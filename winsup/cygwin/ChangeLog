@@ -1,3 +1,7 @@
+2015-02-24  Ken Brown  <kbrown@cornell.edu>
+
+	* include/sys/socket.h (sockatmark): Add prototype.
+
 2015-02-23  Corinna Vinschen  <corinna@vinschen.de>
 
 	* userinfo.h (struct fetch_full_grp_t): Define only when building

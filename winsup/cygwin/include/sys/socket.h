@@ -1,7 +1,7 @@
 /* sys/socket.h
 
    Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2005, 2006, 2009, 2010,
-   2013 Red Hat, Inc.
+   2013, 2015 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -43,6 +43,7 @@ extern "C"
 		  socklen_t *__optlen);
   int shutdown (int, int);
   int socket (int __family, int __type, int __protocol);
+  int sockatmark (int __fd);
   int socketpair (int __domain, int __type, int __protocol, int *__socket_vec);
 
   struct servent *getservbyname (const char *__name, const char *__proto);
