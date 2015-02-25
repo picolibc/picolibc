@@ -9,6 +9,16 @@ What changed:
 
 - Performance improvements of the new account DB handling.
 
+- Since 1.7.34, chmod does not always affect the POSIX permission mask as
+  returned by stat(2) or printed by ls(1), due to the improved POSIX ACL
+  handling.  However, that's still far from perfect, so, as a temporary
+  workaround, chmod now checks if secondary groups and users in the ACL
+  have more permissions than the primary group.  If so, the permissions
+  of the secondary users and groups will be reduced according to the mask
+  given by the new primary group permissions.  I.e, chmod 600 will remove
+  all permissions from the primary group as well as all secondary user and
+  group entries in the ACL.
+
 
 Bug Fixes
 ---------
