@@ -2517,6 +2517,7 @@ client_request_pwdgrp::client_request_pwdgrp (fetch_user_arg_t &arg, bool group)
     case ID_arg:
       _parameters.in.arg.id = arg.id;
       len = sizeof (uint32_t);
+      break;
     default:
       api_fatal ("Fetching account info from cygserver with wrong arg.type "
 		 "%d", arg.type);
