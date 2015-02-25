@@ -1,5 +1,10 @@
 2015-02-25  Corinna Vinschen  <corinna@vinschen.de>
 
+	* security.cc (alloc_sd): Don't apply temporary workaround for chmod
+	to DEF_USER_OBJ, DEF_GROUP_OBJ, and DEF_OTHER_OBJ ACEs.
+
+2015-02-25  Corinna Vinschen  <corinna@vinschen.de>
+
 	* fhandler_tty.cc (fhandler_pty_slave::read): Having no input is not an
 	error condition for tcflush.
 
