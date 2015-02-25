@@ -606,6 +606,14 @@
  * Our macros begin with two underscores to avoid namespace screwage.
  */
 
+/* Deal with _GNU_SOURCE, which implies everything and the kitchen sink */
+#ifdef _GNU_SOURCE
+#undef _XOPEN_SOURCE
+#define	_XOPEN_SOURCE		700
+#define	__BSD_VISIBLE		1
+#define	__GNU_VISIBLE		1
+#endif
+
 /* Deal with IEEE Std. 1003.1-1990, in which _POSIX_C_SOURCE == 1. */
 #if defined(_POSIX_C_SOURCE) && _POSIX_C_SOURCE == 1
 #undef _POSIX_C_SOURCE		/* Probably illegal, but beyond caring now. */
@@ -693,12 +701,6 @@
 #define	__XSI_VISIBLE		0
 #define	__BSD_VISIBLE		0
 #define	__ISO_C_VISIBLE		2011
-#elif defined(_GNU_SOURCE)	/* Everything and the kitchen sink. */
-#define	__POSIX_VISIBLE		200809
-#define	__XSI_VISIBLE		700
-#define	__BSD_VISIBLE		1
-#define	__ISO_C_VISIBLE		2011
-#define	__GNU_VISIBLE		1
 #else				/* Default: everything except __GNU_VISIBLE. */
 #define	__POSIX_VISIBLE		200809
 #define	__XSI_VISIBLE		700
