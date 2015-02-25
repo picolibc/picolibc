@@ -1,7 +1,7 @@
 /* security.cc: NT file access control functions
 
    Copyright 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
-   2008, 2009, 2010, 2011, 2012, 2013, 2014 Red Hat, Inc.
+   2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015 Red Hat, Inc.
 
    Originaly written by Gunther Ebert, gunther.ebert@ixos-leipzig.de
    Completely rewritten by Corinna Vinschen <corinna@vinschen.de>
@@ -776,6 +776,15 @@ alloc_sd (path_conv &pc, uid_t uid, gid_t gid, int attribute,
 		 inheritable ACEs are preceding non-inheritable ACEs. */
 	      ace->Header.AceFlags &= ~INHERITED_ACE;
 	    }
+	  else if (uid == ILLEGAL_UID && gid == ILLEGAL_UID
+		   && ace->Header.AceType == ACCESS_ALLOWED_ACE_TYPE)
+	  /* FIXME: Temporary workaround for the problem that chmod does
+	     not affect the group permissions if other users and groups
+	     in the ACL have more permissions than the primary group due
+	     to the CLASS_OBJ emulation.  The temporary workaround is to
+	     disallow any secondary ACE in the ACL more permissions than
+	     the primary group when writing a new ACL via chmod. */
+	    ace->Mask &= group_allow;
 	  /*
 	   * Add unrelated ACCESS_DENIED_ACE to the beginning but
 	   * behind the owner_deny, ACCESS_ALLOWED_ACE to the end.
