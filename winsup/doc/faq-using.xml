@@ -1142,8 +1142,23 @@ mode 0600 becomes mode 0660. Because we are saying we want these
 files to be readable only by our user, the fix for this is easy:</para>
 
 <screen>
+  $ chgrp `id -g` ~/.ssh/*
+</screen>
+
+<para>That resets the group on these files to your default group
+which should be something like <computeroutput>Users</computeroutput>,
+depending on your local configuration. If that doesn't work, you can
+try something like this instead:</para>
+
+<screen>
   $ chgrp None ~/.ssh/*
 </screen>
+
+<para>That group always exists, but its name is different on
+non-English versions of Windows. You might also want to use a
+domain group instead of a local group if your site uses Windows
+domains. For example, you might want to use the <computeroutput>Domain
+Users</computeroutput> group instead.</para>
 
 <para>For more information on <command>setfacl</command>, see
 <ulink url="https://cygwin.com/cygwin-ug-net/using-utils.html#setfacl"/></para>
