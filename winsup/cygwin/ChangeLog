@@ -1,5 +1,10 @@
 2015-02-25  Corinna Vinschen  <corinna@vinschen.de>
 
+	* security.cc (alloc_sd): Fix comment style.  Remove code unused for
+	years.
+
+2015-02-25  Corinna Vinschen  <corinna@vinschen.de>
+
 	* security.cc (alloc_sd): Add temporary workaround which disallows
 	any secondary user to have more permissions than the primary group
 	in calls to chmod.  Add comment to explain why.

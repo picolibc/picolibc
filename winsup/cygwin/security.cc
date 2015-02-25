@@ -785,11 +785,9 @@ alloc_sd (path_conv &pc, uid_t uid, gid_t gid, int attribute,
 	     disallow any secondary ACE in the ACL more permissions than
 	     the primary group when writing a new ACL via chmod. */
 	    ace->Mask &= group_allow;
-	  /*
-	   * Add unrelated ACCESS_DENIED_ACE to the beginning but
-	   * behind the owner_deny, ACCESS_ALLOWED_ACE to the end.
-	   * FIXME: this would break the order of the inherit-only ACEs
-	   */
+	  /* Add unrelated ACCESS_DENIED_ACE to the beginning but behind
+	     the owner_deny, ACCESS_ALLOWED_ACE to the end.  FIXME: this
+	     would break the order of the inherit-only ACEs. */
 	  status = RtlAddAce (acl, ACL_REVISION,
 			      ace->Header.AceType == ACCESS_DENIED_ACE_TYPE
 			      ?  (owner_deny ? 1 : 0) : MAXDWORD,
@@ -810,32 +808,11 @@ alloc_sd (path_conv &pc, uid_t uid, gid_t gid, int attribute,
     {
       const DWORD inherit = CONTAINER_INHERIT_ACE | OBJECT_INHERIT_ACE
 			    | INHERIT_ONLY_ACE;
-#if 0 /* FIXME: Not done currently as this breaks the canonical order */
-      /* Set deny ACE for owner. */
-      if (owner_deny
-	  && !add_access_denied_ace (acl, ace_off++, owner_deny,
-				     well_known_creator_owner_sid, acl_len, inherit))
-	return NULL;
-      /* Set deny ACE for group here to respect the canonical order,
-	 if this does not impact owner */
-      if (group_deny && !(group_deny & owner_allow)
-	  && !add_access_denied_ace (acl, ace_off++, group_deny,
-				     well_known_creator_group_sid, acl_len, inherit))
-	return NULL;
-#endif
       /* Set allow ACE for owner. */
       if (!add_access_allowed_ace (acl, ace_off++, owner_allow,
 				   well_known_creator_owner_sid, acl_len,
 				   inherit))
 	return NULL;
-#if 0 /* FIXME: Not done currently as this breaks the canonical order and
-	 won't be preserved on chown and chmod */
-      /* Set deny ACE for group, conflicting with owner_allow. */
-      if (group_deny & owner_allow
-	  && !add_access_denied_ace (acl, ace_off++, group_deny,
-				     well_known_creator_group_sid, acl_len, inherit))
-	return NULL;
-#endif
       /* Set allow ACE for group. */
       if (!add_access_allowed_ace (acl, ace_off++, group_allow,
 				   well_known_creator_group_sid, acl_len,
