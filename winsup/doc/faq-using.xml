@@ -1125,6 +1125,26 @@ be not too open:</para>
   -rw-------  1 user group 1766 Aug 26  2013 .ssh/id_rsa
 </screen>
 
+<para>If the second <command>ls</command> command still gives you
+<computeroutput>-rw-rw----</computeroutput> permissions after running
+the above commands, it is proably because the file's primary group
+is your user's personal group:</para>
+
+<screen>
+  $ ls -l .ssh/id_rsa
+  -rw-rw----  1 Fred Fred 1766 Aug 26  2013 .ssh/id_rsa
+</screen>
+
+<para>Since the Windows security system treats groups and users as
+much the same thing, a change to the user or group permissions on
+such a file reflects the change to both user and group. In effect,
+mode 0600 becomes mode 0660. Because we are saying we want these
+files to be readable only by our user, the fix for this is easy:</para>
+
+<screen>
+  $ chgrp None ~/.ssh/*
+</screen>
+
 <para>For more information on <command>setfacl</command>, see
 <ulink url="https://cygwin.com/cygwin-ug-net/using-utils.html#setfacl"/></para>
 </answer></qandaentry>

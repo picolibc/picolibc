@@ -1,3 +1,8 @@
+2015-02-24  Warren Young  <warren@etr-usa.com>
+
+	* faq-using.xml (faq.using.ssh-pubkey-stops-working): Added the
+	chgrp None ~/.ssh/* fix for SSH key failure in Cygwin 1.7.34+.
+
 2015-02-17  Warren Young  <warren@etr-usa.com>
 
 	* faq-using.xml (faq.using.startup-slow): Applied Andrey Repin's
