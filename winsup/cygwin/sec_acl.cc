@@ -258,6 +258,8 @@ setacl (HANDLE handle, path_conv &pc, int nentries, aclent_t *aclbufp,
       switch (aclbufp[i].a_type)
 	{
 	case DEF_USER_OBJ:
+	  allow |= STANDARD_RIGHTS_ALL
+		   | (pc.fs_is_samba () ? 0 : FILE_WRITE_ATTRIBUTES);
 	  if (!add_access_allowed_ace (acl, ace_off++, allow,
 				       well_known_creator_owner_sid, acl_len, inheritance))
 	    return -1;

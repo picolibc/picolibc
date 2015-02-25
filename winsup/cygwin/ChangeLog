@@ -1,5 +1,10 @@
 2015-02-25  Corinna Vinschen  <corinna@vinschen.de>
 
+	* sec_acl.cc (setacl): Always grant default owner entry
+	STANDARD_RIGHTS_ALL and FILE_WRITE_ATTRIBUTES access, too.
+
+2015-02-25  Corinna Vinschen  <corinna@vinschen.de>
+
 	* fhandler_tape.cc (fhandler_dev_tape::_lock): Add cw_sig_restart to
 	cygwait call.
 	* thread.cc (pthread_mutex::lock): Ditto.
