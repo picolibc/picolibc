@@ -1760,8 +1760,7 @@ pthread_mutex::lock ()
   else if (type == PTHREAD_MUTEX_NORMAL /* potentially causes deadlock */
 	   || !pthread::equal (owner, self))
     {
-      /* FIXME: no cancel? */
-      cygwait (win32_obj_id, cw_infinite, cw_sig);
+      cygwait (win32_obj_id, cw_infinite, cw_sig | cw_sig_restart);
       set_owner (self);
     }
   else
@@ -3518,7 +3517,8 @@ semaphore::_timedwait (const struct timespec *abstime)
       timeout.QuadPart = abstime->tv_sec * NSPERSEC
 			 + (abstime->tv_nsec + 99) / 100 + FACTOR;
 
-      switch (cygwait (win32_obj_id, &timeout, cw_cancel | cw_cancel_self | cw_sig_eintr))
+      switch (cygwait (win32_obj_id, &timeout,
+		       cw_cancel | cw_cancel_self | cw_sig_eintr))
 	{
 	case WAIT_OBJECT_0:
 	  break;
@@ -3551,7 +3551,8 @@ semaphore::_timedwait (const struct timespec *abstime)
 int
 semaphore::_wait ()
 {
-  switch (cygwait (win32_obj_id, cw_infinite, cw_cancel | cw_cancel_self | cw_sig_eintr))
+  switch (cygwait (win32_obj_id, cw_infinite,
+		   cw_cancel | cw_cancel_self | cw_sig_eintr))
     {
     case WAIT_OBJECT_0:
       break;

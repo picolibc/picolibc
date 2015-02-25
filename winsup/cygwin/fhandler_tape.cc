@@ -2,7 +2,7 @@
    classes.
 
    Copyright 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009,
-   2010, 2011, 2012, 2013, 2014 Red Hat, Inc.
+   2010, 2011, 2012, 2013, 2014, 2015 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -1160,7 +1160,8 @@ fhandler_dev_tape::_lock (bool cancelable)
   /* O_NONBLOCK is only valid in a read or write call.  Only those are
      cancelable. */
   DWORD timeout = cancelable && is_nonblocking () ? 0 : INFINITE;
-  switch (cygwait (mt_mtx, timeout, cw_sig | cw_cancel | cw_cancel_self))
+  switch (cygwait (mt_mtx, timeout,
+		   cw_sig | cw_sig_restart | cw_cancel | cw_cancel_self))
     {
     case WAIT_OBJECT_0:
       return true;
