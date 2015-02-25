@@ -53,3 +53,6 @@ Bug Fixes
 
 - Avoid data loss on non-blocking pipes after switching back to blocking.
   Addresses: https://cygwin.com/ml/cygwin/2015-02/msg00575.html
+
+- Fix a potential heap corruption in mkgroup and mkpasswd when enumerating
+  Unix users.
