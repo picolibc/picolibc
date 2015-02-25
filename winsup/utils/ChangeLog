@@ -1,3 +1,11 @@
+2015-02-25  Corinna Vinschen  <corinna@vinschen.de>
+
+	* mkgroup.c (MAX_SID_LEN): Remove.  Instead, use SECURITY_MAX_SID_SIZE
+	throughout.
+	(enum_unix_groups): Introduce numeric_psid and rearrange code to avoid
+	potential heap corruption.
+	* mkpasswd.c: Ditto.
+
 2015-02-17  Ken Brown  <kbrown@cornell.edu>
 
 	* dump_setup.cc (check_package_files): Accommodate postinstall

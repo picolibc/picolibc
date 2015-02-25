@@ -1,7 +1,7 @@
 /* mkgroup.c:
 
    Copyright 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
-   2008, 2009, 2010, 2011, 2012, 2013, 2014 Red Hat, Inc.
+   2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015 Red Hat, Inc.
 
    This file is part of Cygwin.
 
@@ -33,8 +33,6 @@
 #include <ntdef.h>
 
 #define print_win_error(x) _print_win_error(x, __LINE__)
-
-#define MAX_SID_LEN 40
 
 SID_IDENTIFIER_AUTHORITY sid_world_auth = {SECURITY_WORLD_SID_AUTHORITY};
 SID_IDENTIFIER_AUTHORITY sid_nt_auth = {SECURITY_NT_AUTHORITY};
@@ -132,7 +130,8 @@ enum_unix_groups (domlist_t *mach, const char *sep, DWORD id_offset,
   WCHAR dom[MAX_DOMAIN_NAME_LEN + 1];
   DWORD glen, dlen, sidlen;
   PSID psid;
-  char psid_buffer[MAX_SID_LEN];
+  PSID numeric_psid;
+  char psid_buffer[SECURITY_MAX_SID_SIZE];
   SID_NAME_USE acc_type;
 
   int ret = mbstowcs (machine, mach->str, INTERNET_MAX_HOST_NAME_LENGTH + 1);
@@ -143,12 +142,13 @@ enum_unix_groups (domlist_t *mach, const char *sep, DWORD id_offset,
       return;
     }
 
-  if (!AllocateAndInitializeSid (&auth, 2, 2, 0, 0, 0, 0, 0, 0, 0, &psid))
+  if (!AllocateAndInitializeSid (&auth, 2, 2, 0, 0, 0, 0, 0, 0, 0,
+				 &numeric_psid))
     return;
 
   if (!(grp_list = strdup (unix_grp_list)))
     {
-      FreeSid (psid);
+      FreeSid (numeric_psid);
       return;
     }
 
@@ -159,14 +159,16 @@ enum_unix_groups (domlist_t *mach, const char *sep, DWORD id_offset,
 	  PWCHAR p = wcpcpy (grp, L"Unix Group\\");
 	  ret = mbstowcs (p, gstr, GNLEN + 1);
 	  if (ret < 1 || ret >= GNLEN + 1)
-	    fprintf (stderr, "%s: Invalid group name '%s'.  Skipping...\n",
-		     program_invocation_short_name, gstr);
-	  else if (LookupAccountNameW (machine, grp,
-				       psid = (PSID) psid_buffer,
-				       (sidlen = MAX_SID_LEN, &sidlen),
-				       dom,
-				       (dlen = MAX_DOMAIN_NAME_LEN + 1, &dlen),
-				       &acc_type))
+	    {
+	      fprintf (stderr, "%s: Invalid group name '%s'.  Skipping...\n",
+		       program_invocation_short_name, gstr);
+	      continue;
+	    }
+	  psid = (PSID) psid_buffer;
+	  sidlen = SECURITY_MAX_SID_SIZE;
+	  dlen = MAX_DOMAIN_NAME_LEN + 1;
+	  if (LookupAccountNameW (machine, grp, psid, &sidlen,
+				  dom, &dlen, &acc_type))
 	    printf ("%s%s%ls:%s:%" PRIu32 ":\n",
 		    "Unix_Group",
 		    sep,
@@ -196,13 +198,13 @@ enum_unix_groups (domlist_t *mach, const char *sep, DWORD id_offset,
 	    }
 	  for (; start <= stop; ++ start)
 	    {
+	      psid = numeric_psid;
 	      *GetSidSubAuthority (psid, *GetSidSubAuthorityCount(psid) - 1)
 	      = start;
-	      if (LookupAccountSidW (machine, psid,
-				     grp, (glen = GNLEN + 1, &glen),
-				     dom,
-				     (dlen = MAX_DOMAIN_NAME_LEN + 1, &dlen),
-				     &acc_type)
+	      glen = GNLEN + 1;
+	      dlen = MAX_DOMAIN_NAME_LEN + 1;
+	      if (LookupAccountSidW (machine, psid, grp, &glen,
+				     dom, &dlen, &acc_type)
 		  && !iswdigit (grp[0]))
 		printf ("%s%s%ls:%s:%" PRIu32 ":\n",
 			"Unix_Group",
@@ -215,7 +217,7 @@ enum_unix_groups (domlist_t *mach, const char *sep, DWORD id_offset,
     }
 
   free (grp_list);
-  FreeSid (psid);
+  FreeSid (numeric_psid);
 }
 
 static int
@@ -278,9 +280,9 @@ enum_local_groups (domlist_t *mach, const char *sep,
 	{
 	  WCHAR domain_name[MAX_DOMAIN_NAME_LEN + 1];
 	  DWORD domname_len = MAX_DOMAIN_NAME_LEN + 1;
-	  char psid_buffer[MAX_SID_LEN];
+	  char psid_buffer[SECURITY_MAX_SID_SIZE];
 	  PSID psid = (PSID) psid_buffer;
-	  DWORD sid_length = MAX_SID_LEN;
+	  DWORD sid_length = SECURITY_MAX_SID_SIZE;
 	  DWORD gid;
 	  SID_NAME_USE acc_type;
 	  PDBGSID pdsid;
@@ -301,7 +303,7 @@ enum_local_groups (domlist_t *mach, const char *sep,
 	      wcscpy (domname, domain_name);
 	      wcscat (domname, L"\\");
 	      wcscat (domname, buffer[i].lgrpi0_name);
-	      sid_length = MAX_SID_LEN;
+	      sid_length = SECURITY_MAX_SID_SIZE;
 	      domname_len = MAX_DOMAIN_NAME_LEN + 1;
 	      if (!LookupAccountNameW (machine, domname,
 				       psid, &sid_length,
@@ -417,9 +419,9 @@ enum_groups (domlist_t *mach, const char *sep, DWORD id_offset,
 	{
 	  WCHAR domain_name[MAX_DOMAIN_NAME_LEN + 1];
 	  DWORD domname_len = MAX_DOMAIN_NAME_LEN + 1;
-	  char psid_buffer[MAX_SID_LEN];
+	  char psid_buffer[SECURITY_MAX_SID_SIZE];
 	  PSID psid = (PSID) psid_buffer;
-	  DWORD sid_length = MAX_SID_LEN;
+	  DWORD sid_length = SECURITY_MAX_SID_SIZE;
 	  SID_NAME_USE acc_type;
 
 	  int gid = buffer[i].grpi2_group_id;
@@ -439,7 +441,7 @@ enum_groups (domlist_t *mach, const char *sep, DWORD id_offset,
 	      wcscpy (domname, machine);
 	      wcscat (domname, L"\\");
 	      wcscat (domname, buffer[i].grpi2_name);
-	      sid_length = MAX_SID_LEN;
+	      sid_length = SECURITY_MAX_SID_SIZE;
 	      domname_len = MAX_DOMAIN_NAME_LEN + 1;
 	      if (!LookupAccountNameW (machine, domname, psid, &sid_length,
 				       domain_name, &domname_len, &acc_type))
