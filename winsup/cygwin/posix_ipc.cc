@@ -126,7 +126,6 @@ ipc_mutex_lock (HANDLE mtx, bool eintr)
     case WAIT_ABANDONED_0:
       return 0;
     case WAIT_SIGNALED:
-      _my_tls.call_signal_handler ();
       set_errno (EINTR);
       return 1;
     default:

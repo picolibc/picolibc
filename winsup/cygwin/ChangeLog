@@ -1,5 +1,9 @@
 2015-02-26  Corinna Vinschen  <corinna@vinschen.de>
 
+	* posix_ipc.cc (ipc_mutex_lock): Revert unneeded call to signal handler.
+
+2015-02-26  Corinna Vinschen  <corinna@vinschen.de>
+
 	* posix_ipc.cc (ipc_mutex_lock): Add bool parameter to influence if
 	cygwait should be in EINTR or in restart mode.  Call signal handler
 	if in EINTR mode.
