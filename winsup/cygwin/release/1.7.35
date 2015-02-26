@@ -56,3 +56,9 @@ Bug Fixes
 
 - Fix a potential heap corruption in mkgroup and mkpasswd when enumerating
   Unix users.
+
+- Regression in 1.7.34:  A patch to the pty handling fixing the problem
+  reported in https://cygwin.com/ml/cygwin-developers/2014-11/msg00000.html
+  was incomplete and lead to undesired buffering in non-canonical mode.
+  This should be fixed now.
+  Addresses: https://cygwin.com/ml/cygwin/2015-02/msg00608.html

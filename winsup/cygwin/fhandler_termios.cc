@@ -393,15 +393,17 @@ fhandler_termios::line_edit (const char *rptr, size_t nread, termios& ti,
     }
 
   /* If we didn't write all bytes in non-canonical mode, write them now. */
-  if (!iscanon && ralen > 0)
+  if (!iscanon && ralen > 0
+      && (ret == line_edit_ok || ret == line_edit_input_done))
     {
-      if (ret == line_edit_ok)
-      	{
-	  int status = accept_input ();
-	  if (status != 1)
-	    nread += ralen;
+      int status = accept_input ();
+      if (status != 1)
+	{
+	  ret = status ? line_edit_error : line_edit_pipe_full;
+	  nread += ralen;
 	}
-      ret = line_edit_input_done;
+      else
+	ret = line_edit_input_done;
     }
 
   /* Adding one compensates for the postdecrement in the above loop. */
