@@ -1,6 +1,6 @@
 /* posix_ipc.cc: POSIX IPC API for Cygwin.
 
-   Copyright 2007, 2008, 2009, 2010, 2011, 2012, 2014 Red Hat, Inc.
+   Copyright 2007, 2008, 2009, 2010, 2011, 2012, 2014, 2015 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -117,14 +117,16 @@ ipc_mutex_init (HANDLE *pmtx, const char *name)
 }
 
 static int
-ipc_mutex_lock (HANDLE mtx)
+ipc_mutex_lock (HANDLE mtx, bool eintr)
 {
-  switch (cygwait (mtx, cw_infinite, cw_sig_eintr | cw_cancel | cw_cancel_self))
+  switch (cygwait (mtx, cw_infinite, cw_cancel | cw_cancel_self
+				     | (eintr ? cw_sig_eintr : cw_sig_restart)))
     {
     case WAIT_OBJECT_0:
     case WAIT_ABANDONED_0:
       return 0;
     case WAIT_SIGNALED:
+      _my_tls.call_signal_handler ();
       set_errno (EINTR);
       return 1;
     default:
@@ -662,7 +664,7 @@ mq_getattr (mqd_t mqd, struct mq_attr *mqstat)
 	}
       mqhdr = mqinfo->mqi_hdr;
       attr = &mqhdr->mqh_attr;
-      if ((n = ipc_mutex_lock (mqinfo->mqi_lock)) != 0)
+      if ((n = ipc_mutex_lock (mqinfo->mqi_lock, false)) != 0)
 	{
 	  errno = n;
 	  __leave;
@@ -698,7 +700,7 @@ mq_setattr (mqd_t mqd, const struct mq_attr *mqstat, struct mq_attr *omqstat)
 	}
       mqhdr = mqinfo->mqi_hdr;
       attr = &mqhdr->mqh_attr;
-      if ((n = ipc_mutex_lock (mqinfo->mqi_lock)) != 0)
+      if ((n = ipc_mutex_lock (mqinfo->mqi_lock, false)) != 0)
 	{
 	  errno = n;
 	  __leave;
@@ -742,7 +744,7 @@ mq_notify (mqd_t mqd, const struct sigevent *notification)
 	  __leave;
 	}
       mqhdr = mqinfo->mqi_hdr;
-      if ((n = ipc_mutex_lock (mqinfo->mqi_lock)) != 0)
+      if ((n = ipc_mutex_lock (mqinfo->mqi_lock, false)) != 0)
 	{
 	  errno = n;
 	  __leave;
@@ -810,7 +812,7 @@ _mq_send (mqd_t mqd, const char *ptr, size_t len, unsigned int prio,
       mqhdr = mqinfo->mqi_hdr;        /* struct pointer */
       mptr = (int8_t *) mqhdr;        /* byte pointer */
       attr = &mqhdr->mqh_attr;
-      if ((n = ipc_mutex_lock (mqinfo->mqi_lock)) != 0)
+      if ((n = ipc_mutex_lock (mqinfo->mqi_lock, true)) != 0)
 	{
 	  errno = n;
 	  __leave;
@@ -938,7 +940,7 @@ _mq_receive (mqd_t mqd, char *ptr, size_t maxlen, unsigned int *priop,
       mqhdr = mqinfo->mqi_hdr;        /* struct pointer */
       mptr = (int8_t *) mqhdr;        /* byte pointer */
       attr = &mqhdr->mqh_attr;
-      if ((n = ipc_mutex_lock (mqinfo->mqi_lock)) != 0)
+      if ((n = ipc_mutex_lock (mqinfo->mqi_lock, true)) != 0)
 	{
 	  errno = n;
 	  __leave;
