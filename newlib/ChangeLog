@@ -1,3 +1,8 @@
+2015-02-26  Steve Ellcey  <sellcey@imgtec.com>
+
+	* libc/machine/mips/memcpy.S: Fix macro indentation and typos in
+	comments.
+
 2015-02-24  Jon TURNEY  <jon.turney@dronecode.org.uk>
 
 	* libc/include/sys/cdefs.h (_GNU_SOURCE): Move check so it has an
