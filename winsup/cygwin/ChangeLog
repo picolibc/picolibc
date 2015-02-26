@@ -1,5 +1,11 @@
 2015-02-26  Corinna Vinschen  <corinna@vinschen.de>
 
+	* ldap.cc (cyg_ldap::wait): Call cygwait with cw_infinite timeout value
+	and with cw_sig_restart instead of cw_sig_eintr.  Drop useless
+	_my_tls.call_signal_handler call.  Return EIO if cygwait failed.
+
+2015-02-26  Corinna Vinschen  <corinna@vinschen.de>
+
 	* posix_ipc.cc (ipc_mutex_lock): Revert unneeded call to signal handler.
 
 2015-02-26  Corinna Vinschen  <corinna@vinschen.de>

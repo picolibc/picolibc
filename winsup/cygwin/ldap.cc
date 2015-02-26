@@ -142,11 +142,10 @@ cyg_ldap::wait (cygthread *thr)
 {
   if (!thr)
     return EIO;
-  if (cygwait (*thr, INFINITE, cw_sig | cw_sig_eintr) != WAIT_OBJECT_0)
+  if (cygwait (*thr, cw_infinite, cw_sig | cw_sig_restart) != WAIT_OBJECT_0)
     {
       thr->terminate_thread ();
-      _my_tls.call_signal_handler ();
-      return EINTR;
+      return EIO;
     }
   thr->detach ();
   return 0;
