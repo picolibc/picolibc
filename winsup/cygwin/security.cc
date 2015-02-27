@@ -239,9 +239,9 @@ get_attribute_from_acl (mode_t *attribute, PACL acl, PSID owner_sid,
 			PSID group_sid, bool grp_member)
 {
   ACCESS_ALLOWED_ACE *ace;
-  int allow = 0;
-  int deny = 0;
-  int *flags, *anti;
+  mode_t allow = 0;
+  mode_t deny = 0;
+  mode_t *flags, *anti;
 
   for (DWORD i = 0; i < acl->AceCount; ++i)
     {
@@ -301,6 +301,17 @@ get_attribute_from_acl (mode_t *attribute, PACL acl, PSID owner_sid,
 	    *flags |= ((!(*anti & S_IWUSR)) ? S_IWUSR : 0);
 	  if (ace->Mask & FILE_EXEC_BITS)
 	    *flags |= ((!(*anti & S_IXUSR)) ? S_IXUSR : 0);
+	  /* Apply deny mask to group if group SID == owner SID. */
+	  if (group_sid && RtlEqualSid (owner_sid, group_sid)
+	      && ace->Header.AceType == ACCESS_DENIED_ACE_TYPE)
+	    {
+	      if (ace->Mask & FILE_READ_BITS)
+		*flags |= ((!(*anti & S_IRUSR)) ? S_IRGRP : 0);
+	      if (ace->Mask & FILE_WRITE_BITS)
+		*flags |= ((!(*anti & S_IWUSR)) ? S_IWGRP : 0);
+	      if (ace->Mask & FILE_EXEC_BITS)
+		*flags |= ((!(*anti & S_IXUSR)) ? S_IXGRP : 0);
+	    }
 	}
       else if (ace_sid == group_sid)
 	{
@@ -331,6 +342,11 @@ get_attribute_from_acl (mode_t *attribute, PACL acl, PSID owner_sid,
 	}
     }
   *attribute &= ~(S_IRWXU | S_IRWXG | S_IRWXO | S_ISVTX | S_ISGID | S_ISUID);
+#if 0
+  /* Disable owner/group permissions equivalence if owner SID == group SID.
+     It's technically not quite correct, but it helps in case a security
+     conscious application checks if a file has too open permissions.  In
+     fact, since owner == group, there's no security issue here. */
   if (owner_sid && group_sid && RtlEqualSid (owner_sid, group_sid)
       /* FIXME: temporary exception for /var/empty */
       && well_known_system_sid != group_sid)
@@ -340,6 +356,7 @@ get_attribute_from_acl (mode_t *attribute, PACL acl, PSID owner_sid,
 		| ((allow & S_IWUSR) ? S_IWGRP : 0)
 		| ((allow & S_IXUSR) ? S_IXGRP : 0));
     }
+#endif
   *attribute |= allow;
 }
 

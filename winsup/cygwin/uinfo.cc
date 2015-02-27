@@ -2053,12 +2053,31 @@ pwdgrp::fetch_account_from_windows (fetch_user_arg_t &arg, cyg_ldap *pldap)
       switch (acc_type)
       	{
 	case SidTypeUser:
-	  /* Don't allow users as group.  While this is technically possible,
-	     it doesn't make sense in a POSIX scenario.  It *is* used for
-	     Microsoft Accounts, but those are converted to well-known groups
-	     above. */
-	  if (is_group ())
-	    return NULL;
+	  if (is_group () && acc_type == SidTypeUser)
+	    {
+	      /* Don't allow users as group.  While this is technically
+		 possible, it doesn't make sense in a POSIX scenario.
+	 
+		 And then there are the so-called Microsoft Accounts.  The
+		 special SID with security authority 11 is converted to a
+		 well known group above, but additionally, when logging in
+		 with such an account, the user's primary group SID is the
+		 user's SID.  Those we let pass, but no others. */
+	      bool its_ok = false;
+	      if (wincap.has_microsoft_accounts ())
+		{
+		  struct cyg_USER_INFO_24 *ui24;
+		  if (NetUserGetInfo (NULL, name, 24, (PBYTE *) &ui24)
+		      == NERR_Success)
+		    {
+		      if (ui24->usri24_internet_identity)
+			its_ok = true;
+		      NetApiBufferFree (ui24);
+		    }
+		}
+	      if (!its_ok)
+		return NULL;
+	    }
 	  /*FALLTHRU*/
 	case SidTypeGroup:
 	case SidTypeAlias:
@@ -2230,25 +2249,6 @@ pwdgrp::fetch_account_from_windows (fetch_user_arg_t &arg, cyg_ldap *pldap)
 		    {
 		      debug_printf ("NetUserGetInfo(%W) %u", name, nas);
 		      break;
-		    }
-		  /* Logging in with a Microsoft Account, the user's primary
-		     group SID is the user's SID.  Security sensitive tools
-		     expecting tight file permissions choke on that.  We need
-		     an explicit primary group which is not identical to the
-		     user account.  Unfortunately, while the default primary
-		     group of the account in SAM is still "None", "None" is not
-		     in the user token group list.  So, what we do here is to
-		     use "Users" as a sane default primary group instead. */
-		  if (wincap.has_microsoft_accounts ())
-		    {
-		      struct cyg_USER_INFO_24 *ui24;
-		      nas = NetUserGetInfo (NULL, name, 24, (PBYTE *) &ui24);
-		      if (nas == NERR_Success)
-			{
-			  if (ui24->usri24_internet_identity)
-			    gid = DOMAIN_ALIAS_RID_USERS;
-			  NetApiBufferFree (ui24);
-			}
 		    }
 		  /* Fetch user attributes. */
 		  home = cygheap->pg.get_home (ui, sid, dom, name,

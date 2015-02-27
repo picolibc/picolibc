@@ -1,3 +1,20 @@
+2015-02-27  Corinna Vinschen  <corinna@vinschen.de>
+
+	* sec_acl.cc (setacl): Fix bug which leads to ACE duplication in
+	case owner SID == group SID.
+	(getacl): Reverse order of SID test against group or owner sid to
+	prefer owner attributes over group attributes.  Disable setting group
+	permissions equivalent to owner permissions if owner == group.  Add
+	comment to explain why.  Fix indentation.
+	* security.cc (get_attribute_from_acl): Change type of local variables
+	containing permission to mode_t.  Apply deny mask to group if group SID
+	== owner SID to avoid Everyone permissions to spill over into group
+	permissions.  Disable setting group permissions equivalent to owner
+	permissions if owner == group.  Add comment to explain why.
+	* uinfo.cc (pwdgrp::fetch_account_from_windows): Allow user SID as
+	group account if user is a "Microsoft Account".  Explain why.  Drop
+	workaround enforcing primary group "Users" for "Microsoft Accounts".
+
 2015-02-26  Corinna Vinschen  <corinna@vinschen.de>
 
 	* ldap.cc (cyg_ldap::wait): Call cygwait with cw_infinite timeout value

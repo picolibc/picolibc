@@ -169,7 +169,7 @@ setacl (HANDLE handle, path_conv &pc, int nentries, aclent_t *aclbufp,
 	*allow |= FILE_DELETE_CHILD;
       invalid[i] = true;
     }
-  bool isownergroup = (owner_sid == group_sid);
+  bool isownergroup = (owner == group);
   DWORD owner_deny = ~owner_allow & (group_allow | other_allow);
   owner_deny &= ~(STANDARD_RIGHTS_READ
 		  | FILE_READ_ATTRIBUTES | FILE_WRITE_ATTRIBUTES);
@@ -179,27 +179,27 @@ setacl (HANDLE handle, path_conv &pc, int nentries, aclent_t *aclbufp,
   /* Set deny ACE for owner. */
   if (owner_deny
       && !add_access_denied_ace (acl, ace_off++, owner_deny,
-				 owner_sid, acl_len, NO_INHERITANCE))
+				 owner, acl_len, NO_INHERITANCE))
     return -1;
   /* Set deny ACE for group here to respect the canonical order,
      if this does not impact owner */
   if (group_deny && !(group_deny & owner_allow) && !isownergroup
       && !add_access_denied_ace (acl, ace_off++, group_deny,
-				 group_sid, acl_len, NO_INHERITANCE))
+				 group, acl_len, NO_INHERITANCE))
     return -1;
   /* Set allow ACE for owner. */
   if (!add_access_allowed_ace (acl, ace_off++, owner_allow,
-			       owner_sid, acl_len, NO_INHERITANCE))
+			       owner, acl_len, NO_INHERITANCE))
     return -1;
   /* Set deny ACE for group, if still needed. */
   if (group_deny & owner_allow && !isownergroup
       && !add_access_denied_ace (acl, ace_off++, group_deny,
-				 group_sid, acl_len, NO_INHERITANCE))
+				 group, acl_len, NO_INHERITANCE))
     return -1;
   /* Set allow ACE for group. */
   if (!isownergroup
       && !add_access_allowed_ace (acl, ace_off++, group_allow,
-                                  group_sid, acl_len, NO_INHERITANCE))
+                                  group, acl_len, NO_INHERITANCE))
     return -1;
   /* Set allow ACE for everyone. */
   if (!add_access_allowed_ace (acl, ace_off++, other_allow,
@@ -451,15 +451,15 @@ getacl (HANDLE handle, path_conv &pc, int nentries, aclent_t *aclbufp)
 	      type = OTHER_OBJ;
 	      id = ILLEGAL_GID;
 	    }
-	  else if (ace_sid == group_sid)
-	    {
-	      type = GROUP_OBJ;
-	      id = gid;
-	    }
 	  else if (ace_sid == owner_sid)
 	    {
 	      type = USER_OBJ;
 	      id = uid;
+	    }
+	  else if (ace_sid == group_sid)
+	    {
+	      type = GROUP_OBJ;
+	      id = gid;
 	    }
 	  else if (ace_sid == well_known_creator_group_sid)
 	    {
@@ -563,19 +563,26 @@ getacl (HANDLE handle, path_conv &pc, int nentries, aclent_t *aclbufp)
     }
   if ((pos = searchace (lacl, MAX_ACL_ENTRIES, 0)) < 0)
     pos = MAX_ACL_ENTRIES;
-  if (aclbufp) {
-    if (owner_sid == group_sid)
-      lacl[0].a_perm = lacl[1].a_perm;
-    if (pos > nentries)
-      {
-	set_errno (ENOSPC);
-	return -1;
-      }
-    memcpy (aclbufp, lacl, pos * sizeof (aclent_t));
-    for (i = 0; i < pos; ++i)
-      aclbufp[i].a_perm &= ~(DENY_R | DENY_W | DENY_X);
-    aclsort32 (pos, 0, aclbufp);
-  }
+  if (aclbufp)
+    {
+#if 0
+      /* Disable owner/group permissions equivalence if owner SID == group SID.
+	 It's technically not quite correct, but it helps in case a security
+	 conscious application checks if a file has too open permissions.  In
+	 fact, since owner == group, there's no security issue here. */
+      if (owner_sid == group_sid)
+	lacl[1].a_perm = lacl[0].a_perm;
+#endif
+      if (pos > nentries)
+	{
+	  set_errno (ENOSPC);
+	  return -1;
+	}
+      memcpy (aclbufp, lacl, pos * sizeof (aclent_t));
+      for (i = 0; i < pos; ++i)
+	aclbufp[i].a_perm &= ~(DENY_R | DENY_W | DENY_X);
+      aclsort32 (pos, 0, aclbufp);
+    }
   syscall_printf ("%R = getacl(%S)", pos, pc.get_nt_native_path ());
   return pos;
 }
