@@ -1,5 +1,10 @@
 2015-02-27  Corinna Vinschen  <corinna@vinschen.de>
 
+	* security.cc (alloc_sd): For directories, mark inherited ACEs
+	inheritable to better follow POSIX 1003.1e rules.
+
+2015-02-27  Corinna Vinschen  <corinna@vinschen.de>
+
 	* sec_acl.cc (getacl): Add mask even if all group and secondary account
 	permissions are 0.
 

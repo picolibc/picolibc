@@ -792,6 +792,12 @@ alloc_sd (path_conv &pc, uid_t uid, gid_t gid, int attribute,
 		 opening a file's security tab.  Explorer complains if
 		 inheritable ACEs are preceding non-inheritable ACEs. */
 	      ace->Header.AceFlags &= ~INHERITED_ACE;
+	      /* However, if the newly created object is a directory,
+	         it inherits the default ACL from its parent, so mark
+		 all unrelated, inherited ACEs inheritable. */
+	      if (S_ISDIR (attribute))
+		ace->Header.AceFlags |= CONTAINER_INHERIT_ACE
+					| OBJECT_INHERIT_ACE;
 	    }
 	  else if (uid == ILLEGAL_UID && gid == ILLEGAL_UID
 		   && ace->Header.AceType == ACCESS_ALLOWED_ACE_TYPE
