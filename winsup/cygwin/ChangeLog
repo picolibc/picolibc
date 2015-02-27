@@ -1,5 +1,10 @@
 2015-02-27  Corinna Vinschen  <corinna@vinschen.de>
 
+	* sec_acl.cc (getacl): Add mask even if all group and secondary account
+	permissions are 0.
+
+2015-02-27  Corinna Vinschen  <corinna@vinschen.de>
+
 	* uinfo.cc (pwdgrp::fetch_account_from_windows): Drop redundant test
 	for SidTypeUser.
 

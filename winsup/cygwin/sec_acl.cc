@@ -423,6 +423,7 @@ getacl (HANDLE handle, path_conv &pc, int nentries, aclent_t *aclbufp)
 
   int pos, i, types_def = 0;
   int pgrp_pos = 1, def_pgrp_pos = -1;
+  bool has_class_perm = false, has_def_class_perm = false;
   mode_t class_perm = 0, def_class_perm = 0;
 
   if (!acl_exists || !acl)
@@ -485,7 +486,10 @@ getacl (HANDLE handle, path_conv &pc, int nentries, aclent_t *aclbufp)
 		  getace (lacl[pos], type, id, ace->Mask, ace->Header.AceType);
 		  /* Fix up CLASS_OBJ value. */
 		  if (type == USER || type == GROUP)
-		    class_perm |= lacl[pos].a_perm;
+		    {
+		      has_class_perm = true;
+		      class_perm |= lacl[pos].a_perm;
+		    }
 		}
 	    }
 	  if ((ace->Header.AceFlags
@@ -503,7 +507,10 @@ getacl (HANDLE handle, path_conv &pc, int nentries, aclent_t *aclbufp)
 		  getace (lacl[pos], type, id, ace->Mask, ace->Header.AceType);
 		  /* Fix up DEF_CLASS_OBJ value. */
 		  if (type == DEF_USER || type == DEF_GROUP)
-		    def_class_perm |= lacl[pos].a_perm;
+		    {
+		      has_def_class_perm = true;
+		      def_class_perm |= lacl[pos].a_perm;
+		    }
 		  /* And note the position of the DEF_GROUP_OBJ entry. */
 		  else if (type == DEF_GROUP_OBJ)
 		    def_pgrp_pos = pos;
@@ -514,7 +521,7 @@ getacl (HANDLE handle, path_conv &pc, int nentries, aclent_t *aclbufp)
 	 CLASS_OBJ entry. The CLASS_OBJ permissions are the or'ed permissions
 	 of the primary group permissions and all secondary user and group
 	 permissions. */
-      if (class_perm && (pos = searchace (lacl, MAX_ACL_ENTRIES, 0)) >= 0)
+      if (has_class_perm && (pos = searchace (lacl, MAX_ACL_ENTRIES, 0)) >= 0)
 	{
 	  lacl[pos].a_type = CLASS_OBJ;
 	  lacl[pos].a_id = ILLEGAL_GID;
@@ -552,7 +559,8 @@ getacl (HANDLE handle, path_conv &pc, int nentries, aclent_t *aclbufp)
 	 fake a matching DEF_CLASS_OBJ entry. The DEF_CLASS_OBJ permissions are
 	 the or'ed permissions of the primary group default permissions and all
 	 secondary user and group default permissions. */
-      if (def_class_perm && (pos = searchace (lacl, MAX_ACL_ENTRIES, 0)) >= 0)
+      if (has_def_class_perm
+	  && (pos = searchace (lacl, MAX_ACL_ENTRIES, 0)) >= 0)
 	{
 	  lacl[pos].a_type = DEF_CLASS_OBJ;
 	  lacl[pos].a_id = ILLEGAL_GID;
