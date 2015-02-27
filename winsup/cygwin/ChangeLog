@@ -1,5 +1,10 @@
 2015-02-27  Corinna Vinschen  <corinna@vinschen.de>
 
+	* uinfo.cc (pwdgrp::fetch_account_from_windows): Drop redundant test
+	for SidTypeUser.
+
+2015-02-27  Corinna Vinschen  <corinna@vinschen.de>
+
 	* sec_acl.cc (setacl): Fix bug which leads to ACE duplication in
 	case owner SID == group SID.
 	(getacl): Reverse order of SID test against group or owner sid to

@@ -2053,7 +2053,7 @@ pwdgrp::fetch_account_from_windows (fetch_user_arg_t &arg, cyg_ldap *pldap)
       switch (acc_type)
       	{
 	case SidTypeUser:
-	  if (is_group () && acc_type == SidTypeUser)
+	  if (is_group ())
 	    {
 	      /* Don't allow users as group.  While this is technically
 		 possible, it doesn't make sense in a POSIX scenario.
