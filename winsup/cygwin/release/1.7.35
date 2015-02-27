@@ -19,6 +19,15 @@ What changed:
   all permissions from the primary group as well as all secondary user and
   group entries in the ACL.
 
+- Change handling of group permissions if owner SID == group SID.  Now the
+  group permissions don't mirror the user permissions anymore, thus leading
+  to less hassle with security-conscious applications.
+
+- Allow group SID to be the same as owner SID for "Microsoft Accounts".
+  Those have the group in their user token set to the owner SID by default.
+  Drop the workaround to change their primary group to "Users".  It's not
+  required anymore due to the aforementioned changes.
+
 
 Bug Fixes
 ---------
@@ -45,6 +54,12 @@ Bug Fixes
   - SETACL accidentally missed to grant owner FILE_WRITE_ATTRIBUTES access.
     Addresses: https://cygwin.com/ml/cygwin/2015-02/msg00457.html
 
+- Keep SETACL from duplicating user/group deny/allow ACEs if owner SID is
+  the same as group SID.
+
+- When creating directories, keep permissions inherited from parent directory
+  inheritable, per POSIX 1003.1e.
+
 - 64 bit: Export forgotten symbol __mempcpy.
   Addresses: https://cygwin.com/ml/cygwin/2015-02/msg00394.html
 
@@ -62,3 +77,6 @@ Bug Fixes
   was incomplete and lead to undesired buffering in non-canonical mode.
   This should be fixed now.
   Addresses: https://cygwin.com/ml/cygwin/2015-02/msg00608.html
+
+- Fix signal handling in a few functions.
+  Partially addresses: https://cygwin.com/ml/cygwin/2015-02/msg00762.html
