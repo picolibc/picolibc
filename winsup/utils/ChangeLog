@@ -1,3 +1,9 @@
+2015-02-28  Corinna Vinschen  <corinna@vinschen.de>
+
+	* getfacl.c (usage): Change --all to --access, --dir to --default.
+	Align text to output of Linux tool.
+	(longopts): Add --access and --default options.
+
 2015-02-25  Corinna Vinschen  <corinna@vinschen.de>
 
 	* mkgroup.c (MAX_SID_LEN): Remove.  Instead, use SECURITY_MAX_SID_SIZE

@@ -1,6 +1,6 @@
 /* getfacl.c
 
-   Copyright 2000, 2001, 2002, 2003, 2004, 2009, 2011, 2014 Red Hat Inc.
+   Copyright 2000, 2001, 2002, 2003, 2004, 2009, 2011, 2014, 2015 Red Hat Inc.
 
    Written by Corinna Vinschen <vinschen@redhat.com>
 
@@ -69,11 +69,9 @@ usage (FILE * stream)
 	    "\n"
 	    "Display file and directory access control lists (ACLs).\n"
 	    "\n"
-	    "  -a, --all      display the filename, the owner, the group, and\n"
-	    "                 the ACL of the file\n"
-	    "  -d, --dir      display the filename, the owner, the group, and\n"
-	    "                 the default ACL of the directory, if it exists\n"
-	    "  -h, --help     output usage information and exit\n"
+	    "  -a, --access   display the file access control list\n"
+	    "  -d, --default  display the default access control list\n"
+	    "  -h, --help     print help explaining the command line options\n"
 	    "  -n, --noname   display user and group IDs instead of names\n"
 	    "  -V, --version  output version information and exit\n"
 	    "\n"
@@ -113,7 +111,9 @@ usage (FILE * stream)
 }
 
 struct option longopts[] = {
+  {"access", no_argument, NULL, 'a'},
   {"all", no_argument, NULL, 'a'},
+  {"default", no_argument, NULL, 'd'},
   {"dir", no_argument, NULL, 'd'},
   {"help", no_argument, NULL, 'h'},
   {"noname", no_argument, NULL, 'n'},
