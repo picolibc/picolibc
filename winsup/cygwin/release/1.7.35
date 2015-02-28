@@ -28,6 +28,9 @@ What changed:
   Drop the workaround to change their primary group to "Users".  It's not
   required anymore due to the aforementioned changes.
 
+- Change getfacl long options from --all to --access and from --dir to
+  --default, along the lines of the Linux getfacl tool.
+
 
 Bug Fixes
 ---------
