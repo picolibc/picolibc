@@ -518,12 +518,10 @@ Other options:
 Usage: getfacl [-adn] FILE [FILE2...]
 
 Display file and directory access control lists (ACLs).
-
-  -a, --all      display the filename, the owner, the group, and
-                 the ACL of the file
-  -d, --dir      display the filename, the owner, the group, and
-                 the default ACL of the directory, if it exists
-  -h, --help     output usage information and exit
+ 
+  -a, --access   display the file access control list
+  -d, --default  display the default access control list
+  -h, --help     print help explaining the command line options
   -n, --noname   display user and group IDs instead of names
   -V, --version  output version information and exit
 

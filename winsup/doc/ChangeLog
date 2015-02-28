@@ -1,3 +1,7 @@
+2015-02-28  Corinna Vinschen  <corinna@vinschen.de>
+
+	* utils.xml (getfacl): Adjust options to option nmame change.
+
 2015-02-25  Warren Young  <warren@etr-usa.com>
 
 	* faq-using.xml (faq.using.ssh-pubkey-stops-working): More
