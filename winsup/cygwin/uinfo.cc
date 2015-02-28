@@ -574,8 +574,9 @@ pwdgrp::add_line (char *eptr)
 				       max_lines * pwdgrp_buf_elem_size);
 	}
       lptr = eptr;
-      if ((this->*parse) ())
-	curr_lines++;
+      if (!(this->*parse) ())
+	return NULL;
+      curr_lines++;
     }
   return eptr;
 }
@@ -1459,18 +1460,18 @@ get_logon_sid ()
 void *
 pwdgrp::add_account_post_fetch (char *line, bool lock)
 {
+  void *ret = NULL;
+
   if (line)
     { 
-      void *ret;
       if (lock)
 	pglock.init ("pglock")->acquire ();
-      add_line (line);
-      ret = ((char *) pwdgrp_buf) + (curr_lines - 1) * pwdgrp_buf_elem_size;
+      if (add_line (line))
+	ret = ((char *) pwdgrp_buf) + (curr_lines - 1) * pwdgrp_buf_elem_size;
       if (lock)
 	pglock.release ();
-      return ret;
     }
-  return NULL;
+  return ret;
 }
 
 void *

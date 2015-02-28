@@ -1,3 +1,9 @@
+2015-02-28  Corinna Vinschen  <corinna@vinschen.de>
+
+	* uinfo.cc (pwdgrp::add_line): Return NULL if parsing a line failed.
+	(pwdgrp::add_account_post_fetch): Check return value from add_line and
+	return NULL if add_line returns NULL.
+
 2015-02-27  Corinna Vinschen  <corinna@vinschen.de>
 
 	* security.cc (alloc_sd): For directories, mark inherited ACEs
