@@ -1,3 +1,9 @@
+2015-03-02  Corinna Vinschen  <corinna@vinschen.de>
+
+	* security.cc (get_attribute_from_acl): Don't spill Everyone permissions
+	into group permissions if owner SID == group SID.
+	(alloc_sd): Add parenthesis for clarity.
+
 2015-02-28  Corinna Vinschen  <corinna@vinschen.de>
 
 	* uinfo.cc (pwdgrp::add_line): Return NULL if parsing a line failed.

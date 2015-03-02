@@ -242,6 +242,7 @@ get_attribute_from_acl (mode_t *attribute, PACL acl, PSID owner_sid,
   mode_t allow = 0;
   mode_t deny = 0;
   mode_t *flags, *anti;
+  bool isownergroup = RtlEqualSid (owner_sid, group_sid);
 
   for (DWORD i = 0; i < acl->AceCount; ++i)
     {
@@ -268,15 +269,15 @@ get_attribute_from_acl (mode_t *attribute, PACL acl, PSID owner_sid,
 	{
 	  if (ace->Mask & FILE_READ_BITS)
 	    *flags |= ((!(*anti & S_IROTH)) ? S_IROTH : 0)
-		      | ((!(*anti & S_IRGRP)) ? S_IRGRP : 0)
+		      | ((!isownergroup && !(*anti & S_IRGRP)) ? S_IRGRP : 0)
 		      | ((!(*anti & S_IRUSR)) ? S_IRUSR : 0);
 	  if (ace->Mask & FILE_WRITE_BITS)
 	    *flags |= ((!(*anti & S_IWOTH)) ? S_IWOTH : 0)
-		      | ((!(*anti & S_IWGRP)) ? S_IWGRP : 0)
+		      | ((!isownergroup && !(*anti & S_IWGRP)) ? S_IWGRP : 0)
 		      | ((!(*anti & S_IWUSR)) ? S_IWUSR : 0);
 	  if (ace->Mask & FILE_EXEC_BITS)
 	    *flags |= ((!(*anti & S_IXOTH)) ? S_IXOTH : 0)
-		      | ((!(*anti & S_IXGRP)) ? S_IXGRP : 0)
+		      | ((!isownergroup && !(*anti & S_IXGRP)) ? S_IXGRP : 0)
 		      | ((!(*anti & S_IXUSR)) ? S_IXUSR : 0);
 	  if ((S_ISDIR (*attribute)) &&
 	      (ace->Mask & (FILE_WRITE_DATA | FILE_EXECUTE | FILE_DELETE_CHILD))
@@ -302,7 +303,7 @@ get_attribute_from_acl (mode_t *attribute, PACL acl, PSID owner_sid,
 	  if (ace->Mask & FILE_EXEC_BITS)
 	    *flags |= ((!(*anti & S_IXUSR)) ? S_IXUSR : 0);
 	  /* Apply deny mask to group if group SID == owner SID. */
-	  if (group_sid && RtlEqualSid (owner_sid, group_sid)
+	  if (group_sid && isownergroup
 	      && ace->Header.AceType == ACCESS_DENIED_ACE_TYPE)
 	    {
 	      if (ace->Mask & FILE_READ_BITS)
@@ -708,7 +709,7 @@ alloc_sd (path_conv &pc, uid_t uid, gid_t gid, int attribute,
 			       owner_sid, acl_len, NO_INHERITANCE))
     return NULL;
   /* Set deny ACE for group, if still needed. */
-  if (group_deny & owner_allow && !isownergroup
+  if ((group_deny & owner_allow) && !isownergroup
       && !add_access_denied_ace (acl, ace_off++, group_deny,
 				 group_sid, acl_len, NO_INHERITANCE))
     return NULL;
