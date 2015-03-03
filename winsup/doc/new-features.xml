@@ -4,6 +4,56 @@
 
 <sect1 id="ov-new1.7"><title>What's new and what changed in Cygwin</title>
 
+<sect2 id="ov-new1.7.35"><title>What's new and what changed in 1.7.35</title>
+
+<itemizedlist mark="bullet">
+
+<listitem><para>
+Performance improvements of the new account DB handling.
+</para></listitem>
+
+<listitem><para>
+Since 1.7.34, chmod does not always affect the POSIX permission mask as
+returned by stat(2) or printed by ls(1), due to the improved POSIX ACL
+handling.  However, that's still far from perfect, so, as a temporary
+workaround, chmod now checks if secondary groups and users in the ACL
+have more permissions than the primary group.  If so, the permissions of
+the secondary users and groups will be reduced according to the mask
+given by the new primary group permissions.  I.e, chmod 600 will remove
+all permissions from the primary group as well as all secondary user and
+group entries in the ACL.
+</para></listitem>
+
+<listitem><para>
+Change handling of group permissions if owner SID == group SID.  Now the
+group permissions don't mirror the user permissions anymore, thus
+leading to less hassle with security-conscious applications.
+</para></listitem>
+
+<listitem><para>
+Allow group SID to be the same as owner SID for "Microsoft Accounts".
+Those have the group in their user token set to the owner SID by
+default.  Drop the workaround to change their primary group to "Users".
+It's not required anymore due to the aforementioned changes.
+</para></listitem>
+
+<listitem><para>
+Change getfacl long options from --all to --access and from --dir to
+--default, along the lines of the Linux getfacl tool.
+</para></listitem>
+
+<listitem><para>
+New APIs: cabsl, cimagl, creall, finitel, hypotl, sqrtl.
+</para></listitem>
+
+<listitem><para>
+New API: issetugid.
+</para></listitem>
+
+</itemizedlist>
+
+</sect2>
+
 <sect2 id="ov-new1.7.34"><title>What's new and what changed in 1.7.34</title>
 
 <itemizedlist mark="bullet">
