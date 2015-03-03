@@ -639,6 +639,7 @@ isnan NOSIGFE
 isnanf NOSIGFE
 isprint NOSIGFE
 ispunct NOSIGFE
+issetugid NOSIGFE
 isspace NOSIGFE
 isupper NOSIGFE
 iswalnum NOSIGFE

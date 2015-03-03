@@ -31,6 +31,14 @@ details. */
 #include "cygserver_setpwd.h"
 #include <cygwin/version.h>
 
+/* OpenBSD 2.0 and later. */
+extern "C"
+int
+issetugid (void)
+{
+  return cygheap->user.issetuid () ? 1 : 0;
+}
+
 /* Starting with Windows Vista, the token returned by system functions
    is a restricted token.  The full admin token is linked to it and can
    be fetched with NtQueryInformationToken.  This function returns the original

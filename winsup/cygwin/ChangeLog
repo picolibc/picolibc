@@ -1,3 +1,10 @@
+2015-03-03  Corinna Vinschen  <corinna@vinschen.de>
+
+	* common.din (issetugid): Export.
+	* glob.cc (issetugid): Drop macro.
+	* sec_auth.cc (issetugid): New exported function.
+	* include/cygwin/version.h (CYGWIN_VERSION_API_MINOR): Bump.
+
 2015-03-02  Corinna Vinschen  <corinna@vinschen.de>
 
 	* security.cc (get_attribute_from_acl): Don't spill Everyone permissions

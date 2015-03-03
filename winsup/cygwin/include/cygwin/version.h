@@ -468,12 +468,13 @@ details. */
       284: Export sockatmark.
       285: Export wcstold.
       285: Export cabsl, cimagl, creall, finitel, hypotl, sqrtl.
+      287: Export issetugid.
      */
 
      /* Note that we forgot to bump the api for ualarm, strtoll, strtoull */
 
 #define CYGWIN_VERSION_API_MAJOR 0
-#define CYGWIN_VERSION_API_MINOR 286
+#define CYGWIN_VERSION_API_MINOR 287
 
      /* There is also a compatibity version number associated with the
 	shared memory regions.  It is incremented when incompatible

@@ -103,7 +103,6 @@ __FBSDID("$FreeBSD: src/lib/libc/gen/glob.c,v 1.28 2010/05/12 17:44:00 gordon Ex
 
 #define getpwuid(uid)	getpwuid32 (uid)
 #define getuid()	getuid32 ()
-#define issetugid()	(cygheap->user.issetuid ())
 
 #define CCHAR(c)	(ignore_case_with_glob ? towlower (CHAR (c)) : CHAR (c))
 #define Cchar(c)	(ignore_case_with_glob ? towlower (c) : (c))

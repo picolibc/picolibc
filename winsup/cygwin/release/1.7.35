@@ -3,6 +3,8 @@ What's new:
 
 - New APIs: cabsl, cimagl, creall, finitel, hypotl, sqrtl.
 
+- New API: issetugid.
+
 
 What changed:
 -------------
