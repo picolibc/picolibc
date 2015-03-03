@@ -1,5 +1,9 @@
 2015-03-03  Steve Ellcey  <sellcey@imgtec.com>
 
+	* libc/machine/mips/memset.S: Add support for mips32r6/mips64r6.
+
+2015-03-03  Steve Ellcey  <sellcey@imgtec.com>
+
 	* libc/machine/mips/memcpy.S: Add support for mips32r6/mips64r6.
 
 2015-02-26  Steve Ellcey  <sellcey@imgtec.com>

@@ -84,6 +84,15 @@
 # endif
 #endif
 
+/* New R6 instructions that may not be in asm.h.  */
+#ifndef PTR_LSA
+# if _MIPS_SIM == _ABI64
+#  define PTR_LSA        dlsa
+# else
+#  define PTR_LSA        lsa
+# endif
+#endif
+
 /* Using PREFETCH_HINT_PREPAREFORSTORE instead of PREFETCH_STORE
    or PREFETCH_STORE_STREAMED offers a large performance advantage
    but PREPAREFORSTORE has some special restrictions to consider.
@@ -152,6 +161,14 @@
 # endif
 #else /* USE_PREFETCH not defined */
 # define PREFETCH_FOR_STORE(offset, reg)
+#endif
+
+#if __mips_isa_rev > 5
+# if (PREFETCH_STORE_HINT == PREFETCH_HINT_PREPAREFORSTORE)
+#  undef PREFETCH_STORE_HINT
+#  define PREFETCH_STORE_HINT PREFETCH_HINT_STORE_STREAMED
+# endif
+# define R6_CODE
 #endif
 
 /* Allow the routine to be named something else if desired.  */
@@ -243,11 +260,48 @@ LEAF(MEMSET_NAME)
 /* If the destination address is not aligned do a partial store to get it
    aligned.  If it is already aligned just jump to L(aligned).  */
 L(set0):
+#ifndef R6_CODE
 	andi	t2,a3,(NSIZE-1)		/* word-unaligned address?          */
 	beq	t2,zero,L(aligned)	/* t2 is the unalignment count      */
 	PTR_SUBU a2,a2,t2
 	C_STHI	a1,0(a0)
 	PTR_ADDU a0,a0,t2
+#else /* R6_CODE */
+	andi	t2,a0,(NSIZE-1)
+	lapc	t9,L(atable)
+	PTR_LSA	t9,t2,t9,2
+	jrc	t9
+L(atable):
+	bc	L(aligned)
+# ifdef USE_DOUBLE
+	bc	L(lb7)
+	bc	L(lb6)
+	bc	L(lb5)
+	bc	L(lb4)
+# endif
+	bc	L(lb3)
+	bc	L(lb2)
+	bc	L(lb1)
+L(lb7):
+	sb	a1,6(a0)
+L(lb6):
+	sb	a1,5(a0)
+L(lb5):
+	sb	a1,4(a0)
+L(lb4):
+	sb	a1,3(a0)
+L(lb3):
+	sb	a1,2(a0)
+L(lb2):
+	sb	a1,1(a0)
+L(lb1):
+	sb	a1,0(a0)
+
+	li	t9,NSIZE
+	subu	t2,t9,t2
+	PTR_SUBU a2,a2,t2
+	PTR_ADDU a0,a0,t2
+#endif /* R6_CODE */
 
 L(aligned):
 /* If USE_DOUBLE is not set we may still want to align the data on a 16
@@ -298,8 +352,12 @@ L(loop16w):
 	bgtz	v1,L(skip_pref)
 	nop
 #endif
+#ifndef R6_CODE
 	PREFETCH_FOR_STORE (4, a0)
 	PREFETCH_FOR_STORE (5, a0)
+#else
+	PREFETCH_FOR_STORE (2, a0)
+#endif
 L(skip_pref):
 	C_ST	a1,UNIT(0)(a0)
 	C_ST	a1,UNIT(1)(a0)
