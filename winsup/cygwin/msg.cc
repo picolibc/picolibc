@@ -1,6 +1,6 @@
 /* msg.cc: XSI IPC interface for Cygwin.
 
-   Copyright 2002, 2003, 2004, 2005, 2008, 2009, 2014 Red Hat, Inc.
+   Copyright 2002, 2003, 2004, 2005, 2008, 2009, 2014, 2015 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -116,8 +116,6 @@ msgctl (int msqid, int cmd, struct msqid_ds *buf)
 	{
 	  syscall_printf ("-1 [%d] = msgctl ()", request.error_code ());
 	  set_errno (request.error_code ());
-	  if (request.error_code () == ENOSYS)
-	    raise (SIGSYS);
 	  __leave;
 	}
       return request.retval ();
@@ -136,8 +134,6 @@ msgget (key_t key, int msgflg)
     {
       syscall_printf ("-1 [%d] = msgget ()", request.error_code ());
       set_errno (request.error_code ());
-      if (request.error_code () == ENOSYS)
-	raise (SIGSYS);
       return -1;
     }
   return request.retval ();
@@ -156,8 +152,6 @@ msgrcv (int msqid, void *msgp, size_t msgsz, long msgtyp, int msgflg)
 	{
 	  syscall_printf ("-1 [%d] = msgrcv ()", request.error_code ());
 	  set_errno (request.error_code ());
-	  if (request.error_code () == ENOSYS)
-	    raise (SIGSYS);
 	  __leave;
 	}
       return request.rcvval ();
@@ -179,8 +173,6 @@ msgsnd (int msqid, const void *msgp, size_t msgsz, int msgflg)
 	{
 	  syscall_printf ("-1 [%d] = msgsnd ()", request.error_code ());
 	  set_errno (request.error_code ());
-	  if (request.error_code () == ENOSYS)
-	    raise (SIGSYS);
 	  __leave;
 	}
       return request.retval ();

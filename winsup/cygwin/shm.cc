@@ -1,7 +1,7 @@
 /* shm.cc: XSI IPC interface for Cygwin.
 
-   Copyright 2001, 2002, 2003, 2004, 2005, 2007, 2008, 2009, 2012, 2013, 2014
-   Red Hat, Inc.
+   Copyright 2001, 2002, 2003, 2004, 2005, 2007, 2008, 2009, 2012, 2013, 2014,
+   2015 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -242,8 +242,6 @@ shmat (int shmid, const void *shmaddr, int shmflg)
       delete sph_entry;
       set_errno (request.error_code ());
       --ssh_entry->ref_count;
-      if (request.error_code () == ENOSYS)
-	raise (SIGSYS);
       return (void *) -1;
     }
   sph_entry->ptr = ptr;
@@ -267,8 +265,6 @@ shmctl (int shmid, int cmd, struct shmid_ds *buf)
 	{
 	  syscall_printf ("-1 [%d] = shmctl ()", request.error_code ());
 	  set_errno (request.error_code ());
-	  if (request.error_code () == ENOSYS)
-	    raise (SIGSYS);
 	  __leave;
 	}
       if (cmd == IPC_RMID)
@@ -310,8 +306,6 @@ shmdt (const void *shmaddr)
     {
       syscall_printf ("-1 [%d] = shmdt ()", request.error_code ());
       set_errno (request.error_code ());
-      if (request.error_code () == ENOSYS)
-	raise (SIGSYS);
       return -1;
     }
   shm_attached_list *sph_entry, *sph_next_entry;
@@ -359,8 +353,6 @@ shmget (key_t key, size_t size, int shmflg)
       syscall_printf ("-1 [%d] = shmget ()", request.error_code ());
       delete ssh_new_entry;
       set_errno (request.error_code ());
-      if (request.error_code () == ENOSYS)
-	raise (SIGSYS);
       return -1;
     }
   int shmid = request.retval ();	/* Shared mem ID */

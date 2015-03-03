@@ -1,6 +1,6 @@
 /* sem.cc: XSI IPC interface for Cygwin.
 
-   Copyright 2002, 2003, 2004, 2005, 2008, 2009, 2012, 2014 Red Hat, Inc.
+   Copyright 2002, 2003, 2004, 2005, 2008, 2009, 2012, 2014, 2015 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -92,8 +92,6 @@ semctl (int semid, int semnum, int cmd, ...)
 	{
 	  syscall_printf ("-1 [%d] = semctl ()", request.error_code ());
 	  set_errno (request.error_code ());
-	  if (request.error_code () == ENOSYS)
-	    raise (SIGSYS);
 	  __leave;
 	}
       return request.retval ();
@@ -113,8 +111,6 @@ semget (key_t key, int nsems, int semflg)
     {
       syscall_printf ("-1 [%d] = semget ()", request.error_code ());
       set_errno (request.error_code ());
-      if (request.error_code () == ENOSYS)
-	raise (SIGSYS);
       return -1;
     }
   return request.retval ();
@@ -132,8 +128,6 @@ semop (int semid, struct sembuf *sops, size_t nsops)
 	{
 	  syscall_printf ("-1 [%d] = semop ()", request.error_code ());
 	  set_errno (request.error_code ());
-	  if (request.error_code () == ENOSYS)
-	    raise (SIGSYS);
 	  __leave;
 	}
       return request.retval ();

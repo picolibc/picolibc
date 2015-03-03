@@ -1,5 +1,11 @@
 2015-03-03  Corinna Vinschen  <corinna@vinschen.de>
 
+	* msg.cc: Throughout, drop raising SIGSYS if cygserver is not running.
+	* sem.cc: Ditto.
+	* shm.cc: Ditto.
+
+2015-03-03  Corinna Vinschen  <corinna@vinschen.de>
+
 	* common.din (issetugid): Export.
 	* glob.cc (issetugid): Drop macro.
 	* sec_auth.cc (issetugid): New exported function.

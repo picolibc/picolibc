@@ -33,6 +33,9 @@ What changed:
 - Change getfacl long options from --all to --access and from --dir to
   --default, along the lines of the Linux getfacl tool.
 
+- Don't raise a SIGSYS signal in the XSI IPC functions if cygserver is not
+  running.  Just return -1 with errno set to ENOSYS.
+
 
 Bug Fixes
 ---------
