@@ -1,5 +1,9 @@
 2015-03-03  Corinna Vinschen  <corinna@vinschen.de>
 
+	* new-features.xml (ov-new1.7.35): Add SIGSYS change.
+
+2015-03-03  Corinna Vinschen  <corinna@vinschen.de>
+
 	* new-features.xml (ov-new1.7.35): Add new section.
 
 2015-02-28  Corinna Vinschen  <corinna@vinschen.de>
