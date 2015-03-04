@@ -1,3 +1,7 @@
+2015-03-04  Corinna Vinschen  <corinna@vinschen.de>
+
+	* posix.xml (std-bsd): Add issetugid.
+
 2015-03-03  Corinna Vinschen  <corinna@vinschen.de>
 
 	* new-features.xml (ov-new1.7.35): Add SIGSYS change.
