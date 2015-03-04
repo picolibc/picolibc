@@ -1,3 +1,7 @@
+2015-03-04  Corinna Vinschen  <corinna@vinschen.de>
+
+	* include/cygwin/version.h (CYGWIN_VERSION_DLL_MINOR): Bump to 36.
+
 2015-03-03  Corinna Vinschen  <corinna@vinschen.de>
 
 	* msg.cc: Throughout, drop raising SIGSYS if cygserver is not running.
