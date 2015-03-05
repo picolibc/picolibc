@@ -1,3 +1,20 @@
+2015-03-05  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler.h (fhandler_base::get_echo_handle): New virtual method.
+	(class fhandler_pty_master): Add echo_r and echo_w handles constituting
+	read and write side of new echo pipe.
+	* select.cc (peek_pipe): On pty masters, check additionally if input
+	from the echo pipe is available.
+	* fhandler_tty.cc (fhandler_pty_master::doecho): Drop output_mutex
+	locking.  Write output to echo pipe.
+	(fhandler_pty_master::process_slave_output): Check if input is available
+	in echo pipe and prefer to read from it, if so.
+	(fhandler_pty_slave::write): Drop output_mutex locking.
+	(fhandler_pty_master::fhandler_pty_master): Initialize echo pipe
+	handles to NULL.
+	(fhandler_pty_master::close): Close and NULL echo pipe handles.
+	(fhandler_pty_master::setup): Create echo pipe, close in case of error.
+
 2015-03-04  Corinna Vinschen  <corinna@vinschen.de>
 
 	* include/cygwin/version.h (CYGWIN_VERSION_DLL_MINOR): Bump to 36.

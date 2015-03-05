@@ -1,7 +1,7 @@
 /* select.cc
 
    Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006,
-   2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014 Red Hat, Inc.
+   2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -626,6 +626,9 @@ peek_pipe (select_record *s, bool from_select)
 	  goto out;
 	}
       int n = pipe_data_available (s->fd, fh, h, false);
+      /* On PTY masters, check if input from the echo pipe is available. */
+      if (n == 0 && fh->get_echo_handle ())
+	n = pipe_data_available (s->fd, fh, fh->get_echo_handle (), false);
 
       if (n < 0)
 	{

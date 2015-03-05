@@ -145,10 +145,8 @@ fhandler_pty_common::__release_output_mutex (const char *fn, int ln)
 void
 fhandler_pty_master::doecho (const void *str, DWORD len)
 {
-  acquire_output_mutex (INFINITE);
-  if (!WriteFile (to_master, str, len, &len, NULL))
-    termios_printf ("Write to %p failed, %E", to_master);
-  release_output_mutex ();
+  if (!WriteFile (echo_w, str, len, &len, NULL))
+    termios_printf ("Write to echo pipe failed, %E");
 }
 
 int
@@ -221,6 +219,7 @@ fhandler_pty_master::process_slave_output (char *buf, size_t len, int pktmode_on
   size_t rlen;
   char outbuf[OUT_BUFFER_SIZE + 1];
   DWORD n;
+  DWORD echo_cnt;
   int column = 0;
   int rc = 0;
 
@@ -257,9 +256,12 @@ fhandler_pty_master::process_slave_output (char *buf, size_t len, int pktmode_on
       if (rlen > sizeof outbuf)
 	rlen = sizeof outbuf;
 
-      n = 0;
+      n = echo_cnt = 0;
       for (;;)
 	{
+	  /* Check echo pipe first. */
+	  if (::bytes_available (echo_cnt, echo_r) && echo_cnt > 0)
+	    break;
 	  if (!bytes_available (n))
 	    goto err;
 	  if (n)
@@ -287,7 +289,17 @@ fhandler_pty_master::process_slave_output (char *buf, size_t len, int pktmode_on
 	  flush_to_slave ();
 	}
 
-      if (!ReadFile (get_handle (), outbuf, rlen, &n, NULL))
+      /* If echo pipe has data (something has been typed or pasted), prefer
+         it over slave output. */
+      if (echo_cnt > 0)
+      	{
+	  if (!ReadFile (echo_r, outbuf, rlen, &n, NULL))
+	    {
+	      termios_printf ("ReadFile on echo pipe failed, %E");
+	      goto err;
+	    }
+	}
+      else if (!ReadFile (get_handle (), outbuf, rlen, &n, NULL))
 	{
 	  termios_printf ("ReadFile failed, %E");
 	  goto err;
@@ -653,7 +665,6 @@ fhandler_pty_slave::write (const void *ptr, size_t len)
 
       while (tc ()->output_stopped)
 	cygwait (10);
-      acquire_output_mutex (INFINITE);
 
       /* Previous write may have set write_error to != 0.  Check it here.
 	 This is less than optimal, but the alternative slows down pty
@@ -663,12 +674,10 @@ fhandler_pty_slave::write (const void *ptr, size_t len)
 	  set_errno (get_ttyp ()->write_error);
 	  towrite = -1;
 	  get_ttyp ()->write_error = 0;
-	  release_output_mutex ();
 	  break;
 	}
 
       BOOL res = WriteFile (get_output_handle (), buf, n, &n, NULL);
-      release_output_mutex ();
       if (!res)
 	{
 	  DWORD err = GetLastError ();
@@ -1228,7 +1237,7 @@ errout:
 fhandler_pty_master::fhandler_pty_master (int unit)
   : fhandler_pty_common (), pktmode (0), master_ctl (NULL),
     master_thread (NULL), from_master (NULL), to_master (NULL),
-    dwProcessId (0), need_nl (0)
+    echo_r (NULL), echo_w (NULL), dwProcessId (0), need_nl (0)
 {
   if (unit >= 0)
     dev ().parse (DEV_PTYM_MAJOR, unit);
@@ -1317,6 +1326,9 @@ fhandler_pty_master::close ()
   if (!ForceCloseHandle (to_master))
     termios_printf ("error closing from_master %p, %E", to_master);
   from_master = to_master = NULL;
+  ForceCloseHandle (echo_r);
+  ForceCloseHandle (echo_w);
+  echo_r = echo_w = NULL;
 
   fhandler_pty_common::close ();
 
@@ -1660,6 +1672,15 @@ fhandler_pty_master::setup ()
 
   ProtectHandle1 (get_io_handle (), from_pty);
 
+  __small_sprintf (pipename, "pty%d-echoloop", unit);
+  res = fhandler_pipe::create (&sec_none, &echo_r, &echo_w,
+			       fhandler_pty_common::pipesize, pipename, 0);
+  if (res)
+    {
+      errstr = "echo pipe";
+      goto err;
+    }
+
   /* Create security attribute.  Default permissions are 0620. */
   sd.malloc (sizeof (SECURITY_DESCRIPTOR));
   RtlCreateSecurityDescriptor (sd, SECURITY_DESCRIPTOR_REVISION);
@@ -1730,6 +1751,8 @@ err:
   close_maybe (input_mutex);
   close_maybe (from_master);
   close_maybe (to_master);
+  close_maybe (echo_r);
+  close_maybe (echo_w);
   close_maybe (master_ctl);
   termios_printf ("pty%d open failed - failed to create %s", unit, errstr);
   return false;

@@ -414,6 +414,7 @@ public:
   virtual HANDLE& get_io_handle () { return io_handle; }
   virtual HANDLE& get_output_handle () { return io_handle; }
   virtual HANDLE get_stat_handle () { return pc.handle () ?: io_handle; }
+  virtual HANDLE get_echo_handle () const { return NULL; }
   virtual bool hit_eof () {return false;}
   virtual select_record *select_read (select_stuff *);
   virtual select_record *select_write (select_stuff *);
@@ -1569,11 +1570,13 @@ class fhandler_pty_master: public fhandler_pty_common
   HANDLE master_ctl;		// Control socket for handle duplication
   cygthread *master_thread;	// Master control thread
   HANDLE from_master, to_master;
+  HANDLE echo_r, echo_w;
   DWORD dwProcessId;		// Owner of master handles
 
 public:
   int need_nl;			// Next read should start with \n
 
+  HANDLE get_echo_handle () const { return echo_r; }
   /* Constructor */
   fhandler_pty_master (int);
 
