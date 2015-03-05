@@ -1,3 +1,8 @@
+2015-03-05  Craig Howland  <howland@LGSInnovations.com>
+
+	* libc/include/stdio.h (FILE): Protect typedef from redefinition.
+	* libc/include/wchar.h: Ditto.
+
 2015-02-25  Gedare Bloom  <gedare@rtems.org>
 
 	* libc/include/machine/time.h (_CLOCKS_PER_SEC_): redefine for RTEMS.

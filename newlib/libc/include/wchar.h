@@ -49,7 +49,10 @@
 _BEGIN_STD_C
 
 /* As in stdio.h, <sys/reent.h> defines __FILE. */
+#if !defined(__FILE_defined)
 typedef __FILE FILE;
+# define __FILE_defined
+#endif
 
 /* As required by POSIX.1-2008, declare tm as incomplete type.
    The actual definition is in time.h. */

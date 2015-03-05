@@ -49,7 +49,10 @@
 
 _BEGIN_STD_C
 
+#if !defined(__FILE_defined)
 typedef __FILE FILE;
+# define __FILE_defined
+#endif
 
 #ifdef __CYGWIN__
 typedef _fpos64_t fpos_t;
