@@ -1,5 +1,16 @@
 2015-03-05  Corinna Vinschen  <corinna@vinschen.de>
 
+	* tty.h (tty::set_master_ctl_closed): Rename from set_master_closed.
+	(tty::is_master_closed): Drop method.
+	* fhandler_tty.cc (fhandler_pty_slave::open): Remove code prematurely
+	bailing out if master control thread is not running.
+	(fhandler_pty_slave::read): Don't generate SIGHUP if master control
+	thread is not running.
+	(fhandler_pty_master::close): Rearrange code to avoid stopping master
+	control thread twice in multi-threaded scenarios.
+
+2015-03-05  Corinna Vinschen  <corinna@vinschen.de>
+
 	* fhandler.h (fhandler_base::get_echo_handle): New virtual method.
 	(class fhandler_pty_master): Add echo_r and echo_w handles constituting
 	read and write side of new echo pipe.

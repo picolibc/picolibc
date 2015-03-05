@@ -1,7 +1,7 @@
 /* tty.h: shared tty info for cygwin
 
-   Copyright 2000, 2001, 2002, 2003, 2004, 2006, 2009, 2010, 2011, 2012, 2013
-   Red Hat, Inc.
+   Copyright 2000, 2001, 2002, 2003, 2004, 2006, 2009, 2010, 2011, 2012, 2013,
+   2015 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -129,8 +129,7 @@ public:
     { return open_mutex (INPUT_MUTEX, access); }
   bool exists ();
   bool not_allocated (HANDLE&, HANDLE&);
-  void set_master_closed () {master_pid = -1;}
-  bool is_master_closed () const {return master_pid == -1;}
+  void set_master_ctl_closed () {master_pid = -1;}
   static void __stdcall create_master (int);
   static void __stdcall init_session ();
   friend class fhandler_pty_master;

@@ -12,3 +12,6 @@ Bug Fixes
 - Fix potential hang in pseudo ttys when generating ECHO output while the slave
   is flooding the pty with output.
   Addresses: https://cygwin.com/ml/cygwin/2015-03/msg00019.html
+
+- Fix potential premature SIGHUP in pty code.
+  Addresses: https://cygwin.com/ml/cygwin/2015-03/msg00070.html

@@ -462,12 +462,6 @@ fhandler_pty_slave::open (int flags, mode_t)
       goto err_no_errno;
     }
 
-  if (get_ttyp ()->is_master_closed ())
-    {
-      errmsg = "*** master is closed";
-      set_errno (EAGAIN);
-      goto err_no_errno;
-    }
   /* Three case for duplicating the pipe handles:
      - Either we're the master.  In this case, just duplicate the handles.
      - Or, we have the right to open the master process for handle duplication.
@@ -744,12 +738,6 @@ fhandler_pty_slave::read (void *ptr, size_t& len)
       switch (cygwait (input_available_event, time_to_wait))
 	{
 	case WAIT_OBJECT_0:
-	  if (get_ttyp ()->is_master_closed ())
-	    {
-	      raise (SIGHUP);
-	      totalread = 0;
-	      goto out;
-	    }
 	  break;
 	case WAIT_SIGNALED:
 	  if (totalread > 0)
@@ -1315,9 +1303,17 @@ fhandler_pty_master::close ()
 
 	  __small_sprintf (buf, "\\\\.\\pipe\\cygwin-%S-pty%d-master-ctl",
 			   &cygheap->installation_key, get_minor ());
-	  CallNamedPipe (buf, &req, sizeof req, &repl, sizeof repl, &len, 500);
-	  CloseHandle (master_ctl);
-	  master_thread->detach ();
+	  acquire_output_mutex (INFINITE);
+	  if (master_ctl)
+	    {
+	      CallNamedPipe (buf, &req, sizeof req, &repl, sizeof repl, &len,
+			     500);
+	      CloseHandle (master_ctl);
+	      master_thread->detach ();
+	      get_ttyp ()->set_master_ctl_closed ();
+	      master_ctl = NULL;
+	    }
+	  release_output_mutex ();
 	}
     }
 
@@ -1334,11 +1330,6 @@ fhandler_pty_master::close ()
 
   if (have_execed || get_ttyp ()->master_pid != myself->pid)
     termios_printf ("not clearing: %d, master_pid %d", have_execed, get_ttyp ()->master_pid);
-  else
-    {
-      get_ttyp ()->set_master_closed ();
-      SetEvent (input_available_event);
-    }
   if (!ForceCloseHandle (input_available_event))
     termios_printf ("CloseHandle (input_available_event<%p>), %E", input_available_event);
 
