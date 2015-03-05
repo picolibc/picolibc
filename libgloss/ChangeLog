@@ -1,3 +1,7 @@
+2015-03-05  Nick Clifton  <nickc@redhat.com>
+
+	* v850/sim.ld: Add a .note.renesas section.
+
 2015-02-17  Renlin Li  <renlin.li@arm.com>
 
 	* arm/crt0.S: Initialise __heap_limit when ARM_RDI_MONITOR is defined.
