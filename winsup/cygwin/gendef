@@ -311,6 +311,8 @@ sigdelayed:
 	xchgq	%r10,(%rsp)
 	ret
 	.seh_endproc
+_sigdelayed_end:
+	.global _sigdelayed_end
 
 # _cygtls::pop
 	.global _ZN7_cygtls3popEv

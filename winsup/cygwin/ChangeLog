@@ -1,3 +1,9 @@
+2015-03-12  Jon TURNEY  <jon.turney@dronecode.org.uk>
+
+	* exceptions.cc (stack_info): Add sigstackptr member.
+	(walk): Unwind sigstackptr inside _sigbe and sigdelayed.
+	* gendef (_sigdelayed_end): Add symbol to mark end of sigdelayed.
+
 2015-03-13  Corinna Vinschen  <corinna@vinschen.de>
 
 	* include/cygwin/sys_time.h: Remove.  Definitions moved to newlib's

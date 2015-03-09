@@ -45,6 +45,8 @@ details. */
 #define CALL_HANDLER_RETRY_INNER 10
 
 char debugger_command[2 * NT_MAX_PATH + 20];
+extern u_char _sigbe;
+extern u_char _sigdelayed_end;
 
 static BOOL WINAPI ctrl_c_handler (DWORD);
 
@@ -224,6 +226,7 @@ class stack_info
 #ifdef __x86_64__
   CONTEXT c;
   UNWIND_HISTORY_TABLE hist;
+  __stack_t *sigstackptr;
 #endif
 public:
   STACKFRAME sf;		 /* For storing the stack information */
@@ -252,6 +255,7 @@ stack_info::init (PUINT_PTR framep, bool wantargs, PCONTEXT ctx)
       memset (&c, 0, sizeof c);
       c.ContextFlags = CONTEXT_ALL;
     }
+  sigstackptr = _my_tls.stackptr;
 #endif
   memset (&sf, 0, sizeof (sf));
   if (ctx)
@@ -286,6 +290,15 @@ stack_info::walk ()
   sf.AddrPC.Offset = c.Rip;
   sf.AddrStack.Offset = c.Rsp;
   sf.AddrFrame.Offset = c.Rbp;
+
+  if ((c.Rip >= (DWORD64)&_sigbe) && (c.Rip < (DWORD64)&_sigdelayed_end))
+    {
+      /* _sigbe and sigdelayed don't have SEH unwinding data, so virtually
+         unwind the tls sigstack */
+      c.Rip = sigstackptr[-1];
+      sigstackptr--;
+      return 1;
+    }
 
   f = RtlLookupFunctionEntry (c.Rip, &imagebase, &hist);
   if (f)
