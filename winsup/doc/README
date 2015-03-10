@@ -16,7 +16,6 @@ texinfo
 perl
 xmlto
 
-
 OTHER NOTES:
 
 You may use docbook2X to convert the DocBook files into info pages.
