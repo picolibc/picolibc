@@ -114,7 +114,7 @@ typedef unsigned long long uintmax_t;
 #if !defined (__cplusplus) || defined (__STDC_LIMIT_MACROS) \
     || defined (__INSIDE_CYGWIN__)
 
-#if __x86_64__
+#ifdef __x86_64__
 # define __I64(n) n ## L
 # define __U64(n) n ## UL
 #else
