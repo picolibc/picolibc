@@ -1,3 +1,8 @@
+2015-03-10  Corinna Vinschen  <corinna@vinschen.de>
+
+	* faq-programming.xml: Accommodate switch of Cygwin repo to GIT.
+	* setup-net.xml: Ditto.
+
 2015-03-04  Corinna Vinschen  <corinna@vinschen.de>
 
 	* posix.xml (std-bsd): Add issetugid.

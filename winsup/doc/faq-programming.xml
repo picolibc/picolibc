@@ -710,11 +710,11 @@ which requires the <literal>dblatex</literal>,
 documentation, see the README included in the <literal>cygwin-doc</literal> package.
 </para>
 
-<para>Next, get the Cygwin source.  Ideally, you should check out
-what you need from CVS (<ulink url="https://cygwin.com/cvs.html"/>).  This is the
-<emphasis>preferred method</emphasis> for acquiring the sources.  Otherwise, if
-you are trying to duplicate a cygwin release then you should 
-download the corresponding source package
+<para>Next, get the Cygwin source.  Ideally, you should check out what you
+need from GIT (<ulink url="https://cygwin.com/git.html"/>).  This is the
+<emphasis>preferred method</emphasis> for acquiring the sources.  Otherwise,
+if you are trying to duplicate a cygwin release then you should download the
+corresponding source package
 (<literal>cygwin-x.y.z-n-src.tar.bz2</literal>). </para> 
 
 <para>You <emphasis>must</emphasis> build cygwin in a separate directory from
@@ -751,7 +751,7 @@ same time. Remove all but one.
 symbols that you see in gdb are basically meaningless. It is also a good
 idea to use the latest code in case the bug has been fixed, so we
 recommend trying the latest snapshot from
-<ulink url="https://cygwin.com/snapshots/"/> or building the DLL from CVS.
+<ulink url="https://cygwin.com/snapshots/"/> or building the DLL from GIT.
 </para>
 <para>To build a debugging version of the Cygwin DLL, you will need to follow
 the instructions at <ulink url="https://cygwin.com/faq/faq.html#faq.programming.building-cygwin"/>. 

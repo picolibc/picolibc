@@ -34,8 +34,9 @@ The <command>setup.exe</command> installer is designed to be easy
 for new users to understand while remaining flexible for the 
 experienced. The volunteer development team is constantly working
 on <command>setup.exe</command>; before requesting a new feature,
-check the wishlist in the <ulink url="https://sourceware.org/cgi-bin/cvsweb.cgi/setup/README?cvsroot=cygwin-apps&amp;rev=2">CVS <literal>README</literal>
-</ulink>. It may already be present in the CVS version!
+check the wishlist in the
+<ulink url="https://sourceware.org/git/gitweb.cgi?p=cygwin-setup.git;a=blob_plain;f=README;hb=HEAD">GIT <literal>README</literal>
+</ulink>. It may already be present in the GIT version!
 </para>
 
 <para>
