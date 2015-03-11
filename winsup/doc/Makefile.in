@@ -92,17 +92,6 @@ faq/faq.html : $(FAQ_SOURCES)
 	-$(XMLTO) html -o faq -m $(srcdir)/cygwin.xsl $(srcdir)/faq.xml
 	-sed -i 's;<a name="id[mp][0-9]*"></a>;;g' faq/faq.html
 
-TBFILES = cygwin-ug-net.dvi cygwin-ug-net.rtf cygwin-ug-net.ps \
-	  cygwin-ug-net.pdf cygwin-ug-net.xml \
-	  cygwin-api.dvi cygwin-api.rtf cygwin-api.ps \
-	  cygwin-api.pdf cygwin-api.xml
-TBDIRS = cygwin-ug-net cygwin-api
-TBDEPS = cygwin-ug-net/cygwin-ug-net.html cygwin-api/cygwin-api.html
-
-tarball : cygwin-docs.tar.bz2
-cygwin-docs.tar.bz2 : $(TBFILES) $(TBDEPS)
-	find $(TBFILES) $(TBDIRS) \! -type d | sort | tar -T - -cf -  | bzip2 > cygwin-docs.tar.bz2
-
 Makefile.dep: cygwin-ug-net.xml cygwin-api.xml
 	cd $(srcdir) && ./xidepend $^ > "${CURDIR}/$@"
 
