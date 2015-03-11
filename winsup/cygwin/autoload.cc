@@ -1,7 +1,7 @@
 /* autoload.cc: all dynamic load stuff.
 
    Copyright 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010,
-   2011, 2012, 2013, 2014 Red Hat, Inc.
+   2011, 2012, 2013, 2014, 2015 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -429,7 +429,7 @@ std_dll_init ()
       for (i = 1; i <= RETRY_COUNT; i++)
 	{
 	  /* If loading the library succeeds, just leave the loop. */
-	  if (!dll_load (dll->handle, dll_path))
+	  if (dll_load (dll->handle, dll_path))
 	    break;
 	  /* Otherwise check error code returned by LoadLibrary.  If the
 	     error code is neither NOACCESS nor DLL_INIT_FAILED, break out

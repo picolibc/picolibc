@@ -1,3 +1,8 @@
+2015-03-11  Corinna Vinschen  <corinna@vinschen.de>
+
+	* autoload.cc (std_dll_init): Fix condition for breaking from DLL
+	loading loop.
+
 2015-03-10  Yaakov Selkowitz  <yselkowitz@cygwin.com>
 
 	* include/stdint.h: Fix __x86_64__ conditional.
