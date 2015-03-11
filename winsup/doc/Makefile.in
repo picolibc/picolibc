@@ -12,6 +12,7 @@ SHELL = @SHELL@
 srcdir = @srcdir@
 VPATH = @srcdir@
 
+prefix:=@prefix@
 datarootdir:=@datarootdir@
 docdir = @docdir@
 htmldir = @htmldir@
