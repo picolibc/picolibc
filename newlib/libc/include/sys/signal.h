@@ -9,6 +9,7 @@ extern "C" {
 #include "_ansi.h"
 #include <sys/features.h>
 #include <sys/types.h>
+#include <sys/_timespec.h>
 
 /* #ifndef __STRICT_ANSI__*/
 

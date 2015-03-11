@@ -9,6 +9,7 @@ extern "C" {
 #include <time.h>
 #include <sys/cdefs.h>
 #include <sys/types.h>
+#include <sys/_timespec.h>
 
 /* dj's stat defines _STAT_H_ */
 #ifndef _STAT_H_

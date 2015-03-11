@@ -25,6 +25,7 @@
 #define CLK_TCK CLOCKS_PER_SEC
 
 #include <sys/types.h>
+#include <sys/timespec.h>
 
 _BEGIN_STD_C
 
