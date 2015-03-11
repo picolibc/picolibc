@@ -18,7 +18,7 @@ int main()
 #else
   char cbuf[512];
   wchar_t wcbuf[512], wcbuf2[512];
-  double val = 1E+308;
+  double val = 1E+30;
   snprintf(cbuf, 512, "%.*f", 3, val);
   swprintf(wcbuf, 512, L"%.*f", 3, val);
   mbstowcs(wcbuf2, cbuf, 512);

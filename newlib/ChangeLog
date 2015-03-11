@@ -1,3 +1,9 @@
+2015-03-11  Nick Clifton  <nickc@redhat.com>
+
+	* testsuite/newlib.stdio/swprintf.c (main): Change size of value
+	used to initialise 'val' variable so that it will compile on
+	targets with 32-bit doubles.
+
 2015-03-05  Craig Howland  <howland@LGSInnovations.com>
 
 	* libc/include/stdio.h (FILE): Protect typedef from redefinition.
