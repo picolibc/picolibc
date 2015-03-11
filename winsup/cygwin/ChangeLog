@@ -1,5 +1,9 @@
 2015-03-11  Corinna Vinschen  <corinna@vinschen.de>
 
+	* autoload.cc (CreateEnvironmentBlock): Make loading non-fatal.
+
+2015-03-11  Corinna Vinschen  <corinna@vinschen.de>
+
 	* autoload.cc (std_dll_init): Fix condition for breaking from DLL
 	loading loop.
 
