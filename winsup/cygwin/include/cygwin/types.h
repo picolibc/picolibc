@@ -1,6 +1,6 @@
 /* types.h
 
-   Copyright 2001, 2002, 2003, 2005, 2006, 2010, 2011 Red Hat Inc.
+   Copyright 2001, 2002, 2003, 2005, 2006, 2010, 2011, 2012, 2015 Red Hat Inc.
    Written by Robert Collins <rbtcollins@hotmail.com>
 
 This file is part of Cygwin.
@@ -20,6 +20,7 @@ extern "C"
 #include <stdint.h>
 #include <endian.h>
 #include <bits/wordsize.h>
+#include <sys/_timespec.h>
 
 #ifndef __timespec_t_defined
 #define __timespec_t_defined
