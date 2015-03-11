@@ -1431,7 +1431,11 @@ following sections explain the settings in detail.
 
 </sect4>
 
-<sect4 id="ntsec-mapping-nsswitch-home"><title id="ntsec-mapping-nsswitch-home.title">The <literal>db_home:</literal> setting</title>
+<sect4 id="ntsec-mapping-nsswitch-home">
+  <sectioninfo>
+    <title role="texinfo-node">The <literal>db_home</literal> setting</title>
+  </sectioninfo>
+    <title id="ntsec-mapping-nsswitch-home.title">The <literal>db_home:</literal> setting</title>
 
 <para>
 The <literal>db_home:</literal> setting defines how Cygwin fetches the user's
@@ -1518,7 +1522,11 @@ So by default, Cygwin just sets the home dir to
 
 </sect4>
 
-<sect4 id="ntsec-mapping-nsswitch-shell"><title id="ntsec-mapping-nsswitch-shell.title">The <literal>db_shell:</literal> setting</title>
+<sect4 id="ntsec-mapping-nsswitch-shell">
+  <sectioninfo>
+    <title role="texinfo-node">The <literal>db_shell</literal> setting</title>
+  </sectioninfo>
+  <title id="ntsec-mapping-nsswitch-shell.title">The <literal>db_shell:</literal> setting</title>
 
 <para>
 The <literal>db_shell:</literal> setting defines how Cygwin fetches the user's
@@ -1593,7 +1601,11 @@ As for <literal>db_home:</literal>, the default setting for
 
 </sect4>
 
-<sect4 id="ntsec-mapping-nsswitch-gecos"><title id="ntsec-mapping-nsswitch-gecos.title">The <literal>db_gecos:</literal> setting</title>
+<sect4 id="ntsec-mapping-nsswitch-gecos">
+  <sectioninfo>
+    <title role="texinfo-node">The <literal>db_gecos</literal> setting</title>
+  </sectioninfo>
+  <title id="ntsec-mapping-nsswitch-gecos.title">The <literal>db_gecos:</literal> setting</title>
 
 <para>
 The <literal>db_gecos:</literal> setting defines how to fetch additional

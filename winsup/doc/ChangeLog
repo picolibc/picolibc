@@ -1,3 +1,12 @@
+2015-06-22  Jon Turney  <jon.turney@dronecode.org.uk>
+
+	* Makefile.in (install-info, cygwin-ug-net.info)
+	(cygwin-api.info): Add.
+	* cygwin-ug-net.xml: Add texinfo-node.
+	* cygwin-api.xml: Ditto.
+	* ntsec.xml (db_home): Add texinfo-node for titles containing a
+	':' which are the targets of an xref.
+
 2015-06-20  Corinna Vinschen  <corinna@vinschen.de>
 
 	* new-features.xml (ov-new2.1): Add alterante signal stack info.

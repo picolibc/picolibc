@@ -5,6 +5,9 @@
 <book id="cygwin-ug-net" xmlns:xi="http://www.w3.org/2001/XInclude">
   <bookinfo>
     <title>Cygwin User's Guide</title>
+    <abstract role="texinfo-node">
+      <para>Cygwin User's Guide</para>
+    </abstract>
 		<xi:include href="legal.xml"/>
   </bookinfo>
 

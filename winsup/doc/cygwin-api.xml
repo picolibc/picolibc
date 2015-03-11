@@ -6,6 +6,9 @@
 
   <bookinfo>
     <title>Cygwin API Reference</title>
+    <abstract role="texinfo-node">
+      <para>Cygwin API Reference</para>
+    </abstract>
       <xi:include href="legal.xml"/>
   </bookinfo>
 

@@ -19,6 +19,7 @@ htmldir = @htmldir@
 mandir = @mandir@
 man1dir = $(mandir)/man1
 man3dir = $(mandir)/man3
+infodir:=@infodir@
 
 override INSTALL:=@INSTALL@
 override INSTALL_DATA:=@INSTALL_DATA@
@@ -29,6 +30,7 @@ CC:=@CC@
 CC_FOR_TARGET:=@CC@
 
 XMLTO:=xmlto --skip-validation --with-dblatex
+DOCBOOK2XTEXI:=docbook2x-texi --xinclude --info --utf8trans-map=charmap
 
 include $(srcdir)/../Makefile.common
 -include Makefile.dep
@@ -40,7 +42,8 @@ FAQ_SOURCES:= $(wildcard $(srcdir)/faq*.xml)
 .html.body:
 	$(srcdir)/bodysnatcher.pl $<
 
-.PHONY: all clean install install-all install-pdf install-html install-man
+.PHONY: all clean install install-all install-pdf install-html install-man \
+	info install-info
 
 all: Makefile Makefile.dep \
 	cygwin-ug-net/cygwin-ug-net.html \
@@ -50,7 +53,8 @@ all: Makefile Makefile.dep \
 	cygwin-ug-net/cygwin-ug-net.pdf \
 	cygwin-api/cygwin-api.pdf \
 	utils2man.stamp \
-	api2man.stamp
+	api2man.stamp \
+	cygwin-ug-net.info cygwin-api.info
 
 Makefile: $(srcdir)/Makefile.in
 	/bin/sh ./config.status
@@ -61,10 +65,11 @@ clean:
 	rm -Rf cygwin-api cygwin-ug cygwin-ug-net faq
 	rm -f *.1 utils2man.stamp
 	rm -f *.3 api2man.stamp
+	rm -f *.info* charmap
 
 install: install-all
 
-install-all: install-pdf install-html install-man
+install-all: install-pdf install-html install-man install-info
 
 install-pdf: cygwin-ug-net/cygwin-ug-net.pdf cygwin-api/cygwin-api.pdf
 	@$(MKDIRP) $(DESTDIR)$(docdir)
@@ -84,6 +89,10 @@ install-man: utils2man.stamp api2man.stamp
 	@$(MKDIRP) $(DESTDIR)$(man3dir)
 	$(INSTALL_DATA) *.3 $(DESTDIR)$(man3dir)
 
+install-info: cygwin-ug-net.info cygwin-api.info
+	$(MKDIRP) $(DESTDIR)$(infodir)
+	$(INSTALL_DATA) *.info* $(DESTDIR)$(infodir)
+
 cygwin-ug-net/cygwin-ug-net-nochunks.html.gz : $(cygwin-ug-net_SOURCES) html.xsl
 	-$(XMLTO) html-nochunks -m $(srcdir)/html.xsl $<
 	-@$(MKDIRP) cygwin-ug-net
@@ -101,6 +110,9 @@ utils2man.stamp: $(cygwin-ug-net_SOURCES) man.xsl
 	$(XMLTO) man -m ${srcdir}/man.xsl $<
 	@touch $@
 
+cygwin-ug-net.info: $(cygwin-ug-net_SOURCES) charmap
+	-$(DOCBOOK2XTEXI) $(srcdir)/cygwin-ug-net.xml --string-param output-file=cygwin-ug-net
+
 cygwin-api/cygwin-api.html : $(cygwin-api_SOURCES) html.xsl
 	-$(XMLTO) html -o cygwin-api/ -m $(srcdir)/html.xsl $<
 
@@ -110,6 +122,14 @@ cygwin-api/cygwin-api.pdf : $(cygwin-api_SOURCES) fo.xsl
 api2man.stamp: $(cygwin-api_SOURCES) man.xsl
 	$(XMLTO) man -m ${srcdir}/man.xsl $<
 	@touch $@
+
+cygwin-api.info: $(cygwin-api_SOURCES) charmap
+	-$(DOCBOOK2XTEXI) $(srcdir)/cygwin-api.xml --string-param output-file=cygwin-api
+
+# this generates a custom charmap for docbook2x-texi which has a mapping for &reg;
+charmap:
+	cp /usr/share/docbook2X/charmaps/texi.charmap charmap
+	echo "ae (R)" >>charmap
 
 faq/faq.html : $(FAQ_SOURCES)
 	-$(XMLTO) html -o faq -m $(srcdir)/html.xsl $(srcdir)/faq.xml
