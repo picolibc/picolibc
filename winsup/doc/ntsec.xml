@@ -744,9 +744,9 @@ You want to use a Cygwin username different from your Windows username.
 </para>
 
 <note><para>
-Note: This is only supported via <filename>/etc/passwd</filename>.  A
-Cygwin username maintained in the Windows user databases would require
-very costly (read: slow) search operations.
+This is only supported via <filename>/etc/passwd</filename>.  A Cygwin
+username maintained in the Windows user databases would require very costly
+(read: slow) search operations.
 </para></note>
 </listitem>
 
@@ -876,7 +876,7 @@ file set up to all default values:
   db_enum:  cache builtin
   db_home:  /home/%U
   db_shell: /bin/bash
-  db_gecos: &lt;empty$gt;
+  db_gecos: &lt;empty&gt;
 </screen>
 
 <sect4 id="ntsec-mapping-nsswitch-syntax"><title id="ntsec-mapping-nsswitch-syntax.title">The <filename>/etc/nsswitch.conf</filename> syntax</title>

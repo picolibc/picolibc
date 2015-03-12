@@ -1,3 +1,9 @@
+2015-03-12  Corinna Vinschen  <corinna@vinschen.de>
+
+	* ntsec.xml (ntsec-mapping-passwdinfo): Drop the word "Note" from
+	a note.
+	(ntsec-mapping-nsswitch): Fix typo.
+
 2015-03-10  Corinna Vinschen  <corinna@vinschen.de>
 
 	* faq-programming.xml: Accommodate switch of Cygwin repo to GIT.
