@@ -1916,7 +1916,7 @@ quote itself.  The double quotes are required for the decimal values as well!
 <note>
 <para>
 There's also a length restriction imposed by Windows.  The
-<literal>description</literal> entry has a maximumn length of 1023 characters.
+<literal>description</literal> entry has a maximum length of 1023 characters.
 </para>
 </note>
 
@@ -2089,7 +2089,7 @@ add:
 </screen>
 
 <para>
-To the user's group SAM comment add:
+To the <literal>Users</literal> group SAM comment add:
 </para>
 
 <screen>

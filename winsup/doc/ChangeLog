@@ -1,5 +1,10 @@
 2015-03-12  Corinna Vinschen  <corinna@vinschen.de>
 
+	* ntsec.xml (ntsec-mapping-nsswitch-desc): Fix typo.
+	(ntsec-mapping-samba): Ditto.
+
+2015-03-12  Corinna Vinschen  <corinna@vinschen.de>
+
 	* ntsec.xml (ntsec-mapping-passwdinfo): Drop the word "Note" from
 	a note.
 	(ntsec-mapping-nsswitch): Fix typo.
