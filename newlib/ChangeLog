@@ -1,3 +1,7 @@
+2015-03-12  Sebastian Huber  <sebastian.huber@embedded-brains.de>
+
+	* libc/sys/rtems/include/semaphore.h: Import from FreeBSD.
+
 2015-03-11  Sebastian Huber  <sebastian.huber@embedded-brains.de>
 
 	* libc/include/sys/_timespec.h: Import from FreeBSD.
