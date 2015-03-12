@@ -1317,16 +1317,22 @@ fhandler_pty_master::close ()
 	}
     }
 
+  fhandler_pty_common::close ();
+
+  /* Check if the last master handle has been closed.  If so, set
+     input_available_event to wake up potentially waiting slaves. */
+  if (!PeekNamedPipe (from_master, NULL, 0, NULL, NULL, NULL)
+      && GetLastError () == ERROR_BROKEN_PIPE) 
+    SetEvent (input_available_event);
+
   if (!ForceCloseHandle (from_master))
     termios_printf ("error closing from_master %p, %E", from_master);
   if (!ForceCloseHandle (to_master))
-    termios_printf ("error closing from_master %p, %E", to_master);
+    termios_printf ("error closing to_master %p, %E", to_master);
   from_master = to_master = NULL;
   ForceCloseHandle (echo_r);
   ForceCloseHandle (echo_w);
   echo_r = echo_w = NULL;
-
-  fhandler_pty_common::close ();
 
   if (have_execed || get_ttyp ()->master_pid != myself->pid)
     termios_printf ("not clearing: %d, master_pid %d", have_execed, get_ttyp ()->master_pid);
