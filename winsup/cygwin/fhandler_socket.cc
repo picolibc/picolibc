@@ -14,9 +14,7 @@
 #define  __INSIDE_CYGWIN_NET__
 #define USE_SYS_TYPES_FD_SET
 
-#define _BSDTYPES_DEFINED
 #include "winsup.h"
-#undef _BSDTYPES_DEFINED
 #ifdef __x86_64__
 /* 2014-04-24: Current Mingw headers define sockaddr_in6 using u_long (8 byte)
    because a redefinition for LP64 systems is missing.  This leads to a wrong

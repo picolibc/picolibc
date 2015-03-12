@@ -1,3 +1,8 @@
+2015-03-12  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_socket.cc: Drop defining _BSDTYPES_DEFINED before including
+	winsup.h.
+
 2015-03-12  Takashi Yano  <takashi.yano@nifty.ne.jp>
 
 	* fhandler_tty.cc (fhandler_pty_master::close): Add code to make slave
