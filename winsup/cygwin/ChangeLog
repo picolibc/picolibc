@@ -1,3 +1,7 @@
+2015-03-12  Alexey Pavlov  <alexpux@gmail.com>
+
+	* include/cygwin/version.h: Fix typo.
+
 2015-03-12  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler_socket.cc: Drop defining _BSDTYPES_DEFINED before including

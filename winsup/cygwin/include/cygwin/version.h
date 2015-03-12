@@ -467,7 +467,7 @@ details. */
            putwc_unlocked, putwchar_unlocked.
       284: Export sockatmark.
       285: Export wcstold.
-      285: Export cabsl, cimagl, creall, finitel, hypotl, sqrtl.
+      286: Export cabsl, cimagl, creall, finitel, hypotl, sqrtl.
       287: Export issetugid.
      */
 
