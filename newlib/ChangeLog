@@ -1,3 +1,8 @@
+2015-03-13  Jon TURNEY  <jon.turney@dronecode.org.uk>
+
+	* libc/libc.texinfo: Fix directory entry.
+	* libm/libm.texinfo: Ditto.
+
 2015-03-13  Corinna Vinschen  <vinschen@redhat.com>
 
 	* libc/include/sys/time.h: Drop including cygwin/sys_time.h on Cygwin.

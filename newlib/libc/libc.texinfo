@@ -4,9 +4,10 @@
 
 @ifinfo
 @format
-START-INFO-DIR-ENTRY
-* libc::                        The ANSI C library.
-END-INFO-DIR-ENTRY
+@dircategory Newlib
+@direntry
+* libc: (libc).                 The ANSI C library.
+@end direntry
 @end format
 @end ifinfo
 

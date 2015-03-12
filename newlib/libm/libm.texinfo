@@ -4,9 +4,10 @@
 
 @ifinfo
 @format
-START-INFO-DIR-ENTRY
-* libm::                        An ANSI-C conforming mathematical library.
-END-INFO-DIR-ENTRY
+@dircategory Newlib
+@direntry
+* libm: (libm).                 An ANSI-C conforming mathematical library.
+@end direntry
 @end format
 @end ifinfo
 
