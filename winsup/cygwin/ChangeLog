@@ -1,3 +1,8 @@
+2015-03-13  Corinna Vinschen  <corinna@vinschen.de>
+
+	* include/cygwin/sys_time.h: Remove.  Definitions moved to newlib's
+	sys/time.h.
+
 2015-03-13  Alexey Pavlov  <alexpux@gmail.com>
 
 	* net.cc (in6addr_any): Remove redundant braces.
