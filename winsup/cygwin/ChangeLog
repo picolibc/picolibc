@@ -1,3 +1,8 @@
+2015-03-13  Alexey Pavlov  <alexpux@gmail.com>
+
+	* net.cc (in6addr_any): Remove redundant braces.
+	(in6addr_loopback): Ditto.
+
 2015-03-12  Alexey Pavlov  <alexpux@gmail.com>
 
 	* include/cygwin/version.h: Fix typo.

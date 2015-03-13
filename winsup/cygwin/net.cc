@@ -79,8 +79,8 @@ extern "C"
 		 const unsigned char *);
 }				/* End of "C" section */
 
-const struct in6_addr in6addr_any = {{IN6ADDR_ANY_INIT}};
-const struct in6_addr in6addr_loopback = {{IN6ADDR_LOOPBACK_INIT}};
+const struct in6_addr in6addr_any = IN6ADDR_ANY_INIT;
+const struct in6_addr in6addr_loopback = IN6ADDR_LOOPBACK_INIT;
 
 static fhandler_socket *
 get (const int fd)
