@@ -267,7 +267,13 @@ typedef _TIMER_T_ timer_t;
 #endif
 
 typedef unsigned long useconds_t;
-typedef long suseconds_t;
+
+#ifndef _SUSECONDS_T_DECLARED
+typedef	__suseconds_t	suseconds_t;
+#define	_SUSECONDS_T_DECLARED
+#endif
+
+typedef	__int64_t	sbintime_t;
 
 #include <sys/features.h>
 

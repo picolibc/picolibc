@@ -1,3 +1,29 @@
+2015-03-13  Sebastian Huber  <sebastian.huber@embedded-brains.de>
+
+	* libc/include/machine/_types.h (__suseconds_t): Define.
+	* libc/include/sys/_timeval.h: Import from FreeBSD and add
+	MinGW-w64 compatibility.
+	(timerclear): Copy from FreeBSD <sys/time.h>.
+	(timerisset): Likewise.
+	(timercmp): Likewise.
+	(timeradd): Likewise.
+	(timersub): Likewise.
+	* libc/include/sys/time.h: (bintime, ...) Import from FreeBSD.
+	(timespecclear, ...): Likewise.
+	(inittodr, ...): Likewise.
+	(timerclear): Delete.
+	(timerisset): Likewise.
+	(timercmp): Likewise.
+	(timeradd): Likewise.
+	(timersub): Likewise.
+	(futimes): Declare if __BSD_VISIBLE.
+	(futimesat): Likewise.
+	(lutimes): Likewise.
+	(setitimer): Declare unconditionally.
+	(gettimeofday): Declare if __XSI_VISIBLE.
+	* libc/include/sys/types.h (sbintime_t): Define.
+	(suseconds_t): Define conditionally via __suseconds_t.
+
 2015-03-12  Sebastian Huber  <sebastian.huber@embedded-brains.de>
 
 	* libc/sys/rtems/include/semaphore.h: Import from FreeBSD.
