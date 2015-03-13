@@ -287,10 +287,6 @@ tvtosbt(struct timeval _tv)
 
 #endif /* _KERNEL */
 
-#ifdef __CYGWIN__
-#include <cygwin/sys_time.h>
-#endif /* __CYGWIN__ */
-
 /*
  * Names of the interval timers, and structure
  * defining a timer setting.
