@@ -104,13 +104,13 @@ find_exec (const char *name, path_conv& buf, const char *search,
   if ((has_slash || opt & FE_CWD)
       && (suffix = perhaps_suffix (name, buf, err, opt)) != NULL)
     {
+      /* Overwrite potential symlink target with original path.
+	 See comment preceeding this method. */
+      tmp_path = tmp;
       if (!has_slash)
-	{
-	  /* Overwrite potential symlink target with original path.
-	     See comment preceeding this method. */
-	  stpcpy (stpcpy (tmp, "./"), name);
-	  buf.set_posix (tmp);
-	}
+	tmp_path = stpcpy (tmp, "./");
+      stpcpy (tmp_path, name);
+      buf.set_posix (tmp);
       retval = buf.get_posix ();
       goto out;
     }

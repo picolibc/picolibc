@@ -1,3 +1,8 @@
+2015-03-17  Corinna Vinschen  <corinna@vinschen.de>
+
+	* spawn.cc (find_exec): Fix a name change in case of a symlink which
+	can be opened as is.
+
 2015-03-12  Jon TURNEY  <jon.turney@dronecode.org.uk>
 
 	* exceptions.cc (stack_info): Add sigstackptr member.

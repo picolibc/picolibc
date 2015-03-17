@@ -15,3 +15,6 @@ Bug Fixes
 
 - Fix potential premature SIGHUP in pty code.
   Addresses: https://cygwin.com/ml/cygwin/2015-03/msg00070.html
+
+- Fix a name change from symlink to target name in calls to execvp, system, etc.
+  Addresses: https://cygwin.com/ml/cygwin/2015-03/msg00270.html
