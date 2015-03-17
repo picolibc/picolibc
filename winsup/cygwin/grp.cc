@@ -552,12 +552,8 @@ endgrent_filtered (void *gr)
   ((gr_ent *) gr)->endgrent ();
 }
 
-/* timeout_ns (in 100ns units) is set to non-0 when called from
-   internal_getlogin.  This restricts fetching of the user's groups at process
-   tree startup to a (hopefully) bearable time.  */
 int
-internal_getgroups (int gidsetsize, gid_t *grouplist, cyg_ldap *pldap,
-		    const DWORD timeout_ns)
+internal_getgroups (int gidsetsize, gid_t *grouplist, cyg_ldap *pldap)
 {
   NTSTATUS status;
   HANDLE tok;

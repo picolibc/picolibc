@@ -1,5 +1,11 @@
 2015-03-17  Corinna Vinschen  <corinna@vinschen.de>
 
+	* grp.cc (internal_getgroups): Drop unused timeout parameter.
+	* pwdgrp.h (internal_getgroups): Ditto in prototype.
+	* uinfo.cc (internal_getlogin): Ditto in usage.
+
+2015-03-17  Corinna Vinschen  <corinna@vinschen.de>
+
 	* spawn.cc (find_exec): Fix a name change in case of a symlink which
 	can be opened as is.
 
