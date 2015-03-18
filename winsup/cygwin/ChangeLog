@@ -1,3 +1,17 @@
+2015-03-18  Corinna Vinschen  <corinna@vinschen.de>
+
+	* sec_auth.cc (get_server_groups): Drop unused passwd argument.  Adjust
+	calls throughout.
+	(get_initgroups_sidlist): Ditto.
+	(get_setgroups_sidlist): Ditto.
+	(create_token): Ditto.
+	(lsaauth): Ditto.
+	* security.h (create_token): Adjust prototype to above change.
+	(lsaauth): Ditto.
+	(get_server_groups): Ditto.
+	* grp.cc (get_groups): Adjust call to get_server_groups.
+	* syscalls.cc (seteuid32): Adjust calls to lsaauth and create_token.
+
 2015-03-17  Corinna Vinschen  <corinna@vinschen.de>
 
 	* grp.cc (internal_getgroups): Drop unused timeout parameter.

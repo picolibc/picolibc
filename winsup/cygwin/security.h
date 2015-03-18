@@ -457,15 +457,15 @@ int setacl (HANDLE, path_conv &, int, struct acl *, bool &);
 /* Set impersonation or restricted token.  */
 void set_imp_token (HANDLE token, int type);
 /* Function creating a token by calling NtCreateToken. */
-HANDLE create_token (cygsid &usersid, user_groups &groups, struct passwd * pw);
+HANDLE create_token (cygsid &usersid, user_groups &groups);
 /* LSA authentication function. */
-HANDLE lsaauth (cygsid &, user_groups &, struct passwd *);
+HANDLE lsaauth (cygsid &, user_groups &);
 /* LSA private key storage authentication, same as when using service logons. */
 HANDLE lsaprivkeyauth (struct passwd *pw);
 /* Verify an existing token */
 bool verify_token (HANDLE token, cygsid &usersid, user_groups &groups, bool *pintern = NULL);
 /* Get groups of a user */
-bool get_server_groups (cygsidlist &grp_list, PSID usersid, struct passwd *pw);
+bool get_server_groups (cygsidlist &grp_list, PSID usersid);
 
 /* Extract U-domain\user field from passwd entry. */
 void extract_nt_dom_user (const struct passwd *pw, PWCHAR domain, PWCHAR user);

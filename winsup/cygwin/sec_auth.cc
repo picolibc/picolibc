@@ -544,7 +544,7 @@ get_token_group_sidlist (cygsidlist &grp_list, PTOKEN_GROUPS my_grps,
 }
 
 bool
-get_server_groups (cygsidlist &grp_list, PSID usersid, struct passwd *pw)
+get_server_groups (cygsidlist &grp_list, PSID usersid)
 {
   WCHAR user[UNLEN + 1];
   WCHAR domain[MAX_DOMAIN_NAME_LEN + 1];
@@ -581,8 +581,7 @@ get_server_groups (cygsidlist &grp_list, PSID usersid, struct passwd *pw)
 }
 
 static bool
-get_initgroups_sidlist (cygsidlist &grp_list,
-			PSID usersid, PSID pgrpsid, struct passwd *pw,
+get_initgroups_sidlist (cygsidlist &grp_list, PSID usersid, PSID pgrpsid,
 			PTOKEN_GROUPS my_grps, LUID auth_luid, int &auth_pos)
 {
   grp_list *= well_known_world_sid;
@@ -591,7 +590,7 @@ get_initgroups_sidlist (cygsidlist &grp_list,
     auth_pos = -1;
   else
     get_token_group_sidlist (grp_list, my_grps, auth_luid, auth_pos);
-  if (!get_server_groups (grp_list, usersid, pw))
+  if (!get_server_groups (grp_list, usersid))
     return false;
 
   /* special_pgrp true if pgrpsid is not in normal groups */
@@ -600,14 +599,14 @@ get_initgroups_sidlist (cygsidlist &grp_list,
 }
 
 static void
-get_setgroups_sidlist (cygsidlist &tmp_list, PSID usersid, struct passwd *pw,
+get_setgroups_sidlist (cygsidlist &tmp_list, PSID usersid,
 		       PTOKEN_GROUPS my_grps, user_groups &groups,
 		       LUID auth_luid, int &auth_pos)
 {
   tmp_list *= well_known_world_sid;
   tmp_list *= well_known_authenticated_users_sid;
   get_token_group_sidlist (tmp_list, my_grps, auth_luid, auth_pos);
-  get_server_groups (tmp_list, usersid, pw);
+  get_server_groups (tmp_list, usersid);
   for (int gidx = 0; gidx < groups.sgsids.count (); gidx++)
     tmp_list += groups.sgsids.sids[gidx];
   tmp_list += groups.pgsid;
@@ -875,7 +874,7 @@ verify_token (HANDLE token, cygsid &usersid, user_groups &groups, bool *pintern)
 }
 
 HANDLE
-create_token (cygsid &usersid, user_groups &new_groups, struct passwd *pw)
+create_token (cygsid &usersid, user_groups &new_groups)
 {
   NTSTATUS status;
   LSA_HANDLE lsa = NULL;
@@ -964,9 +963,9 @@ create_token (cygsid &usersid, user_groups &new_groups, struct passwd *pw)
   /* Create list of groups, the user is member in. */
   int auth_pos;
   if (new_groups.issetgroups ())
-    get_setgroups_sidlist (tmp_gsids, usersid, pw, my_tok_gsids, new_groups,
+    get_setgroups_sidlist (tmp_gsids, usersid, my_tok_gsids, new_groups,
 			   auth_luid, auth_pos);
-  else if (!get_initgroups_sidlist (tmp_gsids, usersid, new_groups.pgsid, pw,
+  else if (!get_initgroups_sidlist (tmp_gsids, usersid, new_groups.pgsid,
 				    my_tok_gsids, auth_luid, auth_pos))
     goto out;
 
@@ -1037,7 +1036,7 @@ out:
 }
 
 HANDLE
-lsaauth (cygsid &usersid, user_groups &new_groups, struct passwd *pw)
+lsaauth (cygsid &usersid, user_groups &new_groups)
 {
   cygsidlist tmp_gsids (cygsidlist_auto, 12);
   cygpsid pgrpsid;
@@ -1111,9 +1110,9 @@ lsaauth (cygsid &usersid, user_groups &new_groups, struct passwd *pw)
   /* Create list of groups, the user is member in. */
   int auth_pos;
   if (new_groups.issetgroups ())
-    get_setgroups_sidlist (tmp_gsids, usersid, pw, NULL, new_groups, auth_luid,
+    get_setgroups_sidlist (tmp_gsids, usersid, NULL, new_groups, auth_luid,
 			   auth_pos);
-  else if (!get_initgroups_sidlist (tmp_gsids, usersid, new_groups.pgsid, pw,
+  else if (!get_initgroups_sidlist (tmp_gsids, usersid, new_groups.pgsid,
 				    NULL, auth_luid, auth_pos))
     goto out;
 
