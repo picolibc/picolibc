@@ -14,6 +14,7 @@
 #define _INTTYPES_H
 
 #include <newlib.h>
+#include <sys/config.h>
 #include <sys/_intsup.h>
 #include <stdint.h>
 #define __need_wchar_t
