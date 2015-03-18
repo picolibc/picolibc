@@ -246,3 +246,11 @@ public:
   struct group *getgrent ();
   inline void endgrent () { endent (true); }
 };
+
+/* These inline methods have to be defined here so that pg_pwd and pg_grp
+   are defined. */
+inline BOOL cygsid::getfrompw (const struct passwd *pw)
+  { return (*this = pw ? (PSID) ((pg_pwd *) pw)->sid : NO_SID) != NO_SID; }
+
+inline BOOL cygsid::getfromgr (const struct group *gr)
+  { return (*this = gr ? (PSID) ((pg_grp *) gr)->sid : NO_SID) != NO_SID; }

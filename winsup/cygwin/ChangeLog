@@ -1,5 +1,21 @@
 2015-03-18  Corinna Vinschen  <corinna@vinschen.de>
 
+	* grp.cc (pwdgrp::parse_group): Call cygsid::getfromgr_passwd.
+	* passwd.cc (pwdgrp::parse_passwd): Call cygsid::getfrompw_gecos.
+	* pwdgrp.h (cygsid::getfrompw): Implement as inline method here,
+	accessing pg_pwd's sid member directly.
+	(cygsid::getfromgr): Implement as inline method here, accessing
+	pg_grp's sid member directly.
+	* sec_auth.cc (extract_nt_dom_user): Call cygsid::getfrompw_gecos.
+	Explain why.
+	* sec_helper.cc (cygsid::getfrompw): Drop implementation.
+	(cygsid::getfromgr): Ditto.
+	* security.h (cygsid::getfrompw_gecos): Implement former getfrompw
+	inline here.
+	(cygsid::getfromgr_passwd): Implement former getfromgr inline here.
+
+2015-03-18  Corinna Vinschen  <corinna@vinschen.de>
+
 	* sec_auth.cc (get_server_groups): Drop unused passwd argument.  Adjust
 	calls throughout.
 	(get_initgroups_sidlist): Ditto.

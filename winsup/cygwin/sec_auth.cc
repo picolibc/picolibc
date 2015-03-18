@@ -119,7 +119,10 @@ extract_nt_dom_user (const struct passwd *pw, PWCHAR domain, PWCHAR user)
 
   debug_printf ("pw_gecos %p (%s)", pw->pw_gecos, pw->pw_gecos);
 
-  if (psid.getfrompw (pw)
+  /* The incoming passwd entry is not necessarily a pointer to the
+     internal passwd buffers, thus we must not rely on being able to
+     cast it to pg_pwd. */
+  if (psid.getfrompw_gecos (pw)
       && LookupAccountSidW (NULL, psid, user, &ulen, domain, &dlen, &use))
     return;
 

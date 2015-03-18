@@ -237,6 +237,18 @@ public:
 
   inline PSID set () { return psid = (PSID) sbuf; }
 
+  inline BOOL getfrompw_gecos (const struct passwd *pw)
+    {
+      char *sp = (pw && pw->pw_gecos) ? strrchr (pw->pw_gecos, ',') : NULL;
+      return (*this = sp ? sp + 1 : sp) != NO_SID;
+    }
+  inline BOOL getfromgr_passwd (const struct group *gr)
+    {
+      char *sp = (gr && gr->gr_passwd) ? gr->gr_passwd : NULL;
+      return (*this = sp) != NO_SID;
+    }
+
+  /* Implemented in pwdgrp.h. */
   BOOL getfrompw (const struct passwd *pw);
   BOOL getfromgr (const struct group *gr);
 

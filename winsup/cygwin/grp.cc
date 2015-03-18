@@ -47,7 +47,7 @@ pwdgrp::parse_group ()
     return false;
   /* Don't generate gr_mem entries. */
   grp.g.gr_mem = &null_ptr;
-  grp.sid.getfromgr (&grp.g);
+  grp.sid.getfromgr_passwd (&grp.g);
   return true;
 }
 
