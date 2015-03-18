@@ -1,5 +1,28 @@
 2015-03-18  Corinna Vinschen  <corinna@vinschen.de>
 
+	Preliminary read side implementation of new permission handling.
+	* acl.h (MAX_ACL_ENTRIES): Raise to 2730.  Add comment to explain.
+	* sec_acl.cc:  Add leading comment to explain new ACL style.
+	Add definitions and macros to use for bits in new Cygwin ACL.
+	(DENY_RWX): New mask value for all temporary deny bits.
+	(getace): Add bool parameter to decide when leaving all bits intact,
+	rather than filtering them per the already set bits.
+	(get_posix_access): New function, taking over functionality to read
+	POSIX ACL from SECURITY_DESCRIPTOR.
+	(getacl): Just call get_posix_access.
+	* sec_helper.cc (well_known_cygwin_sid): Define.
+	* security.cc (get_attribute_from_acl): Remove.
+	(get_info_from_sd): Remove.
+	(get_reg_sd): Call get_posix_access instead of get_info_from_sd.
+	(get_file_attribute): Ditto.
+	(get_object_attribute): Ditto.
+	* security.h (well_known_cygwin_sid): Declare.
+	(get_posix_access): Add prototype.
+
+	* Throughout, use simpler ACE macros from Windows' accctrl.h.
+
+2015-03-18  Corinna Vinschen  <corinna@vinschen.de>
+
 	* grp.cc (pwdgrp::parse_group): Call cygsid::getfromgr_passwd.
 	* passwd.cc (pwdgrp::parse_passwd): Call cygsid::getfrompw_gecos.
 	* pwdgrp.h (cygsid::getfrompw): Implement as inline method here,

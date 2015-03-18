@@ -393,6 +393,7 @@ public:
 };
 
 extern cygpsid well_known_null_sid;
+extern cygpsid well_known_cygwin_sid;
 extern cygpsid well_known_world_sid;
 extern cygpsid well_known_local_sid;
 extern cygpsid well_known_console_logon_sid;
@@ -463,6 +464,8 @@ bool get_sids_info (cygpsid, cygpsid, uid_t * , gid_t *);
 struct acl;
 extern "C" int aclsort32 (int, int, struct acl *);
 extern "C" int acl32 (const char *, int, int, struct acl *);
+int get_posix_access (PSECURITY_DESCRIPTOR, mode_t *, uid_t *, gid_t *,
+		      struct acl *, int);
 int getacl (HANDLE, path_conv &, int, struct acl *);
 int setacl (HANDLE, path_conv &, int, struct acl *, bool &);
 

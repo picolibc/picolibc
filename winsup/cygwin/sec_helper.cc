@@ -40,6 +40,8 @@ SECURITY_ATTRIBUTES NO_COPY_RO sec_all_nih =
 
 MKSID (well_known_null_sid, "S-1-0-0",
        SECURITY_NULL_SID_AUTHORITY, 1, SECURITY_NULL_RID);
+MKSID (well_known_cygwin_sid, "S-1-0-1132029815",
+       SECURITY_NULL_SID_AUTHORITY, 1, 0x43796777); /* "Cygw" */
 MKSID (well_known_world_sid, "S-1-1-0",
        SECURITY_WORLD_SID_AUTHORITY, 1, SECURITY_WORLD_RID);
 MKSID (well_known_local_sid, "S-1-2-0",
@@ -616,22 +618,21 @@ _recycler_sd (void *buf, bool users, bool dir)
      pre-Vista permissions the same way as on Vista and later. */
   RtlCreateAcl (dacl, MAX_DACL_LEN (3), ACL_REVISION);
   RtlAddAccessAllowedAceEx (dacl, ACL_REVISION,
-			    dir ? CONTAINER_INHERIT_ACE | OBJECT_INHERIT_ACE
+			    dir ? SUB_CONTAINERS_AND_OBJECTS_INHERIT
 				: NO_INHERITANCE,
 			    FILE_ALL_ACCESS, well_known_admins_sid);
   RtlAddAccessAllowedAceEx (dacl, ACL_REVISION,
-			    dir ? CONTAINER_INHERIT_ACE | OBJECT_INHERIT_ACE
+			    dir ? SUB_CONTAINERS_AND_OBJECTS_INHERIT
 				: NO_INHERITANCE,
 			    FILE_ALL_ACCESS, well_known_system_sid);
   if (users)
-    RtlAddAccessAllowedAceEx (dacl, ACL_REVISION, NO_PROPAGATE_INHERIT_ACE,
+    RtlAddAccessAllowedAceEx (dacl, ACL_REVISION, INHERIT_NO_PROPAGATE,
 			      FILE_GENERIC_READ | FILE_GENERIC_EXECUTE
 			      | FILE_APPEND_DATA | FILE_WRITE_ATTRIBUTES,
 			      well_known_users_sid);
   else
     RtlAddAccessAllowedAceEx (dacl, ACL_REVISION,
-			      dir ? CONTAINER_INHERIT_ACE
-				    | OBJECT_INHERIT_ACE
+			      dir ? SUB_CONTAINERS_AND_OBJECTS_INHERIT
 				  : NO_INHERITANCE,
 			      FILE_ALL_ACCESS, cygheap->user.sid ());
   LPVOID ace;

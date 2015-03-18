@@ -234,194 +234,6 @@ set_file_sd (HANDLE fh, path_conv &pc, security_descriptor &sd, bool is_chown)
   return res;
 }
 
-static void
-get_attribute_from_acl (mode_t *attribute, PACL acl, PSID owner_sid,
-			PSID group_sid, bool grp_member)
-{
-  ACCESS_ALLOWED_ACE *ace;
-  mode_t allow = 0;
-  mode_t deny = 0;
-  mode_t *flags, *anti;
-  bool isownergroup = RtlEqualSid (owner_sid, group_sid);
-
-  for (DWORD i = 0; i < acl->AceCount; ++i)
-    {
-      if (!NT_SUCCESS (RtlGetAce (acl, i, (PVOID *) &ace)))
-	continue;
-      if (ace->Header.AceFlags & INHERIT_ONLY_ACE)
-	continue;
-      switch (ace->Header.AceType)
-	{
-	case ACCESS_ALLOWED_ACE_TYPE:
-	  flags = &allow;
-	  anti = &deny;
-	  break;
-	case ACCESS_DENIED_ACE_TYPE:
-	  flags = &deny;
-	  anti = &allow;
-	  break;
-	default:
-	  continue;
-	}
-
-      cygpsid ace_sid ((PSID) &ace->SidStart);
-      if (ace_sid == well_known_world_sid)
-	{
-	  if (ace->Mask & FILE_READ_BITS)
-	    *flags |= ((!(*anti & S_IROTH)) ? S_IROTH : 0)
-		      | ((!isownergroup && !(*anti & S_IRGRP)) ? S_IRGRP : 0)
-		      | ((!(*anti & S_IRUSR)) ? S_IRUSR : 0);
-	  if (ace->Mask & FILE_WRITE_BITS)
-	    *flags |= ((!(*anti & S_IWOTH)) ? S_IWOTH : 0)
-		      | ((!isownergroup && !(*anti & S_IWGRP)) ? S_IWGRP : 0)
-		      | ((!(*anti & S_IWUSR)) ? S_IWUSR : 0);
-	  if (ace->Mask & FILE_EXEC_BITS)
-	    *flags |= ((!(*anti & S_IXOTH)) ? S_IXOTH : 0)
-		      | ((!isownergroup && !(*anti & S_IXGRP)) ? S_IXGRP : 0)
-		      | ((!(*anti & S_IXUSR)) ? S_IXUSR : 0);
-	  if ((S_ISDIR (*attribute)) &&
-	      (ace->Mask & (FILE_WRITE_DATA | FILE_EXECUTE | FILE_DELETE_CHILD))
-	      == (FILE_WRITE_DATA | FILE_EXECUTE))
-	    *flags |= S_ISVTX;
-	}
-      else if (ace_sid == well_known_null_sid)
-	{
-	  /* Read SUID, SGID and VTX bits from NULL ACE. */
-	  if (ace->Mask & FILE_READ_DATA)
-	    *flags |= S_ISVTX;
-	  if (ace->Mask & FILE_WRITE_DATA)
-	    *flags |= S_ISGID;
-	  if (ace->Mask & FILE_APPEND_DATA)
-	    *flags |= S_ISUID;
-	}
-      else if (ace_sid == owner_sid)
-	{
-	  if (ace->Mask & FILE_READ_BITS)
-	    *flags |= ((!(*anti & S_IRUSR)) ? S_IRUSR : 0);
-	  if (ace->Mask & FILE_WRITE_BITS)
-	    *flags |= ((!(*anti & S_IWUSR)) ? S_IWUSR : 0);
-	  if (ace->Mask & FILE_EXEC_BITS)
-	    *flags |= ((!(*anti & S_IXUSR)) ? S_IXUSR : 0);
-	  /* Apply deny mask to group if group SID == owner SID. */
-	  if (group_sid && isownergroup
-	      && ace->Header.AceType == ACCESS_DENIED_ACE_TYPE)
-	    {
-	      if (ace->Mask & FILE_READ_BITS)
-		*flags |= ((!(*anti & S_IRUSR)) ? S_IRGRP : 0);
-	      if (ace->Mask & FILE_WRITE_BITS)
-		*flags |= ((!(*anti & S_IWUSR)) ? S_IWGRP : 0);
-	      if (ace->Mask & FILE_EXEC_BITS)
-		*flags |= ((!(*anti & S_IXUSR)) ? S_IXGRP : 0);
-	    }
-	}
-      else if (ace_sid == group_sid)
-	{
-	  if (ace->Mask & FILE_READ_BITS)
-	    *flags |= ((!(*anti & S_IRGRP)) ? S_IRGRP : 0)
-		      | ((grp_member && !(*anti & S_IRUSR)) ? S_IRUSR : 0);
-	  if (ace->Mask & FILE_WRITE_BITS)
-	    *flags |= ((!(*anti & S_IWGRP)) ? S_IWGRP : 0)
-		      | ((grp_member && !(*anti & S_IWUSR)) ? S_IWUSR : 0);
-	  if (ace->Mask & FILE_EXEC_BITS)
-	    *flags |= ((!(*anti & S_IXGRP)) ? S_IXGRP : 0)
-		      | ((grp_member && !(*anti & S_IXUSR)) ? S_IXUSR : 0);
-	}
-      else if (flags == &allow)
-	{
-	  /* Simplified computation of additional group permissions based on
-	     the CLASS_OBJ value.  CLASS_OBJ represents the or'ed value of
-	     the primary group permissions and all secondary user and group
-	     permissions.  FIXME: This only takes ACCESS_ALLOWED_ACEs into
-	     account.  The computation with additional ACCESS_DENIED_ACE
-	     handling is much more complicated. */
-	  if (ace->Mask & FILE_READ_BITS)
-	    *flags |= S_IRGRP;
-	  if (ace->Mask & FILE_WRITE_BITS)
-	    *flags |= S_IWGRP;
-	  if (ace->Mask & FILE_EXEC_BITS)
-	    *flags |= S_IXGRP;
-	}
-    }
-  *attribute &= ~(S_IRWXU | S_IRWXG | S_IRWXO | S_ISVTX | S_ISGID | S_ISUID);
-#if 0
-  /* Disable owner/group permissions equivalence if owner SID == group SID.
-     It's technically not quite correct, but it helps in case a security
-     conscious application checks if a file has too open permissions.  In
-     fact, since owner == group, there's no security issue here. */
-  if (owner_sid && group_sid && RtlEqualSid (owner_sid, group_sid)
-      /* FIXME: temporary exception for /var/empty */
-      && well_known_system_sid != group_sid)
-    {
-      allow &= ~(S_IRGRP | S_IWGRP | S_IXGRP);
-      allow |= (((allow & S_IRUSR) ? S_IRGRP : 0)
-		| ((allow & S_IWUSR) ? S_IWGRP : 0)
-		| ((allow & S_IXUSR) ? S_IXGRP : 0));
-    }
-#endif
-  *attribute |= allow;
-}
-
-static void
-get_info_from_sd (PSECURITY_DESCRIPTOR psd, mode_t *attribute,
-		  uid_t *uidret, gid_t *gidret)
-{
-  if (!psd)
-    {
-      /* If reading the security descriptor failed, treat the object
-	 as unreadable. */
-      if (attribute)
-	*attribute &= ~(S_IRWXU | S_IRWXG | S_IRWXO);
-      if (uidret)
-	*uidret = ILLEGAL_UID;
-      if (gidret)
-	*gidret = ILLEGAL_GID;
-      return;
-    }
-
-  cygpsid owner_sid;
-  cygpsid group_sid;
-  NTSTATUS status;
-  BOOLEAN dummy;
-
-  status = RtlGetOwnerSecurityDescriptor (psd, (PSID *) &owner_sid, &dummy);
-  if (!NT_SUCCESS (status))
-    debug_printf ("RtlGetOwnerSecurityDescriptor: %y", status);
-  status = RtlGetGroupSecurityDescriptor (psd, (PSID *) &group_sid, &dummy);
-  if (!NT_SUCCESS (status))
-    debug_printf ("RtlGetGroupSecurityDescriptor: %y", status);
-
-  uid_t uid;
-  gid_t gid;
-  bool grp_member = get_sids_info (owner_sid, group_sid, &uid, &gid);
-  if (uidret)
-    *uidret = uid;
-  if (gidret)
-    *gidret = gid;
-
-  if (!attribute)
-    {
-      syscall_printf ("uid %u, gid %u", uid, gid);
-      return;
-    }
-
-  PACL acl;
-  BOOLEAN acl_exists;
-
-  status = RtlGetDaclSecurityDescriptor (psd, &acl_exists, &acl, &dummy);
-  if (!NT_SUCCESS (status))
-    {
-      __seterrno_from_nt_status (status);
-      *attribute &= ~(S_IRWXU | S_IRWXG | S_IRWXO);
-    }
-  else if (!acl_exists || !acl)
-    *attribute |= S_IRWXU | S_IRWXG | S_IRWXO;
-  else
-    get_attribute_from_acl (attribute, acl, owner_sid, group_sid, grp_member);
-
-  syscall_printf ("%sACL %y, uid %u, gid %u",
-		  (!acl_exists || !acl)?"NO ":"", *attribute, uid, gid);
-}
-
 static int
 get_reg_sd (HANDLE handle, security_descriptor &sd_ret)
 {
@@ -454,7 +266,7 @@ get_reg_attribute (HKEY hkey, mode_t *attribute, uid_t *uidret,
 
   if (!get_reg_sd (hkey, sd))
     {
-      get_info_from_sd (sd, attribute, uidret, gidret);
+      get_posix_access (sd, attribute, uidret, gidret, NULL, 0);
       return 0;
     }
   /* The entries are already set to default values */
@@ -471,7 +283,7 @@ get_file_attribute (HANDLE handle, path_conv &pc,
 
       if (!get_file_sd (handle, pc, sd, false))
 	{
-	  get_info_from_sd (sd, attribute, uidret, gidret);
+	  get_posix_access (sd, attribute, uidret, gidret, NULL, 0);
 	  return 0;
 	}
       /* ENOSYS is returned by get_file_sd if fetching the DACL from a remote
@@ -773,10 +585,10 @@ alloc_sd (path_conv &pc, uid_t uid, gid_t gid, int attribute,
 	    {
 	      if ((S_ISDIR (attribute) && (attribute & S_JUSTCREATED))
 		  || (ace->Header.AceFlags
-		      & (CONTAINER_INHERIT_ACE | OBJECT_INHERIT_ACE)) == 0)
+		      & (SUB_CONTAINERS_AND_OBJECTS_INHERIT)) == 0)
 		continue;
 	      else
-		ace->Header.AceFlags |= INHERIT_ONLY_ACE;
+		ace->Header.AceFlags |= INHERIT_ONLY;
 	    }
 	  if (attribute & S_JUSTCREATED)
 	    {
@@ -797,8 +609,7 @@ alloc_sd (path_conv &pc, uid_t uid, gid_t gid, int attribute,
 	         it inherits the default ACL from its parent, so mark
 		 all unrelated, inherited ACEs inheritable. */
 	      if (S_ISDIR (attribute))
-		ace->Header.AceFlags |= CONTAINER_INHERIT_ACE
-					| OBJECT_INHERIT_ACE;
+		ace->Header.AceFlags |= SUB_CONTAINERS_AND_OBJECTS_INHERIT;
 	    }
 	  else if (uid == ILLEGAL_UID && gid == ILLEGAL_UID
 		   && ace->Header.AceType == ACCESS_ALLOWED_ACE_TYPE
@@ -835,8 +646,7 @@ alloc_sd (path_conv &pc, uid_t uid, gid_t gid, int attribute,
      Cygwin applications don't need this. */
   if (S_ISDIR (attribute) && (attribute & S_JUSTCREATED))
     {
-      const DWORD inherit = CONTAINER_INHERIT_ACE | OBJECT_INHERIT_ACE
-			    | INHERIT_ONLY_ACE;
+      const DWORD inherit = SUB_CONTAINERS_AND_OBJECTS_INHERIT | INHERIT_ONLY;
       /* Set allow ACE for owner. */
       if (!add_access_allowed_ace (acl, ace_off++, owner_allow,
 				   well_known_creator_owner_sid, acl_len,
@@ -936,7 +746,7 @@ get_object_attribute (HANDLE handle, uid_t *uidret, gid_t *gidret,
 
   if (get_object_sd (handle, sd))
     return -1;
-  get_info_from_sd (sd, attribute, uidret, gidret);
+  get_posix_access (sd, attribute, uidret, gidret, NULL, 0);
   return 0;
 }
 

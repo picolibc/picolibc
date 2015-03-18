@@ -1,6 +1,6 @@
 /* cygwin/acl.h header file for Cygwin.
 
-   Copyright 1999, 2000, 2001, 2002, 2010, 2014 Red Hat, Inc.
+   Copyright 1999, 2000, 2001, 2002, 2010, 2014, 2015 Red Hat, Inc.
    Written by C. Vinschen.
 
 This file is part of Cygwin.
@@ -25,8 +25,16 @@ extern "C" {
 #define GETACL          (0x1)
 #define GETACLCNT       (0x2)
 
+/* Windows ACLs have a maximum size of 64K.  Counting the most pessimistic way,
+   the maximum number of ACEs is 3276.  Technet claims "approximately 1820",
+   which uses the length of normal user and group SIDs for the computation. 
+   We're now going with 2730, the number of aclent_t entries matching a 32K
+   buffer.
+   On one hand, there are only a limited number of SIDs shorter than the normal
+   user/group SIDs, on the other hand there are no deny aclent_t entries, so we
+   should be fine with 32K aclbuf_t buffers provided by the caller. */
 #define	MIN_ACL_ENTRIES (3)    // minimal acl entries from GETACLCNT
-#define	MAX_ACL_ENTRIES	(256)  // max entries of each type
+#define	MAX_ACL_ENTRIES	(2730) // max entries of each type
 
 // Return values of aclcheck(3) in case of error */
 #define GRP_ERROR       (0x1)
