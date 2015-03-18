@@ -1,3 +1,12 @@
+2015-03-23  Joel Sherrill <joel.sherrill@oarcorp.com
+
+	* configure.in: Delete logic to determine _UINTPTR_EQ_ULONGLONG
+	and _UINTPTR_EQ_ULONG at configuration time.
+	*libc/include/sys/config.h: Add logic to determine
+	_UINTPTR_EQ_ULONGLONG and _UINTPTR_EQ_ULONG at compilation time.
+	* libc/include/inttypes.h: Add include of <sys/config.h>.
+	* configure: Regenerated.
+
 2015-03-19  Steve Ellcey  <sellcey@imgtec.com>
 
 	* libc/include/sys/time.h: Replace uint32_t and uint64_t

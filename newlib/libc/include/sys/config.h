@@ -287,4 +287,30 @@
 #define _MB_EXTENDED_CHARSETS_WINDOWS 1
 #endif
 
+/* Determine how uintptr_t is defined by gcc for this target. This
+   is used to determine the correct printf() constant in inttypes.h */
+#pragma push_macro("signed")
+#pragma push_macro("int")
+#pragma push_macro("long")
+#undef signed
+#undef int
+#undef long
+#define signed +0
+#define int +0
+#define long +1
+#if __INTPTR_TYPE__ == 2
+#define _UINTPTR_EQ_ULONGLONG
+#elif __INTPTR_TYPE__ == 1
+#define _UINTPTR_EQ_ULONG
+#elif __INTPTR_TYPE__ == 0
+/* Nothing to define because intptr_t is safe to print as an int. */
+#else
+#error "Unable to determine type definition of uintptr_t"
+#endif
+#undef long
+#undef int
+#undef signed
+#pragma pop_macro("signed")
+#pragma pop_macro("int")
+#pragma pop_macro("long") 
 #endif /* __SYS_CONFIG_H__ */
