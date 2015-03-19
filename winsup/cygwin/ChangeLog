@@ -1,3 +1,10 @@
+2015-03-19  Corinna Vinschen  <corinna@vinschen.de>
+
+	* sec_acl.cc (get_posix_access): Handle multiple ACEs for the
+	owner and primary group of the file.  Handle the default primary
+	group ACE as DEF_GROUP_OBJ entry if the directory has the S_ISGID bit
+	set.  Add comments.  Minor code rearrangements.
+
 2015-03-18  Corinna Vinschen  <corinna@vinschen.de>
 
 	Preliminary read side implementation of new permission handling.

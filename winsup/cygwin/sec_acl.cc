@@ -456,10 +456,16 @@ get_posix_access (PSECURITY_DESCRIPTOR psd,
   int pos, type, id;
 
   bool new_style = false;
+  bool saw_user_obj = false;
+  bool saw_group_obj = false;
+  bool saw_def_group_obj = false;
+  bool has_class_perm = false;
+  bool has_def_class_perm = false;
+
+  mode_t class_perm = 0;
+  mode_t def_class_perm = 0;
   int types_def = 0;
   int def_pgrp_pos = -1;
-  bool has_class_perm = false, has_def_class_perm = false;
-  mode_t class_perm = 0, def_class_perm = 0;
 
   if (aclbufp && nentries < MIN_ACL_ENTRIES)
     {
@@ -561,8 +567,7 @@ get_posix_access (PSECURITY_DESCRIPTOR psd,
 	      new_style = true;
 	      type = (ace->Header.AceFlags & SUB_CONTAINERS_AND_OBJECTS_INHERIT)
 		     ? DEF_CLASS_OBJ : CLASS_OBJ;
-	      if ((pos = searchace (lacl, MAX_ACL_ENTRIES, type, ILLEGAL_GID))
-		  >= 0)
+	      if ((pos = searchace (lacl, MAX_ACL_ENTRIES, type)) >= 0)
 		{
 		  lacl[pos].a_type = type;
 		  lacl[pos].a_id = ILLEGAL_GID;
@@ -607,6 +612,7 @@ get_posix_access (PSECURITY_DESCRIPTOR psd,
 	  type = DEF_GROUP_OBJ;
 	  types_def |= type;
 	  id = ILLEGAL_GID;
+	  saw_def_group_obj = true;
 	}
       else
 	{
@@ -616,6 +622,23 @@ get_posix_access (PSECURITY_DESCRIPTOR psd,
 	}
       if (!(ace->Header.AceFlags & INHERIT_ONLY || type & ACL_DEFAULT))
 	{
+	  if (type == USER_OBJ)
+	    {
+	      /* If we get a second entry for the owner, it's an additional
+		 USER entry.  This can happen when chown'ing a file. */
+	      if (saw_user_obj)
+		type = USER;
+	      if (ace->Header.AceType == ACCESS_ALLOWED_ACE_TYPE)
+		saw_user_obj = true;
+	    }
+	  else if (type == GROUP_OBJ)
+	    {
+	      /* Same for the primary group. */
+	      if (saw_group_obj)
+		type = GROUP;
+	      if (ace->Header.AceType == ACCESS_ALLOWED_ACE_TYPE)
+		saw_group_obj = true;
+	    }
 	  if ((pos = searchace (lacl, MAX_ACL_ENTRIES, type, id)) >= 0)
 	    {
 	      getace (lacl[pos], type, id, ace->Mask, ace->Header.AceType,
@@ -636,7 +659,15 @@ get_posix_access (PSECURITY_DESCRIPTOR psd,
 	  if (type == USER_OBJ)
 	    type = USER;
 	  else if (type == GROUP_OBJ)
-	    type = GROUP;
+	    {
+	      /* If the SGID bit is set, the inheritable entry for the
+		 primary group is, in fact, the DEF_GROUP_OBJ entry,
+		 so don't change the type to GROUP in this case. */
+	      if (!new_style || saw_def_group_obj || !(attr & S_ISGID))
+		type = GROUP;
+	      else if (ace->Header.AceType == ACCESS_ALLOWED_ACE_TYPE)
+		saw_def_group_obj = true;
+	    }
 	  type |= ACL_DEFAULT;
 	  types_def |= type;
 	  if ((pos = searchace (lacl, MAX_ACL_ENTRIES, type, id)) >= 0)
