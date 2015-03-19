@@ -1,3 +1,8 @@
+2015-03-19  Steve Ellcey  <sellcey@imgtec.com>
+
+	* libc/include/sys/time.h: Replace uint32_t and uint64_t
+	with __uint32_t and __uint64_t.
+
 2015-03-13  Jon TURNEY  <jon.turney@dronecode.org.uk>
 
 	* libc/libc.texinfo: Fix directory entry.
