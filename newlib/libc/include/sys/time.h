@@ -57,13 +57,13 @@ struct timezone {
 #if __BSD_VISIBLE
 struct bintime {
 	time_t	sec;
-	uint64_t frac;
+	__uint64_t frac;
 };
 
 static __inline void
-bintime_addx(struct bintime *_bt, uint64_t _x)
+bintime_addx(struct bintime *_bt, __uint64_t _x)
 {
-	uint64_t _u;
+	__uint64_t _u;
 
 	_u = _bt->frac;
 	_bt->frac += _x;
@@ -74,7 +74,7 @@ bintime_addx(struct bintime *_bt, uint64_t _x)
 static __inline void
 bintime_add(struct bintime *_bt, const struct bintime *_bt2)
 {
-	uint64_t _u;
+	__uint64_t _u;
 
 	_u = _bt->frac;
 	_bt->frac += _bt2->frac;
@@ -86,7 +86,7 @@ bintime_add(struct bintime *_bt, const struct bintime *_bt2)
 static __inline void
 bintime_sub(struct bintime *_bt, const struct bintime *_bt2)
 {
-	uint64_t _u;
+	__uint64_t _u;
 
 	_u = _bt->frac;
 	_bt->frac -= _bt2->frac;
@@ -98,7 +98,7 @@ bintime_sub(struct bintime *_bt, const struct bintime *_bt2)
 static __inline void
 bintime_mul(struct bintime *_bt, u_int _x)
 {
-	uint64_t _p1, _p2;
+	__uint64_t _p1, _p2;
 
 	_p1 = (_bt->frac & 0xffffffffull) * _x;
 	_p2 = (_bt->frac >> 32) * _x + (_p1 >> 32);
@@ -117,7 +117,7 @@ bintime_shift(struct bintime *_bt, int _exp)
 		_bt->frac <<= _exp;
 	} else if (_exp < 0) {
 		_bt->frac >>= -_exp;
-		_bt->frac |= (uint64_t)_bt->sec << (64 + _exp);
+		_bt->frac |= (__uint64_t)_bt->sec << (64 + _exp);
 		_bt->sec >>= -_exp;
 	}
 }
@@ -179,8 +179,8 @@ bintime2timespec(const struct bintime *_bt, struct timespec *_ts)
 {
 
 	_ts->tv_sec = _bt->sec;
-	_ts->tv_nsec = ((uint64_t)1000000000 *
-	    (uint32_t)(_bt->frac >> 32)) >> 32;
+	_ts->tv_nsec = ((__uint64_t)1000000000 *
+	    (__uint32_t)(_bt->frac >> 32)) >> 32;
 }
 
 static __inline void
@@ -189,7 +189,7 @@ timespec2bintime(const struct timespec *_ts, struct bintime *_bt)
 
 	_bt->sec = _ts->tv_sec;
 	/* 18446744073 = int(2^64 / 1000000000) */
-	_bt->frac = _ts->tv_nsec * (uint64_t)18446744073LL;
+	_bt->frac = _ts->tv_nsec * (__uint64_t)18446744073LL;
 }
 
 static __inline void
@@ -197,7 +197,7 @@ bintime2timeval(const struct bintime *_bt, struct timeval *_tv)
 {
 
 	_tv->tv_sec = _bt->sec;
-	_tv->tv_usec = ((uint64_t)1000000 * (uint32_t)(_bt->frac >> 32)) >> 32;
+	_tv->tv_usec = ((__uint64_t)1000000 * (__uint32_t)(_bt->frac >> 32)) >> 32;
 }
 
 static __inline void
@@ -206,7 +206,7 @@ timeval2bintime(const struct timeval *_tv, struct bintime *_bt)
 
 	_bt->sec = _tv->tv_sec;
 	/* 18446744073709 = int(2^64 / 1000000) */
-	_bt->frac = _tv->tv_usec * (uint64_t)18446744073709LL;
+	_bt->frac = _tv->tv_usec * (__uint64_t)18446744073709LL;
 }
 
 static __inline struct timespec
@@ -215,7 +215,7 @@ sbttots(sbintime_t _sbt)
 	struct timespec _ts;
 
 	_ts.tv_sec = _sbt >> 32;
-	_ts.tv_nsec = ((uint64_t)1000000000 * (uint32_t)_sbt) >> 32;
+	_ts.tv_nsec = ((__uint64_t)1000000000 * (__uint32_t)_sbt) >> 32;
 	return (_ts);
 }
 
@@ -224,7 +224,7 @@ tstosbt(struct timespec _ts)
 {
 
 	return (((sbintime_t)_ts.tv_sec << 32) +
-	    (_ts.tv_nsec * (((uint64_t)1 << 63) / 500000000) >> 32));
+	    (_ts.tv_nsec * (((__uint64_t)1 << 63) / 500000000) >> 32));
 }
 
 static __inline struct timeval
@@ -233,7 +233,7 @@ sbttotv(sbintime_t _sbt)
 	struct timeval _tv;
 
 	_tv.tv_sec = _sbt >> 32;
-	_tv.tv_usec = ((uint64_t)1000000 * (uint32_t)_sbt) >> 32;
+	_tv.tv_usec = ((__uint64_t)1000000 * (__uint32_t)_sbt) >> 32;
 	return (_tv);
 }
 
@@ -242,7 +242,7 @@ tvtosbt(struct timeval _tv)
 {
 
 	return (((sbintime_t)_tv.tv_sec << 32) +
-	    (_tv.tv_usec * (((uint64_t)1 << 63) / 500000) >> 32));
+	    (_tv.tv_usec * (((__uint64_t)1 << 63) / 500000) >> 32));
 }
 #endif /* __BSD_VISIBLE */
 
@@ -390,7 +390,7 @@ int	tvtohz(struct timeval *tv);
 #define	TC_DEFAULTPERC		5
 
 #define	BT2FREQ(bt)                                                     \
-	(((uint64_t)0x8000000000000000 + ((bt)->frac >> 2)) /           \
+	(((__uint64_t)0x8000000000000000 + ((bt)->frac >> 2)) /           \
 	    ((bt)->frac >> 1))
 
 #define	SBT2FREQ(sbt)	((SBT_1S + ((sbt) >> 1)) / (sbt))
@@ -398,7 +398,7 @@ int	tvtohz(struct timeval *tv);
 #define	FREQ2BT(freq, bt)                                               \
 {									\
 	(bt)->sec = 0;                                                  \
-	(bt)->frac = ((uint64_t)0x8000000000000000  / (freq)) << 1;     \
+	(bt)->frac = ((__uint64_t)0x8000000000000000  / (freq)) << 1;     \
 }
 
 #define	TIMESEL(sbt, sbt2)						\
