@@ -1,3 +1,7 @@
+2013-03-23  Joel Sherrill <joel.sherrill@oarcorp.com>
+
+	* newlib.hin: Remove _UINTPTR_EQ_ULONG and _UINTPTR_EQ_ULONGLONG.
+
 2015-03-23  Joel Sherrill <joel.sherrill@oarcorp.com
 
 	* configure.in: Delete logic to determine _UINTPTR_EQ_ULONGLONG
