@@ -1,3 +1,7 @@
+2015-03-23  Sebastian Huber  <sebastian.huber@embedded-brains.de>
+
+	* libc/include/sys/tree.h: New file.
+
 2013-03-23  Joel Sherrill <joel.sherrill@oarcorp.com>
 
 	* newlib.hin: Remove _UINTPTR_EQ_ULONG and _UINTPTR_EQ_ULONGLONG.
