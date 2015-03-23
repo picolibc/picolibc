@@ -1,3 +1,7 @@
+2015-03-23  Corinna Vinschen  <corinna@vinschen.de>
+
+	* include/cygwin/_types.h: Drop unused file.
+
 2015-03-19  Corinna Vinschen  <corinna@vinschen.de>
 
 	* sec_acl.cc (get_posix_access): Handle multiple ACEs for the
