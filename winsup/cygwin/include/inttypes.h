@@ -1,6 +1,6 @@
 /* inttypes.h - fixed size integer types
 
-   Copyright 2003, 2005, 2009, 2010, 2012 Red Hat, Inc.
+   Copyright 2003, 2005, 2009, 2010, 2012, 2015 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -15,11 +15,6 @@ details. */
 #define __need_wchar_t
 #include <stddef.h>
 #include <bits/wordsize.h>
-
-/* C99 requires that in C++ the following macros should be defined only
-   if requested. */
-#if !defined (__cplusplus) || defined (__STDC_FORMAT_MACROS) \
-    || defined (__INSIDE_CYGWIN__)
 
 #if __WORDSIZE == 64
 #define __PRI64 "l"
@@ -246,8 +241,6 @@ details. */
 
 #define SCNxMAX __SCN64 "x"
 #define SCNxPTR __SCNPTR "x"
-
-#endif /* !__cplusplus || __STDC_FORMAT_MACROS || __INSIDE_CYGWIN__ */
 
 #ifdef __cplusplus
 extern "C" {
