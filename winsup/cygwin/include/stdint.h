@@ -1,6 +1,6 @@
 /* stdint.h - integer types
 
-   Copyright 2003, 2005, 2006, 2007, 2008, 2009, 2010, 2012 Red Hat, Inc.
+   Copyright 2003, 2005, 2006, 2007, 2008, 2009, 2010, 2012 2015 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -108,11 +108,6 @@ typedef unsigned long uintmax_t;
 typedef long long intmax_t;
 typedef unsigned long long uintmax_t;
 #endif
-
-/* C99 requires that in C++ the following macros should be defined only
-   if requested. */
-#if !defined (__cplusplus) || defined (__STDC_LIMIT_MACROS) \
-    || defined (__INSIDE_CYGWIN__)
 
 #ifdef __x86_64__
 # define __I64(n) n ## L
@@ -248,13 +243,6 @@ typedef unsigned long long uintmax_t;
 #define WINT_MAX (4294967295U)
 #endif
 
-#endif /* !__cplusplus || __STDC_LIMIT_MACROS || __INSIDE_CYGWIN__ */
-
-/* C99 requires that in C++ the following macros should be defined only
-   if requested. */
-#if !defined (__cplusplus) || defined (__STDC_CONSTANT_MACROS) \
-    || defined (__INSIDE_CYGWIN__)
-
 /* Macros for minimum-width integer constant expressions */
 
 #define INT8_C(x) x
@@ -284,7 +272,5 @@ typedef unsigned long long uintmax_t;
 #define INTMAX_C(x) x ## LL
 #define UINTMAX_C(x) x ## ULL
 #endif
-
-#endif /* !__cplusplus || __STDC_CONSTANT_MACROS || __INSIDE_CYGWIN__ */
 
 #endif /* _STDINT_H */

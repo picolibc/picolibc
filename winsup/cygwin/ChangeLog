@@ -1,3 +1,10 @@
+2015-03-24  Corinna Vinschen  <corinna@vinschen.de>
+
+	Per glibc BZ #15366:
+	* inttypes.h: Drop __STDC_FORMAT_MACROS consideration.
+	* stdint.h: Drop __STDC_LIMIT_MACROS and __STDC_CONSTANT_MACROS
+	consideration.
+
 2015-03-23  Corinna Vinschen  <corinna@vinschen.de>
 
 	* include/cygwin/_types.h: Drop unused file.
