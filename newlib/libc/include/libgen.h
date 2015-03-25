@@ -13,6 +13,7 @@ extern "C" {
 #endif
 
 char      *_EXFUN(basename,     (char *));
+#define _BASENAME_DEFINED
 char      *_EXFUN(dirname,     (char *));
 
 #ifdef __cplusplus

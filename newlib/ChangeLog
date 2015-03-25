@@ -1,3 +1,11 @@
+2015-03-30  Yaakov Selkowitz  <yselkowi@redhat.com>
+
+	* libc/include/libgen.h (_BASENAME_DEFINED): Define.
+	* libc/include/string.h (basename): Declare.
+	* libc/string/Makefile.am (ELIX_4_SOURCES): Add gnu_basename.c.
+	* libc/string/Makefile.in: Regenerate.
+	* libc/string/gnu_basename.c: New file.
+
 2015-03-23  Sebastian Huber  <sebastian.huber@embedded-brains.de>
 
 	* libc/include/sys/tree.h: New file.
