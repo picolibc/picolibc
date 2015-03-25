@@ -1,5 +1,10 @@
 2015-03-30  Yaakov Selkowitz  <yselkowi@redhat.com>
 
+	* libc/time/strftime.c (strftime) <%Z>: Initialize tznam to NULL.
+	Use _tzname as fallback if TM_ZONE is NULL.
+
+2015-03-30  Yaakov Selkowitz  <yselkowi@redhat.com>
+
 	* libc/include/libgen.h (_BASENAME_DEFINED): Define.
 	* libc/include/string.h (basename): Declare.
 	* libc/string/Makefile.am (ELIX_4_SOURCES): Add gnu_basename.c.
