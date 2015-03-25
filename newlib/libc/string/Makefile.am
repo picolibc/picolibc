@@ -102,6 +102,7 @@ if ELIX_LEVEL_3
 ELIX_4_SOURCES =
 else
 ELIX_4_SOURCES = \
+	gnu_basename.c \
 	memmem.c \
 	memrchr.c \
 	rawmemchr.c \

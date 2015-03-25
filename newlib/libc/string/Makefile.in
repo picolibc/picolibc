@@ -118,7 +118,8 @@ am__objects_1 = lib_a-bcopy.$(OBJEXT) lib_a-bzero.$(OBJEXT) \
 @ELIX_LEVEL_1_FALSE@	lib_a-wcpcpy.$(OBJEXT) \
 @ELIX_LEVEL_1_FALSE@	lib_a-wcpncpy.$(OBJEXT) \
 @ELIX_LEVEL_1_FALSE@	lib_a-wcsdup.$(OBJEXT)
-@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@am__objects_3 = lib_a-memmem.$(OBJEXT) \
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@am__objects_3 = lib_a-gnu_basename.$(OBJEXT) \
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	lib_a-memmem.$(OBJEXT) \
 @ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	lib_a-memrchr.$(OBJEXT) \
 @ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	lib_a-rawmemchr.$(OBJEXT) \
 @ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	lib_a-wcscasecmp.$(OBJEXT) \
@@ -145,7 +146,8 @@ am__objects_4 = bcopy.lo bzero.lo index.lo memchr.lo memcmp.lo \
 @ELIX_LEVEL_1_FALSE@	stpcpy.lo stpncpy.lo strndup.lo \
 @ELIX_LEVEL_1_FALSE@	strcasestr.lo strchrnul.lo strndup_r.lo \
 @ELIX_LEVEL_1_FALSE@	wcpcpy.lo wcpncpy.lo wcsdup.lo
-@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@am__objects_6 = memmem.lo \
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@am__objects_6 = gnu_basename.lo \
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	memmem.lo \
 @ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	memrchr.lo \
 @ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	rawmemchr.lo \
 @ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	wcscasecmp.lo \
@@ -410,6 +412,7 @@ GENERAL_SOURCES = \
 
 @ELIX_LEVEL_1_TRUE@ELIX_2_SOURCES = 
 @ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@ELIX_4_SOURCES = \
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	gnu_basename.c \
 @ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	memmem.c \
 @ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	memrchr.c \
 @ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	rawmemchr.c \
@@ -997,6 +1000,12 @@ lib_a-wcsdup.o: wcsdup.c
 
 lib_a-wcsdup.obj: wcsdup.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-wcsdup.obj `if test -f 'wcsdup.c'; then $(CYGPATH_W) 'wcsdup.c'; else $(CYGPATH_W) '$(srcdir)/wcsdup.c'; fi`
+
+lib_a-gnu_basename.o: gnu_basename.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-gnu_basename.o `test -f 'gnu_basename.c' || echo '$(srcdir)/'`gnu_basename.c
+
+lib_a-gnu_basename.obj: gnu_basename.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-gnu_basename.obj `if test -f 'gnu_basename.c'; then $(CYGPATH_W) 'gnu_basename.c'; else $(CYGPATH_W) '$(srcdir)/gnu_basename.c'; fi`
 
 lib_a-memmem.o: memmem.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-memmem.o `test -f 'memmem.c' || echo '$(srcdir)/'`memmem.c

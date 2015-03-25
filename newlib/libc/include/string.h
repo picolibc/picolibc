@@ -163,6 +163,20 @@ int	_EXFUN(strtosigno, (const char *__name));
 			 (char *) memcpy (__out, __in, __len-1);}))
 #endif /* _GNU_SOURCE && __GNUC__ */
 
+/* There are two common basename variants.  If you #include <libgen.h>
+   first, you get the POSIX version; otherwise you get the GNU version.
+   POSIX requires that #undef basename will still let you
+   invoke the underlying function, but that requires gcc support.  */
+#if __GNU_VISIBLE && !defined(_BASENAME_DEFINED)
+# ifdef __GNUC__
+char	*_EXFUN(basename,(const char *))
+             __asm__ (__ASMNAME ("__gnu_basename")) __nonnull(1);
+# else
+char	*_EXFUN(__gnu_basename,(const char *));
+# define basename __gnu_basename
+# endif
+#endif
+
 #include <sys/string.h>
 
 _END_STD_C
