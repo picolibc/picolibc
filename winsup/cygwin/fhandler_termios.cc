@@ -1,7 +1,7 @@
 /* fhandler_termios.cc
 
    Copyright 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2008, 2009, 2010,
-   2011, 2012, 2014 Red Hat, Inc.
+   2011, 2012, 2014, 2015 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -46,14 +46,14 @@ fhandler_termios::tcinit (bool is_pty_master)
       tc ()->ti.c_cc[VINTR]	= CINTR;
       tc ()->ti.c_cc[VKILL]	= CKILL;
       tc ()->ti.c_cc[VLNEXT]	= CLNEXT;
-      tc ()->ti.c_cc[VMIN]	= 1;
+      tc ()->ti.c_cc[VMIN]	= CMIN;
       tc ()->ti.c_cc[VQUIT]	= CQUIT;
       tc ()->ti.c_cc[VREPRINT]	= CRPRNT;
       tc ()->ti.c_cc[VSTART]	= CSTART;
       tc ()->ti.c_cc[VSTOP]	= CSTOP;
       tc ()->ti.c_cc[VSUSP]	= CSUSP;
       tc ()->ti.c_cc[VSWTC]	= CSWTCH;
-      tc ()->ti.c_cc[VTIME]	= 0;
+      tc ()->ti.c_cc[VTIME]	= CTIME;
       tc ()->ti.c_cc[VWERASE]	= CWERASE;
 
       tc ()->ti.c_ispeed = tc ()->ti.c_ospeed = B38400;
