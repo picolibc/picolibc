@@ -1311,7 +1311,7 @@ recurse:
 	  if (tim_p->tm_isdst >= 0)
 	    {
 	      size_t size;
-	      const char *tznam;
+	      const char *tznam = NULL;
 
 	      TZ_LOCK;
 #if defined (__CYGWIN__)
@@ -1320,9 +1320,9 @@ recurse:
 	      tznam = __cygwin_gettzname (tim_p);
 #elif defined (__TM_ZONE)
 	      tznam = tim_p->__TM_ZONE;
-#else
-	      tznam = _tzname[tim_p->tm_isdst > 0];
 #endif
+	      if (!tznam)
+		tznam = _tzname[tim_p->tm_isdst > 0];
 	      /* Note that in case of wcsftime this loop only works for
 	         timezone abbreviations using the portable codeset (aka ASCII).
 		 This seems to be the case, but if that ever changes, this
