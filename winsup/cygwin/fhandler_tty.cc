@@ -145,7 +145,8 @@ fhandler_pty_common::__release_output_mutex (const char *fn, int ln)
 void
 fhandler_pty_master::doecho (const void *str, DWORD len)
 {
-  if (!WriteFile (echo_w, str, len, &len, NULL))
+  ssize_t towrite = len;
+  if (!process_opost_output (echo_w, str, towrite, true))
     termios_printf ("Write to echo pipe failed, %E");
 }
 
@@ -217,10 +218,9 @@ int
 fhandler_pty_master::process_slave_output (char *buf, size_t len, int pktmode_on)
 {
   size_t rlen;
-  char outbuf[OUT_BUFFER_SIZE + 1];
+  char outbuf[OUT_BUFFER_SIZE];
   DWORD n;
   DWORD echo_cnt;
-  int column = 0;
   int rc = 0;
 
   flush_to_slave ();
@@ -228,34 +228,8 @@ fhandler_pty_master::process_slave_output (char *buf, size_t len, int pktmode_on
   if (len == 0)
     goto out;
 
-  if (need_nl)
-    {
-      /* We need to return a left over \n character, resulting from
-	 \r\n conversion.  Note that we already checked for FLUSHO and
-	 output_stopped at the time that we read the character, so we
-	 don't check again here.  */
-      if (buf)
-	buf[0] = '\n';
-      need_nl = 0;
-      rc = 1;
-      goto out;
-    }
-
   for (;;)
     {
-      /* Set RLEN to the number of bytes to read from the pipe.  */
-      rlen = len;
-      if (get_ttyp ()->ti.c_oflag & OPOST && get_ttyp ()->ti.c_oflag & ONLCR)
-	{
-	  /* We are going to expand \n to \r\n, so don't read more than
-	     half of the number of bytes requested.  */
-	  rlen /= 2;
-	  if (rlen == 0)
-	    rlen = 1;
-	}
-      if (rlen > sizeof outbuf)
-	rlen = sizeof outbuf;
-
       n = echo_cnt = 0;
       for (;;)
 	{
@@ -267,7 +241,11 @@ fhandler_pty_master::process_slave_output (char *buf, size_t len, int pktmode_on
 	  if (n)
 	    break;
 	  if (hit_eof ())
-	    goto out;
+	    {
+	      set_errno (EIO);
+	      rc = -1;
+	      goto out;
+	    }
 	  /* DISCARD (FLUSHO) and tcflush can finish here. */
 	  if ((get_ttyp ()->ti.c_lflag & FLUSHO || !buf))
 	    goto out;
@@ -289,6 +267,26 @@ fhandler_pty_master::process_slave_output (char *buf, size_t len, int pktmode_on
 	  flush_to_slave ();
 	}
 
+      /* Set RLEN to the number of bytes to read from the pipe.  */
+      rlen = len;
+
+      char *optr;
+      optr = buf;
+      if (pktmode_on && buf)
+	{
+	  *optr++ = TIOCPKT_DATA;
+	  rlen -= 1;
+	}
+
+      if (rlen == 0)
+	{
+	  rc = optr - buf;
+	  goto out;
+	}
+
+      if (rlen > sizeof outbuf)
+	rlen = sizeof outbuf;
+
       /* If echo pipe has data (something has been typed or pasted), prefer
          it over slave output. */
       if (echo_cnt > 0)
@@ -306,68 +304,12 @@ fhandler_pty_master::process_slave_output (char *buf, size_t len, int pktmode_on
 	}
 
       termios_printf ("bytes read %u", n);
-      get_ttyp ()->write_error = 0;
 
       if (get_ttyp ()->ti.c_lflag & FLUSHO || !buf)
 	continue;
 
-      char *optr;
-      optr = buf;
-      if (pktmode_on)
-	*optr++ = TIOCPKT_DATA;
-
-      if (!(get_ttyp ()->ti.c_oflag & OPOST))	// post-process output
-	{
-	  memcpy (optr, outbuf, n);
-	  optr += n;
-	}
-      else					// raw output mode
-	{
-	  char *iptr = outbuf;
-
-	  while (n--)
-	    {
-	      switch (*iptr)
-		{
-		case '\r':
-		  if ((get_ttyp ()->ti.c_oflag & ONOCR) && column == 0)
-		    {
-		      iptr++;
-		      continue;
-		    }
-		  if (get_ttyp ()->ti.c_oflag & OCRNL)
-		    *iptr = '\n';
-		  else
-		    column = 0;
-		  break;
-		case '\n':
-		  if (get_ttyp ()->ti.c_oflag & ONLCR)
-		    {
-		      *optr++ = '\r';
-		      column = 0;
-		    }
-		  if (get_ttyp ()->ti.c_oflag & ONLRET)
-		    column = 0;
-		  break;
-		default:
-		  column++;
-		  break;
-		}
-
-	      /* Don't store data past the end of the user's buffer.  This
-		 can happen if the user requests a read of 1 byte when
-		 doing \r\n expansion.  */
-	      if (optr - buf >= (int) len)
-		{
-		  if (*iptr != '\n' || n != 0)
-		    system_printf ("internal error: %u unexpected characters", n);
-		  need_nl = 1;
-		  break;
-		}
-
-	      *optr++ = *iptr++;
-	    }
-	}
+      memcpy (optr, outbuf, n);
+      optr += n;
       rc = optr - buf;
       break;
 
@@ -639,7 +581,6 @@ fhandler_pty_slave::init (HANDLE h, DWORD a, mode_t)
 ssize_t __stdcall
 fhandler_pty_slave::write (const void *ptr, size_t len)
 {
-  DWORD n;
   ssize_t towrite = len;
 
   bg_check_types bg = bg_check (SIGTTOU);
@@ -650,43 +591,19 @@ fhandler_pty_slave::write (const void *ptr, size_t len)
 
   push_process_state process_state (PID_TTYOU);
 
-  while (len)
+  if (!process_opost_output (get_output_handle (), ptr, towrite, false))
     {
-      n = MIN (OUT_BUFFER_SIZE, len);
-      char *buf = (char *)ptr;
-      ptr = (char *) ptr + n;
-      len -= n;
-
-      while (tc ()->output_stopped)
-	cygwait (10);
-
-      /* Previous write may have set write_error to != 0.  Check it here.
-	 This is less than optimal, but the alternative slows down pty
-	 writes enormously. */
-      if (get_ttyp ()->write_error)
+      DWORD err = GetLastError ();
+      termios_printf ("WriteFile failed, %E");
+      switch (err)
 	{
-	  set_errno (get_ttyp ()->write_error);
-	  towrite = -1;
-	  get_ttyp ()->write_error = 0;
-	  break;
+	case ERROR_NO_DATA:
+	  err = ERROR_IO_DEVICE;
+	default:
+	  __seterrno_from_win_error (err);
 	}
-
-      BOOL res = WriteFile (get_output_handle (), buf, n, &n, NULL);
-      if (!res)
-	{
-	  DWORD err = GetLastError ();
-	  termios_printf ("WriteFile failed, %E");
-	  switch (err)
-	    {
-	    case ERROR_NO_DATA:
-	      err = ERROR_IO_DEVICE;
-	    default:
-	      __seterrno_from_win_error (err);
-	    }
-	  raise (SIGHUP);		/* FIXME: Should this be SIGTTOU? */
-	  towrite = -1;
-	  break;
-	}
+      raise (SIGHUP);		/* FIXME: Should this be SIGTTOU? */
+      towrite = -1;
     }
   return towrite;
 }
@@ -1225,7 +1142,7 @@ errout:
 fhandler_pty_master::fhandler_pty_master (int unit)
   : fhandler_pty_common (), pktmode (0), master_ctl (NULL),
     master_thread (NULL), from_master (NULL), to_master (NULL),
-    echo_r (NULL), echo_w (NULL), dwProcessId (0), need_nl (0)
+    echo_r (NULL), echo_w (NULL), dwProcessId (0)
 {
   if (unit >= 0)
     dev ().parse (DEV_PTYM_MAJOR, unit);
@@ -1782,4 +1699,94 @@ fhandler_pty_master::fixup_after_exec ()
     fixup_after_fork (spawn_info->parent);
   else
     from_master = to_master = NULL;
+}
+
+BOOL
+fhandler_pty_common::process_opost_output (HANDLE h, const void *ptr, ssize_t& len, bool is_echo)
+{
+  ssize_t towrite = len;
+  BOOL res = TRUE;
+  while (towrite)
+    {
+      if (!is_echo)
+	{
+	  if (tc ()->output_stopped && is_nonblocking ())
+	    {
+	      if (towrite < len)
+		break;
+	      else
+		{
+		  set_errno(EAGAIN);
+		  len = -1;
+		  return TRUE;
+		}
+	    }
+	  while (tc ()->output_stopped)
+	    cygwait (10);
+	}
+
+      if (!(get_ttyp ()->ti.c_oflag & OPOST))	// raw output mode
+	{
+	  DWORD n = MIN (OUT_BUFFER_SIZE, towrite);
+	  res = WriteFile (h, ptr, n, &n, NULL);
+	  if (!res)
+	    break;
+	  ptr = (char *) ptr + n;
+	  towrite -= n;
+	}
+      else					// post-process output
+	{
+	  char outbuf[OUT_BUFFER_SIZE + 1];
+	  char *buf = (char *)ptr;
+	  DWORD n = 0;
+	  ssize_t rc = 0;
+	  acquire_output_mutex (INFINITE);
+	  while (n < OUT_BUFFER_SIZE && rc < towrite)
+	    {
+	      switch (buf[rc])
+		{
+		case '\r':
+		  if ((get_ttyp ()->ti.c_oflag & ONOCR)
+		      && get_ttyp ()->column == 0)
+		    {
+		      rc++;
+		      continue;
+		    }
+		  if (get_ttyp ()->ti.c_oflag & OCRNL)
+		    {
+		      outbuf[n++] = '\n';
+		      rc++;
+		    }
+		  else
+		    {
+		      outbuf[n++] = buf[rc++];
+		      get_ttyp ()->column = 0;
+		    }
+		  break;
+		case '\n':
+		  if (get_ttyp ()->ti.c_oflag & ONLCR)
+		    {
+		      outbuf[n++] = '\r';
+		      get_ttyp ()->column = 0;
+		    }
+		  if (get_ttyp ()->ti.c_oflag & ONLRET)
+		    get_ttyp ()->column = 0;
+		  outbuf[n++] = buf[rc++];
+		  break;
+		default:
+		  outbuf[n++] = buf[rc++];
+		  get_ttyp ()->column++;
+		  break;
+		}
+	    }
+	  release_output_mutex ();
+	  res = WriteFile (h, outbuf, n, &n, NULL);
+	  if (!res)
+	    break;
+	  ptr = (char *) ptr + rc;
+	  towrite -= rc;
+	}
+    }
+  len -= towrite;
+  return res;
 }

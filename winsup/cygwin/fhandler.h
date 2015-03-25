@@ -1508,6 +1508,9 @@ class fhandler_pty_common: public fhandler_termios
     copyto (fh);
     return fh;
   }
+
+ protected:
+  BOOL process_opost_output (HANDLE h, const void *ptr, ssize_t& len, bool is_echo);
 };
 
 class fhandler_pty_slave: public fhandler_pty_common
@@ -1574,8 +1577,6 @@ class fhandler_pty_master: public fhandler_pty_common
   DWORD dwProcessId;		// Owner of master handles
 
 public:
-  int need_nl;			// Next read should start with \n
-
   HANDLE get_echo_handle () const { return echo_r; }
   /* Constructor */
   fhandler_pty_master (int);

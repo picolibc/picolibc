@@ -237,6 +237,7 @@ tty::init ()
   was_opened = false;
   master_pid = 0;
   is_console = false;
+  column = 0;
 }
 
 HANDLE

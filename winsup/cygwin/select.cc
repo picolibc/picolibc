@@ -604,11 +604,6 @@ peek_pipe (select_record *s, bool from_select)
 	  {
 	    fhandler_pty_master *fhm = (fhandler_pty_master *) fh;
 	    fhm->flush_to_slave ();
-	    if (fhm->need_nl)
-	      {
-		gotone = s->read_ready = true;
-		goto out;
-	      }
 	  }
 	  break;
 	default:
