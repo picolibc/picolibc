@@ -1,3 +1,31 @@
+2015-03-25  Takashi Yano  <takashi.yano@nifty.ne.jp>
+
+	* tty.h (class tty_min): Remove variable "write_error" to which any
+	errors are not currently set at anywhere.
+	(class tty): Add variable "column" for handling ONOCR.
+	* tty.cc (tty::init): Add initialization code for variable "column".
+	* fhandler.h (class fhandler_pty_master): Remove variable "need_nl"
+	which is not necessary any more. "need_nl" was needed by OPOST process
+	in fhandler_pty_master::process_slave_output().
+	(class fhandler_pty_common): Add function process_opost_output() for
+	handling post processing for OPOST in write process.
+	* fhandler_tty.cc (fhandler_pty_master::process_slave_output): Count
+	TIOCPKT control byte into length to be read in TIOCPKT mode. Move
+	post processing for OPOST to write process. Remove code related to
+	variable "write_error". Return with EIO error if slave is already
+	closed.
+	(fhandler_pty_master::fhandler_pty_master): Remove initialization
+	code for variable "need_nl".
+	(fhandler_pty_common::process_opost_output): Add this function for
+	handling of OPOST in write process. Add code to avoid blocking in
+	non-blocking mode when output is suspended by ^S.
+	(fhandler_pty_slave::write): Call fhandler_pty_common::
+	process_opost_output() instead of WriteFile(). Remove code related to
+	variable "write_error".
+	(fhandler_pty_master::doecho): Call fhandler_pty_common::
+	process_opost_output() instead of WriteFile().
+	* select.cc (peek_pipe): Remove code related to variable "need_nl".
+
 2015-03-24  Corinna Vinschen  <corinna@vinschen.de>
 
 	Per glibc BZ #15366:

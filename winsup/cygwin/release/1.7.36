@@ -18,3 +18,7 @@ Bug Fixes
 
 - Fix a name change from symlink to target name in calls to execvp, system, etc.
   Addresses: https://cygwin.com/ml/cygwin/2015-03/msg00270.html
+
+- Fix internal error in pty -ONLCR handling.  Fix timing bug in pty OPOST 
+  handling.
+  Addresses: https://cygwin.com/ml/cygwin/2015-02/msg00929.html

@@ -67,7 +67,6 @@ public:
    * -ERRNO
    */
   int ioctl_retval;
-  int write_error;
 
   void setntty (_major_t t, _minor_t n) {ntty = (fh_devices) FHDEV (t, n);}
   dev_t getntty () const {return ntty;}
@@ -117,6 +116,7 @@ public:
 
   int read_retval;
   bool was_opened;	/* True if opened at least once. */
+  int column;	/* Current Column */
 
   void init ();
   HANDLE open_inuse (ACCESS_MASK access);
