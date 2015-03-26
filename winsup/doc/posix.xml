@@ -50,7 +50,7 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     atoi
     atol
     atoll
-    basename
+    basename			(see chapter "Implementation Notes")
     bind
     bsearch
     btowc
@@ -1139,6 +1139,7 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     asnprintf
     asprintf
     asprintf_r
+    basename			(see chapter "Implementation Notes")
     canonicalize_file_name
     dremf
     dup3
@@ -1602,6 +1603,9 @@ group quotas, no inode quotas, no time constraints.</para>
 
 <para><function>qsort_r</function> is available in both BSD and GNU flavors,
 depending on whether _BSD_SOURCE or _GNU_SOURCE is defined when compiling.</para>
+
+<para><function>basename</function> is available in both POSIX and GNU flavors,
+depending on whether libgen.h is included or not.</para>
 
 </sect1>
 
