@@ -61,6 +61,7 @@ __fsetlocking SIGFE
 __fwritable NOSIGFE
 __fwriting NOSIGFE
 __getreent NOSIGFE
+__gnu_basename NOSIGFE
 __infinity NOSIGFE
 __isinfd NOSIGFE
 __isinff NOSIGFE

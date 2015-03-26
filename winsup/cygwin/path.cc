@@ -48,6 +48,7 @@
      c: means c:\.
   */
 
+#define _BASENAME_DEFINED
 #include "winsup.h"
 #include "miscfuncs.h"
 #include <ctype.h>
@@ -4765,6 +4766,33 @@ basename (char *path)
       return buf;
     }
   return path;
+}
+
+/* The differences with the POSIX version above:
+   - declared in <string.h> (instead of <libgen.h>);
+   - the argument is never modified, and therefore is marked const;
+   - the empty string is returned if path is an empty string, "/", or ends
+     with a trailing slash. */
+extern "C" char *
+__gnu_basename (const char *path)
+{
+  static char buf[1];
+  char *c, *d, *bs = (char *)path;
+
+  if (!path || !*path)
+    return strcpy (buf, "");
+  if (isalpha (path[0]) && path[1] == ':')
+    bs += 2;
+  else if (strspn (path, "/\\") > 1)
+    ++bs;
+  c = strrchr (bs, '/');
+  if ((d = strrchr (c ?: bs, '\\')) > c)
+    c = d;
+  if (c)
+    return c + 1;
+  else if (!bs[0])
+    return strcpy (buf, "");
+  return (char *)path;
 }
 
 /* No need to be reentrant or thread-safe according to SUSv3.

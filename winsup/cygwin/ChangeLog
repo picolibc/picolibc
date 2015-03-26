@@ -1,3 +1,8 @@
+2015-03-30  Yaakov Selkowitz  <yselkowi@redhat.com>
+
+	* common.din (__gnu_basename): Export.
+	* path.cc (__gnu_basename): New function.
+
 2015-03-30  Corinna Vinschen  <corinna@vinschen.de>
 
 	* cygheap.h (cygheap_domain_info::add_domain): Add prototype.
