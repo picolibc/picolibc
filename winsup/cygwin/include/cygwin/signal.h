@@ -18,6 +18,10 @@
 extern "C" {
 #endif
 
+/*
+  Define a struct __mcontext, which should be identical in layout to the Win32
+  API type CONTEXT with the addition of oldmask and cr2 fields at the end.
+*/
 #ifdef __x86_64__
 
 struct _uc_fpxreg {
@@ -45,7 +49,7 @@ struct _fpstate
   __uint32_t padding[24];
 };
 
-struct ucontext
+struct __mcontext
 {
   __uint64_t p1home;
   __uint64_t p2home;
@@ -53,7 +57,7 @@ struct ucontext
   __uint64_t p4home;
   __uint64_t p5home;
   __uint64_t p6home;
-  __uint32_t cr2;
+  __uint32_t ctxflags;
   __uint32_t mxcsr;
   __uint16_t cs;
   __uint16_t ds;
@@ -86,14 +90,15 @@ struct ucontext
   __uint64_t r15;
   __uint64_t rip;
   struct _fpstate fpregs;
+  __uint64_t vregs[52];
   __uint64_t vcx;
   __uint64_t dbc;
   __uint64_t btr;
   __uint64_t bfr;
   __uint64_t etr;
   __uint64_t efr;
-  __uint8_t _internal;
   __uint64_t oldmask;
+  __uint64_t cr2;
 };
 
 #else /* !x86_64 */
@@ -117,9 +122,9 @@ struct _fpstate
   __uint32_t nxst;
 };
 
-struct ucontext
+struct __mcontext
 {
-  __uint32_t cr2;
+  __uint32_t ctxflags;
   __uint32_t dr0;
   __uint32_t dr1;
   __uint32_t dr2;
@@ -143,15 +148,20 @@ struct ucontext
   __uint32_t eflags;
   __uint32_t esp;
   __uint32_t ss;
-  __uint8_t _internal;
+  __uint32_t reserved[128];
   __uint32_t oldmask;
+  __uint32_t cr2;
 };
 
 #endif /* !x86_64 */
 
-/* Needed for GDB.   It only compiles in the context copy code if this
-   macro s defined. */
-#define __COPY_CONTEXT_SIZE ((size_t) (uintptr_t) &((struct ucontext *) 0)->_internal)
+/* Needed for GDB.  It only compiles in the context copy code if this macro is
+   defined.  This is not sizeof(CONTEXT) due to historical accidents. */
+#ifdef __x86_64__
+#define __COPY_CONTEXT_SIZE 816
+#else
+#define __COPY_CONTEXT_SIZE 204
+#endif
 
 typedef union sigval
 {
