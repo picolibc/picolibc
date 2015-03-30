@@ -393,6 +393,7 @@ public:
 
   inline PDS_DOMAIN_TRUSTSW trusted_domain (ULONG idx) const
     { return (idx < tdom_count) ? tdom + idx : NULL; }
+  PDS_DOMAIN_TRUSTSW add_domain (PCWSTR, PSID);
 
   inline PWCHAR get_rfc2307_domain () const
     { return rfc2307_domain_buf ?: NULL; }
