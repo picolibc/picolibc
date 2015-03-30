@@ -1,7 +1,7 @@
 /* cygtls.h
 
    Copyright 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013,
-   2014 Red Hat, Inc.
+   2014, 2015 Red Hat, Inc.
 
 This software is a copyrighted work licensed under the terms of the
 Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
@@ -191,7 +191,7 @@ public:
   siginfo_t *sigwait_info;
   HANDLE signal_arrived;
   bool will_wait_for_signal;
-  struct ucontext thread_context;
+  CONTEXT thread_context;
   DWORD thread_id;
   siginfo_t infodata;
   struct pthread *tid;

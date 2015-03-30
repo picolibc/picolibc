@@ -1,3 +1,10 @@
+2015-03-30  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygtls.h (struct _cygtls): Convert thread_context to type CONTEXT.
+	* exceptions.cc (_cygtls::signal_debugger): Use sizeof (CONTEXT) for
+	size of CONTEXT copied for GDB's digestion.
+	* include/cygwin/signal.h: Add a preliminary comment.
+
 2015-03-25  Corinna Vinschen  <corinna@vinschen.de>
 
 	* include/sys/termios.h: Add CMIN and CTIME.
