@@ -16,6 +16,7 @@ details. */
 #include <stdlib.h>
 #include <syslog.h>
 #include <wchar.h>
+#include <ucontext.h>
 
 #include "cygtls.h"
 #include "pinfo.h"
@@ -1489,15 +1490,33 @@ _cygtls::call_signal_handler ()
       siginfo_t thissi = infodata;
       void (*thisfunc) (int, siginfo_t *, void *) = func;
 
+      ucontext_t thiscontext;
+      thiscontext.uc_link = 0;
+      thiscontext.uc_flags = 0;
+      if (thissi.si_cyg)
+        memcpy (&thiscontext.uc_mcontext, ((cygwin_exception *)thissi.si_cyg)->context(), sizeof(CONTEXT));
+      else
+        RtlCaptureContext ((CONTEXT *)&thiscontext.uc_mcontext);
+        /* FIXME: Really this should be the context which the signal interrupted? */
+
+      /* FIXME: If/when sigaltstack is implemented, this will need to do
+         something more complicated */
+      thiscontext.uc_stack.ss_sp = NtCurrentTeb ()->Tib.StackBase;
+      thiscontext.uc_stack.ss_flags = 0;
+      if (!NtCurrentTeb ()->DeallocationStack)
+        thiscontext.uc_stack.ss_size = (uintptr_t)NtCurrentTeb ()->Tib.StackLimit - (uintptr_t)NtCurrentTeb ()->Tib.StackBase;
+      else
+        thiscontext.uc_stack.ss_size = (uintptr_t)NtCurrentTeb ()->DeallocationStack - (uintptr_t)NtCurrentTeb ()->Tib.StackBase;
+
       sigset_t this_oldmask = set_process_mask_delta ();
+      thiscontext.uc_sigmask = this_oldmask;
       int this_errno = saved_errno;
       reset_signal_arrived ();
       incyg = false;
       sig = 0;		/* Flag that we can accept another signal */
       unlock ();	/* unlock signal stack */
 
-      /* no ucontext_t information provided yet, so third arg is NULL */
-      thisfunc (thissig, &thissi, NULL);
+      thisfunc (thissig, &thissi, &thiscontext);
       incyg = true;
 
       set_signal_mask (_my_tls.sigmask, this_oldmask);
