@@ -1,5 +1,12 @@
 2015-04-01  Jon TURNEY  <jon.turney@dronecode.org.uk>
 
+	* include/sys/ucontext.h : New header.
+	* include/ucontext.h : Ditto.
+	* exceptions.cc (call_signal_handler): Provide ucontext_t
+	parameter to signal handler function.
+
+2015-04-01  Jon TURNEY  <jon.turney@dronecode.org.uk>
+
 	* external.cc (cygwin_internal): Add operation to retrieve a copy
 	of the EXCEPTION_RECORD from a siginfo_t *.
 	* include/sys/cygwin.h (cygwin_getinfo_types): Ditto.
