@@ -1,5 +1,12 @@
 2015-04-01  Jon TURNEY  <jon.turney@dronecode.org.uk>
 
+	* external.cc (cygwin_internal): Add operation to retrieve a copy
+	of the EXCEPTION_RECORD from a siginfo_t *.
+	* include/sys/cygwin.h (cygwin_getinfo_types): Ditto.
+	* exception.h (cygwin_exception): Add exception_record accessor.
+
+2015-04-01  Jon TURNEY  <jon.turney@dronecode.org.uk>
+
 	* include/cygwin/signal.h : Rename struct ucontext to struct
 	__mcontext.  Fix layout differences from the Win32 API CONTEXT
 	type.  Remove unused member _internal.  Rename member which
