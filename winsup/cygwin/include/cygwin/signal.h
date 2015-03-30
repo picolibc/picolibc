@@ -1,7 +1,7 @@
 /* signal.h
 
-  Copyright 2003, 2004, 2005, 2006, 2007, 2008, 2010, 2011, 2012, 2013
-  Red Hat, Inc.
+  Copyright 2003, 2004, 2005, 2006, 2007, 2008, 2010, 2011, 2012, 2013,
+  2015 Red Hat, Inc.
 
   This file is part of Cygwin.
 
@@ -149,6 +149,8 @@ struct ucontext
 
 #endif /* !x86_64 */
 
+/* Needed for GDB.   It only compiles in the context copy code if this
+   macro s defined. */
 #define __COPY_CONTEXT_SIZE ((size_t) (uintptr_t) &((struct ucontext *) 0)->_internal)
 
 typedef union sigval
