@@ -1,3 +1,10 @@
+2015-04-01  Jon TURNEY  <jon.turney@dronecode.org.uk>
+
+	* include/cygwin/signal.h : Rename struct ucontext to struct
+	__mcontext.  Fix layout differences from the Win32 API CONTEXT
+	type.  Remove unused member _internal.  Rename member which
+	corresponds to ContextFlags.  Add cr2 member.
+
 2015-04-01  Corinna Vinschen  <corinna@vinschen.de>
 
 	* grp.cc (internal_getgroups): Handle negative domain index to avoid
