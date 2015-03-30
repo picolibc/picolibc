@@ -27,6 +27,7 @@ details. */
 #include "environ.h"
 #include "cygserver_setpwd.h"
 #include "pwdgrp.h"
+#include "exception.h"
 #include <unistd.h>
 #include <stdlib.h>
 #include <wchar.h>
@@ -686,6 +687,19 @@ cygwin_internal (cygwin_getinfo_types t, ...)
 
       case CW_FIXED_ATEXIT:
 	res = 0;
+	break;
+
+      case CW_EXCEPTION_RECORD_FROM_SIGINFO_T:
+	{
+	  siginfo_t *si = va_arg(arg, siginfo_t *);
+	  EXCEPTION_RECORD *er = va_arg(arg, EXCEPTION_RECORD *);
+	  if (si && si->si_cyg && er)
+	    {
+	      memcpy(er, ((cygwin_exception *)si->si_cyg)->exception_record(),
+		     sizeof(EXCEPTION_RECORD));
+	      res = 0;
+	    }
+	}
 	break;
 
       default:

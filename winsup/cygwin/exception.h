@@ -175,4 +175,5 @@ public:
     framep (in_framep), ctx (in_ctx), e (in_e), h (NULL) {}
   void dumpstack ();
   PCONTEXT context () const {return ctx;}
+  EXCEPTION_RECORD *exception_record () const {return e;}
 };
