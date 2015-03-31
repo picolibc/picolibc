@@ -1,3 +1,8 @@
+2015-04-01  Jon TURNEY  <jon.turney@dronecode.org.uk>
+
+	* libc/include/sys/signal.h (stack_t): Make typedef generally
+	available.
+
 2015-04-01  Corinna Vinschen  <vinschen@redhat.com>
 
 	* libc/stdlib/wctomb_r.c (__utf8_wctomb): Fix check for handling a

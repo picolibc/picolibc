@@ -125,15 +125,6 @@ struct sigaction {
  */
 #define	SS_ONSTACK	0x1
 #define	SS_DISABLE	0x2
-
-/*
- * Structure used in sigaltstack call.
- */
-typedef struct sigaltstack {
-  void     *ss_sp;    /* Stack base or pointer.  */
-  int       ss_flags; /* Flags.  */
-  size_t    ss_size;  /* Stack size.  */
-} stack_t;
 #endif
 
 #elif defined(__CYGWIN__)
@@ -150,6 +141,15 @@ struct sigaction
 	int sa_flags;
 };
 #endif /* defined(__rtems__) */
+
+/*
+ * Structure used in sigaltstack call.
+ */
+typedef struct sigaltstack {
+  void     *ss_sp;    /* Stack base or pointer.  */
+  int       ss_flags; /* Flags.  */
+  size_t    ss_size;  /* Stack size.  */
+} stack_t;
 
 #define SIG_SETMASK 0	/* set mask with sigprocmask() */
 #define SIG_BLOCK 1	/* set of signals to block */
