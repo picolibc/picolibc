@@ -1,3 +1,14 @@
+2015-03-31  Corinna Vinschen  <vinschen@redhat.com>
+
+	* libc/time/local.h (_tzset_unlocked_r): Add prototype.
+	(_tzset_unlocked): Ditto.
+	* libc/time/tzset.c (_tzset_unlocked): New function, call
+	_tzset_unlocked_r.
+	(tzset): Lock and call _tzset_unlocked_r.
+	* libc/time/tzset_r (_tzset_unlocked_r): Remove locking and rename
+	from _tzset_r.
+	(_tzset_r): Lock and call _tzset_unlocked_r.
+
 2015-03-30  Craig Howland  <howland@LGSInnovations.com>
 
 	* libc/stdlib/setenv_r.c (_setenv_r): Remove tzset() call for TZ
