@@ -14,7 +14,7 @@ static char __tzname_dst[11];
 static char *prev_tzenv = NULL;
 
 _VOID
-_DEFUN (_tzset_r, (reent_ptr),
+_DEFUN (_tzset_unlocked_r, (reent_ptr),
         struct _reent *reent_ptr)
 {
   char *tzenv;
@@ -25,24 +25,17 @@ _DEFUN (_tzset_r, (reent_ptr),
 
   if ((tzenv = _getenv_r (reent_ptr, "TZ")) == NULL)
       {
-	TZ_LOCK;
 	_timezone = 0;
 	_daylight = 0;
 	_tzname[0] = "GMT";
 	_tzname[1] = "GMT";
 	free(prev_tzenv);
 	prev_tzenv = NULL;
-	TZ_UNLOCK;
 	return;
       }
 
-  TZ_LOCK;
-
   if (prev_tzenv != NULL && strcmp(tzenv, prev_tzenv) == 0)
-    {
-      TZ_UNLOCK;
-      return;
-    }
+    return;
 
   free(prev_tzenv);
   prev_tzenv = _malloc_r (reent_ptr, strlen(tzenv) + 1);
@@ -54,10 +47,7 @@ _DEFUN (_tzset_r, (reent_ptr),
     ++tzenv;  
 
   if (sscanf (tzenv, "%10[^0-9,+-]%n", __tzname_std, &n) <= 0)
-    {
-      TZ_UNLOCK;
-      return;
-    }
+    return;
  
   tzenv += n;
 
@@ -74,10 +64,7 @@ _DEFUN (_tzset_r, (reent_ptr),
   ss = 0;
  
   if (sscanf (tzenv, "%hu%n:%hu%n:%hu%n", &hh, &n, &mm, &n, &ss, &n) < 1)
-    {
-      TZ_UNLOCK;
-      return;
-    }
+    return;
   
   tz->__tzrule[0].offset = sign * (ss + SECSPERMIN * mm + SECSPERHOUR * hh);
   _tzname[0] = __tzname_std;
@@ -88,7 +75,6 @@ _DEFUN (_tzset_r, (reent_ptr),
       _tzname[1] = _tzname[0];
       _timezone = tz->__tzrule[0].offset;
       _daylight = 0;
-      TZ_UNLOCK;
       return;
     }
   else
@@ -127,10 +113,7 @@ _DEFUN (_tzset_r, (reent_ptr),
 	{
 	  if (sscanf (tzenv, "M%hu%n.%hu%n.%hu%n", &m, &n, &w, &n, &d, &n) != 3 ||
 	      m < 1 || m > 12 || w < 1 || w > 5 || d > 6)
-	    {
-	      TZ_UNLOCK;
-	      return;
-	    }
+	    return;
 	  
 	  tz->__tzrule[i].ch = 'M';
 	  tz->__tzrule[i].m = m;
@@ -198,6 +181,13 @@ _DEFUN (_tzset_r, (reent_ptr),
   __tzcalc_limits (tz->__tzyear);
   _timezone = tz->__tzrule[0].offset;  
   _daylight = tz->__tzrule[0].offset != tz->__tzrule[1].offset;
+}
 
+_VOID
+_DEFUN (_tzset_r, (reent_ptr),
+        struct _reent *reent_ptr)
+{
+  TZ_LOCK;
+  _tzset_unlocked_r (reent_ptr);
   TZ_UNLOCK;
 }

@@ -68,7 +68,15 @@ Supporting OS subroutine required: None
 #include "local.h"
 
 _VOID
+_DEFUN_VOID (_tzset_unlocked)
+{
+  _tzset_unlocked_r (_REENT);
+}
+
+_VOID
 _DEFUN_VOID (tzset)
 {
-  _tzset_r (_REENT);
+  TZ_LOCK;
+  _tzset_unlocked_r (_REENT);
+  TZ_UNLOCK;
 }

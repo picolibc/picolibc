@@ -500,7 +500,11 @@ static int		tzload(timezone_t sp, const char * name,
 				int doextend);
 static int		tzparse(timezone_t sp, const char * name,
 				int lastditch);
+#ifdef __CYGWIN__
+extern "C" void		tzset_unlocked(void);
+#else
 static void		tzset_unlocked(void);
+#endif
 static long		leapcorr(const timezone_t sp, time_t * timep);
 
 static timezone_t lclptr;
@@ -1613,6 +1617,9 @@ tzsetwall (void)
 
 static NO_COPY muto tzset_guard;
 
+#ifdef __CYGWIN__
+extern "C"
+#else
 #ifndef STD_INSPIRED
 /*
 ** A non-static declaration of tzsetwall in a system header file
@@ -1620,6 +1627,7 @@ static NO_COPY muto tzset_guard;
 */
 static
 #endif /* !defined STD_INSPIRED */
+#endif
 void
 tzset_unlocked(void)
 {
@@ -1662,6 +1670,8 @@ tzset_unlocked(void)
 			(void) gmtload(lclptr);
 	settzname();
 }
+
+EXPORT_ALIAS (tzset_unlocked, _tzset_unlocked)
 
 extern "C" void
 tzset(void)
