@@ -1,3 +1,7 @@
+2015-03-31  Jon TURNEY  <jon.turney@dronecode.org.uk>
+
+	* misc-funcs.xml (cygwin_internal): Correct return type.
+
 2015-03-31  Corinna Vinschen  <corinna@vinschen.de>
 
 	* new-features.xml (ov-new1.7.36): Add new section.  Document GNU
