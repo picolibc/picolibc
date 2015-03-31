@@ -79,9 +79,6 @@ _DEFUN (_setenv_r, (reent_ptr, name, value, rewrite),
 	{			/* old larger; copy over */
 	  while ((*C++ = *value++) != 0);
           ENV_UNLOCK;
-	  /* if we are changing the TZ environment variable, update timezone info */
-	  if (strcmp (name, "TZ") == 0)
-	    tzset ();
 	  return 0;
 	}
     }
@@ -127,10 +124,6 @@ _DEFUN (_setenv_r, (reent_ptr, name, value, rewrite),
   for (*C++ = '='; (*C++ = *value++) != 0;);
 
   ENV_UNLOCK;
-
-  /* if we are setting the TZ environment variable, update timezone info */
-  if (strncmp ((*p_environ)[offset], "TZ=", 3) == 0)
-    tzset ();
 
   return 0;
 }

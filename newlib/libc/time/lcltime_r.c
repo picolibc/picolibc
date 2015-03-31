@@ -31,6 +31,7 @@ _DEFUN (localtime_r, (tim_p, res),
   year = res->tm_year + YEAR_BASE;
   ip = __month_lengths[isleap(year)];
 
+  tzset ();
   TZ_LOCK;
   if (_daylight)
     {
