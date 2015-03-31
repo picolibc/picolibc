@@ -197,9 +197,9 @@ _DEFUN(mktime, (tim_p),
   /* compute total seconds */
   tim += (days * _SEC_IN_DAY);
 
-  tzset ();
-
   TZ_LOCK;
+
+  _tzset_unlocked ();
 
   if (_daylight)
     {

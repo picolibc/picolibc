@@ -1,5 +1,13 @@
 2015-03-31  Corinna Vinschen  <vinschen@redhat.com>
 
+	* libc/time/lcltime_r.c (localtime_r): Call _tzset_unlocked inside
+	TZ lock.
+	* libc/time/mktime.c (mktime):  Ditto.
+	* libc/time/strftime.c (strftime, wcsftime): Ditto.  Guard against
+	calling _tzset_unlocked more than once (baring recursion).
+
+2015-03-31  Corinna Vinschen  <vinschen@redhat.com>
+
 	* libc/time/local.h (_tzset_unlocked_r): Add prototype.
 	(_tzset_unlocked): Ditto.
 	* libc/time/tzset.c (_tzset_unlocked): New function, call

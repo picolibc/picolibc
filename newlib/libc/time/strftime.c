@@ -703,6 +703,7 @@ _DEFUN (strftime, (s, maxsize, format, tim_p),
   CHAR alt;
   CHAR pad;
   unsigned long width;
+  int tzset_called = 0;
 
   struct lc_time_T *_CurrentTimeLocale = __get_current_time_locale ();
   for (;;)
@@ -1283,7 +1284,13 @@ recurse:
           if (tim_p->tm_isdst >= 0)
             {
 	      long offset;
-	      tzset ();
+
+	      TZ_LOCK;
+	      if (!tzset_called)
+		{
+		  _tzset_unlocked ();
+		  tzset_called = 1;
+		}
 
 #if defined (__CYGWIN__)
 	      /* Cygwin must check if the application has been built with or
@@ -1302,6 +1309,7 @@ recurse:
 		 but have to use __tzrule for daylight savings.  */
 	      offset = -tz->__tzrule[tim_p->tm_isdst > 0].offset;
 #endif
+	      TZ_UNLOCK;
 	      len = snprintf (&s[count], maxsize - count, CQ("%+03ld%.2ld"),
 			      offset / SECSPERHOUR,
 			      labs (offset / SECSPERMIN) % 60L);
@@ -1314,8 +1322,12 @@ recurse:
 	      size_t size;
 	      const char *tznam = NULL;
 
-	      tzset ();
 	      TZ_LOCK;
+	      if (!tzset_called)
+		{
+		  _tzset_unlocked ();
+		  tzset_called = 1;
+		}
 #if defined (__CYGWIN__)
 	      /* See above. */
 	      extern const char *__cygwin_gettzname (const struct tm *tmp);
