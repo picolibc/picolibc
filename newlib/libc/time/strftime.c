@@ -1283,6 +1283,7 @@ recurse:
           if (tim_p->tm_isdst >= 0)
             {
 	      long offset;
+	      tzset ();
 
 #if defined (__CYGWIN__)
 	      /* Cygwin must check if the application has been built with or
@@ -1313,6 +1314,7 @@ recurse:
 	      size_t size;
 	      const char *tznam = NULL;
 
+	      tzset ();
 	      TZ_LOCK;
 #if defined (__CYGWIN__)
 	      /* See above. */

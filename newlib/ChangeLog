@@ -1,3 +1,11 @@
+2015-03-30  Craig Howland  <howland@LGSInnovations.com>
+
+	* libc/stdlib/setenv_r.c (_setenv_r): Remove tzset() call for TZ
+	definition.
+	* libc/time/lcltime_r.c (localtime_r): Add tzset() call
+	* libc/time/mktime.c (mktime):  Ditto.
+	* libc/time/strftime.c (strftime, wcsftime): Ditto.
+
 2015-03-30  Yaakov Selkowitz  <yselkowi@redhat.com>
 
 	* libc/time/strftime.c (strftime) <%Z>: Initialize tznam to NULL.
