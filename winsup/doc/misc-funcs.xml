@@ -34,7 +34,7 @@ much.</para>
 <title>cygwin_internal</title>
 
 <funcsynopsis><funcprototype>
-<funcdef>extern "C" DWORD
+<funcdef>extern "C" uintptr_t
 <function>cygwin_internal</function></funcdef>
 <paramdef>cygwin_getinfo_types <parameter>t</parameter></paramdef>
 <paramdef><parameter>...</parameter></paramdef>
