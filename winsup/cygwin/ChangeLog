@@ -1,5 +1,10 @@
 2015-03-31  Corinna Vinschen  <corinna@vinschen.de>
 
+	* uinfo.cc (pwdgrp::fetch_account_from_windows): Don't allow fully
+	qualified Windows account names (domain\user or user@domain).
+
+2015-03-31  Corinna Vinschen  <corinna@vinschen.de>
+
 	* localtime.cc (tzset_unlocked): Export as _tzset_unlocked.
 
 2015-03-30  Yaakov Selkowitz  <yselkowi@redhat.com>
