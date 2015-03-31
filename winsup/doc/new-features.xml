@@ -4,6 +4,24 @@
 
 <sect1 id="ov-new1.7"><title>What's new and what changed in Cygwin</title>
 
+<sect2 id="ov-new1.7.36"><title>What's new and what changed in 1.7.36</title>
+
+<itemizedlist mark="bullet">
+
+<listitem><para>
+basename(3) now comes in two flavors, POSIX and GNU.  The POSIX version is
+the default.  You get the GNU version after
+
+<screen>
+  #define _GNU_SOURCE
+  #include &lt;string.h&gt;
+</screen>
+</para></listitem>
+
+</itemizedlist>
+
+</sect2>
+
 <sect2 id="ov-new1.7.35"><title>What's new and what changed in 1.7.35</title>
 
 <itemizedlist mark="bullet">
