@@ -1,6 +1,12 @@
 What's new:
 -----------
 
+- basename(3) now comes in two flavors, POSIX and GNU.  The POSIX version is
+  the default.  You get the GNU version after
+
+    #define _GNU_SOURCE
+    #include <string.h>
+
 
 What changed:
 -------------
@@ -22,3 +28,7 @@ Bug Fixes
 - Fix internal error in pty -ONLCR handling.  Fix timing bug in pty OPOST 
   handling.
   Addresses: https://cygwin.com/ml/cygwin/2015-02/msg00929.html
+
+- Avoid creating passwd and group records from fully qualified Windows
+  account names (domain\name, name@domain).
+  Addresses: https://cygwin.com/ml/cygwin/2015-03/msg00528.html
