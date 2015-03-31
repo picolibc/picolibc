@@ -1,3 +1,7 @@
+2015-03-31  Renato Silva  <br.renatosilva@gmail.com>
+
+	* net.cc (cygwin_gethostname): Fix buffer size error handling.
+
 2015-03-31  Corinna Vinschen  <corinna@vinschen.de>
 
 	* uinfo.cc (pwdgrp::fetch_account_from_windows): Don't allow fully

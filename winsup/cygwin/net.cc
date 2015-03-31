@@ -1076,7 +1076,10 @@ cygwin_gethostname (char *name, size_t len)
 	  if (!GetComputerNameExA (ComputerNameDnsFullyQualified, name,
 				   &local_len))
 	    {
-	      set_winsock_errno ();
+	      if (GetLastError () == ERROR_MORE_DATA)
+		set_errno (ENAMETOOLONG);
+	      else
+		set_winsock_errno ();
 	      __leave;
 	    }
 	}
