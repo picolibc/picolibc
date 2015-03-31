@@ -1827,6 +1827,13 @@ pwdgrp::fetch_account_from_windows (fetch_user_arg_t &arg, cyg_ldap *pldap)
       fq_name = false;
       /* Copy over to wchar for search. */
       sys_mbstowcs (name, UNLEN + 1, arg.name);
+      /* If the incoming name has a backslash or at sign, and neither backslash
+	 nor at are the domain separator chars, the name is invalid. */
+      if ((p = wcspbrk (name, L"\\@")) && *p != cygheap->pg.nss_separator ()[0])
+	{
+	  debug_printf ("Invalid account name <%s> (backslash/at)", arg.name);
+	  return NULL;
+	}
       /* Replace domain separator char with backslash and make sure p is NULL
 	 or points to the backslash. */
       if ((p = wcschr (name, cygheap->pg.nss_separator ()[0])))
