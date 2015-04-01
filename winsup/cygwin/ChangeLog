@@ -1,3 +1,9 @@
+2015-04-01  Corinna Vinschen  <corinna@vinschen.de>
+
+	* include/cygwin/types.h: Include sys/_stdint.h rather than stdint.h.
+	* include/stdint.h: Drop in favor of newlib version.
+	* include/inttypes.h: Ditto.
+
 2015-04-01  Jon TURNEY  <jon.turney@dronecode.org.uk>
 
 	* include/sys/ucontext.h : New header.

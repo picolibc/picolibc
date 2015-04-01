@@ -17,7 +17,7 @@ extern "C"
 {
 #endif
 
-#include <stdint.h>
+#include <sys/_stdint.h>
 #include <endian.h>
 #include <bits/wordsize.h>
 #include <sys/_timespec.h>
