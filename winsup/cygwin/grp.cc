@@ -643,13 +643,17 @@ internal_getgroups (int gidsetsize, gid_t *grouplist, cyg_ldap *pldap)
 	{
 	  for (ULONG ncnt = 0; ncnt < scnt; ++ncnt)
 	    {
+	      static UNICODE_STRING empty = { 0, 0, (PWSTR) L"" };
 	      fetch_acc_t full_acc =
 		{
 		  .sid = sidp_buf[ncnt],
 		  .name = &nlst[ncnt].Name,
-		  .dom = &dlst->Domains[nlst[ncnt].DomainIndex].Name,
+		  .dom = &empty,
 		  .acc_type = nlst[ncnt].Use
 		};
+
+	      if (nlst[ncnt].DomainIndex >= 0)
+	        full_acc.dom = &dlst->Domains[nlst[ncnt].DomainIndex].Name;
 	      if ((grp = internal_getgrfull (full_acc, pldap)))
 		{
 		  if (cnt < gidsetsize)
