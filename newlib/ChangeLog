@@ -1,3 +1,21 @@
+2015-04-01  Sebastian Huber  <sebastian.huber@embedded-brains.de>
+
+	* libc/include/sys/_stdint.h: New file.
+	* libc/include/stdint.h (int8_t): Move to <sys/_stdint.h>.
+	(uint8_t): Likewise.
+	(int16_t): Likewise.
+	(uint16_t): Likewise.
+	(int32_t): Likewise.
+	(uint32_t): Likewise.
+	(int64_t): Likewise.
+	(uint64_t): Likewise.
+	(intptr_t): Likewise.
+	(uintptr_t): Likewise.
+	* libc/include/sys/types.h: Include <sys/_stdint.h>.
+	* libc/sys/rtems/machine/_types.h: Remove <stdint.h> include.
+	* libc/sys/time.h>: Replace __uint32_t with uint32_t and
+	__uint64_t with uint64_t.
+
 2015-04-01  Jon TURNEY  <jon.turney@dronecode.org.uk>
 
 	* libc/include/sys/signal.h (stack_t): Make typedef generally
