@@ -59,6 +59,7 @@ typedef	quad_t *	qaddr_t;
 
 #define _SYS_TYPES_H
 #include <sys/_types.h>
+#include <sys/_stdint.h>
 
 #ifdef __i386__
 #if defined (GO32) || defined (__MSDOS__)

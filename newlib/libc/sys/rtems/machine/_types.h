@@ -9,7 +9,6 @@
 #define _HAVE_SYSTYPES
 
 #include <machine/_default_types.h>
-#include <stdint.h> /* For FreeBSD compatibility */
 
 typedef __int32_t blksize_t;
 typedef __int32_t blkcnt_t;
