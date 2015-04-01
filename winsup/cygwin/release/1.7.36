@@ -35,3 +35,6 @@ Bug Fixes
 
 - Avoid potential crash at startup or in getgroups(2).
   Addresses: https://cygwin.com/ml/cygwin/2015-04/msg00010.html
+
+- Fix UTF-16 surrogate handling in wctomb and friends.
+  Addresses: https://cygwin.com/ml/cygwin/2015-03/msg00452.html
