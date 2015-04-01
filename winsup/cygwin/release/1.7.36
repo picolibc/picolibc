@@ -32,3 +32,6 @@ Bug Fixes
 - Avoid creating passwd and group records from fully qualified Windows
   account names (domain\name, name@domain).
   Addresses: https://cygwin.com/ml/cygwin/2015-03/msg00528.html
+
+- Avoid potential crash at startup or in getgroups(2).
+  Addresses: https://cygwin.com/ml/cygwin/2015-04/msg00010.html
