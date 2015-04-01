@@ -74,7 +74,7 @@ _DEFUN (__utf8_wctomb, (r, s, wchar, charset, state),
     return 0; /* UTF-8 encoding is not state-dependent */
 
   if (sizeof (wchar_t) == 2 && state->__count == -4
-      && (wchar < 0xdc00 || wchar >= 0xdfff))
+      && (wchar < 0xdc00 || wchar > 0xdfff))
     {
       /* There's a leftover lone high surrogate.  Write out the CESU-8 value
 	 of the surrogate and proceed to convert the given character.  Note
