@@ -1,3 +1,8 @@
+2015-04-02  Jon TURNEY  <jon.turney@dronecode.org.uk>
+
+	* include/cygwin/signal.h (struct __mcontext): 16-byte align.
+	* include/sys/ucontext.h (ucontext_t): Ditto.
+
 2015-04-01  Corinna Vinschen  <corinna@vinschen.de>
 
 	* include/cygwin/types.h: Include sys/_stdint.h rather than stdint.h.
