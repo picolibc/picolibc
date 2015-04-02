@@ -1,3 +1,9 @@
+2015-04-02  Jon TURNEY  <jon.turney@dronecode.org.uk>
+
+	* exceptions.cc (call_signal_handler): Only bother to construct
+	the ucontext for signal handlers with SA_SIGINFO set.  Set
+	mcontext.oldmask.
+
 2015-04-04  Jon TURNEY  <jon.turney@dronecode.org.uk>
 
 	* exceptions.cc (call_signal_handler): Zero initialize context and set

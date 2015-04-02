@@ -1485,42 +1485,52 @@ _cygtls::call_signal_handler ()
       debug_only_printf ("dealing with signal %d", sig);
       this_sa_flags = sa_flags;
 
+      sigset_t this_oldmask = set_process_mask_delta ();
+
       /* Save information locally on stack to pass to handler. */
       int thissig = sig;
       siginfo_t thissi = infodata;
       void (*thisfunc) (int, siginfo_t *, void *) = func;
 
-      ucontext_t thiscontext;
-      thiscontext.uc_link = 0;
-      thiscontext.uc_flags = 0;
-      if (thissi.si_cyg)
-        memcpy (&thiscontext.uc_mcontext, ((cygwin_exception *)thissi.si_cyg)->context(), sizeof(CONTEXT));
-      else
+      ucontext_t context;
+      ucontext_t *thiscontext = NULL;
+
+      /* Only make a context for SA_SIGINFO handlers */
+      if (this_sa_flags & SA_SIGINFO)
 	{
-	  /* FIXME: Really this should be the context which the signal interrupted? */
-	  memset(&thiscontext.uc_mcontext, 0, sizeof(struct __mcontext));
-	  thiscontext.uc_mcontext.ctxflags = CONTEXT_FULL;
-	  RtlCaptureContext ((CONTEXT *)&thiscontext.uc_mcontext);
+	  context.uc_link = 0;
+	  context.uc_flags = 0;
+	  if (thissi.si_cyg)
+	    memcpy (&context.uc_mcontext, ((cygwin_exception *)thissi.si_cyg)->context(), sizeof(CONTEXT));
+	  else
+	    {
+	      /* FIXME: Really this should be the context which the signal interrupted? */
+	      memset(&context.uc_mcontext, 0, sizeof(struct __mcontext));
+	      context.uc_mcontext.ctxflags = CONTEXT_FULL;
+	      RtlCaptureContext ((CONTEXT *)&context.uc_mcontext);
+	    }
+
+	  /* FIXME: If/when sigaltstack is implemented, this will need to do
+	     something more complicated */
+	  context.uc_stack.ss_sp = NtCurrentTeb ()->Tib.StackBase;
+	  context.uc_stack.ss_flags = 0;
+	  if (!NtCurrentTeb ()->DeallocationStack)
+	    context.uc_stack.ss_size = (uintptr_t)NtCurrentTeb ()->Tib.StackLimit - (uintptr_t)NtCurrentTeb ()->Tib.StackBase;
+	  else
+	    context.uc_stack.ss_size = (uintptr_t)NtCurrentTeb ()->DeallocationStack - (uintptr_t)NtCurrentTeb ()->Tib.StackBase;
+
+	  context.uc_sigmask = context.uc_mcontext.oldmask = this_oldmask;
+
+	  thiscontext = &context;
 	}
 
-      /* FIXME: If/when sigaltstack is implemented, this will need to do
-         something more complicated */
-      thiscontext.uc_stack.ss_sp = NtCurrentTeb ()->Tib.StackBase;
-      thiscontext.uc_stack.ss_flags = 0;
-      if (!NtCurrentTeb ()->DeallocationStack)
-        thiscontext.uc_stack.ss_size = (uintptr_t)NtCurrentTeb ()->Tib.StackLimit - (uintptr_t)NtCurrentTeb ()->Tib.StackBase;
-      else
-        thiscontext.uc_stack.ss_size = (uintptr_t)NtCurrentTeb ()->DeallocationStack - (uintptr_t)NtCurrentTeb ()->Tib.StackBase;
-
-      sigset_t this_oldmask = set_process_mask_delta ();
-      thiscontext.uc_sigmask = this_oldmask;
       int this_errno = saved_errno;
       reset_signal_arrived ();
       incyg = false;
       sig = 0;		/* Flag that we can accept another signal */
       unlock ();	/* unlock signal stack */
 
-      thisfunc (thissig, &thissi, &thiscontext);
+      thisfunc (thissig, &thissi, thiscontext);
       incyg = true;
 
       set_signal_mask (_my_tls.sigmask, this_oldmask);
