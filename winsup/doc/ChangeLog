@@ -1,3 +1,10 @@
+2015-04-02  David A. Wheeler  <dwheeler@dwheeler.com>
+
+	* faq-setup.xml: Document how Cygwin secures installation and
+	update against man-in-the-middle (MITM) attacks.  Note that
+	setup embeds a public key to check the signature of setup.ini,
+	and that setup.ini includes SHA-512 cryptographic hashes.
+
 2015-03-31  Jon TURNEY  <jon.turney@dronecode.org.uk>
 
 	* misc-funcs.xml (cygwin_internal): Correct return type.

@@ -156,6 +156,120 @@ and that installing the older version will not help improve Cygwin.
 </para>
 </answer></qandaentry>
 
+<qandaentry id="faq.setup.install-security">
+<question><para>How does Cygwin secure the installation and update process?</para></question>
+<answer>
+
+<para>
+Here is how Cygwin secures the installation and update process to counter
+<ulink url="https://en.wikipedia.org/wiki/Man-in-the-middle_attack">man-in-the-middle (MITM) attacks</ulink>:
+</para>
+
+<orderedlist>
+<listitem><para>The Cygwin website provides the setup program
+(<literal>setup-x86.exe</literal> or <literal>setup-x86_64.exe</literal>)
+using HTTPS (SSL/TLS).
+This authenticates that the setup program
+came from the Cygwin website
+(users simply use their web browsers to download the setup program).
+You can use tools like Qualsys' SSL Server Test,
+<ulink url="https://www.ssllabs.com/ssltest/"/>,
+to check the HTTPS configuration of Cygwin.
+The cygwin.com site supports HTTP Strict Transport Security (HSTS),
+which forces the browser to keep using HTTPS once the browser has seen
+it before (this counters many downgrade attacks).
+</para></listitem>
+<listitem><para>The setup program has the
+Cygwin public key embedded in it.
+The Cygwin public key is protected from attacker subversion
+during transmission by the previous step, and this public
+key is then used to protect all later steps.
+You can confirm that the key is in setup by looking at the setup project
+(<ulink url="http://sourceware.org/cygwin-apps/setup.html"/>)
+source code file <literal>cyg-pubkey.h</literal>
+(the key is automatically generated from file <literal>cygwin.pub</literal>).
+</para></listitem>
+<listitem><para>The setup program downloads
+the package list <literal>setup.ini</literal> from a mirror
+and checks its digital signature.
+The package list is in the file
+<literal>setup.bz2</literal> (compressed) or
+<literal>setup.ini</literal> (uncompressed) on the selected mirror.
+The package list includes for every official Cygwin package
+the package name, cryptographic hash, and length (in bytes).
+The setup program also gets the relevant <literal>.sig</literal>
+(signature) file for that package list, and checks that the package list
+is properly signed with the Cygwin public key embedded in the setup program.
+A mirror could corrupt the package list and/or signature, but this
+would be detected by setup program's signature detection
+(unless you use the <literal>-X</literal> option to disable signature checking).
+The setup program also checks the package list
+timestamp/version and reports to the user if the file
+goes backwards in time; that process detects downgrade attacks
+(e.g., where an attacker subverts a mirror to send a signed package list
+that is older than the currently-downloaded version).
+</para></listitem>
+<listitem><para>The packages to be installed
+(which may be updates) are downloaded and both their
+lengths and cryptographic hashes
+(from the signed <literal>setup.{bz2,ini}</literal> file) are checked.
+Non-matching packages are rejected, countering any attacker's
+attempt to subvert the files on a mirror.
+Cygwin currently uses the cryptographic hash function SHA-512
+for the <literal>setup.ini</literal> files.
+</para></listitem>
+</orderedlist>
+
+<para>
+Cygwin uses the cryptographic hash algorithm SHA-512 as of 2015-03-23.
+The earlier 2015-02-06 update of the setup program added support for SHA-512
+(Cygwin previously used MD5).
+There are no known practical exploits of SHA-512 (SHA-512 is part of the
+widely-used SHA-2 suite of cryptographic hashes).
+</para>
+
+</answer></qandaentry>
+
+<qandaentry id="faq.setup.increase-install-security">
+<question><para>What else can I do to ensure that my installation and updates are secure?</para></question>
+<answer>
+
+<para>
+To best secure your installation and update process, download
+the setup program <literal>setup-x86.exe</literal> (32-bit) or
+<literal>setup-x86_64.exe</literal> (64-bit), and then
+check its signature (using a signature-checking tool you trust)
+using the Cygwin public key
+(<ulink url="https://cygwin.com/key/pubring.asc"/>).
+This was noted on the front page for installing and updating.
+</para>
+<para>
+If you use the actual Cygwin public key, and have an existing secure
+signature-checking process, you will counter many other
+attacks such as subversion of the Cygwin website and
+malicious certificates issued by untrustworthy certificate authorities (CAs).
+One challenge, of course, is ensuring that
+you have the actual Cygwin public key.
+You can increase confidence in the Cygwin public key by checking older copies
+of the Cygwin public key (to see if it's been the same over time).
+Another challenge is having a secure signature-checking process.
+You can use GnuPG to check signatures; if you have a trusted Cygwin
+installation you can install GnuPG.
+Otherwise, to check the signature you must use an existing trusted tool or
+install a signature-checking tool you can trust.
+</para>
+<para>
+Not everyone will go through this additional effort,
+but we make it possible for those who want that extra confidence.
+We also provide automatic mechanisms
+(such as our use of HTTPS) for those with limited time and
+do not want to perform the signature checking on the setup program itself.
+Once the correct setup program is running, it will counter other attacks
+as described in
+<ulink url="https://cygwin.com/faq/faq.html#faq.setup.install-security"/>.
+</para>
+</answer></qandaentry>
+
 <qandaentry id="faq.setup.virus">
 <question><para>Is Cygwin Setup, or one of the packages, infected with a virus?</para></question>
 <answer>
@@ -197,8 +311,13 @@ disk if you are paranoid.
 </orderedlist>
 
 <para>This should be safe, but only if Cygwin Setup is not substituted by
-something malicious, and no mirror has been compromised.
+something malicious.
+See also
+<ulink url="https://cygwin.com/faq/faq.html#faq.setup.install-security"/>
+for a description of how the
+Cygwin project counters man-in-the-middle (MITM) attacks.
 </para>
+
 <para>See also <ulink url="https://cygwin.com/faq/faq.html#faq.using.bloda"/>
 for a list of applications that have been known, at one time or another, to
 interfere with the normal functioning of Cygwin.
