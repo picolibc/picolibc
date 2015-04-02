@@ -1,5 +1,11 @@
 2015-04-02  Corinna Vinschen  <corinna@vinschen.de>
 
+	* sec_acl.cc (CYG_ACE_ISBITS_TO_WIN): Fix typo.
+	(get_posix_access): Rename index variable from i to idx.  Define only
+	once at top level.
+
+2015-04-02  Corinna Vinschen  <corinna@vinschen.de>
+
 	* security.cc (add_access_allowed_ace): Drop unused parameter "offset".
 	Accommodate throughout.
 	(add_access_denied_ace): Ditto.

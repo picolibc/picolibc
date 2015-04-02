@@ -69,7 +69,7 @@ details. */
 #define CYG_ACE_ISBITS_TO_POSIX(val)	\
 				(((val) & 0x007) << 9)
 #define CYG_ACE_ISBITS_TO_WIN(val) \
-				(((val) & (S_ISVTX | S_ISUID | S_IS_GID)) >> 9)
+				(((val) & (S_ISVTX | S_ISUID | S_ISGID)) >> 9)
 
 #define CYG_ACE_MASK_X		0x008		/* 0x001 <-> 0x008 */
 #define CYG_ACE_MASK_W		0x010		/* 0x002 <-> 0x010 */
@@ -449,7 +449,7 @@ get_posix_access (PSECURITY_DESCRIPTOR psd,
   mode_t attr = 0;
   aclent_t *lacl = NULL;
   cygpsid ace_sid;
-  int pos, type, id;
+  int pos, type, id, idx;
 
   bool new_style = false;
   bool saw_user_obj = false;
@@ -536,9 +536,9 @@ get_posix_access (PSECURITY_DESCRIPTOR psd,
       goto out;
     }
 
-  for (int i = 0; i < acl->AceCount; ++i)
+  for (idx = 0; idx < acl->AceCount; ++idx)
     {
-      if (!NT_SUCCESS (RtlGetAce (acl, i, (PVOID *) &ace)))
+      if (!NT_SUCCESS (RtlGetAce (acl, idx, (PVOID *) &ace)))
 	continue;
 
       ace_sid = (PSID) &ace->SidStart;
@@ -745,13 +745,13 @@ get_posix_access (PSECURITY_DESCRIPTOR psd,
 
   /* For old-style or non-Cygwin ACLs, check for merging permissions. */
   if (!new_style)
-    for (int i = 0; i < pos; ++i)
+    for (idx = 0; idx < pos; ++idx)
       {
 	/* Current user?  If the user entry has a deny ACE, don't check. */
-	if (lacl[i].a_id == myself->uid
-	    && lacl[i].a_type & (USER_OBJ | USER)
-	    && !(lacl[i].a_type & ACL_DEFAULT)
-	    && !(lacl[i].a_perm & DENY_RWX))
+	if (lacl[idx].a_id == myself->uid
+	    && lacl[idx].a_type & (USER_OBJ | USER)
+	    && !(lacl[idx].a_type & ACL_DEFAULT)
+	    && !(lacl[idx].a_perm & DENY_RWX))
 	  {
 	    int gpos;
 	    gid_t grps[NGROUPS_MAX];
@@ -766,14 +766,14 @@ get_posix_access (PSECURITY_DESCRIPTOR psd,
 		  || (gpos = searchace (lacl, MAX_ACL_ENTRIES, GROUP, grps[g]))
 		     >= 0)
 		grp_perm |= lacl[gpos].a_perm & S_IRWXO;
-	    lacl[i].a_perm |= grp_perm;
+	    lacl[idx].a_perm |= grp_perm;
 	  }
 	/* For all groups, if everyone has more permissions, add everyone
 	   perms to group perms.  Skip groups with deny ACE. */
-	else if (lacl[i].a_id & (GROUP_OBJ | GROUP)
-		 && !(lacl[i].a_type & ACL_DEFAULT)
-		 && !(lacl[i].a_perm & DENY_RWX))
-	  lacl[i].a_perm |= lacl[2].a_perm & S_IRWXO;
+	else if (lacl[idx].a_id & (GROUP_OBJ | GROUP)
+		 && !(lacl[idx].a_type & ACL_DEFAULT)
+		 && !(lacl[idx].a_perm & DENY_RWX))
+	  lacl[idx].a_perm |= lacl[2].a_perm & S_IRWXO;
       }
   /* Construct POSIX permission bits.  Fortunately we know exactly where
      to fetch the affecting bits from, at least as long as the array
@@ -797,8 +797,8 @@ out:
 	  return -1;
 	}
       memcpy (aclbufp, lacl, pos * sizeof (aclent_t));
-      for (int i = 0; i < pos; ++i)
-	aclbufp[i].a_perm &= S_IRWXO;
+      for (idx = 0; idx < pos; ++idx)
+	aclbufp[idx].a_perm &= S_IRWXO;
       aclsort32 (pos, 0, aclbufp);
     }
   return pos;
