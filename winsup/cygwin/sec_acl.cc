@@ -171,7 +171,6 @@ setacl (HANDLE handle, path_conv &pc, int nentries, aclent_t *aclbufp,
   /* Fill access control list. */
   acl = (PACL) tp.w_get ();
   size_t acl_len = sizeof (ACL);
-  int ace_off = 0;
 
   cygsid sid;
   struct passwd *pw;
@@ -236,37 +235,37 @@ setacl (HANDLE handle, path_conv &pc, int nentries, aclent_t *aclbufp,
 
   /* Set deny ACE for owner. */
   if (owner_deny
-      && !add_access_denied_ace (acl, ace_off++, owner_deny,
-				 owner, acl_len, NO_INHERITANCE))
+      && !add_access_denied_ace (acl, owner_deny, owner, acl_len,
+				 NO_INHERITANCE))
     return -1;
   /* Set deny ACE for group here to respect the canonical order,
      if this does not impact owner */
   if (group_deny && !(group_deny & owner_allow) && !isownergroup
-      && !add_access_denied_ace (acl, ace_off++, group_deny,
-				 group, acl_len, NO_INHERITANCE))
+      && !add_access_denied_ace (acl, group_deny, group, acl_len,
+				 NO_INHERITANCE))
     return -1;
   /* Set allow ACE for owner. */
-  if (!add_access_allowed_ace (acl, ace_off++, owner_allow,
-			       owner, acl_len, NO_INHERITANCE))
+  if (!add_access_allowed_ace (acl, owner_allow, owner, acl_len,
+			       NO_INHERITANCE))
     return -1;
   /* Set deny ACE for group, if still needed. */
   if (group_deny & owner_allow && !isownergroup
-      && !add_access_denied_ace (acl, ace_off++, group_deny,
-				 group, acl_len, NO_INHERITANCE))
+      && !add_access_denied_ace (acl, group_deny, group, acl_len,
+				 NO_INHERITANCE))
     return -1;
   /* Set allow ACE for group. */
   if (!isownergroup
-      && !add_access_allowed_ace (acl, ace_off++, group_allow,
-                                  group, acl_len, NO_INHERITANCE))
+      && !add_access_allowed_ace (acl, group_allow, group, acl_len,
+				  NO_INHERITANCE))
     return -1;
   /* Set allow ACE for everyone. */
-  if (!add_access_allowed_ace (acl, ace_off++, other_allow,
-			       well_known_world_sid, acl_len, NO_INHERITANCE))
+  if (!add_access_allowed_ace (acl, other_allow, well_known_world_sid, acl_len,
+			       NO_INHERITANCE))
     return -1;
   /* If a NULL ACE exists, copy it verbatim. */
   if (null_mask)
-    if (!add_access_allowed_ace (acl, ace_off++, null_mask, well_known_null_sid,
-				 acl_len, NO_INHERITANCE))
+    if (!add_access_allowed_ace (acl, null_mask, well_known_null_sid, acl_len,
+				 NO_INHERITANCE))
       return -1;
   for (int i = 0; i < nentries; ++i)
     {
@@ -317,8 +316,8 @@ setacl (HANDLE handle, path_conv &pc, int nentries, aclent_t *aclbufp,
 	case DEF_USER_OBJ:
 	  allow |= STANDARD_RIGHTS_ALL
 		   | (pc.fs_is_samba () ? 0 : FILE_WRITE_ATTRIBUTES);
-	  if (!add_access_allowed_ace (acl, ace_off++, allow,
-				       well_known_creator_owner_sid, acl_len, inheritance))
+	  if (!add_access_allowed_ace (acl, allow, well_known_creator_owner_sid,
+				       acl_len, inheritance))
 	    return -1;
 	  break;
 	case USER:
@@ -329,13 +328,12 @@ setacl (HANDLE handle, path_conv &pc, int nentries, aclent_t *aclbufp,
 	      set_errno (EINVAL);
 	      return -1;
 	    }
-	  if (!add_access_allowed_ace (acl, ace_off++, allow,
-				       sid, acl_len, inheritance))
+	  if (!add_access_allowed_ace (acl, allow, sid, acl_len, inheritance))
 	    return -1;
 	  break;
 	case DEF_GROUP_OBJ:
-	  if (!add_access_allowed_ace (acl, ace_off++, allow,
-				       well_known_creator_group_sid, acl_len, inheritance))
+	  if (!add_access_allowed_ace (acl, allow, well_known_creator_group_sid,
+				       acl_len, inheritance))
 	    return -1;
 	  break;
 	case GROUP:
@@ -346,13 +344,11 @@ setacl (HANDLE handle, path_conv &pc, int nentries, aclent_t *aclbufp,
 	      set_errno (EINVAL);
 	      return -1;
 	    }
-	  if (!add_access_allowed_ace (acl, ace_off++, allow,
-				       sid, acl_len, inheritance))
+	  if (!add_access_allowed_ace (acl, allow, sid, acl_len, inheritance))
 	    return -1;
 	  break;
 	case DEF_OTHER_OBJ:
-	  if (!add_access_allowed_ace (acl, ace_off++, allow,
-				       well_known_world_sid,
+	  if (!add_access_allowed_ace (acl, allow, well_known_world_sid,
 				       acl_len, inheritance))
 	    return -1;
 	}

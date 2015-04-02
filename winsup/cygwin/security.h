@@ -449,8 +449,8 @@ int __reg3 set_object_sd (HANDLE, security_descriptor &, bool);
 int __reg3 get_reg_attribute (HKEY hkey, mode_t *, uid_t *, gid_t *);
 LONG __reg3 get_file_sd (HANDLE fh, path_conv &, security_descriptor &, bool);
 LONG __reg3 set_file_sd (HANDLE fh, path_conv &, security_descriptor &, bool);
-bool __reg3 add_access_allowed_ace (PACL, int, DWORD, PSID, size_t &, DWORD);
-bool __reg3 add_access_denied_ace (PACL, int, DWORD, PSID, size_t &, DWORD);
+bool __reg3 add_access_allowed_ace (PACL, DWORD, PSID, size_t &, DWORD);
+bool __reg3 add_access_denied_ace (PACL, DWORD, PSID, size_t &, DWORD);
 int __reg3 check_file_access (path_conv &, int, bool);
 int __reg3 check_registry_access (HANDLE, int, bool);
 

@@ -311,8 +311,8 @@ get_file_attribute (HANDLE handle, path_conv &pc,
 }
 
 bool
-add_access_allowed_ace (PACL acl, int offset, DWORD attributes,
-			PSID sid, size_t &len_add, DWORD inherit)
+add_access_allowed_ace (PACL acl, DWORD attributes, PSID sid, size_t &len_add,
+			DWORD inherit)
 {
   NTSTATUS status = RtlAddAccessAllowedAceEx (acl, ACL_REVISION, inherit,
 					      attributes, sid);
@@ -326,8 +326,8 @@ add_access_allowed_ace (PACL acl, int offset, DWORD attributes,
 }
 
 bool
-add_access_denied_ace (PACL acl, int offset, DWORD attributes,
-		       PSID sid, size_t &len_add, DWORD inherit)
+add_access_denied_ace (PACL acl, DWORD attributes, PSID sid, size_t &len_add,
+		       DWORD inherit)
 {
   NTSTATUS status = RtlAddAccessDeniedAceEx (acl, ACL_REVISION, inherit,
 					     attributes, sid);
@@ -421,7 +421,6 @@ alloc_sd (path_conv &pc, uid_t uid, gid_t gid, int attribute,
 
   /* From here fill ACL. */
   size_t acl_len = sizeof (ACL);
-  int ace_off = 0;
   /* Only used for sync objects (for ttys).  The admins group should
      always have the right to manipulate the ACL, so we have to make sure
      that the ACL gives the admins group STANDARD_RIGHTS_ALL access. */
@@ -507,35 +506,35 @@ alloc_sd (path_conv &pc, uid_t uid, gid_t gid, int attribute,
 
   /* Set deny ACE for owner. */
   if (owner_deny
-      && !add_access_denied_ace (acl, ace_off++, owner_deny,
-				 owner_sid, acl_len, NO_INHERITANCE))
+      && !add_access_denied_ace (acl, owner_deny, owner_sid, acl_len,
+				 NO_INHERITANCE))
     return NULL;
   /* Set deny ACE for group here to respect the canonical order,
      if this does not impact owner */
   if (group_deny && !(group_deny & owner_allow) && !isownergroup
-      && !add_access_denied_ace (acl, ace_off++, group_deny,
-				 group_sid, acl_len, NO_INHERITANCE))
+      && !add_access_denied_ace (acl, group_deny, group_sid, acl_len,
+				 NO_INHERITANCE))
     return NULL;
   /* Set allow ACE for owner. */
-  if (!add_access_allowed_ace (acl, ace_off++, owner_allow,
-			       owner_sid, acl_len, NO_INHERITANCE))
+  if (!add_access_allowed_ace (acl, owner_allow, owner_sid, acl_len,
+			       NO_INHERITANCE))
     return NULL;
   /* Set deny ACE for group, if still needed. */
   if ((group_deny & owner_allow) && !isownergroup
-      && !add_access_denied_ace (acl, ace_off++, group_deny,
-				 group_sid, acl_len, NO_INHERITANCE))
+      && !add_access_denied_ace (acl, group_deny, group_sid, acl_len,
+				 NO_INHERITANCE))
     return NULL;
   /* Set allow ACE for group. */
   if (!isownergroup
-      && !add_access_allowed_ace (acl, ace_off++, group_allow,
-				  group_sid, acl_len, NO_INHERITANCE))
+      && !add_access_allowed_ace (acl, group_allow, group_sid, acl_len,
+				  NO_INHERITANCE))
     return NULL;
 
   /* For sync objects, if we didn't see the admins group so far, add entry
      with STANDARD_RIGHTS_ALL access. */
   if (S_ISCHR (attribute) && !saw_admins)
     {
-      if (!add_access_allowed_ace (acl, ace_off++, STANDARD_RIGHTS_ALL,
+      if (!add_access_allowed_ace (acl, STANDARD_RIGHTS_ALL,
 				   well_known_admins_sid, acl_len,
 				   NO_INHERITANCE))
 	return NULL;
@@ -543,13 +542,13 @@ alloc_sd (path_conv &pc, uid_t uid, gid_t gid, int attribute,
     }
 
   /* Set allow ACE for everyone. */
-  if (!add_access_allowed_ace (acl, ace_off++, other_allow,
-			       well_known_world_sid, acl_len, NO_INHERITANCE))
+  if (!add_access_allowed_ace (acl, other_allow, well_known_world_sid, acl_len,
+			       NO_INHERITANCE))
     return NULL;
   /* Set null ACE for special bits. */
   if (null_allow
-      && !add_access_allowed_ace (acl, ace_off++, null_allow,
-				  well_known_null_sid, acl_len, NO_INHERITANCE))
+      && !add_access_allowed_ace (acl, null_allow, well_known_null_sid, acl_len,
+				  NO_INHERITANCE))
     return NULL;
 
   /* Fill ACL with unrelated ACEs from current security descriptor. */
@@ -637,7 +636,6 @@ alloc_sd (path_conv &pc, uid_t uid, gid_t gid, int attribute,
 	      __seterrno_from_nt_status (status);
 	      return NULL;
 	    }
-	  ace_off++;
 	  acl_len += ace->Header.AceSize;
 	}
 
@@ -648,18 +646,18 @@ alloc_sd (path_conv &pc, uid_t uid, gid_t gid, int attribute,
     {
       const DWORD inherit = SUB_CONTAINERS_AND_OBJECTS_INHERIT | INHERIT_ONLY;
       /* Set allow ACE for owner. */
-      if (!add_access_allowed_ace (acl, ace_off++, owner_allow,
+      if (!add_access_allowed_ace (acl, owner_allow,
 				   well_known_creator_owner_sid, acl_len,
 				   inherit))
 	return NULL;
       /* Set allow ACE for group. */
-      if (!add_access_allowed_ace (acl, ace_off++, group_allow,
+      if (!add_access_allowed_ace (acl, group_allow,
 				   well_known_creator_group_sid, acl_len,
 				   inherit))
 	return NULL;
       /* Set allow ACE for everyone. */
-      if (!add_access_allowed_ace (acl, ace_off++, other_allow,
-				   well_known_world_sid, acl_len, inherit))
+      if (!add_access_allowed_ace (acl, other_allow, well_known_world_sid,
+				   acl_len, inherit))
 	return NULL;
     }
 
@@ -955,7 +953,7 @@ convert_samba_sd (security_descriptor &sd_ret)
 		if (gid < UNIX_POSIX_OFFSET && (grp = internal_getgrgid (gid)))
 		  ace_sid.getfromgr (grp);
 	      }
-	    if (!add_access_allowed_ace (acl, i, ace->Mask, ace_sid, acl_len,
+	    if (!add_access_allowed_ace (acl, ace->Mask, ace_sid, acl_len,
 					 ace->Header.AceFlags))
 	      return;
 	  }
