@@ -49,7 +49,7 @@ struct _fpstate
   __uint32_t padding[24];
 };
 
-struct __mcontext
+struct __attribute__ ((aligned (16))) __mcontext
 {
   __uint64_t p1home;
   __uint64_t p2home;

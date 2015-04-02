@@ -15,11 +15,11 @@ details. */
 
 typedef struct __mcontext mcontext_t;
 
-typedef struct __ucontext {
+typedef __attribute__ ((aligned (16))) struct __ucontext {
+	mcontext_t	uc_mcontext;
 	struct __ucontext *uc_link;
 	sigset_t	uc_sigmask;
 	stack_t	uc_stack;
-	mcontext_t	uc_mcontext;
 	unsigned long int	uc_flags;
 } ucontext_t;
 
