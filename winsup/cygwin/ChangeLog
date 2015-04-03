@@ -1,3 +1,8 @@
+2015-04-03  Takashi Yano  <takashi.yano@nifty.ne.jp>
+
+	* fhandler_tty.cc (fhandler_pty_slave::read): Change calculation of
+	"readlen" not to use "bytes_in_pipe" value directly.
+
 2015-04-02  Jon TURNEY  <jon.turney@dronecode.org.uk>
 
 	* include/cygwin/signal.h (struct __mcontext): 16-byte align.
