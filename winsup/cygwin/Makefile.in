@@ -449,59 +449,14 @@ INSTOBJS:=automode.o binmode.o textmode.o textreadmode.o
 TARGET_LIBS:=$(LIB_NAME) $(CYGWIN_START) $(GMON_START) $(LIBGMON_A) $(SUBLIBS) $(INSTOBJS) $(EXTRALIBS)
 
 ifneq "${filter -O%,$(CFLAGS)}" ""
-cygheap_CFLAGS:=-fomit-frame-pointer
-cygthread_CFLAGS:=-fomit-frame-pointer
-cygtls_CFLAGS:=-fomit-frame-pointer
-cygwait_CFLAGS=-fomit-frame-pointer
-delqueue_CFLAGS:=-fomit-frame-pointer
-devices_CFLAGS:=-fomit-frame-pointer
-dir_CFLAGS:=-fomit-frame-pointer
-dlfcn_CFLAGS:=-fomit-frame-pointer
-dll_init_CFLAGS:=-fomit-frame-pointer
-dtable_CFLAGS:=-fomit-frame-pointer -fcheck-new
-fcntl_CFLAGS:=-fomit-frame-pointer
-fenv_CFLAGS:=-fomit-frame-pointer
-fhandler_CFLAGS:=-fomit-frame-pointer
-fhandler_clipboard_CFLAGS:=-fomit-frame-pointer
-fhandler_console_CFLAGS:=-fomit-frame-pointer
-fhandler_disk_file_CFLAGS:=-fomit-frame-pointer
-fhandler_dsp_CFLAGS:=-fomit-frame-pointer
-fhandler_floppy_CFLAGS:=-fomit-frame-pointer
-fhandler_netdrive_CFLAGS:=-fomit-frame-pointer
-fhandler_proc_CFLAGS:=-fomit-frame-pointer
-fhandler_process_CFLAGS:=-fomit-frame-pointer
-fhandler_random_CFLAGS:=-fomit-frame-pointer
-fhandler_raw_CFLAGS:=-fomit-frame-pointer
-fhandler_registry_CFLAGS:=-fomit-frame-pointer
-fhandler_serial_CFLAGS:=-fomit-frame-pointer
-fhandler_socket_CFLAGS:=-fomit-frame-pointer
-fhandler_syslog_CFLAGS:=-fomit-frame-pointer
-fhandler_tape_CFLAGS:=-fomit-frame-pointer
-fhandler_termios_CFLAGS:=-fomit-frame-pointer
-fhandler_tty_CFLAGS:=-fomit-frame-pointer
-fhandler_virtual_CFLAGS:=-fomit-frame-pointer
-fhandler_windows_CFLAGS:=-fomit-frame-pointer
-fhandler_zero_CFLAGS:=-fomit-frame-pointer
-flock_CFLAGS:=-fomit-frame-pointer
-grp_CFLAGS:=-fomit-frame-pointer
-libstdcxx_wrapper_CFLAGS:=-fomit-frame-pointer
+dtable_CFLAGS:=-fcheck-new
 localtime_CFLAGS:=-fwrapv
-malloc_CFLAGS:=-fomit-frame-pointer -O3
-malloc_wrapper_CFLAGS:=-fomit-frame-pointer
-miscfuncs_CFLAGS:=-fomit-frame-pointer
-net_CFLAGS:=-fomit-frame-pointer
-passwd_CFLAGS:=-fomit-frame-pointer
-path_CFLAGS=-fomit-frame-pointer
-regcomp_CFLAGS=-fomit-frame-pointer
-regerror_CFLAGS=-fomit-frame-pointer
-regexec_CFLAGS=-fomit-frame-pointer
-regfree_CFLAGS=-fomit-frame-pointer
-shared_CFLAGS:=-fomit-frame-pointer
-sync_CFLAGS:=-fomit-frame-pointer -O3
-smallprint_CFLAGS:=-fomit-frame-pointer
-syscalls_CFLAGS:=-fomit-frame-pointer
-sysconf_CFLAGS:=-fomit-frame-pointer
-uinfo_CFLAGS:=-fomit-frame-pointer
+malloc_CFLAGS:=-O3
+sync_CFLAGS:=-O3
+ifeq ($(target_cpu),i686)
+# on x86, exceptions.cc must be compiled with a frame-pointer as it uses RtlCaptureContext()
+exceptions_CFLAGS:=-fno-omit-frame-pointer
+endif
 endif
 
 fhandler_proc_CFLAGS+=-DUSERNAME="\"$(USER)\"" -DHOSTNAME="\"$(HOSTNAME)\""

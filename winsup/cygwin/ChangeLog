@@ -1,3 +1,9 @@
+2015-04-04  Jon TURNEY  <jon.turney@dronecode.org.uk>
+
+	* Makefile.in : Remove setting -fomit-frame-pointer for compiling
+	various files, it is already the default.  Set
+	-fno-omit-frame-pointer for exceptions.cc on x86.
+
 2015-04-03  Takashi Yano  <takashi.yano@nifty.ne.jp>
 
 	* fhandler_tty.cc (fhandler_pty_slave::read): Change calculation of
