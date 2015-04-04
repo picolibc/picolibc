@@ -1,3 +1,8 @@
+2015-04-04  Jon TURNEY  <jon.turney@dronecode.org.uk>
+
+	* exceptions.cc (call_signal_handler): Zero initialize context and set
+	context flags, as RlCaptureContext doesn't.
+
 2015-04-10  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler.cc (fhandler_base::open_with_arch): Call open with mode
