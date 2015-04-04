@@ -1496,8 +1496,12 @@ _cygtls::call_signal_handler ()
       if (thissi.si_cyg)
         memcpy (&thiscontext.uc_mcontext, ((cygwin_exception *)thissi.si_cyg)->context(), sizeof(CONTEXT));
       else
-        RtlCaptureContext ((CONTEXT *)&thiscontext.uc_mcontext);
-        /* FIXME: Really this should be the context which the signal interrupted? */
+	{
+	  /* FIXME: Really this should be the context which the signal interrupted? */
+	  memset(&thiscontext.uc_mcontext, 0, sizeof(struct __mcontext));
+	  thiscontext.uc_mcontext.ctxflags = CONTEXT_FULL;
+	  RtlCaptureContext ((CONTEXT *)&thiscontext.uc_mcontext);
+	}
 
       /* FIXME: If/when sigaltstack is implemented, this will need to do
          something more complicated */
