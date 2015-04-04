@@ -1,3 +1,8 @@
+2015-04-04  Jon TURNEY  <jon.turney@dronecode.org.uk>
+
+	* exceptions.cc (call_signal_handler): Set mcontext.cr2 to the
+	faulting address.
+
 2015-04-02  Jon TURNEY  <jon.turney@dronecode.org.uk>
 
 	* exceptions.cc (call_signal_handler): Only bother to construct

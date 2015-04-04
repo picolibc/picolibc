@@ -1521,6 +1521,10 @@ _cygtls::call_signal_handler ()
 
 	  context.uc_sigmask = context.uc_mcontext.oldmask = this_oldmask;
 
+	  context.uc_mcontext.cr2 = (thissi.si_signo == SIGSEGV
+				     || thissi.si_signo == SIGBUS)
+				    ? (uintptr_t) thissi.si_addr : 0;
+
 	  thiscontext = &context;
 	}
 
