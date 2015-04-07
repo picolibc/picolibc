@@ -90,29 +90,14 @@ public:
   pid_t master_pid;	/* PID of tty master process */
 
 private:
-  /* Since tty is shared, the HANDLEs must be 32 and 64 bit clean.  The below
-     code makes sure of that by setting the upper 4 byte of the union to 0
-     when writing the handle value from a 32 bit process.  Fortunately the
-     actual values are 32 bit on both platforms, so the HANDLES can be
-     used on both platforms. */
-  union {
-    HANDLE _from_master;
-    LARGE_INTEGER _fm_dummy;
-  };
-  union {    
-    HANDLE _to_master;
-    LARGE_INTEGER _tm_dummy;
-  };
+  HANDLE _from_master;
+  HANDLE _to_master;
+
 public:
   HANDLE from_master() const { return _from_master; }
   HANDLE to_master() const { return _to_master; }
-#ifdef __x86_64__
   void set_from_master (HANDLE h) { _from_master = h; }
   void set_to_master (HANDLE h) { _to_master = h; }
-#else
-  void set_from_master (HANDLE h) { _fm_dummy.HighPart = 0; _from_master = h; }
-  void set_to_master (HANDLE h) { _tm_dummy.HighPart = 0; _to_master = h; }
-#endif
 
   int read_retval;
   bool was_opened;	/* True if opened at least once. */
