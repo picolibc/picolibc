@@ -11,6 +11,8 @@ What's new:
 What changed:
 -------------
 
+- The maximum number of PTYs has been raised from 64 to 128.
+
 
 Bug Fixes
 ---------

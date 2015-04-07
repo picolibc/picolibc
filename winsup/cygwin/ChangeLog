@@ -1,3 +1,9 @@
+2015-04-07  Corinna Vinschen  <corinna@vinschen.de>
+
+	* tty.h (NTTYS): Raise to 128.
+	* devices.in: Change pty, ptym, and cons expressions accordingly.
+	* devices.cc: Regenerate.
+
 2015-04-04  Jon TURNEY  <jon.turney@dronecode.org.uk>
 
 	* Makefile.in : Remove setting -fomit-frame-pointer for compiling
