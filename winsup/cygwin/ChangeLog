@@ -1,5 +1,10 @@
 2015-04-07  Corinna Vinschen  <corinna@vinschen.de>
 
+	* tty.h (class tty): Remove unused 32/64 bit interoperability
+	considerations.
+
+2015-04-07  Corinna Vinschen  <corinna@vinschen.de>
+
 	* tty.h (NTTYS): Raise to 128.
 	* devices.in: Change pty, ptym, and cons expressions accordingly.
 	* devices.cc: Regenerate.
