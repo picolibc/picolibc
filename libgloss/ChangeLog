@@ -1,3 +1,8 @@
+2015-04-07  Nick Clifton  <nickc@redhat.com>
+
+	* rl78/rl78.ld (.csstart): Add a KEEP directive.
+	* rl78/rl78-sim.ld (.csstart): Add a KEEP directive.
+
 2015-03-05  Nick Clifton  <nickc@redhat.com>
 
 	* v850/sim.ld: Add a .note.renesas section.
