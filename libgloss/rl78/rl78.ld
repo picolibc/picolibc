@@ -66,7 +66,7 @@ SECTIONS
 
   /* CubeSuite always starts at 0xd8.  */
   .csstart : {
-    *(.csstart)
+    KEEP (*(.csstart))
   } > ROM
 
   /* For code that must be in the first 64k, or could fill unused
