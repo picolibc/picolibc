@@ -1102,6 +1102,12 @@ EXPORT_ALIAS (aclfrompbits32, aclfrompbits)
 EXPORT_ALIAS (acltotext32, acltotext)
 EXPORT_ALIAS (aclfromtext32, aclfromtext)
 #else
+typedef struct __acl16 {
+    int          a_type;
+    __uid16_t    a_id;
+    mode_t       a_perm;
+} __aclent16_t;
+
 /* __aclent16_t and aclent_t have same size and same member offsets */
 static aclent_t *
 acl16to32 (__aclent16_t *aclbufp, int nentries)

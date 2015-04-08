@@ -58,16 +58,6 @@ extern "C" {
 #define MASK            CLASS_OBJ
 #define OTHER           OTHER_OBJ
 
-#ifdef __INSIDE_CYGWIN__
-#ifndef __x86_64__
-typedef struct __acl16 {
-    int          a_type;
-    __uid16_t    a_id;
-    mode_t       a_perm;
-} __aclent16_t;
-#endif
-#endif
-
 typedef struct acl {
     int          a_type;    /* entry type */
     uid_t        a_id;      /* UID | GID  */

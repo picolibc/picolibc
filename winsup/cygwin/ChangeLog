@@ -1,3 +1,8 @@
+2015-04-08  Corinna Vinschen  <corinna@vinschen.de>
+
+	* include/cyggwin/acl.h (struct __acl16): Move from here...
+	* sec_acl.cc: ...to here.
+
 2015-04-07  Corinna Vinschen  <corinna@vinschen.de>
 
 	* tty.h (class tty): Remove unused 32/64 bit interoperability
