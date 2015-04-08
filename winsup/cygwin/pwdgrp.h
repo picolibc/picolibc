@@ -254,3 +254,19 @@ inline BOOL cygsid::getfrompw (const struct passwd *pw)
 
 inline BOOL cygsid::getfromgr (const struct group *gr)
   { return (*this = gr ? (PSID) ((pg_grp *) gr)->sid : NO_SID) != NO_SID; }
+
+/* Use these functions if you just need the PSID. */
+inline PSID sidfromuid (uid_t uid, cyg_ldap *pldap)
+  {
+    struct passwd *pw = internal_getpwuid (uid, pldap);
+    if (pw)
+      return (PSID) ((pg_pwd *) pw)->sid;
+    return NO_SID;
+  }
+inline PSID sidfromgid (gid_t gid, cyg_ldap *pldap)
+  {
+    struct group *gr = internal_getgrgid (gid, pldap);
+    if (gr)
+      return (PSID) ((pg_grp *) gr)->sid;
+    return NO_SID;
+  }
