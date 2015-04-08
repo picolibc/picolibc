@@ -1,6 +1,6 @@
 /* quotactl.cc: code for manipulating disk quotas
 
-   Copyright 2014 Red Hat, Inc.
+   Copyright 2014, 2015 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -28,7 +28,7 @@ extern "C" int
 quotactl (int cmd, const char *special, int id, caddr_t addr)
 {
   ACCESS_MASK access = FILE_READ_DATA;
-  cygsid sid;
+  PSID sid = NO_SID;
   path_conv pc;
   tmp_pathbuf tp;
   UNICODE_STRING path;
@@ -75,18 +75,11 @@ quotactl (int cmd, const char *special, int id, caddr_t addr)
       /* Windows feature: Default limits.  Get or set them with id == -1. */
       if (id != -1)
 	{
-	  struct passwd *pw = NULL;
-	  struct group *gr = NULL;
-
 	  if (type == USRQUOTA)
-	    pw = internal_getpwuid (id);
+	    sid = sidfromuid (id, NULL);
 	  else
-	    gr = internal_getgrgid (id);
-	  if (pw)
-	    sid.getfrompw (pw);
-	  else if (gr)
-	    sid.getfromgr (gr);
-	  else
+	    sid = sidfromgid (id, NULL);
+	  if (sid == NO_SID)
 	    {
 	      set_errno (EINVAL);
 	      return -1;

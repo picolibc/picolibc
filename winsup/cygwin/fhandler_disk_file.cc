@@ -989,10 +989,10 @@ fhandler_disk_file::fchown (uid_t uid, gid_t gid)
 	 the standard UNIX accounts, we're faking success. */
       if (res == -1 && pc.fs_is_samba ())
 	{
-	  cygsid sid;
+	  PSID sid;
 
 	  if (old_uid == ILLEGAL_UID
-	      || (sid.getfrompw (internal_getpwuid (old_uid))
+	      || ((sid = sidfromuid (old_uid, NULL)) != NO_SID
 		  && RtlEqualPrefixSid (sid,
 					well_known_samba_unix_user_fake_sid)))
 	    {

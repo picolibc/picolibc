@@ -1,5 +1,12 @@
 2015-04-08  Corinna Vinschen  <corinna@vinschen.de>
 
+	* pwdgrp.h (sidfromuid): New inline function.
+	(sidfromgid): Ditto.
+	* fhandler_disk_file.cc (fhandler_disk_file::fchown): Use sidfromuid.
+	* quotactl.cc (quotactl): Use sidfromuid and sidfromgid.
+
+2015-04-08  Corinna Vinschen  <corinna@vinschen.de>
+
 	* include/cyggwin/acl.h (struct __acl16): Move from here...
 	* sec_acl.cc: ...to here.
 
