@@ -192,6 +192,7 @@ SECTIONS
   }
 
   /* The rest are all not normally part of the runtime image.  */
+  .note : { *(.note) }
 
   /* Stabs debugging sections.  */
   .stab          0 : { *(.stab) }
@@ -226,5 +227,10 @@ SECTIONS
   .debug_funcnames 0 : { *(.debug_funcnames) }
   .debug_typenames 0 : { *(.debug_typenames) }
   .debug_varnames  0 : { *(.debug_varnames) }
+  /* DWARF 3 */
+  .debug_pubtypes 0 : { *(.debug_pubtypes) }
+  .debug_ranges   0 : { *(.debug_ranges) }
+  /* DWARF Extension.  */
+  .debug_macro    0 : { *(.debug_macro) }
   /DISCARD/ : { *(.note.GNU-stack) }
 }
