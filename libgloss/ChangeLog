@@ -1,3 +1,8 @@
+2015-04-08  Nick Clifton  <nickc@redhat.com>
+
+	* rx/rx.ld: Add .note and DWARF3 sections.
+	* rx/rx-sim.ld: Likewise.
+
 2015-04-07  Nick Clifton  <nickc@redhat.com>
 
 	* rl78/rl78.ld (.csstart): Add a KEEP directive.
