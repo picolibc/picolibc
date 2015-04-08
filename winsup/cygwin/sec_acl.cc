@@ -27,23 +27,30 @@ details. */
 /* How does a correctly constructed new-style Windows ACL claiming to be a
    POSIX ACL look like?
 
-   - Cygwin ACE (special bits, CLASS_OBJ).
+   - NULL ACE (special bits, CLASS_OBJ).
 
-   - If a USER entry has more permissions than any group, Everyone, or if it
-     has more permissions than allowed by the CLASS_OBJ entry:
+   - USER_OBJ deny.  If the user has less permissions than the sum of CLASS_OBJ
+     (or GROUP_OBJ if CLASS_OBJ doesn't exist) and OTHER_OBJ, deny the excess
+     permissions so that group and other perms don't spill into the owner perms.
 
-     USER      deny ACEs   == POSIX allow
-			      & ^(mask | all group allows | Everyone allow)
+       USER_OBJ deny ACE   == ~USER_OBJ & (CLASS_OBJ | OTHER_OBJ)
+     or
+       USER_OBJ deny ACE   == ~USER_OBJ & (GROUP_OBJ | OTHER_OBJ)
+
+   - USER deny.  If a user has different permissions from CLASS_OBJ, or if the
+     user has less permissions than OTHER_OBJ, deny the excess permissions.
+
+       USER deny ACE       == (USER ^ CLASS_OBJ) | (~USER & OTHER_OBJ)
 
    - USER_OBJ  allow ACE
    - USER      allow ACEs
 
      The POSIX permissions returned for a USER entry are the allow bits alone!
 
-   - If a GROUP entry has more permissions than Everyone, or if it has more
-     permissions than allowed by the CLASS_OBJ entry:
+   - GROUP{_OBJ} deny.  If a group has more permissions than CLASS_OBJ,
+     or less permissions than OTHER_OBJ, deny the excess permissions.
 
-     GROUP	deny ACEs  == POSIX allow & ^(mask | Everyone allow)
+       GROUP{_OBJ} deny ACEs  == (GROUP & ~CLASS_OBJ) | (~GROUP & OTHER_OBJ)
 
    - GROUP_OBJ	allow ACE
    - GROUP	allow ACEs
@@ -54,15 +61,16 @@ details. */
 
    Rinse and repeat for default ACEs with INHERIT flags set.
 
-   - Default Cygwin ACE (S_ISGID, CLASS_OBJ). */
+   - Default NULL ACE (S_ISGID, CLASS_OBJ). */
 
 						/* POSIX <-> Win32 */
 
-/* Historically, these bits are stored in a NULL SID ACE.  To distinguish
-   the new ACL style from the old one, we're now using an invented SID, the
-   Cygwin SID (S-1-0-1132029815).  The new ACEs can exist twice in an ACL,
-   the "normal one" containg CLASS_OBJ and special bits, and the one with
-   INHERIT bit set to pass the DEF_CLASS_OBJ bits and the S_ISGID bit on. */
+/* Historically, these bits are stored in a NULL SID ACE.  To distinguish the
+   new ACL style from the old one, we're using an access denied ACE, plus
+   setting an as yet unused bit in the access mask.  The new ACEs can exist
+   twice in an ACL, the "normal one" containing CLASS_OBJ and special bits
+   and the one with INHERIT bit set to pass the DEF_CLASS_OBJ bits and the
+   S_ISGID bit on. */
 #define CYG_ACE_ISVTX		0x001		/* 0x200 <-> 0x001 */
 #define CYG_ACE_ISGID		0x002		/* 0x400 <-> 0x002 */
 #define CYG_ACE_ISUID		0x004		/* 0x800 <-> 0x004 */
@@ -81,6 +89,7 @@ details. */
 #define CYG_ACE_MASK_TO_WIN(val)	\
 				((((val) & S_IRWXO) << 3) \
 				 | CYG_ACE_MASK_VALID)
+#define CYG_ACE_NEW_STYLE	READ_CONTROL	/* New style if set. */
 
 static int
 searchace (aclent_t *aclp, int nentries, int type, uid_t id = ILLEGAL_UID)
@@ -386,7 +395,9 @@ setacl (HANDLE handle, path_conv &pc, int nentries, aclent_t *aclbufp,
   return set_file_sd (handle, pc, sd_ret, false);
 }
 
-/* Temporary access denied bits */
+/* Temporary access denied bits used by getace and get_posix_access during
+   Windows ACL processing.  These bits get removed before the created POSIX
+   ACL gets published. */
 #define DENY_R 040000
 #define DENY_W 020000
 #define DENY_X 010000
@@ -545,44 +556,50 @@ get_posix_access (PSECURITY_DESCRIPTOR psd,
 
       if (ace_sid == well_known_null_sid)
 	{
-	  /* Old-style or non-Cygwin ACL.  Fetch only the special bits. */
+	  /* Fetch special bits. */
 	  attr |= CYG_ACE_ISBITS_TO_POSIX (ace->Mask);
-	  continue;
-	}
-      if (ace_sid == well_known_cygwin_sid)
-	{
-	  /* New-style ACL.  Note the fact that a mask value is present since
-	     that changes how getace fetches the information.  That's fine,
-	     because the Cygwin SID ACE is supposed to precede all USER, GROUP
-	     and GROUP_OBJ entries.  Any ACL not created that way has been
-	     rearranged by the Windows functionality to create the brain-dead
-	     "canonical" ACL order and is broken anyway. */
-	  attr |= CYG_ACE_ISBITS_TO_POSIX (ace->Mask);
-	  if (ace->Mask & CYG_ACE_MASK_VALID)
+	  if (ace->Header.AceType == ACCESS_DENIED_ACE_TYPE
+	      && ace->Mask & CYG_ACE_NEW_STYLE)
 	    {
-	      new_style = true;
-	      type = (ace->Header.AceFlags & SUB_CONTAINERS_AND_OBJECTS_INHERIT)
-		     ? DEF_CLASS_OBJ : CLASS_OBJ;
-	      if ((pos = searchace (lacl, MAX_ACL_ENTRIES, type)) >= 0)
+	      /* New-style ACL.  Note the fact that a mask value is present
+		 since that changes how getace fetches the information.  That's
+		 fine, because the Cygwin SID ACE is supposed to precede all
+		 USER, GROUP and GROUP_OBJ entries.  Any ACL not created that
+		 way has been rearranged by the Windows functionality to create
+		 the brain-dead "canonical" ACL order and is broken anyway. */
+	      attr |= CYG_ACE_ISBITS_TO_POSIX (ace->Mask);
+	      if (ace->Mask & CYG_ACE_MASK_VALID)
 		{
-		  lacl[pos].a_type = type;
-		  lacl[pos].a_id = ILLEGAL_GID;
-		  lacl[pos].a_perm = CYG_ACE_MASK_TO_POSIX (ace->Mask);
-		}
-	      if (type == CLASS_OBJ)	/* Needed for POSIX permissions. */
-		{
-		  has_class_perm = true;
-		  class_perm = lacl[pos].a_perm;
-		}
-	      else
-		{
-		  has_def_class_perm = true;
-		  def_class_perm = lacl[pos].a_perm;
+		  new_style = true;
+		  if (!(ace->Header.AceFlags & INHERIT_ONLY))
+		    {
+		      if ((pos = searchace (lacl, MAX_ACL_ENTRIES, CLASS_OBJ))
+			  >= 0)
+			{
+			  lacl[pos].a_type = CLASS_OBJ;
+			  lacl[pos].a_id = ILLEGAL_GID;
+			  lacl[pos].a_perm = CYG_ACE_MASK_TO_POSIX (ace->Mask);
+			}
+		      has_class_perm = true;
+		      class_perm = lacl[pos].a_perm;
+		    }
+		  if (ace->Header.AceFlags & SUB_CONTAINERS_AND_OBJECTS_INHERIT)
+		    {
+		      if ((pos = searchace (lacl, MAX_ACL_ENTRIES,
+					    DEF_CLASS_OBJ)) >= 0)
+			{
+			  lacl[pos].a_type = DEF_CLASS_OBJ;
+			  lacl[pos].a_id = ILLEGAL_GID;
+			  lacl[pos].a_perm = CYG_ACE_MASK_TO_POSIX (ace->Mask);
+			}
+		      has_def_class_perm = true;
+		      def_class_perm = lacl[pos].a_perm;
+		    }
 		}
 	    }
 	  continue;
 	}
-      else if (ace_sid == owner_sid)
+      if (ace_sid == owner_sid)
 	{
 	  type = USER_OBJ;
 	  id = uid;

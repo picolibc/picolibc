@@ -40,8 +40,6 @@ SECURITY_ATTRIBUTES NO_COPY_RO sec_all_nih =
 
 MKSID (well_known_null_sid, "S-1-0-0",
        SECURITY_NULL_SID_AUTHORITY, 1, SECURITY_NULL_RID);
-MKSID (well_known_cygwin_sid, "S-1-0-1132029815",
-       SECURITY_NULL_SID_AUTHORITY, 1, 0x43796777); /* "Cygw" */
 MKSID (well_known_world_sid, "S-1-1-0",
        SECURITY_WORLD_SID_AUTHORITY, 1, SECURITY_WORLD_RID);
 MKSID (well_known_local_sid, "S-1-2-0",

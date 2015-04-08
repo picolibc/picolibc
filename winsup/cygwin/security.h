@@ -393,7 +393,6 @@ public:
 };
 
 extern cygpsid well_known_null_sid;
-extern cygpsid well_known_cygwin_sid;
 extern cygpsid well_known_world_sid;
 extern cygpsid well_known_local_sid;
 extern cygpsid well_known_console_logon_sid;

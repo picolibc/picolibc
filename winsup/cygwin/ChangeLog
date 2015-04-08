@@ -1,5 +1,18 @@
 2015-04-08  Corinna Vinschen  <corinna@vinschen.de>
 
+	* sec_acl.cc: Change preceeding comment explaining new-style ACLs.
+	Describe how to generate deny ACEs in more detail.  Accommodate the
+	fact that a NULL deny ACE is used for {DEF_}CLASS_OBJ, rather than
+	a special Cygwin ACE.  Improve further comments.
+	(CYG_ACE_NEW_STYLE): Define.
+	(get_posix_access): Change from Cygwin ACE to NULL deny ACE.  Fix
+	CLASS_OBJ handling to generate CLASS_OBJ and DEF_CLASS_OBJ from a single
+	NULL deny ACE if the inheritance flags say so.
+	* sec_helper.cc (well_known_cygwin_sid): Remove.
+	* security.h (well_known_cygwin_sid): Drop declaration.
+
+2015-04-08  Corinna Vinschen  <corinna@vinschen.de>
+
 	* include/cyggwin/acl.h (struct __acl16): Move from here...
 	* sec_acl.cc: ...to here.
 
