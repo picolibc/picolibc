@@ -40,11 +40,24 @@ _start:
 	mov	#__stack, r0
 	mvtc	#__vectors, intb
 
+	/* Copy the .data section from ROM into RAM.  */
 	mov	#__datastart, r1
 	mov	#__romdatastart, r2
 	mov	#__romdatacopysize, r3
-	smovf
+#ifdef __RX_DISALLOW_STRING_INSNS__
+	cmp	#0, r3
+	beq	2f
 
+1:	mov.b	[r2+], r5
+	mov.b	r5, [r1+]
+	sub	#1, r3
+	bne	1b
+2:	
+#else
+	smovf
+#endif
+
+	/* Initialise the contents of the .bss section.  */
 	mov	#__bssstart, r1
 	mov	#0, r2
 	mov	#__bsssize, r3

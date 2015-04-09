@@ -7,7 +7,27 @@ _strncat:
 	;; On entry: r1 => Destination
 	;;           r2 => Source
 	;; 	     r3 => Max number of bytes to copy
+#ifdef __RX_DISALLOW_STRING_INSNS__
+	cmp	#0, r3		; If max is zero we have nothing to do.
+	beq	2f
 	
+	mov 	r1, r4		; Leave the desintation pointer intact for the return value.
+	
+1:	mov.b	[r4+], r5	; Find the NUL byte at the end of the destination.
+	cmp	#0, r5
+	bne	1b
+
+	sub	#1, r4
+
+3:	mov.b	[r2+], r5	; Copy bytes from the source into the destination ...
+	mov.b	r5, [r4+]
+	cmp	#0, r5		; ... until we reach a NUL byte ...
+	beq 	2f
+	sub	#1, r3
+	bne	3b		; ... or we have copied N bytes.
+	
+2:	rts
+#else
 	mov 	r1, r4		; Save a copy of the dest pointer.
 	mov 	r2, r5		; Save a copy of the source pointer.
 	mov 	r3, r14		; Save a copy of the byte count.
@@ -33,3 +53,6 @@ _strncat:
 1:	
 	mov	r4, r1		; Return the original dest pointer.
 	rts
+#endif
+	.size _strncat, . - _strncat
+	

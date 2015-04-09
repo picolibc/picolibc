@@ -8,3 +8,6 @@ _memset:
 	sstr.b
 	mov	r4, r1
 	rts
+
+	.size _memset, . - _memset
+	
