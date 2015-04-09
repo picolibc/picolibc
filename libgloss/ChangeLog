@@ -1,3 +1,8 @@
+2015-04-09  Nick Clifton  <nickc@redhat.com>
+
+	* rx/crt0.S (_start): If string instructions are not allowed,
+	avoid using SMOVF.
+
 2015-04-08  Nick Clifton  <nickc@redhat.com>
 
 	* rx/rx.ld: Add .note and DWARF3 sections.
