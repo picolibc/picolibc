@@ -1037,7 +1037,7 @@ fhandler_dev_dsp::fixup_after_exec ()
 
 
 int
-fhandler_dev_dsp::open (int flags, mode_t mode)
+fhandler_dev_dsp::open (int flags, mode_t)
 {
   int ret = 0, err = 0;
   UINT num_in = 0, num_out = 0;
@@ -1068,7 +1068,7 @@ fhandler_dev_dsp::open (int flags, mode_t mode)
   if (err)
     set_errno (err);
   else
-    ret = fhandler_base::open (flags, mode);
+    ret = open_null (flags);
 
   debug_printf ("ACCMODE=%y audio_in=%d audio_out=%d, err=%d, ret=%d",
 		flags & O_ACCMODE, num_in, num_out, err, ret);
