@@ -1,3 +1,7 @@
+2015-04-09  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_dsp.cc (fhandler_dev_dsp::open): Call open_null.
+
 2015-04-08  Corinna Vinschen  <corinna@vinschen.de>
 
 	* pwdgrp.h (sidfromuid): New inline function.
