@@ -15,6 +15,7 @@ details. */
 #include "winsup.h"
 #include <unistd.h>
 #include <stdlib.h>
+#include <sys/acl.h>
 #include "cygerrno.h"
 #include "security.h"
 #include "path.h"
@@ -34,7 +35,6 @@ static GENERIC_MAPPING NO_COPY_RO file_mapping = { FILE_GENERIC_READ,
 						   FILE_GENERIC_WRITE,
 						   FILE_GENERIC_EXECUTE,
 						   FILE_ALL_ACCESS };
-
 LONG
 get_file_sd (HANDLE fh, path_conv &pc, security_descriptor &sd,
 	     bool justcreated)
@@ -85,62 +85,46 @@ get_file_sd (HANDLE fh, path_conv &pc, security_descriptor &sd,
 	  return -1;
 	}
     }
-  /* Ok, so we have a security descriptor now.  Unfortunately, if you want
-     to know if an ACE is inherited from the parent object, you can't just
-     call NtQuerySecurityObject once.  The problem is this:
+  /* We have a security descriptor now.  Unfortunately, if you want to know
+     if an ACE is inherited from the parent object, this isn't sufficient.
 
      In the simple case, the SDs control word contains one of the
      SE_DACL_AUTO_INHERITED or SE_DACL_PROTECTED flags, or at least one of
-     the ACEs has the INHERITED_ACE flag set.  In all of these cases the
-     GetSecurityInfo function calls NtQuerySecurityObject only once, too,
-     apparently because it figures that the DACL is self-sufficient, which
-     it usually is.  Windows Explorer, for instance, takes great care to
-     set these flags in a security descriptor if you change the ACL in the
-     GUI property dialog.
+     the ACEs has the INHERITED_ACE flag set.  In all of these cases we
+     know the DACL has been inherited.
 
-     The tricky case is if none of these flags is set in the SD.  That means
-     the information whether or not an ACE has been inherited is not available
-     in the DACL of the object.  In this case GetSecurityInfo also fetches the
-     SD from the parent directory and tests if the object's SD contains
-     inherited ACEs from the parent.  The below code is closly emulating the
-     behaviour of GetSecurityInfo so we can get rid of this advapi32 dependency.
+     If none of these flags is set in the SD, the information whether
+     or not an ACE has been inherited is not available in the DACL of the
+     object.  In this case GetSecurityInfo fetches the SD from the parent
+     directory and tests if the object's SD contains inherited ACEs from the
+     parent.
 
-     However, this functionality is slow, and the extra information is only
-     required when the file has been created and the permissions are about
-     to be set to POSIX permissions.  Therefore we only use it in case the
-     file just got created.
+     Note that we're not testing the SE_DACL_AUTO_INHERITED and
+     SE_DACL_PROTECTED flags here because we know the state the file's SD
+     is in.  Since we're creating all files with a NULL descriptor, the DACL
+     is either inherited from the parent, or it's the default DACL.  In
+     neither case, one of these flags is set.
 
-     Note that GetSecurityInfo has a problem on 5.1 and 5.2 kernels.  Sometimes
-     it returns ERROR_INVALID_ADDRESS if a former request for the parent
-     directories' SD used NtQuerySecurityObject, rather than GetSecurityInfo
-     as well.  See http://cygwin.com/ml/cygwin-developers/2011-03/msg00027.html
-     for the solution.  This problem does not occur with the below code, so
-     the workaround has been removed. */
+     For speed, we're not calling RtlConvertToAutoInheritSecurityObject
+     anymore (but keep the code here for reference).  Rather we just test
+     if one of the parent's ACEs is inheritable.  If so, we know we inherited
+     it and set the SE_DACL_AUTO_INHERITED flag.  If not, we may assume our
+     object's DACL is the default DACL.
+
+     This functionality is slow and the extra information is only required
+     when the file has been created and the permissions are about to be set
+     to POSIX permissions.  Therefore we only use it in case the file just
+     got created. */
   if (justcreated)
     {
-      SECURITY_DESCRIPTOR_CONTROL ctrl;
-      ULONG dummy;
       PACL dacl;
       BOOLEAN exists, def;
       ACCESS_ALLOWED_ACE *ace;
       UNICODE_STRING dirname;
-      PSECURITY_DESCRIPTOR psd, nsd;
+      PSECURITY_DESCRIPTOR psd;
       tmp_pathbuf tp;
 
-      /* Check SDs control flags.  If SE_DACL_AUTO_INHERITED or
-	 SE_DACL_PROTECTED is set we're done. */
-      RtlGetControlSecurityDescriptor (sd, &ctrl, &dummy);
-      if (ctrl & (SE_DACL_AUTO_INHERITED | SE_DACL_PROTECTED))
-	return 0;
-      /* Otherwise iterate over the ACEs and see if any one of them has the
-	 INHERITED_ACE flag set.  If so, we're done. */
-      if (NT_SUCCESS (RtlGetDaclSecurityDescriptor (sd, &exists, &dacl, &def))
-	  && exists && dacl)
-	for (ULONG idx = 0; idx < dacl->AceCount; ++idx)
-	  if (NT_SUCCESS (RtlGetAce (dacl, idx, (PVOID *) &ace))
-	      && (ace->Header.AceFlags & INHERITED_ACE))
-	    return 0;
-      /* Otherwise, open the parent directory with READ_CONTROL... */
+      /* Open the parent directory with READ_CONTROL... */
       RtlSplitUnicodePath (pc.get_nt_native_path (), &dirname, NULL);
       InitializeObjectAttributes (&attr, &dirname, pc.objcaseinsensitive (),
 				  NULL, NULL);
@@ -164,12 +148,14 @@ get_file_sd (HANDLE fh, path_conv &pc, security_descriptor &sd,
 			&dirname, status);
 	  return 0;
 	}
+#if 0
       /* ... and create a new security descriptor in which all inherited ACEs
 	 are marked with the INHERITED_ACE flag.  For a description of the
 	 undocumented RtlConvertToAutoInheritSecurityObject function from
 	 ntdll.dll see the MSDN man page for the advapi32 function
 	 ConvertToAutoInheritPrivateObjectSecurity.  Fortunately the latter
 	 is just a shim. */
+      PSECURITY_DESCRIPTOR nsd;
       status = RtlConvertToAutoInheritSecurityObject (psd, sd, &nsd, NULL,
 						      pc.isdir (),
 						      &file_mapping);
@@ -185,6 +171,36 @@ get_file_sd (HANDLE fh, path_conv &pc, security_descriptor &sd,
       len = RtlLengthSecurityDescriptor (nsd);
       memcpy ((PSECURITY_DESCRIPTOR) sd, nsd, len);
       RtlDeleteSecurityObject (&nsd);
+#else
+      /* ... and check the parent descriptor for inheritable ACEs matching
+	 our current object type (file/dir).  The simple truth in our case
+	 is, either the parent dir had inheritable ACEs and all our ACEs are
+	 inherited, or the parent dir didn't have inheritable ACEs and all
+	 our ACEs are taken from the default DACL. */
+      bool inherited = false;
+      BYTE search_flags = pc.isdir () ? SUB_CONTAINERS_AND_OBJECTS_INHERIT
+				      : SUB_OBJECTS_ONLY_INHERIT;
+      if (NT_SUCCESS (RtlGetDaclSecurityDescriptor (psd, &exists, &dacl, &def))
+	  && exists && dacl)
+	for (ULONG idx = 0; idx < dacl->AceCount; ++idx)
+	  if (NT_SUCCESS (RtlGetAce (dacl, idx, (PVOID *) &ace))
+	      && (ace->Header.AceFlags & search_flags))
+	    {
+	      inherited = true;
+	      break;
+	    }
+      /* Then, if the parent descriptor contained inheritable ACEs, we mark
+	 the SD as SE_DACL_AUTO_INHERITED.  Note that this requires the
+	 matching check in get_posix_access.  If we ever revert to
+	 RtlConvertToAutoInheritSecurityObject, the check in get_posix_access
+	 has to test every single ACE for the INHERITED_ACE flag again. */
+      if (inherited
+	  && NT_SUCCESS (RtlGetDaclSecurityDescriptor (sd, &exists, &dacl,
+						       &def))
+	  && exists && dacl)
+	RtlSetControlSecurityDescriptor (sd, SE_DACL_AUTO_INHERITED,
+					     SE_DACL_AUTO_INHERITED);
+#endif
     }
   return 0;
 }
@@ -340,363 +356,6 @@ add_access_denied_ace (PACL acl, DWORD attributes, PSID sid, size_t &len_add,
   return true;
 }
 
-static PSECURITY_DESCRIPTOR
-alloc_sd (path_conv &pc, uid_t uid, gid_t gid, int attribute,
-	  security_descriptor &sd_ret)
-{
-  NTSTATUS status;
-  BOOLEAN dummy;
-  tmp_pathbuf tp;
-
-  /* NOTE: If the high bit of attribute is set, we have just created
-     a file or directory.  See below for an explanation. */
-
-  debug_printf("uid %u, gid %u, attribute 0%o", uid, gid, attribute);
-
-  /* Get owner and group from current security descriptor. */
-  PSID cur_owner_sid = NULL;
-  PSID cur_group_sid = NULL;
-  status = RtlGetOwnerSecurityDescriptor (sd_ret, &cur_owner_sid, &dummy);
-  if (!NT_SUCCESS (status))
-    debug_printf ("RtlGetOwnerSecurityDescriptor: %y", status);
-  status = RtlGetGroupSecurityDescriptor (sd_ret, &cur_group_sid, &dummy);
-  if (!NT_SUCCESS (status))
-    debug_printf ("RtlGetGroupSecurityDescriptor: %y", status);
-
-  /* Get SID of owner. */
-  cygsid owner_sid;
-  /* Check for current user first */
-  if (uid == myself->uid)
-    owner_sid = cygheap->user.sid ();
-  else if (uid == ILLEGAL_UID)
-    owner_sid = cur_owner_sid;
-  else if (!owner_sid.getfrompw (internal_getpwuid (uid)))
-    {
-      set_errno (EINVAL);
-      return NULL;
-    }
-  owner_sid.debug_print ("alloc_sd: owner SID =");
-
-  /* Get SID of new group. */
-  cygsid group_sid;
-  /* Check for current user first */
-  if (gid == myself->gid)
-    group_sid = cygheap->user.groups.pgsid;
-  else if (gid == ILLEGAL_GID)
-    group_sid = cur_group_sid;
-  else if (!group_sid.getfromgr (internal_getgrgid (gid)))
-    {
-      set_errno (EINVAL);
-      return NULL;
-    }
-  group_sid.debug_print ("alloc_sd: group SID =");
-
-  /* Initialize local security descriptor. */
-  SECURITY_DESCRIPTOR sd;
-  RtlCreateSecurityDescriptor (&sd, SECURITY_DESCRIPTOR_REVISION);
-
-  /* We set the SE_DACL_PROTECTED flag here to prevent the DACL from being
-     modified by inheritable ACEs. */
-  RtlSetControlSecurityDescriptor (&sd, SE_DACL_PROTECTED, SE_DACL_PROTECTED);
-
-  /* Create owner for local security descriptor. */
-  status = RtlSetOwnerSecurityDescriptor (&sd, owner_sid, FALSE);
-  if (!NT_SUCCESS (status))
-    {
-      __seterrno_from_nt_status (status);
-      return NULL;
-    }
-
-  /* Create group for local security descriptor. */
-  status = RtlSetGroupSecurityDescriptor (&sd, group_sid, FALSE);
-  if (!NT_SUCCESS (status))
-    {
-      __seterrno_from_nt_status (status);
-      return NULL;
-    }
-
-  /* Initialize local access control list. */
-  PACL acl = (PACL) tp.w_get ();
-  RtlCreateAcl (acl, ACL_MAXIMUM_SIZE, ACL_REVISION);
-
-  /* From here fill ACL. */
-  size_t acl_len = sizeof (ACL);
-  /* Only used for sync objects (for ttys).  The admins group should
-     always have the right to manipulate the ACL, so we have to make sure
-     that the ACL gives the admins group STANDARD_RIGHTS_ALL access. */
-  bool saw_admins = false;
-
-  /* Construct allow attribute for owner.
-     Don't set FILE_READ/WRITE_ATTRIBUTES unconditionally on Samba, otherwise
-     it enforces read permissions.  Same for other's below. */
-  DWORD owner_allow = STANDARD_RIGHTS_ALL
-		      | (pc.fs_is_samba ()
-			 ? 0 : (FILE_READ_ATTRIBUTES | FILE_WRITE_ATTRIBUTES));
-  if (attribute & S_IRUSR)
-    owner_allow |= FILE_GENERIC_READ;
-  if (attribute & S_IWUSR)
-    owner_allow |= FILE_GENERIC_WRITE;
-  if (attribute & S_IXUSR)
-    owner_allow |= FILE_GENERIC_EXECUTE & ~FILE_READ_ATTRIBUTES;
-  if (S_ISDIR (attribute)
-      && (attribute & (S_IWUSR | S_IXUSR)) == (S_IWUSR | S_IXUSR))
-    owner_allow |= FILE_DELETE_CHILD;
-  /* For sync objects note that the owner is admin. */
-  if (S_ISCHR (attribute) && owner_sid == well_known_admins_sid)
-    saw_admins = true;
-
-  /* Construct allow attribute for group. */
-  DWORD group_allow = STANDARD_RIGHTS_READ | SYNCHRONIZE
-		      | (pc.fs_is_samba () ? 0 : FILE_READ_ATTRIBUTES);
-  if (attribute & S_IRGRP)
-    group_allow |= FILE_GENERIC_READ;
-  if (attribute & S_IWGRP)
-    group_allow |= FILE_GENERIC_WRITE;
-  if (attribute & S_IXGRP)
-    group_allow |= FILE_GENERIC_EXECUTE & ~FILE_READ_ATTRIBUTES;
-  if (S_ISDIR (attribute)
-      && (attribute & (S_IWGRP | S_IXGRP)) == (S_IWGRP | S_IXGRP)
-      && !(attribute & S_ISVTX))
-    group_allow |= FILE_DELETE_CHILD;
-  /* For sync objects, add STANDARD_RIGHTS_ALL for admins group. */
-  if (S_ISCHR (attribute) && group_sid == well_known_admins_sid)
-    {
-      group_allow |= STANDARD_RIGHTS_ALL;
-      saw_admins = true;
-    }
-
-  /* Construct allow attribute for everyone. */
-  DWORD other_allow = STANDARD_RIGHTS_READ | SYNCHRONIZE
-		      | (pc.fs_is_samba () ? 0 : FILE_READ_ATTRIBUTES);
-  if (attribute & S_IROTH)
-    other_allow |= FILE_GENERIC_READ;
-  if (attribute & S_IWOTH)
-    other_allow |= FILE_GENERIC_WRITE;
-  if (attribute & S_IXOTH)
-    other_allow |= FILE_GENERIC_EXECUTE & ~FILE_READ_ATTRIBUTES;
-  if (S_ISDIR (attribute)
-      && (attribute & (S_IWOTH | S_IXOTH)) == (S_IWOTH | S_IXOTH)
-      && !(attribute & S_ISVTX))
-    other_allow |= FILE_DELETE_CHILD;
-
-  /* Construct SUID, SGID and VTX bits in NULL ACE. */
-  DWORD null_allow = 0L;
-  if (attribute & (S_ISUID | S_ISGID | S_ISVTX))
-    {
-      if (attribute & S_ISUID)
-	null_allow |= FILE_APPEND_DATA;
-      if (attribute & S_ISGID)
-	null_allow |= FILE_WRITE_DATA;
-      if (attribute & S_ISVTX)
-	null_allow |= FILE_READ_DATA;
-    }
-
-  /* Add owner and group permissions if SIDs are equal
-     and construct deny attributes for group and owner. */
-  bool isownergroup;
-  if ((isownergroup = (owner_sid == group_sid)))
-    owner_allow |= group_allow;
-
-  DWORD owner_deny = ~owner_allow & (group_allow | other_allow);
-  owner_deny &= ~(STANDARD_RIGHTS_READ
-		  | FILE_READ_ATTRIBUTES | FILE_WRITE_ATTRIBUTES);
-
-  DWORD group_deny = ~group_allow & other_allow;
-  group_deny &= ~(STANDARD_RIGHTS_READ | FILE_READ_ATTRIBUTES);
-
-  /* Set deny ACE for owner. */
-  if (owner_deny
-      && !add_access_denied_ace (acl, owner_deny, owner_sid, acl_len,
-				 NO_INHERITANCE))
-    return NULL;
-  /* Set deny ACE for group here to respect the canonical order,
-     if this does not impact owner */
-  if (group_deny && !(group_deny & owner_allow) && !isownergroup
-      && !add_access_denied_ace (acl, group_deny, group_sid, acl_len,
-				 NO_INHERITANCE))
-    return NULL;
-  /* Set allow ACE for owner. */
-  if (!add_access_allowed_ace (acl, owner_allow, owner_sid, acl_len,
-			       NO_INHERITANCE))
-    return NULL;
-  /* Set deny ACE for group, if still needed. */
-  if ((group_deny & owner_allow) && !isownergroup
-      && !add_access_denied_ace (acl, group_deny, group_sid, acl_len,
-				 NO_INHERITANCE))
-    return NULL;
-  /* Set allow ACE for group. */
-  if (!isownergroup
-      && !add_access_allowed_ace (acl, group_allow, group_sid, acl_len,
-				  NO_INHERITANCE))
-    return NULL;
-
-  /* For sync objects, if we didn't see the admins group so far, add entry
-     with STANDARD_RIGHTS_ALL access. */
-  if (S_ISCHR (attribute) && !saw_admins)
-    {
-      if (!add_access_allowed_ace (acl, STANDARD_RIGHTS_ALL,
-				   well_known_admins_sid, acl_len,
-				   NO_INHERITANCE))
-	return NULL;
-      saw_admins = true;
-    }
-
-  /* Set allow ACE for everyone. */
-  if (!add_access_allowed_ace (acl, other_allow, well_known_world_sid, acl_len,
-			       NO_INHERITANCE))
-    return NULL;
-  /* Set null ACE for special bits. */
-  if (null_allow
-      && !add_access_allowed_ace (acl, null_allow, well_known_null_sid, acl_len,
-				  NO_INHERITANCE))
-    return NULL;
-
-  /* Fill ACL with unrelated ACEs from current security descriptor. */
-  PACL oacl;
-  BOOLEAN acl_exists = FALSE;
-  ACCESS_ALLOWED_ACE *ace;
-
-  status = RtlGetDaclSecurityDescriptor (sd_ret, &acl_exists, &oacl, &dummy);
-  if (NT_SUCCESS (status) && acl_exists && oacl)
-    for (DWORD i = 0; i < oacl->AceCount; ++i)
-      if (NT_SUCCESS (RtlGetAce (oacl, i, (PVOID *) &ace)))
-	{
-	  cygpsid ace_sid ((PSID) &ace->SidStart);
-
-	  /* Always skip NULL SID as well as admins SID on virtual device files
-	     in /proc/sys. */
-	  if (ace_sid == well_known_null_sid
-	      || (S_ISCHR (attribute) && ace_sid == well_known_admins_sid))
-	    continue;
-	  /* Check for ACEs which are always created in the preceding code
-	     and check for the default inheritence ACEs which will be created
-	     for just created directories.  Skip them for just created
-	     directories or if they are not inherited.  If they are inherited,
-	     make sure they are *only* inherited, so they don't collide with
-	     the permissions set in this function. */
-	  if ((ace_sid == cur_owner_sid)
-	      || (ace_sid == owner_sid)
-	      || (ace_sid == cur_group_sid)
-	      || (ace_sid == group_sid)
-	      || (ace_sid == well_known_creator_owner_sid)
-	      || (ace_sid == well_known_creator_group_sid)
-	      || (ace_sid == well_known_world_sid))
-	    {
-	      if ((S_ISDIR (attribute) && (attribute & S_JUSTCREATED))
-		  || (ace->Header.AceFlags
-		      & (SUB_CONTAINERS_AND_OBJECTS_INHERIT)) == 0)
-		continue;
-	      else
-		ace->Header.AceFlags |= INHERIT_ONLY;
-	    }
-	  if (attribute & S_JUSTCREATED)
-	    {
-	      /* Since files and dirs are created with a NULL descriptor,
-		 inheritence rules kick in.  If no inheritable entries exist
-		 in the parent object, Windows will create entries from the
-		 user token's default DACL in the file DACL.  These entries
-		 are not desired and we drop them silently. */
-	      if (!(ace->Header.AceFlags & INHERITED_ACE))
-		continue;
-	      /* Remove the INHERITED_ACE flag since on POSIX systems
-		 inheritance is settled when the file has been created.
-		 This also avoids error messages in Windows Explorer when
-		 opening a file's security tab.  Explorer complains if
-		 inheritable ACEs are preceding non-inheritable ACEs. */
-	      ace->Header.AceFlags &= ~INHERITED_ACE;
-	      /* However, if the newly created object is a directory,
-	         it inherits the default ACL from its parent, so mark
-		 all unrelated, inherited ACEs inheritable. */
-	      if (S_ISDIR (attribute))
-		ace->Header.AceFlags |= SUB_CONTAINERS_AND_OBJECTS_INHERIT;
-	    }
-	  else if (uid == ILLEGAL_UID && gid == ILLEGAL_UID
-		   && ace->Header.AceType == ACCESS_ALLOWED_ACE_TYPE
-		   && ace_sid != well_known_creator_group_sid
-		   && ace_sid != well_known_creator_owner_sid
-		   && ace_sid != well_known_world_sid)
-	    {
-	      /* FIXME: Temporary workaround for the problem that chmod does
-		 not affect the group permissions if other users and groups
-		 in the ACL have more permissions than the primary group due
-		 to the CLASS_OBJ emulation.  The temporary workaround is to
-		 disallow any secondary ACE in the ACL more permissions than
-		 the primary group when writing a new ACL via chmod. */
-	      ace->Mask &= group_allow;
-	    }
-	  /* Add unrelated ACCESS_DENIED_ACE to the beginning but behind
-	     the owner_deny, ACCESS_ALLOWED_ACE to the end.  FIXME: this
-	     would break the order of the inherit-only ACEs. */
-	  status = RtlAddAce (acl, ACL_REVISION,
-			      ace->Header.AceType == ACCESS_DENIED_ACE_TYPE
-			      ?  (owner_deny ? 1 : 0) : MAXDWORD,
-			      (LPVOID) ace, ace->Header.AceSize);
-	  if (!NT_SUCCESS (status))
-	    {
-	      __seterrno_from_nt_status (status);
-	      return NULL;
-	    }
-	  acl_len += ace->Header.AceSize;
-	}
-
-  /* Construct appropriate inherit attribute for new directories.  Keep in
-     mind that we do this only for the sake of non-Cygwin applications.
-     Cygwin applications don't need this. */
-  if (S_ISDIR (attribute) && (attribute & S_JUSTCREATED))
-    {
-      const DWORD inherit = SUB_CONTAINERS_AND_OBJECTS_INHERIT | INHERIT_ONLY;
-      /* Set allow ACE for owner. */
-      if (!add_access_allowed_ace (acl, owner_allow,
-				   well_known_creator_owner_sid, acl_len,
-				   inherit))
-	return NULL;
-      /* Set allow ACE for group. */
-      if (!add_access_allowed_ace (acl, group_allow,
-				   well_known_creator_group_sid, acl_len,
-				   inherit))
-	return NULL;
-      /* Set allow ACE for everyone. */
-      if (!add_access_allowed_ace (acl, other_allow, well_known_world_sid,
-				   acl_len, inherit))
-	return NULL;
-    }
-
-  /* Set AclSize to computed value. */
-  acl->AclSize = acl_len;
-  debug_printf ("ACL-Size: %d", acl_len);
-
-  /* Create DACL for local security descriptor. */
-  status = RtlSetDaclSecurityDescriptor (&sd, TRUE, acl, FALSE);
-  if (!NT_SUCCESS (status))
-    {
-      __seterrno_from_nt_status (status);
-      return NULL;
-    }
-
-  /* Make self relative security descriptor. */
-  DWORD sd_size = 0;
-  RtlAbsoluteToSelfRelativeSD (&sd, sd_ret, &sd_size);
-  if (sd_size <= 0)
-    {
-      __seterrno ();
-      return NULL;
-    }
-  if (!sd_ret.malloc (sd_size))
-    {
-      set_errno (ENOMEM);
-      return NULL;
-    }
-  status = RtlAbsoluteToSelfRelativeSD (&sd, sd_ret, &sd_size);
-  if (!NT_SUCCESS (status))
-    {
-      __seterrno_from_nt_status (status);
-      return NULL;
-    }
-  debug_printf ("Created SD-Size: %u", sd_ret.size ());
-
-  return sd_ret;
-}
-
 void
 set_security_attribute (path_conv &pc, int attribute, PSECURITY_ATTRIBUTES psa,
 			security_descriptor &sd)
@@ -704,8 +363,9 @@ set_security_attribute (path_conv &pc, int attribute, PSECURITY_ATTRIBUTES psa,
   psa->lpSecurityDescriptor = sd.malloc (SECURITY_DESCRIPTOR_MIN_LENGTH);
   RtlCreateSecurityDescriptor ((PSECURITY_DESCRIPTOR) psa->lpSecurityDescriptor,
 				SECURITY_DESCRIPTOR_REVISION);
-  psa->lpSecurityDescriptor = alloc_sd (pc, geteuid32 (), getegid32 (),
-					attribute, sd);
+  psa->lpSecurityDescriptor = set_posix_access (attribute, geteuid32 (),
+						getegid32 (), NULL, 0,
+						sd, false);
 }
 
 int
@@ -744,8 +404,8 @@ get_object_attribute (HANDLE handle, uid_t *uidret, gid_t *gidret,
 
   if (get_object_sd (handle, sd))
     return -1;
-  get_posix_access (sd, attribute, uidret, gidret, NULL, 0);
-  return 0;
+  return get_posix_access (sd, attribute, uidret, gidret, NULL, 0) >= 0
+	 ? 0 : -1;
 }
 
 int
@@ -754,7 +414,7 @@ create_object_sd_from_attribute (HANDLE handle, uid_t uid, gid_t gid,
 {
   path_conv pc;
   if ((handle && get_object_sd (handle, sd))
-      || !alloc_sd (pc, uid, gid, attribute, sd))
+      || !set_posix_access (attribute, uid, gid, NULL, 0, sd, false))
     return -1;
   return 0;
 }
@@ -786,24 +446,72 @@ set_object_attribute (HANDLE handle, uid_t uid, gid_t gid,
 }
 
 int
-set_file_attribute (HANDLE handle, path_conv &pc,
-		    uid_t uid, gid_t gid, mode_t attribute)
+set_created_file_access (HANDLE handle, path_conv &pc, mode_t attr)
 {
   int ret = -1;
+  security_descriptor sd, sd_ret;
+  mode_t attr_rd;
+  uid_t uid;
+  gid_t gid;
+  tmp_pathbuf tp;
+  aclent_t *aclp;
+  int nentries, idx;
 
-  if (pc.has_acls ())
+  if (!get_file_sd (handle, pc, sd, true))
     {
-      security_descriptor sd;
-
-      if (!get_file_sd (handle, pc, sd, (bool)(attribute & S_JUSTCREATED))
-	  && alloc_sd (pc, uid, gid, attribute, sd))
-	ret = set_file_sd (handle, pc, sd,
-			   uid != ILLEGAL_UID || gid != ILLEGAL_GID);
+      attr |= S_JUSTCREATED;
+      if (pc.isdir ())
+	attr |= S_IFDIR;
+      attr_rd = attr;
+      aclp = (aclent_t *) tp.c_get ();
+      if ((nentries = get_posix_access (sd, &attr_rd, &uid, &gid,
+					aclp, MAX_ACL_ENTRIES)) >= 0)
+	{
+	  /* Symlinks always get the request POSIX perms. */
+	  if (S_ISLNK (attr))
+	    attr_rd = 0777;
+	  /* Overwrite ACL permissions as required by POSIX 1003.1e
+	     draft 17. */
+	  aclp[0].a_perm = ((attr & attr_rd) >> 6) & S_IRWXO;
+	  if (nentries > MIN_ACL_ENTRIES
+	      && (idx = searchace (aclp, nentries, CLASS_OBJ)) >= 0)
+	    aclp[idx].a_perm = ((attr & attr_rd) >> 3) & S_IRWXO;
+	  else
+	    aclp[1].a_perm = ((attr & attr_rd) >> 3) & S_IRWXO;
+	  if ((idx = searchace (aclp, nentries, OTHER_OBJ)) >= 0)
+	    aclp[idx].a_perm = (attr & attr_rd) & S_IRWXO;
+	  /* Construct appropriate inherit attribute for new directories.
+	     Basically we do this only for the sake of non-Cygwin applications.
+	     Cygwin applications don't need these.  Additionally, if the
+	     S_ISGID bit is set, propagate it. */
+	  if (S_ISDIR (attr))
+	    {
+	      if (searchace (aclp, nentries, DEF_USER_OBJ) < 0)
+		{
+		  aclp[nentries].a_type = DEF_USER_OBJ;
+		  aclp[nentries].a_id = ILLEGAL_UID;
+		  aclp[nentries++].a_perm = (attr >> 6) & S_IRWXO;
+		}
+	      if (searchace (aclp, nentries, DEF_GROUP_OBJ) < 0)
+		{
+		  aclp[nentries].a_type = DEF_GROUP_OBJ;
+		  aclp[nentries].a_id = ILLEGAL_GID;
+		  aclp[nentries++].a_perm = (attr >> 3) & S_IRWXO;
+		}
+	      if (searchace (aclp, nentries, DEF_OTHER_OBJ) < 0)
+		{
+		  aclp[nentries].a_type = DEF_OTHER_OBJ;
+		  aclp[nentries].a_id = ILLEGAL_UID;
+		  aclp[nentries++].a_perm = attr & S_IRWXO;
+		}
+	      if (attr_rd & S_ISGID)
+		attr |= S_ISGID;
+	    }
+	  if (set_posix_access (attr, uid, gid, aclp, nentries, sd_ret,
+				pc.fs_is_samba ()))
+	    ret = set_file_sd (handle, pc, sd_ret, attr_rd & S_ISGID);
+	}
     }
-  else
-    ret = 0;
-  syscall_printf ("%d = set_file_attribute(%S, %d, %d, 0%o)",
-		  ret, pc.get_nt_native_path (), uid, gid, attribute);
   return ret;
 }
 

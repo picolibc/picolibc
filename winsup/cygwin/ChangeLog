@@ -1,3 +1,44 @@
+2015-04-10  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler.cc (fhandler_base::open_with_arch): Call open with mode
+	not umasked.
+	(fhandler_base::open): Explicitely umask mode on NFS here.  Call new
+	set_created_file_access rather than set_file_attribute.
+	* fhandler_disk_file.cc (fhandler_disk_file::fchmod): Reimplement
+	setting permissions on filesystems supporting ACLs using the new
+	set_posix_access call.
+	(fhandler_disk_file::fchown): Ditto.
+	(fhandler_disk_file::mkdir): Call new set_created_file_access rather
+	than set_file_attribute.
+	* fhandler_socket.cc (fhandler_socket::bind): Don't umask here.  Add
+	WRITE_OWNER access to allow writing group in case of SGID bit set.
+	Call new set_created_file_access rather than set_file_attribute.
+	* path.cc (symlink_worker): Call new set_created_file_access rather
+	than set_file_attribute.
+	* sec_acl.cc (searchace): Un-staticize.
+	(set_posix_access): New, complementary functionality to
+	get_posix_access.
+	(setacl): Implement in terms of get_posix_access/set_posix_access.
+	(get_posix_access): Add handling for just created files requiring
+	their first Cygwin ACL.  Fix new_style recognition.  Handle SGID
+	bit.  For old-style ACLs, ignore SYSTEM and Administrators when
+	computing the {DEF_}CLASS_OBJ perms.
+	* security.cc (get_file_sd): Revamp comment.  Change and (hopefully)
+	speed up inheritance processing for just created files.
+	(alloc_sd): Remove.
+	(set_security_attribute): Call set_posix_access instead of alloc_sd.
+	(get_object_attribute): Fix return value.
+	(create_object_sd_from_attribute): Call set_posix_access instead of
+	alloc_sd.
+	(set_file_attribute): Remove.
+	(set_created_file_access): New function implemented in terms of
+	get_posix_access/set_posix_access.
+	* security.h (set_file_attribute): Remove prototype.
+	(set_created_file_access): Add prototype.
+	(searchace): Ditto.
+	(set_posix_access): Ditto.
+	* syscalls.cc (open): Call open_with_arch with mode not umasked.
+
 2015-04-09  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler_dsp.cc (fhandler_dev_dsp::open): Call open_null.

@@ -436,8 +436,7 @@ class path_conv;
 /* File manipulation */
 int __reg3 get_file_attribute (HANDLE, path_conv &, mode_t *,
 				  uid_t *, gid_t *);
-int __reg3 set_file_attribute (HANDLE, path_conv &,
-				  uid_t, gid_t, mode_t);
+int __reg3 set_created_file_access (HANDLE, path_conv &, mode_t);
 int __reg2 get_object_sd (HANDLE, security_descriptor &);
 int __reg3 get_object_attribute (HANDLE, uid_t *, gid_t *, mode_t *);
 int __reg3 set_object_attribute (HANDLE, uid_t, gid_t, mode_t);
@@ -463,6 +462,9 @@ bool get_sids_info (cygpsid, cygpsid, uid_t * , gid_t *);
 struct acl;
 extern "C" int aclsort32 (int, int, struct acl *);
 extern "C" int acl32 (const char *, int, int, struct acl *);
+int searchace (struct acl *, int, int, uid_t id = ILLEGAL_UID);
+PSECURITY_DESCRIPTOR set_posix_access (mode_t, uid_t, gid_t, struct acl *, int,
+				       security_descriptor &, bool);
 int get_posix_access (PSECURITY_DESCRIPTOR, mode_t *, uid_t *, gid_t *,
 		      struct acl *, int);
 int getacl (HANDLE, path_conv &, int, struct acl *);

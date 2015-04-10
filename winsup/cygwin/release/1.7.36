@@ -1,6 +1,24 @@
 What's new:
 -----------
 
+- New, unified implementation of POSIX permission and ACL handling.  The
+  new ACLs now store the POSIX ACL MASK/CLASS_OBJ permission mask, and
+  they allow to inherit the S_ISGID bit.  ACL inheritance now really
+  works as desired, in a limited, but theoretically equivalent fashion
+  even for non-Cygwin processes.
+
+  To accommodate Windows default ACLs, the new code ignores SYSTEM and
+  Administrators group permissions when computing the MASK/CLASS_OBJ
+  permission mask on old ACLs, and it doesn't deny access to SYSTEM and
+  Administrators group based on the value of MASK/CLASS_OBJ when
+  creating the new ACLs.
+
+  The new code now handles the S_ISGID bit on directories as on Linux:
+  Setting S_ISGID on a directory causes new files and subdirs created
+  within to inherit its group, rather than the primary group of the user
+  who created the file.  This only works for files and directories
+  created by Cygwin processes.
+
 - basename(3) now comes in two flavors, POSIX and GNU.  The POSIX version is
   the default.  You get the GNU version after
 

@@ -1,7 +1,7 @@
 /* fhandler_socket.cc. See fhandler.h for a description of the fhandler classes.
 
    Copyright 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010,
-   2011, 2012, 2013, 2014 Red Hat, Inc.
+   2011, 2012, 2013, 2014, 2015 Red Hat, Inc.
 
    This file is part of Cygwin.
 
@@ -1039,10 +1039,10 @@ fhandler_socket::bind (const struct sockaddr *name, int namelen)
       sin.sin_port = ntohs (sin.sin_port);
       debug_printf ("AF_LOCAL: socket bound to port %u", sin.sin_port);
 
-      mode_t mode = adjust_socket_file_mode ((S_IRWXU | S_IRWXG | S_IRWXO)
-					     & ~cygheap->umask);
+      mode_t mode = S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH;
       DWORD fattr = FILE_ATTRIBUTE_SYSTEM;
-      if (!(mode & (S_IWUSR | S_IWGRP | S_IWOTH)) && !pc.has_acls ())
+      if (!pc.has_acls ()
+	  && !(mode & ~cygheap->umask & (S_IWUSR | S_IWGRP | S_IWOTH)))
 	fattr |= FILE_ATTRIBUTE_READONLY;
       SECURITY_ATTRIBUTES sa = sec_none_nih;
       NTSTATUS status;
@@ -1060,7 +1060,7 @@ fhandler_socket::bind (const struct sockaddr *name, int namelen)
 	 I don't know what setting that is or how to recognize such a share,
 	 so for now we don't request WRITE_DAC on remote drives. */
       if (pc.has_acls () && !pc.isremote ())
-	access |= READ_CONTROL | WRITE_DAC;
+	access |= READ_CONTROL | WRITE_DAC | WRITE_OWNER;
 
       status = NtCreateFile (&fh, access, pc.get_object_attr (attr, sa), &io,
 			     NULL, fattr, 0, FILE_CREATE,
@@ -1078,8 +1078,7 @@ fhandler_socket::bind (const struct sockaddr *name, int namelen)
       else
 	{
 	  if (pc.has_acls ())
-	    set_file_attribute (fh, pc, ILLEGAL_UID, ILLEGAL_GID,
-				S_JUSTCREATED | mode);
+	    set_created_file_access (fh, pc, mode);
 	  char buf[sizeof (SOCKET_COOKIE) + 80];
 	  __small_sprintf (buf, "%s%u %c ", SOCKET_COOKIE, sin.sin_port,
 			   get_socket_type () == SOCK_STREAM ? 's'
