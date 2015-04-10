@@ -1,3 +1,8 @@
+2015-04-10  Corinna Vinschen  <corinna@vinschen.de>
+
+	* new-features.xml (ov-new2.0): Rename from ov-new1.7.36 and change
+	version number to 2.0.
+
 2015-04-02  David A. Wheeler  <dwheeler@dwheeler.com>
 
 	* faq-setup.xml: Document how Cygwin secures installation and

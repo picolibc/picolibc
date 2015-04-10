@@ -1,3 +1,8 @@
+2015-04-10  Corinna Vinschen  <corinna@vinschen.de>
+
+	* include/cygwin/version.h (CYGWIN_VERSION_DLL_MAJOR): Bump to 2000.
+	(CYGWIN_VERSION_DLL_MINOR): Set to 0.
+
 2015-04-04  Jon TURNEY  <jon.turney@dronecode.org.uk>
 
 	* exceptions.cc (call_signal_handler): Set mcontext.cr2 to the
