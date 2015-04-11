@@ -906,9 +906,9 @@ fhandler_disk_file::fchmod (mode_t mode)
 	      aclp[0].a_perm = (mode >> 6) & S_IRWXO;
 	      if (nentries > MIN_ACL_ENTRIES
 		  && (idx = searchace (aclp, nentries, CLASS_OBJ)) >= 0)
-		aclp[idx].a_perm = (mode >> 6) & S_IRWXO;
+		aclp[idx].a_perm = (mode >> 3) & S_IRWXO;
 	      else
-		aclp[1].a_perm = (mode >> 6) & S_IRWXO;
+		aclp[1].a_perm = (mode >> 3) & S_IRWXO;
 	      if ((idx = searchace (aclp, nentries, OTHER_OBJ)) >= 0)
 		aclp[idx].a_perm = mode & S_IRWXO;
 	      if (pc.isdir ())
