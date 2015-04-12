@@ -58,3 +58,6 @@ Bug Fixes
 
 - Fix UTF-16 surrogate handling in wctomb and friends.
   Addresses: https://cygwin.com/ml/cygwin/2015-03/msg00452.html
+
+- Fix shmget usage of size parameter for already existing segments.
+  Addresses: https://cygwin.com/ml/cygwin/2015-04/msg00105.html

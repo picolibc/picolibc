@@ -377,7 +377,14 @@ shmget (key_t key, size_t size, int shmflg)
      shmid and hdl value to the list. */
   ssh_new_entry->shmid = shmid;
   ssh_new_entry->hdl = hdl;
-  ssh_new_entry->size = size;
+  /* Fetch segment size from server.  If this is an already existing segment,
+     the size value in this shmget call is supposed to be meaningless. */
+  struct shmid_ds stat;
+  client_request_shm stat_req (shmid, IPC_STAT, &stat);
+  if (stat_req.make_request () == -1 || stat_req.retval () == -1)
+    ssh_new_entry->size = size;
+  else
+    ssh_new_entry->size = stat.shm_segsz;
   ssh_new_entry->ref_count = 0;
   SLIST_INSERT_HEAD (&ssh_list, ssh_new_entry, ssh_next);
   SLIST_UNLOCK ();
