@@ -141,6 +141,7 @@ set_posix_access (mode_t attr, uid_t uid, gid_t gid,
   mode_t class_obj = 0, other_obj, group_obj, deny;
   DWORD access;
   int idx, start_idx, class_idx, tmp_idx;
+  bool dev_saw_admins = false;
 
   /* Initialize local security descriptor. */
   RtlCreateSecurityDescriptor (&sd, SECURITY_DESCRIPTOR_REVISION);
@@ -335,6 +336,14 @@ set_posix_access (mode_t attr, uid_t uid, gid_t gid,
 		  if (aclbufp[idx].a_perm == S_IRWXO)
 		    access |= FILE_DELETE_CHILD;
 		}
+	      /* For ptys check if the admins group is in the ACL.  If so,
+		 make sure the group has WRITE_DAC and WRITE_OWNER perms. */
+	      if (S_ISCHR (attr) && !dev_saw_admins
+		  && aclsid[idx] == well_known_admins_sid)
+		{
+		  access |= STD_RIGHTS_OWNER;
+		  dev_saw_admins = true;
+		}
 	      if (aclbufp[idx].a_perm & S_IROTH)
 		access |= FILE_ALLOW_READ;
 	      if (aclbufp[idx].a_perm & S_IWOTH)
@@ -352,6 +361,13 @@ set_posix_access (mode_t attr, uid_t uid, gid_t gid,
 		return NULL;
 	    }
 	}
+      /* For ptys if the admins group isn't in the ACL, add an ACE to make
+	 sure the group has WRITE_DAC and WRITE_OWNER perms. */
+      if (S_ISCHR (attr) && !dev_saw_admins
+	  && !add_access_allowed_ace (acl, STD_RIGHTS_OWNER,
+				      well_known_admins_sid, acl_len,
+				      NO_INHERITANCE))
+	return NULL;
       /* Create allow ACE for other.  It's preceeded by class_obj if it exists.
 	 If so, skip it. */
       if (aclbufp[idx].a_type & CLASS_OBJ)

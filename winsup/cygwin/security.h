@@ -440,8 +440,8 @@ int __reg3 set_created_file_access (HANDLE, path_conv &, mode_t);
 int __reg2 get_object_sd (HANDLE, security_descriptor &);
 int __reg3 get_object_attribute (HANDLE, uid_t *, gid_t *, mode_t *);
 int __reg3 set_object_attribute (HANDLE, uid_t, gid_t, mode_t);
-int __reg3 create_object_sd_from_attribute (HANDLE, uid_t, gid_t,
-					       mode_t, security_descriptor &);
+int __reg3 create_object_sd_from_attribute (uid_t, gid_t, mode_t,
+					    security_descriptor &);
 int __reg3 set_object_sd (HANDLE, security_descriptor &, bool);
 
 int __reg3 get_reg_attribute (HKEY hkey, mode_t *, uid_t *, gid_t *);

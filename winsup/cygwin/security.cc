@@ -409,14 +409,11 @@ get_object_attribute (HANDLE handle, uid_t *uidret, gid_t *gidret,
 }
 
 int
-create_object_sd_from_attribute (HANDLE handle, uid_t uid, gid_t gid,
-				 mode_t attribute, security_descriptor &sd)
+create_object_sd_from_attribute (uid_t uid, gid_t gid, mode_t attribute,
+				 security_descriptor &sd)
 {
-  path_conv pc;
-  if ((handle && get_object_sd (handle, sd))
-      || !set_posix_access (attribute, uid, gid, NULL, 0, sd, false))
-    return -1;
-  return 0;
+  return set_posix_access (S_IFCHR | attribute, uid, gid, NULL, 0, sd, false)
+  	 ? 0 : -1;
 }
 
 int
@@ -434,12 +431,11 @@ set_object_sd (HANDLE handle, security_descriptor &sd, bool chown)
 }
 
 int
-set_object_attribute (HANDLE handle, uid_t uid, gid_t gid,
-		      mode_t attribute)
+set_object_attribute (HANDLE handle, uid_t uid, gid_t gid, mode_t attribute)
 {
   security_descriptor sd;
 
-  if (create_object_sd_from_attribute (handle, uid, gid, attribute, sd)
+  if (create_object_sd_from_attribute (uid, gid, attribute, sd)
       || set_object_sd (handle, sd, uid != ILLEGAL_UID || gid != ILLEGAL_GID))
     return -1;
   return 0;

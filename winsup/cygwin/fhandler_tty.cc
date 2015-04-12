@@ -387,9 +387,8 @@ fhandler_pty_slave::open (int flags, mode_t)
     sd.malloc (sizeof (SECURITY_DESCRIPTOR));
     RtlCreateSecurityDescriptor (sd, SECURITY_DESCRIPTOR_REVISION);
     SECURITY_ATTRIBUTES sa = { sizeof (SECURITY_ATTRIBUTES), NULL, TRUE };
-    if (!create_object_sd_from_attribute (NULL, myself->uid, myself->gid,
-					  S_IFCHR | S_IRUSR | S_IWUSR | S_IWGRP,
-					  sd))
+    if (!create_object_sd_from_attribute (myself->uid, myself->gid,
+					  S_IRUSR | S_IWUSR | S_IWGRP, sd))
       sa.lpSecurityDescriptor = (PSECURITY_DESCRIPTOR) sd;
     acquire_output_mutex (INFINITE);
     inuse = get_ttyp ()->create_inuse (&sa);
@@ -1093,7 +1092,7 @@ fhandler_pty_slave::fchmod (mode_t mode)
   sd.malloc (sizeof (SECURITY_DESCRIPTOR));
   RtlCreateSecurityDescriptor (sd, SECURITY_DESCRIPTOR_REVISION);
   if (!get_object_attribute (input_available_event, &uid, &gid, NULL)
-      && !create_object_sd_from_attribute (NULL, uid, gid, S_IFCHR | mode, sd))
+      && !create_object_sd_from_attribute (uid, gid, mode, sd))
     ret = fch_set_sd (sd, false);
 errout:
   if (to_close)
@@ -1126,8 +1125,7 @@ fhandler_pty_slave::fchown (uid_t uid, gid_t gid)
       if ((uid == ILLEGAL_UID || uid == o_uid)
 	  && (gid == ILLEGAL_GID || gid == o_gid))
 	ret = 0;
-      else if (!create_object_sd_from_attribute (input_available_event,
-						 uid, gid, S_IFCHR | mode, sd))
+      else if (!create_object_sd_from_attribute (uid, gid, mode, sd))
 	ret = fch_set_sd (sd, true);
     }
 errout:
@@ -1598,9 +1596,8 @@ fhandler_pty_master::setup ()
   /* Create security attribute.  Default permissions are 0620. */
   sd.malloc (sizeof (SECURITY_DESCRIPTOR));
   RtlCreateSecurityDescriptor (sd, SECURITY_DESCRIPTOR_REVISION);
-  if (!create_object_sd_from_attribute (NULL, myself->uid, myself->gid,
-					S_IFCHR | S_IRUSR | S_IWUSR | S_IWGRP,
-					sd))
+  if (!create_object_sd_from_attribute (myself->uid, myself->gid,
+					S_IRUSR | S_IWUSR | S_IWGRP, sd))
     sa.lpSecurityDescriptor = (PSECURITY_DESCRIPTOR) sd;
 
   /* Carefully check that the input_available_event didn't already exist.
