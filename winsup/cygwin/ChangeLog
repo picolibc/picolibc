@@ -1,3 +1,9 @@
+2015-04-12  Corinna Vinschen  <corinna@vinschen.de>
+
+	* shm.cc (shmget): Fetch segment size from server rather than using
+	size argument to accommodate existing segments.  Add comment to explain
+	why.
+
 2015-04-10  Corinna Vinschen  <corinna@vinschen.de>
 
 	* include/cygwin/version.h (CYGWIN_VERSION_DLL_MAJOR): Bump to 2000.
