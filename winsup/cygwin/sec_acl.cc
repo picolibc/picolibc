@@ -739,11 +739,12 @@ get_posix_access (PSECURITY_DESCRIPTOR psd,
 	      if (!new_style)
 		{
 		  /* Fix up CLASS_OBJ value. */
-		  if (type & (USER | GROUP_OBJ | GROUP))
+		  if (type & (USER | GROUP))
 		    {
 		      has_class_perm = true;
-		      /* Accommodate Windows: Never add SYSTEM and Admins
-			 perms to CLASS_OBJ perms. */
+		      /* Accommodate Windows: Never add SYSTEM and Admins to
+			 CLASS_OBJ.  Unless (implicitely) if they are the
+			 GROUP_OBJ entry. */
 		      if (ace_sid != well_known_system_sid
 			  && ace_sid != well_known_admins_sid)
 			class_perm |= lacl[pos].a_perm;
@@ -774,11 +775,12 @@ get_posix_access (PSECURITY_DESCRIPTOR psd,
 	      if (!new_style)
 		{
 		  /* Fix up DEF_CLASS_OBJ value. */
-		  if (type & (USER | GROUP_OBJ | GROUP))
+		  if (type & (USER | GROUP))
 		    {
 		      has_def_class_perm = true;
-		      /* Accommodate Windows: Never add SYSTEM and Admins
-			 perms to CLASS_OBJ perms. */
+		      /* Accommodate Windows: Never add SYSTEM and Admins to
+			 CLASS_OBJ.  Unless (implicitely) if they are the
+			 GROUP_OBJ entry. */
 		      if (ace_sid != well_known_system_sid
 			  && ace_sid != well_known_admins_sid)
 		      def_class_perm |= lacl[pos].a_perm;
