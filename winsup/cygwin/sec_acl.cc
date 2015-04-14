@@ -743,7 +743,7 @@ get_posix_access (PSECURITY_DESCRIPTOR psd,
 		    {
 		      has_class_perm = true;
 		      /* Accommodate Windows: Never add SYSTEM and Admins to
-			 CLASS_OBJ.  Unless (implicitely) if they are the
+			 CLASS_OBJ.  Unless (implicitly) if they are the
 			 GROUP_OBJ entry. */
 		      if (ace_sid != well_known_system_sid
 			  && ace_sid != well_known_admins_sid)
@@ -779,7 +779,7 @@ get_posix_access (PSECURITY_DESCRIPTOR psd,
 		    {
 		      has_def_class_perm = true;
 		      /* Accommodate Windows: Never add SYSTEM and Admins to
-			 CLASS_OBJ.  Unless (implicitely) if they are the
+			 CLASS_OBJ.  Unless (implicitly) if they are the
 			 GROUP_OBJ entry. */
 		      if (ace_sid != well_known_system_sid
 			  && ace_sid != well_known_admins_sid)
