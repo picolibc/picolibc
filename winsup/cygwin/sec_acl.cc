@@ -141,6 +141,7 @@ set_posix_access (mode_t attr, uid_t uid, gid_t gid,
   mode_t class_obj = 0, other_obj, group_obj, deny;
   DWORD access;
   int idx, start_idx, class_idx, tmp_idx;
+  bool owner_eq_group;
   bool dev_saw_admins = false;
 
   /* Initialize local security descriptor. */
@@ -165,6 +166,7 @@ set_posix_access (mode_t attr, uid_t uid, gid_t gid,
       __seterrno_from_nt_status (status);
       return NULL;
     }
+  owner_eq_group = RtlEqualSid (owner, group);
 
   /* No POSIX ACL?  Use attr to generate one from scratch. */
   if (!aclbufp)
@@ -198,26 +200,35 @@ set_posix_access (mode_t attr, uid_t uid, gid_t gid,
   /* Collect SIDs of all entries in aclbufp. */
   aclsid = (cygpsid *) tp.w_get ();
   for (idx = 0; idx < nentries; ++idx)
-    switch (aclbufp[idx].a_type & ~ACL_DEFAULT)
+    switch (aclbufp[idx].a_type)
       {
       case USER_OBJ:
-	aclsid[idx] = (aclbufp[idx].a_type & ACL_DEFAULT)
-		      ? (PSID) well_known_creator_owner_sid : owner;
+	aclsid[idx] = owner;
+	break;
+      case DEF_USER_OBJ:
+	aclsid[idx] = well_known_creator_owner_sid;
 	break;
       case USER:
+      case DEF_USER:
 	aclsid[idx] = sidfromuid (aclbufp[idx].a_id, &cldap);
 	break;
       case GROUP_OBJ:
-	aclsid[idx] = (aclbufp[idx].a_type & ACL_DEFAULT && !(attr & S_ISGID))
-		      ? (PSID) well_known_creator_group_sid : group;
+	aclsid[idx] = group;
+	break;
+      case DEF_GROUP_OBJ:
+	aclsid[idx] = !(attr & S_ISGID) ? (PSID) well_known_creator_group_sid
+					: group;
 	break;
       case GROUP:
+      case DEF_GROUP:
 	aclsid[idx] = sidfromgid (aclbufp[idx].a_id, &cldap);
 	break;
       case CLASS_OBJ:
+      case DEF_CLASS_OBJ:
 	aclsid[idx] = well_known_null_sid;
 	break;
       case OTHER_OBJ:
+      case DEF_OTHER_OBJ:
 	aclsid[idx] = well_known_world_sid;
 	break;
       }
@@ -255,6 +266,11 @@ set_posix_access (mode_t attr, uid_t uid, gid_t gid,
       group_obj = aclbufp[tmp_idx].a_perm;
       tmp_idx = searchace (aclbufp, nentries, def | OTHER_OBJ);
       other_obj = aclbufp[tmp_idx].a_perm;
+
+      /* Do we potentially chmod a file with owner SID == group SID?  If so,
+	 make sure the owner perms are always >= group perms. */
+      if (!def && owner_eq_group)
+	  aclbufp[0].a_perm |= group_obj;
 
       /* ... class_obj.  Create Cygwin ACE.  Only the S_ISGID attribute gets
 	 inherited. */
@@ -514,11 +530,13 @@ get_posix_access (PSECURITY_DESCRIPTOR psd,
   cygpsid ace_sid;
   int pos, type, id, idx;
 
+  bool owner_eq_group;
   bool just_created = false;
   bool new_style = false;
   bool saw_user_obj = false;
   bool saw_group_obj = false;
   bool saw_other_obj = false;
+  bool saw_def_user_obj = false;
   bool saw_def_group_obj = false;
   bool has_class_perm = false;
   bool has_def_class_perm = false;
@@ -585,6 +603,8 @@ get_posix_access (PSECURITY_DESCRIPTOR psd,
       attr = *attr_ret & S_IFMT;
       just_created = *attr_ret & S_JUSTCREATED;
     }
+  /* Remember the fact that owner and group are the same account. */
+  owner_eq_group = owner_sid == group_sid;
 
   /* Create and initialize local aclent_t array. */
   lacl = (aclent_t *) tp.c_get ();
@@ -690,6 +710,7 @@ get_posix_access (PSECURITY_DESCRIPTOR psd,
 	  type = DEF_USER_OBJ;
 	  types_def |= type;
 	  id = ILLEGAL_GID;
+	  saw_def_user_obj = true;
 	}
       else if (ace_sid == well_known_creator_group_sid)
 	{
@@ -703,25 +724,38 @@ get_posix_access (PSECURITY_DESCRIPTOR psd,
 	  id = ace_sid.get_id (TRUE, &type, &cldap);
 	  if (!type)
 	    continue;
-	  /* If the SGID attribute is set on a new-style Cygwin ACL on
-	     a just created file or dir, the first group in the ACL is
-	     the desired primary group of the new object. */
-	  if (just_created && new_style && attr & S_ISGID
-	      && !saw_group_obj && type == GROUP)
-	    {
-	      type = GROUP_OBJ;
-	      lacl[1].a_id = gid = id;
-	    }
+	}
+      /* If the SGID attribute is set on a just created file or dir, the
+         first group in the ACL is the desired primary group of the new
+	 object.  Alternatively, the first repetition of the owner SID is
+	 the desired primary group, and we mark the object as owner_eq_group
+	 object. */
+      if (just_created && attr & S_ISGID && !saw_group_obj
+	  && (type == GROUP || (type == USER_OBJ && saw_user_obj)))
+	{
+	  type = GROUP_OBJ;
+	  lacl[1].a_id = gid = id;
+	  owner_eq_group = true;
 	}
       if (!(ace->Header.AceFlags & INHERIT_ONLY || type & ACL_DEFAULT))
 	{
 	  if (type == USER_OBJ)
 	    {
-	      /* If we get a second entry for the owner, it's an additional
-		 USER entry.  This can happen when chown'ing a file. */
+	      /* If we get a second entry for the owner SID, it's either a
+		 GROUP_OBJ entry for the same SID, if owner SID == group SID,
+		 or it's an additional USER entry.  The latter can happen
+		 when chown'ing a file. */
 	      if (saw_user_obj)
-		type = USER;
-	      if (ace->Header.AceType == ACCESS_ALLOWED_ACE_TYPE)
+		{
+		  if (owner_eq_group && !saw_group_obj)
+		    {
+		      type = GROUP_OBJ;
+		      saw_group_obj = true;
+		    }
+		  else
+		    type = USER;
+		}
+	      else if (ace->Header.AceType == ACCESS_ALLOWED_ACE_TYPE)
 		saw_user_obj = true;
 	    }
 	  else if (type == GROUP_OBJ)
@@ -755,8 +789,23 @@ get_posix_access (PSECURITY_DESCRIPTOR psd,
       if ((ace->Header.AceFlags & SUB_CONTAINERS_AND_OBJECTS_INHERIT))
 	{
 	  if (type == USER_OBJ)
-	    type = USER;
-	  else if (type == GROUP_OBJ)
+	    {
+	      /* As above: If we get a second entry for the owner SID, it's
+		 a GROUP_OBJ entry for the same SID if owner SID == group SID,
+		 but this time only if the S_ISGID bit is set. Otherwise it's
+		 an additional USER entry. */
+	      if (saw_def_user_obj)
+		{
+		  if (owner_eq_group && !saw_def_group_obj && attr & S_ISGID)
+		    type = GROUP_OBJ;	/* This needs post-processing in the
+					   following GROUP_OBJ handling... */
+		  else
+		    type = USER;
+		}
+	      else if (ace->Header.AceType == ACCESS_ALLOWED_ACE_TYPE)
+		saw_def_user_obj = true;
+	    }
+	  if (type == GROUP_OBJ)
 	    {
 	      /* If the SGID bit is set, the inheritable entry for the
 		 primary group is, in fact, the DEF_GROUP_OBJ entry,
@@ -897,6 +946,11 @@ get_posix_access (PSECURITY_DESCRIPTOR psd,
 		 && !(lacl[idx].a_perm & DENY_RWX))
 	  lacl[idx].a_perm |= lacl[2].a_perm & S_IRWXO;
       }
+  /* If owner SID == group SID (Microsoft Accounts) merge group perms into
+     user perms but leave group perms intact.  That's a fake, but it allows
+     to keep track of the POSIX group perms without much effort. */
+  if (owner_eq_group)
+    lacl[0].a_perm |= lacl[1].a_perm;
   /* Construct POSIX permission bits.  Fortunately we know exactly where
      to fetch the affecting bits from, at least as long as the array
      hasn't been sorted. */
