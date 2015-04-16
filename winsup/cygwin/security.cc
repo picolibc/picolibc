@@ -469,11 +469,14 @@ set_created_file_access (HANDLE handle, path_conv &pc, mode_t attr)
 	  /* Overwrite ACL permissions as required by POSIX 1003.1e
 	     draft 17. */
 	  aclp[0].a_perm = ((attr & attr_rd) >> 6) & S_IRWXO;
+	  /* Deliberate deviation from POSIX 1003.1e here.  We're not
+	     writing CLASS_OBJ *or* GROUP_OBJ, but both.  Otherwise we're
+	     going to be in constant trouble with user expectations. */
+	  if ((idx = searchace (aclp, nentries, GROUP_OBJ)) >= 0)
+	    aclp[idx].a_perm = ((attr & attr_rd) >> 3) & S_IRWXO;
 	  if (nentries > MIN_ACL_ENTRIES
 	      && (idx = searchace (aclp, nentries, CLASS_OBJ)) >= 0)
 	    aclp[idx].a_perm = ((attr & attr_rd) >> 3) & S_IRWXO;
-	  else
-	    aclp[1].a_perm = ((attr & attr_rd) >> 3) & S_IRWXO;
 	  if ((idx = searchace (aclp, nentries, OTHER_OBJ)) >= 0)
 	    aclp[idx].a_perm = (attr & attr_rd) & S_IRWXO;
 	  /* Construct appropriate inherit attribute for new directories.

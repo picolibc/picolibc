@@ -1,5 +1,12 @@
 2015-04-16  Corinna Vinschen  <corinna@vinschen.de>
 
+	* fhandler_disk_file.cc (fhandler_disk_file::fchmod): Deliberatly
+	set GROUP_OBJ and CLASS_OBJ perms to new group perms.  Add comment
+	to explain why.
+	* security.cc (set_created_file_access): Ditto.
+
+2015-04-16  Corinna Vinschen  <corinna@vinschen.de>
+
 	* sec_acl.cc (set_posix_access): Replace previous patch.  Return
 	EINVAL if uid and/or guid is invalid and not backed by an actual
 	Windows account.
