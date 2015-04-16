@@ -1,3 +1,7 @@
+2015-04-16  Corinna Vinschen  <corinna@vinschen.de>
+
+	* sec_acl.cc (set_posix_access): Workaround owner/group SIDs being NULL.
+
 2015-04-15  Corinna Vinschen  <corinna@vinschen.de>
 
 	* sec_acl.cc (set_posix_access): Handle files with owner == group.

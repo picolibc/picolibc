@@ -141,7 +141,7 @@ set_posix_access (mode_t attr, uid_t uid, gid_t gid,
   mode_t class_obj = 0, other_obj, group_obj, deny;
   DWORD access;
   int idx, start_idx, class_idx, tmp_idx;
-  bool owner_eq_group;
+  bool owner_eq_group = false;
   bool dev_saw_admins = false;
 
   /* Initialize local security descriptor. */
@@ -166,7 +166,10 @@ set_posix_access (mode_t attr, uid_t uid, gid_t gid,
       __seterrno_from_nt_status (status);
       return NULL;
     }
-  owner_eq_group = RtlEqualSid (owner, group);
+  /* If the account DBs are broken, we might end up without SIDs.  Better
+     check them here. */
+  if (owner && group)
+    owner_eq_group = RtlEqualSid (owner, group);
 
   /* No POSIX ACL?  Use attr to generate one from scratch. */
   if (!aclbufp)
