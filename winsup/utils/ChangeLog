@@ -1,3 +1,13 @@
+2015-04-16  Corinna Vinschen  <corinna@vinschen.de>
+
+	* getfacl.c (usage): Align more closely to Linux version.  Add new
+	options -c, -e, -E.  Change formatting to accommodate longer options.
+	(longopts): Rename --noname to --numeric.  Keep --noname for backward
+	compatibility.  Add --omit-header, --all-effective and --no-effective
+	options.
+	(opts): Add -c, -e and -E option.
+	(main): Handle new -c, -e, and -E options.
+
 2015-02-28  Corinna Vinschen  <corinna@vinschen.de>
 
 	* getfacl.c (usage): Change --all to --access, --dir to --default.

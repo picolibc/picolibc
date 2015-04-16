@@ -519,11 +519,14 @@ Usage: getfacl [-adn] FILE [FILE2...]
 
 Display file and directory access control lists (ACLs).
  
-  -a, --access   display the file access control list
-  -d, --default  display the default access control list
-  -h, --help     print help explaining the command line options
-  -n, --noname   display user and group IDs instead of names
-  -V, --version  output version information and exit
+  -a, --access        display the file access control list only
+  -d, --default       display the default access control list only
+  -c, --omit-header   do not display the comment header
+  -e, --all-effective print all effective rights
+  -E, --no-effective  print no effective rights
+  -n, --numeric       print numeric user/group identifiers
+  -V, --version       print version and exit
+  -h, --help          this help text
 
 When multiple files are specified on the command line, a blank
 line separates the ACLs for each file.
