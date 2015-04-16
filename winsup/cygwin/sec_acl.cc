@@ -154,6 +154,11 @@ set_posix_access (mode_t attr, uid_t uid, gid_t gid,
   /* Fetch owner and group and set in security descriptor. */
   owner = sidfromuid (uid, &cldap);
   group = sidfromgid (gid, &cldap);
+  if (!owner || !group)
+    {
+      set_errno (EINVAL);
+      return NULL;
+    }
   status = RtlSetOwnerSecurityDescriptor (&sd, owner, FALSE);
   if (!NT_SUCCESS (status))
     {
@@ -166,10 +171,9 @@ set_posix_access (mode_t attr, uid_t uid, gid_t gid,
       __seterrno_from_nt_status (status);
       return NULL;
     }
-  /* If the account DBs are broken, we might end up without SIDs.  Better
-     check them here. */
-  if (owner && group)
-    owner_eq_group = RtlEqualSid (owner, group);
+  owner_eq_group = RtlEqualSid (owner, group);
+
+
 
   /* No POSIX ACL?  Use attr to generate one from scratch. */
   if (!aclbufp)
