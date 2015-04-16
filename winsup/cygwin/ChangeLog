@@ -1,5 +1,10 @@
 2015-04-16  Corinna Vinschen  <corinna@vinschen.de>
 
+	* sec_acl.cc (get_posix_access): Only set saw_group_obj flag if we saw
+	the ACCESS_ALLOWED_ACE.
+
+2015-04-16  Corinna Vinschen  <corinna@vinschen.de>
+
 	* fhandler_disk_file.cc (fhandler_disk_file::fchmod): Deliberatly
 	set GROUP_OBJ and CLASS_OBJ perms to new group perms.  Add comment
 	to explain why.

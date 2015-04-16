@@ -757,7 +757,8 @@ get_posix_access (PSECURITY_DESCRIPTOR psd,
 		  if (owner_eq_group && !saw_group_obj)
 		    {
 		      type = GROUP_OBJ;
-		      saw_group_obj = true;
+		      if (ace->Header.AceType == ACCESS_ALLOWED_ACE_TYPE)
+			saw_group_obj = true;
 		    }
 		  else
 		    type = USER;
