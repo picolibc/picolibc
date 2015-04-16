@@ -274,11 +274,6 @@ set_posix_access (mode_t attr, uid_t uid, gid_t gid,
       tmp_idx = searchace (aclbufp, nentries, def | OTHER_OBJ);
       other_obj = aclbufp[tmp_idx].a_perm;
 
-      /* Do we potentially chmod a file with owner SID == group SID?  If so,
-	 make sure the owner perms are always >= group perms. */
-      if (!def && owner_eq_group)
-	  aclbufp[0].a_perm |= group_obj;
-
       /* ... class_obj.  Create Cygwin ACE.  Only the S_ISGID attribute gets
 	 inherited. */
       access = CYG_ACE_ISBITS_TO_WIN (def ? attr & S_ISGID : attr);
@@ -299,6 +294,11 @@ set_posix_access (mode_t attr, uid_t uid, gid_t gid,
       if (!add_access_denied_ace (acl, access, well_known_null_sid, acl_len,
 				  inherit))
 	return NULL;
+
+      /* Do we potentially chmod a file with owner SID == group SID?  If so,
+	 make sure the owner perms are always >= group perms. */
+      if (!def && owner_eq_group)
+	  aclbufp[0].a_perm |= group_obj & class_obj;
 
       /* This loop has two runs, the first w/ check_types == (USER_OBJ | USER),
 	 the second w/ check_types == (GROUP_OBJ | GROUP).  Each run creates

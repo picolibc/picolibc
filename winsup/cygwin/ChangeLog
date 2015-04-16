@@ -1,5 +1,11 @@
 2015-04-16  Corinna Vinschen  <corinna@vinschen.de>
 
+	* sec_acl.cc (set_posix_access): Move merging group perms into owner
+	perms in case of owner == group after mask has been computed.  Take
+	mask into account when doing so to avoid unnecessary ACCESS_DENIED_ACE.
+
+2015-04-16  Corinna Vinschen  <corinna@vinschen.de>
+
 	* sec_acl.cc (get_posix_access): Only set saw_group_obj flag if we saw
 	the ACCESS_ALLOWED_ACE.
 
