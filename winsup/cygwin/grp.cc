@@ -47,7 +47,9 @@ pwdgrp::parse_group ()
     return false;
   /* Don't generate gr_mem entries. */
   grp.g.gr_mem = &null_ptr;
-  grp.sid.getfromgr_passwd (&grp.g);
+  cygsid csid;
+  csid.getfromgr_passwd (&grp.g);
+  RtlCopySid (SECURITY_MAX_SID_SIZE, grp.sid, csid);
   return true;
 }
 

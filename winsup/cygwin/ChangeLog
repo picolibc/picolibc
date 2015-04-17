@@ -1,3 +1,11 @@
+2015-04-17  Corinna Vinschen  <corinna@vinschen.de>
+
+	* pwdgrp.h: Add comment to explain below change.
+	(struct pg_pwd): Convert sid member to BYTE array.
+	(struct pg_grp): Ditto.
+	* grp.cc (pwdgrp::parse_group): Accommodate above change.
+	* passwd.cc (pwdgrp::parse_passwd): Ditto.
+
 2015-04-16  Corinna Vinschen  <corinna@vinschen.de>
 
 	* sec_acl.cc (set_posix_access): Move merging group perms into owner
