@@ -1,5 +1,10 @@
 2015-04-17  Corinna Vinschen  <corinna@vinschen.de>
 
+	* uinfo.cc (pwdgrp::fetch_account_from_windows): Always revert SID
+	subauth count after checking for known domain.
+
+2015-04-17  Corinna Vinschen  <corinna@vinschen.de>
+
 	* pwdgrp.h: Add comment to explain below change.
 	(struct pg_pwd): Convert sid member to BYTE array.
 	(struct pg_grp): Ditto.

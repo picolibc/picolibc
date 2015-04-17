@@ -2475,10 +2475,10 @@ pwdgrp::fetch_account_from_windows (fetch_user_arg_t &arg, cyg_ldap *pldap)
 		  posix_offset = fetch_posix_offset (td, &loc_ldap);
 		  break;
 		}
+	  sid_sub_auth_count (sid) = sid_sub_auth_count (sid) + 1;
 	}
       if (domain)
 	{
-	  sid_sub_auth_count (sid) = sid_sub_auth_count (sid) + 1;
 	  wcscpy (dom, domain);
 	  __small_swprintf (name = namebuf, L"%W(%u)",
 			    is_group () ? L"Group" : L"User",
