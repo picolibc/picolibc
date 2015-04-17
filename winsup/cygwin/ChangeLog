@@ -1,5 +1,19 @@
 2015-04-17  Corinna Vinschen  <corinna@vinschen.de>
 
+	* fhandler.h (fhandler_pty_slave::facl): Add prototype.
+	* fhandler_tty.cc (fhandler_pty_slave::facl): New method.
+	(fhandler_pty_slave::fchown): Fix uid/gid handling.
+	* sec_acl.cc (set_posix_access): Drop superfluous class_idx variable.
+	Simplify and move around code in a few places.  To improve ACL
+	readability, add r/w permissions to Admins ACE appended to pty ACL.
+	Add comment to explain Windows ACE Mask filtering being in the way of
+	creating a real CLASS_OBJ.
+	(get_posix_access): Fake CLASS_OBJ for ptys.  Explain why.
+	* security.cc (get_object_attribute): Add S_IFCHR flag to attributes
+	when calling get_posix_access.
+
+2015-04-17  Corinna Vinschen  <corinna@vinschen.de>
+
 	* uinfo.cc (pwdgrp::fetch_account_from_windows): Always revert SID
 	subauth count after checking for known domain.
 

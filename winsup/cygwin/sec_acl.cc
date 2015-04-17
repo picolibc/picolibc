@@ -140,9 +140,9 @@ set_posix_access (mode_t attr, uid_t uid, gid_t gid,
   size_t acl_len = sizeof (ACL);
   mode_t class_obj = 0, other_obj, group_obj, deny;
   DWORD access;
-  int idx, start_idx, class_idx, tmp_idx;
+  int idx, start_idx, tmp_idx;
   bool owner_eq_group = false;
-  bool dev_saw_admins = false;
+  bool dev_has_admins = false;
 
   /* Initialize local security descriptor. */
   RtlCreateSecurityDescriptor (&sd, SECURITY_DESCRIPTOR_REVISION);
@@ -172,8 +172,9 @@ set_posix_access (mode_t attr, uid_t uid, gid_t gid,
       return NULL;
     }
   owner_eq_group = RtlEqualSid (owner, group);
-
-
+  if (S_ISCHR (attr))
+    dev_has_admins = well_known_admins_sid == owner
+		     || well_known_admins_sid == group;
 
   /* No POSIX ACL?  Use attr to generate one from scratch. */
   if (!aclbufp)
@@ -276,11 +277,12 @@ set_posix_access (mode_t attr, uid_t uid, gid_t gid,
 
       /* ... class_obj.  Create Cygwin ACE.  Only the S_ISGID attribute gets
 	 inherited. */
-      access = CYG_ACE_ISBITS_TO_WIN (def ? attr & S_ISGID : attr);
-      class_idx = searchace (aclbufp, nentries, def | CLASS_OBJ);
-      if (class_idx >= 0)
+      access = CYG_ACE_ISBITS_TO_WIN (def ? attr & S_ISGID : attr)
+	       | CYG_ACE_NEW_STYLE;
+      tmp_idx = searchace (aclbufp, nentries, def | CLASS_OBJ);
+      if (tmp_idx >= 0)
 	{
-	  class_obj = aclbufp[class_idx].a_perm;
+	  class_obj = aclbufp[tmp_idx].a_perm;
 	  access |= CYG_ACE_MASK_TO_WIN (class_obj);
 	}
       else
@@ -288,9 +290,11 @@ set_posix_access (mode_t attr, uid_t uid, gid_t gid,
 	  /* Setting class_obj to group_obj allows to write below code without
 	     additional checks for existence of a CLASS_OBJ. */
 	  class_obj = group_obj;
-	  class_idx = -1;
 	}
-      access |= CYG_ACE_NEW_STYLE;
+      /* Note that Windows filters the ACE Mask value so it only reflects
+	 the bit values supported by the object type.  The result is that
+	 we can't set a CLASS_OBJ value for ptys.  The get_posix_access
+	 function has to workaround that. */
       if (!add_access_denied_ace (acl, access, well_known_null_sid, acl_len,
 				  inherit))
 	return NULL;
@@ -359,14 +363,6 @@ set_posix_access (mode_t attr, uid_t uid, gid_t gid,
 		  if (aclbufp[idx].a_perm == S_IRWXO)
 		    access |= FILE_DELETE_CHILD;
 		}
-	      /* For ptys check if the admins group is in the ACL.  If so,
-		 make sure the group has WRITE_DAC and WRITE_OWNER perms. */
-	      if (S_ISCHR (attr) && !dev_saw_admins
-		  && aclsid[idx] == well_known_admins_sid)
-		{
-		  access |= STD_RIGHTS_OWNER;
-		  dev_saw_admins = true;
-		}
 	      if (aclbufp[idx].a_perm & S_IROTH)
 		access |= FILE_ALLOW_READ;
 	      if (aclbufp[idx].a_perm & S_IWOTH)
@@ -379,6 +375,10 @@ set_posix_access (mode_t attr, uid_t uid, gid_t gid,
 		     == (S_IWOTH | S_IXOTH)
 		  && (!(attr & S_ISVTX) || aclbufp[idx].a_type & USER_OBJ))
 		access |= FILE_DELETE_CHILD;
+	      /* For ptys, make sure the Administrators group has WRITE_DAC
+		 and WRITE_OWNER perms. */
+	      if (dev_has_admins && aclsid[idx] == well_known_admins_sid)
+		access |= STD_RIGHTS_OWNER;
 	      if (!add_access_allowed_ace (acl, access, aclsid[idx], acl_len,
 					   inherit))
 		return NULL;
@@ -386,8 +386,10 @@ set_posix_access (mode_t attr, uid_t uid, gid_t gid,
 	}
       /* For ptys if the admins group isn't in the ACL, add an ACE to make
 	 sure the group has WRITE_DAC and WRITE_OWNER perms. */
-      if (S_ISCHR (attr) && !dev_saw_admins
-	  && !add_access_allowed_ace (acl, STD_RIGHTS_OWNER,
+      if (S_ISCHR (attr) && !dev_has_admins
+	  && !add_access_allowed_ace (acl,
+				      STD_RIGHTS_OWNER | FILE_ALLOW_READ
+				      | FILE_ALLOW_WRITE,
 				      well_known_admins_sid, acl_len,
 				      NO_INHERITANCE))
 	return NULL;
@@ -859,6 +861,20 @@ get_posix_access (PSECURITY_DESCRIPTOR psd,
       lacl[pos].a_type = CLASS_OBJ;
       lacl[pos].a_id = ILLEGAL_GID;
       lacl[pos].a_perm = class_perm | lacl[1].a_perm;
+    }
+  /* For ptys, fake a mask if the admins group is neither owner nor group.
+     In that case we have an extra ACE for the admins group, and we need a
+     CLASS_OBJ to get a valid POSIX ACL.  However, Windows filters the ACE
+     Mask value so it only reflects the bit values supported by the object
+     type.  The result is that we can't set an explicit CLASS_OBJ value for
+     ptys in the NULL SID ACE. */
+  else if (S_ISCHR (attr) && owner_sid != well_known_admins_sid
+	   && group_sid != well_known_admins_sid
+	   && (pos = searchace (lacl, MAX_ACL_ENTRIES, CLASS_OBJ)) >= 0)
+    {
+      lacl[pos].a_type = CLASS_OBJ;
+      lacl[pos].a_id = ILLEGAL_GID;
+      lacl[pos].a_perm = lacl[1].a_perm; /* == group perms */
     }
   /* If this is a just created file, and there are no default permissions
      (probably no inherited ACEs so created from a default DACL), assign

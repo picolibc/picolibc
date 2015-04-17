@@ -1545,6 +1545,7 @@ class fhandler_pty_slave: public fhandler_pty_common
   select_record *select_read (select_stuff *);
   virtual char const *ttyname () { return pc.dev.name; }
   int __reg2 fstat (struct stat *buf);
+  int __reg3 facl (int, int, struct acl *);
   int __reg1 fchmod (mode_t mode);
   int __reg2 fchown (uid_t uid, gid_t gid);
 

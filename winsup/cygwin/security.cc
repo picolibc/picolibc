@@ -401,11 +401,16 @@ get_object_attribute (HANDLE handle, uid_t *uidret, gid_t *gidret,
 		      mode_t *attribute)
 {
   security_descriptor sd;
+  mode_t attr = S_IFCHR;
 
   if (get_object_sd (handle, sd))
     return -1;
-  return get_posix_access (sd, attribute, uidret, gidret, NULL, 0) >= 0
-	 ? 0 : -1;
+  if (attribute)
+    *attribute |= S_IFCHR;
+  else
+    attribute = &attr;
+  return get_posix_access (sd, attribute, uidret, gidret, NULL, 0)
+	 >= 0 ? 0 : -1;
 }
 
 int

@@ -12,6 +12,7 @@ details. */
 #include "winsup.h"
 #include <stdlib.h>
 #include <sys/param.h>
+#include <sys/acl.h>
 #include <cygwin/kd.h>
 #include "cygerrno.h"
 #include "security.h"
@@ -1018,6 +1019,62 @@ fhandler_pty_slave::fstat (struct stat *st)
   return 0;
 }
 
+int __reg3
+fhandler_pty_slave::facl (int cmd, int nentries, aclent_t *aclbufp)
+{
+  int res = -1;
+  bool to_close = false;
+  security_descriptor sd;
+  mode_t attr = S_IFCHR;
+
+  switch (cmd)
+    {
+      case SETACL:
+	if (!aclsort32 (nentries, 0, aclbufp))
+	  set_errno (ENOTSUP);
+	break;
+      case GETACL:
+	if (!aclbufp)
+	  {
+	    set_errno (EFAULT);
+	    break;
+	  }
+	/*FALLTHRU*/
+      case GETACLCNT:
+	if (!input_available_event)
+	  {
+	    char buf[MAX_PATH];
+	    shared_name (buf, INPUT_AVAILABLE_EVENT, get_minor ());
+	    input_available_event = OpenEvent (READ_CONTROL, TRUE, buf);
+	    if (input_available_event)
+	      to_close = true;
+	  }
+	if (!input_available_event
+	    || get_object_sd (input_available_event, sd))
+	  {
+	    res = get_posix_access (NULL, &attr, NULL, NULL, aclbufp, nentries);
+	    if (aclbufp && res == MIN_ACL_ENTRIES)
+	      {
+		aclbufp[0].a_perm = S_IROTH | S_IWOTH;
+		aclbufp[0].a_id = 18;
+		aclbufp[1].a_id = 544;
+	      }
+	    break;
+	  }
+	if (cmd == GETACL)
+	  res = get_posix_access (sd, &attr, NULL, NULL, aclbufp, nentries);
+	else
+	  res = get_posix_access (sd, &attr, NULL, NULL, NULL, 0);
+	break;
+      default:
+	set_errno (EINVAL);
+	break;
+    }
+  if (to_close)
+    CloseHandle (input_available_event);
+  return res;
+}
+
 /* Helper function for fchmod and fchown, which just opens all handles
    and signals success via bool return. */
 bool
@@ -1122,8 +1179,11 @@ fhandler_pty_slave::fchown (uid_t uid, gid_t gid)
   RtlCreateSecurityDescriptor (sd, SECURITY_DESCRIPTOR_REVISION);
   if (!get_object_attribute (input_available_event, &o_uid, &o_gid, &mode))
     {
-      if ((uid == ILLEGAL_UID || uid == o_uid)
-	  && (gid == ILLEGAL_GID || gid == o_gid))
+      if (uid == ILLEGAL_UID)
+	uid = o_uid;
+      if (gid == ILLEGAL_GID)
+	gid = o_gid;
+      if (uid == o_uid && gid == o_gid)
 	ret = 0;
       else if (!create_object_sd_from_attribute (uid, gid, mode, sd))
 	ret = fch_set_sd (sd, true);
