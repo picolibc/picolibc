@@ -38,17 +38,21 @@ void *setgrent_filtered (int enums, PCWSTR enum_tdoms);
 void *getgrent_filtered (void *gr);
 void endgrent_filtered (void *gr);
 
+/* NOTE: The below sid members were cygsid's originally.  Don't do that.
+   cygsid's are pointer based.  When adding new entries to the passwd or
+   group caches, a crealloc call potenitally moves the entries and then
+   the cygsid pointers point into neverneverland. */
 struct pg_pwd
 {
   struct passwd p;
-  cygsid sid;
+  BYTE sid[SECURITY_MAX_SID_SIZE];
   size_t len;
 };
 
 struct pg_grp
 {
   struct group g;
-  cygsid sid;
+  BYTE sid[SECURITY_MAX_SID_SIZE];
   size_t len;
 };
 
