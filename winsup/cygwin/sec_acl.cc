@@ -316,6 +316,12 @@ set_posix_access (mode_t attr, uid_t uid, gid_t gid,
 	       idx < nentries && aclbufp[idx].a_type & check_types;
 	       ++idx)
 	    {
+	      /* Avoid to create DENY ACEs for the second orrurence of
+		 accounts which show up twice, as USER_OBJ and USER, or
+		 GROUP_OBJ and GROUP. */
+	      if ((aclbufp[idx].a_type & USER && aclsid[idx] == owner)
+		  || (aclbufp[idx].a_type & GROUP && aclsid[idx] == group))
+		continue;
 	      /* For the rules how to construct the deny access mask, see the
 		 comment right at the start of this file. */
 	      if (aclbufp[idx].a_type & USER_OBJ)

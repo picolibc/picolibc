@@ -1,5 +1,10 @@
 2015-04-17  Corinna Vinschen  <corinna@vinschen.de>
 
+	* sec_acl.cc (set_posix_access): Don't create DENY ACEs for USER and
+	GROUP entries if they are the same as USER_OBJ or GROUP_OBJ.
+
+2015-04-17  Corinna Vinschen  <corinna@vinschen.de>
+
 	* fhandler.h (fhandler_pty_slave::facl): Add prototype.
 	* fhandler_tty.cc (fhandler_pty_slave::facl): New method.
 	(fhandler_pty_slave::fchown): Fix uid/gid handling.
