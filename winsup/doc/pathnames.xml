@@ -81,9 +81,8 @@ see <xref linkend="cygdrive"></xref></para>
 <para>The fourth field describes the mount options associated
 with the filesystem.  It is formatted as a comma separated list of
 options.  It contains at least the type of mount (binary or text) plus
-any additional options appropriate to the filesystem type.  Recognized
-options are binary, text, nouser, user, exec, notexec, cygexec, nosuid,
-posix=[0|1].  The meaning of the options is as follows.</para>
+any additional options appropriate to the filesystem type.  The list of
+the options, including their meaning, follows.</para>
 
 <screen>
   acl       - Cygwin uses the filesystem's access control lists (ACLs) to
@@ -136,14 +135,14 @@ executability, this is not possible on filesystems which don't support
 permissions at all (like FAT/FAT32), or if ACLs are ignored on filesystems
 supporting them (see the aforementioned <literal>acl</literal> mount option).
 In these cases, the following heuristic is used to evaluate if a file is
-executable: Files ending in certain extensions (.exe, .com, .bat, .btm,
-.cmd) are assumed to be executable.  Files whose first two characters begin
-with '#!' are also considered to be executable.
+executable: Files ending in certain extensions (.exe, .com, .lnk) are
+assumed to be executable.  Files whose first two characters are "#!", "MZ",
+or ":\n" are also considered to be executable.
 The <literal>exec</literal> option is used to instruct Cygwin that the
 mounted file is "executable".  If the <literal>exec</literal> option is used
 with a directory then all files in the directory are executable.
 This option allows other files to be marked as executable and avoids the
-overhead of opening each file to check for a '#!'.  The
+overhead of opening each file to check for "magic" bytes.  The
 <literal>cygexec</literal> option is very similar to <literal>exec</literal>,
 but also prevents Cygwin from setting up commands and environment variables
 for a normal Windows program, adding another small performance gain.  The
