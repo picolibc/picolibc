@@ -1,3 +1,8 @@
+2015-04-20  Corinna Vinschen  <corinna@vinschen.de>
+
+	* sec_acl.cc (set_posix_access): Apply mask only in terms of execute bit
+	for SYSTEM and Admins group.
+
 2015-04-17  Corinna Vinschen  <corinna@vinschen.de>
 
 	* sec_acl.cc (set_posix_access): Don't create DENY ACEs for USER and

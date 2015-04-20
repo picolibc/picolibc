@@ -329,15 +329,17 @@ set_posix_access (mode_t attr, uid_t uid, gid_t gid,
 	      else if (aclbufp[idx].a_type & USER)
 		deny = (aclbufp[idx].a_perm ^ class_obj)
 		       | (~aclbufp[idx].a_perm & other_obj);
+	      /* Accommodate Windows: Only generate deny masks for SYSTEM
+		 and the Administrators group in terms of the execute bit,
+		 if they are not the primary group. */
+	      else if (aclbufp[idx].a_type & GROUP
+		       && (aclsid[idx] == well_known_system_sid
+			   || aclsid[idx] == well_known_admins_sid))
+		deny = aclbufp[idx].a_perm & ~(class_obj | S_IROTH | S_IWOTH);
 	      else
 		deny = (aclbufp[idx].a_perm & ~class_obj)
 		       | (~aclbufp[idx].a_perm & other_obj);
 	      if (!deny)
-		continue;
-	      /* Accommodate Windows: Never generate deny masks for SYSTEM
-		 and the Administrators group. */
-	      if (aclsid[idx] == well_known_system_sid
-		  || aclsid[idx] == well_known_admins_sid)
 		continue;
 	      access = 0;
 	      if (deny & S_IROTH)

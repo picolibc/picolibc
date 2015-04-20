@@ -279,14 +279,30 @@ main (int argc, char **argv)
 	    {
 	    case USER:
 	    case GROUP_OBJ:
-	    case GROUP:
 	      effective = acls[i].a_perm & mask;
+	      print_effective = 1;
+	      break;
+	    case GROUP:
+	      /* Special case SYSTEM and Admins group:  The mask only
+	         applies to them as far as the execute bit is concerned. */
+	      if (acls[i].a_id == 18 || acls[i].a_id == 544)
+		effective = acls[i].a_perm & (mask | S_IROTH | S_IWOTH);
+	      else
+		effective = acls[i].a_perm & mask;
 	      print_effective = 1;
 	      break;
 	    case DEF_USER:
 	    case DEF_GROUP_OBJ:
-	    case DEF_GROUP:
 	      effective = acls[i].a_perm & def_mask;
+	      print_effective = 1;
+	      break;
+	    case DEF_GROUP:
+	      /* Special case SYSTEM and Admins group:  The mask only
+	         applies to them as far as the execute bit is concerned. */
+	      if (acls[i].a_id == 18 || acls[i].a_id == 544)
+		effective = acls[i].a_perm & (def_mask | S_IROTH | S_IWOTH);
+	      else
+		effective = acls[i].a_perm & def_mask;
 	      print_effective = 1;
 	      break;
 	    }
