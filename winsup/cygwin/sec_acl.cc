@@ -549,6 +549,7 @@ get_posix_access (PSECURITY_DESCRIPTOR psd,
 
   bool owner_eq_group;
   bool just_created = false;
+  bool standard_ACEs_only = true;
   bool new_style = false;
   bool saw_user_obj = false;
   bool saw_group_obj = false;
@@ -802,6 +803,17 @@ get_posix_access (PSECURITY_DESCRIPTOR psd,
 			class_perm |= lacl[pos].a_perm;
 		    }
 		}
+	      /* For a newly created file, we'd like to know if we're running
+		 with a standard ACL, one only consisting of POSIX perms, plus
+		 SYSTEM and Admins as maximum non-POSIX perms entries.  If it's
+		 a standard ACL, we apply umask.  That's not entirely correct,
+		 but it's probably the best we can do. */
+	      else if (type & (USER | GROUP)
+		       && just_created
+		       && standard_ACEs_only
+		       && ace_sid != well_known_system_sid
+		       && ace_sid != well_known_admins_sid)
+		standard_ACEs_only = false;
 	    }
 	}
       if ((ace->Header.AceFlags & SUB_CONTAINERS_AND_OBJECTS_INHERIT))
@@ -884,19 +896,19 @@ get_posix_access (PSECURITY_DESCRIPTOR psd,
       lacl[pos].a_id = ILLEGAL_GID;
       lacl[pos].a_perm = lacl[1].a_perm; /* == group perms */
     }
-  /* If this is a just created file, and there are no default permissions
-     (probably no inherited ACEs so created from a default DACL), assign
-     the permissions specified by the file creation mask.  The values get
-     masked by the actually requested permissions by the caller.
-     See POSIX 1003.1e draft 17. */
+  /* If this is a just created file, and this is an ACL with only standard
+     entries, or if standard POSIX permissions are missing (probably no
+     inherited ACEs so created from a default DACL), assign the permissions
+     specified by the file creation mask.  The values get masked by the
+     actually requested permissions by the caller per POSIX 1003.1e draft 17. */
   if (just_created)
     {
       mode_t perms = (S_IRWXU | S_IRWXG | S_IRWXO) & ~cygheap->umask;
-      if (!saw_user_obj)
+      if (standard_ACEs_only || !saw_user_obj)
 	lacl[0].a_perm = (perms >> 6) & S_IRWXO;
-      if (!saw_group_obj)
+      if (standard_ACEs_only || !saw_group_obj)
 	lacl[1].a_perm = (perms >> 3) & S_IRWXO;
-      if (!saw_other_obj)
+      if (standard_ACEs_only || !saw_other_obj)
 	lacl[2].a_perm = perms & S_IRWXO;
     }
   /* Ensure that the default acl contains at least

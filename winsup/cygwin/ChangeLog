@@ -1,3 +1,10 @@
+2015-04-21  Corinna Vinschen  <corinna@vinschen.de>
+
+	* sec_acl.cc (get_posix_access): Check for Cygwin "standard" ACL.
+	Apply umask, if so.  Align comments.
+	* security.cc (set_created_file_access): Fix permission masking by
+	incoming requested file mode.
+
 2015-04-20  Corinna Vinschen  <corinna@vinschen.de>
 
 	* sec_acl.cc (set_posix_access): Apply mask only in terms of execute bit
