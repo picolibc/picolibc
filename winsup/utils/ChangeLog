@@ -1,3 +1,8 @@
+2015-04-21  Corinna Vinschen  <corinna@vinschen.de>
+
+	* tzmap-from-unicode.org: Convert Calcutta to Kolkata.
+	* tzmap.h: Regenerate.
+
 2015-02-28  Corinna Vinschen  <corinna@vinschen.de>
 
 	* getfacl.c (usage): Change --all to --access, --dir to --default.

@@ -64,6 +64,7 @@ echo "{"
 wget -O - "${ZONES_FILE}" | \
 {
   sed -n -e 's#territory="001"#territory=""#
+	     s#Asia/Calcutta#Asia/Kolkata#
 	     s#.*mapZone other=\("[^"]*"\) territory=\("[^"]*"\) type=\("[^"]*"\).*#  { L\1, L\2, L\3 },#p'
   echo '  { L"Armenian Standard Time", L"AM", L"Asia/Yerevan" },'
   echo '  { L"Central Europe Standard Time", L"CS", L"Europe/Belgrade" },'
