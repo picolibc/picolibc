@@ -1,3 +1,7 @@
+2015-04-21  Mike Frysinger  <vapier@gentoo.org>
+
+	* arm/syscall.h: Adjust comment header.
+
 2015-04-09  Nick Clifton  <nickc@redhat.com>
 
 	* rx/crt0.S (_start): If string instructions are not allowed,
