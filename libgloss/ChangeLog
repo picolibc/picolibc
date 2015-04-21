@@ -1,5 +1,9 @@
 2015-04-21  Mike Frysinger  <vapier@gentoo.org>
 
+	* mcore/syscall.h: New header.
+
+2015-04-21  Mike Frysinger  <vapier@gentoo.org>
+
 	* arm/syscall.h: Adjust comment header.
 
 2015-04-09  Nick Clifton  <nickc@redhat.com>
