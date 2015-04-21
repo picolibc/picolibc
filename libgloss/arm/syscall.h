@@ -1,6 +1,6 @@
-/* General use syscall.h file.
-   The more ports that use this file, the simpler sim/common/nltvals.def
-   remains.  */
+/* arm syscall.h file.  This is used only by the simulator.  This includes
+   a few extra needed by RedBoot, but is otherwise a copy of the
+   libgloss/syscall.h file.  */
 
 #ifndef LIBGLOSS_SYSCALL_H
 #define LIBGLOSS_SYSCALL_H
