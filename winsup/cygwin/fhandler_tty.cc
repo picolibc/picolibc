@@ -1084,9 +1084,6 @@ fhandler_pty_slave::fch_set_sd (security_descriptor &sd, bool chown)
 void
 fhandler_pty_slave::fch_close_handles ()
 {
-  close_maybe (get_io_handle ());
-  close_maybe (get_output_handle ());
-  close_maybe (get_output_handle_cyg ());
   close_maybe (input_available_event);
   close_maybe (output_mutex);
   close_maybe (input_mutex);

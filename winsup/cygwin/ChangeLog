@@ -1,3 +1,8 @@
+2015-04-22  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_tty.cc (fhandler_pty_slave::fch_close_handles): Don't close
+	handles not opened via fhandler_pty_slave::fch_open_handles.
+
 2015-04-22  Takashi Yano  <takashi.yano@nifty.ne.jp>
 
 	* fhandler.h (class fhandler_base): Add virtual function
