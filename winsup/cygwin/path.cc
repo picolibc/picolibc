@@ -4726,6 +4726,8 @@ out:
   return buf;
 }
 
+#undef basename
+
 /* No need to be reentrant or thread-safe according to SUSv3.
    / and \\ are treated equally.  Leading drive specifiers are
    kept intact as far as it makes sense.  Everything else is
