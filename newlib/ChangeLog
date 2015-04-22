@@ -1,3 +1,11 @@
+2015-04-22  Corinna Vinschen  <vinschen@redhat.com>
+
+	* libc/include/libgen.h (basename): Drop defining _BASENAME_DEFINED.
+	Always define macro basename.  Add comment to explain why.
+	* libc/include/string.h (basename): Check for basename instead of
+	_BASENAME_DEFINED.  Drop __GNUC__ branch, always use basename macro.
+	Change comment to explain why.  Add nonnull function attribute.
+
 2015-04-09  Nick Clifton  <nickc@redhat.com>
 
 	* libc/machine/rx/memchr.S: Add non-string insn using version.
