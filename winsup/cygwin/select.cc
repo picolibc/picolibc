@@ -80,7 +80,7 @@ details. */
 #define copyfd_set(to, from, n) memcpy (to, from, sizeof_fd_set (n));
 
 #define set_handle_or_return_if_not_open(h, s) \
-  h = (s)->fh->get_handle (); \
+  h = (s)->fh->get_io_handle_cyg (); \
   if (cygheap->fdtab.not_open ((s)->fd)) \
     { \
       (s)->thread_errno =  EBADF; \
@@ -1264,7 +1264,7 @@ fhandler_base::select_read (select_stuff *ss)
       s->startup = no_startup;
       s->verify = verify_ok;
     }
-  s->h = get_handle ();
+  s->h = get_io_handle_cyg ();
   s->read_selected = true;
   s->read_ready = true;
   return s;

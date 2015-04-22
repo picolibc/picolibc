@@ -42,6 +42,7 @@ struct pipe_request {
 struct pipe_reply {
   HANDLE from_master;
   HANDLE to_master;
+  HANDLE to_master_cyg;
   DWORD error;
 };
 
@@ -236,7 +237,7 @@ fhandler_pty_master::process_slave_output (char *buf, size_t len, int pktmode_on
 	  /* Check echo pipe first. */
 	  if (::bytes_available (echo_cnt, echo_r) && echo_cnt > 0)
 	    break;
-	  if (!bytes_available (n))
+	  if (!::bytes_available (n, get_io_handle_cyg ()))
 	    goto err;
 	  if (n)
 	    break;
@@ -297,7 +298,7 @@ fhandler_pty_master::process_slave_output (char *buf, size_t len, int pktmode_on
 	      goto err;
 	    }
 	}
-      else if (!ReadFile (get_handle (), outbuf, rlen, &n, NULL))
+      else if (!ReadFile (get_io_handle_cyg (), outbuf, rlen, &n, NULL))
 	{
 	  termios_printf ("ReadFile failed, %E");
 	  goto err;
@@ -332,7 +333,7 @@ out:
 /* pty slave stuff */
 
 fhandler_pty_slave::fhandler_pty_slave (int unit)
-  : fhandler_pty_common (), inuse (NULL)
+  : fhandler_pty_common (), inuse (NULL), output_handle_cyg (NULL)
 {
   if (unit >= 0)
     dev ().parse (DEV_PTYS_MAJOR, unit);
@@ -341,11 +342,11 @@ fhandler_pty_slave::fhandler_pty_slave (int unit)
 int
 fhandler_pty_slave::open (int flags, mode_t)
 {
-  HANDLE pty_owner, from_master_local, to_master_local;
+  HANDLE pty_owner, from_master_local, to_master_local, to_master_cyg_local;
   HANDLE *handles[] =
   {
     &from_master_local, &input_available_event, &input_mutex, &inuse,
-    &output_mutex, &to_master_local, &pty_owner,
+    &output_mutex, &to_master_local, &pty_owner, &to_master_cyg_local,
     NULL
   };
 
@@ -397,7 +398,8 @@ fhandler_pty_slave::open (int flags, mode_t)
     release_output_mutex ();
   }
 
-  if (!get_ttyp ()->from_master () || !get_ttyp ()->to_master ())
+  if (!get_ttyp ()->from_master () ||
+      !get_ttyp ()->to_master () || !get_ttyp ()->to_master_cyg ())
     {
       errmsg = "pty handles have been closed";
       set_errno (EACCES);
@@ -448,6 +450,13 @@ fhandler_pty_slave::open (int flags, mode_t)
 	  errmsg = "can't duplicate output, %E";
 	  goto err;
 	}
+      if (!DuplicateHandle (pty_owner, get_ttyp ()->to_master_cyg (),
+			  GetCurrentProcess (), &to_master_cyg_local, 0, TRUE,
+			  DUPLICATE_SAME_ACCESS))
+	{
+	  errmsg = "can't duplicate output for cygwin, %E";
+	  goto err;
+	}
       if (pty_owner != GetCurrentProcess ())
 	CloseHandle (pty_owner);
     }
@@ -468,7 +477,8 @@ fhandler_pty_slave::open (int flags, mode_t)
 	}
       from_master_local = repl.from_master;
       to_master_local = repl.to_master;
-      if (!from_master_local || !to_master_local)
+      to_master_cyg_local = repl.to_master_cyg;
+      if (!from_master_local || !to_master_local || !to_master_cyg_local)
 	{
 	  SetLastError (repl.error);
 	  errmsg = "error duplicating pipes, %E";
@@ -477,14 +487,18 @@ fhandler_pty_slave::open (int flags, mode_t)
     }
   VerifyHandle (from_master_local);
   VerifyHandle (to_master_local);
+  VerifyHandle (to_master_cyg_local);
 
   termios_printf ("duplicated from_master %p->%p from pty_owner",
 		  get_ttyp ()->from_master (), from_master_local);
   termios_printf ("duplicated to_master %p->%p from pty_owner",
 		  get_ttyp ()->to_master (), to_master_local);
+  termios_printf ("duplicated to_master_cyg %p->%p from pty_owner",
+		  get_ttyp ()->to_master_cyg (), to_master_cyg_local);
 
   set_io_handle (from_master_local);
   set_output_handle (to_master_local);
+  set_output_handle_cyg (to_master_cyg_local);
 
   fhandler_console::need_invisible ();
   set_open_status ();
@@ -533,6 +547,9 @@ fhandler_pty_slave::close ()
     termios_printf ("CloseHandle (inuse), %E");
   if (!ForceCloseHandle (input_available_event))
     termios_printf ("CloseHandle (input_available_event<%p>), %E", input_available_event);
+  if (!ForceCloseHandle (get_output_handle_cyg ()))
+    termios_printf ("CloseHandle (get_output_handle_cyg ()<%p>), %E",
+	get_output_handle_cyg ());
   if ((unsigned) myself->ctty == FHDEV (DEV_PTYS_MAJOR, get_minor ()))
     fhandler_console::free_console ();	/* assumes that we are the last pty closer */
   return fhandler_pty_common::close ();
@@ -591,7 +608,7 @@ fhandler_pty_slave::write (const void *ptr, size_t len)
 
   push_process_state process_state (PID_TTYOU);
 
-  if (!process_opost_output (get_output_handle (), ptr, towrite, false))
+  if (!process_opost_output (get_output_handle_cyg (), ptr, towrite, false))
     {
       DWORD err = GetLastError ();
       termios_printf ("WriteFile failed, %E");
@@ -1069,6 +1086,7 @@ fhandler_pty_slave::fch_close_handles ()
 {
   close_maybe (get_io_handle ());
   close_maybe (get_output_handle ());
+  close_maybe (get_output_handle_cyg ());
   close_maybe (input_available_event);
   close_maybe (output_mutex);
   close_maybe (input_mutex);
@@ -1142,7 +1160,8 @@ errout:
 fhandler_pty_master::fhandler_pty_master (int unit)
   : fhandler_pty_common (), pktmode (0), master_ctl (NULL),
     master_thread (NULL), from_master (NULL), to_master (NULL),
-    echo_r (NULL), echo_w (NULL), dwProcessId (0)
+    echo_r (NULL), echo_w (NULL), dwProcessId (0),
+    io_handle_cyg (NULL), to_master_cyg (NULL), master_fwd_thread (NULL)
 {
   if (unit >= 0)
     dev ().parse (DEV_PTYM_MAJOR, unit);
@@ -1200,15 +1219,15 @@ fhandler_pty_master::cleanup ()
 {
   report_tty_counts (this, "closing master", "");
   if (archetype)
-    from_master = to_master = NULL;
+    from_master = to_master = to_master_cyg = NULL;
   fhandler_base::cleanup ();
 }
 
 int
 fhandler_pty_master::close ()
 {
-  termios_printf ("closing from_master(%p)/to_master(%p) since we own them(%u)",
-		  from_master, to_master, dwProcessId);
+  termios_printf ("closing from_master(%p)/to_master(%p)/to_master_cyg(%p) since we own them(%u)",
+		  from_master, to_master, to_master_cyg, dwProcessId);
   if (cygwin_finished_initializing)
     {
       if (master_ctl && get_ttyp ()->master_pid == myself->pid)
@@ -1231,6 +1250,7 @@ fhandler_pty_master::close ()
 	      master_ctl = NULL;
 	    }
 	  release_output_mutex ();
+	  master_fwd_thread->terminate_thread ();
 	}
     }
 
@@ -1247,6 +1267,11 @@ fhandler_pty_master::close ()
   if (!ForceCloseHandle (to_master))
     termios_printf ("error closing to_master %p, %E", to_master);
   from_master = to_master = NULL;
+  if (!ForceCloseHandle (get_io_handle_cyg ()))
+    termios_printf ("error closing io_handle_cyg %p, %E", get_io_handle_cyg ());
+  if (!ForceCloseHandle (to_master_cyg))
+    termios_printf ("error closing to_master_cyg %p, %E", to_master_cyg);
+  get_io_handle_cyg () = to_master_cyg = NULL;
   ForceCloseHandle (echo_r);
   ForceCloseHandle (echo_w);
   echo_r = echo_w = NULL;
@@ -1353,7 +1378,7 @@ fhandler_pty_master::ioctl (unsigned int cmd, void *arg)
     case FIONREAD:
       {
 	DWORD n;
-	if (!::bytes_available (n, to_master))
+	if (!::bytes_available (n, get_io_handle_cyg ()))
 	  {
 	    set_errno (EINVAL);
 	    return -1;
@@ -1523,6 +1548,13 @@ fhandler_pty_master::pty_master_thread ()
 	      termios_printf ("DuplicateHandle (to_master), %E");
 	      goto reply;
 	    }
+	  if (!DuplicateHandle (GetCurrentProcess (), to_master_cyg,
+				client, &repl.to_master_cyg,
+				0, TRUE, DUPLICATE_SAME_ACCESS))
+	    {
+	      termios_printf ("DuplicateHandle (to_master_cyg), %E");
+	      goto reply;
+	    }
 	}
 reply:
       repl.error = GetLastError ();
@@ -1546,6 +1578,40 @@ static DWORD WINAPI
 pty_master_thread (VOID *arg)
 {
   return ((fhandler_pty_master *) arg)->pty_master_thread ();
+}
+
+DWORD
+fhandler_pty_master::pty_master_fwd_thread ()
+{
+  DWORD rlen;
+  char outbuf[OUT_BUFFER_SIZE];
+
+  termios_printf("Started.");
+  for (;;)
+    {
+      if (!ReadFile (get_io_handle (), outbuf, sizeof outbuf, &rlen, NULL))
+	{
+	  termios_printf ("ReadFile for forwarding failed, %E");
+	  break;
+	}
+      ssize_t wlen = rlen;
+      while (rlen>0)
+	{
+	  if (!process_opost_output (to_master_cyg, outbuf, wlen, false))
+	    {
+	      termios_printf ("WriteFile for forwarding failed, %E");
+	      break;
+	    }
+	  rlen -= wlen;
+	}
+    }
+  return 0;
+}
+
+static DWORD WINAPI
+pty_master_fwd_thread (VOID *arg)
+{
+  return ((fhandler_pty_master *) arg)->pty_master_fwd_thread ();
 }
 
 bool
@@ -1574,13 +1640,22 @@ fhandler_pty_master::setup ()
     termios_printf ("can't set output_handle(%p) to non-blocking mode",
 		    get_output_handle ());
 
-  char pipename[sizeof("ptyNNNN-from-master")];
+  char pipename[sizeof("ptyNNNN-to-master-cyg")];
   __small_sprintf (pipename, "pty%d-to-master", unit);
   res = fhandler_pipe::create (&sec_none, &get_io_handle (), &to_master,
 			       fhandler_pty_common::pipesize, pipename, 0);
   if (res)
     {
       errstr = "output pipe";
+      goto err;
+    }
+
+  __small_sprintf (pipename, "pty%d-to-master-cyg", unit);
+  res = fhandler_pipe::create (&sec_none, &get_io_handle_cyg (), &to_master_cyg,
+			       fhandler_pty_common::pipesize, pipename, 0);
+  if (res)
+    {
+      errstr = "output pipe for cygwin";
       goto err;
     }
 
@@ -1643,28 +1718,38 @@ fhandler_pty_master::setup ()
       errstr = "pty master control thread";
       goto err;
     }
+  master_fwd_thread = new cygthread (::pty_master_fwd_thread, this, "ptymf");
+  if (!master_fwd_thread)
+    {
+      errstr = "pty master forwarding thread";
+      goto err;
+    }
 
   t.set_from_master (from_master);
   t.set_to_master (to_master);
+  t.set_to_master_cyg (to_master_cyg);
   t.winsize.ws_col = 80;
   t.winsize.ws_row = 25;
   t.master_pid = myself->pid;
 
   dev ().parse (DEV_PTYM_MAJOR, unit);
 
-  termios_printf ("this %p, pty%d opened - from_pty %p, to_pty %p", this, unit,
-		  get_io_handle (), get_output_handle ());
+  termios_printf ("this %p, pty%d opened - from_pty <%p,%p>, to_pty %p",
+	this, unit, get_io_handle (), get_io_handle_cyg (),
+	get_output_handle ());
   return true;
 
 err:
   __seterrno ();
   close_maybe (get_io_handle ());
+  close_maybe (get_io_handle_cyg ());
   close_maybe (get_output_handle ());
   close_maybe (input_available_event);
   close_maybe (output_mutex);
   close_maybe (input_mutex);
   close_maybe (from_master);
   close_maybe (to_master);
+  close_maybe (to_master_cyg);
   close_maybe (echo_r);
   close_maybe (echo_w);
   close_maybe (master_ctl);
@@ -1684,11 +1769,13 @@ fhandler_pty_master::fixup_after_fork (HANDLE parent)
 	{
 	  t.set_from_master (arch->from_master);
 	  t.set_to_master (arch->to_master);
+	  t.set_to_master_cyg (arch->to_master_cyg);
 	}
       arch->dwProcessId = wpid;
     }
   from_master = arch->from_master;
   to_master = arch->to_master;
+  to_master_cyg = arch->to_master_cyg;
   report_tty_counts (this, "inherited master", "");
 }
 
@@ -1698,7 +1785,7 @@ fhandler_pty_master::fixup_after_exec ()
   if (!close_on_exec ())
     fixup_after_fork (spawn_info->parent);
   else
-    from_master = to_master = NULL;
+    from_master = to_master = to_master_cyg = NULL;
 }
 
 BOOL

@@ -92,12 +92,15 @@ public:
 private:
   HANDLE _from_master;
   HANDLE _to_master;
+  HANDLE _to_master_cyg;
 
 public:
   HANDLE from_master() const { return _from_master; }
   HANDLE to_master() const { return _to_master; }
+  HANDLE to_master_cyg() const { return _to_master_cyg; }
   void set_from_master (HANDLE h) { _from_master = h; }
   void set_to_master (HANDLE h) { _to_master = h; }
+  void set_to_master_cyg (HANDLE h) { _to_master_cyg = h; }
 
   int read_retval;
   bool was_opened;	/* True if opened at least once. */
