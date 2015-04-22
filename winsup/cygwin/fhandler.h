@@ -412,6 +412,7 @@ public:
      that some fd's have two handles. */
   virtual HANDLE& get_handle () { return io_handle; }
   virtual HANDLE& get_io_handle () { return io_handle; }
+  virtual HANDLE& get_io_handle_cyg () { return io_handle; }
   virtual HANDLE& get_output_handle () { return io_handle; }
   virtual HANDLE get_stat_handle () { return pc.handle () ?: io_handle; }
   virtual HANDLE get_echo_handle () const { return NULL; }
@@ -1516,6 +1517,7 @@ class fhandler_pty_common: public fhandler_termios
 class fhandler_pty_slave: public fhandler_pty_common
 {
   HANDLE inuse;			// used to indicate that a tty is in use
+  HANDLE output_handle_cyg;
 
   /* Helper functions for fchmod and fchown. */
   bool fch_open_handles (bool chown);
@@ -1525,6 +1527,9 @@ class fhandler_pty_slave: public fhandler_pty_common
  public:
   /* Constructor */
   fhandler_pty_slave (int);
+
+  void set_output_handle_cyg (HANDLE h) { output_handle_cyg = h; }
+  HANDLE& get_output_handle_cyg () { return output_handle_cyg; }
 
   int open (int flags, mode_t mode = 0);
   void open_setup (int flags);
@@ -1576,13 +1581,17 @@ class fhandler_pty_master: public fhandler_pty_common
   HANDLE from_master, to_master;
   HANDLE echo_r, echo_w;
   DWORD dwProcessId;		// Owner of master handles
+  HANDLE io_handle_cyg, to_master_cyg;
+  cygthread *master_fwd_thread;	// Master forwarding thread
 
 public:
   HANDLE get_echo_handle () const { return echo_r; }
+  HANDLE& get_io_handle_cyg () { return io_handle_cyg; }
   /* Constructor */
   fhandler_pty_master (int);
 
   DWORD pty_master_thread ();
+  DWORD pty_master_fwd_thread ();
   int process_slave_output (char *buf, size_t len, int pktmode_on);
   void doecho (const void *str, DWORD len);
   int accept_input ();
