@@ -486,6 +486,18 @@ get_nt_native_path (const char *path, UNICODE_STRING& upath, bool dos)
   return &upath;
 }
 
+/* Handle with extrem care!  Only used in a certain instance in try_to_bin.
+   Every other usage needs a careful check. */
+void
+path_conv::set_nt_native_path (PUNICODE_STRING new_path)
+{
+  wide_path = (PWCHAR) crealloc_abort (wide_path, new_path->MaximumLength);
+  memcpy (wide_path, new_path->Buffer, new_path->Length);
+  uni_path.Length = new_path->Length;
+  uni_path.MaximumLength = new_path->MaximumLength;
+  uni_path.Buffer = wide_path;
+}
+
 PUNICODE_STRING
 path_conv::get_nt_native_path ()
 {

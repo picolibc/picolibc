@@ -314,15 +314,35 @@ try_to_bin (path_conv &pc, HANDLE &fh, ACCESS_MASK access, ULONG flags)
 	RtlAppendUnicodeToString (&recycler, L"\\Recycled\\");
       else
 	goto out;
-      /* Is the file a subdir of the recycler? */
       RtlInitCountedUnicodeString(&fname, pfni->FileName, pfni->FileNameLength);
+      /* Is the file a subdir of the recycler? */
       if (RtlEqualUnicodePathPrefix (&fname, &recycler, TRUE))
 	goto out;
       /* Is fname the recycler?  Temporarily hide trailing backslash. */
       recycler.Length -= sizeof (WCHAR);
       if (RtlEqualUnicodeString (&fname, &recycler, TRUE))
 	goto out;
+      /* Is fname really a subcomponent of the full path?  If not, there's
+	 a high probability we're acessing the file via a virtual drive
+	 created with "subst".  Check and accommodate it.  Note that we
+	 ony get here if the virtual drive is really pointing to a local
+	 drive.  Otherwise pc.isremote () returns "true". */
+      if (!RtlEqualUnicodePathSuffix (pc.get_nt_native_path (), &fname, TRUE))
+	{
+	  WCHAR drive[3] = { pc.get_nt_native_path ()->Buffer[4], ':', '\0' };
+	  PWCHAR tgt = tp.w_get ();
 
+	  if (QueryDosDeviceW (drive, tgt, NT_MAX_PATH)
+	      && !wcsncmp (tgt, L"\\??\\", 4))
+	    {
+	      UNICODE_STRING new_path;
+
+	      wcsncpy (tgt + 6, fname.Buffer, fname.Length / sizeof (WCHAR));
+	      RtlInitCountedUnicodeString(&new_path, tgt,
+					  6 * sizeof (WCHAR) + fname.Length);
+	      pc.set_nt_native_path (&new_path);
+	    }
+	}
       /* Create root dir path from file name information. */
       RtlSplitUnicodePath (&fname, &fname, NULL);
       RtlSplitUnicodePath (pc.get_nt_native_path (), &root, NULL);
@@ -367,9 +387,11 @@ try_to_bin (path_conv &pc, HANDLE &fh, ACCESS_MASK access, ULONG flags)
      starting at U+dc00.  Use plain ASCII chars on filesystems not supporting
      Unicode.  The rest of the filename is the inode number in hex encoding
      and a hash of the full NT path in hex.  The combination allows to remove
-     multiple hardlinks to the same file. */
+     multiple hardlinks to the same file.  Samba doesn't like the transposed
+     names. */
   RtlAppendUnicodeToString (&recycler,
-			    pc.fs_flags () & FILE_UNICODE_ON_DISK
+			    (pc.fs_flags () & FILE_UNICODE_ON_DISK
+			     && !pc.fs_is_samba ())
 			    ? L".\xdc63\xdc79\xdc67" : L".cyg");
   pfii = (PFILE_INTERNAL_INFORMATION) infobuf;
   /* Note: Modern Samba versions apparently don't like buffer sizes of more
