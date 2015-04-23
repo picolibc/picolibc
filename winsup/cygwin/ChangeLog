@@ -1,3 +1,11 @@
+2015-04-23  Corinna Vinschen  <corinna@vinschen.de>
+
+	* path.cc (path_conv::set_nt_native_path): New function.
+	* path.h (path_conv::set_nt_native_path): Add prototype.
+	* syscall.cc (try_to_bin): Handle moving files to the recycler
+	accessed via a local virtual drive (subst).  Fix a problem renaming
+	the file to the unique replacement name on Samba.  Align comment.
+
 2015-04-22  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler_tty.cc (fhandler_pty_slave::fch_close_handles): Don't close
