@@ -43,3 +43,9 @@ Bug Fixes
 
 - Fix shmget usage of size parameter for already existing segments.
   Addresses: https://cygwin.com/ml/cygwin/2015-04/msg00105.html
+
+- Fix how in-use files on virtual drives created via subst are moved to
+  the recycler in unlink(2).
+  Addresses: https://cygwin.com/ml/cygwin/2015-04/msg00527.html
+
+- Fix how in-use files on Samba drives are renamed in unlink(2).
