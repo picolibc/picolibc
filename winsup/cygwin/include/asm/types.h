@@ -1,6 +1,6 @@
 /* asm/types.h
 
-   Copyright 1998, 2000, 2001 Red Hat, Inc.
+   Copyright 1998, 2000, 2001, 2015 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -19,5 +19,9 @@ typedef unsigned short __u16;
 
 typedef __signed__ int __s32;
 typedef unsigned int __u32;
+
+/* As on Linux.  Works for both platforms, i686 and x86_64. */
+typedef __signed__ long long __s64;
+typedef unsigned long long __u64;
 
 #endif /* _ASM_TYPES_H */
