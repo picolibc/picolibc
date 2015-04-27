@@ -179,6 +179,19 @@
 
 </sect2>
 
+<sect2 id="install-cygserver"><title>How to install Cygserver</title>
+
+<para>
+  Cygserver is part of the base <emphasis role='bold'>cygwin</emphasis> package.
+  Therefore, whenever Cygwin is installed, so is Cygserver.
+</para>
+<para>
+  You may want to install Cygserver as a service. See
+  <xref linkend="start-cygserver"></xref>.
+</para>
+
+</sect2>
+
 <sect2 id="start-cygserver"><title>How to start Cygserver</title>
 
 <para>
