@@ -863,7 +863,7 @@ the old information.
 <para>
 So, what settings can we perform with <filename>/etc/nsswitch.conf</filename>?
 Let's start with an example <filename>/etc/nsswitch.conf</filename> file
-file set up to all default values:
+set up to all default values:
 </para>
 
 <screen>
@@ -1749,7 +1749,7 @@ The <literal>unix</literal> schema utilizes the
 <literal>posixAccount</literal> attribute extension.  This is one of two
 schema extensions which are connected to AD accounts, available by default
 starting with Windows Server 2003 R2.  They are usually
-<literal>not set</literal>, unless used by the Active Directory
+<emphasis role='bold'>not set</emphasis>, unless used by the Active Directory
 <literal>Server for NIS</literal> feature (deprecated since Server 2012 R2).
 
 Two schemata are interesting for Cygwin, <literal>posixAccount</literal>,
@@ -2031,7 +2031,7 @@ by child processes.
 
 <para>
 A fully set up Samba file server with domain integration is running winbindd to
-map Window SIDs to artificially created UNIX uids and gids, and this mapping is
+map Windows SIDs to artificially created UNIX uids and gids, and this mapping is
 transparent within the domain, so Cygwin doesn't have to do anything special.
 </para>
 
@@ -2134,7 +2134,7 @@ met.  Later ACEs are not taken into account.</para></listitem>
 
 <listitem><para>All access denied ACEs <emphasis
 role='bold'>should</emphasis> precede any access allowed ACE.  ACLs
-following this rule are called "canonical"</para></listitem>
+following this rule are called "canonical".</para></listitem>
 </itemizedlist>
 
 <para>Note that the last rule is a preference or a definition of
