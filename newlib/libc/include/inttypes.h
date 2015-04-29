@@ -142,7 +142,7 @@
 #define SCNxFAST16	__SCN16(x)
 
 /* 32-bit types */
-#if __have_long32
+#if defined (_INT32_EQ_LONG)
 #define __PRI32(x) __STRINGIFY(l##x)
 #define __SCN32(x) __STRINGIFY(l##x)
 #else
@@ -272,10 +272,10 @@
 #define SCNxMAX		__SCNMAX(x)
 
 /* ptr types */
-#if defined(_UINTPTR_EQ_ULONGLONG)
+#if defined (_INTPTR_EQ_LONGLONG)
 # define __PRIPTR(x) __STRINGIFY(ll##x)
 # define __SCNPTR(x) __STRINGIFY(ll##x)
-#elif defined(_UINTPTR_EQ_ULONG)
+#elif defined (_INTPTR_EQ_LONG)
 # define __PRIPTR(x) __STRINGIFY(l##x)
 # define __SCNPTR(x) __STRINGIFY(l##x)
 #else

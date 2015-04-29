@@ -216,7 +216,7 @@ typedef __uint_least64_t uint_least64_t;
 #define INT32_MAX (__INT32_MAX__)
 #define UINT32_MAX (__UINT32_MAX__)
 #elif defined(__int32_t_defined)
-#if __have_long32
+#if defined (_INT32_EQ_LONG)
 #define INT32_MIN 	 (-2147483647L-1)
 #define INT32_MAX 	 (2147483647L)
 #define UINT32_MAX       (4294967295UL)
@@ -232,7 +232,7 @@ typedef __uint_least64_t uint_least64_t;
 #define INT_LEAST32_MAX (__INT_LEAST32_MAX__)
 #define UINT_LEAST32_MAX (__UINT_LEAST32_MAX__)
 #elif defined(__int_least32_t_defined)
-#if __have_long32
+#if defined (_INT32_EQ_LONG)
 #define INT_LEAST32_MIN  (-2147483647L-1)
 #define INT_LEAST32_MAX  (2147483647L)
 #define UINT_LEAST32_MAX (4294967295UL)
@@ -439,7 +439,7 @@ typedef __uint_least64_t uint_least64_t;
 #define INT32_C(x) __INT32_C(x)
 #define UINT32_C(x) __UINT32_C(x)
 #else
-#if __have_long32
+#if defined (_INT32_EQ_LONG)
 #define INT32_C(x)	x##L
 #define UINT32_C(x)	x##UL
 #else
