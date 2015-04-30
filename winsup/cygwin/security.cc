@@ -1145,10 +1145,10 @@ convert_samba_sd (security_descriptor &sd_ret)
 		if (gid < UNIX_POSIX_OFFSET && (grp = internal_getgrgid (gid)))
 		  ace_sid.getfromgr (grp);
 	      }
-	    if (!add_access_allowed_ace (acl, i, ace->Mask, ace_sid, acl_len,
-					 ace->Header.AceFlags))
-	      return;
 	  }
+	if (!add_access_allowed_ace (acl, i, ace->Mask, ace_sid, acl_len,
+				     ace->Header.AceFlags))
+	  return;
       }
   acl->AclSize = acl_len;
 
