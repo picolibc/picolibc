@@ -1,3 +1,8 @@
+2015-04-30  Corinna Vinschen  <corinna@vinschen.de>
+
+	* security.cc (convert_samba_sd): Fix accidental dropping of all
+	non-Unix User, non-Unix Group accounts.
+
 2015-04-27  Corinna Vinschen  <corinna@vinschen.de>
 
 	* include/asm/types.h: Add __s64 and __u64 types.
