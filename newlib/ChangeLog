@@ -1,3 +1,7 @@
+2015-05-02  Corinna Vinschen  <vinschen@redhat.com>
+
+	* libc/include/sys/time.h: Include sys/select.h on Cygwin.  Explain why.
+
 2015-04-29  Corinna Vinschen  <vinschen@redhat.com>
 
 	* libc/include/sys/config.h: Move evaluation of _UINTPTR_EQ_ULONG and
