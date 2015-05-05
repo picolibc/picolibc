@@ -1,27 +1,35 @@
-/*  Copyright (c) 2013-2014 Red Hat, Inc. All rights reserved.
+/* Copyright (c) 2013-2015 Red Hat, Inc. All rights reserved.
 
-   This copyrighted material is made available to anyone wishing to use, modify,
-   copy, or redistribute it subject to the terms and conditions of the BSD
-   License.   This program is distributed in the hope that it will be useful,
-   but WITHOUT ANY WARRANTY expressed or implied, including the implied warranties
-   of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  A copy of this license
-   is available at http://www.opensource.org/licenses. Any Red Hat trademarks that
-   are incorporated in the source code or documentation are not subject to the BSD
-   License and may only be used or replicated with the express permission of
-   Red Hat, Inc.  */
+   This copyrighted material is made available to anyone wishing to use,
+   modify, copy, or redistribute it subject to the terms and conditions of
+   the BSD License.   This program is distributed in the hope that it will be
+   useful, but WITHOUT ANY WARRANTY expressed or implied, including the
+   implied warranties of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+   A copy of this license is available at http://www.opensource.org/licenses.
 
-/* Default linker script, for large MSP430X executables.  */
+   Any Red Hat trademarks that are incorporated in the source code or
+   documentation are not subject to the BSD License and may only be used or
+   replicated with the express permission of Red Hat, Inc.  */
+
+/* Example linker script, for large MSP430X executables.  */
 
 OUTPUT_ARCH(msp430)
 ENTRY(_start)
 
 INCLUDE intr_vectors.ld
 
+/* Note - These memory regions are just examples.  Real MSP430 MCUs will have
+   different varieties and sizes of RAM, ROM and FLASH.  Not all devices will
+   have all of these regions either.  Device specific linker scripts are
+   provided by TI, so this file is intended to be used as a guide and so that
+   toolchain tests can be run against the simulator.  */
 MEMORY
 {
-  RAM (w)      : ORIGIN = 0x00200, LENGTH = 0x01e00
+  RAM (rw)     : ORIGIN = 0x00200, LENGTH = 0x01e00
   ROM (rx)     : ORIGIN = 0x02000, LENGTH = 0x0df00
-  HIFRAM (rxw) : ORIGIN = 0x10000, LENGTH = 0x80000
+  /* The regions from intr_vectors.ld go here.  */
+  HIFRAM (rw)  : ORIGIN = 0x10000, LENGTH = 0x80000
+  HIROM (rx)   : ORIGIN = 0x90000, LENGTH = 0x70000
 }
 
 SECTIONS
@@ -31,22 +39,34 @@ SECTIONS
     *(.resetvec)
   } > VECT31
 
-  .upper.rodata :
-  {
-    . = ALIGN(2);
-    *(.upper.rodata.* .upper.rodata)
-  } > HIFRAM
-
   .rodata :
   {
     . = ALIGN(2);
     *(.plt)
+
+    . = ALIGN(2);
     *(.lower.rodata.* .lower.rodata)
+
+    /* Note: By default we do not have this line:
+
+         *(.either.rodata.*) *(.either.rodata)
+
+       defined here, or anywhere else in this script.  This is deliberate.
+       The algorithm in the linker that automatically places rodata into
+       either the .rodata or the .upper.rodata sections relies upon the
+       fact that the .either.rodata section is not defined, and that the
+       .upper.rodata section is defined.  If the .upper.rodata is not
+       defined in this script then the line above should be restored so that
+       code compiled with -mdata-region=either enabled will still work.
+
+       The same reasoning applies to the absence of definitions for the
+       .either.text, .either.data and .either.bss sections as well.  */
+       
+    . = ALIGN(2);
     *(.rodata .rodata.* .gnu.linkonce.r.* .const .const:*)
     *(.rodata1)
 
-    *(.eh_frame_hdr)
-    KEEP (*(.eh_frame))
+    . = ALIGN(2);
     KEEP (*(.gcc_except_table)) *(.gcc_except_table.*)
     PROVIDE (__preinit_array_start = .);
     KEEP (*(.preinit_array))
@@ -60,6 +80,17 @@ SECTIONS
     KEEP (*(SORT(.fini_array.*)))
     PROVIDE (__fini_array_end = .);
     LONG(0); /* Sentinel.  */
+
+  } > ROM
+
+  /* Note: This is a separate .rodata section for sections which are
+     read only but which older linkers treat as read-write.
+     This prevents older linkers from marking the entire .rodata
+     section as read-write.  */
+  .rodata2 : {
+    . = ALIGN(2);
+    *(.eh_frame_hdr)
+    KEEP (*(.eh_frame))
 
     /* gcc uses crtbegin.o to find the start of the constructors, so
        we make sure it is first.  Because this is a wildcard, it
@@ -83,11 +114,19 @@ SECTIONS
     KEEP (*(.dtors))
   } > ROM
 
-  .upper.data :
+  .upper.rodata :
   {
+    /* Note: If this section is not defined then please add:
+    
+         *(.either.rodata.*) *(.either.rodata)
+
+       to the definition of the .rodata section above.  This
+       will allow code compiled with -mdata-region=either to
+       work properly.  */
+
     . = ALIGN(2);
-    *(.upper.data.* .upper.data)
-  } > HIFRAM
+    *(.upper.rodata.* .upper.rodata)
+  } > HIROM
 
   .data :
   {
@@ -100,7 +139,14 @@ SECTIONS
     *(.data.rel.ro.local) *(.data.rel.ro*)
     *(.dynamic)
 
+    . = ALIGN(2);
     *(.data .data.* .gnu.linkonce.d.*)
+
+    /* See the note in .rodata section about why we do not have this line here:
+
+        *(.either.data.* .either.data)
+    */
+
     KEEP (*(.gnu.linkonce.d.*personality*))
     SORT(CONSTRUCTORS)
     *(.data1)
@@ -113,24 +159,109 @@ SECTIONS
     *(.sdata .sdata.* .gnu.linkonce.s.* D_2 D_1)
 
     . = ALIGN(2);
-
     _edata = .;
     PROVIDE (edata = .);
     PROVIDE (__dataend = .);
-  } > RAM
 
-  /* Note that crt0 assumes this is a multiple of two; all the
-     start/stop symbols are also assumed word-aligned.  */
-  PROVIDE(__romdatastart = LOADADDR(.data));
-  PROVIDE (__romdatacopysize = SIZEOF(.data));
+    /* See the comment in the .upper.data section about the need
+       to copy data from ROM into RAM at program start up.  */
+  } > RAM AT> ROM
 
-  .upper.bss :
+  /* Note that crt0 assumes that __romdatacopysize is a multiple of two.
+     All the start/stop symbols are also assumed to be word-aligned.  */
+  __romdatastart = LOADADDR(.data);
+  __romdatacopysize = SIZEOF(.data);
+
+  /* ------------------- start of .upper.data sections.----------------  */
+  /* Note: If both HIROM and HIFRAM are available then the .upper.data
+     section should look like this:
+
+        . = ALIGN(2);
+        .upper.data :
+        {
+          __upper_data_init = LOADADDR (.upper.data);
+          /* Status word.  * /
+          SHORT(1);
+          __high_datastart = .;
+          *(.upper.data.* .upper.data)
+          __high_dataend = .;
+	} > HIFRAM AT> HIROM
+
+        __rom_highdatacopysize = SIZEOF(.upper.data) - 2;
+        __rom_highdatastart = LOADADDR(.upper.data) + 2;
+  
+      If only HIFRAM is available then the layout below must look like this:
+
+        .upper.data :
+        {
+          . = ALIGN(2);
+          __high_datastart = .;
+          *(.upper.data.* .upper.data)
+          __high_dataend = .;
+        } > HIFRAM
+
+	__rom_highdatacopysize = SIZEOF(.upper.data);
+
+	.shadow.upper.data :
+        {
+          . = ALIGN(2);
+          __upper_data_init = .;
+          /* Status word.  * /
+          SHORT(0);
+          /* Space for the copy of .upper.data.  * /
+          . = . + SIZEOF(.upper.data) - 2;
+         } > HIFRAM
+
+        __rom_highdatastart = LOADADDR(.shadow.upper.data) + 2;
+
+      Note - remove the space in this sequence: * / (twice) when you copy one
+      of the script fragments above into your script.
+
+      Note - the symbols defined here are *not* enclosed by the PROVIDE
+      keyword.  This is deliberate.  The crt0 library provides weak
+      definitions of these symbols and those weak definitions *must* be
+      overriden by the correct values.
+
+      The status word is used to control how the .upper.data section
+      is initialized at application start up.  If the word is non-zero
+      then data is copied from __rom_highdatastart to __high_datastart.
+      This corresponds with copying the contents of .upper.data from its
+      load address (HIROM) to its run-time address (HIFRAM) in the first
+      scenario, or from the .shadow.upper.section to the .upper.data in
+      the second scenario.
+
+      If the status word is zero then the data is copied the other way
+      and the word is set to one.  This only happens when the second
+      scenario is in play, and only the very first time the application
+      starts running.  This makes sure that the .shadow.upper.data section
+      contains a pristine copy of the .upper.data section that can be used
+      to reinitialize the .upper.data section upon device reset.
+
+      The status word is necessary as this allows us to have one routine
+      in crt0 that can handle either form of .upper.data layout.  IE crt0
+      is linker script agnostic.
+
+      Note - if the .upper.data section is not going to be defined at all
+      then please add this line back into the .data section above:
+
+        *(.either.data.* .either.data)
+    */
+
+  . = ALIGN(2);
+  .upper.data :
   {
-    . = ALIGN(2);
-    PROVIDE (__high_bssstart = .);
-    *(.upper.bss.* .upper.bss)
-    PROVIDE (__high_bssend = .);
-  } > HIFRAM
+    __upper_data_init = LOADADDR (.upper.data);
+    /* Status word.  */
+    SHORT(1);
+    __high_datastart = .;
+    *(.upper.data.* .upper.data)
+    __high_dataend = .;
+  } > HIFRAM AT> HIROM
+  
+  __rom_highdatacopysize = SIZEOF(.upper.data) - 2;
+  __rom_highdatastart = LOADADDR(.upper.data) + 2;
+
+  /* ------------------- end of .upper.data sections.----------------  */
 
   .bss :
   {
@@ -140,53 +271,87 @@ SECTIONS
     *(.dynbss)
     *(.sbss .sbss.*)
     *(.bss .bss.* .gnu.linkonce.b.*)
+    /* See the note in .rodata section about why we do not have this line here:
+
+        *(.either.bss.* .either.bss)
+    */
+    . = ALIGN(2);
+    *(COMMON)
     . = ALIGN(2);
     PROVIDE (__bssend = .);
   } > RAM
   PROVIDE (__bsssize = SIZEOF(.bss));
 
-  /* This section contains data that is not initialised at startup.  */
+  /* This section contains data that is not initialised at startup
+     *or* application reset.  */
   .noinit (NOLOAD) :
   {
     . = ALIGN(2);
     PROVIDE (__noinit_start = .);
     *(.noinit)
     . = ALIGN(2);
-    *(COMMON)
     PROVIDE (__noinit_end = .);
   } > RAM
 
-  _end = .;
-  PROVIDE (end = .);
+  .upper.bss :
+  {
+    /* Note - if this section is not going to be defined then please
+       add this line back into the definition of the .bss section above:
+       
+      *(.either.bss.* .either.bss)
+    */
+    . = ALIGN(2);
+    __high_bssstart = .;
+    *(.upper.bss.* .upper.bss)
+    . = ALIGN(2);
+    __high_bssend = .;
+  } > HIFRAM
 
-  .stack (ORIGIN (HIFRAM) + LENGTH(HIFRAM)) :
+  /* We create this section so that "end" will always be in the
+     HIFRAM region (matching .stack below), even if the .upper.bss
+     section is empty.  */
+  .heap_start :
+  {
+    . = ALIGN(2);
+    _end = .;
+    PROVIDE (end = .);
+    LONG(0);
+  } > HIFRAM
+
+  /* Note: We place the stack in HIFRAM because then there is less
+     chance that it will collide with allocated data in the RAM region.
+     In scripts targeted at real MCUs however it may be better to place
+     the stack and heap in RAM, as flash does have a limited number of
+     writes before failure.
+
+     Note - if the location of .stack is changed, then be sure to change
+     the definition of .heap_start above as well.  */
+  .stack (ORIGIN (HIFRAM) + LENGTH (HIFRAM)) :
   {
     PROVIDE (__stack = .);
-    *(.stack)
   }
-
-  /* This is just for crt0.S and interrupt handlers.  */
-  .lowtext :
-  {
-    PROVIDE (_start = .);
-    . = ALIGN(2);
-    KEEP (*(SORT(.crt_*)))
-    KEEP (*(.lowtext))
-  } > ROM
-
-  .upper.text :
-  {
-    . = ALIGN(2);
-    *(.upper.text.* .upper.text)
-  } > HIFRAM
 
   .text :
   {
+    PROVIDE (_start = .);
+
+    . = ALIGN(2);
+    KEEP (*(SORT(.crt_*)))
+
+    . = ALIGN(2);
+    KEEP (*(.lowtext))
+
     . = ALIGN(2);
     *(.lower.text.* .lower.text)
+
     . = ALIGN(2);
     *(.text .stub .text.* .gnu.linkonce.t.* .text:*)
 
+    /* See the note in .rodata section about why we do not have this line here:
+
+        *(.either.text.* .either.text)
+    */
+    
     KEEP (*(.text.*personality*))
     /* .gnu.warning sections are handled specially by elf32.em.  */
     *(.gnu.warning)
@@ -199,6 +364,18 @@ SECTIONS
     KEEP (*(.fini))
     KEEP (*(.tm_clone_table))
   } > ROM
+
+  .upper.text :
+  {
+    /* Note - if this section is not going to be included in the script
+       then please add this line back into the definition of the .text
+       section above:
+
+       *(.either.text.* .either.text)
+    */
+    . = ALIGN(2);
+    *(.upper.text.* .upper.text)
+  } > HIROM
 
   /* The rest are all not normally part of the runtime image.  */
 

@@ -1,3 +1,29 @@
+2015-05-05  Nick Clifton  <nickc@redhat.com>
+
+	* msp430/msp430.ld: Delete.
+	* msp430/msp430F5438A-l.ld: Delete.
+	* msp430/msp430F5438A-s.ld: Delete.
+	* msp430/crt_movedata.S: Delete.
+
+	* msp430/Makefile.in (SCRIPTS): Remove msp430.ld.
+	(CRT_OBJS): Add crt_move_highdata.o.
+	* msp430/memmodel.h (START_CRT_FUNC): New macro.
+	(END_CRT_FUNC): New macro.
+	(WEAK_DEF): New macro.
+	* msp430/crt0.S: Use new macros.
+	(move_highdata): New code to initialise the .data section if it is
+	held in high memory.
+
+	* msp430/msp430-sim.ld (.data): Add .either.data.
+	(.rodata2): Move some read-only data sections here.
+	(.text): Add .either.text.
+	(.rodata): Add .either.rodata.
+	(.bss): Add .either.bss.
+	* msp430/msp430xl-sim.ld (MEMORY): Add HIROM.
+	(.rodata2): Move some read-only data sections here.
+	(.upper.data): New section.  Include notes about how to initialise
+	it.
+
 2015-04-21  Mike Frysinger  <vapier@gentoo.org>
 
 	* mcore/syscall.h: New header.
