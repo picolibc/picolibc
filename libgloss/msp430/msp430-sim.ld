@@ -1,4 +1,4 @@
-/*  Copyright (c) 2013-2014 Red Hat, Inc. All rights reserved.
+/* Copyright (c) 2013-2015 Red Hat, Inc. All rights reserved.
 
    This copyrighted material is made available to anyone wishing to use, modify,
    copy, or redistribute it subject to the terms and conditions of the BSD
@@ -33,11 +33,15 @@ SECTIONS
   {
     . = ALIGN(2);
     *(.plt)
+    . = ALIGN(2);
     *(.lower.rodata.* .lower.rodata)
+    . = ALIGN(2);
     *(.rodata .rodata.* .gnu.linkonce.r.* .const .const:*)
+    . = ALIGN(2);
+    *(.either.rodata.* .either.rodata)
+    . = ALIGN(2);
     *(.rodata1)
-    *(.eh_frame_hdr)
-    KEEP (*(.eh_frame))
+
     KEEP (*(.gcc_except_table)) *(.gcc_except_table.*)
     PROVIDE (__preinit_array_start = .);
     KEEP (*(.preinit_array))
@@ -51,6 +55,17 @@ SECTIONS
     KEEP (*(SORT(.fini_array.*)))
     PROVIDE (__fini_array_end = .);
     LONG(0); /* Sentinel.  */
+
+  } > RAM
+
+  /* Note: This is a separate .rodata section for sections which are
+     read only but which older linkers treat as read-write.
+     This prevents older linkers from marking the entire .rodata
+     section as read-write.  */
+  .rodata2 : {
+    . = ALIGN(2);
+    *(.eh_frame_hdr)
+    KEEP (*(.eh_frame))
 
     /* gcc uses crtbegin.o to find the start of the constructors, so
        we make sure it is first.  Because this is a wildcard, it
@@ -80,8 +95,9 @@ SECTIONS
     PROVIDE (_start = .);
     KEEP (*(SORT(.crt_*)))
     *(.lowtext)
-    *(.lower.text.* .lower.text)    
+    *(.lower.text.* .lower.text)
     *(.text .stub .text.* .gnu.linkonce.t.* .text:*)
+    *(.either.text.* .either.text)
     KEEP (*(.text.*personality*))
     /* .gnu.warning sections are handled specially by elf32.em.  */
     *(.gnu.warning)
@@ -101,11 +117,15 @@ SECTIONS
     PROVIDE (__datastart = .);
 
     *(.lower.data.* .lower.data)
+
+    *(.data .data.* .gnu.linkonce.d.*)
+
+    *(.either.data.* .either.data)
+
     KEEP (*(.jcr))
     *(.data.rel.ro.local) *(.data.rel.ro*)
     *(.dynamic)
 
-    *(.data .data.* .gnu.linkonce.d.*)
     KEEP (*(.gnu.linkonce.d.*personality*))
     SORT(CONSTRUCTORS)
     *(.data1)
@@ -136,6 +156,7 @@ SECTIONS
     *(.dynbss)
     *(.sbss .sbss.*)
     *(.bss .bss.* .gnu.linkonce.b.*)
+    *(.either.bss.* .either.bss)
     PROVIDE (__bssend = .);
   } > RAM
   PROVIDE (__bsssize = SIZEOF(.bss));
@@ -167,7 +188,7 @@ SECTIONS
     *(.upper.data.* .upper.data)
     *(.upper.bss.* .upper.bss)
     *(.upper.text.* .upper.text)  
-    ASSERT (SIZEOF(.upper) == 0, ".upper sections present in a binary linked without -mlarge support");
+    ASSERT (SIZEOF(.upper) == 0, "This MCU does not support high memory");
   }
 
   /* The rest are all not normally part of the runtime image.  */

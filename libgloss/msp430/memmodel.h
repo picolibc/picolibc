@@ -1,4 +1,4 @@
-/* Copyright (c) 2012-2013 Red Hat, Inc. All rights reserved.
+/* Copyright (c) 2012-2015 Red Hat, Inc. All rights reserved.
 
    This copyrighted material is made available to anyone wishing to use, modify,
    copy, or redistribute it subject to the terms and conditions of the BSD
@@ -37,5 +37,30 @@
 #define add_	ADD
 #define PTRsz	2
 
-
 #endif
+
+/* Start a function in its own named and numbered section, so that it
+   can be subject to linker garbage collection.  The numbers are used
+   to enforce link-time ordering of the sections.  Note - the construction
+   of the symbol names is critical - they need to match the unresolved
+   symbol references created by the compiler and assembler.  */
+.macro START_CRT_FUNC number name 
+	.section .crt_\number\name,"ax",@progbits
+	.global __crt0_\name
+	.type __crt0_\name , @function
+__crt0_\name:
+.endm
+
+
+/* End a named function.  Sets the size so that GDB does not get confused.  */
+.macro END_CRT_FUNC name 
+   .size __crt0_\name, . - __crt0_\name
+.endm
+
+
+/* Provide a weak definition of NAME, initialized to zero.  */
+.macro WEAK_DEF name
+	.global \name
+	.weak	\name
+   \name  = 0
+.endm
