@@ -41,19 +41,19 @@ int __signbitd (double x);
 int
 __signbitf (float x)
 {
-  unsigned int w;
+  __uint32_t w;
 
   GET_FLOAT_WORD(w,x);
 
-  return (w & 0x80000000);
+  return (w & 0x80000000) != 0;
 }
 
 int
 __signbitd (double x)
 {
-  unsigned int msw;
+  __uint32_t msw;
 
   GET_HIGH_WORD(msw, x);
 
-  return (msw & 0x80000000);
+  return (msw & 0x80000000) != 0;
 }
