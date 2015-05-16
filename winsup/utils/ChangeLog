@@ -1,3 +1,9 @@
+2015-06-07  Jon Turney  <jon.turney@dronecode.org.uk>
+
+	* strace.cc (proc_child): Log process and thread create and exit,
+	and DLL load and unload.
+	(GetFileNameFromHandle): New function.
+
 2015-06-10  Corinna Vinschen  <corinna@vinschen.de>
 
 	* ps.cc (main): Widen UID field in long format to accommodate longer

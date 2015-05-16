@@ -2002,6 +2002,7 @@ Trace system calls and signals
 
   -b, --buffer-size=SIZE       set size of output file buffer
   -d, --no-delta               don't display the delta-t microsecond timestamp
+  -e, --events                 log all Windows DEBUG_EVENTS (toggle - default true)
   -f, --trace-children         trace child processes (toggle - default true)
   -h, --help                   output usage information and exit
   -m, --mask=MASK              set message filter mask
