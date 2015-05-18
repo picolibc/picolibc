@@ -61,7 +61,7 @@ SECTIONS
 
        The same reasoning applies to the absence of definitions for the
        .either.text, .either.data and .either.bss sections as well.  */
-       
+
     . = ALIGN(2);
     *(.rodata .rodata.* .gnu.linkonce.r.* .const .const:*)
     *(.rodata1)
@@ -318,6 +318,17 @@ SECTIONS
     LONG(0);
   } > HIFRAM
 
+  /* The __stack_size value of 0x100 is just a guess, but since it is
+     PROVIDEd the user can override it on the command line.  It has to be
+     set here, rather than inside the .stack section, as symbols defined
+     inside sections are only evaluated during the final phase of the link,
+     long after the ASSERT is checked.  An ASSERT referencing a PROVIDED but
+     not yet evaluated symbol will automatically fail.
+
+     FIXME: It would be nice if this value could be automatically set via
+     gcc's -fstack-usage command line option somehow.  */
+  PROVIDE (__stack_size = 0x100);
+
   /* Note: We place the stack in HIFRAM because then there is less
      chance that it will collide with allocated data in the RAM region.
      In scripts targeted at real MCUs however it may be better to place
@@ -329,6 +340,11 @@ SECTIONS
   .stack (ORIGIN (HIFRAM) + LENGTH (HIFRAM)) :
   {
     PROVIDE (__stack = .);
+
+    /* Linker section checking ignores empty sections like
+       this one so we have to have our own test here.  */
+    ASSERT ((__stack > (_end + __stack_size)),
+            "Error: Too much data - no room left for the stack");
   }
 
   .text :

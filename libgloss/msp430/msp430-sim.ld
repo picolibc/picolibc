@@ -175,10 +175,26 @@ SECTIONS
   _end = .;
   PROVIDE (end = .);
 
+  /* The __stack_size value of 0x100 is just a guess, but since it is
+     PROVIDEd the user can override it on the command line.  It has to be
+     set here, rather than inside the .stack section, as symbols defined
+     inside sections are only evaluated during the final phase of the link,
+     long after the ASSERT is checked.  An ASSERT referencing a PROVIDED but
+     not yet evaluated symbol will automatically fail.
+
+     FIXME: It would be nice if this value could be automatically set via
+     gcc's -fstack-usage command line option somehow.  */
+  PROVIDE (__stack_size = 0x100);
+
   .stack (ORIGIN (RAM) + LENGTH(RAM)) :
   {
     PROVIDE (__stack = .);
     *(.stack)
+
+    /* Linker section checking ignores empty sections like
+       this one so we have to have our own test here.  */
+    ASSERT ((__stack > (_end + __stack_size)),
+            "Error: Too much data - no room left for the stack");
   }
 
   /* Make sure that .upper sections are not used without -mlarge support.  */
