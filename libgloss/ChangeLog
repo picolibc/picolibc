@@ -1,3 +1,14 @@
+2015-05-18  Nick Clifton  <nickc@redhat.com>
+
+	* msp430/msp430-sim.ld (.stack): Add an assertion to make sure
+	that the data area does not overrun the stack.  PROVIDE a new
+	symbol __stack_size to allow the user to set the limit.
+	* msp430/msp430xl-sim.ld (.stack): Likewise.
+	* rl78/rl78-sim.ld (.stack): Likewise.
+	* rl78/rl78.ld (.stack): Likewise.
+	* rx/rx-sim.ld (.stack): Likewise.
+	* rx/rx.ld (.stack): Likewise.
+
 2015-05-05  Nick Clifton  <nickc@redhat.com>
 
 	* msp430/msp430.ld: Delete.
