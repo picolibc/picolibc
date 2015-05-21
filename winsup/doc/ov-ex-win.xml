@@ -27,12 +27,6 @@ package installation screen will provide you with the ability to control
 what is installed or updated. 
 </para>
 <para>
-Another option is to install everything by clicking on the
-<literal>Default</literal> field next to the <literal>All</literal>
-category. However, be advised that this will download and install
-several hundreds of megabytes of software to your computer. The best
-plan is probably to click on individual categories and install either
-entire categories or packages from the categories themselves.
 After installation, you can find Cygwin-specific documentation in
 the <literal>/usr/share/doc/Cygwin/</literal> directory.
 </para>

@@ -1,3 +1,9 @@
+2015-06-01  Jon Turney  <jon.turney@dronecode.org.uk>
+
+	* ov-ex-unix.xml: Remove unhelpful mention of and inaccurate size
+	estimate for installing everything.
+	* ov-ex-win.xml: Ditto.
+
 2015-04-27  Mike DePaulo  <mikedep333@gmail.com>
 
 	* cygserver.xml (install-cygserver): Add new section. How to install
