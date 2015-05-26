@@ -61,10 +61,10 @@
 // Reserved stack size for exceptions (can usually be smaller than normal stack)
 #define EXCEPTION_STACK_SIZE 8192
 
-// Size of redzone + size of space required to store state
+// Size of space required to store state
 // This value must match that in the support library or1k_exception_handler
 // function
-#define EXCEPTION_STACK_FRAME (128+128)
+#define EXCEPTION_STACK_FRAME 136
 
 	.extern _or1k_stack_top    /* points to the next address after the stack */
 	.extern _or1k_stack_bottom /* points to the last address in the stack */

@@ -24,7 +24,7 @@
                                                                               */
 /* -------------------------------------------------------------------------- */
 // Warning - this must be the same as specified in crt0.S
-#define EXCEPTION_STACK_SIZE 128+128
+#define EXCEPTION_STACK_SIZE 136
 
 	.extern _or1k_exception_handler_table
 
