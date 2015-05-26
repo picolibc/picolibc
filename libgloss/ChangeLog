@@ -1,5 +1,9 @@
 2015-05-26  Stefan Wallentowitz  <stefan.wallentowitz@tum.de>
 
+	* or1k/or1k_uart.c: Fix interrupts
+
+2015-05-26  Stefan Wallentowitz  <stefan.wallentowitz@tum.de>
+
 	* or1k/timer.c: Properly set interrupt flags
 
 2015-05-26  Stefan Wallentowitz  <stefan.wallentowitz@tum.de>

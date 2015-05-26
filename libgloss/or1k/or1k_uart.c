@@ -94,9 +94,11 @@ void _or1k_uart_interrupt_handler(uint32_t data)
 {
 	uint8_t iir = REG8(IIR);
 
-	// Check if this is a read fifo interrupt, bit 0 indicates pending
-	// interrupt and the other bits are IIR_RDA
-	if (!(iir & 0x1) || ((iir & 0xfe) != IIR_RDA)) {
+	// Check if this is a read fifo or timeout interrupt, bit 0
+	// indicates pending interrupt and the other bits are IIR_RDA
+	// or IIR_TO
+	if (!(iir & 0x1) || ((iir & 0xfe) != IIR_RDA) ||
+	    ((iir & 0xfe) != IIR_TO)) {
 		return;
 	}
 
