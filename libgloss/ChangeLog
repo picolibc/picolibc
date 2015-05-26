@@ -1,3 +1,7 @@
+2015-05-26  Stefan Wallentowitz  <stefan.wallentowitz@tum.de>
+
+	* or1k/interruts-asm.S: Change registers to callee-saved.
+
 2015-05-18  Nick Clifton  <nickc@redhat.com>
 
 	* msp430/msp430-sim.ld (.stack): Add an assertion to make sure
