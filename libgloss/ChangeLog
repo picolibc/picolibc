@@ -1,5 +1,9 @@
 2015-05-26  Stefan Wallentowitz  <stefan.wallentowitz@tum.de>
 
+	* or1k/boards/optimsoc.S: Heap for gzll kernel
+
+2015-05-26  Stefan Wallentowitz  <stefan.wallentowitz@tum.de>
+
 	* or1k/sbrk.c: Allow for different heap start
 
 2015-05-26  Stefan Wallentowitz  <stefan.wallentowitz@tum.de>
