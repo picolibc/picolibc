@@ -19,12 +19,13 @@
 
 #include "include/or1k-support.h"
 
+extern uint32_t	end; /* Set by linker.  */
+uint32_t _or1k_heap_start = &end;
 static uint32_t _or1k_heap_end;
 
 void *
 _sbrk_r (struct _reent * reent, ptrdiff_t incr)
 {
-	extern uint32_t	end; /* Set by linker.  */
 	uint32_t	prev_heap_end;
 
 	// This needs to be atomic
@@ -34,7 +35,7 @@ _sbrk_r (struct _reent * reent, ptrdiff_t incr)
 	uint32_t sr_tee = or1k_timer_disable();
 
 	// Initialize heap end to end if not initialized before
-	or1k_sync_cas((void*) &_or1k_heap_end, 0, (uint32_t) &end);
+	or1k_sync_cas((void*) &_or1k_heap_end, 0, (uint32_t) _or1k_heap_start);
 
 	do {
 		// Read previous heap end
