@@ -73,6 +73,10 @@ _or1k_exception_handler:
 	l.sw	GPR_BUF_OFFSET(29)(r1),r29
 	l.sw	GPR_BUF_OFFSET(30)(r1),r30
 	l.sw	GPR_BUF_OFFSET(31)(r1),r31
+	l.mfspr r14,r0,OR1K_SPR_SYS_EPCR_BASE
+	l.sw	0x80(r1),r14
+	l.mfspr r14,r0,OR1K_SPR_SYS_ESR_BASE
+	l.sw	0x84(r1),r14
 
 	/* Replace impure pointer for exception */
 	l.movhi	r20,hi(_or1k_exception_impure_ptr)
@@ -156,6 +160,12 @@ _or1k_exception_handler:
 	l.sw	0(r21),r20
 
 	/* Restore state */
+	l.lwz   r2,0x80(r1)
+	l.mtspr r0,r2,OR1K_SPR_SYS_EPCR_BASE
+
+	l.lwz   r2,0x84(r1)
+	l.mtspr r0,r2,OR1K_SPR_SYS_ESR_BASE
+
 	l.lwz	r2,GPR_BUF_OFFSET(2)(r1)
 	l.lwz	r3,GPR_BUF_OFFSET(3)(r1)
 	l.lwz	r4,GPR_BUF_OFFSET(4)(r1)
