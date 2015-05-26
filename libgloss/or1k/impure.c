@@ -94,6 +94,9 @@ _or1k_libc_impure_init (void)
 	_REENT_INIT_PTR (_impure_ptr);
 	_REENT_INIT_PTR (_or1k_exception_impure_ptr);
 
+	// Use the standard impure ptr during normal software run
+	_or1k_impure_ptr = _impure_ptr;
+
 	// Set current to standard impure pointer
 	_or1k_current_impure_ptr = _impure_ptr;
 #endif
