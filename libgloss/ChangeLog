@@ -1,5 +1,9 @@
 2015-05-26  Stefan Wallentowitz  <stefan.wallentowitz@tum.de>
 
+	* or1k/timer.c: Properly set interrupt flags
+
+2015-05-26  Stefan Wallentowitz  <stefan.wallentowitz@tum.de>
+
 	* or1k/exception-asm.S: Store missing state
 
 2015-05-26  Stefan Wallentowitz  <stefan.wallentowitz@tum.de>
