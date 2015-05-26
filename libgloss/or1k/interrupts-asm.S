@@ -38,49 +38,51 @@
 	.type	_or1k_interrupt_handler,@function
 
 _or1k_interrupt_handler:
-	/* Make room on stack, save link register */
-	l.addi	r1,r1,-12
+	/* Make room on stack, save link address register */
+	l.addi	r1,r1,-4
 	l.sw	0(r1),r9
 
 	/* Read PICSR */
-	l.mfspr	r3,r0,OR1K_SPR_PIC_PICSR_ADDR
+	l.mfspr	r20,r0,OR1K_SPR_PIC_PICSR_ADDR
 
 	/* Load handler table base address */
-	l.movhi r7,hi(_or1k_interrupt_handler_table)
-	l.ori	r7,r7,lo(_or1k_interrupt_handler_table)
+	// Needs to be callee-saved register
+	l.movhi r16,hi(_or1k_interrupt_handler_table)
+	l.ori	r16,r16,lo(_or1k_interrupt_handler_table)
 	/* Load data pointer table base address */
-	l.movhi r12,hi(_or1k_interrupt_handler_data_ptr_table)
-	l.ori	r12,r12,lo(_or1k_interrupt_handler_data_ptr_table)
+	// Needs to be callee-saved register
+	l.movhi r18,hi(_or1k_interrupt_handler_data_ptr_table)
+	l.ori	r18,r18,lo(_or1k_interrupt_handler_data_ptr_table)
 #ifdef __OR1K_MULTICORE__
 	/* Read the addresses of the arrays of cores */
 	/* r7 = (*or1k_interrupt_handler_table)  */
-	l.lwz	r7,0(r7)
+	l.lwz	r16,0(r16)
 	/* r12 = (*or1k_interrupt_handler_data_ptr_table)  */
-	l.lwz	r12,0(r12)
+	l.lwz	r18,0(r18)
 	/* Generate offset in arrays */
 	/* r14 = coreid */
 	l.mfspr	r14,r0,OR1K_SPR_SYS_COREID_ADDR
 	/* r14 = coreid*32*4 = off */
 	l.slli	r14,r14,7
 	/* r7 = (*or1k_exception_handler_table)[coreid] */
-	l.add	r7,r7,r14
+	l.add	r16,r16,r14
 	/* r12 = (*or1k_exception_handler_table)[coreid] */
-	l.add	r12,r12,r14
+	l.add	r18,r18,r14
 #endif
 
 .L0:
 	/* Find first set bit in PICSR */
-	l.ff1	r4,r3
+	l.ff1	r4,r20
 	/* Any bits set? */
 	l.sfne	r4,r0
 	/* If none, finish */
 	OR1K_DELAYED_NOP(OR1K_INST(l.bnf .L2))
 	/* What is IRQ function table offset? */
-	l.addi	r5,r4,-1
-	l.slli	r6,r5,2
+	l.addi	r22,r4,-1
+	l.slli	r6,r22,2
 	/* Add this to table bases */
-	l.add	r14,r6,r7
-	l.add	r13,r6,r12
+	l.add	r14,r6,r16
+	l.add	r13,r6,r18
 
 	/* Fetch handler function address */
 	l.lwz	r14,0(r14)
@@ -90,33 +92,27 @@ _or1k_interrupt_handler:
 	/* Skip if no handler: TODO: Indicate interrupt fired but no handler*/
 	OR1K_DELAYED_NOP(OR1K_INST(l.bnf .L1))
 
-	/* Pull out data pointer from table, save r3, we'll write over it */
-	l.sw	4(r1),r3
-	l.lwz	r3,0(r13)
-	/* Call handler, save r5 in delay slot */
+	/* Call handler, load data pointer */
 	OR1K_DELAYED(
-		OR1K_INST(l.sw   8(r1),r5),
+		OR1K_INST(l.lwz  r3,0(r13)),
 		OR1K_INST(l.jalr r14)
 	)
 
-	/* Reload r3,r5 */
-	l.lwz	r3,4(r1)
-	l.lwz	r5,8(r1)
 .L1:
 	/* Clear bit from PICSR, return to start of checking loop */
 	l.ori	r6,r0,1
-	l.sll	r6,r6,r5
+	l.sll	r6,r6,r22
 	OR1K_DELAYED(
-		OR1K_INST(l.xor r3,r3,r6),
+		OR1K_INST(l.xor r20,r20,r6),
 		OR1K_INST(l.j   .L0)
 	)
 
 .L2:
 	/* Finish up - write PICSR back, restore r9*/
 	l.lwz	r9,0(r1)
-	l.mtspr	r0,r3,OR1K_SPR_PIC_PICSR_ADDR
+	l.mtspr	r0,r20,OR1K_SPR_PIC_PICSR_ADDR
 	OR1K_DELAYED(
-		OR1K_INST(l.addi r1,r1,12),
+		OR1K_INST(l.addi r1,r1,4),
 		OR1K_INST(l.jr   r9)
 	)
 
