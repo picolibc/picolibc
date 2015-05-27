@@ -18,7 +18,8 @@ details. */
 	  if_indextoname functions in iphlpapi.h since Vista.
    TODO:  Convert if_nametoindex to cygwin_if_nametoindex and call
 	  system functions on Vista and later. */
-#define _INC_NETIOAPI
+#define _INC_NETIOAPI	/* w32api < 4.0 */
+#define _NETIOAPI_H_
 #include "winsup.h"
 #ifdef __x86_64__
 /* 2014-04-24: Current Mingw headers define sockaddr_in6 using u_long (8 byte)
