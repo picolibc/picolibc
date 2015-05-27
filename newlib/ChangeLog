@@ -1,3 +1,8 @@
+2015-05-26  DJ Delorie  <dj@redhat.com>
+
+	* libm/math/e_sqrt.c (__ieee754_sqrt): Don't truncate constant to
+	"int".
+
 2015-05-13  Nick Clifton  <nickc@redhat.com>
 
 	* libm/common/s_signbit.c (__signbitf): Fix for 16-bit targets.
