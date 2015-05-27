@@ -99,7 +99,7 @@ static	double	one	= 1.0, tiny=1.0e-300;
 #endif
 {
 	double z;
-	__int32_t sign = (int)0x80000000; 
+	__int32_t sign = 0x80000000; 
 	__uint32_t r,t1,s1,ix1,q1;
 	__int32_t ix0,s0,q,m,t,i;
 
