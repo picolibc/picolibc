@@ -1,3 +1,7 @@
+2015-05-27  David Stacey  <drstacey@tiscali.co.uk>
+
+	* libc/argz/argz_replace.c: Fix potential memory leak.
+
 2015-05-26  DJ Delorie  <dj@redhat.com>
 
 	* libm/math/e_sqrt.c (__ieee754_sqrt): Don't truncate constant to

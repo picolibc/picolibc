@@ -71,7 +71,10 @@ _DEFUN (argz_replace, (argz, argz_len, str, with, replace_count),
 
       /* reallocate argz, and copy over the new value. */
       if(!(*argz = (char *)realloc(*argz, new_argz_len)))
-        return ENOMEM;
+        {
+          free(new_argz);
+          return ENOMEM;
+        }
 
       memcpy(*argz, new_argz, new_argz_len);
       *argz_len = new_argz_len;
