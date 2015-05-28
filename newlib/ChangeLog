@@ -1,3 +1,7 @@
+2015-05-28  Corinna Vinschen  <vinschen@redhat.com>
+
+	* libc/include/sys/wait.h: Fix comment.
+
 2015-05-27  David Stacey  <drstacey@tiscali.co.uk>
 
 	* libc/argz/argz_replace.c: Fix potential memory leak.
