@@ -1,3 +1,11 @@
+2015-05-28  Takashi Yano  <takashi.yano@nifty.ne.jp>
+	    Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_tty.cc (fhandler_pty_common::close): Don't close output_mutex
+	here.  Move into callers.
+	(fhandler_pty_master::close): Use NtQueryObject instead of PeekNamedPipe
+	to detect closing the last master handle.
+
 2015-05-27  Takashi Yano  <takashi.yano@nifty.ne.jp>
 
 	* net.cc: Define _NETIOAPI_H_ to accomodate newer w32api.
