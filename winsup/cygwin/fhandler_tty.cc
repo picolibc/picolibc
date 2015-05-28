@@ -552,7 +552,10 @@ fhandler_pty_slave::close ()
 	get_output_handle_cyg ());
   if ((unsigned) myself->ctty == FHDEV (DEV_PTYS_MAJOR, get_minor ()))
     fhandler_console::free_console ();	/* assumes that we are the last pty closer */
-  return fhandler_pty_common::close ();
+  fhandler_pty_common::close ();
+  if (!ForceCloseHandle (output_mutex))
+    termios_printf ("CloseHandle (output_mutex<%p>), %E", output_mutex);
+  return 0;
 }
 
 int
@@ -1201,8 +1204,6 @@ fhandler_pty_common::close ()
   termios_printf ("pty%d <%p,%p> closing", get_minor (), get_handle (), get_output_handle ());
   if (!ForceCloseHandle (input_mutex))
     termios_printf ("CloseHandle (input_mutex<%p>), %E", input_mutex);
-  if (!ForceCloseHandle (output_mutex))
-    termios_printf ("CloseHandle (output_mutex<%p>), %E", output_mutex);
   if (!ForceCloseHandle1 (get_handle (), from_pty))
     termios_printf ("CloseHandle (get_handle ()<%p>), %E", get_handle ());
   if (!ForceCloseHandle1 (get_output_handle (), to_pty))
@@ -1223,6 +1224,9 @@ fhandler_pty_master::cleanup ()
 int
 fhandler_pty_master::close ()
 {
+  OBJECT_BASIC_INFORMATION obi;
+  NTSTATUS status;
+
   termios_printf ("closing from_master(%p)/to_master(%p)/to_master_cyg(%p) since we own them(%u)",
 		  from_master, to_master, to_master_cyg, dwProcessId);
   if (cygwin_finished_initializing)
@@ -1251,13 +1255,22 @@ fhandler_pty_master::close ()
 	}
     }
 
-  fhandler_pty_common::close ();
-
   /* Check if the last master handle has been closed.  If so, set
      input_available_event to wake up potentially waiting slaves. */
-  if (!PeekNamedPipe (from_master, NULL, 0, NULL, NULL, NULL)
-      && GetLastError () == ERROR_BROKEN_PIPE) 
-    SetEvent (input_available_event);
+  acquire_output_mutex (INFINITE);
+  status = NtQueryObject (get_output_handle (), ObjectBasicInformation,
+			  &obi, sizeof obi, NULL);
+  fhandler_pty_common::close ();
+  release_output_mutex ();
+  if (!ForceCloseHandle (output_mutex))
+    termios_printf ("CloseHandle (output_mutex<%p>), %E", output_mutex);
+  if (!NT_SUCCESS (status))
+    debug_printf ("NtQueryObject: %y", status);
+  else if (obi.HandleCount == 1)
+    {
+      termios_printf("Closing last master of pty%d", get_minor ());
+      SetEvent (input_available_event);
+    }
 
   if (!ForceCloseHandle (from_master))
     termios_printf ("error closing from_master %p, %E", from_master);
