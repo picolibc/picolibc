@@ -1,3 +1,8 @@
+2015-05-31  David Stacey  <drstacey@tiscali.co.uk>
+
+	* libc/argz/argz_replace.c (argz_replace): Correct behaviour when memory
+	is exhausted.
+
 2015-05-28  Corinna Vinschen  <vinschen@redhat.com>
 
 	* libc/include/sys/wait.h: Fix comment.

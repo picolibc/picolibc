@@ -30,6 +30,7 @@ _DEFUN (argz_replace, (argz, argz_len, str, with, replace_count),
   char *new_argz = NULL;
   size_t new_argz_len = 0;
   char *new_argz_iter = NULL;
+  char *argz_realloc = NULL;
 
   *replace_count = 0;
   new_argz_len = *argz_len;
@@ -45,7 +46,8 @@ _DEFUN (argz_replace, (argz, argz_len, str, with, replace_count),
 
   if (*replace_count)
     {
-      new_argz = (char *)malloc(new_argz_len);
+      if (!(new_argz = (char *)malloc(new_argz_len)))
+	return ENOMEM;
       
       buf_iter = *argz;
       buf_len = *argz_len;
@@ -70,11 +72,12 @@ _DEFUN (argz_replace, (argz, argz_len, str, with, replace_count),
       memcpy(new_argz_iter, last_iter, *argz + *argz_len - last_iter);
 
       /* reallocate argz, and copy over the new value. */
-      if(!(*argz = (char *)realloc(*argz, new_argz_len)))
+      if(!(argz_realloc = (char *)realloc(*argz, new_argz_len)))
         {
           free(new_argz);
           return ENOMEM;
         }
+      *argz = argz_realloc;
 
       memcpy(*argz, new_argz, new_argz_len);
       *argz_len = new_argz_len;
