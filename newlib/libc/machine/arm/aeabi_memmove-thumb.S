@@ -33,32 +33,34 @@
 	ASM_ALIAS __aeabi_memmove4 __aeabi_memmove
 	ASM_ALIAS __aeabi_memmove8 __aeabi_memmove
 __aeabi_memmove:
-	.cfi_startproc
 	push	{r4, lr}
 	cmp	r0, r1
-	bls	.L9
-	adds	r3, r1, r2
-	cmp	r0, r3
-	bcc	.L3
-.L9:
+	bls	3f
+	adds	r4, r1, r2
+	cmp	r0, r4
+	bcs	3f
+	subs	r3, r2, #1
+	cmp	r2, #0
+	beq	2f
+	subs	r2, r4, r2
+1:
+	ldrb	r1, [r2, r3]
+	strb	r1, [r0, r3]
+	subs	r3, r3, #1
+	bcs	1b
+2:
+	pop	{r4}
+	pop	{r1}
+	bx	r1
+3:
 	movs	r3, #0
-	b	.L4
-.L3:
-	subs	r3, r3, r2
-.L5:
-	subs	r2, r2, #1
-	bcc	.L10
-	ldrb	r1, [r3, r2]
-	strb	r1, [r0, r2]
-	b	.L5
-.L4:
-	cmp	r3, r2
-	beq	.L10
+	cmp	r2, #0
+	beq	2b
+4:
 	ldrb	r4, [r1, r3]
 	strb	r4, [r0, r3]
 	adds	r3, r3, #1
-	b	.L4
-.L10:
-	pop	{r4, pc}
-	.cfi_endproc
+	cmp	r2, r3
+	bne	4b
+	b	2b
 	.size __aeabi_memmove, . - __aeabi_memmove

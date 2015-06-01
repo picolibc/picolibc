@@ -1,3 +1,13 @@
+2015-06-01  Hale Wang  <hale.wang@arm.com>
+
+	* libc/machine/arm/aeabi_memmove-arm.S (__aeabi_memmove): Update the
+	assembler implementation.
+	* libc/machine/arm/aeabi_memmove-thumb.S (__aeabi_memmove): Ditto.
+	* libc/machine/arm/aeabi_memmove-thumb2.S (__aeabi_memmove): Ditto.
+	* libc/machine/arm/aeabi_memset-arm.S (__aeabi_memset): Ditto.
+	* libc/machine/arm/aeabi_memset-thumb.S (__aeabi_memset): Ditto.
+	* libc/machine/arm/aeabi_memset-thumb2.S (__aeabi_memset): Ditto.
+
 2015-06-01  Szabolcs Nagy  <szabolcs.nagy@arm.com>
 
 	* libm/machine/aarch64/e_sqrt.c: New file.

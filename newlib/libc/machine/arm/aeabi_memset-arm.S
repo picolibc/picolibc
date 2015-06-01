@@ -33,81 +33,75 @@
 	ASM_ALIAS __aeabi_memset4 __aeabi_memset
 	ASM_ALIAS __aeabi_memset8 __aeabi_memset
 __aeabi_memset:
-	.cfi_startproc
 	tst	r0, #3
-	stmfd	sp!, {r4, r5, lr}
-	beq	.L14
+	stmfd	sp!, {r4, lr}
+	beq	10f
 	cmp	r1, #0
 	sub	r1, r1, #1
-	ldmeqfd	sp!, {r4, r5, pc}
-	uxtb	lr, r2
+	beq	9f
+	and	ip, r2, #255
 	mov	r3, r0
-	b	.L4
-.L6:
+	b	2f
+1:
 	cmp	r1, #0
-	mov	r1, ip
-	ldmeqfd	sp!, {r4, r5, pc}
-.L4:
-	strb	lr, [r3], #1
+	sub	r1, r1, #1
+	beq	9f
+2:
+	strb	ip, [r3], #1
 	tst	r3, #3
-	sub	ip, r1, #1
-	bne	.L6
-.L2:
+	bne	1b
+3:
 	cmp	r1, #3
-	bls	.L11
-	uxtb	lr, r2
-	cmp	r1, #15
+	bls	7f
+	and	lr, r2, #255
 	orr	lr, lr, lr, asl #8
+	cmp	r1, #15
 	orr	lr, lr, lr, asl #16
-	bls	.L15
-	sub	r4, r1, #16
+	bls	5f
+	mov	r4, r1
 	add	ip, r3, #16
-	mov	r4, r4, lsr #4
-	add	r5, r4, #2
-	add	r5, r3, r5, lsl #4
-.L10:
+4:
+	sub	r4, r4, #16
+	cmp	r4, #15
 	str	lr, [ip, #-16]
+	str	lr, [ip, #-12]
+	str	lr, [ip, #-8]
+	str	lr, [ip, #-4]
 	add	ip, ip, #16
-	str	lr, [ip, #-28]
-	str	lr, [ip, #-24]
-	str	lr, [ip, #-20]
-	cmp	ip, r5
-	bne	.L10
+	bhi	4b
+	sub	ip, r1, #16
+	bic	ip, ip, #15
 	and	r1, r1, #15
-	add	ip, r4, #1
+	add	ip, ip, #16
 	cmp	r1, #3
-	add	ip, r3, ip, lsl #4
-	bls	.L28
-.L9:
-	sub	r3, r1, #4
-	bic	r3, r3, #3
-	add	r3, r3, #4
-	add	r3, ip, r3
-.L12:
-	str	lr, [ip], #4
-	cmp	r3, ip
-	bne	.L12
+	add	r3, r3, ip
+	bls	7f
+5:
+	mov	r4, r3
+	mov	ip, r1
+6:
+	sub	ip, ip, #4
+	cmp	ip, #3
+	str	lr, [r4], #4
+	bhi	6b
+	sub	ip, r1, #4
+	bic	ip, ip, #3
+	add	ip, ip, #4
+	add	r3, r3, ip
 	and	r1, r1, #3
-.L11:
+7:
 	cmp	r1, #0
-	uxtbne	r2, r2
+	andne	r2, r2, #255
 	addne	r1, r3, r1
-	beq	.L29
-.L13:
+	beq	9f
+8:
 	strb	r2, [r3], #1
 	cmp	r3, r1
-	bne	.L13
-	ldmfd	sp!, {r4, r5, pc}
-.L29:
-	ldmfd	sp!, {r4, r5, pc}
-.L14:
+	bne	8b
+9:
+	ldmfd	sp!, {r4, lr}
+	bx	lr
+10:
 	mov	r3, r0
-	b	.L2
-.L15:
-	mov	ip, r3
-	b	.L9
-.L28:
-	mov	r3, ip
-	b	.L11
-	.cfi_endproc
+	b	3b
 	.size __aeabi_memset, . - __aeabi_memset

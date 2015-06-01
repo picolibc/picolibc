@@ -33,35 +33,34 @@
 	ASM_ALIAS __aeabi_memset4 __aeabi_memset
 	ASM_ALIAS __aeabi_memset8 __aeabi_memset
 __aeabi_memset:
-	.cfi_startproc
 	push	{r4, r5, r6}
 	lsls	r4, r0, #30
-	beq	.L14
+	beq	10f
 	subs	r4, r1, #1
 	cmp	r1, #0
-	beq	.L16
+	beq	9f
 	uxtb	r5, r2
 	mov	r3, r0
-	b	.L4
-.L6:
+	b	2f
+1:
 	subs	r1, r4, #1
-	cbz	r4, .L16
+	cbz	r4, 9f
 	mov	r4, r1
-.L4:
+2:
 	strb	r5, [r3], #1
 	lsls	r1, r3, #30
-	bne	.L6
-.L2:
+	bne	1b
+3:
 	cmp	r4, #3
-	bls	.L11
+	bls	7f
 	uxtb	r5, r2
 	orr	r5, r5, r5, lsl #8
 	cmp	r4, #15
 	orr	r5, r5, r5, lsl #16
-	bls	.L9
-	add	r1, r3, #16
+	bls	5f
 	mov	r6, r4
-.L10:
+	add	r1, r3, #16
+4:
 	subs	r6, r6, #16
 	cmp	r6, #15
 	str	r5, [r1, #-16]
@@ -69,41 +68,40 @@ __aeabi_memset:
 	str	r5, [r1, #-8]
 	str	r5, [r1, #-4]
 	add	r1, r1, #16
-	bhi	.L10
+	bhi	4b
 	sub	r1, r4, #16
 	bic	r1, r1, #15
 	and	r4, r4, #15
 	adds	r1, r1, #16
 	cmp	r4, #3
 	add	r3, r3, r1
-	bls	.L11
-.L9:
+	bls	7f
+5:
 	mov	r6, r3
 	mov	r1, r4
-.L12:
+6:
 	subs	r1, r1, #4
 	cmp	r1, #3
 	str	r5, [r6], #4
-	bhi	.L12
+	bhi	6b
 	subs	r1, r4, #4
 	bic	r1, r1, #3
 	adds	r1, r1, #4
 	add	r3, r3, r1
 	and	r4, r4, #3
-.L11:
-	cbz	r4, .L16
+7:
+	cbz	r4, 9f
 	uxtb	r2, r2
 	add	r4, r4, r3
-.L13:
+8:
 	strb	r2, [r3], #1
 	cmp	r3, r4
-	bne	.L13
-.L16:
+	bne	8b
+9:
 	pop	{r4, r5, r6}
 	bx	lr
-.L14:
+10:
 	mov	r4, r1
 	mov	r3, r0
-	b	.L2
-	.cfi_endproc
+	b	3b
 	.size __aeabi_memset, . - __aeabi_memset
