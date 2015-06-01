@@ -6,7 +6,10 @@ INCLUDES = -I $(newlib_basedir)/../newlib/libm/common $(NEWLIB_CFLAGS) \
 	$(CROSS_CFLAGS) $(TARGET_CFLAGS)
 
 LIB_SOURCES = \
+	e_sqrt.c \
+	ef_sqrt.c \
 	s_ceil.c \
+	s_fabs.c \
 	s_floor.c \
 	s_fma.c \
 	s_fmax.c \
@@ -20,6 +23,7 @@ LIB_SOURCES = \
 	s_round.c \
 	s_trunc.c \
 	sf_ceil.c \
+	sf_fabs.c \
 	sf_floor.c \
 	sf_fma.c \
 	sf_fmax.c \

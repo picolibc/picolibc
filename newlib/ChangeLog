@@ -1,3 +1,12 @@
+2015-06-01  Szabolcs Nagy  <szabolcs.nagy@arm.com>
+
+	* libm/machine/aarch64/e_sqrt.c: New file.
+	* libm/machine/aarch64/ef_sqrt.c: New file.
+	* libm/machine/aarch64/s_fabs.c: New file.
+	* libm/machine/aarch64/sf_fabs.c: New file.
+	* libm/machine/aarch64/Makefile.in: Add new source files.
+	* libm/machine/aarch64/Makefile.am: Regenerate.
+
 2015-05-31  David Stacey  <drstacey@tiscali.co.uk>
 
 	* libc/argz/argz_replace.c (argz_replace): Correct behaviour when memory

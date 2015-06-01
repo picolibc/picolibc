@@ -70,13 +70,15 @@ LIBRARIES = $(noinst_LIBRARIES)
 ARFLAGS = cru
 lib_a_AR = $(AR) $(ARFLAGS)
 lib_a_LIBADD =
-am__objects_1 = lib_a-s_ceil.$(OBJEXT) lib_a-s_floor.$(OBJEXT) \
-	lib_a-s_fma.$(OBJEXT) lib_a-s_fmax.$(OBJEXT) \
-	lib_a-s_fmin.$(OBJEXT) lib_a-s_llrint.$(OBJEXT) \
-	lib_a-s_llround.$(OBJEXT) lib_a-s_lrint.$(OBJEXT) \
-	lib_a-s_lround.$(OBJEXT) lib_a-s_nearbyint.$(OBJEXT) \
-	lib_a-s_rint.$(OBJEXT) lib_a-s_round.$(OBJEXT) \
-	lib_a-s_trunc.$(OBJEXT) lib_a-sf_ceil.$(OBJEXT) \
+am__objects_1 = lib_a-e_sqrt.$(OBJEXT) lib_a-ef_sqrt.$(OBJEXT) \
+	lib_a-s_ceil.$(OBJEXT) lib_a-s_fabs.$(OBJEXT) \
+	lib_a-s_floor.$(OBJEXT) lib_a-s_fma.$(OBJEXT) \
+	lib_a-s_fmax.$(OBJEXT) lib_a-s_fmin.$(OBJEXT) \
+	lib_a-s_llrint.$(OBJEXT) lib_a-s_llround.$(OBJEXT) \
+	lib_a-s_lrint.$(OBJEXT) lib_a-s_lround.$(OBJEXT) \
+	lib_a-s_nearbyint.$(OBJEXT) lib_a-s_rint.$(OBJEXT) \
+	lib_a-s_round.$(OBJEXT) lib_a-s_trunc.$(OBJEXT) \
+	lib_a-sf_ceil.$(OBJEXT) lib_a-sf_fabs.$(OBJEXT) \
 	lib_a-sf_floor.$(OBJEXT) lib_a-sf_fma.$(OBJEXT) \
 	lib_a-sf_fmax.$(OBJEXT) lib_a-sf_fmin.$(OBJEXT) \
 	lib_a-sf_llrint.$(OBJEXT) lib_a-sf_llround.$(OBJEXT) \
@@ -209,7 +211,10 @@ INCLUDES = -I $(newlib_basedir)/../newlib/libm/common $(NEWLIB_CFLAGS) \
 	$(CROSS_CFLAGS) $(TARGET_CFLAGS)
 
 LIB_SOURCES = \
+	e_sqrt.c \
+	ef_sqrt.c \
 	s_ceil.c \
+	s_fabs.c \
 	s_floor.c \
 	s_fma.c \
 	s_fmax.c \
@@ -223,6 +228,7 @@ LIB_SOURCES = \
 	s_round.c \
 	s_trunc.c \
 	sf_ceil.c \
+	sf_fabs.c \
 	sf_floor.c \
 	sf_fma.c \
 	sf_fmax.c \
@@ -302,11 +308,29 @@ distclean-compile:
 .c.obj:
 	$(COMPILE) -c `$(CYGPATH_W) '$<'`
 
+lib_a-e_sqrt.o: e_sqrt.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-e_sqrt.o `test -f 'e_sqrt.c' || echo '$(srcdir)/'`e_sqrt.c
+
+lib_a-e_sqrt.obj: e_sqrt.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-e_sqrt.obj `if test -f 'e_sqrt.c'; then $(CYGPATH_W) 'e_sqrt.c'; else $(CYGPATH_W) '$(srcdir)/e_sqrt.c'; fi`
+
+lib_a-ef_sqrt.o: ef_sqrt.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-ef_sqrt.o `test -f 'ef_sqrt.c' || echo '$(srcdir)/'`ef_sqrt.c
+
+lib_a-ef_sqrt.obj: ef_sqrt.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-ef_sqrt.obj `if test -f 'ef_sqrt.c'; then $(CYGPATH_W) 'ef_sqrt.c'; else $(CYGPATH_W) '$(srcdir)/ef_sqrt.c'; fi`
+
 lib_a-s_ceil.o: s_ceil.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-s_ceil.o `test -f 's_ceil.c' || echo '$(srcdir)/'`s_ceil.c
 
 lib_a-s_ceil.obj: s_ceil.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-s_ceil.obj `if test -f 's_ceil.c'; then $(CYGPATH_W) 's_ceil.c'; else $(CYGPATH_W) '$(srcdir)/s_ceil.c'; fi`
+
+lib_a-s_fabs.o: s_fabs.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-s_fabs.o `test -f 's_fabs.c' || echo '$(srcdir)/'`s_fabs.c
+
+lib_a-s_fabs.obj: s_fabs.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-s_fabs.obj `if test -f 's_fabs.c'; then $(CYGPATH_W) 's_fabs.c'; else $(CYGPATH_W) '$(srcdir)/s_fabs.c'; fi`
 
 lib_a-s_floor.o: s_floor.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-s_floor.o `test -f 's_floor.c' || echo '$(srcdir)/'`s_floor.c
@@ -385,6 +409,12 @@ lib_a-sf_ceil.o: sf_ceil.c
 
 lib_a-sf_ceil.obj: sf_ceil.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-sf_ceil.obj `if test -f 'sf_ceil.c'; then $(CYGPATH_W) 'sf_ceil.c'; else $(CYGPATH_W) '$(srcdir)/sf_ceil.c'; fi`
+
+lib_a-sf_fabs.o: sf_fabs.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-sf_fabs.o `test -f 'sf_fabs.c' || echo '$(srcdir)/'`sf_fabs.c
+
+lib_a-sf_fabs.obj: sf_fabs.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-sf_fabs.obj `if test -f 'sf_fabs.c'; then $(CYGPATH_W) 'sf_fabs.c'; else $(CYGPATH_W) '$(srcdir)/sf_fabs.c'; fi`
 
 lib_a-sf_floor.o: sf_floor.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-sf_floor.o `test -f 'sf_floor.c' || echo '$(srcdir)/'`sf_floor.c
