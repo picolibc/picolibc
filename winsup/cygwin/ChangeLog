@@ -1,3 +1,10 @@
+2015-06-08  Takashi Yano  <takashi.yano@nifty.ne.jp>
+
+	* fhandler_tty.cc (fhandler_pty_slave::write): Move causing of SIGHUP
+	into fhandler_pty_master::close().
+	(fhandler_pty_slave::read): Ditto.
+	(fhandler_pty_master::close): Ditto.
+
 2015-06-08  Corinna Vinschen  <corinna@vinschen.de>
 
 	* include/cygwin/version.h (CYGWIN_VERSION_DLL_MINOR): Bump to 4.

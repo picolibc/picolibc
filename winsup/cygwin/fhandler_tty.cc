@@ -622,7 +622,6 @@ fhandler_pty_slave::write (const void *ptr, size_t len)
 	default:
 	  __seterrno_from_win_error (err);
 	}
-      raise (SIGHUP);		/* FIXME: Should this be SIGTTOU? */
       towrite = -1;
     }
   return towrite;
@@ -749,7 +748,12 @@ fhandler_pty_slave::read (void *ptr, size_t& len)
 	  goto out;
 	}
       if (!bytes_available (bytes_in_pipe))
-	raise (SIGHUP);
+	{
+	  ReleaseMutex (input_mutex);
+	  set_errno (EIO);
+	  totalread = -1;
+	  goto out;
+	}
 
       /* On first peek determine no. of bytes to flush. */
       if (!ptr && len == UINT_MAX)
@@ -779,9 +783,10 @@ fhandler_pty_slave::read (void *ptr, size_t& len)
 	  if (!ReadFile (get_handle (), buf, readlen, &n, NULL))
 	    {
 	      termios_printf ("read failed, %E");
-	      raise (SIGHUP);
-	      bytes_in_pipe = 0;
-	      ptr = NULL;
+	      ReleaseMutex (input_mutex);
+	      set_errno (EIO);
+	      totalread = -1;
+	      goto out;
 	    }
 	  else
 	    {
@@ -790,7 +795,12 @@ fhandler_pty_slave::read (void *ptr, size_t& len)
 		 change after successful read. So we have to peek into the pipe
 		 again to see if input is still available */
 	      if (!bytes_available (bytes_in_pipe))
-		raise (SIGHUP);
+		{
+		  ReleaseMutex (input_mutex);
+		  set_errno (EIO);
+		  totalread = -1;
+		  goto out;
+		}
 	      if (n)
 		{
 		  len -= n;
@@ -1269,6 +1279,8 @@ fhandler_pty_master::close ()
   else if (obi.HandleCount == 1)
     {
       termios_printf("Closing last master of pty%d", get_minor ());
+      if (get_ttyp ()->getsid () > 0)
+	kill (get_ttyp ()->getsid (), SIGHUP);
       SetEvent (input_available_event);
     }
 
