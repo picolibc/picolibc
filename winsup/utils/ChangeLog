@@ -1,3 +1,8 @@
+2015-06-08  Corinna Vinschen  <corinna@vinschen.de>
+
+	* path.cc (from_fstab_line): Don't convert slashes to backslashes for
+	bind mounts.  Explain why.
+
 2015-04-21  Corinna Vinschen  <corinna@vinschen.de>
 
 	* tzmap-from-unicode.org: Convert Calcutta to Kolkata.

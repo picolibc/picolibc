@@ -1,7 +1,7 @@
 /* path.cc
 
    Copyright 2001, 2002, 2003, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012,
-   2013 Red Hat, Inc.
+   2013, 2015 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -443,7 +443,12 @@ from_fstab_line (mnt_t *m, char *line, bool user)
 	    return false;
 	  }
       m->posix = strdup (posix_path);
-      unconvert_slashes (native_path);
+      /* Bind mounts require POSIX paths, otherwise the path is wrongly
+	 prefixed with the Cygwin root dir when trying to convert it to
+	 a Win32 path in mount(2). So don't convert slashes to backslashes
+         in this case. */
+      if (!(mount_flags & MOUNT_BIND))
+	unconvert_slashes (native_path);
       m->native = strdup (native_path);
       m->flags = mount_flags;
     }
