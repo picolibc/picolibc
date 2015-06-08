@@ -892,7 +892,7 @@ open_commune_proc_parms (DWORD pid, PRTL_USER_PROCESS_PARAMETERS prupp)
 char *
 _pinfo::cwd (size_t& n)
 {
-  char *s;
+  char *s = NULL;
   if (!this || !pid)
     return NULL;
   if (ISSTATE (this, PID_NOTCYGWIN))
@@ -938,7 +938,7 @@ _pinfo::cwd (size_t& n)
 char *
 _pinfo::cmdline (size_t& n)
 {
-  char *s;
+  char *s = NULL;
   if (!this || !pid)
     return NULL;
   if (ISSTATE (this, PID_NOTCYGWIN))

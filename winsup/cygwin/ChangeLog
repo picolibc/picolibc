@@ -1,5 +1,10 @@
 2015-06-08  Corinna Vinschen  <corinna@vinschen.de>
 
+	* pinfo.cc (_pinfo::cwd): Initialize s to avoid comiler warning.
+	(_pinfo::cmdline): Ditto.
+
+2015-06-08  Corinna Vinschen  <corinna@vinschen.de>
+
 	* pinfo.cc (_pinfo::root): Fake default root for native processes.
 	(open_commune_proc_parms): New helper function to access process
 	parameter block.
