@@ -1,3 +1,8 @@
+2015-06-08  Corinna Vinschen  <corinna@vinschen.de>
+
+	* pinfo.cc (_pinfo::commune_request): Don't try to send commune
+	requests to non-Cygwin processes.
+
 2015-06-08  Takashi Yano  <takashi.yano@nifty.ne.jp>
 
 	* fhandler_tty.cc (fhandler_pty_slave::write): Move causing of SIGHUP
