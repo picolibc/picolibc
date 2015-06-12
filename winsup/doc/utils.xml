@@ -27,18 +27,18 @@
 
       <refsynopsisdiv>
 	<screen>
-Usage: cygcheck [-v] [-h] PROGRAM
-       cygcheck -c [-d] [PACKAGE]
-       cygcheck -s [-r] [-v] [-h]
-       cygcheck -k
-       cygcheck -f FILE [FILE]...
-       cygcheck -l [PACKAGE]...
-       cygcheck -p REGEXP
-       cygcheck --delete-orphaned-installation-keys
-       cygcheck --enable-unique-object-names Cygwin-DLL
-       cygcheck --disable-unique-object-names Cygwin-DLL
-       cygcheck --show-unique-object-names Cygwin-DLL
-       cygcheck -h
+cygcheck [-v] [-h] PROGRAM
+cygcheck -c [-d] [PACKAGE]
+cygcheck -s [-r] [-v] [-h]
+cygcheck -k
+cygcheck -f FILE [FILE]...
+cygcheck -l [PACKAGE]...
+cygcheck -p REGEXP
+cygcheck --delete-orphaned-installation-keys
+cygcheck --enable-unique-object-names Cygwin-DLL
+cygcheck --disable-unique-object-names Cygwin-DLL
+cygcheck --show-unique-object-names Cygwin-DLL
+cygcheck -h
 	</screen>
       </refsynopsisdiv>
 
@@ -291,10 +291,10 @@ are unable to find another Cygwin DLL.
 
     <refsynopsisdiv>
     <screen>
-Usage: cygpath (-d|-m|-u|-w|-t TYPE) [-f FILE] [OPTION]... NAME...
-       cygpath [-c HANDLE]
-       cygpath [-ADHOPSW]
-       cygpath [-F ID]
+cygpath (-d|-m|-u|-w|-t TYPE) [-f FILE] [OPTION]... NAME...
+cygpath [-c HANDLE]
+cygpath [-ADHOPSW]
+cygpath [-F ID]
     </screen>
     </refsynopsisdiv>
 
@@ -466,7 +466,7 @@ explorer $XPATH &
 
     <refsynopsisdiv>
       <screen>
-Usage: dumper [OPTION] FILENAME WIN32PID
+dumper [OPTION] FILENAME WIN32PID
       </screen>
     </refsynopsisdiv>
 
@@ -526,8 +526,8 @@ error_start=x:\path\to\dumper.exe
 
     <refsynopsisdiv>
       <screen>
-Usage: getconf [-v specification] variable_name [pathname]
-       getconf -a [pathname]
+getconf [-v specification] variable_name [pathname]
+getconf -a [pathname]
       </screen>
     </refsynopsisdiv>
 
@@ -590,7 +590,7 @@ Other options:
 
     <refsynopsisdiv>
       <screen>
-Usage: getfacl [-adn] FILE [FILE2...]
+getfacl [-adn] FILE [FILE2...]
       </screen>
     </refsynopsisdiv>
 
@@ -655,8 +655,8 @@ line separates the ACLs for each file.
 
     <refsynopsisdiv>
       <screen>
-Usage: kill [-f] [-signal] [-s signal] pid1 [pid2 ...]
-       kill -l [signal]
+kill [-f] [-signal] [-s signal] pid1 [pid2 ...]
+kill -l [signal]
       </screen>
     </refsynopsisdiv>
 
@@ -772,7 +772,7 @@ SIGUSR2     31    user defined signal 2
 
     <refsynopsisdiv>
       <screen>
-Usage: ldd [OPTION]... FILE...
+ldd [OPTION]... FILE...
       </screen>
     </refsynopsisdiv>
 
@@ -812,9 +812,9 @@ Usage: ldd [OPTION]... FILE...
 
     <refsynopsisdiv>
       <screen>
-Usage: locale [-amvhV]
-   or: locale [-ck] NAME
-   or: locale [-usfnU]
+locale [-amvhV]
+locale [-ck] NAME
+locale [-usfnU]
       </screen>
     </refsynopsisdiv>
 
@@ -977,7 +977,7 @@ bash$ locale noexpr
 
     <refsynopsisdiv>
       <screen>
-Usage: minidumper [OPTION] FILENAME WIN32PID
+minidumper [OPTION] FILENAME WIN32PID
       </screen>
     </refsynopsisdiv>
 
@@ -1030,7 +1030,7 @@ Usage: minidumper [OPTION] FILENAME WIN32PID
 
     <refsynopsisdiv>
       <screen>
-Usage: mkgroup [OPTION]...
+mkgroup [OPTION]...
       </screen>
     </refsynopsisdiv>
 
@@ -1134,7 +1134,7 @@ groups on domain controllers and domain member machines.
 
     <refsynopsisdiv>
       <screen>
-Usage: mkpasswd [OPTIONS]...
+mkpasswd [OPTIONS]...
       </screen>
     </refsynopsisdiv>
 
@@ -1240,9 +1240,9 @@ on domain controllers and domain member machines.
 
     <refsynopsisdiv>
       <screen>
-Usage: mount [OPTION] [&lt;win32path&gt; &lt;posixpath&gt;]
-       mount -a
-       mount &lt;posixpath&gt;
+mount [OPTION] [&lt;win32path&gt; &lt;posixpath&gt;]
+mount -a
+mount &lt;posixpath&gt;
       </screen>
      </refsynopsisdiv>
 
@@ -1507,7 +1507,7 @@ D: on /d type fat (binary,user,noumount)
 
     <refsynopsisdiv>
       <screen>
-Usage: passwd [OPTION] [USER]
+passwd [OPTION] [USER]
       </screen>
     </refsynopsisdiv>
 
@@ -1668,7 +1668,7 @@ specifying an empty password.
 
     <refsynopsisdiv>
       <screen>
-Usage: pldd [OPTION...] PID
+pldd [OPTION...] PID
       </screen>
     </refsynopsisdiv>
 
@@ -1702,7 +1702,7 @@ Usage: pldd [OPTION...] PID
 
     <refsynopsisdiv>
       <screen>
-Usage: ps [-aefls] [-u UID]
+ps [-aefls] [-u UID]
       </screen>
     </refsynopsisdiv>
 
@@ -1775,7 +1775,7 @@ With no options, ps outputs the long format by default
 
     <refsynopsisdiv>
       <screen>
-Usage: regtool [OPTION] (add|check|get|list|remove|unset|load|unload|save) KEY
+regtool [OPTION] (add|check|get|list|remove|unset|load|unload|save) KEY
       </screen>
     </refsynopsisdiv>
 
@@ -1965,8 +1965,8 @@ Example: regtool get '\user\software\Microsoft\Clock\iFormat'
 
     <refsynopsisdiv>
       <screen>
-Usage: setfacl [-r] {-f ACL_FILE | -s acl_entries} FILE...
-       setfacl [-r] {-b|[-d acl_entries] [-m acl_entries]} FILE...
+setfacl [-r] {-f ACL_FILE | -s acl_entries} FILE...
+setfacl [-r] {-b|[-d acl_entries] [-m acl_entries]} FILE...
       </screen>
      </refsynopsisdiv>
 
@@ -2101,7 +2101,7 @@ $ getfacl source_file | setfacl -f - target_file
 
     <refsynopsisdiv>
       <screen>
-Usage: setmetamode [metabit|escprefix]
+setmetamode [metabit|escprefix]
       </screen>
     </refsynopsisdiv>
 
@@ -2141,7 +2141,7 @@ Other options:
 
     <refsynopsisdiv>
       <screen>
-Usage: ssp [options] low_pc high_pc command...
+ssp [options] low_pc high_pc command...
       </screen>
     </refsynopsisdiv>
 
@@ -2315,8 +2315,8 @@ $ ssp <literal>-v</literal> <literal>-s</literal> <literal>-l</literal> <literal
 
     <refsynopsisdiv>
       <screen>
-Usage: strace [OPTIONS] &lt;command-line&gt;
-Usage: strace [OPTIONS] -p &lt;pid&gt;
+strace [OPTIONS] &lt;command-line&gt;
+strace [OPTIONS] -p &lt;pid&gt;
       </screen>
     </refsynopsisdiv>
 
@@ -2410,7 +2410,7 @@ $ strace -o tracing_output -w sh -c 'while true; do echo "tracing..."; done' &am
 
     <refsynopsisdiv>
       <screen>
-Usage: tzset [OPTION]
+tzset [OPTION]
       </screen>
     </refsynopsisdiv>
 
@@ -2456,7 +2456,7 @@ setenv TZ `tzset`
 
     <refsynopsisdiv>
       <screen>
-Usage: umount [OPTION] [&lt;posixpath&gt;]
+umount [OPTION] [&lt;posixpath&gt;]
       </screen>
     </refsynopsisdiv>
 

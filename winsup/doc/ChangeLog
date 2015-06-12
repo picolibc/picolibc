@@ -1,5 +1,9 @@
 2015-06-22  Jon Turney  <jon.turney@dronecode.org.uk>
 
+	* utils.xml: Remove 'Usage' prefix from synopses.
+
+2015-06-22  Jon Turney  <jon.turney@dronecode.org.uk>
+
 	* Makefile.in (intro2man.stamp): Add.
 	* intro.xml: New file.
 
