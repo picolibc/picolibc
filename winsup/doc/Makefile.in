@@ -28,6 +28,7 @@ CC_FOR_TARGET:=@CC@
 XMLTO:=xmlto --skip-validation --with-dblatex
 
 include $(srcdir)/../Makefile.common
+-include Makefile.dep
 
 FAQ_SOURCES:= $(wildcard $(srcdir)/faq*.xml)
 
@@ -61,7 +62,7 @@ install-all: install-pdf install-html
 install-pdf: cygwin-ug-net/cygwin-ug-net.pdf cygwin-api/cygwin-api.pdf
 	@$(MKDIRP) $(DESTDIR)$(docdir)
 	$(INSTALL_DATA) $^ $(DESTDIR)$(docdir)
-	
+
 install-html: cygwin-ug-net/cygwin-ug-net.html cygwin-api/cygwin-api.html
 	@$(MKDIRP) $(DESTDIR)$(htmldir)/cygwin-ug-net
 	$(INSTALL_DATA) cygwin-ug-net/*.html $(DESTDIR)$(htmldir)/cygwin-ug-net
@@ -70,22 +71,22 @@ install-html: cygwin-ug-net/cygwin-ug-net.html cygwin-api/cygwin-api.html
 	$(INSTALL_DATA) cygwin-api/*.html $(DESTDIR)$(htmldir)/cygwin-api
 	$(INSTALL_DATA) cygwin-api/cygwin-api.html $(DESTDIR)$(htmldir)/cygwin-api/index.html
 
-cygwin-ug-net/cygwin-ug-net-nochunks.html.gz : cygwin-ug-net.xml
+cygwin-ug-net/cygwin-ug-net-nochunks.html.gz : $(cygwin-ug-net_SOURCES) cygwin.xsl
 	-$(XMLTO) html-nochunks -m $(srcdir)/cygwin.xsl $<
 	-cp cygwin-ug-net.html cygwin-ug-net/cygwin-ug-net-nochunks.html
 	-rm -f cygwin-ug-net/cygwin-ug-net-nochunks.html.gz
 	-gzip cygwin-ug-net/cygwin-ug-net-nochunks.html
 
-cygwin-ug-net/cygwin-ug-net.html : cygwin-ug-net.xml cygwin.xsl
+cygwin-ug-net/cygwin-ug-net.html : $(cygwin-ug-net_SOURCES) cygwin.xsl
 	-$(XMLTO) html -o cygwin-ug-net/ -m $(srcdir)/cygwin.xsl $<
 
-cygwin-ug-net/cygwin-ug-net.pdf : cygwin-ug-net.xml fo.xsl
+cygwin-ug-net/cygwin-ug-net.pdf : $(cygwin-ug-net_SOURCES) fo.xsl
 	-$(XMLTO) pdf -o cygwin-ug-net/ -m $(srcdir)/fo.xsl $<
 
-cygwin-api/cygwin-api.html : cygwin-api.xml cygwin.xsl
+cygwin-api/cygwin-api.html : $(cygwin-api_SOURCES) cygwin.xsl
 	-$(XMLTO) html -o cygwin-api/ -m $(srcdir)/cygwin.xsl $<
 
-cygwin-api/cygwin-api.pdf : cygwin-api.xml fo.xsl
+cygwin-api/cygwin-api.pdf : $(cygwin-api_SOURCES) fo.xsl
 	-$(XMLTO) pdf -o cygwin-api/ -m $(srcdir)/fo.xsl $<
 
 faq/faq.html : $(FAQ_SOURCES)
@@ -94,5 +95,3 @@ faq/faq.html : $(FAQ_SOURCES)
 
 Makefile.dep: cygwin-ug-net.xml cygwin-api.xml
 	cd $(srcdir) && ./xidepend $^ > "${CURDIR}/$@"
-
--include Makefile.dep

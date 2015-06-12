@@ -1,5 +1,12 @@
 2015-06-12  Jon Turney  <jon.turney@dronecode.org.uk>
 
+	* xidepend: Write a Makefile fragment defining variables
+	containing all the XIncluded sources, rather than a dependency on
+	those sources.
+	* Makefile.in: Use that variable to express the dependency.
+
+2015-06-12  Jon Turney  <jon.turney@dronecode.org.uk>
+
 	* Makefile.in (cygwin-ug-net/cygwin-ug-net.pdf)
 	(cygwin-api/cygwin-api.pdf): Use fo.xsl to customized DocBook
 	XML->PDF conversion.
