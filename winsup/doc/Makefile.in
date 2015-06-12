@@ -80,13 +80,13 @@ cygwin-ug-net/cygwin-ug-net.html : cygwin-ug-net.xml cygwin.xsl
 	-$(XMLTO) html -o cygwin-ug-net/ -m $(srcdir)/cygwin.xsl $<
 
 cygwin-ug-net/cygwin-ug-net.pdf : cygwin-ug-net.xml fo.xsl
-	-$(XMLTO) pdf -o cygwin-ug-net/ $<
+	-$(XMLTO) pdf -o cygwin-ug-net/ -m $(srcdir)/fo.xsl $<
 
 cygwin-api/cygwin-api.html : cygwin-api.xml cygwin.xsl
 	-$(XMLTO) html -o cygwin-api/ -m $(srcdir)/cygwin.xsl $<
 
 cygwin-api/cygwin-api.pdf : cygwin-api.xml fo.xsl
-	-$(XMLTO) pdf -o cygwin-api/ $<
+	-$(XMLTO) pdf -o cygwin-api/ -m $(srcdir)/fo.xsl $<
 
 faq/faq.html : $(FAQ_SOURCES)
 	-$(XMLTO) html -o faq -m $(srcdir)/cygwin.xsl $(srcdir)/faq.xml

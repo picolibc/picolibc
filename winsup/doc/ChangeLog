@@ -1,5 +1,11 @@
 2015-06-12  Jon Turney  <jon.turney@dronecode.org.uk>
 
+	* Makefile.in (cygwin-ug-net/cygwin-ug-net.pdf)
+	(cygwin-api/cygwin-api.pdf): Use fo.xsl to customized DocBook
+	XML->PDF conversion.
+
+2015-06-12  Jon Turney  <jon.turney@dronecode.org.uk>
+
 	* cygwin-ug-net.xml: Remove incorrect unused date.
 	* utils.xml : Remove .exe suffix inconsistently added in a few
 	places.  Tidy up some trailing whitespace.
