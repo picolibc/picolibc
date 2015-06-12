@@ -1,5 +1,12 @@
 2015-06-12  Jon Turney  <jon.turney@dronecode.org.uk>
 
+	* utils.xml : Convert from using a sect2 element to using a
+	refentry element for each utility program.
+	* cygwin.xsl: Customize autotoc to include refentries.
+	* fo.xsl: Ditto.
+
+2015-06-12  Jon Turney  <jon.turney@dronecode.org.uk>
+
 	* Makefile.in (cygwin-ug-net/cygwin-ug-net-nochunks.html.gz):
 	Ensure cygwin-ug-net directory exists.
 

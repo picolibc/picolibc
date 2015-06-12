@@ -13,10 +13,20 @@
     identically. All of the Cygwin command-line utilities support the
     <literal>--help</literal> and <literal>--version</literal> options. </para>
 
-  <sect2 id="cygcheck">
-    <title>cygcheck</title>
+    <refentry id="cygcheck">
+      <refmeta>
+	<refentrytitle>cygcheck</refentrytitle>
+	<manvolnum>1</manvolnum>
+	<refmiscinfo class="manual">Cygwin Utilities</refmiscinfo>
+      </refmeta>
 
-    <screen>
+      <refnamediv>
+	<refname>cygcheck</refname>
+	<refpurpose>List system information, check installed packages, or query package database</refpurpose>
+      </refnamediv>
+
+      <refsynopsisdiv>
+	<screen>
 Usage: cygcheck [-v] [-h] PROGRAM
        cygcheck -c [-d] [PACKAGE]
        cygcheck -s [-r] [-v] [-h]
@@ -29,9 +39,12 @@ Usage: cygcheck [-v] [-h] PROGRAM
        cygcheck --disable-unique-object-names Cygwin-DLL
        cygcheck --show-unique-object-names Cygwin-DLL
        cygcheck -h
+	</screen>
+      </refsynopsisdiv>
 
-List system information, check installed packages, or query package database.
-
+      <refsect1>
+	<title>Options</title>
+	<screen>
 At least one command option or a PROGRAM is required, as shown above.
 
   PROGRAM              list library (DLL) dependencies of PROGRAM
@@ -68,7 +81,10 @@ Note: -c, -f, and -l only report on packages that are currently installed. To
   search all official Cygwin packages use -p instead.  The -p REGEXP matches
   package names, descriptions, and names of files/paths within all packages.
 </screen>
+      </refsect1>
 
+<refsect1>
+  <title>Description</title>
     <para> The <command>cygcheck</command> program is a diagnostic utility for
       dealing with Cygwin programs. If you are familiar with
       <command>dpkg</command> or <command>rpm</command>,
@@ -257,20 +273,34 @@ are unable to find another Cygwin DLL.
       and <literal>--enable-...</literal> options, the
       <literal>--show-unique-object-names</literal> option also works for
       Cygwin DLLs which are currently in use.</para>
+  </refsect1>
 
-  </sect2>
+  </refentry>
 
-  <sect2 id="cygpath">
-    <title>cygpath</title>
+  <refentry id="cygpath">
+    <refmeta>
+      <refentrytitle>cygpath</refentrytitle>
+      <manvolnum>1</manvolnum>
+      <refmiscinfo class="manual">Cygwin Utilities</refmiscinfo>
+    </refmeta>
 
+    <refnamediv>
+      <refname>cygpath</refname>
+      <refpurpose>Convert Unix and Windows format paths, or output system path information</refpurpose>
+    </refnamediv>
+
+    <refsynopsisdiv>
     <screen>
 Usage: cygpath (-d|-m|-u|-w|-t TYPE) [-f FILE] [OPTION]... NAME...
        cygpath [-c HANDLE]
        cygpath [-ADHOPSW]
        cygpath [-F ID]
+    </screen>
+    </refsynopsisdiv>
 
-Convert Unix and Windows format paths, or output system path information
-
+    <refsect1>
+      <title>Options</title>
+    <screen>
 Output type options:
 
   -d, --dos             print DOS (short) form of NAMEs (C:\PROGRA~1\)
@@ -312,7 +342,10 @@ Other options:
   -h, --help            output usage information and exit
   -V, --version         output version information and exit
 </screen>
+    </refsect1>
 
+    <refsect1>
+      <title>Description</title>
     <para>The <command>cygpath</command> program is a utility that converts
       Windows native filenames to Cygwin POSIX-style pathnames and vice versa.
       It can be used when a Cygwin program needs to pass a file name to a
@@ -416,23 +449,39 @@ explorer $XPATH &
       (CDBurn area). By default the output is in UNIX (POSIX) format; use the
       <literal>-w</literal> or <literal>-d</literal> options to get other
       formats.</para>
+    </refsect1>
+  </refentry>
 
-  </sect2>
+  <refentry id="dumper">
+    <refmeta>
+      <refentrytitle>dumper</refentrytitle>
+      <manvolnum>1</manvolnum>
+      <refmiscinfo class="manual">Cygwin Utilities</refmiscinfo>
+    </refmeta>
 
-  <sect2 id="dumper">
-    <title>dumper</title>
+    <refnamediv>
+      <refname>dumper</refname>
+      <refpurpose>Dump core from WIN32PID to FILENAME.core</refpurpose>
+    </refnamediv>
 
-    <screen>
+    <refsynopsisdiv>
+      <screen>
 Usage: dumper [OPTION] FILENAME WIN32PID
+      </screen>
+    </refsynopsisdiv>
 
-Dump core from WIN32PID to FILENAME.core
-
+    <refsect1>
+      <title>Options</title>
+      <screen>
 -d, --verbose  be verbose while dumping
 -h, --help     output help information and exit
 -q, --quiet    be quiet while dumping (default)
 -V, --version  output version information and exit
 </screen>
+    </refsect1>
 
+    <refsect1>
+      <title>Description</title>
     <para>The <command>dumper</command> utility can be used to create a core
       dump of running Windows process. This core dump can be later loaded to
       <command>gdb</command> and analyzed. One common way to use
@@ -460,18 +509,31 @@ error_start=x:\path\to\dumper.exe
       dump on one machine and try to debug it on another, you'll need to place
       identical copies of the executable and dlls in the same directories as on
       the machine where the core dump was created. </para>
+    </refsect1>
+  </refentry>
 
-  </sect2>
+  <refentry id="getconf">
+    <refmeta>
+      <refentrytitle>getconf</refentrytitle>
+      <manvolnum>1</manvolnum>
+      <refmiscinfo class="manual">Cygwin Utilities</refmiscinfo>
+    </refmeta>
 
-  <sect2 id="getconf">
-    <title>getconf</title>
+    <refnamediv>
+      <refname>getconf</refname>
+      <refpurpose>Get configuration values</refpurpose>
+    </refnamediv>
 
-    <screen>
+    <refsynopsisdiv>
+      <screen>
 Usage: getconf [-v specification] variable_name [pathname]
        getconf -a [pathname]
+      </screen>
+    </refsynopsisdiv>
 
-Get configuration values
-
+    <refsect1>
+      <title>Options</title>
+      <screen>
   -v specification     Indicate specific version for which configuration
                        values shall be fetched.
   -a, --all            Print all known configuration values
@@ -481,7 +543,10 @@ Other options:
   -h, --help           This text
   -V, --version        Print program version and exit
 </screen>
+    </refsect1>
 
+    <refsect1>
+      <title>Description</title>
     <para>The <command>getconf</command> utility prints the value of the
       configuration variable specified by <literal>variable_name</literal>. If
       no <literal>pathname</literal> is given, <command>getconf</command>
@@ -508,17 +573,30 @@ Other options:
     <para>Use the <literal>-a</literal> option to print a list of all available
       configuration variables for the system, or given
       <literal>pathname</literal>, and their values.</para>
+    </refsect1>
+  </refentry>
 
-  </sect2>
+  <refentry id="getfacl">
+    <refmeta>
+      <refentrytitle>getfacl</refentrytitle>
+      <manvolnum>1</manvolnum>
+      <refmiscinfo class="manual">Cygwin Utilities</refmiscinfo>
+    </refmeta>
 
-  <sect2 id="getfacl">
-    <title>getfacl</title>
+    <refnamediv>
+      <refname>getfacl</refname>
+      <refpurpose>Display file and directory access control lists (ACLs)</refpurpose>
+    </refnamediv>
 
-    <screen>
+    <refsynopsisdiv>
+      <screen>
 Usage: getfacl [-adn] FILE [FILE2...]
+      </screen>
+    </refsynopsisdiv>
 
-Display file and directory access control lists (ACLs).
-
+    <refsect1>
+      <title>Options</title>
+      <screen>
   -a, --access   display the file access control list
   -d, --default  display the default access control list
   -h, --help     print help explaining the command line options
@@ -528,7 +606,10 @@ Display file and directory access control lists (ACLs).
 When multiple files are specified on the command line, a blank
 line separates the ACLs for each file.
 </screen>
+    </refsect1>
 
+    <refsect1>
+      <title>Description</title>
     <para> For each argument that is a regular file, special file or directory,
       <command>getfacl</command> displays the owner, the group, and the ACL.
       For directories <command>getfacl</command> displays additionally the
@@ -557,24 +638,41 @@ line separates the ACLs for each file.
      default:other:perm
 </screen>
     </para>
-  </sect2>
+    </refsect1>
+  </refentry>
 
-  <sect2 id="kill">
-    <title>kill</title>
+  <refentry id="kill">
+    <refmeta>
+      <refentrytitle>kill</refentrytitle>
+      <manvolnum>1</manvolnum>
+      <refmiscinfo class="manual">Cygwin Utilities</refmiscinfo>
+    </refmeta>
 
-    <screen>
+    <refnamediv>
+      <refname>kill</refname>
+      <refpurpose>Send signals to processes</refpurpose>
+    </refnamediv>
+
+    <refsynopsisdiv>
+      <screen>
 Usage: kill [-f] [-signal] [-s signal] pid1 [pid2 ...]
        kill -l [signal]
+      </screen>
+    </refsynopsisdiv>
 
-Send signals to processes
-
+    <refsect1>
+      <title>Options</title>
+      <screen>
  -f, --force     force, using win32 interface if necessary
  -l, --list      print a list of signal names
  -s, --signal    send signal (use kill --list for a list)
  -h, --help      output usage information and exit
  -V, --version   output version information and exit
 </screen>
+    </refsect1>
 
+    <refsect1>
+      <title>Description</title>
     <para>The <command>kill</command> program allows you to send arbitrary
       signals to other Cygwin programs. The usual purpose is to end a running
       program from some other window when ^C won't work, but you can also send
@@ -657,17 +755,30 @@ SIGPWR      29    power failure
 SIGUSR1     30    user defined signal 1
 SIGUSR2     31    user defined signal 2
 </screen>
+    </refsect1>
+  </refentry>
 
-  </sect2>
+  <refentry id="ldd">
+    <refmeta>
+      <refentrytitle>ldd</refentrytitle>
+      <manvolnum>1</manvolnum>
+      <refmiscinfo class="manual">Cygwin Utilities</refmiscinfo>
+    </refmeta>
 
-  <sect2 id="ldd">
-    <title>ldd</title>
+    <refnamediv>
+      <refname>ldd</refname>
+      <refpurpose>Print shared library dependencies</refpurpose>
+    </refnamediv>
 
-    <screen>
+    <refsynopsisdiv>
+      <screen>
 Usage: ldd [OPTION]... FILE...
+      </screen>
+    </refsynopsisdiv>
 
-Print shared library dependencies
-
+    <refsect1>
+      <title>Options</title>
+      <screen>
   -h, --help              print this help and exit
   -V, --version           print version information and exit
   -r, --function-relocs   process data and function relocations
@@ -677,23 +788,39 @@ Print shared library dependencies
   -v, --verbose           print all information
                           (currently unimplemented)
 </screen>
+    </refsect1>
 
+    <refsect1>
+      <title>Description</title>
     <para><command>ldd</command> prints the shared libraries (DLLs) an
       executable or DLL is linked against. No modifying option is implemented
       yet.</para>
+    </refsect1>
+  </refentry>
 
-  </sect2>
+  <refentry id="locale">
+    <refmeta>
+      <refentrytitle>locale</refentrytitle>
+      <manvolnum>1</manvolnum>
+      <refmiscinfo class="manual">Cygwin Utilities</refmiscinfo>
+    </refmeta>
 
-  <sect2 id="locale">
-    <title>locale</title>
+    <refnamediv>
+      <refname>locale</refname>
+      <refpurpose>Get locale-specific information</refpurpose>
+    </refnamediv>
 
-    <screen>
+    <refsynopsisdiv>
+      <screen>
 Usage: locale [-amvhV]
    or: locale [-ck] NAME
    or: locale [-usfnU]
+      </screen>
+    </refsynopsisdiv>
 
-Get locale-specific information.
-
+    <refsect1>
+      <title>Options</title>
+      <screen>
 System information:
 
   -a, --all-locales    List all available supported locales
@@ -719,7 +846,10 @@ Other options:
   -h, --help           This text
   -V, --version        Print program version and exit
 </screen>
+    </refsect1>
 
+    <refsect1>
+      <title>Description</title>
     <para><command>locale</command> without parameters prints information about
       the current locale environment settings.</para>
 
@@ -829,17 +959,31 @@ nostr="no"
 messages-codeset="UTF-8"
 bash$ locale noexpr
 ^[nN]
-</screen>
+    </screen>
+    </refsect1>
+  </refentry>
 
-  </sect2>
+  <refentry id="minidumper">
+      <refmeta>
+      <refentrytitle>minidumper</refentrytitle>
+      <manvolnum>1</manvolnum>
+      <refmiscinfo class="manual">Cygwin Utilities</refmiscinfo>
+      </refmeta>
 
-  <sect2 id="minidumper"><title>minidumper</title>
+    <refnamediv>
+      <refname>minidumper</refname>
+      <refpurpose>Write minidump from WIN32PID to FILENAME.dmp</refpurpose>
+    </refnamediv>
 
-  <screen>
+    <refsynopsisdiv>
+      <screen>
 Usage: minidumper [OPTION] FILENAME WIN32PID
+      </screen>
+    </refsynopsisdiv>
 
-Write minidump from WIN32PID to FILENAME.dmp
-
+    <refsect1>
+      <title>Options</title>
+      <screen>
 -t, --type     minidump type flags
 -n, --nokill   don't terminate the dumped process
 -d, --verbose  be verbose while dumping
@@ -847,7 +991,10 @@ Write minidump from WIN32PID to FILENAME.dmp
 -q, --quiet    be quiet while dumping (default)
 -V, --version  output version information and exit
   </screen>
+    </refsect1>
 
+    <refsect1>
+      <title>Description</title>
   <para>
     The <command>minidumper</command> utility can be used to create a
     minidump of a running Windows process.  This minidump can be later
@@ -866,20 +1013,30 @@ Write minidump from WIN32PID to FILENAME.dmp
     <command>dumper</command> the target process is terminated after dumping
     unless the <literal>-n</literal> option is given.
   </para>
+    </refsect1>
+  </refentry>
 
-  </sect2>
+  <refentry id="mkgroup">
+    <refmeta>
+      <refentrytitle>mkgroup</refentrytitle>
+      <manvolnum>1</manvolnum>
+      <refmiscinfo class="manual">Cygwin Utilities</refmiscinfo>
+    </refmeta>
 
-  <sect2 id="mkgroup">
-    <title>mkgroup</title>
+    <refnamediv>
+      <refname>mkgroup</refname>
+      <refpurpose>Write /etc/group-like output to stdout</refpurpose>
+    </refnamediv>
 
-    <screen>
+    <refsynopsisdiv>
+      <screen>
 Usage: mkgroup [OPTION]...
+      </screen>
+    </refsynopsisdiv>
 
-Write /etc/group-like output to stdout
-
-Don't use this command to generate a local /etc/group file, unless you
-really need one.  See the Cygwin User's Guide for more information.
-
+    <refsect1>
+      <title>Options</title>
+      <screen>
 Options:
 
    -l,--local [machine]    Print local group accounts of \"machine\",
@@ -906,6 +1063,13 @@ Options:
 Default is to print local groups on stand-alone machines, plus domain
 groups on domain controllers and domain member machines.
 </screen>
+    </refsect1>
+
+    <refsect1>
+      <title>Description</title>
+     <para>Don't use this command to generate a local /etc/group file, unless you
+     really need one.  See the Cygwin User's Guide for more information.
+     </para>
 
     <para>The <command>mkgroup</command> program can be used to create a local
       <filename>/etc/group</filename> file.  Cygwin doesn't need this file,
@@ -953,21 +1117,31 @@ groups on domain controllers and domain member machines.
       samba-server</literal> or <literal>-L samba-server</literal>. The normal
       UNIX groups are usually not enumerated, but they can show up as a group
       in <command>ls -l</command> output. </para>
+    </refsect1>
+  </refentry>
 
-  </sect2>
+  <refentry id="mkpasswd">
+    <refmeta>
+      <refentrytitle>mkpasswd</refentrytitle>
+      <manvolnum>1</manvolnum>
+      <refmiscinfo class="manual">Cygwin Utilities</refmiscinfo>
+    </refmeta>
 
-  <sect2 id="mkpasswd">
-    <title>mkpasswd</title>
+    <refnamediv>
+      <refname>mkpasswd</refname>
+      <refpurpose>Write /etc/passwd-like output to stdout</refpurpose>
+    </refnamediv>
 
-    <screen>
+    <refsynopsisdiv>
+      <screen>
 Usage: mkpasswd [OPTIONS]...
+      </screen>
+    </refsynopsisdiv>
 
-Write /etc/passwd-like output to stdout
-
-Don't use this command to generate a local /etc/passwd file, unless you
-really need one.  See the Cygwin User's Guide for more information.
-
-Options:
+    <refsect1>
+      <title>Options</title>
+      <screen>
+    Options:
 
    -l,--local [machine]    Print local user accounts of \"machine\",
                            from local machine if no machine specified.
@@ -996,6 +1170,12 @@ Options:
 Default is to print local accounts on stand-alone machines, domain accounts
 on domain controllers and domain member machines.
 </screen>
+    </refsect1>
+
+    <refsect1>
+      <title>Description</title>
+    <para>Don't use this command to generate a local /etc/passwd file, unless you
+    really need one.  See the Cygwin User's Guide for more information.</para>
 
     <para>The <command>mkpasswd</command> program can be used to create a
       <filename>/etc/passwd</filename> file.  Cygwin doesn't need this file,
@@ -1043,19 +1223,32 @@ on domain controllers and domain member machines.
       samba-server</literal>. The normal UNIX users are usually not enumerated,
       but they can show up as file owners in <command>ls -l</command> output.
       </para>
+    </refsect1>
+  </refentry>
 
-  </sect2>
+  <refentry id="mount">
+    <refmeta>
+      <refentrytitle>mount</refentrytitle>
+      <manvolnum>1</manvolnum>
+      <refmiscinfo class="manual">Cygwin Utilities</refmiscinfo>
+    </refmeta>
 
-  <sect2 id="mount">
-    <title>mount</title>
+    <refnamediv>
+      <refname>mount</refname>
+      <refpurpose>Display information about mounted filesystems, or mount a filesystem</refpurpose>
+    </refnamediv>
 
-    <screen>
+    <refsynopsisdiv>
+      <screen>
 Usage: mount [OPTION] [&lt;win32path&gt; &lt;posixpath&gt;]
        mount -a
        mount &lt;posixpath&gt;
+      </screen>
+     </refsynopsisdiv>
 
-Display information about mounted filesystems, or mount a filesystem
-
+    <refsect1>
+      <title>Options</title>
+    <screen>
   -a, --all                     mount all filesystems mentioned in fstab
   -c, --change-cygdrive-prefix  change the cygdrive path prefix to &lt;posixpath&gt;
   -f, --force                   force mount, don't warn about missing mount
@@ -1067,7 +1260,10 @@ Display information about mounted filesystems, or mount a filesystem
   -p, --show-cygdrive-prefix    show user and/or system cygdrive path prefix
   -V, --version                 output version information and exit
 </screen>
+    </refsect1>
 
+    <refsect1>
+      <title>Description</title>
     <para>The <command>mount</command> program is used to map your drives and
       shares onto Cygwin's simulated POSIX directory tree, much like as is done
       by mount commands on typical UNIX systems. However, in contrast to mount
@@ -1078,7 +1274,7 @@ Display information about mounted filesystems, or mount a filesystem
       the Cygwin POSIX file system and strategies for using mounts. To remove
       mounts temporarily, use <command>umount</command></para>
 
-    <sect3 id="utils-mount">
+    <refsect2 id="utils-mount">
       <title>Using mount</title>
 
       <para>If you just type <command>mount</command> with no parameters, it
@@ -1223,9 +1419,9 @@ D: on /d type fat (binary,user,noumount)
         <filename>/etc/fstab</filename> to restore the old state. It also makes
         moving your settings to a different machine much easier.</para>
 
-    </sect3>
+    </refsect2>
 
-    <sect3 id="utils-cygdrive">
+    <refsect2 id="utils-cygdrive">
       <title>Cygdrive mount points</title>
 
       <para>Whenever Cygwin cannot use any of the existing mounts to convert
@@ -1264,9 +1460,9 @@ D: on /d type fat (binary,user,noumount)
       </example>
 
 
-    </sect3>
+    </refsect2>
 
-    <sect3 id="utils-limitations">
+    <refsect2 id="utils-limitations">
       <title>Limitations</title>
 
       <para>Limitations: there is a hard-coded limit of 64 mount points (up to
@@ -1293,18 +1489,31 @@ D: on /d type fat (binary,user,noumount)
         or <command>echo *</command> command and <command>find .</command> will
         not find <filename>mtpt</filename>. </para>
 
-    </sect3>
+    </refsect2>
+    </refsect1>
+  </refentry>
 
-  </sect2>
+  <refentry id="passwd">
+    <refmeta>
+      <refentrytitle>passwd</refentrytitle>
+      <manvolnum>1</manvolnum>
+      <refmiscinfo class="manual">Cygwin Utilities</refmiscinfo>
+    </refmeta>
 
-  <sect2 id="passwd">
-    <title>passwd</title>
+    <refnamediv>
+      <refname>passwd</refname>
+      <refpurpose>Change USER's password or password attributes.</refpurpose>
+    </refnamediv>
 
-    <screen>
+    <refsynopsisdiv>
+      <screen>
 Usage: passwd [OPTION] [USER]
+      </screen>
+    </refsynopsisdiv>
 
-Change USER's password or password attributes.
-
+    <refsect1>
+      <title>Options</title>
+      <screen>
 User operations:
   -l, --lock               lock USER's account.
   -u, --unlock             unlock USER's account.
@@ -1346,7 +1555,10 @@ Don't use this feature if you don't need network access within a remote
 session.  You can delete your stored password by using `passwd -R' and
 specifying an empty password.
 </screen>
+    </refsect1>
 
+    <refsect1>
+      <title>Description</title>
     <para> <command>passwd</command> changes passwords for user accounts. A
       normal user may only change the password for their own account, but
       administrators may change passwords on any account.
@@ -1439,35 +1651,64 @@ specifying an empty password.
 
     <para>Limitations: Users may not be able to change their password on some
       systems.</para>
+    </refsect1>
+  </refentry>
 
-  </sect2>
+  <refentry id="pldd">
+    <refmeta>
+      <refentrytitle>pldd</refentrytitle>
+      <manvolnum>1</manvolnum>
+      <refmiscinfo class="manual">Cygwin Utilities</refmiscinfo>
+    </refmeta>
 
-  <sect2 id="pldd">
-    <title>pldd</title>
+    <refnamediv>
+      <refname>pldd</refname>
+      <refpurpose>List dynamic shared objects loaded into a process</refpurpose>
+    </refnamediv>
 
-    <screen>
+    <refsynopsisdiv>
+      <screen>
 Usage: pldd [OPTION...] PID
+      </screen>
+    </refsynopsisdiv>
 
-List dynamic shared objects loaded into a process.
-
+    <refsect1>
+      <title>Options</title>
+      <screen>
   -?, --help                 Give this help list
       --usage                Give a short usage message
   -V, --version              Print program version
 </screen>
+    </refsect1>
 
+    <refsect1>
+      <title>Description</title>
     <para><command>pldd</command> prints the shared libraries (DLLs) loaded by
       the process with the given PID.</para>
+    </refsect1>
+  </refentry>
 
-  </sect2>
+  <refentry id="ps">
+    <refmeta>
+      <refentrytitle>ps</refentrytitle>
+      <manvolnum>1</manvolnum>
+      <refmiscinfo class="manual">Cygwin Utilities</refmiscinfo>
+    </refmeta>
 
-  <sect2 id="ps">
-    <title>ps</title>
+    <refnamediv>
+      <refname>ps</refname>
+      <refpurpose>Report process status</refpurpose>
+    </refnamediv>
 
-    <screen>
+    <refsynopsisdiv>
+      <screen>
 Usage: ps [-aefls] [-u UID]
+      </screen>
+    </refsynopsisdiv>
 
-Report process status
-
+    <refsect1>
+      <title>Options</title>
+      <screen>
  -a, --all       show processes of all users
  -e, --everyone  show processes of all users
  -f, --full      show process uids, ppids
@@ -1480,7 +1721,10 @@ Report process status
  -W, --windows   show windows as well as cygwin processes
 With no options, ps outputs the long format by default
 </screen>
+    </refsect1>
 
+    <refsect1>
+      <title>Description</title>
     <para>The <command>ps</command> program gives the status of all the Cygwin
       processes running on the system (ps = "process status"). Due to the
       limitations of simulating a POSIX environment under Windows, there is
@@ -1514,17 +1758,30 @@ With no options, ps outputs the long format by default
       non-Cygwin Windows processes as well as Cygwin processes. The WINPID is
       also the PID, and they can be killed with the Cygwin
       <command>kill</command> command's <literal>-f</literal> option. </para>
+    </refsect1>
+  </refentry>
 
-  </sect2>
+  <refentry id="regtool">
+    <refmeta>
+      <refentrytitle>regtool</refentrytitle>
+      <manvolnum>1</manvolnum>
+      <refmiscinfo class="manual">Cygwin Utilities</refmiscinfo>
+    </refmeta>
 
-  <sect2 id="regtool">
-    <title>regtool</title>
+    <refnamediv>
+      <refname>regtool</refname>
+      <refpurpose>View or edit the Windows registry</refpurpose>
+    </refnamediv>
 
-    <screen>
+    <refsynopsisdiv>
+      <screen>
 Usage: regtool [OPTION] (add|check|get|list|remove|unset|load|unload|save) KEY
+      </screen>
+    </refsynopsisdiv>
 
-View or edit the Win32 registry
-
+    <refsect1>
+      <title>Options</title>
+      <screen>
 Actions:
 
  add KEY\SUBKEY             add new SUBKEY
@@ -1592,7 +1849,10 @@ You can use forward slash ('/') as a separator instead of backslash, in
 that case backslash is treated as escape character
 Example: regtool get '\user\software\Microsoft\Clock\iFormat'
 </screen>
+    </refsect1>
 
+    <refsect1>
+      <title>Description</title>
     <para>The <command>regtool</command> program allows shell scripts to access
       and modify the Windows registry. Note that modifying the Windows registry
       is dangerous, and carelessness here can result in an unusable system. Be
@@ -1688,19 +1948,31 @@ Example: regtool get '\user\software\Microsoft\Clock\iFormat'
     <para> By default, the last "\" or "/" is assumed to be the separator
       between the key and the value. You can use the <literal>-K</literal>
       option to provide an alternate key/value separator character. </para>
+    </refsect1>
+  </refentry>
 
-  </sect2>
+  <refentry id="setfacl">
+    <refmeta>
+      <refentrytitle>setfacl</refentrytitle>
+      <manvolnum>1</manvolnum>
+      <refmiscinfo class="manual">Cygwin Utilities</refmiscinfo>
+    </refmeta>
 
-  <sect2 id="setfacl">
-    <title>setfacl</title>
+    <refnamediv>
+      <refname>setfacl</refname>
+      <refpurpose>Modify file and directory access control lists (ACLs)</refpurpose>
+    </refnamediv>
 
-    <screen>
+    <refsynopsisdiv>
+      <screen>
 Usage: setfacl [-r] {-f ACL_FILE | -s acl_entries} FILE...
        setfacl [-r] {-b|[-d acl_entries] [-m acl_entries]} FILE...
+      </screen>
+     </refsynopsisdiv>
 
-
-Modify file and directory access control lists (ACLs)
-
+    <refsect1>
+      <title>Options</title>
+      <screen>
   -b, --remove-all remove all extended ACL entries
   -d, --delete     delete one or more specified ACL entries
   -f, --file       set ACL entries for FILE to ACL entries read
@@ -1717,7 +1989,10 @@ Modify file and directory access control lists (ACLs)
 
 At least one of (-b, -d, -f, -k, -m, -s) must be specified
 </screen>
+    </refsect1>
 
+    <refsect1>
+      <title>Description</title>
     <para> For each file given as parameter, <command>setfacl</command> will
       either replace its complete ACL (<literal>-s</literal>,
       <literal>-f</literal>), or it will add, modify, or delete ACL entries.
@@ -1809,17 +2084,32 @@ $ getfacl source_file | setfacl -f - target_file
       directory that contains default ACL entries will have permissions
       according to the combination of the current umask, the explicit
       permissions requested and the default ACL entries </para>
-  </sect2>
+    </refsect1>
+  </refentry>
 
-  <sect2 id="setmetamode">
-    <title>setmetamode</title>
+  <refentry id="setmetamode">
+    <refmeta>
+      <refentrytitle>setmetamode</refentrytitle>
+      <manvolnum>1</manvolnum>
+      <refmiscinfo class="manual">Cygwin Utilities</refmiscinfo>
+    </refmeta>
 
-    <screen>
+    <refnamediv>
+      <refname>setmetamode</refname>
+      <refpurpose>Get or set keyboard meta mode</refpurpose>
+    </refnamediv>
+
+    <refsynopsisdiv>
+      <screen>
 Usage: setmetamode [metabit|escprefix]
+      </screen>
+    </refsynopsisdiv>
 
-Get or set keyboard meta mode
-
+    <refsect1>
+      <title>Options</title>
+      <screen>
   Without argument, it shows the current meta key mode.
+
   metabit|meta|bit     The meta key sets the top bit of the character.
   escprefix|esc|prefix The meta key sends an escape prefix.
 
@@ -1828,20 +2118,36 @@ Other options:
   -h, --help           This text
   -V, --version        Print program version and exit
 </screen>
+    </refsect1>
 
+    <refsect1>
+      <title>Description</title>
     <para><command>setmetamode</command> can be used to determine and set the
       key code sent by the meta (aka <literal>Alt</literal>) key.</para>
+    </refsect1>
+  </refentry>
 
-  </sect2>
+  <refentry id="ssp">
+    <refmeta>
+      <refentrytitle>ssp</refentrytitle>
+      <manvolnum>1</manvolnum>
+      <refmiscinfo class="manual">Cygwin Utilities</refmiscinfo>
+    </refmeta>
 
-  <sect2 id="ssp">
-    <title>ssp</title>
+    <refnamediv>
+      <refname>ssp</refname>
+      <refpurpose>Single-step profile COMMAND</refpurpose>
+    </refnamediv>
 
-    <screen>
+    <refsynopsisdiv>
+      <screen>
 Usage: ssp [options] low_pc high_pc command...
+      </screen>
+    </refsynopsisdiv>
 
-Single-step profile COMMAND
-
+    <refsect1>
+      <title>Options</title>
+      <screen>
  -c, --console-trace  trace every EIP value to the console. *Lots* slower.
  -d, --disable        disable single-stepping by default; use
                       OutputDebugString ("ssp on") to enable stepping
@@ -1859,7 +2165,10 @@ Single-step profile COMMAND
 
 Example: ssp 0x401000 0x403000 hello.exe
 </screen>
+    </refsect1>
 
+    <refsect1>
+      <title>Description</title>
     <para> SSP - The Single Step Profiler </para>
 
     <para> Original Author: DJ Delorie </para>
@@ -1989,17 +2298,31 @@ Each sample counts as 0.01 seconds.
 $ ssp <literal>-v</literal> <literal>-s</literal> <literal>-l</literal> <literal>-d</literal> 0x61001000 0x61080000 hello.exe
 </screen>
     </para>
-  </sect2>
+  </refsect1>
+  </refentry>
 
-  <sect2 id="strace">
-    <title>strace</title>
+  <refentry id="strace">
+    <refmeta>
+      <refentrytitle>strace</refentrytitle>
+      <manvolnum>1</manvolnum>
+      <refmiscinfo class="manual">Cygwin Utilities</refmiscinfo>
+    </refmeta>
 
-    <screen>
+    <refnamediv>
+      <refname>strace</refname>
+      <refpurpose>Trace system calls and signals</refpurpose>
+    </refnamediv>
+
+    <refsynopsisdiv>
+      <screen>
 Usage: strace [OPTIONS] &lt;command-line&gt;
 Usage: strace [OPTIONS] -p &lt;pid&gt;
+      </screen>
+    </refsynopsisdiv>
 
-Trace system calls and signals
-
+    <refsect1>
+      <title>Options</title>
+      <screen>
   -b, --buffer-size=SIZE       set size of output file buffer
   -d, --no-delta               don't display the delta-t microsecond timestamp
   -e, --events                 log all Windows DEBUG_EVENTS (toggle - default true)
@@ -2050,7 +2373,10 @@ Trace system calls and signals
     special  0x100000 (_STRACE_SPECIAL)  Special debugging printfs for
                                          non-checked-in code
 </screen>
+    </refsect1>
 
+    <refsect1>
+      <title>Description</title>
     <para>The <command>strace</command> program executes a program, and
       optionally the children of the program, reporting any Cygwin DLL output
       from the program(s) to stdout, or to a file with the
@@ -2067,51 +2393,84 @@ $ strace -o tracing_output -w sh -c 'while true; do echo "tracing..."; done' &am
       <command>cygcheck</command>). As a result it does not understand
       symlinks. This program is mainly useful for debugging the Cygwin DLL
       itself.</para>
+    </refsect1>
+  </refentry>
 
-  </sect2>
+  <refentry id="tzset">
+    <refmeta>
+      <refentrytitle>tzset</refentrytitle>
+      <manvolnum>1</manvolnum>
+      <refmiscinfo class="manual">Cygwin Utilities</refmiscinfo>
+    </refmeta>
 
-  <sect2 id="tzset">
-    <title>tzset</title>
+    <refnamediv>
+      <refname>tzset</refname>
+      <refpurpose>Print POSIX-compatible timezone ID from current Windows timezone setting</refpurpose>
+    </refnamediv>
 
-    <screen>
+    <refsynopsisdiv>
+      <screen>
 Usage: tzset [OPTION]
+      </screen>
+    </refsynopsisdiv>
 
-Print POSIX-compatible timezone ID from current Windows timezone setting
-
+    <refsect1>
+      <title>Options</title>
+      <screen>
 Options:
   -h, --help               output usage information and exit.
   -V, --version            output version information and exit.
+      </screen>
+    </refsect1>
 
-Use tzset to set your TZ variable. In POSIX-compatible shells like bash,
-dash, mksh, or zsh:
-
-      export TZ=$(tzset)
-
-In csh-compatible shells like tcsh:
-
-      setenv TZ `tzset`
-</screen>
+    <refsect1>
+      <title>Description</title>
+      Use tzset to set your TZ variable. In POSIX-compatible shells like bash,
+      dash, mksh, or zsh:
+      <screen>
+export TZ=$(tzset)
+      </screen>
+      In csh-compatible shells like tcsh:
+      <screen>
+setenv TZ `tzset`
+      </screen>
 
     <para>The <command>tzset</command> tool reads the current timezone from
       Windows and generates a POSIX-compatible timezone information for the TZ
       environment variable from that information. That's all there is to it.
       For the way how to use it, see the above usage information.</para>
+    </refsect1>
+  </refentry>
 
-  </sect2>
+  <refentry id="umount">
+    <refmeta>
+      <refentrytitle>umount</refentrytitle>
+      <manvolnum>1</manvolnum>
+      <refmiscinfo class="manual">Cygwin Utilities</refmiscinfo>
+    </refmeta>
 
-  <sect2 id="umount">
-    <title>umount</title>
+    <refnamediv>
+      <refname>umount</refname>
+      <refpurpose>Unmount filesystems</refpurpose>
+    </refnamediv>
 
-    <screen>
+    <refsynopsisdiv>
+      <screen>
 Usage: umount [OPTION] [&lt;posixpath&gt;]
+      </screen>
+    </refsynopsisdiv>
 
-Unmount filesystems
-
+    <refsect1>
+      <title>Options</title>
+      <screen>
   -h, --help                    output usage information and exit
   -U, --remove-user-mounts      remove all user mounts
   -V, --version                 output version information and exit
 </screen>
+    </refsect1>
 
+    <refsect1>
+      <title>Description</title>
     <para>The <command>umount</command> program removes mounts from the mount
       table in the current session. If you specify a POSIX path that
       corresponds to a current mount point, <command>umount</command> will
@@ -2121,6 +2480,7 @@ Unmount filesystems
 
     <para>See <xref linkend="mount-table"/> for more information on the mount
       table.</para>
-  </sect2>
+    </refsect1>
+  </refentry>
 
 </sect1>

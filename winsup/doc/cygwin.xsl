@@ -10,4 +10,17 @@
 <xsl:param name="root.filename" select="@id" />
 <xsl:param name="toc.section.depth" select="4" />
 
+<!-- autotoc.xsl customization to make refentry in sect1 appear in toc -->
+<xsl:template match="sect1" mode="toc">
+  <xsl:param name="toc-context" select="."/>
+  <xsl:call-template name="subtoc">
+    <xsl:with-param name="toc-context" select="$toc-context"/>
+    <xsl:with-param name="nodes" select="sect2|refentry
+                                         |bridgehead[$bridgehead.in.toc != 0]"/>
+  </xsl:call-template>
+</xsl:template>
+
+<!-- suppress refentry in toc being annotated with refpurpose -->
+<xsl:param name="annotate.toc" select="0" />
+
 </xsl:stylesheet>

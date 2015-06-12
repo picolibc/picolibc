@@ -29,4 +29,40 @@
 	<!-- Inform the DocBook stylesheets that it's safe to use FOP
 	     specific extensions. -->
 	<xsl:param name="fop1.extensions" select="1"/>
+
+	<!-- autotoc.xsl customization to make refentry in sect1 appear in toc -->
+<xsl:template match="sect1" mode="toc">
+  <xsl:param name="toc-context" select="."/>
+
+  <xsl:variable name="id">
+    <xsl:call-template name="object.id"/>
+  </xsl:variable>
+
+  <xsl:variable name="cid">
+    <xsl:call-template name="object.id">
+      <xsl:with-param name="object" select="$toc-context"/>
+    </xsl:call-template>
+  </xsl:variable>
+
+  <xsl:call-template name="toc.line">
+    <xsl:with-param name="toc-context" select="$toc-context"/>
+  </xsl:call-template>
+
+  <xsl:variable name="depth.from.context" select="count(ancestor::*)-count($toc-context/ancestor::*)"/>
+
+  <xsl:if test="$toc.section.depth > 1
+                and $toc.max.depth > $depth.from.context">
+    <fo:block id="toc.{$cid}.{$id}">
+      <xsl:attribute name="margin-{$direction.align.start}">
+        <xsl:call-template name="set.toc.indent"/>
+      </xsl:attribute>
+
+      <xsl:apply-templates select="refentry|sect2|qandaset[$qanda.in.toc != 0]"
+                           mode="toc">
+        <xsl:with-param name="toc-context" select="$toc-context"/>
+      </xsl:apply-templates>
+    </fo:block>
+  </xsl:if>
+</xsl:template>
+
 </xsl:stylesheet>
