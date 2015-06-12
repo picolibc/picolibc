@@ -97,8 +97,8 @@ cygwin-ug-net/cygwin-ug-net.html : $(cygwin-ug-net_SOURCES) html.xsl
 cygwin-ug-net/cygwin-ug-net.pdf : $(cygwin-ug-net_SOURCES) fo.xsl
 	-$(XMLTO) pdf -o cygwin-ug-net/ -m $(srcdir)/fo.xsl $<
 
-utils2man.stamp: $(cygwin-ug-net_SOURCES)
-	$(XMLTO) man $<
+utils2man.stamp: $(cygwin-ug-net_SOURCES) man.xsl
+	$(XMLTO) man -m ${srcdir}/man.xsl $<
 	@touch $@
 
 cygwin-api/cygwin-api.html : $(cygwin-api_SOURCES) html.xsl
@@ -107,8 +107,8 @@ cygwin-api/cygwin-api.html : $(cygwin-api_SOURCES) html.xsl
 cygwin-api/cygwin-api.pdf : $(cygwin-api_SOURCES) fo.xsl
 	-$(XMLTO) pdf -o cygwin-api/ -m $(srcdir)/fo.xsl $<
 
-api2man.stamp: $(cygwin-api_SOURCES)
-	$(XMLTO) man $<
+api2man.stamp: $(cygwin-api_SOURCES) man.xsl
+	$(XMLTO) man -m ${srcdir}/man.xsl $<
 	@touch $@
 
 faq/faq.html : $(FAQ_SOURCES)
