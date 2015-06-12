@@ -36,7 +36,7 @@ FAQ_SOURCES:= $(wildcard $(srcdir)/faq*.xml)
 .html.body:
 	$(srcdir)/bodysnatcher.pl $<
 
-.PHONY: all clean install install-all install-pdf install-html tarball
+.PHONY: all clean install install-all install-pdf install-html
 
 all: Makefile Makefile.dep \
 	cygwin-ug-net/cygwin-ug-net.html \
