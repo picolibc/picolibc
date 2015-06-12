@@ -1,5 +1,9 @@
 2015-06-12  Jon Turney  <jon.turney@dronecode.org.uk>
 
+	* xidepend: Fix to handle relative pathnames.
+
+2015-06-12  Jon Turney  <jon.turney@dronecode.org.uk>
+
 	* Makefile.in (.PHONY): Remove tarball target.
 
 2015-06-04  Jon Turney  <jon.turney@dronecode.org.uk>
