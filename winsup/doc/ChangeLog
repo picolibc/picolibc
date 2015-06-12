@@ -1,5 +1,10 @@
 2015-06-12  Jon Turney  <jon.turney@dronecode.org.uk>
 
+	* Makefile.in (cygwin-ug-net/cygwin-ug-net-nochunks.html.gz):
+	Ensure cygwin-ug-net directory exists.
+
+2015-06-12  Jon Turney  <jon.turney@dronecode.org.uk>
+
 	* xidepend: Write a Makefile fragment defining variables
 	containing all the XIncluded sources, rather than a dependency on
 	those sources.
