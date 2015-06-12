@@ -1,5 +1,10 @@
 2015-06-12  Jon Turney  <jon.turney@dronecode.org.uk>
 
+	* Makefile.in (install-man, utils2man.stamp): Add rules to build
+	and install manpages for utils.
+
+2015-06-12  Jon Turney  <jon.turney@dronecode.org.uk>
+
 	* utils.xml : Convert from using a sect2 element to using a
 	refentry element for each utility program.
 	* cygwin.xsl: Customize autotoc to include refentries.

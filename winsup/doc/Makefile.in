@@ -16,6 +16,8 @@ prefix:=@prefix@
 datarootdir:=@datarootdir@
 docdir = @docdir@
 htmldir = @htmldir@
+mandir = @mandir@
+man1dir = $(mandir)/man1
 
 override INSTALL:=@INSTALL@
 override INSTALL_DATA:=@INSTALL_DATA@
@@ -37,7 +39,7 @@ FAQ_SOURCES:= $(wildcard $(srcdir)/faq*.xml)
 .html.body:
 	$(srcdir)/bodysnatcher.pl $<
 
-.PHONY: all clean install install-all install-pdf install-html
+.PHONY: all clean install install-all install-pdf install-html install-man
 
 all: Makefile Makefile.dep \
 	cygwin-ug-net/cygwin-ug-net.html \
@@ -45,7 +47,8 @@ all: Makefile Makefile.dep \
 	cygwin-api/cygwin-api.html \
 	faq/faq.body faq/faq.html \
 	cygwin-ug-net/cygwin-ug-net.pdf \
-	cygwin-api/cygwin-api.pdf
+	cygwin-api/cygwin-api.pdf \
+	utils2man.stamp
 
 Makefile: $(srcdir)/Makefile.in
 	/bin/sh ./config.status
@@ -54,10 +57,11 @@ clean:
 	rm -f Makefile.dep
 	rm -f *.html *.html.gz
 	rm -Rf cygwin-api cygwin-ug cygwin-ug-net faq
+	rm -f *.1 utils2man.stamp
 
 install: install-all
 
-install-all: install-pdf install-html
+install-all: install-pdf install-html install-man
 
 install-pdf: cygwin-ug-net/cygwin-ug-net.pdf cygwin-api/cygwin-api.pdf
 	@$(MKDIRP) $(DESTDIR)$(docdir)
@@ -71,6 +75,10 @@ install-html: cygwin-ug-net/cygwin-ug-net.html cygwin-api/cygwin-api.html
 	$(INSTALL_DATA) cygwin-api/*.html $(DESTDIR)$(htmldir)/cygwin-api
 	$(INSTALL_DATA) cygwin-api/cygwin-api.html $(DESTDIR)$(htmldir)/cygwin-api/index.html
 
+install-man: utils2man.stamp
+	@$(MKDIRP) $(DESTDIR)$(man1dir)
+	$(INSTALL_DATA) *.1 $(DESTDIR)$(man1dir)
+
 cygwin-ug-net/cygwin-ug-net-nochunks.html.gz : $(cygwin-ug-net_SOURCES) cygwin.xsl
 	-$(XMLTO) html-nochunks -m $(srcdir)/cygwin.xsl $<
 	-@$(MKDIRP) cygwin-ug-net
@@ -83,6 +91,10 @@ cygwin-ug-net/cygwin-ug-net.html : $(cygwin-ug-net_SOURCES) cygwin.xsl
 
 cygwin-ug-net/cygwin-ug-net.pdf : $(cygwin-ug-net_SOURCES) fo.xsl
 	-$(XMLTO) pdf -o cygwin-ug-net/ -m $(srcdir)/fo.xsl $<
+
+utils2man.stamp: $(cygwin-ug-net_SOURCES)
+	$(XMLTO) man $<
+	@touch $@
 
 cygwin-api/cygwin-api.html : $(cygwin-api_SOURCES) cygwin.xsl
 	-$(XMLTO) html -o cygwin-api/ -m $(srcdir)/cygwin.xsl $<
