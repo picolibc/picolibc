@@ -1,5 +1,18 @@
 2015-06-15  Corinna Vinschen  <corinna@vinschen.de>
 
+	* fhandler_socket.cc (LOCK_EVENTS): Don't enter critical section with
+	invalid mutex handle since then socket has been closed.
+	(UNLOCK_EVENTS): Close critical section.
+	(fhandler_socket::evaluate_events): Handle calling connect on shutdown
+	socket.
+	(fhandler_socket::wait_for_events): Try for pthread_testcancel in case
+	of WAIT_FAILED.  Try to come up with a better errno in case we waited
+	on an invalid handle.
+	(fhandler_socket::release_events): Change wsock_mtx and wsock_evt to
+	NULL under lock to avoid accessing invalid handle.
+
+2015-06-15  Corinna Vinschen  <corinna@vinschen.de>
+
 	* net.cc (errmap): Handle more Winsock error codes.
 
 2015-06-15  Corinna Vinschen  <corinna@vinschen.de>

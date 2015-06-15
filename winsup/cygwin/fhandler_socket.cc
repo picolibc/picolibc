@@ -501,8 +501,14 @@ fhandler_socket::af_local_set_secret (char *buf)
    counted as one socket. */
 #define NUM_SOCKS       (32768 / sizeof (wsa_event))
 
-#define LOCK_EVENTS	WaitForSingleObject (wsock_mtx, INFINITE)
-#define UNLOCK_EVENTS	ReleaseMutex (wsock_mtx)
+#define LOCK_EVENTS	\
+  if (wsock_mtx && \
+      WaitForSingleObject (wsock_mtx, INFINITE) != WAIT_FAILED) \
+    {
+
+#define UNLOCK_EVENTS \
+      ReleaseMutex (wsock_mtx); \
+    }
 
 static wsa_event wsa_events[NUM_SOCKS] __attribute__((section (".cygwin_dll_common"), shared));
 
@@ -709,14 +715,21 @@ fhandler_socket::evaluate_events (const long event_mask, long &events,
 	  wsock_events->events &= ~FD_CONNECT;
 	  wsock_events->connect_errorcode = 0;
 	}
-      /* This test makes the accept function behave as on Linux when
-	 accept is called on a socket for which shutdown for the read side
-	 has been called.  The second half of this code is in the shutdown
-	 method.  See there for more info. */
-      if ((event_mask & FD_ACCEPT) && (events & FD_CLOSE))
+      /* This test makes accept/connect behave as on Linux when accept/connect
+         is called on a socket for which shutdown has been called.  The second
+	 half of this code is in the shutdown method. */
+      if (events & FD_CLOSE)
 	{
-	  WSASetLastError (WSAEINVAL);
-	  ret = SOCKET_ERROR;
+	  if ((event_mask & FD_ACCEPT) && saw_shutdown_read ())
+	    {
+	      WSASetLastError (WSAEINVAL);
+	      ret = SOCKET_ERROR;
+	    }
+	  if (event_mask & FD_CONNECT)
+	    {
+	      WSASetLastError (WSAECONNRESET);
+	      ret = SOCKET_ERROR;
+	    }
 	}
       if (erase)
 	wsock_events->events &= ~(events & ~(FD_WRITE | FD_CLOSE));
@@ -750,7 +763,8 @@ fhandler_socket::wait_for_events (const long event_mask, const DWORD flags)
 	{
 	  case WSA_WAIT_TIMEOUT:
 	    pthread_testcancel ();
-	    /*FALLTHRU*/
+	    break;
+
 	  case WSA_WAIT_EVENT_0:
 	    break;
 
@@ -761,19 +775,31 @@ fhandler_socket::wait_for_events (const long event_mask, const DWORD flags)
 	    return SOCKET_ERROR;
 
 	  default:
-	    WSASetLastError (WSAEFAULT);
+	    pthread_testcancel ();
+	    /* wsock_evt can be NULL.  We're generating the same errno values
+	       as for sockets on which shutdown has been called. */
+	    if (WSAGetLastError () != WSA_INVALID_HANDLE)
+	      WSASetLastError (WSAEFAULT);
+	    else
+	      WSASetLastError ((event_mask & FD_CONNECT) ? WSAECONNRESET
+							 : WSAEINVAL);
 	    return SOCKET_ERROR;
 	}
     }
-
   return ret;
 }
 
 void
 fhandler_socket::release_events ()
 {
-  NtClose (wsock_evt);
-  NtClose (wsock_mtx);
+  HANDLE evt = wsock_evt;
+  HANDLE mtx = wsock_mtx;
+
+  LOCK_EVENTS;
+  wsock_evt = wsock_mtx = NULL;
+  } ReleaseMutex (mtx);	/* == UNLOCK_EVENTS, but note using local mtx here. */
+  NtClose (evt);
+  NtClose (mtx);
 }
 
 /* Called from net.cc:fdsock() if a freshly created socket is not
