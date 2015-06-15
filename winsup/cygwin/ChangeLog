@@ -1,5 +1,9 @@
 2015-06-15  Corinna Vinschen  <corinna@vinschen.de>
 
+	* net.cc (errmap): Handle more Winsock error codes.
+
+2015-06-15  Corinna Vinschen  <corinna@vinschen.de>
+
 	* exceptions.cc (_cygtls::call_signal_handler): Disable enforcing
 	SA_RESTART in non-main threads to allow returning with EINTR from
 	system calls.
