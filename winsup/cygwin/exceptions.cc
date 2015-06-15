@@ -1542,7 +1542,12 @@ _cygtls::call_signal_handler ()
 	set_errno (this_errno);
     }
 
-  return this_sa_flags & SA_RESTART || (this != _main_tls);
+  /* FIXME: Since 2011 this return statement always returned 1 (meaning
+     SA_RESTART is effective) if the thread we're running in is not the
+     main thread.  We're disabling this check to enable EINTR behaviour
+     on system calls not running in the main thread.  It's not quite clear
+     if that has undesired side-effects, therefore this comment. */
+  return this_sa_flags & SA_RESTART;
 }
 
 void
