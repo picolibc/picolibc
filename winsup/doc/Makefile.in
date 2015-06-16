@@ -35,8 +35,6 @@ DOCBOOK2XTEXI:=docbook2x-texi --xinclude --info --utf8trans-map=charmap
 include $(srcdir)/../Makefile.common
 -include Makefile.dep
 
-FAQ_SOURCES:= $(wildcard $(srcdir)/faq*.xml)
-
 .SUFFIXES: .html .body
 
 .html.body:
@@ -137,9 +135,9 @@ intro2man.stamp: intro.xml man.xsl
 	@echo ".so intro.1" >cygwin.1
 	@touch $@
 
-faq/faq.html : $(FAQ_SOURCES)
+faq/faq.html : $(faq_SOURCES)
 	-$(XMLTO) html -o faq -m $(srcdir)/html.xsl $(srcdir)/faq.xml
 	-sed -i 's;<a name="id[mp][0-9]*"></a>;;g' faq/faq.html
 
-Makefile.dep: cygwin-ug-net.xml cygwin-api.xml
+Makefile.dep: cygwin-ug-net.xml cygwin-api.xml faq.xml
 	cd $(srcdir) && ./xidepend $^ > "${CURDIR}/$@"
