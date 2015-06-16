@@ -265,7 +265,6 @@ CHEWOUT_FILES= \
 	llabs.def	\
 	lldiv.def	\
 	malloc.def	\
-	$(MALLOCR).def	\
 	mblen.def	\
 	mbsnrtowcs.def	\
 	mbstowcs.def	\

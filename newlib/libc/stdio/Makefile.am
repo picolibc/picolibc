@@ -391,7 +391,6 @@ CHEWOUT_FILES = \
 	getline.def		\
 	gets.def		\
 	getw.def		\
-	getwc.def		\
 	getwchar.def		\
 	mktemp.def		\
 	open_memstream.def	\
@@ -402,7 +401,6 @@ CHEWOUT_FILES = \
 	putchar_u.def		\
 	puts.def		\
 	putw.def		\
-	putwc.def		\
 	putwchar.def		\
 	remove.def		\
 	rename.def		\

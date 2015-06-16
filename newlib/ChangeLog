@@ -1,5 +1,11 @@
 2015-06-23  Jon Turney  <jon.turney@dronecode.org.uk>
 
+	* libc/stdlib/Makefile.am (CHEWOUT_FILES): Remove $(MALLOCR).def.
+	* libc/stdio/Makefile.am (CHEWOUT_FILES): Remove getwc.def and
+	putwc.def.
+
+2015-06-23  Jon Turney  <jon.turney@dronecode.org.uk>
+
 	* libc/locale/locale.c: Fix mismatched parentheses in
 	documentation.
 	* libc/locale/locale.tex: Ditto.
