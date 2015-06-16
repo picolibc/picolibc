@@ -1,5 +1,11 @@
 2015-06-17  Jon Turney  <jon.turney@dronecode.org.uk>
 
+	* fo.xsl: Render funcsynopsis elements as ANSI style function
+	prototypes.
+	* html.xsl: Ditto.
+
+2015-06-17  Jon Turney  <jon.turney@dronecode.org.uk>
+
 	* html.xsl: Renamed from cygwin.xsl.
 
 2015-06-17  Corinna Vinschen  <corinna@vinschen.de>

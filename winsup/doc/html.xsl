@@ -23,4 +23,7 @@
 <!-- suppress refentry in toc being annotated with refpurpose -->
 <xsl:param name="annotate.toc" select="0" />
 
+<!-- generate ansi rather than k&r style function synopses -->
+<xsl:param name="funcsynopsis.style" select="ansi" />
+
 </xsl:stylesheet>

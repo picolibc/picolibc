@@ -65,4 +65,7 @@
   </xsl:if>
 </xsl:template>
 
+	<!-- generate ansi rather than k&r style function synopses -->
+	<xsl:param name="funcsynopsis.style" select="ansi" />
+
 </xsl:stylesheet>
