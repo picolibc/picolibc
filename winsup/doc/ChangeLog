@@ -1,3 +1,7 @@
+2015-06-17  Jon Turney  <jon.turney@dronecode.org.uk>
+
+	* html.xsl: Renamed from cygwin.xsl.
+
 2015-06-17  Corinna Vinschen  <corinna@vinschen.de>
 
 	* posix.xml (std-bsd): Add sethostname.

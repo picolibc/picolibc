@@ -79,15 +79,15 @@ install-man: utils2man.stamp
 	@$(MKDIRP) $(DESTDIR)$(man1dir)
 	$(INSTALL_DATA) *.1 $(DESTDIR)$(man1dir)
 
-cygwin-ug-net/cygwin-ug-net-nochunks.html.gz : $(cygwin-ug-net_SOURCES) cygwin.xsl
-	-$(XMLTO) html-nochunks -m $(srcdir)/cygwin.xsl $<
+cygwin-ug-net/cygwin-ug-net-nochunks.html.gz : $(cygwin-ug-net_SOURCES) html.xsl
+	-$(XMLTO) html-nochunks -m $(srcdir)/html.xsl $<
 	-@$(MKDIRP) cygwin-ug-net
 	-cp cygwin-ug-net.html cygwin-ug-net/cygwin-ug-net-nochunks.html
 	-rm -f cygwin-ug-net/cygwin-ug-net-nochunks.html.gz
 	-gzip cygwin-ug-net/cygwin-ug-net-nochunks.html
 
-cygwin-ug-net/cygwin-ug-net.html : $(cygwin-ug-net_SOURCES) cygwin.xsl
-	-$(XMLTO) html -o cygwin-ug-net/ -m $(srcdir)/cygwin.xsl $<
+cygwin-ug-net/cygwin-ug-net.html : $(cygwin-ug-net_SOURCES) html.xsl
+	-$(XMLTO) html -o cygwin-ug-net/ -m $(srcdir)/html.xsl $<
 
 cygwin-ug-net/cygwin-ug-net.pdf : $(cygwin-ug-net_SOURCES) fo.xsl
 	-$(XMLTO) pdf -o cygwin-ug-net/ -m $(srcdir)/fo.xsl $<
@@ -96,14 +96,14 @@ utils2man.stamp: $(cygwin-ug-net_SOURCES)
 	$(XMLTO) man $<
 	@touch $@
 
-cygwin-api/cygwin-api.html : $(cygwin-api_SOURCES) cygwin.xsl
-	-$(XMLTO) html -o cygwin-api/ -m $(srcdir)/cygwin.xsl $<
+cygwin-api/cygwin-api.html : $(cygwin-api_SOURCES) html.xsl
+	-$(XMLTO) html -o cygwin-api/ -m $(srcdir)/html.xsl $<
 
 cygwin-api/cygwin-api.pdf : $(cygwin-api_SOURCES) fo.xsl
 	-$(XMLTO) pdf -o cygwin-api/ -m $(srcdir)/fo.xsl $<
 
 faq/faq.html : $(FAQ_SOURCES)
-	-$(XMLTO) html -o faq -m $(srcdir)/cygwin.xsl $(srcdir)/faq.xml
+	-$(XMLTO) html -o faq -m $(srcdir)/html.xsl $(srcdir)/faq.xml
 	-sed -i 's;<a name="id[mp][0-9]*"></a>;;g' faq/faq.html
 
 Makefile.dep: cygwin-ug-net.xml cygwin-api.xml
