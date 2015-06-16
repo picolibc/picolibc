@@ -4,7 +4,6 @@
 
 <book id="cygwin-ug-net" xmlns:xi="http://www.w3.org/2001/XInclude">
   <bookinfo>
-    <date>2009-03-18</date>
     <title>Cygwin User's Guide</title>
 		<xi:include href="legal.xml"/>
   </bookinfo>

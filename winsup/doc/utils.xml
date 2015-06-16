@@ -265,9 +265,9 @@ are unable to find another Cygwin DLL.
 
     <screen>
 Usage: cygpath (-d|-m|-u|-w|-t TYPE) [-f FILE] [OPTION]... NAME...
-       cygpath [-c HANDLE] 
-       cygpath [-ADHOPSW] 
-       cygpath [-F ID] 
+       cygpath [-c HANDLE]
+       cygpath [-ADHOPSW]
+       cygpath [-F ID]
 
 Convert Unix and Windows format paths, or output system path information
 
@@ -518,7 +518,7 @@ Other options:
 Usage: getfacl [-adn] FILE [FILE2...]
 
 Display file and directory access control lists (ACLs).
- 
+
   -a, --access   display the file access control list
   -d, --default  display the default access control list
   -h, --help     print help explaining the command line options
@@ -928,7 +928,7 @@ groups on domain controllers and domain member machines.
       of your current account apply.  The <literal>-l/-L</literal> when used
       with a machine name, tries to contact that machine to enumerate local
       groups of other machines, typically outside of domains.  This scenario
-      cannot be covered by Cygwin's account automatism.  If you want to use 
+      cannot be covered by Cygwin's account automatism.  If you want to use
       the <literal>-L</literal> option, but you don't like the default
       domain/group separator from <filename>/etc/nsswitch.conf</filename>,
       you can specify another separator using the <literal>-S</literal> option,
@@ -1025,7 +1025,7 @@ on domain controllers and domain member machines.
 
     <para>For very simple needs, an entry for the current user can be created
       by using the option <literal>-c</literal>.</para>
-      
+
     <para>The <literal>-o</literal> option allows for special cases (such as
       multiple domains) where the UIDs might match otherwise. The
       <literal>-p</literal> option causes <command>mkpasswd</command> to use
@@ -1144,22 +1144,22 @@ D: on /d type fat (binary,user,noumount)
                implement real POSIX permissions (default).
   binary     - Files default to binary mode (default).
   bind       - Allows to remount part of the file hierarchy somewhere else.
-               Different from other mount calls, the first argument 
-	       specifies an absolute POSIX path, rather than a Win32 path.
-	       This POSIX path is remounted to the POSIX path specified as
-	       the second parameter.  The conversion to a Win32 path is done
-	       within Cygwin immediately at the time of the call.  Note that
-	       symlinks are ignored while performing this path conversion.
+               Different from other mount calls, the first argument
+               specifies an absolute POSIX path, rather than a Win32 path.
+               This POSIX path is remounted to the POSIX path specified as
+               the second parameter.  The conversion to a Win32 path is done
+               within Cygwin immediately at the time of the call.  Note that
+               symlinks are ignored while performing this path conversion.
   cygexec    - Treat all files below mount point as cygwin executables.
   dos        - Always convert leading spaces and trailing dots and spaces to
-	       characters in the UNICODE private use area.  This allows to use
-	       broken filesystems which only allow DOS filenames, even if they
-	       are not recognized as such by Cygwin.
+               characters in the UNICODE private use area.  This allows to use
+               broken filesystems which only allow DOS filenames, even if they
+               are not recognized as such by Cygwin.
   exec       - Treat all files below mount point as executable.
   ihash      - Always fake inode numbers rather than using the ones returned
-	       by the filesystem.  This allows to use broken filesystems which
-	       don't return unambiguous inode numbers, even if they are not
-	       recognized as such by Cygwin.
+               by the filesystem.  This allows to use broken filesystems which
+               don't return unambiguous inode numbers, even if they are not
+               recognized as such by Cygwin.
   noacl      - Ignore ACLs and fake POSIX permissions.
   nosuid     - No suid files are allowed (currently unimplemented)
   notexec    - Treat all files below mount point as not executable.
@@ -1168,7 +1168,7 @@ D: on /d type fat (binary,user,noumount)
   posix=1    - Switch on case sensitivity for paths under this mount point
                (default).
   sparse     - Switch on support for sparse files.  This option only makes
-	       sense on NTFS and then only if you really need sparse files.
+               sense on NTFS and then only if you really need sparse files.
   text       - Files default to CRLF text mode line endings.
 </screen>
 
@@ -1336,7 +1336,7 @@ Other options:
 
 If no option is given, change USER's password.  If no user name is given,
 operate on current user.  System operations must not be mixed with user
-operations.  Don't specify a USER when triggering a system operation. 
+operations.  Don't specify a USER when triggering a system operation.
 
 Don't specify a user or any other option together with the -R option.
 Non-Admin users can only store their password if cygserver is running.
@@ -1590,7 +1590,7 @@ remote host in either \\hostname or hostname: format and prefix is any of:
 
 You can use forward slash ('/') as a separator instead of backslash, in
 that case backslash is treated as escape character
-Example: regtool.exe get '\user\software\Microsoft\Clock\iFormat'
+Example: regtool get '\user\software\Microsoft\Clock\iFormat'
 </screen>
 
     <para>The <command>regtool</command> program allows shell scripts to access
@@ -1706,7 +1706,7 @@ Modify file and directory access control lists (ACLs)
   -f, --file       set ACL entries for FILE to ACL entries read
                    from a ACL_FILE
   -k, --remove-default
-		   remove all default ACL entries
+                   remove all default ACL entries
   -m, --modify     modify one or more specified ACL entries
   -r, --replace    replace mask entry with maximum permissions
                    needed for the file group class
@@ -1759,7 +1759,7 @@ At least one of (-b, -d, -f, -k, -m, -s) must be specified
       <screen>
          u[ser]:uid[:]
          g[roup]:gid[:]
-	 m[ask][:]
+         m[ask][:]
          d[efault]:u[ser][:uid]
          d[efault]:g[roup][:gid]
          d[efault]:m[ask][:]
@@ -1995,8 +1995,8 @@ $ ssp <literal>-v</literal> <literal>-s</literal> <literal>-l</literal> <literal
     <title>strace</title>
 
     <screen>
-Usage: strace.exe [OPTIONS] &lt;command-line&gt;
-Usage: strace.exe [OPTIONS] -p &lt;pid&gt;
+Usage: strace [OPTIONS] &lt;command-line&gt;
+Usage: strace [OPTIONS] -p &lt;pid&gt;
 
 Trace system calls and signals
 
@@ -2013,7 +2013,7 @@ Trace system calls and signals
   -q, --quiet                  toggle "quiet" flag.  Defaults to on if "-p",
                                off otherwise.
   -S, --flush-period=PERIOD    flush buffered strace output every PERIOD secs
-  -t, --timestamp              use an absolute hh:mm:ss timestamp insted of 
+  -t, --timestamp              use an absolute hh:mm:ss timestamp insted of
                                the default microsecond timestamp.  Implies -d
   -T, --toggle                 toggle tracing in a process already being
                                traced. Requires -p &lt;pid&gt;
@@ -2034,7 +2034,7 @@ Trace system calls and signals
     uhoh     0x000008 (_STRACE_UHOH)     Unusual or weird phenomenon.
     syscall  0x000010 (_STRACE_SYSCALL)  System calls.
     startup  0x000020 (_STRACE_STARTUP)  argc/envp printout at startup.
-    debug    0x000040 (_STRACE_DEBUG)    Info to help debugging. 
+    debug    0x000040 (_STRACE_DEBUG)    Info to help debugging.
     paranoid 0x000080 (_STRACE_PARANOID) Paranoid info.
     termios  0x000100 (_STRACE_TERMIOS)  Info for debugging termios stuff.
     select   0x000200 (_STRACE_SELECT)   Info on ugly select internals.
@@ -2103,7 +2103,7 @@ In csh-compatible shells like tcsh:
     <title>umount</title>
 
     <screen>
-Usage: umount.exe [OPTION] [&lt;posixpath&gt;]
+Usage: umount [OPTION] [&lt;posixpath&gt;]
 
 Unmount filesystems
 
