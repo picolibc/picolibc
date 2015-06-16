@@ -1,28 +1,9 @@
-The cygwin-doc source files are kept in CVS. Please see
-https://cygwin.com/cvs.html for more information.
+ADDITIONAL BUILD REQUIREMENTS FOR DOCUMENTATION
 
-BUILD REQUIREMENTS:
-
-bash
-bzip2
-coreutils
-cygwin
 dblatex
 docbook-xml45
 docbook-xsl
+docbook2x-texi
 gzip
-make
 texinfo
-perl
 xmlto
-
-OTHER NOTES:
-
-You may use docbook2X to convert the DocBook files into info pages.
-I have not been able to get a working docbook2X installation on Cygwin,
-so currently I convert the files on a machine running GNU/Linux.
-
-A few handmade files (cygwin.texi, intro.3, etc.) are found in the
-cygwin-doc-x.y-z-src.tar.bz2 package. It also contains the utilities for
-building the cygwin-doc-x.y-z "binary" package--simply run each step in
-the cygwin-doc-x.y-z.sh script.

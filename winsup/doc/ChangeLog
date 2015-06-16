@@ -1,5 +1,9 @@
 2015-06-22  Jon Turney  <jon.turney@dronecode.org.uk>
 
+	* README: Update.
+
+2015-06-22  Jon Turney  <jon.turney@dronecode.org.uk>
+
 	* Makefile.in (FAQ_SOURCES): Remove and generate with xidepend.
 
 2015-06-22  Jon Turney  <jon.turney@dronecode.org.uk>
