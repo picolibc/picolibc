@@ -1,5 +1,13 @@
 2015-06-17  Jon Turney  <jon.turney@dronecode.org.uk>
 
+	* cygwin-api.xml: Move introductory paragraph here.
+	* logon-funcs.xml: Convert from using a sect2 element to using a
+	refentry element for each function.
+	* misc-funcs.xml: Ditto.
+	* path.xml: Ditto.
+
+2015-06-17  Jon Turney  <jon.turney@dronecode.org.uk>
+
 	* fo.xsl: Render funcsynopsis elements as ANSI style function
 	prototypes.
 	* html.xsl: Ditto.

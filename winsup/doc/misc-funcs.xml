@@ -5,11 +5,24 @@
 <sect1 id="func-cygwin-misc">
 <title>Miscellaneous functions</title>
 
-<sect2 id="func-cygwin-attach-handle-to-fd">
-<title>cygwin_attach_handle_to_fd</title>
+<refentry id="func-cygwin-attach-handle-to-fd">
+  <refmeta>
+    <refentrytitle>cygwin_attach_handle_to_fd</refentrytitle>
+    <manvolnum>3</manvolnum>
+    <refmiscinfo class="manual">Cygwin API Reference</refmiscinfo>
+  </refmeta>
 
-<funcsynopsis><funcprototype>
-<funcdef>extern "C" int
+  <refnamediv>
+    <refname>cygwin_attach_handle_to_fd</refname>
+  </refnamediv>
+
+  <refsynopsisdiv>
+<funcsynopsis>
+<funcsynopsisinfo>
+#include &lt;sys/cygwin.h&gt;
+</funcsynopsisinfo>
+<funcprototype>
+<funcdef>int
 <function>cygwin_attach_handle_to_fd</function></funcdef>
 <paramdef>char *<parameter>name</parameter></paramdef>
 <paramdef>int <parameter>fd</parameter></paramdef>
@@ -17,7 +30,10 @@
 <paramdef>int <parameter>bin</parameter></paramdef>
 <paramdef>int <parameter>access</parameter></paramdef>
 </funcprototype></funcsynopsis>
+  </refsynopsisdiv>
 
+  <refsect1>
+    <title>Description</title>
 <para>This function can be used to turn a Win32 "handle" into a
 posix-style file handle. <parameter>fd</parameter> may be -1 to
 make cygwin allocate a handle; the actual handle is returned
@@ -27,38 +43,71 @@ in all cases.</para>
 underlying file or device.  It just tries to supply the typical file
 functions on a "best-effort" basis.  Use with care.  Don't expect too
 much.</para>
+  </refsect1>
+</refentry>
 
-</sect2>
+<refentry id="func-cygwin-internal">
+  <refmeta>
+    <refentrytitle>cygwin_internal</refentrytitle>
+    <manvolnum>3</manvolnum>
+    <refmiscinfo class="manual">Cygwin API Reference</refmiscinfo>
+  </refmeta>
 
-<sect2 id="func-cygwin-internal">
-<title>cygwin_internal</title>
+  <refnamediv>
+    <refname>cygwin_internal</refname>
+  </refnamediv>
 
-<funcsynopsis><funcprototype>
-<funcdef>extern "C" uintptr_t
+  <refsynopsisdiv>
+<funcsynopsis>
+<funcsynopsisinfo>
+#include &lt;sys/cygwin.h&gt;
+</funcsynopsisinfo>
+<funcprototype>
+<funcdef>uintptr_t
 <function>cygwin_internal</function></funcdef>
 <paramdef>cygwin_getinfo_types <parameter>t</parameter></paramdef>
 <paramdef><parameter>...</parameter></paramdef>
 </funcprototype></funcsynopsis>
+  </refsynopsisdiv>
 
+  <refsect1>
+    <title>Description</title>
 <para>This function gives you access to various internal data and functions.
 It takes two arguments.  The first argument is a type from the 'cygwin_getinfo_types'
 enum.  The second is an optional pointer.</para>
 <para>Stay away unless you know what you're doing.</para>
+  </refsect1>
+</refentry>
 
-</sect2>
 
-<sect2 id="func-cygwin-stackdump">
-<title>cygwin_stackdump</title>
+<refentry id="func-cygwin-stackdump">
+  <refmeta>
+    <refentrytitle>cygwin_stackdump</refentrytitle>
+    <manvolnum>3</manvolnum>
+    <refmiscinfo class="manual">Cygwin API Reference</refmiscinfo>
+  </refmeta>
 
-<funcsynopsis><funcprototype>
-<funcdef>extern "C" void
+  <refnamediv>
+    <refname>cygwin_stackdump</refname>
+  </refnamediv>
+
+  <refsynopsisdiv>
+<funcsynopsis>
+<funcsynopsisinfo>
+#include &lt;sys/cygwin.h&gt;
+</funcsynopsisinfo>
+<funcprototype>
+<funcdef>void
 <function>cygwin_stackdump</function></funcdef>
 <void />
 </funcprototype></funcsynopsis>
+  </refsynopsisdiv>
 
+  <refsect1>
+    <title>Description</title>
 <para> Outputs a stackdump to stderr from the called location.
 </para>
-
-</sect2>
+  </refsect1>
+</refentry>
 
 </sect1>

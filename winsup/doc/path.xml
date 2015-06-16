@@ -5,21 +5,34 @@
 <sect1 id="func-cygwin-path">
 <title>Path conversion functions</title>
 
-<para>These functions are specific to Cygwin itself, and probably
-won't be found anywhere else.  </para>
+<refentry id="func-cygwin-conv-path">
+  <refmeta>
+    <refentrytitle>cygwin_conv_path</refentrytitle>
+    <manvolnum>3</manvolnum>
+    <refmiscinfo class="manual">Cygwin API Reference</refmiscinfo>
+  </refmeta>
 
-<sect2 id="func-cygwin-conv-path">
-<title>cygwin_conv_path</title>
+  <refnamediv>
+    <refname>cygwin_conv_path</refname>
+  </refnamediv>
 
-<funcsynopsis><funcprototype>
-<funcdef>extern "C" ssize_t
+  <refsynopsisdiv>
+<funcsynopsis>
+<funcsynopsisinfo>
+#include &lt;sys/cygwin.h&gt;
+</funcsynopsisinfo>
+<funcprototype>
+<funcdef>ssize_t
 <function>cygwin_conv_path</function></funcdef>
 <paramdef>cygwin_conv_path_t <parameter>what</parameter></paramdef>
 <paramdef>const void * <parameter>from</parameter></paramdef>
 <paramdef>void * <parameter>to</parameter></paramdef>
 <paramdef>size_t <parameter>size</parameter></paramdef>
 </funcprototype></funcsynopsis>
+  </refsynopsisdiv>
 
+  <refsect1>
+    <title>Description</title>
 <para>Use this function to convert POSIX paths in
 <parameter>from</parameter> to Win32 paths in <parameter>to</parameter>
 or, vice versa, Win32 paths in <parameter>from</parameter> to POSIX paths
@@ -58,7 +71,10 @@ error and errno is set to one of the below values.</para>
                   of what == CCP_POSIX_TO_WIN_A, longer than MAX_PATH.
     ENOSPC        size is less than required for the conversion.
 </programlisting>
+  </refsect1>
 
+  <refsect1>
+    <title>Example</title>
 <example>
 <title>Example use of cygwin_conv_path</title>
 <programlisting>
@@ -83,21 +99,37 @@ else
 ]]>
 </programlisting>
 </example>
+  </refsect1>
+</refentry>
 
-</sect2>
+<refentry id="func-cygwin-conv-path-list">
+  <refmeta>
+    <refentrytitle>cygwin_conv_path_list</refentrytitle>
+    <manvolnum>3</manvolnum>
+    <refmiscinfo class="manual">Cygwin API Reference</refmiscinfo>
+  </refmeta>
 
-<sect2 id="func-cygwin-conv-path-list">
-<title>cygwin_conv_path_list</title>
+  <refnamediv>
+    <refname>cygwin_conv_path_list</refname>
+  </refnamediv>
 
-<funcsynopsis><funcprototype>
-<funcdef>extern "C" ssize_t
+  <refsynopsisdiv>
+<funcsynopsis>
+<funcsynopsisinfo>
+#include &lt;sys/cygwin.h&gt;
+</funcsynopsisinfo>
+<funcprototype>
+<funcdef>ssize_t
 <function>cygwin_conv_path_list</function></funcdef>
 <paramdef>cygwin_conv_path_t <parameter>what</parameter></paramdef>
 <paramdef>const void * <parameter>from</parameter></paramdef>
 <paramdef>void * <parameter>to</parameter></paramdef>
 <paramdef>size_t <parameter>size</parameter></paramdef>
 </funcprototype></funcsynopsis>
+  </refsynopsisdiv>
 
+  <refsect1>
+    <title>Description</title>
 <para>This is the same as <function>cygwin_conv_path</function>, but the
 input is treated as a path list in $PATH or %PATH% notation.</para>
 <para>If <parameter>what</parameter> is CCP_POSIX_TO_WIN_A or
@@ -108,21 +140,40 @@ CCP_WIN_W_TO_POSIX, given a Win32 %PATH%-style string (i.e. d:\;e:\bar)
 convert it to the equivalent POSIX $PATH-style string (i.e. /foo:/bar).</para>
 <para><parameter>size</parameter> is the size of the buffer pointed to by
 <parameter>to</parameter> in bytes.</para>
+  </refsect1>
 
+<refsect1>
+  <title>See also</title>
 <para>See also <link linkend="func-cygwin-conv-path">cygwin_conv_path</link></para>
+  </refsect1>
+</refentry>
 
-</sect2>
+<refentry id="func-cygwin-create-path">
+  <refmeta>
+    <refentrytitle>cygwin_create_path</refentrytitle>
+    <manvolnum>3</manvolnum>
+    <refmiscinfo class="manual">Cygwin API Reference</refmiscinfo>
+  </refmeta>
 
-<sect2 id="func-cygwin-create-path">
-<title>cygwin_create_path</title>
+  <refnamediv>
+    <refname>cygwin_create_path</refname>
+  </refnamediv>
 
-<funcsynopsis><funcprototype>
-<funcdef>extern "C" void *
+  <refsynopsisdiv>
+<funcsynopsis>
+<funcsynopsisinfo>
+#include &lt;sys/cygwin.h&gt;
+</funcsynopsisinfo>
+<funcprototype>
+<funcdef>void *
 <function>cygwin_create_path</function></funcdef>
 <paramdef>cygwin_conv_path_t <parameter>what</parameter></paramdef>
 <paramdef>const void * <parameter>from</parameter></paramdef>
 </funcprototype></funcsynopsis>
+  </refsynopsisdiv>
 
+  <refsect1>
+    <title>Description</title>
 <para>This is equivalent to the <function>cygwin_conv_path</function>, except
 that <function>cygwin_create_path</function> does not take a buffer pointer
 for the result of the conversion as input.  Rather it allocates the buffer
@@ -137,20 +188,39 @@ errno can be set to the below value.</para>
 
 <para>When you don't need the returned buffer anymore, use
 <function>free</function>(3) to deallocate it.</para>
+  </refsect1>
 
+<refsect1>
+  <title>See also</title>
 <para>See also <link linkend="func-cygwin-conv-path">cygwin_conv_path</link></para>
+  </refsect1>
+</refentry>
 
-</sect2>
+<refentry id="func-cygwin-posix-path-list-p">
+  <refmeta>
+    <refentrytitle>cygwin_posix_path_list_p</refentrytitle>
+    <manvolnum>3</manvolnum>
+    <refmiscinfo class="manual">Cygwin API Reference</refmiscinfo>
+  </refmeta>
 
-<sect2 id="func-cygwin-posix-path-list-p">
-<title>cygwin_posix_path_list_p</title>
+  <refnamediv>
+    <refname>cygwin_posix_path_list_p</refname>
+  </refnamediv>
 
-<funcsynopsis><funcprototype>
-<funcdef>extern "C" int
+  <refsynopsisdiv>
+<funcsynopsis>
+<funcsynopsisinfo>
+#include &lt;sys/cygwin.h&gt;
+</funcsynopsisinfo>
+<funcprototype>
+<funcdef>int
 <function>cygwin_posix_path_list_p</function></funcdef>
 <paramdef>const char *<parameter>path</parameter></paramdef>
 </funcprototype></funcsynopsis>
+  </refsynopsisdiv>
 
+  <refsect1>
+    <title>Description</title>
 <para>This function tells you if the supplied
 <parameter>path</parameter> is a POSIX-style path (i.e. posix names,
 forward slashes, colon delimiters) or a Win32-style path (drive
@@ -158,25 +228,44 @@ letters, reverse slashes, semicolon delimiters.  The return value is
 true if the path is a POSIX path.  Note that "_p" means "predicate", a
 lisp term meaning that the function tells you something about the
 parameter.</para>
+  </refsect1>
+</refentry>
 
-</sect2>
+<refentry id="func-cygwin-split-path">
+  <refmeta>
+    <refentrytitle>cygwin_split_path</refentrytitle>
+    <manvolnum>3</manvolnum>
+    <refmiscinfo class="manual">Cygwin API Reference</refmiscinfo>
+  </refmeta>
 
-<sect2 id="func-cygwin-split-path">
-<title>cygwin_split_path</title>
+  <refnamediv>
+    <refname>cygwin_split_path</refname>
+  </refnamediv>
 
-<funcsynopsis><funcprototype>
-<funcdef>extern "C" void
+  <refsynopsisdiv>
+<funcsynopsis>
+<funcsynopsisinfo>
+#include &lt;sys/cygwin.h&gt;
+</funcsynopsisinfo>
+<funcprototype>
+<funcdef>void
 <function>cygwin_split_path</function>
 </funcdef>
 <paramdef>const char * <parameter>path</parameter></paramdef>
 <paramdef>char * <parameter>dir</parameter></paramdef>
 <paramdef>char * <parameter>file</parameter></paramdef>
 </funcprototype></funcsynopsis>
+  </refsynopsisdiv>
 
+  <refsect1>
+    <title>Description</title>
 <para>Split a path into the directory and the file portions.  Both
 <parameter>dir</parameter> and <parameter>file</parameter> are
 expected to point to buffers of sufficient size.  </para>
+  </refsect1>
 
+  <refsect1>
+    <title>Example</title>
 <example>
 <title>Example use of cygwin_split_path</title>
 <programlisting>
@@ -185,6 +274,7 @@ cygwin_split_path("c:/foo/bar.c", dir, file);
 printf("dir=%s, file=%s\n", dir, file);
 </programlisting>
 </example>
-</sect2>
+  </refsect1>
+</refentry>
 
 </sect1>

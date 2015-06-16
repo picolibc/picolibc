@@ -5,7 +5,6 @@
 <book id="cygwin-api" xmlns:xi="http://www.w3.org/2001/XInclude">
 
   <bookinfo>
-    <date>1998-08-31</date>
     <title>Cygwin API Reference</title>
       <xi:include href="legal.xml"/>
   </bookinfo>
@@ -16,6 +15,11 @@
 
   <chapter id="cygwin-functions" xmlns:xi="http://www.w3.org/2001/XInclude">
   <title>Cygwin Functions</title>
+
+  <para>
+    These functions are specific to Cygwin itself, and probably won't be
+    found anywhere else.
+  </para>
 
     <xi:include href="path.xml"/>
     <xi:include href="logon-funcs.xml"/>
