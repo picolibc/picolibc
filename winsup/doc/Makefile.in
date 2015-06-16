@@ -18,6 +18,7 @@ docdir = @docdir@
 htmldir = @htmldir@
 mandir = @mandir@
 man1dir = $(mandir)/man1
+man3dir = $(mandir)/man3
 
 override INSTALL:=@INSTALL@
 override INSTALL_DATA:=@INSTALL_DATA@
@@ -48,7 +49,8 @@ all: Makefile Makefile.dep \
 	faq/faq.body faq/faq.html \
 	cygwin-ug-net/cygwin-ug-net.pdf \
 	cygwin-api/cygwin-api.pdf \
-	utils2man.stamp
+	utils2man.stamp \
+	api2man.stamp
 
 Makefile: $(srcdir)/Makefile.in
 	/bin/sh ./config.status
@@ -58,6 +60,7 @@ clean:
 	rm -f *.html *.html.gz
 	rm -Rf cygwin-api cygwin-ug cygwin-ug-net faq
 	rm -f *.1 utils2man.stamp
+	rm -f *.3 api2man.stamp
 
 install: install-all
 
@@ -75,9 +78,11 @@ install-html: cygwin-ug-net/cygwin-ug-net.html cygwin-api/cygwin-api.html
 	$(INSTALL_DATA) cygwin-api/*.html $(DESTDIR)$(htmldir)/cygwin-api
 	$(INSTALL_DATA) cygwin-api/cygwin-api.html $(DESTDIR)$(htmldir)/cygwin-api/index.html
 
-install-man: utils2man.stamp
+install-man: utils2man.stamp api2man.stamp
 	@$(MKDIRP) $(DESTDIR)$(man1dir)
 	$(INSTALL_DATA) *.1 $(DESTDIR)$(man1dir)
+	@$(MKDIRP) $(DESTDIR)$(man1dir)
+	$(INSTALL_DATA) *.3 $(DESTDIR)$(man3dir)
 
 cygwin-ug-net/cygwin-ug-net-nochunks.html.gz : $(cygwin-ug-net_SOURCES) html.xsl
 	-$(XMLTO) html-nochunks -m $(srcdir)/html.xsl $<
@@ -101,6 +106,10 @@ cygwin-api/cygwin-api.html : $(cygwin-api_SOURCES) html.xsl
 
 cygwin-api/cygwin-api.pdf : $(cygwin-api_SOURCES) fo.xsl
 	-$(XMLTO) pdf -o cygwin-api/ -m $(srcdir)/fo.xsl $<
+
+api2man.stamp: $(cygwin-api_SOURCES)
+	$(XMLTO) man $<
+	@touch $@
 
 faq/faq.html : $(FAQ_SOURCES)
 	-$(XMLTO) html -o faq -m $(srcdir)/html.xsl $(srcdir)/faq.xml
