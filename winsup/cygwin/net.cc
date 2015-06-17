@@ -1095,6 +1095,20 @@ cygwin_gethostname (char *name, size_t len)
   return res;
 }
 
+extern "C" int
+sethostname (const char *name, size_t len)
+{
+  WCHAR wname[MAX_COMPUTERNAME_LENGTH + 1];
+
+  sys_mbstowcs (wname, MAX_COMPUTERNAME_LENGTH + 1, name, len);
+  if (!SetComputerNameExW (ComputerNamePhysicalDnsHostname, wname))
+    {
+      __seterrno ();
+      return -1;
+    }
+  return 0;
+}
+
 /* exported as gethostbyname: standards? */
 extern "C" struct hostent *
 cygwin_gethostbyname (const char *name)

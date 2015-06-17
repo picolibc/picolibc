@@ -1054,6 +1054,7 @@ sendmsg = cygwin_sendmsg SIGFE
 sendto = cygwin_sendto SIGFE
 setbuf SIGFE
 setbuffer SIGFE
+sethostname SIGFE
 setdtablesize SIGFE
 setegid SIGFE
 setenv SIGFE

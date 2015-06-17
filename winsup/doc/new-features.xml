@@ -2,7 +2,19 @@
 <!DOCTYPE sect1 PUBLIC "-//OASIS//DTD DocBook V4.5//EN"
 		"http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
 
-<sect1 id="ov-new1.7"><title>What's new and what changed in Cygwin</title>
+<sect1 id="ov-new"><title>What's new and what changed in Cygwin</title>
+
+<sect2 id="ov-new2.1"><title>What's new and what changed in 2.1</title>
+
+<itemizedlist mark="bullet">
+
+<listitem><para>
+New API: sethostname.
+</para></listitem>
+
+</itemizedlist>
+
+</sect2>
 
 <sect2 id="ov-new2.0"><title>What's new and what changed in 2.0</title>
 

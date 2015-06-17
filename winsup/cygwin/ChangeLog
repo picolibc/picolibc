@@ -1,3 +1,10 @@
+2015-06-17  Corinna Vinschen  <corinna@vinschen.de>
+
+	* net.cc (sethostname): New function.
+	* common.din (sethostname): Export
+	* include/cygwin/version.h (CYGWIN_VERSION_DLL_MAJOR): Bump to 2001.
+	(CYGWIN_VERSION_DLL_MINOR): Set to 0.
+
 2015-06-15  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler_socket.cc (LOCK_EVENTS): Don't enter critical section with
