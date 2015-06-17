@@ -1,5 +1,9 @@
 2015-06-17  Corinna Vinschen  <corinna@vinschen.de>
 
+	* posix.xml (std-bsd): Add sethostname.
+
+2015-06-17  Corinna Vinschen  <corinna@vinschen.de>
+
 	* new-features.xml (ov-new): Rename from ov-new1.7.
 	(ov-new2.1): Add new section.  Document sethostname.
 
