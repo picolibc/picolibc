@@ -81,7 +81,7 @@ install-html: cygwin-ug-net/cygwin-ug-net.html cygwin-api/cygwin-api.html
 install-man: utils2man.stamp api2man.stamp
 	@$(MKDIRP) $(DESTDIR)$(man1dir)
 	$(INSTALL_DATA) *.1 $(DESTDIR)$(man1dir)
-	@$(MKDIRP) $(DESTDIR)$(man1dir)
+	@$(MKDIRP) $(DESTDIR)$(man3dir)
 	$(INSTALL_DATA) *.3 $(DESTDIR)$(man3dir)
 
 cygwin-ug-net/cygwin-ug-net-nochunks.html.gz : $(cygwin-ug-net_SOURCES) html.xsl
