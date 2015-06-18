@@ -505,16 +505,16 @@ install-headers:
 install-man:
 	@$(MKDIRP) $(DESTDIR)$(mandir)/man2 $(DESTDIR)$(mandir)/man3 $(DESTDIR)$(mandir)/man5 $(DESTDIR)$(mandir)/man7
 	cd $(srcdir); \
-	for i in `find . -type f -name '*.2'`; do \
+	for i in `find . -type f ! -path './release/*' -name '*.2'`; do \
 	    $(INSTALL_DATA) $$i $(DESTDIR)$(mandir)/man2/`basename $$i` ; \
 	done; \
-	for i in `find . -type f -name '*.3'`; do \
+	for i in `find . -type f ! -path './release/*' -name '*.3'`; do \
 	    $(INSTALL_DATA) $$i $(DESTDIR)$(mandir)/man3/`basename $$i` ; \
 	done; \
-	for i in `find . -type f -name '*.5'`; do \
+	for i in `find . -type f ! -path './release/*' -name '*.5'`; do \
 	    $(INSTALL_DATA) $$i $(DESTDIR)$(mandir)/man5/`basename $$i` ; \
 	done; \
-	for i in `find . -type f -name '*.7'`; do \
+	for i in `find . -type f ! -path './release/*' -name '*.7'`; do \
 	    $(INSTALL_DATA) $$i $(DESTDIR)$(mandir)/man7/`basename $$i` ; \
 	done
 
