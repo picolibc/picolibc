@@ -88,7 +88,7 @@ Cygwin additionally supports locales from the file
 /usr/share/locale/locale.alias.
 
 (<<"">> is also accepted; if given, the settings are read from the
-corresponding LC_* environment variables and $LANG according to POSIX rules.
+corresponding LC_* environment variables and $LANG according to POSIX rules.)
 
 This implementation also supports the modifier <<"cjknarrow">>, which
 affects how the functions <<wcwidth>> and <<wcswidth>> handle characters

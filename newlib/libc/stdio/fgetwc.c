@@ -150,7 +150,7 @@ are simply reentrant versions of the above functions that are passed the
 additional reentrant structure pointer argument: <[ptr]>.
 
 RETURNS
-The next wide character cast to <<wint_t>>), unless there is no more data,
+The next wide character cast to <<wint_t>>, unless there is no more data,
 or the host system reports a read error; in either of these situations,
 <<fgetwc>> and <<getwc>> return <<WEOF>>.
 

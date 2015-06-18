@@ -1,5 +1,12 @@
 2015-06-23  Jon Turney  <jon.turney@dronecode.org.uk>
 
+	* libc/locale/locale.c: Fix mismatched parentheses in
+	documentation.
+	* libc/locale/locale.tex: Ditto.
+	* libc/stdio/fgetwc.c: Ditto.
+
+2015-06-23  Jon Turney  <jon.turney@dronecode.org.uk>
+
 	* libc/stdlib/efgcvt.c: Fix typo-ed function names in
 	documentation.
 	* libc/stdlib/stdlib.tex: Fix function name in menu to match.
