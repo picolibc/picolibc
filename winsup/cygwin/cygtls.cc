@@ -125,6 +125,7 @@ _cygtls::init_thread (void *x, DWORD (*func) (void *, void *))
       memset (this, 0, sizeof (*this));
       _REENT_INIT_PTR (&local_clib);
       stackptr = stack;
+      altstack.ss_flags = SS_DISABLE;
       if (_GLOBAL_REENT)
 	{
 	  local_clib._stdin = _GLOBAL_REENT->_stdin;

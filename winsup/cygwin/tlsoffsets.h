@@ -23,40 +23,42 @@
 //; $tls::psigmask = 2832;
 //; $tls::sigwait_mask = -9864;
 //; $tls::psigwait_mask = 2836;
-//; $tls::sigwait_info = -9860;
-//; $tls::psigwait_info = 2840;
-//; $tls::signal_arrived = -9856;
-//; $tls::psignal_arrived = 2844;
-//; $tls::will_wait_for_signal = -9852;
-//; $tls::pwill_wait_for_signal = 2848;
-//; $tls::thread_context = -9848;
-//; $tls::pthread_context = 2852;
-//; $tls::thread_id = -9132;
-//; $tls::pthread_id = 3568;
-//; $tls::infodata = -9128;
-//; $tls::pinfodata = 3572;
-//; $tls::tid = -8980;
-//; $tls::ptid = 3720;
-//; $tls::_ctinfo = -8976;
-//; $tls::p_ctinfo = 3724;
-//; $tls::andreas = -8972;
-//; $tls::pandreas = 3728;
-//; $tls::wq = -8968;
-//; $tls::pwq = 3732;
-//; $tls::sig = -8940;
-//; $tls::psig = 3760;
-//; $tls::incyg = -8936;
-//; $tls::pincyg = 3764;
-//; $tls::spinning = -8932;
-//; $tls::pspinning = 3768;
-//; $tls::stacklock = -8928;
-//; $tls::pstacklock = 3772;
-//; $tls::stackptr = -8924;
-//; $tls::pstackptr = 3776;
-//; $tls::stack = -8920;
-//; $tls::pstack = 3780;
-//; $tls::initialized = -7896;
-//; $tls::pinitialized = 4804;
+//; $tls::altstack = -9860;
+//; $tls::paltstack = 2840;
+//; $tls::sigwait_info = -9848;
+//; $tls::psigwait_info = 2852;
+//; $tls::signal_arrived = -9844;
+//; $tls::psignal_arrived = 2856;
+//; $tls::will_wait_for_signal = -9840;
+//; $tls::pwill_wait_for_signal = 2860;
+//; $tls::thread_context = -9836;
+//; $tls::pthread_context = 2864;
+//; $tls::thread_id = -9120;
+//; $tls::pthread_id = 3580;
+//; $tls::infodata = -9116;
+//; $tls::pinfodata = 3584;
+//; $tls::tid = -8968;
+//; $tls::ptid = 3732;
+//; $tls::_ctinfo = -8964;
+//; $tls::p_ctinfo = 3736;
+//; $tls::andreas = -8960;
+//; $tls::pandreas = 3740;
+//; $tls::wq = -8956;
+//; $tls::pwq = 3744;
+//; $tls::sig = -8928;
+//; $tls::psig = 3772;
+//; $tls::incyg = -8924;
+//; $tls::pincyg = 3776;
+//; $tls::spinning = -8920;
+//; $tls::pspinning = 3780;
+//; $tls::stacklock = -8916;
+//; $tls::pstacklock = 3784;
+//; $tls::stackptr = -8912;
+//; $tls::pstackptr = 3788;
+//; $tls::stack = -8908;
+//; $tls::pstack = 3792;
+//; $tls::initialized = -7884;
+//; $tls::pinitialized = 4816;
 //; __DATA__
 
 #define tls_locals (-12700)
@@ -81,37 +83,39 @@
 #define tls_psigmask (2832)
 #define tls_sigwait_mask (-9864)
 #define tls_psigwait_mask (2836)
-#define tls_sigwait_info (-9860)
-#define tls_psigwait_info (2840)
-#define tls_signal_arrived (-9856)
-#define tls_psignal_arrived (2844)
-#define tls_will_wait_for_signal (-9852)
-#define tls_pwill_wait_for_signal (2848)
-#define tls_thread_context (-9848)
-#define tls_pthread_context (2852)
-#define tls_thread_id (-9132)
-#define tls_pthread_id (3568)
-#define tls_infodata (-9128)
-#define tls_pinfodata (3572)
-#define tls_tid (-8980)
-#define tls_ptid (3720)
-#define tls__ctinfo (-8976)
-#define tls_p_ctinfo (3724)
-#define tls_andreas (-8972)
-#define tls_pandreas (3728)
-#define tls_wq (-8968)
-#define tls_pwq (3732)
-#define tls_sig (-8940)
-#define tls_psig (3760)
-#define tls_incyg (-8936)
-#define tls_pincyg (3764)
-#define tls_spinning (-8932)
-#define tls_pspinning (3768)
-#define tls_stacklock (-8928)
-#define tls_pstacklock (3772)
-#define tls_stackptr (-8924)
-#define tls_pstackptr (3776)
-#define tls_stack (-8920)
-#define tls_pstack (3780)
-#define tls_initialized (-7896)
-#define tls_pinitialized (4804)
+#define tls_altstack (-9860)
+#define tls_paltstack (2840)
+#define tls_sigwait_info (-9848)
+#define tls_psigwait_info (2852)
+#define tls_signal_arrived (-9844)
+#define tls_psignal_arrived (2856)
+#define tls_will_wait_for_signal (-9840)
+#define tls_pwill_wait_for_signal (2860)
+#define tls_thread_context (-9836)
+#define tls_pthread_context (2864)
+#define tls_thread_id (-9120)
+#define tls_pthread_id (3580)
+#define tls_infodata (-9116)
+#define tls_pinfodata (3584)
+#define tls_tid (-8968)
+#define tls_ptid (3732)
+#define tls__ctinfo (-8964)
+#define tls_p_ctinfo (3736)
+#define tls_andreas (-8960)
+#define tls_pandreas (3740)
+#define tls_wq (-8956)
+#define tls_pwq (3744)
+#define tls_sig (-8928)
+#define tls_psig (3772)
+#define tls_incyg (-8924)
+#define tls_pincyg (3776)
+#define tls_spinning (-8920)
+#define tls_pspinning (3780)
+#define tls_stacklock (-8916)
+#define tls_pstacklock (3784)
+#define tls_stackptr (-8912)
+#define tls_pstackptr (3788)
+#define tls_stack (-8908)
+#define tls_pstack (3792)
+#define tls_initialized (-7884)
+#define tls_pinitialized (4816)

@@ -232,7 +232,7 @@ class stack_info
 #ifdef __x86_64__
   CONTEXT c;
   UNWIND_HISTORY_TABLE hist;
-  __stack_t *sigstackptr;
+  __tlsstack_t *sigstackptr;
 #endif
 public:
   STACKFRAME sf;		 /* For storing the stack information */
@@ -696,11 +696,17 @@ exception::handle (EXCEPTION_RECORD *e, exception_list *frame, CONTEXT *in,
 	}
       break;
 
+    case STATUS_STACK_OVERFLOW:
+      /* If we encounter a stack overflow, and if the thread has no alternate
+         stack, don't even try to call a signal handler.  This is in line with
+	 Linux behaviour and also makes a lot of sense on Windows. */
+      if (me.altstack.ss_flags)
+	global_sigs[SIGSEGV].sa_handler = SIG_DFL;
+      /*FALLTHRU*/
     case STATUS_ARRAY_BOUNDS_EXCEEDED:
     case STATUS_IN_PAGE_ERROR:
     case STATUS_NO_MEMORY:
     case STATUS_INVALID_DISPOSITION:
-    case STATUS_STACK_OVERFLOW:
       si.si_signo = SIGSEGV;
       si.si_code = SEGV_MAPERR;
       break;
@@ -894,7 +900,7 @@ _cygtls::interrupt_now (CONTEXT *cx, siginfo_t& si, void *handler,
 void __reg3
 _cygtls::interrupt_setup (siginfo_t& si, void *handler, struct sigaction& siga)
 {
-  push ((__stack_t) sigdelayed);
+  push ((__tlsstack_t) sigdelayed);
   deltamask = siga.sa_mask & ~SIG_NONMASKABLE;
   sa_flags = siga.sa_flags;
   func = (void (*) (int, siginfo_t *, void *)) handler;
@@ -1497,7 +1503,7 @@ _cygtls::call_signal_handler ()
 
       /* Pop the stack if the next "return address" is sigdelayed, since
 	 this function is doing what sigdelayed would have done anyway. */
-      if (retaddr () == (__stack_t) sigdelayed)
+      if (retaddr () == (__tlsstack_t) sigdelayed)
 	pop ();
 
       debug_only_printf ("dealing with signal %d", sig);

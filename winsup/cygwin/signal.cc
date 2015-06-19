@@ -587,7 +587,7 @@ sigwaitinfo (const sigset_t *set, siginfo_t *info)
 		*info = _my_tls.infodata;
 	      res = _my_tls.infodata.si_signo;
 	      _my_tls.sig = 0;
-	      if (_my_tls.retaddr () == (__stack_t) sigdelayed)
+	      if (_my_tls.retaddr () == (__tlsstack_t) sigdelayed)
 		_my_tls.pop ();
 	      _my_tls.unlock ();
 	    }
@@ -623,4 +623,42 @@ sigqueue (pid_t pid, int sig, const union sigval value)
   si.si_code = SI_QUEUE;
   si.si_value = value;
   return sig_send (dest, si);
+}
+
+extern "C" int
+sigaltstack (const stack_t *ss, stack_t *oss)
+{
+  _cygtls& me = _my_tls;
+
+  if (ss)
+    {
+      if (me.altstack.ss_flags == SS_ONSTACK)
+	{
+	  set_errno (EPERM);
+	  return -1;
+	}
+      if (ss->ss_flags == SS_DISABLE)
+	{
+	  me.altstack.ss_sp = NULL;
+	  me.altstack.ss_flags = 0;
+	  me.altstack.ss_size = 0;
+	}
+      else
+	{
+	  if (ss->ss_flags)
+	    {
+	      set_errno (EINVAL);
+	      return -1;
+	    }
+	  if (ss->ss_size < MINSIGSTKSZ)
+	    {
+	      set_errno (ENOMEM);
+	      return -1;
+	    }
+	  memcpy (&me.altstack, ss, sizeof *ss);
+	}
+    }
+  if (oss)
+    memcpy (oss, &me.altstack, sizeof *oss);
+  return 0;
 }

@@ -332,12 +332,18 @@ struct sigaction
   int sa_flags;
 };
 
+#define MINSIGSTKSZ     32768
+#define SIGSTKSZ        65536
+
 #define SA_NOCLDSTOP 1   		/* Do not generate SIGCHLD when children
 					   stop */
 #define SA_SIGINFO   2   		/* Invoke the signal catching function
 					   with three arguments instead of one
 					 */
 #define SA_RESTART   0x10000000 	/* Restart syscall on signal return */
+#define SA_ONSTACK   0x20000000		/* Call signal handler on alternate
+					   signal stack provided by
+					   sigaltstack(2). */
 #define SA_NODEFER   0x40000000		/* Don't automatically block the signal
 					   when its handler is being executed  */
 #define SA_RESETHAND 0x80000000		/* Reset to SIG_DFL on entry to handler */

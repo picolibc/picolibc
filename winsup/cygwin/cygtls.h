@@ -167,7 +167,7 @@ extern "C" int __ljfault (jmp_buf, int);
 
 /*gentls_offsets*/
 
-typedef uintptr_t __stack_t;
+typedef uintptr_t __tlsstack_t;
 
 class _cygtls
 {
@@ -188,6 +188,7 @@ public:
   int *errno_addr;
   sigset_t sigmask;
   sigset_t sigwait_mask;
+  stack_t altstack;
   siginfo_t *sigwait_info;
   HANDLE signal_arrived;
   bool will_wait_for_signal;
@@ -202,17 +203,17 @@ public:
   unsigned incyg;
   unsigned spinning;
   unsigned stacklock;
-  __stack_t *stackptr;
-  __stack_t stack[TLS_STACK_SIZE];
+  __tlsstack_t *stackptr;
+  __tlsstack_t stack[TLS_STACK_SIZE];
   unsigned initialized;
 
   /*gentls_offsets*/
   void init_thread (void *, DWORD (*) (void *, void *));
   static void call (DWORD (*) (void *, void *), void *);
   void remove (DWORD);
-  void push (__stack_t addr) {*stackptr++ = (__stack_t) addr;}
-  __stack_t __reg1 pop ();
-  __stack_t retaddr () {return stackptr[-1];}
+  void push (__tlsstack_t addr) {*stackptr++ = (__tlsstack_t) addr;}
+  __tlsstack_t __reg1 pop ();
+  __tlsstack_t retaddr () {return stackptr[-1];}
   bool isinitialized () const
   {
     return initialized == CYGTLS_INITIALIZED;

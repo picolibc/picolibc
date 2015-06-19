@@ -1099,6 +1099,7 @@ shmget SIGFE
 shutdown = cygwin_shutdown SIGFE
 sigaction SIGFE
 sigaddset SIGFE
+sigaltstack SIGFE
 sigdelset SIGFE
 sigemptyset NOSIGFE
 sigfillset NOSIGFE
