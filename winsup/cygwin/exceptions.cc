@@ -194,10 +194,14 @@ cygwin_exception::dump_exception ()
     small_printf ("Exception: %s at rip=%011X\r\n", exception_name, ctx->Rip);
   else
     small_printf ("Signal %d at rip=%011X\r\n", e->ExceptionCode, ctx->Rip);
-  small_printf ("rax=%016X rbx=%016X rcx=%016X\r\n", ctx->Rax, ctx->Rbx, ctx->Rcx);
-  small_printf ("rdx=%016X rsi=%016X rdi=%016X\r\n", ctx->Rdx, ctx->Rsi, ctx->Rdi);
-  small_printf ("r8 =%016X r9 =%016X r10=%016X\r\n", ctx->R8, ctx->R9, ctx->R10);
-  small_printf ("r11=%016X r12=%016X r13=%016X\r\n", ctx->R11, ctx->R12, ctx->R13);
+  small_printf ("rax=%016X rbx=%016X rcx=%016X\r\n",
+		ctx->Rax, ctx->Rbx, ctx->Rcx);
+  small_printf ("rdx=%016X rsi=%016X rdi=%016X\r\n",
+		ctx->Rdx, ctx->Rsi, ctx->Rdi);
+  small_printf ("r8 =%016X r9 =%016X r10=%016X\r\n",
+		ctx->R8, ctx->R9, ctx->R10);
+  small_printf ("r11=%016X r12=%016X r13=%016X\r\n",
+		ctx->R11, ctx->R12, ctx->R13);
   small_printf ("r14=%016X r15=%016X\r\n", ctx->R14, ctx->R15);
   small_printf ("rbp=%016X rsp=%016X\r\n", ctx->Rbp, ctx->Rsp);
   small_printf ("program=%W, pid %u, thread %s\r\n",
@@ -214,7 +218,8 @@ cygwin_exception::dump_exception ()
 		cygthread::name ());
 #endif
   small_printf ("cs=%04x ds=%04x es=%04x fs=%04x gs=%04x ss=%04x\r\n",
-		ctx->SegCs, ctx->SegDs, ctx->SegEs, ctx->SegFs, ctx->SegGs, ctx->SegSs);
+		ctx->SegCs, ctx->SegDs, ctx->SegEs, ctx->SegFs,
+		ctx->SegGs, ctx->SegSs);
 }
 
 /* A class for manipulating the stack. */
@@ -417,7 +422,8 @@ _cygtls::inside_kernel (CONTEXT *cx)
 					   can hang */
   else if (h == user_data->hmodule)
     res = false;
-  else if (!GetModuleFileNameW (h, checkdir, windows_system_directory_length + 6))
+  else if (!GetModuleFileNameW (h, checkdir,
+				windows_system_directory_length + 6))
     res = false;
   else
     {
@@ -464,13 +470,15 @@ try_to_debug (bool waitloop)
       return 0;
     }
 
-  __small_sprintf (strchr (debugger_command, '\0'), " %u", GetCurrentProcessId ());
+  __small_sprintf (strchr (debugger_command, '\0'), " %u",
+		   GetCurrentProcessId ());
 
   LONG prio = GetThreadPriority (GetCurrentThread ());
   SetThreadPriority (GetCurrentThread (), THREAD_PRIORITY_HIGHEST);
   PROCESS_INFORMATION pi = {NULL, 0, 0, 0};
 
-  STARTUPINFOW si = {0, NULL, NULL, NULL, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, NULL, NULL, NULL};
+  STARTUPINFOW si = {0, NULL, NULL, NULL, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+		     NULL, NULL, NULL, NULL};
   si.lpReserved = NULL;
   si.lpDesktop = NULL;
   si.dwFlags = 0;
@@ -544,7 +552,9 @@ try_to_debug (bool waitloop)
    exception handler. */
 #define rtl_unwind(el,er)
 #else
-static void __reg3 rtl_unwind (exception_list *, PEXCEPTION_RECORD) __attribute__ ((noinline, regparm (3)));
+static void __reg3 rtl_unwind (exception_list *, PEXCEPTION_RECORD)
+		   __attribute__ ((noinline, regparm (3)));
+
 void __reg3
 rtl_unwind (exception_list *frame, PEXCEPTION_RECORD e)
 {
@@ -714,8 +724,10 @@ exception::handle (EXCEPTION_RECORD *e, exception_list *frame, CONTEXT *in,
       return ExceptionContinueSearch;
     }
 
-  debug_printf ("In cygwin_except_handler exception %y at %p sp %p", e->ExceptionCode, in->_GR(ip), in->_GR(sp));
-  debug_printf ("In cygwin_except_handler signal %d at %p", si.si_signo, in->_GR(ip));
+  debug_printf ("In cygwin_except_handler exception %y at %p sp %p",
+		e->ExceptionCode, in->_GR(ip), in->_GR(sp));
+  debug_printf ("In cygwin_except_handler signal %d at %p",
+		si.si_signo, in->_GR(ip));
 
 #ifdef __x86_64__
   PUINT_PTR framep = (PUINT_PTR) in->Rbp;
@@ -726,7 +738,9 @@ exception::handle (EXCEPTION_RECORD *e, exception_list *frame, CONTEXT *in,
     framep = (PUINT_PTR) in->Rsp;
 #else
   PUINT_PTR framep = (PUINT_PTR) in->_GR(sp);
-  for (PUINT_PTR bpend = (PUINT_PTR) __builtin_frame_address (0); framep > bpend; framep--)
+  for (PUINT_PTR bpend = (PUINT_PTR) __builtin_frame_address (0);
+       framep > bpend;
+       framep--)
     if (*framep == in->SegCs && framep[-1] == in->_GR(ip))
       {
 	framep -= 2;
@@ -766,9 +780,9 @@ exception::handle (EXCEPTION_RECORD *e, exception_list *frame, CONTEXT *in,
 #else
 	    "%s[%d]: segfault at %08x rip %08x rsp %08x error %d",
 #endif
-		      __progname, myself->pid,
-		      e->ExceptionInformation[1], in->_GR(ip), in->_GR(sp),
-		      error_code);
+	    __progname, myself->pid,
+	    e->ExceptionInformation[1], in->_GR(ip), in->_GR(sp),
+	    error_code);
     }
   cygwin_exception exc (framep, in, e);
   si.si_cyg = (void *) &exc;
@@ -894,14 +908,15 @@ _cygtls::interrupt_setup (siginfo_t& si, void *handler, struct sigaction& siga)
     }
 
   infodata = si;
-  this->sig = si.si_signo;		// Should always be last thing set to avoid a race
+  this->sig = si.si_signo; /* Should always be last thing set to avoid race */
 
   if (incyg)
     SetEvent (get_signal_arrived (false));
 
   if (!have_execed)
     proc_subproc (PROC_CLEARWAIT, 1);
-  sigproc_printf ("armed signal_arrived %p, signal %d", signal_arrived, si.si_signo);
+  sigproc_printf ("armed signal_arrived %p, signal %d",
+		  signal_arrived, si.si_signo);
 }
 
 extern "C" void __stdcall
@@ -931,7 +946,8 @@ sigpacket::setup_handler (void *handler, struct sigaction& siga, _cygtls *tls)
 	  tls->lock ();
 	  if (tls->incyg)
 	    {
-	      sigproc_printf ("controlled interrupt. stackptr %p, stack %p, stackptr[-1] %p",
+	      sigproc_printf ("controlled interrupt. stackptr %p, stack %p, "
+			      "stackptr[-1] %p",
 			      tls->stackptr, tls->stack, tls->stackptr[-1]);
 	      tls->interrupt_setup (si, handler, siga);
 	      interrupted = true;
@@ -950,10 +966,11 @@ sigpacket::setup_handler (void *handler, struct sigaction& siga, _cygtls *tls)
 	    {
 	      /* Suspend the thread which will receive the signal.
 		 If one of these conditions is not true we loop.
-		 If the thread is already suspended (which can occur when a program
-		 has called SuspendThread on itself) then just queue the signal. */
-
-	      sigproc_printf ("suspending thread, tls %p, _main_tls %p", tls, _main_tls);
+		 If the thread is already suspended (which can occur when a
+		 program has called SuspendThread on itself) then just queue
+		 the signal. */
+	      sigproc_printf ("suspending thread, tls %p, _main_tls %p",
+			      tls, _main_tls);
 	      res = SuspendThread (hth);
 	      /* Just set pending if thread is already suspended */
 	      if (res)
@@ -983,7 +1000,8 @@ sigpacket::setup_handler (void *handler, struct sigaction& siga, _cygtls *tls)
     }
 
 out:
-  sigproc_printf ("signal %d %sdelivered", si.si_signo, interrupted ? "" : "not ");
+  sigproc_printf ("signal %d %sdelivered", si.si_signo,
+		  interrupted ? "" : "not ");
   return interrupted;
 }
 
@@ -1076,14 +1094,14 @@ ctrl_c_handler (DWORD type)
     return TRUE;
 
   tty_min *t = cygwin_shared->tty.get_cttyp ();
-  /* Ignore this if we're not the process group leader since it should be handled
-     *by* the process group leader. */
+  /* Ignore this if we're not the process group leader since it should be
+     handled *by* the process group leader. */
   if (t && (!have_execed || have_execed_cygwin)
       && t->getpgid () == myself->pid &&
       (GetTickCount () - t->last_ctrl_c) >= MIN_CTRL_C_SLOP)
-    /* Otherwise we just send a SIGINT to the process group and return TRUE (to indicate
-       that we have handled the signal).  At this point, type should be
-       a CTRL_C_EVENT or CTRL_BREAK_EVENT. */
+    /* Otherwise we just send a SIGINT to the process group and return TRUE
+       (to indicate that we have handled the signal).  At this point, type
+       should be a CTRL_C_EVENT or CTRL_BREAK_EVENT. */
     {
       int sig = SIGINT;
       /* If intr and quit are both mapped to ^C, send SIGQUIT on ^BREAK */
@@ -1501,13 +1519,16 @@ _cygtls::call_signal_handler ()
 	  context.uc_link = 0;
 	  context.uc_flags = 0;
 	  if (thissi.si_cyg)
-	    memcpy (&context.uc_mcontext, ((cygwin_exception *)thissi.si_cyg)->context(), sizeof(CONTEXT));
+	    memcpy (&context.uc_mcontext,
+		    ((cygwin_exception *) thissi.si_cyg)->context (),
+		    sizeof (CONTEXT));
 	  else
 	    {
-	      /* FIXME: Really this should be the context which the signal interrupted? */
-	      memset(&context.uc_mcontext, 0, sizeof(struct __mcontext));
+	      /* FIXME: Really this should be the context which the signal
+		 interrupted? */
+	      memset(&context.uc_mcontext, 0, sizeof (struct __mcontext));
 	      context.uc_mcontext.ctxflags = CONTEXT_FULL;
-	      RtlCaptureContext ((CONTEXT *)&context.uc_mcontext);
+	      RtlCaptureContext ((CONTEXT *) &context.uc_mcontext);
 	    }
 
 	  /* FIXME: If/when sigaltstack is implemented, this will need to do
@@ -1515,9 +1536,13 @@ _cygtls::call_signal_handler ()
 	  context.uc_stack.ss_sp = NtCurrentTeb ()->Tib.StackBase;
 	  context.uc_stack.ss_flags = 0;
 	  if (!NtCurrentTeb ()->DeallocationStack)
-	    context.uc_stack.ss_size = (uintptr_t)NtCurrentTeb ()->Tib.StackLimit - (uintptr_t)NtCurrentTeb ()->Tib.StackBase;
+	    context.uc_stack.ss_size
+	      = (uintptr_t) NtCurrentTeb ()->Tib.StackLimit
+		- (uintptr_t) NtCurrentTeb ()->Tib.StackBase;
 	  else
-	    context.uc_stack.ss_size = (uintptr_t)NtCurrentTeb ()->DeallocationStack - (uintptr_t)NtCurrentTeb ()->Tib.StackBase;
+	    context.uc_stack.ss_size
+	      = (uintptr_t) NtCurrentTeb ()->DeallocationStack
+		- (uintptr_t) NtCurrentTeb ()->Tib.StackBase;
 
 	  context.uc_sigmask = context.uc_mcontext.oldmask = this_oldmask;
 
@@ -1570,9 +1595,10 @@ _cygtls::signal_debugger (siginfo_t& si)
 #endif
 	  memcpy (&thread_context, &c, sizeof (CONTEXT));
 	  /* Enough space for 32/64 bit addresses */
-	  char sigmsg[2 * sizeof (_CYGWIN_SIGNAL_STRING " ffffffff ffffffffffffffff")];
-	  __small_sprintf (sigmsg, _CYGWIN_SIGNAL_STRING " %d %y %p", si.si_signo,
-			   thread_id, &thread_context);
+	  char sigmsg[2 * sizeof (_CYGWIN_SIGNAL_STRING
+				  " ffffffff ffffffffffffffff")];
+	  __small_sprintf (sigmsg, _CYGWIN_SIGNAL_STRING " %d %y %p",
+			   si.si_signo, thread_id, &thread_context);
 	  OutputDebugString (sigmsg);
 	}
       ResumeThread (th);

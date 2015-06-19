@@ -1,3 +1,7 @@
+2015-06-19  Corinna Vinschen  <corinna@vinschen.de>
+
+	* exceptions.cc: Minor formatting fixes.
+
 2015-06-18  Corinna Vinschen  <corinna@vinschen.de>
 
 	* Makefile.in (install-man): Exclude release subdir from search paths.
