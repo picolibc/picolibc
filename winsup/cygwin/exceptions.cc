@@ -1610,7 +1610,7 @@ _cygtls::call_signal_handler ()
 		   movq  %[CTX], %%r8      # thiscontext to 3rd arg reg	\n\
 		   movq  %[FUNC], %%rax    # thisfunc to rax		\n\
 		   movq  %%rbp, %%r12      # Save rbp in r12		\n\
-		   movq  %%rsp, %%r13      # Store rsp in r13		\n\
+		   movq  %%rsp, %%r13      # Save rsp in r13		\n\
 		   movq  %%r10, %%rsp      # Move alt stack into rsp	\n\
 		   xorq  %%rbp, %%rbp      # Set rbp to 0		\n\
 		   subq  $32, %%rsp        # Setup shadow space		\n\
@@ -1653,7 +1653,7 @@ _cygtls::call_signal_handler ()
 		       [FUNC]	"o" (thisfunc)
 		   : "memory");
 #endif
-	  /* Revert altstack info to normal. */
+	  /* Revert alternate stack to unused. */
 	  _my_tls.altstack.ss_flags = 0;
 	}
       else
