@@ -108,20 +108,6 @@ struct sigaction {
 #define sa_sigaction  _signal_handlers._sigaction
 #endif
 
-#if __BSD_VISIBLE || __XSI_VISIBLE || __POSIX_VISIBLE >= 200112
-/*
- * Minimum and default signal stack constants. Allow for target overrides
- * from <sys/features.h>.
- */
-#ifndef	MINSIGSTKSZ
-#define	MINSIGSTKSZ	2048
-#endif
-#ifndef	SIGSTKSZ
-#define	SIGSTKSZ	8192
-#endif
-
-#endif
-
 #elif defined(__CYGWIN__)
 #include <cygwin/signal.h>
 #else
@@ -137,11 +123,25 @@ struct sigaction
 };
 #endif /* defined(__rtems__) */
 
+#if __BSD_VISIBLE || __XSI_VISIBLE || __POSIX_VISIBLE >= 200112
+/*
+ * Minimum and default signal stack constants. Allow for target overrides
+ * from <sys/features.h>.
+ */
+#ifndef	MINSIGSTKSZ
+#define	MINSIGSTKSZ	2048
+#endif
+#ifndef	SIGSTKSZ
+#define	SIGSTKSZ	8192
+#endif
+
 /*
  * Possible values for ss_flags in stack_t below.
  */
 #define	SS_ONSTACK	0x1
 #define	SS_DISABLE	0x2
+
+#endif
 
 /*
  * Structure used in sigaltstack call.

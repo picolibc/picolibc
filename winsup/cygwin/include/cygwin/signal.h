@@ -332,9 +332,6 @@ struct sigaction
   int sa_flags;
 };
 
-#define MINSIGSTKSZ     32768
-#define SIGSTKSZ        65536
-
 #define SA_NOCLDSTOP 1   		/* Do not generate SIGCHLD when children
 					   stop */
 #define SA_SIGINFO   2   		/* Invoke the signal catching function
