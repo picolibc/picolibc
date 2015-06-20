@@ -1537,19 +1537,26 @@ _cygtls::call_signal_handler ()
 	      RtlCaptureContext ((CONTEXT *) &context.uc_mcontext);
 	    }
 
-	  /* FIXME: If/when sigaltstack is implemented, this will need to do
-	     something more complicated */
-	  context.uc_stack.ss_sp = NtCurrentTeb ()->Tib.StackBase;
-	  context.uc_stack.ss_flags = 0;
-	  if (!NtCurrentTeb ()->DeallocationStack)
-	    context.uc_stack.ss_size
-	      = (uintptr_t) NtCurrentTeb ()->Tib.StackLimit
-		- (uintptr_t) NtCurrentTeb ()->Tib.StackBase;
+	  if (this_sa_flags & SA_ONSTACK
+	      && !_my_tls.altstack.ss_flags
+	      && _my_tls.altstack.ss_sp)
+	    {
+	      context.uc_stack = _my_tls.altstack;
+	      context.uc_stack.ss_flags = SS_ONSTACK;
+	    }
 	  else
-	    context.uc_stack.ss_size
-	      = (uintptr_t) NtCurrentTeb ()->DeallocationStack
-		- (uintptr_t) NtCurrentTeb ()->Tib.StackBase;
-
+	    {
+	      context.uc_stack.ss_sp = NtCurrentTeb ()->Tib.StackBase;
+	      context.uc_stack.ss_flags = 0;
+	      if (!NtCurrentTeb ()->DeallocationStack)
+		context.uc_stack.ss_size
+		  = (uintptr_t) NtCurrentTeb ()->Tib.StackLimit
+		    - (uintptr_t) NtCurrentTeb ()->Tib.StackBase;
+	      else
+		context.uc_stack.ss_size
+		  = (uintptr_t) NtCurrentTeb ()->DeallocationStack
+		    - (uintptr_t) NtCurrentTeb ()->Tib.StackBase;
+	    }
 	  context.uc_sigmask = context.uc_mcontext.oldmask = this_oldmask;
 
 	  context.uc_mcontext.cr2 = (thissi.si_signo == SIGSEGV
@@ -1565,7 +1572,95 @@ _cygtls::call_signal_handler ()
       sig = 0;		/* Flag that we can accept another signal */
       unlock ();	/* unlock signal stack */
 
-      thisfunc (thissig, &thissi, thiscontext);
+      /* Alternate signal stack requested for this signal and alternate signal
+	 stack set up for this thread? */
+      if (this_sa_flags & SA_ONSTACK
+	  && !_my_tls.altstack.ss_flags
+	  && _my_tls.altstack.ss_sp)
+	{
+	  /* Yes, use alternate signal stack.
+
+	    NOTE:
+
+	    We DO NOT change the TEB's stack addresses and we DO NOT move the
+	    _cygtls area to the alternate stack.  This seems to work fine on
+	    32 and 64 bit, but there may be Windows functions not working
+	    correctly under these circumstances.  Especially 32 bit exception
+	    handling may be broken.
+
+	    On the other hand, if a Windows function crashed and we're handling
+	    this here, moving the TEB stack addresses may be fatal.
+
+	    If the current code does not work as expected in the "usual"
+	    POSIX circumstances, this problem must be revisited. */
+
+	  /* Compute new stackbase.  We start from the high address, subtract
+	     16 bytes (safe/sorry) and align to 16 byte. */
+	  uintptr_t new_sp = (uintptr_t) _my_tls.altstack.ss_sp
+			     + _my_tls.altstack.ss_size - 0x10;
+	  new_sp &= ~0xf;
+	  /* Mark alternate stack as used. */
+	  _my_tls.altstack.ss_flags = SS_ONSTACK;
+	  /* Move to alternate stack, call thisfunc, revert stack regs. */
+#ifdef __x86_64__
+	  __asm__ ("\n\
+		   movq  %[NEW_SP], %%r10  # Load alt stack into r10	\n\
+		   movl  %[SIG], %%ecx     # thissig to 1st arg reg	\n\
+		   movq  %[SI], %%rdx      # &thissi to 2nd arg reg	\n\
+		   movq  %[CTX], %%r8      # thiscontext to 3rd arg reg	\n\
+		   movq  %[FUNC], %%rax    # thisfunc to rax		\n\
+		   movq  %%rbp, %%r12      # Save rbp in r12		\n\
+		   movq  %%rsp, %%r13      # Store rsp in r13		\n\
+		   movq  %%r10, %%rsp      # Move alt stack into rsp	\n\
+		   xorq  %%rbp, %%rbp      # Set rbp to 0		\n\
+		   subq  $32, %%rsp        # Setup shadow space		\n\
+		   call  *%%rax            # Call thisfunc		\n\
+		   movq  %%r12, %%rbp      # Restore rbp		\n\
+		   movq  %%r13, %%rsp      # Restore rsp		\n"
+		   : : [NEW_SP]	"o" (new_sp),
+		       [SIG]	"o" (thissig),
+		       [SI]	"p" (&thissi),
+		       [CTX]	"o" (thiscontext),
+		       [FUNC]	"o" (thisfunc)
+		   : "memory");
+#else
+	  __asm__ ("\n\
+		   push  %%ecx             # Save ecx on orig stack	\n\
+		   push  %%edx             # Save edx on orig stack	\n\
+		   movl  %[NEW_SP], %%ecx  # Load alt stack into ecx	\n\
+		   subl  $20, %%ecx        # Make room on new stack	\n\
+		   movl  %[SIG], %%edx     # thissig to 1st arg slot	\n\
+		   movl  %%edx, (%%ecx)					\n\
+		   movl  %[SI], %%edx      # &thissi to 2nd arg slot	\n\
+		   movl  %%edx, 4(%%ecx)				\n\
+		   movl  %[CTX], %%edx     # thiscontext to 3rd arg slot\n\
+		   movl  %%edx, 8(%%ecx)				\n\
+		   movl  %[FUNC], %%eax    # thisfunc to eax		\n\
+		   movl  %%ebp, 12(%%ecx)  # Save ebp on alt stack	\n\
+		   movl  %%esp, 16(%%ecx)  # Save esp on alt stack	\n\
+		   movl  %%ecx, %%esp      # Move stackbase into esp	\n\
+		   xorl  %%ebp, %%ebp      # Set ebp to 0		\n\
+		   call  *%%eax            # Call thisfunc		\n\
+		   movl	 %%esp, %%ecx      # Move alt stack to ecx	\n\
+		   movl	 12(%%ecx), %%ebp  # Restore ebp		\n\
+		   movl  16(%%ecx), %%esp  # Restore esp		\n\
+		   popl  %%edx             # Restore edx from orig stack\n\
+		   popl  %%ecx             # Restore ecx from orig stack\n"
+		   : : [NEW_SP]	"o" (new_sp),
+		       [SIG]	"o" (thissig),
+		       [SI]	"p" (&thissi),
+		       [CTX]	"o" (thiscontext),
+		       [FUNC]	"o" (thisfunc)
+		   : "memory");
+#endif
+	  /* Revert altstack info to normal. */
+	  _my_tls.altstack.ss_flags = 0;
+	}
+      else
+	/* No alternate signal stack requested or available, just call
+	   signal handler. */
+	thisfunc (thissig, &thissi, thiscontext);
+
       incyg = true;
 
       set_signal_mask (_my_tls.sigmask, this_oldmask);
