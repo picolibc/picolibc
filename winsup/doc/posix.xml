@@ -763,6 +763,7 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     shutdown
     sigaction
     sigaddset
+    sigaltstack
     sigdelset
     sigemptyset
     sigfillset
@@ -1490,7 +1491,6 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     scalblnl
     scalbnl
     setnetent
-    sigaltstack
     sigtimedwait
     sinhl
     sinl

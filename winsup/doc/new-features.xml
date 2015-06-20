@@ -9,6 +9,16 @@
 <itemizedlist mark="bullet">
 
 <listitem><para>
+First cut of an implementation to allow signal handlers running on an
+alternate signal stack. 
+</para></listitem>
+
+<listitem><para>
+New API sigaltstack, plus definitions for SA_ONSTACK, SS_ONSTACK,
+SS_DISABLE, MINSIGSTKSZ, SIGSTKSZ.
+</para></listitem>
+
+<listitem><para>
 New API: sethostname.
 </para></listitem>
 

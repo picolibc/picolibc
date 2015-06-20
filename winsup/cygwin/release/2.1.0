@@ -1,6 +1,12 @@
 What's new:
 -----------
 
+- First cut of an implementation to allow signal handlers running on an
+  alternate signal stack.
+  
+- New API sigaltstack, plus definitions for SA_ONSTACK, SS_ONSTACK, SS_DISABLE,
+  MINSIGSTKSZ, SIGSTKSZ.
+
 - New API: sethostname.
 
 
