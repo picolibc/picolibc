@@ -1,3 +1,28 @@
+2015-06-20  Corinna Vinschen  <corinna@vinschen.de>
+
+	* exceptions.cc (_cygtls::call_signal_handler): Implement alternate
+	signal stack handling.
+	* signal.cc (sigaltstack): Add fault handler.
+	* include/cygwin/signal.h: Remove definitions of MINSIGSTKSZ
+	and SIGSTKSZ here.
+
+2015-06-19  Corinna Vinschen  <corinna@vinschen.de>
+
+	* common.din (sigaltstack): Export.
+	* cygtls.cc (_cygtls::init_thread): Initialize altstack.
+	* cygtls.h (__tlsstack_t): Rename from __stack_t to distinguish
+	more clearly from stack_t.  Accommodate throughout.
+	(_cygtls): Add altstack member.
+	* exceptions.cc (exception::handle): Set SIGSEGV handler to SIG_DFL
+	if we encounter a stack overflow, and no alternate stack has been
+	defined.
+	* include/cygwin/signal.h (MINSIGSTKSZ): Define
+	(SIGSTKSZ): Define.
+	(SA_ONSTACK): Define.
+	* signal.cc (sigaltstack): New function.
+	* tlsoffset.h: Regenerate.
+	* tlsoffset64.h: Ditto.
+
 2015-06-19  Corinna Vinschen  <corinna@vinschen.de>
 
 	* exceptions.cc: Minor formatting fixes.

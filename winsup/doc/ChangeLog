@@ -1,3 +1,8 @@
+2015-06-20  Corinna Vinschen  <corinna@vinschen.de>
+
+	* new-features.xml (ov-new2.1): Add alterante signal stack info.
+	* posix.xml (std-susv4): Move sigaltstack here.
+
 2015-06-19  Jon Turney  <jon.turney@dronecode.org.uk>
 
 	* Makefile.in (install-man): Fix command to create man3 install
