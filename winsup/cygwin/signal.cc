@@ -630,35 +630,49 @@ sigaltstack (const stack_t *ss, stack_t *oss)
 {
   _cygtls& me = _my_tls;
 
-  if (ss)
+  __try
     {
-      if (me.altstack.ss_flags == SS_ONSTACK)
+      if (ss)
 	{
-	  set_errno (EPERM);
-	  return -1;
-	}
-      if (ss->ss_flags == SS_DISABLE)
-	{
-	  me.altstack.ss_sp = NULL;
-	  me.altstack.ss_flags = 0;
-	  me.altstack.ss_size = 0;
-	}
-      else
-	{
-	  if (ss->ss_flags)
+	  if (me.altstack.ss_flags == SS_ONSTACK)
 	    {
-	      set_errno (EINVAL);
+	      /* An attempt was made to modify an active stack. */
+	      set_errno (EPERM);
 	      return -1;
 	    }
-	  if (ss->ss_size < MINSIGSTKSZ)
+	  if (ss->ss_flags == SS_DISABLE)
 	    {
-	      set_errno (ENOMEM);
-	      return -1;
+	      me.altstack.ss_sp = NULL;
+	      me.altstack.ss_flags = 0;
+	      me.altstack.ss_size = 0;
 	    }
-	  memcpy (&me.altstack, ss, sizeof *ss);
+	  else
+	    {
+	      if (ss->ss_flags)
+		{
+		  /* The ss argument is not a null pointer, and the ss_flags
+		     member pointed to by ss contains flags other than
+		     SS_DISABLE. */
+		  set_errno (EINVAL);
+		  return -1;
+		}
+	      if (ss->ss_size < MINSIGSTKSZ)
+		{
+		  /* The size of the alternate stack area is less than
+		     MINSIGSTKSZ. */
+		  set_errno (ENOMEM);
+		  return -1;
+		}
+	      memcpy (&me.altstack, ss, sizeof *ss);
+	    }
 	}
+      if (oss)
+	memcpy (oss, &me.altstack, sizeof *oss);
     }
-  if (oss)
-    memcpy (oss, &me.altstack, sizeof *oss);
+  __except (EFAULT)
+    {
+      return EFAULT;
+    }
+  __endtry
   return 0;
 }
