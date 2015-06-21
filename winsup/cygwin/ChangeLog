@@ -1,3 +1,10 @@
+2015-06-21  Corinna Vinschen  <corinna@vinschen.de>
+
+	* exceptions.cc (_cygtls::call_signal_handler): Drop subtracting 16
+	bytes from the alternate stack, it's not necessary.  Safe all clobbered
+	registers.  Safe one on the orignal stack, the others on the alternate
+	stack on both platforms.
+
 2015-06-20  Corinna Vinschen  <corinna@vinschen.de>
 
 	* exceptions.cc (_cygtls::call_signal_handler): Implement alternate

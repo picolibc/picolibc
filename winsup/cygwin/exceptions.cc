@@ -1594,29 +1594,49 @@ _cygtls::call_signal_handler ()
 	    If the current code does not work as expected in the "usual"
 	    POSIX circumstances, this problem must be revisited. */
 
-	  /* Compute new stackbase.  We start from the high address, subtract
-	     16 bytes (safe/sorry) and align to 16 byte. */
+	  /* Compute new stackbase.  We start from the high address, aligned
+	     to 16 byte. */
 	  uintptr_t new_sp = (uintptr_t) _my_tls.altstack.ss_sp
-			     + _my_tls.altstack.ss_size - 0x10;
+			     + _my_tls.altstack.ss_size;
 	  new_sp &= ~0xf;
 	  /* Mark alternate stack as used. */
 	  _my_tls.altstack.ss_flags = SS_ONSTACK;
-	  /* Move to alternate stack, call thisfunc, revert stack regs. */
+	  /* In assembler: Save regs on new stack, move to alternate stack,
+	     call thisfunc, revert stack regs. */
 #ifdef __x86_64__
+	  /* Clobbered regs: rax, rcx, rdx, r8, r9, r10, r11, rbp, rsp */
 	  __asm__ ("\n\
-		   movq  %[NEW_SP], %%r10  # Load alt stack into r10	\n\
+		   pushq %%r9              # Push r9 on orig stack 	\n\
+		   movq  %[NEW_SP], %%r9   # Load alt stack into r9	\n\
+		   subq  $0x40, %%r9       # Make room on alt stack to	\n\
+					   # save clobbered regs	\n\
+		   movq  %%rax, (%%r9)     # Save other clobbered regs	\n\
+		   movq  %%rcx, 0x8(%%r9)				\n\
+		   movq  %%rdx, 0x10(%%r9)				\n\
+		   movq  %%r8,  0x18(%%r9)				\n\
+		   movq  %%r10, 0x20(%%r9)				\n\
+		   movq  %%r11, 0x28(%%r9)				\n\
+		   movq  %%rbp, 0x30(%%r9)				\n\
+		   movq  %%rsp, 0x38(%%r9)				\n\
 		   movl  %[SIG], %%ecx     # thissig to 1st arg reg	\n\
 		   movq  %[SI], %%rdx      # &thissi to 2nd arg reg	\n\
 		   movq  %[CTX], %%r8      # thiscontext to 3rd arg reg	\n\
 		   movq  %[FUNC], %%rax    # thisfunc to rax		\n\
-		   movq  %%rbp, %%r12      # Save rbp in r12		\n\
-		   movq  %%rsp, %%r13      # Save rsp in r13		\n\
-		   movq  %%r10, %%rsp      # Move alt stack into rsp	\n\
+		   movq  %%r9, %%rsp       # Move alt stack into rsp	\n\
 		   xorq  %%rbp, %%rbp      # Set rbp to 0		\n\
-		   subq  $32, %%rsp        # Setup shadow space		\n\
+		   subq  $0x20, %%rsp      # Setup shadow space		\n\
 		   call  *%%rax            # Call thisfunc		\n\
-		   movq  %%r12, %%rbp      # Restore rbp		\n\
-		   movq  %%r13, %%rsp      # Restore rsp		\n"
+		   addq  $0x20, %%rsp      # Revert shadow space	\n\
+		   movq  %%rsp, %%r9       # Restore clobbered regs	\n\
+		   movq  0x38(%%r9), %%rsp				\n\
+		   movq  0x30(%%r9), %%rbp				\n\
+		   movq  0x28(%%r9), %%r11				\n\
+		   movq  0x20(%%r9), %%r10				\n\
+		   movq  0x18(%%r9), %%r8				\n\
+		   movq  0x10(%%r9), %%rdx				\n\
+		   movq  0x8(%%r9), %%rcx				\n\
+		   movq  (%%r9), %%rax					\n\
+		   popq  %%r9						\n"
 		   : : [NEW_SP]	"o" (new_sp),
 		       [SIG]	"o" (thissig),
 		       [SI]	"p" (&thissi),
@@ -1624,11 +1644,17 @@ _cygtls::call_signal_handler ()
 		       [FUNC]	"o" (thisfunc)
 		   : "memory");
 #else
+	  /* Clobbered regs: eax, ecx, edx, ebp, esp */
 	  __asm__ ("\n\
-		   push  %%ecx             # Save ecx on orig stack	\n\
-		   push  %%edx             # Save edx on orig stack	\n\
+		   push  %%ecx             # Push ecx on orig stack	\n\
 		   movl  %[NEW_SP], %%ecx  # Load alt stack into ecx	\n\
-		   subl  $20, %%ecx        # Make room on new stack	\n\
+		   subl  $28, %%ecx        # Make room on alt stack for	\n\
+					   # clobbered regs and args to \n\
+					   # signal handler             \n\
+		   movl  %%eax, 12(%%ecx)  # Save other clobbered regs	\n\
+		   movl  %%edx, 16(%%ecx)				\n\
+		   movl  %%ebp, 20(%%ecx)				\n\
+		   movl  %%esp, 24(%%ecx)				\n\
 		   movl  %[SIG], %%edx     # thissig to 1st arg slot	\n\
 		   movl  %%edx, (%%ecx)					\n\
 		   movl  %[SI], %%edx      # &thissi to 2nd arg slot	\n\
@@ -1636,16 +1662,15 @@ _cygtls::call_signal_handler ()
 		   movl  %[CTX], %%edx     # thiscontext to 3rd arg slot\n\
 		   movl  %%edx, 8(%%ecx)				\n\
 		   movl  %[FUNC], %%eax    # thisfunc to eax		\n\
-		   movl  %%ebp, 12(%%ecx)  # Save ebp on alt stack	\n\
-		   movl  %%esp, 16(%%ecx)  # Save esp on alt stack	\n\
-		   movl  %%ecx, %%esp      # Move stackbase into esp	\n\
+		   movl  %%ecx, %%esp      # Move alt stack into esp	\n\
 		   xorl  %%ebp, %%ebp      # Set ebp to 0		\n\
 		   call  *%%eax            # Call thisfunc		\n\
-		   movl	 %%esp, %%ecx      # Move alt stack to ecx	\n\
-		   movl	 12(%%ecx), %%ebp  # Restore ebp		\n\
-		   movl  16(%%ecx), %%esp  # Restore esp		\n\
-		   popl  %%edx             # Restore edx from orig stack\n\
-		   popl  %%ecx             # Restore ecx from orig stack\n"
+		   movl	 %%esp, %%ecx      # Restore clobbered regs	\n\
+		   movl  24(%%ecx), %%esp				\n\
+		   movl	 20(%%ecx), %%ebp				\n\
+		   movl	 16(%%ecx), %%edx				\n\
+		   movl	 12(%%ecx), %%eax				\n\
+		   popl  %%ecx						\n"
 		   : : [NEW_SP]	"o" (new_sp),
 		       [SIG]	"o" (thissig),
 		       [SI]	"p" (&thissi),
