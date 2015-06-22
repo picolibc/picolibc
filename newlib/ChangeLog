@@ -1,3 +1,7 @@
+2015-06-22  Corinna Vinschen  <corinna@vinschen.de>
+
+	* libc/include/sys/signal.h: Include forgotten sys/cdefs.h.
+
 2015-06-20  Corinna Vinschen  <corinna@vinschen.de>
 
 	* libc/include/sys/signal.h: Move altstack macros completely

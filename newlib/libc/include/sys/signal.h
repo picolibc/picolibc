@@ -7,6 +7,7 @@ extern "C" {
 #endif
 
 #include "_ansi.h"
+#include <sys/cdefs.h>
 #include <sys/features.h>
 #include <sys/types.h>
 #include <sys/_timespec.h>
