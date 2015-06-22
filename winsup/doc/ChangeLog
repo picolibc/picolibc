@@ -1,5 +1,10 @@
 2015-06-22  Jon Turney  <jon.turney@dronecode.org.uk>
 
+	* Makefile.in (intro2man.stamp): Add.
+	* intro.xml: New file.
+
+2015-06-22  Jon Turney  <jon.turney@dronecode.org.uk>
+
 	* Makefile.in (install-info, cygwin-ug-net.info)
 	(cygwin-api.info): Add.
 	* cygwin-ug-net.xml: Add texinfo-node.

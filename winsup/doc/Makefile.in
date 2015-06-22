@@ -54,6 +54,7 @@ all: Makefile Makefile.dep \
 	cygwin-api/cygwin-api.pdf \
 	utils2man.stamp \
 	api2man.stamp \
+	intro2man.stamp \
 	cygwin-ug-net.info cygwin-api.info
 
 Makefile: $(srcdir)/Makefile.in
@@ -83,7 +84,7 @@ install-html: cygwin-ug-net/cygwin-ug-net.html cygwin-api/cygwin-api.html
 	$(INSTALL_DATA) cygwin-api/*.html $(DESTDIR)$(htmldir)/cygwin-api
 	$(INSTALL_DATA) cygwin-api/cygwin-api.html $(DESTDIR)$(htmldir)/cygwin-api/index.html
 
-install-man: utils2man.stamp api2man.stamp
+install-man: utils2man.stamp api2man.stamp intro2man.stamp
 	@$(MKDIRP) $(DESTDIR)$(man1dir)
 	$(INSTALL_DATA) *.1 $(DESTDIR)$(man1dir)
 	@$(MKDIRP) $(DESTDIR)$(man3dir)
@@ -130,6 +131,11 @@ cygwin-api.info: $(cygwin-api_SOURCES) charmap
 charmap:
 	cp /usr/share/docbook2X/charmaps/texi.charmap charmap
 	echo "ae (R)" >>charmap
+
+intro2man.stamp: intro.xml man.xsl
+	-$(XMLTO) man -m ${srcdir}/man.xsl $<
+	@echo ".so intro.1" >cygwin.1
+	@touch $@
 
 faq/faq.html : $(FAQ_SOURCES)
 	-$(XMLTO) html -o faq -m $(srcdir)/html.xsl $(srcdir)/faq.xml

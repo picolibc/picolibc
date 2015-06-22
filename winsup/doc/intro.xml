@@ -1,0 +1,197 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE reference PUBLIC "-//OASIS//DTD DocBook V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
+
+<reference id="intro" xmlns:xi="http://www.w3.org/2001/XInclude">
+  <referenceinfo>
+    <xi:include href="legal.xml"/>
+  </referenceinfo>
+  <title>Cygwin</title>
+  <refentry id="intro1">
+    <refmeta>
+      <refentrytitle>intro</refentrytitle>
+      <manvolnum>1</manvolnum>
+      <refmiscinfo class="manual">Cygwin</refmiscinfo>
+    </refmeta>
+    <refnamediv>
+      <refname>intro</refname>
+      <refpurpose>Introduction to the Cygwin Environment</refpurpose>
+    </refnamediv>
+    <refsect1>
+      <title>DESCRIPTION</title>
+      <para><emphasis>Cygwin</emphasis> is a Linux-like environment for
+      Windows. It consists of two parts:</para>
+      <para>A DLL (<filename>cygwin1.dll</filename>) which acts as a POSIX API
+      emulation layer providing substantial POSIX API functionality, modelled
+      after the GNU/Linux operating system. The
+      <citerefentry><refentrytitle>intro</refentrytitle><manvolnum>3</manvolnum></citerefentry>
+      man page gives an introduction to this API.</para>
+      <para>A collection of tools which provide Linux look and feel.  This man
+      page describes the user environment.</para>
+    </refsect1>
+    <refsect1>
+      <title>AVAILABILITY</title>
+      <para><emphasis>Cygwin</emphasis> is developed by volunteers collaborating
+      over the Internet. It is distributed through the website <ulink
+      url="http://cygwin.com"/>, where you can find extensive documentation,
+      including FAQ, User's Guide, and API Reference. The
+      <emphasis>Cygwin</emphasis> website should be considered the authoritative
+      source of information. The source code, released under the <emphasis>GNU
+      General Public License, Version 3 (GPLv3+)</emphasis>, is also available
+      from the website or one of the mirrors.</para>
+    </refsect1>
+    <refsect1>
+      <title>COMPATIBILITY</title>
+      <para><emphasis>Cygwin</emphasis> uses the GNU versions of many of the
+      standard UNIX command-line utilities (<command>sed</command>,
+      <command>awk</command>, etc.), so the user environment is more similar to
+      a Linux system than, for example, Sun Solaris.</para>
+      <para>The default login shell and <command>/bin/sh</command> for
+      <emphasis>Cygwin</emphasis> is <command>bash</command>, the GNU
+      "Bourne-Again Shell", but other shells such as <command>tcsh</command>
+      (an improved <command>csh</command>) are also available and can be
+      installed using <emphasis>Cygwin</emphasis>'s setup.</para>
+    </refsect1>
+    <refsect1>
+      <title>NOTES</title>
+      <para>To port applications you will need to install the development tools,
+      which you can do by selecting <package>gcc</package> in
+      <emphasis>setup.exe</emphasis> (dependencies are automatically handled).
+      If you need a specific program or library, you can search for a
+      <emphasis>Cygwin</emphasis> package containing it at:</para>
+      <para>
+	<ulink url="http://cygwin.com/packages/"/>
+      </para>
+      <para>If you are a UNIX veteran who plans to use
+      <emphasis>Cygwin</emphasis> extensively, you will probably find it worth
+      your while to learn to use <emphasis>Cygwin</emphasis>-specific tools that
+      provide a UNIX-like interface to common operations. For example,
+      <command>cygpath</command> converts between UNIX and Win32-style
+      pathnames. The full documentation for these utilities is at:</para>
+      <para>
+	<ulink url="http://cygwin.com/cygwin-ug-net/using-utils.html"/>
+      </para>
+      <para>The optional <package>cygutils</package> package also contains
+      utilities that help with common problems, such as
+      <command>dos2unix</command> and <command>unix2dos</command> for the
+      CRLF issue.</para>
+    </refsect1>
+    <refsect1>
+      <title>DOCUMENTATION</title>
+      <para>In addition to man pages and texinfo documentation, many
+      <emphasis>Cygwin</emphasis> packages provide system-independent
+      documentation in the <filename>/usr/share/doc/</filename> directory and
+      <emphasis>Cygwin</emphasis>-specific documentation in
+      <filename>/usr/share/doc/Cygwin/</filename></para>
+      <para>For example, if you have both <command>less</command> and
+      <command>cron</command> installed, the command <command>less
+      /usr/share/doc/Cygwin/cron.README</command> would display the instructions
+      to set up <command>cron</command> on your system.</para>
+    </refsect1>
+    <refsect1>
+      <title>REPORTING BUGS</title>
+      <para>If you find a bug in <emphasis>Cygwin</emphasis>, please read</para>
+      <para>
+	<ulink url="http://cygwin.com/bugs.html"/>
+      </para>
+      <para>and follow the instructions for reporting found there.  If you are
+      able to track down the source of the bug and can provide a fix, there are
+      instructions for contributing patches at:</para>
+      <para>
+	<ulink url="http://cygwin.com/contrib.html"/>
+      </para>
+    </refsect1>
+    <refsect1>
+      <title>SEE ALSO</title>
+      <para>
+	<citerefentry>
+	  <refentrytitle>intro</refentrytitle>
+	  <manvolnum>3</manvolnum>
+	</citerefentry>
+      </para>
+    </refsect1>
+  </refentry>
+
+  <refentry id="intro3">
+    <refmeta>
+      <refentrytitle>intro</refentrytitle>
+      <manvolnum>3</manvolnum>
+      <refmiscinfo class="manual">Cygwin</refmiscinfo>
+    </refmeta>
+    <refnamediv>
+      <refname>intro</refname>
+      <refpurpose>Introduction to the Cygwin API</refpurpose>
+    </refnamediv>
+    <refsect1>
+      <title>DESCRIPTION</title>
+      <para><emphasis>Cygwin</emphasis> is a Linux-like environment for
+      Windows. It consists of two parts:</para>
+      <para>A DLL (<filename>cygwin1.dll</filename>) which acts as a POSIX API
+      emulation layer providing substantial POSIX API functionality, modelled
+      after the GNU/Linux operating system. This page describes the API provided
+      by the DLL.
+      </para>
+      <para>A collection of tools which provide Linux look and feel.  This
+      environment is described in the
+      <citerefentry><refentrytitle>intro</refentrytitle><manvolnum>1</manvolnum></citerefentry>
+      man page.</para>
+    </refsect1>
+    <refsect1>
+      <title>AVAILABILITY</title>
+      <para><emphasis>Cygwin</emphasis> is developed by volunteers collaborating
+      over the Internet. It is distributed through the website <ulink
+      url="http://cygwin.com"/>. The website has extensive documentation,
+      including FAQ, User's Guide, and API Reference. It should be considered
+      the authoritative source of information. The source code, released under
+      the <emphasis>GNU General Public License, Version 3 (GPLv3+)</emphasis>,
+      is also available from the website or one of the mirrors.</para>
+    </refsect1>
+    <refsect1>
+      <title>COMPATIBILITY</title>
+      <para><emphasis>Cygwin</emphasis> policy is to attempt to adhere to
+      <emphasis>POSIX.1-2008/SUSv4</emphasis> (Portable Operating System
+      Interface for UNIX / The Single UNIX Specification, Version 4) where
+      possible.</para>
+      <para><emphasis>SUSv4</emphasis> is available online at:</para>
+      <para>
+	<ulink url="http://pubs.opengroup.org/onlinepubs/9699919799/"/>
+      </para>
+      <para>For compatibility information about specific functions, see the API
+      Reference at:</para>
+      <para>
+	<ulink url="http://cygwin.com/cygwin-api/cygwin-api.html"/>
+      </para>
+      <para>Where these standards are ambiguous, Cygwin tries to mimic
+      <emphasis>Linux</emphasis>.  However, <emphasis>Cygwin</emphasis> uses
+      <emphasis>newlib</emphasis> instead of <emphasis>glibc</emphasis> as its C
+      Library, available at:</para>
+      <para>
+	<ulink url="https://sourceware.org/newlib/"/>
+      </para>
+      <para>Keep in mind that there are many underlying differences between UNIX
+      and Win32 making complete compatibility an ongoing challenge.</para>
+    </refsect1>
+    <refsect1>
+      <title>REPORTING BUGS</title>
+      <para>If you find a bug in <emphasis>Cygwin</emphasis>, please read</para>
+      <para>
+	<ulink url="http://cygwin.com/bugs.html"/>
+      </para>
+      <para>and follow the instructions for reporting found there.  If you are
+      able to track down the source of the bug and can provide a fix, there are
+      instructions for contributing patches at:</para>
+      <para>
+	<ulink url="http://cygwin.com/contrib.html"/>
+      </para>
+    </refsect1>
+    <refsect1>
+      <title>SEE ALSO</title>
+      <para>
+	<citerefentry>
+	  <refentrytitle>intro</refentrytitle>
+	  <manvolnum>1</manvolnum>
+	</citerefentry>
+      </para>
+    </refsect1>
+  </refentry>
+
+</reference>
