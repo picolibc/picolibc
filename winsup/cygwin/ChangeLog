@@ -1,3 +1,10 @@
+2015-06-22  Corinna Vinschen  <corinna@vinschen.de>
+
+	* exceptions.cc (_cygtls::call_signal_handler): Drop pushing a register
+	on the original stack, it confuses GCC.  Rearrange the assembler code
+	so that $rax/$eax is not used by GCC to prepare an argument value.
+	Use $rax/$eax without saving.  Drop clearing $rbp/$epb.
+
 2015-06-21  Corinna Vinschen  <corinna@vinschen.de>
 
 	* exceptions.cc (_cygtls::call_signal_handler): Drop subtracting 16
