@@ -17,7 +17,7 @@
 
 /*
 FUNCTION
-<<fread>>. <<fread_unlocked>>---read array elements from a file
+<<fread>>, <<fread_unlocked>>---read array elements from a file
 
 INDEX
 	fread

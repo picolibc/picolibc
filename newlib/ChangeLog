@@ -1,5 +1,10 @@
 2015-06-23  Jon Turney  <jon.turney@dronecode.org.uk>
 
+	* libc/stdio/fread.c: Fix inconsistent use of '.' to separate
+	function names in FUNCTION mark up.
+
+2015-06-23  Jon Turney  <jon.turney@dronecode.org.uk>
+
 	* libc/stdlib/llabs.c: Mark up parameter name in ANSI_SYNOPSIS.
 	* libc/time/tzset.c: Add and mark up parameter in SYNOPSIS.
 	* libm/common/s_nan.c: Ditto.
