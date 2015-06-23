@@ -4,7 +4,7 @@ FUNCTION
 
 ANSI_SYNOPSIS
 	#include <wchar.h>
-	wchar_t *wcpcpy(wchar_t *<[s1]>, const wchar_t *,<[s2]>);
+	wchar_t *wcpcpy(wchar_t *<[s1]>, const wchar_t *<[s2]>);
 
 TRAD_SYNOPSIS
 	wchar_t *wcpcpy(<[s1]>, <[s2]>
