@@ -69,12 +69,12 @@ TRAD_SYNOPSIS
 DESCRIPTION
 The <<wcsrtombs>> function converts a string of wide characters indirectly
 pointed to by <[src]> to a corresponding multibyte character string stored in
-the array pointed to by <[dst}>.  No more than <[len]> bytes are written to
-<[dst}>.
+the array pointed to by <[dst]>.  No more than <[len]> bytes are written to
+<[dst]>.
 
-If <[dst}> is NULL, no characters are stored.
+If <[dst]> is NULL, no characters are stored.
 
-If <[dst}> is not NULL, the pointer pointed to by <[src]> is updated to point
+If <[dst]> is not NULL, the pointer pointed to by <[src]> is updated to point
 to the character after the one that conversion stopped at.  If conversion
 stops because a null character is encountered, *<[src]> is set to NULL.
 

@@ -1,5 +1,10 @@
 2015-06-23  Jon Turney  <jon.turney@dronecode.org.uk>
 
+	* libc/stdlib/itoa.c: Fix makedoc markup.
+	* libc/stdlib/wcsnrtombs.c: Ditto.
+
+2015-06-23  Jon Turney  <jon.turney@dronecode.org.uk>
+
 	* libc/signal/signal.tex: Use texinfo not makedoc markup.
 	* libc/stdio/stdio.tex: Ditto.
 
