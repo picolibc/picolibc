@@ -67,6 +67,7 @@ CHEWOUT_FILES= \
 	isalnum.def	\
 	isalpha.def	\
 	isascii.def	\
+	isblank.def	\
 	iscntrl.def	\
 	isdigit.def	\
 	islower.def	\

@@ -52,7 +52,8 @@ endif # USE_LIBTOOL
 include $(srcdir)/../../Makefile.shared	
 
 CHEWOUT_FILES = \
-	popen.def
+	popen.def \
+	posix_spawn.def
 
 SUFFIXES = .def
 

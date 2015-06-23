@@ -43,6 +43,7 @@ include $(srcdir)/../../Makefile.shared
 AM_CFLAGS = -I $(srcdir)/../stdio
 
 CHEWOUT_FILES = \
+	fdopen64.def		\
 	fgetpos64.def		\
 	fopen64.def		\
 	freopen64.def		\

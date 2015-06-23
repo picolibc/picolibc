@@ -9,7 +9,8 @@ system, but these functions provide a uniform interface.
 
 The corresponding declarations are in @file{stdio.h}.
 
-@menu  
+@menu
+* fdopen64::    Turn open large file into a stream
 * fopen64::     Open a large file
 * freopen64::   Open a large file using an existing file descriptor
 * fsetpos64::   Restore position of a large stream or file
@@ -18,6 +19,9 @@ The corresponding declarations are in @file{stdio.h}.
 * fseeko64::    Set large file position
 * tmpfile64::   Create a temporary large file
 @end menu 
+
+@page
+@include stdio64/fdopen64.def
 
 @page
 @include stdio64/fopen64.def

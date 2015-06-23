@@ -1,5 +1,17 @@
 2015-06-23  Jon Turney  <jon.turney@dronecode.org.uk>
 
+	* libc/ctype/Makefile.am (CHEWOUT_FILES): Add isblank.def.
+	* libc/ctype/ctype.tex: Include isblank and add to menu.
+	* libc/posix/Makefile.am (CHEWOUT_FILES): Add posix_spawn.def.
+	* libc/posix/posix.tex: Include posix_spawn and add to menu.
+	* libc/stdio64/Makefile.am (CHEWOUT_FILES): Add fdopen.def.
+	* libc/stdio64/stdio64.tex: Include fdopen64 and add to menu.
+	* libc/stdio64/fdopen64.c: Improve one-line description.
+	* libc/string/Makefile.am (CHEWOUT_FILES): Add strchrnul.def.
+	* libc/string/strings.tex: Include strchrnul and add to menu.
+
+2015-06-23  Jon Turney  <jon.turney@dronecode.org.uk>
+
 	* libc/stdlib/stdlib.tex: Include itoa and utoa, and add to menu.
 	* libc/string/strings.tex: Include memrchr and rawmemchr, and add
 	to menu.

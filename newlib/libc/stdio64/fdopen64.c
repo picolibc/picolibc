@@ -1,6 +1,6 @@
 /*
 FUNCTION
-<<fdopen64>>---turn open file into a stream
+<<fdopen64>>---turn open large file into a stream
 
 INDEX
 	fdopen64

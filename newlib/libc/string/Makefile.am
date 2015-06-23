@@ -143,7 +143,7 @@ wcsncmp.def	wcsncpy.def	wcsnlen.def	wcspbrk.def \
 wcsrchr.def	wcsspn.def	wcsstr.def 	wcstok.def  \
 wcswidth.def	wcsxfrm.def	wcwidth.def	wmemchr.def \
 wmemcmp.def	wmemcpy.def	wmemmove.def	wmemset.def \
-memmem.def	memrchr.def	rawmemchr.def
+memmem.def	memrchr.def	rawmemchr.def	strchrnul.def
 
 SUFFIXES = .def
 
