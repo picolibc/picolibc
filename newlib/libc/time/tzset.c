@@ -10,12 +10,12 @@ INDEX
 ANSI_SYNOPSIS
 	#include <time.h>
 	void tzset(void);
-	void _tzset_r (struct _reent *);
+	void _tzset_r (struct _reent *<[reent_ptr]>);
 
 TRAD_SYNOPSIS
 	#include <time.h>
 	void tzset();
-	void _tzset_r (reent_ptr)
+	void _tzset_r (<[reent_ptr]>);
         struct _reent *reent_ptr;
 
 DESCRIPTION

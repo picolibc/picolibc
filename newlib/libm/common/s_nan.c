@@ -14,8 +14,8 @@ INDEX
 
 ANSI_SYNOPSIS
 	#include <math.h>
-	double nan(const char *);
-	float nanf(const char *);
+	double nan(const char *<[unused]>);
+	float nanf(const char *<[unused]>);
 
 TRAD_SYNOPSIS
 	#include <math.h>

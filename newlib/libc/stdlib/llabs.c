@@ -7,7 +7,7 @@ INDEX
 
 ANSI_SYNOPSIS
         #include <stdlib.h>
-        long long llabs(long long j);
+        long long llabs(long long <[j]>);
 
 TRAD_SYNOPSIS
         #include <stdlib.h>
