@@ -14,7 +14,7 @@
 
 /*
 FUNCTION
-	<<pow10>>, <<pow10f>>---exponential
+	<<pow10>>, <<pow10f>>---base 10 power functions
 INDEX
 	pow10
 INDEX

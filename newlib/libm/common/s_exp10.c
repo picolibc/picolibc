@@ -14,7 +14,7 @@
 
 /*
 FUNCTION
-	<<exp10>>, <<exp10f>>---exponential
+	<<exp10>>, <<exp10f>>---exponential, base 10
 INDEX
 	exp10
 INDEX

@@ -51,6 +51,7 @@ machines---are available when you include @file{fastmath.h} instead of
 * cosh::	Hyperbolic cosine
 * erf::		Error function (erf, erfc)
 * exp::		Exponential, base e
+* exp10::	Exponential, base 10
 * exp2::	Exponential, base 2
 * expm1::	Exponential, base e, of x - 1
 * fabs::	Absolute value (magnitude)
@@ -81,6 +82,7 @@ machines---are available when you include @file{fastmath.h} instead of
 * nearbyint::	Round to integer
 * nextafter::	Get next representable number
 * pow::		X to the power Y
+* pow10::	10 to the power X
 * remainder::	remainder of X divided by Y 
 * remquo::	Remainder and part of quotient
 * rint::	Round to integer
@@ -189,6 +191,8 @@ registered trademark of The IEEE.
 @page
 @include   math/w_exp.def
 @page
+@include   common/s_exp10.def
+@page
 @include   math/w_exp2.def
 @page
 @include common/s_expm1.def
@@ -248,6 +252,8 @@ registered trademark of The IEEE.
 @include common/s_nextafter.def
 @page
 @include   math/w_pow.def
+@page
+@include   common/s_pow10.def
 @page
 @include   math/w_remainder.def
 @page

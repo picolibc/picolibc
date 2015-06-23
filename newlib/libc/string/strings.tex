@@ -17,7 +17,9 @@ managing areas of memory.  The corresponding declarations are in
 * memmem::      Find memory segment
 * memmove::     Move possibly overlapping memory
 * mempcpy::	Copy memory regions and locate end
+* memrchr::     Reverse search for character in memory
 * memset::      Set an area of memory
+* rawmemchr::   Find character in memory
 * rindex::      Reverse search for character in string
 * stpcpy::      Copy string returning a pointer to its end
 * stpncpy::     Counted copy string returning a pointer to its end
@@ -86,7 +88,13 @@ managing areas of memory.  The corresponding declarations are in
 @include string/mempcpy.def
 
 @page
+@include string/memrchr.def
+
+@page
 @include string/memset.def
+
+@page
+@include string/rawmemchr.def
 
 @page
 @include string/rindex.def

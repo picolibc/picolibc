@@ -1,5 +1,14 @@
 2015-06-23  Jon Turney  <jon.turney@dronecode.org.uk>
 
+	* libc/stdlib/stdlib.tex: Include itoa and utoa, and add to menu.
+	* libc/string/strings.tex: Include memrchr and rawmemchr, and add
+	to menu.
+	* libm/math/math.tex: Include exp10 and pow10, and add to menu.
+	* libm/common/s_exp10.c: Improve one-line description.
+	* libm/common/s_exp10.c: Ditto.
+
+2015-06-23  Jon Turney  <jon.turney@dronecode.org.uk>
+
 	* libc/stdlib/Makefile.am (CHEWOUT_FILES): Remove $(MALLOCR).def.
 	* libc/stdio/Makefile.am (CHEWOUT_FILES): Remove getwc.def and
 	putwc.def.

@@ -23,6 +23,7 @@ The corresponding declarations are in the header file @file{stdlib.h}.
 * gcvt::        Format double or float as string
 * exit::        End program execution
 * getenv::      Look up environment variable
+* itoa::        Integer to string
 * labs::        Long integer absolute value (magnitude)
 * ldiv::        Divide two long integers
 * llabs::       Long long integer absolute value (magnitude)
@@ -50,6 +51,7 @@ The corresponding declarations are in the header file @file{stdlib.h}.
 * wcstoul::     Wide string to unsigned long
 * wcstoull::    Wide string to unsigned long long
 * system::      Execute command string
+* utoa::        Unsigned integer to string
 * wcstombs::	Minimal wide string to multibyte string converter
 * wctomb::      Minimal wide character to multibyte converter
 @end menu
@@ -104,6 +106,9 @@ The corresponding declarations are in the header file @file{stdlib.h}.
 
 @page
 @include stdlib/getenv.def
+
+@page
+@include stdlib/itoa.def
 
 @page
 @include stdlib/labs.def
@@ -185,6 +190,9 @@ The corresponding declarations are in the header file @file{stdlib.h}.
 
 @page
 @include stdlib/system.def
+
+@page
+@include stdlib/utoa.def
 
 @page
 @include stdlib/wcstombs.def
