@@ -1,5 +1,9 @@
 2015-06-23  Jon Turney  <jon.turney@dronecode.org.uk>
 
+	* libc/stdio/getchar_u.c: Fix a non-ANSI prototype in SYNOPSIS.
+
+2015-06-23  Jon Turney  <jon.turney@dronecode.org.uk>
+
 	* libc/string/wcscpy.c: Remove stray ',' from prototype in
 	ANSI_SYNOPSIS.
 	* libc/string/wcpcpy.c: Ditto.

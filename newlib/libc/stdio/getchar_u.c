@@ -26,7 +26,7 @@ INDEX
 
 SYNOPSIS
 	#include <stdio.h>
-	int getchar_unlocked();
+	int getchar_unlocked(void);
 
 	#include <stdio.h>
 	int _getchar_unlocked_r(struct _reent *<[ptr]>);
