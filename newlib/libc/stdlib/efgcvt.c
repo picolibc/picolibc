@@ -84,7 +84,7 @@ Supporting OS subroutines required: <<close>>, <<fstat>>, <<isatty>>,
 
 NEWPAGE
 FUNCTION
-<<gvcvt>>, <<gcvtf>>---format double or float as string
+<<gcvt>>, <<gcvtf>>---format double or float as string
 
 INDEX
 	gcvt
@@ -111,7 +111,7 @@ TRAD_SYNOPSIS
 
 DESCRIPTION
 <<gcvt>> writes a fully formatted number as a null-terminated
-string in the buffer <<*<[buf]>>>.  <<gdvtf>> produces corresponding
+string in the buffer <<*<[buf]>>>.  <<gcvtf>> produces corresponding
 character representations of <<float>> numbers.
 
 <<gcvt>> uses the same rules as the <<printf>> format
