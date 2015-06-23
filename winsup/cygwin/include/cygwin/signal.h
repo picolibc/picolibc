@@ -311,6 +311,10 @@ enum
 					   perform notification */
 };
 
+#define SIGEV_SIGNAL SIGEV_SIGNAL
+#define SIGEV_NONE   SIGEV_NONE
+#define SIGEV_THREAD SIGEV_THREAD
+
 #if __WORDSIZE == 64
 typedef __uint64_t sigset_t;
 #else
