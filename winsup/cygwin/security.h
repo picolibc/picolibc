@@ -436,20 +436,19 @@ class path_conv;
 /* File manipulation */
 int __reg3 get_file_attribute (HANDLE, path_conv &, mode_t *,
 				  uid_t *, gid_t *);
-int __reg3 set_file_attribute (HANDLE, path_conv &,
-				  uid_t, gid_t, mode_t);
+int __reg3 set_created_file_access (HANDLE, path_conv &, mode_t);
 int __reg2 get_object_sd (HANDLE, security_descriptor &);
 int __reg3 get_object_attribute (HANDLE, uid_t *, gid_t *, mode_t *);
 int __reg3 set_object_attribute (HANDLE, uid_t, gid_t, mode_t);
-int __reg3 create_object_sd_from_attribute (HANDLE, uid_t, gid_t,
-					       mode_t, security_descriptor &);
+int __reg3 create_object_sd_from_attribute (uid_t, gid_t, mode_t,
+					    security_descriptor &);
 int __reg3 set_object_sd (HANDLE, security_descriptor &, bool);
 
 int __reg3 get_reg_attribute (HKEY hkey, mode_t *, uid_t *, gid_t *);
 LONG __reg3 get_file_sd (HANDLE fh, path_conv &, security_descriptor &, bool);
 LONG __reg3 set_file_sd (HANDLE fh, path_conv &, security_descriptor &, bool);
-bool __reg3 add_access_allowed_ace (PACL, int, DWORD, PSID, size_t &, DWORD);
-bool __reg3 add_access_denied_ace (PACL, int, DWORD, PSID, size_t &, DWORD);
+bool __reg3 add_access_allowed_ace (PACL, DWORD, PSID, size_t &, DWORD);
+bool __reg3 add_access_denied_ace (PACL, DWORD, PSID, size_t &, DWORD);
 int __reg3 check_file_access (path_conv &, int, bool);
 int __reg3 check_registry_access (HANDLE, int, bool);
 
@@ -463,6 +462,11 @@ bool get_sids_info (cygpsid, cygpsid, uid_t * , gid_t *);
 struct acl;
 extern "C" int aclsort32 (int, int, struct acl *);
 extern "C" int acl32 (const char *, int, int, struct acl *);
+int searchace (struct acl *, int, int, uid_t id = ILLEGAL_UID);
+PSECURITY_DESCRIPTOR set_posix_access (mode_t, uid_t, gid_t, struct acl *, int,
+				       security_descriptor &, bool);
+int get_posix_access (PSECURITY_DESCRIPTOR, mode_t *, uid_t *, gid_t *,
+		      struct acl *, int);
 int getacl (HANDLE, path_conv &, int, struct acl *);
 int setacl (HANDLE, path_conv &, int, struct acl *, bool &);
 

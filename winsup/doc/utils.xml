@@ -590,18 +590,21 @@ Other options:
 
     <refsynopsisdiv>
       <screen>
-getfacl [-adn] FILE [FILE2...]
+getfacl [-adceEn] FILE [FILE2...]
       </screen>
     </refsynopsisdiv>
 
     <refsect1>
       <title>Options</title>
       <screen>
-  -a, --access   display the file access control list
-  -d, --default  display the default access control list
-  -h, --help     print help explaining the command line options
-  -n, --noname   display user and group IDs instead of names
-  -V, --version  output version information and exit
+  -a, --access        display the file access control list only
+  -d, --default       display the default access control list only
+  -c, --omit-header   do not display the comment header
+  -e, --all-effective print all effective rights
+  -E, --no-effective  print no effective rights
+  -n, --numeric       print numeric user/group identifiers
+  -V, --version       print version and exit
+  -h, --help          this help text
 
 When multiple files are specified on the command line, a blank
 line separates the ACLs for each file.
@@ -1965,29 +1968,27 @@ Example: regtool get '\user\software\Microsoft\Clock\iFormat'
 
     <refsynopsisdiv>
       <screen>
-setfacl [-r] {-f ACL_FILE | -s acl_entries} FILE...
-setfacl [-r] {-b|[-d acl_entries] [-m acl_entries]} FILE...
+setfacl [-n] {-f ACL_FILE | -s acl_entries} FILE...
+setfacl [-n] {-b|-k|[-x acl_entries] [-m acl_entries]} FILE...
       </screen>
      </refsynopsisdiv>
 
     <refsect1>
       <title>Options</title>
       <screen>
-  -b, --remove-all remove all extended ACL entries
-  -d, --delete     delete one or more specified ACL entries
-  -f, --file       set ACL entries for FILE to ACL entries read
-                   from a ACL_FILE
-  -k, --remove-default
-                   remove all default ACL entries
-  -m, --modify     modify one or more specified ACL entries
-  -r, --replace    replace mask entry with maximum permissions
-                   needed for the file group class
-  -s, --substitute substitute specified ACL entries for the
-                   ACL of FILE
-  -h, --help       output usage information and exit
-  -V, --version    output version information and exit
+  -b, --remove-all       remove all extended ACL entries\n"
+  -x, --delete           delete one or more specified ACL entries\n"
+  -f, --file             set ACL entries for FILE to ACL entries read\n"
+                         from ACL_FILE\n"
+  -k, --remove-default   remove all default ACL entries\n"
+  -m, --modify           modify one or more specified ACL entries\n"
+  -n, --no-mask          don't recalculate the effective rights mask\n"
+      --mask             do recalculate the effective rights mask\n"
+  -s, --substitute       substitute specified ACL entries on FILE\n"
+  -V, --version          print version and exit\n"
+  -h, --help             this help text\n"
 
-At least one of (-b, -d, -f, -k, -m, -s) must be specified
+At least one of (-b, -x, -f, -k, -m, -s) must be specified\n"
 </screen>
     </refsect1>
 
@@ -1996,8 +1997,8 @@ At least one of (-b, -d, -f, -k, -m, -s) must be specified
     <para> For each file given as parameter, <command>setfacl</command> will
       either replace its complete ACL (<literal>-s</literal>,
       <literal>-f</literal>), or it will add, modify, or delete ACL entries.
-      For more information on Cygwin and Windows ACLs, see see <xref
-      linkend="ntsec"/> in the Cygwin User's Guide. </para>
+      For more information on Cygwin and Windows ACLs, see
+      <xref linkend="ntsec"/> in the Cygwin User's Guide. </para>
 
     <para> Acl_entries are one or more comma-separated ACL entries from the
       following list:
@@ -2024,13 +2025,14 @@ At least one of (-b, -d, -f, -k, -m, -s) must be specified
 
     <para> The following options are supported: </para>
 
-    <para> <literal>-b</literal> Remove all extended ACL entries.  The base
-      ACL entries of the owner, group and others are retained.</para>
+    <para> <literal>-b</literal>,<literal>--remove-all</literal> Remove all
+      extended ACL entries.  The base ACL entries of the owner, group and
+      others are retained.</para>
 
-    <para> <literal>-d</literal> Delete one or more specified entries from the
-      file's ACL. The owner, group and others entries must not be deleted.
-      Acl_entries to be deleted should be specified without permissions, as in
-      the following list:
+    <para> <literal>-x</literal>,<literal>--delete</literal> Delete one or
+      more specified entries from the file's ACL. The owner, group and others
+      entries must not be deleted.  Acl_entries to be deleted should be
+      specified without permissions, as in the following list:
       <screen>
          u[ser]:uid[:]
          g[roup]:gid[:]
@@ -2041,11 +2043,12 @@ At least one of (-b, -d, -f, -k, -m, -s) must be specified
          d[efault]:o[ther][:]
 </screen> </para>
 
-    <para> <literal>-f</literal> Take the Acl_entries from ACL_FILE one per
-      line. Whitespace characters are ignored, and the character "#" may be
-      used to start a comment. The special filename "-" indicates reading from
-      stdin. Note that you can use this with <command>getfacl</command> and
-      <command>setfacl</command> to copy ACLs from one file to another:
+    <para> <literal>-f</literal>,<literal>--file</literal> Take the Acl_entries
+      from ACL_FILE one per line. Whitespace characters are ignored, and the
+      character "#" may be used to start a comment. The special filename "-"
+      indicates reading from stdin. Note that you can use this with
+      <command>getfacl</command> and <command>setfacl</command> to copy ACLs
+      from one file to another:
       <screen>
 $ getfacl source_file | setfacl -f - target_file
 </screen> </para>
@@ -2061,22 +2064,31 @@ $ getfacl source_file | setfacl -f - target_file
       file, one default group entry for the group of the file, one default mask
       entry for the file group class, and one default other entry. </para>
 
-    <para> <literal>-k</literal> Remove all default ACL entries. If no default
-      ACL entries exist, no warnings are issued. </para>
+    <para> <literal>-k</literal>,<literal>--remove-default</literal> Remove all
+      default ACL entries. If no default ACL entries exist, no warnings are
+      issued. </para>
 
-    <para> <literal>-m</literal> Add or modify one or more specified ACL
-      entries. Acl_entries is a comma-separated list of entries from the same
-      list as above. </para>
+    <para> <literal>-m</literal>,<literal>--modify</literal> Add or modify one
+      or more specified ACL entries. Acl_entries is a comma-separated list of
+      entries from the same list as above. </para>
 
-    <para> <literal>-r</literal> Causes the permissions specified in the mask
-      entry to be ignored and replaced by the maximum permissions needed for
-      the file group class. </para>
+    <para> <literal>-n</literal>,<literal>--no-mask</literal> Valid in
+      conjunction with -m.  Do not recalculate the effective rights mask.
+      The default behavior of setfacl is to recalculate the ACL mask entry,
+      unless a mask entry was explicitly given.  The mask entry is set to
+      the union of all permissions of the owning group, and all named user
+      and group entries.  (These are exactly the entries affected by the
+      mask entry). </para>
 
-    <para> <literal>-s</literal> Like <literal>-f</literal>, but substitute the
-      file's ACL with Acl_entries specified in a comma-separated list on the
-      command line. </para>
+    <para> <literal>--mask</literal> Valid in conjunction with -m.  Do
+      recalculate the effective rights mask, even if an ACL mask entry was
+      explicitly given. (See the -n option.) </para>
 
-    <para> While the <literal>-d</literal> and <literal>-m</literal> options
+    <para> <literal>-s</literal>,<literal>--substitute</literal> Like
+      <literal>-f</literal>, but substitute the file's ACL with Acl_entries
+      specified in a comma-separated list on the command line. </para>
+
+    <para> While the <literal>-x</literal> and <literal>-m</literal> options
       may be used in the same command, the <literal>-f</literal> and
       <literal>-s</literal> options may be used only exclusively. </para>
 

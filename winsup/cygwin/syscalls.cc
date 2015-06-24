@@ -1434,8 +1434,7 @@ open (const char *unix_path, int flags, ...)
 		}
 	      else if ((fh->is_fs_special ()
 	      		&& fh->device_access_denied (flags))
-		       || !fh->open_with_arch (flags, (mode & 07777)
-						      & ~cygheap->umask))
+		       || !fh->open_with_arch (flags, mode & 07777))
 		delete fh;
 	      else
 		{
