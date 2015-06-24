@@ -1,5 +1,157 @@
 2015-11-18  Corinna Vinschen  <corinna@vinschen.de>
 
+	Reapply POSIX ACL changes.
+
+	* sec_acl.cc (get_posix_access): Check for Cygwin "standard" ACL.
+	Apply umask, if so.  Align comments.
+	* security.cc (set_created_file_access): Fix permission masking by
+	incoming requested file mode.
+
+	* sec_acl.cc (set_posix_access): Apply mask only in terms of execute bit
+	for SYSTEM and Admins group.
+
+	* sec_acl.cc (set_posix_access): Don't create DENY ACEs for USER and
+	GROUP entries if they are the same as USER_OBJ or GROUP_OBJ.
+
+	* fhandler.h (fhandler_pty_slave::facl): Add prototype.
+	* fhandler_tty.cc (fhandler_pty_slave::facl): New method.
+	(fhandler_pty_slave::fchown): Fix uid/gid handling.
+	* sec_acl.cc (set_posix_access): Drop superfluous class_idx variable.
+	Simplify and move around code in a few places.  To improve ACL
+	readability, add r/w permissions to Admins ACE appended to pty ACL.
+	Add comment to explain Windows ACE Mask filtering being in the way of
+	creating a real CLASS_OBJ.
+	(get_posix_access): Fake CLASS_OBJ for ptys.  Explain why.
+	* security.cc (get_object_attribute): Add S_IFCHR flag to attributes
+	when calling get_posix_access.
+
+	* sec_acl.cc (set_posix_access): Move merging group perms into owner
+	perms in case of owner == group after mask has been computed.  Take
+	mask into account when doing so to avoid unnecessary ACCESS_DENIED_ACE.
+
+	* sec_acl.cc (get_posix_access): Only set saw_group_obj flag if we saw
+	the ACCESS_ALLOWED_ACE.
+
+	* fhandler_disk_file.cc (fhandler_disk_file::fchmod): Deliberatly
+	set GROUP_OBJ and CLASS_OBJ perms to new group perms.  Add comment
+	to explain why.
+	* security.cc (set_created_file_access): Ditto.
+
+	* sec_acl.cc (set_posix_access): Replace previous patch.  Return
+	EINVAL if uid and/or guid is invalid and not backed by an actual
+	Windows account.
+
+	* sec_acl.cc (set_posix_access): Workaround owner/group SIDs being NULL.
+
+	* sec_acl.cc (set_posix_access): Handle files with owner == group.
+	Rephrase switch statement checking against unfiltered a_type value.
+	(get_posix_access): Handle files with owner == group.
+
+	* sec_acl.cc (get_posix_access): Don't use GROUP_OBJ access to fix up
+	CLASS_OBJ mask on old-style ACLs.  Fix a comment.
+
+	* sec_acl.cc (set_posix_access): Always make sure Admins have
+	WRITE_DAC and WRITE_OWNER permissions.
+	* security.h (create_object_sd_from_attribute): Drop handle parameter
+	from prototype.
+	* security.cc (create_object_sd_from_attribute): Drop handle parameter.
+	Just create the standard POSIXy security descriptor.
+	(set_object_attribute): Accommodate dropped paramter in call to
+	create_object_sd_from_attribute.
+	* fhandler_tty.cc: Ditto, throughout.
+
+	* fhandler_disk_file.cc (fhandler_disk_file::fchmod): Fix typo in
+	mask computation.
+
+	* fhandler.cc (fhandler_base::open_with_arch): Call open with mode
+	not umasked.
+	(fhandler_base::open): Explicitely umask mode on NFS here.  Call new
+	set_created_file_access rather than set_file_attribute.
+	* fhandler_disk_file.cc (fhandler_disk_file::fchmod): Reimplement
+	setting permissions on filesystems supporting ACLs using the new
+	set_posix_access call.
+	(fhandler_disk_file::fchown): Ditto.
+	(fhandler_disk_file::mkdir): Call new set_created_file_access rather
+	than set_file_attribute.
+	* fhandler_socket.cc (fhandler_socket::bind): Don't umask here.  Add
+	WRITE_OWNER access to allow writing group in case of SGID bit set.
+	Call new set_created_file_access rather than set_file_attribute.
+	* path.cc (symlink_worker): Call new set_created_file_access rather
+	than set_file_attribute.
+	* sec_acl.cc (searchace): Un-staticize.
+	(set_posix_access): New, complementary functionality to
+	get_posix_access.
+	(setacl): Implement in terms of get_posix_access/set_posix_access.
+	(get_posix_access): Add handling for just created files requiring
+	their first Cygwin ACL.  Fix new_style recognition.  Handle SGID
+	bit.  For old-style ACLs, ignore SYSTEM and Administrators when
+	computing the {DEF_}CLASS_OBJ perms.
+	* security.cc (get_file_sd): Revamp comment.  Change and (hopefully)
+	speed up inheritance processing for just created files.
+	(alloc_sd): Remove.
+	(set_security_attribute): Call set_posix_access instead of alloc_sd.
+	(get_object_attribute): Fix return value.
+	(create_object_sd_from_attribute): Call set_posix_access instead of
+	alloc_sd.
+	(set_file_attribute): Remove.
+	(set_created_file_access): New function implemented in terms of
+	get_posix_access/set_posix_access.
+	* security.h (set_file_attribute): Remove prototype.
+	(set_created_file_access): Add prototype.
+	(searchace): Ditto.
+	(set_posix_access): Ditto.
+	* syscalls.cc (open): Call open_with_arch with mode not umasked.
+
+	* sec_acl.cc: Change preceeding comment explaining new-style ACLs.
+	Describe how to generate deny ACEs in more detail.  Accommodate the
+	fact that a NULL deny ACE is used for {DEF_}CLASS_OBJ, rather than
+	a special Cygwin ACE.  Improve further comments.
+	(CYG_ACE_NEW_STYLE): Define.
+	(get_posix_access): Change from Cygwin ACE to NULL deny ACE.  Fix
+	CLASS_OBJ handling to generate CLASS_OBJ and DEF_CLASS_OBJ from a single
+	NULL deny ACE if the inheritance flags say so.
+	* sec_helper.cc (well_known_cygwin_sid): Remove.
+	* security.h (well_known_cygwin_sid): Drop declaration.
+
+	* sec_acl.cc (CYG_ACE_ISBITS_TO_WIN): Fix typo.
+	(get_posix_access): Rename index variable from i to idx.  Define only
+	once at top level.
+
+	* security.cc (add_access_allowed_ace): Drop unused parameter "offset".
+	Accommodate throughout.
+	(add_access_denied_ace): Ditto.
+	* sec_acl.cc: Accommodate above change throughout.
+	* security.h (add_access_allowed_ace): Adjust prototype to above change.
+	(add_access_denied_ace): Ditto.
+
+	* sec_acl.cc (get_posix_access): Handle multiple ACEs for the
+	owner and primary group of the file.  Handle the default primary
+	group ACE as DEF_GROUP_OBJ entry if the directory has the S_ISGID bit
+	set.  Add comments.  Minor code rearrangements.
+
+	Preliminary read side implementation of new permission handling.
+	* acl.h (MAX_ACL_ENTRIES): Raise to 2730.  Add comment to explain.
+	* sec_acl.cc:  Add leading comment to explain new ACL style.
+	Add definitions and macros to use for bits in new Cygwin ACL.
+	(DENY_RWX): New mask value for all temporary deny bits.
+	(getace): Add bool parameter to decide when leaving all bits intact,
+	rather than filtering them per the already set bits.
+	(get_posix_access): New function, taking over functionality to read
+	POSIX ACL from SECURITY_DESCRIPTOR.
+	(getacl): Just call get_posix_access.
+	* sec_helper.cc (well_known_cygwin_sid): Define.
+	* security.cc (get_attribute_from_acl): Remove.
+	(get_info_from_sd): Remove.
+	(get_reg_sd): Call get_posix_access instead of get_info_from_sd.
+	(get_file_attribute): Ditto.
+	(get_object_attribute): Ditto.
+	* security.h (well_known_cygwin_sid): Declare.
+	(get_posix_access): Add prototype.
+
+	* Throughout, use simpler ACE macros from Windows' accctrl.h.
+
+2015-11-18  Corinna Vinschen  <corinna@vinschen.de>
+
 	* include/cygwin/version.h (CYGWIN_VERSION_DLL_MAJOR): Bump to 2004.
 	(CYGWIN_VERSION_API_MINOR): Reset to 0.
 

@@ -2061,10 +2061,9 @@ symlink_worker (const char *oldpath, const char *newpath, bool isdevice)
 	  __seterrno_from_nt_status (status);
 	  __leave;
 	}
-      if (win32_newpath.has_acls ())
-	set_file_attribute (fh, win32_newpath, ILLEGAL_UID, ILLEGAL_GID,
-			    (io.Information == FILE_CREATED ? S_JUSTCREATED : 0)
-			    | S_IFLNK | STD_RBITS | STD_WBITS);
+      if (io.Information == FILE_CREATED && win32_newpath.has_acls ())
+	set_created_file_access (fh, win32_newpath,
+				 S_IFLNK | STD_RBITS | STD_WBITS);
       status = NtWriteFile (fh, NULL, NULL, NULL, &io, buf, cp - buf,
 			    NULL, NULL);
       if (NT_SUCCESS (status) && io.Information == (ULONG) (cp - buf))

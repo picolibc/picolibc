@@ -846,7 +846,7 @@ int __reg1
 fhandler_disk_file::fchmod (mode_t mode)
 {
   extern int chmod_device (path_conv& pc, mode_t mode);
-  int res = -1;
+  int ret = -1;
   int oret = 0;
   NTSTATUS status;
   IO_STATUS_BLOCK io;
@@ -893,17 +893,45 @@ fhandler_disk_file::fchmod (mode_t mode)
       if (!NT_SUCCESS (status))
 	__seterrno_from_nt_status (status);
       else
-	res = 0;
+	ret = 0;
       goto out;
     }
 
   if (pc.has_acls ())
     {
-      if (pc.isdir ())
-	mode |= S_IFDIR;
-      if (!set_file_attribute (get_handle (), pc,
-			       ILLEGAL_UID, ILLEGAL_GID, mode))
-	res = 0;
+      security_descriptor sd, sd_ret;
+      uid_t uid;
+      gid_t gid;
+      tmp_pathbuf tp;
+      aclent_t *aclp;
+      int nentries, idx;
+
+      if (!get_file_sd (get_handle (), pc, sd, false))
+	{
+	  aclp = (aclent_t *) tp.c_get ();
+	  if ((nentries = get_posix_access (sd, NULL, &uid, &gid,
+					    aclp, MAX_ACL_ENTRIES)) >= 0)
+	    {
+	      /* Overwrite ACL permissions as required by POSIX 1003.1e
+		 draft 17. */
+	      aclp[0].a_perm = (mode >> 6) & S_IRWXO;
+	      /* Deliberate deviation from POSIX 1003.1e here.  We're not
+		 writing CLASS_OBJ *or* GROUP_OBJ, but both.  Otherwise we're
+		 going to be in constant trouble with user expectations. */
+	      if ((idx = searchace (aclp, nentries, GROUP_OBJ)) >= 0)
+		aclp[idx].a_perm = (mode >> 3) & S_IRWXO;
+	      if (nentries > MIN_ACL_ENTRIES
+		  && (idx = searchace (aclp, nentries, CLASS_OBJ)) >= 0)
+		aclp[idx].a_perm = (mode >> 3) & S_IRWXO;
+	      if ((idx = searchace (aclp, nentries, OTHER_OBJ)) >= 0)
+		aclp[idx].a_perm = mode & S_IRWXO;
+	      if (pc.isdir ())
+		mode |= S_IFDIR;
+	      if (set_posix_access (mode, uid, gid, aclp, nentries, sd_ret,
+				    pc.fs_is_samba ()))
+		ret = set_file_sd (get_handle (), pc, sd_ret, false);
+	    }
+	}
     }
 
   /* If the mode has any write bits set, the DOS R/O flag is in the way. */
@@ -940,20 +968,28 @@ fhandler_disk_file::fchmod (mode_t mode)
       if (!NT_SUCCESS (status))
 	__seterrno_from_nt_status (status);
       else
-	res = 0;
+	ret = 0;
     }
 
 out:
   if (oret)
     close_fs ();
 
-  return res;
+  return ret;
 }
 
 int __reg2
 fhandler_disk_file::fchown (uid_t uid, gid_t gid)
 {
   int oret = 0;
+  int ret = -1;
+  security_descriptor sd, sd_ret;
+  mode_t attr = pc.isdir () ? S_IFDIR : 0;
+  uid_t old_uid;
+  gid_t old_gid;
+  tmp_pathbuf tp;
+  aclent_t *aclp;
+  int nentries;
 
   if (!pc.has_acls ())
     {
@@ -970,52 +1006,71 @@ fhandler_disk_file::fchown (uid_t uid, gid_t gid)
 	return -1;
     }
 
-  mode_t attrib = 0;
-  if (pc.isdir ())
-    attrib |= S_IFDIR;
-  uid_t old_uid;
-  int res = get_file_attribute (get_handle (), pc, &attrib, &old_uid, NULL);
-  if (!res)
-    {
-      /* Typical Windows default ACLs can contain permissions for one
-	 group, while being owned by another user/group.  The permission
-	 bits returned above are pretty much useless then.  Creating a
-	 new ACL with these useless permissions results in a potentially
-	 broken symlink.  So what we do here is to set the underlying
-	 permissions of symlinks to a sensible value which allows the
-	 world to read the symlink and only the new owner to change it. */
-      if (pc.issymlink ())
-	attrib = S_IFLNK | STD_RBITS | STD_WBITS;
-      res = set_file_attribute (get_handle (), pc, uid, gid, attrib);
-      /* If you're running a Samba server which has no winbind running, the
-	 uid<->SID mapping is disfunctional.  Even trying to chown to your
-	 own account fails since the account used on the server is the UNIX
-	 account which gets used for the standard user mapping.  This is a
-	 default mechanism which doesn't know your real Windows SID.
-	 There are two possible error codes in different Samba releases for
-	 this situation, one of them is unfortunately the not very significant
-	 STATUS_ACCESS_DENIED.  Instead of relying on the error codes, we're
-	 using the below very simple heuristic.  If set_file_attribute failed,
-	 and the original user account was either already unknown, or one of
-	 the standard UNIX accounts, we're faking success. */
-      if (res == -1 && pc.fs_is_samba ())
-	{
-	  PSID sid;
+  if (get_file_sd (get_handle (), pc, sd, false))
+    goto out;
 
-	  if (old_uid == ILLEGAL_UID
-	      || ((sid = sidfromuid (old_uid, NULL)) != NO_SID
-		  && RtlEqualPrefixSid (sid,
-					well_known_samba_unix_user_fake_sid)))
-	    {
-	      debug_printf ("Faking chown worked on standalone Samba");
-	      res = 0;
-	    }
+  aclp = (aclent_t *) tp.c_get ();
+  if ((nentries = get_posix_access (sd, &attr, &old_uid, &old_gid,
+				    aclp, MAX_ACL_ENTRIES)) < 0)
+    goto out;
+
+  if (uid == ILLEGAL_UID)
+    uid = old_uid;
+  if (gid == ILLEGAL_GID)
+    gid = old_gid;
+  if (uid == old_uid && gid == old_gid)
+    {
+      ret = 0;
+      goto out;
+    }
+
+  /* Windows ACLs can contain permissions for one group, while being owned by
+     another user/group.  The permission bits returned above are pretty much
+     useless then.  Creating a new ACL with these useless permissions results
+     in a potentially broken symlink.  So what we do here is to set the
+     underlying permissions of symlinks to a sensible value which allows the
+     world to read the symlink and only the new owner to change it. */
+  if (pc.issymlink ())
+    for (int idx = 0; idx < nentries; ++idx)
+      {
+	aclp[idx].a_perm |= S_IROTH;
+	if (aclp[idx].a_type & USER_OBJ)
+	  aclp[idx].a_perm |= S_IWOTH;
+      }
+
+  if (set_posix_access (attr, uid, gid, aclp, nentries, sd_ret,
+			pc.fs_is_samba ()))
+    ret = set_file_sd (get_handle (), pc, sd_ret, true);
+
+  /* If you're running a Samba server with no winbind, the uid<->SID mapping
+     is disfunctional.  Even trying to chown to your own account fails since
+     the account used on the server is the UNIX account which gets used for
+     the standard user mapping.  This is a default mechanism which doesn't
+     know your real Windows SID.  There are two possible error codes in
+     different Samba releases for this situation, one of them unfortunately
+     the not very significant STATUS_ACCESS_DENIED.  Instead of relying on
+     the error codes, we're using the below very simple heuristic.
+     If set_file_sd failed, and the original user account was either already
+     unknown, or one of the standard UNIX accounts, we're faking success. */
+  if (ret == -1 && pc.fs_is_samba ())
+    {
+      PSID sid;
+
+      if (uid == old_uid
+	  || ((sid = sidfromuid (old_uid, NULL)) != NO_SID
+	      && RtlEqualPrefixSid (sid,
+				    well_known_samba_unix_user_fake_sid)))
+	{
+	  debug_printf ("Faking chown worked on standalone Samba");
+	  ret = 0;
 	}
     }
+
+out:
   if (oret)
     close_fs ();
 
-  return res;
+  return ret;
 }
 
 int __reg3
@@ -1774,10 +1829,11 @@ fhandler_disk_file::mkdir (mode_t mode)
 			 p, plen);
   if (NT_SUCCESS (status))
     {
+      /* Set the "directory attribute" so that pc.isdir() returns correct
+	 value in subsequent function calls. */
+      pc.file_attributes (FILE_ATTRIBUTE_DIRECTORY);
       if (has_acls ())
-	set_file_attribute (dir, pc, ILLEGAL_UID, ILLEGAL_GID,
-			    S_JUSTCREATED | S_IFDIR
-			    | ((mode & 07777) & ~cygheap->umask));
+	set_created_file_access (dir, pc, mode & 07777);
       NtClose (dir);
       res = 0;
     }

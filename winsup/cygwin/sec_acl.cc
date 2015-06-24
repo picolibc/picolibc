@@ -24,8 +24,75 @@ details. */
 #include "ntdll.h"
 #include "tls_pbuf.h"
 
-static int
-searchace (aclent_t *aclp, int nentries, int type, uid_t id = ILLEGAL_UID)
+/* How does a correctly constructed new-style Windows ACL claiming to be a
+   POSIX ACL look like?
+
+   - NULL ACE (special bits, CLASS_OBJ).
+
+   - USER_OBJ deny.  If the user has less permissions than the sum of CLASS_OBJ
+     (or GROUP_OBJ if CLASS_OBJ doesn't exist) and OTHER_OBJ, deny the excess
+     permissions so that group and other perms don't spill into the owner perms.
+
+       USER_OBJ deny ACE   == ~USER_OBJ & (CLASS_OBJ | OTHER_OBJ)
+     or
+       USER_OBJ deny ACE   == ~USER_OBJ & (GROUP_OBJ | OTHER_OBJ)
+
+   - USER deny.  If a user has different permissions from CLASS_OBJ, or if the
+     user has less permissions than OTHER_OBJ, deny the excess permissions.
+
+       USER deny ACE       == (USER ^ CLASS_OBJ) | (~USER & OTHER_OBJ)
+
+   - USER_OBJ  allow ACE
+   - USER      allow ACEs
+
+     The POSIX permissions returned for a USER entry are the allow bits alone!
+
+   - GROUP{_OBJ} deny.  If a group has more permissions than CLASS_OBJ,
+     or less permissions than OTHER_OBJ, deny the excess permissions.
+
+       GROUP{_OBJ} deny ACEs  == (GROUP & ~CLASS_OBJ) | (~GROUP & OTHER_OBJ)
+
+   - GROUP_OBJ	allow ACE
+   - GROUP	allow ACEs
+
+     The POSIX permissions returned for a GROUP entry are the allow bits alone!
+
+   - OTHER_OBJ	allow ACE
+
+   Rinse and repeat for default ACEs with INHERIT flags set.
+
+   - Default NULL ACE (S_ISGID, CLASS_OBJ). */
+
+						/* POSIX <-> Win32 */
+
+/* Historically, these bits are stored in a NULL SID ACE.  To distinguish the
+   new ACL style from the old one, we're using an access denied ACE, plus
+   setting an as yet unused bit in the access mask.  The new ACEs can exist
+   twice in an ACL, the "normal one" containing CLASS_OBJ and special bits
+   and the one with INHERIT bit set to pass the DEF_CLASS_OBJ bits and the
+   S_ISGID bit on. */
+#define CYG_ACE_ISVTX		0x001		/* 0x200 <-> 0x001 */
+#define CYG_ACE_ISGID		0x002		/* 0x400 <-> 0x002 */
+#define CYG_ACE_ISUID		0x004		/* 0x800 <-> 0x004 */
+#define CYG_ACE_ISBITS_TO_POSIX(val)	\
+				(((val) & 0x007) << 9)
+#define CYG_ACE_ISBITS_TO_WIN(val) \
+				(((val) & (S_ISVTX | S_ISUID | S_ISGID)) >> 9)
+
+#define CYG_ACE_MASK_X		0x008		/* 0x001 <-> 0x008 */
+#define CYG_ACE_MASK_W		0x010		/* 0x002 <-> 0x010 */
+#define CYG_ACE_MASK_R		0x020		/* 0x004 <-> 0x020 */
+#define CYG_ACE_MASK_RWX	0x038
+#define CYG_ACE_MASK_VALID	0x040		/* has mask if set */
+#define CYG_ACE_MASK_TO_POSIX(val)	\
+				(((val) & CYG_ACE_MASK_RWX) >> 3)
+#define CYG_ACE_MASK_TO_WIN(val)	\
+				((((val) & S_IRWXO) << 3) \
+				 | CYG_ACE_MASK_VALID)
+#define CYG_ACE_NEW_STYLE	READ_CONTROL	/* New style if set. */
+
+int
+searchace (aclent_t *aclp, int nentries, int type, uid_t id)
 {
   int i;
 
@@ -36,270 +103,325 @@ searchace (aclent_t *aclp, int nentries, int type, uid_t id = ILLEGAL_UID)
   return -1;
 }
 
-/* This function *requires* an acl list sorted with aclsort{32}. */
-int
-setacl (HANDLE handle, path_conv &pc, int nentries, aclent_t *aclbufp,
-	bool &writable)
+/* Define own bit masks rather than using the GENERIC masks.  The latter
+   also contain standard rights, which we don't need here. */
+#define FILE_ALLOW_READ		(FILE_READ_DATA | FILE_READ_ATTRIBUTES | \
+				 FILE_READ_EA)
+#define FILE_DENY_READ		(FILE_READ_DATA | FILE_READ_EA)
+#define FILE_ALLOW_WRITE	(FILE_WRITE_DATA | FILE_WRITE_ATTRIBUTES | \
+				 FILE_WRITE_EA | FILE_APPEND_DATA)
+#define FILE_DENY_WRITE		FILE_ALLOW_WRITE | FILE_DELETE_CHILD
+#define FILE_DENY_WRITE_OWNER	(FILE_WRITE_DATA | FILE_WRITE_EA | \
+				 FILE_APPEND_DATA | FILE_DELETE_CHILD)
+#define FILE_ALLOW_EXEC		(FILE_EXECUTE)
+#define FILE_DENY_EXEC		FILE_ALLOW_EXEC
+
+#define STD_RIGHTS_OTHER	(STANDARD_RIGHTS_READ | SYNCHRONIZE)
+#define STD_RIGHTS_OWNER	(STANDARD_RIGHTS_ALL | SYNCHRONIZE)
+
+/* From the attributes and the POSIX ACL list, compute a new-style Cygwin
+   security descriptor.  The function returns a pointer to the
+   SECURITY_DESCRIPTOR in sd_ret, or NULL if the function fails.
+
+   This function *requires* a verified and sorted acl list! */
+PSECURITY_DESCRIPTOR
+set_posix_access (mode_t attr, uid_t uid, gid_t gid,
+		  aclent_t *aclbufp, int nentries,
+		  security_descriptor &sd_ret,
+		  bool is_samba)
 {
-  security_descriptor sd_ret;
-  tmp_pathbuf tp;
-
-  if (get_file_sd (handle, pc, sd_ret, false))
-    return -1;
-
+  SECURITY_DESCRIPTOR sd;
+  cyg_ldap cldap;
+  PSID owner, group;
   NTSTATUS status;
+  tmp_pathbuf tp;
+  cygpsid *aclsid;
   PACL acl;
-  BOOLEAN acl_exists, dummy;
-
-  /* Get owner SID. */
-  PSID owner_sid;
-  status = RtlGetOwnerSecurityDescriptor (sd_ret, &owner_sid, &dummy);
-  if (!NT_SUCCESS (status))
-    {
-      __seterrno_from_nt_status (status);
-      return -1;
-    }
-  cygsid owner (owner_sid);
-
-  /* Get group SID. */
-  PSID group_sid;
-  status = RtlGetGroupSecurityDescriptor (sd_ret, &group_sid, &dummy);
-  if (!NT_SUCCESS (status))
-    {
-      __seterrno_from_nt_status (status);
-      return -1;
-    }
-  cygsid group (group_sid);
-
-  /* Search for NULL ACE and store state of SUID, SGID and VTX bits. */
-  DWORD null_mask = 0;
-  if (NT_SUCCESS (RtlGetDaclSecurityDescriptor (sd_ret, &acl_exists, &acl,
-						&dummy)))
-    for (USHORT i = 0; i < acl->AceCount; ++i)
-      {
-	ACCESS_ALLOWED_ACE *ace;
-	if (NT_SUCCESS (RtlGetAce (acl, i, (PVOID *) &ace)))
-	  {
-	    cygpsid ace_sid ((PSID) &ace->SidStart);
-	    if (ace_sid == well_known_null_sid)
-	      {
-		null_mask = ace->Mask;
-		break;
-	      }
-	  }
-      }
+  size_t acl_len = sizeof (ACL);
+  mode_t class_obj = 0, other_obj, group_obj, deny;
+  DWORD access;
+  int idx, start_idx, tmp_idx;
+  bool owner_eq_group = false;
+  bool dev_has_admins = false;
 
   /* Initialize local security descriptor. */
-  SECURITY_DESCRIPTOR sd;
   RtlCreateSecurityDescriptor (&sd, SECURITY_DESCRIPTOR_REVISION);
 
   /* As in alloc_sd, set SE_DACL_PROTECTED to prevent the DACL from being
      modified by inheritable ACEs. */
   RtlSetControlSecurityDescriptor (&sd, SE_DACL_PROTECTED, SE_DACL_PROTECTED);
 
+  /* Fetch owner and group and set in security descriptor. */
+  owner = sidfromuid (uid, &cldap);
+  group = sidfromgid (gid, &cldap);
+  if (!owner || !group)
+    {
+      set_errno (EINVAL);
+      return NULL;
+    }
   status = RtlSetOwnerSecurityDescriptor (&sd, owner, FALSE);
   if (!NT_SUCCESS (status))
     {
       __seterrno_from_nt_status (status);
-      return -1;
+      return NULL;
     }
   status = RtlSetGroupSecurityDescriptor (&sd, group, FALSE);
   if (!NT_SUCCESS (status))
     {
       __seterrno_from_nt_status (status);
-      return -1;
+      return NULL;
+    }
+  owner_eq_group = RtlEqualSid (owner, group);
+  if (S_ISCHR (attr))
+    dev_has_admins = well_known_admins_sid == owner
+		     || well_known_admins_sid == group;
+
+  /* No POSIX ACL?  Use attr to generate one from scratch. */
+  if (!aclbufp)
+    {
+      aclbufp = (aclent_t *) tp.c_get ();
+      aclbufp[0].a_type = USER_OBJ;
+      aclbufp[0].a_id = ILLEGAL_UID;
+      aclbufp[0].a_perm = (attr >> 6) & S_IRWXO;
+      aclbufp[1].a_type = GROUP_OBJ;
+      aclbufp[1].a_id = ILLEGAL_GID;
+      aclbufp[1].a_perm = (attr >> 3) & S_IRWXO;
+      aclbufp[2].a_type = OTHER_OBJ;
+      aclbufp[2].a_id = ILLEGAL_GID;
+      aclbufp[2].a_perm = attr & S_IRWXO;
+      nentries = MIN_ACL_ENTRIES;
+      if (S_ISDIR (attr))
+	{
+	  aclbufp[3].a_type = DEF_USER_OBJ;
+	  aclbufp[3].a_id = ILLEGAL_UID;
+	  aclbufp[3].a_perm = (attr >> 6) & S_IRWXO;
+	  aclbufp[4].a_type = GROUP_OBJ;
+	  aclbufp[4].a_id = ILLEGAL_GID;
+	  aclbufp[4].a_perm = (attr >> 3) & S_IRWXO;
+	  aclbufp[5].a_type = OTHER_OBJ;
+	  aclbufp[5].a_id = ILLEGAL_GID;
+	  aclbufp[5].a_perm = attr & S_IRWXO;
+	  nentries += MIN_ACL_ENTRIES;
+	}
     }
 
-  /* Fill access control list. */
+  /* Collect SIDs of all entries in aclbufp. */
+  aclsid = (cygpsid *) tp.w_get ();
+  for (idx = 0; idx < nentries; ++idx)
+    switch (aclbufp[idx].a_type)
+      {
+      case USER_OBJ:
+	aclsid[idx] = owner;
+	break;
+      case DEF_USER_OBJ:
+	aclsid[idx] = well_known_creator_owner_sid;
+	break;
+      case USER:
+      case DEF_USER:
+	aclsid[idx] = sidfromuid (aclbufp[idx].a_id, &cldap);
+	break;
+      case GROUP_OBJ:
+	aclsid[idx] = group;
+	break;
+      case DEF_GROUP_OBJ:
+	aclsid[idx] = !(attr & S_ISGID) ? (PSID) well_known_creator_group_sid
+					: group;
+	break;
+      case GROUP:
+      case DEF_GROUP:
+	aclsid[idx] = sidfromgid (aclbufp[idx].a_id, &cldap);
+	break;
+      case CLASS_OBJ:
+      case DEF_CLASS_OBJ:
+	aclsid[idx] = well_known_null_sid;
+	break;
+      case OTHER_OBJ:
+      case DEF_OTHER_OBJ:
+	aclsid[idx] = well_known_world_sid;
+	break;
+      }
+
+  /* Initialize ACL. */
   acl = (PACL) tp.w_get ();
-  size_t acl_len = sizeof (ACL);
-  int ace_off = 0;
-
-  cygsid sid;
-  struct passwd *pw;
-  struct group *gr;
-  int pos;
-  cyg_ldap cldap;
-
   RtlCreateAcl (acl, ACL_MAXIMUM_SIZE, ACL_REVISION);
 
-  writable = false;
-
-  bool *invalid = (bool *) tp.c_get ();
-  memset (invalid, 0, nentries * sizeof *invalid);
-
-  /* Pre-compute owner, group, and other permissions to allow creating
-     matching deny ACEs as in alloc_sd. */
-  DWORD owner_allow = 0, group_allow = 0, other_allow = 0;
-  PDWORD allow;
-  for (int i = 0; i < nentries; ++i)
+  /* This loop has two runs, the first handling the actual permission,
+     the second handling the default permissions. */
+  idx = 0;
+  for (int def = 0; def <= ACL_DEFAULT; def += ACL_DEFAULT)
     {
-      switch (aclbufp[i].a_type)
-	{
-	case USER_OBJ:
-	  allow = &owner_allow;
-	  *allow = STANDARD_RIGHTS_ALL
-		   | (pc.fs_is_samba () ? 0 : FILE_WRITE_ATTRIBUTES);
-	  break;
-	case GROUP_OBJ:
-	  allow = &group_allow;
-	  break;
-	case OTHER_OBJ:
-	  allow = &other_allow;
-	  break;
-	default:
-	  continue;
-	}
-      *allow |= STANDARD_RIGHTS_READ | SYNCHRONIZE
-		| (pc.fs_is_samba () ? 0 : FILE_READ_ATTRIBUTES);
-      if (aclbufp[i].a_perm & S_IROTH)
-	*allow |= FILE_GENERIC_READ;
-      if (aclbufp[i].a_perm & S_IWOTH)
-	{
-	  *allow |= FILE_GENERIC_WRITE;
-	  writable = true;
-	}
-      if (aclbufp[i].a_perm & S_IXOTH)
-	*allow |= FILE_GENERIC_EXECUTE & ~FILE_READ_ATTRIBUTES;
-      /* Keep S_ISVTX rule in sync with alloc_sd. */
-      if (pc.isdir ()
-	  && (aclbufp[i].a_perm & (S_IWOTH | S_IXOTH)) == (S_IWOTH | S_IXOTH)
-	  && (aclbufp[i].a_type == USER_OBJ
-	      || !(null_mask & FILE_READ_DATA)))
-	*allow |= FILE_DELETE_CHILD;
-      invalid[i] = true;
-    }
-  bool isownergroup = (owner == group);
-  DWORD owner_deny = ~owner_allow & (group_allow | other_allow);
-  owner_deny &= ~(STANDARD_RIGHTS_READ
-		  | FILE_READ_ATTRIBUTES | FILE_WRITE_ATTRIBUTES);
-  DWORD group_deny = ~group_allow & other_allow;
-  group_deny &= ~(STANDARD_RIGHTS_READ | FILE_READ_ATTRIBUTES);
-
-  /* Set deny ACE for owner. */
-  if (owner_deny
-      && !add_access_denied_ace (acl, ace_off++, owner_deny,
-				 owner, acl_len, NO_INHERITANCE))
-    return -1;
-  /* Set deny ACE for group here to respect the canonical order,
-     if this does not impact owner */
-  if (group_deny && !(group_deny & owner_allow) && !isownergroup
-      && !add_access_denied_ace (acl, ace_off++, group_deny,
-				 group, acl_len, NO_INHERITANCE))
-    return -1;
-  /* Set allow ACE for owner. */
-  if (!add_access_allowed_ace (acl, ace_off++, owner_allow,
-			       owner, acl_len, NO_INHERITANCE))
-    return -1;
-  /* Set deny ACE for group, if still needed. */
-  if (group_deny & owner_allow && !isownergroup
-      && !add_access_denied_ace (acl, ace_off++, group_deny,
-				 group, acl_len, NO_INHERITANCE))
-    return -1;
-  /* Set allow ACE for group. */
-  if (!isownergroup
-      && !add_access_allowed_ace (acl, ace_off++, group_allow,
-                                  group, acl_len, NO_INHERITANCE))
-    return -1;
-  /* Set allow ACE for everyone. */
-  if (!add_access_allowed_ace (acl, ace_off++, other_allow,
-			       well_known_world_sid, acl_len, NO_INHERITANCE))
-    return -1;
-  /* If a NULL ACE exists, copy it verbatim. */
-  if (null_mask)
-    if (!add_access_allowed_ace (acl, ace_off++, null_mask, well_known_null_sid,
-				 acl_len, NO_INHERITANCE))
-      return -1;
-  for (int i = 0; i < nentries; ++i)
-    {
-      DWORD allow;
-      /* Skip invalidated entries. */
-      if (invalid[i])
-	continue;
-
-      allow = STANDARD_RIGHTS_READ
-	      | (pc.fs_is_samba () ? 0 : FILE_READ_ATTRIBUTES);
-      if (aclbufp[i].a_perm & S_IROTH)
-	allow |= FILE_GENERIC_READ;
-      if (aclbufp[i].a_perm & S_IWOTH)
-	{
-	  allow |= FILE_GENERIC_WRITE;
-	  writable = true;
-	}
-      if (aclbufp[i].a_perm & S_IXOTH)
-	allow |= FILE_GENERIC_EXECUTE & ~FILE_READ_ATTRIBUTES;
-      /* Keep S_ISVTX rule in sync with alloc_sd. */
-      if (pc.isdir ()
-	  && (aclbufp[i].a_perm & (S_IWOTH | S_IXOTH)) == (S_IWOTH | S_IXOTH)
-	  && !(null_mask & FILE_READ_DATA))
-	allow |= FILE_DELETE_CHILD;
-      /* Set inherit property. */
-      DWORD inheritance = (aclbufp[i].a_type & ACL_DEFAULT)
-			  ? (CONTAINER_INHERIT_ACE | OBJECT_INHERIT_ACE
-			     | INHERIT_ONLY_ACE)
+      DWORD inherit = def ? SUB_CONTAINERS_AND_OBJECTS_INHERIT | INHERIT_ONLY
 			  : NO_INHERITANCE;
-      /*
-       * If a specific acl contains a corresponding default entry with
-       * identical permissions, only one Windows ACE with proper
-       * inheritance bits is created.
-       */
-      if (!(aclbufp[i].a_type & ACL_DEFAULT)
-	  && aclbufp[i].a_type & (USER|GROUP)
-	  && (pos = searchace (aclbufp + i + 1, nentries - i - 1,
-			       aclbufp[i].a_type | ACL_DEFAULT,
-			       (aclbufp[i].a_type & (USER|GROUP))
-			       ? aclbufp[i].a_id : ILLEGAL_UID)) >= 0
-	  && aclbufp[i].a_perm == aclbufp[i + 1 + pos].a_perm)
+
+      /* No default ACEs on files. */
+      if (def && !S_ISDIR (attr))
 	{
-	  inheritance = CONTAINER_INHERIT_ACE | OBJECT_INHERIT_ACE;
-	  /* invalidate the corresponding default entry. */
-	  invalid[i + 1 + pos] = true;
+	  /* Trying to set default ACEs on a non-directory is an error.
+	     The underlying functions on Linux return EACCES. */
+	  if (idx < nentries && aclbufp[idx].a_type & ACL_DEFAULT)
+	    {
+	      set_errno (EACCES);
+	      return NULL;
+	    }
+	  break;
 	}
-      switch (aclbufp[i].a_type)
+
+      /* To compute deny access masks, we need group_obj, other_obj and... */
+      tmp_idx = searchace (aclbufp, nentries, def | GROUP_OBJ);
+      /* No default entries present? */
+      if (tmp_idx < 0)
+	break;
+      group_obj = aclbufp[tmp_idx].a_perm;
+      tmp_idx = searchace (aclbufp, nentries, def | OTHER_OBJ);
+      other_obj = aclbufp[tmp_idx].a_perm;
+
+      /* ... class_obj.  Create Cygwin ACE.  Only the S_ISGID attribute gets
+	 inherited. */
+      access = CYG_ACE_ISBITS_TO_WIN (def ? attr & S_ISGID : attr)
+	       | CYG_ACE_NEW_STYLE;
+      tmp_idx = searchace (aclbufp, nentries, def | CLASS_OBJ);
+      if (tmp_idx >= 0)
 	{
-	case DEF_USER_OBJ:
-	  allow |= STANDARD_RIGHTS_ALL
-		   | (pc.fs_is_samba () ? 0 : FILE_WRITE_ATTRIBUTES);
-	  if (!add_access_allowed_ace (acl, ace_off++, allow,
-				       well_known_creator_owner_sid, acl_len, inheritance))
-	    return -1;
-	  break;
-	case USER:
-	case DEF_USER:
-	  if (!(pw = internal_getpwuid (aclbufp[i].a_id, &cldap))
-	      || !sid.getfrompw (pw))
-	    {
-	      set_errno (EINVAL);
-	      return -1;
-	    }
-	  if (!add_access_allowed_ace (acl, ace_off++, allow,
-				       sid, acl_len, inheritance))
-	    return -1;
-	  break;
-	case DEF_GROUP_OBJ:
-	  if (!add_access_allowed_ace (acl, ace_off++, allow,
-				       well_known_creator_group_sid, acl_len, inheritance))
-	    return -1;
-	  break;
-	case GROUP:
-	case DEF_GROUP:
-	  if (!(gr = internal_getgrgid (aclbufp[i].a_id, &cldap))
-	      || !sid.getfromgr (gr))
-	    {
-	      set_errno (EINVAL);
-	      return -1;
-	    }
-	  if (!add_access_allowed_ace (acl, ace_off++, allow,
-				       sid, acl_len, inheritance))
-	    return -1;
-	  break;
-	case DEF_OTHER_OBJ:
-	  if (!add_access_allowed_ace (acl, ace_off++, allow,
-				       well_known_world_sid,
-				       acl_len, inheritance))
-	    return -1;
+	  class_obj = aclbufp[tmp_idx].a_perm;
+	  access |= CYG_ACE_MASK_TO_WIN (class_obj);
 	}
+      else
+	{
+	  /* Setting class_obj to group_obj allows to write below code without
+	     additional checks for existence of a CLASS_OBJ. */
+	  class_obj = group_obj;
+	}
+      /* Note that Windows filters the ACE Mask value so it only reflects
+	 the bit values supported by the object type.  The result is that
+	 we can't set a CLASS_OBJ value for ptys.  The get_posix_access
+	 function has to workaround that. */
+      if (!add_access_denied_ace (acl, access, well_known_null_sid, acl_len,
+				  inherit))
+	return NULL;
+
+      /* Do we potentially chmod a file with owner SID == group SID?  If so,
+	 make sure the owner perms are always >= group perms. */
+      if (!def && owner_eq_group)
+	  aclbufp[0].a_perm |= group_obj & class_obj;
+
+      /* This loop has two runs, the first w/ check_types == (USER_OBJ | USER),
+	 the second w/ check_types == (GROUP_OBJ | GROUP).  Each run creates
+	 first the deny, then the allow ACEs for the current types. */
+      for (int check_types = USER_OBJ | USER;
+	   check_types < CLASS_OBJ;
+	   check_types <<= 2)
+	{
+	  /* Create deny ACEs for users, then groups. */
+	  for (start_idx = idx;
+	       idx < nentries && aclbufp[idx].a_type & check_types;
+	       ++idx)
+	    {
+	      /* Avoid creating DENY ACEs for the second occurrence of
+		 accounts which show up twice, as USER_OBJ and USER, or
+		 GROUP_OBJ and GROUP. */
+	      if ((aclbufp[idx].a_type & USER && aclsid[idx] == owner)
+		  || (aclbufp[idx].a_type & GROUP && aclsid[idx] == group))
+		continue;
+	      /* For the rules how to construct the deny access mask, see the
+		 comment right at the start of this file. */
+	      if (aclbufp[idx].a_type & USER_OBJ)
+		deny = ~aclbufp[idx].a_perm & (class_obj | other_obj);
+	      else if (aclbufp[idx].a_type & USER)
+		deny = (aclbufp[idx].a_perm ^ class_obj)
+		       | (~aclbufp[idx].a_perm & other_obj);
+	      /* Accommodate Windows: Only generate deny masks for SYSTEM
+		 and the Administrators group in terms of the execute bit,
+		 if they are not the primary group. */
+	      else if (aclbufp[idx].a_type & GROUP
+		       && (aclsid[idx] == well_known_system_sid
+			   || aclsid[idx] == well_known_admins_sid))
+		deny = aclbufp[idx].a_perm & ~(class_obj | S_IROTH | S_IWOTH);
+	      else
+		deny = (aclbufp[idx].a_perm & ~class_obj)
+		       | (~aclbufp[idx].a_perm & other_obj);
+	      if (!deny)
+		continue;
+	      access = 0;
+	      if (deny & S_IROTH)
+		access |= FILE_DENY_READ;
+	      if (deny & S_IWOTH)
+		access |= (aclbufp[idx].a_type & USER_OBJ)
+			  ? FILE_DENY_WRITE_OWNER : FILE_DENY_WRITE;
+	      if (deny & S_IXOTH)
+		access |= FILE_DENY_EXEC;
+	      if (!add_access_denied_ace (acl, access, aclsid[idx], acl_len,
+					  inherit))
+		return NULL;
+	    }
+	  /* Create allow ACEs for users, then groups. */
+	  for (idx = start_idx;
+	       idx < nentries && aclbufp[idx].a_type & check_types;
+	       ++idx)
+	    {
+	      /* Don't set FILE_READ/WRITE_ATTRIBUTES unconditionally on Samba,
+		 otherwise it enforces read permissions. */
+	      access = STD_RIGHTS_OTHER | (is_samba ? 0 : FILE_READ_ATTRIBUTES);
+	      if (aclbufp[idx].a_type & USER_OBJ)
+		{
+		  access |= STD_RIGHTS_OWNER;
+		  if (!is_samba)
+		    access |= FILE_WRITE_ATTRIBUTES;
+		  /* Set FILE_DELETE_CHILD on files with "rwx" perms for the
+		     owner so that the owner gets "full control" (Duh). */
+		  if (aclbufp[idx].a_perm == S_IRWXO)
+		    access |= FILE_DELETE_CHILD;
+		}
+	      if (aclbufp[idx].a_perm & S_IROTH)
+		access |= FILE_ALLOW_READ;
+	      if (aclbufp[idx].a_perm & S_IWOTH)
+		access |= FILE_ALLOW_WRITE;
+	      if (aclbufp[idx].a_perm & S_IXOTH)
+		access |= FILE_ALLOW_EXEC;
+	      /* Handle S_ISVTX. */
+	      if (S_ISDIR (attr)
+		  && (aclbufp[idx].a_perm & (S_IWOTH | S_IXOTH))
+		     == (S_IWOTH | S_IXOTH)
+		  && (!(attr & S_ISVTX) || aclbufp[idx].a_type & USER_OBJ))
+		access |= FILE_DELETE_CHILD;
+	      /* For ptys, make sure the Administrators group has WRITE_DAC
+		 and WRITE_OWNER perms. */
+	      if (dev_has_admins && aclsid[idx] == well_known_admins_sid)
+		access |= STD_RIGHTS_OWNER;
+	      if (!add_access_allowed_ace (acl, access, aclsid[idx], acl_len,
+					   inherit))
+		return NULL;
+	    }
+	}
+      /* For ptys if the admins group isn't in the ACL, add an ACE to make
+	 sure the group has WRITE_DAC and WRITE_OWNER perms. */
+      if (S_ISCHR (attr) && !dev_has_admins
+	  && !add_access_allowed_ace (acl,
+				      STD_RIGHTS_OWNER | FILE_ALLOW_READ
+				      | FILE_ALLOW_WRITE,
+				      well_known_admins_sid, acl_len,
+				      NO_INHERITANCE))
+	return NULL;
+      /* Create allow ACE for other.  It's preceeded by class_obj if it exists.
+	 If so, skip it. */
+      if (aclbufp[idx].a_type & CLASS_OBJ)
+	++idx;
+      access = STD_RIGHTS_OTHER | (is_samba ? 0 : FILE_READ_ATTRIBUTES);
+      if (aclbufp[idx].a_perm & S_IROTH)
+	access |= FILE_ALLOW_READ;
+      if (aclbufp[idx].a_perm & S_IWOTH)
+	access |= FILE_ALLOW_WRITE;
+      if (aclbufp[idx].a_perm & S_IXOTH)
+	access |= FILE_ALLOW_EXEC;
+      /* Handle S_ISVTX. */
+      if (S_ISDIR (attr)
+	  && (aclbufp[idx].a_perm & (S_IWOTH | S_IXOTH)) == (S_IWOTH | S_IXOTH)
+	  && !(attr & S_ISVTX))
+	access |= FILE_DELETE_CHILD;
+      if (!add_access_allowed_ace (acl, access, aclsid[idx++], acl_len,
+				   inherit))
+	return NULL;
     }
+
   /* Set AclSize to computed value. */
   acl->AclSize = acl_len;
   debug_printf ("ACL-Size: %u", acl_len);
@@ -308,7 +430,7 @@ setacl (HANDLE handle, path_conv &pc, int nentries, aclent_t *aclbufp,
   if (!NT_SUCCESS (status))
     {
       __seterrno_from_nt_status (status);
-      return -1;
+      return NULL;
     }
   /* Make self relative security descriptor in sd_ret. */
   DWORD sd_size = 0;
@@ -316,36 +438,65 @@ setacl (HANDLE handle, path_conv &pc, int nentries, aclent_t *aclbufp,
   if (sd_size <= 0)
     {
       __seterrno ();
-      return -1;
+      return NULL;
     }
   if (!sd_ret.realloc (sd_size))
     {
       set_errno (ENOMEM);
-      return -1;
+      return NULL;
     }
   status = RtlAbsoluteToSelfRelativeSD (&sd, sd_ret, &sd_size);
   if (!NT_SUCCESS (status))
     {
       __seterrno_from_nt_status (status);
-      return -1;
+      return NULL;
     }
   debug_printf ("Created SD-Size: %u", sd_ret.size ());
+  return sd_ret;
+}
+
+/* This function *requires* a verified and sorted acl list! */
+int
+setacl (HANDLE handle, path_conv &pc, int nentries, aclent_t *aclbufp,
+	bool &writable)
+{
+  security_descriptor sd, sd_ret;
+  mode_t attr = pc.isdir () ? S_IFDIR : 0;
+  uid_t uid;
+  gid_t gid;
+
+  if (get_file_sd (handle, pc, sd, false))
+    return -1;
+  if (get_posix_access (sd, &attr, &uid, &gid, NULL, 0) < 0)
+    return -1;
+  if (!set_posix_access (attr, uid, gid, aclbufp, nentries,
+			 sd_ret, pc.fs_is_samba ()))
+    return -1;
+  /* FIXME?  Caller needs to know if any write perms are set to allow removing
+     the DOS R/O bit. */
+  writable = true;
   return set_file_sd (handle, pc, sd_ret, false);
 }
 
-/* Temporary access denied bits */
+/* Temporary access denied bits used by getace and get_posix_access during
+   Windows ACL processing.  These bits get removed before the created POSIX
+   ACL gets published. */
 #define DENY_R 040000
 #define DENY_W 020000
 #define DENY_X 010000
+#define DENY_RWX (DENY_R | DENY_W | DENY_X)
 
+/* New style ACL means, just read the bits and store them away.  Don't
+   create masked values on your own. */
 static void
 getace (aclent_t &acl, int type, int id, DWORD win_ace_mask,
-	DWORD win_ace_type)
+	DWORD win_ace_type, bool new_style)
 {
   acl.a_type = type;
   acl.a_id = id;
 
-  if ((win_ace_mask & FILE_READ_BITS) && !(acl.a_perm & (S_IROTH | DENY_R)))
+  if ((win_ace_mask & FILE_READ_BITS)
+      && (new_style || !(acl.a_perm & (S_IROTH | DENY_R))))
     {
       if (win_ace_type == ACCESS_ALLOWED_ACE_TYPE)
 	acl.a_perm |= S_IROTH;
@@ -353,7 +504,8 @@ getace (aclent_t &acl, int type, int id, DWORD win_ace_mask,
 	acl.a_perm |= DENY_R;
     }
 
-  if ((win_ace_mask & FILE_WRITE_BITS) && !(acl.a_perm & (S_IWOTH | DENY_W)))
+  if ((win_ace_mask & FILE_WRITE_BITS)
+      && (new_style || !(acl.a_perm & (S_IWOTH | DENY_W))))
     {
       if (win_ace_type == ACCESS_ALLOWED_ACE_TYPE)
 	acl.a_perm |= S_IWOTH;
@@ -361,13 +513,515 @@ getace (aclent_t &acl, int type, int id, DWORD win_ace_mask,
 	acl.a_perm |= DENY_W;
     }
 
-  if ((win_ace_mask & FILE_EXEC_BITS) && !(acl.a_perm & (S_IXOTH | DENY_X)))
+  if ((win_ace_mask & FILE_EXEC_BITS)
+      && (new_style || !(acl.a_perm & (S_IXOTH | DENY_X))))
     {
       if (win_ace_type == ACCESS_ALLOWED_ACE_TYPE)
 	acl.a_perm |= S_IXOTH;
       else if (win_ace_type == ACCESS_DENIED_ACE_TYPE)
 	acl.a_perm |= DENY_X;
     }
+}
+
+/* From the SECURITY_DESCRIPTOR given in psd, compute user, owner, posix
+   attributes, as well as the POSIX acl.  The function returns the number
+   of entries returned in aclbufp, or -1 in case of error. */
+int
+get_posix_access (PSECURITY_DESCRIPTOR psd,
+		  mode_t *attr_ret, uid_t *uid_ret, gid_t *gid_ret,
+		  aclent_t *aclbufp, int nentries)
+{
+  tmp_pathbuf tp;
+  NTSTATUS status;
+  BOOLEAN dummy, acl_exists;
+  SECURITY_DESCRIPTOR_CONTROL ctrl;
+  ULONG rev;
+  PACL acl;
+  PACCESS_ALLOWED_ACE ace;
+  cygpsid owner_sid, group_sid;
+  cyg_ldap cldap;
+  uid_t uid;
+  gid_t gid;
+  mode_t attr = 0;
+  aclent_t *lacl = NULL;
+  cygpsid ace_sid;
+  int pos, type, id, idx;
+
+  bool owner_eq_group;
+  bool just_created = false;
+  bool standard_ACEs_only = true;
+  bool new_style = false;
+  bool saw_user_obj = false;
+  bool saw_group_obj = false;
+  bool saw_other_obj = false;
+  bool saw_def_user_obj = false;
+  bool saw_def_group_obj = false;
+  bool has_class_perm = false;
+  bool has_def_class_perm = false;
+
+  mode_t class_perm = 0;
+  mode_t def_class_perm = 0;
+  int types_def = 0;
+  int def_pgrp_pos = -1;
+
+  if (aclbufp && nentries < MIN_ACL_ENTRIES)
+    {
+      set_errno (EINVAL);
+      return -1;
+    }
+  /* If reading the security descriptor failed, treat the object as
+     unreadable. */
+  if (!psd)
+    {
+      if (attr_ret)
+        *attr_ret &= S_IFMT;
+      if (uid_ret)
+        *uid_ret = ILLEGAL_UID;
+      if (gid_ret)
+        *gid_ret = ILLEGAL_GID;
+      if (aclbufp)
+	{
+	  aclbufp[0].a_type = USER_OBJ;
+	  aclbufp[0].a_id = ILLEGAL_UID;
+	  aclbufp[0].a_perm = 0;
+	  aclbufp[1].a_type = GROUP_OBJ;
+	  aclbufp[1].a_id = ILLEGAL_GID;
+	  aclbufp[1].a_perm = 0;
+	  aclbufp[2].a_type = OTHER_OBJ;
+	  aclbufp[2].a_id = ILLEGAL_GID;
+	  aclbufp[2].a_perm = 0;
+	  return MIN_ACL_ENTRIES;
+	}
+      return 0;
+    }
+  /* Fetch owner, group, and ACL from security descriptor. */
+  status = RtlGetOwnerSecurityDescriptor (psd, (PSID *) &owner_sid, &dummy);
+  if (!NT_SUCCESS (status))
+    {
+      __seterrno_from_nt_status (status);
+      return -1;
+    }
+  status = RtlGetGroupSecurityDescriptor (psd, (PSID *) &group_sid, &dummy);
+  if (!NT_SUCCESS (status))
+    {
+      __seterrno_from_nt_status (status);
+      return -1;
+    }
+  status = RtlGetDaclSecurityDescriptor (psd, &acl_exists, &acl, &dummy);
+  if (!NT_SUCCESS (status))
+    {
+      __seterrno_from_nt_status (status);
+      return -1;
+    }
+  /* Set uidret, gidret, and initalize attributes. */
+  uid = owner_sid.get_uid (&cldap);
+  gid = group_sid.get_gid (&cldap);
+  if (attr_ret)
+    {
+      attr = *attr_ret & S_IFMT;
+      just_created = *attr_ret & S_JUSTCREATED;
+    }
+  /* Remember the fact that owner and group are the same account. */
+  owner_eq_group = owner_sid == group_sid;
+
+  /* Create and initialize local aclent_t array. */
+  lacl = (aclent_t *) tp.c_get ();
+  memset (lacl, 0, MAX_ACL_ENTRIES * sizeof (aclent_t *));
+  lacl[0].a_type = USER_OBJ;
+  lacl[0].a_id = uid;
+  lacl[1].a_type = GROUP_OBJ;
+  lacl[1].a_id = gid;
+  lacl[2].a_type = OTHER_OBJ;
+  lacl[2].a_id = ILLEGAL_GID;
+
+  /* No ACEs?  Everybody has full access. */
+  if (!acl_exists || !acl || acl->AceCount == 0)
+    {
+      for (pos = 0; pos < MIN_ACL_ENTRIES; ++pos)
+	lacl[pos].a_perm = S_IROTH | S_IWOTH | S_IXOTH;
+      goto out;
+    }
+
+  /* Files and dirs are created with a NULL descriptor, so inheritence
+     rules kick in.  If no inheritable entries exist in the parent object,
+     Windows will create entries according to the user token's default DACL.
+     These entries are not desired and we ignore them at creation time.
+     We're just checking the SE_DACL_AUTO_INHERITED flag here, since that's
+     what we set in get_file_sd.  Read the longish comment there before
+     changing this test! */
+  if (just_created
+      && NT_SUCCESS (RtlGetControlSecurityDescriptor (psd, &ctrl, &rev))
+      && !(ctrl & SE_DACL_AUTO_INHERITED))
+    ;
+  else for (idx = 0; idx < acl->AceCount; ++idx)
+    {
+      if (!NT_SUCCESS (RtlGetAce (acl, idx, (PVOID *) &ace)))
+	continue;
+
+      ace_sid = (PSID) &ace->SidStart;
+
+      if (ace_sid == well_known_null_sid)
+	{
+	  /* Fetch special bits. */
+	  attr |= CYG_ACE_ISBITS_TO_POSIX (ace->Mask);
+	  if (ace->Header.AceType == ACCESS_DENIED_ACE_TYPE
+	      && ace->Mask & CYG_ACE_NEW_STYLE)
+	    {
+	      /* New-style ACL.  Note the fact that a mask value is present
+		 since that changes how getace fetches the information.  That's
+		 fine, because the Cygwin SID ACE is supposed to precede all
+		 USER, GROUP and GROUP_OBJ entries.  Any ACL not created that
+		 way has been rearranged by the Windows functionality to create
+		 the brain-dead "canonical" ACL order and is broken anyway. */
+	      new_style = true;
+	      attr |= CYG_ACE_ISBITS_TO_POSIX (ace->Mask);
+	      if (ace->Mask & CYG_ACE_MASK_VALID)
+		{
+		  if (!(ace->Header.AceFlags & INHERIT_ONLY))
+		    {
+		      if ((pos = searchace (lacl, MAX_ACL_ENTRIES, CLASS_OBJ))
+			  >= 0)
+			{
+			  lacl[pos].a_type = CLASS_OBJ;
+			  lacl[pos].a_id = ILLEGAL_GID;
+			  lacl[pos].a_perm = CYG_ACE_MASK_TO_POSIX (ace->Mask);
+			}
+		      has_class_perm = true;
+		      class_perm = lacl[pos].a_perm;
+		    }
+		  if (ace->Header.AceFlags & SUB_CONTAINERS_AND_OBJECTS_INHERIT)
+		    {
+		      if ((pos = searchace (lacl, MAX_ACL_ENTRIES,
+					    DEF_CLASS_OBJ)) >= 0)
+			{
+			  lacl[pos].a_type = DEF_CLASS_OBJ;
+			  lacl[pos].a_id = ILLEGAL_GID;
+			  lacl[pos].a_perm = CYG_ACE_MASK_TO_POSIX (ace->Mask);
+			}
+		      has_def_class_perm = true;
+		      def_class_perm = lacl[pos].a_perm;
+		    }
+		}
+	    }
+	  continue;
+	}
+      if (ace_sid == owner_sid)
+	{
+	  type = USER_OBJ;
+	  id = uid;
+	}
+      else if (ace_sid == group_sid)
+	{
+	  type = GROUP_OBJ;
+	  id = gid;
+	}
+      else if (ace_sid == well_known_world_sid)
+	{
+	  type = OTHER_OBJ;
+	  id = ILLEGAL_GID;
+	  if (ace->Header.AceType == ACCESS_ALLOWED_ACE_TYPE
+	      && !(ace->Header.AceFlags & INHERIT_ONLY))
+	    saw_other_obj = true;
+	}
+      else if (ace_sid == well_known_creator_owner_sid)
+	{
+	  type = DEF_USER_OBJ;
+	  types_def |= type;
+	  id = ILLEGAL_GID;
+	  saw_def_user_obj = true;
+	}
+      else if (ace_sid == well_known_creator_group_sid)
+	{
+	  type = DEF_GROUP_OBJ;
+	  types_def |= type;
+	  id = ILLEGAL_GID;
+	  saw_def_group_obj = true;
+	}
+      else
+	{
+	  id = ace_sid.get_id (TRUE, &type, &cldap);
+	  if (!type)
+	    continue;
+	}
+      /* If the SGID attribute is set on a just created file or dir, the
+         first group in the ACL is the desired primary group of the new
+	 object.  Alternatively, the first repetition of the owner SID is
+	 the desired primary group, and we mark the object as owner_eq_group
+	 object. */
+      if (just_created && attr & S_ISGID && !saw_group_obj
+	  && (type == GROUP || (type == USER_OBJ && saw_user_obj)))
+	{
+	  type = GROUP_OBJ;
+	  lacl[1].a_id = gid = id;
+	  owner_eq_group = true;
+	}
+      if (!(ace->Header.AceFlags & INHERIT_ONLY || type & ACL_DEFAULT))
+	{
+	  if (type == USER_OBJ)
+	    {
+	      /* If we get a second entry for the owner SID, it's either a
+		 GROUP_OBJ entry for the same SID, if owner SID == group SID,
+		 or it's an additional USER entry.  The latter can happen
+		 when chown'ing a file. */
+	      if (saw_user_obj)
+		{
+		  if (owner_eq_group && !saw_group_obj)
+		    {
+		      type = GROUP_OBJ;
+		      if (ace->Header.AceType == ACCESS_ALLOWED_ACE_TYPE)
+			saw_group_obj = true;
+		    }
+		  else
+		    type = USER;
+		}
+	      else if (ace->Header.AceType == ACCESS_ALLOWED_ACE_TYPE)
+		saw_user_obj = true;
+	    }
+	  else if (type == GROUP_OBJ)
+	    {
+	      /* Same for the primary group. */
+	      if (saw_group_obj)
+		type = GROUP;
+	      if (ace->Header.AceType == ACCESS_ALLOWED_ACE_TYPE)
+		saw_group_obj = true;
+	    }
+	  if ((pos = searchace (lacl, MAX_ACL_ENTRIES, type, id)) >= 0)
+	    {
+	      getace (lacl[pos], type, id, ace->Mask, ace->Header.AceType,
+		      new_style && type & (USER | GROUP_OBJ | GROUP));
+	      if (!new_style)
+		{
+		  /* Fix up CLASS_OBJ value. */
+		  if (type & (USER | GROUP))
+		    {
+		      has_class_perm = true;
+		      /* Accommodate Windows: Never add SYSTEM and Admins to
+			 CLASS_OBJ.  Unless (implicitly) if they are the
+			 GROUP_OBJ entry. */
+		      if (ace_sid != well_known_system_sid
+			  && ace_sid != well_known_admins_sid)
+			class_perm |= lacl[pos].a_perm;
+		    }
+		}
+	      /* For a newly created file, we'd like to know if we're running
+		 with a standard ACL, one only consisting of POSIX perms, plus
+		 SYSTEM and Admins as maximum non-POSIX perms entries.  If it's
+		 a standard ACL, we apply umask.  That's not entirely correct,
+		 but it's probably the best we can do. */
+	      else if (type & (USER | GROUP)
+		       && just_created
+		       && standard_ACEs_only
+		       && ace_sid != well_known_system_sid
+		       && ace_sid != well_known_admins_sid)
+		standard_ACEs_only = false;
+	    }
+	}
+      if ((ace->Header.AceFlags & SUB_CONTAINERS_AND_OBJECTS_INHERIT))
+	{
+	  if (type == USER_OBJ)
+	    {
+	      /* As above: If we get a second entry for the owner SID, it's
+		 a GROUP_OBJ entry for the same SID if owner SID == group SID,
+		 but this time only if the S_ISGID bit is set. Otherwise it's
+		 an additional USER entry. */
+	      if (saw_def_user_obj)
+		{
+		  if (owner_eq_group && !saw_def_group_obj && attr & S_ISGID)
+		    type = GROUP_OBJ;	/* This needs post-processing in the
+					   following GROUP_OBJ handling... */
+		  else
+		    type = USER;
+		}
+	      else if (ace->Header.AceType == ACCESS_ALLOWED_ACE_TYPE)
+		saw_def_user_obj = true;
+	    }
+	  if (type == GROUP_OBJ)
+	    {
+	      /* If the SGID bit is set, the inheritable entry for the
+		 primary group is, in fact, the DEF_GROUP_OBJ entry,
+		 so don't change the type to GROUP in this case. */
+	      if (!new_style || saw_def_group_obj || !(attr & S_ISGID))
+		type = GROUP;
+	      else if (ace->Header.AceType == ACCESS_ALLOWED_ACE_TYPE)
+		saw_def_group_obj = true;
+	    }
+	  type |= ACL_DEFAULT;
+	  types_def |= type;
+	  if ((pos = searchace (lacl, MAX_ACL_ENTRIES, type, id)) >= 0)
+	    {
+	      getace (lacl[pos], type, id, ace->Mask, ace->Header.AceType,
+		      new_style && type & (USER | GROUP_OBJ | GROUP));
+	      if (!new_style)
+		{
+		  /* Fix up DEF_CLASS_OBJ value. */
+		  if (type & (USER | GROUP))
+		    {
+		      has_def_class_perm = true;
+		      /* Accommodate Windows: Never add SYSTEM and Admins to
+			 CLASS_OBJ.  Unless (implicitly) if they are the
+			 GROUP_OBJ entry. */
+		      if (ace_sid != well_known_system_sid
+			  && ace_sid != well_known_admins_sid)
+		      def_class_perm |= lacl[pos].a_perm;
+		    }
+		  /* And note the position of the DEF_GROUP_OBJ entry. */
+		  if (type == DEF_GROUP_OBJ)
+		    def_pgrp_pos = pos;
+		}
+	    }
+	}
+    }
+  /* If this is an old-style or non-Cygwin ACL, and secondary user and group
+     entries exist in the ACL, fake a matching CLASS_OBJ entry. The CLASS_OBJ
+     permissions are the or'ed permissions of the primary group permissions
+     and all secondary user and group permissions. */
+  if (!new_style && has_class_perm
+      && (pos = searchace (lacl, MAX_ACL_ENTRIES, 0)) >= 0)
+    {
+      lacl[pos].a_type = CLASS_OBJ;
+      lacl[pos].a_id = ILLEGAL_GID;
+      lacl[pos].a_perm = class_perm | lacl[1].a_perm;
+    }
+  /* For ptys, fake a mask if the admins group is neither owner nor group.
+     In that case we have an extra ACE for the admins group, and we need a
+     CLASS_OBJ to get a valid POSIX ACL.  However, Windows filters the ACE
+     Mask value so it only reflects the bit values supported by the object
+     type.  The result is that we can't set an explicit CLASS_OBJ value for
+     ptys in the NULL SID ACE. */
+  else if (S_ISCHR (attr) && owner_sid != well_known_admins_sid
+	   && group_sid != well_known_admins_sid
+	   && (pos = searchace (lacl, MAX_ACL_ENTRIES, CLASS_OBJ)) >= 0)
+    {
+      lacl[pos].a_type = CLASS_OBJ;
+      lacl[pos].a_id = ILLEGAL_GID;
+      lacl[pos].a_perm = lacl[1].a_perm; /* == group perms */
+    }
+  /* If this is a just created file, and this is an ACL with only standard
+     entries, or if standard POSIX permissions are missing (probably no
+     inherited ACEs so created from a default DACL), assign the permissions
+     specified by the file creation mask.  The values get masked by the
+     actually requested permissions by the caller per POSIX 1003.1e draft 17. */
+  if (just_created)
+    {
+      mode_t perms = (S_IRWXU | S_IRWXG | S_IRWXO) & ~cygheap->umask;
+      if (standard_ACEs_only || !saw_user_obj)
+	lacl[0].a_perm = (perms >> 6) & S_IRWXO;
+      if (standard_ACEs_only || !saw_group_obj)
+	lacl[1].a_perm = (perms >> 3) & S_IRWXO;
+      if (standard_ACEs_only || !saw_other_obj)
+	lacl[2].a_perm = perms & S_IRWXO;
+    }
+  /* Ensure that the default acl contains at least
+     DEF_(USER|GROUP|OTHER)_OBJ entries.  */
+  if (types_def && (pos = searchace (lacl, MAX_ACL_ENTRIES, 0)) >= 0)
+    {
+      if (!(types_def & USER_OBJ))
+	{
+	  lacl[pos].a_type = DEF_USER_OBJ;
+	  lacl[pos].a_id = uid;
+	  lacl[pos].a_perm = lacl[0].a_perm;
+	  pos++;
+	}
+      if (!(types_def & GROUP_OBJ) && pos < MAX_ACL_ENTRIES)
+	{
+	  lacl[pos].a_type = DEF_GROUP_OBJ;
+	  lacl[pos].a_id = gid;
+	  lacl[pos].a_perm = lacl[1].a_perm;
+	  /* Note the position of the DEF_GROUP_OBJ entry. */
+	  def_pgrp_pos = pos;
+	  pos++;
+	}
+      if (!(types_def & OTHER_OBJ) && pos < MAX_ACL_ENTRIES)
+	{
+	  lacl[pos].a_type = DEF_OTHER_OBJ;
+	  lacl[pos].a_id = ILLEGAL_GID;
+	  lacl[pos].a_perm = lacl[2].a_perm;
+	  pos++;
+	}
+    }
+  /* If this is an old-style or non-Cygwin ACL, and secondary user default
+     and group default entries exist in the ACL, fake a matching DEF_CLASS_OBJ
+     entry. The DEF_CLASS_OBJ permissions are the or'ed permissions of the
+     primary group default permissions and all secondary user and group def.
+     permissions. */
+  if (!new_style && has_def_class_perm
+      && (pos = searchace (lacl, MAX_ACL_ENTRIES, 0)) >= 0)
+    {
+      lacl[pos].a_type = DEF_CLASS_OBJ;
+      lacl[pos].a_id = ILLEGAL_GID;
+      lacl[pos].a_perm = def_class_perm;
+      if (def_pgrp_pos >= 0)
+	lacl[pos].a_perm |= lacl[def_pgrp_pos].a_perm;
+    }
+
+  /* Make sure `pos' contains the number of used entries in lacl. */
+  if ((pos = searchace (lacl, MAX_ACL_ENTRIES, 0)) < 0)
+    pos = MAX_ACL_ENTRIES;
+
+  /* For old-style or non-Cygwin ACLs, check for merging permissions. */
+  if (!new_style)
+    for (idx = 0; idx < pos; ++idx)
+      {
+	/* Current user?  If the user entry has a deny ACE, don't check. */
+	if (lacl[idx].a_id == myself->uid
+	    && lacl[idx].a_type & (USER_OBJ | USER)
+	    && !(lacl[idx].a_type & ACL_DEFAULT)
+	    && !(lacl[idx].a_perm & DENY_RWX))
+	  {
+	    int gpos;
+	    gid_t grps[NGROUPS_MAX];
+	    cyg_ldap cldap;
+
+	    /* Sum up all permissions of groups the user is member of, plus
+	       everyone perms, and merge them to user perms.  */
+	    mode_t grp_perm = lacl[2].a_perm & S_IRWXO;
+	    int gnum = internal_getgroups (NGROUPS_MAX, grps, &cldap);
+	    for (int g = 0; g < gnum && grp_perm != S_IRWXO; ++g)
+	      if ((gpos = 1, grps[g] == lacl[gpos].a_id)
+		  || (gpos = searchace (lacl, MAX_ACL_ENTRIES, GROUP, grps[g]))
+		     >= 0)
+		grp_perm |= lacl[gpos].a_perm & S_IRWXO;
+	    lacl[idx].a_perm |= grp_perm;
+	  }
+	/* For all groups, if everyone has more permissions, add everyone
+	   perms to group perms.  Skip groups with deny ACE. */
+	else if (lacl[idx].a_id & (GROUP_OBJ | GROUP)
+		 && !(lacl[idx].a_type & ACL_DEFAULT)
+		 && !(lacl[idx].a_perm & DENY_RWX))
+	  lacl[idx].a_perm |= lacl[2].a_perm & S_IRWXO;
+      }
+  /* If owner SID == group SID (Microsoft Accounts) merge group perms into
+     user perms but leave group perms intact.  That's a fake, but it allows
+     to keep track of the POSIX group perms without much effort. */
+  if (owner_eq_group)
+    lacl[0].a_perm |= lacl[1].a_perm;
+  /* Construct POSIX permission bits.  Fortunately we know exactly where
+     to fetch the affecting bits from, at least as long as the array
+     hasn't been sorted. */
+  attr |= (lacl[0].a_perm & S_IRWXO) << 6;
+  attr |= (has_class_perm ? class_perm : (lacl[1].a_perm & S_IRWXO)) << 3;
+  attr |= (lacl[2].a_perm & S_IRWXO);
+
+out:
+  if (uid_ret)
+    *uid_ret = uid;
+  if (gid_ret)
+    *gid_ret = gid;
+  if (attr_ret)
+    *attr_ret = attr;
+  if (aclbufp)
+    {
+      if (pos > nentries)
+	{
+	  set_errno (ENOSPC);
+	  return -1;
+	}
+      memcpy (aclbufp, lacl, pos * sizeof (aclent_t));
+      for (idx = 0; idx < pos; ++idx)
+	aclbufp[idx].a_perm &= S_IRWXO;
+      aclsort32 (pos, 0, aclbufp);
+    }
+  return pos;
 }
 
 int
@@ -377,220 +1031,7 @@ getacl (HANDLE handle, path_conv &pc, int nentries, aclent_t *aclbufp)
 
   if (get_file_sd (handle, pc, sd, false))
     return -1;
-
-  cygpsid owner_sid;
-  cygpsid group_sid;
-  NTSTATUS status;
-  BOOLEAN dummy;
-  uid_t uid;
-  gid_t gid;
-  cyg_ldap cldap;
-
-  status = RtlGetOwnerSecurityDescriptor (sd, (PSID *) &owner_sid, &dummy);
-  if (!NT_SUCCESS (status))
-    {
-      __seterrno_from_nt_status (status);
-      return -1;
-    }
-  uid = owner_sid.get_uid (&cldap);
-
-  status = RtlGetGroupSecurityDescriptor (sd, (PSID *) &group_sid, &dummy);
-  if (!NT_SUCCESS (status))
-    {
-      __seterrno_from_nt_status (status);
-      return -1;
-    }
-  gid = group_sid.get_gid (&cldap);
-
-  aclent_t lacl[MAX_ACL_ENTRIES];
-  memset (&lacl, 0, MAX_ACL_ENTRIES * sizeof (aclent_t));
-  lacl[0].a_type = USER_OBJ;
-  lacl[0].a_id = uid;
-  lacl[1].a_type = GROUP_OBJ;
-  lacl[1].a_id = gid;
-  lacl[2].a_type = OTHER_OBJ;
-  lacl[2].a_id = ILLEGAL_GID;
-
-  PACL acl;
-  BOOLEAN acl_exists;
-
-  status = RtlGetDaclSecurityDescriptor (sd, &acl_exists, &acl, &dummy);
-  if (!NT_SUCCESS (status))
-    {
-      __seterrno_from_nt_status (status);
-      return -1;
-    }
-
-  int pos, i, types_def = 0;
-  int pgrp_pos = 1, def_pgrp_pos = -1;
-  bool has_class_perm = false, has_def_class_perm = false;
-  mode_t class_perm = 0, def_class_perm = 0;
-
-  if (!acl_exists || !acl)
-    for (pos = 0; pos < 3; ++pos)
-      lacl[pos].a_perm = S_IROTH | S_IWOTH | S_IXOTH;
-  else
-    {
-      for (i = 0; i < acl->AceCount; ++i)
-	{
-	  ACCESS_ALLOWED_ACE *ace;
-
-	  if (!NT_SUCCESS (RtlGetAce (acl, i, (PVOID *) &ace)))
-	    continue;
-
-	  cygpsid ace_sid ((PSID) &ace->SidStart);
-	  int id;
-	  int type = 0;
-
-	  if (ace_sid == well_known_null_sid)
-	    {
-	      /* Simply ignore. */
-	      continue;
-	    }
-	  if (ace_sid == well_known_world_sid)
-	    {
-	      type = OTHER_OBJ;
-	      id = ILLEGAL_GID;
-	    }
-	  else if (ace_sid == owner_sid)
-	    {
-	      type = USER_OBJ;
-	      id = uid;
-	    }
-	  else if (ace_sid == group_sid)
-	    {
-	      type = GROUP_OBJ;
-	      id = gid;
-	    }
-	  else if (ace_sid == well_known_creator_group_sid)
-	    {
-	      type = DEF_GROUP_OBJ;
-	      types_def |= type;
-	      id = ILLEGAL_GID;
-	    }
-	  else if (ace_sid == well_known_creator_owner_sid)
-	    {
-	      type = DEF_USER_OBJ;
-	      types_def |= type;
-	      id = ILLEGAL_GID;
-	    }
-	  else
-	    id = ace_sid.get_id (TRUE, &type, &cldap);
-
-	  if (!type)
-	    continue;
-	  if (!(ace->Header.AceFlags & INHERIT_ONLY_ACE || type & ACL_DEFAULT))
-	    {
-	      if ((pos = searchace (lacl, MAX_ACL_ENTRIES, type, id)) >= 0)
-		{
-		  getace (lacl[pos], type, id, ace->Mask, ace->Header.AceType);
-		  /* Fix up CLASS_OBJ value. */
-		  if (type == USER || type == GROUP)
-		    {
-		      has_class_perm = true;
-		      class_perm |= lacl[pos].a_perm;
-		    }
-		}
-	    }
-	  if ((ace->Header.AceFlags
-	      & (CONTAINER_INHERIT_ACE | OBJECT_INHERIT_ACE))
-	      && pc.isdir ())
-	    {
-	      if (type == USER_OBJ)
-		type = USER;
-	      else if (type == GROUP_OBJ)
-		type = GROUP;
-	      type |= ACL_DEFAULT;
-	      types_def |= type;
-	      if ((pos = searchace (lacl, MAX_ACL_ENTRIES, type, id)) >= 0)
-		{
-		  getace (lacl[pos], type, id, ace->Mask, ace->Header.AceType);
-		  /* Fix up DEF_CLASS_OBJ value. */
-		  if (type == DEF_USER || type == DEF_GROUP)
-		    {
-		      has_def_class_perm = true;
-		      def_class_perm |= lacl[pos].a_perm;
-		    }
-		  /* And note the position of the DEF_GROUP_OBJ entry. */
-		  else if (type == DEF_GROUP_OBJ)
-		    def_pgrp_pos = pos;
-		}
-	    }
-	}
-      /* If secondary user and group entries exist in the ACL, fake a matching
-	 CLASS_OBJ entry. The CLASS_OBJ permissions are the or'ed permissions
-	 of the primary group permissions and all secondary user and group
-	 permissions. */
-      if (has_class_perm && (pos = searchace (lacl, MAX_ACL_ENTRIES, 0)) >= 0)
-	{
-	  lacl[pos].a_type = CLASS_OBJ;
-	  lacl[pos].a_id = ILLEGAL_GID;
-	  lacl[pos].a_perm = class_perm | lacl[pgrp_pos].a_perm;
-	}
-      /* Ensure that the default acl contains at least
-      	 DEF_(USER|GROUP|OTHER)_OBJ entries.  */
-      if (types_def && (pos = searchace (lacl, MAX_ACL_ENTRIES, 0)) >= 0)
-	{
-	  if (!(types_def & USER_OBJ))
-	    {
-	      lacl[pos].a_type = DEF_USER_OBJ;
-	      lacl[pos].a_id = uid;
-	      lacl[pos].a_perm = lacl[0].a_perm;
-	      pos++;
-	    }
-	  if (!(types_def & GROUP_OBJ) && pos < MAX_ACL_ENTRIES)
-	    {
-	      lacl[pos].a_type = DEF_GROUP_OBJ;
-	      lacl[pos].a_id = gid;
-	      lacl[pos].a_perm = lacl[1].a_perm;
-	      /* Note the position of the DEF_GROUP_OBJ entry. */
-	      def_pgrp_pos = pos;
-	      pos++;
-	    }
-	  if (!(types_def & OTHER_OBJ) && pos < MAX_ACL_ENTRIES)
-	    {
-	      lacl[pos].a_type = DEF_OTHER_OBJ;
-	      lacl[pos].a_id = ILLEGAL_GID;
-	      lacl[pos].a_perm = lacl[2].a_perm;
-	      pos++;
-	    }
-	}
-      /* If secondary user default and group default entries exist in the ACL,
-	 fake a matching DEF_CLASS_OBJ entry. The DEF_CLASS_OBJ permissions are
-	 the or'ed permissions of the primary group default permissions and all
-	 secondary user and group default permissions. */
-      if (has_def_class_perm
-	  && (pos = searchace (lacl, MAX_ACL_ENTRIES, 0)) >= 0)
-	{
-	  lacl[pos].a_type = DEF_CLASS_OBJ;
-	  lacl[pos].a_id = ILLEGAL_GID;
-	  lacl[pos].a_perm = def_class_perm;
-	  if (def_pgrp_pos >= 0)
-	    lacl[pos].a_perm |= lacl[def_pgrp_pos].a_perm;
-	}
-    }
-  if ((pos = searchace (lacl, MAX_ACL_ENTRIES, 0)) < 0)
-    pos = MAX_ACL_ENTRIES;
-  if (aclbufp)
-    {
-#if 0
-      /* Disable owner/group permissions equivalence if owner SID == group SID.
-	 It's technically not quite correct, but it helps in case a security
-	 conscious application checks if a file has too open permissions.  In
-	 fact, since owner == group, there's no security issue here. */
-      if (owner_sid == group_sid)
-	lacl[1].a_perm = lacl[0].a_perm;
-#endif
-      if (pos > nentries)
-	{
-	  set_errno (ENOSPC);
-	  return -1;
-	}
-      memcpy (aclbufp, lacl, pos * sizeof (aclent_t));
-      for (i = 0; i < pos; ++i)
-	aclbufp[i].a_perm &= ~(DENY_R | DENY_W | DENY_X);
-      aclsort32 (pos, 0, aclbufp);
-    }
+  int pos = get_posix_access (sd, NULL, NULL, NULL, aclbufp, nentries);
   syscall_printf ("%R = getacl(%S)", pos, pc.get_nt_native_path ());
   return pos;
 }

@@ -1,3 +1,31 @@
+2015-11-18  Corinna Vinschen  <corinna@vinschen.de>
+
+	Reapply POSIX ACL changes.
+
+	* getfacl.c (main): Special-case SYSTEM and Admins group.  Add comments.
+
+	* setfacl.c: Align more to Linux tool.
+	(delacl): New function to delete acl entries only.
+	(modacl): Drop delete functionality.  Add handling of recomputing the
+	mask and default mask values.
+	(delallacl): Rename from delacl.
+	(setfacl): Call delacl in Delete case.  Call delallacl in DeleteAll
+	and DeleteDef case.
+	(usage): Accommodate new options.  Rearrange and rephrase slightly.
+	(longopts): Emit 'x' in --delete case.  Add --no-mask and --mask
+	options.
+	(opts): Add -x and -n options.
+	(main): Handle -d and -x the same.  Handle -n and --mask options.
+	Drop handling for -r option.
+
+	* getfacl.c (usage): Align more closely to Linux version.  Add new
+	options -c, -e, -E.  Change formatting to accommodate longer options.
+	(longopts): Rename --noname to --numeric.  Keep --noname for backward
+	compatibility.  Add --omit-header, --all-effective and --no-effective
+	options.
+	(opts): Add -c, -e and -E option.
+	(main): Handle new -c, -e, and -E options.
+
 2015-10-22  Yaakov Selkowitz  <yselkowi@redhat.com>
 
 	* getconf.c (conf_table): Add LEVEL*_CACHE_* variables.
