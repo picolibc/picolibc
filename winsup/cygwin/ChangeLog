@@ -1,5 +1,11 @@
 2015-06-26  Corinna Vinschen  <corinna@vinschen.de>
 
+	* include/cygwin/signal.h: Revert to define MINSIGSTKSZ and SIGSTKSZ
+	here with bigger values to allow _cygtls to reside on signal stack,
+	should it turn out to be required at one point.
+
+2015-06-26  Corinna Vinschen  <corinna@vinschen.de>
+
 	* resource.cc (getrlimit): Fix values returned by RLIMIT_STACK.
 	Explain why this had to be changed.
 
