@@ -1,3 +1,8 @@
+2015-06-26  Corinna Vinschen  <corinna@vinschen.de>
+
+	* resource.cc (getrlimit): Fix values returned by RLIMIT_STACK.
+	Explain why this had to be changed.
+
 2015-06-23  Ken Brown  <kbrown@cornell.edu>
 
 	* include/cygwin/signal.h (SIGEV_*): Add macros.

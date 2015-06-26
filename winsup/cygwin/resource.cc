@@ -114,8 +114,6 @@ getrusage (int intwho, struct rusage *rusage_in)
 extern "C" int
 getrlimit (int resource, struct rlimit *rlp)
 {
-  MEMORY_BASIC_INFORMATION m;
-
   __try
     {
       rlp->rlim_cur = RLIM_INFINITY;
@@ -129,14 +127,32 @@ getrlimit (int resource, struct rlimit *rlp)
 	case RLIMIT_AS:
 	  break;
 	case RLIMIT_STACK:
-	  if (!VirtualQuery ((LPCVOID) &m, &m, sizeof m))
-	    debug_printf ("couldn't get stack info, returning def.values. %E");
-	  else
-	    {
-	      rlp->rlim_cur = (rlim_t) &m - (rlim_t) m.AllocationBase;
-	      rlp->rlim_max = (rlim_t) m.BaseAddress + m.RegionSize
-			      - (rlim_t) m.AllocationBase;
-	    }
+	  PTEB teb;
+	  /* 2015-06-26: Originally rlim_cur returned the size of the still
+	     available stack area on the current stack, rlim_max the total size
+	     of the current stack.  Two problems:
+
+	     - Per POSIX, RLIMIT_STACK returns "the maximum size of the initial
+	       thread's stack, in bytes. The implementation does not
+	       automatically grow the stack beyond this limit".
+
+	     - With the implementation of sigaltstack, the current stack is not
+	       necessarily the "initial thread's stack" anymore.  Rather, when
+	       called from a signal handler running on the alternate stack,
+	       RLIMIT_STACK should return the size of the original stack.
+
+	     rlim_cur is now the size of the stack.  For system-provided stacks
+	     it's the size between DeallocationStack and StackBase.  For
+	     application-provided stacks (via pthread_attr_setstack),
+	     DeallocationStack is NULL, but StackLimit points to the bottom
+	     of the stack.
+
+	     rlim_max is set to RLIM_INFINITY since there's no hard limit
+	     for stack sizes on Windows. */
+	  teb = NtCurrentTeb ();
+	  rlp->rlim_cur = (rlim_t) teb->Tib.StackBase
+			  - (rlim_t) (teb->DeallocationStack
+				      ?: teb->Tib.StackLimit);
 	  break;
 	case RLIMIT_NOFILE:
 	  rlp->rlim_cur = getdtablesize ();
