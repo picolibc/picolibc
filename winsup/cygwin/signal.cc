@@ -667,7 +667,17 @@ sigaltstack (const stack_t *ss, stack_t *oss)
 	    }
 	}
       if (oss)
-	memcpy (oss, &me.altstack, sizeof *oss);
+	{
+	  char stack_marker;
+	  memcpy (oss, &me.altstack, sizeof *oss);
+	  if (!me.altstack.ss_flags && me.altstack.ss_sp)
+	    {
+	      if (&stack_marker >= (char *) me.altstack.ss_sp
+		  && &stack_marker < (char *) me.altstack.ss_sp
+				     + me.altstack.ss_size)
+		oss->ss_flags = SS_ONSTACK;
+	    }
+	}
     }
   __except (EFAULT)
     {

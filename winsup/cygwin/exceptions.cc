@@ -1599,8 +1599,6 @@ _cygtls::call_signal_handler ()
 	  uintptr_t new_sp = (uintptr_t) _my_tls.altstack.ss_sp
 			     + _my_tls.altstack.ss_size;
 	  new_sp &= ~0xf;
-	  /* Mark alternate stack as used. */
-	  _my_tls.altstack.ss_flags = SS_ONSTACK;
 	  /* In assembler: Save regs on new stack, move to alternate stack,
 	     call thisfunc, revert stack regs. */
 #ifdef __x86_64__
@@ -1671,8 +1669,6 @@ _cygtls::call_signal_handler ()
 		       [FUNC]	"o" (thisfunc)
 		   : "memory");
 #endif
-	  /* Revert alternate stack to unused. */
-	  _my_tls.altstack.ss_flags = 0;
 	}
       else
 	/* No alternate signal stack requested or available, just call

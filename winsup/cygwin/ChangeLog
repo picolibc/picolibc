@@ -1,3 +1,10 @@
+2015-06-27  Corinna Vinschen  <corinna@vinschen.de>
+
+	* exceptions.cc (_cygtls::call_signal_handler): Drop manipulating
+	thread's ss_flags here.  It's not safe against longjmp.
+	* signal.cc (sigaltstack): Check if we're running on the alternate
+	stack and set ss_flags returned in oss to SS_ONSTACK.
+
 2015-06-26  Corinna Vinschen  <corinna@vinschen.de>
 
 	* include/cygwin/signal.h: Revert to define MINSIGSTKSZ and SIGSTKSZ
