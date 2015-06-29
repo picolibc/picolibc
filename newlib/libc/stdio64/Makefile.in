@@ -293,6 +293,7 @@ libstdio64_la_LDFLAGS = -Xcompiler -nostdlib
 @USE_LIBTOOL_FALSE@lib_a_CFLAGS = $(AM_CFLAGS)
 AM_CFLAGS = -I $(srcdir)/../stdio
 CHEWOUT_FILES = \
+	fdopen64.def		\
 	fgetpos64.def		\
 	fopen64.def		\
 	freopen64.def		\

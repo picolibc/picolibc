@@ -1,3 +1,12 @@
+2015-06-29  Jon Turney  <jon.turney@dronecode.org.uk>
+
+	* libc/ctype/Makefile.in: Regenerate.
+	* libc/posix/Makefile.in: Ditto.
+	* libc/stdio/Makefile.in: Ditto.
+	* libc/stdio64/Makefile.in: Ditto.
+	* libc/stdlib/Makefile.in: Ditto.
+	* libc/string/Makefile.in: Ditto.
+
 2015-06-23  Jon Turney  <jon.turney@dronecode.org.uk>
 
 	* libc/ctype/Makefile.am (CHEWOUT_FILES): Add isblank.def.

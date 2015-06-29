@@ -320,7 +320,8 @@ libposix_la_LDFLAGS = -Xcompiler -nostdlib
 @USE_LIBTOOL_FALSE@lib_a_SOURCES = $(GENERAL_SOURCES) $(ELIX_SOURCES)
 @USE_LIBTOOL_FALSE@lib_a_CFLAGS = $(AM_CFLAGS)
 CHEWOUT_FILES = \
-	popen.def
+	popen.def \
+	posix_spawn.def
 
 SUFFIXES = .def
 CHEW = ../../doc/makedoc -f $(srcdir)/../../doc/doc.str
