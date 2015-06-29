@@ -1,3 +1,8 @@
+2015-07-14  Andre Vieira  <andre.simoesdiasvieira@arm.com\>
+
+	* arm/elf-nano.specs: Added option to search for system headers in
+	newlib-nano directory.
+
 2015-05-26  Stefan Wallentowitz  <stefan.wallentowitz@tum.de>
 
 	* or1k/impure.c: Fix initialization of impure ptr
