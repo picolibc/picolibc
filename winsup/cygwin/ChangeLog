@@ -1,3 +1,7 @@
+2015-06-30  Corinna Vinschen  <corinna@vinschen.de>
+
+	* signal.cc (sigaltstack): Add comment.
+
 2015-06-27  Corinna Vinschen  <corinna@vinschen.de>
 
 	* exceptions.cc (_cygtls::call_signal_handler): Drop manipulating

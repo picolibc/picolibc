@@ -670,6 +670,10 @@ sigaltstack (const stack_t *ss, stack_t *oss)
 	{
 	  char stack_marker;
 	  memcpy (oss, &me.altstack, sizeof *oss);
+	  /* Check if the current stack is the alternate signal stack.  If so,
+	     set ss_flags accordingly.  We do this here rather than setting
+	     ss_flags in _cygtls::call_signal_handler since the signal handler
+	     calls longjmp, so we never return to reset the flag. */
 	  if (!me.altstack.ss_flags && me.altstack.ss_sp)
 	    {
 	      if (&stack_marker >= (char *) me.altstack.ss_sp
