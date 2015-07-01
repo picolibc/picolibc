@@ -308,9 +308,21 @@ frok::parent (volatile char * volatile stack_here)
   ch.forker_finished = forker_finished;
 
   PTEB teb = NtCurrentTeb ();
-  ch.stackbottom = _tlsbase;
-  ch.stacktop = (void *) _tlstop;
   ch.stackaddr = teb->DeallocationStack;
+  ch.stackbottom = _tlsbase;
+  /* If DeallocationStack is NULL, we're running on an application-provided
+     stack.  If so, the entire stack is committed anyway and StackLimit points
+     to the allocation address of the stack.  Otherwise we're running on a
+     system-allocated stack and using StackLimit is dangerous, in case the
+     application encountered a stack overflow and recovered from it via
+     a signal handler running on an alternate stack.  Since stack_here is
+     the address of the stack pointer we start the child with anyway, we
+     can set ch.stacktop to this value rounded down to page size.  The
+     child will not need the rest of the stack anyway. */
+  if (!ch.stackaddr)
+    ch.stacktop = _tlstop;
+  else
+    ch.stacktop = (void *) ((uintptr_t) stack_here & ~wincap.page_size ());
   ch.guardsize = 0;
   if (&_my_tls != _main_tls)
     {
