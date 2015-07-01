@@ -22,3 +22,6 @@ Bug Fixes
 
 - Try to handle concurrent close on socket more gracefully
   Addresses: https://cygwin.com/ml/cygwin/2015-06/msg00235.html
+
+- Fix fork failing after the parent recovered from a stack overflow.
+  Addresses: https://cygwin.com/ml/cygwin/2015-06/msg00384.html
