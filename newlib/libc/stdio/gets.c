@@ -79,13 +79,17 @@ _DEFUN(_gets_r, (ptr, buf),
 {
   register int c;
   register char *s = buf;
+  FILE *fp;
 
-  _newlib_flockfile_start (stdin);
-  while ((c = __sgetc_r (ptr, stdin)) != '\n')
+  _REENT_SMALL_CHECK_INIT (ptr);
+  fp = _stdin_r (ptr);
+  CHECK_INIT (ptr, fp);
+  _newlib_flockfile_start (fp);
+  while ((c = __sgetc_r (ptr, fp)) != '\n')
     if (c == EOF)
       if (s == buf)
 	{
-	  _newlib_flockfile_exit (stdin);
+	  _newlib_flockfile_exit (fp);
 	  return NULL;
 	}
       else
@@ -93,7 +97,7 @@ _DEFUN(_gets_r, (ptr, buf),
     else
       *s++ = c;
   *s = 0;
-  _newlib_flockfile_end (stdin);
+  _newlib_flockfile_end (fp);
   return buf;
 }
 

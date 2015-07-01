@@ -95,6 +95,7 @@ _DEFUN(_puts_r, (ptr, s),
 
   _REENT_SMALL_CHECK_INIT (ptr);
   fp = _stdout_r (ptr);
+  CHECK_INIT (ptr, fp);
   _newlib_flockfile_start (fp);
   ORIENT (fp, -1);
   result = (__sfvwrite_r (ptr, fp, &uio) ? EOF : '\n');
@@ -107,6 +108,7 @@ _DEFUN(_puts_r, (ptr, s),
   _REENT_SMALL_CHECK_INIT (ptr);
 
   fp = _stdout_r (ptr);
+  CHECK_INIT (ptr, fp);
   _newlib_flockfile_start (fp);
   ORIENT (fp, -1);
   /* Make sure we can write.  */

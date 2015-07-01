@@ -1,3 +1,9 @@
+2015-07-01  Sebastian Huber  <sebastian.huber@embedded-brains.de>
+
+	* libc/stdio/fputs.c (_puts_r): Add missing CHECK_INIT().
+	* libc/stdio/gets.c (_gets_r): Add missing _REENT_SMALL_CHECK_INIT() and
+	CHECK_INIT().  Use _stdin_r() to get the file pointer instead of stdin.
+
 2015-06-29  Jon Turney  <jon.turney@dronecode.org.uk>
 
 	* libc/ctype/Makefile.in: Regenerate.
