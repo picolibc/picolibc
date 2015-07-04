@@ -17,6 +17,7 @@ details. */
 #include <mntent.h>
 #undef _NOMNTENT_FUNCS
 #include <setjmp.h>
+#include <ucontext.h>
 
 #define CYGTLS_INITIALIZED 0xc763173f
 
@@ -192,7 +193,8 @@ public:
   siginfo_t *sigwait_info;
   HANDLE signal_arrived;
   bool will_wait_for_signal;
-  CONTEXT thread_context;
+  long __align;			/* Needed to align context to 16 byte. */
+  ucontext_t context;
   DWORD thread_id;
   siginfo_t infodata;
   struct pthread *tid;

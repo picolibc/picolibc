@@ -1,3 +1,28 @@
+2015-07-04  Corinna Vinschen  <corinna@vinschen.de>
+
+	* autoload.cc (SetThreadStackGuarantee): Import.
+	* cygtls.h (struct _cygtls): Replace thread_context with a ucontext_t
+	called context.
+	* exceptions.cc (exception::handle): Exit from process via signal_exit
+	in case sig_send returns from handling a stack overflow SIGSEGV.
+	Explain why.
+	(dumpstack_overflow_wrapper): Thread wrapper to create a stackdump
+	from another thread.
+	(signal_exit): Fix argument list to reflect three-arg signal handler.
+	In case we have to create a stackdump for a stack overflow condition,
+	do so from a separate thread.  Explain why.
+	(sigpacket::process): Don't run signal_exit on alternate stack.
+	(altstack_wrapper): Wrapper function to do stack correction when
+	calling the signal handler on an alternate stack to handle a stack
+	overflow.  Make sure to have lots of comments.
+	(_cygtls::call_signal_handler): Drop local context variable to reduce
+	stack pressure.  Use this->context instead.  Change inline assembler
+	to call altstack_wrapper.
+	(_cygtls::signal_debugger): Accommodate aforementioned change to
+	struct _cygtls.
+	* tlsoffset.h: Regenerate.
+	* tlsoffset64.h: Regenerate.
+
 2015-07-01  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fork.cc (frok::parent): Set stacktop value based on requested stack

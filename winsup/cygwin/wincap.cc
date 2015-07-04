@@ -21,6 +21,7 @@ details. */
    puzzled that this has never been noticed before... */
 
 wincaps wincap_xpsp2 __attribute__((section (".cygwin_dll_common"), shared)) = {
+  def_guard_pages:1,
   max_sys_priv:SE_CREATE_GLOBAL_PRIVILEGE,
   is_server:false,
   has_mandatory_integrity_control:false,
@@ -46,9 +47,11 @@ wincaps wincap_xpsp2 __attribute__((section (".cygwin_dll_common"), shared)) = {
   terminate_thread_frees_stack:false,
   has_precise_system_time:false,
   has_microsoft_accounts:false,
+  has_set_thread_stack_guarantee:false,
 };
 
 wincaps wincap_2003 __attribute__((section (".cygwin_dll_common"), shared)) = {
+  def_guard_pages:1,
   max_sys_priv:SE_CREATE_GLOBAL_PRIVILEGE,
   is_server:false,
   has_mandatory_integrity_control:false,
@@ -74,9 +77,11 @@ wincaps wincap_2003 __attribute__((section (".cygwin_dll_common"), shared)) = {
   terminate_thread_frees_stack:false,
   has_precise_system_time:false,
   has_microsoft_accounts:false,
+  has_set_thread_stack_guarantee:true,
 };
 
 wincaps wincap_vista __attribute__((section (".cygwin_dll_common"), shared)) = {
+  def_guard_pages:1,
   max_sys_priv:SE_CREATE_SYMBOLIC_LINK_PRIVILEGE,
   is_server:false,
   has_mandatory_integrity_control:true,
@@ -102,9 +107,11 @@ wincaps wincap_vista __attribute__((section (".cygwin_dll_common"), shared)) = {
   terminate_thread_frees_stack:true,
   has_precise_system_time:false,
   has_microsoft_accounts:false,
+  has_set_thread_stack_guarantee:true,
 };
 
 wincaps wincap_7 __attribute__((section (".cygwin_dll_common"), shared)) = {
+  def_guard_pages:1,
   max_sys_priv:SE_CREATE_SYMBOLIC_LINK_PRIVILEGE,
   is_server:false,
   has_mandatory_integrity_control:true,
@@ -130,9 +137,11 @@ wincaps wincap_7 __attribute__((section (".cygwin_dll_common"), shared)) = {
   terminate_thread_frees_stack:true,
   has_precise_system_time:false,
   has_microsoft_accounts:false,
+  has_set_thread_stack_guarantee:true,
 };
 
 wincaps wincap_8 __attribute__((section (".cygwin_dll_common"), shared)) = {
+  def_guard_pages:2,
   max_sys_priv:SE_CREATE_SYMBOLIC_LINK_PRIVILEGE,
   is_server:false,
   has_mandatory_integrity_control:true,
@@ -158,9 +167,11 @@ wincaps wincap_8 __attribute__((section (".cygwin_dll_common"), shared)) = {
   terminate_thread_frees_stack:true,
   has_precise_system_time:true,
   has_microsoft_accounts:true,
+  has_set_thread_stack_guarantee:true,
 };
 
 wincaps wincap_10 __attribute__((section (".cygwin_dll_common"), shared)) = {
+  def_guard_pages:2,
   max_sys_priv:SE_CREATE_SYMBOLIC_LINK_PRIVILEGE,
   is_server:false,
   has_mandatory_integrity_control:true,
@@ -186,6 +197,7 @@ wincaps wincap_10 __attribute__((section (".cygwin_dll_common"), shared)) = {
   terminate_thread_frees_stack:true,
   has_precise_system_time:true,
   has_microsoft_accounts:true,
+  has_set_thread_stack_guarantee:true,
 };
 
 wincapc wincap __attribute__((section (".cygwin_dll_common"), shared));
@@ -240,6 +252,8 @@ wincapc::init ()
   ((wincaps *)caps)->is_server = (version.wProductType != VER_NT_WORKSTATION);
 #ifdef __x86_64__
   wow64 = 0;
+  /* 64 bit systems have one more guard page than their 32 bit counterpart. */
+  ++((wincaps *)caps)->def_guard_pages;
 #else
   if (NT_SUCCESS (NtQueryInformationProcess (NtCurrentProcess (),
 					     ProcessWow64Information,

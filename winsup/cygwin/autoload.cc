@@ -581,6 +581,7 @@ LoadDLLfunc (GetSystemTimePreciseAsFileTime, 4, kernel32)
 LoadDLLfuncEx (IdnToAscii, 20, kernel32, 1)
 LoadDLLfuncEx (IdnToUnicode, 20, kernel32, 1)
 LoadDLLfunc (LocaleNameToLCID, 8, kernel32)
+LoadDLLfunc (SetThreadStackGuarantee, 4, kernel32)
 
 /* ldap functions are cdecl! */
 #pragma push_macro ("mangle")

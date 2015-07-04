@@ -800,6 +800,19 @@ exception::handle (EXCEPTION_RECORD *e, exception_list *frame, CONTEXT *in,
 	       ? (void *) e->ExceptionInformation[1] : (void *) in->_GR(ip);
   me.incyg++;
   sig_send (NULL, si, &me);	/* Signal myself */
+  if ((NTSTATUS) e->ExceptionCode == STATUS_STACK_OVERFLOW)
+    {
+      /* If we catched a stack overflow, and if the signal handler didn't exit
+	 or longjmp, we're back here and about to continue, supposed to run the
+	 offending instruction again.  That works on Linux, but not on Windows.
+	 In case of a stack overflow we're not immediately returning to the
+	 system exception handler, but to NTDLL::__stkchk.  __stkchk will then
+	 terminate the applicaton.  So what we do here is to signal our current
+	 process again, but this time with SIG_DFL action.  This creates a
+	 stackdump and then exits through our own means. */
+      global_sigs[SIGSEGV].sa_handler = SIG_DFL;
+      sig_send (NULL, si, &me);
+    }
   me.incyg--;
   e->ExceptionFlags = 0;
   return ExceptionContinueExecution;
@@ -1237,10 +1250,20 @@ set_signal_mask (sigset_t& setmask, sigset_t newmask)
     sig_dispatch_pending (true);
 }
 
+
+DWORD WINAPI
+dumpstack_overflow_wrapper (PVOID arg)
+{
+  cygwin_exception *exc = (cygwin_exception *) arg;
+
+  exc->dumpstack ();
+  return 0;
+}
+
 /* Exit due to a signal.  Should only be called from the signal thread.  */
 extern "C" {
 static void
-signal_exit (int sig, siginfo_t *si)
+signal_exit (int sig, siginfo_t *si, void *)
 {
   debug_printf ("exiting due to signal %d", sig);
   exit_state = ES_SIGNAL_EXIT;
@@ -1262,7 +1285,27 @@ signal_exit (int sig, siginfo_t *si)
 	if (try_to_debug ())
 	  break;
 	if (si->si_code != SI_USER && si->si_cyg)
-	  ((cygwin_exception *) si->si_cyg)->dumpstack ();
+	  {
+	    cygwin_exception *exc = (cygwin_exception *) si->si_cyg;
+	    if ((NTSTATUS) exc->exception_record ()->ExceptionCode
+		== STATUS_STACK_OVERFLOW)
+	      {
+		/* We're handling a stack overflow so we're running low
+		   on stack (surprise!)  The dumpstack method needs lots
+		   of stack for buffers.  So what we do here is to run
+		   dumpstack in another thread with its own stack. */
+		HANDLE thread = CreateThread (&sec_none_nih, 0,
+					      dumpstack_overflow_wrapper,
+					      exc, 0, NULL);
+		if (thread)
+		  {
+		    WaitForSingleObject (thread, INFINITE);
+		    CloseHandle (thread);
+		  }
+	      }
+	    else
+	      ((cygwin_exception *) si->si_cyg)->dumpstack ();
+	  }
 	else
 	  {
 	    CONTEXT c;
@@ -1470,6 +1513,8 @@ stop:
 exit_sig:
   handler = (void *) signal_exit;
   thissig.sa_flags |= SA_SIGINFO;
+  /* Don't run signal_exit on alternate stack. */
+  thissig.sa_flags &= ~SA_ONSTACK;
 
 dosig:
   if (have_execed)
@@ -1486,6 +1531,58 @@ done:
   sigproc_printf ("returning %d", rc);
   return rc;
 
+}
+
+static void
+altstack_wrapper (int sig, siginfo_t *siginfo, ucontext_t *sigctx,
+		  void (*handler) (int, siginfo_t *, void *))
+{
+  siginfo_t si = *siginfo;
+  ULONG guard_size = 0;
+  DWORD old_prot = (DWORD) -1;
+  PTEB teb = NtCurrentTeb ();
+  PVOID old_limit = NULL;
+
+  /* Check if we're just handling a stack overflow.  If so... */
+  if (sig == SIGSEGV && si.si_cyg
+      && ((cygwin_exception *) si.si_cyg)->exception_record ()->ExceptionCode
+	  == (DWORD) STATUS_STACK_OVERFLOW)
+    {
+      /* ...restore guard pages in original stack as if MSVCRT::_resetstkovlw
+	 has been called.
+
+	 Compute size of guard pages.  If SetThreadStackGuarantee isn't
+	 supported, or if it returns 0, use the default guard page size. */
+      if (wincap.has_set_thread_stack_guarantee ())
+	SetThreadStackGuarantee (&guard_size);
+      if (!guard_size)
+	guard_size = wincap.def_guard_page_size ();
+      else
+	guard_size += wincap.page_size ();
+      old_limit = teb->Tib.StackLimit;
+      /* Amazing but true: This VirtualProtect call automatically fixes the
+	 value of teb->Tib.StackLimit on some systems.*/
+      if (VirtualProtect (teb->Tib.StackLimit, guard_size,
+			  PAGE_READWRITE | PAGE_GUARD, &old_prot)
+	  && old_limit == teb->Tib.StackLimit)
+	teb->Tib.StackLimit = (caddr_t) old_limit + guard_size;
+    }
+  handler (sig, &si, sigctx);
+  if (old_prot != (DWORD) -1)
+    {
+      /* Typically the handler would exit or at least perform a siglongjmp
+	 trying to overcome a SEGV condition.  However, if we return from a
+	 segv handler after a stack overflow, we're dead.  While on Linux the
+	 process returns to the offending code and thus the handler is called
+	 ad infinitum, on Windows the NTDLL::__stkchk function will simply kill
+	 the process.  So what we do here is to remove the guard pages again so
+	 we can return to exception::handle.  exception::handle will then call
+	 sig_send again, this time with SIG_DFL action, so at least we get a
+	 stackdump. */
+      if (VirtualProtect ((caddr_t) teb->Tib.StackLimit - guard_size,
+			  guard_size, old_prot, &old_prot))
+	teb->Tib.StackLimit = old_limit;
+    }
 }
 
 int
@@ -1516,7 +1613,6 @@ _cygtls::call_signal_handler ()
       siginfo_t thissi = infodata;
       void (*thisfunc) (int, siginfo_t *, void *) = func;
 
-      ucontext_t context;
       ucontext_t *thiscontext = NULL;
 
       /* Only make a context for SA_SIGINFO handlers */
@@ -1596,9 +1692,8 @@ _cygtls::call_signal_handler ()
 
 	  /* Compute new stackbase.  We start from the high address, aligned
 	     to 16 byte. */
-	  uintptr_t new_sp = (uintptr_t) _my_tls.altstack.ss_sp
-			     + _my_tls.altstack.ss_size;
-	  new_sp &= ~0xf;
+	  uintptr_t new_sp = ((uintptr_t) _my_tls.altstack.ss_sp
+			      + _my_tls.altstack.ss_size) & ~0xf;
 	  /* In assembler: Save regs on new stack, move to alternate stack,
 	     call thisfunc, revert stack regs. */
 #ifdef __x86_64__
@@ -1620,8 +1715,9 @@ _cygtls::call_signal_handler ()
 		   leaq  %[SI], %%rdx      # &thissi to 2nd arg reg	\n\
 		   movq  %[CTX], %%r8      # thiscontext to 3rd arg reg	\n\
 		   movq  %[FUNC], %%r9     # thisfunc to r9		\n\
+		   leaq  %[WRAPPER], %%r10 # wrapper address to r10	\n\
 		   movq  %%rax, %%rsp      # Move alt stack into rsp	\n\
-		   call  *%%r9             # Call thisfunc		\n\
+		   call  *%%r10            # Call wrapper		\n\
 		   movq  %%rsp, %%rax      # Restore clobbered regs	\n\
 		   movq  0x58(%%rax), %%rsp				\n\
 		   movq  0x50(%%rax), %%rbp				\n\
@@ -1635,38 +1731,42 @@ _cygtls::call_signal_handler ()
 		       [SIG]	"o" (thissig),
 		       [SI]	"o" (thissi),
 		       [CTX]	"o" (thiscontext),
-		       [FUNC]	"o" (thisfunc)
+		       [FUNC]	"o" (thisfunc),
+		       [WRAPPER] "o" (altstack_wrapper)
 		   : "memory");
 #else
 	  /* Clobbered regs: ecx, edx, ebp, esp */
 	  __asm__ ("\n\
 		   movl  %[NEW_SP], %%eax  # Load alt stack into eax	\n\
-		   subl  $28, %%eax        # Make room on alt stack for	\n\
+		   subl  $32, %%eax        # Make room on alt stack for	\n\
 					   # clobbered regs and args to \n\
 					   # signal handler             \n\
-		   movl  %%ecx, 12(%%eax)  # Save other clobbered regs	\n\
-		   movl  %%edx, 16(%%eax)				\n\
-		   movl  %%ebp, 20(%%eax)				\n\
-		   movl  %%esp, 24(%%eax)				\n\
+		   movl  %%ecx, 16(%%eax)  # Save clobbered regs	\n\
+		   movl  %%edx, 20(%%eax)				\n\
+		   movl  %%ebp, 24(%%eax)				\n\
+		   movl  %%esp, 28(%%eax)				\n\
 		   movl  %[SIG], %%ecx     # thissig to 1st arg slot	\n\
 		   movl  %%ecx, (%%eax)					\n\
 		   leal  %[SI], %%ecx      # &thissi to 2nd arg slot	\n\
 		   movl  %%ecx, 4(%%eax)				\n\
 		   movl  %[CTX], %%ecx     # thiscontext to 3rd arg slot\n\
 		   movl  %%ecx, 8(%%eax)				\n\
-		   movl  %[FUNC], %%ecx    # thisfunc to ecx		\n\
+		   movl  %[FUNC], %%ecx    # thisfunc to 4th arg slot	\n\
+		   movl  %%ecx, 12(%%eax)				\n\
+		   leal  %[WRAPPER], %%ecx # thisfunc to ecx		\n\
 		   movl  %%eax, %%esp      # Move alt stack into esp	\n\
 		   call  *%%ecx            # Call thisfunc		\n\
 		   movl	 %%esp, %%eax      # Restore clobbered regs	\n\
-		   movl  24(%%eax), %%esp				\n\
-		   movl	 20(%%eax), %%ebp				\n\
-		   movl	 16(%%eax), %%edx				\n\
-		   movl	 12(%%eax), %%eax				\n"
+		   movl  28(%%eax), %%esp				\n\
+		   movl	 24(%%eax), %%ebp				\n\
+		   movl	 20(%%eax), %%edx				\n\
+		   movl	 16(%%eax), %%eax				\n"
 		   : : [NEW_SP]	"o" (new_sp),
 		       [SIG]	"o" (thissig),
 		       [SI]	"o" (thissi),
 		       [CTX]	"o" (thiscontext),
-		       [FUNC]	"o" (thisfunc)
+		       [FUNC]	"o" (thisfunc),
+		       [WRAPPER] "o" (altstack_wrapper)
 		   : "memory");
 #endif
 	}
@@ -1708,12 +1808,12 @@ _cygtls::signal_debugger (siginfo_t& si)
 #else
 	    c.Eip = retaddr ();
 #endif
-	  memcpy (&thread_context, &c, sizeof (CONTEXT));
+	  memcpy (&context.uc_mcontext, &c, sizeof (CONTEXT));
 	  /* Enough space for 32/64 bit addresses */
 	  char sigmsg[2 * sizeof (_CYGWIN_SIGNAL_STRING
 				  " ffffffff ffffffffffffffff")];
 	  __small_sprintf (sigmsg, _CYGWIN_SIGNAL_STRING " %d %y %p",
-			   si.si_signo, thread_id, &thread_context);
+			   si.si_signo, thread_id, &context.uc_mcontext);
 	  OutputDebugString (sigmsg);
 	}
       ResumeThread (th);
