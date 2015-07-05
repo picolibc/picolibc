@@ -30,7 +30,7 @@ CC:=@CC@
 CC_FOR_TARGET:=@CC@
 
 XMLTO:=xmlto --skip-validation --with-dblatex
-DOCBOOK2XTEXI:=docbook2x-texi --xinclude --info --utf8trans-map=charmap
+DOCBOOK2XTEXI:=@DOCBOOK2XTEXI@ --xinclude --info --utf8trans-map=charmap
 
 include $(srcdir)/../Makefile.common
 -include Makefile.dep

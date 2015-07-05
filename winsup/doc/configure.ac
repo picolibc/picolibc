@@ -16,6 +16,7 @@ AC_CONFIG_SRCDIR(cygwin-api.xml)
 AC_CONFIG_AUX_DIR(../..)
 
 AC_PROG_INSTALL
+AC_CHECK_PROGS([DOCBOOK2XTEXI], [docbook2x-texi db2x_docbook2texi], [true])
 AC_NO_EXECUTABLES
 AC_CANONICAL_SYSTEM
 

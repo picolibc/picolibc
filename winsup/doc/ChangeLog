@@ -1,3 +1,9 @@
+2015-07-05  Jon Turney  <jon.turney@dronecode.org.uk>
+
+	* configure.ac: Add check for DOCBOOK2XTEXI
+	* configure: Regenerate.
+	* Makefile.in (DOCBOOK2XTEXI): Use.
+
 2015-06-22  Jon Turney  <jon.turney@dronecode.org.uk>
 
 	* README: Update.
