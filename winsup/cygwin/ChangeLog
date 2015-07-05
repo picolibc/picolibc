@@ -1,5 +1,11 @@
 2015-07-05  Corinna Vinschen  <corinna@vinschen.de>
 
+	* dcrt0.cc (CYGWIN_GUARD): Remove.
+	(child_info_fork::alloc_stack_hard_way): Align stack commit to changes
+	of thread stack setup in CygwinCreateThread.
+
+2015-07-05  Corinna Vinschen  <corinna@vinschen.de>
+
 	* miscfuncs.cc (struct pthread_wrapper_arg): Add member guardsize.
 	(pthread_wrapper): Set thread stack guarantee according to guardsize.
 	Tweak assembler code so that $rax/$eax is not required by GCC to

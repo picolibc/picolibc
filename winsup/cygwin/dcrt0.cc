@@ -16,6 +16,7 @@ details. */
 #include "glob.h"
 #include <ctype.h>
 #include <locale.h>
+#include <sys/param.h>
 #include "environ.h"
 #include "sigproc.h"
 #include "pinfo.h"
@@ -404,8 +405,6 @@ check_sanity_and_sync (per_process *p)
 
 child_info NO_COPY *child_proc_info;
 
-#define CYGWIN_GUARD (PAGE_READWRITE | PAGE_GUARD)
-
 void
 child_info_fork::alloc_stack_hard_way (volatile char *b)
 {
@@ -421,7 +420,7 @@ child_info_fork::alloc_stack_hard_way (volatile char *b)
       || is_mmapped_region ((caddr_t) stacktop, (caddr_t) stackbottom))
     return;
   /* First, try to reserve the entire stack. */
-  stacksize = (SIZE_T) stackbottom - (SIZE_T) stackaddr;
+  stacksize = (PBYTE) stackbottom - (PBYTE) stackaddr;
   if (!VirtualAlloc (stackaddr, stacksize, MEM_RESERVE, PAGE_NOACCESS))
     {
       PTEB teb = NtCurrentTeb ();
@@ -429,25 +428,32 @@ child_info_fork::alloc_stack_hard_way (volatile char *b)
 		 "%p - %p, (child has %p - %p), %E",
 		 stackaddr, stackbottom, teb->DeallocationStack, _tlsbase);
     }
-  stacksize = (SIZE_T) stackbottom - (SIZE_T) stacktop;
+  stacksize = (PBYTE) stackbottom - (PBYTE) stacktop;
   stack_ptr = VirtualAlloc (stacktop, stacksize, MEM_COMMIT, PAGE_READWRITE);
   if (!stack_ptr)
     abort ("can't commit memory for stack %p(%ly), %E", stacktop, stacksize);
   if (guardsize != (size_t) -1)
     {
+      ULONG real_guardsize = guardsize
+			     ? roundup2 (guardsize, wincap.page_size ())
+			     : wincap.def_guard_page_size ();
       /* Allocate PAGE_GUARD page if it still fits. */
       if (stack_ptr > stackaddr)
 	{
-	  stack_ptr = (void *) ((LPBYTE) stack_ptr
-					- wincap.page_size ());
-	  if (!VirtualAlloc (stack_ptr, wincap.page_size (), MEM_COMMIT,
-			     CYGWIN_GUARD))
+	  stack_ptr = (void *) ((PBYTE) stack_ptr - real_guardsize);
+	  if (!VirtualAlloc (stack_ptr, real_guardsize, MEM_COMMIT,
+			     PAGE_READWRITE | PAGE_GUARD))
 	    api_fatal ("fork: couldn't allocate new stack guard page %p, %E",
 		       stack_ptr);
 	}
-      /* Allocate POSIX guard pages. */
-      if (guardsize > 0)
-	VirtualAlloc (stackaddr, guardsize, MEM_COMMIT, PAGE_NOACCESS);
+      /* On post-XP systems, set thread stack guarantee matching the guardsize.
+	 Note that the guardsize is one page bigger than the guarantee. */
+      if (wincap.has_set_thread_stack_guarantee ()
+	  && real_guardsize > wincap.def_guard_page_size ())
+	{
+	  real_guardsize -= wincap.page_size ();
+	  SetThreadStackGuarantee (&real_guardsize);
+	}
     }
   b[0] = '\0';
 }
