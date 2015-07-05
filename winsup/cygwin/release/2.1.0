@@ -1,6 +1,12 @@
 What's new:
 -----------
 
+- Handle pthread stacksizes as in GLibc:  Default to RLIMIT_STACK resource.
+  Allow to set RLIMIT_STACK via setrlimit.  Default RLIMIT_STACK to value
+  from executable header as described on
+  https://msdn.microsoft.com/en-us/library/windows/desktop/ms686774.aspx
+  Default stacksize to 2 Megs in case RLIMIT_STACK is set to RLIM_INFINITY.
+
 - First cut of an implementation to allow signal handlers running on an
   alternate signal stack.
   

@@ -1,5 +1,40 @@
 2015-07-05  Corinna Vinschen  <corinna@vinschen.de>
 
+	* miscfuncs.cc (struct pthread_wrapper_arg): Add member guardsize.
+	(pthread_wrapper): Set thread stack guarantee according to guardsize.
+	Tweak assembler code so that $rax/$eax is not required by GCC to
+	prepare the wrapper_arg value.
+	(CygwinCreateThread): Fix deadzone handling.  Drop setting a "POSIX"
+	guardpage (aka page w/ PAGE_NOACCESS).  Always use Windows guard
+	pages instead.  On post-XP systems (providing SetThreadStackGuarantee)
+	always set up stack Windows like with reserved/commited areas and
+	movable guard pages.  Only on XP set up stack fully commited if the
+	guardpage size is not the default system guardpage size.
+	Fill out pthread_wrapper_arg::guardsize.  Improve comments.
+	* resource.cc: Implement RSTACK_LIMIT Linux-like.
+	(DEFAULT_STACKSIZE): New macro.
+	(DEFAULT_STACKGUARD): Ditto.
+	(rlimit_stack_guard): New muto.
+	(rlimit_stack): New global variable holding current RSTACK_LIMIT values.
+	(__set_rlimit_stack): Set rlimit_stack under lock.
+	(__get_rlimit_stack): Initialize rlimit_stack from executable header
+	and return rlimit_stack values under lock.
+	(get_rlimit_stack): Filtering function to return useful default
+	stacksize from rlimit_stack.rlim_cur value.
+	(getrlimit): Call __get_rlimit_stack in RLIMIT_STACK case.
+	(setrlimit): Call __set_rlimit_stack in RLIMIT_STACK case.
+	* thread.cc (pthread::create): Fetch default stacksize calling
+	get_rlimit_stack.
+	(pthread_attr::pthread_attr): Fetch default guardsize calling
+	wincap.def_guard_page_size.
+	(pthread_attr_getstacksize): Fetch default stacksize calling
+	get_rlimit_stack.
+	* thread.h (PTHREAD_DEFAULT_STACKSIZE): Remove.
+	(PTHREAD_DEFAULT_GUARDSIZE): Remove.
+	(get_rlimit_stack): Declare.
+
+2015-07-05  Corinna Vinschen  <corinna@vinschen.de>
+
 	* fhandler_process.cc (heap_info::heap_info): Disable fetching heap info
 	on 64 bit XP/2003.  Explain why.
 	* wincap.h (wincaps::has_broken_rtl_query_process_debug_information):

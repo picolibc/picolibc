@@ -560,6 +560,7 @@ struct pthread_wrapper_arg
   PBYTE stackaddr;
   PBYTE stackbase;
   PBYTE stacklimit;
+  ULONG guardsize;
 };
 
 DWORD WINAPI
@@ -592,7 +593,14 @@ pthread_wrapper (PVOID arg)
      The below assembler code will release the OS stack after switching to our
      new stack. */
   wrapper_arg.stackaddr = dealloc_addr;
-
+  /* On post-XP systems, set thread stack guarantee matching the guardsize.
+     Note that the guardsize is one page bigger than the guarantee. */
+  if (wincap.has_set_thread_stack_guarantee ()
+      && wrapper_arg.guardsize > wincap.def_guard_page_size ())
+    {
+      wrapper_arg.guardsize -= wincap.page_size ();
+      SetThreadStackGuarantee (&wrapper_arg.guardsize);
+    }
   /* Initialize new _cygtls. */
   _my_tls.init_thread (wrapper_arg.stackbase - CYGTLS_PADSIZE,
 		       (DWORD (*)(void*, void*)) wrapper_arg.func);
@@ -632,7 +640,7 @@ pthread_wrapper (PVOID arg)
 #endif
 #ifdef __x86_64__
   __asm__ ("\n\
-	   movq  %[WRAPPER_ARG], %%rbx	# Load &wrapper_arg into rbx	\n\
+	   leaq  %[WRAPPER_ARG], %%rbx	# Load &wrapper_arg into rbx	\n\
 	   movq  (%%rbx), %%r12		# Load thread func into r12	\n\
 	   movq  8(%%rbx), %%r13	# Load thread arg into r13	\n\
 	   movq  16(%%rbx), %%rcx	# Load stackaddr into rcx	\n\
@@ -652,11 +660,11 @@ pthread_wrapper (PVOID arg)
 	   # register r13 and then just call the function.		\n\
 	   movq  %%r13, %%rcx		# Move thread arg to 1st arg reg\n\
 	   call  *%%r12			# Call thread func		\n"
-	   : : [WRAPPER_ARG] "r" (&wrapper_arg),
+	   : : [WRAPPER_ARG] "o" (wrapper_arg),
 	       [CYGTLS] "i" (CYGTLS_PADSIZE));
 #else
   __asm__ ("\n\
-	   movl  %[WRAPPER_ARG], %%ebx	# Load &wrapper_arg into ebx	\n\
+	   leal  %[WRAPPER_ARG], %%ebx	# Load &wrapper_arg into ebx	\n\
 	   movl  (%%ebx), %%eax		# Load thread func into eax	\n\
 	   movl  4(%%ebx), %%ecx	# Load thread arg into ecx	\n\
 	   movl  8(%%ebx), %%edx	# Load stackaddr into edx	\n\
@@ -683,7 +691,7 @@ pthread_wrapper (PVOID arg)
 	   # stack in the expected spot.				\n\
 	   popl  %%eax			# Pop thread_func address	\n\
 	   call  *%%eax			# Call thread func		\n"
-	   : : [WRAPPER_ARG] "r" (&wrapper_arg),
+	   : : [WRAPPER_ARG] "o" (wrapper_arg),
 	       [CYGTLS] "i" (CYGTLS_PADSIZE));
 #endif
   /* pthread::thread_init_wrapper calls pthread::exit, which
@@ -777,7 +785,8 @@ CygwinCreateThread (LPTHREAD_START_ROUTINE thread_func, PVOID thread_arg,
 
   if (stackaddr)
     {
-      /* If the application provided the stack, just use it. */
+      /* If the application provided the stack, just use it.  There won't
+	 be any stack overflow handling! */
       wrapper_arg->stackaddr = (PBYTE) stackaddr;
       wrapper_arg->stackbase = (PBYTE) stackaddr + stacksize;
     }
@@ -790,10 +799,8 @@ CygwinCreateThread (LPTHREAD_START_ROUTINE thread_func, PVOID thread_arg,
       real_guardsize = roundup2 (guardsize, wincap.page_size ());
       /* Add the guardsize to the stacksize */
       real_stacksize += real_guardsize;
-      /* If we use the default Windows guardpage method, we have to take
-	 the 2 pages dead zone into account. */
-      if (real_guardsize == wincap.page_size ())
-	  real_stacksize += 2 * wincap.page_size ();
+      /* Take dead zone page into account, which always stays uncommited. */
+      real_stacksize += wincap.page_size ();
       /* Now roundup the result to the next allocation boundary. */
       real_stacksize = roundup2 (real_stacksize,
 				 wincap.allocation_granularity ());
@@ -811,46 +818,63 @@ CygwinCreateThread (LPTHREAD_START_ROUTINE thread_func, PVOID thread_arg,
 #endif
       if (!real_stackaddr)
 	return NULL;
-      /* Set up committed region.  Two cases: */
-      if (real_guardsize != wincap.page_size ())
+      /* Set up committed region.  We have two cases: */
+      if (!wincap.has_set_thread_stack_guarantee ()
+	  && real_guardsize != wincap.def_guard_page_size ())
 	{
-	  /* If guardsize is set to something other than the page size, we
-	     commit the entire stack and, if guardsize is > 0, we set up a
-	     POSIX guardpage.  We don't set up a Windows guardpage. */
-	  if (!VirtualAlloc (real_stackaddr, real_guardsize, MEM_COMMIT,
-			     PAGE_NOACCESS))
+	  /* If guardsize is set to something other than the default guard page
+	     size, and if we're running on Windows XP 32 bit, we commit the
+	     entire stack, and, if guardsize is > 0, set up a guard page. */
+	  real_stacklimit = (PBYTE) real_stackaddr + wincap.page_size ();
+	  if (real_guardsize
+	      && !VirtualAlloc (real_stacklimit, real_guardsize, MEM_COMMIT,
+				PAGE_READWRITE | PAGE_GUARD))
 	    goto err;
-	  real_stacklimit = (PBYTE) real_stackaddr + real_guardsize;
-	  if (!VirtualAlloc (real_stacklimit, real_stacksize - real_guardsize,
+	  real_stacklimit += real_guardsize;
+	  if (!VirtualAlloc (real_stacklimit, real_stacksize - real_guardsize
+					      - wincap.page_size (),
 			     MEM_COMMIT, PAGE_READWRITE))
 	    goto err;
 	}
       else
 	{
-	  /* If guardsize is exactly the page_size, we can assume that the
-	     application will behave Windows conformant in terms of stack usage.
-	     We can especially assume that it never allocates more than one
-	     page at a time (alloca/_chkstk).  Therefore, this is the default
-	     case which allows a Windows compatible stack setup with a
-	     reserved region, a guard page, and a commited region.  We don't
-	     need to set up a POSIX guardpage since Windows already handles
-	     stack overflow: Trying to extend the stack into the last three
-	     pages of the stack results in a SEGV.
-	     We always commit 64K here, starting with the guardpage. */
+	  /* Otherwise we set up the stack like the OS does, with a reserved
+	     region, the guard pages, and a commited region.  We commit the
+	     stack commit size from the executable header, but at least
+	     PTHREAD_STACK_MIN (64K). */
+	  static ULONG exe_commitsize;
+
+	  if (!exe_commitsize)
+	    {
+	      PIMAGE_DOS_HEADER dosheader;
+	      PIMAGE_NT_HEADERS ntheader;
+
+	      dosheader = (PIMAGE_DOS_HEADER) GetModuleHandle (NULL);
+	      ntheader = (PIMAGE_NT_HEADERS)
+			 ((PBYTE) dosheader + dosheader->e_lfanew);
+	      exe_commitsize = ntheader->OptionalHeader.SizeOfStackCommit;
+	      exe_commitsize = roundup2 (exe_commitsize, wincap.page_size ());
+	    }
+	  ULONG commitsize = exe_commitsize;
+	  if (commitsize > real_stacksize - real_guardsize
+			   - wincap.page_size ())
+	    commitsize = real_stacksize - real_guardsize - wincap.page_size ();
+	  else if (commitsize < PTHREAD_STACK_MIN)
+	    commitsize = PTHREAD_STACK_MIN;
 	  real_stacklimit = (PBYTE) real_stackaddr + real_stacksize
-				- wincap.allocation_granularity ();
-	  if (!VirtualAlloc (real_stacklimit, wincap.page_size (), MEM_COMMIT,
-			     PAGE_READWRITE | PAGE_GUARD))
+			    - commitsize - real_guardsize;
+	  if (!VirtualAlloc (real_stacklimit, real_guardsize,
+			     MEM_COMMIT, PAGE_READWRITE | PAGE_GUARD))
 	    goto err;
-	  real_stacklimit += wincap.page_size ();
-	  if (!VirtualAlloc (real_stacklimit, wincap.allocation_granularity ()
-					 - wincap.page_size (), MEM_COMMIT,
+	  real_stacklimit += real_guardsize;
+	  if (!VirtualAlloc (real_stacklimit, commitsize, MEM_COMMIT,
 			     PAGE_READWRITE))
 	    goto err;
       	}
       wrapper_arg->stackaddr = (PBYTE) real_stackaddr;
       wrapper_arg->stackbase = (PBYTE) real_stackaddr + real_stacksize;
       wrapper_arg->stacklimit = real_stacklimit;
+      wrapper_arg->guardsize = real_guardsize;
     }
   /* Use the STACK_SIZE_PARAM_IS_A_RESERVATION parameter so only the
      minimum size for a thread stack is reserved by the OS.  Note that we

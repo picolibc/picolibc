@@ -475,7 +475,7 @@ pthread::create (void *(*func) (void *), pthread_attr *newattr,
   mutex.lock ();
   /* stackaddr holds the uppermost stack address.  See the comments in
      pthread_attr_setstack and pthread_attr_setstackaddr for a description. */
-  ULONG stacksize = attr.stacksize ?: PTHREAD_DEFAULT_STACKSIZE;
+  ULONG stacksize = attr.stacksize ?: get_rlimit_stack ();
   PVOID stackaddr = attr.stackaddr ? ((caddr_t) attr.stackaddr - stacksize)
 				   : NULL;
   win32_obj_id = CygwinCreateThread (thread_init_wrapper, this, stackaddr,
@@ -1093,7 +1093,7 @@ pthread::resume ()
 pthread_attr::pthread_attr ():verifyable_object (PTHREAD_ATTR_MAGIC),
 joinable (PTHREAD_CREATE_JOINABLE), contentionscope (PTHREAD_SCOPE_PROCESS),
 inheritsched (PTHREAD_INHERIT_SCHED), stackaddr (NULL), stacksize (0),
-guardsize (PTHREAD_DEFAULT_GUARDSIZE)
+guardsize (wincap.def_guard_page_size ())
 {
   schedparam.sched_priority = 0;
 }
@@ -2330,7 +2330,7 @@ pthread_attr_getstacksize (const pthread_attr_t *attr, size_t *size)
   /* If the stacksize has not been set by the application, return the
      default stacksize.  Note that this is different from what
      pthread_attr_getstack returns. */
-  *size = (*attr)->stacksize ?: PTHREAD_DEFAULT_STACKSIZE;
+  *size = (*attr)->stacksize ?: get_rlimit_stack ();
   return 0;
 }
 

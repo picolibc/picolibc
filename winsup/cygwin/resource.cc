@@ -111,6 +111,61 @@ getrusage (int intwho, struct rusage *rusage_in)
   return res;
 }
 
+/* Default stacksize in case RLIMIT_STACK is RLIM_INFINITY is 2 Megs with
+   system-dependent number of guard pages.  The pthread stacksize does not
+   include the guardpage size, so we have to subtract the default guardpage
+   size.  Additionally the Windows stack handling disallows to commit the
+   last page, so we subtract it, too. */
+#define DEFAULT_STACKSIZE (2 * 1024 * 1024)
+#define DEFAULT_STACKGUARD (wincap.def_guard_page_size() + wincap.page_size ())
+
+muto NO_COPY rlimit_stack_guard;
+static struct rlimit rlimit_stack = { 0, RLIM_INFINITY };
+
+static void
+__set_rlimit_stack (const struct rlimit *rlp)
+{
+  rlimit_stack_guard.init ("rlimit_stack_guard")->acquire ();
+  rlimit_stack = *rlp;
+  rlimit_stack_guard.release ();
+}
+
+static void
+__get_rlimit_stack (struct rlimit *rlp)
+{
+  rlimit_stack_guard.init ("rlimit_stack_guard")->acquire ();
+  if (!rlimit_stack.rlim_cur)
+    {
+      /* Fetch the default stacksize from the executable header... */
+      PIMAGE_DOS_HEADER dosheader;
+      PIMAGE_NT_HEADERS ntheader;
+
+      dosheader = (PIMAGE_DOS_HEADER) GetModuleHandle (NULL);
+      ntheader = (PIMAGE_NT_HEADERS) ((PBYTE) dosheader + dosheader->e_lfanew);
+      rlimit_stack.rlim_cur = ntheader->OptionalHeader.SizeOfStackReserve;
+      /* ...and subtract the guardpages. */
+      rlimit_stack.rlim_cur -= DEFAULT_STACKGUARD;
+    }
+  *rlp = rlimit_stack;
+  rlimit_stack_guard.release ();
+}
+
+size_t
+get_rlimit_stack (void)
+{
+  struct rlimit rl;
+
+  __get_rlimit_stack (&rl);
+  /* RLIM_INFINITY doesn't make much sense.  As in glibc, use an
+     "architecture-specific default". */
+  if (rl.rlim_cur == RLIM_INFINITY)
+    rl.rlim_cur = DEFAULT_STACKSIZE - DEFAULT_STACKGUARD;
+  /* Always return at least minimum stacksize. */
+  else if (rl.rlim_cur < PTHREAD_STACK_MIN)
+    rl.rlim_cur = PTHREAD_STACK_MIN;
+  return (size_t) rl.rlim_cur;
+}
+
 extern "C" int
 getrlimit (int resource, struct rlimit *rlp)
 {
@@ -127,32 +182,7 @@ getrlimit (int resource, struct rlimit *rlp)
 	case RLIMIT_AS:
 	  break;
 	case RLIMIT_STACK:
-	  PTEB teb;
-	  /* 2015-06-26: Originally rlim_cur returned the size of the still
-	     available stack area on the current stack, rlim_max the total size
-	     of the current stack.  Two problems:
-
-	     - Per POSIX, RLIMIT_STACK returns "the maximum size of the initial
-	       thread's stack, in bytes. The implementation does not
-	       automatically grow the stack beyond this limit".
-
-	     - With the implementation of sigaltstack, the current stack is not
-	       necessarily the "initial thread's stack" anymore.  Rather, when
-	       called from a signal handler running on the alternate stack,
-	       RLIMIT_STACK should return the size of the original stack.
-
-	     rlim_cur is now the size of the stack.  For system-provided stacks
-	     it's the size between DeallocationStack and StackBase.  For
-	     application-provided stacks (via pthread_attr_setstack),
-	     DeallocationStack is NULL, but StackLimit points to the bottom
-	     of the stack.
-
-	     rlim_max is set to RLIM_INFINITY since there's no hard limit
-	     for stack sizes on Windows. */
-	  teb = NtCurrentTeb ();
-	  rlp->rlim_cur = (rlim_t) teb->Tib.StackBase
-			  - (rlim_t) (teb->DeallocationStack
-				      ?: teb->Tib.StackLimit);
+	  __get_rlimit_stack (rlp);
 	  break;
 	case RLIMIT_NOFILE:
 	  rlp->rlim_cur = getdtablesize ();
@@ -205,6 +235,9 @@ setrlimit (int resource, const struct rlimit *rlp)
 	case RLIMIT_NOFILE:
 	  if (rlp->rlim_cur != RLIM_INFINITY)
 	    return setdtablesize (rlp->rlim_cur);
+	  break;
+	case RLIMIT_STACK:
+	  __set_rlimit_stack (rlp);
 	  break;
 	default:
 	  set_errno (EINVAL);
