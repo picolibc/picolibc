@@ -1,3 +1,11 @@
+2015-07-05  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_process.cc (heap_info::heap_info): Disable fetching heap info
+	on 64 bit XP/2003.  Explain why.
+	* wincap.h (wincaps::has_broken_rtl_query_process_debug_information):
+	New element.
+	* wincap.cc: Implement above element throughout.
+
 2015-07-04  Corinna Vinschen  <corinna@vinschen.de>
 
 	* autoload.cc (SetThreadStackGuarantee): Import.

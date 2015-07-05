@@ -25,3 +25,5 @@ Bug Fixes
 
 - Fix fork failing after the parent recovered from a stack overflow.
   Addresses: https://cygwin.com/ml/cygwin/2015-06/msg00384.html
+
+- Fix a crash on 64 bit XP/2003 when opening /proc/$PID/maps.
