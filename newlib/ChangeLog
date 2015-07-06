@@ -1,3 +1,12 @@
+2015-07-06  Yaakov Selkowitz  <yselkowi@redhat.com>
+
+	* libc/include/libgen.h (basename): Define as __xpg_basename
+	for source compatibility with glibc.
+	Declare with __ASMNAME("basename") for ABI compatibility.
+	* libc/include/string.h (basename): Define as basename for
+	source compatibility with glibc.
+	Declare with __ASMNAME("__gnu_basename") for ABI compatibility.
+
 2015-07-06  Corinna Vinschen  <corinna@vinschen.de>
 
 	* libc/include/sys/time.h: Explicitely include sys/cdefs.h.

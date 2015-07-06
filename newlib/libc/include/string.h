@@ -175,8 +175,8 @@ int	_EXFUN(strtosigno, (const char *__name));
    this also implies that the POSIX version is used in this case.  That's made
    sure here. */
 #if __GNU_VISIBLE && !defined(basename)
-char	*_EXFUN(__nonnull (1) __gnu_basename,(const char *));
-# define basename __gnu_basename
+# define basename basename
+char	*_EXFUN(__nonnull (1) basename,(const char *)) __asm__(__ASMNAME("__gnu_basename"));
 #endif
 
 #include <sys/string.h>
