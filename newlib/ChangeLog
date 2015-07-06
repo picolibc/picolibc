@@ -1,3 +1,9 @@
+2015-07-06  Corinna Vinschen  <corinna@vinschen.de>
+
+	* libc/include/sys/time.h: Explicitely include sys/cdefs.h.
+	* libc/include/sys/types.h: Ditto.  Guard BSD convenience base types
+	with __BSD_VISIBLE rather than !_POSIX_SOURCE.
+
 2015-07-01  Sebastian Huber  <sebastian.huber@embedded-brains.de>
 
 	* libc/stdio/fputs.c (_puts_r): Add missing CHECK_INIT().

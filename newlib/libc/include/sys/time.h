@@ -38,6 +38,7 @@
 #define	_SYS_TIME_H_
 
 #include <_ansi.h>
+#include <sys/cdefs.h>
 #include <sys/_timeval.h>
 #include <sys/types.h>
 #include <sys/timespec.h>

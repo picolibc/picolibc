@@ -18,6 +18,7 @@
 #ifndef _SYS_TYPES_H
 
 #include <_ansi.h>
+# include <sys/cdefs.h>
 
 #ifndef __INTTYPES_DEFINED__
 #define __INTTYPES_DEFINED__
@@ -83,7 +84,7 @@ typedef	quad_t *	qaddr_t;
 #define _ST_INT32
 #endif
 
-# ifndef	_POSIX_SOURCE
+# if	__BSD_VISIBLE
 
 #  define	physadr		physadr_t
 #  define	quad		quad_t
@@ -112,7 +113,7 @@ typedef	unsigned long	u_long;
 typedef	unsigned short	ushort;		/* System V compatibility */
 typedef	unsigned int	uint;		/* System V compatibility */
 typedef	unsigned long	ulong;		/* System V compatibility */
-# endif	/*!_POSIX_SOURCE */
+# endif	/*__BSD_VISIBLE */
 
 #ifndef __clock_t_defined
 typedef _CLOCK_T_ clock_t;
