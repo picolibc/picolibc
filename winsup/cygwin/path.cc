@@ -48,7 +48,12 @@
      c: means c:\.
   */
 
-#define _BASENAME_DEFINED
+/* This file includes both the XPG and GNU basename functions, with the
+   former exported as "basename" for ABI compatibility but the latter
+   declared as such for source compatibility with glibc.  This tells
+   <string.h> not to declare the GNU variant in order to prevent a conflicting
+   declaration error with the XPG variant implemented herein. */
+#define basename basename
 #include "winsup.h"
 #include "miscfuncs.h"
 #include <ctype.h>
@@ -70,6 +75,7 @@
 #include <ntdll.h>
 #include <wchar.h>
 #include <wctype.h>
+#undef basename
 
 suffix_info stat_suffixes[] =
 {
@@ -4738,8 +4744,6 @@ out:
   MALLOC_CHECK;
   return buf;
 }
-
-#undef basename
 
 /* No need to be reentrant or thread-safe according to SUSv3.
    / and \\ are treated equally.  Leading drive specifiers are
