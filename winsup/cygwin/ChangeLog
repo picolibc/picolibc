@@ -1,5 +1,21 @@
 2015-07-07  Corinna Vinschen  <corinna@vinschen.de>
 
+	x86_64 only:
+	* cygtls.cc (san::leave): Restore _my_tls.andreas.
+	* cygtls.h (class san):  Add _clemente as in 32 bit case.  Add ret and
+	frame members.
+	(san::san): Handle _my_tls.andreas as on 32 bit.  Take parameter and
+	write it to new member ret.  Store current stack pointer in frame.
+	(san::~san): New destructor to restore _my_tls.andreas.
+	(__try): Use __l_except address as parameter to san::san.
+	* dcrt0.cc (dll_crt0_0): Add myfault_altstack_handler as vectored
+	continuation handler.
+	* exception.h (myfault_altstack_handler): Declare.
+	* exceptions.cc (myfault_altstack_handler): New function.  Explain what
+	it's good for.
+
+2015-07-07  Corinna Vinschen  <corinna@vinschen.de>
+
 	* child_info.h (CURR_CHILD_INFO_MAGIC): Update.
 	(child_info_fork::alloc_stack_hard_way): Drop declaration.
 	* dcrt0.cc (child_info_fork::alloc_stack_hard_way): Fold into
