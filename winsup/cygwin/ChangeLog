@@ -1,3 +1,8 @@
+2015-07-07  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fork.cc (frok::parent): Simplify code propagating stack setup to
+	child process.  Tweak comments.
+
 2015-07-06  Yaakov Selkowitz  <yselkowi@redhat.com>
 
 	* path.cc: Rework basename redefinition handling.  Explain why.
