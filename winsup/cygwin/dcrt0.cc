@@ -405,79 +405,10 @@ check_sanity_and_sync (per_process *p)
 
 child_info NO_COPY *child_proc_info;
 
-void
-child_info_fork::alloc_stack_hard_way (volatile char *b)
-{
-  void *stack_ptr;
-  SIZE_T stacksize;
-
-  /* First check if the requested stack area is part of the user heap
-     or part of a mmapped region.  If so, we have been started from a
-     pthread with an application-provided stack, and the stack has just
-     to be used as is. */
-  if ((stacktop >= cygheap->user_heap.base
-      && stackbottom <= cygheap->user_heap.max)
-      || is_mmapped_region ((caddr_t) stacktop, (caddr_t) stackbottom))
-    return;
-  /* First, try to reserve the entire stack. */
-  stacksize = (PBYTE) stackbottom - (PBYTE) stackaddr;
-  if (!VirtualAlloc (stackaddr, stacksize, MEM_RESERVE, PAGE_NOACCESS))
-    {
-      PTEB teb = NtCurrentTeb ();
-      api_fatal ("fork: can't reserve memory for parent stack "
-		 "%p - %p, (child has %p - %p), %E",
-		 stackaddr, stackbottom, teb->DeallocationStack, _tlsbase);
-    }
-  stacksize = (PBYTE) stackbottom - (PBYTE) stacktop;
-  stack_ptr = VirtualAlloc (stacktop, stacksize, MEM_COMMIT, PAGE_READWRITE);
-  if (!stack_ptr)
-    abort ("can't commit memory for stack %p(%ly), %E", stacktop, stacksize);
-  if (guardsize != (size_t) -1)
-    {
-      ULONG real_guardsize = guardsize
-			     ? roundup2 (guardsize, wincap.page_size ())
-			     : wincap.def_guard_page_size ();
-      /* Allocate PAGE_GUARD page if it still fits. */
-      if (stack_ptr > stackaddr)
-	{
-	  stack_ptr = (void *) ((PBYTE) stack_ptr - real_guardsize);
-	  if (!VirtualAlloc (stack_ptr, real_guardsize, MEM_COMMIT,
-			     PAGE_READWRITE | PAGE_GUARD))
-	    api_fatal ("fork: couldn't allocate new stack guard page %p, %E",
-		       stack_ptr);
-	}
-      /* On post-XP systems, set thread stack guarantee matching the guardsize.
-	 Note that the guardsize is one page bigger than the guarantee. */
-      if (wincap.has_set_thread_stack_guarantee ()
-	  && real_guardsize > wincap.def_guard_page_size ())
-	{
-	  real_guardsize -= wincap.page_size ();
-	  SetThreadStackGuarantee (&real_guardsize);
-	}
-    }
-  b[0] = '\0';
-}
-
-void *getstack (void *) __attribute__ ((noinline));
-volatile char *
-getstack (volatile char * volatile p)
-{
-  *p ^= 1;
-  *p ^= 1;
-  return p - 4096;
-}
-
-/* extend the stack prior to fork longjmp */
-
+/* Extend the stack prior to fork longjmp. */
 void
 child_info_fork::alloc_stack ()
 {
-  volatile char * volatile stackp;
-#ifdef __x86_64__
-  __asm__ volatile ("movq %%rsp,%0": "=r" (stackp));
-#else
-  __asm__ volatile ("movl %%esp,%0": "=r" (stackp));
-#endif
   /* Make sure not to try a hard allocation if we have been forked off from
      the main thread of a Cygwin process which has been started from a 64 bit
      parent.  In that case the _tlsbase of the forked child is not the same
@@ -487,14 +418,72 @@ child_info_fork::alloc_stack ()
      parent stack fits into the child stack. */
   if (_tlsbase != stackbottom
       && (!wincap.is_wow64 ()
-      	  || stacktop < (char *) NtCurrentTeb ()->DeallocationStack
+	  || stacktop < NtCurrentTeb ()->DeallocationStack
 	  || stackbottom > _tlsbase))
-    alloc_stack_hard_way (stackp);
+    {
+      void *stack_ptr;
+      size_t stacksize;
+
+      /* If guardsize is -1, we have been started from a pthread with an
+	 application-provided stack, and the stack has just to be used as is. */
+      if (guardsize == (size_t) -1)
+	return;
+      /* Reserve entire stack. */
+      stacksize = (PBYTE) stackbottom - (PBYTE) stackaddr;
+      if (!VirtualAlloc (stackaddr, stacksize, MEM_RESERVE, PAGE_NOACCESS))
+	{
+	  PTEB teb = NtCurrentTeb ();
+	  api_fatal ("fork: can't reserve memory for parent stack "
+		     "%p - %p, (child has %p - %p), %E",
+		     stackaddr, stackbottom, teb->DeallocationStack, _tlsbase);
+	}
+      /* Commit the area commited in parent. */
+      stacksize = (PBYTE) stackbottom - (PBYTE) stacktop;
+      stack_ptr = VirtualAlloc (stacktop, stacksize, MEM_COMMIT,
+				PAGE_READWRITE);
+      if (!stack_ptr)
+	api_fatal ("can't commit memory for stack %p(%ly), %E",
+		   stacktop, stacksize);
+      /* Set up guardpages. */
+      ULONG real_guardsize = guardsize
+			     ? roundup2 (guardsize, wincap.page_size ())
+			     : wincap.def_guard_page_size ();
+      if (stack_ptr > stackaddr)
+	{
+	  stack_ptr = (void *) ((PBYTE) stack_ptr - real_guardsize);
+	  if (!VirtualAlloc (stack_ptr, real_guardsize, MEM_COMMIT,
+			     PAGE_READWRITE | PAGE_GUARD))
+	    api_fatal ("fork: couldn't allocate new stack guard page %p, %E",
+		       stack_ptr);
+	}
+      /* On post-XP systems, set thread stack guarantee matching the
+	 guardsize.  Note that the guardsize is one page bigger than
+	 the guarantee. */
+      if (wincap.has_set_thread_stack_guarantee ()
+	  && real_guardsize > wincap.def_guard_page_size ())
+	{
+	  real_guardsize -= wincap.page_size ();
+	  SetThreadStackGuarantee (&real_guardsize);
+	}
+    }
   else
     {
-      char *st = (char *) stacktop;
-      while (_tlstop > st)
-	stackp = getstack (stackp);
+      /* Fork has been called from main thread.  Simply commit the region
+	 of the stack commited in the parent but not yet commited in the
+	 child and create new guardpages. */
+      if (_tlstop > stacktop)
+	{
+	  SIZE_T commitsize = (PBYTE) _tlstop - (PBYTE) stacktop;
+	  if (!VirtualAlloc (stacktop, commitsize, MEM_COMMIT, PAGE_READWRITE))
+	    api_fatal ("can't commit child memory for stack %p(%ly), %E",
+		       stacktop, commitsize);
+	  PVOID guardpage = (PBYTE) stacktop - wincap.def_guard_page_size ();
+	  if (!VirtualAlloc (guardpage, wincap.def_guard_page_size (),
+			     MEM_COMMIT, PAGE_READWRITE | PAGE_GUARD))
+	    api_fatal ("fork: couldn't allocate new stack guard page %p, %E",
+		       guardpage);
+	  _tlstop = stacktop;
+	}
       stackaddr = 0;
       /* This only affects forked children of a process started from a native
 	 64 bit process, but it doesn't hurt to do it unconditionally.  Fix

@@ -1,5 +1,16 @@
 2015-07-07  Corinna Vinschen  <corinna@vinschen.de>
 
+	* child_info.h (CURR_CHILD_INFO_MAGIC): Update.
+	(child_info_fork::alloc_stack_hard_way): Drop declaration.
+	* dcrt0.cc (child_info_fork::alloc_stack_hard_way): Fold into
+	child_info_fork::alloc_stack.
+	(getstack): Remove.
+	(child_info_fork::alloc_stack): Simplify check for application-provided
+	stack in "hard way" code.  Don't call getstack for each page, just
+	reallocate stack immediately as required.
+
+2015-07-07  Corinna Vinschen  <corinna@vinschen.de>
+
 	* fork.cc (frok::parent): Simplify code propagating stack setup to
 	child process.  Tweak comments.
 
