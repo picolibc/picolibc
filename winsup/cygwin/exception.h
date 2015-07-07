@@ -160,6 +160,8 @@ public:
   }
 };
 
+LONG CALLBACK myfault_altstack_handler (EXCEPTION_POINTERS *);
+
 #endif /* !__x86_64__ */
 
 class cygwin_exception

@@ -588,6 +588,50 @@ exception::myfault (EXCEPTION_RECORD *e, exception_list *frame, CONTEXT *in,
   /* NOTREACHED, make gcc happy. */
   return ExceptionContinueSearch;
 }
+
+/* If another exception occurs while running a signal handler on an alternate
+   signal stack, the normal SEH handlers are skipped, because the OS exception
+   handling considers the current (alternate) stack "broken".  However, it
+   still calls vectored exception handlers.
+
+   TODO: What we do here is to handle only __try/__except blocks in Cygwin.
+         "Normal" exceptions will simply exit the process.  Still, better
+	 than nothing... */
+LONG WINAPI
+myfault_altstack_handler (EXCEPTION_POINTERS *exc)
+{
+  _cygtls& me = _my_tls;
+
+  if (me.andreas)
+    {
+      PRUNTIME_FUNCTION f;
+      ULONG64 imagebase;
+      UNWIND_HISTORY_TABLE hist;
+      DWORD64 establisher;
+      PVOID hdl;
+      CONTEXT *c = exc->ContextRecord;
+
+      /* Unwind the stack manually and call RtlRestoreContext.  This
+	 is necessary because RtlUnwindEx checks the stack for validity,
+	 which, as outlined above, fails for the alternate stack. */
+      while (c->Rsp < me.andreas->frame)
+	{
+	  f = RtlLookupFunctionEntry (c->Rip, &imagebase, &hist);
+	  if (f)
+	    RtlVirtualUnwind (0, imagebase, c->Rip, f, c, &hdl, &establisher,
+			      NULL);
+	  else
+	    {
+	      c->Rip = *(ULONG_PTR *) c->Rsp;
+	      c->Rsp += 8;
+	    }
+	}
+      c->Rip = me.andreas->ret;
+      RtlRestoreContext (c, NULL);
+    }
+  return EXCEPTION_CONTINUE_SEARCH;
+}
+
 #endif
 
 /* Main exception handler. */
@@ -697,11 +741,13 @@ exception::handle (EXCEPTION_RECORD *e, exception_list *frame, CONTEXT *in,
       break;
 
     case STATUS_STACK_OVERFLOW:
+#if 0
       /* If we encounter a stack overflow, and if the thread has no alternate
          stack, don't even try to call a signal handler.  This is in line with
 	 Linux behaviour and also makes a lot of sense on Windows. */
       if (me.altstack.ss_flags)
 	global_sigs[SIGSEGV].sa_handler = SIG_DFL;
+#endif
       /*FALLTHRU*/
     case STATUS_ARRAY_BOUNDS_EXCEEDED:
     case STATUS_IN_PAGE_ERROR:

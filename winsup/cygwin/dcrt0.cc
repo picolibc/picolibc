@@ -800,6 +800,11 @@ dll_crt0_0 ()
   if (!dynamically_loaded)
     sigproc_init ();
 
+#ifdef __x86_64__
+  /* See comment preceeding myfault_altstack_handler in exception.cc. */
+  AddVectoredContinueHandler (0, myfault_altstack_handler);
+#endif
+
   debug_printf ("finished dll_crt0_0 initialization");
 }
 

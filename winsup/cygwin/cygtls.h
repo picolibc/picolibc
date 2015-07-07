@@ -301,11 +301,26 @@ extern _cygtls *_sig_tls;
 #ifdef __x86_64__
 class san
 {
+  san *_clemente;
   uint64_t _cnt;
 public:
-  san () __attribute__ ((always_inline))
+  DWORD64 ret;
+  DWORD64 frame;
+
+  san (PVOID _ret) __attribute__ ((always_inline))
   {
+    _clemente = _my_tls.andreas;
+    _my_tls.andreas = this;
     _cnt = _my_tls.locals.pathbufs._counters;
+    /* myfault_altstack_handler needs the current stack pointer and the
+       address of the _except block to restore the context correctly.
+       See comment preceeding myfault_altstack_handler in exception.cc. */
+    ret = (DWORD64) _ret;
+    __asm__ volatile ("movq %%rsp,%0": "=o" (frame));
+  }
+  ~san () __attribute__ ((always_inline))
+  {
+    _my_tls.andreas = _clemente;
   }
   /* This is the first thing called in the __except handler.  The attribute
      "returns_twice" makes sure that GCC disregards any register value set
@@ -363,7 +378,7 @@ public:
   { \
     __label__ __l_try, __l_except, __l_endtry; \
     __mem_barrier; \
-    san __sebastian; \
+    san __sebastian (&&__l_except); \
     __asm__ goto ("\n" \
       "  .seh_handler _ZN9exception7myfaultEP17_EXCEPTION_RECORDPvP8_CONTEXTP19_DISPATCHER_CONTEXT, @except						\n" \
       "  .seh_handlerdata						\n" \

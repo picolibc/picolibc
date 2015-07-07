@@ -224,5 +224,6 @@ void san::leave ()
 {
   /* Restore tls_pathbuf counters in case of error. */
   _my_tls.locals.pathbufs._counters = _cnt;
+  _my_tls.andreas = _clemente;
 }
 #endif
