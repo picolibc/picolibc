@@ -33,3 +33,7 @@ Bug Fixes
   Addresses: https://cygwin.com/ml/cygwin/2015-06/msg00384.html
 
 - Fix a crash on 64 bit XP/2003 when opening /proc/$PID/maps.
+
+- Apparently on some Windows systems timezones differ in case
+  from the standard.  Fix the tzset tool to check case-insensitive.
+  Addresses: https://cygwin.com/ml/cygwin/2015-07/msg00113.html

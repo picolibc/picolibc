@@ -207,11 +207,11 @@ main (int argc, char **argv)
   /* Now iterate over the mapping table and find the right entry. */
   for (idx = 0; idx < TZMAP_SIZE; ++idx)
     {
-      if (!wcscmp (keyname, tzmap[idx].win_tzkey))
+      if (!wcscasecmp (keyname, tzmap[idx].win_tzkey))
 	{
 	  if (gotit < 0)
 	    gotit = idx;
-	  if (!wcscmp (country, tzmap[idx].country))
+	  if (!wcscasecmp (country, tzmap[idx].country))
 	    break;
 	}
       else if (gotit >= 0)

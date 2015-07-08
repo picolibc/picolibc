@@ -1,3 +1,7 @@
+2015-07-08  Corinna Vinschen  <corinna@vinschen.de>
+
+	* tzset.c (main): Check timezone and country case-insensitive.
+
 2015-06-07  Jon Turney  <jon.turney@dronecode.org.uk>
 
 	* strace.cc (proc_child): Log process and thread create and exit,
