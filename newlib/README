@@ -5,7 +5,7 @@ This is `newlib', a simple ANSI C library, math library, and collection
 of board support packages.
 
 The newlib and libgloss subdirectories are a collection of software from
-several sources, each wi6h their own copyright and license.  See the file
+several sources, each with their own copyright and license.  See the file
 COPYING.NEWLIB for details.  The rest of the release tree is under either
 the GNU GPL or LGPL licenses.
 
