@@ -1,3 +1,8 @@
+2015-07-13  Wilco Dijkstra  <wdijkstr@arm.com>
+
+	* newlib/libc/machine/aarch64/memove.S (memmove):
+	Rewrite of optimized memmove.
+
 2015-07-06  Yaakov Selkowitz  <yselkowi@redhat.com>
 
 	* libc/include/libgen.h (basename): Define as __xpg_basename
