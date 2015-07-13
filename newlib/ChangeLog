@@ -1,5 +1,10 @@
 2015-07-13  Wilco Dijkstra  <wdijkstr@arm.com>
 
+	* newlib/libc/machine/aarch64/memcpy.S (memcpy):
+	Rewrite of optimized memcpy.
+
+2015-07-13  Wilco Dijkstra  <wdijkstr@arm.com>
+
 	* newlib/libc/machine/aarch64/memove.S (memmove):
 	Rewrite of optimized memmove.
 
