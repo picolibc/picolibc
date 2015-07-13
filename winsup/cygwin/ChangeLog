@@ -1,3 +1,8 @@
+2015-07-13  Corinna Vinschen  <corinna@vinschen.de>
+
+	* exceptions.cc (exception::handle): Reenable code only disabled for
+	debug purposes.
+
 2015-07-07  Corinna Vinschen  <corinna@vinschen.de>
 
 	x86_64 only:

@@ -741,13 +741,11 @@ exception::handle (EXCEPTION_RECORD *e, exception_list *frame, CONTEXT *in,
       break;
 
     case STATUS_STACK_OVERFLOW:
-#if 0
       /* If we encounter a stack overflow, and if the thread has no alternate
          stack, don't even try to call a signal handler.  This is in line with
 	 Linux behaviour and also makes a lot of sense on Windows. */
       if (me.altstack.ss_flags)
 	global_sigs[SIGSEGV].sa_handler = SIG_DFL;
-#endif
       /*FALLTHRU*/
     case STATUS_ARRAY_BOUNDS_EXCEEDED:
     case STATUS_IN_PAGE_ERROR:
