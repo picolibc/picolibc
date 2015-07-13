@@ -1,5 +1,10 @@
 2015-07-13  Wilco Dijkstra  <wdijkstr@arm.com>
 
+	* libc/machine/aarch64/memset.S (memset):
+	Rewrite of optimized memset.
+
+2015-07-13  Wilco Dijkstra  <wdijkstr@arm.com>
+
 	* libc/machine/aarch64/memcpy.S (memcpy):
 	Rewrite of optimized memcpy.
 
