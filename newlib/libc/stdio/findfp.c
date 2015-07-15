@@ -254,6 +254,7 @@ __sinit (struct _reent *s)
 
   /* make sure we clean up on exit */
   s->__cleanup = _cleanup_r;	/* conservative */
+  s->__sdidinit = 1;
 
   s->__sglue._next = NULL;
 #ifndef _REENT_SMALL

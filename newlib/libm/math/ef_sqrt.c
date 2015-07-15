@@ -13,6 +13,13 @@
  * ====================================================
  */
 
+/* TENSILICA: Avoid the hassle of tpp and other conditionals with
+   FP by using a function in libgcc instead of this one when
+   fp is present.  */
+
+#ifdef __XTENSA__
+#include <xtensa/config/core-isa.h>
+#endif // __XTENSA__
 #include "fdlibm.h"
 
 #ifdef __STDC__
@@ -20,6 +27,8 @@ static	const float	one	= 1.0, tiny=1.0e-30;
 #else
 static	float	one	= 1.0, tiny=1.0e-30;
 #endif
+
+#if !XCHAL_HAVE_FP_SQRT
 
 #ifdef __STDC__
 	float __ieee754_sqrtf(float x)
@@ -87,3 +96,6 @@ static	float	one	= 1.0, tiny=1.0e-30;
 	SET_FLOAT_WORD(z,ix);
 	return z;
 }
+
+#endif /* !XCHAL_HAVE_FP_SQRT */
+

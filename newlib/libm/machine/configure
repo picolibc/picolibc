@@ -572,7 +572,7 @@ PACKAGE_STRING='newlib 3.3.0'
 PACKAGE_BUGREPORT=''
 PACKAGE_URL=''
 
-ac_unique_file="i386"
+ac_unique_file="xtensa"
 # Factoring default headers for most tests.
 ac_includes_default="\
 #include <stdio.h>
@@ -793,7 +793,8 @@ nds32
 pru
 spu
 riscv
-x86_64'
+x86_64
+xtensa'
 
 # Initialize some variables set by options.
 ac_init_help=
@@ -11817,6 +11818,8 @@ subdirs="$subdirs aarch64"
 	pru) subdirs="$subdirs pru"
  ;;
 	spu) subdirs="$subdirs spu"
+ ;;
+	xtensa) subdirs="$subdirs xtensa"
  ;;
 	riscv) subdirs="$subdirs riscv"
  ;;

@@ -161,15 +161,15 @@ libc-libtool-objectlist: $(LIBM_OBJECTLISTS) $(LIBC_OBJECTLISTS)
 
 else
 
+# TENSILICA: removed libg.a hard link from the following rule
 libc.a: libc/libc.a libm.a
-	rm -rf libc.a libg.a tmp
+	rm -rf libc.a tmp
 	mkdir tmp
 	cd tmp; \
 	 $(AR) x ../libm.a $(MATHOBJS_IN_LIBC) ; \
 	 $(AR) x ../libc/libc.a ; \
 	 $(AR) $(AR_FLAGS) ../$@ *.o
 	$(RANLIB) libc.a
-	ln libc.a libg.a >/dev/null 2>/dev/null || cp libc.a libg.a
 	rm -rf tmp
 
 libc/libc.a: ; @true
@@ -191,10 +191,10 @@ $(BUILD_MULTISUBDIR)/crt0.o: $(CRT0_DIR)$(CRT0) $(BUILD_MULTISUBDIR)
 	ln $< $@ >/dev/null 2>/dev/null || cp $< $@
 
 $(BUILD_MULTISUBDIR)/libc.a: libc.a $(BUILD_MULTISUBDIR)
-	rm -f $@ $(BUILD_MULTISUBDIR)/libg.a
-	ln $< $@ >/dev/null 2>/dev/null || cp $< $@
-	ln libg.a $(BUILD_MULTISUBDIR)/libg.a >/dev/null 2>/dev/null || \
-	cp libg.a $(BUILD_MULTISUBDIR)/libg.a
+#	rm -f $@ $(BUILD_MULTISUBDIR)/libg.a
+#	ln $< $@ >/dev/null 2>/dev/null || cp $< $@
+#	ln libg.a $(BUILD_MULTISUBDIR)/libg.a >/dev/null 2>/dev/null || \
+#	cp libg.a $(BUILD_MULTISUBDIR)/libg.a
 
 $(BUILD_MULTISUBDIR)/libm.a: libm.a $(BUILD_MULTISUBDIR)
 	rm -f $@
@@ -264,6 +264,16 @@ stmp-targ-include: config.status
 		    	mkdir targ-include/`basename $$i`; \
 		    fi; \
 	      	    cp $$j targ-include/`basename $$i`/`basename $$j`; \
+		done \
+	    else true; fi ; \
+	  done
+	-for i in $(srcdir)/libc/sys/$(sys_dir)/include/xtensa/*; do \
+	    if [ -d $$i ]; then \
+		for j in $$i/*.h; do \
+		    if [ ! -d targ-include/xtensa/`basename $$i` ]; then \
+			mkdir targ-include/xtensa/`basename $$i`; \
+		    fi; \
+		    cp $$j targ-include/xtensa/`basename $$i`/`basename $$j`; \
 		done \
 	    else true; fi ; \
 	  done
@@ -367,6 +377,17 @@ endif
 	    if [ -d $$i ]; then \
 		for j in $$i/*.h; do \
 	            $(INSTALL_DATA) $$j $(DESTDIR)$(tooldir)/include/`basename $$i`/`basename $$j`; \
+		done ; \
+	    else true; fi ; \
+	  done ; \
+	  for i in $(srcdir)/libc/sys/$(sys_dir)/include/xtensa/*; do \
+	    if [ -d $$i ]; then \
+		for j in $$i/*.h; do \
+		    if [ ! -d $(DESTDIR)$(tooldir)/include/xtensa/`basename $$i` ]; then \
+			$(mkinstalldirs) $(DESTDIR)$(tooldir)/include/xtensa; \
+			$(mkinstalldirs) $(DESTDIR)$(tooldir)/include/xtensa/`basename $$i`; \
+		    fi ; \
+	            $(INSTALL_DATA) $$j $(DESTDIR)$(tooldir)/include/xtensa/`basename $$i`/`basename $$j`; \
 		done ; \
 	    else true; fi ; \
 	  done ; \

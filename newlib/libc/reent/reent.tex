@@ -2,9 +2,24 @@
 @chapter Reentrancy
 
 @cindex reentrancy
-Reentrancy is a characteristic of library functions which allows multiple
-processes to use the same address space with assurance that the values stored
-in those spaces will remain constant between calls. The Red Hat
+Reentrancy is a characteristic of functions which allows them to be safely
+called recursively or from concurrent processes.  Libraries of reentrant
+functions enable multiple processes to use the same address space with
+assurance that the values stored in those spaces will remain constant
+between calls.  A fully reentrant library function does not access any
+resources that could be shared with another concurrent or recursive
+invocation of that function.  The reentrancy features described
+here provide a mechanism for each process to have separate resources.
+
+A system with multiple threads may share resources such as the heap,
+environment, file pointers, writable static data, or devices.  Any library
+function that deals with such shared resources cannot be fully reentrant.
+If you want to share resources across threads, you may need a mechanism
+such as locking to protect access to them and make the relevant functions
+thread-safe.  See the @cite{Xtensa Linker Support Packages (LSPs) Reference
+Manual} for more information about reentrancy and thread safety.
+
+The Red Hat
 newlib implementation of the library functions ensures that 
 whenever possible, these library functions are reentrant.  However,
 there are some functions that can not be trivially made reentrant.

@@ -40,6 +40,30 @@ info_TEXINFOS = libm.texinfo
 libm_TEXINFOS = targetdep.tex
 
 libm.dvi: targetdep.tex math/stmp-def complex/stmp-def fenv/stmp-def
+# TENSILICA: add new dependencies for Tensilica-specific files
+EXTRA_TEXI_FILES = \
+	tensilica-version.texi \
+	tensilica-address.texi \
+	tensilica-legal-info.texi \
+	tensilica-legal-tex.texi
+
+XTENSA_SRC_DIR = $(srcdir)/../../../..
+XTENSA_DOC_DIR = $(XTENSA_SRC_DIR)/Software-doc
+
+XTENSA_MINORVERSION = ".2"
+
+tensilica-version.texi: $(XTENSA_DOC_DIR)/issue-date $(XTENSA_SRC_DIR)/version
+	majorversion=`sed -e 's/\(.*\)\..*/\1/' < $(XTENSA_SRC_DIR)/version`; \
+	echo "@set XTENSAVERSION $$majorversion$(XTENSA_MINORVERSION)" > $@
+	issuedate=`cat $(XTENSA_DOC_DIR)/issue-date`; \
+	echo "@set ISSUEDATE $$issuedate" >> $@
+
+tensilica-address.texi tensilica-legal-info.texi tensilica-legal-tex.texi: \
+	% : $(XTENSA_DOC_DIR)/%
+	rm -f $@
+	cp $< $@
+
+libm.dvi libm.html libm.pdf: targetdep.tex math/stmp-def complex/stmp-def
 
 stmp-targetdep: force
 	rm -f tmp.texi

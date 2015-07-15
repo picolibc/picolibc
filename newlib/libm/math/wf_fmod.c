@@ -33,7 +33,7 @@
 	float z;
 	z = __ieee754_fmodf(x,y);
 	if(_LIB_VERSION == _IEEE_ ||isnan(y)||isnan(x)) return z;
-	if(y==0.0f) {
+	if(y==0.0f || !finite(x)) {
             /* fmodf(x,0) */
 	    errno = EDOM;
 	    return  0.0f/0.0f;

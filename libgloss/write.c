@@ -21,6 +21,9 @@ extern int  outbyte (char x);
  *          stdout and stderr are the same. Since we have no filesystem,
  *          open will only return an error.
  */
+
+#ifndef REENTRANT_SYSCALLS_PROVIDED
+
 int
 write (int fd,
        char *buf,

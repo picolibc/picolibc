@@ -57,6 +57,10 @@ typedef struct
 typedef int (*__compar_fn_t) (const void *, const void *);
 #endif
 
+#ifndef NULL
+#define NULL 0
+#endif
+
 #define EXIT_FAILURE 1
 #define EXIT_SUCCESS 0
 
@@ -130,8 +134,12 @@ int	mkstemp (char *);
 #if __MISC_VISIBLE
 int	mkstemps (char *, int);
 #endif
+#if (__GNUC__ < 4) || defined(__XTENSA__)
+char *	mktemp (char *);
+#else
 #if __BSD_VISIBLE || (__XSI_VISIBLE >= 4 && __POSIX_VISIBLE < 200112)
 char *	mktemp (char *) _ATTRIBUTE ((__deprecated__("the use of `mktemp' is dangerous; use `mkstemp' instead")));
+#endif
 #endif
 #endif /* !_REENT_ONLY */
 char *	_mkdtemp_r (struct _reent *, char *);
@@ -139,7 +147,11 @@ int	_mkostemp_r (struct _reent *, char *, int);
 int	_mkostemps_r (struct _reent *, char *, int, int);
 int	_mkstemp_r (struct _reent *, char *);
 int	_mkstemps_r (struct _reent *, char *, int);
+#if (__GNUC__ < 4) || defined(__XTENSA__)
+char *	_mktemp_r (struct _reent *, char *);
+#else
 char *	_mktemp_r (struct _reent *, char *) _ATTRIBUTE ((__deprecated__("the use of `mktemp' is dangerous; use `mkstemp' instead")));
+#endif
 void	qsort (void *__base, size_t __nmemb, size_t __size, __compar_fn_t _compar);
 int	rand (void);
 void	*realloc(void *, size_t) __result_use_check __alloc_size(2) _NOTHROW;

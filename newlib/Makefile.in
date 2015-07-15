@@ -917,15 +917,15 @@ uninstall-am: uninstall-toollibDATA uninstall-toollibLIBRARIES \
 @USE_LIBTOOL_TRUE@libc-libtool-objectlist: $(LIBM_OBJECTLISTS) $(LIBC_OBJECTLISTS)
 @USE_LIBTOOL_TRUE@	cat $(LIBM_OBJECTLISTS) $(LIBC_OBJECTLISTS) |  $(AWK) '{ libc[$$1] = $$2 }; END { for (x in libc) printf ("%s\n", libc[x]) }' > $@
 
+# TENSILICA: removed libg.a hard link from the following rule
 @USE_LIBTOOL_FALSE@libc.a: libc/libc.a libm.a
-@USE_LIBTOOL_FALSE@	rm -rf libc.a libg.a tmp
+@USE_LIBTOOL_FALSE@	rm -rf libc.a tmp
 @USE_LIBTOOL_FALSE@	mkdir tmp
 @USE_LIBTOOL_FALSE@	cd tmp; \
 @USE_LIBTOOL_FALSE@	 $(AR) x ../libm.a $(MATHOBJS_IN_LIBC) ; \
 @USE_LIBTOOL_FALSE@	 $(AR) x ../libc/libc.a ; \
 @USE_LIBTOOL_FALSE@	 $(AR) $(AR_FLAGS) ../$@ *.o
 @USE_LIBTOOL_FALSE@	$(RANLIB) libc.a
-@USE_LIBTOOL_FALSE@	ln libc.a libg.a >/dev/null 2>/dev/null || cp libc.a libg.a
 @USE_LIBTOOL_FALSE@	rm -rf tmp
 
 @USE_LIBTOOL_FALSE@libc/libc.a: ; @true
@@ -944,10 +944,10 @@ uninstall-am: uninstall-toollibDATA uninstall-toollibLIBRARIES \
 @HAVE_MULTISUBDIR_TRUE@	ln $< $@ >/dev/null 2>/dev/null || cp $< $@
 
 @HAVE_MULTISUBDIR_TRUE@$(BUILD_MULTISUBDIR)/libc.a: libc.a $(BUILD_MULTISUBDIR)
-@HAVE_MULTISUBDIR_TRUE@	rm -f $@ $(BUILD_MULTISUBDIR)/libg.a
-@HAVE_MULTISUBDIR_TRUE@	ln $< $@ >/dev/null 2>/dev/null || cp $< $@
-@HAVE_MULTISUBDIR_TRUE@	ln libg.a $(BUILD_MULTISUBDIR)/libg.a >/dev/null 2>/dev/null || \
-@HAVE_MULTISUBDIR_TRUE@	cp libg.a $(BUILD_MULTISUBDIR)/libg.a
+#@HAVE_MULTISUBDIR_TRUE@	rm -f $@ $(BUILD_MULTISUBDIR)/libg.a
+#@HAVE_MULTISUBDIR_TRUE@	ln $< $@ >/dev/null 2>/dev/null || cp $< $@
+#@HAVE_MULTISUBDIR_TRUE@	ln libg.a $(BUILD_MULTISUBDIR)/libg.a >/dev/null 2>/dev/null || \
+#@HAVE_MULTISUBDIR_TRUE@	cp libg.a $(BUILD_MULTISUBDIR)/libg.a
 
 @HAVE_MULTISUBDIR_TRUE@$(BUILD_MULTISUBDIR)/libm.a: libm.a $(BUILD_MULTISUBDIR)
 @HAVE_MULTISUBDIR_TRUE@	rm -f $@
@@ -1016,6 +1016,16 @@ stmp-targ-include: config.status
 		    	mkdir targ-include/`basename $$i`; \
 		    fi; \
 	      	    cp $$j targ-include/`basename $$i`/`basename $$j`; \
+		done \
+	    else true; fi ; \
+	  done
+	-for i in $(srcdir)/libc/sys/$(sys_dir)/include/xtensa/*; do \
+	    if [ -d $$i ]; then \
+		for j in $$i/*.h; do \
+		    if [ ! -d targ-include/xtensa/`basename $$i` ]; then \
+			mkdir targ-include/xtensa/`basename $$i`; \
+		    fi; \
+		    cp $$j targ-include/xtensa/`basename $$i`/`basename $$j`; \
 		done \
 	    else true; fi ; \
 	  done
@@ -1114,6 +1124,17 @@ install-data-local:	install-toollibLIBRARIES
 	    if [ -d $$i ]; then \
 		for j in $$i/*.h; do \
 	            $(INSTALL_DATA) $$j $(DESTDIR)$(tooldir)/include/`basename $$i`/`basename $$j`; \
+		done ; \
+	    else true; fi ; \
+	  done ; \
+	  for i in $(srcdir)/libc/sys/$(sys_dir)/include/xtensa/*; do \
+	    if [ -d $$i ]; then \
+		for j in $$i/*.h; do \
+		    if [ ! -d $(DESTDIR)$(tooldir)/include/xtensa/`basename $$i` ]; then \
+			$(mkinstalldirs) $(DESTDIR)$(tooldir)/include/xtensa; \
+			$(mkinstalldirs) $(DESTDIR)$(tooldir)/include/xtensa/`basename $$i`; \
+		    fi ; \
+	            $(INSTALL_DATA) $$j $(DESTDIR)$(tooldir)/include/xtensa/`basename $$i`/`basename $$j`; \
 		done ; \
 	    else true; fi ; \
 	  done ; \
