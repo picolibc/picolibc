@@ -495,6 +495,14 @@
 #define __OBSOLETE_MATH __OBSOLETE_MATH_DEFAULT
 #endif
 
+#if (defined(__XTENSA__))
+# ifdef __XTENSA_EB__
+#  define __IEEE_BIG_ENDIAN
+# else
+#  define __IEEE_LITTLE_ENDIAN
+# endif
+#endif
+
 #ifndef __IEEE_BIG_ENDIAN
 #ifndef __IEEE_LITTLE_ENDIAN
 #error Endianess not declared!!

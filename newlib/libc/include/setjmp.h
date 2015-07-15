@@ -18,6 +18,8 @@ void	longjmp (jmp_buf __jmpb, int __retval)
 void	longjmp (jmp_buf __jmpb, int __retval);
 #endif
 int	setjmp (jmp_buf __jmpb);
+#define setjmp(env) setjmp(env)
+
 
 _END_STD_C
 

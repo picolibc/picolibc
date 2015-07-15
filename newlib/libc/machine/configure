@@ -572,7 +572,7 @@ PACKAGE_STRING='newlib 4.1.0'
 PACKAGE_BUGREPORT=''
 PACKAGE_URL=''
 
-ac_unique_file="d10v"
+ac_unique_file="xtensa"
 # Factoring default headers for most tests.
 ac_includes_default="\
 #include <stdio.h>
@@ -843,6 +843,7 @@ w65
 x86_64
 xc16x
 xstormy16
+xtensa
 z8k'
 
 # Initialize some variables set by options.
@@ -11969,6 +11970,8 @@ subdirs="$subdirs a29k"
 	xc16x) subdirs="$subdirs xc16x"
  ;;
 	xstormy16) subdirs="$subdirs xstormy16"
+ ;;
+	xtensa) subdirs="$subdirs xtensa"
  ;;
 	z8k) subdirs="$subdirs z8k"
  ;;

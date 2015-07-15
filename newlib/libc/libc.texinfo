@@ -9,11 +9,14 @@
 @end direntry
 @end format
 @end ifinfo
+@end ignore
 
 @ifinfo
-This file documents the ANSI C library.
+This file documents the ANSI C library,
+version 2.20.0 for Xtensa(R) Tools Version @value{XTENSAVERSION}.
 
 Copyright (C) 1992, 1993, 1994-2014 Red Hat, Inc.
+Copyright (C) 1999--2012 Tensilica, Inc.
 
 @file{libc} includes software developed by the
 University of California, Berkeley and its contributors.
@@ -58,6 +61,8 @@ permission notice identical to this one.
 
 Permission is granted to copy and distribute translations of this manual
 into another language, under the above conditions for modified versions.
+
+@include tensilica-legal-info.texi
 @end ifinfo
 @iftex
 @c @smallbook
@@ -75,6 +80,17 @@ into another language, under the above conditions for modified versions.
 @author {Roland Pesch}
 @author {Red Hat Support}
 @author {Jeff Johnston}
+@subtitle Reference Manual
+@subtitle December 2012
+@author Version 2.0.0
+@author
+@author For Xtensa@registeredsymbol{} Tools Version @value{XTENSAVERSION}
+@vskip 50pt
+@author Steve Chamberlain, Roland Pesch, Red Hat Support, and Jeff Johnston
+@author
+@author With modifications from Tensilica, Inc.
+@vskip 50pt
+@include tensilica-address.texi
 @page
 
 @tex
@@ -84,6 +100,10 @@ Copyright \copyright{} 1992, 1993, 1994-2004 Red Hat Inc.
 }
 \global\parindent=0pt % Steve likes it this way
 @end tex
+@copyrightfonts @rm
+Copyright @copyright{} 1992, 1993, 1994--2004 Red Hat Inc.@*
+@*
+Copyright @copyright{} 1999--2012 Tensilica, Inc.
 
 @file{libc} includes software developed by the
 University of California, Berkeley and its contributors.
@@ -125,6 +145,8 @@ permission notice identical to this one.
 
 Permission is granted to copy and distribute translations of this manual
 into another language, under the above conditions for modified versions.
+
+@include tensilica-legal-tex.texi
 @end titlepage
 @end iftex
 
@@ -144,7 +166,11 @@ into another language, under the above conditions for modified versions.
 @include iconvset.texi
 
 @menu
+@ifset XTENSA
+* Revisions::
 * Introduction::
+@end ifset
+
 * Stdlib::
 * Ctype::
 * Stdio::
@@ -166,6 +192,10 @@ into another language, under the above conditions for modified versions.
 @ifset POSIX
 * Posix::
 @end ifset
+@ifset XTENSA
+* Xtensa::
+@end ifset
+
 * Syscalls::
 * Arglists::
 @ifset ICONV
@@ -176,6 +206,12 @@ into another language, under the above conditions for modified versions.
 * Document Index::
 @end menu
 @end ifnottex
+
+@ifset XTENSA
+@node Revisions
+@unnumbered Changes from Previous Versions
+
+Tensilica newlib C library has been upgraded from version 1.19.0 to version 2.0.0.
 
 @node Introduction
 @chapter Introduction
@@ -194,6 +230,7 @@ The specific operating system subroutines required for a particular
 library function are listed in the ``Portability'' section of the
 function description.  @xref{Syscalls}, for a description of the
 relevant operating system calls.
+@end ifset
 
 @include targetdep.tex
 
@@ -429,6 +466,7 @@ usage as the ANSI C version from @file{stdarg.h}.
 @unnumbered Document Index
 @printindex cp
 
+@ignore
 @tex
 % I think something like @@colophon should be in texinfo.  In the
 % meantime:
@@ -443,8 +481,8 @@ usage as the ANSI C version from @file{stdarg.h}.
 \page\colophon
 % Blame: pesch@@cygnus.com, 28mar91.
 @end tex
+@end ignore
 
-@contents
 @bye
 
 

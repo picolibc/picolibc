@@ -367,6 +367,11 @@ case "${host_cpu}" in
 	newlib_cflags="${newlib_cflags} -DMALLOC_PROVIDED"
 	newlib_cflags="${newlib_cflags} -DPREFER_SIZE_OVER_SPEED"
         ;;
+  xtensa)
+	libm_machine_dir=xtensa
+	machine_dir=xtensa
+	newlib_cflags="${newlib_cflags} -mlongcalls"
+	;;
   z8k)
 	machine_dir=z8k
 	;;
@@ -629,6 +634,9 @@ case "${host}" in
 	;;
   w65-*-*)
 	sys_dir=w65
+	;;
+  xtensa*-*-* | xtensa*-*)
+	sys_dir=xtensa
 	;;
   z8k-*-coff)
 	sys_dir=z8ksim
@@ -925,6 +933,10 @@ newlib_cflags="${newlib_cflags} -DCLOCK_PROVIDED -DMALLOC_PROVIDED -DEXIT_PROVID
         ;;
   xstormy16-*-*)
 	syscall_dir=syscalls
+	;;
+  xtensa*-*-* | xtensa*-*)
+	syscall_dir=syscalls
+	newlib_cflags="${newlib_cflags} -DHAVE_FCNTL -DHAVE_BLKSIZE -DGETREENT_PROVIDED -DREENTRANT_SYSCALLS_PROVIDED -DSIGNAL_PROVIDED -I."
 	;;
   z8k-*-*)
 	syscall_dir=syscalls

@@ -17,6 +17,9 @@
 /*
  * kill -- go out via exit...
  */
+
+#ifndef REENTRANT_SYSCALLS_PROVIDED
+
 int
 kill (int pid,
         int sig)
@@ -25,3 +28,19 @@ kill (int pid,
     _exit(sig);
   return 0;
 }
+
+#else /* REENTRANT_SYSCALLS_PROVIDED */
+
+#include <sys/reent.h>
+
+int
+_kill_r(struct _reent *ptr,
+        int pid,
+        int sig)
+{
+  if (pid == __MYPID)
+    _exit (sig);
+  return 0;
+}
+
+#endif /* REENTRANT_SYSCALLS_PROVIDED */

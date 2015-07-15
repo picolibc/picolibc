@@ -572,7 +572,7 @@ PACKAGE_STRING='newlib 4.1.0'
 PACKAGE_BUGREPORT=''
 PACKAGE_URL=''
 
-ac_unique_file="i386"
+ac_unique_file="xtensa"
 # Factoring default headers for most tests.
 ac_includes_default="\
 #include <stdio.h>
@@ -796,7 +796,8 @@ riscv
 x86_64
 powerpc
 sparc
-mips'
+mips
+xtensa'
 
 # Initialize some variables set by options.
 ac_init_help=
@@ -11820,6 +11821,8 @@ subdirs="$subdirs aarch64"
 	pru) subdirs="$subdirs pru"
  ;;
 	spu) subdirs="$subdirs spu"
+ ;;
+	xtensa) subdirs="$subdirs xtensa"
  ;;
 	riscv) subdirs="$subdirs riscv"
  ;;

@@ -20,7 +20,14 @@ endif
 
 $(machine_dir)/lib.a:
 
+TARGETDOC = ../tmp.texi
+
 doc:
+	for d in $(SUBDIRS); do \
+	  if test "$$d" != "."; then \
+	    (cd $$d && $(MAKE) TARGETDOC=$(TARGETDOC) doc) || exit 1; \
+	  fi; \
+	done
 
 docbook:
 

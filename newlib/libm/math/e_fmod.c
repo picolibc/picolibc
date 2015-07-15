@@ -11,15 +11,57 @@
  * ====================================================
  */
 
+#include "fdlibm.h"
+
+#ifndef _DOUBLE_IS_32BITS
+
+/* __ieee754_remainder is provided by libgcc and presumably is faster
+   then original implementation */
+
+#ifndef __XTENSA__
+
+extern double __ieee754_remainder(double x, double y);
+
+#ifdef __STDC__
+        double __ieee754_fmod(double x, double y)
+#else
+        double __ieee754_fmod(x,y)
+        double x,y ;
+#endif
+{
+        __int32_t hx,hy,sx,sy,sign;
+        GET_HIGH_WORD(hx,x);
+        GET_HIGH_WORD(hy,y);
+        sx = hx&0x80000000;             /* sign of x */
+        sy = hy&0x80000000;             /* sign of y */
+
+        x = __ieee754_remainder(x,y);
+
+        /* Make sure the result has the same sign as x.  Exceptional
+           cases should be OK because the result will be either NaN or
+           the original value of x.  */
+
+        GET_HIGH_WORD(hx,x);
+        sign = hx&0x80000000;           /* sign of the result */
+        if (sx ^ sign) {
+            if (sx ^ sy)
+                y = -y;
+            x += y;
+        }
+        return x;
+}
+
+
+#else
+
+ /* original version */
+
 /* 
  * __ieee754_fmod(x,y)
  * Return x mod y in exact arithmetic
  * Method: shift and subtract
  */
 
-#include "fdlibm.h"
-
-#ifndef _DOUBLE_IS_32BITS
 
 #ifdef __STDC__
 static const double one = 1.0, Zero[] = {0.0, -0.0,};
@@ -136,5 +178,7 @@ static double one = 1.0, Zero[] = {0.0, -0.0,};
 	}
 	return x;		/* exact output */
 }
+
+#endif /* original version */
 
 #endif /* defined(_DOUBLE_IS_32BITS) */

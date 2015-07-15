@@ -9,11 +9,15 @@
 @end direntry
 @end format
 @end ifinfo
+@end ignore
 
 @ifinfo
-This file documents an ANSI-C conforming mathematical subroutine library.
+This file documents an ANSI-C conforming mathematical subroutine library,
+version 2.0.0 for Xtensa(R) Tools Version @value{XTENSAVERSION}.
 
-Copyright (C) 1992, 1993, 1995, 1996-2014 Red Hat, Inc. 
+Copyright (C) 1992, 1993, 1995, 1996-2014 Red Hat, Inc.
+Copyright (C) 1999--2009 Tensilica, Inc.
+
 
 @file{libm} includes software developed at SunPro, a Sun Microsystems,
 Inc. business.  Permission to use, copy, modify, and distribute this
@@ -38,11 +42,15 @@ permission notice identical to this one.
 
 Permission is granted to copy and distribute translations of this manual
 into another language, under the above conditions for modified versions.
+
+@include tensilica-legal-info.texi
 @end ifinfo
-@iftex
+
+@smallbook
 @finalout
 @setchapternewpage odd
 @settitle The Red Hat newlib C Math Library
+
 @titlepage
 @title The Red Hat newlib C Math Library
 @sp 1
@@ -52,20 +60,17 @@ into another language, under the above conditions for modified versions.
 @author {Roland Pesch}
 @author {Red Hat Support}
 @author {Jeff Johnston}
+@author For Xtensa@registeredsymbol{} Tools Version @value{XTENSAVERSION}
+@vskip 50pt
+@author
+@author With modifications from Tensilica, Inc.
+@vskip 50pt
+@include tensilica-address.texi
 @page
-
-@tex
-{\parskip=0pt
-\hfill Red Hat Support\par
-\hfill sac@@cygnus.com\par
-\hfill pesch@@cygnus.com\par
-\hfill jjohnstn@@redhat.com\par
-}
-\global\parindent=0pt % Steve likes it this way
-@end tex
-
-@vskip 0pt plus 1filll
-Copyright @copyright{} 1992, 1993, 1994-2004 Red Hat, Inc. 
+@copyrightfonts @rm
+Copyright @copyright{} 1992, 1993, 1994--2004 Red Hat, Inc.@*
+@*
+Copyright @copyright{} 1999--2011 Tensilica, Inc.
 
 @file{libm} includes software developed at SunPro, a Sun Microsystems,
 Inc. business.  Permission to use, copy, modify, and distribute this
@@ -83,8 +88,43 @@ permission notice identical to this one.
 
 Permission is granted to copy and distribute translations of this manual
 into another language, under the above conditions for modified versions.
+
+@include tensilica-legal-tex.texi
 @end titlepage
-@end iftex
+
+@ifhtml
+Version 2.0.0@*
+For Xtensa
+@c registered trademark (R) symbol
+@html
+&#174;
+@end html
+Tools Version @value{XTENSAVERSION}@*
+@*
+Steve Chamberlain, Roland Pesch, Red Hat Support, and Jeff Johnston@*
+With modifications from Tensilica, Inc.@*
+@*
+Copyright @copyright{} 1992, 1993, 1994--2004 Red Hat, Inc.@*
+Copyright @copyright{} 1999--2011 Tensilica, Inc.
+
+@file{libm} includes software developed at SunPro, a Sun Microsystems,
+Inc. business.  Permission to use, copy, modify, and distribute this
+software is freely granted, provided that this notice is preserved.
+
+Permission is granted to make and distribute verbatim copies of
+this manual provided the copyright notice and this permission notice
+are preserved on all copies.
+
+Permission is granted to copy and distribute modified versions of this
+manual under the conditions for verbatim copying, subject to the terms
+of the GNU General Public License, which includes the provision that the
+entire resulting derived work is distributed under the terms of a
+permission notice identical to this one.
+
+Permission is granted to copy and distribute translations of this manual
+into another language, under the above conditions for modified versions.
+
+@include tensilica-legal-tex.texi
 
 @ifnottex
 @node Top
@@ -92,6 +132,10 @@ into another language, under the above conditions for modified versions.
 @end ifnottex
 
 @menu
+@ifset XTENSA
+* Revisions::      Changes from Previous Versions
+@end ifset
+
 * Math::           The mathematical functions (`math.h').
 * Complex::        The mathematical complex functions (`complex.h').
 * Fenv::           The floating point environment functions ('fenv.h').
@@ -99,6 +143,13 @@ into another language, under the above conditions for modified versions.
 * Long Double Functions:: The long double function support of libm.
 * Document Index::
 @end menu
+@end ifnottex
+
+@ifset XTENSA
+@node Revisions
+@unnumbered Changes from Previous Versions
+Tensilica newlib C math library has been upgraded from version 1.19.0 to version 2.0.0.
+@end ifset
 
 @include targetdep.tex
 
@@ -125,6 +176,7 @@ For such platforms, the long double math functions are implemented as calls to t
 @unnumbered Document Index
 @printindex cp
 
+@ignore
 @tex
 % I think something like @@colophon should be in texinfo.  In the
 % meantime:
@@ -139,8 +191,6 @@ For such platforms, the long double math functions are implemented as calls to t
 \page\colophon
 % Blame: pesch@@cygnus.com, 28mar91.
 @end tex
+@end ignore
 
-@contents
 @bye
-
-

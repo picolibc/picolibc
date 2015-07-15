@@ -14,9 +14,22 @@ system, without an OS---you will at least need to provide do-nothing
 stubs (or subroutines with minimal functionality) to allow your
 programs to link with the subroutines in @code{libc.a}.
 
+System routines may be provided in either reentrant or non-reentrant
+versions.  The reentrant versions take an extra argument for the
+reentrancy structure and have different names, formed by prepending
+@samp{_} and appending @samp{_r} (e.g., @code{_close_r} instead of
+@code{close}).  If newlib is configured to use reentrant system
+routines, the non-reentrant versions of the system routines are provided
+as cover routines.  Likewise, if newlib is configured to use
+non-reentrant system routines, reentrant cover routines are provided
+that achieve reentrancy by using a reserved global data block.
+@xref{Reentrancy,,Reentrancy}.
+
 @menu
 * Stubs::		Definitions for OS interface
-* Reentrant Syscalls::	Reentrant covers for OS subroutines
+@ifset XTENSA
+* Xtensa Syscalls::     System calls in the default Xtensa runtime
+@end ifset
 @end menu
 
 @node Stubs
@@ -30,7 +43,8 @@ required; the examples shown implement the minimal functionality
 required to allow @code{libc} to link, and fail gracefully where OS
 services are not available.  
 
-Graceful failure is permitted by returning an error code.  A minor
+Graceful failure is permitted by returning an error code.  If newlib is
+configured to use non-reentrant system routines, a minor
 complication arises here: the C library must be compatible with
 development environments that supply fully functional versions of these
 subroutines.  Such environments usually return error codes in a global
@@ -45,9 +59,9 @@ capture the @code{errno} values returned globally, and record them in
 the appropriate field of the reentrancy structure (so that you can query
 them using the @code{errno} macro from @file{errno.h}).
 
-This mechanism becomes visible when you write stub routines for OS
-interfaces.   You must include @file{errno.h}, then disable the macro,
-like this:
+This mechanism becomes visible when you write non-reentrant stub
+routines for OS interfaces.  You must include @file{errno.h}, then
+disable the macro, like this:
 
 @example
 #include <errno.h>
@@ -57,12 +71,23 @@ extern int errno;
 
 @noindent
 The examples in this chapter include this treatment of @code{errno}.
+If you are writing reentrant stub routines, this issue is irrelevant
+because the error code is stored into the reentrancy structure and 
+there is no need for a global variable.
+
+For simplicity, only the non-reentrant versions of the system routines
+are shown here.  The reentrant versions are similar except for
+the function names, the extra reentrancy structure argument,
+and the error codes being stored into the reentrancy structure
+instead of the global @code{errno} variable.
 
 @ftable @code
 @item _exit
 Exit a program without cleaning up files.  If your system doesn't
 provide this, it is best to avoid linking with subroutines that require
-it (@code{exit}, @code{system}).
+it (@code{exit}, @code{system}).  Note that there is no separate
+reentrant version of this routine, even when newlib is configured to use
+reentrant system routines.
 
 @item close
 Close a file.  Minimal implementation:
@@ -92,6 +117,16 @@ without processes):
 extern int errno;
 int execve(char *name, char **argv, char **env) @{
   errno = ENOMEM;
+  return -1;
+@}
+@end example
+
+@item fcntl
+File control commands.  Minimal implementation:
+
+@example
+int fcntl(int fildes, int cmd, int arg) @{
+  errno = EAGAIN;
   return -1;
 @}
 @end example
@@ -134,6 +169,20 @@ int getpid(void) @{
 @}
 @end example
 
+@item gettimeofday
+Get the current time.  Minimal implementation:
+
+@example
+#include <sys/time.h>
+int gettimeofday(struct timeval *tv,
+                 struct timezone *tz) @{
+  errno = EINVAL;
+  return -1;
+@}
+@end example
+
+@ifclear XTENSA
+@c isatty is provided by newlib for Xtensa (in libc/sys/xtensa/isatty.c).
 @item isatty
 Query whether output stream is a terminal.   For consistency with the
 other minimal implementations, which only support output to
@@ -144,6 +193,7 @@ int isatty(int file) @{
   return 1;
 @}
 @end example
+@end ifclear
 
 @item kill
 Send a signal.  Minimal implementation:
@@ -195,6 +245,19 @@ Read from a file.  Minimal implementation:
 @example
 int read(int file, char *ptr, int len) @{
   return 0;
+@}
+@end example
+
+@item _rename
+Rename a file.  For systems that do not support the @code{link} system
+routine, newlib can be configured to use this optional routine for
+renaming files.  Note that the reentrant version of this routine is
+named @code{_rename_r}.  Minimal implementation:
+
+@example
+int _rename(char *oldpath, char *newpath) @{
+  errno = EINVAL;
+  return -1;
 @}
 @end example
 
@@ -276,7 +339,7 @@ system routine for output to all files, @emph{including}
 @code{stdout}---so if you need to generate any output, for example to a
 serial port for debugging, you should make your minimal @code{write}
 capable of doing this.  The following minimal implementation is an
-incomplete example; it relies on a @code{outbyte} subroutine (not
+incomplete example; it relies on an @code{outbyte} subroutine (not
 shown; typically, you must write this in assembler from examples
 provided by your hardware manufacturer) to actually perform the output.
 

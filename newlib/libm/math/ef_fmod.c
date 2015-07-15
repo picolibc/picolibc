@@ -13,13 +13,53 @@
  * ====================================================
  */
 
+#include "fdlibm.h"
+
+/* __ieee754_remainderf is provided by libgcc and presumably is faster
+   then original implementation */
+
+#ifndef __XTENSA__
+
+extern float __ieee754_remainderf(float x, float y);
+
+#ifdef __STDC__
+        float __ieee754_fmodf(float x, float y)
+#else
+        float __ieee754_fmodf(x,y)
+        float x,y ;
+#endif
+{
+        __int32_t hx,hy,sx,sy,sign;
+        GET_FLOAT_WORD(hx,x);
+        GET_FLOAT_WORD(hy,y);
+        sx = hx&0x80000000;             /* sign of x */
+        sy = hy&0x80000000;             /* sign of y */
+
+        x = __ieee754_remainderf(x,y);
+
+        /* Make sure the result has the same sign as x.  Exceptional
+           cases should be OK because the result will be either NaN or
+           the original value of x.  */
+
+        GET_FLOAT_WORD(hx,x);
+        sign = hx&0x80000000;           /* sign of the result */
+        if (sx ^ sign) {
+            if (sx ^ sy)
+	      y = -y;
+	    x += y;
+        }
+        return x;
+}
+
+#else
+
+/* original version */
+
 /* 
  * __ieee754_fmodf(x,y)
  * Return x mod y in exact arithmetic
  * Method: shift and subtract
  */
-
-#include "fdlibm.h"
 
 #ifdef __STDC__
 static const float one = 1.0, Zero[] = {0.0, -0.0,};
@@ -111,3 +151,6 @@ static float one = 1.0, Zero[] = {0.0, -0.0,};
 	}
 	return x;		/* exact output */
 }
+
+#endif
+

@@ -152,7 +152,6 @@ libgcj="target-libffi \
 # Note that libiberty is not a target library.
 target_libraries="target-libgcc \
 		target-libbacktrace \
-		target-libgloss \
 		target-newlib \
 		target-libgomp \
 		target-libcilkrts \
@@ -171,6 +170,9 @@ target_libraries="target-libgcc \
 		target-libobjc \
 		target-libada \
 		target-libgo"
+#TENSILICA-LOCAL - We have our own libgloss, so skip newlib's
+#		target-libgloss
+#TENSILICA-LOCAL
 
 # these tools are built using the target libraries, and are intended to
 # run only in the target environment

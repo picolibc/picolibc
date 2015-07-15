@@ -308,8 +308,20 @@ libm_la_LDFLAGS = -Xcompiler -nostdlib
 @USE_LIBTOOL_TRUE@libm_la_LIBADD = $(SUBLIBS)
 @USE_LIBTOOL_FALSE@noinst_LIBRARIES = libm.a
 info_TEXINFOS = libm.texinfo
-libm_TEXINFOS = targetdep.tex
-CLEANFILES = tmp.texi targetdep.tex stmp-targetdep *.xml *.3
+libm_TEXINFOS = targetdep.tex $(EXTRA_TEXI_FILES)
+
+# TENSILICA: add new dependencies for Tensilica-specific files
+EXTRA_TEXI_FILES =
+#	tensilica-version.texi \
+#	tensilica-address.texi \
+#	tensilica-legal-info.texi \
+#	tensilica-legal-tex.texi
+
+XTENSA_SRC_DIR = $(srcdir)/../../../..
+XTENSA_DOC_DIR = $(XTENSA_SRC_DIR)/Software-doc
+XTENSA_MINORVERSION = ".2"
+
+CLEANFILES = tmp.texi targetdep.tex stmp-targetdep *.xml *.3  $(EXTRA_TEXI_FILES)
 ACLOCAL_AMFLAGS = -I .. -I ../..
 CONFIG_STATUS_DEPENDENCIES = $(newlib_basedir)/configure.host
 all: all-recursive
@@ -406,10 +418,10 @@ distclean-libtool:
 	if $(MAKEINFO) $(AM_MAKEINFOFLAGS) $(MAKEINFOFLAGS) -I $(srcdir) \
 	 -o $@ $<; \
 	then \
-	  rc=0; \
+	  rc=$$?; \
 	  $(am__cd) $(srcdir); \
 	else \
-	  rc=$$?; \
+	  rc=0; \
 	  $(am__cd) $(srcdir) && \
 	  $$restore $$backupdir/* `echo "./$@" | sed 's|[^/]*$$||'`; \
 	fi; \
@@ -908,6 +920,20 @@ uninstall-am: uninstall-dvi-am uninstall-html-am uninstall-info-am \
 $(SUBLIBS):
 
 libm.dvi: targetdep.tex math/stmp-def complex/stmp-def fenv/stmp-def
+tensilica-version.texi: $(XTENSA_DOC_DIR)/issue-date $(XTENSA_SRC_DIR)/version
+	majorversion=`sed -e 's/\(.*\)\..*/\1/' < $(XTENSA_SRC_DIR)/version`; \
+	echo "@set XTENSAVERSION $$majorversion$(XTENSA_MINORVERSION)" > $@
+	issuedate=`cat $(XTENSA_DOC_DIR)/issue-date`; \
+	echo "@set ISSUEDATE $$issuedate" >> $@
+
+tensilica-address.texi tensilica-legal-info.texi tensilica-legal-tex.texi: \
+	% : $(XTENSA_DOC_DIR)/%
+	rm -f $@
+	cp $< $@
+
+libm.info: targetdep.tex math/stmp-def $(EXTRA_TEXI_FILES)
+
+libm.dvi libm.html libm.pdf: targetdep.tex math/stmp-def $(EXTRA_TEXI_FILES)
 
 stmp-targetdep: force
 	rm -f tmp.texi

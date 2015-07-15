@@ -32,8 +32,8 @@
 #else
 	float z;
 	z = __ieee754_remainderf(x,y);
-	if(_LIB_VERSION == _IEEE_ || isnan(y)) return z;
-	if(y==0.0f) {
+	if(_LIB_VERSION == _IEEE_ || isnan(y) || isnan(x)) return z;
+	if(y==0.0f || !finite(x)) {
 	    /* remainderf(x,0) */
 	    errno = EDOM;
 	    return 0.0f/0.0f;

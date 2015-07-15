@@ -131,6 +131,13 @@ at (string_type *buffer, unsigned int pos)
 static void
 catchar (string_type *buffer, char ch)
 {
+/* On newer cygwin, 1.7.15 onwards, for example, DOS files with CRLFs aren't handled 
+ * correctly, so let's skip the CRs
+ */
+#ifdef __CYGWIN__
+  if (ch == '\r')
+    return; /* skip CR */
+#endif
   if (buffer->write_idx == buffer->size) 
   {
     buffer->size *=2;
