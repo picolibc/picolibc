@@ -92,10 +92,6 @@ static	const double	one	= 1.0, tiny=1.0e-300;
 static	double	one	= 1.0, tiny=1.0e-300;
 #endif
 
-/* TENSILICA: always using a function in libgcc instead of this one */
-
-#if 0
-
 #ifdef __STDC__
 	double __ieee754_sqrt(double x)
 #else
@@ -196,8 +192,6 @@ static	double	one	= 1.0, tiny=1.0e-300;
 	INSERT_WORDS(z,ix0,ix1);
 	return z;
 }
- 
-#endif /* 0 */
  
 #endif /* defined(_DOUBLE_IS_32BITS) */
 
