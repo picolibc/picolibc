@@ -19,7 +19,7 @@
    TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
    SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.  */
 
-#include <xtensa/coreasm.h>
+#include <xtensa/config/core-isa.h>
 
 # Define macros for leaf function entry and return, supporting either the
 # standard register windowed ABI or the non-windowed call0 ABI.  These
