@@ -57,7 +57,7 @@ ARFLAGS = cru
 lib_a_AR = $(AR) $(ARFLAGS)
 lib_a_LIBADD =
 am_lib_a_OBJECTS = _atexit.$(OBJEXT) creat.$(OBJEXT) isatty.$(OBJEXT) \
-	clibrary_init.$(OBJEXT)
+	clibrary_init.$(OBJEXT) lock.$(OBJEXT)
 lib_a_OBJECTS = $(am_lib_a_OBJECTS)
 DEFAULT_INCLUDES = -I. -I$(srcdir)
 depcomp =
@@ -184,7 +184,7 @@ target_alias = @target_alias@
 AUTOMAKE_OPTIONS = cygnus
 INCLUDES = $(NEWLIB_CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLAGS)
 noinst_LIBRARIES = lib.a
-lib_a_SOURCES = _atexit.c creat.c isatty.c clibrary_init.c
+lib_a_SOURCES = _atexit.c creat.c isatty.c clibrary_init.c lock.c
 ACLOCAL_AMFLAGS = -I ../../..
 CONFIG_STATUS_DEPENDENCIES = $(newlib_basedir)/configure.host
 all: all-am
