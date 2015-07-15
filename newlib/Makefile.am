@@ -161,15 +161,15 @@ libc-libtool-objectlist: $(LIBM_OBJECTLISTS) $(LIBC_OBJECTLISTS)
 
 else
 
+# TENSILICA: removed libg.a hard link from the following rule
 libc.a: libc/libc.a libm.a
-	rm -rf libc.a libg.a tmp
+	rm -rf libc.a tmp
 	mkdir tmp
 	cd tmp; \
 	 $(AR) x ../libm.a $(MATHOBJS_IN_LIBC) ; \
 	 $(AR) x ../libc/libc.a ; \
 	 $(AR) $(AR_FLAGS) ../$@ *.o
 	$(RANLIB) libc.a
-	ln libc.a libg.a >/dev/null 2>/dev/null || cp libc.a libg.a
 	rm -rf tmp
 
 libc/libc.a: ; @true
@@ -191,10 +191,10 @@ $(BUILD_MULTISUBDIR)/crt0.o: $(CRT0_DIR)$(CRT0) $(BUILD_MULTISUBDIR)
 	ln $< $@ >/dev/null 2>/dev/null || cp $< $@
 
 $(BUILD_MULTISUBDIR)/libc.a: libc.a $(BUILD_MULTISUBDIR)
-	rm -f $@ $(BUILD_MULTISUBDIR)/libg.a
-	ln $< $@ >/dev/null 2>/dev/null || cp $< $@
-	ln libg.a $(BUILD_MULTISUBDIR)/libg.a >/dev/null 2>/dev/null || \
-	cp libg.a $(BUILD_MULTISUBDIR)/libg.a
+#	rm -f $@ $(BUILD_MULTISUBDIR)/libg.a
+#	ln $< $@ >/dev/null 2>/dev/null || cp $< $@
+#	ln libg.a $(BUILD_MULTISUBDIR)/libg.a >/dev/null 2>/dev/null || \
+#	cp libg.a $(BUILD_MULTISUBDIR)/libg.a
 
 $(BUILD_MULTISUBDIR)/libm.a: libm.a $(BUILD_MULTISUBDIR)
 	rm -f $@

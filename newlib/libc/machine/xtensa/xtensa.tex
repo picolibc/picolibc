@@ -1,0 +1,72 @@
+@node Xtensa
+@chapter Functions for Xtensa Processors
+
+This chapter describes machine-dependent functions that are included
+in the C library when it is built for Xtensa processors.
+
+@menu
+* setjmp::      Save stack environment
+* longjmp::     Non-local goto
+@end menu
+
+@page
+@node setjmp
+@section @code{setjmp}---save stack environment
+@findex setjmp
+@strong{Synopsis}
+@example
+#include <setjmp.h>
+int setjmp(jmp_buf env);
+
+@end example
+@strong{Description}@*
+@code{setjmp} and @code{longjmp} are useful for dealing with errors
+and interrupts encountered in a low-level subroutine of a program.
+@code{setjmp} saves the stack context/environment in @code{env} for
+later use by @code{longjmp}.  The stack context will be invalidated if
+the function which called @code{setjmp} returns.
+
+@*
+@strong{Returns}@*
+@code{setjmp} returns 0 if returning directly, and non-zero when
+returning from @code{longjmp} using the saved context.
+
+@*
+@strong{Portability}@*
+@code{setjmp} is ANSI C and POSIX.1.
+
+setjmp requires no supporting OS subroutines.
+
+@*
+@page
+@node longjmp
+@section @code{longjmp}---non-local goto
+@findex longjmp
+@strong{Synopsis}
+@example
+#include <setjmp.h>
+void longjmp(jmp_buf env, int val);
+
+@end example
+@strong{Description}@*
+@code{longjmp} and @code{setjmp} are useful for dealing with errors
+and interrupts encountered in a low-level subroutine of a program.
+@code{longjmp} restores the environment saved by the last call of
+@code{setjmp} with the corresponding @code{env} argument.  After
+@code{longjmp} is completed, program execution continues as if the
+corresponding call of @code{setjmp} had just returned the value
+@code{val}.  @code{longjmp} cannot cause 0 to be returned.  If
+@code{longjmp} is invoked with a second argument of 0, 1 will be
+returned instead.
+
+@*
+@strong{Returns}@*
+This function never returns.
+
+@*
+@strong{Portability}@*
+@code{longjmp} is ANSI C and POSIX.1.
+
+longjmp requires no supporting OS subroutines.
+
+@*

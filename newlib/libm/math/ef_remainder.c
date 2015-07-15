@@ -15,6 +15,10 @@
 
 #include "fdlibm.h"
 
+/* __ieee754_remainderf is provided by libgcc */
+
+#if 0
+
 #ifdef __STDC__
 static const float zero = 0.0;
 #else
@@ -66,3 +70,5 @@ static float zero = 0.0;
 	SET_FLOAT_WORD(x,hx^sx);
 	return x;
 }
+
+#endif /* 0 */

@@ -19,6 +19,9 @@
  * open -- open a file descriptor. We don't have a filesystem, so
  *         we return an error.
  */
+
+#ifndef REENTRANT_SYSCALLS_PROVIDED
+
 int
 open (const char *buf,
        int flags,
@@ -28,3 +31,19 @@ open (const char *buf,
   return (-1);
 }
 
+#else /* REENTRANT_SYSCALLS_PROVIDED */
+
+#include <sys/reent.h>
+
+int
+_DEFUN (_open_r, (ptr, buf, flags, mode),
+	struct _reent *ptr _AND
+	const char *buf _AND
+	int flags _AND
+	int mode)
+{
+  ptr->_errno = EIO;
+  return -1;
+}
+
+#endif /* REENTRANT_SYSCALLS_PROVIDED */

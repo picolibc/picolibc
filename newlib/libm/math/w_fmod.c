@@ -72,7 +72,7 @@ PORTABILITY
 	struct exception exc;
 	z = __ieee754_fmod(x,y);
 	if(_LIB_VERSION == _IEEE_ ||isnan(y)||isnan(x)) return z;
-	if(y==0.0) {
+	if(y==0.0 || !finite(x)) {
             /* fmod(x,0) */
             exc.type = DOMAIN;
             exc.name = "fmod";

@@ -59,8 +59,8 @@ PORTABILITY
 	double z;
 	struct exception exc;
 	z = __ieee754_remainder(x,y);
-	if(_LIB_VERSION == _IEEE_ || isnan(y)) return z;
-	if(y==0.0) { 
+	if(_LIB_VERSION == _IEEE_ || isnan(y) || isnan(x)) return z;
+	if(y==0.0 || !finite(x)) { 
             /* remainder(x,0) */
             exc.type = DOMAIN;
             exc.name = "remainder";

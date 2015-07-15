@@ -81,6 +81,7 @@
  *---------------
  */
 
+#include <xtensa/config/core-isa.h>
 #include "fdlibm.h"
 
 #ifndef _DOUBLE_IS_32BITS
@@ -90,6 +91,10 @@ static	const double	one	= 1.0, tiny=1.0e-300;
 #else
 static	double	one	= 1.0, tiny=1.0e-300;
 #endif
+
+/* TENSILICA: always using a function in libgcc instead of this one */
+
+#if 0
 
 #ifdef __STDC__
 	double __ieee754_sqrt(double x)
@@ -191,6 +196,8 @@ static	double	one	= 1.0, tiny=1.0e-300;
 	INSERT_WORDS(z,ix0,ix1);
 	return z;
 }
+ 
+#endif /* 0 */
  
 #endif /* defined(_DOUBLE_IS_32BITS) */
 
@@ -450,3 +457,4 @@ B.  sqrt(x) by Reciproot Iteration
     (4)	Special cases (see (4) of Section A).	
  
  */
+
