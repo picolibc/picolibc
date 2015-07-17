@@ -1,5 +1,15 @@
 2015-07-17  Corinna Vinschen  <corinna@vinschen.de>
 
+	* exceptions.cc (__unwind_single_frame): Move up in file to be
+	accessible from other places.  Move comment to getcontext.
+	(stack_info::walk): Call __unwind_single_frame in 64 bit case.  Fix
+	preceeding comment.
+	(myfault_altstack_handler): Call __unwind_single_frame.
+	(getcontext): Give comment from __unwind_single_frame a new home.
+	(swapcontext): Fix comment.
+
+2015-07-17  Corinna Vinschen  <corinna@vinschen.de>
+
 	* common.din (getcontext): Export.
 	(makecontext): Export.
 	(setcontext): Export.

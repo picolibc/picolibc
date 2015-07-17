@@ -280,17 +280,36 @@ stack_info::init (PUINT_PTR framep, bool wantargs, PCONTEXT ctx)
 
 extern "C" void _cygwin_exit_return ();
 
-/* Walk the stack by looking at successive stored 'bp' frames.
+#ifdef __x86_64__
+static inline void
+__unwind_single_frame (PCONTEXT ctx)
+{
+  PRUNTIME_FUNCTION f;
+  ULONG64 imagebase;
+  UNWIND_HISTORY_TABLE hist;
+  DWORD64 establisher;
+  PVOID hdl;
+
+  f = RtlLookupFunctionEntry (ctx->Rip, &imagebase, &hist);
+  if (f)
+    RtlVirtualUnwind (0, imagebase, ctx->Rip, f, ctx, &hdl, &establisher,
+		      NULL);
+  else
+    {
+      ctx->Rip = *(ULONG_PTR *) ctx->Rsp;
+      ctx->Rsp += 8;
+    }
+}
+#endif
+
+/* Walk the stack.
+
+   On 32 bit we're doing this by looking at successive stored 'ebp' frames.
    This is not foolproof. */
 int
 stack_info::walk ()
 {
 #ifdef __x86_64__
-  PRUNTIME_FUNCTION f;
-  ULONG64 imagebase;
-  DWORD64 establisher;
-  PVOID hdl;
-
   if (!c.Rip)
     return 0;
 
@@ -306,15 +325,7 @@ stack_info::walk ()
       sigstackptr--;
       return 1;
     }
-
-  f = RtlLookupFunctionEntry (c.Rip, &imagebase, &hist);
-  if (f)
-    RtlVirtualUnwind (0, imagebase, c.Rip, f, &c, &hdl, &establisher, NULL);
-  else
-    {
-      c.Rip = *(ULONG_PTR *) c.Rsp;
-      c.Rsp += 8;
-    }
+  __unwind_single_frame (&c);
   if (needargs && c.Rip)
     {
       PULONG_PTR p = (PULONG_PTR) c.Rsp;
@@ -605,28 +616,13 @@ myfault_altstack_handler (EXCEPTION_POINTERS *exc)
 
   if (me.andreas)
     {
-      PRUNTIME_FUNCTION f;
-      ULONG64 imagebase;
-      UNWIND_HISTORY_TABLE hist;
-      DWORD64 establisher;
-      PVOID hdl;
       CONTEXT *c = exc->ContextRecord;
 
       /* Unwind the stack manually and call RtlRestoreContext.  This
 	 is necessary because RtlUnwindEx checks the stack for validity,
 	 which, as outlined above, fails for the alternate stack. */
       while (c->Rsp < me.andreas->frame)
-	{
-	  f = RtlLookupFunctionEntry (c->Rip, &imagebase, &hist);
-	  if (f)
-	    RtlVirtualUnwind (0, imagebase, c->Rip, f, c, &hdl, &establisher,
-			      NULL);
-	  else
-	    {
-	      c->Rip = *(ULONG_PTR *) c->Rsp;
-	      c->Rsp += 8;
-	    }
-	}
+	__unwind_single_frame (c);
       c->Rip = me.andreas->ret;
       RtlRestoreContext (c, NULL);
     }
@@ -1865,33 +1861,6 @@ _cygtls::signal_debugger (siginfo_t& si)
     }
 }
 
-#ifdef __x86_64__
-static inline void
-__unwind_single_frame (PCONTEXT ctx)
-{
-  /* Amazing, but true:  On 32 bit, RtlCaptureContext returns the context
-     matching the caller of getcontext, so all we have to do is call it.
-     On 64 bit, RtlCaptureContext returns the exact context of its own
-     caller, so we have to unwind virtually by a single frame to get the
-     context of the caller of getcontext. */
-  PRUNTIME_FUNCTION f;
-  ULONG64 imagebase;
-  UNWIND_HISTORY_TABLE hist;
-  DWORD64 establisher;
-  PVOID hdl;
-
-  f = RtlLookupFunctionEntry (ctx->Rip, &imagebase, &hist);
-  if (f)
-    RtlVirtualUnwind (0, imagebase, ctx->Rip, f, ctx, &hdl, &establisher,
-		      NULL);
-  else
-    {
-      ctx->Rip = *(ULONG_PTR *) ctx->Rsp;
-      ctx->Rsp += 8;
-    }
-}
-#endif
-
 extern "C" int
 setcontext (const ucontext_t *ucp)
 {
@@ -1917,6 +1886,11 @@ getcontext (ucontext_t *ucp)
   PCONTEXT ctx = (PCONTEXT) &ucp->uc_mcontext;
   ctx->ContextFlags = CONTEXT_FULL;
   RtlCaptureContext (ctx);
+  /* Amazing, but true:  On 32 bit, RtlCaptureContext returns the context
+     matching the caller of getcontext, so all we have to do is call it.
+     On 64 bit, RtlCaptureContext returns the exact context of its own
+     caller, so we have to unwind virtually by a single frame to get the
+     context of the caller of getcontext. */
   __unwind_single_frame (ctx);
   /* Successful getcontext is supposed to return 0.  If we don't set rax to 0
      here, there's a chance that code like this:
@@ -1937,8 +1911,8 @@ swapcontext (ucontext_t *oucp, const ucontext_t *ucp)
   PCONTEXT ctx = (PCONTEXT) &oucp->uc_mcontext;
   ctx->ContextFlags = CONTEXT_FULL;
   RtlCaptureContext (ctx);
+  /* See comments in getcontext. */
   __unwind_single_frame (ctx);
-  /* See above. */
   oucp->uc_mcontext.rax = 0;
   oucp->uc_sigmask = oucp->uc_mcontext.oldmask = _my_tls.sigmask;
   return setcontext (ucp);
