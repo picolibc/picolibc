@@ -1,5 +1,12 @@
 2015-07-17  Corinna Vinschen  <corinna@vinschen.de>
 
+	* exceptions.cc (getcontext/x86_64): Drop comment on RtlCaptureContext.
+	(swapcontext/x86_64): Fix comment yet again.
+	(getcontext/i686): Move comment from x86_64 getcontext, slightly
+	rearranged, to preceeding comment.
+
+2015-07-17  Corinna Vinschen  <corinna@vinschen.de>
+
 	* exceptions.cc (__unwind_single_frame): Move up in file to be
 	accessible from other places.  Move comment to getcontext.
 	(stack_info::walk): Call __unwind_single_frame in 64 bit case.  Fix

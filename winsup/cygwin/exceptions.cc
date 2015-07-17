@@ -1886,11 +1886,6 @@ getcontext (ucontext_t *ucp)
   PCONTEXT ctx = (PCONTEXT) &ucp->uc_mcontext;
   ctx->ContextFlags = CONTEXT_FULL;
   RtlCaptureContext (ctx);
-  /* Amazing, but true:  On 32 bit, RtlCaptureContext returns the context
-     matching the caller of getcontext, so all we have to do is call it.
-     On 64 bit, RtlCaptureContext returns the exact context of its own
-     caller, so we have to unwind virtually by a single frame to get the
-     context of the caller of getcontext. */
   __unwind_single_frame (ctx);
   /* Successful getcontext is supposed to return 0.  If we don't set rax to 0
      here, there's a chance that code like this:
@@ -1911,8 +1906,8 @@ swapcontext (ucontext_t *oucp, const ucontext_t *ucp)
   PCONTEXT ctx = (PCONTEXT) &oucp->uc_mcontext;
   ctx->ContextFlags = CONTEXT_FULL;
   RtlCaptureContext (ctx);
-  /* See comments in getcontext. */
   __unwind_single_frame (ctx);
+  /* See comment in getcontext. */
   oucp->uc_mcontext.rax = 0;
   oucp->uc_sigmask = oucp->uc_mcontext.oldmask = _my_tls.sigmask;
   return setcontext (ucp);
@@ -1940,6 +1935,11 @@ __cont_link_context:			\n\
 /* On 32 bit it's crucial to call RtlCaptureContext in a way which makes sure
    the callee-saved registers, especially $ebx, are not changed by the calling
    function.  If so, makecontext/__cont_link_context would be broken.
+
+   Amazing, but true:  While on 64 bit RtlCaptureContext returns the exact
+   context of its own caller, as expected, on 32 bit RtlCaptureContext returns
+   the context of the callers caller.  So while we have to unwind another frame
+   on 64 bit, we can skip this step on 32 bit.
 
    Both functions are split into the first half in assembler, and the second
    half in C to allow easy access to _my_tls. */
