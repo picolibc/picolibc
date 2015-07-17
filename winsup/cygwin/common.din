@@ -503,6 +503,7 @@ getc SIGFE
 getc_unlocked SIGFE
 getchar SIGFE
 getchar_unlocked SIGFE
+getcontext NOSIGFE
 getcwd SIGFE
 getdelim = __getdelim SIGFE
 getdomainname SIGFE
@@ -717,6 +718,7 @@ lsetxattr SIGFE
 lstat SIGFE
 lutimes SIGFE
 madvise = posix_madvise SIGFE
+makecontext NOSIGFE
 mallinfo SIGFE
 malloc SIGFE
 malloc_stats SIGFE
@@ -1054,6 +1056,7 @@ sendmsg = cygwin_sendmsg SIGFE
 sendto = cygwin_sendto SIGFE
 setbuf SIGFE
 setbuffer SIGFE
+setcontext NOSIGFE
 sethostname SIGFE
 setdtablesize SIGFE
 setegid SIGFE
@@ -1199,6 +1202,7 @@ strtoumax = strtoull NOSIGFE
 strupr NOSIGFE
 strxfrm NOSIGFE
 swab NOSIGFE
+swapcontext NOSIGFE
 swprintf SIGFE
 swscanf SIGFE
 symlink SIGFE

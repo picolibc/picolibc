@@ -1,3 +1,10 @@
+2015-07-17  Corinna Vinschen  <corinna@vinschen.de>
+
+	* new-features.xml (ov-new2.2): Add new section.  Document getcontext,
+	setcontext, makecontext, swapcontext.
+	* posix.xml (std-deprec): Add getcontext, setcontext, makecontext,
+	swapcontext.
+
 2015-07-05  Jon Turney  <jon.turney@dronecode.org.uk>
 
 	* configure.ac: Add check for DOCBOOK2XTEXI

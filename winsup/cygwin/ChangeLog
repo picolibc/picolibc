@@ -1,5 +1,26 @@
 2015-07-17  Corinna Vinschen  <corinna@vinschen.de>
 
+	* common.din (getcontext): Export.
+	(makecontext): Export.
+	(setcontext): Export.
+	(swapcontext): Export.
+	* exceptions.cc (__unwind_single_frame): New static functions, 64 bit
+	only.
+	(setcontext): New function.
+	(getcontext): New function.
+	(swapcontext): New function.
+	(__cont_link_context): New function.
+	(makecontext): New function.
+	* include/cygwin/version.h (CYGWIN_VERSION_DLL_MAJOR): Bump to 2002.
+	(CYGWIN_VERSION_API_MINOR): Bump.
+	* include/ucontext.h (getcontext): Add prototype.
+	(setcontext): Ditto.
+	(swapcontext): Ditto.
+	(makecontext): Ditto.
+	* ntdll.h (NtContinue): Ditto.
+
+2015-07-17  Corinna Vinschen  <corinna@vinschen.de>
+
 	* include/cygwin/version.h (CYGWIN_VERSION_API_MINOR): Document the
 	fact that we forgot to bump for sigaltstack and sethostname.
 

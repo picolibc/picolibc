@@ -14,6 +14,7 @@ details. */
 #include "miscfuncs.h"
 #include <imagehlp.h>
 #include <stdlib.h>
+#include <stdarg.h>
 #include <syslog.h>
 #include <wchar.h>
 #include <ucontext.h>
@@ -1862,4 +1863,227 @@ _cygtls::signal_debugger (siginfo_t& si)
 	}
       ResumeThread (th);
     }
+}
+
+#ifdef __x86_64__
+static inline void
+__unwind_single_frame (PCONTEXT ctx)
+{
+  /* Amazing, but true:  On 32 bit, RtlCaptureContext returns the context
+     matching the caller of getcontext, so all we have to do is call it.
+     On 64 bit, RtlCaptureContext returns the exact context of its own
+     caller, so we have to unwind virtually by a single frame to get the
+     context of the caller of getcontext. */
+  PRUNTIME_FUNCTION f;
+  ULONG64 imagebase;
+  UNWIND_HISTORY_TABLE hist;
+  DWORD64 establisher;
+  PVOID hdl;
+
+  f = RtlLookupFunctionEntry (ctx->Rip, &imagebase, &hist);
+  if (f)
+    RtlVirtualUnwind (0, imagebase, ctx->Rip, f, ctx, &hdl, &establisher,
+		      NULL);
+  else
+    {
+      ctx->Rip = *(ULONG_PTR *) ctx->Rsp;
+      ctx->Rsp += 8;
+    }
+}
+#endif
+
+extern "C" int
+setcontext (const ucontext_t *ucp)
+{
+  PCONTEXT ctx = (PCONTEXT) &ucp->uc_mcontext;
+  _my_tls.sigmask = ucp->uc_sigmask;
+#ifdef __x86_64__
+  /* Apparently a call to NtContinue works on 64 bit as well, but using
+     RtlRestoreContext is the blessed way. */
+  RtlRestoreContext (ctx, NULL);
+#else
+  NtContinue (ctx, FALSE);
+#endif
+  /* If we got here, something was wrong. */
+  set_errno (EINVAL);
+  return -1;
+}
+
+#ifdef __x86_64__
+
+extern "C" int
+getcontext (ucontext_t *ucp)
+{
+  PCONTEXT ctx = (PCONTEXT) &ucp->uc_mcontext;
+  ctx->ContextFlags = CONTEXT_FULL;
+  RtlCaptureContext (ctx);
+  __unwind_single_frame (ctx);
+  /* Successful getcontext is supposed to return 0.  If we don't set rax to 0
+     here, there's a chance that code like this:
+
+       if (getcontext (&ctx) != 0)
+
+     assumes that getcontext failed after calling setcontext (&ctx).
+     Same goes for eax on 32 bit, see assembler implementation below. */
+  ucp->uc_mcontext.rax = 0;
+  ucp->uc_sigmask = ucp->uc_mcontext.oldmask = _my_tls.sigmask;
+  /* Do not touch any other member of ucontext_t. */
+  return 0;
+}
+
+extern "C" int
+swapcontext (ucontext_t *oucp, const ucontext_t *ucp)
+{
+  PCONTEXT ctx = (PCONTEXT) &oucp->uc_mcontext;
+  ctx->ContextFlags = CONTEXT_FULL;
+  RtlCaptureContext (ctx);
+  __unwind_single_frame (ctx);
+  /* See above. */
+  oucp->uc_mcontext.rax = 0;
+  oucp->uc_sigmask = oucp->uc_mcontext.oldmask = _my_tls.sigmask;
+  return setcontext (ucp);
+}
+
+/* Trampoline function to set the context to uc_link.  The pointer to the
+   address of uc_link is stored in the callee-saved register $rbx.  If uc_link
+   is NULL, call exit. */
+__asm__ ("				\n\
+	.global	__cont_link_context	\n\
+__cont_link_context:			\n\
+	movq	%rbx, %rsp		\n\
+	popq	%rcx			\n\
+	testq	%rcx, %rcx		\n\
+	je	1f			\n\
+	call	setcontext		\n\
+	movq	$0xff, %rcx		\n\
+1:					\n\
+	call	cygwin_exit		\n\
+	nop				\n\
+	");
+
+#else
+
+/* On 32 bit it's crucial to call RtlCaptureContext in a way which makes sure
+   the callee-saved registers, especially $ebx, are not changed by the calling
+   function.  If so, makecontext/__cont_link_context would be broken.
+
+   Both functions are split into the first half in assembler, and the second
+   half in C to allow easy access to _my_tls. */
+
+extern "C" int
+__getcontext (ucontext_t *ucp)
+{
+  ucp->uc_mcontext.eax = 0;
+  ucp->uc_sigmask = ucp->uc_mcontext.oldmask = _my_tls.sigmask;
+  return 0;
+}
+
+__asm__ ("				\n\
+	.global	_getcontext		\n\
+_getcontext:				\n\
+	pushl	%ebp			\n\
+	movl	%esp, %ebp		\n\
+	movl	8(%esp), %eax		\n\
+	pushl	%eax			\n\
+	call	_RtlCaptureContext@4	\n\
+	popl	%ebp			\n\
+	jmp	___getcontext		\n\
+	nop				\n\
+	");
+
+extern "C" int
+__swapcontext (ucontext_t *oucp, const ucontext_t *ucp)
+{
+  oucp->uc_mcontext.eax = 0;
+  oucp->uc_sigmask = oucp->uc_mcontext.oldmask = _my_tls.sigmask;
+  return setcontext (ucp);
+}
+
+__asm__ ("				\n\
+	.global	_swapcontext		\n\
+_swapcontext:				\n\
+	pushl	%ebp			\n\
+	movl	%esp, %ebp		\n\
+	movl	8(%esp), %eax		\n\
+	pushl	%eax			\n\
+	call	_RtlCaptureContext@4	\n\
+	popl	%ebp			\n\
+	jmp	___swapcontext		\n\
+	nop				\n\
+	");
+
+/* Trampoline function to set the context to uc_link.  The pointer to the
+   address of uc_link is stored in the callee-saved register $ebx.  If uc_link
+   is NULL, call exit. */
+__asm__ ("				\n\
+	.global	___cont_link_context	\n\
+___cont_link_context:			\n\
+	movl	%ebx, %esp		\n\
+	movl	(%esp), %eax		\n\
+	testl	%eax, %eax		\n\
+	je	1f			\n\
+	call	_setcontext		\n\
+	movl	$0xff, (%esp)		\n\
+1:					\n\
+	call	_cygwin_exit		\n\
+	nop				\n\
+	");
+#endif
+
+/* makecontext is modelled after GLibc's makecontext.  The stack from uc_stack
+   is prepared so that it starts with a pointer to the linked context uc_link,
+   followed by the arguments to func, and finally at the bottom the "return"
+   address set to __cont_link_context.  In the ucp context, rbx/ebx is set to
+   point to the stack address where the pointer to uc_link is stored.  The
+   requirement to make this work is that rbx/ebx are callee-saved registers
+   per the ABI.  If any function is called which doesn't follow the ABI
+   conventions, e.g. assembler code, this method will break.  But that's ok. */
+extern "C" void
+makecontext (ucontext_t *ucp, void (*func) (void), int argc, ...)
+{
+  extern void __cont_link_context (void);
+  uintptr_t *sp;
+  va_list ap;
+
+  sp = (uintptr_t *) ((uintptr_t) ucp->uc_stack.ss_sp
+				+ ucp->uc_stack.ss_size);
+  sp -= (argc + 1);
+  sp = (uintptr_t *) ((uintptr_t) sp & ~0xf);
+  --sp;
+  sp[0] = (uintptr_t) __cont_link_context;
+  sp[argc + 1] = (uintptr_t) ucp->uc_link;
+#ifdef __x86_64__
+  ucp->uc_mcontext.rip = (uint64_t) func;
+  ucp->uc_mcontext.rbx = (uint64_t) (sp + argc + 1);
+  ucp->uc_mcontext.rsp = (uint64_t) sp;
+#else
+  ucp->uc_mcontext.eip = (uint32_t) func;
+  ucp->uc_mcontext.ebx = (uint32_t) (sp + argc + 1);
+  ucp->uc_mcontext.esp = (uint32_t) sp;
+#endif
+  va_start (ap, argc);
+  for (int i = 0; i < argc; ++i)
+#ifdef __x86_64__
+    switch (i)
+      {
+      case 0:
+	ucp->uc_mcontext.rcx = va_arg (ap, uintptr_t);
+	break;
+      case 1:
+	ucp->uc_mcontext.rdx = va_arg (ap, uintptr_t);
+	break;
+      case 2:
+	ucp->uc_mcontext.r8 = va_arg (ap, uintptr_t);
+	break;
+      case 3:
+	ucp->uc_mcontext.r9 = va_arg (ap, uintptr_t);
+	break;
+      default:
+	sp[i + 1] = va_arg (ap, uintptr_t);
+	break;
+      }
+#else
+    sp[i + 1] = va_arg (ap, uintptr_t);
+#endif
+  va_end (ap);
 }

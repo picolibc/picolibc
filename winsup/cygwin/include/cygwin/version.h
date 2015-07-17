@@ -42,7 +42,7 @@ details. */
 	 the Cygwin shared library".  This version is used to track important
 	 changes to the DLL and is mainly informative in nature. */
 
-#define CYGWIN_VERSION_DLL_MAJOR 2001
+#define CYGWIN_VERSION_DLL_MAJOR 2002
 #define CYGWIN_VERSION_DLL_MINOR 0
 
       /* Major numbers before CYGWIN_VERSION_DLL_EPOCH are
@@ -469,13 +469,14 @@ details. */
       285: Export wcstold.
       286: Export cabsl, cimagl, creall, finitel, hypotl, sqrtl.
       287: Export issetugid.
+      288: Export getcontext, makecontext, setcontext, swapcontext.
      */
 
      /* Note that we forgot to bump the api for ualarm, strtoll, strtoull,
 	sigaltstack, sethostname. */
 
 #define CYGWIN_VERSION_API_MAJOR 0
-#define CYGWIN_VERSION_API_MINOR 287
+#define CYGWIN_VERSION_API_MINOR 288
 
      /* There is also a compatibity version number associated with the
 	shared memory regions.  It is incremented when incompatible
