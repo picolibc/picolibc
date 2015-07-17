@@ -471,7 +471,8 @@ details. */
       287: Export issetugid.
      */
 
-     /* Note that we forgot to bump the api for ualarm, strtoll, strtoull */
+     /* Note that we forgot to bump the api for ualarm, strtoll, strtoull,
+	sigaltstack, sethostname. */
 
 #define CYGWIN_VERSION_API_MAJOR 0
 #define CYGWIN_VERSION_API_MINOR 287

@@ -1,3 +1,8 @@
+2015-07-17  Corinna Vinschen  <corinna@vinschen.de>
+
+	* include/cygwin/version.h (CYGWIN_VERSION_API_MINOR): Document the
+	fact that we forgot to bump for sigaltstack and sethostname.
+
 2015-07-13  Corinna Vinschen  <corinna@vinschen.de>
 
 	* exceptions.cc (exception::handle): Reenable code only disabled for
