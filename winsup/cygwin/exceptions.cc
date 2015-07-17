@@ -300,6 +300,8 @@ __unwind_single_frame (PCONTEXT ctx)
       ctx->Rsp += 8;
     }
 }
+#else
+#define __unwind_single_frame(ctx)
 #endif
 
 /* Walk the stack.
@@ -1667,11 +1669,20 @@ _cygtls::call_signal_handler ()
 		    sizeof (CONTEXT));
 	  else
 	    {
-	      /* FIXME: Really this should be the context which the signal
-		 interrupted? */
-	      memset(&context.uc_mcontext, 0, sizeof (struct __mcontext));
+	      /* Software-generated signal.  We're fetching the current
+		 context, unwind to the caller and in case we're called
+		 from sigdelayed, fix rip/eip accordingly. */
 	      context.uc_mcontext.ctxflags = CONTEXT_FULL;
-	      RtlCaptureContext ((CONTEXT *) &context.uc_mcontext);
+	      RtlCaptureContext ((PCONTEXT) &context.uc_mcontext);
+	      __unwind_single_frame ((PCONTEXT) &context.uc_mcontext);
+	      if (stackptr > stack)
+		{
+#ifdef __x86_64__
+		  context.uc_mcontext.rip = retaddr ();
+#else
+		  context.uc_mcontext.eip = retaddr ();
+#endif
+		}
 	    }
 
 	  if (this_sa_flags & SA_ONSTACK

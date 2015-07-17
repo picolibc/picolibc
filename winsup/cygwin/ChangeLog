@@ -1,5 +1,11 @@
 2015-07-17  Corinna Vinschen  <corinna@vinschen.de>
 
+	* exceptions.cc (__unwind_single_frame): Define empty macro on i686.
+	(_cygtls::call_signal_handler): Try to make sure signal context makes
+	sense in case we're generating context here.  Add comment to explain.
+
+2015-07-17  Corinna Vinschen  <corinna@vinschen.de>
+
 	* exceptions.cc (getcontext/x86_64): Drop comment on RtlCaptureContext.
 	(swapcontext/x86_64): Fix comment yet again.
 	(getcontext/i686): Move comment from x86_64 getcontext, slightly
