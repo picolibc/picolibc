@@ -1,4 +1,8 @@
-2015-07-17  Corinna Vinschen  <corinna@vinschen.de>
+2015-07-18  Corinna Vinschen  <corinna@vinschen.de>
+
+	* gendef: Remove unused 64 bit versions of __sjfault and __ljfault.
+
+2015-07-18  Corinna Vinschen  <corinna@vinschen.de>
 
 	* exceptions.cc (makecontext): Rearrange order of initialization and
 	document at great length.
