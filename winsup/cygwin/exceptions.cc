@@ -2030,22 +2030,31 @@ makecontext (ucontext_t *ucp, void (*func) (void), int argc, ...)
   uintptr_t *sp;
   va_list ap;
 
-  sp = (uintptr_t *) ((uintptr_t) ucp->uc_stack.ss_sp
-				+ ucp->uc_stack.ss_size);
+  /* Initialize sp to the top of the stack. */
+  sp = (uintptr_t *) ((uintptr_t) ucp->uc_stack.ss_sp + ucp->uc_stack.ss_size);
+  /* Subtract slots required for arguments and the pointer to uc_link. */
   sp -= (argc + 1);
+  /* Align. */
   sp = (uintptr_t *) ((uintptr_t) sp & ~0xf);
+  /* Subtract one slot for setting the return address. */
   --sp;
+  /* Set return address to the trampolin function __cont_link_context. */
   sp[0] = (uintptr_t) __cont_link_context;
-  sp[argc + 1] = (uintptr_t) ucp->uc_link;
-#ifdef __x86_64__
-  ucp->uc_mcontext.rip = (uint64_t) func;
-  ucp->uc_mcontext.rbx = (uint64_t) (sp + argc + 1);
-  ucp->uc_mcontext.rsp = (uint64_t) sp;
-#else
-  ucp->uc_mcontext.eip = (uint32_t) func;
-  ucp->uc_mcontext.ebx = (uint32_t) (sp + argc + 1);
-  ucp->uc_mcontext.esp = (uint32_t) sp;
-#endif
+  /* Fetch arguments and store them on the stack.
+
+     x86_64 only:
+
+     - Store first four args in the AMD64 ABI arg registers.
+
+     - Note that the stack is not short by these four register args.  The
+       reason is the shadow space for these regs required by the AMD64 ABI.
+
+     - The definition of makecontext only allows for "int" sized arguments to
+       func, 32 bit, likely for historical reasons.  However, the argument
+       slots on x86_64 are 64 bit anyway, so we can fetch and store the args
+       as 64 bit values, and func can request 64 bit args without violating
+       the definition.  This potentially allows porting 32 bit applications
+       providing pointer values to func without additional porting effort. */
   va_start (ap, argc);
   for (int i = 0; i < argc; ++i)
 #ifdef __x86_64__
@@ -2071,4 +2080,20 @@ makecontext (ucontext_t *ucp, void (*func) (void), int argc, ...)
     sp[i + 1] = va_arg (ap, uintptr_t);
 #endif
   va_end (ap);
+  /* Store pointer to uc_link at the top of the stack. */
+  sp[argc + 1] = (uintptr_t) ucp->uc_link;
+  /* Last but not least set the register in the context at ucp so that a
+     subsequent setcontext or swapcontext picks up the right values:
+     - Set rip/eip to the target function.
+     - Set rsp/esp to the just computed stack pointer value.
+     - Set rbx/ebx to the address of the pointer to uc_link. */
+#ifdef __x86_64__
+  ucp->uc_mcontext.rip = (uint64_t) func;
+  ucp->uc_mcontext.rsp = (uint64_t) sp;
+  ucp->uc_mcontext.rbx = (uint64_t) (sp + argc + 1);
+#else
+  ucp->uc_mcontext.eip = (uint32_t) func;
+  ucp->uc_mcontext.esp = (uint32_t) sp;
+  ucp->uc_mcontext.ebx = (uint32_t) (sp + argc + 1);
+#endif
 }

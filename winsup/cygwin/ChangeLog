@@ -1,5 +1,10 @@
 2015-07-17  Corinna Vinschen  <corinna@vinschen.de>
 
+	* exceptions.cc (makecontext): Rearrange order of initialization and
+	document at great length.
+
+2015-07-17  Corinna Vinschen  <corinna@vinschen.de>
+
 	* exceptions.cc (__unwind_single_frame): Define empty macro on i686.
 	(_cygtls::call_signal_handler): Try to make sure signal context makes
 	sense in case we're generating context here.  Add comment to explain.
