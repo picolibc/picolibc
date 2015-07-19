@@ -355,12 +355,10 @@ struct sigaction
    Do not use.  */
 #define _SA_INTERNAL_MASK 0xf000	/* bits in this range are internal */
 
-#ifndef	MINSIGSTKSZ
-#define	MINSIGSTKSZ	32768
-#endif
-#ifndef	SIGSTKSZ
-#define	SIGSTKSZ	65536
-#endif
+#undef	MINSIGSTKSZ
+#define	MINSIGSTKSZ	 8192
+#undef	SIGSTKSZ
+#define	SIGSTKSZ	32768
 
 #define	SIGHUP	1	/* hangup */
 #define	SIGINT	2	/* interrupt */

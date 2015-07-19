@@ -1,5 +1,10 @@
 2015-07-19  Corinna Vinschen  <corinna@vinschen.de>
 
+	* include/cygwin/signal.h (MINSIGSTKSZ): Define as 8K, unconditionally.
+	(SIGSTKSZ): Define as 32K, unconditionally.
+
+2015-07-19  Corinna Vinschen  <corinna@vinschen.de>
+
 	* dcrt0.cc (initial_env): Reduce size of local path buffers to
 	PATH_MAX.  Allocate debugger_command from process heap.
 	(init_windows_system_directory): Very early initialize new global
