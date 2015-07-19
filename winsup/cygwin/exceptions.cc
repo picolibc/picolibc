@@ -46,7 +46,7 @@ details. */
 #define CALL_HANDLER_RETRY_OUTER 10
 #define CALL_HANDLER_RETRY_INNER 10
 
-char debugger_command[2 * NT_MAX_PATH + 20];
+PWCHAR debugger_command;
 extern u_char _sigbe;
 extern u_char _sigdelayed_end;
 
@@ -112,18 +112,19 @@ extern "C" void
 error_start_init (const char *buf)
 {
   if (!buf || !*buf)
-    {
-      debugger_command[0] = '\0';
-      return;
-    }
+    return;
+  if (!debugger_command &&
+      !(debugger_command = (PWCHAR) malloc ((2 * NT_MAX_PATH + 20)
+					    * sizeof (WCHAR))))
+    return;
 
-  char pgm[NT_MAX_PATH];
-  if (!GetModuleFileName (NULL, pgm, NT_MAX_PATH))
-    strcpy (pgm, "cygwin1.dll");
-  for (char *p = strchr (pgm, '\\'); p; p = strchr (p, '\\'))
-    *p = '/';
-
-  __small_sprintf (debugger_command, "%s \"%s\"", buf, pgm);
+  PWCHAR cp = debugger_command
+	      + sys_mbstowcs (debugger_command, NT_MAX_PATH, buf) - 1;
+  cp = wcpcpy (cp, L" \"");
+  wcpcpy (cp, global_progname);
+  for (PWCHAR p = wcschr (cp, L'\\'); p; p = wcschr (p, L'\\'))
+    *p = L'/';
+  wcscat (cp, L"\"");
 }
 
 void
@@ -474,9 +475,9 @@ cygwin_stackdump ()
 extern "C" int
 try_to_debug (bool waitloop)
 {
-  debug_printf ("debugger_command '%s'", debugger_command);
-  if (*debugger_command == '\0')
+  if (!debugger_command)
     return 0;
+  debug_printf ("debugger_command '%W'", debugger_command);
   if (being_debugged ())
     {
       extern void break_here ();
@@ -484,8 +485,8 @@ try_to_debug (bool waitloop)
       return 0;
     }
 
-  __small_sprintf (strchr (debugger_command, '\0'), " %u",
-		   GetCurrentProcessId ());
+  PWCHAR dbg_end = wcschr (debugger_command, L'\0');
+  __small_swprintf (dbg_end, L" %u", GetCurrentProcessId ());
 
   LONG prio = GetThreadPriority (GetCurrentThread ());
   SetThreadPriority (GetCurrentThread (), THREAD_PRIORITY_HIGHEST);
@@ -529,10 +530,8 @@ try_to_debug (bool waitloop)
   console_printf ("*** starting debugger for pid %u, tid %u\n",
 		  cygwin_pid (GetCurrentProcessId ()), GetCurrentThreadId ());
   BOOL dbg;
-  WCHAR dbg_cmd[strlen(debugger_command) + 1];
-  sys_mbstowcs (dbg_cmd, strlen(debugger_command) + 1, debugger_command);
   dbg = CreateProcessW (NULL,
-			dbg_cmd,
+			debugger_command,
 			NULL,
 			NULL,
 			FALSE,
@@ -542,6 +541,7 @@ try_to_debug (bool waitloop)
 			&si,
 			&pi);
 
+  *dbg_end = L'\0';
   if (!dbg)
     system_printf ("Failed to start debugger, %E");
   else

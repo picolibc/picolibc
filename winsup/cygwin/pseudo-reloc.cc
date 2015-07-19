@@ -85,20 +85,18 @@ __report_error (const char *msg, ...)
    * cygwin ptys.
    */
   char buf[128];
-  WCHAR module[PATH_MAX];
-  char * posix_module = NULL;
+  char *posix_module = NULL;
   static const char UNKNOWN_MODULE[] = "<unknown module>: ";
   static const char CYGWIN_FAILURE_MSG[] = "Cygwin runtime failure: ";
   HANDLE errh = GetStdHandle (STD_ERROR_HANDLE);
-  ssize_t modulelen = GetModuleFileNameW (NULL, module, PATH_MAX);
   va_list args;
 
   /* FIXME: cleanup further to avoid old use of cygwin_internal */
   if (errh == INVALID_HANDLE_VALUE)
     cygwin_internal (CW_EXIT_PROCESS, STATUS_ILLEGAL_DLL_PSEUDO_RELOCATION, 1);
 
-  if (modulelen > 0)
-    posix_module = (char *) cygwin_create_path (CCP_WIN_W_TO_POSIX, module);
+  posix_module = (char *) cygwin_create_path (CCP_WIN_W_TO_POSIX,
+					      global_progname);
 
   va_start (args, msg);
   vsnprintf (buf, sizeof (buf), msg, args);

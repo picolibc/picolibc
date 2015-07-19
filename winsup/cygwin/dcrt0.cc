@@ -509,11 +509,11 @@ initial_env ()
     _cygwin_testing = 1;
 
 #ifdef DEBUGGING
-  char buf[NT_MAX_PATH];
+  char buf[PATH_MAX];
   if (GetEnvironmentVariableA ("CYGWIN_DEBUG", buf, sizeof (buf) - 1))
     {
-      char buf1[NT_MAX_PATH];
-      GetModuleFileName (NULL, buf1, NT_MAX_PATH);
+      char buf1[PATH_MAX];
+      GetModuleFileName (NULL, buf1, PATH_MAX);
       char *p = strpbrk (buf, ":=");
       if (!p)
 	p = (char *) "gdb.exe -nw";
@@ -521,6 +521,13 @@ initial_env ()
 	*p++ = '\0';
       if (strcasestr (buf1, buf))
 	{
+	  extern PWCHAR debugger_command;
+
+	  debugger_command = (PWCHAR) HeapAlloc (GetProcessHeap (), 0,
+						 (2 * NT_MAX_PATH + 20)
+						 * sizeof (WCHAR));
+	  if (!debugger_command)
+	    return;
 	  error_start_init (p);
 	  jit_debug = true;
 	  try_to_debug ();
@@ -736,6 +743,7 @@ void
 dll_crt0_0 ()
 {
   wincap.init ();
+  GetModuleFileNameW (NULL, global_progname, NT_MAX_PATH);
   child_proc_info = get_cygwin_startup_info ();
   init_windows_system_directory ();
   initial_env ();

@@ -31,6 +31,7 @@ UINT windows_system_directory_length;
 WCHAR system_wow64_directory[MAX_PATH];
 UINT system_wow64_directory_length;
 #endif /* !__x86_64__ */
+WCHAR global_progname[NT_MAX_PATH];
 
 /* program exit the program */
 

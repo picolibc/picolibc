@@ -21,9 +21,13 @@ details. */
 #include "dtable.h"
 #include "cygheap.h"
 #include "child_info.h"
+#include "sync.h"
 
-#define PROTECT(x) x[sizeof (x)-1] = 0
-#define CHECK(x) if (x[sizeof (x)-1] != 0) { small_printf ("array bound exceeded %d\n", __LINE__); ExitProcess (1); }
+#define PROTECT(x) {x[NT_MAX_PATH - 1] = '\0';}
+#define CHECK(x) if (x[NT_MAX_PATH - 1] != '\0') \
+		   { small_printf ("array bound exceeded %d\n", __LINE__); \
+		     ExitProcess (1); \
+		   }
 
 class strace NO_COPY strace;
 
@@ -35,25 +39,25 @@ strace::activate (bool isfork)
   if (!_active && being_debugged ())
     {
       char buf[30];
-      __small_sprintf (buf, "cYg%8x %lx %d", _STRACE_INTERFACE_ACTIVATE_ADDR, &_active, isfork);
+      __small_sprintf (buf, "cYg%8x %lx %d",
+		       _STRACE_INTERFACE_ACTIVATE_ADDR, &_active, isfork);
       OutputDebugString (buf);
       if (_active)
 	{
 	  char pidbuf[80];
-	  WCHAR progname_buf[NT_MAX_PATH - 512];
-	  WCHAR *progname;
+	  PWCHAR progname;
 	  if (myself)
 	    {
-	      __small_sprintf (pidbuf, "(pid %d, ppid %d, windows pid %u)", myself->pid,
-			       myself->ppid ?: 1, GetCurrentProcessId ());
+	      __small_sprintf (pidbuf, "(pid %d, ppid %d, windows pid %u)",
+			       myself->pid, myself->ppid ?: 1,
+			       GetCurrentProcessId ());
 	      progname = myself->progname;
 	    }
 	  else
 	    {
-	      GetModuleFileNameW (NULL, progname_buf,
-	      			  sizeof progname_buf / sizeof (WCHAR));
-	      __small_sprintf (pidbuf, "(windows pid %u)", GetCurrentProcessId ());
-	      progname = progname_buf;
+	      __small_sprintf (pidbuf, "(windows pid %u)",
+			       GetCurrentProcessId ());
+	      progname = global_progname;
 	    }
 	  prntf (1, NULL, "**********************************************");
 	  prntf (1, NULL, "Program name: %W %s", progname, pidbuf);
@@ -151,32 +155,32 @@ strace::vsprntf (char *buf, const char *func, const char *infmt, va_list ap)
   else
     {
       PWCHAR pn = NULL;
-      WCHAR progname[NT_MAX_PATH];
-      if (!cygwin_finished_initializing)
-	pn = (myself) ? myself->progname : NULL;
-      else if (__progname)
-	sys_mbstowcs(pn = progname, NT_MAX_PATH, __progname);
-
-      WCHAR empty[1] = {};
-      PWCHAR p;
-      if (!pn)
-	GetModuleFileNameW (NULL, pn = progname, sizeof (progname));
-      if (!pn)
-	p = empty;
-      else if ((p = wcsrchr (pn, L'\\')) != NULL)
-	p++;
-      else if ((p = wcsrchr (pn, L'/')) != NULL)
-	p++;
+      WCHAR progname[NAME_MAX];
+      if (cygwin_finished_initializing && __progname)
+	{
+	  char *p = strrchr (__progname, '/');
+	  if (p)
+	    ++p;
+	  else
+	    p = __progname;
+	  char *pe = strrchr (p, '.');
+	  if (!pe || !ascii_strcasematch (pe, ".exe"))
+	    pe = strrchr (p, '\0');
+	  sys_mbstowcs (pn = progname, NAME_MAX, p, pe - p);
+	}
       else
-	p = pn;
-      if (p != progname)
-	wcscpy (progname, p);
-      if ((p = wcsrchr (progname, '.')) != NULL
-	  && !wcscasecmp (p, L".exe"))
-	*p = '\000';
-      p = progname;
+	{
+	  PWCHAR p = wcsrchr (global_progname, L'\\');
+	  ++p;
+	  PWCHAR pe = wcsrchr (p, '.');
+	  if (!pe || wcscasecmp (pe, L".exe"))
+	    pe = wcsrchr (p, L'\0');
+	  pe = wcpncpy (progname, p, pe - p);
+	  *pe = L'\0';
+	  pn = progname;
+	}
       char tmpbuf[20];
-      count = __small_sprintf (buf, fmt, *p ? p : L"?", mypid (tmpbuf),
+      count = __small_sprintf (buf, fmt, pn, mypid (tmpbuf),
 			       execing ? "!" : "");
       if (func)
 	count += getfunc (buf + count, func);
@@ -235,14 +239,22 @@ strace::write_childpid (pid_t pid)
 
 /* Printf function used when tracing system calls.
    Warning: DO NOT SET ERRNO HERE! */
+static NO_COPY muto strace_buf_guard;
+static NO_COPY char *buf;
 
 void
 strace::vprntf (unsigned category, const char *func, const char *fmt, va_list ap)
 {
   DWORD err = GetLastError ();
   int len;
-  char buf[NT_MAX_PATH];
 
+  strace_buf_guard.init ("smallprint_buf")->acquire ();
+  /* Creating buffer on Windows process heap to drop stack pressure and
+     keeping our .bss small. */
+  if (!buf)
+    buf = (char *) HeapAlloc (GetProcessHeap (), 0, NT_MAX_PATH);
+  if (!buf)
+    return;
   PROTECT (buf);
   SetLastError (err);
 
@@ -272,6 +284,7 @@ strace::vprntf (unsigned category, const char *func, const char *fmt, va_list ap
   if (active ())
     write (category, buf, len);
 #endif
+  strace_buf_guard.release ();
   SetLastError (err);
 }
 

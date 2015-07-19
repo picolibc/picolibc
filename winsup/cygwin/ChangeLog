@@ -1,3 +1,42 @@
+2015-07-19  Corinna Vinschen  <corinna@vinschen.de>
+
+	* dcrt0.cc (initial_env): Reduce size of local path buffers to
+	PATH_MAX.  Allocate debugger_command from process heap.
+	(init_windows_system_directory): Very early initialize new global
+	variable global_progname.
+	* dll_init.cc (dll_list::alloc): Make path buffer static.  Explain why.
+	(dll_list::populate_deps): Use tmp_pathbuf for local path buffer.
+	* exceptions.cc (debugger_command): Convert to PWCHAR.
+	(error_start_init): Allocate debugger_command and fill with wide char
+	strings.  Only allocate if NULL.
+	(try_to_debug): Just check if debugger_command is a NULL pointer to
+	return.  Drop conversion from char to WCHAR and drop local variable
+	dbg_cmd.
+	* globals.cc (global_progname): New global variable to store Windows
+	application path.
+	* pinfo.cc (pinfo_basic::pinfo_basic): Just copy progname over from
+	global_progname.
+	(pinfo::status_exit): Let path_conv create the POSIX path to
+	avoid local buffer.
+	* pseudo_reloc.cc (__report_error): Utilize global_progname, drop local
+	buffer.
+	* smallprint.cc (__small_vsprintf): Just utilize global_progname for
+	%P format specifier.
+	(__small_vswprintf): Ditto.
+	* strace.cc (PROTECT): Change to reflect x being a pointer.  Reformat.
+	(CHECK): Ditto.  Reformat.
+	(strace::activate): Utilize global_progname, drop local buffer.
+	Fix formatting.
+	(strace::vsprntf): Reduce size of local progname buffer to NAME_MAX.
+	Copy and, if necessary, convert only the last path component to
+	progname.
+	(strace_buf_guard): New muto.
+	(buf): New static pointer.
+	(strace::vprntf): Use buf under strace_buf_guard lock only.  Allocate
+	buffer space for buf on Windows heap.
+	* wow64.cc (wow64_respawn_process): Utilize global_progname, drop
+	local path buffer.
+
 2015-07-18  Corinna Vinschen  <corinna@vinschen.de>
 
 	* gendef: Remove unused 64 bit versions of __sjfault and __ljfault.

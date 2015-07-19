@@ -38,7 +38,9 @@ public:
 pinfo_basic::pinfo_basic ()
 {
   pid = dwProcessId = GetCurrentProcessId ();
-  GetModuleFileNameW (NULL, progname, sizeof (progname) / sizeof (WCHAR));
+  PWCHAR pend = wcpncpy (progname, global_progname,
+			 sizeof (progname) / sizeof (WCHAR) - 1);
+  *pend = L'\0';
   /* Default uid/gid are needed very early to initialize shared user info. */
   uid = ILLEGAL_UID;
   gid = ILLEGAL_GID;
@@ -120,20 +122,18 @@ pinfo::status_exit (DWORD x)
     {
     case STATUS_DLL_NOT_FOUND:
       {
-	char posix_prog[NT_MAX_PATH];
 	path_conv pc;
 	if (!procinfo)
-	   pc.check ("/dev/null");
+	   pc.check ("/dev/null", PC_NOWARN | PC_POSIX);
 	else
 	  {
 	    UNICODE_STRING uc;
 	    RtlInitUnicodeString(&uc, procinfo->progname);
-	    pc.check (&uc, PC_NOWARN);
+	    pc.check (&uc, PC_NOWARN | PC_POSIX);
 	  }
-	mount_table->conv_to_posix_path (pc.get_win32 (), posix_prog, 1);
 	small_printf ("%s: error while loading shared libraries: %s: cannot "
 		      "open shared object file: No such file or directory\n",
-		      posix_prog, find_first_notloaded_dll (pc));
+		      pc.get_posix (), find_first_notloaded_dll (pc));
 	x = 127 << 8;
       }
       break;

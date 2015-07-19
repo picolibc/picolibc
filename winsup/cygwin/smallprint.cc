@@ -284,12 +284,6 @@ gen_decimalLL:
 		  dst = rnarg (dst, 16, 0, len, pad);
 #endif
 		  break;
-		case 'P':
-		  if (!GetModuleFileName (NULL, tmp, NT_MAX_PATH))
-		    s = "cygwin program";
-		  else
-		    s = tmp;
-		  goto fillin;
 		case '.':
 		  n = strtol (fmt, (char **) &fmt, 10);
 		  if (*fmt++ != 's')
@@ -311,6 +305,9 @@ gen_decimalLL:
 		    else
 		      *dst++ = *s++;
 		  break;
+		case 'P':
+		  RtlInitUnicodeString (us = &uw, global_progname);
+		  goto wfillin;
 		case 'W':
 		  w = va_arg (ap, PWCHAR);
 		  RtlInitUnicodeString (us = &uw, w ?: L"(null)");
@@ -613,10 +610,7 @@ gen_decimalLL:
 #endif
 		  break;
 		case L'P':
-		  if (!GetModuleFileNameW (NULL, tmp, NT_MAX_PATH))
-		    RtlInitUnicodeString (us = &uw, L"cygwin program");
-		  else
-		    RtlInitUnicodeString (us = &uw, tmp);
+		  RtlInitUnicodeString (us = &uw, global_progname);
 		  goto fillin;
 		case L'.':
 		  n = wcstoul (fmt, (wchar_t **) &fmt, 10);
