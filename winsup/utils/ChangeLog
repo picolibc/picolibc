@@ -1,3 +1,8 @@
+2015-07-20  Corinna Vinschen  <corinna@vinschen.de>
+
+	* ldd.cc (STATUS_DLL_NOT_FOUND): Drop definition.
+	(report): Handle STATUS_ENTRYPOINT_NOT_FOUND exception.  Explain why.
+
 2015-07-08  Corinna Vinschen  <corinna@vinschen.de>
 
 	* tzset.c (main): Check timezone and country case-insensitive.

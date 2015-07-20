@@ -42,10 +42,6 @@
 #include <imagehlp.h>
 #include <psapi.h>
 
-#ifndef STATUS_DLL_NOT_FOUND
-#define STATUS_DLL_NOT_FOUND (0xC0000135L)
-#endif
-
 struct option longopts[] =
 {
   {"help", no_argument, NULL, 'h'},
@@ -346,6 +342,11 @@ report (const char *in_fn, bool multiple)
 	case EXCEPTION_DEBUG_EVENT:
 	  switch (ev.u.Exception.ExceptionRecord.ExceptionCode)
 	    {
+	    case STATUS_ENTRYPOINT_NOT_FOUND:
+	      /* A STATUS_ENTRYPOINT_NOT_FOUND might be encountered right after
+		 loading all DLLs.  We have to handle it here, otherwise ldd
+		 runs into an endless loop. */
+	      goto print_and_exit;
 	    case STATUS_DLL_NOT_FOUND:
 	      process_fn = fn_win;
 	      break;
@@ -359,6 +360,7 @@ report (const char *in_fn, bool multiple)
 	  TerminateProcess (hProcess, 0);
 	  break;
 	case EXIT_PROCESS_DEBUG_EVENT:
+print_and_exit:
 	  print_dlls (&dll_list, isdll ? fn_win : NULL, process_fn);
 	  exitnow = true;
 	  break;
