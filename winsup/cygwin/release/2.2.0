@@ -11,3 +11,5 @@ What changed:
 Bug Fixes
 ---------
 
+- Fix potential hang running ldd(1).
+  Addresses: https://cygwin.com/ml/cygwin/2015-07/msg00292.html
