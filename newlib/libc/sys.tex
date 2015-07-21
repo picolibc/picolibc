@@ -306,171 +306,86 @@ routines are consistent with the other reentrant subroutines in this
 library, and achieve reentrancy by using a reserved global data block
 (@pxref{Reentrancy,,Reentrancy}).
 
-@c FIXME!!! The following ignored text specifies how this section ought
-@c to work;  however, both standalone info and Emacs info mode fail when
-@c confronted with nodes beginning `_' as of 24may93.  Restore when Info
-@c readers fixed!
-@ignore
 @menu
-* _open_r::	Reentrant version of open
 * _close_r::	Reentrant version of close
-* _lseek_r::	Reentrant version of lseek
-* _read_r::	Reentrant version of read
-* _write_r::	Reentrant version of write
-* _link_r::     Reentrant version of link
-* _unlink_r::   Reentrant version of unlink
-* _stat_r::     Reentrant version of stat
-* _fstat_r::    Reentrant version of fstat
-* _sbrk_r::     Reentrant version of sbrk
+* _execve_r::	Reentrant version of execve
 * _fork_r::	Reentrant version of fork
+* _fstat64_r::	Reentrant version of fstat64
+* _fstat_r::	Reentrant version of fstat
+* _getpid_r::	Reentrant version of getpid
+* _kill_r::	Reentrant version of kill
+* _link_r::	Reentrant version of link
+* _lseek64_r::	Reentrant version of lseek64
+* _lseek_r::	Reentrant version of lseek
+* _open64_r::	Reentrant version of open64
+* _open_r::	Reentrant version of open
+* _read_r::	Reentrant version of read
+* _sbrk_r::	Reentrant version of sbrk
+* _stat64_r::	Reentrant version of stat64
+* _stat_r::	Reentrant version of stat
+* _times_r::	Reentrant version of times
+* _unlink_r::	Reentrant version of unlink
 * _wait_r::	Reentrant version of wait
+* _write_r::	Reentrant version of write
 @end menu
 
-@down
-@include reent/filer.def
+@lowersections
+@page
+@include reent/closer.def
+
+@page
 @include reent/execr.def
-@include reent/statr.def
+
+@ifset STDIO64
+@page
+@include reent/fstat64r.def
+@end ifset
+
+@page
 @include reent/fstatr.def
+
+@page
 @include reent/linkr.def
-@include reent/unlinkr.def
+
+@ifset STDIO64
+@page
+@include reent/lseek64r.def
+@end ifset
+
+@page
+@include reent/lseekr.def
+
+@ifset STDIO64
+@page
+@include reent/open64r.def
+@end ifset
+
+@page
+@include reent/openr.def
+
+@page
+@include reent/readr.def
+
+@page
 @include reent/sbrkr.def
-@up
-@end ignore
 
-@ftable @code
-@item _open_r
-A reentrant version of @code{open}.  It takes a pointer
-to the global data block, which holds @code{errno}.
-
-@example
-int _open_r(void *@var{reent},
-    const char *@var{file}, int @var{flags}, int @var{mode});
-@end example
+@page
+@include reent/signalr.def
 
 @ifset STDIO64
-@item _open64_r
-A reentrant version of @code{open64}.  It takes a pointer
-to the global data block, which holds @code{errno}.
-
-@example
-int _open64_r(void *@var{reent},
-    const char *@var{file}, int @var{flags}, int @var{mode});
-@end example
+@page
+@include reent/stat64r.def
 @end ifset
 
-@item _close_r
-A reentrant version of @code{close}.  It takes a pointer to the global
-data block, which holds @code{errno}.
+@page
+@include reent/statr.def
 
-@example
-int _close_r(void *@var{reent}, int @var{fd});
-@end example
+@page
+@include reent/timesr.def
 
-@item _lseek_r
-A reentrant version of @code{lseek}.  It takes a pointer to the global
-data block, which holds @code{errno}.
+@page
+@include reent/unlinkr.def
 
-@example
-off_t _lseek_r(void *@var{reent},
-    int @var{fd}, off_t @var{pos}, int @var{whence});
-@end example
-
-@ifset STDIO64
-@item _lseek64_r
-A reentrant version of @code{lseek64}.  It takes a pointer to the global
-data block, which holds @code{errno}.
-
-@example
-off_t _lseek64_r(void *@var{reent},
-    int @var{fd}, off_t @var{pos}, int @var{whence});
-@end example
-@end ifset
-
-@item _read_r
-A reentrant version of @code{read}.  It takes a pointer to the global
-data block, which holds @code{errno}.
-
-@example
-long _read_r(void *@var{reent},
-    int @var{fd}, void *@var{buf}, size_t @var{cnt});
-@end example
-
-@item _write_r
-A reentrant version of @code{write}.  It takes a pointer to the global
-data block, which holds @code{errno}.
-
-@example
-long _write_r(void *@var{reent},
-    int @var{fd}, const void *@var{buf}, size_t @var{cnt});
-@end example
-
-@item _fork_r
-A reentrant version of @code{fork}.  It takes a pointer to the global
-data block, which holds @code{errno}.
-
-@example
-int _fork_r(void *@var{reent});
-@end example
-
-@item _wait_r
-A reentrant version of @code{wait}.  It takes a pointer to the global
-data block, which holds @code{errno}.
-
-@example
-int _wait_r(void *@var{reent}, int *@var{status});
-@end example
-
-@item _stat_r
-A reentrant version of @code{stat}.  It takes a pointer to the global
-data block, which holds @code{errno}.
-
-@example
-int _stat_r(void *@var{reent},
-    const char *@var{file}, struct stat *@var{pstat});
-@end example
-
-@item _fstat_r
-A reentrant version of @code{fstat}.  It takes a pointer to the global
-data block, which holds @code{errno}.
-
-@example
-int _fstat_r(void *@var{reent},
-    int @var{fd}, struct stat *@var{pstat});
-@end example
-
-@ifset STDIO64
-@item _fstat64_r
-A reentrant version of @code{fstat64}.  It takes a pointer to the global
-data block, which holds @code{errno}.
-
-@example
-int _fstat64_r(void *@var{reent},
-    int @var{fd}, struct stat *@var{pstat});
-@end example
-@end ifset
-
-@item _link_r
-A reentrant version of @code{link}.  It takes a pointer to the global
-data block, which holds @code{errno}.
-
-@example
-int _link_r(void *@var{reent},
-    const char *@var{old}, const char *@var{new});
-@end example
-
-@item _unlink_r
-A reentrant version of @code{unlink}.  It takes a pointer to the global
-data block, which holds @code{errno}.
-
-@example
-int _unlink_r(void *@var{reent}, const char *@var{file});
-@end example
-
-@item _sbrk_r
-A reentrant version of @code{sbrk}.  It takes a pointer to the global
-data block, which holds @code{errno}.
-
-@example
-char *_sbrk_r(void *@var{reent}, size_t @var{incr});
-@end example
-@end ftable
+@page
+@include reent/writer.def
+@raisesections
