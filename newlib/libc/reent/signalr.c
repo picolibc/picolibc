@@ -64,6 +64,7 @@ _DEFUN (_kill_r, (ptr, pid, sig),
 }
 
 /*
+NEWPAGE
 FUNCTION
 	<<_getpid_r>>---Reentrant version of getpid
 	

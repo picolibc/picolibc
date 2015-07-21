@@ -69,6 +69,7 @@ _DEFUN (_execve_r, (ptr, name, argv, env),
 
 
 /*
+NEWPAGE
 FUNCTION
 	<<_fork_r>>---Reentrant version of fork
 	
@@ -107,6 +108,7 @@ _DEFUN (_fork_r, (ptr),
 #endif
 
 /*
+NEWPAGE
 FUNCTION
 	<<_wait_r>>---Reentrant version of wait
 	
