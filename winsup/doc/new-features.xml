@@ -12,6 +12,14 @@
 New APIs: getcontext, setcontext, makecontext, swapcontext.
 </para></listitem>
 
+<listitem><para>
+New functions: sigsetjmp, siglongjmp.
+</para>
+<para>
+These were only available as macros up to now, but POSIX requires that
+siglongjmp has to be available as function.
+</para></listitem>
+
 </itemizedlist>
 
 </sect2>

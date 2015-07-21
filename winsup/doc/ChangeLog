@@ -1,3 +1,7 @@
+2015-07-21  Corinna Vinschen  <corinna@vinschen.de>
+
+	* new-features.xml (ov-new2.2): Document sigsetjmp, siglongjmp.
+
 2015-07-17  Corinna Vinschen  <corinna@vinschen.de>
 
 	* new-features.xml (ov-new2.2): Add new section.  Document getcontext,

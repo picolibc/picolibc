@@ -1110,6 +1110,7 @@ sighold SIGFE
 sigignore SIGFE
 siginterrupt SIGFE
 sigismember SIGFE
+siglongjmp NOSIGFE
 signal SIGFE
 significand NOSIGFE
 significandf NOSIGFE
@@ -1119,6 +1120,7 @@ sigprocmask SIGFE
 sigqueue SIGFE
 sigrelse SIGFE
 sigset SIGFE
+sigsetjmp NOSIGFE
 sigsuspend SIGFE
 sigwait SIGFE
 sigwaitinfo SIGFE

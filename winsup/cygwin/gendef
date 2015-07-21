@@ -590,21 +590,32 @@ sub longjmp {
     if ($is64bit) {
 	return <<EOF;
 
+	.globl	sigsetjmp
+	.seh_proc sigsetjmp
+sigsetjmp:
+	.seh_endprologue
+	movl	%edx,0x100(%rcx)		# store savemask
+	testl	%edx,%edx			# savemask != 0?
+	je	setjmp				# no, skip fetching sigmask
+	pushq	%rcx
+	subq	\$0x20,%rsp
+	leaq	0x108(%rcx),%r8			# &sigjmp_buf.sigmask
+	xorq	%rdx,%rdx			# NULL
+	xorl	%ecx,%ecx			# SIG_SETMASK
+	call	pthread_sigmask
+	addq	\$0x20,%rsp
+	popq	%rcx
+	jmp	setjmp
+	.seh_endproc
+
 	.globl  setjmp
 	.seh_proc setjmp
 setjmp:
 	.seh_endprologue
-	leaq	8(%rsp),%rdx
-	jmp	__setjmpex
-	.seh_endproc
-
-	.globl	__setjmpex
-	.seh_proc __setjmpex
-__setjmpex:
-	.seh_endprologue
-	# We use the Windows jmp_buf layout.
-	# Store alternative stackptr in Spare.
-	movq	%rdx,(%rcx)
+	# We use the Windows jmp_buf layout with two small twists.
+	# - we store the tls stackptr in Frame, MSVCRT stores a second copy
+	#   of %rbp in Frame (twice? why?)
+	# - we just store %rsp as is, MSVCRT stores %rsp of the caller in Rsp
 	movq	%rbx,0x8(%rcx)
 	movq	%rsp,0x10(%rcx)
 	movq	%rbp,0x18(%rcx)
@@ -616,6 +627,8 @@ __setjmpex:
 	movq	%r15,0x48(%rcx)
 	movq	(%rsp),%r10
 	movq	%r10,0x50(%rcx)
+	stmxcsr	0x58(%rcx)
+	fnstcw	0x5c(%rcx)
 	# jmp_buf is potentially unaligned!
 	movdqu	%xmm6,0x60(%rcx)
 	movdqu	%xmm7,0x70(%rcx)
@@ -632,10 +645,29 @@ __setjmpex:
 	call	stabilize_sig_stack		# returns tls in r11
 	popq	%rcx
 	movq	$tls::stackptr(%r11),%r10
-	movq	%r10,0x58(%rcx)
+	movq	%r10,(%rcx)
 	decl	$tls::stacklock(%r11)
-	movl	\$0,%eax
+	xorl	%eax,%eax
 	ret
+	.seh_endproc
+
+	.globl	siglongjmp
+	.seh_proc siglongjmp
+siglongjmp:
+	pushq	%rcx
+	.seh_pushreg %rcx
+	.seh_endprologue
+	movl	%edx, %r12d
+	movl	0x100(%rcx),%r8d		# savemask
+	testl	%r8d,%r8d			# savemask != 0?
+	je	1f				# no, jmp to longjmp
+	xorq	%r8,%r8				# NULL
+	leaq    0x108(%rcx),%rdx		# &sigjmp_buf.sigmask
+	xorl	%ecx,%ecx			# SIG_SETMASK
+	subq	\$0x20,%rsp
+	call	pthread_sigmask
+	addq	\$0x20,%rsp
+	jmp	1f
 	.seh_endproc
 
 	.globl  longjmp
@@ -644,15 +676,16 @@ longjmp:
 	pushq	%rcx
 	.seh_pushreg %rcx
 	.seh_endprologue
-	movl	%edx,%r12d			# save return value (r12 is overwritten anyway)
+	movl	%edx,%r12d			# save return value
+1:
 	call	stabilize_sig_stack		# returns tls in r11
 	popq	%rcx
 	movl	%r12d,%eax			# restore return value
-	movq	0x58(%rcx),%r10			# get old signal stack
+	movq	(%rcx),%r10			# get old signal stack
 	movq	%r10,$tls::stackptr(%r11)	# restore
 	decl	$tls::stacklock(%r11)		# relinquish lock
 	xorl	%r10d,%r10d
-	movl	%r10d,$tls::incyg(%r11)		# we're definitely not in cygwin anymore
+	movl	%r10d,$tls::incyg(%r11)		# we're not in cygwin anymore
 	movq	0x8(%rcx),%rbx
 	movq	0x10(%rcx),%rsp
 	movq	0x18(%rcx),%rbp
@@ -664,6 +697,9 @@ longjmp:
 	movq	0x48(%rcx),%r15
 	movq	0x50(%rcx),%r10
 	movq	%r10,(%rsp)
+	ldmxcsr	0x58(%rcx)
+	fnclex
+	fldcw	0x5c(%rcx)
 	# jmp_buf is potentially unaligned!
 	movdqu	0x60(%rcx),%xmm6
 	movdqu	0x70(%rcx),%xmm7
@@ -684,12 +720,33 @@ EOF
     } else {
 	return <<EOF;
 
+	.globl	_sigsetjmp
+_sigsetjmp:
+	pushl   %ebp
+	movl    %esp,%ebp
+	pushl   %edi
+	movl	8(%ebp),%edi			# &sigjmp_buf
+	movl	12(%ebp),%eax			# savemask
+	movl	%eax,208(%edi)			# store savemask
+	testl	%eax,%eax			# savemask != 0?
+	je	1f				# no, skip fetching sigmask
+	subl	\$12,%esp
+	leal	212(%edi),%eax			# &sigjmp_buf.sigmask
+	movl	%eax,8(%esp)			# -> 3rd param "oldset"
+	xorl	%eax,%eax
+	movl	%eax,4(%esp)			# NULL -> 2nd param "set"
+	movl	%eax,(%esp)			# SIG_SETMASK -> 1st param "how"
+	call	_pthread_sigmask
+	addl	\$12,%esp
+	jmp	1f
+
 	.globl	_setjmp
 _setjmp:
 	pushl	%ebp
 	movl	%esp,%ebp
 	pushl	%edi
 	movl	8(%ebp),%edi
+1:
 	movl	%eax,0(%edi)
 	movl	%ebx,4(%edi)
 	movl	%ecx,8(%edi)
@@ -717,7 +774,7 @@ _setjmp:
 	fnstcw  48(%edi)
 	pushl	%ebx
 	call	stabilize_sig_stack
-	movl	$tls::stackptr(%ebx),%eax		# save stack pointer contents
+	movl	$tls::stackptr(%ebx),%eax	# save stack pointer contents
 	decl	$tls::stacklock(%ebx)
 	popl	%ebx
 	movl	%eax,52(%edi)
@@ -796,17 +853,36 @@ ___ljfault:
 	popfl
 	ret
 
+	.globl	_siglongjmp
+_siglongjmp:
+	pushl	%ebp
+	movl	%esp,%ebp
+	movl	8(%ebp),%edi			# &sigjmp_buf
+	movl	208(%edi),%eax			# load savemask
+	testl	%eax,%eax			# savemask != 0?
+	je	1f				# no, skip restoring sigmask
+	subl	\$12,%esp
+	leal	212(%edi),%eax			# &sigjmp_buf.sigmask
+	movl	%eax,4(%esp)			# -> 2nd param "set"
+	xorl	%eax,%eax
+	movl	%eax,8(%esp)			# NULL -> 3rd param "oldset"
+	movl	%eax,(%esp)			# SIG_SETMASK -> 1st param "how"
+	call	_pthread_sigmask
+	addl	\$12,%esp
+	jmp	1f
+
 	.globl	_longjmp
 _longjmp:
 	pushl	%ebp
 	movl	%esp,%ebp
-	movl	8(%ebp),%edi				# address of buffer
+	movl	8(%ebp),%edi			# &jmp_buf
+1:
 	call	stabilize_sig_stack
-	movl	52(%edi),%eax				# get old signal stack
-	movl	%eax,$tls::stackptr(%ebx)		# restore
-	decl	$tls::stacklock(%ebx)			# relinquish lock
+	movl	52(%edi),%eax			# get old signal stack
+	movl	%eax,$tls::stackptr(%ebx)	# restore
+	decl	$tls::stacklock(%ebx)		# relinquish lock
 	xorl	%eax,%eax
-	movl	%eax,$tls::incyg(%ebx)			# we're definitely not in cygwin anymore
+	movl	%eax,$tls::incyg(%ebx)		# we're not in cygwin anymore
 
 	movl	12(%ebp),%eax
 	testl	%eax,%eax

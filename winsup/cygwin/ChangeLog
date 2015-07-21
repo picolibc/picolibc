@@ -1,3 +1,17 @@
+2015-07-21  Corinna Vinschen  <corinna@vinschen.de>
+
+	* common.din (siglongjmp): Export.
+	(sigsetjmp): Export.
+	* gendef: Change formatting of some comments.
+	(sigsetjmp): Implement.
+	(siglongjmp): Implement.
+	(__setjmpex): x86_64 only: Drop entry point.
+	(setjmp): x86_64 only: Store tls stackptr in Frame now, store MXCSR
+	and FPUCW registers in Spare, as MSVCRT does.
+	(longjmp): x86_64 only: Restore tls stackptr from Frame now, restore
+	MXCSR and FPUCW registers from Spare.
+	* include/cygwin/version.h (CYGWIN_VERSION_API_MINOR): Bump.
+
 2015-07-19  Corinna Vinschen  <corinna@vinschen.de>
 
 	* include/cygwin/signal.h (MINSIGSTKSZ): Define as 8K, unconditionally.

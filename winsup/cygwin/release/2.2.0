@@ -3,6 +3,10 @@ What's new:
 
 - New APIs: getcontext, setcontext, makecontext, swapcontext.
 
+- New functions: sigsetjmp, siglongjmp.
+  These were only available as macros up to now, but POSIX requires that
+  siglongjmp has to be available as function.
+
 
 What changed:
 -------------

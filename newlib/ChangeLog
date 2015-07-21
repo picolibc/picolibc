@@ -1,3 +1,10 @@
+2015-07-21  Corinna Vinschen  <corinna@vinschen.de>
+
+	* libc/include/machine/setjmp.h (siglongjmp): Declare as function on
+	Cygwin.
+	(sigsetjmp): Ditto.
+	(_longjmp): Mark as noreturn function on Cygwin.
+
 2015-07-15  Wilco Dijkstra  <wdijkstr@arm.com>
 
 	* libc/machine/aarch64/memset.S (memset):
