@@ -48,7 +48,7 @@ ANSI_SYNOPSIS
         size_t iconv (iconv_t <[cd]>, char **restrict <[inbuf]>, 
 	              size_t *restrict <[inbytesleft]>, 
 		      char **restrict <[outbuf]>, 
-                      size_t *restrict <[outbytesleft]>),
+                      size_t *restrict <[outbytesleft]>);
 
 	iconv_t _iconv_open_r (struct _reent *<[rptr]>, 
 			       const char *<[to]>, const char *<[from]>);
@@ -56,11 +56,11 @@ ANSI_SYNOPSIS
         size_t _iconv_r (struct _reent *<[rptr]>,
 			 iconv_t <[cd]>, const char **<[inbuf]>, 
 	                 size_t *<[inbytesleft]>, 
-		         char **<[outbuf]>, size_t *<[outbytesleft]>),
+		         char **<[outbuf]>, size_t *<[outbytesleft]>);
 
 TRAD_SYNOPSIS
 	#include <iconv.h>
-        size_t iconv (<[cd]>, <[in]>, <[inleft]>, <[out]>, <[outleft]>)
+        size_t iconv (<[cd]>, <[in]>, <[inleft]>, <[out]>, <[outleft]>);
 	iconv_t <[cd]>;
 	char **<[in]>;
 	size_t *<[inleft]>; 
@@ -77,7 +77,7 @@ TRAD_SYNOPSIS
 	iconv_t <[cd]>;
 
 	#include <iconv.h>
-        size_t _iconv_r (<[rptr]>, <[cd]>, <[in]>, <[inleft]>, <[out]>, <[outleft]>)
+        size_t _iconv_r (<[rptr]>, <[cd]>, <[in]>, <[inleft]>, <[out]>, <[outleft]>);
 	struct _reent *<[rptr]>;
 	iconv_t <[cd]>;
 	const char **<[in]>;
