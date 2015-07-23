@@ -13,6 +13,7 @@ What changed:
 
 - When started from a non-Cygwin process, check if $HOME starts with a
   slash (absolute POSIX path).  Otherwise ignore it.
+  Addresses: https://cygwin.com/ml/cygwin/2015-07/msg00344.html
 
 
 Bug Fixes
