@@ -1,5 +1,11 @@
 2015-07-23  Corinna Vinschen  <corinna@vinschen.de>
 
+	* exceptions.cc (__cont_link_context): x86_64: align stack and reserve
+	shadow space for subsequent function calls, otherwise suffer potential
+	buffer overflow.
+
+2015-07-23  Corinna Vinschen  <corinna@vinschen.de>
+
 	* uinfo.cc (cygheap_user::ontherange): Ignore $HOME if it's not
 	starting with a slash (aka, absolute POSIX Path).
 

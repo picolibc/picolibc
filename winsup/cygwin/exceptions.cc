@@ -1929,9 +1929,14 @@ swapcontext (ucontext_t *oucp, const ucontext_t *ucp)
    is NULL, call exit. */
 __asm__ ("				\n\
 	.global	__cont_link_context	\n\
+	.seh_proc __cont_link_context	\n\
 __cont_link_context:			\n\
+	.seh_endprologue		\n\
 	movq	%rbx, %rsp		\n\
-	popq	%rcx			\n\
+	movq	(%rsp), %rcx		\n\
+	# align stack and subtract shadow space	\n\
+	andq	$~0xf, %rsp		\n\
+	subq	$0x20, %rsp		\n\
 	testq	%rcx, %rcx		\n\
 	je	1f			\n\
 	call	setcontext		\n\
@@ -1939,6 +1944,7 @@ __cont_link_context:			\n\
 1:					\n\
 	call	cygwin_exit		\n\
 	nop				\n\
+	.seh_endproc			\n\
 	");
 
 #else
