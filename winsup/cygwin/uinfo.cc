@@ -331,8 +331,15 @@ cygheap_user::ontherange (homebodies what, struct passwd *pw)
       char *p;
 
       if ((p = getenv ("HOME")))
-	debug_printf ("HOME is already in the environment %s", p);
-      else
+	{
+	  debug_printf ("HOME is already in the environment %s", p);
+	  if (p[0] != '/')
+	    {
+	      p = NULL;
+	      debug_printf ("discard HOME, no absolute POSIX path");
+	    }
+	}
+      if (!p)
 	{
 	  if (pw && pw->pw_dir && *pw->pw_dir)
 	    {

@@ -1,3 +1,8 @@
+2015-07-23  Corinna Vinschen  <corinna@vinschen.de>
+
+	* uinfo.cc (cygheap_user::ontherange): Ignore $HOME if it's not
+	starting with a slash (aka, absolute POSIX Path).
+
 2015-07-21  Corinna Vinschen  <corinna@vinschen.de>
 
 	* common.din (siglongjmp): Export.
