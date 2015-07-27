@@ -131,13 +131,13 @@
  *
  * BKVASIZE -	Nominal buffer space per buffer, in bytes.  BKVASIZE is the
  *		minimum KVM memory reservation the kernel is willing to make.
- *		Filesystems can of course request smaller chunks.  Actual 
+ *		Filesystems can of course request smaller chunks.  Actual
  *		backing memory uses a chunk size of a page (PAGE_SIZE).
  *
  *		If you make BKVASIZE too small you risk seriously fragmenting
  *		the buffer KVM map which may slow things down a bit.  If you
- *		make it too big the kernel will not be able to optimally use 
- *		the KVM memory reserved for the buffer cache and will wind 
+ *		make it too big the kernel will not be able to optimally use
+ *		the KVM memory reserved for the buffer cache and will wind
  *		up with too-few buffers.
  *
  *		The default is 16384, roughly 2x the block size used by a

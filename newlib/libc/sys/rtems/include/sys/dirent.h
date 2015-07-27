@@ -58,7 +58,7 @@ int scandir ( const char *dirname,
 
 #ifdef __cplusplus
 }
-#endif 
+#endif
 
 
 #endif
