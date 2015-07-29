@@ -24,3 +24,7 @@ Bug Fixes
 
 - Fix crashes under AllocationPreference=0x100000 condition
   Addresses: https://cygwin.com/ml/cygwin/2015-02/msg00765.html
+
+- x86_64 only: Implement memset, memmove, memcpy, wmemmove, wmemcpy in
+  assembler derived from NetBSD.
+  Addresses: https://cygwin.com/ml/cygwin-patches/2015-q3/msg00010.html

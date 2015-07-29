@@ -898,23 +898,177 @@ err:
 }
 
 #ifdef __x86_64__
-// TODO: The equivalent newlib functions only work for SYSV ABI so far.
-#undef RtlFillMemory
-#undef RtlCopyMemory
-extern "C" void NTAPI RtlFillMemory (PVOID, SIZE_T, BYTE);
-extern "C" void NTAPI RtlCopyMemory (PVOID, const VOID *, SIZE_T);
+/* These functions are almost verbatim NetBSD code, just wrapped in the
+   minimum required code to make them work with the MS AMD64 ABI.
+   See NetBSD src/lib/libc/amd64/string/memset.S
+   and NetBSD src/lib/libc/amd64/string/bcopy.S */
 
-extern "C" void *
-memset (void *s, int c, size_t n)
-{
-  RtlFillMemory (s, n, c);
-  return s;
-}
+asm volatile ("								\n\
+/*									\n\
+ * Written by J.T. Conklin <jtc@NetBSD.org>.				\n\
+ * Public domain.							\n\
+ * Adapted for NetBSD/x86_64 by						\n\
+ * Frank van der Linden <fvdl@wasabisystems.com>			\n\
+ */									\n\
+									\n\
+	.globl	memset							\n\
+	.seh_proc memset						\n\
+memset:									\n\
+	movq	%rsi,8(%rsp)						\n\
+	movq	%rdi,16(%rsp)						\n\
+	.seh_endprologue						\n\
+	movq	%rcx,%rdi						\n\
+	movq	%rdx,%rsi						\n\
+	movq	%r8,%rdx						\n\
+									\n\
+	movq    %rsi,%rax						\n\
+	andq    $0xff,%rax						\n\
+	movq    %rdx,%rcx						\n\
+	movq    %rdi,%r11						\n\
+									\n\
+	cld			/* set fill direction forward */	\n\
+									\n\
+	/* if the string is too short, it's really not worth the	\n\
+	 * overhead of aligning to word boundries, etc.  So we jump to	\n\
+	 * a plain unaligned set. */					\n\
+	cmpq    $0x0f,%rcx						\n\
+	jle     L1							\n\
+									\n\
+	movb    %al,%ah		/* copy char to all bytes in word */\n\
+	movl    %eax,%edx						\n\
+	sall    $16,%eax						\n\
+	orl     %edx,%eax						\n\
+									\n\
+	movl    %eax,%edx						\n\
+	salq    $32,%rax						\n\
+	orq     %rdx,%rax						\n\
+									\n\
+	movq    %rdi,%rdx	/* compute misalignment */		\n\
+	negq    %rdx							\n\
+	andq    $7,%rdx							\n\
+	movq    %rcx,%r8						\n\
+	subq    %rdx,%r8						\n\
+									\n\
+	movq    %rdx,%rcx	/* set until word aligned */		\n\
+	rep								\n\
+	stosb								\n\
+									\n\
+	movq    %r8,%rcx						\n\
+	shrq    $3,%rcx		/* set by words */			\n\
+	rep								\n\
+	stosq								\n\
+									\n\
+	movq    %r8,%rcx	/* set remainder by bytes */		\n\
+	andq    $7,%rcx							\n\
+L1:     rep								\n\
+	stosb								\n\
+	movq    %r11,%rax						\n\
+									\n\
+	movq	8(%rsp),%rsi						\n\
+	movq	16(%rsp),%rdi						\n\
+	ret								\n\
+	.seh_endproc							\n\
+");
 
-extern "C" void *
-memcpy(void *__restrict dest, const void *__restrict src, size_t n)
-{
-  RtlCopyMemory (dest, src, n);
-  return dest;
-}
+asm volatile ("								\n\
+/*-									\n\
+ * Copyright (c) 1990 The Regents of the University of California.	\n\
+ * All rights reserved.							\n\
+ *									\n\
+ * This code is derived from locore.s.					\n\
+ *									\n\
+ * Redistribution and use in source and binary forms, with or without	\n\
+ * modification, are permitted provided that the following conditions	\n\
+ * are met:								\n\
+ * 1. Redistributions of source code must retain the above copyright	\n\
+ *    notice, this list of conditions and the following disclaimer.	\n\
+ * 2. Redistributions in binary form must reproduce the above copyright	\n\
+ *    notice, this list of conditions and the following disclaimer in	\n\
+ *    the documentation and/or other materials provided with the	\n\
+ *    distribution.							\n\
+ * 3. Neither the name of the University nor the names of its		\n\
+ *    contributors may be used to endorse or promote products derived	\n\
+ *    from this software without specific prior written permission.	\n\
+ *									\n\
+ * THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS ``AS IS''	\n\
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,\n\
+ * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A		\n\
+ * PARTICULAR PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL THE REGENTS OR	\n\
+ * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,\n\
+ * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,	\n\
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR	\n\
+ * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY	\n\
+ * OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT		\n\
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE	\n\
+ * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH	\n\
+ * DAMAGE.								\n\
+ */									\n\
+									\n\
+	.globl  memmove							\n\
+	.seh_proc memmove						\n\
+memmove:								\n\
+	.seh_endprologue						\n\
+	nop			/* FALLTHRU */				\n\
+	.seh_endproc							\n\
+									\n\
+	.globl  memcpy							\n\
+	.seh_proc memcpy						\n\
+memcpy:									\n\
+	movq	%rsi,8(%rsp)						\n\
+	movq	%rdi,16(%rsp)						\n\
+	.seh_endprologue						\n\
+	movq	%rcx,%rdi						\n\
+	movq	%rdx,%rsi						\n\
+	movq	%r8,%rdx						\n\
+									\n\
+	movq	%rdi,%rax	/* return dst */			\n\
+	movq    %rdx,%rcx						\n\
+	movq    %rdi,%r8						\n\
+	subq    %rsi,%r8						\n\
+	cmpq    %rcx,%r8	/* overlapping? */			\n\
+	jb      1f							\n\
+	cld                     /* nope, copy forwards. */		\n\
+	shrq    $3,%rcx		/* copy by words */			\n\
+	rep movsq							\n\
+	movq    %rdx,%rcx						\n\
+	andq    $7,%rcx		/* any bytes left? */			\n\
+	rep movsb							\n\
+	jmp	2f							\n\
+1:									\n\
+	addq    %rcx,%rdi	/* copy backwards. */			\n\
+	addq    %rcx,%rsi						\n\
+	std								\n\
+	andq    $7,%rcx		/* any fractional bytes? */		\n\
+	decq    %rdi							\n\
+	decq    %rsi							\n\
+	rep movsb							\n\
+	movq    %rdx,%rcx	/* copy remainder by words */		\n\
+	shrq    $3,%rcx							\n\
+	subq    $7,%rsi							\n\
+	subq    $7,%rdi							\n\
+	rep movsq							\n\
+	cld								\n\
+2:									\n\
+	movq	8(%rsp),%rsi						\n\
+	movq	16(%rsp),%rdi						\n\
+	ret								\n\
+	.seh_endproc							\n\
+");
+
+asm volatile ("								\n\
+	.globl  wmemmove						\n\
+	.seh_proc wmemmove						\n\
+wmemmove:								\n\
+	.seh_endprologue						\n\
+	nop			/* FALLTHRU */				\n\
+	.seh_endproc							\n\
+									\n\
+	.globl  wmemcpy							\n\
+	.seh_proc wmemcpy						\n\
+wmemcpy:								\n\
+	.seh_endprologue						\n\
+	shlq	$1,%r8		/* cnt * sizeof (wchar_t) */		\n\
+	jmp	memcpy							\n\
+	.seh_endproc							\n\
+");
 #endif

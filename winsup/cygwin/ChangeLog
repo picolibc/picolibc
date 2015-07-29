@@ -1,5 +1,11 @@
 2015-07-29  Corinna Vinschen  <corinna@vinschen.de>
 
+	* miscfuncs.cc (memset): x86_64 only: Implement in assembler.
+	(memmove,memcpy): x86_64 only: Ditto.
+	(wmemmove,wmemcpy): x86_64 only: Ditto.
+
+2015-07-29  Corinna Vinschen  <corinna@vinschen.de>
+
 	* cygtls.h: Include cygtls_padsize.h and define CYGTLS_PADSIZE there.
 	* cygtls_padsize.h: New file.  Define CYGTLS_PADSIZE.
 	* environ.cc (parse_options): Fix NULL pointer access.
