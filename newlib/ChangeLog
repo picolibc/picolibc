@@ -1,3 +1,7 @@
+2015-07-28  Sebastian Huber  <sebastian.huber@embedded-brains.de>
+
+	* libc/sys/rtems/include/sys/lock.h: New.
+
 2015-07-21  Corinna Vinschen  <corinna@vinschen.de>
 
 	* libc/include/machine/setjmp.h (siglongjmp): Declare as function on
