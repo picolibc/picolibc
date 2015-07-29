@@ -1,6 +1,6 @@
 /* wow64.cc
 
-   Copyright 2011, 2012 Red Hat, Inc.
+   Copyright 2011, 2012, 2015 Red Hat, Inc.
 
 This file is part of Cygwin.
 

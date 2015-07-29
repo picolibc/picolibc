@@ -1,6 +1,6 @@
 /* tzset.c: Convert current Windows timezone to POSIX timezone information.
 
-   Copyright 2012, 2013, 2014 Red Hat, Inc.
+   Copyright 2012, 2013, 2014, 2015 Red Hat, Inc.
 
 This file is part of Cygwin.
 

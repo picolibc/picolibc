@@ -1,7 +1,7 @@
 /* child_info.h: shared child info for cygwin
 
    Copyright 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2008, 2009, 2011, 2012,
-   2013 Red Hat, Inc.
+   2013, 2015 Red Hat, Inc.
 
 This file is part of Cygwin.
 

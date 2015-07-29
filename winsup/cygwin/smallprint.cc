@@ -1,8 +1,7 @@
 /* smallprint.cc: small print routines for WIN32
 
    Copyright 1996, 1998, 2000, 2001, 2002, 2003, 2005, 2006,
-	     2007, 2008, 2009, 2012, 2013, 2014
-   Red Hat, Inc.
+	     2007, 2008, 2009, 2012, 2013, 2014, 2015 Red Hat, Inc.
 
 This file is part of Cygwin.
 
