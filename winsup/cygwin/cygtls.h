@@ -271,12 +271,7 @@ private:
 };
 #pragma pack(pop)
 
-/* FIXME: Find some way to autogenerate this value */
-#ifdef __x86_64__
-const int CYGTLS_PADSIZE = 12800;	/* Must be 16-byte aligned */
-#else
-const int CYGTLS_PADSIZE = 12700;
-#endif
+#include "cygtls_padsize.h"
 
 /*gentls_offsets*/
 

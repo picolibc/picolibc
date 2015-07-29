@@ -25,8 +25,10 @@ static bool dll_finished_loading;
 static void WINAPI
 threadfunc_fe (VOID *arg)
 {
+#ifndef __x86_64__
   (void)__builtin_return_address(1);
   asm volatile ("andl $-16,%%esp" ::: "%esp");
+#endif
   _cygtls::call ((DWORD (*)  (void *, void *)) TlsGetValue (_my_oldfunc), arg);
 }
 

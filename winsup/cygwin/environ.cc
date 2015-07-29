@@ -232,8 +232,7 @@ parse_options (const char *inbuf)
 	    switch (k->disposition)
 	      {
 	      case isfunc:
-		k->setting.func ((!eq || !istrue) ?
-		  k->values[istrue].s : eq);
+		k->setting.func ((!eq || !istrue) ?  k->values[istrue].s : eq);
 		debug_printf ("%s (called func)", k->name);
 		break;
 	      case setdword:
@@ -258,10 +257,12 @@ parse_options (const char *inbuf)
 		break;
 	      }
 
+	    int n = 0;
 	    if (eq)
-	      *--eq = ch;
-
-	    int n = eq - p;
+	      {
+		*--eq = ch;
+		n = eq - p;
+	      }
 	    p = strdup (keyword_here);
 	    if (n > 0)
 	      p[n] = ':';

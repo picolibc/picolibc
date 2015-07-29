@@ -1,3 +1,10 @@
+2015-07-29  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygtls.h: Include cygtls_padsize.h and define CYGTLS_PADSIZE there.
+	* cygtls_padsize.h: New file.  Define CYGTLS_PADSIZE.
+	* environ.cc (parse_options): Fix NULL pointer access.
+	* init.cc (threadfunc_fe): Do not force stack align on x86_64.
+
 2015-07-23  Corinna Vinschen  <corinna@vinschen.de>
 
 	* exceptions.cc (__cont_link_context): x86_64: align stack and reserve

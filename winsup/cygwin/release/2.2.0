@@ -21,3 +21,6 @@ Bug Fixes
 
 - Fix potential hang running ldd(1).
   Addresses: https://cygwin.com/ml/cygwin/2015-07/msg00292.html
+
+- Fix crashes under AllocationPreference=0x100000 condition
+  Addresses: https://cygwin.com/ml/cygwin/2015-02/msg00765.html

@@ -1,7 +1,7 @@
 /* strace.cc
 
    Copyright 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008,
-   2009, 2010, 2011, 2012, 2013 Red Hat Inc.
+   2009, 2010, 2011, 2012, 2013, 2015 Red Hat Inc.
 
    Written by Chris Faylor <cgf@redhat.com>
 
@@ -26,6 +26,7 @@ details. */
 #include "../cygwin/include/sys/strace.h"
 #include "../cygwin/include/sys/cygwin.h"
 #include "../cygwin/include/cygwin/version.h"
+#include "../cygwin/cygtls_padsize.h"
 #include "path.h"
 #undef cygwin_internal
 #include "loadlib.h"
@@ -1025,7 +1026,7 @@ print_version ()
 }
 
 int
-main (int argc, char **argv)
+main2 (int argc, char **argv)
 {
   unsigned mask = 0;
   FILE *ofile = NULL;
@@ -1163,6 +1164,19 @@ character #%d.\n", optarg, (int) (endptr - optarg), endptr);
       ExitProcess (ret);
     }
   return 0;
+}
+
+int
+main (int argc, char **argv)
+{
+  /* Make sure to have room for the _cygtls area *and* to initialize it.
+     This is required to make sure cygwin_internal calls into Cygwin work
+     reliably.  This problem has been noticed under AllocationPreference
+     registry setting to 0x100000 (TOP_DOWN). */
+  char buf[CYGTLS_PADSIZE];
+
+  memset (buf, 0, sizeof (buf));
+  exit (main2 (argc, argv));
 }
 
 #undef CloseHandle
