@@ -216,7 +216,7 @@ typedef struct _Mutex_recursive_Control _LOCK_RECURSIVE_T;
     _qualifier _LOCK_T _designator = _MUTEX_INITIALIZER
 
 #define __LOCK_INIT_RECURSIVE(_qualifier, _designator) \
-    _qualifier _LOCK_T _designator = _MUTEX_RECURSIVE_INITIALIZER
+    _qualifier _LOCK_RECURSIVE_T _designator = _MUTEX_RECURSIVE_INITIALIZER
 
 #define __lock_init(_lock) _Mutex_Initialize(&_lock)
 #define __lock_acquire(_lock) _Mutex_Acquire(&_lock)
