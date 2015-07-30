@@ -1,3 +1,7 @@
+2015-07-30  Wilco Dijkstra  <wdijkstr@arm.com>
+
+	* libc/machine/aarch64/memset.S (memset): Rewrite.
+
 2015-07-28  Sebastian Huber  <sebastian.huber@embedded-brains.de>
 
 	libc/sys/rtems/machine/_types.h: Move to ...
