@@ -4,6 +4,7 @@
 # define _SYS_PARAM_H
 
 #include <machine/param.h>
+#include <machine/endian.h>
 
 #ifndef HZ
 # define HZ (60)
@@ -13,15 +14,6 @@
 #endif
 #ifndef PATHSIZE
 # define PATHSIZE (1024)
-#endif
-
-#define BIG_ENDIAN      4321
-#define LITTLE_ENDIAN   1234
-
-#ifdef __ARMEB__
-#define BYTE_ORDER BIG_ENDIAN
-#else
-#define BYTE_ORDER LITTLE_ENDIAN
 #endif
 
 #endif
