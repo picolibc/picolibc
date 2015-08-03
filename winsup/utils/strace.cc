@@ -1034,6 +1034,7 @@ main2 (int argc, char **argv)
   int opt;
   int toggle = 0;
   int sawquiet = -1;
+  DWORD ret = 0;
 
   if (load_cygwin ())
     {
@@ -1147,23 +1148,24 @@ character #%d.\n", optarg, (int) (endptr - optarg), endptr);
   if (!mask)
     mask = _STRACE_ALL;
 
-  if (bufsize)
-    setvbuf (ofile, (char *) alloca (bufsize), _IOFBF, bufsize);
-
   if (!ofile)
     ofile = stdout;
+
+  if (bufsize)
+    setvbuf (ofile, (char *) alloca (bufsize), _IOFBF, bufsize);
 
   if (toggle)
     dotoggle (pid);
   else
     {
       drive_map = (void *) cygwin_internal (CW_ALLOC_DRIVE_MAP);
-      DWORD ret = dostrace (mask, ofile, pid, argv + optind);
+      ret = dostrace (mask, ofile, pid, argv + optind);
       if (drive_map)
 	cygwin_internal (CW_FREE_DRIVE_MAP, drive_map);
-      ExitProcess (ret);
     }
-  return 0;
+  if (ofile && ofile != stdout)
+    fclose (ofile);
+  ExitProcess (ret);
 }
 
 int
