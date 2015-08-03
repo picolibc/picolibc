@@ -1,3 +1,9 @@
+2015-08-03  Shoichi Sakon  <s-sakon@ap.jp.nec.com>
+
+	* libc/stdio/vfwscanf.c (__SVFWSCANF_R): Convert wrong usage of va_arg
+	to GET_ARG in %lc, %ls nad %l[] cases.  Fix unterminated string in %l[]
+	case.
+
 2015-07-30  Sebastian Huber  <sebastian.huber@embedded-brains.de>
 
 	* libc/sys/rtems/include/sys/lock.h (__LOCK_INIT_RECURSIVE): Use

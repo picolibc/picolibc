@@ -777,7 +777,7 @@ _DEFUN(__SVFWSCANF_R, (rptr, fp, fmt0, ap),
           if (flags & LONG)
 	    {
 	      if (!(flags & SUPPRESS))
-		p = va_arg(ap, wchar_t *);
+		p = GET_ARG(N, ap, wchar_t *);
 	      n = 0;
 	      while (width-- != 0 && (wi = _fgetwc_r (rptr, fp)) != WEOF)
 		{
@@ -794,7 +794,7 @@ _DEFUN(__SVFWSCANF_R, (rptr, fp, fmt0, ap),
 	  else
 	    {
 	      if (!(flags & SUPPRESS))
-		mbp = va_arg(ap, char *);
+		mbp = GET_ARG(N, ap, char *);
 	      n = 0;
 	      memset ((_PTR)&mbs, '\0', sizeof (mbstate_t));
 	      while (width != 0 && (wi = _fgetwc_r (rptr, fp)) != WEOF)
@@ -849,7 +849,7 @@ _DEFUN(__SVFWSCANF_R, (rptr, fp, fmt0, ap),
 	    }
 	  else if (flags & LONG)
 	    {
-	      p0 = p = va_arg(ap, wchar_t *);
+	      p0 = p = GET_ARG(N, ap, wchar_t *);
 	      while ((wi = _fgetwc_r (rptr, fp)) != WEOF
 		     && width-- != 0 && INCCL (wi))
 		*p++ = (wchar_t) wi;
@@ -858,11 +858,13 @@ _DEFUN(__SVFWSCANF_R, (rptr, fp, fmt0, ap),
 	      n = p - p0;
 	      if (n == 0)
 		goto match_failure;
+	      *p = L'\0';
+	      nassigned++;
 	    }
 	  else
 	    {
 	      if (!(flags & SUPPRESS))
-		mbp = va_arg(ap, char *);
+		mbp = GET_ARG(N, ap, char *);
 	      n = 0;
 	      memset ((_PTR) &mbs, '\0', sizeof (mbstate_t));
 	      while ((wi = _fgetwc_r (rptr, fp)) != WEOF
@@ -914,7 +916,7 @@ _DEFUN(__SVFWSCANF_R, (rptr, fp, fmt0, ap),
 	    }
 	  else if (flags & LONG)
 	    {
-	      p0 = p = va_arg(ap, wchar_t *);
+	      p0 = p = GET_ARG(N, ap, wchar_t *);
 	      while ((wi = _fgetwc_r (rptr, fp)) != WEOF
 		     && width-- != 0 && !iswspace (wi))
 		{
@@ -923,13 +925,13 @@ _DEFUN(__SVFWSCANF_R, (rptr, fp, fmt0, ap),
 		}
 	      if (wi != WEOF)
 		_ungetwc_r (rptr, wi, fp);
-	      *p = '\0';
+	      *p = L'\0';
 	      nassigned++;
 	    }
 	  else
 	    {
 	      if (!(flags & SUPPRESS))
-		mbp = va_arg(ap, char *);
+		mbp = GET_ARG(N, ap, char *);
 	      memset ((_PTR) &mbs, '\0', sizeof (mbstate_t));
 	      while ((wi = _fgetwc_r (rptr, fp)) != WEOF
 		     && width != 0 && !iswspace (wi))
