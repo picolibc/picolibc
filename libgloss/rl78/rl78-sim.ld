@@ -217,6 +217,7 @@ SECTIONS
   } > ROM
 
   /* The rest are all not normally part of the runtime image.  */
+  PROVIDE (__rl78_abs__ = 0);
 
   /* Stabs debugging sections.  */
   .stab          0 : { *(.stab) }

@@ -1,3 +1,8 @@
+2015-08-04  Nick Clifton  <nickc@redhat.com>
+
+	* rl78/rl78-sim.ld: Provide a value for __rl78_abs__.
+	* rl78/rl78.ld: Likewise.
+
 2015-07-14  Andre Vieira  <andre.simoesdiasvieira@arm.com\>
 
 	* arm/elf-nano.specs: Added option to search for system headers in
