@@ -1,3 +1,7 @@
+2015-08-03  Jon Turney  <jon.turney@dronecode.org.uk>
+
+	* faq-programming.xml: Improve debugging-cygwin answer.
+
 2015-07-21  Corinna Vinschen  <corinna@vinschen.de>
 
 	* new-features.xml (ov-new2.2): Document sigsetjmp, siglongjmp.

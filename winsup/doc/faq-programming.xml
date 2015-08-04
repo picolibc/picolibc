@@ -747,14 +747,32 @@ same time. Remove all but one.
 <question><para>I may have found a bug in Cygwin, how can I debug it (the symbols in gdb look funny)?</para></question>
 <answer>
 
-<para>Debugging symbols are stripped from distibuted Cygwin binaries, so any
-symbols that you see in gdb are basically meaningless. It is also a good
+<para>Debugging symbols are stripped from distibuted Cygwin binaries, so to
+debug with <command>gdb</command> you will need to install the
+<package>cygwin-debuginfo</package> package to obtain the debug symbols for
+<filename>cygwin1.dll</filename>
+</para>
+
+<para>
+If your bug causes an exception inside <filename>cygwin1.dll</filename> you will
+need to use the <command>gdb</command> command <userinput>set cygwin-exceptions
+on</userinput> to tell <command>gdb</command> to stop on exceptions inside the
+Cygwin DLL (by default they are ignored, as they may be generated during normal
+operation e.g. when checking a pointer is valid)
+</para>
+
+<para>
+It is also a good
 idea to use the latest code in case the bug has been fixed, so we
 recommend trying the latest snapshot from
-<ulink url="https://cygwin.com/snapshots/"/> or building the DLL from GIT.
+<ulink url="https://cygwin.com/snapshots/"/> or building the DLL from git.
 </para>
+
 <para>To build a debugging version of the Cygwin DLL, you will need to follow
-the instructions at <ulink url="https://cygwin.com/faq/faq.html#faq.programming.building-cygwin"/>. 
+the instructions at <ulink url="https://cygwin.com/faq/faq.html#faq.programming.building-cygwin"/>.
+</para>
+
+<para>
 You can also contact the mailing list for pointers (a simple test case that 
 demonstrates the bug is always welcome).  
 </para>
