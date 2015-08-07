@@ -1,3 +1,7 @@
+2015-08-07  Stefan Wallentowitz  <stefan.wallentowitz@tum.de>
+
+	* libc/sys/or1k/mlock.c: Fix exception enable saving
+
 2015-08-03  Shoichi Sakon  <s-sakon@ap.jp.nec.com>
 
 	* libc/stdio/vfwscanf.c (__SVFWSCANF_R): Convert wrong usage of va_arg

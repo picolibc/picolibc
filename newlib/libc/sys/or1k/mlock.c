@@ -65,7 +65,9 @@ void __malloc_lock(struct _reent *ptr) {
 	}
 
 	// Store the TEE and IEE flags for later restore
-	_or1k_malloc_lock_restore = restore;
+	if (_or1k_malloc_lock_cnt == 0) {
+	  _or1k_malloc_lock_restore = restore;
+	}
 
 	// Increment counter. The lock may be accessed recursively
 	_or1k_malloc_lock_cnt++;
@@ -85,7 +87,7 @@ void __malloc_unlock(struct _reent *ptr) {
 		// unset lock
 		_or1k_malloc_lock = 0;
 		// Restore flags
-		or1k_critical_end(_or1k_malloc_lock_restore);
+		or1k_critical_end(restore);
 	}
 
 	return;
