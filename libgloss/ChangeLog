@@ -1,3 +1,7 @@
+2015-08-07 Stefan Wallentowitz <stefan.wallentowitz@tum.de>
+
+	* or1k/sbrk.c: Make heap end globally visible
+
 2015-08-04  Nick Clifton  <nickc@redhat.com>
 
 	* rl78/rl78-sim.ld: Provide a value for __rl78_abs__.

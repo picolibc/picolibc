@@ -21,7 +21,7 @@
 
 extern uint32_t	end; /* Set by linker.  */
 uint32_t _or1k_heap_start = &end;
-static uint32_t _or1k_heap_end;
+uint32_t _or1k_heap_end;
 
 void *
 _sbrk_r (struct _reent * reent, ptrdiff_t incr)
