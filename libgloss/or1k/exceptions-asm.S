@@ -27,6 +27,7 @@
 #define EXCEPTION_STACK_SIZE 136
 
 	.extern _or1k_exception_handler_table
+	.extern _or1k_exception_level
 
 /* -------------------------------------------------------------------------- */
 /*!Function to call appropriate exception handler
@@ -158,6 +159,24 @@ _or1k_exception_handler:
 	l.add	r21,r21,r22
 #endif
 	l.sw	0(r21),r20
+
+	/* Decrement the exception nesting level */
+	// Load the exception level entry
+	l.movhi	r2,hi(_or1k_exception_level)
+	l.ori	r2,r2,lo(_or1k_exception_level)
+#ifdef __OR1K_MULTICORE__
+	// In multicore this is the pointer to an array
+	// Load pointer value
+	l.lwz	r2,0(r2)
+	// Add word offset of this core's nesting level
+	l.add	r2,r2,r22
+#endif
+	// Load the nesting level entry
+	l.lwz	r3,0(r2)
+	// Decrement nesting level
+	l.addi	r3,r3,-1
+	// Store back the nesting level
+	l.sw	0(r2),r3
 
 	/* Restore state */
 	l.lwz   r2,0x80(r1)

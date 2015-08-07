@@ -1,5 +1,11 @@
 2015-08-07 Stefan Wallentowitz <stefan.wallentowitz@tum.de>
 
+	* or1k/crt0.S: Add exception nesting
+	* or1k/exceptions-asm.S: ditto
+	* or1k/util.c: ditto
+
+2015-08-07 Stefan Wallentowitz <stefan.wallentowitz@tum.de>
+
 	* or1k/sbrk.c: Make heap end globally visible
 
 2015-08-04  Nick Clifton  <nickc@redhat.com>

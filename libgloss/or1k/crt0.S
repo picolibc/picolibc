@@ -66,14 +66,18 @@
 // function
 #define EXCEPTION_STACK_FRAME 136
 
+#define REDZONE 128
+
 	.extern _or1k_stack_top    /* points to the next address after the stack */
 	.extern _or1k_stack_bottom /* points to the last address in the stack */
 	.extern _or1k_exception_stack_top
 	.extern _or1k_exception_stack_bottom
+	.extern _or1k_exception_level /* Nesting level of exceptions */
 
 	.section .data
 	.global _or1k_stack_size /* reserved stack size */
 	.global _or1k_exception_stack_size
+	.global _or1k_exception_level
 
 _or1k_stack_size:		.word STACK_SIZE
 _or1k_exception_stack_size:	.word EXCEPTION_STACK_SIZE
@@ -95,13 +99,35 @@ _or1k_exception_stack_size:	.word EXCEPTION_STACK_SIZE
 #define GPR_BUF_OFFSET(x) (x << 2)
 
 #ifndef __OR1K_MULTICORE__
-#define CALL_EXCEPTION_HANDLER					\
-	/* store current stack pointer to address 4 */		\
+#define CALL_EXCEPTION_HANDLER(id)				\
+	/* Store current stack pointer to address 4 */		\
 	l.sw	0x4(r0),r1;					\
+	/* Load address of exception nesting level */		\
+	l.movhi	r1,hi(_or1k_exception_level);			\
+	l.ori	r1,r1,lo(_or1k_exception_level);		\
+	/* Load the current nesting level */			\
+	l.lwz	r1,0(r1);					\
+	/* Set flag if this is the outer (first) exception */	\
+	l.sfeq	r1,r0;						\
+	/* Branch to the code for nested exceptions */		\
+	OR1K_DELAYED_NOP(					\
+		OR1K_INST(l.bnf .Lnested_##id)			\
+	);							\
 	/* Load top of the exception stack */			\
 	l.movhi	r1,hi(_or1k_exception_stack_top);		\
 	l.ori	r1,r1,lo(_or1k_exception_stack_top);		\
-	l.lwz	r1,0(r1);					\
+	OR1K_DELAYED(						\
+		/* Load value from array to stack pointer */	\
+		OR1K_INST(l.lwz r1,0(r1)),			\
+		/* and jump over the nested code */		\
+		OR1K_INST(l.j   .Lnesting_done_##id)		\
+	);							\
+.Lnested_##id:							\
+	/* Load back the stack pointer */			\
+	l.lwz	r1,0x4(r0));					\
+	/* Add redzone, nesting needs this */			\
+	l.addi	r1,r1,-REDZONE;					\
+.Lnesting_done_##id:						\
 	/* Reserve red zone and context space */		\
 	l.addi	r1,r1,-EXCEPTION_STACK_FRAME;			\
 	/* Store GPR3 in context */				\
@@ -112,6 +138,15 @@ _or1k_exception_stack_size:	.word EXCEPTION_STACK_SIZE
 	l.sw	GPR_BUF_OFFSET(1)(r1),r3;			\
 	/* Store GPR4 in the context */				\
 	l.sw	GPR_BUF_OFFSET(4)(r1),r4;			\
+	/* Load address of the exception level */		\
+	l.movhi	r3,hi(_or1k_exception_level);			\
+	l.ori	r3,r3,lo(_or1k_exception_level);		\
+	/* Load current value */				\
+	l.lwz	r4,0(r3);					\
+	/* Increment level */					\
+	l.addi	r4,r4,1;					\
+	/* Store back */					\
+	l.sw	0(r3),r4;					\
 	/* Copy the current program counter as first */		\
 	/* argument for the exception handler. This */		\
 	/* is then used to determine the exception. */		\
@@ -124,11 +159,36 @@ _or1k_exception_stack_size:	.word EXCEPTION_STACK_SIZE
 		OR1K_INST(l.j _or1k_exception_handler)		\
 	)
 #else
-#define CALL_EXCEPTION_HANDLER					\
-	/* store current stack pointer to shadow reg */		\
+#define CALL_EXCEPTION_HANDLER(id)				\
+	/* Store current stack pointer to shadow reg */		\
 	l.mtspr	r0,r1,SHADOW_REG(1);				\
-	/* store current GPR3 as we need it */			\
+	/* Store current GPR3 for temporary use */		\
 	l.mtspr	r0,r3,SHADOW_REG(2);				\
+	/* Store current GPR2 for the level pointer */		\
+	l.mtspr	r0,r4,SHADOW_REG(3);				\
+	/* Load nesting level of exceptions */			\
+	l.movhi	r4,hi(_or1k_exception_level);			\
+	l.ori	r4,r4,lo(_or1k_exception_level);		\
+	/* Load array pointer */				\
+	l.lwz	r4,0(r4);					\
+	/* Get core id */					\
+	l.mfspr	r3,r0,OR1K_SPR_SYS_COREID_ADDR;			\
+	/* Generate offset */					\
+	l.slli	r3,r3,2;					\
+	/* Generate core nesting level address */		\
+	l.add	r4,r4,r3;					\
+	/* Load nesting level */				\
+	l.lwz	r3,0(r4);					\
+	/* Increment nesting level */				\
+	l.addi	r3,r3,1;					\
+	/* Write back nesting level */				\
+	l.sw	0(r4),r3;					\
+	/* Set flag if this is the outer (first) exception */	\
+	l.sfeqi	r3,1;						\
+	/* Branch to the code for nested exceptions */		\
+	OR1K_DELAYED_NOP(					\
+		OR1K_INST(l.bnf .Lnested_##id)			\
+	);							\
 	/* Load pointer to exception stack array */		\
 	l.movhi	r1,hi(_or1k_exception_stack_core);		\
 	l.ori	r1,r1,lo(_or1k_exception_stack_core);		\
@@ -137,10 +197,19 @@ _or1k_exception_stack_size:	.word EXCEPTION_STACK_SIZE
 	l.mfspr	r3,r0,OR1K_SPR_SYS_COREID_ADDR;			\
 	/* Calculate offset in array */				\
 	l.slli	r3,r3,2;					\
-	/* Load value from array to stack pointer */		\
 	l.add	r1,r1,r3;					\
-	l.lwz	r1,0(r1);					\
-	/* Reserve red zone and context space */		\
+	OR1K_DELAYED(						\
+		/* Load value from array to stack pointer */	\
+		OR1K_INST(l.lwz r1,0(r1)),			\
+		/* and jump over nested exception pointer */	\
+		OR1K_INST(l.j .Lnesting_done_##id)		\
+	);							\
+.Lnested_##id:							\
+	/* The stack pointer is still active */			\
+	/* Add redzone, nesting needs this */			\
+	l.addi	r1,r1,-REDZONE;					\
+.Lnesting_done_##id:						\
+	/* Reserve context space */				\
 	l.addi	r1,r1,-EXCEPTION_STACK_FRAME;			\
 	/* Load back software's stack pointer */		\
 	l.mfspr	r3,r0,SHADOW_REG(1);				\
@@ -150,6 +219,8 @@ _or1k_exception_stack_size:	.word EXCEPTION_STACK_SIZE
 	l.mfspr	r3,r0,SHADOW_REG(2);				\
 	/* Store this in the context */				\
 	l.sw	GPR_BUF_OFFSET(3)(r1),r3;			\
+	/* Load back GPR4 */					\
+	l.mfspr	r4,r0,SHADOW_REG(3);				\
 	/* Store GPR4 in the context */				\
 	l.sw	GPR_BUF_OFFSET(4)(r1),r4;			\
 	/* Copy the current program counter as first */		\
@@ -223,107 +294,107 @@ _or1k_reset:
 	OR1K_DELAYED_NOP(OR1K_INST(l.jr r4))
 
 	.org 0x200
-	CALL_EXCEPTION_HANDLER
+	CALL_EXCEPTION_HANDLER(2)
 
 	/* 0x300: Data Page Fault exception */
 	.org 0x300
-	CALL_EXCEPTION_HANDLER
+	CALL_EXCEPTION_HANDLER(3)
 
 	/* 0x400: Insn Page Fault exception */
 	.org 0x400
-	CALL_EXCEPTION_HANDLER
+	CALL_EXCEPTION_HANDLER(4)
 
 	/* 0x500: Timer exception */
 	.org 0x500
-	CALL_EXCEPTION_HANDLER
+	CALL_EXCEPTION_HANDLER(5)
 
 	/* 0x600: Aligment exception */
 	.org 0x600
-	CALL_EXCEPTION_HANDLER
+	CALL_EXCEPTION_HANDLER(6)
 
 	/* 0x700: Illegal insn exception */
 	.org 0x700
-	CALL_EXCEPTION_HANDLER
+	CALL_EXCEPTION_HANDLER(7)
 
 	/* 0x800: External interrupt exception */
 	.org 0x800
-	CALL_EXCEPTION_HANDLER
+	CALL_EXCEPTION_HANDLER(8)
 
 	/* 0x900: DTLB miss exception */
 	.org 0x900
-	CALL_EXCEPTION_HANDLER
+	CALL_EXCEPTION_HANDLER(9)
 
 	/* 0xa00: ITLB miss exception */
 	.org 0xa00
-	CALL_EXCEPTION_HANDLER
+	CALL_EXCEPTION_HANDLER(10)
 
 	/* 0xb00: Range exception */
 	.org 0xb00
-	CALL_EXCEPTION_HANDLER
+	CALL_EXCEPTION_HANDLER(11)
 
 	/* 0xc00: Syscall exception */
 	.org 0xc00
-	CALL_EXCEPTION_HANDLER
+	CALL_EXCEPTION_HANDLER(12)
 
 	/* 0xd00: Floating point exception */
 	.org 0xd00
-	CALL_EXCEPTION_HANDLER
+	CALL_EXCEPTION_HANDLER(13)
 
 	/* 0xe00: Trap exception */
 	.org 0xe00
-	CALL_EXCEPTION_HANDLER
+	CALL_EXCEPTION_HANDLER(14)
 
 	/* 0xf00: Reserved exceptions */
 	.org 0xf00
-	CALL_EXCEPTION_HANDLER
+	CALL_EXCEPTION_HANDLER(15)
 
 	.org 0x1000
-	CALL_EXCEPTION_HANDLER
+	CALL_EXCEPTION_HANDLER(16)
 
 	.org 0x1100
-	CALL_EXCEPTION_HANDLER
+	CALL_EXCEPTION_HANDLER(17)
 
 	.org 0x1200
-	CALL_EXCEPTION_HANDLER
+	CALL_EXCEPTION_HANDLER(18)
 
 	.org 0x1300
-	CALL_EXCEPTION_HANDLER
+	CALL_EXCEPTION_HANDLER(19)
 
 	.org 0x1400
-	CALL_EXCEPTION_HANDLER
+	CALL_EXCEPTION_HANDLER(20)
 
 	.org 0x1500
-	CALL_EXCEPTION_HANDLER
+	CALL_EXCEPTION_HANDLER(21)
 
 	.org 0x1600
-	CALL_EXCEPTION_HANDLER
+	CALL_EXCEPTION_HANDLER(22)
 
 	.org 0x1700
-	CALL_EXCEPTION_HANDLER
+	CALL_EXCEPTION_HANDLER(23)
 
 	.org 0x1800
-	CALL_EXCEPTION_HANDLER
+	CALL_EXCEPTION_HANDLER(24)
 
 	.org 0x1900
-	CALL_EXCEPTION_HANDLER
+	CALL_EXCEPTION_HANDLER(25)
 
 	.org 0x1a00
-	CALL_EXCEPTION_HANDLER
+	CALL_EXCEPTION_HANDLER(26)
 
 	.org 0x1b00
-	CALL_EXCEPTION_HANDLER
+	CALL_EXCEPTION_HANDLER(27)
 
 	.org 0x1c00
-	CALL_EXCEPTION_HANDLER
+	CALL_EXCEPTION_HANDLER(28)
 
 	.org 0x1d00
-	CALL_EXCEPTION_HANDLER
+	CALL_EXCEPTION_HANDLER(29)
 
 	.org 0x1e00
-	CALL_EXCEPTION_HANDLER
+	CALL_EXCEPTION_HANDLER(30)
 
 	.org 0x1f00
-	CALL_EXCEPTION_HANDLER
+	CALL_EXCEPTION_HANDLER(31)
 
 	/* Pad to the end */
 	.org 0x1ffc

@@ -23,8 +23,13 @@
 #include "or1k-internals.h"
 
 #ifdef __OR1K_MULTICORE__
+// Define pointers to arrays
 uint32_t* *_or1k_stack_core;
 uint32_t* *_or1k_exception_stack_core;
+uint32_t* *_or1k_exception_level;
+#else
+// Define scalar
+uint32_t _or1k_exception_level;
 #endif
 
 uint32_t* _or1k_stack_top;
@@ -67,6 +72,15 @@ void _or1k_init() {
 	}
 #else
 	_or1k_exception_handler_table[6] = _or1k_interrupt_handler;
+#endif
+
+#ifdef __OR1K_MULTICORE__
+	_or1k_exception_level = _sbrk_r(0, 4 * or1k_numcores());
+	for (c = 0; c < or1k_numcores(); c++) {
+		_or1k_exception_level[c] = 0;
+	}
+#else
+	_or1k_exception_level = 0;
 #endif
 }
 
