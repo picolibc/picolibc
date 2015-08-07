@@ -124,7 +124,7 @@ _or1k_exception_stack_size:	.word EXCEPTION_STACK_SIZE
 	);							\
 .Lnested_##id:							\
 	/* Load back the stack pointer */			\
-	l.lwz	r1,0x4(r0));					\
+	l.lwz	r1,0x4(r0);					\
 	/* Add redzone, nesting needs this */			\
 	l.addi	r1,r1,-REDZONE;					\
 .Lnesting_done_##id:						\

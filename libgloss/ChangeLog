@@ -1,5 +1,10 @@
 2015-08-07 Stefan Wallentowitz <stefan.wallentowitz@tum.de>
 
+	* or1k/boards/optimsoc.S: Fix symbol name
+	* or1k/crt0.S: Remove paranthesis
+
+2015-08-07 Stefan Wallentowitz <stefan.wallentowitz@tum.de>
+
 	* or1k/crt0.S: Add exception nesting
 	* or1k/exceptions-asm.S: ditto
 	* or1k/util.c: ditto

@@ -59,7 +59,7 @@ _or1k_board_init_early:
 #ifndef __OR1K_MULTICORE__
 	l.nop	0x1
 .die:
-	OR1K_DELAYED_NOP(l.j die)
+	OR1K_DELAYED_NOP(l.j .die)
 #endif
 	l.movhi	r1,hi(OPTIMSOC_NA_LMEM_SIZE)
 	l.ori	r1,r1,lo(OPTIMSOC_NA_LMEM_SIZE)
