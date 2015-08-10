@@ -1,5 +1,9 @@
 2015-08-10  Corinna Vinschen  <corinna@vinschen.de>
 
+	*  miscfuncs.cc: Fix comment preceeding x86_64 memset and friends.
+
+2015-08-10  Corinna Vinschen  <corinna@vinschen.de>
+
 	* uinfo.cc (cygheap_user::ontherange): Revert previous patch.
 
 2015-08-03  Corinna Vinschen  <corinna@vinschen.de>
