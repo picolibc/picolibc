@@ -107,7 +107,7 @@
 	courierize
 	do_fancy_stuff
 	catstr
-	"@*\n" catstr
+	"@sp 1\n" catstr
 	;
 
 : asection
