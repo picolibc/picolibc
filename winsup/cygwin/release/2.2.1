@@ -5,11 +5,13 @@ What's new:
 What changed:
 -------------
 
-- Revert the following patch from 2.2.0:
-  When started from a non-Cygwin process, check if $HOME starts with a
-  slash (absolute POSIX path).  Otherwise ignore it.
-
 
 Bug Fixes
 ---------
 
+- Revert the following patch from 2.2.0:
+  When started from a non-Cygwin process, check if $HOME starts with a
+  slash (absolute POSIX path).  Otherwise ignore it.
+
+- Fix output of /proc/cpuinfo in terms of cpu topology and cache size for
+  modern CPUs and modern Windows OSes supporting more than 64 logical CPUs.

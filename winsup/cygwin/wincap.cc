@@ -49,6 +49,7 @@ wincaps wincap_xpsp2 __attribute__((section (".cygwin_dll_common"), shared)) = {
   has_microsoft_accounts:false,
   has_set_thread_stack_guarantee:false,
   has_broken_rtl_query_process_debug_information:false,
+  has_processor_groups:false,
 };
 
 wincaps wincap_2003 __attribute__((section (".cygwin_dll_common"), shared)) = {
@@ -80,6 +81,7 @@ wincaps wincap_2003 __attribute__((section (".cygwin_dll_common"), shared)) = {
   has_microsoft_accounts:false,
   has_set_thread_stack_guarantee:true,
   has_broken_rtl_query_process_debug_information:true,
+  has_processor_groups:false,
 };
 
 wincaps wincap_vista __attribute__((section (".cygwin_dll_common"), shared)) = {
@@ -111,6 +113,7 @@ wincaps wincap_vista __attribute__((section (".cygwin_dll_common"), shared)) = {
   has_microsoft_accounts:false,
   has_set_thread_stack_guarantee:true,
   has_broken_rtl_query_process_debug_information:false,
+  has_processor_groups:false,
 };
 
 wincaps wincap_7 __attribute__((section (".cygwin_dll_common"), shared)) = {
@@ -142,6 +145,7 @@ wincaps wincap_7 __attribute__((section (".cygwin_dll_common"), shared)) = {
   has_microsoft_accounts:false,
   has_set_thread_stack_guarantee:true,
   has_broken_rtl_query_process_debug_information:false,
+  has_processor_groups:true,
 };
 
 wincaps wincap_8 __attribute__((section (".cygwin_dll_common"), shared)) = {
@@ -173,6 +177,7 @@ wincaps wincap_8 __attribute__((section (".cygwin_dll_common"), shared)) = {
   has_microsoft_accounts:true,
   has_set_thread_stack_guarantee:true,
   has_broken_rtl_query_process_debug_information:false,
+  has_processor_groups:true,
 };
 
 wincaps wincap_10 __attribute__((section (".cygwin_dll_common"), shared)) = {
@@ -204,6 +209,7 @@ wincaps wincap_10 __attribute__((section (".cygwin_dll_common"), shared)) = {
   has_microsoft_accounts:true,
   has_set_thread_stack_guarantee:true,
   has_broken_rtl_query_process_debug_information:false,
+  has_processor_groups:true,
 };
 
 wincapc wincap __attribute__((section (".cygwin_dll_common"), shared));

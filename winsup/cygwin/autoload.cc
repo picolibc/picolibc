@@ -576,11 +576,13 @@ LoadDLLfunc (GetUdpTable, 12, iphlpapi)
 
 LoadDLLfuncEx (CancelSynchronousIo, 4, kernel32, 1)
 LoadDLLfunc (CreateSymbolicLinkW, 12, kernel32)
+LoadDLLfuncEx (GetLogicalProcessorInformationEx, 12, kernel32, 1)
 LoadDLLfuncEx (GetNamedPipeClientProcessId, 8, kernel32, 1)
 LoadDLLfunc (GetSystemTimePreciseAsFileTime, 4, kernel32)
 LoadDLLfuncEx (IdnToAscii, 20, kernel32, 1)
 LoadDLLfuncEx (IdnToUnicode, 20, kernel32, 1)
 LoadDLLfunc (LocaleNameToLCID, 8, kernel32)
+LoadDLLfunc (SetThreadGroupAffinity, 12, kernel32)
 LoadDLLfunc (SetThreadStackGuarantee, 4, kernel32)
 
 /* ldap functions are cdecl! */

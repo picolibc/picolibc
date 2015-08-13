@@ -42,6 +42,7 @@ struct wincaps
   unsigned has_microsoft_accounts			: 1;
   unsigned has_set_thread_stack_guarantee		: 1;
   unsigned has_broken_rtl_query_process_debug_information : 1;
+  unsigned has_processor_groups				: 1;
 };
 
 class wincapc
@@ -98,6 +99,7 @@ public:
   bool	IMPLEMENT (has_microsoft_accounts)
   bool	IMPLEMENT (has_set_thread_stack_guarantee)
   bool	IMPLEMENT (has_broken_rtl_query_process_debug_information)
+  bool	IMPLEMENT (has_processor_groups)
 
 #undef IMPLEMENT
 };

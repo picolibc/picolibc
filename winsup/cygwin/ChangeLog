@@ -1,3 +1,17 @@
+2015-08-13  Corinna Vinschen  <corinna@vinschen.de>
+
+	* autoload.cc (GetLogicalProcessorInformationEx): Import.
+	(SetThreadGroupAffinity): Import.
+	* fhandler_proc.cc (add_size): New macro.
+	(get_msb): New inline function.
+	(mask_bits): Ditto.
+	(format_proc_cpuinfo): Drop handling of old CPUs.  Check if we're
+	running on a OS version supporting porcessor groups.  If so, use
+	SetThreadGroupAffinity to set thread affinity.  Improve cache info
+	to include 3rd level cache on Intel CPUs.  Improve multi core info.
+	* wincap.h (wincaps::has_processor_groups): New element.
+	* wincap.cc: Implement above element throughout.
+
 2015-08-10  Corinna Vinschen  <corinna@vinschen.de>
 
 	*  miscfuncs.cc: Fix comment preceeding x86_64 memset and friends.
