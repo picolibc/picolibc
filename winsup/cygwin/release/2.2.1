@@ -15,3 +15,7 @@ Bug Fixes
 
 - Fix output of /proc/cpuinfo in terms of cpu topology and cache size for
   modern CPUs and modern Windows OSes supporting more than 64 logical CPUs.
+
+- Don't try to perform RFC2307 owner/group mapping on Samba/NFS if account
+  info is only fetched from local passwd/group files.
+  Addresses: https://cygwin.com/ml/cygwin/2015-07/msg00270.html

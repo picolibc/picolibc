@@ -349,7 +349,7 @@ fhandler_base::fstat_by_nfs_ea (struct stat *buf)
      add it to the mapping cache. */
   buf->st_uid = cygheap->ugid_cache.get_uid (nfs_attr->uid);
   buf->st_gid = cygheap->ugid_cache.get_gid (nfs_attr->gid);
-  if (buf->st_uid == ILLEGAL_UID)
+  if (buf->st_uid == ILLEGAL_UID && cygheap->pg.nss_pwd_db ())
     {
       uid_t map_uid = ILLEGAL_UID;
 
@@ -361,7 +361,7 @@ fhandler_base::fstat_by_nfs_ea (struct stat *buf)
       cygheap->ugid_cache.add_uid (nfs_attr->uid, map_uid);
       buf->st_uid = map_uid;
     }
-  if (buf->st_gid == ILLEGAL_GID)
+  if (buf->st_gid == ILLEGAL_GID && cygheap->pg.nss_grp_db ())
     {
       gid_t map_gid = ILLEGAL_GID;
 

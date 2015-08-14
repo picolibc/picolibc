@@ -1122,19 +1122,19 @@ convert_samba_sd (security_descriptor &sd_ret)
     return;
   group = sid;
 
-  if (sid_id_auth (owner) == 22)
+  if (sid_id_auth (owner) == 22 && cygheap->pg.nss_pwd_db ())
     {
       struct passwd *pwd;
       uid_t uid = owner.get_uid (&cldap);
       if (uid < UNIX_POSIX_OFFSET && (pwd = internal_getpwuid (uid)))
-      	owner.getfrompw (pwd);
+	owner.getfrompw (pwd);
     }
-  if (sid_id_auth (group) == 22)
+  if (sid_id_auth (group) == 22 && cygheap->pg.nss_grp_db ())
     {
       struct group *grp;
       gid_t gid = group.get_gid (&cldap);
       if (gid < UNIX_POSIX_OFFSET && (grp = internal_getgrgid (gid)))
-      	group.getfromgr (grp);
+	group.getfromgr (grp);
     }
 
   if (!NT_SUCCESS (RtlGetDaclSecurityDescriptor (sd_ret, &dummy,
@@ -1150,14 +1150,16 @@ convert_samba_sd (security_descriptor &sd_ret)
 	cygsid ace_sid ((PSID) &ace->SidStart);
 	if (sid_id_auth (ace_sid) == 22)
 	  {
-	    if (sid_sub_auth (ace_sid, 0) == 1) /* user */
+	    if (sid_sub_auth (ace_sid, 0) == 1 /* user */
+		&& cygheap->pg.nss_pwd_db ())
 	      {
 		struct passwd *pwd;
 		uid_t uid = ace_sid.get_uid (&cldap);
 		if (uid < UNIX_POSIX_OFFSET && (pwd = internal_getpwuid (uid)))
 		  ace_sid.getfrompw (pwd);
 	      }
-	    else /* group */
+	    else if (sid_sub_auth (ace_sid, 0) == 1 /* group */
+		     && cygheap->pg.nss_grp_db ())
 	      {
 		struct group *grp;
 		gid_t gid = ace_sid.get_gid (&cldap);
