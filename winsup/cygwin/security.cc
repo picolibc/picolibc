@@ -1158,7 +1158,7 @@ convert_samba_sd (security_descriptor &sd_ret)
 		if (uid < UNIX_POSIX_OFFSET && (pwd = internal_getpwuid (uid)))
 		  ace_sid.getfrompw (pwd);
 	      }
-	    else if (sid_sub_auth (ace_sid, 0) == 1 /* group */
+	    else if (sid_sub_auth (ace_sid, 0) == 2 /* group */
 		     && cygheap->pg.nss_grp_db ())
 	      {
 		struct group *grp;

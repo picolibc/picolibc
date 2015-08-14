@@ -1,9 +1,14 @@
 2015-08-14  Corinna Vinschen  <corinna@vinschen.de>
 
+	* security.cc (convert_samba_sd): Fix copy/paste error in previous
+	patch.
+
+2015-08-14  Corinna Vinschen  <corinna@vinschen.de>
+
 	* fhandler_disk_file.cc (fhandler_base::fstat_by_nfs_ea): Only try
 	to map user and group info per RFC2307 if account info is fetched
 	from Windows account DB.
-	(convert_samba_sd): Ditto.
+	* security.cc (convert_samba_sd): Ditto.
 
 2015-08-14  Corinna Vinschen  <corinna@vinschen.de>
 
