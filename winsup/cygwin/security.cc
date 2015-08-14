@@ -243,6 +243,7 @@ get_attribute_from_acl (mode_t *attribute, PACL acl, PSID owner_sid,
   mode_t deny = 0;
   mode_t *flags, *anti;
   bool isownergroup = RtlEqualSid (owner_sid, group_sid);
+  bool userisowner  = RtlEqualSid (owner_sid, cygheap->user.sid ());
 
   for (DWORD i = 0; i < acl->AceCount; ++i)
     {
@@ -340,6 +341,24 @@ get_attribute_from_acl (mode_t *attribute, PACL acl, PSID owner_sid,
 	    *flags |= S_IWGRP;
 	  if (ace->Mask & FILE_EXEC_BITS)
 	    *flags |= S_IXGRP;
+	  /* If the current user is the owner of the file, check if the
+	     additional SIDs are in the user's token.  Note that this is
+	     some ugly hack, but a full-fledged solution requires to
+	     create tokens or perhaps using AUTHZ. */
+	  BOOL ret;
+	  if (userisowner
+	      && CheckTokenMembership (cygheap->user.issetuid ()
+				       ? cygheap->user.imp_token () : NULL,
+				       ace_sid, &ret)
+	      && ret)
+	    {
+	      if (ace->Mask & FILE_READ_BITS)
+		*flags |= (!(*anti & S_IRUSR)) ? S_IRUSR : 0;
+	      if (ace->Mask & FILE_WRITE_BITS)
+		*flags |= (!(*anti & S_IWUSR)) ? S_IWUSR : 0;
+	      if (ace->Mask & FILE_EXEC_BITS)
+		*flags |= (!(*anti & S_IXUSR)) ? S_IXUSR : 0;
+	    }
 	}
     }
   *attribute &= ~(S_IRWXU | S_IRWXG | S_IRWXO | S_ISVTX | S_ISGID | S_ISUID);

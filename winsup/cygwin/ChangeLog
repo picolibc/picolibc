@@ -1,3 +1,8 @@
+2015-08-14  Corinna Vinschen  <corinna@vinschen.de>
+
+	* security,cc (get_attribute_from_acl): Merge all group perms into
+	user perms if user is member of group.
+
 2015-08-13  Corinna Vinschen  <corinna@vinschen.de>
 
 	* autoload.cc (GetLogicalProcessorInformationEx): Import.
