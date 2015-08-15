@@ -1,20 +1,15 @@
-What's new:
------------
-
-
-What changed:
--------------
-
-
 Bug Fixes
 ---------
 
 - Revert the following patch from 2.2.0:
   When started from a non-Cygwin process, check if $HOME starts with a
   slash (absolute POSIX path).  Otherwise ignore it.
+  Addresses discussion starting at
+  https://cygwin.com/ml/cygwin/2015-08/msg00048.html
 
 - Fix output of /proc/cpuinfo in terms of cpu topology and cache size for
   modern CPUs and modern Windows OSes supporting more than 64 logical CPUs.
+  Addresses: https://cygwin.com/ml/cygwin/2015-06/msg00345.html
 
 - Don't try to perform RFC2307 owner/group mapping on Samba/NFS if account
   info is only fetched from local passwd/group files.
@@ -23,4 +18,4 @@ Bug Fixes
 - Precautionally fix a potential data corruption problem in pipe I/O, only
   actually observered in Wine yet.  However, MSDN language indicates this
   might be a problem on real Windows as well.
-  Addresses: Freenode IRC #cygwin discussion, ML entry follows.
+  Addresses: https://cygwin.com/ml/cygwin/2015-08/msg00225.html
