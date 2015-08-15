@@ -19,3 +19,8 @@ Bug Fixes
 - Don't try to perform RFC2307 owner/group mapping on Samba/NFS if account
   info is only fetched from local passwd/group files.
   Addresses: https://cygwin.com/ml/cygwin/2015-07/msg00270.html
+
+- Precautionally fix a potential data corruption problem in pipe I/O, only
+  actually observered in Wine yet.  However, MSDN language indicates this
+  might be a problem on real Windows as well.
+  Addresses: Freenode IRC #cygwin discussion, ML entry follows.

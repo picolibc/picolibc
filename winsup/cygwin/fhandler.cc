@@ -2093,6 +2093,46 @@ fhandler_base_overlapped::raw_write (const void *ptr, size_t len)
       else
 	chunk = max_atomic_write;
 
+      /* MSDN "WriteFile" contains the following note: "Accessing the output
+         buffer while a write operation is using the buffer may lead to
+	 corruption of the data written from that buffer.  [...]  This can
+	 be particularly problematic when using an asynchronous file handle.
+	 (https://msdn.microsoft.com/en-us/library/windows/desktop/aa365747)
+
+	 MSDN "Synchronous and Asynchronous I/O" contains the following note:
+	 "Do not deallocate or modify [...] the data buffer until all
+	 asynchronous I/O operations to the file object have been completed."
+	 (https://msdn.microsoft.com/en-us/library/windows/desktop/aa365683)
+
+	 This problem is a non-issue for blocking I/O, but it can lead to
+	 problems when using nonblocking I/O.  Consider:
+	 - The application uses a static buffer in repeated calls to
+	   non-blocking write.
+	 - The previous write returned with success, but the overlapped I/O
+	   operation is ongoing.
+	 - The application copies the next set of data to the static buffer,
+	   thus overwriting data still accessed by the previous write call.
+	 --> potential data corruption.
+
+	 What we do here is to allocate a per-fhandler buffer big enough
+	 to perform the maximum atomic operation from, copy the user space
+	 data over to this buffer and then call NtWriteFile on this buffer.
+	 This decouples the write operation from the user buffer and the
+	 user buffer can be reused without data corruption issues.
+
+	 Since no further write can occur while we're still having ongoing
+	 I/O, this should be reasanably safe.
+
+	 Note: We only have proof that this problem actually occurs on Wine
+	 yet.  However, the MSDN language indicates that this may be a real
+	 problem on real Windows as well. */
+      if (is_nonblocking ())
+	{
+	  if (!atomic_write_buf)
+	    atomic_write_buf = cmalloc_abort (HEAP_BUF, max_atomic_write);
+	  ptr = memcpy (atomic_write_buf, ptr, chunk);
+	}
+
       nbytes = 0;
       DWORD nbytes_now = 0;
       /* Write to fd in smaller chunks, accumulating a total.

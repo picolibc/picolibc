@@ -661,6 +661,7 @@ protected:
   OVERLAPPED io_status;
   OVERLAPPED *overlapped;
   size_t max_atomic_write;
+  void *atomic_write_buf;
 public:
   wait_return __reg3 wait_overlapped (bool, bool, DWORD *, bool, DWORD = 0);
   int __reg1 setup_overlapped ();
@@ -670,7 +671,7 @@ public:
   OVERLAPPED *&get_overlapped () {return overlapped;}
   OVERLAPPED *get_overlapped_buffer () {return &io_status;}
   void set_overlapped (OVERLAPPED *ov) {overlapped = ov;}
-  fhandler_base_overlapped (): io_pending (false), overlapped (NULL), max_atomic_write (0)
+  fhandler_base_overlapped (): io_pending (false), overlapped (NULL), max_atomic_write (0), atomic_write_buf (NULL)
   {
     memset (&io_status, 0, sizeof io_status);
   }
@@ -686,11 +687,17 @@ public:
   static void __reg1 flush_all_async_io ();;
 
   fhandler_base_overlapped (void *) {}
+  ~fhandler_base_overlapped ()
+  {
+    if (atomic_write_buf)
+      cfree (atomic_write_buf);
+  }
 
   virtual void copyto (fhandler_base *x)
   {
     x->pc.free_strings ();
     *reinterpret_cast<fhandler_base_overlapped *> (x) = *this;
+    reinterpret_cast<fhandler_base_overlapped *> (x)->atomic_write_buf = NULL;
     x->reset (this);
   }
 
