@@ -456,7 +456,8 @@ void set_security_attribute (path_conv &pc, int attribute,
 			     PSECURITY_ATTRIBUTES psa,
 			     security_descriptor &sd_buf);
 
-bool get_sids_info (cygpsid, cygpsid, uid_t * , gid_t *);
+void authz_get_user_attribute (mode_t *attribute, PSECURITY_DESCRIPTOR psd,
+			       PSID user_sid);
 
 /* sec_acl.cc */
 struct acl;

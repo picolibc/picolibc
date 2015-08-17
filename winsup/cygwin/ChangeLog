@@ -1,5 +1,21 @@
 2015-11-18  Corinna Vinschen  <corinna@vinschen.de>
 
+	* autoload.cc (AuthzAccessCheck): Import.
+	(AuthzFreeContext): Import.
+	(AuthzInitializeContextFromSid): Import.
+	(AuthzInitializeContextFromToken): Import.
+	(AuthzInitializeResourceManager): Import.
+	* sec_helper.cc (get_sids_info): Remove.
+	(class authz_ctx_cache_entry): New class.
+	(class authz_ctx_cache): New class.
+	(class authz_ctx): New class.
+	(authz_get_user_attribute): New function.
+	* security.h (get_sids_info): Drop prototype.
+	(authz_get_user_attribute): Add prototype.
+	* winlean.h (_AUTHZ_): Define.
+
+2015-11-18  Corinna Vinschen  <corinna@vinschen.de>
+
 	* sec_acl.cc (get_posix_access): Fix class_perm in !new_style case.
 
 2015-11-18  Corinna Vinschen  <corinna@vinschen.de>

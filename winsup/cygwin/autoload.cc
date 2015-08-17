@@ -558,6 +558,12 @@ LoadDLLfunc (RegisterEventSourceW, 8, advapi32)
 LoadDLLfunc (ReportEventW, 36, advapi32)
 LoadDLLfunc (SystemFunction036, 8, advapi32)	/* Aka "RtlGenRandom" */
 
+LoadDLLfunc (AuthzAccessCheck, 36, authz)
+LoadDLLfunc (AuthzFreeContext, 4, authz)
+LoadDLLfunc (AuthzInitializeContextFromSid, 32, authz)
+LoadDLLfunc (AuthzInitializeContextFromToken, 32, authz)
+LoadDLLfunc (AuthzInitializeResourceManager, 24, authz)
+
 LoadDLLfunc (DnsQuery_A, 24, dnsapi)
 LoadDLLfunc (DnsRecordListFree, 8, dnsapi)
 
