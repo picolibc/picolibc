@@ -14,6 +14,8 @@ details. */
 #include "winsup.h"
 #include <stdlib.h>
 #include <sys/acl.h>
+#include <sys/queue.h>
+#include <authz.h>
 #include <wchar.h>
 #include "cygerrno.h"
 #include "security.h"
@@ -319,29 +321,6 @@ cygsidlist::add (const PSID nsi, bool well_known)
   else
     sids[cnt++] = nsi;
   return TRUE;
-}
-
-bool
-get_sids_info (cygpsid owner_sid, cygpsid group_sid, uid_t * uidret, gid_t * gidret)
-{
-  BOOL ret = false;
-  cyg_ldap cldap;
-
-  owner_sid.debug_print ("get_sids_info: owner SID =");
-  group_sid.debug_print ("get_sids_info: group SID =");
-
-  *uidret = owner_sid.get_uid (&cldap);
-  *gidret = group_sid.get_gid (&cldap);
-  if (*uidret == myself->uid)
-    {
-      if (*gidret == myself->gid)
-	ret = TRUE;
-      else
-	CheckTokenMembership (cygheap->user.issetuid ()
-			      ? cygheap->user.imp_token () : NULL,
-			      group_sid, &ret);
-    }
-  return (bool) ret;
 }
 
 PSECURITY_DESCRIPTOR
@@ -687,3 +666,169 @@ _everyone_sd (void *buf, ACCESS_MASK access)
   return psd;
 }
 
+static NO_COPY muto authz_guard;
+static LUID authz_dummy_luid = { 0 };
+
+class authz_ctx_cache_entry
+{
+  SLIST_ENTRY (authz_ctx_cache_entry)	ctx_next;
+  cygsid				sid;
+  AUTHZ_CLIENT_CONTEXT_HANDLE		ctx_hdl;
+
+  authz_ctx_cache_entry ()
+  : sid (NO_SID), ctx_hdl (NULL)
+  {
+    ctx_next.sle_next = NULL;
+  }
+  authz_ctx_cache_entry (bool)
+  : sid (NO_SID), ctx_hdl (NULL)
+  {
+    ctx_next.sle_next = NULL;
+  }
+  void set (PSID psid, AUTHZ_CLIENT_CONTEXT_HANDLE hdl)
+  {
+    sid = psid;
+    ctx_hdl = hdl;
+  }
+  bool is (PSID psid) const { return RtlEqualSid (sid, psid); }
+  AUTHZ_CLIENT_CONTEXT_HANDLE context () const { return ctx_hdl; }
+
+  friend class authz_ctx_cache;
+};
+
+class authz_ctx_cache
+{
+  SLIST_HEAD (, authz_ctx_cache_entry) ctx_list;
+
+  AUTHZ_CLIENT_CONTEXT_HANDLE context (PSID);
+
+  friend class authz_ctx;
+};
+
+class authz_ctx
+{
+  AUTHZ_RESOURCE_MANAGER_HANDLE authz_hdl;
+  AUTHZ_CLIENT_CONTEXT_HANDLE user_ctx_hdl;
+  authz_ctx_cache ctx_cache;
+  operator AUTHZ_RESOURCE_MANAGER_HANDLE ();
+
+  friend class authz_ctx_cache;
+public:
+  void get_user_attribute (mode_t *, PSECURITY_DESCRIPTOR, PSID);
+};
+
+/* Authz handles are not inheritable. */
+static NO_COPY authz_ctx authz;
+
+authz_ctx::operator AUTHZ_RESOURCE_MANAGER_HANDLE ()
+{
+  if (!authz_hdl)
+    {
+      /* Create handle to Authz resource manager */
+      authz_guard.init ("authz_guard")->acquire ();
+      if (!authz_hdl
+	  && !AuthzInitializeResourceManager (AUTHZ_RM_FLAG_NO_AUDIT,
+					      NULL, NULL, NULL, NULL,
+					      &authz_hdl))
+	debug_printf ("AuthzInitializeResourceManager, %E");
+      authz_guard.release ();
+    }
+  return authz_hdl;
+}
+
+AUTHZ_CLIENT_CONTEXT_HANDLE
+authz_ctx_cache::context (PSID user_sid)
+{
+  authz_ctx_cache_entry *entry;
+  AUTHZ_CLIENT_CONTEXT_HANDLE ctx_hdl = NULL;
+
+  SLIST_FOREACH (entry, &ctx_list, ctx_next)
+    {
+      if (entry->is (user_sid))
+	return entry->context ();
+    }
+  entry = new authz_ctx_cache_entry (true);
+  /* If the user is the current user, prefer to create the context from the
+     token, as outlined in MSDN. */
+  if (RtlEqualSid (user_sid, cygheap->user.sid ())
+      && !AuthzInitializeContextFromToken (0, cygheap->user.issetuid ()
+					   ?  cygheap->user.primary_token ()
+					   : hProcToken,
+					   authz, NULL, authz_dummy_luid,
+					   NULL, &ctx_hdl))
+    debug_printf ("AuthzInitializeContextFromToken, %E");
+  /* In any other case, create the context from the user SID. */
+  else if (!AuthzInitializeContextFromSid (0, user_sid, authz, NULL,
+					   authz_dummy_luid, NULL, &ctx_hdl))
+    debug_printf ("AuthzInitializeContextFromSid, %E");
+  else
+    {
+      entry->set (user_sid, ctx_hdl);
+      authz_guard.acquire ();
+      SLIST_INSERT_HEAD (&ctx_list, entry, ctx_next);
+      authz_guard.release ();
+      return entry->context ();
+    }
+  delete entry;
+  return NULL;
+}
+
+/* Ask Authz for the effective user permissions of the user with SID user_sid
+   on the object with security descriptor psd.  We're caching the handles for
+   the Authz resource manager and the user contexts. */
+void
+authz_ctx::get_user_attribute (mode_t *attribute, PSECURITY_DESCRIPTOR psd,
+			       PSID user_sid)
+{
+  /* If the owner is the main user of the process token (not some impersonated
+     user), cache the user context in the global user_ctx_hdl variable. */
+  AUTHZ_CLIENT_CONTEXT_HANDLE ctx_hdl = NULL;
+  if (RtlEqualSid (user_sid, cygheap->user.sid ())
+      && !cygheap->user.issetuid ())
+    {
+      if (!user_ctx_hdl)
+	{
+	  authz_guard.acquire ();
+	  if (!AuthzInitializeContextFromToken (0, hProcToken, authz, NULL,
+						authz_dummy_luid, NULL,
+						&user_ctx_hdl))
+	    debug_printf ("AuthzInitializeContextFromToken, %E");
+	  authz_guard.release ();
+	}
+      if (user_ctx_hdl)
+	ctx_hdl = user_ctx_hdl;
+    }
+  if (!ctx_hdl && !(ctx_hdl = ctx_cache.context (user_sid)))
+    return;
+  /* All set, check access. */
+  ACCESS_MASK access = 0;
+  DWORD error = 0;
+  AUTHZ_ACCESS_REQUEST req = {
+    .DesiredAccess		= MAXIMUM_ALLOWED,
+    .PrincipalSelfSid		= NULL,
+    .ObjectTypeList		= NULL,
+    .ObjectTypeListLength	= 0,
+    .OptionalArguments		= NULL
+  };
+  AUTHZ_ACCESS_REPLY repl = {
+    .ResultListLength		= 1,
+    .GrantedAccessMask		= &access,
+    .SaclEvaluationResults	= NULL,
+    .Error			= &error
+  };
+  if (AuthzAccessCheck (0, ctx_hdl, &req, NULL, psd, NULL, 0, &repl, NULL))
+    {
+      if (access & FILE_READ_BITS)
+	*attribute |= S_IRUSR;
+      if (access & FILE_WRITE_BITS)
+	*attribute |= S_IWUSR;
+      if (access & FILE_EXEC_BITS)
+	*attribute |= S_IXUSR;
+    }
+}
+
+void authz_get_user_attribute (mode_t *attribute, PSECURITY_DESCRIPTOR psd,
+			       PSID user_sid)
+{
+  authz.get_user_attribute (attribute, psd, user_sid);
+}
