@@ -1,5 +1,14 @@
 2015-08-17  Corinna Vinschen  <corinna@vinschen.de>
 
+	* fhandler_disk_file.cc (fhandler_base::fstat_by_nfs_ea): Rearrange
+	to fall back to myself uid/gid in case we don't utilize Windows
+	account DBs, just as prior to 1.7.34.
+	* sec_helper.cc (cygpsid::get_id): Disable Samba user/group mapping per
+	RFC2307 if we're not utilizing Windows account DBs.
+	* security.cc (convert_samba_sd): Revert previous patch.
+
+2015-08-17  Corinna Vinschen  <corinna@vinschen.de>
+
 	* fhandler_proc.cc (format_proc_cpuinfo): Handle AMDs providing
 	extended topology info in CPUID leaf 0x8000001e.  Fix handling of
 	AMD CPUs providing extended legacy core info in CPUID leaf 0x80000008.

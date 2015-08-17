@@ -112,7 +112,7 @@ cygpsid::get_id (BOOL search_grp, int *type, cyg_ldap *pldap)
       struct group *gr;
       if (cygheap->user.groups.pgsid == psid)
 	id = myself->gid;
-      else if (sid_id_auth (psid) == 22)
+      else if (sid_id_auth (psid) == 22 && cygheap->pg.nss_grp_db ())
 	{
 	  /* Samba UNIX group.  Try to map to Cygwin gid.  If there's no
 	     mapping in the cache, try to fetch it from the configured
@@ -144,7 +144,7 @@ cygpsid::get_id (BOOL search_grp, int *type, cyg_ldap *pldap)
       struct passwd *pw;
       if (*this == cygheap->user.sid ())
 	id = myself->uid;
-      else if (sid_id_auth (psid) == 22)
+      else if (sid_id_auth (psid) == 22 && cygheap->pg.nss_pwd_db ())
 	{
 	  /* Samba UNIX user.  See comment above. */
 	  uid_t uid = sid_sub_auth_rid (psid);
