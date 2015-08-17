@@ -1256,6 +1256,10 @@ format_proc_cpuinfo (void *, char *&destbuf)
 	    print (" 100mhzsteps");
 	  if (features1 & (1 << 7))
 	    print (" hwpstate");
+	  if (features1 & (1 << 9))
+	    print (" cpb");
+	  if (features1 & (1 << 10))
+	    print (" eff_freq_ro");
 	}
 
       if (orig_affinity_mask != 0)

@@ -1,3 +1,8 @@
+2015-08-17  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_proc.cc (format_proc_cpuinfo): Print cpb and eff_freq_ro
+	power management flags.
+
 2015-08-15  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler.cc (fhandler_base_overlapped::raw_write): When performing
