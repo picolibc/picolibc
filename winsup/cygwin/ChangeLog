@@ -1,3 +1,7 @@
+2015-08-17  Orgad Shaneh  <orgads@gmail.com>
+
+	* mkglobals_h: Handle CRLF earlier.
+
 2015-08-17  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler_proc.cc (format_proc_cpuinfo): Print cpb and eff_freq_ro
