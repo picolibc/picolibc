@@ -11,8 +11,9 @@ Bug Fixes
   modern CPUs and modern Windows OSes supporting more than 64 logical CPUs.
   Addresses: https://cygwin.com/ml/cygwin/2015-06/msg00345.html
 
-- Don't try to perform RFC2307 owner/group mapping on Samba/NFS if account
-  info is only fetched from local passwd/group files.
+- Don't call LsaLookupSids to fetch group information and don't perform RFC2307
+  owner/group mapping on Samba/NFS if account info is only fetched from local
+  passwd/group files.
   Addresses: https://cygwin.com/ml/cygwin/2015-07/msg00270.html
 
 - Precautionally fix a potential data corruption problem in pipe I/O, only

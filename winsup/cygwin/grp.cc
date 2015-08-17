@@ -152,17 +152,8 @@ internal_getgrfull (fetch_acc_t &full_acc, cyg_ldap *pldap)
   struct group *ret;
 
   cygheap->pg.nss_init ();
-  /* Check caches first. */
-  if (cygheap->pg.nss_cygserver_caching ()
-      && (ret = cygheap->pg.grp_cache.cygserver.find_group (full_acc.sid)))
-    return ret;
-  if (cygheap->pg.nss_grp_files ()
-      && (ret = cygheap->pg.grp_cache.file.find_group (full_acc.sid)))
-    return ret;
-  if (cygheap->pg.nss_grp_db ()
-      && (ret = cygheap->pg.grp_cache.win.find_group (full_acc.sid)))
-    return ret;
-  /* Ask sources afterwards. */
+  /* Skip local caches, internal_getgroups already called
+     internal_getgrsid_cachedonly. */
   if (cygheap->pg.nss_cygserver_caching ()
       && (ret = cygheap->pg.grp_cache.cygserver.add_group_from_cygserver
       							(full_acc.sid)))
@@ -598,7 +589,7 @@ internal_getgroups (int gidsetsize, gid_t *grouplist, cyg_ldap *pldap)
 				    &size);
   if (!NT_SUCCESS (status))
     {
-      system_printf ("token group list > 64K?  status = %u", status);
+      debug_printf ("NtQueryInformationToken(TokenGroups) %y", status);
       goto out;
     }
   /* Iterate over the group list and check which of them are already cached.
@@ -627,16 +618,40 @@ internal_getgroups (int gidsetsize, gid_t *grouplist, cyg_ldap *pldap)
       else 
 	sidp_buf[scnt++] = sid;
     }
-  /* If there are non-cached groups left, call LsaLookupSids and call
-     internal_getgrfull on the returned groups.  This performs a lot
-     better than calling internal_getgrsid on each group. */
+  /* If there are non-cached groups left, try to fetch them. */
   if (scnt > 0)
     {
+      /* Don't call LsaLookupSids if we're not utilizing the Windows account
+	 DBs.  If we don't have access to the AD, which is one good reason to
+	 disable passwd/group: db in nsswitch.conf, then the subsequent call
+	 to LsaLookupSids will take 5 - 10 seconds in some environments. */
+      if (!cygheap->pg.nss_grp_db ())
+	{
+	  for (DWORD pg = 0; pg < scnt; ++pg)
+	    {
+	      cygpsid sid = sidp_buf[pg];
+	      if ((grp = internal_getgrsid (sid, NULL)))
+		{
+		  if (cnt < gidsetsize)
+		    grouplist[cnt] = grp->gr_gid;
+		  ++cnt;
+		  if (gidsetsize && cnt > gidsetsize)
+		    {
+		      cnt = -1;
+		      break;
+		    }
+		}
+	    }
+	  goto out;
+	}
+      /* Otherwise call LsaLookupSids and call internal_getgrfull on the
+	 returned groups.  This performs a lot better than calling
+	 internal_getgrsid on each group. */
       status = STATUS_ACCESS_DENIED;
       HANDLE lsa = lsa_open_policy (NULL, POLICY_LOOKUP_NAMES);
       if (!lsa)
 	{
-	  system_printf ("POLICY_LOOKUP_NAMES not given?");
+	  debug_printf ("POLICY_LOOKUP_NAMES right not given?");
 	  goto out;
 	}
       status = LsaLookupSids (lsa, scnt, sidp_buf, &dlst, &nlst);
@@ -664,7 +679,7 @@ internal_getgroups (int gidsetsize, gid_t *grouplist, cyg_ldap *pldap)
 		  if (gidsetsize && cnt > gidsetsize)
 		    {
 		      cnt = -1;
-		      goto out;
+		      break;
 		    }
 		}
 	    }

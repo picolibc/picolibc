@@ -1,5 +1,12 @@
 2015-08-17  Corinna Vinschen  <corinna@vinschen.de>
 
+	* grp.cc (internal_getgrfull): Drop asking caches.  Explain why.
+	(internal_getgroups): In case we're not utilizing the Windows account
+	DBs, don't call LsaLookupSids but iterate over the group SIDs in the
+	token and call internal_getgrsid for each of them.  Explain why.
+
+2015-08-17  Corinna Vinschen  <corinna@vinschen.de>
+
 	* fhandler_disk_file.cc (fhandler_base::fstat_by_nfs_ea): Rearrange
 	to fall back to myself uid/gid in case we don't utilize Windows
 	account DBs, just as prior to 1.7.34.
