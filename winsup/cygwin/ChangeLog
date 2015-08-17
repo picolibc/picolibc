@@ -1,3 +1,9 @@
+2015-08-17  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_proc.cc (format_proc_cpuinfo): Handle AMDs providing
+	extended topology info in CPUID leaf 0x8000001e.  Fix handling of
+	AMD CPUs providing extended legacy core info in CPUID leaf 0x80000008.
+
 2015-08-17  Orgad Shaneh  <orgads@gmail.com>
 
 	* mkglobals_h: Handle CRLF earlier.

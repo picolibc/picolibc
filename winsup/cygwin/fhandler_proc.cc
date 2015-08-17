@@ -896,21 +896,37 @@ format_proc_cpuinfo (void *, char *&destbuf)
 	    }
 	  else if (is_amd)
 	    {
-	      if (maxe >= 0x80000008)
+	      if (maxe >= 0x8000001e)
+		{
+		  uint32_t cus, core_info;
+
+		  cpuid (&unused, &unused, &core_info, &unused, 0x80000008);
+		  cpuid (&unused, &cus, &unused, &unused, 0x8000001e);
+		  siblings = (core_info & 0xff) + 1;
+		  logical_bits = (core_info >> 12) & 0xf;
+		  cus = ((cus >> 8) & 0x3) + 1;
+		  ht_bits = mask_bits (cus);
+		  cpu_cores = siblings >> ht_bits;
+		}
+	      else if (maxe >= 0x80000008)
 		{
 		  uint32_t core_info;
 
 		  cpuid (&unused, &unused, &core_info, &unused, 0x80000008);
-		  cpu_cores = (core_info & 0xff) + 1;
-		  siblings = cpu_cores;
+		  siblings = (core_info & 0xff) + 1;
+		  cpu_cores = siblings;
+		  logical_bits = (core_info >> 12) & 0xf;
+		  if (!logical_bits)
+		    logical_bits = mask_bits (siblings);
+		  ht_bits = 0;
 		}
 	      else
 		{
-		  cpu_cores = (extra_info >> 16) & 0xff;
-		  siblings = cpu_cores;
+		  siblings = (extra_info >> 16) & 0xff;
+		  cpu_cores = siblings;
+		  logical_bits = mask_bits (siblings);
+		  ht_bits = 0;
 		}
-	      logical_bits = mask_bits (cpu_cores);
-	      ht_bits = 0;
 	    }
 	  phys_id = initial_apic_id >> logical_bits;
 	  core_id = (initial_apic_id & ((1 << logical_bits) - 1)) >> ht_bits;
