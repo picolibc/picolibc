@@ -1,3 +1,7 @@
+2015-08-18  Corinna Vinschen  <corinna@vinschen.de>
+
+	* exceptions.cc: Drop including ucontext.h.
+
 2015-08-17  Corinna Vinschen  <corinna@vinschen.de>
 
 	* grp.cc (internal_getgrfull): Drop asking caches.  Explain why.

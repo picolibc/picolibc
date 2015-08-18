@@ -17,7 +17,6 @@ details. */
 #include <stdarg.h>
 #include <syslog.h>
 #include <wchar.h>
-#include <ucontext.h>
 
 #include "cygtls.h"
 #include "pinfo.h"
