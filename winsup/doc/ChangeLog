@@ -1,3 +1,8 @@
+2015-08-18  Jon Turney  <jon.turney@dronecode.org.uk>
+
+	* faq-using.xml (faq.using.bloda): Add Lavasoft Web Companion to
+	BLODA list.
+
 2015-08-03  Jon Turney  <jon.turney@dronecode.org.uk>
 
 	* faq-programming.xml: Improve debugging-cygwin answer.
