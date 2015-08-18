@@ -352,6 +352,12 @@ int _EXFUN(sigqueue, (pid_t pid, int signo, const union sigval value));
 }
 #endif
 
+#if defined(__CYGWIN__)
+#if __POSIX_VISIBLE >= 200809
+#include <sys/ucontext.h>
+#endif
+#endif
+
 #ifndef _SIGNAL_H_
 /* Some applications take advantage of the fact that <sys/signal.h>
  * and <signal.h> are equivalent in glibc.  Allow for that here.  */
