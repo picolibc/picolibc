@@ -1,6 +1,6 @@
 /* netdb.cc: network database related routines.
 
-   Copyright 2002, 2003, 2007, 2008, 2010, 2011, 2013 Red Hat, Inc.
+   Copyright 2002, 2003, 2007, 2008, 2010, 2011, 2013, 2015 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -192,7 +192,7 @@ parse_services_line (FILE *svc_file, struct servent *sep)
       *protocol++ = '\0';
       sep->s_name = strdup (name);
       paranoid_printf ("sep->s_name strdup %p", sep->s_name);
-      sep->s_port = atoi (port);
+      sep->s_port = htons (atoi (port));
       sep->s_proto = strdup (protocol);
       paranoid_printf ("sep->s_proto strdup %p", sep->s_proto);
       /* parse_alias_list relies on side effects.  Read the comments

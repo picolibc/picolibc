@@ -23,3 +23,7 @@ Bug Fixes
 
 - Include <sys/ucontext.h> from <sys/signal.h> if compiling for POSIX.1-2008.
   Addresses: https://cygwin.com/ml/cygwin/2015-08/msg00266.html
+
+- getservent(3) returned the port number in host byte order.  Change that to
+  network byte order as required.
+  Addresses: https://cygwin.com/ml/cygwin/2015-08/msg00301.html

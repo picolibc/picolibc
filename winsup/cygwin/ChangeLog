@@ -1,5 +1,10 @@
 2015-08-18  Corinna Vinschen  <corinna@vinschen.de>
 
+	* netdb.cc (parse_services_line): Convert port number to network byte
+	order.
+
+2015-08-18  Corinna Vinschen  <corinna@vinschen.de>
+
 	* exceptions.cc: Drop including ucontext.h.
 
 2015-08-17  Corinna Vinschen  <corinna@vinschen.de>
