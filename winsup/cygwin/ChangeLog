@@ -1,3 +1,7 @@
+2015-08-24  Corinna Vinschen  <corinna@vinschen.de>
+
+	* include/cygwin/version.h (CYGWIN_VERSION_DLL_MINOR): Bump to 2.
+
 2015-08-18  Corinna Vinschen  <corinna@vinschen.de>
 
 	* netdb.cc (parse_services_line): Convert port number to network byte
