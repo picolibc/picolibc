@@ -532,7 +532,8 @@ typedef enum _PROCESSINFOCLASS
   ProcessTimes = 4,
   ProcessSessionInformation = 24,
   ProcessWow64Information = 26,
-  ProcessImageFileName = 27
+  ProcessImageFileName = 27,
+  ProcessDebugFlags = 31
 } PROCESSINFOCLASS;
 
 /* Checked on 64 bit. */

@@ -1,5 +1,11 @@
 2015-08-24  Corinna Vinschen  <corinna@vinschen.de>
 
+	* ntdll.h (PROCESSINFOCLASS): Define ProcessDebugFlags.
+	* sigproc.cc (child_info::child_info): Only propagate _CI_STRACED to
+	child if strace is actually tracing child processes.
+
+2015-08-24  Corinna Vinschen  <corinna@vinschen.de>
+
 	* include/cygwin/version.h (CYGWIN_VERSION_DLL_MINOR): Bump to 2.
 
 2015-08-18  Corinna Vinschen  <corinna@vinschen.de>

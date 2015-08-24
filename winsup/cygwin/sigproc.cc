@@ -772,7 +772,21 @@ child_info::child_info (unsigned in_cb, child_info_types chtype,
   fhandler_union_cb = sizeof (fhandler_union);
   user_h = cygwin_user_h;
   if (strace.active ())
-    flag |= _CI_STRACED;
+    {
+      NTSTATUS status;
+      ULONG DebugFlags;
+
+      /* Only propagate _CI_STRACED to child if strace is actually tracing
+	 child processes of this process.  The undocumented ProcessDebugFlags
+	 returns 0 if EPROCESS->NoDebugInherit is TRUE, 1 otherwise.
+	 This avoids a hang when stracing a forking or spawning process
+	 with the -f flag set to "don't follow fork". */
+      status = NtQueryInformationProcess (GetCurrentProcess (),
+					  ProcessDebugFlags, &DebugFlags,
+					  sizeof (DebugFlags), NULL);
+      if (NT_SUCCESS (status) && DebugFlags)
+	flag |= _CI_STRACED;
+    }
   if (need_subproc_ready)
     {
       subproc_ready = CreateEvent (&sec_all, FALSE, FALSE, NULL);
