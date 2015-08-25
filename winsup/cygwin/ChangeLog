@@ -1,5 +1,10 @@
 2015-08-25  Corinna Vinschen  <corinna@vinschen.de>
 
+	* autoload.cc (noload): i686 only: Save and restore $edx when calling
+	SetLastError to avoid clobbering return address stating with Windows 7.
+
+2015-08-25  Corinna Vinschen  <corinna@vinschen.de>
+
 	* mmap.cc: Fix a few comments.
 
 2015-08-24  Corinna Vinschen  <corinna@vinschen.de>

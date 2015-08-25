@@ -254,11 +254,13 @@ noload:									\n\
 	addl	%eax,%esp	# Pop off bytes				\n\
 	andl	$0xffff0000,%eax# upper word				\n\
 	subl	%eax,%esp	# adjust for possible return value	\n\
-	pushl	%eax		# Save for later			\n\
+	pushl	%eax		# Save return value for later		\n\
+	pushl	%edx		# Save return address for later		\n\
 	movl	$127,%eax	# ERROR_PROC_NOT_FOUND			\n\
 	pushl	%eax		# First argument			\n\
 	call	_SetLastError@4	# Set it				\n\
-	popl	%eax		# Get back argument			\n\
+	popl	%edx		# Get back return address		\n\
+	popl	%eax		# Get back return value			\n\
 	sarl	$16,%eax	# return value in high order word	\n\
 	jmp	*%edx		# Return				\n\
 1:									\n\
