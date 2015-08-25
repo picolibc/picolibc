@@ -1,5 +1,9 @@
 2015-08-25  Corinna Vinschen  <corinna@vinschen.de>
 
+	* autoload.cc (std_dll_init): Revert using full paths to system DLLs.
+
+2015-08-25  Corinna Vinschen  <corinna@vinschen.de>
+
 	* autoload.cc (noload): i686 only: Save and restore $edx when calling
 	SetLastError to avoid clobbering return address stating with Windows 7.
 
