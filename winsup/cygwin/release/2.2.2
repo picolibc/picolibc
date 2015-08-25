@@ -12,3 +12,7 @@ Bug Fixes
 - Fix a hang when stracing a forking or spawning process without activating
   stracing of child processes.
   Addresses: https://cygwin.com/ml/cygwin/2015-08/msg00390.html
+
+- Fix long-standing potential SEGV on 32 bit Cygwin when the dynamic loader
+  for OS functions fails to load a function on Windows 7 or later.
+  Addresses: No actual bug report known.

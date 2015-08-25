@@ -1,5 +1,10 @@
 2015-08-25  Corinna Vinschen  <corinna@vinschen.de>
 
+	* winsup.h (_WIN32_WINNT): Set to 0x0a00 for Windows 10.
+	(WINVER): Ditto.  Remove outdated comment.
+
+2015-08-25  Corinna Vinschen  <corinna@vinschen.de>
+
 	* autoload.cc (std_dll_init): Revert using full paths to system DLLs.
 
 2015-08-25  Corinna Vinschen  <corinna@vinschen.de>
