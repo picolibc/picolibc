@@ -1,7 +1,7 @@
 /* mmap.cc
 
    Copyright 1996, 1997, 1998, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
-   2008, 2009, 2010, 2011, 2012, 2013 Red Hat, Inc.
+   2008, 2009, 2010, 2011, 2012, 2013, 2015 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -712,7 +712,7 @@ is_mmapped_region (caddr_t start_addr, caddr_t end_address)
    Check if the address range is all within noreserve mmap regions.  If so,
    call VirtualAlloc to commit the pages and return MMAP_NORESERVE_COMMITED
    on success.  If the page has __PROT_ATTACH (SUSv3 memory protection
-   extension), or if VirutalAlloc fails, return MMAP_RAISE_SIGBUS.
+   extension), or if VirtualAlloc fails, return MMAP_RAISE_SIGBUS.
    Otherwise, return MMAP_NONE if the address range is not covered by an
    attached or noreserve map.
 
@@ -1262,8 +1262,7 @@ munmap (void *addr, size_t len)
 
   LIST_LOCK ();
 
-  /* Iterate through the map, unmap pages between addr and addr+len
-     in all maps. */
+  /* Iterate over maps, unmap pages between addr and addr+len in all maps. */
   mmap_list *map_list, *next_map_list;
   LIST_FOREACH_SAFE (map_list, &mmapped_areas.lists, ml_next, next_map_list)
     {
@@ -1327,8 +1326,7 @@ msync (void *addr, size_t len, int flags)
   len = roundup2 (len, wincap.allocation_granularity ());
 #endif
 
-  /* Iterate through the map, looking for the mmapped area.
-     Error if not found. */
+  /* Iterate over maps, looking for the mmapped area.  Error if not found. */
   LIST_FOREACH (map_list, &mmapped_areas.lists, ml_next)
     {
       mmap_record *rec;
@@ -1385,8 +1383,7 @@ mprotect (void *addr, size_t len, int prot)
 
   LIST_LOCK ();
 
-  /* Iterate through the map, protect pages between addr and addr+len
-     in all maps. */
+  /* Iterate over maps, protect pages between addr and addr+len in all maps. */
   mmap_list *map_list;
   LIST_FOREACH (map_list, &mmapped_areas.lists, ml_next)
     {
@@ -1820,7 +1817,7 @@ fhandler_disk_file::fixup_mmap_after_fork (HANDLE h, int prot, int flags,
 int __stdcall
 fixup_mmaps_after_fork (HANDLE parent)
 {
-  /* Iterate through the map */
+  /* Iterate over maps */
   mmap_list *map_list;
   LIST_FOREACH (map_list, &mmapped_areas.lists, ml_next)
     {

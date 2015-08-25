@@ -1,3 +1,7 @@
+2015-08-25  Corinna Vinschen  <corinna@vinschen.de>
+
+	* mmap.cc: Fix a few comments.
+
 2015-08-24  Corinna Vinschen  <corinna@vinschen.de>
 
 	* ntdll.h (PROCESSINFOCLASS): Define ProcessDebugFlags.
