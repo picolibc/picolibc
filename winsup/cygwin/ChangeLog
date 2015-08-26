@@ -1,3 +1,8 @@
+2015-08-26  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_proc.cc (format_proc_cpuinfo): Only fetch group relations,
+	we don't need anything else.
+
 2015-08-25  Corinna Vinschen  <corinna@vinschen.de>
 
 	* winsup.h (_WIN32_WINNT): Set to 0x0a00 for Windows 10.

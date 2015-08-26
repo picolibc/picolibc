@@ -641,7 +641,7 @@ format_proc_cpuinfo (void *, char *&destbuf)
       PSYSTEM_LOGICAL_PROCESSOR_INFORMATION_EX lpi =
 		(PSYSTEM_LOGICAL_PROCESSOR_INFORMATION_EX) tp.c_get ();
       lpi_size = NT_MAX_PATH;
-      if (!GetLogicalProcessorInformationEx (RelationAll, lpi, &lpi_size))
+      if (!GetLogicalProcessorInformationEx (RelationGroup, lpi, &lpi_size))
 	lpi = NULL;
       else
 	{
