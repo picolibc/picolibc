@@ -1,6 +1,12 @@
 What's new:
 -----------
 
+- posix_madvise(POSIX_MADV_WILLNEED) now utilizes OS functionality available
+  starting with Windows 8/Server 2012.  Still a no-op on older systems.
+
+- posix_madvise(POSIX_MADV_DONTNEED) now utilizes OS functionality available
+  starting with Windows 8.1/Server 2012R2.  Still a no-op on older systems.
+
 
 What changed:
 -------------

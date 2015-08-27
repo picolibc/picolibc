@@ -50,6 +50,7 @@ wincaps wincap_xpsp2 __attribute__((section (".cygwin_dll_common"), shared)) = {
   has_set_thread_stack_guarantee:false,
   has_broken_rtl_query_process_debug_information:false,
   has_processor_groups:false,
+  has_broken_prefetchvm:false,
 };
 
 wincaps wincap_2003 __attribute__((section (".cygwin_dll_common"), shared)) = {
@@ -82,6 +83,7 @@ wincaps wincap_2003 __attribute__((section (".cygwin_dll_common"), shared)) = {
   has_set_thread_stack_guarantee:true,
   has_broken_rtl_query_process_debug_information:true,
   has_processor_groups:false,
+  has_broken_prefetchvm:false,
 };
 
 wincaps wincap_vista __attribute__((section (".cygwin_dll_common"), shared)) = {
@@ -114,6 +116,7 @@ wincaps wincap_vista __attribute__((section (".cygwin_dll_common"), shared)) = {
   has_set_thread_stack_guarantee:true,
   has_broken_rtl_query_process_debug_information:false,
   has_processor_groups:false,
+  has_broken_prefetchvm:false,
 };
 
 wincaps wincap_7 __attribute__((section (".cygwin_dll_common"), shared)) = {
@@ -146,6 +149,7 @@ wincaps wincap_7 __attribute__((section (".cygwin_dll_common"), shared)) = {
   has_set_thread_stack_guarantee:true,
   has_broken_rtl_query_process_debug_information:false,
   has_processor_groups:true,
+  has_broken_prefetchvm:false,
 };
 
 wincaps wincap_8 __attribute__((section (".cygwin_dll_common"), shared)) = {
@@ -178,6 +182,7 @@ wincaps wincap_8 __attribute__((section (".cygwin_dll_common"), shared)) = {
   has_set_thread_stack_guarantee:true,
   has_broken_rtl_query_process_debug_information:false,
   has_processor_groups:true,
+  has_broken_prefetchvm:false,
 };
 
 wincaps wincap_10 __attribute__((section (".cygwin_dll_common"), shared)) = {
@@ -210,6 +215,7 @@ wincaps wincap_10 __attribute__((section (".cygwin_dll_common"), shared)) = {
   has_set_thread_stack_guarantee:true,
   has_broken_rtl_query_process_debug_information:false,
   has_processor_groups:true,
+  has_broken_prefetchvm:true,
 };
 
 wincapc wincap __attribute__((section (".cygwin_dll_common"), shared));
@@ -281,6 +287,7 @@ wincapc::init ()
       ((wincaps *)caps)->has_restricted_stack_args = false;
       ((wincaps *)caps)->wow64_has_secondary_stack = false;
       ((wincaps *)caps)->has_gaa_largeaddress_bug = false;
+      ((wincaps *)caps)->has_broken_prefetchvm = false;
     }
 
   __small_sprintf (osnam, "NT-%d.%d", version.dwMajorVersion,

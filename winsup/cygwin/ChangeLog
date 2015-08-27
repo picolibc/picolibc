@@ -1,3 +1,17 @@
+2015-08-27  Corinna Vinschen  <corinna@vinschen.de>
+
+	* autoload.cc (DiscardVirtualMemory): Import.
+	(PrefetchVirtualMemory): Import.
+	* mmap.cc (posix_madvise): Actually implement POSIX_MADV_WILLNEED
+	utilizing PrefetchVirtualMemory and POSIX_MADV_DONTNEED utilizing
+	DiscardVirtualMemory on systems supporting them.
+	* wincap.h (wincaps::has_broken_prefetchvm): New element.
+	* wincap.cc: Implement above element throughout.
+	(wincapc::init): Make sure has_broken_prefetchvm is only true on
+	W10 under WOW64.
+	* include/cygwin/version.h (CYGWIN_VERSION_DLL_MAJOR): Bump to 2003.
+	(CYGWIN_VERSION_API_MINOR): Reset to 0.
+
 2015-08-26  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler_proc.cc (format_proc_cpuinfo): Only fetch group relations,

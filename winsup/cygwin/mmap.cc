@@ -1531,35 +1531,111 @@ munlock (const void *addr, size_t len)
   return ret;
 }
 
+/* This is required until Mingw-w64 catches up with newer functions. */
+extern "C" WINAPI DWORD DiscardVirtualMemory (PVOID, SIZE_T);
+
 extern "C" int
 posix_madvise (void *addr, size_t len, int advice)
 {
-  int ret;
+  int ret = 0;
   /* Check parameters. */
   if (advice < POSIX_MADV_NORMAL || advice > POSIX_MADV_DONTNEED
       || !len)
-    ret = EINVAL;
-  else
     {
-      /* Check requested memory area. */
-      MEMORY_BASIC_INFORMATION m;
-      char *p = (char *) addr;
-      char *endp = p + len;
-      while (p < endp)
-	{
-	  if (!VirtualQuery (p, &m, sizeof m) || m.State == MEM_FREE)
-	    {
-	      ret = ENOMEM;
-	      break;
-	    }
-	  p = (char *) m.BaseAddress + m.RegionSize;
-	}
-      ret = 0;
+      ret = EINVAL;
+      goto out;
     }
 
+  /* Check requested memory area. */
+  MEMORY_BASIC_INFORMATION m;
+  char *p, *endp;
+
+  for (p = (char *) addr, endp = p + len;
+       p < endp;
+       p = (char *) m.BaseAddress + m.RegionSize)
+    {
+      if (!VirtualQuery (p, &m, sizeof m) || m.State == MEM_FREE)
+	{
+	  ret = ENOMEM;
+	  break;
+	}
+    }
+  if (ret)
+    goto out;
+  switch (advice)
+    {
+    case POSIX_MADV_WILLNEED:
+      {
+	/* Align address and length values to page size. */
+	size_t pagesize = wincap.allocation_granularity ();
+	PVOID base = (PVOID) rounddown ((uintptr_t) addr, pagesize);
+	SIZE_T size = roundup2 (((uintptr_t) addr - (uintptr_t) base)
+				+ len, pagesize);
+	WIN32_MEMORY_RANGE_ENTRY me = { base, size };
+	if (!PrefetchVirtualMemory (GetCurrentProcess (), 1, &me, 0)
+	    && GetLastError () != ERROR_PROC_NOT_FOUND)
+	  {
+	    /* FIXME 2015-08-27: On W10 build 10240 under WOW64,
+	       PrefetchVirtualMemory always returns ERROR_INVALID_PARAMETER
+	       for some reason.  If we're running on W10 WOW64, ignore this
+	       error for now.  There's an open case at Microsoft for this. */
+	    if (!wincap.has_broken_prefetchvm ()
+		|| GetLastError () != ERROR_INVALID_PARAMETER)
+	      ret = EINVAL;
+	  }
+      }
+      break;
+    case POSIX_MADV_DONTNEED:
+      {
+	/* Align address and length values to page size. */
+	size_t pagesize = wincap.allocation_granularity ();
+	PVOID base = (PVOID) rounddown ((uintptr_t) addr, pagesize);
+	SIZE_T size = roundup2 (((uintptr_t) addr - (uintptr_t) base)
+				+ len, pagesize);
+	DWORD err = DiscardVirtualMemory (base, size);
+	/* DiscardVirtualMemory is unfortunately pretty crippled:
+	   On copy-on-write pages it returns ERROR_INVALID_PARAMETER, on
+	   any file-backed memory map it returns ERROR_USER_MAPPED_FILE.
+	   Since POSIX_MADV_DONTNEED is advisory only anyway, let them
+	   slip through. */
+	switch (err)
+	  {
+	  case ERROR_PROC_NOT_FOUND:
+	  case ERROR_USER_MAPPED_FILE:
+	  case 0:
+	    break;
+	  case ERROR_INVALID_PARAMETER:
+	    {
+	      ret = EINVAL;
+	      /* Check if the region contains copy-on-write pages.*/
+	      for (p = (char *) addr, endp = p + len;
+		   p < endp;
+		   p = (char *) m.BaseAddress + m.RegionSize)
+		{
+		  if (VirtualQuery (p, &m, sizeof m)
+		      && m.State == MEM_COMMIT
+		      && m.Protect
+			 & (PAGE_EXECUTE_WRITECOPY | PAGE_WRITECOPY))
+		    {
+		      /* Yes, let this slip. */
+		      ret = 0;
+		      break;
+		    }
+		}
+	    }
+	    break;
+	  default:
+	    ret = geterrno_from_win_error (err);
+	    break;
+	  }
+      }
+      break;
+    default:
+      break;
+    }
+out:
   syscall_printf ("%d = posix_madvise(%p, %lu, %d)", ret, addr, len, advice);
-  /* Eventually do nothing. */
-  return 0;
+  return ret;
 }
 
 /*

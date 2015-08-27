@@ -1,3 +1,8 @@
+2015-08-27  Corinna Vinschen  <corinna@vinschen.de>
+
+	* new-features.xml (ov-new2.3): New section, document posix_madvise
+	POSIX_MADV_WILLNEED/POSIX_MADV_DONTNEED change.
+
 2015-08-18  Jon Turney  <jon.turney@dronecode.org.uk>
 
 	* faq-using.xml (faq.using.bloda): Add Lavasoft Web Companion to
