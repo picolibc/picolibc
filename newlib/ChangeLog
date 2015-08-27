@@ -1,3 +1,8 @@
+2015-08-27  Markus Eisenmann  <meisenmann.lba@fh-salzburg.ac.at>
+
+	* libc/machine/arm/strlen-armv7.S: Fix prepocessor check to avoid
+	double definition of strlen.
+
 2015-08-27  Andre Vieira  <andre.simoesdiasvieira@arm.com>
 
 	* libc/include/sys/_intsup.h: Defined new __INTxx, __FASTxx and

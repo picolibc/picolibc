@@ -37,7 +37,7 @@
 /* NOTE: This ifdef MUST match the ones in arm/strlen.c
    We fallback to the one in arm/strlen.c for size optimised or
    for older architectures. */
-#if defined(_ISA_ARM_7) || defined(__ARM_ARCH_6T2__) && \
+#if (defined(_ISA_ARM_7) || defined(__ARM_ARCH_6T2__)) && \
     !(defined (__OPTIMIZE_SIZE__) || defined (PREFER_SIZE_OVER_SPEED) || \
       (defined (__thumb__) && !defined (__thumb2__)))
 
