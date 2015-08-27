@@ -1,3 +1,13 @@
+2015-08-27  Andre Vieira  <andre.simoesdiasvieira@arm.com>
+
+	* libc/include/sys/_intsup.h: Defined new __INTxx, __FASTxx and
+	__LEASTxx macro's to hold information regarding the respective types
+	print and scan formats.
+	* libc/include/inttypes.h: Defined LEAST and FAST specific PRI and SCN
+	macro's as these are not always the same as the INT variants. Used the
+	new __INTxx, __FASTxx and __LEASTxx macro's in their corresponding PRI
+	and SCN macros.
+
 2015-08-07  Stefan Wallentowitz  <stefan.wallentowitz@tum.de>
 
 	* libc/sys/or1k/mlock.c: Fix exception enable saving
