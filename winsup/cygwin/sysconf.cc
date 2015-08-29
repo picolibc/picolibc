@@ -428,6 +428,8 @@ get_cpu_cache_amd (int in, uint32_t maxe)
   else if (in >= _SC_LEVEL2_CACHE_SIZE && in <= _SC_LEVEL3_CACHE_LINESIZE
 	   && maxe >= 0x80000006)
     cpuid (&eax, &ebx, &ecx, &edx, 0x80000006);
+  else
+    return 0;
 
   switch (in)
     {
