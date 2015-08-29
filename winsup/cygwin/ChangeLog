@@ -1,3 +1,32 @@
+2015-08-29  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_proc.cc (format_proc_cpuinfo): Fetch cache information
+	from new cache functions in sysconf.cc, get_cpu_cache_intel and
+	get_cpu_cache_amd.
+	* sysconf.cc (__nt_query_system): New local helper.
+	(get_nproc_values): Utilize __nt_query_system on pre-Windows 7 systems.
+	Use GetLogicalProcessorInformationEx otherwise to handle more than
+	64 CPUs.  Only handle _SC_NPROCESSORS_CONF and _SC_NPROCESSORS_ONLN.
+	(get_phys_pages): New helper to handle _SC_PHYS_PAGES.
+	(cpuid2_cache_descriptor): New array to map Intel CPUID 2 descriptor
+	values to cache type, cache size, associativity and linesize.
+	(cpuid2_cache_desc_compar): Comparision function for bsearch over
+	cpuid2_cache_descriptor.
+	(get_cpu_cache_intel_cpuid2): New function to fetch cache info from
+	Intel CPUID 2.
+	(get_cpu_cache_intel_cpuid4): Ditto from Intel CPUID 4.
+	(get_cpu_cache_intel): New function as CPU-specific entry point.
+	(assoc): New array to map associativity values from AMD CPUID
+	0x80000006.
+	(get_cpu_cache_amd): New function to fetch cache info from AMD CPUIDs
+	0x80000005 and 0x80000006.
+	(get_cpu_cache): New function to fetch cache info.
+	(sca): Call get_phys_pages if _SC_PHYS_PAGES is requested.  Call
+	get_cpu_cache for new _SC_* cache requests.
+	(SC_MAX): Set to _SC_LEVEL4_CACHE_LINESIZE.
+	(get_phys_pages(void)): Call get_phys_pages(int).
+	* include/cygwin/version.h (CYGWIN_VERSION_API_MINOR): Bump.
+
 2015-08-27  Corinna Vinschen  <corinna@vinschen.de>
 
 	* autoload.cc (DiscardVirtualMemory): Import.

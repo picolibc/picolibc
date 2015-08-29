@@ -425,6 +425,21 @@ int	_EXFUN(unlinkat, (int, const char *, int));
 #define _SC_THREAD_ROBUST_PRIO_INHERIT  122
 #define _SC_THREAD_ROBUST_PRIO_PROTECT  123
 #define _SC_XOPEN_UUCP                  124
+#define _SC_LEVEL1_ICACHE_SIZE          125
+#define _SC_LEVEL1_ICACHE_ASSOC         126
+#define _SC_LEVEL1_ICACHE_LINESIZE      127
+#define _SC_LEVEL1_DCACHE_SIZE          128
+#define _SC_LEVEL1_DCACHE_ASSOC         129
+#define _SC_LEVEL1_DCACHE_LINESIZE      130
+#define _SC_LEVEL2_CACHE_SIZE           131
+#define _SC_LEVEL2_CACHE_ASSOC          132
+#define _SC_LEVEL2_CACHE_LINESIZE       133
+#define _SC_LEVEL3_CACHE_SIZE           134
+#define _SC_LEVEL3_CACHE_ASSOC          135
+#define _SC_LEVEL3_CACHE_LINESIZE       136
+#define _SC_LEVEL4_CACHE_SIZE           137
+#define _SC_LEVEL4_CACHE_ASSOC          138
+#define _SC_LEVEL4_CACHE_LINESIZE       139
 
 /*
  *  pathconf values per IEEE Std 1003.1, 2008 Edition

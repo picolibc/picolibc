@@ -758,47 +758,46 @@ format_proc_cpuinfo (void *, char *&destbuf)
 	cache_alignment = clflush * 2;
       if (is_intel)
 	{
-	  uint32_t cache_level = 0;
-	  uint32_t info, layout, sets;
+	  extern long get_cpu_cache_intel (int sysc, uint32_t maxf);
+	  long cs;
 
-	  for (int idx = 0; ; ++idx)
+	  /* As on Linux, don't check for L3 cache. */
+	  cs = get_cpu_cache_intel (_SC_LEVEL2_CACHE_SIZE, maxf);
+	  if (cs == -1)
 	    {
-	      cpuid (&info, &layout, &sets, &unused, 0x00000004, idx);
-	      uint32_t cache_type = (info & 0x1f);
-	      if (cache_type == 0)
-		break;
-	      uint32_t cur_level = ((info >> 5) & 0x7);
-	      uint32_t ways = ((layout >> 22) & 0x3ff) + 1;
-	      uint32_t part = ((layout >> 12) & 0x3ff) + 1;
-	      uint32_t line = (layout & 0xfff) + 1;
-	      sets++;
-	      if (cur_level == cache_level)
-		cache_size += ways * part * line * sets;
-	      else if (cur_level > cache_level)
-		{
-		  cache_size = ways * part * line * sets;
-		  cache_level = cur_level;
-		}
+	      cs = get_cpu_cache_intel (_SC_LEVEL1_ICACHE_SIZE, maxf);
+	      if (cs != -1)
+		cache_size = cs;
+	      cs = get_cpu_cache_intel (_SC_LEVEL1_DCACHE_SIZE, maxf);
+	      if (cs != -1)
+		cache_size += cs;
 	    }
+	  else
+	    cache_size = cs;
 	  if (cache_size != -1)
 	    cache_size >>= 10;
 	}
-      /* L2 Cache and L2 TLB Identifiers. */
-      if (cache_size == -1 && maxe >= 0x80000006)
+      else if (is_amd)
 	{
-	  uint32_t l2;
-	  cpuid (&unused, &unused, &l2, &unused, 0x80000006);
+	  extern long get_cpu_cache_amd (int sysc, uint32_t maxe);
+	  long cs;
 
-	  cache_size = l2 >> 16;
-	}
-      /* L1 Cache and TLB Identifiers. */
-      if (cache_size == -1 && maxe >= 0x80000005)
-	{
-	  uint32_t data_cache, inst_cache;
-	  cpuid (&unused, &unused, &data_cache, &inst_cache,
-		 0x80000005);
-
-	  cache_size = (inst_cache >> 24) + (data_cache >> 24);
+	  cs = get_cpu_cache_amd (_SC_LEVEL3_CACHE_SIZE, maxe);
+	  if (cs == -1)
+	    cs = get_cpu_cache_amd (_SC_LEVEL2_CACHE_SIZE, maxe);
+	  if (cs == -1)
+	    {
+	      cs = get_cpu_cache_amd (_SC_LEVEL1_ICACHE_SIZE, maxe);
+	      if (cs != -1)
+		cache_size = cs;
+	      cs = get_cpu_cache_amd (_SC_LEVEL1_DCACHE_SIZE, maxe);
+	      if (cs != -1)
+		cache_size += cs;
+	    }
+	  else
+	    cache_size = cs;
+	  if (cache_size != -1)
+	    cache_size >>= 10;
 	}
       bufptr += __small_sprintf (bufptr, "cpu family\t: %d\n"
 					 "model\t\t: %d\n"

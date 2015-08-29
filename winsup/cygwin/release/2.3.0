@@ -7,6 +7,13 @@ What's new:
 - posix_madvise(POSIX_MADV_DONTNEED) now utilizes OS functionality available
   starting with Windows 8.1/Server 2012R2.  Still a no-op on older systems.
 
+- sysconf() now supports returning CPU cache information:
+  _SC_LEVEL1_ICACHE_SIZE, _SC_LEVEL1_ICACHE_ASSOC, _SC_LEVEL1_ICACHE_LINESIZE,
+  _SC_LEVEL1_DCACHE_SIZE, _SC_LEVEL1_DCACHE_ASSOC, _SC_LEVEL1_DCACHE_LINESIZE,
+  _SC_LEVEL2_CACHE_SIZE, _SC_LEVEL2_CACHE_ASSOC, _SC_LEVEL2_CACHE_LINESIZE,
+  _SC_LEVEL3_CACHE_SIZE, _SC_LEVEL3_CACHE_ASSOC, _SC_LEVEL3_CACHE_LINESIZE,
+  _SC_LEVEL4_CACHE_SIZE, _SC_LEVEL4_CACHE_ASSOC, _SC_LEVEL4_CACHE_LINESIZE
+
 
 What changed:
 -------------
@@ -22,3 +29,6 @@ Bug Fixes
 - Fix long-standing potential SEGV on 32 bit Cygwin when the dynamic loader
   for OS functions fails to load a function on Windows 7 or later.
   Addresses: No actual bug report known.
+
+- sysconf _SC_NPROCESSORS_CONF and _SC_NPROCESSORS_ONLN now handle more than
+  64 CPUs on Windows 7 and later.

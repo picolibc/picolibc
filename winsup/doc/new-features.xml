@@ -16,6 +16,17 @@ posix_madvise(POSIX_MADV_DONTNEED) now utilizes OS functionality available
 starting with Windows 8.1/Server 2012R2.
 </para></listitem>
 
+<listitem><para>
+sysconf() now supports returning CPU cache information:
+  <screen>
+  _SC_LEVEL1_ICACHE_SIZE, _SC_LEVEL1_ICACHE_ASSOC, _SC_LEVEL1_ICACHE_LINESIZE,
+  _SC_LEVEL1_DCACHE_SIZE, _SC_LEVEL1_DCACHE_ASSOC, _SC_LEVEL1_DCACHE_LINESIZE,
+  _SC_LEVEL2_CACHE_SIZE, _SC_LEVEL2_CACHE_ASSOC, _SC_LEVEL2_CACHE_LINESIZE,
+  _SC_LEVEL3_CACHE_SIZE, _SC_LEVEL3_CACHE_ASSOC, _SC_LEVEL3_CACHE_LINESIZE,
+  _SC_LEVEL4_CACHE_SIZE, _SC_LEVEL4_CACHE_ASSOC, _SC_LEVEL4_CACHE_LINESIZE
+  </screen>
+</para></listitem>
+
 </itemizedlist>
 
 </sect2>

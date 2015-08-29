@@ -1,7 +1,7 @@
 /* sysconf.cc
 
    Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006,
-   2007, 2008, 2009, 2010, 2011, 2012, 2013 Red Hat, Inc.
+   2007, 2008, 2009, 2010, 2011, 2012, 2013, 2015 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -20,6 +20,8 @@ details. */
 #include "dtable.h"
 #include "pinfo.h"
 #include "ntdll.h"
+#include "tls_pbuf.h"
+#include "cpuid.h"
 
 static long
 get_open_max (int in)
@@ -36,38 +38,79 @@ get_page_size (int in)
   return wincap.allocation_granularity ();
 }
 
+static bool
+__nt_query_system (PSYSTEM_BASIC_INFORMATION psbi)
+{
+  NTSTATUS status;
+
+  status = NtQuerySystemInformation (SystemBasicInformation, (PVOID) psbi,
+				     sizeof *psbi, NULL);
+  return NT_SUCCESS (status);
+}
+
+#define add_size(p,s) ((p) = ((__typeof__(p))((PBYTE)(p)+(s))))
+
 static long
 get_nproc_values (int in)
 {
-  NTSTATUS status;
+  if (!wincap.has_processor_groups ())	/* Pre Windows 7 */
+    {
+      SYSTEM_BASIC_INFORMATION sbi;
+
+      if (!__nt_query_system (&sbi))
+	return -1;
+      switch (in)
+	{
+	case _SC_NPROCESSORS_CONF:
+	  return sbi.NumberProcessors;
+	case _SC_NPROCESSORS_ONLN:
+	  {
+	    int i = 0;
+	    do
+	     if (sbi.ActiveProcessors & 1)
+	       i++;
+	    while (sbi.ActiveProcessors >>= 1);
+	    return i;
+	  }
+	}
+    }
+
+  tmp_pathbuf tp;
+  PSYSTEM_LOGICAL_PROCESSOR_INFORMATION_EX lpi, plpi;
+  DWORD lpi_size = NT_MAX_PATH;
+  long cnt = 0;
+
+  lpi = (PSYSTEM_LOGICAL_PROCESSOR_INFORMATION_EX) tp.c_get ();
+  if (!GetLogicalProcessorInformationEx (RelationGroup, lpi, &lpi_size))
+    return -1;
+  plpi = lpi;
+  for (DWORD size = lpi_size; size > 0;
+       size -= plpi->Size, add_size (plpi, plpi->Size))
+    if (plpi->Relationship == RelationGroup)
+      {
+	for (WORD i = 0; i < plpi->Group.MaximumGroupCount; ++i)
+	  switch (in)
+	    {
+	    case _SC_NPROCESSORS_CONF:
+	      cnt += plpi->Group.GroupInfo[0].MaximumProcessorCount;
+	      break;
+	    case _SC_NPROCESSORS_ONLN:
+	      cnt += plpi->Group.GroupInfo[0].ActiveProcessorCount;
+	      break;
+	    }
+      }
+  return cnt;
+}
+
+static long
+get_phys_pages (int in)
+{
   SYSTEM_BASIC_INFORMATION sbi;
 
-  status = NtQuerySystemInformation (SystemBasicInformation, (PVOID) &sbi,
-				     sizeof sbi, NULL);
-  if (!NT_SUCCESS (status))
-    {
-      __seterrno_from_nt_status (status);
-      debug_printf ("NtQuerySystemInformation: status %y, %E", status);
-      return -1;
-    }
-  switch (in)
-    {
-    case _SC_NPROCESSORS_CONF:
-      return sbi.NumberProcessors;
-    case _SC_NPROCESSORS_ONLN:
-      {
-	int i = 0;
-	do
-	 if (sbi.ActiveProcessors & 1)
-	   i++;
-	while (sbi.ActiveProcessors >>= 1);
-	return i;
-      }
-    case _SC_PHYS_PAGES:
-      return sbi.NumberOfPhysicalPages
-	     / (wincap.allocation_granularity () / wincap.page_size ());
-    }
-  return -1;
+  if (!__nt_query_system (&sbi))
+    return -1;
+  return sbi.NumberOfPhysicalPages
+	 / (wincap.allocation_granularity () / wincap.page_size ());
 }
 
 static long
@@ -86,6 +129,370 @@ get_avphys (int in)
     }
   return spi.AvailablePages
 	 / (wincap.allocation_granularity () / wincap.page_size ());
+}
+
+enum cache_level
+{
+  LevelNone,
+  Level1I,
+  Level1D,
+  Level2,
+  Level3,
+  Level4
+};
+
+struct cpuid2_cache_desc
+{
+  uint8_t	desc;
+  cache_level	level;
+  uint32_t	size;
+  uint32_t	assoc;
+  uint32_t	linesize;
+};
+
+static const cpuid2_cache_desc cpuid2_cache_descriptor[] =
+{
+  { 0x06, Level1I,     8,  4, 32 },
+  { 0x08, Level1I,    16,  4, 32 },
+  { 0x09, Level1I,    32,  4, 64 },
+  { 0x0a, Level1D,     8,  2, 32 },
+  { 0x0c, Level1D,    16,  4, 32 },
+  { 0x0d, Level1D,    16,  4, 64 },
+  { 0x0e, Level1D,    24,  6, 64 },
+  { 0x21, Level2,    256,  8, 64 },
+  { 0x22, Level3,    512,  4, 64 },
+  { 0x23, Level3,   1024,  8, 64 },
+  { 0x25, Level3,   2048,  8, 64 },
+  { 0x29, Level3,   4096,  8, 64 },
+  { 0x2c, Level1D,    32,  8, 64 },
+  { 0x30, Level1I,    32,  8, 64 },
+  { 0x39, Level2,    128,  4, 64 },
+  { 0x3a, Level2,    192,  6, 64 },
+  { 0x3b, Level2,    128,  2, 64 },
+  { 0x3c, Level2,    256,  4, 64 },
+  { 0x3d, Level2,    384,  6, 64 },
+  { 0x3e, Level2,    512,  4, 64 },
+  { 0x3f, Level2,    256,  2, 64 },
+  { 0x41, Level2,    128,  4, 32 },
+  { 0x42, Level2,    256,  4, 32 },
+  { 0x43, Level2,    512,  4, 32 },
+  { 0x44, Level2,   1024,  4, 32 },
+  { 0x45, Level2,   2048,  4, 32 },
+  { 0x46, Level3,   4096,  4, 64 },
+  { 0x47, Level3,   8192,  8, 64 },
+  { 0x48, Level2,   3072, 12, 64 },
+  { 0x49, Level3,   4096, 16, 64 },
+  { 0x4a, Level3,   6144, 12, 64 },
+  { 0x4b, Level3,   8192, 16, 64 },
+  { 0x4c, Level3,  12288, 12, 64 },
+  { 0x4d, Level3,  16384, 16, 64 },
+  { 0x4e, Level2,   6144, 24, 64 },
+  { 0x60, Level1D,    16,  8, 64 },
+  { 0x66, Level1D,     8,  4, 64 },
+  { 0x67, Level1D,    16,  4, 64 },
+  { 0x68, Level1D,    32,  4, 64 },
+  { 0x78, Level2,   1024,  4, 64 },
+  { 0x79, Level2,    128,  8, 64 },
+  { 0x7a, Level2,    256,  8, 64 },
+  { 0x7b, Level2,    512,  8, 64 },
+  { 0x7c, Level2,   1024,  8, 64 },
+  { 0x7d, Level2,   2048,  8, 64 },
+  { 0x7f, Level2,    512,  2, 64 },
+  { 0x80, Level2,    512,  8, 64 },
+  { 0x82, Level2,    256,  8, 32 },
+  { 0x83, Level2,    512,  8, 32 },
+  { 0x84, Level2,   1024,  8, 32 },
+  { 0x85, Level2,   2048,  8, 32 },
+  { 0x86, Level2,    512,  4, 64 },
+  { 0x87, Level2,   1024,  8, 64 },
+  { 0xd0, Level3,    512,  4, 64 },
+  { 0xd1, Level3,   1024,  4, 64 },
+  { 0xd2, Level3,   2048,  4, 64 },
+  { 0xd6, Level3,   1024,  8, 64 },
+  { 0xd7, Level3,   2048,  8, 64 },
+  { 0xd8, Level3,   4096, 12, 64 },
+  { 0xdc, Level3,   2048, 12, 64 },
+  { 0xdd, Level3,   4096, 12, 64 },
+  { 0xde, Level3,   8192, 12, 64 },
+  { 0xe2, Level3,   2048, 16, 64 },
+  { 0xe3, Level3,   4096, 16, 64 },
+  { 0xe4, Level3,   8192, 16, 64 },
+  { 0xea, Level3,  12288, 24, 64 },
+  { 0xeb, Level3,  18432, 24, 64 },
+  { 0xec, Level3,  24576, 24, 64 },
+};
+
+static int
+cpuid2_cache_desc_compar (const void *key, const void *memb)
+{
+  cpuid2_cache_desc *ckey = (cpuid2_cache_desc *) key;
+  cpuid2_cache_desc *cmemb = (cpuid2_cache_desc *) memb;
+  return ckey->desc - cmemb->desc;
+}
+
+static long
+get_cpu_cache_intel_cpuid2 (int in)
+{
+  uint32_t reg[4];
+  long ret = 0;
+  int num;
+
+  cpuid (reg, reg + 1, reg + 2, reg + 3, 0x00000002);
+  num = reg[0] & 0xff;
+  for (int i = 0; i < num; ++i)
+    {
+      cpuid (reg, reg + 1, reg + 2, reg + 3, 0x00000002);
+      for (int r = 0; r < 4; ++r)
+	{
+	  if (reg[r] & 0x80000000)
+	    continue;
+	  for (int b = (r == 0) ? 1 : 0; b < 4; ++b)
+	    {
+	      cpuid2_cache_desc key, *cdp;
+
+	      key.desc = ((uint8_t *) &reg[r])[b];
+	      cdp = (cpuid2_cache_desc *)
+			bsearch (&key, cpuid2_cache_descriptor,
+				 sizeof cpuid2_cache_descriptor
+				 / sizeof *cpuid2_cache_descriptor,
+				 sizeof *cpuid2_cache_descriptor,
+				 cpuid2_cache_desc_compar);
+	      if (!cdp)
+		continue;
+	      switch (in)
+		{
+		case _SC_LEVEL1_ICACHE_SIZE:
+		  if (cdp->level == Level1I)
+		    ret += cdp->size * 1024;
+		  break;
+		case _SC_LEVEL1_ICACHE_ASSOC:
+		  if (cdp->level == Level1I)
+		    return cdp->assoc;
+		  break;
+		case _SC_LEVEL1_ICACHE_LINESIZE:
+		  if (cdp->level == Level1I)
+		    return cdp->linesize;
+		  break;
+		case _SC_LEVEL1_DCACHE_SIZE:
+		  if (cdp->level == Level1D)
+		    ret += cdp->size * 1024;
+		  break;
+		case _SC_LEVEL1_DCACHE_ASSOC:
+		  if (cdp->level == Level1D)
+		    return cdp->assoc;
+		  break;
+		case _SC_LEVEL1_DCACHE_LINESIZE:
+		  if (cdp->level == Level1D)
+		    return cdp->linesize;
+		  break;
+		case _SC_LEVEL2_CACHE_SIZE:
+		  if (cdp->level == Level2)
+		    ret += cdp->size * 1024;
+		  break;
+		case _SC_LEVEL2_CACHE_ASSOC:
+		  if (cdp->level == Level2)
+		    return cdp->assoc;
+		  break;
+		case _SC_LEVEL2_CACHE_LINESIZE:
+		  if (cdp->level == Level2)
+		    return cdp->linesize;
+		  break;
+		case _SC_LEVEL3_CACHE_SIZE:
+		  if (cdp->level == Level3)
+		    ret += cdp->size * 1024;
+		  break;
+		case _SC_LEVEL3_CACHE_ASSOC:
+		  if (cdp->level == Level3)
+		    return cdp->assoc;
+		  break;
+		case _SC_LEVEL3_CACHE_LINESIZE:
+		  if (cdp->level == Level3)
+		    return cdp->linesize;
+		  break;
+		}
+	    }
+	}
+    }
+  return ret;
+}
+
+static long
+get_cpu_cache_intel_cpuid4 (int in)
+{
+  uint32_t eax, ebx, ecx, edx;
+  long ret = 0;
+
+  for (int idx = 0; ; ++idx)
+    {
+      uint32_t cache_type, cur_level, assoc, part, linesize, sets;
+
+      cpuid (&eax, &ebx, &ecx, &edx, 0x00000004, idx);
+      if ((cache_type = (eax & 0x1f))== 0)
+	break;
+      cur_level = ((eax >> 5) & 0x7);
+      assoc = ((ebx >> 22) & 0x3ff) + 1;
+      part = ((ebx >> 12) & 0x3ff) + 1;
+      linesize = (ebx & 0xfff) + 1;
+      sets = ecx + 1;
+      switch (in)
+	{
+	case _SC_LEVEL1_ICACHE_SIZE:
+	  if (cur_level == 1 && cache_type == 2)
+	    ret += assoc * part * linesize * sets;
+	  break;
+	case _SC_LEVEL1_ICACHE_ASSOC:
+	  if (cur_level == 1 && cache_type == 2)
+	    return assoc;
+	case _SC_LEVEL1_ICACHE_LINESIZE:
+	  if (cur_level == 1 && cache_type == 2)
+	    return linesize;
+	case _SC_LEVEL1_DCACHE_SIZE:
+	  if (cur_level == 1 && cache_type == 1)
+	    ret += assoc * part * linesize * sets;
+	  break;
+	case _SC_LEVEL1_DCACHE_ASSOC:
+	  if (cur_level == 1 && cache_type == 1)
+	    return assoc;
+	case _SC_LEVEL1_DCACHE_LINESIZE:
+	  if (cur_level == 1 && cache_type == 1)
+	    return linesize;
+	case _SC_LEVEL2_CACHE_SIZE:
+	  if (cur_level == 2)
+	    ret += assoc * part * linesize * sets;
+	  break;
+	case _SC_LEVEL2_CACHE_ASSOC:
+	  if (cur_level == 2)
+	    return assoc;
+	case _SC_LEVEL2_CACHE_LINESIZE:
+	  if (cur_level == 2)
+	    return linesize;
+	case _SC_LEVEL3_CACHE_SIZE:
+	  if (cur_level == 3)
+	    ret += assoc * part * linesize * sets;
+	  break;
+	case _SC_LEVEL3_CACHE_ASSOC:
+	  if (cur_level == 3)
+	    return assoc;
+	case _SC_LEVEL3_CACHE_LINESIZE:
+	  if (cur_level == 3)
+	    return linesize;
+	}
+    }
+  return ret;
+}
+
+/* Also called from format_proc_cpuinfo */
+long
+get_cpu_cache_intel (int in, uint32_t maxf)
+{
+  long ret = 0;
+
+  switch (in)
+    {
+    case _SC_LEVEL1_ICACHE_SIZE:
+    case _SC_LEVEL1_ICACHE_ASSOC:
+    case _SC_LEVEL1_ICACHE_LINESIZE:
+    case _SC_LEVEL1_DCACHE_SIZE:
+    case _SC_LEVEL1_DCACHE_ASSOC:
+    case _SC_LEVEL1_DCACHE_LINESIZE:
+    case _SC_LEVEL2_CACHE_SIZE:
+    case _SC_LEVEL2_CACHE_ASSOC:
+    case _SC_LEVEL2_CACHE_LINESIZE:
+    case _SC_LEVEL3_CACHE_SIZE:
+    case _SC_LEVEL3_CACHE_ASSOC:
+    case _SC_LEVEL3_CACHE_LINESIZE:
+      if (maxf >= 4)
+	ret = get_cpu_cache_intel_cpuid4 (in);
+      else if (maxf >= 2)
+	ret = get_cpu_cache_intel_cpuid2 (in);
+      break;
+    default:
+      break;
+    }
+  return ret;
+}
+
+static const long assoc[16] = {  0,  1,  2,  2,  4,  4,   8,      8,
+				16, 16, 32, 48, 64, 96, 128, 0x8000 };
+
+/* Also called from format_proc_cpuinfo */
+long
+get_cpu_cache_amd (int in, uint32_t maxe)
+{
+  uint32_t eax, ebx, ecx, edx;
+  long ret = 0;
+
+  if (in >= _SC_LEVEL1_ICACHE_SIZE && in <= _SC_LEVEL1_DCACHE_LINESIZE
+      && maxe >= 0x80000005)
+    cpuid (&eax, &ebx, &ecx, &edx, 0x80000005);
+  else if (in >= _SC_LEVEL2_CACHE_SIZE && in <= _SC_LEVEL3_CACHE_LINESIZE
+	   && maxe >= 0x80000006)
+    cpuid (&eax, &ebx, &ecx, &edx, 0x80000006);
+
+  switch (in)
+    {
+    case _SC_LEVEL1_ICACHE_SIZE:
+      ret = (edx & 0xff000000) >> 14;
+      break;
+    case _SC_LEVEL1_ICACHE_ASSOC:
+      ret = (edx & 0xff0000) >> 16;
+      if (ret == 0xff)
+	ret = 0x8000;
+      break;
+    case _SC_LEVEL1_ICACHE_LINESIZE:
+      ret = (edx & 0xff);
+      break;
+    case _SC_LEVEL1_DCACHE_SIZE:
+      ret = (ecx & 0xff000000) >> 14;
+      break;
+    case _SC_LEVEL1_DCACHE_ASSOC:
+      ret = (ecx & 0xff0000) >> 16;
+      if (ret == 0xff)
+	ret = 0x8000;
+      break;
+    case _SC_LEVEL1_DCACHE_LINESIZE:
+      ret = (ecx & 0xff);
+      break;
+    case _SC_LEVEL2_CACHE_SIZE:
+      ret = (ecx & 0xffff0000) >> 6;
+      break;
+    case _SC_LEVEL2_CACHE_ASSOC:
+      ret = assoc[(ecx & 0xf000) >> 12];
+      break;
+    case _SC_LEVEL2_CACHE_LINESIZE:
+      ret = (ecx & 0xff);
+      break;
+    case _SC_LEVEL3_CACHE_SIZE:
+      ret = (long) ((edx & 0xfffc0000) >> 18) * 512 * 1024;
+      break;
+    case _SC_LEVEL3_CACHE_ASSOC:
+      ret = assoc[(edx & 0xf000) >> 12];
+      break;
+    case _SC_LEVEL3_CACHE_LINESIZE:
+      ret = (edx & 0xff);
+      break;
+    default:
+      break;
+    }
+  return ret;
+}
+
+static long
+get_cpu_cache (int in)
+{
+  uint32_t maxf, vendor_id[4];
+  cpuid (&maxf, &vendor_id[0], &vendor_id[2], &vendor_id[1], 0x00000000);
+
+  vendor_id[3] = 0;
+  if (!strcmp ((char*) vendor_id, "GenuineIntel"))
+    return get_cpu_cache_intel (in, maxf & 0xffff);
+  else if (!strcmp ((char*)vendor_id, "AuthenticAMD"))
+    {
+      uint32_t maxe = 0, unused;
+      cpuid (&maxe, &unused, &unused, &unused, 0x80000000);
+      return get_cpu_cache_amd (in, maxe);
+    }
+  return 0;
 }
 
 enum sc_type { nsup, cons, func };
@@ -111,7 +518,7 @@ static struct
   {func, {f:get_page_size}},		/*   8, _SC_PAGESIZE */
   {func, {f:get_nproc_values}},		/*   9, _SC_NPROCESSORS_CONF */
   {func, {f:get_nproc_values}},		/*  10, _SC_NPROCESSORS_ONLN */
-  {func, {f:get_nproc_values}},		/*  11, _SC_PHYS_PAGES */
+  {func, {f:get_phys_pages}},		/*  11, _SC_PHYS_PAGES */
   {func, {f:get_avphys}},		/*  12, _SC_AVPHYS_PAGES */
   {cons, {c:MQ_OPEN_MAX}},		/*  13, _SC_MQ_OPEN_MAX */
   {cons, {c:MQ_PRIO_MAX}},		/*  14, _SC_MQ_PRIO_MAX */
@@ -225,10 +632,25 @@ static struct
   {cons, {c:-1L}},			/* 122, _SC_THREAD_ROBUST_PRIO_INHERIT */
   {cons, {c:-1L}},			/* 123, _SC_THREAD_ROBUST_PRIO_PROTECT */
   {cons, {c:-1L}},			/* 124, _SC_XOPEN_UUCP */
+  {func, {f:get_cpu_cache}},		/* 125, _SC_LEVEL1_ICACHE_SIZE */
+  {func, {f:get_cpu_cache}},		/* 126, _SC_LEVEL1_ICACHE_ASSOC */
+  {func, {f:get_cpu_cache}},		/* 127, _SC_LEVEL1_ICACHE_LINESIZE */
+  {func, {f:get_cpu_cache}},		/* 128, _SC_LEVEL1_DCACHE_SIZE */
+  {func, {f:get_cpu_cache}},		/* 129, _SC_LEVEL1_DCACHE_ASSOC */
+  {func, {f:get_cpu_cache}},		/* 130, _SC_LEVEL1_DCACHE_LINESIZE */
+  {func, {f:get_cpu_cache}},		/* 131, _SC_LEVEL2_CACHE_SIZE */
+  {func, {f:get_cpu_cache}},		/* 132, _SC_LEVEL2_CACHE_ASSOC */
+  {func, {f:get_cpu_cache}},		/* 133, _SC_LEVEL2_CACHE_LINESIZE */
+  {func, {f:get_cpu_cache}},		/* 134, _SC_LEVEL3_CACHE_SIZE */
+  {func, {f:get_cpu_cache}},		/* 135, _SC_LEVEL3_CACHE_ASSOC */
+  {func, {f:get_cpu_cache}},		/* 136, _SC_LEVEL3_CACHE_LINESIZE */
+  {func, {f:get_cpu_cache}},		/* 137, _SC_LEVEL4_CACHE_SIZE */
+  {func, {f:get_cpu_cache}},		/* 138, _SC_LEVEL4_CACHE_ASSOC */
+  {func, {f:get_cpu_cache}},		/* 139, _SC_LEVEL4_CACHE_LINESIZE */
 };
 
 #define SC_MIN _SC_ARG_MAX
-#define SC_MAX _SC_XOPEN_UUCP
+#define SC_MAX _SC_LEVEL4_CACHE_LINESIZE
 
 /* sysconf: POSIX 4.8.1.1 */
 /* Allows a portable app to determine quantities of resources or
@@ -335,7 +757,7 @@ get_nprocs (void)
 extern "C" long
 get_phys_pages (void)
 {
-  return get_nproc_values (_SC_PHYS_PAGES);
+  return get_phys_pages (_SC_PHYS_PAGES);
 }
 
 extern "C" long
