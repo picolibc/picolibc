@@ -1,5 +1,10 @@
 2015-08-30  Corinna Vinschen  <corinna@vinschen.de>
 
+	* cygcheck.cc (dump_sysinfo): Correctly handle Windows 10/Server 2016.
+	Add missing product types.
+
+2015-08-30  Corinna Vinschen  <corinna@vinschen.de>
+
 	* cygcheck.cc (track_down): Skip error output for "api-ms-win-"
 	downlevel DLLs.
 

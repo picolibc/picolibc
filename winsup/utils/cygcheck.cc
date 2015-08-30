@@ -1464,35 +1464,41 @@ dump_sysinfo ()
     {
     case VER_PLATFORM_WIN32_NT:
       is_nt = true;
-      if (osversion.dwMajorVersion == 6)
+      if (osversion.dwMajorVersion >= 6)
 	{
 	  HMODULE k32 = GetModuleHandleW (L"kernel32.dll");
 	  BOOL (WINAPI *GetProductInfo) (DWORD, DWORD, DWORD, DWORD, PDWORD) =
 		  (BOOL (WINAPI *)(DWORD, DWORD, DWORD, DWORD, PDWORD))
 		  GetProcAddress (k32, "GetProductInfo");
-	  switch (osversion.dwMinorVersion)
+	  if (osversion.dwMajorVersion == 6)
+	    switch (osversion.dwMinorVersion)
+	      {
+	      case 0:
+		strcpy (osname, osversion.wProductType == VER_NT_WORKSTATION
+				? "Vista" : "2008");
+		break;
+	      case 1:
+		strcpy (osname, osversion.wProductType == VER_NT_WORKSTATION
+				? "7" : "2008 R2");
+		break;
+	      case 2:
+		strcpy (osname, osversion.wProductType == VER_NT_WORKSTATION
+				? "8" : "2012");
+		break;
+	      case 3:
+		strcpy (osname, osversion.wProductType == VER_NT_WORKSTATION
+				? "8.1" : "2012 R2");
+		break;
+	      case 4:
+	      default:
+		strcpy (osname, osversion.wProductType == VER_NT_WORKSTATION
+				? "10 Preview" : "2016 Preview");
+		break;
+	      }
+	  else if (osversion.dwMajorVersion == 10)
 	    {
-	    case 0:
 	      strcpy (osname, osversion.wProductType == VER_NT_WORKSTATION
-			      ? "Vista" : "2008");
-	      break;
-	    case 1:
-	      strcpy (osname, osversion.wProductType == VER_NT_WORKSTATION
-			      ? "7" : "2008 R2");
-	      break;
-	    case 2:
-	      strcpy (osname, osversion.wProductType == VER_NT_WORKSTATION
-			      ? "8" : "2012");
-	      break;
-	    case 3:
-	      strcpy (osname, osversion.wProductType == VER_NT_WORKSTATION
-			      ? "8.1" : "2012 R2");
-	      break;
-	    case 4:
-	    default:
-	      strcpy (osname, osversion.wProductType == VER_NT_WORKSTATION
-			      ? "10" : "2014");
-	      break;
+			      ? "10" : "2016");
 	    }
 	  DWORD prod;
 	  if (GetProductInfo (osversion.dwMajorVersion,
@@ -1601,16 +1607,46 @@ dump_sysinfo ()
  /* 0x0000005f */ " Storage Server Workgroup (Evaluation inst.)",
  /* 0x00000060 */ " Storage Server Standard (Evaluation inst.)",
  /* 0x00000061 */ "",
- /* 0x00000062 */ " N",			/* "8 N" */
- /* 0x00000063 */ " China",		/* "8 China" */
- /* 0x00000064 */ " Single Language",	/* "8 Single Language" */
- /* 0x00000065 */ "",			/* "8" */
+ /* 0x00000062 */ " N",
+ /* 0x00000063 */ " China",
+ /* 0x00000064 */ " Single Language",
+ /* 0x00000065 */ " Home",
  /* 0x00000066 */ "",
  /* 0x00000067 */ " Professional with Media Center"
+ /* 0x00000068 */ " Mobile"
+ /* 0x00000069 */ "",
+ /* 0x0000006a */ "",
+ /* 0x0000006b */ "",
+ /* 0x0000006c */ "",
+ /* 0x0000006d */ "",
+ /* 0x0000006e */ "",
+ /* 0x0000006f */ "",
+ /* 0x00000070 */ "",
+ /* 0x00000071 */ "",
+ /* 0x00000072 */ "",
+ /* 0x00000073 */ "",
+ /* 0x00000074 */ "",
+ /* 0x00000075 */ "",
+ /* 0x00000076 */ "",
+ /* 0x00000077 */ "",
+ /* 0x00000078 */ "",
+ /* 0x00000079 */ " Education"
+ /* 0x0000007a */ " Education N"
+ /* 0x0000007b */ "",
+ /* 0x0000007c */ "",
+ /* 0x0000007d */ "",
+ /* 0x0000007e */ "",
+ /* 0x0000007f */ "",
+ /* 0x00000080 */ "",
+ /* 0x00000081 */ "",
+ /* 0x00000082 */ "",
+ /* 0x00000083 */ "",
+ /* 0x00000084 */ "",
+ /* 0x00000085 */ " Mobile Enterprise"
 		};
 	      if (prod == PRODUCT_UNLICENSED)
 		strcat (osname, "Unlicensed");
-	      else if (prod > PRODUCT_PROFESSIONAL_WMC)
+	      else if (prod > 0x00000085)
 		strcat (osname, "");
 	      else
 		strcat (osname, products[prod]);
