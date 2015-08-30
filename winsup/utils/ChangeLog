@@ -1,3 +1,8 @@
+2015-08-30  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygcheck.cc (track_down): Skip error output for "api-ms-win-"
+	downlevel DLLs.
+
 2015-08-03  Corinna Vinschen  <corinna@vinschen.de>
 
 	* strace.cc (main2): Don't call setvbuf on NULL descriptor.

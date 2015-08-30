@@ -1,7 +1,7 @@
 /* cygcheck.cc
 
    Copyright 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008,
-   2009, 2010, 2011, 2012, 2013, 2014 Red Hat, Inc.
+   2009, 2010, 2011, 2012, 2013, 2014, 2015 Red Hat, Inc.
 
    This file is part of Cygwin.
 
@@ -764,7 +764,12 @@ track_down (const char *file, const char *suffix, int lvl)
   const char *path = find_on_path (file, suffix, false, true);
   if (!path)
     {
-      display_error ("track_down: could not find %s\n", file);
+      /* The api-ms-win-*.dll files are in system32/downlevel and not in the
+	 DLL search path, so find_on_path doesn't find them.  Since they are
+	 never actually linked against by the executables, they are of no
+	 interest to us.  Skip any error message in not finding them. */
+      if (strncasecmp (file, "api-ms-win-", 11) || strcasecmp (suffix, ".dll"))
+	display_error ("track_down: could not find %s\n", file);
       return false;
     }
 
