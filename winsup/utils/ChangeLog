@@ -1,5 +1,9 @@
 2015-08-30  Corinna Vinschen  <corinna@vinschen.de>
 
+	* cygcheck.cc (dump_sysinfo): Fix missing commas in products array.
+
+2015-08-30  Corinna Vinschen  <corinna@vinschen.de>
+
 	* cygcheck.cc (load_cygwin): Only unload cygwin DLL if not running
 	under a debugger.  Explain why.
 

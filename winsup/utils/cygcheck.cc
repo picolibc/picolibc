@@ -1612,8 +1612,8 @@ dump_sysinfo ()
  /* 0x00000064 */ " Single Language",
  /* 0x00000065 */ " Home",
  /* 0x00000066 */ "",
- /* 0x00000067 */ " Professional with Media Center"
- /* 0x00000068 */ " Mobile"
+ /* 0x00000067 */ " Professional with Media Center",
+ /* 0x00000068 */ " Mobile",
  /* 0x00000069 */ "",
  /* 0x0000006a */ "",
  /* 0x0000006b */ "",
@@ -1630,8 +1630,8 @@ dump_sysinfo ()
  /* 0x00000076 */ "",
  /* 0x00000077 */ "",
  /* 0x00000078 */ "",
- /* 0x00000079 */ " Education"
- /* 0x0000007a */ " Education N"
+ /* 0x00000079 */ " Education",
+ /* 0x0000007a */ " Education N",
  /* 0x0000007b */ "",
  /* 0x0000007c */ "",
  /* 0x0000007d */ "",
@@ -1642,7 +1642,7 @@ dump_sysinfo ()
  /* 0x00000082 */ "",
  /* 0x00000083 */ "",
  /* 0x00000084 */ "",
- /* 0x00000085 */ " Mobile Enterprise"
+ /* 0x00000085 */ " Mobile Enterprise",
 		};
 	      if (prod == PRODUCT_UNLICENSED)
 		strcat (osname, "Unlicensed");
