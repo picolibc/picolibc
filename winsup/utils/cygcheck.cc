@@ -2340,7 +2340,8 @@ load_cygwin (int& argc, char **&argv)
       char **av = (char **) cygwin_internal (CW_ARGV);
       if (av && ((uintptr_t) av != (uintptr_t) -1))
 	{
-	  /* Copy cygwin's idea of the argument list into this Window application. */
+	  /* Copy cygwin's idea of the argument list into this Window
+	     application. */
 	  for (argc = 0; av[argc]; argc++)
 	    continue;
 	  argv = (char **) calloc (argc + 1, sizeof (char *));
@@ -2352,8 +2353,8 @@ load_cygwin (int& argc, char **&argv)
       char **envp = (char **) cygwin_internal (CW_ENVP);
       if (envp && ((uintptr_t) envp != (uintptr_t) -1))
 	{
-	  /* Store path and revert to this value, otherwise path gets overwritten
-	     by the POSIXy Cygwin variation, which breaks cygcheck.
+	  /* Store path and revert to this value, otherwise path gets
+	     overwritten by the POSIXy Cygwin variation, which breaks cygcheck.
 	     Another approach would be to use the Cygwin PATH and convert it to
 	     Win32 again. */
 	  char *path = NULL;
@@ -2371,7 +2372,10 @@ load_cygwin (int& argc, char **&argv)
 	    putenv (path);
 	}
     }
-  FreeLibrary (h);
+  /* GDB chokes when the DLL got unloaded and, for some reason, fails to set
+     any breakpoint after the fact. */
+  if (!IsDebuggerPresent ())
+    FreeLibrary (h);
 }
 
 int

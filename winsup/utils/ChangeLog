@@ -1,5 +1,10 @@
 2015-08-30  Corinna Vinschen  <corinna@vinschen.de>
 
+	* cygcheck.cc (load_cygwin): Only unload cygwin DLL if not running
+	under a debugger.  Explain why.
+
+2015-08-30  Corinna Vinschen  <corinna@vinschen.de>
+
 	* cygcheck.cc (dump_sysinfo): Correctly handle Windows 10/Server 2016.
 	Add missing product types.
 
