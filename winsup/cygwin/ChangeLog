@@ -1,5 +1,9 @@
 2015-11-18  Corinna Vinschen  <corinna@vinschen.de>
 
+	* sec_acl.cc (get_posix_access): Fix class_perm in !new_style case.
+
+2015-11-18  Corinna Vinschen  <corinna@vinschen.de>
+
 	Reapply POSIX ACL changes.
 
 	* sec_acl.cc (get_posix_access): Check for Cygwin "standard" ACL.
