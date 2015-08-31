@@ -642,6 +642,15 @@ get_posix_access (PSECURITY_DESCRIPTOR psd,
       goto out;
     }
 
+  /* If we use the Windows user DB, use Authz to make sure the owner
+     permissions are correctly reflecting the Windows permissions. */
+  if (cygheap->pg.nss_pwd_db ())
+    {
+      mode_t attr = 0;
+      authz_get_user_attribute (&attr, psd, owner_sid);
+      lacl[0].a_perm = attr >> 6;
+    }
+
   /* Files and dirs are created with a NULL descriptor, so inheritence
      rules kick in.  If no inheritable entries exist in the parent object,
      Windows will create entries according to the user token's default DACL.
@@ -787,8 +796,21 @@ get_posix_access (PSECURITY_DESCRIPTOR psd,
 	    }
 	  if ((pos = searchace (lacl, MAX_ACL_ENTRIES, type, id)) >= 0)
 	    {
-	      getace (lacl[pos], type, id, ace->Mask, ace->Header.AceType,
-		      new_style && type & (USER | GROUP_OBJ | GROUP));
+	      /* If we use the Windows user DB, use Authz to check for user
+		 permissions. */
+	      if (cygheap->pg.nss_pwd_db () && (type & (USER_OBJ | USER)))
+		{
+		  /* We already handle the USER_OBJ entry above. */
+		  if (type == USER)
+		    {
+		      mode_t attr = 0;
+		      authz_get_user_attribute (&attr, psd, ace_sid);
+		      lacl[pos].a_perm = attr >> 6;
+		    }
+		}
+	      else
+		getace (lacl[pos], type, id, ace->Mask, ace->Header.AceType,
+			new_style && type & (USER | GROUP_OBJ | GROUP));
 	      if (!new_style)
 		{
 		  /* Fix up CLASS_OBJ value. */
