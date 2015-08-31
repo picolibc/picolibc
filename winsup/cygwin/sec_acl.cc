@@ -880,7 +880,8 @@ get_posix_access (PSECURITY_DESCRIPTOR psd,
     {
       lacl[pos].a_type = CLASS_OBJ;
       lacl[pos].a_id = ILLEGAL_GID;
-      lacl[pos].a_perm = class_perm | lacl[1].a_perm;
+      class_perm |= lacl[1].a_perm;
+      lacl[pos].a_perm = class_perm;
     }
   /* For ptys, fake a mask if the admins group is neither owner nor group.
      In that case we have an extra ACE for the admins group, and we need a
