@@ -714,7 +714,7 @@ class authz_ctx
 
   friend class authz_ctx_cache;
 public:
-  void get_user_attribute (mode_t *, PSECURITY_DESCRIPTOR, PSID);
+  bool get_user_attribute (mode_t *, PSECURITY_DESCRIPTOR, PSID);
 };
 
 /* Authz handles are not inheritable. */
@@ -776,7 +776,7 @@ authz_ctx_cache::context (PSID user_sid)
 /* Ask Authz for the effective user permissions of the user with SID user_sid
    on the object with security descriptor psd.  We're caching the handles for
    the Authz resource manager and the user contexts. */
-void
+bool
 authz_ctx::get_user_attribute (mode_t *attribute, PSECURITY_DESCRIPTOR psd,
 			       PSID user_sid)
 {
@@ -799,7 +799,7 @@ authz_ctx::get_user_attribute (mode_t *attribute, PSECURITY_DESCRIPTOR psd,
 	ctx_hdl = user_ctx_hdl;
     }
   if (!ctx_hdl && !(ctx_hdl = ctx_cache.context (user_sid)))
-    return;
+    return false;
   /* All set, check access. */
   ACCESS_MASK access = 0;
   DWORD error = 0;
@@ -819,16 +819,20 @@ authz_ctx::get_user_attribute (mode_t *attribute, PSECURITY_DESCRIPTOR psd,
   if (AuthzAccessCheck (0, ctx_hdl, &req, NULL, psd, NULL, 0, &repl, NULL))
     {
       if (access & FILE_READ_BITS)
-	*attribute |= S_IRUSR;
+	*attribute |= S_IROTH;
       if (access & FILE_WRITE_BITS)
-	*attribute |= S_IWUSR;
+	*attribute |= S_IWOTH;
       if (access & FILE_EXEC_BITS)
-	*attribute |= S_IXUSR;
+	*attribute |= S_IXOTH;
+      return true;
     }
+  return false;
 }
 
-void authz_get_user_attribute (mode_t *attribute, PSECURITY_DESCRIPTOR psd,
-			       PSID user_sid)
+bool
+authz_get_user_attribute (mode_t *attribute, PSECURITY_DESCRIPTOR psd,
+			  PSID user_sid)
 {
-  authz.get_user_attribute (attribute, psd, user_sid);
+  *attribute = 0;
+  return authz.get_user_attribute (attribute, psd, user_sid);
 }

@@ -580,7 +580,7 @@ get_posix_access (PSECURITY_DESCRIPTOR psd,
   gid_t gid;
   mode_t attr = 0;
   aclent_t *lacl = NULL;
-  cygpsid ace_sid;
+  cygpsid ace_sid, *aclsid;
   int pos, type, id, idx;
 
   bool owner_eq_group;
@@ -669,6 +669,11 @@ get_posix_access (PSECURITY_DESCRIPTOR psd,
   lacl[1].a_id = gid;
   lacl[2].a_type = OTHER_OBJ;
   lacl[2].a_id = ILLEGAL_GID;
+  /* Create array to collect SIDs of all entries in lacl. */
+  aclsid = (cygpsid *) tp.w_get ();
+  aclsid[0] = owner_sid;
+  aclsid[1] = group_sid;
+  aclsid[2] = well_known_world_sid;
 
   /* No ACEs?  Everybody has full access. */
   if (!acl_exists || !acl || acl->AceCount == 0)
@@ -676,15 +681,6 @@ get_posix_access (PSECURITY_DESCRIPTOR psd,
       for (pos = 0; pos < MIN_ACL_ENTRIES; ++pos)
 	lacl[pos].a_perm = S_IROTH | S_IWOTH | S_IXOTH;
       goto out;
-    }
-
-  /* If we use the Windows user DB, use Authz to make sure the owner
-     permissions are correctly reflecting the Windows permissions. */
-  if (cygheap->pg.nss_pwd_db ())
-    {
-      mode_t attr = 0;
-      authz_get_user_attribute (&attr, psd, owner_sid);
-      lacl[0].a_perm = attr >> 6;
     }
 
   /* Files and dirs are created with a NULL descriptor, so inheritence
@@ -730,6 +726,7 @@ get_posix_access (PSECURITY_DESCRIPTOR psd,
 			  lacl[pos].a_type = CLASS_OBJ;
 			  lacl[pos].a_id = ILLEGAL_GID;
 			  lacl[pos].a_perm = CYG_ACE_MASK_TO_POSIX (ace->Mask);
+			  aclsid[pos] = well_known_null_sid;
 			}
 		      has_class_perm = true;
 		      class_perm = lacl[pos].a_perm;
@@ -742,6 +739,7 @@ get_posix_access (PSECURITY_DESCRIPTOR psd,
 			  lacl[pos].a_type = DEF_CLASS_OBJ;
 			  lacl[pos].a_id = ILLEGAL_GID;
 			  lacl[pos].a_perm = CYG_ACE_MASK_TO_POSIX (ace->Mask);
+			  aclsid[pos] = well_known_null_sid;
 			}
 		      has_def_class_perm = true;
 		      def_class_perm = lacl[pos].a_perm;
@@ -832,21 +830,9 @@ get_posix_access (PSECURITY_DESCRIPTOR psd,
 	    }
 	  if ((pos = searchace (lacl, MAX_ACL_ENTRIES, type, id)) >= 0)
 	    {
-	      /* If we use the Windows user DB, use Authz to check for user
-		 permissions. */
-	      if (cygheap->pg.nss_pwd_db () && (type & (USER_OBJ | USER)))
-		{
-		  /* We already handle the USER_OBJ entry above. */
-		  if (type == USER)
-		    {
-		      mode_t attr = 0;
-		      authz_get_user_attribute (&attr, psd, ace_sid);
-		      lacl[pos].a_perm = attr >> 6;
-		    }
-		}
-	      else
-		getace (lacl[pos], type, id, ace->Mask, ace->Header.AceType,
-			new_style && type & (USER | GROUP_OBJ | GROUP));
+	      getace (lacl[pos], type, id, ace->Mask, ace->Header.AceType,
+		      new_style && type & (USER | GROUP_OBJ | GROUP));
+	      aclsid[pos] = ace_sid;
 	      if (!new_style)
 		{
 		  /* Fix up CLASS_OBJ value. */
@@ -909,6 +895,7 @@ get_posix_access (PSECURITY_DESCRIPTOR psd,
 	    {
 	      getace (lacl[pos], type, id, ace->Mask, ace->Header.AceType,
 		      new_style && type & (USER | GROUP_OBJ | GROUP));
+	      aclsid[pos] = ace_sid;
 	      if (!new_style)
 		{
 		  /* Fix up DEF_CLASS_OBJ value. */
@@ -940,6 +927,7 @@ get_posix_access (PSECURITY_DESCRIPTOR psd,
       lacl[pos].a_id = ILLEGAL_GID;
       class_perm |= lacl[1].a_perm;
       lacl[pos].a_perm = class_perm;
+      aclsid[pos] = well_known_null_sid;
     }
   /* For ptys, fake a mask if the admins group is neither owner nor group.
      In that case we have an extra ACE for the admins group, and we need a
@@ -954,6 +942,7 @@ get_posix_access (PSECURITY_DESCRIPTOR psd,
       lacl[pos].a_type = CLASS_OBJ;
       lacl[pos].a_id = ILLEGAL_GID;
       lacl[pos].a_perm = lacl[1].a_perm; /* == group perms */
+      aclsid[pos] = well_known_null_sid;
     }
   /* If this is a just created file, and this is an ACL with only standard
      entries, or if standard POSIX permissions are missing (probably no
@@ -979,6 +968,7 @@ get_posix_access (PSECURITY_DESCRIPTOR psd,
 	  lacl[pos].a_type = DEF_USER_OBJ;
 	  lacl[pos].a_id = uid;
 	  lacl[pos].a_perm = lacl[0].a_perm;
+	  aclsid[pos] = well_known_creator_owner_sid;
 	  pos++;
 	}
       if (!(types_def & GROUP_OBJ) && pos < MAX_ACL_ENTRIES)
@@ -988,6 +978,7 @@ get_posix_access (PSECURITY_DESCRIPTOR psd,
 	  lacl[pos].a_perm = lacl[1].a_perm;
 	  /* Note the position of the DEF_GROUP_OBJ entry. */
 	  def_pgrp_pos = pos;
+	  aclsid[pos] = well_known_creator_group_sid;
 	  pos++;
 	}
       if (!(types_def & OTHER_OBJ) && pos < MAX_ACL_ENTRIES)
@@ -995,6 +986,7 @@ get_posix_access (PSECURITY_DESCRIPTOR psd,
 	  lacl[pos].a_type = DEF_OTHER_OBJ;
 	  lacl[pos].a_id = ILLEGAL_GID;
 	  lacl[pos].a_perm = lacl[2].a_perm;
+	  aclsid[pos] = well_known_world_sid;
 	  pos++;
 	}
     }
@@ -1011,6 +1003,7 @@ get_posix_access (PSECURITY_DESCRIPTOR psd,
       lacl[pos].a_perm = def_class_perm;
       if (def_pgrp_pos >= 0)
 	lacl[pos].a_perm |= lacl[def_pgrp_pos].a_perm;
+      aclsid[pos] = well_known_null_sid;
     }
 
   /* Make sure `pos' contains the number of used entries in lacl. */
@@ -1021,26 +1014,36 @@ get_posix_access (PSECURITY_DESCRIPTOR psd,
   if (!new_style)
     for (idx = 0; idx < pos; ++idx)
       {
-	/* Current user?  If the user entry has a deny ACE, don't check. */
-	if (lacl[idx].a_id == myself->uid
-	    && lacl[idx].a_type & (USER_OBJ | USER)
-	    && !(lacl[idx].a_type & ACL_DEFAULT)
-	    && !(lacl[idx].a_perm & DENY_RWX))
+	if (lacl[idx].a_type & (USER_OBJ | USER)
+	    && !(lacl[idx].a_type & ACL_DEFAULT))
 	  {
-	    int gpos;
-	    gid_t grps[NGROUPS_MAX];
-	    cyg_ldap cldap;
+	    mode_t perm;
 
-	    /* Sum up all permissions of groups the user is member of, plus
-	       everyone perms, and merge them to user perms.  */
-	    mode_t grp_perm = lacl[2].a_perm & S_IRWXO;
-	    int gnum = internal_getgroups (NGROUPS_MAX, grps, &cldap);
-	    for (int g = 0; g < gnum && grp_perm != S_IRWXO; ++g)
-	      if ((gpos = 1, grps[g] == lacl[gpos].a_id)
-		  || (gpos = searchace (lacl, MAX_ACL_ENTRIES, GROUP, grps[g]))
-		     >= 0)
-		grp_perm |= lacl[gpos].a_perm & S_IRWXO;
-	    lacl[idx].a_perm |= grp_perm;
+	    /* If we use the Windows user DB, utilize Authz to make sure all
+	       user permissions are correctly reflecting the Windows
+	       permissions. */
+	    if (cygheap->pg.nss_pwd_db ()
+		&& authz_get_user_attribute (&perm, psd, owner_sid))
+	      lacl[0].a_perm = perm;
+	    /* Otherwise we only check the current user.  If the user entry
+	       has a deny ACE, don't check. */
+	    else if (lacl[idx].a_id == myself->uid
+		     && !(lacl[idx].a_perm & DENY_RWX))
+	      {
+		/* Sum up all permissions of groups the user is member of, plus
+		   everyone perms, and merge them to user perms.  */
+		BOOL ret;
+
+		perm = lacl[2].a_perm & S_IRWXO;
+		for (int gidx = 1; gidx < pos; ++gidx)
+		  if (lacl[gidx].a_type & (GROUP_OBJ | GROUP)
+		      && CheckTokenMembership (cygheap->user.issetuid ()
+					       ? cygheap->user.imp_token () : NULL,
+					       aclsid[gidx], &ret)
+		      && ret)
+		    perm |= lacl[gidx].a_perm & S_IRWXO;
+		lacl[idx].a_perm |= perm;
+	      }
 	  }
 	/* For all groups, if everyone has more permissions, add everyone
 	   perms to group perms.  Skip groups with deny ACE. */
