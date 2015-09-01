@@ -37,25 +37,30 @@ details. */
      or
        USER_OBJ deny ACE   == ~USER_OBJ & (GROUP_OBJ | OTHER_OBJ)
 
-   - USER deny.  If a user has different permissions from CLASS_OBJ, or if the
+   - USER deny.  If a user has more permissions than CLASS_OBJ, or if the
      user has less permissions than OTHER_OBJ, deny the excess permissions.
 
-       USER deny ACE       == (USER ^ CLASS_OBJ) | (~USER & OTHER_OBJ)
+       USER deny ACE       == (USER & ~CLASS_OBJ) | (~USER & OTHER_OBJ)
 
    - USER_OBJ  allow ACE
    - USER      allow ACEs
 
-     The POSIX permissions returned for a USER entry are the allow bits alone!
+   The POSIX permissions returned for a USER entry are the allow bits alone!
 
    - GROUP{_OBJ} deny.  If a group has more permissions than CLASS_OBJ,
      or less permissions than OTHER_OBJ, deny the excess permissions.
 
-       GROUP{_OBJ} deny ACEs  == (GROUP & ~CLASS_OBJ) | (~GROUP & OTHER_OBJ)
+       GROUP{_OBJ} deny ACEs  == (GROUP & ~CLASS_OBJ)
 
    - GROUP_OBJ	allow ACE
    - GROUP	allow ACEs
 
-     The POSIX permissions returned for a GROUP entry are the allow bits alone!
+   The POSIX permissions returned for a GROUP entry are the allow bits alone!
+
+   - 2. GROUP{_OBJ} deny.  If a group has less permissions than OTHER_OBJ,
+     deny the excess permissions.
+
+       2. GROUP{_OBJ} deny ACEs  == (~GROUP & OTHER_OBJ)
 
    - OTHER_OBJ	allow ACE
 
@@ -311,7 +316,9 @@ set_posix_access (mode_t attr, uid_t uid, gid_t gid,
 	   check_types < CLASS_OBJ;
 	   check_types <<= 2)
 	{
-	  /* Create deny ACEs for users, then groups. */
+	  /* Create deny ACEs for users, then 1st run for groups.  For groups,
+	     only take CLASS_OBJ permissions into account.  Class permissions
+	     are handled in the 2nd deny loop below. */
 	  for (start_idx = idx;
 	       idx < nentries && aclbufp[idx].a_type & check_types;
 	       ++idx)
@@ -327,7 +334,7 @@ set_posix_access (mode_t attr, uid_t uid, gid_t gid,
 	      if (aclbufp[idx].a_type & USER_OBJ)
 		deny = ~aclbufp[idx].a_perm & (class_obj | other_obj);
 	      else if (aclbufp[idx].a_type & USER)
-		deny = (aclbufp[idx].a_perm ^ class_obj)
+		deny = (aclbufp[idx].a_perm & ~class_obj)
 		       | (~aclbufp[idx].a_perm & other_obj);
 	      /* Accommodate Windows: Only generate deny masks for SYSTEM
 		 and the Administrators group in terms of the execute bit,
@@ -337,8 +344,7 @@ set_posix_access (mode_t attr, uid_t uid, gid_t gid,
 			   || aclsid[idx] == well_known_admins_sid))
 		deny = aclbufp[idx].a_perm & ~(class_obj | S_IROTH | S_IWOTH);
 	      else
-		deny = (aclbufp[idx].a_perm & ~class_obj)
-		       | (~aclbufp[idx].a_perm & other_obj);
+		deny = (aclbufp[idx].a_perm & ~class_obj);
 	      if (!deny)
 		continue;
 	      access = 0;
@@ -391,6 +397,36 @@ set_posix_access (mode_t attr, uid_t uid, gid_t gid,
 					   inherit))
 		return NULL;
 	    }
+	  /* 2nd deny loop: Create deny ACEs for groups when they have less
+	     permissions than OTHER_OBJ. */
+	  if (check_types == (GROUP_OBJ | GROUP))
+	    for (idx = start_idx;
+		 idx < nentries && aclbufp[idx].a_type & check_types;
+		 ++idx)
+	      {
+		if (aclbufp[idx].a_type & GROUP && aclsid[idx] == group)
+		  continue;
+		/* Only generate deny masks for SYSTEM and the Administrators
+		   group if they are the primary group. */
+		if (aclbufp[idx].a_type & GROUP
+		    && (aclsid[idx] == well_known_system_sid
+			|| aclsid[idx] == well_known_admins_sid))
+		  deny = 0;
+		else
+		  deny = (~aclbufp[idx].a_perm & other_obj);
+		if (!deny)
+		  continue;
+		access = 0;
+		if (deny & S_IROTH)
+		  access |= FILE_DENY_READ;
+		if (deny & S_IWOTH)
+		  access |= FILE_DENY_WRITE;
+		if (deny & S_IXOTH)
+		  access |= FILE_DENY_EXEC;
+		if (!add_access_denied_ace (acl, access, aclsid[idx], acl_len,
+					    inherit))
+		  return NULL;
+	      }
 	}
       /* For ptys if the admins group isn't in the ACL, add an ACE to make
 	 sure the group has WRITE_DAC and WRITE_OWNER perms. */
