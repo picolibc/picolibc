@@ -1,5 +1,16 @@
 2015-11-18  Corinna Vinschen  <corinna@vinschen.de>
 
+	* security.h (authz_get_user_attribute): Declare bool.
+	* sec_helper.cc (authz_ctx::get_user_attribute): Make bool method.
+	Set S_IxOTH bits in returned attributes rather than S_IxUSR bits.
+	(authz_get_user_attribute): Make bool function.
+	* sec_acl.cc (get_posix_access): Introduce cygsid array to keep
+	track of all SIDs in the ACL.  Move AuthZ calls into !new_style
+	permission post processing.  When not using AuthZ, use 
+	CheckTokenMembership to collect group permissions.
+
+2015-11-18  Corinna Vinschen  <corinna@vinschen.de>
+
 	* fhandler_disk_file.cc (fhandler_disk_file::fchmod): Disable
 	deviation from POSIX 1003.1e in terms of GROUP_OBJ/CLASS_OBJ
 	permissions.  Follow POSIX 1003.1e again.  Keep old code in
