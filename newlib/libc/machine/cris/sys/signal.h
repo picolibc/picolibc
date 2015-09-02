@@ -44,6 +44,10 @@ struct sigaction {
 
 int sigprocmask (int __how, const sigset_t *__a, sigset_t *__b);
 
+/* The first argument is really a pid_t, but that's just a typedef'd
+   int, so let's avoid requiring sys/types only for this declaration.  */
+int kill (int, int);
+
 #define SIGHUP		 1
 #define SIGINT		 2
 #define SIGQUIT		 3
