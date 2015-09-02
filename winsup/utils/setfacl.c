@@ -43,13 +43,14 @@ details. */
 static char *prog_name;
 
 typedef enum {
-  NoAction,
+  NoAction = 0,
+  DeleteExt = 1,	/* The values 1,2,3 allow bitmasking below. */
+  DeleteDef = 2,
+  DeleteAll = 3,
   Set,
   Modify,
   Delete,
   ModNDel,
-  DeleteAll,
-  DeleteDef,
   SetFromFile
 } action_t;
 
@@ -430,10 +431,12 @@ delallacl (aclent_t *tgt, int tcnt, action_t action)
   int t;
 
   for (t = 0; t < tcnt; ++t)
-    /* -b (DeleteAll): Remove all extended ACL entries.
-       -k (DeleteDef): Remove all default ACL entries. */
-    if ((action == DeleteAll && (tgt[t].a_type & (USER | GROUP | CLASS_OBJ)))
-	|| (action == DeleteDef && (tgt[t].a_type & ACL_DEFAULT)))
+    /* -b (DeleteExt):    Remove all extended ACL entries.
+       -k (DeleteDef):    Remove all default ACL entries.
+       -b -k (DeleteAll): Remove extended and remove defaults.  That means,
+			  only preserve standard POSIX perms. */
+    if (((action & DeleteExt) && (tgt[t].a_type & (USER | GROUP | CLASS_OBJ)))
+	|| ((action & DeleteDef) && (tgt[t].a_type & ACL_DEFAULT)))
       {
 	--tcnt;
 	if (t < tcnt)
@@ -468,8 +471,9 @@ setfacl (action_t action, const char *path, aclent_t *acls, int cnt)
 	  return 2;
 	}
       break;
-    case DeleteAll:
+    case DeleteExt:
     case DeleteDef:
+    case DeleteAll:
       if ((lcnt = acl (path, GETACL, MAX_ACL_ENTRIES, lacl)) < 0
 	  || (lcnt = delallacl (lacl, lcnt, action)) < 0
 	  || (lcnt = acl (path, SETACL, lcnt, lacl)) < 0)
@@ -496,126 +500,121 @@ static void
 usage (FILE *stream)
 {
   fprintf (stream, ""
-      "Usage: %s {-f ACL_FILE | -s acl_entries} FILE...\n"
-      "       %s {-b|[-x acl_entries] [-m acl_entries]} FILE...\n"
-      "\n"
-      "Modify file and directory access control lists (ACLs)\n"
-      "\n"
-      "  -b, --remove-all       remove all extended ACL entries\n"
-      "  -x, --delete           delete one or more specified ACL entries\n"
-      "  -f, --file             set ACL entries for FILE to ACL entries read\n"
-      "                         from ACL_FILE\n"
-      "  -k, --remove-default   remove all default ACL entries\n"
-      "  -m, --modify           modify one or more specified ACL entries\n"
-      "  -n, --no-mask          don't recalculate the effective rights mask\n"
-      "      --mask             do recalculate the effective rights mask\n"
-      "  -s, --substitute       substitute specified ACL entries on FILE\n"
-      "  -V, --version          print version and exit\n"
-      "  -h, --help             this help text\n"
-      "\n"
-      "At least one of (-b, -x, -f, -k, -m, -s) must be specified\n"
-      "\n", prog_name, prog_name);
+"Usage: %s [-n] {-f ACL_FILE | -s acl_entries} FILE...\n"
+"       %s [-n] {[-bk]|[-x acl_entries] [-m acl_entries]} FILE...\n"
+"\n"
+"Modify file and directory access control lists (ACLs)\n"
+"\n"
+"  -b, --remove-all       remove all extended ACL entries\n"
+"  -x, --delete           delete one or more specified ACL entries\n"
+"  -f, --file             set ACL entries for FILE to ACL entries read\n"
+"                         from ACL_FILE\n"
+"  -k, --remove-default   remove all default ACL entries\n"
+"  -m, --modify           modify one or more specified ACL entries\n"
+"  -n, --no-mask          don't recalculate the effective rights mask\n"
+"      --mask             do recalculate the effective rights mask\n"
+"  -s, --substitute       substitute specified ACL entries on FILE\n"
+"  -V, --version          print version and exit\n"
+"  -h, --help             this help text\n"
+"\n"
+"At least one of (-b, -x, -f, -k, -m, -s) must be specified\n"
+"\n", prog_name, prog_name);
     if (stream == stdout)
     {
       printf(""
-      "     Acl_entries are one or more comma-separated ACL entries \n"
-      "     from the following list:\n"
-      "\n"
-      "         u[ser]::perm\n"
-      "         u[ser]:uid:perm\n"
-      "         g[roup]::perm\n"
-      "         g[roup]:gid:perm\n"
-      "         m[ask]:perm\n"
-      "         o[ther]:perm\n"
-      "\n"
-      "     Default entries are like the above with the additional\n"
-      "     default identifier. For example: \n"
-      "\n"
-      "         d[efault]:u[ser]:uid:perm\n"
-      "\n"
-      "     'perm' is either a 3-char permissions string in the form\n"
-      "     \"rwx\" with the character - for no permission\n"
-      "     or it is the octal representation of the permissions, a\n"
-      "     value from 0 (equivalent to \"---\") to 7 (\"rwx\").\n"
-      "     'uid' is a user name or a numerical uid.\n"
-      "     'gid' is a group name or a numerical gid.\n"
-      "\n"
-      "\n"
-      "For each file given as parameter, %s will either replace its\n"
-      "complete ACL (-s, -f), or it will add, modify, or delete ACL\n"
-      "entries.\n"
-      "\n"
-      "The following options are supported:\n"
-      "\n"
-      "-b, --remove-all\n"
-      "     Remove all extended ACL entries.  The base ACL entries of the\n"
-      "     owner, group and others are retained.\n"
-      "\n"
-      "-x, --delete\n"
-      "     Delete one or more specified entries from the file's ACL.\n"
-      "     The owner, group and others entries must not be deleted.\n"
-      "     Acl_entries to be deleted should be specified without\n"
-      "     permissions, as in the following list:\n"
-      "\n"
-      "         u[ser]:uid[:]\n"
-      "         g[roup]:gid[:]\n"
-      "         m[ask][:]\n"
-      "         d[efault]:u[ser][:uid]\n"
-      "         d[efault]:g[roup][:gid]\n"
-      "         d[efault]:m[ask][:]\n"
-      "         d[efault]:o[ther][:]\n"
-      "\n"
-      "-f, --file\n"
-      "     Take the Acl_entries from ACL_FILE one per line.  Whitespace\n"
-      "     characters are ignored, and the character \"#\" may be used\n"
-      "     to start a comment.  The special filename \"-\" indicates\n"
-      "     reading from stdin.\n"
-      "     Required entries are\n"
-      "     - One user entry for the owner of the file.\n"
-      "     - One group entry for the group of the file.\n"
-      "     - One other entry.\n"
-      "     If additional user and group entries are given:\n"
-      "     - A mask entry for the file group class of the file.\n"
-      "     - No duplicate user or group entries with the same uid/gid.\n"
-      "     If it is a directory:\n"
-      "     - One default user entry for the owner of the file.\n"
-      "     - One default group entry for the group of the file.\n"
-      "     - One default mask entry for the file group class.\n"
-      "     - One default other entry.\n"
-      "\n"
-      "-k, --remove-default\n"
-      "     Remove all default ACL entries. If no default ACL entries exist,\n"
-      "     no warnings are issued.\n"
-      "\n"
-      "-m, --modify\n"
-      "     Add or modify one or more specified ACL entries.  Acl_entries is\n"
-      "     a comma-separated list of entries from the same list as above.\n"
-      "\n"
-      "-n, --no-mask\n"
-      "     Valid in conjunction with -m.  Do not recalculate the effective\n"
-      "     rights mask. The default behavior of setfacl is to recalculate the\n"
-      "     ACL mask entry, unless a mask entry was explicitly given.  The\n"
-      "     mask entry is set to the union of all permissions of the owning\n"
-      "     group, and all named user and group entries.  (These are exactly\n"
-      "     the entries affected by the mask entry).\n"
-      "\n"
-      "--mask\n"
-      "     Valid in conjunction with -m.  Do recalculate the effective rights\n"
-      "     mask, even if an ACL mask entry was explicitly given. (See the\n"
-      "     -n option.)\n"
-      "\n"
-      "-s, --substitute\n"
-      "     Like -f, but substitute the file's ACL with ACL entries\n"
-      "     specified in a comma-separated list on the command line.\n"
-      "\n"
-      "While the -x and -m options may be used in the same command, the\n"
-      "-f and -s options may be used only exclusively.\n"
-      "\n"
-      "Directories may contain default ACL entries.  Files created\n"
-      "in a directory that contains default ACL entries will have\n"
-      "permissions according to the combination of the current umask,\n"
-      "the explicit permissions requested and the default ACL entries\n"
-      "\n", prog_name);
+"  Acl_entries are one or more comma-separated ACL entries from the following\n"
+"  list:\n"
+"\n"
+"    u[ser]::perm\n"
+"    u[ser]:uid:perm\n"
+"    g[roup]::perm\n"
+"    g[roup]:gid:perm\n"
+"    m[ask]:perm\n"
+"    o[ther]:perm\n"
+"\n"
+"  Default entries are like the above with the additional default identifier.\n"
+"  For example: \n"
+"\n"
+"    d[efault]:u[ser]:uid:perm\n"
+"\n"
+"  'perm' is either a 3-char permissions string in the form \"rwx\" with the\n"
+"  character - for no permission, or it is the octal representation of the\n"
+"  permissions, a value from 0 (equivalent to \"---\") to 7 (\"rwx\").\n"
+"  'uid' is a user name or a numerical uid.\n"
+"  'gid' is a group name or a numerical gid.\n"
+"\n"
+"For each file given as parameter, %s will either replace its complete ACL\n"
+"(-s, -f), or it will add, modify, or delete ACL entries.\n"
+"\n"
+"The following options are supported:\n"
+"\n"
+"-b, --remove-all\n"
+"  Remove all extended ACL entries.  The base ACL entries of the owner, group\n"
+"  and others are retained.  This option can be combined with the\n"
+"  -k,--remove-default option to delete all non-standard POSIX permissions.\n"
+"\n"
+"-x, --delete\n"
+"  Delete one or more specified entries from the file's ACL.  The owner, group\n"
+"  and others entries must not be deleted.  Acl_entries to be deleted should\n"
+"  be specified without permissions, as in the following list:\n"
+"\n"
+"    u[ser]:uid[:]\n"
+"    g[roup]:gid[:]\n"
+"    m[ask][:]\n"
+"    d[efault]:u[ser][:uid]\n"
+"    d[efault]:g[roup][:gid]\n"
+"    d[efault]:m[ask][:]\n"
+"    d[efault]:o[ther][:]\n"
+"\n"
+"-f, --file\n"
+"  Take the Acl_entries from ACL_FILE one per line.  Whitespace characters are\n"
+"  ignored, and the character \"#\" may be used to start a comment.  The special\n"
+"  filename \"-\" indicates reading from stdin.\n"
+"  Required entries are\n"
+"  - One user entry for the owner of the file.\n"
+"  - One group entry for the group of the file.\n"
+"  - One other entry.\n"
+"  If additional user and group entries are given:\n"
+"  - A mask entry for the file group class of the file.\n"
+"  - No duplicate user or group entries with the same uid/gid.\n"
+"  If it is a directory:\n"
+"  - One default user entry for the owner of the file.\n"
+"  - One default group entry for the group of the file.\n"
+"  - One default mask entry for the file group class.\n"
+"  - One default other entry.\n"
+"\n"
+"-k, --remove-default\n"
+"  Remove all default ACL entries. If no default ACL entries exist, no\n"
+"  warnings are issued.  This option can be combined with the -b,--remove-all\n"
+"  option to delete all non-standard POSIX permissions.\n"
+"\n"
+"-m, --modify\n"
+"  Add or modify one or more specified ACL entries.  Acl_entries is a\n"
+"  comma-separated list of entries from the same list as above.\n"
+"\n"
+"-n, --no-mask\n"
+"  Valid in conjunction with -m.  Do not recalculate the effective rights\n"
+"  mask. The default behavior of setfacl is to recalculate the ACL mask entry,\n"
+"  unless a mask entry was explicitly given.  The mask entry is set to the\n"
+"  union of all permissions of the owning group, and all named user and group\n"
+"  entries.  (These are exactly the entries affected by the mask entry).\n"
+"\n"
+"--mask\n"
+"  Valid in conjunction with -m.  Do recalculate the effective rights mask,\n"
+"  even if an ACL mask entry was explicitly given. (See the -n option.)\n"
+"\n"
+"-s, --substitute\n"
+"  Like -f, but substitute the file's ACL with ACL entries specified in a\n"
+"  comma-separated list on the command line.\n"
+"\n"
+"While the -x and -m options may be used in the same command, the -f and -s\n"
+"options may be used only exclusively.\n"
+"\n"
+"Directories may contain default ACL entries.  Files created in a directory\n"
+"that contains default ACL entries will have permissions according to the\n"
+"combination of the current umask, the explicit permissions requested and\n"
+"the default ACL entries.\n"
+"\n", prog_name);
   }
   else
     fprintf(stream, "Try '%s --help' for more information.\n", prog_name);
@@ -668,6 +667,8 @@ main (int argc, char **argv)
       {
       case 'b':
 	if (action == NoAction)
+	  action = DeleteExt;
+	else if (action == DeleteDef)
 	  action = DeleteAll;
 	else
 	  {
@@ -712,6 +713,8 @@ main (int argc, char **argv)
       case 'k':
 	if (action == NoAction)
 	  action = DeleteDef;
+	else if (action == DeleteExt)
+	  action = DeleteAll;
 	else
 	  {
 	    usage (stderr);

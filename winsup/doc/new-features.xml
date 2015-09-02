@@ -27,6 +27,11 @@ sysconf() now supports returning CPU cache information:
   </screen>
 </para></listitem>
 
+<listitem><para>
+setfacl(1) now allows to use the -b and -k option combined to allow reducing
+an ACL to only reflect standard POSIX permissions.
+</para></listitem>
+
 </itemizedlist>
 
 </sect2>
