@@ -1,5 +1,15 @@
 2015-11-18  Corinna Vinschen  <corinna@vinschen.de>
 
+	* setfacl.c (action_t): Rename DeleteAll to DeleteExt.  Add
+	DeleteAll.  Rearrange for bit-wise testing later in the code.
+	(delallacl): Handle -b -k combination.
+	(setfacl): Handle DeleteExt/DeleteAll.
+	(usage): Fix -b/-k output.  Rearrange output to better fill 80
+	columns. 
+	(main): Allow to combine -b and -k.
+
+2015-11-18  Corinna Vinschen  <corinna@vinschen.de>
+
 	Reapply POSIX ACL changes.
 
 	* getfacl.c (main): Special-case SYSTEM and Admins group.  Add comments.

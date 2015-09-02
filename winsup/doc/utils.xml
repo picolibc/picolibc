@@ -1969,7 +1969,7 @@ Example: regtool get '\user\software\Microsoft\Clock\iFormat'
     <refsynopsisdiv>
       <screen>
 setfacl [-n] {-f ACL_FILE | -s acl_entries} FILE...
-setfacl [-n] {-b|-k|[-x acl_entries] [-m acl_entries]} FILE...
+setfacl [-n] {[-bk]|[-x acl_entries] [-m acl_entries]} FILE...
       </screen>
      </refsynopsisdiv>
 
@@ -2027,7 +2027,9 @@ At least one of (-b, -x, -f, -k, -m, -s) must be specified\n"
 
     <para> <literal>-b</literal>,<literal>--remove-all</literal> Remove all
       extended ACL entries.  The base ACL entries of the owner, group and
-      others are retained.</para>
+      others are retained.  This option can be combined with the
+      <literal>-k</literal>,<literal>--remove-default</literal> option
+      to delete all non-standard POSIX permissions.</para>
 
     <para> <literal>-x</literal>,<literal>--delete</literal> Delete one or
       more specified entries from the file's ACL. The owner, group and others
@@ -2066,7 +2068,9 @@ $ getfacl source_file | setfacl -f - target_file
 
     <para> <literal>-k</literal>,<literal>--remove-default</literal> Remove all
       default ACL entries. If no default ACL entries exist, no warnings are
-      issued. </para>
+      issued.  This option can be combined with the
+      <literal>-b</literal>,<literal>--remove-all</literal> option
+      to delete all non-standard POSIX permissions.</para>
 
     <para> <literal>-m</literal>,<literal>--modify</literal> Add or modify one
       or more specified ACL entries. Acl_entries is a comma-separated list of
@@ -2095,7 +2099,7 @@ $ getfacl source_file | setfacl -f - target_file
     <para> Directories may contain default ACL entries. Files created in a
       directory that contains default ACL entries will have permissions
       according to the combination of the current umask, the explicit
-      permissions requested and the default ACL entries </para>
+      permissions requested and the default ACL entries.</para>
     </refsect1>
   </refentry>
 

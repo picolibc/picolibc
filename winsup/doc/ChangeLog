@@ -1,5 +1,10 @@
 2015-11-18  Corinna Vinschen  <corinna@vinschen.de>
 
+	* utils.xml (setfacl): Accommodate -b/-k change.
+	* new-features.xml (ov-new2.4): Add setfacl -b/-k change.
+
+2015-11-18  Corinna Vinschen  <corinna@vinschen.de>
+
 	* utils.xml (setfacl): Show new option output.
 	(getfacl): Show new option output.
 
