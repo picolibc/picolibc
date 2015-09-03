@@ -1,5 +1,18 @@
 2015-11-18  Corinna Vinschen  <corinna@vinschen.de>
 
+	* fhandler_tty.cc (fhandler_pty_slave::open): Add S_IFCHR flag
+	in call to create_object_sd_from_attribute.
+	(fhandler_pty_slave::fstat): Ditto in call to get_object_attribute.
+	(fhandler_pty_slave::fchmod): Add an orig_mode flag and ditto for
+	both calls.
+	(fhandler_pty_master::setup): Ditto in call to
+	create_object_sd_from_attribute.
+	* security.cc (get_object_attribute): Never add S_IFCHR to mode
+	here.  Let the caller decide.
+	(create_object_sd_from_attribute): Ditto.
+
+2015-11-18  Corinna Vinschen  <corinna@vinschen.de>
+
 	* security.h (authz_get_user_attribute): Declare bool.
 	* sec_helper.cc (authz_ctx::get_user_attribute): Make bool method.
 	Set S_IxOTH bits in returned attributes rather than S_IxUSR bits.
