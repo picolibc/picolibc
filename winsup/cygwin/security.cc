@@ -401,14 +401,9 @@ get_object_attribute (HANDLE handle, uid_t *uidret, gid_t *gidret,
 		      mode_t *attribute)
 {
   security_descriptor sd;
-  mode_t attr = S_IFCHR;
 
   if (get_object_sd (handle, sd))
     return -1;
-  if (attribute)
-    *attribute |= S_IFCHR;
-  else
-    attribute = &attr;
   return get_posix_access (sd, attribute, uidret, gidret, NULL, 0)
 	 >= 0 ? 0 : -1;
 }
@@ -417,7 +412,7 @@ int
 create_object_sd_from_attribute (uid_t uid, gid_t gid, mode_t attribute,
 				 security_descriptor &sd)
 {
-  return set_posix_access (S_IFCHR | attribute, uid, gid, NULL, 0, sd, false)
+  return set_posix_access (attribute, uid, gid, NULL, 0, sd, false)
   	 ? 0 : -1;
 }
 

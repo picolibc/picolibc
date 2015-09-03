@@ -390,7 +390,8 @@ fhandler_pty_slave::open (int flags, mode_t)
     RtlCreateSecurityDescriptor (sd, SECURITY_DESCRIPTOR_REVISION);
     SECURITY_ATTRIBUTES sa = { sizeof (SECURITY_ATTRIBUTES), NULL, TRUE };
     if (!create_object_sd_from_attribute (myself->uid, myself->gid,
-					  S_IRUSR | S_IWUSR | S_IWGRP, sd))
+					  S_IFCHR | S_IRUSR | S_IWUSR | S_IWGRP,
+					  sd))
       sa.lpSecurityDescriptor = (PSECURITY_DESCRIPTOR) sd;
     acquire_output_mutex (INFINITE);
     inuse = get_ttyp ()->create_inuse (&sa);
@@ -1034,6 +1035,7 @@ fhandler_pty_slave::fstat (struct stat *st)
       if (input_available_event)
 	to_close = true;
     }
+  st->st_mode = S_IFCHR;
   if (!input_available_event
       || get_object_attribute (input_available_event, &st->st_uid, &st->st_gid,
 			       &st->st_mode))
@@ -1167,6 +1169,7 @@ fhandler_pty_slave::fchmod (mode_t mode)
   security_descriptor sd;
   uid_t uid;
   gid_t gid;
+  mode_t orig_mode = S_IFCHR;
 
   if (!input_available_event)
     {
@@ -1176,8 +1179,8 @@ fhandler_pty_slave::fchmod (mode_t mode)
     }
   sd.malloc (sizeof (SECURITY_DESCRIPTOR));
   RtlCreateSecurityDescriptor (sd, SECURITY_DESCRIPTOR_REVISION);
-  if (!get_object_attribute (input_available_event, &uid, &gid, NULL)
-      && !create_object_sd_from_attribute (uid, gid, mode, sd))
+  if (!get_object_attribute (input_available_event, &uid, &gid, &orig_mode)
+      && !create_object_sd_from_attribute (uid, gid, S_IFCHR | mode, sd))
     ret = fch_set_sd (sd, false);
 errout:
   if (to_close)
@@ -1190,10 +1193,10 @@ fhandler_pty_slave::fchown (uid_t uid, gid_t gid)
 {
   int ret = -1;
   bool to_close = false;
-  mode_t mode = 0;
+  security_descriptor sd;
   uid_t o_uid;
   gid_t o_gid;
-  security_descriptor sd;
+  mode_t mode = S_IFCHR;
 
   if (uid == ILLEGAL_UID && gid == ILLEGAL_GID)
     return 0;
@@ -1754,7 +1757,8 @@ fhandler_pty_master::setup ()
   sd.malloc (sizeof (SECURITY_DESCRIPTOR));
   RtlCreateSecurityDescriptor (sd, SECURITY_DESCRIPTOR_REVISION);
   if (!create_object_sd_from_attribute (myself->uid, myself->gid,
-					S_IRUSR | S_IWUSR | S_IWGRP, sd))
+					S_IFCHR | S_IRUSR | S_IWUSR | S_IWGRP,
+					sd))
     sa.lpSecurityDescriptor = (PSECURITY_DESCRIPTOR) sd;
 
   /* Carefully check that the input_available_event didn't already exist.
