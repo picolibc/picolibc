@@ -1,3 +1,23 @@
+2015-09-04  James Bowman  <james.bowman@ftdichip.com>
+
+	* configure.host: Add ft32 support.
+	* libc/include/machine/ieeefp.h: Ditto.
+	* libc/include/machine/setjmp.h: Ditto.
+	* libc/machine/configure.in: Ditto.
+	* libc/machine/configure: Ditto.
+	* libc/machine/ft32/Makefile.am: New file.
+	* libc/machine/ft32/Makefile.in: Ditto.
+	* libc/machine/ft32/aclocal.m4: Ditto.
+	* libc/machine/ft32/configure.in: Ditto.
+	* libc/machine/ft32/configure: Ditto.
+	* libc/machine/ft32/memcpy.S: Ditto.
+	* libc/machine/ft32/memset.S: Ditto.
+	* libc/machine/ft32/setjmp.S: Ditto.
+	* libc/machine/ft32/stpcmp.S: Ditto.
+	* libc/machine/ft32/strcmp.S: Ditto.
+	* libc/machine/ft32/strcpy.S: Ditto.
+	* libc/machine/ft32/strlen.S: Ditto.
+
 2015-09-03  Hans-Peter Nilsson  <hp@axis.com>
 
 	* libc/machine/cris/sys/signal.h (kill): Declare.

@@ -141,6 +141,15 @@ case "${host_cpu}" in
   frv)
 	machine_dir=frv
         ;;
+  ft32*)
+        machine_dir=ft32
+        target_optspace=yes
+        # newlib_io_float=no
+        default_newlib_io_long_long="yes"
+        newlib_cflags="-DPREFER_SIZE_OVER_SPEED -Os"
+        CFLAGS="-Os"
+        CCASFLAGS="-Os"
+        ;;
   h8300)
 	machine_dir=h8300
 	;;
@@ -426,6 +435,9 @@ case "${host}" in
   frv*)
         sys_dir=
         ;;
+  ft32*)
+        sys_dir=
+        ;;
   h8300-*-hms*)
 	sys_dir=h8300hms
 	;;
@@ -670,6 +682,9 @@ case "${host}" in
   frv-*-*)
         syscall_dir=syscalls
 	default_newlib_io_long_long="yes"
+        ;;
+  ft32*-*-*)
+        syscall_dir=syscalls
         ;;
   h8300*-*-*)
 	syscall_dir=syscalls	

@@ -283,6 +283,10 @@
 #define __IEEE_BIG_ENDIAN
 #endif
 
+#ifdef __FT32__
+#define __IEEE_LITTLE_ENDIAN
+#endif
+
 #ifdef __mcore__
 #define __IEEE_BIG_ENDIAN
 #endif

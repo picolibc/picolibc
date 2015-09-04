@@ -250,6 +250,10 @@ _BEGIN_STD_C
 #define _JBLEN 10
 #endif
 
+#ifdef  __FT32__
+#define _JBLEN 27
+#endif
+
 #ifdef __iq2000__
 #define _JBLEN 32
 #endif
