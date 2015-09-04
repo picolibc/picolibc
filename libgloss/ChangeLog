@@ -1,3 +1,27 @@
+2015-09-04  James Bowman  <james.bowman@ftdichip.com>
+
+	* configure.in: Add ft32 support.
+	* ft32/sbrk.c: New file.
+	* ft32/sim-close.S: Ditto.
+	* ft32/sim-exit.S: Ditto.
+	* ft32/sim-inbyte.c: Ditto.
+	* ft32/sim.ld: Ditto.
+	* ft32/sim-lseek.c: Ditto.
+	* ft32/sim-lseek.S: Ditto.
+	* ft32/sim-open.S: Ditto.
+	* ft32/sim-read.S: Ditto.
+	* ft32/sim-time.c: Ditto.
+	* ft32/sim-unlink.S: Ditto.
+	* ft32/sim-write.S: Ditto.
+	* ft32/stat.c: Ditto.
+	* ft32/configure.in: Ditto.
+	* ft32/crt0.S: Ditto.
+	* ft32/fstat.c: Ditto.
+	* ft32/getpid.c: Ditto.
+	* ft32/isatty.c: Ditto.
+	* ft32/kill.c: Ditto.
+	* ft32/Makefile.in: Ditto.
+
 2015-08-20  Nick Clifton  <nickc@redhat.com>
 
 	PR libgloss/18786

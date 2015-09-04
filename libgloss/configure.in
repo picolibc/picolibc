@@ -105,6 +105,9 @@ case "${target}" in
   frv*-*-*)
 	AC_CONFIG_SUBDIRS([frv])
 	;;
+  ft32*-*-*)
+	AC_CONFIG_SUBDIRS([ft32])
+	;;
   lm32*-*-*)
 	AC_CONFIG_SUBDIRS([lm32])
 	;;
