@@ -1,3 +1,8 @@
+2015-09-04  James Bowman  <james.bowman@ftdichip.com>
+
+	* COPYING.LIBGLOSS: Add FTDI license.
+	* COPYING.NEWLIB: Likewise.
+
 2015-01-21  Eric Botcazou  <ebotcazou@adacore.com>
 
 	* COPYING.LIBGLOSS: Add Controls and Data Services copyright.
