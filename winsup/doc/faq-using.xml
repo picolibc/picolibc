@@ -376,10 +376,10 @@ or <literal>whatis</literal>, you
 must create the whatis database.  Just run the command
 </para>
 <screen>
-	/usr/sbin/makewhatis
+	mandb
 </screen>
 
-<para>(it may take a minute to complete).
+<para>(it may take a few minutes to complete).
 </para>
 </answer></qandaentry>
 
