@@ -290,7 +290,7 @@ class lockf_t
     { cfree (p); }
 
     POBJECT_ATTRIBUTES create_lock_obj_attr (lockfattr_t *attr,
-					     ULONG flags);
+					     ULONG flags, void *sd_buf);
 
     void create_lock_obj ();
     bool open_lock_obj ();
@@ -636,7 +636,7 @@ inode_t::get_all_locks_list ()
 /* Create the lock object name.  The name is constructed from the lock
    properties which identify it uniquely, all values in hex. */
 POBJECT_ATTRIBUTES
-lockf_t::create_lock_obj_attr (lockfattr_t *attr, ULONG flags)
+lockf_t::create_lock_obj_attr (lockfattr_t *attr, ULONG flags, void *sd_buf)
 {
   __small_swprintf (attr->name, LOCK_OBJ_NAME_FMT,
 		    lf_flags & (F_POSIX | F_FLOCK), lf_type, lf_start, lf_end,
@@ -644,7 +644,7 @@ lockf_t::create_lock_obj_attr (lockfattr_t *attr, ULONG flags)
   RtlInitCountedUnicodeString (&attr->uname, attr->name,
 			       LOCK_OBJ_NAME_LEN * sizeof (WCHAR));
   InitializeObjectAttributes (&attr->attr, &attr->uname, flags, lf_inode->i_dir,
-			      everyone_sd (FLOCK_EVENT_ACCESS));
+			      _everyone_sd (sd_buf, FLOCK_EVENT_ACCESS));
   return &attr->attr;
 }
 
@@ -766,11 +766,13 @@ lockf_t::create_lock_obj ()
 {
   lockfattr_t attr;
   NTSTATUS status;
+  POBJECT_ATTRIBUTES lock_obj_attr;
 
+  lock_obj_attr = create_lock_obj_attr (&attr, OBJ_INHERIT,
+					alloca (SD_MIN_SIZE));
   do
     {
-      status = NtCreateEvent (&lf_obj, CYG_EVENT_ACCESS,
-			      create_lock_obj_attr (&attr, OBJ_INHERIT),
+      status = NtCreateEvent (&lf_obj, CYG_EVENT_ACCESS, lock_obj_attr,
 			      NotificationEvent, FALSE);
       if (!NT_SUCCESS (status))
 	{
@@ -852,7 +854,7 @@ lockf_t::open_lock_obj ()
   NTSTATUS status;
 
   status = NtOpenEvent (&lf_obj, FLOCK_EVENT_ACCESS,
-			create_lock_obj_attr (&attr, 0));
+			create_lock_obj_attr (&attr, 0, alloca (SD_MIN_SIZE)));
   if (!NT_SUCCESS (status))
     {
       SetLastError (RtlNtStatusToDosError (status));

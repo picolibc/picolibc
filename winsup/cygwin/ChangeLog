@@ -1,3 +1,13 @@
+2015-09-08  Corinna Vinschen  <corinna@vinschen.de>
+
+	* flock.cc (lockf_t::create_lock_obj_attr): Add buffer parameter.
+	Call _everyone_sd with buffer argument from caller rather than
+	everyone_sd with locally allocated stack buffer.
+	(lockf_t::create_lock_obj): Call create_lock_obj_attr only once
+	outside the loop and with additional buffer argument.
+	(lockf_t::open_lock_obj): Call create_lock_obj_attr with additional
+	buffer argument.
+
 2015-08-29  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler_proc.cc (format_proc_cpuinfo): Fetch cache information
