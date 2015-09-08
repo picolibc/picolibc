@@ -35,3 +35,7 @@ Bug Fixes
 
 - sysconf _SC_NPROCESSORS_CONF and _SC_NPROCESSORS_ONLN now handle more than
   64 CPUs on Windows 7 and later.
+
+- Fix a potential crash in advisory file locking due to usage of stack space
+  out of scope.
+  Addresses: https://cygwin.com/ml/cygwin/2015-09/msg00079.html
