@@ -1,4 +1,4 @@
-/*	$OpenBSD: arc4random.c,v 1.53 2015/09/10 18:53:50 bcook Exp $	*/
+/*	$OpenBSD: arc4random.c,v 1.54 2015/09/13 08:31:47 guenther Exp $	*/
 
 /*
  * Copyright (c) 1996, David Mazieres <dm@uun.org>
