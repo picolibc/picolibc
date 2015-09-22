@@ -1,3 +1,7 @@
+2015-09-22  James Bowman  <james.bowman@ftdichip.com>
+
+	* configure.host (ft32): minimise newlib code size
+
 2015-09-04  James Bowman  <james.bowman@ftdichip.com>
 
 	* configure.host: Add ft32 support.

@@ -143,12 +143,7 @@ case "${host_cpu}" in
         ;;
   ft32*)
         machine_dir=ft32
-        target_optspace=yes
-        # newlib_io_float=no
-        default_newlib_io_long_long="yes"
-        newlib_cflags="-DPREFER_SIZE_OVER_SPEED -Os"
-        CFLAGS="-Os"
-        CCASFLAGS="-Os"
+        newlib_cflags="${newlib_cflags} -DPREFER_SIZE_OVER_SPEED"
         ;;
   h8300)
 	machine_dir=h8300
