@@ -64,3 +64,10 @@ _isatty:
 getpid:
 	MOV	#42,R12
 	ret_
+
+	.weak	gettimeofday
+	.global	gettimeofday
+gettimeofday:
+	MOV	#0,R12
+	ret_
+	.size gettimeofday , . - gettimeofday

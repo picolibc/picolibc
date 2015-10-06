@@ -25,7 +25,7 @@ INCLUDE intr_vectors.ld
    toolchain tests can be run against the simulator.  */
 MEMORY
 {
-  RAM (rw)     : ORIGIN = 0x00200, LENGTH = 0x01e00
+  RAM (rw)     : ORIGIN = 0x00500, LENGTH = 0x01b00
   ROM (rx)     : ORIGIN = 0x02000, LENGTH = 0x0df00
   /* The regions from intr_vectors.ld go here.  */
   HIFRAM (rw)  : ORIGIN = 0x10000, LENGTH = 0x80000
@@ -282,7 +282,7 @@ SECTIONS
   } > RAM
   PROVIDE (__bsssize = SIZEOF(.bss));
 
-  /* This section contains data that is not initialised at startup
+  /* This section contains data that is not initialised during load
      *or* application reset.  */
   .noinit (NOLOAD) :
   {
@@ -293,6 +293,17 @@ SECTIONS
     PROVIDE (__noinit_end = .);
   } > RAM
 
+  /* This section contains data that *is* initialised during load
+     but *not* on application reset.  This section should be in FLASH.  */
+  .persistent :
+  {
+    . = ALIGN(2);
+    PROVIDE (__persistent_start = .);
+    *(.persistent)
+    . = ALIGN(2);
+    PROVIDE (__persistent_end = .);
+  } > HIFRAM
+ 
   .upper.bss :
   {
     /* Note - if this section is not going to be defined then please
