@@ -1183,6 +1183,48 @@ Users</computeroutput> group instead.</para>
 
 </answer></qandaentry>
 
+<qandaentry id="faq.using.same-with-permissions">
+<question><para>Why do my files have extra permissions after updating to Cygwin 1.7.34?</para></question>
+<answer>
+
+<para>The problem is exactly the same as with the key files of SSH.  See
+<xref linkend="faq.using.ssh-pubkey-stops-working"/>.</para>
+
+<para>The solution is the same:</para>
+
+<screen>
+  $ ls -l *
+  -rw-rwxr--+ 1 user group 42 Nov 12  2010 file1
+  -rw-rwxr--+ 1 user group 42 Nov 12  2010 file2
+  $ setfacl -b *
+  $ ls -l *
+  -rw-r--r--  1 user group 42 Nov 12  2010 file1
+  -rw-r--r--  1 user group 42 Nov 12  2010 file2
+</screen>
+
+<para>You may find that newly-created files also have unexpected
+permissions:</para>
+
+<screen>
+  $ touch foo
+  $ ls -l foo
+  -rw-rwxr--+ 1 user group 42 Nov 12  2010 foo
+</screen>
+
+<para>This probably means that the directory in which you're creating
+the files has unwanted default ACL entries that are inherited by
+newly-created files and subdirectories.  The solution is again the
+same:</para>
+
+<screen>
+  $ setfacl -b .
+  $ touch bar
+  $ ls -l bar
+  -rw-r--r--  1 user group 42 Nov 12  2010 bar
+</screen>
+
+</answer></qandaentry>
+
 <qandaentry id="faq.using.tcl-tk">
 <question><para>Why do my Tk programs not work anymore?</para></question>
 <answer>
