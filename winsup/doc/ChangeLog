@@ -1,3 +1,7 @@
+2015-10-06  Ken Brown  <kbrown@cornell.edu>
+
+	* faq-using.xml (faq.using.same-with-permissions): New entry.
+
 2015-09-07  Brian Inglis  <Brian.Inglis@SystematicSw.ab.ca>
 
 	* faq-using.xml (faq.using.man): Replace makewhatis with mandb.
