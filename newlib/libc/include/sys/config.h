@@ -196,6 +196,8 @@
 #ifdef __XTENSA__
 #include <xtensa/config/core-isa.h>
 #define MALLOC_ALIGNMENT ((XCHAL_DATA_WIDTH) < 16 ? 16 : (XCHAL_DATA_WIDTH))
+/* esp8266-specific: shrink the default fd buffer size */
+#define __BUFSIZ__ 128
 #endif
 
 /* This block should be kept in sync with GCC's limits.h.  The point
