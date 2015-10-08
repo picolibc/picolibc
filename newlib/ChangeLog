@@ -1,3 +1,7 @@
+2015-10-08  Nick Clifton  <nickc@redhat.com>
+
+	* libc/include/machine/setjmp.h (_JBLEN): Define for IA64.
+
 2015-09-22  James Bowman  <james.bowman@ftdichip.com>
 
 	* configure.host (ft32): minimise newlib code size

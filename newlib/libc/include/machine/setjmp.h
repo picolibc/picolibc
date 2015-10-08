@@ -291,6 +291,10 @@ _BEGIN_STD_C
 #define _JBLEN 18
 #endif
 
+#ifdef __ia64
+#define _JBLEN 64
+#endif
+
 #ifdef __lm32__
 #define _JBLEN 19
 #endif
