@@ -1,3 +1,8 @@
+2015-10-13  Sebastian Huber  <sebastian.huber@embedded-brains.de>
+
+        * libc/include/sys/cdefs.h: Add style changes of latest FreeBSD
+        version.
+
 2015-10-08  Nick Clifton  <nickc@redhat.com>
 
 	* libc/include/machine/setjmp.h (_JBLEN): Define for IA64.
