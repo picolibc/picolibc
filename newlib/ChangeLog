@@ -1,3 +1,8 @@
+2015-10-13  Sebastian Huber  <sebastian.huber@embedded-brains.de>
+
+        * libc/include/sys/cdefs.h: Add style changes of latest FreeBSD
+        version.
+
 2015-08-29  Corinna Vinschen  <corinna@vinschen.de>
 
 	* include/sys/unistd.h (_SC_LEVEL*): Add cache-related variables as
