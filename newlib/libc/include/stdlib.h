@@ -284,6 +284,8 @@ extern long double strtold (const char *__restrict, char **__restrict);
  * If we're in a mode greater than C99, expose C11 functions.
  */
 #if __ISO_C_VISIBLE >= 2011 || __cplusplus >= 201103L
+void *	aligned_alloc(size_t, size_t) __malloc_like __alloc_align(1)
+	    __alloc_size(2);
 int	at_quick_exit(void (*)(void));
 _Noreturn void
 	quick_exit(int);

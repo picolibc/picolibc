@@ -1,5 +1,9 @@
 2015-10-14  Sebastian Huber  <sebastian.huber@embedded-brains.de>
 
+	* libc/include/stdlib.h (alloc_aligned): Declare.
+
+2015-10-14  Sebastian Huber  <sebastian.huber@embedded-brains.de>
+
 	* libc/include/stdlib.h (at_quick_exit): Declare.
 	(quick_exit): Likewise.
 	* libc/stdlib/Makefile.am (GENERAL_SOURCES): Add
