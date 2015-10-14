@@ -13,6 +13,7 @@ GENERAL_SOURCES = \
 	_Exit.c		\
 	abort.c  	\
 	abs.c 		\
+	aligned_alloc.c	\
 	assert.c  	\
 	atexit.c	\
 	atof.c 		\

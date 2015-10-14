@@ -1,5 +1,11 @@
 2015-10-14  Sebastian Huber  <sebastian.huber@embedded-brains.de>
 
+	* libc/stdlib/Makefile.am (GENERAL_SOURCES): Add alloc_aligned.c.c.
+	* libc/stdlib/Makefile.in: Regenerate.
+	* libc/stdlib/aligned_alloc.c: New.
+
+2015-10-14  Sebastian Huber  <sebastian.huber@embedded-brains.de>
+
 	* libc/include/stdlib.h (alloc_aligned): Declare.
 
 2015-10-14  Sebastian Huber  <sebastian.huber@embedded-brains.de>
