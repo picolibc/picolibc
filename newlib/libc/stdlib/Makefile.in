@@ -85,16 +85,17 @@ am__objects_2 = lib_a-__adjust.$(OBJEXT) lib_a-__atexit.$(OBJEXT) \
 	lib_a-__call_atexit.$(OBJEXT) lib_a-__exp10.$(OBJEXT) \
 	lib_a-__ten_mu.$(OBJEXT) lib_a-_Exit.$(OBJEXT) \
 	lib_a-abort.$(OBJEXT) lib_a-abs.$(OBJEXT) \
-	lib_a-assert.$(OBJEXT) lib_a-atexit.$(OBJEXT) \
-	lib_a-atof.$(OBJEXT) lib_a-atoff.$(OBJEXT) \
-	lib_a-atoi.$(OBJEXT) lib_a-atol.$(OBJEXT) \
-	lib_a-calloc.$(OBJEXT) lib_a-div.$(OBJEXT) \
-	lib_a-dtoa.$(OBJEXT) lib_a-dtoastub.$(OBJEXT) \
-	lib_a-environ.$(OBJEXT) lib_a-envlock.$(OBJEXT) \
-	lib_a-eprintf.$(OBJEXT) lib_a-exit.$(OBJEXT) \
-	lib_a-gdtoa-gethex.$(OBJEXT) lib_a-gdtoa-hexnan.$(OBJEXT) \
-	lib_a-getenv.$(OBJEXT) lib_a-getenv_r.$(OBJEXT) \
-	lib_a-itoa.$(OBJEXT) lib_a-labs.$(OBJEXT) lib_a-ldiv.$(OBJEXT) \
+	lib_a-aligned_alloc.$(OBJEXT) lib_a-assert.$(OBJEXT) \
+	lib_a-atexit.$(OBJEXT) lib_a-atof.$(OBJEXT) \
+	lib_a-atoff.$(OBJEXT) lib_a-atoi.$(OBJEXT) \
+	lib_a-atol.$(OBJEXT) lib_a-calloc.$(OBJEXT) \
+	lib_a-div.$(OBJEXT) lib_a-dtoa.$(OBJEXT) \
+	lib_a-dtoastub.$(OBJEXT) lib_a-environ.$(OBJEXT) \
+	lib_a-envlock.$(OBJEXT) lib_a-eprintf.$(OBJEXT) \
+	lib_a-exit.$(OBJEXT) lib_a-gdtoa-gethex.$(OBJEXT) \
+	lib_a-gdtoa-hexnan.$(OBJEXT) lib_a-getenv.$(OBJEXT) \
+	lib_a-getenv_r.$(OBJEXT) lib_a-itoa.$(OBJEXT) \
+	lib_a-labs.$(OBJEXT) lib_a-ldiv.$(OBJEXT) \
 	lib_a-ldtoa.$(OBJEXT) lib_a-malloc.$(OBJEXT) \
 	lib_a-mblen.$(OBJEXT) lib_a-mblen_r.$(OBJEXT) \
 	lib_a-mbstowcs.$(OBJEXT) lib_a-mbstowcs_r.$(OBJEXT) \
@@ -149,11 +150,11 @@ lib_a_OBJECTS = $(am_lib_a_OBJECTS)
 LTLIBRARIES = $(noinst_LTLIBRARIES)
 @HAVE_LONG_DOUBLE_TRUE@am__objects_8 = strtold.lo wcstold.lo
 am__objects_9 = __adjust.lo __atexit.lo __call_atexit.lo __exp10.lo \
-	__ten_mu.lo _Exit.lo abort.lo abs.lo assert.lo atexit.lo \
-	atof.lo atoff.lo atoi.lo atol.lo calloc.lo div.lo dtoa.lo \
-	dtoastub.lo environ.lo envlock.lo eprintf.lo exit.lo \
-	gdtoa-gethex.lo gdtoa-hexnan.lo getenv.lo getenv_r.lo itoa.lo \
-	labs.lo ldiv.lo ldtoa.lo malloc.lo mblen.lo mblen_r.lo \
+	__ten_mu.lo _Exit.lo abort.lo abs.lo aligned_alloc.lo \
+	assert.lo atexit.lo atof.lo atoff.lo atoi.lo atol.lo calloc.lo \
+	div.lo dtoa.lo dtoastub.lo environ.lo envlock.lo eprintf.lo \
+	exit.lo gdtoa-gethex.lo gdtoa-hexnan.lo getenv.lo getenv_r.lo \
+	itoa.lo labs.lo ldiv.lo ldtoa.lo malloc.lo mblen.lo mblen_r.lo \
 	mbstowcs.lo mbstowcs_r.lo mbtowc.lo mbtowc_r.lo mlock.lo \
 	mprec.lo mstats.lo quick_exit.lo rand.lo rand_r.lo realloc.lo \
 	reallocf.lo sb_charsets.lo strtod.lo strtol.lo strtoul.lo \
@@ -353,9 +354,9 @@ top_srcdir = @top_srcdir@
 AUTOMAKE_OPTIONS = cygnus
 INCLUDES = $(NEWLIB_CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLAGS)
 GENERAL_SOURCES = __adjust.c __atexit.c __call_atexit.c __exp10.c \
-	__ten_mu.c _Exit.c abort.c abs.c assert.c atexit.c atof.c \
-	atoff.c atoi.c atol.c calloc.c div.c dtoa.c dtoastub.c \
-	environ.c envlock.c eprintf.c exit.c gdtoa-gethex.c \
+	__ten_mu.c _Exit.c abort.c abs.c aligned_alloc.c assert.c \
+	atexit.c atof.c atoff.c atoi.c atol.c calloc.c div.c dtoa.c \
+	dtoastub.c environ.c envlock.c eprintf.c exit.c gdtoa-gethex.c \
 	gdtoa-hexnan.c getenv.c getenv_r.c itoa.c labs.c ldiv.c \
 	ldtoa.c malloc.c mblen.c mblen_r.c mbstowcs.c mbstowcs_r.c \
 	mbtowc.c mbtowc_r.c mlock.c mprec.c mstats.c quick_exit.c \
@@ -647,6 +648,12 @@ lib_a-abs.o: abs.c
 
 lib_a-abs.obj: abs.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-abs.obj `if test -f 'abs.c'; then $(CYGPATH_W) 'abs.c'; else $(CYGPATH_W) '$(srcdir)/abs.c'; fi`
+
+lib_a-aligned_alloc.o: aligned_alloc.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-aligned_alloc.o `test -f 'aligned_alloc.c' || echo '$(srcdir)/'`aligned_alloc.c
+
+lib_a-aligned_alloc.obj: aligned_alloc.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-aligned_alloc.obj `if test -f 'aligned_alloc.c'; then $(CYGPATH_W) 'aligned_alloc.c'; else $(CYGPATH_W) '$(srcdir)/aligned_alloc.c'; fi`
 
 lib_a-assert.o: assert.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-assert.o `test -f 'assert.c' || echo '$(srcdir)/'`assert.c
