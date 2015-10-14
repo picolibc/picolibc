@@ -280,6 +280,15 @@ extern long double strtold (const char *__restrict, char **__restrict);
 #endif
 #endif /* _HAVE_LONG_DOUBLE */
 
+/*
+ * If we're in a mode greater than C99, expose C11 functions.
+ */
+#if __ISO_C_VISIBLE >= 2011 || __cplusplus >= 201103L
+int	at_quick_exit(void (*)(void));
+_Noreturn void
+	quick_exit(int);
+#endif /* __ISO_C_VISIBLE >= 2011 */
+
 _END_STD_C
 
 #endif /* _STDLIB_H_ */

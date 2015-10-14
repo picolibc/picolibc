@@ -1,3 +1,12 @@
+2015-10-14  Sebastian Huber  <sebastian.huber@embedded-brains.de>
+
+	* libc/include/stdlib.h (at_quick_exit): Declare.
+	(quick_exit): Likewise.
+	* libc/stdlib/Makefile.am (GENERAL_SOURCES): Add
+	quick_exit.c.
+	* libc/stdlib/Makefile.in: Regenerate.
+	* libc/stdlib/quick_exit.c: New.
+
 2015-10-13  Sebastian Huber  <sebastian.huber@embedded-brains.de>
 
 	* libc/include/sys/cdefs.h: Synchronize with latest FreeBSD
