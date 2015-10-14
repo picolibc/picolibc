@@ -45,6 +45,7 @@ GENERAL_SOURCES = \
 	mlock.c		\
 	mprec.c		\
 	mstats.c	\
+	quick_exit.c	\
 	rand.c		\
 	rand_r.c	\
 	realloc.c	\
