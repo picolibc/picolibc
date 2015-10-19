@@ -1,3 +1,8 @@
+2015-10-19  Nick Clifton  <nickc@redhat.com>
+
+	* libc/include/sys/_intsup.h: Add support for 16-bit and 20-bit
+	pointers.
+
 2015-10-14  Sebastian Huber  <sebastian.huber@embedded-brains.de>
 
 	* libc/stdlib/Makefile.am (GENERAL_SOURCES): Add alloc_aligned.c.c.

@@ -50,6 +50,7 @@
 #pragma push_macro("unsigned")
 #pragma push_macro("char")
 #pragma push_macro("short")
+#pragma push_macro("__int20")
 #pragma push_macro("int")
 #pragma push_macro("long")
 #undef signed
@@ -57,19 +58,26 @@
 #undef char
 #undef short
 #undef int
+#undef __int20
 #undef long
 #define signed +0
 #define unsigned +0
 #define char +0
 #define short +1
+#define __int20 +2
 #define int +2
 #define long +4
 #if (__INTPTR_TYPE__ == 8 || __INTPTR_TYPE__ == 10)
 #define _INTPTR_EQ_LONGLONG
 #elif (__INTPTR_TYPE__ == 4 || __INTPTR_TYPE__ == 6)
 #define _INTPTR_EQ_LONG
+/* Note - the tests for _INTPTR_EQ_INT and _INTPTR_EQ_SHORT are currently
+   redundant as the values are not used.  But one day they may be needed
+   and so the tests remain.  */
 #elif __INTPTR_TYPE__ == 2
-/* Nothing to define because intptr_t is safe to print as an int. */
+#define _INTPTR_EQ_INT
+#elif (__INTPTR_TYPE__ == 1 || __INTPTR_TYPE__ == 3)
+#define _INTPTR_EQ_SHORT
 #else
 #error "Unable to determine type definition of intptr_t"
 #endif
@@ -194,6 +202,7 @@
 #pragma pop_macro("unsigned")
 #pragma pop_macro("char")
 #pragma pop_macro("short")
+#pragma pop_macro("__int20")
 #pragma pop_macro("int")
 #pragma pop_macro("long")
 
