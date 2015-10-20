@@ -746,7 +746,7 @@ fhandler_socket::wait_for_events (const long event_mask, const DWORD flags)
     return 0;
 
   int ret;
-  long events;
+  long events = 0;
 
   while (!(ret = evaluate_events (event_mask, events, !(flags & MSG_PEEK)))
 	 && !events)
@@ -1159,7 +1159,7 @@ int
 fhandler_socket::connect (const struct sockaddr *name, int namelen)
 {
   struct sockaddr_storage sst;
-  int type;
+  int type = 0;
 
   if (get_inet_addr (name, namelen, &sst, &namelen, &type, connect_secret)
       == SOCKET_ERROR)

@@ -1,3 +1,10 @@
+2015-09-23  Evgeny Grin  <k2k@yandex.ru>
+
+	* fhandler_socket.cc (fhandler_socket::wait_for_events): Fix compiler
+	warning in -O3 case.
+	(fhandler_socket::connect): Ditto.
+	* regex/regcomp.c (singleton): Ditto.
+
 2015-08-29  Corinna Vinschen  <corinna@vinschen.de>
 
 	* fhandler_proc.cc (format_proc_cpuinfo): Fetch cache information
