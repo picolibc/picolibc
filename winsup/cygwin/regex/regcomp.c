@@ -1246,7 +1246,7 @@ freeset(struct parse *p, cset *cs)
 static wint_t
 singleton(cset *cs)
 {
-	wint_t i, s, n;
+	wint_t i, s = OUT, n;
 
 	for (i = n = 0; i < NC; i++)
 		if (CHIN(cs, i)) {
