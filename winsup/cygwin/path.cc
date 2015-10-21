@@ -2289,7 +2289,13 @@ symlink_info::check_reparse_point (HANDLE h, bool remote)
     {
       debug_printf ("NtFsControlFile(FSCTL_GET_REPARSE_POINT) failed, %y",
 		    status);
-      set_error (EIO);
+      /* When accessing the root dir of some remote drives (observed with
+	 OS X shares), the FILE_ATTRIBUTE_REPARSE_POINT flag is set, but
+	 the followup call to NtFsControlFile(FSCTL_GET_REPARSE_POINT)
+	 returns with STATUS_NOT_A_REPARSE_POINT.  That's quite buggy, but
+	 we cope here with this scenario by not setting an error code. */
+      if (status != STATUS_NOT_A_REPARSE_POINT)
+	set_error (EIO);
       return 0;
     }
   if (rp->ReparseTag == IO_REPARSE_TAG_SYMLINK)

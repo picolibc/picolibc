@@ -1,3 +1,8 @@
+2015-10-21  Corinna Vinschen  <corinna@vinschen.de>
+
+	* path.cc (symlink_info::check_reparse_point): Don't generate an EIO
+	error if NtFsControlFile returns STATUS_NOT_A_REPARSE_POINT.
+
 2015-09-23  Evgeny Grin  <k2k@yandex.ru>
 
 	* fhandler_socket.cc (fhandler_socket::wait_for_events): Fix compiler
