@@ -2485,8 +2485,7 @@ pthread::resume (pthread_t *thread)
 extern "C" int
 pthread_getattr_np (pthread_t thread, pthread_attr_t *attr)
 {
-  const size_t sizeof_tbi = sizeof (THREAD_BASIC_INFORMATION);
-  PTHREAD_BASIC_INFORMATION tbi;
+  THREAD_BASIC_INFORMATION tbi;
   NTSTATUS status;
 
   if (!pthread::is_good_object (&thread))
@@ -2506,13 +2505,12 @@ pthread_getattr_np (pthread_t thread, pthread_attr_t *attr)
   (*attr)->schedparam = thread->attr.schedparam;
   (*attr)->guardsize = thread->attr.guardsize;
 
-  tbi = (PTHREAD_BASIC_INFORMATION) malloc (sizeof_tbi);
   status = NtQueryInformationThread (thread->win32_obj_id,
 				     ThreadBasicInformation,
-				     tbi, sizeof_tbi, NULL);
+				     &tbi, sizeof (tbi), NULL);
   if (NT_SUCCESS (status))
     {
-      PTEB teb = (PTEB) tbi->TebBaseAddress;
+      PTEB teb = (PTEB) tbi.TebBaseAddress;
       /* stackaddr holds the uppermost stack address.  See the comments
 	 in pthread_attr_setstack and pthread_attr_setstackaddr for a
 	 description. */

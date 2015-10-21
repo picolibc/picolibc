@@ -1,5 +1,10 @@
 2015-10-21  Corinna Vinschen  <corinna@vinschen.de>
 
+	* thread.cc (pthread_getattr_np): Fix memory leak, remove usage of
+	malloc for small local buffer.
+
+2015-10-21  Corinna Vinschen  <corinna@vinschen.de>
+
 	* path.cc (symlink_info::check_reparse_point): Don't generate an EIO
 	error if NtFsControlFile returns STATUS_NOT_A_REPARSE_POINT.
 
