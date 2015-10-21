@@ -176,16 +176,18 @@ _start:
 
 ;; block fill to .bss
 
-	movw	bc, #__bsssize
-	movw	ax, #0
-1:	
-	cmpw	ax, bc
-	bz	$1f
-	movw	__bssstart[bc], ax
-	decw	bc
-	decw	bc
-	br	$1b
-1:	
+	movw    bc, #__bsssize
+	movw    ax, #0
+	cmpw    ax, bc
+	bz      $_bss_zero_done
+1:
+	decw    bc
+	decw    bc
+	movw    __bssstart[bc], ax
+	cmpw    ax, bc
+	bnz      $1b
+
+_bss_zero_done:
 
 	call	!!__rl78_init
 

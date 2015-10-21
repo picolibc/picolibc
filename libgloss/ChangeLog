@@ -1,3 +1,7 @@
+2015-10-20  Kaushik Phatak <kaushik.phatak@kpit.com>
+
+        * rl78/crt0.S (_start): Fixed code that clears .bss
+
 2015-10-06  Nick Clifton  <nickc@redhat.com>
 
 	* msp430/msp430-sim.ld: Add .persistent section.
