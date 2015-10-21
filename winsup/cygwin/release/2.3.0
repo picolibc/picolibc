@@ -39,3 +39,6 @@ Bug Fixes
 - Fix a potential crash in advisory file locking due to usage of stack space
   out of scope.
   Addresses: https://cygwin.com/ml/cygwin/2015-09/msg00079.html
+
+- Fix EIO error accessing certain (OS X SMB?) drives
+  Addresses: https://cygwin.com/ml/cygwin/2015-09/msg00229.html
