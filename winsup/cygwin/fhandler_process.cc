@@ -568,9 +568,9 @@ format_process_winexename (void *data, char *&destbuf)
   _pinfo *p = (_pinfo *) data;
   size_t len = sys_wcstombs (NULL, 0, p->progname);
   destbuf = (char *) crealloc_abort (destbuf, len + 1);
-  sys_wcstombs (destbuf, len, p->progname);
-  destbuf[len] = '\n';
-  return len + 1;
+  /* With trailing \0 for backward compat reasons. */
+  sys_wcstombs (destbuf, len + 1, p->progname);
+  return len;
 }
 
 struct heap_info

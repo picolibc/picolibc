@@ -474,7 +474,6 @@ sys_cp_wcstombs (wctomb_p f_wctomb, const char *charset, char *dst, size_t len,
 	}
       if (n + bytes <= len)
 	{
-	  n += bytes;
 	  if (dst)
 	    {
 	      for (int i = 0; i < bytes; ++i)
@@ -482,6 +481,7 @@ sys_cp_wcstombs (wctomb_p f_wctomb, const char *charset, char *dst, size_t len,
 	    }
 	  if (*pwcs++ == 0x00)
 	    break;
+	  n += bytes;
 	}
       else
 	break;

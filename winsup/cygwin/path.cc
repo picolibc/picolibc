@@ -2167,7 +2167,7 @@ symlink_info::check_shortcut (HANDLE h)
 	{
 	  char *tmpbuf = tp.c_get ();
 	  if (sys_wcstombs (tmpbuf, NT_MAX_PATH, (PWCHAR) (cp + 2))
-	      > SYMLINK_MAX + 1)
+	      > SYMLINK_MAX)
 	    return 0;
 	  res = posixify (tmpbuf);
 	}
@@ -2248,7 +2248,7 @@ symlink_info::check_sysfile (HANDLE h)
 	    srcbuf += 2;
 	  char *tmpbuf = tp.c_get ();
 	  if (sys_wcstombs (tmpbuf, NT_MAX_PATH, (PWCHAR) srcbuf)
-	      > SYMLINK_MAX + 1)
+	      > SYMLINK_MAX)
 	    debug_printf ("symlink string too long");
 	  else
 	    res = posixify (tmpbuf);
@@ -2368,7 +2368,7 @@ symlink_info::check_nfs_symlink (HANDLE h)
       PWCHAR spath = (PWCHAR)
 		     (pffei->EaName + pffei->EaNameLength + 1);
       res = sys_wcstombs (contents, SYMLINK_MAX + 1,
-			  spath, pffei->EaValueLength) - 1;
+			  spath, pffei->EaValueLength);
       pflags |= PATH_SYMLINK;
     }
   return res;
