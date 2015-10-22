@@ -218,7 +218,10 @@ cygsid::get_sid (DWORD s, DWORD cnt, DWORD *r, bool well_known)
   SID_IDENTIFIER_AUTHORITY sid_auth = { SECURITY_NULL_SID_AUTHORITY };
 # define SECURITY_NT_AUTH 5
 
-  if (s > 255 || cnt < 1 || cnt > SID_MAX_SUB_AUTHORITIES)
+  /* 2015-10-22: Note that we let slip SIDs with a subauthority count of 0.
+     There are systems, which generate the SID S-1-0 as group ownership SID,
+     see https://cygwin.com/ml/cygwin/2015-10/msg00141.html. */
+  if (s > 255 || cnt > SID_MAX_SUB_AUTHORITIES)
     {
       psid = NO_SID;
       return NULL;
