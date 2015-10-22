@@ -895,7 +895,7 @@ getwinenveq (const char *name, size_t namelen, int x)
   int totlen = GetEnvironmentVariableW (name0, valbuf, 32768);
   if (totlen > 0)
     {
-      totlen = sys_wcstombs (NULL, 0, valbuf);
+      totlen = sys_wcstombs (NULL, 0, valbuf) + 1;
       if (x == HEAP_1_STR)
 	totlen += namelen;
       else

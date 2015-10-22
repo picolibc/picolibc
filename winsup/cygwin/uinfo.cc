@@ -56,7 +56,7 @@ cygheap_user::init ()
   if (GetEnvironmentVariableW (L"USERNAME", user_name, user_name_len)
       || GetEnvironmentVariableW (L"USER", user_name, user_name_len))
     {
-      char mb_user_name[user_name_len = sys_wcstombs (NULL, 0, user_name)];
+      char mb_user_name[user_name_len = sys_wcstombs (NULL, 0, user_name) + 1];
       sys_wcstombs (mb_user_name, user_name_len, user_name);
       set_name (mb_user_name);
     }

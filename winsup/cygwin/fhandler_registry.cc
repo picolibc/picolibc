@@ -286,7 +286,7 @@ multi_wcstombs (char *dst, size_t len, const wchar_t *src, size_t nwc)
 
   while (nwc)
     {
-      siz = sys_wcstombs (dst, len, src, nwc);
+      siz = sys_wcstombs (dst, len, src, nwc) + 1;
       sum += siz;
       if (dst)
 	{
@@ -555,7 +555,8 @@ fhandler_registry::fstat (struct stat *buf)
 		      else
 			buf->st_size = sys_wcstombs (NULL, 0,
 						     (wchar_t *) tmpbuf,
-						     dwSize / sizeof (wchar_t));
+						     dwSize / sizeof (wchar_t))
+				       + 1;
 		      if (tmpbuf)
 			free (tmpbuf);
 		    }
@@ -972,7 +973,7 @@ fhandler_registry::fill_filebuf ()
 	}
       if (type == REG_SZ || type == REG_EXPAND_SZ || type == REG_LINK)
 	bufalloc = sys_wcstombs (NULL, 0, (wchar_t *) tmpbuf,
-				 size / sizeof (wchar_t));
+				 size / sizeof (wchar_t)) + 1;
       else if (type == REG_MULTI_SZ)
 	bufalloc = multi_wcstombs (NULL, 0, (wchar_t *) tmpbuf,
 				   size / sizeof (wchar_t));

@@ -2107,7 +2107,7 @@ get_friendlyname (struct ifall *ifp, PIP_ADAPTER_ADDRESSES pap)
 				 &ifp->ifa_frndlyname;
   iff->ifrf_len = sys_wcstombs (iff->ifrf_friendlyname,
 				IFRF_FRIENDLYNAMESIZ,
-				pap->FriendlyName);
+				pap->FriendlyName) + 1;
 }
 
 static void

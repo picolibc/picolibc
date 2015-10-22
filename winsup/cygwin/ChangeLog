@@ -1,3 +1,11 @@
+2015-10-22  Corinna Vinschen  <corinna@vinschen.de>
+
+	* strfuncs.cc (sys_cp_wcstombs): Always return number of multibytes
+	without trailing NUL as the documentation implies.  Throughout Cygwin,
+	fix usage to align to this pattern.
+	* fhandler_process.cc (format_process_winexename): Drop trailing NUL
+	and LF from output.
+
 2015-10-21  Corinna Vinschen  <corinna@vinschen.de>
 
 	* thread.cc (pthread_getattr_np): Fix memory leak, remove usage of
