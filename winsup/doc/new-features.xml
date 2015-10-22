@@ -32,6 +32,10 @@ setfacl(1) now allows to use the -b and -k option combined to allow reducing
 an ACL to only reflect standard POSIX permissions.
 </para></listitem>
 
+<listitem><para>
+New API: aligned_alloc, at_quick_exit, quick_exit.
+</para></listitem>
+
 </itemizedlist>
 
 </sect2>

@@ -472,13 +472,14 @@ details. */
       288: Export getcontext, makecontext, setcontext, swapcontext.
       289: Export sigsetjmp, siglongjmp.
       290: Add sysconf cache handling.
+      291: Export aligned_alloc, at_quick_exit, quick_exit.
      */
 
      /* Note that we forgot to bump the api for ualarm, strtoll, strtoull,
 	sigaltstack, sethostname. */
 
 #define CYGWIN_VERSION_API_MAJOR 0
-#define CYGWIN_VERSION_API_MINOR 290
+#define CYGWIN_VERSION_API_MINOR 291
 
      /* There is also a compatibity version number associated with the
 	shared memory regions.  It is incremented when incompatible

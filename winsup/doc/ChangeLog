@@ -1,3 +1,10 @@
+2015-10-22  Corinna Vinschen  <corinna@vinschen.de>
+
+	* posix.xml (std-iso): New section.
+	(std-deprec): Rearrange title text.
+	* new-features.xml (ov-new2.3): Document aligned_alloc, at_quick_exit,
+	quick_exit.
+
 2015-10-06  Ken Brown  <kbrown@cornell.edu>
 
 	* faq-using.xml (faq.using.same-with-permissions): New entry.

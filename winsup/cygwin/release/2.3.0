@@ -14,6 +14,8 @@ What's new:
   _SC_LEVEL3_CACHE_SIZE, _SC_LEVEL3_CACHE_ASSOC, _SC_LEVEL3_CACHE_LINESIZE,
   _SC_LEVEL4_CACHE_SIZE, _SC_LEVEL4_CACHE_ASSOC, _SC_LEVEL4_CACHE_LINESIZE
 
+- New API: aligned_alloc, at_quick_exit, quick_exit.
+
 
 What changed:
 -------------
