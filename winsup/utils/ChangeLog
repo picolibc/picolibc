@@ -1,3 +1,7 @@
+2015-10-22  Yaakov Selkowitz  <yselkowi@redhat.com>
+
+	* getconf.c (conf_table): Add LEVEL*_CACHE_* variables.
+
 2015-08-30  Corinna Vinschen  <corinna@vinschen.de>
 
 	* cygcheck.cc (dump_sysinfo): Fix missing commas in products array.
