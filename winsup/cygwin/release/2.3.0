@@ -46,3 +46,6 @@ Bug Fixes
 - Fix memory leak in calls to pthread_getattr_np.
 
 - Fix output of /proc/<PID>/winexename.
+
+- Avoid SEGV when handling SIDs with 0 subauthorities.
+  Addresses: https://cygwin.com/ml/cygwin/2015-10/msg00141.html
