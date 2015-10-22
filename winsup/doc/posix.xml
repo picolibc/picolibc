@@ -1306,9 +1306,19 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     xdrstdio_create		(available in external "libtirpc" library)
 </screen>
 
+<sect1 id="std-iso"><title>System interfaces not in POSIX but compatible with ISO C requirements:</title>
+
+<screen>
+    aligned_alloc		(ISO C11)
+    at_quick_exit		(ISO C11)
+    quick_exit			(ISO C11)
+</screen>
+
 </sect1>
 
-<sect1 id="std-deprec"><title>Other UNIX system interfaces, deprecated or not in POSIX.1-2008:</title>
+</sect1>
+
+<sect1 id="std-deprec"><title>Other UNIX system interfaces, not in POSIX.1-2008 or deprecated:</title>
 
 <screen>
     bcmp			(POSIX.1-2001, SUSv3)

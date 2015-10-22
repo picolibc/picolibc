@@ -130,6 +130,7 @@ acosf NOSIGFE
 acosh NOSIGFE
 acoshf NOSIGFE
 alarm SIGFE
+aligned_alloc SIGFE
 alphasort NOSIGFE
 arc4random NOSIGFE
 arc4random_addrandom NOSIGFE
@@ -168,6 +169,7 @@ atoff SIGFE
 atoi NOSIGFE
 atol NOSIGFE
 atoll NOSIGFE
+at_quick_exit SIGFE
 basename NOSIGFE
 bcmp NOSIGFE
 bcopy NOSIGFE
@@ -957,6 +959,7 @@ putwc_unlocked SIGFE
 putwchar SIGFE
 putwchar_unlocked SIGFE
 pwrite SIGFE
+quick_exit SIGFE
 qsort NOSIGFE
 qsort_r NOSIGFE
 quotactl SIGFE

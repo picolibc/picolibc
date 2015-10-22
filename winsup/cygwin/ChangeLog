@@ -1,5 +1,11 @@
 2015-10-22  Corinna Vinschen  <corinna@vinschen.de>
 
+	* common.din (aligned_alloc): Export.
+	(at_quick_exit): Export.
+	(quick_exit): Export.
+
+2015-10-22  Corinna Vinschen  <corinna@vinschen.de>
+
 	* sec_helper.cc (cygsid::get_sid): Don't reject SIDs with missing
 	subauthorities.
 

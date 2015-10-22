@@ -27,6 +27,10 @@ sysconf() now supports returning CPU cache information:
   </screen>
 </para></listitem>
 
+<listitem><para>
+New API: aligned_alloc, at_quick_exit, quick_exit.
+</para></listitem>
+
 </itemizedlist>
 
 </sect2>
