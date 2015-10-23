@@ -100,8 +100,8 @@ case "${host_cpu}" in
 	machine_dir=aarch64
 	libm_machine_dir=aarch64
 	;;
-  arc)
-	machine_dir=
+  arc*)
+	machine_dir=arc
 	;;
   arm*)
 	machine_dir=arm
@@ -611,8 +611,9 @@ case "${host}" in
 	default_newlib_io_long_long="yes"
 	syscall_dir=syscalls
 	;;
-  arc-*-*)
+  arc*-*-*)
 	syscall_dir=syscalls
+	default_newlib_io_long_long="yes"
 	;;
   arm*-*-pe)
 	syscall_dir=syscalls
@@ -630,9 +631,6 @@ case "${host}" in
 #         newlib_cflags="${newlib_cflags} -DARM_RDP_MONITOR"
 	  newlib_cflags="${newlib_cflags} -DARM_RDI_MONITOR"
 	fi
-	;;
-  arc*)
-	newlib_cflags="${newlib_cflags} -DREENTRANT_SYSCALLS_PROVIDED"
 	;;
   avr*)
 	newlib_cflags="${newlib_cflags} -DNO_EXEC -DSMALL_MEMORY -DMISSING_SYSCALL_NAMES"

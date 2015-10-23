@@ -786,6 +786,7 @@ CPPFLAGS
 CPP'
 ac_subdirs_all='a29k
 aarch64
+arc
 arm
 bfin
 cr16
@@ -11833,6 +11834,8 @@ if test -n "${machine_dir}"; then
 subdirs="$subdirs a29k"
  ;;
 	aarch64) subdirs="$subdirs aarch64"
+ ;;
+	arc) subdirs="$subdirs arc"
  ;;
 	arm) subdirs="$subdirs arm"
  ;;

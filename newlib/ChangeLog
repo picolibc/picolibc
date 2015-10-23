@@ -1,5 +1,48 @@
 2015-11-12  Anton Kolesov  <Anton.Kolesov@synopsys.com>
 
+	* configure.host: Add ARC support.
+	* libc/include/machine/setjmp.h: Likewise.
+	* libc/machine/configure: Likewise.
+	* libc/machine/configure.in: Likewise.
+	* libc/machine/arc/Makefile.am: Likewise.
+	* libc/machine/arc/Makefile.in: Likewise.
+	* libc/machine/arc/aclocal.m4: Likewise.
+	* libc/machine/arc/asm.h: Likewise.
+	* libc/machine/arc/configure: Likewise.
+	* libc/machine/arc/configure.in: Likewise.
+	* libc/machine/arc/memcmp-bs-norm.S: Likewise.
+	* libc/machine/arc/memcmp-stub.c: Likewise.
+	* libc/machine/arc/memcmp.S: Likewise.
+	* libc/machine/arc/memcpy-archs.S: Likewise.
+	* libc/machine/arc/memcpy-bs.S: Likewise.
+	* libc/machine/arc/memcpy-stub.c: Likewise.
+	* libc/machine/arc/memcpy.S: Likewise.
+	* libc/machine/arc/memset-archs.S: Likewise.
+	* libc/machine/arc/memset-bs.S: Likewise.
+	* libc/machine/arc/memset-stub.c: Likewise.
+	* libc/machine/arc/memset.S: Likewise.
+	* libc/machine/arc/setjmp.S: Likewise.
+	* libc/machine/arc/strchr-bs-norm.S: Likewise.
+	* libc/machine/arc/strchr-bs.S: Likewise.
+	* libc/machine/arc/strchr-stub.c: Likewise.
+	* libc/machine/arc/strchr.S: Likewise.
+	* libc/machine/arc/strcmp-archs.S: Likewise.
+	* libc/machine/arc/strcmp-stub.c: Likewise.
+	* libc/machine/arc/strcmp.S: Likewise.
+	* libc/machine/arc/strcpy-bs-arc600.S: Likewise.
+	* libc/machine/arc/strcpy-bs.S: Likewise.
+	* libc/machine/arc/strcpy-stub.c: Likewise.
+	* libc/machine/arc/strcpy.S: Likewise.
+	* libc/machine/arc/strlen-bs-norm.S: Likewise.
+	* libc/machine/arc/strlen-bs.S: Likewise.
+	* libc/machine/arc/strlen-stub.c: Likewise.
+	* libc/machine/arc/strlen.S: Likewise.
+	* libc/machine/arc/strncpy-bs.S: Likewise.
+	* libc/machine/arc/strncpy-stub.c: Likewise.
+	* libc/machine/arc/strncpy.S: Likewise.
+
+2015-11-12  Anton Kolesov  <Anton.Kolesov@synopsys.com>
+
 	* configure.host: Remove ARC system.
 	* libc/sys/configure: Likewise.
 	* libc/sys/configure.in: Likewise.
