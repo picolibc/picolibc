@@ -187,6 +187,7 @@ _cygtls::remove (DWORD wait)
   /* FIXME: Need some sort of atthreadexit function to allow things like
      select to control this themselves. */
 
+  remove_pending_sigs ();
   if (signal_arrived)
     {
       HANDLE h = signal_arrived;

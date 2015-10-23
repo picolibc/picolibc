@@ -267,6 +267,7 @@ public:
   void handle_SIGCONT ();
 private:
   void __reg3 call2 (DWORD (*) (void *, void *), void *, void *);
+  void remove_pending_sigs ();
   /*gentls_offsets*/
 };
 #pragma pack(pop)

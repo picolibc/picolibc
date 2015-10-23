@@ -1,3 +1,12 @@
+2015-10-23  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygtls.cc (_cygtls::remove): Call remove_pending_sigs.
+	* cygtls.h (_cygtls::remove_pending_sigs): Declare.
+	* sigproc.cc (pending_signals::clear): Define new method taking a
+	_cygtls pointer argument.  Drop pending signals for that thread.
+	(_cygtls::remove_pending_sigs): Call pending_signals::clear for this
+	thread.
+
 2015-10-22  Corinna Vinschen  <corinna@vinschen.de>
 
 	* common.din (aligned_alloc): Export.
