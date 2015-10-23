@@ -1,3 +1,21 @@
+2015-11-12  Anton Kolesov  <Anton.Kolesov@synopsys.com>
+
+	* configure.host: Remove ARC system.
+	* libc/sys/configure: Likewise.
+	* libc/sys/configure.in: Likewise.
+	* libc/sys/arc/Makefile.am: Likewise.
+	* libc/sys/arc/Makefile.in: Likewise.
+	* libc/sys/arc/aclocal.m4: Likewise.
+	* libc/sys/arc/configure: Likewise.
+	* libc/sys/arc/configure.in: Likewise.
+	* libc/sys/arc/crt0.S: Likewise.
+	* libc/sys/arc/dummy.S: Likewise.
+	* libc/sys/arc/isatty.c: Likewise.
+	* libc/sys/arc/mem-layout.c: Likewise.
+	* libc/sys/arc/sbrk.c: Likewise.
+	* libc/sys/arc/sys/syscall.h: Likewise.
+	* libc/sys/arc/syscalls.c: Likewise.
+
 2015-11-12  Marcus Shawcroft  <marcus.shawcroft@arm.com>
 
 	* testsuite/lib/flags.exp (libgloss_link_flags): Drop multilibtop

@@ -398,9 +398,6 @@ case "${host}" in
 	sys_dir=a29khif
 	signal_dir=
 	;;
-  arc-*-*)
-	sys_dir=arc
-	;;
   arm*-*-*)
 	sys_dir=arm
 	if [ "x${newlib_may_supply_syscalls}" = "xno" ] ; then
