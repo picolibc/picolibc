@@ -1,0 +1,5 @@
+%rename link_gcc_c_sequence                nsim_link_gcc_c_sequence
+
+*link_gcc_c_sequence:
+%(nsim_link_gcc_c_sequence) --start-group %G -lc -lnsim --end-group
+

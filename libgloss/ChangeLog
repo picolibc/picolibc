@@ -1,3 +1,18 @@
+2015-11-12  Anton Kolesov  <Anton.Kolesov@synopsys.com>
+
+	* configure: Add ARC support.
+	* configure.in: Likewise.
+	* arc/Makefile.in: Likewise.
+	* arc/aclocal.m4: Likewise.
+	* arc/configure: Likewise.
+	* arc/configure.in: Likewise.
+	* arc/crt0.S: Likewise.
+	* arc/libcfunc.c: Likewise.
+	* arc/nsim-syscall.h: Likewise.
+	* arc/nsim-syscalls.c: Likewise.
+	* arc/nsim.specs: Likewise.
+	* arc/sbrk.c: Likewise.
+
 2015-10-20  Kaushik Phatak <kaushik.phatak@kpit.com>
 
         * rl78/crt0.S (_start): Fixed code that clears .bss

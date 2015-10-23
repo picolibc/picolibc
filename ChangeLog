@@ -1,3 +1,8 @@
+2015-11-12  Anton Kolesov  <Anton.Kolesov@synopsys.com>
+
+	* configure.in: Add ARC support to libgloss.
+	* configure: Regenerate.
+
 2015-09-22  Mike Frysinger  <vapier@gentoo.org>
 
 	* config.guess: Update from config repo.

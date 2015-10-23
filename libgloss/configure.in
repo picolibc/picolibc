@@ -38,6 +38,9 @@ case "${target}" in
 	AC_CONFIG_SUBDIRS(aarch64)
 	config_testsuite=true
 	;;
+  arc*-*-*)
+	AC_CONFIG_SUBDIRS(arc)
+	;;
   epiphany-*-*)
 	AC_CONFIG_SUBDIRS(epiphany)
 	config_testsuite=true
