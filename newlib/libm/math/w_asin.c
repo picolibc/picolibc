@@ -59,7 +59,8 @@ return NaN (not a number), set the global variable <<errno>> to
 
 You can change this error treatment using <<matherr>>.
 
-QUICKREF ANSI SVID POSIX RENTRANT
+QUICKREF
+ ansi svid posix rentrant
  asin	 y,y,y,m
  asinf   n,n,n,m
 

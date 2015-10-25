@@ -58,7 +58,8 @@ RETURNS
 	You can modify error handling for these functions using <<matherr>>.
 
 
-QUICKREF ANSI SVID POSIX RENTRANT
+QUICKREF
+ ansi svid posix rentrant
  acos	 y,y,y,m
  acosf   n,n,n,m
 

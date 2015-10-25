@@ -1,5 +1,13 @@
 2015-11-06  Jon Turney  <jon.turney@dronecode.org.uk>
 
+	* libm/mathfp/s_acos.c: Fix QUICKREF.
+	* libm/mathfp/e_acosh.c: Ditto.
+	* libm/math/w_asin.c: Ditto.
+	* libm/mathfp/e_acosh.c: Ditto.
+	* libm/mathfp/s_acos.c: Ditto.
+
+2015-11-06  Jon Turney  <jon.turney@dronecode.org.uk>
+
 	* doc/doc.str: Fix INTERNAL_DEFINITION, INTERNAL_FUNCTION and
 	INTERNAL.
 
