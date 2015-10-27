@@ -1,3 +1,8 @@
+2015-10-26  Brian Inglis  <Brian.Inglis@SystematicSw.ab.ca>
+
+	* libc/time/strftime.c (__strftime): add support for %s (seconds from
+	Unix epoch).  Fix whitespaces.
+
 2015-10-19  Nick Clifton  <nickc@redhat.com>
 
 	* libc/include/sys/_intsup.h: Add support for 16-bit and 20-bit
