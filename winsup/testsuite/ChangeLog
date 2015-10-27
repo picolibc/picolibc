@@ -1,3 +1,7 @@
+2015-10-27  Jon Turney  <jon.turney@dronecode.org.uk>
+
+	* winsup.api/signal-into-win32-api.c: Remove execute permissions.
+
 2014-08-15  Corinna Vinschen  <corinna@vinschen.de>
 
 	* configure.ac: Convert to new AC_INIT style.
