@@ -1,3 +1,7 @@
+2015-10-27  Corinna Vinschen  <corinna@vinschen.de>
+
+	* new-features.xml (ov-new2.3): Document strftime %s addition.
+
 2015-10-22  Corinna Vinschen  <corinna@vinschen.de>
 
 	* posix.xml (std-iso): New section.

@@ -9,6 +9,10 @@
 <itemizedlist mark="bullet">
 
 <listitem><para>
+strftime(3) supports %s (seconds since Epoch) now.
+</para></listitem>
+
+<listitem><para>
 posix_madvise(POSIX_MADV_WILLNEED) now utilizes OS functionality available
 starting with Windows 8/Server 2012.
 </para><para>
