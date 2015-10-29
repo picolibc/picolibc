@@ -50,3 +50,6 @@ Bug Fixes
 
 - Avoid SEGV when handling SIDs with 0 subauthorities.
   Addresses: https://cygwin.com/ml/cygwin/2015-10/msg00141.html
+
+- Fix a potential SEGV on (at least) Wine.
+  Addresses: https://cygwin.com/ml/cygwin/2015-10/msg00018.html

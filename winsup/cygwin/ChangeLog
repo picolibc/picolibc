@@ -1,3 +1,9 @@
+2015-10-29  Qian Hong  <qhong@codeweavers.com>
+
+	* init.cc (munge_threadfunc): Check that we're actually replacing
+	the correct original function address on the stack.
+	* ntdll.h (enum _THREADINFOCLASS): Add ThreadQuerySetWin32StartAddress.
+
 2015-08-21  Jon Turney  <jon.turney@dronecode.org.uk>
 
 	* cygwin-cxx.h: Remove execute permissions.

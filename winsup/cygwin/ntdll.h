@@ -1162,7 +1162,8 @@ typedef enum _THREADINFOCLASS
 {
   ThreadBasicInformation = 0,
   ThreadTimes = 1,
-  ThreadImpersonationToken = 5
+  ThreadImpersonationToken = 5,
+  ThreadQuerySetWin32StartAddress = 9
 } THREADINFOCLASS, *PTHREADINFOCLASS;
 
 /* Checked on 64 bit. */
