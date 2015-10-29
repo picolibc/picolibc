@@ -55,12 +55,17 @@ munge_threadfunc ()
 
   if (threadfunc_ix[0])
     {
-      char *threadfunc = ebp[threadfunc_ix[0]];
+      char *threadfunc = NULL;
+
+      NtQueryInformationThread (NtCurrentThread (),
+				ThreadQuerySetWin32StartAddress,
+				&threadfunc, sizeof threadfunc, NULL);
       if (!search_for || threadfunc == search_for)
 	{
 	  search_for = NULL;
 	  for (i = 0; threadfunc_ix[i]; i++)
-	    ebp[threadfunc_ix[i]] = (char *) threadfunc_fe;
+	    if (!threadfunc || ebp[threadfunc_ix[i]] == threadfunc)
+	       ebp[threadfunc_ix[i]] = (char *) threadfunc_fe;
 	  TlsSetValue (_my_oldfunc, threadfunc);
 	}
     }
