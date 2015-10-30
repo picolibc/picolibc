@@ -57,3 +57,6 @@ Bug Fixes
 - Fix sigwait(3) to return errno instead of -1 and never to return with EINTR.
 
 - Fix pthread_kill(3) to return errno instead of -1.
+
+- Workaround a bug in Windows 10 NLS handling.
+  Addresses: https://cygwin.com/ml/cygwin/2015-10/msg00547.html
