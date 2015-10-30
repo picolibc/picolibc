@@ -29,39 +29,19 @@ MEMCHR_SRC=
 MEMCHR_OBJ=
 endif
 
-if OPT_SIZE
-MEMCPY_SRC=
-MEMCPY_OBJ=
-else
-if HAVE_ARMV8A
-MEMCPY_SRC=memcpy.S
-MEMCPY_OBJ=$(lpfx)memcpy.o
-else
-if HAVE_ARMV7A
-MEMCPY_SRC=memcpy.S
-MEMCPY_OBJ=$(lpfx)memcpy.o
-else
-if HAVE_ARMV7M
-MEMCPY_SRC=memcpy.S
-MEMCPY_OBJ=$(lpfx)memcpy.o
-else
-MEMCPY_SRC=
-MEMCPY_OBJ=
-endif !HAVE_ARMV7M
-endif !HAVE_ARMV7A
-endif !HAVE_ARMV8A
-endif !OPT_SIZE
-
 lib_a_SOURCES = setjmp.S access.c strcmp.S strcpy.c \
-	        $(MEMCPY_SRC) $(MEMCHR_SRC) $(STRLEN_SRC) \
+		$(MEMCHR_SRC) $(STRLEN_SRC) \
 		strlen-armv7.S aeabi_memcpy.c aeabi_memcpy-armv7a.S \
 		aeabi_memmove.c aeabi_memmove-soft.S \
 		aeabi_memset.c aeabi_memset-soft.S aeabi_memclr.c
+lib_a_SOURCES += memcpy-stub.c
+lib_a_SOURCES += memcpy.S
 
 lib_a_CCASFLAGS=$(AM_CCASFLAGS)
 lib_a_CFLAGS = $(AM_CFLAGS)
-lib_a_LIBADD = $(STRLEN_OBJ) $(MEMCHR_OBJ) $(MEMCPY_OBJ)
-lib_a_DEPENDENCIES = $(STRLEN_OBJ) $(MEMCHR_OBJ) $(MEMCPY_OBJ)
+lib_a_LIBADD = $(STRLEN_OBJ) $(MEMCHR_OBJ)
+
+lib_a_DEPENDENCIES = $(STRLEN_OBJ) $(MEMCHR_OBJ)
 
 ACLOCAL_AMFLAGS = -I ../../.. -I ../../../..
 CONFIG_STATUS_DEPENDENCIES = $(newlib_basedir)/configure.host

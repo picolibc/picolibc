@@ -1,3 +1,14 @@
+2015-11-06  Marcus Shawcroft  <marcus.shawcroft@arm.com>
+
+	* libc/machine/arm/Makefile.am: Drop MEMCPY_SRC and MEMCPY_OBJ.
+	* libc/machine/arm/Makefile.in: Regenerate.
+	* libc/machine/arm/configure.in: Remove HAVE_ARMV8A, HAVE_ARMV7A and
+	HAVE_ARM7M.
+	* libc/machine/arm/configure: Regenerate.
+	* libc/machine/arm/memcpy-stub.c: New.
+	* libc/machine/arm/memcpy.c: Adjust copyright year.  Adjust comments.
+	Include acle-compat.h.
+
 2015-11-06  Olivier Martin  <olivier@labapart.com>
 
 	* libc/include/stdlib.h (mktemp): Change attribute to deprecated.

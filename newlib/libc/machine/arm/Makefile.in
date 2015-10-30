@@ -71,27 +71,20 @@ lib_a_AR = $(AR) $(ARFLAGS)
 @HAVE_THUMB1_FALSE@am__DEPENDENCIES_1 = $(lpfx)strlen.o
 @HAVE_THUMB1_TRUE@@OPT_SIZE_TRUE@am__DEPENDENCIES_1 = $(lpfx)strlen.o
 @HAVE_ARMV7_TRUE@am__DEPENDENCIES_2 = $(lpfx)memchr.o
-@HAVE_ARMV7A_FALSE@@HAVE_ARMV7M_TRUE@@HAVE_ARMV8A_FALSE@@OPT_SIZE_FALSE@am__DEPENDENCIES_3 = $(lpfx)memcpy.o
-@HAVE_ARMV7A_TRUE@@HAVE_ARMV8A_FALSE@@OPT_SIZE_FALSE@am__DEPENDENCIES_3 = $(lpfx)memcpy.o
-@HAVE_ARMV8A_TRUE@@OPT_SIZE_FALSE@am__DEPENDENCIES_3 =  \
-@HAVE_ARMV8A_TRUE@@OPT_SIZE_FALSE@	$(lpfx)memcpy.o
-@HAVE_ARMV7A_FALSE@@HAVE_ARMV7M_TRUE@@HAVE_ARMV8A_FALSE@@OPT_SIZE_FALSE@am__objects_1 = lib_a-memcpy.$(OBJEXT)
-@HAVE_ARMV7A_TRUE@@HAVE_ARMV8A_FALSE@@OPT_SIZE_FALSE@am__objects_1 = lib_a-memcpy.$(OBJEXT)
-@HAVE_ARMV8A_TRUE@@OPT_SIZE_FALSE@am__objects_1 =  \
-@HAVE_ARMV8A_TRUE@@OPT_SIZE_FALSE@	lib_a-memcpy.$(OBJEXT)
-@HAVE_ARMV7_TRUE@am__objects_2 = lib_a-memchr.$(OBJEXT)
-@HAVE_THUMB1_FALSE@am__objects_3 = lib_a-strlen.$(OBJEXT)
-@HAVE_THUMB1_TRUE@@OPT_SIZE_TRUE@am__objects_3 =  \
+@HAVE_ARMV7_TRUE@am__objects_1 = lib_a-memchr.$(OBJEXT)
+@HAVE_THUMB1_FALSE@am__objects_2 = lib_a-strlen.$(OBJEXT)
+@HAVE_THUMB1_TRUE@@OPT_SIZE_TRUE@am__objects_2 =  \
 @HAVE_THUMB1_TRUE@@OPT_SIZE_TRUE@	lib_a-strlen.$(OBJEXT)
 am_lib_a_OBJECTS = lib_a-setjmp.$(OBJEXT) lib_a-access.$(OBJEXT) \
 	lib_a-strcmp.$(OBJEXT) lib_a-strcpy.$(OBJEXT) $(am__objects_1) \
-	$(am__objects_2) $(am__objects_3) lib_a-strlen-armv7.$(OBJEXT) \
+	$(am__objects_2) lib_a-strlen-armv7.$(OBJEXT) \
 	lib_a-aeabi_memcpy.$(OBJEXT) \
 	lib_a-aeabi_memcpy-armv7a.$(OBJEXT) \
 	lib_a-aeabi_memmove.$(OBJEXT) \
 	lib_a-aeabi_memmove-soft.$(OBJEXT) \
 	lib_a-aeabi_memset.$(OBJEXT) lib_a-aeabi_memset-soft.$(OBJEXT) \
-	lib_a-aeabi_memclr.$(OBJEXT)
+	lib_a-aeabi_memclr.$(OBJEXT) lib_a-memcpy-stub.$(OBJEXT) \
+	lib_a-memcpy.$(OBJEXT)
 lib_a_OBJECTS = $(am_lib_a_OBJECTS)
 DEFAULT_INCLUDES = -I.@am__isrc@
 depcomp =
@@ -228,26 +221,15 @@ noinst_LIBRARIES = lib.a
 @HAVE_ARMV7_TRUE@MEMCHR_SRC = memchr.S
 @HAVE_ARMV7_FALSE@MEMCHR_OBJ = 
 @HAVE_ARMV7_TRUE@MEMCHR_OBJ = $(lpfx)memchr.o
-@HAVE_ARMV7A_FALSE@@HAVE_ARMV7M_FALSE@@HAVE_ARMV8A_FALSE@@OPT_SIZE_FALSE@MEMCPY_SRC = 
-@HAVE_ARMV7A_FALSE@@HAVE_ARMV7M_TRUE@@HAVE_ARMV8A_FALSE@@OPT_SIZE_FALSE@MEMCPY_SRC = memcpy.S
-@HAVE_ARMV7A_TRUE@@HAVE_ARMV8A_FALSE@@OPT_SIZE_FALSE@MEMCPY_SRC = memcpy.S
-@HAVE_ARMV8A_TRUE@@OPT_SIZE_FALSE@MEMCPY_SRC = memcpy.S
-@OPT_SIZE_TRUE@MEMCPY_SRC = 
-@HAVE_ARMV7A_FALSE@@HAVE_ARMV7M_FALSE@@HAVE_ARMV8A_FALSE@@OPT_SIZE_FALSE@MEMCPY_OBJ = 
-@HAVE_ARMV7A_FALSE@@HAVE_ARMV7M_TRUE@@HAVE_ARMV8A_FALSE@@OPT_SIZE_FALSE@MEMCPY_OBJ = $(lpfx)memcpy.o
-@HAVE_ARMV7A_TRUE@@HAVE_ARMV8A_FALSE@@OPT_SIZE_FALSE@MEMCPY_OBJ = $(lpfx)memcpy.o
-@HAVE_ARMV8A_TRUE@@OPT_SIZE_FALSE@MEMCPY_OBJ = $(lpfx)memcpy.o
-@OPT_SIZE_TRUE@MEMCPY_OBJ = 
-lib_a_SOURCES = setjmp.S access.c strcmp.S strcpy.c \
-	        $(MEMCPY_SRC) $(MEMCHR_SRC) $(STRLEN_SRC) \
-		strlen-armv7.S aeabi_memcpy.c aeabi_memcpy-armv7a.S \
-		aeabi_memmove.c aeabi_memmove-soft.S \
-		aeabi_memset.c aeabi_memset-soft.S aeabi_memclr.c
-
+lib_a_SOURCES = setjmp.S access.c strcmp.S strcpy.c $(MEMCHR_SRC) \
+	$(STRLEN_SRC) strlen-armv7.S aeabi_memcpy.c \
+	aeabi_memcpy-armv7a.S aeabi_memmove.c aeabi_memmove-soft.S \
+	aeabi_memset.c aeabi_memset-soft.S aeabi_memclr.c \
+	memcpy-stub.c memcpy.S
 lib_a_CCASFLAGS = $(AM_CCASFLAGS)
 lib_a_CFLAGS = $(AM_CFLAGS)
-lib_a_LIBADD = $(STRLEN_OBJ) $(MEMCHR_OBJ) $(MEMCPY_OBJ)
-lib_a_DEPENDENCIES = $(STRLEN_OBJ) $(MEMCHR_OBJ) $(MEMCPY_OBJ)
+lib_a_LIBADD = $(STRLEN_OBJ) $(MEMCHR_OBJ)
+lib_a_DEPENDENCIES = $(STRLEN_OBJ) $(MEMCHR_OBJ)
 ACLOCAL_AMFLAGS = -I ../../.. -I ../../../..
 CONFIG_STATUS_DEPENDENCIES = $(newlib_basedir)/configure.host
 MEMCPY_DEP = memcpy-armv7a.S memcpy-armv7m.S
@@ -330,12 +312,6 @@ lib_a-strcmp.o: strcmp.S
 lib_a-strcmp.obj: strcmp.S
 	$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-strcmp.obj `if test -f 'strcmp.S'; then $(CYGPATH_W) 'strcmp.S'; else $(CYGPATH_W) '$(srcdir)/strcmp.S'; fi`
 
-lib_a-memcpy.o: memcpy.S
-	$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-memcpy.o `test -f 'memcpy.S' || echo '$(srcdir)/'`memcpy.S
-
-lib_a-memcpy.obj: memcpy.S
-	$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-memcpy.obj `if test -f 'memcpy.S'; then $(CYGPATH_W) 'memcpy.S'; else $(CYGPATH_W) '$(srcdir)/memcpy.S'; fi`
-
 lib_a-memchr.o: memchr.S
 	$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-memchr.o `test -f 'memchr.S' || echo '$(srcdir)/'`memchr.S
 
@@ -365,6 +341,12 @@ lib_a-aeabi_memset-soft.o: aeabi_memset-soft.S
 
 lib_a-aeabi_memset-soft.obj: aeabi_memset-soft.S
 	$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-aeabi_memset-soft.obj `if test -f 'aeabi_memset-soft.S'; then $(CYGPATH_W) 'aeabi_memset-soft.S'; else $(CYGPATH_W) '$(srcdir)/aeabi_memset-soft.S'; fi`
+
+lib_a-memcpy.o: memcpy.S
+	$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-memcpy.o `test -f 'memcpy.S' || echo '$(srcdir)/'`memcpy.S
+
+lib_a-memcpy.obj: memcpy.S
+	$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-memcpy.obj `if test -f 'memcpy.S'; then $(CYGPATH_W) 'memcpy.S'; else $(CYGPATH_W) '$(srcdir)/memcpy.S'; fi`
 
 .c.o:
 	$(COMPILE) -c $<
@@ -413,6 +395,12 @@ lib_a-aeabi_memclr.o: aeabi_memclr.c
 
 lib_a-aeabi_memclr.obj: aeabi_memclr.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-aeabi_memclr.obj `if test -f 'aeabi_memclr.c'; then $(CYGPATH_W) 'aeabi_memclr.c'; else $(CYGPATH_W) '$(srcdir)/aeabi_memclr.c'; fi`
+
+lib_a-memcpy-stub.o: memcpy-stub.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-memcpy-stub.o `test -f 'memcpy-stub.c' || echo '$(srcdir)/'`memcpy-stub.c
+
+lib_a-memcpy-stub.obj: memcpy-stub.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-memcpy-stub.obj `if test -f 'memcpy-stub.c'; then $(CYGPATH_W) 'memcpy-stub.c'; else $(CYGPATH_W) '$(srcdir)/memcpy-stub.c'; fi`
 
 ID: $(HEADERS) $(SOURCES) $(LISP) $(TAGS_FILES)
 	list='$(SOURCES) $(HEADERS) $(LISP) $(TAGS_FILES)'; \
