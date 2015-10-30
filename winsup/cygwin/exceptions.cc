@@ -1475,10 +1475,7 @@ sigpacket::process ()
 	  else if (!sigismember (&tls->sigmask, si.si_signo))
 	    issig_wait = false;
 	  else
-	    {
-	      cygheap->unlock_tls (tl_entry);
-	      tls = NULL;
-	    }
+	    tls = NULL;
 	}
     }
       
