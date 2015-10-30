@@ -53,3 +53,7 @@ Bug Fixes
 
 - Fix a potential SEGV on (at least) Wine.
   Addresses: https://cygwin.com/ml/cygwin/2015-10/msg00018.html
+
+- Fix sigwait(3) to return errno instead of -1 and never to return with EINTR.
+
+- Fix pthread_kill(3) to return errno instead of -1.

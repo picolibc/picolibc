@@ -1,3 +1,9 @@
+2015-10-30  Corinna Vinschen  <corinna@vinschen.de>
+
+	* signal.cc (sigwait): Fix return value to reflect errno in case of
+	error according to POSIX.  Never return EINTR.
+	* thread.cc (pthread_kill): Return errno if sig_send failed.
+
 2015-10-29  Qian Hong  <qhong@codeweavers.com>
 
 	* init.cc (munge_threadfunc): Check that we're actually replacing

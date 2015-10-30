@@ -3056,7 +3056,11 @@ pthread_kill (pthread_t thread, int sig)
   if (!thread->valid)
     rval = ESRCH;
   else if (sig)
-    rval = sig_send (NULL, si, thread->cygtls);
+    {
+      rval = sig_send (NULL, si, thread->cygtls);
+      if (rval == -1)
+	rval = get_errno ();
+    }
   else
     switch (WaitForSingleObject (thread->win32_obj_id, 0))
       {
