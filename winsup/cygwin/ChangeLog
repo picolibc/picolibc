@@ -1,5 +1,10 @@
 2015-10-30  Corinna Vinschen  <corinna@vinschen.de>
 
+	* exceptions.cc (sigpacket::process): Avoid potentially double unlocking
+	the TLS mutex.
+
+2015-10-30  Corinna Vinschen  <corinna@vinschen.d>
+
 	* signal.cc (sigwait): Fix return value to reflect errno in case of
 	error according to POSIX.  Never return EINTR.
 	* thread.cc (pthread_kill): Return errno if sig_send failed.
