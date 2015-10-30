@@ -557,10 +557,16 @@ siginterrupt (int sig, int flag)
 extern "C" int
 sigwait (const sigset_t *set, int *sig_ptr)
 {
-  int sig = sigwaitinfo (set, NULL);
+  int sig;
+
+  do
+    {
+      sig = sigwaitinfo (set, NULL);
+    }
+  while (sig == -1 && get_errno () == EINTR);
   if (sig > 0)
     *sig_ptr = sig;
-  return sig > 0 ? 0 : -1;
+  return sig > 0 ? 0 : get_errno ();
 }
 
 extern "C" int
