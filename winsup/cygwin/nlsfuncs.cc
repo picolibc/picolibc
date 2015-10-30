@@ -1,6 +1,6 @@
 /* nlsfuncs.cc: NLS helper functions
 
-   Copyright 2010, 2011, 2012, 2013 Red Hat, Inc.
+   Copyright 2010, 2011, 2012, 2013, 2015 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -88,7 +88,9 @@ __get_lcid_from_locale (const char *name)
       *c = '-';
       mbstowcs (wlocale, locale, ENCODING_LEN + 1);
       lcid = LocaleNameToLCID (wlocale, 0);
-      if (lcid == 0)
+      /* Bug on Windows 10: LocaleNameToLCID returns LOCALE_CUSTOM_UNSPECIFIED
+         for unknown locales. */
+      if (lcid == 0 || lcid == LOCALE_CUSTOM_UNSPECIFIED)
 	{
 	  /* Unfortunately there are a couple of locales for which no form
 	     without a Script part per RFC 4646 exists.
@@ -127,24 +129,29 @@ __get_lcid_from_locale (const char *name)
 		  {
 		    /* Vista/2K8 is missing sr-ME and sr-RS.  It has only the
 		       deprecated sr-CS.  So we map ME and RS to CS here. */
-		    if (lcid == 0)
+		    if (lcid == 0 || lcid == LOCALE_CUSTOM_UNSPECIFIED)
 		      lcid = LocaleNameToLCID (L"sr-Cyrl-CS", 0);
 		    /* "@latin" modifier for the sr_XY locales changes
 			collation behaviour so lcid should accommodate that
 			by being set to the Latin sublang. */
-		    if (lcid != 0 && has_modifier ("@latin"))
+		    if (lcid != 0 && lcid != LOCALE_CUSTOM_UNSPECIFIED
+			&& has_modifier ("@latin"))
 		      lcid = MAKELANGID (lcid & 0x3ff, (lcid >> 10) - 1);
 		  }
 		else if (!strncmp (locale, "uz-", 3))
 		  {
 		    /* Equivalent for "@cyrillic" modifier in uz_UZ locale */
-		    if (lcid != 0 && has_modifier ("@cyrillic"))
+		    if (lcid != 0 && lcid != LOCALE_CUSTOM_UNSPECIFIED
+			&& has_modifier ("@cyrillic"))
 		      lcid = MAKELANGID (lcid & 0x3ff, (lcid >> 10) + 1);
 		  }
 		break;
 	      }
 	}
-      last_lcid = lcid ?: (LCID) -1;
+      if (lcid && lcid != LOCALE_CUSTOM_UNSPECIFIED)
+	last_lcid = lcid;
+      else
+	last_lcid = (LCID) -1;
       debug_printf ("LCID=%04y", last_lcid);
       return last_lcid;
     }
