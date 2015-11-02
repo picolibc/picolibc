@@ -1,5 +1,11 @@
 2015-11-02  Corinna Vinschen  <corinna@vinschen.de>
 
+	* sigproc.cc (class pending_signals): Drop sigproc_init friendship.
+	(pending_signals::clear): Fix implementation to avoid subsequent
+	endless loop in wait_sig.  Improve comment.
+
+2015-11-02  Corinna Vinschen  <corinna@vinschen.de>
+
 	* mount.h (enum fs_info_type): Add prlfs (Parallels Desktop FS).
 	(class fs_info): Add has_broken_fnoi flag.  Implement prlfs FS flag.
 	* mount.cc (fs_info::update): Handle PrlFS.  Fill new has_broken_fnoi

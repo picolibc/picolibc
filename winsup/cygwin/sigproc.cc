@@ -82,7 +82,6 @@ public:
   void clear (_cygtls *tls);
   friend void __reg1 sig_dispatch_pending (bool);
   friend void WINAPI wait_sig (VOID *arg);
-  friend void sigproc_init ();
 };
 
 Static pending_signals sigq;
@@ -398,14 +397,21 @@ sig_clear (int sig)
   sigq.clear (sig);
 }
 
-/* Clear pending signals of specific thread.  Called from
+/* Clear pending signals of specific thread.  Called under TLS lock from
    _cygtls::remove_pending_sigs. */
 void
 pending_signals::clear (_cygtls *tls)
 {
-  for (int sig = 0; sig < NSIG + 1; ++sig)
-    if (sigs[sig].sigtls == tls)
-      clear (sig);
+  sigpacket *q = &start, *qnext;
+
+  while ((qnext = q->next))
+    {
+      if (qnext->sigtls == tls)
+	{
+	  q->next = qnext->next;
+	  qnext->si.si_signo = 0;
+	}
+    }
 }
 
 /* Clear pending signals of specific thread.  Called from _cygtls::remove */
