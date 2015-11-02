@@ -1,3 +1,16 @@
+2015-11-02  Corinna Vinschen  <corinna@vinschen.de>
+
+	* mount.h (enum fs_info_type): Add prlfs (Parallels Desktop FS).
+	(class fs_info): Add has_broken_fnoi flag.  Implement prlfs FS flag.
+	* mount.cc (fs_info::update): Handle PrlFS.  Fill new has_broken_fnoi
+	flag with life.
+	(fs_names): Add prlfs.
+	* globals.cc (ro_u_prlfs): Define.
+	* path.h (path_conv::has_broken_fnoi): New method.
+	* path.cc (symlink_info::check): Call file_get_fnoi utilizing new
+	has_broken_fnoi filesystem flag.
+	* fhandler_disk_file.cc (fhandler_base::fstat_by_handle): Ditto.
+
 2015-10-30  Corinna Vinschen  <corinna@vinschen.de>
 
 	* nlsfuncs.cc (__get_lcid_from_locale): Handle LocaleNameToLCID

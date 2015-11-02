@@ -416,7 +416,7 @@ fhandler_base::fstat_by_handle (struct stat *buf)
      on the information stored in pc.fnoi.  So we overwrite them here. */
   if (get_io_handle ())
     {
-      status = file_get_fnoi (h, pc.fs_is_netapp (), pc.fnoi ());
+      status = file_get_fnoi (h, pc.has_broken_fnoi (), pc.fnoi ());
       if (!NT_SUCCESS (status))
        {
 	 debug_printf ("%y = NtQueryInformationFile(%S, "

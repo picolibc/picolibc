@@ -2828,7 +2828,8 @@ restart:
 	    }
 	  else
 	    {
-	      status = file_get_fnoi (h, fs.is_netapp (), conv_hdl.fnoi ());
+	      status = file_get_fnoi (h, fs.has_broken_fnoi (),
+				      conv_hdl.fnoi ());
 	      if (NT_SUCCESS (status))
 		fileattr = conv_hdl.fnoi ()->FileAttributes;
 	    }

@@ -1,7 +1,7 @@
 /* mount.h: mount definitions.
 
    Copyright 1996, 1997, 1998, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007,
-   2008, 2009, 2010, 2011, 2012, 2013, 2014 Red Hat, Inc.
+   2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -45,6 +45,7 @@ enum fs_info_type
   nwfs,
   ncfsd,
   afs,
+  prlfs,
   /* Always last. */
   max_fs_type
 };
@@ -75,6 +76,7 @@ class fs_info
     unsigned has_buggy_fileid_dirinfo	: 1;
     unsigned has_buggy_basic_info	: 1;
     unsigned has_dos_filenames_only	: 1;
+    unsigned has_broken_fnoi		: 1;
   } status;
   ULONG sernum;			/* Volume Serial Number */
   char fsn[80];			/* Windows filesystem name */
@@ -100,6 +102,7 @@ class fs_info
   IMPLEMENT_STATUS_FLAG (bool, has_buggy_fileid_dirinfo)
   IMPLEMENT_STATUS_FLAG (bool, has_buggy_basic_info)
   IMPLEMENT_STATUS_FLAG (bool, has_dos_filenames_only)
+  IMPLEMENT_STATUS_FLAG (bool, has_broken_fnoi)
   IMPLEMENT_FS_FLAG (fat)
   IMPLEMENT_FS_FLAG (ntfs)
   IMPLEMENT_FS_FLAG (refs)
@@ -116,6 +119,7 @@ class fs_info
   IMPLEMENT_FS_FLAG (nwfs)
   IMPLEMENT_FS_FLAG (ncfsd)
   IMPLEMENT_FS_FLAG (afs)
+  IMPLEMENT_FS_FLAG (prlfs)
   fs_info_type what_fs () const { return status.fs_type; }
   bool got_fs () const { return status.fs_type != none; }
 

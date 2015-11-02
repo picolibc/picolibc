@@ -1,7 +1,7 @@
 /* mount.cc: mount handling.
 
    Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006,
-   2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014 Red Hat, Inc.
+   2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -370,7 +370,8 @@ fs_info::update (PUNICODE_STRING upath, HANDLE in_vol)
 	  && !is_unixfs (RtlEqualUnicodeString (&fsname, &ro_u_unixfs, FALSE))
 	  /* AFSRDRFsd == Andrew File System.  Doesn't support DOS attributes.
 	     Only native symlinks are supported. */
-	  && !is_afs (RtlEqualUnicodeString (&fsname, &ro_u_afs, FALSE)))
+	  && !is_afs (RtlEqualUnicodeString (&fsname, &ro_u_afs, FALSE))
+	  && !is_prlfs (RtlEqualUnicodeString (&fsname, &ro_u_prlfs, FALSE)))
 	{
 	  /* Known remote file system with buggy open calls.  Further
 	     explanation in fhandler.cc (fhandler_disk_file::open_fs). */
@@ -402,6 +403,10 @@ fs_info::update (PUNICODE_STRING upath, HANDLE in_vol)
 	     only support this if the filename is non-null and the handle is
 	     the handle to a directory. NcFsd IR10 is supposed to be ok. */
 	  has_buggy_reopen (is_netapp () || is_nwfs ());
+	  /* Netapp and Parallels Desktop FS have problems with the
+	     FileNetworkOpenInformation info class.  Netapp doesn't
+	     implement it at all, Parallels always returns a size of 0. */
+	  has_broken_fnoi (is_netapp () || is_prlfs ());
 	}
     }
   if (!got_fs ()
@@ -1527,6 +1532,7 @@ fs_names_t fs_names[] = {
     { "nwfs", false },
     { "ncfsd", false },
     { "afs", false },
+    { "prlfs", false },
     { NULL, false }
 };
 

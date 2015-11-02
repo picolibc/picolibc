@@ -35,6 +35,10 @@ sysconf() now supports returning CPU cache information:
 New API: aligned_alloc, at_quick_exit, quick_exit.
 </para></listitem>
 
+<listitem><para>
+Add support for Parallels Desktop FS (prlfs).
+</para></listitem>
+
 </itemizedlist>
 
 </sect2>
