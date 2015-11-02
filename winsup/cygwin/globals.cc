@@ -138,6 +138,7 @@ extern "C" {
   extern UNICODE_STRING _RDATA ro_u_mvfs = _ROU (L"MVFS");
   extern UNICODE_STRING _RDATA ro_u_nfs = _ROU (L"NFS");
   extern UNICODE_STRING _RDATA ro_u_ntfs = _ROU (L"NTFS");
+  extern UNICODE_STRING _RDATA ro_u_prlfs = _ROU (L"PrlSF"); /* No typo! */
   extern UNICODE_STRING _RDATA ro_u_refs = _ROU (L"ReFS");
   extern UNICODE_STRING _RDATA ro_u_sunwnfs = _ROU (L"SUNWNFS");
   extern UNICODE_STRING _RDATA ro_u_udf = _ROU (L"UDF");
