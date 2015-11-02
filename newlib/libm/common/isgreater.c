@@ -3,7 +3,7 @@
  * defined in math.h (q.v.).  */
 /*
 FUNCTION
-<<isgreater>>, <<isgreaterequal>>, <<isless>>, <<islessequal>>, <<islessgreater>>, and <<isunordered>>--comparison macros
+<<isgreater>>, <<isgreaterequal>>, <<isless>>, <<islessequal>>, <<islessgreater>>, and <<isunordered>>---comparison macros
 INDEX
 	isgreater
 INDEX

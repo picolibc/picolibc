@@ -8,7 +8,7 @@
 
 /*
 FUNCTION
-<<wcsftime>>--convert date and time to a formatted wide-character string
+<<wcsftime>>---convert date and time to a formatted wide-character string
 
 INDEX
 	wcsftime

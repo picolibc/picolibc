@@ -5,7 +5,7 @@
  */
 /*
 FUNCTION
-<<fdim>>, <<fdimf>>--positive difference
+<<fdim>>, <<fdimf>>---positive difference
 INDEX
 	fdim
 INDEX

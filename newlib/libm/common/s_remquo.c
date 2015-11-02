@@ -13,7 +13,7 @@
  */
 /*
 FUNCTION
-<<remquo>>, <<remquof>>--remainder and part of quotient
+<<remquo>>, <<remquof>>---remainder and part of quotient
 INDEX
 	remquo
 INDEX

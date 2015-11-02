@@ -5,7 +5,7 @@
 
 /*
 FUNCTION
-	<<infinity>>, <<infinityf>>--representation of infinity
+	<<infinity>>, <<infinityf>>---representation of infinity
 
 INDEX
 	infinity

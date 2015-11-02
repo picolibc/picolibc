@@ -13,7 +13,7 @@
 
 /*
 FUNCTION
-<<scalbn>>, <<scalbnf>>, <<scalbln>>, <<scalblnf>>--scale by power of FLT_RADIX (=2)
+<<scalbn>>, <<scalbnf>>, <<scalbln>>, <<scalblnf>>---scale by power of FLT_RADIX (=2)
 INDEX
 	scalbn
 INDEX

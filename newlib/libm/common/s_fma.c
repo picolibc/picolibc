@@ -1,6 +1,6 @@
 /*
 FUNCTION
-<<fma>>, <<fmaf>>--floating multiply add
+<<fma>>, <<fmaf>>---floating multiply add
 INDEX
 	fma
 INDEX

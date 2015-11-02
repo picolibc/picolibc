@@ -5,7 +5,7 @@
  */
 /*
 FUNCTION
-<<fmin>>, <<fminf>>--minimum
+<<fmin>>, <<fminf>>---minimum
 INDEX
 	fmin
 INDEX

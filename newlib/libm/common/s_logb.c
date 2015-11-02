@@ -12,7 +12,7 @@
  */
 /*
 FUNCTION
-       <<logb>>, <<logbf>>--get exponent of floating-point number
+       <<logb>>, <<logbf>>---get exponent of floating-point number
 INDEX
 	logb
 INDEX

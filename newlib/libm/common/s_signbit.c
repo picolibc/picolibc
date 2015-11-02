@@ -5,7 +5,7 @@
  */
 /*
 FUNCTION
-<<signbit>>--Does floating-point number have negative sign?
+<<signbit>>---Does floating-point number have negative sign?
 
 INDEX
 	signbit

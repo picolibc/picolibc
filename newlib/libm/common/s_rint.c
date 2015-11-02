@@ -12,7 +12,7 @@
  */
 /*
 FUNCTION
-<<rint>>, <<rintf>>--round to integer
+<<rint>>, <<rintf>>---round to integer
 INDEX
 	rint
 INDEX

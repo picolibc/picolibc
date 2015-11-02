@@ -5,7 +5,7 @@
  */
 /*
 FUNCTION
-<<fmax>>, <<fmaxf>>--maximum
+<<fmax>>, <<fmaxf>>---maximum
 INDEX
 	fmax
 INDEX

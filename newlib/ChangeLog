@@ -1,3 +1,41 @@
+2015-11-02  Jon Turney  <jon.turney@dronecode.org.uk>
+
+        * libc/time/wcsftime.c: Consistently use an em-dash in FUNCTION
+summary.
+        * libm/common/isgreater.c: Ditto.
+        * libm/common/s_fdim.c: Ditto.
+        * libm/common/s_fma.c: Ditto.
+        * libm/common/s_fmax.c: Ditto.
+        * libm/common/s_fmin.c: Ditto.
+        * libm/common/s_infinity.c: Ditto.
+        * libm/common/s_isnan.c: Ditto.
+        * libm/common/s_log2.c: Ditto.
+        * libm/common/s_logb.c: Ditto.
+        * libm/common/s_lrint.c: Ditto.
+        * libm/common/s_lround.c: Ditto.
+        * libm/common/s_nearbyint.c: Ditto.
+        * libm/common/s_remquo.c: Ditto.
+        * libm/common/s_rint.c: Ditto.
+        * libm/common/s_round.c: Ditto.
+        * libm/common/s_scalbn.c: Ditto.
+        * libm/common/s_signbit.c: Ditto.
+        * libm/common/s_trunc.c: Ditto.
+        * libm/math/w_exp2.c: Ditto.
+        * libm/math/w_gamma.c: Ditto.
+
+2015-11-02  Jon Turney  <jon.turney@dronecode.org.uk>
+
+        * libc/stdio/fseek.c: Add missing semicolons to prototypes in
+        SYNOPSIS.
+        * libc/stdio/fwide.c: Ditto.
+        * libc/stdio64/fseeko64.c: Ditto.
+        * libc/string/strtok.c: Ditto.
+        * libc/string/wcstok.c: Ditto.
+        * libm/math/w_cosh.c: Ditto.
+        * libm/math/w_fmod.c:  Ditto.
+        * libm/mathfp/s_cosh.c: Ditto.
+        * libm/mathfp/s_fmod.c: Ditto.
+
 2015-11-02  Steve Ellcey  <sellcey@imgtec.com>
 
 	* libc/machine/mips/memcpy.S (memcpy): Add word copies for small

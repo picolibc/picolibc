@@ -10,7 +10,7 @@
  */
 /*
 FUNCTION
-<<round>>, <<roundf>>--round to integer, to nearest
+<<round>>, <<roundf>>---round to integer, to nearest
 INDEX
 	round
 INDEX

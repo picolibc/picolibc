@@ -13,7 +13,7 @@
 
 /*
 FUNCTION
-	<<exp2>>, <<exp2f>>--exponential, base 2
+	<<exp2>>, <<exp2f>>---exponential, base 2
 INDEX
 	exp2
 INDEX

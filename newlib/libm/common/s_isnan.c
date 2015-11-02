@@ -13,7 +13,7 @@
 
 /*
 FUNCTION
-<<fpclassify>>, <<isfinite>>, <<isinf>>, <<isnan>>, and <<isnormal>>--floating-point classification macros; <<finite>>, <<finitef>>, <<isinf>>, <<isinff>>, <<isnan>>, <<isnanf>>--test for exceptional numbers
+<<fpclassify>>, <<isfinite>>, <<isinf>>, <<isnan>>, and <<isnormal>>---floating-point classification macros; <<finite>>, <<finitef>>, <<isinf>>, <<isinff>>, <<isnan>>, <<isnanf>>---test for exceptional numbers
 
 @c C99 (start
 INDEX

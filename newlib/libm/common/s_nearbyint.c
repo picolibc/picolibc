@@ -10,7 +10,7 @@
  */
 /*
 FUNCTION
-<<nearbyint>>, <<nearbyintf>>--round to integer
+<<nearbyint>>, <<nearbyintf>>---round to integer
 INDEX
 	nearbyint
 INDEX
