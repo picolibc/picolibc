@@ -1,5 +1,34 @@
 2015-11-02  Jon Turney  <jon.turney@dronecode.org.uk>
 
+	* HOWTO: Update.
+	* Makefile.shared: Move documentation rules to here...
+	* libc/argz/Makefile.am: ... from here ...
+	* libc/ctype/Makefile.am: ... and here.
+	* libc/errno/Makefile.am: Ditto.
+	* libc/iconv/Makefile.am: Ditto.
+	* libc/iconv/ccs/Makefile.am : Ditto.
+	* libc/iconv/ces/Makefile.am: Ditto.
+	* libc/iconv/lib/Makefile.am: Ditto.
+	* libc/locale/Makefile.am: Ditto.
+	* libc/misc/Makefile.am: Ditto.
+	* libc/posix/Makefile.am: Ditto.
+	* libc/reent/Makefile.am: Ditto.
+	* libc/search/Makefile.am: Ditto.
+	* libc/stdio/Makefile.am: Ditto.
+	* libc/stdio64/Makefile.am: Ditto.
+	* libc/stdlib/Makefile.am : Ditto.
+	* libc/string/Makefile.am: Ditto.
+	* libc/syscalls/Makefile.am: Ditto.
+	* libc/time/Makefile.am : Ditto.
+	* libc/unix/Makefile.am: Ditto.
+	* libc/xdr/Makefile.am: Ditto.
+	* libm/common/Makefile.am: Ditto.
+	* libm/complex/Makefile.am: Ditto.
+	* libm/math/Makefile.am: Ditto.
+	* libm/mathfp/Makefile.am: Ditto.
+
+2015-11-02  Jon Turney  <jon.turney@dronecode.org.uk>
+
         * libc/time/wcsftime.c: Consistently use an em-dash in FUNCTION
 summary.
         * libm/common/isgreater.c: Ditto.

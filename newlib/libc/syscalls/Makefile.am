@@ -53,18 +53,5 @@ endif
 include $(srcdir)/../../Makefile.shared
 
 CHEWOUT_FILES =
-
-SUFFIXES = .def
-
-CHEW = ../../doc/makedoc -f $(srcdir)/../../doc/doc.str
-
-.c.def:
-	$(CHEW) < $< > $*.def 2> $*.ref
-	touch stmp-def
-
-TARGETDOC = ../tmp.texi
-
+CHAPTERS =
 # No doc for syscalls.
-doc:
-
-CLEANFILES = $(CHEWOUT_FILES) *.ref

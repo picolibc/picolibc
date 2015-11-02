@@ -247,12 +247,19 @@ lib_a_SOURCES = $(LIB_SOURCES)
 lib_a_CFLAGS = $(AM_CFLAGS)
 lib_a_CCASFLAGS = $(AM_CCASFLAGS)
 noinst_DATA = 
+
+#
+# documentation rules
+#
+SUFFIXES = .def
+CHEW = ${top_builddir}/../doc/makedoc -f $(top_srcdir)/../doc/doc.str
+CLEANFILES = $(CHEWOUT_FILES) *.ref
 ACLOCAL_AMFLAGS = -I ../../.. -I ../../../..
 CONFIG_STATUS_DEPENDENCIES = $(newlib_basedir)/configure.host
 all: all-am
 
 .SUFFIXES:
-.SUFFIXES: .c .o .obj
+.SUFFIXES: .def .c .o .obj
 am--refresh: Makefile
 	@:
 $(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am $(srcdir)/../../../Makefile.shared $(am__configure_deps)
@@ -565,6 +572,7 @@ install-strip:
 mostlyclean-generic:
 
 clean-generic:
+	-test -z "$(CLEANFILES)" || rm -f $(CLEANFILES)
 
 distclean-generic:
 	-test -z "$(CONFIG_CLEAN_FILES)" || rm -f $(CONFIG_CLEAN_FILES)
@@ -663,6 +671,18 @@ objectlist.awk.in: $(noinst_LTLIBRARIES)
 	for i in `ls *.lo` ; \
 	do \
 	  echo $$i `pwd`/$$i >> objectlist.awk.in ; \
+	done
+
+.c.def:
+	$(CHEW) < $< > $*.def 2> $*.ref
+	touch stmp-def
+
+TARGETDOC ?= ../tmp.texi
+
+doc: $(CHEWOUT_FILES)
+	for chapter in $(CHAPTERS) ; \
+	do \
+	  cat $(srcdir)/$$chapter >> $(TARGETDOC) ; \
 	done
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.

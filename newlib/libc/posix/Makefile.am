@@ -49,25 +49,12 @@ lib_a_CFLAGS = $(AM_CFLAGS)
 noinst_DATA =
 endif # USE_LIBTOOL
 
-include $(srcdir)/../../Makefile.shared	
+include $(srcdir)/../../Makefile.shared
 
 CHEWOUT_FILES = \
 	popen.def \
 	posix_spawn.def
 
-SUFFIXES = .def
-
-CHEW = ../../doc/makedoc -f $(srcdir)/../../doc/doc.str
-
-.c.def:
-	$(CHEW) < $< > $*.def 2> $*.ref
-	touch stmp-def
-
-TARGETDOC = ../tmp.texi
-
-doc: $(CHEWOUT_FILES)
-	cat $(srcdir)/posix.tex >> $(TARGETDOC)
+CHAPTERS = posix.tex
 
 AM_CFLAGS = -D_GNU_SOURCE
-
-CLEANFILES = $(CHEWOUT_FILES) *.ref

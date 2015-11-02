@@ -34,16 +34,4 @@ noinst_DATA =
 include $(srcdir)/../../../Makefile.shared
 
 CHEWOUT_FILES = iconv.def
-
-SUFFIXES = .def
-
-CHEW = ../../../doc/makedoc -f $(srcdir)/../../../doc/doc.str
-
-.c.def:
-	$(CHEW) < $< > $*.def 2> $*.ref
-	touch stmp-def
-
-doc: $(CHEWOUT_FILES)
-
-CLEANFILES = $(CHEWOUT_FILES) *.ref
-
+CHAPTER =

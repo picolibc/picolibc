@@ -52,7 +52,7 @@ POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
 subdir = .
-DIST_COMMON = README $(srcdir)/Makefile.in $(srcdir)/Makefile.am \
+DIST_COMMON = $(srcdir)/Makefile.in $(srcdir)/Makefile.am \
 	$(top_srcdir)/configure $(am__configure_deps) \
 	$(srcdir)/../../../../mkinstalldirs
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4

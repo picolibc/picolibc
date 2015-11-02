@@ -55,7 +55,7 @@ endif # USE_LIBTOOL
 
 include $(srcdir)/../../Makefile.shared
 
-chobj =	s_cbrt.def s_copysign.def s_exp10.def s_expm1.def s_ilogb.def \
+CHEWOUT_FILES =	s_cbrt.def s_copysign.def s_exp10.def s_expm1.def s_ilogb.def \
 	s_infinity.def s_isnan.def s_log1p.def s_matherr.def s_modf.def \
 	s_nan.def s_nextafter.def s_pow10.def s_scalbn.def \
 	s_fdim.def s_fma.def s_fmax.def s_fmin.def \
@@ -63,19 +63,7 @@ chobj =	s_cbrt.def s_copysign.def s_exp10.def s_expm1.def s_ilogb.def \
 	s_remquo.def s_rint.def s_round.def s_signbit.def s_trunc.def \
 	isgreater.def
 
-SUFFIXES = .def
-
-CHEW = ../../doc/makedoc -f $(srcdir)/../../doc/doc.str
-
-.c.def:
-	$(CHEW) < $< > $*.def 2> $*.ref
-	touch stmp-def
-
-TARGETDOC = ../tmp.texi
-
-doc: $(chobj)
-
-CLEANFILES = $(chobj) *.ref
+CHAPTERS =
 
 # A partial dependency list.
 

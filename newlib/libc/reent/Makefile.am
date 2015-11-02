@@ -90,19 +90,6 @@ CHEWOUT_FILES = \
 	$(STDIO64_DEFS) \
 	writer.def
 
-SUFFIXES = .def .h
-
-CHEW = ../../doc/makedoc -f $(srcdir)/../../doc/doc.str
-
-.c.def:
-	$(CHEW) < $< > $*.def 2> $*.ref
-	touch stmp-def
-
-TARGETDOC = ../tmp.texi
-
-doc: $(CHEWOUT_FILES)
-	cat $(srcdir)/reent.tex >> $(TARGETDOC)
+CHAPTERS = reent.tex
 
 $(lpfx)impure.$(oext): $(srcdir)/impure.c $(srcdir)/../include/sys/reent.h
-
-CLEANFILES = $(CHEWOUT_FILES) *.ref

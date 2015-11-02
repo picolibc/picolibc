@@ -442,6 +442,13 @@ libthread_db_la_LDFLAGS = -version-info $(LIBTOOL_VERSION_INFO) -release newlib 
 @USE_LIBTOOL_FALSE@libpthread_a_DEPENDENCIES = $(LIBADD_OBJS) $(MACHINE_LIB)
 @USE_LIBTOOL_FALSE@libthread_db_a_SOURCES = $(LIB_DB_SOURCES)
 @USE_LIBTOOL_FALSE@libthread_db_a_CFLAGS = $(AM_CFLAGS)
+
+#
+# documentation rules
+#
+SUFFIXES = .def
+CHEW = ${top_builddir}/../doc/makedoc -f $(top_srcdir)/../doc/doc.str
+CLEANFILES = $(CHEWOUT_FILES) *.ref
 AM_CFLAGS = -D_XOPEN_SOURCE=600 -D_GNU_SOURCE=1
 ACLOCAL_AMFLAGS = -I ../../../.. -I ../../../../..
 CONFIG_STATUS_DEPENDENCIES = $(newlib_basedir)/configure.host
@@ -452,7 +459,7 @@ CFLAGS_pthread = -D__NO_WEAK_PTHREAD_ALIASES -DHAVE_Z_NODELETE
 all: all-recursive
 
 .SUFFIXES:
-.SUFFIXES: .c .lo .o .obj
+.SUFFIXES: .def .c .lo .o .obj
 am--refresh: Makefile
 	@:
 $(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am $(srcdir)/../../../../Makefile.shared $(am__configure_deps)
@@ -1166,6 +1173,7 @@ install-strip:
 mostlyclean-generic:
 
 clean-generic:
+	-test -z "$(CLEANFILES)" || rm -f $(CLEANFILES)
 
 distclean-generic:
 	-test -z "$(CONFIG_CLEAN_FILES)" || rm -f $(CONFIG_CLEAN_FILES)
@@ -1276,6 +1284,18 @@ objectlist.awk.in: $(noinst_LTLIBRARIES)
 	for i in `ls *.lo` ; \
 	do \
 	  echo $$i `pwd`/$$i >> objectlist.awk.in ; \
+	done
+
+.c.def:
+	$(CHEW) < $< > $*.def 2> $*.ref
+	touch stmp-def
+
+TARGETDOC ?= ../tmp.texi
+
+doc: $(CHEWOUT_FILES)
+	for chapter in $(CHAPTERS) ; \
+	do \
+	  cat $(srcdir)/$$chapter >> $(TARGETDOC) ; \
 	done
 
 doc:

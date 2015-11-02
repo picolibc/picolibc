@@ -292,20 +292,7 @@ CHEWOUT_FILES= \
 	wcstombs.def	\
 	wctomb.def	
 
-SUFFIXES = .def
-
-CHEW = ../../doc/makedoc -f $(srcdir)/../../doc/doc.str
-
-.c.def:
-	$(CHEW) < $< > $*.def 2> $*.ref
-	touch stmp-def
-
-TARGETDOC = ../tmp.texi
-
-doc: $(CHEWOUT_FILES)
-	cat $(srcdir)/stdlib.tex >> $(TARGETDOC)
-
-CLEANFILES = $(CHEWOUT_FILES) *.ref
+CHAPTERS = stdlib.tex
 
 $(lpfx)dtoa.$(oext): dtoa.c mprec.h
 $(lpfx)ldtoa.$(oext): ldtoa.c mprec.h

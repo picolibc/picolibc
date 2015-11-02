@@ -22,18 +22,4 @@ endif # USE_LIBTOOL
 include $(srcdir)/../../Makefile.shared
 
 CHEWOUT_FILES = unctrl.def ffs.def
-
-SUFFIXES = .def
-
-CHEW = ../../doc/makedoc -f $(srcdir)/../../doc/doc.str
-
-.c.def:
-	$(CHEW) < $< > $*.def 2> $*.ref
-	touch stmp-def
-
-TARGETDOC = ../tmp.texi
-
-doc: $(CHEWOUT_FILES)
-	cat $(srcdir)/misc.tex >> $(TARGETDOC)
-
-CLEANFILES = $(CHEWOUT_FILES) *.ref
+CHAPTERS = misc.tex

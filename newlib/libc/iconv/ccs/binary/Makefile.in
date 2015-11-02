@@ -264,9 +264,17 @@ cp775.cct cp850.cct cp852.cct cp855.cct cp866.cct \
 jis_x0212_1990.cct jis_x0201_1976.cct jis_x0208_1990.cct ksx1001.cct \
 cns11643_plane1.cct cns11643_plane2.cct cns11643_plane14.cct
 
+
+#
+# documentation rules
+#
+SUFFIXES = .def
+CHEW = ${top_builddir}/../doc/makedoc -f $(top_srcdir)/../doc/doc.str
+CLEANFILES = $(CHEWOUT_FILES) *.ref
 all: all-am
 
 .SUFFIXES:
+.SUFFIXES: .def .c
 $(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am $(srcdir)/../../../../Makefile.shared $(am__configure_deps)
 	@for dep in $?; do \
 	  case '$(am__configure_deps)' in \
@@ -360,6 +368,7 @@ install-strip:
 mostlyclean-generic:
 
 clean-generic:
+	-test -z "$(CLEANFILES)" || rm -f $(CLEANFILES)
 
 distclean-generic:
 	-test -z "$(CONFIG_CLEAN_FILES)" || rm -f $(CONFIG_CLEAN_FILES)
@@ -451,6 +460,18 @@ objectlist.awk.in: $(noinst_LTLIBRARIES)
 	for i in `ls *.lo` ; \
 	do \
 	  echo $$i `pwd`/$$i >> objectlist.awk.in ; \
+	done
+
+.c.def:
+	$(CHEW) < $< > $*.def 2> $*.ref
+	touch stmp-def
+
+TARGETDOC ?= ../tmp.texi
+
+doc: $(CHEWOUT_FILES)
+	for chapter in $(CHAPTERS) ; \
+	do \
+	  cat $(srcdir)/$$chapter >> $(TARGETDOC) ; \
 	done
 
 info:

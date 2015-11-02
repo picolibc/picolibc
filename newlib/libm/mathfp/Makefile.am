@@ -58,7 +58,7 @@ endif # USE_LIBTOOL
 
 include $(srcdir)/../../Makefile.shared
 
-chobj = e_acosh.def \
+CHEWOUT_FILES = e_acosh.def \
 	e_atanh.def \
 	e_hypot.def \
 	e_remainder.def \
@@ -87,20 +87,7 @@ chobj = e_acosh.def \
 	s_tanh.def \
 	w_jn.def
 
-SUFFIXES = .def
-
-CHEW = ../../doc/makedoc -f $(srcdir)/../../doc/doc.str
-
-.c.def:
-	$(CHEW) < $< > $*.def 2> $*.ref
-	touch stmp-def
-
-TARGETDOC = ../tmp.texi
-
-doc: $(chobj)
-	cat $(srcdir)/mathfp.tex >> $(TARGETDOC)
-
-CLEANFILES = $(chobj) *.ref
+CHAPTERS = mathfp.tex
 
 # A partial dependency list.
 

@@ -267,12 +267,19 @@ cctdir = $(datadir)/iconv_data
 cct_DATA = encoding.aliases
 INCLUDES = $(NEWLIB_CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLAGS)
 SUBDEFS = lib/stmp-def
-CHEWOUT_FILES = iconv.def
-TARGETDOC = ../tmp.texi
+
+#
+# documentation rules
+#
+SUFFIXES = .def
+CHEW = ${top_builddir}/../doc/makedoc -f $(top_srcdir)/../doc/doc.str
 CLEANFILES = $(CHEWOUT_FILES) *.ref
+CHEWOUT_FILES = iconv.def
+CHAPTERS = iconv.tex
 all: all-recursive
 
 .SUFFIXES:
+.SUFFIXES: .def .c
 $(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am $(srcdir)/../../Makefile.shared $(am__configure_deps)
 	@for dep in $?; do \
 	  case '$(am__configure_deps)' in \
@@ -595,6 +602,18 @@ objectlist.awk.in: $(noinst_LTLIBRARIES)
 	  echo $$i `pwd`/$$i >> objectlist.awk.in ; \
 	done
 
+.c.def:
+	$(CHEW) < $< > $*.def 2> $*.ref
+	touch stmp-def
+
+TARGETDOC ?= ../tmp.texi
+
+doc: $(CHEWOUT_FILES)
+	for chapter in $(CHAPTERS) ; \
+	do \
+	  cat $(srcdir)/$$chapter >> $(TARGETDOC) ; \
+	done
+
 iconv.def: lib/iconv.def
 	cp lib/iconv.def iconv.def
 
@@ -610,9 +629,6 @@ $(SUBDEFS): stmp-def
 lib/iconv.def: $(SUBDEFS); @true
 
 lib/stmp-def: ; @true
-
-doc: $(CHEWOUT_FILES)
-	cat $(srcdir)/iconv.tex >> $(TARGETDOC)
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

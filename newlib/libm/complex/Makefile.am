@@ -33,27 +33,13 @@ endif # USE_LIBTOOL
 
 include $(srcdir)/../../Makefile.shared
 
-chobj =	cabs.def cacos.def cacosh.def carg.def \
+CHEWOUT_FILES =	cabs.def cacos.def cacosh.def carg.def \
         casin.def casinh.def catan.def catanh.def \
         ccos.def ccosh.def cexp.def cimag.def clog.def \
         conj.def cpow.def cproj.def creal.def \
         csin.def csinh.def csqrt.def ctan.def ctanh.def
 
-
-SUFFIXES = .def
-
-CHEW = ../../doc/makedoc -f $(srcdir)/../../doc/doc.str
-
-.c.def:
-	$(CHEW) < $< > $*.def 2> $*.ref
-	touch stmp-def
-
-TARGETDOC = ../tmp.texi
-
-doc: $(chobj)
-	cat $(srcdir)/complex.tex >> $(TARGETDOC)
-
-CLEANFILES = $(chobj) *.ref
+CHAPTERS = complex.tex
 
 # A partial dependency list.
 

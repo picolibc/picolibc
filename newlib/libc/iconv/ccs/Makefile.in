@@ -349,10 +349,14 @@ lib_a_SOURCES = $(GENERAL_SOURCES) $(ELIX_SOURCES)
 lib_a_CFLAGS = $(AM_CFLAGS)
 noinst_DATA = 
 SUBDIRS = binary
-CHEWOUT_FILES = ccs.def
+CHEWOUT_FILES = 
+CHAPTERS = 
+
+#
+# documentation rules
+#
 SUFFIXES = .def
-CHEW = ../../../doc/makedoc -f $(srcdir)/../../../doc/doc.str
-TARGETDOC = ../tmp.texi
+CHEW = ${top_builddir}/../doc/makedoc -f $(top_srcdir)/../doc/doc.str
 CLEANFILES = $(CHEWOUT_FILES) *.ref
 all: all-recursive
 
@@ -927,18 +931,23 @@ uninstall-am:
 	mostlyclean-libtool pdf pdf-am ps ps-am tags tags-recursive \
 	uninstall uninstall-am
 
-
-.c.def:
-	$(CHEW) < $< > $*.def 2> $*.ref
-	touch stmp-def
-
-doc: $(CHEWOUT_FILES)
-	cat $(srcdir)/ccs.tex >> $(TARGETDOC)
 objectlist.awk.in: $(noinst_LTLIBRARIES)
 	-rm -f objectlist.awk.in
 	for i in `ls *.lo` ; \
 	do \
 	  echo $$i `pwd`/$$i >> objectlist.awk.in ; \
+	done
+
+.c.def:
+	$(CHEW) < $< > $*.def 2> $*.ref
+	touch stmp-def
+
+TARGETDOC ?= ../tmp.texi
+
+doc: $(CHEWOUT_FILES)
+	for chapter in $(CHAPTERS) ; \
+	do \
+	  cat $(srcdir)/$$chapter >> $(TARGETDOC) ; \
 	done
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.

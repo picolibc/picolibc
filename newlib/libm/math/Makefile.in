@@ -138,14 +138,13 @@ am__objects_2 = lib_a-kf_rem_pio2.$(OBJEXT) lib_a-kf_cos.$(OBJEXT) \
 	lib_a-sf_signif.$(OBJEXT) lib_a-sf_sin.$(OBJEXT) \
 	lib_a-sf_tan.$(OBJEXT) lib_a-sf_tanh.$(OBJEXT) \
 	lib_a-wf_exp2.$(OBJEXT) lib_a-wf_tgamma.$(OBJEXT)
-am__objects_5 = lib_a-el_hypot.$(OBJEXT)
+am__objects_3 = lib_a-el_hypot.$(OBJEXT)
 @USE_LIBTOOL_FALSE@am_lib_a_OBJECTS = $(am__objects_1) \
-@USE_LIBTOOL_FALSE@	$(am__objects_2) \
-@USE_LIBTOOL_FALSE@	$(am__objects_5)
+@USE_LIBTOOL_FALSE@	$(am__objects_2) $(am__objects_3)
 lib_a_OBJECTS = $(am_lib_a_OBJECTS)
 LTLIBRARIES = $(noinst_LTLIBRARIES)
 libmath_la_LIBADD =
-am__objects_3 = k_standard.lo k_rem_pio2.lo k_cos.lo k_sin.lo k_tan.lo \
+am__objects_4 = k_standard.lo k_rem_pio2.lo k_cos.lo k_sin.lo k_tan.lo \
 	e_acos.lo e_acosh.lo e_asin.lo e_atan2.lo e_atanh.lo e_cosh.lo \
 	e_exp.lo e_fmod.lo er_gamma.lo e_hypot.lo e_j0.lo e_j1.lo \
 	e_jn.lo er_lgamma.lo e_log.lo e_log10.lo e_pow.lo \
@@ -157,7 +156,7 @@ am__objects_3 = k_standard.lo k_rem_pio2.lo k_cos.lo k_sin.lo k_tan.lo \
 	w_sincos.lo w_drem.lo s_asinh.lo s_atan.lo s_ceil.lo s_cos.lo \
 	s_erf.lo s_fabs.lo s_floor.lo s_frexp.lo s_ldexp.lo \
 	s_signif.lo s_sin.lo s_tan.lo s_tanh.lo w_exp2.lo w_tgamma.lo
-am__objects_4 = kf_rem_pio2.lo kf_cos.lo kf_sin.lo kf_tan.lo \
+am__objects_5 = kf_rem_pio2.lo kf_cos.lo kf_sin.lo kf_tan.lo \
 	ef_acos.lo ef_acosh.lo ef_asin.lo ef_atan2.lo ef_atanh.lo \
 	ef_cosh.lo ef_exp.lo ef_fmod.lo erf_gamma.lo ef_hypot.lo \
 	ef_j0.lo ef_j1.lo ef_jn.lo erf_lgamma.lo ef_log.lo ef_log10.lo \
@@ -171,10 +170,9 @@ am__objects_4 = kf_rem_pio2.lo kf_cos.lo kf_sin.lo kf_tan.lo \
 	sf_cos.lo sf_erf.lo sf_fabs.lo sf_floor.lo sf_frexp.lo \
 	sf_ldexp.lo sf_signif.lo sf_sin.lo sf_tan.lo sf_tanh.lo \
 	wf_exp2.lo wf_tgamma.lo
-am__objects_6 = el_hypot.lo 
-@USE_LIBTOOL_TRUE@am_libmath_la_OBJECTS = $(am__objects_3) \
-@USE_LIBTOOL_TRUE@	$(am__objects_4) \
-@USE_LIBTOOL_TRUE@	$(am__objects_6)
+am__objects_6 = el_hypot.lo
+@USE_LIBTOOL_TRUE@am_libmath_la_OBJECTS = $(am__objects_4) \
+@USE_LIBTOOL_TRUE@	$(am__objects_5) $(am__objects_6)
 libmath_la_OBJECTS = $(am_libmath_la_OBJECTS)
 libmath_la_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
@@ -377,7 +375,6 @@ fsrc = kf_rem_pio2.c \
 	wf_exp2.c wf_tgamma.c
 
 lsrc = el_hypot.c
-
 libmath_la_LDFLAGS = -Xcompiler -nostdlib
 @USE_LIBTOOL_TRUE@noinst_LTLIBRARIES = libmath.la
 @USE_LIBTOOL_TRUE@libmath_la_SOURCES = $(src) $(fsrc) $(lsrc)
@@ -386,7 +383,14 @@ libmath_la_LDFLAGS = -Xcompiler -nostdlib
 @USE_LIBTOOL_FALSE@noinst_LIBRARIES = lib.a
 @USE_LIBTOOL_FALSE@lib_a_SOURCES = $(src) $(fsrc) $(lsrc)
 @USE_LIBTOOL_FALSE@lib_a_CFLAGS = $(AM_CFLAGS)
-chobj = w_acos.def w_acosh.def w_asin.def s_asinh.def \
+
+#
+# documentation rules
+#
+SUFFIXES = .def
+CHEW = ${top_builddir}/../doc/makedoc -f $(top_srcdir)/../doc/doc.str
+CLEANFILES = $(CHEWOUT_FILES) *.ref
+CHEWOUT_FILES = w_acos.def w_acosh.def w_asin.def s_asinh.def \
 	s_atan.def w_atan2.def w_atanh.def w_j0.def \
 	w_cosh.def s_erf.def w_exp.def w_exp2.def \
 	s_fabs.def s_floor.def w_fmod.def s_frexp.def \
@@ -395,10 +399,7 @@ chobj = w_acos.def w_acosh.def w_asin.def s_asinh.def \
 	w_pow.def w_remainder.def s_sin.def w_sinh.def \
 	w_sqrt.def s_tan.def s_tanh.def
 
-SUFFIXES = .def
-CHEW = ../../doc/makedoc -f $(srcdir)/../../doc/doc.str
-TARGETDOC = ../tmp.texi
-CLEANFILES = $(chobj) *.ref
+CHAPTERS = math.tex
 all: all-am
 
 .SUFFIXES:
@@ -1460,8 +1461,13 @@ objectlist.awk.in: $(noinst_LTLIBRARIES)
 	$(CHEW) < $< > $*.def 2> $*.ref
 	touch stmp-def
 
-doc: $(chobj)
-	cat $(srcdir)/math.tex >> $(TARGETDOC)
+TARGETDOC ?= ../tmp.texi
+
+doc: $(CHEWOUT_FILES)
+	for chapter in $(CHAPTERS) ; \
+	do \
+	  cat $(srcdir)/$$chapter >> $(TARGETDOC) ; \
+	done
 
 # A partial dependency list.
 

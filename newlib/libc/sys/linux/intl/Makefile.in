@@ -263,6 +263,13 @@ msgcatdir = /usr/share/locale
 @USE_LIBTOOL_FALSE@noinst_LIBRARIES = lib.a
 @USE_LIBTOOL_FALSE@lib_a_SOURCES = $(LIB_SOURCES)
 @USE_LIBTOOL_FALSE@lib_a_CFLAGS = $(AM_CFLAGS)
+
+#
+# documentation rules
+#
+SUFFIXES = .def
+CHEW = ${top_builddir}/../doc/makedoc -f $(top_srcdir)/../doc/doc.str
+CLEANFILES = $(CHEWOUT_FILES) *.ref
 AM_CFLAGS = -DNOT_IN_libc -DHAVE_CONFIG_H -D_GNU_SOURCE -D__libc_enable_secure=1 -D'LOCALEDIR="$(msgcatdir)"' -D'LOCALE_ALIAS_PATH="$(msgcatdir)"' -DNLSPATH='"$(msgcatdir)/%L/%N:$(msgcatdir)/%L/LC_MESSAGES/%N:$(msgcatdir)/%l/%N:$(msgcatdir)/%l/LC_MESSAGES/%N:"'
 
 # shouldn't have to do the following, but if needed
@@ -270,7 +277,7 @@ BISONFLAGS = --yacc --name-prefix=__gettext --output
 all: all-am
 
 .SUFFIXES:
-.SUFFIXES: .c .lo .o .obj
+.SUFFIXES: .def .c .lo .o .obj
 $(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am $(srcdir)/../../../../Makefile.shared $(am__configure_deps)
 	@for dep in $?; do \
 	  case '$(am__configure_deps)' in \
@@ -527,6 +534,7 @@ install-strip:
 mostlyclean-generic:
 
 clean-generic:
+	-test -z "$(CLEANFILES)" || rm -f $(CLEANFILES)
 
 distclean-generic:
 	-test -z "$(CONFIG_CLEAN_FILES)" || rm -f $(CONFIG_CLEAN_FILES)
@@ -625,6 +633,18 @@ objectlist.awk.in: $(noinst_LTLIBRARIES)
 	for i in `ls *.lo` ; \
 	do \
 	  echo $$i `pwd`/$$i >> objectlist.awk.in ; \
+	done
+
+.c.def:
+	$(CHEW) < $< > $*.def 2> $*.ref
+	touch stmp-def
+
+TARGETDOC ?= ../tmp.texi
+
+doc: $(CHEWOUT_FILES)
+	for chapter in $(CHAPTERS) ; \
+	do \
+	  cat $(srcdir)/$$chapter >> $(TARGETDOC) ; \
 	done
 plural.c: plural.y
 	$(BISON) $(BISONFLAGS) $@ $^

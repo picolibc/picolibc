@@ -291,6 +291,13 @@ libstdio64_la_LDFLAGS = -Xcompiler -nostdlib
 @USE_LIBTOOL_FALSE@noinst_LIBRARIES = lib.a
 @USE_LIBTOOL_FALSE@lib_a_SOURCES = $(GENERAL_SOURCES) $(ELIX_SOURCES)
 @USE_LIBTOOL_FALSE@lib_a_CFLAGS = $(AM_CFLAGS)
+
+#
+# documentation rules
+#
+SUFFIXES = .def
+CHEW = ${top_builddir}/../doc/makedoc -f $(top_srcdir)/../doc/doc.str
+CLEANFILES = $(CHEWOUT_FILES) *.ref
 AM_CFLAGS = -I $(srcdir)/../stdio
 CHEWOUT_FILES = \
 	fdopen64.def		\
@@ -302,10 +309,7 @@ CHEWOUT_FILES = \
 	ftello64.def		\
 	tmpfile64.def
 
-SUFFIXES = .def
-CHEW = ../../doc/makedoc -f $(srcdir)/../../doc/doc.str
-TARGETDOC = ../tmp.texi
-CLEANFILES = $(CHEWOUT_FILES) *.ref
+CHAPTERS = stdio64.tex
 all: all-am
 
 .SUFFIXES:
@@ -623,8 +627,13 @@ objectlist.awk.in: $(noinst_LTLIBRARIES)
 	$(CHEW) < $< > $*.def 2> $*.ref
 	touch stmp-def
 
+TARGETDOC ?= ../tmp.texi
+
 doc: $(CHEWOUT_FILES)
-	cat $(srcdir)/stdio64.tex >> $(TARGETDOC)
+	for chapter in $(CHAPTERS) ; \
+	do \
+	  cat $(srcdir)/$$chapter >> $(TARGETDOC) ; \
+	done
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

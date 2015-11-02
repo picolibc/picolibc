@@ -47,21 +47,7 @@ noinst_DATA =
 
 SUBDIRS=binary
 
-CHEWOUT_FILES = ccs.def
-
-SUFFIXES = .def
-
-CHEW = ../../../doc/makedoc -f $(srcdir)/../../../doc/doc.str
-
-.c.def:
-	$(CHEW) < $< > $*.def 2> $*.ref
-	touch stmp-def
-
-TARGETDOC = ../tmp.texi
-
-doc: $(CHEWOUT_FILES)
-	cat $(srcdir)/ccs.tex >> $(TARGETDOC)
-
-CLEANFILES = $(CHEWOUT_FILES) *.ref
+CHEWOUT_FILES =
+CHAPTERS =
 
 include $(srcdir)/../../../Makefile.shared

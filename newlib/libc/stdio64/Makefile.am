@@ -52,18 +52,4 @@ CHEWOUT_FILES = \
 	ftello64.def		\
 	tmpfile64.def
 
-SUFFIXES = .def
-
-CHEW = ../../doc/makedoc -f $(srcdir)/../../doc/doc.str
-
-.c.def:
-	$(CHEW) < $< > $*.def 2> $*.ref
-	touch stmp-def
-
-TARGETDOC = ../tmp.texi
-
-doc: $(CHEWOUT_FILES)
-	cat $(srcdir)/stdio64.tex >> $(TARGETDOC)
-
-CLEANFILES = $(CHEWOUT_FILES) *.ref
-
+CHAPTERS = stdio64.tex

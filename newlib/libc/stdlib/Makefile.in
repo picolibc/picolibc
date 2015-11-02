@@ -479,6 +479,13 @@ libstdlib_la_LDFLAGS = -Xcompiler -nostdlib
 @USE_LIBTOOL_FALSE@lib_a_LIBADD = $(LIBADD_OBJS) $(ELIX_OBJS)
 @USE_LIBTOOL_FALSE@lib_a_CFLAGS = $(AM_CFLAGS)
 @USE_LIBTOOL_FALSE@lib_a_DEPENDENCIES = $(LIBADD_OBJS) $(ELIX_OBJS)
+
+#
+# documentation rules
+#
+SUFFIXES = .def
+CHEW = ${top_builddir}/../doc/makedoc -f $(top_srcdir)/../doc/doc.str
+CLEANFILES = $(CHEWOUT_FILES) *.ref
 MALLOC_COMPILE = $(LIB_COMPILE) -DINTERNAL_NEWLIB
 CHEWOUT_FILES = \
 	_Exit.def	\
@@ -528,10 +535,7 @@ CHEWOUT_FILES = \
 	wcstombs.def	\
 	wctomb.def	
 
-SUFFIXES = .def
-CHEW = ../../doc/makedoc -f $(srcdir)/../../doc/doc.str
-TARGETDOC = ../tmp.texi
-CLEANFILES = $(CHEWOUT_FILES) *.ref
+CHAPTERS = stdlib.tex
 all: all-am
 
 .SUFFIXES:
@@ -1439,6 +1443,18 @@ objectlist.awk.in: $(noinst_LTLIBRARIES)
 	  echo $$i `pwd`/$$i >> objectlist.awk.in ; \
 	done
 
+.c.def:
+	$(CHEW) < $< > $*.def 2> $*.ref
+	touch stmp-def
+
+TARGETDOC ?= ../tmp.texi
+
+doc: $(CHEWOUT_FILES)
+	for chapter in $(CHAPTERS) ; \
+	do \
+	  cat $(srcdir)/$$chapter >> $(TARGETDOC) ; \
+	done
+
 $(lpfx)$(MALLOCR).$(oext): $(MALLOCR).c
 	$(MALLOC_COMPILE) -DDEFINE_MALLOC -c $(srcdir)/$(MALLOCR).c -o $@
 
@@ -1474,13 +1490,6 @@ $(lpfx)$(MSIZER).$(oext): $(MALLOCR).c
 
 $(lpfx)$(MALLOPTR).$(oext): $(MALLOCR).c
 	$(MALLOC_COMPILE) -DDEFINE_MALLOPT -c $(srcdir)/$(MALLOCR).c -o $@
-
-.c.def:
-	$(CHEW) < $< > $*.def 2> $*.ref
-	touch stmp-def
-
-doc: $(CHEWOUT_FILES)
-	cat $(srcdir)/stdlib.tex >> $(TARGETDOC)
 
 $(lpfx)dtoa.$(oext): dtoa.c mprec.h
 $(lpfx)ldtoa.$(oext): ldtoa.c mprec.h

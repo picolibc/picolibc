@@ -58,20 +58,8 @@ lib_a_CFLAGS = $(AM_CFLAGS)
 noinst_DATA =
 endif # USE_LIBTOOL
 
-SUFFIXES = .def
-
 CHEWOUT_FILES =
-
-CHEW = ../../doc/makedoc -f $(srcdir)/../../doc/doc.str
-
-.c.def:
-	$(CHEW) < $< > $*.def 2> $*.ref
-	touch stmp-def
-
-TARGETDOC = ../tmp.texi
-
-doc: $(CHEWOUT_FILES)
-
-CLEANFILES = $(CHEWOUT_FILES) *.ref
+CHAPTERS =
+# No doc for xdr.
 
 include $(srcdir)/../../Makefile.shared

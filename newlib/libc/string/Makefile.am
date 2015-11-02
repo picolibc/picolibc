@@ -145,18 +145,4 @@ wcswidth.def	wcsxfrm.def	wcwidth.def	wmemchr.def \
 wmemcmp.def	wmemcpy.def	wmemmove.def	wmemset.def \
 memmem.def	memrchr.def	rawmemchr.def	strchrnul.def
 
-SUFFIXES = .def
-
-CHEW = ../../doc/makedoc -f $(srcdir)/../../doc/doc.str
-
-.c.def:
-	$(CHEW) < $< > $*.def 2> $*.ref
-	touch stmp-def
-
-TARGETDOC = ../tmp.texi
-
-doc: $(CHEWOUT_FILES)
-	cat $(srcdir)/strings.tex >> $(TARGETDOC)
-	cat $(srcdir)/wcstrings.tex >> $(TARGETDOC)
-
-CLEANFILES = $(CHEWOUT_FILES) *.ref
+CHAPTERS = strings.tex wcstrings.tex
