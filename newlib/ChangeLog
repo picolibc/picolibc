@@ -1,3 +1,7 @@
+2015-10-30  Sebastian Huber  <sebastian.huber@embedded-brains.de>
+
+	* libc/include/pthread.h: Include <sched.h> instead of <sys/sched.h>.
+
 2015-10-26  Brian Inglis  <Brian.Inglis@SystematicSw.ab.ca>
 
 	* libc/time/strftime.c (__strftime): add support for %s (seconds from
