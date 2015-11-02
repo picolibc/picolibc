@@ -22,15 +22,15 @@ fmodf
 
 ANSI_SYNOPSIS
 #include <math.h>
-double fmod(double <[x]>, double <[y]>)
-float fmodf(float <[x]>, float <[y]>)
+double fmod(double <[x]>, double <[y]>);
+float fmodf(float <[x]>, float <[y]>);
 
 TRAD_SYNOPSIS
 #include <math.h>
-double fmod(<[x]>, <[y]>)
+double fmod(<[x]>, <[y]>);
 double (<[x]>, <[y]>);
 
-float fmodf(<[x]>, <[y]>)
+float fmodf(<[x]>, <[y]>);
 float (<[x]>, <[y]>);
 
 DESCRIPTION

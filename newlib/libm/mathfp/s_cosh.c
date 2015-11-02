@@ -9,14 +9,14 @@ FUNCTION
 ANSI_SYNOPSIS
         #include <math.h>
         double cosh(double <[x]>);
-        float coshf(float <[x]>)
+        float coshf(float <[x]>);
 
 TRAD_SYNOPSIS
         #include <math.h>
-        double cosh(<[x]>)
+        double cosh(<[x]>);
         double <[x]>;
 
-        float coshf(<[x]>)
+        float coshf(<[x]>);
         float <[x]>;
 
 DESCRIPTION

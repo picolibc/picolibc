@@ -26,18 +26,18 @@ INDEX
 
 ANSI_SYNOPSIS
 	#include <stdio.h>
-	int fseeko64(FILE *<[fp]>, _off64_t <[offset]>, int <[whence]>)
+	int fseeko64(FILE *<[fp]>, _off64_t <[offset]>, int <[whence]>);
 	int _fseeko64_r (struct _reent *<[ptr]>, FILE *<[fp]>,
-                         _off64_t <[offset]>, int <[whence]>)
+                         _off64_t <[offset]>, int <[whence]>);
 TRAD_SYNOPSIS
 	#include <stdio.h>
 
-	int fseeko64(<[fp]>, <[offset]>, <[whence]>)
+	int fseeko64(<[fp]>, <[offset]>, <[whence]>);
 	FILE *<[fp]>;
 	_off64_t <[offset]>;
 	int <[whence]>;
 
-	int _fseeko64_r (<[ptr]>, <[fp]>, <[offset]>, <[whence]>)
+	int _fseeko64_r (<[ptr]>, <[fp]>, <[offset]>, <[whence]>);
 	struct _reent *<[ptr]>;
 	FILE *<[fp]>;
 	_off64_t <[offset]>;
