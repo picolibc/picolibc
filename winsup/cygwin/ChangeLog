@@ -1,5 +1,9 @@
 2015-11-02  Corinna Vinschen  <corinna@vinschen.de>
 
+	* include/netinet/ip.h (MAX_IPOPTLEN): Define.
+
+2015-11-02  Corinna Vinschen  <corinna@vinschen.de>
+
 	* sigproc.cc (class pending_signals): Drop sigproc_init friendship.
 	(pending_signals::clear): Fix implementation to avoid subsequent
 	endless loop in wait_sig.  Improve comment.
