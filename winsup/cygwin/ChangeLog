@@ -1,3 +1,8 @@
+2015-11-03  Corinna Vinschen  <corinna@vinschen.de>
+
+	* sigproc.cc (pending_signals::clear): Fix previous fix resulting in
+	yet another endless loop.
+
 2015-11-02  Corinna Vinschen  <corinna@vinschen.de>
 
 	* include/netinet/ip.h (MAX_IPOPTLEN): Define.

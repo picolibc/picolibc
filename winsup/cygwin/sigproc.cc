@@ -402,16 +402,11 @@ sig_clear (int sig)
 void
 pending_signals::clear (_cygtls *tls)
 {
-  sigpacket *q = &start, *qnext;
+  sigpacket *q, *qnext;
 
-  while ((qnext = q->next))
-    {
-      if (qnext->sigtls == tls)
-	{
-	  q->next = qnext->next;
-	  qnext->si.si_signo = 0;
-	}
-    }
+  for (q = &start; (qnext = q->next); q->next = qnext->next)
+    if (qnext->sigtls == tls)
+      qnext->si.si_signo = 0;
 }
 
 /* Clear pending signals of specific thread.  Called from _cygtls::remove */
