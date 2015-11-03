@@ -60,32 +60,6 @@ rm -f conftest*])
 
 AM_CONDITIONAL(OPT_SIZE, test x"$acnewlib_cv_opt_size" = x"yes")
 
-dnl Check for whether ARM_7 or ARM_ARCH_6T2 is defined.
-dnl This macro is used to support memchr() for old CPU.
-AC_CACHE_CHECK(whether armv7 processor is supported,
-	       acnewlib_cv_armv7_processor, [dnl
-cat > conftest.c <<EOF
-
-#if defined (_ISA_ARM_7) || defined (__ARM_ARCH_6T2__)
-  #define HAVE_ARMV7
- #else
-  #error "ARMV7 is not supported."
-#endif
-int main () {
-  return 0;
-}
-EOF
-if AC_TRY_COMMAND([${CC} $CFLAGS $CPPFLAGS -c -o conftest.o conftest.c
-							1>&AS_MESSAGE_LOG_FD])
-then
-  acnewlib_cv_armv7_processor=yes;
-else
-  acnewlib_cv_armv7_processor=no;
-fi
-rm -f conftest*])
-
-AM_CONDITIONAL(HAVE_ARMV7, test x"$acnewlib_cv_armv7_processor" = x"yes")
-
 AC_SUBST(CFLAGS)
 
 AC_CONFIG_FILES([Makefile])

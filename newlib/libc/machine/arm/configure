@@ -565,8 +565,6 @@ ac_unique_file="Makefile.am"
 ac_subst_vars='LTLIBOBJS
 LIBOBJS
 CFLAGS
-HAVE_ARMV7_FALSE
-HAVE_ARMV7_TRUE
 OPT_SIZE_FALSE
 OPT_SIZE_TRUE
 HAVE_THUMB1_FALSE
@@ -3501,48 +3499,6 @@ else
 fi
 
 
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether armv7 processor is supported" >&5
-$as_echo_n "checking whether armv7 processor is supported... " >&6; }
-if ${acnewlib_cv_armv7_processor+:} false; then :
-  $as_echo_n "(cached) " >&6
-else
-  cat > conftest.c <<EOF
-
-#if defined (_ISA_ARM_7) || defined (__ARM_ARCH_6T2__)
-  #define HAVE_ARMV7
- #else
-  #error "ARMV7 is not supported."
-#endif
-int main () {
-  return 0;
-}
-EOF
-if { ac_try='${CC} $CFLAGS $CPPFLAGS -c -o conftest.o conftest.c
-							1>&5'
-  { { eval echo "\"\$as_me\":${as_lineno-$LINENO}: \"$ac_try\""; } >&5
-  (eval $ac_try) 2>&5
-  ac_status=$?
-  $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
-  test $ac_status = 0; }; }
-then
-  acnewlib_cv_armv7_processor=yes;
-else
-  acnewlib_cv_armv7_processor=no;
-fi
-rm -f conftest*
-fi
-{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $acnewlib_cv_armv7_processor" >&5
-$as_echo "$acnewlib_cv_armv7_processor" >&6; }
-
- if test x"$acnewlib_cv_armv7_processor" = x"yes"; then
-  HAVE_ARMV7_TRUE=
-  HAVE_ARMV7_FALSE='#'
-else
-  HAVE_ARMV7_TRUE='#'
-  HAVE_ARMV7_FALSE=
-fi
-
-
 
 
 ac_config_files="$ac_config_files Makefile"
@@ -3739,10 +3695,6 @@ Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${OPT_SIZE_TRUE}" && test -z "${OPT_SIZE_FALSE}"; then
   as_fn_error $? "conditional \"OPT_SIZE\" was never defined.
-Usually this means the macro was only invoked conditionally." "$LINENO" 5
-fi
-if test -z "${HAVE_ARMV7_TRUE}" && test -z "${HAVE_ARMV7_FALSE}"; then
-  as_fn_error $? "conditional \"HAVE_ARMV7\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 

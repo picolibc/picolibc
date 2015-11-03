@@ -21,31 +21,26 @@ STRLEN_SRC=strlen.c
 STRLEN_OBJ=$(lpfx)strlen.o
 endif
 
-if HAVE_ARMV7
-MEMCHR_SRC=memchr.S
-MEMCHR_OBJ=$(lpfx)memchr.o
-else
-MEMCHR_SRC=
-MEMCHR_OBJ=
-endif
-
 lib_a_SOURCES = setjmp.S access.c strcmp.S strcpy.c \
-		$(MEMCHR_SRC) $(STRLEN_SRC) \
+		$(STRLEN_SRC) \
 		strlen-armv7.S aeabi_memcpy.c aeabi_memcpy-armv7a.S \
 		aeabi_memmove.c aeabi_memmove-soft.S \
 		aeabi_memset.c aeabi_memset-soft.S aeabi_memclr.c
+lib_a_SOURCES += memchr-stub.c
+lib_a_SOURCES += memchr.S
 lib_a_SOURCES += memcpy-stub.c
 lib_a_SOURCES += memcpy.S
 
 lib_a_CCASFLAGS=$(AM_CCASFLAGS)
 lib_a_CFLAGS = $(AM_CFLAGS)
-lib_a_LIBADD = $(STRLEN_OBJ) $(MEMCHR_OBJ)
+lib_a_LIBADD = $(STRLEN_OBJ)
 
-lib_a_DEPENDENCIES = $(STRLEN_OBJ) $(MEMCHR_OBJ)
+lib_a_DEPENDENCIES = $(STRLEN_OBJ)
 
 ACLOCAL_AMFLAGS = -I ../../.. -I ../../../..
 CONFIG_STATUS_DEPENDENCIES = $(newlib_basedir)/configure.host
 
+MEMCHR_DEP=acle-compat.h arm_asm.h
 MEMCPY_DEP=memcpy-armv7a.S memcpy-armv7m.S
 STRCMP_DEP=strcmp-arm-tiny.S strcmp-armv4.S strcmp-armv4t.S strcmp-armv6.S \
 	strcmp-armv6m.S strcmp-armv7.S strcmp-armv7m.S
@@ -53,6 +48,9 @@ AEABI_MEMMOVE_DEP=aeabi_memmove-thumb.S aeabi_memmove-thumb2.S \
 	aeabi_memmove-arm.S
 AEABI_MEMSET_DEP=aeabi_memset-thumb.S aeabi_memset-thumb2.S \
 	aeabi_memset-arm.S
+
+$(lpfx)memchr.o: $(MEMCHR_DEP)
+$(lpfx)memchr.obj: $(MEMCHR_DEP)
 
 $(lpfx)memcpy.o: $(MEMCPY_DEP)
 

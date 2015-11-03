@@ -1,5 +1,15 @@
 2015-11-06  Marcus Shawcroft  <marcus.shawcroft@arm.com>
 
+	* libc/machine/arm/Makefile.am: Drop MEMCHR_SRC and MEMCHR_OBJ.
+	* libc/machine/arm/Makefile.in: Regenerate.
+	* libc/machine/arm/memchr-stub.c: New.
+	* libc/machine/arm/memchr.S: Adjust comments.  Include memchr.c and
+	acle-compat.h.  Make .arch directive architecture dependent.
+	* libc/machine/arm/configure.in (HAVE_ARMV7): Remove.
+	* libc/machine/arm/configure: Regenerate.
+
+2015-11-06  Marcus Shawcroft  <marcus.shawcroft@arm.com>
+
 	* libc/machine/arm/Makefile.am: Drop MEMCPY_SRC and MEMCPY_OBJ.
 	* libc/machine/arm/Makefile.in: Regenerate.
 	* libc/machine/arm/configure.in: Remove HAVE_ARMV8A, HAVE_ARMV7A and
