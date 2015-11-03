@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013 ARM Ltd
+ * Copyright (c) 2013-2015 ARM Ltd
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -40,7 +40,8 @@
      lib_a-memcpy.o to be generated.
   */
 
-#elif defined (__ARM_ARCH_7A__) && defined (__ARM_FEATURE_UNALIGNED)
+#elif (__ARM_ARCH >= 7 && __ARM_ARCH_PROFILE == 'A' \
+       && defined (__ARM_FEATURE_UNALIGNED))
 #include "memcpy-armv7a.S"
 
 #elif defined (__ARM_ARCH_7M__) || defined (__ARM_ARCH_7EM__)

@@ -567,6 +567,8 @@ LIBOBJS
 CFLAGS
 HAVE_ARMV7M_FALSE
 HAVE_ARMV7M_TRUE
+HAVE_ARMV8A_FALSE
+HAVE_ARMV8A_TRUE
 HAVE_ARMV7A_FALSE
 HAVE_ARMV7A_TRUE
 HAVE_ARMV7_FALSE
@@ -3589,6 +3591,48 @@ else
 fi
 
 
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether armv8a processor is supported" >&5
+$as_echo_n "checking whether armv8a processor is supported... " >&6; }
+if ${acnewlib_cv_armv8a_processor+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  cat > conftest.c <<EOF
+
+#if defined (__ARM_ARCH_8A__) && defined (__ARM_FEATURE_UNALIGNED)
+  #define HAVE_ARMV8A
+ #else
+  #error "ARMV8A is not supported."
+#endif
+int main () {
+  return 0;
+}
+EOF
+if { ac_try='${CC} $CFLAGS $CPPFLAGS -c -o conftest.o conftest.c
+							1>&5'
+  { { eval echo "\"\$as_me\":${as_lineno-$LINENO}: \"$ac_try\""; } >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
+  test $ac_status = 0; }; }
+then
+  acnewlib_cv_armv8a_processor=yes;
+else
+  acnewlib_cv_armv8a_processor=no;
+fi
+rm -f conftest*
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $acnewlib_cv_armv8a_processor" >&5
+$as_echo "$acnewlib_cv_armv8a_processor" >&6; }
+
+ if test x"$acnewlib_cv_armv8a_processor" = x"yes"; then
+  HAVE_ARMV8A_TRUE=
+  HAVE_ARMV8A_FALSE='#'
+else
+  HAVE_ARMV8A_TRUE='#'
+  HAVE_ARMV8A_FALSE=
+fi
+
+
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether armv7m processor is supported" >&5
 $as_echo_n "checking whether armv7m processor is supported... " >&6; }
 if ${acnewlib_cv_armv7m_processor+:} false; then :
@@ -3835,6 +3879,10 @@ Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${HAVE_ARMV7A_TRUE}" && test -z "${HAVE_ARMV7A_FALSE}"; then
   as_fn_error $? "conditional \"HAVE_ARMV7A\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${HAVE_ARMV8A_TRUE}" && test -z "${HAVE_ARMV8A_FALSE}"; then
+  as_fn_error $? "conditional \"HAVE_ARMV8A\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${HAVE_ARMV7M_TRUE}" && test -z "${HAVE_ARMV7M_FALSE}"; then

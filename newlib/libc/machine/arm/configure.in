@@ -111,6 +111,31 @@ rm -f conftest*])
 
 AM_CONDITIONAL(HAVE_ARMV7A, test x"$acnewlib_cv_armv7a_processor" = x"yes")
 
+dnl Check for whether ARM_ARCH_8A is defined.
+AC_CACHE_CHECK(whether armv8a processor is supported,
+	       acnewlib_cv_armv8a_processor, [dnl
+cat > conftest.c <<EOF
+
+#if defined (__ARM_ARCH_8A__) && defined (__ARM_FEATURE_UNALIGNED)
+  #define HAVE_ARMV8A
+ #else
+  #error "ARMV8A is not supported."
+#endif
+int main () {
+  return 0;
+}
+EOF
+if AC_TRY_COMMAND([${CC} $CFLAGS $CPPFLAGS -c -o conftest.o conftest.c
+							1>&AS_MESSAGE_LOG_FD])
+then
+  acnewlib_cv_armv8a_processor=yes;
+else
+  acnewlib_cv_armv8a_processor=no;
+fi
+rm -f conftest*])
+
+AM_CONDITIONAL(HAVE_ARMV8A, test x"$acnewlib_cv_armv8a_processor" = x"yes")
+
 dnl Check for whether ARM_ARCH_7M is defined.
 AC_CACHE_CHECK(whether armv7m processor is supported,
 	       acnewlib_cv_armv7m_processor, [dnl

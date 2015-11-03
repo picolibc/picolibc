@@ -33,6 +33,10 @@ if OPT_SIZE
 MEMCPY_SRC=
 MEMCPY_OBJ=
 else
+if HAVE_ARMV8A
+MEMCPY_SRC=memcpy.S
+MEMCPY_OBJ=$(lpfx)memcpy.o
+else
 if HAVE_ARMV7A
 MEMCPY_SRC=memcpy.S
 MEMCPY_OBJ=$(lpfx)memcpy.o
@@ -45,6 +49,7 @@ MEMCPY_SRC=
 MEMCPY_OBJ=
 endif !HAVE_ARMV7M
 endif !HAVE_ARMV7A
+endif !HAVE_ARMV8A
 endif !OPT_SIZE
 
 lib_a_SOURCES = setjmp.S access.c strcmp.S strcpy.c \
