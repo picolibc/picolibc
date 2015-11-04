@@ -371,6 +371,8 @@ fs_info::update (PUNICODE_STRING upath, HANDLE in_vol)
 	  /* AFSRDRFsd == Andrew File System.  Doesn't support DOS attributes.
 	     Only native symlinks are supported. */
 	  && !is_afs (RtlEqualUnicodeString (&fsname, &ro_u_afs, FALSE))
+	  /* PrlSF == Parallels Desktop File System.  Has a bug in
+	     FileNetworkOpenInformation, see below. */
 	  && !is_prlfs (RtlEqualUnicodeString (&fsname, &ro_u_prlfs, FALSE)))
 	{
 	  /* Known remote file system with buggy open calls.  Further
