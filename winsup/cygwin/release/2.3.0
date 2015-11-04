@@ -60,5 +60,8 @@ Bug Fixes
 
 - Fix pthread_kill(3) to return errno instead of -1.
 
+- Remove lingering pending signals after a thread exited.
+  Addresses: https://cygwin.com/ml/cygwin/2015-09/msg00197.html
+
 - Workaround a bug in Windows 10 NLS handling.
   Addresses: https://cygwin.com/ml/cygwin/2015-10/msg00547.html
