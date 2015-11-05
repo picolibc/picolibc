@@ -182,8 +182,7 @@ fs_info::update (PUNICODE_STRING upath, HANDLE in_vol)
 
   clear ();
   /* Always caseinsensitive.  We really just need access to the drive. */
-  InitializeObjectAttributes (&attr, upath, OBJ_CASE_INSENSITIVE, NULL,
-			      NULL);
+  InitializeObjectAttributes (&attr, upath, OBJ_CASE_INSENSITIVE, NULL, NULL);
   if (in_vol)
     vol = in_vol;
   else
@@ -232,6 +231,33 @@ fs_info::update (PUNICODE_STRING upath, HANDLE in_vol)
   uint32_t hash = 0;
   if (NT_SUCCESS (status))
     {
+      /* If the FS doesn't return a valid serial number (PrlSF is a candidate),
+	 create reproducible serial number from path.  We need this to create
+	 a unique per-drive/share hash. */
+      if (ffvi_buf.ffvi.VolumeSerialNumber == 0)
+	{
+	  UNICODE_STRING path_prefix;
+	  WCHAR *p;
+
+	  if (upath->Buffer[5] == L':' && upath->Buffer[6] == L'\\')
+	    p = upath->Buffer + 6;
+	  else
+	    {
+	      /* We're expecting an UNC path.  Move p to the backslash after
+	         "\??\UNC\server\share" or the trailing NUL. */
+	      p = upath->Buffer + 7;  /* Skip "\??\UNC" */
+	      int bs_cnt = 0;
+
+	      while (*++p)
+		if (*p == L'\\')
+		    if (++bs_cnt > 1)
+		      break;
+	    }
+	  RtlInitCountedUnicodeString (&path_prefix, upath->Buffer,
+				       (p - upath->Buffer) * sizeof (WCHAR));
+	  ffvi_buf.ffvi.VolumeSerialNumber = hash_path_name ((ino_t) 0,
+							     &path_prefix);
+	}
       fs_info *fsi = fsi_cache.search (&ffvi_buf.ffvi, hash);
       if (fsi)
 	{
