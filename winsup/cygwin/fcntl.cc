@@ -1,7 +1,7 @@
 /* fcntl.cc: fcntl syscall
 
    Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2005, 2008, 2009,
-   2010, 2011, 2012, 2013, 2014 Red Hat, Inc.
+   2010, 2011, 2012, 2013, 2014, 2015 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -32,7 +32,9 @@ fcntl64 (int fd, int cmd, ...)
     {
 
       debug_printf ("fcntl(%d, %d, ...)", fd, cmd);
-      cygheap_fdget cfd (fd, true);
+
+      /* Don't lock the fd table when performing locking calls. */
+      cygheap_fdget cfd (fd, cmd < F_GETLK || cmd > F_SETLKW);
       if (cfd < 0)
 	__leave;
 
