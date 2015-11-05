@@ -1,3 +1,10 @@
+2015-11-05  Corinna Vinschen  <corinna@vinschen.de>
+
+	* sigproc.cc (pending_signals::clear): Yet another fix to fix the fix.
+	Actually iterate over the list of pending signals even if there's a
+	signal which doesn't have to be cleared.  Other than that, revert loop
+	to it's former self as a while loop.
+
 2015-11-04  Corinna Vinschen  <corinna@vinschen.de>
 
 	* globals.cc (ro_u_prlfs): Add trailing NUL.  Explain why.
