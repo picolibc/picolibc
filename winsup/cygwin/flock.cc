@@ -1,6 +1,6 @@
 /* flock.cc.  NT specific implementation of advisory file locking.
 
-   Copyright 2003, 2008, 2009, 2010, 2011, 2012, 2013, 2014 Red Hat, Inc.
+   Copyright 2003, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015 Red Hat, Inc.
 
    This file is part of Cygwin.
 
@@ -1773,7 +1773,7 @@ flock (int fd, int operation)
 
   __try
     {
-      cygheap_fdget cfd (fd, true);
+      cygheap_fdget cfd (fd);
       if (cfd < 0)
 	__leave;
 
@@ -1817,7 +1817,7 @@ lockf (int filedes, int function, off_t size)
 
   __try
     {
-      cygheap_fdget cfd (filedes, true);
+      cygheap_fdget cfd (filedes);
       if (cfd < 0)
 	__leave;
 

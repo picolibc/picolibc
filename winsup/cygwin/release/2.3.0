@@ -65,3 +65,6 @@ Bug Fixes
 
 - Workaround a bug in Windows 10 NLS handling.
   Addresses: https://cygwin.com/ml/cygwin/2015-10/msg00547.html
+
+- Avoid unnecessry locking and thus a potential deadlock in flock(2).
+  Addresses: https://cygwin.com/ml/cygwin/2015-11/msg00095.html
