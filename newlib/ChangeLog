@@ -1,5 +1,10 @@
 2015-11-06  Jon Turney  <jon.turney@dronecode.org.uk>
 
+	* doc/makedoc.c (iscommand): Only allow commands to have trailing
+	spaces, not space separated words.
+
+2015-11-06  Jon Turney  <jon.turney@dronecode.org.uk>
+
 	* libm/mathfp/s_acos.c: Fix QUICKREF.
 	* libm/mathfp/e_acosh.c: Ditto.
 	* libm/math/w_asin.c: Ditto.

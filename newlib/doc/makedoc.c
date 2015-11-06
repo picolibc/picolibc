@@ -777,14 +777,18 @@ DEFUN( iscommand,(ptr, idx),
       unsigned int idx)
 {
     unsigned int len = 0;
-    while (at(ptr,idx)) {
-	    if (isupper(at(ptr,idx)) || at(ptr,idx) == ' ' ||
-		at(ptr,idx) == '_') 
-	    {
+
+    while (isupper(at(ptr,idx)) || at(ptr,idx) == '_') {
 	     len++;
 	     idx++;
-	 }
-	    else if(at(ptr,idx) == '\n')
+    }
+
+    while (at(ptr,idx) == ' ') {
+	     len++;
+	     idx++;
+    }
+
+    if(at(ptr,idx) == '\n')
 	    {
 		/* The length check will never fail on a real command
 		 * because the commands are screened as the definitions file
@@ -792,8 +796,7 @@ DEFUN( iscommand,(ptr, idx),
 		if (len >= MIN_CMDLEN) return 1;
 		return 0;
 	    }
-	    else return 0;
-	}
+
     return 0;
 
 }
