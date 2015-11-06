@@ -1,3 +1,8 @@
+2015-11-12  Marcus Shawcroft  <marcus.shawcroft@arm.com>
+
+	* testsuite/lib/flags.exp (libgloss_link_flags): Drop multilibtop
+	from target_build_path.
+
 2015-11-06  Jon Turney  <jon.turney@dronecode.org.uk>
 
 	* doc/makedoc.c (iscommand): Only allow commands to have trailing

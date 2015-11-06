@@ -36,7 +36,7 @@ proc libgloss_link_flags { args } {
 	return ""
     }
 
-    set target_build_path "$objdir/$multibuildtop.."
+    set target_build_path "$objdir/.."
 
     set gloss_srcdir [lookfor_file ${srcdir} libgloss/$target_cpu]
 
