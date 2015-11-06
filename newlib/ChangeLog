@@ -1,3 +1,8 @@
+2015-11-12  Wilco Dijkstra  <wdijkstr@arm.com>
+
+	* newlib/libc/machine/aarch64/memcpy.S (memcpy): Further tuning for
+	performance.
+
 2015-11-12  Joseph Myers  <joseph@codesourcery.com>
 
 	* libc/machine/arm/strcmp-arm-tiny.S: Use .cfi_sections
