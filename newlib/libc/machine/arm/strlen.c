@@ -65,7 +65,7 @@ strlen (const char* str)
 
 #else /* defined __OPTIMIZE_SIZE__ || defined PREFER_SIZE_OVER_SPEED */
 #if defined __thumb__ && ! defined __thumb2__
-  /* Implemented in ../../string/strlen.c.  */
+#include "../../string/strlen.c"
 
 #elif defined _ISA_ARM_7 || defined __ARM_ARCH_6T2__
   /* Implemented in strlen-armv7.S.  */

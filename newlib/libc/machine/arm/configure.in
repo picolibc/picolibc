@@ -10,56 +10,6 @@ AC_CONFIG_AUX_DIR(../../../..)
 
 NEWLIB_CONFIGURE(../../..)
 
-dnl Check for Thumb1 supported.
-AC_CACHE_CHECK(whether we are using thumb1,
-	       acnewlib_cv_thumb1_processor, [dnl
-cat > conftest.c <<EOF
-
-#if defined (__thumb__) && !defined (__thumb2__)
-  #define _THUMB1
- #else
-  #error "not thumb1"
-#endif
-int main () {
-  return 0;
-}
-EOF
-if AC_TRY_COMMAND([${CC} $CFLAGS $CPPFLAGS -c -o conftest.o conftest.c
-							1>&AS_MESSAGE_LOG_FD])
-then
-  acnewlib_cv_thumb1_processor=yes;
-else
-  acnewlib_cv_thumb1_processor=no;
-fi
-rm -f conftest*])
-
-AM_CONDITIONAL(HAVE_THUMB1, test x"$acnewlib_cv_thumb1_processor" = x"yes")
-
-dnl Check for whether the size is preferred.
-AC_CACHE_CHECK(whether the size is preferred,
-	       acnewlib_cv_opt_size, [dnl
-cat > conftest.c <<EOF
-
-#if defined (__OPTIMIZE_SIZE__) || defined (PREFER_SIZE_OVER_SPEED)
-  #define OPT_SIZE
- #else
-  #error "not need for size optimization."
-#endif
-int main () {
-  return 0;
-}
-EOF
-if AC_TRY_COMMAND([${CC} $CFLAGS $CPPFLAGS -c -o conftest.o conftest.c
-							1>&AS_MESSAGE_LOG_FD])
-then
-  acnewlib_cv_opt_size=yes;
-else
-  acnewlib_cv_opt_size=no;
-fi
-rm -f conftest*])
-
-AM_CONDITIONAL(OPT_SIZE, test x"$acnewlib_cv_opt_size" = x"yes")
-
 AC_SUBST(CFLAGS)
 
 AC_CONFIG_FILES([Makefile])

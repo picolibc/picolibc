@@ -1,5 +1,14 @@
 2015-11-13  Marcus Shawcroft  <marcus.shawcroft@arm.com>
 
+	* libc/machine/arm/Makefile.am: Drop STRLEN_SRC and STRLEN_OBJ.
+	Adding strlen.c.
+	* libc/machine/arm/configure.in (HAVE_THUMB1, OPT_SIZE): Remove.
+	* libc/machine/arm/strlen.c: Include ../../string/strlen.c.
+	* libc/machine/arm/configure: Regenerate.
+	* libc/machine/arm/Makefile.in: Regenerate.
+
+2015-11-13  Marcus Shawcroft  <marcus.shawcroft@arm.com>
+
 	* libc/machine/arm/strlen.c: Refactor nested #if.
 
 2015-11-12  Anton Kolesov  <Anton.Kolesov@synopsys.com>
