@@ -1,3 +1,7 @@
+2015-11-13  Marcus Shawcroft  <marcus.shawcroft@arm.com>
+
+	* libc/machine/arm/strlen.c: Refactor nested #if.
+
 2015-11-12  Anton Kolesov  <Anton.Kolesov@synopsys.com>
 
 	* configure.host: Add ARC support.
