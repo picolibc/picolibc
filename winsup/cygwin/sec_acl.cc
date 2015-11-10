@@ -1019,8 +1019,17 @@ get_posix_access (PSECURITY_DESCRIPTOR psd,
 	  {
 	    mode_t perm;
 
-	    /* If we use the Windows user DB, utilize Authz to make sure all
-	       user permissions are correctly reflecting the Windows
+	    /* Don't merge if the user already has all permissions, or... */
+	    if (lacl[idx].a_perm == S_IRWXO)
+	      continue;
+	    /* ...if the sum of perms is less than or equal the user's perms. */
+	    perm = lacl[idx].a_perm
+		   | (has_class_perm ? class_perm : lacl[1].a_perm)
+		   | lacl[2].a_perm;
+	    if (perm == lacl[idx].a_perm)
+	      continue;
+	    /* Otherwise, if we use the Windows user DB, utilize Authz to make
+	       sure all user permissions are correctly reflecting the Windows
 	       permissions. */
 	    if (cygheap->pg.nss_pwd_db ()
 		&& authz_get_user_attribute (&perm, psd, aclsid[idx]))

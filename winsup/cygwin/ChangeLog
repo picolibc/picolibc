@@ -1,5 +1,11 @@
 2015-11-18  Corinna Vinschen  <corinna@vinschen.de>
 
+	* sec_acl.cc (get_posix_access): Skip merging permissions if current
+	user has rwx permissions anywa, or if the sum of all group and other
+	permissions is less than or equal to the user's permissions.
+
+2015-11-18  Corinna Vinschen  <corinna@vinschen.de>
+
 	* sec_acl.cc (get_posix_access): Fix computation of effective user
 	permissions to handle current user, not only the file owner.
 
