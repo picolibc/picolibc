@@ -1,5 +1,11 @@
 2015-11-13  Marcus Shawcroft  <marcus.shawcroft@arm.com>
 
+	* libc/machine/arm/strlen-stub.c: Move T1 -O2 implementation to...
+	* libc/machine/arm/strlen-thumb1-Os.S: New file.
+	* libc/machine/arm/strlen.S: Include strlen-thumb1-Os.S.
+
+2015-11-13  Marcus Shawcroft  <marcus.shawcroft@arm.com>
+
 	* libc/machine/arm/Makefile.am: Adding strlen.S.
 	* libc/machine/arm/Makefile.in: Regenerate.
 	* libc/machine/arm/strlen.S: New.

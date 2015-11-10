@@ -33,20 +33,7 @@
 
 #if defined __OPTIMIZE_SIZE__ || defined PREFER_SIZE_OVER_SPEED
 #if defined __thumb__ && !defined __thumb2__
-size_t
-strlen (const char* str)
-{
-  int scratch;
-  size_t len;
-  asm ("mov	%0, #0\n"
-       "1:\n\t"
-       "ldrb	%1, [%2, %0]\n\t"
-       "add	%0, %0, #1\n\t"
-       "cmp	%1, #0\n\t"
-       "bne	1b"
-       : "=&r" (len), "=&r" (scratch) : "r" (str) : "memory", "cc");
-  return len - 1;
-}
+/* Implemented in strlen.S.  */
 
 #else
 size_t

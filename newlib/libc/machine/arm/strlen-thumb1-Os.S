@@ -24,25 +24,27 @@
    (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
    OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.  */
 
-#include "acle-compat.h"
+	.macro def_fn f p2align=0
+	.text
+	.p2align \p2align
+	.global \f
+	.type \f, %function
+\f:
+	.endm
 
-#if defined __OPTIMIZE_SIZE__ || defined PREFER_SIZE_OVER_SPEED
-#if defined __thumb__ && !defined __thumb2__
-#include "strlen-thumb1-Os.S"
+	.arch	armv4t
+	.eabi_attribute Tag_also_compatible_with, "\006\013" /* ARMv6-M.  */
+	.eabi_attribute Tag_ARM_ISA_use, 0
+	.thumb
+	.syntax unified
 
-#else
-  /* Implemented in strlen-stub.c.  */
-
-#endif
-
-#else /* defined __OPTIMIZE_SIZE__ || defined PREFER_SIZE_OVER_SPEED */
-#if defined __thumb__ && ! defined __thumb2__
-  /* Implemented in strlen-stub.c.  */
-
-#elif (__ARM_ARCH >= 7 && defined __ARM_ARCH_ISA_ARM) || defined __ARM_ARCH_6T2__
-#include "strlen-armv7.S"
-
-#else
-  /* Implemented in strlen-stub.c.  */
-#endif
-#endif
+def_fn	strlen p2align=1
+	movs	r3, #0
+1:
+	ldrb	r2, [r0, r3]
+	adds	r3, r3, #1
+	cmp	r2, #0
+	bne	1b
+	subs	r0, r3, #1
+	bx	lr
+	.size	strlen, . - strlen
