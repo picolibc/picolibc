@@ -1,5 +1,10 @@
 2015-11-18  Corinna Vinschen  <corinna@vinschen.de>
 
+	* sec_acl.cc (get_posix_access): Fix computation of effective user
+	permissions to handle current user, not only the file owner.
+
+2015-11-18  Corinna Vinschen  <corinna@vinschen.de>
+
 	* fhandler_tty.cc (fhandler_pty_slave::open): Add S_IFCHR flag
 	in call to create_object_sd_from_attribute.
 	(fhandler_pty_slave::fstat): Ditto in call to get_object_attribute.
