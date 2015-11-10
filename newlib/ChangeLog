@@ -1,5 +1,13 @@
 2015-11-13  Marcus Shawcroft  <marcus.shawcroft@arm.com>
 
+	* libc/machine/arm/Makefile.am: Adding strlen.S.
+	* libc/machine/arm/Makefile.in: Regenerate.
+	* libc/machine/arm/strlen.S: New.
+	* libc/machine/arm/strlen-stub.c: Rewrite #if condition.
+	* libc/machine/arm/strlen-armv7.S: Remove surrounding #if.
+
+2015-11-13  Marcus Shawcroft  <marcus.shawcroft@arm.com>
+
 	* libc/machine/arm/Makefile.am: Rename strlen.c to strlen-stub.c
 	* libc/machine/arm/Makefile.in: Regenerate.
 	* libc/machine/arm/strlen.c: Rename to...

@@ -34,13 +34,6 @@
 
 #include "arm_asm.h"
 
-/* NOTE: This ifdef MUST match the ones in arm/strlen.c
-   We fallback to the one in arm/strlen.c for size optimised or
-   for older architectures. */
-#if (defined(_ISA_ARM_7) || defined(__ARM_ARCH_6T2__)) && \
-    !(defined (__OPTIMIZE_SIZE__) || defined (PREFER_SIZE_OVER_SPEED) || \
-      (defined (__thumb__) && !defined (__thumb2__)))
-
 	.macro def_fn f p2align=0
 	.text
 	.p2align \p2align
@@ -153,5 +146,3 @@ def_fn	strlen p2align=6
 	mov	const_0, #0
 	b	.Lstart_realigned
 	.size	strlen, . - strlen
-
-#endif

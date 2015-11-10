@@ -67,8 +67,8 @@ strlen (const char* str)
 #if defined __thumb__ && ! defined __thumb2__
 #include "../../string/strlen.c"
 
-#elif defined _ISA_ARM_7 || defined __ARM_ARCH_6T2__
-  /* Implemented in strlen-armv7.S.  */
+#elif (__ARM_ARCH >= 7 && defined __ARM_ARCH_ISA_ARM) || defined __ARM_ARCH_6T2__
+  /* Implemented in strlen.S.  */
 
 #else
 size_t __attribute__((naked))
