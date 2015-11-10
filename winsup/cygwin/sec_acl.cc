@@ -1023,8 +1023,8 @@ get_posix_access (PSECURITY_DESCRIPTOR psd,
 	       user permissions are correctly reflecting the Windows
 	       permissions. */
 	    if (cygheap->pg.nss_pwd_db ()
-		&& authz_get_user_attribute (&perm, psd, owner_sid))
-	      lacl[0].a_perm = perm;
+		&& authz_get_user_attribute (&perm, psd, aclsid[idx]))
+	      lacl[idx].a_perm = perm;
 	    /* Otherwise we only check the current user.  If the user entry
 	       has a deny ACE, don't check. */
 	    else if (lacl[idx].a_id == myself->uid
