@@ -1,5 +1,12 @@
 2015-11-13  Marcus Shawcroft  <marcus.shawcroft@arm.com>
 
+	* libc/machine/arm/Makefile.am: Rename strlen.c to strlen-stub.c
+	* libc/machine/arm/Makefile.in: Regenerate.
+	* libc/machine/arm/strlen.c: Rename to...
+	* libc/machine/arm/strlen-stub.c: ... this.
+
+2015-11-13  Marcus Shawcroft  <marcus.shawcroft@arm.com>
+
 	* libc/machine/arm/Makefile.am: Drop STRLEN_SRC and STRLEN_OBJ.
 	Adding strlen.c.
 	* libc/machine/arm/configure.in (HAVE_THUMB1, OPT_SIZE): Remove.

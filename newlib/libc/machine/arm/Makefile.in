@@ -78,7 +78,7 @@ am_lib_a_OBJECTS = lib_a-setjmp.$(OBJEXT) lib_a-access.$(OBJEXT) \
 	lib_a-aeabi_memset.$(OBJEXT) lib_a-aeabi_memset-soft.$(OBJEXT) \
 	lib_a-aeabi_memclr.$(OBJEXT) lib_a-memchr-stub.$(OBJEXT) \
 	lib_a-memchr.$(OBJEXT) lib_a-memcpy-stub.$(OBJEXT) \
-	lib_a-memcpy.$(OBJEXT) lib_a-strlen.$(OBJEXT)
+	lib_a-memcpy.$(OBJEXT) lib_a-strlen-stub.$(OBJEXT)
 lib_a_OBJECTS = $(am_lib_a_OBJECTS)
 DEFAULT_INCLUDES = -I.@am__isrc@
 depcomp =
@@ -209,7 +209,7 @@ lib_a_SOURCES = setjmp.S access.c strcmp.S strcpy.c strlen-armv7.S \
 	aeabi_memcpy.c aeabi_memcpy-armv7a.S aeabi_memmove.c \
 	aeabi_memmove-soft.S aeabi_memset.c aeabi_memset-soft.S \
 	aeabi_memclr.c memchr-stub.c memchr.S memcpy-stub.c memcpy.S \
-	strlen.c
+	strlen-stub.c
 lib_a_CCASFLAGS = $(AM_CCASFLAGS)
 lib_a_CFLAGS = $(AM_CFLAGS)
 ACLOCAL_AMFLAGS = -I ../../.. -I ../../../..

@@ -16,7 +16,7 @@ lib_a_SOURCES += memchr-stub.c
 lib_a_SOURCES += memchr.S
 lib_a_SOURCES += memcpy-stub.c
 lib_a_SOURCES += memcpy.S
-lib_a_SOURCES += strlen.c
+lib_a_SOURCES += strlen-stub.c
 
 lib_a_CCASFLAGS=$(AM_CCASFLAGS)
 lib_a_CFLAGS = $(AM_CFLAGS)
