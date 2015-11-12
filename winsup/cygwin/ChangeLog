@@ -1,5 +1,10 @@
 2015-11-12  Corinna Vinschen  <corinna@vinschen.de>
 
+	* flock.cc (lockf_t::create_lock_obj): Correctly recreate lock object
+	attributes anew in each loop.
+
+2015-11-12  Corinna Vinschen  <corinna@vinschen.de>
+
 	* init.cc (munge_threadfunc): Don't call NtQueryInformationThread with
 	ThreadQuerySetWin32StartAddress info class on XP 64 and Server 2003 64.
 	It crashes.
