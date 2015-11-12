@@ -167,39 +167,43 @@ DESCRIPTION
 	        o #
 			The result is to be converted to an
 			alternative form, according to the <[type]>
-			character:
-
-			o+
-			o o
-				Increases precision to force the first
-				digit of the result to be a zero.
-
-			o x
-				A non-zero result will have a <<0x>>
-				prefix.
-
-			o X
-				A non-zero result will have a <<0X>>
-				prefix.
-
-			o a, A, e, E, f, or F
-				The result will always contain a
-			        decimal point even if no digits follow
-			        the point.  (Normally, a decimal point
-			        appears only if a digit follows it.)
-			        Trailing zeros are removed.
-
-			o g or G
-				The result will always contain a
-			        decimal point even if no digits follow
-			        the point.  Trailing zeros are not
-			        removed.
-
-			o all others
-				Undefined.
-
-			o-
+			character.
 		o-
+
+	The alternative form output with the # flag depends on the <[type]>
+	character:
+
+		o+
+		o o
+			Increases precision to force the first
+			digit of the result to be a zero.
+
+		o x
+			A non-zero result will have a <<0x>>
+			prefix.
+
+		o X
+			A non-zero result will have a <<0X>>
+			prefix.
+
+		o a, A, e, E, f, or F
+			The result will always contain a
+			decimal point even if no digits follow
+			the point.  (Normally, a decimal point
+			appears only if a digit follows it.)
+			Trailing zeros are removed.
+
+		o g or G
+			The result will always contain a
+			decimal point even if no digits follow
+			the point.  Trailing zeros are not
+			removed.
+
+		o all others
+			Undefined.
+
+		o-
+
 
 	o <[width]>
 

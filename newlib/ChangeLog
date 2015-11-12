@@ -1,5 +1,10 @@
 2015-11-12  Jon Turney  <jon.turney@dronecode.org.uk>
 
+	* libc/stdio/sprintf.c: Simplify documentation markup.
+	* libc/stdio/swprintf.c: Ditto.
+
+2015-11-12  Jon Turney  <jon.turney@dronecode.org.uk>
+
 	* libc/stdio/sscanf.c: Improve documentation markup.
 	* libc/stdio/swscanf.c: Ditto.
 
