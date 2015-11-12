@@ -57,9 +57,12 @@ munge_threadfunc ()
     {
       char *threadfunc = NULL;
 
-      NtQueryInformationThread (NtCurrentThread (),
-				ThreadQuerySetWin32StartAddress,
-				&threadfunc, sizeof threadfunc, NULL);
+      if (wincap.wow64_has_secondary_stack ())
+	threadfunc = ebp[threadfunc_ix[0]];
+      else
+	NtQueryInformationThread (NtCurrentThread (),
+				  ThreadQuerySetWin32StartAddress,
+				  &threadfunc, sizeof threadfunc, NULL);
       if (!search_for || threadfunc == search_for)
 	{
 	  search_for = NULL;

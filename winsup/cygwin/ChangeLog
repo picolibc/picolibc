@@ -1,3 +1,9 @@
+2015-11-12  Corinna Vinschen  <corinna@vinschen.de>
+
+	* init.cc (munge_threadfunc): Don't call NtQueryInformationThread with
+	ThreadQuerySetWin32StartAddress info class on XP 64 and Server 2003 64.
+	It crashes.
+
 2015-11-09  Corinna Vinschen  <corinna@vinschen.de>
 
 	* include/cygwin/version.h (CYGWIN_VERSION_DLL_MINOR): Bump to 1.
