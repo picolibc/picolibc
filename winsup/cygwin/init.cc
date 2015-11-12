@@ -57,6 +57,8 @@ munge_threadfunc ()
     {
       char *threadfunc = NULL;
 
+      /* This call to NtQueryInformationThread crashes under WOW64 on
+         64 bit XP and Server 2003. */
       if (wincap.wow64_has_secondary_stack ())
 	threadfunc = ebp[threadfunc_ix[0]];
       else
