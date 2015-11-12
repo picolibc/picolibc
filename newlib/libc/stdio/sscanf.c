@@ -132,12 +132,14 @@ DESCRIPTION
 
         Each format specification begins with the percent character (<<%>>).
         The other fields are:
-	o+
+	O+
 		o *
+
 		an optional marker; if present, it suppresses interpretation and
         assignment of this input field.
 
         o <[width]>
+
 		an optional maximum field width: a decimal integer,
 		which controls the maximum number of characters that
 		will be read before converting the current input field.  If the
@@ -150,58 +152,115 @@ DESCRIPTION
 		to that character are read, converted, and stored.
 		Then <<scanf>> proceeds to the next format specification.
 
-        o size
+        o <[size]>
+
 		<<h>>, <<j>>, <<l>>, <<L>>, <<t>>, and <<z>> are optional size
 		characters which override the default way that <<scanf>>
 		interprets the data type of the corresponding argument.
 
-
-.Modifier   Type(s)
-.   hh      d, i, o, u, x, n  convert input to char,
-.                             store in char object
-.
-.   h       d, i, o, u, x, n  convert input to short,
-.                             store in short object
-.
-.   h       D, I, O, U, X     no effect
-.           e, f, c, s, p
-.
-.   j       d, i, o, u, x, n  convert input to intmax_t,
-.                             store in intmax_t object
-.
-.   j       all others        no effect
-.
-.   l       d, i, o, u, x, n  convert input to long,
-.                             store in long object
-.
-.   l       e, f, g           convert input to double
-.                             store in a double object
-.
-.   l       D, I, O, U, X     no effect
-.           c, s, p
-.
-.   ll      d, i, o, u, x, n  convert to long long,
-.                             store in long long
-.
-.   L       d, i, o, u, x, n  convert to long long,
-.                             store in long long
-.
-.   L       e, f, g, E, G     convert to long double,
-.                             store in long double
-.
-.   L       all others        no effect
-.
-.   t       d, i, o, u, x, n  convert input to ptrdiff_t,
-.                             store in ptrdiff_t object
-.
-.   t       all others        no effect
-.
-.   z       d, i, o, u, x, n  convert input to size_t,
-.                             store in size_t object
-.
-.   z       all others        no effect
-.
-
+		@multitable @columnfractions 0.18 0.30 0.52
+		@headitem
+		Modifier
+		@tab
+		Type(s)
+		@tab
+		@item
+		hh
+		@tab
+		d, i, o, u, x, n
+		@tab
+		convert input to char, store in char object
+		@item
+		h
+		@tab
+		d, i, o, u, x, n
+		@tab
+		convert input to short, store in short object
+		@item
+		h
+		@tab
+		D, I, O, U, X, e, f, c, s, p
+		@tab
+		no effect
+		@item
+		j
+		@tab
+		d, i, o, u, x, n
+		@tab
+		convert input to intmax_t, store in intmax_t object
+		@item
+		j
+		@tab
+		all others
+		@tab
+		no effect
+		@item
+		l
+		@tab
+		d, i, o, u, x, n
+		@tab
+		convert input to long, store in long object
+		@item
+		l
+		@tab
+		e, f, g
+		@tab
+		convert input to double, store in a double object
+		@item
+		l
+		@tab
+		D, I, O, U, X, c, s, p
+		@tab
+		no effect
+		@item
+		ll
+		@tab
+		d, i, o, u, x, n
+		@tab
+		convert to long long, store in long long object
+		@item
+		L
+		@tab
+		d, i, o, u, x, n
+		@tab
+		convert to long long, store in long long object
+		@item
+		L
+		@tab
+		e, f, g, E, G
+		@tab
+		convert to long double, store in long double object
+		@item
+		L
+		@tab
+		all others
+		@tab
+		no effect
+		@item
+		t
+		@tab
+		d, i, o, u, x, n
+		@tab
+		convert input to ptrdiff_t, store in ptrdiff_t object
+		@item
+		t
+		@tab
+		all others
+		@tab
+		no effect
+		@item
+		z
+		@tab
+		d, i, o, u, x, n
+		@tab
+		convert input to size_t, store in size_t object
+		@item
+		z
+		@tab
+		all others
+		@tab
+		no effect
+		@end multitable
 
         o <[type]>
 
@@ -210,7 +269,7 @@ DESCRIPTION
                 characters:
 
 		o+
-		o  %
+		o %
 		No conversion is done; the percent character (<<%>>) is stored.
 
 		o c
@@ -220,7 +279,7 @@ DESCRIPTION
 		Reads a character string into the array supplied.
 		Corresponding <[arg]>: <<(char arg[])>>.
 
-		o  [<[pattern]>]
+		o [<[pattern]>]
 		Reads a non-empty character string into memory
 		starting at <[arg]>.  This area must be large
 		enough to accept the sequence and a
@@ -244,7 +303,6 @@ DESCRIPTION
 		o u
 		Reads an unsigned decimal integer into the corresponding
 		<[arg]>: <<(unsigned int *arg)>>.
-			
 
 		o U
 		Reads an unsigned decimal integer into the corresponding <[arg]>:
@@ -262,19 +320,19 @@ DESCRIPTION
 		Read a floating-point number into the corresponding <[arg]>:
 		<<(double *arg)>>.
 
-		o  i
+		o i
 		Reads a decimal, octal or hexadecimal integer into the
 		corresponding <[arg]>: <<(int *arg)>>.
 
-		o  I
+		o I
 		Reads a decimal, octal or hexadecimal integer into the
 		corresponding <[arg]>: <<(long *arg)>>.
 
-		o  n
+		o n
 		Stores the number of characters read in the corresponding
 		<[arg]>: <<(int *arg)>>.
 
-		o  p
+		o p
                 Stores a scanned pointer.  ANSI C leaves the details
 		to each implementation; this implementation treats
 		<<%p>> exactly the same as <<%U>>.  Corresponding
@@ -316,7 +374,7 @@ DESCRIPTION
 
 	where objects inclosed in square brackets are optional, and <<ddd>>
 	represents decimal, octal, or hexadecimal digits.
-	o-
+	O-
 
 RETURNS
         <<scanf>> returns the number of input fields successfully
