@@ -131,6 +131,7 @@ def_fn	strcmp
 	cmpcs	r2, r3
 	bne	.Lfastpath_exit
 #endif
+	.cfi_sections .debug_frame
 	.cfi_startproc
 	strd	r4, r5, [sp, #-16]!
 	.cfi_def_cfa_offset 16

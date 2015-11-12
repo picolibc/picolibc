@@ -53,6 +53,7 @@
 
 	.text
 def_fn	strcmp
+	.cfi_sections .debug_frame
 	.cfi_startproc
 	mov	r2, r0
 	push	{r4, r5, r6, lr}

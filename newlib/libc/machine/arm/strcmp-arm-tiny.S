@@ -31,6 +31,7 @@
 
 	.syntax unified
 def_fn strcmp
+	.cfi_sections .debug_frame
 	.cfi_startproc
 1:
 	ldrb	r2, [r0], #1

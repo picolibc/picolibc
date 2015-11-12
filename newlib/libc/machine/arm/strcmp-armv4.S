@@ -45,6 +45,7 @@
 
 	.arm
 def_fn strcmp
+	.cfi_sections .debug_frame
 	.cfi_startproc
 	eor	tmp1, src1, src2
 	tst	tmp1, #3

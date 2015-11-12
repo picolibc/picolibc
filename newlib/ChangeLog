@@ -1,3 +1,14 @@
+2015-11-12  Joseph Myers  <joseph@codesourcery.com>
+
+	* libc/machine/arm/strcmp-arm-tiny.S: Use .cfi_sections
+	.debug_frame.
+	* libc/machine/arm/strcmp-armv4.S: Likewise.
+	* libc/machine/arm/strcmp-armv4t.S: Likewise.
+	* libc/machine/arm/strcmp-armv6.S: Likewise.
+	* libc/machine/arm/strcmp-armv6m.S: Likewise.
+	* libc/machine/arm/strcmp-armv7.S: Likewise.
+	* libc/machine/arm/strcmp-armv7m.S: Likewise.
+
 2015-11-06  Marcus Shawcroft  <marcus.shawcroft@arm.com>
 
 	* libc/machine/arm/Makefile.am: Drop MEMCHR_SRC and MEMCHR_OBJ.

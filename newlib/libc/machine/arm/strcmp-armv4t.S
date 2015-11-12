@@ -36,6 +36,7 @@
 	.eabi_attribute Tag_also_compatible_with, "\006\013" /* ARMv6-M.  */
 	.eabi_attribute Tag_ARM_ISA_use, 0
 def_fn strcmp
+	.cfi_sections .debug_frame
 	.cfi_startproc
 1:
 	ldrb	r2, [r0]
