@@ -766,12 +766,12 @@ lockf_t::create_lock_obj ()
 {
   lockfattr_t attr;
   NTSTATUS status;
+  PSECURITY_DESCRIPTOR sd_buf = alloca (SD_MIN_SIZE);
   POBJECT_ATTRIBUTES lock_obj_attr;
 
-  lock_obj_attr = create_lock_obj_attr (&attr, OBJ_INHERIT,
-					alloca (SD_MIN_SIZE));
   do
     {
+      lock_obj_attr = create_lock_obj_attr (&attr, OBJ_INHERIT, sd_buf);
       status = NtCreateEvent (&lf_obj, CYG_EVENT_ACCESS, lock_obj_attr,
 			      NotificationEvent, FALSE);
       if (!NT_SUCCESS (status))
