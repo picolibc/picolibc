@@ -26,23 +26,29 @@
 
 #include "acle-compat.h"
 
-#if defined __OPTIMIZE_SIZE__ || defined PREFER_SIZE_OVER_SPEED
-#if defined __thumb__ && !defined __thumb2__
-#include "strlen-thumb1-Os.S"
+	.macro def_fn f p2align=0
+	.text
+	.p2align \p2align
+	.global \f
+	.type \f, %function
+\f:
+	.endm
 
+#if __ARM_ARCH_ISA_THUMB >= 2 && __ARM_ARCH >= 7
+	.arch   armv7
 #else
-#include "strlen-thumb2-Os.S"
-
+	.arch	armv6t2
 #endif
+	.eabi_attribute Tag_ARM_ISA_use, 0
+	.thumb
+	.syntax unified
 
-#else /* defined __OPTIMIZE_SIZE__ || defined PREFER_SIZE_OVER_SPEED */
-#if defined __thumb__ && ! defined __thumb2__
-  /* Implemented in strlen-stub.c.  */
-
-#elif (__ARM_ARCH >= 7 && defined __ARM_ARCH_ISA_ARM) || defined __ARM_ARCH_6T2__
-#include "strlen-armv7.S"
-
-#else
-  /* Implemented in strlen-stub.c.  */
-#endif
-#endif
+def_fn	strlen p2align=1
+	mov     r3, r0
+1:	ldrb.w  r2, [r3], #1
+	cmp     r2, #0
+	bne	1b
+	subs    r0, r3, r0
+	subs    r0, #1
+	bx      lr
+	.size	strlen, . - strlen

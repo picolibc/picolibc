@@ -36,18 +36,8 @@
 /* Implemented in strlen.S.  */
 
 #else
-size_t
-strlen (const char* str)
-{
-  int scratch;
-  const char* end;
-  asm ("1:\n\t"
-       "ldrb	%1, [%0], #1\n\t"
-       "cmp	%1, #0\n\t"
-       "bne	1b"
-       : "=&r" (end), "=&r" (scratch) : "0" (str) : "memory", "cc");
-  return end - str - 1;
-}
+/* Implemented in strlen.S.  */
+
 #endif
 
 #else /* defined __OPTIMIZE_SIZE__ || defined PREFER_SIZE_OVER_SPEED */
