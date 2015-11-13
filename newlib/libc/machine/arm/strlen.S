@@ -39,7 +39,7 @@
 #if defined __thumb__ && ! defined __thumb2__
   /* Implemented in strlen-stub.c.  */
 
-#elif (__ARM_ARCH >= 7 && defined __ARM_ARCH_ISA_ARM) || defined __ARM_ARCH_6T2__
+#elif __ARM_ARCH_ISA_THUMB >= 2 && defined __ARM_FEATURE_DSP
 #include "strlen-armv7.S"
 
 #else

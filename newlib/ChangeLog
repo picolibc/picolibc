@@ -1,5 +1,10 @@
 2015-11-23  Marcus Shawcroft  <marcus.shawcroft@arm.com>
 
+	* libc/machine/arm/strlen-stub.c: Adjust strlen-armv7.S selection logic.
+	* libc/machine/arm/strlen.S: Likewise.
+
+2015-11-23  Marcus Shawcroft  <marcus.shawcroft@arm.com>
+
 	* libc/machine/arm/strlen-stub.c: Move T2 -O2 implementation to...
 	* libc/machine/arm/strlen-thumb2-Os.S: New file.
 	* libc/machine/arm/strlen.S: Include strlen-thumb2-Os.S.
