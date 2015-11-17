@@ -1,3 +1,12 @@
+2015-11-17  Yaakov Selkowitz  <yselkowi@redhat.com>
+
+	* libc/include/stdlib.h (rpmatch): Declare.
+	* libc/stdlib/Makefile.am (ELIX_4_SOURCES): Add rpmatch.c.
+	(CHEWOUT_FILES): Add rpmatch.def.
+	* libc/stdlib/Makefile.in: Regenerate.
+	* libc/stdlib/rpmatch.c: New file.
+	* libc/stdlib/stdlib.tex: Add references to rpmatch.
+
 2015-11-13  Marcus Shawcroft  <marcus.shawcroft@arm.com>
 
 	* libc/machine/arm/strlen-stub.c: Move T1 -O2 implementation to...

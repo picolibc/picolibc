@@ -159,6 +159,7 @@ ELIX_3_SOURCES = \
 	setenv_r.c
 
 ELIX_4_SOURCES = \
+	rpmatch.c	\
 	system.c
 
 if ELIX_LEVEL_1
@@ -276,6 +277,7 @@ CHEWOUT_FILES= \
 	on_exit.def	\
 	rand.def	\
 	rand48.def	\
+	rpmatch.def	\
 	strtod.def 	\
 	strtol.def 	\
 	strtoll.def 	\
