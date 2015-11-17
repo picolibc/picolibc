@@ -1086,6 +1086,7 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     res_send
     revoke
     rexec
+    rpmatch
     rresvport
     rresvport_af
     ruserok

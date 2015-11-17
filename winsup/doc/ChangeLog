@@ -1,3 +1,8 @@
+2015-11-17  Yaakov Selkowitz  <yselkowi@redhat.com>
+
+	* new-features.xml (ov-new2.4): New section. Document rpmatch.
+	* posix.xml (std-bsd): Add rpmatch.
+
 2015-11-02  Corinna Vinschen  <corinna@vinschen.de>
 
 	* new-features.xml (ov-new2.3): Document Parallels Desktop FS support.

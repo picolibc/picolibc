@@ -1017,6 +1017,7 @@ rindex NOSIGFE
 rmdir SIGFE
 round NOSIGFE
 roundf NOSIGFE
+rpmatch SIGFE
 rresvport = cygwin_rresvport SIGFE
 rresvport_af = cygwin_rresvport_af SIGFE
 ruserok SIGFE
