@@ -1,5 +1,11 @@
 2015-11-18  Corinna Vinschen  <corinna@vinschen.de>
 
+	* collate.h (__collate_load_error): Convert to extern declaration.
+	* globals.cc (__collate_load_error): Define and initialize here.
+	* libc/fnmatch.c: Update to latest from FreeBSD.
+
+2015-11-18  Corinna Vinschen  <corinna@vinschen.de>
+
 	* path.cc (symlink_native): Don't generate native symlink targeting
 	Cygwin special file.  Inform the caller.
 	(symlink_worker): Don;t bail out in WSYM_nativestrict case if the
