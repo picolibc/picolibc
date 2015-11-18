@@ -1,5 +1,9 @@
 2015-11-18  Corinna Vinschen  <corinna@vinschen.de>
 
+	* new-features.xml (ov-new2.4): Add new ACL changes.
+
+2015-11-18  Corinna Vinschen  <corinna@vinschen.de>
+
 	* utils.xml (setfacl): Accommodate -b/-k change.
 	* new-features.xml (ov-new2.4): Add setfacl -b/-k change.
 

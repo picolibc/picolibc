@@ -1,0 +1,36 @@
+What's new:
+-----------
+
+- New, unified implementation of POSIX permission and ACL handling.  The
+  new ACLs now store the POSIX ACL MASK/CLASS_OBJ permission mask, and
+  they allow to inherit the S_ISGID bit.  ACL inheritance now really
+  works as desired, in a limited, but theoretically equivalent fashion
+  even for non-Cygwin processes.
+
+  To accommodate standard Windows ACLs, the POSIX permissions of the
+  owner and all other users in the ACL are computed using the Windows
+  AuthZ API.  This may slow down the computation of POSIX permissions
+  noticably in some circumstances, but is generally more correct.  The
+  new code also ignores SYSTEM and Administrators group permissions when
+  computing the MASK/CLASS_OBJ permission mask on old ACLs, and it
+  doesn't deny access to SYSTEM and Administrators group based on the
+  value of MASK/CLASS_OBJ when creating the new ACLs.
+
+  The new code now handles the S_ISGID bit on directories as on Linux:
+  Setting S_ISGID on a directory causes new files and subdirs created
+  within to inherit its group, rather than the primary group of the user
+  who created the file.  This only works for files and directories
+  created by Cygwin processes.
+
+- New API: rpmatch.
+
+
+What changed:
+-------------
+
+- setfacl(1) now allows to use the -b and -k option combined to allow reducing
+  an ACL to only reflect standard POSIX permissions.
+
+
+Bug Fixes
+---------
