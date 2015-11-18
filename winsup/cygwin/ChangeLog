@@ -1,5 +1,16 @@
 2015-12-07  Corinna Vinschen  <corinna@vinschen.de>
 
+	* include/sys/select.h: Move select(2) macros from newlib's sys/types.h
+	here.  Rename howmany to _howmany to unclutter namespace. Move file to
+	newlib.
+	* libc/rexex.cc: Add declaration for cygwin_gethostname.
+	* poll.cc: Include sys/param.h and locale select.h.
+	* select.h (cygwin_select): Declare.
+	* uname.cc: Declare cygwin_gethostname.
+	* winsup.h: Drop declarations of cygwin_select and cygwin_gethostname.
+
+2015-12-07  Corinna Vinschen  <corinna@vinschen.de>
+
 	* dcrt0.cc: Semi-revert commit 12743c2d5d2721f3a80b4d7671a349be03c1f520.
 	(dll_crt0_0): Drop setting wow64_needs_stack_adjustment on 64 bit.
 	(_dll_crt0): Split out 64 bit code again and always create new main

@@ -63,6 +63,7 @@ static char sccsid[] = "@(#)rexec.c	8.1 (Berkeley) 6/4/93";
 extern "C" {
   int cygwin_accept (int, struct sockaddr *, socklen_t *);
   int cygwin_connect (int, const struct sockaddr *, socklen_t);
+  int cygwin_gethostname (char *__name, size_t __len);
   int cygwin_getsockname (int, struct sockaddr *, socklen_t *);
   void cygwin_herror (const char *);
   int cygwin_listen (int, int);

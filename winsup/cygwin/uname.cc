@@ -16,6 +16,8 @@ details. */
 #include "cygwin_version.h"
 #include "cygtls.h"
 
+extern "C" int cygwin_gethostname (char *__name, size_t __len);
+
 /* uname: POSIX 4.4.1.1 */
 extern "C" int
 uname (struct utsname *name)

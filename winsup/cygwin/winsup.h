@@ -260,14 +260,6 @@ extern inline bool flush_file_buffers (HANDLE h)
 /* Make sure that regular ExitThread is never called */
 #define ExitThread exit_thread
 
-/**************************** Exports ******************************/
-
-extern "C" {
-int cygwin_select (int , fd_set *, fd_set *, fd_set *,
-		   struct timeval *to);
-int cygwin_gethostname (char *__name, size_t __len);
-};
-
 /*************************** Unsorted ******************************/
 
 #define WM_ASYNCIO	0x8000		// WM_APP

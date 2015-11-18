@@ -1,3 +1,10 @@
+2015-12-07  Corinna Vinschen  <corinna@vinschen.de>
+
+	* libc/include/sys/types.h: Move definitions of NBBY and howmany to
+	sys/param.h.  Move definitions of select(2) macros to sys/select.h.
+	* libc/include/sys/param.h: See above.
+	* libc/include/sys/select.h: Move Cygwin's sys/select.h here.
+
 2015-11-26  Corinna Vinschen  <corinna@vinschen.de>
 
 	* libc/stdlib/strtodg.c: Add ifdef to check _HAVE_LONG_DOUBLE and

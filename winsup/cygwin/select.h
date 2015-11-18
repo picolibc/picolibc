@@ -107,4 +107,8 @@ public:
 		   device_specific_serial (NULL),
 		   device_specific_mailslot (NULL) {}
 };
+
+extern "C" int cygwin_select (int , fd_set *, fd_set *, fd_set *,
+			      struct timeval *to);
+
 #endif /* _SELECT_H_ */
