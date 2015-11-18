@@ -1,6 +1,6 @@
 /* collate.h: Internal BSD libc header, used in glob and regcomp, for instance.
 
-   Copyright 2012 Red Hat, Inc.
+   Copyright 2012, 2015 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -13,10 +13,9 @@ details. */
 extern "C" {
 #endif
 
-/* We never have a collate load error. */
-const int __collate_load_error = 0;
+extern const int __collate_load_error;
 
-int __collate_range_cmp (int c1, int c2);
+extern int __collate_range_cmp (int c1, int c2);
 
 #ifdef __cplusplus
 };
