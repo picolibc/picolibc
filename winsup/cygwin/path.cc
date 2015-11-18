@@ -1700,6 +1700,11 @@ symlink_native (const char *oldpath, path_conv &win32_newpath)
       SetLastError (ERROR_FILE_NOT_FOUND);
       return -1;
     }
+  /* Don't allow native symlinks to Cygwin special files.  However, the
+     caller shoud know because this case shouldn't be covered by the
+     default "nativestrict" behaviour, so we use a special return code. */
+  if (win32_oldpath.isspecial ())
+    return -2;
   /* Convert native paths to Win32 UNC paths. */
   final_newpath = win32_newpath.get_nt_native_path ();
   final_newpath->Buffer[1] = L'\\';
@@ -1843,8 +1848,9 @@ symlink_worker (const char *oldpath, const char *newpath, bool isdevice)
 	  res = symlink_native (oldpath, win32_newpath);
 	  if (!res)
 	    __leave;
-	  /* Strictly native?  Too bad. */
-	  if (wsym_type == WSYM_nativestrict)
+	  /* Strictly native?  Too bad, unless the target is a Cygwin
+	     special file. */
+	  if (res == -1 && wsym_type == WSYM_nativestrict)
 	    {
 	      __seterrno ();
 	      __leave;
