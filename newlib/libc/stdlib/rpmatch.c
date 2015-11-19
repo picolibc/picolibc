@@ -57,6 +57,7 @@ No supporting OS subroutines are required.
  */
 
 #include <sys/cdefs.h>
+#include <sys/types.h>
 
 #include <langinfo.h>
 #include <regex.h>
