@@ -1,5 +1,10 @@
 2015-11-19  Corinna Vinschen  <corinna@vinschen.de>
 
+	* libc/stdlib/ldtoa.c: Convert to GNU style so as not to get crazy
+	reading the code.
+
+2015-11-19  Corinna Vinschen  <corinna@vinschen.de>
+
 	* libc/stdlib/rpmatch.c: Include sys/types.h to make GCC happy.
 
 2015-11-12  Jon Turney  <jon.turney@dronecode.org.uk>
