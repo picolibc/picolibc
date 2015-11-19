@@ -1,3 +1,7 @@
+2015-11-19  Yaakov Selkowitz  <yselkowi@redhat.com>
+
+	* libc/stdlib/stdlib.tex: Fix typo in rpmatch reference.
+
 2015-11-19  Corinna Vinschen  <corinna@vinschen.de>
 
 	* libc/stdlib/ldtoa.c: Convert to GNU style so as not to get crazy
