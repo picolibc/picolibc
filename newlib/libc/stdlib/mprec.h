@@ -360,6 +360,7 @@ typedef struct _Bigint _Bigint;
 #define mult	__multiply
 #define pow5mult	__pow5mult
 #define lshift	__lshift
+#define match   __match
 #define cmp	__mcmp
 #define diff	__mdiff
 #define ulp 	__ulp
@@ -396,6 +397,7 @@ int 		_EXFUN(hi0bits,(__ULong));
 int 		_EXFUN(lo0bits,(__ULong *));
 _Bigint *	_EXFUN(d2b,(struct _reent *p, double d, int *e, int *bits));
 _Bigint *	_EXFUN(lshift,(struct _reent *p, _Bigint *b, int k));
+int		_EXFUN(match,(const char**, char*));
 _Bigint *	_EXFUN(diff,(struct _reent *p, _Bigint *a, _Bigint *b));
 int		_EXFUN(cmp,(_Bigint *a, _Bigint *b));
 int		_EXFUN(gethex,(struct _reent *p, _CONST char **sp, _CONST struct FPI *fpi, Long *exp, _Bigint **bp, int sign));     

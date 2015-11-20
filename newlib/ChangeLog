@@ -1,5 +1,11 @@
 2015-11-20  Corinna Vinschen  <corinna@vinschen.de>
 
+	* libc/stdlib/strtod.c (match): Move from here...
+	* libc/stdlib/gdtoa-hexnan.c (match): ...to here.
+	* libc/stdlib/mprec.h (match): Declare and add __match define.
+
+2015-11-20  Corinna Vinschen  <corinna@vinschen.de>
+
 	* libc/stdlib/wcstold.c (_strtold): Drop unused declaration.
 
 2015-11-19  Yaakov Selkowitz  <yselkowi@redhat.com>

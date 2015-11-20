@@ -44,6 +44,24 @@ THIS SOFTWARE.
 #include "gdtoa.h"
 
 #ifdef INFNAN_CHECK
+int
+_DEFUN (match, (sp, t),
+	_CONST char **sp _AND
+	char *t)
+{
+	int c, d;
+	_CONST char *s = *sp;
+
+	while( (d = *t++) !=0) {
+		if ((c = *++s) >= 'A' && c <= 'Z')
+			c += 'a' - 'A';
+		if (c != d)
+			return 0;
+		}
+	*sp = s + 1;
+	return 1;
+}
+
 static void
 _DEFUN (L_shift, (x, x1, i),
 	__ULong *x _AND
