@@ -131,7 +131,6 @@ Supporting OS subroutines required:
 #define _NO_LONGDBL
 #if defined _WANT_IO_LONG_DOUBLE && (LDBL_MANT_DIG > DBL_MANT_DIG)
 #undef _NO_LONGDBL
-extern _LONG_DOUBLE _strtold _PARAMS((char *s, char **sptr));
 #endif
 
 #define _NO_LONGLONG
@@ -1211,7 +1210,7 @@ __svfscanf_r (rptr, fp, fmt0, ap)
 #ifdef _NO_LONGDBL
 	      res = _strtod_r (rptr, buf, NULL);
 #else  /* !_NO_LONGDBL */
-	      res = _strtold (buf, NULL);
+	      res = _strtold_r (rptr, buf, NULL);
 #endif /* !_NO_LONGDBL */
 	      if (flags & LONG)
 		{

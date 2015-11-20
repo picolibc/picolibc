@@ -1,5 +1,30 @@
 2015-11-20  Corinna Vinschen  <corinna@vinschen.de>
 
+	* libc/stdlib/Makefile.am (GENERAL_SOURCES): Add strtodg.c and
+	strtorx.c.
+	* libc/stdlib/Makefile.in: Regenerate.
+	* libc/stdlib/strtodg.c: New file implementing generic string to long
+	double conversion.
+	* libc/stdlib/strtorx.c: New file, implementing IEEE format string to
+	long double conversion.
+	* libc/stdlib/mprec.h (_strtodg_r): Declare.
+	(_strtorx_r): Declare.
+	* libc/stdlib/gdtoa.h (__UShort): Define.
+	* libc/stdlib/strtold.c (__flt_rounds): Define for i386 and x86_64
+	target.
+	(FLT_ROUNDS): Define, as 0 on platforms missing a __flt_rounds
+	function.
+	(_strtold_r): Converted from strtold.  Call _strtorx_r on targets
+	supporting distinct long doubles.
+	(strtold): Just call _strtold_r.
+	* libc/include/stdlib.h (_strtold_r): Declare.
+	* libc/stdlib/ldtoa.c (_strtold): Comment out.  Explain why.
+	* libc/stdio/vfscanf.c (__SVFSCANF_R): Call _strtold_r instead of
+	_strtold.
+	* libc/machine/powerpc/vfscanf.c (__svfscanf_r): Ditto.
+
+2015-11-20  Corinna Vinschen  <corinna@vinschen.de>
+
 	* libc/stdlib/strtod.c (match): Move from here...
 	* libc/stdlib/gdtoa-hexnan.c (match): ...to here.
 	* libc/stdlib/mprec.h (match): Declare and add __match define.

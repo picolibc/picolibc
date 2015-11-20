@@ -404,6 +404,11 @@ int		_EXFUN(gethex,(struct _reent *p, _CONST char **sp, _CONST struct FPI *fpi, 
 double		_EXFUN(ratio,(_Bigint *a, _Bigint *b));
 __ULong		_EXFUN(any_on,(_Bigint *b, int k));
 void		_EXFUN(copybits,(__ULong *c, int n, _Bigint *b));
+#if defined (_HAVE_LONG_DOUBLE) && !defined (_LDBL_EQ_DBL)
+int		_EXFUN(_strtorx_r,(struct _reent *, _CONST char *, char **, int, void *));
+int		_EXFUN(_strtodg_r,(struct _reent *p, _CONST char *s00, char **se, struct FPI *fpi, Long *exp, __ULong *bits));
+#endif /* _HAVE_LONG_DOUBLE && !_LDBL_EQ_DBL */
+
 #if defined(PREFER_SIZE_OVER_SPEED) || defined(__OPTIMIZE_SIZE__) || defined(_SMALL_HEXDIG)
 unsigned char _EXFUN(__hexdig_fun,(unsigned char));
 #endif /* !defined(PREFER_SIZE_OVER_SPEED) && !defined(__OPTIMIZE_SIZE__) && !defined(_SMALL_HEXDIG) */

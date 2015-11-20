@@ -3280,7 +3280,7 @@ bxit:
 }
 
 
-
+#if 0 /* Broken, unusable implementation of strtold */
 
 /*
 ;								ASCTOQ
@@ -3644,7 +3644,7 @@ aexit:
   return lenldstr;
 }
 
-
+#endif
 
 /* y = largest integer not greater than x
  * (truncated toward minus infinity)

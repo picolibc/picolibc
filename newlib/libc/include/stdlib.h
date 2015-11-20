@@ -274,6 +274,7 @@ _VOID	_EXFUN(qsort_r,(_PTR __base, size_t __nmemb, size_t __size, int (*_compar)
 
 /* On platforms where long double equals double.  */
 #ifdef _HAVE_LONG_DOUBLE
+extern long double _strtold_r (struct _reent *, const char *__restrict, char **__restrict);
 #if !defined(__STRICT_ANSI__) || \
   (defined(__STDC_VERSION__) && __STDC_VERSION__ >= 199901L) || \
   (defined(__cplusplus) && __cplusplus >= 201103L)

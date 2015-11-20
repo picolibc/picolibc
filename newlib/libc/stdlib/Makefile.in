@@ -105,7 +105,8 @@ am__objects_2 = lib_a-__adjust.$(OBJEXT) lib_a-__atexit.$(OBJEXT) \
 	lib_a-rand.$(OBJEXT) lib_a-rand_r.$(OBJEXT) \
 	lib_a-realloc.$(OBJEXT) lib_a-reallocf.$(OBJEXT) \
 	lib_a-sb_charsets.$(OBJEXT) lib_a-strtod.$(OBJEXT) \
-	lib_a-strtol.$(OBJEXT) lib_a-strtoul.$(OBJEXT) \
+	lib_a-strtodg.$(OBJEXT) lib_a-strtol.$(OBJEXT) \
+	lib_a-strtorx.$(OBJEXT) lib_a-strtoul.$(OBJEXT) \
 	lib_a-utoa.$(OBJEXT) lib_a-wcstod.$(OBJEXT) \
 	lib_a-wcstol.$(OBJEXT) lib_a-wcstoul.$(OBJEXT) \
 	lib_a-wcstombs.$(OBJEXT) lib_a-wcstombs_r.$(OBJEXT) \
@@ -157,9 +158,10 @@ am__objects_9 = __adjust.lo __atexit.lo __call_atexit.lo __exp10.lo \
 	itoa.lo labs.lo ldiv.lo ldtoa.lo malloc.lo mblen.lo mblen_r.lo \
 	mbstowcs.lo mbstowcs_r.lo mbtowc.lo mbtowc_r.lo mlock.lo \
 	mprec.lo mstats.lo quick_exit.lo rand.lo rand_r.lo realloc.lo \
-	reallocf.lo sb_charsets.lo strtod.lo strtol.lo strtoul.lo \
-	utoa.lo wcstod.lo wcstol.lo wcstoul.lo wcstombs.lo \
-	wcstombs_r.lo wctomb.lo wctomb_r.lo $(am__objects_8)
+	reallocf.lo sb_charsets.lo strtod.lo strtodg.lo strtol.lo \
+	strtorx.lo strtoul.lo utoa.lo wcstod.lo wcstol.lo wcstoul.lo \
+	wcstombs.lo wcstombs_r.lo wctomb.lo wctomb_r.lo \
+	$(am__objects_8)
 am__objects_10 = cxa_atexit.lo cxa_finalize.lo drand48.lo ecvtbuf.lo \
 	efgcvt.lo erand48.lo jrand48.lo lcong48.lo lrand48.lo \
 	mrand48.lo msize.lo mtrim.lo nrand48.lo rand48.lo seed48.lo \
@@ -361,8 +363,9 @@ GENERAL_SOURCES = __adjust.c __atexit.c __call_atexit.c __exp10.c \
 	ldtoa.c malloc.c mblen.c mblen_r.c mbstowcs.c mbstowcs_r.c \
 	mbtowc.c mbtowc_r.c mlock.c mprec.c mstats.c quick_exit.c \
 	rand.c rand_r.c realloc.c reallocf.c sb_charsets.c strtod.c \
-	strtol.c strtoul.c utoa.c wcstod.c wcstol.c wcstoul.c \
-	wcstombs.c wcstombs_r.c wctomb.c wctomb_r.c $(am__append_1)
+	strtodg.c strtol.c strtorx.c strtoul.c utoa.c wcstod.c \
+	wcstol.c wcstoul.c wcstombs.c wcstombs_r.c wctomb.c wctomb_r.c \
+	$(am__append_1)
 @NEWLIB_NANO_MALLOC_FALSE@MALIGNR = malignr
 @NEWLIB_NANO_MALLOC_TRUE@MALIGNR = nano-malignr
 @NEWLIB_NANO_MALLOC_FALSE@MALLOPTR = malloptr
@@ -895,11 +898,23 @@ lib_a-strtod.o: strtod.c
 lib_a-strtod.obj: strtod.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-strtod.obj `if test -f 'strtod.c'; then $(CYGPATH_W) 'strtod.c'; else $(CYGPATH_W) '$(srcdir)/strtod.c'; fi`
 
+lib_a-strtodg.o: strtodg.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-strtodg.o `test -f 'strtodg.c' || echo '$(srcdir)/'`strtodg.c
+
+lib_a-strtodg.obj: strtodg.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-strtodg.obj `if test -f 'strtodg.c'; then $(CYGPATH_W) 'strtodg.c'; else $(CYGPATH_W) '$(srcdir)/strtodg.c'; fi`
+
 lib_a-strtol.o: strtol.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-strtol.o `test -f 'strtol.c' || echo '$(srcdir)/'`strtol.c
 
 lib_a-strtol.obj: strtol.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-strtol.obj `if test -f 'strtol.c'; then $(CYGPATH_W) 'strtol.c'; else $(CYGPATH_W) '$(srcdir)/strtol.c'; fi`
+
+lib_a-strtorx.o: strtorx.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-strtorx.o `test -f 'strtorx.c' || echo '$(srcdir)/'`strtorx.c
+
+lib_a-strtorx.obj: strtorx.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-strtorx.obj `if test -f 'strtorx.c'; then $(CYGPATH_W) 'strtorx.c'; else $(CYGPATH_W) '$(srcdir)/strtorx.c'; fi`
 
 lib_a-strtoul.o: strtoul.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-strtoul.o `test -f 'strtoul.c' || echo '$(srcdir)/'`strtoul.c

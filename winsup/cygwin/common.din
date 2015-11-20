@@ -1199,7 +1199,7 @@ strtoimax = strtoll NOSIGFE
 strtok NOSIGFE
 strtok_r NOSIGFE
 strtol NOSIGFE
-strtold = _strtold SIGFE
+strtold SIGFE
 strtoll NOSIGFE
 strtosigno NOSIGFE
 strtoul NOSIGFE

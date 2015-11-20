@@ -53,7 +53,9 @@ GENERAL_SOURCES = \
 	reallocf.c	\
 	sb_charsets.c	\
 	strtod.c	\
+	strtodg.c	\
 	strtol.c	\
+	strtorx.c	\
 	strtoul.c	\
 	utoa.c          \
 	wcstod.c	\

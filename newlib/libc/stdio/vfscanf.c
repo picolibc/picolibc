@@ -170,7 +170,6 @@ Supporting OS subroutines required:
 #define _NO_LONGDBL
 #if defined _WANT_IO_LONG_DOUBLE && (LDBL_MANT_DIG > DBL_MANT_DIG)
 #undef _NO_LONGDBL
-extern _LONG_DOUBLE _strtold _PARAMS((char *s, char **sptr));
 #endif
 
 #include "floatio.h"
@@ -1596,12 +1595,13 @@ _DEFUN(__SVFSCANF_R, (rptr, fp, fmt0, ap),
                  sprintf (exp_start, "e%ld", new_exp);
 		}
 
-	      /* Current _strtold routine is markedly slower than
+	      /* FIXME: Is that still true?
+	         Current _strtold routine is markedly slower than
 	         _strtod_r.  Only use it if we have a long double
 	         result.  */
 #ifndef _NO_LONGDBL /* !_NO_LONGDBL */
 	      if (flags & LONGDBL)
-		qres = _strtold (buf, NULL);
+		qres = _strtold_r (rptr, buf, NULL);
 	      else
 #endif
 	        res = _strtod_r (rptr, buf, NULL);

@@ -70,3 +70,5 @@ enum {	/* FPI.rounding values: same as FLT_ROUNDS */
 	};
 
 #endif /* GDTOA_H_INCLUDED */
+
+typedef unsigned short __UShort;

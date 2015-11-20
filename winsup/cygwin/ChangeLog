@@ -1,3 +1,7 @@
+2015-11-20  Corinna Vinschen  <corinna@vinschen.de>
+
+	* common.din (strtold): Drop redirection to _strtold.
+
 2015-11-18  Corinna Vinschen  <corinna@vinschen.de>
 
 	* sec_acl.cc (get_posix_access): Skip merging permissions if current
