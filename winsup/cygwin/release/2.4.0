@@ -34,3 +34,7 @@ What changed:
 
 Bug Fixes
 ---------
+
+- Replaced old, buggy strtold implementation with well-tested gdtoa version
+  from David M. Gay.
+  Addresses: https://cygwin.com/ml/cygwin/2015-11/msg00205.html
