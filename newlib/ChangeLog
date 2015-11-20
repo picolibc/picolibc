@@ -1,3 +1,7 @@
+2015-11-20  Corinna Vinschen  <corinna@vinschen.de>
+
+	* libc/stdlib/wcstold.c (_strtold): Drop unused declaration.
+
 2015-11-19  Yaakov Selkowitz  <yselkowi@redhat.com>
 
 	* libc/stdlib/stdlib.tex: Fix typo in rpmatch reference.

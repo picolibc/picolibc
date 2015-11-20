@@ -35,8 +35,6 @@ POSSIBILITY OF SUCH DAMAGE.
 #include <locale.h>
 #include "local.h"
 
-extern _LONG_DOUBLE _strtold _PARAMS((char *s, char **sptr));
-
 long double
 wcstold (const wchar_t *__restrict nptr, wchar_t **__restrict endptr)
 {
