@@ -39,6 +39,8 @@ THIS SOFTWARE.
 
 #include "locale.h"
 
+#define USE_LOCALE
+
  static const int
 fivesbits[] = {	 0,  3,  5,  7, 10, 12, 14, 17, 19, 21,
 		24, 26, 28, 31, 33, 35, 38, 40, 42, 45,
@@ -516,13 +518,18 @@ _strtodg_r
 			z = 10*z + c - '0';
 	nd0 = nd;
 #ifdef USE_LOCALE
-	if (c == *localeconv()->decimal_point)
+	if (strncmp (s, _localeconv_r (p)->decimal_point,
+		     strlen (_localeconv_r (p)->decimal_point)) == 0)
 #else
 	if (c == '.')
 #endif
 		{
 		decpt = 1;
+#ifdef USE_LOCALE
+		c = *(s += strlen (_localeconv_r (p)->decimal_point));
+#else
 		c = *++s;
+#endif
 		if (!nd) {
 			for(; c == '0'; c = *++s)
 				nz++;

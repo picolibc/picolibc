@@ -1,3 +1,8 @@
+2015-11-21  Corinna Vinschen  <corinna@vinschen.de>
+
+	* libc/stdlib/strtodg.c: Define USE_LOCALE.
+	(_strtodg_r): Handle multibyte decimal point.
+
 2015-11-20  Corinna Vinschen  <corinna@vinschen.de>
 
 	* libc/stdlib/Makefile.am (GENERAL_SOURCES): Add strtodg.c and
