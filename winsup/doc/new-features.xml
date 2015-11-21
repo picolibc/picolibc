@@ -40,6 +40,11 @@ setfacl(1) now allows to use the -b and -k option combined to allow reducing
 an ACL to only reflect standard POSIX permissions.
 </para></listitem>
 
+<listitem><para>
+Fix (numeric and monetary) decimal point and thousands separator in
+fa_IR and ps_AF locales to be aligned with Linux.
+</para></listitem>
+
 </itemizedlist>
 
 </sect2>

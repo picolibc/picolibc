@@ -1,3 +1,7 @@
+2015-11-21  Corinna Vinschen  <corinna@vinschen.de>
+
+	* new-features.xml (ov-new2.4): Document fa_IR and ps_AF locale fixes.
+
 2015-11-18  Corinna Vinschen  <corinna@vinschen.de>
 
 	* new-features.xml (ov-new2.4): Add new ACL changes.

@@ -1,3 +1,12 @@
+2015-11-21  Corinna Vinschen  <corinna@vinschen.de>
+
+	* nlsfuncs.cc (setlocaleinfo): New macro calling __setlocaleinfo.
+	(__setlocaleinfo): New function to set a locale-specific character
+	to an explicit wchar_t value.
+	(__set_lc_numeric_from_win): Handle fa_IR and ps_AF locales to return
+	same decimal point and thousands separator characters as on Linux.
+	(__set_lc_monetary_from_win): Ditto for monetary characters.
+
 2015-11-20  Corinna Vinschen  <corinna@vinschen.de>
 
 	* common.din (strtold): Drop redirection to _strtold.

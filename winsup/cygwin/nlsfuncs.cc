@@ -31,6 +31,8 @@ details. */
 
 #define getlocaleinfo(category,type) \
 	    __getlocaleinfo(lcid,(type),_LC(category))
+#define setlocaleinfo(category,val) \
+	    __setlocaleinfo(_LC(category),(val))
 #define eval_datetimefmt(type,flags) \
 	    __eval_datetimefmt(lcid,(type),(flags),&lc_time_ptr,\
 			       lc_time_end-lc_time_ptr)
@@ -362,6 +364,20 @@ __getlocaleinfo (LCID lcid, LCTYPE type, char **ptr, size_t size)
   ret = (wchar_t *) *ptr;
   num = GetLocaleInfoW (lcid, type, ret, size / sizeof (wchar_t));
   *ptr = (char *) (ret + num);
+  return ret;
+}
+
+static wchar_t *
+__setlocaleinfo (char **ptr, size_t size, wchar_t val)
+{
+  wchar_t *ret;
+
+  if ((uintptr_t) *ptr % 1)
+    ++*ptr;
+  ret = (wchar_t *) *ptr;
+  ret[0] = val;
+  ret[1] = L'\0';
+  *ptr = (char *) (ret + 2);
   return ret;
 }
 
@@ -868,11 +884,28 @@ __set_lc_numeric_from_win (const char *name,
     memcpy (_numeric_locale, _C_numeric_locale, sizeof (struct lc_numeric_T));
   else
     {
-      /* decimal_point */
-      _numeric_locale->wdecimal_point = getlocaleinfo (numeric, LOCALE_SDECIMAL);
+      /* decimal_point and thousands_sep */
+      if (lcid == 0x0429)	/* fa_IR.  Windows decimal_point is slash,
+					   correct is dot */
+	{
+	  _numeric_locale->wdecimal_point = setlocaleinfo (numeric, L'.');
+	  _numeric_locale->wthousands_sep = setlocaleinfo (numeric, L',');
+	}
+      else if (lcid == 0x0463)	/* ps_AF.  Windows decimal_point is dot,
+					   thousands_sep is comma, correct are
+					   arabic separators. */
+	{
+	  _numeric_locale->wdecimal_point = setlocaleinfo (numeric, 0x066b);
+	  _numeric_locale->wthousands_sep = setlocaleinfo (numeric, 0x066c);
+	}
+      else
+	{
+	  _numeric_locale->wdecimal_point = getlocaleinfo (numeric,
+							   LOCALE_SDECIMAL);
+	  _numeric_locale->wthousands_sep = getlocaleinfo (numeric,
+							   LOCALE_STHOUSAND);
+	}
       _numeric_locale->decimal_point = charfromwchar (numeric, wdecimal_point);
-      /* thousands_sep */
-      _numeric_locale->wthousands_sep = getlocaleinfo (numeric, LOCALE_STHOUSAND);
       _numeric_locale->thousands_sep = charfromwchar (numeric, wthousands_sep);
       /* grouping */
       _numeric_locale->grouping = conv_grouping (lcid, LOCALE_SGROUPING,
@@ -953,14 +986,27 @@ __set_lc_monetary_from_win (const char *name,
       else
 	_monetary_locale->currency_symbol = charfromwchar (monetary,
 							   wcurrency_symbol);
-      /* mon_decimal_point */
-      _monetary_locale->wmon_decimal_point = getlocaleinfo (monetary,
-							    LOCALE_SMONDECIMALSEP);
+      /* mon_decimal_point and mon_thousands_sep */
+      if (lcid == 0x0429 || lcid == 0x0463)	/* fa_IR or ps_AF.  Windows
+						   mon_decimal_point is slash
+						   and comma, mon_thousands_sep
+						   is comma and dot, correct
+						   are arabic separators. */
+	{
+	  _monetary_locale->wmon_decimal_point = setlocaleinfo (monetary,
+								0x066b);
+	  _monetary_locale->wmon_thousands_sep = setlocaleinfo (monetary,
+								0x066c);
+	}
+      else
+	{
+	  _monetary_locale->wmon_decimal_point = getlocaleinfo (monetary,
+							LOCALE_SMONDECIMALSEP);
+	  _monetary_locale->wmon_thousands_sep = getlocaleinfo (monetary,
+							LOCALE_SMONTHOUSANDSEP);
+	}
       _monetary_locale->mon_decimal_point = charfromwchar (monetary,
 							   wmon_decimal_point);
-      /* mon_thousands_sep */
-      _monetary_locale->wmon_thousands_sep = getlocaleinfo (monetary,
-							    LOCALE_SMONTHOUSANDSEP);
       _monetary_locale->mon_thousands_sep = charfromwchar (monetary,
 							   wmon_thousands_sep);
       /* mon_grouping */
