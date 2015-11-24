@@ -1,3 +1,7 @@
+2015-11-24  David Macek  <david.macek.0@gmail.com>
+
+	* faq-using.xml: Add Forefront TMG to the BLODA.
+
 2015-11-21  Corinna Vinschen  <corinna@vinschen.de>
 
 	* new-features.xml (ov-new2.4): Document fa_IR and ps_AF locale fixes.
