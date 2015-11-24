@@ -1,5 +1,10 @@
 2015-11-24  David Macek  <david.macek.0@gmail.com>
 
+	* pathnames.xml: Add a section describing peculiarities of how Cygwin
+	creates NTFS symlinks.
+
+2015-11-24  David Macek  <david.macek.0@gmail.com>
+
 	* faq-using.xml: Add Forefront TMG to the BLODA.
 
 2015-11-21  Corinna Vinschen  <corinna@vinschen.de>

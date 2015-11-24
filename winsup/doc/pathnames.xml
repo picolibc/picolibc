@@ -407,6 +407,9 @@ these two settings, see <xref linkend="using-cygwinenv"></xref>.
 On AFS, native symlinks are the only supported type of symlink due to
 AFS lacking support for DOS attributes.  This is independent from the
 <literal>winsymlinks</literal> setting.</para>
+<para>Creation of native symlinks follows special rules to ensure the links
+are usable outside of Cygwin. This includes dereferencing any Cygwin-only
+symlinks that lie in the target path.</para>
 </listitem>
 
 <listitem>
