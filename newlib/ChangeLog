@@ -1,3 +1,7 @@
+2015-11-24  Steve Ellcey  <sellcey@imgtec.com>
+
+	* libc/stdlib/strtorx.c: Fix ifdef to check _LDBL_EQ_DBL.
+
 2015-11-23  Marcus Shawcroft  <marcus.shawcroft@arm.com>
 
 	* libc/machine/arm/strlen-stub.c: Adjust strlen-armv7.S selection logic.

@@ -37,7 +37,7 @@ THIS SOFTWARE.
 #include "gdtoa.h"
 #include "gd_qnan.h"
 
-#ifdef _HAVE_LONG_DOUBLE
+#if defined (_HAVE_LONG_DOUBLE) && !defined (_LDBL_EQ_DBL)
 
 #undef _0
 #undef _1
@@ -126,4 +126,4 @@ _strtorx_r(struct _reent *p, const char *s, char **sp, int rounding, void *L)
 	return k;
 	}
 
-#endif /* _HAVE_LONG_DOUBLE */
+#endif /* _HAVE_LONG_DOUBLE && !_LDBL_EQ_DBL */
