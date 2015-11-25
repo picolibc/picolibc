@@ -1318,6 +1318,7 @@ behaviour which affect the operation of other programs, such as Cygwin.
 <listitem><para>Citrix Metaframe Presentation Server/XenApp (see <ulink url="http://support.citrix.com/article/CTX107825">Citrix Support page</ulink>)</para></listitem>
 <listitem><para>Lavasoft Web Companion</para></listitem>
 <listitem><para>Forefront TMG</para></listitem>
+<listitem><para>MacType</para></listitem>
 </itemizedlist></para>
 <para>Sometimes these problems can be worked around, by temporarily or partially
 disabling the offending software.  For instance, it may be possible to disable
@@ -1332,7 +1333,7 @@ it may be necessary to uninstall the software altogether to restore normal opera
 <para>Some of the symptoms you may experience are:</para>
 <para><itemizedlist>
 <listitem>
-<para>Random fork() failures.</para>
+<para>Random fork() failures</para>
 <para>Caused by hook DLLs that load themselves into every process in the
 system.  POSIX fork() semantics require that the memory map of the child process
 must be an exact duplicate of the parent process' layout.  If one of these DLLs
@@ -1343,7 +1344,7 @@ DLL at that same address in the child, the fork() call has to fail.
 </para>
 </listitem>
 <listitem>
-<para>File access problems.</para>
+<para>File access problems</para>
 <para>Some programs (e.g., virus scanners with on-access scanning) scan or
 otherwise operate on every file accessed by all the other software running on
 your computer.  In some cases they may retain an open handle on the file even

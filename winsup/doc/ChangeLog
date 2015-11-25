@@ -1,3 +1,7 @@
+2015-11-25  David Macek  <david.macek.0@gmail.com>
+
+	* faq-using.xml: Add MacType to the BLODA.  Fix formatting.
+
 2015-11-24  David Macek  <david.macek.0@gmail.com>
 
 	* pathnames.xml: Add a section describing peculiarities of how Cygwin
