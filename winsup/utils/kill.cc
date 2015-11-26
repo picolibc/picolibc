@@ -1,7 +1,7 @@
 /* kill.cc
 
    Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2007,
-   2009, 2011 Red Hat, Inc.
+   2009, 2011, 2015 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -70,7 +70,7 @@ print_version ()
 static const char *
 strsigno (int signo)
 {
-  if (signo >= 0 && signo < NSIG)
+  if (signo > 0 && signo < NSIG)
     return sys_sigabbrev[signo];
   static char buf[sizeof ("Unknown signal") + 32];
   sprintf (buf, "Unknown signal %d", signo);
@@ -121,7 +121,7 @@ listsig (const char *in_sig)
     {
       sig = getsig (in_sig);
       test_for_unknown_sig (sig, in_sig);
-      if (atoi (in_sig) == sig)
+      if (sig && atoi (in_sig) == sig)
 	puts (strsigno (sig) + 3);
       else
 	printf ("%d\n", sig);

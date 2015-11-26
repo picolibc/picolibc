@@ -1,3 +1,8 @@
+2015-11-26  Michael Kwasigroch  <mkwasigr@web.de>
+
+	* kill.cc (strsigno): Don't call sys_sigabbrev for signal 0.
+	(listsig): Don't call strsigno for signal 0.
+
 2015-11-18  Corinna Vinschen  <corinna@vinschen.de>
 
 	* setfacl.c (action_t): Rename DeleteAll to DeleteExt.  Add
