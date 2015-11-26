@@ -1668,7 +1668,7 @@ symlink_native (const char *oldpath, path_conv &win32_newpath)
 	    prefix strings.  We start counting behind the \\?\ for speed. */
       int num = cnt_bs (win32_oldpath.get_nt_native_path ()->Buffer + 4, c_old);
       if (num < 1		/* locale drive. */
-	  || (win32_oldpath.get_nt_native_path ()->Buffer[6] != L':'
+	  || (win32_oldpath.get_nt_native_path ()->Buffer[5] != L':'
 	      && num < 3))	/* UNC path. */
 	{
 	  /* 3a. No valid common path prefix: Create absolute symlink. */

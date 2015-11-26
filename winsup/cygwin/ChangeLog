@@ -1,3 +1,7 @@
+2015-11-26  Corinna Vinschen  <corinna@vinschen.de>
+
+	* path.cc (symlink_native): Fix index when looking for colon in path.
+
 2015-11-21  Corinna Vinschen  <corinna@vinschen.de>
 
 	* nlsfuncs.cc (setlocaleinfo): New macro calling __setlocaleinfo.
