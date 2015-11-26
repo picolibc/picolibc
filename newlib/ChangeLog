@@ -1,3 +1,8 @@
+2015-11-26  Corinna Vinschen  <corinna@vinschen.de>
+
+	* libc/stdlib/strtodg.c: Add ifdef to check _HAVE_LONG_DOUBLE and
+	_LDBL_EQ_DBL.
+
 2015-11-24  Steve Ellcey  <sellcey@imgtec.com>
 
 	* libc/stdlib/strtorx.c: Fix ifdef to check _LDBL_EQ_DBL.

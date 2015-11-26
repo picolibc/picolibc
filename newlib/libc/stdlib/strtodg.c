@@ -39,6 +39,8 @@ THIS SOFTWARE.
 
 #include "locale.h"
 
+#if defined (_HAVE_LONG_DOUBLE) && !defined (_LDBL_EQ_DBL)
+
 #define USE_LOCALE
 
  static const int
@@ -1141,3 +1143,5 @@ _strtodg_r
 		}
 	return irv;
 	}
+
+#endif /* _HAVE_LONG_DOUBLE && !_LDBL_EQ_DBL */
