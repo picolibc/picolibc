@@ -41,3 +41,6 @@ Bug Fixes
 - Replaced old, buggy strtold implementation with well-tested gdtoa version
   from David M. Gay.
   Addresses: https://cygwin.com/ml/cygwin/2015-11/msg00205.html
+
+- Fix a race condition in signal handling.
+  Addresses: https://cygwin.com/ml/cygwin/2015-11/msg00387.html

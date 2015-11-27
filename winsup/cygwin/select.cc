@@ -353,7 +353,7 @@ select_stuff::wait (fd_set *readfds, fd_set *writefds, fd_set *exceptfds,
   select_record *s = &start;
   DWORD m = 0;
 
-  set_signal_arrived here (w4[m++]);
+  wait_signal_arrived here (w4[m++]);
   if ((w4[m] = pthread::get_cancel_event ()) != NULL)
     m++;
 

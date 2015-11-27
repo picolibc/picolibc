@@ -248,7 +248,7 @@ public:
       }
     return signal_arrived;
   }
-  void set_signal_arrived (bool setit, HANDLE& h)
+  void wait_signal_arrived (bool setit, HANDLE& h)
   {
     if (!setit)
       will_wait_for_signal = false;
@@ -258,10 +258,17 @@ public:
 	will_wait_for_signal = true;
       }
   }
+  void set_signal_arrived ()
+  {
+    SetEvent (get_signal_arrived (false));
+  }
   void reset_signal_arrived ()
   {
     if (signal_arrived)
       ResetEvent (signal_arrived);
+  }
+  void unwait_signal_arrived ()
+  {
     will_wait_for_signal = false;
   }
   void handle_SIGCONT ();
@@ -430,14 +437,18 @@ public:
   }
 #endif /* __x86_64__ */
 
-class set_signal_arrived
+class wait_signal_arrived
 {
 public:
-  set_signal_arrived (bool setit, HANDLE& h) { _my_tls.set_signal_arrived (setit, h); }
-  set_signal_arrived (HANDLE& h) { _my_tls.set_signal_arrived (true, h); }
+  wait_signal_arrived (bool setit, HANDLE& h) { _my_tls.wait_signal_arrived (setit, h); }
+  wait_signal_arrived (HANDLE& h) { _my_tls.wait_signal_arrived (true, h); }
 
   operator int () const {return _my_tls.will_wait_for_signal;}
-  ~set_signal_arrived () { _my_tls.reset_signal_arrived (); }
+  /* Do not reset the signal_arrived event just because we leave the scope of
+     this wait_signal_arrived object.  This may lead to all sorts of races.
+     The only method actually resetting the signal_arrived event is
+     _cygtls::call_signal_handler. */
+  ~wait_signal_arrived () { _my_tls.unwait_signal_arrived (); }
 };
 
 #define __getreent() (&_my_tls.local_clib)

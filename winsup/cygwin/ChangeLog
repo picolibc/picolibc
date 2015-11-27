@@ -1,3 +1,25 @@
+2015-11-27  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygtls.h (_cygtls::wait_signal_arrived): Renamed from
+	set_signal_arrived.
+	(_cygtls::set_signal_arrived): New function signalling signal_arrived.
+	(_cygtls::reset_signal_arrived): Don't reset will_wait_for_signal.
+	(_cygtls::unwait_signal_arrived): New function only resetting
+	will_wait_for_signal.
+	(class wait_signal_arrived): Rename from set_signal_arrived.
+	Accommodate name change throughout Cygwin.
+	(wait_signal_arrived::~wait_signal_arrived): Call
+	_cygtls::unwait_signal_arrived.  Add comment.
+	* cygserver_ipc.h (ipc_set_proc_info): Fetch signal_arrived handle
+	via call to _cygtls::get_signal_arrived.
+	* exceptions.cc (_cygtls::interrupt_setup): Signal signal_arrived via
+	call to _cygtls::set_signal_arrived.
+	(_cygtls::handle_SIGCONT): Ditto.
+	* fhandler_socket.cc (fhandler_socket::wait_for_events): Generate
+	WSAEVENT array prior to entering wait loop.  Add cancel event object
+	if available.  Remove calls to pthread_testcancel and just call
+	pthread::static_cancel_self if the cancel event object is signalled.
+
 2015-11-26  Corinna Vinschen  <corinna@vinschen.de>
 
 	* path.cc (symlink_native): Fix index when looking for colon in path.

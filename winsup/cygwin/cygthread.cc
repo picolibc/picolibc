@@ -1,7 +1,7 @@
 /* cygthread.cc
 
    Copyright 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2008, 2009,
-   2010, 2011, 2012, 2013 Red Hat, Inc.
+   2010, 2011, 2012, 2013, 2015 Red Hat, Inc.
 
 This software is a copyrighted work licensed under the terms of the
 Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
@@ -374,7 +374,7 @@ cygthread::detach (HANDLE sigwait)
 	  unsigned n = 2;
 	  DWORD howlong = INFINITE;
 	  w4[0] = sigwait;
-	  set_signal_arrived here (w4[1]);
+	  wait_signal_arrived here (w4[1]);
 	  /* For a description of the below loop see the end of this file */
 	  for (int i = 0; i < 2; i++)
 	    switch (res = WaitForMultipleObjects (n, w4, FALSE, howlong))

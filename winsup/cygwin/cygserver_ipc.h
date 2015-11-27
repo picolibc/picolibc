@@ -43,10 +43,7 @@ ipc_set_proc_info (proc &blk, bool in_fork = false)
   blk.gidcnt = 0;
   blk.gidlist = NULL;
   blk.is_admin = false;
-  if (in_fork)
-    blk.signal_arrived = NULL;
-  else
-    _my_tls.set_signal_arrived (true, blk.signal_arrived);
+  blk.signal_arrived = in_fork ? NULL : _my_tls.get_signal_arrived (true);
 }
 #endif /* __INSIDE_CYGWIN__ */
 

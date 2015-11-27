@@ -972,7 +972,7 @@ _cygtls::interrupt_setup (siginfo_t& si, void *handler, struct sigaction& siga)
   this->sig = si.si_signo; /* Should always be last thing set to avoid race */
 
   if (incyg)
-    SetEvent (get_signal_arrived (false));
+    set_signal_arrived ();
 
   if (!have_execed)
     proc_subproc (PROC_CLEARWAIT, 1);
@@ -1404,7 +1404,7 @@ _cygtls::handle_SIGCONT ()
     else
       {
 	sig = SIGCONT;
-	SetEvent (signal_arrived); /* alert sig_handle_tty_stop */
+	set_signal_arrived (); /* alert sig_handle_tty_stop */
 	sigsent = true;
       }
   /* Clear pending stop signals */
