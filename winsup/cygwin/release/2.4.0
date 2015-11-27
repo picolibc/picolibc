@@ -42,5 +42,12 @@ Bug Fixes
   from David M. Gay.
   Addresses: https://cygwin.com/ml/cygwin/2015-11/msg00205.html
 
+- Fix handling of relative paths in native symlinks if the target is in a
+  drive's root dir or one level below.
+  Addresses: https://cygwin.com/ml/cygwin/2015-11/msg00277.html
+
+- Fix a SEGV when calling `kill -l 0'.
+  Addresses: https://cygwin.com/ml/cygwin/2015-11/msg00430.html
+
 - Fix a race condition in signal handling.
   Addresses: https://cygwin.com/ml/cygwin/2015-11/msg00387.html
