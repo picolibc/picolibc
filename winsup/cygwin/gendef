@@ -229,6 +229,7 @@ sigdelayed:
 	.seh_pushreg %rax
 	subq	\$0x128,%rsp
 	.seh_stackalloc 0x128
+	stmxcsr	0x124(%rsp)
 	fnstcw	0x120(%rsp)
 	movdqa	%xmm15,0x110(%rsp)
 	movdqa	%xmm14,0x100(%rsp)
@@ -290,6 +291,7 @@ sigdelayed:
 	movdqa	0x110(%rsp),%xmm15
 	fninit
 	fldcw	0x120(%rsp)
+	ldmxcsr	0x124(%rsp)
 	addq	\$0x128,%rsp
 	popq	%rax
 	popq	%rbx

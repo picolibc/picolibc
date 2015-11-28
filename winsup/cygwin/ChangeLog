@@ -1,3 +1,8 @@
+2015-11-28  Corinna Vinschen  <corinna@vinschen.de>
+
+	* gendef (sigdelayed): Save and restore content of the MXCSR register
+	on x86_64.
+
 2015-11-27  Corinna Vinschen  <corinna@vinschen.de>
 
 	* cygtls.h (_cygtls::wait_signal_arrived): Renamed from
