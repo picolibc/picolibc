@@ -811,6 +811,12 @@ get_posix_access (PSECURITY_DESCRIPTOR psd,
 		  if (owner_eq_group && !saw_group_obj)
 		    {
 		      type = GROUP_OBJ;
+		      /* Gid and uid are not necessarily the same even if the
+			 SID is the same: /etc/group is in use and the user got
+			 added to /etc/group using another gid than the uid.
+			 This is a border case but it happened and resetting id
+			 to gid is not much of a burden. */
+		      id = gid;
 		      if (ace->Header.AceType == ACCESS_ALLOWED_ACE_TYPE)
 			saw_group_obj = true;
 		    }
@@ -871,8 +877,12 @@ get_posix_access (PSECURITY_DESCRIPTOR psd,
 	      if (saw_def_user_obj)
 		{
 		  if (owner_eq_group && !saw_def_group_obj && attr & S_ISGID)
-		    type = GROUP_OBJ;	/* This needs post-processing in the
-					   following GROUP_OBJ handling... */
+		    {
+		      /* This needs post-processing in the following GROUP_OBJ
+		         handling...  Set id to ILLEGAL_GID to play it safe. */
+		      type = GROUP_OBJ;
+		      id = ILLEGAL_GID;
+		    }
 		  else
 		    type = USER;
 		}

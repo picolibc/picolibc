@@ -1,3 +1,9 @@
+2015-11-29  Corinna Vinschen  <corinna@vinschen.de>
+
+	* sec_acl.cc (get_posix_access): In case owner SID == group SID, when
+	encountering the group entry, change the value of `id' accordingly.
+	Explain why.
+
 2015-11-28  Corinna Vinschen  <corinna@vinschen.de>
 
 	* gendef (sigdelayed): Save and restore content of the MXCSR register
