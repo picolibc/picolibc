@@ -74,9 +74,10 @@ doesn't matter if you write <literal>FAT</literal> into this field even if
 the filesystem is NTFS.  Cygwin figures out the filesystem type and its
 capabilities by itself.</para>
 
-<para>The only exception is the file system type cygdrive.  This type is
-used to set the cygdrive prefix.  For a description of the cygdrive prefix
-see <xref linkend="cygdrive"></xref></para>
+<para>The only two exceptions are the file system types cygdrive and usertemp.
+The cygdrive type is used to set the cygdrive prefix.  For a description of
+the cygdrive prefix see <xref linkend="cygdrive"></xref>, for a description of
+the usertemp file system type see <xref linkend="usertemp"></xref></para>
 
 <para>The fourth field describes the mount options associated
 with the filesystem.  It is formatted as a comma separated list of
@@ -350,6 +351,23 @@ independently from the current cygdrive prefix:</para>
   EOF
   $ sh -c ./x.sh
   -rwxrwx---+ 1 SYSTEM SYSTEM 826 Sep  4 22:43 hosts
+</screen>
+
+</sect2>
+
+<sect2 id="usertemp"><title>The usertemp file system type</title>
+
+<para>On Windows, the environment variable <literal>TEMP</literal> specifies
+the location of the temp folder.  It serves the same purpose as the /tmp/
+directory in Unix systems.  In contrast to /tmp/, it is by default a
+different folder for every Windows.  By using the special purpose usertemp
+file system, that temp folder can be mapped to /tmp/.  This is particularly
+useful in setups where the administrator wants to write-protect the entire
+Cygwin directory.  The usertemp file system can be configured in /etc/fstab
+like this:</para>
+
+<screen>
+  none /tmp usertemp binary,posix=0 0 0
 </screen>
 
 </sect2>

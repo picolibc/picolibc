@@ -1,3 +1,7 @@
+2015-12-07  Johannes Schindelin  <johannes.schindelin@gmx.de>
+
+	* pathnames.xml: Document the new usertemp file system type.
+
 2015-12-06  Corinna Vinschen  <corinna@vinschen.de>
 
 	* new-features.xml (ov-new2.4): Document cygpath -U option.

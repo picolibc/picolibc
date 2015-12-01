@@ -1186,6 +1186,8 @@ mount_info::from_fstab_line (char *line, bool user)
   unsigned mount_flags = MOUNT_SYSTEM | MOUNT_BINARY;
   if (!strcmp (fs_type, "cygdrive"))
     mount_flags |= MOUNT_NOPOSIX;
+  if (!strcmp (fs_type, "usertemp"))
+    mount_flags |= MOUNT_IMMUTABLE;
   if (!fstab_read_flags (&c, mount_flags, false))
     return true;
   if (mount_flags & MOUNT_BIND)
@@ -1209,6 +1211,22 @@ mount_info::from_fstab_line (char *line, bool user)
       cygdrive_flags = mount_flags | MOUNT_CYGDRIVE;
       slashify (posix_path, cygdrive, 1);
       cygdrive_len = strlen (cygdrive);
+    }
+  else if (!strcmp (fs_type, "usertemp"))
+    {
+      WCHAR tmp[PATH_MAX + 1];
+
+      if (GetTempPathW (PATH_MAX, tmp))
+	{
+	  tmp_pathbuf tp;
+	  char *mb_tmp = tp.c_get ();
+	  sys_wcstombs (mb_tmp, PATH_MAX, tmp);
+
+	  mount_flags |= MOUNT_USER_TEMP;
+	  int res = mount_table->add_item (mb_tmp, posix_path, mount_flags);
+	  if (res && get_errno () == EMFILE)
+	    return false;
+	}
     }
   else
     {
@@ -1666,6 +1684,9 @@ fillout_mntent (const char *native_path, const char *posix_path, unsigned flags)
 
   if (flags & (MOUNT_BIND))
     strcat (_my_tls.locals.mnt_opts, (char *) ",bind");
+
+  if (flags & (MOUNT_USER_TEMP))
+    strcat (_my_tls.locals.mnt_opts, (char *) ",usertemp");
 
   ret.mnt_opts = _my_tls.locals.mnt_opts;
 

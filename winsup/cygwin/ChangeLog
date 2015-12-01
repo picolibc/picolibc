@@ -1,3 +1,9 @@
+2015-12-07  Johannes Schindelin  <johannes.schindelin@gmx.de>
+
+	* mount.cc (mount_info::from_fstab_line): Support mounting the current
+	user's temp folder as /tmp/.  This is particularly useful a feature
+	when Cygwin's own files are write-protected.
+
 2015-12-07  Corinna Vinschen  <corinna@vinschen.de>
 
 	* include/sys/select.h: Move select(2) macros from newlib's sys/types.h
