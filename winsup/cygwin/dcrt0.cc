@@ -412,15 +412,15 @@ child_info_fork::alloc_stack ()
   /* Make sure not to try a hard allocation if we have been forked off from
      the main thread of a Cygwin process which has been started from a 64 bit
      parent.  In that case the StackBase of the forked child is not the same
-     as the StackBase of the parent (== stackbottom), but only because the
+     as the StackBase of the parent (== this.stackbase), but only because the
      stack of the parent has been slightly rearranged.  See comment in
      wow64_revert_to_original_stack for details. We check here if the
      parent stack fits into the child stack. */
   PTEB teb = NtCurrentTeb ();
-  if (teb->Tib.StackBase != stackbottom
+  if (teb->Tib.StackBase != stackbase
       && (!wincap.is_wow64 ()
-	  || stacktop < teb->DeallocationStack
-	  || stackbottom > teb->Tib.StackBase))
+	  || stacklimit < teb->DeallocationStack
+	  || stackbase > teb->Tib.StackBase))
     {
       void *stack_ptr;
       size_t stacksize;
@@ -430,21 +430,21 @@ child_info_fork::alloc_stack ()
       if (guardsize == (size_t) -1)
 	return;
       /* Reserve entire stack. */
-      stacksize = (PBYTE) stackbottom - (PBYTE) stackaddr;
+      stacksize = (PBYTE) stackbase - (PBYTE) stackaddr;
       if (!VirtualAlloc (stackaddr, stacksize, MEM_RESERVE, PAGE_NOACCESS))
 	{
 	  api_fatal ("fork: can't reserve memory for parent stack "
 		     "%p - %p, (child has %p - %p), %E",
-		     stackaddr, stackbottom, teb->DeallocationStack,
+		     stackaddr, stackbase, teb->DeallocationStack,
 		     teb->Tib.StackBase);
 	}
       /* Commit the area commited in parent. */
-      stacksize = (PBYTE) stackbottom - (PBYTE) stacktop;
-      stack_ptr = VirtualAlloc (stacktop, stacksize, MEM_COMMIT,
+      stacksize = (PBYTE) stackbase - (PBYTE) stacklimit;
+      stack_ptr = VirtualAlloc (stacklimit, stacksize, MEM_COMMIT,
 				PAGE_READWRITE);
       if (!stack_ptr)
 	api_fatal ("can't commit memory for stack %p(%ly), %E",
-		   stacktop, stacksize);
+		   stacklimit, stacksize);
       /* Set up guardpages. */
       ULONG real_guardsize = guardsize
 			     ? roundup2 (guardsize, wincap.page_size ())
@@ -472,26 +472,26 @@ child_info_fork::alloc_stack ()
       /* Fork has been called from main thread.  Simply commit the region
 	 of the stack commited in the parent but not yet commited in the
 	 child and create new guardpages. */
-      if (NtCurrentTeb()->Tib.StackLimit > stacktop)
+      if (NtCurrentTeb()->Tib.StackLimit > stacklimit)
 	{
 	  SIZE_T commitsize = (PBYTE) NtCurrentTeb()->Tib.StackLimit
-			      - (PBYTE) stacktop;
-	  if (!VirtualAlloc (stacktop, commitsize, MEM_COMMIT, PAGE_READWRITE))
+			      - (PBYTE) stacklimit;
+	  if (!VirtualAlloc (stacklimit, commitsize, MEM_COMMIT, PAGE_READWRITE))
 	    api_fatal ("can't commit child memory for stack %p(%ly), %E",
-		       stacktop, commitsize);
-	  PVOID guardpage = (PBYTE) stacktop - wincap.def_guard_page_size ();
+		       stacklimit, commitsize);
+	  PVOID guardpage = (PBYTE) stacklimit - wincap.def_guard_page_size ();
 	  if (!VirtualAlloc (guardpage, wincap.def_guard_page_size (),
 			     MEM_COMMIT, PAGE_READWRITE | PAGE_GUARD))
 	    api_fatal ("fork: couldn't allocate new stack guard page %p, %E",
 		       guardpage);
-	  NtCurrentTeb()->Tib.StackLimit = stacktop;
+	  NtCurrentTeb()->Tib.StackLimit = stacklimit;
 	}
       stackaddr = 0;
       /* This only affects forked children of a process started from a native
 	 64 bit process, but it doesn't hurt to do it unconditionally.  Fix
 	 StackBase in the child to be the same as in the parent, so that the
 	 computation of _my_tls is correct. */
-      teb->Tib.StackBase = (PVOID) stackbottom;
+      teb->Tib.StackBase = (PVOID) stackbase;
     }
 }
 
@@ -920,8 +920,8 @@ dll_crt0_1 (void *)
 	 this step. */
       if (fork_info->stackaddr)
 	{
-	  NtCurrentTeb()->Tib.StackBase = (PVOID) fork_info->stackbottom;
-	  NtCurrentTeb()->Tib.StackLimit = (PVOID) fork_info->stacktop;
+	  NtCurrentTeb()->Tib.StackBase = (PVOID) fork_info->stackbase;
+	  NtCurrentTeb()->Tib.StackLimit = (PVOID) fork_info->stacklimit;
 	}
 
       /* Not resetting _my_tls.incyg here because presumably fork will overwrite

@@ -1,5 +1,12 @@
 2015-12-02  Corinna Vinschen  <corinna@vinschen.de>
 
+	* child_info.h (CURR_CHILD_INFO_MAGIC): Align to below change.
+	(class child_info_fork): Rename stacktop to stacklimit.  Rename
+	stackbottom to stackbase.  Accommodate name change throughout Cygwin.
+	Rephrase comments to be clearer.
+
+2015-12-02  Corinna Vinschen  <corinna@vinschen.de>
+
 	* cygtls.h (_tlsbase): Remove.  Replace throughout with
 	NtCurrentTeb()->Tib.StackBase.
 	(_tlstop): Remove. Replace throughout with
