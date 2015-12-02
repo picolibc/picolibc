@@ -898,8 +898,8 @@ err:
 }
 
 #ifdef __x86_64__
-/* These functions are almost verbatim FreeBSD code (even if ther header of
-   one file mentioneds NetBSD), just wrapped in the minimum required code to
+/* These functions are almost verbatim FreeBSD code (even if the header of
+   one file mentiones NetBSD), just wrapped in the minimum required code to
    make them work with the MS AMD64 ABI.
    See FreeBSD src/lib/libc/amd64/string/memset.S
    and FreeBSD src/lib/libc/amd64/string/bcopy.S */
