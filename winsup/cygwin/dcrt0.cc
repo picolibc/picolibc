@@ -411,15 +411,16 @@ child_info_fork::alloc_stack ()
 {
   /* Make sure not to try a hard allocation if we have been forked off from
      the main thread of a Cygwin process which has been started from a 64 bit
-     parent.  In that case the _tlsbase of the forked child is not the same
-     as the _tlsbase of the parent (== stackbottom), but only because the
+     parent.  In that case the StackBase of the forked child is not the same
+     as the StackBase of the parent (== stackbottom), but only because the
      stack of the parent has been slightly rearranged.  See comment in
      wow64_revert_to_original_stack for details. We check here if the
      parent stack fits into the child stack. */
-  if (_tlsbase != stackbottom
+  PTEB teb = NtCurrentTeb ();
+  if (teb->Tib.StackBase != stackbottom
       && (!wincap.is_wow64 ()
-	  || stacktop < NtCurrentTeb ()->DeallocationStack
-	  || stackbottom > _tlsbase))
+	  || stacktop < teb->DeallocationStack
+	  || stackbottom > teb->Tib.StackBase))
     {
       void *stack_ptr;
       size_t stacksize;
@@ -432,10 +433,10 @@ child_info_fork::alloc_stack ()
       stacksize = (PBYTE) stackbottom - (PBYTE) stackaddr;
       if (!VirtualAlloc (stackaddr, stacksize, MEM_RESERVE, PAGE_NOACCESS))
 	{
-	  PTEB teb = NtCurrentTeb ();
 	  api_fatal ("fork: can't reserve memory for parent stack "
 		     "%p - %p, (child has %p - %p), %E",
-		     stackaddr, stackbottom, teb->DeallocationStack, _tlsbase);
+		     stackaddr, stackbottom, teb->DeallocationStack,
+		     teb->Tib.StackBase);
 	}
       /* Commit the area commited in parent. */
       stacksize = (PBYTE) stackbottom - (PBYTE) stacktop;
@@ -471,9 +472,10 @@ child_info_fork::alloc_stack ()
       /* Fork has been called from main thread.  Simply commit the region
 	 of the stack commited in the parent but not yet commited in the
 	 child and create new guardpages. */
-      if (_tlstop > stacktop)
+      if (NtCurrentTeb()->Tib.StackLimit > stacktop)
 	{
-	  SIZE_T commitsize = (PBYTE) _tlstop - (PBYTE) stacktop;
+	  SIZE_T commitsize = (PBYTE) NtCurrentTeb()->Tib.StackLimit
+			      - (PBYTE) stacktop;
 	  if (!VirtualAlloc (stacktop, commitsize, MEM_COMMIT, PAGE_READWRITE))
 	    api_fatal ("can't commit child memory for stack %p(%ly), %E",
 		       stacktop, commitsize);
@@ -482,14 +484,14 @@ child_info_fork::alloc_stack ()
 			     MEM_COMMIT, PAGE_READWRITE | PAGE_GUARD))
 	    api_fatal ("fork: couldn't allocate new stack guard page %p, %E",
 		       guardpage);
-	  _tlstop = stacktop;
+	  NtCurrentTeb()->Tib.StackLimit = stacktop;
 	}
       stackaddr = 0;
       /* This only affects forked children of a process started from a native
 	 64 bit process, but it doesn't hurt to do it unconditionally.  Fix
 	 StackBase in the child to be the same as in the parent, so that the
 	 computation of _my_tls is correct. */
-      _tlsbase = (PVOID) stackbottom;
+      teb->Tib.StackBase = (PVOID) stackbottom;
     }
 }
 
@@ -918,8 +920,8 @@ dll_crt0_1 (void *)
 	 this step. */
       if (fork_info->stackaddr)
 	{
-	  _tlsbase = (PVOID) fork_info->stackbottom;
-	  _tlstop = (PVOID) fork_info->stacktop;
+	  NtCurrentTeb()->Tib.StackBase = (PVOID) fork_info->stackbottom;
+	  NtCurrentTeb()->Tib.StackLimit = (PVOID) fork_info->stacktop;
 	}
 
       /* Not resetting _my_tls.incyg here because presumably fork will overwrite

@@ -286,18 +286,7 @@ private:
 #include "cygerrno.h"
 #include "ntdll.h"
 
-#ifdef __x86_64__
-/* When just using a "gs:X" asm for the x86_64 code, gcc wrongly creates
-   pc-relative instructions.  However, NtCurrentTeb() is inline assembler
-   anyway, so using it here should be fast enough on x86_64. */
-#define _tlsbase (NtCurrentTeb()->Tib.StackBase)
-#define _tlstop (NtCurrentTeb()->Tib.StackLimit)
-#else
-extern PVOID _tlsbase __asm__ ("%fs:4");
-extern PVOID _tlstop __asm__ ("%fs:8");
-#endif
-
-#define _my_tls (*((_cygtls *) ((char *)_tlsbase - CYGTLS_PADSIZE)))
+#define _my_tls (*((_cygtls *) ((PBYTE) NtCurrentTeb()->Tib.StackBase - CYGTLS_PADSIZE)))
 extern _cygtls *_main_tls;
 extern _cygtls *_sig_tls;
 

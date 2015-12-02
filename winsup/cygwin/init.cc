@@ -42,7 +42,7 @@ munge_threadfunc ()
   if (!threadfunc_ix[0])
     {
       char **peb;
-      char **top = (char **) _tlsbase;
+      char **top = (char **) NtCurrentTeb()->Tib.StackBase;
       for (peb = ebp, i = 0; peb < top && i < 7; peb++)
 	if (*peb == search_for)
 	  threadfunc_ix[i++] = peb - ebp;

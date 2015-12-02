@@ -171,10 +171,10 @@ wow64_revert_to_original_stack (PVOID &allocationbase)
      accordingly, and return the new, 16 byte aligned address for the
      stack pointer.  The second half of the stack move is done by the
      caller _dll_crt0. */
-  _tlsbase = (char *) newbase;
-  _tlstop = (char *) newtop;
+  NtCurrentTeb()->Tib.StackBase = (char *) newbase;
+  NtCurrentTeb()->Tib.StackLimit = (char *) newtop;
   _main_tls = &_my_tls;
-  return PTR_ADD (_tlsbase, -16);
+  return PTR_ADD (NtCurrentTeb()->Tib.StackBase, -16);
 }
 
 /* Respawn WOW64 process. This is only called if we can't reuse the original

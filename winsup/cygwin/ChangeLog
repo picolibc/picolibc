@@ -1,3 +1,14 @@
+2015-12-02  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygtls.h (_tlsbase): Remove.  Replace throughout with
+	NtCurrentTeb()->Tib.StackBase.
+	(_tlstop): Remove. Replace throughout with
+	NtCurrentTeb()->Tib.StackLimit.
+	* dcrt0.cc (child_info_fork::alloc_stack): Move definition of local
+	teb variable up to be used throughout.
+	* include/cygwin/config.h (__getreent): Use inline function on both
+	architectures.
+
 2015-11-29  Corinna Vinschen  <corinna@vinschen.de>
 
 	* uinfo.cc (pwdgrp::fetch_account_from_windows): Only create 1-5-32-x

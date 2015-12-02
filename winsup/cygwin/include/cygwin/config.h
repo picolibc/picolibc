@@ -40,20 +40,19 @@ extern "C" {
 #ifdef _COMPILING_NEWLIB
 #ifdef __x86_64__
 #include "../tlsoffsets64.h"
-/* We would like to use just "%gs:8", but on x86_64 gcc uses pc-relative
-   addressing and translates "gs:8" into the wrong addressing mode. */
-static inline char *___getreent (void)
-{
-  register char *ret;
-  __asm __volatile__ ("movq %%gs:8,%0" : "=r" (ret));
-  return ret + tls_local_clib;
-}
-#define __getreent() ((struct _reent *) ___getreent())
 #else
 #include "../tlsoffsets.h"
-extern char *_tlsbase __asm__ ("%fs:4");
-#define __getreent() (struct _reent *)(_tlsbase + tls_local_clib)
 #endif
+extern inline struct _reent *__getreent (void)
+{
+  register char *ret;
+#ifdef __x86_64__
+  __asm __volatile__ ("movq %%gs:8,%0" : "=r" (ret));
+#else
+  __asm __volatile__ ("movl %%fs:4,%0" : "=r" (ret));
+#endif
+  return (struct _reent *) (ret + tls_local_clib);
+}
 #endif  /* _COMPILING_NEWLIB */
 
 #ifdef __x86_64__
