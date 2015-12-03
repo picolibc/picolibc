@@ -731,7 +731,8 @@ struct thread_info
 	  {
 	    *r = (region) { regions, (ULONG) (ULONG_PTR) thread[i].ClientId.UniqueThread,
 			    (char *) tbi.TebBaseAddress,
-			    (char *) tbi.TebBaseAddress + wincap.page_size (),
+			    (char *) tbi.TebBaseAddress
+				     + 2 * wincap.page_size (),
 			    true };
 	    regions = r;
 	  }
@@ -771,17 +772,14 @@ struct thread_info
 	}
     return NULL;
   }
-  char *fill_if_match (char *start, char *end, ULONG type, char *dest)
+  /* Helper to look for TEBs inside single allocated region since W10 1511. */
+  char *fill_if_match (char *start, char *dest)
   {
     for (region *r = regions; r; r = r->next)
-      if (r->teb && start <= r->start && r->end <= end)
+      if (r->teb && start == r->start)
 	{
-	  char *p = dest + __small_sprintf (dest, "[teb (tid %ld)",
-					    r->thread_id);
-	  if (type & MEM_MAPPED)
-	    p = stpcpy (p, " shared");
-	  stpcpy (p, "]");
-	  return dest;
+	  __small_sprintf (dest, "[teb (tid %ld)]", r->thread_id);
+	  return r->end;
 	}
     return NULL;
   }
@@ -839,6 +837,7 @@ format_process_maps (void *data, char *&destbuf)
     char *abase;
     char *rbase;
     char *rend;
+    DWORD state;
   } cur = {{{'\0'}}, (char *)1, 0, 0};
 
   MEMORY_BASIC_INFORMATION mb;
@@ -852,6 +851,7 @@ format_process_maps (void *data, char *&destbuf)
   PMEMORY_SECTION_NAME msi = (PMEMORY_SECTION_NAME) tp.w_get ();
   char *posix_modname = tp.c_get ();
   size_t maxsize = 0;
+  char *peb_teb_abase = NULL;
 
   if (destbuf)
     {
@@ -897,7 +897,8 @@ format_process_maps (void *data, char *&destbuf)
       region next = { a,
 		      (char *) mb.AllocationBase,
 		      (char *) mb.BaseAddress,
-		      (char *) mb.BaseAddress+mb.RegionSize
+		      (char *) mb.BaseAddress+mb.RegionSize,
+		      mb.State
       };
 
       /* Windows permissions are more fine-grained than the unix rwxp,
@@ -915,24 +916,48 @@ peb_teb_rinse_repeat:
 	     the region starting at the PEB address page-wise. */
 	  if (wincap.has_new_pebteb_region ())
 	    {
-	      if (!newbase && cur.rbase == (char *) peb)
-		{
-		  strcpy (posix_modname, "[peb]");
-		  peb_teb_end = cur.rend;
-		  cur.rend = cur.rbase + wincap.page_size ();
-		}
-	      else if (peb_teb_end)
+	      if (peb_teb_abase && !peb_teb_end && cur.abase == peb_teb_abase)
 		{
 		  posix_modname[0] = '\0';
-		  if (!threads.fill_if_match (cur.rbase, cur.rend,
-					      mb.Type, posix_modname))
-		    do
-		      {
-			cur.rend += wincap.page_size ();
-		      }
-		    while (!threads.fill_if_match (cur.rbase, cur.rend,
-						   mb.Type, posix_modname)
-			   && cur.rend < peb_teb_end);
+		  peb_teb_end = cur.rend;
+		  if (cur.state == MEM_COMMIT)
+		    cur.rend = cur.rbase + wincap.page_size ();
+		}
+	      if (cur.state == MEM_COMMIT)
+		{
+		  if (!peb_teb_abase && cur.rbase == (char *) peb)
+		    {
+		      peb_teb_abase = cur.abase;
+		      peb_teb_end = cur.rend;
+		      cur.rend = cur.rbase + wincap.page_size ();
+		      strcpy (posix_modname, "[peb]");
+		    }
+		  else if (peb_teb_end)
+		    {
+		      char *end;
+		      posix_modname[0] = '\0';
+		      end = threads.fill_if_match (cur.rbase, posix_modname);
+
+		      if (end)
+			cur.rend = end;
+		      else
+			{
+			  char *base = cur.rbase;
+			  do
+			    {
+			      base += wincap.page_size ();
+			    }
+			  while (!threads.fill_if_match (base, posix_modname)
+				 && base < peb_teb_end);
+			  if (posix_modname[0])
+			    {
+			      posix_modname[0] = '\0';
+			      cur.rend = base;
+			    }
+			  else
+			      cur.rend = peb_teb_end;
+			}
+		    }
 		}
 	    }
 	  /* output the current region if it's "interesting". */
@@ -956,7 +981,7 @@ peb_teb_rinse_repeat:
 	      len += __small_sprintf (destbuf + len, "%s\n", posix_modname);
 	    }
 
-	  if (peb_teb_end)
+	  if (peb_teb_end && cur.state == MEM_COMMIT)
 	    {
 	      cur.rbase = cur.rend;
 	      cur.rend += wincap.page_size ();
@@ -966,7 +991,7 @@ peb_teb_rinse_repeat:
 	  /* start of a new region (but possibly still the same allocation). */
 	  cur = next;
 	  /* if a new allocation, figure out what kind it is. */
-	  if (newbase && !last_pass && mb.State != MEM_FREE)
+	  if (newbase && !last_pass && cur.state != MEM_FREE)
 	    {
 	      /* If the return length pointer is missing, NtQueryVirtualMemory
 		 returns with STATUS_ACCESS_VIOLATION on Windows 2000. */

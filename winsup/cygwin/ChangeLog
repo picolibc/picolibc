@@ -1,5 +1,14 @@
 2015-12-03  Corinna Vinschen  <corinna@vinschen.de>
 
+	* fhandler_process.cc (thread_info::thread_info): Accommodate the fact
+	that TEBs take two pages.
+	(thread_info::fill_if_match): Rewrite the method for post W10 1511 TEB
+	detection.
+	(format_process_maps): Add a state member to region.  Fix the code
+	to handle PEB/TEB region since W10 1511.
+
+2015-12-03  Corinna Vinschen  <corinna@vinschen.de>
+
 	* fhandler_process.cc (heap_info::fill_if_match): Return NULL, not 0.
 	(thread_info::fill_if_match): Ditto.
 	(thread_info::fill_if_match): New method to extract TEB info from
