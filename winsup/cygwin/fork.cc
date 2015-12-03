@@ -308,7 +308,7 @@ frok::parent (volatile char * volatile stack_here)
   ch.forker_finished = forker_finished;
 
   ch.from_main = &_my_tls == _main_tls;
-  ch.stackbase = NtCurrentTeb()->Tib.StackBase;
+  ch.stackbase = NtCurrentTeb ()->Tib.StackBase;
   ch.stackaddr = NtCurrentTeb ()->DeallocationStack;
   if (!ch.stackaddr)
     {
@@ -316,7 +316,7 @@ frok::parent (volatile char * volatile stack_here)
 	 stack.  If so, the entire stack is committed anyway and StackLimit
 	 points to the allocation address of the stack.  Mark in guardsize that
 	 we must not set up guard pages. */
-      ch.stackaddr = ch.stacklimit = NtCurrentTeb()->Tib.StackLimit;
+      ch.stackaddr = ch.stacklimit = NtCurrentTeb ()->Tib.StackLimit;
       ch.guardsize = (size_t) -1;
     }
   else
@@ -683,7 +683,7 @@ child_copy (HANDLE hp, bool write, ...)
 	  SIZE_T done = 0;
 	  if (here + todo > high)
 	    todo = high - here;
-	  int res;
+	  BOOL res;
 	  if (write)
 	    res = WriteProcessMemory (hp, here, here, todo, &done);
 	  else

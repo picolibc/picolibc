@@ -472,9 +472,9 @@ child_info_fork::alloc_stack ()
       /* Fork has been called from main thread.  Simply commit the region
 	 of the stack commited in the parent but not yet commited in the
 	 child and create new guardpages. */
-      if (NtCurrentTeb()->Tib.StackLimit > stacklimit)
+      if (NtCurrentTeb ()->Tib.StackLimit > stacklimit)
 	{
-	  SIZE_T commitsize = (PBYTE) NtCurrentTeb()->Tib.StackLimit
+	  SIZE_T commitsize = (PBYTE) NtCurrentTeb ()->Tib.StackLimit
 			      - (PBYTE) stacklimit;
 	  if (!VirtualAlloc (stacklimit, commitsize, MEM_COMMIT, PAGE_READWRITE))
 	    api_fatal ("can't commit child memory for stack %p(%ly), %E",
@@ -484,7 +484,7 @@ child_info_fork::alloc_stack ()
 			     MEM_COMMIT, PAGE_READWRITE | PAGE_GUARD))
 	    api_fatal ("fork: couldn't allocate new stack guard page %p, %E",
 		       guardpage);
-	  NtCurrentTeb()->Tib.StackLimit = stacklimit;
+	  NtCurrentTeb ()->Tib.StackLimit = stacklimit;
 	}
       /* This only affects forked children of a process started from a native
 	 64 bit process, but it doesn't hurt to do it unconditionally.  Fix
