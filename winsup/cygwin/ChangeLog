@@ -1,5 +1,10 @@
 2015-12-03  Corinna Vinschen  <corinna@vinschen.de>
 
+	* crt0.cc (dll_crt0_1): Always restore the TEB stack info.  Especially
+	restore DeallocationStack.  Fix comment.
+
+2015-12-03  Corinna Vinschen  <corinna@vinschen.de>
+
 	* dcrt0.cc (child_info_fork::alloc_stack): Don't set stackaddr to 0.
 
 2015-12-03  Corinna Vinschen  <corinna@vinschen.de>

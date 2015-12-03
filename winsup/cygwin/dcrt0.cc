@@ -910,18 +910,18 @@ dll_crt0_1 (void *)
   cygbench ("pre-forkee");
   if (in_forkee)
     {
-      /* If we've played with the stack, stacksize != 0.  That means that
-	 fork() was invoked from other than the main thread.  Make sure that
-	 frame pointer is referencing the new stack so that the OS knows what
-	 to do when it needs to increase the size of the stack.
+      /* Make sure to restore the TEB's stack info.  If guardsize is -1 the
+	 stack has been provided by the application and must not be deallocated
+	 automagically when the thread exits.
 
 	 NOTE: Don't do anything that involves the stack until you've completed
 	 this step. */
-      if (fork_info->stackaddr)
-	{
-	  NtCurrentTeb()->Tib.StackBase = (PVOID) fork_info->stackbase;
-	  NtCurrentTeb()->Tib.StackLimit = (PVOID) fork_info->stacklimit;
-	}
+      PTEB teb = NtCurrentTeb ();
+      teb->Tib.StackBase = (PVOID) fork_info->stackbase;
+      teb->Tib.StackLimit = (PVOID) fork_info->stacklimit;
+      teb->DeallocationStack = (fork_info->guardsize == (size_t) -1)
+			       ? NULL
+			       : (PVOID) fork_info->stackaddr;
 
       /* Not resetting _my_tls.incyg here because presumably fork will overwrite
 	 it with the value of the forker and all will be good.   */
