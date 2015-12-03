@@ -8,10 +8,6 @@ This software is a copyrighted work licensed under the terms of the
 Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
-#ifndef __x86_64__
-/* WOW64 only plays a role in the 32 bit version.  Don't use any of this
-   in the 64 bit version. */
-
 #include "winsup.h"
 #include "cygtls.h"
 #include "ntdll.h"
@@ -25,11 +21,11 @@ static void
 wow64_eval_expected_main_stack (PVOID &allocbase, PVOID &stackbase)
 {
   PIMAGE_DOS_HEADER dosheader;
-  PIMAGE_NT_HEADERS32 ntheader;
-  DWORD size;
+  PIMAGE_NT_HEADERS ntheader;
+  SIZE_T size;
 
   dosheader = (PIMAGE_DOS_HEADER) GetModuleHandle (NULL);
-  ntheader = (PIMAGE_NT_HEADERS32) ((PBYTE) dosheader + dosheader->e_lfanew);
+  ntheader = (PIMAGE_NT_HEADERS) ((PBYTE) dosheader + dosheader->e_lfanew);
   /* The main thread stack is expected to be located at 0x30000, which is the
      case for all observed NT systems up to Server 2003 R2, unless the
      stacksize requested by the StackReserve field in the PE/COFF header is
@@ -41,8 +37,15 @@ wow64_eval_expected_main_stack (PVOID &allocbase, PVOID &stackbase)
      stack address on Vista/2008 64 bit is 0x80000 and on W7/2K8R2 64 bit
      it is 0x90000.  However, this is no problem because the system sticks
      to that address for all WOW64 processes, not only for the first one
-     started from a 64 bit parent. */
+     started from a 64 bit parent.
+
+     On 64 bit W10 1511 the stack starts at 0x400000 by default.  See comment
+     in wow64_test_for_64bit_parent. */
+#ifdef __x86_64__
+  allocbase = (PVOID) 0x400000;
+#else
   allocbase = (PVOID) 0x30000;
+#endif
   /* Stack size.  The OS always rounds the size up to allocation granularity
      and it never allocates less than 256K. */
   size = roundup2 (ntheader->OptionalHeader.SizeOfStackReserve,
@@ -71,11 +74,19 @@ wow64_test_for_64bit_parent ()
      we have to "alloc_stack_hard_way".  However, this fails in almost all
      cases because the stack slot of the parent process is taken by something
      else in the child process.
-     What we do here is to check if the current stack is the excpected main
+     What we do here is to check if the current stack is the expected main
      thread stack and if not, if we really have been started from a 64 bit
      process here.  If so, we note this fact in wow64_needs_stack_adjustment
      so we can workaround the stack problem in _dll_crt0.  See there for how
      we go along. */
+
+  /* Amazing but true: Starting with Windows 10 1511 this problem has been
+     reintroduced, just in the opposite direction: If a 64 bit process is
+     created from a 32 bit WOW64 process, the main thread stack in the 64
+     bit child gets moved to another location than the default.  In the
+     forked child, the stack is back where it usually is when started from
+     another 64 bit process.  Therefore we have to be able to recognize
+     this scenarion now on 64 bit as well.  We I don't believe it... */
   NTSTATUS ret;
   PROCESS_BASIC_INFORMATION pbi;
   HANDLE parent;
@@ -86,7 +97,7 @@ wow64_test_for_64bit_parent ()
   /* First check if the current stack is where it belongs.  If so, we don't
      have to do anything special.  This is the case on Vista and later. */
   wow64_eval_expected_main_stack (allocbase, stackbase);
-  if (&wow64 >= (PULONG) allocbase && &wow64 < (PULONG) stackbase)
+  if (&wow64 >= (PULONG_PTR) allocbase && &wow64 < (PULONG_PTR) stackbase)
     return false;
 
   /* Check if the parent is a native 64 bit process.  Unfortunately there's
@@ -106,6 +117,8 @@ wow64_test_for_64bit_parent ()
     }
   return !wow64;
 }
+
+#ifndef __x86_64__
 
 PVOID
 wow64_revert_to_original_stack (PVOID &allocationbase)
@@ -177,6 +190,8 @@ wow64_revert_to_original_stack (PVOID &allocationbase)
   return PTR_ADD (NtCurrentTeb()->Tib.StackBase, -16);
 }
 
+#endif /* !__x86_64__ */
+
 /* Respawn WOW64 process. This is only called if we can't reuse the original
    stack.  See comment in wow64_revert_to_original_stack for details.  See
    _dll_crt0 for the call of this function.
@@ -211,5 +226,3 @@ wow64_respawn_process ()
   TerminateProcess (GetCurrentProcess (), ret);
   ExitProcess (ret);
 }
-
-#endif /* !__x86_64__ */

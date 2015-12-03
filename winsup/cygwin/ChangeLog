@@ -1,5 +1,23 @@
 2015-12-03  Corinna Vinschen  <corinna@vinschen.de>
 
+	* dcrt0.cc (dll_crt0_0): On 64 bit, set wow64_needs_stack_adjustment
+	if not started from a 64 bit process.
+	(_dll_crt0): Enable wow64_needs_stack_adjustment branch on 64 bit
+	as well.  Remove 64 bit only code.  Introduce CREATE_STACK and
+	FIX_STACK macros to conditionalize the code.  Rearrange and
+	partially rewrite comments.
+	* wincap.h (wincaps::has_3264_stack_broken): New element.
+	* wincap.cc: Implement above element throughout.
+	(wincapc::init): Set has_3264_stack_broken to false on 32 bit.
+	* wow64.cc: Enable functionality on 64 bit architecture, except for
+	wow64_revert_to_original_stack.  Enhance comments to explain.
+	(wow64_eval_expected_main_stack): Make 64 bit clean.
+	(wow64_test_for_64bit_parent): Ditto.
+	* wow64.h: Export wow64_revert_to_original_stack on 32 bit only,
+	everything else on all architectures.
+
+2015-12-03  Corinna Vinschen  <corinna@vinschen.de>
+
 	* fhandler_process.cc (thread_info::thread_info): Accommodate the fact
 	that TEBs take two pages.
 	(thread_info::fill_if_match): Rewrite the method for post W10 1511 TEB
