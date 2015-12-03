@@ -1,5 +1,19 @@
 2015-12-03  Corinna Vinschen  <corinna@vinschen.de>
 
+	* fhandler_process.cc (heap_info::fill_if_match): Return NULL, not 0.
+	(thread_info::fill_if_match): Ditto.
+	(thread_info::fill_if_match): New method to extract TEB info from
+	PEB/TEB region since W10 1511.
+	(format_process_maps): Drop outdated FIXME comment.  Add code to handle
+	PEB/TEB region since W10 1511.
+	* mmap.cc (posix_madvise): Align comment to new W10 1511 version.
+	* wincap.h (wincaps::has_new_pebteb_region): New element.
+	* wincap.cc: Implement above element throughout.
+	(wincap_10_1511): New global wincaps to support Windows 10 since 1511.
+	(wincapc::init): Use wincap_10_1511 for W10 builds >= 10586.
+
+2015-12-03  Corinna Vinschen  <corinna@vinschen.de>
+
 	x86_64 only:
 	* dcrt0.cc (_dll_crt0): Always move stack to pthread stack area.
 	Explain why.

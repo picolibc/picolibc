@@ -648,7 +648,7 @@ struct heap_info
 	  stpcpy (p, "]");
 	  return dest;
 	}
-    return 0;
+    return NULL;
   }
 
   ~heap_info ()
@@ -769,7 +769,21 @@ struct thread_info
 	  stpcpy (p, "]");
 	  return dest;
 	}
-    return 0;
+    return NULL;
+  }
+  char *fill_if_match (char *start, char *end, ULONG type, char *dest)
+  {
+    for (region *r = regions; r; r = r->next)
+      if (r->teb && start <= r->start && r->end <= end)
+	{
+	  char *p = dest + __small_sprintf (dest, "[teb (tid %ld)",
+					    r->thread_id);
+	  if (type & MEM_MAPPED)
+	    p = stpcpy (p, " shared");
+	  stpcpy (p, "]");
+	  return dest;
+	}
+    return NULL;
   }
 
   ~thread_info ()
@@ -847,12 +861,7 @@ format_process_maps (void *data, char *&destbuf)
 
   /* Iterate over each VM region in the address space, coalescing
      memory regions with the same permissions. Once we run out, do one
-     last_pass to trigger output of the last accumulated region.
-     
-     FIXME:  32 bit processes can't get address information beyond the
-	     32 bit address space from 64 bit processes.  We have to run
-	     this functionality in the target process, if the target
-	     process is 64 bit and our own process is 32 bit. */
+     last_pass to trigger output of the last accumulated region. */
   for (char *i = 0;
        VirtualQueryEx (proc, i, &mb, sizeof(mb)) || (1 == ++last_pass);
        i = cur.rend)
@@ -899,6 +908,33 @@ format_process_maps (void *data, char *&destbuf)
 	  cur.rend = next.rend; /* merge with previous */
       else
 	{
+	  char *peb_teb_end = NULL;
+peb_teb_rinse_repeat:
+	  /* Starting with W10 1511, PEB and TEBs don't get allocated
+	     separately.  Rather they are created in a single region.  Examine
+	     the region starting at the PEB address page-wise. */
+	  if (wincap.has_new_pebteb_region ())
+	    {
+	      if (!newbase && cur.rbase == (char *) peb)
+		{
+		  strcpy (posix_modname, "[peb]");
+		  peb_teb_end = cur.rend;
+		  cur.rend = cur.rbase + wincap.page_size ();
+		}
+	      else if (peb_teb_end)
+		{
+		  posix_modname[0] = '\0';
+		  if (!threads.fill_if_match (cur.rbase, cur.rend,
+					      mb.Type, posix_modname))
+		    do
+		      {
+			cur.rend += wincap.page_size ();
+		      }
+		    while (!threads.fill_if_match (cur.rbase, cur.rend,
+						   mb.Type, posix_modname)
+			   && cur.rend < peb_teb_end);
+		}
+	    }
 	  /* output the current region if it's "interesting". */
 	  if (cur.a.word)
 	    {
@@ -918,6 +954,14 @@ format_process_maps (void *data, char *&destbuf)
 		destbuf[len + written++] = ' ';
 	      len += written;
 	      len += __small_sprintf (destbuf + len, "%s\n", posix_modname);
+	    }
+
+	  if (peb_teb_end)
+	    {
+	      cur.rbase = cur.rend;
+	      cur.rend += wincap.page_size ();
+	      if (cur.rbase < peb_teb_end)
+		goto peb_teb_rinse_repeat;
 	    }
 	  /* start of a new region (but possibly still the same allocation). */
 	  cur = next;
