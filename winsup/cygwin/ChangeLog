@@ -1,5 +1,14 @@
 2015-12-03  Corinna Vinschen  <corinna@vinschen.de>
 
+	x86_64 only:
+	* dcrt0.cc (_dll_crt0): Always move stack to pthread stack area.
+	Explain why.
+	* miscfuncs.cc (create_new_main_thread_stack): New function to create
+	OS-like stack for main thread in pthread stack area.
+	* miscfuncs.cc (create_new_main_thread_stack): Declare.
+
+2015-12-03  Corinna Vinschen  <corinna@vinschen.de>
+
 	* dcrt0.cc (child_info_fork::alloc_stack): Fix formatting.
 	* fork.cc (frok::parent): Fix formatting.
 	(child_copy): Change type of res to BOOL.

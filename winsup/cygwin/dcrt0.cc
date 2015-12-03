@@ -1093,6 +1093,35 @@ _dll_crt0 ()
 	/* Fall back to respawn if wow64_revert_to_original_stack fails. */
 	wow64_respawn_process ();
     }
+#else
+  /* Starting with Windows 10 rel 1511, the main stack of an application is
+     not reproducible if a 64 bit process has been started from a 32 bit
+     process.  Given that we have enough virtual address space on 64 bit
+     anyway, we now move the main thread stack to the stack area reserved for
+     pthread stacks.  This allows a reproducible stack space under our own
+     control and avoids collision with the OS. */
+  if (!in_forkee && !dynamically_loaded)
+    {
+      /* Must be static since it's referenced after the stack and frame
+	 pointer registers have been changed. */
+      static PVOID allocationbase;
+
+      PVOID stackaddr = create_new_main_thread_stack (allocationbase);
+      if (stackaddr)
+	{
+	  /* 2nd half of the stack move.  Set stack pointer to new address.
+	     Don't set frame pointer to 0 since x86_64 uses the stack while
+	     evaluating NtCurrentTeb (). */
+	  __asm__ ("\n\
+		   movq %[ADDR], %%rsp \n\
+		   movq  %%rsp, %%rbp   \n"
+		   : : [ADDR] "r" (stackaddr));
+	  /* Now we're back on the new stack.  Free up space taken by the
+	     former main thread stack and set DeallocationStack correctly. */
+	  VirtualFree (NtCurrentTeb ()->DeallocationStack, 0, MEM_RELEASE);
+	  NtCurrentTeb ()->DeallocationStack = allocationbase;
+	}
+    }
 #endif /* !__x86_64__ */
   _feinitialise ();
 #ifndef __x86_64__
