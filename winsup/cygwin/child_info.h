@@ -39,7 +39,7 @@ enum child_status
 #define EXEC_MAGIC_SIZE sizeof(child_info)
 
 /* Change this value if you get a message indicating that it is out-of-sync. */
-#define CURR_CHILD_INFO_MAGIC 0xc96f5e9U
+#define CURR_CHILD_INFO_MAGIC 0x30ea98f6U
 
 #define NPROCS	256
 
@@ -109,6 +109,7 @@ public:
   void *stackbase;	// StackBase of parent thread
   size_t guardsize;     // size of POSIX guard region or (size_t) -1 if
 			// user stack
+  bool from_main;	// true if started from parent's main thread
   char filler[4];
   child_info_fork ();
   void __reg1 handle_fork ();

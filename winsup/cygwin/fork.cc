@@ -149,7 +149,7 @@ frok::child (volatile char * volatile here)
   /* If we've played with the stack, stacksize != 0.  That means that
      fork() was invoked from other than the main thread.  Make sure that
      the threadinfo information is properly set up.  */
-  if (fork_info->stackaddr)
+  if (!fork_info->from_main)
     {
       _main_tls = &_my_tls;
       _main_tls->init_thread (NULL, NULL);
@@ -307,6 +307,7 @@ frok::parent (volatile char * volatile stack_here)
 
   ch.forker_finished = forker_finished;
 
+  ch.from_main = &_my_tls == _main_tls;
   ch.stackbase = NtCurrentTeb()->Tib.StackBase;
   ch.stackaddr = NtCurrentTeb ()->DeallocationStack;
   if (!ch.stackaddr)

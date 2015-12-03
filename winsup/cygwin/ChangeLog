@@ -1,3 +1,9 @@
+2015-12-03  Corinna Vinschen  <corinna@vinschen.de>
+
+	* child_info.h (struct child_info): Add member from_main.
+	* fork.cc (frok::child): Check from_main rather than stackaddr.
+	(frok::parent): Set ch.from_main if running in the main thread.
+
 2015-12-02  Corinna Vinschen  <corinna@vinschen.de>
 
 	* child_info.h (CURR_CHILD_INFO_MAGIC): Align to below change.
