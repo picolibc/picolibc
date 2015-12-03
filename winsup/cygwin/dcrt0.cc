@@ -486,7 +486,6 @@ child_info_fork::alloc_stack ()
 		       guardpage);
 	  NtCurrentTeb()->Tib.StackLimit = stacklimit;
 	}
-      stackaddr = 0;
       /* This only affects forked children of a process started from a native
 	 64 bit process, but it doesn't hurt to do it unconditionally.  Fix
 	 StackBase in the child to be the same as in the parent, so that the
