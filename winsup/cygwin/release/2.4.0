@@ -38,6 +38,13 @@ What changed:
 Bug Fixes
 ---------
 
+- Not a bug fix as such, but a workaround for new behaviour in Windows 10
+  version 1511 64 bit.  This version introduces a problem which existed in
+  a similar variation (just vice versa) in XP and Server 2003 64 bit as well.
+  An unexpected stack arrangement when starting a 64 bit Cygwin application
+  from a 32 bit application (e.g. 32 bit CMD.EXE) broke Cygwin's fork.
+  Addresses: https://cygwin.com/ml/cygwin/2015-12/msg00003.html
+
 - Replaced old, buggy strtold implementation with well-tested gdtoa version
   from David M. Gay.
   Addresses: https://cygwin.com/ml/cygwin/2015-11/msg00205.html
