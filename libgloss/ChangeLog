@@ -1,6 +1,10 @@
-2015-11-23  Nick Clifton  <nickc@redhat.com>
+2015-12-04  Nick Clifton  <nickc@redhat.com>
 
 	* msp430/msp430xl-sim.ld (__high_bsssize): Define.
+
+2015-11-23  Nick Clifton  <nickc@redhat.com>
+
+	* msp430/msp430xl-sim.ld (__high_bsssize): Provide.
 
 2015-11-12  Anton Kolesov  <Anton.Kolesov@synopsys.com>
 

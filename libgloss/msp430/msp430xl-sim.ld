@@ -317,7 +317,7 @@ SECTIONS
     . = ALIGN(2);
     __high_bssend = .;
   } > HIFRAM
-  PROVIDE (__high_bsssize = SIZEOF(.upper.bss));
+  __high_bsssize = SIZEOF(.upper.bss);
 
   /* We create this section so that "end" will always be in the
      HIFRAM region (matching .stack below), even if the .upper.bss
