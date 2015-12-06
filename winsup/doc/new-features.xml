@@ -32,6 +32,11 @@ created by Cygwin processes.
 </para></listitem>
 
 <listitem><para>
+cygpath has a new -U option, which creates cygdrive paths using the
+unambiguous /proc/cygdrive prefix.
+</para></listitem>
+
+<listitem><para>
 New API: rpmatch.
 </para></listitem>
 

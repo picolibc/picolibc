@@ -3342,7 +3342,7 @@ cygwin_conv_path (cygwin_conv_path_t what, const void *from, void *to,
   char *buf = NULL;
   PWCHAR path = NULL;
   int error = 0;
-  bool relative = !!(what & CCP_RELATIVE);
+  int how = what & ~CCP_CONVTYPE_MASK;
   what &= CCP_CONVTYPE_MASK;
   int ret = -1;
 
@@ -3360,7 +3360,8 @@ cygwin_conv_path (cygwin_conv_path_t what, const void *from, void *to,
 	  {
 	    p.check ((const char *) from,
 		     PC_POSIX | PC_SYM_FOLLOW | PC_SYM_NOFOLLOW_REP
-		     | PC_NO_ACCESS_CHECK | PC_NOWARN | (relative ? PC_NOFULL : 0));
+		     | PC_NO_ACCESS_CHECK | PC_NOWARN
+		     | ((how & CCP_RELATIVE) ? PC_NOFULL : 0));
 	    if (p.error)
 	      {
 	        set_errno (p.error);
@@ -3393,7 +3394,7 @@ cygwin_conv_path (cygwin_conv_path_t what, const void *from, void *to,
 	       backslash ".\\" in the Win32 path.  That's a result of the
 	       conversion in normalize_posix_path.  This should not occur
 	       so the below code is just a band-aid. */
-	    if (relative && !strcmp ((const char *) from, ".")
+	    if ((how & CCP_RELATIVE) && !strcmp ((const char *) from, ".")
 		&& !strcmp (buf, ".\\"))
 	      {
 		lsiz = 2;
@@ -3404,14 +3405,15 @@ cygwin_conv_path (cygwin_conv_path_t what, const void *from, void *to,
 	case CCP_POSIX_TO_WIN_W:
 	  p.check ((const char *) from,
 		   PC_POSIX | PC_SYM_FOLLOW | PC_SYM_NOFOLLOW_REP
-		   | PC_NO_ACCESS_CHECK | PC_NOWARN | (relative ? PC_NOFULL : 0));
+		   | PC_NO_ACCESS_CHECK | PC_NOWARN
+		   | ((how & CCP_RELATIVE) ? PC_NOFULL : 0));
 	  if (p.error)
 	    {
 	      set_errno (p.error);
 	      __leave;
 	    }
 	  /* Relative Windows paths are always restricted to MAX_PATH chars. */
-	  if (relative && !isabspath (p.get_win32 ())
+	  if ((how & CCP_RELATIVE) && !isabspath (p.get_win32 ())
 	      && sys_mbstowcs (NULL, 0, p.get_win32 ()) > MAX_PATH)
 	    {
 	      /* Recreate as absolute path. */
@@ -3455,7 +3457,7 @@ cygwin_conv_path (cygwin_conv_path_t what, const void *from, void *to,
 	      lsiz += ro_u_globalroot.Length / sizeof (WCHAR);
 	    }
 	  /* TODO: Same ".\\" band-aid as in CCP_POSIX_TO_WIN_A case. */
-	  if (relative && !strcmp ((const char *) from, ".")
+	  if ((how & CCP_RELATIVE) && !strcmp ((const char *) from, ".")
 	      && !wcscmp (path, L".\\"))
 	    {
 	      lsiz = 2;
@@ -3466,7 +3468,7 @@ cygwin_conv_path (cygwin_conv_path_t what, const void *from, void *to,
 	case CCP_WIN_A_TO_POSIX:
 	  buf = tp.c_get ();
 	  error = mount_table->conv_to_posix_path ((const char *) from, buf,
-						   relative);
+						   how);
 	  if (error)
 	    {
 	      set_errno (p.error);
@@ -3477,7 +3479,7 @@ cygwin_conv_path (cygwin_conv_path_t what, const void *from, void *to,
 	case CCP_WIN_W_TO_POSIX:
 	  buf = tp.c_get ();
 	  error = mount_table->conv_to_posix_path ((const PWCHAR) from, buf,
-						   relative);
+						   how);
 	  if (error)
 	    {
 	      set_errno (error);

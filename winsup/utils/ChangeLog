@@ -1,3 +1,18 @@
+2015-12-06  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygpath.cc (absolute_flag): Initialize to CCP_RELATIVE to simplify
+	expressions.
+	(cygdrive_flag): New global flag.
+	(long_options): Add --proc-cygdrive option.
+	(options): Add -U option.
+	(usage): Add description for -U option.
+	(do_sysfolders): Or cygdrive_flag to cygwin_conv_path call.
+	(do_pathconv): Simply or absolute_flag to conv_func.  Or
+	cygdrive_flag to conv_func.
+	(do_options): Initalize absolute_flag to CCP_RELATIVE.  Initialize new
+	cygdrive_flag.  Set absolute_flag to CCP_ABSOLUTE on -a.  Set
+	cygdrive_flag to CCP_PROC_CYGDRIVE on -U.
+
 2015-11-26  Michael Kwasigroch  <mkwasigr@web.de>
 
 	* kill.cc (strsigno): Don't call sys_sigabbrev for signal 0.

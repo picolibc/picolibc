@@ -195,16 +195,15 @@ class mount_info
   unsigned set_flags_from_win32_path (const char *path);
   int conv_to_win32_path (const char *src_path, char *dst, device&,
 			  unsigned *flags = NULL);
-  int conv_to_posix_path (PWCHAR src_path, char *posix_path,
-			  int keep_rel_p);
+  int conv_to_posix_path (PWCHAR src_path, char *posix_path, int ccp_flags);
   int conv_to_posix_path (const char *src_path, char *posix_path,
-			  int keep_rel_p);
+			  int ccp_flags);
   struct mntent *getmntent (int x);
 
   int write_cygdrive_info (const char *cygdrive_prefix, unsigned flags);
   int get_cygdrive_info (char *user, char *system, char* user_flags,
 			 char* system_flags);
-  void cygdrive_posix_path (const char *src, char *dst, int trailing_slash_p);
+  void cygdrive_posix_path (const char *src, char *dst, int flags);
   int get_mounts_here (const char *parent_dir, int,
 		       PUNICODE_STRING mount_points,
 		       PUNICODE_STRING cygd);

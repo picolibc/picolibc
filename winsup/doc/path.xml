@@ -54,8 +54,10 @@ relative paths in relative notation.  Creating absolute paths is the
 default.</para>
 
 <programlisting>
-  CCP_ABSOLUTE = 0,       /* Request absolute path (default).             */
-  CCP_RELATIVE = 0x100    /* Request to keep path relative.               */
+  CCP_ABSOLUTE = 0,         /* Request absolute path (default).             */
+  CCP_RELATIVE = 0x100      /* Request to keep path relative.               */
+  CCP_PROC_CYGDRIVE = 0x200 /* Request to return /proc/cygdrive path
+                               (only with CCP_*_TO_POSIX).                  */
 </programlisting>
 
 <para><parameter>size</parameter> is the size of the buffer pointed to

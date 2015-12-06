@@ -540,7 +540,7 @@ format_process_exename (void *data, char *&destbuf)
     stpcpy (buf, "<defunct>");
   else
     {
-      mount_table->conv_to_posix_path (p->progname, buf, 1);
+      mount_table->conv_to_posix_path (p->progname, buf, CCP_RELATIVE);
       len = strlen (buf);
       if (len > 4)
 	{

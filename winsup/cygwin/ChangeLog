@@ -1,3 +1,19 @@
+2015-12-06  Corinna Vinschen  <corinna@vinschen.de>
+
+	* include/sys/cygwin.h (CCP_PROC_CYGDRIVE): New flag.
+	* mount.cc (mount_info::cygdrive_posix_path): Take flag values rather
+	than just a trailing_slash_p bool.  Emit /proc/cygdrive path if
+	CCP_PROC_CYGDRIVE flag is given.
+	(mount_info::conv_to_posix_path): Take flag values rather than just
+	a keep_rel_p bool.  Rename _p variables.  Print flag value as hex in
+	debug_printf.  Call cygdrive_posix_path with flag values.
+	* mount.h (mount_info::cygdrive_posix_path): Accommodate above change
+	in declaration.
+	(mount_info::conv_to_posix_path): Ditto.
+	* fhandler_process.cc (format_process_exename): Accommodate change to
+	mount_info::conv_to_posix_path.
+	* path.cc (cygwin_conv_path): Ditto.
+
 2015-12-03  Corinna Vinschen  <corinna@vinschen.de>
 
 	* dcrt0.cc (dll_crt0_0): On 64 bit, set wow64_needs_stack_adjustment

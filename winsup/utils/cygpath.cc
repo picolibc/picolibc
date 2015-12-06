@@ -1,6 +1,6 @@
 /* cygpath.cc -- convert pathnames between Windows and Unix format
    Copyright 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008,
-   2009, 2010, 2011, 2012, 2013 Red Hat, Inc.
+   2009, 2010, 2011, 2012, 2013, 2015 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -36,7 +36,7 @@ details. */
 
 static char *prog_name;
 static char *file_arg, *output_arg;
-static int path_flag, unix_flag, windows_flag, absolute_flag;
+static int path_flag, unix_flag, windows_flag, absolute_flag, cygdrive_flag;
 static int shortname_flag, longname_flag;
 static int ignore_flag, allusers_flag, output_flag;
 static int mixed_flag, options_from_file_flag, mode_flag;
@@ -56,6 +56,7 @@ static struct option long_options[] = {
   {(char *) "mode", no_argument, NULL, 'M'},
   {(char *) "option", no_argument, NULL, 'o'},
   {(char *) "path", no_argument, NULL, 'p'},
+  {(char *) "proc-cygdrive", no_argument, NULL, 'U'},
   {(char *) "short-name", no_argument, NULL, 's'},
   {(char *) "type", required_argument, NULL, 't'},
   {(char *) "unix", no_argument, NULL, 'u'},
@@ -73,7 +74,7 @@ static struct option long_options[] = {
   {0, no_argument, 0, 0}
 };
 
-static char options[] = "ac:df:hilmMopst:uVwAC:DHOPSWF:";
+static char options[] = "ac:df:hilmMopst:uUVwAC:DHOPSWF:";
 
 static void
 usage (FILE * stream, int status)
@@ -101,6 +102,8 @@ Path conversion options:\n\
   -a, --absolute        output absolute path\n\
   -l, --long-name       print Windows long form of NAMEs (with -w, -m only)\n\
   -p, --path            NAME is a PATH list (i.e., '/bin:/usr/bin')\n\
+  -U, --proc-cygdrive   Emit /proc/cygdrive path instead of cygdrive prefix\n\
+                        when converting Windows path to UNIX path.\n\
   -s, --short-name      print DOS (short) form of NAMEs (with -w, -m only)\n\
   -C, --codepage CP     print DOS, Windows, or mixed pathname in Windows\n\
                         codepage CP.  CP can be a numeric codepage identifier,\n\
@@ -607,7 +610,8 @@ do_sysfolders (char option)
     }
   else if (!windows_flag)
     {
-      if (cygwin_conv_path (CCP_WIN_W_TO_POSIX, wbuf, buf, PATH_MAX))
+      if (cygwin_conv_path (CCP_WIN_W_TO_POSIX | cygdrive_flag,
+			    wbuf, buf, PATH_MAX))
 	fprintf (stderr, "%s: error converting \"%ls\" - %s\n",
 		 prog_name, wbuf, strerror (errno));
     }
@@ -652,7 +656,7 @@ do_pathconv (char *filename)
   bool print_tmp = false;
   cygwin_conv_path_t conv_func =
 		      (unix_flag ? CCP_WIN_W_TO_POSIX : CCP_POSIX_TO_WIN_W)
-		      | (absolute_flag ? CCP_ABSOLUTE : CCP_RELATIVE);
+		      | absolute_flag | cygdrive_flag;
 
   if (!filename || !filename[0])
     {
@@ -792,6 +796,8 @@ do_options (int argc, char **argv, int from_file)
   output_flag = 0;
   mode_flag = 0;
   codepage = 0;
+  cygdrive_flag = 0;
+  absolute_flag = CCP_RELATIVE;
   if (!from_file)
     options_from_file_flag = 0;
   optind = 0;
@@ -801,7 +807,7 @@ do_options (int argc, char **argv, int from_file)
       switch (c)
 	{
 	case 'a':
-	  absolute_flag = 1;
+	  absolute_flag = CCP_ABSOLUTE;
 	  break;
 
 	case 'c':
@@ -881,6 +887,10 @@ do_options (int argc, char **argv, int from_file)
 
 	case 'A':
 	  allusers_flag = 1;
+	  break;
+
+	case 'U':
+	  cygdrive_flag = CCP_PROC_CYGDRIVE;
 	  break;
 
 	case 'C':

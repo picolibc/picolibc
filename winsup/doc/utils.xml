@@ -315,6 +315,8 @@ Path conversion options:
   -a, --absolute        output absolute path
   -l, --long-name       print Windows long form of NAMEs (with -w, -m only)
   -p, --path            NAME is a PATH list (i.e., '/bin:/usr/bin')
+  -U, --proc-cygdrive   Emit /proc/cygdrive path instead of cygdrive prefix
+                        when converting Windows path to UNIX path.
   -s, --short-name      print DOS (short) form of NAMEs (with -w, -m only)
   -C, --codepage CP     print DOS, Windows, or mixed pathname in Windows
                         codepage CP.  CP can be a numeric codepage identifier,
@@ -379,6 +381,16 @@ Other options:
       instance, might expect pathnames in the current OEM codepage, while
       graphical tools like Windows Explorer might expect pathnames in the
       current ANSI codepage.</para>
+
+    <para>The <literal>-U</literal> option allows to use cygpath to create
+    unambiguous Unix paths pointing outside the Cygwin tree andf thus having
+    no explicit POSIX path.  Those paths usually use the cygdrive prefix.
+    However, the cygdrive prefix can be changed by the user, so symbolic links
+    created using the cygdrive prefix are not foolproof.  With
+    <literal>-U</literal> cygpath will generate such paths prepended by the
+    virtual <pathname>/proc/cygdrive</pathname> symbolic link, which will
+    never change, so the created path is safe against changing the cygdrive
+    prefix.</para>
 
     <para>The <literal>-C</literal> option takes a single parameter:</para>
     <itemizedlist spacing="compact">

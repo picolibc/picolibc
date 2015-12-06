@@ -2,7 +2,7 @@
 /* sys/cygwin.h
 
    Copyright 1997, 1998, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008,
-   2009, 2010, 2011, 2012, 2013, 2014 Red Hat, Inc.
+   2009, 2010, 2011, 2012, 2013, 2014, 2015 Red Hat, Inc.
 
 This file is part of Cygwin.
 
@@ -57,8 +57,10 @@ enum
   CCP_CONVTYPE_MASK = 3,
 
   /* Or these values to the above as needed. */
-  CCP_ABSOLUTE = 0,	  /* Request absolute path (default). */
-  CCP_RELATIVE = 0x100    /* Request to keep path relative.   */
+  CCP_ABSOLUTE = 0,	  	/* Request absolute path (default). 	*/
+  CCP_RELATIVE = 0x100,    	/* Request to keep path relative.   	*/
+  CCP_PROC_CYGDRIVE = 0x200    	/* Request to return /proc/cygdrive
+				   path (only with CCP_*_TO_POSIX).   */
 };
 typedef unsigned int cygwin_conv_path_t;
 
