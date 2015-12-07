@@ -1,3 +1,8 @@
+2015-12-07  Nick Withers  <nick.withers@anu.edu.au>
+
+	* libc/sys/arm/sys/param.h (NBBY): Define if not already defined.
+	* libc/sys/rtems/include/sys/param.h (NBBY): Define.
+
 2015-12-07  Corinna Vinschen  <corinna@vinschen.de>
 
 	* libc/include/sys/types.h: Move definitions of NBBY and howmany to

@@ -6,6 +6,9 @@
 #include <machine/param.h>
 #include <machine/endian.h>
 
+#ifndef NBBY
+# define NBBY 8		/* number of bits in a byte */
+#endif
 #ifndef HZ
 # define HZ (60)
 #endif
