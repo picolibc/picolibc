@@ -1124,7 +1124,7 @@ _dll_crt0 ()
 	}
       else
 	/* Fall back to respawning if creating a new stack fails. */
-	wow64_respawn_process();
+	wow64_respawn_process ();
     }
   main_environ = user_data->envptr;
   if (in_forkee)
