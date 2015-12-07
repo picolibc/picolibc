@@ -782,11 +782,6 @@ dll_crt0_0 ()
 	 description in wow64_test_for_64bit_parent. */
       if (wincap.wow64_has_secondary_stack ())
 	wow64_needs_stack_adjustment = wow64_test_for_64bit_parent ();
-#else
-      /* Windows 10 1511 has a stack move when a 64 bit process is started from
-	 a 32 bit process, just as it was vice versa in XP/2003. */
-      if (wincap.has_3264_stack_broken ())
-	wow64_needs_stack_adjustment = !wow64_test_for_64bit_parent ();
 #endif /* !__x86_64__ */
     }
   else
@@ -1068,59 +1063,76 @@ extern "C" void __stdcall
 _dll_crt0 ()
 {
 #ifdef __x86_64__
-  /* Handle 64 bit process on Windows 10 rel 1511 which has been started from
-     32 bit WOW64 process.  See comment in wow64_test_for_64bit_parent for a
-     problem description.  Unfortunately the areas the stacks would have to
-     be moved to are both taken by "something else"(tm) in both, forker and
-     forkee, so we can't use the wow64_revert_to_original_stack method as in
-     the 32 bit case.  Rather, we move the main thread stack to the stack area
-     reserved for pthread stacks for this process. */
-#define CREATE_STACK(a)	create_new_main_thread_stack(a)
-#define FIX_STACK(s)	__asm__ ("\n"				\
-				 "movq %[ADDR], %%rsp \n"	\
-				 "movq  %%rsp, %%rbp  \n"	\
-				 : : [ADDR] "r" (s))
+  /* Starting with Windows 10 rel 1511, the main stack of an application is
+     not reproducible if a 64 bit process has been started from a 32 bit
+     process.  Given that we have enough virtual address space on 64 bit
+     anyway, we now always move the main thread stack to the stack area
+     reserved for pthread stacks.  This allows a reproducible stack space
+     under our own control and avoids collision with the OS. */
+  if (!dynamically_loaded)
+    {
+      if (!in_forkee || fork_info->from_main)
+	{
+	  /* Must be static since it's referenced after the stack and frame
+	     pointer registers have been changed. */
+	  static PVOID allocationbase;
+	  SIZE_T commitsize = in_forkee ? (PBYTE) fork_info->stackbase
+					  - (PBYTE) fork_info->stacklimit
+					: 0;
+	  PVOID stackaddr = create_new_main_thread_stack (allocationbase,
+							  commitsize);
+	  if (stackaddr)
+	    {
+	      /* Set stack pointer to new address.  Set frame pointer to
+	         stack pointer and subtract 32 bytes for shadow space. */
+	      __asm__ ("\n\
+		       movq %[ADDR], %%rsp \n\
+		       movq  %%rsp, %%rbp  \n\
+		       subq  $32,%%rsp     \n"
+		       : : [ADDR] "r" (stackaddr));
+	      /* We're on the new stack now.  Free up space taken by the former
+		 main thread stack and set DeallocationStack correctly. */
+	      VirtualFree (NtCurrentTeb ()->DeallocationStack, 0, MEM_RELEASE);
+	      NtCurrentTeb ()->DeallocationStack = allocationbase;
+	    }
+	}
+      else
+	fork_info->alloc_stack ();
+    }
 #else
   /* Handle WOW64 process on XP/2K3 which has been started from native 64 bit
      process.  See comment in wow64_test_for_64bit_parent for a full problem
      description. */
-#define CREATE_STACK(a)	wow64_revert_to_original_stack(a)
-#define FIX_STACK(s)	__asm__ ("\n"				\
-				 "movl  %[ADDR], %%esp \n"	\
-				 "xorl  %%ebp, %%ebp   \n"	\
-				 : : [ADDR] "r" (s))
-#endif
   if (wow64_needs_stack_adjustment && !dynamically_loaded)
     {
       /* Must be static since it's referenced after the stack and frame
 	 pointer registers have been changed. */
       static PVOID allocationbase;
 
-      PVOID stackaddr = CREATE_STACK (allocationbase);
+      PVOID stackaddr = wow64_revert_to_original_stack (allocationbase);
       if (stackaddr)
       	{
-	  /* 2nd half of the stack move.  Set stack pointer to new address.
-	     Set frame pointer to 0. */
-	  FIX_STACK (stackaddr);
-	  /* Now we're back on the original stack.  Free up space taken by the
+	  /* Set stack pointer to new address.  Set frame pointer to 0. */
+	  __asm__ ("\n\
+		   movl  %[ADDR], %%esp \n\
+		   xorl  %%ebp, %%ebp   \n"
+		   : : [ADDR] "r" (stackaddr));
+	  /* We're back on the original stack now.  Free up space taken by the
 	     former main thread stack and set DeallocationStack correctly. */
 	  VirtualFree (NtCurrentTeb ()->DeallocationStack, 0, MEM_RELEASE);
 	  NtCurrentTeb ()->DeallocationStack = allocationbase;
 	}
       else
 	/* Fall back to respawning if creating a new stack fails. */
-	wow64_respawn_process ();
+	wow64_respawn_process();
     }
-  _feinitialise ();
-#ifndef __x86_64__
   main_environ = user_data->envptr;
-#endif
   if (in_forkee)
-    {
-      fork_info->alloc_stack ();
-      _main_tls = &_my_tls;
-    }
+    fork_info->alloc_stack ();
+#endif
 
+  _feinitialise ();
+  _main_tls = &_my_tls;
   _main_tls->call ((DWORD (*) (void *, void *)) dll_crt0_1, NULL);
 }
 

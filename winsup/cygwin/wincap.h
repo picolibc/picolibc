@@ -45,7 +45,6 @@ struct wincaps
   unsigned has_processor_groups				: 1;
   unsigned has_broken_prefetchvm			: 1;
   unsigned has_new_pebteb_region			: 1;
-  unsigned has_3264_stack_broken			: 1;
 };
 
 class wincapc
@@ -105,7 +104,6 @@ public:
   bool	IMPLEMENT (has_processor_groups)
   bool	IMPLEMENT (has_broken_prefetchvm)
   bool	IMPLEMENT (has_new_pebteb_region)
-  bool	IMPLEMENT (has_3264_stack_broken)
 
 #undef IMPLEMENT
 };

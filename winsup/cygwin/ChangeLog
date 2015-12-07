@@ -1,3 +1,26 @@
+2015-12-07  Corinna Vinschen  <corinna@vinschen.de>
+
+	* dcrt0.cc: Semi-revert commit 12743c2d5d2721f3a80b4d7671a349be03c1f520.
+	(dll_crt0_0): Drop setting wow64_needs_stack_adjustment on 64 bit.
+	(_dll_crt0): Split out 64 bit code again and always create new main
+	thread stack, unless forked off from the non main thread in the parent.
+	Call create_new_main_thread_stack with parent stack commitsize if
+	started from the parent's main thread.
+	Only call child_info_fork::alloc_stack for the latter case on 64 bit.
+	Slightly rearrange moving rsp and rbp to new stack and document how.
+	Revert 32 bit wow64 handling to its former self.
+	* miscfunc.cc (create_new_main_thread_stack): Take a commitsize
+	parameter and use it if it's not 0.  Don't set _main_tls here, it's
+	done in the caller _dll_crt0 anyway.  Return stackbase - 16 bytes,
+	rather than stacklimit (which was very wrong anyway).
+	* miscfuncs.h (create_new_main_thread_stack): Accommodate declaration
+	to aforementioned change.
+	* wincap.h (wincaps::has_3264_stack_broken): Remove element.
+	* wincap.cc: Ditto, throughout.
+	* wow64.cc: Semi-revert to pre-12743c2d5d2721f3a80b4d7671a349be03c1f520
+	but keep architecture-agnostic type changes intact.  Fix formatting.
+	* wow64.h: Revert to pre-12743c2d5d2721f3a80b4d7671a349be03c1f520.
+
 2015-12-06  Corinna Vinschen  <corinna@vinschen.de>
 
 	* include/sys/cygwin.h (CCP_PROC_CYGDRIVE): New flag.

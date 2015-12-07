@@ -765,13 +765,13 @@ thread_allocator thr_alloc NO_COPY;
    maintained by the thr_alloc class.  See the description in the x86_64-only
    code in _dll_crt0 to understand why we have to do this. */
 PVOID
-create_new_main_thread_stack (PVOID &allocationbase)
+create_new_main_thread_stack (PVOID &allocationbase, SIZE_T parent_commitsize)
 {
   PIMAGE_DOS_HEADER dosheader;
   PIMAGE_NT_HEADERS ntheader;
   SIZE_T stacksize;
   ULONG guardsize;
-  ULONG commitsize;
+  SIZE_T commitsize;
   PBYTE stacklimit;
 
   dosheader = (PIMAGE_DOS_HEADER) GetModuleHandle (NULL);
@@ -783,7 +783,10 @@ create_new_main_thread_stack (PVOID &allocationbase)
   allocationbase
 	= thr_alloc.alloc (ntheader->OptionalHeader.SizeOfStackReserve);
   guardsize = wincap.def_guard_page_size ();
-  commitsize = ntheader->OptionalHeader.SizeOfStackCommit;
+  if (parent_commitsize)
+    commitsize = (SIZE_T) parent_commitsize;
+  else
+    commitsize = ntheader->OptionalHeader.SizeOfStackCommit;
   commitsize = roundup2 (commitsize, wincap.page_size ());
   if (commitsize > stacksize - guardsize - wincap.page_size ())
     commitsize = stacksize - guardsize - wincap.page_size ();
@@ -798,8 +801,7 @@ create_new_main_thread_stack (PVOID &allocationbase)
     return NULL;
   NtCurrentTeb()->Tib.StackBase = ((PBYTE) allocationbase + stacksize);
   NtCurrentTeb()->Tib.StackLimit = stacklimit;
-  _main_tls = &_my_tls;
-  return stacklimit - 64;
+  return ((PBYTE) allocationbase + stacksize - 16);
 }
 #endif
 
