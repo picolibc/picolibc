@@ -1,5 +1,14 @@
 2015-12-08  Corinna Vinschen  <corinna@vinschen.de>
 
+	* libc/stdio/fclose.c (_fclose_r): Make _flockfile/_funlockfile calls
+	dependent on __SNLK flag.
+	* libc/stdio/findfp.c (__fp_lock): Ditto.
+	(__fp_unlock): Ditto.
+	* libc/stdio/freopen.c (_freopen_r): Ditto.
+	* libc/stdio64/freopen64.c (_freopen64_r): Ditto.
+
+2015-12-08  Corinna Vinschen  <corinna@vinschen.de>
+
 	* libc/stdio/freopen.c (_freopen_r): Only reset __SWID bit per SUSv4.
 	* libc/stdio64/freopen64.c (_freopen64_r): Add missing resetting of
 	flag values and _mbstate.

@@ -94,7 +94,7 @@ _DEFUN (_freopen64_r, (ptr, file, mode, fp),
 	register FILE *fp)
 {
   register int f;
-  int flags, oflags;
+  int flags, oflags, oflags2;
   int e = 0;
 
 
@@ -106,11 +106,14 @@ _DEFUN (_freopen64_r, (ptr, file, mode, fp),
   int __oldcancel;
   pthread_setcancelstate (PTHREAD_CANCEL_DISABLE, &__oldcancel);
 #endif
-  _flockfile (fp);
+  oflags2 = fp->_flags2;
+  if (!(oflags2 & __SNLK))
+    _flockfile (fp);
 
   if ((flags = __sflags (ptr, mode, &oflags)) == 0)
     {
-      _funlockfile (fp);
+      if (!(oflags2 & __SNLK))
+	_funlockfile (fp);
 #ifdef _STDIO_WITH_THREAD_CANCELLATION_SUPPORT
       pthread_setcancelstate (__oldcancel, &__oldcancel);
 #endif
@@ -217,7 +220,8 @@ _DEFUN (_freopen64_r, (ptr, file, mode, fp),
       __sfp_lock_acquire ();
       fp->_flags = 0;		/* set it free */
       ptr->_errno = e;		/* restore in case _close clobbered */
-      _funlockfile (fp);
+      if (!(oflags2 & __SNLK))
+	_funlockfile (fp);
 #ifndef __SINGLE_THREAD__
       __lock_close_recursive (fp->_lock);
 #endif
@@ -244,7 +248,8 @@ _DEFUN (_freopen64_r, (ptr, file, mode, fp),
 
   fp->_flags |= __SL64;
 
-  _funlockfile (fp);
+  if (!(oflags2 & __SNLK))
+    _funlockfile (fp);
 #if !defined (__SINGLE_THREAD__) && defined (_POSIX_THREADS)
   pthread_setcancelstate (__oldcancel, &__oldcancel);
 #endif
