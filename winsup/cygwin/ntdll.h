@@ -265,7 +265,7 @@ typedef struct _FILE_ID_BOTH_DIR_INFORMATION
   ULONG  EaSize;
   CCHAR  ShortNameLength;
   WCHAR  ShortName[12];
-  LARGE_INTEGER  FileId;
+  LARGE_INTEGER  IndexNumber;
   WCHAR  FileName[1];
 } FILE_ID_BOTH_DIR_INFORMATION, *PFILE_ID_BOTH_DIR_INFORMATION;
 
@@ -858,7 +858,7 @@ typedef struct _FILE_NETWORK_OPEN_INFORMATION
 /* Checked on 64 bit. */
 typedef struct _FILE_INTERNAL_INFORMATION
 {
-  LARGE_INTEGER FileId;
+  LARGE_INTEGER IndexNumber;
 } FILE_INTERNAL_INFORMATION, *PFILE_INTERNAL_INFORMATION;
 
 /* Checked on 64 bit. */

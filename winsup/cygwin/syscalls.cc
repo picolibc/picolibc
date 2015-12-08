@@ -405,7 +405,7 @@ try_to_bin (path_conv &pc, HANDLE &fh, ACCESS_MASK access, ULONG flags)
 		    "failed, status = %y", pc.get_nt_native_path (), status);
       goto out;
     }
-  RtlInt64ToHexUnicodeString (pfii->FileId.QuadPart, &recycler, TRUE);
+  RtlInt64ToHexUnicodeString (pfii->IndexNumber.QuadPart, &recycler, TRUE);
   RtlInt64ToHexUnicodeString (hash_path_name (0, pc.get_nt_native_path ()),
 			      &recycler, TRUE);
   /* Shoot. */
@@ -2548,7 +2548,7 @@ rename (const char *oldpath, const char *newpath)
 	      && NT_SUCCESS (NtQueryInformationFile (nfh, &io, &nfii,
 						     sizeof nfii,
 						     FileInternalInformation))
-	      && ofii.FileId.QuadPart == nfii.FileId.QuadPart)
+	      && ofii.IndexNumber.QuadPart == nfii.IndexNumber.QuadPart)
 	    {
 	      debug_printf ("%s and %s are the same file", oldpath, newpath);
 	      NtClose (nfh);

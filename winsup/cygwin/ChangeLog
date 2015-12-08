@@ -1,3 +1,11 @@
+2015-12-08  Corinna Vinschen  <corinna@vinschen.de>
+
+	* ntdll.h (FILE_ID_BOTH_DIR_INFORMATION): Rename FileId to IndexNumber
+	to align with Microsoft naming scheme.
+	(FILE_INTERNAL_INFORMATION): Ditto.
+	* fhandler_disk_file.cc: Rename FileId to IndexNumber throughout.
+	* syscalls.cc: Ditto.
+
 2015-12-07  Johannes Schindelin  <johannes.schindelin@gmx.de>
 
 	* mount.cc (mount_info::from_fstab_line): Support mounting the current

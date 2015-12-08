@@ -228,8 +228,8 @@ path_conv::get_ino_by_handle (HANDLE hdl)
 
   if (NT_SUCCESS (NtQueryInformationFile (hdl, &io, &fai, sizeof fai,
 					  FileInternalInformation))
-      && isgood_inode (fai.FileId.QuadPart))
-    return fai.FileId.QuadPart;
+      && isgood_inode (fai.IndexNumber.QuadPart))
+    return fai.IndexNumber.QuadPart;
   return 0;
 }
 
@@ -449,8 +449,8 @@ fhandler_base::fstat_by_handle (struct stat *buf)
 			    status, pc.get_nt_native_path ());
 	      return -1;
 	    }
-	  else if (pc.isgood_inode (fii.FileId.QuadPart))
-	    ino = fii.FileId.QuadPart;
+	  else if (pc.isgood_inode (fii.IndexNumber.QuadPart))
+	    ino = fii.IndexNumber.QuadPart;
 	}
     }
   return fstat_helper (buf, fsi.NumberOfLinks);
@@ -494,7 +494,7 @@ fhandler_base::fstat_by_name (struct stat *buf)
 	    debug_printf ("%y = NtQueryDirectoryFile(%S)", status,
 			  pc.get_nt_native_path ());
 	  else
-	    ino = fdi_buf.fdi.FileId.QuadPart;
+	    ino = fdi_buf.fdi.IndexNumber.QuadPart;
 	}
     }
   return fstat_helper (buf, 1);
@@ -2339,7 +2339,7 @@ go_ahead:
 	  FileNameLength = buf->FileNameLength;
 	  FileAttributes = buf->FileAttributes;
 	  if ((dir->__flags & dirent_set_d_ino))
-	    de->d_ino = buf->FileId.QuadPart;
+	    de->d_ino = buf->IndexNumber.QuadPart;
 	}
       else if ((dir->__flags & dirent_nfs_d_ino))
 	{
@@ -2413,8 +2413,8 @@ go_ahead:
 		  NtClose (hdl);
 		  if (NT_SUCCESS (f_status))
 		    {
-		      if (pc.isgood_inode (fai.FileId.QuadPart))
-			de->d_ino = fai.FileId.QuadPart;
+		      if (pc.isgood_inode (fai.IndexNumber.QuadPart))
+			de->d_ino = fai.IndexNumber.QuadPart;
 		      else
 			/* Untrusted file system.  Don't try to fetch inode
 			   number again. */
