@@ -1,5 +1,10 @@
 2015-12-08  Corinna Vinschen  <corinna@vinschen.de>
 
+	* thread.cc (pthread::setcancelstate): Remove unnecessary locking.
+	(pthread::setcanceltype): Ditto.
+
+2015-12-08  Corinna Vinschen  <corinna@vinschen.de>
+
 	* ntdll.h (FILE_ID_BOTH_DIR_INFORMATION): Rename FileId to IndexNumber
 	to align with Microsoft naming scheme.
 	(FILE_INTERNAL_INFORMATION): Ditto.

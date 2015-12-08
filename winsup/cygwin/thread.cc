@@ -966,43 +966,27 @@ pthread::static_cancel_self ()
 int
 pthread::setcancelstate (int state, int *oldstate)
 {
-  int result = 0;
-
-  mutex.lock ();
-
   if (state != PTHREAD_CANCEL_ENABLE && state != PTHREAD_CANCEL_DISABLE)
-    result = EINVAL;
-  else
-    {
-      if (oldstate)
-	*oldstate = cancelstate;
-      cancelstate = state;
-    }
+    return EINVAL;
 
-  mutex.unlock ();
+  if (oldstate)
+    *oldstate = cancelstate;
+  cancelstate = state;
 
-  return result;
+  return 0;
 }
 
 int
 pthread::setcanceltype (int type, int *oldtype)
 {
-  int result = 0;
-
-  mutex.lock ();
-
   if (type != PTHREAD_CANCEL_DEFERRED && type != PTHREAD_CANCEL_ASYNCHRONOUS)
-    result = EINVAL;
-  else
-    {
-      if (oldtype)
-	*oldtype = canceltype;
-      canceltype = type;
-    }
+    return EINVAL;
 
-  mutex.unlock ();
+  if (oldtype)
+    *oldtype = canceltype;
+  canceltype = type;
 
-  return result;
+  return 0;
 }
 
 void
