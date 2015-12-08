@@ -1,3 +1,9 @@
+2015-12-08  Corinna Vinschen  <corinna@vinschen.de>
+
+	* libc/stdio/freopen.c (_freopen_r): Only reset __SWID bit per SUSv4.
+	* libc/stdio64/freopen64.c (_freopen64_r): Add missing resetting of
+	flag values and _mbstate.
+
 2015-12-07  Nick Withers  <nick.withers@anu.edu.au>
 
 	* libc/sys/arm/sys/param.h (NBBY): Define if not already defined.

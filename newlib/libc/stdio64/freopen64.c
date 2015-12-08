@@ -208,6 +208,9 @@ _DEFUN (_freopen64_r, (ptr, file, mode, fp),
   if (HASLB (fp))
     FREELB (ptr, fp);
   fp->_lb._size = 0;
+  fp->_flags &= ~__SORD;
+  fp->_flags2 &= ~__SWID;
+  memset (&fp->_mbstate, 0, sizeof (_mbstate_t));
 
   if (f < 0)
     {				/* did not get it after all */
