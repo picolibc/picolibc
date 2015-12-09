@@ -265,7 +265,7 @@ typedef struct _FILE_ID_BOTH_DIR_INFORMATION
   ULONG  EaSize;
   CCHAR  ShortNameLength;
   WCHAR  ShortName[12];
-  LARGE_INTEGER  IndexNumber;
+  LARGE_INTEGER  FileId;
   WCHAR  FileName[1];
 } FILE_ID_BOTH_DIR_INFORMATION, *PFILE_ID_BOTH_DIR_INFORMATION;
 

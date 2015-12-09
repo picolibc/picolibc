@@ -494,7 +494,7 @@ fhandler_base::fstat_by_name (struct stat *buf)
 	    debug_printf ("%y = NtQueryDirectoryFile(%S)", status,
 			  pc.get_nt_native_path ());
 	  else
-	    ino = fdi_buf.fdi.IndexNumber.QuadPart;
+	    ino = fdi_buf.fdi.FileId.QuadPart;
 	}
     }
   return fstat_helper (buf, 1);
@@ -2339,7 +2339,7 @@ go_ahead:
 	  FileNameLength = buf->FileNameLength;
 	  FileAttributes = buf->FileAttributes;
 	  if ((dir->__flags & dirent_set_d_ino))
-	    de->d_ino = buf->IndexNumber.QuadPart;
+	    de->d_ino = buf->FileId.QuadPart;
 	}
       else if ((dir->__flags & dirent_nfs_d_ino))
 	{

@@ -1,3 +1,9 @@
+2015-12-09  Corinna Vinschen  <corinna@vinschen.de>
+
+	* ntdll.h (FILE_ID_BOTH_DIR_INFORMATION): Revert IndexNumber to FileId
+	since it's actually right here.
+	* fhandler_disk_file.cc: Accommodate above change.
+
 2015-12-08  Corinna Vinschen  <corinna@vinschen.de>
 
 	* thread.cc (pthread::setcancelstate): Remove unnecessary locking.
