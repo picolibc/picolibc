@@ -1,3 +1,13 @@
+2015-12-09  Thomas Preud'homme  <thomas.preudhomme@arm.com>
+
+	* libm/machine/arm/s_ceil.c: Also check that 64bit FP instructions are
+	available in the guard.
+	* libm/machine/arm/s_floor.c: Likewise.
+	* libm/machine/arm/s_nearbyint.c: Likewise.
+	* libm/machine/arm/s_rint.c: Likewise.
+	* libm/machine/arm/s_round.c: Likewise.
+	* libm/machine/arm/s_trunc.c: Likewise.
+
 2015-12-08  Corinna Vinschen  <corinna@vinschen.de>
 
 	* libc/stdio/fclose.c (_fclose_r): Make _flockfile/_funlockfile calls
