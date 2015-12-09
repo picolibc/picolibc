@@ -341,8 +341,7 @@ class fhandler_base
   void __reg2 stat_fixup (struct stat *buf);
   int __reg2 fstat_fs (struct stat *buf);
 private:
-  int __reg3 fstat_helper (struct stat *buf,
-			      DWORD nNumberOfLinks);
+  int __reg2 fstat_helper (struct stat *buf);
   int __reg2 fstat_by_nfs_ea (struct stat *buf);
   int __reg2 fstat_by_handle (struct stat *buf);
   int __reg2 fstat_by_name (struct stat *buf);

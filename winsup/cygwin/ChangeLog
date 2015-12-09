@@ -1,5 +1,34 @@
 2015-12-10  Corinna Vinschen  <corinna@vinschen.de>
 
+	* path.h (class path_conv_handle): Use FILE_ALL_INFORMATION instead of
+	FILE_NETWORK_OPEN_INFORMATION.  Use definitions from ntdll.h since it's
+	included anyway.
+	(path_conv_handle::fai): Change name from fnoi.
+	(path_conv::fai): Ditto.
+	(file_get_fai): Change name from file_get_fnoi.  Drop second parameter.
+	* path.cc (file_get_fai): Ditto.  Fetch FileAllInformation rather than
+	FileNetworkOpenInformation.  Convert STATUS_BUFFER_OVERFLOW to
+	STATUS_SUCCESS.  Remove workaround to fetch FileBasicInformation and
+	FileStandardInformation on filesystems with broken
+	FileNetworkOpenInformation handling.
+	(symlink_info::check): Accommodate above changes.  In case of using
+	the NtQueryDirectoryFile fallback, fetch FileIdBothDirectoryInformation
+	to get inode number as well.
+	* fhandler_disk_file.cc (fhandler_base::fstat_by_handle): Drop outdated
+	comment.  Accommodate change to using FileAllInformation.  Drop
+	extra function calls to fetch NumberOfLinks and IndexNumber.  Set ino
+	directly from IndexNumber stored in pc.fai().  Drop second argument
+	from call to fstat_helper.
+	(fhandler_base::fstat_by_name): Drop second argument from call to
+	fstat_helper.
+	(fhandler_base::fstat_helper): Drop second parameter.  Accommodate
+	the fact that we access a FILE_ALL_INFORMATION structure now.
+	(fhandler_base::open_fs): Set ino directly from IndexNumber stored in
+	pc.fai().
+	* fhandler.h (fhandler_base::fstat_helper): Fix declaration accrdingly.
+
+2015-12-10  Corinna Vinschen  <corinna@vinschen.de>
+
 	* fhandler_disk_file.cc (path_conv::ndisk_links): Drop unused method.
 	(fhandler_base::fstat_helper): Drop unused call to ndisk_links.
 

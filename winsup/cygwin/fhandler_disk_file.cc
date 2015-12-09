@@ -319,59 +319,25 @@ fhandler_base::fstat_by_nfs_ea (struct stat *buf)
 int __reg2
 fhandler_base::fstat_by_handle (struct stat *buf)
 {
-  /* Don't use FileAllInformation info class.  It returns a pathname rather
-     than a filename, so it needs a really big buffer for no good reason
-     since we don't need the name anyway.  So we just call the three info
-     classes necessary to get all information required by stat(2). */
-  FILE_STANDARD_INFORMATION fsi;
-  FILE_INTERNAL_INFORMATION fii;
-
   HANDLE h = get_stat_handle ();
   NTSTATUS status = 0;
-  IO_STATUS_BLOCK io;
 
   /* If the file has been opened for other purposes than stat, we can't rely
-     on the information stored in pc.fnoi.  So we overwrite them here. */
+     on the information stored in pc.fai.  So we overwrite them here. */
   if (get_io_handle ())
     {
-      status = file_get_fnoi (h, pc.has_broken_fnoi (), pc.fnoi ());
+      status = file_get_fai (h, pc.fai ());
       if (!NT_SUCCESS (status))
        {
-	 debug_printf ("%y = NtQueryInformationFile(%S, "
-		       "FileNetworkOpenInformation)",
+	 debug_printf ("%y = NtQueryInformationFile(%S, FileAllInformation)",
 		       status, pc.get_nt_native_path ());
 	 return -1;
        }
     }
-  if (!pc.hasgood_inode ())
-    fsi.NumberOfLinks = 1;
-  else
-    {
-      status = NtQueryInformationFile (h, &io, &fsi, sizeof fsi,
-				       FileStandardInformation);
-      if (!NT_SUCCESS (status))
-	{
-	  debug_printf ("%y = NtQueryInformationFile(%S, "
-			"FileStandardInformation)",
-			status, pc.get_nt_native_path ());
-	  return -1;
-	}
-      if (!ino)
-	{
-	  status = NtQueryInformationFile (h, &io, &fii, sizeof fii,
-					   FileInternalInformation);
-	  if (!NT_SUCCESS (status))
-	    {
-	      debug_printf ("%y = NtQueryInformationFile(%S, "
-			    "FileInternalInformation)",
-			    status, pc.get_nt_native_path ());
-	      return -1;
-	    }
-	  else if (pc.isgood_inode (fii.IndexNumber.QuadPart))
-	    ino = fii.IndexNumber.QuadPart;
-	}
-    }
-  return fstat_helper (buf, fsi.NumberOfLinks);
+  if (pc.hasgood_inode ()
+      && pc.isgood_inode (pc.fai ()->InternalInformation.IndexNumber.QuadPart))
+    ino = pc.fai ()->InternalInformation.IndexNumber.QuadPart;
+  return fstat_helper (buf);
 }
 
 int __reg2
@@ -415,7 +381,7 @@ fhandler_base::fstat_by_name (struct stat *buf)
 	    ino = fdi_buf.fdi.FileId.QuadPart;
 	}
     }
-  return fstat_helper (buf, 1);
+  return fstat_helper (buf);
 }
 
 int __reg2
@@ -463,22 +429,23 @@ fhandler_base::fstat_fs (struct stat *buf)
 }
 
 int __reg3
-fhandler_base::fstat_helper (struct stat *buf, DWORD nNumberOfLinks)
+fhandler_base::fstat_helper (struct stat *buf)
 {
   IO_STATUS_BLOCK st;
   FILE_COMPRESSION_INFORMATION fci;
   HANDLE h = get_stat_handle ();
-  PFILE_NETWORK_OPEN_INFORMATION pfnoi = pc.fnoi ();
+  PFILE_ALL_INFORMATION pfai = pc.fai ();
   ULONG attributes = pc.file_attributes ();
 
-  to_timestruc_t (&pfnoi->LastAccessTime, &buf->st_atim);
-  to_timestruc_t (&pfnoi->LastWriteTime, &buf->st_mtim);
+  to_timestruc_t (&pfai->BasicInformation.LastAccessTime, &buf->st_atim);
+  to_timestruc_t (&pfai->BasicInformation.LastWriteTime, &buf->st_mtim);
   /* If the ChangeTime is 0, the underlying FS doesn't support this timestamp
      (FAT for instance).  If so, it's faked using LastWriteTime. */
-  to_timestruc_t (pfnoi->ChangeTime.QuadPart ? &pfnoi->ChangeTime
-					     : &pfnoi->LastWriteTime,
+  to_timestruc_t (pfai->BasicInformation.ChangeTime.QuadPart
+		  ? &pfai->BasicInformation.ChangeTime
+		  : &pfai->BasicInformation.LastWriteTime,
 		  &buf->st_ctim);
-  to_timestruc_t (&pfnoi->CreationTime, &buf->st_birthtim);
+  to_timestruc_t (&pfai->BasicInformation.CreationTime, &buf->st_birthtim);
   buf->st_dev = get_dev ();
   /* CV 2011-01-13: Observations on the Cygwin mailing list point to an
      interesting behaviour in some Windows versions.  Apparently the size of
@@ -487,11 +454,13 @@ fhandler_base::fstat_helper (struct stat *buf, DWORD nNumberOfLinks)
      0 in the first call and size > 0 in the second call.  This in turn can
      affect applications like newer tar.
      FIXME: Is the allocation size affected as well? */
-  buf->st_size = pc.isdir () ? 0 : (off_t) pfnoi->EndOfFile.QuadPart;
+  buf->st_size = pc.isdir ()
+		 ? 0
+		 : (off_t) pfai->StandardInformation.EndOfFile.QuadPart;
   /* The number of links to a directory includes the number of subdirectories
      in the directory, since all those subdirectories point to it.  However,
      this is painfully slow, so we do without it. */
-  buf->st_nlink = nNumberOfLinks;
+  buf->st_nlink = pc.fai()->StandardInformation.NumberOfLinks;
 
   /* Enforce namehash as inode number on untrusted file systems. */
   if (ino && pc.isgood_inode (ino))
@@ -501,11 +470,11 @@ fhandler_base::fstat_helper (struct stat *buf, DWORD nNumberOfLinks)
 
   buf->st_blksize = PREFERRED_IO_BLKSIZE;
 
-  if (pfnoi->AllocationSize.QuadPart >= 0LL)
+  if (pfai->StandardInformation.AllocationSize.QuadPart >= 0LL)
     /* A successful NtQueryInformationFile returns the allocation size
        correctly for compressed and sparse files as well. */
-    buf->st_blocks = (pfnoi->AllocationSize.QuadPart + S_BLKSIZE - 1)
-		     / S_BLKSIZE;
+    buf->st_blocks = (pfai->StandardInformation.AllocationSize.QuadPart
+		      + S_BLKSIZE - 1) / S_BLKSIZE;
   else if (::has_attribute (attributes, FILE_ATTRIBUTE_COMPRESSED
 					| FILE_ATTRIBUTE_SPARSE_FILE)
 	   && h && !is_fs_special ()
@@ -1509,7 +1478,9 @@ fhandler_base::open_fs (int flags, mode_t mode)
       return 0;
     }
 
-  ino = pc.get_ino_by_handle (get_handle ());
+  if (pc.hasgood_inode ()
+      && pc.isgood_inode (pc.fai ()->InternalInformation.IndexNumber.QuadPart))
+    ino = pc.fai ()->InternalInformation.IndexNumber.QuadPart;
 
 out:
   syscall_printf ("%d = fhandler_disk_file::open(%S, %y)", res,

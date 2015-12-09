@@ -1300,44 +1300,18 @@ path_conv::is_binary ()
 	 && (bin == SCS_32BIT_BINARY || bin == SCS_64BIT_BINARY);
 }
 
-/* Helper function to fill the fnoi datastructure for a file. */
+/* Helper function to fill the fai datastructure for a file. */
 NTSTATUS
-file_get_fnoi (HANDLE h, bool skip_network_open_inf,
-	       PFILE_NETWORK_OPEN_INFORMATION pfnoi)
+file_get_fai (HANDLE h, PFILE_ALL_INFORMATION pfai)
 {
   NTSTATUS status;
   IO_STATUS_BLOCK io;
 
   /* Some FSes (Netapps) don't implement FileNetworkOpenInformation. */
-  status = skip_network_open_inf ? STATUS_INVALID_PARAMETER
-	   : NtQueryInformationFile (h, &io, pfnoi, sizeof *pfnoi,
-				     FileNetworkOpenInformation);
-  if (status == STATUS_INVALID_PARAMETER)
-    {
-      /* Apart from accessing Netapps, this also occurs when accessing SMB
-	 share root dirs hosted on NT4. */
-      FILE_BASIC_INFORMATION fbi;
-      FILE_STANDARD_INFORMATION fsi;
-
-      status = NtQueryInformationFile (h, &io, &fbi, sizeof fbi,
-				       FileBasicInformation);
-      if (NT_SUCCESS (status))
-	{
-	  memcpy (pfnoi, &fbi, 4 * sizeof (LARGE_INTEGER));
-	  if (NT_SUCCESS (NtQueryInformationFile (h, &io, &fsi,
-					 sizeof fsi,
-					 FileStandardInformation)))
-	    {
-	      pfnoi->EndOfFile.QuadPart = fsi.EndOfFile.QuadPart;
-	      pfnoi->AllocationSize.QuadPart
-		= fsi.AllocationSize.QuadPart;
-	    }
-	  else
-	    pfnoi->EndOfFile.QuadPart
-	      = pfnoi->AllocationSize.QuadPart = 0;
-	  pfnoi->FileAttributes = fbi.FileAttributes;
-	}
-    }
+  status = NtQueryInformationFile (h, &io, pfai, sizeof *pfai,
+				   FileAllInformation);
+  if (status == STATUS_BUFFER_OVERFLOW)
+    status = STATUS_SUCCESS;
   return status;
 }
 
@@ -2833,10 +2807,9 @@ restart:
 	    }
 	  else
 	    {
-	      status = file_get_fnoi (h, fs.has_broken_fnoi (),
-				      conv_hdl.fnoi ());
+	      status = file_get_fai (h, conv_hdl.fai ());
 	      if (NT_SUCCESS (status))
-		fileattr = conv_hdl.fnoi ()->FileAttributes;
+		fileattr = conv_hdl.fai ()->BasicInformation.FileAttributes;
 	    }
 	}
       if (!NT_SUCCESS (status))
@@ -2874,7 +2847,7 @@ restart:
 	      OBJECT_ATTRIBUTES dattr;
 	      HANDLE dir;
 	      struct {
-		FILE_BOTH_DIR_INFORMATION fdi;
+		FILE_ID_BOTH_DIR_INFORMATION fdi;
 		WCHAR dummy_buf[NAME_MAX + 1];
 	      } fdi_buf;
 
@@ -2906,7 +2879,7 @@ restart:
 		{
 		  status = NtQueryDirectoryFile (dir, NULL, NULL, NULL, &io,
 						 &fdi_buf, sizeof fdi_buf,
-						 FileBothDirectoryInformation,
+						 FileIdBothDirectoryInformation,
 						 TRUE, &basename, TRUE);
 		  /* Take the opportunity to check file system while we're
 		     having the handle to the parent dir. */
@@ -2932,18 +2905,20 @@ restart:
 		    }
 		  else
 		    {
-		      PFILE_NETWORK_OPEN_INFORMATION pfnoi = conv_hdl.fnoi ();
+		      PFILE_ALL_INFORMATION pfai = conv_hdl.fai ();
 
 		      fileattr = fdi_buf.fdi.FileAttributes;
-		      memcpy (pfnoi, &fdi_buf.fdi.CreationTime, sizeof *pfnoi);
-		      /* Amazing, but true:  The FILE_NETWORK_OPEN_INFORMATION
-			 structure has the AllocationSize and EndOfFile members
-			 interchanged relative to the directory information
-			 classes. */
-		      pfnoi->AllocationSize.QuadPart
+		      memcpy (&pfai->BasicInformation.CreationTime,
+			      &fdi_buf.fdi.CreationTime,
+			      4 * sizeof (LARGE_INTEGER));
+		      pfai->BasicInformation.FileAttributes = fileattr;
+		      pfai->StandardInformation.AllocationSize.QuadPart
 			= fdi_buf.fdi.AllocationSize.QuadPart;
-		      pfnoi->EndOfFile.QuadPart
+		      pfai->StandardInformation.EndOfFile.QuadPart
 			= fdi_buf.fdi.EndOfFile.QuadPart;
+		      pfai->StandardInformation.NumberOfLinks = 1;
+		      pfai->InternalInformation.IndexNumber.QuadPart
+			= fdi_buf.fdi.FileId.QuadPart;
 		    }
 		}
 	      ext_tacked_on = !!*ext_here;
@@ -2977,7 +2952,8 @@ restart:
 	  if (res > 0)
 	    {
 	      /* A symlink is never a directory. */
-	      conv_hdl.fnoi ()->FileAttributes &= ~FILE_ATTRIBUTE_DIRECTORY;
+	      conv_hdl.fai ()->BasicInformation.FileAttributes
+		&= ~FILE_ATTRIBUTE_DIRECTORY;
 	      break;
 	    }
 	  else
