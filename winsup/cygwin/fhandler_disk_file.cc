@@ -224,12 +224,12 @@ inline ino_t
 path_conv::get_ino_by_handle (HANDLE hdl)
 {
   IO_STATUS_BLOCK io;
-  FILE_INTERNAL_INFORMATION fai;
+  FILE_INTERNAL_INFORMATION fii;
 
-  if (NT_SUCCESS (NtQueryInformationFile (hdl, &io, &fai, sizeof fai,
+  if (NT_SUCCESS (NtQueryInformationFile (hdl, &io, &fii, sizeof fii,
 					  FileInternalInformation))
-      && isgood_inode (fai.IndexNumber.QuadPart))
-    return fai.IndexNumber.QuadPart;
+      && isgood_inode (fii.IndexNumber.QuadPart))
+    return fii.IndexNumber.QuadPart;
   return 0;
 }
 
@@ -2407,14 +2407,14 @@ go_ahead:
 		  /* We call NtQueryInformationFile here, rather than
 		     pc.get_ino_by_handle(), otherwise we can't short-circuit
 		     dirent_set_d_ino correctly. */
-		  FILE_INTERNAL_INFORMATION fai;
-		  f_status = NtQueryInformationFile (hdl, &io, &fai, sizeof fai,
+		  FILE_INTERNAL_INFORMATION fii;
+		  f_status = NtQueryInformationFile (hdl, &io, &fii, sizeof fii,
 						     FileInternalInformation);
 		  NtClose (hdl);
 		  if (NT_SUCCESS (f_status))
 		    {
-		      if (pc.isgood_inode (fai.IndexNumber.QuadPart))
-			de->d_ino = fai.IndexNumber.QuadPart;
+		      if (pc.isgood_inode (fii.IndexNumber.QuadPart))
+			de->d_ino = fii.IndexNumber.QuadPart;
 		      else
 			/* Untrusted file system.  Don't try to fetch inode
 			   number again. */

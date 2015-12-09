@@ -1,3 +1,9 @@
+2015-12-10  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_disk_file.cc (path_conv::get_ino_by_handle): Rename fai to
+	fii for clearness.
+	(fhandler_disk_file::readdir): Ditto.
+
 2015-12-09  Corinna Vinschen  <corinna@vinschen.de>
 
 	* ntdll.h (FILE_ID_BOTH_DIR_INFORMATION): Revert IndexNumber to FileId
