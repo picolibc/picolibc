@@ -233,88 +233,6 @@ path_conv::get_ino_by_handle (HANDLE hdl)
   return 0;
 }
 
-#if 0
-/* This function is obsolete.  We're keeping it in so we don't forget
-   that we already did all that at one point. */
-unsigned __stdcall
-path_conv::ndisk_links (DWORD nNumberOfLinks)
-{
-  if (!isdir () || isremote ())
-    return nNumberOfLinks;
-
-  OBJECT_ATTRIBUTES attr;
-  IO_STATUS_BLOCK io;
-  HANDLE fh;
-
-  if (!NT_SUCCESS (NtOpenFile (&fh, SYNCHRONIZE | FILE_LIST_DIRECTORY,
-			       get_object_attr (attr, sec_none_nih),
-			       &io, FILE_SHARE_VALID_FLAGS,
-			       FILE_SYNCHRONOUS_IO_NONALERT
-			       | FILE_OPEN_FOR_BACKUP_INTENT
-			       | FILE_DIRECTORY_FILE)))
-    return nNumberOfLinks;
-
-  unsigned count = 0;
-  bool first = true;
-  PFILE_BOTH_DIR_INFORMATION fdibuf = (PFILE_BOTH_DIR_INFORMATION)
-				       alloca (65536);
-  __DIR_mounts *dir = new __DIR_mounts (get_posix ());
-  while (NT_SUCCESS (NtQueryDirectoryFile (fh, NULL, NULL, NULL, &io, fdibuf,
-					   65536, FileBothDirectoryInformation,
-					   FALSE, NULL, first)))
-    {
-      if (first)
-	{
-	  first = false;
-	  /* All directories have . and .. as their first entries.
-	     If . is not present as first entry, we're on a drive's
-	     root direcotry, which doesn't have these entries. */
-	  if (fdibuf->FileNameLength != 2 || fdibuf->FileName[0] != L'.')
-	    count = 2;
-	}
-      for (PFILE_BOTH_DIR_INFORMATION pfdi = fdibuf;
-	   pfdi;
-	   pfdi = (PFILE_BOTH_DIR_INFORMATION)
-		  (pfdi->NextEntryOffset ? (PBYTE) pfdi + pfdi->NextEntryOffset
-					 : NULL))
-	{
-	  switch (pfdi->FileAttributes
-		  & (FILE_ATTRIBUTE_DIRECTORY | FILE_ATTRIBUTE_REPARSE_POINT))
-	    {
-	    case FILE_ATTRIBUTE_DIRECTORY:
-	      /* Just a directory */
-	      ++count;
-	      break;
-	    case FILE_ATTRIBUTE_DIRECTORY | FILE_ATTRIBUTE_REPARSE_POINT:
-	      /* Volume mount point or symlink to directory */
-	      {
-		UNICODE_STRING fname;
-
-		RtlInitCountedUnicodeString (&fname, pfdi->FileName,
-					     pfdi->FileNameLength);
-		InitializeObjectAttributes (&attr, &fname,
-					    objcaseinsensitive (), fh, NULL);
-		if (is_volume_mountpoint (&attr))
-		  ++count;
-	      }
-	      break;
-	    default:
-	      break;
-	    }
-	  UNICODE_STRING fname;
-	  RtlInitCountedUnicodeString (&fname, pfdi->FileName,
-				       pfdi->FileNameLength);
-	  dir->check_mount (&fname, 0, false);
-	}
-    }
-  while (dir->check_missing_mount ())
-    ++count;
-  NtClose (fh);
-  delete dir;
-  return count;
-}
-#endif
-
 /* For files on NFS shares, we request an EA of type NfsV3Attributes.
    This returns the content of a struct fattr3 as defined in RFC 1813.
    The content is the NFS equivalent of struct stat. so there's not much
@@ -573,11 +491,7 @@ fhandler_base::fstat_helper (struct stat *buf, DWORD nNumberOfLinks)
   /* The number of links to a directory includes the number of subdirectories
      in the directory, since all those subdirectories point to it.  However,
      this is painfully slow, so we do without it. */
-#if 0
-  buf->st_nlink = pc.ndisk_links (nNumberOfLinks);
-#else
   buf->st_nlink = nNumberOfLinks;
-#endif
 
   /* Enforce namehash as inode number on untrusted file systems. */
   if (ino && pc.isgood_inode (ino))

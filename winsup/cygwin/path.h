@@ -396,9 +396,6 @@ class path_conv
   void close_conv_handle () { conv_handle.close (); }
 
   ino_t get_ino_by_handle (HANDLE h);
-#if 0 /* obsolete, method still exists in fhandler_disk_file.cc */
-  unsigned __stdcall ndisk_links (DWORD);
-#endif
   inline const char *get_posix () const { return posix_path; }
   void __reg2 set_posix (const char *);
   DWORD get_symlink_length () { return symlink_length; };

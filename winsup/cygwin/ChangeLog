@@ -1,5 +1,10 @@
 2015-12-10  Corinna Vinschen  <corinna@vinschen.de>
 
+	* fhandler_disk_file.cc (path_conv::ndisk_links): Drop unused method.
+	(fhandler_base::fstat_helper): Drop unused call to ndisk_links.
+
+2015-12-10  Corinna Vinschen  <corinna@vinschen.de>
+
 	* fhandler_disk_file.cc (path_conv::get_ino_by_handle): Rename fai to
 	fii for clearness.
 	(fhandler_disk_file::readdir): Ditto.
