@@ -428,7 +428,7 @@ fhandler_base::fstat_fs (struct stat *buf)
   return res;
 }
 
-int __reg3
+int __reg2
 fhandler_base::fstat_helper (struct stat *buf)
 {
   IO_STATUS_BLOCK st;

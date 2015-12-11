@@ -1,3 +1,8 @@
+2015-12-11  Ken Brown  <kbrown@cornell.edu>
+
+	* fhandler_disk_file.cc (fhandler_base::fstat_helper): Align
+	regparm attribute to declaration in fhandler.h.
+
 2015-12-10  Corinna Vinschen  <corinna@vinschen.de>
 
 	* path.h (class path_conv_handle): Use FILE_ALL_INFORMATION instead of
