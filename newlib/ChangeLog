@@ -1,3 +1,8 @@
+2015-12-12  Freddie Chopin  <freddie.chopin@gmail.com>
+
+	* libc/stdlib/__atexit.c (__register_exitproc): Always release
+	lock before return.
+
 2015-12-09  Thomas Preud'homme  <thomas.preudhomme@arm.com>
 
 	* libm/machine/arm/s_ceil.c: Also check that 64bit FP instructions are
