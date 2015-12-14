@@ -446,9 +446,8 @@ extern const struct __sFILE_fake __sf_fake_stderr;
     _NULL \
   }
 
-#define _REENT_INIT_PTR(var) \
-  { memset((var), 0, sizeof(*(var))); \
-    (var)->_stdin = (__FILE *)&__sf_fake_stdin; \
+#define _REENT_INIT_PTR_ZEROED(var) \
+  { (var)->_stdin = (__FILE *)&__sf_fake_stdin; \
     (var)->_stdout = (__FILE *)&__sf_fake_stdout; \
     (var)->_stderr = (__FILE *)&__sf_fake_stderr; \
     (var)->_current_locale = "C"; \
@@ -694,9 +693,8 @@ struct _reent
     {_NULL, 0, _NULL} \
   }
 
-#define _REENT_INIT_PTR(var) \
-  { memset((var), 0, sizeof(*(var))); \
-    (var)->_stdin = &(var)->__sf[0]; \
+#define _REENT_INIT_PTR_ZEROED(var) \
+  { (var)->_stdin = &(var)->__sf[0]; \
     (var)->_stdout = &(var)->__sf[1]; \
     (var)->_stderr = &(var)->__sf[2]; \
     (var)->_current_locale = "C"; \
@@ -744,6 +742,11 @@ struct _reent
 #define _REENT_GETDATE_ERR_P(ptr) (&((ptr)->_new._reent._getdate_err))
 
 #endif /* !_REENT_SMALL */
+
+#define _REENT_INIT_PTR(var) \
+  { memset((var), 0, sizeof(*(var))); \
+    _REENT_INIT_PTR_ZEROED(var); \
+  }
 
 /* This value is used in stdlib/misc.c.  reent/reent.c has to know it
    as well to make sure the freelist is correctly free'd.  Therefore

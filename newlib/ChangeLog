@@ -1,5 +1,10 @@
 2015-12-14  Sebastian Huber  <sebastian.huber@embedded-brains.de>
 
+	* libc/include/sys/reent.h (_REENT_INIT_PTR_ZEROED): New.
+	(_REENT_INIT_PTR): Define only once and use _REENT_INIT_PTR_ZEROED().
+
+2015-12-14  Sebastian Huber  <sebastian.huber@embedded-brains.de>
+
 	* libc/include/sys/_sigset.h: New.
 	* libc/include/sys/select.h: Do not include <sys/types.h> and
 	<sys/time.h> to avoid cyclic header file dependencies.  Include
