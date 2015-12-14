@@ -43,11 +43,9 @@
 #include <sys/types.h>
 #include <sys/timespec.h>
 
-/* Cygwin exposes sys/select.h to users of sys/time.h for a couple of years
-   so we have to maintain that.  Note that this is in accordance with POSIX. */
-#ifdef __CYGWIN__
+#if __BSD_VISIBLE
 #include <sys/select.h>
-#endif /* __CYGWIN__ */
+#endif
 
 struct timezone {
 	int	tz_minuteswest;	/* minutes west of Greenwich */

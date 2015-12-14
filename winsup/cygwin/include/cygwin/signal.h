@@ -315,14 +315,6 @@ enum
 #define SIGEV_NONE   SIGEV_NONE
 #define SIGEV_THREAD SIGEV_THREAD
 
-#if __WORDSIZE == 64
-typedef __uint64_t sigset_t;
-#else
-/* FIXME: We should probably raise the # of signals for 32 bit as well.
-          Unfortunately this is an ABI change so requires some forethought. */
-typedef __uint32_t sigset_t;
-#endif
-
 typedef void (*_sig_func_ptr)(int);
 
 struct sigaction

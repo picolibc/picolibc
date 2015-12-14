@@ -1,3 +1,15 @@
+2015-12-14  Sebastian Huber  <sebastian.huber@embedded-brains.de>
+
+	* libc/include/sys/_sigset.h: New.
+	* libc/include/sys/select.h: Do not include <sys/types.h> and
+	<sys/time.h> to avoid cyclic header file dependencies.  Include
+	specialized header files instead.
+	(sigset_t): Conditionally define.
+	* libc/include/sys/signal.h (sigset_t): Likewise.
+	* libc/include/sys/time.h: Include <sys/select.h> if
+	__BSD_VISIBLE.
+	* libc/include/sys/types.h: Likewise.
+
 2015-12-12  Freddie Chopin  <freddie.chopin@gmail.com>
 
 	* libc/stdlib/__atexit.c (__register_exitproc): Always release

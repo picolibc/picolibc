@@ -86,6 +86,8 @@ typedef	quad_t *	qaddr_t;
 
 # if	__BSD_VISIBLE
 
+#include <sys/select.h>
+
 #  define	physadr		physadr_t
 #  define	quad		quad_t
 

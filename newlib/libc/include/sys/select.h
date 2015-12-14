@@ -23,15 +23,14 @@ details. */
 
 #include <sys/cdefs.h>
 
-/* Get fd_set, and macros like FD_SET */
-#include <sys/types.h>
+#include <sys/_sigset.h>
+#include <sys/_timeval.h>
+#include <sys/timespec.h>
 
-/* Get definition of timeval.  */
-#include <sys/time.h>
-#include <time.h>
-
-/* Get definition of sigset_t. */
-#include <signal.h>
+#if !defined(_SIGSET_T_DECLARED)
+#define	_SIGSET_T_DECLARED
+typedef	__sigset_t	sigset_t;
+#endif
 
 #  define _SYS_TYPES_FD_SET
 /*

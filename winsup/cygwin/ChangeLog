@@ -1,3 +1,7 @@
+2015-12-14  Sebastian Huber  <sebastian.huber@embedded-brains.de>
+
+	* include/cygwin/signal.h (sigset_t): Move defintition to newlib.
+
 2015-12-11  Ken Brown  <kbrown@cornell.edu>
 
 	* fhandler_disk_file.cc (fhandler_base::fstat_helper): Align

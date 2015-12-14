@@ -10,13 +10,14 @@ extern "C" {
 #include <sys/cdefs.h>
 #include <sys/features.h>
 #include <sys/types.h>
+#include <sys/_sigset.h>
 #include <sys/_timespec.h>
 
 /* #ifndef __STRICT_ANSI__*/
 
-/* Cygwin defines it's own sigset_t in include/cygwin/signal.h */
-#ifndef __CYGWIN__
-typedef unsigned long sigset_t;
+#if !defined(_SIGSET_T_DECLARED)
+#define	_SIGSET_T_DECLARED
+typedef	__sigset_t	sigset_t;
 #endif
 
 #if defined(__rtems__)
