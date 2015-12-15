@@ -79,164 +79,78 @@ __get_lcid_from_locale (const char *name)
   c = strchr (locale, '_');
   if (!c)
     return last_lcid = (LCID) -1;
-  if (wincap.has_localenames ())
-    {
-      wchar_t wlocale[ENCODING_LEN + 1];
 
-      /* Convert to RFC 4646 syntax which is the standard for the locale names
-	 replacing LCIDs starting with Vista. */
-      *c = '-';
-      mbstowcs (wlocale, locale, ENCODING_LEN + 1);
-      lcid = LocaleNameToLCID (wlocale, 0);
-      /* Bug on Windows 10: LocaleNameToLCID returns LOCALE_CUSTOM_UNSPECIFIED
-         for unknown locales. */
-      if (lcid == 0 || lcid == LOCALE_CUSTOM_UNSPECIFIED)
-	{
-	  /* Unfortunately there are a couple of locales for which no form
-	     without a Script part per RFC 4646 exists.
-	     Linux also supports no_NO which is equivalent to nb_NO. */
-	  struct {
-	    const char    *loc;
-	    const wchar_t *wloc;
-	  } sc_only_locale[] = {
-	    { "az-AZ" , L"az-Latn-AZ"  },
-	    { "bs-BA" , L"bs-Latn-BA"  },
-	    { "chr-US", L"chr-Cher-US"},
-	    { "ff-SN" , L"ff-Latn-SN"  },
-	    { "ha-NG" , L"ha-Latn-NG"  },
-	    { "iu-CA" , L"iu-Latn-CA"  },
-	    { "ku-IQ" , L"ku-Arab-IQ"  },
-	    { "mn-CN" , L"mn-Mong-CN"  },
-	    { "no-NO" , L"nb-NO"       },
-	    { "pa-PK" , L"pa-Arab-PK"  },
-	    { "sd-PK" , L"sd-Arab-PK"  },
-	    { "sr-BA" , L"sr-Cyrl-BA"  },
-	    { "sr-CS" , L"sr-Cyrl-CS"  },
-	    { "sr-ME" , L"sr-Cyrl-ME"  },
-	    { "sr-RS" , L"sr-Cyrl-RS"  },
-	    { "tg-TJ" , L"tg-Cyrl-TJ"  },
-	    { "tzm-DZ", L"tzm-Latn-DZ" },
-	    { "tzm-MA", L"tzm-Tfng-MA" },
-	    { "uz-UZ" , L"uz-Latn-UZ"  },
-	    { NULL    , NULL	       }
-	  };
-	  for (int i = 0; sc_only_locale[i].loc
-			  && sc_only_locale[i].loc[0] <= locale[0]; ++i)
-	    if (!strcmp (locale, sc_only_locale[i].loc))
-	      {
-		lcid = LocaleNameToLCID (sc_only_locale[i].wloc, 0);
-		if (!strncmp (locale, "sr-", 3))
-		  {
-		    /* Vista/2K8 is missing sr-ME and sr-RS.  It has only the
-		       deprecated sr-CS.  So we map ME and RS to CS here. */
-		    if (lcid == 0 || lcid == LOCALE_CUSTOM_UNSPECIFIED)
-		      lcid = LocaleNameToLCID (L"sr-Cyrl-CS", 0);
-		    /* "@latin" modifier for the sr_XY locales changes
-			collation behaviour so lcid should accommodate that
-			by being set to the Latin sublang. */
-		    if (lcid != 0 && lcid != LOCALE_CUSTOM_UNSPECIFIED
-			&& has_modifier ("@latin"))
-		      lcid = MAKELANGID (lcid & 0x3ff, (lcid >> 10) - 1);
-		  }
-		else if (!strncmp (locale, "uz-", 3))
-		  {
-		    /* Equivalent for "@cyrillic" modifier in uz_UZ locale */
-		    if (lcid != 0 && lcid != LOCALE_CUSTOM_UNSPECIFIED
-			&& has_modifier ("@cyrillic"))
-		      lcid = MAKELANGID (lcid & 0x3ff, (lcid >> 10) + 1);
-		  }
-		break;
-	      }
-	}
-      if (lcid && lcid != LOCALE_CUSTOM_UNSPECIFIED)
-	last_lcid = lcid;
-      else
-	last_lcid = (LCID) -1;
-      debug_printf ("LCID=%04y", last_lcid);
-      return last_lcid;
-    }
-  /* Pre-Vista we have to loop through the LCID values and see if they
-     match language and TERRITORY. */
-  *c++ = '\0';
-  /* locale now points to the language, c points to the TERRITORY */
-  const char *language = locale;
-  const char *territory = c;
-  LCID lang, sublang;
-  char iso[10];
+  wchar_t wlocale[ENCODING_LEN + 1];
 
-  /* In theory the lang part takes 10 bits (0x3ff), but up to Windows 2003 R2
-     the highest lang value is 0x81. */
-  for (lang = 1; lang <= 0x81; ++lang)
-    if (GetLocaleInfo (lang, LOCALE_SISO639LANGNAME, iso, 10)
-	&& !strcmp (language, iso))
-      break;
-  if (lang > 0x81)
-    lcid = 0;
-  else if (!territory)
-    lcid = lang;
-  else
+  /* Convert to RFC 4646 syntax which is the standard for the locale names
+     replacing LCIDs starting with Vista. */
+  *c = '-';
+  mbstowcs (wlocale, locale, ENCODING_LEN + 1);
+  lcid = LocaleNameToLCID (wlocale, 0);
+  /* Bug on Windows 10: LocaleNameToLCID returns LOCALE_CUSTOM_UNSPECIFIED
+     for unknown locales. */
+  if (lcid == 0 || lcid == LOCALE_CUSTOM_UNSPECIFIED)
     {
-      /* In theory the sublang part takes 7 bits (0x3f), but up to
-	 Windows 2003 R2 the highest sublang value is 0x14. */
-      for (sublang = 1; sublang <= 0x14; ++sublang)
-	{
-	  lcid = (sublang << 10) | lang;
-	  if (GetLocaleInfo (lcid, LOCALE_SISO3166CTRYNAME, iso, 10)
-	      && !strcmp (territory, iso))
-	    break;
-	}
-      if (sublang > 0x14)
-	lcid = 0;
-    }
-  if (lcid == 0 && territory)
-    {
-      /* Unfortunately there are four language LCID number areas representing
-	 multiple languages.  Fortunately only two of them already existed
-	 pre-Vista.  The concealed languages have to be tested explicitly,
-	 since they are not catched by the above loops.
-	 This also enables the serbian ISO 3166 territory codes which have
-	 been changed post 2003, and maps them to the old wrong (SP was never
-	 a valid ISO 3166 code) territory code sr_SP which fortunately has the
-	 same LCID as the newer sr_CS.
+      /* Unfortunately there are a couple of locales for which no form
+	 without a Script part per RFC 4646 exists.
 	 Linux also supports no_NO which is equivalent to nb_NO. */
       struct {
-	const char *loc;
-	LCID	    lcid;
-      } ambiguous_locale[] = {
-	{ "bs_BA", MAKELANGID (LANG_BOSNIAN, 0x05)			    },
-	{ "nn_NO", MAKELANGID (LANG_NORWEGIAN, SUBLANG_NORWEGIAN_NYNORSK)   },
-	{ "no_NO", MAKELANGID (LANG_NORWEGIAN, SUBLANG_NORWEGIAN_BOKMAL)    },
-	{ "sr_BA", MAKELANGID (LANG_BOSNIAN,
-			       SUBLANG_SERBIAN_BOSNIA_HERZEGOVINA_CYRILLIC) },
-	{ "sr_CS", MAKELANGID (LANG_SERBIAN, SUBLANG_SERBIAN_CYRILLIC)      },
-	{ "sr_ME", MAKELANGID (LANG_SERBIAN, SUBLANG_SERBIAN_CYRILLIC)      },
-	{ "sr_RS", MAKELANGID (LANG_SERBIAN, SUBLANG_SERBIAN_CYRILLIC)      },
-	{ "sr_SP", MAKELANGID (LANG_SERBIAN, SUBLANG_SERBIAN_CYRILLIC)      },
-	{ NULL,    0 },
+	const char    *loc;
+	const wchar_t *wloc;
+      } sc_only_locale[] = {
+	{ "az-AZ" , L"az-Latn-AZ"  },
+	{ "bs-BA" , L"bs-Latn-BA"  },
+	{ "chr-US", L"chr-Cher-US"},
+	{ "ff-SN" , L"ff-Latn-SN"  },
+	{ "ha-NG" , L"ha-Latn-NG"  },
+	{ "iu-CA" , L"iu-Latn-CA"  },
+	{ "ku-IQ" , L"ku-Arab-IQ"  },
+	{ "mn-CN" , L"mn-Mong-CN"  },
+	{ "no-NO" , L"nb-NO"       },
+	{ "pa-PK" , L"pa-Arab-PK"  },
+	{ "sd-PK" , L"sd-Arab-PK"  },
+	{ "sr-BA" , L"sr-Cyrl-BA"  },
+	{ "sr-CS" , L"sr-Cyrl-CS"  },
+	{ "sr-ME" , L"sr-Cyrl-ME"  },
+	{ "sr-RS" , L"sr-Cyrl-RS"  },
+	{ "tg-TJ" , L"tg-Cyrl-TJ"  },
+	{ "tzm-DZ", L"tzm-Latn-DZ" },
+	{ "tzm-MA", L"tzm-Tfng-MA" },
+	{ "uz-UZ" , L"uz-Latn-UZ"  },
+	{ NULL    , NULL	       }
       };
-      *--c = '_';
-      for (int i = 0; ambiguous_locale[i].loc
-		      && ambiguous_locale[i].loc[0] <= locale[0]; ++i)
-	if (!strcmp (locale, ambiguous_locale[i].loc)
-	    && GetLocaleInfo (ambiguous_locale[i].lcid, LOCALE_SISO639LANGNAME,
-			      iso, 10))
+      for (int i = 0; sc_only_locale[i].loc
+		      && sc_only_locale[i].loc[0] <= locale[0]; ++i)
+	if (!strcmp (locale, sc_only_locale[i].loc))
 	  {
-	    lcid = ambiguous_locale[i].lcid;
-	    /* "@latin" modifier for the sr_XY locales changes collation
-	       behaviour so lcid should accommodate that by being set to
-	       the Latin sublang. */
-	    if (!strncmp (locale, "sr_", 3) && has_modifier ("@latin"))
-	      lcid = MAKELANGID (lcid & 0x3ff, (lcid >> 10) - 1);
+	    lcid = LocaleNameToLCID (sc_only_locale[i].wloc, 0);
+	    if (!strncmp (locale, "sr-", 3))
+	      {
+		/* Vista/2K8 is missing sr-ME and sr-RS.  It has only the
+		   deprecated sr-CS.  So we map ME and RS to CS here. */
+		if (lcid == 0 || lcid == LOCALE_CUSTOM_UNSPECIFIED)
+		  lcid = LocaleNameToLCID (L"sr-Cyrl-CS", 0);
+		/* "@latin" modifier for the sr_XY locales changes
+		    collation behaviour so lcid should accommodate that
+		    by being set to the Latin sublang. */
+		if (lcid != 0 && lcid != LOCALE_CUSTOM_UNSPECIFIED
+		    && has_modifier ("@latin"))
+		  lcid = MAKELANGID (lcid & 0x3ff, (lcid >> 10) - 1);
+	      }
+	    else if (!strncmp (locale, "uz-", 3))
+	      {
+		/* Equivalent for "@cyrillic" modifier in uz_UZ locale */
+		if (lcid != 0 && lcid != LOCALE_CUSTOM_UNSPECIFIED
+		    && has_modifier ("@cyrillic"))
+		  lcid = MAKELANGID (lcid & 0x3ff, (lcid >> 10) + 1);
+	      }
 	    break;
 	  }
     }
-  else if (lcid == 0x0443)		/* uz_UZ (Uzbek/Uzbekistan) */
-    {
-      /* Equivalent for "@cyrillic" modifier in uz_UZ locale */
-      if (lcid != 0 && has_modifier ("@cyrillic"))
-	lcid = MAKELANGID (lcid & 0x3ff, (lcid >> 10) + 1);
-    }
-  last_lcid = lcid ?: (LCID) -1;
+  if (lcid && lcid != LOCALE_CUSTOM_UNSPECIFIED)
+    last_lcid = lcid;
+  else
+    last_lcid = (LCID) -1;
   debug_printf ("LCID=%04y", last_lcid);
   return last_lcid;
 }
