@@ -776,13 +776,8 @@ child_info::child_info (unsigned in_cb, child_info_types chtype,
      This seems to be a bug in Vista's WOW64, which apparently copies the
      lpReserved2 datastructure not using the cbReserved2 size information,
      but using the information given in the first DWORD within lpReserved2
-     instead.  32 bit Windows and former WOW64 don't care if msv_count is 0
-     or a sensible non-0 count value.  However, it's not clear if a non-0
-     count doesn't result in trying to evaluate the content, so we do this
-     really only for Vista 64 for now.
-
-     Note: It turns out that a non-zero value *does* harm operation on
-     XP 64 and 2K3 64 (Crash in CreateProcess call).
+     instead.  However, it's not clear if a non-0 count doesn't result in
+     trying to evaluate the content, so we do this really only for Vista 64.
 
      The value is sizeof (child_info_*) / 5 which results in a count which
      covers the full datastructure, plus not more than 4 extra bytes.  This
