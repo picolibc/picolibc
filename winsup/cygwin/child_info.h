@@ -53,7 +53,7 @@ struct cchildren
 class child_info
 {
 public:
-  DWORD msv_count;	// zeroed on < W2K3, set to pseudo-count on Vista
+  DWORD msv_count;	// set to pseudo-count on Vista, zeroed otherwise
   DWORD cb;		// size of this record
   DWORD intro;		// improbable string
   DWORD magic;		// magic number unique to child_info
