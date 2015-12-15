@@ -17,7 +17,6 @@ struct wincaps
   unsigned has_mandatory_integrity_control		: 1;
   unsigned needs_count_in_si_lpres2			: 1;
   unsigned has_gaa_largeaddress_bug			: 1;
-  unsigned has_restricted_stack_args			: 1;
   unsigned has_transactions				: 1;
   unsigned has_sendmsg					: 1;
   unsigned has_broken_udf				: 1;
@@ -74,7 +73,6 @@ public:
   bool	IMPLEMENT (has_mandatory_integrity_control)
   bool	IMPLEMENT (needs_count_in_si_lpres2)
   bool	IMPLEMENT (has_gaa_largeaddress_bug)
-  bool	IMPLEMENT (has_restricted_stack_args)
   bool	IMPLEMENT (has_transactions)
   bool	IMPLEMENT (has_sendmsg)
   bool	IMPLEMENT (has_broken_udf)

@@ -354,12 +354,6 @@ stack_info::walk ()
 
       /* The arguments follow the return address */
       sf.Params[0] = (_ADDR) *++framep;
-      /* Hack for XP/2K3 WOW64.  If the first stack param points to the
-	 application entry point, we can only fetch one additional
-	 parameter.  Accessing anything beyond this address results in
-	 a SEGV.  This is fixed in Vista/2K8 WOW64. */
-      if (wincap.has_restricted_stack_args () && sf.Params[0] == 0x401000)
-	nparams = 2;
       for (unsigned i = 1; i < nparams; i++)
 	sf.Params[i] = (_ADDR) *++framep;
     }

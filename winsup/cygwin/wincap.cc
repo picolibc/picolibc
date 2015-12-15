@@ -24,7 +24,6 @@ wincaps wincap_xpsp2 __attribute__((section (".cygwin_dll_common"), shared)) = {
   has_mandatory_integrity_control:false,
   needs_count_in_si_lpres2:false,
   has_gaa_largeaddress_bug:false,
-  has_restricted_stack_args:false,
   has_transactions:false,
   has_sendmsg:false,
   has_broken_udf:true,
@@ -56,7 +55,6 @@ wincaps wincap_2003 __attribute__((section (".cygwin_dll_common"), shared)) = {
   has_mandatory_integrity_control:false,
   needs_count_in_si_lpres2:false,
   has_gaa_largeaddress_bug:false,
-  has_restricted_stack_args:true,
   has_transactions:false,
   has_sendmsg:false,
   has_broken_udf:true,
@@ -88,7 +86,6 @@ wincaps wincap_vista __attribute__((section (".cygwin_dll_common"), shared)) = {
   has_mandatory_integrity_control:true,
   needs_count_in_si_lpres2:true,
   has_gaa_largeaddress_bug:true,
-  has_restricted_stack_args:false,
   has_transactions:true,
   has_sendmsg:true,
   has_broken_udf:false,
@@ -120,7 +117,6 @@ wincaps wincap_7 __attribute__((section (".cygwin_dll_common"), shared)) = {
   has_mandatory_integrity_control:true,
   needs_count_in_si_lpres2:false,
   has_gaa_largeaddress_bug:true,
-  has_restricted_stack_args:false,
   has_transactions:true,
   has_sendmsg:true,
   has_broken_udf:false,
@@ -152,7 +148,6 @@ wincaps wincap_8 __attribute__((section (".cygwin_dll_common"), shared)) = {
   has_mandatory_integrity_control:true,
   needs_count_in_si_lpres2:false,
   has_gaa_largeaddress_bug:false,
-  has_restricted_stack_args:false,
   has_transactions:true,
   has_sendmsg:true,
   has_broken_udf:false,
@@ -184,7 +179,6 @@ wincaps wincap_10 __attribute__((section (".cygwin_dll_common"), shared)) = {
   has_mandatory_integrity_control:true,
   needs_count_in_si_lpres2:false,
   has_gaa_largeaddress_bug:false,
-  has_restricted_stack_args:false,
   has_transactions:true,
   has_sendmsg:true,
   has_broken_udf:false,
@@ -216,7 +210,6 @@ wincaps wincap_10_1511 __attribute__((section (".cygwin_dll_common"), shared)) =
   has_mandatory_integrity_control:true,
   needs_count_in_si_lpres2:false,
   has_gaa_largeaddress_bug:false,
-  has_restricted_stack_args:false,
   has_transactions:true,
   has_sendmsg:true,
   has_broken_udf:false,
@@ -318,7 +311,6 @@ wincapc::init ()
 #endif
     {
       ((wincaps *)caps)->needs_count_in_si_lpres2 = false;
-      ((wincaps *)caps)->has_restricted_stack_args = false;
       ((wincaps *)caps)->wow64_has_secondary_stack = false;
       ((wincaps *)caps)->has_gaa_largeaddress_bug = false;
       ((wincaps *)caps)->has_broken_prefetchvm = false;
