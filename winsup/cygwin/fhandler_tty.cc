@@ -1517,10 +1517,8 @@ fhandler_pty_slave::fixup_after_exec ()
 
    A special case is when the master side of the tty is about to be closed.
    The client side is the fhandler_pty_master::close function and it sends
-   a PID -1 in that case.  On Vista and later a check is performed that the
-   request to leave really comes from the master process itself.  On earlier
-   OSes there's no function to check for the PID of the client process so
-   we have to trust the client side.
+   a PID -1 in that case.  A check is performed that the request to leave
+   really comes from the master process itself.
 
    Since there's always only one pipe instance, there's a chance that clients
    have to wait to connect to the master control pipe.  Therefore the client
@@ -1595,10 +1593,8 @@ fhandler_pty_master::pty_master_thread ()
 	}
       if (req.pid == (DWORD) -1)	/* Request to finish thread. */
 	{
-	  /* Pre-Vista: Just believe in the good of the client process.
-	     Post-Vista: Check if the requesting process is the master
-	     process itself. */
-	  if (pid == (DWORD) -1 || pid == GetCurrentProcessId ())
+	  /* Check if the requesting process is the master process itself. */
+	  if (pid == GetCurrentProcessId ())
 	    exit = true;
 	  goto reply;
 	}
