@@ -20,7 +20,6 @@ struct wincaps
   unsigned has_console_logon_sid			: 1;
   unsigned has_precise_system_time			: 1;
   unsigned has_microsoft_accounts			: 1;
-  unsigned has_broken_rtl_query_process_debug_information : 1;
   unsigned has_processor_groups				: 1;
   unsigned has_broken_prefetchvm			: 1;
   unsigned has_new_pebteb_region			: 1;
@@ -62,7 +61,6 @@ public:
   bool	IMPLEMENT (has_console_logon_sid)
   bool	IMPLEMENT (has_precise_system_time)
   bool	IMPLEMENT (has_microsoft_accounts)
-  bool	IMPLEMENT (has_broken_rtl_query_process_debug_information)
   bool	IMPLEMENT (has_processor_groups)
   bool	IMPLEMENT (has_broken_prefetchvm)
   bool	IMPLEMENT (has_new_pebteb_region)

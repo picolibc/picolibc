@@ -589,10 +589,6 @@ struct heap_info
     NTSTATUS status;
     PDEBUG_HEAP_ARRAY harray;
 
-    /* FIXME?  RtlQueryProcessDebugInformation/CreateToolhelp32Snapshot both
-       crash the target process on 64 bit XP/2003 in native 64 bit mode. */
-    if (wincap.has_broken_rtl_query_process_debug_information ())
-      return;
     buf = RtlCreateQueryDebugBuffer (16 * 65536, FALSE);
     if (!buf)
       return;

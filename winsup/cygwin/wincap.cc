@@ -27,7 +27,6 @@ wincaps wincap_xpsp2 __attribute__((section (".cygwin_dll_common"), shared)) = {
   has_console_logon_sid:false,
   has_precise_system_time:false,
   has_microsoft_accounts:false,
-  has_broken_rtl_query_process_debug_information:false,
   has_processor_groups:false,
   has_broken_prefetchvm:false,
   has_new_pebteb_region:false,
@@ -44,7 +43,6 @@ wincaps wincap_2003 __attribute__((section (".cygwin_dll_common"), shared)) = {
   has_console_logon_sid:false,
   has_precise_system_time:false,
   has_microsoft_accounts:false,
-  has_broken_rtl_query_process_debug_information:true,
   has_processor_groups:false,
   has_broken_prefetchvm:false,
   has_new_pebteb_region:false,
@@ -61,7 +59,6 @@ wincaps wincap_vista __attribute__((section (".cygwin_dll_common"), shared)) = {
   has_console_logon_sid:false,
   has_precise_system_time:false,
   has_microsoft_accounts:false,
-  has_broken_rtl_query_process_debug_information:false,
   has_processor_groups:false,
   has_broken_prefetchvm:false,
   has_new_pebteb_region:false,
@@ -78,7 +75,6 @@ wincaps wincap_7 __attribute__((section (".cygwin_dll_common"), shared)) = {
   has_console_logon_sid:true,
   has_precise_system_time:false,
   has_microsoft_accounts:false,
-  has_broken_rtl_query_process_debug_information:false,
   has_processor_groups:true,
   has_broken_prefetchvm:false,
   has_new_pebteb_region:false,
@@ -95,7 +91,6 @@ wincaps wincap_8 __attribute__((section (".cygwin_dll_common"), shared)) = {
   has_console_logon_sid:true,
   has_precise_system_time:true,
   has_microsoft_accounts:true,
-  has_broken_rtl_query_process_debug_information:false,
   has_processor_groups:true,
   has_broken_prefetchvm:false,
   has_new_pebteb_region:false,
@@ -112,7 +107,6 @@ wincaps wincap_10 __attribute__((section (".cygwin_dll_common"), shared)) = {
   has_console_logon_sid:true,
   has_precise_system_time:true,
   has_microsoft_accounts:true,
-  has_broken_rtl_query_process_debug_information:false,
   has_processor_groups:true,
   has_broken_prefetchvm:true,
   has_new_pebteb_region:false,
@@ -129,7 +123,6 @@ wincaps wincap_10_1511 __attribute__((section (".cygwin_dll_common"), shared)) =
   has_console_logon_sid:true,
   has_precise_system_time:true,
   has_microsoft_accounts:true,
-  has_broken_rtl_query_process_debug_information:false,
   has_processor_groups:true,
   has_broken_prefetchvm:false,
   has_new_pebteb_region:true,
@@ -199,10 +192,6 @@ wincapc::init ()
   /* 64 bit systems have one more guard page than their 32 bit counterpart. */
   ++((wincaps *)caps)->def_guard_pages;
 #else
-  /* RtlQueryProcessDebugInformation/CreateToolhelp32Snapshot both crash the
-     target process on 64 bit XP/2003 in native 64 bit mode only.  Reset the
-     flag here for 32 bit. */
-  ((wincaps *)caps)->has_broken_rtl_query_process_debug_information = false;
   /* Windows 10 1511 has a stack move when a 64 bit process is started from
      a 32 bit process, just as it was vice versa in XP/2003.  Reset the flag
      here for 32 bit. */
