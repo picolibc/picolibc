@@ -2703,32 +2703,6 @@ restart:
 	}
       if (status == STATUS_OBJECT_NAME_NOT_FOUND)
 	{
-	  if (ci_flag == 0 && wincap.has_broken_udf ()
-	      && (!fs.inited () || fs.is_udf ()))
-	    {
-	      /* On NT 5.x UDF is broken (at least) in terms of case
-		 sensitivity.  When trying to open a file case sensitive,
-		 the file appears to be non-existant.  Another bug is
-		 described in fs_info::update. */
-	      attr.Attributes = OBJ_CASE_INSENSITIVE;
-	      status = NtOpenFile (&h, READ_CONTROL | FILE_READ_ATTRIBUTES,
-				   &attr, &io, FILE_SHARE_VALID_FLAGS,
-				   FILE_OPEN_REPARSE_POINT
-				   | FILE_OPEN_FOR_BACKUP_INTENT);
-	      debug_printf ("%y = NtOpenFile (broken-UDF, %S)", status, &upath);
-	      attr.Attributes = 0;
-	      if (NT_SUCCESS (status))
-		{
-		  if (!fs.inited ())
-		    fs.update (&upath, h);
-		  if (!fs.is_udf ())
-		    {
-		      NtClose (h);
-		      h = NULL;
-		      status = STATUS_OBJECT_NAME_NOT_FOUND;
-		    }
-		}
-	    }
 	  /* There are filesystems out in the wild (Netapp, NWFS, and others)
 	     which are uncapable of generating pathnames outside the Win32
 	     rules.  That means, filenames on these FSes must not have a

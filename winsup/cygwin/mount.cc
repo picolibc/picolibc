@@ -448,18 +448,9 @@ fs_info::update (PUNICODE_STRING upath, HANDLE in_vol)
      except on Samba which handles Windows clients case insensitive.
 
      NFS doesn't set the FILE_CASE_SENSITIVE_SEARCH flag but is case
-     sensitive.
-
-     UDF on NT 5.x is broken (at least) in terms of case sensitivity.
-     The UDF driver reports the FILE_CASE_SENSITIVE_SEARCH capability
-     but:
-     - Opening the root directory for query seems to work at first,
-       but the filenames in the directory listing are mutilated.
-     - When trying to open a file or directory case sensitive, the file
-       appears to be non-existant. */
-  caseinsensitive (((!(flags () & FILE_CASE_SENSITIVE_SEARCH) || is_samba ())
-		    && !is_nfs ())
-		   || (is_udf () && wincap.has_broken_udf ()));
+     sensitive. */
+  caseinsensitive ((!(flags () & FILE_CASE_SENSITIVE_SEARCH) || is_samba ())
+		   && !is_nfs ());
 
   if (!in_vol)
     NtClose (vol);
