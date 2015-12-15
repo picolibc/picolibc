@@ -3894,12 +3894,11 @@ fcwd_access_t::Free (PVOID heap)
 {
   /* Decrement the reference count.  If it's down to 0, free
      structure from heap. */
-  if (this && InterlockedDecrement (&ReferenceCount ()) == 0)
+  if (InterlockedDecrement (&ReferenceCount ()) == 0)
     {
-      /* In contrast to pre-Vista, the handle on init is always a
-	 fresh one and not the handle inherited from the parent
-	 process.  So we always have to close it here.  However, the
-	 handle could be NULL, if we cd'ed into a virtual dir. */
+      /* The handle on init is always a fresh one, not the handle inherited
+	 from the parent process.  We always have to close it here.
+	 Note: The handle could be NULL, if we cd'ed into a virtual dir. */
       HANDLE h = DirectoryHandle ();
       if (h)
 	NtClose (h);
@@ -4247,113 +4246,89 @@ cwdstuff::override_win32_cwd (bool init, ULONG old_dismount_count)
   UNICODE_STRING &upp_cwd_str = peb.ProcessParameters->CurrentDirectoryName;
   HANDLE &upp_cwd_hdl = peb.ProcessParameters->CurrentDirectoryHandle;
 
-  if (wincap.has_fast_cwd ())
+  if (fast_cwd_ptr == (fcwd_access_t **) -1)
+    fast_cwd_ptr = find_fast_cwd ();
+  if (fast_cwd_ptr)
     {
-      if (fast_cwd_ptr == (fcwd_access_t **) -1)
-	fast_cwd_ptr = find_fast_cwd ();
-      if (fast_cwd_ptr)
+      /* Default method starting with Vista.  If we got a valid value for
+	 fast_cwd_ptr, we can simply replace the RtlSetCurrentDirectory_U
+	 function entirely, just as on pre-Vista. */
+      PVOID heap = peb.ProcessHeap;
+      /* First allocate a new fcwd_access_t structure on the heap.
+	 The new fcwd_access_t structure is 4 byte bigger than the old one,
+	 but we simply don't care, so we allocate always room for the
+	 new one. */
+      fcwd_access_t *f_cwd = (fcwd_access_t *)
+			RtlAllocateHeap (heap, 0, sizeof (fcwd_access_t));
+      if (!f_cwd)
 	{
-	  /* Default method starting with Vista.  If we got a valid value for
-	     fast_cwd_ptr, we can simply replace the RtlSetCurrentDirectory_U
-	     function entirely, just as on pre-Vista. */
-	  PVOID heap = peb.ProcessHeap;
-	  /* First allocate a new fcwd_access_t structure on the heap.
-	     The new fcwd_access_t structure is 4 byte bigger than the old one,
-	     but we simply don't care, so we allocate always room for the
-	     new one. */
-	  fcwd_access_t *f_cwd = (fcwd_access_t *)
-			    RtlAllocateHeap (heap, 0, sizeof (fcwd_access_t));
-	  if (!f_cwd)
-	    {
-	      debug_printf ("RtlAllocateHeap failed");
-	      return;
-	    }
-	  /* Fill in the values. */
-	  f_cwd->FillIn (dir, error ? &ro_u_pipedir : &win32,
-			 old_dismount_count);
-	  /* Use PEB lock when switching fast_cwd_ptr to the new FAST_CWD
-	     structure and writing the CWD to the user process parameter
-	     block.  This is equivalent to calling RtlAcquirePebLock/
-	     RtlReleasePebLock, but without having to go through the FS
-	     selector again. */
-	  RtlEnterCriticalSection (peb.FastPebLock);
-	  fcwd_access_t *old_cwd = *fast_cwd_ptr;
-	  *fast_cwd_ptr = f_cwd;
-	  f_cwd->CopyPath (upp_cwd_str);
-	  upp_cwd_hdl = dir;
-	  RtlLeaveCriticalSection (peb.FastPebLock);
-	  old_cwd->Free (heap);
+	  debug_printf ("RtlAllocateHeap failed");
+	  return;
 	}
-      else
-	{
-	  /* This is more a hack, and it's only used on Vista and later if we
-	     failed to find the fast_cwd_ptr value.  What we do here is to call
-	     RtlSetCurrentDirectory_U and let it set up a new FAST_CWD
-	     structure.  Afterwards, compute the address of that structure
-	     utilizing the fact that the buffer address in the user process
-	     parameter block is actually pointing to the buffer in that
-	     FAST_CWD structure.  Then replace the directory handle in that
-	     structure with our own handle and close the original one.
-
-	     Note that the call to RtlSetCurrentDirectory_U also closes our
-	     old dir handle, so there won't be any handle left open.
-
-	     This method is prone to two race conditions:
-
-	     - Due to the way RtlSetCurrentDirectory_U opens the directory
-	       handle, the directory is locked against deletion or renaming
-	       between the RtlSetCurrentDirectory_U and the subsequent NtClose
-	       call.
-
-	     - When another thread calls SetCurrentDirectory at exactly the
-	       same time, a crash might occur, or worse, unrelated data could
-	       be overwritten or NtClose could be called on an unrelated handle.
-
-	     Therefore, use this *only* as a fallback. */
-	  if (!init)
-	    {
-	      NTSTATUS status =
-		RtlSetCurrentDirectory_U (error ? &ro_u_pipedir : &win32);
-	      if (!NT_SUCCESS (status))
-		{
-		  debug_printf ("RtlSetCurrentDirectory_U(%S) failed, %y",
-				error ? &ro_u_pipedir : &win32, status);
-		  return;
-		}
-	    }
-	  else if (upp_cwd_hdl == NULL)
-	    return;
-	  RtlEnterCriticalSection (peb.FastPebLock);
-	  fcwd_access_t::SetDirHandleFromBufferPointer(upp_cwd_str.Buffer, dir);
-	  h = upp_cwd_hdl;
-	  upp_cwd_hdl = dir;
-	  RtlLeaveCriticalSection (peb.FastPebLock);
-	  /* In contrast to pre-Vista, the handle on init is always a fresh one
-	     and not the handle inherited from the parent process.  So we always
-	     have to close it here. */
-	  NtClose (h);
-	}
+      /* Fill in the values. */
+      f_cwd->FillIn (dir, error ? &ro_u_pipedir : &win32,
+		     old_dismount_count);
+      /* Use PEB lock when switching fast_cwd_ptr to the new FAST_CWD
+	 structure and writing the CWD to the user process parameter
+	 block.  This is equivalent to calling RtlAcquirePebLock/
+	 RtlReleasePebLock, but without having to go through the FS
+	 selector again. */
+      RtlEnterCriticalSection (peb.FastPebLock);
+      fcwd_access_t *old_cwd = *fast_cwd_ptr;
+      *fast_cwd_ptr = f_cwd;
+      f_cwd->CopyPath (upp_cwd_str);
+      upp_cwd_hdl = dir;
+      RtlLeaveCriticalSection (peb.FastPebLock);
+      if (old_cwd)
+	old_cwd->Free (heap);
     }
   else
     {
-      /* This method is used for all pre-Vista OSes.  We simply set the values
-	 for the CWD in the user process parameter block entirely by ourselves
-	 under PEB lock condition.  This is how RtlSetCurrentDirectory_U worked
-	 in these older OSes, so we're safe.
+      /* This is more a hack, and it's only used on Vista and later if we
+	 failed to find the fast_cwd_ptr value.  What we do here is to call
+	 RtlSetCurrentDirectory_U and let it set up a new FAST_CWD
+	 structure.  Afterwards, compute the address of that structure
+	 utilizing the fact that the buffer address in the user process
+	 parameter block is actually pointing to the buffer in that
+	 FAST_CWD structure.  Then replace the directory handle in that
+	 structure with our own handle and close the original one.
 
-	 Note that we can't just RtlEnterCriticalSection (peb.FastPebLock)
-	 on pre-Vista.  RtlAcquirePebLock was way more complicated back then. */
-      RtlAcquirePebLock ();
+	 Note that the call to RtlSetCurrentDirectory_U also closes our
+	 old dir handle, so there won't be any handle left open.
+
+	 This method is prone to two race conditions:
+
+	 - Due to the way RtlSetCurrentDirectory_U opens the directory
+	   handle, the directory is locked against deletion or renaming
+	   between the RtlSetCurrentDirectory_U and the subsequent NtClose
+	   call.
+
+	 - When another thread calls SetCurrentDirectory at exactly the
+	   same time, a crash might occur, or worse, unrelated data could
+	   be overwritten or NtClose could be called on an unrelated handle.
+
+	 Therefore, use this *only* as a fallback. */
       if (!init)
-	copy_cwd_str (&upp_cwd_str, error ? &ro_u_pipedir : &win32);
+	{
+	  NTSTATUS status =
+	    RtlSetCurrentDirectory_U (error ? &ro_u_pipedir : &win32);
+	  if (!NT_SUCCESS (status))
+	    {
+	      debug_printf ("RtlSetCurrentDirectory_U(%S) failed, %y",
+			    error ? &ro_u_pipedir : &win32, status);
+	      return;
+	    }
+	}
+      else if (upp_cwd_hdl == NULL)
+	return;
+      RtlEnterCriticalSection (peb.FastPebLock);
+      fcwd_access_t::SetDirHandleFromBufferPointer(upp_cwd_str.Buffer, dir);
       h = upp_cwd_hdl;
       upp_cwd_hdl = dir;
-      RtlReleasePebLock ();
-      /* Only on init, the handle is potentially a native handle.  However,
-	 if it's identical to dir, it's the inherited handle from a Cygwin
-	 parent process and must not be closed. */
-      if (h && h != dir)
-	NtClose (h);
+      RtlLeaveCriticalSection (peb.FastPebLock);
+      /* The handle on init is always a fresh one, not the handle inherited
+	 from the parent process.  We always have to close it here. */
+      NtClose (h);
     }
 }
 
