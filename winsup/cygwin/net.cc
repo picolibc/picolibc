@@ -560,18 +560,6 @@ fdsock (cygheap_fdmanip& fd, const device *dev, SOCKET soc)
 	debug_printf ("WSAIoctl: %u", WSAGetLastError ());
       else if (base_soc != soc)
 	{
-	  /* LSPs are often BLODAs as well.  So we print an info about
-	     detecting an LSP if BLODA detection is desired. */
-	  if (detect_bloda)
-	    {
-	      WSAPROTOCOL_INFO prot;
-
-	      memset (&prot, 0, sizeof prot);
-	      ::getsockopt (soc, SOL_SOCKET, SO_PROTOCOL_INFO, (char *) &prot,
-			    (size = sizeof prot, &size));
-	      small_printf ("\n\nPotential BLODA detected!  Layered Socket "
-			    "Service Provider:\n  %s\n\n", prot.szProtocol);
-	    }
 	  if (GetHandleInformation ((HANDLE) base_soc, &flags)
 	      && (flags & HANDLE_FLAG_INHERIT))
 	    {

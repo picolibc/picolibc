@@ -65,7 +65,6 @@ int NO_COPY dynamically_loaded;
 
 /* Some CYGWIN environment variable variables. */
 bool allow_glob = true;
-bool detect_bloda;
 bool dos_file_warning;
 bool ignore_case_with_glob;
 bool pipe_byte;
