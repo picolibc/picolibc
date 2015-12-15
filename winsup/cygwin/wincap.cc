@@ -17,38 +17,6 @@ details. */
    in the same session.  I'm only writing this longish comment because I'm
    puzzled that this has never been noticed before... */
 
-wincaps wincap_xpsp2 __attribute__((section (".cygwin_dll_common"), shared)) = {
-  def_guard_pages:1,
-  max_sys_priv:SE_CREATE_GLOBAL_PRIVILEGE,
-  is_server:false,
-  needs_count_in_si_lpres2:false,
-  has_gaa_largeaddress_bug:false,
-  has_broken_alloc_console:false,
-  has_console_logon_sid:false,
-  has_precise_system_time:false,
-  has_microsoft_accounts:false,
-  has_processor_groups:false,
-  has_broken_prefetchvm:false,
-  has_new_pebteb_region:false,
-  has_broken_whoami:true,
-};
-
-wincaps wincap_2003 __attribute__((section (".cygwin_dll_common"), shared)) = {
-  def_guard_pages:1,
-  max_sys_priv:SE_CREATE_GLOBAL_PRIVILEGE,
-  is_server:false,
-  needs_count_in_si_lpres2:false,
-  has_gaa_largeaddress_bug:false,
-  has_broken_alloc_console:false,
-  has_console_logon_sid:false,
-  has_precise_system_time:false,
-  has_microsoft_accounts:false,
-  has_processor_groups:false,
-  has_broken_prefetchvm:false,
-  has_new_pebteb_region:false,
-  has_broken_whoami:true,
-};
-
 wincaps wincap_vista __attribute__((section (".cygwin_dll_common"), shared)) = {
   def_guard_pages:1,
   max_sys_priv:SE_CREATE_SYMBOLIC_LINK_PRIVILEGE,
@@ -148,17 +116,6 @@ wincapc::init ()
 
   switch (version.dwMajorVersion)
     {
-      case 5:
-	switch (version.dwMinorVersion)
-	  {
-	    case 1:
-	      caps = &wincap_xpsp2;
-	      break;
-
-	    default:
-	      caps = &wincap_2003;
-	  }
-	break;
       case 6:
 	switch (version.dwMinorVersion)
 	  {
