@@ -534,18 +534,15 @@ fdsock (cygheap_fdmanip& fd, const device *dev, SOCKET soc)
      SetHandleInformation.  Subsequent socket calls in the child process fail
      with error 10038, WSAENOTSOCK.
 
-     The only way up to Windows Server 2003 to make these sockets usable in
-     child processes is to duplicate them via WSADuplicateSocket/WSASocket
-     calls.  This requires to start the child process in SUSPENDED state so
-     we only do this on affected systems.  If we recognize a non-inheritable
-     socket we switch to inheritance/dup via WSADuplicateSocket/WSASocket for
-     that socket.
+     There's a neat way to workaround these annoying LSP sockets.  WSAIoctl
+     allows to fetch the underlying base socket, which is a normal, inheritable
+     IFS handle.  So we fetch the base socket, duplicate it, and close the
+     original socket.  Now we have a standard IFS socket which (hopefully)
+     works as expected.
 
-     Starting with Vista there's another neat way to workaround these annoying
-     LSP sockets.  WSAIoctl allows to fetch the underlying base socket, which
-     is a normal, inheritable IFS handle.  So we fetch the base socket,
-     duplicate it, and close the original socket.  Now we have a standard IFS
-     socket which (hopefully) works as expected. */
+     If that doesn't work for some reason, mark the sockets for duplication
+     via WSADuplicateSocket/WSASocket.  This requires to start the child
+     process in SUSPENDED state so we only do this if really necessary. */
   DWORD flags;
   bool fixup = false;
   if (!GetHandleInformation ((HANDLE) soc, &flags)
