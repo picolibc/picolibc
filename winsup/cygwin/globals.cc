@@ -138,7 +138,6 @@ const int __collate_load_error = 0;
      in the reply from the filesystem. */
   extern UNICODE_STRING _RDATA ro_u_prlfs = _ROU (L"PrlSF\0");
   extern UNICODE_STRING _RDATA ro_u_refs = _ROU (L"ReFS");
-  extern UNICODE_STRING _RDATA ro_u_sunwnfs = _ROU (L"SUNWNFS");
   extern UNICODE_STRING _RDATA ro_u_udf = _ROU (L"UDF");
   extern UNICODE_STRING _RDATA ro_u_unixfs = _ROU (L"UNIXFS");
   extern UNICODE_STRING _RDATA ro_u_nwfs = _ROU (L"NWFS");

@@ -393,15 +393,11 @@ fs_info::update (PUNICODE_STRING upath, HANDLE in_vol)
 	  && !is_unixfs (RtlEqualUnicodeString (&fsname, &ro_u_unixfs, FALSE))
 	  /* AFSRDRFsd == Andrew File System.  Doesn't support DOS attributes.
 	     Only native symlinks are supported. */
-	  && !is_afs (RtlEqualUnicodeString (&fsname, &ro_u_afs, FALSE))
+	  && !is_afs (RtlEqualUnicodeString (&fsname, &ro_u_afs, FALSE)))
+	{
 	  /* PrlSF == Parallels Desktop File System.  Has a bug in
 	     FileNetworkOpenInformation, see below. */
-	  && !is_prlfs (RtlEqualUnicodeString (&fsname, &ro_u_prlfs, FALSE)))
-	{
-	  /* Known remote file system with buggy open calls.  Further
-	     explanation in fhandler.cc (fhandler_disk_file::open_fs). */
-	  is_sunwnfs (RtlEqualUnicodeString (&fsname, &ro_u_sunwnfs, FALSE));
-	  has_buggy_open (is_sunwnfs ());
+	  is_prlfs (RtlEqualUnicodeString (&fsname, &ro_u_prlfs, FALSE));
 	}
       if (got_fs ())
 	{
@@ -1573,7 +1569,6 @@ fs_names_t fs_names[] = {
     { "iso9660", true },
     { "udf", true },
     { "csc-cache", false },
-    { "sunwnfs", false },
     { "unixfs", false },
     { "mvfs", false },
     { "cifs", false },

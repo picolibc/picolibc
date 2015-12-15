@@ -1457,32 +1457,17 @@ fhandler_base::open_fs (int flags, mode_t mode)
   bool new_file = !exists ();
 
   int res = fhandler_base::open (flags | O_DIROPEN, mode);
-  if (!res)
-    goto out;
-
-  /* This is for file systems known for having a buggy CreateFile call
-     which might return a valid HANDLE without having actually opened
-     the file.
-     The only known file system to date is the SUN NFS Solstice Client 3.1
-     which returns a valid handle when trying to open a file in a nonexistent
-     directory. */
-  if (pc.has_buggy_open () && !pc.exists ())
+  if (res)
     {
-      debug_printf ("Buggy open detected.");
-      close_fs ();
-      set_errno (ENOENT);
-      return 0;
+      /* The file info in pc is wrong at this point for newly created files.
+	 Refresh it before fetching any file info. */
+      if (new_file)
+	pc.get_finfo (get_io_handle ());
+
+      if (pc.isgood_inode (pc.get_ino ()))
+	ino = pc.get_ino ();
     }
 
-  /* The file info in pc is wrong at this point for newly created files.
-     Refresh it before fetching any file info. */
-  if (new_file)
-    pc.get_finfo (get_io_handle ());
-
-  if (pc.isgood_inode (pc.get_ino ()))
-    ino = pc.get_ino ();
-
-out:
   syscall_printf ("%d = fhandler_disk_file::open(%S, %y)", res,
 		  pc.get_nt_native_path (), flags);
   return res;
