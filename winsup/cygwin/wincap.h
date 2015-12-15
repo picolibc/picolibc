@@ -17,7 +17,6 @@ struct wincaps
   unsigned needs_count_in_si_lpres2			: 1;
   unsigned has_gaa_largeaddress_bug			: 1;
   unsigned has_broken_alloc_console			: 1;
-  unsigned has_restricted_raw_disk_access		: 1;
   unsigned use_dont_resolve_hack			: 1;
   unsigned has_console_logon_sid			: 1;
   unsigned wow64_has_secondary_stack			: 1;
@@ -66,7 +65,6 @@ public:
   bool	IMPLEMENT (needs_count_in_si_lpres2)
   bool	IMPLEMENT (has_gaa_largeaddress_bug)
   bool	IMPLEMENT (has_broken_alloc_console)
-  bool	IMPLEMENT (has_restricted_raw_disk_access)
   bool	IMPLEMENT (use_dont_resolve_hack)
   bool	IMPLEMENT (has_console_logon_sid)
   bool	IMPLEMENT (wow64_has_secondary_stack)

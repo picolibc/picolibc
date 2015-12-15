@@ -302,7 +302,6 @@ fhandler_dev_floppy::write_file (const void *buf, DWORD to_write,
      See http://support.microsoft.com/kb/942448 for details.
      What we do here is to lock the affected partition(s) and retry. */
   if (*err == ERROR_ACCESS_DENIED
-      && wincap.has_restricted_raw_disk_access ()
       && get_major () != DEV_FLOPPY_MAJOR
       && get_major () != DEV_CDROM_MAJOR
       && (get_flags () & O_ACCMODE) != O_RDONLY
