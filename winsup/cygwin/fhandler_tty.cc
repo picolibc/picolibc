@@ -1556,9 +1556,6 @@ fhandler_pty_master::pty_master_thread ()
 	  termios_printf ("ReadFile, %E");
 	  goto reply;
 	}
-      /* This function is only available since Vista, unfortunately.
-	 In earlier OSes we simply have to believe that the client
-	 has no malicious intent (== sends arbitrary PIDs). */
       if (!GetNamedPipeClientProcessId (master_ctl, &pid))
 	pid = req.pid;
       if (get_object_sd (input_available_event, sd))
