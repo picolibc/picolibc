@@ -22,6 +22,9 @@ What's new:
   who created the file.  This only works for files and directories
   created by Cygwin processes.
 
+- New mount type "usertemp" which allows to mount a POSIX directory to
+  the Windows per-user temporary directory.
+
 - cygpath has a new -U option, which creates cygdrive paths using the
   unambiguous /proc/cygdrive prefix.
 
