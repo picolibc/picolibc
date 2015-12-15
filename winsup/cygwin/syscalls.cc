@@ -223,12 +223,6 @@ static char desktop_ini[] =
 static char desktop_ini_ext[] =
   "LocalizedResourceName=@%SystemRoot%\\system32\\shell32.dll,-8964\r\n";
 
-static BYTE info2[] =
-{
-  0x05, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-  0x00, 0x00, 0x20, 0x03, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
-};
-
 enum bin_status
 {
   dont_move,
@@ -303,14 +297,7 @@ try_to_bin (path_conv &pc, HANDLE &fh, ACCESS_MASK access, ULONG flags)
   RtlInitEmptyUnicodeString (&recycler, recyclerbuf, sizeof recyclerbuf);
   if (!pc.isremote ())
     {
-      if (wincap.has_recycle_dot_bin ()) /* NTFS and FAT since Vista, ReFS */
-	RtlAppendUnicodeToString (&recycler, L"\\$Recycle.Bin\\");
-      else if (pc.fs_is_ntfs ())	/* NTFS up to 2K3 */
-	RtlAppendUnicodeToString (&recycler, L"\\RECYCLER\\");
-      else if (pc.fs_is_fat ())	/* FAT up to 2K3 */
-	RtlAppendUnicodeToString (&recycler, L"\\Recycled\\");
-      else
-	goto out;
+      RtlAppendUnicodeToString (&recycler, L"\\$Recycle.Bin\\");
       RtlInitCountedUnicodeString(&fname, pfni->FileName, pfni->FileNameLength);
       /* Is the file a subdir of the recycler? */
       if (RtlEqualUnicodePathPrefix (&fname, &recycler, TRUE))
@@ -431,13 +418,9 @@ try_to_bin (path_conv &pc, HANDLE &fh, ACCESS_MASK access, ULONG flags)
 	}
       /* Then check if recycler exists by opening and potentially creating it.
 	 Yes, we can really do that.  Typically the recycle bin is created
-	 by the first user actually using the bin.  Pre-Vista, the permissions
-	 are the default permissions propagated from the root directory.
-	 Since Vista the top-level recycle dir has explicit permissions. */
+	 by the first user actually using the bin. */
       InitializeObjectAttributes (&attr, &recycler, OBJ_CASE_INSENSITIVE,
-				  rootdir,
-				  wincap.has_recycle_dot_bin ()
-				  ? recycler_sd (true, true) : NULL);
+				  rootdir, recycler_sd (true, true));
       recycler.Length = recycler_base_len;
       status = NtCreateFile (&recyclerdir,
 			     READ_CONTROL
@@ -475,9 +458,8 @@ try_to_bin (path_conv &pc, HANDLE &fh, ACCESS_MASK access, ULONG flags)
 	      goto out;
 	    }
 	}
-      /* The desktop.ini and INFO2 (pre-Vista) files are expected by
-	 Windows Explorer.  Otherwise, the created bin is treated as
-	 corrupted */
+      /* The desktop.ini file is expected by Windows Explorer.  Otherwise,
+         the created bin is treated as corrupted */
       if (io.Information == FILE_CREATED)
 	{
 	  RtlInitUnicodeString (&fname, L"desktop.ini");
@@ -495,41 +477,14 @@ try_to_bin (path_conv &pc, HANDLE &fh, ACCESS_MASK access, ULONG flags)
 	    {
 	      status = NtWriteFile (tmp_fh, NULL, NULL, NULL, &io, desktop_ini,
 				    sizeof desktop_ini - 1, NULL, NULL);
+	      if (NT_SUCCESS (status))
+		status = NtWriteFile (tmp_fh, NULL, NULL, NULL, &io,
+				      desktop_ini_ext,
+				      sizeof desktop_ini_ext - 1, NULL, NULL);
 	      if (!NT_SUCCESS (status))
 		debug_printf ("NtWriteFile (%S) failed, status = %y",
 			      &fname, status);
-	      else if (wincap.has_recycle_dot_bin ())
-	      	{
-		  status = NtWriteFile (tmp_fh, NULL, NULL, NULL, &io,
-		  			desktop_ini_ext,
-					sizeof desktop_ini_ext - 1, NULL, NULL);
-		  if (!NT_SUCCESS (status))
-		    debug_printf ("NtWriteFile (%S) failed, status = %y",
-				  &fname, status);
-		}
 	      NtClose (tmp_fh);
-	    }
-	  if (!wincap.has_recycle_dot_bin ()) /* No INFO2 file since Vista */
-	    {
-	      RtlInitUnicodeString (&fname, L"INFO2");
-	      status = NtCreateFile (&tmp_fh, FILE_GENERIC_WRITE, &attr, &io,
-				     NULL, FILE_ATTRIBUTE_ARCHIVE
-					   | FILE_ATTRIBUTE_HIDDEN,
-				     FILE_SHARE_VALID_FLAGS, FILE_CREATE,
-				     FILE_SYNCHRONOUS_IO_NONALERT
-				     | FILE_NON_DIRECTORY_FILE, NULL, 0);
-		if (!NT_SUCCESS (status))
-		  debug_printf ("NtCreateFile (%S) failed, status = %y",
-				&recycler, status);
-		else
-		{
-		  status = NtWriteFile (tmp_fh, NULL, NULL, NULL, &io, info2,
-					sizeof info2, NULL, NULL);
-		  if (!NT_SUCCESS (status))
-		    debug_printf ("NtWriteFile (%S) failed, status = %y",
-				  &fname, status);
-		  NtClose (tmp_fh);
-		}
 	    }
 	}
       NtClose (recyclerdir);
