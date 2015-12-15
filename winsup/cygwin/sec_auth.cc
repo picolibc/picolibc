@@ -45,39 +45,36 @@ issetugid (void)
 static HANDLE
 get_full_privileged_inheritable_token (HANDLE token)
 {
-  if (wincap.has_mandatory_integrity_control ())
+  TOKEN_LINKED_TOKEN linked;
+  ULONG size;
+
+  /* When fetching the linked token without TCB privs, then the linked
+     token is not a primary token, only an impersonation token, which is
+     not suitable for CreateProcessAsUser.  Converting it to a primary
+     token using DuplicateTokenEx does NOT work for the linked token in
+     this case.  So we have to switch on TCB privs to get a primary token.
+     This is generally performed in the calling functions.  */
+  if (NT_SUCCESS (NtQueryInformationToken (token, TokenLinkedToken,
+					   (PVOID) &linked, sizeof linked,
+					   &size)))
     {
-      TOKEN_LINKED_TOKEN linked;
-      ULONG size;
-
-      /* When fetching the linked token without TCB privs, then the linked
-	 token is not a primary token, only an impersonation token, which is
-	 not suitable for CreateProcessAsUser.  Converting it to a primary
-	 token using DuplicateTokenEx does NOT work for the linked token in
-	 this case.  So we have to switch on TCB privs to get a primary token.
-	 This is generally performed in the calling functions.  */
-      if (NT_SUCCESS (NtQueryInformationToken (token, TokenLinkedToken,
-					       (PVOID) &linked, sizeof linked,
-					       &size)))
+      debug_printf ("Linked Token: %p", linked.LinkedToken);
+      if (linked.LinkedToken)
 	{
-	  debug_printf ("Linked Token: %p", linked.LinkedToken);
-	  if (linked.LinkedToken)
-	    {
-	      TOKEN_TYPE type;
+	  TOKEN_TYPE type;
 
-	      /* At this point we don't know if the user actually had TCB
-		 privileges.  Check if the linked token is a primary token.
-		 If not, just return the original token. */
-	      if (NT_SUCCESS (NtQueryInformationToken (linked.LinkedToken,
-						       TokenType, (PVOID) &type,
-						       sizeof type, &size))
-		  && type != TokenPrimary)
-		debug_printf ("Linked Token is not a primary token!");
-	      else
-		{
-		  CloseHandle (token);
-		  token = linked.LinkedToken;
-		}
+	  /* At this point we don't know if the user actually had TCB
+	     privileges.  Check if the linked token is a primary token.
+	     If not, just return the original token. */
+	  if (NT_SUCCESS (NtQueryInformationToken (linked.LinkedToken,
+						   TokenType, (PVOID) &type,
+						   sizeof type, &size))
+	      && type != TokenPrimary)
+	    debug_printf ("Linked Token is not a primary token!");
+	  else
+	    {
+	      CloseHandle (token);
+	      token = linked.LinkedToken;
 	    }
 	}
     }
@@ -972,14 +969,10 @@ create_token (cygsid &usersid, user_groups &new_groups)
 			       &mandatory_integrity_sid)))
     goto out;
 
-  /* On systems supporting Mandatory Integrity Control, add the MIC SID. */
-  if (wincap.has_mandatory_integrity_control ())
-    {
-      new_tok_gsids->Groups[new_tok_gsids->GroupCount].Attributes =
-	SE_GROUP_INTEGRITY | SE_GROUP_INTEGRITY_ENABLED;
-      new_tok_gsids->Groups[new_tok_gsids->GroupCount++].Sid
-	= mandatory_integrity_sid;
-    }
+  new_tok_gsids->Groups[new_tok_gsids->GroupCount].Attributes =
+    SE_GROUP_INTEGRITY | SE_GROUP_INTEGRITY_ENABLED;
+  new_tok_gsids->Groups[new_tok_gsids->GroupCount++].Sid
+    = mandatory_integrity_sid;
 
   /* Let's be heroic... */
   status = NtCreateToken (&token, TOKEN_ALL_ACCESS, &oa, TokenImpersonation,

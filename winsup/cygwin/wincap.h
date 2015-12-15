@@ -14,7 +14,6 @@ struct wincaps
   DWORD    def_guard_pages;
   DWORD    max_sys_priv;
   unsigned is_server                                    : 1;
-  unsigned has_mandatory_integrity_control		: 1;
   unsigned needs_count_in_si_lpres2			: 1;
   unsigned has_gaa_largeaddress_bug			: 1;
   unsigned has_transactions				: 1;
@@ -70,7 +69,6 @@ public:
   }
   DWORD IMPLEMENT (max_sys_priv)
   bool  IMPLEMENT (is_server)
-  bool	IMPLEMENT (has_mandatory_integrity_control)
   bool	IMPLEMENT (needs_count_in_si_lpres2)
   bool	IMPLEMENT (has_gaa_largeaddress_bug)
   bool	IMPLEMENT (has_transactions)
