@@ -3499,13 +3499,10 @@ cygwin_getaddrinfo (const char *hostname, const char *servname,
 	     Winsock.  Sert upper 4 bytes explicitely to 0 to avoid EAI_FAIL. */
 	  whints.ai_addrlen &= UINT32_MAX;
 #endif
-	  /* AI_ADDRCONFIG is not supported prior to Vista.  Rather it's
-	     the default and only possible setting.
-	     On Vista, the default behaviour is as if AI_ADDRCONFIG is set,
+	  /* On Windows, the default behaviour is as if AI_ADDRCONFIG is set,
 	     apparently for performance reasons.  To get the POSIX default
 	     behaviour, the AI_ALL flag has to be set. */
-	  if (wincap.supports_all_posix_ai_flags ()
-	      && whints.ai_family == PF_UNSPEC
+	  if (whints.ai_family == PF_UNSPEC
 	      && !(whints.ai_flags & AI_ADDRCONFIG))
 	    whints.ai_flags |= AI_ALL;
 	}
@@ -3529,51 +3526,6 @@ cygwin_getaddrinfo (const char *hostname, const char *servname,
 	  if (!*res)
 	    __leave;
 	}
-      /* AI_V4MAPPED and AI_ALL are not supported prior to Vista.  So, what
-	 we do here is to emulate AI_V4MAPPED.  If no IPv6 addresses are
-	 returned, or the AI_ALL flag is set, we try with AF_INET again, and
-	 convert the returned IPv4 addresses into v4-in-v6 entries.  This
-	 is done in ga_dup if the v4mapped flag is set. */
-      if (!wincap.supports_all_posix_ai_flags ()
-	  && hints
-	  && hints->ai_family == AF_INET6
-	  && (hints->ai_flags & AI_V4MAPPED)
-	  && (ret == EAI_NODATA || ret == EAI_NONAME
-	      || (hints->ai_flags & AI_ALL)))
-	{
-	  /* sizeof addrinfo == sizeof addrinfoW */
-	  memcpy (&whints, hints, sizeof whints);
-	  whints.ai_family = AF_INET;
-#ifdef __x86_64__
-	  /* ai_addrlen is socklen_t (4 bytes) in POSIX but size_t (8 bytes) in
-	     Winsock.  Sert upper 4 bytes explicitely to 0 to avoid EAI_FAIL. */
-	  whints.ai_addrlen &= UINT32_MAX;
-#endif
-	  int ret2 = w32_to_gai_err (GetAddrInfoW (whost, wserv, &whints, &wres));
-	  if (!ret2)
-	    {
-	      struct addrinfo *v4res = ga_duplist (wres, true, idn_flags, ret);
-	      FreeAddrInfoW (wres);
-	      if (!v4res)
-		{
-		  if (!ret)
-		    cygwin_freeaddrinfo (*res);
-		  __leave;
-		}
-	      /* If a list of v6 addresses exists, append the v4-in-v6 address
-		 list.  Otherwise just return the v4-in-v6 address list. */
-	      if (!ret)
-		{
-		  struct addrinfo *ptr;
-		  for (ptr = *res; ptr->ai_next; ptr = ptr->ai_next)
-		    ;
-		  ptr->ai_next = v4res;
-		}
-	      else
-		*res = v4res;
-	      ret = 0;
-	    }
-	}
     }
   __except (EFAULT)
     {
@@ -3592,31 +3544,6 @@ cygwin_getnameinfo (const struct sockaddr *sa, socklen_t salen,
 
   __try
     {
-      /* When the incoming port number does not resolve to a well-known service,
-	 WinSock's getnameinfo up to Windows 2003 returns with error WSANO_DATA
-	 instead of setting `serv' to the numeric port number string, as
-	 required by RFC 3493.  This is fixed on Vista and later.  To avoid the
-	 error on systems up to Windows 2003, we check if the port number
-	 resolves to a well-known service.  If not, we set the NI_NUMERICSERV
-	 flag. */
-      if (!wincap.supports_all_posix_ai_flags ())
-	{
-	  int port = 0;
-
-	  switch (sa->sa_family)
-	    {
-	    case AF_INET:
-	      port = ((struct sockaddr_in *) sa)->sin_port;
-	      break;
-	    case AF_INET6:
-	      port = ((struct sockaddr_in6 *) sa)->sin6_port;
-	      break;
-	    default:
-	      return EAI_FAMILY;
-	    }
-	  if (!port || !getservbyport (port, flags & NI_DGRAM ? "udp" : "tcp"))
-	    flags |= NI_NUMERICSERV;
-	}
       /* We call GetNameInfoW with local buffers and convert to locale
 	 charset to allow RFC 3490 IDNs like glibc 2.3.4 and later. */
 #define NI_IDN_MASK (NI_IDN | \
