@@ -1022,7 +1022,6 @@ _DEFUN(_localeconv_r, (data),
 
 #ifndef _REENT_ONLY
 
-#ifndef __CYGWIN__
 /* Cygwin provides its own version of setlocale to perform some more
    initialization work.  It calls _setlocale_r, though. */
 char *
@@ -1032,7 +1031,6 @@ _DEFUN(setlocale, (category, locale),
 {
   return _setlocale_r (_REENT, category, locale);
 }
-#endif /* __CYGWIN__ */
 
 struct lconv *
 _DEFUN_VOID(localeconv)

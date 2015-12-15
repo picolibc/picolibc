@@ -1557,35 +1557,6 @@ __set_locale_from_locale_alias (const char *locale, char *new_locale)
   return ret;
 }
 
-static char *
-check_codepage (char *ret)
-{
-  if (!wincap.has_always_all_codepages ())
-    {
-      /* Prior to Windows Vista, many codepages are not installed by
-	 default, or can be deinstalled.  The following codepages require
-	 that the respective conversion tables are installed into the OS.
-	 So we check if they are installed and if not, setlocale should
-	 fail. */
-      CPINFO cpi;
-      UINT cp = 0;
-      if (__mbtowc == __sjis_mbtowc)
-	cp = 932;
-      else if (__mbtowc == __eucjp_mbtowc)
-	cp = 20932;
-      else if (__mbtowc == __gbk_mbtowc)
-	cp = 936;
-      else if (__mbtowc == __kr_mbtowc)
-	cp = 949;
-      else if (__mbtowc == __big5_mbtowc)
-	cp = 950;
-      if (cp && !GetCPInfo (cp, &cpi)
-	  && GetLastError () == ERROR_INVALID_PARAMETER)
-	return NULL;
-    }
-  return ret;
-}
-
 /* Can be called via cygwin_internal (CW_INTERNAL_SETLOCALE) for application
    which really (think they) know what they are doing. */
 extern "C" void
@@ -1650,22 +1621,6 @@ void
 initial_setlocale ()
 {
   char *ret = _setlocale_r (_REENT, LC_CTYPE, "");
-  if (ret && check_codepage (ret))
+  if (ret)
     internal_setlocale ();
-}
-
-/* Like newlib's setlocale, but additionally check if the charset needs
-   OS support and the required codepage is actually installed.  If codepage
-   is not available, revert to previous locale and return NULL.  For details
-   about codepage availability, see the comment in check_codepage() above. */
-extern "C" char *
-setlocale (int category, const char *locale)
-{
-  char old[(LC_MESSAGES + 1) * (ENCODING_LEN + 1/*"/"*/ + 1)];
-  if (locale && !wincap.has_always_all_codepages ())
-    stpcpy (old, _setlocale_r (_REENT, category, NULL));
-  char *ret = _setlocale_r (_REENT, category, locale);
-  if (ret && locale && !(ret = check_codepage (ret)))
-    _setlocale_r (_REENT, category, old);
-  return ret;
 }

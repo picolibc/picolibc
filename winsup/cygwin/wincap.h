@@ -18,7 +18,6 @@ struct wincaps
   unsigned has_gaa_largeaddress_bug			: 1;
   unsigned has_transactions				: 1;
   unsigned has_broken_alloc_console			: 1;
-  unsigned has_always_all_codepages			: 1;
   unsigned has_localenames				: 1;
   unsigned has_fast_cwd					: 1;
   unsigned has_restricted_raw_disk_access		: 1;
@@ -71,7 +70,6 @@ public:
   bool	IMPLEMENT (has_gaa_largeaddress_bug)
   bool	IMPLEMENT (has_transactions)
   bool	IMPLEMENT (has_broken_alloc_console)
-  bool	IMPLEMENT (has_always_all_codepages)
   bool	IMPLEMENT (has_localenames)
   bool	IMPLEMENT (has_fast_cwd)
   bool	IMPLEMENT (has_restricted_raw_disk_access)
