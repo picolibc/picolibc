@@ -1880,13 +1880,11 @@ fhandler_disk_file::opendir (int fd)
 	      while (!NT_SUCCESS (status));
 	    }
 
-	  /* FileIdBothDirectoryInformation is apparently unsupported on
-	     XP when accessing directories on UDF.  When trying to use it
-	     so, NtQueryDirectoryFile returns with STATUS_ACCESS_VIOLATION.
-	     It's not clear if the call isn't also unsupported on other
-	     OS/FS combinations.  Instead of testing for yet another error
-	     code, let's use FileIdBothDirectoryInformation only on FSes
-	     supporting persistent ACLs, FileBothDirectoryInformation otherwise.
+	  /* FileIdBothDirectoryInformation was unsupported on XP when
+	     accessing UDF.  It's not clear if the call isn't also unsupported
+	     on other OS/FS combinations.  Instead of testing for yet another
+	     error code, use FileIdBothDirectoryInformation only on FSes
+	     supporting persistent ACLs.
 
 	     NFS clients hide dangling symlinks from directory queries,
 	     unless you use the FileNamesInformation info class.
