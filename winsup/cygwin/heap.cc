@@ -54,9 +54,9 @@ eval_start_address ()
 	 the current TEB address as very simple test that this is a large
 	 address aware executable.
 	 The above test for an address beyond 0xbf000000 is supposed to
-	 make sure that we really have 3GB on a 32 bit system.  XP and
-	 later support smaller large address regions, but then it's not
-	 that interesting for us to use it for the heap.
+	 make sure that we really have 3GB on a 32 bit system.  Windows
+	 supports smaller large address regions, but then it's not that
+	 interesting for us to use it for the heap.
 	 If the region is big enough, the heap gets allocated at its
 	 start.  What we get are 0.999 or 1.999 Gigs of free contiguous
 	 memory for heap, thread stacks, and shared memory regions. */
