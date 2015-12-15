@@ -577,7 +577,6 @@ LoadDLLfunc (GetUdpTable, 12, iphlpapi)
 LoadDLLfunc (if_indextoname, 8, iphlpapi)
 LoadDLLfunc (if_nametoindex, 4, iphlpapi)
 
-LoadDLLfuncEx (CancelSynchronousIo, 4, kernel32, 1)
 LoadDLLfunc (CreateSymbolicLinkW, 12, kernel32)
 LoadDLLfuncEx2 (DiscardVirtualMemory, 8, kernel32, 1, 127)
 LoadDLLfuncEx (GetLogicalProcessorInformationEx, 12, kernel32, 1)

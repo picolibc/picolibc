@@ -2006,14 +2006,12 @@ fhandler_disk_file::mand_lock (int a_op, struct flock *fl)
 	      thr->detach ();
 	      break;
 	    default:
-	      /* Signal arrived. */
-	      /* Starting with Vista, CancelSynchronousIo works, and we wait
-		 for the thread to exit.  lp.status will be either
-		 STATUS_SUCCESS, or STATUS_CANCELLED.  We only call
-		 NtUnlockFile in the first case.
-		 Prior to Vista, CancelSynchronousIo doesn't exist, so we
-		 terminated the thread and always call NtUnlockFile since
-		 lp.status was 0 to begin with. */
+	      /* Signal arrived.
+		 If CancelSynchronousIo works we wait for the thread to exit.
+		 lp.status will be either STATUS_SUCCESS, or STATUS_CANCELLED.
+		 We only call NtUnlockFile in the first case.
+		 If CancelSynchronousIo fails we terminated the thread and
+		 call NtUnlockFile since lp.status was 0 to begin with. */
 	      if (CancelSynchronousIo (thr->thread_handle ()))
 		thr->detach ();
 	      else
