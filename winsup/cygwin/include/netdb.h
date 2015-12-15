@@ -158,9 +158,9 @@ extern __declspec(dllimport) int h_errno;
 #define AI_NUMERICHOST  0x4	/* Input is address, don't resolve. */
 #define AI_NUMERICSERV  0x8	/* Input is port number, don't resolve. */
 #define AI_ALL          0x100	/* Return v4-mapped and v6 addresses. */
-#define AI_ADDRCONFIG   0x400	/* Only available on Vista.  Unchangable default
-				   on older systems. */
-#define AI_V4MAPPED     0x800
+#define AI_ADDRCONFIG   0x400	/* Only return address types available on
+				   this host. */
+#define AI_V4MAPPED     0x800	/* IPv4 mapped addresses are acceptable. */
 /* Glibc extensions. We use numerical values taken by winsock-specific
    extensions. */
 #define AI_IDN          0x4000	/* Encode IDN input from current local to
