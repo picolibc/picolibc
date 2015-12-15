@@ -1759,15 +1759,7 @@ symlink_worker (const char *oldpath, const char *newpath, bool isdevice)
 	wsym_type = WSYM_lnk;
       /* AFS only supports native symlinks. */
       else if (win32_newpath.fs_is_afs ())
-	{
-	  /* Bail out if OS doesn't support native symlinks. */
-	  if (wincap.max_sys_priv () < SE_CREATE_SYMBOLIC_LINK_PRIVILEGE)
-	    {
-	      set_errno (EPERM);
-	      __leave;
-	    }
-	  wsym_type = WSYM_nativestrict;
-	}
+	wsym_type = WSYM_nativestrict;
       /* Don't try native symlinks on FSes not supporting reparse points. */
       else if ((wsym_type == WSYM_native || wsym_type == WSYM_nativestrict)
 	       && !(win32_newpath.fs_flags () & FILE_SUPPORTS_REPARSE_POINTS))
