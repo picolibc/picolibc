@@ -216,11 +216,9 @@ stop_transaction (NTSTATUS status, HANDLE old_trans, HANDLE &trans)
   return status;
 }
 
-static char desktop_ini[] =
+static const char desktop_ini[] =
   "[.ShellClassInfo]\r\n"
-  "CLSID={645FF040-5081-101B-9F08-00AA002F954E}\r\n";
-
-static char desktop_ini_ext[] =
+  "CLSID={645FF040-5081-101B-9F08-00AA002F954E}\r\n"
   "LocalizedResourceName=@%SystemRoot%\\system32\\shell32.dll,-8964\r\n";
 
 enum bin_status
@@ -475,12 +473,9 @@ try_to_bin (path_conv &pc, HANDLE &fh, ACCESS_MASK access, ULONG flags)
 			  &recycler, status);
 	  else
 	    {
-	      status = NtWriteFile (tmp_fh, NULL, NULL, NULL, &io, desktop_ini,
-				    sizeof desktop_ini - 1, NULL, NULL);
-	      if (NT_SUCCESS (status))
-		status = NtWriteFile (tmp_fh, NULL, NULL, NULL, &io,
-				      desktop_ini_ext,
-				      sizeof desktop_ini_ext - 1, NULL, NULL);
+	      status = NtWriteFile (tmp_fh, NULL, NULL, NULL, &io,
+				    (PVOID) desktop_ini, sizeof desktop_ini - 1,
+				    NULL, NULL);
 	      if (!NT_SUCCESS (status))
 		debug_printf ("NtWriteFile (%S) failed, status = %y",
 			      &fname, status);
