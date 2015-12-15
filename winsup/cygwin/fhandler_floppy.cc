@@ -47,9 +47,9 @@ fhandler_dev_floppy::get_drive_info (struct hd_geometry *geo)
   PARTITION_INFORMATION *pi = NULL;
   DWORD bytes_read = 0;
 
-  /* Always try using the new EX ioctls first (>= XP).  If not available,
-     fall back to trying the old non-EX ioctls.
-     Unfortunately the EX ioctls are not implemented in the floppy driver. */
+  /* Always try using the new EX ioctls first.  If not available, fall back
+     to trying the non-EX ioctls which are unfortunately not implemented in
+     the floppy driver. */
   if (get_major () != DEV_FLOPPY_MAJOR)
     {
       if (!DeviceIoControl (get_handle (),
