@@ -218,13 +218,6 @@ get_user_profile_directory (PCWSTR sidstr, PWCHAR path, SIZE_T path_len)
   return path;
 }
 
-/* The CreateProfile prototype is for some reason missing in our w32api headers,
-   even though it's defined upstream since Dec-2013. */
-extern "C" {
-  HRESULT WINAPI CreateProfile (LPCWSTR pszUserSid, LPCWSTR pszUserName,
-				LPWSTR pszProfilePath, DWORD cchProfilePath);
-}
-
 /* Load user profile if it's not already loaded.  If the user profile doesn't
    exist on the machine, and if we're running Vista or later, try to create it. 
 
@@ -258,13 +251,11 @@ load_user_profile (HANDLE token, struct passwd *pw, cygpsid &usersid)
   /* Check if the local profile dir has already been created. */
   if (!get_user_profile_directory (sid, userpath, MAX_PATH))
    {
-     /* No, try to create it.  This function exists only on Vista and later. */
+     /* No, try to create it. */
      HRESULT res = CreateProfile (sid, username, userpath, MAX_PATH);
      if (res != S_OK)
        {
-	 /* If res is 1 (S_FALSE), autoloading failed (XP or 2K3). */
-	 if (res != S_FALSE)
-	   debug_printf ("CreateProfile, HRESULT %x", res);
+	 debug_printf ("CreateProfile, HRESULT %x", res);
 	 return NULL;
        }
     }
