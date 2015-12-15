@@ -405,39 +405,35 @@ child_info_spawn::worker (const char *prog_arg, const char *const *argv,
 
       c_flags |= CREATE_SEPARATE_WOW_VDM | CREATE_UNICODE_ENVIRONMENT;
 
-      if (wincap.has_program_compatibility_assistant ())
+      /* We're adding the CREATE_BREAKAWAY_FROM_JOB flag here to workaround
+	 issues with the "Program Compatibility Assistant (PCA) Service".
+	 For some reason, when starting long running sessions from mintty(*),
+	 the affected svchost.exe process takes more and more memory and at one
+	 point takes over the CPU.  At this point the machine becomes
+	 unresponsive.  The only way to get back to normal is to stop the
+	 entire mintty session, or to stop the PCA service.  However, a process
+	 which is controlled by PCA is part of a compatibility job, which
+	 allows child processes to break away from the job.  This helps to
+	 avoid this issue.
+
+	 First we call IsProcessInJob.  It fetches the information whether or
+	 not we're part of a job 20 times faster than QueryInformationJobObject.
+
+	 (*) Note that this is not mintty's fault.  It has just been observed
+	 with mintty in the first place.  See the archives for more info:
+	 http://cygwin.com/ml/cygwin-developers/2012-02/msg00018.html */
+      JOBOBJECT_BASIC_LIMIT_INFORMATION jobinfo;
+      BOOL is_in_job;
+
+      if (IsProcessInJob (GetCurrentProcess (), NULL, &is_in_job)
+	  && is_in_job
+	  && QueryInformationJobObject (NULL, JobObjectBasicLimitInformation,
+				     &jobinfo, sizeof jobinfo, NULL)
+	  && (jobinfo.LimitFlags & (JOB_OBJECT_LIMIT_BREAKAWAY_OK
+				    | JOB_OBJECT_LIMIT_SILENT_BREAKAWAY_OK)))
 	{
-	  /* We're adding the CREATE_BREAKAWAY_FROM_JOB flag here to workaround
-	     issues with the "Program Compatibility Assistant (PCA) Service"
-	     starting with Windows Vista.  For some reason, when starting long
-	     running sessions from mintty(*), the affected svchost.exe process
-	     takes more and more memory and at one point takes over the CPU.  At
-	     this point the machine becomes unresponsive.  The only way to get
-	     back to normal is to stop the entire mintty session, or to stop the
-	     PCA service.  However, a process which is controlled by PCA is part
-	     of a compatibility job, which allows child processes to break away
-	     from the job.  This helps to avoid this issue.
-
-	     First we call IsProcessInJob.  It fetches the information whether or
-	     not we're part of a job 20 times faster than QueryInformationJobObject.
-
-	     (*) Note that this is not mintty's fault.  It has just been observed
-	     with mintty in the first place.  See the archives for more info:
-	     http://cygwin.com/ml/cygwin-developers/2012-02/msg00018.html */
-
-	  JOBOBJECT_BASIC_LIMIT_INFORMATION jobinfo;
-	  BOOL is_in_job;
-
-	  if (IsProcessInJob (GetCurrentProcess (), NULL, &is_in_job)
-	      && is_in_job
-	      && QueryInformationJobObject (NULL, JobObjectBasicLimitInformation,
-					 &jobinfo, sizeof jobinfo, NULL)
-	      && (jobinfo.LimitFlags & (JOB_OBJECT_LIMIT_BREAKAWAY_OK
-					| JOB_OBJECT_LIMIT_SILENT_BREAKAWAY_OK)))
-	    {
-	      debug_printf ("Add CREATE_BREAKAWAY_FROM_JOB");
-	      c_flags |= CREATE_BREAKAWAY_FROM_JOB;
-	    }
+	  debug_printf ("Add CREATE_BREAKAWAY_FROM_JOB");
+	  c_flags |= CREATE_BREAKAWAY_FROM_JOB;
 	}
 
       if (mode == _P_DETACH)
