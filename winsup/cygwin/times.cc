@@ -36,23 +36,6 @@ get_system_time (PLARGE_INTEGER systime)
 	: GetSystemTimeAsFileTime ((LPFILETIME) systime);
 }
 
-/* There's no GetTickCount64 on pre-Vista.  This is the do-it-yourself kit,
-   as it was implemented as hires_ms::timeGetTime_ns once.  Resurrect the
-   functionality to allow reliable (albeit low res) timing values.  The
-   function returns the value in 100ns interval to avoid a division by 10000. */
-ULONGLONG
-GetTickCount_ns ()
-{
-  LARGE_INTEGER t;
-  do
-    {
-      t.HighPart = SharedUserData.InterruptTime.High1Time;
-      t.LowPart = SharedUserData.InterruptTime.LowPart;
-    }
-  while (t.HighPart != SharedUserData.InterruptTime.High2Time);
-  return (ULONGLONG) t.QuadPart;
-}
-
 /* Cygwin internal */
 static uint64_t __stdcall
 __to_clock_t (PLARGE_INTEGER src, int flag)
