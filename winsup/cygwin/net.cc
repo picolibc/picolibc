@@ -608,7 +608,7 @@ fdsock (cygheap_fdmanip& fd, const device *dev, SOCKET soc)
      handle inheritance.  An explanation for this weird behaviour would
      be nice, though.
 
-     NOTE 2.  Testing on x86_64 (XP, Vista, 2008 R2, W8) indicates that
+     NOTE 2.  Testing on x86_64 (Vista, 2008 R2, W8) indicates that
      this is no problem on 64 bit.  So we set the default buffer size to
      the default values in current 3.x Linux versions.
 
@@ -1821,8 +1821,8 @@ get_adapters_addresses (PIP_ADAPTER_ADDRESSES *pa_ret, ULONG family)
   DWORD ret;
   gaa_wa param = { family, pa_ret };
 
-  if ((uintptr_t) &param >= (uintptr_t) 0x80000000L
-      && wincap.has_gaa_largeaddress_bug ())
+  if (wincap.has_gaa_largeaddress_bug ()
+      && (uintptr_t) &param >= (uintptr_t) 0x80000000L)
     {
       /* In Windows Vista and Windows 7 under WOW64, GetAdaptersAddresses fails
 	 if it's running in a thread with a stack located in the large address
@@ -3371,8 +3371,8 @@ cygwin_getaddrinfo (const char *hostname, const char *servname,
 			| AI_NUMERICSERV | AI_ADDRCONFIG | AI_V4MAPPED
 			| AI_IDN_MASK)))
 	return EAI_BADFLAGS;
-      /* AI_NUMERICSERV is not supported prior to Windows Vista.  We just check
-	 the servname parameter by ourselves here. */
+      /* AI_NUMERICSERV is not supported "by Microsoft providers".  We just
+	 check the servname parameter by ourselves here. */
       if (hints && (hints->ai_flags & AI_NUMERICSERV))
 	{
 	  char *p;

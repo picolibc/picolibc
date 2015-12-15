@@ -2889,9 +2889,7 @@ restart:
 
       /* Reparse points are potentially symlinks.  This check must be
 	 performed before checking the SYSTEM attribute for sysfile
-	 symlinks, since reparse points can have this flag set, too.
-	 For instance, Vista starts to create a couple of reparse points
-	 with SYSTEM and HIDDEN flags set. */
+	 symlinks, since reparse points can have this flag set, too. */
       if ((fileattr & FILE_ATTRIBUTE_REPARSE_POINT))
 	{
 	  res = check_reparse_point (h, fs.is_remote_drive ());
@@ -3974,13 +3972,9 @@ fcwd_access_t::SetVersionFromPointer (PBYTE buf_p, bool is_buffer)
 }
 
 /* This function scans the code in ntdll.dll to find the address of the
-   global variable used to access the CWD starting with Vista.  While the
-   pointer is global, it's not exported from the DLL, unfortunately.
-   Therefore we have to use some knowledge to figure out the address.
-
-   This code has been tested on Vista 32/64 bit, Server 2008 32/64 bit,
-   Windows 7 32/64 bit, Server 2008 R2 (which is only 64 bit anyway),
-   Windows 8 32/64 bit, Windows 8.1 32/64 bit, and Server 2012 R2. */
+   global variable used to access the CWD.  While the pointer is global,
+   it's not exported from the DLL, unfortunately.  Therefore we have to
+   use some knowledge to figure out the address. */
 
 #ifdef __x86_64__
 
@@ -4240,9 +4234,8 @@ cwdstuff::override_win32_cwd (bool init, ULONG old_dismount_count)
     fast_cwd_ptr = find_fast_cwd ();
   if (fast_cwd_ptr)
     {
-      /* Default method starting with Vista.  If we got a valid value for
-	 fast_cwd_ptr, we can simply replace the RtlSetCurrentDirectory_U
-	 function entirely, just as on pre-Vista. */
+      /* If we got a valid value for fast_cwd_ptr, we can simply replace
+	 the RtlSetCurrentDirectory_U function entirely. */
       PVOID heap = peb.ProcessHeap;
       /* First allocate a new fcwd_access_t structure on the heap.
 	 The new fcwd_access_t structure is 4 byte bigger than the old one,
@@ -4274,14 +4267,13 @@ cwdstuff::override_win32_cwd (bool init, ULONG old_dismount_count)
     }
   else
     {
-      /* This is more a hack, and it's only used on Vista and later if we
-	 failed to find the fast_cwd_ptr value.  What we do here is to call
-	 RtlSetCurrentDirectory_U and let it set up a new FAST_CWD
-	 structure.  Afterwards, compute the address of that structure
-	 utilizing the fact that the buffer address in the user process
-	 parameter block is actually pointing to the buffer in that
-	 FAST_CWD structure.  Then replace the directory handle in that
-	 structure with our own handle and close the original one.
+      /* This is more a hack, and it's only used if we failed to find the
+	 fast_cwd_ptr value.  We call RtlSetCurrentDirectory_U and let it
+	 set up a new FAST_CWD structure.  Afterwards, compute the address
+	 of that structure utilizing the fact that the buffer address in
+	 the user process parameter block is actually pointing to the buffer
+	 in that FAST_CWD structure.  Then replace the directory handle in
+	 that structure with our own handle and close the original one.
 
 	 Note that the call to RtlSetCurrentDirectory_U also closes our
 	 old dir handle, so there won't be any handle left open.
@@ -4374,13 +4366,6 @@ cwdstuff::set (path_conv *nat_cwd, const char *posix_cwd)
      - SetCurrentDirectory can naturally not work on virtual Cygwin paths
        like /proc or /cygdrive.
 
-     Unfortunately, even though we have access to the Win32 process parameter
-     block, we can't just replace the directory handle.  Starting with Vista,
-     the handle is used elsewhere, and just replacing the handle in the process
-     parameter block shows quite surprising results.
-     FIXME: If we ever find a *safe* way to replace the directory handle in
-     the process parameter block, we're back in business.
-
      Nevertheless, doing entirely without SetCurrentDirectory is not really
      feasible, because it breaks too many mixed applications using the Win32
      API.
@@ -4401,11 +4386,11 @@ cwdstuff::set (path_conv *nat_cwd, const char *posix_cwd)
     }
 
   /* Memorize old DismountCount before opening the dir.  This value is
-     stored in the FAST_CWD structure on Vista and later.  It would be
-     simpler to fetch the old DismountCount in override_win32_cwd, but
-     Windows also fetches it before opening the directory handle.  It's
-     not quite clear if that's really required, but since we don't know
-     the side effects of this action, we better follow Windows' lead. */
+     stored in the FAST_CWD structure.  It would be simpler to fetch the
+     old DismountCount in override_win32_cwd, but Windows also fetches
+     it before opening the directory handle.  It's not quite clear if
+     that's really required, but since we don't know the side effects of
+     this action, we better follow Windows' lead. */
   ULONG old_dismount_count = SharedUserData.DismountCount;
   /* Open a directory handle with FILE_OPEN_FOR_BACKUP_INTENT and with all
      sharing flags set.  The handle is right now used in exceptions.cc only,

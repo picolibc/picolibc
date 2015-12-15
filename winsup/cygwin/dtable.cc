@@ -304,8 +304,8 @@ dtable::init_std_file_from_handle (int fd, HANDLE handle)
 	dev.parse (name);
       else if (strcmp (name, ":sock:") == 0
 	       /* NtQueryObject returns an error when called on an LSP socket
-		  handle.  While fdsock now tries to fetch the underlying
-		  base socket, this only works on Vista and later. */
+		  handle.  fdsock tries to fetch the underlying base socket,
+		  but this might fail. */
 	       || (strcmp (name, unknown_file) == 0
 		   && !::getsockopt ((SOCKET) handle, SOL_SOCKET, SO_RCVBUF,
 				     (char *) &rcv, &len)))

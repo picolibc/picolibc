@@ -523,13 +523,12 @@ void dll_list::load_after_fork_impl (HANDLE parent, dll* d, int retries)
      We DONT_RESOLVE_DLL_REFERENCES at first in case the DLL lands in
      the wrong spot;
 
-     NOTE: This step skips DLLs which loaded at their preferred
-     address in the parent because they should behave (we already
-     verified that their preferred address in the child is
-     available). However, this may fail on a Vista/Win7 machine with
-     ASLR active, because the ASLR base address will usually not equal
-     the preferred base recorded in the dll. In this case, we should
-     make the LoadLibraryExW call unconditional.
+     NOTE: This step skips DLLs which loaded at their preferred address in
+     the parent because they should behave (we already verified that their
+     preferred address in the child is available). However, this may fail
+     with ASLR active, because the ASLR base address will usually not equal
+     the preferred base recorded in the dll. In this case, we should make
+     the LoadLibraryExW call unconditional.
    */
   for ( ; d; d = dlls.inext ())
     if (d->handle != d->preferred_base)

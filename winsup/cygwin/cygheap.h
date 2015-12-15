@@ -207,17 +207,16 @@ enum fcwd_version_t {
   FCWD_W8
 };
 
-/* This class is used to store the CWD starting with Windows Vista.
-   The CWD storage in the RTL_USER_PROCESS_PARAMETERS block is only
-   an afterthought now.  The actual CWD storage is a FAST_CWD structure
-   which is allocated on the process heap.  The new method only requires
-   minimal locking and it's much more multi-thread friendly.  Presumably
-   it minimizes contention when accessing the CWD.
+/* This class is used to store the CWD.  The CWD storage in the
+   RTL_USER_PROCESS_PARAMETERS block is only an afterthought now.  The actual
+   CWD storage is a FAST_CWD structure which is allocated on the process heap.
+   The new method only requires minimal locking and it's much more multi-thread
+   friendly.  Presumably it minimizes contention when accessing the CWD.
    The class fcwd_access_t is supposed to encapsulate the gory implementation
    details depending on OS version from the calling functions.
    The layout of all structures has been tested on 32 and 64 bit. */
 class fcwd_access_t {
-  /* This is the layout used in Windows 8. */
+  /* This is the layout used in Windows 8 and later. */
   struct FAST_CWD_8 {
     LONG           ReferenceCount;	/* Only release when this is 0. */
     HANDLE         DirectoryHandle;

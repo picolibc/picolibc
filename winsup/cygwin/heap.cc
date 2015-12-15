@@ -38,11 +38,11 @@ eval_start_address ()
      So we let the heap start at 0x6:00000000L. */
   uintptr_t start_address = 0x600000000L;
 #else
-  /* Starting with Vista, Windows performs heap ASLR.  This spoils the entire
-     region below 0x20000000 for us, because that region is used by Windows
-     to randomize heap and stack addresses.  Therefore we put our heap into a
-     safe region starting at 0x20000000.  This should work right from the start
-     in 99% of the cases. */
+  /* Windows performs heap ASLR.  This spoils the entire region below
+     0x20000000 for us, because that region is used by Windows to randomize
+     heap and stack addresses.  Therefore we put our heap into a safe region
+     starting at 0x20000000.  This should work right from the start in 99%
+     of the cases. */
   uintptr_t start_address = 0x20000000L;
   if ((uintptr_t) NtCurrentTeb () >= 0xbf000000L)
     {

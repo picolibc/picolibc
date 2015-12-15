@@ -385,7 +385,7 @@ fs_info::update (PUNICODE_STRING upath, HANDLE in_vol)
 	     and stuff like that. */
 	  && !is_mvfs (RtlEqualUnicodePathPrefix (&fsname, &ro_u_mvfs, FALSE))
 	  /* NWFS == Novell Netware FS.  Broken info class, see below. */
-	  /* NcFsd == Novell Netware FS via own driver since Windows Vista. */
+	  /* NcFsd == Novell Netware FS via own driver. */
 	  && !is_nwfs (RtlEqualUnicodeString (&fsname, &ro_u_nwfs, FALSE))
 	  && !is_ncfsd (RtlEqualUnicodeString (&fsname, &ro_u_ncfsd, FALSE))
 	  /* UNIXFS == TotalNet Advanced Server (TAS).  Doesn't support

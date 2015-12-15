@@ -36,12 +36,11 @@ issetugid (void)
   return cygheap->user.issetuid () ? 1 : 0;
 }
 
-/* Starting with Windows Vista, the token returned by system functions
-   is a restricted token.  The full admin token is linked to it and can
-   be fetched with NtQueryInformationToken.  This function returns the original
-   token on pre-Vista, and the elevated token on Vista++ if it's available,
-   the original token otherwise.  The token handle is also made inheritable
-   since that's necessary anyway. */
+/* The token returned by system functions is a restricted token.  The full
+   admin token is linked to it and can be fetched with NtQueryInformationToken.
+   This function returns the elevated token if available, the original token
+   otherwise.  The token handle is also made inheritable since that's necessary
+   anyway. */
 static HANDLE
 get_full_privileged_inheritable_token (HANDLE token)
 {
@@ -219,7 +218,7 @@ get_user_profile_directory (PCWSTR sidstr, PWCHAR path, SIZE_T path_len)
 }
 
 /* Load user profile if it's not already loaded.  If the user profile doesn't
-   exist on the machine, and if we're running Vista or later, try to create it. 
+   exist on the machine try to create it.
 
    Return a handle to the loaded user registry hive only if it got actually
    loaded here, not if it already existed.  There's no reliable way to know
@@ -821,8 +820,8 @@ verify_token (HANDLE token, cygsid &usersid, user_groups &groups, bool *pintern)
 
       /* Check that all groups in the setgroups () list are in the token.
 	 A token created through ADVAPI should be allowed to contain more
-	 groups than requested through setgroups(), especially since Vista
-	 and the addition of integrity groups. */
+	 groups than requested through setgroups(), especially since the
+	 addition of integrity groups. */
       memset (saw, 0, sizeof(saw));
       for (int gidx = 0; gidx < groups.sgsids.count (); gidx++)
 	{

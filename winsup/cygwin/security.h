@@ -89,7 +89,6 @@ void uinfo_init ();
 #define SE_MANAGE_VOLUME_PRIVILEGE          28U
 #define SE_IMPERSONATE_PRIVILEGE            29U
 #define SE_CREATE_GLOBAL_PRIVILEGE          30U
-/* Starting with Vista */
 #define SE_TRUSTED_CREDMAN_ACCESS_PRIVILEGE 31U
 #define SE_RELABEL_PRIVILEGE                32U
 #define SE_INCREASE_WORKING_SET_PRIVILEGE   33U

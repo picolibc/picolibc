@@ -628,11 +628,6 @@ _recycler_sd (void *buf, bool users, bool dir)
     return NULL;
   RtlCreateSecurityDescriptor (psd, SECURITY_DESCRIPTOR_REVISION);
   PACL dacl = (PACL) (psd + 1);
-  /* Pre-Vista, the per-user recycler dir has a rather too complicated
-     ACL by default, which has distinct ACEs for inheritable and non-inheritable
-     permissions.  However, this ACL is practically equivalent to the ACL
-     created since Vista.  Therefore we simplify our job here and create the
-     pre-Vista permissions the same way as on Vista and later. */
   RtlCreateAcl (dacl, MAX_DACL_LEN (3), ACL_REVISION);
   RtlAddAccessAllowedAceEx (dacl, ACL_REVISION,
 			    dir ? SUB_CONTAINERS_AND_OBJECTS_INHERIT

@@ -268,11 +268,11 @@ try_to_bin (path_conv &pc, HANDLE &fh, ACCESS_MASK access, ULONG flags)
      them into the recycler. */
   if (pfni->FileNameLength == 2) /* root dir. */
     goto out;
-  /* The recycler name on Vista and later is $Recycler.Bin by default.  If the
-     recycler dir disappeared for some reason, the shell32.dll recreates the
-     directory in all upper case.  So, we never know beforehand if the dir
-     is written in mixed case or in all upper case.  That's a problem when
-     using casesensitivity.  If the file handle given to FileRenameInformation
+  /* The recycler name is $Recycler.Bin by default.  If the recycler dir
+     disappeared for some reason, the shell32.dll recreates the directory in
+     all upper case.  So, we never know beforehand if the dir is written in
+     mixed case or in all upper case.  That's a problem when using
+     casesensitivity.  If the file handle given to FileRenameInformation
      has been opened casesensitive, the call also handles the path to the
      target dir casesensitive.  Rather then trying to find the right name
      of the recycler, we just reopen the file to move with OBJ_CASE_INSENSITIVE,
@@ -958,10 +958,10 @@ try_again:
 	     "Subsequently, the only legal operation by such a caller is
 	     to close the open file handle."
 
-	     FIXME? On Vista and later, we could use FILE_HARD_LINK_INFORMATION
-	     to find all hardlinks and use one of them to restore the R/O bit,
-	     after the NtClose, but before we stop the transaction.  This
-	     avoids the aforementioned problem entirely . */
+	     FIXME?  We could use FILE_HARD_LINK_INFORMATION to find all
+	     hardlinks and use one of them to restore the R/O bit, after the
+	     NtClose, but before we stop the transaction.  This avoids the
+	     aforementioned problem entirely . */
 	  else if (pc.is_lnk_symlink () && num_links > 1)
 	    NtSetAttributesFile (fh, pc.file_attributes ());
 	}
@@ -3219,9 +3219,9 @@ seteuid32 (uid_t uid)
 		       CW_TOKEN_RESTRICTED);
        setuid (getuid ());
 
-    Note that using the current uid is a requirement!  Starting with Windows
-    Vista, we have restricted tokens galore (UAC), so this is really just
-    a special case to restict your own processes to lesser rights. */
+    Note that using the current uid is a requirement!  We have restricted
+    tokens galore (UAC), so this is really just a special case to restrict
+    your own processes to lesser rights. */
   bool request_restricted_uid_switch = (uid == myself->uid
       && cygheap->user.ext_token_is_restricted);
   if (uid == myself->uid && !cygheap->user.groups.ischanged
