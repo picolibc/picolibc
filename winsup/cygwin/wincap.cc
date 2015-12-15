@@ -149,9 +149,6 @@ wincapc::init ()
   /* 64 bit systems have one more guard page than their 32 bit counterpart. */
   ++((wincaps *)caps)->def_guard_pages;
 #else
-  /* Windows 10 1511 has a stack move when a 64 bit process is started from
-     a 32 bit process, just as it was vice versa in XP/2003.  Reset the flag
-     here for 32 bit. */
   if (NT_SUCCESS (NtQueryInformationProcess (NtCurrentProcess (),
 					     ProcessWow64Information,
 					     &wow64, sizeof wow64, NULL))
