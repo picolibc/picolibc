@@ -677,8 +677,7 @@ unlink_nt (path_conv &pc)
 
       /* If possible, hide the non-atomicity of the "remove R/O flag, remove
 	 link to file" operation behind a transaction. */
-      if (wincap.has_transactions ()
-	  && (pc.fs_flags () & FILE_SUPPORTS_TRANSACTIONS))
+      if ((pc.fs_flags () & FILE_SUPPORTS_TRANSACTIONS))
 	start_transaction (old_trans, trans);
 retry_open:
       status = NtOpenFile (&fh_ro, FILE_WRITE_ATTRIBUTES, &attr, &io,
@@ -2346,8 +2345,7 @@ rename (const char *oldpath, const char *newpath)
       /* Opening the file must be part of the transaction.  It's not sufficient
 	 to call only NtSetInformationFile under the transaction.  Therefore we
 	 have to start the transaction here, if necessary. */
-      if (wincap.has_transactions ()
-	  && (dstpc->fs_flags () & FILE_SUPPORTS_TRANSACTIONS)
+      if ((dstpc->fs_flags () & FILE_SUPPORTS_TRANSACTIONS)
 	  && (dstpc->isdir ()
 	      || (!removepc && dstpc->has_attribute (FILE_ATTRIBUTE_READONLY))))
 	start_transaction (old_trans, trans);
@@ -2516,9 +2514,7 @@ rename (const char *oldpath, const char *newpath)
       if (status == STATUS_ACCESS_DENIED && dstpc->exists ()
 	  && !dstpc->isdir ())
 	{
-	  if (wincap.has_transactions ()
-	      && (dstpc->fs_flags () & FILE_SUPPORTS_TRANSACTIONS)
-	      && !trans)
+	  if ((dstpc->fs_flags () & FILE_SUPPORTS_TRANSACTIONS) && !trans)
 	    {
 	      start_transaction (old_trans, trans);
 	      /* As mentioned earlier, opening the file must be part of the
