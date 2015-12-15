@@ -1435,7 +1435,7 @@ cygheap_domain_info::init ()
      The latter is useful to get an RFC 2307 mapping for Samba UNIX accounts,
      even if no NFS name mapping is configured on the machine.  Fortunately,
      the posixAccount and posixGroup schemas are already available in the
-     Active Directory default setup since Windows Server 2003 R2. */
+     Active Directory default setup. */
   reg_key reg (HKEY_LOCAL_MACHINE, KEY_READ | KEY_WOW64_64KEY,
 	       L"SOFTWARE", L"Microsoft", L"ServicesForNFS", NULL);
   if (!reg.error ())
