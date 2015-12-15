@@ -11,12 +11,6 @@ details. */
 #define  __INSIDE_CYGWIN_NET__
 #define USE_SYS_TYPES_FD_SET
 #define __WSA_ERR_MACROS_DEFINED
-/* FIXME: Collision with different declarations of if_nametoindex and
-	  if_indextoname functions in iphlpapi.h since Vista.
-   TODO:  Convert if_nametoindex to cygwin_if_nametoindex and call
-	  system functions on Vista and later. */
-#define _INC_NETIOAPI	/* w32api < 4.0 */
-#define _NETIOAPI_H_
 #include "winsup.h"
 #ifdef __x86_64__
 /* 2014-04-24: Current Mingw headers define sockaddr_in6 using u_long (8 byte)
@@ -1785,61 +1779,6 @@ getdomainname (char *domain, size_t len)
 
 /* Fill out an ifconf struct. */
 
-#ifndef IN_LOOPBACK
-#define IN_LOOPBACK(a)	((((long int) (a)) & 0xff000000) == 0x7f000000)
-#endif
-
-static int in6_are_prefix_equal (struct in6_addr *, struct in6_addr *, int);
-
-static int in_are_prefix_equal (struct in_addr *p1, struct in_addr *p2, int len)
-{
-  if (0 > len || len > 32)
-    return 0;
-  uint32_t pfxmask = 0xffffffff << (32 - len);
-  return (ntohl (p1->s_addr) & pfxmask) == (ntohl (p2->s_addr) & pfxmask);
-}
-
-extern "C" int
-ip_addr_prefix (PIP_ADAPTER_UNICAST_ADDRESS pua, PIP_ADAPTER_PREFIX pap)
-{
-  if (wincap.has_gaa_on_link_prefix ())
-    return (int) ((PIP_ADAPTER_UNICAST_ADDRESS_LH) pua)->OnLinkPrefixLength;
-  switch (pua->Address.lpSockaddr->sa_family)
-    {
-    case AF_INET:
-      /* Prior to Vista, the loopback prefix is not available. */
-      if (IN_LOOPBACK (ntohl (((struct sockaddr_in *)
-			      pua->Address.lpSockaddr)->sin_addr.s_addr)))
-	return 8;
-      for ( ; pap; pap = pap->Next)
-	if (in_are_prefix_equal (
-	      &((struct sockaddr_in *) pua->Address.lpSockaddr)->sin_addr,
-	      &((struct sockaddr_in *) pap->Address.lpSockaddr)->sin_addr,
-	      pap->PrefixLength))
-	  return pap->PrefixLength;
-      break;
-    case AF_INET6:
-      /* Prior to Vista, the loopback prefix is not available. */
-      if (IN6_IS_ADDR_LOOPBACK (&((struct sockaddr_in6 *)
-				  pua->Address.lpSockaddr)->sin6_addr))
-	return 128;
-      for ( ; pap; pap = pap->Next)
-	if (in6_are_prefix_equal (
-	      &((struct sockaddr_in6 *) pua->Address.lpSockaddr)->sin6_addr,
-	      &((struct sockaddr_in6 *) pap->Address.lpSockaddr)->sin6_addr,
-	      pap->PrefixLength))
-	  return pap->PrefixLength;
-      break;
-    default:
-      break;
-    }
-  return 0;
-}
-
-#ifndef GAA_FLAG_INCLUDE_ALL_INTERFACES
-#define GAA_FLAG_INCLUDE_ALL_INTERFACES 0x0100
-#endif
-
 struct gaa_wa {
   ULONG family;
   PIP_ADAPTER_ADDRESSES *pa_ret;
@@ -2252,7 +2191,7 @@ get_ifs (ULONG family)
 	    memcpy (&ifp->ifa_addr, sa, sa_size);
 	    ifp->ifa_ifa.ifa_addr = (struct sockaddr *) &ifp->ifa_addr;
 	    /* Netmask */
-	    int prefix = ip_addr_prefix (pua, pap->FirstPrefix);
+	    int prefix = pua->OnLinkPrefixLength;
 	    switch (sa->sa_family)
 	      {
 	      case AF_INET:
@@ -2306,13 +2245,8 @@ get_ifs (ULONG family)
 	    /* Hardware address */
 	    get_hwaddr (ifp, pap);
 	    /* Metric */
-	    if (wincap.has_gaa_on_link_prefix ())
-	      ifp->ifa_hwdata.ifa_metric
-		= (sa->sa_family == AF_INET)
-		  ? ((PIP_ADAPTER_ADDRESSES_LH) pap)->Ipv4Metric
-		  : ((PIP_ADAPTER_ADDRESSES_LH) pap)->Ipv6Metric;
-	    else
-	      ifp->ifa_hwdata.ifa_metric = 1;
+	    ifp->ifa_hwdata.ifa_metric = (sa->sa_family == AF_INET
+					 ? pap->Ipv4Metric : pap->Ipv6Metric);
 	    /* MTU */
 	    ifp->ifa_hwdata.ifa_mtu = pap->Mtu;
 	    /* Interface index */
@@ -3747,92 +3681,6 @@ cygwin_getnameinfo (const struct sockaddr *sa, socklen_t salen,
     }
   __endtry
   return ret;
-}
-
-/* The below function in6_are_prefix_equal has been taken from OpenBSD's
-   src/sys/netinet6/in6.c. */
-
-/*
- * Copyright (C) 1995, 1996, 1997, and 1998 WIDE Project.
- * All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the
- *    documentation and/or other materials provided with the distribution.
- * 3. Neither the name of the project nor the names of its contributors
- *    may be used to endorse or promote products derived from this software
- *    without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE PROJECT AND CONTRIBUTORS ``AS IS'' AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
- * ARE DISCLAIMED.  IN NO EVENT SHALL THE PROJECT OR CONTRIBUTORS BE LIABLE
- * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
- * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
- * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
- * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
- * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
- * SUCH DAMAGE.
- */
-
-/*
- * Copyright (c) 1982, 1986, 1991, 1993
- *      The Regents of the University of California.  All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the
- *    documentation and/or other materials provided with the distribution.
- * 3. Neither the name of the University nor the names of its contributors
- *    may be used to endorse or promote products derived from this software
- *    without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS ``AS IS'' AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
- * ARE DISCLAIMED.  IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE
- * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
- * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
- * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
- * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
- * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
- * SUCH DAMAGE.
- *
- *      @(#)in.c        8.2 (Berkeley) 11/15/93
- */
-
-static int
-in6_are_prefix_equal (struct in6_addr *p1, struct in6_addr *p2, int len)
-{
-  int bytelen, bitlen;
-
-  /* sanity check */
-  if (0 > len || len > 128)
-    return 0;
-
-  bytelen = len / 8;
-  bitlen = len % 8;
-
-  if (memcmp (&p1->s6_addr, &p2->s6_addr, bytelen))
-    return 0;
-  /* len == 128 is ok because bitlen == 0 then */
-  if (bitlen != 0 &&
-      p1->s6_addr[bytelen] >> (8 - bitlen) !=
-      p2->s6_addr[bytelen] >> (8 - bitlen))
-    return 0;
-
-  return 1;
 }
 
 /* These functions are stick to the end of this file so that the
