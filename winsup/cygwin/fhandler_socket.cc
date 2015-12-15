@@ -1979,8 +1979,7 @@ fhandler_socket::sendmsg (const struct msghdr *msg, int flags)
     }
   /* Disappointing but true:  Even if WSASendMsg is supported, it's only
      supported for datagram and raw sockets. */
-  DWORD controllen = (DWORD) (!wincap.has_sendmsg ()
-			      || get_socket_type () == SOCK_STREAM
+  DWORD controllen = (DWORD) (get_socket_type () == SOCK_STREAM
 			      || get_addr_family () == AF_LOCAL
 			      ? 0 : msg->msg_controllen);
   WSAMSG wsamsg = { msg->msg_name ? (struct sockaddr *) &sst : NULL, len,
