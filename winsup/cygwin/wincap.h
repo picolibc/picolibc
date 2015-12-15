@@ -18,7 +18,6 @@ struct wincaps
   unsigned has_gaa_largeaddress_bug			: 1;
   unsigned has_broken_alloc_console			: 1;
   unsigned has_console_logon_sid			: 1;
-  unsigned wow64_has_secondary_stack			: 1;
   unsigned has_program_compatibility_assistant		: 1;
   unsigned has_pipe_reject_remote_clients		: 1;
   unsigned terminate_thread_frees_stack			: 1;
@@ -65,7 +64,6 @@ public:
   bool	IMPLEMENT (has_gaa_largeaddress_bug)
   bool	IMPLEMENT (has_broken_alloc_console)
   bool	IMPLEMENT (has_console_logon_sid)
-  bool	IMPLEMENT (wow64_has_secondary_stack)
   bool	IMPLEMENT (has_program_compatibility_assistant)
   bool	IMPLEMENT (has_pipe_reject_remote_clients)
   bool	IMPLEMENT (terminate_thread_frees_stack)

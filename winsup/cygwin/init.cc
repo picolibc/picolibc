@@ -54,14 +54,9 @@ munge_threadfunc ()
     {
       char *threadfunc = NULL;
 
-      /* This call to NtQueryInformationThread crashes under WOW64 on
-         64 bit XP and Server 2003. */
-      if (wincap.wow64_has_secondary_stack ())
-	threadfunc = ebp[threadfunc_ix[0]];
-      else
-	NtQueryInformationThread (NtCurrentThread (),
-				  ThreadQuerySetWin32StartAddress,
-				  &threadfunc, sizeof threadfunc, NULL);
+      NtQueryInformationThread (NtCurrentThread (),
+				ThreadQuerySetWin32StartAddress,
+				&threadfunc, sizeof threadfunc, NULL);
       if (!search_for || threadfunc == search_for)
 	{
 	  search_for = NULL;

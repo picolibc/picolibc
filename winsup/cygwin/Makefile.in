@@ -395,7 +395,6 @@ DLL_OFILES:= \
 	wincap.o \
 	window.o \
 	winf.o \
-	wow64.o \
 	xsique.o \
 	$(EXTRA_OFILES) \
 	$(MALLOC_OFILES) \
