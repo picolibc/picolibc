@@ -1783,8 +1783,7 @@ fhandler_pty_master::setup ()
 				     | FILE_FLAG_FIRST_PIPE_INSTANCE,
 				PIPE_WAIT | PIPE_TYPE_MESSAGE
 				| PIPE_READMODE_MESSAGE
-				| (wincap.has_pipe_reject_remote_clients ()
-				   ? PIPE_REJECT_REMOTE_CLIENTS : 0),
+				| PIPE_REJECT_REMOTE_CLIENTS,
 				1, 4096, 4096, 0, &sec_all_nih);
   if (master_ctl == INVALID_HANDLE_VALUE)
     {
