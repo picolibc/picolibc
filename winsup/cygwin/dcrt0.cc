@@ -443,11 +443,9 @@ child_info_fork::alloc_stack ()
 	    api_fatal ("fork: couldn't allocate new stack guard page %p, %E",
 		       stack_ptr);
 	}
-      /* On post-XP systems, set thread stack guarantee matching the
-	 guardsize.  Note that the guardsize is one page bigger than
-	 the guarantee. */
-      if (wincap.has_set_thread_stack_guarantee ()
-	  && real_guardsize > wincap.def_guard_page_size ())
+      /* Set thread stack guarantee matching the guardsize.
+	 Note that the guardsize is one page bigger than the guarantee. */
+      if (real_guardsize > wincap.def_guard_page_size ())
 	{
 	  real_guardsize -= wincap.page_size ();
 	  SetThreadStackGuarantee (&real_guardsize);

@@ -22,7 +22,6 @@ struct wincaps
   unsigned terminate_thread_frees_stack			: 1;
   unsigned has_precise_system_time			: 1;
   unsigned has_microsoft_accounts			: 1;
-  unsigned has_set_thread_stack_guarantee		: 1;
   unsigned has_broken_rtl_query_process_debug_information : 1;
   unsigned has_processor_groups				: 1;
   unsigned has_broken_prefetchvm			: 1;
@@ -67,7 +66,6 @@ public:
   bool	IMPLEMENT (terminate_thread_frees_stack)
   bool	IMPLEMENT (has_precise_system_time)
   bool	IMPLEMENT (has_microsoft_accounts)
-  bool	IMPLEMENT (has_set_thread_stack_guarantee)
   bool	IMPLEMENT (has_broken_rtl_query_process_debug_information)
   bool	IMPLEMENT (has_processor_groups)
   bool	IMPLEMENT (has_broken_prefetchvm)

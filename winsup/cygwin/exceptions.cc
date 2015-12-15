@@ -1581,10 +1581,9 @@ altstack_wrapper (int sig, siginfo_t *siginfo, ucontext_t *sigctx,
       /* ...restore guard pages in original stack as if MSVCRT::_resetstkovlw
 	 has been called.
 
-	 Compute size of guard pages.  If SetThreadStackGuarantee isn't
-	 supported, or if it returns 0, use the default guard page size. */
-      if (wincap.has_set_thread_stack_guarantee ())
-	SetThreadStackGuarantee (&guard_size);
+	 Compute size of guard pages.  If SetThreadStackGuarantee returns 0,
+	 use the default guard page size. */
+      SetThreadStackGuarantee (&guard_size);
       if (!guard_size)
 	guard_size = wincap.def_guard_page_size ();
       else

@@ -609,10 +609,9 @@ pthread_wrapper (PVOID arg)
      The below assembler code will release the OS stack after switching to our
      new stack. */
   wrapper_arg.stackaddr = dealloc_addr;
-  /* On post-XP systems, set thread stack guarantee matching the guardsize.
+  /* Set thread stack guarantee matching the guardsize.
      Note that the guardsize is one page bigger than the guarantee. */
-  if (wincap.has_set_thread_stack_guarantee ()
-      && wrapper_arg.guardsize > wincap.def_guard_page_size ())
+  if (wrapper_arg.guardsize > wincap.def_guard_page_size ())
     {
       wrapper_arg.guardsize -= wincap.page_size ();
       SetThreadStackGuarantee (&wrapper_arg.guardsize);
@@ -877,59 +876,38 @@ CygwinCreateThread (LPTHREAD_START_ROUTINE thread_func, PVOID thread_arg,
 #endif
       if (!real_stackaddr)
 	return NULL;
-      /* Set up committed region.  We have two cases: */
-      if (!wincap.has_set_thread_stack_guarantee ()
-	  && real_guardsize != wincap.def_guard_page_size ())
+      /* Set up committed region.  We set up the stack like the OS does,
+	 with a reserved region, the guard pages, and a commited region.
+	 We commit the stack commit size from the executable header, but
+	 at least PTHREAD_STACK_MIN (64K). */
+      static ULONG exe_commitsize;
+
+      if (!exe_commitsize)
 	{
-	  /* If guardsize is set to something other than the default guard page
-	     size, and if we're running on Windows XP 32 bit, we commit the
-	     entire stack, and, if guardsize is > 0, set up a guard page. */
-	  real_stacklimit = (PBYTE) real_stackaddr + wincap.page_size ();
-	  if (real_guardsize
-	      && !VirtualAlloc (real_stacklimit, real_guardsize, MEM_COMMIT,
-				PAGE_READWRITE | PAGE_GUARD))
-	    goto err;
-	  real_stacklimit += real_guardsize;
-	  if (!VirtualAlloc (real_stacklimit, real_stacksize - real_guardsize
-					      - wincap.page_size (),
-			     MEM_COMMIT, PAGE_READWRITE))
-	    goto err;
+	  PIMAGE_DOS_HEADER dosheader;
+	  PIMAGE_NT_HEADERS ntheader;
+
+	  dosheader = (PIMAGE_DOS_HEADER) GetModuleHandle (NULL);
+	  ntheader = (PIMAGE_NT_HEADERS)
+		     ((PBYTE) dosheader + dosheader->e_lfanew);
+	  exe_commitsize = ntheader->OptionalHeader.SizeOfStackCommit;
+	  exe_commitsize = roundup2 (exe_commitsize, wincap.page_size ());
 	}
-      else
-	{
-	  /* Otherwise we set up the stack like the OS does, with a reserved
-	     region, the guard pages, and a commited region.  We commit the
-	     stack commit size from the executable header, but at least
-	     PTHREAD_STACK_MIN (64K). */
-	  static ULONG exe_commitsize;
+      ULONG commitsize = exe_commitsize;
+      if (commitsize > real_stacksize - real_guardsize - wincap.page_size ())
+	commitsize = real_stacksize - real_guardsize - wincap.page_size ();
+      else if (commitsize < PTHREAD_STACK_MIN)
+	commitsize = PTHREAD_STACK_MIN;
+      real_stacklimit = (PBYTE) real_stackaddr + real_stacksize
+			- commitsize - real_guardsize;
+      if (!VirtualAlloc (real_stacklimit, real_guardsize, MEM_COMMIT,
+			 PAGE_READWRITE | PAGE_GUARD))
+	goto err;
+      real_stacklimit += real_guardsize;
+      if (!VirtualAlloc (real_stacklimit, commitsize, MEM_COMMIT,
+			 PAGE_READWRITE))
+	goto err;
 
-	  if (!exe_commitsize)
-	    {
-	      PIMAGE_DOS_HEADER dosheader;
-	      PIMAGE_NT_HEADERS ntheader;
-
-	      dosheader = (PIMAGE_DOS_HEADER) GetModuleHandle (NULL);
-	      ntheader = (PIMAGE_NT_HEADERS)
-			 ((PBYTE) dosheader + dosheader->e_lfanew);
-	      exe_commitsize = ntheader->OptionalHeader.SizeOfStackCommit;
-	      exe_commitsize = roundup2 (exe_commitsize, wincap.page_size ());
-	    }
-	  ULONG commitsize = exe_commitsize;
-	  if (commitsize > real_stacksize - real_guardsize
-			   - wincap.page_size ())
-	    commitsize = real_stacksize - real_guardsize - wincap.page_size ();
-	  else if (commitsize < PTHREAD_STACK_MIN)
-	    commitsize = PTHREAD_STACK_MIN;
-	  real_stacklimit = (PBYTE) real_stackaddr + real_stacksize
-			    - commitsize - real_guardsize;
-	  if (!VirtualAlloc (real_stacklimit, real_guardsize,
-			     MEM_COMMIT, PAGE_READWRITE | PAGE_GUARD))
-	    goto err;
-	  real_stacklimit += real_guardsize;
-	  if (!VirtualAlloc (real_stacklimit, commitsize, MEM_COMMIT,
-			     PAGE_READWRITE))
-	    goto err;
-      	}
       wrapper_arg->stackaddr = (PBYTE) real_stackaddr;
       wrapper_arg->stackbase = (PBYTE) real_stackaddr + real_stacksize;
       wrapper_arg->stacklimit = real_stacklimit;
