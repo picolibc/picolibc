@@ -627,12 +627,6 @@ LoadDLLfunc (NetUserGetGroups, 28, netapi32)
 LoadDLLfunc (NetUserGetInfo, 16, netapi32)
 LoadDLLfunc (NetUserGetLocalGroups, 32, netapi32)
 
-LoadDLLfunc (NtCommitTransaction, 8, ntdll)
-LoadDLLfunc (NtCreateTransaction, 40, ntdll)
-LoadDLLfunc (NtRollbackTransaction, 8, ntdll)
-LoadDLLfunc (RtlGetCurrentTransaction, 0, ntdll)
-LoadDLLfunc (RtlSetCurrentTransaction, 4, ntdll)
-
 LoadDLLfunc (CoTaskMemFree, 4, ole32)
 
 LoadDLLfunc (LsaDeregisterLogonProcess, 4, secur32)
