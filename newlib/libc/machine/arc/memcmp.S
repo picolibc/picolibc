@@ -35,7 +35,8 @@
 
 #include "asm.h"
 
-#if defined (__ARC601__) || !defined (__ARC_NORM__) || !defined (__Xbarrel_shifter)
+#if defined (__ARC601__) || !defined (__ARC_NORM__) \
+    || !defined (__ARC_BARREL_SHIFTER__)
 
 /* Addresses are unsigned, and at 0 is the vector table, so it's OK to assume
    that we can subtract 8 from a source end address without underflow.  */
@@ -148,6 +149,6 @@ ENTRY (memcmp)
 	j_s.d	[blink]
 	mov_s	r0,0
 ENDFUNC (memcmp)
-#endif /* __ARC601__ || !__ARC_NORM__ || !__Xbarrel_shifter */
+#endif /* __ARC601__ || !__ARC_NORM__ || !__ARC_BARREL_SHIFTER__ */
 
 #endif /* !__OPTIMIZE_SIZE__ && !PREFER_SIZE_OVER_SPEED */

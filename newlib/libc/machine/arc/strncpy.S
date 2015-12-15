@@ -40,7 +40,7 @@
    it 8 byte aligned.  Thus, we can do a little read-ahead, without
    dereferencing a cache line that we should not touch.  */
 
-#if defined (__ARC601__) || !defined (__Xbarrel_shifter)
+#if defined (__ARC601__) || !defined (__ARC_BARREL_SHIFTER__)
 
 #define BRand(a,b,l)	and	a,a,b ` brne_s a,0,l
 
@@ -129,6 +129,6 @@ ENTRY (strncpy)
 	j_s.d	[blink]
 	stb_s	r12,[r3]
 ENDFUNC (strncpy)
-#endif /* __ARC601__ || !__Xbarrel_shifter */
+#endif /* __ARC601__ || !__ARC_BARREL_SHIFTER__ */
 
 #endif /* !__OPTIMIZE_SIZE__ && !PREFER_SIZE_OVER_SPEED */

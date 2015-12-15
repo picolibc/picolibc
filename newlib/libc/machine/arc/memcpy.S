@@ -35,7 +35,9 @@
 
 #include "asm.h"
 
-#if defined (__ARC601__) || (!defined (__Xbarrel_shifter) && !defined (__HS__))
+#if defined (__ARC601__) || \
+    (!defined (__ARC_BARREL_SHIFTER__) && !defined (__ARCHS__))
+
 /* Adapted from memcpy-bs.S.  */
 /* We assume that most sources and destinations are aligned, and
    that also lengths are mostly a multiple of four, although to a lesser
@@ -104,6 +106,6 @@ ENTRY (memcpy)
 	j_s.d	[blink]
 	stb	r12,[r5,0]
 ENDFUNC (memcpy)
-#endif /* __ARC601__ || (!__Xbarrel_shifter && !__HS__) */
+#endif /* __ARC601__ || (!__ARC_BARREL_SHIFTER__ && !__ARCHS__) */
 
 #endif /* !__OPTIMIZE_SIZE__ && !PREFER_SIZE_OVER_SPEED */

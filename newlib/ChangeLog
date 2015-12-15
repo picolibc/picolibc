@@ -1,3 +1,30 @@
+2015-12-17  Anton Kolesov  <Anton.Kolesov@synopsys.com>
+
+	* libc/machine/arc/asm.h: Define new GCC definition for old compiler.
+	* libc/machine/arc/memcmp-bs-norm.S: Use new GCC defines to detect
+	processor features.
+	* libc/machine/arc/memcmp.S: Likewise.
+	* libc/machine/arc/memcpy-archs.S: Likewise.
+	* libc/machine/arc/memcpy-bs.S: Likewise.
+	* libc/machine/arc/memcpy.S: Likewise.
+	* libc/machine/arc/memset-archs.S: Likewise.
+	* libc/machine/arc/memset-bs.S: Likewise.
+	* libc/machine/arc/memset.S: Likewise.
+	* libc/machine/arc/setjmp.S: Likewise.
+	* libc/machine/arc/strchr-bs-norm.S: Likewise.
+	* libc/machine/arc/strchr-bs.S: Likewise.
+	* libc/machine/arc/strchr.S: Likewise.
+	* libc/machine/arc/strcmp-archs.S: Likewise.
+	* libc/machine/arc/strcmp.S: Likewise.
+	* libc/machine/arc/strcpy-bs-arc600.S: Likewise.
+	* libc/machine/arc/strcpy-bs.S: Likewise.
+	* libc/machine/arc/strcpy.S: Likewise.
+	* libc/machine/arc/strlen-bs-norm.S: Likewise.
+	* libc/machine/arc/strlen-bs.S: Likewise.
+	* libc/machine/arc/strlen.S: Likewise.
+	* libc/machine/arc/strncpy-bs.S: Likewise.
+	* libc/machine/arc/strncpy.S: Likewise.
+
 2015-12-17  Corinna Vinschen  <corinna@vinschen.de>
 
 	* libc/include/sys/types.h: Remove including <sys/select.h>.

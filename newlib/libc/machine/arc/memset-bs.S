@@ -42,7 +42,7 @@
    better would be to avoid a second entry point into function.  ARC HS always
    has barrel-shifter, so this implementation will be always used for this
    purpose.  */
-#if !defined (__ARC601__) && defined (__Xbarrel_shifter)
+#if !defined (__ARC601__) && defined (__ARC_BARREL_SHIFTER__)
 
 /* To deal with alignment/loop issues, SMALL must be at least 2.  */
 #define SMALL	7
@@ -57,12 +57,12 @@
    cases, because the copying of a string presumably leaves start address
    and length alignment for the zeroing randomly distributed.  */
 
-#ifdef __HS__
+#ifdef __ARCHS__
 ENTRY (__dummy_memset)
 #else
 ENTRY (memset)
 #endif
-#if !defined (__ARC700__) && !defined (__EM__)
+#if !defined (__ARC700__) && !defined (__ARCEM__)
 #undef SMALL
 #define SMALL 8 /* Even faster if aligned.  */
 	brls.d	r2,SMALL,.Ltiny
@@ -74,7 +74,7 @@ ENTRY (memset)
 	asl	r12,r1,8
 	beq.d	.Laligned
 	or_s	r1,r1,r12
-#if defined (__ARC700__) || defined (__EM__)
+#if defined (__ARC700__) || defined (__ARCEM__)
 	brls	r2,SMALL,.Ltiny
 #endif
 .Lnot_tiny:
@@ -90,7 +90,7 @@ ENTRY (memset)
 	stw.ab	r1,[r3,2]
 	bclr_s	r3,r3,1
 .Laligned:	; This code address should be aligned for speed.
-#if defined (__ARC700__) || defined (__EM__)
+#if defined (__ARC700__) || defined (__ARCEM__)
 	asl	r12,r1,16
 	lsr.f	lp_count,r2,2
 	or_s	r1,r1,r12
@@ -111,7 +111,7 @@ ENTRY (memset)
 	st_s	r1,[r3]
 #endif /* !__ARC700 */
 
-#if defined (__ARC700__) || defined (__EM__)
+#if defined (__ARC700__) || defined (__ARCEM__)
 	.balign	4
 __strncpy_bzero:
 	brhi.d	r2,17,.Lnot_tiny
@@ -144,11 +144,11 @@ __strncpy_bzero:
 	stb_s	r1,[r3]
 	j_s	[blink]
 #endif /* !__ARC700 */
-#ifdef __HS__
+#ifdef __ARCHS__
 ENDFUNC (__dummy_memset)
 #else
 ENDFUNC (memset)
 #endif
-#endif /* !__ARC601__ && __Xbarrel_shifter */
+#endif /* !__ARC601__ && __ARC_BARREL_SHIFTER__ */
 
 #endif /* !__OPTIMIZE_SIZE__ && !PREFER_SIZE_OVER_SPEED */

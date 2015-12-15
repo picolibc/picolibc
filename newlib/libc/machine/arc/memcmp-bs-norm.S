@@ -35,7 +35,9 @@
 
 #include "asm.h"
 
-#if !defined (__ARC601__) && defined (__ARC_NORM__) && defined (__Xbarrel_shifter)
+#if !defined (__ARC601__) && defined (__ARC_NORM__) \
+    && defined (__ARC_BARREL_SHIFTER__)
+
 #ifdef __LITTLE_ENDIAN__
 #define WORD2 r2
 #define SHIFT r3
@@ -47,7 +49,7 @@
 ENTRY (memcmp)
 	or	r12,r0,r1
 	asl_s	r12,r12,30
-#if defined (__ARC700__) || defined (__EM__) || defined (__HS__)
+#if defined (__ARC700__) || defined (__ARCEM__) || defined (__ARCHS__)
 	sub_l	r3,r2,1
 	brls	r2,r12,.Lbytewise
 #else
@@ -57,7 +59,7 @@ ENTRY (memcmp)
 	ld	r4,[r0,0]
 	ld	r5,[r1,0]
 	lsr.f	lp_count,r3,3
-#ifdef __EM__
+#ifdef __ARCEM__
 	/* A branch can't be the last instruction in a zero overhead loop.
 	   So we move the branch to the start of the loop, duplicate it
 	   after the end, and set up r12 so that the branch isn't taken
@@ -74,12 +76,12 @@ ENTRY (memcmp)
 	brne	r4,r5,.Leven
 	ld.a	r4,[r0,8]
 	ld.a	r5,[r1,8]
-#ifdef __EM__
+#ifdef __ARCEM__
 .Loop_end:
 	brne	WORD2,r12,.Lodd
 #else
 	brne	WORD2,r12,.Lodd
-#ifdef __HS__
+#ifdef __ARCHS__
 	nop
 #endif
 .Loop_end:
@@ -90,7 +92,7 @@ ENTRY (memcmp)
 	ld	r4,[r0,4]
 	ld	r5,[r1,4]
 #ifdef __LITTLE_ENDIAN__
-#if defined (__ARC700__) || defined (__EM__) || defined (__HS__)
+#if defined (__ARC700__) || defined (__ARCEM__) || defined (__ARCHS__)
 	nop_s
 	; one more load latency cycle
 .Last_cmp:
@@ -167,14 +169,14 @@ ENTRY (memcmp)
 	bset.cs	r0,r0,31
 .Lodd:
 	cmp_s	WORD2,r12
-#if defined (__ARC700__) || defined (__EM__) || defined (__HS__)
+#if defined (__ARC700__) || defined (__ARCEM__) || defined (__ARCHS__)
 	mov_s	r0,1
 	j_s.d	[blink]
 	bset.cs	r0,r0,31
-#else /* !__ARC700__ */
+#else
 	j_s.d	[blink]
 	rrc	r0,2
-#endif /* !__ARC700__ */
+#endif /* __ARC700__ || __ARCEM__ || __ARCHS__ */
 #endif /* ENDIAN */
 	.balign	4
 .Lbytewise:
@@ -182,7 +184,7 @@ ENTRY (memcmp)
 	ldb	r4,[r0,0]
 	ldb	r5,[r1,0]
 	lsr.f	lp_count,r3
-#ifdef __EM__
+#ifdef __ARCEM__
 	mov	r12,r3
 	lpne	.Lbyte_end
 	brne	r3,r12,.Lbyte_odd
@@ -194,12 +196,12 @@ ENTRY (memcmp)
 	brne	r4,r5,.Lbyte_even
 	ldb.a	r4,[r0,2]
 	ldb.a	r5,[r1,2]
-#ifdef __EM__
+#ifdef __ARCEM__
 .Lbyte_end:
 	brne	r3,r12,.Lbyte_odd
 #else
 	brne	r3,r12,.Lbyte_odd
-#ifdef __HS__
+#ifdef __ARCHS__
 	nop
 #endif
 .Lbyte_end:
@@ -218,6 +220,6 @@ ENTRY (memcmp)
 	j_s.d	[blink]
 	mov_l	r0,0
 ENDFUNC (memcmp)
-#endif /* !__ARC601__ && __ARC_NORM__ && __Xbarrel_shifter */
+#endif /* !__ARC601__ && __ARC_NORM__ && __ARC_BARREL_SHIFTER__ */
 
 #endif /* !__OPTIMIZE_SIZE__ && !PREFER_SIZE_OVER_SPEED */

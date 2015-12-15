@@ -41,7 +41,7 @@
    by a factor of two, and speculatively loading the second word / byte of
    source 1; however, that would increase the overhead for loop setup / finish,
    and strcmp might often terminate early.  */
-#ifndef __HS__
+#ifndef __ARCHS__
 
 ENTRY (strcmp)
 	or	r2,r0,r1
@@ -128,6 +128,6 @@ ENTRY (strcmp)
 	j_s.d	[blink]
 	sub	r0,r2,r3
 ENDFUNC (strcmp)
-#endif /* !__HS__ */
+#endif /* !__ARCHS__ */
 
 #endif /* !__OPTIMIZE_SIZE__ && !PREFER_SIZE_OVER_SPEED */

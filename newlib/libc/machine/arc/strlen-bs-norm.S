@@ -34,8 +34,8 @@
 #if !defined (__OPTIMIZE_SIZE__) && !defined (PREFER_SIZE_OVER_SPEED)
 
 #include "asm.h"
-#if (defined (__ARC700__) || defined (__EM__) || defined (__HS__)) \
-    && defined (__ARC_NORM__) && defined (__Xbarrel_shifter)
+#if (defined (__ARC700__) || defined (__ARCEM__) || defined (__ARCHS__)) \
+    && defined (__ARC_NORM__) && defined (__ARC_BARREL_SHIFTER__)
 
 ENTRY (strlen)
 	or	r3,r0,7
@@ -110,6 +110,7 @@ ENTRY (strlen)
 	b.d	.Lend
 	sub_s.ne r1,r1,r1
 ENDFUNC (strlen)
-#endif /* (__ARC700__ || __EM__ || __HS__) && __ARC_NORM__ && _Xbarrel_shifter */
+#endif /* (__ARC700__ || __ARCEM__ || __ARCHS__) && __ARC_NORM__
+    && __ARC_BARREL_SHIFTER__ */
 
 #endif /* !__OPTIMIZE_SIZE__ && !PREFER_SIZE_OVER_SPEED */

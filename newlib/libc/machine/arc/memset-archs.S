@@ -35,7 +35,7 @@
 
 #include "asm.h"
 
-#ifdef __HS__
+#ifdef __ARCHS__
 
 #ifdef USE_PREFETCH
 #define PREWRITE(A,B)	prefetchw [(A),(B)]
@@ -81,7 +81,7 @@ ENTRY (memset)
 	lpnz	@.Lset64bytes
 	; LOOP START
 	PREWRITE (r3, 64)	;Prefetch the next write location
-#ifdef __LL64__
+#ifdef __ARC_LL64__
 	std.ab	r4, [r3, 8]
 	std.ab	r4, [r3, 8]
 	std.ab	r4, [r3, 8]
@@ -114,7 +114,7 @@ ENTRY (memset)
 	lpnz	.Lset32bytes
 	; LOOP START
 	prefetchw [r3, 32]	;Prefetch the next write location
-#ifdef __LL64__
+#ifdef __ARC_LL64__
 	std.ab	r4, [r3, 8]
 	std.ab	r4, [r3, 8]
 	std.ab	r4, [r3, 8]
@@ -141,6 +141,6 @@ ENTRY (memset)
 	j	[blink]
 
 ENDFUNC (memset)
-#endif /* __HS__ */
+#endif /* __ARCHS__ */
 
 #endif /* !__OPTIMIZE_SIZE__ && !PREFER_SIZE_OVER_SPEED */

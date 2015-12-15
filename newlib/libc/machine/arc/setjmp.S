@@ -92,7 +92,7 @@ setjmp:
 	st	r2, [r0, ABIlps]
 	st	r3, [r0, ABIlpe]
 
-#if (!defined (__A7__) && !defined (__EM__) && !defined (__HS__))
+#if (!defined (__ARC700__) && !defined (__ARCEM__) && !defined (__ARCHS__))
 ; Till the configure changes are decided, and implemented, the code working on
 ; mlo/mhi and using mul64 should be disabled.
 ; 	st	mlo, [r0, ABImlo]
@@ -145,7 +145,7 @@ longjmp:
 	sr	r2, [lp_start]
 	sr	r3, [lp_end]
 
-#if (!defined (__A7__) && !defined (__EM__) && !defined (__HS__))
+#if (!defined (__ARC700__) && !defined (__ARCEM__) && !defined (__ARCHS__))
 	ld	r2, [r0, ABImlo]
 	ld	r3, [r0, ABImhi]
 ; We do not support restoring of mulhi and mlo registers, yet.

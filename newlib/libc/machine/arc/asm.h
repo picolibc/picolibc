@@ -61,4 +61,22 @@
 
 #define bcc_s	bhs_s
 
+/* Compatibility with older ARC GCC, that doesn't provide some of the
+   preprocessor defines used by newlib for ARC.  */
+#if defined (__Xbarrel_shifter) && !defined (__ARC_BARREL_SHIFTER__)
+#define __ARC_BARREL_SHIFTER__ 1
+#endif
+
+#if defined (__EM__) && !defined (__ARCEM__)
+#define __ARCEM__ 1
+#endif
+
+#if defined (__HS__) && !defined (__ARCHS__)
+#define __ARCHS__ 1
+#endif
+
+#if defined (__LL64__) && !defined (__ARC_LL64__)
+#define __ARC_LL64__ 1
+#endif
+
 #endif /* ARC_NEWLIB_ASM_H */

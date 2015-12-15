@@ -35,7 +35,8 @@
 
 #include "asm.h"
 
-#if defined (__ARC601__) || (!defined (__Xbarrel_shifter) && !defined (__HS__))
+#if defined (__ARC601__) \
+    || (!defined (__ARC_BARREL_SHIFTER__) && !defined (__ARCHS__))
 
 /* To deal with alignment/loop issues, SMALL must be at least 2.  */
 #define SMALL 8 /* Even faster if aligned.  */
@@ -104,6 +105,6 @@ __strncpy_bzero:
 	stb_s	r1,[r3]
 	j_s	[blink]
 ENDFUNC (memset)
-#endif /* __ARC601__ || (!__Xbarrel_shifter && !__HS__)  */
+#endif /* __ARC601__ || (!__ARC_BARREL_SHIFTER__ && !__ARCHS__)  */
 
 #endif /* !__OPTIMIZE_SIZE__ && !PREFER_SIZE_OVER_SPEED */

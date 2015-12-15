@@ -35,7 +35,7 @@
 
 #include "asm.h"
 
-#if defined(__ARC601__) || !defined (__Xbarrel_shifter)
+#if defined(__ARC601__) || !defined (__ARC_BARREL_SHIFTER__)
 /* This code is optimized for the ARC601 pipeline without barrel shifter.  */
 
 ENTRY (strlen)
@@ -160,6 +160,6 @@ ENTRY (strlen)
 	sub_s.ne r1,r1,r1
 #endif /* !SPECIAL_EARLY_END */
 ENDFUNC (strlen)
-#endif /* __ARC601__ || !__Xbarrel_shifter*/
+#endif /* __ARC601__ || !__ARC_BARREL_SHIFTER__*/
 
 #endif /* !__OPTIMIZE_SIZE__ && !PREFER_SIZE_OVER_SPEED */

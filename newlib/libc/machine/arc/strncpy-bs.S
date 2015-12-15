@@ -45,9 +45,9 @@
    there, but the it is not likely to be taken often, and it
    would also be likey to cost an unaligned mispredict at the next call.  */
 
-#if !defined (__ARC601__) && defined (__Xbarrel_shifter)
+#if !defined (__ARC601__) && defined (__ARC_BARREL_SHIFTER__)
 
-#if defined (__ARC700___) || defined (__EM__) || defined (__HS__)
+#if defined (__ARC700___) || defined (__ARCEM__) || defined (__ARCHS__)
 #define BRand(a,b,l)	tst	a,b ` bne_l l
 #else
 #define BRand(a,b,l)	and	a,a,b ` brne_s a,0,l
@@ -112,7 +112,7 @@ ENTRY (strncpy)
 .Lr4z:
 	mov_l	r3,r4
 .Lr3z:
-#if defined (__ARC700__) || defined (__EM__) || defined (__HS__)
+#if defined (__ARC700__) || defined (__ARCEM__) || defined (__ARCHS__)
 #ifdef __LITTLE_ENDIAN__
 	bmsk.f	r1,r3,7
 	lsr_s	r3,r3,8
@@ -166,6 +166,6 @@ ENTRY (strncpy)
 	j_s.d	[blink]
 	stb_l	r12,[r3]
 ENDFUNC (strncpy)
-#endif /* !__ARC601__ && __Xbarrel_shifter */
+#endif /* !__ARC601__ && __ARC_BARREL_SHIFTER__ */
 
 #endif /* !__OPTIMIZE_SIZE__ && !PREFER_SIZE_OVER_SPEED */

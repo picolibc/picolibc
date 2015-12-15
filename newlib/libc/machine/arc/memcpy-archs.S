@@ -35,7 +35,7 @@
 
 #include "asm.h"
 
-#if defined (__HS__)
+#if defined (__ARCHS__)
 
 #ifdef __LITTLE_ENDIAN__
 # define SHIFT_1(RX,RY,IMM)	asl	RX, RY, IMM	; <<
@@ -53,7 +53,7 @@
 # define EXTRACT_2(RX,RY,IMM)	lsr	RX, RY, 0x08
 #endif
 
-#ifdef __LL64__
+#ifdef __ARC_LL64__
 # define PREFETCH_READ(RX)	prefetch	[RX, 56]
 # define PREFETCH_WRITE(RX)	prefetchw	[RX, 64]
 # define LOADX(DST,RX)		ldd.ab	DST, [RX, 8]
@@ -263,6 +263,6 @@ ENTRY (memcpy)
 	j	[blink]
 
 ENDFUNC (memcpy)
-#endif /* __HS__ */
+#endif /* __ARCHS__ */
 
 #endif /* !__OPTIMIZE_SIZE__ && !PREFER_SIZE_OVER_SPEED */

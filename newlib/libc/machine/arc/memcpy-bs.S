@@ -35,7 +35,9 @@
 
 #include "asm.h"
 
-#if !defined (__ARC601__) && !defined (__HS__) && defined (__Xbarrel_shifter)
+#if !defined (__ARC601__) && !defined (__ARCHS__) \
+    && defined (__ARC_BARREL_SHIFTER__)
+
 /* Mostly optimized for ARC700, but not bad for ARC600 either.  */
 /* This memcpy implementation does not support objects of 1GB or larger -
    the check for alignment does not work then.  */
@@ -98,6 +100,6 @@ ENTRY (memcpy)
 	j_s.d	[blink]
 	stb	r12,[r5,0]
 ENDFUNC (memcpy)
-#endif /* !__ARC601__ && !__HS__ && __Xbarrel_shifter */
+#endif /* !__ARC601__ && !__ARCHS__ && __ARC_BARREL_SHIFTER__ */
 
 #endif /* !__OPTIMIZE_SIZE__ && !PREFER_SIZE_OVER_SPEED */

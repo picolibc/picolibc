@@ -35,7 +35,7 @@
 
 #include "asm.h"
 
-#ifdef __HS__
+#ifdef __ARCHS__
 ENTRY (strcmp)
 	or	r2, r0, r1
 	bmsk_s	r2, r2, 1
@@ -104,6 +104,6 @@ ENTRY (strcmp)
 	j_s.d	[blink]
 	sub	r0, r2, r3
 ENDFUNC (strcmp)
-#endif /* __HS__ */
+#endif /* __ARCHS__ */
 
 #endif /* !__OPTIMIZE_SIZE__ && !PREFER_SIZE_OVER_SPEED */
