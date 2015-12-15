@@ -101,8 +101,6 @@ _write(int fd, char *ptr, int len)
 
   while (len != 0)
     {
-      if (*ptr == '\n')
-	tputc ('\r');
       tputc (*ptr);
       ptr ++;
       len --;

@@ -1,3 +1,7 @@
+2015-12-16  Kevin Buettner  <kevinb@redhat.com>
+
+	* rl78/write.c (_write): Don't output CR when LF is encountered.
+
 2015-12-04  Nick Clifton  <nickc@redhat.com>
 
 	* msp430/msp430xl-sim.ld (__high_bsssize): Define.
