@@ -136,10 +136,10 @@ wincapc::init ()
 	break;
       case 10:
       default:
-	if (version.dwBuildNumber >= 10586)
-	  caps = &wincap_10_1511;
-	else
+	if (version.dwBuildNumber < 10586)
 	  caps = &wincap_10;
+	else
+	  caps = &wincap_10_1511;
 	break;
     }
 
