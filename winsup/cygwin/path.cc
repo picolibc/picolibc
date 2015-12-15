@@ -2702,9 +2702,8 @@ restart:
 	     manages them.  I really hope it's streamlined enough not to
 	     slow down normal operation.  This extra check only kicks in if
 	     we encountered a STATUS_OBJECT_NAME_NOT_FOUND *and* we didn't
-	     already attach a suffix *and* the above special case for UDF
-	     on XP didn't succeeed. */
-	  if (!restarted && !*ext_here && !(pflags & PATH_DOS) && !fs.inited ())
+	     already attach a suffix. */
+	  if (!restarted && !*ext_here && !(pflags & PATH_DOS))
 	    {
 	      /* Check for trailing dot or space or leading space in
 		 last component. */
@@ -2720,8 +2719,7 @@ restart:
 		{
 		  /* If so, check if file resides on one of the known broken
 		     FSes only supporting filenames following DOS rules. */
-		  if (!fs.inited ())
-		    fs.update (&upath, NULL);
+		  fs.update (&upath, NULL);
 		  if (fs.has_dos_filenames_only ())
 		    {
 		      /* If so, try again.  Since we now know the FS, the
