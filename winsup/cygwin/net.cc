@@ -2380,77 +2380,15 @@ get_ifconf (struct ifconf *ifc, int what)
 }
 
 extern "C" unsigned
-if_nametoindex (const char *name)
+cygwin_if_nametoindex (const char *name)
 {
-  PIP_ADAPTER_ADDRESSES pa0 = NULL, pap;
-  unsigned index = 0;
-
-  __try
-    {
-      if (get_adapters_addresses (&pa0, AF_UNSPEC))
-	{
-	  char lname[IF_NAMESIZE], *c;
-
-	  lname[0] = '\0';
-	  strncat (lname, name, IF_NAMESIZE - 1);
-	  if (lname[0] == '{' && (c = strchr (lname, ':')))
-	    *c = '\0';
-	  for (pap = pa0; pap; pap = pap->Next)
-	    if (strcasematch (lname, pap->AdapterName))
-	      {
-		index = pap->Ipv6IfIndex ?: pap->IfIndex;
-		break;
-	      }
-	  free (pa0);
-	}
-    }
-  __except (EFAULT)
-    {
-      index = 0;
-    }
-  __endtry
-  return index;
+  return (unsigned) ::if_nametoindex (name);
 }
 
 extern "C" char *
-if_indextoname (unsigned ifindex, char *ifname)
+cygwin_if_indextoname (unsigned ifindex, char *ifname)
 {
-  PIP_ADAPTER_ADDRESSES pa0 = NULL, pap;
-  char *name = NULL;
-
-  __try
-    {
-      if (get_adapters_addresses (&pa0, AF_UNSPEC))
-	{
-	  for (pap = pa0; pap; pap = pap->Next)
-	    if (ifindex == (pap->Ipv6IfIndex ?: pap->IfIndex))
-	      {
-		/* Unfortunately the pre-Vista IPv6 stack has a distinct
-		   loopback device with the same Ipv6IfIndex as the IfIndex
-		   of the IPv4 loopback device, but with a different adapter
-		   name.  For consistency with /proc/net/if_inet6, try to find
-		   the IPv6 loopback device and use that adapter name instead.
-		   We identify the loopback device by its IfIndex of 1. */
-		if (pap->IfIndex == 1 && pap->Ipv6IfIndex == 0)
-		  for (PIP_ADAPTER_ADDRESSES pap2 = pa0;
-		       pap2;
-		       pap2 = pap2->Next)
-		    if (pap2->Ipv6IfIndex == 1)
-		      {
-			pap = pap2;
-			break;
-		      }
-		name = strcpy (ifname, pap->AdapterName);
-		break;
-	      }
-	  free (pa0);
-	}
-      else
-	set_errno (ENXIO);
-    }
-  __except (EFAULT) {}
-  __endtry
-  return name;
+  return ::if_indextoname (ifindex, ifname);
 }
 
 extern "C" struct if_nameindex *

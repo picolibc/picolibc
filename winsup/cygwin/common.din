@@ -692,9 +692,9 @@ hypot NOSIGFE
 hypotf NOSIGFE
 hypotl NOSIGFE
 if_freenameindex SIGFE
-if_indextoname SIGFE
+if_indextoname = cygwin_if_indextoname SIGFE
 if_nameindex SIGFE
-if_nametoindex SIGFE
+if_nametoindex = cygwin_if_nametoindex SIGFE
 ilogb NOSIGFE
 ilogbf NOSIGFE
 ilogbl NOSIGFE

@@ -574,6 +574,8 @@ LoadDLLfunc (GetIpAddrTable, 12, iphlpapi)
 LoadDLLfunc (GetIpForwardTable, 12, iphlpapi)
 LoadDLLfunc (GetNetworkParams, 8, iphlpapi)
 LoadDLLfunc (GetUdpTable, 12, iphlpapi)
+LoadDLLfunc (if_indextoname, 8, iphlpapi)
+LoadDLLfunc (if_nametoindex, 4, iphlpapi)
 
 LoadDLLfuncEx (CancelSynchronousIo, 4, kernel32, 1)
 LoadDLLfunc (CreateSymbolicLinkW, 12, kernel32)
