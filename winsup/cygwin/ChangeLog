@@ -1,3 +1,8 @@
+2015-12-16  Corinna Vinschen  <corinna@vinschen.de>
+
+	* grp.cc (pwdgrp::parse_group): Only copy the SID if it's valid.
+	* passwd.cc (pwdgrp::parse_passwd): Ditto.
+
 2015-12-14  Sebastian Huber  <sebastian.huber@embedded-brains.de>
 
 	* include/cygwin/signal.h (sigset_t): Move defintition to newlib.
