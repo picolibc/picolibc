@@ -1,3 +1,8 @@
+2015-12-17  DJ Delorie  <dj@redhat.com>
+
+	* msp430/cio.c: Remove, replace with...
+	* msp430/cio.S: New, this.
+
 2015-12-16  Kevin Buettner  <kevinb@redhat.com>
 
 	* rl78/write.c (_write): Don't output CR when LF is encountered.

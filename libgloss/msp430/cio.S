@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2013  Red Hat, Inc. All rights reserved.
+Copyright (c) 2014  Red Hat, Inc. All rights reserved.
 
 This copyrighted material is made available to anyone wishing to use, modify,
 copy, or redistribute it subject to the terms and conditions of the BSD
@@ -13,14 +13,21 @@ License and may only be used or replicated with the express permission of
 Red Hat, Inc.
 
 */
+#include "memmodel.h"
 
-#include "cio.h"
+	.data
 
-__CIOBUF__TYPE__ __CIOBUF__;
+	.global	__CIOBUF__
+__CIOBUF__:
+	.global	_CIOBUF_
+_CIOBUF_:
+	.space	75
 
-void
-_libgloss_cio_hook (void)
-{
-  __asm__ __volatile__ (" .global C$$IO$$");
-  __asm__ __volatile__ ("C$$IO$$: nop");
-}
+	.text
+
+	.global	_libgloss_cio_hook
+_libgloss_cio_hook:
+	.global C$$IO$$
+C$$IO$$:
+	nop
+        ret_
