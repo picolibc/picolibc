@@ -1,3 +1,7 @@
+2015-12-17  Corinna Vinschen  <corinna@vinschen.de>
+
+	* libc/include/sys/types.h: Remove including <sys/select.h>.
+
 2015-12-14  Sebastian Huber  <sebastian.huber@embedded-brains.de>
 
 	* libc/include/sys/reent.h (_REENT_INIT_PTR_ZEROED): New.
