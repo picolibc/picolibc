@@ -953,9 +953,9 @@ dll_crt0_1 (void *)
   if (!__argc)
     {
       PWCHAR wline = GetCommandLineW ();
-      size_t size = sys_wcstombs (NULL, 0, wline) + 1;
+      size_t size = sys_wcstombs_no_path (NULL, 0, wline) + 1;
       char *line = (char *) alloca (size);
-      sys_wcstombs (line, size, wline);
+      sys_wcstombs_no_path (line, size, wline);
 
       /* Scan the command line and build argv.  Expand wildcards if not
 	 called from another cygwin process. */

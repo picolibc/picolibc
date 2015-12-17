@@ -833,7 +833,7 @@ environ_init (char **envp, int envc)
 	 eventually want to use them).  */
       for (i = 0, w = rawenv; *w != L'\0'; w = wcschr (w, L'\0') + 1, i++)
 	{
-	  sys_wcstombs_alloc (&newp, HEAP_NOTHEAP, w);
+	  sys_wcstombs_alloc_no_path (&newp, HEAP_NOTHEAP, w);
 	  if (i >= envc)
 	    envp = (char **) realloc (envp, (4 + (envc += 100)) * sizeof (char *));
 	  envp[i] = newp;
@@ -895,7 +895,7 @@ getwinenveq (const char *name, size_t namelen, int x)
   int totlen = GetEnvironmentVariableW (name0, valbuf, 32768);
   if (totlen > 0)
     {
-      totlen = sys_wcstombs (NULL, 0, valbuf) + 1;
+      totlen = sys_wcstombs_no_path (NULL, 0, valbuf) + 1;
       if (x == HEAP_1_STR)
 	totlen += namelen;
       else
@@ -903,7 +903,7 @@ getwinenveq (const char *name, size_t namelen, int x)
       char *p = (char *) cmalloc_abort ((cygheap_types) x, totlen);
       if (namelen)
 	strcpy (p, name);
-      sys_wcstombs (p + namelen, totlen, valbuf);
+      sys_wcstombs_no_path (p + namelen, totlen, valbuf);
       debug_printf ("using value from GetEnvironmentVariable for '%W'", name0);
       return p;
     }
@@ -1055,7 +1055,7 @@ build_env (const char * const *envp, PWCHAR &envblock, int &envc,
 	  for (winnum = 0, var = cwinenv;
 	       *var;
 	       ++winnum, var = wcschr (var, L'\0') + 1)
-	    sys_wcstombs_alloc (&winenv[winnum], HEAP_NOTHEAP, var);
+	    sys_wcstombs_alloc_no_path (&winenv[winnum], HEAP_NOTHEAP, var);
 	}
       DestroyEnvironmentBlock (cwinenv);
       /* Eliminate variables which are already available in envp, as well as

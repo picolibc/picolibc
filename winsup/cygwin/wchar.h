@@ -52,7 +52,11 @@ extern char *__locale_charset ();
 #ifdef __cplusplus
 size_t __reg3 sys_wcstombs (char *dst, size_t len, const wchar_t * src,
 			       size_t nwc = (size_t) -1);
+size_t __reg3 sys_wcstombs_no_path (char *dst, size_t len,
+			       const wchar_t * src, size_t nwc = (size_t) -1);
 size_t __reg3 sys_wcstombs_alloc (char **, int, const wchar_t *,
+				     size_t = (size_t) -1);
+size_t __reg3 sys_wcstombs_alloc_no_path (char **, int, const wchar_t *,
 				     size_t = (size_t) -1);
 
 size_t __reg3 sys_cp_mbstowcs (mbtowc_p, const char *, wchar_t *, size_t,
