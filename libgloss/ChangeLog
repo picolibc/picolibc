@@ -1,5 +1,9 @@
 2015-12-17  DJ Delorie  <dj@redhat.com>
 
+	* configure.in: Don't build default libnosys for msp430
+	* configure: Regenerate.
+	* msp430/Makefile: Rename libcio to libnosys.
+
 	* msp430/cio.c: Remove, replace with...
 	* msp430/cio.S: New, this.
 
