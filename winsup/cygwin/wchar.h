@@ -50,8 +50,6 @@ extern char *__locale_charset ();
 
 #ifdef __INSIDE_CYGWIN__
 #ifdef __cplusplus
-size_t __reg3 sys_cp_wcstombs (wctomb_p, const char *, char *, size_t,
-				  const wchar_t *, size_t = (size_t) -1);
 size_t __reg3 sys_wcstombs (char *dst, size_t len, const wchar_t * src,
 			       size_t nwc = (size_t) -1);
 size_t __reg3 sys_wcstombs_alloc (char **, int, const wchar_t *,

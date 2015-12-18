@@ -218,8 +218,7 @@ tty_list::get_cttyp ()
 inline DWORD
 dev_console::con_to_str (char *d, int dlen, WCHAR w)
 {
-  return sys_cp_wcstombs (cygheap->locale.wctomb, cygheap->locale.charset,
-			  d, dlen, &w, 1);
+  return sys_wcstombs (d, dlen, &w, 1);
 }
 
 inline UINT

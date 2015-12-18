@@ -59,7 +59,7 @@ static const WCHAR tfx_chars[] = {
  0xf000 | '|',          '}',          '~',          127
 };
 
-/* This is the table for the reverse functionality in sys_cp_wcstombs.
+/* This is the table for the reverse functionality in sys_wcstombs.
    It differs deliberately in two code places (space and dot) to allow
    converting back space and dot on filesystems only supporting DOS
    filenames. */
@@ -410,8 +410,7 @@ __big5_mbtowc (struct _reent *r, wchar_t *pwc, const char *s, size_t n,
        function should be raised.
 */
 size_t __reg3
-sys_cp_wcstombs (wctomb_p f_wctomb, const char *charset, char *dst, size_t len,
-		 const wchar_t *src, size_t nwc)
+sys_wcstombs (char *dst, size_t len, const wchar_t *src, size_t nwc)
 {
   char buf[10];
   char *ptr = dst;
@@ -419,6 +418,8 @@ sys_cp_wcstombs (wctomb_p f_wctomb, const char *charset, char *dst, size_t len,
   size_t n = 0;
   mbstate_t ps;
   save_errno save;
+  wctomb_p f_wctomb = cygheap->locale.wctomb;
+  const char *charset = cygheap->locale.charset;
 
   memset (&ps, 0, sizeof ps);
   if (dst == NULL)
@@ -493,13 +494,6 @@ sys_cp_wcstombs (wctomb_p f_wctomb, const char *charset, char *dst, size_t len,
     }
 
   return n;
-}
-
-size_t __reg3
-sys_wcstombs (char *dst, size_t len, const wchar_t * src, size_t nwc)
-{
-  return sys_cp_wcstombs (cygheap->locale.wctomb, cygheap->locale.charset,
-			  dst, len, src, nwc);
 }
 
 /* Allocate a buffer big enough for the string, always including the
