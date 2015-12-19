@@ -1,3 +1,7 @@
+2015-12-19  Houder  <houder@xs4all.nl>
+
+	* setfacl.cc (opts): Add colon to x option.
+
 2015-12-06  Corinna Vinschen  <corinna@vinschen.de>
 
 	* cygpath.cc (absolute_flag): Initialize to CCP_RELATIVE to simplify

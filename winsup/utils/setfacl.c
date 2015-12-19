@@ -634,7 +634,7 @@ struct option longopts[] = {
   {"version", no_argument, NULL, 'V'},
   {0, no_argument, NULL, 0}
 };
-const char *opts = "bd:f:hkm:nrs:Vx";
+const char *opts = "bd:f:hkm:nrs:Vx:";
 
 static void
 print_version ()
