@@ -1,3 +1,8 @@
+2015-12-20  Houder  <houder@xs4all.nl>
+
+	* setfacl.cc (longopts): Drop accidentally requiring an argument to
+	the --mask and --no-mask options.
+
 2015-12-19  Houder  <houder@xs4all.nl>
 
 	* setfacl.cc (opts): Add colon to x option.
