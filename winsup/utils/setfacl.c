@@ -266,11 +266,6 @@ int
 modacl (aclent_t *tgt, int tcnt, aclent_t *src, int scnt)
 {
   int t, s;
-  int recompute_mask = 0, recompute_def_mask = 0;
-  int need_mask = 0, need_def_mask = 0;
-  int has_mask = 0, has_def_mask = 0;
-  int mask_idx = -1, def_mask_idx = -1;
-  mode_t mask = 0, def_mask = 0;
 
   /* Replace or add given acl entries. */
   for (s = 0; s < scnt; ++s)
@@ -282,16 +277,25 @@ modacl (aclent_t *tgt, int tcnt, aclent_t *src, int scnt)
       tgt[t] = src[s];
       if (t >= tcnt)
 	++tcnt;
-      /* Note if CLASS_OBJ and/or DEF_CLASS_OBJ are present in input. */
-      if (src[s].a_type == CLASS_OBJ)
-	has_mask = 1;
-      else if (src[s].a_type == DEF_CLASS_OBJ)
-	has_def_mask = 1;
-      else if (src[s].a_type & ACL_DEFAULT)
-	recompute_def_mask = 1;
-      else
-	recompute_mask = 1;
     }
+  return tcnt;
+}
+
+void
+check_got_mask (aclent_t *src, int scnt, int *got_mask, int *got_def_mask)
+{
+  *got_mask = searchace (src, scnt, CLASS_OBJ, -1) >= 0;
+  *got_def_mask = searchace (src, scnt, DEF_CLASS_OBJ, -1) >= 0;
+}
+
+int
+recompute_mask (aclent_t *tgt, int tcnt, int got_mask, int got_def_mask)
+{
+  int t;
+  int need_mask = 0, need_def_mask = 0;
+  int mask_idx = -1, def_mask_idx = -1;
+  mode_t mask = 0, def_mask = 0;
+
   /* Now recompute mask, if requested (default) */
   for (t = 0; t < tcnt; ++t)
     {
@@ -325,9 +329,13 @@ modacl (aclent_t *tgt, int tcnt, aclent_t *src, int scnt)
 	  break;
 	}
     }
-  /* Recompute mask, if requested */
-  if (recompute_mask && need_mask && mask_opt >= 0
-      && (mask_opt > 0 || !has_mask))
+  /* Recompute mask, if requested
+     - If we got a mask in the input string, recompute only if --mask has been
+       specified.
+     - If we got no mask in the input, but we either need a mask or we already
+       have one, and --no-mask has *not* been specified, recompute. */
+  if ((got_mask && mask_opt > 0)
+      || (!got_mask && mask_opt >= 0 && (need_mask || mask_idx >= 0)))
     {
       if (mask_idx >= 0)
 	t = mask_idx;
@@ -342,8 +350,9 @@ modacl (aclent_t *tgt, int tcnt, aclent_t *src, int scnt)
       tgt[t].a_perm = mask;
     }
   /* Recompute default mask, if requested */
-  if (recompute_def_mask && need_def_mask && mask_opt >= 0
-      && (mask_opt > 0 || !has_def_mask))
+  if ((got_def_mask && mask_opt > 0)
+      || (!got_def_mask && mask_opt >= 0
+	  && (need_def_mask || def_mask_idx >= 0)))
     {
       if (def_mask_idx >= 0)
 	t = def_mask_idx;
@@ -357,7 +366,6 @@ modacl (aclent_t *tgt, int tcnt, aclent_t *src, int scnt)
       tgt[t].a_id = -1;
       tgt[t].a_perm = def_mask;
     }
-
   return tcnt;
 }
 
@@ -373,13 +381,17 @@ addmissing (aclent_t *tgt, int tcnt)
     if (tgt[t].a_type & ACL_DEFAULT)
       {
 	def_types |= tgt[t].a_type;
-	if (tgt[t].a_type & (USER | GROUP | GROUP_OBJ))
+	if (tgt[t].a_type & GROUP_OBJ)
+	  def_perm |= tgt[t].a_perm;
+	else if ((tgt[t].a_type & (USER | GROUP)) && mask_opt >= 0)
 	  def_perm |= tgt[t].a_perm;
       }
     else
       {
 	types |= tgt[t].a_type;
-	if (tgt[t].a_type & (USER | GROUP | GROUP_OBJ))
+	if (tgt[t].a_type & GROUP_OBJ)
+	  perm |= tgt[t].a_perm;
+	else if ((tgt[t].a_type & (USER | GROUP)) && mask_opt >= 0)
 	  perm |= tgt[t].a_perm;
       }
   /* Add missing CLASS_OBJ */
@@ -450,22 +462,28 @@ int
 setfacl (action_t action, const char *path, aclent_t *acls, int cnt)
 {
   aclent_t lacl[MAX_ACL_ENTRIES];
-  int lcnt;
+  int lcnt, got_mask = 0, got_def_mask = 0;
 
   memset (lacl, 0, sizeof lacl);
   switch (action)
     {
     case Set:
-      if (acl (path, SETACL, cnt, acls))
+      check_got_mask (acls, cnt, &got_mask, &got_def_mask);
+      memcpy (lacl, acls, (lcnt = cnt) * sizeof (aclent_t));
+      if ((lcnt = recompute_mask (lacl, lcnt, got_mask, got_def_mask)) < 0
+	  || (lcnt = addmissing (lacl, lcnt)) < 0
+	  || acl (path, SETACL, lcnt, lacl) < 0)
 	{
 	  perror (prog_name);
 	  return 2;
 	}
       break;
     case Delete:
+      check_got_mask (acls, cnt, &got_mask, &got_def_mask);
       if ((lcnt = acl (path, GETACL, MAX_ACL_ENTRIES, lacl)) < 0
 	  || (lcnt = delacl (lacl, lcnt, acls, cnt)) < 0
-	  || (lcnt = acl (path, SETACL, lcnt, lacl)) < 0)
+	  || (lcnt = recompute_mask (lacl, lcnt, got_mask, got_def_mask)) < 0
+	  || acl (path, SETACL, lcnt, lacl) < 0)
 	{
 	  perror (prog_name);
 	  return 2;
@@ -476,17 +494,19 @@ setfacl (action_t action, const char *path, aclent_t *acls, int cnt)
     case DeleteAll:
       if ((lcnt = acl (path, GETACL, MAX_ACL_ENTRIES, lacl)) < 0
 	  || (lcnt = delallacl (lacl, lcnt, action)) < 0
-	  || (lcnt = acl (path, SETACL, lcnt, lacl)) < 0)
+	  || acl (path, SETACL, lcnt, lacl) < 0)
 	{
 	  perror (prog_name);
 	  return 2;
 	}
       break;
     default:
+      check_got_mask (acls, cnt, &got_mask, &got_def_mask);
       if ((lcnt = acl (path, GETACL, MAX_ACL_ENTRIES, lacl)) < 0
 	  || (lcnt = modacl (lacl, lcnt, acls, cnt)) < 0
+	  || (lcnt = recompute_mask (lacl, lcnt, got_mask, got_def_mask)) < 0
 	  || (lcnt = addmissing (lacl, lcnt)) < 0
-	  || (lcnt = acl (path, SETACL, lcnt, lacl)) < 0)
+	  || acl (path, SETACL, lcnt, lacl) < 0)
 	{
 	  perror (prog_name);
 	  return 2;
@@ -513,7 +533,7 @@ usage (FILE *stream)
 "  -m, --modify           modify one or more specified ACL entries\n"
 "  -n, --no-mask          don't recalculate the effective rights mask\n"
 "      --mask             do recalculate the effective rights mask\n"
-"  -s, --substitute       substitute specified ACL entries on FILE\n"
+"  -s, --set              set specified ACL entries on FILE\n"
 "  -V, --version          print version and exit\n"
 "  -h, --help             this help text\n"
 "\n"
@@ -603,8 +623,8 @@ usage (FILE *stream)
 "  Valid in conjunction with -m.  Do recalculate the effective rights mask,\n"
 "  even if an ACL mask entry was explicitly given. (See the -n option.)\n"
 "\n"
-"-s, --substitute\n"
-"  Like -f, but substitute the file's ACL with ACL entries specified in a\n"
+"-s, --set\n"
+"  Like -f, but set the file's ACL with ACL entries specified in a\n"
 "  comma-separated list on the command line.\n"
 "\n"
 "While the -x and -m options may be used in the same command, the -f and -s\n"
@@ -629,6 +649,7 @@ struct option longopts[] = {
   {"no-mask", no_argument, NULL, 'n'},
   {"mask", no_argument, NULL, '\n'},
   {"replace", no_argument, NULL, 'r'},
+  {"set", required_argument, NULL, 's'},
   {"substitute", required_argument, NULL, 's'},
   {"help", no_argument, NULL, 'h'},
   {"version", no_argument, NULL, 'V'},

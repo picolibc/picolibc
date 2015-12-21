@@ -1,3 +1,14 @@
+2015-12-21  Corinna Vinschen  <corinna@vinschen.de>
+
+	* setfacl.cc (modacl): Move recomputing mask into new function.
+	(check_got_mask): New function checking if mask is in input.
+	(recompute_mask): New function to recompute mask.
+	(addmissing): Align mask computation to Linux setfacl.
+	(setfacl): Call check_got_mask and recompute_mask on Set, Delete and
+	Modify actions.
+	(usage): Rename --substitute to --set.
+	(longopts): Add --set option.
+
 2015-12-20  Houder  <houder@xs4all.nl>
 
 	* setfacl.cc (longopts): Drop accidentally requiring an argument to

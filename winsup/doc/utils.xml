@@ -1996,7 +1996,7 @@ setfacl [-n] {[-bk]|[-x acl_entries] [-m acl_entries]} FILE...
   -m, --modify           modify one or more specified ACL entries\n"
   -n, --no-mask          don't recalculate the effective rights mask\n"
       --mask             do recalculate the effective rights mask\n"
-  -s, --substitute       substitute specified ACL entries on FILE\n"
+  -s, --set              set specified ACL entries on FILE\n"
   -V, --version          print version and exit\n"
   -h, --help             this help text\n"
 
@@ -2100,8 +2100,8 @@ $ getfacl source_file | setfacl -f - target_file
       recalculate the effective rights mask, even if an ACL mask entry was
       explicitly given. (See the -n option.) </para>
 
-    <para> <literal>-s</literal>,<literal>--substitute</literal> Like
-      <literal>-f</literal>, but substitute the file's ACL with Acl_entries
+    <para> <literal>-s</literal>,<literal>--set</literal> Like
+      <literal>-f</literal>, but set the file's ACL with Acl_entries
       specified in a comma-separated list on the command line. </para>
 
     <para> While the <literal>-x</literal> and <literal>-m</literal> options
