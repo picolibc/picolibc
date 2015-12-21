@@ -242,6 +242,17 @@ searchace (aclent_t *aclp, int nentries, int type, int id)
 }
 
 int
+delace (aclent_t *tgt, int tcnt, int t)
+{
+  int i;
+
+  for (i = t + 1; i < tcnt; ++i)
+    tgt[i - 1] = tgt[i];
+  --tcnt;
+  return tcnt;
+}
+
+int
 delacl (aclent_t *tgt, int tcnt, aclent_t *src, int scnt)
 {
   int t, s, i;
@@ -253,11 +264,7 @@ delacl (aclent_t *tgt, int tcnt, aclent_t *src, int scnt)
       if (t < 0)
 	return -1;
       if (t < tcnt)
-	{
-	  for (i = t + 1; i < tcnt; ++i)
-	    tgt[i - 1] = tgt[i];
-	  --tcnt;
-	}
+	tcnt = delace (tgt, tcnt, t);
     }
   return tcnt;
 }
@@ -267,16 +274,22 @@ modacl (aclent_t *tgt, int tcnt, aclent_t *src, int scnt)
 {
   int t, s;
 
-  /* Replace or add given acl entries. */
+  /* Delete, replace or add given acl entries. */
   for (s = 0; s < scnt; ++s)
     {
       t = searchace (tgt, MAX_ACL_ENTRIES, src[s].a_type,
 		     (src[s].a_type & (USER | GROUP)) ? src[s].a_id : -1);
       if (t < 0)
 	return -1;
-      tgt[t] = src[s];
-      if (t >= tcnt)
-	++tcnt;
+      /* ILLEGAL_MODE means "delete". */
+      if (src[s].a_perm == ILLEGAL_MODE && t < tcnt)
+	tcnt = delace (tgt, tcnt, t);
+      else
+	{
+	  tgt[t] = src[s];
+	  if (t >= tcnt)
+	    ++tcnt;
+	}
     }
   return tcnt;
 }

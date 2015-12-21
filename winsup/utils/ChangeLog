@@ -1,5 +1,11 @@
 2015-12-21  Corinna Vinschen  <corinna@vinschen.de>
 
+	* setfacl.cc (delace): New helper function to delete a single ACE.
+	(delacl): Call delace.
+	(modacl): Ditto, if entry is supposed to get deleted.  Align comments.
+
+2015-12-21  Corinna Vinschen  <corinna@vinschen.de>
+
 	* setfacl.cc (modacl): Move recomputing mask into new function.
 	(check_got_mask): New function checking if mask is in input.
 	(recompute_mask): New function to recompute mask.
