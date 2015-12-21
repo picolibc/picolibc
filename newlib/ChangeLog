@@ -1,5 +1,10 @@
 2015-12-21  Freddie Chopin  <freddie.chopin@gmail.com>
 
+	* libc/stdlib/__atexit.c (__register_exitproc): Fix for
+	_ATEXIT_DYNAMIC_ALLOC.
+
+2015-12-21  Freddie Chopin  <freddie.chopin@gmail.com>
+
 	* libc/stdlib/on_exit_args.{c,h}: New files.
 	* libc/stdlib/Makefile.am: Add new source file.
 	* libc/stdlib/Makefile.in: Regenerate.

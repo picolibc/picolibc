@@ -131,6 +131,12 @@ _DEFUN (__register_exitproc,
       args = p->_on_exit_args_ptr;
       if (args == NULL)
 	{
+#ifndef _ATEXIT_DYNAMIC_ALLOC
+#ifndef __SINGLE_THREAD__
+	  __lock_release_recursive(__atexit_lock);
+#endif
+	  return -1;
+#else
 	  if (malloc)
 	    args = malloc (sizeof * p->_on_exit_args_ptr);
 
@@ -144,6 +150,7 @@ _DEFUN (__register_exitproc,
 	  args->_fntypes = 0;
 	  args->_is_cxa = 0;
 	  p->_on_exit_args_ptr = args;
+#endif
 	}
 #else
       args = &p->_on_exit_args;
