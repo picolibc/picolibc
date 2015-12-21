@@ -1,3 +1,14 @@
+2015-12-21  Freddie Chopin  <freddie.chopin@gmail.com>
+
+	* libc/stdlib/on_exit_args.{c,h}: New files.
+	* libc/stdlib/Makefile.am: Add new source file.
+	* libc/stdlib/Makefile.in: Regenerate.
+	* libc/stdlib/__atexit.c (__register_exitproc): Initialize
+	_on_exit_args_ptr field of _GLOBAL_ATEXIT on first run.
+	* libc/stdlib/on_exit.c: Force linking of static instance of
+	_on_exit_args.
+	* libc/stdlib/cxa_atexit.c: Likewise.
+
 2015-12-17  Anton Kolesov  <Anton.Kolesov@synopsys.com>
 
 	* libc/machine/arc/asm.h: Define new GCC definition for old compiler.
@@ -6,7 +17,7 @@
 	* libc/machine/arc/memcmp.S: Likewise.
 	* libc/machine/arc/memcpy-archs.S: Likewise.
 	* libc/machine/arc/memcpy-bs.S: Likewise.
-	* libc/machine/arc/memcpy.S: Likewise.
+	* libc/machine/arc/memcpy.S: Likewise.	* libc/machine/arc/memset-archs.S: Likewise.
 	* libc/machine/arc/memset-archs.S: Likewise.
 	* libc/machine/arc/memset-bs.S: Likewise.
 	* libc/machine/arc/memset.S: Likewise.

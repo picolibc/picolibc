@@ -58,6 +58,15 @@ Supporting OS subroutines required: None
 #include <stdlib.h>
 #include "atexit.h"
 
+#ifdef _REENT_SMALL
+
+#include "on_exit_args.h"
+
+/* force linking of static instance of _on_exit_args */
+const void * const __on_exit_dummy = &__on_exit_args;
+
+#endif	/* def _REENT_SMALL */
+
 /*
  * Register a function to be performed at exit.
  */

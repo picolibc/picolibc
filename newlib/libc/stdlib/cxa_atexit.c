@@ -8,6 +8,15 @@
 #include <sys/lock.h>
 #include "atexit.h"
 
+#ifdef _REENT_SMALL
+
+#include "on_exit_args.h"
+
+/* force linking of static instance of _on_exit_args */
+const void * const __cxa_atexit_dummy = &__on_exit_args;
+
+#endif	/* def _REENT_SMALL */
+
 /*
  * Register a function to be performed at exit or DSO unload.
  */
