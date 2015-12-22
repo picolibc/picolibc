@@ -1,3 +1,17 @@
+*** Major changes in newlib version 2.3.0:
+
+- dynamic atexit logic fixed
+- various arm performance enhancements
+- new version of strtold
+- doc improvements
+- arc platform support redone
+- strftime improvements/enhancements
+- imported logic from FreeBSD
+- locking fixes
+- complex math enhancements
+- visium platform support added
+- or1k platform support added
+
 *** Major changes in newlib version 2.2.0:
 
 - multiple functional/performance enhancements for arm/aarch64
