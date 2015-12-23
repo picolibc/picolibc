@@ -1,5 +1,10 @@
 2015-12-24  Corinna Vinschen  <corinna@vinschen.de>
 
+	* sec_acl.cc (__aclcalcmask): New function to recalculate ACL masks.
+	(aclsort32): Honor calclass argument.
+
+2015-12-24  Corinna Vinschen  <corinna@vinschen.de>
+
 	* sec_acl.cc (aclfromtext32): Return missing aclcnt parameter.
 
 2015-12-24  Corinna Vinschen  <corinna@vinschen.de>

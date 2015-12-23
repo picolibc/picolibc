@@ -1295,6 +1295,24 @@ aclcheck32 (aclent_t *aclbufp, int nentries, int *which)
   return 0;
 }
 
+void
+__aclcalcmask (aclent_t *aclbufp, int nentries)
+{
+  acl_perm_t mask = 0;
+  int mask_idx = -1;
+
+  for (int idx = 0; idx < nentries; ++idx)
+    {
+      if (aclbufp[idx].a_type == CLASS_OBJ)
+	mask_idx = idx;
+      else if (aclbufp[idx].a_type
+	       & (USER | GROUP_OBJ | GROUP))
+	mask |= aclbufp[idx].a_perm;
+    }
+  if (mask_idx != -1)
+    aclbufp[mask_idx].a_perm = mask;
+}
+
 static int
 acecmp (const void *a1, const void *a2)
 {
@@ -1307,7 +1325,7 @@ acecmp (const void *a1, const void *a2)
 }
 
 extern "C" int
-aclsort32 (int nentries, int, aclent_t *aclbufp)
+aclsort32 (int nentries, int calclass, aclent_t *aclbufp)
 {
   if (aclcheck32 (aclbufp, nentries, NULL))
     {
@@ -1320,6 +1338,8 @@ aclsort32 (int nentries, int, aclent_t *aclbufp)
       return -1;
     }
   qsort ((void *) aclbufp, nentries, sizeof (aclent_t), acecmp);
+  if (calclass)
+    __aclcalcmask (aclbufp, nentries);
   return 0;
 }
 
