@@ -1501,7 +1501,7 @@ permfromstr (char *perm)
 }
 
 extern "C" aclent_t *
-aclfromtext32 (char *acltextp, int *)
+aclfromtext32 (const char *acltextp, int *aclcnt)
 {
   if (!acltextp || strlen (acltextp) > NT_MAX_PATH)
     {
@@ -1610,7 +1610,11 @@ aclfromtext32 (char *acltextp, int *)
     }
   aclent_t *aclp = (aclent_t *) malloc (pos * sizeof (aclent_t));
   if (aclp)
-    memcpy (aclp, lacl, pos * sizeof (aclent_t));
+    {
+      memcpy (aclp, lacl, pos * sizeof (aclent_t));
+      if (aclcnt)
+	*aclcnt = pos;
+    }
   return aclp;
 }
 
