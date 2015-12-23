@@ -1,4 +1,4 @@
-/* sec_acl.cc: Sun compatible ACL functions.
+/* sec_acl.cc: Solaris compatible ACL functions.
 
    Copyright 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010,
    2011, 2012, 2014, 2015 Red Hat, Inc.
@@ -96,18 +96,6 @@ details. */
 				 | CYG_ACE_MASK_VALID)
 #define CYG_ACE_NEW_STYLE	READ_CONTROL	/* New style if set. */
 
-int
-searchace (aclent_t *aclp, int nentries, int type, uid_t id)
-{
-  int i;
-
-  for (i = 0; i < nentries; ++i)
-    if ((aclp[i].a_type == type && (id == ILLEGAL_UID || aclp[i].a_id == id))
-	|| !aclp[i].a_type)
-      return i;
-  return -1;
-}
-
 /* Define own bit masks rather than using the GENERIC masks.  The latter
    also contain standard rights, which we don't need here. */
 #define FILE_ALLOW_READ		(FILE_READ_DATA | FILE_READ_ATTRIBUTES | \
@@ -123,6 +111,18 @@ searchace (aclent_t *aclp, int nentries, int type, uid_t id)
 
 #define STD_RIGHTS_OTHER	(STANDARD_RIGHTS_READ | SYNCHRONIZE)
 #define STD_RIGHTS_OWNER	(STANDARD_RIGHTS_ALL | SYNCHRONIZE)
+
+int
+searchace (aclent_t *aclp, int nentries, int type, uid_t id)
+{
+  int i;
+
+  for (i = 0; i < nentries; ++i)
+    if ((aclp[i].a_type == type && (id == ILLEGAL_UID || aclp[i].a_id == id))
+	|| !aclp[i].a_type)
+      return i;
+  return -1;
+}
 
 /* From the attributes and the POSIX ACL list, compute a new-style Cygwin
    security descriptor.  The function returns a pointer to the
@@ -1705,7 +1705,7 @@ acltotext (__aclent16_t *aclbufp, int aclcnt)
 }
 
 extern "C" __aclent16_t *
-aclfromtext (char *acltextp, int * aclcnt)
+aclfromtext (char *acltextp, int *aclcnt)
 {
   return (__aclent16_t *) aclfromtext32 (acltextp, aclcnt);
 }
