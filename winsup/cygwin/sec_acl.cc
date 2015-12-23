@@ -1432,7 +1432,8 @@ acltotext32 (aclent_t *aclbufp, int aclcnt)
       set_errno (EINVAL);
       return NULL;
     }
-  char buf[32000];
+  tmp_pathbuf tp;
+  char *buf = tp.c_get ();
   buf[0] = '\0';
   bool first = true;
 
@@ -1502,16 +1503,17 @@ permfromstr (char *perm)
 extern "C" aclent_t *
 aclfromtext32 (char *acltextp, int *)
 {
-  if (!acltextp)
+  if (!acltextp || strlen (acltextp) > NT_MAX_PATH)
     {
       set_errno (EINVAL);
       return NULL;
     }
-  char buf[strlen (acltextp) + 1];
+  tmp_pathbuf tp;
   aclent_t lacl[MAX_ACL_ENTRIES];
   memset (lacl, 0, sizeof lacl);
   int pos = 0;
-  strcpy (buf, acltextp);
+  char *buf = tp.t_get ();
+  stpcpy (buf, acltextp);
   char *lasts;
   cyg_ldap cldap;
   for (char *c = strtok_r (buf, ",", &lasts);
