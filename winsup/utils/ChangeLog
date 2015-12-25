@@ -1,3 +1,7 @@
+2015-12-25  Corinna Vinschen  <corinna@vinschen.de>
+
+	* setfacl.cc (delacl): Remove unused local variable.
+
 2015-12-21  Corinna Vinschen  <corinna@vinschen.de>
 
 	* setfacl.cc (delace): New helper function to delete a single ACE.

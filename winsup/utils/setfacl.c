@@ -255,7 +255,7 @@ delace (aclent_t *tgt, int tcnt, int t)
 int
 delacl (aclent_t *tgt, int tcnt, aclent_t *src, int scnt)
 {
-  int t, s, i;
+  int t, s;
 
   for (s = 0; s < scnt; ++s)
     {
