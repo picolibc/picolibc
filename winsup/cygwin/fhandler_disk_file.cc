@@ -742,7 +742,7 @@ fhandler_disk_file::fchmod (mode_t mode)
       query_open (query_write_dac);
       if (!(oret = open (O_BINARY, 0)))
 	{
-	  /* Need WRITE_DAC|WRITE_OWNER to write ACLs. */
+	  /* Need WRITE_DAC to write ACLs. */
 	  if (pc.has_acls ())
 	    return -1;
 	  /* Otherwise FILE_WRITE_ATTRIBUTES is sufficient. */
@@ -1021,7 +1021,7 @@ cant_access_acl:
       if ((cmd == SETACL && !get_handle ())
 	  || (cmd != SETACL && !get_stat_handle ()))
 	{
-	  query_open (cmd == SETACL ? query_write_control : query_read_control);
+	  query_open (cmd == SETACL ? query_write_dac : query_read_control);
 	  if (!(oret = open (O_BINARY, 0)))
 	    {
 	      if (cmd == GETACL || cmd == GETACLCNT)

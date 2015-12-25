@@ -1,3 +1,9 @@
+2015-12-25  Corinna Vinschen  <corinna@vinschen.de>
+
+	* fhandler_disk_file.cc (fhandler_disk_file::fchmod): Only request
+	query_write_dac rather than query_write_control access when writing
+	an ACL.  Fix a comment.
+
 2015-12-24  Corinna Vinschen  <corinna@vinschen.de>
 
 	* sec_acl.cc (__aclcalcmask): New function to recalculate ACL masks.
