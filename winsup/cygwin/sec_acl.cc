@@ -1699,8 +1699,8 @@ __acltotext (aclent_t *aclbufp, int aclcnt, const char *prefix, char separator,
     {
       _CHK (1);
       *bufp++ = separator;
-      *bufp++ = '\0';
     }
+  *bufp = '\0';
   return strdup (buf);
 }
 
