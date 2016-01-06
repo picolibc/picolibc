@@ -13,7 +13,7 @@ details. */
 #include <unistd.h>
 #include <stdlib.h>
 #include <sys/uio.h>
-#include <sys/acl.h>
+#include <cygwin/acl.h>
 #include <sys/param.h>
 #include "cygerrno.h"
 #include "perprocess.h"

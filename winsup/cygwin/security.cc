@@ -15,7 +15,7 @@ details. */
 #include "winsup.h"
 #include <unistd.h>
 #include <stdlib.h>
-#include <sys/acl.h>
+#include <cygwin/acl.h>
 #include "cygerrno.h"
 #include "security.h"
 #include "path.h"

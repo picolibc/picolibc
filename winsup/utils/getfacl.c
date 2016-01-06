@@ -15,8 +15,7 @@ details. */
 #include <stdio.h>
 #include <unistd.h>
 #include <getopt.h>
-#include <sys/types.h>
-#include <sys/acl.h>
+#include <cygwin/acl.h>
 #include <sys/stat.h>
 #include <cygwin/version.h>
 #include <string.h>
