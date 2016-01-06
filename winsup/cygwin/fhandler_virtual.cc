@@ -10,7 +10,7 @@ Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
 #include "winsup.h"
-#include <sys/acl.h>
+#include <cygwin/acl.h>
 #include <sys/statvfs.h>
 #include "cygerrno.h"
 #include "path.h"

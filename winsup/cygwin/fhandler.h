@@ -56,6 +56,7 @@ typedef struct __DIR DIR;
 struct dirent;
 struct iovec;
 struct acl;
+struct __acl_t;
 
 enum dirent_states
 {
@@ -355,6 +356,8 @@ public:
   virtual int __reg1 fchmod (mode_t mode);
   virtual int __reg2 fchown (uid_t uid, gid_t gid);
   virtual int __reg3 facl (int, int, struct acl *);
+  virtual struct __acl_t * __reg2 acl_get (uint32_t);
+  virtual int __reg3 acl_set (struct __acl_t *, uint32_t);
   virtual ssize_t __reg3 fgetxattr (const char *, void *, size_t);
   virtual int __reg3 fsetxattr (const char *, const void *, size_t, int);
   virtual int __reg3 fadvise (off_t, off_t, int);
@@ -1011,6 +1014,8 @@ class fhandler_disk_file: public fhandler_base
   int __reg1 fchmod (mode_t mode);
   int __reg2 fchown (uid_t uid, gid_t gid);
   int __reg3 facl (int, int, struct acl *);
+  struct __acl_t * __reg2 acl_get (uint32_t);
+  int __reg3 acl_set (struct __acl_t *, uint32_t);
   ssize_t __reg3 fgetxattr (const char *, void *, size_t);
   int __reg3 fsetxattr (const char *, const void *, size_t, int);
   int __reg3 fadvise (off_t, off_t, int);

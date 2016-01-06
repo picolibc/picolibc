@@ -13,7 +13,7 @@ details. */
 
 #include "winsup.h"
 #include <stdlib.h>
-#include <sys/acl.h>
+#include <cygwin/acl.h>
 #include <sys/queue.h>
 #include <authz.h>
 #include <wchar.h>

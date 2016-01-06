@@ -20,8 +20,7 @@ details. */
 #include <getopt.h>
 #include <pwd.h>
 #include <grp.h>
-#include <sys/types.h>
-#include <sys/acl.h>
+#include <cygwin/acl.h>
 #include <cygwin/version.h>
 
 #ifndef BOOL

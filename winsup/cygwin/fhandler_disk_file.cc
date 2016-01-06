@@ -13,7 +13,7 @@ details. */
 #include <winioctl.h>
 #include <lm.h>
 #include <stdlib.h>
-#include <sys/acl.h>
+#include <cygwin/acl.h>
 #include <sys/statvfs.h>
 #include "cygerrno.h"
 #include "security.h"

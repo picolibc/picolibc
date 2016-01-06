@@ -41,7 +41,7 @@
 #include "wininfo.h"
 #include <unistd.h>
 #include <sys/param.h>
-#include <sys/acl.h>
+#include <cygwin/acl.h>
 #include "cygtls.h"
 #include <sys/un.h>
 #include "ntdll.h"

@@ -12,7 +12,7 @@ details. */
 #include "winsup.h"
 #include <stdlib.h>
 #include <sys/param.h>
-#include <sys/acl.h>
+#include <cygwin/acl.h>
 #include <cygwin/kd.h>
 #include "cygerrno.h"
 #include "security.h"
