@@ -48,34 +48,27 @@ acl_init (int count)
   return acl;
 }
 
-static acl_t
-__acl_dup (acl_t acl, int max)
+extern "C" acl_t
+acl_dup (acl_t acl)
 {
   __try
     {
-      acl_t new_acl = acl_init (max);
+      acl_t new_acl = acl_init (acl->max_count);
       if (new_acl)
 	{
-	  int new_idx = 0;
+	  uint16_t new_idx = 0;
 
 	  for (uint16_t idx = 0; idx < acl->count; ++idx)
 	    if (acl->entry[idx].a_type != ACL_DELETED_TAG)
 	      new_acl->entry[new_idx++] = acl->entry[idx];
 	  new_acl->magic = ACL_MAGIC;
 	  new_acl->count = new_idx;
-	  new_acl->max_count = max;
 	  return new_acl;
 	}
     }
   __except (EINVAL) {}
   __endtry
   return NULL;
-}
-
-extern "C" acl_t
-acl_dup (acl_t acl)
-{
-  return __acl_dup (acl, acl->max_count);
 }
 
 extern "C" int
@@ -159,12 +152,14 @@ acl_create_entry (acl_t *acl_p, acl_entry_t *entry_p)
 	}
       if (acl->count >= acl->max_count)
 	{
-	  acl_t new_acl = __acl_dup (acl, acl->count + 1);
-	  if (!new_acl)
+	  aclent_t *new_e;
+
+	  new_e = (aclent_t *) realloc (acl->entry,
+					_ENTRY_SIZE (acl->max_count + 1));
+	  if (!new_e)
 	    __leave;
-	  *acl_p = new_acl;
-	  acl_free (acl);
-	  acl = *acl_p;
+	  acl->entry = new_e;
+	  ++acl->max_count;
 	}
       idx = acl->count++;
       *entry_p = __to_entry (acl, idx);
