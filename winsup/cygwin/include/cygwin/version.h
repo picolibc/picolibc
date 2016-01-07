@@ -474,13 +474,14 @@ details. */
       290: Add sysconf cache handling.
       291: Export aligned_alloc, at_quick_exit, quick_exit.
       292: Export rpmatch.
+      293: Convert utmpname/utmpxname to int.
      */
 
      /* Note that we forgot to bump the api for ualarm, strtoll, strtoull,
 	sigaltstack, sethostname. */
 
 #define CYGWIN_VERSION_API_MAJOR 0
-#define CYGWIN_VERSION_API_MINOR 292
+#define CYGWIN_VERSION_API_MINOR 293
 
      /* There is also a compatibity version number associated with the
 	shared memory regions.  It is incremented when incompatible

@@ -12,6 +12,7 @@
 #include <cygwin/utmp.h>
 #include <sys/time.h>
 
+#define _PATH_UTMPX _PATH_UTMP
 #define UTMPX_FILE _PATH_UTMP
 
 #ifdef __cplusplus
@@ -46,7 +47,7 @@ extern struct utmpx *getutxid (const struct utmpx *id);
 extern struct utmpx *getutxline (const struct utmpx *line);
 extern struct utmpx *pututxline (const struct utmpx *utmpx);
 extern void setutxent (void);
-extern void utmpxname (const char *file);
+extern int utmpxname (const char *file);
 extern void updwtmpx (const char *file, const struct utmpx *utmpx);
 
 #ifdef __cplusplus

@@ -52,6 +52,10 @@ Fix (numeric and monetary) decimal point and thousands separator in
 fa_IR and ps_AF locales to be aligned with Linux.
 </para></listitem>
 
+<listitem><para>
+utmpname/utmpxname are now defined as int functions as on Linux.
+</para></listitem>
+
 </itemizedlist>
 
 </sect2>

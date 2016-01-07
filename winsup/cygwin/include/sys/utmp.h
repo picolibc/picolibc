@@ -40,7 +40,7 @@ extern struct utmp *getutline (const struct utmp *);
 extern struct utmp *pututline (const struct utmp *);
 extern void endutent (void);
 extern void setutent (void);
-extern void utmpname (const char *);
+extern int utmpname (const char *);
 
 void login (const struct utmp *);
 int logout (const char *);
