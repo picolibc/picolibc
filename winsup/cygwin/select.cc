@@ -1631,6 +1631,7 @@ peek_mailslot (select_record *me, bool)
   DWORD msgcnt = 0;
   if (!GetMailslotInfo (h, NULL, NULL, &msgcnt, NULL))
     {
+      me->except_ready = true;
       select_printf ("mailslot %d(%p) error %E", me->fd, h);
       return 1;
     }
