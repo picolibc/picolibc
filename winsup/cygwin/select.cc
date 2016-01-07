@@ -133,7 +133,8 @@ select (int maxfds, fd_set *readfds, fd_set *writefds, fd_set *exceptfds,
 {
   int res = select_stuff::select_loop;
 
-  LONGLONG start_time = gtod.msecs ();	/* Record the current time for later use. */
+  /* Record the current time for later use. */
+  LONGLONG start_time = gtod.msecs ();
 
   select_stuff sel;
   sel.return_on_signal = 0;
@@ -174,15 +175,15 @@ select (int maxfds, fd_set *readfds, fd_set *writefds, fd_set *exceptfds,
 	    pthread::static_cancel_self ();
 	    /*NOTREACHED*/
 	  default:
-	    res = select_stuff::select_set_zero;	/* Set res to zero below. */
+	    res = select_stuff::select_set_zero; /* Set res to zero below. */
 	    break;
 	  }
       else if (sel.always_ready || ms == 0)
-	res = 0;					/* Catch any active fds via
-							   sel.poll() below */
+	res = 0;				 /* Catch any active fds via
+						    sel.poll() below */
       else
-	res = sel.wait (r, w, e, ms);			/* wait for an fd to become
-							   become active or time out */
+	res = sel.wait (r, w, e, ms);		 /* wait for an fd to become
+						    become active or time out */
       select_printf ("res %d", res);
       if (res >= 0)
 	{
@@ -199,7 +200,7 @@ select (int maxfds, fd_set *readfds, fd_set *writefds, fd_set *exceptfds,
 	 all up again.  */
       sel.cleanup ();
       sel.destroy ();
-      /* Recalculate the time remaining to wait if we are going to be looping. */
+      /* Recalculate time remaining to wait if we are going to be looping. */
       if (res == select_stuff::select_loop && ms != INFINITE)
 	{
 	  select_printf ("recalculating ms");
@@ -436,10 +437,10 @@ next_while:;
     default:
       s = &start;
       bool gotone = false;
-      /* Some types of objects (e.g., consoles) wake up on "inappropriate" events
-	 like mouse movements.  The verify function will detect these situations.
-	 If it returns false, then this wakeup was a false alarm and we should go
-	 back to waiting. */
+      /* Some types of objects (e.g., consoles) wake up on "inappropriate"
+	 events like mouse movements.  The verify function will detect these
+	 situations.  If it returns false, then this wakeup was a false alarm
+	 and we should go back to waiting. */
       while ((s = s->next))
 	if (s->saw_error ())
 	  {
