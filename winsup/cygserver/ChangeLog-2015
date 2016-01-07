@@ -1,0 +1,833 @@
+2015-02-23  Corinna Vinschen  <corinna@vinschen.de>
+
+	* pwdgrp.cc: Handle default fetch_user_arg_type_t in switches
+	throughout to silence compiler.
+
+2015-01-28  Corinna Vinschen  <corinna@vinschen.de>
+
+	* Makefile.in: Simplify rule to build dependencies from cygwin dir.
+
+2015-01-19  Corinna Vinschen  <corinna@vinschen.de>
+
+	* bsd_helper.h: Throughout, convert "struct thread" to "class thread".
+	* bsd_mutex.cc (_msleep): Fetch signal_arrived handle from thread's
+	ipcblk.
+	* process.h (class process): Drop _signal_arrived and align methods.
+	(process_cache::process): Drop signal_arrived parameter.
+	* process.cc (process::process): Ditto.  Drop related code.
+	(process::~process): Drop closing signal_arrived handle.
+	(process_cache::process): Drop signal_arrived parameter in call to
+	process::process.
+	(thread::dup_signal_arrived): New method duplicating thread's
+	signal_arrived handle.
+	(thread::close_signal_arrived): New method closing thread's
+	signal_arrived handle.
+	* msg.cc (client_request_msg::serve): Drop signal_arrived parameter from
+	call to process_cache::process. Use thread constructor to initialize td.
+	* sem.cc (client_request_sem::serve): Ditto.
+	* shm.cc (client_request_shm::serve): Ditto.
+
+2014-11-06  Florian Friesdorf  <flo@chaoflow.net>
+
+	* cygserver-config: Add -N option to allow different service name.
+
+2014-08-15  Corinna Vinschen  <corinna@vinschen.de>
+
+	* configure.ac: Convert to new AC_INIT style.
+	* configure: Regenerate.
+
+2014-06-23  Corinna Vinschen  <corinna@vinschen.de>
+
+	* bsd_helper.cc (ipcexit_creat_hookthread): Delete shs in another error
+	case to make Coverity really happy (CID 59993).
+
+2014-06-23  Corinna Vinschen  <corinna@vinschen.de>
+
+	* client.cc: Throughout, fix debug output of signed byte count value.
+
+2014-05-19  Corinna Vinschen  <corinna@vinschen.de>
+
+	* bsd_mutex.cc (msleep_sync_array::~msleep_sync_array): New destructor
+	to make Coverity happy (CID 59838).
+
+2014-05-19  Corinna Vinschen  <corinna@vinschen.de>
+
+	* bsd_helper.cc (ipcexit_creat_hookthread): Delete shs to make
+	Coverity happy (CID 59993).
+	* transport_pipes.cc (transport_layer_pipes::listen): Make listen_pipe
+	and connect_pipe statics to make Coverity happy (CID 60010/60011).
+
+2014-04-16  Corinna Vinschen  <corinna@vinschen.de>
+
+	* pwdgrp.cc (client_request_pwdgrp::pwd_serve): Add 1 to the message
+	length to account for the trailing NUL.
+
+2014-04-16  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygserver-config: Use numeric id 18 instead of "system" in chown.
+
+2014-04-07  Corinna Vinschen  <corinna@vinschen.de>
+
+	* process.cc (process::process): Only notice that signal_arrived is
+	NULL in debug output.
+
+2014-03-12  Corinna Vinschen  <corinna@vinschen.de>
+
+	* Makefile.in (OBJS): Add pwdgrp.o.
+	* client.cc (client_request::handle_request): Handle
+	CYGSERVER_REQUEST_PWDGRP message.
+	* pwdgrp.cc: New file implementing CYGSERVER_REQUEST_PWDGRP.
+
+2014-03-12  Corinna Vinschen  <corinna@vinschen.de>
+
+	* Throughout, fix format specifiers in debug statements to accommodate
+	x86_64.
+
+2014-03-06  Corinna Vinschen  <corinna@vinschen.de>
+
+	* setpwd.cc (client_request_setpwd::serve): Use RtlSecureZeroMemory to
+	delete password from memory.
+
+2013-11-06  Christopher Faylor  <me.cygwin2013@cgf.cx>
+
+	* configure.ac: Detect windows headers/libs after we've figured out the
+	C compiler.
+	* configure: Regenerate.
+	* aclocal.m4: Regenerate.
+
+2013-04-23  Corinna Vinschen  <corinna@vinschen.de>
+
+	* Merge in cygwin-64bit-branch.  See ChangeLog.64bit for details.
+
+2012-11-27  Christopher Faylor  <me.cygwin2012@cgf.cx>
+
+	* Makefile.in: Remove old from CFLAGS and move C*FLAGS so that they can
+	be manipulated by Makefile.common.
+
+2012-11-26  Christopher Faylor  <me.cygwin2012@cgf.cx>
+
+	* configure.ac: Rename from configure.in.
+	* configure.in: Delete.
+	* configure: Regenerate.
+
+2012-11-26  Corinna Vinschen  <corinna@vinschen.de>
+
+	* transport_pipes.cc (pipe_instance_lock_once): Remove.
+	(pipe_instance_lock): Remove.
+	(pipe_instance): Remove.
+	(initialise_pipe_instance_lock): Remove.
+	(transport_layer_pipes::accept): Drop entire pipe_instance handling.
+	(transport_layer_pipes::close): Ditto.
+
+2012-11-23  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygserver.cc (main): Call listen right after creating the
+	transport.
+	* transport_pipes.cc (transport_layer_pipes::listen): Create
+	first instance of the named pipe here.  Connect the client side
+	to block it for further use by the system.
+	(transport_layer_pipes::accept): Don't handle first pipe instance
+	here.  Change debug output accordingly.
+
+2012-11-23  Christopher Faylor  <me.cygwin2012@cgf.cx>
+
+	* Makefile.in: Use /bin/mkdir to make install directories.
+
+2012-11-23  Corinna Vinschen  <corinna@vinschen.de>
+
+	* sysv_sem.cc (semundo_clear): Move condition to break from
+	inner loop to the right spot.
+
+2012-11-12  Christopher Faylor  <me.cygwin2012@cgf.cx>
+
+	* Makefile.in: Revamp for new configury.
+	* configure.in: Revamp for new configury.
+	* aclocal.m4: Regenerate.
+	* configure: Ditto.
+	* autogen.sh: New script.
+
+2012-10-25  Corinna Vinschen  <corinna@vinschen.de>
+
+	* bsd_helper.cc (adjust_identity_info): Fix typo in log message.
+
+2012-07-19  Corinna Vinschen  <corinna@vinschen.de>
+
+	* woutsup.h: Just include winlean.h.
+
+2012-03-19  Christopher Faylor  <me.cygwin2012@cgf.cx>
+
+	* client.cc: Revert sigproc.h inclusion since it was fixed elsewhere.
+
+2012-03-19  Corinna Vinschen  <corinna@vinschen.de>
+
+	* client.cc: Include sigproc.h if __INSIDE_CYGWIN__ is defined.
+
+2012-03-19  Christopher Faylor  <me.cygwin2012@cgf.cx>
+
+	* client.cc: Remove unneeded #include "sigproc.h".
+
+2012-02-14  Corinna Vinschen  <corinna@vinschen.de>
+
+	* transport_pipes.cc (transport_layer_pipes::transport_layer_pipes):
+	Always use cygwin_internal to fetch installation key.
+
+2011-10-10  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygserver.cc (print_usage): Align output to utilities in utils
+	directory.
+	(print_version): Ditto.
+
+2011-08-18  Yaakov Selkowitz  <yselkowitz@users.sourceforge.net>
+
+	* sysv_shm.cc (ACCESSPERMS): Remove to fix redefined warning, as
+	this is now defined in <sys/stat.h>.
+
+2011-02-07  Corinna Vinschen  <corinna@vinschen.de>
+
+	* configure.in: Remove AC_ALLOCA test and test for __builtin_memset.
+	* configure: Regenerate.
+
+2010-04-19  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* transport_pipes.cc: Include ntdef.h to accommodate cygerrno.h.
+
+2009-11-16  Corinna Vinschen  <corinna@vinschen.de>
+
+	* Makefile.in (cygserver.exe): Link with -static to avoid linking
+	against cygstdc++-6.dll due to references to __cxa_pure_virtual.
+
+2009-11-06  Corinna Vinschen  <corinna@vinschen.de>
+
+	* transport_pipes.cc (transport_layer_pipes::transport_layer_pipes):
+	Check cygwin_internal for returning 0 rather than for != 0.
+	(transport_layer_pipes::accept): Add debug output.
+	(transport_layer_pipes::connect): Ditto.
+
+2009-10-31  Corinna Vinschen  <corinna@vinschen.de>
+
+	* transport_pipes.h (PIPE_NAME_PREFIX): New define.
+	(PIPE_NAME_SUFFIX): Ditto.
+	(class transport_layer_pipes): Convert _pipe_name from char pointer
+	to wchar_t array.
+	* transport_pipes.cc (transport_layer_pipes::transport_layer_pipes):
+	Accommodate the fact that _pipe_name is a wchar_t array, rather than
+	a char pointer.
+	(transport_layer_pipes::transport_layer_pipes): Initialize _pipe_name
+	with variable pipe name based in installation key fetched from Cygwin
+	DLL.
+	(transport_layer_pipes::accept): Call CreateNamedPipeW explicitely.
+	(transport_layer_pipes::connect): Call CreateFileW and WaitNamedPipeW
+	explicitely.
+
+2009-08-18  Corinna Vinschen  <corinna@vinschen.de>
+
+	* Makefile.in (CXXFLAGS): Allow override.
+
+2009-03-26  Yaakov Selkowitz  <yselkowitz@cygwin.com>
+
+	* README: Remove "How to use" section, as CYGWIN="server" is
+	no longer required.
+
+2009-03-20  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygserver-config: Remove misleading text describing the
+	"CYGWIN=server" setting for the client.
+
+2009-02-23  Sjors Gielen <mailinglist@dazjorz.com>
+
+	* Makefile.in: Add DESTDIR functionality.
+
+2009-01-21  Corinna Vinschen  <corinna@vinschen.de>
+
+	* client.cc (allow_server): Remove variable.
+	(client_request_get_version::client_request_get_version): Drop checking
+	allow_server.
+
+2009-01-03  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* Makefile.in (CFLAGS): Look in cygwin's build directory for header
+	files.
+
+2008-12-15  Corinna Vinschen  <corinna@vinschen.de>
+
+	* setpwd.cc (client_request_setpwd::serve): Don't treat removing
+	non-existant private data as error.
+
+2008-12-15  Corinna Vinschen  <corinna@vinschen.de>
+
+	* setpwd.cc (client_request_setpwd::serve): Explicitely erase password
+	buffer content after usage.
+
+2008-11-26  Corinna Vinschen  <corinna@vinschen.de>
+
+	* Makefile.in (OBJS): Add setpwd.o.
+	* README: Explain new service to store passwords in the LSA registry
+	area.
+	* bsd_helper.cc (get_token_info): Make externally available.
+	* bsd_helper.h (get_token_info): Declare.
+	* client.cc (client_request::handle_request): Add case for
+	CYGSERVER_REQUEST_SETPWD request.
+	* setpwd.cc: New file implementing the CYGSERVER_REQUEST_SETPWD
+	request.
+
+2008-10-30  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* Makefile.in: Use -static-libgcc when creating cygserver.exe.
+
+2008-04-30  Corinna Vinschen  <corinna@vinschen.de>
+
+	* sysv_msg.cc: Add fix from upstream version 1.65.
+	(msgsnd): Call msleep with timeout value.  Handle EWOULDBLOCK.  Make
+	sure it's clear from where msleep has been called in debug output.
+	(msgrcv): Make sure it's clear from where msleep has been called in
+	debug output.
+
+2008-02-06  Corinna Vinschen  <corinna@vinschen.de>
+
+	* bsd_helper.cc: Replace %E __small_printf format specifier with %lu
+	and call to GetLastError throughout.
+	* bsd_mutex.cc: Ditto.
+	* sysv_sem.cc (semget): Replace %X __small_printf format specifier
+	with %llx.
+
+2008-02-06  Corinna Vinschen  <corinna@vinschen.de>
+
+	Remove dependency from Cygwin internal code.
+	* Makefile.in (CYGWIN_OBJS): Remove smallprint.o.
+	(cygserver.exe): Remove strfuncs.o
+	(strfuncs.o): Drop rule.
+	* bsd_log.cc (_vlog): Use snprintf/vsnprintf instead of
+	__small_sprintf/__small_vsprintf.
+	* sysv_sem.cc (seminit): Use sys_malloc instead of malloc.  Use
+	snprintf instead of __small_sprintf.
+	(semunload): Free the above allocated sema_mtx names here.
+
+2008-02-03  Brian Dessent  <brian@dessent.net>
+
+	* Makefile.in: Don't link strfuncs.o from the Cygwin build dir.
+	Build it again with __OUTSIDE_CYGWIN__ defined.
+
+2007-11-05  Corinna Vinschen  <corinna@vinschen.de>
+
+	* bsd_helper.cc (tunable_params): Add kern.ipc.shm_allow_removed as
+	bool parameter.
+	* cygserver.conf: Add a description for the kern.ipc.shm_allow_removed
+	parameter.
+	* sysv_shm.cc (shminit): Set shm_allow_removed variable according to
+	kern.ipc.shm_allow_removed setting.
+
+2007-08-02  Corinna Vinschen  <corinna@vinschen.de>
+
+	* smallprint.c: Remove.
+
+2007-08-02  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* Makefile.in: Add -lntdll to link line.
+	(CYGWIN_OBJS): Include strfuncs.o.
+
+2007-08-02  Corinna Vinschen  <corinna@vinschen.de>
+
+	* smallprint.c: New file.
+	* Makefile.in (OBJS): Add smallprint.o.
+	(CYGWIN_OBJS): Remove smallprint.o from Cygwin dir.
+
+2007-07-21  Corinna Vinschen  <corinna@vinschen.de>
+
+	* bsd_helper.cc: Drop unnecessary security.h include.
+
+2007-02-23  Corinna Vinschen  <corinna@vinschen.de>
+
+	Throughout remove using wincap.
+	* Makefile.in (OBJS): Remove wincap.o.
+	* README: Don't mention 9x.
+	* bsd_mutex.cc (_mtx_unlock): Drop checking for 9x error codes.
+	* cygserver.cc (server_submission_loop::request_loop): Add FIXME
+	comment.
+	* wincap.cc: Remove.
+	* wincap.h: Remove.
+	* woutsup.h: Don't include wincap.h.
+
+2007-02-22  Corinna Vinschen  <corinna@vinschen.de>
+
+	* Makefile.in (OBJS): Drop transport_sockets.o.
+	* sysv_shm.cc (shmget_allocate_segment): Remove spurious cast.
+	* transport.cc: Don't include transport_sockets.h.
+	(create_server_transport): Always create transport_layer_pipes.
+	* transport_sockets.cc: Remove.
+	* transport_sockets.h: Remove.
+
+2006-05-24  Christopher Faylor  <cgf@timesys.com>
+
+	* configure.in: Update to newer autoconf.
+	(thanks to Steve Ellcey)
+	* configure: Regenerate.
+	* aclocal.m4: New file.
+
+2006-01-12  Corinna Vinschen  <corinna@vinschen.de>
+
+	* wincap.cc: New file.
+	* wincap.h: New file.
+	* Makefile.in: Accomodate having our own wincap implementation now.
+
+2006-01-09  Corinna Vinschen  <corinna@vinschen.de>
+
+	Check FreeBSD upstream changes and apply important patches.
+	* sysv_sem.cc (__semctl): Check copyin return value (from 1.76).
+	* sysv_shm.cc (shminit): Actually use the iterating variable in the
+	for loop when trying to avoid overflow (from 1.102).
+
+2005-11-10  Corinna Vinschen  <corinna@vinschen.de>
+
+	* bsd_helper.cc (securityinit): New function.  Move initialization
+	of security related variables from ipcinit here.
+	* bsd_helper.h (securityinit): Add prototype.
+	* cygserver.cc (main): Call securityinit right after wincap.init.
+
+2005-11-10  Corinna Vinschen  <corinna@vinschen.de>
+
+	* bsd_log.cc (_vpanic): LOG_EMERG is overkill, use LOG_CRIT.
+
+2005-11-09  Corinna Vinschen  <corinna@vinschen.de>
+
+	* process.cc (process_cache::process): Fix maximum process condition.
+
+2005-10-24  Corinna Vinschen  <corinna@vinschen.de>
+
+	* README: Add description for new -p/--process-cache option.
+	* bsd_helper.cc (default_tun_check): Add kern.srv.process_cache_size
+	entry to tunable_params. Set max value of kern.srv.request_threads
+	to 310.
+	* cygserver.cc (SERVER_VERSION): Set to 1.20.
+	(print_usage): Print usage of new parameter -p.
+	(main): Add process cache parameter handling. Accomodate new max
+	value of request threads.
+	* cygserver.conf: Add kern.srv.process_cache_size tunable parameter.
+	Accomodate new max value of kern.srv.request_threads.
+	* process.cc: Fix a comment.
+	(process_cache::process_cache): Add max process cache size parameter.
+	Change _cache_add_trigger to manual reset event.
+	(struct pcache_wait_t): New struct used as parameter to
+	pcache_wait_thread.
+	(pcache_wait_thread): New thread function used for threaded process
+	cache.
+	(process_cache::wait_for_processes): Use threaded waiting if number
+	of processes to wait for is bigger than 62. Always check all processes
+	to avoid race under heavy load.
+	(process_cache::sync_wait_array): Remove useless assert. Reset
+	_cache_add_trigger right at the start since it's manual reset now.
+	Accomodate threaded waiting.
+	* process.h (process_cache::process_cache): Add max_procs parameter.
+	(process_cache::_max_process_count): New member.
+	(process_cache::_wait_array: Raise to allow up to 5 wait threads.
+	(process_cache::_process_array): Ditto.
+
+2005-08-08  Christopher Faylor  <cgf@timesys.com>
+
+	* cygserver.cc (main): Call wincap.init() earlier to avoid a NULL
+	dereference.
+
+2005-06-14  Corinna Vinschen  <corinna@vinschen.de>
+
+	* sysv_sem.cc (semu_list): Define static to avoid gcc 4.x compiler
+	warning.
+
+2005-04-08  Corinna Vinschen  <corinna@vinschen.de>
+
+	* bsd_mutex.cc (msleep_cnt): Remove.
+	(msleep_max_cnt): Remove.
+	(msleep_arr): Remove.
+	(class msleep_sync_array): New class to encapsulate msleep/wakeup
+	thread synchronization.
+	(msleep_sync): New object pointer.
+	(msleep_init): Initialize new msleep_sync object.
+	(_mutex): Just call msleep_sync->enter() and msleep_sync->leave() for
+	thread synchronization. Improve debug output a bit more.
+	(wakeup): Just call msleep_sync->wakeup().
+	(wakeup_all): Whitespace fix.
+
+2005-04-06  Corinna Vinschen  <corinna@vinschen.de>
+
+	* bsd_helper.cc (ipcexit_hookthread): Fix whitespace and handle leak.
+	* bsd_mutex.cc: Include stdlib.h, sys/msg.h and sys/sem.h.
+	(mtx_init): Initialize lock counter to 0.
+	(_mtx_lock): Increment and log mutex lock counter.
+	(mtx_owned): Add winpid argument. Return true only if mutex is
+	actually owned by process winpid.
+	(_mtx_assert): Add winpid argument accordingly.
+	(_mtx_unlock): Log owner and lock count.
+	(MSLEEP_MUTEX): Remove.
+	(MSLEEP_SEM): Ditto.
+	(MSLEEP_EVENT): Ditto.
+	(msleep_event_name): Ditto.
+	(msleep_cs): New global critical section.
+	(msleep_cnt): New global variable indicating msleep record usage.
+	(msleep_max_cnt): New global variable indicating msleep record size.
+	(msleep_arr): New global pointer to msleep records.
+	(msleep_init): Initialize msleep_cs. Allocate msleep_arr array.
+	(_msleep): Rewrite using new msleep_cs/msleep_arr based thread
+	synchronization. Don't be shy with debug output.
+	(wakeup): Rewrite using new msleep_cs/msleep_arr based thread
+	synchronization.
+	* bsd_mutex.h (struct mtx): Add lock counter for better debugging.
+	(mtx_owned): Declare with winpid argument.
+	(_mtx_assert): Ditto.
+	(mtx_assert): Define with winpid argument.
+	* cygserver.cc (version): Remove.
+	(SERVER_VERSION): New define, decoupling server version information
+	from source code control system.
+	(print_version): Simplify printing server version.
+	* process.cc (process::process): Fix wrong bracketing (and handle leak).
+	(process::~process): Only try to close _signal_arrived if valid.
+	* sysv_sem.cc: Include sys/smallprint.h.
+	(semundo_clear): Define with additional struct thread pointer argument.
+	Accomodate throughout.
+	(SEMUNDO_LOCKASSERT): Define with winpid argument. Accomodate
+	throughout.
+	(struct sem_undo): Define un_proc as pid_t on Cygwin. Accomodate
+	throughout.
+	(seminit): Improve debugging by adding the semid to the mutex name.
+	(semget): Correctly print key value as 64 bit hex value in debug
+	output.
+	(semexit_myhook): Remove Cygwin specific unlocking of mutexes owned
+	by exiting process.  Keep semaphore global lock throughout whole
+	function to avoid races.
+	* sysv_shm.cc (GIANT_REQUIRED): Define empty on Cygwin. We know that
+	Giant is locked.
+
+2005-04-01  Corinna Vinschen  <corinna@vinschen.de>
+
+	* bsd_mutex.cc (_msleep): Whitespace fix.
+	* process.cc (process::process): Handle invalid signal_arrived values
+	more gracefully.
+
+2004-12-30  Corinna Vinschen  <corinna@vinschen.de>
+
+	* bsd_mutex.cc: Include limits.h.
+	(MSLEEP_MUTEX): New define for third parameter to msleep_event_name.
+	(MSLEEP_SEM): Ditto.
+	(MSLEEP_EVENT): Ditto.
+	(msleep_event_name): Add third parameter to allow multiple
+	synchronization objects per ident.
+	(_msleep): Implement new synchronization technique to make sure
+	that all threads have been woken up by a corresponding wakeup call.
+	(wakeup): Ditto.
+
+2004-10-18  Corinna Vinschen  <corinna@vinschen.de>
+
+	* sysv_sem.cc: Redefine offsetof to circumvent build problems with
+	gcc 3.4.
+
+2004-10-04  Corinna Vinschen  <corinna@vinschen.de>
+
+	* bsd_mutex.cc (_msleep): Simplify event creation.  Revert change from
+	2004-08-24.  It should be unnecessary now.
+	* msg.cc (client_request_msg::serve): Release process critical
+	section as early as possible.
+	* sem.cc (client_request_sem::serve): Ditto.
+	* shm.cc (client_request_shm::serve): Ditto.
+	* process.cc: Use hold and release method calls instead of
+	EnterCriticalSection/LeaveCriticalSection calls throughout.
+	* process.h (_hold): Rename from hold.  Take filename and linenumber
+	parameter for logging.  Define matching hold macro.
+	(release): Ditto.
+
+2004-10-01  Corinna Vinschen  <corinna@vinschen.de>
+
+	* sysv_sem.cc: Update to FreeBSD version 1.69.
+	1.68: Reduce the overhead of semop() by using the kernel stack
+	instead of malloc'd memory to store the operations array if it
+	is small enough to fit.
+	1.69: Adjust the number of processes waiting on a semaphore properly
+	if we're woken up in the middle of sleeping.
+
+2004-09-23  Corinna Vinschen  <corinna@vinschen.de>
+
+	* sysv_shm.cc (kern_shmat): Avoid compiler warning.
+
+2004-09-21  Corinna Vinschen  <corinna@vinschen.de>
+
+	* sysv_shm.cc (vm_object_reference): remove Cygwin specific define.
+	(vm_map_find): Ditto.
+	(vm_map_inherit): Ditto.
+	(kern_shmat): On Cygwin, take shmaddr just as is.  Don't call vm
+	system calls on Cygwin.  Add comment.
+
+2004-09-15  Corinna Vinschen  <corinna@vinschen.de>
+
+	Fix copyright throughout.
+	Eliminate use of _impure_ptr outside Cygwin.
+	* bsd_helper.cc: Include errno.h instead of cygerrno.h.
+	* bsd_mutex.cc : Ditto.
+	* client.cc: Ditto.
+	* cygserver.cc: Ditto.
+	* process.cc: Don't build functions inside Cygwin.  Don't include
+	cygerrno.h.  Don't set errno.
+	* transport_pipes.cc (SET_ERRNO): New define.  Use througout.
+	* transport_sockets.cc (SET_ERRNO): Ditto.
+	(GET_ERRNO): Ditto.
+
+2004-09-06  Corinna Vinschen  <corinna@vinschen.de>
+
+	* bsd_mutex.cc (_msleep): Disable resetting event object for now.
+
+2004-08-31  Corinna Vinschen  <corinna@vinschen.de>
+
+	* sysv_shm.cc (kern_shmat): Add debug_printf's.
+
+2004-08-24  Corinna Vinschen  <corinna@vinschen.de>
+
+	* bsd_mutex.cc (_msleep): Release process object while waiting.
+
+2004-08-03  Corinna Vinschen  <corinna@vinschen.de>
+
+	* transport.cc (transport_layer_base::~transport_layer_base): Resurrect.
+	* transport.h (transport_layer_base::~transport_layer_base): Ditto.
+
+2004-07-30  Corinna Vinschen  <corinna@vinschen.de>
+
+	* bsd_mutex.cc (_msleep): Reset event object and close it before
+	entering mutex.  Turn order of conditional for better readability.
+
+2004-07-26  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygserver.conf: Describe relation between shmmaxpgs and SHMMAX.
+
+2004-07-20  Corinna Vinschen  <corinna@vinschen.de>
+
+	* bsd_helper.cc: Whitespace fixes.
+	* bsd_mutex.cc: Ditto.
+
+2004-07-19  Corinna Vinschen  <corinna@vinschen.de>
+
+	* transport.cc (transport_layer_base::~transport_layer_base): Remove.
+	* transport.h (transport_layer_base::~transport_layer_base): Ditto.
+
+2004-07-19  Corinna Vinschen  <corinna@vinschen.de>
+
+	* bsd_mutex.cc (win_priority): Actually calculate p from priority.
+
+2004-06-03  Corinna Vinschen  <corinna@vinschen.de>
+
+	* shm.cc (shmget): Explicitely set td_retval[0] to -1 on error.
+
+2004-03-30  Corinna Vinschen  <corinna@vinschen.de>
+
+	* sysv_shm.cc (shmget): Allow to retrieve shared memory segments
+	by shmid when IPC_KEY_IS_SHMID is set.
+
+2004-03-02  Corinna Vinschen  <corinna@vinschen.de>
+
+	* sysv_sem.cc (semundo_adjust): Check for process id instead of
+	process struct pointer, which isn't fixed under Cygwin.
+	(semexit_myhook): Ditto.  Adjust debug print statements to print
+	Cygwin and Windows PIDs instead of process pointer under Cygwin.
+
+2004-02-07  Corinna Vinschen  <corinna@vinschen.de>
+
+	* bsd_mutex.cc (win_priority): Move to msleep helper function section.
+	(set_priority): Ditto. Fix formatting.
+	(_msleep): Cleanup obj formatting.  Rearrange obj order.
+
+2004-02-06  Corinna Vinschen  <corinna@vinschen.de>
+
+	* bsd_mutex.cc (_msleep): Handle PCATCH using signal_arrived event.
+	* client.cc: Include sigproc.h.
+	* msg.cc (client_request_msg::serve): Accomodate third parameter to
+	process::process.
+	* sem.cc (client_request_sem::serve): Ditto.
+	* shm.cc (client_request_shm::serve): Ditto.
+	* process.cc (process::process): Duplicate signal_arrived into
+	Cygserver process space.
+	(process::~process): Close _signal_arrived handle.
+	(process_cache::process): Add signal_arrived handling.
+	* process.h (process::process): Add signal_arrived parameter.
+	(process:signal_arrived): New read accessor.
+	(process:_signal_arrived): New member.
+	(process_cache::process): Add signal_arrived parameter.
+
+2004-01-16  Corinna Vinschen  <corinna@vinschen.de>
+
+	* process.h (cleanup_routine::~cleanup_routine): Make pure virtual
+	function to avoid miscompilation with certain versions of gcc.
+	* process.cc (cleanup_routine::~cleanup_routine): Remove.
+
+2003-12-26  Christopher Faylor  <cgf@redhat.com>
+
+	* Makefile.in (CFLAGS, CXXFLAGS): Remove unneeded include.
+	(CYGWIN_LIB): Delete.
+	(cygserver.exe target): Add -L$(cygwin_build) to the link line to force
+	linker to use build tree version of the library.  Remove specific
+	inclusion of libcygwin.a from the link line.
+
+2003-12-16  Corinna Vinschen  <corinna@vinschen.de>
+
+	* bsd_helper.cc (tunable_params): Add entries for kern.ipc.msgmnb and
+	kern.ipc.msgtql.  Raise max value for kern.ipc.msgseg to 65535.
+	* cygserver.conf: Add kern.ipc.msgmnb and kern.ipc.msgtql.
+	* sysv_msg.cc (msginit): Add TUNABLE_INT_FETCH call for
+	kern.ipc.msgmnb and kern.ipc.msgtql.
+
+2003-11-26  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygserver.cc (main): Move call to ipcinit() up before installing
+	any threads.
+	* sysv_sem.cc: Update to FreeBSD version 1.67.
+	(seminit): Initialize semaphore sequence numbers to 0.
+
+2003-11-26  Corinna Vinschen  <corinna@vinschen.de>
+
+	* Makefile.in (CYGWIN_LIB): Variable pointing to libcygwin.a in
+	the parallel cygwin dir.
+	(cygserver.exe): Depend on and link against $CYGWIN_LIB.
+
+2003-11-25  Christopher Faylor  <cgf@redhat.com>
+
+	* Makefile.in (CXXFLAGS): Remove duplicate options handled in
+	Makefile.common.
+
+2003-11-22  Corinna Vinschen  <corinna@vinschen.de>
+
+	* msg.cc (client_request_msg::serve): Add default case to msgop switch.
+	* sem.cc (client_request_sem::serve): Add default case to semop switch.
+	* shm.cc (client_request_shm::serve): Add default case to shmop switch.
+
+2003-11-21  Corinna Vinschen  <corinna@vinschen.de>
+
+	* Makefile.in (install): Explicitely create directories.  Install
+	README to $(prefix)/share/doc/Cygwin.
+	* README: New file.
+
+2003-11-21  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygserver.cc (print_usage): Fix scrambled output.
+
+2003-11-20  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cygserver-config: Slightly modify printed message.
+
+2003-11-20  Corinna Vinschen  <corinna@vinschen.de>
+
+	* Makefile.in (install): Install cygserver-config script to bindir.
+	* cygserver-config: New script.
+
+2003-11-19  Corinna Vinschen  <corinna@vinschen.de>
+
+	Don't use safe_new but new throughout.  Fix copyright dates
+	throughout.
+	* Makefile.in: Accomodate all new files and name changes.
+	Add a *.d dependency.
+	(sbindir): Add.
+	(etcdir): Drop in favor of more appropriate sysconfdir definition.
+	(sysconfdir): Add.
+	(CXXFLAGS): Add -MMD flag. Add SYSCONFDIR definition.
+	(.SUFFIXES): Add.
+	(install): Add action items.
+	(libclean): New target.
+	(fullclean): Ditto.
+	* bsd_helper.cc: New file.
+	* bsd_helper.h: Ditto.
+	* bsd_log.cc: Ditto.
+	* bsd_log.h: Ditto.
+	* bsd_mutex.cc: Ditto.
+	* bsd_mutex.h: Ditto.
+	* client.cc: Rearrange to build as less as possible if
+	__INSIDE_CYGWIN__.
+	(client_request::handle_request): Add Message Queue and Semaphore
+	handling.
+	* cygserver.cc: Rearrange to build as less as possible if
+	__INSIDE_CYGWIN__. Use new debug/log/panic logging functions.
+	(DEF_CONFIG_FILE): New definition for configuration file.  Use
+	throughout.
+	(getfunc): Remove.
+	(__cygserver__printf): Remove.
+	(client_request_attach_tty::serve): Return error if impersonation
+	fails.
+	(print_usage): Pump up help message.
+	(print_version): Add output of default configuration file.
+	(main): Accommodate new options.  Allow overwrite of threading options
+	from config file.  Call several new initialization functions.  Drop
+	printing dots.  Don't define SIGHANDLE inline.
+	* cygserver.conf: New file.
+	* cygserver_process.h: Rename to process.h.
+	* cygserver_transport.h: Rename to transport.h.
+	* cygserver_transport_pipes.h: Rename to transport_pipes.h.
+	* cygserver_transport_sockets.h: Rename to transport_sockets.h.
+	* msg.cc: Rewrite.
+	* sem.cc: Rewrite.
+	* shm.cc: Rewrite.
+	* sysv_msg.cc: New file, derived from FreeBSD version 1.52.
+	* sysv_sem.cc: New file, derived from FreeBSD version 1.66.
+	* sysv_shm.cc: New file, derived from FreeBSD version 1.89.
+	* threaded_queue.cc: Rearrange to build as less as possible if
+	__INSIDE_CYGWIN__.
+	* transport.cc (transport_layer_base::impersonate_client): Define bool.
+	(transport_layer_base::revert_to_self): Ditto.
+	* transport.h (transport_layer_base::impersonate_client): Declare bool.
+	(transport_layer_base::revert_to_self): Ditto.
+	* transport_pipes.cc (transport_layer_pipes::transport_layer_pipes):
+	Don't call init_security.
+	(init_security): Remove.
+	(transport_layer_pipes::accept): Use global sec_all_nih.
+	(transport_layer_pipes::connect): Ditto.
+	(transport_layer_pipes::impersonate_client): Define bool.
+	(transport_layer_pipes::revert_to_self): Ditt.
+	* transport_pipes.h (transport_layer_pipes::impersonate_client): Declare
+	bool.
+	(transport_layer_pipes::revert_to_self): Ditto.
+	* woutsup.h: Include bsd compatibility headers.
+	(SIGHANDLE): Add definition.
+	(__cygserver__printf): Remove definition.
+	(__noop_printf): Ditto.
+	(debug_printf): Define using debug.
+	(syscall_printf): Define using log.
+	(system_printf): Ditto.
+	Drop all other _printf definitions.
+
+2003-10-22  Corinna Vinschen  <corinna@vinschen.de>
+
+	Accomodate moving cygserver header files from cygwin/include/cygwin
+	to here and cygwin dir.
+	* Makefile.in (EXEEXT): Drop as unused.
+	(EXEEXT_FOR_BUILD): Ditto.
+	(all): Don't build libcygserver.a.
+	* cygserver_process.h: Moved from cygwin/include/cygwin to here.
+	* cygserver_transport.h: Ditto.
+	* cygserver_transport_pipes.h: Ditto.
+	* cygserver_transport_sockets.h: Ditto.
+	* ipc.h: Moved to ../cygwin and renamed to cygserver_ipc.h.
+	* shm.h: Moved to ../cygwin and renamed to cygserver_shm.h.
+
+2003-08-30  Christopher Faylor  <cgf@redhat.com>
+
+	* msg.cc: New file.
+	* sem.cc: Ditto.
+
+2003-08-30  Christopher Faylor  <cgf@redhat.com>
+
+	* threaded_queue.h: New file.
+
+2003-08-25  Christopher Faylor  <cgf@redhat.com>
+
+	* Makefile.in: Build libcygserver.a.
+	* client.cc: Rename allow_daemon to allow_server.
+
+2003-07-25  Christopher Faylor  <cgf@redhat.com>
+
+	* configure.in: Use 'install-sh -c'.
+	* configure: Regenerate.
+
+2003-07-25  Christopher Faylor  <cgf@redhat.com>
+
+	* configure.in: Always use install-sh.
+	* configure: Regenerate.
+
+2003-07-01  Christopher Faylor  <cgf@redhat.com>
+
+	* Makefile.in (OBJS): Move some more files from cygwin directory.
+	* woutsup.h: Define _MT_SAFE.
+
+2003-07-01  Christopher Faylor  <cgf@redhat.com>
+
+	* configure.in: First pass.
+	* Makefile.in: Ditto.
+	* configure: Generate.

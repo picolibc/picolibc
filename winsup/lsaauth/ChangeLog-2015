@@ -1,0 +1,170 @@
+2014-08-15  Corinna Vinschen  <corinna@vinschen.de>
+
+	* configure.ac: Convert to new AC_INIT style.
+	* configure: Regenerate.
+
+2013-12-03  Christopher Faylor  <me.cygwin2013@cgf.cx>
+
+	* configure.ac: Back out stupid change.
+	* configure: Regenerate.
+
+2013-12-03  Christopher Faylor  <me.cygwin2013@cgf.cx>
+
+	* configure.ac: Don't require 64-bit compiler for 32-bit builds.
+	* configure: Regenerate.
+
+2013-07-29  Corinna Vinschen  <corinna@vinschen.de>
+
+	* Makefile.in (cyglsa.dll): Explicitely specify DLL entry point to
+	harden against gcc function and block reordering optimizations.
+	(cyglsa64.dll): Ditto.
+
+2013-04-23  Corinna Vinschen  <corinna@vinschen.de>
+
+	* Merge in cygwin-64bit-branch.  See ChangeLog.64bit for details.
+
+2012-11-26  Christopher Faylor  <me.cygwin2012@cgf.cx>
+
+	* configure.ac: Rename from configure.in.
+	* configure.in: Delete.
+	* configure: Regenerate.
+
+2012-11-23  Christopher Faylor  <me.cygwin2012@cgf.cx>
+
+	* Makefile.in: Use /bin/mkdir to make directories.
+
+2012-10-24  Corinna Vinschen  <corinna@vinschen.de>
+
+	* configure.in: Add AC_NO_EXECUTABLES.
+	* configure: Regenerate.
+
+2012-10-24  Kai Tietz  <ktietz70@googlemail.com>
+	    Yaakov Selkowitz  <yselkowitz@users.sourceforge.net>
+
+	* configure.in: Check for MINGW32_CC and MINGW64_CC.
+	* configure: Regenerate.
+	* Makefile.in: Use MINGW32_CC and MINGW64_CC to build 32-bit and
+	64-bit DLLs.  Remove references to mingw and w32api directories.
+	* cyglsa64.dll: Remove from version control.
+	* make-64bit-version-with-mingw-w64.sh: Remove.
+
+2012-05-29  Corinna Vinschen  <corinna@vinschen.de>
+
+	* Makefile.in (LIBS): Re-add advapi32.dll.  Explain why.
+	* make-64bit-version-with-mingw-w64.sh (LIBS): Ditto.
+	* cyglsa.c: Drop NTDLL function declarations.  Use equivalent advapi32
+	functions again, throughout.
+	* cyglsa64.dll: Regenerate.
+
+2011-05-10  Corinna Vinschen  <corinna@vinschen.de>
+
+	* Makefile.in: Don't override CC.
+	* cyglsa.c: Don't include wchar.h.  Declare wcscpy and wcslen instead.
+	* cyglsa64.dll: Rebuild.
+
+2011-03-31  Corinna Vinschen  <corinna@vinschen.de>
+
+	* Makefile.in (LIBS): Remove advapi32.dll.
+	(clean): Remove cyglsa.def.
+	* cyglsa.c: Drop definitions required for VC++.  Don't include ntddk.h.
+	Declare functions from NTDLL here.  Explain why.  Use NTDLL functions
+	in place of ADVAPI32 functions.
+	* cyglsa64.def: New file.
+	* cyglsa64.dll: Regenerate.
+	* make-64bit-version-with-mingw-w64.sh (LIBS): Remove advapi32.dll.
+	Reference cyglsa64.def instead of mslsa.def.
+	* make-64bit-version-with-visual-c.bat: Remove.
+	* mslsa.def: Remove.
+
+2011-03-31  Yaakov Selkowitz  <yselkowitz@users.sourceforge.net>
+
+	* cyglsa.c: Fix compilation with MinGW-w64 toolchains.
+	* make-64bit-version-with-mingw-w64.sh: New file.
+	* cyglsa64.dll: Regenerate with MinGW-w64-gc.
+
+2010-12-10  Illia Bobyr <Illia.Bobyr@ronin-capital.com>
+
+	* cyglsa-config: Unset GREP_OPTIONS when calling grep.
+
+2010-01-29  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cyglsa.c: Include lmcons.h instead of lm.h to make newer WinDDK happy.
+	(LsaApLogonUserEx): Use CYG_LSA_MAGIC as checksum start value to 
+	decouple from Cygwin release.
+	* make-64bit-version-with-visual-c.bat: Avoid compiler warning.
+	* cyglsa64.dll: New build.
+
+2009-02-23  Sjors Gielen <mailinglist@dazjorz.com>
+
+	* Makefile.in: Add DESTDIR functionality.
+
+2008-10-12  Christopher Faylor  <me+cygwin@cgf.cx>
+
+	* Makefile.in: Rearrange to avoid -mno-cygwin.
+	* configure.in: Use mingw front-end from utils directory as compiler
+	front-end.
+	* configure: Regenerate.
+	* cyglsa.c (cyglsa_printf): Rename from 'printf' to avoid a compiler
+	error.
+	(print_sid, print_groups, print_privs, print_dacl, print_tokinf,
+	LsaApLogonUserEx): Ditto.
+
+2008-08-13  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cyglsa-config: Copy the DLL instead of moving.
+
+2008-07-16  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cyglsa-config: Always create a /bin/cyglsa directory and copy the
+	LSA DLL there.  Register this copy in the registry.
+
+2008-07-15  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cyglsa.c: Include ntddk.h again, but only if __MINGW32__ is defined.
+	* cyglsa64.dll: Regenerate.
+	* make-64bit-version-with-visual-c.bat: Fix comment.
+
+2008-07-13  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cyglsa.c: Don't include ntddk.h.
+	(RtlInitEmptyUnicodeString): Use Visual-C compatible "__inline" instead
+	of "inline".
+	(uni_alloc): Change second argument to USHORT.
+	(printf): Move definition of ap to make Visual-C++ happy.
+	(LsaApLogonUserEx): Compute size of datastructure returned to
+	LSA on 64 bit systems correctly to avoid heap corruption.
+	* cyglsa64.dll: Regenerate.
+	* make-64bit-version-with-visual-c.bat: Accommodate newer Microsoft
+	toolchains.  Add more comment.
+	* mslsa.def: Export LsaApLogonUserEx instead of LsaApLogonUser.
+
+2008-07-11  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cyglsa.c (LsaApLogonUserEx): Accommodate the fact that authinf->domain
+	and authinf->username are now of type WCHAR.  Change sam_username and
+	sam_u size to be deifned in terms of MAX_DOMAIN_NAME_LEN instead of
+	INTERNET_MAX_HOST_NAME_LENGTH.
+
+2008-07-10  Corinna Vinschen  <corinna@vinschen.de>
+
+	* cyglsa.c: Revamp debugging output.
+	(LsaApInitializePackage): Open debugging output file here.
+	(LsaApLogonUserEx): Replace LsaApLogonUser.  Add debugging output.
+	Create machine name for accounting.  Add (disabled) code to fetch
+	a token from GetAuthDataForUser/ConvertAuthDataToToken.
+	* cyglsa.din: Relace LsaApLogonUser with LsaApLogonUserEx.
+
+2006-11-27  Corinna Vinschen  <corinna@vinschen.de>
+
+	Initial release of the Cygwin LSA authentication package.
+	* ChangeLog: New file.
+	* Makefile.in: Ditto.
+	* aclocal.m4: Ditto.
+	* configure.in: Ditto.
+	* configure: Ditto. Generated from configure.in.
+	* cyglsa-config: Ditto.
+	* cyglsa.c: Ditto.
+	* cyglsa.din: Ditto.
+	* cyglsa64.dll: Ditto.
+	* make-64bit-version-with-visual-c.bat: Ditto.
+	* mslsa.def: Ditto.
