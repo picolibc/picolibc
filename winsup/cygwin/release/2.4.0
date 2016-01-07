@@ -73,3 +73,7 @@ Bug Fixes
 - Fix a potential crash reading invalid passwd and group entries from
   /etc/passwd and /etc/group.
   Addresses: https://cygwin.com/ml/cygwin/2015-12/msg00170.html
+
+- Cygpath(1) now tries to correct the case of system directories when
+  returned as POSIX paths.
+  Addresses: https://cygwin.com/ml/cygwin/2016-01/msg00002.html

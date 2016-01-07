@@ -20,6 +20,7 @@ details. */
 #include <sys/cygwin.h>
 #include <cygwin/version.h>
 #include <ctype.h>
+#include <wctype.h>
 #include <errno.h>
 
 #define _WIN32_WINNT 0x0602
@@ -579,20 +580,7 @@ do_sysfolders (char option)
       break;
 
     case 'S':
-      {
-	HANDLE fh;
-	WIN32_FIND_DATAW w32_fd;
-
-	GetSystemDirectoryW (wbuf, MAX_PATH);
-	/* The path returned by GetSystemDirectoryW is not case preserving.
-	   The below code is a trick to get the correct case of the system
-	   directory from Windows. */
-	if ((fh = FindFirstFileW (wbuf, &w32_fd)) != INVALID_HANDLE_VALUE)
-	  {
-	    FindClose (fh);
-	    wcscpy (wcsrchr (wbuf, L'\\') + 1, w32_fd.cFileName);
-	  }
-      }
+      GetSystemDirectoryW (wbuf, MAX_PATH);
       break;
 
     case 'W':
@@ -607,9 +595,43 @@ do_sysfolders (char option)
     {
       fprintf (stderr, "%s: failed to retrieve special folder path\n",
 	       prog_name);
+      return;
     }
   else if (!windows_flag)
     {
+      /* The system folders are not necessarily case-correct.  To allow
+	 case-sensitivity, try to correct the case.  Note that this only
+	 works for local filesystems. */
+      if (iswalpha (wbuf[0]) && wbuf[1] == L':' && wbuf[2] == L'\\')
+	{
+	  OBJECT_ATTRIBUTES attr;
+	  NTSTATUS status;
+	  HANDLE h;
+	  IO_STATUS_BLOCK io;
+	  UNICODE_STRING upath;
+	  const ULONG size = sizeof (FILE_NAME_INFORMATION)
+			     + PATH_MAX * sizeof (WCHAR);
+	  PFILE_NAME_INFORMATION pfni = (PFILE_NAME_INFORMATION) alloca (size);
+
+	  /* Avoid another buffer, reuse pfni. */
+	  wcpcpy (wcpcpy (pfni->FileName, L"\\??\\"), wbuf);
+	  RtlInitUnicodeString (&upath, pfni->FileName);
+	  InitializeObjectAttributes (&attr, &upath, OBJ_CASE_INSENSITIVE,
+				      NULL, NULL);
+	  status = NtOpenFile (&h, READ_CONTROL, &attr, &io,
+			       FILE_SHARE_VALID_FLAGS, FILE_OPEN_REPARSE_POINT);
+	  if (NT_SUCCESS (status))
+	    {
+	      status = NtQueryInformationFile (h, &io, pfni, size,
+					       FileNameInformation);
+	      if (NT_SUCCESS (status))
+		{
+		  pfni->FileName[pfni->FileNameLength / sizeof (WCHAR)] = L'\0';
+		  wcscpy (wbuf + 2, pfni->FileName);
+		}
+	      NtClose (h);
+	    }
+	}
       if (cygwin_conv_path (CCP_WIN_W_TO_POSIX | cygdrive_flag,
 			    wbuf, buf, PATH_MAX))
 	fprintf (stderr, "%s: error converting \"%ls\" - %s\n",
