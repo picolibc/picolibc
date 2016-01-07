@@ -1298,7 +1298,7 @@ aclcheck32 (aclent_t *aclbufp, int nentries, int *which)
 void
 __aclcalcmask (aclent_t *aclbufp, int nentries)
 {
-  acl_perm_t mask = 0;
+  mode_t mask = 0;
   int mask_idx = -1;
 
   for (int idx = 0; idx < nentries; ++idx)
