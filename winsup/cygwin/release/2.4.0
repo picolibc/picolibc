@@ -77,3 +77,7 @@ Bug Fixes
 - Cygpath(1) now tries to correct the case of system directories when
   returned as POSIX paths.
   Addresses: https://cygwin.com/ml/cygwin/2016-01/msg00002.html
+
+- *Always* zero out descriptor arrays when returning from select due to
+  timeout, per POSIX.
+  Addresses: https://cygwin.com/ml/cygwin/2015-12/msg00332.html
