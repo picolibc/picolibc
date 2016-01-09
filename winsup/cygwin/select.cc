@@ -77,8 +77,6 @@ details. */
   (fd_set *) __res; \
 })
 
-#define copyfd_set(to, from, n) memcpy (to, from, sizeof_fd_set (n));
-
 #define set_handle_or_return_if_not_open(h, s) \
   h = (s)->fh->get_io_handle_cyg (); \
   if (cygheap->fdtab.not_open ((s)->fd)) \
@@ -132,6 +130,7 @@ select (int maxfds, fd_set *readfds, fd_set *writefds, fd_set *exceptfds,
 	DWORD ms)
 {
   int res = select_stuff::select_loop;
+  int ret = 0;
 
   /* Record the current time for later use. */
   LONGLONG start_time = gtod.msecs ();
@@ -144,7 +143,7 @@ select (int maxfds, fd_set *readfds, fd_set *writefds, fd_set *exceptfds,
   fd_set *w = allocfd_set (maxfds);
   fd_set *e = allocfd_set (maxfds);
 
-  while (res == select_stuff::select_loop)
+  do
     {
       /* Build the select record per fd linked list and set state as
 	 needed. */
@@ -187,14 +186,15 @@ select (int maxfds, fd_set *readfds, fd_set *writefds, fd_set *exceptfds,
       select_printf ("res %d", res);
       if (res >= 0)
 	{
-	  copyfd_set (readfds, r, maxfds);
-	  copyfd_set (writefds, w, maxfds);
-	  copyfd_set (exceptfds, e, maxfds);
-	  if (res == select_stuff::select_set_zero)
-	    res = 0;
-	  else
-	    /* Set the bit mask from sel records */
-	    res = sel.poll (readfds, writefds, exceptfds) ?: select_stuff::select_loop;
+	  UNIX_FD_ZERO (readfds, maxfds);
+	  UNIX_FD_ZERO (writefds, maxfds);
+	  UNIX_FD_ZERO (exceptfds, maxfds);
+	  /* Set bit mask from sel records even in case of a timeout so we
+	     don't miss one.  This also sets ret to the right value >= 0,
+	     matching the number of bits set in the fds records. */
+	  ret = sel.poll (readfds, writefds, exceptfds);
+	  if (!ret && res != select_stuff::select_set_zero)
+	    res = select_stuff::select_loop;
 	}
       /* Always clean up everything here.  If we're looping then build it
 	 all up again.  */
@@ -208,7 +208,11 @@ select (int maxfds, fd_set *readfds, fd_set *writefds, fd_set *exceptfds,
 	  if (now > (start_time + ms))
 	    {
 	      select_printf ("timed out after verification");
-	      res = 0;
+	      /* Set descriptor bits to zero per POSIX. */
+	      UNIX_FD_ZERO (readfds, maxfds);
+	      UNIX_FD_ZERO (writefds, maxfds);
+	      UNIX_FD_ZERO (exceptfds, maxfds);
+	      ret = res = 0;
 	    }
 	  else
 	    {
@@ -218,10 +222,11 @@ select (int maxfds, fd_set *readfds, fd_set *writefds, fd_set *exceptfds,
 	    }
 	}
     }
+  while (res == select_stuff::select_loop);
 
-  if (res < -1)
-    res = -1;
-  return res;
+  if (res < 0)
+    ret = -1;
+  return ret;
 }
 
 extern "C" int
