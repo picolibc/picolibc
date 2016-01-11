@@ -594,6 +594,7 @@ fhandler_socket::init_events ()
 	InterlockedIncrement (&socket_serial_number);
       if (!new_serial_number)	/* 0 is reserved for global mutex */
 	InterlockedIncrement (&socket_serial_number);
+      set_ino (new_serial_number);
       RtlInitUnicodeString (&uname, sock_shared_name (name, new_serial_number));
       InitializeObjectAttributes (&attr, &uname, OBJ_INHERIT | OBJ_OPENIF,
 				  get_session_parent_dir (),
@@ -937,8 +938,8 @@ fhandler_socket::fstat (struct stat *buf)
       res = fhandler_base::fstat (buf);
       if (!res)
 	{
-	  buf->st_dev = 0;
-	  buf->st_ino = (ino_t) ((uintptr_t) get_handle ());
+	  buf->st_dev = FHDEV (DEV_TCP_MAJOR, 0);
+	  buf->st_ino = (ino_t) get_ino ();
 	  buf->st_mode = S_IFSOCK | S_IRWXU | S_IRWXG | S_IRWXO;
 	  buf->st_size = 0;
 	}

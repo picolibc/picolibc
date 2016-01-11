@@ -188,7 +188,7 @@ struct _sigcommune
   __extension__ union
   {
     int _si_fd;
-    void *_si_pipe_fhandler;
+    int64_t _si_pipe_unique_id;
     char *_si_str;
   };
 };

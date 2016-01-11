@@ -81,3 +81,6 @@ Bug Fixes
 - *Always* zero out descriptor arrays when returning from select due to
   timeout, per POSIX.
   Addresses: https://cygwin.com/ml/cygwin/2015-12/msg00332.html
+
+- Return unique inode numbers when calling stat/fstat on pipes and IP sockets.
+  Addresses: https://cygwin.com/ml/cygwin/2015-12/msg00310.html

@@ -622,11 +622,11 @@ commune_process (void *arg)
     case PICOM_PIPE_FHANDLER:
       {
 	sigproc_printf ("processing PICOM_FDS");
-	HANDLE hdl = si._si_commune._si_pipe_fhandler;
+	int64_t unique_id = si._si_commune._si_pipe_unique_id;
 	unsigned int n = 0;
 	cygheap_fdenum cfd;
 	while (cfd.next () >= 0)
-	  if (cfd->get_handle () == hdl)
+	  if (cfd->get_unique_id () == unique_id)
 	    {
 	      fhandler_pipe *fh = cfd;
 	      n = sizeof *fh;
@@ -701,7 +701,7 @@ _pinfo::commune_request (__uint32_t code, ...)
   switch (code)
     {
     case PICOM_PIPE_FHANDLER:
-      si._si_commune._si_pipe_fhandler = va_arg (args, HANDLE);
+      si._si_commune._si_pipe_unique_id = va_arg (args, int64_t);
       break;
 
     case PICOM_FD:
@@ -781,13 +781,13 @@ out:
 }
 
 fhandler_pipe *
-_pinfo::pipe_fhandler (HANDLE hdl, size_t &n)
+_pinfo::pipe_fhandler (int64_t unique_id, size_t &n)
 {
   if (!this || !pid)
     return NULL;
   if (pid == myself->pid)
     return NULL;
-  commune_result cr = commune_request (PICOM_PIPE_FHANDLER, hdl);
+  commune_result cr = commune_request (PICOM_PIPE_FHANDLER, unique_id);
   n = cr.n;
   return (fhandler_pipe *) cr.s;
 }

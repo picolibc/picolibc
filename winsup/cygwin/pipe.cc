@@ -31,7 +31,7 @@ fhandler_pipe::fhandler_pipe ()
 }
 
 int
-fhandler_pipe::init (HANDLE f, DWORD a, mode_t mode)
+fhandler_pipe::init (HANDLE f, DWORD a, mode_t mode, int64_t uniq_id)
 {
   /* FIXME: Have to clean this up someday
      FIXME: Do we have to check for both !get_win32_name() and
@@ -54,6 +54,8 @@ fhandler_pipe::init (HANDLE f, DWORD a, mode_t mode)
   a &= ~FILE_CREATE_PIPE_INSTANCE;
   fhandler_base::init (f, a, mode);
   close_on_exec (mode & O_CLOEXEC);
+  set_ino (uniq_id);
+  set_unique_id (uniq_id | !!(mode & GENERIC_WRITE));
   if (opened_properly)
     setup_overlapped ();
   else
@@ -66,27 +68,33 @@ extern "C" int sscanf (const char *, const char *, ...);
 int
 fhandler_pipe::open (int flags, mode_t mode)
 {
-  HANDLE proc, pipe_hdl, nio_hdl = NULL;
-  fhandler_pipe *fh = NULL;
+  HANDLE proc, nio_hdl = NULL;
+  int64_t uniq_id;
+  fhandler_pipe *fh = NULL, *fhr = NULL, *fhw = NULL;
   size_t size;
   int pid, rwflags = (flags & O_ACCMODE);
   bool inh;
+  bool got_one = false;
 
-  sscanf (get_name (), "/proc/%d/fd/pipe:[%lu]",
-		       &pid, (unsigned long *) &pipe_hdl);
+  sscanf (get_name (), "/proc/%d/fd/pipe:[%lld]",
+		       &pid, (long long *) &uniq_id);
   if (pid == myself->pid)
     {
       cygheap_fdenum cfd (true);
       while (cfd.next () >= 0)
 	{
-	  if (cfd->get_handle () != pipe_hdl)
+	  /* Windows doesn't allow to copy a pipe HANDLE with another access
+	     mode.  So we check for read and write side of pipe and try to
+	     find the one matching the requested access mode. */
+	  if (cfd->get_unique_id () == uniq_id)
+	    got_one = true;
+	  else if (cfd->get_unique_id () == uniq_id + 1)
+	    got_one = true;
+	  else
 	    continue;
 	  if ((rwflags == O_RDONLY && !(cfd->get_access () & GENERIC_READ))
 	      || (rwflags == O_WRONLY && !(cfd->get_access () & GENERIC_WRITE)))
-	    {
-	      set_errno (EACCES);
-	      return 0;
-	    }
+	    continue;
 	  cfd->copyto (this);
 	  set_io_handle (NULL);
 	  pc.reset_conv_handle ();
@@ -94,7 +102,9 @@ fhandler_pipe::open (int flags, mode_t mode)
 	    return 1;
 	  return 0;
 	}
-      set_errno (ENOENT);
+      /* Found the pipe but access mode didn't match? EACCES.
+	 Otherwise ENOENT */
+      set_errno (got_one ? EACCES : ENOENT);
       return 0;
     }
 
@@ -109,27 +119,30 @@ fhandler_pipe::open (int flags, mode_t mode)
       __seterrno ();
       return 0;
     }
-  if (!(fh = p->pipe_fhandler (pipe_hdl, size)) || !size)
+  fhr = p->pipe_fhandler (uniq_id, size);
+  if (fhr && rwflags == O_RDONLY)
+    fh = fhr;
+  else
     {
-      set_errno (ENOENT);
-      goto out;
+      fhw = p->pipe_fhandler (uniq_id + 1, size);
+      if (fhw && rwflags == O_WRONLY)
+	fh = fhw;
     }
-  /* Too bad, but Windows only allows the same access mode when dup'ing
-     the pipe. */
-  if ((rwflags == O_RDONLY && !(fh->get_access () & GENERIC_READ))
-      || (rwflags == O_WRONLY && !(fh->get_access () & GENERIC_WRITE)))
+  if (!fh)
     {
-      set_errno (EACCES);
+      /* Too bad, but Windows only allows the same access mode when dup'ing
+	 the pipe. */
+      set_errno (fhr || fhw ? EACCES : ENOENT);
       goto out;
     }
   inh = !(flags & O_CLOEXEC);
-  if (!DuplicateHandle (proc, pipe_hdl, GetCurrentProcess (), &nio_hdl,
-			0, inh, DUPLICATE_SAME_ACCESS))
+  if (!DuplicateHandle (proc, fh->get_handle (), GetCurrentProcess (),
+			&nio_hdl, 0, inh, DUPLICATE_SAME_ACCESS))
     {
       __seterrno ();
       goto out;
     }
-  init (nio_hdl, fh->get_access (), mode & O_TEXT ?: O_BINARY);
+  init (nio_hdl, fh->get_access (), mode & O_TEXT ?: O_BINARY, fh->get_ino ());
   cfree (fh);
   CloseHandle (proc);
   return 1;
@@ -168,7 +181,7 @@ fhandler_pipe::ftruncate (off_t length, bool allow_truncate)
 char *
 fhandler_pipe::get_proc_fd_name (char *buf)
 {
-  __small_sprintf (buf, "pipe:[%lu]", get_handle ());
+  __small_sprintf (buf, "pipe:[%D]", get_ino ());
   return buf;
 }
 
@@ -199,7 +212,8 @@ fhandler_pipe::dup (fhandler_base *child, int flags)
    unlike CreatePipe, which returns a bool for success or failure.  */
 DWORD
 fhandler_pipe::create (LPSECURITY_ATTRIBUTES sa_ptr, PHANDLE r, PHANDLE w,
-		       DWORD psize, const char *name, DWORD open_mode)
+		       DWORD psize, const char *name, DWORD open_mode,
+		       int64_t *unique_id)
 {
   /* Default to error. */
   if (r)
@@ -241,8 +255,12 @@ fhandler_pipe::create (LPSECURITY_ATTRIBUTES sa_ptr, PHANDLE r, PHANDLE w,
     {
       static volatile ULONG pipe_unique_id;
       if (!name)
-	__small_sprintf (pipename + len, "pipe-%p",
-			 InterlockedIncrement ((LONG *) &pipe_unique_id));
+	{
+	  LONG id = InterlockedIncrement ((LONG *) &pipe_unique_id);
+	  __small_sprintf (pipename + len, "pipe-%p", id);
+	  if (unique_id)
+	    *unique_id = ((int64_t) id << 32 | GetCurrentProcessId ());
+	}
 
       debug_printf ("name %s, size %u, mode %s", pipename, psize,
 		    (pipe_mode & PIPE_TYPE_MESSAGE)
@@ -341,8 +359,9 @@ fhandler_pipe::create (fhandler_pipe *fhs[2], unsigned psize, int mode)
   HANDLE r, w;
   SECURITY_ATTRIBUTES *sa = sec_none_cloexec (mode);
   int res = -1;
+  int64_t unique_id;
 
-  int ret = create (sa, &r, &w, psize, NULL, FILE_FLAG_OVERLAPPED);
+  int ret = create (sa, &r, &w, psize, NULL, FILE_FLAG_OVERLAPPED, &unique_id);
   if (ret)
     __seterrno_from_win_error (ret);
   else if ((fhs[0] = (fhandler_pipe *) build_fh_dev (*piper_dev)) == NULL)
@@ -358,8 +377,10 @@ fhandler_pipe::create (fhandler_pipe *fhs[2], unsigned psize, int mode)
   else
     {
       mode |= mode & O_TEXT ?: O_BINARY;
-      fhs[0]->init (r, FILE_CREATE_PIPE_INSTANCE | GENERIC_READ, mode);
-      fhs[1]->init (w, FILE_CREATE_PIPE_INSTANCE | GENERIC_WRITE, mode);
+      fhs[0]->init (r, FILE_CREATE_PIPE_INSTANCE | GENERIC_READ, mode,
+		    unique_id);
+      fhs[1]->init (w, FILE_CREATE_PIPE_INSTANCE | GENERIC_WRITE, mode,
+		    unique_id);
       res = 0;
     }
 
@@ -395,6 +416,21 @@ fhandler_pipe::ioctl (unsigned int cmd, void *p)
 }
 
 int __reg2
+fhandler_pipe::fstat (struct stat *buf)
+{
+  int ret = fhandler_base::fstat (buf);
+  if (!ret)
+    {
+      buf->st_dev = FH_PIPE;
+      /* Don't use get_ino, it doesn't return 0 but a hash instead. */
+      if (!(buf->st_ino = get_unique_id ()))
+	sscanf (get_name (), "/proc/%*d/fd/pipe:[%lld]",
+			     (long long *) &buf->st_ino);
+    }
+  return ret;
+}
+
+int __reg2
 fhandler_pipe::fstatvfs (struct statvfs *sfs)
 {
   set_errno (EBADF);
@@ -410,10 +446,10 @@ pipe_worker (int filedes[2], unsigned int psize, int mode)
     {
       cygheap_fdnew fdin;
       cygheap_fdnew fdout (fdin, false);
-      char buf[sizeof ("/dev/fd/pipe:[2147483647]")];
-      __small_sprintf (buf, "/dev/fd/pipe:[%d]", (int) fdin);
+      char buf[sizeof ("/dev/fd/pipe:[9223372036854775807]")];
+      __small_sprintf (buf, "/dev/fd/pipe:[%D]", fhs[0]->get_ino ());
       fhs[0]->pc.set_posix (buf);
-      __small_sprintf (buf, "pipe:[%d]", (int) fdout);
+      __small_sprintf (buf, "pipe:[%D]", fhs[1]->get_ino ());
       fhs[1]->pc.set_posix (buf);
       fdin = fhs[0];
       fdout = fhs[1];

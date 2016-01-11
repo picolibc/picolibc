@@ -103,7 +103,7 @@ public:
 
   commune_result commune_request (__uint32_t, ...);
   bool alive ();
-  fhandler_pipe *pipe_fhandler (HANDLE, size_t &);
+  fhandler_pipe *pipe_fhandler (int64_t, size_t &);
   char *fd (int fd, size_t &);
   char *fds (size_t &);
   char *root (size_t &);
