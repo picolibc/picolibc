@@ -189,12 +189,17 @@ select (int maxfds, fd_set *readfds, fd_set *writefds, fd_set *exceptfds,
 	  UNIX_FD_ZERO (readfds, maxfds);
 	  UNIX_FD_ZERO (writefds, maxfds);
 	  UNIX_FD_ZERO (exceptfds, maxfds);
-	  /* Set bit mask from sel records even in case of a timeout so we
-	     don't miss one.  This also sets ret to the right value >= 0,
-	     matching the number of bits set in the fds records. */
-	  ret = sel.poll (readfds, writefds, exceptfds);
-	  if (!ret && res != select_stuff::select_set_zero)
-	    res = select_stuff::select_loop;
+	  if (res == select_stuff::select_set_zero)
+	    ret = 0;
+	  else
+	    {
+	      /* Set bit mask from sel records.  This also sets ret to the
+		 right value >= 0, matching the number of bits set in the
+		 fds records.  if ret is 0, continue to loop. */
+	      ret = sel.poll (readfds, writefds, exceptfds);
+	      if (!ret)
+		res = select_stuff::select_loop;
+	    }
 	}
       /* Always clean up everything here.  If we're looping then build it
 	 all up again.  */
