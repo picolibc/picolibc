@@ -250,7 +250,7 @@ fhandler_socket::~fhandler_socket ()
 char *
 fhandler_socket::get_proc_fd_name (char *buf)
 {
-  __small_sprintf (buf, "socket:[%lu]", get_socket ());
+  __small_sprintf (buf, "socket:[%lu]", get_plain_ino ());
   return buf;
 }
 
@@ -939,7 +939,9 @@ fhandler_socket::fstat (struct stat *buf)
       if (!res)
 	{
 	  buf->st_dev = FHDEV (DEV_TCP_MAJOR, 0);
-	  buf->st_ino = (ino_t) get_ino ();
+	  if (!(buf->st_ino = get_plain_ino ()))
+	    sscanf (get_name (), "/proc/%*d/fd/socket:[%lld]",
+				 (long long *) &buf->st_ino);
 	  buf->st_mode = S_IFSOCK | S_IRWXU | S_IRWXG | S_IRWXO;
 	  buf->st_size = 0;
 	}

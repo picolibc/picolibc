@@ -142,7 +142,8 @@ fhandler_pipe::open (int flags, mode_t mode)
       __seterrno ();
       goto out;
     }
-  init (nio_hdl, fh->get_access (), mode & O_TEXT ?: O_BINARY, fh->get_ino ());
+  init (nio_hdl, fh->get_access (), mode & O_TEXT ?: O_BINARY,
+	fh->get_plain_ino ());
   cfree (fh);
   CloseHandle (proc);
   return 1;
@@ -181,7 +182,7 @@ fhandler_pipe::ftruncate (off_t length, bool allow_truncate)
 char *
 fhandler_pipe::get_proc_fd_name (char *buf)
 {
-  __small_sprintf (buf, "pipe:[%D]", get_ino ());
+  __small_sprintf (buf, "pipe:[%D]", get_plain_ino ());
   return buf;
 }
 
@@ -422,8 +423,7 @@ fhandler_pipe::fstat (struct stat *buf)
   if (!ret)
     {
       buf->st_dev = FH_PIPE;
-      /* Don't use get_ino, it doesn't return 0 but a hash instead. */
-      if (!(buf->st_ino = get_unique_id ()))
+      if (!(buf->st_ino = get_plain_ino ()))
 	sscanf (get_name (), "/proc/%*d/fd/pipe:[%lld]",
 			     (long long *) &buf->st_ino);
     }
@@ -447,9 +447,9 @@ pipe_worker (int filedes[2], unsigned int psize, int mode)
       cygheap_fdnew fdin;
       cygheap_fdnew fdout (fdin, false);
       char buf[sizeof ("/dev/fd/pipe:[9223372036854775807]")];
-      __small_sprintf (buf, "/dev/fd/pipe:[%D]", fhs[0]->get_ino ());
+      __small_sprintf (buf, "/dev/fd/pipe:[%D]", fhs[0]->get_plain_ino ());
       fhs[0]->pc.set_posix (buf);
-      __small_sprintf (buf, "pipe:[%D]", fhs[1]->get_ino ());
+      __small_sprintf (buf, "pipe:[%D]", fhs[1]->get_plain_ino ());
       fhs[1]->pc.set_posix (buf);
       fdin = fhs[0];
       fdout = fhs[1];

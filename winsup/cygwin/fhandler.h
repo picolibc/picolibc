@@ -304,6 +304,8 @@ class fhandler_base
   const char *get_name () const { return pc.get_posix (); }
   const char *get_win32_name () { return pc.get_win32 (); }
   virtual dev_t get_dev () { return get_device (); }
+  /* Use get_plain_ino if the caller needs to avoid hashing if ino is 0. */
+  ino_t get_plain_ino () { return ino; }
   ino_t get_ino () { return ino ?: ino = hash_path_name (0, pc.get_nt_native_path ()); }
   int64_t get_unique_id () const { return unique_id; }
   /* Returns name used for /proc/<pid>/fd in buf. */
