@@ -420,15 +420,18 @@ std_dll_init ()
     {
       fenv_t fpuenv;
       fegetenv (&fpuenv);
+      WCHAR dll_path[MAX_PATH];
       DWORD err = ERROR_SUCCESS;
       int i;
+      /* http://www.microsoft.com/technet/security/advisory/2269637.mspx */
+      wcpcpy (wcpcpy (dll_path, windows_system_directory), dll->name);
       /* MSDN seems to imply that LoadLibrary can fail mysteriously, so,
 	 since there have been reports of this in the mailing list, retry
 	 several times before giving up. */
       for (i = 1; i <= RETRY_COUNT; i++)
 	{
 	  /* If loading the library succeeds, just leave the loop. */
-	  if (dll_load (dll->handle, dll->name))
+	  if (dll_load (dll->handle, dll_path))
 	    break;
 	  /* Otherwise check error code returned by LoadLibrary.  If the
 	     error code is neither NOACCESS nor DLL_INIT_FAILED, break out
@@ -441,10 +444,15 @@ std_dll_init ()
 	}
       if ((uintptr_t) dll->handle <= 1)
 	{
-	  if ((func->decoration & 1))
+	  /* If LoadLibrary with full path returns one of the weird errors
+	     reported on the Cygwin mailing list, retry with only the DLL
+	     name.  Only do this when the above retry loop has been exhausted. */
+	  if (i > RETRY_COUNT && dll_load (dll->handle, dll->name))
+	    /* got it with the fallback */;
+	  else if ((func->decoration & 1))
 	    dll->handle = INVALID_HANDLE_VALUE;
 	  else
-	    api_fatal ("unable to load %W, %E", dll->name);
+	    api_fatal ("unable to load %W, %E", dll_path);
 	}
       fesetenv (&fpuenv);
     }
