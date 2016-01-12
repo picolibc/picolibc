@@ -523,7 +523,7 @@ wsock_init ()
 		   GetProcAddress ((HMODULE) (dll->handle), "WSAStartup");
       if (wsastartup)
 	{
-	  int res = wsastartup ((2<<8) | 2, &wsadata);
+	  int res = wsastartup (MAKEWORD (2, 2), &wsadata);
 
 	  debug_printf ("res %d", res);
 	  debug_printf ("wVersion %d", wsadata.wVersion);
