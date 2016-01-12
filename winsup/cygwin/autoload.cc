@@ -333,20 +333,44 @@ union retchain
 };
 
 
-/* This function is a workaround for the problem reported here:
+/* This function handles the problem described here:
+
+  http://www.microsoft.com/technet/security/advisory/2269637.mspx
+  https://msdn.microsoft.com/library/ff919712
+
+  It also contains a workaround for the problem reported here:
   http://cygwin.com/ml/cygwin/2011-02/msg00552.html
   and discussed here:
   http://cygwin.com/ml/cygwin-developers/2011-02/threads.html#00007
 
   To wit: winmm.dll calls FreeLibrary in its DllMain and that can result
-  in LoadLibraryExW returning an ERROR_INVALID_ADDRESS.  */
+  in LoadLibraryExW returning an ERROR_INVALID_ADDRESS. */
 static __inline bool
-dll_load (HANDLE& handle, WCHAR *name)
+dll_load (HANDLE& handle, PWCHAR name)
 {
-  HANDLE h = LoadLibraryW (name);
-  if (!h && handle && wincap.use_dont_resolve_hack ()
-      && GetLastError () == ERROR_INVALID_ADDRESS)
-    h = LoadLibraryExW (name, NULL, DONT_RESOLVE_DLL_REFERENCES);
+  HANDLE h;
+
+  /* On systems supporting LOAD_LIBRARY_SEARCH flags, try to load
+     explicitely from the system dir first. */
+  if (wincap.has_load_lib_search_flags ())
+    h = LoadLibraryExW (name, NULL, LOAD_LIBRARY_SEARCH_SYSTEM32);
+  if (!h)
+    {
+      WCHAR dll_path[MAX_PATH];
+
+      /* If that failed, try loading with full path, which sometimes
+	 fails for no good reason. */
+      wcpcpy (wcpcpy (dll_path, windows_system_directory), name);
+      h = LoadLibraryW (dll_path);
+      /* If that failed according to the second problem outlined in the
+	 comment preceeding this function. */
+      if (!h && handle && wincap.use_dont_resolve_hack ()
+	  && GetLastError () == ERROR_INVALID_ADDRESS)
+	h = LoadLibraryExW (dll_path, NULL, DONT_RESOLVE_DLL_REFERENCES);
+      /* Last resort: Try loading just by name. */
+      if (!h)
+	h = LoadLibraryW (name);
+    }
   if (!h)
     return false;
   handle = h;
@@ -420,18 +444,15 @@ std_dll_init ()
     {
       fenv_t fpuenv;
       fegetenv (&fpuenv);
-      WCHAR dll_path[MAX_PATH];
       DWORD err = ERROR_SUCCESS;
       int i;
-      /* http://www.microsoft.com/technet/security/advisory/2269637.mspx */
-      wcpcpy (wcpcpy (dll_path, windows_system_directory), dll->name);
       /* MSDN seems to imply that LoadLibrary can fail mysteriously, so,
 	 since there have been reports of this in the mailing list, retry
 	 several times before giving up. */
       for (i = 1; i <= RETRY_COUNT; i++)
 	{
 	  /* If loading the library succeeds, just leave the loop. */
-	  if (dll_load (dll->handle, dll_path))
+	  if (dll_load (dll->handle, dll->name))
 	    break;
 	  /* Otherwise check error code returned by LoadLibrary.  If the
 	     error code is neither NOACCESS nor DLL_INIT_FAILED, break out
@@ -444,15 +465,10 @@ std_dll_init ()
 	}
       if ((uintptr_t) dll->handle <= 1)
 	{
-	  /* If LoadLibrary with full path returns one of the weird errors
-	     reported on the Cygwin mailing list, retry with only the DLL
-	     name.  Only do this when the above retry loop has been exhausted. */
-	  if (i > RETRY_COUNT && dll_load (dll->handle, dll->name))
-	    /* got it with the fallback */;
-	  else if ((func->decoration & 1))
+	  if ((func->decoration & 1))
 	    dll->handle = INVALID_HANDLE_VALUE;
 	  else
-	    api_fatal ("unable to load %W, %E", dll_path);
+	    api_fatal ("unable to load %W, %E", dll->name);
 	}
       fesetenv (&fpuenv);
     }

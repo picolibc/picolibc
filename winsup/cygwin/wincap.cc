@@ -52,6 +52,7 @@ wincaps wincap_xpsp2 __attribute__((section (".cygwin_dll_common"), shared)) = {
   has_processor_groups:false,
   has_broken_prefetchvm:false,
   has_new_pebteb_region:false,
+  has_load_lib_search_flags:false,
 };
 
 wincaps wincap_2003 __attribute__((section (".cygwin_dll_common"), shared)) = {
@@ -86,6 +87,7 @@ wincaps wincap_2003 __attribute__((section (".cygwin_dll_common"), shared)) = {
   has_processor_groups:false,
   has_broken_prefetchvm:false,
   has_new_pebteb_region:false,
+  has_load_lib_search_flags:false,
 };
 
 wincaps wincap_vista __attribute__((section (".cygwin_dll_common"), shared)) = {
@@ -120,6 +122,7 @@ wincaps wincap_vista __attribute__((section (".cygwin_dll_common"), shared)) = {
   has_processor_groups:false,
   has_broken_prefetchvm:false,
   has_new_pebteb_region:false,
+  has_load_lib_search_flags:true,
 };
 
 wincaps wincap_7 __attribute__((section (".cygwin_dll_common"), shared)) = {
@@ -154,6 +157,7 @@ wincaps wincap_7 __attribute__((section (".cygwin_dll_common"), shared)) = {
   has_processor_groups:true,
   has_broken_prefetchvm:false,
   has_new_pebteb_region:false,
+  has_load_lib_search_flags:true,
 };
 
 wincaps wincap_8 __attribute__((section (".cygwin_dll_common"), shared)) = {
@@ -188,6 +192,7 @@ wincaps wincap_8 __attribute__((section (".cygwin_dll_common"), shared)) = {
   has_processor_groups:true,
   has_broken_prefetchvm:false,
   has_new_pebteb_region:false,
+  has_load_lib_search_flags:true,
 };
 
 wincaps wincap_10 __attribute__((section (".cygwin_dll_common"), shared)) = {
@@ -222,6 +227,7 @@ wincaps wincap_10 __attribute__((section (".cygwin_dll_common"), shared)) = {
   has_processor_groups:true,
   has_broken_prefetchvm:true,
   has_new_pebteb_region:false,
+  has_load_lib_search_flags:true,
 };
 
 wincaps wincap_10_1511 __attribute__((section (".cygwin_dll_common"), shared)) = {
@@ -256,6 +262,7 @@ wincaps wincap_10_1511 __attribute__((section (".cygwin_dll_common"), shared)) =
   has_processor_groups:true,
   has_broken_prefetchvm:false,
   has_new_pebteb_region:true,
+  has_load_lib_search_flags:true,
 };
 
 wincapc wincap __attribute__((section (".cygwin_dll_common"), shared));
