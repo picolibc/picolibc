@@ -348,7 +348,7 @@ union retchain
 static __inline bool
 dll_load (HANDLE& handle, PWCHAR name)
 {
-  HANDLE h;
+  HANDLE h = NULL;
 
   /* On systems supporting LOAD_LIBRARY_SEARCH flags, try to load
      explicitely from the system dir first. */
