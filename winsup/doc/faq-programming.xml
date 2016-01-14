@@ -859,15 +859,22 @@ on using <literal>strace</literal>, see the Cygwin User's Guide.
 </answer></qandaentry>
 
 <qandaentry id="faq.programming.gdb-signals">
-<question><para>Why doesn't gdb handle signals?</para></question>
+<question><para>How does gdb handle signals?</para></question>
 <answer>
 
-<para>Unfortunately, there is only minimal signal handling support in gdb
-currently.  Signal handling only works with Windows-type signals.
-SIGINT may work, SIGFPE may work, SIGSEGV definitely does.  You cannot
-'stop', 'print' or 'nopass' signals like SIGUSR1 or SIGHUP to the
-process being debugged.
+<para>
+gdb maps known Windows exceptions to signals such as SIGSEGV, SIGFPE, SIGTRAP,
+SIGINT and SIGILL.  Other Windows exceptions are passed on to the handler (if
+any), and reported as an unknown signal if an unhandled (second chance)
+exception occurs.
 </para>
+
+<para>
+There is also an experimental feature to notify gdb of purely Cygwin signals
+like SIGABRT, SIGHUP or SIGUSR1.  This currently has some known problems, for
+example, single-stepping from these signals may not work as expected.
+</para>
+
 </answer></qandaentry>
 
 <qandaentry id="faq.programming.linker">
