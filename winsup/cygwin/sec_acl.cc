@@ -1080,7 +1080,7 @@ get_posix_access (PSECURITY_DESCRIPTOR psd,
      to fetch the affecting bits from, at least as long as the array
      hasn't been sorted. */
   attr |= (lacl[0].a_perm & S_IRWXO) << 6;
-  attr |= (has_class_perm ? class_perm : (lacl[1].a_perm & S_IRWXO)) << 3;
+  attr |= ((has_class_perm ? class_perm : lacl[1].a_perm) & S_IRWXO) << 3;
   attr |= (lacl[2].a_perm & S_IRWXO);
 
 out:
