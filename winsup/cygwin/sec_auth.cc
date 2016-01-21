@@ -134,11 +134,11 @@ extract_nt_dom_user (const struct passwd *pw, PWCHAR domain, PWCHAR user)
     {
       c = strchrnul (d + 2, ',');
       if ((u = strchrnul (d + 2, '\\')) >= c)
-       u = d + 1;
+	u = d + 1;
       else if (u - d <= MAX_DOMAIN_NAME_LEN + 2)
-       sys_mbstowcs (domain, MAX_DOMAIN_NAME_LEN + 1, d + 2, u - d - 1);
+	sys_mbstowcs (domain, MAX_DOMAIN_NAME_LEN + 1, d + 2, u - d - 1);
       if (c - u <= UNLEN + 1)
-       sys_mbstowcs (user, UNLEN + 1, u + 1, c - u);
+	sys_mbstowcs (user, UNLEN + 1, u + 1, c - u);
     }
 }
 
