@@ -172,13 +172,17 @@ cygwin_logon_user (const struct passwd *pw, const char *password)
     }
   else
     {
+      HANDLE hPrivToken = NULL;
+
       /* See the comment in get_full_privileged_inheritable_token for a
       description why we enable TCB privileges here. */
       push_self_privilege (SE_TCB_PRIVILEGE, true);
-      hToken = get_full_privileged_inheritable_token (hToken);
+      hPrivToken = get_full_privileged_inheritable_token (hToken);
       pop_self_privilege ();
-      if (!hToken)
-	hToken = INVALID_HANDLE_VALUE;
+      if (!hPrivToken)
+	debug_printf ("Can't fetch linked token (%E), use standard token");
+      else
+	hToken = hPrivToken;
     }
   RtlSecureZeroMemory (passwd, NT_MAX_PATH);
   cygheap->user.reimpersonate ();
