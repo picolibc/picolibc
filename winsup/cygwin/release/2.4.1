@@ -1,0 +1,12 @@
+Bug Fixes
+---------
+
+- The cygpath(1) patch to correct the case of system directories when
+  returned as POSIX paths didn't work correctly for the SYSTEMROOT
+  directory on 32 bit Cygwin running on 64 bit Windows.
+  Addresses: https://cygwin.com/ml/cygwin/2016-01/msg00257.html
+
+- cygwin_login_user(2): Don't fail if the calling user has no TCB privileges
+  and the user account to create the token for is an admin account.  Return
+  the UAC-restricted token instead.
+  Addresses: Reported on IRC.
