@@ -360,7 +360,7 @@ independently from the current cygdrive prefix:</para>
 <para>On Windows, the environment variable <literal>TEMP</literal> specifies
 the location of the temp folder.  It serves the same purpose as the /tmp/
 directory in Unix systems.  In contrast to /tmp/, it is by default a
-different folder for every Windows.  By using the special purpose usertemp
+different folder for every Windows user.  By using the special purpose usertemp
 file system, that temp folder can be mapped to /tmp/.  This is particularly
 useful in setups where the administrator wants to write-protect the entire
 Cygwin directory.  The usertemp file system can be configured in /etc/fstab
