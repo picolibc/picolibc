@@ -129,7 +129,7 @@ static int
 select (int maxfds, fd_set *readfds, fd_set *writefds, fd_set *exceptfds,
 	DWORD ms)
 {
-  int res = select_stuff::select_loop;
+  select_stuff::wait_states wait_state = select_stuff::select_loop;
   int ret = 0;
 
   /* Record the current time for later use. */
@@ -167,29 +167,32 @@ select (int maxfds, fd_set *readfds, fd_set *writefds, fd_set *exceptfds,
 	       call_signal_handler().  */
 	    _my_tls.call_signal_handler ();
 	    set_sig_errno (EINTR);
-	    res = select_stuff::select_signalled;
+	    wait_state = select_stuff::select_signalled;
 	    break;
 	  case WAIT_CANCELED:
 	    sel.destroy ();
 	    pthread::static_cancel_self ();
 	    /*NOTREACHED*/
 	  default:
-	    res = select_stuff::select_set_zero; /* Set res to zero below. */
+	    /* Set wait_state to zero below. */
+	    wait_state = select_stuff::select_set_zero;
 	    break;
 	  }
       else if (sel.always_ready || ms == 0)
-	res = 0;				 /* Catch any active fds via
-						    sel.poll() below */
+	/* Catch any active fds via sel.poll() below */
+	wait_state = select_stuff::select_ok;
       else
-	res = sel.wait (r, w, e, ms);		 /* wait for an fd to become
-						    become active or time out */
-      select_printf ("res %d", res);
-      if (res >= 0)
+	/* wait for an fd to become active or time out */
+	wait_state = sel.wait (r, w, e, ms);
+
+      select_printf ("sel.wait returns %d", wait_state);
+
+      if (wait_state >= select_stuff::select_ok)
 	{
 	  UNIX_FD_ZERO (readfds, maxfds);
 	  UNIX_FD_ZERO (writefds, maxfds);
 	  UNIX_FD_ZERO (exceptfds, maxfds);
-	  if (res == select_stuff::select_set_zero)
+	  if (wait_state == select_stuff::select_set_zero)
 	    ret = 0;
 	  else
 	    {
@@ -198,7 +201,7 @@ select (int maxfds, fd_set *readfds, fd_set *writefds, fd_set *exceptfds,
 		 fds records.  if ret is 0, continue to loop. */
 	      ret = sel.poll (readfds, writefds, exceptfds);
 	      if (!ret)
-		res = select_stuff::select_loop;
+		wait_state = select_stuff::select_loop;
 	    }
 	}
       /* Always clean up everything here.  If we're looping then build it
@@ -206,7 +209,7 @@ select (int maxfds, fd_set *readfds, fd_set *writefds, fd_set *exceptfds,
       sel.cleanup ();
       sel.destroy ();
       /* Recalculate time remaining to wait if we are going to be looping. */
-      if (res == select_stuff::select_loop && ms != INFINITE)
+      if (wait_state == select_stuff::select_loop && ms != INFINITE)
 	{
 	  select_printf ("recalculating ms");
 	  LONGLONG now = gtod.msecs ();
@@ -217,7 +220,8 @@ select (int maxfds, fd_set *readfds, fd_set *writefds, fd_set *exceptfds,
 	      UNIX_FD_ZERO (readfds, maxfds);
 	      UNIX_FD_ZERO (writefds, maxfds);
 	      UNIX_FD_ZERO (exceptfds, maxfds);
-	      ret = res = 0;
+	      wait_state = select_stuff::select_ok;
+	      ret = 0;
 	    }
 	  else
 	    {
@@ -227,9 +231,9 @@ select (int maxfds, fd_set *readfds, fd_set *writefds, fd_set *exceptfds,
 	    }
 	}
     }
-  while (res == select_stuff::select_loop);
+  while (wait_state == select_stuff::select_loop);
 
-  if (res < 0)
+  if (wait_state < select_stuff::select_ok)
     ret = -1;
   return ret;
 }
