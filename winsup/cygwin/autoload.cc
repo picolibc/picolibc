@@ -332,7 +332,6 @@ union retchain
   two_addr_t ll;
 };
 
-
 /* This function handles the problem described here:
 
   http://www.microsoft.com/technet/security/advisory/2269637.mspx
@@ -349,28 +348,20 @@ static __inline bool
 dll_load (HANDLE& handle, PWCHAR name)
 {
   HANDLE h = NULL;
+  WCHAR dll_path[MAX_PATH];
 
-  /* On systems supporting LOAD_LIBRARY_SEARCH flags, try to load
-     explicitely from the system dir first. */
-  if (wincap.has_load_lib_search_flags ())
-    h = LoadLibraryExW (name, NULL, LOAD_LIBRARY_SEARCH_SYSTEM32);
+  /* If that failed, try loading with full path, which sometimes
+     fails for no good reason. */
+  wcpcpy (wcpcpy (dll_path, windows_system_directory), name);
+  h = LoadLibraryW (dll_path);
+  /* If that failed according to the second problem outlined in the
+     comment preceeding this function. */
+  if (!h && handle && wincap.use_dont_resolve_hack ()
+      && GetLastError () == ERROR_INVALID_ADDRESS)
+    h = LoadLibraryExW (dll_path, NULL, DONT_RESOLVE_DLL_REFERENCES);
+  /* Last resort: Try loading just by name. */
   if (!h)
-    {
-      WCHAR dll_path[MAX_PATH];
-
-      /* If that failed, try loading with full path, which sometimes
-	 fails for no good reason. */
-      wcpcpy (wcpcpy (dll_path, windows_system_directory), name);
-      h = LoadLibraryW (dll_path);
-      /* If that failed according to the second problem outlined in the
-	 comment preceeding this function. */
-      if (!h && handle && wincap.use_dont_resolve_hack ()
-	  && GetLastError () == ERROR_INVALID_ADDRESS)
-	h = LoadLibraryExW (dll_path, NULL, DONT_RESOLVE_DLL_REFERENCES);
-      /* Last resort: Try loading just by name. */
-      if (!h)
-	h = LoadLibraryW (name);
-    }
+    h = LoadLibraryW (name);
   if (!h)
     return false;
   handle = h;
