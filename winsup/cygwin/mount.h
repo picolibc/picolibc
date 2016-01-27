@@ -76,7 +76,6 @@ class fs_info
     unsigned has_buggy_fileid_dirinfo	: 1;
     unsigned has_buggy_basic_info	: 1;
     unsigned has_dos_filenames_only	: 1;
-    unsigned has_broken_fnoi		: 1;
   } status;
   ULONG sernum;			/* Volume Serial Number */
   char fsn[80];			/* Windows filesystem name */
@@ -102,7 +101,6 @@ class fs_info
   IMPLEMENT_STATUS_FLAG (bool, has_buggy_fileid_dirinfo)
   IMPLEMENT_STATUS_FLAG (bool, has_buggy_basic_info)
   IMPLEMENT_STATUS_FLAG (bool, has_dos_filenames_only)
-  IMPLEMENT_STATUS_FLAG (bool, has_broken_fnoi)
   IMPLEMENT_FS_FLAG (fat)
   IMPLEMENT_FS_FLAG (ntfs)
   IMPLEMENT_FS_FLAG (refs)

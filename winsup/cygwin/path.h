@@ -158,7 +158,6 @@ class path_conv
   int has_buggy_reopen () const {return fs.has_buggy_reopen ();}
   int has_buggy_fileid_dirinfo () const {return fs.has_buggy_fileid_dirinfo ();}
   int has_buggy_basic_info () const {return fs.has_buggy_basic_info ();}
-  int has_broken_fnoi () const {return fs.has_broken_fnoi ();}
   int binmode () const
   {
     if (path_flags & PATH_BINARY)

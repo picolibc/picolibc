@@ -431,10 +431,6 @@ fs_info::update (PUNICODE_STRING upath, HANDLE in_vol)
 	     only support this if the filename is non-null and the handle is
 	     the handle to a directory. NcFsd IR10 is supposed to be ok. */
 	  has_buggy_reopen (is_netapp () || is_nwfs ());
-	  /* Netapp and Parallels Desktop FS have problems with the
-	     FileNetworkOpenInformation info class.  Netapp doesn't
-	     implement it at all, Parallels always returns a size of 0. */
-	  has_broken_fnoi (is_netapp () || is_prlfs ());
 	}
     }
   if (!got_fs ()
