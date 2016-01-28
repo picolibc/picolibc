@@ -829,10 +829,12 @@ get_posix_access (PSECURITY_DESCRIPTOR psd,
 	  else if (type == GROUP_OBJ)
 	    {
 	      /* Same for the primary group. */
-	      if (saw_group_obj)
-		type = GROUP;
 	      if (ace->Header.AceType == ACCESS_ALLOWED_ACE_TYPE)
-		saw_group_obj = true;
+		{
+		  if (saw_group_obj)
+		    type = GROUP;
+		  saw_group_obj = true;
+		}
 	    }
 	  if ((pos = searchace (lacl, MAX_ACL_ENTRIES, type, id)) >= 0)
 	    {
