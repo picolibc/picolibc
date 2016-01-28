@@ -561,11 +561,17 @@ getace (aclent_t &acl, int type, int id, DWORD win_ace_mask,
 
 /* From the SECURITY_DESCRIPTOR given in psd, compute user, owner, posix
    attributes, as well as the POSIX acl.  The function returns the number
-   of entries returned in aclbufp, or -1 in case of error. */
+   of entries returned in aclbufp, or -1 in case of error.
+
+   When called from chmod, it also returns the fact if the ACL is a "standard"
+   ACL.  A "standard" ACL is an ACL which only consists of ACEs for owner,
+   group, other, as well as (this is Windows) the Administrators group and
+   SYSTEM.  See fhandler_disk_file::fchmod for how this is used to fake
+   stock POSIX perms even if Administrators and SYSTEM is in the ACE. */
 int
 get_posix_access (PSECURITY_DESCRIPTOR psd,
 		  mode_t *attr_ret, uid_t *uid_ret, gid_t *gid_ret,
-		  aclent_t *aclbufp, int nentries)
+		  aclent_t *aclbufp, int nentries, bool *std_acl)
 {
   tmp_pathbuf tp;
   NTSTATUS status;
@@ -852,7 +858,10 @@ get_posix_access (PSECURITY_DESCRIPTOR psd,
 			 GROUP_OBJ entry. */
 		      if (ace_sid != well_known_system_sid
 			  && ace_sid != well_known_admins_sid)
-			class_perm |= lacl[pos].a_perm;
+			{
+			  class_perm |= lacl[pos].a_perm;
+			  standard_ACEs_only = false;
+			}
 		    }
 		}
 	      /* For a newly created file, we'd like to know if we're running
@@ -861,7 +870,6 @@ get_posix_access (PSECURITY_DESCRIPTOR psd,
 		 a standard ACL, we apply umask.  That's not entirely correct,
 		 but it's probably the best we can do. */
 	      else if (type & (USER | GROUP)
-		       && just_created
 		       && standard_ACEs_only
 		       && ace_sid != well_known_system_sid
 		       && ace_sid != well_known_admins_sid)
@@ -1104,6 +1112,8 @@ out:
 	aclbufp[idx].a_perm &= S_IRWXO;
       aclsort32 (pos, 0, aclbufp);
     }
+  if (std_acl)
+    *std_acl = standard_ACEs_only;
   return pos;
 }
 
