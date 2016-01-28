@@ -85,41 +85,68 @@ details. */
       return -1; \
     }
 
-static int select (int, fd_set *, fd_set *, fd_set *, DWORD);
+static int select (int, fd_set *, fd_set *, fd_set *, LONGLONG);
 
 /* The main select code.  */
+extern "C" int
+pselect(int maxfds, fd_set *readfds, fd_set *writefds, fd_set *exceptfds,
+	const struct timespec *to, const sigset_t *set)
+{
+  sigset_t oldset = _my_tls.sigmask;
+
+  __try
+    {
+      if (set)
+	set_signal_mask (_my_tls.sigmask, *set);
+
+      select_printf ("pselect(%d, %p, %p, %p, %p, %p)", maxfds, readfds, writefds, exceptfds, to, set);
+
+      pthread_testcancel ();
+      int res;
+      if (maxfds < 0)
+	{
+	  set_errno (EINVAL);
+	  res = -1;
+	}
+      else
+	{
+	  /* Convert to microseconds or -1 if to == NULL */
+	  LONGLONG us = to ? to->tv_sec * 1000000LL + (to->tv_nsec + 999) / 1000 : -1LL;
+
+	  if (to)
+	    select_printf ("to->tv_sec %ld, to->tv_nsec %ld, us %lld", to->tv_sec, to->tv_nsec, us);
+	  else
+	    select_printf ("to NULL, us %lld", us);
+
+	  res = select (maxfds, readfds ?: allocfd_set (maxfds),
+			writefds ?: allocfd_set (maxfds),
+			exceptfds ?: allocfd_set (maxfds), us);
+	}
+      syscall_printf ("%R = select(%d, %p, %p, %p, %p)", res, maxfds, readfds,
+		      writefds, exceptfds, to);
+
+      if (set)
+	set_signal_mask (_my_tls.sigmask, oldset);
+      return res;
+    }
+  __except (EFAULT) {}
+  __endtry
+  return -1;
+}
+
+/* select() is just a wrapper on pselect(). */
 extern "C" int
 cygwin_select (int maxfds, fd_set *readfds, fd_set *writefds, fd_set *exceptfds,
 	       struct timeval *to)
 {
-  select_printf ("select(%d, %p, %p, %p, %p)", maxfds, readfds, writefds, exceptfds, to);
-
-  pthread_testcancel ();
-  int res;
-  if (maxfds < 0)
+  struct timespec ts;
+  if (to)
     {
-      set_errno (EINVAL);
-      res = -1;
+      ts.tv_sec = to->tv_sec;
+      ts.tv_nsec = to->tv_usec * 1000;
     }
-  else
-    {
-      /* Convert to milliseconds or INFINITE if to == NULL */
-      DWORD ms = to ? (to->tv_sec * 1000) + (to->tv_usec / 1000) : INFINITE;
-      if (ms == 0 && to->tv_usec)
-	ms = 1;			/* At least 1 ms granularity */
-
-      if (to)
-	select_printf ("to->tv_sec %ld, to->tv_usec %ld, ms %d", to->tv_sec, to->tv_usec, ms);
-      else
-	select_printf ("to NULL, ms %x", ms);
-
-      res = select (maxfds, readfds ?: allocfd_set (maxfds),
-		    writefds ?: allocfd_set (maxfds),
-		    exceptfds ?: allocfd_set (maxfds), ms);
-    }
-  syscall_printf ("%R = select(%d, %p, %p, %p, %p)", res, maxfds, readfds,
-		  writefds, exceptfds, to);
-  return res;
+  return pselect (maxfds, readfds, writefds, exceptfds,
+		  to ? &ts : NULL, NULL);
 }
 
 /* This function is arbitrarily split out from cygwin_select to avoid odd
@@ -127,13 +154,13 @@ cygwin_select (int maxfds, fd_set *readfds, fd_set *writefds, fd_set *exceptfds,
    for the sel variable.  */
 static int
 select (int maxfds, fd_set *readfds, fd_set *writefds, fd_set *exceptfds,
-	DWORD ms)
+	LONGLONG us)
 {
   select_stuff::wait_states wait_state = select_stuff::select_loop;
   int ret = 0;
 
   /* Record the current time for later use. */
-  LONGLONG start_time = gtod.msecs ();
+  LONGLONG start_time = gtod.usecs ();
 
   select_stuff sel;
   sel.return_on_signal = 0;
@@ -158,7 +185,7 @@ select (int maxfds, fd_set *readfds, fd_set *writefds, fd_set *exceptfds,
       /* Degenerate case.  No fds to wait for.  Just wait for time to run out
 	 or signal to arrive. */
       if (sel.start.next == NULL)
-	switch (cygwait (ms))
+	switch (cygwait_us (us))
 	  {
 	  case WAIT_SIGNALED:
 	    select_printf ("signal received");
@@ -178,12 +205,12 @@ select (int maxfds, fd_set *readfds, fd_set *writefds, fd_set *exceptfds,
 	    wait_state = select_stuff::select_set_zero;
 	    break;
 	  }
-      else if (sel.always_ready || ms == 0)
+      else if (sel.always_ready || us == 0)
 	/* Catch any active fds via sel.poll() below */
 	wait_state = select_stuff::select_ok;
       else
 	/* wait for an fd to become active or time out */
-	wait_state = sel.wait (r, w, e, ms);
+	wait_state = sel.wait (r, w, e, us);
 
       select_printf ("sel.wait returns %d", wait_state);
 
@@ -209,11 +236,11 @@ select (int maxfds, fd_set *readfds, fd_set *writefds, fd_set *exceptfds,
       sel.cleanup ();
       sel.destroy ();
       /* Recalculate time remaining to wait if we are going to be looping. */
-      if (wait_state == select_stuff::select_loop && ms != INFINITE)
+      if (wait_state == select_stuff::select_loop && us != -1)
 	{
-	  select_printf ("recalculating ms");
-	  LONGLONG now = gtod.msecs ();
-	  if (now > (start_time + ms))
+	  select_printf ("recalculating us");
+	  LONGLONG now = gtod.usecs ();
+	  if (now > (start_time + us))
 	    {
 	      select_printf ("timed out after verification");
 	      /* Set descriptor bits to zero per POSIX. */
@@ -225,9 +252,9 @@ select (int maxfds, fd_set *readfds, fd_set *writefds, fd_set *exceptfds,
 	    }
 	  else
 	    {
-	      ms -= (now - start_time);
+	      us -= (now - start_time);
 	      start_time = now;
-	      select_printf ("ms now %u", ms);
+	      select_printf ("us now %lld", us);
 	    }
 	}
     }
@@ -236,33 +263,6 @@ select (int maxfds, fd_set *readfds, fd_set *writefds, fd_set *exceptfds,
   if (wait_state < select_stuff::select_ok)
     ret = -1;
   return ret;
-}
-
-extern "C" int
-pselect(int maxfds, fd_set *readfds, fd_set *writefds, fd_set *exceptfds,
-	const struct timespec *ts, const sigset_t *set)
-{
-  struct timeval tv;
-  sigset_t oldset = _my_tls.sigmask;
-
-  __try
-    {
-      if (ts)
-	{
-	  tv.tv_sec = ts->tv_sec;
-	  tv.tv_usec = ts->tv_nsec / 1000;
-	}
-      if (set)
-	set_signal_mask (_my_tls.sigmask, *set);
-      int ret = cygwin_select (maxfds, readfds, writefds, exceptfds,
-			       ts ? &tv : NULL);
-      if (set)
-	set_signal_mask (_my_tls.sigmask, oldset);
-      return ret;
-    }
-  __except (EFAULT) {}
-  __endtry
-  return -1;
 }
 
 /* Call cleanup functions for all inspected fds.  Gets rid of any
@@ -362,13 +362,50 @@ err:
 /* The heart of select.  Waits for an fd to do something interesting. */
 select_stuff::wait_states
 select_stuff::wait (fd_set *readfds, fd_set *writefds, fd_set *exceptfds,
-		    DWORD ms)
+		    LONGLONG us)
 {
   HANDLE w4[MAXIMUM_WAIT_OBJECTS];
   select_record *s = &start;
   DWORD m = 0;
 
+  /* Always wait for signals. */
   wait_signal_arrived here (w4[m++]);
+
+  /* Set a timeout, or not, for WMFO. */
+  DWORD dTimeoutMs;
+  if (us == 0)
+    {
+      dTimeoutMs = 0;
+    }
+  else
+    {
+      dTimeoutMs = INFINITE;
+    }
+  /* Create and set a waitable timer, if a finite timeout has been
+     requested. */
+  LARGE_INTEGER liTimeout;
+  HANDLE hTimeout;
+  NTSTATUS status;
+  status = NtCreateTimer(&hTimeout, TIMER_ALL_ACCESS, NULL, NotificationTimer);
+  if (!NT_SUCCESS (status))
+    {
+      select_printf("NtCreateTimer failed (%d)\n", GetLastError());
+      return select_error;
+    }
+  w4[m++] = hTimeout;
+  if (us >= 0)
+    {
+      liTimeout.QuadPart = -us * 10;
+      int setret;
+      status = NtSetTimer (hTimeout, &liTimeout, NULL, NULL, FALSE, 0, NULL);
+      if (!NT_SUCCESS(status))
+	{
+	  select_printf ("NtSetTimer failed: %d (%08x)\n", setret, GetLastError());
+	  return select_error;
+	}
+    }
+
+  /* Optionally wait for pthread cancellation. */
   if ((w4[m] = pthread::get_cancel_event ()) != NULL)
     m++;
 
@@ -397,20 +434,26 @@ select_stuff::wait (fd_set *readfds, fd_set *writefds, fd_set *exceptfds,
 next_while:;
     }
 
-  debug_printf ("m %d, ms %u", m, ms);
+  debug_printf ("m %d, us %llu, dTimeoutMs %d", m, us, dTimeoutMs);
 
   DWORD wait_ret;
   if (!windows_used)
-    wait_ret = WaitForMultipleObjects (m, w4, FALSE, ms);
+    wait_ret = WaitForMultipleObjects (m, w4, FALSE, dTimeoutMs);
   else
     /* Using MWMO_INPUTAVAILABLE is the officially supported solution for
        the problem that the call to PeekMessage disarms the queue state
        so that a subsequent MWFMO hangs, even if there are still messages
        in the queue. */
-    wait_ret = MsgWaitForMultipleObjectsEx (m, w4, ms,
+    wait_ret = MsgWaitForMultipleObjectsEx (m, w4, dTimeoutMs,
 					    QS_ALLINPUT | QS_ALLPOSTMESSAGE,
 					    MWMO_INPUTAVAILABLE);
   select_printf ("wait_ret %d, m = %d.  verifying", wait_ret, m);
+
+  if (dTimeoutMs == INFINITE)
+    {
+      CancelWaitableTimer (hTimeout);
+      CloseHandle (hTimeout);
+    }
 
   wait_states res;
   switch (wait_ret)
@@ -434,12 +477,13 @@ next_while:;
       s->set_select_errno ();
       res = select_error;
       break;
+    case WAIT_OBJECT_0 + 1:
     case WAIT_TIMEOUT:
       select_printf ("timed out");
       res = select_set_zero;
       break;
-    case WAIT_OBJECT_0 + 1:
-      if (startfds > 1)
+    case WAIT_OBJECT_0 + 2:
+      if (startfds > 2)
 	{
 	  cleanup ();
 	  destroy ();

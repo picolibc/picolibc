@@ -59,3 +59,30 @@ cygwait (DWORD howlong)
 {
   return cygwait (NULL, howlong);
 }
+
+extern inline DWORD __attribute__ ((always_inline))
+cygwait_us (HANDLE h, LONGLONG howlong, unsigned mask)
+{
+  LARGE_INTEGER li_howlong;
+  PLARGE_INTEGER pli_howlong;
+  if (howlong < 0LL)
+    pli_howlong = NULL;
+  else
+    {
+      li_howlong.QuadPart = -(10LL * howlong);
+      pli_howlong = &li_howlong;
+    }
+  return cygwait (h, pli_howlong, mask);
+}
+
+static inline DWORD __attribute__ ((always_inline))
+cygwait_us (HANDLE h, LONGLONG howlong = -1)
+{
+  return cygwait_us (h, howlong, cw_cancel | cw_sig);
+}
+
+static inline DWORD __attribute__ ((always_inline))
+cygwait_us (LONGLONG howlong)
+{
+  return cygwait_us (NULL, howlong);
+}
