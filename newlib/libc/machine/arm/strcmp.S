@@ -29,6 +29,7 @@
 /* Wrapper for the various implementations of strcmp.  */
 
 #include "arm_asm.h"
+#include "acle-compat.h"
 
 #ifdef __ARM_BIG_ENDIAN
 #define S2LO lsl
@@ -61,7 +62,7 @@
 	.endm
 
 #if defined (__OPTIMIZE_SIZE__) || defined (PREFER_SIZE_OVER_SPEED) \
-	|| (__ARM_ARCH == 6 && __ARM_ARCH_PROFILE == 'M')
+	|| (__ARM_ARCH_ISA_THUMB == 1 && !__ARM_ARCH_ISA_ARM)
 
 # if defined (__thumb__) && !defined (__thumb2__)
 /* Thumb1 only variant.  If size is preferred, use strcmp-armv4t.S.
@@ -78,7 +79,7 @@
 #  include "strcmp-arm-tiny.S"
 # endif
 
-#elif __ARM_ARCH >= 7
+#elif __ARM_ARCH_ISA_THUMB == 2
 
 # ifdef __ARM_FEATURE_SIMD32
 #  include "strcmp-armv7.S"

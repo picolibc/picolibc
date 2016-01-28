@@ -44,7 +44,7 @@
 /* .text is used instead of .section .text so it works with arm-aout too.  */
 	.text
 	.syntax unified
-#ifdef THUMB_V7_V6M
+#ifdef PREFER_THUMB
 	.thumb
 .macro FUNC_START name
 	.global \name
@@ -99,7 +99,7 @@
 	/*  Issue Angel SWI to read stack info.  */
 	movs	r0, #AngelSWI_Reason_HeapInfo
 	adr	r1, .LC0	/*  Point at ptr to 4 words to receive data.  */
-#ifdef THUMB_V7M_V6M
+#ifdef THUMB_VXM
 	bkpt	AngelSWI
 #elif defined(__thumb2__)
 	/*  We are in thumb mode for startup on armv7 architectures.  */
@@ -176,7 +176,7 @@
 		 have somehow missed it below (in which case it gets the same
 		 value as FIQ - not ideal, but better than nothing).  */
 	mov	sp, r3
-#ifdef THUMB_V7_V6M
+#ifdef PREFER_THUMB
 	/* XXX Fill in stack assignments for interrupt modes.  */
 #else
 	mrs	r2, CPSR
@@ -239,7 +239,7 @@
 	subs	a3, a3, a1		/* Third arg: length of block.  */
 	
 
-#if defined(__thumb__) && !defined(THUMB_V7_V6M)
+#if __thumb__ && !defined(PREFER_THUMB)
 	/* Enter Thumb mode...  */
 	add	a4, pc, #1	/* Get the address of the Thumb block.  */
 	bx	a4		/* Go there and start Thumb decoding.  */
@@ -278,7 +278,7 @@ __change_mode:
 #else
 	movs	r0, #AngelSWI_Reason_GetCmdLine
 	adr	r1, .LC30	/* Space for command line.  */
-#ifdef THUMB_V7M_V6M
+#ifdef THUMB_VXM
 	bkpt	AngelSWI
 #else
  	AngelSWIAsm	AngelSWI
@@ -404,7 +404,7 @@ __change_mode:
 
 	bl	FUNCTION (exit)		/* Should not return.  */
 
-#if defined(__thumb__) && !defined(THUMB_V7_V6M)
+#if __thumb__ && !defined(PREFER_THUMB)
 	/* Come out of Thumb mode.  This code should be redundant.  */
 	mov	a4, pc
 	bx	a4

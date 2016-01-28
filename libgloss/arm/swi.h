@@ -36,7 +36,7 @@
 #define AngelSWI 			AngelSWI_ARM
 #endif
 /* For thumb only architectures use the BKPT instruction instead of SWI.  */
-#ifdef THUMB_V7M_V6M
+#ifdef THUMB_VXM
 #define AngelSWIInsn			"bkpt"
 #define AngelSWIAsm			bkpt
 #else

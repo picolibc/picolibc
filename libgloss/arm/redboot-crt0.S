@@ -14,7 +14,7 @@
     .text
 	.syntax unified
      /* Setup the assembly entry point.  */
-#ifdef THUMB_V7_V6M
+#ifdef PREFER_THUMB
 .macro FUNC_START name
 	.global \name
 	.thumb_func
@@ -31,13 +31,13 @@
 	FUNC_START SYM_NAME(_start)
     /* Unnecessary to set fp for v6-m/v7-m, which don't support
        ARM state.  */
-#ifndef THUMB_V7M_V6M
+#if __ARM_ARCH_ISA_ARM
 	mov	fp, #0	/* Null frame pointer.  */
 #endif
 	movs	r7, #0	/* Null frame pointer for Thumb.  */
 
 	/* Enable interrupts for gdb debugging.  */
-#ifdef THUMB_V7_V6M
+#ifdef PREFER_THUMB
 	cpsie if
 #else
 	mrs    r0, cpsr
@@ -66,7 +66,7 @@
 	/* Nothing to left to clear.  */
 #endif
 
-#if defined(__thumb__) && !defined(THUMB_V7_V6M)
+#if __thumb__ && !defined(PREFER_THUMB)
 	/* Enter Thumb mode. */
 	add	a4, pc, #1	/* Get the address of the Thumb block.  */
 	bx	a4		/* Go there and start Thumb decoding.   */

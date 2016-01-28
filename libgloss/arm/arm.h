@@ -29,25 +29,27 @@
 #ifndef _LIBGLOSS_ARM_H
 #define _LIBGLOSS_ARM_H
 
-/* __thumb2__ stands for thumb on armva7(A/R/M/EM) architectures,
-   __ARM_ARCH_6M__ stands for armv6-M(thumb only) architecture,
-   __ARM_ARCH_7M__ stands for armv7-M(thumb only) architecture.
-   __ARM_ARCH_7EM__ stands for armv7e-M(thumb only) architecture.
-   There are some macro combinations used many times in libgloss/arm,
-   like (__thumb2__ || (__thumb__ && __ARM_ARCH_6M__)), so factor
-   it out and use THUMB_V7_V6M instead, which stands for thumb on
-   v6-m/v7 arch as the combination does.  */
-#if defined(__thumb2__) || (defined(__thumb__) && defined(__ARM_ARCH_6M__))
-# define THUMB_V7_V6M
+#include "acle-compat.h"
+
+/* Checking for targets supporting only Thumb instructions (eg. ARMv6-M) or
+   supporting Thumb-2 instructions, whether ARM instructions are available or
+   not, is done many times in libgloss/arm.  So factor it out and use
+   PREFER_THUMB instead.  */
+#if __thumb2__ || (__thumb__ && !__ARM_ARCH_ISA_ARM)
+# define PREFER_THUMB
 #endif
 
-/* The (__ARM_ARCH_7EM__ || __ARM_ARCH_7M__ || __ARM_ARCH_6M__) combination
-   stands for cortex-M profile architectures, which don't support ARM state.
-   Factor it out and use THUMB_V7M_V6M instead.  */
-#if defined(__ARM_ARCH_7M__)     \
-    || defined(__ARM_ARCH_7EM__) \
-    || defined(__ARM_ARCH_6M__)
-# define THUMB_V7M_V6M
+/* Processor only capable of executing Thumb-1 instructions.  */
+#if __ARM_ARCH_ISA_THUMB == 1 && !__ARM_ARCH_ISA_ARM
+# define THUMB1_ONLY
+#endif
+
+/* M profile architectures.  This is a different set of architectures than
+   those not having ARM ISA because it does not contain ARMv7.  This macro is
+   necessary to test which architectures use bkpt as semihosting interface from
+   architectures using svc.  */
+#if !__ARM_ARCH_ISA_ARM && !__ARM_ARCH_7__
+# define THUMB_VXM
 #endif
 
 /* Defined if this target supports the BLX Rm instruction.  */
