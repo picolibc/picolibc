@@ -77,11 +77,6 @@ void		 setgrent (void);
 void		 endgrent (void);
 #endif /* __BSD_VISIBLE || __XSI_VISIBLE >= 500 */
 #if __BSD_VISIBLE
-#ifndef __CYGWIN__
-char		*group_from_gid (gid_t, int);
-void		 setgrfile (const char *);
-int		 setgroupent (int);
-#endif /* !__CYGWIN__ */
 int		 initgroups (const char *, gid_t);
 #endif /* __BSD_VISIBLE */
 #endif /* !__INSIDE_CYGWIN__ */
