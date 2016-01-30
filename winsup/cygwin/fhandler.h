@@ -1469,6 +1469,7 @@ private:
   bool set_unit ();
   static bool need_invisible ();
   static void free_console ();
+  static const char *get_nonascii_key (INPUT_RECORD& input_rec, char *);
 
   fhandler_console (void *) {}
 

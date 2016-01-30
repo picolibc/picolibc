@@ -46,8 +46,6 @@ details. */
 #define srTop (con.b.srWindow.Top + con.scroll_region.Top)
 #define srBottom ((con.scroll_region.Bottom < 0) ? con.b.srWindow.Bottom : con.b.srWindow.Top + con.scroll_region.Bottom)
 
-const char *get_nonascii_key (INPUT_RECORD&, char *);
-
 const unsigned fhandler_console::MAX_WRITE_CHARS = 16384;
 
 fhandler_console::console_state NO_COPY *fhandler_console::shared_console_info;
@@ -2389,7 +2387,7 @@ static const struct {
 };
 
 const char *
-get_nonascii_key (INPUT_RECORD& input_rec, char *tmp)
+fhandler_console::get_nonascii_key (INPUT_RECORD& input_rec, char *tmp)
 {
 #define NORMAL  0
 #define SHIFT	1

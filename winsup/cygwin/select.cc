@@ -839,7 +839,6 @@ fhandler_fifo::select_except (select_stuff *ss)
 static int
 peek_console (select_record *me, bool)
 {
-  extern const char * get_nonascii_key (INPUT_RECORD& input_rec, char *);
   fhandler_console *fh = (fhandler_console *) me->fh;
 
   if (!me->read_selected)
@@ -881,7 +880,7 @@ peek_console (select_record *me, bool)
 	  {
 	    if (irec.Event.KeyEvent.bKeyDown
 		&& (irec.Event.KeyEvent.uChar.AsciiChar
-		    || get_nonascii_key (irec, tmpbuf)))
+		    || fhandler_console::get_nonascii_key (irec, tmpbuf)))
 	      return me->read_ready = true;
 	  }
 	else
