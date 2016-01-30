@@ -916,7 +916,7 @@ fhandler_console::select_read (select_stuff *ss)
   s->peek = peek_console;
   s->h = get_handle ();
   s->read_selected = true;
-  s->read_ready = false;
+  s->read_ready = get_readahead_valid();
   return s;
 }
 
