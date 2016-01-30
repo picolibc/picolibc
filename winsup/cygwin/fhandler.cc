@@ -90,6 +90,7 @@ fhandler_base::get_readahead ()
   /* FIXME - not thread safe */
   if (raixget >= ralen)
     raixget = raixput = ralen = 0;
+  debug_printf("available: %d", chret > -1);
   return chret;
 }
 

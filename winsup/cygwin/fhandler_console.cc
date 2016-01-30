@@ -309,6 +309,8 @@ fhandler_console::read (void *pv, size_t& buflen)
   int ch;
   set_input_state ();
 
+  debug_printf("requested buflen %d", buflen);
+
   /* Check console read-ahead buffer filled from terminal requests */
   if (con.cons_rapoi && *con.cons_rapoi)
     {
@@ -318,6 +320,7 @@ fhandler_console::read (void *pv, size_t& buflen)
     }
 
   int copied_chars = get_readahead_into_buffer (buf, buflen);
+  debug_printf("copied_chars %d", copied_chars);
 
   if (copied_chars)
     {
@@ -695,15 +698,19 @@ fhandler_console::read (void *pv, size_t& buflen)
 	  continue;
 	}
 
+      debug_printf("toadd = %p, nread = %d", toadd, nread);
       if (toadd)
 	{
-	  line_edit_status res = line_edit (toadd, nread, ti);
+	  ssize_t bytes_read;
+	  line_edit_status res = line_edit (toadd, nread, ti, &bytes_read);
 	  if (res == line_edit_signalled)
 	    goto sig_exit;
 	  else if (res == line_edit_input_done)
 	    break;
 	}
     }
+
+  debug_printf("ralen = %d, bytes = %d", ralen, ralen - raixget);
 
   while (buflen)
     if ((ch = get_readahead ()) < 0)
@@ -716,6 +723,7 @@ fhandler_console::read (void *pv, size_t& buflen)
 #undef buf
 
   buflen = copied_chars;
+  debug_printf("buflen set to %d", buflen);
   return;
 
 err:
