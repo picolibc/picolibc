@@ -375,6 +375,7 @@ _DEFUN(__SVFSCANF_R, (rptr, fp, fmt0, ap),
 	case 'p':
 	  scan_data.flags |= POINTER;
 	case 'x':
+	case 'X':
 	  scan_data.flags |= PFXOK;
 	  scan_data.base = 16;
 	  goto number;
