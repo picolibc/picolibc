@@ -423,9 +423,9 @@ _DEFUN(__SVFSCANF_R, (rptr, fp, fmt0, ap),
 	  return EOF;
 
 #ifdef FLOATING_POINT
-	case 'e':
-	case 'f':
-	case 'g':
+	case 'e': case 'E':
+	case 'f': case 'F':
+	case 'g': case 'G':
 	  scan_data.code = CT_FLOAT;
 	  break;
 #endif
