@@ -78,7 +78,6 @@ public:
   enum wait_states
   {
     select_signalled = -3,
-    select_loop = -2,
     select_error = -1,
     select_ok = 0,
     select_set_zero = 1
