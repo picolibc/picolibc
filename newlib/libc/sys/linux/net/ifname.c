@@ -125,7 +125,8 @@ struct if_nameindex *
 if_nameindex()
 {
 	size_t needed;
-	int mib[6], i, ifn = 0, off = 0, hlen;
+	int mib[6], ifn = 0, off = 0, hlen;
+	unsigned int i;
 	char *buf = NULL, *lim, *next, *cp, *ifbuf = NULL;
 	struct rt_msghdr *rtm;
 	struct if_msghdr *ifm;
