@@ -311,17 +311,23 @@ int	_EXFUN(vsscanf, (const char *__restrict, const char *__restrict, __VALIST)
  * Routines in POSIX 1003.1:2001.
  */
 
-#ifndef __STRICT_ANSI__
+#if !defined(__STRICT_ANSI__) || __XSI_VISIBLE || __POSIX_VISIBLE >= 200112
 #ifndef _REENT_ONLY
 FILE *	_EXFUN(fdopen, (int, const char *));
 #endif
 int	_EXFUN(fileno, (FILE *));
-int	_EXFUN(getw, (FILE *));
 int	_EXFUN(pclose, (FILE *));
 FILE *  _EXFUN(popen, (const char *, const char *));
-int	_EXFUN(putw, (int, FILE *));
+#endif
+
+#if !defined(__STRICT_ANSI__) || __BSD_VISIBLE
 void    _EXFUN(setbuffer, (FILE *, char *, int));
 int	_EXFUN(setlinebuf, (FILE *));
+#endif
+
+#if !defined(__STRICT_ANSI__) || __BSD_VISIBLE || __XSI_VISIBLE || __POSIX_VISIBLE >= 200112
+int	_EXFUN(getw, (FILE *));
+int	_EXFUN(putw, (int, FILE *));
 int	_EXFUN(getc_unlocked, (FILE *));
 int	_EXFUN(getchar_unlocked, (void));
 void	_EXFUN(flockfile, (FILE *));
@@ -329,7 +335,7 @@ int	_EXFUN(ftrylockfile, (FILE *));
 void	_EXFUN(funlockfile, (FILE *));
 int	_EXFUN(putc_unlocked, (int, FILE *));
 int	_EXFUN(putchar_unlocked, (int));
-#endif /* ! __STRICT_ANSI__ */
+#endif
 
 /*
  * Routines in POSIX 1003.1:200x.
