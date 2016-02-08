@@ -1332,7 +1332,7 @@ reswitch:	switch (ch) {
 				expsize = exponent (expstr, expt, ch);
 				size = expsize + ndig;
 				if (ndig > 1 || flags & ALT)
-					++size;
+					size += decp_len;
 # ifdef _WANT_IO_C99_FORMATS
 				flags &= ~GROUPING;
 # endif
@@ -1341,18 +1341,20 @@ reswitch:	switch (ch) {
 					if (expt > 0) {
 						size = expt;
 						if (prec || flags & ALT)
-							size += prec + 1;
+							size += prec + decp_len;
 					} else	/* "0.X" */
 						size = (prec || flags & ALT)
-							  ? prec + 2
+							  ? prec + 1 + decp_len
 							  : 1;
 				} else if (expt >= ndig) { /* fixed g fmt */
 					size = expt;
 					if (flags & ALT)
-						++size;
-				} else
-					size = ndig + (expt > 0 ?
-						1 : 2 - expt);
+						size += decp_len;
+				} else {
+					size = ndig + decp_len;
+					if (expt <= 0)
+						size += 1 - expt;
+				}
 # ifdef _WANT_IO_C99_FORMATS
 				if ((flags & GROUPING) && expt > 0) {
 					/* space for thousands' grouping */
