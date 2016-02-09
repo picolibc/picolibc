@@ -12,6 +12,10 @@ details. */
 #ifndef _MOUNT_H
 #define _MOUNT_H
 
+#define __CCP_APP_SLASH	0x10000000	/* Internal flag for conv_to_posix_path.
+					   always append slash, even if path
+					   is "X:\\" only. */
+
 enum disk_type
 {
   DT_NODISK,

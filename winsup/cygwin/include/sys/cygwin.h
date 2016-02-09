@@ -59,8 +59,10 @@ enum
   /* Or these values to the above as needed. */
   CCP_ABSOLUTE = 0,	  	/* Request absolute path (default). 	*/
   CCP_RELATIVE = 0x100,    	/* Request to keep path relative.   	*/
-  CCP_PROC_CYGDRIVE = 0x200    	/* Request to return /proc/cygdrive
+  CCP_PROC_CYGDRIVE = 0x200,   	/* Request to return /proc/cygdrive
 				   path (only with CCP_*_TO_POSIX).   */
+
+  CCP_CONVFLAGS_MASK = 0x300,
 };
 typedef unsigned int cygwin_conv_path_t;
 

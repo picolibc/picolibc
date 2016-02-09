@@ -899,7 +899,8 @@ mount_info::conv_to_posix_path (const char *src_path, char *posix_path,
   else
     {
       const char *lastchar = src_path + src_path_len - 1;
-      append_slash = isdirsep (*lastchar) && lastchar[-1] != ':';
+      append_slash = isdirsep (*lastchar)
+		     && ((ccp_flags & __CCP_APP_SLASH) || lastchar[-1] != ':');
     }
 
   debug_printf ("conv_to_posix_path (%s, 0x%x, %s)", src_path, ccp_flags,

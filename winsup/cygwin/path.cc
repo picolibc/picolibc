@@ -3318,7 +3318,7 @@ cygwin_conv_path (cygwin_conv_path_t what, const void *from, void *to,
   char *buf = NULL;
   PWCHAR path = NULL;
   int error = 0;
-  int how = what & ~CCP_CONVTYPE_MASK;
+  int how = what & CCP_CONVFLAGS_MASK;
   what &= CCP_CONVTYPE_MASK;
   int ret = -1;
 
@@ -3444,7 +3444,7 @@ cygwin_conv_path (cygwin_conv_path_t what, const void *from, void *to,
 	case CCP_WIN_A_TO_POSIX:
 	  buf = tp.c_get ();
 	  error = mount_table->conv_to_posix_path ((const char *) from, buf,
-						   how);
+						   how | __CCP_APP_SLASH);
 	  if (error)
 	    {
 	      set_errno (p.error);
@@ -3455,7 +3455,7 @@ cygwin_conv_path (cygwin_conv_path_t what, const void *from, void *to,
 	case CCP_WIN_W_TO_POSIX:
 	  buf = tp.c_get ();
 	  error = mount_table->conv_to_posix_path ((const PWCHAR) from, buf,
-						   how);
+						   how | __CCP_APP_SLASH);
 	  if (error)
 	    {
 	      set_errno (error);
