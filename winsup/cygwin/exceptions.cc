@@ -637,7 +637,7 @@ EXCEPTION_DISPOSITION
 exception::handle (EXCEPTION_RECORD *e, exception_list *frame, CONTEXT *in,
 		   PDISPATCHER_CONTEXT dispatch)
 {
-  static bool NO_COPY debugging;
+  static int NO_COPY debugging = 0;
   _cygtls& me = _my_tls;
 
 #ifndef __x86_64__
@@ -808,7 +808,7 @@ exception::handle (EXCEPTION_RECORD *e, exception_list *frame, CONTEXT *in,
     rtl_unwind (frame, e);
   else
     {
-      debugging = true;
+      debugging = 1;
       return ExceptionContinueExecution;
     }
 

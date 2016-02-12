@@ -11,6 +11,7 @@ details. */
 #ifndef _WINBASE2_H
 #define _WINBASE2_H
 
+__attribute__((gnu_inline))
 extern __inline__ LONG
 ilockcmpexch (volatile LONG *t, LONG v, LONG c)
 {
@@ -30,6 +31,7 @@ ilockcmpexch (volatile LONG *t, LONG v, LONG c)
 #undef InterlockedCompareExchangePointer
 
 #ifdef __x86_64__
+__attribute__((gnu_inline))
 extern __inline__ LONGLONG
 ilockcmpexch64 (volatile LONGLONG *t, LONGLONG v, LONGLONG c)
 {
