@@ -1,3 +1,4 @@
+// -*- C++ -*-
 /* thread.h: Locking and threading module definitions
 
    Copyright 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2007, 2008, 2009,
@@ -84,6 +85,8 @@ class pinfo;
 #define PTHREAD_RWLOCK_MAGIC PTHREAD_MAGIC+9
 #define PTHREAD_RWLOCKATTR_MAGIC PTHREAD_MAGIC+10
 #define PTHREAD_SPINLOCK_MAGIC PTHREAD_MAGIC+11
+#define PTHREAD_BARRIER_MAGIC PTHREAD_MAGIC+12
+#define PTHREAD_BARRIERATTR_MAGIC PTHREAD_MAGIC+13
 
 #define MUTEX_OWNER_ANONYMOUS ((pthread_t) -1)
 
@@ -519,6 +522,38 @@ private:
   static List<pthread_cond> conds;
   static fast_mutex cond_initialization_lock;
 };
+
+
+class pthread_barrierattr: public verifyable_object
+{
+public:
+  static bool is_good_object(pthread_barrierattr_t const *);
+  int shared;
+
+  pthread_barrierattr ();
+  ~pthread_barrierattr ();
+};
+
+
+class pthread_barrier: public verifyable_object
+{
+public:
+  static bool is_good_object(pthread_barrier_t const *);
+
+  pthread_mutex_t mtx; /* Mutex protecting everything below. */
+  pthread_cond_t cond; /* Conditional variable to wait on. */
+  unsigned cnt; /* Barrier count. Threads to wait for. */
+  uint64_t cyc; /* Cycle count. */
+  unsigned wt; /* Already waiting threads count. */
+
+  int init (const pthread_barrierattr_t *, unsigned);
+  int wait();
+  int destroy ();
+
+  pthread_barrier ();
+  ~pthread_barrier ();
+};
+
 
 class pthread_rwlockattr: public verifyable_object
 {

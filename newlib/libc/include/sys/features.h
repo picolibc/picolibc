@@ -118,10 +118,10 @@ extern "C" {
 
 #define _POSIX_ADVISORY_INFO			200112L
 /* #define _POSIX_ASYNCHRONOUS_IO		    -1 */
-/* #define _POSIX_BARRIERS			    -1 */
+#define _POSIX_BARRIERS				200112L
 #define _POSIX_CHOWN_RESTRICTED			     1
 #define _POSIX_CLOCK_SELECTION			200112L
-#define _POSIX_CPUTIME			    	200112L
+#define _POSIX_CPUTIME				200112L
 #define _POSIX_FSYNC				200112L
 #define _POSIX_IPV6				200112L
 #define _POSIX_JOB_CONTROL			     1
@@ -140,7 +140,7 @@ extern "C" {
 #define _POSIX_REGEXP				     1
 #define _POSIX_SAVED_IDS			     1
 #define _POSIX_SEMAPHORES			200112L
-#define _POSIX_SHARED_MEMORY_OBJECTS		200112L 
+#define _POSIX_SHARED_MEMORY_OBJECTS		200112L
 #define _POSIX_SHELL				     1
 /* #define _POSIX_SPAWN				    -1 */
 #define _POSIX_SPIN_LOCKS			    200112L

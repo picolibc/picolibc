@@ -50,6 +50,17 @@ const pthread_t pthread_mutex::_new_mutex = (pthread_t) 1;
 const pthread_t pthread_mutex::_unlocked_mutex = (pthread_t) 2;
 const pthread_t pthread_mutex::_destroyed_mutex = (pthread_t) 3;
 
+
+template <typename T>
+static inline
+void
+delete_and_clear (T * * const ptr)
+{
+  delete *ptr;
+  *ptr = 0;
+}
+
+
 inline bool
 pthread_mutex::no_owner()
 {
@@ -263,6 +274,23 @@ inline bool
 pthread_cond::is_initializer_or_object (pthread_cond_t const *cond)
 {
   if (verifyable_object_isvalid (cond, PTHREAD_COND_MAGIC, PTHREAD_COND_INITIALIZER) == INVALID_OBJECT)
+    return false;
+  return true;
+}
+
+inline bool
+pthread_barrierattr::is_good_object (pthread_barrierattr_t const *cond)
+{
+  if (verifyable_object_isvalid (cond, PTHREAD_BARRIERATTR_MAGIC)
+      != VALID_OBJECT)
+    return false;
+  return true;
+}
+
+inline bool
+pthread_barrier::is_good_object (pthread_barrier_t const *cond)
+{
+  if (verifyable_object_isvalid (cond, PTHREAD_BARRIER_MAGIC) != VALID_OBJECT)
     return false;
   return true;
 }
@@ -1298,6 +1326,25 @@ pthread_cond::_fixup_after_fork ()
   sem_wait = ::CreateSemaphore (&sec_none_nih, 0, INT32_MAX, NULL);
   if (!sem_wait)
     api_fatal ("pthread_cond::_fixup_after_fork () failed to recreate win32 semaphore");
+}
+
+pthread_barrierattr::pthread_barrierattr ()
+  : verifyable_object (PTHREAD_BARRIERATTR_MAGIC)
+  , shared (PTHREAD_PROCESS_PRIVATE)
+{
+}
+
+pthread_barrierattr::~pthread_barrierattr ()
+{
+}
+
+pthread_barrier::pthread_barrier ()
+  : verifyable_object (PTHREAD_BARRIER_MAGIC)
+{
+}
+
+pthread_barrier::~pthread_barrier ()
+{
 }
 
 pthread_rwlockattr::pthread_rwlockattr ():verifyable_object
@@ -3869,3 +3916,218 @@ pthread_null::getsequence_np ()
 }
 
 pthread_null pthread_null::_instance;
+
+
+extern "C"
+int
+pthread_barrierattr_init (pthread_barrierattr_t * battr)
+{
+  if (unlikely (battr == NULL))
+    return EINVAL;
+
+  *battr = new pthread_barrierattr;
+  (*battr)->shared = PTHREAD_PROCESS_PRIVATE;
+
+  return 0;
+}
+
+
+extern "C"
+int
+pthread_barrierattr_setpshared (pthread_barrierattr_t * battr, int shared)
+{
+  if (unlikely (! pthread_barrierattr::is_good_object (battr)))
+    return EINVAL;
+
+  if (unlikely (shared != PTHREAD_PROCESS_SHARED
+                && shared != PTHREAD_PROCESS_PRIVATE))
+    return EINVAL;
+
+  (*battr)->shared = shared;
+  return 0;
+}
+
+
+extern "C"
+int
+pthread_barrierattr_getpshared (const pthread_barrierattr_t * battr,
+                                int * shared)
+{
+  if (unlikely (! pthread_barrierattr::is_good_object (battr)
+                || shared == NULL))
+    return EINVAL;
+
+  *shared = (*battr)->shared;
+  return 0;
+}
+
+
+extern "C"
+int
+pthread_barrierattr_destroy (pthread_barrierattr_t * battr)
+{
+  if (unlikely (! pthread_barrierattr::is_good_object (battr)))
+    return EINVAL;
+
+  delete_and_clear (battr);
+  return 0;
+}
+
+
+extern "C"
+int
+pthread_barrier_init (pthread_barrier_t * bar,
+                      const pthread_barrierattr_t * attr, unsigned count)
+{
+  if (unlikely (bar == NULL))
+    return EINVAL;
+
+  *bar = new pthread_barrier;
+  return (*bar)->init (attr, count);
+}
+
+
+int
+pthread_barrier::init (const pthread_barrierattr_t * attr, unsigned count)
+{
+  pthread_mutex_t * mutex = NULL;
+
+  if (unlikely ((attr != NULL
+                 && (! pthread_barrierattr::is_good_object (attr)
+                     || (*attr)->shared == PTHREAD_PROCESS_SHARED))
+                || count == 0))
+    return EINVAL;
+
+  int retval = pthread_mutex_init (&mtx, NULL);
+  if (unlikely (retval != 0))
+    return retval;
+
+  retval = pthread_cond_init (&cond, NULL);
+  if (unlikely (retval != 0))
+    {
+      int ret = pthread_mutex_destroy (mutex);
+      if (ret != 0)
+        api_fatal ("pthread_mutex_destroy (%p) = %d", mutex, ret);
+
+      mtx = NULL;
+      return retval;
+    }
+
+  cnt = count;
+  cyc = 0;
+  wt = 0;
+
+  return 0;
+}
+
+
+extern "C"
+int
+pthread_barrier_destroy (pthread_barrier_t * bar)
+{
+  if (unlikely (! pthread_barrier::is_good_object (bar)))
+    return EINVAL;
+
+  int ret;
+  ret = (*bar)->destroy ();
+  if (ret == 0)
+    delete_and_clear (bar);
+
+  return ret;
+}
+
+
+int
+pthread_barrier::destroy ()
+{
+  if (unlikely (wt != 0))
+    return EBUSY;
+
+  int retval = pthread_cond_destroy (&cond);
+  if (unlikely (retval != 0))
+    return retval;
+  else
+    cond = NULL;
+
+  retval = pthread_mutex_destroy (&mtx);
+  if (unlikely (retval != 0))
+    return retval;
+  else
+    mtx = NULL;
+
+  cnt = 0;
+  cyc = 0;
+  wt = 0;
+
+  return 0;
+}
+
+
+extern "C"
+int
+pthread_barrier_wait (pthread_barrier_t * bar)
+{
+  if (unlikely (! pthread_barrier::is_good_object (bar)))
+    return EINVAL;
+
+  return (*bar)->wait ();
+}
+
+
+int
+pthread_barrier::wait ()
+{
+  int retval = pthread_mutex_lock (&mtx);
+  if (unlikely (retval != 0))
+    return retval;
+
+  if (unlikely (wt >= cnt))
+    {
+      api_fatal ("wt >= cnt (%u >= %u)", wt, cnt);
+      return EINVAL;
+    }
+
+  if (unlikely (++wt == cnt))
+    {
+      ++cyc;
+      /* This is the last thread to reach the barrier. Signal the waiting
+         threads to wake up and continue.  */
+      retval = pthread_cond_broadcast (&cond);
+      if (unlikely (retval != 0))
+        goto cond_error;
+
+      wt = 0;
+      retval = pthread_mutex_unlock (&mtx);
+      if (unlikely (retval != 0))
+        abort ();
+
+      return PTHREAD_BARRIER_SERIAL_THREAD;
+    }
+  else
+    {
+      uint64_t cycle = cyc;
+      do
+        {
+          retval = pthread_cond_wait (&cond, &mtx);
+          if (unlikely (retval != 0))
+            goto cond_error;
+        }
+      while (unlikely (cycle == cyc));
+
+      retval = pthread_mutex_unlock (&mtx);
+      if (unlikely (retval != 0))
+        api_fatal ("pthread_mutex_unlock (%p) = %d", &mtx, retval);
+
+      return 0;
+    }
+
+ cond_error:
+  {
+    --wt;
+    int ret = pthread_mutex_unlock (&mtx);
+    if (unlikely (ret != 0))
+        api_fatal ("pthread_mutex_unlock (%p) = %d", &mtx, ret);
+
+    return retval;
+  }
+}

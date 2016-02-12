@@ -431,6 +431,7 @@ typedef struct {
 
 /* POSIX Barrier Types */
 
+#if !defined(__CYGWIN__)
 #if defined(_POSIX_BARRIERS)
 typedef __uint32_t pthread_barrier_t;        /* POSIX Barrier Object */
 typedef struct {
@@ -443,7 +444,6 @@ typedef struct {
 
 /* POSIX Spin Lock Types */
 
-#if !defined (__CYGWIN__)
 #if defined(_POSIX_SPIN_LOCKS)
 typedef __uint32_t pthread_spinlock_t;        /* POSIX Spin Lock Object */
 #endif /* defined(_POSIX_SPIN_LOCKS) */

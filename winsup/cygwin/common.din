@@ -869,6 +869,13 @@ pthread_attr_setscope SIGFE
 pthread_attr_setstack SIGFE
 pthread_attr_setstackaddr SIGFE
 pthread_attr_setstacksize SIGFE
+pthread_barrierattr_init SIGFE
+pthread_barrierattr_setpshared SIGFE
+pthread_barrierattr_getpshared SIGFE
+pthread_barrierattr_destroy SIGFE
+pthread_barrier_init SIGFE
+pthread_barrier_destroy SIGFE
+pthread_barrier_wait SIGFE
 pthread_cancel SIGFE
 pthread_cond_broadcast SIGFE
 pthread_cond_destroy SIGFE
