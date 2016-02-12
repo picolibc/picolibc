@@ -20,7 +20,7 @@ _DEFUN (__gnu_basename, (path),
   char *p;
   if ((p = strrchr (path, '/')))
     return p + 1;
-  return path;
+  return (char *) path;
 }
 
 #endif /* !_NO_BASENAME  */

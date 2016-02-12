@@ -30,6 +30,8 @@ POSSIBILITY OF SUCH DAMAGE.
 
 #include <stdlib.h>
 #include "local.h"
+#include "mprec.h"
+#undef FLT_ROUNDS
 
 #ifdef _HAVE_LONG_DOUBLE
 
