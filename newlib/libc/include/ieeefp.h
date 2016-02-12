@@ -270,22 +270,17 @@ int _EXFUN(finitef, (float));
 #define __IEEE_DBL_NAN_EXP 0x7ff
 #define __IEEE_FLT_NAN_EXP 0xff
 
-#ifndef __ieeefp_isnanf
-#define __ieeefp_isnanf(x) (((*(long *)&(x) & 0x7f800000L)==0x7f800000L) && \
-			    ((*(long *)&(x) & 0x007fffffL)!=0000000000L))
-#endif
+#ifdef __ieeefp_isnanf
 #define isnanf(x)	__ieeefp_isnanf(x)
-
-#ifndef __ieeefp_isinff
-#define __ieeefp_isinff(x) (((*(long *)&(x) & 0x7f800000L)==0x7f800000L) && \
-			    ((*(long *)&(x) & 0x007fffffL)==0000000000L))
 #endif
+
+#ifdef __ieeefp_isinff
 #define isinff(x)	__ieeefp_isinff(x)
-
-#ifndef __ieeefp_finitef
-#define __ieeefp_finitef(x) (((*(long *)&(x) & 0x7f800000L)!=0x7f800000L))
 #endif
+
+#ifdef __ieeefp_finitef
 #define finitef(x)	__ieeefp_finitef(x)
+#endif
 
 #ifdef _DOUBLE_IS_32BITS
 #undef __IEEE_DBL_EXPBIAS
