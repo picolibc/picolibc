@@ -4,6 +4,26 @@
 
 <sect1 id="ov-new"><title>What's new and what changed in Cygwin</title>
 
+<sect2 id="ov-new2.5"><title>What's new and what changed in 2.5</title>
+
+<itemizedlist mark="bullet">
+
+<listitem><para>
+First implementation of pthread_barrier/pthread_barrierattr functions.
+New APIs: pthread_barrierattr_init, pthread_barrierattr_setpshared,
+pthread_barrierattr_getpshared, pthread_barrierattr_destroy,
+pthread_barrier_init, pthread_barrier_destroy, pthread_barrier_wait.
+</para></listitem>
+
+<listitem><para>
+In calls to chmod treat ACLs with extra ACEs *only* for Admins and
+SYSTEM like a trivial ACL.
+</para></listitem>
+
+</itemizedlist>
+
+</sect2>
+
 <sect2 id="ov-new2.4"><title>What's new and what changed in 2.4</title>
 
 <itemizedlist mark="bullet">

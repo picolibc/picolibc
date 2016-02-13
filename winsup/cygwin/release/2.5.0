@@ -1,0 +1,31 @@
+What's new:
+-----------
+
+- First implementation of pthread_barrier/pthread_barrierattr functions.
+  New APIs: pthread_barrierattr_init, pthread_barrierattr_setpshared,
+  pthread_barrierattr_getpshared, pthread_barrierattr_destroy,
+  pthread_barrier_init, pthread_barrier_destroy, pthread_barrier_wait.
+
+
+What changed:
+-------------
+
+- In calls to chmod treat ACLs with extra ACEs *only* for Admins and
+  SYSTEM like a trivial ACL.
+
+
+Bug Fixes
+---------
+
+- Fix potential hang when using LoadLibraryEx(LOAD_LIBRARY_SEARCH_SYSTEM32).
+  Reported and tested via IRC.
+
+- Fix a bug in ACL handling which might result in a spurious extra entry
+  for the primary group.  Self-observed.
+
+- printf(3): Handle multibyte decimal point in field size computation.
+  Addresses: https://cygwin.com/ml/cygwin/2016-02/msg00014.html
+
+- cygwin_conv_path: Always preserve trailing backslashes in conversion
+  to POSIX paths.
+  Addresses: https://cygwin.com/ml/cygwin/2016-01/msg00480.html
