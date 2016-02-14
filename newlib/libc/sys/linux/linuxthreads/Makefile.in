@@ -54,23 +54,18 @@ POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
 DIST_COMMON = $(srcdir)/../../../../Makefile.shared \
-	$(srcdir)/Makefile.in $(srcdir)/Makefile.am \
-	$(top_srcdir)/configure $(am__configure_deps) \
-	$(srcdir)/../../../../../mkinstalldirs
-subdir = .
+	$(srcdir)/Makefile.in $(srcdir)/Makefile.am
+subdir = linuxthreads
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
-am__aclocal_m4_deps = $(top_srcdir)/../../../../../libtool.m4 \
-	$(top_srcdir)/../../../../../ltoptions.m4 \
-	$(top_srcdir)/../../../../../ltsugar.m4 \
-	$(top_srcdir)/../../../../../ltversion.m4 \
-	$(top_srcdir)/../../../../../lt~obsolete.m4 \
-	$(top_srcdir)/../../../../acinclude.m4 \
-	$(top_srcdir)/configure.in
+am__aclocal_m4_deps = $(top_srcdir)/../../../../libtool.m4 \
+	$(top_srcdir)/../../../../ltoptions.m4 \
+	$(top_srcdir)/../../../../ltsugar.m4 \
+	$(top_srcdir)/../../../../ltversion.m4 \
+	$(top_srcdir)/../../../../lt~obsolete.m4 \
+	$(top_srcdir)/../../../acinclude.m4 $(top_srcdir)/configure.in
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
-am__CONFIG_DISTCLEAN_FILES = config.status config.cache config.log \
- configure.lineno config.status.lineno
-mkinstalldirs = $(SHELL) $(top_srcdir)/../../../../../mkinstalldirs
+mkinstalldirs = $(SHELL) $(top_srcdir)/../../../../mkinstalldirs
 CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 am__vpath_adj_setup = srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`;
@@ -104,7 +99,6 @@ am__installdirs = "$(DESTDIR)$(toollibdir)" "$(DESTDIR)$(toollibdir)"
 LIBRARIES = $(toollib_LIBRARIES)
 ARFLAGS = cru
 libpthread_a_AR = $(AR) $(ARFLAGS)
-am__DEPENDENCIES_1 =
 am__objects_1 = libpthread_a-attr.$(OBJEXT) \
 	libpthread_a-barrier.$(OBJEXT) libpthread_a-condvar.$(OBJEXT) \
 	libpthread_a-events.$(OBJEXT) \
@@ -280,6 +274,8 @@ ECHO_N = @ECHO_N@
 ECHO_T = @ECHO_T@
 EGREP = @EGREP@
 EXEEXT = @EXEEXT@
+EXTRA_SUBDIRS = @EXTRA_SUBDIRS@
+EXTRA_SUBLIBS = @EXTRA_SUBLIBS@
 FGREP = @FGREP@
 GREP = @GREP@
 INSTALL = @INSTALL@
@@ -292,11 +288,10 @@ LDFLAGS = @LDFLAGS@
 LIBOBJS = @LIBOBJS@
 LIBS = @LIBS@
 LIBTOOL = @LIBTOOL@
+LINUX_MACH_LIB = @LINUX_MACH_LIB@
 LIPO = @LIPO@
 LN_S = @LN_S@
 LTLIBOBJS = @LTLIBOBJS@
-MACHINE_LIB = @MACHINE_LIB@
-MACHINE_OBJLIST = @MACHINE_OBJLIST@
 MAINT = @MAINT@
 MAKEINFO = @MAKEINFO@
 MKDIR_P = @MKDIR_P@
@@ -460,40 +455,36 @@ all: all-recursive
 
 .SUFFIXES:
 .SUFFIXES: .def .c .lo .o .obj
-am--refresh: Makefile
-	@:
 $(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am $(srcdir)/../../../../Makefile.shared $(am__configure_deps)
 	@for dep in $?; do \
 	  case '$(am__configure_deps)' in \
 	    *$$dep*) \
-	      echo ' cd $(srcdir) && $(AUTOMAKE) --cygnus'; \
-	      $(am__cd) $(srcdir) && $(AUTOMAKE) --cygnus \
-		&& exit 0; \
+	      ( cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh ) \
+	        && { if test -f $@; then exit 0; else break; fi; }; \
 	      exit 1;; \
 	  esac; \
 	done; \
-	echo ' cd $(top_srcdir) && $(AUTOMAKE) --cygnus Makefile'; \
+	echo ' cd $(top_srcdir) && $(AUTOMAKE) --cygnus linuxthreads/Makefile'; \
 	$(am__cd) $(top_srcdir) && \
-	  $(AUTOMAKE) --cygnus Makefile
+	  $(AUTOMAKE) --cygnus linuxthreads/Makefile
 .PRECIOUS: Makefile
 Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 	@case '$?' in \
 	  *config.status*) \
-	    echo ' $(SHELL) ./config.status'; \
-	    $(SHELL) ./config.status;; \
+	    cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh;; \
 	  *) \
-	    echo ' cd $(top_builddir) && $(SHELL) ./config.status $@ $(am__depfiles_maybe)'; \
-	    cd $(top_builddir) && $(SHELL) ./config.status $@ $(am__depfiles_maybe);; \
+	    echo ' cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@ $(am__depfiles_maybe)'; \
+	    cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@ $(am__depfiles_maybe);; \
 	esac;
 $(srcdir)/../../../../Makefile.shared:
 
 $(top_builddir)/config.status: $(top_srcdir)/configure $(CONFIG_STATUS_DEPENDENCIES)
-	$(SHELL) ./config.status --recheck
+	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
 
 $(top_srcdir)/configure: @MAINTAINER_MODE_TRUE@ $(am__configure_deps)
-	$(am__cd) $(srcdir) && $(AUTOCONF)
+	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
 $(ACLOCAL_M4): @MAINTAINER_MODE_TRUE@ $(am__aclocal_m4_deps)
-	$(am__cd) $(srcdir) && $(ACLOCAL) $(ACLOCAL_AMFLAGS)
+	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
 $(am__aclocal_m4_deps):
 install-toollibLIBRARIES: $(toollib_LIBRARIES)
 	@$(NORMAL_INSTALL)
@@ -1006,9 +997,6 @@ mostlyclean-libtool:
 clean-libtool:
 	-rm -rf .libs _libs
 
-distclean-libtool:
-	-rm -f libtool config.lt
-
 # This directory's subdirectories are mostly independent; you can cd
 # into them and run `make' without going through this Makefile.
 # To change the values of `make' variables: instead of editing Makefiles,
@@ -1188,10 +1176,9 @@ clean-am: clean-generic clean-libtool clean-toollibLIBRARIES \
 	clean-toollibLTLIBRARIES mostlyclean-am
 
 distclean: distclean-recursive
-	-rm -f $(am__CONFIG_DISTCLEAN_FILES)
 	-rm -f Makefile
 distclean-am: clean-am distclean-compile distclean-generic \
-	distclean-libtool distclean-tags
+	distclean-tags
 
 dvi: dvi-recursive
 
@@ -1235,8 +1222,6 @@ install-ps-am:
 installcheck-am:
 
 maintainer-clean: maintainer-clean-recursive
-	-rm -f $(am__CONFIG_DISTCLEAN_FILES)
-	-rm -rf $(top_srcdir)/autom4te.cache
 	-rm -f Makefile
 maintainer-clean-am: distclean-am maintainer-clean-generic
 
@@ -1259,15 +1244,15 @@ uninstall-am: uninstall-toollibLIBRARIES uninstall-toollibLTLIBRARIES
 	install-am install-strip tags-recursive
 
 .PHONY: $(RECURSIVE_CLEAN_TARGETS) $(RECURSIVE_TARGETS) CTAGS GTAGS \
-	all all-am am--refresh check check-am clean clean-generic \
-	clean-libtool clean-toollibLIBRARIES clean-toollibLTLIBRARIES \
-	ctags ctags-recursive distclean distclean-compile \
-	distclean-generic distclean-libtool distclean-tags dvi dvi-am \
-	html html-am info info-am install install-am install-data \
-	install-data-am install-data-local install-dvi install-dvi-am \
-	install-exec install-exec-am install-html install-html-am \
-	install-info install-info-am install-man install-pdf \
-	install-pdf-am install-ps install-ps-am install-strip \
+	all all-am check check-am clean clean-generic clean-libtool \
+	clean-toollibLIBRARIES clean-toollibLTLIBRARIES ctags \
+	ctags-recursive distclean distclean-compile distclean-generic \
+	distclean-libtool distclean-tags dvi dvi-am html html-am info \
+	info-am install install-am install-data install-data-am \
+	install-data-local install-dvi install-dvi-am install-exec \
+	install-exec-am install-html install-html-am install-info \
+	install-info-am install-man install-pdf install-pdf-am \
+	install-ps install-ps-am install-strip \
 	install-toollibLIBRARIES install-toollibLTLIBRARIES \
 	installcheck installcheck-am installdirs installdirs-am \
 	maintainer-clean maintainer-clean-generic mostlyclean \

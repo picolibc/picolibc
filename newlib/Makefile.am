@@ -191,7 +191,19 @@ crt1.o: $(CRT1_DIR)$(CRT1)
 
 $(CRT1_DIR)$(CRT1): ; @true
 
-$(srcdir)/newlib.hin:
+targ-include:
+	mkdir $@
+
+targ-include/newlib.h: targ-include/_newlib_version.h
+
+targ-include/sys targ-include/machine targ-include/bits: targ-include/_newlib_version.h targ-include/newlib.h
+	mkdir $@
+
+targ-include/newlib.h: newlib.h targ-include
+	cp newlib.h $@
+
+targ-include/_newlib_version.h: _newlib_version.h targ-include
+	cp _newlib_version.h $@
 
 all-recursive: stmp-targ-include
 
@@ -200,8 +212,10 @@ all-recursive: stmp-targ-include
 # used while building.
 stmp-targ-include: config.status
 	-rm -rf targ-include stmp-targ-include
-	mkdir targ-include targ-include/sys targ-include/machine targ-include/bits
-	cp newlib.h targ-include/newlib.h
+	$(MAKE) targ-include/sys \
+		targ-include/machine \
+		targ-include/bits \
+		targ-include/newlib.h
 	-for i in $(srcdir)/libc/machine/$(machine_dir)/machine/*.h; do \
 	    if [ -f $$i ]; then \
 	      cp $$i targ-include/machine/`basename $$i`; \
@@ -274,6 +288,7 @@ endif
 	   $(INSTALL_DATA) $$i $(DESTDIR)$(tooldir)/include/`basename $$i`; \
 	  done; \
 	  $(INSTALL_DATA) newlib.h $(DESTDIR)$(tooldir)/include/newlib.h; \
+	  $(INSTALL_DATA) _newlib_version.h $(DESTDIR)$(tooldir)/include/_newlib_version.h; \
 	  $(mkinstalldirs) $(DESTDIR)$(tooldir)/include/machine; \
 	  for i in $(srcdir)/libc/include/machine/*.h; do \
 	   $(INSTALL_DATA) $$i $(DESTDIR)$(tooldir)/include/machine/`basename $$i`; \
@@ -441,4 +456,4 @@ check-DEJAGNU: site.exp
 	fi
 
 clean-local:
-	-rm -rf targ-include
+	-rm -rf targ-include newlib.h _newlib_version.h stamp-*

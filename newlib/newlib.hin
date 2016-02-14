@@ -10,7 +10,7 @@
 #undef _ELIX_LEVEL
 
 /* Newlib version */
-#undef _NEWLIB_VERSION
+#include <_newlib_version.h>
 
 /* C99 formats support (such as %a, %zu, ...) in IO functions like
  * printf/scanf enabled */
