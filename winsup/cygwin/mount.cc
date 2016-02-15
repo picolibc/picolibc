@@ -959,7 +959,7 @@ mount_info::conv_to_posix_path (const char *src_path, char *posix_path,
       if ((mi.posix_pathlen + (pathbuflen - mi.native_pathlen) + addslash) >= NT_MAX_PATH)
 	return ENAMETOOLONG;
       strcpy (posix_path, mi.posix_path);
-      if (addslash)
+      if (addslash || (!nextchar && append_slash))
 	strcat (posix_path, "/");
       if (nextchar)
 	slashify (p,
