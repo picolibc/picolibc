@@ -20,7 +20,6 @@ Cygwin license.  Please consult the file "CYGWIN_LICENSE" for details. */
 #include "../cygwin/include/cygwin/version.h"
 
 static PLSA_SECPKG_FUNCS funcs;
-static BOOL must_create_logon_sid;
 
 BOOL APIENTRY
 DllMain (HINSTANCE inst, DWORD reason, LPVOID res)
@@ -252,7 +251,6 @@ LsaApInitializePackage (ULONG authp_id, PLSA_SECPKG_FUNCS dpt,
 			PLSA_STRING *authp_name)
 {
   PLSA_STRING name = NULL;
-  DWORD vers, major, minor;
 
   /* Set global pointer to lsa helper function table. */
   funcs = dpt;
@@ -270,14 +268,6 @@ LsaApInitializePackage (ULONG authp_id, PLSA_SECPKG_FUNCS dpt,
   name->MaximumLength = sizeof (CYG_LSA_PKGNAME);
   strcpy (name->Buffer, CYG_LSA_PKGNAME);
   (*authp_name) = name;
-
-  vers = GetVersion ();
-  major = LOBYTE (LOWORD (vers));
-  minor = HIBYTE (LOWORD (vers));
-  /* Check if we're running on Windows 2000 or lower.  If so, we must create
-     the logon sid in the group list by ourselves. */
-  if (major < 5 || (major == 5 && minor == 0))
-    must_create_logon_sid = TRUE;
 
 #ifdef DEBUGGING
   fh = CreateFile ("C:\\cyglsa.dbgout", GENERIC_WRITE,
@@ -540,14 +530,6 @@ LsaApLogonUserEx (PLSA_CLIENT_REQUEST request, SECURITY_LOGON_TYPE logon_type,
     {
       /* ...on 32 bit systems we just allocate tokinf with the same size as
          we get, copy the whole structure and convert offsets into pointers. */
-
-      /* Allocate LUID for usage in the logon SID on Windows 2000.  This is
-	 not done in the 64 bit code above for hopefully obvious reasons... */
-      LUID logon_sid_id;
-
-      if (must_create_logon_sid && !AllocateLocallyUniqueId (&logon_sid_id))
-	return STATUS_INSUFFICIENT_RESOURCES;
-
       if (!(tokinf = funcs->AllocateLsaHeap (authinf->inf_size)))
 	return STATUS_NO_MEMORY;
       memcpy (tokinf, &authinf->inf, authinf->inf_size);
@@ -560,22 +542,8 @@ LsaApLogonUserEx (PLSA_CLIENT_REQUEST request, SECURITY_LOGON_TYPE logon_type,
 	      ((PBYTE) tokinf + (LONG_PTR) tokinf->Groups);
       /* Group SIDs */
       for (i = 0; i < tokinf->Groups->GroupCount; ++i)
-	{
-	  tokinf->Groups->Groups[i].Sid = (PSID)
-		((PBYTE) tokinf + (LONG_PTR) tokinf->Groups->Groups[i].Sid);
-	  if (must_create_logon_sid
-	      && tokinf->Groups->Groups[i].Attributes & SE_GROUP_LOGON_ID
-	      && *GetSidSubAuthorityCount (tokinf->Groups->Groups[i].Sid) == 3
-	      && *GetSidSubAuthority (tokinf->Groups->Groups[i].Sid, 0)
-		 == SECURITY_LOGON_IDS_RID)
-	    {
-	      *GetSidSubAuthority (tokinf->Groups->Groups[i].Sid, 1)
-	      = logon_sid_id.HighPart;
-	      *GetSidSubAuthority (tokinf->Groups->Groups[i].Sid, 2)
-	      = logon_sid_id.LowPart;
-	    }
-	}
-
+	tokinf->Groups->Groups[i].Sid = (PSID)
+	      ((PBYTE) tokinf + (LONG_PTR) tokinf->Groups->Groups[i].Sid);
       /* Primary Group SID */
       tokinf->PrimaryGroup.PrimaryGroup = (PSID)
 	      ((PBYTE) tokinf + (LONG_PTR) tokinf->PrimaryGroup.PrimaryGroup);
@@ -587,7 +555,6 @@ LsaApLogonUserEx (PLSA_CLIENT_REQUEST request, SECURITY_LOGON_TYPE logon_type,
       /* Default DACL */
       tokinf->DefaultDacl.DefaultDacl = (PACL)
 	      ((PBYTE) tokinf + (LONG_PTR) tokinf->DefaultDacl.DefaultDacl);
-
     }
 #endif
 
