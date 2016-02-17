@@ -67,3 +67,8 @@ AC_DEFUN([_AM_SUBST_NOTMAKE])
 # Public sister of _AM_SUBST_NOTMAKE.
 AC_DEFUN([AM_SUBST_NOTMAKE], [_AM_SUBST_NOTMAKE($@)])
 
+m4_include([../../libtool.m4])
+m4_include([../../ltoptions.m4])
+m4_include([../../ltsugar.m4])
+m4_include([../../ltversion.m4])
+m4_include([../../lt~obsolete.m4])
