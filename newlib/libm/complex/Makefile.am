@@ -6,14 +6,14 @@ INCLUDES = -I$(srcdir)/../common -I$(srcdir)/ $(NEWLIB_CFLAGS) $(CROSS_CFLAGS) $
 
 src = cabs.c cacos.c cacosh.c carg.c casin.c casinh.c \
       catan.c catanh.c ccos.c ccosh.c cephes_subr.c \
-      cexp.c cimag.c  clog.c conj.c  \
+      cexp.c cimag.c  clog.c clog10.c conj.c  \
       cpow.c cproj.c  creal.c  \
       csin.c csinh.c csqrt.c ctan.c ctanh.c
 
 lsrc = cabsl.c creall.c cimagl.c
 
 fsrc =	cabsf.c casinf.c ccosf.c cimagf.c cprojf.c  \
-        csqrtf.c cacosf.c casinhf.c ccoshf.c clogf.c \
+        csqrtf.c cacosf.c casinhf.c ccoshf.c clogf.c clog10f.c \
         crealf.c ctanf.c cacoshf.c catanf.c   \
         cephes_subrf.c conjf.c csinf.c ctanhf.c \
         cargf.c catanhf.c cexpf.c cpowf.c csinhf.c
@@ -36,7 +36,7 @@ include $(srcdir)/../../Makefile.shared
 CHEWOUT_FILES =	cabs.def cacos.def cacosh.def carg.def \
         casin.def casinh.def catan.def catanh.def \
         ccos.def ccosh.def cexp.def cimag.def clog.def \
-        conj.def cpow.def cproj.def creal.def \
+        clog10.def conj.def cpow.def cproj.def creal.def \
         csin.def csinh.def csqrt.def ctan.def ctanh.def
 
 CHAPTERS = complex.tex

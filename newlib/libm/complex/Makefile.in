@@ -79,23 +79,23 @@ am__objects_1 = lib_a-cabs.$(OBJEXT) lib_a-cacos.$(OBJEXT) \
 	lib_a-ccos.$(OBJEXT) lib_a-ccosh.$(OBJEXT) \
 	lib_a-cephes_subr.$(OBJEXT) lib_a-cexp.$(OBJEXT) \
 	lib_a-cimag.$(OBJEXT) lib_a-clog.$(OBJEXT) \
-	lib_a-conj.$(OBJEXT) lib_a-cpow.$(OBJEXT) \
-	lib_a-cproj.$(OBJEXT) lib_a-creal.$(OBJEXT) \
-	lib_a-csin.$(OBJEXT) lib_a-csinh.$(OBJEXT) \
-	lib_a-csqrt.$(OBJEXT) lib_a-ctan.$(OBJEXT) \
-	lib_a-ctanh.$(OBJEXT)
+	lib_a-clog10.$(OBJEXT) lib_a-conj.$(OBJEXT) \
+	lib_a-cpow.$(OBJEXT) lib_a-cproj.$(OBJEXT) \
+	lib_a-creal.$(OBJEXT) lib_a-csin.$(OBJEXT) \
+	lib_a-csinh.$(OBJEXT) lib_a-csqrt.$(OBJEXT) \
+	lib_a-ctan.$(OBJEXT) lib_a-ctanh.$(OBJEXT)
 am__objects_2 = lib_a-cabsf.$(OBJEXT) lib_a-casinf.$(OBJEXT) \
 	lib_a-ccosf.$(OBJEXT) lib_a-cimagf.$(OBJEXT) \
 	lib_a-cprojf.$(OBJEXT) lib_a-csqrtf.$(OBJEXT) \
 	lib_a-cacosf.$(OBJEXT) lib_a-casinhf.$(OBJEXT) \
 	lib_a-ccoshf.$(OBJEXT) lib_a-clogf.$(OBJEXT) \
-	lib_a-crealf.$(OBJEXT) lib_a-ctanf.$(OBJEXT) \
-	lib_a-cacoshf.$(OBJEXT) lib_a-catanf.$(OBJEXT) \
-	lib_a-cephes_subrf.$(OBJEXT) lib_a-conjf.$(OBJEXT) \
-	lib_a-csinf.$(OBJEXT) lib_a-ctanhf.$(OBJEXT) \
-	lib_a-cargf.$(OBJEXT) lib_a-catanhf.$(OBJEXT) \
-	lib_a-cexpf.$(OBJEXT) lib_a-cpowf.$(OBJEXT) \
-	lib_a-csinhf.$(OBJEXT)
+	lib_a-clog10f.$(OBJEXT) lib_a-crealf.$(OBJEXT) \
+	lib_a-ctanf.$(OBJEXT) lib_a-cacoshf.$(OBJEXT) \
+	lib_a-catanf.$(OBJEXT) lib_a-cephes_subrf.$(OBJEXT) \
+	lib_a-conjf.$(OBJEXT) lib_a-csinf.$(OBJEXT) \
+	lib_a-ctanhf.$(OBJEXT) lib_a-cargf.$(OBJEXT) \
+	lib_a-catanhf.$(OBJEXT) lib_a-cexpf.$(OBJEXT) \
+	lib_a-cpowf.$(OBJEXT) lib_a-csinhf.$(OBJEXT)
 am__objects_3 = lib_a-cabsl.$(OBJEXT) lib_a-creall.$(OBJEXT) \
 	lib_a-cimagl.$(OBJEXT)
 @USE_LIBTOOL_FALSE@am_lib_a_OBJECTS = $(am__objects_1) \
@@ -105,13 +105,13 @@ LTLIBRARIES = $(noinst_LTLIBRARIES)
 libcomplex_la_LIBADD =
 am__objects_4 = cabs.lo cacos.lo cacosh.lo carg.lo casin.lo casinh.lo \
 	catan.lo catanh.lo ccos.lo ccosh.lo cephes_subr.lo cexp.lo \
-	cimag.lo clog.lo conj.lo cpow.lo cproj.lo creal.lo csin.lo \
-	csinh.lo csqrt.lo ctan.lo ctanh.lo
+	cimag.lo clog.lo clog10.lo conj.lo cpow.lo cproj.lo creal.lo \
+	csin.lo csinh.lo csqrt.lo ctan.lo ctanh.lo
 am__objects_5 = cabsf.lo casinf.lo ccosf.lo cimagf.lo cprojf.lo \
-	csqrtf.lo cacosf.lo casinhf.lo ccoshf.lo clogf.lo crealf.lo \
-	ctanf.lo cacoshf.lo catanf.lo cephes_subrf.lo conjf.lo \
-	csinf.lo ctanhf.lo cargf.lo catanhf.lo cexpf.lo cpowf.lo \
-	csinhf.lo
+	csqrtf.lo cacosf.lo casinhf.lo ccoshf.lo clogf.lo clog10f.lo \
+	crealf.lo ctanf.lo cacoshf.lo catanf.lo cephes_subrf.lo \
+	conjf.lo csinf.lo ctanhf.lo cargf.lo catanhf.lo cexpf.lo \
+	cpowf.lo csinhf.lo
 am__objects_6 = cabsl.lo creall.lo cimagl.lo
 @USE_LIBTOOL_TRUE@am_libcomplex_la_OBJECTS = $(am__objects_4) \
 @USE_LIBTOOL_TRUE@	$(am__objects_5) $(am__objects_6)
@@ -272,13 +272,13 @@ AUTOMAKE_OPTIONS = cygnus
 INCLUDES = -I$(srcdir)/../common -I$(srcdir)/ $(NEWLIB_CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLAGS)
 src = cabs.c cacos.c cacosh.c carg.c casin.c casinh.c \
       catan.c catanh.c ccos.c ccosh.c cephes_subr.c \
-      cexp.c cimag.c  clog.c conj.c  \
+      cexp.c cimag.c  clog.c clog10.c conj.c  \
       cpow.c cproj.c  creal.c  \
       csin.c csinh.c csqrt.c ctan.c ctanh.c
 
 lsrc = cabsl.c creall.c cimagl.c
 fsrc = cabsf.c casinf.c ccosf.c cimagf.c cprojf.c  \
-        csqrtf.c cacosf.c casinhf.c ccoshf.c clogf.c \
+        csqrtf.c cacosf.c casinhf.c ccoshf.c clogf.c clog10f.c \
         crealf.c ctanf.c cacoshf.c catanf.c   \
         cephes_subrf.c conjf.c csinf.c ctanhf.c \
         cargf.c catanhf.c cexpf.c cpowf.c csinhf.c
@@ -301,7 +301,7 @@ CLEANFILES = $(CHEWOUT_FILES) *.ref
 CHEWOUT_FILES = cabs.def cacos.def cacosh.def carg.def \
         casin.def casinh.def catan.def catanh.def \
         ccos.def ccosh.def cexp.def cimag.def clog.def \
-        conj.def cpow.def cproj.def creal.def \
+        clog10.def conj.def cpow.def cproj.def creal.def \
         csin.def csinh.def csqrt.def ctan.def ctanh.def
 
 CHAPTERS = complex.tex
@@ -458,6 +458,12 @@ lib_a-clog.o: clog.c
 lib_a-clog.obj: clog.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-clog.obj `if test -f 'clog.c'; then $(CYGPATH_W) 'clog.c'; else $(CYGPATH_W) '$(srcdir)/clog.c'; fi`
 
+lib_a-clog10.o: clog10.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-clog10.o `test -f 'clog10.c' || echo '$(srcdir)/'`clog10.c
+
+lib_a-clog10.obj: clog10.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-clog10.obj `if test -f 'clog10.c'; then $(CYGPATH_W) 'clog10.c'; else $(CYGPATH_W) '$(srcdir)/clog10.c'; fi`
+
 lib_a-conj.o: conj.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-conj.o `test -f 'conj.c' || echo '$(srcdir)/'`conj.c
 
@@ -571,6 +577,12 @@ lib_a-clogf.o: clogf.c
 
 lib_a-clogf.obj: clogf.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-clogf.obj `if test -f 'clogf.c'; then $(CYGPATH_W) 'clogf.c'; else $(CYGPATH_W) '$(srcdir)/clogf.c'; fi`
+
+lib_a-clog10f.o: clog10f.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-clog10f.o `test -f 'clog10f.c' || echo '$(srcdir)/'`clog10f.c
+
+lib_a-clog10f.obj: clog10f.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-clog10f.obj `if test -f 'clog10f.c'; then $(CYGPATH_W) 'clog10f.c'; else $(CYGPATH_W) '$(srcdir)/clog10f.c'; fi`
 
 lib_a-crealf.o: crealf.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-crealf.o `test -f 'crealf.c' || echo '$(srcdir)/'`crealf.c

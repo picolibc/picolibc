@@ -120,6 +120,11 @@ double creal(double complex);
 float crealf(float complex);
 long double creall(long double complex);
 
+#if __GNU_VISIBLE
+double complex clog10(double complex);
+float complex clog10f(float complex);
+#endif
+
 __END_DECLS
 
 #endif	/* ! _COMPLEX_H */
