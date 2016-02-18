@@ -358,6 +358,7 @@ struct sigaction
 #define	SIGILL	4	/* illegal instruction (not reset when caught) */
 #define	SIGTRAP	5	/* trace trap (not reset when caught) */
 #define	SIGABRT 6	/* used by abort */
+#define	SIGIOT	SIGABRT	/* synonym for SIGABRT on most systems */
 #define	SIGEMT	7	/* EMT instruction */
 #define	SIGFPE	8	/* floating point exception */
 #define	SIGKILL	9	/* kill (cannot be caught or ignored) */

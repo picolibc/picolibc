@@ -741,6 +741,7 @@ SIGQUIT      3    quit
 SIGILL       4    illegal instruction (not reset when caught)
 SIGTRAP      5    trace trap (not reset when caught)
 SIGABRT      6    used by abort
+SIGIOT       6    another name for SIGABRT
 SIGEMT       7    EMT instruction
 SIGFPE       8    floating point exception
 SIGKILL      9    kill (cannot be caught or ignored)

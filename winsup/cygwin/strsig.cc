@@ -26,7 +26,8 @@ struct sigdesc
   _s(SIGQUIT, "Quit"),				/*  3 */ \
   _s(SIGILL, "Illegal instruction"),		/*  4 */ \
   _s(SIGTRAP, "Trace/breakpoint trap"),		/*  5 */ \
-  _s(SIGABRT, "Aborted"),			/*  6 */ \
+  _s2(SIGABRT, "Aborted",			/*  6 */ \
+      SIGIOT, "Aborted"),				 \
   _s(SIGEMT, "EMT instruction"),		/*  7 */ \
   _s(SIGFPE, "Floating point exception"),	/*  8 */ \
   _s(SIGKILL, "Killed"),			/*  9 */ \
