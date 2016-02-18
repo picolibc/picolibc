@@ -232,6 +232,8 @@ clock_nanosleep SIGFE
 clock_setres SIGFE
 clock_settime SIGFE
 clog NOSIGFE
+clog10 NOSIGFE
+clog10f NOSIGFE
 clogf NOSIGFE
 close SIGFE
 closedir SIGFE

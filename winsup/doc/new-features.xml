@@ -24,6 +24,10 @@ SYSTEM like a trivial ACL.
 Bump POSIX option macros to POSIX.1-2008.
 </para></listitem>
 
+<listitem><para>
+New APIs: clog10, clog10f.
+</para></listitem>
+
 </itemizedlist>
 
 </sect2>
