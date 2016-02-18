@@ -31,9 +31,6 @@ hires_ms NO_COPY gtod;
 
 hires_ns NO_COPY ntod;
 
-/* Temporary declare here until 32 bit w32api follows suit. */
-extern "C" { void WINAPI GetSystemTimePreciseAsFileTime (LPFILETIME); }
-
 static inline void __attribute__ ((always_inline))
 get_system_time (PLARGE_INTEGER systime)
 {
