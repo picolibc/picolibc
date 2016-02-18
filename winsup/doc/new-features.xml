@@ -20,6 +20,10 @@ In calls to chmod treat ACLs with extra ACEs *only* for Admins and
 SYSTEM like a trivial ACL.
 </para></listitem>
 
+<listitem><para>
+Bump POSIX option macros to POSIX.1-2008.
+</para></listitem>
+
 </itemizedlist>
 
 </sect2>

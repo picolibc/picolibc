@@ -13,6 +13,8 @@ What changed:
 - In calls to chmod treat ACLs with extra ACEs *only* for Admins and
   SYSTEM like a trivial ACL.
 
+- Bump POSIX option macros to POSIX.1-2008.
+
 
 Bug Fixes
 ---------
@@ -29,3 +31,14 @@ Bug Fixes
 - cygwin_conv_path: Always preserve trailing backslashes in conversion
   to POSIX paths.
   Addresses: https://cygwin.com/ml/cygwin/2016-01/msg00480.html
+
+- Make buffered console characters visible to select().
+  Addresses: https://cygwin.com/ml/cygwin/2014-12/msg00118.html
+
+- Always report relocation problems, not only in debug DLL.
+  Addresses: https://cygwin.com/ml/cygwin/2016-02/msg00147.html
+
+- Don't spill network credentials of privileged user changing the user
+  context via setuid method 1
+  (https://cygwin.com/cygwin-ug-net/ntsec.html#ntsec-nopasswd1) into
+  user session
