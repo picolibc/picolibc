@@ -1,8 +1,7 @@
-/*  pthread.h
+/*
+ *  Written by Joel Sherrill <joel.sherrill@OARcorp.com>.
  *
- *  Written by Joel Sherrill <joel@OARcorp.com>.
- *
- *  COPYRIGHT (c) 1989-2013.
+ *  COPYRIGHT (c) 1989-2013, 2015.
  *  On-Line Applications Research Corporation (OAR).
  *
  *  Permission to use, copy, modify, and distribute this software for any
@@ -14,8 +13,6 @@
  *  WARRANTY.  IN PARTICULAR,  THE AUTHOR MAKES NO REPRESENTATION
  *  OR WARRANTY OF ANY KIND CONCERNING THE MERCHANTABILITY OF THIS
  *  SOFTWARE OR ITS FITNESS FOR ANY PARTICULAR PURPOSE.
- *
- *  $Id$
  */
 
 #ifndef __PTHREAD_h
@@ -96,6 +93,13 @@ int	_EXFUN(pthread_mutex_timedlock,
  
 int	_EXFUN(pthread_condattr_init, (pthread_condattr_t *__attr));
 int	_EXFUN(pthread_condattr_destroy, (pthread_condattr_t *__attr));
+
+int	_EXFUN(pthread_condattr_getclock,
+		(const pthread_condattr_t *__restrict __attr,
+              clockid_t *__restrict __clock_id));
+int	_EXFUN(pthread_condattr_setclock,
+		(pthread_condattr_t *__attr, clockid_t __clock_id));
+
 int	_EXFUN(pthread_condattr_getpshared,
 		(_CONST pthread_condattr_t *__attr, int *__pshared));
 int	_EXFUN(pthread_condattr_setpshared,
@@ -160,6 +164,9 @@ int	_EXFUN(pthread_getschedparam,
 	(pthread_t __pthread, int *__policy, struct sched_param *__param));
 int	_EXFUN(pthread_setschedparam,
 	(pthread_t __pthread, int __policy, struct sched_param *__param));
+
+/* Set Scheduling Priority of a Thread */
+int	_EXFUN(pthread_setschedprio, (pthread_t thread, int prio));
 
 #endif /* defined(_POSIX_THREAD_PRIORITY_SCHEDULING) */
 
@@ -262,6 +269,14 @@ pthread_t	_EXFUN(pthread_self, (void));
 /* Compare Thread IDs, p1003.1c/Draft 10, p. 153 */
 
 int	_EXFUN(pthread_equal, (pthread_t __t1, pthread_t __t2));
+
+/* Retrieve ID of a Thread's CPU Time Clock */
+int	_EXFUN(pthread_getcpuclockid,
+		(pthread_t thread, clockid_t *clock_id));
+
+/* Get/Set Current Thread's Concurrency Level */
+int	_EXFUN(pthread_setconcurrency, (int new_level));
+int	_EXFUN(pthread_getconcurrency, (void));
 
 /* Dynamic Package Initialization */
 
