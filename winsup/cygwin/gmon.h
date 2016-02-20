@@ -153,7 +153,7 @@ struct rawarc {
  * The profiling data structures are housed in this structure.
  */
 struct gmonparam {
-	int		state;
+	volatile int	state;
 	u_short		*kcount;
 	size_t		kcountsize;
 	u_short		*froms;

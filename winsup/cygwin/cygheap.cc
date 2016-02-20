@@ -744,3 +744,15 @@ init_cygheap::find_tls (int sig, bool& issig_wait)
     WaitForSingleObject (t->mutex, INFINITE);
   return t;
 }
+
+/* Called from profil.c to sample all non-main thread PC values for profiling */
+extern "C" void
+cygheap_profthr_all (void (*profthr_byhandle) (HANDLE))
+{
+  for (uint32_t ix = 0; ix < nthreads; ix++)
+    {
+      _cygtls *tls = cygheap->threadlist[ix].thread;
+      if (tls->tid)
+	profthr_byhandle (tls->tid->win32_obj_id);
+    }
+}

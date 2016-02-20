@@ -151,7 +151,6 @@ void _mcleanup (void);
 void
 _mcleanup(void)
 {
-	static char gmon_out[] = "gmon.out";
 	int fd;
 	int hz;
 	int fromindex;
@@ -161,7 +160,8 @@ _mcleanup(void)
 	struct rawarc rawarc;
 	struct gmonparam *p = &_gmonparam;
 	struct gmonhdr gmonhdr, *hdr;
-	const char *proffile;
+	char *filename = (char *) "gmon.out";
+	char *prefix;
 #ifdef DEBUG
 	int log, len;
 	char dbuf[200];
@@ -173,58 +173,44 @@ _mcleanup(void)
 	hz = PROF_HZ;
 	moncontrol(0);
 
-#ifdef nope
-	if ((profdir = getenv("PROFDIR")) != NULL) {
-		extern char *__progname;
-		char *s, *t, *limit;
-		pid_t pid;
-		long divisor;
+	/* We copy an undocumented glibc feature: customizing the profiler's
+	   output file name somewhat, depending on the env var GMON_OUT_PREFIX.
+	   if GMON_OUT_PREFIX is unspecified, the file's name is "gmon.out".
 
-		/* If PROFDIR contains a null value, no profiling
-		   output is produced */
-		if (*profdir == '\0') {
-			return;
-		}
+	   if GMON_OUT_PREFIX is specified with at least one character, the
+	   file's name is computed as "$GMON_OUT_PREFIX.$pid".
 
-		limit = buf + sizeof buf - 1 - 10 - 1 -
-		    strlen(__progname) - 1;
-		t = buf;
-		s = profdir;
-		while((*t = *s) != '\0' && t < limit) {
-			t++;
-			s++;
-		}
-		*t++ = '/';
+	   if GMON_OUT_PREFIX is specified but contains no characters, the
+	   file's name is computed as "gmon.out.$pid".  Cygwin-specific.
+	*/
+	if ((prefix = getenv("GMON_OUT_PREFIX")) != NULL) {
+		char *buf;
+		/* Covers positive pid_t values. */
+		int32_t divisor = 1000*1000*1000;
+		pid_t pid = getpid();
+		size_t len = strlen(prefix);
 
-		/*
-		 * Copy and convert pid from a pid_t to a string.  For
-		 * best performance, divisor should be initialized to
-		 * the largest power of 10 less than PID_MAX.
-		 */
-		pid = getpid();
-		divisor=10000;
-		while (divisor > pid) divisor /= 10;	/* skip leading zeros */
-		do {
-			*t++ = (pid/divisor) + '0';
+		if (len == 0)
+			len = strlen(prefix = filename);
+		buf = alloca(len + 13);// allow for '.', 10-digit pid, NUL, +1
+
+		memcpy(buf, prefix, len);
+		buf[len++] = '.';
+
+		while (divisor > pid)  // skip leading zeroes
+			divisor /= 10;
+		do {                   // convert pid to digits and store 'em
+			buf[len++] = (pid / divisor) + '0';
 			pid %= divisor;
 		} while (divisor /= 10);
-		*t++ = '.';
 
-		s = __progname;
-		while ((*t++ = *s++) != '\0')
-			;
-
-		proffile = buf;
-	} else {
-		proffile = gmon_out;
+		buf[len] = '\0';
+		filename = buf;
 	}
-#else
-	proffile = gmon_out;
-#endif
 
-	fd = open(proffile , O_CREAT|O_TRUNC|O_WRONLY|O_BINARY, 0666);
+	fd = open(filename, O_CREAT|O_TRUNC|O_WRONLY|O_BINARY, 0666);
 	if (fd < 0) {
-		perror( proffile );
+		perror(filename);
 		return;
 	}
 #ifdef DEBUG

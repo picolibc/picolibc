@@ -41,6 +41,7 @@ static char rcsid[] = "$OpenBSD: mcount.c,v 1.6 1997/07/23 21:11:27 kstailey Exp
 #endif
 #include <sys/types.h>
 #include "gmon.h"
+#include "winsup.h"
 
 /*
  * mcount is called on entry to each function compiled with the profiling
@@ -70,11 +71,12 @@ _MCOUNT_DECL (size_t frompc, size_t selfpc)
 	p = &_gmonparam;
 	/*
 	 * check that we are profiling
-	 * and that we aren't recursively invoked.
+	 * and that we aren't recursively invoked by this thread
+	 * or entered anew by any other thread.
 	 */
-	if (p->state != GMON_PROF_ON)
+	if (InterlockedCompareExchange (
+		    &p->state, GMON_PROF_BUSY, GMON_PROF_ON) != GMON_PROF_ON)
 		return;
-	p->state = GMON_PROF_BUSY;
 	/*
 	 * check that frompcindex is a reasonable pc value.
 	 * for example:	signal catchers get called from the stack,
@@ -162,10 +164,10 @@ _MCOUNT_DECL (size_t frompc, size_t selfpc)
 		}
 	}
 done:
-	p->state = GMON_PROF_ON;
+	InterlockedExchange (&p->state, GMON_PROF_ON);
 	return;
 overflow:
-	p->state = GMON_PROF_ERROR;
+	InterlockedExchange (&p->state, GMON_PROF_ERROR);
 	return;
 }
 

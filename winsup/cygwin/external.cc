@@ -702,6 +702,17 @@ cygwin_internal (cygwin_getinfo_types t, ...)
 	}
 	break;
 
+      case CW_CYGHEAP_PROFTHR_ALL:
+	{
+	  typedef void (*func_t) (HANDLE);
+	  extern void cygheap_profthr_all (func_t);
+
+	  func_t profthr_byhandle = va_arg(arg, func_t);
+	  cygheap_profthr_all (profthr_byhandle);
+	  res = 0;
+	}
+	break;
+
       default:
 	set_errno (ENOSYS);
     }
