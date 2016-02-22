@@ -27,7 +27,7 @@ details. */
 /* How does a correctly constructed new-style Windows ACL claiming to be a
    POSIX ACL look like?
 
-   - NULL ACE (special bits, CLASS_OBJ).
+   - NULL deny ACE (special bits, CLASS_OBJ).
 
    - USER_OBJ deny.  If the user has less permissions than the sum of CLASS_OBJ
      (or GROUP_OBJ if CLASS_OBJ doesn't exist) and OTHER_OBJ, deny the excess
@@ -66,12 +66,12 @@ details. */
 
    Rinse and repeat for default ACEs with INHERIT flags set.
 
-   - Default NULL ACE (S_ISGID, CLASS_OBJ). */
+   - Default NULL deny ACE (S_ISGID, CLASS_OBJ). */
 
 						/* POSIX <-> Win32 */
 
-/* Historically, these bits are stored in a NULL SID ACE.  To distinguish the
-   new ACL style from the old one, we're using an access denied ACE, plus
+/* Historically, these bits are stored in a NULL allow SID ACE.  To distinguish
+   the new ACL style from the old one, we're using an access denied ACE, plus
    setting an as yet unused bit in the access mask.  The new ACEs can exist
    twice in an ACL, the "normal one" containing CLASS_OBJ and special bits
    and the one with INHERIT bit set to pass the DEF_CLASS_OBJ bits and the
@@ -280,7 +280,7 @@ set_posix_access (mode_t attr, uid_t uid, gid_t gid,
       tmp_idx = searchace (aclbufp, nentries, def | OTHER_OBJ);
       other_obj = aclbufp[tmp_idx].a_perm;
 
-      /* ... class_obj.  Create Cygwin ACE.  Only the S_ISGID attribute gets
+      /* ... class_obj.  Create NULL deny ACE.  Only the S_ISGID attribute gets
 	 inherited. */
       access = CYG_ACE_ISBITS_TO_WIN (def ? attr & S_ISGID : attr)
 	       | CYG_ACE_NEW_STYLE;
@@ -429,7 +429,7 @@ set_posix_access (mode_t attr, uid_t uid, gid_t gid,
 	      }
 	}
       /* For ptys if the admins group isn't in the ACL, add an ACE to make
-	 sure the group has WRITE_DAC and WRITE_OWNER perms. */
+	 sure the admins group has WRITE_DAC and WRITE_OWNER perms. */
       if (S_ISCHR (attr) && !dev_has_admins
 	  && !add_access_allowed_ace (acl,
 				      STD_RIGHTS_OWNER | FILE_ALLOW_READ
@@ -716,7 +716,7 @@ get_posix_access (PSECURITY_DESCRIPTOR psd,
 	    {
 	      /* New-style ACL.  Note the fact that a mask value is present
 		 since that changes how getace fetches the information.  That's
-		 fine, because the Cygwin SID ACE is supposed to precede all
+		 fine, because the NULL deny ACE is supposed to precede all
 		 USER, GROUP and GROUP_OBJ entries.  Any ACL not created that
 		 way has been rearranged by the Windows functionality to create
 		 the brain-dead "canonical" ACL order and is broken anyway. */
