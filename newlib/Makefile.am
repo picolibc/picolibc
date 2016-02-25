@@ -214,8 +214,7 @@ stmp-targ-include: config.status
 	-rm -rf targ-include stmp-targ-include
 	$(MAKE) targ-include/sys \
 		targ-include/machine \
-		targ-include/bits \
-		targ-include/newlib.h
+		targ-include/bits
 	-for i in $(srcdir)/libc/machine/$(machine_dir)/machine/*.h; do \
 	    if [ -f $$i ]; then \
 	      cp $$i targ-include/machine/`basename $$i`; \
@@ -271,6 +270,7 @@ stmp-targ-include: config.status
 	      cp $$i targ-include/machine/`basename $$i`; \
 	    else true; fi ; \
 	  done
+	$(MAKE) targ-include/newlib.h
 	touch $@
 
 CLEANFILES = stmp-targ-include
