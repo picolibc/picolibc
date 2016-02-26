@@ -104,7 +104,7 @@
 #define SOTYPE_FUNCTION(sym)
 #endif
 
-#ifdef _I386MACH_ALLOW_HW_INTERRUPTS
+#ifndef _I386MACH_DISABLE_HW_INTERRUPTS
 #define        __CLI
 #define        __STI
 #else
