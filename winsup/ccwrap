@@ -12,11 +12,7 @@ if ($ARGV[0] ne '++') {
     $cxx = 1;
 }
 die "$0: $ccorcxx environment variable does not exist\n" unless exists $ENV{$ccorcxx};
-if (`uname -o` =~ /cygwin/i) {
-    $ENV{'LANG'} = 'C.UTF-8';
-} else {
-    $ENV{'LANG'} = 'C';
-}
+$ENV{'LANG'} = 'C';
 my @compiler = split ' ', $ENV{$ccorcxx};
 if ("@ARGV" !~ / -nostdinc/o) {
     my $fd;
