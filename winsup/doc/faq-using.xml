@@ -1286,39 +1286,39 @@ behaviour which affect the operation of other programs, such as Cygwin.
 </para>
 <para>Among the software that has been found to cause difficulties are:</para>
 <para><itemizedlist>
-<listitem><para>Sonic Solutions burning software containing DLA component (when DLA disabled)</para></listitem>
-<listitem><para>Norton/McAfee/Symantec antivirus or antispyware</para></listitem>
-<listitem><para>Logitech webcam software with "Logitech process monitor" service</para></listitem>
-<listitem><para>Kerio, Agnitum or ZoneAlarm Personal Firewall</para></listitem>
-<listitem><para>Iolo System Mechanic/AntiVirus/Firewall</para></listitem>
-<listitem><para>LanDesk</para></listitem>
-<listitem><para>Windows Defender </para></listitem>
-<listitem><para>Various programs by Wave Systems Corp using wxvault.dll, including Embassy Trust Suite and Embassy Security Center</para></listitem>
-<listitem><para>NOD32 Antivirus</para></listitem>
-<listitem><para>ByteMobile laptop optimization client</para></listitem>
-<listitem><para>Earthlink Total-Access</para></listitem>
-<listitem><para>Spybot S&amp;D TeaTimer</para></listitem>
 <listitem><para>AR Soft RAM Disk</para></listitem>
 <listitem><para>ATI Catalyst (some versions)</para></listitem>
-<listitem><para>NVIDIA GeForce (some versions)</para></listitem>
-<listitem><para>Windows LiveOneCare</para></listitem>
-<listitem><para>Webroot Spy Sweeper with Antivirus</para></listitem>
-<listitem><para>COMODO Firewall Pro</para></listitem>
-<listitem><para>PC Tools Spyware Doctor</para></listitem>
+<listitem><para>AVAST (disable FILESYSTEM and BEHAVIOR realtime shields)</para></listitem>
 <listitem><para>Avira AntiVir</para></listitem>
-<listitem><para>Panda Internet Security</para></listitem>
 <listitem><para>BitDefender</para></listitem>
-<listitem><para>Google Desktop</para></listitem>
-<listitem><para>Sophos Anti-Virus 7</para></listitem>
 <listitem><para>Bufferzone from Trustware</para></listitem>
+<listitem><para>ByteMobile laptop optimization client</para></listitem>
+<listitem><para>COMODO Firewall Pro</para></listitem>
+<listitem><para>Citrix Metaframe Presentation Server/XenApp (see <ulink url="http://support.citrix.com/article/CTX107825">Citrix Support page</ulink>)</para></listitem>
+<listitem><para>Credant Guardian Shield</para></listitem>
+<listitem><para>Earthlink Total-Access</para></listitem>
+<listitem><para>Forefront TMG</para></listitem>
+<listitem><para>Google Desktop</para></listitem>
+<listitem><para>Iolo System Mechanic/AntiVirus/Firewall</para></listitem>
+<listitem><para>Kerio, Agnitum or ZoneAlarm Personal Firewall</para></listitem>
+<listitem><para>LanDesk</para></listitem>
+<listitem><para>Lavasoft Web Companion</para></listitem>
 <listitem><para>Lenovo IPS Core Service (ipssvc)</para></listitem>
 <listitem><para>Lenovo RapidBoot Shield</para></listitem>
-<listitem><para>Credant Guardian Shield</para></listitem>
-<listitem><para>AVAST (disable FILESYSTEM and BEHAVIOR realtime shields)</para></listitem>
-<listitem><para>Citrix Metaframe Presentation Server/XenApp (see <ulink url="http://support.citrix.com/article/CTX107825">Citrix Support page</ulink>)</para></listitem>
-<listitem><para>Lavasoft Web Companion</para></listitem>
-<listitem><para>Forefront TMG</para></listitem>
+<listitem><para>Logitech webcam software with "Logitech process monitor" service</para></listitem>
 <listitem><para>MacType</para></listitem>
+<listitem><para>NOD32 Antivirus</para></listitem>
+<listitem><para>NVIDIA GeForce (some versions)</para></listitem>
+<listitem><para>Norton/McAfee/Symantec antivirus or antispyware</para></listitem>
+<listitem><para>PC Tools Spyware Doctor</para></listitem>
+<listitem><para>Panda Internet Security</para></listitem>
+<listitem><para>Sonic Solutions burning software containing DLA component (when DLA disabled)</para></listitem>
+<listitem><para>Sophos Anti-Virus 7</para></listitem>
+<listitem><para>Spybot S&amp;D TeaTimer</para></listitem>
+<listitem><para>Various programs by Wave Systems Corp using wxvault.dll, including Embassy Trust Suite and Embassy Security Center</para></listitem>
+<listitem><para>Webroot Spy Sweeper with Antivirus</para></listitem>
+<listitem><para>Windows Defender </para></listitem>
+<listitem><para>Windows LiveOneCare</para></listitem>
 </itemizedlist></para>
 <para>Sometimes these problems can be worked around, by temporarily or partially
 disabling the offending software.  For instance, it may be possible to disable
@@ -1398,16 +1398,40 @@ such as virtual memory paging and file caching.</para>
     <listitem>Ensure that you have eliminated (not just disabled) all
     software on the <xref linkend="faq.using.bloda"/>.
     </listitem>
-    <listitem>Read the 'rebase' package README in
-    <literal>/usr/share/doc/rebase/</literal>, and follow the
-    instructions there to run 'rebaseall'.</listitem>
     <listitem>Switch from 32-bit Cygwin to 64-bit Cygwin, if your OS and CPU support that.
     With the bigger address space <literal>fork()</literal> is less likely to fail.</listitem>
+    <listitem>
+      <para>
+      Try setting the environment variable CYGWIN to "detect_bloda", which
+      enables some extra debugging, which may indicate what other software is
+      causing the problem.
+      </para>
+      <para>
+      See <ulink url="https://cygwin.com/ml/cygwin/2012-02/msg00797.html">this
+      mail</ulink> for more information.
+      </para>
+    </listitem>
+    <listitem>
+      <para>
+	Force a full rebase: Run <command>rebase-trigger fullrebase</command>,
+	exit all Cygwin programs and run Cygwin setup.
+      </para>
+      <para>
+	By default, Cygwin's setup program automatically performs an incremental
+	rebase of newly installed files.  Forcing a full rebase causes the
+	rebase map to be cleared before doing the rebase.
+      </para>
+      <para>
+	See <literal>/usr/share/doc/rebase/README</literal> and
+	<literal>/usr/share/doc/Cygwin/_autorebase.README</literal> for more
+	details.
+      </para>
+      <para>Please note that installing new packages or updating existing
+      ones undoes the effects of rebase and often causes fork() failures to
+      reappear.
+      </para>
+    </listitem>
     </itemizedlist></para>
-  <para>Please note that installing new packages or updating existing
-  ones undoes the effects of rebaseall and often causes fork() failures
-  to reappear. If so, just run rebaseall again.
-  </para>
   <para>See the <ulink url="https://cygwin.com/cygwin-ug-net/highlights.html#ov-hi-process">
   process creation</ulink> section of the User's Guide for the technical reasons it is so
   difficult to make <literal>fork()</literal> work reliably.</para>
