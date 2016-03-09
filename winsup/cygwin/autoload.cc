@@ -480,7 +480,6 @@ std_dll_init ()
 }
 
 /* Initialization function for winsock stuff. */
-WSADATA NO_COPY wsadata;
 
 #ifdef __x86_64__
 /* See above comment preceeding std_dll_init. */
@@ -493,6 +492,10 @@ __attribute__ ((used, noinline)) static two_addr_t
 wsock_init ()
 #endif
 {
+  /* CV 2016-03-09: Moved wsadata into wsock_init to workaround a problem
+     with the NO_COPY definition of wsadata and here starting with gcc-5.3.0.
+     See the git log for a description. */
+  static WSADATA NO_COPY wsadata;
   static LONG NO_COPY here = -1L;
 #ifndef __x86_64__
   struct func_info *func = (struct func_info *) __builtin_return_address (0);
