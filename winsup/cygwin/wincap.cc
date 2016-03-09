@@ -276,6 +276,11 @@ wincapc::init ()
   GetSystemInfo (&system_info);
   version.dwOSVersionInfoSize = sizeof (RTL_OSVERSIONINFOEXW);
   RtlGetVersion (&version);
+  /* Overwrite unreliable kernel version with correct values returned by
+     RtlGetNtVersionNumbers.  See git log of this change for a description. */
+  RtlGetNtVersionNumbers (&version.dwMajorVersion,
+			  &version.dwMinorVersion,
+			  &version.dwBuildNumber);
 
   switch (version.dwMajorVersion)
     {
