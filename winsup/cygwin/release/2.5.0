@@ -31,6 +31,11 @@ What changed:
 
 - Bump POSIX option macros to POSIX.1-2008.
 
+- Profiling data, specifically pc sampling, now covers all threads of a
+  program and not just the main thread.  Environment variable GMON_OUT_PREFIX
+  enables multiple gmon.out files to preserve profiling data after fork or
+  from multiple program runs.
+
 
 Bug Fixes
 ---------
