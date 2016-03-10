@@ -38,6 +38,10 @@ pthread_barrier_init, pthread_barrier_destroy, pthread_barrier_wait.
 </para></listitem>
 
 <listitem><para>
+New APIs: clog10, clog10f.
+</para></listitem>
+
+<listitem><para>
 In calls to chmod treat ACLs with extra ACEs *only* for Admins and
 SYSTEM like a trivial ACL.
 </para></listitem>
@@ -47,7 +51,10 @@ Bump POSIX option macros to POSIX.1-2008.
 </para></listitem>
 
 <listitem><para>
-New APIs: clog10, clog10f.
+Profiling data, specifically pc sampling, now covers all threads of a
+program and not just the main thread.  Environment variable GMON_OUT_PREFIX
+enables multiple gmon.out files to preserve profiling data after fork or
+from multiple program runs.
 </para></listitem>
 
 </itemizedlist>
