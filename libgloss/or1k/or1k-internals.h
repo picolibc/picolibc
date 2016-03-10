@@ -6,17 +6,17 @@
 
 #include "include/or1k-support.h"
 
-extern uint32_t* _or1k_stack_top;
+extern uint8_t* _or1k_stack_top;
 extern size_t _or1k_stack_size;
-extern uint32_t* _or1k_stack_bottom;
+extern uint8_t* _or1k_stack_bottom;
 
-extern uint32_t* _or1k_exception_stack_top;
+extern uint8_t* _or1k_exception_stack_top;
 extern size_t _or1k_exception_stack_size;
-extern uint32_t* _or1k_exception_stack_bottom;
+extern uint8_t* _or1k_exception_stack_bottom;
 
 #ifdef __OR1K_MULTICORE__
-extern uint32_t* *_or1k_stack_core;
-extern uint32_t* *_or1k_exception_stack_core;
+extern uint8_t* *_or1k_stack_core;
+extern uint8_t* *_or1k_exception_stack_core;
 #endif
 
 

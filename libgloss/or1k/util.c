@@ -24,27 +24,27 @@
 
 #ifdef __OR1K_MULTICORE__
 // Define pointers to arrays
-uint32_t* *_or1k_stack_core;
-uint32_t* *_or1k_exception_stack_core;
+uint8_t* *_or1k_stack_core;
+uint8_t* *_or1k_exception_stack_core;
 uint32_t* *_or1k_exception_level;
 #else
 // Define scalar
 uint32_t _or1k_exception_level;
 #endif
 
-uint32_t* _or1k_stack_top;
-uint32_t* _or1k_stack_bottom;
+uint8_t* _or1k_stack_top;
+uint8_t* _or1k_stack_bottom;
 
-uint32_t* _or1k_exception_stack_top;
-uint32_t* _or1k_exception_stack_bottom;
+uint8_t* _or1k_exception_stack_top;
+uint8_t* _or1k_exception_stack_bottom;
 
 void _or1k_init() {
 #ifdef __OR1K_MULTICORE__
 	uint32_t c;
 
 	// Initialize stacks
-	_or1k_stack_core = _sbrk_r(0, sizeof(uint32_t*) * or1k_numcores());
-	_or1k_exception_stack_core = _sbrk_r(0, sizeof(uint32_t*) * or1k_numcores());
+	_or1k_stack_core = _sbrk_r(0, sizeof(uint8_t*) * or1k_numcores());
+	_or1k_exception_stack_core = _sbrk_r(0, sizeof(uint8_t*) * or1k_numcores());
 
 	_or1k_stack_core[0] = _or1k_stack_top;
 	_or1k_exception_stack_core[0] = _or1k_exception_stack_top;
