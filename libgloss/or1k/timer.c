@@ -140,7 +140,7 @@ void
 or1k_timer_restore(uint32_t sr_tee)
 {
 	uint32_t sr = or1k_mfspr(OR1K_SPR_SYS_SR_ADDR);
-	sr = OR1K_SPR_SYS_SR_TEE_SET(sr, 1);
+	sr = OR1K_SPR_SYS_SR_TEE_SET(sr, sr_tee);
 	or1k_mtspr(OR1K_SPR_SYS_SR_ADDR, sr);
 }
 
