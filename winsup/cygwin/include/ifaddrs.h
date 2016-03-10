@@ -38,6 +38,19 @@ struct ifaddrs {
 	void		*ifa_data;
 };
 
+#ifdef __CYGWIN__
+#include <cygwin/if.h>
+/* On Cygwin the ifa_data member points to this structure, independent of
+   the address family. */
+struct ifaddrs_hwdata {
+	struct sockaddr         ifa_hwaddr;
+	int                     ifa_metric;
+	int                     ifa_mtu;
+	int                     ifa_ifindex;
+	struct ifreq_frndlyname ifa_frndlyname;
+};
+#endif
+
 /*
  * This may have been defined in <net/if.h>.  Note that if <net/if.h> is
  * to be included it must be included before this header file.

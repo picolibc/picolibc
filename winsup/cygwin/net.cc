@@ -1950,11 +1950,7 @@ struct ifall {
   struct sockaddr_storage ifa_addr;
   struct sockaddr_storage ifa_brddstaddr;
   struct sockaddr_storage ifa_netmask;
-  struct sockaddr         ifa_hwaddr;
-  int                     ifa_metric;
-  int                     ifa_mtu;
-  int                     ifa_ifindex;
-  struct ifreq_frndlyname ifa_frndlyname;
+  struct ifaddrs_hwdata   ifa_hwdata;
 };
 
 static unsigned int
@@ -2104,7 +2100,7 @@ static void
 get_friendlyname (struct ifall *ifp, PIP_ADAPTER_ADDRESSES pap)
 {
   struct ifreq_frndlyname *iff = (struct ifreq_frndlyname *)
-				 &ifp->ifa_frndlyname;
+				 &ifp->ifa_hwdata.ifa_frndlyname;
   iff->ifrf_len = sys_wcstombs (iff->ifrf_friendlyname,
 				IFRF_FRIENDLYNAMESIZ,
 				pap->FriendlyName) + 1;
@@ -2115,9 +2111,9 @@ get_hwaddr (struct ifall *ifp, PIP_ADAPTER_ADDRESSES pap)
 {
   for (UINT i = 0; i < IFHWADDRLEN; ++i)
     if (i >= pap->PhysicalAddressLength)
-      ifp->ifa_hwaddr.sa_data[i] = '\0';
+      ifp->ifa_hwdata.ifa_hwaddr.sa_data[i] = '\0';
     else
-      ifp->ifa_hwaddr.sa_data[i] = pap->PhysicalAddress[i];
+      ifp->ifa_hwdata.ifa_hwaddr.sa_data[i] = pap->PhysicalAddress[i];
 }
 
 /*
@@ -2233,13 +2229,15 @@ get_ifs (ULONG family)
 	    /* Hardware address */
 	    get_hwaddr (ifp, pap);
 	    /* Metric */
-	    ifp->ifa_metric = 1;
+	    ifp->ifa_hwdata.ifa_metric = 1;
 	    /* MTU */
-	    ifp->ifa_mtu = pap->Mtu;
+	    ifp->ifa_hwdata.ifa_mtu = pap->Mtu;
 	    /* Interface index */
-	    ifp->ifa_ifindex = pap->IfIndex;
+	    ifp->ifa_hwdata.ifa_ifindex = pap->IfIndex;
 	    /* Friendly name */
 	    get_friendlyname (ifp, pap);
+	    /* Let ifa_data member point to "ifaddrs_hwdata" data. */
+	    ifp->ifa_ifa.ifa_data = &ifp->ifa_hwdata;
 	    ++ifp;
 	  }
       else
@@ -2327,17 +2325,20 @@ get_ifs (ULONG family)
 	    get_hwaddr (ifp, pap);
 	    /* Metric */
 	    if (wincap.has_gaa_on_link_prefix ())
-	      ifp->ifa_metric = (sa->sa_family == AF_INET
-				? ((PIP_ADAPTER_ADDRESSES_LH) pap)->Ipv4Metric
-				: ((PIP_ADAPTER_ADDRESSES_LH) pap)->Ipv6Metric);
+	      ifp->ifa_hwdata.ifa_metric
+		= (sa->sa_family == AF_INET)
+		  ? ((PIP_ADAPTER_ADDRESSES_LH) pap)->Ipv4Metric
+		  : ((PIP_ADAPTER_ADDRESSES_LH) pap)->Ipv6Metric;
 	    else
-	      ifp->ifa_metric = 1;
+	      ifp->ifa_hwdata.ifa_metric = 1;
 	    /* MTU */
-	    ifp->ifa_mtu = pap->Mtu;
+	    ifp->ifa_hwdata.ifa_mtu = pap->Mtu;
 	    /* Interface index */
-	    ifp->ifa_ifindex = pap->IfIndex;
+	    ifp->ifa_hwdata.ifa_ifindex = pap->IfIndex;
 	    /* Friendly name */
 	    get_friendlyname (ifp, pap);
+	    /* Let ifa_data member point to "ifaddrs_hwdata" data. */
+	    ifp->ifa_ifa.ifa_data = &ifp->ifa_hwdata;
 	    ++ifp;
 #         undef sin
 #         undef sin6
@@ -2432,20 +2433,20 @@ get_ifconf (struct ifconf *ifc, int what)
 		}
 	      break;
 	    case SIOCGIFHWADDR:
-	      memcpy (&ifr->ifr_hwaddr, &ifp->ifa_hwaddr,
+	      memcpy (&ifr->ifr_hwaddr, &ifp->ifa_hwdata.ifa_hwaddr,
 		      sizeof ifr->ifr_hwaddr);
 	      break;
 	    case SIOCGIFMETRIC:
-	      ifr->ifr_metric = ifp->ifa_metric;
+	      ifr->ifr_metric = ifp->ifa_hwdata.ifa_metric;
 	      break;
 	    case SIOCGIFMTU:
-	      ifr->ifr_mtu = ifp->ifa_mtu;
+	      ifr->ifr_mtu = ifp->ifa_hwdata.ifa_mtu;
 	      break;
 	    case SIOCGIFINDEX:
-	      ifr->ifr_ifindex = ifp->ifa_ifindex;
+	      ifr->ifr_ifindex = ifp->ifa_hwdata.ifa_ifindex;
 	      break;
 	    case SIOCGIFFRNDLYNAM:
-	      memcpy (ifr->ifr_frndlyname, &ifp->ifa_frndlyname,
+	      memcpy (ifr->ifr_frndlyname, &ifp->ifa_hwdata.ifa_frndlyname,
 		      sizeof (struct ifreq_frndlyname));
 	    }
 	  if ((caddr_t) ++ifr >
