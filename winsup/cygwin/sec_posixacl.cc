@@ -953,6 +953,22 @@ acl_error (int code)
   return acl_err_txt[code - ACL_MULTI_ERROR];
 }
 
+static int
+__acl_extended_fh (fhandler_base *fh)
+{
+  int ret = -1;
+
+  if (!fh->pc.has_acls ())
+    set_errno (ENOTSUP);
+  else
+    {
+      ret = fh->facl (GETACLCNT, 0, NULL);
+      if (ret >= 0)
+	ret = (ret > MIN_ACL_ENTRIES) ? 1 : 0;
+    }
+  return ret;
+}
+
 extern "C" int
 acl_extended_fd (int fd)
 {
@@ -961,12 +977,7 @@ acl_extended_fd (int fd)
       cygheap_fdget cfd (fd);
       if (cfd < 0)
 	__leave;
-      if (!cfd->pc.has_acls ())
-	{
-	  set_errno (ENOTSUP);
-	  __leave;
-	}
-      return cfd->facl (GETACLCNT, 0, NULL);
+      return __acl_extended_fh (cfd);
     }
   __except (EBADF) {}
   __endtry
@@ -974,26 +985,45 @@ acl_extended_fd (int fd)
 }
 
 static int
-__acl_extended_file (const char *path_p, mode_t follow)
+__acl_extended_file (path_conv &pc)
 {
-  int fd = open (path_p, O_RDONLY | O_CLOEXEC | follow);
-  if (fd < 0)
-    return -1;
-  int ret = acl_extended_fd (fd);
-  close (fd);
+  int ret = -1;
+
+  __try
+    {
+      if (pc.error)
+	set_errno (pc.error);
+      else if (!pc.exists ())
+	set_errno (ENOENT);
+      else
+	{
+	  fhandler_base *fh;
+
+	  if (!(fh = build_fh_pc (pc)))
+	    __leave;
+	  ret = __acl_extended_fh (fh);
+	  delete fh;
+	}
+    }
+  __except (EFAULT) {}
+  __endtry
   return ret;
 }
 
 extern "C" int
 acl_extended_file (const char *path_p)
 {
-  return __acl_extended_file (path_p, 0);
+  path_conv pc (path_p, PC_SYM_FOLLOW | PC_POSIX | PC_KEEP_HANDLE,
+		stat_suffixes);
+  return __acl_extended_file (pc);
 }
 
 extern "C" int
 acl_extended_file_nofollow (const char *path_p)
 {
-  return __acl_extended_file (path_p, O_NOFOLLOW);
+  path_conv pc (path_p, PC_SYM_NOFOLLOW | PC_POSIX | PC_KEEP_HANDLE,
+		stat_suffixes);
+  return __acl_extended_file (pc);
 }
 
 extern "C" acl_t
