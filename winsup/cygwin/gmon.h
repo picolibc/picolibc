@@ -65,6 +65,9 @@ extern void mcount(void);
 #ifdef __MINGW32__
 #include <_bsd_types.h>
 #endif /* __MINGW32__*/
+#ifdef __CYGWIN__
+#include <winsup.h>
+#endif
 
 /*
  * Structure prepended to gmon.out profiling data file.
@@ -153,7 +156,7 @@ struct rawarc {
  * The profiling data structures are housed in this structure.
  */
 struct gmonparam {
-	volatile int	state;
+	volatile LONG	state;
 	u_short		*kcount;
 	size_t		kcountsize;
 	u_short		*froms;
