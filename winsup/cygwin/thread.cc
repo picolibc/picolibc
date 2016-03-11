@@ -1916,6 +1916,19 @@ pthread_spinlock::lock ()
 {
   pthread_t self = ::pthread_self ();
   int result = -1;
+  unsigned spins = 0;
+
+  /*
+    We want to spin using 'pause' instruction on multi-core system but we
+    want to avoid this on single-core systems.
+
+    The limit of 1000 spins is semi-arbitrary. Microsoft suggests (in their
+    InitializeCriticalSectionAndSpinCount documentation on MSDN) they are
+    using spin count limit 4000 for their heap manager critical
+    sections. Other source suggest spin count as small as 200 for fast path
+    of mutex locking.
+   */
+  unsigned const FAST_SPINS_LIMIT = wincap.cpu_count () != 1 ? 1000 : 0;
 
   do
     {
@@ -1924,8 +1937,13 @@ pthread_spinlock::lock ()
 	  set_owner (self);
 	  result = 0;
 	}
-      else if (pthread::equal (owner, self))
+      else if (unlikely(pthread::equal (owner, self)))
 	result = EDEADLK;
+      else if (spins < FAST_SPINS_LIMIT)
+        {
+          ++spins;
+          __asm__ volatile ("pause":::);
+        }
       else
 	{
 	  /* Minimal timeout to minimize CPU usage while still spinning. */
