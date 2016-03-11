@@ -9,4 +9,5 @@
 	<xi:include href="gdb.xml"/>
 	<xi:include href="dll.xml"/>
 	<xi:include href="windres.xml"/>
+	<xi:include href="gprof.xml"/>
 </chapter>

@@ -1,0 +1,250 @@
+<?xml version="1.0" encoding='UTF-8'?>
+<!DOCTYPE sect1 PUBLIC "-//OASIS//DTD DocBook V4.5//EN"
+		"http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
+
+<sect1 id="gprof"><title>Profiling Cygwin Programs</title>
+
+<sect2 id="gprof-intro"><title>Introduction</title>
+<para>Profiling is a way to analyze your program to find out where it is
+spending its time. You might need to do this if it seems your program is
+taking more time to do its job than you think it should. It is always
+preferable to profile your program than to just guess where the time is
+being spent; even expert programmers are known to guess badly at this.
+</para>
+
+<para>In Cygwin, you enable profiling with a compiler flag and you display
+the resulting profiling data with gprof.  Read on to find out how.
+</para>
+
+<para>To enable profiling of your program, first compile it with an
+additional gcc flag: <userinput>-pg</userinput>. That flag should be used
+when compiling every source file of the program. If your program has a
+Makefile, you would add the flag to all gcc compilation commands or to the
+CFLAGS= setting. A manual compilation that enables profiling looks like this:
+</para>
+
+<screen>
+<prompt>bash$</prompt> <userinput>gcc -pg -g -o myapp myapp.c</userinput>
+</screen>
+
+<para>The <userinput>-pg</userinput> flag causes gcc to do two additional
+things as it compiles your program. First, a small bit of code is added to
+the beginning of each function that records its address and the address it
+was called from at run time. gprof uses this data to generate a call graph.
+Second, gcc arranges to have a special "front end" added to the beginning
+of your program. The front end starts a recurring timer and every time the
+timer fires, 100 times per second, the currently executing address is saved.
+gprof uses this data to generate a "flat profile" showing where your
+program is spending its time.
+</para>
+
+<para>After compiling your program (and linking it, if you do that as a
+separate step), you are ready to profile it. Just run it as you normally
+would. If there are specific code paths you want to profile, take the
+actions that would exercise those code paths. When your program exits,
+you will have an additional file in the current directory: gmon.out.
+That file contains the profiling data gprof processes and displays.
+</para>
+
+<para>gprof has many flags to control its operation. The
+<citation>gprof man page</citation> details everything gprof can do. We
+will only use a few of gprof's flags here. You launch gprof as follows:
+<screen>
+<prompt>bash$</prompt> <userinput>gprof [flags] appname [datafile]...</userinput>
+</screen>
+If you don't specify any flags, gprof operates as if you gave it flags
+<userinput>-p -q</userinput> which means: generate a flat profile with
+descriptive text and generate a call graph with more descriptive text. In
+the examples below we will give specific flags to gprof to demonstrate
+specific displays. We'll also use flag <userinput>-b</userinput> which
+means: be brief, i.e. don't display the descriptive text. You can also
+specify a trailing list of one or more profiling data files. If you don't,
+gprof assumes gmon.out is the only file to process and display.
+</para>
+</sect2>
+
+<sect2 id="gprof-ex"><title>Examples</title>
+<example id="gprof-flat"><title>Flat profile</title>
+<screen>
+<prompt>bash$</prompt> <userinput>gprof -b -p myapp</userinput>
+<literal>Flat profile:
+
+Each sample counts as 0.01 seconds.
+  %   cumulative   self              self     total
+ time   seconds   seconds    calls   s/call   s/call  name
+ 25.11     13.34    13.34        1    13.34    13.34  func0
+ 25.00     26.62    13.28        1    13.28    13.28  func1
+ 25.00     39.90    13.28        1    13.28    13.28  func3
+ 24.89     53.12    13.22        1    13.22    13.22  func2
+</literal> </screen> </example>
+
+<example id="gprof-cg"><title>Call graph</title>
+<screen>
+<prompt>bash$</prompt> <userinput>gprof -b -q myapp</userinput>
+<literal>                        Call graph
+
+
+granularity: each sample hit covers 4 byte(s) for 0.02% of 53.12 seconds
+
+index % time    self  children    called     name
+                                                 &lt;spontaneous&gt;
+[1]    100.0    0.00   53.12                 main [1]
+               13.34    0.00       1/1           func0 [2]
+               13.28    0.00       1/1           func1 [3]
+               13.28    0.00       1/1           func3 [4]
+               13.22    0.00       1/1           func2 [5]
+-----------------------------------------------
+               13.34    0.00       1/1           main [1]
+[2]     25.1   13.34    0.00       1         func0 [2]
+-----------------------------------------------
+               13.28    0.00       1/1           main [1]
+[3]     25.0   13.28    0.00       1         func1 [3]
+-----------------------------------------------
+               13.28    0.00       1/1           main [1]
+[4]     25.0   13.28    0.00       1         func3 [4]
+-----------------------------------------------
+               13.22    0.00       1/1           main [1]
+[5]     24.9   13.22    0.00       1         func2 [5]
+-----------------------------------------------
+
+
+Index by function name
+
+   [2] func0                   [5] func2
+   [3] func1                   [4] func3
+</literal> </screen> </example>
+
+<example id="gprof-line"><title>Source line profile</title>
+<screen>
+<prompt>bash$</prompt> <userinput>gprof -b -l myapp</userinput>
+<literal>Flat profile:
+
+Each sample counts as 0.01 seconds.
+  %   cumulative   self              self     total
+ time   seconds   seconds    calls   s/call   s/call  name
+ 25.11     13.34    13.34        1    13.34    13.34  func0 (myapp.c:9 @ 1004010e0)
+ 25.00     26.62    13.28        1    13.28    13.28  func1 (myapp.c:10 @ 10040111a)
+ 25.00     39.90    13.28        1    13.28    13.28  func3 (myapp.c:12 @ 10040118e)
+ 24.89     53.12    13.22        1    13.22    13.22  func2 (myapp.c:11 @ 100401154)
+
+
+                        Call graph
+
+
+granularity: each sample hit covers 4 byte(s) for 0.02% of 53.12 seconds
+
+index % time    self  children    called     name
+               13.34    0.00       1/1           main (myapp.c:26 @ 10040123c) [1]
+[2]     25.1   13.34    0.00       1         func0 (myapp.c:9 @ 1004010e0) [2]
+-----------------------------------------------
+               13.28    0.00       1/1           main (myapp.c:26 @ 10040123c) [1]
+[3]     25.0   13.28    0.00       1         func1 (myapp.c:10 @ 10040111a) [3]
+-----------------------------------------------
+               13.28    0.00       1/1           main (myapp.c:28 @ 100401246) [5]
+[4]     25.0   13.28    0.00       1         func3 (myapp.c:12 @ 10040118e) [4]
+-----------------------------------------------
+               13.22    0.00       1/1           main (myapp.c:27 @ 100401241) [7]
+[6]     24.9   13.22    0.00       1         func2 (myapp.c:11 @ 100401154) [6]
+-----------------------------------------------
+
+
+Index by function name
+
+   [2] func0 (myapp.c:9 @ 1004010e0) [6] func2 (myapp.c:11 @ 100401154)
+   [3] func1 (myapp.c:10 @ 10040111a) [4] func3 (myapp.c:12 @ 10040118e)
+</literal> </screen> </example>
+</sect2>
+
+<sect2 id="gprof-ss"><title>Special situations</title>
+<sect3 id="gprof-mt"><title>Profiling multi-threaded programs</title>
+<para>Multi-threaded programs are profiled just like single-threaded programs.
+There is no mechanism to turn profiling on or off for specific threads.
+gprof combines the data for all threads when generating its displays.
+</para>
+</sect3>
+
+<sect3 id="gprof-fork"><title>Profiling programs that fork</title>
+<para>Programs that fork, i.e., use the fork() system call with or without
+using exec() afterwards, require special care. Since there is only one
+gmon.out file, profiling data from the parent process might get overwritten
+by the child process, or vice-versa, after a fork(). You can avoid this by
+setting the environment variable GMON_OUT_PREFIX before running your
+program. If the variable is non-empty, its contents will be used as a
+prefix to name the profiling data files. Here's an example:
+</para>
+
+<example id="gprof-prefix">
+<screen>
+<prompt>bash$</prompt> <userinput>export GMON_OUT_PREFIX=myapp.out</userinput>
+<prompt>bash$</prompt> <userinput>./myapp -fork</userinput>
+<prompt>bash$</prompt> <userinput>ls myapp.out*</userinput>
+<literal>myapp.out.2728  myapp.out.3224
+</literal>
+<prompt>bash$</prompt> <userinput>gprof -bp myapp myapp.out.2728</userinput>
+<literal>Flat profile:
+
+Each sample counts as 0.01 seconds.
+  %   cumulative   self              self     total
+ time   seconds   seconds    calls   s/call   s/call  name
+ 50.25     30.28    30.28        2    15.14    15.14  func3
+ 24.99     45.34    15.06        1    15.06    15.06  func1
+ 24.76     60.26    14.92        1    14.92    14.92  func2
+</literal>
+<prompt>bash$</prompt> <userinput>gprof -bp myapp myapp.out.3224</userinput>
+<literal>Flat profile:
+
+Each sample counts as 0.01 seconds.
+  %   cumulative   self              self     total
+ time   seconds   seconds    calls   s/call   s/call  name
+ 49.25     29.36    29.36        2    14.68    14.68  func3
+ 25.43     44.52    15.16        1    15.16    15.16  func1
+ 25.33     59.62    15.10        1    15.10    15.10  func2
+</literal>
+<prompt>bash$</prompt> <userinput>gprof -bp myapp myapp.out*</userinput>
+<literal>Flat profile:
+
+Each sample counts as 0.01 seconds.
+  %   cumulative   self              self     total
+ time   seconds   seconds    calls   s/call   s/call  name
+ 49.75     59.64    59.64        4    14.91    14.91  func3
+ 25.21     89.86    30.22        2    15.11    15.11  func1
+ 25.04    119.88    30.02        2    15.01    15.01  func2
+</literal> </screen> </example>
+<para>As the last gprof command above shows, gprof can combine the data
+from a selection of profiling data files to generate its displays. Just
+list the names of those files at the end of the gprof command; you can use
+a wildcard here. NOTE: If you update your program, remember to remove stale
+profiling data files before profiling your program again. If you aren't
+careful about this, gprof could combine data from your most recent version
+with stale data from prior versions, possibly giving misleading displays.
+</para>
+</sect3>
+
+<sect3 id="gprof-res"><title>Getting better profiling resolution</title>
+<para>To get better resolution (i.e., more data points) when profiling
+your program, try running it multiple times with the environment variable
+GMON_OUT_PREFIX set, as described in the previous situation. There will be
+multiple profiling data files generated and you can have gprof combine
+the data from all of them into one display.
+</para>
+</sect3>
+
+<sect3 id="gprof-lib"><title>Profiling programs with their libraries</title>
+<para>At the time of this writing Cygwin's profiling support only allows
+for one range of addresses per program. It is hard-wired to be the range
+covering the .text segment of your program, which is where your code resides.
+If you build your program with static libraries (e.g., libfoo.a), the code
+from those libraries is linked into your program's .text segment so will be
+included when profiling. But dynamic libraries (e.g., libfoo.dll) reside in
+other address ranges and code within them won't be included.
+</para>
+</sect3>
+
+<sect3 id="gprof-cyg"><title>Profiling Cygwin itself</title>
+<para>Due to the issue mentioned in the previous situation and other issues,
+at the time of this writing there is no support for profiling Cygwin itself.
+</para>
+</sect3>
+</sect2>
+
+</sect1>
