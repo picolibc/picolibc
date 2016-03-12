@@ -138,7 +138,8 @@ set_posix_access (mode_t attr, uid_t uid, gid_t gid,
 {
   SECURITY_DESCRIPTOR sd;
   cyg_ldap cldap;
-  PSID owner, group;
+  PSID owner = NULL, group = NULL;
+  cygsid smb_owner, smb_group;
   NTSTATUS status;
   tmp_pathbuf tp;
   cygpsid *aclsid;
@@ -157,9 +158,27 @@ set_posix_access (mode_t attr, uid_t uid, gid_t gid,
      modified by inheritable ACEs. */
   RtlSetControlSecurityDescriptor (&sd, SE_DACL_PROTECTED, SE_DACL_PROTECTED);
 
-  /* Fetch owner and group and set in security descriptor. */
-  owner = sidfromuid (uid, &cldap);
-  group = sidfromgid (gid, &cldap);
+  /* Fetch owner and group and set in security descriptor.
+
+     For Samba we check if there's an RFC2307 mapping in place, otherwise
+     we're trying to create an ACL with the wrong Windows SIDs rather than
+     the correct Unix SIDs.  Same happens below for mapping other USER and
+     GROUP SIDs. */
+  if (is_samba)
+    {
+      uint32_t smb_uid, smb_gid;
+
+      smb_uid = cygheap->ugid_cache.reverse_get_uid (uid);
+      if (smb_uid != ILLEGAL_UID)
+	owner = smb_owner.create (22, 2, 1, smb_uid);
+      smb_gid = cygheap->ugid_cache.reverse_get_gid (gid);
+      if (smb_gid != ILLEGAL_GID)
+	group = smb_group.create (22, 2, 2, smb_gid);
+    }
+  if (!owner)
+    owner = sidfromuid (uid, &cldap);
+  if (!group)
+    group = sidfromgid (gid, &cldap);
   if (!owner || !group)
     {
       set_errno (EINVAL);
@@ -224,7 +243,21 @@ set_posix_access (mode_t attr, uid_t uid, gid_t gid,
 	break;
       case USER:
       case DEF_USER:
-	aclsid[idx] = sidfromuid (aclbufp[idx].a_id, &cldap);
+	aclsid[idx] = NO_SID;
+	if (is_samba)
+	  {
+	    uint32_t smb_uid;
+	    cygsid *smb_sid;
+
+	    smb_uid = cygheap->ugid_cache.reverse_get_uid (aclbufp[idx].a_id);
+	    if (smb_uid != ILLEGAL_UID)
+	      {
+		smb_sid = (cygsid *) alloca (sizeof (cygsid));
+		aclsid[idx] = smb_sid->create (22, 2, 1, smb_uid);
+	      }
+	  }
+	if (!aclsid[idx])
+	  aclsid[idx] = sidfromuid (aclbufp[idx].a_id, &cldap);
 	break;
       case GROUP_OBJ:
 	aclsid[idx] = group;
@@ -235,7 +268,21 @@ set_posix_access (mode_t attr, uid_t uid, gid_t gid,
 	break;
       case GROUP:
       case DEF_GROUP:
-	aclsid[idx] = sidfromgid (aclbufp[idx].a_id, &cldap);
+	aclsid[idx] = NO_SID;
+	if (is_samba)
+	  {
+	    uint32_t smb_gid;
+	    cygsid *smb_sid;
+
+	    smb_gid = cygheap->ugid_cache.reverse_get_gid (aclbufp[idx].a_id);
+	    if (smb_gid != ILLEGAL_GID)
+	      {
+		smb_sid = (cygsid *) alloca (sizeof (cygsid));
+		aclsid[idx] = smb_sid->create (22, 2, 2, smb_gid);
+	      }
+	  }
+	if (!aclsid[idx])
+	  aclsid[idx] = sidfromgid (aclbufp[idx].a_id, &cldap);
 	break;
       case CLASS_OBJ:
       case DEF_CLASS_OBJ:

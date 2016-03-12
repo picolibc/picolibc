@@ -117,21 +117,28 @@ cygpsid::get_id (BOOL search_grp, int *type, cyg_ldap *pldap)
 	id = myself->gid;
       else if (sid_id_auth (psid) == 22 && cygheap->pg.nss_grp_db ())
 	{
-	  /* Samba UNIX group.  Try to map to Cygwin gid.  If there's no
+	  /* Samba UNIX group?  Try to map to Cygwin gid.  If there's no
 	     mapping in the cache, try to fetch it from the configured
 	     RFC 2307 domain (see last comment in cygheap_domain_info::init()
-	     for more information) and add it to the mapping cache. */
-	  gid_t gid = sid_sub_auth_rid (psid);
-	  gid_t map_gid = cygheap->ugid_cache.get_gid (gid);
-	  if (map_gid == ILLEGAL_GID)
+	     for more information) and add it to the mapping cache.
+	     If this is a user, not a group, make sure to skip the subsequent
+	     internal_getgrsid call, otherwise we end up with a fake group
+	     entry for a UNIX user account. */
+	  if (sid_sub_auth (psid, 0) == 2)
 	    {
-	      if (pldap->open (cygheap->dom.get_rfc2307_domain ()) == NO_ERROR)
-		map_gid = pldap->remap_gid (gid);
-	      if (map_gid == ILLEGAL_GID) 
-		map_gid = MAP_UNIX_TO_CYGWIN_ID (gid);
-	      cygheap->ugid_cache.add_gid (gid, map_gid);
+	      gid_t gid = sid_sub_auth_rid (psid);
+	      gid_t map_gid = cygheap->ugid_cache.get_gid (gid);
+	      if (map_gid == ILLEGAL_GID)
+		{
+		  if (pldap->open (cygheap->dom.get_rfc2307_domain ())
+		      == NO_ERROR)
+		    map_gid = pldap->remap_gid (gid);
+		  if (map_gid == ILLEGAL_GID) 
+		    map_gid = MAP_UNIX_TO_CYGWIN_ID (gid);
+		  cygheap->ugid_cache.add_gid (gid, map_gid);
+		}
+	      id = (uid_t) map_gid;
 	    }
-	  id = (uid_t) map_gid;
 	}
       else if ((gr = internal_getgrsid (*this, pldap)))
 	id = gr->gr_gid;
@@ -147,7 +154,8 @@ cygpsid::get_id (BOOL search_grp, int *type, cyg_ldap *pldap)
       struct passwd *pw;
       if (*this == cygheap->user.sid ())
 	id = myself->uid;
-      else if (sid_id_auth (psid) == 22 && cygheap->pg.nss_pwd_db ())
+      else if (sid_id_auth (psid) == 22 && sid_sub_auth (psid, 0) == 1
+	       && cygheap->pg.nss_pwd_db ())
 	{
 	  /* Samba UNIX user.  See comment above. */
 	  uid_t uid = sid_sub_auth_rid (psid);

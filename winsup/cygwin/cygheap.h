@@ -508,6 +508,13 @@ class cygheap_ugid_cache
 	  return _map[i].cyg_id;
       return (uint32_t) -1;
     }
+    uint32_t reverse_get (uint32_t id) const
+    {
+      for (uint32_t i = 0; i < _cnt; ++i)
+	if (_map[i].cyg_id == id)
+	  return _map[i].nfs_id;
+      return (uint32_t) -1;
+    }
     void add (uint32_t nfs_id, uint32_t cyg_id)
     {
       if (_cnt >= _max)
@@ -523,6 +530,8 @@ class cygheap_ugid_cache
 public:
   uid_t get_uid (uid_t uid) const { return uids.get (uid); }
   gid_t get_gid (gid_t gid) const { return gids.get (gid); }
+  uid_t reverse_get_uid (uid_t uid) const { return uids.reverse_get (uid); }
+  gid_t reverse_get_gid (gid_t gid) const { return gids.reverse_get (gid); }
   void add_uid (uid_t nfs_uid, uid_t cyg_uid) { uids.add (nfs_uid, cyg_uid); }
   void add_gid (gid_t nfs_gid, gid_t cyg_gid) { gids.add (nfs_gid, cyg_gid); }
 };
