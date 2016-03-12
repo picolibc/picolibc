@@ -39,13 +39,10 @@ _DEFUN(__smakebuf_r, (ptr, fp),
        struct _reent *ptr _AND
        register FILE *fp)
 {
-  register size_t size, couldbetty;
   register _PTR p;
-#ifdef __USE_INTERNAL_STAT64
-  struct stat64 st;
-#else
-  struct stat st;
-#endif
+  int flags;
+  size_t size;
+  int couldbetty;
 
   if (fp->_flags & __SNBF)
     {
@@ -53,49 +50,7 @@ _DEFUN(__smakebuf_r, (ptr, fp),
       fp->_bf._size = 1;
       return;
     }
-#ifdef __USE_INTERNAL_STAT64
-  if (fp->_file < 0 || _fstat64_r (ptr, fp->_file, &st) < 0)
-#else
-  if (fp->_file < 0 || _fstat_r (ptr, fp->_file, &st) < 0)
-#endif
-    {
-      couldbetty = 0;
-      /* Check if we are be called by asprintf family for initial buffer.  */
-      if (fp->_flags & __SMBF)
-        size = _DEFAULT_ASPRINTF_BUFSIZE;
-      else
-        size = BUFSIZ;
-#ifdef _FSEEK_OPTIMIZATION
-      /* do not try to optimise fseek() */
-      fp->_flags |= __SNPT;
-#endif
-    }
-  else
-    {
-      couldbetty = (st.st_mode & S_IFMT) == S_IFCHR;
-#ifdef HAVE_BLKSIZE
-      size = st.st_blksize <= 0 ? BUFSIZ : st.st_blksize;
-#else
-      size = BUFSIZ;
-#endif
-#ifdef _FSEEK_OPTIMIZATION
-      /*
-       * Optimize fseek() only if it is a regular file.
-       * (The test for __sseek is mainly paranoia.)
-       */
-      if ((st.st_mode & S_IFMT) == S_IFREG && fp->_seek == __sseek)
-	{
-	  fp->_flags |= __SOPT;
-#ifdef HAVE_BLKSIZE
-	  fp->_blksize = st.st_blksize;
-#else
-	  fp->_blksize = 1024;
-#endif
-	}
-      else
-	fp->_flags |= __SNPT;
-#endif
-    }
+  flags = __swhatbuf_r (ptr, fp, &size, &couldbetty);
   if ((p = _malloc_r (ptr, size)) == NULL)
     {
       if (!(fp->_flags & __SSTR))
@@ -113,5 +68,60 @@ _DEFUN(__smakebuf_r, (ptr, fp),
       fp->_bf._size = size;
       if (couldbetty && _isatty_r (ptr, fp->_file))
 	fp->_flags |= __SLBF;
+      fp->_flags |= flags;
     }
+}
+
+/*
+ * Internal routine to determine `proper' buffering for a file.
+ */
+int
+_DEFUN(__swhatbuf_r, (ptr, fp, bufsize, couldbetty),
+	struct _reent *ptr _AND
+	FILE *fp _AND
+	size_t *bufsize _AND
+	int *couldbetty)
+{
+#ifdef _FSEEK_OPTIMIZATION
+  const int snpt = __SNPT;
+#else
+  const int snpt = 0;
+#endif
+
+#ifdef __USE_INTERNAL_STAT64
+  struct stat64 st;
+
+  if (fp->_file < 0 || _fstat64_r (ptr, fp->_file, &st) < 0)
+#else
+  struct stat st;
+
+  if (fp->_file < 0 || _fstat_r (ptr, fp->_file, &st) < 0)
+#endif
+    {
+      *couldbetty = 0;
+      /* Check if we are be called by asprintf family for initial buffer.  */
+      if (fp->_flags & __SMBF)
+        *bufsize = _DEFAULT_ASPRINTF_BUFSIZE;
+      else
+        *bufsize = BUFSIZ;
+      return (0);
+    }
+
+  /* could be a tty iff it is a character device */
+  *couldbetty = S_ISCHR(st.st_mode);
+#ifdef HAVE_BLKSIZE
+  if (st.st_blksize > 0)
+    {
+      /*
+       * Optimise fseek() only if it is a regular file.  (The test for
+       * __sseek is mainly paranoia.)  It is safe to set _blksize
+       * unconditionally; it will only be used if __SOPT is also set.
+       */
+      *bufsize = st.st_blksize;
+      fp->_blksize = st.st_blksize;
+      return ((st.st_mode & S_IFMT) == S_IFREG ?  __SOPT : snpt);
+    }
+#endif
+  *bufsize = BUFSIZ;
+  return (snpt);
 }

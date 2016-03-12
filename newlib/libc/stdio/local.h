@@ -182,6 +182,7 @@ extern int    _EXFUN(__stextmode,(int));
 extern _VOID   _EXFUN(__sinit,(struct _reent *));
 extern _VOID   _EXFUN(_cleanup_r,(struct _reent *));
 extern _VOID   _EXFUN(__smakebuf_r,(struct _reent *, FILE *));
+extern int    _EXFUN(__swhatbuf_r,(struct _reent *, FILE *, size_t *, int *));
 extern int    _EXFUN(_fwalk,(struct _reent *, int (*)(FILE *)));
 extern int    _EXFUN(_fwalk_reent,(struct _reent *, int (*)(struct _reent *, FILE *)));
 struct _glue * _EXFUN(__sfmoreglue,(struct _reent *,int n));
