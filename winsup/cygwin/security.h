@@ -248,6 +248,9 @@ public:
       return (*this = sp) != NO_SID;
     }
 
+  const PSID create (DWORD auth, DWORD subauth_cnt, ...);
+  bool append (DWORD rid);
+
   /* Implemented in pwdgrp.h. */
   BOOL getfrompw (const struct passwd *pw);
   BOOL getfromgr (const struct group *gr);

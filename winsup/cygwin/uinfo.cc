@@ -1952,11 +1952,11 @@ pwdgrp::fetch_account_from_windows (fetch_user_arg_t &arg, cyg_ldap *pldap)
 	 We create uid/gid values compatible with the old values generated
 	 by mkpasswd/mkgroup. */
       if (arg.id < 0x200)
-	__small_swprintf (sidstr, L"S-1-5-%u", arg.id & 0x1ff);
+	csid.create (5, 1, arg.id & 0x1ff);
       else if (arg.id <= 0x3e7)
-	__small_swprintf (sidstr, L"S-1-5-32-%u", arg.id & 0x3ff);
+	csid.create (5, 2, 32, arg.id & 0x3ff);
       else if (arg.id == 0x3e8) /* Special case "Other Organization" */
-	wcpcpy (sidstr, L"S-1-5-1000");
+	csid.create (5, 1, 1000);
       else
 #endif
       if (arg.id == 0xffe)
@@ -1988,32 +1988,30 @@ pwdgrp::fetch_account_from_windows (fetch_user_arg_t &arg, cyg_ldap *pldap)
 	  arg.id -= 0x10000;
 	  /* SECURITY_APP_PACKAGE_AUTHORITY */
 	  if (arg.id >= 0xf20 && arg.id <= 0xf3f)
-	    __small_swprintf (sidstr, L"S-1-15-%u-%u", (arg.id >> 4) & 0xf,
-						       arg.id & 0xf);
+	    csid.create (15, 2, (arg.id >> 4) & 0xf, arg.id & 0xf);
 	  else
-	    __small_swprintf (sidstr, L"S-1-%u-%u", arg.id >> 8, arg.id & 0xff);
+	    csid.create (arg.id >> 8, 1, arg.id & 0xff);
 	}
       else if (arg.id >= 0x30000 && arg.id < 0x40000)
 	{
 	  /* Account domain user or group. */
-	  PWCHAR s = cygheap->dom.account_sid ().pstring (sidstr);
-	  __small_swprintf (s, L"-%u", arg.id & 0xffff);
+	  csid = cygheap->dom.account_sid ();
+	  csid.append (arg.id & 0xffff);
 	}
       else if (arg.id < 0x60000)
 	{
 	  /* Builtin Alias */
-	  __small_swprintf (sidstr, L"S-1-5-%u-%u",
-			    arg.id >> 12, arg.id & 0xffff);
+	  csid.create (5, 2, arg.id >> 12, arg.id & 0xffff);
 	}
       else if (arg.id < 0x70000)
 	{
 	  /* Mandatory Label. */
-	  __small_swprintf (sidstr, L"S-1-16-%u", arg.id & 0xffff);
+	  csid.create (16, 1, arg.id & 0xffff);
 	}
       else if (arg.id < 0x80000)
 	{
 	  /* Identity assertion SIDs. */
-	  __small_swprintf (sidstr, L"S-1-18-%u", arg.id & 0xffff);
+	  csid.create (18, 1, arg.id & 0xffff);
 	}
       else if (arg.id < PRIMARY_POSIX_OFFSET)
 	{
@@ -2024,16 +2022,15 @@ pwdgrp::fetch_account_from_windows (fetch_user_arg_t &arg, cyg_ldap *pldap)
       else if (arg.id == ILLEGAL_UID)
 	{
 	  /* Just some fake. */
-	  sid = csid = "S-1-99-0";
+	  sid = csid.create (99, 1, 0);
 	  break;
 	}
       else if (arg.id >= UNIX_POSIX_OFFSET)
 	{
 	  /* UNIX (unknown NFS or Samba) user account. */
-	  __small_swprintf (sidstr, L"S-1-22-%u-%u",
-			    is_group () ? 2 : 1,  arg.id & UNIX_POSIX_MASK);
+	  csid.create (22, 2, is_group () ? 2 : 1,  arg.id & UNIX_POSIX_MASK);
 	  /* LookupAccountSidW will fail. */
-	  sid = csid = sidstr;
+	  sid = csid;
 	  break;
 	}
       else
@@ -2049,23 +2046,22 @@ pwdgrp::fetch_account_from_windows (fetch_user_arg_t &arg, cyg_ldap *pldap)
 	    }
 	  if (this_td)
 	    {
-	      cygpsid tsid (this_td->DomainSid);
-	      PWCHAR s = tsid.pstring (sidstr);
-	      __small_swprintf (s, L"-%u", arg.id - posix_offset);
+	      csid = this_td->DomainSid;
+	      csid.append (arg.id - posix_offset);
 	    }
 	  else
 	    {
 	      /* Primary domain */
-	      PWCHAR s = cygheap->dom.primary_sid ().pstring (sidstr);
-	      __small_swprintf (s, L"-%u", arg.id - PRIMARY_POSIX_OFFSET);
+	      csid = cygheap->dom.primary_sid ();
+	      csid.append (arg.id - PRIMARY_POSIX_OFFSET);
 	    }
 	  posix_offset = 0;
 	}
-      sid = csid = sidstr;
+      sid = csid;
       ret = LookupAccountSidW (NULL, sid, name, &nlen, dom, &dlen, &acc_type);
       if (!ret)
 	{
-	  debug_printf ("LookupAccountSidW (%W), %E", sidstr);
+	  debug_printf ("LookupAccountSidW (%W), %E", sid.string (sidstr));
 	  return NULL;
 	}
       break;

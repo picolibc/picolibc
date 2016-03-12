@@ -13,6 +13,7 @@ details. */
 
 #include "winsup.h"
 #include <stdlib.h>
+#include <stdarg.h>
 #include <cygwin/acl.h>
 #include <sys/queue.h>
 #include <authz.h>
@@ -282,6 +283,37 @@ cygsid::getfromstr (const char *nsidstr, bool well_known)
 	return get_sid (s, cnt, r, well_known);
     }
   return psid = NO_SID;
+}
+
+const PSID
+cygsid::create (DWORD auth, DWORD subauth_cnt, ...)
+{
+  va_list ap;
+  PSID sid;
+
+  if (subauth_cnt > SID_MAX_SUB_AUTHORITIES)
+    return NULL;
+
+  DWORD subauth[subauth_cnt];
+
+  va_start (ap, subauth_cnt);
+  for (DWORD i = 0; i < subauth_cnt; ++i)
+    subauth[i] = va_arg (ap, DWORD);
+  sid = get_sid (auth, subauth_cnt, subauth, false);
+  va_end (ap);
+  return sid;
+}
+
+bool
+cygsid::append (DWORD rid)
+{
+  if (psid == NO_SID)
+    return false;
+  PISID dsid = (PISID) psid;
+  if (dsid->SubAuthorityCount >= SID_MAX_SUB_AUTHORITIES)
+    return false;
+  dsid->SubAuthority[dsid->SubAuthorityCount++] = rid;
+  return true;
 }
 
 cygsid *
