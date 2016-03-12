@@ -1124,7 +1124,7 @@ get_posix_access (PSECURITY_DESCRIPTOR psd,
 	  }
 	/* For all groups, if everyone has more permissions, add everyone
 	   perms to group perms.  Skip groups with deny ACE. */
-	else if (lacl[idx].a_id & (GROUP_OBJ | GROUP)
+	else if (lacl[idx].a_type & (GROUP_OBJ | GROUP)
 		 && !(lacl[idx].a_type & ACL_DEFAULT)
 		 && !(lacl[idx].a_perm & DENY_RWX))
 	  lacl[idx].a_perm |= lacl[2].a_perm & S_IRWXO;
