@@ -651,10 +651,12 @@ _ELIDABLE_INLINE int __sgetc_r(struct _reent *__ptr, FILE *__p)
 #define __sgetc_r(__ptr, __p) __sgetc_raw_r(__ptr, __p)
 #endif
 
-#ifdef _never /* __GNUC__ */
-/* If this inline is actually used, then systems using coff debugging
-   info get hopelessly confused.  21sept93 rich@cygnus.com.  */
+#ifdef __GNUC__
 _ELIDABLE_INLINE int __sputc_r(struct _reent *_ptr, int _c, FILE *_p) {
+#ifdef __SCLE
+	if ((_p->_flags & __SCLE) && _c == '\n')
+	  __sputc_r (_ptr, '\r', _p);
+#endif
 	if (--_p->_w >= 0 || (_p->_w >= _p->_lbfsize && (char)_c != '\n'))
 		return (*_p->_p++ = _c);
 	else
