@@ -64,4 +64,15 @@ Bug Fixes
 - Don't spill network credentials of privileged user changing the user
   context via setuid method 1
   (https://cygwin.com/cygwin-ug-net/ntsec.html#ntsec-nopasswd1) into
-  user session
+  user session.
+  Addresses: https://cygwin.com/ml/cygwin/2016-02/msg00101.html
+
+- Fix bug in setvbuf resulting in overwriting data in line buffered IO
+  when writing after reading.
+  Addresses: https://cygwin.com/ml/cygwin/2016-03/msg00180.html
+
+- Fix typo in code converting Windows ACL to POSIX ACL, potentially
+  resulting in incorrect group permissions.  Self-observed.
+
+- Fix reading/writing ACLs on Samba shares when using RFC2307 mapped uid/gid
+  values.  Self-observed.
