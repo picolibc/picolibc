@@ -203,7 +203,6 @@ nbf:
    */
   if (mode == _IOLBF)
     fp->_flags |= __SLBF;
-  reent->__cleanup = _cleanup_r;
   fp->_bf._base = fp->_p = (unsigned char *) buf;
   fp->_bf._size = size;
   /* fp->_lbfsize is still 0 */
