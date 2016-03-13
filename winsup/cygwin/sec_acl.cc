@@ -145,7 +145,8 @@ set_posix_access (mode_t attr, uid_t uid, gid_t gid,
   cygpsid *aclsid;
   PACL acl;
   size_t acl_len = sizeof (ACL);
-  mode_t class_obj = 0, other_obj, group_obj, deny;
+  mode_t user_obj, group_obj, other_obj, deny;
+  mode_t class_obj = 0;
   DWORD access;
   int idx, start_idx, tmp_idx;
   bool owner_eq_group = false;
@@ -319,6 +320,9 @@ set_posix_access (mode_t attr, uid_t uid, gid_t gid,
 	  break;
 	}
 
+      /* To check if the NULL SID deny ACE is required we need user_obj.  */
+      tmp_idx = searchace (aclbufp, nentries, def | USER_OBJ);
+      user_obj = aclbufp[tmp_idx].a_perm;
       /* To compute deny access masks, we need group_obj, other_obj and... */
       tmp_idx = searchace (aclbufp, nentries, def | GROUP_OBJ);
       /* No default entries present? */
@@ -347,9 +351,18 @@ set_posix_access (mode_t attr, uid_t uid, gid_t gid,
       /* Note that Windows filters the ACE Mask value so it only reflects
 	 the bit values supported by the object type.  The result is that
 	 we can't set a CLASS_OBJ value for ptys.  The get_posix_access
-	 function has to workaround that. */
-      if (!add_access_denied_ace (acl, access, well_known_null_sid, acl_len,
-				  inherit))
+	 function has to workaround that.
+
+	 We also don't write the NULL SID ACE in case we have a simple POSIX
+	 permission ACL with the user perms >= group perms >= other perms and
+	 no special bits set.  In all other cases we either need the NULL SID
+	 ACE or we write it to avoid calls to AuthZ from get_posix_access. */
+      if (!S_ISCHR (attr)
+	  && access != CYG_ACE_NEW_STYLE
+	  && ((user_obj | group_obj | other_obj) != user_obj
+	      || (group_obj | other_obj) != group_obj)
+	  && !add_access_denied_ace (acl, access, well_known_null_sid, acl_len,
+				     inherit))
 	return NULL;
 
       /* Do we potentially chmod a file with owner SID == group SID?  If so,
