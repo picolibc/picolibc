@@ -52,5 +52,6 @@ PORTABILITY
 <<qsort_r>>, in various forms, appears in both BSD and glibc.
 */
 
+#define _GNU_SOURCE
 #define I_AM_GNU_QSORT_R
 #include "qsort.c"

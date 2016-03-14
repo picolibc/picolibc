@@ -25,12 +25,12 @@
  *
  */
 
-#include <sys/cdefs.h>
 #if 0
 __FBSDID("$FreeBSD: src/lib/libc/stdlib/strfmon.c,v 1.19 2008/04/24 07:49:00 ru Exp $");
 #endif
 
 #include "winsup.h"
+#include <sys/cdefs.h>
 #include <sys/types.h>
 #include <ctype.h>
 #include <errno.h>

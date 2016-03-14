@@ -28,26 +28,34 @@ __uint32_t arc4random_uniform(__uint32_t);
 const char *getprogname (void);
 void	setprogname (const char *);
 
-#ifndef __STRICT_ANSI__
+#if __GNU_VISIBLE
 char *canonicalize_file_name (const char *);
+#endif
+#if __BSD_VISIBLE || __POSIX_VISIBLE >= 200112
 int unsetenv (const char *);
-#endif /*__STRICT_ANSI__*/
-#if !defined(__STRICT_ANSI__) || (__XSI_VISIBLE >= 500)
+#endif
+#if __BSD_VISIBLE || __SVID_SOURCE || __XSI_VISIBLE >= 4
 char *initstate (unsigned seed, char *state, size_t size);
 long random (void);
 char *setstate (const char *state);
 void srandom (unsigned);
 #endif
-#ifndef __STRICT_ANSI__
+#if __XSI_VISIBLE
 char *ptsname (int);
-int ptsname_r(int, char *, size_t);
-int getpt (void);
 int grantpt (int);
 int unlockpt (int);
-#endif /*__STRICT_ANSI__*/
+#endif
+#if __GNU_VISIBLE
+int ptsname_r(int, char *, size_t);
+int getpt (void);
+#endif
 
+#if __XSI_VISIBLE >= 600
 int posix_openpt (int);
+#endif
+#if __POSIX_VISIBLE >= 200112
 int posix_memalign (void **, size_t, size_t);
+#endif
 
 #ifdef _COMPILING_NEWLIB
 #define unsetenv UNUSED_unsetenv
@@ -55,7 +63,9 @@ int posix_memalign (void **, size_t, size_t);
 #endif
 
 extern _PTR memalign _PARAMS ((size_t, size_t));
+#if __BSD_VISIBLE || (__XSI_VISIBLE >= 4 && __POSIX_VISIBLE < 200112)
 extern _PTR valloc _PARAMS ((size_t));
+#endif
 
 #undef _malloc_r
 #define _malloc_r(r, s) malloc (s)

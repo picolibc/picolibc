@@ -131,6 +131,8 @@ Supporting OS subroutines required: <<close>>, <<fstat>>, <<isatty>>,
 <<lseek>>, <<read>>, <<sbrk>>, <<write>>.
 */
 
+#define _XOPEN_SOURCE
+#define _XOPEN_SOURCE_EXTENDED
 #include <_ansi.h>
 #include <reent.h>
 #include <stdio.h>
