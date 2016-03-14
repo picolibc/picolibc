@@ -3595,7 +3595,16 @@ cygwin_getaddrinfo (const char *hostname, const char *servname,
 	}
       /* Disable automatic IDN conversion on W8 and later. */
       whints.ai_flags |= AI_DISABLE_IDN_ENCODING;
-      ret = w32_to_gai_err (GetAddrInfoW (whost, wserv, &whints, &wres));
+      ret = GetAddrInfoW (whost, wserv, &whints, &wres);
+      /* Try to workaround an apparent shortcoming in Winsock's getaddrinfo
+	 implementation.  See this link for details:
+	 https://communities.vmware.com/message/2577858#2577858 */
+      if (ret == WSANO_RECOVERY && (whints.ai_flags & AI_ALL))
+	{
+	  whints.ai_flags &= ~AI_ALL;
+	  ret = GetAddrInfoW (whost, wserv, &whints, &wres);
+	}
+      ret = w32_to_gai_err (ret);
       /* Always copy over to self-allocated memory. */
       if (!ret)
 	{
