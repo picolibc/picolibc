@@ -110,7 +110,7 @@ details. */
 #define __LONG_LONG_MAX__ 9223372036854775807LL
 #endif
 
-#if defined (__GNU_LIBRARY__) ? defined (__USE_GNU) : !defined (__STRICT_ANSI__)
+#if __GNU_VISIBLE
 #undef LONG_LONG_MIN
 #define LONG_LONG_MIN (-LONG_LONG_MAX-1)
 #undef LONG_LONG_MAX
