@@ -189,7 +189,9 @@ wint_t _EXFUN(putwc_unlocked, (wchar_t, __FILE *));
 wint_t _EXFUN(putwchar_unlocked, (wchar_t));
 #endif
 
+#if __POSIX_VISIBLE >= 200809
 __FILE *_EXFUN (open_wmemstream, (wchar_t **, size_t *));
+#endif
 __FILE *_EXFUN (_open_wmemstream_r, (struct _reent *, wchar_t **, size_t *));
 
 #ifndef __VALIST
