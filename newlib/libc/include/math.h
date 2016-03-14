@@ -3,6 +3,7 @@
 #define  _MATH_H_
 
 #include <sys/reent.h>
+#include <sys/cdefs.h>
 #include <machine/ieeefp.h>
 #include "_ansi.h"
 
@@ -136,9 +137,7 @@ extern double fmod _PARAMS((double, double));
 #endif /* ! defined (__math_68881) */
 #endif /* ! defined (_REENT_ONLY) */
 
-#if !defined(__STRICT_ANSI__) || defined(__cplusplus) || \
-  (defined(__STDC_VERSION__) && __STDC_VERSION__ >= 199901L)
-
+#if __ISO_C_VISIBLE >= 1999
 /* ISO C99 types and macros. */
 
 /* FIXME:  FLT_EVAL_METHOD should somehow be gotten from float.h (which is hard,
@@ -468,35 +467,39 @@ extern long long int llrintl _PARAMS((_LONG_DOUBLE));
 #endif /* __i386__ */
 #endif /* !_LDBL_EQ_DBL */
 
-#endif /* !defined (__STRICT_ANSI__) || defined(__cplusplus) || (defined(__STDC_VERSION__) && __STDC_VERSION__ >= 199901L) */
+#endif /* __ISO_C_VISIBLE >= 1999 */
 
-#if !defined (__STRICT_ANSI__) || defined(__cplusplus)
-
+#if __MISC_VISIBLE
 extern double drem _PARAMS((double, double));
-extern void sincos _PARAMS((double, double *, double *));
+extern float dremf _PARAMS((float, float));
 extern double gamma_r _PARAMS((double, int *));
 extern double lgamma_r _PARAMS((double, int *));
+extern float gammaf_r _PARAMS((float, int *));
+extern float lgammaf_r _PARAMS((float, int *));
+#endif
 
+#if __MISC_VISIBLE || __XSI_VISIBLE
 extern double y0 _PARAMS((double));
 extern double y1 _PARAMS((double));
 extern double yn _PARAMS((int, double));
 extern double j0 _PARAMS((double));
 extern double j1 _PARAMS((double));
 extern double jn _PARAMS((int, double));
+#endif
 
-extern float dremf _PARAMS((float, float));
-extern void sincosf _PARAMS((float, float *, float *));
-extern float gammaf_r _PARAMS((float, int *));
-extern float lgammaf_r _PARAMS((float, int *));
-
+#if __MISC_VISIBLE || __XSI_VISIBLE >= 600
 extern float y0f _PARAMS((float));
 extern float y1f _PARAMS((float));
 extern float ynf _PARAMS((int, float));
 extern float j0f _PARAMS((float));
 extern float j1f _PARAMS((float));
 extern float jnf _PARAMS((int, float));
+#endif
 
 /* GNU extensions */
+#if __GNU_VISIBLE
+extern void sincos _PARAMS((double, double *, double *));
+extern void sincosf _PARAMS((float, float *, float *));
 # ifndef exp10
 extern double exp10 _PARAMS((double));
 # endif
@@ -509,11 +512,9 @@ extern float exp10f _PARAMS((float));
 # ifndef pow10f
 extern float pow10f _PARAMS((float));
 # endif
+#endif /* __GNU_VISIBLE */
 
-#endif /* !defined (__STRICT_ANSI__) || defined(__cplusplus) */
-
-#ifndef __STRICT_ANSI__
-
+#if __MISC_VISIBLE || __XSI_VISIBLE
 /* The gamma functions use a global variable, signgam.  */
 #ifndef _REENT_ONLY
 #define signgam (*__signgam())
@@ -521,7 +522,9 @@ extern int *__signgam _PARAMS((void));
 #endif /* ! defined (_REENT_ONLY) */
 
 #define __signgam_r(ptr) _REENT_SIGNGAM(ptr)
+#endif /* __MISC_VISIBLE || __XSI_VISIBLE */
 
+#if __SVID_VISIBLE
 /* The exception structure passed to the matherr routine.  */
 /* We have a problem when using C++ since `exception' is a reserved
    name in C++.  */
@@ -554,11 +557,11 @@ extern int matherr _PARAMS((struct exception *e));
 #define TLOSS 5
 #define PLOSS 6
 
-#endif /* ! defined (__STRICT_ANSI__) */
+#endif /* __SVID_VISIBLE */
 
 /* Useful constants.  */
 
-#if !defined(__STRICT_ANSI__) || ((_XOPEN_SOURCE - 0) >= 500)
+#if __BSD_VISIBLE || __XSI_VISIBLE >= 500
 
 #define MAXFLOAT	3.40282347e+38F
 
@@ -578,7 +581,7 @@ extern int matherr _PARAMS((struct exception *e));
 
 #endif
 
-#ifndef __STRICT_ANSI__
+#if __BSD_VISIBLE
 
 #define M_TWOPI         (M_PI * 2.0)
 #define M_3PI_4		2.3561944901923448370E0
@@ -610,7 +613,7 @@ extern __IMPORT _LIB_VERSION_TYPE _LIB_VERSION;
 #define _XOPEN_ __fdlibm_xopen
 #define _POSIX_ __fdlibm_posix
 
-#endif /* ! defined (__STRICT_ANSI__) */
+#endif /* __BSD_VISIBLE */
 
 _END_STD_C
 
