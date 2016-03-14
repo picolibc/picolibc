@@ -232,9 +232,6 @@
 
 #if defined(__CYGWIN__)
 #include <cygwin/config.h>
-#if !defined (__STRICT_ANSI__) || (__STDC_VERSION__ >= 199901L)
-#define __USE_XOPEN2K 1
-#endif
 #endif
 
 #if defined(__rtems__)
