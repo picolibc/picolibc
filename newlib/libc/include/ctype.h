@@ -2,6 +2,7 @@
 #define _CTYPE_H_
 
 #include "_ansi.h"
+#include <sys/cdefs.h>
 
 _BEGIN_STD_C
 
@@ -19,11 +20,11 @@ int _EXFUN(isxdigit,(int __c));
 int _EXFUN(tolower, (int __c));
 int _EXFUN(toupper, (int __c));
 
-#if !defined(__STRICT_ANSI__) || defined(__cplusplus) || __STDC_VERSION__ >= 199901L
+#if __ISO_C_VISIBLE >= 1999
 int _EXFUN(isblank, (int __c));
 #endif
 
-#ifndef __STRICT_ANSI__
+#if __MISC_VISIBLE || __XSI_VISIBLE
 int _EXFUN(isascii, (int __c));
 int _EXFUN(toascii, (int __c));
 #define _tolower(__c) ((unsigned char)(__c) - 'A' + 'a')
@@ -68,8 +69,7 @@ extern	__IMPORT char	*__ctype_ptr__;
 #define	isgraph(__c)	(__ctype_lookup(__c)&(_P|_U|_L|_N))
 #define iscntrl(__c)	(__ctype_lookup(__c)&_C)
 
-#if defined(__GNUC__) && \
-    (!defined(__STRICT_ANSI__) || __STDC_VERSION__ >= 199901L)
+#if defined(__GNUC__) && __ISO_C_VISIBLE >= 1999
 #define isblank(__c) \
   __extension__ ({ __typeof__ (__c) __x = (__c);		\
         (__ctype_lookup(__x)&_B) || (int) (__x) == '\t';})
@@ -98,12 +98,13 @@ extern	__IMPORT char	*__ctype_ptr__;
       (void) __ctype_ptr__[__x]; (tolower) (__x);})
 #  endif /* _MB_EXTENDED_CHARSETS* */
 # endif /* __GNUC__ */
-#endif /* !__cplusplus */
 
-#ifndef __STRICT_ANSI__
+#if __MISC_VISIBLE || __XSI_VISIBLE
 #define isascii(__c)	((unsigned)(__c)<=0177)
 #define toascii(__c)	((__c)&0177)
 #endif
+
+#endif /* !__cplusplus */
 
 /* For C++ backward-compatibility only.  */
 extern	__IMPORT _CONST char	_ctype_[];
