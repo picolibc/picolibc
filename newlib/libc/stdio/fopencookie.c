@@ -82,6 +82,7 @@ It is not portable.  See also the <<funopen>> interface from BSD.
 Supporting OS subroutines required: <<sbrk>>.
 */
 
+#define _GNU_SOURCE
 #include <stdio.h>
 #include <errno.h>
 #include <sys/lock.h>
