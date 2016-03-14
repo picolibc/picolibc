@@ -344,7 +344,7 @@ void	_EXFUN(_pthread_cleanup_pop,
     _pthread_cleanup_pop(&_pthread_clup_ctx, (_execute)); \
   } while (0)
 
-#if defined(_GNU_SOURCE)
+#if __GNU_VISIBLE
 void	_EXFUN(_pthread_cleanup_push_defer,
 	(struct _pthread_cleanup_context *_context,
 	void (*_routine)(void *), void *_arg));
@@ -362,7 +362,7 @@ void	_EXFUN(_pthread_cleanup_pop_restore,
 #define pthread_cleanup_pop_restore_np(_execute) \
     _pthread_cleanup_pop_restore(&_pthread_clup_ctx, (_execute)); \
   } while (0)
-#endif /* defined(_GNU_SOURCE) */
+#endif /* __GNU_VISIBLE */
 
 #if defined(_POSIX_THREAD_CPUTIME)
  
