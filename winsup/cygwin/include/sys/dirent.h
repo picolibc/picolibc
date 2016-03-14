@@ -12,6 +12,7 @@
 #ifndef _SYS_DIRENT_H
 #define _SYS_DIRENT_H
 
+#include <sys/cdefs.h>
 #include <sys/types.h>
 #include <limits.h>
 
@@ -72,22 +73,28 @@ int closedir (DIR *);
 
 int dirfd (DIR *);
 
-#ifndef _POSIX_SOURCE
+#if __MISC_VISIBLE || __XSI_VISIBLE
 #ifndef __INSIDE_CYGWIN__
 long telldir (DIR *);
 void seekdir (DIR *, long loc);
 #endif
+#endif
 
+#if __MISC_VISIBLE || __POSIX_VISIBLE >= 200809
 int scandir (const char *__dir,
 	     struct dirent ***__namelist,
 	     int (*select) (const struct dirent *),
 	     int (*compar) (const struct dirent **, const struct dirent **));
+int alphasort (const struct dirent **__a, const struct dirent **__b);
+#endif
 
+#if __GNU_VISIBLE
 int scandirat (int __dirfd, const char *__dir, struct dirent ***__namelist,
 	       int (*select) (const struct dirent *),
 	       int (*compar) (const struct dirent **, const struct dirent **));
+#endif
 
-int alphasort (const struct dirent **__a, const struct dirent **__b);
+#if __BSD_VISIBLE
 #ifdef _DIRENT_HAVE_D_TYPE
 /* File types for `d_type'.  */
 enum
@@ -116,5 +123,5 @@ enum
 # define IFTODT(mode)		(((mode) & 0170000) >> 12)
 # define DTTOIF(dirtype)        ((dirtype) << 12)
 #endif /* _DIRENT_HAVE_D_TYPE */
-#endif /* _POSIX_SOURCE */
+#endif /* __BSD_VISIBLE */
 #endif /*_SYS_DIRENT_H*/
