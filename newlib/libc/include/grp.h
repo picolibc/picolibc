@@ -49,7 +49,7 @@
 #include <cygwin/grp.h>
 #endif
 
-#if !defined(_POSIX_SOURCE) && !defined(_XOPEN_SOURCE)
+#if __BSD_VISIBLE
 #define	_PATH_GROUP		"/etc/group"
 #endif
 
@@ -67,15 +67,17 @@ extern "C" {
 #ifndef __INSIDE_CYGWIN__
 struct group	*getgrgid (gid_t);
 struct group	*getgrnam (const char *);
+#if __MISC_VISIBLE || __POSIX_VISIBLE
 int		 getgrnam_r (const char *, struct group *,
 			char *, size_t, struct group **);
 int		 getgrgid_r (gid_t, struct group *,
 			char *, size_t, struct group **);
-#if __BSD_VISIBLE || __XSI_VISIBLE >= 500
+#endif /* __MISC_VISIBLE || __POSIX_VISIBLE */
+#if __MISC_VISIBLE || __XSI_VISIBLE >= 4
 struct group	*getgrent (void);
 void		 setgrent (void);
 void		 endgrent (void);
-#endif /* __BSD_VISIBLE || __XSI_VISIBLE >= 500 */
+#endif /* __MISC_VISIBLE || __XSI_VISIBLE >= 4 */
 #if __BSD_VISIBLE
 int		 initgroups (const char *, gid_t);
 #endif /* __BSD_VISIBLE */
