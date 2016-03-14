@@ -19,10 +19,9 @@ details. */
    includes the W32api winsock[2].h header must know what it is doing;
    it must not call the Cygwin select function.
 */
-# if !(defined (_POSIX_SOURCE) || defined (_WINSOCK_H) || defined (_WINSOCKAPI_) || defined (__USE_W32_SOCKETS))
+# if !(defined (_WINSOCK_H) || defined (_WINSOCKAPI_) || defined (__USE_W32_SOCKETS))
 
 #include <sys/cdefs.h>
-
 #include <sys/_sigset.h>
 #include <sys/_timeval.h>
 #include <sys/timespec.h>
@@ -73,14 +72,16 @@ __BEGIN_DECLS
 
 int select __P ((int __n, fd_set *__readfds, fd_set *__writefds,
 		 fd_set *__exceptfds, struct timeval *__timeout));
+#if __POSIX_VISIBLE >= 200112
 int pselect __P ((int __n, fd_set *__readfds, fd_set *__writefds,
 		  fd_set *__exceptfds, const struct timespec *__timeout,
 		  const sigset_t *__set));
+#endif
 
 __END_DECLS
 
-#endif
+#endif /* !__INSIDE_CYGWIN_NET__ */
 
-#endif /* !_POSIX_SOURCE, !__INSIDE_CYGWIN_NET__ */
+#endif /* !(_WINSOCK_H || _WINSOCKAPI_ || __USE_W32_SOCKETS) */
 
 #endif /* sys/select.h */
