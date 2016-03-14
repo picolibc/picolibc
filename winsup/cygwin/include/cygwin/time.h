@@ -24,17 +24,18 @@ time_t __cdecl timegm (struct tm *);
 
 #define TIMER_RELTIME  0 /* For compatibility with HP/UX, Solaris, others? */
 
-#ifndef __STRICT_ANSI__
-
+#if __SVID_VISIBLE
 extern int stime (const time_t *);
+#endif
 
+#if __SVID_VISIBLE || __XSI_VISIBLE
 extern int daylight __asm__ (_SYMSTR (_daylight));
 
 #ifndef __timezonefunc__
 extern long timezone __asm__ (_SYMSTR (_timezone));
 #endif
 
-#endif /*__STRICT_ANSI__*/
+#endif /* __SVID_VISIBLE || __XSI_VISIBLE */
 
 #ifdef __cplusplus
 }
