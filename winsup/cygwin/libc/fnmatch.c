@@ -38,6 +38,7 @@
 #if defined(LIBC_SCCS) && !defined(lint)
 static char sccsid[] = "@(#)fnmatch.c	8.2 (Berkeley) 4/16/94";
 #endif /* LIBC_SCCS and not lint */
+#include "winsup.h"
 #include <sys/cdefs.h>
 __FBSDID("$FreeBSD: head/lib/libc/gen/fnmatch.c 288309 2015-09-27 12:52:18Z jilles $");
 
