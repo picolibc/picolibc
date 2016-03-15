@@ -11,6 +11,8 @@ details. */
 #ifndef _FENV_H_
 #define _FENV_H_
 
+#include <sys/cdefs.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -133,14 +135,14 @@ extern const fenv_t *_fe_dfl_env;
    type "pointer to const-qualified fenv_t",may also be specified by
    the implementation.  */
 
-#ifdef _GNU_SOURCE
+#if __GNU_VISIBLE
 /*  If possible, the GNU C Library defines a macro FE_NOMASK_ENV which
    represents an environment where every exception raised causes a trap
    to occur. You can test for this macro using #ifdef. It is only defined
    if _GNU_SOURCE is defined.  */
 extern const fenv_t *_fe_nomask_env;
 #define FE_NOMASK_ENV (_fe_nomask_env)
-#endif /* _GNU_SOURCE */
+#endif /* __GNU_VISIBLE */
 
 
 /*  The following shall be declared as functions and may also be

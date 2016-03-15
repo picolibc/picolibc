@@ -12,6 +12,7 @@ details. */
 #define _ENDIAN_H_
 
 #include <sys/config.h>
+#include <sys/cdefs.h>
 #include <bits/endian.h>
 
 /*#ifdef  __USE_BSD*/
@@ -27,7 +28,7 @@ details. */
 # define __LONG_LONG_PAIR(HI, LO) HI, LO
 #endif
 
-#if /*defined __USE_BSD ||*/ ! defined _POSIX_SOURCE
+#if __BSD_VISIBLE
 
 #include <byteswap.h>
 
@@ -71,7 +72,7 @@ details. */
 
 #endif /*__BYTE_ORDER == __BIG_ENDIAN*/
 
-#endif /*__USE_BSD || !_POSIX_SOURCE*/
+#endif /*__BSD_VISIBLE*/
 
 #endif /*_ENDIAN_H_*/
 
