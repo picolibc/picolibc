@@ -82,12 +82,12 @@ struct	stat
 #define	S_ISUID		0004000	/* set user id on execution */
 #define	S_ISGID		0002000	/* set group id on execution */
 #define	S_ISVTX		0001000	/* save swapped text even after use */
-#ifndef	_POSIX_SOURCE
+#if __BSD_VISIBLE
 #define	S_IREAD		0000400	/* read permission, owner */
 #define	S_IWRITE 	0000200	/* write permission, owner */
 #define	S_IEXEC		0000100	/* execute/search permission, owner */
 #define	S_ENFMT 	0002000	/* enforcement-mode locking */
-#endif	/* !_POSIX_SOURCE */
+#endif	/* !_BSD_VISIBLE */
 
 #define	S_IFMT		_IFMT
 #define	S_IFDIR		_IFDIR
@@ -124,7 +124,7 @@ struct	stat
 #define		S_IWOTH	0000002	/* write permission, other */
 #define		S_IXOTH 0000001/* execute/search permission, other */
 
-#ifndef _POSIX_SOURCE
+#if __BSD_VISIBLE
 #define ACCESSPERMS (S_IRWXU | S_IRWXG | S_IRWXO) /* 0777 */
 #define ALLPERMS (S_ISUID | S_ISGID | S_ISVTX | S_IRWXU | S_IRWXG | S_IRWXO) /* 07777 */
 #define DEFFILEMODE (S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH) /* 0666 */
@@ -157,19 +157,15 @@ int	_EXFUN(lstat,( const char *__restrict __path, struct stat *__restrict __buf 
 int	_EXFUN(mknod,( const char *__path, mode_t __mode, dev_t __dev ));
 #endif
 
-#if (__POSIX_VISIBLE >= 200809 || defined (__CYGWIN__)) && !defined(__INSIDE_CYGWIN__)
+#if __ATFILE_VISIBLE && !defined(__INSIDE_CYGWIN__)
 int	_EXFUN(fchmodat, (int, const char *, mode_t, int));
-#endif
-#if (__BSD_VISIBLE || __POSIX_VISIBLE >= 200809 || defined (__CYGWIN__)) && !defined(__INSIDE_CYGWIN__)
 int	_EXFUN(fstatat, (int, const char *__restrict , struct stat *__restrict, int));
 int	_EXFUN(mkdirat, (int, const char *, mode_t));
 int	_EXFUN(mkfifoat, (int, const char *, mode_t));
-#endif
-#if (__BSD_VISIBLE || __XSI_VISIBLE >= 700 || defined (__CYGWIN__)) && !defined(__INSIDE_CYGWIN__)
 int	_EXFUN(mknodat, (int, const char *, mode_t, dev_t));
-#endif
-#if (__BSD_VISIBLE || __POSIX_VISIBLE >= 200809 || defined (__CYGWIN__)) && !defined(__INSIDE_CYGWIN__)
 int	_EXFUN(utimensat, (int, const char *, const struct timespec *, int));
+#endif
+#if __POSIX_VISIBLE >= 200809 && !defined(__INSIDE_CYGWIN__)
 int	_EXFUN(futimens, (int, const struct timespec *));
 #endif
 
