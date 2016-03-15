@@ -84,13 +84,14 @@ typedef	quad_t *	qaddr_t;
 #define _ST_INT32
 #endif
 
-# if	__BSD_VISIBLE
-
+#if __BSD_VISIBLE
 #include <sys/select.h>
-
 #  define	physadr		physadr_t
 #  define	quad		quad_t
+#endif
 
+/* These types are required by netinet/*.h on Cygwin */
+#if __BSD_VISIBLE || defined(__CYGWIN__)
 #ifndef _BSDTYPES_DEFINED
 /* also defined in mingw/gmon.h and in w32api/winsock[2].h */
 #ifndef __u_char_defined
@@ -111,11 +112,13 @@ typedef	unsigned long	u_long;
 #endif
 #define _BSDTYPES_DEFINED
 #endif
+#endif	/*__BSD_VISIBLE || __CYGWIN__ */
 
+#if __MISC_VISIBLE
 typedef	unsigned short	ushort;		/* System V compatibility */
 typedef	unsigned int	uint;		/* System V compatibility */
 typedef	unsigned long	ulong;		/* System V compatibility */
-# endif	/*__BSD_VISIBLE */
+#endif
 
 #ifndef __clock_t_defined
 typedef _CLOCK_T_ clock_t;
