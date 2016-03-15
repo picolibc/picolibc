@@ -182,7 +182,10 @@ static HANDLE
 lookup_thread_id (DWORD threadId, int *tix)
 {
   int i;
-  *tix = 0;
+
+  if (tix)
+    *tix = 0;
+
   for (i=0; i<num_active_threads; i++)
     if (active_thread_ids[i] == threadId)
       {
@@ -463,6 +466,7 @@ run_program (char *cmdline)
 		      thread_return_address[tix] = rv;
 		}
 	      set_step_threads (event.dwThreadId, stepping_enabled);
+	      /* fall-through */
 	    case STATUS_SINGLE_STEP:
 	      opcode_count++;
 	      pc = (CONTEXT_REG)event.u.Exception.ExceptionRecord.ExceptionAddress;
@@ -854,6 +858,7 @@ main (int argc, char **argv)
   int c, i;
   int total_pcount = 0, total_scount = 0;
   FILE *gmon;
+  ssize_t range;
 
   setbuf (stdout, 0);
 
@@ -906,14 +911,20 @@ main (int argc, char **argv)
   sscanf (argv[optind++], ADDR_SSCANF_FMT, &low_pc);
   sscanf (argv[optind++], ADDR_SSCANF_FMT, &high_pc);
 
-  if (low_pc > high_pc-8)
+  range = high_pc - low_pc;
+  if (range <= 0)
     {
       fprintf (stderr, "Hey, low_pc must be lower than high_pc\n");
       exit (1);
     }
 
-  hits = (HISTCOUNTER *)malloc (high_pc-low_pc+4);
-  memset (hits, 0, high_pc-low_pc+4);
+  hits = (HISTCOUNTER *)malloc (range+4);
+  if (!hits)
+    {
+      fprintf (stderr, "Ouch, malloc failed\n");
+      exit (1);
+    }
+  memset (hits, 0, range+4);
 
   fprintf (stderr, "prun: [" CONTEXT_REG_FMT "," CONTEXT_REG_FMT "] Running '%s'\n",
 	  low_pc, high_pc, argv[optind]);
@@ -922,13 +933,13 @@ main (int argc, char **argv)
 
   hdr.lpc = low_pc;
   hdr.hpc = high_pc;
-  hdr.ncnt = high_pc-low_pc + sizeof (hdr);
+  hdr.ncnt = range + sizeof (hdr);
   hdr.version = GMONVERSION;
   hdr.profrate = 100;
 
   gmon = fopen ("gmon.out", "wb");
   fwrite (&hdr, 1, sizeof (hdr), gmon);
-  fwrite (hits, 1, high_pc-low_pc, gmon);
+  fwrite (hits, 1, range, gmon);
   write_call_edges (gmon);
   fclose (gmon);
 
