@@ -43,7 +43,7 @@
 #include <sys/types.h>
 #include <sys/timespec.h>
 
-#if __BSD_VISIBLE
+#if __BSD_VISIBLE || __POSIX_VISIBLE >= 200112 || __XSI_VISIBLE
 #include <sys/select.h>
 #endif
 
@@ -416,22 +416,25 @@ int	tvtohz(struct timeval *tv);
 #include <sys/cdefs.h>
 
 __BEGIN_DECLS
-int _EXFUN(setitimer, (int __which, const struct itimerval *__restrict __value,
-					struct itimerval *__restrict __ovalue));
 int _EXFUN(utimes, (const char *__path, const struct timeval *__tvp));
 
 #if __BSD_VISIBLE
 int _EXFUN(adjtime, (const struct timeval *, struct timeval *));
 int _EXFUN(futimes, (int, const struct timeval *));
-int _EXFUN(futimesat, (int, const char *, const struct timeval [2]));
 int _EXFUN(lutimes, (const char *, const struct timeval *));
 int _EXFUN(settimeofday, (const struct timeval *, const struct timezone *));
 #endif
 
-#if __XSI_VISIBLE
+#if __MISC_VISIBLE || __XSI_VISIBLE
 int _EXFUN(getitimer, (int __which, struct itimerval *__value));
+int _EXFUN(setitimer, (int __which, const struct itimerval *__restrict __value,
+					struct itimerval *__restrict __ovalue));
 int _EXFUN(gettimeofday, (struct timeval *__restrict __p,
 			  void *__restrict __tz));
+#endif
+
+#if __GNU_VISIBLE
+int _EXFUN(futimesat, (int, const char *, const struct timeval [2]));
 #endif
 
 #ifdef _COMPILING_NEWLIB
