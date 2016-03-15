@@ -24,63 +24,67 @@ int     _EXFUN(chmod, (const char *__path, mode_t __mode ));
 #if !defined(__INSIDE_CYGWIN__)
 int     _EXFUN(chown, (const char *__path, uid_t __owner, gid_t __group ));
 #endif
-#if defined(__CYGWIN__) || defined(__rtems__)
+#if __BSD_VISIBLE || (__XSI_VISIBLE >= 4 && __POSIX_VISIBLE < 200112)
 int     _EXFUN(chroot, (const char *__path ));
 #endif
 int     _EXFUN(close, (int __fildes ));
-#if defined(__CYGWIN__)
+#if __POSIX_VISIBLE >= 199209
 size_t	_EXFUN(confstr, (int __name, char *__buf, size_t __len));
 #endif
 char *  _EXFUN(ctermid, (char *__s ));
 char *  _EXFUN(cuserid, (char *__s ));
-#if defined(__CYGWIN__)
+#if __BSD_VISIBLE || (__XSI_VISIBLE && __XSI_VISIBLE < 500)
 int	_EXFUN(daemon, (int nochdir, int noclose));
 #endif
 int     _EXFUN(dup, (int __fildes ));
 int     _EXFUN(dup2, (int __fildes, int __fildes2 ));
-#if defined(__CYGWIN__)
+#if __GNU_VISIBLE
 int     _EXFUN(dup3, (int __fildes, int __fildes2, int flags));
 int	_EXFUN(eaccess, (const char *__path, int __mode));
+#endif
+#if __BSD_VISIBLE || (__XSI_VISIBLE && __XSI_VISIBLE < 500)
 void	_EXFUN(endusershell, (void));
+#endif
+#if __GNU_VISIBLE
 int	_EXFUN(euidaccess, (const char *__path, int __mode));
 #endif
 int     _EXFUN(execl, (const char *__path, const char *, ... ));
 int     _EXFUN(execle, (const char *__path, const char *, ... ));
 int     _EXFUN(execlp, (const char *__file, const char *, ... ));
-#if defined(__CYGWIN__)
+#if __MISC_VISIBLE
 int     _EXFUN(execlpe, (const char *__file, const char *, ... ));
 #endif
 int     _EXFUN(execv, (const char *__path, char * const __argv[] ));
 int     _EXFUN(execve, (const char *__path, char * const __argv[], char * const __envp[] ));
 int     _EXFUN(execvp, (const char *__file, char * const __argv[] ));
-#if defined(__CYGWIN__)
+#if __GNU_VISIBLE
 int     _EXFUN(execvpe, (const char *__file, char * const __argv[], char * const __envp[] ));
 #endif
-#if __POSIX_VISIBLE >= 200809 || __BSD_VISIBLE || defined(__CYGWIN__)
+#if __ATFILE_VISIBLE
 int	_EXFUN(faccessat, (int __dirfd, const char *__path, int __mode, int __flags));
 #endif
-#if defined(__CYGWIN__) || defined(__rtems__) || defined(__SPU__)
+#if __BSD_VISIBLE || __XSI_VISIBLE >= 4
 int     _EXFUN(fchdir, (int __fildes));
 #endif
 int     _EXFUN(fchmod, (int __fildes, mode_t __mode ));
 #if !defined(__INSIDE_CYGWIN__)
 int     _EXFUN(fchown, (int __fildes, uid_t __owner, gid_t __group ));
 #endif
-#if __POSIX_VISIBLE >= 200809 || __BSD_VISIBLE || defined(__CYGWIN__)
+#if __ATFILE_VISIBLE
 int	_EXFUN(fchownat, (int __dirfd, const char *__path, uid_t __owner, gid_t __group, int __flags));
 #endif
-#if defined(__CYGWIN__)
+#if __POSIX_VISIBLE >= 200809
 int	_EXFUN(fexecve, (int __fd, char * const __argv[], char * const __envp[] ));
 #endif
 pid_t   _EXFUN(fork, (void ));
 long    _EXFUN(fpathconf, (int __fd, int __name ));
 int     _EXFUN(fsync, (int __fd));
 int     _EXFUN(fdatasync, (int __fd));
-#if defined(__CYGWIN__)
+#if __GNU_VISIBLE
 char *  _EXFUN(get_current_dir_name, (void));
 #endif
 char *  _EXFUN(getcwd, (char *__buf, size_t __size ));
-#if defined(__CYGWIN__)
+#if __BSD_VISIBLE || (__XSI_VISIBLE && __XSI_VISIBLE < 500)
 int	_EXFUN(getdomainname ,(char *__name, size_t __len));
 #endif
 #if !defined(__INSIDE_CYGWIN__)
@@ -89,7 +93,7 @@ uid_t   _EXFUN(geteuid, (void ));
 gid_t   _EXFUN(getgid, (void ));
 #endif
 int     _EXFUN(getgroups, (int __gidsetsize, gid_t __grouplist[] ));
-#if defined(__CYGWIN__)
+#if __BSD_VISIBLE || __XSI_VISIBLE >= 4
 long    _EXFUN(gethostid, (void));
 #endif
 char *  _EXFUN(getlogin, (void ));
@@ -98,22 +102,26 @@ int _EXFUN(getlogin_r, (char *name, size_t namesize) );
 #endif
 char *  _EXFUN(getpass, (const char *__prompt));
 int	_EXFUN(getpagesize, (void));
-#if defined(__CYGWIN__)
+#if __BSD_VISIBLE
 int    _EXFUN(getpeereid, (int, uid_t *, gid_t *));
 #endif
 pid_t   _EXFUN(getpgid, (pid_t));
 pid_t   _EXFUN(getpgrp, (void ));
 pid_t   _EXFUN(getpid, (void ));
 pid_t   _EXFUN(getppid, (void ));
-#if defined(__CYGWIN__) || defined(__rtems__)
+#if __POSIX_VISIBLE >= 200809 || __XSI_VISIBLE >= 4
 pid_t   _EXFUN(getsid, (pid_t));
 #endif
 #if !defined(__INSIDE_CYGWIN__)
 uid_t   _EXFUN(getuid, (void ));
 #endif
-#ifdef __CYGWIN__
+#if __BSD_VISIBLE || (__XSI_VISIBLE && __XSI_VISIBLE < 500)
 char *	_EXFUN(getusershell, (void));
+#endif
+#if __BSD_VISIBLE || (__XSI_VISIBLE >= 4 && __POSIX_VISIBLE < 200809)
 char *  _EXFUN(getwd, (char *__buf ));
+#endif
+#if __BSD_VISIBLE
 int	_EXFUN(iruserok, (unsigned long raddr, int superuser, const char *ruser, const char *luser));
 #endif
 int     _EXFUN(isatty, (int __fildes ));
@@ -124,14 +132,14 @@ int        _EXFUN(issetugid, (void));
 int     _EXFUN(lchown, (const char *__path, uid_t __owner, gid_t __group ));
 #endif
 int     _EXFUN(link, (const char *__path1, const char *__path2 ));
-#if __POSIX_VISIBLE >= 200809 || __BSD_VISIBLE || defined(__CYGWIN__)
+#if __ATFILE_VISIBLE
 int     _EXFUN(linkat, (int __dirfd1, const char *__path1, int __dirfd2, const char *__path2, int __flags ));
 #endif
 int	_EXFUN(nice, (int __nice_value ));
 #if !defined(__INSIDE_CYGWIN__)
 off_t   _EXFUN(lseek, (int __fildes, off_t __offset, int __whence ));
 #endif
-#if defined(__SPU__) || defined(__CYGWIN__)
+#if __MISC_VISIBLE || __XSI_VISIBLE >= 4
 #define F_ULOCK	0
 #define F_LOCK	1
 #define F_TLOCK	2
@@ -140,41 +148,41 @@ int     _EXFUN(lockf, (int __fd, int __cmd, off_t __len));
 #endif
 long    _EXFUN(pathconf, (const char *__path, int __name ));
 int     _EXFUN(pause, (void ));
-#ifdef __CYGWIN__
+#if __POSIX_VISIBLE >= 199506
 int	_EXFUN(pthread_atfork, (void (*)(void), void (*)(void), void (*)(void)));
 #endif
 int     _EXFUN(pipe, (int __fildes[2] ));
-#ifdef __CYGWIN__
+#if __GNU_VISIBLE
 int     _EXFUN(pipe2, (int __fildes[2], int flags));
 #endif
 ssize_t _EXFUN(pread, (int __fd, void *__buf, size_t __nbytes, off_t __offset));
 ssize_t _EXFUN(pwrite, (int __fd, const void *__buf, size_t __nbytes, off_t __offset));
 _READ_WRITE_RETURN_TYPE _EXFUN(read, (int __fd, void *__buf, size_t __nbyte ));
-#if defined(__CYGWIN__)
+#if __BSD_VISIBLE
 int	_EXFUN(rresvport, (int *__alport));
 int	_EXFUN(revoke, (char *__path));
 #endif
 int     _EXFUN(rmdir, (const char *__path ));
-#if defined(__CYGWIN__)
+#if __BSD_VISIBLE
 int	_EXFUN(ruserok, (const char *rhost, int superuser, const char *ruser, const char *luser));
 #endif
 void *  _EXFUN(sbrk,  (ptrdiff_t __incr));
 #if !defined(__INSIDE_CYGWIN__)
-#if defined(__CYGWIN__) || defined(__rtems__)
+#if __BSD_VISIBLE || __POSIX_VISIBLE >= 200112
 int     _EXFUN(setegid, (gid_t __gid ));
 int     _EXFUN(seteuid, (uid_t __uid ));
 #endif
 int     _EXFUN(setgid, (gid_t __gid ));
 #endif
-#if defined(__CYGWIN__)
+#if __BSD_VISIBLE
 int	_EXFUN(setgroups, (int ngroups, const gid_t *grouplist ));
 #endif
-#if __BSD_VISIBLE || (defined(_XOPEN_SOURCE) && __XSI_VISIBLE < 500)
+#if __BSD_VISIBLE || (__XSI_VISIBLE && __XSI_VISIBLE < 500)
 int	_EXFUN(sethostname, (const char *, size_t));
 #endif
 int     _EXFUN(setpgid, (pid_t __pid, pid_t __pgid ));
 int     _EXFUN(setpgrp, (void ));
-#if defined(__CYGWIN__) && !defined(__INSIDE_CYGWIN__)
+#if (__BSD_VISIBLE || __XSI_VISIBLE >= 4) && !defined(__INSIDE_CYGWIN__)
 int	_EXFUN(setregid, (gid_t __rgid, gid_t __egid));
 int	_EXFUN(setreuid, (uid_t __ruid, uid_t __euid));
 #endif
@@ -182,7 +190,7 @@ pid_t   _EXFUN(setsid, (void ));
 #if !defined(__INSIDE_CYGWIN__)
 int     _EXFUN(setuid, (uid_t __uid ));
 #endif
-#if defined(__CYGWIN__)
+#if __BSD_VISIBLE || (__XSI_VISIBLE && __XSI_VISIBLE < 500)
 void	_EXFUN(setusershell, (void));
 #endif
 unsigned _EXFUN(sleep, (unsigned int __seconds ));
@@ -191,9 +199,7 @@ long    _EXFUN(sysconf, (int __name ));
 pid_t   _EXFUN(tcgetpgrp, (int __fildes ));
 int     _EXFUN(tcsetpgrp, (int __fildes, pid_t __pgrp_id ));
 char *  _EXFUN(ttyname, (int __fildes ));
-#if defined(__CYGWIN__) || defined(__rtems__)
 int     _EXFUN(ttyname_r, (int, char *, size_t)); 
-#endif
 int     _EXFUN(unlink, (const char *__path ));
 int 	_EXFUN(usleep, (useconds_t __useconds));
 int     _EXFUN(vhangup, (void ));
@@ -210,9 +216,9 @@ int	 getopt(int, char * const [], const char *);
 extern int optreset;			/* getopt(3) external variable */
 #endif
 
-#ifndef        _POSIX_SOURCE
+#if __BSD_VISIBLE || (__XSI_VISIBLE >= 4 && __POSIX_VISIBLE < 200809)
 pid_t   _EXFUN(vfork, (void ));
-#endif /* _POSIX_SOURCE */
+#endif
 
 #ifdef _COMPILING_NEWLIB
 /* Provide prototypes for most of the _<systemcall> names that are
@@ -255,14 +261,14 @@ char *	_EXFUN(mktemp, (char *));
 void    _EXFUN(sync, (void));
 #endif
 
+#if __BSD_VISIBLE || __POSIX_VISIBLE >= 200112 || __XSI_VISIBLE >= 4
 ssize_t _EXFUN(readlink, (const char *__restrict __path,
                           char *__restrict __buf, size_t __buflen));
-#if __POSIX_VISIBLE >= 200809 || __BSD_VISIBLE || defined(__CYGWIN__)
+int     _EXFUN(symlink, (const char *__name1, const char *__name2));
+#endif
+#if __ATFILE_VISIBLE
 ssize_t        _EXFUN(readlinkat, (int __dirfd1, const char *__restrict __path,
                             char *__restrict __buf, size_t __buflen));
-#endif
-int     _EXFUN(symlink, (const char *__name1, const char *__name2));
-#if __POSIX_VISIBLE >= 200809 || __BSD_VISIBLE || defined(__CYGWIN__)
 int	_EXFUN(symlinkat, (const char *, int, const char *));
 int	_EXFUN(unlinkat, (int, const char *, int));
 #endif
