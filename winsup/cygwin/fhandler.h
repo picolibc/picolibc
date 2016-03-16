@@ -1352,6 +1352,8 @@ class dev_console
   bool ext_mouse_mode15;
   bool use_focus;
   bool raw_win32_keyboard_mode;
+  char cons_rabuf[40];  // cannot get longer than char buf[40] in char_command
+  char *cons_rapoi;
 
   inline UINT get_console_cp ();
   DWORD con_to_str (char *d, int dlen, WCHAR w);
@@ -1449,6 +1451,10 @@ private:
   int init (HANDLE, DWORD, mode_t);
   bool mouse_aware (MOUSE_EVENT_RECORD& mouse_event);
   bool focus_aware () {return shared_console_info->con.use_focus;}
+  bool get_cons_readahead_valid ()
+  {
+    return shared_console_info->con.cons_rapoi != NULL;
+  }
 
   select_record *select_read (select_stuff *);
   select_record *select_write (select_stuff *);

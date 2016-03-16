@@ -845,6 +845,12 @@ peek_console (select_record *me, bool)
   if (!me->read_selected)
     return me->write_ready;
 
+  if (fh->get_cons_readahead_valid ())
+    {
+      select_printf ("cons_readahead");
+      return me->read_ready = true;
+    }
+
   if (fh->get_readahead_valid ())
     {
       select_printf ("readahead");
