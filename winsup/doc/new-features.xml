@@ -38,6 +38,12 @@ pthread_barrier_init, pthread_barrier_destroy, pthread_barrier_wait.
 </para></listitem>
 
 <listitem><para>
+Enabled console reports requested by escape sequences: Requesting primary
+and secondary device attributes, requesting cursor position report;
+see https://cygwin.com/ml/cygwin-patches/2012-q3/msg00019.html
+</para></listitem>
+
+<listitem><para>
 New APIs: clog10, clog10f.
 </para></listitem>
 
