@@ -80,3 +80,7 @@ Bug Fixes
 
 - Fix reading/writing ACLs on Samba shares when using RFC2307 mapped uid/gid
   values.  Self-observed.
+
+- Fix a wrong error code returned when trying to execute a file which can't
+  be read for any reason.
+  Addresses: https://cygwin.com/ml/cygwin/2016-03/msg00364.html
