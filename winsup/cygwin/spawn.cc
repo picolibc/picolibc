@@ -1085,6 +1085,7 @@ av::setup (const char *prog_arg, path_conv& real_path, const char *ext,
 		real_path.set_cygexec (true);
 		break;
 	      }
+	    SetLastError (RtlNtStatusToDosError (status));
 	    goto err;
 	  }
 	if (!GetFileSizeEx (h, &size))
