@@ -12,6 +12,7 @@ extern "C" {
 #endif
 
 #include <_ansi.h>
+#include <sys/cdefs.h>
 
 #define	_FOPEN		(-1)	/* from sys/file.h, kernel use only */
 #define	_FREAD		0x0001	/* read enabled */
@@ -58,10 +59,9 @@ extern "C" {
 /*	O_NDELAY	_FNBIO 		set in 5include/fcntl.h */
 #define	O_NONBLOCK	_FNONBLOCK
 #define	O_NOCTTY	_FNOCTTY
-
-#ifndef	_POSIX_SOURCE
-
 #define	O_SYNC		_FSYNC
+
+#if __MISC_VISIBLE
 
 /*
  * Flags that work for fcntl(fd, F_SETFL, FXXXX)
@@ -93,7 +93,7 @@ extern "C" {
 #define	FEXCL		_FEXCL
 #define	FNOCTTY		_FNOCTTY
 
-#endif	!_POSIX_SOURCE
+#endif /* __MISC_VISIBLE */
 
 /* XXX close on exec request; must match UF_EXCLOSE in user.h */
 #define	FD_CLOEXEC	1	/* posix */
@@ -104,7 +104,7 @@ extern "C" {
 #define	F_SETFD		2	/* Set fildes flags (close on exec) */
 #define	F_GETFL		3	/* Get file flags */
 #define	F_SETFL		4	/* Set file flags */
-#ifndef	_POSIX_SOURCE
+#if __BSD_VISIBLE || __POSIX_VISIBLE >= 200112
 #ifdef __svr4__
 #define	F_GETOWN 	23	/* Get owner - for ASYNC */
 #define	F_SETOWN 	24	/* Set owner - for ASYNC */
@@ -112,7 +112,7 @@ extern "C" {
 #define	F_GETOWN 	5	/* Get owner - for ASYNC */
 #define	F_SETOWN 	6	/* Set owner - for ASYNC */
 #endif
-#endif	/* !_POSIX_SOURCE */
+#endif	/* __BSD_VISIBLE || __POSIX_VISIBLE >= 200112 */
 #ifdef __svr4__
 #define	F_GETLK  	14	/* Get record-locking information */
 #define	F_SETLK		6	/* Set or Clear a record-lock (Non-Blocking) */
@@ -122,20 +122,20 @@ extern "C" {
 #define	F_SETLK  	8	/* Set or Clear a record-lock (Non-Blocking) */
 #define	F_SETLKW 	9	/* Set or Clear a record-lock (Blocking) */
 #endif
-#ifndef	_POSIX_SOURCE
+#if __MISC_VISIBLE
 #define	F_RGETLK 	10	/* Test a remote lock to see if it is blocked */
 #define	F_RSETLK 	11	/* Set or unlock a remote lock */
 #define	F_CNVT 		12	/* Convert a fhandle to an open fd */
 #define	F_RSETLKW 	13	/* Set or Clear remote record-lock(Blocking) */
-#endif	/* !_POSIX_SOURCE */
+#endif	/* __MISC_VISIBLE */
 
 /* fcntl(2) flags (l_type field of flock structure) */
 #define	F_RDLCK		1	/* read lock */
 #define	F_WRLCK		2	/* write lock */
 #define	F_UNLCK		3	/* remove lock(s) */
-#ifndef	_POSIX_SOURCE
+#if __MISC_VISIBLE
 #define	F_UNLKSYS	4	/* remove remote locks for a given system */
-#endif	/* !_POSIX_SOURCE */
+#endif	/* __MISC_VISIBLE */
 
 /*#include <sys/stdtypes.h>*/
 
@@ -149,7 +149,7 @@ struct flock {
 	short	l_xxx;		/* reserved for future use */
 };
 
-#ifndef	_POSIX_SOURCE
+#if __MISC_VISIBLE
 /* extended file segment locking set data type */
 struct eflock {
 	short	l_type;		/* F_RDLCK, F_WRLCK, or F_UNLCK */
@@ -161,7 +161,7 @@ struct eflock {
 	long	l_rpid;		/* Remote process id wanting this lock */
 	long	l_rsys;		/* Remote system id wanting this lock */
 };
-#endif	/* !_POSIX_SOURCE */
+#endif	/* __MISC_VISIBLE */
 
 
 #include <sys/types.h>
