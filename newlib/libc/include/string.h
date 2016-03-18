@@ -51,6 +51,9 @@ int	 _EXFUN(bcmp,(const void *, const void *, size_t));
 void	 _EXFUN(bcopy,(const void *, void *, size_t));
 void	 _EXFUN(bzero,(void *, size_t));
 #endif
+#if __BSD_VISIBLE
+void	 _EXFUN(explicit_bzero,(void *, size_t));
+#endif
 #if __MISC_VISIBLE || __POSIX_VISIBLE >= 200809
 int	 _EXFUN(ffs,(int));
 #endif
