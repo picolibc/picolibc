@@ -1,3 +1,8 @@
+2016-03-18  Nick Clifton  <nickc@redhat.com>
+
+	* texi2pod.pl: Add TARGET to the list of recognised man page
+	sections.
+
 2014-06-27  Ludovic Courtès  <ludo@gnu.org>
 
 	PR external/16327
