@@ -772,9 +772,8 @@ of this is perl's configuration script, which wants
 tell the difference between files with just different case, so the
 configuration fails.
 </para>
-<para>To help with this problem, Cygwin supports case sensitivity
-starting with Cygwin 1.7.0.  For a detailed description how to use that
-feature see the Cygwin User's Guilde at
+<para>To help with this problem, Cygwin supports case sensitivity.  For a
+detailed description how to use that feature see the Cygwin User's Guide at
 <ulink url="https://cygwin.com/cygwin-ug-net/using-specialnames.html"/>.
 </para>
 
@@ -793,8 +792,7 @@ interesting.  E.g., the perl distribution has a file called
 letters 'aux' in it will hang.
 </para>
 <para>At least that's what happens when using native Windows tools.  Cygwin
-1.7.0 and later can deal with these filenames just fine.  Again, see the
-User's Guide at
+can deal with these filenames just fine.  Again, see the User's Guide at
 <ulink url="https://cygwin.com/cygwin-ug-net/using-specialnames.html"/>
 for a detailed description of what's possible with filenames and what is not.
 </para>
@@ -950,14 +948,13 @@ two packages:</para>
 <question><para>Why don't some of my old symlinks work anymore?</para></question>
 <answer>
 
-<para>Beginning with Cygwin 1.7, Cygwin supports multiple character sets.
-Symlinks created with Cygwin 1.7 are using the UTF-16 character set, which is
-portable across all character sets.  Old symlinks were written using your
-current Windows codepage, which is not portable across all character sets.
-If the target of the symlink doesn't resolve anymore, it's very likely that
-the symlink points to a target filename using native, non-ASCII characters,
-and you're now using another character set than way back when you created
-the symlink.</para>
+<para>Cygwin supports multiple character sets.  Symlinks created with Cygwin
+are using the UTF-16 character set, which is portable across all character
+sets.  Old symlinks were written using your current Windows codepage, which
+is not portable across all character sets.  If the target of the symlink
+doesn't resolve anymore, it's very likely that the symlink points to a target
+filename using native, non-ASCII characters, and you're now using another
+character set than way back when you created the symlink.</para>
 
 <para>Solution: Delete the symlink and create it again under you new Cygwin.
 The new symlink will be correctly point to the target no matter what character
@@ -1054,7 +1051,7 @@ usually all set and you can start the sshd service via
 </answer></qandaentry>
 
 <qandaentry id="faq.using.ssh-pubkey-stops-working">
-<question><para>Why does public key authentication with ssh fail after updating to Cygwin 1.7.34?</para></question>
+<question><para>Why does public key authentication with ssh fail after updating to Cygwin 1.7.34 or later?</para></question>
 <answer>
 
 <para>

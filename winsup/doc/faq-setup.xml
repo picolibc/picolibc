@@ -709,9 +709,9 @@ easy way to do it. Full instructions for constructing a portable Cygwin
 on CD by hand can be found on the mailing list at
 <ulink url="https://www.cygwin.com/ml/cygwin/2003-07/msg01117.html"/>
 (Thanks to fergus at bonhard dot uklinux dot net for these instructions.)
-Please note that these instructions are rather old and are referring to the
+Please note that these instructions are very old and are referring to the
 somewhat different setup of a Cygwin 1.5.x release.  As soon as somebody set
-this up for Cygwin 1.7, we might add this information here.
+this up for recent Cygwin releases, we might add this information here.
 </para>
 </answer></qandaentry>
 
@@ -719,9 +719,8 @@ this up for Cygwin 1.7, we might add this information here.
 <question><para>How do I save, restore, delete, or modify the Cygwin information stored in the registry?</para></question>
 <answer>
 
-<para>Since Cygwin 1.7, there's nothing important in the registry anymore,
-except for the installation directory information stored there for the sake
-of setup-x86{_64}.exe.  There's nothing left to manipulate anymore.
+<para>Cygwin doesn't store anything important in the registry anymore for
+quite some time.  There's no reason to save, restore or delete it.
 </para></answer></qandaentry>
 </qandadiv>
 

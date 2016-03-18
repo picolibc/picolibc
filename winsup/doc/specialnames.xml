@@ -50,10 +50,9 @@ to be readable by the $USER user account itself.</para>
 
 <sect2 id="pathnames-dosdevices"><title>Invalid filenames</title>
 
-<para>Filenames invalid under Win32 are not necessarily invalid
-under Cygwin since release 1.7.0.  There are a few rules which
-apply to Windows filenames.  Most notably, DOS device names like
-<filename>AUX</filename>, <filename>COM1</filename>,
+<para>Filenames invalid under Win32 are not necessarily invalid under Cygwin.
+There are a few rules which apply to Windows filenames.  Most notably, DOS
+device names like <filename>AUX</filename>, <filename>COM1</filename>,
 <filename>LPT1</filename> or <filename>PRN</filename> (to name a few)
 cannot be used as filename or extension in a native Win32 application.
 So filenames like <filename>prn.txt</filename> or <filename>foo.aux</filename>
@@ -95,12 +94,12 @@ can create and access files with trailing dots and spaces without problems.
 
 <para>An exception from this rule are some network filesystems (NetApp,
 NWFS) which choke on these filenames.  They return with an error like
-"No such file or directory" when trying to create such files.  Starting
-with Cygwin 1.7.6, Cygwin recognizes these filesystems and works around
-this problem by applying the same rule as for the other forbidden characters. 
-Leading spaces and trailing dots and spaces will be converted to UNICODE
-characters in the private use area.  This behaviour can be switched on
-explicitely for a filesystem or a directory tree by using the mount option
+"No such file or directory" when trying to create such files.  Cygwin
+recognizes these filesystems and works around this problem by applying
+the same rule as for the other forbidden characters.  Leading spaces and
+trailing dots and spaces will be converted to UNICODE characters in the
+private use area.  This behaviour can be switched on explicitely for a
+filesystem or a directory tree by using the mount option
 <literal>dos</literal>.</para>
 
 </sect2>
@@ -227,11 +226,8 @@ semaphores, shared memory, and message queues, so a system without a real
 </para>
 
 <para>Apart from that, Cygwin automatically simulates POSIX devices
-internally.  Up to Cygwin 1.7.11, these devices couldn't be seen with the
-command <command>ls /dev/</command> although commands such as
-<command>ls /dev/tty</command> worked fine.  Starting with Cygwin 1.7.12,
-the <filename>/dev</filename> directory is automagically populated with
-existing POSIX devices by Cygwin in a way comparable with a
+internally.  The <filename>/dev</filename> directory is automagically
+populated with existing POSIX devices by Cygwin in a way comparable with a
 <ulink url="http://en.wikipedia.org/wiki/Udev">udev</ulink> based virtual
 <filename>/dev</filename> directory under Linux.</para>
 
@@ -245,15 +241,13 @@ Cygwin supports the following character devices commonly found on POSIX systems:
 /dev/full
 
 /dev/console	Pseudo device name for the current console window of a session.
-		Up to Cygwin 1.7.9, this was the only name for a console.
-		Different consoles were indistinguishable.
 		Cygwin's /dev/console is not quite comparable with the console
 		device on UNIX machines.
 
-/dev/cons0      Starting with Cygwin 1.7.10, Console sessions are numbered from 
-/dev/cons1	/dev/cons0 upwards.  Console device names are pseudo device
-...		names, only accessible from processes within this very console
-		session.  This is due to a restriction in Windows.
+/dev/cons0      Console sessions are numbered from  /dev/cons0 upwards.
+/dev/cons1	Console device names are pseudo device names, only accessible
+...		from processes within this very console session.  This is due
+		to a restriction in Windows.
 
 /dev/tty	The current controlling tty of a session.
 

@@ -278,8 +278,9 @@ shared library.  First of all, since October 1998 every Cygwin DLL has
 been named <literal>cygwin1.dll</literal> and has a 1 in the release name.
 Additionally, there are DLL major and minor numbers that correspond to
 the name of the release, and a release number. In other words,
-cygwin-1.7.1-2 is <literal>cygwin1.dll</literal>, major version 7, minor
-version 1, release 2.
+cygwin-2.4.1-1 is <literal>cygwin1.dll</literal>, major version 2, minor
+version 4, release 1.  -1 is a subrelease number required by the distro
+versioning scheme.  It's not actually part of the Cygwin DLL version number.
 </para>
 <para>The <literal>cygwin1.dll</literal> major version number gets incremented
 only when a change is made that makes existing software incompatible. For

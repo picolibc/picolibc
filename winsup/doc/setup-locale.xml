@@ -60,11 +60,10 @@ provided by the gettext package under Cygwin.</para>
 
 <para>
 At application startup, the application's locale is set to the default
-"C" or "POSIX" locale.  Under Cygwin 1.7.2 and later, this locale defaults
-to the ASCII character set on the application level.  If you want to stick
-to the "C" locale and only change to another charset, you can define this
-by setting one of the locale environment variables to "C.charset".  For
-instance</para>
+"C" or "POSIX" locale.  This locale defaults to the ASCII character set
+on the application level.  If you want to stick to the "C" locale and only
+change to another charset, you can define this by setting one of the locale
+environment variables to "C.charset".  For instance</para>
 
 <screen>
   "C.ISO-8859-1"
@@ -117,10 +116,9 @@ interoperability with applications running in the default "C.UTF-8" locale.
 </para>
 
 <para>
-Starting with Cygwin 1.7.2, the language and territory are used to
-fetch locale-dependent information from Windows.  If the language and
-territory are not known to Windows, the <function>setlocale</function>
-function fails.</para>
+The language and territory are used to fetch locale-dependent information
+from Windows.  If the language and territory are not known to Windows, the
+<function>setlocale</function> function fails.</para>
 
 <para>The following modifiers are recognized.  Any other modifier is simply
 ignored for now.</para>
@@ -181,10 +179,10 @@ Assume that you've set one of the aforementioned environment variables to some
 valid POSIX locale value, other than "C" and "POSIX".  Assume further that
 you're living in Japan.  You might want to use the language code "ja" and the
 territory "JP", thus setting, say, <envar>LANG</envar> to "ja_JP".  You didn't
-set a character set, so what will Cygwin use now?  Starting with Cygwin 1.7.2,
-the default character set is determined by the default Windows ANSI codepage
-for this language and territory.  Cygwin uses a character set which is the
-typical Unix-equivalent to the Windows ANSI codepage.  For instance:</para>
+set a character set, so what will Cygwin use now?  The default character set
+is determined by the default Windows ANSI codepage for this language and
+territory.  Cygwin uses a character set which is the typical Unix-equivalent
+to the Windows ANSI codepage.  For instance:</para>
 
 <screen>
   "en_US"		ISO-8859-1
@@ -307,25 +305,9 @@ environment, if it's different from the UTF-8 charset.</para>
 consist of valid ASCII characters, and only of uppercase letters, digits, and
 the underscore for maximum portability.</para></note>
 
-<para>Symbolic links, too, may pose a problem when switching charsets on
-the fly.  A symbolic link contains the filename of the target file the
-symlink points to.  When a symlink had been created with older versions
-of Cygwin, the current ANSI or OEM character set had been used to store
-the target filename, dependent on the old <envar>CYGWIN</envar>
-environment variable setting <envar>codepage</envar> (see <xref
-linkend="cygwinenv-removed-options"></xref>.  If the target filename
-contains non-ASCII characters and you use another character set than
-your default ANSI/OEM charset, the target filename of the symlink is now
-potentially an invalid character sequence in the new character set.
-This behaviour is not different from the behaviour in other Operating
-Systems.  So, if you suddenly can't access a symlink anymore which
-worked all these years before, maybe it's because you switched to
-another character set.  This doesn't occur with symlinks created with
-Cygwin 1.7 or later.  </para>
-
 <para>Another problem you might encounter is that older versions of
 Windows did not install all charsets by default.  If you are running
-Windows XP or older, you can open the "Regional and Language Options"
+Windows XP or 2003, you can open the "Regional and Language Options"
 portion of the Control Panel, select the "Advanced" tab, and select
 entries from the "Code page conversion tables" list.  The following
 entries are useful to cygwin: 932/SJIS, 936/GBK, 949/EUC-KR, 950/Big5,

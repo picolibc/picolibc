@@ -1481,10 +1481,9 @@ D: on /d type fat (binary,user,noumount)
     <refsect2 id="utils-limitations">
       <title>Limitations</title>
 
-      <para>Limitations: there is a hard-coded limit of 64 mount points (up to
-        Cygwin 1.7.9: 30 mount points). Also, although you can mount to
-        pathnames that do not start with "/", there is no way to make use of
-        such mount points.</para>
+      <para>Limitations: there is a hard-coded limit of 64 mount points.
+        Also, although you can mount to pathnames that do not start with "/",
+	there is no way to make use of such mount points.</para>
 
       <para>Normally the POSIX mount point in Cygwin is an existing empty
         directory, as in standard UNIX. If this is the case, or if there is a

@@ -30,9 +30,8 @@ This is, of course, just an example.  For the recognized settings of the
 
 <para>
 Locale support is controlled by the <envar>LANG</envar> and
-<envar>LC_xxx</envar> environment variables.  Since Cygwin 1.7.2, all of
-them are honored and have a meaning.  For a more detailed description see
-<xref linkend="setup-locale"></xref>.
+<envar>LC_xxx</envar> environment variables.  For a more detailed description
+see <xref linkend="setup-locale"></xref>.
 </para>
 
 <para>

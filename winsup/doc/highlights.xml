@@ -74,10 +74,10 @@ a POSIX-compliant one.  The implementation details are safely hidden in the
 Cygwin DLL.  UNC pathnames (starting with two slashes) are supported for
 network paths.</para>
 
-<para>Since version 1.7.0, the layout of this POSIX view of the Windows file
-system space is stored in the <filename>/etc/fstab</filename> file.  Actually,
-there is a system-wide <filename>/etc/fstab</filename> file as well as a
-user-specific fstab file <filename>/etc/fstab.d/${USER}</filename>.</para>
+<para>The layout of this POSIX view of the Windows file system space is
+stored in the <filename>/etc/fstab</filename> file.  Actually, there is a
+system-wide <filename>/etc/fstab</filename> file as well as a user-specific
+fstab file <filename>/etc/fstab.d/${USER}</filename>.</para>
 
 <para>At startup the DLL has to find out where it can find the
 <filename>/etc/fstab</filename> file.  The mechanism used for this is simple.
@@ -130,23 +130,22 @@ guaranteed to be unique.  However, we have not found this to be a significant
 problem because of the low probability of generating a duplicate inode number.
 </para>
 
-<para>Cygwin 1.7 and later supports Extended Attributes (EAs) via the
-linux-specific function calls <function>getxattr</function>,
-<function>setxattr</function>, <function>listxattr</function>, and
-<function>removexattr</function>.  All EAs on Samba or NTFS are treated as
-user EAs, so, if the name of an EA is "foo" from the Windows perspective,
-it's transformed into "user.foo" within Cygwin.  This allows Linux-compatible
-EA operations and keeps tools like <command>attr</command>, or
-<command>setfattr</command> happy.
+<para>Cygwin supports Extended Attributes (EAs) via the linux-specific function
+calls <function>getxattr</function>, <function>setxattr</function>,
+<function>listxattr</function>, and <function>removexattr</function>.  All EAs
+on Samba or NTFS are treated as user EAs, so, if the name of an EA is "foo"
+from the Windows perspective, it's transformed into "user.foo" within Cygwin.
+This allows Linux-compatible EA operations and keeps tools like
+<command>attr</command>, or <command>setfattr</command> happy.
 </para>
 
-<para><function>chroot</function> is supported since Cygwin 1.1.3.
-However, chroot is not a concept known by Windows.  This implies some serious
-restrictions.  First of all, the <function>chroot</function> call isn't a
-privileged call.  Any user may call it.  Second, the chroot environment
-isn't safe against native windows processes.  Given that, chroot in Cygwin
-is only a hack which pretends security where there is none.  For that reason
-the usage of chroot is discouraged.
+<para><function>chroot</function> is supported.  Kind of.  Chroot is not a
+concept known by Windows.  This implies some serious restrictions.  First of
+all, the <function>chroot</function> call isn't a privileged call.  Any user
+may call it.  Second, the chroot environment isn't safe against native windows
+processes.  Given that, chroot in Cygwin is only a hack which pretends security
+where there is none.  For that reason the usage of chroot is discouraged.
+Don't use it unless you really, really know what you're doing.
 </para>
 </sect2>
 
@@ -347,14 +346,11 @@ completely transparent to the application.  Cygwin's implementation also
 supports the getpeereid BSD extension.  However, Cygwin does not yet support
 descriptor passing.</para>
 
-<para>IPv6 is supported beginning with Cygwin release 1.7.0.  This
-support is dependent, however, on the availability of the Windows IPv6
-stack.  The IPv6 stack was "experimental", i.e. not feature complete in
-Windows 2003 and earlier.  Full IPv6 support became available starting
-with Windows Vista and Windows Server 2008.  Cygwin does not depend on
-the underlying OS for the (newly implemented) <function>getaddrinfo</function>
-and <function>getnameinfo</function> functions.  Cygwin 1.7.0 adds
-replacement functions which implement the full functionality for IPv4.</para>
+<para>IPv6 is supported.  This support is dependent, however, on the
+availability of the Windows IPv6 stack.  The IPv6 stack was "experimental",
+i.e. not feature complete in Windows 2003 and earlier.  Full IPv6 support
+became only available starting with Windows Vista and Windows Server 2008.
+</para>
 
 </sect2>
 

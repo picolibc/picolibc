@@ -119,8 +119,8 @@ system call will immediately fail.</para>
 <title>Obsolete options</title>
 
 <para>
-Certain CYGWIN options available in past releases have been removed in
-Cygwin 1.7 for one reason or another.  These obsolete options are listed
+Certain CYGWIN options available in past releases have been removed over
+time for one reason or another.  These obsolete options are listed
 below.</para>
 
 <itemizedlist mark="bullet">
@@ -225,8 +225,8 @@ Windows programs.</para>
 <listitem>
 <para><envar>(no)upcaseenv</envar> - This option could be used to convert
 all environment variables to uppercase.  This was the default behavior in
-releases prior to Cygwin 1.7.  Since keeping the case of environment
-variables intact is POSIXly correct, Cygwin now does not change the case
+older releases of Cygwin.  Since keeping the case of environment variables
+intact is POSIXly correct, Cygwin now does not change the case
 of environment variables, except for a restricted set to maintain minimal
 backward compatibility.  The current list of always uppercased variables is:
 </para>
