@@ -488,8 +488,7 @@ fhandler_socket::af_local_copy (fhandler_socket *sock)
 void
 fhandler_socket::af_local_set_secret (char *buf)
 {
-  if (!fhandler_dev_random::crypt_gen_random (connect_secret,
-					      sizeof (connect_secret)))
+  if (getentropy (connect_secret, sizeof (connect_secret)))
     bzero ((char*) connect_secret, sizeof (connect_secret));
   __small_sprintf (buf, "%08x-%08x-%08x-%08x",
 		   connect_secret [0], connect_secret [1],

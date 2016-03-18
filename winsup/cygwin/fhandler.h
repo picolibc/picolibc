@@ -1731,8 +1731,6 @@ class fhandler_dev_random: public fhandler_base
   void __reg3 read (void *ptr, size_t& len);
   off_t lseek (off_t, int) { return 0; }
 
-  static bool crypt_gen_random (void *ptr, size_t len);
-
   fhandler_dev_random () : fhandler_base () {}
   fhandler_dev_random (void *) {}
 
