@@ -192,7 +192,11 @@ typedef _mode_t mode_t;
 #ifndef __CYGWIN__
 typedef	long key_t;
 #endif
+
+#ifndef _SSIZE_T_DECLARED
 typedef _ssize_t ssize_t;
+#define	_SSIZE_T_DECLARED
+#endif
 
 #if !defined(__CYGWIN__) && !defined(__rtems__)
 #ifdef __MS_types__
