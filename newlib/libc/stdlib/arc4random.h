@@ -39,9 +39,28 @@
 
 __LOCK_INIT(static, _arc4random_mutex);
 
+#ifdef __CYGWIN__
+
+extern int __isthreaded;
+
+#define _ARC4_LOCK()				\
+        do {					\
+	  if (__isthreaded)			\
+	    __lock_acquire (_arc4random_mutex);	\
+        } while (0)
+
+#define _ARC4_UNLOCK()				\
+        do {					\
+	  if (__isthreaded)			\
+	    __lock_release (_arc4random_mutex);	\
+        } while (0)
+#else
+
 #define _ARC4_LOCK() __lock_acquire(_arc4random_mutex)
 
 #define _ARC4_UNLOCK() __lock_release(_arc4random_mutex)
+
+#endif
 
 #ifdef _ARC4RANDOM_DATA
 _ARC4RANDOM_DATA
