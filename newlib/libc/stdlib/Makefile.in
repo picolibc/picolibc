@@ -112,7 +112,8 @@ am__objects_2 = lib_a-__adjust.$(OBJEXT) lib_a-__atexit.$(OBJEXT) \
 	lib_a-wcstoul.$(OBJEXT) lib_a-wcstombs.$(OBJEXT) \
 	lib_a-wcstombs_r.$(OBJEXT) lib_a-wctomb.$(OBJEXT) \
 	lib_a-wctomb_r.$(OBJEXT) $(am__objects_1)
-am__objects_3 = lib_a-cxa_atexit.$(OBJEXT) \
+am__objects_3 = lib_a-arc4random.$(OBJEXT) \
+	lib_a-arc4random_uniform.$(OBJEXT) lib_a-cxa_atexit.$(OBJEXT) \
 	lib_a-cxa_finalize.$(OBJEXT) lib_a-drand48.$(OBJEXT) \
 	lib_a-ecvtbuf.$(OBJEXT) lib_a-efgcvt.$(OBJEXT) \
 	lib_a-erand48.$(OBJEXT) lib_a-jrand48.$(OBJEXT) \
@@ -162,12 +163,12 @@ am__objects_9 = __adjust.lo __atexit.lo __call_atexit.lo __exp10.lo \
 	strtodg.lo strtol.lo strtorx.lo strtoul.lo utoa.lo wcstod.lo \
 	wcstol.lo wcstoul.lo wcstombs.lo wcstombs_r.lo wctomb.lo \
 	wctomb_r.lo $(am__objects_8)
-am__objects_10 = cxa_atexit.lo cxa_finalize.lo drand48.lo ecvtbuf.lo \
-	efgcvt.lo erand48.lo jrand48.lo lcong48.lo lrand48.lo \
-	mrand48.lo msize.lo mtrim.lo nrand48.lo rand48.lo seed48.lo \
-	srand48.lo strtoll.lo strtoll_r.lo strtoull.lo strtoull_r.lo \
-	wcstoll.lo wcstoll_r.lo wcstoull.lo wcstoull_r.lo atoll.lo \
-	llabs.lo lldiv.lo
+am__objects_10 = arc4random.lo arc4random_uniform.lo cxa_atexit.lo \
+	cxa_finalize.lo drand48.lo ecvtbuf.lo efgcvt.lo erand48.lo \
+	jrand48.lo lcong48.lo lrand48.lo mrand48.lo msize.lo mtrim.lo \
+	nrand48.lo rand48.lo seed48.lo srand48.lo strtoll.lo \
+	strtoll_r.lo strtoull.lo strtoull_r.lo wcstoll.lo wcstoll_r.lo \
+	wcstoull.lo wcstoull_r.lo atoll.lo llabs.lo lldiv.lo
 am__objects_11 = a64l.lo btowc.lo getopt.lo getsubopt.lo l64a.lo \
 	malign.lo mbrlen.lo mbrtowc.lo mbsinit.lo mbsnrtowcs.lo \
 	mbsrtowcs.lo on_exit.lo valloc.lo wcrtomb.lo wcsnrtombs.lo \
@@ -391,6 +392,8 @@ GENERAL_SOURCES = __adjust.c __atexit.c __call_atexit.c __exp10.c \
 @NEWLIB_NANO_MALLOC_FALSE@MALLOCR = mallocr
 @NEWLIB_NANO_MALLOC_TRUE@MALLOCR = nano-mallocr
 EXTENDED_SOURCES = \
+	arc4random.c	\
+	arc4random_uniform.c \
 	cxa_atexit.c	\
 	cxa_finalize.c	\
 	drand48.c	\
@@ -987,6 +990,18 @@ lib_a-wcstold.o: wcstold.c
 
 lib_a-wcstold.obj: wcstold.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-wcstold.obj `if test -f 'wcstold.c'; then $(CYGPATH_W) 'wcstold.c'; else $(CYGPATH_W) '$(srcdir)/wcstold.c'; fi`
+
+lib_a-arc4random.o: arc4random.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-arc4random.o `test -f 'arc4random.c' || echo '$(srcdir)/'`arc4random.c
+
+lib_a-arc4random.obj: arc4random.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-arc4random.obj `if test -f 'arc4random.c'; then $(CYGPATH_W) 'arc4random.c'; else $(CYGPATH_W) '$(srcdir)/arc4random.c'; fi`
+
+lib_a-arc4random_uniform.o: arc4random_uniform.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-arc4random_uniform.o `test -f 'arc4random_uniform.c' || echo '$(srcdir)/'`arc4random_uniform.c
+
+lib_a-arc4random_uniform.obj: arc4random_uniform.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-arc4random_uniform.obj `if test -f 'arc4random_uniform.c'; then $(CYGPATH_W) 'arc4random_uniform.c'; else $(CYGPATH_W) '$(srcdir)/arc4random_uniform.c'; fi`
 
 lib_a-cxa_atexit.o: cxa_atexit.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-cxa_atexit.o `test -f 'cxa_atexit.c' || echo '$(srcdir)/'`cxa_atexit.c

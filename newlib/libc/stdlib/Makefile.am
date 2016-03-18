@@ -102,6 +102,8 @@ MALLOCR=mallocr
 endif
 
 EXTENDED_SOURCES = \
+	arc4random.c	\
+	arc4random_uniform.c \
 	cxa_atexit.c	\
 	cxa_finalize.c	\
 	drand48.c	\

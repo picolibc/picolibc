@@ -64,6 +64,11 @@ int	_EXFUN(__locale_mb_cur_max,(_VOID));
 
 _VOID	_EXFUN(abort,(_VOID) _ATTRIBUTE ((__noreturn__)));
 int	_EXFUN(abs,(int));
+#if __BSD_VISIBLE
+__uint32_t _EXFUN(arc4random, (void));
+__uint32_t _EXFUN(arc4random_uniform, (__uint32_t));
+void    _EXFUN(arc4random_buf, (void *, size_t));
+#endif
 int	_EXFUN(atexit,(_VOID (*__func)(_VOID)));
 double	_EXFUN(atof,(const char *__nptr));
 #if __MISC_VISIBLE

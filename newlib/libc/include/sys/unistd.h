@@ -87,6 +87,9 @@ char *  _EXFUN(getcwd, (char *__buf, size_t __size ));
 #if __BSD_VISIBLE || (__XSI_VISIBLE && __XSI_VISIBLE < 500)
 int	_EXFUN(getdomainname ,(char *__name, size_t __len));
 #endif
+#if __BSD_VISIBLE
+int     _EXFUN(getentropy, (void *, size_t));
+#endif
 #if !defined(__INSIDE_CYGWIN__)
 gid_t   _EXFUN(getegid, (void ));
 uid_t   _EXFUN(geteuid, (void ));
