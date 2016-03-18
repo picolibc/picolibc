@@ -156,15 +156,6 @@ typedef struct sigaltstack {
 #define SIG_BLOCK 1	/* set of signals to block */
 #define SIG_UNBLOCK 2	/* set of signals to, well, unblock */
 
-/* These depend upon the type of sigset_t, which right now 
-   is always a long.. They're in the POSIX namespace, but
-   are not ANSI. */
-#define sigaddset(what,sig) (*(what) |= (1<<(sig)), 0)
-#define sigdelset(what,sig) (*(what) &= ~(1<<(sig)), 0)
-#define sigemptyset(what)   (*(what) = 0, 0)
-#define sigfillset(what)    (*(what) = ~(0), 0)
-#define sigismember(what,sig) (((*(what)) & (1<<(sig))) != 0)
-
 int _EXFUN(sigprocmask, (int how, const sigset_t *set, sigset_t *oset));
 
 #if defined(_POSIX_THREADS)
@@ -172,12 +163,6 @@ int _EXFUN(pthread_sigmask, (int how, const sigset_t *set, sigset_t *oset));
 #endif
 
 #if defined(__CYGWIN__) || defined(__rtems__)
-#undef sigaddset
-#undef sigdelset
-#undef sigemptyset
-#undef sigfillset
-#undef sigismember
-
 #ifdef _COMPILING_NEWLIB
 int _EXFUN(_kill, (pid_t, int));
 #endif /* _COMPILING_NEWLIB */
@@ -196,7 +181,18 @@ int _EXFUN(sigemptyset, (sigset_t *));
 int _EXFUN(sigpending, (sigset_t *));
 int _EXFUN(sigsuspend, (const sigset_t *));
 int _EXFUN(sigpause, (int));
-#endif
+
+#if !defined(__CYGWIN__) && !defined(__rtems__)
+/* These depend upon the type of sigset_t, which right now 
+   is always a long.. They're in the POSIX namespace, but
+   are not ANSI. */
+#define sigaddset(what,sig) (*(what) |= (1<<(sig)), 0)
+#define sigdelset(what,sig) (*(what) &= ~(1<<(sig)), 0)
+#define sigemptyset(what)   (*(what) = 0, 0)
+#define sigfillset(what)    (*(what) = ~(0), 0)
+#define sigismember(what,sig) (((*(what)) & (1<<(sig))) != 0)
+#endif /* !__CYGWIN__ && !__rtems__ */
+#endif /* __BSD_VISIBLE || __XSI_VISIBLE >= 4 */
 
 #if __BSD_VISIBLE || __XSI_VISIBLE >= 4 || __POSIX_VISIBLE >= 200809
 int _EXFUN(sigaltstack, (const stack_t *__restrict, stack_t *__restrict));
