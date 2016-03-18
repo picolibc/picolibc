@@ -193,3 +193,21 @@ arc4random_buf(void *buf, size_t n)
 	_rs_random_buf(buf, n);
 	_ARC4_UNLOCK();
 }
+
+void
+arc4random_stir(void)
+{
+        _ARC4_LOCK();
+	_rs_stir();
+	_ARC4_UNLOCK();
+}
+
+void
+arc4random_addrandom(u_char *dat, int datlen)
+{
+	_ARC4_LOCK();
+	if (!rs)
+		_rs_stir();
+	_rs_rekey(dat, datlen);
+	_ARC4_UNLOCK();
+}
