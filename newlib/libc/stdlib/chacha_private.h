@@ -16,11 +16,8 @@ typedef struct
   u32 input[16]; /* could be compressed */
 } chacha_ctx;
 
-#define U8C(v) (v##U)
-#define U32C(v) (v##U)
-
-#define U8V(v) ((u8)(v) & U8C(0xFF))
-#define U32V(v) ((u32)(v) & U32C(0xFFFFFFFF))
+#define U8V(v) ((u8)(v))
+#define U32V(v) ((u32)(v))
 
 #define ROTL32(v, n) \
   (U32V((v) << (n)) | ((v) >> (32 - (n))))
