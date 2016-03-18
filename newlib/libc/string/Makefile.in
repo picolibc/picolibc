@@ -93,20 +93,21 @@ am__objects_1 = lib_a-bcopy.$(OBJEXT) lib_a-bzero.$(OBJEXT) \
 	lib_a-strtok_r.$(OBJEXT) lib_a-strupr.$(OBJEXT) \
 	lib_a-strxfrm.$(OBJEXT) lib_a-strstr.$(OBJEXT) \
 	lib_a-swab.$(OBJEXT) lib_a-timingsafe_bcmp.$(OBJEXT) \
-	lib_a-u_strerr.$(OBJEXT) lib_a-wcscat.$(OBJEXT) \
-	lib_a-wcschr.$(OBJEXT) lib_a-wcscmp.$(OBJEXT) \
-	lib_a-wcscoll.$(OBJEXT) lib_a-wcscpy.$(OBJEXT) \
-	lib_a-wcscspn.$(OBJEXT) lib_a-wcslcat.$(OBJEXT) \
-	lib_a-wcslcpy.$(OBJEXT) lib_a-wcslen.$(OBJEXT) \
-	lib_a-wcsncat.$(OBJEXT) lib_a-wcsncmp.$(OBJEXT) \
-	lib_a-wcsncpy.$(OBJEXT) lib_a-wcsnlen.$(OBJEXT) \
-	lib_a-wcspbrk.$(OBJEXT) lib_a-wcsrchr.$(OBJEXT) \
-	lib_a-wcsspn.$(OBJEXT) lib_a-wcsstr.$(OBJEXT) \
-	lib_a-wcstok.$(OBJEXT) lib_a-wcswidth.$(OBJEXT) \
-	lib_a-wcsxfrm.$(OBJEXT) lib_a-wcwidth.$(OBJEXT) \
-	lib_a-wmemchr.$(OBJEXT) lib_a-wmemcmp.$(OBJEXT) \
-	lib_a-wmemcpy.$(OBJEXT) lib_a-wmemmove.$(OBJEXT) \
-	lib_a-wmemset.$(OBJEXT) lib_a-xpg_strerror_r.$(OBJEXT)
+	lib_a-timingsafe_memcmp.$(OBJEXT) lib_a-u_strerr.$(OBJEXT) \
+	lib_a-wcscat.$(OBJEXT) lib_a-wcschr.$(OBJEXT) \
+	lib_a-wcscmp.$(OBJEXT) lib_a-wcscoll.$(OBJEXT) \
+	lib_a-wcscpy.$(OBJEXT) lib_a-wcscspn.$(OBJEXT) \
+	lib_a-wcslcat.$(OBJEXT) lib_a-wcslcpy.$(OBJEXT) \
+	lib_a-wcslen.$(OBJEXT) lib_a-wcsncat.$(OBJEXT) \
+	lib_a-wcsncmp.$(OBJEXT) lib_a-wcsncpy.$(OBJEXT) \
+	lib_a-wcsnlen.$(OBJEXT) lib_a-wcspbrk.$(OBJEXT) \
+	lib_a-wcsrchr.$(OBJEXT) lib_a-wcsspn.$(OBJEXT) \
+	lib_a-wcsstr.$(OBJEXT) lib_a-wcstok.$(OBJEXT) \
+	lib_a-wcswidth.$(OBJEXT) lib_a-wcsxfrm.$(OBJEXT) \
+	lib_a-wcwidth.$(OBJEXT) lib_a-wmemchr.$(OBJEXT) \
+	lib_a-wmemcmp.$(OBJEXT) lib_a-wmemcpy.$(OBJEXT) \
+	lib_a-wmemmove.$(OBJEXT) lib_a-wmemset.$(OBJEXT) \
+	lib_a-xpg_strerror_r.$(OBJEXT)
 @ELIX_LEVEL_1_FALSE@am__objects_2 = lib_a-bcmp.$(OBJEXT) \
 @ELIX_LEVEL_1_FALSE@	lib_a-memccpy.$(OBJEXT) \
 @ELIX_LEVEL_1_FALSE@	lib_a-mempcpy.$(OBJEXT) \
@@ -138,10 +139,10 @@ am__objects_4 = bcopy.lo bzero.lo explicit_bzero.lo index.lo memchr.lo \
 	strncasecmp.lo strncat.lo strncmp.lo strncpy.lo strnlen.lo \
 	strpbrk.lo strrchr.lo strsep.lo strsignal.lo strspn.lo \
 	strtok.lo strtok_r.lo strupr.lo strxfrm.lo strstr.lo swab.lo \
-	timingsafe_bcmp.lo u_strerr.lo wcscat.lo wcschr.lo wcscmp.lo \
-	wcscoll.lo wcscpy.lo wcscspn.lo wcslcat.lo wcslcpy.lo \
-	wcslen.lo wcsncat.lo wcsncmp.lo wcsncpy.lo wcsnlen.lo \
-	wcspbrk.lo wcsrchr.lo wcsspn.lo wcsstr.lo wcstok.lo \
+	timingsafe_bcmp.lo timingsafe_memcmp.lo u_strerr.lo wcscat.lo \
+	wcschr.lo wcscmp.lo wcscoll.lo wcscpy.lo wcscspn.lo wcslcat.lo \
+	wcslcpy.lo wcslen.lo wcsncat.lo wcsncmp.lo wcsncpy.lo \
+	wcsnlen.lo wcspbrk.lo wcsrchr.lo wcsspn.lo wcsstr.lo wcstok.lo \
 	wcswidth.lo wcsxfrm.lo wcwidth.lo wmemchr.lo wmemcmp.lo \
 	wmemcpy.lo wmemmove.lo wmemset.lo xpg_strerror_r.lo
 @ELIX_LEVEL_1_FALSE@am__objects_5 = bcmp.lo memccpy.lo mempcpy.lo \
@@ -371,6 +372,7 @@ GENERAL_SOURCES = \
 	strstr.c \
 	swab.c \
 	timingsafe_bcmp.c \
+	timingsafe_memcmp.c \
 	u_strerr.c \
 	wcscat.c \
 	wcschr.c \
@@ -780,6 +782,12 @@ lib_a-timingsafe_bcmp.o: timingsafe_bcmp.c
 
 lib_a-timingsafe_bcmp.obj: timingsafe_bcmp.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-timingsafe_bcmp.obj `if test -f 'timingsafe_bcmp.c'; then $(CYGPATH_W) 'timingsafe_bcmp.c'; else $(CYGPATH_W) '$(srcdir)/timingsafe_bcmp.c'; fi`
+
+lib_a-timingsafe_memcmp.o: timingsafe_memcmp.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-timingsafe_memcmp.o `test -f 'timingsafe_memcmp.c' || echo '$(srcdir)/'`timingsafe_memcmp.c
+
+lib_a-timingsafe_memcmp.obj: timingsafe_memcmp.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-timingsafe_memcmp.obj `if test -f 'timingsafe_memcmp.c'; then $(CYGPATH_W) 'timingsafe_memcmp.c'; else $(CYGPATH_W) '$(srcdir)/timingsafe_memcmp.c'; fi`
 
 lib_a-u_strerr.o: u_strerr.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-u_strerr.o `test -f 'u_strerr.c' || echo '$(srcdir)/'`u_strerr.c
