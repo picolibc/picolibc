@@ -46,6 +46,7 @@ GENERAL_SOURCES = \
 	strxfrm.c  \
 	strstr.c \
 	swab.c \
+	timingsafe_bcmp.c \
 	u_strerr.c \
 	wcscat.c \
 	wcschr.c \

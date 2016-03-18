@@ -53,6 +53,7 @@ void	 _EXFUN(bzero,(void *, size_t));
 #endif
 #if __BSD_VISIBLE
 void	 _EXFUN(explicit_bzero,(void *, size_t));
+int	 _EXFUN(timingsafe_bcmp,(const void *, const void *, size_t));
 #endif
 #if __MISC_VISIBLE || __POSIX_VISIBLE >= 200809
 int	 _EXFUN(ffs,(int));
