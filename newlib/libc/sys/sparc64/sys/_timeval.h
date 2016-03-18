@@ -1,7 +1,12 @@
 #ifndef _SYS_TIME_H
 #define _SYS_TIME_H
 
-#include <sys/types.h>	/* for time_t */
+#include <machine/types.h>
+
+#ifndef __time_t_defined
+typedef _TIME_T_        time_t;
+#define __time_t_defined
+#endif
 
 #ifdef __cplusplus
 extern "C" {
