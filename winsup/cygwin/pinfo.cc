@@ -1391,14 +1391,13 @@ winpids::enum_processes (bool winpid)
 	}
 
       PSYSTEM_PROCESS_INFORMATION px = procs;
-      char *&pxc = (char *&)px;
       while (1)
 	{
 	  if (px->UniqueProcessId)
 	    add (nelem, true, (DWORD) (uintptr_t) px->UniqueProcessId);
 	  if (!px->NextEntryOffset)
 	    break;
-	  pxc += px->NextEntryOffset;
+          px = (PSYSTEM_PROCESS_INFORMATION) ((char *) px + px->NextEntryOffset);
 	}
     }
   return nelem;
