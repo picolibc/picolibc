@@ -746,8 +746,6 @@ dev_console::fillin (HANDLE h)
     {
       dwWinSize.Y = 1 + b.srWindow.Bottom - b.srWindow.Top;
       dwWinSize.X = 1 + b.srWindow.Right - b.srWindow.Left;
-      if (b.dwSize.Y != b.dwSize.Y || b.dwSize.X != b.dwSize.X)
-	dwEnd.X = dwEnd.Y = 0;
       if (b.dwCursorPosition.Y > dwEnd.Y
 	  || (b.dwCursorPosition.Y >= dwEnd.Y && b.dwCursorPosition.X > dwEnd.X))
 	dwEnd = b.dwCursorPosition;
