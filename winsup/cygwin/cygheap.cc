@@ -219,12 +219,6 @@ init_cygheap::init_installation_root ()
 				    installation_root)))
 	break;
     }
-
-  if (cygwin_props.disable_key)
-    {
-      installation_key.Length = 0;
-      installation_key.Buffer[0] = L'\0';
-    }
 }
 
 void __stdcall

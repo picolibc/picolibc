@@ -35,9 +35,6 @@ cygcheck -f FILE [FILE]...
 cygcheck -l [PACKAGE]...
 cygcheck -p REGEXP
 cygcheck --delete-orphaned-installation-keys
-cygcheck --enable-unique-object-names Cygwin-DLL
-cygcheck --disable-unique-object-names Cygwin-DLL
-cygcheck --show-unique-object-names Cygwin-DLL
 cygcheck -h
 	</screen>
       </refsynopsisdiv>
@@ -63,15 +60,6 @@ At least one command option or a PROGRAM is required, as shown above.
                        Delete installation keys of old, now unused
                        installations from the registry.  Requires the right
                        to change the registry.
-  --enable-unique-object-names Cygwin-DLL
-  --disable-unique-object-names Cygwin-DLL
-  --show-unique-object-names Cygwin-DLL
-                       Enable, disable, or show the setting of the
-                       \"unique object names\" setting in the Cygwin DLL
-                       given as argument to this option.  The DLL path must
-                       be given as valid Windows(!) path.
-                       See the users guide for more information.
-                       If you don't know what this means, don't change it.
   -v, --verbose        produce more verbose output
   -h, --help           annotate output with explanatory comments when given
                        with another command, otherwise print this help
@@ -227,52 +215,6 @@ coreutils-5.3.0-6         GNU core utilities (includes fileutils, sh-utils and t
       which the installation doesn't exist anymore. To get rid of these
       orphaned registry entries, use the <command>cygcheck
       --delete-orphaned-installation-keys</command> command.</para>
-
-    <para> Each Cygwin DLL generates a key value from its installation path.
-      This value is not only stored in the registry, it's also used to generate
-      global object names used for interprocess communication. This keeps
-      different Cygwin installations separate. Processes running under a Cygwin
-      DLL installed in C:\cygwin don't see processes running under a Cygwin DLL
-      installed in C:\Program Files\cygwin. This allows running multiple
-      versions of Cygwin DLLs without these versions to interfere with each
-      other, or to run small third-party installations for a specific purpose
-      independently from a Cygwin net distribution. </para>
-
-    <para> For debugging purposes it could be desired that the various Cygwin
-      DLLs use the same key, independently from their installation paths. If
-      the DLLs have different versions, trying to run processes under these
-      DLLs concurrently will result in error messages like this one:</para>
-
-    <screen>
-*** shared version mismatch detected - 0x8A88009C/0x75BE0074.
-This problem is probably due to using incompatible versions of the Cygwin DLL.
-Search for cygwin1.dll using the Windows Start->Find/Search facility
-and delete all but the most recent version.  The most recent version *should*
-reside in x:\\cygwin\\bin, where 'x' is the drive on which you have
-installed the cygwin distribution.  Rebooting is also suggested if you
-are unable to find another Cygwin DLL.
-</screen>
-
-    <para> To disable the usage of a unique key value of a certain Cygwin DLL,
-      use the <command>cygcheck --disable-unique-object-names
-      Cygwin-DLL</command> command. <literal>Cygwin-DLL</literal> is the
-      Windows path (*not* a Cygwin POSIX path) to the DLL for which you want to
-      disable this feature. Note that you have to stop all Cygwin processes
-      running under this DLL, before you're allowed to change this setting. For
-      instance, run <command>cygcheck</command> from a DOS command line for
-      this purpose.</para>
-
-    <para>To re-enable the usage of a unique key, use the <command>cygcheck
-      --enable-unique-object-names Cygwin-DLL</command> command. This option
-      has the same characteristics as the
-      <literal>--disable-unique-object-names</literal> option</para>
-
-    <para>Finally, you can use <command>cygcheck --show-unique-object-names
-      Cygwin-DLL</command> to find out if the given Cygwin DLL use unique
-      object names or not. In contrast to the <literal>--disable-...</literal>
-      and <literal>--enable-...</literal> options, the
-      <literal>--show-unique-object-names</literal> option also works for
-      Cygwin DLLs which are currently in use.</para>
   </refsect1>
 
   </refentry>

@@ -13,7 +13,6 @@ details. */
 #include "winsup.h"
 #include "cygtls.h"
 #include "perprocess.h"
-#include "cygprops.h"
 #include "thread.h"
 #include <malloc.h>
 #include <cygwin/version.h>
@@ -159,19 +158,6 @@ const int __collate_load_error = 0;
   extern UNICODE_STRING _RDATA ro_u_natsyml = _ROU (L"SymbolicLink");
   extern UNICODE_STRING _RDATA ro_u_natdev = _ROU (L"Device");
   #undef _ROU
-
-  /* Cygwin properties are meant to be readonly data placed in the DLL, but
-     which can be changed by external tools to make adjustments to the
-     behaviour of a DLL based on the binary of the DLL itself.  This is
-     different from $CYGWIN since it only affects that very DLL, not all
-     DLLs which have access to the $CYGWIN environment variable.  We use the
-     same _RDATA trick as for the above UNICODE_STRINGs. */
-  extern cygwin_props_t _RDATA cygwin_props =
-  {
-    CYGWIN_PROPS_MAGIC,
-    sizeof (cygwin_props_t),
-    0
-  };
 
   /* This is an exported copy of environ which can be used by DLLs
      which use cygwin.dll.  */

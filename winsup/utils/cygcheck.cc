@@ -27,7 +27,6 @@
 #include "../cygwin/include/sys/cygwin.h"
 #define _NOMNTENT_MACROS
 #include "../cygwin/include/mntent.h"
-#include "../cygwin/cygprops.h"
 #undef cygwin_internal
 #include "loadlib.h"
 
@@ -50,7 +49,6 @@ int find_package = 0;
 int list_package = 0;
 int grep_packages = 0;
 int del_orphaned_reg = 0;
-int unique_object_name_opt = 0;
 
 static char emptystr[] = "";
 
@@ -132,9 +130,6 @@ static common_apps[] = {
 enum
 {
   CO_DELETE_KEYS = 0x100,
-  CO_ENABLE_UON = 0x101,
-  CO_DISABLE_UON = 0x102,
-  CO_SHOW_UON = 0x103
 };
 
 static int num_paths, max_paths;
@@ -1341,89 +1336,6 @@ memmem (char *haystack, size_t haystacklen,
   return NULL;
 }
 
-int
-handle_unique_object_name (int opt, char *path)
-{
-  HANDLE fh, fm;
-  void *haystack = NULL;
-
-  if (!path || !*path)
-    usage (stderr, 1);
-
-  DWORD access, share, protect, mapping;
-
-  if (opt == CO_SHOW_UON)
-    {
-      access = GENERIC_READ;
-      share = FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE;
-      protect = PAGE_READONLY;
-      mapping = FILE_MAP_READ;
-    }
-  else
-    {
-      access = GENERIC_READ | GENERIC_WRITE;
-      share = 0;
-      protect = PAGE_READWRITE;
-      mapping = FILE_MAP_WRITE;
-    }
-
-  fh = CreateFile (path, access, share, NULL, OPEN_EXISTING,
-		   FILE_FLAG_BACKUP_SEMANTICS, NULL);
-  if (fh == INVALID_HANDLE_VALUE)
-    {
-      DWORD err = GetLastError ();
-      switch (err)
-	{
-	case ERROR_SHARING_VIOLATION:
-	  display_error ("%s still used by other Cygwin processes.\n"
-			 "Please stop all of them and retry.", path);
-	  break;
-	case ERROR_ACCESS_DENIED:
-	  display_error (
-	    "Your permissions are not sufficient to change the file \"%s\"",
-	    path);
-	  break;
-	case ERROR_FILE_NOT_FOUND:
-	  display_error ("%s: No such file.", path);
-	  break;
-	default:
-	  display_error (path, true, false);
-	  break;
-	}
-      return 1;
-    }
-  if (!(fm = CreateFileMapping (fh, NULL, protect, 0, 0, NULL)))
-    display_error ("CreateFileMapping");
-  else if (!(haystack = MapViewOfFile (fm, mapping, 0, 0, 0)))
-    display_error ("MapViewOfFile");
-  else
-    {
-      size_t haystacklen = GetFileSize (fh, NULL);
-      cygwin_props_t *cygwin_props = (cygwin_props_t *)
-	       memmem ((char *) haystack, haystacklen,
-		       CYGWIN_PROPS_MAGIC, sizeof (CYGWIN_PROPS_MAGIC));
-      if (!cygwin_props)
-	display_error ("Can't find Cygwin properties in %s", path);
-      else
-	{
-	  if (opt != CO_SHOW_UON)
-	    cygwin_props->disable_key = opt - CO_ENABLE_UON;
-	  printf ("Unique object names are %s\n",
-		  cygwin_props->disable_key ? "disabled" : "enabled");
-	  UnmapViewOfFile (haystack);
-	  CloseHandle (fm);
-	  CloseHandle (fh);
-	  return 0;
-	}
-    }
-  if (haystack)
-    UnmapViewOfFile (haystack);
-  if (fm)
-    CloseHandle (fm);
-  CloseHandle (fh);
-  return 1;
-}
-
 extern "C" NTSTATUS NTAPI RtlGetVersion (PRTL_OSVERSIONINFOEXW);
 
 static void
@@ -2231,9 +2143,6 @@ Usage: cygcheck [-v] [-h] PROGRAM\n\
        cygcheck -l [PACKAGE]...\n\
        cygcheck -p REGEXP\n\
        cygcheck --delete-orphaned-installation-keys\n\
-       cygcheck --enable-unique-object-names Cygwin-DLL\n\
-       cygcheck --disable-unique-object-names Cygwin-DLL\n\
-       cygcheck --show-unique-object-names Cygwin-DLL\n\
        cygcheck -h\n\n\
 List system information, check installed packages, or query package database.\n\
 \n\
@@ -2255,15 +2164,6 @@ At least one command option or a PROGRAM is required, as shown above.\n\
 		       Delete installation keys of old, now unused\n\
 		       installations from the registry.  Requires the right\n\
 		       to change the registry.\n\
-  --enable-unique-object-names Cygwin-DLL\n\
-  --disable-unique-object-names Cygwin-DLL\n\
-  --show-unique-object-names Cygwin-DLL\n\
-		       Enable, disable, or show the setting of the\n\
-		       \"unique object names\" setting in the Cygwin DLL\n\
-		       given as argument to this option.  The DLL path must\n\
-		       be given as valid Windows(!) path.\n\
-		       See the users guide for more information.\n\
-		       If you don't know what this means, don't change it.\n\
   -v, --verbose        produce more verbose output\n\
   -h, --help           annotate output with explanatory comments when given\n\
 		       with another command, otherwise print this help\n\
@@ -2287,9 +2187,6 @@ struct option longopts[] = {
   {"list-package", no_argument, NULL, 'l'},
   {"package-query", no_argument, NULL, 'p'},
   {"delete-orphaned-installation-keys", no_argument, NULL, CO_DELETE_KEYS},
-  {"enable-unique-object-names", no_argument, NULL, CO_ENABLE_UON},
-  {"disable-unique-object-names", no_argument, NULL, CO_DISABLE_UON},
-  {"show-unique-object-names", no_argument, NULL, CO_SHOW_UON},
   {"help", no_argument, NULL, 'h'},
   {"version", no_argument, 0, 'V'},
   {0, no_argument, NULL, 0}
@@ -2426,11 +2323,6 @@ main (int argc, char **argv)
       case CO_DELETE_KEYS:
 	del_orphaned_reg = 1;
 	break;
-      case CO_ENABLE_UON:
-      case CO_DISABLE_UON:
-      case CO_SHOW_UON:
-	unique_object_name_opt = i;
-	break;
       case 'V':
 	print_version ();
 	exit (0);
@@ -2454,17 +2346,12 @@ main (int argc, char **argv)
     }
 
   if ((check_setup || sysinfo || find_package || list_package || grep_packages
-       || del_orphaned_reg || unique_object_name_opt)
+       || del_orphaned_reg)
       && keycheck)
     usage (stderr, 1);
 
   if ((find_package || list_package || grep_packages)
       && (check_setup || del_orphaned_reg))
-    usage (stderr, 1);
-
-  if ((check_setup || sysinfo || find_package || list_package || grep_packages
-       || del_orphaned_reg)
-      && unique_object_name_opt)
     usage (stderr, 1);
 
   if (dump_only && !check_setup && !sysinfo)
@@ -2475,8 +2362,6 @@ main (int argc, char **argv)
 
   if (keycheck)
     return check_keys ();
-  if (unique_object_name_opt)
-    return handle_unique_object_name (unique_object_name_opt, *argv);
   if (del_orphaned_reg)
     del_orphaned_reg_installations ();
   if (grep_packages)
