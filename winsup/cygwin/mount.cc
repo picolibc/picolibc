@@ -1962,7 +1962,7 @@ dos_drive_mappings::dos_drive_mappings ()
   HANDLE sh = FindFirstVolumeW (vol, 64);
   if (sh == INVALID_HANDLE_VALUE)
     debug_printf ("FindFirstVolumeW, %E");
-  else
+  else {
     do
       {
 	/* Skip drives which are not mounted. */
@@ -2023,6 +2023,7 @@ dos_drive_mappings::dos_drive_mappings ()
       }
     while (FindNextVolumeW (sh, vol, 64));
     FindVolumeClose (sh);
+  }
 }
 
 wchar_t *
