@@ -3746,7 +3746,7 @@ semaphore::open (unsigned long long hash, LUID luid, int fd, int oflag,
   for (semaphore *sema = semaphores.head; sema; sema = sema->next)
     if (sema->fd >= 0 && sema->hash == hash
 	&& sema->luid.HighPart == luid.HighPart
-	&& sema->luid.LowPart == sema->luid.LowPart)
+	&& sema->luid.LowPart == luid.LowPart)
       {
 	wasopen = true;
 	semaphores.mx.unlock ();
