@@ -135,9 +135,8 @@ _cygwin_crt0_common (MainFunc f, per_process *u)
   u->premain[3] = cygwin_premain3;
   u->fmode_ptr = &_fmode;
 
-  /* This is used to record what the initial sp was.  The value is needed
-     when copying the parent's stack to the child during a fork.  */
-  u->initial_sp = (char *) __builtin_frame_address (1);
+  /* Unused */
+  u->initial_sp = NULL;
 
   /* Remember whatever the user linked his application with - or
      point to entries in the dll.  */
