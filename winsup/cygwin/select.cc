@@ -925,28 +925,18 @@ peek_console (select_record *me, bool)
 	    if (irec.Event.KeyEvent.bKeyDown
 		&& (irec.Event.KeyEvent.uChar.AsciiChar
 		    || fhandler_console::get_nonascii_key (irec, tmpbuf)))
-	      {
-		debug_printf("peeked KEY_EVENT");
-		return me->read_ready = true;
-	      }
+	      return me->read_ready = true;
 	  }
 	else
 	  {
 	    if (irec.EventType == MOUSE_EVENT
 		&& fh->mouse_aware (irec.Event.MouseEvent))
-	      {
-		debug_printf("peeked MOUSE_EVENT");
 		return me->read_ready = true;
-	      }
 	    if (irec.EventType == FOCUS_EVENT && fh->focus_aware ())
-	      {
-		debug_printf("peeked FOCUS_EVENT");
 		return me->read_ready = true;
-	      }
 	  }
 
 	/* Read and discard the event */
-	debug_printf("discarded other event");
 	ReadConsoleInput (h, &irec, 1, &events_read);
       }
 
