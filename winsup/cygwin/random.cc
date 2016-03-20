@@ -299,7 +299,6 @@ dummy (unsigned volatile long *x)
 void
 srandomdev()
 {
-	int fd, done;
 	size_t len;
 
 	if (rand_type == TYPE_0)
@@ -307,15 +306,7 @@ srandomdev()
 	else
 		len = rand_deg * sizeof state[0];
 
-	done = 0;
-	fd = open("/dev/random", O_RDONLY, 0);
-	if (fd >= 0) {
-		if (read(fd, (void *) state, len) == (ssize_t) len)
-			done = 1;
-		close(fd);
-	}
-
-	if (!done) {
+	if (getentropy ((void *) state, len)) {
 		struct timeval tv;
 		unsigned long junk;
 
