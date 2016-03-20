@@ -1,3 +1,4 @@
+#ifndef __rtems__
 static __inline__ long int
 random (void)
 {
@@ -13,3 +14,4 @@ srandom (unsigned int seed)
 
   srand (seed);
 }
+#endif
