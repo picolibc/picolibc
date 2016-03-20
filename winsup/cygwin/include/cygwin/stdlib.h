@@ -19,12 +19,6 @@ extern "C"
 {
 #endif
 
-__uint32_t arc4random(void);
-void arc4random_addrandom(unsigned char *, int);
-void arc4random_buf(void *, size_t);
-void arc4random_stir(void);
-__uint32_t arc4random_uniform(__uint32_t);
-
 const char *getprogname (void);
 void	setprogname (const char *);
 
