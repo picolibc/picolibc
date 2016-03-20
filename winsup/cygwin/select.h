@@ -96,7 +96,7 @@ public:
 
   bool test_and_set (int, fd_set *, fd_set *, fd_set *);
   int poll (fd_set *, fd_set *, fd_set *);
-  wait_states wait (fd_set *, fd_set *, fd_set *, LONGLONG);
+  wait_states wait (fd_set *, fd_set *, fd_set *, DWORD);
   void cleanup ();
   void destroy ();
 
