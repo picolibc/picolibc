@@ -3838,7 +3838,7 @@ getpriority (int which, id_t who)
 	  case PRIO_USER:
 	    if ((uid_t) who == p->uid && p->nice < nice)
 	      nice = p->nice;
-	      break;
+	    break;
 	  }
     }
 out:
