@@ -230,7 +230,7 @@ int	_EXFUN(rename, (const char *, const char *));
 int	_EXFUN(_rename, (const char *, const char *));
 #endif
 #endif
-#if __LARGEFILE_VISIBLE
+#if __LARGEFILE_VISIBLE || __POSIX_VISIBLE >= 200112
 #ifdef _COMPILING_NEWLIB
 int	_EXFUN(fseeko, (FILE *, _off_t, int));
 _off_t	_EXFUN(ftello, ( FILE *));
