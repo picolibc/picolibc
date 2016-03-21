@@ -1177,7 +1177,8 @@ semop(struct thread *td, struct semop_args *uap)
 		 */
 		if (error != 0) {
 #ifdef __CYGWIN__
-		    if (error != EIDRM)
+		    if (error == EIDRM)
+                        goto done2;
 #endif /* __CYGWIN__ */
 			error = EINTR;
 			goto done2;
