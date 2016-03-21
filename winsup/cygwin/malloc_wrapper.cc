@@ -126,8 +126,7 @@ posix_memalign (void **memptr, size_t alignment, size_t bytes)
   __malloc_unlock ();
   if (!res)
     return ENOMEM;
-  if (memptr)
-    *memptr = res;
+  *memptr = res;
   return 0;
 }
 

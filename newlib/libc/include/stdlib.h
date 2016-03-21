@@ -253,7 +253,7 @@ int	_EXFUN(_unsetenv_r,(struct _reent *, const char *__string));
 
 #ifdef __rtems__
 #if __POSIX_VISIBLE >= 200112
-int _EXFUN(posix_memalign,(void **, size_t, size_t));
+int _EXFUN(__nonnull (1) posix_memalign,(void **, size_t, size_t));
 #endif
 #endif
 
