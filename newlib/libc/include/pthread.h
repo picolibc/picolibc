@@ -260,7 +260,7 @@ int	_EXFUN(pthread_detach, (pthread_t __pthread));
 
 /* Thread Termination, p1003.1c/Draft 10, p. 150 */
 
-void	_EXFUN(pthread_exit, (void *__value_ptr));
+void	_EXFUN(pthread_exit, (void *__value_ptr)) __dead2;
 
 /* Get Calling Thread's ID, p1003.1c/Draft 10, p. XXX */
 
