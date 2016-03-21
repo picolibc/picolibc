@@ -286,7 +286,7 @@ static int cygwin_query(res_state statp, const char * DomName, int Class, int Ty
     rr = rr->pNext;
   }
 
-  DnsRecordListFree(pQueryResultsSet, DnsFreeRecordList);
+  DnsFree(pQueryResultsSet, DnsFreeRecordList);
 
   len = ptr - AnsPtr;
 done:

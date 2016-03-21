@@ -583,7 +583,7 @@ LoadDLLfunc (AuthzInitializeContextFromToken, 32, authz)
 LoadDLLfunc (AuthzInitializeResourceManager, 24, authz)
 
 LoadDLLfunc (DnsQuery_A, 24, dnsapi)
-LoadDLLfunc (DnsRecordListFree, 8, dnsapi)
+LoadDLLfunc (DnsFree, 8, dnsapi)
 
 LoadDLLfunc (GetAdaptersAddresses, 20, iphlpapi)
 LoadDLLfunc (GetIfEntry, 4, iphlpapi)
