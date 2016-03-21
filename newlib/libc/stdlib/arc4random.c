@@ -193,18 +193,3 @@ arc4random_buf(void *buf, size_t n)
 	_rs_random_buf(buf, n);
 	_ARC4_UNLOCK();
 }
-
-#ifdef __CYGWIN__
-/* Exported functions removed from OpenBSD in the meantime.  Keep them,
-   but make them non-functional.  They don't return a value anyway. */
-void
-arc4random_stir(void)
-{
-}
-
-void
-arc4random_addrandom(u_char *dat, int datlen)
-{
-}
-
-#endif /* __CYGWIN__ */

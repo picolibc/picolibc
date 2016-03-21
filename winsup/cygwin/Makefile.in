@@ -155,6 +155,7 @@ MT_SAFE_OBJECTS:=
 #
 DLL_OFILES:= \
 	advapi32.o \
+	arc4random_stir.o \
 	assert.o \
 	autoload.o \
 	base64.o \
