@@ -264,8 +264,9 @@ direct calls to Winsock functions.  If you use Cygwin, use the POSIX API.
 <question><para>I don't want Unix sockets, how do I use normal Win32 winsock?</para></question>
 <answer>
 
-<para>You don't.  Look for the MingW project to port applications using
-native Win32/Winsock functions.
+<para>You don't.  Look for the Mingw-w64 project to port applications using
+native Win32/Winsock functions.  Cross compilers packages to build Mingw-w64
+targets are available in the Cygwin distro.
 </para>
 </answer></qandaentry>
 
