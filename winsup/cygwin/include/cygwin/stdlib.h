@@ -28,12 +28,6 @@ char *canonicalize_file_name (const char *);
 #if __BSD_VISIBLE || __POSIX_VISIBLE >= 200112
 int unsetenv (const char *);
 #endif
-#if __BSD_VISIBLE || __SVID_SOURCE || __XSI_VISIBLE >= 4
-char *initstate (unsigned seed, char *state, size_t size);
-long random (void);
-char *setstate (const char *state);
-void srandom (unsigned);
-#endif
 #if __XSI_VISIBLE
 char *ptsname (int);
 int grantpt (int);

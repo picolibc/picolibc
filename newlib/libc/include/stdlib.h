@@ -226,6 +226,12 @@ unsigned short *
 _VOID  _EXFUN(srand48,(long));
 _VOID  _EXFUN(_srand48_r,(struct _reent *, long));
 #endif /* __SVID_VISIBLE || __XSI_VISIBLE */
+#if __SVID_VISIBLE || __XSI_VISIBLE >= 4 || __BSD_VISIBLE
+char *	_EXFUN(initstate,(unsigned, char *, size_t));
+long	_EXFUN(random,(_VOID));
+char *	_EXFUN(setstate,(char *));
+_VOID	_EXFUN(srandom,(unsigned));
+#endif
 #if __ISO_C_VISIBLE >= 1999
 long long _EXFUN(atoll,(const char *__nptr));
 #endif

@@ -103,15 +103,16 @@ am__objects_2 = lib_a-__adjust.$(OBJEXT) lib_a-__atexit.$(OBJEXT) \
 	lib_a-mlock.$(OBJEXT) lib_a-mprec.$(OBJEXT) \
 	lib_a-mstats.$(OBJEXT) lib_a-on_exit_args.$(OBJEXT) \
 	lib_a-quick_exit.$(OBJEXT) lib_a-rand.$(OBJEXT) \
-	lib_a-rand_r.$(OBJEXT) lib_a-realloc.$(OBJEXT) \
-	lib_a-reallocf.$(OBJEXT) lib_a-sb_charsets.$(OBJEXT) \
-	lib_a-strtod.$(OBJEXT) lib_a-strtodg.$(OBJEXT) \
-	lib_a-strtol.$(OBJEXT) lib_a-strtorx.$(OBJEXT) \
-	lib_a-strtoul.$(OBJEXT) lib_a-utoa.$(OBJEXT) \
-	lib_a-wcstod.$(OBJEXT) lib_a-wcstol.$(OBJEXT) \
-	lib_a-wcstoul.$(OBJEXT) lib_a-wcstombs.$(OBJEXT) \
-	lib_a-wcstombs_r.$(OBJEXT) lib_a-wctomb.$(OBJEXT) \
-	lib_a-wctomb_r.$(OBJEXT) $(am__objects_1)
+	lib_a-rand_r.$(OBJEXT) lib_a-random.$(OBJEXT) \
+	lib_a-realloc.$(OBJEXT) lib_a-reallocf.$(OBJEXT) \
+	lib_a-sb_charsets.$(OBJEXT) lib_a-strtod.$(OBJEXT) \
+	lib_a-strtodg.$(OBJEXT) lib_a-strtol.$(OBJEXT) \
+	lib_a-strtorx.$(OBJEXT) lib_a-strtoul.$(OBJEXT) \
+	lib_a-utoa.$(OBJEXT) lib_a-wcstod.$(OBJEXT) \
+	lib_a-wcstol.$(OBJEXT) lib_a-wcstoul.$(OBJEXT) \
+	lib_a-wcstombs.$(OBJEXT) lib_a-wcstombs_r.$(OBJEXT) \
+	lib_a-wctomb.$(OBJEXT) lib_a-wctomb_r.$(OBJEXT) \
+	$(am__objects_1)
 am__objects_3 = lib_a-arc4random.$(OBJEXT) \
 	lib_a-arc4random_uniform.$(OBJEXT) lib_a-cxa_atexit.$(OBJEXT) \
 	lib_a-cxa_finalize.$(OBJEXT) lib_a-drand48.$(OBJEXT) \
@@ -159,10 +160,10 @@ am__objects_9 = __adjust.lo __atexit.lo __call_atexit.lo __exp10.lo \
 	itoa.lo labs.lo ldiv.lo ldtoa.lo malloc.lo mblen.lo mblen_r.lo \
 	mbstowcs.lo mbstowcs_r.lo mbtowc.lo mbtowc_r.lo mlock.lo \
 	mprec.lo mstats.lo on_exit_args.lo quick_exit.lo rand.lo \
-	rand_r.lo realloc.lo reallocf.lo sb_charsets.lo strtod.lo \
-	strtodg.lo strtol.lo strtorx.lo strtoul.lo utoa.lo wcstod.lo \
-	wcstol.lo wcstoul.lo wcstombs.lo wcstombs_r.lo wctomb.lo \
-	wctomb_r.lo $(am__objects_8)
+	rand_r.lo random.lo realloc.lo reallocf.lo sb_charsets.lo \
+	strtod.lo strtodg.lo strtol.lo strtorx.lo strtoul.lo utoa.lo \
+	wcstod.lo wcstol.lo wcstoul.lo wcstombs.lo wcstombs_r.lo \
+	wctomb.lo wctomb_r.lo $(am__objects_8)
 am__objects_10 = arc4random.lo arc4random_uniform.lo cxa_atexit.lo \
 	cxa_finalize.lo drand48.lo ecvtbuf.lo efgcvt.lo erand48.lo \
 	jrand48.lo lcong48.lo lrand48.lo mrand48.lo msize.lo mtrim.lo \
@@ -363,7 +364,7 @@ GENERAL_SOURCES = __adjust.c __atexit.c __call_atexit.c __exp10.c \
 	gdtoa-hexnan.c getenv.c getenv_r.c itoa.c labs.c ldiv.c \
 	ldtoa.c malloc.c mblen.c mblen_r.c mbstowcs.c mbstowcs_r.c \
 	mbtowc.c mbtowc_r.c mlock.c mprec.c mstats.c on_exit_args.c \
-	quick_exit.c rand.c rand_r.c realloc.c reallocf.c \
+	quick_exit.c rand.c rand_r.c random.c realloc.c reallocf.c \
 	sb_charsets.c strtod.c strtodg.c strtol.c strtorx.c strtoul.c \
 	utoa.c wcstod.c wcstol.c wcstoul.c wcstombs.c wcstombs_r.c \
 	wctomb.c wctomb_r.c $(am__append_1)
@@ -526,6 +527,7 @@ CHEWOUT_FILES = \
 	on_exit.def	\
 	rand.def	\
 	rand48.def	\
+	random.def	\
 	rpmatch.def	\
 	strtod.def 	\
 	strtol.def 	\
@@ -882,6 +884,12 @@ lib_a-rand_r.o: rand_r.c
 
 lib_a-rand_r.obj: rand_r.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-rand_r.obj `if test -f 'rand_r.c'; then $(CYGPATH_W) 'rand_r.c'; else $(CYGPATH_W) '$(srcdir)/rand_r.c'; fi`
+
+lib_a-random.o: random.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-random.o `test -f 'random.c' || echo '$(srcdir)/'`random.c
+
+lib_a-random.obj: random.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-random.obj `if test -f 'random.c'; then $(CYGPATH_W) 'random.c'; else $(CYGPATH_W) '$(srcdir)/random.c'; fi`
 
 lib_a-realloc.o: realloc.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-realloc.o `test -f 'realloc.c' || echo '$(srcdir)/'`realloc.c

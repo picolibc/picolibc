@@ -50,6 +50,7 @@ GENERAL_SOURCES = \
 	quick_exit.c	\
 	rand.c		\
 	rand_r.c	\
+	random.c	\
 	realloc.c	\
 	reallocf.c	\
 	sb_charsets.c	\
@@ -282,6 +283,7 @@ CHEWOUT_FILES= \
 	on_exit.def	\
 	rand.def	\
 	rand48.def	\
+	random.def	\
 	rpmatch.def	\
 	strtod.def 	\
 	strtol.def 	\
