@@ -1,3 +1,7 @@
+2016-03-22  Corinna Vinschen  <corinna@vinschen.de>
+
+	* Sync toplevel with upstream GCC.
+
 2015-11-12  Anton Kolesov  <Anton.Kolesov@synopsys.com>
 
 	* COPYING.LIBGLOSS: Add Synopsys license.

@@ -80,7 +80,7 @@ extern void freeargv (char **);
 /* Duplicate an argument vector. Allocates memory using malloc.  Use
    freeargv to free the vector.  */
 
-extern char **dupargv (char **) ATTRIBUTE_MALLOC;
+extern char **dupargv (char * const *) ATTRIBUTE_MALLOC;
 
 /* Expand "@file" arguments in argv.  */
 
@@ -88,11 +88,11 @@ extern void expandargv (int *, char ***);
 
 /* Write argv to an @-file, inserting necessary quoting.  */
 
-extern int writeargv (char **, FILE *);
+extern int writeargv (char * const *, FILE *);
 
 /* Return the number of elements in argv.  */
 
-extern int countargv (char**);
+extern int countargv (char * const *);
 
 /* Return the last component of a path name.  Note that we can't use a
    prototype here because the parameter is declared inconsistently
@@ -621,7 +621,7 @@ extern int pexecute (const char *, char * const *, const char *,
 
 extern int pwait (int, int *, int);
 
-#if !HAVE_DECL_ASPRINTF
+#if defined(HAVE_DECL_ASPRINTF) && !HAVE_DECL_ASPRINTF
 /* Like sprintf but provides a pointer to malloc'd storage, which must
    be freed by the caller.  */
 

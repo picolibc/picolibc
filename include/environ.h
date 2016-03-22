@@ -1,5 +1,5 @@
-/* Basic struct timeval utilities.
-   Copyright (C) 2011-2015 Free Software Foundation, Inc.
+/* Declare the environ system variable.
+   Copyright (C) 2015 Free Software Foundation, Inc.
 
 This file is part of the libiberty library.
 Libiberty is free software; you can redistribute it and/or
@@ -17,24 +17,17 @@ License along with libiberty; see the file COPYING.LIB.  If not,
 write to the Free Software Foundation, Inc., 51 Franklin Street - Fifth Floor,
 Boston, MA 02110-1301, USA.  */
 
-#ifndef TIMEVAL_UTILS_H
-#define TIMEVAL_UTILS_H
+/* On OSX, the environ variable can be used directly in the code of an
+   executable, but cannot be used in the code of a shared library (such as
+   GCC's liblto_plugin, which links in libiberty code).  Instead, the
+   function _NSGetEnviron can be called to get the address of environ.  */
 
-#ifdef __cplusplus
-extern "C" {
-#endif /* __cplusplus */
-
-/* forward decl */
-struct timeval;
-
-extern void timeval_add (struct timeval *result,
-			 const struct timeval *a, const struct timeval *b);
-
-extern void timeval_sub (struct timeval *result,
-			 const struct timeval *a, const struct timeval *b);
-
-#ifdef __cplusplus
-}
-#endif /* __cplusplus */
-
-#endif /* TIMEVAL_UTILS_H */
+#ifndef HAVE_ENVIRON_DECL
+#  ifdef __APPLE__
+#     include <crt_externs.h>
+#     define environ (*_NSGetEnviron ())
+#  else
+extern char **environ;
+#  endif
+#  define HAVE_ENVIRON_DECL
+#endif

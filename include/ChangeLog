@@ -1,3 +1,155 @@
+2016-03-17  Thomas Schwinge  <thomas@codesourcery.com>
+
+	* gomp-constants.h (enum gomp_map_kind): Rename
+	GOMP_MAP_FORCE_DEALLOC to GOMP_MAP_DELETE.  Adjust all users.
+
+2016-03-03  Than McIntosh <thanm@google.com>
+
+	* plugin-api.h: Add new hooks to the plugin transfer vector to
+	to support querying section alignment and section size.
+	(ld_plugin_get_input_section_alignment): New hook.
+	(ld_plugin_get_input_section_size): New hook.
+	(ld_plugin_tag): Add LDPT_GET_INPUT_SECTION_ALIGNMENT
+	and LDPT_GET_INPUT_SECTION_SIZE.
+	(ld_plugin_tv): Add tv_get_input_section_alignment and
+	tv_get_input_section_size.
+
+2016-03-03  Evgenii Stepanov  <eugenis@google.com>
+
+	* plugin-api.h (enum ld_plugin_tag): Add LDPT_GET_SYMBOLS_V3.
+
+2016-01-19  Martin Jambor  <mjambor@suse.cz>
+
+	* gomp-constants.h (GOMP_DEVICE_HSA): New macro.
+	(GOMP_VERSION_HSA): Likewise.
+	(GOMP_TARGET_ARG_DEVICE_MASK): Likewise.
+	(GOMP_TARGET_ARG_DEVICE_ALL): Likewise.
+	(GOMP_TARGET_ARG_SUBSEQUENT_PARAM): Likewise.
+	(GOMP_TARGET_ARG_ID_MASK): Likewise.
+	(GOMP_TARGET_ARG_NUM_TEAMS): Likewise.
+	(GOMP_TARGET_ARG_THREAD_LIMIT): Likewise.
+	(GOMP_TARGET_ARG_VALUE_SHIFT): Likewise.
+	(GOMP_TARGET_ARG_HSA_KERNEL_ATTRIBUTES): Likewise.
+
+2016-01-07  Mike Frysinger  <vapier@gentoo.org>
+
+	* longlong.h: Change !__SHMEDIA__ to
+	(!defined (__SHMEDIA__) || !__SHMEDIA__).
+	Change __SHMEDIA__ to defined (__SHMEDIA__) && __SHMEDIA__.
+
+2016-01-05  Mike Frysinger  <vapier@gentoo.org>
+
+	* libiberty.h (dupargv): Change arg to char * const *.
+	(writeargv, countargv): Likewise.
+
+2015-11-25  Rainer Orth  <ro@CeBiTec.Uni-Bielefeld.DE>
+
+	* vtv-change-permission.h (VTV_PAGE_SIZE) [__sun__ && __svr4__ &&
+	__sparc__]: Define.
+
+2015-11-12  James Norris  <jnorris@codesourcery.com>
+	    Joseph Myers  <joseph@codesourcery.com>
+
+	* gomp-constants.h (enum gomp_map_kind): Add GOMP_MAP_DEVICE_RESIDENT
+	and GOMP_MAP_LINK.
+
+2015-11-09  Alan Modra  <amodra@gmail.com>
+
+	PR gdb/17133
+	* obstack.h (__attribute_pure__): Expand _GL_ATTRIBUTE_PURE.
+
+2015-11-09  Alan Modra  <amodra@gmail.com>
+
+	PR gdb/17133
+	* obstack.h: Import current gnulib file.
+
+2015-11-05  Jakub Jelinek  <jakub@redhat.com>
+	    Ilya Verbin  <ilya.verbin@intel.com>
+
+	* gomp-constants.h (GOMP_MAP_FLAG_SPECIAL_2): Define.
+	(GOMP_MAP_FLAG_ALWAYS): Remove.
+	(enum gomp_map_kind): Use GOMP_MAP_FLAG_SPECIAL_2 instead of
+	GOMP_MAP_FLAG_ALWAYS for GOMP_MAP_ALWAYS_TO, GOMP_MAP_ALWAYS_FROM,
+	GOMP_MAP_ALWAYS_TOFROM, GOMP_MAP_STRUCT, GOMP_MAP_RELEASE.
+	Add GOMP_MAP_ALWAYS_POINTER and GOMP_MAP_FIRSTPRIVATE_REFERENCE.
+	(GOMP_MAP_ALWAYS_P): Define.
+	(GOMP_TARGET_FLAG_NOWAIT): Adjust comment.
+
+2015-10-27  Daniel Jacobowitz  <dan@codesourcery.com>
+	    Joseph Myers  <joseph@codesourcery.com>
+	    Mark Shinwell  <shinwell@codesourcery.com>
+	    Andrew Stubbs  <ams@codesourcery.com>
+	    Rich Felker <dalias@libc.org>
+
+	* longlong.h (udiv_qrnnd): Add FDPIC compatible version for SH.
+
+2015-10-18  Roland McGrath  <roland@gnu.org>
+
+	PR other/63758
+	* environ.h: New file.
+
+2015-10-13  Jakub Jelinek  <jakub@redhat.com>
+	    Ilya Verbin  <ilya.verbin@intel.com>
+
+	* gomp-constants.h (GOMP_MAP_FLAG_ALWAYS): Define.
+	(enum gomp_map_kind): Add GOMP_MAP_FIRSTPRIVATE,
+	GOMP_MAP_FIRSTPRIVATE_INT, GOMP_MAP_USE_DEVICE_PTR,
+	GOMP_MAP_ZERO_LEN_ARRAY_SECTION, GOMP_MAP_ALWAYS_TO,
+	GOMP_MAP_ALWAYS_FROM, GOMP_MAP_ALWAYS_TOFROM, GOMP_MAP_STRUCT,
+	GOMP_MAP_DELETE_ZERO_LEN_ARRAY_SECTION, GOMP_MAP_DELETE,
+	GOMP_MAP_RELEASE, GOMP_MAP_FIRSTPRIVATE_POINTER.
+	(GOMP_MAP_ALWAYS_TO_P, GOMP_MAP_ALWAYS_FROM_P): Define.
+	(GOMP_TASK_FLAG_UNTIED, GOMP_TASK_FLAG_FINAL, GOMP_TASK_FLAG_MERGEABLE,
+	GOMP_TASK_FLAG_DEPEND, GOMP_TASK_FLAG_PRIORITY, GOMP_TASK_FLAG_UP,
+	GOMP_TASK_FLAG_GRAINSIZE, GOMP_TASK_FLAG_IF, GOMP_TASK_FLAG_NOGROUP,
+	GOMP_TARGET_FLAG_NOWAIT, GOMP_TARGET_FLAG_EXIT_DATA,
+	GOMP_TARGET_FLAG_UPDATE): Define.
+
+2015-09-28  Nathan Sidwell  <nathan@codesourcery.com>
+
+	* gomp-constants.h (GOMP_VERSION_NVIDIA_PTX): Increment.
+	(GOMP_DIM_GANG, GOMP_DIM_WORKER, GOMP_DIM_VECTOR, GOMP_DIM_MAX,
+	GOMP_DIM_MASK): New.
+	(GOMP_LAUNCH_DIM, GOMP_LAUNCH_ASYNC, GOMP_LAUNCH_WAIT): New.
+	(GOMP_LAUNCH_CODE_SHIFT, GOMP_LAUNCH_DEVICE_SHIFT,
+	GOMP_LAUNCH_OP_SHIFT): New.
+	(GOMP_LAUNCH_PACK, GOMP_LAUNCH_CODE, GOMP_LAUNCH_DEVICE,
+	GOMP_LAUNCH_OP): New.
+	(GOMP_LAUNCH_OP_MAX): New.
+
+2015-08-24  Nathan Sidwell  <nathan@codesourcery.com>
+
+	* gomp-constants.h (GOMP_VERSION, GOMP_VERSION_NVIDIA_PTX,
+	GOMP_VERSION_INTEL_MIC): New.
+	(GOMP_VERSION_PACK, GOMP_VERSION_LIB, GOMP_VERSION_DEV): New.
+
+2015-08-14  Pierre-Marie de Rodat  <derodat@adacore.com>
+
+	* dwarf2.def (DW_AT_GNU_bias): New attribute.
+
+2015-08-14  Pierre-Marie de Rodat  <derodat@adacore.com>
+
+	* dwarf2.def (DW_AT_GNU_numerator, DW_AT_GNU_denominator): New
+	attributes.
+
+2015-08-11  Trevor Saunders  <tbsaunde+gcc@tbsaunde.org>
+
+	* ansidecl.h (GCC_FINAL): New macro.
+
+2015-08-10  Thomas Schwinge  <thomas@codesourcery.com>
+
+	* gomp-constants.c (GOMP_DEVICE_HOST_NONSHM): Remove.
+
+2015-05-22  Yunlian Jiang  <yunlian@google.com>
+
+	* libiberty.h (asprintf): Don't declare if HAVE_DECL_ASPRINTF is
+	not defined.
+
+2015-03-19  Richard Biener  <rguenther@suse.de>
+
+	* partition.h (struct partition_elem): Re-order elements to
+	avoid padding.
+
 2015-03-02  Markus Trippelsdorf  <markus@trippelsdorf.de>
 
 	PR target/65261
@@ -18,7 +170,7 @@
 
 	* gomp-constants.h: New file.
 
-2015-12-14  Jan-Benedict Glaw  <jbglaw@lug-owl.de>
+2014-12-14  Jan-Benedict Glaw  <jbglaw@lug-owl.de>
 
 	* libiberty.h: Merge Copyright year update from Binutils.
 
@@ -62,14 +214,15 @@
 	(DW_AT_APPLE_property_attribute, DW_AT_APPLE_objc_complete_type)
 	(DW_AT_APPLE_property): New macros.
 
-2014-11-11  David Malcolm  <dmalcolm@redhat.com>
-
-	* ChangeLog.jit: New.
-
-2014-11-05  Anthony Brandon  <anthony.brandon@gmail.com>
+2014-11-11  Anthony Brandon  <anthony.brandon@gmail.com>
+	    Manuel López-Ibáñez  <manu@gcc.gnu.org>
 
 	PR driver/36312
 	* filenames.h: Add prototype for canonical_filename_eq.
+
+2014-11-11  David Malcolm  <dmalcolm@redhat.com>
+
+	* ChangeLog.jit: New.
 
 2014-10-28  Richard Henderson  <rth@redhat.com>
 
