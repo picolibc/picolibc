@@ -81,7 +81,7 @@ extern "C" {
  * _XOPEN_SOURCE >= 700
  *	SUSv4 (POSIX.1-2008 plus XSI)
  *
- * _ISOC99_SOURCE or gcc -std=c99 or g++ -std=c++11
+ * _ISOC99_SOURCE or gcc -std=c99 or g++
  * 	ISO C99
  *
  * _ISOC11_SOURCE or gcc -std=c11 or g++ -std=c++11
@@ -204,8 +204,8 @@ extern "C" {
  *
  * __ISO_C_VISIBLE >= 1999
  * 	ISO C99; enabled with gcc -std=c99 or newer (on by default since GCC 5),
- * 	g++ -std=c++11 or newer (on by default since GCC 6), or with
- * 	_ISOC99_SOURCE, _POSIX_C_SOURCE >= 200112L, or _XOPEN_SOURCE >= 600.
+ * 	any version of C++, or with _ISOC99_SOURCE, _POSIX_C_SOURCE >= 200112L,
+ * 	or _XOPEN_SOURCE >= 600.
  *
  * __ISO_C_VISIBLE >= 2011
  * 	ISO C11; enabled with gcc -std=c11 or newer (on by default since GCC 5),
@@ -259,8 +259,8 @@ extern "C" {
 #if defined(_ISOC11_SOURCE) || \
   (__STDC_VERSION__ - 0) >= 201112L || (__cplusplus - 0) >= 201103L
 #define	__ISO_C_VISIBLE		2011
-#elif defined(_ISOC99_SOURCE) || \
-  (__STDC_VERSION__ - 0) >= 199901L || (_POSIX_C_SOURCE - 0) >= 200112L
+#elif defined(_ISOC99_SOURCE) || (_POSIX_C_SOURCE - 0) >= 200112L || \
+  (__STDC_VERSION__ - 0) >= 199901L || defined(__cplusplus)
 #define	__ISO_C_VISIBLE		1999
 #else
 #define	__ISO_C_VISIBLE		1990
