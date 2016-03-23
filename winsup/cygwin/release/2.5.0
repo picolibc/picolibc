@@ -84,3 +84,7 @@ Bug Fixes
 - Fix a wrong error code returned when trying to execute a file which can't
   be read for any reason.
   Addresses: https://cygwin.com/ml/cygwin/2016-03/msg00364.html
+
+- Only allow enabled groups from the user token's group list as primary
+  token.
+  Addresses: https://cygwin.com/ml/cygwin/2016-03/msg00477.html
