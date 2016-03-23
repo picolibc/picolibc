@@ -47,9 +47,6 @@ int getpt (void);
 #if __XSI_VISIBLE >= 600
 int posix_openpt (int);
 #endif
-#if __POSIX_VISIBLE >= 200112
-int posix_memalign (void **, size_t, size_t);
-#endif
 
 #ifdef _COMPILING_NEWLIB
 #define unsetenv UNUSED_unsetenv
