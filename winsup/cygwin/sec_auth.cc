@@ -763,6 +763,7 @@ verify_token (HANDLE token, cygsid &usersid, user_groups &groups, bool *pintern)
   NTSTATUS status;
   ULONG size;
   bool intern = false;
+  tmp_pathbuf tp;
 
   if (pintern)
     {
@@ -808,16 +809,10 @@ verify_token (HANDLE token, cygsid &usersid, user_groups &groups, bool *pintern)
 	return gsid == groups.pgsid;
     }
 
-  PTOKEN_GROUPS my_grps;
+  PTOKEN_GROUPS my_grps = (PTOKEN_GROUPS) tp.w_get ();
 
-  status = NtQueryInformationToken (token, TokenGroups, NULL, 0, &size);
-  if (!NT_SUCCESS (status) && status != STATUS_BUFFER_TOO_SMALL)
-    {
-      debug_printf ("NtQueryInformationToken(token, TokenGroups), %y", status);
-      return false;
-    }
-  my_grps = (PTOKEN_GROUPS) alloca (size);
-  status = NtQueryInformationToken (token, TokenGroups, my_grps, size, &size);
+  status = NtQueryInformationToken (token, TokenGroups, my_grps,
+				    2 * NT_MAX_PATH, &size);
   if (!NT_SUCCESS (status))
     {
       debug_printf ("NtQueryInformationToken(my_token, TokenGroups), %y",
@@ -903,6 +898,7 @@ create_token (cygsid &usersid, user_groups &new_groups)
   HANDLE token = INVALID_HANDLE_VALUE;
   HANDLE primary_token = INVALID_HANDLE_VALUE;
 
+  tmp_pathbuf tp;
   PTOKEN_GROUPS my_tok_gsids = NULL;
   cygpsid mandatory_integrity_sid;
   ULONG size;
@@ -938,24 +934,14 @@ create_token (cygsid &usersid, user_groups &new_groups)
 
       /* Retrieving current processes group list to be able to inherit
 	 some important well known group sids. */
-      status = NtQueryInformationToken (hProcToken, TokenGroups, NULL, 0,
-					&size);
-      if (!NT_SUCCESS (status) && status != STATUS_BUFFER_TOO_SMALL)
-	debug_printf ("NtQueryInformationToken(hProcToken, TokenGroups), %y",
-		      status);
-      else if (!(my_tok_gsids = (PTOKEN_GROUPS) malloc (size)))
-	debug_printf ("malloc (my_tok_gsids) failed.");
-      else
+      my_tok_gsids = (PTOKEN_GROUPS) tp.w_get ();
+      status = NtQueryInformationToken (hProcToken, TokenGroups, my_tok_gsids,
+					2 * NT_MAX_PATH, &size);
+      if (!NT_SUCCESS (status))
 	{
-	  status = NtQueryInformationToken (hProcToken, TokenGroups,
-					    my_tok_gsids, size, &size);
-	  if (!NT_SUCCESS (status))
-	    {
-	      debug_printf ("NtQueryInformationToken(hProcToken, TokenGroups), "
-			    "%y", status);
-	      free (my_tok_gsids);
-	      my_tok_gsids = NULL;
-	    }
+	  debug_printf ("NtQueryInformationToken(hProcToken, TokenGroups), "
+			"%y", status);
+	  my_tok_gsids = NULL;
 	}
     }
 
@@ -1022,8 +1008,6 @@ out:
     CloseHandle (token);
   if (privs)
     free (privs);
-  if (my_tok_gsids)
-    free (my_tok_gsids);
   lsa_close_policy (lsa);
 
   debug_printf ("%p = create_token ()", primary_token);
