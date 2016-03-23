@@ -29,11 +29,15 @@ operator delete (void *p)
 {
   free (p);
 }
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wc++14-compat"
 void
 operator delete (void *p, size_t)
 {
   ::operator delete(p);
 }
+#pragma GCC diagnostic pop
 
 void *
 operator new[] (std::size_t s)
