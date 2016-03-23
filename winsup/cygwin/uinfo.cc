@@ -113,6 +113,38 @@ cygheap_user::init ()
     system_printf("Cannot get dacl, %E");
 }
 
+/* Check if sid is an enabled SID in the token group list of the current
+   effective token.  Note that we only check for ENABLED groups, not for
+   INTEGRITY_ENABLED.  The latter just doesn't make sense in our scenario
+   of using the group as primary group.
+
+   This needs careful checking should we use check_token_membership in other
+   circumstances. */
+static bool
+check_token_membership (PSID sid)
+{
+  NTSTATUS status;
+  ULONG size;
+  tmp_pathbuf tp;
+  PTOKEN_GROUPS groups = (PTOKEN_GROUPS) tp.w_get ();
+
+  /* If impersonated, use impersonation token. */
+  HANDLE tok = cygheap->user.issetuid () ? cygheap->user.primary_token ()
+					 : hProcToken;
+  status = NtQueryInformationToken (tok, TokenGroups, groups, 2 * NT_MAX_PATH,
+				    &size);
+  if (!NT_SUCCESS (status))
+    debug_printf ("NtQueryInformationToken (TokenGroups) %y", status);
+  else
+    {
+      for (DWORD pg = 0; pg < groups->GroupCount; ++pg)
+	if (RtlEqualSid (sid, groups->Groups[pg].Sid)
+	    && (groups->Groups[pg].Attributes & SE_GROUP_ENABLED))
+	  return true;
+    }
+  return false;
+}
+
 void
 internal_getlogin (cygheap_user &user)
 {
@@ -148,16 +180,23 @@ internal_getlogin (cygheap_user &user)
 		 disagree with gr_gid from the group file.  Overwrite it. */
 	      if ((grp2 = internal_getgrsid (gsid, &cldap)) && grp2 != grp)
 		myself->gid = pwd->pw_gid = grp2->gr_gid;
-	      /* Set primary group to the group in /etc/passwd. */
+	      /* Set primary group to the group in /etc/passwd, *iff*
+		 the group in /etc/passwd is in the token *and* enabled. */
 	      if (gsid != user.groups.pgsid)
 		{
-		  NTSTATUS status = NtSetInformationToken (hProcToken,
-							   TokenPrimaryGroup,
-							   &gsid, sizeof gsid);
+		  NTSTATUS status = STATUS_INVALID_PARAMETER;
+
+		  if (check_token_membership (gsid))
+		    {
+		      status = NtSetInformationToken (hProcToken,
+						      TokenPrimaryGroup,
+						      &gsid, sizeof gsid);
+		      if (!NT_SUCCESS (status))
+			debug_printf ("NtSetInformationToken "
+				      "(TokenPrimaryGroup), %y", status);
+		    }
 		  if (!NT_SUCCESS (status))
 		    {
-		      debug_printf ("NtSetInformationToken (TokenPrimaryGroup),"
-				    " %y", status);
 		      /* Revert the primary group setting and override the
 			 setting in the passwd entry. */
 		      if (pgrp)
