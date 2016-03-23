@@ -171,12 +171,15 @@ Since newlib is a library, the target concept does not apply to it, and the
 build, host, and target options given to the top-level configure script must
 be changed for newlib's use.
 
-The options are shifted according to these correspondences:
+The build system shifts the options according to these correspondences:
 
 gcc's build platform has no equivalent in newlib.
 gcc's host platform is newlib's build platform.
 gcc's target platform is newlib's host platform.
 and as mentioned before, newlib has no concept of target.
+
+In summary: the --target=TARGET switch to the top-level configure
+script configures newlib's host platform.
 
 `configure' options
 ===================
