@@ -665,6 +665,7 @@ target_builddir'
 ac_subst_files=''
 ac_user_opts='
 enable_option_checking
+with_mingw_progs
 with_windows_headers
 with_windows_libs
 '
@@ -680,7 +681,8 @@ CXX
 CXXFLAGS
 CCC
 CPP'
-ac_subdirs_all='cygwin utils cygserver lsaauth doc'
+ac_subdirs_all='cygwin cygserver doc
+utils lsaauth'
 
 # Initialize some variables set by options.
 ac_init_help=
@@ -1293,6 +1295,8 @@ if test -n "$ac_init_help"; then
 Optional Packages:
   --with-PACKAGE[=ARG]    use PACKAGE [ARG=yes]
   --without-PACKAGE       do not use PACKAGE (same as --with-PACKAGE=no)
+  --without-mingw-progs   do not build programs using the mingw toolchain
+                          (useful for cross-compiling)
   --with-windows-headers=DIR
                           specify where the windows includes are located
   --with-windows-libs=DIR specify where the windows libraries are located
@@ -2091,7 +2095,6 @@ test -n "$target_alias" &&
   test "$program_prefix$program_suffix$program_transform_name" = \
     NONENONEs,x,x, &&
   program_prefix=${target_alias}-
-
 
 ac_ext=c
 ac_cpp='$CPP $CPPFLAGS'
@@ -3359,6 +3362,14 @@ ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $
 ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
 
+# Check whether --with-mingw-progs was given.
+if test "${with_mingw_progs+set}" = set; then :
+  withval=$with_mingw_progs;
+else
+  with_mingw_progs=yes
+fi
+
+
 
 
 # Check whether --with-windows-headers was given.
@@ -3435,7 +3446,12 @@ export CXX
 
 
 
-subdirs="$subdirs cygwin utils cygserver lsaauth doc"
+subdirs="$subdirs cygwin cygserver doc"
+
+if test "x$with_mingw_progs" != xno; then
+    subdirs="$subdirs utils lsaauth"
+
+fi
 
 INSTALL_LICENSE="install-license"
 
