@@ -37,6 +37,25 @@ done
     echo "**** Couldn't open file '$incfile'.  Aborting."
 }
 
+function parse_preproc_flags() {
+  # Since we're manually specifying the preprocessor, pass the default flags normally defined.
+  ccflags="--preprocessor=$1 --preprocessor-arg=-E --preprocessor-arg=-xc-header --define=RC_INVOKED "
+  shift
+  while [ -n "$*" ]; do
+      case "$1" in
+          # We need to be able to find the just-built cc1 binary.
+          -B*)
+            ccflags="$ccflags --preprocessor-arg=$1"
+            ;;
+      esac
+      shift
+  done
+}
+
+parse_preproc_flags $CC
+
+
+
 #
 # Load the current date so we can work on individual fields
 #
@@ -166,4 +185,4 @@ fi
 
 echo "Version $cygwin_ver"
 set -$- $builddate
-$windres $iflags --define CYGWIN_BUILD_DATE="$1" --define CYGWIN_BUILD_TIME="$2" --define CYGWIN_BUILD_YEAR=$y --define CYGWIN_VERSION='"'"$cygwin_ver"'"' $rcfile winver.o
+$windres $iflags $ccflags --define CYGWIN_BUILD_DATE="$1" --define CYGWIN_BUILD_TIME="$2" --define CYGWIN_BUILD_YEAR=$y --define CYGWIN_VERSION='"'"$cygwin_ver"'"' $rcfile winver.o
