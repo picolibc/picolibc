@@ -1462,12 +1462,12 @@ get_logon_sid ()
       NTSTATUS status;
       ULONG size;
       tmp_pathbuf tp;
-      PTOKEN_GROUPS groups = (PTOKEN_GROUPS) tp.c_get ();
+      PTOKEN_GROUPS groups = (PTOKEN_GROUPS) tp.w_get ();
 
       status = NtQueryInformationToken (hProcToken, TokenGroups, groups,
-					NT_MAX_PATH, &size);
+					2 * NT_MAX_PATH, &size);
       if (!NT_SUCCESS (status))
-	debug_printf ("NtQueryInformationToken() %y", status);
+	debug_printf ("NtQueryInformationToken (TokenGroups) %y", status);
       else
 	{
 	  for (DWORD pg = 0; pg < groups->GroupCount; ++pg)
