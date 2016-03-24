@@ -1913,20 +1913,6 @@ get_adapters_addresses (PIP_ADAPTER_ADDRESSES *pa_ret, ULONG family)
   return ret == ERROR_SUCCESS || (!pa_ret && ret == ERROR_BUFFER_OVERFLOW);
 }
 
-#define WS_IFF_UP	     1
-#define WS_IFF_BROADCAST     2
-#define WS_IFF_LOOPBACK	     4
-#define WS_IFF_POINTTOPOINT  8
-#define WS_IFF_MULTICAST    16
-
-static inline short
-convert_ifr_flags (u_long ws_flags)
-{
-  return (ws_flags & (WS_IFF_UP | WS_IFF_BROADCAST))
-	 | ((ws_flags & (WS_IFF_LOOPBACK | WS_IFF_POINTTOPOINT)) << 1)
-	 | ((ws_flags & WS_IFF_MULTICAST) << 8);
-}
-
 static u_long
 get_routedst (DWORD if_index)
 {
