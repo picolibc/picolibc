@@ -19,6 +19,6 @@ arc4random_stir(void)
 }
 
 void
-arc4random_addrandom(u_char *dat, int datlen)
+arc4random_addrandom(u_int8_t *dat, int datlen)
 {
 }

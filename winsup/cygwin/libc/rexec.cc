@@ -315,7 +315,7 @@ cygwin_rexec (char **ahost, unsigned short rport, char *name, char *pass,
 {
   struct sockaddr_in sin, sin2, from;
   struct hostent *hp;
-  u_short port = 0;
+  uint16_t port = 0;
   int s, timo = 1, s3;
   char c;
   static char ahostbuf[INTERNET_MAX_HOST_NAME_LENGTH + 1];
@@ -371,7 +371,7 @@ retry:
 		      (void) close(s2);
 		      goto bad;
 	      }
-	      port = ntohs((u_short)sin2.sin_port);
+	      port = ntohs((uint16_t)sin2.sin_port);
 	      (void) sprintf(num, "%u", port);
 	      (void) write(s, num, strlen(num)+1);
 	      { int len = sizeof (from);

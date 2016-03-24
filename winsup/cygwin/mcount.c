@@ -63,7 +63,7 @@ _MCOUNT_DECL (size_t, size_t);
 
 _MCOUNT_DECL (size_t frompc, size_t selfpc)
 {
-	register u_short *frompcindex;
+	register u_int16_t *frompcindex;
 	register struct tostruct *top, *prevtop;
 	register struct gmonparam *p;
 	register long toindex;

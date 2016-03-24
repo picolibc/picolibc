@@ -301,10 +301,11 @@ first_day (int year)
 /* This simplifies the calls to conv_num enormously. */
 #define ALT_DIGITS	((alt_format & ALT_O) ? *alt_digits : NULL)
 
-static const u_char *conv_num(const unsigned char *, int *, uint, uint,
-			      alt_digits_t *);
-static const u_char *find_string(const u_char *, int *, const char * const *,
-	const char * const *, int);
+static const unsigned char *conv_num(const unsigned char *, int *, uint, uint,
+				     alt_digits_t *);
+static const unsigned char *find_string(const unsigned char *, int *,
+					const char * const *,
+					const char * const *, int);
 
 static char *
 __strptime(const char *buf, const char *fmt, struct tm *tm,
@@ -321,7 +322,7 @@ __strptime(const char *buf, const char *fmt, struct tm *tm,
 	uint ulim;
 	int ymd = 0;
 
-	bp = (const u_char *)buf;
+	bp = (const unsigned char *)buf;
 	struct lc_time_T *_CurrentTimeLocale = __get_current_time_locale ();
 
 	while (bp != NULL && (c = *fmt++) != '\0') {
@@ -442,9 +443,9 @@ literal:
 			LEGAL_ALT(ALT_E);
 			ymd |= SET_YMD;
 		    recurse:
-			bp = (const u_char *)__strptime((const char *)bp,
-							new_fmt, tm,
-							era_info, alt_digits);
+			bp = (const unsigned char *)
+			     __strptime((const char *)bp, new_fmt, tm,
+					era_info, alt_digits);
 			continue;
 
 		/*
@@ -787,7 +788,7 @@ strptime (const char *__restrict buf, const char *__restrict fmt,
   return ret;
 }
 
-static const u_char *
+static const unsigned char *
 conv_num(const unsigned char *buf, int *dest, uint llim, uint ulim,
 	 alt_digits_t *alt_digits)
 {
@@ -820,9 +821,9 @@ conv_num(const unsigned char *buf, int *dest, uint llim, uint ulim,
 	return buf;
 }
 
-static const u_char *
-find_string(const u_char *bp, int *tgt, const char * const *n1,
-		const char * const *n2, int c)
+static const unsigned char *
+find_string(const unsigned char *bp, int *tgt, const char * const *n1,
+	    const char * const *n2, int c)
 {
 	int i;
 	unsigned int len;

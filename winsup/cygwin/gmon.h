@@ -130,10 +130,10 @@ struct gmonhdr {
 #define MAXARCS		((1 << (8 * sizeof(HISTCOUNTER))) - 2)
 
 struct tostruct {
-	size_t	selfpc;
-	long	count;
-	u_short	link;
-	u_short pad;
+	size_t		selfpc;
+	long		count;
+	u_int16_t	link;
+	u_int16_t	pad;
 };
 
 /*
@@ -157,9 +157,9 @@ struct rawarc {
  */
 struct gmonparam {
 	volatile LONG	state;
-	u_short		*kcount;
+	u_int16_t	*kcount;
 	size_t		kcountsize;
-	u_short		*froms;
+	u_int16_t	*froms;
 	size_t		fromssize;
 	struct tostruct	*tos;
 	size_t		tossize;

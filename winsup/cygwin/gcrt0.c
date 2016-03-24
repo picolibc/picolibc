@@ -20,8 +20,8 @@ details. */
 #include <_bsd_types.h>
 #endif
 
-extern u_char etext asm ("etext");
-extern u_char eprol asm ("__eprol");
+extern uint8_t etext asm ("etext");
+extern uint8_t eprol asm ("__eprol");
 extern void _mcleanup (void);
 extern void monstartup (size_t, size_t);
 void _monstartup (void) __attribute__((__constructor__));

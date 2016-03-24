@@ -117,9 +117,9 @@ monstartup (size_t lowpc, size_t highpc)
 
 	p->tos = (struct tostruct *)cp;
 	cp += p->tossize;
-	p->kcount = (u_short *)cp;
+	p->kcount = (u_int16_t *)cp;
 	cp += p->kcountsize;
-	p->froms = (u_short *)cp;
+	p->froms = (u_int16_t *)cp;
 
 	/* XXX minbrk needed? */
 	//minbrk = fake_sbrk(0);

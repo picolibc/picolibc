@@ -363,7 +363,7 @@ cygwin_rresvport_af(int *alport, int family)
 {
 	int s;
 	struct sockaddr_storage ss;
-	u_short *sport;
+	u_int16_t *sport;
 
 	memset(&ss, 0, sizeof(ss));
 	ss.ss_family = family;

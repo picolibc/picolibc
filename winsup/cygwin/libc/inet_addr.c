@@ -100,7 +100,7 @@ __FBSDID("$FreeBSD$");
  */
 extern int
 cygwin_inet_aton(const char *cp, struct in_addr *addr) {
-	u_long val;
+	u_int32_t val;
 	int base, n;
 	char c;
 	u_int8_t parts[4];

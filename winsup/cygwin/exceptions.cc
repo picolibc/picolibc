@@ -46,8 +46,8 @@ details. */
 #define CALL_HANDLER_RETRY_INNER 10
 
 PWCHAR debugger_command;
-extern u_char _sigbe;
-extern u_char _sigdelayed_end;
+extern uint8_t _sigbe;
+extern uint8_t _sigdelayed_end;
 
 static BOOL WINAPI ctrl_c_handler (DWORD);
 

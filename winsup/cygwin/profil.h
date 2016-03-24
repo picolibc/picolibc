@@ -45,11 +45,11 @@ struct profinfo {
     _WINHANDLE targthr;			/* thread to profile */
     _WINHANDLE profthr;			/* profiling thread */
     _WINHANDLE quitevt;			/* quit event */
-    u_short *counter;			/* profiling counters */
+    uint16_t *counter;			/* profiling counters */
     size_t lowpc, highpc;		/* range to be profiled */
-    u_int scale;			/* scale value of bins */
+    uint32_t scale;			/* scale value of bins */
 };
 
-int profile_ctl(struct profinfo *, char *, size_t, size_t, u_int);
-int profil(char *, size_t, size_t, u_int);
+int profile_ctl(struct profinfo *, char *, size_t, size_t, uint32_t);
+int profil(char *, size_t, size_t, uint32_t);
 

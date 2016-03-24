@@ -205,7 +205,7 @@ profile_child (void)
  * Start or stop profiling.
  *
  * Profiling data goes into the SAMPLES buffer of size SIZE (which is treated
- * as an array of u_shorts of size SIZE/2).
+ * as an array of uint16_t of size SIZE/2).
  *
  * Each bin represents a range of pc addresses from OFFSET.  The number
  * of pc addresses in a bin depends on SCALE.  (A scale of 65536 maps
@@ -215,7 +215,7 @@ profile_child (void)
  */
 int
 profile_ctl (struct profinfo * p, char *samples, size_t size,
-	     size_t offset, u_int scale)
+	     size_t offset, uint32_t scale)
 {
   size_t maxbin;
 
@@ -231,7 +231,7 @@ profile_ctl (struct profinfo * p, char *samples, size_t size,
       memset (samples, 0, size);
       memset (p, 0, sizeof *p);
       maxbin = size >> 1;
-      prof.counter = (u_short *) samples;
+      prof.counter = (uint16_t *) samples;
       prof.lowpc = offset;
       prof.highpc = PROFADDR (maxbin, offset, scale);
       prof.scale = scale;
@@ -250,7 +250,7 @@ profile_ctl (struct profinfo * p, char *samples, size_t size,
    The word pointed to by this address is incremented.  Buf is unused. */
 
 int
-profil (char *samples, size_t size, size_t offset, u_int scale)
+profil (char *samples, size_t size, size_t offset, uint32_t scale)
 {
   return profile_ctl (&prof, samples, size, offset, scale);
 }
