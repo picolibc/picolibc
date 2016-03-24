@@ -18,21 +18,12 @@
 #ifndef _SYS_TYPES_H
 
 #include <_ansi.h>
-# include <sys/cdefs.h>
-
-#ifndef __INTTYPES_DEFINED__
-#define __INTTYPES_DEFINED__
-
+#include <sys/cdefs.h>
 #include <machine/_types.h>
 
-#if defined(__rtems__) || defined(__XMK__)
-/*
- *  The following section is RTEMS specific and is needed to more
- *  closely match the types defined in the BSD sys/types.h.
- *  This is needed to let the RTEMS/BSD TCP/IP stack compile.
- */
-
-/* deprecated */
+/* BSD types permitted by POSIX and always exposed as in Glibc.  Only provided
+   for backward compatibility with BSD code.  The uintN_t standard types should
+   be preferred in new code. */
 #if ___int8_t_defined
 typedef __uint8_t	u_int8_t;
 #endif
@@ -42,19 +33,25 @@ typedef __uint16_t	u_int16_t;
 #if ___int32_t_defined
 typedef __uint32_t	u_int32_t;
 #endif
-
 #if ___int64_t_defined
 typedef __uint64_t	u_int64_t;
+#endif
+
+#if defined(__rtems__) || defined(__XMK__)
+/*
+ *  The following section is RTEMS specific and is needed to more
+ *  closely match the types defined in the BSD sys/types.h.
+ *  This is needed to let the RTEMS/BSD TCP/IP stack compile.
+ */
 
 /* deprecated */
+#if ___int64_t_defined
 typedef	__uint64_t	u_quad_t;
 typedef	__int64_t	quad_t;
 typedef	quad_t *	qaddr_t;
 #endif
 
-#endif
-
-#endif /* ! __INTTYPES_DEFINED */
+#endif /* __rtems__ || __XMK__ */
 
 #ifndef __need_inttypes
 

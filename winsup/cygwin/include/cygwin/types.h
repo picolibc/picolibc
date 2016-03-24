@@ -141,23 +141,6 @@ typedef unsigned long vm_size_t;
 typedef void *vm_object_t;
 #endif /* __vm_object_t_defined */
 
-#ifndef __u_int8_t_defined
-#define __u_int8_t_defined
-typedef unsigned char u_int8_t;
-#endif
-#ifndef __u_int16_t_defined
-#define __u_int16_t_defined
-typedef __uint16_t u_int16_t;
-#endif
-#ifndef __u_int32_t_defined
-#define __u_int32_t_defined
-typedef __uint32_t u_int32_t;
-#endif
-#ifndef __u_int64_t_defined
-#define __u_int64_t_defined
-typedef __uint64_t u_int64_t;
-#endif
-
 #ifndef __register_t_defined
 #define __register_t_defined
 typedef __int32_t register_t;
