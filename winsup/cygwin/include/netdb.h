@@ -218,7 +218,7 @@ struct hostent	*gethostbyaddr (const char *, int, int);
 struct hostent	*gethostbyname (const char *);
 struct hostent	*gethostbyname2 (const char *, int);
 struct hostent	*gethostent (void);
-struct netent	*getnetbyaddr (long, int); /* u_long? */
+struct netent	*getnetbyaddr (uint32_t, int);
 struct netent	*getnetbyname (const char *);
 struct netent	*getnetent (void);
 struct protoent	*getprotobyname (const char *);

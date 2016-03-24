@@ -2248,7 +2248,7 @@ fhandler_socket::ioctl (unsigned int cmd, void *p)
        use a type of the expected size.  Hopefully. */
     case FIOASYNC:
 #ifdef __x86_64__
-    case _IOW('f', 125, unsigned long):
+    case _IOW('f', 125, u_long):
 #endif
       res = WSAAsyncSelect (get_socket (), winmsg, WM_ASYNCIO,
 	      *(int *) p ? ASYNC_MASK : 0);
@@ -2261,7 +2261,7 @@ fhandler_socket::ioctl (unsigned int cmd, void *p)
       break;
     case FIONREAD:
 #ifdef __x86_64__
-    case _IOR('f', 127, unsigned long):
+    case _IOR('f', 127, u_long):
 #endif
       res = ioctlsocket (get_socket (), FIONREAD, (u_long *) p);
       if (res == SOCKET_ERROR)

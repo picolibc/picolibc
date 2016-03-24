@@ -87,8 +87,7 @@ typedef	quad_t *	qaddr_t;
 #  define	quad		quad_t
 #endif
 
-/* These types are required by netinet/ *.h on Cygwin */
-#if __MISC_VISIBLE || defined(__CYGWIN__)
+#if __MISC_VISIBLE
 #ifndef _BSDTYPES_DEFINED
 /* also defined in mingw/gmon.h and in w32api/winsock[2].h */
 #ifndef __u_char_defined

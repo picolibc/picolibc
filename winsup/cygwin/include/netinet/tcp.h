@@ -50,19 +50,19 @@ typedef u_int32_t tcp_cc;               /* connection count per rfc1644 */
  * Per RFC 793, September, 1981.
  */
 struct tcphdr {
-	u_short th_sport;               /* source port */
-	u_short th_dport;               /* destination port */
-	tcp_seq th_seq;                 /* sequence number */
-	tcp_seq th_ack;                 /* acknowledgement number */
+	u_int16_t th_sport;             /* source port */
+	u_int16_t th_dport;             /* destination port */
+	tcp_seq   th_seq;               /* sequence number */
+	tcp_seq   th_ack;               /* acknowledgement number */
 #if __BYTE_ORDER == __LITTLE_ENDIAN
-	u_int   th_x2:4,                /* (unused) */
-		th_off:4;               /* data offset */
+	unsigned int  th_x2:4,          /* (unused) */
+		      th_off:4;         /* data offset */
 #endif
 #if __BYTE_ORDER == __BIG_ENDIAN
-	u_int   th_off:4,               /* data offset */
-		th_x2:4;                /* (unused) */
+	unsigned int  th_off:4,         /* data offset */
+		      th_x2:4;          /* (unused) */
 #endif
-	u_char  th_flags;
+	u_int8_t  th_flags;
 #define TH_FIN  0x01
 #define TH_SYN  0x02
 #define TH_RST  0x04
@@ -71,9 +71,9 @@ struct tcphdr {
 #define TH_URG  0x20
 #define TH_FLAGS (TH_FIN|TH_SYN|TH_RST|TH_ACK|TH_URG)
 
-	u_short th_win;                 /* window */
-	u_short th_sum;                 /* checksum */
-	u_short th_urp;                 /* urgent pointer */
+	u_int16_t th_win;                 /* window */
+	u_int16_t th_sum;                 /* checksum */
+	u_int16_t th_urp;                 /* urgent pointer */
 };
 
 #define TCPOPT_EOL              0

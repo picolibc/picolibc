@@ -22,15 +22,15 @@ details. */
 #define _IOR(x,y,t)     (IOC_OUT|(((long)sizeof(t)&IOCPARM_MASK)<<16)|(x<<8)|y)
 #define _IOW(x,y,t)     (IOC_IN|(((long)sizeof(t)&IOCPARM_MASK)<<16)|(x<<8)|y)
 
-#define SIOCATMARK  _IOR('s',  7, u_long)  /* at oob mark? */
-#define FIONREAD    _IOR('f', 127, u_long) /* get # bytes to read */
+#define SIOCATMARK  _IOR('s',  7, long)  /* at oob mark? */
+#define FIONREAD    _IOR('f', 127, long) /* get # bytes to read */
 #define FIONBIO 0x8004667e /* To be compatible with termiost version */
-#define REAL_FIONBIO     _IOW('f', 126, u_long) /* set/clear non-blocking i/o */
-#define FIOASYNC    _IOW('f', 125, u_long) /* set/clear async i/o */
-#define SIOCSHIWAT  _IOW('s',  0, u_long)  /* set high watermark */
-#define SIOCGHIWAT  _IOR('s',  1, u_long)  /* get high watermark */
-#define SIOCSLOWAT  _IOW('s',  2, u_long)  /* set low watermark */
-#define SIOCGLOWAT  _IOR('s',  3, u_long)  /* get low watermark */
+#define REAL_FIONBIO     _IOW('f', 126, long) /* set/clear non-blocking i/o */
+#define FIOASYNC    _IOW('f', 125, long) /* set/clear async i/o */
+#define SIOCSHIWAT  _IOW('s',  0, long)  /* set high watermark */
+#define SIOCGHIWAT  _IOR('s',  1, long)  /* get high watermark */
+#define SIOCSLOWAT  _IOW('s',  2, long)  /* set low watermark */
+#define SIOCGLOWAT  _IOR('s',  3, long)  /* get low watermark */
 
 /* Needed for if queries */
 #define SIOCGIFCONF     _IOW('s', 100, struct ifconf) /* get if list */
@@ -57,7 +57,7 @@ details. */
 #define SO_USELOOPBACK  0x0040          /* bypass hardware when possible */
 #define SO_LINGER       0x0080          /* linger on close if data present */
 #define SO_OOBINLINE    0x0100          /* leave received OOB data in line */
-#define SO_DONTLINGER   (u_int)(~SO_LINGER)
+#define SO_DONTLINGER   (unsigned int)(~SO_LINGER)
 #define SO_PEERCRED	0x0200		/* same as getpeereid */
 
 /*

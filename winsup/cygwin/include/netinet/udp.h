@@ -42,10 +42,10 @@
  * Per RFC 768, September, 1981.
  */
 struct udphdr {
-	u_short	uh_sport;		/* source port */
-	u_short	uh_dport;		/* destination port */
-	u_short	uh_ulen;		/* udp length */
-	u_short	uh_sum;			/* udp checksum */
+	u_int16_t uh_sport;		/* source port */
+	u_int16_t uh_dport;		/* destination port */
+	u_int16_t uh_ulen;		/* udp length */
+	u_int16_t uh_sum;		/* udp checksum */
 };
 
 #endif
