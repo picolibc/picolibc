@@ -1913,7 +1913,7 @@ get_adapters_addresses (PIP_ADAPTER_ADDRESSES *pa_ret, ULONG family)
   return ret == ERROR_SUCCESS || (!pa_ret && ret == ERROR_BUFFER_OVERFLOW);
 }
 
-static u_long
+static in_addr_t
 get_routedst (DWORD if_index)
 {
   PMIB_IPFORWARDTABLE pift;
