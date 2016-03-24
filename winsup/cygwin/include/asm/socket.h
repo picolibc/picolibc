@@ -24,8 +24,8 @@ details. */
 
 #define SIOCATMARK  _IOR('s',  7, long)  /* at oob mark? */
 #define FIONREAD    _IOR('f', 127, long) /* get # bytes to read */
-#define FIONBIO 0x8004667e /* To be compatible with termiost version */
-#define REAL_FIONBIO     _IOW('f', 126, long) /* set/clear non-blocking i/o */
+/* Compatible with termios.h */
+#define FIONBIO     0x8004667e		 /* set/clear non-blocking i/o */
 #define FIOASYNC    _IOW('f', 125, long) /* set/clear async i/o */
 #define SIOCSHIWAT  _IOW('s',  0, long)  /* set high watermark */
 #define SIOCGHIWAT  _IOR('s',  1, long)  /* get high watermark */
