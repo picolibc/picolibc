@@ -127,7 +127,16 @@ spin:
     mcr         15, 0, r4, cr2, cr0, 2  @ Write TTBCR
     adr         r4, page_table_addr	@ Load the base for vectors
     ldr         r4, [r4]
-    add         r4, r4, #1		@ Page tables inner cacheable
+    mrc         p15, 0, r0, c0, c0, 5   @ read MPIDR
+    tst         r0, #0x80000000         @ bis[31]
+    @ Set page table flags - there are two page table flag formats for the
+    @ architecture.  For systems without multiprocessor extensions we use 0x1
+    @ which is Inner cacheable/Outer non-cacheable.  For systems with
+    @ multiprocessor extensions we use 0x59 which is Inner/Outer write-back,
+    @ no write-allocate, and cacheable.  See the ARMARM-v7AR for more details.
+    it          ne
+    addne       r4, r4, #0x58
+    add         r4, r4, #1
 
     mcr         15, 0, r4, cr2, cr0, 0  @ Write TTBR0
 
