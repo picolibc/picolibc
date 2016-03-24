@@ -175,6 +175,8 @@ split_lines(char *p, const char *plim) {
 
 	for (i = 0; p < plim; i++) {
 		p = strchr(p, '\n');
+		if (!p)
+			break;
 		*p++ = '\0';
 	}
 	return i;
