@@ -665,6 +665,9 @@ maintainer-clean: clean
 $(LDSCRIPT): $(LDSCRIPT).in
 	$(CC) -E - -P < $^ -o $@
 
+# always delete target if an error occurs
+ .DELETE_ON_ERROR:
+
 # Rule to build cygwin.dll
 $(TEST_DLL_NAME): $(LDSCRIPT) dllfixdbg $(DLL_OFILES) $(LIBSERVER) $(LIBC) $(LIBM) $(API_VER) Makefile $(VERSION_OFILES)
 	$(CXX) $(CXXFLAGS) \
@@ -674,7 +677,7 @@ $(TEST_DLL_NAME): $(LDSCRIPT) dllfixdbg $(DLL_OFILES) $(LIBSERVER) $(LIBC) $(LIB
 	-e $(DLL_ENTRY) $(DEF_FILE) $(DLL_OFILES) $(VERSION_OFILES) \
 	$(MALLOC_OBJ) $(LIBSERVER) $(LIBM) $(LIBC) \
 	-lgcc $(DLL_IMPORTS) -Wl,-Map,cygwin.map
-	@$(word 2,$^) $(OBJDUMP) $(OBJCOPY) $@ ${patsubst %0.dll,%1.dbg,$@}
+	$(srcdir)/dllfixdbg $(OBJDUMP) $(OBJCOPY) $@ ${patsubst %0.dll,%1.dbg,$@}
 	@ln -f $@ new-$(DLL_NAME)
 
 # Rule to build libcygwin.a
