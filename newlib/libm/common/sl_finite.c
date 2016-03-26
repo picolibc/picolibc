@@ -19,7 +19,7 @@ finitel (long double x)
      Some architectures for example have an 80-bit long double whereas
      others use 128-bits.  We use macros and comiler builtin functions
      to avoid specific knowledge of the long double format.  */
-  return __builtin_isinf_sign (x) == 0;
+  return __builtin_isfinite (x);
 #endif
 }
 
