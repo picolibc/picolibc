@@ -204,35 +204,70 @@ extern int __fpclassifyd (double x);
 extern int __signbitf (float x);
 extern int __signbitd (double x);
 
-#define fpclassify(__x) \
-	((sizeof(__x) == sizeof(float))  ? __fpclassifyf(__x) : \
-	__fpclassifyd(__x))
-
-#ifndef isfinite
-  #define isfinite(__y) \
-          (__extension__ ({int __cy = fpclassify(__y); \
-                           __cy != FP_INFINITE && __cy != FP_NAN;}))
-#endif
-
 /* Note: isinf and isnan were once functions in newlib that took double
  *       arguments.  C99 specifies that these names are reserved for macros
  *       supporting multiple floating point types.  Thus, they are
  *       now defined as macros.  Implementations of the old functions
  *       taking double arguments still exist for compatibility purposes
  *       (prototypes for them are in <ieeefp.h>).  */
-#ifndef isinf
-  #define isinf(y) (fpclassify(y) == FP_INFINITE)
+
+#if __GNUC_PREREQ (4, 4)
+  #define fpclassify(__x) (__builtin_fpclassify (FP_NAN, FP_INFINITE, \
+						 FP_NORMAL, FP_SUBNORMAL, \
+						 FP_ZERO, __x))
+  #ifndef isfinite
+    #define isfinite(__x)	(__builtin_isfinite (__x))
+  #endif
+  #ifndef isinf
+    #define isinf(__x) (__builtin_isinf_sign (__x))
+  #endif
+  #ifndef isnan
+    #define isnan(__x) (__builtin_isnan (__x))
+  #endif
+  #define isnormal(__x) (__builtin_isnormal (__x))
+#else
+  #define fpclassify(__x) \
+	  ((sizeof(__x) == sizeof(float))  ? __fpclassifyf(__x) : \
+	  __fpclassifyd(__x))
+  #ifndef isfinite
+    #define isfinite(__y) \
+	    (__extension__ ({int __cy = fpclassify(__y); \
+			     __cy != FP_INFINITE && __cy != FP_NAN;}))
+  #endif
+  #ifndef isinf
+    #define isinf(__x) (fpclassify(__x) == FP_INFINITE)
+  #endif
+  #ifndef isnan
+    #define isnan(__x) (fpclassify(__x) == FP_NAN)
+  #endif
+  #define isnormal(__x) (fpclassify(__x) == FP_NORMAL)
 #endif
 
-#ifndef isnan
-  #define isnan(y) (fpclassify(y) == FP_NAN)
+#if __GNUC_PREREQ (4, 0)
+  #if defined(_HAVE_LONG_DOUBLE)
+    #define signbit(__x) \
+	    ((sizeof(__x) == sizeof(float))  ? __builtin_signbitf(__x) : \
+	     (sizeof(__x) == sizeof(double)) ? __builtin_signbit (__x) : \
+					       __builtin_signbitl(__x))
+  #else
+    #define signbit(__x) \
+	    ((sizeof(__x) == sizeof(float))  ? __builtin_signbitf(__x) : \
+					       __builtin_signbit (__x))
+  #endif
+#else
+  #define signbit(__x) \
+	  ((sizeof(__x) == sizeof(float))  ?  __signbitf(__x) : \
+		  __signbitd(__x))
 #endif
 
-#define isnormal(y) (fpclassify(y) == FP_NORMAL)
-#define signbit(__x) \
-	((sizeof(__x) == sizeof(float))  ?  __signbitf(__x) : \
-		__signbitd(__x))
-
+#if __GNUC_PREREQ (2, 97)
+#define isgreater(__x,__y)	(__builtin_isgreater (__x, __y))
+#define isgreaterequal(__x,__y)	(__builtin_isgreaterequal (__x, __y))
+#define isless(__x,__y)		(__builtin_isless (__x, __y))
+#define islessequal(__x,__y)	(__builtin_islessequal (__x, __y))
+#define islessgreater(__x,__y)	(__builtin_islessgreater (__x, __y))
+#define isunordered(__x,__y)	(__builtin_isunordered (__x, __y))
+#else
 #define isgreater(x,y) \
           (__extension__ ({__typeof__(x) __x = (x); __typeof__(y) __y = (y); \
                            !isunordered(__x,__y) && (__x > __y);}))
@@ -252,6 +287,7 @@ extern int __signbitd (double x);
 #define isunordered(a,b) \
           (__extension__ ({__typeof__(a) __a = (a); __typeof__(b) __b = (b); \
                            fpclassify(__a) == FP_NAN || fpclassify(__b) == FP_NAN;}))
+#endif
 
 /* Non ANSI long double precision functions.  */
 
