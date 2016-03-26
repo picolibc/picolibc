@@ -88,3 +88,9 @@ Bug Fixes
 - Only allow enabled groups from the user token's group list as primary
   token.
   Addresses: https://cygwin.com/ml/cygwin/2016-03/msg00477.html
+
+- Fix implementation of finitel.
+  Addresses: https://cygwin.com/ml/cygwin-apps/2016-03/msg00152.html
+
+- Fix strtold return value for +/-infinity.
+  Addresses: https://cygwin.com/ml/cygwin-apps/2016-03/msg00152.html
