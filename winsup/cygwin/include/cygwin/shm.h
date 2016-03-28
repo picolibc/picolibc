@@ -13,7 +13,6 @@ details. */
 #define _CYGWIN_SHM_H
 
 #include <cygwin/ipc.h>
-#include <sys/cygwin.h>
 
 #ifdef __cplusplus
 extern "C"
@@ -24,7 +23,9 @@ extern "C"
  *
  * 64 Kb was hardcoded for x86. MS states this may change so the constant
  * expression is replaced by a function call returning the correct value. */
-#define SHMLBA	(cygwin_internal (CW_GET_SHMLBA))
+#define SHMLBA	(__getpagesize ())
+/* internal alias of legacy getpagesize to avoid polluting global namespace */
+int __getpagesize (void);
 
 /* Shared memory operation flags:
  */

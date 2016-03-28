@@ -477,13 +477,14 @@ details. */
       293: Convert utmpname/utmpxname to int.
       294: Export clog10, clog10f.
       295: Export POSIX ACL functions.
+      296: Export __getpagesize.
      */
 
      /* Note that we forgot to bump the api for ualarm, strtoll, strtoull,
 	sigaltstack, sethostname. */
 
 #define CYGWIN_VERSION_API_MAJOR 0
-#define CYGWIN_VERSION_API_MINOR 295
+#define CYGWIN_VERSION_API_MINOR 296
 
      /* There is also a compatibity version number associated with the
 	shared memory regions.  It is incremented when incompatible

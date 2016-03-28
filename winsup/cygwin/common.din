@@ -60,6 +60,7 @@ __freading NOSIGFE
 __fsetlocking SIGFE
 __fwritable NOSIGFE
 __fwriting NOSIGFE
+__getpagesize = getpagesize SIGFE
 __getreent NOSIGFE
 __gnu_basename NOSIGFE
 __infinity NOSIGFE

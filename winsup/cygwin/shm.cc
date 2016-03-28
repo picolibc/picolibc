@@ -21,6 +21,10 @@ details. */
 #include "sync.h"
 #include "ntdll.h"
 
+/* __getpagesize is only available from libcygwin.a */
+#undef SHMLBA
+#define SHMLBA (wincap.allocation_granularity ())
+
 /*
  * client_request_shm Constructors
  */
