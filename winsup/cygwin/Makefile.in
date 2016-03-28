@@ -29,7 +29,7 @@ export CCWRAP_HEADERS:=. ${srcdir}
 export CCWRAP_SYSTEM_HEADERS:=@cygwin_headers@ @newlib_headers@
 export CCWRAP_DIRAFTER_HEADERS:=@windows_headers@
 
-VPATH+=$(srcdir)/regex $(srcdir)/lib $(srcdir)/libc
+VPATH+=$(srcdir)/regex $(srcdir)/lib $(srcdir)/libc $(srcdir)/math
 
 target_cpu:=@target_cpu@
 target_alias:=@target_alias@
@@ -153,6 +153,101 @@ DLL_IMPORTS:=${shell $(CC) -print-file-name=w32api/libkernel32.a} ${shell $(CC) 
 
 MT_SAFE_OBJECTS:=
 #
+MATH_OFILES:= \
+	acoshl.o \
+	acosl.o \
+	asinhl.o \
+	asinl.o \
+	atan2l.o \
+	atanhl.o \
+	atanl.o \
+	cabsl.o \
+	cacosl.o \
+	cargl.o \
+	casinl.o \
+	catanl.o \
+	cbrtl.o \
+	ccosl.o \
+	ceill.o \
+	cephes_emath.o \
+	cexpl.o \
+	cimagl.o \
+	clog10l.o \
+	clogl.o \
+	conjl.o \
+	copysignl.o \
+	coshl.o \
+	cosl.o \
+	cosl_internal.o \
+	cossin.o \
+	cpowl.o \
+	cprojl.o \
+	creall.o \
+	csinl.o \
+	csqrtl.o \
+	ctanl.o \
+	erfl.o \
+	exp10l.o \
+	exp2l.o \
+	expl.o \
+	expm1l.o \
+	fabsl.o \
+	fdiml.o \
+	finite.o \
+	floorl.o \
+	fmal.o \
+	fmaxl.o \
+	fminl.o \
+	fmodl.o \
+	frexpl.o \
+	ilogbl.o \
+	internal_logl.o \
+	isinf.o \
+	isnan.o \
+	ldexpl.o \
+	lgammal.o \
+	llrint.o \
+	llrintf.o \
+	llrintl.o \
+	llroundl.o \
+	log10l.o \
+	log1pl.o \
+	log2l.o \
+	logbl.o \
+	logl.o \
+	lrint.o \
+	lrintf.o \
+	lrintl.o \
+	lroundl.o \
+	modfl.o \
+	nearbyint.o \
+	nearbyintf.o \
+	nearbyintl.o \
+	nextafterl.o \
+	nexttoward.o \
+	nexttowardf.o \
+	pow10l.o \
+	powil.o \
+	powl.o \
+	remainder.o \
+	remainderf.o \
+	remainderl.o \
+	remquol.o \
+	rint.o \
+	rintf.o \
+	rintl.o \
+	roundl.o \
+	scalbl.o \
+	scalbnl.o \
+	sinhl.o \
+	sinl.o \
+	sinl_internal.o \
+	sqrtl.o \
+	tanhl.o \
+	tanl.o \
+	tgammal.o \
+	truncl.o
+
 DLL_OFILES:= \
 	advapi32.o \
 	arc4random_stir.o \
@@ -305,6 +400,7 @@ DLL_OFILES:= \
 	xsique.o \
 	$(EXTRA_OFILES) \
 	$(MALLOC_OFILES) \
+	$(MATH_OFILES) \
 	$(MT_SAFE_OBJECTS)
 
 EXCLUDE_STATIC_OFILES:=$(addprefix --exclude=,\
@@ -626,7 +722,7 @@ $(srcdir)/devices.cc: gendevices devices.in devices.h
 ${CURDIR}/libc.a: ${LIB_NAME} ${CURDIR}/libm.a libpthread.a libutil.a
 	${speclib} -v ${@F}
 
-${CURDIR}/libm.a: ${LIB_NAME} $(LIBM)
+${CURDIR}/libm.a: ${LIB_NAME} $(LIBM) $(MATH_OFILES)
 	${speclib} ${@F}
 
 libpthread.a: ${LIB_NAME} pthread.o thread.o

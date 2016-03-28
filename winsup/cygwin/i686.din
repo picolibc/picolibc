@@ -164,21 +164,21 @@ _f_frexp NOSIGFE
 _f_frexpf NOSIGFE
 _f_ldexp NOSIGFE
 _f_ldexpf NOSIGFE
-_f_llrint NOSIGFE
-_f_llrintf NOSIGFE
-_f_llrintl NOSIGFE
+_f_llrint = llrint NOSIGFE
+_f_llrintf = llrintf NOSIGFE
+_f_llrintl = llrintl NOSIGFE
 _f_log NOSIGFE
 _f_log10 NOSIGFE
 _f_log10f NOSIGFE
 _f_logf NOSIGFE
-_f_lrint NOSIGFE
-_f_lrintf NOSIGFE
-_f_lrintl NOSIGFE
+_f_lrint = lrint NOSIGFE
+_f_lrintf = lrintf NOSIGFE
+_f_lrintl = lrintl NOSIGFE
 _f_pow NOSIGFE
 _f_powf NOSIGFE
-_f_rint NOSIGFE
-_f_rintf NOSIGFE
-_f_rintl NOSIGFE
+_f_rint = rint NOSIGFE
+_f_rintf = rintf NOSIGFE
+_f_rintl = rintl NOSIGFE
 _f_tan NOSIGFE
 _f_tanf NOSIGFE
 _fabs = fabs NOSIGFE
@@ -622,19 +622,10 @@ fscanf_r = _fscanf_r SIGFE
 get_osfhandle = _get_osfhandle SIGFE
 getpwduid NOSIGFE
 lacl SIGFE
-llrint = _f_llrint NOSIGFE
-llrintf = _f_llrintf NOSIGFE
-llrintl = _f_llrintl NOSIGFE
-lrint = _f_lrint NOSIGFE
-lrintf = _f_lrintf NOSIGFE
-lrintl = _f_lrintl NOSIGFE
 posix_regcomp = regcomp SIGFE
 posix_regerror = regerror SIGFE
 posix_regexec = regexec SIGFE
 posix_regfree = regfree SIGFE
-rint = _f_rint NOSIGFE
-rintf = _f_rintf NOSIGFE
-rintl = _f_rintl NOSIGFE
 scanf_r = _scanf_r SIGFE
 setmode = cygwin_setmode SIGFE
 setregid32 SIGFE

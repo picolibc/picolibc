@@ -64,10 +64,10 @@ __getpagesize = getpagesize SIGFE
 __getreent NOSIGFE
 __gnu_basename NOSIGFE
 __infinity NOSIGFE
-__isinfd NOSIGFE
-__isinff NOSIGFE
-__isnand NOSIGFE
-__isnanf NOSIGFE
+__isinfd = isinf NOSIGFE
+__isinff = isinff NOSIGFE
+__isnand = isnan NOSIGFE
+__isnanf = isnanf NOSIGFE
 __locale_mb_cur_max NOSIGFE
 __main NOSIGFE
 __mempcpy = mempcpy NOSIGFE
@@ -169,6 +169,8 @@ acos NOSIGFE
 acosf NOSIGFE
 acosh NOSIGFE
 acoshf NOSIGFE
+acoshl NOSIGFE
+acosl NOSIGFE
 alarm SIGFE
 aligned_alloc SIGFE
 alphasort NOSIGFE
@@ -195,14 +197,19 @@ asin NOSIGFE
 asinf NOSIGFE
 asinh NOSIGFE
 asinhf NOSIGFE
+asinhl NOSIGFE
+asinl NOSIGFE
 asnprintf SIGFE
 asprintf SIGFE
 atan NOSIGFE
 atan2 NOSIGFE
 atan2f NOSIGFE
+atan2l NOSIGFE
 atanf NOSIGFE
 atanh NOSIGFE
 atanhf NOSIGFE
+atanhl NOSIGFE
+atanl NOSIGFE
 atexit = cygwin_atexit SIGFE
 atof SIGFE
 atoff SIGFE
@@ -226,28 +233,40 @@ cacos NOSIGFE
 cacosf NOSIGFE
 cacosh NOSIGFE
 cacoshf NOSIGFE
+cacoshl NOSIGFE
+cacosl NOSIGFE
 calloc SIGFE
 canonicalize_file_name SIGFE
 carg NOSIGFE
 cargf NOSIGFE
+cargl NOSIGFE
 casin NOSIGFE
 casinf NOSIGFE
 casinh NOSIGFE
 casinhf NOSIGFE
+casinhl NOSIGFE
+casinl NOSIGFE
 catan NOSIGFE
 catanf NOSIGFE
 catanh NOSIGFE
 catanhf NOSIGFE
+catanhl NOSIGFE
+catanl NOSIGFE
 cbrt NOSIGFE
 cbrtf NOSIGFE
+cbrtl NOSIGFE
 ccos NOSIGFE
 ccosf NOSIGFE
 ccosh NOSIGFE
 ccoshf NOSIGFE
+ccoshl NOSIGFE
+ccosl NOSIGFE
 ceil NOSIGFE
 ceilf NOSIGFE
+ceill NOSIGFE
 cexp NOSIGFE
 cexpf NOSIGFE
+cexpl NOSIGFE
 cfgetispeed NOSIGFE
 cfgetospeed NOSIGFE
 cfmakeraw NOSIGFE
@@ -274,24 +293,32 @@ clock_settime SIGFE
 clog NOSIGFE
 clog10 NOSIGFE
 clog10f NOSIGFE
+clog10l NOSIGFE
 clogf NOSIGFE
+clogl NOSIGFE
 close SIGFE
 closedir SIGFE
 closelog SIGFE
 confstr NOSIGFE
 conj NOSIGFE
 conjf NOSIGFE
+conjl NOSIGFE
 connect = cygwin_connect SIGFE
 copysign NOSIGFE
 copysignf NOSIGFE
+copysignl NOSIGFE
 cos NOSIGFE
 cosf NOSIGFE
 cosh NOSIGFE
 coshf NOSIGFE
+coshl NOSIGFE
+cosl NOSIGFE
 cpow NOSIGFE
 cpowf NOSIGFE
+cpowl NOSIGFE
 cproj NOSIGFE
 cprojf NOSIGFE
+cprojl NOSIGFE
 creal NOSIGFE
 crealf NOSIGFE
 creall NOSIGFE
@@ -300,12 +327,17 @@ csin NOSIGFE
 csinf NOSIGFE
 csinh NOSIGFE
 csinhf NOSIGFE
+csinhl NOSIGFE
+csinl NOSIGFE
 csqrt NOSIGFE
 csqrtf NOSIGFE
+csqrtl NOSIGFE
 ctan NOSIGFE
 ctanf NOSIGFE
 ctanh NOSIGFE
 ctanhf NOSIGFE
+ctanhl NOSIGFE
+ctanl NOSIGFE
 ctermid SIGFE
 ctime SIGFE
 ctime_r SIGFE
@@ -342,8 +374,9 @@ dn_expand = __dn_expand SIGFE
 dn_skipname = __dn_skipname SIGFE
 dprintf SIGFE
 drand48 NOSIGFE
-drem NOSIGFE
-dremf NOSIGFE
+drem = remainder NOSIGFE
+dremf= remainderf NOSIGFE
+dreml= remainderl NOSIGFE
 dup SIGFE
 dup2 SIGFE
 dup3 SIGFE
@@ -370,7 +403,9 @@ erand48 NOSIGFE
 erf NOSIGFE
 erfc NOSIGFE
 erfcf NOSIGFE
+erfcl NOSIGFE
 erff NOSIGFE
+erfl NOSIGFE
 err SIGFE
 error SIGFE
 error_at_line SIGFE
@@ -387,13 +422,18 @@ exit = cygwin_exit SIGFE
 exp NOSIGFE
 exp10 NOSIGFE
 exp10f NOSIGFE
+exp10l NOSIGFE
 exp2 NOSIGFE
 exp2f NOSIGFE
+exp2l NOSIGFE
 expf NOSIGFE
+expl NOSIGFE
 expm1 NOSIGFE
 expm1f NOSIGFE
+expm1l NOSIGFE
 fabs NOSIGFE
 fabsf NOSIGFE
+fabsl NOSIGFE
 faccessat SIGFE
 facl SIGFE
 fchdir SIGFE
@@ -410,6 +450,7 @@ fcvtf SIGFE
 fdatasync SIGFE
 fdim NOSIGFE
 fdimf NOSIGFE
+fdiml NOSIGFE
 fdopen SIGFE
 fdopendir SIGFE
 feclearexcept NOSIGFE
@@ -459,15 +500,20 @@ flock SIGFE
 flockfile SIGFE
 floor NOSIGFE
 floorf NOSIGFE
+floorl NOSIGFE
 fma NOSIGFE
 fmaf NOSIGFE
+fmal NOSIGFE
 fmax NOSIGFE
 fmaxf NOSIGFE
+fmaxl NOSIGFE
 fmemopen SIGFE
 fmin NOSIGFE
 fminf NOSIGFE
+fminl NOSIGFE
 fmod NOSIGFE
 fmodf NOSIGFE
+fmodl NOSIGFE
 fnmatch NOSIGFE
 fopen SIGFE
 fopencookie SIGFE
@@ -493,6 +539,7 @@ fremovexattr SIGFE
 freopen SIGFE
 frexp NOSIGFE
 frexpf NOSIGFE
+frexpl NOSIGFE
 fscanf SIGFE
 fseek SIGFE
 fseeko SIGFE
@@ -650,6 +697,7 @@ if_nameindex SIGFE
 if_nametoindex SIGFE
 ilogb NOSIGFE
 ilogbf NOSIGFE
+ilogbl NOSIGFE
 imaxabs = llabs NOSIGFE
 imaxdiv = lldiv NOSIGFE
 index NOSIGFE
@@ -680,9 +728,11 @@ isdigit NOSIGFE
 isgraph NOSIGFE
 isinf NOSIGFE
 isinff NOSIGFE
+isinfl NOSIGFE
 islower NOSIGFE
 isnan NOSIGFE
 isnanf NOSIGFE
+isnanl NOSIGFE
 isprint NOSIGFE
 ispunct NOSIGFE
 issetugid NOSIGFE
@@ -717,12 +767,15 @@ lchown SIGFE
 lcong48 NOSIGFE
 ldexp NOSIGFE
 ldexpf NOSIGFE
+ldexpl NOSIGFE
 ldiv NOSIGFE
 lfind NOSIGFE
 lgamma NOSIGFE
 lgamma_r NOSIGFE
 lgammaf NOSIGFE
 lgammaf_r NOSIGFE
+lgammal NOSIGFE
+lgammal_r NOSIGFE
 lgetxattr SIGFE
 link SIGFE
 linkat SIGFE
@@ -731,8 +784,12 @@ listxattr SIGFE
 llabs NOSIGFE
 lldiv NOSIGFE
 llistxattr SIGFE
+llrint NOSIGFE
+llrintf NOSIGFE
+llrintl NOSIGFE
 llround NOSIGFE
 llroundf NOSIGFE
+llroundl NOSIGFE
 localeconv NOSIGFE
 localtime SIGFE
 localtime_r SIGFE
@@ -740,13 +797,18 @@ lockf SIGFE
 log NOSIGFE
 log10 NOSIGFE
 log10f NOSIGFE
+log10l NOSIGFE
 log1p NOSIGFE
 log1pf NOSIGFE
+log1pl NOSIGFE
 log2 NOSIGFE
 log2f NOSIGFE
+log2l NOSIGFE
 logb NOSIGFE
 logbf NOSIGFE
+logbl NOSIGFE
 logf NOSIGFE
+logl NOSIGFE
 login SIGFE
 login_tty SIGFE
 logout SIGFE
@@ -754,8 +816,12 @@ logwtmp SIGFE
 longjmp NOSIGFE
 lrand48 NOSIGFE
 lremovexattr SIGFE
+lrint NOSIGFE
+lrintf NOSIGFE
+lrintl NOSIGFE
 lround NOSIGFE
 lroundf NOSIGFE
+lroundl NOSIGFE
 lsearch NOSIGFE
 lseek SIGFE
 lsetxattr SIGFE
@@ -805,6 +871,7 @@ mlock SIGFE
 mmap SIGFE
 modf NOSIGFE
 modff NOSIGFE
+modfl NOSIGFE
 mount SIGFE
 mprotect SIGFE
 mq_close SIGFE
@@ -830,8 +897,13 @@ nanf NOSIGFE
 nanosleep SIGFE
 nearbyint NOSIGFE
 nearbyintf NOSIGFE
+nearbyintl NOSIGFE
 nextafter NOSIGFE
 nextafterf NOSIGFE
+nextafterl NOSIGFE
+nexttoward NOSIGFE
+nexttowardf NOSIGFE
+nexttowardl NOSIGFE
 nftw SIGFE
 nice SIGFE
 nl_langinfo SIGFE
@@ -883,7 +955,9 @@ posix_spawn_file_actions_addopen SIGFE
 pow NOSIGFE
 pow10 NOSIGFE
 pow10f NOSIGFE
+pow10l NOSIGFE
 powf NOSIGFE
+powl NOSIGFE
 ppoll SIGFE
 pread SIGFE
 printf SIGFE
@@ -1037,11 +1111,13 @@ regexec SIGFE
 regfree SIGFE
 remainder NOSIGFE
 remainderf NOSIGFE
+remainderl NOSIGFE
 remove SIGFE
 removexattr SIGFE
 remque NOSIGFE
 remquo NOSIGFE
 remquof NOSIGFE
+remquol NOSIGFE
 rename SIGFE
 renameat SIGFE
 res_close = __res_close SIGFE
@@ -1063,9 +1139,13 @@ rewind SIGFE
 rewinddir SIGFE
 rexec = cygwin_rexec SIGFE
 rindex NOSIGFE
+rint NOSIGFE
+rintf NOSIGFE
+rintl NOSIGFE
 rmdir SIGFE
 round NOSIGFE
 roundf NOSIGFE
+roundl NOSIGFE
 rpmatch SIGFE
 rresvport = cygwin_rresvport SIGFE
 rresvport_af = cygwin_rresvport_af SIGFE
@@ -1073,10 +1153,13 @@ ruserok SIGFE
 sbrk SIGFE
 scalb NOSIGFE
 scalbf NOSIGFE
+scalbl NOSIGFE
 scalbln NOSIGFE
 scalblnf NOSIGFE
+scalblnl NOSIGFE
 scalbn NOSIGFE
 scalbnf NOSIGFE
+scalbnl NOSIGFE
 scandir SIGFE
 scandirat SIGFE
 scanf SIGFE
@@ -1180,9 +1263,12 @@ sigwaitinfo SIGFE
 sin NOSIGFE
 sincos NOSIGFE
 sincosf NOSIGFE
+sincosl NOSIGFE
 sinf NOSIGFE
 sinh NOSIGFE
 sinhf NOSIGFE
+sinhl NOSIGFE
+sinl NOSIGFE
 siprintf SIGFE
 sleep SIGFE
 snprintf SIGFE
@@ -1271,6 +1357,8 @@ tan NOSIGFE
 tanf NOSIGFE
 tanh NOSIGFE
 tanhf NOSIGFE
+tanhl NOSIGFE
+tanl NOSIGFE
 tcdrain SIGFE
 tcflow SIGFE
 tcflush SIGFE
@@ -1287,6 +1375,7 @@ tempnam SIGFE
 tfind NOSIGFE
 tgamma NOSIGFE
 tgammaf NOSIGFE
+tgammal NOSIGFE
 time SIGFE
 timegm NOSIGFE
 timelocal SIGFE
@@ -1307,6 +1396,7 @@ towupper NOSIGFE
 trunc NOSIGFE
 truncate SIGFE
 truncf NOSIGFE
+truncl NOSIGFE
 tsearch SIGFE
 ttyname SIGFE
 ttyname_r SIGFE

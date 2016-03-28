@@ -108,12 +108,10 @@ long double cimagl(long double complex);
 /* 7.3.9.3 The conj functions */
 double complex conj(double complex);
 float complex conjf(float complex);
-/*long double complex conjl(long double complex); */
 
 /* 7.3.9.4 The cproj functions */
 double complex cproj(double complex);
 float complex cprojf(float complex);
-/*long double complex cprojl(long double complex); */
 
 /* 7.3.9.5 The creal functions */
 double creal(double complex);
@@ -124,6 +122,31 @@ long double creall(long double complex);
 double complex clog10(double complex);
 float complex clog10f(float complex);
 #endif
+
+#if defined(__CYGWIN__)
+long double complex cacosl(long double complex);
+long double complex casinl(long double complex);
+long double complex catanl(long double complex);
+long double complex ccosl(long double complex);
+long double complex csinl(long double complex);
+long double complex ctanl(long double complex);
+long double complex cacoshl(long double complex);
+long double complex casinhl(long double complex);
+long double complex catanhl(long double complex);
+long double complex ccoshl(long double complex);
+long double complex csinhl(long double complex);
+long double complex ctanhl(long double complex);
+long double complex cexpl(long double complex);
+long double complex clogl(long double complex);
+long double complex cpowl(long double complex, long double complex);
+long double complex csqrtl(long double complex);
+long double cargl(long double complex);
+long double complex conjl(long double complex);
+long double complex cprojl(long double complex);
+#if __GNU_VISIBLE
+long double complex clog10l(long double complex);
+#endif
+#endif /* __CYGWIN__ */
 
 __END_DECLS
 
