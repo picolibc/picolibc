@@ -30,6 +30,8 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     acosf
     acosh
     acoshf
+    acoshl
+    acosl
     alarm
     alphasort
     asctime
@@ -38,12 +40,17 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     asinf
     asinh
     asinhf
+    asinhl
+    asinl
     atan
     atan2
     atan2f
+    atan2l
     atanf
     atanh
     atanhf
+    atanhl
+    atanl
     atexit
     atof
     atoff
@@ -61,31 +68,42 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     cacosf
     cacosh
     cacoshf
+    cacoshl
+    cacosl
     calloc
     carg
     cargf
+    cargl
     casin
     casinf
     casinh
     casinhf
     casinhl
+    casinl
     catan
     catanf
     catanh
     catanhf
+    catanhl
+    catanl
     catclose 			(available in external "catgets" library)
     catgets  			(available in external "catgets" library)
     catopen  			(available in external "catgets" library)
     cbrt
     cbrtf
+    cbrtl
     ccos
     ccosf
     ccosh
     ccoshf
+    ccoshl
+    ccosl
     ceil
     ceilf
+    ceill
     cexp
     cexpf
+    cexpl
     cfgetispeed
     cfgetospeed
     cfsetispeed
@@ -105,23 +123,30 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     clock_settime		(see chapter "Implementation Notes")
     clog
     clogf
+    clogl
     close
     closedir
     closelog
     confstr
     conj
     conjf
+    conjl
     connect
     copysign
     copysignf
+    copysignl
     cos
     cosf
     cosh
     coshf
+    coshl
+    cosl
     cpow
     cpowf
+    cpowl
     cproj
     cprojf
+    cprojl
     creal
     crealf
     creall
@@ -131,12 +156,17 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     csinf
     csinh
     csinhf
+    csinhl
+    csinl
     csqrt
     csqrtf
+    csqrtl
     ctan
     ctanf
     ctanh
     ctanhf
+    ctanhl
+    ctanl
     ctermid
     ctime
     ctime_r
@@ -174,7 +204,9 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     erf
     erfc
     erfcf
+    erfcl
     erff
+    erfl
     errno
     execl
     execle
@@ -186,11 +218,15 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     exp
     exp2
     exp2f
+    exp2l
     expf
+    expl
     expm1
     expm1f
+    expm1l
     fabs
     fabsf
+    fabsl
     faccessat
     fchdir
     fchmod
@@ -202,6 +238,7 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     fdatasync
     fdim
     fdimf
+    fdiml
     fdopen
     fdopendir
     feclearexcept
@@ -229,15 +266,20 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     flockfile
     floor
     floorf
+    floorl
     fma
     fmaf
+    fmal
     fmax
     fmaxf
+    fmaxl
     fmemopen
     fmin
     fminf
+    fminl
     fmod
     fmodf
+    fmodl
     fnmatch
     fopen
     fork
@@ -254,6 +296,7 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     freopen
     frexp
     frexpf
+    frexpl
     fscanf
     fseek
     fseeko
@@ -354,6 +397,7 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     if_nametoindex
     ilogb
     ilogbf
+    ilogbl
     imaxabs
     imaxdiv
     inet_addr
@@ -412,10 +456,12 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     lcong48
     ldexp
     ldexpf
+    ldexpl
     ldiv
     lfind
     lgamma
     lgammaf
+    lgammal
     link
     linkat
     listen
@@ -426,6 +472,7 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     llrintl
     llround
     llroundf
+    llroundl
     localeconv
     localtime
     localtime_r
@@ -433,13 +480,18 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     log
     log10
     log10f
+    log10l
     log1p
     log1pf
+    log1pl
     log2
     log2f
+    log2l
     logb
     logbf
+    logbl
     logf
+    logl
     longjmp
     lrand48
     lrint
@@ -447,6 +499,7 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     lrintl
     lround
     lroundf
+    lroundl
     lsearch
     lseek
     lstat
@@ -478,6 +531,7 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     mmap
     modf
     modff
+    modfl
     mprotect
     mq_close
     mq_getattr
@@ -499,11 +553,17 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     munmap
     nan
     nanf
+    nanl
     nanosleep
     nearbyint
     nearbyintf
+    nearbyintl
     nextafter
     nextafterf
+    nextafterl
+    nexttoward
+    nexttowardf
+    nexttowardl
     nftw
     nice
     nl_langinfo
@@ -533,14 +593,19 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     posix_memalign
     posix_openpt
     posix_spawn
+    posix_spawn_file_actions_addclose
+    posix_spawn_file_actions_adddup2
+    posix_spawn_file_actions_addopen
+    posix_spawn_file_actions_destroy
+    posix_spawn_file_actions_init
     posix_spawnattr_destroy
-    posix_spawnattr_init
     posix_spawnattr_getflags
     posix_spawnattr_getpgroup
     posix_spawnattr_getschedparam
     posix_spawnattr_getschedpolicy
     posix_spawnattr_getsigdefault
     posix_spawnattr_getsigmask
+    posix_spawnattr_init
     posix_spawnattr_setflags
     posix_spawnattr_setpgroup
     posix_spawnattr_setschedparam
@@ -548,13 +613,9 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     posix_spawnattr_setsigdefault
     posix_spawnattr_setsigmask
     posix_spawnp
-    posix_spawn_file_actions_destroy
-    posix_spawn_file_actions_init
-    posix_spawn_file_actions_addclose
-    posix_spawn_file_actions_adddup2
-    posix_spawn_file_actions_addopen
     pow
     powf
+    powl
     pread
     printf
     pselect
@@ -579,13 +640,13 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     pthread_attr_setscope
     pthread_attr_setstack
     pthread_attr_setstacksize
+    pthread_barrier_destroy
+    pthread_barrier_init
+    pthread_barrier_wait
+    pthread_barrierattr_destroy
+    pthread_barrierattr_getpshared
     pthread_barrierattr_init
     pthread_barrierattr_setpshared
-    pthread_barrierattr_getpshared
-    pthread_barrierattr_destroy
-    pthread_barrier_init
-    pthread_barrier_destroy
-    pthread_barrier_wait
     pthread_cancel
     pthread_cond_broadcast
     pthread_cond_destroy
@@ -687,10 +748,12 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     regfree
     remainder
     remainderf
+    reminderl
     remove
     remque
     remquo
     remquof
+    remquol
     rename
     renameat
     rewind
@@ -701,10 +764,13 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     rmdir
     round
     roundf
+    roundl
     scalbln
     scalblnf
+    scalblnl
     scalbn
     scalbnf
+    scalbnl
     scandir
     scanf
     sched_get_priority_max
@@ -796,6 +862,8 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     sinf
     sinh
     sinhf
+    sinhl
+    sinl
     sleep
     snprintf
     sockatmark
@@ -847,6 +915,7 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     strtok
     strtok_r
     strtol
+    strtold
     strtoll
     strtoul
     strtoull
@@ -865,11 +934,14 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     tanf
     tanh
     tanhf
+    tanhl
+    tanl
     tcdrain
     tcflow
     tcflush
     tcgetattr
     tcgetpgrp
+    tcgetsid
     tcsendbreak
     tcsetattr
     tcsetpgrp
@@ -879,6 +951,7 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     tfind
     tgamma
     tgammaf
+    tgammal
     time
     timer_create		(see chapter "Implementation Notes")
     timer_delete
@@ -897,6 +970,7 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     trunc
     truncate
     truncf
+    truncl
     tsearch
     ttyname
     ttyname_r
@@ -1153,6 +1227,7 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     canonicalize_file_name
     clog10
     clog10f
+    clog10l
     dremf
     dup3
     envz_add
@@ -1167,6 +1242,7 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     execvpe
     exp10
     exp10f
+    exp10l
     fcloseall
     fcloseall_r
     fegetprec
@@ -1212,6 +1288,7 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     pipe2
     pow10
     pow10f
+    pow10l
     ppoll
     pthread_getattr_np
     pthread_sigqueue
@@ -1224,6 +1301,9 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     removexattr
     scandirat
     setxattr
+    sincos
+    sincosf
+    sincosl
     strchrnul
     sysinfo
     tdestroy
@@ -1388,8 +1468,6 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
 <sect1 id="std-notimpl"><title>NOT implemented system interfaces from the Single Unix Specification, Volume 4:</title>
 
 <screen>
-    acoshl
-    acosl
     aio_cancel
     aio_error
     aio_fsync
@@ -1397,52 +1475,11 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     aio_return
     aio_suspend
     aio_write
-    asinhl
-    asinl
-    atan2l
-    atanhl
-    atanl
-    cacoshl
-    cacosl
-    cargl
-    casinl
-    catanhl
-    catanl
-    cbrtl
-    ccoshl
-    ccosl
-    ceill
-    cexpl
-    clogl
-    conjl
-    copysignl
-    coshl
-    cosl
-    cpowl
-    cprojl
-    csinhl
-    csinl
-    csqrtl
-    ctanhl
-    ctanl
     duplocale
     endnetent
-    erfcl
-    erfl
-    exp2l
-    expl
-    expm1l
-    fabsl
     fattach
-    fdiml
-    floorl
-    fmal
-    fmaxl
-    fminl
-    fmodl
     fmtmsg
     freelocale
-    frexpl
     getdate
     getdate_err
     gethostent
@@ -1451,7 +1488,6 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     getnetbyname
     getnetent
     getpmsg
-    ilogbl
     isalnum_l
     isalpha_l
     isastream
@@ -1477,30 +1513,13 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     iswupper_l
     iswxdigit_l
     isxdigit_l
-    ldexpl
-    lgammal
     lio_listio
-    llroundl
-    log10l
-    log1pl
-    log2l
-    logbl
-    logl
-    lroundl
     mlockall
-    modfl
     munlockall
-    nanl
-    nearbyintl
     newlocale
-    nextafterl
-    nexttoward
-    nexttowardf
-    nexttowardl
     posix_mem_offset
     posix_trace[...]
     posix_typed_[...]
-    powl
     pthread_mutexattr_getrobust
     pthread_mutexattr_setrobust
     pthread_mutex_consistent
@@ -1508,30 +1527,17 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     pthread_rwlock_timedrdlock
     pthread_rwlock_timedwrlock
     putmsg
-    reminderl
-    remquol
-    roundl
-    scalblnl
-    scalbnl
     setnetent
     sigtimedwait
-    sinhl
-    sinl
     strcasecmp_l
     strcoll_l
     strfmon_l
     strncasecmp_l
-    strtold
     strxfrm_l
-    tanhl
-    tanl
-    tcgetsid
-    tgammal
     timer_getoverrun
     tolower_l
     toupper_l
     towctrans_l
-    truncl
     ulimit
     uselocale
     waitid
