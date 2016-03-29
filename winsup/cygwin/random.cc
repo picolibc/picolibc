@@ -413,7 +413,7 @@ initstate(unsigned seed,		/* seed for R.N.G. */
  * complain about mis-alignment, but you should disregard these messages.
  */
 char *
-setstate(const char *arg_state /* pointer to state array */)
+setstate(char *arg_state /* pointer to state array */)
 {
 	uint32_t *new_state = (uint32_t *)arg_state;
 	uint32_t type = new_state[0] % MAX_TYPES;
