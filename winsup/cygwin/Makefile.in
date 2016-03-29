@@ -220,6 +220,7 @@ MATH_OFILES:= \
 	lrintl.o \
 	lroundl.o \
 	modfl.o \
+	nanl.o \
 	nearbyint.o \
 	nearbyintf.o \
 	nearbyintl.o \

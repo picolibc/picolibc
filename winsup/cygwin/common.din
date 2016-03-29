@@ -894,6 +894,7 @@ munlock SIGFE
 munmap SIGFE
 nan NOSIGFE
 nanf NOSIGFE
+nanl NOSIGFE
 nanosleep SIGFE
 nearbyint NOSIGFE
 nearbyintf NOSIGFE
