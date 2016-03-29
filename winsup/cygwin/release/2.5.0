@@ -23,7 +23,18 @@ What's new:
   and secondary device attributes, requesting cursor position report;
   see https://cygwin.com/ml/cygwin-patches/2012-q3/msg00019.html
 
-- New APIs: clog10, clog10f.
+- New APIs: clog10, clog10f, nexttoward, nexttowardf, nexttowardl.
+
+- Add missing long double functions.  New APIs:
+  acoshl, acosl, asinhl, asinl, atan2l, atanhl, atanl, cacoshl, cacosl, cargl,
+  casinhl, casinl, catanhl, catanl, ccoshl, ccosl, ceill, cexpl, clog10l,
+  clogl, conjl, copysignl, coshl, cosl, cpowl, cprojl, csinhl, csinl, csqrtl,
+  ctanhl, ctanl, dreml, erfcl, erfl, exp10l, exp2l, expl, expm1l, fabsl,
+  fdiml, floorl, fmal, fmaxl, fminl, fmodl, frexpl, ilogbl, isinfl, isnanl,
+  ldexpl, lgammal, lgammal_r, llroundl, log10l, log1pl, log2l, logbl, logl,
+  lroundl, modfl, nearbyintl, nextafterl, pow10l, powl, remainderl, remquol,
+  roundl, scalbl, scalblnl, scalbnl, sincosl, sinhl, sinl, tanhl, tanl,
+  tgammal, truncl.
 
 
 What changed:
