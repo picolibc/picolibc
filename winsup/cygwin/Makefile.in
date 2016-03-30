@@ -705,7 +705,7 @@ $(LIBGMON_A): $(GMON_OFILES) $(GMON_START)
 globals.h: mkglobals_h globals.cc
 	$^ > $@
 
-${DLL_OFILES} ${LIBCOS}: globals.h
+${DLL_OFILES} ${LIBCOS}: globals.h $(srcdir)/$(TLSOFFSETS_H)
 
 shared_info_magic.h: cygmagic shared_info.h
 	/bin/sh $(word 1,$^) $@ "${COMPILE.cc} -E -x c++" $(word 2,$^) SHARED_MAGIC 'class shared_info' USER_MAGIC 'class user_info'
@@ -765,7 +765,7 @@ sigfe.s: $(DEF_FILE)
 	{ rm -f $(DEF_FILE); $(MAKE) -s -j1 $(DEF_FILE); }; \
 	[ -s $@ ] && touch $@
 
-sigfe.o: sigfe.s
+sigfe.o: sigfe.s $(srcdir)/$(TLSOFFSETS_H)
 	$(CC) ${CFLAGS} -c -o $@ $<
 
 ctags: CTAGS
