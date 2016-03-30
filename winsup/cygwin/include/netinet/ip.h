@@ -63,7 +63,7 @@ struct ip {
 		     ip_hl:4;		/* header length */
 #endif
 #endif /* not _IP_VHL */
-	u_int_8   ip_tos;		/* type of service */
+	u_int8_t   ip_tos;		/* type of service */
 	u_int16_t ip_len;		/* total length */
 	u_int16_t ip_id;		/* identification */
 	u_int16_t ip_off;		/* fragment offset field */
