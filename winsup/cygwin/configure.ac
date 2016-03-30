@@ -10,9 +10,8 @@ dnl details.
 dnl
 dnl Process this file with autoconf to produce a configure script.
 
-AC_PREREQ(2.59)dnl
-AC_INIT([Cygwin DLL], 0,
-	cygwin@cygwin.com, cygwin, https://cygwin.com)
+AC_PREREQ(2.59)
+AC_INIT([Cygwin DLL],[0],[cygwin@cygwin.com],[cygwin],[https://cygwin.com])
 AC_CONFIG_SRCDIR(Makefile.in)
 AC_CONFIG_HEADER(config.h)
 AC_CONFIG_AUX_DIR(..)
@@ -21,7 +20,7 @@ AC_CONFIG_AUX_DIR(..)
 
 AC_PROG_INSTALL
 AC_NO_EXECUTABLES
-AC_CANONICAL_SYSTEM
+AC_CANONICAL_TARGET
 
 AC_PROG_CC
 AC_PROG_CXX

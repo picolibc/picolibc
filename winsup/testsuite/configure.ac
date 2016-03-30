@@ -10,8 +10,7 @@ dnl
 dnl Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.59)
-AC_INIT([Cygwin Testsuite], 0,
-	cygwin@cygwin.com, cygwin, https://cygwin.com)
+AC_INIT([Cygwin Testsuite],[0],[cygwin@cygwin.com],[cygwin],[https://cygwin.com])
 AC_CONFIG_SRCDIR(Makefile.in)
 
 AC_PROG_CC

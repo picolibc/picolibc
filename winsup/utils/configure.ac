@@ -20,7 +20,7 @@ AC_NO_EXECUTABLES
 
 . ${srcdir}/../configure.cygwin
 
-AC_CANONICAL_SYSTEM
+AC_CANONICAL_TARGET
 
 AC_PROG_CC
 

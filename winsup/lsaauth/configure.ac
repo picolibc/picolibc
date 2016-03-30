@@ -13,14 +13,13 @@ dnl Changed for lsa subdir by Corinna Vinschen <corinna@vinschen.de>
 dnl Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.59)
-AC_INIT([Cygwin Lsaauth], 0,
-	cygwin@cygwin.com, cygwin, https://cygwin.com)
+AC_INIT([Cygwin Lsaauth],[0],[cygwin@cygwin.com],[cygwin],[https://cygwin.com])
 AC_CONFIG_SRCDIR(Makefile.in)
 
 AC_CONFIG_AUX_DIR(../..)
 
 AC_NO_EXECUTABLES
-AC_CANONICAL_SYSTEM
+AC_CANONICAL_TARGET
 
 LIB_AC_PROG_CC
 
