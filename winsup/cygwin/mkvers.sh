@@ -21,34 +21,36 @@ windres="$1"; shift
 iflags=
 # Find header file locations
 while [ -n "$*" ]; do
-    case "$1" in
-	-I*)
-	    iflags="$iflags $1"
-	    ;;
-	-idirafter)
-	    shift
-	    iflags="$iflags -I$1"
-	    ;;
-    esac
+  case "$1" in
+  -I*)
+    iflags="$iflags $1"
+    ;;
+  -idirafter)
     shift
+    iflags="$iflags -I$1"
+      ;;
+  esac
+  shift
 done
 
 [ -r $incfile ] || {
-    echo "**** Couldn't open file '$incfile'.  Aborting."
+  echo "**** Couldn't open file '$incfile'.  Aborting."
 }
 
 function parse_preproc_flags() {
-  # Since we're manually specifying the preprocessor, pass the default flags normally defined.
-  ccflags="--preprocessor=$1 --preprocessor-arg=-E --preprocessor-arg=-xc-header --define=RC_INVOKED "
+  # Since we're manually specifying the preprocessor, pass the default flags
+  # normally defined.
+  ccflags="--preprocessor=$1 --preprocessor-arg=-E \
+	   --preprocessor-arg=-xc-header --define=RC_INVOKED "
   shift
   while [ -n "$*" ]; do
-      case "$1" in
-          # We need to be able to find the just-built cc1 binary.
-          -B*)
-            ccflags="$ccflags --preprocessor-arg=$1"
-            ;;
-      esac
-      shift
+    case "$1" in
+    # We need to be able to find the just-built cc1 binary.
+    -B*)
+      ccflags="$ccflags --preprocessor-arg=$1"
+      ;;
+    esac
+    shift
   done
 }
 
@@ -87,15 +89,15 @@ EOF
 #
 # Split version file into dir and filename components
 #
-dir=`dirname $incfile`
-fn=`basename $incfile`
+dir=$(dirname $incfile)
+fn=$(basename $incfile)
 
 #
 # Look in the include file CVS directory for a CVS Tag file.  This file,
 # if it exists, will contain the name of the sticky tag associated with
 # the current build.  Save that for output later.
 #
-cvs_tag="`sed -e '/dontuse/d' -e 's%^.\(.*\)%\1%' $dir/CVS/Tag 2>/dev/null`"
+cvs_tag="$(sed -e '/dontuse/d' -e 's%^.\(.*\)%\1%' $dir/CVS/Tag 2>/dev/null)"
 
 wv_cvs_tag="$cvs_tag"
 [ -n "$cvs_tag" ] && cvs_tag=" CVS tag"'
@@ -104,14 +106,14 @@ wv_cvs_tag="$cvs_tag"
 #
 # Look in the source directory containing the include/cygwin/version.h
 # and set dir accordingly.
-dir=`echo $dir | sed -e 's%/include/cygwin.*$%%' -e 's%include/cygwin.*$%.%'`
+dir=$(echo $dir | sed -e 's%/include/cygwin.*$%%' -e 's%include/cygwin.*$%.%')
 
 # Look in $dir for a a ".snapshot-date" file.  If one is found then this
 # information will be saved for output to the DLL.
 #
 if [ -r "$dir/.snapshot-date" ]; then
-    read snapshotdate < "$dir/.snapshot-date"
-    snapshot="snapshot date
+  read snapshotdate < "$dir/.snapshot-date"
+  snapshot="snapshot date
 $snapshotdate"
 fi
 
@@ -124,11 +126,13 @@ fi
 # These strings are strictly for use by a user to scan the DLL for
 # interesting information.
 #
-(sed -n -e 's%#define CYGWIN_INFO_\([A-Z_]*\)[ 	][ 	]*\([a-zA-Z0-9"][^/]*\).*%_\1\
+(
+  sed -n -e 's%#define CYGWIN_INFO_\([A-Z_]*\)[ 	][ 	]*\([a-zA-Z0-9"][^/]*\).*%_\1\
 \2%p' -e 's%#define CYGWIN_VERSION_\([A-Z_]*\)[ 	][ 	]*\([a-zA-Z0-9"][^/]*\).*%_\1\
 \2%p' $incfile | sed -e 's/["\\]//g'  -e '/^_/y/ABCDEFGHIJKLMNOPQRSTUVWXYZ_/abcdefghijklmnopqrstuvwxyz /';
-echo ' build date'; echo $build_date; [ -n "$cvs_tag" ] && echo "$cvs_tag";\
-[ -n "$snapshot" ] && echo "$snapshot"
+  echo ' build date'; echo $build_date;
+  [ -n "$cvs_tag" ] && echo "$cvs_tag";
+  [ -n "$snapshot" ] && echo "$snapshot"
 ) | while read var; do
     read val
 cat <<EOF
@@ -139,7 +143,7 @@ done | tee /tmp/mkvers.$$ 1>&9
 trap "rm -f /tmp/mkvers.$$" 0 1 2 15
 
 if [ -n "$snapshotdate" ]; then
-  usedate="`echo $snapshotdate | sed 's/-\\(..:..[^-]*\\).*$/ \1SNP/'`"
+  usedate="$(echo $snapshotdate | sed 's/-\\(..:..[^-]*\\).*$/ \1SNP/')"
 else
   usedate="$builddate"
 fi
@@ -174,15 +178,21 @@ EOF
 # Generate winver.o using cygwin/version.h information.
 # Turn the cygwin major number from some large number to something like 1.1.0.
 #
-eval `sed -n 's/^.*dll \(m[ai][jn]or\): \([0-9]*\)[^0-9]*$/\1=\2/p' /tmp/mkvers.$$`
-cygverhigh=`expr $major / 1000`
-cygverlow=`expr $major % 1000`
+eval $(sed -n 's/^.*dll \(m[ai][jn]or\): \([0-9]*\)[^0-9]*$/\1=\2/p' /tmp/mkvers.$$)
+cygverhigh=$(expr $major / 1000)
+cygverlow=$(expr $major % 1000)
 cygwin_ver="$cygverhigh.$cygverlow.$minor"
-if [ -n "$cvs_tag" ]; then
-    cvs_tag="`echo $wv_cvs_tag | sed -e 's/-branch.*//'`"
-    cygwin_ver="$cygwin_ver-$cvs_tag"
+if [ -n "$cvs_tag" ]
+then
+  cvs_tag="$(echo $wv_cvs_tag | sed -e 's/-branch.*//')"
+  cygwin_ver="$cygwin_ver-$cvs_tag"
 fi
 
 echo "Version $cygwin_ver"
 set -$- $builddate
-$windres $iflags $ccflags --define CYGWIN_BUILD_DATE="$1" --define CYGWIN_BUILD_TIME="$2" --define CYGWIN_BUILD_YEAR=$y --define CYGWIN_VERSION='"'"$cygwin_ver"'"' $rcfile winver.o
+$windres $iflags $ccflags \
+	 --define CYGWIN_BUILD_DATE="$1" \
+	 --define CYGWIN_BUILD_TIME="$2" \
+	 --define CYGWIN_BUILD_YEAR=$y \
+	 --define CYGWIN_VERSION='"'"$cygwin_ver"'"' \
+	 $rcfile winver.o
