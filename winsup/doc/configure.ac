@@ -19,8 +19,9 @@ AC_CHECK_PROGS([DOCBOOK2XTEXI], [docbook2x-texi db2x_docbook2texi], [true])
 AC_NO_EXECUTABLES
 AC_CANONICAL_TARGET
 
-LIB_AC_PROG_CC
+AC_PROG_CC
 
 AC_SUBST(build_exeext)
 
-AC_OUTPUT(Makefile)
+AC_CONFIG_FILES([Makefile])
+AC_OUTPUT
