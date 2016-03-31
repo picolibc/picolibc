@@ -902,11 +902,6 @@ dll_crt0_1 (void *)
      Need to do this before any helper threads start. */
   debug_init ();
 
-#ifdef NEWVFORK
-  cygheap->fdtab.vfork_child_fixup ();
-  main_vfork = vfork_storage.create ();
-#endif
-
   cygbench ("pre-forkee");
   if (in_forkee)
     {
@@ -1196,15 +1191,6 @@ void __reg1
 do_exit (int status)
 {
   syscall_printf ("do_exit (%d), exit_state %d", status, exit_state);
-
-#ifdef NEWVFORK
-  vfork_save *vf = vfork_storage.val ();
-  if (vf != NULL && vf->pid < 0)
-    {
-      exit_state = ES_NOT_EXITING;
-      vf->restore_exit (status);
-    }
-#endif
 
   lock_process until_exit (true);
 

@@ -18,9 +18,7 @@ details. */
 #include "perprocess.h"
 #include "miscfuncs.h"
 #include "cygmalloc.h"
-#ifndef MALLOC_DEBUG
 #include <malloc.h>
-#endif
 extern "C" struct mallinfo dlmallinfo ();
 
 /* we provide these stubs to call into a user's
@@ -281,7 +279,6 @@ malloc_init ()
 {
   mallock.init ("mallock");
 
-#ifndef MALLOC_DEBUG
   /* Check if malloc is provided by application. If so, redirect all
      calls to malloc/free/realloc to application provided. This may
      happen if some other dll calls cygwin's malloc, but main code provides
@@ -296,7 +293,6 @@ malloc_init ()
       malloc_printf ("using %s malloc", use_internal ? "internal" : "external");
       internal_malloc_determined = true;
     }
-#endif
 }
 
 extern "C" void

@@ -882,14 +882,6 @@ spawnve (int mode, const char *path, const char *const *argv,
   static char *const empty_env[] = { NULL };
 
   int ret;
-#ifdef NEWVFORK
-  vfork_save *vf = vfork_storage.val ();
-
-  if (vf != NULL && (vf->pid < 0) && mode == _P_OVERLAY)
-    mode = _P_NOWAIT;
-  else
-    vf = NULL;
-#endif
 
   syscall_printf ("spawnve (%s, %s, %p)", path, argv[0], envp);
 
@@ -910,16 +902,6 @@ spawnve (int mode, const char *path, const char *const *argv,
     case _P_DETACH:
     case _P_SYSTEM:
       ret = ch_spawn.worker (path, argv, envp, mode);
-#ifdef NEWVFORK
-      if (vf)
-	{
-	  if (ret > 0)
-	    {
-	      debug_printf ("longjmping due to vfork");
-	      vf->restore_pid (ret);
-	    }
-	}
-#endif
       break;
     default:
       set_errno (EINVAL);

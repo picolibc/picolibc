@@ -1129,21 +1129,6 @@ getppid ()
 extern "C" pid_t
 setsid (void)
 {
-#ifdef NEWVFORK
-  vfork_save *vf = vfork_storage.val ();
-  /* This is a horrible, horrible kludge */
-  if (vf && vf->pid < 0)
-    {
-      pid_t pid = fork ();
-      if (pid > 0)
-	{
-	  syscall_printf ("longjmping due to vfork");
-	  vf->restore_pid (pid);
-	}
-      /* assuming that fork was successful */
-    }
-#endif
-
   if (myself->pgid == myself->pid)
     syscall_printf ("hmm.  pgid %d pid %d", myself->pgid, myself->pid);
   else

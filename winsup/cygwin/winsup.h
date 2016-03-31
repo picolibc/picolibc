@@ -88,9 +88,7 @@ extern const unsigned char case_folded_lower[];
 extern const unsigned char case_folded_upper[];
 #define cyg_toupper(c) ((char) case_folded_upper[(unsigned char)(c)])
 
-#ifndef MALLOC_DEBUG
 #define cfree newlib_cfree_dont_use
-#endif
 
 /* Used as type by sys_wcstombs_alloc and sys_mbstowcs_alloc.  For a
    description see there. */

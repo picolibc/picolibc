@@ -7,16 +7,7 @@ This software is a copyrighted work licensed under the terms of the
 Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
-#ifndef MALLOC_DEBUG
 #define MALLOC_CHECK do {} while (0)
-#else
-#include <stdlib.h>
-#include <malloc.h>
-#define MALLOC_CHECK ({\
-  debug_printf ("checking malloc pool");\
-  mallinfo ();\
-})
-#endif
 
 #if !defined(_DEBUG_H_)
 #define _DEBUG_H_

@@ -88,9 +88,6 @@ int NO_COPY __isthreaded = 0;
 int __argc_safe;
 int __argc;
 char **__argv;
-#ifdef NEWVFORK
-vfork_save NO_COPY *main_vfork;
-#endif
 
 _cygtls NO_COPY *_main_tls /* !globals.h */;
 
