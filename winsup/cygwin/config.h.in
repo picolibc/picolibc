@@ -1,12 +1,12 @@
 /* config.h.in.  Generated from configure.ac by autoheader.  */
-/* Define if DEBUGGING support is requested.  */
-#undef DEBUGGING
-
 /* Define if MALLOC_DEBUGGING support is requested.  */
 #undef MALLOC_DEBUG
 
 /* Define if using new vfork functionality. */
 #undef NEWVFORK
+
+/* Define if DEBUGGING support is requested. */
+#undef DEBUGGING
 
 /* Define to the address where bug reports for this package should be sent. */
 #undef PACKAGE_BUGREPORT

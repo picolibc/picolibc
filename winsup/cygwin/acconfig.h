@@ -1,6 +1,3 @@
-/* Define if DEBUGGING support is requested.  */
-#undef DEBUGGING
-
 /* Define if MALLOC_DEBUGGING support is requested.  */
 #undef MALLOC_DEBUG
 

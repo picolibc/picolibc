@@ -4427,7 +4427,8 @@ fi
 # Check whether --enable-debugging was given.
 if test "${enable_debugging+set}" = set; then :
   enableval=$enable_debugging; case "${enableval}" in
-yes)	 $as_echo "#define DEBUGGING 1" >>confdefs.h
+yes)
+$as_echo "#define DEBUGGING 1" >>confdefs.h
  ;;
 no)	 ;;
 esac
