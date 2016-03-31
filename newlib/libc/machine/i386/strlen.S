@@ -18,9 +18,13 @@ SYM (strlen):
 	pushl ebp
 	movl esp,ebp
 	pushl edi
+#ifdef __iamcu__
+	movl eax,edx
+#else
 	movl 8(ebp),edx
+#endif
 
-#ifdef __OPTIMIZE_SIZE__
+#if defined __OPTIMIZE_SIZE__ || defined __iamcu__
 	cld
 	movl edx,edi
 	movl $4294967295,ecx

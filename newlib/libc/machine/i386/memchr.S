@@ -14,13 +14,33 @@
        SOTYPE_FUNCTION(memchr)
 
 SYM (memchr):
+#ifdef __iamcu__
+	pushl	edi
+	movl	eax,edi
+	movl	edx,eax
+	xorl	edx,edx
+	testl	ecx,ecx
+	jz	L20
+
+	repnz
+	scasb
+
+	setnz	dl
+	decl	edi
+
+	decl	edx
+	andl	edi,edx
+L20:
+	movl	edx,eax
+
+	popl	edi
+#else
 	pushl	ebp
 	movl	esp,ebp
 	pushl	edi
 	movzbl	12(ebp),eax
 	movl	16(ebp),ecx
 	movl	8(ebp),edi
-
 	xorl	edx,edx
 	testl	ecx,ecx
 	jz	L20
@@ -111,4 +131,5 @@ L20:
 	leal	-4(ebp),esp
 	popl	edi
 	leave
+#endif
 	ret

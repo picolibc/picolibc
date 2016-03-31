@@ -15,6 +15,32 @@
 
 SYM (memmove):
 
+#ifdef __iamcu__
+	pushl esi
+	pushl edi
+	movl eax,edi
+	movl edx,esi
+	cmp esi,edi
+	ja .Lcopy_backward
+	je .Lbwd_write_0bytes
+
+	rep movsb
+
+	popl edi
+	popl esi
+	ret
+
+.Lcopy_backward:
+	lea -1(edi,ecx),edi
+	lea -1(esi,ecx),esi
+	std
+	rep movsb
+	cld
+
+.Lbwd_write_0bytes:
+	popl edi
+	popl esi
+#else
 	pushl ebp
 	movl esp,ebp
 	pushl esi
@@ -143,4 +169,5 @@ SYM (memmove):
 	popl edi
 	popl esi
 	leave
+#endif
 	ret

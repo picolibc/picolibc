@@ -15,6 +15,33 @@
 
 SYM (memcmp):
 
+#ifdef __iamcu__
+	pushl edi
+	pushl esi
+	movl eax,edi
+	movl edx,esi
+	cld
+
+/* check if length is zero in which case just return 0 */
+
+	xorl eax,eax
+	testl ecx,ecx
+	jz L4
+
+/* compare any unaligned bytes or remainder bytes */
+	repz
+	cmpsb
+
+/* set output to be < 0 if less than, 0 if equal, or > 0 if greater than */
+	xorl edx,edx
+	movb -1(esi),dl
+	movb -1(edi),al
+	subl edx,eax
+
+L4:
+	popl esi
+	popl edi
+#else
 	pushl ebp
 	movl esp,ebp
 	subl $16,esp
@@ -73,4 +100,5 @@ L4:
 	popl edi
 	popl ebx
 	leave
+#endif
 	ret

@@ -15,6 +15,15 @@
 
 SYM (memset):
 
+#ifdef __iamcu__
+	pushl edi
+	movl eax,edi
+	movzbl dl,eax
+	mov edi,edx
+	rep stosb
+	mov edx,eax
+	popl edi
+#else
 	pushl ebp
 	movl esp,ebp
 	pushl edi
@@ -96,4 +105,5 @@ SYM (memset):
 	leal -4(ebp),esp
 	popl edi
 	leave
+#endif
 	ret

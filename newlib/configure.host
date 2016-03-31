@@ -696,6 +696,15 @@ case "${host}" in
   i[34567]86-*-netware*)
 	newlib_cflags="${newlib_cflags} -DMISSING_SYSCALL_NAMES -DNO_EXEC -DABORT_PROVIDED -DCLOCK_PROVIDED -DMALLOC_PROVIDED -DHAVE_FCNTL"
 	;;
+  i[3-7]86-*-elfiamcu)
+	newlib_cflags="${newlib_cflags} -Os -DPREFER_SIZE_OVER_SPEED -ffunction-sections -fomit-frame-pointer -DREENTRANT_SYSCALL_PROVIDED"
+	if [ "${newlib_multithread}" = "no" ] ; then
+		newlib_cflags="${newlib_cflags} -DMISSING_SYSCALL_NAMES"
+	else
+		syscall_dir=syscalls
+		newlib_cflags="${newlib_cflags} -D__DYNAMIC_REENT__"
+	fi
+	;;
   iq2000*)
 	syscall_dir=syscalls
 	default_newlib_io_long_long="yes"

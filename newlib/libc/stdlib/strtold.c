@@ -35,7 +35,8 @@ POSSIBILITY OF SUCH DAMAGE.
 
 #ifdef _HAVE_LONG_DOUBLE
 
-#if defined (__x86_64__) || defined (__i386__)
+/* Intel MCU has no x87 floating point unit */
+#if (defined (__x86_64__) || defined (__i386__)) && !defined (__iamcu__)
 static const int map[] = {
         1,      /* round to nearest */
         3,      /* round to zero */

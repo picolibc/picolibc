@@ -15,6 +15,29 @@
 
 SYM (strchr):
 
+#ifdef __iamcu__
+	xorl ecx,ecx
+	movb dl,cl
+
+/* loop while (*s && *s++ != c) */
+	leal -1(eax),eax
+L15:
+	incl eax
+	movb (eax),dl
+	testb dl,dl
+	je L14
+	cmpb cl,dl
+	jne L15
+
+L14:
+/*  if (*s == c) return address otherwise return NULL */
+	cmpb cl,(eax)
+	je L19
+	xorl eax,eax
+
+L19:
+	ret
+#else
 	pushl ebp
 	movl esp,ebp
 	pushl edi
@@ -170,3 +193,5 @@ L27:
 	jmp L9
 
 #endif /* !__OPTIMIZE_SIZE__ */
+
+#endif /* __iamcu__ */

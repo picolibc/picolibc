@@ -20,6 +20,10 @@
  **	jmp_buf:
  **	 eax ebx ecx edx esi edi ebp esp eip
  **	 0   4   8   12  16  20  24  28  32
+ **
+ **	Intel MCU jmp_buf:
+ **	 ebx esi edi ebp esp eip
+ **	 0   4   8   12  16  20
  */
 
        #include "i386mach.h"
@@ -31,6 +35,23 @@
  
 SYM (setjmp):
 
+#ifdef __iamcu__
+	/* Store EIP.  */
+	movl	0(esp),ecx
+	movl	ecx,20(eax)
+
+	movl	ebx,0 (eax)
+	movl	esi,4 (eax)
+	movl	edi,8 (eax)
+	movl	ebp,12(eax)
+
+	/* Skip return address, which will be pushed onto stack in
+	   longjmp, and store SP.  */
+	leal	4(esp),ecx
+	movl	ecx,16(eax)
+
+	xorl	eax,eax
+#else
 	pushl	ebp
 	movl	esp,ebp
 
@@ -59,9 +80,28 @@ SYM (setjmp):
 	popl	edi
 	movl	$0,eax
 	leave
+#endif
 	ret
 
 SYM (longjmp):
+#ifdef __iamcu__
+	/* Check retval.  */
+	testl	edx,edx
+	jne	0f
+	incl	edx
+0:
+	/* Restore stack first.  */
+	movl	16(eax),esp
+
+	/* Put return address on stack.  */
+	pushl	20(eax)
+
+	movl	0(eax),ebx
+	movl	4(eax),esi
+	movl	8(eax),edi
+	movl	12(eax),ebp
+	movl	edx,eax
+#else
 	pushl	ebp
 	movl	esp,ebp
 
@@ -87,5 +127,6 @@ SYM (longjmp):
 	movl	16(edi),esi
 	movl	20(edi),edi
        __STI
+#endif
 
 	ret

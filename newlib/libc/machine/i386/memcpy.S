@@ -15,6 +15,17 @@
 
 SYM (memcpy):
 
+#ifdef __iamcu__
+	pushl esi
+	pushl edi
+	movl eax,edi
+	movl edx,esi
+
+	rep movsb
+
+	popl edi
+	popl esi
+#else
 	pushl ebp
 	movl esp,ebp
 	pushl esi
@@ -71,4 +82,5 @@ SYM (memcpy):
 	popl edi
 	popl esi
 	leave
+#endif
 	ret

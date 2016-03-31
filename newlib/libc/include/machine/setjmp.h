@@ -92,6 +92,9 @@ _BEGIN_STD_C
 #  define _JBLEN (13 * 4)
 # elif defined(__unix__) || defined(__rtems__)
 #  define _JBLEN	9
+# elif defined(__iamcu__)
+/* Intel MCU jmp_buf only covers callee-saved registers. */
+#  define _JBLEN	6
 # else
 #  include "setjmp-dj.h"
 # endif
