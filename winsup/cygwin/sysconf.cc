@@ -565,7 +565,7 @@ static struct
   {cons, {c:PTHREAD_DESTRUCTOR_ITERATIONS}},	/*  53, _SC_THREAD_DESTRUCTOR_ITERATIONS */
   {cons, {c:_POSIX_ADVISORY_INFO}},	/*  54, _SC_ADVISORY_INFO */
   {cons, {c:ATEXIT_MAX}},		/*  55, _SC_ATEXIT_MAX */
-  {cons, {c:-1L}},			/*  56, _SC_BARRIERS */
+  {cons, {c:_POSIX_BARRIERS}},		/*  56, _SC_BARRIERS */
   {cons, {c:BC_BASE_MAX}},		/*  57, _SC_BC_BASE_MAX */
   {cons, {c:BC_DIM_MAX}},		/*  58, _SC_BC_DIM_MAX */
   {cons, {c:BC_SCALE_MAX}},		/*  59, _SC_BC_SCALE_MAX */
@@ -584,7 +584,7 @@ static struct
   {cons, {c:_POSIX_REGEXP}},		/*  72, _SC_REGEXP */
   {cons, {c:RE_DUP_MAX}},		/*  73, _SC_RE_DUP_MAX */
   {cons, {c:_POSIX_SHELL}},		/*  74, _SC_SHELL */
-  {cons, {c:-1L}},			/*  75, _SC_SPAWN */
+  {cons, {c:_POSIX_SPAWN}},		/*  75, _SC_SPAWN */
   {cons, {c:_POSIX_SPIN_LOCKS}},	/*  76, _SC_SPIN_LOCKS */
   {cons, {c:-1L}},			/*  77, _SC_SPORADIC_SERVER */
   {nsup, {c:0}},			/*  78, _SC_SS_REPL_MAX */
@@ -618,7 +618,7 @@ static struct
   {cons, {c:_XOPEN_VERSION}},		/* 106, _SC_XOPEN_VERSION */
   {cons, {c:_POSIX2_CHAR_TERM}},	/* 107, _SC_2_CHAR_TERM */
   {cons, {c:_POSIX2_C_BIND}},		/* 108, _SC_2_C_BIND */
-  {cons, {c:_POSIX2_C_BIND}},		/* 109, _SC_2_C_DEV */
+  {cons, {c:_POSIX2_C_DEV}},		/* 109, _SC_2_C_DEV */
   {cons, {c:-1L}},			/* 110, _SC_2_FORT_DEV */
   {cons, {c:-1L}},			/* 111, _SC_2_FORT_RUN */
   {cons, {c:-1L}},			/* 112, _SC_2_LOCALEDEF */
