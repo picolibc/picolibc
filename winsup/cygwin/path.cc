@@ -711,7 +711,6 @@ path_conv::check (const char *src, unsigned opt,
       /* This loop handles symlink expansion.  */
       for (;;)
 	{
-	  MALLOC_CHECK;
 	  assert (src);
 
 	  is_relpath = !isabspath (src);
@@ -1066,9 +1065,6 @@ path_conv::check (const char *src, unsigned opt,
 	      error = ELOOP;   // Eep.
 	      return;
 	    }
-
-	  MALLOC_CHECK;
-
 
 	  /* Place the link content, possibly with head and/or tail,
 	     in tmp_buf */
@@ -3276,7 +3272,6 @@ chdir (const char *in_dir)
       res = -1;
     }
   __endtry
-  MALLOC_CHECK;
   return res;
 }
 
@@ -4686,8 +4681,6 @@ cwdstuff::reset_posix (wchar_t *w_cwd)
 char *
 cwdstuff::get (char *buf, int need_posix, int with_chroot, unsigned ulen)
 {
-  MALLOC_CHECK;
-
   tmp_pathbuf tp;
   if (ulen)
     /* nothing */;
@@ -4731,7 +4724,6 @@ cwdstuff::get (char *buf, int need_posix, int with_chroot, unsigned ulen)
 out:
   syscall_printf ("(%s) = cwdstuff::get (%p, %u, %d, %d), errno %d",
 		  buf, buf, ulen, need_posix, with_chroot, errno);
-  MALLOC_CHECK;
   return buf;
 }
 

@@ -1196,7 +1196,6 @@ read (int fd, void *ptr, size_t len)
   __except (EFAULT) {}
   __endtry
   syscall_printf ("%lR = read(%d, %p, %d)", res, fd, ptr, len);
-  MALLOC_CHECK;
   return (ssize_t) res;
 }
 
@@ -1238,7 +1237,6 @@ readv (int fd, const struct iovec *const iov, const int iovcnt)
   __except (EFAULT) {}
   __endtry
   syscall_printf ("%lR = readv(%d, %p, %d)", res, fd, iov, iovcnt);
-  MALLOC_CHECK;
   return res;
 }
 
@@ -1289,7 +1287,6 @@ write (int fd, const void *ptr, size_t len)
   __except (EFAULT) {}
   __endtry
   syscall_printf ("%lR = write(%d, %p, %d)", res, fd, ptr, len);
-  MALLOC_CHECK;
   return res;
 }
 
@@ -1336,7 +1333,6 @@ writev (const int fd, const struct iovec *const iov, const int iovcnt)
     paranoid_printf ("%lR = writev(%d, %p, %d)", res, fd, iov, iovcnt);
   else
     syscall_printf ("%lR = writev(%d, %p, %d)", res, fd, iov, iovcnt);
-  MALLOC_CHECK;
   return res;
 }
 
@@ -1491,7 +1487,6 @@ close (int fd)
 
   pthread_testcancel ();
 
-  MALLOC_CHECK;
   cygheap_fdget cfd (fd, true);
   if (cfd < 0)
     res = -1;
@@ -1503,7 +1498,6 @@ close (int fd)
     }
 
   syscall_printf ("%R = close(%d)", res, fd);
-  MALLOC_CHECK;
   return res;
 }
 
@@ -1936,7 +1930,6 @@ stat_worker (path_conv &pc, struct stat *buf)
     }
   __except (EFAULT) {}
   __endtry
-  MALLOC_CHECK;
   syscall_printf ("%d = (%S,%p)", res, pc.get_nt_native_path (), buf);
   return res;
 }
@@ -3048,7 +3041,6 @@ statvfs (const char *name, struct statvfs *sfs)
   __except (EFAULT) {}
   __endtry
   delete fh;
-  MALLOC_CHECK;
   if (get_errno () != EFAULT)
     syscall_printf ("%R = statvfs(%s,%p)", res, name, sfs);
   return res;

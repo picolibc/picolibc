@@ -393,7 +393,6 @@ win_env::~win_env ()
 void
 win_env::add_cache (const char *in_posix, const char *in_native)
 {
-  MALLOC_CHECK;
   posix = (char *) realloc (posix, strlen (in_posix) + 1);
   strcpy (posix, in_posix);
   if (in_native)
@@ -409,7 +408,6 @@ win_env::add_cache (const char *in_posix, const char *in_native)
       native = (char *) realloc (native, namelen + 1 + strlen (buf));
       stpcpy (stpcpy (native, name), buf);
     }
-  MALLOC_CHECK;
   if (immediate && cygwin_finished_initializing)
     {
       wchar_t s[sys_mbstowcs (NULL, 0, native) + 1];
@@ -489,7 +487,6 @@ posify_maybe (char **here, const char *value, char *outenv)
   debug_printf ("env var converted to %s", outenv);
   *here = strdup (outenv);
   free (src);
-  MALLOC_CHECK;
 }
 
 /* Returns pointer to value associated with name, if any, else NULL.
@@ -519,7 +516,6 @@ my_findenv (const char *name, int *offset)
 	  *offset = p - cur_environ ();
 	  return (char *) (++c);
 	}
-  MALLOC_CHECK;
   return NULL;
 }
 
@@ -657,7 +653,6 @@ _addenv (const char *name, const char *value, int overwrite)
   if (strcmp (name, "CYGWIN") == 0)
     parse_options (value);
 
-  MALLOC_CHECK;
   return 0;
 }
 
@@ -865,7 +860,6 @@ environ_init (char **envp, int envc)
 	  if (p)
 	    parse_options (p);
 	}
-      MALLOC_CHECK;
     }
   __except (NO_ERROR)
     {

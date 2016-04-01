@@ -720,7 +720,6 @@ dtable::dup3 (int oldfd, int newfd, int flags)
   int res = -1;
   fhandler_base *newfh = NULL;	// = NULL to avoid an incorrect warning
 
-  MALLOC_CHECK;
   debug_printf ("dup3 (%d, %d, %y)", oldfd, newfd, flags);
   lock ();
   bool do_unlock = true;
@@ -786,7 +785,6 @@ dtable::dup3 (int oldfd, int newfd, int flags)
   do_unlock = unlock_on_return;
 
 done:
-  MALLOC_CHECK;
   if (do_unlock)
     unlock ();
   syscall_printf ("%R = dup3(%d, %d, %y)", res, oldfd, newfd, flags);

@@ -708,7 +708,6 @@ strccpy (char *__restrict s1, const char **__restrict s2, char c)
     *s1++ = *((*s2)++);
   *s1 = 0;
 
-  MALLOC_CHECK;
   return s1;
 }
 

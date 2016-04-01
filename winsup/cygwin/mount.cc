@@ -597,8 +597,6 @@ mount_info::conv_to_win32_path (const char *src_path, char *dst, device& dev,
 {
   bool chroot_ok = !cygheap->root.exists ();
 
-  MALLOC_CHECK;
-
   dev = FH_FS;
 
   *flags = 0;
@@ -630,7 +628,6 @@ mount_info::conv_to_win32_path (const char *src_path, char *dst, device& dev,
       goto out_no_chroot_check;
     }
 
-  MALLOC_CHECK;
   /* If the path is on a network drive or a //./ resp. //?/ path prefix,
      bypass the mount table.  If it's // or //MACHINE, use the netdrive
      device. */
@@ -740,7 +737,6 @@ mount_info::conv_to_win32_path (const char *src_path, char *dst, device& dev,
       backslashify (src_path, dst + offset, 0);
     }
  out:
-  MALLOC_CHECK;
   if (chroot_ok || cygheap->root.ischroot_native (dst))
     rc = 0;
   else
@@ -905,7 +901,6 @@ mount_info::conv_to_posix_path (const char *src_path, char *posix_path,
 
   debug_printf ("conv_to_posix_path (%s, 0x%x, %s)", src_path, ccp_flags,
 		append_slash ? "add-slash" : "no-add-slash");
-  MALLOC_CHECK;
 
   if (src_path_len >= NT_MAX_PATH)
     {
@@ -1008,7 +1003,6 @@ mount_info::conv_to_posix_path (const char *src_path, char *posix_path,
 
 out:
   debug_printf ("%s = conv_to_posix_path (%s)", posix_path, src_path);
-  MALLOC_CHECK;
   return 0;
 }
 

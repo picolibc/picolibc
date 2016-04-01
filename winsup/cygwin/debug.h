@@ -7,8 +7,6 @@ This software is a copyrighted work licensed under the terms of the
 Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
-#define MALLOC_CHECK do {} while (0)
-
 #if !defined(_DEBUG_H_)
 #define _DEBUG_H_
 
