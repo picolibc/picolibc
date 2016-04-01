@@ -385,21 +385,32 @@ struct spec_variable {
   int valid;
 };
 
+#if __LP64__
+#define ILP32 0
+#define LP64 1
+#else
+#define ILP32 1
+#define LP64 0
+#endif
+
 static const struct spec_variable spec_table[] = {
-  { "POSIX_V7_ILP32_OFF32",	0 },
-  { "POSIX_V7_ILP32_OFFBIG",	1 },
-  { "POSIX_V7_LP64_OFF64",	0 },
-  { "POSIX_V7_LPBIG_OFFBIG",	0 },
-  { "POSIX_V6_ILP32_OFF32",	0 },
-  { "POSIX_V6_ILP32_OFFBIG",	1 },
-  { "POSIX_V6_LP64_OFF64",	0 },
-  { "POSIX_V6_LPBIG_OFFBIG",	0 },
-  { "XBS5_ILP32_OFF32",		0 },
-  { "XBS5_ILP32_OFFBIG",	1 },
-  { "XBS5_LP64_OFF64",		0 },
-  { "XBS5_LPBIG_OFFBIG",	0 },
+  { "POSIX_V7_ILP32_OFF32",	0	},
+  { "POSIX_V7_ILP32_OFFBIG",	ILP32	},
+  { "POSIX_V7_LP64_OFF64",	LP64	},
+  { "POSIX_V7_LPBIG_OFFBIG",	LP64	},
+  { "POSIX_V6_ILP32_OFF32",	0	},
+  { "POSIX_V6_ILP32_OFFBIG",	ILP32	},
+  { "POSIX_V6_LP64_OFF64",	LP64	},
+  { "POSIX_V6_LPBIG_OFFBIG",	LP64	},
+  { "XBS5_ILP32_OFF32",		0	},
+  { "XBS5_ILP32_OFFBIG",	ILP32	},
+  { "XBS5_LP64_OFF64",		LP64	},
+  { "XBS5_LPBIG_OFFBIG",	LP64	},
   { NULL, 0 },
 };
+
+#undef ILP32
+#undef LP64
 
 static int a_flag = 0;		/* list all variables */
 static int v_flag = 0;		/* follow given specification */
