@@ -382,10 +382,27 @@ extern "C" {
 
 #ifdef __CYGWIN__
 
-#if !defined(__STRICT_ANSI__) || defined(__cplusplus) || __STDC_VERSION__ >= 199901L
+#if __POSIX_VISIBLE >= 200809
 #define _POSIX_VERSION				200809L
 #define _POSIX2_VERSION				200809L
-#define _XOPEN_VERSION				   600
+#elif __POSIX_VISIBLE >= 200112
+#define _POSIX_VERSION				200112L
+#define _POSIX2_VERSION				200112L
+#elif __POSIX_VISIBLE >= 199506
+#define _POSIX_VERSION				199506L
+#define _POSIX2_VERSION				199506L
+#elif __POSIX_VISIBLE >= 199309
+#define _POSIX_VERSION				199309L
+#define _POSIX2_VERSION				199209L
+#elif __POSIX_VISIBLE >= 199209
+#define _POSIX_VERSION				199009L
+#define _POSIX2_VERSION				199209L
+#elif __POSIX_VISIBLE
+#define _POSIX_VERSION				199009L
+#endif
+#if __XSI_VISIBLE >= 4
+#define _XOPEN_VERSION				__XSI_VISIBLE
+#endif
 
 #define _POSIX_ADVISORY_INFO			200809L
 /* #define _POSIX_ASYNCHRONOUS_IO		    -1 */
@@ -428,16 +445,19 @@ extern "C" {
 /* #define _POSIX_THREAD_SPORADIC_SERVER	    -1 */
 #define _POSIX_THREADS				200809L
 /* #define _POSIX_TIMEOUTS			    -1 */
-#define _POSIX_TIMERS				     1
+#define _POSIX_TIMERS				200809L
 /* #define _POSIX_TRACE				    -1 */
 /* #define _POSIX_TRACE_EVENT_FILTER		    -1 */
 /* #define _POSIX_TRACE_INHERIT			    -1 */
 /* #define _POSIX_TRACE_LOG			    -1 */
 /* #define _POSIX_TYPED_MEMORY_OBJECTS		    -1 */
 #define _POSIX_VDISABLE				   '\0'
-#define _POSIX2_C_BIND				200809L
-#define _POSIX2_C_DEV				200809L
-#define _POSIX2_CHAR_TERM			200809L
+
+#if __POSIX_VISIBLE >= 2
+#define _POSIX2_C_VERSION			_POSIX2_VERSION
+#define _POSIX2_C_BIND				_POSIX2_VERSION
+#define _POSIX2_C_DEV				_POSIX2_VERSION
+#define _POSIX2_CHAR_TERM			_POSIX2_VERSION
 /* #define _POSIX2_FORT_DEV			    -1 */
 /* #define _POSIX2_FORT_RUN			    -1 */
 /* #define _POSIX2_LOCALEDEF			    -1 */
@@ -447,8 +467,10 @@ extern "C" {
 /* #define _POSIX2_PBS_LOCATE			    -1 */
 /* #define _POSIX2_PBS_MESSAGE			    -1 */
 /* #define _POSIX2_PBS_TRACK			    -1 */
-#define _POSIX2_SW_DEV				200809L
-#define _POSIX2_UPE				200809L
+#define _POSIX2_SW_DEV				_POSIX2_VERSION
+#define _POSIX2_UPE				_POSIX2_VERSION
+#endif /* __POSIX_VISIBLE >= 2 */
+
 #define _POSIX_V6_ILP32_OFF32			    -1
 #ifdef __LP64__
 #define _POSIX_V6_ILP32_OFFBIG			    -1
@@ -459,10 +481,16 @@ extern "C" {
 #define _POSIX_V6_LP64_OFF64			    -1
 #define _POSIX_V6_LPBIG_OFFBIG			    -1
 #endif
+#define _POSIX_V7_ILP32_OFF32			_POSIX_V6_ILP32_OFF32
+#define _POSIX_V7_ILP32_OFFBIG			_POSIX_V6_ILP32_OFFBIG
+#define _POSIX_V7_LP64_OFF64			_POSIX_V6_LP64_OFF64
+#define _POSIX_V7_LPBIG_OFFBIG			_POSIX_V6_LPBIG_OFFBIG
 #define _XBS5_ILP32_OFF32			_POSIX_V6_ILP32_OFF32
 #define _XBS5_ILP32_OFFBIG			_POSIX_V6_ILP32_OFFBIG
 #define _XBS5_LP64_OFF64			_POSIX_V6_LP64_OFF64
 #define _XBS5_LPBIG_OFFBIG			_POSIX_V6_LPBIG_OFFBIG
+
+#if __XSI_VISIBLE
 #define _XOPEN_CRYPT				     1
 #define _XOPEN_ENH_I18N				     1
 /* #define _XOPEN_LEGACY			    -1 */
@@ -471,8 +499,7 @@ extern "C" {
 #define _XOPEN_SHM				     1
 /* #define _XOPEN_STREAMS			    -1 */
 /* #define _XOPEN_UNIX				    -1 */
-
-#endif /* !__STRICT_ANSI__ || __cplusplus || __STDC_VERSION__ >= 199901L */
+#endif /* __XSI_VISIBLE */
 
 /* The value corresponds to UNICODE version 4.0, which is the version
    supported by XP.  Newlib supports 5.2 (2011) but so far Cygwin needs
