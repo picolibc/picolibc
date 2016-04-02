@@ -3392,6 +3392,7 @@ if test "${with_windows_headers+set}" = set; then :
 fi
 
 
+if test "x$with_cross_bootstrap" != "xyes"; then
 
 
 # Check whether --with-windows-libs was given.
@@ -3410,6 +3411,7 @@ fi
 
 
 
+fi
 
 ac_ext=cpp
 ac_cpp='$CXXCPP $CPPFLAGS'

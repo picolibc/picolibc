@@ -25,17 +25,19 @@ AC_PROG_CC
 AC_PROG_CXX
 AC_PROG_CPP
 AC_LANG(C)
-AC_ARG_WITH([mingw-progs],[AS_HELP_STRING([--without-mingw-progs],[do not build programs using the mingw toolchain (useful for cross-compiling)])],[],[with_mingw_progs=yes])
+AC_ARG_WITH([cross-bootstrap],[AS_HELP_STRING([--with-cross-bootstrap],[do not build programs using the mingw toolchain or check for mingw libraries (useful for bootstrapping a cross-compiler)])],[],[with_cross_bootstrap=no])
 
 AC_WINDOWS_HEADERS
-AC_WINDOWS_LIBS
+if test "x$with_cross_bootstrap" != "xyes"; then
+    AC_WINDOWS_LIBS
+fi
 
 AC_LANG(C++)
 
 AC_CYGWIN_INCLUDES
 
 AC_CONFIG_SUBDIRS(cygwin cygserver doc)
-if test "x$with_mingw_progs" != xno; then
+if test "x$with_cross_bootstrap" != "xyes"; then
     AC_CONFIG_SUBDIRS([utils lsaauth])
 fi
 

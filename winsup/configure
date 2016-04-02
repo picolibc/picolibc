@@ -665,7 +665,7 @@ target_builddir'
 ac_subst_files=''
 ac_user_opts='
 enable_option_checking
-with_mingw_progs
+with_cross_bootstrap
 with_windows_headers
 with_windows_libs
 '
@@ -1295,8 +1295,9 @@ if test -n "$ac_init_help"; then
 Optional Packages:
   --with-PACKAGE[=ARG]    use PACKAGE [ARG=yes]
   --without-PACKAGE       do not use PACKAGE (same as --with-PACKAGE=no)
-  --without-mingw-progs   do not build programs using the mingw toolchain
-                          (useful for cross-compiling)
+  --with-cross-bootstrap  do not build programs using the mingw toolchain or
+                          check for mingw libraries (useful for bootstrapping
+                          a cross-compiler)
   --with-windows-headers=DIR
                           specify where the windows includes are located
   --with-windows-libs=DIR specify where the windows libraries are located
@@ -3362,11 +3363,11 @@ ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $
 ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
 
-# Check whether --with-mingw-progs was given.
-if test "${with_mingw_progs+set}" = set; then :
-  withval=$with_mingw_progs;
+# Check whether --with-cross-bootstrap was given.
+if test "${with_cross_bootstrap+set}" = set; then :
+  withval=$with_cross_bootstrap;
 else
-  with_mingw_progs=yes
+  with_cross_bootstrap=no
 fi
 
 
@@ -3379,6 +3380,7 @@ if test "${with_windows_headers+set}" = set; then :
 fi
 
 
+if test "x$with_cross_bootstrap" != "xyes"; then
 
 
 # Check whether --with-windows-libs was given.
@@ -3397,6 +3399,7 @@ fi
 
 
 
+fi
 
 ac_ext=cpp
 ac_cpp='$CXXCPP $CPPFLAGS'
@@ -3448,7 +3451,7 @@ export CXX
 
 subdirs="$subdirs cygwin cygserver doc"
 
-if test "x$with_mingw_progs" != xno; then
+if test "x$with_cross_bootstrap" != "xyes"; then
     subdirs="$subdirs utils lsaauth"
 
 fi
