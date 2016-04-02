@@ -65,7 +65,7 @@ class fhandler_dev_dsp::Audio
   void convert_S16LE_S16BE (unsigned char *buffer, int size_bytes);
   void fillFormat (WAVEFORMATEX * format,
 		   int rate, int bits, int channels);
-  unsigned blockSize (int rate, int bits, int channels);
+  static unsigned blockSize (int rate, int bits, int channels);
   void (fhandler_dev_dsp::Audio::*convert_)
     (unsigned char *buffer, int size_bytes);
 
@@ -117,6 +117,7 @@ class fhandler_dev_dsp::Audio_out: public Audio
   void stop (bool immediately = false);
   int write (const char *pSampleData, int nBytes);
   void buf_info (audio_buf_info *p, int rate, int bits, int channels);
+  static void default_buf_info (audio_buf_info *p, int rate, int bits, int channels);
   void callback_sampledone (WAVEHDR *pHdr);
   bool parsewav (const char *&pData, int &nBytes,
 		 int rate, int bits, int channels);
@@ -151,6 +152,7 @@ public:
   void stop ();
   bool read (char *pSampleData, int &nBytes);
   void buf_info (audio_buf_info *p, int rate, int bits, int channels);
+  static void default_buf_info (audio_buf_info *p, int rate, int bits, int channels);
   void callback_blockfull (WAVEHDR *pHdr);
 
 private:
@@ -501,11 +503,11 @@ void
 fhandler_dev_dsp::Audio_out::buf_info (audio_buf_info *p,
 				       int rate, int bits, int channels)
 {
-  p->fragstotal = MAX_BLOCKS;
-  if (this && dev_)
+  if (dev_)
     {
       /* If the device is running we use the internal values,
 	 possibly set from the wave file. */
+      p->fragstotal = MAX_BLOCKS;
       p->fragsize = blockSize (freq_, bits_, channels_);
       p->fragments = Qisr2app_->query ();
       if (pHdr_ != NULL)
@@ -516,10 +518,17 @@ fhandler_dev_dsp::Audio_out::buf_info (audio_buf_info *p,
     }
   else
     {
+      default_buf_info(p, rate, bits, channels);
+    }
+}
+
+void fhandler_dev_dsp::Audio_out::default_buf_info (audio_buf_info *p,
+                                                int rate, int bits, int channels)
+{
+      p->fragstotal = MAX_BLOCKS;
       p->fragsize = blockSize (rate, bits, channels);
       p->fragments = MAX_BLOCKS;
       p->bytes = p->fragsize * p->fragments;
-    }
 }
 
 /* This is called on an interupt so use locking.. Note Qisr2app_
@@ -953,14 +962,23 @@ fhandler_dev_dsp::Audio_in::waitfordata ()
   return true;
 }
 
+void fhandler_dev_dsp::Audio_in::default_buf_info (audio_buf_info *p,
+                                                int rate, int bits, int channels)
+{
+  p->fragstotal = MAX_BLOCKS;
+  p->fragsize = blockSize (rate, bits, channels);
+  p->fragments = 0;
+  p->bytes = 0;
+}
+
 void
 fhandler_dev_dsp::Audio_in::buf_info (audio_buf_info *p,
 				      int rate, int bits, int channels)
 {
-  p->fragstotal = MAX_BLOCKS;
-  p->fragsize = blockSize (rate, bits, channels);
-  if (this && dev_)
+  if (dev_)
     {
+      p->fragstotal = MAX_BLOCKS;
+      p->fragsize = blockSize (rate, bits, channels);
       p->fragments = Qisr2app_->query ();
       if (pHdr_ != NULL)
 	p->bytes = pHdr_->dwBytesRecorded - bufferIndex_
@@ -970,8 +988,7 @@ fhandler_dev_dsp::Audio_in::buf_info (audio_buf_info *p,
     }
   else
     {
-      p->fragments = 0;
-      p->bytes = 0;
+      default_buf_info(p, rate, bits, channels);
     }
 }
 
@@ -1345,9 +1362,13 @@ fhandler_dev_dsp::_ioctl (unsigned int cmd, void *buf)
 	    return -1;
 	  }
 	audio_buf_info *p = (audio_buf_info *) buf;
-	audio_out_->buf_info (p, audiofreq_, audiobits_, audiochannels_);
-	debug_printf ("buf=%p frags=%d fragsize=%d bytes=%d",
-		      buf, p->fragments, p->fragsize, p->bytes);
+        if (audio_out_) {
+            audio_out_->buf_info (p, audiofreq_, audiobits_, audiochannels_);
+        } else {
+            Audio_out::default_buf_info(p, audiofreq_, audiobits_, audiochannels_);
+        }
+        debug_printf ("buf=%p frags=%d fragsize=%d bytes=%d",
+                      buf, p->fragments, p->fragsize, p->bytes);
 	return 0;
       }
 
@@ -1359,9 +1380,13 @@ fhandler_dev_dsp::_ioctl (unsigned int cmd, void *buf)
 	    return -1;
 	  }
 	audio_buf_info *p = (audio_buf_info *) buf;
-	audio_in_->buf_info (p, audiofreq_, audiobits_, audiochannels_);
-	debug_printf ("buf=%p frags=%d fragsize=%d bytes=%d",
-		      buf, p->fragments, p->fragsize, p->bytes);
+        if (audio_in_) {
+            audio_in_->buf_info (p, audiofreq_, audiobits_, audiochannels_);
+        } else {
+            Audio_in::default_buf_info(p, audiofreq_, audiobits_, audiochannels_);
+        }
+        debug_printf ("buf=%p frags=%d fragsize=%d bytes=%d",
+                      buf, p->fragments, p->fragsize, p->bytes);
 	return 0;
       }
 

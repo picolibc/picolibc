@@ -371,6 +371,11 @@ format_process_fd (void *data, char *&destbuf)
      case a trailing slash and more followup chars are allowed, provided the
      descriptor symlink points to a directory. */
   char *fdp = strchr (path, '/') + 3;
+  if (!p)
+    {
+      set_errno (ENOENT);
+      return 0;
+    }
   /* The "fd" directory itself? */
   if (fdp[0] =='\0' || (fdp[0] == '/' && fdp[1] == '\0'))
     {
@@ -479,7 +484,7 @@ format_process_root (void *data, char *&destbuf)
       cfree (destbuf);
       destbuf = NULL;
     }
-  destbuf = p->root (fs);
+  destbuf = p ? p->root (fs) : NULL;
   if (!destbuf || !*destbuf)
     {
       destbuf = cstrdup ("<defunct>");
@@ -499,7 +504,7 @@ format_process_cwd (void *data, char *&destbuf)
       cfree (destbuf);
       destbuf = NULL;
     }
-  destbuf = p->cwd (fs);
+  destbuf = p ? p->cwd (fs) : NULL;
   if (!destbuf || !*destbuf)
     {
       destbuf = cstrdup ("<defunct>");
@@ -519,7 +524,7 @@ format_process_cmdline (void *data, char *&destbuf)
       cfree (destbuf);
       destbuf = NULL;
     }
-  destbuf = p->cmdline (fs);
+  destbuf = p ? p->cmdline (fs) : NULL;
   if (!destbuf || !*destbuf)
     {
       destbuf = cstrdup ("<defunct>");

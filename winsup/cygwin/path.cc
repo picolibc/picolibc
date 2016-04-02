@@ -3932,7 +3932,7 @@ fcwd_access_t::Free (PVOID heap)
 {
   /* Decrement the reference count.  If it's down to 0, free
      structure from heap. */
-  if (this && InterlockedDecrement (&ReferenceCount ()) == 0)
+  if (InterlockedDecrement (&ReferenceCount ()) == 0)
     {
       /* In contrast to pre-Vista, the handle on init is always a
 	 fresh one and not the handle inherited from the parent
@@ -4320,7 +4320,8 @@ cwdstuff::override_win32_cwd (bool init, ULONG old_dismount_count)
 	  f_cwd->CopyPath (upp_cwd_str);
 	  upp_cwd_hdl = dir;
 	  RtlLeaveCriticalSection (peb.FastPebLock);
-	  old_cwd->Free (heap);
+	  if (old_cwd)
+	    old_cwd->Free (heap);
 	}
       else
 	{

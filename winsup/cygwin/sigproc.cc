@@ -155,7 +155,8 @@ proc_can_be_signalled (_pinfo *p)
 bool __reg1
 pid_exists (pid_t pid)
 {
-  return pinfo (pid)->exists ();
+  pinfo p(pid);
+  return p && p->exists ();
 }
 
 /* Return true if this is one of our children, false otherwise.  */
@@ -1143,7 +1144,7 @@ remove_proc (int ci)
       if (_my_tls._ctinfo != procs[ci].wait_thread)
 	procs[ci].wait_thread->terminate_thread ();
     }
-  else if (procs[ci]->exists ())
+  else if (procs[ci] && procs[ci]->exists ())
     return true;
 
   sigproc_printf ("removing procs[%d], pid %d, nprocs %d", ci, procs[ci]->pid,
