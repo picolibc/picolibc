@@ -53,7 +53,7 @@ ANSI_SYNOPSIS
 	int isnormal(real-floating <[x]>);
 
 	[Archaic SUSv2 functions:]
-	#include <ieeefp.h>
+	#include <math.h>
 	int isnan(double <[arg]>);
 	int isinf(double <[arg]>);
 	int finite(double <[arg]>);
@@ -142,7 +142,7 @@ o-
 	and <<isinf>> are macros that operate on multiple types of
 	floating-point.  The SUSv2 standard declares <<isnan>> as
 	a function taking double.  Newlib has decided to declare
-	them both as macros in math.h and as functions in ieeefp.h to
+	them both as functions and as macros in math.h to
 	maintain backward compatibility.
 
 RETURNS
@@ -154,9 +154,11 @@ The isnan macro returns nonzero if <[x]> is an NaN, else 0.@*
 The isnormal macro returns nonzero if <[x]> has a normal value, else 0.
 
 PORTABILITY
-math.h macros are C99, POSIX.
+math.h macros are C99, POSIX.1-2001.
 
-ieeefp.h funtions are outdated and should be avoided.
+The functions originate from BSD; isnan was listed in the X/Open
+Portability Guide and Single Unix Specification, but was dropped when
+the macro was standardized in POSIX.1-2001.
 
 QUICKREF
 	isnan - pure
@@ -179,8 +181,8 @@ QUICKREF
  * The C99 standard dictates that isnan is a macro taking
  * multiple floating-point types while the SUSv2 standard
  * notes it is a function taking a double argument.  Newlib
- * has chosen to implement it as a macro in <math.h> and
- * declare it as a function in <ieeefp.h>.
+ * has chosen to declare it both as a function and as a macro in
+ * <math.h> for compatibility.
  */
 
 #include "fdlibm.h"

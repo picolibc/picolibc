@@ -28,7 +28,7 @@ INDEX
 	finitef
 
 ANSI_SYNOPSIS
-	#include <ieeefp.h>
+	#include <math.h>
 	int isnan(double <[arg]>);
 	int isinf(double <[arg]>);
 	int finite(double <[arg]>);
@@ -37,7 +37,7 @@ ANSI_SYNOPSIS
 	int finitef(float <[arg]>);
 
 TRAD_SYNOPSIS
-	#include <ieeefp.h>
+	#include <math.h>
 	int isnan(<[arg]>)
 	double <[arg]>;
 	int isinf(<[arg]>)
@@ -77,8 +77,8 @@ DESCRIPTION
 
 	Note that by the C99 standard, <<isnan>> and <<isinf>> are macros
 	taking any type of floating-point and are declared in
-	<<math.h>>.  Newlib has chosen to declare these as macros in
-	<<math.h>> and as functions in <<ieeefp.h>>.
+	<<math.h>>.  Newlib has chosen to declare these both as functions
+	and as macros in <<math.h>>.
 	
 	The <<isnanf>>, <<isinff>> and <<finitef>> functions perform the same
 	operations as their <<isnan>>, <<isinf>> and <<finite>>

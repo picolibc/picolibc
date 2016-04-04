@@ -228,7 +228,7 @@ extern int __signbitd (double x);
  *       supporting multiple floating point types.  Thus, they are
  *       now defined as macros.  Implementations of the old functions
  *       taking double arguments still exist for compatibility purposes
- *       (prototypes for them are in <ieeefp.h>).  */
+ *       (prototypes for them are earlier in this header).  */
 
 #if __GNUC_PREREQ (4, 4)
   #define fpclassify(__x) (__builtin_fpclassify (FP_NAN, FP_INFINITE, \

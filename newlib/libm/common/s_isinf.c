@@ -4,9 +4,8 @@
  *
  * isinf is a <math.h> macro in the C99 standard.  It was previously
  * implemented as a function by newlib and is declared as such in
- * <ieeefp.h>.  Newlib supplies it here as a function if the user
- * chooses to use <ieeefp.h> or needs to link older code compiled with the
- * previous <math.h> declaration.
+ * <math.h>.  Newlib supplies it here as a function if the user
+ * chooses to use it instead of the C99 macro.
  */
 
 #include "fdlibm.h"
