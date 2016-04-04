@@ -241,19 +241,6 @@ typedef int fp_rdi;
 fp_rdi _EXFUN(fpgetroundtoi,(void));
 fp_rdi _EXFUN(fpsetroundtoi,(fp_rdi));
 
-#undef isnan
-#undef isinf
-
-int _EXFUN(isnan, (double));
-int _EXFUN(isinf, (double));
-int _EXFUN(finite, (double));
-
-
-
-int _EXFUN(isnanf, (float));
-int _EXFUN(isinff, (float));
-int _EXFUN(finitef, (float));
-
 #define __IEEE_DBL_EXPBIAS 1023
 #define __IEEE_FLT_EXPBIAS 127
 
