@@ -342,7 +342,7 @@ cygwin_internal (cygwin_getinfo_types t, ...)
 	  size_t n;
 	  pid_t pid = va_arg (arg, pid_t);
 	  pinfo p (pid);
-	  res = p ? (uintptr_t) p->cmdline (n) : 0;
+	  res = (uintptr_t) p->cmdline (n);
 	}
 	break;
       case CW_CHECK_NTSEC:

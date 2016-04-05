@@ -263,7 +263,7 @@ _pinfo::kill (siginfo_t& si)
 	}
       this_pid = pid;
     }
-  else if (si.si_signo == 0 && process_state == PID_EXITED)
+  else if (si.si_signo == 0 && this && process_state == PID_EXITED)
     {
       this_process_state = process_state;
       this_pid = pid;
@@ -299,12 +299,8 @@ kill0 (pid_t pid, siginfo_t& si)
       syscall_printf ("signal %d out of range", si.si_signo);
       return -1;
     }
-  if (pid > 0) {
-      pinfo p(pid);
-      return p && p->kill(si);
-  } else {
-      return kill_pgrp(-pid, si);
-  }
+
+  return (pid > 0) ? pinfo (pid)->kill (si) : kill_pgrp (-pid, si);
 }
 
 int
@@ -330,7 +326,7 @@ kill_pgrp (pid_t pid, siginfo_t& si)
     {
       _pinfo *p = pids[i];
 
-      if (!p || !p->exists ())
+      if (!p->exists ())
 	continue;
 
       /* Is it a process we want to kill?  */

@@ -134,7 +134,7 @@ tty_min::kill_pgrp (int sig)
   for (unsigned i = 0; i < pids.npids; i++)
     {
       _pinfo *p = pids[i];
-      if (!p || !p->exists () || p->ctty != ntty || p->pgid != pgid)
+      if (!p->exists () || p->ctty != ntty || p->pgid != pgid)
 	continue;
       if (p == myself)
 	killself = sig != __SIGSETPGRP && !exit_state;
