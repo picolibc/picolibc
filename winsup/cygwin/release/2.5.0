@@ -53,6 +53,12 @@ What changed:
   enables multiple gmon.out files to preserve profiling data after fork or
   from multiple program runs.
 
+- Feature test macros, which control which symbols are exposed in the standard
+  headers, have been completely overhauled for compatibility with glibc.
+
+- The isinf, isinff, and isinfl functions are signed, returning -1 for
+  negative infinity for compatibility with glibc.
+
 
 Bug Fixes
 ---------
@@ -105,3 +111,5 @@ Bug Fixes
 
 - Fix strtold return value for +/-infinity.
   Addresses: https://cygwin.com/ml/cygwin-apps/2016-03/msg00152.html
+
+- Fix accepted specifications with `getconf -v' on 64-bit.  Self-observed.
