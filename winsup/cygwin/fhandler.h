@@ -1453,7 +1453,8 @@ private:
   bool focus_aware () {return shared_console_info->con.use_focus;}
   bool get_cons_readahead_valid ()
   {
-    return shared_console_info->con.cons_rapoi != NULL;
+    return shared_console_info->con.cons_rapoi != NULL &&
+      *shared_console_info->con.cons_rapoi;
   }
 
   select_record *select_read (select_stuff *);
