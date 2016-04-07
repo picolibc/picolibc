@@ -251,47 +251,6 @@ tvtosbt(struct timeval _tv)
 }
 #endif /* __BSD_VISIBLE */
 
-#ifdef _KERNEL
-
-/* Operations on timespecs */
-#define	timespecclear(tvp)	((tvp)->tv_sec = (tvp)->tv_nsec = 0)
-#define	timespecisset(tvp)	((tvp)->tv_sec || (tvp)->tv_nsec)
-#define	timespeccmp(tvp, uvp, cmp)					\
-	(((tvp)->tv_sec == (uvp)->tv_sec) ?				\
-	    ((tvp)->tv_nsec cmp (uvp)->tv_nsec) :			\
-	    ((tvp)->tv_sec cmp (uvp)->tv_sec))
-#define	timespecadd(vvp, uvp)						\
-	do {								\
-		(vvp)->tv_sec += (uvp)->tv_sec;				\
-		(vvp)->tv_nsec += (uvp)->tv_nsec;			\
-		if ((vvp)->tv_nsec >= 1000000000) {			\
-			(vvp)->tv_sec++;				\
-			(vvp)->tv_nsec -= 1000000000;			\
-		}							\
-	} while (0)
-#define	timespecsub(vvp, uvp)						\
-	do {								\
-		(vvp)->tv_sec -= (uvp)->tv_sec;				\
-		(vvp)->tv_nsec -= (uvp)->tv_nsec;			\
-		if ((vvp)->tv_nsec < 0) {				\
-			(vvp)->tv_sec--;				\
-			(vvp)->tv_nsec += 1000000000;			\
-		}							\
-	} while (0)
-
-/* Operations on timevals. */
-
-#define	timevalclear(tvp)		((tvp)->tv_sec = (tvp)->tv_usec = 0)
-#define	timevalisset(tvp)		((tvp)->tv_sec || (tvp)->tv_usec)
-#define	timevalcmp(tvp, uvp, cmp)					\
-	(((tvp)->tv_sec == (uvp)->tv_sec) ?				\
-	    ((tvp)->tv_usec cmp (uvp)->tv_usec) :			\
-	    ((tvp)->tv_sec cmp (uvp)->tv_sec))
-
-/* timevaladd and timevalsub are not inlined */
-
-#endif /* _KERNEL */
-
 /*
  * Names of the interval timers, and structure
  * defining a timer setting.
@@ -305,115 +264,8 @@ struct itimerval {
 	struct	timeval it_value;	/* current value */
 };
 
-#ifdef _KERNEL
-
-/*
- * Kernel to clock driver interface.
- */
-void	inittodr(time_t base);
-void	resettodr(void);
-
-extern volatile time_t	time_second;
-extern volatile time_t	time_uptime;
-extern struct bintime boottimebin;
-extern struct timeval boottime;
-extern struct bintime tc_tick_bt;
-extern sbintime_t tc_tick_sbt;
-extern struct bintime tick_bt;
-extern sbintime_t tick_sbt;
-extern int tc_precexp;
-extern int tc_timepercentage;
-extern struct bintime bt_timethreshold;
-extern struct bintime bt_tickthreshold;
-extern sbintime_t sbt_timethreshold;
-extern sbintime_t sbt_tickthreshold;
-
-/*
- * Functions for looking at our clock: [get]{bin,nano,micro}[up]time()
- *
- * Functions without the "get" prefix returns the best timestamp
- * we can produce in the given format.
- *
- * "bin"   == struct bintime  == seconds + 64 bit fraction of seconds.
- * "nano"  == struct timespec == seconds + nanoseconds.
- * "micro" == struct timeval  == seconds + microseconds.
- *
- * Functions containing "up" returns time relative to boot and
- * should be used for calculating time intervals.
- *
- * Functions without "up" returns UTC time.
- *
- * Functions with the "get" prefix returns a less precise result
- * much faster than the functions without "get" prefix and should
- * be used where a precision of 1/hz seconds is acceptable or where
- * performance is priority. (NB: "precision", _not_ "resolution" !)
- */
-
-void	binuptime(struct bintime *bt);
-void	nanouptime(struct timespec *tsp);
-void	microuptime(struct timeval *tvp);
-
-static __inline sbintime_t
-sbinuptime(void)
-{
-	struct bintime _bt;
-
-	binuptime(&_bt);
-	return (bttosbt(_bt));
-}
-
-void	bintime(struct bintime *bt);
-void	nanotime(struct timespec *tsp);
-void	microtime(struct timeval *tvp);
-
-void	getbinuptime(struct bintime *bt);
-void	getnanouptime(struct timespec *tsp);
-void	getmicrouptime(struct timeval *tvp);
-
-static __inline sbintime_t
-getsbinuptime(void)
-{
-	struct bintime _bt;
-
-	getbinuptime(&_bt);
-	return (bttosbt(_bt));
-}
-
-void	getbintime(struct bintime *bt);
-void	getnanotime(struct timespec *tsp);
-void	getmicrotime(struct timeval *tvp);
-
-/* Other functions */
-int	itimerdecr(struct itimerval *itp, int usec);
-int	itimerfix(struct timeval *tv);
-int	ppsratecheck(struct timeval *, int *, int);
-int	ratecheck(struct timeval *, const struct timeval *);
-void	timevaladd(struct timeval *t1, const struct timeval *t2);
-void	timevalsub(struct timeval *t1, const struct timeval *t2);
-int	tvtohz(struct timeval *tv);
-
-#define	TC_DEFAULTPERC		5
-
-#define	BT2FREQ(bt)                                                     \
-	(((uint64_t)0x8000000000000000 + ((bt)->frac >> 2)) /           \
-	    ((bt)->frac >> 1))
-
-#define	SBT2FREQ(sbt)	((SBT_1S + ((sbt) >> 1)) / (sbt))
-
-#define	FREQ2BT(freq, bt)                                               \
-{									\
-	(bt)->sec = 0;                                                  \
-	(bt)->frac = ((uint64_t)0x8000000000000000  / (freq)) << 1;     \
-}
-
-#define	TIMESEL(sbt, sbt2)						\
-	(((sbt2) >= sbt_timethreshold) ?				\
-	    ((*(sbt) = getsbinuptime()), 1) : ((*(sbt) = sbinuptime()), 0))
-
-#else /* !_KERNEL */
+#ifndef _KERNEL
 #include <time.h>
-
-#include <sys/cdefs.h>
 
 __BEGIN_DECLS
 int _EXFUN(utimes, (const char *__path, const struct timeval *__tvp));
@@ -444,5 +296,6 @@ int _EXFUN(_gettimeofday, (struct timeval *__p, void *__tz));
 __END_DECLS
 
 #endif /* !_KERNEL */
+#include <machine/_time.h>
 
 #endif /* !_SYS_TIME_H_ */
