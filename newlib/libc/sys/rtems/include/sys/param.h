@@ -47,8 +47,6 @@
 
 /* end of from newlib's <sys/param.h> */
 
-#include <unistd.h>
-
 #define	BSD	199506		/* System version (year & month). */
 #define BSD4_3	1
 #define BSD4_4	1
