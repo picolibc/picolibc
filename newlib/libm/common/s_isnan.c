@@ -190,6 +190,8 @@ QUICKREF
 
 #ifndef _DOUBLE_IS_32BITS
 
+#undef isnan
+
 #ifdef __STDC__
 	int isnan(double x)
 #else
