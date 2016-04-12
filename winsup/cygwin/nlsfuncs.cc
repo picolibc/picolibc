@@ -1271,21 +1271,27 @@ wcsxfrm (wchar_t *__restrict ws1, const wchar_t *__restrict ws2, size_t wsn)
      the result is wchar_t-NUL terminated. */
   if (ret)
     {
-      ret = (ret + 1) / sizeof (wchar_t);
-      if (ret >= wsn)
-	return wsn;
-      ws1[ret] = L'\0';
+      ret /= sizeof (wchar_t);
+      if (ret < wsn)
+	ws1[ret] = L'\0';
       return ret;
     }
   if (GetLastError () != ERROR_INSUFFICIENT_BUFFER)
     set_errno (EINVAL);
+  else
+    {
+      ret = LCMapStringW (collate_lcid, LCMAP_SORTKEY | LCMAP_BYTEREV, ws2, -1,
+			  NULL, 0);
+      if (ret)
+	wsn = ret / sizeof (wchar_t);
+    }
   return wsn;
 }
 
 extern "C" size_t
 strxfrm (char *__restrict s1, const char *__restrict s2, size_t sn)
 {
-  size_t ret;
+  size_t ret = 0;
   size_t n2;
   wchar_t *ws2;
   tmp_pathbuf tp;
@@ -1297,17 +1303,23 @@ strxfrm (char *__restrict s1, const char *__restrict s2, size_t sn)
   n2 = lc_mbstowcs (collate_mbtowc, collate_charset, NULL, s2, 0) + 1;
   ws2 = (n2 > NT_MAX_PATH ? (wchar_t *) malloc (n2 * sizeof (wchar_t))
 			  : tp.w_get ());
-  lc_mbstowcs (collate_mbtowc, collate_charset, ws2, s2, n2);
-  /* The sort key is a NUL-terminated byte string. */
-  ret = LCMapStringW (collate_lcid, LCMAP_SORTKEY, ws2, -1, (PWCHAR) s1, sn);
-  if (n2 > NT_MAX_PATH)
-    free (ws2);
+  if (ws2)
+    {
+      lc_mbstowcs (collate_mbtowc, collate_charset, ws2, s2, n2);
+      /* The sort key is a NUL-terminated byte string. */
+      ret = LCMapStringW (collate_lcid, LCMAP_SORTKEY, ws2, -1,
+			  (PWCHAR) s1, sn);
+    }
   if (ret == 0)
     {
-      if (GetLastError () != ERROR_INSUFFICIENT_BUFFER)
+      ret = sn + 1;
+      if (!ws2 || GetLastError () != ERROR_INSUFFICIENT_BUFFER)
 	set_errno (EINVAL);
-      return sn;
+      else
+	ret = LCMapStringW (collate_lcid, LCMAP_SORTKEY, ws2, -1, NULL, 0);
     }
+  if (ws2 && n2 > NT_MAX_PATH)
+    free (ws2);
   /* LCMapStringW returns byte count including the terminating NUL character.
      strxfrm is supposed to return length excluding the NUL. */
   return ret - 1;
