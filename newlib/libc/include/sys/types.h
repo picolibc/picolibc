@@ -168,11 +168,23 @@ typedef int32_t register_t;
  */
 
 #ifndef __CYGWIN__	/* which defines these types in it's own types.h. */
-typedef _off_t	off_t;
-typedef __dev_t dev_t;
-typedef __uid_t uid_t;
-typedef __gid_t gid_t;
+#ifndef _OFF_T_DECLARED
+typedef	__off_t		off_t;		/* file offset */
+#define	_OFF_T_DECLARED
 #endif
+#ifndef _DEV_T_DECLARED
+typedef	__dev_t		dev_t;		/* device number or struct cdev */
+#define	_DEV_T_DECLARED
+#endif
+#ifndef _UID_T_DECLARED
+typedef	__uid_t		uid_t;		/* user id */
+#define	_UID_T_DECLARED
+#endif
+#ifndef _GID_T_DECLARED
+typedef	__gid_t		gid_t;		/* group id */
+#define	_GID_T_DECLARED
+#endif
+#endif /* !__CYGWIN__ */
 
 #ifndef _PID_T_DECLARED
 typedef	__pid_t		pid_t;		/* process id */
