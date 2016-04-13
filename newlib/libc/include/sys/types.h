@@ -167,7 +167,6 @@ typedef int32_t register_t;
  * how the file was compiled (e.g. -mint16 vs -mint32, etc.).
  */
 
-#ifndef __CYGWIN__	/* which defines these types in it's own types.h. */
 #ifndef _OFF_T_DECLARED
 typedef	__off_t		off_t;		/* file offset */
 #define	_OFF_T_DECLARED
@@ -184,7 +183,6 @@ typedef	__uid_t		uid_t;		/* user id */
 typedef	__gid_t		gid_t;		/* group id */
 #define	_GID_T_DECLARED
 #endif
-#endif /* !__CYGWIN__ */
 
 #ifndef _PID_T_DECLARED
 typedef	__pid_t		pid_t;		/* process id */
@@ -195,8 +193,9 @@ typedef	__pid_t		pid_t;		/* process id */
 typedef _mode_t mode_t;
 #endif
 
-#ifndef __CYGWIN__
-typedef	long key_t;
+#ifndef _KEY_T_DECLARED
+typedef	__key_t		key_t;		/* IPC key */
+#define	_KEY_T_DECLARED
 #endif
 
 #ifndef _SSIZE_T_DECLARED

@@ -45,6 +45,10 @@ typedef _off_t __off_t;
 
 typedef _off64_t __loff_t;
 
+#ifndef __key_t_defined
+typedef long __key_t;
+#endif
+
 /*
  * We need fpos_t for the following, but it doesn't have a leading "_",
  * so we use _fpos_t instead.

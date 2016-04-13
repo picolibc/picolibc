@@ -32,18 +32,7 @@ typedef struct timespec timespec_t;
 typedef struct timespec timestruc_t;
 #endif /*__timestruc_t_defined*/
 
-#ifndef __off_t_defined
-#define __off_t_defined
-typedef __off_t off_t;
-#endif /*__off_t_defined*/
-
 typedef __loff_t loff_t;
-
-#ifndef __dev_t_defined
-#define __dev_t_defined
-typedef __int16_t __dev16_t;
-typedef __uint32_t dev_t;
-#endif /*__dev_t_defined*/
 
 #ifndef __blksize_t_defined
 #define __blksize_t_defined
@@ -67,18 +56,6 @@ typedef unsigned long fsblkcnt_t;
 /* Keep as is.  32 bit on i386, 64 bit on x86_64. */
 typedef unsigned long fsfilcnt_t;
 #endif /* __fsfilcnt_t_defined */
-
-#ifndef __uid_t_defined
-#define __uid_t_defined
-typedef unsigned short __uid16_t;
-typedef __uint32_t uid_t;
-#endif /*__uid_t_defined*/
-
-#ifndef __gid_t_defined
-#define __gid_t_defined
-typedef unsigned short __gid16_t;
-typedef __uint32_t gid_t;
-#endif /*__gid_t_defined*/
 
 #ifndef __ino_t_defined
 #define __ino_t_defined
@@ -112,11 +89,6 @@ struct flock {
 	off_t	 l_len;		/* length, in bytes; 0 means lock to EOF */
 	pid_t	 l_pid;		/* returned with F_GETLK */
 };
-
-#ifndef __key_t_defined
-#define __key_t_defined
-typedef long long key_t;
-#endif /* __key_t_defined */
 
 #ifndef __BIT_TYPES_DEFINED
 #define __BIT_TYPES_DEFINED__ 1

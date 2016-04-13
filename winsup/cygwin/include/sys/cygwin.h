@@ -397,11 +397,9 @@ extern void cygwin_premain3 (int, char **, struct per_process *);
 #define EXTERNAL_PINFO_VERSION_32_LP  2
 #define EXTERNAL_PINFO_VERSION EXTERNAL_PINFO_VERSION_32_LP
 
-#ifndef __uid_t_defined
+#ifndef __INSIDE_CYGWIN__
 typedef __uint16_t __uid16_t;
 typedef __uint16_t __gid16_t;
-typedef __uint32_t uid_t;
-typedef __uint32_t gid_t;
 #endif
 
 struct external_pinfo
