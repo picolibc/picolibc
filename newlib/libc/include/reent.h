@@ -92,7 +92,6 @@ extern "C" {
 
 #include <sys/reent.h>
 #include <sys/_types.h>
-#include <machine/types.h>
 
 #define __need_size_t
 #define __need_ptrdiff_t

@@ -16,6 +16,12 @@
 typedef long _off_t;
 #endif
 
+#if defined(__XMK__)
+typedef signed char __pid_t;
+#else
+typedef int __pid_t;
+#endif
+
 #ifndef __dev_t_defined
 typedef short __dev_t;
 #endif
@@ -30,6 +36,14 @@ typedef unsigned short __gid_t;
 #ifndef __off64_t_defined
 __extension__ typedef long long _off64_t;
 #endif
+
+#ifdef __CYGWIN__
+typedef _off64_t __off_t;
+#else
+typedef _off_t __off_t;
+#endif
+
+typedef _off64_t __loff_t;
 
 /*
  * We need fpos_t for the following, but it doesn't have a leading "_",
@@ -87,5 +101,12 @@ typedef _LOCK_RECURSIVE_T _flock_t;
 /* Iconv descriptor type */
 typedef void *_iconv_t;
 #endif
+
+#define	_CLOCK_T_	unsigned long		/* clock() */
+#define	_TIME_T_	long			/* time() */
+#define _CLOCKID_T_ 	unsigned long
+#define _TIMER_T_   	unsigned long
+
+typedef	long		__suseconds_t;	/* microseconds (signed) */
 
 #endif	/* _SYS__TYPES_H */

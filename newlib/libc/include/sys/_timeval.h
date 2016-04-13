@@ -29,7 +29,7 @@
 #ifndef _SYS__TIMEVAL_H_
 #define _SYS__TIMEVAL_H_
 
-#include <machine/types.h>
+#include <sys/_types.h>
 
 #ifndef _SUSECONDS_T_DECLARED
 typedef	__suseconds_t	suseconds_t;

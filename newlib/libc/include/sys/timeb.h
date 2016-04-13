@@ -15,7 +15,7 @@ extern "C" {
 #define _SYS_TIMEB_H
 
 #include <_ansi.h>
-#include <machine/types.h>
+#include <sys/_types.h>
 
 #ifndef __time_t_defined
 typedef _TIME_T_ time_t;

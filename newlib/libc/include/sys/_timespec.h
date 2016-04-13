@@ -34,7 +34,7 @@
 #ifndef _SYS__TIMESPEC_H_
 #define	_SYS__TIMESPEC_H_
 
-#include <machine/types.h>
+#include <sys/_types.h>
 
 #ifndef __time_t_defined
 typedef	_TIME_T_	time_t;

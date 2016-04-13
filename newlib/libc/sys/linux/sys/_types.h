@@ -51,4 +51,11 @@ typedef struct
 
 typedef struct { __flock_mutex_t mutex; } _flock_t;
 
+#define	_CLOCK_T_	unsigned long		/* clock() */
+#define	_TIME_T_	long			/* time() */
+#define _CLOCKID_T_ 	unsigned long
+#define _TIMER_T_   	unsigned long
+
+typedef	long		__suseconds_t;	/* microseconds (signed) */
+
 #endif	/* _SYS__TYPES_H */

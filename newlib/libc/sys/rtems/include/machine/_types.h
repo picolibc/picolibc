@@ -5,9 +5,6 @@
 #ifndef _MACHINE__TYPES_H
 #define _MACHINE__TYPES_H
 
-/* This disables some conflicting type definitions in <machine/types.h> */
-#define _HAVE_SYSTYPES
-
 #include <machine/_default_types.h>
 
 typedef __int32_t blksize_t;

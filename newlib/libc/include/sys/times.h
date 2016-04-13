@@ -5,7 +5,7 @@ extern "C" {
 #define	_SYS_TIMES_H
 
 #include <_ansi.h>
-#include <machine/types.h>
+#include <sys/_types.h>
 
 #ifndef __clock_t_defined
 typedef _CLOCK_T_ clock_t;

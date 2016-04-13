@@ -34,12 +34,7 @@ typedef struct timespec timestruc_t;
 
 #ifndef __off_t_defined
 #define __off_t_defined
-/* Based on the newlib definitions. */
-#if __WORDSIZE == 64
-typedef _off_t off_t;
-#else
-typedef _off64_t off_t;
-#endif
+typedef __off_t off_t;
 #endif /*__off_t_defined*/
 
 typedef __loff_t loff_t;

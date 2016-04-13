@@ -54,7 +54,6 @@
 #include <stddef.h>
 #include <sys/config.h>
 #include <features.h>
-#include <machine/types.h>
 #include <sys/_types.h>
 
 #if !defined(__time_t_defined) && !defined(_TIME_T)

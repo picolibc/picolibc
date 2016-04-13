@@ -66,7 +66,6 @@ typedef	quad_t *	qaddr_t;
 #endif
 
 # include <stddef.h>
-# include <machine/types.h>
 
 /* To ensure the stat struct's layout doesn't change when sizeof(int), etc.
    changes, we assume sizeof short and long never change and have all types
@@ -175,10 +174,9 @@ typedef __uid_t uid_t;
 typedef __gid_t gid_t;
 #endif
 
-#if defined(__XMK__)
-typedef signed char pid_t;
-#else
-typedef int pid_t;
+#ifndef _PID_T_DECLARED
+typedef	__pid_t		pid_t;		/* process id */
+#define	_PID_T_DECLARED
 #endif
 
 #if defined(__rtems__)
