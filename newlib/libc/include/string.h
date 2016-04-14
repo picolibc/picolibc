@@ -46,7 +46,7 @@ size_t	 _EXFUN(strxfrm,(char *__restrict, const char *__restrict, size_t));
 #if __MISC_VISIBLE || __POSIX_VISIBLE
 char 	*_EXFUN(strtok_r,(char *__restrict, const char *__restrict, char **__restrict));
 #endif
-#if __BSD_VISIBLE || (__POSIX_VISIBLE && __POSIX_VISIBLE < 200809)
+#if __BSD_VISIBLE /* POSIX declaration is in <strings.h> */
 int	 _EXFUN(bcmp,(const void *, const void *, size_t));
 void	 _EXFUN(bcopy,(const void *, void *, size_t));
 void	 _EXFUN(bzero,(void *, size_t));
@@ -56,10 +56,8 @@ void	 _EXFUN(explicit_bzero,(void *, size_t));
 int	 _EXFUN(timingsafe_bcmp,(const void *, const void *, size_t));
 int	 _EXFUN(timingsafe_memcmp,(const void *, const void *, size_t));
 #endif
-#if __MISC_VISIBLE || __POSIX_VISIBLE >= 200809
+#if __BSD_VISIBLE /* POSIX declaration is in <strings.h> */
 int	 _EXFUN(ffs,(int));
-#endif
-#if __BSD_VISIBLE || (__POSIX_VISIBLE && __POSIX_VISIBLE < 200809)
 char 	*_EXFUN(index,(const char *, int));
 #endif
 #if __MISC_VISIBLE || __POSIX_VISIBLE
@@ -71,12 +69,14 @@ _PTR	 _EXFUN(memmem, (const _PTR, size_t, const _PTR, size_t));
 _PTR 	 _EXFUN(memrchr,(const _PTR, int, size_t));
 _PTR 	 _EXFUN(rawmemchr,(const _PTR, int));
 #endif
-#if __BSD_VISIBLE || (__POSIX_VISIBLE && __POSIX_VISIBLE < 200809)
+#if __BSD_VISIBLE /* POSIX declaration is in <strings.h> */
 char 	*_EXFUN(rindex,(const char *, int));
 #endif
+#if __POSIX_VISIBLE >= 200809
 char 	*_EXFUN(stpcpy,(char *__restrict, const char *__restrict));
 char 	*_EXFUN(stpncpy,(char *__restrict, const char *__restrict, size_t));
-#if __BSD_VISIBLE || __POSIX_VISIBLE
+#endif
+#if __BSD_VISIBLE /* POSIX declaration is in <strings.h> */
 int	 _EXFUN(strcasecmp,(const char *, const char *));
 #endif
 #if __GNU_VISIBLE
@@ -123,7 +123,7 @@ char *	_EXFUN(_strerror_r, (struct _reent *, int, int, int *));
 size_t	_EXFUN(strlcat,(char *, const char *, size_t));
 size_t	_EXFUN(strlcpy,(char *, const char *, size_t));
 #endif
-#if __BSD_VISIBLE || __POSIX_VISIBLE
+#if __BSD_VISIBLE /* POSIX declaration is in <strings.h> */
 int	_EXFUN(strncasecmp,(const char *, const char *, size_t));
 #endif
 #if __POSIX_VISIBLE >= 200809

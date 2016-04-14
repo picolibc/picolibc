@@ -7,6 +7,9 @@
 #ifndef _STRINGS_H_
 #define _STRINGS_H_
 
+/* These functions are already declared in <string.h> with __BSD_VISIBLE */
+#if !(defined(_STRING_H_) && __BSD_VISIBLE)
+
 #include "_ansi.h"
 #include <sys/reent.h>
 #include <sys/cdefs.h>
@@ -31,5 +34,7 @@ int	 _EXFUN(strcasecmp,(const char *, const char *));
 int	 _EXFUN(strncasecmp,(const char *, const char *, size_t));
 
 _END_STD_C
+
+#endif /* !(_STRING_H_ && __BSD_VISIBLE) */
 
 #endif /* _STRINGS_H_ */
