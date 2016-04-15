@@ -7,7 +7,7 @@ char *	_EXFUN(_gcvt,(struct _reent *, double , int , char *, char, int));
 
 char *__locale_charset(_NOARGS);
 
-#ifndef __mbstate_t_defined
+#ifndef __machine_mbstate_t_defined
 #include <wchar.h>
 #endif
 

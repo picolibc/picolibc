@@ -1,35 +1,25 @@
-/*
- *  $Id$
- */
-
 #ifndef _MACHINE__TYPES_H
-#define _MACHINE__TYPES_H
+#define	_MACHINE__TYPES_H
 
 #include <machine/_default_types.h>
 
-typedef __int32_t blksize_t;
-typedef __int32_t blkcnt_t;
+typedef	__int32_t	blksize_t;
+typedef	__int32_t	blkcnt_t;
 
-typedef __uint64_t __dev_t;
-#define __dev_t_defined 1
+typedef	__uint64_t	__dev_t;
+#define	__machine_dev_t_defined
 
 #if defined(__arm__) || defined(__i386__) || defined(__m68k__) || defined(__mips__) || defined(__PPC__) || defined(__sparc__)
-/* Use 64bit types */
-typedef __int64_t _off_t;
-#define __off_t_defined 1
-
-typedef __int64_t _fpos_t;
-#define __fpos_t_defined 1
+typedef	__int64_t	_off_t;
 #else
-/* Use 32bit types */
-typedef __int32_t _off_t;
-#define __off_t_defined 1
-
-typedef __int32_t _fpos_t;
-#define __fpos_t_defined 1
+typedef	__int32_t	_off_t;
 #endif
+#define	__machine_off_t_defined
 
-typedef __uint32_t _mode_t;
-#define __mode_t_defined 1
+typedef	_off_t		_fpos_t;
+#define	__machine_fpos_t_defined
 
-#endif
+typedef	__uint32_t	_mode_t;
+#define	__machine_mode_t_defined
+
+#endif /* _MACHINE__TYPES_H */

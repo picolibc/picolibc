@@ -2,8 +2,18 @@
 
 /* This file defines various typedefs needed by the system calls that support
    the C library.  Basically, they're just the POSIX versions with an '_'
-   prepended.  This file lives in the `sys' directory so targets can provide
-   their own if desired (or they can put target dependant conditionals here).
+   prepended.  Targets shall use <machine/_types.h> to define their own
+   internal types if desired.
+
+   There are three define patterns used for type definitions.  Lets assume
+   xyz_t is a user type.
+
+   The internal type definition uses __machine_xyz_t_defined.  It is defined by
+   <machine/_types.h> to disable a default definition in <sys/_types.h>. It
+   must not be used in other files.
+
+   User type definitions are guarded by __xyz_t_defined in glibc and
+   _XYZ_T_DECLARED in BSD compatible systems.
 */
 
 #ifndef	_SYS__TYPES_H
@@ -12,7 +22,7 @@
 #include <machine/_types.h>
 #include <sys/lock.h>
 
-#ifndef __off_t_defined
+#ifndef __machine_off_t_defined
 typedef long _off_t;
 #endif
 
@@ -22,18 +32,18 @@ typedef signed char __pid_t;
 typedef int __pid_t;
 #endif
 
-#ifndef __dev_t_defined
+#ifndef __machine_dev_t_defined
 typedef short __dev_t;
 #endif
 
-#ifndef __uid_t_defined
+#ifndef __machine_uid_t_defined
 typedef unsigned short __uid_t;
 #endif
-#ifndef __gid_t_defined
+#ifndef __machine_gid_t_defined
 typedef unsigned short __gid_t;
 #endif
 
-#ifndef __off64_t_defined
+#ifndef __machine_off64_t_defined
 __extension__ typedef long long _off64_t;
 #endif
 
@@ -45,7 +55,7 @@ typedef _off_t __off_t;
 
 typedef _off64_t __loff_t;
 
-#ifndef __key_t_defined
+#ifndef __machine_key_t_defined
 typedef long __key_t;
 #endif
 
@@ -53,18 +63,18 @@ typedef long __key_t;
  * We need fpos_t for the following, but it doesn't have a leading "_",
  * so we use _fpos_t instead.
  */
-#ifndef __fpos_t_defined
+#ifndef __machine_fpos_t_defined
 typedef long _fpos_t;		/* XXX must match off_t in <sys/types.h> */
 				/* (and must be `long' for now) */
 #endif
 
 #ifdef __LARGE64_FILES
-#ifndef __fpos64_t_defined
+#ifndef __machine_fpos64_t_defined
 typedef _off64_t _fpos64_t;
 #endif
 #endif
 
-#ifndef __ssize_t_defined
+#ifndef __machine_ssize_t_defined
 #ifdef __SIZE_TYPE__
 /* If __SIZE_TYPE__ is defined (gcc) we define ssize_t based on size_t.
    We simply change "unsigned" to "signed" for this single definition
@@ -84,7 +94,7 @@ typedef long _ssize_t;
 #define __need_wint_t
 #include <stddef.h>
 
-#ifndef __mbstate_t_defined
+#ifndef __machine_mbstate_t_defined
 /* Conversion state information.  */
 typedef struct
 {
@@ -97,11 +107,11 @@ typedef struct
 } _mbstate_t;
 #endif
 
-#ifndef __flock_t_defined
+#ifndef __machine_flock_t_defined
 typedef _LOCK_RECURSIVE_T _flock_t;
 #endif
 
-#ifndef __iconv_t_defined
+#ifndef __machine_iconv_t_defined
 /* Iconv descriptor type */
 typedef void *_iconv_t;
 #endif

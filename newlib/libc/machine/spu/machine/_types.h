@@ -39,22 +39,22 @@
 /*
  * fpos_t large enough for either 32 or 64 bit ppc glibc fpos_t.
  */
-#define __fpos_t_defined
+#define __machine_fpos_t_defined
 typedef struct {
   char __pos[16];
 } _fpos_t;
 
 #ifdef __LARGE64_FILES
-#define __fpos64_t_defined
+#define __machine_fpos64_t_defined
 typedef _fpos_t _fpos64_t;
 #endif
 
-#define __dev_t_defined
+#define __machine_dev_t_defined
 typedef int __dev_t;
 
-#define __uid_t_defined
+#define __machine_uid_t_defined
 typedef unsigned int __uid_t;
-#define __gid_t_defined
+#define __machine_gid_t_defined
 typedef unsigned int __gid_t;
 
 #endif /* _MACHINE__TYPES_H */
