@@ -173,6 +173,7 @@ typedef	_CLOCKID_T_	__clockid_t;
 #define	_TIMER_T_	unsigned long
 typedef	_TIMER_T_	__timer_t;
 
+typedef	unsigned short	__nlink_t;
 typedef	long		__suseconds_t;	/* microseconds (signed) */
 
 #endif	/* _SYS__TYPES_H */

@@ -205,7 +205,10 @@ typedef	__mode_t	mode_t;		/* permissions */
 #define	_MODE_T_DECLARED
 #endif
 
-typedef unsigned short nlink_t;
+#ifndef _NLINK_T_DECLARED
+typedef	__nlink_t	nlink_t;	/* link count */
+#define	_NLINK_T_DECLARED
+#endif
 
 #if !defined(__clockid_t_defined) && !defined(_CLOCKID_T_DECLARED)
 typedef	__clockid_t	clockid_t;
