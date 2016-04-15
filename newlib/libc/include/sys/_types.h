@@ -119,6 +119,21 @@ typedef _off64_t _fpos64_t;
 #endif
 #endif
 
+/* Defined by GCC provided <stddef.h> */
+#undef __size_t
+
+#ifndef __machine_size_t_defined
+#ifdef __SIZE_TYPE__
+typedef __SIZE_TYPE__ __size_t;
+#else
+#if defined(__INT_MAX__) && __INT_MAX__ == 2147483647
+typedef int __size_t;
+#else
+typedef long __size_t;
+#endif
+#endif
+#endif
+
 #ifndef __machine_ssize_t_defined
 #ifdef __SIZE_TYPE__
 /* If __SIZE_TYPE__ is defined (gcc) we define ssize_t based on size_t.
