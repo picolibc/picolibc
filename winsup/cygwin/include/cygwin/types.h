@@ -34,18 +34,6 @@ typedef struct timespec timestruc_t;
 
 typedef __loff_t loff_t;
 
-#ifndef __fsblkcnt_t_defined
-#define __fsblkcnt_t_defined
-/* Keep as is.  32 bit on i386, 64 bit on x86_64. */
-typedef unsigned long fsblkcnt_t;
-#endif /* __fsblkcnt_t_defined */
-
-#ifndef __fsfilcnt_t_defined
-#define __fsfilcnt_t_defined
-/* Keep as is.  32 bit on i386, 64 bit on x86_64. */
-typedef unsigned long fsfilcnt_t;
-#endif /* __fsfilcnt_t_defined */
-
 #if defined (__INSIDE_CYGWIN__) && !defined (__x86_64__)
 struct __flock32 {
 	short	 l_type;	/* F_RDLCK, F_WRLCK, or F_UNLCK */

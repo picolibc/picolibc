@@ -22,6 +22,14 @@ typedef __int32_t __blksize_t;
 #define __machine_dev_t_defined
 typedef __uint32_t __dev_t;
 
+#define __machine_fsblkcnt_t_defined
+/* Keep as is.  32 bit on i386, 64 bit on x86_64. */
+typedef unsigned long __fsblkcnt_t;
+
+#define __machine_fsfilcnt_t_defined
+/* Keep as is.  32 bit on i386, 64 bit on x86_64. */
+typedef unsigned long __fsfilcnt_t;
+
 #define __machine_uid_t_defined
 typedef __uint32_t __uid_t;
 

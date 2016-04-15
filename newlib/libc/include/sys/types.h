@@ -127,6 +127,12 @@ typedef	char *	caddr_t;
 #define __caddr_t_defined
 #endif
 
+#ifndef _FSBLKCNT_T_DECLARED		/* for statvfs() */
+typedef	__fsblkcnt_t	fsblkcnt_t;
+typedef	__fsfilcnt_t	fsfilcnt_t;
+#define	_FSBLKCNT_T_DECLARED
+#endif
+
 #ifndef _ID_T_DECLARED
 typedef	__id_t		id_t;		/* can hold a uid_t or pid_t */
 #define	_ID_T_DECLARED

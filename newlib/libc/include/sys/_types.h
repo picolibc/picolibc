@@ -30,6 +30,14 @@ typedef long __blkcnt_t;
 typedef long __blksize_t;
 #endif
 
+#ifndef __machine_fsblkcnt_t_defined
+typedef __uint64_t __fsblkcnt_t;
+#endif
+
+#ifndef __machine_fsfilcnt_t_defined
+typedef __uint32_t __fsfilcnt_t;
+#endif
+
 #ifndef __machine_off_t_defined
 typedef long _off_t;
 #endif
