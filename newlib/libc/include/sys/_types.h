@@ -145,7 +145,9 @@ typedef _LOCK_RECURSIVE_T _flock_t;
 typedef void *_iconv_t;
 #endif
 
-#define	_CLOCK_T_	unsigned long		/* clock() */
+#define	_CLOCK_T_	unsigned long	/* clock() */
+typedef	_CLOCK_T_	__clock_t;
+
 #define	_TIME_T_	long			/* time() */
 #define _CLOCKID_T_ 	unsigned long
 #define _TIMER_T_   	unsigned long

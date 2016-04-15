@@ -7,9 +7,10 @@ extern "C" {
 #include <_ansi.h>
 #include <sys/_types.h>
 
-#ifndef __clock_t_defined
-typedef _CLOCK_T_ clock_t;
-#define __clock_t_defined
+#if !defined(__clock_t_defined) && !defined(_CLOCK_T_DECLARED)
+typedef	_CLOCK_T_	clock_t;
+#define	__clock_t_defined
+#define	_CLOCK_T_DECLARED
 #endif
 
 /*  Get Process Times, P1003.1b-1993, p. 92 */
