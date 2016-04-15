@@ -43,6 +43,10 @@ typedef unsigned short __uid_t;
 typedef unsigned short __gid_t;
 #endif
 
+#ifndef __machine_id_t_defined
+typedef __uint32_t __id_t;
+#endif
+
 #ifndef __machine_off64_t_defined
 __extension__ typedef long long _off64_t;
 #endif

@@ -134,6 +134,11 @@ typedef	char *	caddr_t;
 #define __caddr_t_defined
 #endif
 
+#ifndef _ID_T_DECLARED
+typedef	__id_t		id_t;		/* can hold a uid_t or pid_t */
+#define	_ID_T_DECLARED
+#endif
+
 #ifndef __CYGWIN__
 #if defined(__MS_types__) || defined(__rtems__) || \
     defined(__sparc__) || defined(__SPU__)
