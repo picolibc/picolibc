@@ -222,7 +222,10 @@ typedef	__timer_t	timer_t;
 #define	_TIMER_T_DECLARED
 #endif
 
-typedef unsigned long useconds_t;
+#ifndef _USECONDS_T_DECLARED
+typedef	__useconds_t	useconds_t;	/* microseconds (unsigned) */
+#define	_USECONDS_T_DECLARED
+#endif
 
 #ifndef _SUSECONDS_T_DECLARED
 typedef	__suseconds_t	suseconds_t;

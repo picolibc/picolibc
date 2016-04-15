@@ -175,5 +175,6 @@ typedef	_TIMER_T_	__timer_t;
 
 typedef	unsigned short	__nlink_t;
 typedef	long		__suseconds_t;	/* microseconds (signed) */
+typedef	unsigned long	__useconds_t;	/* microseconds (unsigned) */
 
 #endif	/* _SYS__TYPES_H */
