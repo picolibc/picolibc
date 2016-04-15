@@ -101,6 +101,11 @@ typedef	__blkcnt_t	blkcnt_t;
 #define	_BLKCNT_T_DECLARED
 #endif
 
+#ifndef _BLKSIZE_T_DECLARED
+typedef	__blksize_t	blksize_t;
+#define	_BLKSIZE_T_DECLARED
+#endif
+
 #if !defined(__clock_t_defined) && !defined(_CLOCK_T_DECLARED)
 typedef	_CLOCK_T_	clock_t;
 #define	__clock_t_defined

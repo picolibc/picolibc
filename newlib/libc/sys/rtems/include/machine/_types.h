@@ -3,10 +3,11 @@
 
 #include <machine/_default_types.h>
 
-typedef	__int32_t	blksize_t;
-
 typedef	__int32_t	__blkcnt_t;
 #define	__machine_blkcnt_t_defined
+
+typedef	__int32_t	__blksize_t;
+#define	__machine_blksize_t_defined
 
 typedef	__uint64_t	__dev_t;
 #define	__machine_dev_t_defined

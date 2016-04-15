@@ -26,6 +26,10 @@
 typedef long __blkcnt_t;
 #endif
 
+#ifndef __machine_blksize_t_defined
+typedef long __blksize_t;
+#endif
+
 #ifndef __machine_off_t_defined
 typedef long _off_t;
 #endif

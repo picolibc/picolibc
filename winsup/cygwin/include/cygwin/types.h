@@ -34,11 +34,6 @@ typedef struct timespec timestruc_t;
 
 typedef __loff_t loff_t;
 
-#ifndef __blksize_t_defined
-#define __blksize_t_defined
-typedef __int32_t blksize_t;
-#endif /*__blksize_t_defined*/
-
 #ifndef __fsblkcnt_t_defined
 #define __fsblkcnt_t_defined
 /* Keep as is.  32 bit on i386, 64 bit on x86_64. */
