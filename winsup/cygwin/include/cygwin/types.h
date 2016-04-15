@@ -104,10 +104,6 @@ typedef __int32_t register_t;
 typedef char *addr_t;
 #endif
 
-#ifndef __mode_t_defined
-#define __mode_t_defined
-typedef unsigned mode_t;
-#endif
 #endif /*__BIT_TYPES_DEFINED*/
 
 #if !defined(__INSIDE_CYGWIN__) || !defined(__cplusplus)

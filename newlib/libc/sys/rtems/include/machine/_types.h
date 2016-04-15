@@ -22,7 +22,7 @@ typedef	_off_t		_fpos_t;
 typedef	unsigned long	__ino_t;
 #define	__machine_ino_t_defined
 
-typedef	__uint32_t	_mode_t;
+typedef	__uint32_t	__mode_t;
 #define	__machine_mode_t_defined
 
 #endif /* _MACHINE__TYPES_H */

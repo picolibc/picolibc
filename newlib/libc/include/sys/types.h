@@ -59,26 +59,7 @@ typedef	quad_t *	qaddr_t;
 #include <sys/_types.h>
 #include <sys/_stdint.h>
 
-#ifdef __i386__
-#if defined (GO32) || defined (__MSDOS__)
-#define __MS_types__
-#endif
-#endif
-
 # include <stddef.h>
-
-/* To ensure the stat struct's layout doesn't change when sizeof(int), etc.
-   changes, we assume sizeof short and long never change and have all types
-   used to define struct stat use them and not int where possible.
-   Where not possible, _ST_INTxx are used.  It would be preferable to not have
-   such assumptions, but until the extra fluff is necessary, it's avoided.
-   No 64 bit targets use stat yet.  What to do about them is postponed
-   until necessary.  */
-#ifdef __GNUC__
-#define _ST_INT32 __attribute__ ((__mode__ (__SI__)))
-#else
-#define _ST_INT32
-#endif
 
 #if __BSD_VISIBLE
 #include <sys/select.h>
@@ -144,7 +125,8 @@ typedef	__ino_t		ino_t;		/* inode number */
 #define	_INO_T_DECLARED
 #endif
 
-#ifdef __MS_types__
+#if defined(__i386__) && (defined(GO32) || defined(__MSDOS__))
+typedef	char *		addr_t;
 typedef unsigned long vm_offset_t;
 typedef unsigned long vm_size_t;
 
@@ -159,7 +141,7 @@ typedef unsigned int u_int32_t;
 typedef long long int64_t;
 typedef unsigned long long u_int64_t;
 typedef int32_t register_t;
-#endif /* __MS_types__ */
+#endif /* __i386__ && (GO32 || __MSDOS__) */
 
 /*
  * All these should be machine specific - right now they are all broken.
@@ -190,10 +172,6 @@ typedef	__pid_t		pid_t;		/* process id */
 #define	_PID_T_DECLARED
 #endif
 
-#if defined(__rtems__)
-typedef _mode_t mode_t;
-#endif
-
 #ifndef _KEY_T_DECLARED
 typedef	__key_t		key_t;		/* IPC key */
 #define	_KEY_T_DECLARED
@@ -204,28 +182,12 @@ typedef _ssize_t ssize_t;
 #define	_SSIZE_T_DECLARED
 #endif
 
-#if !defined(__CYGWIN__) && !defined(__rtems__)
-#ifdef __MS_types__
-typedef	char *	addr_t;
-typedef int mode_t;
-#else
-#if defined (__sparc__) && !defined (__sparc_v9__)
-#ifdef __svr4__
-typedef unsigned long mode_t;
-#else
-typedef unsigned short mode_t;
+#ifndef _MODE_T_DECLARED
+typedef	__mode_t	mode_t;		/* permissions */
+#define	_MODE_T_DECLARED
 #endif
-#else
-typedef unsigned int mode_t _ST_INT32;
-#endif
-#endif /* ! __MS_types__ */
-#endif /*__CYGWIN__*/
 
 typedef unsigned short nlink_t;
-
-#undef __MS_types__
-#undef _ST_INT32
-
 
 #ifndef __clockid_t_defined
 typedef _CLOCKID_T_ clockid_t;

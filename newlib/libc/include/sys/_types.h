@@ -56,6 +56,22 @@ typedef unsigned short __ino_t;
 #endif
 #endif
 
+#ifndef __machine_mode_t_defined
+#if defined(__i386__) && (defined(GO32) || defined(__MSDOS__))
+typedef int __mode_t;
+#else
+#if defined(__sparc__) && !defined(__sparc_v9__)
+#ifdef __svr4__
+typedef unsigned long __mode_t;
+#else
+typedef unsigned short __mode_t;
+#endif
+#else
+typedef __uint32_t __mode_t;
+#endif
+#endif
+#endif
+
 #ifndef __machine_off64_t_defined
 __extension__ typedef long long _off64_t;
 #endif
