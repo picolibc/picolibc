@@ -54,7 +54,7 @@ struct	stat
   time_t	st_ctime;
   long		st_spare3;
   long		st_blksize;
-  long		st_blocks;
+  blkcnt_t	st_blocks;
   long	st_spare4[2];
 #endif
 #endif

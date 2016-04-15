@@ -22,6 +22,10 @@
 #include <machine/_types.h>
 #include <sys/lock.h>
 
+#ifndef __machine_blkcnt_t_defined
+typedef long __blkcnt_t;
+#endif
+
 #ifndef __machine_off_t_defined
 typedef long _off_t;
 #endif

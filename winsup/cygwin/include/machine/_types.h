@@ -6,11 +6,15 @@
 #include <machine/_default_types.h>
 
 #if defined (__INSIDE_CYGWIN__) || defined (_COMPILING_NEWLIB)
+typedef __int32_t __blkcnt32_t;
 typedef __int16_t  __dev16_t;
 typedef __uint16_t __uid16_t;
 typedef __uint16_t __gid16_t;
 typedef __uint32_t __ino32_t;
 #endif
+
+#define __machine_blkcnt_t_defined
+typedef __uint64_t __blkcnt_t;
 
 #define __machine_dev_t_defined
 typedef __uint32_t __dev_t;

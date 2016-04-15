@@ -96,6 +96,11 @@ typedef	unsigned int	uint;		/* System V compatibility */
 typedef	unsigned long	ulong;		/* System V compatibility */
 #endif
 
+#ifndef _BLKCNT_T_DECLARED
+typedef	__blkcnt_t	blkcnt_t;
+#define	_BLKCNT_T_DECLARED
+#endif
+
 #if !defined(__clock_t_defined) && !defined(_CLOCK_T_DECLARED)
 typedef	_CLOCK_T_	clock_t;
 #define	__clock_t_defined

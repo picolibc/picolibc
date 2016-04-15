@@ -39,12 +39,6 @@ typedef __loff_t loff_t;
 typedef __int32_t blksize_t;
 #endif /*__blksize_t_defined*/
 
-#ifndef __blkcnt_t_defined
-#define __blkcnt_t_defined
-typedef __int32_t __blkcnt32_t;
-typedef __int64_t blkcnt_t;
-#endif /*__blkcnt_t_defined*/
-
 #ifndef __fsblkcnt_t_defined
 #define __fsblkcnt_t_defined
 /* Keep as is.  32 bit on i386, 64 bit on x86_64. */
