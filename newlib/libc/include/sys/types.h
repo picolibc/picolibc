@@ -139,14 +139,10 @@ typedef	__id_t		id_t;		/* can hold a uid_t or pid_t */
 #define	_ID_T_DECLARED
 #endif
 
-#ifndef __CYGWIN__
-#if defined(__MS_types__) || defined(__rtems__) || \
-    defined(__sparc__) || defined(__SPU__)
-typedef	unsigned long	ino_t;
-#else
-typedef	unsigned short	ino_t;
+#ifndef _INO_T_DECLARED
+typedef	__ino_t		ino_t;		/* inode number */
+#define	_INO_T_DECLARED
 #endif
-#endif /*__CYGWIN__*/
 
 #ifdef __MS_types__
 typedef unsigned long vm_offset_t;

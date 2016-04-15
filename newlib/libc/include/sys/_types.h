@@ -47,6 +47,15 @@ typedef unsigned short __gid_t;
 typedef __uint32_t __id_t;
 #endif
 
+#ifndef __machine_ino_t_defined
+#if (defined(__i386__) && (defined(GO32) || defined(__MSDOS__))) || \
+    defined(__sparc__) || defined(__SPU__)
+typedef unsigned long __ino_t;
+#else
+typedef unsigned short __ino_t;
+#endif
+#endif
+
 #ifndef __machine_off64_t_defined
 __extension__ typedef long long _off64_t;
 #endif

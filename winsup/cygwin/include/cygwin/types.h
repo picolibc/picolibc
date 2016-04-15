@@ -57,14 +57,6 @@ typedef unsigned long fsblkcnt_t;
 typedef unsigned long fsfilcnt_t;
 #endif /* __fsfilcnt_t_defined */
 
-#ifndef __ino_t_defined
-#define __ino_t_defined
-#ifndef __x86_64__
-typedef __uint32_t __ino32_t;
-#endif
-typedef __uint64_t ino_t;
-#endif /*__ino_t_defined*/
-
 #if defined (__INSIDE_CYGWIN__) && !defined (__x86_64__)
 struct __flock32 {
 	short	 l_type;	/* F_RDLCK, F_WRLCK, or F_UNLCK */
