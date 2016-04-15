@@ -36,9 +36,10 @@ typedef	__suseconds_t	suseconds_t;
 #define	_SUSECONDS_T_DECLARED
 #endif
 
-#ifndef __time_t_defined
+#if !defined(__time_t_defined) && !defined(_TIME_T_DECLARED)
 typedef	_TIME_T_	time_t;
 #define	__time_t_defined
+#define	_TIME_T_DECLARED
 #endif
 
 /* This define is also used outside of Newlib, e.g. in MinGW-w64 */

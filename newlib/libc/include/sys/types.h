@@ -102,9 +102,10 @@ typedef	_CLOCK_T_	clock_t;
 #define	_CLOCK_T_DECLARED
 #endif
 
-#ifndef __time_t_defined
-typedef _TIME_T_ time_t;
-#define __time_t_defined
+#if !defined(__time_t_defined) && !defined(_TIME_T_DECLARED)
+typedef	_TIME_T_	time_t;
+#define	__time_t_defined
+#define	_TIME_T_DECLARED
 #endif
 
 #ifndef __daddr_t_defined
