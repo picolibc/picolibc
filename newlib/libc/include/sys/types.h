@@ -191,9 +191,10 @@ typedef	__mode_t	mode_t;		/* permissions */
 
 typedef unsigned short nlink_t;
 
-#ifndef __clockid_t_defined
-typedef _CLOCKID_T_ clockid_t;
-#define __clockid_t_defined
+#if !defined(__clockid_t_defined) && !defined(_CLOCKID_T_DECLARED)
+typedef	__clockid_t	clockid_t;
+#define	__clockid_t_defined
+#define	_CLOCKID_T_DECLARED
 #endif
 
 #ifndef __timer_t_defined

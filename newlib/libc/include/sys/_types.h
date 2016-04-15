@@ -151,7 +151,9 @@ typedef	_CLOCK_T_	__clock_t;
 #define	_TIME_T_	long		/* time() */
 typedef	_TIME_T_	__time_t;
 
-#define _CLOCKID_T_ 	unsigned long
+#define	_CLOCKID_T_ 	unsigned long
+typedef	_CLOCKID_T_	__clockid_t;
+
 #define _TIMER_T_   	unsigned long
 
 typedef	long		__suseconds_t;	/* microseconds (signed) */
