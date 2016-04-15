@@ -97,7 +97,7 @@ struct symlink_info
   bool isdevice;
   _major_t major;
   _minor_t minor;
-  _mode_t mode;
+  __mode_t mode;
   int check (char *path, const suffix_info *suffixes, fs_info &fs,
 	     path_conv_handle &conv_hdl);
   int set (char *path);
@@ -2565,7 +2565,7 @@ symlink_info::parse_device (const char *contents)
   char *endptr;
   _major_t mymajor;
   _major_t myminor;
-  _mode_t mymode;
+  __mode_t mymode;
 
   mymajor = strtol (contents += 2, &endptr, 16);
   if (endptr == contents)

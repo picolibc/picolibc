@@ -13,7 +13,6 @@ details. */
 
 typedef unsigned short _major_t;
 typedef unsigned short _minor_t;
-typedef mode_t _mode_t;
 
 #define FHDEV(maj, min) ((((unsigned) (maj)) << (sizeof (_major_t) * 8)) | (unsigned) (min))
 #define _minor(dev) ((dev) & ((1 << (sizeof (_minor_t) * 8)) - 1))
@@ -271,7 +270,7 @@ struct device
   } d;
   const char *native;
   int (*exists_func) (const device&);
-  _mode_t mode;
+  __mode_t mode;
   bool lives_in_dev:4;
   bool dev_on_fs:4;
   static const device *lookup (const char *, unsigned int = UINT32_MAX);
