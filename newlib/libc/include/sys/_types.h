@@ -177,4 +177,10 @@ typedef	unsigned short	__nlink_t;
 typedef	long		__suseconds_t;	/* microseconds (signed) */
 typedef	unsigned long	__useconds_t;	/* microseconds (unsigned) */
 
+#ifdef __GNUCLIKE_BUILTIN_VARARGS
+typedef	__builtin_va_list	__va_list;
+#else
+typedef	char *			__va_list;
+#endif /* __GNUCLIKE_BUILTIN_VARARGS */
+
 #endif	/* _SYS__TYPES_H */
