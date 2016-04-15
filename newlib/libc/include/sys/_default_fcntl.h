@@ -99,6 +99,10 @@ extern "C" {
 
 #endif	/* __MISC_VISIBLE */
 
+#if __BSD_VISIBLE
+#define	FNONBLOCK	_FNONBLOCK
+#endif	/* __BSD_VISIBLE */
+
 /* XXX close on exec request; must match UF_EXCLOSE in user.h */
 #define	FD_CLOEXEC	1	/* posix */
 
