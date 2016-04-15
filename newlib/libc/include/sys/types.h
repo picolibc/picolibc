@@ -197,9 +197,10 @@ typedef	__clockid_t	clockid_t;
 #define	_CLOCKID_T_DECLARED
 #endif
 
-#ifndef __timer_t_defined
-typedef _TIMER_T_ timer_t;
-#define __timer_t_defined
+#if !defined(__timer_t_defined) && !defined(_TIMER_T_DECLARED)
+typedef	__timer_t	timer_t;
+#define	__timer_t_defined
+#define	_TIMER_T_DECLARED
 #endif
 
 typedef unsigned long useconds_t;
