@@ -28,4 +28,10 @@ typedef	unsigned long	__ino_t;
 typedef	__uint32_t	__mode_t;
 #define	__machine_mode_t_defined
 
+#ifdef _KERNEL
+typedef	int		boolean_t;
+typedef	struct device	*device_t;
+typedef	char		vm_memattr_t;	/* memory attribute codes */
+#endif /* _KERNEL */
+
 #endif /* _MACHINE__TYPES_H */
