@@ -127,9 +127,9 @@ typedef _off64_t _fpos64_t;
 typedef __SIZE_TYPE__ __size_t;
 #else
 #if defined(__INT_MAX__) && __INT_MAX__ == 2147483647
-typedef int __size_t;
+typedef unsigned int __size_t;
 #else
-typedef long __size_t;
+typedef unsigned long __size_t;
 #endif
 #endif
 #endif
