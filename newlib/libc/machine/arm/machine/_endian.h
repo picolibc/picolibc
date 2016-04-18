@@ -24,17 +24,16 @@
    NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
    SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
-#ifndef _MACHINE_ENDIAN_H
-#define _MACHINE_ENDIAN_H
+#ifndef __MACHINE_ENDIAN_H__
+#error "must be included via <machine/endian.h>"
+#endif /* !__MACHINE_ENDIAN_H__ */
 
-/*  Code relocated from libc/sys/arm/sys/param.h.  */
-#define BIG_ENDIAN      4321
-#define LITTLE_ENDIAN   1234
+#define	_LITTLE_ENDIAN	1234
+#define	_BIG_ENDIAN	4321
+#define	_PDP_ENDIAN	3412
 
 #ifdef __ARMEB__
-#define BYTE_ORDER BIG_ENDIAN
+#define	_BYTE_ORDER	_BIG_ENDIAN
 #else
-#define BYTE_ORDER LITTLE_ENDIAN
-#endif
-
+#define	_BYTE_ORDER	_LITTLE_ENDIAN
 #endif
