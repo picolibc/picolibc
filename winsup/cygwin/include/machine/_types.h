@@ -42,4 +42,8 @@ typedef __uint64_t __ino_t;
 #define __machine_key_t_defined
 typedef long long __key_t;
 
+/* Not unsigned for backward compatibility.  */
+#define __machine_socklen_t_defined
+typedef int __socklen_t;
+
 #endif /* _MACHINE__TYPES_H */

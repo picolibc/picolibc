@@ -16,12 +16,11 @@ details. */
 extern "C" {
 #endif /* __cplusplus */
 
-#include <stdint.h>
+#include <sys/types.h>
 
-/* Not unsigned for backward compatibility.  Keep #define for backward
-   compatibility. */
+/* Keep #define socklen_t for backward compatibility. */
 #ifndef socklen_t
-typedef int socklen_t;
+typedef __socklen_t socklen_t;
 #define socklen_t socklen_t
 #endif
 
@@ -51,7 +50,6 @@ struct sockaddr_storage {
 #include <asm/socket.h>			/* arch-dependent defines	*/
 #include <cygwin/sockios.h>		/* the SIOCxxx I/O controls	*/
 #include <sys/uio.h>			/* iovec support		*/
-#include <sys/types.h>
 
 struct ucred {
   pid_t			pid;
