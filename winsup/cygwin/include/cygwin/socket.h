@@ -24,7 +24,7 @@ typedef __socklen_t socklen_t;
 #define socklen_t socklen_t
 #endif
 
-typedef uint16_t sa_family_t;
+typedef __sa_family_t sa_family_t;
 
 #ifndef __INSIDE_CYGWIN_NET__
 struct sockaddr {

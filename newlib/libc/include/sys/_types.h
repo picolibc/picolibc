@@ -188,6 +188,10 @@ typedef	_CLOCKID_T_	__clockid_t;
 #define	_TIMER_T_	unsigned long
 typedef	_TIMER_T_	__timer_t;
 
+#ifndef __machine_sa_family_t_defined
+typedef	__uint8_t	__sa_family_t;
+#endif
+
 #ifndef __machine_socklen_t_defined
 typedef	__uint32_t	__socklen_t;
 #endif
