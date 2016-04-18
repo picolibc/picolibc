@@ -151,6 +151,8 @@ typedef long _ssize_t;
 #endif
 #endif
 
+typedef _ssize_t __ssize_t;
+
 #define __need_wint_t
 #include <stddef.h>
 
