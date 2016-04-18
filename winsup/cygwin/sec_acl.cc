@@ -323,12 +323,12 @@ set_posix_access (mode_t attr, uid_t uid, gid_t gid,
 
       /* To check if the NULL SID deny ACE is required we need user_obj.  */
       tmp_idx = searchace (aclbufp, nentries, def | USER_OBJ);
-      user_obj = aclbufp[tmp_idx].a_perm;
-      /* To compute deny access masks, we need group_obj, other_obj and... */
-      tmp_idx = searchace (aclbufp, nentries, def | GROUP_OBJ);
       /* No default entries present? */
       if (tmp_idx < 0)
 	break;
+      user_obj = aclbufp[tmp_idx].a_perm;
+      /* To compute deny access masks, we need group_obj, other_obj and... */
+      tmp_idx = searchace (aclbufp, nentries, def | GROUP_OBJ);
       group_obj = aclbufp[tmp_idx].a_perm;
       tmp_idx = searchace (aclbufp, nentries, def | OTHER_OBJ);
       other_obj = aclbufp[tmp_idx].a_perm;
@@ -800,6 +800,7 @@ get_posix_access (PSECURITY_DESCRIPTOR psd,
 			  aclsid[pos] = well_known_null_sid;
 			}
 		      has_class_perm = true;
+		      standard_ACEs_only = false;
 		      class_perm = lacl[pos].a_perm;
 		    }
 		  if (ace->Header.AceFlags & SUB_CONTAINERS_AND_OBJECTS_INHERIT)
@@ -867,7 +868,8 @@ get_posix_access (PSECURITY_DESCRIPTOR psd,
 	{
 	  type = GROUP_OBJ;
 	  lacl[1].a_id = gid = id;
-	  owner_eq_group = true;
+	  if (type == USER_OBJ)
+	    owner_eq_group = true;
 	}
       if (!(ace->Header.AceFlags & INHERIT_ONLY || type & ACL_DEFAULT))
 	{
@@ -933,7 +935,8 @@ get_posix_access (PSECURITY_DESCRIPTOR psd,
 		 with a standard ACL, one only consisting of POSIX perms, plus
 		 SYSTEM and Admins as maximum non-POSIX perms entries.  If it's
 		 a standard ACL, we apply umask.  That's not entirely correct,
-		 but it's probably the best we can do. */
+		 but it's probably the best we can do.  Chmod also wants to
+		 know this.  See there for the details. */
 	      else if (type & (USER | GROUP)
 		       && standard_ACEs_only
 		       && ace_sid != well_known_system_sid
