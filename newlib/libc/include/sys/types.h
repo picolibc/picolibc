@@ -71,6 +71,11 @@ typedef	quad_t *	qaddr_t;
 typedef	__uint32_t	in_addr_t;	/* base type for internet address */
 #define	_IN_ADDR_T_DECLARED
 #endif
+
+#ifndef _IN_PORT_T_DECLARED
+typedef	__uint16_t	in_port_t;
+#define	_IN_PORT_T_DECLARED
+#endif
 #endif /* __BSD_VISIBLE */
 
 #if __MISC_VISIBLE
