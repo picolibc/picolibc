@@ -362,6 +362,7 @@ set_posix_access (mode_t attr, uid_t uid, gid_t gid,
 	 ACE or we write it to avoid calls to AuthZ from get_posix_access. */
       if (!S_ISCHR (attr)
 	  && (has_class_obj
+	      || access != CYG_ACE_NEW_STYLE
 	      || ((user_obj | group_obj | other_obj) != user_obj
 		  || (group_obj | other_obj) != group_obj))
 	  && !add_access_denied_ace (acl, access, well_known_null_sid, acl_len,
