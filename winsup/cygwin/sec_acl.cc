@@ -151,6 +151,7 @@ set_posix_access (mode_t attr, uid_t uid, gid_t gid,
   int idx, start_idx, tmp_idx;
   bool owner_eq_group = false;
   bool dev_has_admins = false;
+  bool has_class_obj;
 
   /* Initialize local security descriptor. */
   RtlCreateSecurityDescriptor (&sd, SECURITY_DESCRIPTOR_REVISION);
@@ -339,6 +340,7 @@ set_posix_access (mode_t attr, uid_t uid, gid_t gid,
       tmp_idx = searchace (aclbufp, nentries, def | CLASS_OBJ);
       if (tmp_idx >= 0)
 	{
+	  has_class_obj = true;
 	  class_obj = aclbufp[tmp_idx].a_perm;
 	  access |= CYG_ACE_MASK_TO_WIN (class_obj);
 	}
@@ -346,6 +348,7 @@ set_posix_access (mode_t attr, uid_t uid, gid_t gid,
 	{
 	  /* Setting class_obj to group_obj allows to write below code without
 	     additional checks for existence of a CLASS_OBJ. */
+	  has_class_obj = false;
 	  class_obj = group_obj;
 	}
       /* Note that Windows filters the ACE Mask value so it only reflects
@@ -358,9 +361,9 @@ set_posix_access (mode_t attr, uid_t uid, gid_t gid,
 	 no special bits set.  In all other cases we either need the NULL SID
 	 ACE or we write it to avoid calls to AuthZ from get_posix_access. */
       if (!S_ISCHR (attr)
-	  && access != CYG_ACE_NEW_STYLE
-	  && ((user_obj | group_obj | other_obj) != user_obj
-	      || (group_obj | other_obj) != group_obj)
+	  && (has_class_obj
+	      || ((user_obj | group_obj | other_obj) != user_obj
+		  || (group_obj | other_obj) != group_obj))
 	  && !add_access_denied_ace (acl, access, well_known_null_sid, acl_len,
 				     inherit))
 	return NULL;
