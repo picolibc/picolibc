@@ -66,7 +66,12 @@ typedef	quad_t *	qaddr_t;
 #include <sys/select.h>
 #  define	physadr		physadr_t
 #  define	quad		quad_t
+
+#ifndef _IN_ADDR_T_DECLARED
+typedef	__uint32_t	in_addr_t;	/* base type for internet address */
+#define	_IN_ADDR_T_DECLARED
 #endif
+#endif /* __BSD_VISIBLE */
 
 #if __MISC_VISIBLE
 #ifndef _BSDTYPES_DEFINED

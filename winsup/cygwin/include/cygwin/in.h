@@ -20,8 +20,12 @@
 
 #include <cygwin/socket.h>
 
+#ifndef _IN_ADDR_T_DECLARED
+typedef	__uint32_t	in_addr_t;
+#define	_IN_ADDR_T_DECLARED
+#endif
+
 typedef uint16_t in_port_t;
-typedef uint32_t in_addr_t;
 
 #ifndef __INSIDE_CYGWIN_NET__
 
