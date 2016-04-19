@@ -16,6 +16,7 @@
 #include <time.h> /* struct timespec */
 #include <unistd.h> /* isatty */
 #include <sys/lock.h> /* _Mutex_recursive_Control */
+#include <machine/_libatomic.h>
 
 void rtems_provides_crt0( void ) {}  /* dummy symbol so file always has one */
 
@@ -58,7 +59,13 @@ RTEMS_STUB(int, _Sched_Count(void), { return -1; })
 RTEMS_STUB(int, _Sched_Index(void), { return -1; })
 RTEMS_STUB(int, _Sched_Name_to_index(const char *p, size_t s), { return -1; })
 RTEMS_STUB(int, _Sched_Processor_count(int i), { return 1; })
- 
+
+/* Stubs for routines from RTEMS <machine/_libatomic.h> */
+RTEMS_STUB(__uint32_t, _Libatomic_Protect_start(void *ptr), { return 0; });
+RTEMS_STUB(void, _Libatomic_Protect_end(void *ptr, __uint32_t isr_level), { });
+RTEMS_STUB(void, _Libatomic_Lock_n(void *ptr, __size_t n), { });
+RTEMS_STUB(void, _Libatomic_Unlock_n(void *ptr, __size_t n), { });
+
 #if defined(__GNUC__)
 /*
  * stubs for libstdc++ rtems-threads support functions from gcc/gthr-rtems.h
