@@ -334,7 +334,19 @@ set_posix_access (mode_t attr, uid_t uid, gid_t gid,
       other_obj = aclbufp[tmp_idx].a_perm;
 
       /* ... class_obj.  Create NULL deny ACE.  Only the S_ISGID attribute gets
-	 inherited. */
+	 inherited.  For directories check if we are also going to generate
+	 default entries.  If not we have a problem.  We can't generate only a
+	 single, inheritable NULL SID ACE because that leads to (fixable, TODO)
+	 access problems when trying to create the matching child permissions.
+	 Therefore we remove the S_ISGID bit on the directory because having it
+	 set would be misleading. */
+      if (!def && S_ISDIR (attr) && (attr & S_ISGID))
+	{
+	  /* Check for a required entry per POSIX. */
+	  tmp_idx = searchace (aclbufp, nentries, DEF_USER_OBJ);
+	  if (tmp_idx < 0)
+	    attr &= ~S_ISGID;
+	}
       access = CYG_ACE_ISBITS_TO_WIN (def ? attr & S_ISGID : attr)
 	       | CYG_ACE_NEW_STYLE;
       tmp_idx = searchace (aclbufp, nentries, def | CLASS_OBJ);
