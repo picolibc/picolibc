@@ -161,10 +161,6 @@ typedef unsigned long vm_size_t;
 
 #define __BIT_TYPES_DEFINED__
 
-typedef signed char int8_t;
-typedef short int16_t;
-typedef int int32_t;
-typedef long long int64_t;
 typedef int32_t register_t;
 #endif /* __i386__ && (GO32 || __MSDOS__) */
 
