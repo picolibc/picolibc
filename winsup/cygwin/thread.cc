@@ -2175,9 +2175,6 @@ pthread::atfork (void (*prepare)(void), void (*parent)(void), void (*child)(void
 extern "C" int
 pthread_attr_init (pthread_attr_t *attr)
 {
-  if (pthread_attr::is_good_object (attr))
-    return EBUSY;
-
   *attr = new pthread_attr;
   if (!pthread_attr::is_good_object (attr))
     {
@@ -2854,9 +2851,6 @@ pthread_cond_wait (pthread_cond_t *cond, pthread_mutex_t *mutex)
 extern "C" int
 pthread_condattr_init (pthread_condattr_t *condattr)
 {
-  if (pthread_condattr::is_good_object (condattr))
-    return EBUSY;
-
   *condattr = new pthread_condattr;
   if (!pthread_condattr::is_good_object (condattr))
     {
@@ -3040,9 +3034,6 @@ pthread_rwlock_unlock (pthread_rwlock_t *rwlock)
 extern "C" int
 pthread_rwlockattr_init (pthread_rwlockattr_t *rwlockattr)
 {
-  if (pthread_rwlockattr::is_good_object (rwlockattr))
-    return EBUSY;
-
   *rwlockattr = new pthread_rwlockattr;
   if (!pthread_rwlockattr::is_good_object (rwlockattr))
     {
@@ -3370,9 +3361,6 @@ pthread_mutexattr_gettype (const pthread_mutexattr_t *attr, int *type)
 extern "C" int
 pthread_mutexattr_init (pthread_mutexattr_t *attr)
 {
-  if (pthread_mutexattr::is_good_object (attr))
-    return EBUSY;
-
   *attr = new pthread_mutexattr ();
   if (!pthread_mutexattr::is_good_object (attr))
     {
