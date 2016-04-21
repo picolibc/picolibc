@@ -240,14 +240,14 @@ typedef	__int64_t	sbintime_t;
 #include <sys/features.h>
 
 
-/* Cygwin will probably never have full posix compliance due to little things
- * like an inability to set the stackaddress. Cygwin is also using void *  
- * pointers rather than structs to ensure maximum binary compatability with
- * previous releases.
- * This means that we don't use the types defined here, but rather in
- * <machine/types.h>
+/*
+ * Cygwin is using a complete distinct implementation of pthread objects and
+ * pointers rather than structs.  This means we can't use the types defined
+ * here, but rather in <machine/types.h>.
  */
-#if defined(_POSIX_THREADS) && !defined(__CYGWIN__)
+#if !defined(__CYGWIN__)
+
+#if defined(_POSIX_THREADS)
 
 #include <sys/sched.h>
 
@@ -430,11 +430,10 @@ typedef struct {
   int   is_initialized;  /* is this structure initialized? */
   int   init_executed;   /* has the initialization routine been run? */
 } pthread_once_t;       /* dynamic package initialization */
-#endif /* defined(_POSIX_THREADS) && !defined(__CYGWIN__) */
+#endif /* defined(_POSIX_THREADS) */
 
 /* POSIX Barrier Types */
 
-#if !defined(__CYGWIN__)
 #if defined(_POSIX_BARRIERS)
 typedef __uint32_t pthread_barrier_t;        /* POSIX Barrier Object */
 typedef struct {
@@ -462,6 +461,7 @@ typedef struct {
 #endif
 } pthread_rwlockattr_t;
 #endif /* defined(_POSIX_READER_WRITER_LOCKS) */
+
 #endif /* __CYGWIN__ */
 
 #include <machine/types.h>
