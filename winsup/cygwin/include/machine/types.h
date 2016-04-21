@@ -71,11 +71,6 @@ typedef unsigned long vm_size_t;
 typedef void *vm_object_t;
 #endif /* __vm_object_t_defined */
 
-#ifndef __register_t_defined
-#define __register_t_defined
-typedef __int32_t register_t;
-#endif
-
 #ifndef __addr_t_defined
 #define __addr_t_defined
 typedef char *addr_t;

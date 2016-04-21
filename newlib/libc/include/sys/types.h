@@ -36,6 +36,8 @@ typedef __uint32_t	u_int32_t;
 #if ___int64_t_defined
 typedef __uint64_t	u_int64_t;
 #endif
+typedef int register_t;
+#define __BIT_TYPES_DEFINED__ 1
 
 #if defined(__rtems__) || defined(__XMK__)
 /*
@@ -158,10 +160,6 @@ typedef	__ino_t		ino_t;		/* inode number */
 typedef	char *		addr_t;
 typedef unsigned long vm_offset_t;
 typedef unsigned long vm_size_t;
-
-#define __BIT_TYPES_DEFINED__
-
-typedef int32_t register_t;
 #endif /* __i386__ && (GO32 || __MSDOS__) */
 
 /*
