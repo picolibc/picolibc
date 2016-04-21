@@ -28,6 +28,13 @@ typedef	unsigned long	__ino_t;
 typedef	__uint32_t	__mode_t;
 #define	__machine_mode_t_defined
 
+typedef	int		__accmode_t;	/* access permissions */
+typedef	__uint32_t	__fixpt_t;	/* fixed point number */
+typedef	int		__lwpid_t;	/* Thread ID (a.k.a. LWP) */
+typedef	__int64_t	__rlim_t;	/* resource limit - intentionally */
+					/* signed, because of legacy code */
+					/* that uses -1 for RLIM_INFINITY */
+
 #ifdef _KERNEL
 typedef	int		boolean_t;
 typedef	struct device	*device_t;
