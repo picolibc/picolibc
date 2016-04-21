@@ -245,7 +245,7 @@ typedef	__int64_t	sbintime_t;
  * pointers rather than structs to ensure maximum binary compatability with
  * previous releases.
  * This means that we don't use the types defined here, but rather in
- * <cygwin/types.h>
+ * <machine/types.h>
  */
 #if defined(_POSIX_THREADS) && !defined(__CYGWIN__)
 
@@ -430,11 +430,7 @@ typedef struct {
   int   is_initialized;  /* is this structure initialized? */
   int   init_executed;   /* has the initialization routine been run? */
 } pthread_once_t;       /* dynamic package initialization */
-#else
-#if defined (__CYGWIN__)
-#include <cygwin/types.h>
-#endif
-#endif /* defined(_POSIX_THREADS) */
+#endif /* defined(_POSIX_THREADS) && !defined(__CYGWIN__) */
 
 /* POSIX Barrier Types */
 
@@ -467,6 +463,8 @@ typedef struct {
 } pthread_rwlockattr_t;
 #endif /* defined(_POSIX_READER_WRITER_LOCKS) */
 #endif /* __CYGWIN__ */
+
+#include <machine/types.h>
 
 #endif  /* !__need_inttypes */
 

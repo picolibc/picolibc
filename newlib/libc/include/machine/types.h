@@ -1,11 +1,7 @@
-#ifndef	_MACHTYPES_H_
-#define	_MACHTYPES_H_
-
 /*
- * This file is provided for backward compatibility.  It is no longer used in
- * Newlib.  Do not add new things to it.
+ * Newlib targets may provide an own version of this file in their machine
+ * directory to add custom user types for <sys/types.h>.
  */
-
-#include <sys/_types.h>
-
-#endif	/* _MACHTYPES_H_ */
+#ifndef _SYS_TYPES_H
+#error "must be included via <sys/types.h>"
+#endif /* !_SYS_TYPES_H */

@@ -199,11 +199,6 @@ int _EXFUN(sigaltstack, (const stack_t *__restrict, stack_t *__restrict));
 #endif
 
 #if defined(_POSIX_THREADS)
-#ifdef __CYGWIN__
-#  ifndef _CYGWIN_TYPES_H
-#    error You need the winsup sources or a cygwin installation to compile the cygwin version of newlib.
-#  endif
-#endif
 int _EXFUN(pthread_kill, (pthread_t thread, int sig));
 #endif
 
