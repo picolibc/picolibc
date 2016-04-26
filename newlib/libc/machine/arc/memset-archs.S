@@ -37,6 +37,8 @@
 
 #ifdef __ARCHS__
 
+#define USE_PREFETCH
+
 #ifdef USE_PREFETCH
 #define PREWRITE(A,B)	prefetchw [(A),(B)]
 #else
