@@ -69,6 +69,7 @@
 # define ZOLAND			0xF
 #endif
 
+#ifdef __ARC_ALIGNED_ACCESS__
 ENTRY (memcpy)
 	prefetch  [r1]		; Prefetch the read location
 	prefetchw [r0]		; Prefetch the write location
@@ -263,6 +264,64 @@ ENTRY (memcpy)
 	j	[blink]
 
 ENDFUNC (memcpy)
+
+#else
+
+ENTRY(memcpy)
+	prefetch  [r1]		; Prefetch the read location
+	prefetchw [r0]		; Prefetch the write location
+	mov.f	0, r2
+;;; if size is zero
+	jz.d	[blink]
+	mov	r3, r0		; don't clobber ret val
+
+;;; if size <= 8
+	cmp	r2, 8
+	bls.d	@.Lsmallchunk
+	mov.f	lp_count, r2
+
+;;; Convert len to Dwords, unfold x4
+	lsr.f	lp_count, r2, ZOLSHFT
+	lpnz	@.Lcopyfast
+	;; LOOP START
+	LOADX (r6, r1)
+	PREFETCH_READ (r1)
+	PREFETCH_WRITE (r3)
+	LOADX (r8, r1)
+	LOADX (r10, r1)
+	LOADX (r4, r1)
+	STOREX (r6, r3)
+	STOREX (r8, r3)
+	STOREX (r10, r3)
+	STOREX (r4, r3)
+.Lcopyfast:
+
+#ifdef __ARC_LL64__
+	and     r2, r2, ZOLAND	;Remaining 31 bytes
+	lsr.f   lp_count, r2, 3	;Convert to 64-bit words.
+	lpnz	@.Lcopy64b
+	;; LOOP START
+	ldd.ab	r6,[r1,8]
+	std.ab	r6,[r3,8]
+.Lcopy64b:
+
+	and.f	lp_count, r2, 0x07 ; Last 7 bytes
+#else
+	and.f	lp_count, r2, ZOLAND
+#endif
+
+.Lsmallchunk:
+	lpnz	@.Lcopyremainingbytes
+	;; LOOP START
+	ldb.ab	r5, [r1,1]
+	stb.ab	r5, [r3,1]
+.Lcopyremainingbytes:
+
+	j	[blink]
+
+ENDFUNC(memcpy)
+#endif
+
 #endif /* __ARCHS__ */
 
 #endif /* !__OPTIMIZE_SIZE__ && !PREFER_SIZE_OVER_SPEED */
