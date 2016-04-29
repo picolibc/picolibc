@@ -1,0 +1,18 @@
+%rename link                nano_link
+%rename link_gcc_c_sequence                nano_link_gcc_c_sequence
+
+*nano_libc:
+-lc_nano
+
+*nano_libgloss:
+%{specs=nsim.specsnsim} %{specs=nosys.specsnosys}
+
+*link_gcc_c_sequence:
+%(nano_link_gcc_c_sequence) --start-group %G %(nano_libc) %(nano_libgloss) --end-group
+
+*link:
+%(nano_link) %:replace-outfile(-lc -lc_nano) %:replace-outfile(-lg -lg_nano) %:replace-outfile(-lstdc++ -lstdc++_nano) %:replace-outfile(-lsupc++ -lsupc++_nano)
+
+*lib:
+%{!shared:%{g*g_nano} %{!p:%{!pgc_nano}}%{pc_p}%{pgc_p}}
+

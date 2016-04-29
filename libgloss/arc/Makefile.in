@@ -58,6 +58,9 @@ NSIM_OBJS = \
 NSIM_INSTALL = install-nsim
 NSIM_SCRIPTS = nsim.specs
 
+NANO_SCRIPTS = nano.specs
+NANO_INSTALL = install-nano
+
 CFLAGS		= -g
 
 # Host specific makefile fragment comes in here.
@@ -83,7 +86,7 @@ distclean maintainer-clean realclean: clean
 	rm -f Makefile config.status config.log config.cache *~
 
 .PHONY: install info install-info clean-info doc dvi
-install: $(CRT0_INSTALL) $(NSIM_INSTALL)
+install: $(CRT0_INSTALL) $(NSIM_INSTALL) $(NANO_INSTALL)
 
 # multilibdir may not exist yet - libgcc for ARC depends on libc, hence
 # newlib/libgloss is built before libgcc. And in parallel build libgloss maybe
@@ -99,6 +102,11 @@ $(NSIM_INSTALL):
 	$(INSTALL_DATA) $(NSIM_BSP) $(DESTDIR)$(tooldir)/lib$(MULTISUBDIR)/$(NSIM_BSP)
 	for x in $(NSIM_SCRIPTS); do \
 	    $(INSTALL_DATA) $(srcdir)/$$x $(DESTDIR)$(tooldir)/lib$(MULTISUBDIR)/$$x; done
+
+$(NANO_INSTALL):
+        $(mkinstalldirs) $(DESTDIR)${tooldir}/lib${MULTISUBDIR}
+        for x in $(NANO_SCRIPTS); do \
+            $(INSTALL_DATA) $(srcdir)/$$x $(DESTDIR)$(tooldir)/lib$(MULTISUBDIR)/$$x; done
 
 doc:
 info:
