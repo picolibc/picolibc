@@ -43,11 +43,10 @@ _DEFUN (time, (t),
 {
   struct timeval now;
 
-  if (_gettimeofday_r (_REENT, &now, NULL) >= 0)
-    {
-      if (t)
-	*t = now.tv_sec;
-      return now.tv_sec;
-    }
-  return -1;
+  if (_gettimeofday_r (_REENT, &now, NULL) < 0)
+    now.tv_sec = (time_t) -1;
+
+  if (t)
+    *t = now.tv_sec;
+  return now.tv_sec;
 }
