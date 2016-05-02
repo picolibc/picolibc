@@ -1,5 +1,5 @@
 /*
-   Copyright (c) 2015, Synopsys, Inc. All rights reserved.
+   Copyright (c) 2015-2016, Synopsys, Inc. All rights reserved.
 
    Redistribution and use in source and binary forms, with or without
    modification, are permitted provided that the following conditions are met:
@@ -41,10 +41,24 @@
    the initialization code.
 */
 
+/* Compatibility with older ARC GCC, that doesn't provide some of the
+   preprocessor defines used by newlib and libgloss for ARC.  */
+#if defined (__Xbarrel_shifter) && !defined (__ARC_BARREL_SHIFTER__)
+#define __ARC_BARREL_SHIFTER__ 1
+#endif
+
+#if defined (__EM__) && !defined (__ARCEM__)
+#define __ARCEM__ 1
+#endif
+
+#if defined (__HS__) && !defined (__ARCHS__)
+#define __ARCHS__ 1
+#endif
+
 	.file	"crt0.S"
 	.extern main
 
-#if defined (__EM__) || defined (__HS__)
+#if defined (__ARCEM__) || defined (__ARCHS__)
 	.section .ivt, "a", @progbits
 
 ; handler's name,          type,    number,name,   offset in IVT (hex/dec)
@@ -74,7 +88,7 @@
 	.section .text.__startup, "ax", @progbits
 #else
 	.text
-#endif
+#endif /* __ARCEM__ || __ARCHS__ */
 
 	.global	__start
 	.type	__start, @function
@@ -111,7 +125,7 @@ __start:
 ;   instruction
 ; - loop body should have at least two instruction words
 __start:
-#if defined (__HS__)
+#if defined (__ARCHS__)
 	; Allow unaligned accesses.
 	lr	r2, [0xA]
 	bset	r2, r2, 19
@@ -163,21 +177,21 @@ __start:
 	jl	@_init
 #else
 	bl	@_init
-#endif
+#endif /* __ARCEM__ || __ARCHS__ */
 	mov_s	r0, r13
 	mov_s	r1, r14
 ; branch to main
-#if defined (__EM__) || defined (__HS__)
+#if defined (__ARCEM__) || defined (__ARCHS__)
 	mov	fp,0			; initialize frame pointer
 	jl	@main
 #else
 	bl.d	@main
 	mov	fp, 0			; initialize frame pointer
-#endif
+#endif /* __ARCEM__ || __ARCHS__ */
 	; r0 contains exit code
 	j	@exit
 
-#if defined (__EM__) || defined (__HS__)
+#if defined (__ARCEM__) || defined (__ARCHS__)
 ; ARCv2 default interrupt routines, defined as weak symbols.
 ; Default implementation halts the core.  To conserve code size those symbols
 ; share a single implementation, however as a downside debugger and
@@ -225,7 +239,7 @@ IRQ_20              :
 	nop
 	b	.Lloop_halt
 	nop
-#endif
+#endif /* __ARCEM__ || __ARCHS__ */
 
 	.section .text._exit_halt,"ax",@progbits
 	.global	 _exit_halt
