@@ -135,7 +135,12 @@ __start:
 	mov_s	r2, @__sbss_start	; r2 = start of the bss section
 	sub	r3, @_end, r2		; r3 = size of the bss section in bytes
 	; set up the loop counter register to the size (in words) of the bss section
-	asr.f	lp_count, r3, 2
+#if defined (__ARC_BARREL_SHIFTER__)
+	asr.f        lp_count, r3, 2
+#else
+	asr_s        r13, r3
+	asr.f        lp_count, r13
+#endif
 #if defined (__ARC600__)
 	; loop to zero out the bss.  Enter loop only if lp_count != 0
 	lpnz	@.Lend_zbss
