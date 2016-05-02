@@ -6,6 +6,18 @@
 
 load_lib checkoutput.exp
 
+# Don't run this test if newlib's build does not support multibyte encodings.
+set newlib_header_name "$objdir/targ-include/newlib.h"
+if [file exists $newlib_header_name] {
+    set newlib_header_fid [open $newlib_header_name r]
+    set newlib_header_text [read $newlib_header_fid]
+    close $newlib_header_fid
+    if {![regexp "#define _MB_CAPABLE" $newlib_header_text] || \
+            [regexp "#define _MB_LEN_MAX 1" $newlib_header_text]} {
+        return
+    }
+}
+
 set expected_output {
 "Set C-UTF-8 locale."
 "* U-00000000"
