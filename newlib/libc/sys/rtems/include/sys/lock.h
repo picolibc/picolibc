@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 embedded brains GmbH.  All rights reserved.
+ * Copyright (c) 2015, 2016 embedded brains GmbH.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -43,8 +43,8 @@ struct _Ticket_lock_Control {
 };
 
 struct _Thread_queue_Queue {
-	struct _Thread_queue_Heads *_heads;
 	struct _Ticket_lock_Control _Lock;
+	struct _Thread_queue_Heads *_heads;
 };
 
 struct _Mutex_Control {
@@ -70,7 +70,7 @@ struct _Futex_Control {
 	struct _Thread_queue_Queue _Queue;
 };
 
-#define _THREAD_QUEUE_INITIALIZER { 0, { 0, 0 } }
+#define _THREAD_QUEUE_INITIALIZER { { 0, 0 }, 0 }
 
 #define _MUTEX_INITIALIZER { _THREAD_QUEUE_INITIALIZER, 0 }
 
