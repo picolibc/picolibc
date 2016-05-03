@@ -45,11 +45,11 @@ struct _Ticket_lock_Control {
 struct _Thread_queue_Queue {
 	struct _Ticket_lock_Control _Lock;
 	struct _Thread_queue_Heads *_heads;
+	struct _Thread_Control *_owner;
 };
 
 struct _Mutex_Control {
 	struct _Thread_queue_Queue _Queue;
-	struct _Thread_Control *_owner;
 };
 
 struct _Mutex_recursive_Control {
@@ -70,9 +70,9 @@ struct _Futex_Control {
 	struct _Thread_queue_Queue _Queue;
 };
 
-#define _THREAD_QUEUE_INITIALIZER { { 0, 0 }, 0 }
+#define _THREAD_QUEUE_INITIALIZER { { 0, 0 }, 0, 0 }
 
-#define _MUTEX_INITIALIZER { _THREAD_QUEUE_INITIALIZER, 0 }
+#define _MUTEX_INITIALIZER { _THREAD_QUEUE_INITIALIZER }
 
 #define _MUTEX_RECURSIVE_INITIALIZER { _MUTEX_INITIALIZER, 0 }
 
