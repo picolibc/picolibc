@@ -104,9 +104,9 @@ $(NSIM_INSTALL):
 	    $(INSTALL_DATA) $(srcdir)/$$x $(DESTDIR)$(tooldir)/lib$(MULTISUBDIR)/$$x; done
 
 $(NANO_INSTALL):
-        $(mkinstalldirs) $(DESTDIR)${tooldir}/lib${MULTISUBDIR}
-        for x in $(NANO_SCRIPTS); do \
-            $(INSTALL_DATA) $(srcdir)/$$x $(DESTDIR)$(tooldir)/lib$(MULTISUBDIR)/$$x; done
+	$(mkinstalldirs) $(DESTDIR)${tooldir}/lib${MULTISUBDIR}
+	for x in $(NANO_SCRIPTS); do \
+		$(INSTALL_DATA) $(srcdir)/$$x $(DESTDIR)$(tooldir)/lib$(MULTISUBDIR)/$$x; done
 
 doc:
 info:
