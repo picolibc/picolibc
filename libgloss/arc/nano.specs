@@ -5,7 +5,7 @@
 -lc_nano
 
 *nano_libgloss:
-%{specs=nsim.specsnsim} %{specs=nosys.specsnosys}
+%{specs=nsim.specs:-lnsim} %{specs=nosys.specs:-lnosys}
 
 *link_gcc_c_sequence:
 %(nano_link_gcc_c_sequence) --start-group %G %(nano_libc) %(nano_libgloss) --end-group
@@ -14,5 +14,5 @@
 %(nano_link) %:replace-outfile(-lc -lc_nano) %:replace-outfile(-lg -lg_nano) %:replace-outfile(-lstdc++ -lstdc++_nano) %:replace-outfile(-lsupc++ -lsupc++_nano)
 
 *lib:
-%{!shared:%{g*g_nano} %{!p:%{!pgc_nano}}%{pc_p}%{pgc_p}}
+%{!shared:%{g*:-lg_nano} %{!p:%{!pg:-lc_nano}}%{p:-lc_p}%{pg:-lc_p}}
 
