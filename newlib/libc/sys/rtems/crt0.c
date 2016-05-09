@@ -16,6 +16,7 @@
 #include <time.h> /* struct timespec */
 #include <unistd.h> /* isatty */
 #include <sys/lock.h> /* _Mutex_recursive_Control */
+#include <machine/_arc4random.h>
 #include <machine/_libatomic.h>
 
 void rtems_provides_crt0( void ) {}  /* dummy symbol so file always has one */
@@ -65,6 +66,10 @@ RTEMS_STUB(__uint32_t, _Libatomic_Protect_start(void *ptr), { return 0; });
 RTEMS_STUB(void, _Libatomic_Protect_end(void *ptr, __uint32_t isr_level), { });
 RTEMS_STUB(void, _Libatomic_Lock_n(void *ptr, __size_t n), { });
 RTEMS_STUB(void, _Libatomic_Unlock_n(void *ptr, __size_t n), { });
+
+/* Stubs for routines for arc4random (from <unistd.h> and <machine/_arc4random.h> */
+RTEMS_STUB(int,  getentropy(void *ptr, __size_t n), { });
+RTEMS_STUB(void, _arc4random_getentropy_fail(void), { });
 
 #if defined(__GNUC__)
 /*
