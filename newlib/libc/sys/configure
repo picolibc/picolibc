@@ -797,6 +797,7 @@ m88kbug
 mmixware
 netware
 or1k
+phoenix
 rdos
 rtems
 sh
@@ -11827,6 +11828,8 @@ subdirs="$subdirs a29khif"
 	netware) subdirs="$subdirs netware"
  ;;
 	or1k) subdirs="$subdirs or1k"
+ ;;
+	phoenix) subdirs="$subdirs phoenix"
  ;;
 	rdos) subdirs="$subdirs rdos"
  ;;
