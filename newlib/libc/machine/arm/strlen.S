@@ -27,11 +27,14 @@
 #include "acle-compat.h"
 
 #if defined __OPTIMIZE_SIZE__ || defined PREFER_SIZE_OVER_SPEED
-#if defined __thumb__ && !defined __thumb2__
+#if __ARM_ARCH_ISA_THUMB == 2
+#include "strlen-thumb2-Os.S"
+
+#elif defined (__ARM_ARCH_ISA_THUMB)
 #include "strlen-thumb1-Os.S"
 
 #else
-#include "strlen-thumb2-Os.S"
+  /* Implemented in strlen-stub.c.  */
 
 #endif
 

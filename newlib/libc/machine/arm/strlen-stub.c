@@ -32,11 +32,14 @@
 #include <limits.h>
 
 #if defined __OPTIMIZE_SIZE__ || defined PREFER_SIZE_OVER_SPEED
-#if defined __thumb__ && !defined __thumb2__
+#if __ARM_ARCH_ISA_THUMB == 2
+/* Implemented in strlen.S.  */
+
+#elif defined (__ARM_ARCH_ISA_THUMB)
 /* Implemented in strlen.S.  */
 
 #else
-/* Implemented in strlen.S.  */
+#include "../../string/strlen.c"
 
 #endif
 
