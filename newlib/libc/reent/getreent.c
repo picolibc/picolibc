@@ -12,11 +12,11 @@ int _dummy_getreent;
 #ifdef __getreent
 #undef __getreent
 #endif
-
+#if 0
 struct _reent *
 __getreent (void)
 {
   return _impure_ptr;
 }
-
+#endif
 #endif

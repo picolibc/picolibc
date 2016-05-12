@@ -8,6 +8,10 @@
  esp8266-specific xtensa stuff
  *************************************************************************/
 
+#ifndef __DYNAMIC_REENT__
+#define __DYNAMIC_REENT__
+#endif
+
 #ifndef _REENT_SMALL
 #define _REENT_SMALL
 #endif
