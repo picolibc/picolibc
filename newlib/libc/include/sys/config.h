@@ -198,6 +198,12 @@
 #define MALLOC_ALIGNMENT ((XCHAL_DATA_WIDTH) < 16 ? 16 : (XCHAL_DATA_WIDTH))
 /* esp8266-specific: shrink the default fd buffer size */
 #define __BUFSIZ__ 128
+#ifndef __DYNAMIC_REENT__
+#define __DYNAMIC_REENT__
+#endif
+#ifndef _REENT_SMALL
+#define _REENT_SMALL
+#endif
 #endif
 
 /* This block should be kept in sync with GCC's limits.h.  The point
