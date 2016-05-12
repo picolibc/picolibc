@@ -18,7 +18,7 @@
 /* __ieee754_remainderf is provided by libgcc and presumably is faster
    then original implementation */
 
-#if 1
+#if 0
 
 extern float __ieee754_remainderf(float x, float y);
 
