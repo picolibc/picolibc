@@ -61,29 +61,40 @@
 #if defined (__ARCEM__) || defined (__ARCHS__)
 	.section .ivt, "a", @progbits
 
-; handler's name,          type,    number,name,   offset in IVT (hex/dec)
-.word   __start           ; exception   0   program entry point  0x0     0
-.word   memory_error      ; exception   1   memory_error         0x4     4
-.word   instruction_error ; exception   2   instruction_error    0x8     8
-.word   EV_MachineCheck   ; exception   3   EV_MachineCheck      0xC     12
-.word   EV_TLBMissI       ; exception   4   EV_TLBMissI          0x10    16
-.word   EV_TLBMissD       ; exception   5   EV_TLBMissD          0x14    20
-.word   EV_ProtV          ; exception   6   EV_ProtV             0x18    24
-.word   EV_PrivilegeV     ; exception   7   EV_PrivilegeV        0x1C    28
-.word   EV_SWI            ; exception   8   EV_SWI               0x20    32
-.word   EV_Trap           ; exception   9   EV_Trap              0x24    36
-.word   EV_Extension      ; exception   10  EV_Extension         0x28    40
-.word   EV_DivZero        ; exception   11  EV_DivZero           0x2C    44
-.word   EV_DCError        ; exception   12  EV_DCError           0x30    48
-.word   EV_Malignedr      ; exception   13  EV_Maligned          0x34    52
-.word   _exit_halt        ; exception   14  unused               0x38    56
-.word   _exit_halt        ; exception   15  unused               0x3C    60
-.word   IRQ_Timer0        ; IRQ         16  Timer 0              0x40    64
-.word   IRQ_Timer1        ; IRQ         17  Timer 1              0x44    68
-.word   IRQ_18            ; IRQ         18                       0x48    72
-.word   IRQ_19            ; IRQ         19                       0x4C    76
-.word   IRQ_20            ; IRQ         20                       0x50    80
+; Helper macro to define weak symbols to include into interrupt vector table.
+; User code may define those functions in them, so user function will be
+; referenced in the IVT. By default all handlers point to _exit_halt - so they
+; always cause application halt, because if application causes an exception or
+; interrupt, but doesn't set a handler for it - something is wrong in
+; application. Exception is "start" entry of IVT, which points to __start
+; function.
+#define IVT_ENTRY(name) \
+    .word name `\
+    .weak name `\
+    .set name, _exit_halt
 
+; handler's name,          number, name,       offset in IVT (hex/dec)
+.word __start                ; 0   program entry point  0x0     0
+IVT_ENTRY(memory_error)      ; 1   memory_error         0x4     4
+IVT_ENTRY(instruction_error) ; 2   instruction_error    0x8     8
+IVT_ENTRY(EV_MachineCheck)   ; 3   EV_MachineCheck      0xC     12
+IVT_ENTRY(EV_TLBMissI)       ; 4   EV_TLBMissI          0x10    16
+IVT_ENTRY(EV_TLBMissD)       ; 5   EV_TLBMissD          0x14    20
+IVT_ENTRY(EV_ProtV)          ; 6   EV_ProtV             0x18    24
+IVT_ENTRY(EV_PrivilegeV)     ; 7   EV_PrivilegeV        0x1C    28
+IVT_ENTRY(EV_SWI)            ; 8   EV_SWI               0x20    32
+IVT_ENTRY(EV_Trap)           ; 9   EV_Trap              0x24    36
+IVT_ENTRY(EV_Extension)      ; 10  EV_Extension         0x28    40
+IVT_ENTRY(EV_DivZero)        ; 11  EV_DivZero           0x2C    44
+IVT_ENTRY(EV_DCError)        ; 12  EV_DCError           0x30    48
+IVT_ENTRY(EV_Maligned)       ; 13  EV_Maligned          0x34    52
+IVT_ENTRY(EV_Ex14)           ; 14  unused               0x38    56
+IVT_ENTRY(EV_Ex15)           ; 15  unused               0x3C    60
+IVT_ENTRY(IRQ_Timer0)        ; 16  Timer 0              0x40    64
+IVT_ENTRY(IRQ_Timer1)        ; 17  Timer 1              0x44    68
+IVT_ENTRY(IRQ_18)            ; 18                       0x48    72
+IVT_ENTRY(IRQ_19)            ; 19                       0x4C    76
+IVT_ENTRY(IRQ_20)            ; 20                       0x50    80
 
 	.section .text.__startup, "ax", @progbits
 #else
@@ -195,56 +206,6 @@ __start:
 #endif /* __ARCEM__ || __ARCHS__ */
 	; r0 contains exit code
 	j	@exit
-
-#if defined (__ARCEM__) || defined (__ARCHS__)
-; ARCv2 default interrupt routines, defined as weak symbols.
-; Default implementation halts the core.  To conserve code size those symbols
-; share a single implementation, however as a downside debugger and
-; disassembler will not be able to distinguish one from another.
-.weak   memory_error
-.weak   instruction_error
-.weak   EV_MachineCheck
-.weak   EV_TLBMissI
-.weak   EV_TLBMissD
-.weak   EV_ProtV
-.weak   EV_PrivilegeV
-.weak   EV_SWI
-.weak   EV_Trap
-.weak   EV_Extension
-.weak   EV_DivZero
-.weak   EV_DCError
-.weak   EV_Malignedr
-.weak   IRQ_Timer0
-.weak   IRQ_Timer1
-.weak   IRQ_18
-.weak   IRQ_19
-.weak   IRQ_20
-
-.balign 4
-memory_error        :
-instruction_error   :
-EV_MachineCheck     :
-EV_TLBMissI         :
-EV_TLBMissD         :
-EV_ProtV            :
-EV_PrivilegeV       :
-EV_SWI              :
-EV_Trap             :
-EV_Extension        :
-EV_DivZero          :
-EV_DCError          :
-EV_Malignedr        :
-IRQ_Timer0          :
-IRQ_Timer1          :
-IRQ_18              :
-IRQ_19              :
-IRQ_20              :
-.Lloop_halt:
-	flag	0x01
-	nop
-	b	.Lloop_halt
-	nop
-#endif /* __ARCEM__ || __ARCHS__ */
 
 	.section .text._exit_halt,"ax",@progbits
 	.global	 _exit_halt
