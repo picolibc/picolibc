@@ -207,15 +207,18 @@ __start:
 	; r0 contains exit code
 	j	@exit
 
-	.section .text._exit_halt,"ax",@progbits
-	.global	 _exit_halt
-	.type	 _exit_halt, @function
+.section .text._exit_halt,"ax",@progbits
+.global	 _exit_halt
+.type	 _exit_halt, @function
 
 _exit_halt:
 	; r0 contains exit code
-	flag	0x01
+	flag	1
+#if defined (__ARC600__) || defined (__ARC700__)
+	; ARCompact requires 3 nops after flag 1
 	nop
-	nop			; ARCompact requires 3 nops after flag 1
 	nop
+	nop
+#endif
 	b	@_exit_halt
-	nop
+.balign 4
