@@ -32,7 +32,6 @@ details. */
 #include "pinfo.h"
 #include "sigproc.h"
 #include "cygtls.h"
-#include "cygwait.h"
 
 /*
  * All these defines below should be in sys/types.h
@@ -156,7 +155,7 @@ static int
 select (int maxfds, fd_set *readfds, fd_set *writefds, fd_set *exceptfds,
 	LONGLONG us)
 {
-  select_stuff::wait_states wait_state = select_stuff::select_loop;
+  select_stuff::wait_states wait_state = select_stuff::select_set_zero;
   int ret = 0;
 
   /* Record the current time for later use. */
@@ -182,30 +181,7 @@ select (int maxfds, fd_set *readfds, fd_set *writefds, fd_set *exceptfds,
 	  }
       select_printf ("sel.always_ready %d", sel.always_ready);
 
-      /* Degenerate case.  No fds to wait for.  Just wait for time to run out
-	 or signal to arrive. */
-      if (sel.start.next == NULL)
-	switch (cygwait (us * 1000ULL))
-	  {
-	  case WAIT_SIGNALED:
-	    select_printf ("signal received");
-	    /* select() is always interrupted by a signal so set EINTR,
-	       unconditionally, ignoring any SA_RESTART detection by
-	       call_signal_handler().  */
-	    _my_tls.call_signal_handler ();
-	    set_sig_errno (EINTR);
-	    wait_state = select_stuff::select_signalled;
-	    break;
-	  case WAIT_CANCELED:
-	    sel.destroy ();
-	    pthread::static_cancel_self ();
-	    /*NOTREACHED*/
-	  default:
-	    /* Set wait_state to zero below. */
-	    wait_state = select_stuff::select_set_zero;
-	    break;
-	  }
-      else if (sel.always_ready || us == 0)
+      if (sel.always_ready || us == 0)
 	/* Catch any active fds via sel.poll() below */
 	wait_state = select_stuff::select_ok;
       else
@@ -214,29 +190,24 @@ select (int maxfds, fd_set *readfds, fd_set *writefds, fd_set *exceptfds,
 
       select_printf ("sel.wait returns %d", wait_state);
 
-      if (wait_state >= select_stuff::select_ok)
+      if (wait_state == select_stuff::select_ok)
 	{
 	  UNIX_FD_ZERO (readfds, maxfds);
 	  UNIX_FD_ZERO (writefds, maxfds);
 	  UNIX_FD_ZERO (exceptfds, maxfds);
-	  if (wait_state == select_stuff::select_set_zero)
-	    ret = 0;
-	  else
-	    {
-	      /* Set bit mask from sel records.  This also sets ret to the
-		 right value >= 0, matching the number of bits set in the
-		 fds records.  if ret is 0, continue to loop. */
-	      ret = sel.poll (readfds, writefds, exceptfds);
-	      if (!ret)
-		wait_state = select_stuff::select_loop;
-	    }
+	  /* Set bit mask from sel records.  This also sets ret to the
+	     right value >= 0, matching the number of bits set in the
+	     fds records.  if ret is 0, continue to loop. */
+	  ret = sel.poll (readfds, writefds, exceptfds);
+	  if (!ret)
+	    wait_state = select_stuff::select_set_zero;
 	}
       /* Always clean up everything here.  If we're looping then build it
 	 all up again.  */
       sel.cleanup ();
       sel.destroy ();
-      /* Recalculate time remaining to wait if we are going to be looping. */
-      if (wait_state == select_stuff::select_loop && us != -1)
+      /* Check and recalculate timeout. */
+      if (us != -1LL && wait_state == select_stuff::select_set_zero)
 	{
 	  select_printf ("recalculating us");
 	  LONGLONG now = gtod.usecs ();
@@ -258,7 +229,7 @@ select (int maxfds, fd_set *readfds, fd_set *writefds, fd_set *exceptfds,
 	    }
 	}
     }
-  while (wait_state == select_stuff::select_loop);
+  while (wait_state == select_stuff::select_set_zero);
 
   if (wait_state < select_stuff::select_ok)
     ret = -1;
@@ -494,7 +465,7 @@ next_while:;
 	 to wait for.  */
     default:
       s = &start;
-      bool gotone = false;
+      res = select_set_zero;
       /* Some types of objects (e.g., consoles) wake up on "inappropriate"
 	 events like mouse movements.  The verify function will detect these
 	 situations.  If it returns false, then this wakeup was a false alarm
@@ -508,13 +479,9 @@ next_while:;
 	  }
 	else if ((((wait_ret >= m && s->windows_handle) || s->h == w4[wait_ret]))
 		 && s->verify (s, readfds, writefds, exceptfds))
-	  gotone = true;
+	  res = select_ok;
 
-      if (!gotone)
-	res = select_loop;
-      else
-	res = select_ok;
-      select_printf ("gotone %d", gotone);
+      select_printf ("res after verify %d", res);
       break;
     }
 out:
