@@ -19,6 +19,8 @@
 #ifndef	_SYS__TYPES_H
 #define _SYS__TYPES_H
 
+#include <newlib.h>
+#include <sys/config.h>
 #include <machine/_types.h>
 #include <sys/lock.h>
 
