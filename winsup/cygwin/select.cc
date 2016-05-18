@@ -182,7 +182,7 @@ select (int maxfds, fd_set *readfds, fd_set *writefds, fd_set *exceptfds,
       select_printf ("sel.always_ready %d", sel.always_ready);
 
       if (sel.always_ready || us == 0)
-	/* Catch any active fds via sel.poll() below */
+	/* Catch any active fds via sel.poll () below */
 	wait_state = select_stuff::select_ok;
       else
 	/* wait for an fd to become active or time out */
@@ -932,7 +932,7 @@ fhandler_console::select_read (select_stuff *ss)
   s->peek = peek_console;
   s->h = get_handle ();
   s->read_selected = true;
-  s->read_ready = get_readahead_valid();
+  s->read_ready = get_readahead_valid ();
   return s;
 }
 
