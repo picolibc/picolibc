@@ -385,7 +385,7 @@ public:
   virtual int munmap (HANDLE h, caddr_t addr, size_t len);
   virtual int msync (HANDLE h, caddr_t addr, size_t len, int flags);
   virtual bool fixup_mmap_after_fork (HANDLE h, int prot, int flags,
-				      off_t offset, DWORD size,
+				      off_t offset, SIZE_T size,
 				      void *address);
 
   void *operator new (size_t, void *p) __attribute__ ((nothrow)) {return p;}
@@ -1028,7 +1028,7 @@ class fhandler_disk_file: public fhandler_base
   int munmap (HANDLE h, caddr_t addr, size_t len);
   int msync (HANDLE h, caddr_t addr, size_t len, int flags);
   bool fixup_mmap_after_fork (HANDLE h, int prot, int flags,
-			      off_t offset, DWORD size, void *address);
+			      off_t offset, SIZE_T size, void *address);
   int mkdir (mode_t mode);
   int rmdir ();
   DIR __reg2 *opendir (int fd);
@@ -1699,7 +1699,7 @@ class fhandler_dev_zero: public fhandler_base
   virtual int munmap (HANDLE h, caddr_t addr, size_t len);
   virtual int msync (HANDLE h, caddr_t addr, size_t len, int flags);
   virtual bool fixup_mmap_after_fork (HANDLE h, int prot, int flags,
-				      off_t offset, DWORD size,
+				      off_t offset, SIZE_T size,
 				      void *address);
 
   fhandler_dev_zero (void *) {}

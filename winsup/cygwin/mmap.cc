@@ -272,7 +272,7 @@ class mmap_record
     DWORD page_map[0];
 
   public:
-    mmap_record (int nfd, HANDLE h, DWORD of, int p, int f, off_t o, DWORD l,
+    mmap_record (int nfd, HANDLE h, DWORD of, int p, int f, off_t o, SIZE_T l,
 		 caddr_t b) :
        mapping_hdl (h),
        len (l),
@@ -309,9 +309,9 @@ class mmap_record
 
     void init_page_map (mmap_record &r);
 
-    DWORD find_unused_pages (DWORD pages) const;
-    bool match (caddr_t addr, SIZE_T len, caddr_t &m_addr, DWORD &m_len);
-    off_t map_pages (off_t off, SIZE_T len);
+    SIZE_T find_unused_pages (SIZE_T pages) const;
+    bool match (caddr_t addr, SIZE_T len, caddr_t &m_addr, SIZE_T &m_len);
+    off_t map_pages (SIZE_T len);
     bool map_pages (caddr_t addr, SIZE_T len);
     bool unmap_pages (caddr_t addr, SIZE_T len);
     int access (caddr_t address);
@@ -368,29 +368,29 @@ mmap_record::compatible_flags (int fl) const
   return (get_flags () & MAP_COMPATMASK) == (fl & MAP_COMPATMASK);
 }
 
-DWORD
-mmap_record::find_unused_pages (DWORD pages) const
+SIZE_T
+mmap_record::find_unused_pages (SIZE_T pages) const
 {
-  DWORD mapped_pages = PAGE_CNT (get_len ());
-  DWORD start;
+  SIZE_T mapped_pages = PAGE_CNT (get_len ());
+  SIZE_T start;
 
   if (pages > mapped_pages)
-    return (DWORD)-1;
+    return (SIZE_T) -1;
   for (start = 0; start <= mapped_pages - pages; ++start)
     if (!MAP_ISSET (start))
       {
-	DWORD cnt;
+	SIZE_T cnt;
 	for (cnt = 0; cnt < pages; ++cnt)
 	  if (MAP_ISSET (start + cnt))
 	    break;
 	if (cnt >= pages)
 	  return start;
       }
-  return (DWORD)-1;
+  return (SIZE_T) -1;
 }
 
 bool
-mmap_record::match (caddr_t addr, SIZE_T len, caddr_t &m_addr, DWORD &m_len)
+mmap_record::match (caddr_t addr, SIZE_T len, caddr_t &m_addr, SIZE_T &m_len)
 {
   caddr_t low = (addr >= get_address ()) ? addr : get_address ();
   caddr_t high = get_address ();
@@ -427,25 +427,26 @@ mmap_record::init_page_map (mmap_record &r)
 }
 
 off_t
-mmap_record::map_pages (off_t off, SIZE_T len)
+mmap_record::map_pages (SIZE_T len)
 {
   /* Used ONLY if this mapping matches into the chunk of another already
      performed mapping in a special case of MAP_ANON|MAP_PRIVATE.
 
      Otherwise it's job is now done by init_page_map(). */
   DWORD old_prot;
-  debug_printf ("map_pages (fd=%d, off=%Y, len=%lu)", get_fd (), off, len);
+  debug_printf ("map_pages (fd=%d, len=%lu)", get_fd (), len);
   len = PAGE_CNT (len);
 
-  if ((off = find_unused_pages (len)) == (DWORD)-1)
-    return 0L;
+  off_t off = find_unused_pages (len);
+  if (off == (off_t) -1)
+    return (off_t) 0;
   if (!noreserve ()
       && !VirtualProtect (get_address () + off * wincap.page_size (),
 			  len * wincap.page_size (), gen_protect (),
 			  &old_prot))
     {
       __seterrno ();
-      return (off_t)-1;
+      return (off_t) -1;
     }
 
   while (len-- > 0)
@@ -458,11 +459,11 @@ mmap_record::map_pages (caddr_t addr, SIZE_T len)
 {
   debug_printf ("map_pages (addr=%p, len=%lu)", addr, len);
   DWORD old_prot;
-  DWORD off = addr - get_address ();
+  off_t off = addr - get_address ();
   off /= wincap.page_size ();
   len = PAGE_CNT (len);
   /* First check if the area is unused right now. */
-  for (DWORD l = 0; l < len; ++l)
+  for (SIZE_T l = 0; l < len; ++l)
     if (MAP_ISSET (off + l))
       {
 	set_errno (EINVAL);
@@ -485,7 +486,7 @@ bool
 mmap_record::unmap_pages (caddr_t addr, SIZE_T len)
 {
   DWORD old_prot;
-  DWORD off = addr - get_address ();
+  SIZE_T off = addr - get_address ();
   if (noreserve ()
       && !VirtualFree (get_address () + off, len, MEM_DECOMMIT))
     debug_printf ("VirtualFree in unmap_pages () failed, %E");
@@ -510,7 +511,7 @@ mmap_record::access (caddr_t address)
 {
   if (address < get_address () || address >= get_address () + get_len ())
     return 0;
-  DWORD off = (address - get_address ()) / wincap.page_size ();
+  SIZE_T off = (address - get_address ()) / wincap.page_size ();
   return MAP_ISSET (off);
 }
 
@@ -594,11 +595,11 @@ mmap_list::try_map (void *addr, size_t len, int flags, off_t off)
 	 chunk of another already performed mapping. */
       SIZE_T plen = PAGE_CNT (len);
       LIST_FOREACH (rec, &recs, mr_next)
-	if (rec->find_unused_pages (plen) != (DWORD) -1)
+	if (rec->find_unused_pages (plen) != (SIZE_T) -1)
 	  break;
       if (rec && rec->compatible_flags (flags))
 	{
-	  if ((off = rec->map_pages (off, len)) == (off_t) -1)
+	  if ((off = rec->map_pages (len)) == (off_t) -1)
 	    return (caddr_t) MAP_FAILED;
 	  return (caddr_t) rec->get_address () + off;
 	}
@@ -609,7 +610,7 @@ mmap_list::try_map (void *addr, size_t len, int flags, off_t off)
 	 unmapped part of an still active mapping.  This can happen
 	 if a memory region is unmapped and remapped with MAP_FIXED. */
       caddr_t u_addr;
-      DWORD u_len;
+      SIZE_T u_len;
 
       LIST_FOREACH (rec, &recs, mr_next)
 	if (rec->match ((caddr_t) addr, len, u_addr, u_len))
@@ -686,7 +687,7 @@ is_mmapped_region (caddr_t start_addr, caddr_t end_address)
 
   mmap_record *rec;
   caddr_t u_addr;
-  DWORD u_len;
+  SIZE_T u_len;
   bool ret = false;
 
   LIST_FOREACH (rec, &map_list->recs, mr_next)
@@ -738,7 +739,7 @@ mmap_is_attached_or_noreserve (void *addr, size_t len)
 
   mmap_record *rec;
   caddr_t u_addr;
-  DWORD u_len;
+  SIZE_T u_len;
 
   LIST_FOREACH (rec, &map_list->recs, mr_next)
     {
@@ -1268,7 +1269,7 @@ munmap (void *addr, size_t len)
     {
       mmap_record *rec, *next_rec;
       caddr_t u_addr;
-      DWORD u_len;
+      SIZE_T u_len;
 
       LIST_FOREACH_SAFE (rec, &map_list->recs, mr_next, next_rec)
 	{
@@ -1335,7 +1336,7 @@ msync (void *addr, size_t len, int flags)
 	  if (rec->access ((caddr_t) addr))
 	    {
 	      /* Check whole area given by len. */
-	      for (DWORD i = wincap.allocation_granularity ();
+	      for (SIZE_T i = wincap.allocation_granularity ();
 		   i < len;
 		   i += wincap.allocation_granularity ())
 		if (!rec->access ((caddr_t) addr + i))
@@ -1389,7 +1390,7 @@ mprotect (void *addr, size_t len, int prot)
     {
       mmap_record *rec;
       caddr_t u_addr;
-      DWORD u_len;
+      SIZE_T u_len;
 
       LIST_FOREACH (rec, &map_list->recs, mr_next)
 	{
@@ -1674,7 +1675,7 @@ fhandler_base::msync (HANDLE h, caddr_t addr, size_t len, int flags)
 
 bool
 fhandler_base::fixup_mmap_after_fork (HANDLE h, int prot, int flags,
-				      off_t offset, DWORD size,
+				      off_t offset, SIZE_T size,
 				      void *address)
 {
   set_errno (ENODEV);
@@ -1772,7 +1773,7 @@ fhandler_dev_zero::msync (HANDLE h, caddr_t addr, size_t len, int flags)
 
 bool
 fhandler_dev_zero::fixup_mmap_after_fork (HANDLE h, int prot, int flags,
-				      off_t offset, DWORD size,
+				      off_t offset, SIZE_T size,
 				      void *address)
 {
   /* Re-create the map */
@@ -1868,7 +1869,7 @@ fhandler_disk_file::msync (HANDLE h, caddr_t addr, size_t len, int flags)
 
 bool
 fhandler_disk_file::fixup_mmap_after_fork (HANDLE h, int prot, int flags,
-					   off_t offset, DWORD size,
+					   off_t offset, SIZE_T size,
 					   void *address)
 {
   /* Re-create the map */
