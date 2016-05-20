@@ -37,6 +37,7 @@ details. */
 extern "C" void __fp_lock_all ();
 extern "C" void __fp_unlock_all ();
 extern "C" bool valid_sched_parameters(const struct sched_param *);
+extern "C" int sched_get_thread_priority(HANDLE thread);
 extern "C" int sched_set_thread_priority(HANDLE thread, int priority);
 static inline verifyable_object_state
   verifyable_object_isvalid (void const * objectptr, thread_magic_t magic,
@@ -531,12 +532,15 @@ pthread::postcreate ()
   valid = true;
 
   InterlockedIncrement (&MT_INTERFACE->threadcount);
-  /* FIXME: set the priority appropriately for system contention scope */
-  if (attr.inheritsched == PTHREAD_EXPLICIT_SCHED)
-    {
-      /* FIXME: set the scheduling settings for the new thread */
-      /* sched_thread_setparam (win32_obj_id, attr.schedparam); */
-    }
+
+  /* Per POSIX the new thread inherits the sched priority from its caller
+     thread if PTHREAD_INHERIT_SCHED is set.
+     FIXME: set the priority appropriately for system contention scope */
+  if (attr.inheritsched == PTHREAD_INHERIT_SCHED)
+    attr.schedparam.sched_priority
+	= sched_get_thread_priority (GetCurrentThread ());
+  if (attr.schedparam.sched_priority)
+    sched_set_thread_priority (win32_obj_id, attr.schedparam.sched_priority);
 }
 
 void
@@ -2601,9 +2605,7 @@ pthread_getschedparam (pthread_t thread, int *policy,
   if (!pthread::is_good_object (&thread))
     return ESRCH;
   *policy = SCHED_FIFO;
-  /* we don't return the current effective priority, we return the current
-     requested priority */
-  *param = thread->attr.schedparam;
+  param->sched_priority = sched_get_thread_priority (thread->win32_obj_id);
   return 0;
 }
 
