@@ -31,8 +31,12 @@ int     _EXFUN(close, (int __fildes ));
 #if __POSIX_VISIBLE >= 199209
 size_t	_EXFUN(confstr, (int __name, char *__buf, size_t __len));
 #endif
+#if __XSI_VISIBLE && __XSI_VISIBLE < 700
 char *  _EXFUN(ctermid, (char *__s ));
+#endif
+#if __XSI_VISIBLE && __XSI_VISIBLE < 600
 char *  _EXFUN(cuserid, (char *__s ));
+#endif
 #if __BSD_VISIBLE || (__XSI_VISIBLE && __XSI_VISIBLE < 500)
 int	_EXFUN(daemon, (int nochdir, int noclose));
 #endif
