@@ -43,7 +43,7 @@ cleanup_glue (struct _reent *ptr,
 void
 _reclaim_reent (struct _reent *ptr)
 {
-  if (ptr != _impure_ptr)
+  if (ptr != _REENT)
     {
       /* used by mprec routines. */
 #ifdef _REENT_SMALL
