@@ -28,7 +28,7 @@
 
 #define LCNUMERIC_SIZE (sizeof(struct lc_numeric_T) / sizeof(char *))
 
-static char	numempty[] = { CHAR_MAX, '\0' };
+static const char	numempty[] = { CHAR_MAX, '\0' };
 
 const struct lc_numeric_T _C_numeric_locale = {
 	".",     			/* decimal_point */
