@@ -1,7 +1,5 @@
 /* cygwin/rdevio.h
 
-   Copyright 1999, 2000, 2001 Red Hat, Inc.
-
    Written by Corinna Vinschen <corinna@vinschen.de>
 
 This file is part of Cygwin.

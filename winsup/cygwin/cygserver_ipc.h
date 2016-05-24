@@ -1,7 +1,5 @@
 /* cygserver_ipc.h
 
-   Copyright 2002, 2003, 2004, 2012, 2013, 2014, 2015 Red Hat, Inc.
-
 This file is part of Cygwin.
 
 This software is a copyrighted work licensed under the terms of the

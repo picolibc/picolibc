@@ -1,7 +1,5 @@
 /* netinet/in.h
 
-   Copyright 1998, 2000, 2001, 2006 Red Hat, Inc.
-
 This file is part of Cygwin.
 
 This software is a copyrighted work licensed under the terms of the

@@ -1,7 +1,5 @@
 /* cygwin/if.h
 
-   Copyright 1996, 2000, 2001, 2007, 2012, 2013 Red Hat, Inc.
-
 This file is part of Cygwin.
 
 This software is a copyrighted work licensed under the terms of the

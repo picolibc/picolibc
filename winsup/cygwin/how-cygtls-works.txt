@@ -1,4 +1,4 @@
-Copyright 2005 Red Hat Inc., Max Kaehn
+Contributed by Max Kaehn
 
 All cygwin threads have separate context in an object of class _cygtls.  The
 storage for this object is kept on the stack in the bottom CYGTLS_PADSIZE

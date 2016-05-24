@@ -1,4 +1,4 @@
-Copyright 2001 Red Hat Inc., Robert Collins
+Contributed by Robert Collins
 
 fhandlers are the core mechanism by which cygwin provides a file descripter (fd)
 interface to things such as a random number generated, winsock sockets, raw disk

@@ -1,5 +1,4 @@
 #!/usr/bin/perl -w
-# Copyright © 2013 by Red Hat, Inc.
 #
 # This file is part of Cygwin.
 # 

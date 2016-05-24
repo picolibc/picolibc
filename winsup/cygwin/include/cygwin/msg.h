@@ -1,6 +1,4 @@
 /* sys/msg.h
-
-   Copyright 2002, 2012, 2013 Red Hat Inc.
    Written by Conrad Scott <conrad.scott@dsl.pipex.com>
 
 This file is part of Cygwin.

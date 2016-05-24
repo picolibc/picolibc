@@ -1,8 +1,5 @@
 /* fhandler_windows.cc: code to access windows message queues.
 
-   Copyright 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2009, 2011, 2012,
-   2013, 2015 Red Hat, Inc.
-
    Written by Sergey S. Okhapkin (sos@prospect.com.ru).
    Feedback and testing by Andy Piper (andyp@parallax.co.uk).
 

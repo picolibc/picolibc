@@ -1,0 +1,92 @@
+This file contains a list of individuals who submit their patches to
+the Cygwin sources under 2-clause BSD license, as well as a list of
+individuals who signed the former Cygwin Copyright Assignment up to 2016.
+
+=========================================================================
+2-clause BSD:
+=========================================================================
+Copyright (c) <YEAR>, <OWNER>
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are
+met:
+
+1. Redistributions of source code must retain the above copyright
+   notice, this list of conditions and the following disclaimer.
+
+2. Redistributions in binary form must reproduce the above copyright
+   notice, this list of conditions and the following disclaimer in the
+   documentation and/or other materials provided with the distribution.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE
+ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+POSSIBILITY OF SUCH DAMAGE.
+=========================================================================
+
+Individuals submitting their patches under 2-clause BSD:
+
+
+=========================================================================
+
+Individuals who signed the former Cygwin Copyright Assignment:
+
+AJ Reins				tbisp@qwest.net
+Brian E. Dessent			brian@dessent.net
+Brian Kenneth Ford			Brian.Ford@FlightSafety.com
+Charles K. Moore			keithmo@exmsft.com
+Christian Franke			franke@computer.org
+Christian Lestrade			christian.lestrade@free.fr
+Christopher Faylor			me@cgf.cx
+Christopher January			chris@atomice.net
+Conrad Scott				conrad.scott@dsl.pipex.com
+Corinna Vinschen			corinna@vinschen.de
+Craig Iain McGeachie			slapdau@yahoo.com.au
+David Korn				dave.korn.cygwin@gmail.com
+Davis Euresti				davie@alum.mit.edu
+Dennis Vshivkov				walrus@amur.ru
+Elfyn McBratney				elfyn@ubertales.co.uk
+Eric Blake				eblake@redhat.com
+Ernie Coskrey				ernie.coskrey@steeleye.com
+Gerd Spalink				Gerd.Spalink@t-online.de
+Hartmut Honisch				hhonisch@users.sourceforge.net
+Igor Pechtchanski			pechtcha@cs.nyu.edu
+Jacek Trzcinski				jacek@certum.pl
+Jeffrey Eric Altman			jaltman@openafs.org
+Jerry D. Hedden				jerry@hedden.us
+Joe Loh					joel@pivot3.com
+Johan Rydberg				johan@rydberg.com
+Johannes Schindelin			johannes.schindelin@gmx.de
+John Hood				cgull@glup.org
+Jon Turney				jon.turney@dronecode.org.uk
+Yoni Londner				yonihola2@gmail.com
+Joseph H. Buehler			jbuehler@hekimian.com
+Joshua Daniel Franklin			joshuadfranklin@yahoo.com
+Ken Brown				kbrown@cornell.edu
+Lapo Luchini				lapo@lapo.it
+Lev Bishop				lev.bishop@gmail.com
+Max Kaehn				slothman@electric-cloud.com
+Micha Nelissen				mdvpost@hotmail.com
+Michael Haubenwallner			michael.haubenwallner@ssi-schaefer.com
+Nicholas S. Wourms			nwourms@netscape.com
+Pavel Yonkov Tsekov			ptsekov@gmx.net
+Peter Foley				pefoley2@pefoley.com
+Pierre A. Humblet			phumblet@phumblet.no-ip.org
+Robert G. Byrnes			byrnes@curl.com
+Ryan C. Gordon				icculus@icculus.org
+Sam Steingold				sds@gnu.org
+Stephen Cleary				shammah@spamcop.net
+Stephen Osborn				bub@io.com
+Takashi Yano				takashi.yano@nifty.ne.jp
+Thomas Pfaff				tpfaff@gmx.net
+Vaclav Haisman				vhaisman@gmail.com
+Yaakov Selkovitz			yselkowi@redhat.com
+Yitzchak Scott-Thoennes			sthoenna@efn.org

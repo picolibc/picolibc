@@ -1,7 +1,5 @@
 /* cygwin/wait.h
 
-   Copyright 2006, 2009, 2011, 2012 Red Hat, Inc.
-
 This file is part of Cygwin.
 
 This software is a copyrighted work licensed under the terms of the

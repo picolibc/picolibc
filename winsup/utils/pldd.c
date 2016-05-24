@@ -1,7 +1,5 @@
 /* pldd.c
 
-   Copyright 2012 Red Hat, Inc.
-
 This file is part of Cygwin.
 
 This software is a copyrighted work licensed under the terms of the
@@ -55,7 +53,7 @@ print_version ()
 {
   printf ("pldd (cygwin) %d.%d.%d\n"
 	  "List dynamic shared objects loaded into process.\n"
-	  "Copyright (C) 2012 Red Hat, Inc.\n\n"
+	  "Copyright (C) 2012 Cygwin Authors\n\n"
 	  "This program comes with NO WARRANTY, to the extent permitted by law.\n"
 	  "You may redistribute copies of this program under the terms of\n"
 	  "the Cygwin license. Please consult the CYGWIN_LICENSE file for details.\n",

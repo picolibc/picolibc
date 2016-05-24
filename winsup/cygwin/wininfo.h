@@ -1,7 +1,5 @@
 /* wininfo.h: main Cygwin header file.
 
-   Copyright 2004, 2005, 2006, 2013 Red Hat, Inc.
-
 This file is part of Cygwin.
 
 This software is a copyrighted work licensed under the terms of the

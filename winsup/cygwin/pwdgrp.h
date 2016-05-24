@@ -1,7 +1,5 @@
 /* pwdgrp.h
 
-   Copyright 2001, 2002, 2003, 2014, 2015 Red Hat inc.
-
    Stuff common to pwd and grp handling.
 
 This file is part of Cygwin.

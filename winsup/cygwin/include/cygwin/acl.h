@@ -1,6 +1,4 @@
 /* cygwin/acl.h header file for Cygwin.
-
-   Copyright 1999, 2000, 2001, 2002, 2010, 2014, 2015 Red Hat, Inc.
    Written by C. Vinschen.
 
 This file is part of Cygwin.

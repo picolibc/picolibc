@@ -36,8 +36,9 @@
       including FAQ, User's Guide, and API Reference. The
       <emphasis>Cygwin</emphasis> website should be considered the authoritative
       source of information. The source code, released under the <emphasis>GNU
-      General Public License, Version 3 (GPLv3+)</emphasis>, is also available
-      from the website or one of the mirrors.</para>
+      General Public License, Version 3 (GPLv3+)</emphasis> and
+      <emphasis>Lesser GNU General Public License, Version 3 (LGPLv3+)</emphasis>,
+      is also available from the website or one of the mirrors.</para>
     </refsect1>
     <refsect1>
       <title>COMPATIBILITY</title>
@@ -142,7 +143,8 @@
       url="http://cygwin.com"/>. The website has extensive documentation,
       including FAQ, User's Guide, and API Reference. It should be considered
       the authoritative source of information. The source code, released under
-      the <emphasis>GNU General Public License, Version 3 (GPLv3+)</emphasis>,
+      the <emphasis>GNU General Public License, Version 3 (GPLv3+)</emphasis> and
+      <emphasis>Lesser GNU General Public License, Version 3 (LGPLv3+)</emphasis>,
       is also available from the website or one of the mirrors.</para>
     </refsect1>
     <refsect1>

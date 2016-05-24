@@ -1,6 +1,4 @@
 /* cygwin/hdreg.h
-
-   Copyright 2002 Red Hat Inc.
    Written by Chris January <chris@atomice.net>
 
 This file is part of Cygwin.

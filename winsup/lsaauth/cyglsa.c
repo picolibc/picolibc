@@ -1,7 +1,5 @@
 /* cyglsa.c: LSA authentication module for Cygwin
 
-   Copyright 2006, 2008, 2010, 2011, 2012 Red Hat, Inc.
-
    Written by Corinna Vinschen <corinna@vinschen.de>
 
 This file is part of Cygwin.

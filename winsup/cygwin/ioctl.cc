@@ -1,8 +1,5 @@
 /* ioctl.cc: ioctl routines.
 
-   Copyright 1996, 1998, 1999, 2000, 2001, 2002, 2003, 2006, 2008, 2009, 2011,
-   2012 Red Hat, Inc.
-
    Written by Doug Evans of Cygnus Support
    dje@cygnus.com
 

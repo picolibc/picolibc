@@ -1,7 +1,5 @@
 /* spinlock.h: Header file for cygwin time-sensitive synchronization primitive.
 
-   Copyright 2010 Red Hat, Inc.
-
 This file is part of Cygwin.
 
 This software is a copyrighted work licensed under the terms of the

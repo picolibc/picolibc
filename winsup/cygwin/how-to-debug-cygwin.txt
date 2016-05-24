@@ -1,4 +1,4 @@
-Copyright 2001, 2002, 2005 Red Hat Inc., Egor Duda
+Contributed by Egor Duda
 
 So, your favorite program has crashed?  And did you say something about
 'stackdump'?  Or it just prints its output from left to right and

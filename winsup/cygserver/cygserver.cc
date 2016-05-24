@@ -1,7 +1,5 @@
 /* cygserver.cc
 
-   Copyright 2001, 2002, 2003, 2004, 2005, 2007, 2011, 2012, 2014 Red Hat Inc.
-
    Written by Egor Duda <deo@logos-m.ru>
 
 This file is part of Cygwin.
@@ -491,7 +489,7 @@ print_version ()
   log (LOG_INFO,
        "cygserver (cygwin) %d.%d.%d\n"
        "Cygwin background service daemon\n"
-       "Copyright (C) 2001 - %s Red Hat, Inc.\n"
+       "Copyright (C) 2001 - %s Cygwin Authors\n"
        "This is free software; see the source for copying conditions.  There is NO\n"
        "warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.",
        CYGWIN_VERSION_DLL_MAJOR / 1000,

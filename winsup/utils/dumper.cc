@@ -1,14 +1,12 @@
 /* dumper.cc
 
-   Copyright 1999, 2001, 2002, 2004, 2006, 2007, 2011, 2013 Red Hat Inc.
-
    Written by Egor Duda <deo@logos-m.ru>
 
    This file is part of Cygwin.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 2 of the License, or
+   the Free Software Foundation; either version 3 of the License, or
    (at your option) any later version.
 
    This program is distributed in the hope that it will be useful,
@@ -872,7 +870,7 @@ print_version ()
 {
   printf ("dumper (cygwin) %d.%d.%d\n"
 	  "Core Dumper for Cygwin\n"
-	  "Copyright (C) 1999 - %s Red Hat, Inc.\n"
+	  "Copyright (C) 1999 - %s Cygwin Authors\n"
 	  "This is free software; see the source for copying conditions.  There is NO\n"
 	  "warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n",
 	  CYGWIN_VERSION_DLL_MAJOR / 1000,

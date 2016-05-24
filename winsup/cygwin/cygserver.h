@@ -1,7 +1,5 @@
 /* cygserver.h
 
-   Copyright 2001, 2002, 2003, 2004, 2008, 2012, 2013 Red Hat Inc.
-
    Written by Egor Duda <deo@logos-m.ru>
 
 This file is part of Cygwin.

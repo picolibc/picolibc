@@ -1,5 +1,4 @@
 dnl Autoconf configure script for Cygwin's testsuite.
-dnl Copyright 2000, 2006, 2012 Red Hat, Inc.
 dnl
 dnl This file is part of Cygwin.
 dnl

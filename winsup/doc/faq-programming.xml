@@ -496,9 +496,8 @@ self-contained executable.
 </para>
 <para>If this is an issue because you intend to distribute your Cygwin
 application, then you had better read and understand
-<ulink url="https://cygwin.com/licensing.html"/>, which explains the licensing
-options.  Unless you purchase a special commercial license from Red
-Hat, then your Cygwin application must be Open Source.
+<ulink url="https://cygwin.com/licensing.html"/>, which explains the
+licensing options.
 </para>
 </answer></qandaentry>
 
@@ -548,15 +547,6 @@ have our own Win32 headers which are pretty complete.
 <question><para>How do I use <literal>cygwin1.dll</literal> with Visual Studio or Mingw-w64?</para></question>
 <answer>
 
-<para>Before you begin, note that Cygwin is licensed under the GNU GPL (as
-indeed are many other Cygwin-based libraries).  That means that if your
-code links against the Cygwin dll (and if your program is calling
-functions from Cygwin, it must, as a matter of fact, be linked against
-it), you must apply the GPL to your source as well.  Of course, this
-only matters if you plan to distribute your program in binary form.  For
-more information, see <ulink url="http://gnu.org/licenses/gpl-faq.html"/>.  If
-that is not a problem, read on.
-</para>
 <para>If you want to load the DLL dynamically, read
 <literal>winsup/cygwin/how-cygtls-works.txt</literal> and the sample code in
 <literal>winsup/testsuite/cygload</literal> to understand how this works.

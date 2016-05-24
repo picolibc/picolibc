@@ -1,7 +1,5 @@
 /* module_info.cc
 
-   Copyright 1999, 2000, 2001, 2010, 2013 Red Hat, Inc.
-
    Written by Egor Duda <deo@logos-m.ru>
 
 This file is part of Cygwin.

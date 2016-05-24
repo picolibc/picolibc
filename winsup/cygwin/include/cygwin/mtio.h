@@ -1,7 +1,5 @@
 /* cygwin/mtio.h
 
-   Copyright 1999, 2000, 2001, 2004, 2013 Red Hat, Inc.
-
    Written by Corinna Vinschen <corinna@vinschen.de>
 
 This file is part of Cygwin.

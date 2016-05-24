@@ -1,6 +1,4 @@
 dnl Autoconf configure script for Cygwin.
-dnl Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2006, 2009, 2010,
-dnl 2011, 2012, 2013, 2014 Red Hat, Inc.
 dnl
 dnl This file is part of Cygwin.
 dnl

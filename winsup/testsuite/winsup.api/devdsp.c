@@ -1,7 +1,5 @@
 /* devdsp.c: Device tests for /dev/dsp
 
-   Copyright 2004 Red Hat, Inc
-
    Written by Gerd Spalink (Gerd.Spalink@t-online.de)
 
 This file is part of Cygwin.

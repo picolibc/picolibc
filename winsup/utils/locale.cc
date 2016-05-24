@@ -82,15 +82,10 @@ usage ()
 void
 print_version ()
 {
-  printf ("locale (cygwin) %d.%d.%d\n"
-	  "Get locale-specific information\n"
-	  "Copyright (C) 2010 - %s Red Hat, Inc.\n"
-	  "This is free software; see the source for copying conditions.  There is NO\n"
-	  "warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n",
+  printf ("locale (cygwin) %d.%d.%d\n",
 	  CYGWIN_VERSION_DLL_MAJOR / 1000,
 	  CYGWIN_VERSION_DLL_MAJOR % 1000,
-	  CYGWIN_VERSION_DLL_MINOR,
-	  strrchr (__DATE__, ' ') + 1);
+	  CYGWIN_VERSION_DLL_MINOR);
 }
 
 struct option longopts[] = {

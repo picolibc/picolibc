@@ -1,7 +1,5 @@
 /* minires-os-if.c.  Stub synchronous resolver for Cygwin.
 
-   Copyright 2006, 2007, 2008, 2009, 2011, 2012, 2015 Red Hat, Inc.
-
    Written by Pierre A. Humblet <Pierre.Humblet@ieee.org>
 
 This file is part of Cygwin.

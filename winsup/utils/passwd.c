@@ -1,8 +1,5 @@
 /* passwd.c: Changing passwords and managing account information
 
-   Copyright 1999, 2000, 2001, 2002, 2003, 2005, 2008, 2009, 2011, 2012,
-   2013, 2014 Red Hat, Inc.
-
    Written by Corinna Vinschen <corinna.vinschen@cityweb.de>
 
 This file is part of Cygwin.
@@ -369,7 +366,7 @@ print_version ()
 {
   printf ("passwd (cygwin) %d.%d.%d\n"
 	  "Password Utility\n"
-	  "Copyright (C) 1999 - %s Red Hat, Inc.\n"
+	  "Copyright (C) 1999 - %s Cygwin Authors\n"
 	  "This is free software; see the source for copying conditions.  There is NO\n"
 	  "warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n",
 	  CYGWIN_VERSION_DLL_MAJOR / 1000,

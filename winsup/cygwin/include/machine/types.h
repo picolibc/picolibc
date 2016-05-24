@@ -1,6 +1,4 @@
 /* machine/types.h
-
-   Copyright 2001, 2002, 2003, 2005, 2006, 2010, 2011, 2012, 2015 Red Hat Inc.
    Written by Robert Collins <rbtcollins@hotmail.com>
 
 This file is part of Cygwin.

@@ -74,17 +74,10 @@ but you should be sure to read the copyright section of the FAQ for more
 information on how the GNU General Public License may affect your use of
 these tools.
 </para>
-<para>In particular, if you intend to port a proprietary (non-GPL'd)
-application using Cygwin, you will need the proprietary-use license 
-for the Cygwin library.  This is available for purchase from Red Hat;
-please visit <ulink url="https://cygwin.com/licensing.html"/> for more
-information.  All other questions should be sent to the public project
-mailing list cygwin@cygwin.com.
-</para>
 <para>Note that when we say "free" we mean freedom, not price.  The goal of
 such freedom is that the people who use a given piece of software
 should be able to change it to fit their needs, learn from it, share
-it with their friends, etc.  The Cygwin license allows you those
+it with their friends, etc.  The GPL or LGPL licenses allows you those
 freedoms, so it is free software.
 </para>
 </answer></qandaentry>

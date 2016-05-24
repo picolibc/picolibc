@@ -1,4 +1,4 @@
-Copyright 2001 Red Hat Inc., Christopher Faylor
+Contributed by Christopher Faylor
 
 Cygwin has recently adopted something called the "cygwin heap".  This is
 an internal heap that is inherited by forked/execed children.  It

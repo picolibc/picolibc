@@ -1,7 +1,5 @@
 /* dll_entry.cc: Provide the default user DLL linker entry point.
 
-   Copyright 1998, 2000, 2001 Red Hat, Inc.
-
 This software is a copyrighted work licensed under the terms of the
 Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */

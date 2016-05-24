@@ -1,7 +1,5 @@
 /* semaphore.h: POSIX semaphore interface
 
-   Copyright 2001, 2003, 2007 Red Hat, Inc.
-
    Written by Robert Collins <rbtcollins@hotmail.com>
 
    This file is part of Cygwin.

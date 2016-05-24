@@ -1,7 +1,5 @@
 /* core_dump.h
 
-   Copyright 1999, 2000, 2001, 2014 Red Hat, Inc.
-
    Written by Egor Duda <deo@logos-m.ru>
 
 This file is part of Cygwin.

@@ -1,7 +1,5 @@
 /* crt0.h: header file for crt0.
 
-   Copyright 2000, 2001, 2008, 2012 Red Hat, Inc.
-
 This file is part of Cygwin.
 
 This software is a copyrighted work licensed under the terms of the

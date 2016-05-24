@@ -1,5 +1,4 @@
 dnl Autoconf configure script for winsup/doc
-dnl Copyright 1997, 1998, 1999, 2000, 2001, 2006, 2012, 2013, 2014 Red Hat, Inc.
 dnl
 dnl This file is part of Cygwin.
 dnl 

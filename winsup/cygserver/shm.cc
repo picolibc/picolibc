@@ -1,7 +1,5 @@
 /* shm.cc: Single unix specification IPC interface for Cygwin.
 
-   Copyright 2003, 2004, 2012 Red Hat, Inc.
-
 This file is part of Cygwin.
 
 This software is a copyrighted work licensed under the terms of the

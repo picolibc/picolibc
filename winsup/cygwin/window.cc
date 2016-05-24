@@ -1,8 +1,5 @@
 /* window.cc: hidden windows for signals/itimer support
 
-   Copyright 1997, 1998, 2000, 2001, 2002, 2003, 2004, 2005, 2008, 2010, 2011
-   Red Hat, Inc.
-
    Written by Sergey Okhapkin <sos@prospect.com.ru>
 
 This file is part of Cygwin.

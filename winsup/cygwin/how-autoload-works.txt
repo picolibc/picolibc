@@ -1,4 +1,4 @@
-Copyright 2002 Red Hat Inc., Egor Duda
+Contributed by Egor Duda
 
 How does function autoloading work?
 

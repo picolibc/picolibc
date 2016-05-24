@@ -1,8 +1,5 @@
 /* ps.cc
 
-   Copyright 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006,
-   2007, 2008, 2009, 2010, 2011, 2012, 2015 Red Hat, Inc.
-
 This file is part of Cygwin.
 
 This software is a copyrighted work licensed under the terms of the
@@ -134,7 +131,7 @@ print_version ()
 {
   printf ("ps (cygwin) %d.%d.%d\n"
 	  "Show process statistics\n"
-	  "Copyright (C) 1996 - %s Red Hat, Inc.\n"
+	  "Copyright (C) 1996 - %s Cygwin Authors\n"
 	  "This is free software; see the source for copying conditions.  There is NO\n"
 	  "warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n",
 	  CYGWIN_VERSION_DLL_MAJOR / 1000,

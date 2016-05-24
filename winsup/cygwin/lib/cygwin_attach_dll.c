@@ -1,7 +1,5 @@
 /* attach_dll.cc: crt0 for attaching cygwin DLL from a non-cygwin app.
 
-   Copyright 2000, 2001, 2007, 2010 Red Hat, Inc.
-
 This file is part of Cygwin.
 
 This software is a copyrighted work licensed under the terms of the

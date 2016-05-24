@@ -2,8 +2,6 @@
 		   to wchar_t Win32 path including long path prefix if
 		   necessary.
 
-   Copyright 2009, 2011, 2013 Red Hat, Inc.
-
    This file is part of Cygwin.
 
    This software is a copyrighted work licensed under the terms of the

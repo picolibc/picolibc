@@ -1,6 +1,4 @@
 /* cygwin/kd.h
-
-   Copyright 2006 Red Hat Inc.
    Written by Kazuhiro Fujieda <fujieda@jaist.ac.jp>
 
 This file is part of Cygwin.

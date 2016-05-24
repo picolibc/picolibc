@@ -1,7 +1,5 @@
 /* advapi32.cc: Win32 replacement functions.
 
-   Copyright 2011, 2012, 2013 Red Hat, Inc.
-
 This file is part of Cygwin.
 
 This software is a copyrighted work licensed under the terms of the

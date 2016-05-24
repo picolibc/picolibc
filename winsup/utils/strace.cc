@@ -1,8 +1,5 @@
 /* strace.cc
 
-   Copyright 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008,
-   2009, 2010, 2011, 2012, 2013, 2015 Red Hat Inc.
-
    Written by Chris Faylor <cgf@redhat.com>
 
 This file is part of Cygwin.
@@ -1016,7 +1013,7 @@ print_version ()
 {
   printf ("strace (cygwin) %d.%d.%d\n"
 	  "System Trace\n"
-	  "Copyright (C) 2000 - %s Red Hat, Inc.\n"
+	  "Copyright (C) 2000 - %s Cygwin Authors\n"
 	  "This is free software; see the source for copying conditions.  There is NO\n"
 	  "warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n",
 	  CYGWIN_VERSION_DLL_MAJOR / 1000,

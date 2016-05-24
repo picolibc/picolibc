@@ -1,5 +1,4 @@
-Copyright 2010 Red Hat Inc., contributed by Dave Korn.
-
+Contributed by Dave Korn
 
     How the C runtime handles startup and termination.
     --------------------------------------------------

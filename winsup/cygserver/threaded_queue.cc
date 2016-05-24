@@ -1,7 +1,5 @@
 /* threaded_queue.cc
 
-   Copyright 2001, 2002, 2003, 2014 Red Hat Inc.
-
    Written by Robert Collins <rbtcollins@hotmail.com>
 
 This file is part of Cygwin.

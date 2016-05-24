@@ -1,7 +1,5 @@
 #!/bin/bash
 #
-# cygserver-config, Copyright 2003 Red Hat Inc.
-#
 # This file is part of the Cygwin DLL.
 
 # Directory where the config files are stored

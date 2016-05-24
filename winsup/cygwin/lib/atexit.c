@@ -1,7 +1,5 @@
 /* atexit.c: atexit entry point
 
-   Copyright 2014 Red Hat, Inc.
-
 This file is part of Cygwin.
 
 This software is a copyrighted work licensed under the terms of the

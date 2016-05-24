@@ -1,7 +1,5 @@
 /* scandir.cc
 
-   Copyright 1998, 1999, 2000, 2001, 2003, 2005, 2014 Red Hat, Inc.
-
    Written by Corinna Vinschen <corinna.vinschen@cityweb.de>
 
    This file is part of Cygwin.

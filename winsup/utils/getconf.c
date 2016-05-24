@@ -1,6 +1,5 @@
 /*-
  * Copyright (c) 1996, 1998 The NetBSD Foundation, Inc.
- * Copyright (c) 2011 Red Hat, Inc.
  * All rights reserved.
  *
  * This code is derived from software contributed to The NetBSD Foundation
@@ -520,7 +519,7 @@ print_version ()
 {
   printf ("getconf (cygwin) %d.%d.%d\n"
 	  "Get configuration values\n"
-	  "Copyright (C) 2011 - %s Red Hat, Inc.\n"
+	  "Copyright (C) 2011 - %s Cygwin Authors\n"
 	  "This is free software; see the source for copying conditions.  There is NO\n"
 	  "warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n",
 	  CYGWIN_VERSION_DLL_MAJOR / 1000,

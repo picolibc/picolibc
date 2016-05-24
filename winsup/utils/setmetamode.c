@@ -1,7 +1,5 @@
 /* setmetamode.c
 
-   Copyright 2006, 2011 Red Hat Inc.
-
    Written by Kazuhiro Fujieda <fujieda@jaist.ac.jp>
 
 This file is part of Cygwin.
@@ -49,7 +47,7 @@ print_version ()
 {
   printf ("setmetamode (cygwin) %d.%d.%d\n"
 	  "Get or set keyboard meta mode\n"
-	  "Copyright (C) 2006 - %s Red Hat, Inc.\n"
+	  "Copyright (C) 2006 - %s Cygwin Authors\n"
 	  "This is free software; see the source for copying conditions.  There is NO\n"
 	  "warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n",
 	  CYGWIN_VERSION_DLL_MAJOR / 1000,

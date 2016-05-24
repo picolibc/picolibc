@@ -1,6 +1,4 @@
 /* cygwin/fs.h
-
-   Copyright 2002, 2003, 2012 Red Hat Inc.
    Written by Chris January <chris@atomice.net>
 
 This file is part of Cygwin.

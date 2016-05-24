@@ -1,12 +1,10 @@
 /* minidumper.cc
 
-   Copyright 2014 Red Hat Inc.
-
    This file is part of Cygwin.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 2 of the License, or
+   the Free Software Foundation; either version 3 of the License, or
    (at your option) any later version.
 
    This program is distributed in the hope that it will be useful,
@@ -170,7 +168,7 @@ print_version ()
 {
   printf ("minidumper (cygwin) %d.%d.%d\n"
           "Minidump write for Cygwin\n"
-          "Copyright (C) 1999 - %s Red Hat, Inc.\n"
+          "Copyright (C) 1999 - %s Cygwin Authors\n"
           "This is free software; see the source for copying conditions.  There is NO\n"
           "warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n",
           CYGWIN_VERSION_DLL_MAJOR / 1000,

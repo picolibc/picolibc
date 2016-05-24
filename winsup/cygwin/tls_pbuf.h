@@ -1,7 +1,5 @@
 /* tls_pbuf.h
 
-   Copyright 2008, 2014 Red Hat, Inc.
-
 This software is a copyrighted work licensed under the terms of the
 Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */

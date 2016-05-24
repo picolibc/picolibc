@@ -1,7 +1,5 @@
 /* userinfo.h
 
-   Copyright 2015 Red Hat inc.
-
 This file is part of Cygwin.
 
 This software is a copyrighted work licensed under the terms of the

@@ -1,6 +1,5 @@
 // cygload.h                                      -*- C++ -*-
 //
-// Copyright 2005, Red Hat, Inc.
 //
 // Written by Max Kaehn <slothman@electric-cloud.com>
 //

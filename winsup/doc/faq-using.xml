@@ -572,13 +572,15 @@ contributing it for others to use)
 Can I bundle Cygwin with my product for free?
 </para></question>
 <answer><para>
-Only if you comply with Cygwin's <ulink
-url="https://cygwin.com/licensing.html">license</ulink> very carefully.  If you
-choose to distribute cygwin1.dll, you must be willing to distribute the
-exact source code used to build that copy of cygwin1.dll as per the
-terms of the GPL.  If you ship applications that link with cygwin1.dll,
-you must either provide those applications' source code under a
-GPL-compatible license, *or* purchase a cygwin license from Red Hat.
+Starting with Cygwin version 2.5.2, which is LGPL licensed, yes, albeit
+it's not recommended for interoperability reasons.</para>
+
+<para>Cygwin versions prior to 2.5.2 were GPL licensed.
+If you choose to distribute an older cygwin1.dll, you must be willing to
+distribute the exact source code used to build that copy of cygwin1.dll
+as per the terms of the GPL.  If you ship applications that link with
+older cygwin1.dll, you must provide those applications' source code
+under a GPL-compatible license.
 </para></answer></qandaentry>
 
 <qandaentry id="faq.using.older-cygwin-conflict">

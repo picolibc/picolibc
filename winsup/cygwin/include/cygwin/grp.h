@@ -1,6 +1,4 @@
 /* cygwin/grp.h
-
-   Copyright 2002, 2011 Red Hat Inc.
    Written by Corinna Vinschen <corinna@vinschen.de>
 
 This file is part of Cygwin.

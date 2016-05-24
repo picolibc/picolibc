@@ -45,17 +45,11 @@ parts are covered by the standard
 <ulink url="http://www.x.org/Downloads_terms.html">X11 license</ulink>, 
 some of it is public domain, some of it was written by Red Hat and placed under
 the <ulink url="http://www.gnu.org/licenses/gpl.html">GNU General Public 
-License</ulink> (GPL). None of it is shareware. You don't have to pay anyone to
-use it but you should be sure to read the copyright section of the FAQ for more
-information on how the GNU GPL may affect your use of these
-tools. If you intend to port a proprietary application using the Cygwin
-library, you may want the Cygwin proprietary-use license.
-For more information about the proprietary-use license, please go to
-<ulink url="http://www.redhat.com/services/custom/cygwin/"/>. 
-Customers of the native Win32 GNUPro should feel free to submit bug
-reports and ask questions through Red Hat channels.  All other
-questions should be sent to the project mailing list
-<email>cygwin@cygwin.com</email>.</para>
+License</ulink> (GPL) or <ulink url="http://www.gnu.org/licenses/lgpl.html">
+GNU Lesser General Public License</ulink> (LGPL). None of it is shareware.
+You don't have to pay anyone to use it but you should be sure to read the
+copyright section of the FAQ for more information on how the GNU GPL may
+affect your use of these tools.</para>
 
 </sect1>
 

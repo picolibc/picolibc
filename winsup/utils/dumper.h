@@ -1,7 +1,5 @@
 /* dumper.h
 
-   Copyright 1999, 2001, 2013 Red Hat Inc.
-
    Written by Egor Duda <deo@logos-m.ru>
 
    This file is part of Cygwin.

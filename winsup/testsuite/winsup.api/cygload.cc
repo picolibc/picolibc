@@ -1,7 +1,5 @@
 /* cygload.cc
 
-   Copyright 2005, 2006 Red Hat, Inc.
-
    Written by Max Kaehn <slothman@electric-cloud.com>
   
    This software is a copyrighted work licensed under the terms of the

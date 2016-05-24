@@ -1,7 +1,5 @@
 /* cygserver_shm.h: Single unix specification IPC interface for Cygwin.
 
-   Copyright 2001, 2002, 2003, 2005, 2008 Red Hat, Inc.
-
 This file is part of Cygwin.
 
 This software is a copyrighted work licensed under the terms of the
