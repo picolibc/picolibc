@@ -35,8 +35,8 @@ for new users to understand while remaining flexible for the
 experienced. The volunteer development team is constantly working
 on <command>setup.exe</command>; before requesting a new feature,
 check the wishlist in the
-<ulink url="https://sourceware.org/git/gitweb.cgi?p=cygwin-setup.git;a=blob_plain;f=README;hb=HEAD">GIT <literal>README</literal>
-</ulink>. It may already be present in the GIT version!
+<ulink url="https://sourceware.org/git/gitweb.cgi?p=cygwin-setup.git;a=blob_plain;f=README;hb=HEAD">Git <literal>README</literal>
+</ulink>. It may already be present in the Git version!
 </para>
 
 <para>

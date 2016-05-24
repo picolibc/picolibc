@@ -707,7 +707,7 @@ documentation, see the README included in the <literal>cygwin-doc</literal> pack
 </para>
 
 <para>Next, get the Cygwin source.  Ideally, you should check out what you
-need from GIT (<ulink url="https://cygwin.com/git.html"/>).  This is the
+need from Git (<ulink url="https://cygwin.com/git.html"/>).  This is the
 <emphasis>preferred method</emphasis> for acquiring the sources.  Otherwise,
 if you are trying to duplicate a cygwin release then you should download the
 corresponding source package
