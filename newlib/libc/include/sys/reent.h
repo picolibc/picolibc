@@ -816,7 +816,9 @@ extern __FILE __sf[3];
 #define __ATTRIBUTE_IMPURE_PTR__
 #endif
 
+#if !defined(__DYNAMIC_REENT__) || defined(__SINGLE_THREAD__)
 extern struct _reent *_impure_ptr __ATTRIBUTE_IMPURE_PTR__;
+#endif
 extern struct _reent *const _global_impure_ptr __ATTRIBUTE_IMPURE_PTR__;
 
 void _reclaim_reent (struct _reent *);
