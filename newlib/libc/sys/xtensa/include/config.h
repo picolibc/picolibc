@@ -4,25 +4,6 @@
 #include <machine/ieeefp.h>  /* floating point macros */
 #include <sys/features.h>	/* POSIX defs */
 
-/*************************************************************************
- esp8266-specific xtensa stuff
- *************************************************************************/
-
-#ifndef __DYNAMIC_REENT__
-#define __DYNAMIC_REENT__
-#endif
-
-#ifndef _REENT_SMALL
-#define _REENT_SMALL
-#endif
-
-/* esp8266 hardware FIFO buffers are 128 bytes */
-#define __BUFSIZ__ 128
-
-/*************************************************************************
- end of esp8266-specific stuff
- *************************************************************************/
-
 #ifndef __EXPORT
 #define __EXPORT
 #endif
