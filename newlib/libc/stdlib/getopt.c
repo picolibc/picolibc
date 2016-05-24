@@ -113,8 +113,8 @@ typedef enum GETOPT_ORDERING_T
 /* globally-defined variables */
 char *optarg = 0;
 int optind = 0;
-int opterr = 1;
-int optopt = '?';
+int opterr = 0;
+int optopt = 0;
 
 /* static variables */
 static int optwhere = 0;
