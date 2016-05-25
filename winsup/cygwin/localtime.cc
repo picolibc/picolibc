@@ -1543,7 +1543,8 @@ tzsetwall (void)
 	    GetTimeZoneInformation(&tz);
 	    dst = cp = buf;
 	    for (src = tz.StandardName; *src; src++)
-	      if (isupper(*src)) *dst++ = *src;
+	      if (*src >= L'A' && *src <= L'Z')
+		*dst++ = *src;
 	    if ((dst - cp) < 3)
 	      {
 		/* In non-english Windows, converted tz.StandardName
@@ -1561,7 +1562,8 @@ tzsetwall (void)
 		cp = strchr(cp, 0);
 		dst = cp;
 		for (src = tz.DaylightName; *src; src++)
-		  if (isupper(*src)) *dst++ = *src;
+		  if (*src >= L'A' && *src <= L'Z')
+		    *dst++ = *src;
 		if ((dst - cp) < 3)
 		  {
 		    /* In non-english Windows, converted tz.DaylightName
