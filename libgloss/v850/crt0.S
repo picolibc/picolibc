@@ -24,6 +24,12 @@ _start:
 	movhi	2,		r0,	r6
 	ldsr    r6, 	    	fpsr
 #endif
+	// FIXME: We currently assume that the data sections
+	// are loaded in place - ie that they do not need to
+	// moved from eg ROM into RAM.  If that is not true
+	// then extra code needs to be added here.
+	
+	// Initialise the .bss section.
 	mov     hilo(_edata),	r6
 	mov     hilo(_end),	r7
 .L0:
@@ -52,6 +58,9 @@ _start:
 	movhi   hi(__gp),	r0,	gp
 	movea   lo(__gp),	gp,	gp
 
+	// FIXME: See note about not moving the data sections above.
+	
+	// Initialise the .bss section.
 	movhi   hi(_edata),	r0,	r6
 	movea   lo(_edata),	r6,	r6
 	movhi   hi(_end),	r0,	r7
