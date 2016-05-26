@@ -69,7 +69,7 @@ const struct lc_time_T	_C_time_locale = {
 
 	/* date_fmt */
 	"%a %b %e %H:%M:%S %Z %Y",
-	
+
 	/* alt_month
 	 * Standalone months forms for %OB
 	 */
@@ -147,10 +147,11 @@ int
 __time_load_locale (struct __locale_t *locale, const char *name,
 		    void *f_wctomb, const char *charset)
 {
-  int	ret;
+  int	ret = 0;
   struct lc_time_T ti;
   char *bufp = NULL;
 
+#ifdef __HAVE_LOCALE_INFO__
 #ifdef __CYGWIN__
   extern int __set_lc_time_from_win (const char *, const struct lc_time_T *,
 				     struct lc_time_T *, char **, void *,
@@ -186,5 +187,6 @@ __time_load_locale (struct __locale_t *locale, const char *name,
 #else
   /* TODO */
 #endif
+#endif /*__HAVE_LOCALE_INFO__*/
   return (ret);
 }
