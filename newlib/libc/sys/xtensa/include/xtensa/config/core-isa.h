@@ -7,7 +7,7 @@
 
 /* Xtensa processor core configuration information.
 
-   Copyright (c) 1999-2015 Tensilica Inc.
+   Copyright (c) 1999-2016 Tensilica Inc.
 
    Permission is hereby granted, free of charge, to any person obtaining
    a copy of this software and associated documentation files (the
@@ -58,7 +58,7 @@
 #define XCHAL_HAVE_NSA			1	/* NSA/NSAU instructions */
 #define XCHAL_HAVE_MINMAX		1	/* MIN/MAX instructions */
 #define XCHAL_HAVE_SEXT			1	/* SEXT instruction */
-#define XCHAL_HAVE_DEPBITS		1	/* DEPBITS instruction */
+#define XCHAL_HAVE_DEPBITS		0	/* DEPBITS instruction */
 #define XCHAL_HAVE_CLAMPS		1	/* CLAMPS instruction */
 #define XCHAL_HAVE_MUL16		1	/* MUL16S/MUL16U instructions */
 #define XCHAL_HAVE_MUL32		1	/* MULL instruction */
@@ -91,8 +91,8 @@
 #define XCHAL_HAVE_PSO_FULL_RETENTION	0	/* all regs preserved on PSO */
 #define XCHAL_HAVE_THREADPTR		1	/* THREADPTR register */
 #define XCHAL_HAVE_BOOLEANS		1	/* boolean registers */
-#define XCHAL_HAVE_CP			0	/* CPENABLE reg (coprocessor) */
-#define XCHAL_CP_MAXCFG			0	/* max allowed cp id plus one */
+#define XCHAL_HAVE_CP			1	/* CPENABLE reg (coprocessor) */
+#define XCHAL_CP_MAXCFG			8	/* max allowed cp id plus one */
 #define XCHAL_HAVE_MAC16		1	/* MAC16 package */
 
 #define XCHAL_HAVE_FUSION		 0	/* Fusion*/
@@ -104,6 +104,8 @@
 #define XCHAL_HAVE_FUSION_BITOPS	 0	/* Fusion Bit Operations Support option */
 #define XCHAL_HAVE_FUSION_AVS	 0	/* Fusion AVS option */
 #define XCHAL_HAVE_FUSION_16BIT_BASEBAND	 0	/* Fusion 16-bit Baseband option */
+#define XCHAL_HAVE_FUSION_VITERBI        0     /* Fusion Viterbi option */
+#define XCHAL_HAVE_FUSION_SOFTDEMAP      0   /* Fusion Soft Bit Demap option */
 #define XCHAL_HAVE_HIFIPRO		0	/* HiFiPro Audio Engine pkg */
 #define XCHAL_HAVE_HIFI4		0	/* HiFi4 Audio Engine pkg */
 #define XCHAL_HAVE_HIFI4_VFPU		0	/* HiFi4 Audio Engine VFPU option */
@@ -117,20 +119,20 @@
 #define XCHAL_HAVE_VECTORFPU2005	0	/* vector or user floating-point pkg */
 #define XCHAL_HAVE_USER_DPFPU         0       /* user DP floating-point pkg */
 #define XCHAL_HAVE_USER_SPFPU         0       /* user DP floating-point pkg */
-#define XCHAL_HAVE_FP                 0      /* single prec floating point */
-#define XCHAL_HAVE_FP_DIV             0  /* FP with DIV instructions */
-#define XCHAL_HAVE_FP_RECIP           0        /* FP with RECIP instructions */
-#define XCHAL_HAVE_FP_SQRT            0 /* FP with SQRT instructions */
-#define XCHAL_HAVE_FP_RSQRT           0        /* FP with RSQRT instructions */
+#define XCHAL_HAVE_FP                 1      /* single prec floating point */
+#define XCHAL_HAVE_FP_DIV             1  /* FP with DIV instructions */
+#define XCHAL_HAVE_FP_RECIP           1        /* FP with RECIP instructions */
+#define XCHAL_HAVE_FP_SQRT            1 /* FP with SQRT instructions */
+#define XCHAL_HAVE_FP_RSQRT           1        /* FP with RSQRT instructions */
 #define XCHAL_HAVE_DFP                        0     /* double precision FP pkg */
 #define XCHAL_HAVE_DFP_DIV            0 /* DFP with DIV instructions */
 #define XCHAL_HAVE_DFP_RECIP          0       /* DFP with RECIP instructions*/
 #define XCHAL_HAVE_DFP_SQRT           0        /* DFP with SQRT instructions */
 #define XCHAL_HAVE_DFP_RSQRT          0       /* DFP with RSQRT instructions*/
-#define XCHAL_HAVE_DFP_ACCEL		0	/* double precision FP acceleration pkg */
+#define XCHAL_HAVE_DFP_ACCEL		1	/* double precision FP acceleration pkg */
 #define XCHAL_HAVE_DFP_accel		XCHAL_HAVE_DFP_ACCEL				/* for backward compatibility */
 
-#define XCHAL_HAVE_DFPU_SINGLE_ONLY    0                 	/* DFPU Coprocessor, single precision only */
+#define XCHAL_HAVE_DFPU_SINGLE_ONLY    1                 	/* DFPU Coprocessor, single precision only */
 #define XCHAL_HAVE_DFPU_SINGLE_DOUBLE  0               	/* DFPU Coprocessor, single and double precision */
 #define XCHAL_HAVE_VECTRA1		0	/* Vectra I  pkg */
 #define XCHAL_HAVE_VECTRALX		0	/* Vectra LX pkg */
@@ -158,47 +160,47 @@
   ----------------------------------------------------------------------*/
 
 #define XCHAL_NUM_LOADSTORE_UNITS	1	/* load/store units */
-#define XCHAL_NUM_WRITEBUFFER_ENTRIES	32	/* size of write buffer */
+#define XCHAL_NUM_WRITEBUFFER_ENTRIES	4	/* size of write buffer */
 #define XCHAL_INST_FETCH_WIDTH		4	/* instr-fetch width in bytes */
 #define XCHAL_DATA_WIDTH		4	/* data width in bytes */
-#define XCHAL_DATA_PIPE_DELAY		1	/* d-side pipeline delay
+#define XCHAL_DATA_PIPE_DELAY		2	/* d-side pipeline delay
 						   (1 = 5-stage, 2 = 7-stage) */
 #define XCHAL_CLOCK_GATING_GLOBAL	1	/* global clock gating */
 #define XCHAL_CLOCK_GATING_FUNCUNIT	1	/* funct. unit clock gating */
 /*  In T1050, applies to selected core load and store instructions (see ISA): */
-#define XCHAL_UNALIGNED_LOAD_EXCEPTION	1	/* unaligned loads cause exc. */
-#define XCHAL_UNALIGNED_STORE_EXCEPTION	1	/* unaligned stores cause exc.*/
-#define XCHAL_UNALIGNED_LOAD_HW		0	/* unaligned loads work in hw */
-#define XCHAL_UNALIGNED_STORE_HW	0	/* unaligned stores work in hw*/
+#define XCHAL_UNALIGNED_LOAD_EXCEPTION	0	/* unaligned loads cause exc. */
+#define XCHAL_UNALIGNED_STORE_EXCEPTION	0	/* unaligned stores cause exc.*/
+#define XCHAL_UNALIGNED_LOAD_HW		1	/* unaligned loads work in hw */
+#define XCHAL_UNALIGNED_STORE_HW	1	/* unaligned stores work in hw*/
 
-#define XCHAL_SW_VERSION		1100002	/* sw version of this header */
+#define XCHAL_SW_VERSION		1100003	/* sw version of this header */
 
-#define XCHAL_CORE_ID			"esp108_v1_2_s5_512int_2"	/* alphanum core name
+#define XCHAL_CORE_ID			"esp32_v3_49_prod"	/* alphanum core name
 						   (CoreID) set in the Xtensa
 						   Processor Generator */
 
-#define XCHAL_BUILD_UNIQUE_ID		0x00057595	/* 22-bit sw build ID */
+#define XCHAL_BUILD_UNIQUE_ID		0x0005FE96	/* 22-bit sw build ID */
 
 /*
  *  These definitions describe the hardware targeted by this software.
  */
-#define XCHAL_HW_CONFIGID0		0xC298FFFE	/* ConfigID hi 32 bits*/
-#define XCHAL_HW_CONFIGID1		0x1C857595	/* ConfigID lo 32 bits*/
-#define XCHAL_HW_VERSION_NAME		"LX6.0.2"	/* (X11.0.2) full version name */
+#define XCHAL_HW_CONFIGID0		0xC2BCFFFE	/* ConfigID hi 32 bits*/
+#define XCHAL_HW_CONFIGID1		0x1CC5FE96	/* ConfigID lo 32 bits*/
+#define XCHAL_HW_VERSION_NAME		"LX6.0.3"	/* full version name */
 #define XCHAL_HW_VERSION_MAJOR		2600	/* major ver# of targeted hw */
-#define XCHAL_HW_VERSION_MINOR		2	/* minor ver# of targeted hw */
-#define XCHAL_HW_VERSION		260002	/* major*100+minor */
+#define XCHAL_HW_VERSION_MINOR		3	/* minor ver# of targeted hw */
+#define XCHAL_HW_VERSION		260003	/* major*100+minor */
 #define XCHAL_HW_REL_LX6		1
 #define XCHAL_HW_REL_LX6_0		1
-#define XCHAL_HW_REL_LX6_0_2		1
+#define XCHAL_HW_REL_LX6_0_3		1
 #define XCHAL_HW_CONFIGID_RELIABLE	1
 /*  If software targets a *range* of hardware versions, these are the bounds: */
 #define XCHAL_HW_MIN_VERSION_MAJOR	2600	/* major v of earliest tgt hw */
-#define XCHAL_HW_MIN_VERSION_MINOR	2	/* minor v of earliest tgt hw */
-#define XCHAL_HW_MIN_VERSION		260002	/* earliest targeted hw */
+#define XCHAL_HW_MIN_VERSION_MINOR	3	/* minor v of earliest tgt hw */
+#define XCHAL_HW_MIN_VERSION		260003	/* earliest targeted hw */
 #define XCHAL_HW_MAX_VERSION_MAJOR	2600	/* major v of latest tgt hw */
-#define XCHAL_HW_MAX_VERSION_MINOR	2	/* minor v of latest tgt hw */
-#define XCHAL_HW_MAX_VERSION		260002	/* latest targeted hw */
+#define XCHAL_HW_MAX_VERSION_MINOR	3	/* minor v of latest tgt hw */
+#define XCHAL_HW_MAX_VERSION		260003	/* latest targeted hw */
 
 
 /*----------------------------------------------------------------------
@@ -242,6 +244,10 @@
   ----------------------------------------------------------------------*/
 
 #define XCHAL_HAVE_PIF			1	/* any outbound PIF present */
+#define XCHAL_HAVE_AXI			0	/* AXI bus */
+
+#define XCHAL_HAVE_PIF_WR_RESP			0	/* pif write response */
+#define XCHAL_HAVE_PIF_REQ_ATTR			0	/* pif attribute */
 
 /*  If present, cache size in bytes == (ways * 2^(linewidth + setwidth)).  */
 
@@ -268,24 +274,23 @@
 /*  Number of encoded cache attr bits (see <xtensa/hal.h> for decoded bits):  */
 #define XCHAL_CA_BITS			4
 
-/*  Whether MEMCTL register has anything useful  */
-#define XCHAL_USE_MEMCTL		(((XCHAL_LOOP_BUFFER_SIZE > 0)	||	\
-					   XCHAL_DCACHE_IS_COHERENT	||	\
-					   XCHAL_HAVE_ICACHE_DYN_WAYS	||	\
-					   XCHAL_HAVE_DCACHE_DYN_WAYS)	&&	\
-					   (XCHAL_HW_MIN_VERSION >= XTENSA_HWVERSION_RE_2012_0))
-
 
 /*----------------------------------------------------------------------
 			INTERNAL I/D RAM/ROMs and XLMI
   ----------------------------------------------------------------------*/
 
-#define XCHAL_NUM_INSTROM		0	/* number of core instr. ROMs */
-#define XCHAL_NUM_INSTRAM		1	/* number of core instr. RAMs */
+#define XCHAL_NUM_INSTROM		1	/* number of core instr. ROMs */
+#define XCHAL_NUM_INSTRAM		2	/* number of core instr. RAMs */
 #define XCHAL_NUM_DATAROM		1	/* number of core data ROMs */
 #define XCHAL_NUM_DATARAM		2	/* number of core data RAMs */
 #define XCHAL_NUM_URAM			0	/* number of core unified RAMs*/
 #define XCHAL_NUM_XLMI			1	/* number of core XLMI ports */
+
+/*  Instruction ROM 0:  */
+#define XCHAL_INSTROM0_VADDR		0x40800000	/* virtual address */
+#define XCHAL_INSTROM0_PADDR		0x40800000	/* physical address */
+#define XCHAL_INSTROM0_SIZE		4194304	/* size in bytes */
+#define XCHAL_INSTROM0_ECC_PARITY	0	/* ECC/parity type, 0=none */
 
 /*  Instruction RAM 0:  */
 #define XCHAL_INSTRAM0_VADDR		0x40000000	/* virtual address */
@@ -293,10 +298,16 @@
 #define XCHAL_INSTRAM0_SIZE		4194304	/* size in bytes */
 #define XCHAL_INSTRAM0_ECC_PARITY	0	/* ECC/parity type, 0=none */
 
+/*  Instruction RAM 1:  */
+#define XCHAL_INSTRAM1_VADDR		0x40400000	/* virtual address */
+#define XCHAL_INSTRAM1_PADDR		0x40400000	/* physical address */
+#define XCHAL_INSTRAM1_SIZE		4194304	/* size in bytes */
+#define XCHAL_INSTRAM1_ECC_PARITY	0	/* ECC/parity type, 0=none */
+
 /*  Data ROM 0:  */
-#define XCHAL_DATAROM0_VADDR		0x3FE00000	/* virtual address */
-#define XCHAL_DATAROM0_PADDR		0x3FE00000	/* physical address */
-#define XCHAL_DATAROM0_SIZE		524288	/* size in bytes */
+#define XCHAL_DATAROM0_VADDR		0x3F400000	/* virtual address */
+#define XCHAL_DATAROM0_PADDR		0x3F400000	/* physical address */
+#define XCHAL_DATAROM0_SIZE		4194304	/* size in bytes */
 #define XCHAL_DATAROM0_ECC_PARITY	0	/* ECC/parity type, 0=none */
 #define XCHAL_DATAROM0_BANKS		1	/* number of banks */
 
@@ -308,9 +319,9 @@
 #define XCHAL_DATARAM0_BANKS		1	/* number of banks */
 
 /*  Data RAM 1:  */
-#define XCHAL_DATARAM1_VADDR		0x3FE80000	/* virtual address */
-#define XCHAL_DATARAM1_PADDR		0x3FE80000	/* physical address */
-#define XCHAL_DATARAM1_SIZE		524288	/* size in bytes */
+#define XCHAL_DATARAM1_VADDR		0x3F800000	/* virtual address */
+#define XCHAL_DATARAM1_PADDR		0x3F800000	/* physical address */
+#define XCHAL_DATARAM1_SIZE		4194304	/* size in bytes */
 #define XCHAL_DATARAM1_ECC_PARITY	0	/* ECC/parity type, 0=none */
 #define XCHAL_DATARAM1_BANKS		1	/* number of banks */
 
@@ -334,26 +345,26 @@
 #define XCHAL_NUM_TIMERS		3	/* number of CCOMPAREn regs */
 #define XCHAL_NUM_INTERRUPTS		32	/* number of interrupts */
 #define XCHAL_NUM_INTERRUPTS_LOG2	5	/* ceil(log2(NUM_INTERRUPTS)) */
-#define XCHAL_NUM_EXTINTERRUPTS		27	/* num of external interrupts */
+#define XCHAL_NUM_EXTINTERRUPTS		26	/* num of external interrupts */
 #define XCHAL_NUM_INTLEVELS		6	/* number of interrupt levels
 						   (not including level zero) */
 #define XCHAL_EXCM_LEVEL		3	/* level masked by PS.EXCM */
 	/* (always 1 in XEA1; levels 2 .. EXCM_LEVEL are "medium priority") */
 
 /*  Masks of interrupts at each interrupt level:  */
-#define XCHAL_INTLEVEL1_MASK		0x007E3FFF
-#define XCHAL_INTLEVEL2_MASK		0x07800000
-#define XCHAL_INTLEVEL3_MASK		0x38008000
-#define XCHAL_INTLEVEL4_MASK		0x40000000
-#define XCHAL_INTLEVEL5_MASK		0x80010000
+#define XCHAL_INTLEVEL1_MASK		0x000637FF
+#define XCHAL_INTLEVEL2_MASK		0x00380000
+#define XCHAL_INTLEVEL3_MASK		0x28C08800
+#define XCHAL_INTLEVEL4_MASK		0x53000000
+#define XCHAL_INTLEVEL5_MASK		0x84010000
 #define XCHAL_INTLEVEL6_MASK		0x00000000
 #define XCHAL_INTLEVEL7_MASK		0x00004000
 
 /*  Masks of interrupts at each range 1..n of interrupt levels:  */
-#define XCHAL_INTLEVEL1_ANDBELOW_MASK	0x007E3FFF
-#define XCHAL_INTLEVEL2_ANDBELOW_MASK	0x07FE3FFF
-#define XCHAL_INTLEVEL3_ANDBELOW_MASK	0x3FFEBFFF
-#define XCHAL_INTLEVEL4_ANDBELOW_MASK	0x7FFEBFFF
+#define XCHAL_INTLEVEL1_ANDBELOW_MASK	0x000637FF
+#define XCHAL_INTLEVEL2_ANDBELOW_MASK	0x003E37FF
+#define XCHAL_INTLEVEL3_ANDBELOW_MASK	0x28FEBFFF
+#define XCHAL_INTLEVEL4_ANDBELOW_MASK	0x7BFEBFFF
 #define XCHAL_INTLEVEL5_ANDBELOW_MASK	0xFFFFBFFF
 #define XCHAL_INTLEVEL6_ANDBELOW_MASK	0xFFFFBFFF
 #define XCHAL_INTLEVEL7_ANDBELOW_MASK	0xFFFFFFFF
@@ -370,7 +381,7 @@
 #define XCHAL_INT8_LEVEL		1
 #define XCHAL_INT9_LEVEL		1
 #define XCHAL_INT10_LEVEL		1
-#define XCHAL_INT11_LEVEL		1
+#define XCHAL_INT11_LEVEL		3
 #define XCHAL_INT12_LEVEL		1
 #define XCHAL_INT13_LEVEL		1
 #define XCHAL_INT14_LEVEL		7
@@ -378,16 +389,16 @@
 #define XCHAL_INT16_LEVEL		5
 #define XCHAL_INT17_LEVEL		1
 #define XCHAL_INT18_LEVEL		1
-#define XCHAL_INT19_LEVEL		1
-#define XCHAL_INT20_LEVEL		1
-#define XCHAL_INT21_LEVEL		1
-#define XCHAL_INT22_LEVEL		1
-#define XCHAL_INT23_LEVEL		2
-#define XCHAL_INT24_LEVEL		2
-#define XCHAL_INT25_LEVEL		2
-#define XCHAL_INT26_LEVEL		2
+#define XCHAL_INT19_LEVEL		2
+#define XCHAL_INT20_LEVEL		2
+#define XCHAL_INT21_LEVEL		2
+#define XCHAL_INT22_LEVEL		3
+#define XCHAL_INT23_LEVEL		3
+#define XCHAL_INT24_LEVEL		4
+#define XCHAL_INT25_LEVEL		4
+#define XCHAL_INT26_LEVEL		5
 #define XCHAL_INT27_LEVEL		3
-#define XCHAL_INT28_LEVEL		3
+#define XCHAL_INT28_LEVEL		4
 #define XCHAL_INT29_LEVEL		3
 #define XCHAL_INT30_LEVEL		4
 #define XCHAL_INT31_LEVEL		5
@@ -406,9 +417,9 @@
 #define XCHAL_INT6_TYPE 	XTHAL_INTTYPE_TIMER
 #define XCHAL_INT7_TYPE 	XTHAL_INTTYPE_SOFTWARE
 #define XCHAL_INT8_TYPE 	XTHAL_INTTYPE_EXTERN_LEVEL
-#define XCHAL_INT9_TYPE 	XTHAL_INTTYPE_EXTERN_EDGE
+#define XCHAL_INT9_TYPE 	XTHAL_INTTYPE_EXTERN_LEVEL
 #define XCHAL_INT10_TYPE 	XTHAL_INTTYPE_EXTERN_EDGE
-#define XCHAL_INT11_TYPE 	XTHAL_INTTYPE_EXTERN_LEVEL
+#define XCHAL_INT11_TYPE 	XTHAL_INTTYPE_PROFILING
 #define XCHAL_INT12_TYPE 	XTHAL_INTTYPE_EXTERN_LEVEL
 #define XCHAL_INT13_TYPE 	XTHAL_INTTYPE_EXTERN_LEVEL
 #define XCHAL_INT14_TYPE 	XTHAL_INTTYPE_NMI
@@ -419,7 +430,7 @@
 #define XCHAL_INT19_TYPE 	XTHAL_INTTYPE_EXTERN_LEVEL
 #define XCHAL_INT20_TYPE 	XTHAL_INTTYPE_EXTERN_LEVEL
 #define XCHAL_INT21_TYPE 	XTHAL_INTTYPE_EXTERN_LEVEL
-#define XCHAL_INT22_TYPE 	XTHAL_INTTYPE_EXTERN_LEVEL
+#define XCHAL_INT22_TYPE 	XTHAL_INTTYPE_EXTERN_EDGE
 #define XCHAL_INT23_TYPE 	XTHAL_INTTYPE_EXTERN_LEVEL
 #define XCHAL_INT24_TYPE 	XTHAL_INTTYPE_EXTERN_LEVEL
 #define XCHAL_INT25_TYPE 	XTHAL_INTTYPE_EXTERN_LEVEL
@@ -427,18 +438,18 @@
 #define XCHAL_INT27_TYPE 	XTHAL_INTTYPE_EXTERN_LEVEL
 #define XCHAL_INT28_TYPE 	XTHAL_INTTYPE_EXTERN_EDGE
 #define XCHAL_INT29_TYPE 	XTHAL_INTTYPE_SOFTWARE
-#define XCHAL_INT30_TYPE 	XTHAL_INTTYPE_EXTERN_LEVEL
+#define XCHAL_INT30_TYPE 	XTHAL_INTTYPE_EXTERN_EDGE
 #define XCHAL_INT31_TYPE 	XTHAL_INTTYPE_EXTERN_LEVEL
 
 /*  Masks of interrupts for each type of interrupt:  */
 #define XCHAL_INTTYPE_MASK_UNCONFIGURED	0x00000000
 #define XCHAL_INTTYPE_MASK_SOFTWARE	0x20000080
-#define XCHAL_INTTYPE_MASK_EXTERN_EDGE	0x10000600
-#define XCHAL_INTTYPE_MASK_EXTERN_LEVEL	0xCFFE393F
+#define XCHAL_INTTYPE_MASK_EXTERN_EDGE	0x50400400
+#define XCHAL_INTTYPE_MASK_EXTERN_LEVEL	0x8FBE333F
 #define XCHAL_INTTYPE_MASK_TIMER	0x00018040
 #define XCHAL_INTTYPE_MASK_NMI		0x00004000
 #define XCHAL_INTTYPE_MASK_WRITE_ERROR	0x00000000
-#define XCHAL_INTTYPE_MASK_PROFILING	0x00000000
+#define XCHAL_INTTYPE_MASK_PROFILING	0x00000800
 
 /*  Interrupt numbers assigned to specific interrupt sources:  */
 #define XCHAL_TIMER0_INTERRUPT		6	/* CCOMPARE0 */
@@ -446,11 +457,11 @@
 #define XCHAL_TIMER2_INTERRUPT		16	/* CCOMPARE2 */
 #define XCHAL_TIMER3_INTERRUPT		XTHAL_TIMER_UNCONFIGURED
 #define XCHAL_NMI_INTERRUPT		14	/* non-maskable interrupt */
+#define XCHAL_PROFILING_INTERRUPT	11	/* profiling interrupt */
 
 /*  Interrupt numbers for levels at which only one interrupt is configured:  */
-#define XCHAL_INTLEVEL4_NUM		30
 #define XCHAL_INTLEVEL7_NUM		14
-/*  (There are many interrupts each at level(s) 1, 2, 3, 5.)  */
+/*  (There are many interrupts each at level(s) 1, 2, 3, 4, 5.)  */
 
 
 /*
@@ -472,24 +483,23 @@
 #define XCHAL_EXTINT6_NUM		8	/* (intlevel 1) */
 #define XCHAL_EXTINT7_NUM		9	/* (intlevel 1) */
 #define XCHAL_EXTINT8_NUM		10	/* (intlevel 1) */
-#define XCHAL_EXTINT9_NUM		11	/* (intlevel 1) */
-#define XCHAL_EXTINT10_NUM		12	/* (intlevel 1) */
-#define XCHAL_EXTINT11_NUM		13	/* (intlevel 1) */
-#define XCHAL_EXTINT12_NUM		14	/* (intlevel 7) */
-#define XCHAL_EXTINT13_NUM		17	/* (intlevel 1) */
-#define XCHAL_EXTINT14_NUM		18	/* (intlevel 1) */
-#define XCHAL_EXTINT15_NUM		19	/* (intlevel 1) */
-#define XCHAL_EXTINT16_NUM		20	/* (intlevel 1) */
-#define XCHAL_EXTINT17_NUM		21	/* (intlevel 1) */
-#define XCHAL_EXTINT18_NUM		22	/* (intlevel 1) */
-#define XCHAL_EXTINT19_NUM		23	/* (intlevel 2) */
-#define XCHAL_EXTINT20_NUM		24	/* (intlevel 2) */
-#define XCHAL_EXTINT21_NUM		25	/* (intlevel 2) */
-#define XCHAL_EXTINT22_NUM		26	/* (intlevel 2) */
-#define XCHAL_EXTINT23_NUM		27	/* (intlevel 3) */
-#define XCHAL_EXTINT24_NUM		28	/* (intlevel 3) */
-#define XCHAL_EXTINT25_NUM		30	/* (intlevel 4) */
-#define XCHAL_EXTINT26_NUM		31	/* (intlevel 5) */
+#define XCHAL_EXTINT9_NUM		12	/* (intlevel 1) */
+#define XCHAL_EXTINT10_NUM		13	/* (intlevel 1) */
+#define XCHAL_EXTINT11_NUM		14	/* (intlevel 7) */
+#define XCHAL_EXTINT12_NUM		17	/* (intlevel 1) */
+#define XCHAL_EXTINT13_NUM		18	/* (intlevel 1) */
+#define XCHAL_EXTINT14_NUM		19	/* (intlevel 2) */
+#define XCHAL_EXTINT15_NUM		20	/* (intlevel 2) */
+#define XCHAL_EXTINT16_NUM		21	/* (intlevel 2) */
+#define XCHAL_EXTINT17_NUM		22	/* (intlevel 3) */
+#define XCHAL_EXTINT18_NUM		23	/* (intlevel 3) */
+#define XCHAL_EXTINT19_NUM		24	/* (intlevel 4) */
+#define XCHAL_EXTINT20_NUM		25	/* (intlevel 4) */
+#define XCHAL_EXTINT21_NUM		26	/* (intlevel 5) */
+#define XCHAL_EXTINT22_NUM		27	/* (intlevel 3) */
+#define XCHAL_EXTINT23_NUM		28	/* (intlevel 4) */
+#define XCHAL_EXTINT24_NUM		30	/* (intlevel 4) */
+#define XCHAL_EXTINT25_NUM		31	/* (intlevel 5) */
 /*  EXTERNAL BInterrupt pin numbers mapped to each core interrupt number:  */
 #define XCHAL_INT0_EXTNUM		0	/* (intlevel 1) */
 #define XCHAL_INT1_EXTNUM		1	/* (intlevel 1) */
@@ -500,24 +510,23 @@
 #define XCHAL_INT8_EXTNUM		6	/* (intlevel 1) */
 #define XCHAL_INT9_EXTNUM		7	/* (intlevel 1) */
 #define XCHAL_INT10_EXTNUM		8	/* (intlevel 1) */
-#define XCHAL_INT11_EXTNUM		9	/* (intlevel 1) */
-#define XCHAL_INT12_EXTNUM		10	/* (intlevel 1) */
-#define XCHAL_INT13_EXTNUM		11	/* (intlevel 1) */
-#define XCHAL_INT14_EXTNUM		12	/* (intlevel 7) */
-#define XCHAL_INT17_EXTNUM		13	/* (intlevel 1) */
-#define XCHAL_INT18_EXTNUM		14	/* (intlevel 1) */
-#define XCHAL_INT19_EXTNUM		15	/* (intlevel 1) */
-#define XCHAL_INT20_EXTNUM		16	/* (intlevel 1) */
-#define XCHAL_INT21_EXTNUM		17	/* (intlevel 1) */
-#define XCHAL_INT22_EXTNUM		18	/* (intlevel 1) */
-#define XCHAL_INT23_EXTNUM		19	/* (intlevel 2) */
-#define XCHAL_INT24_EXTNUM		20	/* (intlevel 2) */
-#define XCHAL_INT25_EXTNUM		21	/* (intlevel 2) */
-#define XCHAL_INT26_EXTNUM		22	/* (intlevel 2) */
-#define XCHAL_INT27_EXTNUM		23	/* (intlevel 3) */
-#define XCHAL_INT28_EXTNUM		24	/* (intlevel 3) */
-#define XCHAL_INT30_EXTNUM		25	/* (intlevel 4) */
-#define XCHAL_INT31_EXTNUM		26	/* (intlevel 5) */
+#define XCHAL_INT12_EXTNUM		9	/* (intlevel 1) */
+#define XCHAL_INT13_EXTNUM		10	/* (intlevel 1) */
+#define XCHAL_INT14_EXTNUM		11	/* (intlevel 7) */
+#define XCHAL_INT17_EXTNUM		12	/* (intlevel 1) */
+#define XCHAL_INT18_EXTNUM		13	/* (intlevel 1) */
+#define XCHAL_INT19_EXTNUM		14	/* (intlevel 2) */
+#define XCHAL_INT20_EXTNUM		15	/* (intlevel 2) */
+#define XCHAL_INT21_EXTNUM		16	/* (intlevel 2) */
+#define XCHAL_INT22_EXTNUM		17	/* (intlevel 3) */
+#define XCHAL_INT23_EXTNUM		18	/* (intlevel 3) */
+#define XCHAL_INT24_EXTNUM		19	/* (intlevel 4) */
+#define XCHAL_INT25_EXTNUM		20	/* (intlevel 4) */
+#define XCHAL_INT26_EXTNUM		21	/* (intlevel 5) */
+#define XCHAL_INT27_EXTNUM		22	/* (intlevel 3) */
+#define XCHAL_INT28_EXTNUM		23	/* (intlevel 4) */
+#define XCHAL_INT30_EXTNUM		24	/* (intlevel 4) */
+#define XCHAL_INT31_EXTNUM		25	/* (intlevel 5) */
 
 
 /*----------------------------------------------------------------------
@@ -595,8 +604,8 @@
   ----------------------------------------------------------------------*/
 
 /*  Misc  */
-#define XCHAL_HAVE_DEBUG_ERI		0	/* ERI to debug module */
-#define XCHAL_HAVE_DEBUG_APB		0	/* APB to debug module */
+#define XCHAL_HAVE_DEBUG_ERI		1	/* ERI to debug module */
+#define XCHAL_HAVE_DEBUG_APB		1	/* APB to debug module */
 #define XCHAL_HAVE_DEBUG_JTAG		1	/* JTAG to debug module */
 
 /*  On-Chip Debug (OCD)  */
@@ -607,14 +616,14 @@
 #define XCHAL_HAVE_OCD_LS32DDR		1	/* L32DDR/S32DDR (faster OCD) */
 
 /*  TRAX (in core)  */
-#define XCHAL_HAVE_TRAX			0	/* TRAX in debug module */
-#define XCHAL_TRAX_MEM_SIZE		0	/* TRAX memory size in bytes */
-#define XCHAL_TRAX_MEM_SHAREABLE	0	/* start/end regs; ready sig. */
-#define XCHAL_TRAX_ATB_WIDTH		0	/* ATB width (bits), 0=no ATB */
+#define XCHAL_HAVE_TRAX			1	/* TRAX in debug module */
+#define XCHAL_TRAX_MEM_SIZE		16384	/* TRAX memory size in bytes */
+#define XCHAL_TRAX_MEM_SHAREABLE	1	/* start/end regs; ready sig. */
+#define XCHAL_TRAX_ATB_WIDTH		32	/* ATB width (bits), 0=no ATB */
 #define XCHAL_TRAX_TIME_WIDTH		0	/* timestamp bitwidth, 0=none */
 
 /*  Perf counters  */
-#define XCHAL_NUM_PERF_COUNTERS		0	/* performance counters */
+#define XCHAL_NUM_PERF_COUNTERS		2	/* performance counters */
 
 
 /*----------------------------------------------------------------------
