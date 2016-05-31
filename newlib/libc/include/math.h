@@ -198,10 +198,10 @@ extern int isnan _PARAMS((double));
 #define FP_NORMAL      4
 
 #ifndef FP_ILOGB0
-# define FP_ILOGB0 (-INT_MAX)
+# define FP_ILOGB0 (-__INT_MAX__)
 #endif
 #ifndef FP_ILOGBNAN
-# define FP_ILOGBNAN INT_MAX
+# define FP_ILOGBNAN __INT_MAX__
 #endif
 
 #ifndef MATH_ERRNO
