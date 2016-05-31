@@ -17,3 +17,9 @@ Bug Fixes
 
 - Allow mmap to map regions > 4 Gigs on 64 bit.
   Addresses: https://cygwin.com/ml/cygwin/2016-05/msg00140.html
+
+- Fix realpath(3) for incoming paths starting with long path prefixes.
+  Addresses: https://sourceware.org/ml/cygwin/2016-04/msg00281.html
+
+- Fix a usage of INT_MAX (required limits.h) in math.h
+  Addresses: Report on #cygwin-developers
