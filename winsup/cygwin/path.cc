@@ -3560,10 +3560,12 @@ realpath (const char *__restrict path, char *__restrict resolved)
      potentially invalid resolved. */
   __try
     {
-      /* Win32 drive letter paths have to be converted to a POSIX path first,
-	 because path_conv leaves the incoming path untouched except for
-	 converting backslashes to forward slashes. */
-      if (isdrive (path))
+      /* Win32 drive letter paths and, generally, any path starting with a
+	 backslash, have to be converted to a POSIX path first, because
+	 path_conv leaves the incoming path untouched except for converting
+	 backslashes to forward slashes.  This also covers '\\?\ and '\??\'
+	 path prefixes. */
+      if (isdrive (path) || path[0] == '\\')
 	{
 	  tpath = tp.c_get ();
 	  mount_table->conv_to_posix_path (path, tpath, 0);
