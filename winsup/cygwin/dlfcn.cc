@@ -135,7 +135,7 @@ dlopen (const char *name, int flags)
 	  /* Check if the last path component contains a dot.  If so,
 	     leave the filename alone.  Otherwise add a trailing dot
 	     to override LoadLibrary's automatic adding of a ".dll" suffix. */
-	  wchar_t *last_bs = wcsrchr (path, L'\\');
+	  wchar_t *last_bs = wcsrchr (path, L'\\') ?: path;
 	  if (last_bs && !wcschr (last_bs, L'.'))
 	    wcscat (last_bs, L".");
 
