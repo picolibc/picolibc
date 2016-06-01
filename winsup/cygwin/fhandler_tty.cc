@@ -767,7 +767,7 @@ fhandler_pty_slave::read (void *ptr, size_t& len)
 	  return;
 	}
 
-      readlen = bytes_in_pipe ? MIN (len, sizeof (buf)) : 0;
+      readlen = MIN (bytes_in_pipe, MIN (len, sizeof (buf)));
 
 #if 0
       /* Why on earth is the read length reduced to vmin, even if more bytes
