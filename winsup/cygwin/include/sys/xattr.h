@@ -13,6 +13,7 @@ details. */
 #ifndef _SYS_XATTR_H
 #define _SYS_XATTR_H
 
+#include <sys/types.h>
 #include <attr/xattr.h>
 
 #endif /* _SYS_XATTR_H */
