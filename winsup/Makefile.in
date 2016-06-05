@@ -48,7 +48,7 @@ CLEAN_SUBDIRS=${patsubst %,clean_%,$(SUBDIRS)}
 
 INSTALL_LICENSE:=@INSTALL_LICENSE@
 
-.PHONY: all install clean all-info info install-info install-license check \
+.PHONY: all install clean distclean all-info info install-info install-license check \
 	$(SUBDIRS) $(INSTALL_SUBDIRS) $(CLEAN_SUBDIRS)
 
 .SUFFIXES:
@@ -71,7 +71,7 @@ install-license: CYGWIN_LICENSE COPYING
 
 install: Makefile $(INSTALL_LICENSE) $(INSTALL_SUBDIRS)
 
-clean: $(CLEAN_SUBDIRS)
+clean distclean: $(CLEAN_SUBDIRS)
 
 all-info:
 

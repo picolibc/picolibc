@@ -564,8 +564,9 @@ _cygwin_crt0_common_STDINCFLAGS:=yes
 libstdcxx_wrapper_STDINCFLAGS:=yes
 cxx_STDINCFLAGS:=yes
 
-.PHONY: all force dll_ofiles install all_target install_target all_host install_host \
-	install install-libs install-headers
+.PHONY: all force dll_ofiles install all_target install_target all_host \
+	install_host install install-libs install-headers \
+	clean distclean realclean maintainer-clean
 
 all_host=@all_host@
 install_host=@install_host@
@@ -653,14 +654,15 @@ uninstall-man:
 	    rm -f $(DESTDIR)$(mandir)/man7/`basename $$i` ; \
 	done
 
-clean:
-	-rm -f *.o *.dll *.dbg *.a *.exp junk *.base version.cc *.exe *.d *stamp* *_magic.h sigfe.s cygwin.def globals.h $(srcdir)/$(TLSOFFSETS_H) $(srcdir)/devices.cc
+clean distclean realclean:
+	-rm -f *.o *.dll *.dbg *.a *.exp junk *.base version.cc *.exe *.d *stamp* *_magic.h sigfe.s cygwin.def globals.h
 	-@$(MAKE) -C ${cygserver_blddir} libclean
 
-maintainer-clean realclean: clean
+maintainer-clean: clean
 	@echo "This command is intended for maintainers to use;"
 	@echo "it deletes files that may require special tools to rebuild."
 	-rm -fr configure
+	-rm -f  $(srcdir)/$(TLSOFFSETS_H) $(srcdir)/devices.cc
 
 # Rule to build LDSCRIPT
 $(LDSCRIPT): $(LDSCRIPT).in
