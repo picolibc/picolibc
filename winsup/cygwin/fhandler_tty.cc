@@ -756,10 +756,6 @@ fhandler_pty_slave::read (void *ptr, size_t& len)
 	  goto out;
 	}
 
-      /* On first peek determine no. of bytes to flush. */
-      if (!ptr && len == UINT_MAX)
-	len = (size_t) bytes_in_pipe;
-
       if (ptr && !bytes_in_pipe && !vmin && !time_to_wait)
 	{
 	  ReleaseMutex (input_mutex);
@@ -767,7 +763,9 @@ fhandler_pty_slave::read (void *ptr, size_t& len)
 	  return;
 	}
 
-      readlen = MIN (bytes_in_pipe, MIN (len, sizeof (buf)));
+      readlen = bytes_in_pipe ? MIN (len, sizeof (buf)) : 0;
+      if (get_ttyp ()->ti.c_lflag & ICANON && ptr)
+	readlen = MIN (bytes_in_pipe, readlen);
 
 #if 0
       /* Why on earth is the read length reduced to vmin, even if more bytes
@@ -804,7 +802,8 @@ fhandler_pty_slave::read (void *ptr, size_t& len)
 		}
 	      if (n)
 		{
-		  len -= n;
+		  if (!(!ptr && len == UINT_MAX)) /* not tcflush() */
+		    len -= n;
 		  totalread += n;
 		  if (ptr)
 		    {
