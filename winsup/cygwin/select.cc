@@ -211,7 +211,7 @@ select (int maxfds, fd_set *readfds, fd_set *writefds, fd_set *exceptfds,
 	{
 	  select_printf ("recalculating us");
 	  LONGLONG now = gtod.usecs ();
-	  if (now > (start_time + us))
+	  if (now >= (start_time + us))
 	    {
 	      select_printf ("timed out after verification");
 	      /* Set descriptor bits to zero per POSIX. */
