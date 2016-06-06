@@ -758,7 +758,7 @@ $(DEF_FILE): gendef $(srcdir)/$(TLSOFFSETS_H) $(DIN_FILE)
 	$(word 1,$^) --cpu=${target_cpu} --output-def=$@  --tlsoffsets=$(word 2,$^) $(wordlist 3,99,$^)
 
 $(srcdir)/$(TLSOFFSETS_H): gentls_offsets cygtls.h
-	$^ $@ $(target_cpu) $(COMPILE.cc) -c
+	$^ $@ $(target_cpu) $(COMPILE.cc) -c || rm $@
 
 sigfe.s: $(DEF_FILE)
 	@[ -s $@ ] || \
