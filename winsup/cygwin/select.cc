@@ -337,7 +337,7 @@ select_stuff::wait (fd_set *readfds, fd_set *writefds, fd_set *exceptfds,
 {
   HANDLE w4[MAXIMUM_WAIT_OBJECTS];
   select_record *s = &start;
-  DWORD m = 0;
+  DWORD m = 0, timer_idx = 0, cancel_idx = 0;
 
   /* Always wait for signals. */
   wait_signal_arrived here (w4[m++]);
@@ -345,44 +345,17 @@ select_stuff::wait (fd_set *readfds, fd_set *writefds, fd_set *exceptfds,
   /* Set a timeout, or not, for WMFO. */
   DWORD wmfo_timeout = us ? INFINITE : 0;
 
-  /* Create and set a waitable timer, if a finite timeout has been
-     requested. */
-  LARGE_INTEGER ms_clock_ticks;
-  HANDLE timer_handle;
-  NTSTATUS status;
-  select_printf ("before NtCreateTimer\n");
-  status = NtCreateTimer (&timer_handle, TIMER_ALL_ACCESS, NULL, NotificationTimer);
-  select_printf ("after NtCreateTimer\n");
-  if (!NT_SUCCESS (status))
-    {
-      select_printf ("NtCreateTimer failed (%d)\n", GetLastError ());
-      return select_error;
-    }
-  w4[m++] = timer_handle;
-  if (us >= 0)
-    {
-      ms_clock_ticks.QuadPart = -us * 10;
-      int setret;
-      select_printf ("before NtCreateTimer\n");
-      status = NtSetTimer (timer_handle, &ms_clock_ticks, NULL, NULL, FALSE, 0, NULL);
-      select_printf ("after NtCreateTimer\n");
-      if (!NT_SUCCESS (status))
-	{
-	  select_printf ("NtSetTimer failed: %d (%08x)\n", setret, GetLastError ());
-	  return select_error;
-	}
-    }
-
   /* Optionally wait for pthread cancellation. */
   if ((w4[m] = pthread::get_cancel_event ()) != NULL)
-    m++;
+    cancel_idx = m++;
 
-  DWORD startfds = m;
   /* Loop through the select chain, starting up anything appropriate and
      counting the number of active fds. */
+  DWORD startfds = m;
   while ((s = s->next))
     {
-      if (m >= MAXIMUM_WAIT_OBJECTS)
+      /* Make sure to leave space for the timer, if we have a finite timeout. */
+      if (m >= MAXIMUM_WAIT_OBJECTS - (us > 0LL ? 1 : 0))
 	{
 	  set_sig_errno (EINVAL);
 	  return select_error;
@@ -402,6 +375,38 @@ select_stuff::wait (fd_set *readfds, fd_set *writefds, fd_set *exceptfds,
 next_while:;
     }
 
+  /* Optionally create and set a waitable timer, if a finite timeout has
+     been requested.  Recycle cw_timer in the cygtls area so we only have
+     to create the timer once per thread.  Since WFMO checks the handles
+     in order, we appand the timer as last object, otherwise it's preferred
+     over actual events on the descriptors. */
+  HANDLE &wait_timer = _my_tls.locals.cw_timer;
+  if (us > 0LL)
+    {
+      NTSTATUS status;
+      if (!wait_timer)
+	{
+	  status = NtCreateTimer (&wait_timer, TIMER_ALL_ACCESS, NULL,
+				  NotificationTimer);
+	  if (!NT_SUCCESS (status))
+	    {
+	      select_printf ("%y = NtCreateTimer ()\n", status);
+	      return select_error;
+	    }
+	}
+      LARGE_INTEGER ms_clock_ticks = { .QuadPart = -us * 10 };
+      status = NtSetTimer (wait_timer, &ms_clock_ticks, NULL, NULL, FALSE,
+			   0, NULL);
+      if (!NT_SUCCESS (status))
+	{
+	  select_printf ("%y = NtSetTimer (%Y)\n",
+			 status, ms_clock_ticks.QuadPart);
+	  return select_error;
+	}
+      w4[m] = wait_timer;
+      timer_idx = m++;
+    }
+
   debug_printf ("m %d, us %U, wmfo_timeout %d", m, us, wmfo_timeout);
 
   DWORD wait_ret;
@@ -417,13 +422,10 @@ next_while:;
 					    MWMO_INPUTAVAILABLE);
   select_printf ("wait_ret %d, m = %d.  verifying", wait_ret, m);
 
-  if (wmfo_timeout == INFINITE)
+  if (timer_idx)
     {
-      select_printf ("before timer cleanup\n");
       BOOLEAN current_state;
-      NtCancelTimer (timer_handle, &current_state);
-      NtClose (timer_handle);
-      select_printf ("after timer cleanup\n");
+      NtCancelTimer (wait_timer, &current_state);
     }
 
   wait_states res;
@@ -448,22 +450,26 @@ next_while:;
       s->set_select_errno ();
       res = select_error;
       break;
-    case WAIT_OBJECT_0 + 1:
     case WAIT_TIMEOUT:
+was_timeout:
       select_printf ("timed out");
       res = select_set_zero;
       break;
-    case WAIT_OBJECT_0 + 2:
-      if (startfds > 2)
+    case WAIT_OBJECT_0 + 1:
+      /* Cancel event? */
+      if (wait_ret == cancel_idx)
 	{
 	  cleanup ();
 	  destroy ();
 	  pthread::static_cancel_self ();
 	  /*NOTREACHED*/
 	}
-      /* Fall through.  This wasn't a cancel event.  It was just a normal object
-	 to wait for.  */
+      /*FALLTHRU*/
     default:
+      /* Timer event? */
+      if (wait_ret == timer_idx)
+	goto was_timeout;
+
       s = &start;
       res = select_set_zero;
       /* Some types of objects (e.g., consoles) wake up on "inappropriate"
@@ -477,7 +483,8 @@ next_while:;
 	    res = select_error;		/* Somebody detected an error */
 	    goto out;
 	  }
-	else if ((((wait_ret >= m && s->windows_handle) || s->h == w4[wait_ret]))
+	else if ((((wait_ret >= m && s->windows_handle)
+	           || s->h == w4[wait_ret]))
 		 && s->verify (s, readfds, writefds, exceptfds))
 	  res = select_ok;
 
