@@ -31,6 +31,9 @@ int     _EXFUN(close, (int __fildes ));
 #if __POSIX_VISIBLE >= 199209
 size_t	_EXFUN(confstr, (int __name, char *__buf, size_t __len));
 #endif
+#if __XSI_VISIBLE
+char *  _EXFUN(crypt, (const char *__key, const char *__salt));
+#endif
 #if __XSI_VISIBLE && __XSI_VISIBLE < 700
 char *  _EXFUN(ctermid, (char *__s ));
 #endif
@@ -45,6 +48,9 @@ int     _EXFUN(dup2, (int __fildes, int __fildes2 ));
 #if __GNU_VISIBLE
 int     _EXFUN(dup3, (int __fildes, int __fildes2, int flags));
 int	_EXFUN(eaccess, (const char *__path, int __mode));
+#endif
+#if __XSI_VISIBLE
+void	_EXFUN(encrypt, (char *__block, int __edflag));
 #endif
 #if __BSD_VISIBLE || (__XSI_VISIBLE && __XSI_VISIBLE < 500)
 void	_EXFUN(endusershell, (void));

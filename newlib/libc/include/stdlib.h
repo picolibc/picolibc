@@ -144,6 +144,9 @@ char *	_EXFUN(realpath, (const char *__restrict path, char *__restrict resolved_
 #if __BSD_VISIBLE
 int	_EXFUN(rpmatch, (const char *response));
 #endif
+#if __XSI_VISIBLE
+_VOID	_EXFUN(setkey, (const char *__key));
+#endif
 _VOID	_EXFUN(srand,(unsigned __seed));
 double	_EXFUN(strtod,(const char *__restrict __n, char **__restrict __end_PTR));
 double	_EXFUN(_strtod_r,(struct _reent *,const char *__restrict __n, char **__restrict __end_PTR));
