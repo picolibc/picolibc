@@ -375,10 +375,10 @@ select_stuff::wait (fd_set *readfds, fd_set *writefds, fd_set *exceptfds,
 next_while:;
     }
 
-  /* Optionally create and set a waitable timer, if a finite timeout has
+  /* Optionally create and set a waitable timer if a finite timeout has
      been requested.  Recycle cw_timer in the cygtls area so we only have
      to create the timer once per thread.  Since WFMO checks the handles
-     in order, we appand the timer as last object, otherwise it's preferred
+     in order, we append the timer as last object, otherwise it's preferred
      over actual events on the descriptors. */
   HANDLE &wait_timer = _my_tls.locals.cw_timer;
   if (us > 0LL)
@@ -399,7 +399,7 @@ next_while:;
 			   0, NULL);
       if (!NT_SUCCESS (status))
 	{
-	  select_printf ("%y = NtSetTimer (%Y)\n",
+	  select_printf ("%y = NtSetTimer (%D)\n",
 			 status, ms_clock_ticks.QuadPart);
 	  return select_error;
 	}
