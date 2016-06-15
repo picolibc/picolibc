@@ -44,13 +44,13 @@ cygheap_user::init ()
   WCHAR user_name[UNLEN + 1];
   DWORD user_name_len = UNLEN + 1;
 
-  /* This code is only run if a Cygwin process gets started by a native
-     Win32 process.  We try to get the username from the environment,
+  /* This method is only called if a Cygwin process gets started by a
+     native Win32 process.  Try to get the username from the environment,
      first USERNAME (Win32), then USER (POSIX).  If that fails (which is
      very unlikely), it only has an impact if we don't have an entry in
      /etc/passwd for this user either.  In that case the username sticks
      to "unknown".  Since this is called early in initialization, and
-     since we don't want pull in a dependency to any other DLL except
+     since we don't want to pull in a dependency to any other DLL except
      ntdll and kernel32 at this early stage, don't call GetUserName,
      GetUserNameEx, NetWkstaUserGetInfo, etc. */
   if (GetEnvironmentVariableW (L"USERNAME", user_name, user_name_len)
@@ -221,7 +221,7 @@ uinfo_init ()
     return;
 
   if (!child_proc_info)
-    internal_getlogin (cygheap->user); /* Set the cygheap->user. */
+    internal_getlogin (cygheap->user); /* Set cygheap->user. */
   /* Conditions must match those in spawn to allow starting child
      processes with ruid != euid and rgid != egid. */
   else if (cygheap->user.issetuid ()
@@ -644,14 +644,6 @@ cygheap_pwdgrp::init ()
   grp_src = (NSS_SRC_FILES | NSS_SRC_DB);
   prefix = NSS_PFX_AUTO;
   separator[0] = L'+';
-#if 0
-  home_scheme[0].method = NSS_SCHEME_CYGWIN;
-  home_scheme[1].method = NSS_SCHEME_DESC;
-  shell_scheme[0].method = NSS_SCHEME_CYGWIN;
-  shell_scheme[1].method = NSS_SCHEME_DESC;
-  gecos_scheme[0].method = NSS_SCHEME_CYGWIN;
-  gecos_scheme[1].method = NSS_SCHEME_DESC;
-#endif
   enums = (ENUM_CACHE | ENUM_BUILTIN);
   enum_tdoms = NULL;
   caching = true;	/* INTERNAL ONLY */
