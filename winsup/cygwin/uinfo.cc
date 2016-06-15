@@ -36,8 +36,8 @@ details. */
 #include "cygserver_pwdgrp.h"
 
 /* Initialize the part of cygheap_user that does not depend on files.
-   The information is used in shared.cc for the user shared.
-   Final initialization occurs in uinfo_init */
+   The information is used in shared.cc to create the shared user_info
+   region.  Final initialization occurs in uinfo_init */
 void
 cygheap_user::init ()
 {
