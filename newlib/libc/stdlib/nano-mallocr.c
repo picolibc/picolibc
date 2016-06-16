@@ -58,9 +58,8 @@
 #define RCALL reent_ptr,
 #define RONECALL reent_ptr
 
-/* Disable MALLOC_LOCK so far. So it won't be thread safe */
-#define MALLOC_LOCK /*__malloc_lock(reent_ptr) */
-#define MALLOC_UNLOCK /*__malloc_unlock(reent_ptr) */
+#define MALLOC_LOCK __malloc_lock(reent_ptr)
+#define MALLOC_UNLOCK __malloc_unlock(reent_ptr)
 
 #define RERRNO reent_ptr->_errno
 
