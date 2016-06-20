@@ -281,9 +281,10 @@ int _EXFUN(settimeofday, (const struct timeval *, const struct timezone *));
 int _EXFUN(getitimer, (int __which, struct itimerval *__value));
 int _EXFUN(setitimer, (int __which, const struct itimerval *__restrict __value,
 					struct itimerval *__restrict __ovalue));
+#endif
+
 int _EXFUN(gettimeofday, (struct timeval *__restrict __p,
 			  void *__restrict __tz));
-#endif
 
 #if __GNU_VISIBLE
 int _EXFUN(futimesat, (int, const char *, const struct timeval [2]));
