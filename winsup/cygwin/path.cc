@@ -2794,19 +2794,9 @@ restart:
 	     This speeds up path_conv noticably (~10%). */
 	  && (fs.inited () || fs.update (&upath, h)))
 	{
-	  if (fs.is_nfs ())
-	    {
-	      status = nfs_fetch_fattr3 (h, conv_hdl.nfsattr ());
-	      if (NT_SUCCESS (status))
-		fileattr = ((conv_hdl.nfsattr ()->type & 7) == NF3DIR)
-			    ? FILE_ATTRIBUTE_DIRECTORY : 0;
-	    }
-	  else
-	    {
-	      status = file_get_fai (h, conv_hdl.fai ());
-	      if (NT_SUCCESS (status))
-		fileattr = conv_hdl.fai ()->BasicInformation.FileAttributes;
-	    }
+	  status = conv_hdl.get_finfo (h, fs.is_nfs ());
+	  if (NT_SUCCESS (status))
+	    fileattr = conv_hdl.get_dosattr (fs.is_nfs ());
 	}
       if (!NT_SUCCESS (status))
 	{

@@ -254,7 +254,7 @@ fhandler_base::fstat_by_nfs_ea (struct stat *buf)
 	 NFS client. */
       if (get_access () & GENERIC_WRITE)
 	FlushFileBuffers (get_io_handle ());
-      nfs_fetch_fattr3 (get_io_handle (), nfs_attr);
+      pc.get_finfo (get_io_handle ());
     }
   buf->st_dev = nfs_attr->fsid;
   buf->st_ino = nfs_attr->fileid;
@@ -326,7 +326,7 @@ fhandler_base::fstat_by_handle (struct stat *buf)
      on the information stored in pc.fai.  So we overwrite them here. */
   if (get_io_handle ())
     {
-      status = file_get_fai (h, pc.fai ());
+      status = pc.get_finfo (h);
       if (!NT_SUCCESS (status))
        {
 	 debug_printf ("%y = NtQueryInformationFile(%S, FileAllInformation)",
