@@ -90,6 +90,8 @@ enum path_types
   PATH_SOCKET		= 0x40000000
 };
 
+NTSTATUS file_get_fai (HANDLE, PFILE_ALL_INFORMATION);
+
 class symlink_info;
 
 class path_conv_handle
@@ -117,10 +119,25 @@ public:
       hdl = NULL;
   }
   inline HANDLE handle () const { return hdl; }
-  inline PFILE_ALL_INFORMATION fai ()
+  inline PFILE_ALL_INFORMATION fai () const
   { return (PFILE_ALL_INFORMATION) &attribs._fai; }
-  inline struct fattr3 *nfsattr ()
+  inline struct fattr3 *nfsattr () const
   { return (struct fattr3 *) &attribs._fattr3; }
+  inline NTSTATUS get_finfo (HANDLE h, bool nfs)
+  {
+    return nfs ? nfs_fetch_fattr3 (h, nfsattr ()) : file_get_fai (h, fai ());
+  }
+  inline ino_t get_ino (bool nfs) const
+  {
+    return nfs ? nfsattr ()->fileid
+	       : fai ()->InternalInformation.IndexNumber.QuadPart;
+  }
+  inline DWORD get_dosattr (bool nfs) const
+  {
+    if (nfs)
+      return (nfsattr ()->type & 7) == NF3DIR ? FILE_ATTRIBUTE_DIRECTORY : 0;
+    return fai ()->BasicInformation.FileAttributes;
+  }
 };
 
 class path_conv
@@ -380,6 +397,11 @@ class path_conv
   HANDLE handle () const { return conv_handle.handle (); }
   PFILE_ALL_INFORMATION fai () { return conv_handle.fai (); }
   struct fattr3 *nfsattr () { return conv_handle.nfsattr (); }
+  inline NTSTATUS get_finfo (HANDLE h)
+  {
+    return conv_handle.get_finfo (h, fs.is_nfs ());
+  }
+  inline ino_t get_ino () const { return conv_handle.get_ino (fs.is_nfs ()); }
   void reset_conv_handle () { conv_handle.set (NULL); }
   void close_conv_handle () { conv_handle.close (); }
 
@@ -432,7 +454,6 @@ bool __reg2 has_dot_last_component (const char *dir, bool test_dot_dot);
 int __reg3 path_prefix_p (const char *path1, const char *path2, int len1,
 		   bool caseinsensitive);
 
-NTSTATUS file_get_fai (HANDLE, PFILE_ALL_INFORMATION);
 int normalize_win32_path (const char *, char *, char *&);
 int normalize_posix_path (const char *, char *, char *&);
 PUNICODE_STRING __reg3 get_nt_native_path (const char *, UNICODE_STRING&, bool);
