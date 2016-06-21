@@ -334,8 +334,7 @@ fhandler_base::fstat_by_handle (struct stat *buf)
 	 return -1;
        }
     }
-  if (pc.hasgood_inode ()
-      && pc.isgood_inode (pc.fai ()->InternalInformation.IndexNumber.QuadPart))
+  if (pc.isgood_inode (pc.fai ()->InternalInformation.IndexNumber.QuadPart))
     ino = pc.fai ()->InternalInformation.IndexNumber.QuadPart;
   return fstat_helper (buf);
 }
@@ -463,10 +462,7 @@ fhandler_base::fstat_helper (struct stat *buf)
   buf->st_nlink = pc.fai()->StandardInformation.NumberOfLinks;
 
   /* Enforce namehash as inode number on untrusted file systems. */
-  if (ino && pc.isgood_inode (ino))
-    buf->st_ino = (ino_t) ino;
-  else
-    buf->st_ino = get_ino ();
+  buf->st_ino = ino ?: get_ino ();
 
   buf->st_blksize = PREFERRED_IO_BLKSIZE;
 
