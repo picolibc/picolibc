@@ -1461,6 +1461,8 @@ fhandler_base::open_fs (int flags, mode_t mode)
       return 0;
     }
 
+  bool new_file = !exists ();
+
   int res = fhandler_base::open (flags | O_DIROPEN, mode);
   if (!res)
     goto out;
@@ -1479,9 +1481,13 @@ fhandler_base::open_fs (int flags, mode_t mode)
       return 0;
     }
 
-  if (pc.hasgood_inode ()
-      && pc.isgood_inode (pc.fai ()->InternalInformation.IndexNumber.QuadPart))
-    ino = pc.fai ()->InternalInformation.IndexNumber.QuadPart;
+  /* The file info in pc is wrong at this point for newly created files.
+     Refresh it before fetching any file info. */
+  if (new_file)
+    pc.get_finfo (get_io_handle ());
+
+  if (pc.isgood_inode (pc.get_ino ()))
+    ino = pc.get_ino ();
 
 out:
   syscall_printf ("%d = fhandler_disk_file::open(%S, %y)", res,
