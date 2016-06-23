@@ -239,7 +239,7 @@ class path_conv
     path_flags (0), suffix (NULL), posix_path (NULL), error (0),
     dev (in_dev)
   {
-    set_path (in_dev.native);
+    set_path (in_dev.native ());
   }
 
   path_conv (int, const char *src, unsigned opt = PC_SYM_FOLLOW,
@@ -322,6 +322,10 @@ class path_conv
   {
     free_strings ();
     memcpy (this, &pc, sizeof pc);
+    /* The device info might contain pointers to allocated strings, in
+       contrast to statically allocated strings.  Calling device::dup()
+       will duplicate the string if the source was allocated. */
+    dev.dup ();
     path = cstrdup (in_path);
     conv_handle.dup (pc.conv_handle);
     posix_path = cstrdup(pc.posix_path);

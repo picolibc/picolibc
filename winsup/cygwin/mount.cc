@@ -78,7 +78,7 @@ win32_device_name (const char *src_path, char *win32_path, device& dev)
   dev.parse (src_path);
   if (dev == FH_FS || dev == FH_DEV)
     return false;
-  strcpy (win32_path, dev.native);
+  strcpy (win32_path, dev.native ());
   return true;
 }
 

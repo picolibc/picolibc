@@ -9,7 +9,7 @@
 #include "fhandler.h"
 #include "ntdll.h"
 
-typedef const device *KR_device_t;
+typedef const _device *KR_device_t;
 }
 %type KR_device_t
 %local {
@@ -36,7 +36,7 @@ exists_ntdev (const device& dev)
   HANDLE h;
   NTSTATUS status;
 
-  sys_mbstowcs (wpath, MAX_PATH, dev.native);
+  sys_mbstowcs (wpath, MAX_PATH, dev.native ());
   RtlInitUnicodeString (&upath, wpath);
   InitializeObjectAttributes (&attr, &upath, OBJ_CASE_INSENSITIVE, NULL, NULL);
   /* Except for the serial IO devices, the native paths are
@@ -86,55 +86,55 @@ exists_pty (const device& dev)
   return cygwin_shared->tty.connect (dev.get_minor ()) != -1;
 }
 
-const device dev_cygdrive_storage =
+const _device dev_cygdrive_storage =
   {"/cygdrive", {FH_CYGDRIVE}, "", exists};
 
-const device dev_fs_storage =
+const _device dev_fs_storage =
   {"", {FH_FS}, "", exists};
 
-const device dev_proc_storage =
+const _device dev_proc_storage =
   {"", {FH_PROC}, "", exists};
 
-const device dev_procnet_storage =
+const _device dev_procnet_storage =
   {"", {FH_PROCNET}, "", exists};
 
-const device dev_procsys_storage =
+const _device dev_procsys_storage =
   {"", {FH_PROCSYS}, "", exists};
 
-const device dev_procsysvipc_storage =
+const _device dev_procsysvipc_storage =
   {"", {FH_PROCSYSVIPC}, "", exists};
 
-const device dev_netdrive_storage =
+const _device dev_netdrive_storage =
   {"", {FH_NETDRIVE}, "", exists};
 
-const device dev_registry_storage =
+const _device dev_registry_storage =
   {"", {FH_REGISTRY}, "", exists_internal};
 
-const device dev_piper_storage =
+const _device dev_piper_storage =
   {"", {FH_PIPER}, "", exists_internal};
 
-const device dev_pipew_storage =
+const _device dev_pipew_storage =
   {"", {FH_PIPEW}, "", exists_internal};
 
-const device dev_tcp_storage =
+const _device dev_tcp_storage =
   {"", {FH_TCP}, "", exists_internal};
 
-const device dev_udp_storage =
+const _device dev_udp_storage =
   {"", {FH_UDP}, "", exists_internal};
 
-const device dev_stream_storage =
+const _device dev_stream_storage =
   {"", {FH_STREAM}, "", exists_internal};
 
-const device dev_dgram_storage =
+const _device dev_dgram_storage =
   {"", {FH_DGRAM}, "", exists_internal};
 
-const device dev_bad_storage =
+const _device dev_bad_storage =
   {"", {FH_NADA}, "", exists_internal};
 
-const device dev_error_storage =
+const _device dev_error_storage =
   {"", {FH_ERROR}, "", exists_internal};
 
-#define BRACK(x) {devn_int: x}
+#define BRACK(x) {devn: x}
 %storage_here
 }
 /* Internal devices below are prefixed with a ":".  This moves them out of
@@ -166,31 +166,140 @@ const device dev_error_storage =
 "/dev/fd%(0-15)d", BRACK(FHDEV(DEV_FLOPPY_MAJOR, {$1})), "\\Device\\Floppy{$1}", exists_ntdev, S_IFBLK
 "/dev/scd%(0-15)d", BRACK(FHDEV(DEV_CDROM_MAJOR, {$1})), "\\Device\\CdRom{$1}", exists_ntdev, S_IFBLK
 "/dev/sr%(0-15)d", BRACK(FHDEV(DEV_CDROM_MAJOR, {$1})), "\\Device\\CdRom{$1}", exists_ntdev, S_IFBLK
-"/dev/sd%{a-z}s", BRACK(FH_SD{uc $1}), "\\Device\\Harddisk{ord($1) - ord('a')}\\Partition0", exists_ntdev, S_IFBLK
-"/dev/sda%{a-z}s", BRACK(FH_SDA{uc $1}), "\\Device\\Harddisk{26 + ord($1) - ord('a')}\\Partition0", exists_ntdev, S_IFBLK
-"/dev/sdb%{a-z}s", BRACK(FH_SDB{uc $1}), "\\Device\\Harddisk{52 + ord($1) - ord('a')}\\Partition0", exists_ntdev, S_IFBLK
-"/dev/sdc%{a-z}s", BRACK(FH_SDC{uc $1}), "\\Device\\Harddisk{78 + ord($1) - ord('a')}\\Partition0", exists_ntdev, S_IFBLK
-"/dev/sdd%{a-x}s", BRACK(FH_SDD{uc $1}), "\\Device\\Harddisk{104 + ord($1) - ord('a')}\\Partition0", exists_ntdev, S_IFBLK
-"/dev/sd%{a-z}s%(1-15)d", BRACK(FH_SD{uc $1} | {$2}), "\\Device\\Harddisk{ord($1) - ord('a')}\\Partition{$2 % 16}", exists_ntdev, S_IFBLK
-"/dev/sda%{a-z}s%(1-15)d", BRACK(FH_SDA{uc $1} | {$2}), "\\Device\\Harddisk{26 + ord($1) - ord('a')}\\Partition{$2 % 16}", exists_ntdev, S_IFBLK
-"/dev/sdb%{a-z}s%(1-15)d", BRACK(FH_SDB{uc $1} | {$2}), "\\Device\\Harddisk{52 + ord($1) - ord('a')}\\Partition{$2 % 16}", exists_ntdev, S_IFBLK
-"/dev/sdc%{a-z}s%(1-15)d", BRACK(FH_SDC{uc $1} | {$2}), "\\Device\\Harddisk{78 + ord($1) - ord('a')}\\Partition{$2 % 16}", exists_ntdev, S_IFBLK
-"/dev/sdd%{a-x}s%(1-15)d", BRACK(FH_SDD{uc $1} | {$2}), "\\Device\\Harddisk{104 + ord($1) - ord('a')}\\Partition{$2 % 16}", exists_ntdev, S_IFBLK
 "/dev/kmsg", BRACK(FH_KMSG), "\\Device\\MailSlot\\cygwin\\dev\\kmsg", exists_ntdev, S_IFCHR
 %other	{return	NULL;}
 %%
 #undef BRACK
 
-const device *dev_storage_end = dev_storage + (sizeof dev_storage / sizeof dev_storage[0]);
+const _device *dev_storage_end = dev_storage
+				+ (sizeof dev_storage / sizeof dev_storage[0]);
+
+/* Convert disk/partition to major/minor */
+static void
+conv_dp_to_mm (int drive, int part, _major_t &major, _minor_t &minor)
+{
+  if (part >= 16)
+    {
+      major = DEV_SD_HIGHPART_START + drive / 5;
+      drive %= 5;
+      minor = (part - 16) + 48 * drive;
+      return;
+    }
+  if (drive < ('q' - 'a'))      /* /dev/sda -to- /dev/sdp */
+    major = DEV_SD_MAJOR;
+  else if (drive < 32)		/* /dev/sdq -to- /dev/sdaf */
+    {
+      major = DEV_SD1_MAJOR;
+      drive -= 'q' - 'a';
+    }
+  else if (drive < 48)		/* /dev/sdag -to- /dev/sdav */
+    {
+      major = DEV_SD2_MAJOR;
+      drive -= 32;
+    }
+  else if (drive < 64)		/* /dev/sdaw -to- /dev/sdbl */
+    {
+      major = DEV_SD3_MAJOR;
+      drive -= 48;
+    }
+  else if (drive < 80)		/* /dev/sdbm -to- /dev/sdcb */
+    {
+      major = DEV_SD4_MAJOR;
+      drive -= 64;
+    }
+  else if (drive < 96)		/* /dev/sdcc -to- /dev/sdcr */
+    {
+      major = DEV_SD5_MAJOR;
+      drive -= 80;
+    }
+  else if (drive < 112)		/* /dev/sdcs -to- /dev/sddh */
+    {
+      major = DEV_SD6_MAJOR;
+      drive -= 96;
+    }
+  /* NOTE: This will cause multiple /dev/sddx entries in
+	   /proc/partitions if there are more than 128 devices */
+  else				/* /dev/sddi -to- /dev/sddx */
+    {
+      major = DEV_SD7_MAJOR;
+      drive -= 112;
+    }
+  minor = part + (drive * 16);
+}
+
+#define DISK_PREFIX	"/dev/sd"
+#define DP_LEN		(sizeof (DISK_PREFIX) - 1)
+
+static const char *hd_pattern = "\\Device\\Harddisk%u\\Partition%u";
 
 void
 device::parse (const char *s)
 {
   size_t len = strlen (s);
-  const device *dev = KR_find_keyword (s, len);
+  const _device *dev = KR_find_keyword (s, len);
 
   if (!dev)
-    *this = *fs_dev;
+    {
+      /* /dev/sd* devices have 8192 entries, given that we support 128 disks
+	 with up to 64 partitions.  Handling them with shilka raises the size
+	 of devices.o from ~250K to ~2 Megs.  So we handle them here manually
+	 to save this space. */
+      int drive = 0, part = 0;
+      const char *pos = s + DP_LEN;
+
+      /* Generic check for /dev/sd[a-z] prefix */
+      if (len <= DP_LEN || strncmp (s, DISK_PREFIX, DP_LEN)
+	  || pos[0] < 'a' || pos[0] > 'z')
+	goto no_disk;
+
+      /* /dev/sdd[a-x]? */
+      if (pos[0] == 'd' && pos[1] >= 'a' && pos[1] <= 'x')
+	{
+	  drive = 104 + (pos[1] - 'a');
+	  ++pos;
+	}
+      /* /dev/sd[a-c][a-z]? */
+      else if (pos[0] <= 'c' && pos[1] >= 'a' && pos[1] <= 'z')
+	{
+	  drive = 26 + (pos[0] - 'a') * 26 + (pos[1] - 'a');
+	  ++pos;
+	}
+      else
+	drive = (pos[0] - 'a');
+      /* Check next position in string for partition number. */
+      ++pos;
+      /* No partition number, equivalent to Windows partition 0. */
+      if (!pos[0])
+	;
+      /* First digit must not be 0. */
+      else if (pos[0] < '1' || pos[0] > '9')
+	goto no_disk;
+      else if (!pos[1])
+	part = (pos[0] - '0');
+      else if (pos[1] < '0' || pos[1] > '9' || pos[2] != '\0')
+	goto no_disk;
+      else
+	{
+	  part = (pos[0] - '0') * 10 + (pos[1] - '0');
+	  if (part > 63)
+	    goto no_disk;
+	}
+      char buf[sizeof *hd_pattern + 32];
+      __small_sprintf (buf, hd_pattern, drive, part);
+      native (buf, false);
+      if (exists_ntdev (*this))
+	{
+	  name (s, true);
+	  conv_dp_to_mm (drive, part, d.major, d.minor);
+	  native (buf, true);
+	  exists_func = exists_ntdev;
+	  _mode = S_IFBLK;
+	  lives_in_dev = dev_on_fs = false;
+	  return;
+	}
+no_disk:
+      *this = *fs_dev;
+    }
   else
     *this = *dev;
 }
@@ -208,7 +317,7 @@ device::parse (_major_t major, _minor_t minor)
 
   d.devn = 0;
 
-  for (const device *devidx = dev_storage; devidx < dev_storage_end; devidx++)
+  for (const _device *devidx = dev_storage; devidx < dev_storage_end; devidx++)
     if (devidx->d.devn == devn)
       {
 	*this = *devidx;
@@ -228,45 +337,26 @@ device::parse (dev_t dev)
 void
 device::parsedisk (int drive, int part)
 {
-  int base;
-  if (drive < ('q' - 'a'))      /* /dev/sda -to- /dev/sdp */
-    base = DEV_SD_MAJOR;
-  else if (drive < 32)		/* /dev/sdq -to- /dev/sdaf */
+  char buf[sizeof ("/dev/sddx63")], *bp;
+
+  conv_dp_to_mm (drive, part, d.major, d.minor);
+  bp = stpcpy (buf, "/dev/sd");
+  if (drive >= 26)
     {
-      base = DEV_SD1_MAJOR;
-      drive -= 'q' - 'a';
+      drive -= 26;
+      *bp++ = drive / 26 + 'a';
+      drive %= 26;
     }
-  else if (drive < 48)		/* /dev/sdag -to- /dev/sdav */
+  *bp++ = drive + 'a';
+  if (part)
     {
-      base = DEV_SD2_MAJOR;
-      drive -= 32;
+      if (part >= 10)
+	{
+	  *bp++ = part / 10 + '0';
+	  part %= 10;
+	}
+      *bp++ = part + '0';
     }
-  else if (drive < 64)		/* /dev/sdaw -to- /dev/sdbl */
-    {
-      base = DEV_SD3_MAJOR;
-      drive -= 48;
-    }
-  else if (drive < 80)		/* /dev/sdbm -to- /dev/sdcb */
-    {
-      base = DEV_SD4_MAJOR;
-      drive -= 64;
-    }
-  else if (drive < 96)		/* /dev/sdcc -to- /dev/sdcr */
-    {
-      base = DEV_SD5_MAJOR;
-      drive -= 80;
-    }
-  else if (drive < 112)		/* /dev/sdcs -to- /dev/sddh */
-    {
-      base = DEV_SD6_MAJOR;
-      drive -= 96;
-    }
-  /* NOTE: This will cause multiple /dev/sddx entries in
-	   /proc/partitions if there are more than 128 devices */
-  else				/* /dev/sddi -to- /dev/sddx */
-    {
-      base = DEV_SD7_MAJOR;
-      drive -= 112;
-    }
-  parse (base, part + (drive * 16));
+  *bp = '\0';
+  name (buf, true);
 }

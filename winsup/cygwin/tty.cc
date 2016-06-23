@@ -277,5 +277,5 @@ tty_min::ttyname ()
 {
   device d;
   d.parse (ntty);
-  return d.name;
+  return d.name ();
 }

@@ -100,7 +100,7 @@ quotactl (int cmd, const char *special, int id, caddr_t addr)
       set_errno (ENOENT);
       return -1;
     }
-  if (!S_ISBLK (pc.dev.mode))
+  if (!S_ISBLK (pc.dev.mode ()))
     {
       set_errno (ENOTBLK);
       return -1;

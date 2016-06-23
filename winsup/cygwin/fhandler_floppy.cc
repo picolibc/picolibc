@@ -159,8 +159,9 @@ fhandler_dev_floppy::lock_partition (DWORD to_write)
   /* The simple case.  We have only a single partition open anyway.
      Try to lock the partition so that a subsequent write succeeds.
      If there's some file handle open on one of the affected partitions,
-     this fails, but that's how it works on Vista and later... */
-  if (get_minor () % 16 != 0)
+     this fails, but that's how it works on Vista and later...
+     Only DEV_SD7_MAJOR and less can point to partition 0. */
+  if (get_major () <= DEV_SD7_MAJOR && get_minor () % 16 != 0)
     {
       if (!DeviceIoControl (get_handle (), FSCTL_LOCK_VOLUME,
 			   NULL, 0, NULL, 0, &bytes_read, NULL))

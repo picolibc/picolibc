@@ -425,7 +425,7 @@ public:
   virtual select_record *select_except (select_stuff *);
   virtual const char *get_native_name ()
   {
-    return dev ().native;
+    return dev ().native ();
   }
   virtual bg_check_types bg_check (int) {return bg_ok;}
   void clear_readahead ()
@@ -1059,8 +1059,9 @@ class fhandler_disk_file: public fhandler_base
 
 class fhandler_dev: public fhandler_disk_file
 {
-  const struct device *devidx;
+  const struct _device *devidx;
   bool dir_exists;
+  int drive, part;
 public:
   fhandler_dev ();
   int open (int flags, mode_t mode);
@@ -1569,7 +1570,7 @@ class fhandler_pty_slave: public fhandler_pty_common
   void fixup_after_exec ();
 
   select_record *select_read (select_stuff *);
-  virtual char const *ttyname () { return pc.dev.name; }
+  virtual char const *ttyname () { return pc.dev.name (); }
   int __reg2 fstat (struct stat *buf);
   int __reg3 facl (int, int, struct acl *);
   int __reg1 fchmod (mode_t mode);

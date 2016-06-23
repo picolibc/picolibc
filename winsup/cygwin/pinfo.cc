@@ -449,7 +449,7 @@ _pinfo::_ctty (char *buf)
     {
       device d;
       d.parse (ctty);
-      __small_sprintf (buf, "ctty %s", d.name);
+      __small_sprintf (buf, "ctty %s", d.name ());
     }
   return buf;
 }

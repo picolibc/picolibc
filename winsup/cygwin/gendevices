@@ -54,7 +54,7 @@ chop $storage[$#storage];
 chop $storage[$#storage];
 $storage[$#storage] .= "\n";
 splice(@lines, $storage_ix, 1,
-       "const _RDATA device dev_storage[] =\n", "{\n",
+       "const _RDATA _device dev_storage[] =\n", "{\n",
        @storage, "};\n\n",
        sort {$a cmp $b} values %pointers);
 open(SHILKA, '>', $shilka);
@@ -128,7 +128,7 @@ sub generate {
 	$rest = "$fh, $rest" if $rest =~ /^"/o;
 	$rest = fixup($rest, $vars);
 	if ($rest =~ /^(.*), =(\S*_dev)\b\s*(.*)$/) {
-	    $pointers{$2} ||= "const device *$2 = $storage_loc;\n";
+	    $pointers{$2} ||= "const _device *$2 = $storage_loc;\n";
 	    $rest = $1 . $3;
 	}
 	push(@storage, "  {\"$dev\", " . $rest . "},\n");

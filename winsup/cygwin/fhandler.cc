@@ -159,8 +159,8 @@ char *fhandler_base::get_proc_fd_name (char *buf)
 {
   if (get_name ())
     return strcpy (buf, get_name ());
-  if (dev ().name)
-    return strcpy (buf, dev ().name);
+  if (dev ().name ())
+    return strcpy (buf, dev ().name ());
   return strcpy (buf, "");
 }
 

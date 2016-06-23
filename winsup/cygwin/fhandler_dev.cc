@@ -25,8 +25,8 @@ details. */
 static int
 device_cmp (const void *a, const void *b)
 {
-  return strcmp (((const device *) a)->name,
-		 ((const device *) b)->name + dev_prefix_len);
+  return strcmp (((const device *) a)->name (),
+		 ((const device *) b)->name () + dev_prefix_len);
 }
 
 fhandler_dev::fhandler_dev () :
@@ -147,6 +147,7 @@ fhandler_dev::opendir (int fd)
       set_close_on_exec (true);
       dir->__fh = this;
       dir_exists = false;
+      drive = part = 0;
     }
 
   devidx = dir_exists ? NULL : dev_storage_scan_start;
@@ -161,11 +162,13 @@ free_dir:
   return NULL;
 }
 
+static const WCHAR *hd_pattern = L"\\Device\\Harddisk%u\\Partition%u";
+
 int
 fhandler_dev::readdir (DIR *dir, dirent *de)
 {
   int ret;
-  const device *curdev;
+  const _device *curdev;
   device dev;
 
   if (!devidx)
@@ -175,7 +178,7 @@ fhandler_dev::readdir (DIR *dir, dirent *de)
 	  /* Avoid to print devices for which users have created files under
 	     /dev already, for instance by using the old script from Igor
 	     Peshansky. */
-	  dev.name = de->d_name;
+	  dev.name (de->d_name);
 	  if (!bsearch (&dev, dev_storage_scan_start, dev_storage_size,
 			sizeof dev, device_cmp))
 	    break;
@@ -192,24 +195,62 @@ fhandler_dev::readdir (DIR *dir, dirent *de)
       /* If exists returns < 0 it means that the device can be used by a
 	 program but its use is deprecated and, so, it is not returned
 	 by readdir(().  */
-      if (curdev->exists () <= 0)
+      device *cdev = (device *) curdev;
+      if (cdev->exists () <= 0)
 	continue;
       ++dir->__d_position;
-      strcpy (de->d_name, curdev->name + dev_prefix_len);
-      if (curdev->get_major () == DEV_TTY_MAJOR
-	  && (curdev->is_device (FH_CONIN)
-	      || curdev->is_device (FH_CONOUT)
-	      || curdev->is_device (FH_CONSOLE)))
+      strcpy (de->d_name, cdev->name () + dev_prefix_len);
+      if (cdev->get_major () == DEV_TTY_MAJOR
+	  && (cdev->is_device (FH_CONIN)
+	      || cdev->is_device (FH_CONOUT)
+	      || cdev->is_device (FH_CONSOLE)))
 	{
 	  /* Make sure conin, conout, and console have the same inode number
 	     as the current consX. */
 	  de->d_ino = myself->ctty;
 	}
       else
-	de->d_ino = curdev->get_device ();
-      de->d_type = curdev->type ();
+	de->d_ino = cdev->get_device ();
+      de->d_type = cdev->type ();
       ret = 0;
       break;
+    }
+  /* Last but not least, scan for existing disks/partitions. */
+  if (ret)
+    {
+      UNICODE_STRING upath;
+      WCHAR buf[(sizeof *hd_pattern + 32) / sizeof (wchar_t)];
+      OBJECT_ATTRIBUTES attr;
+      FILE_BASIC_INFORMATION fbi;
+      NTSTATUS status;
+
+      InitializeObjectAttributes (&attr, &upath, 0, NULL, NULL);
+      while (drive < 128)
+	{
+	  while (part < 64)
+	    {
+	      USHORT len = __small_swprintf (buf, hd_pattern, drive, part);
+	      RtlInitCountedUnicodeString (&upath, buf, len * sizeof (WCHAR));
+	      status = NtQueryAttributesFile (&attr, &fbi);
+	      debug_printf ("%S %y", &upath, status);
+	      if (status != STATUS_OBJECT_NAME_NOT_FOUND
+		  && status != STATUS_OBJECT_PATH_NOT_FOUND)
+		{
+		  device dev (drive, part);
+		  strcpy (de->d_name, dev.name () + 5);
+		  de->d_ino = dev.get_device ();
+		  de->d_type = DT_BLK;
+		  ++part;
+		  ret = 0;
+		  goto out;
+		}
+	      if (part == 0)
+		break;
+	      ++part;
+	    }
+	  part = 0;
+	  ++drive;
+	}
     }
 
 out:

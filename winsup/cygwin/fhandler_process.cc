@@ -461,8 +461,8 @@ format_process_ctty (void *data, char *&destbuf)
     }
   device d;
   d.parse (p->ctty);
-  destbuf = (char *) crealloc_abort (destbuf, strlen (d.name) + 2);
-  return __small_sprintf (destbuf, "%s\n", d.name);
+  destbuf = (char *) crealloc_abort (destbuf, strlen (d.name ()) + 2);
+  return __small_sprintf (destbuf, "%s\n", d.name ());
 }
 
 static off_t

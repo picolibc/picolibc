@@ -1646,7 +1646,7 @@ umask (mode_t mask)
 int
 chmod_device (path_conv& pc, mode_t mode)
 {
-  return mknod_worker (pc.get_win32 (), pc.dev.mode & S_IFMT, mode, pc.dev.get_major (), pc.dev.get_minor ());
+  return mknod_worker (pc.get_win32 (), pc.dev.mode () & S_IFMT, mode, pc.dev.get_major (), pc.dev.get_minor ());
 }
 
 #define FILTERED_MODE(m)	((m) & (S_ISUID | S_ISGID | S_ISVTX \
@@ -2769,7 +2769,7 @@ ctermid (char *str)
     {
       device d;
       d.parse (myself->ctty);
-      strcpy (str, d.name);
+      strcpy (str, d.name ());
     }
   return str;
 }

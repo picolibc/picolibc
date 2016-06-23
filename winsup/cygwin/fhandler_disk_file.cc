@@ -513,7 +513,7 @@ fhandler_base::fstat_helper (struct stat *buf)
       else
 	{
 	  buf->st_dev = buf->st_rdev = dev ();
-	  buf->st_mode = dev ().mode;
+	  buf->st_mode = dev ().mode ();
 	  buf->st_size = 0;
 	}
     }
@@ -532,7 +532,7 @@ fhandler_base::fstat_helper (struct stat *buf)
       else if (is_fs_special ())
 	{
 	  buf->st_dev = buf->st_rdev = dev ();
-	  buf->st_mode = dev ().mode;
+	  buf->st_mode = dev ().mode ();
 	  buf->st_size = 0;
 	}
       else
@@ -2091,7 +2091,7 @@ fhandler_disk_file::readdir_helper (DIR *dir, dirent *de, DWORD w32_err,
 	  else if (fpath.is_fs_special ())
 	    {
 	      fname->Length -= 4 * sizeof (WCHAR);
-	      de->d_type = S_ISCHR (fpath.dev.mode) ? DT_CHR : DT_BLK;
+	      de->d_type = S_ISCHR (fpath.dev.mode ()) ? DT_CHR : DT_BLK;
 	    }
 	}
     }

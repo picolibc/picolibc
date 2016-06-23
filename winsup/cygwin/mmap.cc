@@ -528,7 +528,8 @@ mmap_record::alloc_fh ()
      of the correct type to be sure to call the method of the
      correct class. */
   device fdev;
-  fdev.name = fdev.native = "";
+  fdev.name ("");
+  fdev.native ("");
   fdev.parse (get_device ());
   fhandler_base *fh = build_fh_dev (fdev);
   if (fh)

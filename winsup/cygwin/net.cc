@@ -603,7 +603,7 @@ fdsock (cygheap_fdmanip& fd, const device *dev, SOCKET soc)
   if (fixup)
     ((fhandler_socket *) fd)->init_fixup_before ();
   fd->set_flags (O_RDWR | O_BINARY);
-  debug_printf ("fd %d, name '%s', soc %p", (int) fd, dev->name, soc);
+  debug_printf ("fd %d, name '%s', soc %p", (int) fd, dev->name (), soc);
 
   /* Raise default buffer sizes (instead of WinSock default 8K).
 

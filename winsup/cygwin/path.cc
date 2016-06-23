@@ -687,7 +687,6 @@ path_conv::check (const char *src, unsigned opt,
 	  path = NULL;
 	}
       close_conv_handle ();
-      memset (&dev, 0, sizeof (dev));
       fs.clear ();
       if (posix_path)
 	{
@@ -944,7 +943,7 @@ path_conv::check (const char *src, unsigned opt,
 		    }
 		  dev.parse (sym.major, sym.minor);
 		  dev.setfs (1);
-		  dev.mode = sym.mode;
+		  dev.mode (sym.mode);
 		  fileattr = sym.fileattr;
 		  goto out;
 		}
