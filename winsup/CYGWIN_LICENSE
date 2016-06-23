@@ -2,12 +2,14 @@ THIS SOFTWARE IS PROVIDED ``AS IS'' AND WITHOUT ANY EXPRESSED OR
 IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
 WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
 
-Unless stated otherwise, the sources under the cygwin subdirectory are
-licensed under the Lesser Gnu Public License, version 3 or (at your
-option) any later version (LGPLv3+).  See the COPYING.LIB file for the
-exact wording of that license.
+Unless stated otherwise, the sources under the cygwin subdirectory,
+as well as the sources under the cygserver subdirectory linked into
+the Cygwin DLL, are licensed under the Lesser Gnu Public License,
+version 3 or (at your option) any later version (LGPLv3+).  See the
+COPYING.LIB file for the exact wording of that license.
 
-Unless stated otherwise, the sources under the cygserver, the lsaauth,
+Unless stated otherwise, the sources under the cygserver subdir not
+linked into the Cygwin DLL, as well as the sources under the lsaauth
 and the utils subdirectories are licensed under the Gnu Public License,
 version 3 or (at your option) any later version (GPLv3+).  See the
 COPYING file for the exact wording of that license. 
