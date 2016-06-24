@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
+<book id="libm" xmlns:xi="http://www.w3.org/2001/XInclude">
+  <bookinfo>
+    <productname>newlib</productname>
+  </bookinfo>
+
+  <xi:include href="complex.xml"/>
+  <xi:include href="math.xml"/>
+
+  <!-- processing should insert index here -->
+  <index/>
+
+</book>
