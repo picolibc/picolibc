@@ -96,5 +96,5 @@ int setpgrp(pid_t pid, pid_t pgid)
 {
 	/* TODO: implement. */
 	errno = ENOSYS;
-	return NULL;
+	return -1;
 }
