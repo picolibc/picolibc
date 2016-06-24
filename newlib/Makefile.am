@@ -362,6 +362,21 @@ dvi-recursive: doc/makedoc
 doc/makedoc:
 	cd doc && $(MAKE) all
 
+# Recursive targets for man and install-man
+man:
+	for d in $(SUBDIRS); do \
+	  if test "$$d" != "."; then \
+	    (cd $$d && $(MAKE) man) || exit 1; \
+	  fi; \
+	done
+
+install-man:
+	for d in $(SUBDIRS); do \
+	  if test "$$d" != "."; then \
+	    (cd $$d && $(MAKE) install-man) || exit 1; \
+	  fi; \
+	done
+
 CONFIG_STATUS_DEPENDENCIES = $(newlib_basedir)/configure.host
 
 # Multilib support.

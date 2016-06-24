@@ -22,5 +22,7 @@ $(machine_dir)/lib.a:
 
 doc:
 
+docbook:
+
 ACLOCAL_AMFLAGS = -I ../.. -I ../../..
 CONFIG_STATUS_DEPENDENCIES = $(newlib_basedir)/configure.host

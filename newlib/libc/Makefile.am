@@ -142,6 +142,9 @@ SUBDEFS = \
 	$(LIBC_EXTRA_DEF) \
 	misc/stmp-def
 
+# ditto for stmp-xml files in each subdirectory which builds .xml files
+SUBXMLS = $(SUBDEFS:stmp-def=stmp-xml)
+
 libc.info: sigset.texi extra.texi stdio64.texi posix.texi iconvset.texi \
 	targetdep.tex $(SUBDEFS)
 
@@ -223,6 +226,23 @@ info_TEXINFOS = libc.texinfo
 libc_TEXINFOS = sigset.texi extra.texi posix.texi stdio64.texi iconvset.texi \
 	targetdep.tex $(SUBDEFS)
 
+docbook-recursive: force
+	for d in $(SUBDIRS); do \
+	  if test "$$d" != "."; then \
+	    (cd $$d && $(MAKE) docbook) || exit 1; \
+	  fi; \
+	done
+
+$(SUBXMLS): docbook-recursive
+
+man: $(SUBXMLS) libc.in.xml
+	xsltproc --xinclude --path ${builddir} --nonet ${srcdir}/../refcontainers.xslt ${srcdir}/libc.in.xml >libc.xml
+	xmlto --skip-validation man -m ${srcdir}/../man.xsl libc.xml
+
+install-man: man
+	mkdir -p $(DESTDIR)$(mandir)/man3
+	$(INSTALL_DATA) *.3 $(DESTDIR)$(mandir)/man3
+
 .PHONY: force
 force:
 
@@ -230,7 +250,8 @@ CLEANFILES = $(CRT0) \
 	sigset.texi stmp-sigset extra.texi stmp-extra \
 	stdio64.texi stmp-stdio64 targetdep.tex stmp-targetdep \
 	tmp-sigset.texi tmp-iconvset.texi tmp-extra.texi \
-	tmp-stdio64.texi tmp-posix.texi tmp-targetdep.texi
+	tmp-stdio64.texi tmp-posix.texi tmp-targetdep.texi \
+	*.xml *.3
 
 ACLOCAL_AMFLAGS = -I .. -I ../..
 CONFIG_STATUS_DEPENDENCIES = $(newlib_basedir)/configure.host

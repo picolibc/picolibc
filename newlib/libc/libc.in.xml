@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
+<book id="libc" xmlns:xi="http://www.w3.org/2001/XInclude">
+  <bookinfo>
+    <productname>newlib</productname>
+  </bookinfo>
+
+  <xi:include href="stdlib.xml"/>
+  <xi:include href="ctype.xml"/>
+  <xi:include href="stdio.xml"/>
+  <!-- stdio64 is optional -->
+  <xi:include href="stdio64.xml">
+    <xi:fallback/>
+  </xi:include>
+
+  <xi:include href="strings.xml"/>
+  <xi:include href="wcstrings.xml"/>
+  <!-- signals is optional -->
+  <xi:include href="signal.xml">
+    <xi:fallback/>
+  </xi:include>
+
+  <xi:include href="time.xml"/>
+  <xi:include href="locale.xml"/>
+  <!-- reent.tex contains fixed content and nothing seems to include the .def made in reent/ -->
+
+  <xi:include href="misc.xml"/>
+  <!-- posix is optional -->
+  <xi:include href="posix.xml">
+      <xi:fallback/>
+  </xi:include>
+  <!-- XXX: stdarg.h and vararg.h are directly described in libc.texinfo -->
+
+  <!-- iconv is optional -->
+  <xi:include href="iconv.xml">
+      <xi:fallback/>
+  </xi:include>
+
+  <!-- processing should insert index here -->
+  <index/>
+
+</book>
