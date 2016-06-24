@@ -31,6 +31,7 @@ SOURCES = \
 	net/inet_ntoa.c \
 	net/inet_ntop.c \
 	net/inet_pton.c \
+	net/nametoindex.c \
 	net/network.c \
 	alarm.c \
 	chmod.c \
@@ -42,6 +43,7 @@ SOURCES = \
 	fcntl.c \
 	fork.c \
 	fs.c \
+	getentropy.c \
 	getmntent.c \
 	getpagesize.c \
 	groups.c \
@@ -130,4 +132,8 @@ install-data-local:
 	$(mkinstalldirs) $(DESTDIR)$(tooldir)/include/netinet6; \
 	for i in $(srcdir)/include/netinet6/*.h; do \
 	  $(INSTALL_DATA) $$i $(DESTDIR)$(tooldir)/include/netinet6/`basename $$i`; \
+	done; \
+	$(mkinstalldirs) $(DESTDIR)$(tooldir)/include/netpacket; \
+	for i in $(srcdir)/include/netpacket/*.h; do \
+	  $(INSTALL_DATA) $$i $(DESTDIR)$(tooldir)/include/netpacket/`basename $$i`; \
 	done;

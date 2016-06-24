@@ -81,17 +81,18 @@ am__objects_1 = lib_a-domainname.$(OBJEXT) \
 	lib_a-inet_net_pton.$(OBJEXT) lib_a-inet_netof.$(OBJEXT) \
 	lib_a-inet_network.$(OBJEXT) lib_a-inet_ntoa.$(OBJEXT) \
 	lib_a-inet_ntop.$(OBJEXT) lib_a-inet_pton.$(OBJEXT) \
-	lib_a-network.$(OBJEXT) lib_a-alarm.$(OBJEXT) \
-	lib_a-chmod.$(OBJEXT) lib_a-chown.$(OBJEXT) \
-	lib_a-clocks.$(OBJEXT) lib_a-dup.$(OBJEXT) \
-	lib_a-endmntent.$(OBJEXT) lib_a-exec.$(OBJEXT) \
-	lib_a-fcntl.$(OBJEXT) lib_a-fork.$(OBJEXT) lib_a-fs.$(OBJEXT) \
-	lib_a-getmntent.$(OBJEXT) lib_a-getpagesize.$(OBJEXT) \
-	lib_a-groups.$(OBJEXT) lib_a-ids.$(OBJEXT) lib_a-io.$(OBJEXT) \
-	lib_a-ioctl.$(OBJEXT) lib_a-mmap.$(OBJEXT) \
-	lib_a-mount.$(OBJEXT) lib_a-nanosleep.$(OBJEXT) \
-	lib_a-phoenix.$(OBJEXT) lib_a-pid.$(OBJEXT) \
-	lib_a-pipe.$(OBJEXT) lib_a-poll.$(OBJEXT) \
+	lib_a-nametoindex.$(OBJEXT) lib_a-network.$(OBJEXT) \
+	lib_a-alarm.$(OBJEXT) lib_a-chmod.$(OBJEXT) \
+	lib_a-chown.$(OBJEXT) lib_a-clocks.$(OBJEXT) \
+	lib_a-dup.$(OBJEXT) lib_a-endmntent.$(OBJEXT) \
+	lib_a-exec.$(OBJEXT) lib_a-fcntl.$(OBJEXT) \
+	lib_a-fork.$(OBJEXT) lib_a-fs.$(OBJEXT) \
+	lib_a-getentropy.$(OBJEXT) lib_a-getmntent.$(OBJEXT) \
+	lib_a-getpagesize.$(OBJEXT) lib_a-groups.$(OBJEXT) \
+	lib_a-ids.$(OBJEXT) lib_a-io.$(OBJEXT) lib_a-ioctl.$(OBJEXT) \
+	lib_a-mmap.$(OBJEXT) lib_a-mount.$(OBJEXT) \
+	lib_a-nanosleep.$(OBJEXT) lib_a-phoenix.$(OBJEXT) \
+	lib_a-pid.$(OBJEXT) lib_a-pipe.$(OBJEXT) lib_a-poll.$(OBJEXT) \
 	lib_a-realpath.$(OBJEXT) lib_a-reboot.$(OBJEXT) \
 	lib_a-resource.$(OBJEXT) lib_a-sbrk.$(OBJEXT) \
 	lib_a-sched.$(OBJEXT) lib_a-select.$(OBJEXT) \
@@ -266,6 +267,7 @@ SOURCES = \
 	net/inet_ntoa.c \
 	net/inet_ntop.c \
 	net/inet_pton.c \
+	net/nametoindex.c \
 	net/network.c \
 	alarm.c \
 	chmod.c \
@@ -277,6 +279,7 @@ SOURCES = \
 	fcntl.c \
 	fork.c \
 	fs.c \
+	getentropy.c \
 	getmntent.c \
 	getpagesize.c \
 	groups.c \
@@ -506,6 +509,12 @@ lib_a-inet_pton.o: net/inet_pton.c
 lib_a-inet_pton.obj: net/inet_pton.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-inet_pton.obj `if test -f 'net/inet_pton.c'; then $(CYGPATH_W) 'net/inet_pton.c'; else $(CYGPATH_W) '$(srcdir)/net/inet_pton.c'; fi`
 
+lib_a-nametoindex.o: net/nametoindex.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-nametoindex.o `test -f 'net/nametoindex.c' || echo '$(srcdir)/'`net/nametoindex.c
+
+lib_a-nametoindex.obj: net/nametoindex.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-nametoindex.obj `if test -f 'net/nametoindex.c'; then $(CYGPATH_W) 'net/nametoindex.c'; else $(CYGPATH_W) '$(srcdir)/net/nametoindex.c'; fi`
+
 lib_a-network.o: net/network.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-network.o `test -f 'net/network.c' || echo '$(srcdir)/'`net/network.c
 
@@ -571,6 +580,12 @@ lib_a-fs.o: fs.c
 
 lib_a-fs.obj: fs.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-fs.obj `if test -f 'fs.c'; then $(CYGPATH_W) 'fs.c'; else $(CYGPATH_W) '$(srcdir)/fs.c'; fi`
+
+lib_a-getentropy.o: getentropy.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-getentropy.o `test -f 'getentropy.c' || echo '$(srcdir)/'`getentropy.c
+
+lib_a-getentropy.obj: getentropy.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-getentropy.obj `if test -f 'getentropy.c'; then $(CYGPATH_W) 'getentropy.c'; else $(CYGPATH_W) '$(srcdir)/getentropy.c'; fi`
 
 lib_a-getmntent.o: getmntent.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-getmntent.o `test -f 'getmntent.c' || echo '$(srcdir)/'`getmntent.c
@@ -1087,6 +1102,10 @@ install-data-local:
 	$(mkinstalldirs) $(DESTDIR)$(tooldir)/include/netinet6; \
 	for i in $(srcdir)/include/netinet6/*.h; do \
 	  $(INSTALL_DATA) $$i $(DESTDIR)$(tooldir)/include/netinet6/`basename $$i`; \
+	done; \
+	$(mkinstalldirs) $(DESTDIR)$(tooldir)/include/netpacket; \
+	for i in $(srcdir)/include/netpacket/*.h; do \
+	  $(INSTALL_DATA) $$i $(DESTDIR)$(tooldir)/include/netpacket/`basename $$i`; \
 	done;
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
