@@ -47,7 +47,7 @@ struct mntent *getmntent_r(FILE *fp, struct mntent *result, char *buffer, int bu
 
 	buff_ptr = buffer;
 
-	if (getline(&line, &size, fp) == -1) {
+	if (getline(&line, &size, fp) == -1 || feof(fp)) {
 		free(line);
 		return NULL;
 	}
