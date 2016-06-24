@@ -25,7 +25,10 @@
 #ifndef _SYS_SOCKET_H
 #define	_SYS_SOCKET_H
 
+#include <phoenix/netinet.h>
+#include <phoenix/netinet6.h>
 #include <phoenix/socket.h>
+#include <phoenix/sockios.h>
 #include <sys/types.h>
 
 #define	_SS_MAXSIZE		128U
@@ -40,6 +43,10 @@ struct sockaddr_storage {
 	int64_t __ss_align;				/* Force desired structure storage alignment */
 	char __ss_pad2[_SS_PAD2SIZE];
 };
+
+#define HAVE_STRUCT_SOCKADDR_STORAGE
+#define HAVE_STRUCT_IN6_ADDR
+#define HAVE_STRUCT_SOCKADDR_IN6
 
 int socket(int domain, int type, int protocol);
 int bind(int sockfd, const struct sockaddr *addr, socklen_t addrlen);

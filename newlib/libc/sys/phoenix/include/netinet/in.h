@@ -40,8 +40,8 @@
 #define _NETINET_IN_H
 
 #include <machine/endian.h>
-#include <netinet6/in6.h>
-#include <sys/socket.h>
+#include <phoenix/netinet.h>
+#include <sys/types.h>
 
 #if BYTE_ORDER == BIG_ENDIAN
 #define htons(a)	(a)
@@ -72,35 +72,9 @@ static uint16_t ntohs(uint16_t netshort)
 }
 #endif
 
-/* Protocols common to RFC 1700, POSIX, and X/Open. */
-#define	IPPROTO_IP			0						/* Dummy for IP */
-#define	IPPROTO_ICMP		1						/* Control message protocol */
-#define	IPPROTO_TCP			6						/* TCP */
-#define	IPPROTO_UDP			17						/* User datagram protocol */
-
-#define	INADDR_ANY			(u_int32_t) 0x00000000
-#define	INADDR_BROADCAST	(u_int32_t) 0xffffffff	/* Must be masked */
-
-typedef	uint32_t			in_addr_t;
-typedef	uint16_t			in_port_t;
-
-/* Internet address (a structure for historical reasons). */
-struct in_addr {
-	in_addr_t s_addr;
-};
-
-/* Socket address, internet style. */
-struct sockaddr_in {
-	uint8_t sin_len;
-	sa_family_t sin_family;
-	in_port_t sin_port;
-	struct in_addr sin_addr;
-	char sin_zero[8];
-};
-
 #if __POSIX_VISIBLE >= 200112
-#define	IPPROTO_RAW			255		/* Raw IP packet */
-#define	INET_ADDRSTRLEN		16
+#define	IPPROTO_RAW				255			/* Raw IP packet */
+#define	INET_ADDRSTRLEN			16
 #endif
 
 /*
@@ -281,12 +255,6 @@ struct sockaddr_in {
 #define	IP_DEFAULT_MULTICAST_TTL	1		/* Normally limit m'casts to 1 hop  */
 #define	IP_DEFAULT_MULTICAST_LOOP	1		/* Normally hear sends if a member  */
 #define	IP_MAX_MEMBERSHIPS			20		/* Per socket */
-
-/* Argument structure for IP_ADD_MEMBERSHIP and IP_DROP_MEMBERSHIP. */
-struct ip_mreq {
-	struct in_addr imr_multiaddr;			/* IP multicast address of group */
-	struct in_addr imr_interface;			/* Local IP address of interface */
-};
 
 /* Argument for IP_PORTRANGE - which range to search when port is unspecified at bind() or connect() */
 #define	IP_PORTRANGE_DEFAULT		0		/* Default range */

@@ -26,6 +26,7 @@
 #define	_ARPA_INET_H
 
 #include <netinet/in.h>
+#include <phoenix/socket.h>
 #include <stdint.h>
 
 #define	INET_ADDRSTRLEN		16

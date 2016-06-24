@@ -37,6 +37,7 @@
 #ifndef _NET_IF_H
 #define	_NET_IF_H
 
+#include <phoenix/iface.h>
 #include <sys/queue.h>
 #include <sys/socket.h>
 #include <sys/time.h>
@@ -106,24 +107,6 @@ struct if_data {
 	struct timeval ifi_lastchange;		/* Time of last administrative change */
 };
 
-#define	IFF_UP				0x1			/* Interface is up */
-#define	IFF_BROADCAST		0x2			/* Broadcast address valid */
-#define	IFF_DEBUG			0x4			/* Turn on debugging */
-#define	IFF_LOOPBACK		0x8			/* Is a loopback net */
-#define	IFF_POINTOPOINT		0x10		/* Interface is point-to-point link */
-#define	IFF_NOTRAILERS		0x20		/* Avoid use of trailers */
-#define	IFF_RUNNING			0x40		/* Resources allocated */
-#define	IFF_NOARP			0x80		/* No address resolution protocol */
-#define	IFF_PROMISC			0x100		/* Receive all packets */
-#define	IFF_ALLMULTI		0x200		/* Receive all multicast packets */
-#define	IFF_OACTIVE			0x400		/* Transmission in progress */
-#define	IFF_SIMPLEX			0x800		/* Can't hear own transmissions */
-#define	IFF_LINK0			0x1000		/* Per link layer defined bit */
-#define	IFF_LINK1			0x2000		/* Per link layer defined bit */
-#define	IFF_LINK2			0x4000		/* Per link layer defined bit */
-#define	IFF_ALTPHYS			IFF_LINK2	/* Use alternate physical connection */
-#define	IFF_MULTICAST		0x8000		/* Supports multicast */
-
 /*
  * The following flag(s) ought to go in if_flags, but we cannot change
  * struct ifnet because of binary compatibility, so we store them in
@@ -190,45 +173,6 @@ struct if_announcemsghdr {
 
 #define	IFAN_ARRIVAL		0		/* Interface arrival */
 #define	IFAN_DEPARTURE		1		/* Interface departure */
-
-/*
- * Interface request structure used for socket
- * ioctl's.  All interface ioctl's must have parameter
- * definitions which begin with ifr_name.  The
- * remainder may be interface specific.
- */
-struct ifreq {
-	char ifr_name[IFNAMSIZ];		/* if name, e.g. "en0" */
-	union {
-		struct sockaddr ifru_addr;
-		struct sockaddr ifru_dstaddr;
-		struct sockaddr ifru_broadaddr;
-		struct sockaddr ifru_netmask;
-		short ifru_flags[2];
-		short ifru_index;
-		int	ifru_metric;
-		int	ifru_mtu;
-		int	ifru_phys;
-		int	ifru_media;
-		caddr_t	ifru_data;
-		int	ifru_cap[2];
-	} ifr_ifru;
-
-#define	ifr_addr		ifr_ifru.ifru_addr			/* Address */
-#define	ifr_dstaddr		ifr_ifru.ifru_dstaddr		/* Other end of p-to-p link */
-#define	ifr_broadaddr	ifr_ifru.ifru_broadaddr		/* Broadcast address */
-#define	ifr_netmask		ifr_ifru.ifru_netmask		/* Interface net mask	*/
-#define	ifr_flags		ifr_ifru.ifru_flags[0]		/* Flags */
-#define	ifr_prevflags	ifr_ifru.ifru_flags[1]		/* Flags */
-#define	ifr_metric		ifr_ifru.ifru_metric		/* Metric */
-#define	ifr_mtu			ifr_ifru.ifru_mtu			/* Mtu */
-#define ifr_phys		ifr_ifru.ifru_phys			/* Physical wire */
-#define ifr_media		ifr_ifru.ifru_media			/* Physical media */
-#define	ifr_data		ifr_ifru.ifru_data			/* For use by interface */
-#define	ifr_reqcap		ifr_ifru.ifru_cap[0]		/* Requested capabilities */
-#define	ifr_curcap		ifr_ifru.ifru_cap[1]		/* Current capabilities */
-#define	ifr_index		ifr_ifru.ifru_index			/* Interface index */
-};
 
 struct ifaliasreq {
 	char ifra_name[IFNAMSIZ];	/* if name, e.g. "en0" */

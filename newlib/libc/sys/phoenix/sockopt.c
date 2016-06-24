@@ -25,6 +25,8 @@
 #include "syscall.h"
 
 #include <errno.h>
+#include <phoenix/socket_args.h>
+#include <phoenix/sockios.h>
 #include <sys/ioctl.h>
 #include <sys/socket.h>
 
@@ -41,7 +43,7 @@ int getsockname(int sockfd, struct sockaddr *addr, socklen_t *addrlen)
 
 int getsockopt(int sockfd, int level, int optname, void *optval, socklen_t *optlen)
 {
-	struct setsockopt_args args;
+	struct sockopt_args args;
 	args.level = level;
 	args.optname = optname;
 	args.optval = optval;
@@ -59,7 +61,7 @@ int getsockopt(int sockfd, int level, int optname, void *optval, socklen_t *optl
 
 int setsockopt(int sockfd, int level, int optname, const void *optval, socklen_t optlen)
 {
-	struct setsockopt_args args;
+	struct sockopt_args args;
 	args.level = level;
 	args.optname = optname;
 	args.optval = (void *) optval;
