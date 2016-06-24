@@ -104,11 +104,15 @@ __get_lcid_from_locale (const char *name)
 	{ "ff-SN" , L"ff-Latn-SN"  },
 	{ "ha-NG" , L"ha-Latn-NG"  },
 	{ "iu-CA" , L"iu-Latn-CA"  },
+	{ "ks-IN" , L"ks-Arab-IN"  },
 	{ "ku-IQ" , L"ku-Arab-IQ"  },
 	{ "mn-CN" , L"mn-Mong-CN"  },
+	{ "mn-MN" , L"mn-Mong-MN"  },
 	{ "no-NO" , L"nb-NO"       },
 	{ "pa-PK" , L"pa-Arab-PK"  },
+	{ "quc-GT", L"quc-Latn-GT" },
 	{ "sd-PK" , L"sd-Arab-PK"  },
+	{ "sd-IN" , L"sd-Deva-IN"  },
 	{ "sr-BA" , L"sr-Cyrl-BA"  },
 	{ "sr-CS" , L"sr-Cyrl-CS"  },
 	{ "sr-ME" , L"sr-Cyrl-ME"  },
@@ -117,7 +121,7 @@ __get_lcid_from_locale (const char *name)
 	{ "tzm-DZ", L"tzm-Latn-DZ" },
 	{ "tzm-MA", L"tzm-Tfng-MA" },
 	{ "uz-UZ" , L"uz-Latn-UZ"  },
-	{ NULL    , NULL	       }
+	{ NULL    , NULL	   }
       };
       for (int i = 0; sc_only_locale[i].loc
 		      && sc_only_locale[i].loc[0] <= locale[0]; ++i)
