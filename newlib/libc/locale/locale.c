@@ -1022,8 +1022,6 @@ _DEFUN(_localeconv_r, (data),
 
 #ifndef _REENT_ONLY
 
-/* Cygwin provides its own version of setlocale to perform some more
-   initialization work.  It calls _setlocale_r, though. */
 char *
 _DEFUN(setlocale, (category, locale),
        int category _AND
