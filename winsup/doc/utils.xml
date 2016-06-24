@@ -817,14 +817,14 @@ Other options:
       command in scripts to set the POSIX locale variables.</para>
 
     <para>The <literal>-u</literal> option prints the current user's Windows UI
-      locale to stdout. In Windows Vista and Windows 7 this setting is called
-      the "Display Language"; there was no corresponding user setting in
-      Windows XP. The <literal>-s</literal> option prints the systems default
-      instead. The <literal>-f</literal> option prints the user's setting for
-      time, date, number and currency. That's equivalent to the setting in the
-      "Formats" or "Regional Options" tab in the "Region and Language" or
-      "Regional and Language Options" dialog. With the <literal>-U</literal>
-      option <command>locale</command> appends a ".UTF-8".</para>
+      locale to stdout. In Windows this setting is called the
+      "Display Language". The <literal>-s</literal> option prints the systems
+      default instead. The <literal>-f</literal> option prints the user's
+      setting for time, date, number and currency. That's equivalent to the
+      setting in the "Formats" or "Regional Options" tab in the "Region and
+      Language" or "Regional and Language Options" dialog. With the
+      <literal>-U</literal> option <command>locale</command> appends a
+      ".UTF-8".</para>
 
     <para>Usage example:</para>
 

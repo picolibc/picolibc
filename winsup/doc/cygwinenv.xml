@@ -95,9 +95,7 @@ the R/O attribute set.</para>
 
 <para>If set to <literal>winsymlinks:native</literal> or
 <literal>winsymlinks:nativestrict</literal>, Cygwin creates symlinks as
-native Windows symlinks on filesystems and OS versions supporting them.
-If the OS is known not to support native symlinks (Windows XP, Windows
-Server 2003), a warning message is produced once per session.</para>
+native Windows symlinks on filesystems and OS versions supporting them.</para>
 
 <para>The difference between <literal>winsymlinks:native</literal> and
 <literal>winsymlinks:nativestrict</literal> is this:  If the filesystem

@@ -305,13 +305,18 @@ environment, if it's different from the UTF-8 charset.</para>
 consist of valid ASCII characters, and only of uppercase letters, digits, and
 the underscore for maximum portability.</para></note>
 
-<para>Another problem you might encounter is that older versions of
-Windows did not install all charsets by default.  If you are running
-Windows XP or 2003, you can open the "Regional and Language Options"
-portion of the Control Panel, select the "Advanced" tab, and select
-entries from the "Code page conversion tables" list.  The following
-entries are useful to cygwin: 932/SJIS, 936/GBK, 949/EUC-KR, 950/Big5,
-20932/EUC-JP.</para>
+<para>Very old symbolic links may pose a problem when switching charsets on
+the fly.  A symbolic link contains the filename of the target file the
+symlink points to.  When a symlink had been created with versions of Cygwin
+prior to Cygwin 1.7, the current ANSI or OEM character set had been used to
+store the target filename, dependent on the old <envar>CYGWIN</envar>
+environment variable setting <envar>codepage</envar> (see <xref
+linkend="cygwinenv-removed-options"></xref>.  If the target filename
+contains non-ASCII characters and you use another character set than
+your default ANSI/OEM charset, the target filename of the symlink is now
+potentially an invalid character sequence in the new character set.
+This behaviour is not different from the behaviour in other Operating
+Systems.  Recreate the symlink if that happens to you.</para>
 
 </sect2>
 

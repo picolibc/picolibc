@@ -31,11 +31,11 @@ They can be used from one of the provided Unix shells like bash, tcsh or zsh.
 <answer>
 
 <para>Cygwin can be expected to run on all modern, released versions of Windows.
-State January 2015 this includes Windows XP SP3, Windows Server 2003/2003R2
-and all later versions of Windows up to Windows 8.1 and Windows Server 2012R2.
+State January 2016 this includes Windows Vista, Windows Server 2008 and all
+later versions of Windows up to Windows 10 and Windows Server 2016.
 The 32 bit version of Cygwin also runs in the WOW64 32 bit environment on
-released 64 bit versions of Windows (XP SP3 up to 8.1/2012R2), the 64 bit
-version of course only on 64 bit Windows.
+released 64 bit versions of Windows, the 64 bit version of course only on
+64 bit Windows.
 </para>
 <para>Keep in mind that Cygwin can only do as much as the underlying OS
 supports.  Because of this, Cygwin will behave differently, and

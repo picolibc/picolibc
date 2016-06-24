@@ -109,9 +109,9 @@ Instead, they can do the same path translations by executing the
 
 <para>Win32 applications handle filenames in a case preserving, but case
 insensitive manner.  Cygwin supports case sensitivity on file systems
-supporting that.  Since Windows XP, the OS only supports case
-sensitivity when a specific registry value is changed.  Therefore, case
-sensitivity is not usually the default.</para>
+supporting that.  Windows only supports case sensitivity when a specific
+registry value is changed.  Therefore, case sensitivity is not usually the
+default.</para>
 
 <para>Cygwin supports creating and reading symbolic links, even on Windows
 filesystems and OS versions which don't support them.
@@ -345,12 +345,6 @@ implemented in Cygwin by using local AF_INET sockets instead.  This is
 completely transparent to the application.  Cygwin's implementation also
 supports the getpeereid BSD extension.  However, Cygwin does not yet support
 descriptor passing.</para>
-
-<para>IPv6 is supported.  This support is dependent, however, on the
-availability of the Windows IPv6 stack.  The IPv6 stack was "experimental",
-i.e. not feature complete in Windows 2003 and earlier.  Full IPv6 support
-became only available starting with Windows Vista and Windows Server 2008.
-</para>
 
 </sect2>
 

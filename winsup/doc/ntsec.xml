@@ -1340,8 +1340,8 @@ schemata are the following:
     <term><literal>unix</literal></term>
     <listitem>Utilizes the posixAccount schema attributes per
 	      <ulink url="https://tools.ietf.org/html/rfc2307">RFC 2307</ulink>.
-	      The posixAccount schema is available by default since Windows
-	      Server 2003 R2, but typically only utilized when installing the
+	      The posixAccount schema is available by default in Windows
+	      Server, but typically only utilized when installing the
 	      Active Directory "Server for NIS" feature (which is deprecated
 	      since Server 2012 R2).
 	      See also <xref linkend="ntsec-mapping-nsswitch-posix"></xref>.
@@ -1759,10 +1759,10 @@ The group attributes utilized by Cygwin are:
 <para>
 The <literal>unix</literal> schema utilizes the 
 <literal>posixAccount</literal> attribute extension.  This is one of two
-schema extensions which are connected to AD accounts, available by default
-starting with Windows Server 2003 R2.  They are usually
-<emphasis role='bold'>not set</emphasis>, unless used by the Active Directory
-<literal>Server for NIS</literal> feature (deprecated since Server 2012 R2).
+schema extensions which are connected to AD accounts, available by default.
+They are usually <emphasis role='bold'>not set</emphasis>, unless used by
+the Active Directory <literal>Server for NIS</literal> feature (deprecated
+since Server 2012 R2).
 
 Two schemata are interesting for Cygwin, <literal>posixAccount</literal>,
 connected to user accounts, and <literal>posixGroup</literal>, connected
@@ -2216,20 +2216,18 @@ GroupAllow:  001
 OthersAllow: 110
 </screen>
 
-<para>Again: This works on all existing versions of Windows NT, at the
-time of writing from at least Windows XP up to Server 2012 R2.  Only
-the GUIs aren't able (or willing) to deal with that order.</para>
+<para>Again: This works on all supported versions of Windows.  Only the GUIs
+aren't able (or willing) to deal with that order.</para>
 
 </sect2>
 
 <sect2 id="ntsec-setuid-overview"><title id="ntsec-setuid-overview.title">Switching the user context</title>
 
-<para>Since Windows XP, Windows users have been accustomed to the
-"Switch User" feature, which switches the entire desktop to another user
-while leaving the original user's desktop "suspended".  Another Windows
-feature is the "Run as..." context menu entry, which allows you to start
-an application using another user account when right-clicking on applications
-and shortcuts.</para>
+<para>Windows users have been accustomed to the "Switch User" feature, which
+switches the entire desktop to another user while leaving the original user's
+desktop "suspended".  Another Windows feature is the "Run as..." context menu
+entry, which allows you to start an application using another user account
+when right-clicking on applications and shortcuts.</para>
 
 <para>On POSIX systems, this operation can be performed by processes
 running under the privileged user accounts (usually the "root" user
@@ -2357,9 +2355,8 @@ the user context (<command>sshd</command>, <command>inetd</command>,
 Unfortunately that's too simple.  Using <command>NtCreateToken</command>
 has a few drawbacks.</para>
 
-<para>First of all, beginning with Windows Server 2003,
-the permission "Create a token object" gets explicitly removed from
-the SYSTEM user's access token, when starting services under that
+<para>First of all, the permission "Create a token object" gets explicitly
+removed from the SYSTEM user's access token, when starting services under that
 account.  That requires us to create a new account with this specific
 permission just to run this kind of services.  But that's a minor
 problem.</para>
@@ -2373,9 +2370,9 @@ identify the user domain and user name not by the SID of the access
 token owner, but only by the logon session the process is running under.</para>
 
 <para>This has the following unfortunate consequence.  Consider a
-service started under the SYSTEM account (up to Windows XP) switches the
-user context to DOMAIN\my_user using a token created directly by calling
-the <command>NtCreateToken</command> function.  A process running under
+service started under the SYSTEM account switches the user context to
+DOMAIN\my_user using a token created directly by calling the
+<command>NtCreateToken</command> function.  A process running under
 this new access token might want to know under which user account it's
 running.  The corresponding SID is returned correctly, for instance
 S-1-5-21-1234-5678-9012-77777.  However, if the same process asks the OS

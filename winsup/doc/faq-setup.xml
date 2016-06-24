@@ -588,24 +588,24 @@ editing the registry and restoring
 back to it's original value of <literal>msv1_0</literal>, and then rebooting.
 </para>
 </listitem>
-<listitem><para>Delete the Cygwin root folder and all subfolders.  If you get an error 
-that an object is in use, then ensure that you've stopped all services and 
-closed all Cygwin programs.  If you get a 'Permission Denied' error then you 
-will need to modify the permissions and/or ownership of the files or folders 
-that are causing the error.  For example, sometimes files used by system 
-services end up owned by the SYSTEM account and not writable by regular users.  
-</para>
-<para>The quickest way to delete the entire tree if you run into this problem is to 
-change the ownership of all files and folders to your account.  To do this in 
-Windows Explorer, right click on the root Cygwin folder, choose Properties, then 
-the Security tab.  If you are using Windows XP Home or Simple File Sharing,
-you will need to boot into Safe Mode to access the Security tab.  Select 
-Advanced, then go to the Owner tab and make sure your account is listed as 
-the owner.  Select the 'Replace owner on subcontainers and objects' checkbox 
-and press Ok.  After Explorer applies the changes you should be able to 
-delete the entire tree in one operation.  Note that you can also achieve 
-this in Cygwin by typing <literal>chown -R user /</literal> or by using other 
-tools such as <literal>CACLS.EXE</literal>. 
+<listitem><para>Delete the Cygwin root folder and all subfolders.  If you get
+an error that an object is in use, then ensure that you've stopped all services
+and closed all Cygwin programs.  If you get a 'Permission Denied' error then
+you will need to modify the permissions and/or ownership of the files or
+folders that are causing the error.  For example, sometimes files used by
+system services end up owned by the SYSTEM account and not writable by regular
+users.</para>
+<para>The quickest way to delete the entire tree if you run into this problem
+is to change the ownership of all files and folders to your account.  To do
+this in Windows Explorer, right click on the root Cygwin folder, choose
+Properties, then the Security tab.  If you are using Simple File Sharing, you
+will need to boot into Safe Mode to access the Security tab.  Select Advanced,
+then go to the Owner tab and make sure your account is listed as the owner.
+Select the 'Replace owner on subcontainers and objects' checkbox and press Ok.
+After Explorer applies the changes you should be able to delete the entire tree
+in one operation.  Note that you can also achieve this in Cygwin by typing
+<literal>chown -R user /</literal> or by using other tools such as
+<literal>icacls.exe</literal>. 
 </para>
 </listitem>
 <listitem><para>Delete the Cygwin shortcuts on the Desktop and Start Menu, and

@@ -22,8 +22,7 @@ support the <literal>/?</literal> switch to display usage information.
 <para>
 Unfortunately, no standard set of tools included with all versions of 
 Windows exists.  Generally, the younger the Windows version, the more
-complete are the on-board tools.  Microsoft also provides free downloads
-for Windows XP (the Windows Support Tools).  Additionally, many independent
+complete are the on-board tools.  Additionally, many independent
 sites such as 
 <ulink url="http://download.com">download.com</ulink>, 
 <ulink url="http://simtel.net">simtel.net</ulink>, 

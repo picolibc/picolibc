@@ -153,10 +153,10 @@ characters.</para>
 case-sensitive.  You can't access two files in the same directory which
 only differ by case, like <filename>Abc</filename> and
 <filename>aBc</filename>.  While NTFS (and some remote filesystems)
-support case-sensitivity, the NT kernel starting with Windows XP does
-not support it by default.  Rather, you have to tweak a registry setting
-and reboot.  For that reason, case-sensitivity can not be supported by Cygwin,
-unless you change that registry value.</para>
+support case-sensitivity, the NT kernel does not support it by default.
+Rather, you have to tweak a registry setting and reboot.  For that reason,
+case-sensitivity can not be supported by Cygwin, unless you change that
+registry value.</para>
 
 <para>If you really want case-sensitivity in Cygwin, you can switch it
 on by setting the registry value</para>
