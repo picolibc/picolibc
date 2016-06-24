@@ -28,6 +28,7 @@
 	.global		main
 	.global		exit
 	.global		environ
+	.global		__progname
 
 	.align	4
 
@@ -36,7 +37,10 @@ _start:
 	pop		{lr}
 	ldmfd	sp,	{r0-r2}
 	ldr		r3,	=environ
+	ldr		r4, =__progname
+	ldr		r5,	[r1]
 	str		r2,	[r3]
+	str		r5,	[r4]
 
 	/* Align stack. */
 	bic		sp,	#0x00000007
@@ -44,4 +48,7 @@ _start:
 	blx		lr
 	ldr		lr,	=exit
 	blx		lr
-	
+
+	.section	.data
+__progname:
+	.word		0
