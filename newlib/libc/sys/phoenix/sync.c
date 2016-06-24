@@ -43,3 +43,8 @@ int fsync(int fd)
 
 	return ret;
 }
+
+int fdatasync(int fd)
+{
+	return fsync(fd);
+}
