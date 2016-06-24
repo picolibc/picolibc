@@ -31,6 +31,7 @@
 #define __need_size_t
 #define __need_ptrdiff_t
 #include <stddef.h>
+#include <sys/select.h>
 
 extern char **environ;
 
@@ -46,6 +47,7 @@ int close(int fd);
 int _close(int fd);
 char *ctermid(char *s);
 char *cuserid(char *string);
+int daemon(int nochdir, int noclose);
 int dup(int oldfd);
 int dup2(int olffd, int newfd);
 int execl(const char *path, const char *arg, ...);
@@ -59,6 +61,7 @@ int execvpe(const char *file, char *const argv[], char *const envp[]);
 int fchdir(int fd);
 int fchmod(int fd, mode_t mode);
 int fchown(int fd, uid_t owner, gid_t group);
+int fdatasync(int fd);
 pid_t fork();
 long fpathconf(int fd, int name);
 int fsync(int fd);
