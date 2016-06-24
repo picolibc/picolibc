@@ -25,7 +25,10 @@
 #include "syscall.h"
 
 #include <errno.h>
+#include <stdio.h>
+#include <stdlib.h>
 #include <sys/types.h>
+#include <unistd.h>
 
 pid_t fork()
 {
@@ -41,4 +44,27 @@ pid_t fork()
 pid_t vfork()
 {
 	return fork();
+}
+
+int daemon(int nochdir, int noclose)
+{
+	switch(fork()) {
+	case -1:
+		return -1;
+	case 0:
+		break;
+	default:
+		exit(0);
+	}
+
+	if (setsid() == -1)
+		return -1;
+
+	if (nochdir == 0)
+		chdir("/");
+
+	if (noclose == 0)
+		freopen("/dev/null", "a+", stdout);
+
+	return 0;
 }
