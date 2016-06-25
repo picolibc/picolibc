@@ -9,7 +9,7 @@ objectlist.awk.in: $(noinst_LTLIBRARIES)
 # documentation rules
 #
 
-SUFFIXES = .def .xml
+SUFFIXES = .def
 
 CHEW = ${top_builddir}/../doc/makedoc -f $(top_srcdir)/../doc/doc.str
 
@@ -25,18 +25,4 @@ doc: $(CHEWOUT_FILES)
 	  cat $(srcdir)/$$chapter >> $(TARGETDOC) ; \
 	done
 
-DOCBOOK_CHEW = ${top_srcdir}/../doc/makedocbook.py
-DOCBOOK_OUT_FILES = $(CHEWOUT_FILES:.def=.xml)
-DOCBOOK_CHAPTERS = $(CHAPTERS:.tex=.xml)
-
-.c.xml:
-	$(DOCBOOK_CHEW) < $< > $*.xml || ( rm $*.xml && false )
-	@touch stmp-xml
-
-docbook: $(DOCBOOK_OUT_FILES)
-	for chapter in $(DOCBOOK_CHAPTERS) ; \
-	do \
-	  ${top_srcdir}/../doc/chapter-texi2docbook.py <$(srcdir)/$${chapter%.xml}.tex >../$$chapter ; \
-	done
-
-CLEANFILES = $(CHEWOUT_FILES) $(CHEWOUT_FILES:.def=.ref) $(DOCBOOK_OUT_FILES)
+CLEANFILES = $(CHEWOUT_FILES) *.ref
