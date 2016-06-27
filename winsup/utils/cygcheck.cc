@@ -6,7 +6,7 @@
    Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
    details. */
 
-#define _WIN32_WINNT 0x0602
+#define _WIN32_WINNT 0x0a00
 #define cygwin_internal cygwin_internal_dontuse
 #include <stdio.h>
 #include <stdlib.h>

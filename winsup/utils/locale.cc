@@ -35,8 +35,8 @@
 #include <limits.h>
 #include <sys/cygwin.h>
 #include <cygwin/version.h>
-#define _WIN32_WINNT 0x0602
-#define WINVER 0x0602
+#define _WIN32_WINNT 0x0a00
+#define WINVER 0x0a00
 #include <windows.h>
 
 #define LOCALE_ALIAS		"/usr/share/locale/locale.alias"
