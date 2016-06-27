@@ -1564,38 +1564,6 @@ dump_sysinfo ()
 	    {
 	    }
 	}
-      else if (osversion.dwMajorVersion == 5)
-	{
-	  /* cygcheck won't run on Windows 200 or earlier. */
-	  if (osversion.dwMinorVersion == 1)
-	    {
-	      strcpy (osname, "XP");
-	      if (GetSystemMetrics (SM_MEDIACENTER))
-		strcat (osname, " Media Center Edition");
-	      else if (GetSystemMetrics (SM_TABLETPC))
-		strcat (osname, " Tablet PC Edition");
-	      else if (GetSystemMetrics (SM_STARTER))
-		strcat (osname, " Starter Edition");
-	      else if (osversion.wSuiteMask & VER_SUITE_PERSONAL)
-		strcat (osname, " Home Edition");
-	      else
-		strcat (osname, " Professional");
-	    }
-	  else if (osversion.dwMinorVersion == 2)
-	    {
-	      strcpy (osname, "2003 Server");
-	      if (GetSystemMetrics (SM_SERVERR2))
-		strcat (osname, " R2");
-	      if (osversion.wSuiteMask & VER_SUITE_BLADE)
-		strcat (osname, " Web Edition");
-	      else if (osversion.wSuiteMask & VER_SUITE_DATACENTER)
-		strcat (osname, " Datacenter Edition");
-	      else if (osversion.wSuiteMask & VER_SUITE_ENTERPRISE)
-		strcat (osname, " Enterprise Edition");
-	      else if (osversion.wSuiteMask & VER_SUITE_COMPUTE_SERVER)
-		strcat (osname, " Compute Cluster Edition");
-	    }
-	}
       else
 	strcpy (osname, "NT");
       break;

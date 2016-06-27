@@ -315,7 +315,6 @@ attach_process (pid_t pid)
       if (h)
 	{
 	  /* Try to turn off DEBUG_ONLY_THIS_PROCESS so we can follow forks */
-	  /* This is only supported on XP and later */
 	  ULONG DebugFlags = DEBUG_PROCESS_DETACH_ON_EXIT;
 	  NTSTATUS status = NtSetInformationProcess (h, ProcessDebugFlags, &DebugFlags, sizeof (DebugFlags));
 	  if (!NT_SUCCESS (status))

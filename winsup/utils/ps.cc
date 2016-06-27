@@ -251,13 +251,6 @@ main (int argc, char *argv[])
 	    }
 	}
 
-      /* Check process query capabilities. */
-      OSVERSIONINFO version;
-      version.dwOSVersionInfoSize = sizeof version;
-      GetVersionEx (&version);
-      if (version.dwMajorVersion <= 5)	/* pre-Vista */
-	proc_access = PROCESS_QUERY_INFORMATION;
-
       drive_map = (void *) cygwin_internal (CW_ALLOC_DRIVE_MAP);
       /* Check old Cygwin version. */
       if (drive_map == (void *) -1)
