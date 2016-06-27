@@ -528,7 +528,8 @@ clock_gettime (clockid_t clk_id, struct timespec *tp)
 	  return -1;
 	}
 
-      hProcess = OpenProcess (PROCESS_QUERY_INFORMATION, 0, p->dwProcessId);
+      hProcess = OpenProcess (PROCESS_QUERY_LIMITED_INFORMATION, 0,
+			      p->dwProcessId);
       NtQueryInformationProcess (hProcess, ProcessTimes,
 				 &kut, sizeof kut, NULL);
 
@@ -550,7 +551,7 @@ clock_gettime (clockid_t clk_id, struct timespec *tp)
       if (thr_id == 0)
 	thr_id = pthread::self ()->getsequence_np ();
 
-      hThread = OpenThread (THREAD_QUERY_INFORMATION, 0, thr_id);
+      hThread = OpenThread (THREAD_QUERY_LIMITED_INFORMATION, 0, thr_id);
       if (!hThread)
 	{
 	  set_errno (EINVAL);

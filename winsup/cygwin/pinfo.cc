@@ -517,7 +517,8 @@ _pinfo::exists ()
 bool
 _pinfo::alive ()
 {
-  HANDLE h = OpenProcess (PROCESS_QUERY_INFORMATION, false, dwProcessId);
+  HANDLE h = OpenProcess (PROCESS_QUERY_LIMITED_INFORMATION, false,
+			  dwProcessId);
   if (h)
     CloseHandle (h);
   return !!h;
@@ -872,7 +873,8 @@ open_commune_proc_parms (DWORD pid, PRTL_USER_PROCESS_PARAMETERS prupp)
   PROCESS_BASIC_INFORMATION pbi;
   PEB lpeb;
 
-  proc = OpenProcess (PROCESS_QUERY_INFORMATION | PROCESS_VM_READ, FALSE, pid);
+  proc = OpenProcess (PROCESS_QUERY_LIMITED_INFORMATION | PROCESS_VM_READ,
+		      FALSE, pid);
   if (!proc)
     return NULL;
   status = NtQueryInformationProcess (proc, ProcessBasicInformation,
@@ -1243,7 +1245,7 @@ winpids::add (DWORD& nelem, bool winpid, DWORD pid)
     {
       /* Open a process to prevent a subsequent exit from invalidating the
 	 shared memory region. */
-      onreturn = OpenProcess (PROCESS_QUERY_INFORMATION, false, pid);
+      onreturn = OpenProcess (PROCESS_QUERY_LIMITED_INFORMATION, false, pid);
 
       /* If we couldn't open the process then we don't have rights to it and should
 	 make a copy of the shared memory area when it exists (it may not).  */

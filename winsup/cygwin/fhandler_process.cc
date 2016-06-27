@@ -702,7 +702,8 @@ struct thread_info
 	    free (buf);
 	    return;
 	  }
-	proc = (PSYSTEM_PROCESS_INFORMATION) ((PBYTE) proc + proc->NextEntryOffset);
+	proc = (PSYSTEM_PROCESS_INFORMATION) ((PBYTE) proc
+					      + proc->NextEntryOffset);
       }
     thread = proc->Threads;
     for (ULONG i = 0; i < proc->NumberOfThreads; ++i)
@@ -711,8 +712,9 @@ struct thread_info
 	TEB teb;
 	HANDLE thread_h;
 
-	if (!(thread_h = OpenThread (THREAD_QUERY_INFORMATION, FALSE,
-				     (ULONG) (ULONG_PTR) thread[i].ClientId.UniqueThread)))
+	thread_h = OpenThread (THREAD_QUERY_LIMITED_INFORMATION, FALSE,
+			 (ULONG) (ULONG_PTR) thread[i].ClientId.UniqueThread);
+	if (!thread_h)
 	  continue;
 	status = NtQueryInformationThread (thread_h, ThreadBasicInformation,
 					   &tbi, sizeof tbi, NULL);
@@ -722,7 +724,8 @@ struct thread_info
 	region *r = (region *) malloc (sizeof (region));
 	if (r)
 	  {
-	    *r = (region) { regions, (ULONG) (ULONG_PTR) thread[i].ClientId.UniqueThread,
+	    *r = (region) { regions,
+			    (ULONG) (ULONG_PTR) thread[i].ClientId.UniqueThread,
 			    (char *) tbi.TebBaseAddress,
 			    (char *) tbi.TebBaseAddress
 				     + 2 * wincap.page_size (),
@@ -792,8 +795,8 @@ static off_t
 format_process_maps (void *data, char *&destbuf)
 {
   _pinfo *p = (_pinfo *) data;
-  HANDLE proc = OpenProcess (PROCESS_QUERY_INFORMATION | PROCESS_VM_READ,
-			     FALSE, p->dwProcessId);
+  HANDLE proc = OpenProcess (PROCESS_QUERY_LIMITED_INFORMATION
+			     | PROCESS_VM_READ, FALSE, p->dwProcessId);
   if (!proc)
     return 0;
 
@@ -1075,7 +1078,7 @@ format_process_stat (void *data, char *&destbuf)
   QUOTA_LIMITS ql;
   SYSTEM_TIMEOFDAY_INFORMATION stodi;
   SYSTEM_PROCESSOR_PERFORMANCE_INFORMATION spt;
-  hProcess = OpenProcess (PROCESS_VM_READ | PROCESS_QUERY_INFORMATION,
+  hProcess = OpenProcess (PROCESS_QUERY_LIMITED_INFORMATION | PROCESS_VM_READ,
 			  FALSE, p->dwProcessId);
   if (hProcess != NULL)
     {

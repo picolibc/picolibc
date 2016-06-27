@@ -88,7 +88,8 @@ sched_getparam (pid_t pid, struct sched_param *param)
       set_errno (ESRCH);
       return -1;
     }
-  process = OpenProcess (PROCESS_QUERY_INFORMATION, FALSE, p->dwProcessId);
+  process = OpenProcess (PROCESS_QUERY_LIMITED_INFORMATION, FALSE,
+			 p->dwProcessId);
   if (!process)
     {
       set_errno (ESRCH);
