@@ -122,7 +122,8 @@ main (int argc, char *argv[])
   fd = fopen (exefile, "rb");
   fscanf (fd, "%s", exename);
 
-  hProcess = OpenProcess (PROCESS_QUERY_INFORMATION | PROCESS_VM_READ, 0, winpid);
+  hProcess = OpenProcess (PROCESS_QUERY_INFORMATION | PROCESS_VM_READ,
+			  0, winpid);
   if (!hProcess)
     error (1, EPERM, "cannot attach to process %d", pid);
 

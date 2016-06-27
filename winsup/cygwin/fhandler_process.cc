@@ -738,7 +738,8 @@ struct thread_info
 	r = (region *) malloc (sizeof (region));
 	if (r)
 	  {
-	    *r = (region) { regions, (ULONG) (ULONG_PTR) thread[i].ClientId.UniqueThread,
+	    *r = (region) { regions,
+			    (ULONG) (ULONG_PTR) thread[i].ClientId.UniqueThread,
 			    (char *) (teb.DeallocationStack
 				      ?: teb.Tib.StackLimit),
 			    (char *) teb.Tib.StackBase,
@@ -877,7 +878,8 @@ format_process_maps (void *data, char *&destbuf)
 	  static DWORD const RW = (PAGE_EXECUTE_READWRITE | PAGE_READWRITE
 				   | PAGE_EXECUTE_WRITECOPY | PAGE_WRITECOPY);
 	  static DWORD const X = (PAGE_EXECUTE | PAGE_EXECUTE_READ
-				  | PAGE_EXECUTE_READWRITE | PAGE_EXECUTE_WRITECOPY);
+				  | PAGE_EXECUTE_READWRITE
+				  | PAGE_EXECUTE_WRITECOPY);
 	  static DWORD const WC = (PAGE_EXECUTE_WRITECOPY | PAGE_WRITECOPY);
 	  DWORD p = mb.Protect;
 	  a = (access) {{
