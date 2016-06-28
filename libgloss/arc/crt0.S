@@ -103,7 +103,7 @@ IVT_ENTRY(IRQ_20)            ; 20                       0x50    80
 
 	.global	__start
 	.type	__start, @function
-
+	.align 4
 #ifdef __ARC601__
 ; Startup code for the ARC601 processor
 __start:
@@ -210,7 +210,7 @@ __start:
 .section .text._exit_halt,"ax",@progbits
 .global	 _exit_halt
 .type	 _exit_halt, @function
-
+	.align 4
 _exit_halt:
 	; r0 contains exit code
 	flag	1
