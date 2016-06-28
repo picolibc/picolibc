@@ -39,6 +39,7 @@ typedef __uint64_t		__off64_t;
 typedef __uint32_t		__key_t;
 typedef __uint32_t		__useconds_t;
 typedef __uint32_t		__daddr_t;
+typedef char *			caddr_t;
 typedef __uint32_t		__nlink_t;
 typedef __uint8_t		__u_char;
 typedef unsigned short	__u_short;
