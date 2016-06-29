@@ -683,6 +683,7 @@ installed; you at least need <literal>gcc-g++</literal>, <literal>make</literal>
 <literal>perl</literal>, <literal>cocom</literal>, <literal>gettext-devel</literal>,
 <literal>libiconv-devel</literal> and <literal>zlib-devel</literal>.
 Building for 32-bit Cygwin also requires
+<literal>mingw64-x86_64-gcc-core</literal> (for building the cyglsa64 DLL for WoW64),
 <literal>mingw64-i686-gcc-g++</literal> and <literal>mingw64-i686-zlib</literal>.
 Building for 64-bit Cygwin also requires
 <literal>mingw64-x86_64-gcc-g++</literal> and
