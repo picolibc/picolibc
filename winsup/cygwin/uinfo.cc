@@ -1894,6 +1894,14 @@ pwdgrp::fetch_account_from_windows (fetch_user_arg_t &arg, cyg_ldap *pldap)
 	}
       if (!ret)
 	{
+	  if (!strcmp (arg.name, "nodomain+nobody"))
+	    {
+	      /* Special case "nobody" for reproducible construction of a
+		 nobody SID for WinFsp and similar services.  We use the
+		 value 65534 which is -2 with 16 bit uid/gids. */
+	      csid.create (0, 1, 0xfffe);
+	      break;
+	    }
 	  debug_printf ("LookupAccountNameW (%W), %E", name);
 	  return NULL;
 	}
@@ -2002,6 +2010,15 @@ pwdgrp::fetch_account_from_windows (fetch_user_arg_t &arg, cyg_ldap *pldap)
 	  get_logon_sid ();
 	  /* LookupAccountSidW will fail. */
 	  sid = logon_sid;
+	  break;
+	}
+      else if (arg.id == 0xfffe)
+	{
+	  /* Special case "nobody" for reproducible construction of a
+	     nobody SID for WinFsp and similar services.  We use the
+	     value 65534 which is -2 with 16 bit uid/gids. */
+	  csid.create (0, 1, 0xfffe);
+	  sid = csid;
 	  break;
 	}
       else if (arg.id < 0x10000)
@@ -2428,6 +2445,17 @@ pwdgrp::fetch_account_from_windows (fetch_user_arg_t &arg, cyg_ldap *pldap)
 	  return NULL;
 	}
     } 
+  else if (sid_id_auth (sid) == 0 && sid_sub_auth (sid, 0) == 0xfffe)
+    {
+      /* Special case "nobody" for reproducible construction of a
+	 nobody SID for WinFsp and similar services.  We use the
+	 value 65534 which is -2 with 16 bit uid/gids. */
+      uid = gid = 0xfffe;
+      wcpcpy (dom, L"nodomain");
+      wcpcpy (name = namebuf, L"nobody");
+      fully_qualified_name = true;
+      acc_type = SidTypeUnknown;
+    }
   else if (sid_id_auth (sid) == 5 /* SECURITY_NT_AUTHORITY */
 	   && sid_sub_auth (sid, 0) == SECURITY_LOGON_IDS_RID)
     {
