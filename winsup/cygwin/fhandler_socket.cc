@@ -2259,7 +2259,8 @@ fhandler_socket::ioctl (unsigned int cmd, void *p)
 #ifdef __x86_64__
     case _IOR('f', 127, u_long):
 #endif
-      res = ioctlsocket (get_socket (), FIONREAD, (u_long *) p);
+      /* Make sure to use the Winsock definition of FIONREAD. */
+      res = ioctlsocket (get_socket (), _IOR('f', 127, u_long), (u_long *) p);
       if (res == SOCKET_ERROR)
 	set_winsock_errno ();
       break;
