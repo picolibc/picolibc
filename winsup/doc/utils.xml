@@ -102,7 +102,10 @@ Note: -c, -f, and -l only report on packages that are currently installed. To
     <para> The <literal>-f</literal> option helps you to track down which
       package a file came from, and <literal>-l</literal> lists all files in a
       package. For example, to find out about
-      <filename>/usr/bin/less</filename> and its package: <example
+      <filename>/usr/bin/less</filename> and its package:
+    </para>
+
+    <example
       id="utils-cygcheck-ex"><title>Example <command>cygcheck</command>
       usage</title>
       <screen>
@@ -116,7 +119,7 @@ $ cygcheck -l less
 /usr/man/man1/less.1
 /usr/man/man1/lesskey.1
 </screen>
-      </example> </para>
+      </example>
 
     <para>The <literal>-h</literal> option prints additional helpful messages
       in the report, at the beginning of each section. It also adds table
@@ -150,7 +153,9 @@ $ cygcheck -l less
 
     <para>For example, perhaps you are getting an error because you are missing
       a certain DLL and you want to know which package includes that file:
-      <example id="utils-search-ex"><title>Searching all packages for a
+    </para>
+
+    <example id="utils-search-ex"><title>Searching all packages for a
       file</title>
       <screen>
 $ cygcheck -p 'cygintl-2\.dll'
@@ -170,7 +175,7 @@ Found 2 matches for '/ls\.exe'.
 coreutils-5.2.1-5         GNU core utilities (includes fileutils, sh-utils and textutils)
 coreutils-5.3.0-6         GNU core utilities (includes fileutils, sh-utils and textutils)
 </screen>
-      </example> </para>
+      </example>
 
     <para>Note that this option takes a regular expression, not a glob or
       wildcard. This means that you need to use <literal>.*</literal> if you
@@ -1168,19 +1173,25 @@ on domain controllers and domain member machines.
       multiple domains) where the UIDs might match otherwise. The
       <literal>-p</literal> option causes <command>mkpasswd</command> to use
       the specified prefix instead of the account home dir or <literal>/home/
-      </literal>. For example, this command: <example id="utils-althome-ex"
+      </literal>. For example, this command:
+    </para>
+
+    <example id="utils-althome-ex"
       ><title>Using an alternate home root</title>
       <screen>
 <prompt>$</prompt> <userinput>mkpasswd -l -p "$(cygpath -H)" &gt; /etc/passwd</userinput>
 </screen>
-      </example> would put local users' home directories in the Windows
+    </example>
+
+    <para>
+      would put local users' home directories in the Windows
       'Profiles' directory. The <literal>-u</literal> option creates just an
       entry for the specified user. The <literal>-U</literal> option allows you
       to enumerate the standard UNIX users on a Samba machine. It's used
       together with <literal>-l samba-server</literal> or <literal>-L
       samba-server</literal>. The normal UNIX users are usually not enumerated,
       but they can show up as file owners in <command>ls -l</command> output.
-      </para>
+    </para>
     </refsect1>
   </refentry>
 
