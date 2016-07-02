@@ -335,7 +335,7 @@ Other options:
     However, the cygdrive prefix can be changed by the user, so symbolic links
     created using the cygdrive prefix are not foolproof.  With
     <literal>-U</literal> cygpath will generate such paths prepended by the
-    virtual <pathname>/proc/cygdrive</pathname> symbolic link, which will
+    virtual <filename>/proc/cygdrive</filename> symbolic link, which will
     never change, so the created path is safe against changing the cygdrive
     prefix.</para>
 
