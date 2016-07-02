@@ -352,12 +352,9 @@ report (const char *in_fn, bool multiple)
 	      break;
 	    case STATUS_BREAKPOINT:
 	      if (!isdll)
-		cont = DBG_EXCEPTION_NOT_HANDLED;
+		TerminateProcess (hProcess, 0);
 	      break;
 	    }
-	  break;
-	case CREATE_THREAD_DEBUG_EVENT:
-	  TerminateProcess (hProcess, 0);
 	  break;
 	case EXIT_PROCESS_DEBUG_EVENT:
 print_and_exit:
