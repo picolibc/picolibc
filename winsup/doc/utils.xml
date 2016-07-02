@@ -755,10 +755,20 @@ ldd [OPTION]... FILE...
 
     <refsect1>
       <title>Description</title>
-    <para><command>ldd</command> prints the shared libraries (DLLs) an
-      executable or DLL is linked against. No modifying option is implemented
-      yet.</para>
+      <para><command>ldd</command> prints the shared libraries (DLLs) loaded
+      when running an executable or DLL.</para>
+
+    <refsect2>
+      <title>Security</title>
+      <para>
+	<command>ldd</command> invokes the Windows loader on the file specified,
+	then uses the Windows debugging interface to report DLLs loaded, and
+	(for executables) to attempt to stop execution before the entrypoint.
+	Thus, you should never use ldd on an untrusted file.
+      </para>
+    </refsect2>
     </refsect1>
+
   </refentry>
 
   <refentry id="locale">
