@@ -271,15 +271,18 @@ SUBDEFS = lib/stmp-def
 #
 # documentation rules
 #
-SUFFIXES = .def
+SUFFIXES = .def .xml
 CHEW = ${top_builddir}/../doc/makedoc -f $(top_srcdir)/../doc/doc.str
-CLEANFILES = $(CHEWOUT_FILES) *.ref
+DOCBOOK_CHEW = ${top_srcdir}/../doc/makedocbook.py
+DOCBOOK_OUT_FILES = $(CHEWOUT_FILES:.def=.xml)
+DOCBOOK_CHAPTERS = $(CHAPTERS:.tex=.xml)
+CLEANFILES = $(CHEWOUT_FILES) $(CHEWOUT_FILES:.def=.ref) $(DOCBOOK_OUT_FILES)
 CHEWOUT_FILES = iconv.def
 CHAPTERS = iconv.tex
 all: all-recursive
 
 .SUFFIXES:
-.SUFFIXES: .def .c
+.SUFFIXES: .def .xml .c
 $(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am $(srcdir)/../../Makefile.shared $(am__configure_deps)
 	@for dep in $?; do \
 	  case '$(am__configure_deps)' in \
@@ -614,8 +617,21 @@ doc: $(CHEWOUT_FILES)
 	  cat $(srcdir)/$$chapter >> $(TARGETDOC) ; \
 	done
 
+.c.xml:
+	$(DOCBOOK_CHEW) < $< > $*.xml || ( rm $*.xml && false )
+	@touch stmp-xml
+
+docbook: $(DOCBOOK_OUT_FILES)
+	for chapter in $(DOCBOOK_CHAPTERS) ; \
+	do \
+	  ${top_srcdir}/../doc/chapter-texi2docbook.py <$(srcdir)/$${chapter%.xml}.tex >../$$chapter ; \
+	done
+
 iconv.def: lib/iconv.def
 	cp lib/iconv.def iconv.def
+
+iconv.xml: lib/iconv.xml
+	cp lib/iconv.xml iconv.xml
 
 stmp-def: force
 	(cd lib && $(MAKE) doc)

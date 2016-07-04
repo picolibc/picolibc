@@ -267,9 +267,12 @@ msgcatdir = /usr/share/locale
 #
 # documentation rules
 #
-SUFFIXES = .def
+SUFFIXES = .def .xml
 CHEW = ${top_builddir}/../doc/makedoc -f $(top_srcdir)/../doc/doc.str
-CLEANFILES = $(CHEWOUT_FILES) *.ref
+DOCBOOK_CHEW = ${top_srcdir}/../doc/makedocbook.py
+DOCBOOK_OUT_FILES = $(CHEWOUT_FILES:.def=.xml)
+DOCBOOK_CHAPTERS = $(CHAPTERS:.tex=.xml)
+CLEANFILES = $(CHEWOUT_FILES) $(CHEWOUT_FILES:.def=.ref) $(DOCBOOK_OUT_FILES)
 AM_CFLAGS = -DNOT_IN_libc -DHAVE_CONFIG_H -D_GNU_SOURCE -D__libc_enable_secure=1 -D'LOCALEDIR="$(msgcatdir)"' -D'LOCALE_ALIAS_PATH="$(msgcatdir)"' -DNLSPATH='"$(msgcatdir)/%L/%N:$(msgcatdir)/%L/LC_MESSAGES/%N:$(msgcatdir)/%l/%N:$(msgcatdir)/%l/LC_MESSAGES/%N:"'
 
 # shouldn't have to do the following, but if needed
@@ -277,7 +280,7 @@ BISONFLAGS = --yacc --name-prefix=__gettext --output
 all: all-am
 
 .SUFFIXES:
-.SUFFIXES: .def .c .lo .o .obj
+.SUFFIXES: .def .xml .c .lo .o .obj
 $(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am $(srcdir)/../../../../Makefile.shared $(am__configure_deps)
 	@for dep in $?; do \
 	  case '$(am__configure_deps)' in \
@@ -645,6 +648,16 @@ doc: $(CHEWOUT_FILES)
 	for chapter in $(CHAPTERS) ; \
 	do \
 	  cat $(srcdir)/$$chapter >> $(TARGETDOC) ; \
+	done
+
+.c.xml:
+	$(DOCBOOK_CHEW) < $< > $*.xml || ( rm $*.xml && false )
+	@touch stmp-xml
+
+docbook: $(DOCBOOK_OUT_FILES)
+	for chapter in $(DOCBOOK_CHAPTERS) ; \
+	do \
+	  ${top_srcdir}/../doc/chapter-texi2docbook.py <$(srcdir)/$${chapter%.xml}.tex >../$$chapter ; \
 	done
 plural.c: plural.y
 	$(BISON) $(BISONFLAGS) $@ $^

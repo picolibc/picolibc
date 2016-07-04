@@ -356,6 +356,8 @@ $(MKDOC): makedoc.o
 makedoc.o: makedoc.c
 	$(CC_FOR_BUILD) -g $(CFLAGS_FOR_BUILD) -c $(srcdir)/makedoc.c
 
+man:
+
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
 .NOEXPORT:

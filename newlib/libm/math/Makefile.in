@@ -387,9 +387,12 @@ libmath_la_LDFLAGS = -Xcompiler -nostdlib
 #
 # documentation rules
 #
-SUFFIXES = .def
+SUFFIXES = .def .xml
 CHEW = ${top_builddir}/../doc/makedoc -f $(top_srcdir)/../doc/doc.str
-CLEANFILES = $(CHEWOUT_FILES) *.ref
+DOCBOOK_CHEW = ${top_srcdir}/../doc/makedocbook.py
+DOCBOOK_OUT_FILES = $(CHEWOUT_FILES:.def=.xml)
+DOCBOOK_CHAPTERS = $(CHAPTERS:.tex=.xml)
+CLEANFILES = $(CHEWOUT_FILES) $(CHEWOUT_FILES:.def=.ref) $(DOCBOOK_OUT_FILES)
 CHEWOUT_FILES = w_acos.def w_acosh.def w_asin.def s_asinh.def \
 	s_atan.def w_atan2.def w_atanh.def w_j0.def \
 	w_cosh.def s_erf.def w_exp.def w_exp2.def \
@@ -403,7 +406,7 @@ CHAPTERS = math.tex
 all: all-am
 
 .SUFFIXES:
-.SUFFIXES: .def .c .lo .o .obj
+.SUFFIXES: .def .xml .c .lo .o .obj
 $(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am $(srcdir)/../../Makefile.shared $(am__configure_deps)
 	@for dep in $?; do \
 	  case '$(am__configure_deps)' in \
@@ -1467,6 +1470,16 @@ doc: $(CHEWOUT_FILES)
 	for chapter in $(CHAPTERS) ; \
 	do \
 	  cat $(srcdir)/$$chapter >> $(TARGETDOC) ; \
+	done
+
+.c.xml:
+	$(DOCBOOK_CHEW) < $< > $*.xml || ( rm $*.xml && false )
+	@touch stmp-xml
+
+docbook: $(DOCBOOK_OUT_FILES)
+	for chapter in $(DOCBOOK_CHAPTERS) ; \
+	do \
+	  ${top_srcdir}/../doc/chapter-texi2docbook.py <$(srcdir)/$${chapter%.xml}.tex >../$$chapter ; \
 	done
 
 # A partial dependency list.
