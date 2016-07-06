@@ -82,7 +82,7 @@ strace::dll_info ()
 int
 strace::microseconds ()
 {
-  static hires_ns now;
+  static hires_ns now NO_COPY;
   return (int) now.usecs ();
 }
 
