@@ -740,7 +740,6 @@ dll_crt0_0 ()
   _impure_ptr->_stdin = &_impure_ptr->__sf[0];
   _impure_ptr->_stdout = &_impure_ptr->__sf[1];
   _impure_ptr->_stderr = &_impure_ptr->__sf[2];
-  _impure_ptr->_current_locale = "C";
   user_data->impure_ptr = _impure_ptr;
   user_data->impure_ptr_ptr = &_impure_ptr;
 
