@@ -38,7 +38,7 @@ typedef __uint32_t __ULong;
 struct _reent;
 
 /* TODO: This structure type isn't defined yet.  It's supposed to be used
-   by locale-specific functions in case a pre-thread locale per SUSv4 has
+   by locale-specific functions in case a per-thread locale per SUSv4 has
    been specified. */
 struct _thr_locale_t;
 
