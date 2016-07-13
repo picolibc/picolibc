@@ -1,6 +1,7 @@
 #include "winsup.h"
 extern "C" {
 #include <ctype.h>
+#include "../locale/setlocale.h"
 #include <stdlib.h>
 #include <wctype.h>
 
@@ -18,9 +19,10 @@ extern const char __ctype_cp[22][128 + 256];		/* Newlib */
 extern const char __ctype_iso[15][128 + 256];		/* Newlib */
 
 void
-__set_ctype (const char *charset)
+__set_ctype (struct _reent *reent, const char *charset)
 {
   int idx;
+  char *ctype_ptr = NULL;
 
   switch (*charset)
     {
@@ -36,8 +38,8 @@ __set_ctype (const char *charset)
 	  memcpy (_ctype_b, __ctype_iso[idx], 128);
 	  memcpy (_ctype_b + 256, __ctype_iso[idx] + 256, 128);
 	}
-      __ctype_ptr__ = (char *) (__ctype_iso[idx] + 127);
-      return;
+      ctype_ptr = (char *) __ctype_iso[idx];
+      break;
     case 'C':
       idx = __cp_index (charset + 2);
       if (idx < 0)
@@ -47,17 +49,24 @@ __set_ctype (const char *charset)
 	  memcpy (_ctype_b, __ctype_cp[idx], 128);
 	  memcpy (_ctype_b + 256, __ctype_cp[idx] + 256, 128);
 	}
-      __ctype_ptr__ = (char *) (__ctype_cp[idx] + 127);
-      return;
+      ctype_ptr = (char *) __ctype_cp[idx];
+      break;
     default:
       break;
     }
-  if (CYGWIN_VERSION_CHECK_FOR_OLD_CTYPE)
+  if (!ctype_ptr)
     {
-      memset (_ctype_b, 0, 128);
-      memset (_ctype_b + 256, 0, 128);
+      if (CYGWIN_VERSION_CHECK_FOR_OLD_CTYPE)
+	{
+	  memset (_ctype_b, 0, 128);
+	  memset (_ctype_b + 256, 0, 128);
+	}
+      ctype_ptr = (char *) _ctype_b;
     }
-  __ctype_ptr__ = (char *) _ctype_b + 127;
+  if (reent)
+    __get_locale_r (reent)->ctype_ptr = ctype_ptr + 127;
+  else
+    __ctype_ptr__ = ctype_ptr + 127;
 }
 
 } /* extern "C" */

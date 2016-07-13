@@ -46,8 +46,9 @@ struct lc_numeric_T {
 #endif
 };
 
-struct lc_numeric_T *__get_current_numeric_locale(void);
-int	__numeric_load_locale(const char *, void *, const char *);
+struct lc_numeric_T *__get_current_numeric_locale (void);
+int __numeric_load_locale (struct _thr_locale_t *, const char *, void *,
+			   const char *);
 
 __END_DECLS
 

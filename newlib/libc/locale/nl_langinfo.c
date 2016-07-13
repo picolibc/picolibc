@@ -32,11 +32,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "lctype.h"
-#include "timelocal.h"
-#include "lnumeric.h"
-#include "lmonetary.h"
-#include "lmessages.h"
+#include "setlocale.h"
 
 #ifndef __CYGWIN__
 #define TRANSITION_PERIOD_HACK

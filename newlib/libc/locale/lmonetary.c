@@ -28,10 +28,9 @@
 
 #include <limits.h>
 #include <stdlib.h>
-#include "lmonetary.h"
+#include "setlocale.h"
 #include "ldpart.h"
 
-extern int __mlocale_changed;
 extern const char * __fix_locale_grouping_str(const char *);
 
 #define LCMONETARY_SIZE (sizeof(struct lc_monetary_T) / sizeof(char *))
@@ -75,11 +74,11 @@ static const struct lc_monetary_T _C_monetary_locale = {
 #endif
 };
 
+#ifndef __CYGWIN__
 static struct lc_monetary_T _monetary_locale;
 static int	_monetary_using_locale;
 static char	*_monetary_locale_buf;
 
-#ifndef __CYGWIN__
 static char
 cnv(const char *str) {
 	int i = strtol(str, NULL, 10);
@@ -90,97 +89,66 @@ cnv(const char *str) {
 #endif
 
 int
-__monetary_load_locale(const char *name , void *f_wctomb, const char *charset)
+__monetary_load_locale (struct _thr_locale_t *locale, const char *name ,
+			void *f_wctomb, const char *charset)
 {
-	int ret;
+  int ret;
+  struct lc_monetary_T mo;
+  char *bufp = NULL;
 
 #ifdef __CYGWIN__
-	extern int __set_lc_monetary_from_win (const char *,
-					       const struct lc_monetary_T *,
-					       struct lc_monetary_T *, char **,
-					       void *, const char *);
-	int old_monetary_using_locale = _monetary_using_locale;
-	_monetary_using_locale = 0;
-	ret = __set_lc_monetary_from_win (name, &_C_monetary_locale,
-					  &_monetary_locale,
-					  &_monetary_locale_buf,
-					  f_wctomb, charset);
-	/* ret == -1: error, ret == 0: C/POSIX, ret > 0: valid */
-	if (ret < 0)
-	  _monetary_using_locale = old_monetary_using_locale;
-	else
-	  {
-	    _monetary_using_locale = ret;
-	    __mlocale_changed = 1;
-	    ret = 0;
-	  }
+  extern int __set_lc_monetary_from_win (const char *,
+					 const struct lc_monetary_T *,
+					 struct lc_monetary_T *, char **,
+					 void *, const char *);
+  ret = __set_lc_monetary_from_win (name, &_C_monetary_locale, &mo, &bufp,
+				    f_wctomb, charset);
+  /* ret == -1: error, ret == 0: C/POSIX, ret > 0: valid */
+  if (ret >= 0)
+    {
+      struct lc_monetary_T *mop = NULL;
+
+      if (ret > 0)
+	{
+	  mop = (struct lc_monetary_T *) calloc (1, sizeof *mop);
+	  if (!mop)
+	    return -1;
+	  memcpy (mop, &mo, sizeof *mop);
+	}
+      locale->monetary = ret == 0 ? NULL : mop;
+      if (locale->monetary_buf)
+	free (locale->monetary_buf);
+      locale->monetary_buf = bufp;
+      ret = 0;
+    }
 #else
-	__mlocale_changed = 1;
-	ret = __part_load_locale(name, &_monetary_using_locale,
-		_monetary_locale_buf, "LC_MONETARY",
-		LCMONETARY_SIZE, LCMONETARY_SIZE,
-		(const char **)&_monetary_locale);
-	if (ret == 0 && _monetary_using_locale) {
-		_monetary_locale.mon_grouping =
-		     __fix_locale_grouping_str(_monetary_locale.mon_grouping);
+  ret = __part_load_locale(name, &_monetary_using_locale,
+			   _monetary_locale_buf, "LC_MONETARY",
+			   LCMONETARY_SIZE, LCMONETARY_SIZE,
+			   (const char **)&_monetary_locale);
+  if (ret == 0 && _monetary_using_locale) {
+    _monetary_locale.mon_grouping =
+	 __fix_locale_grouping_str(_monetary_locale.mon_grouping);
 
 #define M_ASSIGN_CHAR(NAME) (((char *)_monetary_locale.NAME)[0] = \
-			     cnv(_monetary_locale.NAME))
+		       cnv(_monetary_locale.NAME))
 
-		M_ASSIGN_CHAR(int_frac_digits);
-		M_ASSIGN_CHAR(frac_digits);
-		M_ASSIGN_CHAR(p_cs_precedes);
-		M_ASSIGN_CHAR(p_sep_by_space);
-		M_ASSIGN_CHAR(n_cs_precedes);
-		M_ASSIGN_CHAR(n_sep_by_space);
-		M_ASSIGN_CHAR(p_sign_posn);
-		M_ASSIGN_CHAR(n_sign_posn);
-	}
+    M_ASSIGN_CHAR(int_frac_digits);
+    M_ASSIGN_CHAR(frac_digits);
+    M_ASSIGN_CHAR(p_cs_precedes);
+    M_ASSIGN_CHAR(p_sep_by_space);
+    M_ASSIGN_CHAR(n_cs_precedes);
+    M_ASSIGN_CHAR(n_sep_by_space);
+    M_ASSIGN_CHAR(p_sign_posn);
+    M_ASSIGN_CHAR(n_sign_posn);
+  }
 #endif
-	return ret;
+  return ret;
 }
 
 struct lc_monetary_T *
-__get_current_monetary_locale(void) {
-
-	return (_monetary_using_locale
-		? &_monetary_locale
-		: (struct lc_monetary_T *)&_C_monetary_locale);
+__get_current_monetary_locale (void)
+{
+  struct _thr_locale_t *cur_locale = __get_current_locale ();
+  return cur_locale->monetary ?: (struct lc_monetary_T *) &_C_monetary_locale;
 }
-
-#ifdef LOCALE_DEBUG
-void
-monetdebug() {
-printf(	"int_curr_symbol = %s\n"
-	"currency_symbol = %s\n"
-	"mon_decimal_point = %s\n"
-	"mon_thousands_sep = %s\n"
-	"mon_grouping = %s\n"
-	"positive_sign = %s\n"
-	"negative_sign = %s\n"
-	"int_frac_digits = %d\n"
-	"frac_digits = %d\n"
-	"p_cs_precedes = %d\n"
-	"p_sep_by_space = %d\n"
-	"n_cs_precedes = %d\n"
-	"n_sep_by_space = %d\n"
-	"p_sign_posn = %d\n"
-	"n_sign_posn = %d\n",
-	_monetary_locale.int_curr_symbol,
-	_monetary_locale.currency_symbol,
-	_monetary_locale.mon_decimal_point,
-	_monetary_locale.mon_thousands_sep,
-	_monetary_locale.mon_grouping,
-	_monetary_locale.positive_sign,
-	_monetary_locale.negative_sign,
-	_monetary_locale.int_frac_digits[0],
-	_monetary_locale.frac_digits[0],
-	_monetary_locale.p_cs_precedes[0],
-	_monetary_locale.p_sep_by_space[0],
-	_monetary_locale.n_cs_precedes[0],
-	_monetary_locale.n_sep_by_space[0],
-	_monetary_locale.p_sign_posn[0],
-	_monetary_locale.n_sign_posn[0]
-);
-}
-#endif /* LOCALE_DEBUG */

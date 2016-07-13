@@ -68,8 +68,9 @@ struct lc_monetary_T {
 #endif
 };
 
-struct lc_monetary_T *__get_current_monetary_locale(void);
-int	__monetary_load_locale(const char *, void *, const char *);
+struct lc_monetary_T *__get_current_monetary_locale (void);
+int __monetary_load_locale (struct _thr_locale_t *, const char *, void *,
+			    const char *);
 
 __END_DECLS
 

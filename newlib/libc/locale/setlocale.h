@@ -29,8 +29,89 @@
 #ifndef _SETLOCALE_H_
 #define	_SETLOCALE_H_
 
+#include <limits.h>
+#include <string.h>
+#include <stdlib.h>
+#include <locale.h>
+#include "lctype.h"
+#include "lmessages.h"
+#include "lnumeric.h"
+#include "timelocal.h"
+#include "lmonetary.h"
+
 #define ENCODING_LEN 31
 #define CATEGORY_LEN 11
+#define _LC_LAST      7
+
+#ifdef __CYGWIN__
+struct lc_collate_T;
+#endif
+
+struct _thr_locale_t
+{
+  char			 categories[_LC_LAST][ENCODING_LEN + 1];
+  int			(*__wctomb) (struct _reent *, char *, wchar_t,
+				     const char *, mbstate_t *);
+  int			(*__mbtowc) (struct _reent *, wchar_t *, const char *,
+				     size_t, const char *, mbstate_t *);
+  char			*ctype_ptr; /* Unused in __global_locale */
+  int			 cjk_lang;
+#ifndef __HAVE_LOCALE_INFO__
+  char			 mb_cur_max[2];
+  char			 ctype_codeset[ENCODING_LEN + 1];
+  char			 message_codeset[ENCODING_LEN + 1];
+#else
+  struct lc_ctype_T	*ctype;
+  char			*ctype_buf;
+  struct lc_monetary_T	*monetary;
+  char			*monetary_buf;
+  struct lc_numeric_T	*numeric;
+  char			*numeric_buf;
+  struct lc_time_T	*time;
+  char			*time_buf;
+  struct lc_messages_T	*messages;
+  char			*messages_buf;
+#ifdef __CYGWIN__
+  struct lc_collate_T	*collate;
+#endif
+  /* Append more categories here. */
+#endif
+};
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+extern struct _thr_locale_t __global_locale;
+
+/* In POSIX terms the global locale is the process-wide locale.  Use this
+   function to always refer to the global locale. */
+_ELIDABLE_INLINE struct _thr_locale_t *
+__get_global_locale ()
+{
+  return &__global_locale;
+}
+
+/* Per REENT locale.  This is newlib-internal. */
+_ELIDABLE_INLINE struct _thr_locale_t *
+__get_locale_r (struct _reent *r)
+{
+  return r->_locale;
+}
+
+/* In POSIX terms the current locale is the locale used by all functions
+   using locale info without providing a locale as parameter (*_l functions).
+   The current locale is either the locale of the current thread, if the
+   thread called uselocale, or the global locale if not. */
+_ELIDABLE_INLINE struct _thr_locale_t *
+__get_current_locale ()
+{
+  return _REENT->_locale ?: &__global_locale;
+}
+
+#ifdef __cplusplus
+}
+#endif
 
 extern char *_PathLocale;
 

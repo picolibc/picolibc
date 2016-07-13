@@ -21,9 +21,6 @@
  * SUCH DAMAGE.
  */
 
-#include <limits.h>
-#include <string.h>
-#include "lctype.h"
 #include "ldpart.h"
 #include "setlocale.h"
 
@@ -53,59 +50,78 @@ static char	*_ctype_locale_buf;
 static char _ctype_locale_buf[_CTYPE_BUF_SIZE];
 #endif
 
+/* NULL locale indicates global locale (called from setlocale) */
 int
-__ctype_load_locale(const char *name, void *f_wctomb, const char *charset,
-		    int mb_cur_max)
+__ctype_load_locale (struct _thr_locale_t *locale, const char *name,
+		     void *f_wctomb, const char *charset, int mb_cur_max)
 {
-	int ret;
+  int ret;
+  struct lc_ctype_T ct;
+  char *bufp = NULL;
 
 #ifdef __CYGWIN__
-	extern int __set_lc_ctype_from_win (const char *,
-					    const struct lc_ctype_T *,
-					    struct lc_ctype_T *, char **,
-					    void *, const char *, int);
-	int old_ctype_using_locale = _ctype_using_locale;
-	_ctype_using_locale = 0;
-	ret = __set_lc_ctype_from_win (name, &_C_ctype_locale, &_ctype_locale,
-				       &_ctype_locale_buf, f_wctomb, charset,
-				       mb_cur_max);
-	/* ret == -1: error, ret == 0: C/POSIX, ret > 0: valid */
-	if (ret < 0)
-	  _ctype_using_locale = old_ctype_using_locale;
-	else
-	  {
-	    _ctype_using_locale = ret;
-	    ret = 0;
-	  }
+  extern int __set_lc_ctype_from_win (const char *, const struct lc_ctype_T *,
+				      struct lc_ctype_T *, char **, void *,
+				      const char *, int);
+  ret = __set_lc_ctype_from_win (name, &_C_ctype_locale, &ct, &bufp,
+				 f_wctomb, charset, mb_cur_max);
+  /* ret == -1: error, ret == 0: C/POSIX, ret > 0: valid */
+  if (ret >= 0)
+    {
+      struct lc_ctype_T *ctp = NULL;
+
+      if (ret > 0)
+	{
+	  ctp = (struct lc_ctype_T *) calloc (1, sizeof *ctp);
+	  if (!ctp)
+	    return -1;
+	  memcpy (ctp, &ct, sizeof *ctp);
+	}
+      locale->ctype = ret == 0 ? NULL : ctp;
+      if (locale->ctype_buf)
+	free (locale->ctype_buf);
+      locale->ctype_buf = bufp;
+      ret = 0;
+    }
 #elif !defined (__HAVE_LOCALE_INFO_EXTENDED__)
-	if (!strcmp (name, "C"))
-	  _ctype_using_locale = 0;
-	else
-	  {
-	    _ctype_locale.codeset = strcpy (_ctype_locale_buf, charset);
-	    char *mbc = _ctype_locale_buf + _CTYPE_BUF_SIZE - 2;
-	    mbc[0] = mb_cur_max;
-	    mbc[1] = '\0';
-	    _ctype_locale.mb_cur_max = mbc;
-	    _ctype_using_locale = 1;
-	  }
-	ret = 0;
+  ret = 0;
+  if (!strcmp (name, "C"))
+    locale->ctype = NULL;
+  else
+    {
+      if (locale == __get_global_locale ())
+	bufp = _ctype_locale_buf;
+      else
+	bufp = (char *) malloc (_CTYPE_BUF_SIZE);
+      if (*bufp)
+	{
+	  _ctype_locale.codeset = strcpy (bufp, charset);
+	  char *mbc = bufp + _CTYPE_BUF_SIZE - 2;
+	  mbc[0] = mb_cur_max;
+	  mbc[1] = '\0';
+	  _ctype_locale.mb_cur_max = mbc;
+	  if (locale->ctype_buf && locale->ctype_buf != _ctype_locale_buf)
+	    free (locale->ctype_buf);
+	  locale->ctype_buf = bufp;
+	}
+      else
+	ret = -1;
+    }
 #else
-	ret = __part_load_locale(name, &_ctype_using_locale,
-		_ctype_locale_buf, "LC_CTYPE",
-		LCCTYPE_SIZE, LCCTYPE_SIZE,
-		(const char **)&_ctype_locale);
-	if (ret == 0 && _ctype_using_locale)
-		_ctype_locale.grouping =
-			__fix_locale_grouping_str(_ctype_locale.grouping);
+  ret = __part_load_locale(name, &_ctype_using_locale,
+			   _ctype_locale_buf, "LC_CTYPE",
+			   LCCTYPE_SIZE, LCCTYPE_SIZE,
+			   (const char **)&_ctype_locale);
+  if (ret == 0 && _ctype_using_locale)
+    _ctype_locale.grouping =
+	    __fix_locale_grouping_str(_ctype_locale.grouping);
 #endif
-	return ret;
+  return ret;
 }
 
 struct lc_ctype_T *
-__get_current_ctype_locale(void) {
-
-	return (_ctype_using_locale
-		? &_ctype_locale
-		: (struct lc_ctype_T *)&_C_ctype_locale);
+__get_current_ctype_locale (void)
+{
+  struct _thr_locale_t *cur_locale = __get_current_locale ();
+  return cur_locale->ctype ?: (struct lc_ctype_T *) &_C_ctype_locale;
 }

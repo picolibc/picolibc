@@ -63,9 +63,8 @@ __FBSDID("$FreeBSD: src/lib/libc/regex/regcomp.c,v 1.36 2007/06/11 03:05:54 delp
 #include "cname.h"
 
 #ifdef __CYGWIN__
-/* These are defined in nlsfuncs.cc. */
-extern LCID collate_lcid;
-extern char collate_charset[];
+/* Defined in nlsfuncs.cc. */
+extern LCID __get_current_collate_lcid ();
 #endif
 
 /*
@@ -832,7 +831,7 @@ p_b_term(struct parse *p, cset *cs)
 			CHadd(p, cs, start);
 		else {
 #ifdef __CYGWIN__
-			if (!collate_lcid) {
+			if (!__get_current_collate_lcid ()) {
 #else
 			if (__collate_load_error) {
 #endif

@@ -41,6 +41,6 @@ No supporting OS subroutines are required.
 int
 _DEFUN(ispunct,(c),int c)
 {
-	return(__ctype_ptr__[c+1] & _P);
+	return(__CTYPE_PTR[c+1] & _P);
 }
 

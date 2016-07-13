@@ -49,8 +49,9 @@ struct	lc_messages_T {
 #endif
 };
 
-struct lc_messages_T *__get_current_messages_locale(void);
-int __messages_load_locale(const char *, void *, const char *);
+struct lc_messages_T *__get_current_messages_locale (void);
+int __messages_load_locale (struct _thr_locale_t *, const char *, void *,
+			    const char *);
 
 __END_DECLS
 

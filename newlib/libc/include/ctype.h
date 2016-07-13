@@ -44,18 +44,24 @@ int _EXFUN(toascii, (int __c));
 _CONST
 #endif
 extern	__IMPORT char	*__ctype_ptr__;
+#ifdef __HAVE_LOCALE_INFO__
+char *_EXFUN(__locale_ctype_ptr, (void));
+# define __CTYPE_PTR	(__locale_ctype_ptr ())
+#else
+# define __CTYPE_PTR	(__ctype_ptr__)
+#endif
 
 #ifndef __cplusplus
 /* These macros are intentionally written in a manner that will trigger
    a gcc -Wall warning if the user mistakenly passes a 'char' instead
    of an int containing an 'unsigned char'.  Note that the sizeof will
-   always be 1, which is what we want for mapping EOF to __ctype_ptr__[0];
+   always be 1, which is what we want for mapping EOF to __CTYPE_PTR[0];
    the use of a raw index inside the sizeof triggers the gcc warning if
    __c was of type char, and sizeof masks side effects of the extra __c.
-   Meanwhile, the real index to __ctype_ptr__+1 must be cast to int,
+   Meanwhile, the real index to __CTYPE_PTR+1 must be cast to int,
    since isalpha(0x100000001LL) must equal isalpha(1), rather than being
    an out-of-bounds reference on a 64-bit machine.  */
-#define __ctype_lookup(__c) ((__ctype_ptr__+sizeof(""[__c]))[(int)(__c)])
+#define __ctype_lookup(__c) ((__CTYPE_PTR+sizeof(""[__c]))[(int)(__c)])
 
 #define	isalpha(__c)	(__ctype_lookup(__c)&(_U|_L))
 #define	isupper(__c)	((__ctype_lookup(__c)&(_U|_L))==_U)
@@ -92,10 +98,10 @@ extern	__IMPORT char	*__ctype_ptr__;
    function.  */
 #   define toupper(__c) \
   __extension__ ({ __typeof__ (__c) __x = (__c);	\
-      (void) __ctype_ptr__[__x]; (toupper) (__x);})
+      (void) __CTYPE_PTR[__x]; (toupper) (__x);})
 #   define tolower(__c) \
   __extension__ ({ __typeof__ (__c) __x = (__c);	\
-      (void) __ctype_ptr__[__x]; (tolower) (__x);})
+      (void) __CTYPE_PTR[__x]; (tolower) (__x);})
 #  endif /* _MB_EXTENDED_CHARSETS* */
 # endif /* __GNUC__ */
 

@@ -24,11 +24,9 @@
  * SUCH DAMAGE.
  */
 
-#include <limits.h>
-#include "lnumeric.h"
+#include "setlocale.h"
 #include "ldpart.h"
 
-extern int __nlocale_changed;
 extern const char *__fix_locale_grouping_str(const char *);
 
 #define LCNUMERIC_SIZE (sizeof(struct lc_numeric_T) / sizeof(char *))
@@ -46,64 +44,60 @@ static const struct lc_numeric_T _C_numeric_locale = {
 #endif
 };
 
+#ifndef __CYGWIN__
 static struct lc_numeric_T _numeric_locale;
 static int	_numeric_using_locale;
 static char	*_numeric_locale_buf;
+#endif
 
 int
-__numeric_load_locale(const char *name , void *f_wctomb, const char *charset)
+__numeric_load_locale (struct _thr_locale_t *locale, const char *name ,
+		       void *f_wctomb, const char *charset)
 {
-	int ret;
+  int ret;
+  struct lc_numeric_T nm;
+  char *bufp = NULL;
 
 #ifdef __CYGWIN__
-	extern int __set_lc_numeric_from_win (const char *,
-					      const struct lc_numeric_T *,
-					      struct lc_numeric_T *, char **,
-					      void *, const char *);
-	int old_numeric_using_locale = _numeric_using_locale;
-	_numeric_using_locale = 0;
-	ret = __set_lc_numeric_from_win (name, &_C_numeric_locale,
-					 &_numeric_locale, &_numeric_locale_buf,
-					 f_wctomb, charset);
-	/* ret == -1: error, ret == 0: C/POSIX, ret > 0: valid */
-	if (ret < 0)
-	  _numeric_using_locale = old_numeric_using_locale;
-	else
-	  {
-	    _numeric_using_locale = ret;
-	    __nlocale_changed = 1;
-	    ret = 0;
-	  }
+  extern int __set_lc_numeric_from_win (const char *,
+					const struct lc_numeric_T *,
+					struct lc_numeric_T *, char **,
+					void *, const char *);
+  ret = __set_lc_numeric_from_win (name, &_C_numeric_locale, &nm, &bufp,
+				   f_wctomb, charset);
+  /* ret == -1: error, ret == 0: C/POSIX, ret > 0: valid */
+  if (ret >= 0)
+    {
+      struct lc_numeric_T *nmp = NULL;
+
+      if (ret > 0)
+	{
+	  nmp = (struct lc_numeric_T *) calloc (1, sizeof *nmp);
+	  if (!nmp)
+	    return -1;
+	  memcpy (nmp, &nm, sizeof *nmp);
+	}
+      locale->numeric = ret == 0 ? NULL : nmp;
+      if (locale->numeric_buf)
+	free (locale->numeric_buf);
+      locale->numeric_buf = bufp;
+      ret = 0;
+    }
 #else
-	__nlocale_changed = 1;
-	ret = __part_load_locale(name, &_numeric_using_locale,
-		_numeric_locale_buf, "LC_NUMERIC",
-		LCNUMERIC_SIZE, LCNUMERIC_SIZE,
-		(const char **)&_numeric_locale);
-	if (ret == 0 && _numeric_using_locale)
-		_numeric_locale.grouping =
-			__fix_locale_grouping_str(_numeric_locale.grouping);
+  ret = __part_load_locale(name, &_numeric_using_locale,
+			   _numeric_locale_buf, "LC_NUMERIC",
+			   LCNUMERIC_SIZE, LCNUMERIC_SIZE,
+			   (const char **)&_numeric_locale);
+  if (ret == 0 && _numeric_using_locale)
+      _numeric_locale.grouping =
+	      __fix_locale_grouping_str(_numeric_locale.grouping);
 #endif
-	return ret;
+  return ret;
 }
 
 struct lc_numeric_T *
-__get_current_numeric_locale(void) {
-
-	return (_numeric_using_locale
-		? &_numeric_locale
-		: (struct lc_numeric_T *)&_C_numeric_locale);
+__get_current_numeric_locale (void)
+{
+  struct _thr_locale_t *cur_locale = __get_current_locale ();
+  return cur_locale->numeric ?: (struct lc_numeric_T *) &_C_numeric_locale;
 }
-
-#ifdef LOCALE_DEBUG
-void
-numericdebug(void) {
-printf(	"decimal_point = %s\n"
-	"thousands_sep = %s\n"
-	"grouping = %s\n",
-	_numeric_locale.decimal_point,
-	_numeric_locale.thousands_sep,
-	_numeric_locale.grouping
-);
-}
-#endif /* LOCALE_DEBUG */
