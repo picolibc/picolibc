@@ -172,30 +172,22 @@ No supporting OS subroutines are required.
 
 #include <newlib.h>
 #include <errno.h>
-#include <locale.h>
+#include <ctype.h>
 #include <string.h>
 #include <limits.h>
 #include <reent.h>
 #include <stdlib.h>
 #include <wchar.h>
-#include "lmessages.h"
-#include "lmonetary.h"
-#include "lnumeric.h"
-#include "lctype.h"
-#include "timelocal.h"
+#include "setlocale.h"
 #include "../stdlib/local.h"
 
-#define _LC_LAST      7
-#define ENCODING_LEN 31
-
-#ifdef __CYGWIN__ /* Cygwin starts with LC_CTYPE set to "C.UTF-8". */
+#ifdef __CYGWIN__ /* Has to be kept available as exported symbol for
+		     backward compatibility.  Set it in setlocale, but
+		     otherwise ignore it.  Applications compiled after
+		     2010 don't use it anymore. */
 int __EXPORT __mb_cur_max = 6;
-#else
-int __EXPORT __mb_cur_max = 1;
 #endif
 
-int __nlocale_changed = 0;
-int __mlocale_changed = 0;
 char *_PathLocale = NULL;
 
 static
@@ -234,43 +226,55 @@ static char *categories[_LC_LAST] = {
  */
 char __default_locale[ENCODING_LEN + 1] = DEFAULT_LOCALE;
 
-/*
- * Current locales for each category
- */
-static char current_categories[_LC_LAST][ENCODING_LEN + 1] = {
-    "C",
-    "C",
-#ifdef __CYGWIN__ /* Cygwin starts with LC_CTYPE set to "C.UTF-8". */
-    "C.UTF-8",
+struct _thr_locale_t __global_locale =
+{
+  { "C", "C", DEFAULT_LOCALE, "C", "C", "C", "C", },
+#ifdef __CYGWIN__
+  __utf8_wctomb,
+  __utf8_mbtowc,
 #else
-    "C",
+  __ascii_wctomb,
+  __ascii_mbtowc,
 #endif
-    "C",
-    "C",
-    "C",
-    "C",
+  NULL,
+  0,
+#ifndef __HAVE_LOCALE_INFO__
+  "\1",
+  "ASCII",
+  "ASCII",
+#else
+  NULL,
+  NULL,
+  NULL,
+  NULL,
+  NULL,
+  NULL,
+  NULL,
+  NULL,
+  NULL,
+  NULL,
+#ifdef __CYGWIN__
+  NULL,
+#endif
+#endif
 };
 
 /*
- * The locales we are going to try and load
+ * The locales we are going to try and load.  These are only temporary
+ * variables and only used in setlocale.
  */
 static char new_categories[_LC_LAST][ENCODING_LEN + 1];
 static char saved_categories[_LC_LAST][ENCODING_LEN + 1];
 
-static char current_locale_string[_LC_LAST * (ENCODING_LEN + 1/*"/"*/ + 1)];
+/* Renamed from current_locale_string to make clear this is only the
+   *global* string for setlocale (LC_ALL, NULL).  There's no equivalent
+   functionality for uselocale. */
+static char global_locale_string[_LC_LAST * (ENCODING_LEN + 1/*"/"*/ + 1)];
 static char *currentlocale(void);
 static char *loadlocale(struct _reent *, int);
 static const char *__get_locale_env(struct _reent *, int);
 
 #endif /* _MB_CAPABLE */
-
-#ifdef __CYGWIN__
-static char lc_ctype_charset[ENCODING_LEN + 1] = "UTF-8";
-#else
-static char lc_ctype_charset[ENCODING_LEN + 1] = "ASCII";
-#endif
-static char lc_message_charset[ENCODING_LEN + 1] = "ASCII";
-static int lc_ctype_cjk_lang = 0;
 
 char *
 _DEFUN(_setlocale_r, (p, category, locale),
@@ -297,13 +301,13 @@ _DEFUN(_setlocale_r, (p, category, locale),
     }
 
   if (locale == NULL)
-    return category != LC_ALL ? current_categories[category] : currentlocale();
+    return category != LC_ALL ? __global_locale.categories[category] : currentlocale();
 
   /*
    * Default to the current locale for everything.
    */
   for (i = 1; i < _LC_LAST; ++i)
-    strcpy (new_categories[i], current_categories[i]);
+    strcpy (new_categories[i], __global_locale.categories[i]);
 
   /*
    * Now go fill up new_categories from the locale argument
@@ -395,7 +399,7 @@ _DEFUN(_setlocale_r, (p, category, locale),
 
   for (i = 1; i < _LC_LAST; ++i)
     {
-      strcpy (saved_categories[i], current_categories[i]);
+      strcpy (saved_categories[i], __global_locale.categories[i]);
       if (loadlocale (p, i) == NULL)
 	{
 	  saverr = p->_errno;
@@ -422,18 +426,18 @@ currentlocale()
 {
         int i;
 
-        (void)strcpy(current_locale_string, current_categories[1]);
+        (void)strcpy(global_locale_string, __global_locale.categories[1]);
 
         for (i = 2; i < _LC_LAST; ++i)
-                if (strcmp(current_categories[1], current_categories[i])) {
+                if (strcmp(__global_locale.categories[1], __global_locale.categories[i])) {
                         for (i = 2; i < _LC_LAST; ++i) {
-                                (void)strcat(current_locale_string, "/");
-                                (void)strcat(current_locale_string,
-                                             current_categories[i]);
+                                (void)strcat(global_locale_string, "/");
+                                (void)strcat(global_locale_string,
+                                             __global_locale.categories[i]);
                         }
                         break;
                 }
-        return (current_locale_string);
+        return (global_locale_string);
 }
 #endif /* _MB_CAPABLE */
 
@@ -441,10 +445,11 @@ currentlocale()
 #ifdef __CYGWIN__
 extern void __set_charset_from_locale (const char *locale, char *charset);
 extern char *__set_locale_from_locale_alias (const char *, char *);
-extern int __collate_load_locale (const char *, void *, const char *);
+extern int __collate_load_locale (struct _thr_locale_t *, const char *, void *,
+				  const char *);
 #endif /* __CYGWIN__ */
 
-extern void __set_ctype (const char *charset);
+extern void __set_ctype (struct _reent *, const char *charset);
 
 static char *
 loadlocale(struct _reent *p, int category)
@@ -455,7 +460,7 @@ loadlocale(struct _reent *p, int category)
      The string must be in one of the allowed locale strings, either
      one in POSIX-style, or one in the old newlib style to maintain
      backward compatibility.  If the local string is correct, the charset
-     is extracted and stored in lc_ctype_charset or lc_message_charset
+     is extracted and stored in ctype_codeset or message_charset
      dependent on the cateogry. */
   char *locale = NULL;
   char charset[ENCODING_LEN + 1];
@@ -468,8 +473,8 @@ loadlocale(struct _reent *p, int category)
   int cjknarrow = 0;
 
   /* Avoid doing everything twice if nothing has changed. */
-  if (!strcmp (new_categories[category], current_categories[category]))
-    return current_categories[category];
+  if (!strcmp (new_categories[category], __global_locale.categories[category]))
+    return __global_locale.categories[category];
 
 #ifdef __CYGWIN__
   /* This additional code handles the case that the incoming locale string
@@ -852,49 +857,61 @@ restart:
   switch (category)
     {
     case LC_CTYPE:
-      strcpy (lc_ctype_charset, charset);
-      __mb_cur_max = mbc_max;
+#ifndef __HAVE_LOCALE_INFO__
+      strcpy (__global_locale.ctype_codeset, charset);
+      __global_locale.mb_cur_max[0] = mbc_max;
+#endif
+#ifdef __CYGWIN__
+      __mb_cur_max = mbc_max;	/* Only for backward compat */
+#endif
       __wctomb = l_wctomb;
       __mbtowc = l_mbtowc;
-      __set_ctype (charset);
+      __set_ctype (NULL, charset);
       /* Determine the width for the "CJK Ambiguous Width" category of
          characters. This is used in wcwidth(). Assume single width for
          single-byte charsets, and double width for multi-byte charsets
          other than UTF-8. For UTF-8, use double width for the East Asian
          languages ("ja", "ko", "zh"), and single width for everything else.
          Single width can also be forced with the "@cjknarrow" modifier. */
-      lc_ctype_cjk_lang = !cjknarrow
+      __global_locale.cjk_lang = !cjknarrow
 			  && mbc_max > 1
 			  && (charset[0] != 'U'
 			      || strncmp (locale, "ja", 2) == 0
 			      || strncmp (locale, "ko", 2) == 0
 			      || strncmp (locale, "zh", 2) == 0);
 #ifdef __HAVE_LOCALE_INFO__
-      ret = __ctype_load_locale (locale, (void *) l_wctomb, charset, mbc_max);
+      ret = __ctype_load_locale (__get_global_locale (), locale,
+				 (void *) l_wctomb, charset, mbc_max);
 #endif /* __HAVE_LOCALE_INFO__ */
       break;
     case LC_MESSAGES:
-      strcpy (lc_message_charset, charset);
 #ifdef __HAVE_LOCALE_INFO__
-      ret = __messages_load_locale (locale, (void *) l_wctomb, charset);
+      ret = __messages_load_locale (__get_global_locale (), locale,
+				    (void *) l_wctomb, charset);
       if (!ret)
+#else
+      strcpy (__global_locale.message_codeset, charset);
 #endif /* __HAVE_LOCALE_INFO__ */
       break;
 #ifdef __HAVE_LOCALE_INFO__
 #ifdef __CYGWIN__
   /* Right now only Cygwin supports a __collate_load_locale function at all. */
     case LC_COLLATE:
-      ret = __collate_load_locale (locale, (void *) l_mbtowc, charset);
+      ret = __collate_load_locale (__get_global_locale (), locale,
+				   (void *) l_mbtowc, charset);
       break;
 #endif
     case LC_MONETARY:
-      ret = __monetary_load_locale (locale, (void *) l_wctomb, charset);
+      ret = __monetary_load_locale (__get_global_locale (), locale,
+				    (void *) l_wctomb, charset);
       break;
     case LC_NUMERIC:
-      ret = __numeric_load_locale (locale, (void *) l_wctomb, charset);
+      ret = __numeric_load_locale (__get_global_locale (), locale,
+				   (void *) l_wctomb, charset);
       break;
     case LC_TIME:
-      ret = __time_load_locale (locale, (void *) l_wctomb, charset);
+      ret = __time_load_locale (__get_global_locale (), locale,
+				(void *) l_wctomb, charset);
       break;
 #endif /* __HAVE_LOCALE_INFO__ */
     default:
@@ -904,7 +921,7 @@ restart:
   if (ret)
     FAIL;
 #endif /* __HAVE_LOCALE_INFO__ */
-  return strcpy(current_categories[category], new_categories[category]);
+  return strcpy(__global_locale.categories[category], new_categories[category]);
 }
 
 static const char *
@@ -934,23 +951,22 @@ __get_locale_env(struct _reent *p, int category)
 char *
 _DEFUN_VOID(__locale_charset)
 {
-#if 0//def __HAVE_LOCALE_INFO__
-  return __get_current_ctype_locale ()->codeset;
+#ifdef __HAVE_LOCALE_INFO__
+  return (char *) __get_current_ctype_locale ()->codeset;
 #else
-  return lc_ctype_charset;
+  return __global_locale.ctype_codeset;
 #endif
 }
 
 int
 _DEFUN_VOID(__locale_mb_cur_max)
 {
-#if 0//def __HAVE_LOCALE_INFO__
+#ifdef __HAVE_LOCALE_INFO__
   return __get_current_ctype_locale ()->mb_cur_max[0];
 #else
-  return __mb_cur_max;
+  return __global_locale.mb_cur_max[0];
 #endif
 }
-
 
 char *
 _DEFUN_VOID(__locale_msgcharset)
@@ -958,64 +974,73 @@ _DEFUN_VOID(__locale_msgcharset)
 #ifdef __HAVE_LOCALE_INFO__
   return (char *) __get_current_messages_locale ()->codeset;
 #else
-  return lc_message_charset;
+  return (char *) __global_locale.message_codeset;
 #endif
 }
 
 int
 _DEFUN_VOID(__locale_cjk_lang)
 {
-  return lc_ctype_cjk_lang;
+#ifdef __HAVE_LOCALE_INFO__
+  return __get_current_locale ()->cjk_lang;
+#else
+  return __global_locale.cjk_lang;
+#endif
 }
+
+#ifdef __HAVE_LOCALE_INFO__
+char *
+_DEFUN_VOID(__locale_ctype_ptr)
+{
+  /* Only check if the current thread/reent has a locale.  ctype_ptr is unused
+     in __global_locale, rather the global variable __ctype_ptr__ is used. */
+  return __get_locale_r (_REENT) ? __get_locale_r (_REENT)->ctype_ptr
+				 : __ctype_ptr__;
+}
+
+#endif
 
 struct lconv *
 _DEFUN(_localeconv_r, (data), 
       struct _reent *data)
 {
 #ifdef __HAVE_LOCALE_INFO__
-  if (__nlocale_changed)
-    {
-      struct lc_numeric_T *n = __get_current_numeric_locale ();
-      lconv.decimal_point = (char *) n->decimal_point;
-      lconv.thousands_sep = (char *) n->thousands_sep;
-      lconv.grouping = (char *) n->grouping;
-      __nlocale_changed = 0;
-    }
-  if (__mlocale_changed)
-    {
-      struct lc_monetary_T *m = __get_current_monetary_locale ();
-      lconv.int_curr_symbol = (char *) m->int_curr_symbol;
-      lconv.currency_symbol = (char *) m->currency_symbol;
-      lconv.mon_decimal_point = (char *) m->mon_decimal_point;
-      lconv.mon_thousands_sep = (char *) m->mon_thousands_sep;
-      lconv.mon_grouping = (char *) m->mon_grouping;
-      lconv.positive_sign = (char *) m->positive_sign;
-      lconv.negative_sign = (char *) m->negative_sign;
-      lconv.int_frac_digits = m->int_frac_digits[0];
-      lconv.frac_digits = m->frac_digits[0];
-      lconv.p_cs_precedes = m->p_cs_precedes[0];
-      lconv.p_sep_by_space = m->p_sep_by_space[0];
-      lconv.n_cs_precedes = m->n_cs_precedes[0];
-      lconv.n_sep_by_space = m->n_sep_by_space[0];
-      lconv.p_sign_posn = m->p_sign_posn[0];
-      lconv.n_sign_posn = m->n_sign_posn[0];
+  struct lc_numeric_T *n = __get_current_numeric_locale ();
+  struct lc_monetary_T *m = __get_current_monetary_locale ();
+
+  lconv.decimal_point = (char *) n->decimal_point;
+  lconv.thousands_sep = (char *) n->thousands_sep;
+  lconv.grouping = (char *) n->grouping;
+  lconv.int_curr_symbol = (char *) m->int_curr_symbol;
+  lconv.currency_symbol = (char *) m->currency_symbol;
+  lconv.mon_decimal_point = (char *) m->mon_decimal_point;
+  lconv.mon_thousands_sep = (char *) m->mon_thousands_sep;
+  lconv.mon_grouping = (char *) m->mon_grouping;
+  lconv.positive_sign = (char *) m->positive_sign;
+  lconv.negative_sign = (char *) m->negative_sign;
+  lconv.int_frac_digits = m->int_frac_digits[0];
+  lconv.frac_digits = m->frac_digits[0];
+  lconv.p_cs_precedes = m->p_cs_precedes[0];
+  lconv.p_sep_by_space = m->p_sep_by_space[0];
+  lconv.n_cs_precedes = m->n_cs_precedes[0];
+  lconv.n_sep_by_space = m->n_sep_by_space[0];
+  lconv.p_sign_posn = m->p_sign_posn[0];
+  lconv.n_sign_posn = m->n_sign_posn[0];
 #ifdef __HAVE_LOCALE_INFO_EXTENDED__
-      lconv.int_p_cs_precedes = m->int_p_cs_precedes[0];
-      lconv.int_p_sep_by_space = m->int_p_sep_by_space[0];
-      lconv.int_n_cs_precedes = m->int_n_cs_precedes[0];
-      lconv.int_n_sep_by_space = m->int_n_sep_by_space[0];
-      lconv.int_n_sign_posn = m->int_n_sign_posn[0];
-      lconv.int_p_sign_posn = m->int_p_sign_posn[0];
+  lconv.int_p_cs_precedes = m->int_p_cs_precedes[0];
+  lconv.int_p_sep_by_space = m->int_p_sep_by_space[0];
+  lconv.int_n_cs_precedes = m->int_n_cs_precedes[0];
+  lconv.int_n_sep_by_space = m->int_n_sep_by_space[0];
+  lconv.int_n_sign_posn = m->int_n_sign_posn[0];
+  lconv.int_p_sign_posn = m->int_p_sign_posn[0];
 #else /* !__HAVE_LOCALE_INFO_EXTENDED__ */
-      lconv.int_p_cs_precedes = m->p_cs_precedes[0];
-      lconv.int_p_sep_by_space = m->p_sep_by_space[0];
-      lconv.int_n_cs_precedes = m->n_cs_precedes[0];
-      lconv.int_n_sep_by_space = m->n_sep_by_space[0];
-      lconv.int_n_sign_posn = m->n_sign_posn[0];
-      lconv.int_p_sign_posn = m->p_sign_posn[0];
+  lconv.int_p_cs_precedes = m->p_cs_precedes[0];
+  lconv.int_p_sep_by_space = m->p_sep_by_space[0];
+  lconv.int_n_cs_precedes = m->n_cs_precedes[0];
+  lconv.int_n_sep_by_space = m->n_sep_by_space[0];
+  lconv.int_n_sign_posn = m->n_sign_posn[0];
+  lconv.int_p_sign_posn = m->p_sign_posn[0];
 #endif /* !__HAVE_LOCALE_INFO_EXTENDED__ */
-      __mlocale_changed = 0;
-    }
 #endif /* __HAVE_LOCALE_INFO__ */
   return (struct lconv *) &lconv;
 }

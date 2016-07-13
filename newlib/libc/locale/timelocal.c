@@ -30,11 +30,7 @@
 #include <stddef.h>
 
 #include "ldpart.h"
-#include "timelocal.h"
-
-static struct lc_time_T _time_locale;
-static int _time_using_locale;
-static char *time_locale_buf;
+#include "setlocale.h"
 
 #define LCTIME_SIZE (sizeof(struct lc_time_T) / sizeof(char *))
 
@@ -149,40 +145,56 @@ static const struct lc_time_T	_C_time_locale = {
 #endif
 };
 
-struct lc_time_T *
-__get_current_time_locale(void) {
-	return (_time_using_locale
-		? &_time_locale
-		: (struct lc_time_T *)&_C_time_locale);
-}
+#ifndef __CYGWIN__
+static struct lc_time_T _time_locale;
+static int _time_using_locale;
+static char *time_locale_buf;
+#endif
 
 int
-__time_load_locale(const char *name, void *f_wctomb, const char *charset) {
-
-	int	ret;
+__time_load_locale (struct _thr_locale_t *locale, const char *name,
+		    void *f_wctomb, const char *charset)
+{
+  int	ret;
+  struct lc_time_T ti;
+  char *bufp = NULL;
 
 #ifdef __CYGWIN__
-	extern int __set_lc_time_from_win (const char *,
-					   const struct lc_time_T *,
-					   struct lc_time_T *,
-					   char **, void *, const char *);
-	int old_time_using_locale = _time_using_locale;
-	_time_using_locale = 0;
-	ret = __set_lc_time_from_win (name, &_C_time_locale, &_time_locale,
-				      &time_locale_buf, f_wctomb, charset);
-	/* ret == -1: error, ret == 0: C/POSIX, ret > 0: valid */
-	if (ret < 0)
-	  _time_using_locale = old_time_using_locale;
-	else
-	  {
-	    _time_using_locale = ret;
-	    ret = 0;
-	  }
+  extern int __set_lc_time_from_win (const char *, const struct lc_time_T *,
+				     struct lc_time_T *, char **, void *,
+				     const char *);
+  ret = __set_lc_time_from_win (name, &_C_time_locale, &ti, &bufp,
+				f_wctomb, charset);
+  /* ret == -1: error, ret == 0: C/POSIX, ret > 0: valid */
+  if (ret >= 0)
+    {
+      struct lc_time_T *tip = NULL;
+
+      if (ret > 0)
+	{
+	  tip = (struct lc_time_T *) calloc (1, sizeof *tip);
+	  if (!tip)
+	    return -1;
+	  memcpy (tip, &ti, sizeof *tip);
+	}
+      locale->time = ret == 0 ? NULL : tip;
+      if (locale->time_buf)
+	free (locale->time_buf);
+      locale->time_buf = bufp;
+      ret = 0;
+    }
 #else
-	ret = __part_load_locale(name, &_time_using_locale,
-			time_locale_buf, "LC_TIME",
-			LCTIME_SIZE, LCTIME_SIZE,
-			(const char **)&_time_locale);
+  ret = __part_load_locale(name, &_time_using_locale,
+		  time_locale_buf, "LC_TIME",
+		  LCTIME_SIZE, LCTIME_SIZE,
+		  (const char **)&_time_locale);
 #endif
-	return (ret);
+  return (ret);
+}
+
+struct lc_time_T *
+__get_current_time_locale (void)
+{
+  struct _thr_locale_t *cur_locale = __get_current_locale ();
+  return cur_locale->time ?: (struct lc_time_T *) &_C_time_locale;
 }

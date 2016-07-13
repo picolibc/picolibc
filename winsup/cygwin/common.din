@@ -68,6 +68,7 @@ __isinfd = isinf NOSIGFE
 __isinff = isinff NOSIGFE
 __isnand = isnan NOSIGFE
 __isnanf = isnanf NOSIGFE
+__locale_ctype_ptr NOSIGFE
 __locale_mb_cur_max NOSIGFE
 __main NOSIGFE
 __mempcpy = mempcpy NOSIGFE

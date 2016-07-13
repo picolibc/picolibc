@@ -39,8 +39,9 @@ struct lc_ctype_T {
 #endif
 };
 
-struct lc_ctype_T *__get_current_ctype_locale(void);
-int	__ctype_load_locale(const char *, void *, const char *, int);
+struct lc_ctype_T *__get_current_ctype_locale (void);
+int __ctype_load_locale (struct _thr_locale_t *, const char *, void *,
+			 const char *, int);
 
 __END_DECLS
 

@@ -39,6 +39,6 @@ No supporting OS subroutines are required.
 int
 _DEFUN(islower,(c),int c)
 {
-	return ((__ctype_ptr__[c+1] & (_U|_L)) == _L);
+	return ((__CTYPE_PTR[c+1] & (_U|_L)) == _L);
 }
 

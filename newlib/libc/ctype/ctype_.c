@@ -98,13 +98,6 @@ char _ctype_b[128 + 256] = {
 	_CTYPE_DATA_128_255
 };
 
-#ifdef _NEED_OLD_CTYPE_PTR_DEFINITION
-#ifndef _MB_CAPABLE
-_CONST
-#endif
-char __EXPORT *__ctype_ptr = (char *) _ctype_b + 128;
-#endif
-
 #ifndef _MB_CAPABLE
 _CONST
 #endif
@@ -135,7 +128,7 @@ _CONST char _ctype_[1 + 256] = {
 };
 #  endif /* !__CYGWIN__ */
 
-#else	/* !defined(ALLOW_NEGATIVE_CTYPE_INDEX) */
+#else	/* !ALLOW_NEGATIVE_CTYPE_INDEX */
 
 _CONST char _ctype_[1 + 256] = {
 	0,
@@ -143,30 +136,24 @@ _CONST char _ctype_[1 + 256] = {
 	_CTYPE_DATA_128_255
 };
 
-#ifdef _NEED_OLD_CTYPE_PTR_DEFINITION
-#ifndef _MB_CAPABLE
-_CONST
-#endif
-char *__ctype_ptr = (char *) _ctype_ + 1;
-#endif
-
 #ifndef _MB_CAPABLE
 _CONST
 #endif
 char *__ctype_ptr__ = (char *) _ctype_;
 
-#endif
+#endif	/* !ALLOW_NEGATIVE_CTYPE_INDEX */
 
 #if defined(_MB_CAPABLE)
 /* Cygwin has its own implementation which additionally maintains backward
    compatibility with applications built under older Cygwin releases. */
 #ifndef __CYGWIN__
 void
-__set_ctype (const char *charset)
+__set_ctype (struct _reent *, const char *charset)
 {
 #if defined(_MB_EXTENDED_CHARSETS_ISO) || defined(_MB_EXTENDED_CHARSETS_WINDOWS)
   int idx;
 #endif
+  char *ctype_ptr = NULL;
 
   switch (*charset)
     {
@@ -180,50 +167,32 @@ __set_ctype (const char *charset)
         idx = 0;
       else
         ++idx;
-#  if defined(ALLOW_NEGATIVE_CTYPE_INDEX)
-#ifdef _NEED_OLD_CTYPE_PTR_DEFINITION
-      __ctype_ptr = (char *) (__ctype_iso[idx] + 128);
-#endif
-      __ctype_ptr__ = (char *) (__ctype_iso[idx] + 127);
-#  else
-#ifdef _NEED_OLD_CTYPE_PTR_DEFINITION
-      __ctype_ptr = (char *) __ctype_iso[idx] + 1;
-#endif
-      __ctype_ptr__ = (char *) __ctype_iso[idx];
-#  endif
-      return;
+      ctype_ptr = __ctype_iso[idx];
+      break;
 #endif
 #if defined(_MB_EXTENDED_CHARSETS_WINDOWS)
     case 'C':
       idx = __cp_index (charset + 2);
       if (idx < 0)
         break;
-#  if defined(ALLOW_NEGATIVE_CTYPE_INDEX)
-#ifdef _NEED_OLD_CTYPE_PTR_DEFINITION
-      __ctype_ptr = (char *) (__ctype_cp[idx] + 128);
-#endif
-      __ctype_ptr__ = (char *) (__ctype_cp[idx] + 127);
-#  else
-#ifdef _NEED_OLD_CTYPE_PTR_DEFINITION
-      __ctype_ptr = (char *) __ctype_cp[idx] + 1;
-#endif
-      __ctype_ptr__ = (char *) __ctype_cp[idx];
-#  endif
-      return;
+      ctype_ptr = __ctype_cp[idx];
+      break;
 #endif
     default:
       break;
     }
+  if (!ctype_ptr)
+    {
 #  if defined(ALLOW_NEGATIVE_CTYPE_INDEX)
-#ifdef _NEED_OLD_CTYPE_PTR_DEFINITION
-  __ctype_ptr = (char *) _ctype_b + 128;
-#endif
-  __ctype_ptr__ = (char *) _ctype_b + 127;
+      ctype_ptr = _ctype_b;
 #  else
-#ifdef _NEED_OLD_CTYPE_PTR_DEFINITION
-  __ctype_ptr = (char *) _ctype_ + 1;
-#endif
-  __ctype_ptr__ = (char *) _ctype_;
+      ctype_ptr = _ctype_;
+#  endif
+    }
+#  if defined(ALLOW_NEGATIVE_CTYPE_INDEX)
+      __ctype_ptr__ = ctype_ptr + 127;
+#  else
+      __ctype_ptr__ = ctype_ptr;
 #  endif
 }
 #endif /* !__CYGWIN__ */

@@ -77,8 +77,9 @@ struct lc_time_T {
 #endif
 };
 
-struct lc_time_T *__get_current_time_locale(void);
-int	__time_load_locale(const char *, void *, const char *);
+struct lc_time_T *__get_current_time_locale (void);
+int __time_load_locale (struct _thr_locale_t *, const char *, void *,
+			const char *);
 
 __END_DECLS
 

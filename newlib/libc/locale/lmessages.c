@@ -28,7 +28,7 @@
 
 #include <stddef.h>
 
-#include "lmessages.h"
+#include "setlocale.h"
 #include "ldpart.h"
 
 #define LCMESSAGES_SIZE_FULL (sizeof(struct lc_messages_T) / sizeof(char *))
@@ -53,57 +53,68 @@ static const struct lc_messages_T _C_messages_locale = {
 #endif
 };
 
+#ifndef __CYGWIN__
 static struct lc_messages_T _messages_locale;
 static int	_messages_using_locale;
 static char	*_messages_locale_buf;
+#endif
 
 int
-__messages_load_locale (const char *name, void *f_wctomb, const char *charset)
+__messages_load_locale (struct _thr_locale_t *locale, const char *name,
+			void *f_wctomb, const char *charset)
 {
+  int ret;
+  struct lc_messages_T me;
+  char *bufp = NULL;
+
 #ifdef __CYGWIN__
-	extern int __set_lc_messages_from_win (const char *,
-					       const struct lc_messages_T *,
-					       struct lc_messages_T *, char **,
-					       void *, const char *);
-	int ret;
+  extern int __set_lc_messages_from_win (const char *,
+					 const struct lc_messages_T *,
+					 struct lc_messages_T *, char **,
+					 void *, const char *);
 
-	int old_messages_using_locale = _messages_using_locale;
-	_messages_using_locale = 0;
-	ret = __set_lc_messages_from_win (name, &_C_messages_locale,
-					  &_messages_locale,
-					  &_messages_locale_buf,
-					  f_wctomb, charset);
-	/* ret == -1: error, ret == 0: C/POSIX, ret > 0: valid */
-	if (ret < 0)
-	  _messages_using_locale = old_messages_using_locale;
-	else
-	  {
-	    _messages_using_locale = ret;
-	    ret = 0;
-	  }
-	return ret;
+  ret = __set_lc_messages_from_win (name, &_C_messages_locale, &me, &bufp,
+				    f_wctomb, charset);
+  /* ret == -1: error, ret == 0: C/POSIX, ret > 0: valid */
+  if (ret >= 0)
+    {
+      struct lc_messages_T *mep = NULL;
+
+      if (ret > 0)
+	{
+	  mep = (struct lc_messages_T *) calloc (1, sizeof *mep);
+	  if (!mep)
+	    return -1;
+	  memcpy (mep, &me, sizeof *mep);
+	}
+      locale->messages = ret == 0 ? NULL : mep;
+      if (locale->messages_buf)
+	free (locale->messages_buf);
+      locale->messages_buf = bufp;
+      ret = 0;
+    }
 #else
-	/*
-	 * Propose that we can have incomplete locale file (w/o "{yes,no}str").
-	 * Initialize them before loading.  In case of complete locale, they'll
-	 * be initialized to loaded value, otherwise they'll not be touched.
-	 */
-	_messages_locale.yesstr = empty;
-	_messages_locale.nostr = empty;
+  /*
+   * Propose that we can have incomplete locale file (w/o "{yes,no}str").
+   * Initialize them before loading.  In case of complete locale, they'll
+   * be initialized to loaded value, otherwise they'll not be touched.
+   */
+  _messages_locale.yesstr = empty;
+  _messages_locale.nostr = empty;
 
-	return __part_load_locale(name, &_messages_using_locale,
-		_messages_locale_buf, "LC_MESSAGES",
-		LCMESSAGES_SIZE_FULL, LCMESSAGES_SIZE_MIN,
-		(const char **)&_messages_locale);
+  ret = __part_load_locale(name, &_messages_using_locale,
+			   _messages_locale_buf, "LC_MESSAGES",
+			   LCMESSAGES_SIZE_FULL, LCMESSAGES_SIZE_MIN,
+			   (const char **)&_messages_locale);
 #endif
+  return ret;
 }
 
 struct lc_messages_T *
-__get_current_messages_locale(void) {
-
-	return (_messages_using_locale
-		? &_messages_locale
-		: (struct lc_messages_T *)&_C_messages_locale);
+__get_current_messages_locale (void)
+{
+  struct _thr_locale_t *cur_locale = __get_current_locale ();
+  return cur_locale->messages ?: (struct lc_messages_T *) &_C_messages_locale;
 }
 
 #ifdef LOCALE_DEBUG

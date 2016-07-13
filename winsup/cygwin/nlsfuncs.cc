@@ -17,11 +17,7 @@ details. */
 #include "cygheap.h"
 #include "tls_pbuf.h"
 /* Internal headers from newlib */
-#include "../locale/timelocal.h"
-#include "../locale/lctype.h"
-#include "../locale/lnumeric.h"
-#include "../locale/lmonetary.h"
-#include "../locale/lmessages.h"
+#include "../locale/setlocale.h"
 #include "lc_msg.h"
 #include "lc_era.h"
 
@@ -689,8 +685,6 @@ __set_lc_time_from_win (const char *name,
   if (tmp != new_lc_time_buf)
     rebase_locale_buf (_time_locale, _time_locale + 1, tmp,
 		       new_lc_time_buf, lc_time_ptr);
-  if (*lc_time_buf)
-    free (*lc_time_buf);
   *lc_time_buf = tmp;
   return 1;
 }
@@ -764,8 +758,6 @@ __set_lc_ctype_from_win (const char *name,
   if (tmp != new_lc_ctype_buf)
     rebase_locale_buf (_ctype_locale, _ctype_locale + 1, tmp,
 		       new_lc_ctype_buf, lc_ctype_ptr);
-  if (*lc_ctype_buf)
-    free (*lc_ctype_buf);
   *lc_ctype_buf = tmp;
   return 1;
 }
@@ -841,8 +833,6 @@ __set_lc_numeric_from_win (const char *name,
   if (tmp != new_lc_numeric_buf)
     rebase_locale_buf (_numeric_locale, _numeric_locale + 1, tmp,
 		       new_lc_numeric_buf, lc_numeric_ptr);
-  if (*lc_numeric_buf)
-    free (*lc_numeric_buf);
   *lc_numeric_buf = tmp;
   return 1;
 }
@@ -981,8 +971,6 @@ __set_lc_monetary_from_win (const char *name,
   if (tmp != new_lc_monetary_buf)
     rebase_locale_buf (_monetary_locale, _monetary_locale + 1, tmp,
 		       new_lc_monetary_buf, lc_monetary_ptr);
-  if (*lc_monetary_buf)
-    free (*lc_monetary_buf);
   *lc_monetary_buf = tmp;
   return 1;
 }
@@ -1083,36 +1071,59 @@ __set_lc_messages_from_win (const char *name,
       _messages_locale->wnostr = (const wchar_t *) wc;
       wcpcpy (wc, msg->nostr);
     }
-  /* Aftermath. */
-  if (*lc_messages_buf)
-    free (*lc_messages_buf);
   *lc_messages_buf = new_lc_messages_buf;
   return 1;
 }
 
-LCID collate_lcid = 0;
-static mbtowc_p collate_mbtowc = __ascii_mbtowc;
-char collate_charset[ENCODING_LEN + 1] = "ASCII";
+struct lc_collate_T
+{
+  LCID lcid;
+  mbtowc_p mbtowc;
+  char codeset[ENCODING_LEN + 1];
+};
 
 /* Called from newlib's setlocale() if category is LC_COLLATE.  Stores
    LC_COLLATE locale information.  This is subsequently accessed by the
    below functions strcoll, strxfrm, wcscoll, wcsxfrm. */
 extern "C" int
-__collate_load_locale (const char *name, mbtowc_p f_mbtowc, const char *charset)
+__collate_load_locale (struct _thr_locale_t *locale, const char *name,
+		       mbtowc_p f_mbtowc, const char *charset)
 {
   LCID lcid = __get_lcid_from_locale (name);
   if (lcid == (LCID) -1)
     return -1;
-  collate_lcid = lcid;
-  collate_mbtowc = f_mbtowc;
-  stpcpy (collate_charset, charset);
+  struct lc_collate_T *cop;
+  if (lcid)
+    {
+      cop = (struct lc_collate_T *) calloc (1, sizeof *cop);
+      if (!cop)
+	return -1;
+      cop->lcid = lcid;
+      cop->mbtowc = f_mbtowc;
+      stpcpy (cop->codeset, charset);
+    }
   return 0;
+}
+
+extern "C" LCID
+__get_current_collate_lcid ()
+{
+  struct _thr_locale_t *cur_locale = __get_current_locale ();
+  return cur_locale->collate ? cur_locale->collate->lcid : 0;
 }
 
 extern "C" const char *
 __get_current_collate_codeset (void)
 {
-  return collate_charset;
+  struct _thr_locale_t *cur_locale = __get_current_locale ();
+  return cur_locale->collate ? cur_locale->collate->codeset : "ASCII";
+}
+
+static mbtowc_p
+__get_current_collate_mbtowc ()
+{
+  struct _thr_locale_t *cur_locale = __get_current_locale ();
+  return cur_locale->collate ? cur_locale->collate->mbtowc : __ascii_mbtowc;
 }
 
 /* We use the Windows functions for locale-specific string comparison and
@@ -1122,6 +1133,7 @@ extern "C" int
 wcscoll (const wchar_t *__restrict ws1, const wchar_t *__restrict ws2)
 {
   int ret;
+  LCID collate_lcid = __get_current_collate_lcid ();
 
   if (!collate_lcid)
     return wcscmp (ws1, ws2);
@@ -1138,11 +1150,14 @@ strcoll (const char *__restrict s1, const char *__restrict s2)
   wchar_t *ws1, *ws2;
   tmp_pathbuf tp;
   int ret;
+  LCID collate_lcid = __get_current_collate_lcid ();
 
   if (!collate_lcid)
     return strcmp (s1, s2);
   /* The ANSI version of CompareString uses the default charset of the lcid,
      so we must use the Unicode version. */
+  mbtowc_p collate_mbtowc = __get_current_collate_mbtowc ();
+  const char *collate_charset = __get_current_collate_codeset ();
   n1 = lc_mbstowcs (collate_mbtowc, collate_charset, NULL, s1, 0) + 1;
   ws1 = (n1 > NT_MAX_PATH ? (wchar_t *) malloc (n1 * sizeof (wchar_t))
 			  : tp.w_get ());
@@ -1176,6 +1191,7 @@ extern "C" size_t
 wcsxfrm (wchar_t *__restrict ws1, const wchar_t *__restrict ws2, size_t wsn)
 {
   size_t ret;
+  LCID collate_lcid = __get_current_collate_lcid ();
 
   if (!collate_lcid)
     return wcslcpy (ws1, ws2, wsn);
@@ -1211,11 +1227,14 @@ strxfrm (char *__restrict s1, const char *__restrict s2, size_t sn)
   size_t n2;
   wchar_t *ws2;
   tmp_pathbuf tp;
+  LCID collate_lcid = __get_current_collate_lcid ();
 
   if (!collate_lcid)
     return strlcpy (s1, s2, sn);
   /* The ANSI version of LCMapString uses the default charset of the lcid,
      so we must use the Unicode version. */
+  mbtowc_p collate_mbtowc = __get_current_collate_mbtowc ();
+  const char *collate_charset = __get_current_collate_codeset ();
   n2 = lc_mbstowcs (collate_mbtowc, collate_charset, NULL, s2, 0) + 1;
   ws2 = (n2 > NT_MAX_PATH ? (wchar_t *) malloc (n2 * sizeof (wchar_t))
 			  : tp.w_get ());
