@@ -14,7 +14,7 @@ typedef __uint32_t __ino32_t;
 #endif
 
 #define __machine_blkcnt_t_defined
-typedef __uint64_t __blkcnt_t;
+typedef __int64_t __blkcnt_t;
 
 #define __machine_blksize_t_defined
 typedef __int32_t __blksize_t;
