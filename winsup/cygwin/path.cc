@@ -447,10 +447,13 @@ get_nt_native_path (const char *path, UNICODE_STRING& upath, bool dos)
 	  str2uni_cat (upath, path);
 	  /* The drive letter must be upper case. */
 	  upath.Buffer[4] = towupper (upath.Buffer[4]);
+	  transform_chars (&upath, 7);
 	}
-      else
-	str2uni_cat (upath, path);
-      transform_chars (&upath, 7);
+      else			/* relative path */
+	{
+	  str2uni_cat (upath, path);
+	  transform_chars (&upath, 0);
+	}
     }
   else if (path[1] != '\\')	/* \Device\... */
     str2uni_cat (upath, path);
