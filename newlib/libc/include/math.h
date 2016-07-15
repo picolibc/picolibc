@@ -628,7 +628,7 @@ extern int matherr _PARAMS((struct exception *e));
 
 /* Useful constants.  */
 
-#if __BSD_VISIBLE || __XSI_VISIBLE >= 500
+#if __BSD_VISIBLE || __XSI_VISIBLE
 
 #define MAXFLOAT	3.40282347e+38F
 
