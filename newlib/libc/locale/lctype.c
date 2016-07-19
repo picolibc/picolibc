@@ -28,7 +28,7 @@
 
 static char	numone[] = { '\1', '\0'};
 
-static const struct lc_ctype_T _C_ctype_locale = {
+const struct lc_ctype_T _C_ctype_locale = {
 	"ASCII",			/* codeset */
 	numone				/* mb_cur_max */
 #ifdef __HAVE_LOCALE_INFO_EXTENDED__
@@ -77,7 +77,7 @@ __ctype_load_locale (struct _thr_locale_t *locale, const char *name,
 	    return -1;
 	  memcpy (ctp, &ct, sizeof *ctp);
 	}
-      locale->ctype = ret == 0 ? NULL : ctp;
+      locale->ctype = ret == 0 ? &_C_ctype_locale : ctp;
       if (locale->ctype_buf)
 	free (locale->ctype_buf);
       locale->ctype_buf = bufp;
@@ -117,11 +117,4 @@ __ctype_load_locale (struct _thr_locale_t *locale, const char *name,
 	    __fix_locale_grouping_str(_ctype_locale.grouping);
 #endif
   return ret;
-}
-
-struct lc_ctype_T *
-__get_current_ctype_locale (void)
-{
-  struct _thr_locale_t *cur_locale = __get_current_locale ();
-  return cur_locale->ctype ?: (struct lc_ctype_T *) &_C_ctype_locale;
 }

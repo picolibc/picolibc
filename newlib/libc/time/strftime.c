@@ -276,7 +276,7 @@ the "C" locale settings.
 #include <ctype.h>
 #include <wctype.h>
 #include "local.h"
-#include "../locale/timelocal.h"
+#include "../locale/setlocale.h"
 
 /* Defines to make the file dual use for either strftime() or wcsftime().
  * To get wcsftime, define MAKE_WCSFTIME.
@@ -709,7 +709,7 @@ _DEFUN (strftime, (s, maxsize, format, tim_p),
   unsigned long width;
   int tzset_called = 0;
 
-  struct lc_time_T *_CurrentTimeLocale = __get_current_time_locale ();
+  const struct lc_time_T *_CurrentTimeLocale = __get_current_time_locale ();
   for (;;)
     {
       while (*format && *format != CQ('%'))

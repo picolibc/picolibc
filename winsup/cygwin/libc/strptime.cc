@@ -46,7 +46,7 @@ __RCSID("$NetBSD: strptime.c,v 1.28 2008/04/28 20:23:01 martin Exp $");
 #include <string.h>
 #include <time.h>
 #include <tzfile.h>
-#include "../locale/timelocal.h"
+#include "../locale/setlocale.h"
 
 #ifdef __TM_GMTOFF
 # define TM_GMTOFF __TM_GMTOFF
@@ -323,7 +323,8 @@ __strptime(const char *buf, const char *fmt, struct tm *tm,
 	int ymd = 0;
 
 	bp = (const unsigned char *)buf;
-	struct lc_time_T *_CurrentTimeLocale = __get_current_time_locale ();
+	const struct lc_time_T *_CurrentTimeLocale =
+						__get_current_time_locale ();
 
 	while (bp != NULL && (c = *fmt++) != '\0') {
 		/* Clear `alternate' modifier prior to new conversion. */

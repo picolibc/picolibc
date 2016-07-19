@@ -41,7 +41,7 @@ static char	numempty[] = { CHAR_MAX, '\0'};
 static wchar_t	wempty[] = L"";
 #endif
 
-static const struct lc_monetary_T _C_monetary_locale = {
+const struct lc_monetary_T _C_monetary_locale = {
 	empty,		/* int_curr_symbol */
 	empty,		/* currency_symbol */
 	empty,		/* mon_decimal_point */
@@ -115,7 +115,7 @@ __monetary_load_locale (struct _thr_locale_t *locale, const char *name ,
 	    return -1;
 	  memcpy (mop, &mo, sizeof *mop);
 	}
-      locale->monetary = ret == 0 ? NULL : mop;
+      locale->monetary = ret == 0 ? &_C_monetary_locale : mop;
       if (locale->monetary_buf)
 	free (locale->monetary_buf);
       locale->monetary_buf = bufp;
@@ -144,11 +144,4 @@ __monetary_load_locale (struct _thr_locale_t *locale, const char *name ,
   }
 #endif
   return ret;
-}
-
-struct lc_monetary_T *
-__get_current_monetary_locale (void)
-{
-  struct _thr_locale_t *cur_locale = __get_current_locale ();
-  return cur_locale->monetary ?: (struct lc_monetary_T *) &_C_monetary_locale;
 }

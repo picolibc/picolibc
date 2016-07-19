@@ -132,7 +132,7 @@ SEEALSO
 #include "fvwrite.h"
 #include "vfieeefp.h"
 #ifdef __HAVE_LOCALE_INFO_EXTENDED__
-#include "../locale/lnumeric.h"
+#include "../locale/setlocale.h"
 #endif
 
 /* Currently a test is made to see if long double processing is warranted.
