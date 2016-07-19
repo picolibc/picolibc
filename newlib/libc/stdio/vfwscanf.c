@@ -163,7 +163,7 @@ C99, POSIX-1.2008
 #include <float.h>
 #include <locale.h>
 #ifdef __HAVE_LOCALE_INFO_EXTENDED__
-#include "../locale/lnumeric.h"
+#include "../locale/setlocale.h"
 #endif
 
 /* Currently a test is made to see if long double processing is warranted.

@@ -48,11 +48,11 @@
 static struct _nl_item_t
 {
   union {
-    struct lc_ctype_T *    (*ctype)(void);
-    struct lc_time_T *     (*time)(void);
-    struct lc_numeric_T *  (*numeric)(void);
-    struct lc_monetary_T * (*monetary)(void);
-    struct lc_messages_T * (*messages)(void);
+    const struct lc_ctype_T *    (*ctype)(void);
+    const struct lc_time_T *     (*time)(void);
+    const struct lc_numeric_T *  (*numeric)(void);
+    const struct lc_monetary_T * (*monetary)(void);
+    const struct lc_messages_T * (*messages)(void);
     void *		   (*base)(void);
   };
   _off_t offset;
@@ -206,8 +206,7 @@ _DEFUN(nl_langinfo, (item),
 #ifdef __CYGWIN__
 	case _NL_COLLATE_CODESET:
 		{
-		  extern const char *__get_current_collate_codeset (void);
-		  ret = (char *) __get_current_collate_codeset ();
+		  ret = (char *) __get_current_collate_locale ()->codeset;
 		  goto do_codeset;
 		}
 #endif /* __CYGWIN__ */

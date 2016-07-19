@@ -37,7 +37,7 @@
 #include <strings.h>
 #include <ctype.h>
 #include <stdlib.h>
-#include "../locale/timelocal.h"
+#include "../locale/setlocale.h"
 
 #define _ctloc(x) (_CurrentTimeLocale->x)
 
@@ -160,7 +160,7 @@ _DEFUN (strptime, (buf, format, timeptr),
     char c;
     int ymd = 0;
 
-    struct lc_time_T *_CurrentTimeLocale = __get_current_time_locale ();
+    const struct lc_time_T *_CurrentTimeLocale = __get_current_time_locale ();
     for (; (c = *format) != '\0'; ++format) {
 	char *s;
 	int ret;

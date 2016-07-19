@@ -39,7 +39,7 @@
 static char empty[] = "";
 #endif
 
-static const struct lc_messages_T _C_messages_locale = {
+const struct lc_messages_T _C_messages_locale = {
 	"^[yY]" ,	/* yesexpr */
 	"^[nN]" ,	/* noexpr */
 	"yes" , 	/* yesstr */
@@ -87,7 +87,7 @@ __messages_load_locale (struct _thr_locale_t *locale, const char *name,
 	    return -1;
 	  memcpy (mep, &me, sizeof *mep);
 	}
-      locale->messages = ret == 0 ? NULL : mep;
+      locale->messages = ret == 0 ? &_C_messages_locale : mep;
       if (locale->messages_buf)
 	free (locale->messages_buf);
       locale->messages_buf = bufp;
@@ -108,13 +108,6 @@ __messages_load_locale (struct _thr_locale_t *locale, const char *name,
 			   (const char **)&_messages_locale);
 #endif
   return ret;
-}
-
-struct lc_messages_T *
-__get_current_messages_locale (void)
-{
-  struct _thr_locale_t *cur_locale = __get_current_locale ();
-  return cur_locale->messages ?: (struct lc_messages_T *) &_C_messages_locale;
 }
 
 #ifdef LOCALE_DEBUG

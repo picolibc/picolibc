@@ -33,7 +33,7 @@ extern const char *__fix_locale_grouping_str(const char *);
 
 static char	numempty[] = { CHAR_MAX, '\0' };
 
-static const struct lc_numeric_T _C_numeric_locale = {
+const struct lc_numeric_T _C_numeric_locale = {
 	".",     			/* decimal_point */
 	"",     			/* thousands_sep */
 	numempty			/* grouping */
@@ -77,7 +77,7 @@ __numeric_load_locale (struct _thr_locale_t *locale, const char *name ,
 	    return -1;
 	  memcpy (nmp, &nm, sizeof *nmp);
 	}
-      locale->numeric = ret == 0 ? NULL : nmp;
+      locale->numeric = ret == 0 ? &_C_numeric_locale : nmp;
       if (locale->numeric_buf)
 	free (locale->numeric_buf);
       locale->numeric_buf = bufp;
@@ -93,11 +93,4 @@ __numeric_load_locale (struct _thr_locale_t *locale, const char *name ,
 	      __fix_locale_grouping_str(_numeric_locale.grouping);
 #endif
   return ret;
-}
-
-struct lc_numeric_T *
-__get_current_numeric_locale (void)
-{
-  struct _thr_locale_t *cur_locale = __get_current_locale ();
-  return cur_locale->numeric ?: (struct lc_numeric_T *) &_C_numeric_locale;
 }

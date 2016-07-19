@@ -236,24 +236,25 @@ struct _thr_locale_t __global_locale =
   __ascii_wctomb,
   __ascii_mbtowc,
 #endif
-  NULL,
   0,
+  NULL,
 #ifndef __HAVE_LOCALE_INFO__
   "\1",
   "ASCII",
   "ASCII",
 #else
+  &_C_ctype_locale,
   NULL,
+  &_C_monetary_locale,
   NULL,
+  &_C_numeric_locale,
   NULL,
+  &_C_time_locale,
   NULL,
-  NULL,
-  NULL,
-  NULL,
-  NULL,
-  NULL,
+  &_C_messages_locale,
   NULL,
 #ifdef __CYGWIN__
+  &_C_collate_locale,
   NULL,
 #endif
 #endif
@@ -442,12 +443,6 @@ currentlocale()
 #endif /* _MB_CAPABLE */
 
 #ifdef _MB_CAPABLE
-#ifdef __CYGWIN__
-extern void __set_charset_from_locale (const char *locale, char *charset);
-extern char *__set_locale_from_locale_alias (const char *, char *);
-extern int __collate_load_locale (struct _thr_locale_t *, const char *, void *,
-				  const char *);
-#endif /* __CYGWIN__ */
 
 extern void __set_ctype (struct _reent *, const char *charset);
 
@@ -952,7 +947,7 @@ char *
 _DEFUN_VOID(__locale_charset)
 {
 #ifdef __HAVE_LOCALE_INFO__
-  return (char *) __get_current_ctype_locale ()->codeset;
+  return __get_current_ctype_locale ()->codeset;
 #else
   return __global_locale.ctype_codeset;
 #endif
@@ -1005,8 +1000,8 @@ _DEFUN(_localeconv_r, (data),
       struct _reent *data)
 {
 #ifdef __HAVE_LOCALE_INFO__
-  struct lc_numeric_T *n = __get_current_numeric_locale ();
-  struct lc_monetary_T *m = __get_current_monetary_locale ();
+  const struct lc_numeric_T *n = __get_current_numeric_locale ();
+  const struct lc_monetary_T *m = __get_current_monetary_locale ();
 
   lconv.decimal_point = (char *) n->decimal_point;
   lconv.thousands_sep = (char *) n->thousands_sep;

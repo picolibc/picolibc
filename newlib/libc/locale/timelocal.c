@@ -34,7 +34,7 @@
 
 #define LCTIME_SIZE (sizeof(struct lc_time_T) / sizeof(char *))
 
-static const struct lc_time_T	_C_time_locale = {
+const struct lc_time_T	_C_time_locale = {
 	{
 		"Jan", "Feb", "Mar", "Apr", "May", "Jun",
 		"Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
@@ -177,7 +177,7 @@ __time_load_locale (struct _thr_locale_t *locale, const char *name,
 	    return -1;
 	  memcpy (tip, &ti, sizeof *tip);
 	}
-      locale->time = ret == 0 ? NULL : tip;
+      locale->time = ret == 0 ? &_C_time_locale : tip;
       if (locale->time_buf)
 	free (locale->time_buf);
       locale->time_buf = bufp;
@@ -190,11 +190,4 @@ __time_load_locale (struct _thr_locale_t *locale, const char *name,
 		  (const char **)&_time_locale);
 #endif
   return (ret);
-}
-
-struct lc_time_T *
-__get_current_time_locale (void)
-{
-  struct _thr_locale_t *cur_locale = __get_current_locale ();
-  return cur_locale->time ?: (struct lc_time_T *) &_C_time_locale;
 }

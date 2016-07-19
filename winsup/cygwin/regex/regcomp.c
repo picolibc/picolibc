@@ -41,6 +41,7 @@ __FBSDID("$FreeBSD: src/lib/libc/regex/regcomp.c,v 1.36 2007/06/11 03:05:54 delp
 
 #ifdef __CYGWIN__
 #include "winsup.h"
+#include "../locale/setlocale.h"
 #endif
 #include <sys/types.h>
 #include <stdio.h>
@@ -61,11 +62,6 @@ __FBSDID("$FreeBSD: src/lib/libc/regex/regcomp.c,v 1.36 2007/06/11 03:05:54 delp
 #include "regex2.h"
 
 #include "cname.h"
-
-#ifdef __CYGWIN__
-/* Defined in nlsfuncs.cc. */
-extern LCID __get_current_collate_lcid ();
-#endif
 
 /*
  * parse structure, passed up and down to avoid global variables and
@@ -831,7 +827,7 @@ p_b_term(struct parse *p, cset *cs)
 			CHadd(p, cs, start);
 		else {
 #ifdef __CYGWIN__
-			if (!__get_current_collate_lcid ()) {
+			if (!__get_current_collate_locale ()->lcid) {
 #else
 			if (__collate_load_error) {
 #endif

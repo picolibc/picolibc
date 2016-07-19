@@ -1075,56 +1075,48 @@ __set_lc_messages_from_win (const char *name,
   return 1;
 }
 
-struct lc_collate_T
-{
-  LCID lcid;
-  mbtowc_p mbtowc;
-  char codeset[ENCODING_LEN + 1];
-};
-
 /* Called from newlib's setlocale() if category is LC_COLLATE.  Stores
    LC_COLLATE locale information.  This is subsequently accessed by the
    below functions strcoll, strxfrm, wcscoll, wcsxfrm. */
 extern "C" int
 __collate_load_locale (struct _thr_locale_t *locale, const char *name,
-		       mbtowc_p f_mbtowc, const char *charset)
+		       void *f_mbtowc, const char *charset)
 {
+  const struct lc_collate_T *ccop;
+  char *buf = NULL;
+
   LCID lcid = __get_lcid_from_locale (name);
   if (lcid == (LCID) -1)
     return -1;
-  struct lc_collate_T *cop;
-  if (lcid)
+  if (!lcid)
     {
-      cop = (struct lc_collate_T *) calloc (1, sizeof *cop);
-      if (!cop)
-	return -1;
-      cop->lcid = lcid;
-      cop->mbtowc = f_mbtowc;
-      stpcpy (cop->codeset, charset);
+      ccop = &_C_collate_locale;
+      buf = NULL;
     }
+  else
+    {
+      buf = (char *) calloc (1, sizeof (struct lc_collate_T));
+      if (!buf)
+	return -1;
+      struct lc_collate_T *cop = (struct lc_collate_T *) buf;
+      cop->lcid = lcid;
+      cop->mbtowc = (mbtowc_p) f_mbtowc;
+      stpcpy (cop->codeset, charset);
+      ccop = (const struct lc_collate_T *) cop;
+    }
+  locale->collate = ccop;
+  if (locale->collate_buf)
+    free (locale->collate_buf);
+  locale->collate_buf = buf;
   return 0;
 }
 
-extern "C" LCID
-__get_current_collate_lcid ()
+const struct lc_collate_T _C_collate_locale =
 {
-  struct _thr_locale_t *cur_locale = __get_current_locale ();
-  return cur_locale->collate ? cur_locale->collate->lcid : 0;
-}
-
-extern "C" const char *
-__get_current_collate_codeset (void)
-{
-  struct _thr_locale_t *cur_locale = __get_current_locale ();
-  return cur_locale->collate ? cur_locale->collate->codeset : "ASCII";
-}
-
-static mbtowc_p
-__get_current_collate_mbtowc ()
-{
-  struct _thr_locale_t *cur_locale = __get_current_locale ();
-  return cur_locale->collate ? cur_locale->collate->mbtowc : __ascii_mbtowc;
-}
+  0,
+  __ascii_mbtowc,
+  "ASCII"
+};
 
 /* We use the Windows functions for locale-specific string comparison and
    transformation.  The advantage is that we don't need any files with
@@ -1133,7 +1125,7 @@ extern "C" int
 wcscoll (const wchar_t *__restrict ws1, const wchar_t *__restrict ws2)
 {
   int ret;
-  LCID collate_lcid = __get_current_collate_lcid ();
+  LCID collate_lcid = __get_current_collate_locale ()->lcid;
 
   if (!collate_lcid)
     return wcscmp (ws1, ws2);
@@ -1150,14 +1142,14 @@ strcoll (const char *__restrict s1, const char *__restrict s2)
   wchar_t *ws1, *ws2;
   tmp_pathbuf tp;
   int ret;
-  LCID collate_lcid = __get_current_collate_lcid ();
+  LCID collate_lcid = __get_current_collate_locale ()->lcid;
 
   if (!collate_lcid)
     return strcmp (s1, s2);
   /* The ANSI version of CompareString uses the default charset of the lcid,
      so we must use the Unicode version. */
-  mbtowc_p collate_mbtowc = __get_current_collate_mbtowc ();
-  const char *collate_charset = __get_current_collate_codeset ();
+  mbtowc_p collate_mbtowc = __get_current_collate_locale ()->mbtowc;
+  const char *collate_charset = __get_current_collate_locale ()->codeset;
   n1 = lc_mbstowcs (collate_mbtowc, collate_charset, NULL, s1, 0) + 1;
   ws1 = (n1 > NT_MAX_PATH ? (wchar_t *) malloc (n1 * sizeof (wchar_t))
 			  : tp.w_get ());
@@ -1191,7 +1183,7 @@ extern "C" size_t
 wcsxfrm (wchar_t *__restrict ws1, const wchar_t *__restrict ws2, size_t wsn)
 {
   size_t ret;
-  LCID collate_lcid = __get_current_collate_lcid ();
+  LCID collate_lcid = __get_current_collate_locale ()->lcid;
 
   if (!collate_lcid)
     return wcslcpy (ws1, ws2, wsn);
@@ -1227,14 +1219,14 @@ strxfrm (char *__restrict s1, const char *__restrict s2, size_t sn)
   size_t n2;
   wchar_t *ws2;
   tmp_pathbuf tp;
-  LCID collate_lcid = __get_current_collate_lcid ();
+  LCID collate_lcid = __get_current_collate_locale ()->lcid;
 
   if (!collate_lcid)
     return strlcpy (s1, s2, sn);
   /* The ANSI version of LCMapString uses the default charset of the lcid,
      so we must use the Unicode version. */
-  mbtowc_p collate_mbtowc = __get_current_collate_mbtowc ();
-  const char *collate_charset = __get_current_collate_codeset ();
+  mbtowc_p collate_mbtowc = __get_current_collate_locale ()->mbtowc;
+  const char *collate_charset = __get_current_collate_locale ()->codeset;
   n2 = lc_mbstowcs (collate_mbtowc, collate_charset, NULL, s2, 0) + 1;
   ws2 = (n2 > NT_MAX_PATH ? (wchar_t *) malloc (n2 * sizeof (wchar_t))
 			  : tp.w_get ());
