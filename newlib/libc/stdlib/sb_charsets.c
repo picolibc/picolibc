@@ -2,8 +2,6 @@
 #include <wchar.h>
 
 #ifdef _MB_CAPABLE
-extern char *__locale_charset ();
-
 #ifdef _MB_EXTENDED_CHARSETS_ISO
 /* Tables for the ISO-8859-x to UTF conversion.  The first index into the
    table is a value computed from the value x (function __iso_8859_index),
@@ -674,26 +672,31 @@ __micro_atoi (const char *s)
 
 #ifdef _MB_EXTENDED_CHARSETS_ISO
 int
-__iso_8859_index (const char *charset_ext)
+__iso_8859_val_index (int val)
 {
-  int iso_idx = __micro_atoi (charset_ext);
-  if (iso_idx >= 2 && iso_idx <= 16)
+  if (val >= 2 && val <= 16)
     {
-      iso_idx -= 2;
-      if (iso_idx > 10)
-	--iso_idx;
-      return iso_idx;
+      val -= 2;
+      if (val > 10)
+	--val;
+      return (int) val;
     }
   return -1;
+}
+
+int
+__iso_8859_index (const char *charset_ext)
+{
+  return __iso_8859_val_index (__micro_atoi (charset_ext));
 }
 #endif /* _MB_EXTENDED_CHARSETS_ISO */
 
 #ifdef _MB_EXTENDED_CHARSETS_WINDOWS
 int
-__cp_index (const char *charset_ext)
+__cp_val_index (int val)
 {
-  int cp_idx = __micro_atoi (charset_ext);
-  switch (cp_idx)
+  int cp_idx;
+  switch (val)
     {
     case 437:
       cp_idx = 0;
@@ -779,5 +782,12 @@ __cp_index (const char *charset_ext)
     }
   return cp_idx;
 }
+
+int
+__cp_index (const char *charset_ext)
+{
+  int cp_idx = __cp_val_index (__micro_atoi (charset_ext));
+}
+
 #endif /* _MB_EXTENDED_CHARSETS_WINDOWS */
 #endif /* _MB_CAPABLE */

@@ -225,10 +225,9 @@ dev_console::get_console_cp ()
 }
 
 inline DWORD
-dev_console::str_to_con (mbtowc_p f_mbtowc, const char *charset,
-			 PWCHAR d, const char *s, DWORD sz)
+dev_console::str_to_con (mbtowc_p f_mbtowc, PWCHAR d, const char *s, DWORD sz)
 {
-  return sys_cp_mbstowcs (f_mbtowc, charset, d, CONVERT_LIMIT, s, sz);
+  return sys_cp_mbstowcs (f_mbtowc, d, CONVERT_LIMIT, s, sz);
 }
 
 bool
@@ -2002,21 +2001,10 @@ fhandler_console::write_normal (const unsigned char *src,
   const unsigned char *found = src;
   size_t ret;
   mbstate_t ps;
-  UINT cp = con.get_console_cp ();
-  const char *charset;
   mbtowc_p f_mbtowc;
 
-  if (cp)
-    {
-      /* The alternate charset is always 437, just as in the Linux console. */
-      f_mbtowc = __cp_mbtowc;
-      charset = "CP437";
-    }
-  else
-    {
-      f_mbtowc = cygheap->locale.mbtowc;
-      charset = cygheap->locale.charset;
-    }
+  /* The alternate charset is always 437, just as in the Linux console. */
+  f_mbtowc = con.get_console_cp () ? __cp_mbtowc (437) : __MBTOWC;
 
   /* First check if we have cached lead bytes of a former try to write
      a truncated multibyte sequence.  If so, process it. */
@@ -2027,7 +2015,7 @@ fhandler_console::write_normal (const unsigned char *src,
       memcpy (trunc_buf.buf + trunc_buf.len, src, cp_len);
       memset (&ps, 0, sizeof ps);
       switch (ret = f_mbtowc (_REENT, NULL, (const char *) trunc_buf.buf,
-			       trunc_buf.len + cp_len, charset, &ps))
+			       trunc_buf.len + cp_len, &ps))
 	{
 	case -2:
 	  /* Still truncated multibyte sequence?  Keep in trunc_buf. */
@@ -2052,9 +2040,9 @@ fhandler_console::write_normal (const unsigned char *src,
       /* Valid multibyte sequence?  Process. */
       if (nfound)
 	{
-	  buf_len = con.str_to_con (f_mbtowc, charset, write_buf,
-					   (const char *) trunc_buf.buf,
-					   nfound - trunc_buf.buf);
+	  buf_len = con.str_to_con (f_mbtowc, write_buf,
+				    (const char *) trunc_buf.buf,
+				    nfound - trunc_buf.buf);
 	  if (!write_console (write_buf, buf_len, done))
 	    {
 	      debug_printf ("multibyte sequence write failed, handle %p", get_output_handle ());
@@ -2075,7 +2063,7 @@ fhandler_console::write_normal (const unsigned char *src,
 	 && base_chars[*found] == NOR)
     {
       switch (ret = f_mbtowc (_REENT, NULL, (const char *) found,
-			       end - found, charset, &ps))
+			       end - found, &ps))
 	{
 	case -2: /* Truncated multibyte sequence.  Store for next write. */
 	  trunc_buf.len = end - found;
@@ -2098,8 +2086,7 @@ do_print:
   if (found != src)
     {
       DWORD len = found - src;
-      buf_len = con.str_to_con (f_mbtowc, charset, write_buf,
-				       (const char *) src, len);
+      buf_len = con.str_to_con (f_mbtowc, write_buf, (const char *) src, len);
       if (!buf_len)
 	{
 	  debug_printf ("conversion error, handle %p",
@@ -2178,7 +2165,7 @@ do_print:
 	      if (found + 1 < end)
 		{
 		  ret = __utf8_mbtowc (_REENT, NULL, (const char *) found + 1,
-				       end - found - 1, NULL, &ps);
+				       end - found - 1, &ps);
 		  if (ret != (size_t) -1)
 		    while (ret-- > 0)
 		      {

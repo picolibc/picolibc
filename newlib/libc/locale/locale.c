@@ -459,12 +459,11 @@ loadlocale(struct _reent *p, int category)
      dependent on the cateogry. */
   char *locale = NULL;
   char charset[ENCODING_LEN + 1];
-  unsigned long val;
+  long val = 0;
   char *end, *c = NULL;
   int mbc_max;
-  int (*l_wctomb) (struct _reent *, char *, wchar_t, const char *, mbstate_t *);
-  int (*l_mbtowc) (struct _reent *, wchar_t *, const char *, size_t,
-		   const char *, mbstate_t *);
+  wctomb_p l_wctomb;
+  mbtowc_p l_mbtowc;
   int cjknarrow = 0;
 
   /* Avoid doing everything twice if nothing has changed. */
@@ -674,8 +673,8 @@ restart:
       *c = '\0';
       mbc_max = 1;
 #ifdef _MB_EXTENDED_CHARSETS_ISO
-      l_wctomb = __iso_wctomb;
-      l_mbtowc = __iso_mbtowc;
+      l_wctomb = __iso_wctomb (val);
+      l_mbtowc = __iso_mbtowc (val);
 #else /* !_MB_EXTENDED_CHARSETS_ISO */
       l_wctomb = __ascii_wctomb;
       l_mbtowc = __ascii_mbtowc;
@@ -715,8 +714,8 @@ restart:
 	case 1258:
 	  mbc_max = 1;
 #ifdef _MB_EXTENDED_CHARSETS_WINDOWS
-	  l_wctomb = __cp_wctomb;
-	  l_mbtowc = __cp_mbtowc;
+	  l_wctomb = __cp_wctomb (val);
+	  l_mbtowc = __cp_mbtowc (val);
 #else /* !_MB_EXTENDED_CHARSETS_WINDOWS */
 	  l_wctomb = __ascii_wctomb;
 	  l_mbtowc = __ascii_mbtowc;
@@ -740,15 +739,21 @@ restart:
       if (*c == '-')
 	++c;
       if (*c == 'R' || *c == 'r')
-	strcpy (charset, "CP20866");
+	{
+	  val = 20866;
+	  strcpy (charset, "CP20866");
+	}
       else if (*c == 'U' || *c == 'u')
-	strcpy (charset, "CP21866");
+	{
+	  val = 21866;
+	  strcpy (charset, "CP21866");
+	}
       else
 	FAIL;
       mbc_max = 1;
 #ifdef _MB_EXTENDED_CHARSETS_WINDOWS
-      l_wctomb = __cp_wctomb;
-      l_mbtowc = __cp_mbtowc;
+      l_wctomb = __cp_wctomb (val);
+      l_mbtowc = __cp_mbtowc (val);
 #else /* !_MB_EXTENDED_CHARSETS_WINDOWS */
       l_wctomb = __ascii_wctomb;
       l_mbtowc = __ascii_mbtowc;
@@ -786,11 +791,12 @@ restart:
 	    ++c;
 	  if (strcasecmp (c, "PS"))
 	    FAIL;
+	  val = 101;
 	  strcpy (charset, "CP101");
 	  mbc_max = 1;
 #ifdef _MB_EXTENDED_CHARSETS_WINDOWS
-	  l_wctomb = __cp_wctomb;
-	  l_mbtowc = __cp_mbtowc;
+	  l_wctomb = __cp_wctomb (val);
+	  l_mbtowc = __cp_mbtowc (val);
 #else /* !_MB_EXTENDED_CHARSETS_WINDOWS */
 	  l_wctomb = __ascii_wctomb;
 	  l_mbtowc = __ascii_mbtowc;
@@ -804,11 +810,12 @@ restart:
       /* PT154 */
       if (strcasecmp (charset, "PT154"))
 	FAIL;
+      val = 102;
       strcpy (charset, "CP102");
       mbc_max = 1;
 #ifdef _MB_EXTENDED_CHARSETS_WINDOWS
-      l_wctomb = __cp_wctomb;
-      l_mbtowc = __cp_mbtowc;
+      l_wctomb = __cp_wctomb (val);
+      l_mbtowc = __cp_mbtowc (val);
 #else /* !_MB_EXTENDED_CHARSETS_WINDOWS */
       l_wctomb = __ascii_wctomb;
       l_mbtowc = __ascii_mbtowc;
@@ -826,8 +833,8 @@ restart:
       strcpy (charset, "CP874");
       mbc_max = 1;
 #ifdef _MB_EXTENDED_CHARSETS_WINDOWS
-      l_wctomb = __cp_wctomb;
-      l_mbtowc = __cp_mbtowc;
+      l_wctomb = __cp_wctomb (val);
+      l_mbtowc = __cp_mbtowc (val);
 #else /* !_MB_EXTENDED_CHARSETS_WINDOWS */
       l_wctomb = __ascii_wctomb;
       l_mbtowc = __ascii_mbtowc;
@@ -859,8 +866,8 @@ restart:
 #ifdef __CYGWIN__
       __mb_cur_max = mbc_max;	/* Only for backward compat */
 #endif
-      __wctomb = l_wctomb;
-      __mbtowc = l_mbtowc;
+      __global_locale.wctomb = l_wctomb;
+      __global_locale.mbtowc = l_mbtowc;
       __set_ctype (NULL, charset);
       /* Determine the width for the "CJK Ambiguous Width" category of
          characters. This is used in wcwidth(). Assume single width for
@@ -943,16 +950,6 @@ __get_locale_env(struct _reent *p, int category)
 }
 #endif /* _MB_CAPABLE */
 
-char *
-_DEFUN_VOID(__locale_charset)
-{
-#ifdef __HAVE_LOCALE_INFO__
-  return __get_current_ctype_locale ()->codeset;
-#else
-  return __global_locale.ctype_codeset;
-#endif
-}
-
 int
 _DEFUN_VOID(__locale_mb_cur_max)
 {
@@ -963,36 +960,16 @@ _DEFUN_VOID(__locale_mb_cur_max)
 #endif
 }
 
-char *
-_DEFUN_VOID(__locale_msgcharset)
-{
-#ifdef __HAVE_LOCALE_INFO__
-  return (char *) __get_current_messages_locale ()->codeset;
-#else
-  return (char *) __global_locale.message_codeset;
-#endif
-}
-
-int
-_DEFUN_VOID(__locale_cjk_lang)
-{
-#ifdef __HAVE_LOCALE_INFO__
-  return __get_current_locale ()->cjk_lang;
-#else
-  return __global_locale.cjk_lang;
-#endif
-}
-
 #ifdef __HAVE_LOCALE_INFO__
 char *
 _DEFUN_VOID(__locale_ctype_ptr)
 {
   /* Only check if the current thread/reent has a locale.  ctype_ptr is unused
      in __global_locale, rather the global variable __ctype_ptr__ is used. */
+  extern char *__ctype_ptr__;
   return __get_locale_r (_REENT) ? __get_locale_r (_REENT)->ctype_ptr
 				 : __ctype_ptr__;
 }
-
 #endif
 
 struct lconv *

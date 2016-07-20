@@ -21,6 +21,5 @@ wctob (wint_t wc)
   reent = _REENT;
   _REENT_CHECK_MISC(reent);
 
-  return __wctomb (reent, (char *) pmb, wc, __locale_charset (), &mbs) == 1
-	  ? (int) pmb[0] : EOF;
+  return __WCTOMB (reent, (char *) pmb, wc, &mbs) == 1 ? (int) pmb[0] : EOF;
 }

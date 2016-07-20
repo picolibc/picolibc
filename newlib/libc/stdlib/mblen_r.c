@@ -57,7 +57,7 @@ _DEFUN (_mblen_r, (r, s, n, state),
 {
 #ifdef _MB_CAPABLE
   int retval;
-  retval = __mbtowc (r, NULL, s, n, __locale_charset (), state);
+  retval = __MBTOWC (r, NULL, s, n, state);
 
   if (retval < 0)
     {

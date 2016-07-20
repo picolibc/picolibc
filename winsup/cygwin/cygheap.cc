@@ -28,7 +28,7 @@
 
 static mini_cygheap NO_COPY cygheap_dummy =
 {
-  {__utf8_mbtowc, __utf8_wctomb}
+  {__utf8_mbtowc}
 };
 
 init_cygheap NO_COPY *cygheap = (init_cygheap *) &cygheap_dummy;
@@ -245,8 +245,6 @@ cygheap_init ()
 	cygheap->bucket_val[b] = sz[b & 1];
       /* Default locale settings. */
       cygheap->locale.mbtowc = __utf8_mbtowc;
-      cygheap->locale.wctomb = __utf8_wctomb;
-      strcpy (cygheap->locale.charset, "UTF-8");
       /* Set umask to a sane default. */
       cygheap->umask = 022;
       cygheap->rlim_core = RLIM_INFINITY;

@@ -172,8 +172,6 @@ static struct _nl_item_t
 
 #define _REL(BASE) ((int)item-BASE)
 
-extern char *__locale_charset ();
-
 char *
 _DEFUN(nl_langinfo, (item), 
        nl_item item) {

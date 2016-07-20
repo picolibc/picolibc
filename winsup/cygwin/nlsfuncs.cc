@@ -16,8 +16,6 @@ details. */
 #include "dtable.h"
 #include "cygheap.h"
 #include "tls_pbuf.h"
-/* Internal headers from newlib */
-#include "../locale/setlocale.h"
 #include "lc_msg.h"
 #include "lc_era.h"
 
@@ -31,8 +29,7 @@ details. */
 	    __eval_datetimefmt(lcid,(type),(flags),&lc_time_ptr,\
 			       lc_time_end-lc_time_ptr)
 #define charfromwchar(category,in) \
-	    __charfromwchar (_##category##_locale->in,_LC(category),\
-			     f_wctomb,charset)
+	    __charfromwchar (_##category##_locale->in,_LC(category),f_wctomb)
 
 #define has_modifier(x)	((x)[0] && !strcmp (modifier, (x)))
 
@@ -159,8 +156,7 @@ __get_lcid_from_locale (const char *name)
    is set, s==NULL returns -1 since then it's used to recognize invalid strings
    in the used charset. */
 static size_t
-lc_wcstombs (wctomb_p f_wctomb, const char *charset,
-	     char *s, const wchar_t *pwcs, size_t n,
+lc_wcstombs (wctomb_p f_wctomb, char *s, const wchar_t *pwcs, size_t n,
 	     bool return_invalid = false)
 {
   char *ptr = s;
@@ -175,7 +171,7 @@ lc_wcstombs (wctomb_p f_wctomb, const char *charset,
       size_t num_bytes = 0;
       while (*pwcs != 0)
 	{
-	  bytes = f_wctomb (_REENT, buf, *pwcs++, charset, &state);
+	  bytes = f_wctomb (_REENT, buf, *pwcs++, &state);
 	  if (bytes != (size_t) -1)
 	    num_bytes += bytes;
 	  else if (return_invalid)
@@ -185,7 +181,7 @@ lc_wcstombs (wctomb_p f_wctomb, const char *charset,
     }
   while (n > 0)
     {
-      bytes = f_wctomb (_REENT, buf, *pwcs, charset, &state);
+      bytes = f_wctomb (_REENT, buf, *pwcs, &state);
       if (bytes == (size_t) -1)
 	{
 	  memset (&state, 0, sizeof state);
@@ -207,8 +203,7 @@ lc_wcstombs (wctomb_p f_wctomb, const char *charset,
 /* Never returns -1.  Invalid sequences are translated to replacement
    wide-chars. */
 static size_t
-lc_mbstowcs (mbtowc_p f_mbtowc, const char *charset,
-	     wchar_t *pwcs, const char *s, size_t n)
+lc_mbstowcs (mbtowc_p f_mbtowc, wchar_t *pwcs, const char *s, size_t n)
 {
   size_t ret = 0;
   char *t = (char *) s;
@@ -220,8 +215,7 @@ lc_mbstowcs (mbtowc_p f_mbtowc, const char *charset,
     n = 1;
   while (n > 0)
     {
-      bytes = f_mbtowc (_REENT, pwcs, t, 6 /* fake, always enough */,
-			charset, &state);
+      bytes = f_mbtowc (_REENT, pwcs, t, 6 /* fake, always enough */, &state);
       if (bytes == (size_t) -1)
 	{
 	  state.__count = 0;
@@ -294,13 +288,12 @@ __setlocaleinfo (char **ptr, size_t size, wchar_t val)
 }
 
 static char *
-__charfromwchar (const wchar_t *in, char **ptr, size_t size,
-		 wctomb_p f_wctomb, const char *charset)
+__charfromwchar (const wchar_t *in, char **ptr, size_t size, wctomb_p f_wctomb)
 {
   size_t num;
   char *ret;
 
-  num = lc_wcstombs (f_wctomb, charset, ret = *ptr, in, size);
+  num = lc_wcstombs (f_wctomb, ret = *ptr, in, size);
   *ptr += num + 1;
   return ret;
 }
@@ -600,11 +593,11 @@ __set_lc_time_from_win (const char *name,
 	  /* Evaluate string length in target charset.  Characters invalid in the
 	     target charset are simply ignored, as on Linux. */
 	  len = 0;
-	  len += lc_wcstombs (f_wctomb, charset, NULL, era->era, 0) + 1;
-	  len += lc_wcstombs (f_wctomb, charset, NULL, era->era_d_fmt, 0) + 1;
-	  len += lc_wcstombs (f_wctomb, charset, NULL, era->era_d_t_fmt, 0) + 1;
-	  len += lc_wcstombs (f_wctomb, charset, NULL, era->era_t_fmt, 0) + 1;
-	  len += lc_wcstombs (f_wctomb, charset, NULL, era->alt_digits, 0) + 1;
+	  len += lc_wcstombs (f_wctomb, NULL, era->era, 0) + 1;
+	  len += lc_wcstombs (f_wctomb, NULL, era->era_d_fmt, 0) + 1;
+	  len += lc_wcstombs (f_wctomb, NULL, era->era_d_t_fmt, 0) + 1;
+	  len += lc_wcstombs (f_wctomb, NULL, era->era_t_fmt, 0) + 1;
+	  len += lc_wcstombs (f_wctomb, NULL, era->alt_digits, 0) + 1;
 	  len += (wcslen (era->era) + 1) * sizeof (wchar_t);
 	  len += (wcslen (era->era_d_fmt) + 1) * sizeof (wchar_t);
 	  len += (wcslen (era->era_d_t_fmt) + 1) * sizeof (wchar_t);
@@ -742,8 +735,7 @@ __set_lc_ctype_from_win (const char *name,
 	  lc_ctype_ptr = (char *) woutdig;
 	  _ctype_locale->outdigits[i] = lc_ctype_ptr;
 	  memset (&state, 0, sizeof state);
-	  lc_ctype_ptr += f_wctomb (_REENT, lc_ctype_ptr, digits[i], charset,
-				      &state);
+	  lc_ctype_ptr += f_wctomb (_REENT, lc_ctype_ptr, digits[i], &state);
 	  *lc_ctype_ptr++ = '\0';
 	}
     }
@@ -885,8 +877,7 @@ __set_lc_monetary_from_win (const char *name,
 							  LOCALE_SCURRENCY);
       /* As on Linux:  If the currency_symbol can't be represented in the
 	 given charset, use int_curr_symbol. */
-      if (lc_wcstombs (f_wctomb, charset, NULL,
-		       _monetary_locale->wcurrency_symbol,
+      if (lc_wcstombs (f_wctomb, NULL, _monetary_locale->wcurrency_symbol,
 		       0, true) == (size_t) -1)
 	_monetary_locale->currency_symbol = _monetary_locale->int_curr_symbol;
       else
@@ -1026,10 +1017,10 @@ __set_lc_messages_from_win (const char *name,
   len += (strlen (charset) + 1);
   if (lcid)
     {
-      len += lc_wcstombs (f_wctomb, charset, NULL, msg->yesexpr, 0) + 1;
-      len += lc_wcstombs (f_wctomb, charset, NULL, msg->noexpr, 0) + 1;
-      len += lc_wcstombs (f_wctomb, charset, NULL, msg->yesstr, 0) + 1;
-      len += lc_wcstombs (f_wctomb, charset, NULL, msg->nostr, 0) + 1;
+      len += lc_wcstombs (f_wctomb, NULL, msg->yesexpr, 0) + 1;
+      len += lc_wcstombs (f_wctomb, NULL, msg->noexpr, 0) + 1;
+      len += lc_wcstombs (f_wctomb, NULL, msg->yesstr, 0) + 1;
+      len += lc_wcstombs (f_wctomb, NULL, msg->nostr, 0) + 1;
       len += (wcslen (msg->yesexpr) + 1) * sizeof (wchar_t);
       len += (wcslen (msg->noexpr) + 1) * sizeof (wchar_t);
       len += (wcslen (msg->yesstr) + 1) * sizeof (wchar_t);
@@ -1051,13 +1042,13 @@ __set_lc_messages_from_win (const char *name,
   if (lcid)
     {
       _messages_locale->yesexpr = (const char *) c;
-      len = lc_wcstombs (f_wctomb, charset, c, msg->yesexpr, lc_messages_end - c);
+      len = lc_wcstombs (f_wctomb, c, msg->yesexpr, lc_messages_end - c);
       _messages_locale->noexpr = (const char *) (c += len + 1);
-      len = lc_wcstombs (f_wctomb, charset, c, msg->noexpr, lc_messages_end - c);
+      len = lc_wcstombs (f_wctomb, c, msg->noexpr, lc_messages_end - c);
       _messages_locale->yesstr = (const char *) (c += len + 1);
-      len = lc_wcstombs (f_wctomb, charset, c, msg->yesstr, lc_messages_end - c);
+      len = lc_wcstombs (f_wctomb, c, msg->yesstr, lc_messages_end - c);
       _messages_locale->nostr = (const char *) (c += len + 1);
-      len = lc_wcstombs (f_wctomb, charset, c, msg->nostr, lc_messages_end - c);
+      len = lc_wcstombs (f_wctomb, c, msg->nostr, lc_messages_end - c);
       c += len + 1;
       if ((uintptr_t) c % 1)
 	++c;
@@ -1149,15 +1140,14 @@ strcoll (const char *__restrict s1, const char *__restrict s2)
   /* The ANSI version of CompareString uses the default charset of the lcid,
      so we must use the Unicode version. */
   mbtowc_p collate_mbtowc = __get_current_collate_locale ()->mbtowc;
-  const char *collate_charset = __get_current_collate_locale ()->codeset;
-  n1 = lc_mbstowcs (collate_mbtowc, collate_charset, NULL, s1, 0) + 1;
+  n1 = lc_mbstowcs (collate_mbtowc, NULL, s1, 0) + 1;
   ws1 = (n1 > NT_MAX_PATH ? (wchar_t *) malloc (n1 * sizeof (wchar_t))
 			  : tp.w_get ());
-  lc_mbstowcs (collate_mbtowc, collate_charset, ws1, s1, n1);
-  n2 = lc_mbstowcs (collate_mbtowc, collate_charset, NULL, s2, 0) + 1;
+  lc_mbstowcs (collate_mbtowc, ws1, s1, n1);
+  n2 = lc_mbstowcs (collate_mbtowc, NULL, s2, 0) + 1;
   ws2 = (n2 > NT_MAX_PATH ? (wchar_t *) malloc (n2 * sizeof (wchar_t))
 			  : tp.w_get ());
-  lc_mbstowcs (collate_mbtowc, collate_charset, ws2, s2, n2);
+  lc_mbstowcs (collate_mbtowc, ws2, s2, n2);
   ret = CompareStringW (collate_lcid, 0, ws1, -1, ws2, -1);
   if (n1 > NT_MAX_PATH)
     free (ws1);
@@ -1226,13 +1216,12 @@ strxfrm (char *__restrict s1, const char *__restrict s2, size_t sn)
   /* The ANSI version of LCMapString uses the default charset of the lcid,
      so we must use the Unicode version. */
   mbtowc_p collate_mbtowc = __get_current_collate_locale ()->mbtowc;
-  const char *collate_charset = __get_current_collate_locale ()->codeset;
-  n2 = lc_mbstowcs (collate_mbtowc, collate_charset, NULL, s2, 0) + 1;
+  n2 = lc_mbstowcs (collate_mbtowc, NULL, s2, 0) + 1;
   ws2 = (n2 > NT_MAX_PATH ? (wchar_t *) malloc (n2 * sizeof (wchar_t))
 			  : tp.w_get ());
   if (ws2)
     {
-      lc_mbstowcs (collate_mbtowc, collate_charset, ws2, s2, n2);
+      lc_mbstowcs (collate_mbtowc, ws2, s2, n2);
       /* The sort key is a NUL-terminated byte string. */
       ret = LCMapStringW (collate_lcid, LCMAP_SORTKEY, ws2, -1,
 			  (PWCHAR) s1, sn);
@@ -1474,7 +1463,7 @@ __set_locale_from_locale_alias (const char *locale, char *new_locale)
       if (strlen (replace) > ENCODING_LEN)
 	continue;
       /* The file is latin1 encoded */
-      lc_mbstowcs (__iso_mbtowc, "ISO-8859-1", walias, alias, ENCODING_LEN + 1);
+      lc_mbstowcs (__iso_mbtowc (1), walias, alias, ENCODING_LEN + 1);
       walias[ENCODING_LEN] = L'\0';
       if (!wcscmp (wlocale, walias))
 	{
@@ -1503,33 +1492,25 @@ internal_setlocale ()
   wchar_t *w_path = NULL, *w_cwd;
 
   /* Don't do anything if the charset hasn't actually changed. */
-  if (strcmp (cygheap->locale.charset, __locale_charset ()) == 0)
+  if (cygheap->locale.mbtowc == __global_locale.mbtowc)
     return;
 
-  debug_printf ("Cygwin charset changed from %s to %s",
-		cygheap->locale.charset, __locale_charset ());
+  debug_printf ("Cygwin charset chang to %s", __locale_charset ());
   /* Fetch PATH and CWD and convert to wchar_t in previous charset. */
   path = getenv ("PATH");
   if (path && *path)	/* $PATH can be potentially unset. */
     {
       w_path = tp.w_get ();
-      sys_mbstowcs (w_path, 32768, path);
+      sys_cp_mbstowcs (cygheap->locale.mbtowc, w_path, 32768, path);
     }
   w_cwd = tp.w_get ();
   cwdstuff::cwd_lock.acquire ();
-  sys_mbstowcs (w_cwd, 32768, cygheap->cwd.get_posix ());
+  sys_cp_mbstowcs (cygheap->locale.mbtowc, w_cwd, 32768,
+		   cygheap->cwd.get_posix ());
   /* Set charset for internal conversion functions. */
-  if (*__locale_charset () == 'A'/*SCII*/)
-    {
-      cygheap->locale.mbtowc = __utf8_mbtowc;
-      cygheap->locale.wctomb = __utf8_wctomb;
-    }
-  else
-    {
-      cygheap->locale.mbtowc = __mbtowc;
-      cygheap->locale.wctomb = __wctomb;
-    }
-  strcpy (cygheap->locale.charset, __locale_charset ());
+  cygheap->locale.mbtowc = __global_locale.mbtowc;
+  if (cygheap->locale.mbtowc == __ascii_mbtowc)
+    cygheap->locale.mbtowc = __utf8_mbtowc;
   /* Restore CWD and PATH in new charset. */
   cygheap->cwd.reset_posix (w_cwd);
   cwdstuff::cwd_lock.release ();

@@ -910,8 +910,8 @@ _DEFUN(_VFPRINTF_R, (data, fp, fmt0, ap),
 	for (;;) {
 	        cp = fmt;
 #ifdef _MB_CAPABLE
-	        while ((n = __mbtowc (data, &wc, fmt, MB_CUR_MAX,
-				      __locale_charset (), &state)) != 0) {
+	        while ((n = __MBTOWC (data, &wc, fmt, MB_CUR_MAX,
+				      &state)) != 0) {
 		    if (n < 0) {
 			/* Wave invalid chars through. */
 			memset (&state, 0, sizeof state);
@@ -2079,8 +2079,7 @@ _DEFUN(get_arg, (data, n, fmt, ap, numargs_p, args, arg_type, last_fmt),
   while (*fmt && n >= numargs)
     {
 # ifdef _MB_CAPABLE
-      while ((nbytes = __mbtowc (data, &wc, fmt, MB_CUR_MAX,
-				 __locale_charset (), &wc_state)) > 0)
+      while ((nbytes = __MBTOWC (data, &wc, fmt, MB_CUR_MAX, &wc_state)) > 0)
 	{
 	  fmt += nbytes;
 	  if (wc == '%')

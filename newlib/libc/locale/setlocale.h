@@ -159,8 +159,7 @@ typedef __uint32_t LCID;
 struct lc_collate_T
 {
   LCID  lcid;
-  int (*mbtowc) (struct _reent *, wchar_t *, const char *, size_t, const char *,
-		 mbstate_t *);
+  int (*mbtowc) (struct _reent *, wchar_t *, const char *, size_t, mbstate_t *);
   char codeset[ENCODING_LEN + 1];
 };
 extern const struct lc_collate_T _C_collate_locale;
@@ -169,13 +168,12 @@ extern const struct lc_collate_T _C_collate_locale;
 struct _thr_locale_t
 {
   char				 categories[_LC_LAST][ENCODING_LEN + 1];
-  int				(*__wctomb) (struct _reent *, char *, wchar_t,
-					     const char *, mbstate_t *);
-  int				(*__mbtowc) (struct _reent *, wchar_t *,
-					     const char *, size_t, const char *,
-					     mbstate_t *);
-  char				*ctype_ptr; /* Unused in __global_locale */
+  int				(*wctomb) (struct _reent *, char *, wchar_t,
+					   mbstate_t *);
+  int				(*mbtowc) (struct _reent *, wchar_t *,
+					   const char *, size_t, mbstate_t *);
   int				 cjk_lang;
+  char				*ctype_ptr; /* Unused in __global_locale */
 #ifndef __HAVE_LOCALE_INFO__
   char				 mb_cur_max[2];
   char				 ctype_codeset[ENCODING_LEN + 1];
@@ -263,6 +261,36 @@ __get_current_collate_locale (void)
   return __get_current_locale ()->collate;
 }
 #endif
+
+_ELIDABLE_INLINE const char *
+__locale_charset (void)
+{
+#ifdef __HAVE_LOCALE_INFO__
+  return __get_current_ctype_locale ()->codeset;
+#else
+  return __global_locale.ctype_codeset;
+#endif
+}
+
+_ELIDABLE_INLINE const char *
+__locale_msgcharset (void)
+{
+#ifdef __HAVE_LOCALE_INFO__
+  return (char *) __get_current_messages_locale ()->codeset;
+#else
+  return (char *) __global_locale.message_codeset;
+#endif
+}
+
+_ELIDABLE_INLINE int
+__locale_cjk_lang (void)
+{
+#ifdef __HAVE_LOCALE_INFO__
+  return __get_current_locale ()->cjk_lang;
+#else
+  return __global_locale.cjk_lang;
+#endif
+}
 
 int __ctype_load_locale (struct _thr_locale_t *, const char *, void *,
 			 const char *, int);
