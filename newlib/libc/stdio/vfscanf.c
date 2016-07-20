@@ -508,8 +508,7 @@ _DEFUN(__SVFSCANF_R, (rptr, fp, fmt0, ap),
 #ifndef _MB_CAPABLE
       wc = *fmt;
 #else
-      nbytes = __mbtowc (rptr, &wc, (char *) fmt, MB_CUR_MAX,
-			 __locale_charset (), &state);
+      nbytes = __MBTOWC (rptr, &wc, (char *) fmt, MB_CUR_MAX, &state);
       if (nbytes < 0) {
 	wc = 0xFFFD; /* Unicode replacement character */
 	nbytes = 1;

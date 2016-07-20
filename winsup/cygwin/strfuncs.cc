@@ -140,15 +140,13 @@ __db_wctomb (struct _reent *r, char *s, wchar_t wchar, UINT cp)
 }
 
 extern "C" int
-__sjis_wctomb (struct _reent *r, char *s, wchar_t wchar, const char *charset,
-	       mbstate_t *state)
+__sjis_wctomb (struct _reent *r, char *s, wchar_t wchar, mbstate_t *state)
 {
   return __db_wctomb (r,s, wchar, 932);
 }
 
 extern "C" int
-__eucjp_wctomb (struct _reent *r, char *s, wchar_t wchar, const char *charset,
-	       mbstate_t *state)
+__eucjp_wctomb (struct _reent *r, char *s, wchar_t wchar, mbstate_t *state)
 {
   /* Unfortunately, the Windows eucJP codepage 20932 is not really 100%
      compatible to eucJP.  It's a cute approximation which makes it a
@@ -192,22 +190,19 @@ __eucjp_wctomb (struct _reent *r, char *s, wchar_t wchar, const char *charset,
 }
 
 extern "C" int
-__gbk_wctomb (struct _reent *r, char *s, wchar_t wchar, const char *charset,
-	       mbstate_t *state)
+__gbk_wctomb (struct _reent *r, char *s, wchar_t wchar, mbstate_t *state)
 {
   return __db_wctomb (r,s, wchar, 936);
 }
 
 extern "C" int
-__kr_wctomb (struct _reent *r, char *s, wchar_t wchar, const char *charset,
-	       mbstate_t *state)
+__kr_wctomb (struct _reent *r, char *s, wchar_t wchar, mbstate_t *state)
 {
   return __db_wctomb (r,s, wchar, 949);
 }
 
 extern "C" int
-__big5_wctomb (struct _reent *r, char *s, wchar_t wchar, const char *charset,
-	       mbstate_t *state)
+__big5_wctomb (struct _reent *r, char *s, wchar_t wchar, mbstate_t *state)
 {
   return __db_wctomb (r,s, wchar, 950);
 }
@@ -268,14 +263,14 @@ __db_mbtowc (struct _reent *r, wchar_t *pwc, const char *s, size_t n, UINT cp,
 
 extern "C" int
 __sjis_mbtowc (struct _reent *r, wchar_t *pwc, const char *s, size_t n,
-	       const char *charset, mbstate_t *state)
+	       mbstate_t *state)
 {
   return __db_mbtowc (r, pwc, s, n, 932, state);
 }
 
 extern "C" int
 __eucjp_mbtowc (struct _reent *r, wchar_t *pwc, const char *s, size_t n,
-		const char *charset, mbstate_t *state)
+		mbstate_t *state)
 {
   /* See comment in __eucjp_wctomb above. */
   wchar_t dummy;
@@ -352,21 +347,21 @@ jis_x_0212:
 
 extern "C" int
 __gbk_mbtowc (struct _reent *r, wchar_t *pwc, const char *s, size_t n,
-	       const char *charset, mbstate_t *state)
+	      mbstate_t *state)
 {
   return __db_mbtowc (r, pwc, s, n, 936, state);
 }
 
 extern "C" int
 __kr_mbtowc (struct _reent *r, wchar_t *pwc, const char *s, size_t n,
-	       const char *charset, mbstate_t *state)
+	     mbstate_t *state)
 {
   return __db_mbtowc (r, pwc, s, n, 949, state);
 }
 
 extern "C" int
 __big5_mbtowc (struct _reent *r, wchar_t *pwc, const char *s, size_t n,
-	       const char *charset, mbstate_t *state)
+	       mbstate_t *state)
 {
   return __db_mbtowc (r, pwc, s, n, 950, state);
 }
@@ -408,7 +403,7 @@ __big5_mbtowc (struct _reent *r, wchar_t *pwc, const char *s, size_t n,
 */
 static size_t __reg3
 sys_wcstombs (char *dst, size_t len, const wchar_t *src, size_t nwc,
-		bool is_path)
+	      bool is_path)
 {
   char buf[10];
   char *ptr = dst;
@@ -416,9 +411,10 @@ sys_wcstombs (char *dst, size_t len, const wchar_t *src, size_t nwc,
   size_t n = 0;
   mbstate_t ps;
   save_errno save;
-  wctomb_p f_wctomb = cygheap->locale.wctomb;
-  const char *charset = cygheap->locale.charset;
+  wctomb_p f_wctomb = __WCTOMB;
 
+  if (f_wctomb == __ascii_wctomb)
+    f_wctomb = __utf8_wctomb;
   memset (&ps, 0, sizeof ps);
   if (dst == NULL)
     len = (size_t) -1;
@@ -441,13 +437,13 @@ sys_wcstombs (char *dst, size_t len, const wchar_t *src, size_t nwc,
 	}
       else
 	{
-	  bytes = f_wctomb (_REENT, buf, pw, charset, &ps);
-	  if (bytes == -1 && *charset != 'U'/*TF-8*/)
+	  bytes = f_wctomb (_REENT, buf, pw, &ps);
+	  if (bytes == -1 && f_wctomb != __utf8_wctomb)
 	    {
 	      /* Convert chars invalid in the current codepage to a sequence
 		 ASCII CAN; UTF-8 representation of invalid char. */
 	      buf[0] = 0x18; /* ASCII CAN */
-	      bytes = __utf8_wctomb (_REENT, buf + 1, pw, charset, &ps);
+	      bytes = __utf8_wctomb (_REENT, buf + 1, pw, &ps);
 	      if (bytes == -1)
 		{
 		  ++pwcs;
@@ -465,8 +461,7 @@ sys_wcstombs (char *dst, size_t len, const wchar_t *src, size_t nwc,
 		      ps.__count = 0;
 		      continue;
 		    }
-		  bytes += __utf8_wctomb (_REENT, buf + bytes, *pwcs, charset,
-					  &ps);
+		  bytes += __utf8_wctomb (_REENT, buf + bytes, *pwcs, &ps);
 		  nwc--;
 		}
 	    }
@@ -557,8 +552,8 @@ sys_wcstombs_alloc_no_path (char **dst_p, int type, const wchar_t *src,
    charset, which is the charset returned by GetConsoleCP ().  Most of the
    time this is used for box and line drawing characters. */
 size_t __reg3
-sys_cp_mbstowcs (mbtowc_p f_mbtowc, const char *charset, wchar_t *dst,
-		 size_t dlen, const char *src, size_t nms)
+sys_cp_mbstowcs (mbtowc_p f_mbtowc, wchar_t *dst, size_t dlen,
+		 const char *src, size_t nms)
 {
   wchar_t *ptr = dst;
   unsigned const char *pmbs = (unsigned const char *) src;
@@ -581,10 +576,11 @@ sys_cp_mbstowcs (mbtowc_p f_mbtowc, const char *charset, wchar_t *dst,
 	     next byte must be a valid UTF-8 start byte.  If the charset
 	     isn't UTF-8 anyway, try to convert the following bytes as UTF-8
 	     sequence. */
-	  if (nms > 2 && pmbs[1] >= 0xc2 && pmbs[1] <= 0xf4 && *charset != 'U'/*TF-8*/)
+	  if (nms > 2 && pmbs[1] >= 0xc2 && pmbs[1] <= 0xf4
+	      && f_mbtowc != __utf8_mbtowc)
 	    {
 	      bytes = __utf8_mbtowc (_REENT, ptr, (const char *) pmbs + 1,
-				     nms - 1, charset, &ps);
+				     nms - 1, &ps);
 	      if (bytes < 0)
 		{
 		  /* Invalid UTF-8 sequence?  Treat the ASCII CAN character as
@@ -603,7 +599,7 @@ sys_cp_mbstowcs (mbtowc_p f_mbtowc, const char *charset, wchar_t *dst,
 		      wchar_t *ptr2 = dst ? ptr + 1 : NULL;
 		      int bytes2 = __utf8_mbtowc (_REENT, ptr2,
 						  (const char *) pmbs + bytes,
-						  nms - bytes, charset, &ps);
+						  nms - bytes, &ps);
 		      if (bytes2 < 0)
 			memset (&ps, 0, sizeof ps);
 		      else
@@ -625,7 +621,7 @@ sys_cp_mbstowcs (mbtowc_p f_mbtowc, const char *charset, wchar_t *dst,
 	    }
 	}
       else if ((bytes = f_mbtowc (_REENT, ptr, (const char *) pmbs, nms,
-				  charset, &ps)) < 0)
+				  &ps)) < 0)
 	{
 	  /* The technique is based on a discussion here:
 	     http://www.mail-archive.com/linux-utf8@nl.linux.org/msg00080.html
@@ -668,8 +664,10 @@ sys_cp_mbstowcs (mbtowc_p f_mbtowc, const char *charset, wchar_t *dst,
 size_t __reg3
 sys_mbstowcs (wchar_t * dst, size_t dlen, const char *src, size_t nms)
 {
-  return sys_cp_mbstowcs (cygheap->locale.mbtowc, cygheap->locale.charset,
-			  dst, dlen, src, nms);
+  mbtowc_p f_mbtowc = __MBTOWC;
+  if (f_mbtowc == __ascii_mbtowc)
+    f_mbtowc = __utf8_mbtowc;
+  return sys_cp_mbstowcs (f_mbtowc, dst, dlen, src, nms);
 }
 
 /* Same as sys_wcstombs_alloc, just backwards. */

@@ -70,7 +70,7 @@ _DEFUN (mbtowc, (pwc, s, n),
   _REENT_CHECK_MISC(reent);
   ps = &(_REENT_MBTOWC_STATE(reent));
   
-  retval = __mbtowc (reent, pwc, s, n, __locale_charset (), ps);
+  retval = __MBTOWC (reent, pwc, s, n, ps);
   
   if (retval < 0)
     {

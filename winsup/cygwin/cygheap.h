@@ -346,8 +346,6 @@ struct cygheap_debug
 struct cygheap_locale
 {
   mbtowc_p mbtowc;
-  wctomb_p wctomb;
-  char charset[ENCODING_LEN + 1];
 };
 
 struct user_heap_info

@@ -20,7 +20,7 @@ _DEFUN (_wcstombs_r, (reent, s, pwcs, n, state),
       size_t num_bytes = 0;
       while (*pwcs != 0)
 	{
-	  bytes = __wctomb (r, buff, *pwcs++, __locale_charset (), state);
+	  bytes = __WCTOMB (r, buff, *pwcs++, state);
 	  if (bytes == -1)
 	    return -1;
 	  num_bytes += bytes;
@@ -31,7 +31,7 @@ _DEFUN (_wcstombs_r, (reent, s, pwcs, n, state),
     {
       while (n > 0)
         {
-          bytes = __wctomb (r, buff, *pwcs, __locale_charset (), state);
+          bytes = __WCTOMB (r, buff, *pwcs, state);
           if (bytes == -1)
             return -1;
           num_to_copy = (n > bytes ? bytes : (int)n);

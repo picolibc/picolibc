@@ -25,9 +25,9 @@ _DEFUN (_wcrtomb_r, (ptr, s, wc, ps),
 #endif
 
   if (s == NULL)
-    retval = __wctomb (ptr, buf, L'\0', __locale_charset (), ps);
+    retval = __WCTOMB (ptr, buf, L'\0', ps);
   else
-    retval = __wctomb (ptr, s, wc, __locale_charset (), ps);
+    retval = __WCTOMB (ptr, s, wc, ps);
 
   if (retval == -1)
     {
@@ -62,9 +62,9 @@ _DEFUN (wcrtomb, (s, wc, ps),
 #endif
 
   if (s == NULL)
-    retval = __wctomb (reent, buf, L'\0', __locale_charset (), ps);
+    retval = __WCTOMB (reent, buf, L'\0', ps);
   else
-    retval = __wctomb (reent, s, wc, __locale_charset (), ps);
+    retval = __WCTOMB (reent, s, wc, ps);
 
   if (retval == -1)
     {

@@ -5,62 +5,59 @@
 
 char *	_EXFUN(_gcvt,(struct _reent *, double , int , char *, char, int));
 
-char *__locale_charset(_NOARGS);
+#include "../locale/setlocale.h"
 
 #ifndef __machine_mbstate_t_defined
 #include <wchar.h>
 #endif
 
-extern int (*__wctomb) (struct _reent *, char *, wchar_t, const char *,
-			mbstate_t *);
-int __ascii_wctomb (struct _reent *, char *, wchar_t, const char *,
-		    mbstate_t *);
+typedef int wctomb_f (struct _reent *, char *, wchar_t, mbstate_t *);
+typedef wctomb_f *wctomb_p;
+
+wctomb_f __ascii_wctomb;
 #ifdef _MB_CAPABLE
-int __utf8_wctomb (struct _reent *, char *, wchar_t, const char *, mbstate_t *);
-int __sjis_wctomb (struct _reent *, char *, wchar_t, const char *, mbstate_t *);
-int __eucjp_wctomb (struct _reent *, char *, wchar_t, const char *,
-		    mbstate_t *);
-int __jis_wctomb (struct _reent *, char *, wchar_t, const char *, mbstate_t *);
-int __iso_wctomb (struct _reent *, char *, wchar_t, const char *, mbstate_t *);
-int __cp_wctomb (struct _reent *, char *, wchar_t, const char *, mbstate_t *);
+wctomb_f __utf8_wctomb;
+wctomb_f __sjis_wctomb;
+wctomb_f __eucjp_wctomb;
+wctomb_f __jis_wctomb;
+wctomb_p __iso_wctomb (int val);
+wctomb_p __cp_wctomb (int val);
 #ifdef __CYGWIN__
-int __gbk_wctomb (struct _reent *, char *, wchar_t, const char *, mbstate_t *);
-int __kr_wctomb (struct _reent *, char *, wchar_t, const char *, mbstate_t *);
-int __big5_wctomb (struct _reent *, char *, wchar_t, const char *, mbstate_t *);
+wctomb_f __gbk_wctomb;
+wctomb_f __kr_wctomb;
+wctomb_f __big5_wctomb;
 #endif
 #endif
 
-extern int (*__mbtowc) (struct _reent *, wchar_t *, const char *, size_t,
-			const char *, mbstate_t *);
-int __ascii_mbtowc (struct _reent *, wchar_t *, const char *, size_t,
-		    const char *, mbstate_t *);
+#define __WCTOMB (__get_current_locale ()->wctomb)
+
+typedef int mbtowc_f (struct _reent *, wchar_t *, const char *, size_t,
+		      mbstate_t *);
+typedef mbtowc_f *mbtowc_p;
+
+mbtowc_f __ascii_mbtowc;
 #ifdef _MB_CAPABLE
-int __utf8_mbtowc (struct _reent *, wchar_t *, const char *, size_t,
-		   const char *, mbstate_t *);
-int __sjis_mbtowc (struct _reent *, wchar_t *, const char *, size_t,
-		   const char *, mbstate_t *);
-int __eucjp_mbtowc (struct _reent *, wchar_t *, const char *, size_t,
-		    const char *, mbstate_t *);
-int __jis_mbtowc (struct _reent *, wchar_t *, const char *, size_t,
-		  const char *, mbstate_t *);
-int __iso_mbtowc (struct _reent *, wchar_t *, const char *, size_t,
-		  const char *, mbstate_t *);
-int __cp_mbtowc (struct _reent *, wchar_t *, const char *, size_t,
-		 const char *, mbstate_t *);
+mbtowc_f __utf8_mbtowc;
+mbtowc_f __sjis_mbtowc;
+mbtowc_f __eucjp_mbtowc;
+mbtowc_f __jis_mbtowc;
+mbtowc_p __iso_mbtowc (int val);
+mbtowc_p __cp_mbtowc (int val);
 #ifdef __CYGWIN__
-int __gbk_mbtowc (struct _reent *, wchar_t *, const char *, size_t,
-		  const char *, mbstate_t *);
-int __kr_mbtowc (struct _reent *, wchar_t *, const char *, size_t,
-		  const char *, mbstate_t *);
-int __big5_mbtowc (struct _reent *, wchar_t *, const char *, size_t,
-		 const char *, mbstate_t *);
+mbtowc_f __gbk_mbtowc;
+mbtowc_f __kr_mbtowc;
+mbtowc_f __big5_mbtowc;
 #endif
 #endif
+
+#define __MBTOWC (__get_current_locale ()->mbtowc)
 
 extern wchar_t __iso_8859_conv[14][0x60];
+int __iso_8859_val_index (int);
 int __iso_8859_index (const char *);
 
 extern wchar_t __cp_conv[][0x80];
+int __cp_val_index (int);
 int __cp_index (const char *);
 
 #endif

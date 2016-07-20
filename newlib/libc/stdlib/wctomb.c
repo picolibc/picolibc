@@ -61,8 +61,7 @@ _DEFUN (wctomb, (s, wchar),
 
         _REENT_CHECK_MISC(reent);
 
-        return __wctomb (reent, s, wchar, __locale_charset (),
-			 &(_REENT_WCTOMB_STATE(reent)));
+        return __WCTOMB (reent, s, wchar, &(_REENT_WCTOMB_STATE(reent)));
 #else /* not _MB_CAPABLE */
         if (s == NULL)
                 return 0;

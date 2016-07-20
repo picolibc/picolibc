@@ -26,9 +26,9 @@ _DEFUN (_mbrtowc_r, (ptr, pwc, s, n, ps),
 #endif
 
   if (s == NULL)
-    retval = __mbtowc (ptr, NULL, "", 1, __locale_charset (), ps);
+    retval = __MBTOWC (ptr, NULL, "", 1, ps);
   else
-    retval = __mbtowc (ptr, pwc, s, n, __locale_charset (), ps);
+    retval = __MBTOWC (ptr, pwc, s, n, ps);
 
   if (retval == -1)
     {
@@ -63,9 +63,9 @@ _DEFUN (mbrtowc, (pwc, s, n, ps),
 #endif
 
   if (s == NULL)
-    retval = __mbtowc (reent, NULL, "", 1, __locale_charset (), ps);
+    retval = __MBTOWC (reent, NULL, "", 1, ps);
   else
-    retval = __mbtowc (reent, pwc, s, n, __locale_charset (), ps);
+    retval = __MBTOWC (reent, pwc, s, n, ps);
 
   if (retval == -1)
     {

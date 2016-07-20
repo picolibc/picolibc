@@ -1355,7 +1355,7 @@ class dev_console
 
   inline UINT get_console_cp ();
   DWORD con_to_str (char *d, int dlen, WCHAR w);
-  DWORD str_to_con (mbtowc_p, const char *, PWCHAR d, const char *s, DWORD sz);
+  DWORD str_to_con (mbtowc_p, PWCHAR d, const char *s, DWORD sz);
   void set_color (HANDLE);
   void set_default_attr ();
   int set_cl_x (cltype);

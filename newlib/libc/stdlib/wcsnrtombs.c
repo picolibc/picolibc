@@ -138,7 +138,7 @@ _DEFUN (_wcsnrtombs_r, (r, dst, src, nwc, len, ps),
     {
       int count = ps->__count;
       wint_t wch = ps->__value.__wch;
-      int bytes = __wctomb (r, buff, *pwcs, __locale_charset (), ps);
+      int bytes = __WCTOMB (r, buff, *pwcs, ps);
       if (bytes == -1)
 	{
 	  r->_errno = EILSEQ;
@@ -164,7 +164,7 @@ _DEFUN (_wcsnrtombs_r, (r, dst, src, nwc, len, ps),
 	}
       else
 	{
-	  /* not enough room, we must back up state to before __wctomb call */
+	  /* not enough room, we must back up state to before __WCTOMB call */
 	  ps->__count = count;
 	  ps->__value.__wch = wch;
           len = 0;
