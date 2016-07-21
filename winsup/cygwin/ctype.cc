@@ -19,7 +19,7 @@ extern const char __ctype_cp[22][128 + 256];		/* Newlib */
 extern const char __ctype_iso[15][128 + 256];		/* Newlib */
 
 void
-__set_ctype (struct _reent *reent, const char *charset)
+__set_ctype (struct __locale_t *loc, const char *charset)
 {
   int idx;
   char *ctype_ptr = NULL;
@@ -63,8 +63,8 @@ __set_ctype (struct _reent *reent, const char *charset)
 	}
       ctype_ptr = (char *) _ctype_b;
     }
-  if (reent)
-    __get_locale_r (reent)->ctype_ptr = ctype_ptr + 127;
+  if (loc)
+    loc->ctype_ptr = ctype_ptr + 127;
   else
     __ctype_ptr__ = ctype_ptr + 127;
 }

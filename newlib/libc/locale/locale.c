@@ -226,7 +226,7 @@ static char *categories[_LC_LAST] = {
  */
 char __default_locale[ENCODING_LEN + 1] = DEFAULT_LOCALE;
 
-struct _thr_locale_t __global_locale =
+struct __locale_t __global_locale =
 {
   { "C", "C", DEFAULT_LOCALE, "C", "C", "C", "C", },
 #ifdef __CYGWIN__
@@ -260,19 +260,12 @@ struct _thr_locale_t __global_locale =
 #endif
 };
 
-/*
- * The locales we are going to try and load.  These are only temporary
- * variables and only used in setlocale.
- */
-static char new_categories[_LC_LAST][ENCODING_LEN + 1];
-static char saved_categories[_LC_LAST][ENCODING_LEN + 1];
-
 /* Renamed from current_locale_string to make clear this is only the
    *global* string for setlocale (LC_ALL, NULL).  There's no equivalent
    functionality for uselocale. */
 static char global_locale_string[_LC_LAST * (ENCODING_LEN + 1/*"/"*/ + 1)];
-static char *currentlocale(void);
-static char *loadlocale(struct _reent *, int);
+static char *currentlocale (void);
+static char *loadlocale (struct __locale_t *, int, const char *);
 static const char *__get_locale_env(struct _reent *, int);
 
 #endif /* _MB_CAPABLE */
@@ -283,6 +276,9 @@ _DEFUN(_setlocale_r, (p, category, locale),
        int category _AND
        _CONST char *locale)
 {
+  static char new_categories[_LC_LAST][ENCODING_LEN + 1];
+  static char saved_categories[_LC_LAST][ENCODING_LEN + 1];
+
 #ifndef _MB_CAPABLE
   if (locale)
     { 
@@ -396,21 +392,23 @@ _DEFUN(_setlocale_r, (p, category, locale),
     }
 
   if (category != LC_ALL)
-    return loadlocale (p, category);
+    return loadlocale (__get_global_locale (), category,
+		       new_categories[category]);
 
   for (i = 1; i < _LC_LAST; ++i)
     {
       strcpy (saved_categories[i], __global_locale.categories[i]);
-      if (loadlocale (p, i) == NULL)
+      if (loadlocale (__get_global_locale (), i, new_categories[i]) == NULL)
 	{
 	  saverr = p->_errno;
 	  for (j = 1; j < i; j++)
 	    {
 	      strcpy (new_categories[j], saved_categories[j]);
-	      if (loadlocale (p, j) == NULL)
+	      if (loadlocale (__get_global_locale (), j, new_categories[j])
+		  == NULL)
 		{
 		  strcpy (new_categories[j], "C");
-		  loadlocale (p, j);
+		  loadlocale (__get_global_locale (), j, new_categories[j]);
 		}
 	    }
 	  p->_errno = saverr;
@@ -423,7 +421,7 @@ _DEFUN(_setlocale_r, (p, category, locale),
 
 #ifdef _MB_CAPABLE
 static char *
-currentlocale()
+currentlocale ()
 {
         int i;
 
@@ -444,10 +442,10 @@ currentlocale()
 
 #ifdef _MB_CAPABLE
 
-extern void __set_ctype (struct _reent *, const char *charset);
+extern void __set_ctype (struct __locale_t *, const char *charset);
 
 static char *
-loadlocale(struct _reent *p, int category)
+loadlocale (struct __locale_t *loc, int category, const char *new_locale)
 {
   /* At this point a full-featured system would just load the locale
      specific data from the locale files.
@@ -467,8 +465,8 @@ loadlocale(struct _reent *p, int category)
   int cjknarrow = 0;
 
   /* Avoid doing everything twice if nothing has changed. */
-  if (!strcmp (new_categories[category], __global_locale.categories[category]))
-    return __global_locale.categories[category];
+  if (!strcmp (new_locale, loc->categories[category]))
+    return loc->categories[category];
 
 #ifdef __CYGWIN__
   /* This additional code handles the case that the incoming locale string
@@ -485,7 +483,7 @@ loadlocale(struct _reent *p, int category)
 
 restart:
   if (!locale)
-    locale = new_categories[category];
+    locale = new_locale;
   else if (locale != tmp_locale)
     {
       locale = __set_locale_from_locale_alias (locale, tmp_locale);
@@ -494,7 +492,7 @@ restart:
     }
 # define FAIL	goto restart
 #else
-  locale = new_categories[category];
+  locale = new_locale;
 # define FAIL	return NULL
 #endif
 
@@ -662,7 +660,7 @@ restart:
       c += 4;
       if (*c == '-')
 	++c;
-      val = _strtol_r (p, c, &end, 10);
+      val = strtol (c, &end, 10);
       if (val < 1 || val > 16 || val == 12 || *end)
 	FAIL;
       strcpy (charset, "ISO-8859-");
@@ -685,7 +683,7 @@ restart:
       if (charset[1] != 'P' && charset[1] != 'p')
 	FAIL;
       strncpy (charset, "CP", 2);
-      val = _strtol_r (p, charset + 2, &end, 10);
+      val = strtol (charset + 2, &end, 10);
       if (*end)
 	FAIL;
       switch (val)
@@ -860,60 +858,54 @@ restart:
     {
     case LC_CTYPE:
 #ifndef __HAVE_LOCALE_INFO__
-      strcpy (__global_locale.ctype_codeset, charset);
-      __global_locale.mb_cur_max[0] = mbc_max;
+      strcpy (loc->ctype_codeset, charset);
+      loc->mb_cur_max[0] = mbc_max;
 #endif
 #ifdef __CYGWIN__
       __mb_cur_max = mbc_max;	/* Only for backward compat */
 #endif
-      __global_locale.wctomb = l_wctomb;
-      __global_locale.mbtowc = l_mbtowc;
-      __set_ctype (NULL, charset);
+      loc->wctomb = l_wctomb;
+      loc->mbtowc = l_mbtowc;
+      __set_ctype (loc == __get_global_locale () ? NULL : loc, charset);
       /* Determine the width for the "CJK Ambiguous Width" category of
          characters. This is used in wcwidth(). Assume single width for
          single-byte charsets, and double width for multi-byte charsets
          other than UTF-8. For UTF-8, use double width for the East Asian
          languages ("ja", "ko", "zh"), and single width for everything else.
          Single width can also be forced with the "@cjknarrow" modifier. */
-      __global_locale.cjk_lang = !cjknarrow
-			  && mbc_max > 1
-			  && (charset[0] != 'U'
-			      || strncmp (locale, "ja", 2) == 0
-			      || strncmp (locale, "ko", 2) == 0
-			      || strncmp (locale, "zh", 2) == 0);
+      loc->cjk_lang = !cjknarrow && mbc_max > 1
+		      && (charset[0] != 'U'
+			  || strncmp (locale, "ja", 2) == 0
+			  || strncmp (locale, "ko", 2) == 0
+			  || strncmp (locale, "zh", 2) == 0);
 #ifdef __HAVE_LOCALE_INFO__
-      ret = __ctype_load_locale (__get_global_locale (), locale,
-				 (void *) l_wctomb, charset, mbc_max);
+      ret = __ctype_load_locale (loc, locale, (void *) l_wctomb, charset,
+				 mbc_max);
 #endif /* __HAVE_LOCALE_INFO__ */
       break;
     case LC_MESSAGES:
 #ifdef __HAVE_LOCALE_INFO__
-      ret = __messages_load_locale (__get_global_locale (), locale,
-				    (void *) l_wctomb, charset);
+      ret = __messages_load_locale (loc, locale, (void *) l_wctomb, charset);
       if (!ret)
 #else
-      strcpy (__global_locale.message_codeset, charset);
+      strcpy (loc->message_codeset, charset);
 #endif /* __HAVE_LOCALE_INFO__ */
       break;
 #ifdef __HAVE_LOCALE_INFO__
 #ifdef __CYGWIN__
   /* Right now only Cygwin supports a __collate_load_locale function at all. */
     case LC_COLLATE:
-      ret = __collate_load_locale (__get_global_locale (), locale,
-				   (void *) l_mbtowc, charset);
+      ret = __collate_load_locale (loc, locale, (void *) l_mbtowc, charset);
       break;
 #endif
     case LC_MONETARY:
-      ret = __monetary_load_locale (__get_global_locale (), locale,
-				    (void *) l_wctomb, charset);
+      ret = __monetary_load_locale (loc, locale, (void *) l_wctomb, charset);
       break;
     case LC_NUMERIC:
-      ret = __numeric_load_locale (__get_global_locale (), locale,
-				   (void *) l_wctomb, charset);
+      ret = __numeric_load_locale (loc, locale, (void *) l_wctomb, charset);
       break;
     case LC_TIME:
-      ret = __time_load_locale (__get_global_locale (), locale,
-				(void *) l_wctomb, charset);
+      ret = __time_load_locale (loc, locale, (void *) l_wctomb, charset);
       break;
 #endif /* __HAVE_LOCALE_INFO__ */
     default:
@@ -923,11 +915,11 @@ restart:
   if (ret)
     FAIL;
 #endif /* __HAVE_LOCALE_INFO__ */
-  return strcpy(__global_locale.categories[category], new_categories[category]);
+  return strcpy(loc->categories[category], new_locale);
 }
 
 static const char *
-__get_locale_env(struct _reent *p, int category)
+__get_locale_env (struct _reent *p, int category)
 {
   const char *env;
 
@@ -951,7 +943,7 @@ __get_locale_env(struct _reent *p, int category)
 #endif /* _MB_CAPABLE */
 
 int
-_DEFUN_VOID(__locale_mb_cur_max)
+_DEFUN_VOID (__locale_mb_cur_max)
 {
 #ifdef __HAVE_LOCALE_INFO__
   return __get_current_ctype_locale ()->mb_cur_max[0];
@@ -962,7 +954,7 @@ _DEFUN_VOID(__locale_mb_cur_max)
 
 #ifdef __HAVE_LOCALE_INFO__
 char *
-_DEFUN_VOID(__locale_ctype_ptr)
+_DEFUN_VOID (__locale_ctype_ptr)
 {
   /* Only check if the current thread/reent has a locale.  ctype_ptr is unused
      in __global_locale, rather the global variable __ctype_ptr__ is used. */
@@ -973,8 +965,8 @@ _DEFUN_VOID(__locale_ctype_ptr)
 #endif
 
 struct lconv *
-_DEFUN(_localeconv_r, (data), 
-      struct _reent *data)
+_DEFUN (_localeconv_r, (data), 
+	struct _reent *data)
 {
 #ifdef __HAVE_LOCALE_INFO__
   const struct lc_numeric_T *n = __get_current_numeric_locale ();
@@ -1020,15 +1012,15 @@ _DEFUN(_localeconv_r, (data),
 #ifndef _REENT_ONLY
 
 char *
-_DEFUN(setlocale, (category, locale),
-       int category _AND
-       _CONST char *locale)
+_DEFUN (setlocale, (category, locale),
+	int category _AND
+	_CONST char *locale)
 {
   return _setlocale_r (_REENT, category, locale);
 }
 
 struct lconv *
-_DEFUN_VOID(localeconv)
+_DEFUN_VOID (localeconv)
 {
   return _localeconv_r (_REENT);
 }

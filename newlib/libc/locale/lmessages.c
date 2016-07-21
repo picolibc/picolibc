@@ -60,7 +60,7 @@ static char	*_messages_locale_buf;
 #endif
 
 int
-__messages_load_locale (struct _thr_locale_t *locale, const char *name,
+__messages_load_locale (struct __locale_t *locale, const char *name,
 			void *f_wctomb, const char *charset)
 {
   int ret;

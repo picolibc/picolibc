@@ -40,7 +40,7 @@ struct _reent;
 /* TODO: This structure type isn't defined yet.  It's supposed to be used
    by locale-specific functions in case a per-thread locale per SUSv4 has
    been specified. */
-struct _thr_locale_t;
+struct __locale_t;
 
 /*
  * If _REENT_SMALL is defined, we make struct _reent as small as possible,
@@ -391,7 +391,7 @@ struct _reent
 
   /* TODO */
   int _unspecified_locale_info;	/* unused, reserved for locale stuff */
-  struct _thr_locale_t *_locale;/* per-thread locale */
+  struct __locale_t *_locale;/* per-thread locale */
 
   struct _mprec *_mp;
 
@@ -584,7 +584,7 @@ struct _reent
 
   /* TODO */
   int _unspecified_locale_info;	/* unused, reserved for locale stuff */
-  struct _thr_locale_t *_locale;/* per-thread locale */
+  struct __locale_t *_locale;/* per-thread locale */
 
   int __sdidinit;		/* 1 means stdio has been init'd */
 

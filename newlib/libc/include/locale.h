@@ -29,10 +29,10 @@
 #define LC_TIME_MASK		(1 << LC_TIME)
 #define LC_MESSAGES_MASK	(1 << LC_MESSAGES)
 
-#define LC_GLOBAL_LOCALE	((struct _thr_locale_t *) -1)
+#define LC_GLOBAL_LOCALE	((struct __locale_t *) -1)
 
-struct _thr_locale_t;
-typedef struct _thr_locale_t *locale_t;
+struct __locale_t;
+typedef struct __locale_t *locale_t;
 #endif
 
 _BEGIN_STD_C

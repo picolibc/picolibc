@@ -1070,7 +1070,7 @@ __set_lc_messages_from_win (const char *name,
    LC_COLLATE locale information.  This is subsequently accessed by the
    below functions strcoll, strxfrm, wcscoll, wcsxfrm. */
 extern "C" int
-__collate_load_locale (struct _thr_locale_t *locale, const char *name,
+__collate_load_locale (struct __locale_t *locale, const char *name,
 		       void *f_mbtowc, const char *charset)
 {
   const struct lc_collate_T *ccop;
