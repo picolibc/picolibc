@@ -36,6 +36,7 @@ static char sccsid[] = "@(#)ctype_.c	5.6 (Berkeley) 6/1/90";
 #endif /* LIBC_SCCS and not lint */
 
 #include <ctype.h>
+#include "../locale/setlocale.h"
 
 #define _CTYPE_DATA_0_127 \
 	_C,	_C,	_C,	_C,	_C,	_C,	_C,	_C, \
@@ -148,7 +149,7 @@ char *__ctype_ptr__ = (char *) _ctype_;
    compatibility with applications built under older Cygwin releases. */
 #ifndef __CYGWIN__
 void
-__set_ctype (struct _reent *, const char *charset)
+__set_ctype (struct __locale_t *loc, const char *charset)
 {
 #if defined(_MB_EXTENDED_CHARSETS_ISO) || defined(_MB_EXTENDED_CHARSETS_WINDOWS)
   int idx;
@@ -184,15 +185,21 @@ __set_ctype (struct _reent *, const char *charset)
   if (!ctype_ptr)
     {
 #  if defined(ALLOW_NEGATIVE_CTYPE_INDEX)
-      ctype_ptr = _ctype_b;
+     ctype_ptr = _ctype_b;
 #  else
-      ctype_ptr = _ctype_;
+     ctype_ptr = _ctype_;
 #  endif
     }
 #  if defined(ALLOW_NEGATIVE_CTYPE_INDEX)
-      __ctype_ptr__ = ctype_ptr + 127;
+  if (loc)
+    loc->ctype_ptr = ctype_ptr + 127;
+  else
+    __ctype_ptr__ = ctype_ptr + 127;
 #  else
-      __ctype_ptr__ = ctype_ptr;
+  if (loc)
+    loc->ctype_ptr = ctype_ptr;
+  else
+    __ctype_ptr__ = ctype_ptr;
 #  endif
 }
 #endif /* !__CYGWIN__ */

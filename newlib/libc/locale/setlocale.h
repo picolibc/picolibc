@@ -165,7 +165,7 @@ struct lc_collate_T
 extern const struct lc_collate_T _C_collate_locale;
 #endif
 
-struct _thr_locale_t
+struct __locale_t
 {
   char				 categories[_LC_LAST][ENCODING_LEN + 1];
   int				(*wctomb) (struct _reent *, char *, wchar_t,
@@ -197,18 +197,18 @@ struct _thr_locale_t
 #endif
 };
 
-extern struct _thr_locale_t __global_locale;
+extern struct __locale_t __global_locale;
 
 /* In POSIX terms the global locale is the process-wide locale.  Use this
    function to always refer to the global locale. */
-_ELIDABLE_INLINE struct _thr_locale_t *
+_ELIDABLE_INLINE struct __locale_t *
 __get_global_locale ()
 {
   return &__global_locale;
 }
 
 /* Per REENT locale.  This is newlib-internal. */
-_ELIDABLE_INLINE struct _thr_locale_t *
+_ELIDABLE_INLINE struct __locale_t *
 __get_locale_r (struct _reent *r)
 {
   return r->_locale;
@@ -218,7 +218,7 @@ __get_locale_r (struct _reent *r)
    using locale info without providing a locale as parameter (*_l functions).
    The current locale is either the locale of the current thread, if the
    thread called uselocale, or the global locale if not. */
-_ELIDABLE_INLINE struct _thr_locale_t *
+_ELIDABLE_INLINE struct __locale_t *
 __get_current_locale ()
 {
   return _REENT->_locale ?: &__global_locale;
@@ -292,18 +292,18 @@ __locale_cjk_lang (void)
 #endif
 }
 
-int __ctype_load_locale (struct _thr_locale_t *, const char *, void *,
+int __ctype_load_locale (struct __locale_t *, const char *, void *,
 			 const char *, int);
-int __monetary_load_locale (struct _thr_locale_t *, const char *, void *,
+int __monetary_load_locale (struct __locale_t *, const char *, void *,
 			    const char *);
-int __numeric_load_locale (struct _thr_locale_t *, const char *, void *,
+int __numeric_load_locale (struct __locale_t *, const char *, void *,
 			   const char *);
-int __time_load_locale (struct _thr_locale_t *, const char *, void *,
+int __time_load_locale (struct __locale_t *, const char *, void *,
 			const char *);
-int __messages_load_locale (struct _thr_locale_t *, const char *, void *,
+int __messages_load_locale (struct __locale_t *, const char *, void *,
 			    const char *);
 #ifdef __CYGWIN__
-int __collate_load_locale (struct _thr_locale_t *, const char *, void *,
+int __collate_load_locale (struct __locale_t *, const char *, void *,
 			   const char *);
 
 extern void __set_charset_from_locale (const char *locale, char *charset);

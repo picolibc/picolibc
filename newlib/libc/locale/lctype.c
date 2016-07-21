@@ -52,7 +52,7 @@ static char _ctype_locale_buf[_CTYPE_BUF_SIZE];
 
 /* NULL locale indicates global locale (called from setlocale) */
 int
-__ctype_load_locale (struct _thr_locale_t *locale, const char *name,
+__ctype_load_locale (struct __locale_t *locale, const char *name,
 		     void *f_wctomb, const char *charset, int mb_cur_max)
 {
   int ret;

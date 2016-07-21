@@ -89,7 +89,7 @@ cnv(const char *str) {
 #endif
 
 int
-__monetary_load_locale (struct _thr_locale_t *locale, const char *name ,
+__monetary_load_locale (struct __locale_t *locale, const char *name ,
 			void *f_wctomb, const char *charset)
 {
   int ret;
