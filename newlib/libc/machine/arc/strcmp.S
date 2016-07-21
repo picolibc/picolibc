@@ -97,7 +97,7 @@ ENTRY (strcmp)
 	   when bit 7 is cleared.  */
 	.balign	4
 .Lfound0:
-#ifndef __ARC601__
+#ifdef __ARC_BARREL_SHIFTER__
 	lsr	r0,r4,8
 	lsr_s	r1,r2
 	bic_s	r2,r2,r0	; get low estimate for r2 and get ...
@@ -110,11 +110,11 @@ ENTRY (strcmp)
 	cmp_s	r2,r3
 	j_s.d	[blink]
 	bset.lo	r0,r0,31
-#else /* __ARC601__ */
+#else /* __ARC_BARREL_SHIFTER__ */
 	/* Fall through to .Lcharloop.  */
 	sub_s	r0,r0,4
 	sub_s	r1,r1,4
-#endif /* __ARC601__ */
+#endif /* __ARC_BARREL_SHIFTER__ */
 #endif /* ENDIAN */
 
 	.balign	4
