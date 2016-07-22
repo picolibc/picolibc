@@ -381,6 +381,7 @@ dreml= remainderl NOSIGFE
 dup SIGFE
 dup2 SIGFE
 dup3 SIGFE
+duplocale SIGFE
 eaccess = euidaccess SIGFE
 ecvt SIGFE
 ecvtbuf SIGFE
@@ -536,6 +537,7 @@ fread_unlocked SIGFE
 free SIGFE
 freeaddrinfo = cygwin_freeaddrinfo SIGFE
 freeifaddrs SIGFE
+freelocale SIGFE
 fremovexattr SIGFE
 freopen SIGFE
 frexp NOSIGFE
@@ -900,6 +902,7 @@ nanosleep SIGFE
 nearbyint NOSIGFE
 nearbyintf NOSIGFE
 nearbyintl NOSIGFE
+newlocale SIGFE
 nextafter NOSIGFE
 nextafterf NOSIGFE
 nextafterl NOSIGFE
@@ -1417,6 +1420,7 @@ unlockpt NOSIGFE
 unsetenv SIGFE
 updwtmp SIGFE
 updwtmpx SIGFE
+uselocale SIGFE
 usleep SIGFE
 utime SIGFE
 utimensat SIGFE

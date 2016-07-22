@@ -65,14 +65,24 @@ struct lconv
   char int_p_sign_posn;
 };
 
-#ifndef _REENT_ONLY
-char *_EXFUN(setlocale,(int category, const char *locale));
-struct lconv *_EXFUN(localeconv,(void));
-#endif
-
 struct _reent;
-char *_EXFUN(_setlocale_r,(struct _reent *, int category, const char *locale));
+char *_EXFUN(_setlocale_r,(struct _reent *, int, const char *));
 struct lconv *_EXFUN(_localeconv_r,(struct _reent *));
+
+locale_t _newlocale_r (struct _reent *, int, const char *, locale_t);
+void _freelocale_r (struct _reent *, locale_t);
+locale_t _duplocale_r (struct _reent *, locale_t);
+locale_t _uselocale_r (struct _reent *, locale_t);
+
+#ifndef _REENT_ONLY
+char *_EXFUN(setlocale,(int, const char *));
+struct lconv *_EXFUN(localeconv,(void));
+
+locale_t newlocale (int, const char *, locale_t);
+void freelocale (locale_t);
+locale_t duplocale (locale_t);
+locale_t uselocale (locale_t);
+#endif
 
 _END_STD_C
 
