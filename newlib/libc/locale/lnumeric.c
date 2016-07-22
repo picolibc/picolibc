@@ -77,10 +77,10 @@ __numeric_load_locale (struct __locale_t *locale, const char *name ,
 	    return -1;
 	  memcpy (nmp, &nm, sizeof *nmp);
 	}
-      locale->numeric = ret == 0 ? &_C_numeric_locale : nmp;
-      if (locale->numeric_buf)
-	free (locale->numeric_buf);
-      locale->numeric_buf = bufp;
+      locale->lc_cat[LC_NUMERIC].ptr = ret == 0 ? &_C_numeric_locale : nmp;
+      if (locale->lc_cat[LC_NUMERIC].buf)
+	free (locale->lc_cat[LC_NUMERIC].buf);
+      locale->lc_cat[LC_NUMERIC].buf = bufp;
       ret = 0;
     }
 #else

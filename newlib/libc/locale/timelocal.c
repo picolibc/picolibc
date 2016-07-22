@@ -177,10 +177,10 @@ __time_load_locale (struct __locale_t *locale, const char *name,
 	    return -1;
 	  memcpy (tip, &ti, sizeof *tip);
 	}
-      locale->time = ret == 0 ? &_C_time_locale : tip;
-      if (locale->time_buf)
-	free (locale->time_buf);
-      locale->time_buf = bufp;
+      locale->lc_cat[LC_TIME].ptr = ret == 0 ? &_C_time_locale : tip;
+      if (locale->lc_cat[LC_TIME].buf)
+	free (locale->lc_cat[LC_TIME].buf);
+      locale->lc_cat[LC_TIME].buf = bufp;
       ret = 0;
     }
 #else
