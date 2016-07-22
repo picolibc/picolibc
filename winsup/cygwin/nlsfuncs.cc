@@ -1074,7 +1074,7 @@ __collate_load_locale (struct __locale_t *locale, const char *name,
 		       void *f_mbtowc, const char *charset)
 {
   const struct lc_collate_T *ccop;
-  char *buf = NULL;
+  char *bufp = NULL;
 
   LCID lcid = __get_lcid_from_locale (name);
   if (lcid == (LCID) -1)
@@ -1082,23 +1082,23 @@ __collate_load_locale (struct __locale_t *locale, const char *name,
   if (!lcid)
     {
       ccop = &_C_collate_locale;
-      buf = NULL;
+      bufp = NULL;
     }
   else
     {
-      buf = (char *) calloc (1, sizeof (struct lc_collate_T));
-      if (!buf)
+      bufp = (char *) calloc (1, sizeof (struct lc_collate_T));
+      if (!bufp)
 	return -1;
-      struct lc_collate_T *cop = (struct lc_collate_T *) buf;
+      struct lc_collate_T *cop = (struct lc_collate_T *) bufp;
       cop->lcid = lcid;
       cop->mbtowc = (mbtowc_p) f_mbtowc;
       stpcpy (cop->codeset, charset);
       ccop = (const struct lc_collate_T *) cop;
     }
-  locale->collate = ccop;
-  if (locale->collate_buf)
-    free (locale->collate_buf);
-  locale->collate_buf = buf;
+  locale->lc_cat[LC_COLLATE].ptr = ccop;
+  if (locale->lc_cat[LC_COLLATE].buf)
+    free (locale->lc_cat[LC_COLLATE].buf);
+  locale->lc_cat[LC_COLLATE].buf = bufp;
   return 0;
 }
 

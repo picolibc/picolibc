@@ -115,10 +115,10 @@ __monetary_load_locale (struct __locale_t *locale, const char *name ,
 	    return -1;
 	  memcpy (mop, &mo, sizeof *mop);
 	}
-      locale->monetary = ret == 0 ? &_C_monetary_locale : mop;
-      if (locale->monetary_buf)
-	free (locale->monetary_buf);
-      locale->monetary_buf = bufp;
+      locale->lc_cat[LC_MONETARY].ptr = ret == 0 ? &_C_monetary_locale : mop;
+      if (locale->lc_cat[LC_MONETARY].buf)
+	free (locale->lc_cat[LC_MONETARY].buf);
+      locale->lc_cat[LC_MONETARY].buf = bufp;
       ret = 0;
     }
 #else

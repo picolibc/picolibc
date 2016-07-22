@@ -77,16 +77,16 @@ __ctype_load_locale (struct __locale_t *locale, const char *name,
 	    return -1;
 	  memcpy (ctp, &ct, sizeof *ctp);
 	}
-      locale->ctype = ret == 0 ? &_C_ctype_locale : ctp;
-      if (locale->ctype_buf)
-	free (locale->ctype_buf);
-      locale->ctype_buf = bufp;
+      locale->lc_cat[LC_CTYPE].ptr = ret == 0 ? &_C_ctype_locale : ctp;
+      if (locale->lc_cat[LC_CTYPE].buf)
+	free (locale->lc_cat[LC_CTYPE].buf);
+      locale->lc_cat[LC_CTYPE].buf = bufp;
       ret = 0;
     }
 #elif !defined (__HAVE_LOCALE_INFO_EXTENDED__)
   ret = 0;
   if (!strcmp (name, "C"))
-    locale->ctype = NULL;
+    locale->lc_cat[LC_CTYPE].ptr = NULL;
   else
     {
       if (locale == __get_global_locale ())
@@ -100,9 +100,10 @@ __ctype_load_locale (struct __locale_t *locale, const char *name,
 	  mbc[0] = mb_cur_max;
 	  mbc[1] = '\0';
 	  _ctype_locale.mb_cur_max = mbc;
-	  if (locale->ctype_buf && locale->ctype_buf != _ctype_locale_buf)
-	    free (locale->ctype_buf);
-	  locale->ctype_buf = bufp;
+	  if (locale->lc_cat[LC_CTYPE].buf
+	      && locale->lc_cat[LC_CTYPE].buf != _ctype_locale_buf)
+	    free (locale->lc_cat[LC_CTYPE].buf);
+	  locale->lc_cat[LC_CTYPE].buf = bufp;
 	}
       else
 	ret = -1;

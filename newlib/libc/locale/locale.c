@@ -243,20 +243,19 @@ struct __locale_t __global_locale =
   "ASCII",
   "ASCII",
 #else
-  &_C_ctype_locale,
-  NULL,
-  &_C_monetary_locale,
-  NULL,
-  &_C_numeric_locale,
-  NULL,
-  &_C_time_locale,
-  NULL,
-  &_C_messages_locale,
-  NULL,
+  {
+    { NULL, NULL },			/* LC_ALL */
 #ifdef __CYGWIN__
-  &_C_collate_locale,
-  NULL,
+    { &_C_collate_locale, NULL },	/* LC_COLLATE */
+#else
+    { NULL, NULL },			/* LC_COLLATE */
 #endif
+    { &_C_ctype_locale, NULL },		/* LC_CTYPE */
+    { &_C_monetary_locale, NULL },	/* LC_MONETARY */
+    { &_C_numeric_locale, NULL },	/* LC_NUMERIC */
+    { &_C_time_locale, NULL },		/* LC_TIME */
+    { &_C_messages_locale, NULL },	/* LC_MESSAGES */
+  },
 #endif
 };
 
@@ -276,9 +275,6 @@ _DEFUN(_setlocale_r, (p, category, locale),
        int category _AND
        _CONST char *locale)
 {
-  static char new_categories[_LC_LAST][ENCODING_LEN + 1];
-  static char saved_categories[_LC_LAST][ENCODING_LEN + 1];
-
 #ifndef _MB_CAPABLE
   if (locale)
     { 
@@ -288,6 +284,8 @@ _DEFUN(_setlocale_r, (p, category, locale),
     }
   return "C";
 #else /* !_MB_CAPABLE */
+  static char new_categories[_LC_LAST][ENCODING_LEN + 1];
+  static char saved_categories[_LC_LAST][ENCODING_LEN + 1];
   int i, j, len, saverr;
   const char *env, *r;
 
@@ -438,9 +436,6 @@ currentlocale ()
                 }
         return (global_locale_string);
 }
-#endif /* _MB_CAPABLE */
-
-#ifdef _MB_CAPABLE
 
 extern void __set_ctype (struct __locale_t *, const char *charset);
 
@@ -483,7 +478,7 @@ loadlocale (struct __locale_t *loc, int category, const char *new_locale)
 
 restart:
   if (!locale)
-    locale = new_locale;
+    locale = (char *) new_locale;
   else if (locale != tmp_locale)
     {
       locale = __set_locale_from_locale_alias (locale, tmp_locale);

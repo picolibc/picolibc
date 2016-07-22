@@ -87,10 +87,10 @@ __messages_load_locale (struct __locale_t *locale, const char *name,
 	    return -1;
 	  memcpy (mep, &me, sizeof *mep);
 	}
-      locale->messages = ret == 0 ? &_C_messages_locale : mep;
-      if (locale->messages_buf)
-	free (locale->messages_buf);
-      locale->messages_buf = bufp;
+      locale->lc_cat[LC_MESSAGES].ptr = ret == 0 ? &_C_messages_locale : mep;
+      if (locale->lc_cat[LC_MESSAGES].buf)
+	free (locale->lc_cat[LC_MESSAGES].buf);
+      locale->lc_cat[LC_MESSAGES].buf = bufp;
       ret = 0;
     }
 #else
