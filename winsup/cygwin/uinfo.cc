@@ -1894,7 +1894,7 @@ pwdgrp::fetch_account_from_windows (fetch_user_arg_t &arg, cyg_ldap *pldap)
 	}
       if (!ret)
 	{
-	  if (!strcmp (arg.name, "nodomain+nobody"))
+	  if (!strcmp (arg.name, "no+body"))
 	    {
 	      /* Special case "nobody" for reproducible construction of a
 		 nobody SID for WinFsp and similar services.  We use the
@@ -2451,8 +2451,8 @@ pwdgrp::fetch_account_from_windows (fetch_user_arg_t &arg, cyg_ldap *pldap)
 	 nobody SID for WinFsp and similar services.  We use the
 	 value 65534 which is -2 with 16 bit uid/gids. */
       uid = gid = 0xfffe;
-      wcpcpy (dom, L"nodomain");
-      wcpcpy (name = namebuf, L"nobody");
+      wcpcpy (dom, L"no");
+      wcpcpy (name = namebuf, L"body");
       fully_qualified_name = true;
       acc_type = SidTypeUnknown;
     }
