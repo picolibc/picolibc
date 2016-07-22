@@ -296,13 +296,14 @@ _DEFUN(_setlocale_r, (p, category, locale),
     }
 
   if (locale == NULL)
-    return category != LC_ALL ? __global_locale.categories[category] : currentlocale();
+    return category != LC_ALL ? __get_global_locale ()->categories[category]
+			      : currentlocale();
 
   /*
    * Default to the current locale for everything.
    */
   for (i = 1; i < _LC_LAST; ++i)
-    strcpy (new_categories[i], __global_locale.categories[i]);
+    strcpy (new_categories[i], __get_global_locale ()->categories[i]);
 
   /*
    * Now go fill up new_categories from the locale argument
@@ -395,7 +396,7 @@ _DEFUN(_setlocale_r, (p, category, locale),
 
   for (i = 1; i < _LC_LAST; ++i)
     {
-      strcpy (saved_categories[i], __global_locale.categories[i]);
+      strcpy (saved_categories[i], __get_global_locale ()->categories[i]);
       if (loadlocale (__get_global_locale (), i, new_categories[i]) == NULL)
 	{
 	  saverr = p->_errno;
@@ -421,20 +422,23 @@ _DEFUN(_setlocale_r, (p, category, locale),
 static char *
 currentlocale ()
 {
-        int i;
+  int i;
 
-        (void)strcpy(global_locale_string, __global_locale.categories[1]);
+  strcpy (global_locale_string, __get_global_locale ()->categories[1]);
 
-        for (i = 2; i < _LC_LAST; ++i)
-                if (strcmp(__global_locale.categories[1], __global_locale.categories[i])) {
-                        for (i = 2; i < _LC_LAST; ++i) {
-                                (void)strcat(global_locale_string, "/");
-                                (void)strcat(global_locale_string,
-                                             __global_locale.categories[i]);
-                        }
-                        break;
-                }
-        return (global_locale_string);
+  for (i = 2; i < _LC_LAST; ++i)
+    if (strcmp (__get_global_locale ()->categories[1],
+		__get_global_locale ()->categories[i]))
+      {
+	for (i = 2; i < _LC_LAST; ++i)
+	  {
+	    (void)strcat(global_locale_string, "/");
+	    (void)strcat(global_locale_string,
+			 __get_global_locale ()->categories[i]);
+	  }
+	break;
+      }
+  return global_locale_string;
 }
 
 extern void __set_ctype (struct __locale_t *, const char *charset);
@@ -943,7 +947,7 @@ _DEFUN_VOID (__locale_mb_cur_max)
 #ifdef __HAVE_LOCALE_INFO__
   return __get_current_ctype_locale ()->mb_cur_max[0];
 #else
-  return __global_locale.mb_cur_max[0];
+  return __get_global_locale ()->mb_cur_max[0];
 #endif
 }
 
