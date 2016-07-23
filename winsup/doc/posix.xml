@@ -192,6 +192,7 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     drand48
     dup
     dup2
+    duplocale
     encrypt			(available in external "crypt" library)
     endgrent
     endhostent
@@ -293,6 +294,7 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     fread
     free
     freeaddrinfo
+    freelocale
     freopen
     frexp
     frexpf
@@ -558,6 +560,7 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     nearbyint
     nearbyintf
     nearbyintl
+    newlocale
     nextafter
     nextafterf
     nextafterl
@@ -985,6 +988,7 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     unlinkat
     unlockpt
     unsetenv
+    uselocale
     utime
     utimensat
     utimes
@@ -1475,11 +1479,9 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     aio_return
     aio_suspend
     aio_write
-    duplocale
     endnetent
     fattach
     fmtmsg
-    freelocale
     getdate
     getdate_err
     gethostent
@@ -1517,7 +1519,6 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     lio_listio
     mlockall
     munlockall
-    newlocale
     posix_mem_offset
     posix_trace[...]
     posix_typed_[...]
@@ -1542,7 +1543,6 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     towlower_l
     towupper_l
     ulimit
-    uselocale
     waitid
     wcscasecmp_l
     wcscoll_l
