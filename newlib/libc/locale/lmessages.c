@@ -27,9 +27,7 @@
 #include <sys/cdefs.h>
 
 #include <stddef.h>
-
 #include "setlocale.h"
-#include "ldpart.h"
 
 #define LCMESSAGES_SIZE_FULL (sizeof(struct lc_messages_T) / sizeof(char *))
 #define LCMESSAGES_SIZE_MIN \
@@ -102,33 +100,7 @@ __messages_load_locale (struct __locale_t *locale, const char *name,
       ret = 0;
     }
 #else
-  /*
-   * Propose that we can have incomplete locale file (w/o "{yes,no}str").
-   * Initialize them before loading.  In case of complete locale, they'll
-   * be initialized to loaded value, otherwise they'll not be touched.
-   */
-  _messages_locale.yesstr = empty;
-  _messages_locale.nostr = empty;
-
-  ret = __part_load_locale(name, &_messages_using_locale,
-			   _messages_locale_buf, "LC_MESSAGES",
-			   LCMESSAGES_SIZE_FULL, LCMESSAGES_SIZE_MIN,
-			   (const char **)&_messages_locale);
+  /* TODO */
 #endif
   return ret;
 }
-
-#ifdef LOCALE_DEBUG
-void
-msgdebug() {
-printf(	"yesexpr = %s\n"
-	"noexpr = %s\n"
-	"yesstr = %s\n"
-	"nostr = %s\n",
-	_messages_locale.yesexpr,
-	_messages_locale.noexpr,
-	_messages_locale.yesstr,
-	_messages_locale.nostr
-);
-}
-#endif /* LOCALE_DEBUG */

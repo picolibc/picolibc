@@ -302,8 +302,6 @@ extern void __set_charset_from_locale (const char *locale, char *charset);
 extern char *__set_locale_from_locale_alias (const char *, char *);
 #endif
 
-extern char *_PathLocale;
-
 __END_DECLS
 
 #endif /* !_SETLOCALE_H_ */

@@ -73,9 +73,7 @@ ARFLAGS = cru
 lib_a_AR = $(AR) $(ARFLAGS)
 lib_a_LIBADD =
 am__objects_1 = lib_a-locale.$(OBJEXT)
-@ELIX_LEVEL_1_FALSE@am__objects_2 = lib_a-fix_grouping.$(OBJEXT) \
-@ELIX_LEVEL_1_FALSE@	lib_a-ldpart.$(OBJEXT) \
-@ELIX_LEVEL_1_FALSE@	lib_a-lmessages.$(OBJEXT) \
+@ELIX_LEVEL_1_FALSE@am__objects_2 = lib_a-lmessages.$(OBJEXT) \
 @ELIX_LEVEL_1_FALSE@	lib_a-lnumeric.$(OBJEXT) \
 @ELIX_LEVEL_1_FALSE@	lib_a-lmonetary.$(OBJEXT) \
 @ELIX_LEVEL_1_FALSE@	lib_a-nl_langinfo.$(OBJEXT) \
@@ -87,8 +85,7 @@ lib_a_OBJECTS = $(am_lib_a_OBJECTS)
 LTLIBRARIES = $(noinst_LTLIBRARIES)
 liblocale_la_LIBADD =
 am__objects_3 = locale.lo
-@ELIX_LEVEL_1_FALSE@am__objects_4 = fix_grouping.lo ldpart.lo \
-@ELIX_LEVEL_1_FALSE@	lmessages.lo lnumeric.lo lmonetary.lo \
+@ELIX_LEVEL_1_FALSE@am__objects_4 = lmessages.lo lnumeric.lo lmonetary.lo \
 @ELIX_LEVEL_1_FALSE@	nl_langinfo.lo timelocal.lo lctype.lo
 @USE_LIBTOOL_TRUE@am_liblocale_la_OBJECTS = $(am__objects_3) \
 @USE_LIBTOOL_TRUE@	$(am__objects_4)
@@ -264,10 +261,8 @@ top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 AUTOMAKE_OPTIONS = cygnus
 INCLUDES = $(NEWLIB_CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLAGS)
-GENERAL_SOURCES = timelocal.h ldpart.h locale.c lnumeric.h lmonetary.h lmessages.h 
+GENERAL_SOURCES = setlocale.h
 @ELIX_LEVEL_1_FALSE@ELIX_SOURCES = \
-@ELIX_LEVEL_1_FALSE@	fix_grouping.c \
-@ELIX_LEVEL_1_FALSE@	ldpart.c \
 @ELIX_LEVEL_1_FALSE@	lmessages.c \
 @ELIX_LEVEL_1_FALSE@	lnumeric.c \
 @ELIX_LEVEL_1_FALSE@	lmonetary.c \
@@ -370,18 +365,6 @@ lib_a-locale.o: locale.c
 
 lib_a-locale.obj: locale.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-locale.obj `if test -f 'locale.c'; then $(CYGPATH_W) 'locale.c'; else $(CYGPATH_W) '$(srcdir)/locale.c'; fi`
-
-lib_a-fix_grouping.o: fix_grouping.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-fix_grouping.o `test -f 'fix_grouping.c' || echo '$(srcdir)/'`fix_grouping.c
-
-lib_a-fix_grouping.obj: fix_grouping.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-fix_grouping.obj `if test -f 'fix_grouping.c'; then $(CYGPATH_W) 'fix_grouping.c'; else $(CYGPATH_W) '$(srcdir)/fix_grouping.c'; fi`
-
-lib_a-ldpart.o: ldpart.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-ldpart.o `test -f 'ldpart.c' || echo '$(srcdir)/'`ldpart.c
-
-lib_a-ldpart.obj: ldpart.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-ldpart.obj `if test -f 'ldpart.c'; then $(CYGPATH_W) 'ldpart.c'; else $(CYGPATH_W) '$(srcdir)/ldpart.c'; fi`
 
 lib_a-lmessages.o: lmessages.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-lmessages.o `test -f 'lmessages.c' || echo '$(srcdir)/'`lmessages.c

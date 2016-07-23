@@ -25,9 +25,6 @@
  */
 
 #include "setlocale.h"
-#include "ldpart.h"
-
-extern const char *__fix_locale_grouping_str(const char *);
 
 #define LCNUMERIC_SIZE (sizeof(struct lc_numeric_T) / sizeof(char *))
 
@@ -43,12 +40,6 @@ const struct lc_numeric_T _C_numeric_locale = {
 	L"",				/* wthousands_sep */
 #endif
 };
-
-#ifndef __CYGWIN__
-static struct lc_numeric_T _numeric_locale;
-static int	_numeric_using_locale;
-static char	*_numeric_locale_buf;
-#endif
 
 int
 __numeric_load_locale (struct __locale_t *locale, const char *name ,
@@ -92,13 +83,7 @@ __numeric_load_locale (struct __locale_t *locale, const char *name ,
       ret = 0;
     }
 #else
-  ret = __part_load_locale(name, &_numeric_using_locale,
-			   _numeric_locale_buf, "LC_NUMERIC",
-			   LCNUMERIC_SIZE, LCNUMERIC_SIZE,
-			   (const char **)&_numeric_locale);
-  if (ret == 0 && _numeric_using_locale)
-      _numeric_locale.grouping =
-	      __fix_locale_grouping_str(_numeric_locale.grouping);
+  /* TODO */
 #endif
   return ret;
 }

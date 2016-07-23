@@ -29,9 +29,6 @@
 #include <limits.h>
 #include <stdlib.h>
 #include "setlocale.h"
-#include "ldpart.h"
-
-extern const char * __fix_locale_grouping_str(const char *);
 
 #define LCMONETARY_SIZE (sizeof(struct lc_monetary_T) / sizeof(char *))
 
@@ -130,26 +127,7 @@ __monetary_load_locale (struct __locale_t *locale, const char *name ,
       ret = 0;
     }
 #else
-  ret = __part_load_locale(name, &_monetary_using_locale,
-			   _monetary_locale_buf, "LC_MONETARY",
-			   LCMONETARY_SIZE, LCMONETARY_SIZE,
-			   (const char **)&_monetary_locale);
-  if (ret == 0 && _monetary_using_locale) {
-    _monetary_locale.mon_grouping =
-	 __fix_locale_grouping_str(_monetary_locale.mon_grouping);
-
-#define M_ASSIGN_CHAR(NAME) (((char *)_monetary_locale.NAME)[0] = \
-		       cnv(_monetary_locale.NAME))
-
-    M_ASSIGN_CHAR(int_frac_digits);
-    M_ASSIGN_CHAR(frac_digits);
-    M_ASSIGN_CHAR(p_cs_precedes);
-    M_ASSIGN_CHAR(p_sep_by_space);
-    M_ASSIGN_CHAR(n_cs_precedes);
-    M_ASSIGN_CHAR(n_sep_by_space);
-    M_ASSIGN_CHAR(p_sign_posn);
-    M_ASSIGN_CHAR(n_sign_posn);
-  }
+  /* TODO */
 #endif
   return ret;
 }

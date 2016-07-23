@@ -4,15 +4,13 @@ AUTOMAKE_OPTIONS = cygnus
 
 INCLUDES = $(NEWLIB_CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLAGS)
 
-GENERAL_SOURCES = timelocal.h ldpart.h locale.c lnumeric.h lmonetary.h lmessages.h 
+GENERAL_SOURCES = setlocale.h
 
 ## The following interfaces are EL/IX level 2
 if ELIX_LEVEL_1
 ELIX_SOURCES =
 else
 ELIX_SOURCES = \
-	fix_grouping.c \
-	ldpart.c \
 	lmessages.c \
 	lnumeric.c \
 	lmonetary.c \
