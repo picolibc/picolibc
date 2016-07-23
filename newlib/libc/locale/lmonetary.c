@@ -112,13 +112,21 @@ __monetary_load_locale (struct __locale_t *locale, const char *name ,
 	{
 	  mop = (struct lc_monetary_T *) calloc (1, sizeof *mop);
 	  if (!mop)
-	    return -1;
-	  memcpy (mop, &mo, sizeof *mop);
+	    {
+	      free (bufp);
+	      return -1;
+	    }
+	  *mop = mo;
 	}
+      struct __lc_cats tmp = locale->lc_cat[LC_MONETARY];
       locale->lc_cat[LC_MONETARY].ptr = ret == 0 ? &_C_monetary_locale : mop;
-      if (locale->lc_cat[LC_MONETARY].buf)
-	free (locale->lc_cat[LC_MONETARY].buf);
       locale->lc_cat[LC_MONETARY].buf = bufp;
+      /* If buf is not NULL, both pointers have been alloc'ed */
+      if (tmp.buf)
+	{
+	  free ((void *) tmp.ptr);
+	  free (tmp.buf);
+	}
       ret = 0;
     }
 #else

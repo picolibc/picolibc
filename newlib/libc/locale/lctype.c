@@ -74,13 +74,21 @@ __ctype_load_locale (struct __locale_t *locale, const char *name,
 	{
 	  ctp = (struct lc_ctype_T *) calloc (1, sizeof *ctp);
 	  if (!ctp)
-	    return -1;
-	  memcpy (ctp, &ct, sizeof *ctp);
+	    {
+	      free (bufp);
+	      return -1;
+	    }
+	  *ctp = ct;
 	}
+      struct __lc_cats tmp = locale->lc_cat[LC_CTYPE];
       locale->lc_cat[LC_CTYPE].ptr = ret == 0 ? &_C_ctype_locale : ctp;
-      if (locale->lc_cat[LC_CTYPE].buf)
-	free (locale->lc_cat[LC_CTYPE].buf);
       locale->lc_cat[LC_CTYPE].buf = bufp;
+      /* If buf is not NULL, both pointers have been alloc'ed */
+      if (tmp.buf)
+	{
+	  free ((void *) tmp.ptr);
+	  free (tmp.buf);
+	}
       ret = 0;
     }
 #elif !defined (__HAVE_LOCALE_INFO_EXTENDED__)

@@ -74,13 +74,21 @@ __numeric_load_locale (struct __locale_t *locale, const char *name ,
 	{
 	  nmp = (struct lc_numeric_T *) calloc (1, sizeof *nmp);
 	  if (!nmp)
-	    return -1;
-	  memcpy (nmp, &nm, sizeof *nmp);
+	    {
+	      free (bufp);
+	      return -1;
+	    }
+	  *nmp = nm;
 	}
+      struct __lc_cats tmp = locale->lc_cat[LC_NUMERIC];
       locale->lc_cat[LC_NUMERIC].ptr = ret == 0 ? &_C_numeric_locale : nmp;
-      if (locale->lc_cat[LC_NUMERIC].buf)
-	free (locale->lc_cat[LC_NUMERIC].buf);
       locale->lc_cat[LC_NUMERIC].buf = bufp;
+      /* If buf is not NULL, both pointers have been alloc'ed */
+      if (tmp.buf)
+	{
+	  free ((void *) tmp.ptr);
+	  free (tmp.buf);
+	}
       ret = 0;
     }
 #else

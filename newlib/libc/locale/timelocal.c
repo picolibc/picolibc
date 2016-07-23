@@ -174,13 +174,21 @@ __time_load_locale (struct __locale_t *locale, const char *name,
 	{
 	  tip = (struct lc_time_T *) calloc (1, sizeof *tip);
 	  if (!tip)
-	    return -1;
-	  memcpy (tip, &ti, sizeof *tip);
+	    {
+	      free (bufp);
+	      return -1;
+	    }
+	  *tip = ti;
 	}
+      struct __lc_cats tmp = locale->lc_cat[LC_TIME];
       locale->lc_cat[LC_TIME].ptr = ret == 0 ? &_C_time_locale : tip;
-      if (locale->lc_cat[LC_TIME].buf)
-	free (locale->lc_cat[LC_TIME].buf);
       locale->lc_cat[LC_TIME].buf = bufp;
+      /* If buf is not NULL, both pointers have been alloc'ed */
+      if (tmp.buf)
+	{
+	  free ((void *) tmp.ptr);
+	  free (tmp.buf);
+	}
       ret = 0;
     }
 #else
