@@ -21,7 +21,6 @@
  * SUCH DAMAGE.
  */
 
-#include "ldpart.h"
 #include "setlocale.h"
 
 #define LCCTYPE_SIZE (sizeof(struct lc_ctype_T) / sizeof(char *))
@@ -39,16 +38,6 @@ const struct lc_ctype_T _C_ctype_locale = {
 	  L"5", L"6", L"7", L"8", L"9" }
 #endif
 };
-
-static struct lc_ctype_T _ctype_locale;
-static int	_ctype_using_locale;
-#ifdef __HAVE_LOCALE_INFO_EXTENDED__
-static char	*_ctype_locale_buf;
-#else
-/* Max encoding_len + NUL byte + 1 byte mb_cur_max plus trailing NUL byte */
-#define _CTYPE_BUF_SIZE	(ENCODING_LEN + 3)
-static char _ctype_locale_buf[_CTYPE_BUF_SIZE];
-#endif
 
 /* NULL locale indicates global locale (called from setlocale) */
 int
@@ -91,39 +80,8 @@ __ctype_load_locale (struct __locale_t *locale, const char *name,
 	}
       ret = 0;
     }
-#elif !defined (__HAVE_LOCALE_INFO_EXTENDED__)
-  ret = 0;
-  if (!strcmp (name, "C"))
-    locale->lc_cat[LC_CTYPE].ptr = NULL;
-  else
-    {
-      if (locale == __get_global_locale ())
-	bufp = _ctype_locale_buf;
-      else
-	bufp = (char *) malloc (_CTYPE_BUF_SIZE);
-      if (*bufp)
-	{
-	  _ctype_locale.codeset = strcpy (bufp, charset);
-	  char *mbc = bufp + _CTYPE_BUF_SIZE - 2;
-	  mbc[0] = mb_cur_max;
-	  mbc[1] = '\0';
-	  _ctype_locale.mb_cur_max = mbc;
-	  if (locale->lc_cat[LC_CTYPE].buf
-	      && locale->lc_cat[LC_CTYPE].buf != _ctype_locale_buf)
-	    free (locale->lc_cat[LC_CTYPE].buf);
-	  locale->lc_cat[LC_CTYPE].buf = bufp;
-	}
-      else
-	ret = -1;
-    }
 #else
-  ret = __part_load_locale(name, &_ctype_using_locale,
-			   _ctype_locale_buf, "LC_CTYPE",
-			   LCCTYPE_SIZE, LCCTYPE_SIZE,
-			   (const char **)&_ctype_locale);
-  if (ret == 0 && _ctype_using_locale)
-    _ctype_locale.grouping =
-	    __fix_locale_grouping_str(_ctype_locale.grouping);
+  /* TODO */
 #endif
   return ret;
 }

@@ -28,8 +28,6 @@
 #include <sys/cdefs.h>
 
 #include <stddef.h>
-
-#include "ldpart.h"
 #include "setlocale.h"
 
 #define LCTIME_SIZE (sizeof(struct lc_time_T) / sizeof(char *))
@@ -145,12 +143,6 @@ const struct lc_time_T	_C_time_locale = {
 #endif
 };
 
-#ifndef __CYGWIN__
-static struct lc_time_T _time_locale;
-static int _time_using_locale;
-static char *time_locale_buf;
-#endif
-
 int
 __time_load_locale (struct __locale_t *locale, const char *name,
 		    void *f_wctomb, const char *charset)
@@ -192,10 +184,7 @@ __time_load_locale (struct __locale_t *locale, const char *name,
       ret = 0;
     }
 #else
-  ret = __part_load_locale(name, &_time_using_locale,
-		  time_locale_buf, "LC_TIME",
-		  LCTIME_SIZE, LCTIME_SIZE,
-		  (const char **)&_time_locale);
+  /* TODO */
 #endif
   return (ret);
 }
