@@ -84,13 +84,21 @@ __messages_load_locale (struct __locale_t *locale, const char *name,
 	{
 	  mep = (struct lc_messages_T *) calloc (1, sizeof *mep);
 	  if (!mep)
-	    return -1;
-	  memcpy (mep, &me, sizeof *mep);
+	    {
+	      free (bufp);
+	      return -1;
+	    }
+	  *mep = me;
 	}
+      struct __lc_cats tmp = locale->lc_cat[LC_MESSAGES];
       locale->lc_cat[LC_MESSAGES].ptr = ret == 0 ? &_C_messages_locale : mep;
-      if (locale->lc_cat[LC_MESSAGES].buf)
-	free (locale->lc_cat[LC_MESSAGES].buf);
       locale->lc_cat[LC_MESSAGES].buf = bufp;
+      /* If buf is not NULL, both pointers have been alloc'ed */
+      if (tmp.buf)
+	{
+	  free ((void *) tmp.ptr);
+	  free (tmp.buf);
+	}
       ret = 0;
     }
 #else

@@ -1152,7 +1152,10 @@ error:
   for (i = 1; i < _LC_LAST; ++i)
     if (tmp_locale.lc_cat[i].buf
 	&& tmp_locale.lc_cat[i].buf != (const void *) -1)
-      _free_r (p, tmp_locale.lc_cat[i].buf);
+      {
+	_free_r (p, tmp_locale.lc_cat[i].ptr);
+	_free_r (p, tmp_locale.lc_cat[i].buf);
+      }
 #endif
 
   return NULL;
@@ -1167,7 +1170,10 @@ _freelocale_r (struct _reent *p, struct __locale_t *locobj)
 #ifdef __HAVE_LOCALE_INFO__
   for (int i = 1; i < _LC_LAST; ++i)
     if (locobj->lc_cat[i].buf)
-      _free_r (p, locobj->lc_cat[i].buf);
+      {
+	_free_r (p, locobj->lc_cat[i].ptr);
+	_free_r (p, locobj->lc_cat[i].buf);
+      }
 #endif
   _free_r (p, locobj);
 }
@@ -1212,7 +1218,10 @@ error:
 #ifdef __HAVE_LOCALE_INFO__
   while (--i > 0)
     if (tmp_locale.lc_cat[i].buf)
-      _free_r (p, tmp_locale.lc_cat[i].buf);
+      {
+	_free_r (p, tmp_locale.lc_cat[i].ptr);
+	_free_r (p, tmp_locale.lc_cat[i].buf);
+      }
 #endif
 
   return NULL;

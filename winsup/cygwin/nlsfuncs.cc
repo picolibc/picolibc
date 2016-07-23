@@ -1066,6 +1066,13 @@ __set_lc_messages_from_win (const char *name,
   return 1;
 }
 
+const struct lc_collate_T _C_collate_locale =
+{
+  0,
+  __ascii_mbtowc,
+  "ASCII"
+};
+
 /* Called from newlib's setlocale() if category is LC_COLLATE.  Stores
    LC_COLLATE locale information.  This is subsequently accessed by the
    below functions strcoll, strxfrm, wcscoll, wcsxfrm. */
@@ -1073,41 +1080,38 @@ extern "C" int
 __collate_load_locale (struct __locale_t *locale, const char *name,
 		       void *f_mbtowc, const char *charset)
 {
-  const struct lc_collate_T *ccop;
   char *bufp = NULL;
+  struct lc_collate_T *cop = NULL;
 
   LCID lcid = __get_lcid_from_locale (name);
   if (lcid == (LCID) -1)
     return -1;
-  if (!lcid)
+  if (lcid)
     {
-      ccop = &_C_collate_locale;
-      bufp = NULL;
-    }
-  else
-    {
-      bufp = (char *) calloc (1, sizeof (struct lc_collate_T));
+      bufp = (char *) malloc (1);	/* dummy */
       if (!bufp)
 	return -1;
-      struct lc_collate_T *cop = (struct lc_collate_T *) bufp;
+      cop = (struct lc_collate_T *) calloc (1, sizeof (struct lc_collate_T));
+      if (!cop)
+	{
+	  free (bufp);
+	  return -1;
+	}
       cop->lcid = lcid;
       cop->mbtowc = (mbtowc_p) f_mbtowc;
       stpcpy (cop->codeset, charset);
-      ccop = (const struct lc_collate_T *) cop;
     }
-  locale->lc_cat[LC_COLLATE].ptr = ccop;
-  if (locale->lc_cat[LC_COLLATE].buf)
-    free (locale->lc_cat[LC_COLLATE].buf);
+  struct __lc_cats tmp = locale->lc_cat[LC_COLLATE];
+  locale->lc_cat[LC_COLLATE].ptr = lcid == 0 ? &_C_collate_locale : cop;
   locale->lc_cat[LC_COLLATE].buf = bufp;
+  /* If buf is not NULL, both pointers have been alloc'ed */
+  if (tmp.buf)
+    {
+      free ((void *) tmp.ptr);
+      free (tmp.buf);
+    }
   return 0;
 }
-
-const struct lc_collate_T _C_collate_locale =
-{
-  0,
-  __ascii_mbtowc,
-  "ASCII"
-};
 
 /* We use the Windows functions for locale-specific string comparison and
    transformation.  The advantage is that we don't need any files with
