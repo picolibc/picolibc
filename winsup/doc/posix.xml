@@ -1504,6 +1504,7 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     iswalpha_l
     iswblank_l
     iswcntrl_l
+    iswctype_l
     iswdigit_l
     iswgraph_l
     iswlower_l
@@ -1538,10 +1539,13 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     tolower_l
     toupper_l
     towctrans_l
+    towlower_l
+    towupper_l
     ulimit
     uselocale
     waitid
     wcscasecmp_l
+    wcscoll_l
     wcsncasecmp_l
     wcsxfrm_l
     wctrans_l
