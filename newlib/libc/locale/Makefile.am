@@ -4,19 +4,23 @@ AUTOMAKE_OPTIONS = cygnus
 
 INCLUDES = $(NEWLIB_CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLAGS)
 
-GENERAL_SOURCES = setlocale.h
+GENERAL_SOURCES = setlocale.h locale.c localeconv.c
 
 ## The following interfaces are EL/IX level 2
 if ELIX_LEVEL_1
 ELIX_SOURCES =
 else
 ELIX_SOURCES = \
+	duplocale.c \
+	freelocale.c \
+	lctype.c \
 	lmessages.c \
 	lnumeric.c \
 	lmonetary.c \
+	newlocale.c \
 	nl_langinfo.c \
 	timelocal.c \
-	lctype.c
+	uselocale.c
 endif
 
 liblocale_la_LDFLAGS = -Xcompiler -nostdlib

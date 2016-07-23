@@ -189,7 +189,11 @@ struct __locale_t
 #endif
 };
 
+extern const struct __locale_t __C_locale;
 extern struct __locale_t __global_locale;
+
+extern char *__loadlocale (struct __locale_t *, int, const char *);
+extern const char *__get_locale_env(struct _reent *, int);
 
 /* In POSIX terms the global locale is the process-wide locale.  Use this
    function to always refer to the global locale. */

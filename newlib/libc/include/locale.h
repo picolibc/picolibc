@@ -8,6 +8,7 @@
 #define _LOCALE_H_
 
 #include "_ansi.h"
+#include <sys/cdefs.h>
 
 #define __need_NULL
 #include <stddef.h>

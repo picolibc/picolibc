@@ -174,8 +174,8 @@ static struct _nl_item_t
 
 char *
 _DEFUN(nl_langinfo, (item), 
-       nl_item item) {
-
+       nl_item item)
+{
    char *ret, *cs;
 #ifndef __CYGWIN__
    char *s;
@@ -212,7 +212,7 @@ _DEFUN(nl_langinfo, (item),
 #endif /* __HAVE_LOCALE_INFO__ */
 	case CODESET:
 #ifdef __CYGWIN__
-		ret = __locale_charset ();
+		ret = (char *) __locale_charset ();
 #endif
 do_codeset:
 #ifdef __CYGWIN__
