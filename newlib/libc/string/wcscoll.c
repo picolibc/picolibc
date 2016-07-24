@@ -21,8 +21,8 @@ DESCRIPTION
 	using an interpretation appropriate to the current <<LC_COLLATE>>
 	state.
 
-	The current implementation of <<wcscoll>> simply uses <<wcscmp>>
-	and does not support any language-specific sorting.
+	(NOT Cygwin:) The current implementation of <<wcscoll>> simply
+	uses <<wcscmp>> and does not support any language-specific sorting.
 
 RETURNS
 	If the first string is greater than the second string,

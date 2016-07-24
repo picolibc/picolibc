@@ -63,6 +63,11 @@ typedef __gnuc_va_list va_list;
 #endif
 #endif
 
+#if __POSIX_VISIBLE >= 200809 || defined (_COMPILING_NEWLIB)
+struct __locale_t;
+typedef struct __locale_t *locale_t;
+#endif
+
 _BEGIN_STD_C
 
 #if __POSIX_VISIBLE >= 200809 || _XSI_VISIBLE
@@ -162,6 +167,14 @@ int	_EXFUN(wcswidth, (const wchar_t *, size_t));
 #endif
 size_t	_EXFUN(wcsxfrm, (wchar_t *__restrict, const wchar_t *__restrict,
 				size_t));
+#if __POSIX_VISIBLE >= 200809
+extern int wcscasecmp_l (const wchar_t *, const wchar_t *, locale_t);
+extern int wcsncasecmp_l (const wchar_t *, const wchar_t *, size_t, locale_t);
+extern int wcscoll_l (const wchar_t *, const wchar_t *, locale_t);
+extern size_t wcsxfrm_l (wchar_t *__restrict, const wchar_t *__restrict, size_t,
+			 locale_t);
+#endif
+
 #if __XSI_VISIBLE
 int	_EXFUN(wcwidth, (const wchar_t));
 #endif

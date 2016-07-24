@@ -46,13 +46,11 @@ _DEFUN (strcasecmp, (s1, s2),
 	_CONST char *s1 _AND
 	_CONST char *s2)
 {
-  _CONST unsigned char *ucs1 = (_CONST unsigned char *) s1;
-  _CONST unsigned char *ucs2 = (_CONST unsigned char *) s2;
   int d = 0;
   for ( ; ; )
     {
-      _CONST int c1 = tolower(*ucs1++);
-      _CONST int c2 = tolower(*ucs2++);
+      _CONST int c1 = tolower(*s1++);
+      _CONST int c2 = tolower(*s2++);
       if (((d = c1 - c2) != 0) || (c2 == '\0'))
         break;
     }

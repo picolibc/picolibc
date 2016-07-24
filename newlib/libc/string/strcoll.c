@@ -20,6 +20,9 @@ DESCRIPTION
 	the string pointed to by <[strb]>, using an interpretation
 	appropriate to the current <<LC_COLLATE>> state.
 
+	(NOT Cygwin:) The current implementation of <<strcoll>> simply
+	uses <<strcmp>> and does not support any language-specific sorting.
+
 RETURNS
 	If the first string is greater than the second string,
 	<<strcoll>> returns a number greater than zero.  If the two

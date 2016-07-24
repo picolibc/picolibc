@@ -1117,10 +1117,11 @@ __collate_load_locale (struct __locale_t *locale, const char *name,
    transformation.  The advantage is that we don't need any files with
    collation information. */
 extern "C" int
-wcscoll (const wchar_t *__restrict ws1, const wchar_t *__restrict ws2)
+wcscoll_l (const wchar_t *__restrict ws1, const wchar_t *__restrict ws2,
+	   struct __locale_t *locale)
 {
   int ret;
-  LCID collate_lcid = __get_current_collate_locale ()->lcid;
+  LCID collate_lcid = __get_locale_collate (locale)->lcid;
 
   if (!collate_lcid)
     return wcscmp (ws1, ws2);
@@ -1131,19 +1132,26 @@ wcscoll (const wchar_t *__restrict ws1, const wchar_t *__restrict ws2)
 }
 
 extern "C" int
-strcoll (const char *__restrict s1, const char *__restrict s2)
+wcscoll (const wchar_t *__restrict ws1, const wchar_t *__restrict ws2)
+{
+  return wcscoll_l (ws1, ws2, __get_current_locale ());
+}
+
+extern "C" int
+strcoll_l (const char *__restrict s1, const char *__restrict s2,
+	   struct __locale_t *locale)
 {
   size_t n1, n2;
   wchar_t *ws1, *ws2;
   tmp_pathbuf tp;
   int ret;
-  LCID collate_lcid = __get_current_collate_locale ()->lcid;
+  LCID collate_lcid = __get_locale_collate (locale)->lcid;
 
   if (!collate_lcid)
     return strcmp (s1, s2);
   /* The ANSI version of CompareString uses the default charset of the lcid,
      so we must use the Unicode version. */
-  mbtowc_p collate_mbtowc = __get_current_collate_locale ()->mbtowc;
+  mbtowc_p collate_mbtowc = __get_locale_collate (locale)->mbtowc;
   n1 = lc_mbstowcs (collate_mbtowc, NULL, s1, 0) + 1;
   ws1 = (n1 > NT_MAX_PATH ? (wchar_t *) malloc (n1 * sizeof (wchar_t))
 			  : tp.w_get ());
@@ -1162,6 +1170,12 @@ strcoll (const char *__restrict s1, const char *__restrict s2)
   return ret - CSTR_EQUAL;
 }
 
+extern "C" int
+strcoll (const char *__restrict s1, const char *__restrict s2)
+{
+  return strcoll_l (s1, s2, __get_current_locale ());
+}
+
 /* BSD.  Used from glob.cc, fnmatch.c and regcomp.c.  Make sure caller is
    using wide chars.  Unfortunately the definition of this functions hides
    the required input type. */
@@ -1174,10 +1188,11 @@ __collate_range_cmp (int c1, int c2)
 }
 
 extern "C" size_t
-wcsxfrm (wchar_t *__restrict ws1, const wchar_t *__restrict ws2, size_t wsn)
+wcsxfrm_l (wchar_t *__restrict ws1, const wchar_t *__restrict ws2, size_t wsn,
+	   struct __locale_t *locale)
 {
   size_t ret;
-  LCID collate_lcid = __get_current_collate_locale ()->lcid;
+  LCID collate_lcid = __get_locale_collate (locale)->lcid;
 
   if (!collate_lcid)
     return wcslcpy (ws1, ws2, wsn);
@@ -1207,19 +1222,26 @@ wcsxfrm (wchar_t *__restrict ws1, const wchar_t *__restrict ws2, size_t wsn)
 }
 
 extern "C" size_t
-strxfrm (char *__restrict s1, const char *__restrict s2, size_t sn)
+wcsxfrm (wchar_t *__restrict ws1, const wchar_t *__restrict ws2, size_t wsn)
+{
+  return wcsxfrm_l (ws1, ws2, wsn, __get_current_locale ());
+}
+
+extern "C" size_t
+strxfrm_l (char *__restrict s1, const char *__restrict s2, size_t sn,
+	   struct __locale_t *locale)
 {
   size_t ret = 0;
   size_t n2;
   wchar_t *ws2;
   tmp_pathbuf tp;
-  LCID collate_lcid = __get_current_collate_locale ()->lcid;
+  LCID collate_lcid = __get_locale_collate (locale)->lcid;
 
   if (!collate_lcid)
     return strlcpy (s1, s2, sn);
   /* The ANSI version of LCMapString uses the default charset of the lcid,
      so we must use the Unicode version. */
-  mbtowc_p collate_mbtowc = __get_current_collate_locale ()->mbtowc;
+  mbtowc_p collate_mbtowc = __get_locale_collate (locale)->mbtowc;
   n2 = lc_mbstowcs (collate_mbtowc, NULL, s2, 0) + 1;
   ws2 = (n2 > NT_MAX_PATH ? (wchar_t *) malloc (n2 * sizeof (wchar_t))
 			  : tp.w_get ());
@@ -1243,6 +1265,12 @@ strxfrm (char *__restrict s1, const char *__restrict s2, size_t sn)
   /* LCMapStringW returns byte count including the terminating NUL character.
      strxfrm is supposed to return length excluding the NUL. */
   return ret - 1;
+}
+
+extern "C" size_t
+strxfrm (char *__restrict s1, const char *__restrict s2, size_t sn)
+{
+  return strxfrm_l (s1, s2, sn, __get_current_locale ());
 }
 
 /* Fetch default ANSI codepage from locale info and generate a setlocale
