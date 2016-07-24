@@ -410,14 +410,20 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     insque
     ioctl
     isalnum
+    isalnum_l
     isalpha
+    isalpha_l
     isascii
     isatty
     isblank
+    isblank_l
     iscntrl
+    iscntrl_l
     isdigit
+    isdigit_l
     isfinite			(see chapter "Implementation Notes")
     isgraph
+    isgraph_l
     isgreater			(see chapter "Implementation Notes")
     isgreaterequal		(see chapter "Implementation Notes")
     isinf			(see chapter "Implementation Notes")
@@ -425,27 +431,46 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     islessequal			(see chapter "Implementation Notes")
     islessgreater		(see chapter "Implementation Notes")
     islower
+    islower_l
     isnan			(see chapter "Implementation Notes")
     isnormal			(see chapter "Implementation Notes")
     isprint
+    isprint_l
     ispunct
+    ispunct_l
     isspace
+    isspace_l
     isunordered			(see chapter "Implementation Notes")
     isupper
+    isupper_l
     iswalnum
+    iswalnum_l
     iswalpha
+    iswalpha_l
     iswblank
+    iswblank_l
     iswcntrl
+    iswcntrl_l
     iswctype
+    iswctype_l
     iswdigit
+    iswdigit_l
     iswgraph
+    iswgraph_l
     iswlower
+    iswlower_l
     iswprint
+    iswprint_l
     iswpunct
+    iswpunct_l
     iswspace
+    iswspace_l
     iswupper
+    iswupper_l
     iswxdigit
+    iswxdigit_l
     isxdigit
+    isxdigit_l
     j0
     j1
     jn
@@ -964,12 +989,16 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     timezone
     tmpfile
     tmpnam
-    toascii
     tolower
+    tolower_l
     toupper
+    toupper_l
     towctrans
+    towctrans_l
     towlower
+    towlower_l
     towupper
+    towupper_l
     trunc
     truncate
     truncf
@@ -1052,7 +1081,9 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     wctob
     wctomb
     wctrans
+    wctrans_l
     wctype
+    wctype_l
     wcwidth
     wmemchr
     wmemcmp
@@ -1313,6 +1344,7 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     tdestroy
     timegm
     timelocal
+    toascii_l
     updwtmpx
     utmpxname
     vasnprintf
@@ -1460,6 +1492,7 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     sys_errlist			(BSD)
     sys_nerr			(BSD)
     sys_siglist			(BSD)
+    toascii			(SUSv3)
     ttyslot			(SUSv2)
     ualarm			(SUSv3)
     usleep			(SUSv3)
@@ -1490,32 +1523,7 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     getnetbyname
     getnetent
     getpmsg
-    isalnum_l
-    isalpha_l
     isastream
-    isblank_l
-    iscntrl_l
-    isdigit_l
-    isgraph_l
-    islower_l
-    isprint_l
-    ispunct_l
-    isspace_l
-    isupper_l
-    iswalnum_l
-    iswalpha_l
-    iswblank_l
-    iswcntrl_l
-    iswctype_l
-    iswdigit_l
-    iswgraph_l
-    iswlower_l
-    iswprint_l
-    iswpunct_l
-    iswspace_l
-    iswupper_l
-    iswxdigit_l
-    isxdigit_l
     lio_listio
     mlockall
     munlockall
@@ -1537,19 +1545,12 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     strncasecmp_l
     strxfrm_l
     timer_getoverrun
-    tolower_l
-    toupper_l
-    towctrans_l
-    towlower_l
-    towupper_l
     ulimit
     waitid
     wcscasecmp_l
     wcscoll_l
     wcsncasecmp_l
     wcsxfrm_l
-    wctrans_l
-    wctype_l
 </screen>
 
 </sect1>

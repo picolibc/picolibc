@@ -220,6 +220,14 @@ __get_current_locale ()
   return _REENT->_locale ?: &__global_locale;
 }
 
+#define __get_locale_ctype(__l) \
+	((const struct lc_ctype_T *) (__l)->lc_cat[LC_CTYPE].ptr)
+#ifdef __HAVE_LOCALE_INFO__
+#define __locale_mb_cur_max_l(__l)	(__get_locale_ctype (__l)->mb_cur_max)
+#else
+#define __locale_mb_cur_max_l(__l)	((__l)->mb_cur_max)
+#endif
+
 #ifdef __CYGWIN__
 _ELIDABLE_INLINE const struct lc_collate_T *
 __get_current_collate_locale (void)
