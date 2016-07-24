@@ -46,11 +46,13 @@ _DEFUN (wcscasecmp, (s1, s2),
 	_CONST wchar_t *s1 _AND
 	_CONST wchar_t *s2)
 {
-  while (*s1 != '\0' && towlower(*s1) == towlower(*s2))
+  int d = 0;
+  for ( ; ; )
     {
-      s1++;
-      s2++;
+      const int c1 = towlower (*s1++);
+      const int c2 = towlower (*s2++);
+      if (((d = c1 - c2) != 0) || (c2 == '\0'))
+        break;
     }
-
-  return towlower(*s1) - towlower(*s2);
+  return d;
 }

@@ -49,16 +49,13 @@ _DEFUN (wcsncasecmp, (s1, s2, n),
 	_CONST wchar_t *s2 _AND
 	size_t n)
 {
-  if (n == 0)
-    return 0;
-
-  while (n-- != 0 && towlower(*s1) == towlower(*s2))
+  int d = 0;
+  for ( ; n != 0; n--)
     {
-      if (n == 0 || *s1 == '\0' || *s2 == '\0')
-	break;
-      s1++;
-      s2++;
+      const int c1 = towlower (*s1++);
+      const int c2 = towlower (*s2++);
+      if (((d = c1 - c2) != 0) || (c2 == '\0'))
+        break;
     }
-
-  return towlower(*s1) - towlower(*s2);
+  return d;
 }

@@ -220,21 +220,35 @@ __get_current_locale ()
   return _REENT->_locale ?: &__global_locale;
 }
 
-#define __get_locale_ctype(__l) \
-	((const struct lc_ctype_T *) (__l)->lc_cat[LC_CTYPE].ptr)
-#ifdef __HAVE_LOCALE_INFO__
-#define __locale_mb_cur_max_l(__l)	(__get_locale_ctype (__l)->mb_cur_max)
-#else
-#define __locale_mb_cur_max_l(__l)	((__l)->mb_cur_max)
-#endif
-
 #ifdef __CYGWIN__
+_ELIDABLE_INLINE const struct lc_collate_T *
+__get_locale_collate (struct __locale_t *locale)
+{
+  return (const struct lc_collate_T *) locale->lc_cat[LC_COLLATE].ptr;
+}
+
 _ELIDABLE_INLINE const struct lc_collate_T *
 __get_current_collate_locale (void)
 {
   return (const struct lc_collate_T *) __get_current_locale ()->lc_cat[LC_COLLATE].ptr;
 }
 #endif
+
+_ELIDABLE_INLINE const struct lc_ctype_T *
+__get_locale_ctype (struct __locale_t *locale)
+{
+  return (const struct lc_ctype_T *) (locale)->lc_cat[LC_CTYPE].ptr;
+}
+
+_ELIDABLE_INLINE int
+__locale_mb_cur_max_l (struct __locale_t *locale)
+{
+#ifdef __HAVE_LOCALE_INFO__
+  return __get_locale_ctype (locale)->mb_cur_max[0];
+#else
+  return locale->mb_cur_max[0];
+#endif
+}
 
 _ELIDABLE_INLINE const struct lc_ctype_T *
 __get_current_ctype_locale (void)
@@ -258,6 +272,12 @@ _ELIDABLE_INLINE const struct lc_time_T *
 __get_current_time_locale (void)
 {
   return (const struct lc_time_T *) __get_current_locale ()->lc_cat[LC_TIME].ptr;
+}
+
+_ELIDABLE_INLINE const struct lc_ctype_T *
+__get_locale_time (struct __locale_t *locale)
+{
+  return (const struct lc_time_T *) (locale)->lc_cat[LC_TIME].ptr;
 }
 
 _ELIDABLE_INLINE const struct lc_messages_T *

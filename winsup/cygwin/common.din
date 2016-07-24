@@ -1330,12 +1330,14 @@ stime SIGFE
 stpcpy NOSIGFE
 stpncpy NOSIGFE
 strcasecmp NOSIGFE
+strcasecmp_l NOSIGFE
 strcasestr NOSIGFE
 strcat NOSIGFE
 strchr NOSIGFE
 strchrnul NOSIGFE
 strcmp NOSIGFE
 strcoll NOSIGFE
+strcoll_l NOSIGFE
 strcpy NOSIGFE
 strcspn NOSIGFE
 strdup SIGFE
@@ -1343,11 +1345,13 @@ strerror SIGFE
 strerror_r SIGFE
 strfmon SIGFE
 strftime SIGFE
+strftime_l SIGFE
 strlcat NOSIGFE
 strlcpy NOSIGFE
 strlen NOSIGFE
 strlwr NOSIGFE
 strncasecmp NOSIGFE
+strncasecmp_l NOSIGFE
 strncat NOSIGFE
 strncmp NOSIGFE
 strncpy NOSIGFE
@@ -1374,6 +1378,7 @@ strtoull NOSIGFE
 strtoumax = strtoull NOSIGFE
 strupr NOSIGFE
 strxfrm NOSIGFE
+strxfrm_l NOSIGFE
 swab NOSIGFE
 swapcontext NOSIGFE
 swprintf SIGFE
@@ -1495,10 +1500,12 @@ wcpcpy NOSIGFE
 wcpncpy NOSIGFE
 wcrtomb NOSIGFE
 wcscasecmp NOSIGFE
+wcscasecmp_l NOSIGFE
 wcscat NOSIGFE
 wcschr NOSIGFE
 wcscmp NOSIGFE
 wcscoll NOSIGFE
+wcscoll_l NOSIGFE
 wcscpy NOSIGFE
 wcscspn NOSIGFE
 wcsdup NOSIGFE
@@ -1507,6 +1514,7 @@ wcslcat NOSIGFE
 wcslcpy NOSIGFE
 wcslen NOSIGFE
 wcsncasecmp NOSIGFE
+wcsncasecmp_l NOSIGFE
 wcsncat NOSIGFE
 wcsncmp NOSIGFE
 wcsncpy NOSIGFE
@@ -1530,6 +1538,7 @@ wcstoull NOSIGFE
 wcstoumax = wcstoull NOSIGFE
 wcswidth NOSIGFE
 wcsxfrm NOSIGFE
+wcsxfrm_l NOSIGFE
 wctob NOSIGFE
 wctomb NOSIGFE
 wctrans NOSIGFE

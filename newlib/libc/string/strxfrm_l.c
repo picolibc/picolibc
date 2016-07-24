@@ -1,21 +1,14 @@
 /*
 FUNCTION
-	<<strxfrm>>---transform string
+	<<strxfrm_l>>---transform string
 
 INDEX
-	strxfrm
+	strxfrm_l
 
 ANSI_SYNOPSIS
 	#include <string.h>
-	size_t strxfrm(char *restrict <[s1]>, const char *restrict <[s2]>,
-                       size_t <[n]>);
-
-TRAD_SYNOPSIS
-	#include <string.h>
-	size_t strxfrm(<[s1]>, <[s2]>, <[n]>);
-	char *<[s1]>;
-	char *<[s2]>;
-	size_t <[n]>;
+	size_t strxfrm_l(char *restrict <[s1]>, const char *restrict <[s2]>,
+                       size_t <[n]>, locale_t <[locale]>);
 
 DESCRIPTION
 	This function transforms the string pointed to by <[s2]> and
@@ -32,31 +25,32 @@ DESCRIPTION
 	copying takes place between objects that overlap, the behavior
 	is undefined.
 
-	(NOT Cygwin:) The current implementation of <<strxfrm>> simply copies
+	(NOT Cygwin:) The current implementation of <<strxfrm_l>> simply copies
 	the input and does not support any language-specific transformations.
 
+	If <[locale]> is LC_GLOBAL_LOCALE or not a valid locale object, the
+	behaviour is undefined.
+
 RETURNS
-	The <<strxfrm>> function returns the length of the transformed string
+	The <<strxfrm_l>> function returns the length of the transformed string
 	(not including the terminating null character). If the value returned
 	is <[n]> or more, the contents of the array pointed to by
 	<[s1]> are indeterminate.
 
 PORTABILITY
-<<strxfrm>> is ANSI C.
+<<strxfrm_l>> is POSIX-1.2008.
 
-<<strxfrm>> requires no supporting OS subroutines.
+<<strxfrm_l>> requires no supporting OS subroutines.
 
 QUICKREF
-	strxfrm ansi pure
+	strxfrm_l ansi pure
 */
 
 #include <string.h>
 
 size_t
-_DEFUN (strxfrm, (s1, s2, n),
-	char *__restrict s1 _AND
-	_CONST char *__restrict s2 _AND
-	size_t n)
+strxfrm_l (char *__restrict s1, const char *__restrict s2, size_t n,
+	   struct __locale_t *locale)
 {
   size_t res;
   res = 0;

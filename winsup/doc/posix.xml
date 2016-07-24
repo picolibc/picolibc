@@ -913,10 +913,12 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     stpcpy
     stpncpy
     strcasecmp
+    strcasecmp_l
     strcat
     strchr
     strcmp
     strcoll
+    strcoll_l
     strcpy
     strcspn
     strdup
@@ -924,8 +926,10 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     strerror_r
     strfmon
     strftime
+    strftime_l
     strlen
     strncasecmp
+    strncasecmp_l
     strncat
     strncmp
     strncpy
@@ -949,6 +953,7 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     strtoull
     strtoumax
     strxfrm
+    strxfrm_l
     swab
     swprintf
     swscanf
@@ -1045,16 +1050,19 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     wcpncpy
     wcrtomb
     wcscasecmp
+    wcscasecmp_l
     wcscat
     wcschr
     wcscmp
     wcscoll
+    wcscoll_l
     wcscpy
     wcscspn
     wcsdup
     wcsftime
     wcslen
     wcsncasecmp
+    wcsncasecmp_l
     wcsncat
     wcsncmp
     wcsncpy
@@ -1078,6 +1086,7 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     wcstoumax
     wcswidth
     wcsxfrm
+    wcsxfrm_l
     wctob
     wctomb
     wctrans
@@ -1539,18 +1548,10 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     putmsg
     setnetent
     sigtimedwait
-    strcasecmp_l
-    strcoll_l
     strfmon_l
-    strncasecmp_l
-    strxfrm_l
     timer_getoverrun
     ulimit
     waitid
-    wcscasecmp_l
-    wcscoll_l
-    wcsncasecmp_l
-    wcsxfrm_l
 </screen>
 
 </sect1>
