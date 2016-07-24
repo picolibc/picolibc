@@ -4,6 +4,11 @@
 #include "_ansi.h"
 #include <sys/cdefs.h>
 
+#if __MISC_VISIBLE || __POSIX_VISIBLE >= 200809 || defined (_COMPILING_NEWLIB)
+struct __locale_t;
+typedef struct __locale_t *locale_t;
+#endif
+
 _BEGIN_STD_C
 
 int _EXFUN(isalnum, (int __c));
@@ -31,6 +36,28 @@ int _EXFUN(toascii, (int __c));
 #define _toupper(__c) ((unsigned char)(__c) - 'a' + 'A')
 #endif
 
+#if __POSIX_VISIBLE >= 200809
+extern int isalnum_l (int __c, locale_t __l);
+extern int isalpha_l (int __c, locale_t __l);
+extern int isblank_l (int __c, locale_t __l);
+extern int iscntrl_l (int __c, locale_t __l);
+extern int isdigit_l (int __c, locale_t __l);
+extern int isgraph_l (int __c, locale_t __l);
+extern int islower_l (int __c, locale_t __l);
+extern int isprint_l (int __c, locale_t __l);
+extern int ispunct_l (int __c, locale_t __l);
+extern int isspace_l (int __c, locale_t __l);
+extern int isupper_l (int __c, locale_t __l);
+extern int isxdigit_l(int __c, locale_t __l);
+extern int tolower_l (int __c, locale_t __l);
+extern int toupper_l (int __c, locale_t __l);
+#endif
+
+#if __MISC_VISIBLE
+extern int isascii_l (int __c, locale_t __l);
+extern int toascii_l (int __c, locale_t __l);
+#endif
+
 #define	_U	01
 #define	_L	02
 #define	_N	04
@@ -43,11 +70,11 @@ int _EXFUN(toascii, (int __c));
 #ifndef _MB_CAPABLE
 _CONST
 #endif
-extern	__IMPORT char	*__ctype_ptr__;
 #ifdef __HAVE_LOCALE_INFO__
-char *_EXFUN(__locale_ctype_ptr, (void));
+char *__locale_ctype_ptr (void);
 # define __CTYPE_PTR	(__locale_ctype_ptr ())
 #else
+extern	__IMPORT char	*__ctype_ptr__;
 # define __CTYPE_PTR	(__ctype_ptr__)
 #endif
 
@@ -81,6 +108,39 @@ char *_EXFUN(__locale_ctype_ptr, (void));
         (__ctype_lookup(__x)&_B) || (int) (__x) == '\t';})
 #endif
 
+#if __POSIX_VISIBLE >= 200809
+char *__locale_ctype_ptr_l (locale_t);
+#define __ctype_lookup_l(__c,__l) ((__locale_ctype_ptr_l(__l)+sizeof(""[__c]))[(int)(__c)])
+
+#define	isalpha_l(__c,__l)	(__ctype_lookup_l(__c,__l)&(_U|_L))
+#define	isupper_l(__c,__l)	((__ctype_lookup_l(__c,__l)&(_U|_L))==_U)
+#define	islower_l(__c,__l)	((__ctype_lookup_l(__c,__l)&(_U|_L))==_L)
+#define	isdigit_l(__c,__l)	(__ctype_lookup_l(__c,__l)&_N)
+#define	isxdigit_l(__c,__l)	(__ctype_lookup_l(__c,__l)&(_X|_N))
+#define	isspace_l(__c,__l)	(__ctype_lookup_l(__c,__l)&_S)
+#define ispunct_l(__c,__l)	(__ctype_lookup_l(__c,__l)&_P)
+#define isalnum_l(__c,__l)	(__ctype_lookup_l(__c,__l)&(_U|_L|_N))
+#define isprint_l(__c,__l)	(__ctype_lookup_l(__c,__l)&(_P|_U|_L|_N|_B))
+#define	isgraph_l(__c,__l)	(__ctype_lookup_l(__c,__l)&(_P|_U|_L|_N))
+#define iscntrl_l(__c,__l)	(__ctype_lookup_l(__c,__l)&_C)
+
+#if defined(__GNUC__)
+#define isblank_l(__c, __l) \
+  __extension__ ({ __typeof__ (__c) __x = (__c);		\
+        (__ctype_lookup_l(__x,__l)&_B) || (int) (__x) == '\t';})
+#endif
+
+#endif /* __POSIX_VISIBLE >= 200809 */
+
+#if __MISC_VISIBLE || __XSI_VISIBLE
+#define isascii(__c)	((unsigned)(__c)<=0177)
+#define toascii(__c)	((__c)&0177)
+#endif
+
+#if __MISC_VISIBLE
+#define isascii_l(__c,__l)	((__l),(unsigned)(__c)<=0177)
+#define toascii_l(__c,__l)	((__l),(__c)&0177)
+#endif
 
 /* Non-gcc versions will get the library versions, and will be
    slightly slower.  These macros are not NLS-aware so they are
@@ -105,10 +165,8 @@ char *_EXFUN(__locale_ctype_ptr, (void));
 #  endif /* _MB_EXTENDED_CHARSETS* */
 # endif /* __GNUC__ */
 
-#if __MISC_VISIBLE || __XSI_VISIBLE
-#define isascii(__c)	((unsigned)(__c)<=0177)
-#define toascii(__c)	((__c)&0177)
-#endif
+#if __POSIX_VISIBLE >= 200809
+#endif /* __POSIX_VISIBLE >= 200809 */
 
 #endif /* !__cplusplus */
 

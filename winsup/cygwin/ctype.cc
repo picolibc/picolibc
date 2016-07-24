@@ -5,6 +5,7 @@ extern "C" {
 #include <stdlib.h>
 #include <wctype.h>
 
+extern char *__ctype_ptr__;
 extern char _ctype_b[128 + 256];
 
 /* Called from newlib's setlocale().  What we do here is to copy the
