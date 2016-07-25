@@ -454,19 +454,21 @@ details. */
        nexttowardf, nexttowardl, pow10l, powl, remainderl, remquol, roundl,
        scalbl, scalblnl, scalbnl, sincosl, sinhl, sinl, tanhl, tanl,
        tgammal, truncl.
-  298: newlocale, freelocale, duplocale, uselocale.
-  299: __locale_ctype_ptr_l, isalnum_l, isalpha_l, isascii_l, isblank_l,
+  298: Export newlocale, freelocale, duplocale, uselocale.
+  299: Export __locale_ctype_ptr_l, isalnum_l, isalpha_l, isascii_l, isblank_l,
        iscntrl_l, isdigit_l, isgraph_l, islower_l, isprint_l, ispunct_l,
        isspace_l, isupper_l, iswalnum_l, iswalpha_l, iswblank_l, iswcntrl_l,
        iswctype_l, iswdigit_l, iswgraph_l, iswlower_l, iswprint_l, iswpunct_l,
        iswspace_l, iswupper_l, iswxdigit_l, isxdigit_l, toascii_l, tolower_l,
        toupper_l, towctrans_l, towlower_l, towupper_l, wctrans_l, wctype_l.
+  300: Export strcasecmp_l, strcoll_l, strfmon_l, strftime_l, strncasecmp_l,
+       strxfrm_l, wcscasecmp_l, wcscoll_l, wcstrncasecmp_l, wcstrxfrm_l.
 
   Note that we forgot to bump the api for ualarm, strtoll, strtoull,
   sigaltstack, sethostname. */
 
 #define CYGWIN_VERSION_API_MAJOR 0
-#define CYGWIN_VERSION_API_MINOR 299
+#define CYGWIN_VERSION_API_MINOR 300
 
 /* There is also a compatibity version number associated with the shared memory
    regions.  It is incremented when incompatible changes are made to the shared
