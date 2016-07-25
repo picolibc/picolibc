@@ -44,123 +44,127 @@ __BEGIN_DECLS
 #define _LC_LAST      7
 
 #ifdef __CYGWIN__
-typedef __uint32_t LCID;
-
 struct lc_collate_T
 {
-  LCID  lcid;
-  int (*mbtowc) (struct _reent *, wchar_t *, const char *, size_t, mbstate_t *);
-  char codeset[ENCODING_LEN + 1];
+  __uint32_t	 lcid;
+  int	       (*mbtowc) (struct _reent *, wchar_t *, const char *, size_t,
+			  mbstate_t *);
+  char		 codeset[ENCODING_LEN + 1];
 };
 extern const struct lc_collate_T _C_collate_locale;
 #endif
 
-struct lc_ctype_T {
-	const char	*codeset;	 /* codeset for mbtowc conversion */
-	const char	*mb_cur_max;
+struct lc_ctype_T
+{
+  const char	*codeset;	 /* codeset for mbtowc conversion */
+  const char	*mb_cur_max;
 #ifdef __HAVE_LOCALE_INFO_EXTENDED__
-	const char	*outdigits[10];
-	const wchar_t	*woutdigits[10];
+  const char	*outdigits[10];
+  const wchar_t	*woutdigits[10];
 #endif
 };
 extern const struct lc_ctype_T _C_ctype_locale;
 
-struct lc_monetary_T {
-	const char	*int_curr_symbol;
-	const char	*currency_symbol;
-	const char	*mon_decimal_point;
-	const char	*mon_thousands_sep;
-	const char	*mon_grouping;
-	const char	*positive_sign;
-	const char	*negative_sign;
-	const char	*int_frac_digits;
-	const char	*frac_digits;
-	const char	*p_cs_precedes;
-	const char	*p_sep_by_space;
-	const char	*n_cs_precedes;
-	const char	*n_sep_by_space;
-	const char	*p_sign_posn;
-	const char	*n_sign_posn;
+struct lc_monetary_T
+{
+  const char	*int_curr_symbol;
+  const char	*currency_symbol;
+  const char	*mon_decimal_point;
+  const char	*mon_thousands_sep;
+  const char	*mon_grouping;
+  const char	*positive_sign;
+  const char	*negative_sign;
+  const char	*int_frac_digits;
+  const char	*frac_digits;
+  const char	*p_cs_precedes;
+  const char	*p_sep_by_space;
+  const char	*n_cs_precedes;
+  const char	*n_sep_by_space;
+  const char	*p_sign_posn;
+  const char	*n_sign_posn;
 #ifdef __HAVE_LOCALE_INFO_EXTENDED__
-	const char	*int_p_cs_precedes;
-	const char	*int_p_sep_by_space;
-	const char	*int_n_cs_precedes;
-	const char	*int_n_sep_by_space;
-	const char	*int_p_sign_posn;
-	const char	*int_n_sign_posn;
-	const char	*codeset;	 /* codeset for mbtowc conversion */
-	const wchar_t	*wint_curr_symbol;
-	const wchar_t	*wcurrency_symbol;
-	const wchar_t	*wmon_decimal_point;
-	const wchar_t	*wmon_thousands_sep;
-	const wchar_t	*wpositive_sign;
-	const wchar_t	*wnegative_sign;
+  const char	*int_p_cs_precedes;
+  const char	*int_p_sep_by_space;
+  const char	*int_n_cs_precedes;
+  const char	*int_n_sep_by_space;
+  const char	*int_p_sign_posn;
+  const char	*int_n_sign_posn;
+  const char	*codeset;	 /* codeset for mbtowc conversion */
+  const wchar_t	*wint_curr_symbol;
+  const wchar_t	*wcurrency_symbol;
+  const wchar_t	*wmon_decimal_point;
+  const wchar_t	*wmon_thousands_sep;
+  const wchar_t	*wpositive_sign;
+  const wchar_t	*wnegative_sign;
 #endif
 };
 extern const struct lc_monetary_T _C_monetary_locale;
 
-struct lc_numeric_T {
-	const char	*decimal_point;
-	const char	*thousands_sep;
-	const char	*grouping;
+struct lc_numeric_T
+{
+  const char	*decimal_point;
+  const char	*thousands_sep;
+  const char	*grouping;
 #ifdef __HAVE_LOCALE_INFO_EXTENDED__
-	const char	*codeset;	 /* codeset for mbtowc conversion */
-	const wchar_t	*wdecimal_point;
-	const wchar_t	*wthousands_sep;
+  const char	*codeset;	 /* codeset for mbtowc conversion */
+  const wchar_t	*wdecimal_point;
+  const wchar_t	*wthousands_sep;
 #endif
 };
 extern const struct lc_numeric_T _C_numeric_locale;
 
-struct lc_time_T {
-	const char	*mon[12];
-	const char	*month[12];
-	const char	*wday[7];
-	const char	*weekday[7];
-	const char	*X_fmt;
-	const char	*x_fmt;
-	const char	*c_fmt;
-	const char	*am_pm[2];
-	const char	*date_fmt;
-	const char	*alt_month[12];	/* unused */
-	const char	*md_order;
-	const char	*ampm_fmt;
-	const char	*era;
-	const char	*era_d_fmt;
-	const char	*era_d_t_fmt;
-	const char	*era_t_fmt;
-	const char	*alt_digits;
+struct lc_time_T
+{
+  const char	*mon[12];
+  const char	*month[12];
+  const char	*wday[7];
+  const char	*weekday[7];
+  const char	*X_fmt;
+  const char	*x_fmt;
+  const char	*c_fmt;
+  const char	*am_pm[2];
+  const char	*date_fmt;
+  const char	*alt_month[12];	/* unused */
+  const char	*md_order;
+  const char	*ampm_fmt;
+  const char	*era;
+  const char	*era_d_fmt;
+  const char	*era_d_t_fmt;
+  const char	*era_t_fmt;
+  const char	*alt_digits;
 #ifdef __HAVE_LOCALE_INFO_EXTENDED__
-	const char	*codeset;	 /* codeset for mbtowc conversion */
-	const wchar_t	*wmon[12];
-	const wchar_t	*wmonth[12];
-	const wchar_t	*wwday[7];
-	const wchar_t	*wweekday[7];
-	const wchar_t	*wX_fmt;
-	const wchar_t	*wx_fmt;
-	const wchar_t	*wc_fmt;
-	const wchar_t	*wam_pm[2];
-	const wchar_t	*wdate_fmt;
-	const wchar_t	*wampm_fmt;
-	const wchar_t	*wera;
-	const wchar_t	*wera_d_fmt;
-	const wchar_t	*wera_d_t_fmt;
-	const wchar_t	*wera_t_fmt;
-	const wchar_t	*walt_digits;
+  const char	*codeset;	 /* codeset for mbtowc conversion */
+  const wchar_t	*wmon[12];
+  const wchar_t	*wmonth[12];
+  const wchar_t	*wwday[7];
+  const wchar_t	*wweekday[7];
+  const wchar_t	*wX_fmt;
+  const wchar_t	*wx_fmt;
+  const wchar_t	*wc_fmt;
+  const wchar_t	*wam_pm[2];
+  const wchar_t	*wdate_fmt;
+  const wchar_t	*wampm_fmt;
+  const wchar_t	*wera;
+  const wchar_t	*wera_d_fmt;
+  const wchar_t	*wera_d_t_fmt;
+  const wchar_t	*wera_t_fmt;
+  const wchar_t	*walt_digits;
 #endif
 };
 extern const struct lc_time_T _C_time_locale;
 
-struct	lc_messages_T {
-	const char	*yesexpr;
-	const char	*noexpr;
-	const char	*yesstr;
-	const char	*nostr;
+struct	lc_messages_T
+{
+  const char	*yesexpr;
+  const char	*noexpr;
+  const char	*yesstr;
+  const char	*nostr;
 #ifdef __HAVE_LOCALE_INFO_EXTENDED__
-	const char	*codeset;	 /* codeset for mbtowc conversion */
-	const wchar_t	*wyesexpr;
-	const wchar_t	*wnoexpr;
-	const wchar_t	*wyesstr;
-	const wchar_t	*wnostr;
+  const char	*codeset;	 /* codeset for mbtowc conversion */
+  const wchar_t	*wyesexpr;
+  const wchar_t	*wnoexpr;
+  const wchar_t	*wyesstr;
+  const wchar_t	*wnostr;
 #endif
 };
 extern const struct lc_messages_T _C_messages_locale;
