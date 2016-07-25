@@ -1344,6 +1344,7 @@ strdup SIGFE
 strerror SIGFE
 strerror_r SIGFE
 strfmon SIGFE
+strfmon_l SIGFE
 strftime SIGFE
 strftime_l SIGFE
 strlcat NOSIGFE
