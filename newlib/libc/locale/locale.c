@@ -223,6 +223,13 @@ const struct __locale_t __C_locale =
   __ascii_mbtowc,
   0,
   NULL,
+  {
+    ".", "", "", "", "", "", "", "", "", "",
+    CHAR_MAX, CHAR_MAX, CHAR_MAX, CHAR_MAX,
+    CHAR_MAX, CHAR_MAX, CHAR_MAX, CHAR_MAX,
+    CHAR_MAX, CHAR_MAX, CHAR_MAX, CHAR_MAX,
+    CHAR_MAX, CHAR_MAX
+  },
 #ifndef __HAVE_LOCALE_INFO__
   "\1",
   "ASCII",
@@ -256,6 +263,13 @@ struct __locale_t __global_locale =
 #endif
   0,
   NULL,
+  {
+    ".", "", "", "", "", "", "", "", "", "",
+    CHAR_MAX, CHAR_MAX, CHAR_MAX, CHAR_MAX,
+    CHAR_MAX, CHAR_MAX, CHAR_MAX, CHAR_MAX,
+    CHAR_MAX, CHAR_MAX, CHAR_MAX, CHAR_MAX,
+    CHAR_MAX, CHAR_MAX
+  },
 #ifndef __HAVE_LOCALE_INFO__
   "\1",
   "ASCII",

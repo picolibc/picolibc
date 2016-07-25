@@ -180,6 +180,7 @@ struct __locale_t
 				   const char *, size_t, mbstate_t *);
   int			 cjk_lang;
   char			*ctype_ptr; /* Unused in __global_locale */
+  struct lconv		 lconv;
 #ifndef __HAVE_LOCALE_INFO__
   char			 mb_cur_max[2];
   char			 ctype_codeset[ENCODING_LEN + 1];
@@ -194,6 +195,8 @@ extern struct __locale_t __global_locale;
 
 extern char *__loadlocale (struct __locale_t *, int, const char *);
 extern const char *__get_locale_env(struct _reent *, int);
+
+extern struct lconv *__localeconv_l (struct __locale_t *locale);
 
 /* In POSIX terms the global locale is the process-wide locale.  Use this
    function to always refer to the global locale. */
