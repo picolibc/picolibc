@@ -1121,7 +1121,7 @@ wcscoll_l (const wchar_t *__restrict ws1, const wchar_t *__restrict ws2,
 	   struct __locale_t *locale)
 {
   int ret;
-  LCID collate_lcid = __get_locale_collate (locale)->lcid;
+  LCID collate_lcid = __get_collate_locale (locale)->lcid;
 
   if (!collate_lcid)
     return wcscmp (ws1, ws2);
@@ -1145,13 +1145,13 @@ strcoll_l (const char *__restrict s1, const char *__restrict s2,
   wchar_t *ws1, *ws2;
   tmp_pathbuf tp;
   int ret;
-  LCID collate_lcid = __get_locale_collate (locale)->lcid;
+  LCID collate_lcid = __get_collate_locale (locale)->lcid;
 
   if (!collate_lcid)
     return strcmp (s1, s2);
   /* The ANSI version of CompareString uses the default charset of the lcid,
      so we must use the Unicode version. */
-  mbtowc_p collate_mbtowc = __get_locale_collate (locale)->mbtowc;
+  mbtowc_p collate_mbtowc = __get_collate_locale (locale)->mbtowc;
   n1 = lc_mbstowcs (collate_mbtowc, NULL, s1, 0) + 1;
   ws1 = (n1 > NT_MAX_PATH ? (wchar_t *) malloc (n1 * sizeof (wchar_t))
 			  : tp.w_get ());
@@ -1192,7 +1192,7 @@ wcsxfrm_l (wchar_t *__restrict ws1, const wchar_t *__restrict ws2, size_t wsn,
 	   struct __locale_t *locale)
 {
   size_t ret;
-  LCID collate_lcid = __get_locale_collate (locale)->lcid;
+  LCID collate_lcid = __get_collate_locale (locale)->lcid;
 
   if (!collate_lcid)
     return wcslcpy (ws1, ws2, wsn);
@@ -1235,13 +1235,13 @@ strxfrm_l (char *__restrict s1, const char *__restrict s2, size_t sn,
   size_t n2;
   wchar_t *ws2;
   tmp_pathbuf tp;
-  LCID collate_lcid = __get_locale_collate (locale)->lcid;
+  LCID collate_lcid = __get_collate_locale (locale)->lcid;
 
   if (!collate_lcid)
     return strlcpy (s1, s2, sn);
   /* The ANSI version of LCMapString uses the default charset of the lcid,
      so we must use the Unicode version. */
-  mbtowc_p collate_mbtowc = __get_locale_collate (locale)->mbtowc;
+  mbtowc_p collate_mbtowc = __get_collate_locale (locale)->mbtowc;
   n2 = lc_mbstowcs (collate_mbtowc, NULL, s2, 0) + 1;
   ws2 = (n2 > NT_MAX_PATH ? (wchar_t *) malloc (n2 * sizeof (wchar_t))
 			  : tp.w_get ());

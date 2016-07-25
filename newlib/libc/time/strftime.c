@@ -698,7 +698,7 @@ __strftime (CHAR *s, size_t maxsize, const CHAR *format,
   unsigned long width;
   int tzset_called = 0;
 
-  const struct lc_time_T *_CurrentTimeLocale = __get_locale_time (locale);
+  const struct lc_time_T *_CurrentTimeLocale = __get_time_locale (locale);
   for (;;)
     {
       while (*format && *format != CQ('%'))
