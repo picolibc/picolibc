@@ -28,6 +28,10 @@
 #include <sys/types.h>
 #include <sys/timespec.h>
 
+#if __POSIX_VISIBLE >= 200809
+#include <sys/_locale.h>
+#endif
+
 _BEGIN_STD_C
 
 struct tm
@@ -62,6 +66,12 @@ struct tm *_EXFUN(localtime,(const time_t *_timer));
 size_t	   _EXFUN(strftime, (char *__restrict _s,
 			     size_t _maxsize, const char *__restrict _fmt,
 			     const struct tm *__restrict _t));
+
+#if __POSIX_VISIBLE >= 200809
+extern size_t strftime_l (char *__restrict _s, size_t _maxsize,
+			  const char *__restrict _fmt,
+			  const struct tm *__restrict _t, locale_t _l);
+#endif
 
 char	  *_EXFUN(asctime_r,	(const struct tm *__restrict,
 				 char *__restrict));

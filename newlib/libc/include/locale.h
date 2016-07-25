@@ -21,7 +21,9 @@
 #define LC_TIME     5
 #define LC_MESSAGES 6
 
-#if __POSIX_VISIBLE >= 200809
+#if __POSIX_VISIBLE >= 200809 || defined (_COMPILING_NEWLIB)
+
+#include <sys/_locale.h>
 
 #define LC_ALL_MASK		(1 << LC_ALL)
 #define LC_COLLATE_MASK		(1 << LC_COLLATE)
@@ -32,9 +34,6 @@
 #define LC_MESSAGES_MASK	(1 << LC_MESSAGES)
 
 #define LC_GLOBAL_LOCALE	((struct __locale_t *) -1)
-
-struct __locale_t;
-typedef struct __locale_t *locale_t;
 
 #endif /* __POSIX_VISIBLE >= 200809 */
 

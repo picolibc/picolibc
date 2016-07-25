@@ -7,6 +7,10 @@
 #define __need_wint_t
 #include <stddef.h>
 
+#if __POSIX_VISIBLE >= 200809
+#include <sys/_locale.h>
+#endif
+
 #ifndef WEOF
 # define WEOF ((wint_t)-1)
 #endif
@@ -43,11 +47,6 @@ wint_t	_EXFUN(towupper, (wint_t));
 wint_t	_EXFUN(towlower, (wint_t));
 wctrans_t _EXFUN(wctrans, (const char *));
 wctype_t _EXFUN(wctype, (const char *));
-
-#if __POSIX_VISIBLE >= 200809 || defined (_COMPILING_NEWLIB)
-struct __locale_t;
-typedef struct __locale_t *locale_t;
-#endif
 
 #if __POSIX_VISIBLE >= 200809
 extern int	iswalpha_l (wint_t, locale_t);
