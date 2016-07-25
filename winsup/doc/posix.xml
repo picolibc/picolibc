@@ -925,6 +925,7 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     strerror
     strerror_r
     strfmon
+    strfmon_l
     strftime
     strftime_l
     strlen
@@ -1548,7 +1549,6 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     putmsg
     setnetent
     sigtimedwait
-    strfmon_l
     timer_getoverrun
     ulimit
     waitid
