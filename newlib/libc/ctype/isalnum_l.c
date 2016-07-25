@@ -23,7 +23,7 @@ You can use a compiled subroutine instead of the macro definition by
 undefining the macro using `<<#undef isalnum_l>>'.
 
 RETURNS
-<<isalnum>_l> returns non-zero if <[c]> is a letter (<<a>>--<<z>> or
+<<isalnum_l>> returns non-zero if <[c]> is a letter (<<a>>--<<z>> or
 <<A>>--<<Z>>) or a digit (<<0>>--<<9>>).
 
 PORTABILITY
