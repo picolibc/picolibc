@@ -31,9 +31,20 @@
 
 #include <sys/cdefs.h>
 #include <sys/types.h>
+#if __POSIX_VISIBLE >= 200809
+#include <sys/_locale.h>
+#endif
 
 __BEGIN_DECLS
-ssize_t	strfmon(char * __restrict, size_t, const char * __restrict, ...);
+
+extern ssize_t strfmon (char * __restrict, size_t, const char * __restrict,
+			...);
+
+#if __POSIX_VISIBLE >= 200809
+extern ssize_t strfmon_l (char * __restrict, size_t, locale_t,
+			  const char * __restrict, ...);
+#endif
+
 __END_DECLS
 
 #endif /* !_MONETARY_H_ */
