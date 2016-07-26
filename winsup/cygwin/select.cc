@@ -645,7 +645,7 @@ peek_pipe (select_record *s, bool from_select)
 	    }
 	}
 
-      if (fh->bg_check (SIGTTIN) <= bg_eof)
+      if (fh->bg_check (SIGTTIN, true) <= bg_eof)
 	{
 	  gotone = s->read_ready = true;
 	  goto out;
@@ -884,7 +884,7 @@ peek_console (select_record *me, bool)
   set_handle_or_return_if_not_open (h, me);
 
   for (;;)
-    if (fh->bg_check (SIGTTIN) <= bg_eof)
+    if (fh->bg_check (SIGTTIN, true) <= bg_eof)
       return me->read_ready = true;
     else if (!PeekConsoleInput (h, &irec, 1, &events_read) || !events_read)
       break;

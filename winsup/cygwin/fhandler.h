@@ -427,7 +427,7 @@ public:
   {
     return dev ().native ();
   }
-  virtual bg_check_types bg_check (int) {return bg_ok;}
+  virtual bg_check_types bg_check (int, bool = false) {return bg_ok;}
   void clear_readahead ()
   {
     raixput = raixget = ralen = rabuflen = 0;
@@ -1233,7 +1233,7 @@ class fhandler_termios: public fhandler_base
   void sigflush ();
   int tcgetpgrp ();
   int tcsetpgrp (int pid);
-  bg_check_types bg_check (int sig);
+  bg_check_types bg_check (int sig, bool dontsignal = false);
   virtual DWORD __acquire_output_mutex (const char *fn, int ln, DWORD ms) {return 1;}
   virtual void __release_output_mutex (const char *fn, int ln) {}
   void echo_erase (int force = 0);

@@ -166,14 +166,43 @@ tty_min::is_orphaned_process_group (int pgid)
   return 1;
 }
 
+/*
+  bg_check: check that this process is either in the foreground process group,
+  or if the terminal operation is allowed for processes which are in a
+  background process group.
+
+  If the operation is not permitted by the terminal configuration for processes
+  which are a member of a background process group, return an error or raise a
+  signal as appropriate.
+
+  This handles the following terminal operations:
+
+  write:                             sig = SIGTTOU
+  read:                              sig = SIGTTIN
+  change terminal settings:          sig = -SIGTTOU
+  (tcsetattr, tcsetpgrp, etc.)
+  peek (poll, select):               sig = SIGTTIN, dontsignal = TRUE
+*/
 bg_check_types
-fhandler_termios::bg_check (int sig)
+fhandler_termios::bg_check (int sig, bool dontsignal)
 {
+  /* Ignore errors:
+     - this process isn't in a process group
+     - tty is invalid
+
+     Everything is ok if:
+     - this process is in the foreground process group, or
+     - this tty is not the controlling tty for this process (???), or
+     - writing, when TOSTOP TTY mode is not set on this tty
+  */
   if (!myself->pgid || !tc () || tc ()->getpgid () == myself->pgid ||
 	myself->ctty != tc ()->ntty ||
 	((sig == SIGTTOU) && !(tc ()->ti.c_lflag & TOSTOP)))
     return bg_ok;
 
+  /* sig -SIGTTOU is used to indicate a change to terminal settings, where
+     TOSTOP TTY mode isn't considered when determining if we need to send a
+     signal. */
   if (sig < 0)
     sig = -sig;
 
@@ -197,19 +226,20 @@ fhandler_termios::bg_check (int sig)
     (_main_tls->sigmask & SIGTOMASK (sig));
   cygheap->unlock_tls (tl_entry);
 
-  /* If the process is ignoring SIGTT*, then background IO is OK.  If
-     the process is not ignoring SIGTT*, then the sig is to be sent to
-     all processes in the process group (unless the process group of the
-     process is orphaned, in which case we return EIO). */
+  /* If the process is blocking or ignoring SIGTT*, then signals are not sent
+     and background IO is allowed */
   if (sigs_ignored)
     return bg_ok;   /* Just allow the IO */
+  /* If the process group of the process is orphaned, return EIO */
   else if (tc ()->is_orphaned_process_group (myself->pgid))
     {
       termios_printf ("process group is orphaned");
       set_errno (EIO);   /* This is an IO error */
       return bg_error;
     }
-  else
+  /* Otherwise, if signalling is desired, the signal is sent to all processes in
+     the process group */
+  else if (!dontsignal)
     {
       /* Don't raise a SIGTT* signal if we have already been
 	 interrupted by another signal. */
@@ -222,6 +252,7 @@ fhandler_termios::bg_check (int sig)
 	}
       return bg_signalled;
     }
+  return bg_ok;
 }
 
 #define set_input_done(x) input_done = input_done || (x)
