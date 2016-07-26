@@ -386,7 +386,6 @@ struct _reent
 
   int __sdidinit;		/* 1 means stdio has been init'd */
 
-  /* TODO */
   int _unspecified_locale_info;	/* unused, reserved for locale stuff */
   struct __locale_t *_locale;/* per-thread locale */
 
@@ -432,7 +431,7 @@ extern const struct __sFILE_fake __sf_fake_stderr;
     _NULL, \
     0, \
     0, \
-    "C", \
+    _NULL, \
     _NULL, \
     _NULL, \
     0, \
@@ -656,7 +655,7 @@ struct _reent
     0, \
     "", \
     0, \
-    "C", \
+    _NULL, \
     0, \
     _NULL, \
     _NULL, \
