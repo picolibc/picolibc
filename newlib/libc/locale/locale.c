@@ -857,6 +857,7 @@ restart:
 	++c;
       if (strcasecmp (c, "620"))
       	FAIL;
+      val = 874;
       strcpy (charset, "CP874");
       mbc_max = 1;
 #ifdef _MB_EXTENDED_CHARSETS_WINDOWS
