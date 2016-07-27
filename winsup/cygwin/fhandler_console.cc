@@ -1216,30 +1216,46 @@ dev_console::scroll_window (HANDLE h, int x1, int y1, int x2, int y2)
     return false;
 
   SMALL_RECT sr;
-  int toscroll = 2 + dwEnd.Y - b.srWindow.Top;
-  int shrink = 1 + toscroll + b.srWindow.Bottom - b.dwSize.Y;
+  int toscroll = dwEnd.Y - b.srWindow.Top + 1;
   sr.Left = sr.Right = dwEnd.X = 0;
-  /* Can't increment dwEnd yet since we may not have space in
-     the buffer.  */
-  SetConsoleCursorPosition (h, dwEnd);
-  if (shrink > 0)
+
+  if (b.srWindow.Bottom + toscroll >= b.dwSize.Y)
     {
-      COORD c = b.dwSize;
-      c.Y = dwEnd.Y - shrink;
-      SetConsoleScreenBufferSize (h, c);
-      SetConsoleScreenBufferSize (h, b.dwSize);
-      dwEnd.Y = 0;
-      fillin (h);
-      toscroll = 2 + dwEnd.Y - b.srWindow.Top;
+      /* So we're at the end of the buffer and scrolling the console window
+	 would move us beyond the buffer.  What we do here is to scroll the
+	 console buffer upward by just as much so that the current last line
+	 becomes the last line just prior to the first window line.  That
+	 keeps the end of the console buffer intact, as desired.
+
+	 Since we're moving the console buffer under the console window in
+	 this case, we must not move the console window. */
+      SMALL_RECT br;
+      COORD dest;
+      CHAR_INFO fill;
+
+      br.Left = 0;
+      br.Top = dwEnd.Y - b.srWindow.Top + 1;
+      br.Right = b.dwSize.X - 1;
+      br.Bottom = b.dwSize.Y - 1;
+      dest.X = dest.Y = 0;
+      fill.Char.AsciiChar = ' ';
+      fill.Attributes = current_win32_attr;
+      ScrollConsoleScreenBuffer (h, &br, NULL, dest, &fill);
+      /* Fix dwEnd to reflect the new cursor line (minus 1 to take the
+	 increment a few lines later into account) */
+      dwEnd.Y = b.dwCursorPosition.Y - 1;
     }
-
-  sr.Top = sr.Bottom = toscroll;
-
-  SetConsoleWindowInfo (h, FALSE, &sr);
-
+  else
+    {
+      /* The reminder of the console buffer is big enough to simply move
+         the console window. */
+      sr.Top = sr.Bottom = toscroll;
+      SetConsoleWindowInfo (h, FALSE, &sr);
+    }
+  /* Eventually set cursor to new end position at the top of the window. */
   dwEnd.Y++;
   SetConsoleCursorPosition (h, dwEnd);
-
+  /* Fix up console buffer info. */
   fillin (h);
   return true;
 }
