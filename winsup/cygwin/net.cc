@@ -1819,6 +1819,7 @@ get_adapters_addresses (PIP_ADAPTER_ADDRESSES *pa_ret, ULONG family)
 	 The OS allocates stacks bottom up, so chances are good that the new
 	 stack will be located in the lower address area. */
       HANDLE thr = CreateThread (NULL, 0, call_gaa, &param, 0, NULL);
+      SetThreadName (GetThreadId (thr), "__call_gaa");
       if (!thr)
 	{
 	  debug_printf ("CreateThread: %E");

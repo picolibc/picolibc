@@ -1992,6 +1992,9 @@ pthread::thread_init_wrapper (void *arg)
   _my_tls.sigmask = thread->parent_sigmask;
   thread->set_tls_self_pointer ();
 
+  // Give thread default name
+  SetThreadName (GetCurrentThreadId (), program_invocation_short_name);
+
   thread->mutex.lock ();
 
   // if thread is detached force cleanup on exit
@@ -2630,6 +2633,8 @@ pthread_setname_np (pthread_t thread, const char *name)
 
   oldname = thread->attr.name;
   thread->attr.name = cp;
+
+  SetThreadName (GetThreadId (thread->win32_obj_id), thread->attr.name);
 
   if (oldname)
     free (oldname);

@@ -964,6 +964,7 @@ dll_crt0_1 (void *)
       if (cp > __progname && ascii_strcasematch (cp, ".exe"))
 	*cp = '\0';
     }
+  SetThreadName (GetCurrentThreadId (), program_invocation_short_name);
 
   (void) xdr_set_vprintf (&cygxdr_vwarnx);
   cygwin_finished_initializing = true;

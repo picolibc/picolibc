@@ -1288,7 +1288,7 @@ DWORD WINAPI
 dumpstack_overflow_wrapper (PVOID arg)
 {
   cygwin_exception *exc = (cygwin_exception *) arg;
-
+  SetThreadName (GetCurrentThreadId (), "__dumpstack_overflow");
   exc->dumpstack ();
   return 0;
 }

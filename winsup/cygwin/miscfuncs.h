@@ -85,4 +85,6 @@ extern "C" HANDLE WINAPI CygwinCreateThread (LPTHREAD_START_ROUTINE thread_func,
 					     DWORD creation_flags,
 					     LPDWORD thread_id);
 
+void SetThreadName (DWORD dwThreadID, const char* threadName);
+
 #endif /*_MISCFUNCS_H*/

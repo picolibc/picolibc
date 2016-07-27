@@ -1110,3 +1110,29 @@ wmemcpy:								\n\
 	.seh_endproc							\n\
 ");
 #endif
+
+/* Signal the thread name to any attached debugger
+
+   (See "How to: Set a Thread Name in Native Code"
+   https://msdn.microsoft.com/en-us/library/xcb2z8hs.aspx) */
+
+#define MS_VC_EXCEPTION 0x406D1388
+
+void
+SetThreadName(DWORD dwThreadID, const char* threadName)
+{
+  if (!IsDebuggerPresent ())
+    return;
+
+  ULONG_PTR info[] =
+    {
+      0x1000,                 /* type, must be 0x1000 */
+      (ULONG_PTR) threadName, /* pointer to threadname */
+      dwThreadID,             /* thread ID (+ flags on x86_64) */
+#ifdef __X86__
+      0,                      /* flags, must be zero */
+#endif
+    };
+
+  RaiseException (MS_VC_EXCEPTION, 0, sizeof (info)/sizeof (ULONG_PTR), (ULONG_PTR *) &info);
+}
