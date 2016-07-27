@@ -70,6 +70,10 @@ munge_threadfunc ()
 
 void dll_crt0_0 ();
 
+/* Non-static fake variable so GCC doesn't second-guess if we *really*
+   need the alloca'd space in the DLL_PROCESS_ATTACH case below... */
+void *alloca_dummy;
+
 extern "C" BOOL WINAPI
 dll_entry (HANDLE h, DWORD reason, void *static_load)
 {
@@ -85,12 +89,12 @@ dll_entry (HANDLE h, DWORD reason, void *static_load)
 
       /* Starting with adding the POSIX-1.2008 per-thread locale functionality,
 	 we need an initalized _REENT area even for the functions called from
-	 dll_crt0_0.  In fact, we only need the _REENT->_locale pointer
+	 dll_crt0_0.  Most importantly, we need the _REENT->_locale pointer
 	 initialized to NULL, so subsequent calls to locale-specific functions
 	 will always fall back to __global_locale, rather then crash due to
 	 _REENT->_locale having an arbitrary value. */
-      (void) alloca (CYGTLS_PADSIZE);
-      _REENT->_locale = NULL;
+      alloca_dummy = alloca (CYGTLS_PADSIZE);
+      memcpy (_REENT, _GLOBAL_REENT, sizeof (struct _reent));
 
       dll_crt0_0 ();
       _my_oldfunc = TlsAlloc ();
