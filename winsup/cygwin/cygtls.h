@@ -436,6 +436,4 @@ public:
      _cygtls::call_signal_handler. */
   ~wait_signal_arrived () { _my_tls.unwait_signal_arrived (); }
 };
-
-#define __getreent() (&_my_tls.local_clib)
 /*gentls_offsets*/
