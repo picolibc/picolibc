@@ -242,11 +242,20 @@ __get_current_collate_locale (void)
 }
 #endif
 
+#ifdef __HAVE_LOCALE_INFO__
 _ELIDABLE_INLINE const struct lc_ctype_T *
 __get_ctype_locale (struct __locale_t *locale)
 {
   return (const struct lc_ctype_T *) (locale)->lc_cat[LC_CTYPE].ptr;
 }
+
+_ELIDABLE_INLINE const struct lc_ctype_T *
+__get_current_ctype_locale (void)
+{
+  return (const struct lc_ctype_T *)
+	 __get_current_locale ()->lc_cat[LC_CTYPE].ptr;
+}
+#endif
 
 _ELIDABLE_INLINE int
 __locale_mb_cur_max_l (struct __locale_t *locale)
@@ -258,13 +267,7 @@ __locale_mb_cur_max_l (struct __locale_t *locale)
 #endif
 }
 
-_ELIDABLE_INLINE const struct lc_ctype_T *
-__get_current_ctype_locale (void)
-{
-  return (const struct lc_ctype_T *)
-	 __get_current_locale ()->lc_cat[LC_CTYPE].ptr;
-}
-
+#ifdef __HAVE_LOCALE_INFO__
 _ELIDABLE_INLINE const struct lc_monetary_T *
 __get_monetary_locale (struct __locale_t *locale)
 {
@@ -316,6 +319,7 @@ __get_current_messages_locale (void)
   return (const struct lc_messages_T *)
 	 __get_current_locale ()->lc_cat[LC_MESSAGES].ptr;
 }
+#endif
 
 _ELIDABLE_INLINE const char *
 __locale_charset (void)
@@ -323,7 +327,7 @@ __locale_charset (void)
 #ifdef __HAVE_LOCALE_INFO__
   return __get_current_ctype_locale ()->codeset;
 #else
-  return __global_locale.ctype_codeset;
+  return __get_current_locale ()->ctype_codeset;
 #endif
 }
 
@@ -333,18 +337,14 @@ __locale_msgcharset (void)
 #ifdef __HAVE_LOCALE_INFO__
   return (char *) __get_current_messages_locale ()->codeset;
 #else
-  return (char *) __global_locale.message_codeset;
+  return (char *) __get_current_locale ()->message_codeset;
 #endif
 }
 
 _ELIDABLE_INLINE int
 __locale_cjk_lang (void)
 {
-#ifdef __HAVE_LOCALE_INFO__
   return __get_current_locale ()->cjk_lang;
-#else
-  return __global_locale.cjk_lang;
-#endif
 }
 
 int __ctype_load_locale (struct __locale_t *, const char *, void *,

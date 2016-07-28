@@ -69,13 +69,8 @@ extern int toascii_l (int __c, locale_t __l);
 #ifndef _MB_CAPABLE
 _CONST
 #endif
-#ifdef __HAVE_LOCALE_INFO__
 char *__locale_ctype_ptr (void);
 # define __CTYPE_PTR	(__locale_ctype_ptr ())
-#else
-extern	__IMPORT char	*__ctype_ptr__;
-# define __CTYPE_PTR	(__ctype_ptr__)
-#endif
 
 #ifndef __cplusplus
 /* These macros are intentionally written in a manner that will trigger
