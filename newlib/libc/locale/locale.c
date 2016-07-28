@@ -978,11 +978,10 @@ _DEFUN_VOID (__locale_mb_cur_max)
 #ifdef __HAVE_LOCALE_INFO__
   return __get_current_ctype_locale ()->mb_cur_max[0];
 #else
-  return __get_global_locale ()->mb_cur_max[0];
+  return __get_current_locale ()->mb_cur_max[0];
 #endif
 }
 
-#ifdef __HAVE_LOCALE_INFO__
 char *
 _DEFUN_VOID (__locale_ctype_ptr)
 {
@@ -992,7 +991,6 @@ _DEFUN_VOID (__locale_ctype_ptr)
   return __get_locale_r (_REENT) ? __get_locale_r (_REENT)->ctype_ptr
 				 : __ctype_ptr__;
 }
-#endif
 
 char *
 __locale_ctype_ptr_l (struct __locale_t *locale)
