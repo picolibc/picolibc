@@ -1248,7 +1248,16 @@ dev_console::scroll_window (HANDLE h, int x1, int y1, int x2, int y2)
   else
     {
       /* The reminder of the console buffer is big enough to simply move
-         the console window. */
+         the console window.  We have to set the cursor first, otherwise
+	 the scroll bars will not be corrected.  */
+      SetConsoleCursorPosition (h, dwEnd);
+      /* If we scroll backwards, setting the cursor position will scroll
+         the console window up so that the cursor is at the bottom.  Correct
+	 the action by moving the window down again so the cursor is one line
+	 above the new window position. */
+      if (toscroll < 0)
+	toscroll = b.srWindow.Bottom - b.srWindow.Top;
+      /* Move the window accordingly. */
       sr.Top = sr.Bottom = toscroll;
       SetConsoleWindowInfo (h, FALSE, &sr);
     }
@@ -1268,12 +1277,23 @@ void __reg3
 fhandler_console::clear_screen (cltype xc1, cltype yc1, cltype xc2, cltype yc2)
 {
   HANDLE h = get_output_handle ();
+  SHORT oldEndY = con.dwEnd.Y;
+
   con.fillin (h);
 
   int x1 = con.set_cl_x (xc1);
   int y1 = con.set_cl_y (yc1);
   int x2 = con.set_cl_x (xc2);
   int y2 = con.set_cl_y (yc2);
+
+  /* Make correction for the following situation:  The console buffer
+     is only partially used and the user scrolled down into the as yet
+     unused area. */
+  if (oldEndY < con.dwEnd.Y)
+    {
+      con.dwEnd.Y = con.b.dwCursorPosition.Y = oldEndY;
+      y1 = con.b.srWindow.Top;
+    }
 
   /* Detect special case - scroll the screen if we have a buffer in order to
      preserve the buffer. */
