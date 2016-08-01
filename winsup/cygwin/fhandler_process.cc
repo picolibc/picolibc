@@ -796,7 +796,7 @@ static off_t
 format_process_maps (void *data, char *&destbuf)
 {
   _pinfo *p = (_pinfo *) data;
-  HANDLE proc = OpenProcess (PROCESS_QUERY_LIMITED_INFORMATION
+  HANDLE proc = OpenProcess (PROCESS_QUERY_INFORMATION
 			     | PROCESS_VM_READ, FALSE, p->dwProcessId);
   if (!proc)
     return 0;
@@ -1438,7 +1438,7 @@ get_mem_values (DWORD dwProcessId, unsigned long *vmsize, unsigned long *vmrss,
   PMEMORY_WORKING_SET_LIST p;
   SIZE_T n = 0x4000, length;
 
-  /* This appears to work despite MSDN claiming that QueryWorkingSSet requires
+  /* This appears to work despite MSDN claiming that QueryWorkingSet requires
      PROCESS_QUERY_INFORMATION *and* PROCESS_VM_READ.  Since we're trying to do
      everything with least perms, we stick to PROCESS_QUERY_INFORMATION only
      unless this changes in Windows for some reason. */
