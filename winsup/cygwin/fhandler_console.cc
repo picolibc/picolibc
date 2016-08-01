@@ -1288,8 +1288,8 @@ fhandler_console::clear_screen (cltype xc1, cltype yc1, cltype xc2, cltype yc2)
 
   /* Make correction for the following situation:  The console buffer
      is only partially used and the user scrolled down into the as yet
-     unused area. */
-  if (oldEndY < con.dwEnd.Y)
+     unused area so far that the cursor is outside the window buffer. */
+  if (oldEndY < con.dwEnd.Y && oldEndY < con.b.srWindow.Top)
     {
       con.dwEnd.Y = con.b.dwCursorPosition.Y = oldEndY;
       y1 = con.b.srWindow.Top;
