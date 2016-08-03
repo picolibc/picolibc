@@ -1225,38 +1225,47 @@ dev_console::scroll_window (HANDLE h, int x1, int y1, int x2, int y2)
 	 would move us beyond the buffer.  What we do here is to scroll the
 	 console buffer upward by just as much so that the current last line
 	 becomes the last line just prior to the first window line.  That
-	 keeps the end of the console buffer intact, as desired.
-
-	 Since we're moving the console buffer under the console window in
-	 this case, we must not move the console window. */
+	 keeps the end of the console buffer intact, as desired. */
       SMALL_RECT br;
       COORD dest;
       CHAR_INFO fill;
 
       br.Left = 0;
-      br.Top = dwEnd.Y - b.srWindow.Top + 1;
+      br.Top = (b.srWindow.Bottom - b.srWindow.Top) + 1
+	       - (b.dwSize.Y - dwEnd.Y - 1);
       br.Right = b.dwSize.X - 1;
       br.Bottom = b.dwSize.Y - 1;
       dest.X = dest.Y = 0;
       fill.Char.AsciiChar = ' ';
       fill.Attributes = current_win32_attr;
       ScrollConsoleScreenBuffer (h, &br, NULL, dest, &fill);
-      /* Fix dwEnd to reflect the new cursor line (minus 1 to take the
-	 increment a few lines later into account) */
-      dwEnd.Y = b.dwCursorPosition.Y - 1;
+      /* Since we're moving the console buffer under the console window
+	 we only have to move the console window if the user scrolled the
+	 window upwards.  The number of lines is the distance to the
+	 buffer bottom. */
+      toscroll = b.dwSize.Y - b.srWindow.Bottom - 1;
+      /* Fix dwEnd to reflect the new cursor line.  Take the above scrolling
+	 into account and subtract 1 to account for the increment below. */
+      dwEnd.Y = b.dwCursorPosition.Y + toscroll - 1;
     }
-  else
+  if (toscroll)
     {
+      /* FIXME: For some reason SetConsoleWindowInfo does not correctly
+	 set the scrollbars.  Calling SetConsoleCursorPosition here is
+	 just a workaround which doesn't cover all cases.  In some scenarios
+	 the scrollbars are still off by one console window size. */
+
       /* The reminder of the console buffer is big enough to simply move
          the console window.  We have to set the cursor first, otherwise
 	 the scroll bars will not be corrected.  */
       SetConsoleCursorPosition (h, dwEnd);
-      /* If we scroll backwards, setting the cursor position will scroll
-         the console window up so that the cursor is at the bottom.  Correct
+      /* If the user scolled manually, setting the cursor position might scroll
+         the console window so that the cursor is not at the top.  Correct
 	 the action by moving the window down again so the cursor is one line
 	 above the new window position. */
-      if (toscroll < 0)
-	toscroll = b.srWindow.Bottom - b.srWindow.Top;
+      GetConsoleScreenBufferInfo (h, &b);
+      if (b.dwCursorPosition.Y >= b.srWindow.Top)
+	toscroll = b.dwCursorPosition.Y - b.srWindow.Top + 1;
       /* Move the window accordingly. */
       sr.Top = sr.Bottom = toscroll;
       SetConsoleWindowInfo (h, FALSE, &sr);
