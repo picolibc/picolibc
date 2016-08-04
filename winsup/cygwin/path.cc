@@ -1305,8 +1305,31 @@ file_get_fai (HANDLE h, PFILE_ALL_INFORMATION pfai)
   /* Some FSes (Netapps) don't implement FileNetworkOpenInformation. */
   status = NtQueryInformationFile (h, &io, pfai, sizeof *pfai,
 				   FileAllInformation);
-  if (status == STATUS_BUFFER_OVERFLOW)
+  if (likely (status == STATUS_BUFFER_OVERFLOW))
     status = STATUS_SUCCESS;
+  /* Filesystems with broken FileAllInformation exist, too.  See the thread
+     starting with https://cygwin.com/ml/cygwin/2016-07/msg00350.html. */
+  else if (!NT_SUCCESS (status) && status != STATUS_ACCESS_DENIED)
+    {
+      memset (pfai, 0, sizeof *pfai);
+      status = NtQueryInformationFile (h, &io, &pfai->BasicInformation,
+				       sizeof pfai->BasicInformation,
+				       FileBasicInformation);
+      if (NT_SUCCESS (status))
+	{
+	  /* The return value of FileInternalInformation is largely ignored.
+	     We only make absolutely sure the inode number is set to 0 in
+	     case it fails. */
+	  status = NtQueryInformationFile (h, &io, &pfai->InternalInformation,
+					   sizeof pfai->InternalInformation,
+					   FileInternalInformation);
+	  if (!NT_SUCCESS (status))
+	    pfai->InternalInformation.IndexNumber.QuadPart = 0LL;
+	  status = NtQueryInformationFile (h, &io, &pfai->StandardInformation,
+					   sizeof pfai->StandardInformation,
+					   FileStandardInformation);
+	}
+    }
   return status;
 }
 
