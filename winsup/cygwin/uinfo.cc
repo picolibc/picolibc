@@ -1082,7 +1082,8 @@ cygheap_pwdgrp::get_home (PUSER_INFO_3 ui, cygpsid &sid, PCWSTR dom,
 	case NSS_SCHEME_FREEATTR:
 	  break;
 	case NSS_SCHEME_DESC:
-	  home = fetch_from_description (ui->usri3_comment, L"home=\"", 6);
+	  if (ui)
+	    home = fetch_from_description (ui->usri3_comment, L"home=\"", 6);
 	  break;
 	case NSS_SCHEME_PATH:
 	  home = fetch_from_path (NULL, ui, sid, home_scheme[idx].attrib,
@@ -1173,7 +1174,8 @@ cygheap_pwdgrp::get_shell (PUSER_INFO_3 ui, cygpsid &sid, PCWSTR dom,
 	case NSS_SCHEME_FREEATTR:
 	  break;
 	case NSS_SCHEME_DESC:
-	  shell = fetch_from_description (ui->usri3_comment, L"shell=\"", 7);
+	  if (ui)
+	    shell = fetch_from_description (ui->usri3_comment, L"shell=\"", 7);
 	  break;
 	case NSS_SCHEME_PATH:
 	  shell = fetch_from_path (NULL, ui, sid, shell_scheme[idx].attrib,
@@ -1271,7 +1273,7 @@ cygheap_pwdgrp::get_gecos (PUSER_INFO_3 ui, cygpsid &sid, PCWSTR dom,
 	case NSS_SCHEME_FALLBACK:
 	  return NULL;
 	case NSS_SCHEME_WINDOWS:
-	  if (ui->usri3_full_name && *ui->usri3_full_name)
+	  if (ui && ui->usri3_full_name && *ui->usri3_full_name)
 	    sys_wcstombs_alloc (&gecos, HEAP_NOTHEAP, ui->usri3_full_name);
 	  break;
 	case NSS_SCHEME_CYGWIN:
@@ -1279,7 +1281,8 @@ cygheap_pwdgrp::get_gecos (PUSER_INFO_3 ui, cygpsid &sid, PCWSTR dom,
 	case NSS_SCHEME_FREEATTR:
 	  break;
 	case NSS_SCHEME_DESC:
-	  gecos = fetch_from_description (ui->usri3_comment, L"gecos=\"", 7);
+	  if (ui)
+	    gecos = fetch_from_description (ui->usri3_comment, L"gecos=\"", 7);
 	  break;
 	case NSS_SCHEME_PATH:
 	  gecos = fetch_from_path (NULL, ui, sid, gecos_scheme[idx].attrib + 1,
@@ -1502,6 +1505,36 @@ get_logon_sid ()
 	    if (groups->Groups[pg].Attributes & SE_GROUP_LOGON_ID)
 	      {
 		logon_sid = groups->Groups[pg].Sid;
+		break;
+	      }
+	}
+    }
+}
+
+/* Fetch special AzureAD group, which is part of the token group list but
+   *not* recognized by LookupAccountSid (ERROR_NONE_MAPPED). */
+static cygsid azure_grp_sid ("");
+
+static void
+get_azure_grp_sid ()
+{
+  if (PSID (azure_grp_sid) == NO_SID)
+    {
+      NTSTATUS status;
+      ULONG size;
+      tmp_pathbuf tp;
+      PTOKEN_GROUPS groups = (PTOKEN_GROUPS) tp.w_get ();
+
+      status = NtQueryInformationToken (hProcToken, TokenGroups, groups,
+					2 * NT_MAX_PATH, &size);
+      if (!NT_SUCCESS (status))
+	debug_printf ("NtQueryInformationToken (TokenGroups) %y", status);
+      else
+	{
+	  for (DWORD pg = 0; pg < groups->GroupCount; ++pg)
+	    if (sid_id_auth (groups->Groups[pg].Sid) == 12)
+	      {
+		azure_grp_sid = groups->Groups[pg].Sid;
 		break;
 	      }
 	}
@@ -1911,6 +1944,9 @@ pwdgrp::fetch_account_from_windows (fetch_user_arg_t &arg, cyg_ldap *pldap)
       /* Last but not least, some validity checks on the name style. */
       if (!fq_name)
 	{
+	  /* AzureAD user must be prepended by "domain" name. */
+	  if (sid_id_auth (sid) == 12)
+	    return NULL;
 	  /* name_only only if db_prefix is auto. */
 	  if (!cygheap->pg.nss_prefix_auto ())
 	    {
@@ -1944,6 +1980,9 @@ pwdgrp::fetch_account_from_windows (fetch_user_arg_t &arg, cyg_ldap *pldap)
 	{
 	  /* All is well if db_prefix is always. */
 	  if (cygheap->pg.nss_prefix_always ())
+	    break;
+	  /* AzureAD accounts should be fully qualifed either. */
+	  if (sid_id_auth (sid) == 12)
 	    break;
 	  /* Otherwise, no fully_qualified for builtin accounts, except for
 	     NT SERVICE, for which we require the prefix.  Note that there's
@@ -2010,6 +2049,19 @@ pwdgrp::fetch_account_from_windows (fetch_user_arg_t &arg, cyg_ldap *pldap)
 	  get_logon_sid ();
 	  /* LookupAccountSidW will fail. */
 	  sid = logon_sid;
+	  break;
+	}
+      else if (arg.id == 0x1000)
+        {
+	  /* AzureAD S-1-12-1-W-X-Y-Z user */
+	  csid = cygheap->user.saved_sid ();
+	}
+      else if (arg.id == 0x1001)
+        {
+	  /* Special AzureAD group SID */
+	  get_azure_grp_sid ();
+	  /* LookupAccountSidW will fail. */
+	  sid = csid = azure_grp_sid;
 	  break;
 	}
       else if (arg.id == 0xfffe)
@@ -2130,13 +2182,15 @@ pwdgrp::fetch_account_from_windows (fetch_user_arg_t &arg, cyg_ldap *pldap)
 	      /* Don't allow users as group.  While this is technically
 		 possible, it doesn't make sense in a POSIX scenario.
 	 
-		 And then there are the so-called Microsoft Accounts.  The
-		 special SID with security authority 11 is converted to a
-		 well known group above, but additionally, when logging in
-		 with such an account, the user's primary group SID is the
-		 user's SID.  Those we let pass, but no others. */
+		 Microsoft Accounts as well as AzureAD accounts have the
+		 primary group SID in their user token set to their own
+		 user SID.
+
+		 Those we let pass, but no others. */
 	      bool its_ok = false;
-	      if (wincap.has_microsoft_accounts ())
+	      if (sid_id_auth (sid) == 12)
+		its_ok = true;
+	      else if (wincap.has_microsoft_accounts ())
 		{
 		  struct cyg_USER_INFO_24 *ui24;
 		  if (NetUserGetInfo (NULL, name, 24, (PBYTE *) &ui24)
@@ -2226,6 +2280,19 @@ pwdgrp::fetch_account_from_windows (fetch_user_arg_t &arg, cyg_ldap *pldap)
 		  if (domain)
 		    posix_offset = fetch_posix_offset (td, &loc_ldap);
 		}
+	    }
+	  /* AzureAD S-1-12-1-W-X-Y-Z user */
+	  else if (sid_id_auth (sid) == 12)
+	    {
+	      uid = gid = 0x1000;
+	      fully_qualified_name = true;
+	      home = cygheap->pg.get_home ((PUSER_INFO_3) NULL, sid, dom, name,
+					   fully_qualified_name);
+	      shell = cygheap->pg.get_shell ((PUSER_INFO_3) NULL, sid, dom,
+					     name, fully_qualified_name);
+	      gecos = cygheap->pg.get_gecos ((PUSER_INFO_3) NULL, sid, dom,
+					     name, fully_qualified_name);
+	      break;
 	    }
 	  /* If the domain returned by LookupAccountSid is not our machine
 	     name, and if our machine is no domain member, we lose.  We have
@@ -2453,6 +2520,19 @@ pwdgrp::fetch_account_from_windows (fetch_user_arg_t &arg, cyg_ldap *pldap)
       uid = gid = 0xfffe;
       wcpcpy (dom, L"no");
       wcpcpy (name = namebuf, L"body");
+      fully_qualified_name = true;
+      acc_type = SidTypeUnknown;
+    }
+  else if (sid_id_auth (sid) == 12 && sid_sub_auth (sid, 0) == 1)
+    {
+      /* Special AzureAD group SID which can't be resolved by
+         LookupAccountSid (ERROR_NONE_MAPPED).  This is only allowed
+	 as group entry, not as passwd entry. */
+      if (is_passwd ())
+	return NULL;
+      uid = gid = 0x1001;
+      wcpcpy (dom, L"AzureAD");
+      wcpcpy (name = namebuf, L"Group");
       fully_qualified_name = true;
       acc_type = SidTypeUnknown;
     }
