@@ -1,19 +1,28 @@
 /*
 FUNCTION
-   <<wcstoll>>---wide string to long long
+   <<wcstoll>>, <<wcstoll_l>>---wide string to long long
 
 INDEX
 	wcstoll
+
+INDEX
+	wcstoll_l
+
 INDEX
 	_wcstoll_r
 
 ANSI_SYNOPSIS
 	#include <wchar.h>
         long long wcstoll(const wchar_t *__restrict <[s]>,
-        	wchar_t **__restrict <[ptr]>,int <[base]>);
+			  wchar_t **__restrict <[ptr]>,int <[base]>);
 
-        long long _wcstoll_r(void *<[reent]>, 
-                       const wchar_t *<[s]>, wchar_t **<[ptr]>,int <[base]>);
+	#include <wchar.h>
+        long long wcstoll_l(const wchar_t *__restrict <[s]>,
+			    wchar_t **__restrict <[ptr]>, int <[base]>,
+			    locale_t <[locale]>);
+
+        long long _wcstoll_r(void *<[reent]>, const wchar_t *<[s]>,
+			     wchar_t **<[ptr]>, int <[base]>);
 
 TRAD_SYNOPSIS
 	#include <stdlib.h>
@@ -71,15 +80,21 @@ not <<NULL>>).
 The alternate function <<_wcstoll_r>> is a reentrant version.  The
 extra argument <[reent]> is a pointer to a reentrancy structure.
 
-RETURNS
-<<wcstoll>> returns the converted value, if any. If no conversion was
-made, 0 is returned.
+<<wcstoll_l>> is like <<wcstoll>> but performs the conversion based on the
+locale specified by the locale object locale.  If <[locale]> is
+LC_GLOBAL_LOCALE or not a valid locale object, the behaviour is undefined.
 
-<<wcstoll>> returns <<LONG_LONG_MAX>> or <<LONG_LONG_MIN>> if the magnitude of
-the converted value is too large, and sets <<errno>> to <<ERANGE>>.
+RETURNS
+<<wcstoll>>, <<wcstoll_l>> return the converted value, if any. If no
+conversion was made, 0 is returned.
+
+<<wcstoll>>, <<wcstoll_l>> return <<LONG_LONG_MAX>> or <<LONG_LONG_MIN>>
+if the magnitude of the converted value is too large, and sets <<errno>>
+to <<ERANGE>>.
 
 PORTABILITY
 <<wcstoll>> is ANSI.
+<<wcstoll_l>> is a GNU extension.
 
 No supporting OS subroutines are required.
 */
@@ -117,15 +132,117 @@ No supporting OS subroutines are required.
  * SUCH DAMAGE.
  */
 
-
+#define _GNU_SOURCE
 #include <_ansi.h>
 #include <limits.h>
 #include <wctype.h>
 #include <errno.h>
 #include <wchar.h>
 #include <reent.h>
+#include "../locale/setlocale.h"
+
+/*
+ * Convert a wide string to a long long integer.
+ */
+long long
+_wcstoll_l (struct _reent *rptr, const wchar_t *nptr, wchar_t **endptr,
+	    int base, locale_t loc)
+{
+	register const wchar_t *s = nptr;
+	register unsigned long long acc;
+	register int c;
+	register unsigned long long cutoff;
+	register int neg = 0, any, cutlim;
+
+	/*
+	 * Skip white space and pick up leading +/- sign if any.
+	 * If base is 0, allow 0x for hex and 0 for octal, else
+	 * assume decimal; if base is already 16, allow 0x.
+	 */
+	do {
+		c = *s++;
+	} while (iswspace_l(c, loc));
+	if (c == L'-') {
+		neg = 1;
+		c = *s++;
+	} else if (c == L'+')
+		c = *s++;
+	if ((base == 0 || base == 16) &&
+	    c == L'0' && (*s == L'x' || *s == L'X')) {
+		c = s[1];
+		s += 2;
+		base = 16;
+	}
+	if (base == 0)
+		base = c == L'0' ? 8 : 10;
+
+	/*
+	 * Compute the cutoff value between legal numbers and illegal
+	 * numbers.  That is the largest legal value, divided by the
+	 * base.  An input number that is greater than this value, if
+	 * followed by a legal input character, is too big.  One that
+	 * is equal to this value may be valid or not; the limit
+	 * between valid and invalid numbers is then based on the last
+	 * digit.  For instance, if the range for longs is
+	 * [-2147483648..2147483647] and the input base is 10,
+	 * cutoff will be set to 214748364 and cutlim to either
+	 * 7 (neg==0) or 8 (neg==1), meaning that if we have accumulated
+	 * a value > 214748364, or equal but the next digit is > 7 (or 8),
+	 * the number is too big, and we will return a range error.
+	 *
+	 * Set any if any `digits' consumed; make it negative to indicate
+	 * overflow.
+	 */
+	cutoff = neg ? -(unsigned long long)LONG_LONG_MIN : LONG_LONG_MAX;
+	cutlim = cutoff % (unsigned long long)base;
+	cutoff /= (unsigned long long)base;
+	for (acc = 0, any = 0;; c = *s++) {
+		if (c >= L'0' && c <= L'9')
+			c -= L'0';
+		else if (c >= L'A' && c <= L'Z')
+			c -= L'A' - 10;
+		else if (c >= L'a' && c <= L'z')
+			c -= L'a' - 10;
+		else
+			break;
+		if (c >= base)
+			break;
+               if (any < 0 || acc > cutoff || (acc == cutoff && c > cutlim))
+			any = -1;
+		else {
+			any = 1;
+			acc *= base;
+			acc += c;
+		}
+	}
+	if (any < 0) {
+		acc = neg ? LONG_LONG_MIN : LONG_LONG_MAX;
+		rptr->_errno = ERANGE;
+	} else if (neg)
+		acc = -acc;
+	if (endptr != 0)
+		*endptr = (wchar_t *) (any ? s - 1 : nptr);
+	return (acc);
+}
+
+long long
+_DEFUN (_wcstoll_r, (rptr, nptr, endptr, base),
+	struct _reent *rptr _AND
+	_CONST wchar_t *nptr _AND
+	wchar_t **endptr _AND
+	int base)
+{
+	return _wcstoll_l (rptr, nptr, endptr, base, __get_current_locale ());
+}
 
 #ifndef _REENT_ONLY
+
+long long
+wcstoll_l (const wchar_t *__restrict s, wchar_t **__restrict ptr, int base,
+	   locale_t loc)
+{
+	return _wcstoll_l (_REENT, s, ptr, base, loc);
+}
 
 long long
 _DEFUN (wcstoll, (s, ptr, base),
@@ -133,7 +250,7 @@ _DEFUN (wcstoll, (s, ptr, base),
 	wchar_t **__restrict ptr _AND
 	int base)
 {
-	return _wcstoll_r (_REENT, s, ptr, base);
+	return _wcstoll_l (_REENT, s, ptr, base, __get_current_locale ());
 }
 
 #endif

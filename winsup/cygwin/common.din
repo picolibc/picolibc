@@ -1366,16 +1366,23 @@ strsignal SIGFE
 strspn NOSIGFE
 strstr NOSIGFE
 strtod SIGFE
+strtod_l SIGFE
 strtof SIGFE
+strtof_l SIGFE
 strtoimax = strtoll NOSIGFE
 strtok NOSIGFE
 strtok_r NOSIGFE
 strtol NOSIGFE
+strtol_l NOSIGFE
 strtold SIGFE
+strtold_l SIGFE
 strtoll NOSIGFE
+strtoll_l NOSIGFE
 strtosigno NOSIGFE
 strtoul NOSIGFE
+strtoul_l NOSIGFE
 strtoull NOSIGFE
+strtoull_l NOSIGFE
 strtoumax = strtoull NOSIGFE
 strupr NOSIGFE
 strxfrm NOSIGFE
@@ -1527,15 +1534,22 @@ wcsrtombs NOSIGFE
 wcsspn NOSIGFE
 wcsstr NOSIGFE
 wcstod NOSIGFE
+wcstod_l NOSIGFE
 wcstof NOSIGFE
+wcstof_l NOSIGFE
 wcstoimax = wcstoll NOSIGFE
 wcstok NOSIGFE
 wcstol NOSIGFE
+wcstol_l NOSIGFE
 wcstold NOSIGFE
+wcstold_l NOSIGFE
 wcstoll NOSIGFE
+wcstoll_l NOSIGFE
 wcstombs NOSIGFE
 wcstoul NOSIGFE
+wcstoul_l NOSIGFE
 wcstoull NOSIGFE
+wcstoull_l NOSIGFE
 wcstoumax = wcstoull NOSIGFE
 wcswidth NOSIGFE
 wcsxfrm NOSIGFE

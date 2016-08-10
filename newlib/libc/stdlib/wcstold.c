@@ -34,13 +34,15 @@ POSSIBILITY OF SUCH DAMAGE.
 #include <wctype.h>
 #include <locale.h>
 #include "local.h"
+#include "../locale/setlocale.h"
 
 long double
-wcstold (const wchar_t *__restrict nptr, wchar_t **__restrict endptr)
+wcstold_l (const wchar_t *__restrict nptr, wchar_t **__restrict endptr,
+	   locale_t loc)
 {
 #ifdef _LDBL_EQ_DBL
 /* On platforms where long double is as wide as double.  */
-  return wcstod(nptr, endptr);
+  return wcstod_l(nptr, endptr, loc);
 
 #else /* This is a duplicate of the code in wcstod.c, but converted to long double.  */
 
@@ -57,7 +59,8 @@ wcstold (const wchar_t *__restrict nptr, wchar_t **__restrict endptr)
   /* Convert the supplied numeric wide char string to multibyte.  */
   wcp = nptr;
   mbs = initial;
-  if ((len = wcsrtombs (NULL, &wcp, 0, &mbs)) == (size_t)-1)
+  if ((len = _wcsnrtombs_l (_REENT, NULL, &wcp, (size_t) -1, 0, &mbs, loc))
+      == (size_t) -1)
     {
       if (endptr != NULL)
 	*endptr = (wchar_t *) nptr;
@@ -68,9 +71,9 @@ wcstold (const wchar_t *__restrict nptr, wchar_t **__restrict endptr)
     return 0.0L;
 
   mbs = initial;
-  wcsrtombs (buf, &wcp, len + 1, &mbs);
+  _wcsnrtombs_l (_REENT, buf, &wcp, (size_t) -1, len + 1, &mbs, loc);
 
-  val = strtold (buf, &end);
+  val = strtold_l (buf, &end, loc);
 
   /* We only know where the number ended in the _multibyte_
      representation of the string. If the caller wants to know
@@ -89,10 +92,10 @@ wcstold (const wchar_t *__restrict nptr, wchar_t **__restrict endptr)
 	 just one byte long.  The resulting difference (end - buf)
 	 is then equivalent to the number of valid wide characters
 	 in the input string.  */
-      len = strlen (localeconv ()->decimal_point);
+      len = strlen (__localeconv_l (loc)->decimal_point);
       if (len > 1)
 	{
-	  char *d = strstr (buf, localeconv ()->decimal_point);
+	  char *d = strstr (buf, __localeconv_l (loc)->decimal_point);
 
 	  if (d && d < end)
 	    end -= len - 1;
@@ -105,4 +108,15 @@ wcstold (const wchar_t *__restrict nptr, wchar_t **__restrict endptr)
 
   return val;
 #endif /* _LDBL_EQ_DBL */
+}
+
+long double
+wcstold (const wchar_t *__restrict nptr, wchar_t **__restrict endptr)
+{
+#ifdef _LDBL_EQ_DBL
+/* On platforms where long double is as wide as double.  */
+  return wcstod_l(nptr, endptr, __get_current_locale ());
+#else
+  return wcstold_l(nptr, endptr, __get_current_locale ());
+#endif
 }

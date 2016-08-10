@@ -1,22 +1,48 @@
 /*
 FUNCTION
-        <<wcstod>>, <<wcstof>>---wide char string to double or float
+        <<wcstod>>, <<wcstof>>, <<wcstold>>, <<wcstod_l>>, <<wcstof_l>>, <<wcstold_l>>---wide char string to double or float
 
 INDEX
 	wcstod
-INDEX
-	_wcstod_r
+
 INDEX
 	wcstof
+
+INDEX
+	wcstold
+
+INDEX
+	wcstod_l
+
+INDEX
+	wcstof_l
+
+INDEX
+	wcstold_l
+
+INDEX
+	_wcstod_r
+
 INDEX
 	_wcstof_r
 
 ANSI_SYNOPSIS
         #include <stdlib.h>
         double wcstod(const wchar_t *__restrict <[str]>,
-            wchar_t **__restrict <[tail]>);
+		      wchar_t **__restrict <[tail]>);
         float wcstof(const wchar_t *__restrict <[str]>,
-            wchar_t **__restrict <[tail]>);
+		     wchar_t **__restrict <[tail]>);
+        long double wcstold(const wchar_t *__restrict <[str]>,
+			    wchar_t **__restrict <[tail]>);
+
+        #include <stdlib.h>
+        double wcstod_l(const wchar_t *__restrict <[str]>,
+			wchar_t **__restrict <[tail]>, locale_t <[locale]>);
+        float wcstof_l(const wchar_t *__restrict <[str]>,
+		       wchar_t **__restrict <[tail]>, locale_t <[locale]>);
+        long double wcstold_l(const wchar_t *__restrict <[str]>,
+			      wchar_t **__restrict <[tail]>,
+			      locale_t <[locale]>);
 
         double _wcstod_r(void *<[reent]>,
                          const wchar_t *<[str]>, wchar_t **<[tail]>);
@@ -44,11 +70,11 @@ TRAD_SYNOPSIS
         wchar_t **<[tail]>;
 
 DESCRIPTION
-	The function <<wcstod>> parses the wide character string <[str]>,
-	producing a substring which can be converted to a double
-	value.  The substring converted is the longest initial
-	subsequence of <[str]>, beginning with the first
-	non-whitespace character, that has one of these formats:
+	<<wcstod>>, <<wcstof>>, <<wcstold>> parse the wide-character string
+	<[str]>, producing a substring which can be converted to a double,
+	float, or long double value.  The substring converted is the longest
+	initial subsequence of <[str]>, beginning with the first non-whitespace
+	character, that has one of these formats:
 	.[+|-]<[digits]>[.[<[digits]>]][(e|E)[+|-]<[digits]>]
 	.[+|-].<[digits]>[(e|E)[+|-]<[digits]>]
 	.[+|-](i|I)(n|N)(f|F)[(i|I)(n|N)(i|I)(t|T)(y|Y)]
@@ -66,12 +92,17 @@ DESCRIPTION
 	(which will contain at least the terminating null character of
 	<[str]>) is stored in <<*<[tail]>>>.  If you want no
 	assignment to <<*<[tail]>>>, pass a null pointer as <[tail]>.
-	<<wcstof>> is identical to <<wcstod>> except for its return type.
 
 	This implementation returns the nearest machine number to the
 	input decimal string.  Ties are broken by using the IEEE
 	round-even rule.  However, <<wcstof>> is currently subject to
 	double rounding errors.
+
+	<<wcstod_l>>, <<wcstof_l>>, <<wcstold_l>> are like <<wcstod>>,
+	<<wcstof>>, <<wcstold>> but perform the conversion based on the
+	locale specified by the locale object locale.  If <[locale]> is
+	LC_GLOBAL_LOCALE or not a valid locale object, the behaviour is
+	undefined.
 
 	The alternate functions <<_wcstod_r>> and <<_wcstof_r>> are 
 	reentrant versions of <<wcstod>> and <<wcstof>>, respectively.
@@ -84,6 +115,11 @@ RETURNS
 	plus or minus <<HUGE_VAL>> is returned, and <<ERANGE>> is
 	stored in errno. If the correct value would cause underflow, 0
 	is returned and <<ERANGE>> is stored in errno.
+
+PORTABILITY
+<<wcstod>> is ANSI.
+<<wcstof>>, <<wcstold>> are C99.
+<<wcstod_l>>, <<wcstof_l>>, <<wcstold_l>> are GNU extensions.
 
 Supporting OS subroutines required: <<close>>, <<fstat>>, <<isatty>>,
 <<lseek>>, <<read>>, <<sbrk>>, <<write>>.
@@ -123,12 +159,11 @@ Supporting OS subroutines required: <<close>>, <<fstat>>, <<isatty>>,
 #include <wctype.h>
 #include <locale.h>
 #include <math.h>
+#include "mprec.h"
 
 double
-_DEFUN (_wcstod_r, (ptr, nptr, endptr),
-	struct _reent *ptr _AND
-	_CONST wchar_t *nptr _AND
-	wchar_t **endptr)
+_wcstod_l (struct _reent *ptr, const wchar_t *nptr, wchar_t **endptr,
+	   locale_t loc)
 {
         static const mbstate_t initial;
         mbstate_t mbs;
@@ -137,7 +172,7 @@ _DEFUN (_wcstod_r, (ptr, nptr, endptr),
         const wchar_t *wcp;
         size_t len;
 
-        while (iswspace(*nptr))
+        while (iswspace_l(*nptr, loc))
                 nptr++;
 
         /*
@@ -152,7 +187,8 @@ _DEFUN (_wcstod_r, (ptr, nptr, endptr),
          */
         wcp = nptr;
         mbs = initial;
-        if ((len = _wcsrtombs_r(ptr, NULL, &wcp, 0, &mbs)) == (size_t)-1) {
+        if ((len = _wcsnrtombs_l(ptr, NULL, &wcp, (size_t) -1, 0, &mbs, loc))
+	    == (size_t) -1) {
                 if (endptr != NULL)
                         *endptr = (wchar_t *)nptr;
                 return (0.0);
@@ -160,10 +196,10 @@ _DEFUN (_wcstod_r, (ptr, nptr, endptr),
         if ((buf = _malloc_r(ptr, len + 1)) == NULL)
                 return (0.0);
         mbs = initial;
-        _wcsrtombs_r(ptr, buf, &wcp, len + 1, &mbs);
+        _wcsnrtombs_l(ptr, buf, &wcp, (size_t) -1, len + 1, &mbs, loc);
 
         /* Let strtod() do most of the work for us. */
-        val = _strtod_r(ptr, buf, &end);
+        val = _strtod_l(ptr, buf, &end, loc);
 
         /*
          * We only know where the number ended in the _multibyte_
@@ -182,10 +218,10 @@ _DEFUN (_wcstod_r, (ptr, nptr, endptr),
 		   just one byte long.  The resulting difference (end - buf)
 		   is then equivalent to the number of valid wide characters
 		   in the input string. */
-		len = strlen (_localeconv_r (ptr)->decimal_point);
+		len = strlen (__localeconv_l (loc)->decimal_point);
 		if (len > 1) {
 			char *d = strstr (buf,
-					  _localeconv_r (ptr)->decimal_point);
+					  __localeconv_l (loc)->decimal_point);
 			if (d && d < end)
 				end -= len - 1;
 		}
@@ -197,13 +233,22 @@ _DEFUN (_wcstod_r, (ptr, nptr, endptr),
         return (val);
 }
 
+double
+_DEFUN (_wcstod_r, (ptr, nptr, endptr),
+	struct _reent *ptr _AND
+	_CONST wchar_t *nptr _AND
+	wchar_t **endptr)
+{
+  return _wcstod_l (ptr, nptr, endptr, __get_current_locale ());
+}
+
 float
 _DEFUN (_wcstof_r, (ptr, nptr, endptr),
 	struct _reent *ptr _AND
 	_CONST wchar_t *nptr _AND
 	wchar_t **endptr)
 {
-  double retval = _wcstod_r (ptr, nptr, endptr);
+  double retval = _wcstod_l (ptr, nptr, endptr, __get_current_locale ());
   if (isnan (retval))
     return nanf (NULL);
   return (float)retval;
@@ -212,10 +257,27 @@ _DEFUN (_wcstof_r, (ptr, nptr, endptr),
 #ifndef _REENT_ONLY
 
 double
+wcstod_l (const wchar_t *__restrict nptr, wchar_t **__restrict endptr,
+	  locale_t loc)
+{
+  return _wcstod_l (_REENT, nptr, endptr, loc);
+}
+
+double
 _DEFUN (wcstod, (nptr, endptr),
 	_CONST wchar_t *__restrict nptr _AND wchar_t **__restrict endptr)
 {
-  return _wcstod_r (_REENT, nptr, endptr);
+  return _wcstod_l (_REENT, nptr, endptr, __get_current_locale ());
+}
+
+float
+wcstof_l (const wchar_t *__restrict nptr, wchar_t **__restrict endptr,
+	  locale_t loc)
+{
+  double retval = _wcstod_l (_REENT, nptr, endptr, loc);
+  if (isnan (retval))
+    return nanf (NULL);
+  return (float)retval;
 }
 
 float
@@ -223,7 +285,7 @@ _DEFUN (wcstof, (nptr, endptr),
 	_CONST wchar_t *__restrict nptr _AND
 	wchar_t **__restrict endptr)
 {
-  double retval = _wcstod_r (_REENT, nptr, endptr);
+  double retval = _wcstod_l (_REENT, nptr, endptr, __get_current_locale ());
   if (isnan (retval))
     return nanf (NULL);
   return (float)retval;

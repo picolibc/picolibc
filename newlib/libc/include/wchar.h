@@ -203,6 +203,19 @@ unsigned long long _EXFUN(_wcstoull_r, (struct _reent *, const wchar_t *, wchar_
 long double _EXFUN(wcstold, (const wchar_t *, wchar_t **));
 #endif
 
+#if __GNU_VISIBLE
+long wcstol_l (const wchar_t *__restrict, wchar_t **__restrict, int, locale_t);
+long long wcstoll_l (const wchar_t *__restrict, wchar_t **__restrict, int,
+		     locale_t);
+unsigned long wcstoul_l (const wchar_t *__restrict, wchar_t **__restrict, int,
+			 locale_t);
+unsigned long long wcstoull_l (const wchar_t *__restrict, wchar_t **__restrict,
+			       int, locale_t);
+double wcstod_l (const wchar_t *, wchar_t **, locale_t);
+float wcstof_l (const wchar_t *, wchar_t **, locale_t);
+long double wcstold_l (const wchar_t *, wchar_t **, locale_t);
+#endif
+
 wint_t _EXFUN(fgetwc, (__FILE *));
 wchar_t *_EXFUN(fgetws, (wchar_t *__restrict, int, __FILE *__restrict));
 wint_t _EXFUN(fputwc, (wchar_t, __FILE *));

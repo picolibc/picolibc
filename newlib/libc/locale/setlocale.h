@@ -202,6 +202,9 @@ extern const char *__get_locale_env(struct _reent *, int);
 
 extern struct lconv *__localeconv_l (struct __locale_t *locale);
 
+extern size_t _wcsnrtombs_l (struct _reent *, char *, const wchar_t **,
+			     size_t, size_t, mbstate_t *, locale_t);
+
 /* In POSIX terms the global locale is the process-wide locale.  Use this
    function to always refer to the global locale. */
 _ELIDABLE_INLINE struct __locale_t *

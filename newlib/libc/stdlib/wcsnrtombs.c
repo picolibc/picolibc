@@ -103,15 +103,11 @@ PORTABILITY
 #include <stdio.h>
 #include <errno.h>
 #include "local.h"
+#include "../locale/setlocale.h"
 
 size_t
-_DEFUN (_wcsnrtombs_r, (r, dst, src, nwc, len, ps),
-	struct _reent *r _AND
-	char *dst _AND
-	const wchar_t **src _AND
-	size_t nwc _AND
-	size_t len _AND
-	mbstate_t *ps)
+_wcsnrtombs_l (struct _reent *r, char *dst, const wchar_t **src, size_t nwc,
+	       size_t len, mbstate_t *ps, locale_t loc)
 {
   char *ptr = dst;
   char buff[10];
@@ -138,7 +134,7 @@ _DEFUN (_wcsnrtombs_r, (r, dst, src, nwc, len, ps),
     {
       int count = ps->__count;
       wint_t wch = ps->__value.__wch;
-      int bytes = __WCTOMB (r, buff, *pwcs, ps);
+      int bytes = loc->wctomb (r, buff, *pwcs, ps);
       if (bytes == -1)
 	{
 	  r->_errno = EILSEQ;
@@ -174,6 +170,19 @@ _DEFUN (_wcsnrtombs_r, (r, dst, src, nwc, len, ps),
   return n;
 } 
 
+size_t
+_DEFUN (_wcsnrtombs_r, (r, dst, src, nwc, len, ps),
+	struct _reent *r _AND
+	char *dst _AND
+	const wchar_t **src _AND
+	size_t nwc _AND
+	size_t len _AND
+	mbstate_t *ps)
+{
+  return _wcsnrtombs_l (_REENT, dst, src, nwc, len, ps,
+			__get_current_locale ());
+}
+
 #ifndef _REENT_ONLY
 size_t
 _DEFUN (wcsnrtombs, (dst, src, nwc, len, ps),
@@ -183,6 +192,7 @@ _DEFUN (wcsnrtombs, (dst, src, nwc, len, ps),
 	size_t len _AND
 	mbstate_t *__restrict ps)
 {
-  return _wcsnrtombs_r (_REENT, dst, src, nwc, len, ps);
+  return _wcsnrtombs_l (_REENT, dst, src, nwc, len, ps,
+			__get_current_locale ());
 }
 #endif /* !_REENT_ONLY */

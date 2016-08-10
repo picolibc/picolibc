@@ -1,18 +1,29 @@
 /*
 FUNCTION
-   <<strtoll>>---string to long long
+   <<strtoll>>, <<strtoll_l>>---string to long long
 
 INDEX
 	strtoll
+
+INDEX
+	strtoll_l
+
 INDEX
 	_strtoll_r
 
 ANSI_SYNOPSIS
 	#include <stdlib.h>
-        long long strtoll(const char *restrict <[s]>, char **restrict <[ptr]>,int <[base]>);
+        long long strtoll(const char *restrict <[s]>, char **restrict <[ptr]>,
+			  int <[base]>);
+
+	#include <stdlib.h>
+        long long strtoll_l(const char *restrict <[s]>,
+			    char **restrict <[ptr]>, int <[base]>,
+			    locale_t <[locale]>);
 
         long long _strtoll_r(void *<[reent]>, 
-                       const char *restrict <[s]>, char **restrict <[ptr]>,int <[base]>);
+			     const char *restrict <[s]>,
+			     char **restrict <[ptr]>, int <[base]>);
 
 TRAD_SYNOPSIS
 	#include <stdlib.h>
@@ -67,18 +78,24 @@ If the subject string is empty (or not in acceptable form), no conversion
 is performed and the value of <[s]> is stored in <[ptr]> (if <[ptr]> is
 not <<NULL>>).
 
+<<strtoll_l>> is like <<strtoll>> but performs the conversion based on the
+locale specified by the locale object locale.  If <[locale]> is
+LC_GLOBAL_LOCALE or not a valid locale object, the behaviour is undefined.
+
 The alternate function <<_strtoll_r>> is a reentrant version.  The
 extra argument <[reent]> is a pointer to a reentrancy structure.
 
 RETURNS
-<<strtoll>> returns the converted value, if any. If no conversion was
-made, 0 is returned.
+<<strtoll>>, <<strtoll_l>> return the converted value, if any. If no
+conversion was made, 0 is returned.
 
-<<strtoll>> returns <<LONG_LONG_MAX>> or <<LONG_LONG_MIN>> if the magnitude of
-the converted value is too large, and sets <<errno>> to <<ERANGE>>.
+<<strtoll>>, <<strtoll_l>> return <<LONG_LONG_MAX>> or <<LONG_LONG_MIN>>
+if the magnitude of the converted value is too large, and sets <<errno>>
+to <<ERANGE>>.
 
 PORTABILITY
 <<strtoll>> is ANSI.
+<<strtoll_l>> is a GNU extension.
 
 No supporting OS subroutines are required.
 */
@@ -116,15 +133,117 @@ No supporting OS subroutines are required.
  * SUCH DAMAGE.
  */
 
-
+#define _GNU_SOURCE
 #include <_ansi.h>
 #include <limits.h>
 #include <ctype.h>
 #include <errno.h>
 #include <stdlib.h>
 #include <reent.h>
+#include "../locale/setlocale.h"
+
+/*
+ * Convert a string to a long long integer.
+ */
+static long long
+_strtoll_l (struct _reent *rptr, _CONST char *__restrict nptr,
+	    char **__restrict endptr, int base, locale_t loc)
+{
+	register const unsigned char *s = (const unsigned char *)nptr;
+	register unsigned long long acc;
+	register int c;
+	register unsigned long long cutoff;
+	register int neg = 0, any, cutlim;
+
+	/*
+	 * Skip white space and pick up leading +/- sign if any.
+	 * If base is 0, allow 0x for hex and 0 for octal, else
+	 * assume decimal; if base is already 16, allow 0x.
+	 */
+	do {
+		c = *s++;
+	} while (isspace_l(c, loc));
+	if (c == '-') {
+		neg = 1;
+		c = *s++;
+	} else if (c == '+')
+		c = *s++;
+	if ((base == 0 || base == 16) &&
+	    c == '0' && (*s == 'x' || *s == 'X')) {
+		c = s[1];
+		s += 2;
+		base = 16;
+	}
+	if (base == 0)
+		base = c == '0' ? 8 : 10;
+
+	/*
+	 * Compute the cutoff value between legal numbers and illegal
+	 * numbers.  That is the largest legal value, divided by the
+	 * base.  An input number that is greater than this value, if
+	 * followed by a legal input character, is too big.  One that
+	 * is equal to this value may be valid or not; the limit
+	 * between valid and invalid numbers is then based on the last
+	 * digit.  For instance, if the range for longs is
+	 * [-2147483648..2147483647] and the input base is 10,
+	 * cutoff will be set to 214748364 and cutlim to either
+	 * 7 (neg==0) or 8 (neg==1), meaning that if we have accumulated
+	 * a value > 214748364, or equal but the next digit is > 7 (or 8),
+	 * the number is too big, and we will return a range error.
+	 *
+	 * Set any if any `digits' consumed; make it negative to indicate
+	 * overflow.
+	 */
+	cutoff = neg ? -(unsigned long long)LONG_LONG_MIN : LONG_LONG_MAX;
+	cutlim = cutoff % (unsigned long long)base;
+	cutoff /= (unsigned long long)base;
+	for (acc = 0, any = 0;; c = *s++) {
+		if (c >= '0' && c <= '9')
+			c -= '0';
+		else if (c >= 'A' && c <= 'Z')
+			c -= 'A' - 10;
+		else if (c >= 'a' && c <= 'z')
+			c -= 'a' - 10;
+		else
+			break;
+		if (c >= base)
+			break;
+               if (any < 0 || acc > cutoff || (acc == cutoff && c > cutlim))
+			any = -1;
+		else {
+			any = 1;
+			acc *= base;
+			acc += c;
+		}
+	}
+	if (any < 0) {
+		acc = neg ? LONG_LONG_MIN : LONG_LONG_MAX;
+		rptr->_errno = ERANGE;
+	} else if (neg)
+		acc = -acc;
+	if (endptr != 0)
+		*endptr = (char *) (any ? (char *)s - 1 : nptr);
+	return (acc);
+}
+
+long long
+_DEFUN (_strtoll_r, (rptr, nptr, endptr, base),
+	struct _reent *rptr _AND
+	_CONST char *__restrict nptr _AND
+	char **__restrict endptr _AND
+	int base)
+{
+	return _strtoll_l (rptr, nptr, endptr, base, __get_current_locale ());
+}
 
 #ifndef _REENT_ONLY
+
+long long
+strtoll_l (const char *__restrict s, char **__restrict ptr, int base,
+	   locale_t loc)
+{
+	return _strtoll_l (_REENT, s, ptr, base, loc);
+}
 
 long long
 _DEFUN (strtoll, (s, ptr, base),
@@ -132,7 +251,7 @@ _DEFUN (strtoll, (s, ptr, base),
 	char **__restrict ptr _AND
 	int base)
 {
-	return _strtoll_r (_REENT, s, ptr, base);
+	return _strtoll_l (_REENT, s, ptr, base, __get_current_locale ());
 }
 
 #endif

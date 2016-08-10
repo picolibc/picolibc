@@ -53,11 +53,7 @@ fivesbits[] = {	 0,  3,  5,  7, 10, 12, 14, 17, 19, 21,
 		};
 
 static _Bigint *
-#ifdef KR_headers
-sum(p, a, b) struct _reent *p; _Bigint *a; _Bigint *b;
-#else
-sum(struct _reent *p, _Bigint *a, _Bigint *b)
-#endif
+sum (struct _reent *p, _Bigint *a, _Bigint *b)
 {
 	_Bigint *c;
 	__ULong carry, *xc, *xa, *xb, *xe, y;
@@ -119,11 +115,7 @@ sum(struct _reent *p, _Bigint *a, _Bigint *b)
 	}
 
 static void
-#ifdef KR_headers
-rshift(b, k) _Bigint *b; int k;
-#else
-rshift(_Bigint *b, int k)
-#endif
+rshift (_Bigint *b, int k)
 {
 	__ULong *x, *x1, *xe, y;
 	int n;
@@ -152,11 +144,7 @@ rshift(_Bigint *b, int k)
 	}
 
 static int
-#ifdef KR_headers
-trailz(b) _Bigint *b;
-#else
-trailz(_Bigint *b)
-#endif
+trailz (_Bigint *b)
 {
 	__ULong L, *x, *xe;
 	int n = 0;
@@ -172,12 +160,8 @@ trailz(_Bigint *b)
 	return n;
 	}
 
- _Bigint *
-#ifdef KR_headers
-increment(p, b) struct _reent *p; _Bigint *b;
-#else
-increment(struct _reent *p, _Bigint *b)
-#endif
+_Bigint *
+increment (struct _reent *p, _Bigint *b)
 {
 	__ULong *x, *xe;
 	_Bigint *b1;
@@ -217,12 +201,8 @@ increment(struct _reent *p, _Bigint *b)
 	return b;
 	}
 
- int
-#ifdef KR_headers
-decrement(b) _Bigint *b;
-#else
-decrement(_Bigint *b)
-#endif
+int
+decrement (_Bigint *b)
 {
 	__ULong *x, *xe;
 #ifdef Pack_16
@@ -250,12 +230,8 @@ decrement(_Bigint *b)
 	return STRTOG_Inexlo;
 	}
 
- static int
-#ifdef KR_headers
-all_on(b, n) _Bigint *b; int n;
-#else
-all_on(_Bigint *b, int n)
-#endif
+static int
+all_on (_Bigint *b, int n)
 {
 	__ULong *x, *xe;
 
@@ -269,12 +245,8 @@ all_on(_Bigint *b, int n)
 	return 1;
 	}
 
- _Bigint *
-#ifdef KR_headers
-set_ones(p, b, n) struct _reent *p; _Bigint *b; int n;
-#else
-set_ones(struct _reent *p, _Bigint *b, int n)
-#endif
+_Bigint *
+set_ones (struct _reent *p, _Bigint *b, int n)
 {
 	int k;
 	__ULong *x, *xe;
@@ -297,14 +269,9 @@ set_ones(struct _reent *p, _Bigint *b, int n)
 	return b;
 	}
 
- static int
-rvOK
-#ifdef KR_headers
- (p, d, fpi, exp, bits, exact, rd, irv)
- struct _reent *p; double d; FPI *fpi; Long *exp; __ULong *bits; int exact, rd, *irv;
-#else
- (struct _reent *p, double d, FPI *fpi, Long *exp, __ULong *bits, int exact, int rd, int *irv)
-#endif
+static int
+rvOK (struct _reent *p, double d, FPI *fpi, Long *exp, __ULong *bits, int exact,
+      int rd, int *irv)
 {
 	_Bigint *b;
 	__ULong carry, inex, lostbits;
@@ -418,12 +385,8 @@ rvOK
 	return rv;
 	}
 
- static int
-#ifdef KR_headers
-mantbits(d) double d;
-#else
-mantbits(U d)
-#endif
+static int
+mantbits (U d)
 {
 	__ULong L;
 #ifdef VAX
@@ -441,14 +404,9 @@ mantbits(U d)
 	return P - 32 - lo0bits(&L);
 	}
 
- int
-_strtodg_r
-#ifdef KR_headers
-	(p, s00, se, fpi, exp, bits)
-	struct _reent *p; const char *s00; char **se; FPI *fpi; Long *exp; __ULong *bits;
-#else
-	(struct _reent *p, const char *s00, char **se, FPI *fpi, Long *exp, __ULong *bits)
-#endif
+int
+_strtodg_l (struct _reent *p, const char *s00, char **se, FPI *fpi, Long *exp,
+	    __ULong *bits, locale_t loc)
 {
 	int abe, abits, asub;
 	int bb0, bb2, bb5, bbe, bd2, bd5, bbbits, bs2, c, decpt, denorm;
@@ -462,6 +420,8 @@ _strtodg_r
 	Long L;
 	__ULong y, z;
 	_Bigint *ab, *bb, *bb1, *bd, *bd0, *bs, *delta, *rvb, *rvb0;
+	struct lconv *lconv = __localeconv_l (loc);
+	int dec_len = strlen (lconv->decimal_point);
 
 	irv = STRTOG_Zero;
 	denorm = sign = nz0 = nz = 0;
@@ -497,7 +457,7 @@ _strtodg_r
 		switch(s[1]) {
 		  case 'x':
 		  case 'X':
-			irv = gethex(p, &s, fpi, exp, &rvb, sign);
+			irv = gethex(p, &s, fpi, exp, &rvb, sign, loc);
 			if (irv == STRTOG_NoNumber) {
 				s = s00;
 				sign = 0;
@@ -520,15 +480,14 @@ _strtodg_r
 			z = 10*z + c - '0';
 	nd0 = nd;
 #ifdef USE_LOCALE
-	if (strncmp (s, _localeconv_r (p)->decimal_point,
-		     strlen (_localeconv_r (p)->decimal_point)) == 0)
+	if (strncmp (s, lconv->decimal_point, dec_len) == 0)
 #else
 	if (c == '.')
 #endif
 		{
 		decpt = 1;
 #ifdef USE_LOCALE
-		c = *(s += strlen (_localeconv_r (p)->decimal_point));
+		c = *(s += dec_len);
 #else
 		c = *++s;
 #endif

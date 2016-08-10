@@ -1,19 +1,30 @@
 /*
 FUNCTION
-	<<wcstoull>>---wide string to unsigned long long
+	<<wcstoull>>, <<wcstoull_l>>---wide string to unsigned long long
 
 INDEX
 	wcstoull
+
+INDEX
+	wcstoull_l
+
 INDEX
 	_wcstoull_r
 
 ANSI_SYNOPSIS
 	#include <wchar.h>
         unsigned long long wcstoull(const wchar_t *__restrict <[s]>,
-                              wchar_t **__restrict <[ptr]>, int <[base]>);
+				    wchar_t **__restrict <[ptr]>,
+				    int <[base]>);
+
+	#include <wchar.h>
+        unsigned long long wcstoull_l(const wchar_t *__restrict <[s]>,
+				      wchar_t **__restrict <[ptr]>,
+				      int <[base]>,
+				      locale_t <[locale]>);
 
         unsigned long long _wcstoull_r(void *<[reent]>, const wchar_t *<[s]>,
-                              wchar_t **<[ptr]>, int <[base]>);
+				       wchar_t **<[ptr]>, int <[base]>);
 
 TRAD_SYNOPSIS
 	#include <wchar.h>
@@ -73,18 +84,23 @@ The alternate function <<_wcstoull_r>> is a reentrant version.  The
 extra argument <[reent]> is a pointer to a reentrancy structure.
 
 
+<<wcstoull_l>> is like <<wcstoull>> but performs the conversion based on the
+locale specified by the locale object locale.  If <[locale]> is
+LC_GLOBAL_LOCALE or not a valid locale object, the behaviour is undefined.
+
 RETURNS
-<<wcstoull>> returns <<0>> and sets <<errno>> to <<EINVAL>> if the value of
-<[base]> is not supported.
+<<wcstoull>>, <<wcstoull_l>> return <<0>> and sets <<errno>> to <<EINVAL>>
+if the value of <[base]> is not supported.
 
-<<wcstoull>> returns the converted value, if any. If no conversion was
-made, <<0>> is returned.
+<<wcstoull>>, <<wcstoull_l>> return the converted value, if any. If no
+conversion was made, <<0>> is returned.
 
-<<wcstoull>> returns <<ULLONG_MAX>> if the magnitude of the converted
-value is too large, and sets <<errno>> to <<ERANGE>>.
+<<wcstoull>>, <<wcstoull_l>> return <<ULLONG_MAX>> if the magnitude of
+the converted value is too large, and sets <<errno>> to <<ERANGE>>.
 
 PORTABILITY
 <<wcstoull>> is ANSI.
+<<wcstoull_l>> is a GNU extension.
 
 <<wcstoull>> requires no supporting OS subroutines.
 */
@@ -122,11 +138,106 @@ PORTABILITY
  * SUCH DAMAGE.
  */
 
+#define _GNU_SOURCE
 #include <_ansi.h>
+#include <limits.h>
 #include <wchar.h>
+#include <wctype.h>
+#include <errno.h>
 #include <reent.h>
+#include "../locale/setlocale.h"
+
+/* Make up for older non-compliant limits.h.  (This is a C99/POSIX function,
+ * and both require ULLONG_MAX in limits.h.)  */
+#if !defined(ULLONG_MAX)
+# define ULLONG_MAX	ULONG_LONG_MAX
+#endif
+
+/*
+ * Convert a wide string to an unsigned long long integer.
+ */
+unsigned long long
+_wcstoull_l (struct _reent *rptr, const wchar_t *nptr, wchar_t **endptr,
+	     int base, locale_t loc)
+{
+	register const wchar_t *s = nptr;
+	register unsigned long long acc;
+	register int c;
+	register unsigned long long cutoff;
+	register int neg = 0, any, cutlim;
+
+	if(base < 0  ||  base == 1  ||  base > 36)  {
+		rptr->_errno = EINVAL;
+		return(0ULL);
+	}
+	/*
+	 * See strtol for comments as to the logic used.
+	 */
+	do {
+		c = *s++;
+	} while (iswspace_l(c, loc));
+	if (c == L'-') {
+		neg = 1;
+		c = *s++;
+	} else if (c == L'+')
+		c = *s++;
+	if ((base == 0 || base == 16) &&
+	    c == L'0' && (*s == L'x' || *s == L'X')) {
+		c = s[1];
+		s += 2;
+		base = 16;
+	}
+	if (base == 0)
+		base = c == L'0' ? 8 : 10;
+	cutoff = (unsigned long long)ULLONG_MAX / (unsigned long long)base;
+	cutlim = (unsigned long long)ULLONG_MAX % (unsigned long long)base;
+	for (acc = 0, any = 0;; c = *s++) {
+		if (c >= L'0' && c <= L'9')
+			c -= L'0';
+		else if (c >= L'A' && c <= L'Z')
+			c -= L'A' - 10;
+		else if (c >= L'a' && c <= L'z')
+			c -= L'a' - 10;
+		else
+			break;
+		if (c >= base)
+			break;
+               if (any < 0 || acc > cutoff || (acc == cutoff && c > cutlim))
+			any = -1;
+		else {
+			any = 1;
+			acc *= base;
+			acc += c;
+		}
+	}
+	if (any < 0) {
+		acc = ULLONG_MAX;
+		rptr->_errno = ERANGE;
+	} else if (neg)
+		acc = -acc;
+	if (endptr != 0)
+		*endptr = (wchar_t *) (any ? s - 1 : nptr);
+	return (acc);
+}
+
+unsigned long long
+_DEFUN (_wcstoull_r, (rptr, nptr, endptr, base),
+	struct _reent *rptr _AND
+	_CONST wchar_t *nptr _AND
+	wchar_t **endptr _AND
+	int base)
+{
+	return _wcstoull_l (rptr, nptr, endptr, base, __get_current_locale ());
+}
 
 #ifndef _REENT_ONLY
+
+unsigned long long
+wcstoull_l (const wchar_t *__restrict s, wchar_t **__restrict ptr, int base,
+	    locale_t loc)
+{
+	return _wcstoull_l (_REENT, s, ptr, base, loc);
+}
 
 unsigned long long
 _DEFUN (wcstoull, (s, ptr, base),
@@ -134,7 +245,7 @@ _DEFUN (wcstoull, (s, ptr, base),
 	wchar_t **__restrict ptr _AND
 	int base)
 {
-	return _wcstoull_r (_REENT, s, ptr, base);
+	return _wcstoull_l (_REENT, s, ptr, base, __get_current_locale ());
 }
 
 #endif

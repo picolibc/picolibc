@@ -1,19 +1,28 @@
 /*
 FUNCTION
-	<<wcstoul>>---wide string to unsigned long
+	<<wcstoul>>, <<wcstoul_l>>---wide string to unsigned long
 
 INDEX
 	wcstoul
+
+INDEX
+	wcstoul_l
+
 INDEX
 	_wcstoul_r
 
 ANSI_SYNOPSIS
 	#include <wchar.h>
         unsigned long wcstoul(const wchar_t *__restrict <[s]>,
-        		      wchar_t **__restrict <[ptr]>, int <[base]>);
+			      wchar_t **__restrict <[ptr]>, int <[base]>);
+
+	#include <wchar.h>
+        unsigned long wcstoul_l(const wchar_t *__restrict <[s]>,
+				wchar_t **__restrict <[ptr]>, int <[base]>,
+				locale_t <[locale]>);
 
         unsigned long _wcstoul_r(void *<[reent]>, const wchar_t *<[s]>,
-                              wchar_t **<[ptr]>, int <[base]>);
+				 wchar_t **<[ptr]>, int <[base]>);
 
 TRAD_SYNOPSIS
 	#include <wchar.h>
@@ -72,15 +81,20 @@ The alternate function <<_wcstoul_r>> is a reentrant version.  The
 extra argument <[reent]> is a pointer to a reentrancy structure.
 
 
-RETURNS
-<<wcstoul>> returns the converted value, if any. If no conversion was
-made, <<0>> is returned.
+<<wcstoul_l>> is like <<wcstoul>> but performs the conversion based on the
+locale specified by the locale object locale.  If <[locale]> is
+LC_GLOBAL_LOCALE or not a valid locale object, the behaviour is undefined.
 
-<<wcstoul>> returns <<ULONG_MAX>> if the magnitude of the converted
-value is too large, and sets <<errno>> to <<ERANGE>>.
+RETURNS
+<<wcstoul>>, <<wcstoul_l>> return the converted value, if any. If no
+conversion was made, <<0>> is returned.
+
+<<wcstoul>>, <<wcstoul_l>> return <<ULONG_MAX>> if the magnitude of the
+converted value is too large, and sets <<errno>> to <<ERANGE>>.
 
 PORTABILITY
 <<wcstoul>> is ANSI.
+<<wcstoul_l>> is a GNU extension.
 
 <<wcstoul>> requires no supporting OS subroutines.
 */
@@ -125,19 +139,14 @@ PORTABILITY
 #include <errno.h>
 #include <stdlib.h>
 #include <reent.h>
+#include "../locale/setlocale.h"
 
 /*
  * Convert a wide string to an unsigned long integer.
- *
- * Ignores `locale' stuff.  Assumes that the upper and lower case
- * alphabets and digits are each contiguous.
  */
 unsigned long
-_DEFUN (_wcstoul_r, (rptr, nptr, endptr, base),
-	struct _reent *rptr _AND
-	_CONST wchar_t *nptr _AND
-	wchar_t **endptr _AND
-	int base)
+_wcstoul_l (struct _reent *rptr, const wchar_t *nptr, wchar_t **endptr,
+	    int base, locale_t loc)
 {
 	register const wchar_t *s = nptr;
 	register unsigned long acc;
@@ -150,7 +159,7 @@ _DEFUN (_wcstoul_r, (rptr, nptr, endptr, base),
 	 */
 	do {
 		c = *s++;
-	} while (iswspace(c));
+	} while (iswspace_l(c, loc));
 	if (c == L'-') {
 		neg = 1;
 		c = *s++;
@@ -167,10 +176,12 @@ _DEFUN (_wcstoul_r, (rptr, nptr, endptr, base),
 	cutoff = (unsigned long)ULONG_MAX / (unsigned long)base;
 	cutlim = (unsigned long)ULONG_MAX % (unsigned long)base;
 	for (acc = 0, any = 0;; c = *s++) {
-		if (iswdigit(c))
+		if (c >= L'0' && c <= L'9')
 			c -= L'0';
-		else if (iswalpha(c))
-			c -= iswupper(c) ? L'A' - 10 : L'a' - 10;
+		else if (c >= L'A' && c <= L'Z')
+			c -= L'A' - 10;
+		else if (c >= L'a' && c <= L'z')
+			c -= L'a' - 10;
 		else
 			break;
 		if (c >= base)
@@ -193,7 +204,24 @@ _DEFUN (_wcstoul_r, (rptr, nptr, endptr, base),
 	return (acc);
 }
 
+unsigned long
+_DEFUN (_wcstoul_r, (rptr, nptr, endptr, base),
+	struct _reent *rptr _AND
+	_CONST wchar_t *nptr _AND
+	wchar_t **endptr _AND
+	int base)
+{
+	return _wcstoul_l (rptr, nptr, endptr, base, __get_current_locale ());
+}
+
 #ifndef _REENT_ONLY
+
+unsigned long
+wcstoul_l (const wchar_t *__restrict s, wchar_t **__restrict ptr, int base,
+	   locale_t loc)
+{
+	return _wcstoul_l (_REENT, s, ptr, base, loc);
+}
 
 unsigned long
 _DEFUN (wcstoul, (s, ptr, base),
@@ -201,7 +229,7 @@ _DEFUN (wcstoul, (s, ptr, base),
 	wchar_t **__restrict ptr _AND
 	int base)
 {
-	return _wcstoul_r (_REENT, s, ptr, base);
+	return _wcstoul_l (_REENT, s, ptr, base, __get_current_locale ());
 }
 
 #endif

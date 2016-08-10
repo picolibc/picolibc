@@ -1,19 +1,28 @@
 /*
 FUNCTION
-	<<strtoul>>---string to unsigned long
+	<<strtoul>>, <<strtoul_l>>---string to unsigned long
 
 INDEX
 	strtoul
+
+INDEX
+	strtoul_l
+
 INDEX
 	_strtoul_r
 
 ANSI_SYNOPSIS
 	#include <stdlib.h>
-        unsigned long strtoul(const char *restrict <[s]>, char **restrict <[ptr]>,
-                              int <[base]>);
+        unsigned long strtoul(const char *restrict <[s]>,
+			      char **restrict <[ptr]>, int <[base]>);
+
+	#include <stdlib.h>
+        unsigned long strtoul_l(const char *restrict <[s]>,
+				char **restrict <[ptr]>, int <[base]>,
+				locale_t <[locale]>);
 
         unsigned long _strtoul_r(void *<[reent]>, const char *restrict <[s]>,
-                              char **restrict <[ptr]>, int <[base]>);
+				 char **restrict <[ptr]>, int <[base]>);
 
 TRAD_SYNOPSIS
 	#include <stdlib.h>
@@ -68,19 +77,23 @@ with a substring in acceptable form), no conversion
 is performed and the value of <[s]> is stored in <[ptr]> (if <[ptr]> is
 not <<NULL>>).
 
+<<strtoul_l>> is like <<strtoul>> but performs the conversion based on the
+locale specified by the locale object locale.  If <[locale]> is
+LC_GLOBAL_LOCALE or not a valid locale object, the behaviour is undefined.
+
 The alternate function <<_strtoul_r>> is a reentrant version.  The
 extra argument <[reent]> is a pointer to a reentrancy structure.
 
-
 RETURNS
-<<strtoul>> returns the converted value, if any. If no conversion was
-made, <<0>> is returned.
+<<strtoul>>, <strtoul_l>> return the converted value, if any. If no
+conversion was made, <<0>> is returned.
 
-<<strtoul>> returns <<ULONG_MAX>> if the magnitude of the converted
-value is too large, and sets <<errno>> to <<ERANGE>>.
+<<strtoul>>, <strtoul_l>> return <<ULONG_MAX>> if the magnitude of the
+converted value is too large, and sets <<errno>> to <<ERANGE>>.
 
 PORTABILITY
 <<strtoul>> is ANSI.
+<<strtoul_l>> is a GNU extension.
 
 <<strtoul>> requires no supporting OS subroutines.
 */
@@ -118,25 +131,21 @@ PORTABILITY
  * SUCH DAMAGE.
  */
 
+#define _GNU_SOURCE
 #include <_ansi.h>
 #include <limits.h>
 #include <ctype.h>
 #include <errno.h>
 #include <stdlib.h>
 #include <reent.h>
+#include "../locale/setlocale.h"
 
 /*
  * Convert a string to an unsigned long integer.
- *
- * Ignores `locale' stuff.  Assumes that the upper and lower case
- * alphabets and digits are each contiguous.
  */
-unsigned long
-_DEFUN (_strtoul_r, (rptr, nptr, endptr, base),
-	struct _reent *rptr _AND
-	_CONST char *__restrict nptr _AND
-	char **__restrict endptr _AND
-	int base)
+static unsigned long
+_strtoul_l (struct _reent *rptr, const char *__restrict nptr,
+	    char **__restrict endptr, int base, locale_t loc)
 {
 	register const unsigned char *s = (const unsigned char *)nptr;
 	register unsigned long acc;
@@ -149,7 +158,7 @@ _DEFUN (_strtoul_r, (rptr, nptr, endptr, base),
 	 */
 	do {
 		c = *s++;
-	} while (isspace(c));
+	} while (isspace_l(c, loc));
 	if (c == '-') {
 		neg = 1;
 		c = *s++;
@@ -166,10 +175,12 @@ _DEFUN (_strtoul_r, (rptr, nptr, endptr, base),
 	cutoff = (unsigned long)ULONG_MAX / (unsigned long)base;
 	cutlim = (unsigned long)ULONG_MAX % (unsigned long)base;
 	for (acc = 0, any = 0;; c = *s++) {
-		if (isdigit(c))
+		if (c >= '0' && c <= '9')
 			c -= '0';
-		else if (isalpha(c))
-			c -= isupper(c) ? 'A' - 10 : 'a' - 10;
+		else if (c >= 'A' && c <= 'Z')
+			c -= 'A' - 10;
+		else if (c >= 'a' && c <= 'z')
+			c -= 'a' - 10;
 		else
 			break;
 		if (c >= base)
@@ -192,7 +203,24 @@ _DEFUN (_strtoul_r, (rptr, nptr, endptr, base),
 	return (acc);
 }
 
+unsigned long
+_DEFUN (_strtoul_r, (rptr, nptr, endptr, base),
+	struct _reent *rptr _AND
+	_CONST char *__restrict nptr _AND
+	char **__restrict endptr _AND
+	int base)
+{
+  return _strtoul_l (rptr, nptr, endptr, base, __get_current_locale ());
+}
+
 #ifndef _REENT_ONLY
+
+unsigned long
+strtoul_l (const char *__restrict s, char **__restrict ptr, int base,
+	   locale_t loc)
+{
+	return _strtoul_l (_REENT, s, ptr, base, loc);
+}
 
 unsigned long
 _DEFUN (strtoul, (s, ptr, base),
@@ -200,7 +228,7 @@ _DEFUN (strtoul, (s, ptr, base),
 	char **__restrict ptr _AND
 	int base)
 {
-	return _strtoul_r (_REENT, s, ptr, base);
+	return _strtoul_l (_REENT, s, ptr, base, __get_current_locale ());
 }
 
 #endif

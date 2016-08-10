@@ -32,6 +32,7 @@
 #include <errno.h>
 #include <sys/config.h>
 #include <sys/types.h>
+#include "../locale/setlocale.h"
 
 #ifdef __IEEE_LITTLE_ENDIAN
 #define IEEE_8087
@@ -400,13 +401,18 @@ _Bigint *	_EXFUN(lshift,(struct _reent *p, _Bigint *b, int k));
 int		_EXFUN(match,(const char**, char*));
 _Bigint *	_EXFUN(diff,(struct _reent *p, _Bigint *a, _Bigint *b));
 int		_EXFUN(cmp,(_Bigint *a, _Bigint *b));
-int		_EXFUN(gethex,(struct _reent *p, _CONST char **sp, _CONST struct FPI *fpi, Long *exp, _Bigint **bp, int sign));     
+int		_EXFUN(gethex,(struct _reent *p, _CONST char **sp, _CONST struct FPI *fpi, Long *exp, _Bigint **bp, int sign, locale_t loc));
 double		_EXFUN(ratio,(_Bigint *a, _Bigint *b));
 __ULong		_EXFUN(any_on,(_Bigint *b, int k));
 void		_EXFUN(copybits,(__ULong *c, int n, _Bigint *b));
+double		_strtod_l (struct _reent *ptr, const char *__restrict s00,
+			   char **__restrict se, locale_t loc);
 #if defined (_HAVE_LONG_DOUBLE) && !defined (_LDBL_EQ_DBL)
-int		_EXFUN(_strtorx_r,(struct _reent *, _CONST char *, char **, int, void *));
-int		_EXFUN(_strtodg_r,(struct _reent *p, _CONST char *s00, char **se, struct FPI *fpi, Long *exp, __ULong *bits));
+int		_strtorx_l (struct _reent *, const char *, char **, int,
+			    void *, locale_t);
+int		_strtodg_l (struct _reent *p, const char *s00, char **se,
+			    struct FPI *fpi, Long *exp, __ULong *bits,
+			    locale_t);
 #endif /* _HAVE_LONG_DOUBLE && !_LDBL_EQ_DBL */
 
 #if defined(PREFER_SIZE_OVER_SPEED) || defined(__OPTIMIZE_SIZE__) || defined(_SMALL_HEXDIG)

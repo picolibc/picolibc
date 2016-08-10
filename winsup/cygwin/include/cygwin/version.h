@@ -463,12 +463,15 @@ details. */
        toupper_l, towctrans_l, towlower_l, towupper_l, wctrans_l, wctype_l.
   300: Export strcasecmp_l, strcoll_l, strfmon_l, strftime_l, strncasecmp_l,
        strxfrm_l, wcscasecmp_l, wcscoll_l, wcstrncasecmp_l, wcstrxfrm_l.
+  301: Export strtod_l, strtof_l, strtol_l, strtold_l, strtoll_l, strtoul_l,
+       strtoull_l, wcstod_l, wcstof_l, wcstol_l, wcstold_l, wcstoll_l,
+       wcstoul_l, wcstoull_l.
 
   Note that we forgot to bump the api for ualarm, strtoll, strtoull,
   sigaltstack, sethostname. */
 
 #define CYGWIN_VERSION_API_MAJOR 0
-#define CYGWIN_VERSION_API_MINOR 300
+#define CYGWIN_VERSION_API_MINOR 301
 
 /* There is also a compatibity version number associated with the shared memory
    regions.  It is incremented when incompatible changes are made to the shared

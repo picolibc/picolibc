@@ -1290,11 +1290,11 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     exp10l
     fcloseall
     fcloseall_r
+    fedisableexcept
+    feenableexcept
+    fegetexcept
     fegetprec
     fesetprec
-    feenableexcept
-    fedisableexcept
-    fegetexcept
     ffsl
     ffsll
     fgets_unlocked
@@ -1310,9 +1310,9 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     fsetxattr
     get_avphys_pages
     get_current_dir_name
-    get_phys_pages
     get_nprocs
     get_nprocs_conf
+    get_phys_pages
     getmntent_r
     getopt_long
     getopt_long_only
@@ -1350,6 +1350,13 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     sincosf
     sincosl
     strchrnul
+    strtod_l
+    strtof_l
+    strtol_l
+    strtold_l
+    strtoll_l
+    strtoul_l
+    strtoull_l
     sysinfo
     tdestroy
     timegm
@@ -1360,6 +1367,13 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     vasnprintf
     vasprintf
     vasprintf_r
+    wcstod_l
+    wcstof_l
+    wcstol_l
+    wcstold_l
+    wcstoll_l
+    wcstoul_l
+    wcstoull_l
 </screen>
 
 </sect1>

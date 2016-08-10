@@ -32,10 +32,10 @@ THIS SOFTWARE.
 #include <_ansi.h>
 #include <reent.h>
 #include <string.h>
+#include <locale.h>
 #include "mprec.h"
 #include "gdtoa.h"
 #include "gd_qnan.h"
-#include "locale.h"
 
 #if !defined(PREFER_SIZE_OVER_SPEED) && !defined(__OPTIMIZE_SIZE__) && !defined(_SMALL_HEXDIG)
 _CONST unsigned char __hexdig[256]=
@@ -145,13 +145,8 @@ _DEFUN (increment, (ptr, b),
 
 
 int
-_DEFUN(gethex, (ptr, sp, fpi, exp, bp, sign),
-	struct _reent *ptr _AND
-	_CONST char **sp _AND
-	_CONST FPI *fpi _AND
-	Long *exp _AND
-	_Bigint **bp _AND
-	int sign)
+gethex (struct _reent *ptr, const char **sp, const FPI *fpi,
+	Long *exp, _Bigint **bp, int sign, locale_t loc)
 {
 	_Bigint *b;
 	_CONST unsigned char *decpt, *s0, *s, *s1;
@@ -159,7 +154,7 @@ _DEFUN(gethex, (ptr, sp, fpi, exp, bp, sign),
 	__ULong L, lostbits, *x;
 	Long e, e1;
 	unsigned char *decimalpoint = (unsigned char *)
-				      _localeconv_r (ptr)->decimal_point;
+				      __localeconv_l (loc)->decimal_point;
 	size_t decp_len = strlen ((const char *) decimalpoint);
 	unsigned char decp_end = decimalpoint[decp_len - 1];
 
