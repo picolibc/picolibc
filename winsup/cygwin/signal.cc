@@ -260,7 +260,7 @@ _pinfo::kill (siginfo_t& si)
 	}
       this_pid = pid;
     }
-  else if (si.si_signo == 0 && this && process_state == PID_EXITED)
+  else if (this && process_state == PID_EXITED)
     {
       this_process_state = process_state;
       this_pid = pid;
