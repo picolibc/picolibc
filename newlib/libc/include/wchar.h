@@ -20,6 +20,10 @@
 /* For __STDC_ISO_10646__ */
 #include <sys/features.h>
 
+#if __XSI_VISIBLE /* && __XSI_VISIBLE < 800 */
+#include <wctype.h>
+#endif
+
 #ifndef WEOF
 # define WEOF ((wint_t)-1)
 #endif
