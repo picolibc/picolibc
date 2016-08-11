@@ -25,7 +25,9 @@ typedef int wctrans_t;
 
 int	_EXFUN(iswalpha, (wint_t));
 int	_EXFUN(iswalnum, (wint_t));
+#if __ISO_C_VISIBLE >= 1999
 int	_EXFUN(iswblank, (wint_t));
+#endif
 int	_EXFUN(iswcntrl, (wint_t));
 int	_EXFUN(iswctype, (wint_t, wctype_t));
 int	_EXFUN(iswdigit, (wint_t));
