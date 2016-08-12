@@ -33,7 +33,7 @@ typedef __gnuc_va_list va_list;
 #endif
 #endif /* __POSIX_VISIBLE >= 200809 || __XSI_VISIBLE */
 
-#if __XSI_VISIBLE /* && __XSI_VISIBLE < 800 */
+#if __XSI_VISIBLE /* && __XSI_VISIBLE < 800 */ && !__GNU_VISIBLE
 #include <wctype.h>
 #endif
 
