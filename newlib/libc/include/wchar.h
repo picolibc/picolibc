@@ -11,14 +11,27 @@
 #define __need_NULL
 #include <stddef.h>
 
-#define __need___va_list
-#include <stdarg.h>
-
 /* For _mbstate_t definition. */
 #include <sys/_types.h>
 #include <sys/cdefs.h>
 /* For __STDC_ISO_10646__ */
 #include <sys/features.h>
+
+/* typedef only __gnuc_va_list, used throughout the header */
+#define __need___va_list
+#include <stdarg.h>
+
+/* typedef va_list only when required */
+#if __POSIX_VISIBLE >= 200809 || __XSI_VISIBLE
+#ifdef __GNUC__
+#ifndef _VA_LIST_DEFINED
+typedef __gnuc_va_list va_list;
+#define _VA_LIST_DEFINED
+#endif
+#else /* !__GNUC__ */
+#include <stdarg.h>
+#endif
+#endif /* __POSIX_VISIBLE >= 200809 || __XSI_VISIBLE */
 
 #if __XSI_VISIBLE /* && __XSI_VISIBLE < 800 */
 #include <wctype.h>
@@ -52,10 +65,12 @@
 
 _BEGIN_STD_C
 
+#if __POSIX_VISIBLE >= 200809 || _XSI_VISIBLE
 /* As in stdio.h, <sys/reent.h> defines __FILE. */
 #if !defined(__FILE_defined)
 typedef __FILE FILE;
 # define __FILE_defined
+#endif
 #endif
 
 /* As required by POSIX.1-2008, declare tm as incomplete type.
