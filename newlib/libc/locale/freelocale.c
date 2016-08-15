@@ -1,3 +1,37 @@
+/*
+FUNCTION
+	<<freelocale>>---free resources allocated for a locale object
+
+INDEX
+	freelocale
+
+INDEX
+	_freelocale_r
+
+ANSI_SYNOPSIS
+	#include <locale.h>
+	locale_t freelocale(locale_t <[locobj]>);
+
+	locale_t _freelocale_r(void *<[reent]>, locale_t <[locobj]>);
+
+DESCRIPTION
+The <<freelocale>> function shall cause the resources allocated for a
+locale object returned by a call to the <<newlocale>> or <<duplocale>>
+functions to be released.
+
+The behavior is undefined if the <[locobj]> argument is the special locale
+object LC_GLOBAL_LOCALE or is not a valid locale object handle.
+
+Any use of a locale object that has been freed results in undefined
+behavior.
+
+RETURNS
+None.
+
+PORTABILITY
+<<freelocale>> is POSIX-1.2008.
+*/
+
 #include <newlib.h>
 #include <reent.h>
 #include <stdlib.h>

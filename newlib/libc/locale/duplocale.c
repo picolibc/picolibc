@@ -1,3 +1,39 @@
+/*
+FUNCTION
+	<<duplocale>>---duplicate a locale object
+
+INDEX
+	duplocale
+
+INDEX
+	_duplocale_r
+
+ANSI_SYNOPSIS
+	#include <locale.h>
+	locale_t duplocale(locale_t <[locobj]>);
+
+	locale_t _duplocale_r(void *<[reent]>, locale_t <[locobj]>);
+
+DESCRIPTION
+The <<duplocale>> function shall create a duplicate copy of the locale
+object referenced by the <[locobj]> argument.
+
+If the <[locobj]> argument is LC_GLOBAL_LOCALE, duplocale() shall create
+a new locale object containing a copy of the global locale determined by
+the setlocale() function.
+
+The behavior is undefined if the <[locobj]> argument is not a valid locale
+object handle.
+
+RETURNS
+Upon successful completion, the <<duplocale>> function shall return a
+handle for a new locale object.  Otherwise <<duplocale>> shall return
+(locale_t) <<0>> and set errno to indicate the error.
+
+PORTABILITY
+<<duplocale>> is POSIX-1.2008.
+*/
+
 #include <newlib.h>
 #include <reent.h>
 #include <stdlib.h>

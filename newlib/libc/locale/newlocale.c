@@ -1,3 +1,78 @@
+/*
+FUNCTION
+	<<newlocale>>---create or modify a locale object
+
+INDEX
+	newlocale
+
+INDEX
+	_newlocale_r
+
+ANSI_SYNOPSIS
+	#include <locale.h>
+	locale_t newlocale(int <[category_mask]>, const char *<[locale]>,
+			   locale_t <[locobj]>);
+
+	locale_t _newlocale_r(void *<[reent]>, int <[category_mask]>,
+			      const char *<[locale]>, locale_t <[locobj]>);
+
+DESCRIPTION
+The <<newlocale>> function shall create a new locale object or modify an
+existing one.  If the base argument is (locale_t) <<0>>, a new locale
+object shall be created. It is unspecified whether the locale object
+pointed to by base shall be modified, or freed and a new locale object
+created.
+
+The category_mask argument specifies the locale categories to be set or
+modified.  Values for category_mask shall be constructed by a
+bitwise-inclusive OR of the symbolic constants LC_CTYPE_MASK,
+LC_NUMERIC_MASK, LC_TIME_MASK, LC_COLLATE_MASK, LC_MONETARY_MASK, and
+LC_MESSAGES_MASK, or any of the other implementation-defined LC_*_MASK
+values defined in <locale.h>.
+
+For each category with the corresponding bit set in category_mask the
+data from the locale named by locale shall be used. In the case of
+modifying an existing locale object, the data from the locale named by
+locale shall replace the existing data within the locale object. If a
+completely new locale object is created, the data for all sections not
+requested by category_mask shall be taken from the default locale.
+
+The following preset values of locale are defined for all settings of
+category_mask:
+
+"POSIX"	Specifies the minimal environment for C-language translation
+called the POSIX locale.
+
+"C"	Equivalent to "POSIX".
+
+""	Specifies an implementation-defined native environment.  This
+	corresponds to the value of the associated environment variables,
+	LC_* and LANG; see the Base Definitions volume of POSIX.1‐2008,
+	Chapter 7, Locale and Chapter 8, Environment Variables.
+
+If the base argument is not (locale_t) <<0>> and the <<newlocale>>
+function call succeeds, the contents of base are unspecified.
+Applications shall ensure that they stop using base as a locale object
+before calling <<newlocale>>.  If the function call fails and the base
+argument is not (locale_t) <<0>>, the contents of base shall remain
+valid and unchanged.
+
+The behavior is undefined if the base argument is the special locale
+object LC_GLOBAL_LOCALE, or is not a valid locale object handle and is
+not (locale_t) <<0>>.
+
+RETURNS
+Upon successful completion, the <<newlocale>> function shall return a
+handle which the caller may use on subsequent calls to <<duplocale>>,
+<<freelocale>>, and other functions taking a locale_t argument.
+
+Upon failure, the <<newlocale>> function shall return (locale_t) <<0>>
+and set errno to indicate the error.
+
+PORTABILITY
+<<newlocale>> is POSIX-1.2008.
+*/
+
 #include <newlib.h>
 #include <errno.h>
 #include <reent.h>

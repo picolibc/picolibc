@@ -297,7 +297,12 @@ DOCBOOK_CHEW = ${top_srcdir}/../doc/makedocbook.py
 DOCBOOK_OUT_FILES = $(CHEWOUT_FILES:.def=.xml)
 DOCBOOK_CHAPTERS = $(CHAPTERS:.tex=.xml)
 CLEANFILES = $(CHEWOUT_FILES) $(CHEWOUT_FILES:.def=.ref) $(DOCBOOK_OUT_FILES)
-CHEWOUT_FILES = locale.def
+CHEWOUT_FILES = \
+	duplocale.def \
+	freelocale.def \
+	locale.def \
+	newlocale.def \
+	uselocale.def
 CHAPTERS = locale.tex
 all: all-am
 
