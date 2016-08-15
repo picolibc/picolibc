@@ -4,6 +4,54 @@
 
 <sect1 id="ov-new"><title>What's new and what changed in Cygwin</title>
 
+<sect2 id="ov-new2.6"><title>What's new and what changed in 2.6</title>
+
+<itemizedlist mark="bullet">
+
+<listitem><para>
+Support for POSIX-1.2008 locale objects and per-thread locales.
+New API: newlocale, freelocale, duplocale, uselocale,
+isalnum_l, isalpha_l, isascii_l, isblank_l, iscntrl_l, isdigit_l, isgraph_l,
+islower_l, isprint_l, ispunct_l, isspace_l, isupper_l, iswalnum_l,
+iswalpha_l, iswblank_l, iswcntrl_l, iswctype_l, iswdigit_l, iswgraph_l,
+iswlower_l, iswprint_l, iswpunct_l, iswspace_l, iswupper_l, iswxdigit_l,
+isxdigit_l, toascii_l, tolower_l, toupper_l, towctrans_l, towlower_l,
+towupper_l, wctrans_l, wctype_l, strcasecmp_l, strcoll_l, strfmon_l,
+strftime_l, strncasecmp_l, strxfrm_l, wcscasecmp_l, wcscoll_l,
+wcstrncasecmp_l, wcstrxfrm_l, strtod_l, strtof_l, strtol_l, strtold_l,
+strtoll_l, strtoul_l, strtoull_l, wcstod_l, wcstof_l, wcstol_l, wcstold_l,
+wcstoll_l, wcstoul_l, wcstoull_l.
+</para></listitem>
+
+<listitem><para>
+Drop support for Windows XP and Windows Server 2003/2003 R2.
+</para></listitem>
+
+<listitem><para>
+Drop support for very old SUNWNFS filesystem.
+</para></listitem>
+
+<listitem><para>
+Raise number of supported partitions per disk (for raw access) to 63.
+</para></listitem>
+
+<listitem><para>
+Further header file improvements in terms of feature test macros.
+</para></listitem>
+
+<listitem><para>
+Add a workaround for filesystems not supporting the FileAllInformation
+info class.
+</para></listitem>
+
+<listitem><para>
+"nobody" account support for WinFSP.
+</para></listitem>
+
+</itemizedlist>
+
+</sect2>
+
 <sect2 id="ov-new2.5"><title>What's new and what changed in 2.5</title>
 
 <itemizedlist mark="bullet">
