@@ -29,14 +29,20 @@
 
 /*
 FUNCTION
-	<<wctype>>---get wide-character classification type
+	<<wctype>>, <<wctype_l>>---get wide-character classification type
 
 INDEX
 	wctype
 
+INDEX
+	wctype_l
+
 ANSI_SYNOPSIS
 	#include <wctype.h>
 	wctype_t wctype(const char *<[c]>);
+
+	#include <wctype.h>
+	wctype_t wctype_l(const char *<[c]>, locale_t <[locale]>);
 
 TRAD_SYNOPSIS
 	#include <wctype.h>
@@ -51,13 +57,18 @@ if one exists.  The following values are guaranteed to be recognized:
 "alnum", "alpha", "blank", "cntrl", "digit", "graph", "lower", "print",
 "punct", "space", "upper", and "xdigit".
 
+<<wctype_l>> is like <<wctype>> but performs the function based on the
+locale specified by the locale object locale.  If <[locale]> is
+LC_GLOBAL_LOCALE or not a valid locale object, the behaviour is undefined.
+
 RETURNS
-<<wctype>> returns 0 and sets <<errno>> to <<EINVAL>> if the
+<<wctype>>, <<wctype_l>> return 0 and sets <<errno>> to <<EINVAL>> if the
 given name is invalid.  Otherwise, it returns a valid non-zero wctype_t
 value.
 
 PORTABILITY
 <<wctype>> is C99.
+<<wctype_l>> is POSIX-1.2008.
 
 No supporting OS subroutines are required.
 */

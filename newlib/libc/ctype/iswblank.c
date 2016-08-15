@@ -29,14 +29,20 @@
 
 /*
 FUNCTION
-	<<iswblank>>---blank wide character test
+	<<iswblank>>, <<iswblank_l>>---blank wide character test
 
 INDEX
 	iswblank
 
+INDEX
+	iswblank_l
+
 ANSI_SYNOPSIS
 	#include <wctype.h>
 	int iswblank(wint_t <[c]>);
+
+	#include <wctype.h>
+	int iswblank_l(wint_t <[c]>, locale_t <[locale]>);
 
 TRAD_SYNOPSIS
 	#include <wctype.h>
@@ -47,11 +53,16 @@ DESCRIPTION
 <<iswblank>> is a function which classifies wide-character values that
 are categorized as blank.
 
+<<iswblank_l>> is like <<iswblank>> but performs the check based on the
+locale specified by the locale object locale.  If <[locale]> is
+LC_GLOBAL_LOCALE or not a valid locale object, the behaviour is undefined.
+
 RETURNS
-<<iswblank>> returns non-zero if <[c]> is a blank wide character.
+<<iswblank>>, <<iswblank_l>> return non-zero if <[c]> is a blank wide character.
 
 PORTABILITY
 <<iswblank>> is C99.
+<<iswblank_l>> is POSIX-1.2008.
 
 No supporting OS subroutines are required.
 */
@@ -79,4 +90,3 @@ _DEFUN(iswblank,(c), wint_t c)
   return (c < 0x100 ? isblank (c) : 0);
 #endif /* _MB_CAPABLE */
 }
-

@@ -1,33 +1,3 @@
-/*
-FUNCTION
-	<<tolower_l>>---translate characters to lowercase
-
-INDEX
-	tolower_l
-
-ANSI_SYNOPSIS
-	#include <ctype.h>
-	int tolower_l(int <[c]>, locale_t <[locale]>);
-
-DESCRIPTION
-<<tolower_l>> is a macro which converts uppercase characters to lowercase,
-leaving all other characters unchanged.  It is only defined when
-<[c]> is an integer in the range <<EOF>> to <<255>>.
-
-if <[locale]> is LC_GLOBAL_LOCALE or not a valid locale object, the behaviour
-is undefined.
-
-RETURNS
-<<tolower_l>> returns the lowercase equivalent of <[c]> when it is a
-character between <<A>> and <<Z>>, and <[c]> otherwise.
-
-PORTABILITY
-<<tolower_l>> is POSIX-1.2008.
-programs.
-
-No supporting OS subroutines are required.
-*/ 
-
 #include <_ansi.h>
 #include <ctype.h>
 #if defined (_MB_EXTENDED_CHARSETS_ISO) || defined (_MB_EXTENDED_CHARSETS_WINDOWS)

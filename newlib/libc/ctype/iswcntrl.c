@@ -29,14 +29,20 @@
 
 /*
 FUNCTION
-	<<iswcntrl>>---control wide character test
+	<<iswcntrl>>, <<iswcntrl_l>>---control wide character test
 
 INDEX
 	iswcntrl
 
+INDEX
+	iswcntrl_l
+
 ANSI_SYNOPSIS
 	#include <wctype.h>
 	int iswcntrl(wint_t <[c]>);
+
+	#include <wctype.h>
+	int iswcntrl_l(wint_t <[c]>, locale_t <[locale]>);
 
 TRAD_SYNOPSIS
 	#include <wctype.h>
@@ -47,11 +53,16 @@ DESCRIPTION
 <<iswcntrl>> is a function which classifies wide-character values that
 are categorized as control characters.
 
+<<iswcntrl_l>> is like <<iswcntrl>> but performs the check based on the
+locale specified by the locale object locale.  If <[locale]> is
+LC_GLOBAL_LOCALE or not a valid locale object, the behaviour is undefined.
+
 RETURNS
-<<iswcntrl>> returns non-zero if <[c]> is a control wide character.
+<<iswcntrl>>, <<iswcntrl_l>> return non-zero if <[c]> is a control wide character.
 
 PORTABILITY
 <<iswcntrl>> is C99.
+<<iswcntrl_l>> is POSIX-1.2008.
 
 No supporting OS subroutines are required.
 */
@@ -77,4 +88,3 @@ _DEFUN(iswcntrl,(c), wint_t c)
   return (c < 0x100 ? iscntrl (c) : 0);
 #endif /* _MB_CAPABLE */
 }
-

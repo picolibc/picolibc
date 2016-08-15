@@ -29,14 +29,20 @@
 
 /*
 FUNCTION
-	<<iswalpha>>---alphabetic wide character test
+	<<iswalpha>>, <<iswalpha_l>>---alphabetic wide character test
 
 INDEX
 	iswalpha
 
+INDEX
+	iswalpha_l
+
 ANSI_SYNOPSIS
 	#include <wctype.h>
 	int iswalpha(wint_t <[c]>);
+
+	#include <wctype.h>
+	int iswalpha_l(wint_t <[c]>, locale_t <[locale]>);
 
 TRAD_SYNOPSIS
 	#include <wctype.h>
@@ -47,11 +53,17 @@ DESCRIPTION
 <<iswalpha>> is a function which classifies wide-character values that
 are alphabetic.
 
+<<iswalpha_l>> is like <<iswalpha>> but performs the check based on the
+locale specified by the locale object locale.  If <[locale]> is
+LC_GLOBAL_LOCALE or not a valid locale object, the behaviour is undefined.
+
 RETURNS
-<<iswalpha>> returns non-zero if <[c]> is an alphabetic wide character.
+<<iswalpha>>, <<iswalpha_l>> return non-zero if <[c]> is an alphabetic
+wide character.
 
 PORTABILITY
 <<iswalpha>> is C99.
+<<iswalpha_l>> is POSIX-1.2008.
 
 No supporting OS subroutines are required.
 */
@@ -430,4 +442,3 @@ _DEFUN(iswalpha,(c), wint_t c)
   return (c < (wint_t)0x100 ? isalpha (c) : 0);
 #endif /* _MB_CAPABLE */
 }
-

@@ -29,14 +29,20 @@
 
 /*
 FUNCTION
-	<<towctrans>>---extensible wide-character translation
+	<<towctrans>>, <<towctrans_l>>---extensible wide-character translation
 
 INDEX
 	towctrans
 
+INDEX
+	towctrans_l
+
 ANSI_SYNOPSIS
 	#include <wctype.h>
 	wint_t towctrans(wint_t <[c]>, wctrans_t <[w]>);
+
+	#include <wctype.h>
+	wint_t towctrans_l(wint_t <[c]>, wctrans_t <[w]>, locale_t <[locale]>);
 
 TRAD_SYNOPSIS
 	#include <wctype.h>
@@ -51,13 +57,19 @@ a specified translation type <[w]>.  If the translation type is
 invalid or cannot be applied to the current character, no change
 to the character is made.
 
+<<towctrans_l>> is like <<towctrans>> but performs the function based on the
+locale specified by the locale object locale.  If <[locale]> is
+LC_GLOBAL_LOCALE or not a valid locale object, the behaviour is undefined.
+
 RETURNS
-<<towctrans>> returns the translated equivalent of <[c]> when it is a
-valid for the given translation, otherwise, it returns the input character.
-When the translation type is invalid, <<errno>> is set <<EINVAL>>.
+<<towctrans>>, <<towctrans_l>> return the translated equivalent of <[c]>
+when it is a valid for the given translation, otherwise, it returns the
+input character.  When the translation type is invalid, <<errno>> is
+set to <<EINVAL>>.
 
 PORTABILITY
 <<towctrans>> is C99.
+<<towctrans_l>> is POSIX-1.2008.
 
 No supporting OS subroutines are required.
 */

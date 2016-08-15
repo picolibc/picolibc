@@ -426,71 +426,38 @@ DOCBOOK_CHAPTERS = $(CHAPTERS:.tex=.xml)
 CLEANFILES = $(CHEWOUT_FILES) $(CHEWOUT_FILES:.def=.ref) $(DOCBOOK_OUT_FILES)
 CHEWOUT_FILES = \
 	isalnum.def	\
-	isalnum_l.def	\
 	isalpha.def	\
-	isalpha_l.def	\
 	isascii.def	\
-	isascii_l.def	\
 	isblank.def	\
-	isblank_l.def	\
 	iscntrl.def	\
-	iscntrl_l.def	\
 	isdigit.def	\
-	isdigit_l.def	\
 	islower.def	\
-	islower_l.def	\
 	isprint.def	\
-	isprint_l.def	\
 	ispunct.def	\
-	ispunct_l.def	\
 	isspace.def	\
-	isspace_l.def	\
 	isupper.def	\
-	isupper_l.def	\
 	iswalnum.def	\
-	iswalnum_l.def	\
 	iswalpha.def	\
-	iswalpha_l.def	\
 	iswblank.def 	\
-	iswblank_l.def 	\
 	iswcntrl.def 	\
-	iswcntrl_l.def 	\
 	iswctype.def 	\
-	iswctype_l.def 	\
 	iswdigit.def 	\
-	iswdigit_l.def 	\
 	iswgraph.def 	\
-	iswgraph_l.def 	\
 	iswlower.def 	\
-	iswlower_l.def 	\
 	iswprint.def 	\
-	iswprint_l.def 	\
 	iswpunct.def 	\
-	iswpunct_l.def 	\
 	iswspace.def 	\
-	iswspace_l.def 	\
 	iswupper.def 	\
-	iswupper_l.def 	\
 	iswxdigit.def 	\
-	iswxdigit_l.def	\
 	isxdigit.def	\
-	isxdigit_l.def	\
 	toascii.def	\
-	toascii_l.def	\
 	tolower.def	\
-	tolower_l.def	\
 	toupper.def	\
-	toupper_l.def	\
 	towctrans.def	\
-	towctrans_l.def	\
 	towlower.def	\
-	towlower_l.def	\
 	towupper.def	\
-	towupper_l.def	\
 	wctrans.def	\
-	wctrans_l.def	\
-	wctype.def	\
-	wctype_l.def
+	wctype.def
 
 CHAPTERS = ctype.tex
 all: all-am

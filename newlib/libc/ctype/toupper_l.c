@@ -1,32 +1,3 @@
-/*
-FUNCTION
-	<<toupper_l>>---translate characters to uppercase
-
-INDEX
-	toupper_l
-
-ANSI_SYNOPSIS
-	#include <ctype.h>
-	int toupper_l(int <[c]>, locale_t <[locale]>);
-
-DESCRIPTION
-<<toupper_l>> is a macro which converts lowercase characters to uppercase,
-leaving all other characters unchanged.  It is only defined when
-<[c]> is an integer in the range <<EOF>> to <<255>>.
-
-if <[locale]> is LC_GLOBAL_LOCALE or not a valid locale object, the behaviour
-is undefined.
-
-RETURNS
-<<toupper_l>> returns the uppercase equivalent of <[c]> when it is a
-character between <<a>> and <<z>>, and <[c]> otherwise.
-
-PORTABILITY
-<<toupper_l>> is POSIX-1.2008.
-
-No supporting OS subroutines are required.
-*/
-
 #include <_ansi.h>
 #include <ctype.h>
 #if defined (_MB_EXTENDED_CHARSETS_ISO) \
