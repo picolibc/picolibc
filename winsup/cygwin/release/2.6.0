@@ -54,7 +54,7 @@ Bug Fixes
 - Don't raise SIGTTIN from select(2)/poll(2).
   Addresses: https://cygwin.com/ml/cygwin-developers/2016-07/msg00004.html
 
-- Fix truncl which was using the wrong FPU rounding mode.
+- Use correct FPU rounding mode in truncl.
   Addresses: https://rt.perl.org/Public/Bug/Display.html?id=128665
 
 - Fix a regression in ioctl(fd, FIONREAD, ...) introduced in Cygwin 2.5.0.
