@@ -49,7 +49,8 @@ DESCRIPTION
 no more than <[maxsize]> characters.
 
 <<strftime_l>> is like <<strftime>> but creates a string in a format
-as expected in locale <[locale]>.
+as expected in locale <[locale]>.  If <[locale]> is LC_GLOBAL_LOCALE or
+not a valid locale object, the behaviour is undefined.
 
 You control the format of the output using the string at <[format]>.
 <<*<[format]>>> can contain two kinds of specifications: text to be
@@ -678,7 +679,7 @@ static size_t
 __strftime (CHAR *s, size_t maxsize, const CHAR *format,
 	    const struct tm *tim_p, struct __locale_t *locale,
 	    era_info_t **era_info, alt_digits_t **alt_digits)
-#else
+#else /* !_WANT_C99_TIME_FORMATS */
 static size_t
 __strftime (CHAR *s, size_t maxsize, const CHAR *format,
 	    const struct tm *tim_p, struct __locale_t *locale)
@@ -1443,6 +1444,7 @@ _DEFUN (strftime, (s, maxsize, format, tim_p),
 	_CONST CHAR *__restrict format _AND
 	_CONST struct tm *__restrict tim_p)
 {
+#ifdef _WANT_C99_TIME_FORMATS
   era_info_t *era_info = NULL;
   alt_digits_t *alt_digits = NULL;
   size_t ret = __strftime (s, maxsize, format, tim_p, __get_current_locale (),
@@ -1452,6 +1454,10 @@ _DEFUN (strftime, (s, maxsize, format, tim_p),
   if (alt_digits)
     free_alt_digits (alt_digits);
   return ret;
+#else /* !_WANT_C99_TIME_FORMATS */
+  return __strftime (s, maxsize, format, tim_p, __get_current_locale (),
+		     NULL, NULL);
+#endif /* !_WANT_C99_TIME_FORMATS */
 }
 
 #if !defined(MAKE_WCSFTIME)
@@ -1459,6 +1465,7 @@ size_t
 strftime_l (char *__restrict s, size_t maxsize, const char *__restrict format,
 	    const struct tm *__restrict tim_p, struct __locale_t *locale)
 {
+#ifdef _WANT_C99_TIME_FORMATS
   era_info_t *era_info = NULL;
   alt_digits_t *alt_digits = NULL;
   size_t ret = __strftime (s, maxsize, format, tim_p, locale,
@@ -1468,6 +1475,9 @@ strftime_l (char *__restrict s, size_t maxsize, const char *__restrict format,
   if (alt_digits)
     free_alt_digits (alt_digits);
   return ret;
+#else /* !_WANT_C99_TIME_FORMATS */
+  return __strftime (s, maxsize, format, tim_p, locale, NULL, NULL);
+#endif /* !_WANT_C99_TIME_FORMATS */
 }
 #endif
 
