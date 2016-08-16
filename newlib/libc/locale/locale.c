@@ -995,7 +995,8 @@ _DEFUN_VOID (__locale_ctype_ptr)
 char *
 __locale_ctype_ptr_l (struct __locale_t *locale)
 {
-  return locale->ctype_ptr;
+  extern char *__ctype_ptr__;
+  return locale->ctype_ptr ?: __ctype_ptr__;
 }
 
 #ifndef _REENT_ONLY
