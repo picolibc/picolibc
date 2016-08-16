@@ -107,7 +107,7 @@ PORTABILITY
 
 size_t
 _wcsnrtombs_l (struct _reent *r, char *dst, const wchar_t **src, size_t nwc,
-	       size_t len, mbstate_t *ps, locale_t loc)
+	       size_t len, mbstate_t *ps, struct __locale_t *loc)
 {
   char *ptr = dst;
   char buff[10];
