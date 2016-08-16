@@ -67,4 +67,3 @@ Bug Fixes
 - Allow kill(pid, <anysig>) on zombies to return successfully, rather than
   only kill(pid, 0), to align behaviour with POSIX requirements.
   Addresses: https://cygwin.com/ml/cygwin/2016-08/msg00188.html
-  behaviour.
