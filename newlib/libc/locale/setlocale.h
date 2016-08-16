@@ -322,7 +322,55 @@ __get_current_messages_locale (void)
   return (const struct lc_messages_T *)
 	 __get_current_locale ()->lc_cat[LC_MESSAGES].ptr;
 }
-#endif
+#else /* ! __HAVE_LOCALE_INFO__ */
+_ELIDABLE_INLINE const struct lc_monetary_T *
+__get_monetary_locale (struct __locale_t *locale)
+{
+  return _C_monetary_locale;
+}
+
+_ELIDABLE_INLINE const struct lc_monetary_T *
+__get_current_monetary_locale (void)
+{
+  return _C_monetary_locale;
+}
+
+_ELIDABLE_INLINE const struct lc_numeric_T *
+__get_numeric_locale (struct __locale_t *locale)
+{
+  return _C_numeric_locale;
+}
+
+_ELIDABLE_INLINE const struct lc_numeric_T *
+__get_current_numeric_locale (void)
+{
+  return _C_numeric_locale;
+}
+
+_ELIDABLE_INLINE const struct lc_time_T *
+__get_time_locale (struct __locale_t *locale)
+{
+  return _C_time_locale;
+}
+
+_ELIDABLE_INLINE const struct lc_time_T *
+__get_current_time_locale (void)
+{
+  return _C_time_locale;
+}
+
+_ELIDABLE_INLINE const struct lc_messages_T *
+__get_messages_locale (struct __locale_t *locale)
+{
+  return _C_messages_locale;
+}
+
+_ELIDABLE_INLINE const struct lc_messages_T *
+__get_current_messages_locale (void)
+{
+  return _C_messages_locale;
+}
+#endif /* !__HAVE_LOCALE_INFO__ */
 
 _ELIDABLE_INLINE const char *
 __locale_charset (void)
