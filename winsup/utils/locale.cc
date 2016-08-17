@@ -48,7 +48,7 @@ usage ()
   printf (
 "Usage: %1$s [-amvhV]\n"
 "   or: %1$s [-ck] NAME\n"
-"   or: %1$s [-usfnU]\n"
+"   or: %1$s [-iusfnU]\n"
 "\n"
 "Get locale-specific information.\n"
 "\n"
@@ -65,6 +65,7 @@ usage ()
 "\n"
 "Default locale information:\n"
 "\n"
+"  -i, --input          Print current input locale\n"
 "  -u, --user           Print locale of user's default UI language\n"
 "  -s, --system         Print locale of system default UI language\n"
 "  -f, --format         Print locale of user's regional format settings\n"
@@ -93,6 +94,7 @@ struct option longopts[] = {
   {"category-name", no_argument, NULL, 'c'},
   {"format", no_argument, NULL, 'f'},
   {"help", no_argument, NULL, 'h'},
+  {"input", no_argument, NULL, 'i'},
   {"keyword-name", no_argument, NULL, 'k'},
   {"charmaps", no_argument, NULL, 'm'},
   {"no-unicode", no_argument, NULL, 'n'},
@@ -103,7 +105,7 @@ struct option longopts[] = {
   {"version", no_argument, NULL, 'V'},
   {0, no_argument, NULL, 0}
 };
-const char *opts = "acfhkmnsuUvV";
+const char *opts = "acfhikmnsuUvV";
 
 int
 getlocale (LCID lcid, char *name)
@@ -785,6 +787,9 @@ main (int argc, char **argv)
 	break;
       case 'm':
 	maps = 1;
+	break;
+      case 'i':
+	lcid = (UINT_PTR) GetKeyboardLayout (0) & 0xffff;
 	break;
       case 's':
 	lcid = GetSystemDefaultUILanguage ();

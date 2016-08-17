@@ -787,7 +787,7 @@ ldd [OPTION]... FILE...
       <screen>
 locale [-amvhV]
 locale [-ck] NAME
-locale [-usfnU]
+locale [-iusfnU]
       </screen>
     </refsynopsisdiv>
 
@@ -807,6 +807,7 @@ Modify output format:
 
 Default locale information:
 
+  -i, --input          Print current input locale
   -u, --user           Print locale of user's default UI language
   -s, --system         Print locale of system default UI language
   -f, --format         Print locale of user's regional format settings
@@ -826,20 +827,34 @@ Other options:
     <para><command>locale</command> without parameters prints information about
       the current locale environment settings.</para>
 
-    <para>The <literal>-u</literal>, <literal>-s</literal>,
-      <literal>-f</literal>, and <literal>-n</literal> options can be used to
-      request the various Windows locale settings. The purpose is to use this
-      command in scripts to set the POSIX locale variables.</para>
+    <para>The <literal>-i</literal>, <literal>-u</literal>,
+      <literal>-s</literal>, <literal>-f</literal>, and <literal>-n</literal>
+      options can be used to request the various Windows locale settings. The
+      purpose is to use this command in scripts to set the POSIX locale
+      variables.</para>
+
+    <para>The <literal>-i</literal> option prints the current input language.
+      This is called the "Input language" and basically equivalent to the
+      current keyboard layout setting.</para>
 
     <para>The <literal>-u</literal> option prints the current user's Windows UI
       locale to stdout. In Windows this setting is called the
-      "Display Language". The <literal>-s</literal> option prints the systems
-      default instead. The <literal>-f</literal> option prints the user's
-      setting for time, date, number and currency. That's equivalent to the
-      setting in the "Formats" or "Regional Options" tab in the "Region and
-      Language" or "Regional and Language Options" dialog. With the
-      <literal>-U</literal> option <command>locale</command> appends a
-      ".UTF-8".</para>
+      "Display Language".</para>
+
+    <para>The <literal>-s</literal> option prints the systems default instead.
+    </para>
+
+    <para>The <literal>-f</literal> option prints the user's setting for time,
+      date, number and currency. That's equivalent to the setting in the
+      "Formats" or "Regional Options" tab in the "Region and Language" or
+      "Regional and Language Options" dialog.</para>
+
+    <para>The <literal>-n</literal> option prints the system's default
+      language used for applications which don't support Unicode.</para>
+
+    <para>With the <literal>-U</literal> option <command>locale</command>
+      appends the string ".UTF-8" to enforce using UTF-8.  Using UTF-8
+      as codeset is recommended.</para>
 
     <para>Usage example:</para>
 
