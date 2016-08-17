@@ -47,8 +47,8 @@ undefining either macro using `<<#undef isprint>>' or `<<#undef isgraph>>',
 or `<<#undef isprint_l>>' or `<<#undef isgraph_l>>'.
 
 RETURNS
-<<isprint>>,<isprint_l> return non-zero if <[c]> is a printing character.
-<<isgraph>>, <<isgraph_l> return non-zero if <[c]> is a printing character
+<<isprint>>, <<isprint_l>> return non-zero if <[c]> is a printing character.
+<<isgraph>>, <<isgraph_l>> return non-zero if <[c]> is a printing character
 except spaces.
 
 PORTABILITY

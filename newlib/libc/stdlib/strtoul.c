@@ -85,10 +85,10 @@ The alternate function <<_strtoul_r>> is a reentrant version.  The
 extra argument <[reent]> is a pointer to a reentrancy structure.
 
 RETURNS
-<<strtoul>>, <strtoul_l>> return the converted value, if any. If no
+<<strtoul>>, <<strtoul_l>> return the converted value, if any. If no
 conversion was made, <<0>> is returned.
 
-<<strtoul>>, <strtoul_l>> return <<ULONG_MAX>> if the magnitude of the
+<<strtoul>>, <<strtoul_l>> return <<ULONG_MAX>> if the magnitude of the
 converted value is too large, and sets <<errno>> to <<ERANGE>>.
 
 PORTABILITY

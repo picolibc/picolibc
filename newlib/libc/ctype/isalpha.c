@@ -1,6 +1,6 @@
 /*
 FUNCTION
-	<<isalpha>>, <isalpha_l>>---alphabetic character predicate
+	<<isalpha>>, <<isalpha_l>>---alphabetic character predicate
 
 INDEX
 	isalpha
