@@ -24,6 +24,11 @@ wcstoll_l, wcstoul_l, wcstoull_l.
 </para></listitem>
 
 <listitem><para>
+locale(1) now supports a -i/--input option to fetch the current input locale
+(this is basically equivalent to the current keyboard layout setting).
+</para></listitem>
+
+<listitem><para>
 Drop support for Windows XP and Windows Server 2003/2003 R2.
 </para></listitem>
 

@@ -14,6 +14,9 @@ What's new:
   strtoll_l, strtoul_l, strtoull_l, wcstod_l, wcstof_l, wcstol_l, wcstold_l,
   wcstoll_l, wcstoul_l, wcstoull_l.
 
+- locale(1) now supports a -i/--input option to fetch the current input
+  locale (this is basically equivalent to the current keyboard layout setting).
+
 
 What changed:
 -------------
