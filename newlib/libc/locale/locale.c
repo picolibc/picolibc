@@ -982,8 +982,8 @@ _DEFUN_VOID (__locale_mb_cur_max)
 #endif
 }
 
-char *
-_DEFUN_VOID (__locale_ctype_ptr)
+const char *
+__locale_ctype_ptr (void)
 {
   /* Only check if the current thread/reent has a locale.  ctype_ptr is unused
      in __global_locale, rather the global variable __ctype_ptr__ is used. */
@@ -992,7 +992,7 @@ _DEFUN_VOID (__locale_ctype_ptr)
 				 : __ctype_ptr__;
 }
 
-char *
+const char *
 __locale_ctype_ptr_l (struct __locale_t *locale)
 {
   extern char *__ctype_ptr__;

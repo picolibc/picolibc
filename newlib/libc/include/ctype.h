@@ -66,10 +66,7 @@ extern int toascii_l (int __c, locale_t __l);
 #define _X	0100
 #define	_B	0200
 
-#ifndef _MB_CAPABLE
-_CONST
-#endif
-char *__locale_ctype_ptr (void);
+const char *__locale_ctype_ptr (void);
 # define __CTYPE_PTR	(__locale_ctype_ptr ())
 
 #ifndef __cplusplus
@@ -103,7 +100,7 @@ char *__locale_ctype_ptr (void);
 #endif
 
 #if __POSIX_VISIBLE >= 200809
-char *__locale_ctype_ptr_l (locale_t);
+const char *__locale_ctype_ptr_l (locale_t);
 #define __ctype_lookup_l(__c,__l) ((__locale_ctype_ptr_l(__l)+sizeof(""[__c]))[(int)(__c)])
 
 #define	isalpha_l(__c,__l)	(__ctype_lookup_l(__c,__l)&(_U|_L))
