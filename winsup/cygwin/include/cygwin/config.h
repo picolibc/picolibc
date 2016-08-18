@@ -42,7 +42,7 @@ extern "C" {
 #include "../tlsoffsets.h"
 #endif
 __attribute__((gnu_inline))
-extern inline struct _reent *__inline_getreent (void)
+extern inline struct _reent *__getreent (void)
 {
   register char *ret;
 #ifdef __x86_64__
@@ -52,7 +52,6 @@ extern inline struct _reent *__inline_getreent (void)
 #endif
   return (struct _reent *) (ret + tls_local_clib);
 }
-#define __getreent()	__inline_getreent()
 #endif  /* _COMPILING_NEWLIB */
 
 #ifdef __x86_64__
