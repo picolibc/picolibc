@@ -80,6 +80,13 @@ pthread_mutex::no_owner()
     return res;
 }
 
+#undef __getreent
+extern "C" struct _reent *
+__getreent ()
+{
+  return &_my_tls.local_clib;
+}
+
 extern "C" void
 __cygwin_lock_init (_LOCK_T *lock)
 {
