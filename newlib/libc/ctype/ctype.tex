@@ -6,73 +6,40 @@ numeric, control characters, whitespace, and so on), or to perform
 simple character mappings.
 
 The header file @file{ctype.h} defines the macros.
-@menu 
-* isalnum::   Alphanumeric character predicate
-* isalnum_l:: Alphanumeric character predicate
-* isalpha::   Alphabetic character predicate
-* isalpha_l:: Alphabetic character predicate
-* isascii::   ASCII character predicate
-* isascii_l:: ASCII character predicate
-* isblank::   Blank character predicate
-* isblank_l:: Blank character predicate
-* iscntrl::   Control character predicate
-* iscntrl_l:: Control character predicate
-* isdigit::   Decimal digit predicate
-* isdigit_l:: Decimal digit predicate
-* islower::   Lowercase character predicate
-* islower_l:: Lowercase character predicate
-* isprint::   Printable character predicates (isprint, isgraph)
-* isprint_l:: Printable character predicates (isprint_l, isgraph_l)
-* ispunct::   Punctuation character predicate
-* ispunct_l::   Punctuation character predicate
-* isspace::   Whitespace character predicate
-* isspace_l::   Whitespace character predicate
-* isupper::   Uppercase character predicate
-* isupper_l::   Uppercase character predicate
-* isxdigit::  Hexadecimal digit predicate
-* isxdigit_l::  Hexadecimal digit predicate
-* toascii::   Force integers to ASCII range
-* toascii_l::   Force integers to ASCII range
-* tolower::   Translate characters to lowercase
-* tolower_l::   Translate characters to lowercase
-* toupper::   Translate characters to uppercase
-* toupper_l::   Translate characters to uppercase
-* iswalnum::  Alphanumeric wide character predicate
-* iswalnum_l::  Alphanumeric wide character predicate
-* iswalpha::  Alphabetic wide character predicate
-* iswalpha_l::  Alphabetic wide character predicate
-* iswblank::  Blank wide character predicate
-* iswblank_l::  Blank wide character predicate
-* iswcntrl::  Control wide character predicate
-* iswcntrl_l::  Control wide character predicate
-* iswdigit::  Decimal digit wide character predicate
-* iswdigit_l::  Decimal digit wide character predicate
-* iswgraph::  Graphic wide character predicate
-* iswgraph_l::  Graphic wide character predicate
-* iswlower::  Lowercase wide character predicate
-* iswlower_l::  Lowercase wide character predicate
-* iswprint::  Printable wide character predicate
-* iswprint_l::  Printable wide character predicate
-* iswpunct::  Punctuation wide character predicate
-* iswpunct_l::  Punctuation wide character predicate
-* iswspace::  Whitespace wide character predicate
-* iswspace_l::  Whitespace wide character predicate
-* iswupper::  Uppercase wide character predicate
-* iswupper_l::  Uppercase wide character predicate
-* iswxdigit:: Hexadecimal digit wide character predicate
-* iswxdigit_l:: Hexadecimal digit wide character predicate
-* iswctype::  Extensible wide-character test
-* iswctype_l::  Extensible wide-character test
-* wctype::    Compute wide-character test type
-* wctype_l::    Compute wide-character test type
-* towlower::  Translate wide characters to lowercase
-* towlower_l::  Translate wide characters to lowercase
-* towupper::  Translate wide characters to uppercase
-* towupper_l::  Translate wide characters to uppercase
-* towctrans:: Extensible wide-character translation
-* towctrans_l:: Extensible wide-character translation
-* wctrans::   Compute wide-character translation type
-* wctrans_l::   Compute wide-character translation type
+@menu
+* isalnum::   Alphanumeric character predicate (isalnum, isalnum_l)
+* isalpha::   Alphabetic character predicate (isalpha, isalpha_l)
+* isascii::   ASCII character predicate (isascii, isascii_l)
+* isblank::   Blank character predicate (isblank, isblank_l)
+* iscntrl::   Control character predicate (iscntrl, iscntrl_l)
+* isdigit::   Decimal digit predicate (isdigit, isdigit_l)
+* islower::   Lowercase character predicate (islower, islower_l)
+* isprint::   Printable character predicates (isprint, isprint_l. isgraph, isgraph_l)
+* ispunct::   Punctuation character predicate (ispunct, ispunct_l)
+* isspace::   Whitespace character predicate (isspace, isspace_l)
+* isupper::   Uppercase character predicate (isupper, isupper_l)
+* isxdigit::  Hexadecimal digit predicate (isxdigit, isxdigit_l)
+* toascii::   Force integers to ASCII range (toascii, toascii_l)
+* tolower::   Translate characters to lowercase (tolower, tolower_l)
+* toupper::   Translate characters to uppercase (toupper, toupper_l)
+* iswalnum::  Alphanumeric wide character predicate (iswalnum, iswalnum_l)
+* iswalpha::  Alphabetic wide character predicate (iswalpha, iswalpha_l)
+* iswblank::  Blank wide character predicate (iswblank, iswblank_l)
+* iswcntrl::  Control wide character predicate (iswcntrl, iswcntrl_l)
+* iswdigit::  Decimal digit wide character predicate (iswdigit, iswdigit_l)
+* iswgraph::  Graphic wide character predicate (iswgraph, iswgraph_l)
+* iswlower::  Lowercase wide character predicate (iswlower, iswlower_l)
+* iswprint::  Printable wide character predicate (iswprint, iswprint_l)
+* iswpunct::  Punctuation wide character predicate (iswpunct, iswpunct_l)
+* iswspace::  Whitespace wide character predicate (iswspace, iswspace_l)
+* iswupper::  Uppercase wide character predicate (iswupper, iswupper_l)
+* iswxdigit:: Hexadecimal digit wide character predicate (iswxdigit, iswxdigit_l)
+* iswctype::  Extensible wide-character test (iswctype, iswctype_l)
+* wctype::    Compute wide-character test type (wctype, wctype_l)
+* towlower::  Translate wide characters to lowercase (towlower, towlower_l)
+* towupper::  Translate wide characters to uppercase (towupper, towupper_l)
+* towctrans:: Extensible wide-character translation (towctrans, towctrans_l)
+* wctrans::   Compute wide-character translation type (wctrans, wctrans_l)
 @end menu
 
 @page
