@@ -50,6 +50,10 @@ info class.
 </para></listitem>
 
 <listitem><para>
+Support AzureAD accounts.
+</para></listitem>
+
+<listitem><para>
 "nobody" account support for WinFSP.
 </para></listitem>
 

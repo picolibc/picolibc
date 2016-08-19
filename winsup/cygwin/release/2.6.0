@@ -34,6 +34,8 @@ What changed:
   info class.
   Addresses: https://cygwin.com/ml/cygwin/2016-07/msg00350.html
 
+- Support AzureAD accounts.
+
 - "nobody" account support for WinFSP.
 
 
