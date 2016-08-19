@@ -40,6 +40,10 @@ What changed:
 Bug Fixes
 ---------
 
+- Try to avoid spurious DENY ACEs when creating files in directories
+  with non-POSIX-like (rather: Windows-like) permissions.
+  Addresses: Report and reproducer on IRC.
+
 - Make sure ldd(1) does not exit prematurely when enumerating DLLs.
   Addresses: https://cygwin.com/ml/cygwin/2016-05/msg00185.html
 
