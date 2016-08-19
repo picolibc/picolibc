@@ -449,6 +449,7 @@ set_created_file_access (HANDLE handle, path_conv &pc, mode_t attr)
   tmp_pathbuf tp;
   aclent_t *aclp;
   int nentries, idx;
+  bool std_acl;
 
   if (!get_file_sd (handle, pc, sd, true))
     {
@@ -457,8 +458,8 @@ set_created_file_access (HANDLE handle, path_conv &pc, mode_t attr)
 	attr |= S_IFDIR;
       attr_rd = attr;
       aclp = (aclent_t *) tp.c_get ();
-      if ((nentries = get_posix_access (sd, &attr_rd, &uid, &gid,
-					aclp, MAX_ACL_ENTRIES)) >= 0)
+      if ((nentries = get_posix_access (sd, &attr_rd, &uid, &gid, aclp,
+					MAX_ACL_ENTRIES, &std_acl)) >= 0)
 	{
 	  if (S_ISLNK (attr))
 	    {
@@ -466,8 +467,7 @@ set_created_file_access (HANDLE handle, path_conv &pc, mode_t attr)
 	      aclp[0].a_perm = (attr >> 6) & S_IRWXO;
 	      if ((idx = searchace (aclp, nentries, GROUP_OBJ)) >= 0)
 		aclp[idx].a_perm = (attr >> 3) & S_IRWXO;
-	      if (nentries > MIN_ACL_ENTRIES
-		  && (idx = searchace (aclp, nentries, CLASS_OBJ)) >= 0)
+	      if ((idx = searchace (aclp, nentries, CLASS_OBJ)) >= 0)
 		aclp[idx].a_perm = (attr >> 3) & S_IRWXO;
 	      if ((idx = searchace (aclp, nentries, OTHER_OBJ)) >= 0)
 		aclp[idx].a_perm = attr & S_IRWXO;
@@ -477,10 +477,10 @@ set_created_file_access (HANDLE handle, path_conv &pc, mode_t attr)
 	      /* Overwrite ACL permissions as required by POSIX 1003.1e
 		 draft 17. */
 	      aclp[0].a_perm &= (attr >> 6) & S_IRWXO;
-	      if (nentries > MIN_ACL_ENTRIES
-		  && (idx = searchace (aclp, nentries, CLASS_OBJ)) >= 0)
+	      if ((idx = searchace (aclp, nentries, CLASS_OBJ)) >= 0)
 		aclp[idx].a_perm &= (attr >> 3) & S_IRWXO;
-	      else if ((idx = searchace (aclp, nentries, GROUP_OBJ)) >= 0)
+	      if (std_acl
+		  && (idx = searchace (aclp, nentries, GROUP_OBJ)) >= 0)
 		aclp[idx].a_perm &= (attr >> 3) & S_IRWXO;
 	      if ((idx = searchace (aclp, nentries, OTHER_OBJ)) >= 0)
 		aclp[idx].a_perm &= attr & S_IRWXO;

@@ -809,7 +809,6 @@ get_posix_access (PSECURITY_DESCRIPTOR psd,
 			  aclsid[pos] = well_known_null_sid;
 			}
 		      has_class_perm = true;
-		      standard_ACEs_only = false;
 		      class_perm = lacl[pos].a_perm;
 		    }
 		  if (ace->Header.AceFlags & SUB_CONTAINERS_AND_OBJECTS_INHERIT)
@@ -1013,6 +1012,21 @@ get_posix_access (PSECURITY_DESCRIPTOR psd,
 	    }
 	}
     }
+  /* If this is a just created file, and this is an ACL with only standard
+     entries, or if standard POSIX permissions are missing (probably no
+     inherited ACEs so created from a default DACL), assign the permissions
+     specified by the file creation mask.  The values get masked by the
+     actually requested permissions by the caller per POSIX 1003.1e draft 17. */
+  if (just_created)
+    {
+      mode_t perms = (S_IRWXU | S_IRWXG | S_IRWXO) & ~cygheap->umask;
+      if (standard_ACEs_only || !saw_user_obj)
+	lacl[0].a_perm = (perms >> 6) & S_IRWXO;
+      if (standard_ACEs_only || !saw_group_obj)
+	lacl[1].a_perm = (perms >> 3) & S_IRWXO;
+      if (standard_ACEs_only || !saw_other_obj)
+	lacl[2].a_perm = perms & S_IRWXO;
+    }
   /* If this is an old-style or non-Cygwin ACL, and secondary user and group
      entries exist in the ACL, fake a matching CLASS_OBJ entry. The CLASS_OBJ
      permissions are the or'ed permissions of the primary group permissions
@@ -1040,21 +1054,6 @@ get_posix_access (PSECURITY_DESCRIPTOR psd,
       lacl[pos].a_id = ACL_UNDEFINED_ID;
       lacl[pos].a_perm = lacl[1].a_perm; /* == group perms */
       aclsid[pos] = well_known_null_sid;
-    }
-  /* If this is a just created file, and this is an ACL with only standard
-     entries, or if standard POSIX permissions are missing (probably no
-     inherited ACEs so created from a default DACL), assign the permissions
-     specified by the file creation mask.  The values get masked by the
-     actually requested permissions by the caller per POSIX 1003.1e draft 17. */
-  if (just_created)
-    {
-      mode_t perms = (S_IRWXU | S_IRWXG | S_IRWXO) & ~cygheap->umask;
-      if (standard_ACEs_only || !saw_user_obj)
-	lacl[0].a_perm = (perms >> 6) & S_IRWXO;
-      if (standard_ACEs_only || !saw_group_obj)
-	lacl[1].a_perm = (perms >> 3) & S_IRWXO;
-      if (standard_ACEs_only || !saw_other_obj)
-	lacl[2].a_perm = perms & S_IRWXO;
     }
   /* Ensure that the default acl contains at least
      DEF_(USER|GROUP|OTHER)_OBJ entries.  */
