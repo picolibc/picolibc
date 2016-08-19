@@ -11,9 +11,9 @@ details. */
 #include <accctrl.h>
 #include <dsgetdc.h>
 
-/* Special file attribute set, for instance, in open() and mkdir() to
-   flag that a file has just been created.  Used in alloc_sd, see there. */
-#define S_JUSTCREATED 0x80000000
+/* Special file attribute set in set_created_file_access to flag that a file
+   has just been created.  Used in get_posix_access. */
+#define S_JUSTCREATED	0x80000000
 
 /* UID/GID */
 void uinfo_init ();
