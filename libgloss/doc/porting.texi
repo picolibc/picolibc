@@ -39,7 +39,7 @@ Permission is granted to copy and distribute translations of this manual
 into another language, under the above conditions for modified versions.
 @end titlepage
 
-@ifinfo
+@ifnottex
 @format
 START-INFO-DIR-ENTRY
 * Embed with GNU: (porting-).         Embed with GNU
@@ -62,7 +62,7 @@ into another language, under the above conditions for modified versions.
 @node Top
 @top Embed with GNU
 
-@end ifinfo
+@end ifnottex
 @strong{Rough Draft}
 
 The goal of this document is to gather all the information needed to
