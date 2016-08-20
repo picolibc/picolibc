@@ -34,26 +34,22 @@
 
 #include "setlocale.h"
 
-#ifndef __CYGWIN__
-#define TRANSITION_PERIOD_HACK
-#endif
-
 #undef offsetoff
 #define _O(TYPE, MEMBER)  __builtin_offsetof (TYPE, MEMBER)
 
-#define _NLITEM(cat,memb) { { cat:__get_current_##cat##_locale }, \
+#define _NLITEM(cat,memb) { { cat:__get_##cat##_locale }, \
 			      _O (struct lc_##cat##_T, memb) }
 
 #ifdef __HAVE_LOCALE_INFO_EXTENDED__
 static struct _nl_item_t
 {
   union {
-    const struct lc_ctype_T *    (*ctype)(void);
-    const struct lc_time_T *     (*time)(void);
-    const struct lc_numeric_T *  (*numeric)(void);
-    const struct lc_monetary_T * (*monetary)(void);
-    const struct lc_messages_T * (*messages)(void);
-    void *		   (*base)(void);
+    const struct lc_ctype_T *    (*ctype)(struct __locale_t *);
+    const struct lc_time_T *     (*time)(struct __locale_t *);
+    const struct lc_numeric_T *  (*numeric)(struct __locale_t *);
+    const struct lc_monetary_T * (*monetary)(struct __locale_t *);
+    const struct lc_messages_T * (*messages)(struct __locale_t *);
+    void *			 (*base)(struct __locale_t *);
   };
   _off_t offset;
 } nl_ext[] =
@@ -172,47 +168,42 @@ static struct _nl_item_t
 
 #define _REL(BASE) ((int)item-BASE)
 
-char *
-_DEFUN(nl_langinfo, (item), 
-       nl_item item)
+char *nl_langinfo_l (nl_item item, struct __locale_t *locale)
 {
    char *ret, *cs;
 #ifndef __CYGWIN__
    char *s;
 #endif
    static char *csym = NULL;
-#ifdef TRANSITION_PERIOD_HACK
-   static char *cset = NULL;
-#endif /* TRANSITION_PERIOD_HACK */
    char *nptr;
 
    switch (item) {
 #ifdef __HAVE_LOCALE_INFO__
 	case _NL_MESSAGES_CODESET:
-	      	ret = (char *) __get_current_messages_locale ()->codeset;
+		ret = (char *) __get_messages_locale (locale)->codeset;
 		goto do_codeset;
 #ifdef __HAVE_LOCALE_INFO_EXTENDED__
 	case _NL_TIME_CODESET:
-	      	ret = (char *) __get_current_time_locale ()->codeset;
+		ret = (char *) __get_time_locale (locale)->codeset;
 		goto do_codeset;
 	case _NL_NUMERIC_CODESET:
-	      	ret = (char *) __get_current_numeric_locale ()->codeset;
+		ret = (char *) __get_numeric_locale (locale)->codeset;
 		goto do_codeset;
 	case _NL_MONETARY_CODESET:
-	      	ret = (char *) __get_current_monetary_locale ()->codeset;
+		ret = (char *) __get_monetary_locale (locale)->codeset;
 		goto do_codeset;
 #ifdef __CYGWIN__
 	case _NL_COLLATE_CODESET:
 		{
-		  ret = (char *) __get_current_collate_locale ()->codeset;
+		  ret = (char *) __get_collate_locale (locale)->codeset;
 		  goto do_codeset;
 		}
 #endif /* __CYGWIN__ */
 #endif /* __HAVE_LOCALE_INFO_EXTENDED__ */
 #endif /* __HAVE_LOCALE_INFO__ */
 	case CODESET:
-#ifdef __CYGWIN__
-		ret = (char *) __current_locale_charset ();
+#ifdef _MB_CAPABLE
+		ret = (char *) __locale_charset (locale);
 #endif
 do_codeset:
 #ifdef __CYGWIN__
@@ -255,112 +246,75 @@ do_codeset:
 		       fine by libiconv. */
 		    ret = "CP932";
 		  }
-#else
-		ret = "";
-		if ((s = setlocale(LC_CTYPE, NULL)) != NULL) {
-			if ((cs = strchr(s, '.')) != NULL) {
-				ret = cs + 1;
-#ifdef TRANSITION_PERIOD_HACK
-				if (strncmp(ret, "ISO_", 4) == 0) {
-					int slen = strlen(ret);
-
-                                        nptr = realloc(cset, slen);
-
-                                        if (!nptr && cset)
-                                          free (cset);
-
-                                        cset = nptr;
-					if (cset != NULL) {
-						strcpy(cset, "ISO");
-						strcat(cset, ret + 4);
-						ret = cset;
-					} else
-						ret = "";
-				} else if (strcmp(ret, "EUC") == 0) {
-					if (strncmp(s, "ja_JP", 5) == 0)
-						ret = "eucJP";
-					else if (strncmp(s, "ko_KR", 5) == 0)
-						ret = "eucKR";
-					else if (strncmp(s, "zh_CN", 5) == 0)
-						ret = "eucCN";
-				} else if (strcmp(ret, "ASCII") == 0)
-					ret = "US-ASCII";
-#endif /* TRANSITION_PERIOD_HACK */
-			} else if (strcmp(s, "C") == 0 ||
-				   strcmp(s, "POSIX") == 0
-#ifdef TRANSITION_PERIOD_HACK
-				   || strstr(s, "ASCII") != NULL
-#endif /* TRANSITION_PERIOD_HACK */
-				  )
-				ret = "US-ASCII";
-		}
+#elif !defined (_MB_CAPABLE)
+		ret = "US-ASCII";
 #endif /* __CYGWIN__ */
 		break;
 	case D_T_FMT:
-		ret = (char *) __get_current_time_locale()->c_fmt;
+		ret = (char *) __get_time_locale (locale)->c_fmt;
 		break;
 	case D_FMT:
-		ret = (char *) __get_current_time_locale()->x_fmt;
+		ret = (char *) __get_time_locale (locale)->x_fmt;
 		break;
 	case T_FMT:
-		ret = (char *) __get_current_time_locale()->X_fmt;
+		ret = (char *) __get_time_locale (locale)->X_fmt;
 		break;
 	case T_FMT_AMPM:
-		ret = (char *) __get_current_time_locale()->ampm_fmt;
+		ret = (char *) __get_time_locale (locale)->ampm_fmt;
 		break;
 	case AM_STR:
-		ret = (char *) __get_current_time_locale()->am_pm[0];
+		ret = (char *) __get_time_locale (locale)->am_pm[0];
 		break;
 	case PM_STR:
-		ret = (char *) __get_current_time_locale()->am_pm[1];
+		ret = (char *) __get_time_locale (locale)->am_pm[1];
 		break;
 	case DAY_1: case DAY_2: case DAY_3:
 	case DAY_4: case DAY_5: case DAY_6: case DAY_7:
-		ret = (char*) __get_current_time_locale()->weekday[_REL(DAY_1)];
+		ret = (char*) __get_time_locale (locale)->weekday[_REL(DAY_1)];
 		break;
 	case ABDAY_1: case ABDAY_2: case ABDAY_3:
 	case ABDAY_4: case ABDAY_5: case ABDAY_6: case ABDAY_7:
-		ret = (char*) __get_current_time_locale()->wday[_REL(ABDAY_1)];
+		ret = (char*) __get_time_locale (locale)->wday[_REL(ABDAY_1)];
 		break;
 	case MON_1: case MON_2: case MON_3: case MON_4:
 	case MON_5: case MON_6: case MON_7: case MON_8:
 	case MON_9: case MON_10: case MON_11: case MON_12:
-		ret = (char*) __get_current_time_locale()->month[_REL(MON_1)];
+		ret = (char*) __get_time_locale (locale)->month[_REL(MON_1)];
 		break;
 	case ABMON_1: case ABMON_2: case ABMON_3: case ABMON_4:
 	case ABMON_5: case ABMON_6: case ABMON_7: case ABMON_8:
 	case ABMON_9: case ABMON_10: case ABMON_11: case ABMON_12:
-		ret = (char*) __get_current_time_locale()->mon[_REL(ABMON_1)];
+		ret = (char*) __get_time_locale (locale)->mon[_REL(ABMON_1)];
 		break;
 	case ERA:
-		ret = (char*) __get_current_time_locale()->era;
+		ret = (char*) __get_time_locale (locale)->era;
 		break;
 	case ERA_D_FMT:
-		ret = (char*) __get_current_time_locale()->era_d_fmt;
+		ret = (char*) __get_time_locale (locale)->era_d_fmt;
 		break;
 	case ERA_D_T_FMT:
-		ret = (char*) __get_current_time_locale()->era_d_t_fmt;
+		ret = (char*) __get_time_locale (locale)->era_d_t_fmt;
 		break;
 	case ERA_T_FMT:
-		ret = (char*) __get_current_time_locale()->era_t_fmt;
+		ret = (char*) __get_time_locale (locale)->era_t_fmt;
 		break;
 	case ALT_DIGITS:
-		ret = (char*) __get_current_time_locale()->alt_digits;
+		ret = (char*) __get_time_locale (locale)->alt_digits;
 		break;
 	case _DATE_FMT:	/* GNU extension */
-		ret = (char*) __get_current_time_locale()->date_fmt;
+		ret = (char*) __get_time_locale (locale)->date_fmt;
 		break;
 	case RADIXCHAR:
-		ret = (char*) __get_current_numeric_locale()->decimal_point;
+		ret = (char*) __get_numeric_locale (locale)->decimal_point;
 		break;
 	case THOUSEP:
-		ret = (char*) __get_current_numeric_locale()->thousands_sep;
+		ret = (char*) __get_numeric_locale (locale)->thousands_sep;
 		break;
 	case YESEXPR:
-		ret = (char*) __get_current_messages_locale()->yesexpr;
+		ret = (char*) __get_messages_locale (locale)->yesexpr;
 		break;
 	case NOEXPR:
-		ret = (char*) __get_current_messages_locale()->noexpr;
+		ret = (char*) __get_messages_locale (locale)->noexpr;
 		break;
 	/*
 	 * All items marked with LEGACY are available, but not recomended
@@ -368,22 +322,22 @@ do_codeset:
 	 * to remove in future specification editions
 	 */
 	case YESSTR:            /* LEGACY  */
-		ret = (char*) __get_current_messages_locale()->yesstr;
+		ret = (char*) __get_messages_locale (locale)->yesstr;
 		break;
 	case NOSTR:             /* LEGACY  */
-		ret = (char*) __get_current_messages_locale()->nostr;
+		ret = (char*) __get_messages_locale (locale)->nostr;
 		break;
 	case CRNCYSTR:
 		ret = "";
-		cs = (char*) __get_current_monetary_locale()->currency_symbol;
+		cs = (char*) __get_monetary_locale (locale)->currency_symbol;
 		if (*cs != '\0') {
-			char pos = localeconv()->p_cs_precedes;
+			char pos = __localeconv_l (locale)->p_cs_precedes;
 
-			if (pos == localeconv()->n_cs_precedes) {
+			if (pos == __localeconv_l (locale)->n_cs_precedes) {
 				char psn = '\0';
 
 				if (pos == CHAR_MAX) {
-					if (strcmp(cs, __get_current_monetary_locale()->mon_decimal_point) == 0)
+					if (strcmp(cs, __get_monetary_locale (locale)->mon_decimal_point) == 0)
 						psn = '.';
 				} else
 					psn = pos ? '-' : '+';
@@ -406,11 +360,11 @@ do_codeset:
 		}
 		break;
 	case D_MD_ORDER:        /* local extension */
-		ret = (char *) __get_current_time_locale()->md_order;
+		ret = (char *) __get_time_locale (locale)->md_order;
 		break;
 #ifdef __HAVE_LOCALE_INFO__
 	case _NL_CTYPE_MB_CUR_MAX:
-		ret = (char *) __get_current_ctype_locale()->mb_cur_max;
+		ret = (char *) __get_ctype_locale (locale)->mb_cur_max;
 		break;
 #endif
 	default:
@@ -418,11 +372,16 @@ do_codeset:
 		if (item > _NL_LOCALE_EXTENDED_FIRST_ENTRY
 		    && item < _NL_LOCALE_EXTENDED_LAST_ENTRY) {
 			int idx = item - _NL_LOCALE_EXTENDED_FIRST_ENTRY - 1;
-			return *(char **) ((char *) (*nl_ext[idx].base)()
+			return *(char **) ((char *) (*nl_ext[idx].base)(locale)
 					   + nl_ext[idx].offset);
 		}
 #endif
 		ret = "";
    }
    return (ret);
+}
+
+char *nl_langinfo (nl_item item)
+{
+  return nl_langinfo_l (item, __get_current_locale ());
 }

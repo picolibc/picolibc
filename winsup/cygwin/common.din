@@ -939,6 +939,7 @@ nexttowardl NOSIGFE
 nftw SIGFE
 nice SIGFE
 nl_langinfo SIGFE
+nl_langinfo_l SIGFE
 nrand48 NOSIGFE
 ntohl NOSIGFE
 ntohs NOSIGFE

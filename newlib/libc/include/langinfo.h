@@ -32,6 +32,9 @@
 #include <newlib.h>
 #include <sys/config.h>
 #include <sys/cdefs.h>
+#if __POSIX_VISIBLE >= 200809
+#include <sys/_locale.h>
+#endif
 
 typedef int nl_item;
 
@@ -310,7 +313,10 @@ enum __nl_item
 };
 
 __BEGIN_DECLS
-char	*nl_langinfo(nl_item);
+char	*nl_langinfo (nl_item);
+#if __POSIX_VISIBLE >= 200809
+char	*nl_langinfo_l (nl_item, locale_t);
+#endif
 __END_DECLS
 
 #endif /* !_LANGINFO_H_ */
