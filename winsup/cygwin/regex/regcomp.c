@@ -1132,7 +1132,7 @@ wgetnext(struct parse *p)
 	   invalid ASCII chars.  To be more Linux-compatible, we align the
 	   behaviour to glibc here.  Allow any character value if the current
 	   local's codeset is ASCII. */
-	if (*__locale_charset () == 'A') /* SCII */
+	if (*__current_locale_charset () == 'A') /* SCII */
 	  return (wint_t) (unsigned char) *p->next++;
 #endif
 	memset(&mbs, 0, sizeof(mbs));
@@ -1503,7 +1503,7 @@ findmust(struct parse *p, struct re_guts *g)
 	 */
 	if (MB_CUR_MAX > 1 &&
 #ifdef __CYGWIN__
-	    strcmp(__locale_charset (), "UTF-8") != 0)
+	    strcmp(__current_locale_charset (), "UTF-8") != 0)
 #else
 	    strcmp(_CurrentRuneLocale->__encoding, "UTF-8") != 0)
 #endif

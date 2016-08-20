@@ -373,7 +373,17 @@ __get_current_messages_locale (void)
 #endif /* !__HAVE_LOCALE_INFO__ */
 
 _ELIDABLE_INLINE const char *
-__locale_charset (void)
+__locale_charset (struct __locale_t *locale)
+{
+#ifdef __HAVE_LOCALE_INFO__
+  return __get_ctype_locale (locale)->codeset;
+#else
+  return locale->ctype_codeset;
+#endif
+}
+
+_ELIDABLE_INLINE const char *
+__current_locale_charset (void)
 {
 #ifdef __HAVE_LOCALE_INFO__
   return __get_current_ctype_locale ()->codeset;

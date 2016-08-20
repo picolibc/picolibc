@@ -212,7 +212,7 @@ _DEFUN(nl_langinfo, (item),
 #endif /* __HAVE_LOCALE_INFO__ */
 	case CODESET:
 #ifdef __CYGWIN__
-		ret = (char *) __locale_charset ();
+		ret = (char *) __current_locale_charset ();
 #endif
 do_codeset:
 #ifdef __CYGWIN__
