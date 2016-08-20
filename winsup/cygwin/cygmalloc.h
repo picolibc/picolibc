@@ -26,17 +26,22 @@ void dlmalloc_stats ();
 #define MALLOC_ALIGNMENT ((size_t)16U)
 #endif
 
-#ifndef __INSIDE_CYGWIN__
+#if defined (DLMALLOC_VERSION)	/* Building malloc.cc */
+
 extern "C" void __set_ENOMEM ();
 void *mmap64 (void *, size_t, int, int, int, off_t);
-#define mmap mmap64
+# define mmap mmap64
 # define MALLOC_FAILURE_ACTION	__set_ENOMEM ()
 # define USE_DL_PREFIX 1
-#else
+
+#elif defined (__INSIDE_CYGWIN__)
+
 # define __malloc_lock() mallock.acquire ()
 # define __malloc_unlock() mallock.release ()
 extern muto mallock;
+
 #endif
+
 #ifdef __cplusplus
 }
 #endif

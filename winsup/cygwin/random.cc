@@ -27,6 +27,8 @@
  * SUCH DAMAGE.
  */
 
+#define __INSIDE_CYGWIN__
+
 extern "C" {
 #if defined(LIBC_SCCS) && !defined(lint)
 static char sccsid[] = "@(#)random.c	8.2 (Berkeley) 5/19/95";

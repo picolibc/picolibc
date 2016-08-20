@@ -30,6 +30,7 @@
  *
  */
 
+#define __INSIDE_CYGWIN__
 #define _GNU_SOURCE
 #include <sys/cdefs.h>
 __FBSDID("$FreeBSD$");
