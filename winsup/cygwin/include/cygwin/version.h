@@ -467,12 +467,13 @@ details. */
        strtoull_l, wcstod_l, wcstof_l, wcstol_l, wcstold_l, wcstoll_l,
        wcstoul_l, wcstoull_l.
   302: Export nl_langinfo_l.
+  303: Export pthread_getname_np, pthread_setname_np.
 
   Note that we forgot to bump the api for ualarm, strtoll, strtoull,
   sigaltstack, sethostname. */
 
 #define CYGWIN_VERSION_API_MAJOR 0
-#define CYGWIN_VERSION_API_MINOR 302
+#define CYGWIN_VERSION_API_MINOR 303
 
 /* There is also a compatibity version number associated with the shared memory
    regions.  It is incremented when incompatible changes are made to the shared

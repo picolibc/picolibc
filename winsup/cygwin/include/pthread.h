@@ -222,6 +222,8 @@ void pthread_testcancel (void);
 
 #if __GNU_VISIBLE
 int pthread_getattr_np (pthread_t, pthread_attr_t *);
+int pthread_getname_np (pthread_t, char *, size_t) __attribute__((nonnull(2)));
+int pthread_setname_np (pthread_t, const char *) __attribute__((nonnull(2)));
 int pthread_sigqueue (pthread_t *, int, const union sigval);
 int pthread_yield (void);
 #endif

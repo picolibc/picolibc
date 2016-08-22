@@ -240,6 +240,7 @@ public:
   void *stackaddr;
   size_t stacksize;
   size_t guardsize;
+  char *name;
 
   pthread_attr ();
   ~pthread_attr ();

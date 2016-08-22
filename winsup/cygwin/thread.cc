@@ -1106,7 +1106,7 @@ pthread::resume ()
 pthread_attr::pthread_attr ():verifyable_object (PTHREAD_ATTR_MAGIC),
 joinable (PTHREAD_CREATE_JOINABLE), contentionscope (PTHREAD_SCOPE_PROCESS),
 inheritsched (PTHREAD_INHERIT_SCHED), stackaddr (NULL), stacksize (0),
-guardsize (wincap.def_guard_page_size ())
+guardsize (wincap.def_guard_page_size ()), name (NULL)
 {
   schedparam.sched_priority = 0;
 }
@@ -2575,6 +2575,69 @@ pthread_getattr_np (pthread_t thread, pthread_attr_t *attr)
 
   return 0;
 }
+
+/* For Linux compatibility, the length of a thread name is 16 characters. */
+#define THRNAMELEN 16
+
+extern "C" int
+pthread_getname_np (pthread_t thread, char *buf, size_t buflen)
+{
+  char *name;
+
+  if (!pthread::is_good_object (&thread))
+    return ESRCH;
+
+  if (!thread->attr.name)
+    name = program_invocation_short_name;
+  else
+    name = thread->attr.name;
+
+  /* Return ERANGE if the provided buffer is less than THRNAMELEN.  Truncate
+     and zero-terminate the name to fit in buf.  This means we always return
+     something if the buffer is THRNAMELEN or larger, but there is no way to
+     tell if we have the whole name. */
+  if (buflen < THRNAMELEN)
+    return ERANGE;
+
+  int ret = 0;
+  __try
+    {
+      strlcpy (buf, name, buflen);
+    }
+  __except (NO_ERROR)
+    {
+      ret = EFAULT;
+    }
+  __endtry
+
+  return ret;
+}
+
+extern "C" int
+pthread_setname_np (pthread_t thread, const char *name)
+{
+  char *oldname, *cp;
+
+  if (!pthread::is_good_object (&thread))
+    return ESRCH;
+
+  if (strlen (name) > THRNAMELEN)
+    return ERANGE;
+
+  cp = strdup (name);
+  if (!cp)
+    return ENOMEM;
+
+  oldname = thread->attr.name;
+  thread->attr.name = cp;
+
+  if (oldname)
+    free (oldname);
+
+  return 0;
+}
+
+#undef THRNAMELEN
 
 /* provided for source level compatability.
    See http://www.opengroup.org/onlinepubs/007908799/xsh/pthread_getconcurrency.html
