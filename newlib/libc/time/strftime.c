@@ -311,6 +311,7 @@ locale, hard-coding the "C" locale settings.
 #  define STRLEN(a)	strlen(a)
 # else
 #  define strftime	wcsftime	/* Alternate function name */
+#  define strftime_l	wcsftime_l	/* Alternate function name */
 #  define CHAR		wchar_t		/* string type basis */
 #  define CQ(a)		L##a		/* character constant qualifier */
 #  define snprintf	swprintf	/* wide-char equivalent function name */
@@ -1460,9 +1461,8 @@ _DEFUN (strftime, (s, maxsize, format, tim_p),
 #endif /* !_WANT_C99_TIME_FORMATS */
 }
 
-#if !defined(MAKE_WCSFTIME)
 size_t
-strftime_l (char *__restrict s, size_t maxsize, const char *__restrict format,
+strftime_l (CHAR *__restrict s, size_t maxsize, const CHAR *__restrict format,
 	    const struct tm *__restrict tim_p, struct __locale_t *locale)
 {
 #ifdef _WANT_C99_TIME_FORMATS
@@ -1479,7 +1479,6 @@ strftime_l (char *__restrict s, size_t maxsize, const char *__restrict format,
   return __strftime (s, maxsize, format, tim_p, locale, NULL, NULL);
 #endif /* !_WANT_C99_TIME_FORMATS */
 }
-#endif
 
 /* The remainder of this file can serve as a regression test.  Compile
  *  with -D_REGRESSION_TEST.  */

@@ -1522,6 +1522,7 @@ wcscpy NOSIGFE
 wcscspn NOSIGFE
 wcsdup NOSIGFE
 wcsftime SIGFE
+wcsftime_l SIGFE
 wcslcat NOSIGFE
 wcslcpy NOSIGFE
 wcslen NOSIGFE
