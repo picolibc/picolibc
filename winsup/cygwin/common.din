@@ -1364,6 +1364,7 @@ strndup SIGFE
 strnlen NOSIGFE
 strpbrk NOSIGFE
 strptime SIGFE
+strptime_l SIGFE
 strrchr NOSIGFE
 strsep NOSIGFE
 strsignal SIGFE

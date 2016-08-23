@@ -30,6 +30,7 @@
  * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
+#define _GNU_SOURCE
 #include <stddef.h>
 #include <stdio.h>
 #include <time.h>
@@ -68,14 +69,15 @@ is_leap_year (int year)
 
 /* Needed for strptime. */
 static int
-match_string (const char *__restrict *buf, const char * const*strs)
+match_string (const char *__restrict *buf, const char * const*strs,
+	      locale_t locale)
 {
     int i = 0;
 
     for (i = 0; strs[i] != NULL; ++i) {
 	int len = strlen (strs[i]);
 
-	if (strncasecmp (*buf, strs[i], len) == 0) {
+	if (strncasecmp_l (*buf, strs[i], len, locale) == 0) {
 	    *buf += len;
 	    return i;
 	}
@@ -148,25 +150,20 @@ set_week_number_mon4 (struct tm *timeptr, int wnum)
     }
 }
 
-/* strptime: roken */
-//extern "C"
 char *
-//strptime (const char *buf, const char *format, struct tm *timeptr)
-_DEFUN (strptime, (buf, format, timeptr),
-	_CONST char *__restrict buf _AND
-	_CONST char *__restrict format _AND
-	struct tm *__restrict timeptr)
+strptime_l (const char *buf, const char *format, struct tm *timeptr,
+	    locale_t locale)
 {
     char c;
     int ymd = 0;
 
-    const struct lc_time_T *_CurrentTimeLocale = __get_current_time_locale ();
+    const struct lc_time_T *_CurrentTimeLocale = __get_time_locale (locale);
     for (; (c = *format) != '\0'; ++format) {
 	char *s;
 	int ret;
 
-	if (isspace ((unsigned char) c)) {
-	    while (isspace ((unsigned char) *buf))
+	if (isspace_l ((unsigned char) c, locale)) {
+	    while (isspace_l ((unsigned char) *buf, locale))
 		++buf;
 	} else if (c == '%' && format[1] != '\0') {
 	    c = *++format;
@@ -174,21 +171,21 @@ _DEFUN (strptime, (buf, format, timeptr),
 		c = *++format;
 	    switch (c) {
 	    case 'A' :
-		ret = match_string (&buf, _ctloc (weekday));
+		ret = match_string (&buf, _ctloc (weekday), locale);
 		if (ret < 0)
 		    return NULL;
 		timeptr->tm_wday = ret;
 		ymd |= SET_WDAY;
 		break;
 	    case 'a' :
-		ret = match_string (&buf, _ctloc (wday));
+		ret = match_string (&buf, _ctloc (wday), locale);
 		if (ret < 0)
 		    return NULL;
 		timeptr->tm_wday = ret;
 		ymd |= SET_WDAY;
 		break;
 	    case 'B' :
-		ret = match_string (&buf, _ctloc (month));
+		ret = match_string (&buf, _ctloc (month), locale);
 		if (ret < 0)
 		    return NULL;
 		timeptr->tm_mon = ret;
@@ -196,14 +193,14 @@ _DEFUN (strptime, (buf, format, timeptr),
 		break;
 	    case 'b' :
 	    case 'h' :
-		ret = match_string (&buf, _ctloc (mon));
+		ret = match_string (&buf, _ctloc (mon), locale);
 		if (ret < 0)
 		    return NULL;
 		timeptr->tm_mon = ret;
 		ymd |= SET_MON;
 		break;
 	    case 'C' :
-		ret = strtol (buf, &s, 10);
+		ret = strtol_l (buf, &s, 10, locale);
 		if (s == buf)
 		    return NULL;
 		timeptr->tm_year = (ret * 100) - tm_year_base;
@@ -211,14 +208,14 @@ _DEFUN (strptime, (buf, format, timeptr),
 		ymd |= SET_YEAR;
 		break;
 	    case 'c' :		/* %a %b %e %H:%M:%S %Y */
-		s = strptime (buf, _ctloc (c_fmt), timeptr);
+		s = strptime_l (buf, _ctloc (c_fmt), timeptr, locale);
 		if (s == NULL)
 		    return NULL;
 		buf = s;
 		ymd |= SET_WDAY | SET_YMD;
 		break;
 	    case 'D' :		/* %m/%d/%y */
-		s = strptime (buf, "%m/%d/%y", timeptr);
+		s = strptime_l (buf, "%m/%d/%y", timeptr, locale);
 		if (s == NULL)
 		    return NULL;
 		buf = s;
@@ -226,7 +223,7 @@ _DEFUN (strptime, (buf, format, timeptr),
 		break;
 	    case 'd' :
 	    case 'e' :
-		ret = strtol (buf, &s, 10);
+		ret = strtol_l (buf, &s, 10, locale);
 		if (s == buf)
 		    return NULL;
 		timeptr->tm_mday = ret;
@@ -235,7 +232,7 @@ _DEFUN (strptime, (buf, format, timeptr),
 		break;
 	    case 'H' :
 	    case 'k' :
-		ret = strtol (buf, &s, 10);
+		ret = strtol_l (buf, &s, 10, locale);
 		if (s == buf)
 		    return NULL;
 		timeptr->tm_hour = ret;
@@ -243,7 +240,7 @@ _DEFUN (strptime, (buf, format, timeptr),
 		break;
 	    case 'I' :
 	    case 'l' :
-		ret = strtol (buf, &s, 10);
+		ret = strtol_l (buf, &s, 10, locale);
 		if (s == buf)
 		    return NULL;
 		if (ret == 12)
@@ -253,7 +250,7 @@ _DEFUN (strptime, (buf, format, timeptr),
 		buf = s;
 		break;
 	    case 'j' :
-		ret = strtol (buf, &s, 10);
+		ret = strtol_l (buf, &s, 10, locale);
 		if (s == buf)
 		    return NULL;
 		timeptr->tm_yday = ret - 1;
@@ -261,7 +258,7 @@ _DEFUN (strptime, (buf, format, timeptr),
 		ymd |= SET_YDAY;
 		break;
 	    case 'm' :
-		ret = strtol (buf, &s, 10);
+		ret = strtol_l (buf, &s, 10, locale);
 		if (s == buf)
 		    return NULL;
 		timeptr->tm_mon = ret - 1;
@@ -269,7 +266,7 @@ _DEFUN (strptime, (buf, format, timeptr),
 		ymd |= SET_MON;
 		break;
 	    case 'M' :
-		ret = strtol (buf, &s, 10);
+		ret = strtol_l (buf, &s, 10, locale);
 		if (s == buf)
 		    return NULL;
 		timeptr->tm_min = ret;
@@ -282,7 +279,7 @@ _DEFUN (strptime, (buf, format, timeptr),
 		    return NULL;
 		break;
 	    case 'p' :
-		ret = match_string (&buf, _ctloc (am_pm));
+		ret = match_string (&buf, _ctloc (am_pm), locale);
 		if (ret < 0)
 		    return NULL;
 		if (timeptr->tm_hour == 0) {
@@ -292,19 +289,19 @@ _DEFUN (strptime, (buf, format, timeptr),
 		    timeptr->tm_hour += 12;
 		break;
 	    case 'r' :		/* %I:%M:%S %p */
-		s = strptime (buf, _ctloc (ampm_fmt), timeptr);
+		s = strptime_l (buf, _ctloc (ampm_fmt), timeptr, locale);
 		if (s == NULL)
 		    return NULL;
 		buf = s;
 		break;
 	    case 'R' :		/* %H:%M */
-		s = strptime (buf, "%H:%M", timeptr);
+		s = strptime_l (buf, "%H:%M", timeptr, locale);
 		if (s == NULL)
 		    return NULL;
 		buf = s;
 		break;
 	    case 'S' :
-		ret = strtol (buf, &s, 10);
+		ret = strtol_l (buf, &s, 10, locale);
 		if (s == buf)
 		    return NULL;
 		timeptr->tm_sec = ret;
@@ -317,13 +314,13 @@ _DEFUN (strptime, (buf, format, timeptr),
 		    return NULL;
 		break;
 	    case 'T' :		/* %H:%M:%S */
-		s = strptime (buf, "%H:%M:%S", timeptr);
+		s = strptime_l (buf, "%H:%M:%S", timeptr, locale);
 		if (s == NULL)
 		    return NULL;
 		buf = s;
 		break;
 	    case 'u' :
-		ret = strtol (buf, &s, 10);
+		ret = strtol_l (buf, &s, 10, locale);
 		if (s == buf)
 		    return NULL;
 		timeptr->tm_wday = ret - 1;
@@ -331,7 +328,7 @@ _DEFUN (strptime, (buf, format, timeptr),
 		ymd |= SET_WDAY;
 		break;
 	    case 'w' :
-		ret = strtol (buf, &s, 10);
+		ret = strtol_l (buf, &s, 10, locale);
 		if (s == buf)
 		    return NULL;
 		timeptr->tm_wday = ret;
@@ -339,7 +336,7 @@ _DEFUN (strptime, (buf, format, timeptr),
 		ymd |= SET_WDAY;
 		break;
 	    case 'U' :
-		ret = strtol (buf, &s, 10);
+		ret = strtol_l (buf, &s, 10, locale);
 		if (s == buf)
 		    return NULL;
 		set_week_number_sun (timeptr, ret);
@@ -347,7 +344,7 @@ _DEFUN (strptime, (buf, format, timeptr),
 		ymd |= SET_YDAY;
 		break;
 	    case 'V' :
-		ret = strtol (buf, &s, 10);
+		ret = strtol_l (buf, &s, 10, locale);
 		if (s == buf)
 		    return NULL;
 		set_week_number_mon4 (timeptr, ret);
@@ -355,7 +352,7 @@ _DEFUN (strptime, (buf, format, timeptr),
 		ymd |= SET_YDAY;
 		break;
 	    case 'W' :
-		ret = strtol (buf, &s, 10);
+		ret = strtol_l (buf, &s, 10, locale);
 		if (s == buf)
 		    return NULL;
 		set_week_number_mon (timeptr, ret);
@@ -363,20 +360,20 @@ _DEFUN (strptime, (buf, format, timeptr),
 		ymd |= SET_YDAY;
 		break;
 	    case 'x' :
-		s = strptime (buf, _ctloc (x_fmt), timeptr);
+		s = strptime_l (buf, _ctloc (x_fmt), timeptr, locale);
 		if (s == NULL)
 		    return NULL;
 		buf = s;
 		ymd |= SET_YMD;
 		break;
 	    case 'X' :
-		s = strptime (buf, _ctloc (X_fmt), timeptr);
+		s = strptime_l (buf, _ctloc (X_fmt), timeptr, locale);
 		if (s == NULL)
 		    return NULL;
 		buf = s;
 	    	break;
 	    case 'y' :
-		ret = strtol (buf, &s, 10);
+		ret = strtol_l (buf, &s, 10, locale);
 		if (s == buf)
 		    return NULL;
 		if (ret < 70)
@@ -387,7 +384,7 @@ _DEFUN (strptime, (buf, format, timeptr),
 		ymd |= SET_YEAR;
 		break;
 	    case 'Y' :
-		ret = strtol (buf, &s, 10);
+		ret = strtol_l (buf, &s, 10, locale);
 		if (s == buf)
 		    return NULL;
 		timeptr->tm_year = ret - tm_year_base;
@@ -475,3 +472,8 @@ _DEFUN (strptime, (buf, format, timeptr),
     return (char *)buf;
 }
 
+char *
+strptime (const char *buf, const char *format, struct tm *timeptr)
+{
+  return strptime_l (buf, format, timeptr, __get_current_locale ());
+}

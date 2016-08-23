@@ -92,6 +92,11 @@ char      *_EXFUN(strptime,     (const char *__restrict,
 				 const char *__restrict,
 				 struct tm *__restrict));
 #endif
+#if __GNU_VISIBLE
+char *strptime_l (const char *__restrict, const char *__restrict,
+		  struct tm *__restrict, locale_t);
+#endif
+
 #if __POSIX_VISIBLE
 _VOID      _EXFUN(tzset,	(_VOID));
 #endif
