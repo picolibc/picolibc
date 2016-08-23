@@ -86,6 +86,9 @@ struct __locale_t *
 _newlocale_r (struct _reent *p, int category_mask, const char *locale,
 	      struct __locale_t *base)
 {
+#ifndef _MB_CAPABLE
+  return __get_C_locale ();
+#else /* _MB_CAPABLE */
   char new_categories[_LC_LAST][ENCODING_LEN + 1];
   struct __locale_t tmp_locale, *new_locale;
   int i;
@@ -108,9 +111,9 @@ _newlocale_r (struct _reent *p, int category_mask, const char *locale,
   if ((!base && category_mask == 0)
       || (category_mask == LC_VALID_MASK
 	  && (!strcmp (locale, "C") || !strcmp (locale, "POSIX"))))
-    return (struct __locale_t *) &__C_locale;
+    return __get_C_locale ();
   /* Start with setting all values to the default locale values. */
-  tmp_locale = __C_locale;
+  tmp_locale = *__get_C_locale ();
   /* Fill out new category strings. */
   for (i = 1; i < _LC_LAST; ++i)
     {
@@ -206,6 +209,7 @@ error:
 #endif /* __HAVE_LOCALE_INFO__ */
 
   return NULL;
+#endif /* _MB_CAPABLE */
 }
 
 struct __locale_t *

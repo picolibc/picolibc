@@ -203,6 +203,7 @@ static char *categories[_LC_LAST] = {
   "LC_TIME",
   "LC_MESSAGES",
 };
+#endif /* _MB_CAPABLE */
 
 /*
  * Default locale per POSIX.  Can be overridden on a per-target base.
@@ -210,6 +211,8 @@ static char *categories[_LC_LAST] = {
 #ifndef DEFAULT_LOCALE
 #define DEFAULT_LOCALE	"C"
 #endif
+
+#ifdef _MB_CAPABLE
 /*
  * This variable can be changed by any outside mechanism.  This allows,
  * for instance, to load the default locale from a file.
@@ -250,6 +253,7 @@ const struct __locale_t __C_locale =
   },
 #endif /* __HAVE_LOCALE_INFO__ */
 };
+#endif /* _MB_CAPABLE */
 
 struct __locale_t __global_locale =
 {
@@ -291,6 +295,7 @@ struct __locale_t __global_locale =
 #endif /* __HAVE_LOCALE_INFO__ */
 };
 
+#ifdef _MB_CAPABLE
 /* Renamed from current_locale_string to make clear this is only the
    *global* string for setlocale (LC_ALL, NULL).  There's no equivalent
    functionality for uselocale. */

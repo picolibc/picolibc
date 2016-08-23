@@ -194,9 +194,10 @@ struct __locale_t
 #endif
 };
 
-extern const struct __locale_t __C_locale;
+#ifdef _MB_CAPABLE
 extern char *__loadlocale (struct __locale_t *, int, const char *);
 extern const char *__get_locale_env(struct _reent *, int);
+#endif /* _MB_CAPABLE */
 
 extern struct lconv *__localeconv_l (struct __locale_t *locale);
 
@@ -227,6 +228,19 @@ _ELIDABLE_INLINE struct __locale_t *
 __get_current_locale ()
 {
   return _REENT->_locale ?: __get_global_locale ();
+}
+
+/* Only access fixed "C" locale using this function.  Fake for !_MB_CAPABLE
+   targets by returning ptr to globale locale. */
+_ELIDABLE_INLINE struct __locale_t *
+__get_C_locale ()
+{
+#ifndef _MB_CAPABLE
+  return __get_global_locale ();
+#else
+  extern const struct __locale_t __C_locale;
+  return (struct __locale_t *) &__C_locale;
+#endif
 }
 
 #ifdef __CYGWIN__

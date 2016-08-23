@@ -45,12 +45,15 @@ _duplocale_r (struct _reent *p, struct __locale_t *locobj)
   struct __locale_t tmp_locale, *new_locale;
   int i;
 
+#ifndef _MB_CAPABLE
+  return __get_C_locale ();
+#else /* _MB_CAPABLE */
   /* LC_GLOBAL_LOCALE denotes the global locale. */
   if (locobj == LC_GLOBAL_LOCALE)
     locobj = __get_global_locale ();
   /* The "C" locale is used statically, never copied. */
-  else if (locobj == &__C_locale)
-    return (struct __locale_t *) &__C_locale;
+  else if (locobj == __get_C_locale ())
+    return __get_C_locale ();
   /* Copy locale content. */
   tmp_locale = *locobj;
 #ifdef __HAVE_LOCALE_INFO__
@@ -86,6 +89,7 @@ error:
 #endif /* __HAVE_LOCALE_INFO__ */
 
   return NULL;
+#endif /* _MB_CAPABLE */
 }
 
 #ifndef _REENT_ONLY

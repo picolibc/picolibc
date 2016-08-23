@@ -40,8 +40,10 @@ PORTABILITY
 void
 _freelocale_r (struct _reent *p, struct __locale_t *locobj)
 {
+  /* Nothing to do on !_MB_CAPABLE targets. */
+#ifdef _MB_CAPABLE
   /* Sanity check.  The "C" locale is static, don't try to free it. */
-  if (!locobj || locobj == &__C_locale || locobj == LC_GLOBAL_LOCALE)
+  if (!locobj || locobj == __get_C_locale () || locobj == LC_GLOBAL_LOCALE)
     return;
 #ifdef __HAVE_LOCALE_INFO__
   for (int i = 1; i < _LC_LAST; ++i)
@@ -52,6 +54,7 @@ _freelocale_r (struct _reent *p, struct __locale_t *locobj)
       }
 #endif /* __HAVE_LOCALE_INFO__ */
   _free_r (p, locobj);
+#endif /* _MB_CAPABLE */
 }
 
 void
