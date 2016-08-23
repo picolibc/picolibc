@@ -33,7 +33,7 @@ string.  The value of <[errnum]> is usually a copy of <<errno>>.
 If <<errnum>> is not a known error number, the result points to an
 empty string.
 
-<<strftime_l>> is like <<strftime>> but creates a string in a format
+<<strerror_l>> is like <<strerror>> but creates a string in a format
 as expected in locale <[locale]>.  If <[locale]> is LC_GLOBAL_LOCALE or
 not a valid locale object, the behaviour is undefined.
 
