@@ -924,6 +924,7 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     strcspn
     strdup
     strerror
+    strerror_l
     strerror_r
     strfmon
     strfmon_l
@@ -1353,6 +1354,7 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     sincosf
     sincosl
     strchrnul
+    strptime_l
     strtod_l
     strtof_l
     strtol_l
@@ -1370,6 +1372,7 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     vasnprintf
     vasprintf
     vasprintf_r
+    wcsftime_l
     wcstod_l
     wcstof_l
     wcstol_l
