@@ -6,15 +6,18 @@
 
 <sect2 id="pathnames-intro"><title>Introduction</title>
 
-<para>Cygwin supports both POSIX- and Win32-style paths.  Directory
+<para>The Cygwin DLL supports both POSIX- and Win32-style paths.  Directory
 delimiters may be either forward slashes or backslashes.  Paths using
 backslashes or starting with a drive letter are always handled as
 Win32 paths.  POSIX paths must only use forward slashes as delimiter,
 otherwise they are treated as Win32 paths and file access might fail
 in surprising ways.</para>
 
-<note><para>The usage of Win32 paths, though possible, is deprecated,
-since it circumvents important internal path handling mechanisms. 
+<note><para>Although the Cygwin DLL supports Win32 paths, not all
+Cygwin applications support them.  Moreover, the usage of Win32 paths
+circumvents important internal path handling mechanisms.  This usage
+is therefore strongly deprecated and may be removed in a future
+release of Cygwin.
 See <xref linkend="pathnames-win32"></xref> and
 <xref linkend="pathnames-win32-api"></xref> for more information.
 </para></note>
@@ -451,11 +454,12 @@ filesystem borders by commands like <command>find -xdev</command>.</para>
 
 <sect2 id="pathnames-win32"><title>Using native Win32 paths</title>
 
-<para>Using native Win32 paths in Cygwin, while possible, is generally
+<para>Using native Win32 paths in Cygwin, while often possible, is generally
 inadvisable.  Those paths circumvent all internal integrity checking and
 bypass the information given in the Cygwin mount table.</para>
 
-<para>The following paths are treated as native Win32 paths in Cygwin:</para>
+<para>The following paths are treated as native Win32 paths by the
+Cygwin DLL (but not necessarily by Cygwin applications):</para>
 
 <itemizedlist spacing="compact">
   <listitem>
