@@ -64,7 +64,7 @@ _duplocale_r (struct _reent *p, struct __locale_t *locobj)
 	if (!__loadlocale (&tmp_locale, i, tmp_locale.categories[i]))
 	  goto error;
       }
-#endif
+#endif /* __HAVE_LOCALE_INFO__ */
   /* Allocate new locale_t. */
   new_locale = (struct __locale_t *) _calloc_r (p, 1, sizeof *new_locale);
   if (!new_locale)
@@ -83,7 +83,7 @@ error:
 	_free_r (p, (void *) tmp_locale.lc_cat[i].ptr);
 	_free_r (p, tmp_locale.lc_cat[i].buf);
       }
-#endif
+#endif /* __HAVE_LOCALE_INFO__ */
 
   return NULL;
 }

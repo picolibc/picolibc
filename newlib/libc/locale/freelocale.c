@@ -50,7 +50,7 @@ _freelocale_r (struct _reent *p, struct __locale_t *locobj)
 	_free_r (p, (void *) locobj->lc_cat[i].ptr);
 	_free_r (p, locobj->lc_cat[i].buf);
       }
-#endif
+#endif /* __HAVE_LOCALE_INFO__ */
   _free_r (p, locobj);
 }
 

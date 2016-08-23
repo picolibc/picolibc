@@ -234,7 +234,7 @@ const struct __locale_t __C_locale =
   "\1",
   "ASCII",
   "ASCII",
-#else
+#else /* __HAVE_LOCALE_INFO__ */
   {
     { NULL, NULL },			/* LC_ALL */
 #ifdef __CYGWIN__
@@ -248,7 +248,7 @@ const struct __locale_t __C_locale =
     { &_C_time_locale, NULL },		/* LC_TIME */
     { &_C_messages_locale, NULL },	/* LC_MESSAGES */
   },
-#endif
+#endif /* __HAVE_LOCALE_INFO__ */
 };
 
 struct __locale_t __global_locale =
@@ -274,7 +274,7 @@ struct __locale_t __global_locale =
   "\1",
   "ASCII",
   "ASCII",
-#else
+#else /* __HAVE_LOCALE_INFO__ */
   {
     { NULL, NULL },			/* LC_ALL */
 #ifdef __CYGWIN__
@@ -288,7 +288,7 @@ struct __locale_t __global_locale =
     { &_C_time_locale, NULL },		/* LC_TIME */
     { &_C_messages_locale, NULL },	/* LC_MESSAGES */
   },
-#endif
+#endif /* __HAVE_LOCALE_INFO__ */
 };
 
 /* Renamed from current_locale_string to make clear this is only the
@@ -313,7 +313,7 @@ _DEFUN(_setlocale_r, (p, category, locale),
         return NULL;
     }
   return "C";
-#else /* !_MB_CAPABLE */
+#else /* _MB_CAPABLE */
   static char new_categories[_LC_LAST][ENCODING_LEN + 1];
   static char saved_categories[_LC_LAST][ENCODING_LEN + 1];
   int i, j, len, saverr;
@@ -445,7 +445,7 @@ _DEFUN(_setlocale_r, (p, category, locale),
 	}
     }
   return currentlocale ();
-#endif /* !_MB_CAPABLE */
+#endif /* _MB_CAPABLE */
 }
 
 #ifdef _MB_CAPABLE

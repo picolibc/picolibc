@@ -149,12 +149,12 @@ _newlocale_r (struct _reent *p, int category_mask, const char *locale,
 	     subsequent error. */
 	  tmp_locale.lc_cat[i].ptr = base->lc_cat[i].ptr;
 	  tmp_locale.lc_cat[i].buf = (void *) -1;
-#else
+#else /* !__HAVE_LOCALE_INFO__ */
 	  if (i == LC_CTYPE)
 	    strcpy (tmp_locale.ctype_codeset, base->ctype_codeset);
 	  else if (i == LC_MESSAGES)
 	    strcpy (tmp_locale.message_codeset, base->message_codeset);
-#endif
+#endif /* !__HAVE_LOCALE_INFO__ */
 	}
       /* Otherwise, if the category is in category_mask, create entry. */
       else if (((1 << i) & category_mask) != 0)
@@ -184,7 +184,7 @@ _newlocale_r (struct _reent *p, int category_mask, const char *locale,
 	    tmp_locale.lc_cat[i].buf = base->lc_cat[i].buf;
 	    base->lc_cat[i].ptr = base->lc_cat[i].buf = NULL;
 	  }
-#endif
+#endif /* __HAVE_LOCALE_INFO__ */
       _freelocale_r (p, base);
     }
 
@@ -203,7 +203,7 @@ error:
 	_free_r (p, (void *) tmp_locale.lc_cat[i].ptr);
 	_free_r (p, tmp_locale.lc_cat[i].buf);
       }
-#endif
+#endif /* __HAVE_LOCALE_INFO__ */
 
   return NULL;
 }
