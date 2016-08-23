@@ -403,6 +403,13 @@ strerror (int errnum)
   return result;
 }
 
+extern "C" char *
+strerror_l (int errnum, locale_t locale)
+{
+  /* We don't provide localized system error messages (yet?). */
+  return strerror (errnum);
+}
+
 /* Newlib's <string.h> provides declarations for two strerror_r
    variants, according to preprocessor feature macros.  However, it
    returns "" instead of "Unknown error ...", so we override both

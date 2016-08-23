@@ -7,14 +7,18 @@
 
 /*
 FUNCTION
-	<<strerror>>---convert error number to string
+	<<strerror>>, <<strerror_l>>---convert error number to string
 
 INDEX
 	strerror
 
+INDEX
+	strerror_l
+
 ANSI_SYNOPSIS
 	#include <string.h>
 	char *strerror(int <[errnum]>);
+	char *strerror_l(int <[errnum]>, locale_t locale);
 	char *_strerror_r(struct _reent <[ptr]>, int <[errnum]>,
 			  int <[internal]>, int *<[error]>);
 
@@ -28,6 +32,10 @@ DESCRIPTION
 string.  The value of <[errnum]> is usually a copy of <<errno>>.
 If <<errnum>> is not a known error number, the result points to an
 empty string.
+
+<<strftime_l>> is like <<strftime>> but creates a string in a format
+as expected in locale <[locale]>.  If <[locale]> is LC_GLOBAL_LOCALE or
+not a valid locale object, the behaviour is undefined.
 
 This implementation of <<strerror>> prints out the following strings
 for each of the values defined in `<<errno.h>>':
@@ -329,6 +337,8 @@ not modify that string.
 PORTABILITY
 ANSI C requires <<strerror>>, but does not specify the strings used
 for each error number.
+
+<<strerror_l>> is POSIX-1.2008.
 
 Although this implementation of <<strerror>> is reentrant (depending
 on <<_user_strerror>>), ANSI C declares that subsequent calls to
@@ -891,5 +901,12 @@ char *
 _DEFUN(strerror, (int),
        int errnum)
 {
+  return _strerror_r (_REENT, errnum, 0, NULL);
+}
+
+char *
+strerror_l (int errnum, locale_t locale)
+{
+  /* We don't support per-locale error messages. */
   return _strerror_r (_REENT, errnum, 0, NULL);
 }

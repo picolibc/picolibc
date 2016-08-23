@@ -1345,6 +1345,7 @@ strcpy NOSIGFE
 strcspn NOSIGFE
 strdup SIGFE
 strerror SIGFE
+strerror_l SIGFE
 strerror_r SIGFE
 strfmon SIGFE
 strfmon_l SIGFE
