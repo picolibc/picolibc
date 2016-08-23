@@ -195,8 +195,6 @@ struct __locale_t
 };
 
 extern const struct __locale_t __C_locale;
-extern struct __locale_t __global_locale;
-
 extern char *__loadlocale (struct __locale_t *, int, const char *);
 extern const char *__get_locale_env(struct _reent *, int);
 
@@ -210,6 +208,7 @@ extern size_t _wcsnrtombs_l (struct _reent *, char *, const wchar_t **,
 _ELIDABLE_INLINE struct __locale_t *
 __get_global_locale ()
 {
+  extern struct __locale_t __global_locale;
   return &__global_locale;
 }
 
@@ -227,7 +226,8 @@ __get_locale_r (struct _reent *r)
 _ELIDABLE_INLINE struct __locale_t *
 __get_current_locale ()
 {
-  return _REENT->_locale ?: &__global_locale;
+  return _REENT->_locale ?: __get_global_locale ();
+}
 }
 
 #ifdef __CYGWIN__

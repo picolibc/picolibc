@@ -1524,11 +1524,11 @@ internal_setlocale ()
   wchar_t *w_path = NULL, *w_cwd;
 
   /* Don't do anything if the charset hasn't actually changed. */
-  if (cygheap->locale.mbtowc == __global_locale.mbtowc)
+  if (cygheap->locale.mbtowc == __get_global_locale ()->mbtowc)
     return;
 
   debug_printf ("Global charset set to %s",
-		__locale_charset (&__global_locale));
+		__locale_charset (__get_global_locale ()));
   /* Fetch PATH and CWD and convert to wchar_t in previous charset. */
   path = getenv ("PATH");
   if (path && *path)	/* $PATH can be potentially unset. */
@@ -1541,7 +1541,7 @@ internal_setlocale ()
   sys_cp_mbstowcs (cygheap->locale.mbtowc, w_cwd, 32768,
 		   cygheap->cwd.get_posix ());
   /* Set charset for internal conversion functions. */
-  cygheap->locale.mbtowc = __global_locale.mbtowc;
+  cygheap->locale.mbtowc = __get_global_locale ()->mbtowc;
   if (cygheap->locale.mbtowc == __ascii_mbtowc)
     cygheap->locale.mbtowc = __utf8_mbtowc;
   /* Restore CWD and PATH in new charset. */
