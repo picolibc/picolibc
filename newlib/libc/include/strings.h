@@ -33,6 +33,11 @@ int	 _EXFUN(ffs,(int));
 int	 _EXFUN(strcasecmp,(const char *, const char *));
 int	 _EXFUN(strncasecmp,(const char *, const char *, size_t));
 
+#if __GNU_VISIBLE
+extern int strcasecmp_l (const char *, const char *, locale_t);
+extern int strncasecmp_l (const char *, const char *, size_t, locale_t);
+#endif /* _GNU_VISIBLE */
+
 _END_STD_C
 
 #endif /* !(_STRING_H_ && __BSD_VISIBLE) */
