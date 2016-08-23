@@ -228,7 +228,6 @@ __get_current_locale ()
 {
   return _REENT->_locale ?: __get_global_locale ();
 }
-}
 
 #ifdef __CYGWIN__
 _ELIDABLE_INLINE const struct lc_collate_T *
