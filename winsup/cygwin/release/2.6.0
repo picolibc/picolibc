@@ -22,6 +22,7 @@ What's new:
 
 - New API: pthread_getname_np, pthread_setname_np.
 
+
 What changed:
 -------------
 
