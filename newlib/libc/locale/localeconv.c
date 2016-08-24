@@ -6,6 +6,9 @@ struct lconv *
 __localeconv_l (struct __locale_t *locale)
 {
   struct lconv *lconv = &locale->lconv;
+  if (locale == __get_C_locale ())
+    return lconv;
+
 #ifdef __HAVE_LOCALE_INFO__
   const struct lc_numeric_T *n = __get_numeric_locale (locale);
   const struct lc_monetary_T *m = __get_monetary_locale (locale);
