@@ -225,7 +225,7 @@ int	_EXFUN(pthread_attr_setguardsize,
  * in GNU/Linux. They may be provided by other OSes for
  * compatibility.
  */
-#if defined(__GNU_VISIBLE)
+#if __GNU_VISIBLE
 #if defined(__rtems__) 
 int	_EXFUN(pthread_attr_setaffinity_np,
 	(pthread_attr_t *__attr, size_t __cpusetsize, 
@@ -242,7 +242,7 @@ int	_EXFUN(pthread_getaffinity_np,
 int	_EXFUN(pthread_getattr_np,
 	(pthread_t __id, pthread_attr_t *__attr));
 #endif /* defined(__rtems__) */
-#endif /* defined(__GNU_VISIBLE) */
+#endif /* __GNU_VISIBLE */
 
 /* Thread Creation, P1003.1c/Draft 10, p. 144 */
 
