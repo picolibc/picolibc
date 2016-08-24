@@ -29,13 +29,17 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
+#ifdef __CYGWIN__
+#include "winsup.h"
+#endif
+
 #include <sys/cdefs.h>
 #if defined(LIBC_SCCS) && !defined(lint)
 __RCSID("$NetBSD: strptime.c,v 1.28 2008/04/28 20:23:01 martin Exp $");
 #endif
 
 #ifdef __CYGWIN__
-#include "winsup.h"
+#include "../locale/setlocale.h"
 #else
 #include "namespace.h"
 #include <sys/localedef.h>
@@ -46,7 +50,6 @@ __RCSID("$NetBSD: strptime.c,v 1.28 2008/04/28 20:23:01 martin Exp $");
 #include <string.h>
 #include <time.h>
 #include <tzfile.h>
-#include "../locale/setlocale.h"
 
 #ifdef __TM_GMTOFF
 # define TM_GMTOFF __TM_GMTOFF
