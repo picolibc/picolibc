@@ -15,6 +15,10 @@
 #include <sys/cdefs.h>
 #include <sys/types.h> /* for size_t */
 
+#if __POSIX_VISIBLE >= 200809
+#include <sys/_locale.h>
+#endif
+
 _BEGIN_STD_C
 
 #if __BSD_VISIBLE || (__POSIX_VISIBLE && __POSIX_VISIBLE < 200809)
@@ -33,10 +37,10 @@ int	 _EXFUN(ffs,(int));
 int	 _EXFUN(strcasecmp,(const char *, const char *));
 int	 _EXFUN(strncasecmp,(const char *, const char *, size_t));
 
-#if __GNU_VISIBLE
-extern int strcasecmp_l (const char *, const char *, locale_t);
-extern int strncasecmp_l (const char *, const char *, size_t, locale_t);
-#endif /* _GNU_VISIBLE */
+#if __POSIX_VISIBLE >= 200809
+int	 strcasecmp_l (const char *, const char *, locale_t);
+int	 strncasecmp_l (const char *, const char *, size_t, locale_t);
+#endif /* __POSIX_VISIBLE >= 200809 */
 
 _END_STD_C
 

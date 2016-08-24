@@ -48,13 +48,14 @@ char 	*_EXFUN(strtok,(char *__restrict, const char *__restrict));
 size_t	 _EXFUN(strxfrm,(char *__restrict, const char *__restrict, size_t));
 
 #if __POSIX_VISIBLE >= 200809
-extern int strcasecmp_l (const char *, const char *, locale_t);
-extern int strncasecmp_l (const char *, const char *, size_t, locale_t);
-extern int strcoll_l (const char *, const char *, locale_t);
-extern size_t strxfrm_l (char *__restrict, const char *__restrict, size_t,
-			 locale_t);
+int	 strcoll_l (const char *, const char *, locale_t);
+char	*strerror_l (int, locale_t);
+size_t	 strxfrm_l (char *__restrict, const char *__restrict, size_t, locale_t);
 #endif
-
+#if __GNU_VISIBLE
+int	 strcasecmp_l (const char *, const char *, locale_t);
+int	 strncasecmp_l (const char *, const char *, size_t, locale_t);
+#endif
 #if __MISC_VISIBLE || __POSIX_VISIBLE
 char 	*_EXFUN(strtok_r,(char *__restrict, const char *__restrict, char **__restrict));
 #endif
