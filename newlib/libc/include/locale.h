@@ -71,10 +71,11 @@ struct _reent;
 char *_EXFUN(_setlocale_r,(struct _reent *, int, const char *));
 struct lconv *_EXFUN(_localeconv_r,(struct _reent *));
 
-locale_t _newlocale_r (struct _reent *, int, const char *, struct __locale_t *);
+struct __locale_t *_newlocale_r (struct _reent *, int, const char *,
+				 struct __locale_t *);
 void _freelocale_r (struct _reent *, struct __locale_t *);
-locale_t _duplocale_r (struct _reent *, struct __locale_t *);
-locale_t _uselocale_r (struct _reent *, struct __locale_t *);
+struct __locale_t *_duplocale_r (struct _reent *, struct __locale_t *);
+struct __locale_t *_uselocale_r (struct _reent *, struct __locale_t *);
 
 #ifndef _REENT_ONLY
 
