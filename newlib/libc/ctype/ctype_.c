@@ -35,7 +35,7 @@
 static char sccsid[] = "@(#)ctype_.c	5.6 (Berkeley) 6/1/90";
 #endif /* LIBC_SCCS and not lint */
 
-#include <ctype.h>
+#include "ctype_.h"
 #include "../locale/setlocale.h"
 
 #define _CTYPE_DATA_0_127 \
@@ -74,10 +74,6 @@ static char sccsid[] = "@(#)ctype_.c	5.6 (Berkeley) 6/1/90";
 	0,	0,	0,	0,	0,	0,	0,	0, \
 	0,	0,	0,	0,	0,	0,	0,	0
 
-#if (defined(__GNUC__) && !defined(__CHAR_UNSIGNED__) && !defined(COMPACT_CTYPE)) || defined (__CYGWIN__)
-#define ALLOW_NEGATIVE_CTYPE_INDEX
-#endif
-
 #if defined(_MB_CAPABLE)
 #if defined(_MB_EXTENDED_CHARSETS_ISO)
 #include "ctype_iso.h"
@@ -91,7 +87,7 @@ static char sccsid[] = "@(#)ctype_.c	5.6 (Berkeley) 6/1/90";
 /* No static const on Cygwin since it's referenced and potentially overwritten
    for compatibility with older applications. */
 #ifndef __CYGWIN__
-static _CONST
+_CONST
 #endif
 char _ctype_b[128 + 256] = {
 	_CTYPE_DATA_128_255,
@@ -99,12 +95,10 @@ char _ctype_b[128 + 256] = {
 	_CTYPE_DATA_128_255
 };
 
-#ifndef _MB_CAPABLE
-_CONST
-#endif
-char __EXPORT *__ctype_ptr__ = (char *) _ctype_b + 127;
-
 #  ifdef __CYGWIN__
+/* For backward compatibility */
+char __EXPORT *__ctype_ptr__ = DEFAULT_CTYPE_PTR;
+
 #    ifdef __x86_64__
 __asm__ ("					\n\
         .data					\n\
@@ -136,11 +130,6 @@ _CONST char _ctype_[1 + 256] = {
 	_CTYPE_DATA_0_127,
 	_CTYPE_DATA_128_255
 };
-
-#ifndef _MB_CAPABLE
-_CONST
-#endif
-char *__ctype_ptr__ = (char *) _ctype_;
 
 #endif	/* !ALLOW_NEGATIVE_CTYPE_INDEX */
 
@@ -191,15 +180,9 @@ __set_ctype (struct __locale_t *loc, const char *charset)
 #  endif
     }
 #  if defined(ALLOW_NEGATIVE_CTYPE_INDEX)
-  if (loc)
-    loc->ctype_ptr = ctype_ptr + 127;
-  else
-    __ctype_ptr__ = ctype_ptr + 127;
+  loc->ctype_ptr = ctype_ptr + 127;
 #  else
-  if (loc)
-    loc->ctype_ptr = ctype_ptr;
-  else
-    __ctype_ptr__ = ctype_ptr;
+  loc->ctype_ptr = ctype_ptr;
 #  endif
 }
 #endif /* !__CYGWIN__ */

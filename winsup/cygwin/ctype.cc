@@ -64,10 +64,10 @@ __set_ctype (struct __locale_t *loc, const char *charset)
 	}
       ctype_ptr = (char *) _ctype_b;
     }
-  if (loc)
-    loc->ctype_ptr = ctype_ptr + 127;
-  else
-    __ctype_ptr__ = ctype_ptr + 127;
+  loc->ctype_ptr = ctype_ptr + 127;
+  /* For backward compatibilty */
+  if (loc == __get_global_locale ())
+    __ctype_ptr__ = loc->ctype_ptr;
 }
 
 } /* extern "C" */

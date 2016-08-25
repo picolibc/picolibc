@@ -172,13 +172,13 @@ No supporting OS subroutines are required.
 
 #include <newlib.h>
 #include <errno.h>
-#include <ctype.h>
 #include <string.h>
 #include <limits.h>
 #include <reent.h>
 #include <stdlib.h>
 #include <wchar.h>
 #include "setlocale.h"
+#include "../ctype/ctype_.h"
 #include "../stdlib/local.h"
 
 #ifdef __CYGWIN__ /* Has to be kept available as exported symbol for
@@ -225,7 +225,7 @@ const struct __locale_t __C_locale =
   __ascii_wctomb,
   __ascii_mbtowc,
   0,
-  NULL,
+  DEFAULT_CTYPE_PTR,
   {
     ".", "", "", "", "", "", "", "", "", "",
     CHAR_MAX, CHAR_MAX, CHAR_MAX, CHAR_MAX,
@@ -266,7 +266,7 @@ struct __locale_t __global_locale =
   __ascii_mbtowc,
 #endif
   0,
-  NULL,
+  DEFAULT_CTYPE_PTR,
   {
     ".", "", "", "", "", "", "", "", "", "",
     CHAR_MAX, CHAR_MAX, CHAR_MAX, CHAR_MAX,
@@ -901,7 +901,7 @@ restart:
 #endif
       loc->wctomb = l_wctomb;
       loc->mbtowc = l_mbtowc;
-      __set_ctype (loc == __get_global_locale () ? NULL : loc, charset);
+      __set_ctype (loc, charset);
       /* Determine the width for the "CJK Ambiguous Width" category of
          characters. This is used in wcwidth(). Assume single width for
          single-byte charsets, and double width for multi-byte charsets
@@ -988,20 +988,15 @@ _DEFUN_VOID (__locale_mb_cur_max)
 }
 
 const char *
-__locale_ctype_ptr (void)
+__locale_ctype_ptr_l (struct __locale_t *locale)
 {
-  /* Only check if the current thread/reent has a locale.  ctype_ptr is unused
-     in __global_locale, rather the global variable __ctype_ptr__ is used. */
-  extern char *__ctype_ptr__;
-  return __get_locale_r (_REENT) ? __get_locale_r (_REENT)->ctype_ptr
-				 : __ctype_ptr__;
+  return locale->ctype_ptr;
 }
 
 const char *
-__locale_ctype_ptr_l (struct __locale_t *locale)
+__locale_ctype_ptr (void)
 {
-  extern char *__ctype_ptr__;
-  return locale->ctype_ptr ?: __ctype_ptr__;
+  return __get_current_locale (_REENT)->ctype_ptr;
 }
 
 #ifndef _REENT_ONLY
