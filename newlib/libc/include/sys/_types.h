@@ -94,7 +94,7 @@ typedef __uint32_t __mode_t;
 __extension__ typedef long long _off64_t;
 #endif
 
-#ifdef __CYGWIN__
+#if defined(__CYGWIN__) && !defined(__LP64__)
 typedef _off64_t __off_t;
 #else
 typedef _off_t __off_t;
