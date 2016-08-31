@@ -20,6 +20,74 @@ details. */
 #include "cygtls.h"
 #include "tls_pbuf.h"
 #include "ntdll.h"
+#include "pathfinder.h"
+
+/* Dumb allocator using memory from tmp_pathbuf.w_get ().
+
+   Does not reuse free'd memory areas.  Instead, memory
+   is released when the tmp_pathbuf goes out of scope.
+
+   ATTENTION: Requesting memory from an instance of tmp_pathbuf breaks
+   when another instance on a newer stack frame has provided memory. */
+class tmp_pathbuf_allocator
+  : public allocator_interface
+{
+  tmp_pathbuf & tp_;
+  union
+    {
+      PWCHAR wideptr;
+      void * voidptr;
+      char * byteptr;
+    }    freemem_;
+  size_t freesize_;
+
+  /* allocator_interface */
+  virtual void * alloc (size_t need)
+  {
+    if (need == 0)
+      need = 1; /* GNU-ish */
+    size_t chunksize = NT_MAX_PATH * sizeof (WCHAR);
+    if (need > chunksize)
+      api_fatal ("temporary buffer too small for %d bytes", need);
+    if (need > freesize_)
+      {
+	/* skip remaining, use next chunk */
+	freemem_.wideptr = tp_.w_get ();
+	freesize_ = chunksize;
+      }
+
+    void * ret = freemem_.voidptr;
+
+    /* adjust remaining, aligned at 8 byte boundary */
+    need = need + 7 - (need - 1) % 8;
+    freemem_.byteptr += need;
+    if (need > freesize_)
+      freesize_ = 0;
+    else
+      freesize_ -= need;
+
+    return ret;
+  }
+
+  /* allocator_interface */
+  virtual void free (void *)
+  {
+    /* no-op: released by tmp_pathbuf at end of scope */
+  }
+
+  tmp_pathbuf_allocator ();
+  tmp_pathbuf_allocator (tmp_pathbuf_allocator const &);
+  tmp_pathbuf_allocator & operator = (tmp_pathbuf_allocator const &);
+
+public:
+  /* use tmp_pathbuf of current stack frame */
+  tmp_pathbuf_allocator (tmp_pathbuf & tp)
+    : allocator_interface ()
+    , tp_ (tp)
+    , freemem_ ()
+    , freesize_ (0)
+  {}
+};
 
 static void
 set_dl_error (const char *str)
@@ -28,84 +96,61 @@ set_dl_error (const char *str)
   _my_tls.locals.dl_error = 1;
 }
 
-/* Look for an executable file given the name and the environment
-   variable to use for searching (eg., PATH); returns the full
-   pathname (static buffer) if found or NULL if not. */
-inline const char *
-check_path_access (const char *mywinenv, const char *name, path_conv& buf)
-{
-  return find_exec (name, buf, mywinenv, FE_NNF | FE_DLL);
-}
-
-/* Search LD_LIBRARY_PATH for dll, if it exists.  Search /usr/bin and /usr/lib
-   by default.  Return valid full path in path_conv real_filename. */
-static inline bool
-gfpod_helper (const char *name, path_conv &real_filename)
-{
-  if (strchr (name, '/'))
-    real_filename.check (name, PC_SYM_FOLLOW | PC_NULLEMPTY);
-  else if (!check_path_access ("LD_LIBRARY_PATH", name, real_filename))
-    check_path_access ("/usr/bin:/usr/lib", name, real_filename);
-  if (!real_filename.exists ())
-    real_filename.error = ENOENT;
-  return !real_filename.error;
-}
-
+/* Identify basename and baselen within name,
+   return true if there is a dir in name. */
 static bool
-get_full_path_of_dll (const char* str, path_conv &real_filename)
+spot_basename (const char * &basename, int &baselen, const char * name)
 {
-  int len = strlen (str);
-
-  /* empty string? */
-  if (len == 0)
-    {
-      set_errno (EINVAL);
-      return false;		/* Yes.  Let caller deal with it. */
-    }
-
-  tmp_pathbuf tp;
-  char *name = tp.c_get ();
-
-  strcpy (name, str);	/* Put it somewhere where we can manipulate it. */
-
-  char *basename = strrchr (name, '/');
+  basename = strrchr (name, '/');
   basename = basename ? basename + 1 : name;
-  char *suffix = strrchr (name, '.');
-  if (suffix && suffix < basename)
-    suffix = NULL;
+  baselen = name + strlen (name) - basename;
+  return basename > name;
+}
 
-  /* Is suffix ".so"? */
-  if (suffix && !strcmp (suffix, ".so"))
+/* Setup basenames using basename and baselen,
+   return true if basenames do have some suffix. */
+static void
+collect_basenames (pathfinder::basenamelist & basenames,
+		   const char * basename, int baselen)
+{
+  /* like strrchr (basename, '.'), but limited to baselen */
+  const char *suffix = basename + baselen;
+  while (--suffix >= basename)
+    if (*suffix == '.')
+      break;
+
+  int suffixlen;
+  if (suffix >= basename)
+    suffixlen = basename + baselen - suffix;
+  else
     {
-      /* Does the file exist? */
-      if (gfpod_helper (name, real_filename))
-	return true;
-      /* No, replace ".so" with ".dll". */
-      strcpy (suffix, ".dll");
+      suffixlen = 0;
+      suffix = NULL;
     }
-  /* Does the filename start with "lib"? */
+
+  char const * ext = "";
+  /* Without some suffix, reserve space for a trailing dot to override
+     GetModuleHandleExA's automatic adding of the ".dll" suffix. */
+  int extlen = suffix ? 0 : 1;
+
+  /* If we have the ".so" suffix, ... */
+  if (suffixlen == 3 && !strncmp (suffix, ".so", 3))
+    {
+      /* ... keep the basename with original suffix, before ... */
+      basenames.appendv (basename, baselen, NULL);
+      /* ... replacing the ".so" with the ".dll" suffix. */
+      baselen -= 3;
+      ext = ".dll";
+      extlen = 4;
+    }
+  /* If the basename starts with "lib", ... */
   if (!strncmp (basename, "lib", 3))
     {
-      /* Yes, replace "lib" with "cyg". */
-      strncpy (basename, "cyg", 3);
-      /* Does the file exist? */
-      if (gfpod_helper (name, real_filename))
-	return true;
-      /* No, revert back to "lib". */
-      strncpy (basename, "lib", 3);
+      /* ... replace "lib" with "cyg", before ... */
+      basenames.appendv ("cyg", 3, basename+3, baselen-3, ext, extlen, NULL);
     }
-  if (gfpod_helper (name, real_filename))
-    return true;
-
-  /* If nothing worked, create a relative path from the original incoming
-     filename and let LoadLibrary search for it using the system default
-     DLL search path. */
-  real_filename.check (str, PC_SYM_FOLLOW | PC_NOFULL | PC_NULLEMPTY);
-  if (!real_filename.error)
-    return true;
-
-  set_errno (real_filename.error);
-  return false;
+  /* ... using original basename with new suffix. */
+  basenames.appendv (basename, baselen, ext, extlen, NULL);
 }
 
 extern "C" void *
@@ -113,64 +158,111 @@ dlopen (const char *name, int flags)
 {
   void *ret = NULL;
 
-  if (name == NULL)
+  do
     {
-      ret = (void *) GetModuleHandle (NULL); /* handle for the current module */
+      if (name == NULL || *name == '\0')
+	{
+	  ret = (void *) GetModuleHandle (NULL); /* handle for the current module */
+	  if (!ret)
+	    __seterrno ();
+	  break;
+	}
+
+      DWORD gmheflags = (flags & RTLD_NODELETE)
+		      ?  GET_MODULE_HANDLE_EX_FLAG_PIN
+		      : 0;
+
+      tmp_pathbuf tp; /* single one per stack frame */
+      tmp_pathbuf_allocator allocator (tp);
+      pathfinder::basenamelist basenames (allocator);
+
+      const char *basename;
+      int baselen;
+      bool have_dir = spot_basename (basename, baselen, name);
+      collect_basenames (basenames, basename, baselen);
+
+      /* handle for the named library */
+      path_conv real_filename;
+      wchar_t *wpath = tp.w_get ();
+
+      pathfinder finder (allocator, basenames); /* eats basenames */
+
+      if (have_dir)
+	{
+	  /* search the specified dir */
+	  finder.add_searchdir (name, basename - 1 - name);
+	}
+      else
+	{
+	  /* NOTE: The Windows loader (for linked dlls) does
+	     not use the LD_LIBRARY_PATH environment variable. */
+	  finder.add_envsearchpath ("LD_LIBRARY_PATH");
+
+	  /* Finally we better have some fallback. */
+	  finder.add_searchdir ("/usr/bin", 8);
+	  finder.add_searchdir ("/usr/lib", 8);
+	}
+
+      /* now search the file system */
+      if (!finder.find (pathfinder::
+			exists_and_not_dir (real_filename,
+					    PC_SYM_FOLLOW | PC_POSIX)))
+	{
+	  /* If nothing worked, create a relative path from the original
+	     incoming filename and let LoadLibrary search for it using the
+	     system default DLL search path. */
+	  real_filename.check (name, PC_SYM_FOLLOW | PC_NOFULL | PC_NULLEMPTY);
+	  if (real_filename.error)
+	    break;
+	}
+
+      real_filename.get_wide_win32_path (wpath);
+      /* Check if the last path component contains a dot.  If so,
+	 leave the filename alone.  Otherwise add a trailing dot
+	 to override LoadLibrary's automatic adding of a ".dll" suffix. */
+      wchar_t *last_bs = wcsrchr (wpath, L'\\') ?: wpath;
+      if (last_bs && !wcschr (last_bs, L'.'))
+	wcscat (last_bs, L".");
+
+      if (flags & RTLD_NOLOAD)
+	{
+	  GetModuleHandleExW (gmheflags, wpath, (HMODULE *) &ret);
+	  if (ret)
+	    break;
+	}
+
+#ifndef __x86_64__
+      /* Workaround for broken DLLs built against Cygwin versions 1.7.0-49
+	 up to 1.7.0-57.  They override the cxx_malloc pointer in their
+	 DLL initialization code even if loaded dynamically.  This is a
+	 no-no since a later dlclose lets cxx_malloc point into nirvana.
+	 The below kludge "fixes" that by reverting the original cxx_malloc
+	 pointer after LoadLibrary.  This implies that their overrides
+	 won't be applied; that's OK.  All overrides should be present at
+	 final link time, as Windows doesn't allow undefined references;
+	 it would actually be wrong for a dlopen'd DLL to opportunistically
+	 override functions in a way that wasn't known then.  We're not
+	 going to try and reproduce the full ELF dynamic loader here!  */
+
+      /* Store original cxx_malloc pointer. */
+      struct per_process_cxx_malloc *tmp_malloc;
+      tmp_malloc = __cygwin_user_data.cxx_malloc;
+#endif
+
+      ret = (void *) LoadLibraryW (wpath);
+
+#ifndef __x86_64__
+      /* Restore original cxx_malloc pointer. */
+      __cygwin_user_data.cxx_malloc = tmp_malloc;
+#endif
+
+      if (ret && gmheflags)
+	GetModuleHandleExW (gmheflags, wpath, (HMODULE *) &ret);
+
       if (!ret)
 	__seterrno ();
     }
-  else
-    {
-      /* handle for the named library */
-      path_conv pc;
-      if (get_full_path_of_dll (name, pc))
-	{
-	  tmp_pathbuf tp;
-	  wchar_t *path = tp.w_get ();
-
-	  pc.get_wide_win32_path (path);
-	  /* Check if the last path component contains a dot.  If so,
-	     leave the filename alone.  Otherwise add a trailing dot
-	     to override LoadLibrary's automatic adding of a ".dll" suffix. */
-	  wchar_t *last_bs = wcsrchr (path, L'\\') ?: path;
-	  if (last_bs && !wcschr (last_bs, L'.'))
-	    wcscat (last_bs, L".");
-
-#ifndef __x86_64__
-	  /* Workaround for broken DLLs built against Cygwin versions 1.7.0-49
-	     up to 1.7.0-57.  They override the cxx_malloc pointer in their
-	     DLL initialization code even if loaded dynamically.  This is a
-	     no-no since a later dlclose lets cxx_malloc point into nirvana.
-	     The below kludge "fixes" that by reverting the original cxx_malloc
-	     pointer after LoadLibrary.  This implies that their overrides
-	     won't be applied; that's OK.  All overrides should be present at
-	     final link time, as Windows doesn't allow undefined references;
-	     it would actually be wrong for a dlopen'd DLL to opportunistically
-	     override functions in a way that wasn't known then.  We're not
-	     going to try and reproduce the full ELF dynamic loader here!  */
-
-	  /* Store original cxx_malloc pointer. */
-	  struct per_process_cxx_malloc *tmp_malloc;
-	  tmp_malloc = __cygwin_user_data.cxx_malloc;
-#endif
-
-	  if (flags & RTLD_NOLOAD)
-	    GetModuleHandleExW (0, path, (HMODULE *) &ret);
-	  else
-	    ret = (void *) LoadLibraryW (path);
-	  if (ret && (flags & RTLD_NODELETE))
-	    GetModuleHandleExW (GET_MODULE_HANDLE_EX_FLAG_PIN, path,
-				(HMODULE *) &ret);
-
-#ifndef __x86_64__
-	  /* Restore original cxx_malloc pointer. */
-	  __cygwin_user_data.cxx_malloc = tmp_malloc;
-#endif
-
-	  if (!ret)
-	    __seterrno ();
-	}
-    }
+  while (0);
 
   if (!ret)
     set_dl_error ("dlopen");
