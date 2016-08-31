@@ -751,15 +751,19 @@ proc_child (unsigned mask, FILE *ofile, pid_t pid)
 	  break;
 
 	case EXCEPTION_DEBUG_EVENT:
-	  if (ev.u.Exception.ExceptionRecord.ExceptionCode
-	      != (DWORD) STATUS_BREAKPOINT)
+	  switch (ev.u.Exception.ExceptionRecord.ExceptionCode)
 	    {
+	    case STATUS_BREAKPOINT:
+	    case 0x406d1388:		/* SetThreadName exception. */
+	      break;
+	    default:
 	      status = DBG_EXCEPTION_NOT_HANDLED;
 	      if (ev.u.Exception.dwFirstChance)
 		fprintf (ofile, "--- Process %lu, exception %08lx at %p\n",
 			 ev.dwProcessId,
 			 ev.u.Exception.ExceptionRecord.ExceptionCode,
 			 ev.u.Exception.ExceptionRecord.ExceptionAddress);
+	      break;
 	    }
 	  break;
 	}
