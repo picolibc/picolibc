@@ -84,3 +84,6 @@ Bug Fixes
 
 - Fix off_t typedef on 64-bit.
   Addresses: https://sourceware.org/ml/newlib/2016/msg01028.html
+
+- Fix weird problem running passwd on newer Windows versions.
+  Addresses: https://cygwin.com/ml/cygwin/2016-08/msg00608.html
