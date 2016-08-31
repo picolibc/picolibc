@@ -182,12 +182,12 @@ public:
 	     basenamelist::member const ** found_basename = NULL)
   {
     char const * critname = criterion.name ();
-    for (basenamelist::iterator name = basenames_.begin ();
-	 name != basenames_.end ();
-	 ++name)
-      for (searchdirlist::iterator dir(searchdirs_.begin ());
-	   dir != searchdirs_.end ();
-	   ++dir)
+    for (searchdirlist::iterator dir(searchdirs_.begin ());
+	 dir != searchdirs_.end ();
+	 ++dir)
+      for (basenamelist::iterator name = basenames_.begin ();
+	   name != basenames_.end ();
+	   ++name)
 	if (criterion.test (dir, name))
 	  {
 	    debug_printf ("(%s), take %s%s", critname,
