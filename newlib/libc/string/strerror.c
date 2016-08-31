@@ -18,7 +18,7 @@ INDEX
 ANSI_SYNOPSIS
 	#include <string.h>
 	char *strerror(int <[errnum]>);
-	char *strerror_l(int <[errnum]>, locale_t locale);
+	char *strerror_l(int <[errnum]>, locale_t <[locale]>);
 	char *_strerror_r(struct _reent <[ptr]>, int <[errnum]>,
 			  int <[internal]>, int *<[error]>);
 
