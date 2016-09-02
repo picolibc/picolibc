@@ -20,6 +20,7 @@ details. */
 #include "cygtls.h"
 #include "tls_pbuf.h"
 #include "ntdll.h"
+#include "shared_info.h"
 #include "pathfinder.h"
 
 /* Dumb allocator using memory from tmp_pathbuf.w_get ().
@@ -153,6 +154,31 @@ collect_basenames (pathfinder::basenamelist & basenames,
   basenames.appendv (basename, baselen, ext, extlen, NULL);
 }
 
+/* Identify dir of current executable into exedirbuf using wpathbuf buffer.
+   Return length of exedirbuf on success, or zero on error. */
+static int
+get_exedir (char * exedirbuf, wchar_t * wpathbuf)
+{
+  /* Unless we have a special cygwin loader, there is no such thing like
+     DT_RUNPATH on Windows we can use to search for dlls, except for the
+     directory of the main executable. */
+  *exedirbuf = '\0';
+
+  wchar_t * wlastsep = wcpcpy (wpathbuf, global_progname);
+  /* like wcsrchr(L'\\'), but we know the wcslen already */
+  while (--wlastsep > wpathbuf)
+    if (*wlastsep == L'\\')
+      break;
+  if (wlastsep <= wpathbuf)
+    return 0;
+  *wlastsep = L'\0';
+
+  if (mount_table->conv_to_posix_path (wpathbuf, exedirbuf, 0))
+    return 0;
+
+  return strlen (exedirbuf);
+}
+
 extern "C" void *
 dlopen (const char *name, int flags)
 {
@@ -184,13 +210,28 @@ dlopen (const char *name, int flags)
       /* handle for the named library */
       path_conv real_filename;
       wchar_t *wpath = tp.w_get ();
+      char *cpath = tp.c_get ();
 
       pathfinder finder (allocator, basenames); /* eats basenames */
 
       if (have_dir)
 	{
+	  int dirlen = basename - 1 - name;
+
+	  /* if the specified dir is x/lib, and the current executable
+	     dir is x/bin, do the /lib -> /bin mapping, which is the
+	     same actually as adding the executable dir */
+	  if (dirlen >= 4 && !strncmp (name + dirlen - 4, "/lib", 4))
+	    {
+	      int exedirlen = get_exedir (cpath, wpath);
+	      if (exedirlen == dirlen &&
+		  !strncmp (cpath, name, dirlen - 4) &&
+		  !strcmp (cpath + dirlen - 4, "/bin"))
+		finder.add_searchdir (cpath, exedirlen);
+	    }
+
 	  /* search the specified dir */
-	  finder.add_searchdir (name, basename - 1 - name);
+	  finder.add_searchdir (name, dirlen);
 	}
       else
 	{
