@@ -811,13 +811,22 @@ Guide here: <ulink url="https://cygwin.com/cygwin-ug-net/dll.html"/>.
 </answer></qandaentry>
 
 <qandaentry id="faq.programming.breakpoint">
-<question><para>How can I set a breakpoint at MainCRTStartup?</para></question>
+<question><para>How can I set a breakpoint at mainCRTStartup?</para></question>
 <answer>
 
-<para><emphasis role='bold'>(Please note: This section has not yet been updated for the latest net release.)</emphasis>
+<para>
+  Set a breakpoint in <command>gdb</command> with <command>b *0x401000</command>
+  (for i686), or <command>b *0x100401000</command> (for x86_64).
 </para>
-<para>Set a breakpoint at *0x401000 in gdb and then run the program in
-question.
+
+<para>
+  This entrypoint address can be computed as the sum of the ImageBase and
+  AddressOfEntryPoint values given by <command>objdump -p</command>.
+</para>
+
+<para>
+  Note that the DllMain entrypoints for linked DLLs will have been executed
+  before this breakpoint is hit.
 </para>
 </answer></qandaentry>
 
