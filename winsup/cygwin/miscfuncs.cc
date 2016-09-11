@@ -1129,10 +1129,17 @@ SetThreadName(DWORD dwThreadID, const char* threadName)
       0x1000,                 /* type, must be 0x1000 */
       (ULONG_PTR) threadName, /* pointer to threadname */
       dwThreadID,             /* thread ID (+ flags on x86_64) */
-#ifdef __X86__
+#ifdef _X86_
       0,                      /* flags, must be zero */
 #endif
     };
+
+#ifdef _X86_
+  /* On x86, for __try/__except to work, we must ensure our exception handler is
+     installed, which may not be the case if this is being called during early
+     initialization. */
+  exception protect;
+#endif
 
   __try
     {
