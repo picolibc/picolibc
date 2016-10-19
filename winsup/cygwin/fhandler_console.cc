@@ -2005,6 +2005,8 @@ fhandler_console::write_normal (const unsigned char *src,
 
   /* The alternate charset is always 437, just as in the Linux console. */
   f_mbtowc = con.get_console_cp () ? __cp_mbtowc (437) : __MBTOWC;
+  if (f_mbtowc == __ascii_mbtowc)
+    f_mbtowc = __utf8_mbtowc;
 
   /* First check if we have cached lead bytes of a former try to write
      a truncated multibyte sequence.  If so, process it. */
