@@ -2224,7 +2224,7 @@ rename (const char *oldpath, const char *newpath)
 	  /* Check for newpath being identical or a subdir of oldpath. */
 	  if (RtlPrefixUnicodeString (oldpc.get_nt_native_path (),
 				      newpc.get_nt_native_path (),
-				      TRUE))
+				      oldpc.objcaseinsensitive ()))
 	    {
 	      if (newpc.get_nt_native_path ()->Length
 		  == oldpc.get_nt_native_path ()->Length)
