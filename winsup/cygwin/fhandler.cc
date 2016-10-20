@@ -1891,6 +1891,8 @@ fhandler_base::fpathconf (int v)
 	return pc.has_acls () || pc.fs_is_nfs ();
       set_errno (EINVAL);
       break;
+    case _PC_CASE_INSENSITIVE:
+      return !!pc.objcaseinsensitive ();
     default:
       set_errno (EINVAL);
       break;

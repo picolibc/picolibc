@@ -490,6 +490,7 @@ int	_EXFUN(unlinkat, (int, const char *, int));
 #define _PC_POSIX_PERMISSIONS            90
 /* Ask for full POSIX permission support including uid/gid settings. */
 #define _PC_POSIX_SECURITY               91
+#define _PC_CASE_INSENSITIVE             92
 #endif
 
 /*
