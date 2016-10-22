@@ -220,10 +220,10 @@ readlink (HANDLE fh, char *path, int maxlen)
 	}
       if (*(PWCHAR) cp == 0xfeff)	/* BOM */
 	{
-	  len = wcstombs (NULL, (wchar_t *) (cp + 2), 0);
-	  if (len == (size_t) -1 || len + 1 > maxlen)
+	  size_t wlen = wcstombs (NULL, (wchar_t *) (cp + 2), 0);
+	  if (wlen == (size_t) -1 || wlen + 1 > maxlen)
 	    return false;
-	  wcstombs (path, (wchar_t *) (cp + 2), len + 1);
+	  wcstombs (path, (wchar_t *) (cp + 2), wlen + 1);
 	}
       else if (len + 1 > maxlen)
 	return false;
@@ -238,10 +238,10 @@ readlink (HANDLE fh, char *path, int maxlen)
       cp = buf + strlen (SYMLINK_COOKIE);
       if (*(PWCHAR) cp == 0xfeff)	/* BOM */
 	{
-	  len = wcstombs (NULL, (wchar_t *) (cp + 2), 0);
-	  if (len == (size_t) -1 || len + 1 > maxlen)
+	  size_t wlen = wcstombs (NULL, (wchar_t *) (cp + 2), 0);
+	  if (wlen == (size_t) -1 || wlen + 1 > maxlen)
 	    return false;
-	  wcstombs (path, (wchar_t *) (cp + 2), len + 1);
+	  wcstombs (path, (wchar_t *) (cp + 2), wlen + 1);
 	}
       else if (fi.nFileSizeLow - strlen (SYMLINK_COOKIE) > (unsigned) maxlen)
 	return false;
