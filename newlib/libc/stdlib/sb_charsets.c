@@ -786,7 +786,7 @@ __cp_val_index (int val)
 int
 __cp_index (const char *charset_ext)
 {
-  int cp_idx = __cp_val_index (__micro_atoi (charset_ext));
+  return __cp_val_index (__micro_atoi (charset_ext));
 }
 
 #endif /* _MB_EXTENDED_CHARSETS_WINDOWS */

@@ -470,9 +470,6 @@
 	_L,	_L,	_L,	_L,	_L,	_L,	_L
 #define _CTYPE_PT154_255 _L
 
-
-extern int __cp_index (const char *charset_ext);
-
 #if defined(ALLOW_NEGATIVE_CTYPE_INDEX)
 
 #ifndef __CYGWIN__
