@@ -795,12 +795,6 @@ track_down (const char *file, const char *suffix, int lvl)
   if (lvl)
     printf ("%*c", lvl, ' ');
 
-  if (!path)
-    {
-      display_error ("file not found - '%s'\n", file);
-      return false;
-    }
-
   printf ("%s", path);
 
   wide_path wpath (path);
