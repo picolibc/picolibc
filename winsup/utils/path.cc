@@ -163,7 +163,7 @@ is_symlink (HANDLE fh)
     }
   else /* magic == SYMLINK_MAGIC */
     {
-      if (!local.dwFileAttributes & FILE_ATTRIBUTE_SYSTEM)
+      if (!(local.dwFileAttributes & FILE_ATTRIBUTE_SYSTEM))
 	goto out; /* Not a Cygwin symlink. */
       char buf[sizeof (SYMLINK_COOKIE) - 1];
       SetFilePointer (fh, 0, 0, FILE_BEGIN);
