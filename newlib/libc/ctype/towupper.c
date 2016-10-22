@@ -397,9 +397,6 @@ _DEFUN(towupper,(c), wint_t c)
       
       if (c == 0x04cf)
       	return 0x04c0;
-
-      if (c >= 0x04f7 && c <= 0x04f9)
-	return (c - 1);
     }
   else if (c < 0x0600)
     {
