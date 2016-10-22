@@ -101,7 +101,7 @@ _newlocale_r (struct _reent *p, int category_mask, const char *locale,
       category_mask |= LC_VALID_MASK;
     }
   /* Check for invalid mask values and valid locale ptr. */
-  if (category_mask & ~LC_VALID_MASK || !locale)
+  if ((category_mask & ~LC_VALID_MASK) || !locale)
     {
       p->_errno = EINVAL;
       return NULL;
@@ -119,7 +119,10 @@ _newlocale_r (struct _reent *p, int category_mask, const char *locale,
     {
       if (((1 << i) & category_mask) != 0)
 	{
-	  const char *cat = locale ?: __get_locale_env (p, i);
+	  /* If locale is "", fetch from environment.  Otherwise use locale
+	     name verbatim. */
+	  const char *cat = (locale[0] == '\0') ? __get_locale_env (p, i)
+						: locale;
 	  if (strlen (cat) > ENCODING_LEN)
 	    {
 	      p->_errno = EINVAL;
