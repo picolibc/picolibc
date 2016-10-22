@@ -284,9 +284,6 @@ ___iso_wctomb (struct _reent *r, char *s, wchar_t _wchar, int iso_idx,
 	{
 	  unsigned char mb;
 
-	  if (s == NULL)
-	    return 0;
-
 	  for (mb = 0; mb < 0x60; ++mb)
 	    if (__iso_8859_conv[iso_idx][mb] == wchar)
 	      {
@@ -442,9 +439,6 @@ ___cp_wctomb (struct _reent *r, char *s, wchar_t _wchar, int cp_idx,
       if (cp_idx >= 0)
 	{
 	  unsigned char mb;
-
-	  if (s == NULL)
-	    return 0;
 
 	  for (mb = 0; mb < 0x80; ++mb)
 	    if (__cp_conv[cp_idx][mb] == wchar)
