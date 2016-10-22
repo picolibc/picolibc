@@ -1192,7 +1192,7 @@ dump_sysinfo_services ()
       puts ("The version of cygrunsrv installed is too old to dump service info.\n");
       return;
     }
-  fclose (f);
+  pclose (f);
 
   /* For verbose mode, just run cygrunsrv --list --verbose and copy output
      verbatim; otherwise run cygrunsrv --list and then cygrunsrv --query for
