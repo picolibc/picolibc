@@ -88,9 +88,6 @@ EvalRet (int ret, const char *user)
 	eprint (0, "You may not change the password for %s.", user);
       break;
 
-      eprint (0, "Bad password: Invalid.");
-      break;
-
     case NERR_PasswordTooShort:
       eprint (0, "Bad password: Too short.");
       break;
