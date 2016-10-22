@@ -472,6 +472,12 @@ handle_output_debug_string (DWORD id, LPVOID p, unsigned mask, FILE *ofile)
 	len = 17;
     }
 
+  /* Note that the following code deliberately points buf 20 bytes into the
+     allocated area.  The subsequent code then overwrites the usecs value
+     given in the application's debug string, which potentially prepends
+     characters to the string.  If that sounds confusing and dangerous, well...
+
+     TODO: This needs a cleanup. */
   char *buf;
   buf = (char *) alloca (len + 85) + 20;
 
