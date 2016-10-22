@@ -1173,14 +1173,14 @@ _DEFUN(__SVFWSCANF_R, (rptr, fp, fmt0, ap),
 	  char nancount = 0;
 	  char infcount = 0;
 #ifdef hardway
-	  if (width == 0 || width > sizeof (buf) - 1)
+	  if (width == 0 || width > sizeof (buf) / sizeof (*buf) - 1)
 #else
 	  /* size_t is unsigned, hence this optimisation */
-	  if (width - 1 > sizeof (buf) - 2)
+	  if (width - 1 > sizeof (buf) / sizeof (*buf) - 2)
 #endif
 	    {
-	      width_left = width - (sizeof (buf) - 1);
-	      width = sizeof (buf) - 1;
+	      width_left = width - (sizeof (buf) / sizeof (*buf) - 1);
+	      width = sizeof (buf) / sizeof (*buf) - 1;
 	    }
 	  flags |= SIGNOK | NDIGITS | DPTOK | EXPOK;
 	  zeroes = 0;
@@ -1431,8 +1431,10 @@ _DEFUN(__SVFWSCANF_R, (rptr, fp, fmt0, ap),
 
 		  /* If there might not be enough space for the new exponent,
 		     truncate some trailing digits to make room.  */
-		  if (exp_start >= buf + sizeof (buf) - MAX_LONG_LEN)
-		    exp_start = buf + sizeof (buf) - MAX_LONG_LEN - 1;
+		  if (exp_start >= buf + sizeof (buf) / sizeof (*buf)
+				   - MAX_LONG_LEN)
+		    exp_start = buf + sizeof (buf) / sizeof (*buf)
+				- MAX_LONG_LEN - 1;
                  swprintf (exp_start, MAX_LONG_LEN, L"e%ld", new_exp);
 		}
 
