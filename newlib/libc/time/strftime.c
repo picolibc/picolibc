@@ -608,7 +608,7 @@ get_alt_digits (const char *alt_digits)
       ++adi->num;
   /* Allocate the `digit' array, which is an array of `num' pointers into
      `buffer'. */
-  adi->digit = (CHAR **) calloc (adi->num, sizeof (CHAR **));
+  adi->digit = (CHAR **) calloc (adi->num, sizeof (CHAR *));
   if (!adi->digit)
     {
       free (adi);
