@@ -115,12 +115,16 @@ main (int argc, char *argv[])
   if (!fd)
     error (1, ENOENT, "cannot open /proc/%d", pid);
   fscanf (fd, "%d", &winpid);
+  fclose (fd);
 
   exefile = (char *) malloc (32);
   exename = (char *) malloc (MAX_PATH);
   sprintf (exefile, "/proc/%d/exename", pid);
   fd = fopen (exefile, "rb");
+  if (!fd)
+    error (1, ENOENT, "cannot open /proc/%d", pid);
   fscanf (fd, "%s", exename);
+  fclose (fd);
 
   hProcess = OpenProcess (PROCESS_QUERY_INFORMATION | PROCESS_VM_READ,
 			  0, winpid);
