@@ -195,7 +195,7 @@ main (int argc, char **argv)
   *country = L'\0';
   geo = GetUserGeoID (GEOCLASS_NATION);
   if (geo != GEOID_NOT_AVAILABLE)
-    GetGeoInfoW (geo, GEO_ISO2, country, sizeof country, 0);
+    GetGeoInfoW (geo, GEO_ISO2, country, sizeof country / sizeof (*country), 0);
   /* If, for some reason, the Geo-location isn't available, we use the locale
      setting instead. */
   if (!*country)
