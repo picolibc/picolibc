@@ -88,6 +88,7 @@ warn (int geterrno, const char *fmt, ...)
       fputs (buf, stderr);
       fputs ("\n", stderr);
     }
+  va_end (args);
 }
 
 static void __attribute__ ((noreturn))
@@ -351,13 +352,16 @@ create_child (char **argv)
   make_command_line (one_line, argv);
 
   SetConsoleCtrlHandler (NULL, 0);
+
   const char *cygwin_env = getenv ("CYGWIN");
   const char *space;
-  if (cygwin_env)
+
+  if (cygwin_env && strlen (cygwin_env) <= 256) /* sanity check */
     space = " ";
   else
     space = cygwin_env = "";
-  char *newenv = (char *) malloc (sizeof ("CYGWIN=noglob") + strlen (space) + strlen (cygwin_env));
+  char *newenv = (char *) malloc (sizeof ("CYGWIN=noglob")
+				  + strlen (space) + strlen (cygwin_env));
   sprintf (newenv, "CYGWIN=noglob%s%s", space, cygwin_env);
   _putenv (newenv);
   ret = CreateProcess (0, one_line.buf,	/* command line */
