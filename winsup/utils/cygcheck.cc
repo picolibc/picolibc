@@ -311,10 +311,7 @@ pathlike::check_existence (const char *fn, int showall, int verbose,
 			   char* first, const char *ext1, const char *ext2)
 {
   char file[4000];
-  strcpy (file, dir);
-  strcat (file, fn);
-  strcat (file, ext1);
-  strcat (file, ext2);
+  snprintf (file, sizeof file, "%s%s%s%s", dir, fn, ext1, ext2);
 
   wide_path wpath (file);
   if (GetFileAttributesW (wpath) != (DWORD) - 1)
