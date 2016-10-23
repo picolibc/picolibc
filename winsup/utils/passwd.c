@@ -592,7 +592,8 @@ main (int argc, char **argv)
       return SetModals (xarg, narg, iarg, Larg, server);
     }
 
-  strcpy (user, optind >= argc ? getlogin () : argv[optind]);
+  user[0] = '\0';
+  strncat (user, optind >= argc ? getlogin () : argv[optind], UNLEN);
 
   /* Changing password for calling user?  Use logonserver for user as well. */
   if (!server && optind >= argc)
