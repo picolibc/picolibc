@@ -312,10 +312,12 @@ enum_users (domlist_t *mach, const char *sep, const char *passed_home_path,
 	  else if (acc_type == SidTypeDomain)
 	    {
 	      WCHAR domname[MAX_DOMAIN_NAME_LEN + UNLEN + 2];
+	      PWCHAR p;
 
-	      wcscpy (domname, machine);
-	      wcscat (domname, L"\\");
-	      wcscat (domname, buffer[i].usri3_name);
+	      p = wcpcpy (domname, machine);
+	      p = wcpcpy (p, L"\\");
+	      p = wcpncpy (p, buffer[i].usri3_name, UNLEN);
+	      *p = L'\0';
 	      sid_length = SECURITY_MAX_SID_SIZE;
 	      domname_len = sizeof (domname);
 	      if (!LookupAccountNameW (machine, domname, psid,

@@ -296,10 +296,12 @@ enum_local_groups (domlist_t *mach, const char *sep,
 	  else if (acc_type == SidTypeDomain)
 	    {
 	      WCHAR domname[MAX_DOMAIN_NAME_LEN + GNLEN + 2];
+	      PWCHAR p;
 
-	      wcscpy (domname, domain_name);
-	      wcscat (domname, L"\\");
-	      wcscat (domname, buffer[i].lgrpi0_name);
+	      p = wcpcpy (domname, domain_name);
+	      p = wcpcpy (p, L"\\");
+	      p = wcpncpy (p, buffer[i].lgrpi0_name, GNLEN);
+	      *p = L'\0';
 	      sid_length = SECURITY_MAX_SID_SIZE;
 	      domname_len = MAX_DOMAIN_NAME_LEN + 1;
 	      if (!LookupAccountNameW (machine, domname,
@@ -434,10 +436,12 @@ enum_groups (domlist_t *mach, const char *sep, DWORD id_offset,
 	  else if (acc_type == SidTypeDomain)
 	    {
 	      WCHAR domname[MAX_DOMAIN_NAME_LEN + GNLEN + 2];
+	      PWCHAR p;
 
-	      wcscpy (domname, machine);
-	      wcscat (domname, L"\\");
-	      wcscat (domname, buffer[i].grpi2_name);
+	      p = wcpcpy (domname, machine);
+	      p = wcpcpy (p, L"\\");
+	      p = wcpncpy (p, buffer[i].grpi2_name, GNLEN);
+	      *p = L'\0';
 	      sid_length = SECURITY_MAX_SID_SIZE;
 	      domname_len = MAX_DOMAIN_NAME_LEN + 1;
 	      if (!LookupAccountNameW (machine, domname, psid, &sid_length,
