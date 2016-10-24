@@ -1704,10 +1704,9 @@ symlink_native (const char *oldpath, path_conv &win32_newpath)
      to Win32 paths. */
   if (final_oldpath->Buffer[0] == L'\\')
     {
-      /* Workaround Windows 8.1 bug.  On Windows 8.1, the ShellExecuteW
-	 function does not handle the long path prefix correctly for symlink
-	 targets.  Thus, we create simple short paths < MAX_PATH without
-	 long path prefix. */
+      /* Starting with Windows 8.1, the ShellExecuteW function does not
+	 handle the long path prefix correctly for symlink targets.  Thus,
+	 we create simple short paths < MAX_PATH without long path prefix. */
       if (RtlEqualUnicodePathPrefix (final_oldpath, &ro_u_uncp, TRUE)
 	  && final_oldpath->Length < (MAX_PATH + 6) * sizeof (WCHAR))
 	{
