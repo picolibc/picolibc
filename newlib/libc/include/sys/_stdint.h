@@ -63,7 +63,7 @@ typedef __uint64_t uint64_t ;
 #define __int64_t_defined 1
 #endif /* ___int64_t_defined */
 
-#ifndef INTPTR_T_DECLARED
+#ifndef _INTPTR_T_DECLARED
 typedef __intptr_t intptr_t;
 #define _INTPTR_T_DECLARED
 #endif
