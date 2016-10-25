@@ -124,25 +124,6 @@ typedef __uint_least64_t uint_least64_t;
 #endif
 #endif
 
-/* Greatest-width integer types */
-/* Modern GCCs provide __INTMAX_TYPE__ */
-#if defined(__INTMAX_TYPE__)
-  typedef __INTMAX_TYPE__ intmax_t;
-#elif __have_longlong64
-  typedef signed long long intmax_t;
-#else
-  typedef signed long intmax_t;
-#endif
-
-/* Modern GCCs provide __UINTMAX_TYPE__ */
-#if defined(__UINTMAX_TYPE__)
-  typedef __UINTMAX_TYPE__ uintmax_t;
-#elif __have_longlong64
-  typedef unsigned long long uintmax_t;
-#else
-  typedef unsigned long uintmax_t;
-#endif
-
 #ifdef __INTPTR_TYPE__
 #define INTPTR_MIN (-__INTPTR_MAX__ - 1)
 #define INTPTR_MAX (__INTPTR_MAX__)

@@ -19,6 +19,20 @@
 #include <limits.h>
 #endif
 
+/* Check if "long long" is 64bit wide */
+/* Modern GCCs provide __LONG_LONG_MAX__, SUSv3 wants LLONG_MAX */
+#if ( defined(__LONG_LONG_MAX__) && (__LONG_LONG_MAX__ > 0x7fffffff) ) \
+  || ( defined(LLONG_MAX) && (LLONG_MAX > 0x7fffffff) )
+#define __have_longlong64 1
+#endif
+
+/* Check if "long" is 64bit or 32bit wide */
+#if __EXP(LONG_MAX) > 0x7fffffff
+#define __have_long64 1
+#elif __EXP(LONG_MAX) == 0x7fffffff && !defined(__SPU__)
+#define __have_long32 1
+#endif
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -194,6 +208,22 @@ typedef unsigned __INT_LEAST64_TYPE__ __uint_least64_t;
 typedef __int64_t __int_least64_t;
 typedef __uint64_t __uint_least64_t;
 #define ___int_least64_t_defined 1
+#endif
+
+#if defined(__INTMAX_TYPE__)
+typedef __INTMAX_TYPE__ __intmax_t;
+#elif __have_longlong64
+typedef signed long long __intmax_t;
+#else
+typedef signed long __intmax_t;
+#endif
+
+#if defined(__UINTMAX_TYPE__)
+typedef __UINTMAX_TYPE__ __uintmax_t;
+#elif __have_longlong64
+typedef unsigned long long __uintmax_t;
+#else
+typedef unsigned long __uintmax_t;
 #endif
 
 #ifdef __INTPTR_TYPE__
