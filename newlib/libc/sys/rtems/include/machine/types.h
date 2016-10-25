@@ -70,4 +70,6 @@ typedef	__uintptr_t	vm_paddr_t;
 typedef	__uintptr_t	vm_pindex_t;
 typedef	__uintptr_t	vm_size_t;
 
+typedef	__uintmax_t	rman_res_t;
+
 #endif /* __BSD_VISIBLE */
