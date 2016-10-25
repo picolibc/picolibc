@@ -1,6 +1,5 @@
 \input texinfo.tex
 @setfilename libm.info
-@syncodeindex fn cp
 
 @ifinfo
 @format
