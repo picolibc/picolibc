@@ -6,6 +6,11 @@ INCLUDES = $(NEWLIB_CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLAGS)
 
 LIB_SOURCES = __dprintf.c unctrl.c ffs.c init.c fini.c
 
+if NEWLIB_RETARGETABLE_LOCKING
+LIB_SOURCES += \
+	lock.c
+endif
+
 libmisc_la_LDFLAGS = -Xcompiler -nostdlib
 
 if USE_LIBTOOL
@@ -21,5 +26,5 @@ endif # USE_LIBTOOL
 
 include $(srcdir)/../../Makefile.shared
 
-CHEWOUT_FILES = unctrl.def ffs.def
+CHEWOUT_FILES = unctrl.def lock.def ffs.def
 CHAPTERS = misc.tex

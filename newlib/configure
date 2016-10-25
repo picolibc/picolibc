@@ -802,6 +802,7 @@ enable_newlib_nano_malloc
 enable_newlib_unbuf_stream_opt
 enable_lite_exit
 enable_newlib_nano_formatted_io
+enable_newlib_retargetable_locking
 enable_multilib
 enable_target_optspace
 enable_malloc_debugging
@@ -1473,6 +1474,7 @@ Optional Features:
   --disable-newlib-unbuf-stream-opt    disable unbuffered stream optimization in streamio
   --enable-lite-exit	enable light weight exit
   --enable-newlib-nano-formatted-io    Use nano version formatted IO
+  --enable-newlib-retargetable-locking    Allow locking routines to be retargeted at link time
   --enable-multilib         build many library versions (default)
   --enable-target-optspace  optimize for space
   --enable-malloc-debugging indicate malloc debugging requested
@@ -2471,6 +2473,18 @@ if test "${enable_newlib_nano_formatted_io+set}" = set; then :
  esac
 else
   newlib_nano_formatted_io=no
+fi
+
+
+# Check whether --enable-newlib-retargetable-locking was given.
+if test "${enable_newlib_retargetable_locking+set}" = set; then :
+  enableval=$enable_newlib_retargetable_locking; case "${enableval}" in
+   yes) newlib_retargetable_locking=yes ;;
+   no)  newlib_retargetable_locking=no ;;
+   *) as_fn_error $? "bad value ${enableval} for newlib-retargetable-locking" "$LINENO" 5 ;;
+ esac
+else
+  newlib_retargetable_locking=no
 fi
 
 
@@ -11780,7 +11794,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<_LT_EOF
-#line 11783 "configure"
+#line 11797 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -11886,7 +11900,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<_LT_EOF
-#line 11889 "configure"
+#line 11903 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -12451,6 +12465,13 @@ fi
 if test "${newlib_nano_formatted_io}" = "yes"; then
 cat >>confdefs.h <<_ACEOF
 #define _NANO_FORMATTED_IO 1
+_ACEOF
+
+fi
+
+if test "${newlib_retargetable_locking}" = "yes"; then
+cat >>confdefs.h <<_ACEOF
+#define _RETARGETABLE_LOCKING 1
 _ACEOF
 
 fi

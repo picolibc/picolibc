@@ -218,6 +218,17 @@ AC_ARG_ENABLE(newlib_nano_formatted_io,
    *) AC_MSG_ERROR(bad value ${enableval} for newlib-nano-formatted-io) ;;
  esac],[newlib_nano_formatted_io=no])
 
+dnl Support --enable-retargetable-locking
+dnl This option is also read in libc/configure.in.  It is repeated
+dnl here so that it shows up in the help text.
+AC_ARG_ENABLE(newlib-retargetable-locking,
+[  --enable-newlib-retargetable-locking    Allow locking routines to be retargeted at link time],
+[case "${enableval}" in
+   yes) newlib_retargetable_locking=yes ;;
+   no)  newlib_retargetable_locking=no ;;
+   *) AC_MSG_ERROR(bad value ${enableval} for newlib-retargetable-locking) ;;
+ esac],[newlib_retargetable_locking=no])
+
 NEWLIB_CONFIGURE(.)
 
 dnl We have to enable libtool after NEWLIB_CONFIGURE because if we try and
@@ -456,6 +467,10 @@ fi
 
 if test "${newlib_nano_formatted_io}" = "yes"; then
 AC_DEFINE_UNQUOTED(_NANO_FORMATTED_IO)
+fi
+
+if test "${newlib_retargetable_locking}" = "yes"; then
+AC_DEFINE_UNQUOTED(_RETARGETABLE_LOCKING)
 fi
 
 dnl

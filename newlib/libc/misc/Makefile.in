@@ -53,6 +53,9 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
+@NEWLIB_RETARGETABLE_LOCKING_TRUE@am__append_1 = \
+@NEWLIB_RETARGETABLE_LOCKING_TRUE@	lock.c
+
 DIST_COMMON = $(srcdir)/../../Makefile.shared $(srcdir)/Makefile.in \
 	$(srcdir)/Makefile.am
 subdir = misc
@@ -72,14 +75,19 @@ LIBRARIES = $(noinst_LIBRARIES)
 ARFLAGS = cru
 lib_a_AR = $(AR) $(ARFLAGS)
 lib_a_LIBADD =
-am__objects_1 = lib_a-__dprintf.$(OBJEXT) lib_a-unctrl.$(OBJEXT) \
-	lib_a-ffs.$(OBJEXT) lib_a-init.$(OBJEXT) lib_a-fini.$(OBJEXT)
-@USE_LIBTOOL_FALSE@am_lib_a_OBJECTS = $(am__objects_1)
+@NEWLIB_RETARGETABLE_LOCKING_TRUE@am__objects_1 =  \
+@NEWLIB_RETARGETABLE_LOCKING_TRUE@	lib_a-lock.$(OBJEXT)
+am__objects_2 = lib_a-__dprintf.$(OBJEXT) lib_a-unctrl.$(OBJEXT) \
+	lib_a-ffs.$(OBJEXT) lib_a-init.$(OBJEXT) lib_a-fini.$(OBJEXT) \
+	$(am__objects_1)
+@USE_LIBTOOL_FALSE@am_lib_a_OBJECTS = $(am__objects_2)
 lib_a_OBJECTS = $(am_lib_a_OBJECTS)
 LTLIBRARIES = $(noinst_LTLIBRARIES)
 libmisc_la_LIBADD =
-am__objects_2 = __dprintf.lo unctrl.lo ffs.lo init.lo fini.lo
-@USE_LIBTOOL_TRUE@am_libmisc_la_OBJECTS = $(am__objects_2)
+@NEWLIB_RETARGETABLE_LOCKING_TRUE@am__objects_3 = lock.lo
+am__objects_4 = __dprintf.lo unctrl.lo ffs.lo init.lo fini.lo \
+	$(am__objects_3)
+@USE_LIBTOOL_TRUE@am_libmisc_la_OBJECTS = $(am__objects_4)
 libmisc_la_OBJECTS = $(am_libmisc_la_OBJECTS)
 libmisc_la_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
@@ -252,7 +260,7 @@ top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 AUTOMAKE_OPTIONS = cygnus
 INCLUDES = $(NEWLIB_CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLAGS)
-LIB_SOURCES = __dprintf.c unctrl.c ffs.c init.c fini.c
+LIB_SOURCES = __dprintf.c unctrl.c ffs.c init.c fini.c $(am__append_1)
 libmisc_la_LDFLAGS = -Xcompiler -nostdlib
 @USE_LIBTOOL_TRUE@noinst_LTLIBRARIES = libmisc.la
 @USE_LIBTOOL_TRUE@libmisc_la_SOURCES = $(LIB_SOURCES)
@@ -271,7 +279,7 @@ DOCBOOK_CHEW = ${top_srcdir}/../doc/makedocbook.py
 DOCBOOK_OUT_FILES = $(CHEWOUT_FILES:.def=.xml)
 DOCBOOK_CHAPTERS = $(CHAPTERS:.tex=.xml)
 CLEANFILES = $(CHEWOUT_FILES) $(CHEWOUT_FILES:.def=.ref) $(DOCBOOK_OUT_FILES)
-CHEWOUT_FILES = unctrl.def ffs.def
+CHEWOUT_FILES = unctrl.def lock.def ffs.def
 CHAPTERS = misc.tex
 all: all-am
 
@@ -371,6 +379,12 @@ lib_a-fini.o: fini.c
 
 lib_a-fini.obj: fini.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-fini.obj `if test -f 'fini.c'; then $(CYGPATH_W) 'fini.c'; else $(CYGPATH_W) '$(srcdir)/fini.c'; fi`
+
+lib_a-lock.o: lock.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-lock.o `test -f 'lock.c' || echo '$(srcdir)/'`lock.c
+
+lib_a-lock.obj: lock.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-lock.obj `if test -f 'lock.c'; then $(CYGPATH_W) 'lock.c'; else $(CYGPATH_W) '$(srcdir)/lock.c'; fi`
 
 mostlyclean-libtool:
 	-rm -f *.lo
