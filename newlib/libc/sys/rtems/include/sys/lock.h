@@ -232,4 +232,9 @@ typedef struct _Mutex_recursive_Control _LOCK_RECURSIVE_T;
 
 __END_DECLS
 
-#endif /* _SYS_LOCK_H_ */
+#ifdef _KERNEL
+/* Header file provided outside of Newlib */
+#include <machine/_kernel_lock.h>
+#endif
+
+#endif /* !_SYS_LOCK_H_ */
