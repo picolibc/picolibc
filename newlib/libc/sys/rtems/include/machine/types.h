@@ -77,4 +77,9 @@ typedef	__uintptr_t	vm_size_t;
 
 typedef	__uintmax_t	rman_res_t;
 
+#ifdef _KERNEL
+/* Header file provided outside of Newlib */
+#include <machine/_kernel_types.h>
+#endif
+
 #endif /* __BSD_VISIBLE */

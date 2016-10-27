@@ -35,11 +35,4 @@ typedef	__int64_t	__rlim_t;	/* resource limit - intentionally */
 					/* signed, because of legacy code */
 					/* that uses -1 for RLIM_INFINITY */
 
-#ifdef _KERNEL
-typedef	int		boolean_t;
-typedef	struct device	*device_t;
-typedef	char		vm_memattr_t;	/* memory attribute codes */
-typedef	struct vm_page	*vm_page_t;
-#endif /* _KERNEL */
-
 #endif /* _MACHINE__TYPES_H */
