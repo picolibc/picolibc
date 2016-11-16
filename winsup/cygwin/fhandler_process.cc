@@ -1251,12 +1251,16 @@ format_process_statm (void *data, char *&destbuf)
   _pinfo *p = (_pinfo *) data;
   unsigned long vmsize = 0UL, vmrss = 0UL, vmtext = 0UL, vmdata = 0UL,
 		vmlib = 0UL, vmshare = 0UL;
+  size_t page_scale;
   if (!get_mem_values (p->dwProcessId, &vmsize, &vmrss, &vmtext, &vmdata,
 		       &vmlib, &vmshare))
     return 0;
+
+  page_scale = wincap.allocation_granularity() / wincap.page_size();
   destbuf = (char *) crealloc_abort (destbuf, 96);
   return __small_sprintf (destbuf, "%ld %ld %ld %ld %ld %ld 0\n",
-			  vmsize, vmrss, vmshare, vmtext, vmlib, vmdata);
+              vmsize / page_scale, vmrss / page_scale, vmshare / page_scale,
+              vmtext / page_scale, vmlib / page_scale, vmdata / page_scale);
 }
 
 extern "C" {
