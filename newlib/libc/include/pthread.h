@@ -73,7 +73,7 @@ int	_EXFUN(pthread_mutex_destroy, (pthread_mutex_t *__mutex));
     pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
  */
 
-#define PTHREAD_MUTEX_INITIALIZER  ((pthread_mutex_t) 0xFFFFFFFF)
+#define PTHREAD_MUTEX_INITIALIZER _PTHREAD_MUTEX_INITIALIZER
 
 /*  Locking and Unlocking a Mutex, P1003.1c/Draft 10, p. 93
     NOTE: P1003.4b/D8 adds pthread_mutex_timedlock(), p. 29 */
@@ -116,7 +116,7 @@ int	_EXFUN(pthread_cond_destroy, (pthread_cond_t *__mutex));
     pthread_cond_t cond = PTHREAD_COND_INITIALIZER;
  */
  
-#define PTHREAD_COND_INITIALIZER  ((pthread_cond_t) 0xFFFFFFFF)
+#define PTHREAD_COND_INITIALIZER _PTHREAD_COND_INITIALIZER
  
 /* Broadcasting and Signaling a Condition, P1003.1c/Draft 10, p. 101 */
  
@@ -286,7 +286,7 @@ int	_EXFUN(pthread_getconcurrency, (void));
   
     NOTE:  This is named inconsistently -- it should be INITIALIZER.  */
  
-#define PTHREAD_ONCE_INIT  { 1, 0 }  /* is initialized and not run */
+#define PTHREAD_ONCE_INIT _PTHREAD_ONCE_INIT
  
 int	_EXFUN(pthread_once,
 	(pthread_once_t *__once_control, void (*__init_routine)(void)));
@@ -413,7 +413,7 @@ int	_EXFUN(pthread_spin_unlock, (pthread_spinlock_t *__spinlock));
     pthread_mutex_t mutex = PTHREAD_RWLOCK_INITIALIZER;
  */
 
-#define PTHREAD_RWLOCK_INITIALIZER  ((pthread_rwlock_t) 0xFFFFFFFF)
+#define PTHREAD_RWLOCK_INITIALIZER _PTHREAD_RWLOCK_INITIALIZER
 
 int	_EXFUN(pthread_rwlockattr_init, (pthread_rwlockattr_t *__attr));
 int	_EXFUN(pthread_rwlockattr_destroy, (pthread_rwlockattr_t *__attr));
