@@ -82,7 +82,7 @@ struct _Futex_Control {
 
 #define _FUTEX_INITIALIZER { _THREAD_QUEUE_INITIALIZER }
 
-static inline void
+static __inline void
 _Mutex_Initialize(struct _Mutex_Control *_mutex)
 {
 	struct _Mutex_Control _init = _MUTEX_INITIALIZER;
@@ -98,14 +98,14 @@ int _Mutex_Try_acquire(struct _Mutex_Control *);
 
 void _Mutex_Release(struct _Mutex_Control *);
 
-static inline void
+static __inline void
 _Mutex_Destroy(struct _Mutex_Control *_mutex)
 {
 
 	(void)_mutex;
 }
 
-static inline void
+static __inline void
 _Mutex_recursive_Initialize(struct _Mutex_recursive_Control *_mutex)
 {
 	struct _Mutex_recursive_Control _init = _MUTEX_RECURSIVE_INITIALIZER;
@@ -122,14 +122,14 @@ int _Mutex_recursive_Try_acquire(struct _Mutex_recursive_Control *);
 
 void _Mutex_recursive_Release(struct _Mutex_recursive_Control *);
 
-static inline void
+static __inline void
 _Mutex_recursive_Destroy(struct _Mutex_recursive_Control *_mutex)
 {
 
 	(void)_mutex;
 }
 
-static inline void
+static __inline void
 _Condition_Initialize(struct _Condition_Control *_cond)
 {
 	struct _Condition_Control _init = _CONDITION_INITIALIZER;
@@ -152,14 +152,14 @@ void _Condition_Signal(struct _Condition_Control *);
 
 void _Condition_Broadcast(struct _Condition_Control *);
 
-static inline void
+static __inline void
 _Condition_Destroy(struct _Condition_Control *_cond)
 {
 
 	(void)_cond;
 }
 
-static inline void
+static __inline void
 _Semaphore_Initialize(struct _Semaphore_Control *_semaphore,
     unsigned int _count)
 {
@@ -172,14 +172,14 @@ void _Semaphore_Wait(struct _Semaphore_Control *);
 
 void _Semaphore_Post(struct _Semaphore_Control *);
 
-static inline void
+static __inline void
 _Semaphore_Destroy(struct _Semaphore_Control *_semaphore)
 {
 
 	(void)_semaphore;
 }
 
-static inline void
+static __inline void
 _Futex_Initialize(struct _Futex_Control *_futex)
 {
 	struct _Futex_Control _init = _FUTEX_INITIALIZER;
@@ -191,7 +191,7 @@ int _Futex_Wait(struct _Futex_Control *, int *, int);
 
 int _Futex_Wake(struct _Futex_Control *, int);
 
-static inline void
+static __inline void
 _Futex_Destroy(struct _Futex_Control *_futex)
 {
 
