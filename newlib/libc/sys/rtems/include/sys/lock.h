@@ -70,7 +70,9 @@ struct _Futex_Control {
 	struct _Thread_queue_Queue _Queue;
 };
 
-#define _THREAD_QUEUE_INITIALIZER { { 0, 0 }, 0, 0 }
+#define _TICKET_LOCK_INITIALIZER { 0, 0 }
+
+#define _THREAD_QUEUE_INITIALIZER { _TICKET_LOCK_INITIALIZER, 0, 0 }
 
 #define _MUTEX_INITIALIZER { _THREAD_QUEUE_INITIALIZER }
 
