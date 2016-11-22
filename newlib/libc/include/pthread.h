@@ -278,6 +278,10 @@ int	_EXFUN(pthread_getcpuclockid,
 int	_EXFUN(pthread_setconcurrency, (int new_level));
 int	_EXFUN(pthread_getconcurrency, (void));
 
+#if __BSD_VISIBLE || __GNU_VISIBLE
+void	_EXFUN(pthread_yield, (void));
+#endif
+
 /* Dynamic Package Initialization */
 
 /* This is used to statically initialize a pthread_once_t. Example:
