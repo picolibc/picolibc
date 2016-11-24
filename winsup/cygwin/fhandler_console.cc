@@ -799,7 +799,7 @@ fhandler_console::scroll_buffer_screen (int x1, int y1, int x2, int y2, int xn, 
   if (y1 >= 0)
     y1 += con.b.srWindow.Top;
   if (y2 >= 0)
-    y1 += con.b.srWindow.Top;
+    y2 += con.b.srWindow.Top;
   if (yn >= 0)
     yn += con.b.srWindow.Top;
   con.scroll_buffer (get_output_handle (), x1, y1, x2, y2, xn, yn);
