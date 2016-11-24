@@ -169,6 +169,7 @@ __small_vsprintf (char *dst, const char *fmt, va_list ap)
 		      pad = '0';
 		      continue;
 		    }
+		  /*FALLTHRU*/
 		case '1': case '2': case '3': case '4':
 		case '5': case '6': case '7': case '8': case '9':
 		  len = len * 10 + (c - '0');
@@ -284,6 +285,7 @@ gen_decimalLL:
 		  n = strtol (fmt, (char **) &fmt, 10);
 		  if (*fmt++ != 's')
 		    goto endfor;
+		  /*FALLTHRU*/
 		case 's':
 		  s = va_arg (ap, char *);
 		  if (s == NULL)
@@ -511,6 +513,7 @@ __small_vswprintf (PWCHAR dst, const WCHAR *fmt, va_list ap)
 		      pad = L'0';
 		      continue;
 		    }
+		  /*FALLTHRU*/
 		case L'1' ... L'9':
 		  len = len * 10 + (c - L'0');
 		  continue;
@@ -612,6 +615,7 @@ gen_decimalLL:
 		  n = wcstoul (fmt, (wchar_t **) &fmt, 10);
 		  if (*fmt++ != L's')
 		    goto endfor;
+		  /*FALLTHRU*/
 		case L's':
 		  s = va_arg (ap, char *);
 		  if (s == NULL)

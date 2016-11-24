@@ -1357,8 +1357,10 @@ wait_sig (VOID *)
 	    sig_clear (-pack.si.si_signo);
 	  else
 	    sigq.add (pack);
+	  /*FALLTHRU*/
 	case __SIGNOHOLD:
 	  sig_held = false;
+	  /*FALLTHRU*/
 	case __SIGFLUSH:
 	case __SIGFLUSHFAST:
 	  if (!sig_held)

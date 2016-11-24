@@ -617,6 +617,7 @@ fhandler_pty_slave::write (const void *ptr, size_t len)
 	{
 	case ERROR_NO_DATA:
 	  err = ERROR_IO_DEVICE;
+	  /*FALLTHRU*/
 	default:
 	  __seterrno_from_win_error (err);
 	}
