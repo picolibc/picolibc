@@ -77,22 +77,15 @@ daemon (int nochdir, int noclose)
 extern "C" int
 login_tty (int fd)
 {
-  char *fdname;
-  int newfd;
-
-  if (setsid () == -1)
+  /* If setsid fails, FreeBSD uses the current sid returned by getsid(0),
+     then calls tcsetsid, which we don't provide (just as Linux doesn't).
+     tcsetsid only uses the sid to check against the value returned by
+     getsid(0).  So, either way, that check will not fail and we can
+     simply ignore the return value from setsid and just perform the
+     ioctl call tcsetsid does. */
+  setsid ();
+  if (ioctl (fd, TIOCSCTTY, NULL) == -1)
     return -1;
-  if ((fdname = ttyname (fd)))
-    {
-      if (fd != STDIN_FILENO)
-	close (STDIN_FILENO);
-      if (fd != STDOUT_FILENO)
-	close (STDOUT_FILENO);
-      if (fd != STDERR_FILENO)
-	close (STDERR_FILENO);
-      newfd = open (fdname, O_RDWR);
-      close (newfd);
-    }
   dup2 (fd, STDIN_FILENO);
   dup2 (fd, STDOUT_FILENO);
   dup2 (fd, STDERR_FILENO);
