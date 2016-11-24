@@ -3966,12 +3966,15 @@ fcwd_access_t::SetDirHandleFromBufferPointer (PWCHAR buf_p, HANDLE dir)
     default:
       f_cwd = (fcwd_access_t *)
 	((PBYTE) buf_p - __builtin_offsetof (FAST_CWD_OLD, Buffer));
+      break;
     case FCWD_W7:
       f_cwd = (fcwd_access_t *)
 	((PBYTE) buf_p - __builtin_offsetof (FAST_CWD_7, Buffer));
+      break;
     case FCWD_W8:
       f_cwd = (fcwd_access_t *)
 	((PBYTE) buf_p - __builtin_offsetof (FAST_CWD_8, Buffer));
+      break;
     }
   f_cwd->DirectoryHandle () = dir;
 }
