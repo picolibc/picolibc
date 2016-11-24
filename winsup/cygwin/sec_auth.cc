@@ -342,9 +342,9 @@ static bool
 get_user_groups (WCHAR *logonserver, cygsidlist &grp_list,
 		 PWCHAR user, PWCHAR domain)
 {
-  WCHAR dgroup[MAX_DOMAIN_NAME_LEN + GNLEN + 2];
+  WCHAR dgroup[MAX_DOMAIN_NAME_LEN + GNLEN + 2], *grp_p;
   LPGROUP_USERS_INFO_0 buf;
-  DWORD cnt, tot, len;
+  DWORD cnt, tot;
   NET_API_STATUS ret;
 
   /* Look only on logonserver */
@@ -363,9 +363,8 @@ get_user_groups (WCHAR *logonserver, cygsidlist &grp_list,
       return ret == NERR_UserNotFound || ret == ERROR_ACCESS_DENIED;
     }
 
-  len = wcslen (domain);
-  wcscpy (dgroup, domain);
-  dgroup[len++] = L'\\';
+  grp_p = wcpncpy (dgroup, domain, MAX_DOMAIN_NAME_LEN);
+  *grp_p++ = L'\\';
 
   for (DWORD i = 0; i < cnt; ++i)
     {
@@ -375,7 +374,8 @@ get_user_groups (WCHAR *logonserver, cygsidlist &grp_list,
       DWORD dlen = sizeof (dom);
       SID_NAME_USE use = SidTypeInvalid;
 
-      wcscpy (dgroup + len, buf[i].grui0_name);
+      *wcpncpy (grp_p, buf[i].grui0_name, sizeof dgroup / sizeof *dgroup
+					 - (grp_p - dgroup) - 1) = L'\0';
       if (!LookupAccountNameW (NULL, dgroup, gsid, &glen, dom, &dlen, &use))
 	debug_printf ("LookupAccountName(%W), %E", dgroup);
       else if (well_known_sid_type (use))
