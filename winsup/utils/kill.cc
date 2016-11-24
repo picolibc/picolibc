@@ -90,7 +90,7 @@ getsig (const char *in_sig)
     }
   intsig = strtosigno (sig) ?: atoi (in_sig);
   char *p;
-  if (!intsig && (strcmp (buf, "SIG0") != 0 && (strtol (in_sig, &p, 10) != 0 || *p)))
+  if (!intsig && (strcmp (sig, "SIG0") != 0 && (strtol (in_sig, &p, 10) != 0 || *p)))
     intsig = -1;
   return intsig;
 }
