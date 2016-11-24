@@ -414,6 +414,7 @@ get_short_paths (char *path)
       exit (1);
     }
   my_wcstombs (ptr, sbuf, len);
+  free (sbuf);
   return ptr;
 }
 
