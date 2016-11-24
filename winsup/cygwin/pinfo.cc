@@ -502,7 +502,7 @@ _pinfo::set_ctty (fhandler_termios *fh, int flags)
       if (!tc.getpgid () && pgid == pid)
 	tc.setpgid (pgid);
     }
-  debug_printf ("cygheap->ctty now %p, archetype %p", cygheap->ctty, fh->archetype);
+  debug_printf ("cygheap->ctty now %p, archetype %p", cygheap->ctty, fh ? fh->archetype : NULL);
   return ctty > 0;
 }
 
