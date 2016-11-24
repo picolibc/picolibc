@@ -34,7 +34,7 @@ signal (int sig, _sig_func_ptr func)
   _sig_func_ptr prev;
 
   /* check that sig is in right range */
-  if (sig < 0 || sig >= NSIG || sig == SIGKILL || sig == SIGSTOP)
+  if (sig <= 0 || sig >= NSIG || sig == SIGKILL || sig == SIGSTOP)
     {
       set_errno (EINVAL);
       syscall_printf ("SIG_ERR = signal (%d, %p)", sig, func);
@@ -387,7 +387,7 @@ sigaction_worker (int sig, const struct sigaction *newact,
     {
       sig_dispatch_pending ();
       /* check that sig is in right range */
-      if (sig < 0 || sig >= NSIG)
+      if (sig <= 0 || sig >= NSIG)
 	set_errno (EINVAL);
       else
 	{
@@ -535,18 +535,21 @@ extern "C" int
 siginterrupt (int sig, int flag)
 {
   struct sigaction act;
-  sigaction (sig, NULL, &act);
-  if (flag)
+  int res = sigaction_worker (sig, NULL, &act, false);
+  if (res == 0)
     {
-      act.sa_flags &= ~SA_RESTART;
-      act.sa_flags |= _SA_NORESTART;
+      if (flag)
+	{
+	  act.sa_flags &= ~SA_RESTART;
+	  act.sa_flags |= _SA_NORESTART;
+	}
+      else
+	{
+	  act.sa_flags &= ~_SA_NORESTART;
+	  act.sa_flags |= SA_RESTART;
+	}
+      res = sigaction_worker (sig, &act, NULL, true);
     }
-  else
-    {
-      act.sa_flags &= ~_SA_NORESTART;
-      act.sa_flags |= SA_RESTART;
-    }
-  int res = sigaction_worker (sig, &act, NULL, true);
   syscall_printf ("%R = siginterrupt(%d, %y)", sig, flag);
   return res;
 }
@@ -620,6 +623,13 @@ sigqueue (pid_t pid, int sig, const union sigval value)
   if (!dest)
     {
       set_errno (ESRCH);
+      return -1;
+    }
+  if (sig == 0)
+    return 0;
+  if (sig < 0 || sig >= NSIG)
+    {
+      set_errno (EINVAL);
       return -1;
     }
   si.si_signo = sig;
