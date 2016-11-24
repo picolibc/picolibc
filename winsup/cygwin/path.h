@@ -316,8 +316,7 @@ class path_conv
     cfree_and_null (posix_path);
     cfree_and_null (wide_path);
   }
-  path_conv& eq_worker (const path_conv& pc, const char *in_path,
-			const char *in_posix_path)
+  path_conv& eq_worker (const path_conv& pc, const char *in_path)
   {
     free_strings ();
     memcpy (this, &pc, sizeof pc);
@@ -341,7 +340,7 @@ class path_conv
   path_conv &operator << (const path_conv& pc)
   {
     const char *save_path;
-    const char *save_posix_path;
+
     if (!path)
       save_path = pc.path;
     else
@@ -349,19 +348,12 @@ class path_conv
 	save_path = (char *) alloca (strlen (path) + 1);
 	strcpy ((char *) save_path, path);
       }
-    if (!posix_path)
-      save_posix_path = pc.posix_path;
-    else
-      {
-	save_posix_path = (char *) alloca (strlen (posix_path) + 1);
-	strcpy ((char *) save_posix_path, path);
-      }
-    return eq_worker (pc, save_path, save_posix_path);
+    return eq_worker (pc, save_path);
   }
 
   path_conv &operator =(const path_conv& pc)
   {
-    return eq_worker (pc, pc.path, pc.posix_path);
+    return eq_worker (pc, pc.path);
   }
   dev_t get_device () {return dev.get_device ();}
   DWORD file_attributes () const {return fileattr;}
