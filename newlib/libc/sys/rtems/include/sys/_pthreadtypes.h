@@ -22,6 +22,7 @@
 
 #include <sys/sched.h>
 #include <sys/cpuset.h>
+#include <sys/lock.h>
 
 /*
  *  2.5 Primitive System Data Types,  P1003.1c/D10, p. 19.
@@ -190,7 +191,10 @@ typedef struct {
 /* POSIX Spin Lock Types */
 
 #if defined(_POSIX_SPIN_LOCKS)
-typedef __uint32_t pthread_spinlock_t;        /* POSIX Spin Lock Object */
+typedef struct {
+  struct _Ticket_lock_Control _Lock;
+  __uint32_t                  _interrupt_state;
+} pthread_spinlock_t;                        /* POSIX Spin Lock Object */
 #endif /* defined(_POSIX_SPIN_LOCKS) */
 
 /* POSIX Reader/Writer Lock Types */
