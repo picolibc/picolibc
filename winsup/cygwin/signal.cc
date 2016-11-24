@@ -279,7 +279,7 @@ _pinfo::kill (siginfo_t& si)
   return res;
 }
 
-int
+extern "C" int
 raise (int sig)
 {
   return kill (myself->pid, sig);
