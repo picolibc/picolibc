@@ -996,7 +996,7 @@ __locale_ctype_ptr_l (struct __locale_t *locale)
 const char *
 __locale_ctype_ptr (void)
 {
-  return __get_current_locale (_REENT)->ctype_ptr;
+  return __get_current_locale ()->ctype_ptr;
 }
 
 #ifndef _REENT_ONLY
