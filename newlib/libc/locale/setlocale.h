@@ -225,7 +225,7 @@ __get_locale_r (struct _reent *r)
    The current locale is either the locale of the current thread, if the
    thread called uselocale, or the global locale if not. */
 _ELIDABLE_INLINE struct __locale_t *
-__get_current_locale ()
+__get_current_locale (void)
 {
   return _REENT->_locale ?: __get_global_locale ();
 }
@@ -233,7 +233,7 @@ __get_current_locale ()
 /* Only access fixed "C" locale using this function.  Fake for !_MB_CAPABLE
    targets by returning ptr to globale locale. */
 _ELIDABLE_INLINE struct __locale_t *
-__get_C_locale ()
+__get_C_locale (void)
 {
 #ifndef _MB_CAPABLE
   return __get_global_locale ();
