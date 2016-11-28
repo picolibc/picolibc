@@ -1406,7 +1406,12 @@ normalize_win32_path (const char *src, char *dst, char *&tail)
       /* Ignore "./".  */
       else if (src[0] == '.' && isdirsep (src[1])
 	       && (src == src_start || isdirsep (src[-1])))
-	src += 2;
+	{
+	  src += 2;
+	  /* Skip /'s to the next path component. */
+	  while (isdirsep (*src))
+	    src++;
+	}
 
       /* Backup if "..".  */
       else if (src[0] == '.' && src[1] == '.'
