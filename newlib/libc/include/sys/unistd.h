@@ -459,6 +459,7 @@ int	_EXFUN(unlinkat, (int, const char *, int));
 #define _SC_LEVEL4_CACHE_SIZE           137
 #define _SC_LEVEL4_CACHE_ASSOC          138
 #define _SC_LEVEL4_CACHE_LINESIZE       139
+#define _SC_POSIX_26_VERSION            140
 
 /*
  *  pathconf values per IEEE Std 1003.1, 2008 Edition

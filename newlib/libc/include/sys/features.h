@@ -366,6 +366,9 @@ extern "C" {
 /* UNIX98 added some new pthread mutex attributes */
 #define _UNIX98_THREAD_MUTEX_ATTRIBUTES         1
 
+/* POSIX 1003.26-2003 defined device control method */
+#define _POSIX_26_VERSION			200312L
+
 #endif
 
 /* XMK loosely adheres to POSIX -- 1003.1 */
