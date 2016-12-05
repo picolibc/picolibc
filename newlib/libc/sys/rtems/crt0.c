@@ -188,6 +188,11 @@ RTEMS_STUB(_VOID, _free_r(struct _reent *r, _PTR *p), { })
 /* stubs for functions required by libc/stdlib */
 RTEMS_STUB(void, __assert_func(const char *file, int line, const char *failedexpr), { })
 
+#if defined(__arm__)
+RTEMS_STUB(void, __aeabi_read_tp(void), { })
+RTEMS_STUB(void *, __tls_get_addr(const void *ti), { })
+#endif
+
 /* The PowerPC expects certain symbols to be defined in the linker script. */
 
 #if defined(__PPC__)
