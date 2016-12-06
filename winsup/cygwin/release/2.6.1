@@ -4,10 +4,6 @@ What's new:
 - Add _PC_CASE_INSENSITIVE flag to [f]pathconf(3).
 
 
-What changed:
--------------
-
-
 Bug Fixes
 ---------
 
@@ -17,5 +13,21 @@ Bug Fixes
 - Fix case-sensitivity problem when renaming directories
   Addresses: https://cygwin.com/ml/cygwin/2016-09/msg00264.html
 
+- Fix SetThreadName with gdb 7.10 on x86
+  Addresses: https://cygwin.com/ml/cygwin/2016-09/msg00143.html
+
+- Fix broken newlocale handling with empty local string "".
+  Found by Coverity.
+
+- Fix assorted buffer overflows and resource leaks found by Coverity.
+
+- Correctly define __hidden macro on Cygwin.
+  Addresses: https://cygwin.com/ml/cygwin/2016-10/msg00294.html
+
 - Fix page count in /proc/<pid>/statm and /proc/<pid>/status.
   Addresses: https://cygwin.com/ml/cygwin-patches/2016-q4/msg00008.html
+
+- Don't allow sending invalid signals from user space
+
+- Fix path handling of ".//" sequences.
+  Addresses: https://cygwin.com/ml/cygwin/2016-11/msg00295.html
