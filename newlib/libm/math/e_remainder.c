@@ -26,7 +26,7 @@
 
 /* __ieee754_remainder is provided by libgcc */
 
-#if 0
+#ifdef __XTENSA__
 
 #ifdef __STDC__
 static const double zero = 0.0;
@@ -81,6 +81,6 @@ static double zero = 0.0;
 	return x;
 }
 
-#endif
+#endif /* __XTENSA__ */
 
 #endif /* defined(_DOUBLE_IS_32BITS) */
