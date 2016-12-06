@@ -358,6 +358,11 @@ makedoc.o: makedoc.c
 
 man:
 
+man-cache:
+	${srcdir}/makedocbook.py --cache
+
+.PHONY: man-cache
+
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
 .NOEXPORT:

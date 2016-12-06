@@ -824,7 +824,11 @@ def main(file):
 if __name__ == '__main__' :
     options = OptionParser()
     options.add_option('-v', '--verbose', action='count', dest = 'verbose')
+    options.add_option('-c', '--cache', action='store_true', dest = 'cache', help="just ensure PLY cache is up to date")
     (opts, args) = options.parse_args()
+
+    if opts.cache:
+	sys.exit()
 
     verbose = opts.verbose
 

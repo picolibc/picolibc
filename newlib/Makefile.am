@@ -364,6 +364,7 @@ doc/makedoc:
 
 # Recursive targets for man and install-man
 man:
+	(cd doc && $(MAKE) man-cache) || exit 1; \
 	for d in $(SUBDIRS); do \
 	  if test "$$d" != "."; then \
 	    (cd $$d && $(MAKE) man) || exit 1; \
