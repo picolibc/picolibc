@@ -306,8 +306,9 @@ dll_list::alloc (HINSTANCE h, per_process *p, dll_type type)
   guard (true);
   /* Already loaded?  For linked DLLs, only compare the basenames.  Linked
      DLLs are loaded using just the basename and the default DLL search path.
-     The Windows loader picks up the first one it finds.  */
-  dll *d = (type == DLL_LINK) ? dlls.find_by_modname (modname) : dlls[ntname];
+     The Windows loader picks up the first one it finds.
+     This also applies to cygwin1.dll and the main-executable (DLL_SELF).  */
+  dll *d = (type != DLL_LOAD) ? dlls.find_by_modname (modname) : dlls[ntname];
   if (d)
     {
       /* We only get here in the forkee. */
@@ -339,7 +340,8 @@ dll_list::alloc (HINSTANCE h, per_process *p, dll_type type)
       d->modname = d->ntname + (modname - ntname);
       d->handle = h;
       d->count = 0;	/* Reference counting performed in dlopen/dlclose. */
-      d->has_dtors = true;
+      /* DLL_SELF dtors (main-executable, cygwin1.dll) are run elsewhere */
+      d->has_dtors = type != DLL_SELF;
       d->p = p;
       d->ndeps = 0;
       d->deps = NULL;
@@ -526,7 +528,7 @@ dll_list::find (void *retaddr)
 
   dll *d = &start;
   while ((d = d->next))
-    if (d->handle == h)
+    if (d->type != DLL_SELF && d->handle == h)
       break;
   return d;
 }
@@ -566,11 +568,22 @@ dll_list::detach (void *retaddr)
 void
 dll_list::init ()
 {
+  track_self ();
+
   /* Walk the dll chain, initializing each dll */
   dll *d = &start;
   dll_global_dtors_recorded = d->next != NULL;
   while ((d = d->next))
-    d->init ();
+    if (d->type != DLL_SELF) /* linked and early loaded dlls */
+      d->init ();
+}
+
+void
+dll_list::track_self ()
+{
+  /* for cygwin1.dll and main-executable: maintain hardlinks only */
+  alloc (cygwin_hmodule, user_data, DLL_SELF);
+  main_executable = alloc (GetModuleHandle (NULL), user_data, DLL_SELF);
 }
 
 #define A64K (64 * 1024)
@@ -637,7 +650,7 @@ dll_list::reserve_space ()
 
 /* Reload DLLs after a fork.  Iterates over the list of dynamically loaded
    DLLs and attempts to load them in the same place as they were loaded in the
-   parent. */
+   parent.  Updates main-executable and cygwin1.dll tracking. */
 void
 dll_list::load_after_fork (HANDLE parent)
 {
@@ -647,6 +660,7 @@ dll_list::load_after_fork (HANDLE parent)
   in_load_after_fork = true;
   if (reload_on_fork)
     load_after_fork_impl (parent, dlls.istart (DLL_LOAD), 0);
+  track_self ();
   in_load_after_fork = false;
 }
 

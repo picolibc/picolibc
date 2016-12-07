@@ -40,6 +40,7 @@ struct per_module
 typedef enum
 {
   DLL_NONE,
+  DLL_SELF, /* main-program.exe, cygwin1.dll */
   DLL_LINK,
   DLL_LOAD,
   DLL_ANY
@@ -75,6 +76,8 @@ struct dll
 
 class dll_list
 {
+  void track_self ();
+
   dll *end;
   dll *hold;
   dll_type hold_type;
@@ -94,6 +97,7 @@ public:
     return nt_max_path_buffer;
   }
 
+  dll *main_executable;
   dll start;
   int loaded_dlls;
   int reload_on_fork;

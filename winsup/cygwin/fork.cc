@@ -175,7 +175,7 @@ frok::child (volatile char * volatile here)
   if (fixup_shms_after_fork ())
     api_fatal ("recreate_shm areas after fork failed");
 
-  /* load dynamic dlls, if any */
+  /* load dynamic dlls, if any, re-track main-executable and cygwin1.dll */
   dlls.load_after_fork (hParent);
 
   cygheap->fdtab.fixup_after_fork (hParent);
@@ -310,11 +310,20 @@ frok::parent (volatile char * volatile stack_here)
 
   while (1)
     {
+      PCWCHAR forking_progname = NULL;
+      if (dlls.main_executable)
+        forking_progname = dll_list::buffered_shortname
+			   (dlls.main_executable->ntname);
+      if (!forking_progname || !*forking_progname)
+	forking_progname = myself->progname;
+
       syscall_printf ("CreateProcessW (%W, %W, 0, 0, 1, %y, 0, 0, %p, %p)",
-		      myself->progname, myself->progname, c_flags, &si, &pi);
+		      forking_progname, myself->progname, c_flags, &si, &pi);
 
       hchild = NULL;
-      rc = CreateProcessW (myself->progname,	/* image to run */
+      /* cygwin1.dll may reuse the forking_progname buffer, even
+	 in case of failure: don't reuse forking_progname later */
+      rc = CreateProcessW (forking_progname,	/* image to run */
 			   GetCommandLineW (),	/* Take same space for command
 						   line as in parent to make
 						   sure child stack is allocated
