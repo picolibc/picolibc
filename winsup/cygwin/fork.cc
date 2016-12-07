@@ -30,8 +30,13 @@ details. */
 /* FIXME: Once things stabilize, bump up to a few minutes.  */
 #define FORK_WAIT_TIMEOUT (300 * 1000)     /* 300 seconds */
 
+static int dofork (bool *with_forkables);
 class frok
 {
+  frok (bool *forkables)
+    : with_forkables (forkables)
+  {}
+  bool *with_forkables;
   bool load_dlls;
   child_info_fork ch;
   const char *errmsg;
@@ -41,7 +46,7 @@ class frok
   int __stdcall parent (volatile char * volatile here);
   int __stdcall child (volatile char * volatile here);
   bool error (const char *fmt, ...);
-  friend int fork ();
+  friend int dofork (bool *with_forkables);
 };
 
 static void
@@ -308,6 +313,8 @@ frok::parent (volatile char * volatile stack_here)
   ch.refresh_cygheap ();
   ch.prefork ();	/* set up process tracking pipes. */
 
+  *with_forkables = dlls.setup_forkables (*with_forkables);
+
   while (1)
     {
       PCWCHAR forking_progname = NULL;
@@ -344,6 +351,7 @@ frok::parent (volatile char * volatile stack_here)
 	{
 	  this_errno = geterrno_from_win_error ();
 	  error ("CreateProcessW failed for '%W'", myself->progname);
+	  dlls.release_forkables ();
 	  memset (&pi, 0, sizeof (pi));
 	  goto cleanup;
 	}
@@ -356,6 +364,8 @@ frok::parent (volatile char * volatile stack_here)
 
       CloseHandle (pi.hThread);
       hchild = pi.hProcess;
+
+      dlls.release_forkables ();
 
       /* Protect the handle but name it similarly to the way it will
 	 be called in subproc handling. */
@@ -523,7 +533,14 @@ cleanup:
 extern "C" int
 fork ()
 {
-  frok grouped;
+  bool with_forkables = true;
+  return dofork (&with_forkables);
+}
+
+static int
+dofork (bool *with_forkables)
+{
+  frok grouped (with_forkables);
 
   debug_printf ("entering");
   grouped.load_dlls = 0;

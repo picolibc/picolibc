@@ -25,6 +25,7 @@ details. */
 #include "cygtls.h"
 #include "tls_pbuf.h"
 #include "child_info.h"
+#include "dll_init.h"
 
 class pinfo_basic: public _pinfo
 {
@@ -216,6 +217,8 @@ pinfo::exit (DWORD n)
   int exitcode = self->exitcode & 0xffff;
   if (!self->cygstarted)
     exitcode = ((exitcode & 0xff) << 8) | ((exitcode >> 8) & 0xff);
+  sigproc_printf ("Calling dlls.cleanup_forkables n %y, exitcode %y", n, exitcode);
+  dlls.cleanup_forkables ();
   sigproc_printf ("Calling ExitProcess n %y, exitcode %y", n, exitcode);
   if (!TerminateProcess (GetCurrentProcess (), exitcode))
     system_printf ("TerminateProcess failed, %E");

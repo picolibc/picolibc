@@ -313,6 +313,7 @@ DLL_OFILES:= \
 	flock.o \
 	fnmatch.o \
 	fork.o \
+	forkable.o \
 	fts.o \
 	ftw.o \
 	getentropy.o \

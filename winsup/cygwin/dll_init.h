@@ -59,9 +59,15 @@ struct dll
   DWORD image_size;
   void* preferred_base;
   PWCHAR modname;
+  FILE_BASIC_INFORMATION fbi;
+  FILE_INTERNAL_INFORMATION fii;
+  PWCHAR forkable_ntname;
   WCHAR ntname[1]; /* must be the last data member */
+
   void detach ();
   int init ();
+  void nominate_forkable (PCWCHAR);
+  bool create_forkable ();
   void run_dtors ()
   {
     if (has_dtors)
@@ -76,7 +82,32 @@ struct dll
 
 class dll_list
 {
+  /* forkables */
+  enum
+    {
+      forkables_unknown,
+      forkables_impossible,
+      forkables_disabled,
+      forkables_needless,
+      forkables_needed,
+      forkables_created,
+    }
+    forkables_needs;
+  DWORD forkables_dirx_size;
+  PWCHAR forkables_dirx_ntname;
+  PWCHAR forkables_mutex_name;
+  HANDLE forkables_mutex;
   void track_self ();
+  size_t forkable_ntnamesize (dll_type, PCWCHAR fullntname, PCWCHAR modname);
+  void prepare_forkables_nomination ();
+  void update_forkables_needs ();
+  bool update_forkables ();
+  bool create_forkables ();
+  void denominate_forkables ();
+  bool close_mutex ();
+  void try_remove_forkables (PWCHAR dirbuf, size_t dirlen, size_t dirbufsize);
+  void set_forkables_inheritance (bool);
+  void request_forkables ();
 
   dll *end;
   dll *hold;
@@ -85,6 +116,11 @@ class dll_list
   /* Use this buffer under loader lock conditions only. */
   static WCHAR NO_COPY nt_max_path_buffer[NT_MAX_PATH];
 public:
+  static HANDLE ntopenfile (PCWCHAR ntname, NTSTATUS *pstatus = NULL,
+			    ULONG openopts = 0, ACCESS_MASK access = 0,
+			    HANDLE rootDir = NULL);
+  static bool read_fii (HANDLE fh, PFILE_INTERNAL_INFORMATION pfii);
+  static bool read_fbi (HANDLE fh, PFILE_BASIC_INFORMATION pfbi);
   static PWCHAR form_ntname (PWCHAR ntbuf, size_t bufsize, PCWCHAR name);
   static PWCHAR form_shortname (PWCHAR shortbuf, size_t bufsize, PCWCHAR name);
   static PWCHAR nt_max_path_buf ()
@@ -114,6 +150,20 @@ public:
   void topsort ();
   void topsort_visit (dll* d, bool goto_tail);
   void append (dll* d);
+
+  void release_forkables ();
+  void cleanup_forkables ();
+  bool setup_forkables (bool with_forkables)
+  {
+    if (forkables_needs == forkables_impossible)
+      return true; /* short cut to not retry fork */
+    /* Once used, always use forkables in current process chain. */
+    if (forkables_needs != forkables_unknown)
+      with_forkables = true;
+    if (with_forkables)
+      request_forkables ();
+    return with_forkables;
+  }
 
   dll *inext ()
   {

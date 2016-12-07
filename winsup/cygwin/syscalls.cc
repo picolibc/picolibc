@@ -670,8 +670,8 @@ check_dir_not_empty (HANDLE dir, path_conv &pc)
   return STATUS_SUCCESS;
 }
 
-NTSTATUS
-unlink_nt (path_conv &pc)
+static NTSTATUS
+_unlink_nt (path_conv &pc, bool shareable)
 {
   NTSTATUS status;
   HANDLE fh, fh_ro = NULL;
@@ -793,6 +793,9 @@ retry_open:
      bin so that it actually disappears from its directory even though its
      in use.  Otherwise, if opening doesn't fail, the file is not in use and
      we can go straight to setting the delete disposition flag.
+     However, while we have the file open with FILE_SHARE_DELETE, using
+     this file via another hardlink for anything other than DELETE by
+     concurrent processes fails. The 'shareable' argument is to prevent this.
 
      NOTE: The missing sharing modes FILE_SHARE_READ and FILE_SHARE_WRITE do
 	   NOT result in a STATUS_SHARING_VIOLATION, if another handle is
@@ -802,7 +805,10 @@ retry_open:
 	   will succeed.  So, apparently there is no reliable way to find out
 	   if a file is already open elsewhere for other purposes than
 	   reading and writing data.  */
-  status = NtOpenFile (&fh, access, &attr, &io, FILE_SHARE_DELETE, flags);
+  if (shareable)
+    status = STATUS_SHARING_VIOLATION;
+  else
+    status = NtOpenFile (&fh, access, &attr, &io, FILE_SHARE_DELETE, flags);
   /* STATUS_SHARING_VIOLATION is what we expect. STATUS_LOCK_NOT_GRANTED can
      be generated under not quite clear circumstances when trying to open a
      file on NFS with FILE_SHARE_DELETE only.  This has been observed with
@@ -1050,6 +1056,18 @@ out:
     stop_transaction (status, old_trans, trans);
   syscall_printf ("%S, return status = %y", pc.get_nt_native_path (), status);
   return status;
+}
+
+NTSTATUS
+unlink_nt (path_conv &pc)
+{
+  return _unlink_nt (pc, false);
+}
+
+NTSTATUS
+unlink_nt_shareable (path_conv &pc)
+{
+  return _unlink_nt (pc, true);
 }
 
 extern "C" int
