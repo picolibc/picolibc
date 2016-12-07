@@ -175,21 +175,18 @@ frok::child (volatile char * volatile here)
   if (fixup_shms_after_fork ())
     api_fatal ("recreate_shm areas after fork failed");
 
-  /* If we haven't dynamically loaded any dlls, just signal
-     the parent.  Otherwise, load all the dlls, tell the parent
-      that we're done, and wait for the parent to fill in the.
-      loaded dlls' data/bss. */
+  /* load dynamic dlls, if any */
+  dlls.load_after_fork (hParent);
+
+  cygheap->fdtab.fixup_after_fork (hParent);
+
+  /* If we haven't dynamically loaded any dlls, just signal the parent.
+     Otherwise, tell the parent that we've loaded all the dlls
+     and wait for the parent to fill in the loaded dlls' data/bss. */
   if (!load_dlls)
-    {
-      cygheap->fdtab.fixup_after_fork (hParent);
-      sync_with_parent ("performed fork fixup", false);
-    }
+    sync_with_parent ("performed fork fixup", false);
   else
-    {
-      dlls.load_after_fork (hParent);
-      cygheap->fdtab.fixup_after_fork (hParent);
-      sync_with_parent ("loaded dlls", true);
-    }
+    sync_with_parent ("loaded dlls", true);
 
   init_console_handler (myself->ctty > 0);
   ForceCloseHandle1 (fork_info->forker_finished, forker_finished);
@@ -303,8 +300,6 @@ frok::parent (volatile char * volatile stack_here)
   si.lpReserved2 = (LPBYTE) &ch;
   si.cbReserved2 = sizeof (ch);
 
-  syscall_printf ("CreateProcessW (%W, %W, 0, 0, 1, %y, 0, 0, %p, %p)",
-		  myself->progname, myself->progname, c_flags, &si, &pi);
   bool locked = __malloc_lock ();
 
   /* Remove impersonation */
@@ -315,6 +310,9 @@ frok::parent (volatile char * volatile stack_here)
 
   while (1)
     {
+      syscall_printf ("CreateProcessW (%W, %W, 0, 0, 1, %y, 0, 0, %p, %p)",
+		      myself->progname, myself->progname, c_flags, &si, &pi);
+
       hchild = NULL;
       rc = CreateProcessW (myself->progname,	/* image to run */
 			   GetCommandLineW (),	/* Take same space for command
