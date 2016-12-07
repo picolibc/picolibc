@@ -289,6 +289,19 @@ dll_list::find_by_modname (PCWCHAR modname)
   return NULL;
 }
 
+/* Look for a dll based on the ntname used
+   to dynamically reload in forked child. */
+dll *
+dll_list::find_by_forkedntname (PCWCHAR ntname)
+{
+  dll *d = &start;
+  while ((d = d->next) != NULL)
+    if (!wcscasecmp (ntname, d->forkedntname ()))
+      return d;
+
+  return NULL;
+}
+
 #define RETRIES 1000
 
 /* Allocate space for a dll struct. */
@@ -308,8 +321,11 @@ dll_list::alloc (HINSTANCE h, per_process *p, dll_type type)
   /* Already loaded?  For linked DLLs, only compare the basenames.  Linked
      DLLs are loaded using just the basename and the default DLL search path.
      The Windows loader picks up the first one it finds.
-     This also applies to cygwin1.dll and the main-executable (DLL_SELF).  */
-  dll *d = (type != DLL_LOAD) ? dlls.find_by_modname (modname) : dlls[ntname];
+     This also applies to cygwin1.dll and the main-executable (DLL_SELF).
+     When in_load_after_fork, dynamically loaded dll's are reloaded
+     using their parent's forkable_ntname, if available.  */
+  dll *d = (type != DLL_LOAD) ? dlls.find_by_modname (modname) :
+	   in_load_after_fork ? dlls.find_by_forkedntname (ntname) : dlls[ntname];
   if (d)
     {
       /* We only get here in the forkee. */
@@ -714,14 +730,16 @@ void dll_list::load_after_fork_impl (HANDLE parent, dll* d, int retries)
 	  fabort ("unable to release protective reservation (%p) for %W, %E",
 		  d->handle, d->ntname);
 
-	HMODULE h = LoadLibraryExW (buffered_shortname (d->ntname),
+	HMODULE h = LoadLibraryExW (buffered_shortname (d->forkedntname ()),
 				    NULL, DONT_RESOLVE_DLL_REFERENCES);
 	if (!h)
-	  fabort ("unable to create interim mapping for %W, %E", d->ntname);
+	  fabort ("unable to create interim mapping for %W (using %W), %E",
+		  d->ntname, buffered_shortname (d->forkedntname ()));
 	if (h != d->handle)
 	  {
-	    sigproc_printf ("%W loaded in wrong place: %p != %p",
-			    d->ntname, h, d->handle);
+	    sigproc_printf ("%W (using %W) loaded in wrong place: %p != %p",
+			    d->ntname, buffered_shortname (d->forkedntname ()),
+			    h, d->handle);
 	    FreeLibrary (h);
 	    PVOID reservation = reserve_at (d->ntname, h,
 					    d->handle, d->image_size);
@@ -732,8 +750,8 @@ void dll_list::load_after_fork_impl (HANDLE parent, dll* d, int retries)
 	    if (retries < DLL_RETRY_MAX)
 	      load_after_fork_impl (parent, d, retries+1);
 	    else
-	       fabort ("unable to remap %W to same address as parent (%p) - try running rebaseall",
-		       d->ntname, d->handle);
+	       fabort ("unable to remap %W (using %W) to same address as parent (%p) - try running rebaseall",
+		       d->ntname, buffered_shortname (d->forkedntname ()), d->handle);
 
 	    /* once the above returns all the dlls are mapped; release
 	       the reservation and continue unwinding */
@@ -761,20 +779,21 @@ void dll_list::load_after_fork_impl (HANDLE parent, dll* d, int retries)
 	  /* Free the library using our parent's handle: it's identical
 	     to ours or we wouldn't have gotten this far */
 	  if (!FreeLibrary (d->handle))
-	    fabort ("unable to unload interim mapping of %W, %E",
-		    d->ntname);
+	    fabort ("unable to unload interim mapping of %W (using %W), %E",
+		    d->ntname, buffered_shortname (d->forkedntname ()));
 	}
       /* cygwin1.dll - as linked dependency - may reuse the shortname
 	 buffer, even in case of failure: don't reuse shortname later */
-      HMODULE h = LoadLibraryW (buffered_shortname (d->ntname));
+      HMODULE h = LoadLibraryW (buffered_shortname (d->forkedntname ()));
       if (!h)
-	fabort ("unable to map %W, %E", d->ntname);
+	fabort ("unable to map %W (using %W), %E",
+		d->ntname, buffered_shortname (d->forkedntname ()));
       if (h != d->handle)
-	fabort ("unable to map %W to same address as parent: %p != %p",
-		d->ntname, d->handle, h);
+	fabort ("unable to map %W (using %W) to same address as parent: %p != %p",
+		d->ntname, buffered_shortname (d->forkedntname ()), d->handle, h);
       /* Fix OS reference count. */
       for (int cnt = 1; cnt < d->count; ++cnt)
-	LoadLibraryW (buffered_shortname (d->ntname));
+	LoadLibraryW (buffered_shortname (d->forkedntname ()));
     }
 }
 

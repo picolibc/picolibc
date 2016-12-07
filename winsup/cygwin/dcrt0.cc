@@ -601,7 +601,7 @@ child_info_fork::handle_fork ()
   myself->uid = cygheap->user.real_uid;
   myself->gid = cygheap->user.real_gid;
 
-  child_copy (parent, false,
+  child_copy (parent, false, silentfail (),
 	      "dll data", dll_data_start, dll_data_end,
 	      "dll bss", dll_bss_start, dll_bss_end,
 	      "user heap", cygheap->user_heap.base, cygheap->user_heap.ptr,
@@ -625,7 +625,7 @@ child_info_fork::handle_fork ()
 
   /* step 2 now that the dll has its heap filled in, we can fill in the
      user's data and bss since user_data is now filled out. */
-  child_copy (parent, false,
+  child_copy (parent, false, silentfail (),
 	      "data", user_data->data_start, user_data->data_end,
 	      "bss", user_data->bss_start, user_data->bss_end,
 	      NULL);

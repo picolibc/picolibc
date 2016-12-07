@@ -1101,7 +1101,10 @@ child_info_fork::abort (const char *fmt, ...)
     {
       va_list ap;
       va_start (ap, fmt);
-      strace_vprintf (SYSTEM, fmt, ap);
+      if (silentfail ())
+	strace_vprintf (DEBUG, fmt, ap);
+      else
+	strace_vprintf (SYSTEM, fmt, ap);
       TerminateProcess (GetCurrentProcess (), EXITCODE_FORK_FAILED);
     }
   if (retry > 0)

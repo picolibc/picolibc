@@ -315,12 +315,14 @@ frok::parent (volatile char * volatile stack_here)
 
   *with_forkables = dlls.setup_forkables (*with_forkables);
 
+  ch.silentfail (!*with_forkables); /* fail silently without forkables */
+
   while (1)
     {
       PCWCHAR forking_progname = NULL;
       if (dlls.main_executable)
         forking_progname = dll_list::buffered_shortname
-			   (dlls.main_executable->ntname);
+			   (dlls.main_executable->forkedntname ());
       if (!forking_progname || !*forking_progname)
 	forking_progname = myself->progname;
 
@@ -444,7 +446,7 @@ frok::parent (volatile char * volatile stack_here)
       impure_beg = _impure_ptr;
       impure_end = _impure_ptr + 1;
     }
-  rc = child_copy (hchild, true,
+  rc = child_copy (hchild, true, !*with_forkables,
 		   "stack", stack_here, ch.stackbase,
 		   impure, impure_beg, impure_end,
 		   NULL);
@@ -462,7 +464,7 @@ frok::parent (volatile char * volatile stack_here)
   for (dll *d = dlls.istart (DLL_LINK); d; d = dlls.inext ())
     {
       debug_printf ("copying data/bss of a linked dll");
-      if (!child_copy (hchild, true,
+      if (!child_copy (hchild, true, !*with_forkables,
 		       "linked dll data", d->p.data_start, d->p.data_end,
 		       "linked dll bss", d->p.bss_start, d->p.bss_end,
 		       NULL))
@@ -492,7 +494,7 @@ frok::parent (volatile char * volatile stack_here)
       for (dll *d = dlls.istart (DLL_LOAD); d; d = dlls.inext ())
 	{
 	  debug_printf ("copying data/bss for a loaded dll");
-	  if (!child_copy (hchild, true,
+	  if (!child_copy (hchild, true, !*with_forkables,
 			   "loaded dll data", d->p.data_start, d->p.data_end,
 			   "loaded dll bss", d->p.bss_start, d->p.bss_end,
 			   NULL))
@@ -539,7 +541,13 @@ cleanup:
 extern "C" int
 fork ()
 {
-  bool with_forkables = true;
+  bool with_forkables = false; /* do not force hardlinks on first try */
+  int res = dofork (&with_forkables);
+  if (res >= 0)
+    return res;
+  if (with_forkables)
+    return res; /* no need for second try when already enabled */
+  with_forkables = true; /* enable hardlinks for second try */
   return dofork (&with_forkables);
 }
 
@@ -613,6 +621,9 @@ dofork (bool *with_forkables)
     {
       if (!grouped.errmsg)
 	syscall_printf ("fork failed - child pid %d, errno %d", grouped.child_pid, grouped.this_errno);
+      else if (grouped.ch.silentfail ())
+	debug_printf ("child %d - %s, errno %d", grouped.child_pid,
+		       grouped.errmsg, grouped.this_errno);
       else
 	system_printf ("child %d - %s, errno %d", grouped.child_pid,
 		       grouped.errmsg, grouped.this_errno);
@@ -640,10 +651,10 @@ vfork ()
 /* Copy memory from one process to another. */
 
 bool
-child_copy (HANDLE hp, bool write, ...)
+child_copy (HANDLE hp, bool write, bool silentfail, ...)
 {
   va_list args;
-  va_start (args, write);
+  va_start (args, silentfail);
   static const char *huh[] = {"read", "write"};
 
   char *what;
@@ -669,10 +680,14 @@ child_copy (HANDLE hp, bool write, ...)
 	    {
 	      if (!res)
 		__seterrno ();
-	      /* If this happens then there is a bug in our fork
-		 implementation somewhere. */
-	      system_printf ("%s %s copy failed, %p..%p, done %lu, windows pid %u, %E",
-			    what, huh[write], low, high, done, myself->dwProcessId);
+	      if (silentfail)
+		debug_printf ("%s %s copy failed, %p..%p, done %lu, windows pid %u, %E",
+			     what, huh[write], low, high, done, myself->dwProcessId);
+	      else
+		/* If this happens then there is a bug in our fork
+		   implementation somewhere. */
+		system_printf ("%s %s copy failed, %p..%p, done %lu, windows pid %u, %E",
+			      what, huh[write], low, high, done, myself->dwProcessId);
 	      goto err;
 	    }
 	}
