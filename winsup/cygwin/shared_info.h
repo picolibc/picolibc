@@ -33,7 +33,7 @@ public:
 /* Data accessible to all tasks */
 
 
-#define CURR_SHARED_MAGIC 0x6758de88U
+#define CURR_SHARED_MAGIC 0x3a6025edU
 
 #define USER_VERSION   1
 
@@ -51,6 +51,7 @@ class shared_info
   mtinfo mt;
   loadavginfo loadavg;
   LONG pid_src;
+  char prefer_forkable_hardlinks; /* single byte access always is atomic */
 
   void initialize ();
   void init_obcaseinsensitive ();
