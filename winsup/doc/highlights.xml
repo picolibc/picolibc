@@ -195,6 +195,47 @@ difficult to implement correctly.  Currently, the Cygwin fork is a
 non-copy-on-write implementation similar to what was present in early
 flavors of UNIX.</para>
 
+<para>As the child process is created as new process, both the main
+executable and all the dlls loaded either statically or dynamically have
+to be identical as to when the parent process has started or loaded a dll.
+While Windows does not allow to remove binaries in use from the file
+system, they still can be renamed or moved into the recycle bin, as
+outlined for unlink(2) in <xref linkend="ov-new1.7-file"></xref>.
+To allow an existing process to fork, the original binary files need to be
+available via their original file names, but they may reside in
+different directories when using the <ulink
+url="https://social.msdn.microsoft.com/search/en-US?query=dotlocal%20dll%20redirection"
+>DotLocal (.local) Dll Redirection</ulink> feature.
+Since NTFS does support hardlinks, when the fork fails we try again, but
+create a private directory containing hardlinks to the original files as
+well as the .local file now.  The private directory for the hardlinks is
+/var/run/cygfork/, which you have to create manually for now if you need to
+protect fork against exe- and dll- updates on your Cygwin instance.  As
+hardlinks cannot be used across multiple NTFS file systems, please make sure
+your exe- and dll- replacing operations operate on the same single NTFS file
+system as your Cygwin instance and the /var/run/cygfork/ directory.</para>
+
+<para>We create one directory per user, application and application age,
+and remove it when no more processes use that directory.  To indicate
+whether a directory still is in use, we define a mutex name similar to
+the directory name.  As mutexes are destroyed when no process holds a
+handle open any more, we can clean up even after power loss or similar:
+Both the parent and child process, at exit they lock the mutex with
+almost no timeout and close it, to get the closure promoted synchronously.
+If the lock succeeded before closing, directory cleanup is started:
+For each directory found, the corresponding mutex is created with lock.
+If that succeeds, the directory is removed, as it is unused now, and the
+corresponding mutex handle is closed.</para>
+
+<para>Before fork, when about to create hardlinks for the first time, the
+mutex is opened and locked with infinite timeout, to wait for the cleanup
+that may run at the same time.  Once locked, the mutex is unlocked
+immediately, but the mutex handle stays open until exit, and the hardlinks
+are created.  It is fine for multiple processes to concurrently create
+the same hardlinks, as the result really should be identical.  Once the
+mutex is open, we can create more hardlinks within this one directory
+without the need to lock the mutex again.</para>
+
 <para>The first thing that happens when a parent process
 forks a child process is that the parent initializes a space in the
 Cygwin process table for the child.  It then creates a suspended
