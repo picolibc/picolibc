@@ -155,6 +155,11 @@ child, releases the mutex the child is waiting on and returns from the
 fork call.  Child wakes from blocking on mutex, recreates any mmapped
 areas passed to it via shared area and then returns from fork itself.
 </para>
+<para>When the executable or any dll in use by the parent was renamed or
+moved into the hidden recycle bin, fork retries with creating hardlinks
+for the old executable and any dll into per-user subdirectories in the
+/var/run/cygfork/ directory, when that one exists and resides on NTFS.
+</para>
 </answer></qandaentry>
 
 <qandaentry id="faq.api.globbing">
