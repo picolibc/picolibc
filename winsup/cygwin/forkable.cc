@@ -522,6 +522,11 @@ dll::create_forkable ()
 size_t
 dll_list::forkable_ntnamesize (dll_type type, PCWCHAR fullntname, PCWCHAR modname)
 {
+  /* per process, this is the first forkables-method ever called */
+  if (forkables_needs == forkables_unknown &&
+      !cygwin_shared->prefer_forkable_hardlinks)
+      forkables_needs = forkables_impossible; /* short cut */
+
   if (forkables_needs == forkables_impossible)
     return 0;
 
@@ -667,6 +672,7 @@ dll_list::update_forkables_needs ()
 	{
 	  debug_printf ("impossible, not on NTFS %W", fn.Buffer);
 	  forkables_needs = forkables_impossible;
+	  cygwin_shared->prefer_forkable_hardlinks = 0;
 	}
     }
 
@@ -1055,6 +1061,13 @@ dll_list::request_forkables ()
   update_forkables_needs ();
 
   set_forkables_inheritance (true);
+
+  if (forkables_needs == forkables_disabled)
+    {
+      /* we do not support (re-)enabling on the fly */
+      forkables_needs = forkables_impossible;
+      cygwin_shared->prefer_forkable_hardlinks = 0;
+    }
 
   if (forkables_needs <= forkables_needless)
     return;
