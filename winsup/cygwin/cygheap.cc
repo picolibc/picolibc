@@ -78,7 +78,8 @@ cygheap_fixup_in_child (bool execed)
 {
   cygheap_max = cygheap = (init_cygheap *) _cygheap_start;
   _csbrk ((char *) child_proc_info->cygheap_max - (char *) cygheap);
-  child_copy (child_proc_info->parent, false, "cygheap", cygheap, cygheap_max, NULL);
+  child_copy (child_proc_info->parent, false, child_proc_info->silentfail (),
+	      "cygheap", cygheap, cygheap_max, NULL);
   cygheap_init ();
   debug_fixup_after_fork_exec ();
   if (execed)

@@ -76,6 +76,10 @@ struct dll
 	p.run_dtors ();
       }
   }
+  PWCHAR forkedntname ()
+  {
+    return forkable_ntname && *forkable_ntname ? forkable_ntname : ntname;
+  }
 };
 
 #define MAX_DLL_BEFORE_INIT     100
@@ -98,6 +102,7 @@ class dll_list
   PWCHAR forkables_mutex_name;
   HANDLE forkables_mutex;
   void track_self ();
+  dll *find_by_forkedntname (PCWCHAR ntname);
   size_t forkable_ntnamesize (dll_type, PCWCHAR fullntname, PCWCHAR modname);
   void prepare_forkables_nomination ();
   void update_forkables_needs ();

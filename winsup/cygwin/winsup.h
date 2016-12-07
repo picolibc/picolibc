@@ -224,7 +224,7 @@ int __small_swprintf (PWCHAR dst, const WCHAR *fmt, ...);
 int __small_vswprintf (PWCHAR dst, const WCHAR *fmt, va_list ap);
 void multiple_cygwin_problem (const char *, uintptr_t, uintptr_t);
 
-bool child_copy (HANDLE, bool, ...);
+bool child_copy (HANDLE, bool, bool, ...);
 
 class path_conv;
 

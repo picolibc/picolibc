@@ -21,7 +21,8 @@ enum child_status
 {
   _CI_STRACED	 = 0x01,
   _CI_ISCYGWIN	 = 0x02,
-  _CI_SAW_CTRL_C = 0x04
+  _CI_SAW_CTRL_C = 0x04,
+  _CI_SILENTFAIL = 0x08
 };
 
 #define OPROC_MAGIC_MASK 0xff00ff00
@@ -36,7 +37,7 @@ enum child_status
 #define EXEC_MAGIC_SIZE sizeof(child_info)
 
 /* Change this value if you get a message indicating that it is out-of-sync. */
-#define CURR_CHILD_INFO_MAGIC 0xc96f5e9U
+#define CURR_CHILD_INFO_MAGIC 0x3ee00652U
 
 #define NPROCS	256
 
@@ -82,6 +83,7 @@ public:
   bool isstraced () const {return !!(flag & _CI_STRACED);}
   bool iscygwin () const {return !!(flag & _CI_ISCYGWIN);}
   bool saw_ctrl_c () const {return !!(flag & _CI_SAW_CTRL_C);}
+  bool silentfail () const {return !!(flag & _CI_SILENTFAIL);}
   void prefork (bool = false);
   void cleanup ();
   void postfork (pinfo& child)
@@ -90,6 +92,13 @@ public:
     wr_proc_pipe = NULL;
     child.set_rd_proc_pipe (rd_proc_pipe);
     rd_proc_pipe = NULL;
+  }
+  void silentfail (bool f)
+  {
+    if (f)
+      flag |= _CI_SILENTFAIL;
+    else
+      flag &= ~_CI_SILENTFAIL;
   }
 };
 
