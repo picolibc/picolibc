@@ -265,9 +265,17 @@ memcpy:
 
 	.macro mis_src_copy shift
 1:
+#ifdef __ARM_BIG_ENDIAN
+	lsls	r4, r4, \shift
+#else
 	lsrs	r4, r4, \shift
+#endif
 	ldr	r3, [r1], #4
+#ifdef __ARM_BIG_ENDIAN
+	lsrs	r5, r3, 32-\shift
+#else
 	lsls	r5, r3, 32-\shift
+#endif
 	orr	r4, r4, r5
 	str	r4, [r0], #4
 	mov	r4, r3
