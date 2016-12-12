@@ -34,9 +34,7 @@ and an API Reference at
 <ulink url="https://cygwin.com/cygwin-api/cygwin-api.html"/>.
 </para>
 <para>You can find documentation for the individual GNU tools at
-<ulink url="http://www.fsf.org/manual/"/>.  (You should read GNU manuals from
-a local mirror, check
-<ulink url="http://www.fsf.org/server/list-mirrors.html"/> for a list of them.)
+<ulink url="http://www.gnu.org/manual/"/>.
 </para>
 </answer></qandaentry>
 

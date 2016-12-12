@@ -1160,7 +1160,7 @@ domains. For example, you might want to use the <computeroutput>Domain
 Users</computeroutput> group instead.</para>
 
 <para>For more information on <command>setfacl</command>, see
-<ulink url="https://cygwin.com/cygwin-ug-net/using-utils.html#setfacl"/></para>
+<ulink url="https://cygwin.com/cygwin-ug-net/setfacl.html"/></para>
 </answer></qandaentry>
 
 <qandaentry id="faq.using.same-with-rhosts">

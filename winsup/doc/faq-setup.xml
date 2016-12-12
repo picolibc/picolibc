@@ -333,7 +333,7 @@ you will have to select it explicitly.  See
 <ulink url="https://cygwin.com/packages/"/> for a searchable list of available
 packages, or use <literal>cygcheck -p </literal> as described in the Cygwin
 User's Guide at
-<ulink url="https://cygwin.com/cygwin-ug-net/using-utils.html#cygcheck"/>.
+<ulink url="https://cygwin.com/cygwin-ug-net/cygcheck.html"/>.
 </para>
 <para>If you want to build programs, of course you'll need <literal>gcc</literal>,
 <literal>binutils</literal>, <literal>make</literal> and probably other packages from the
@@ -415,7 +415,7 @@ looking names, being encoded with their URLs
 <para>Of course, you can keep them around in case you want to reinstall a
 package. If you want to clean out only the outdated packages, Michael Chase
 has written a script called <literal>clean_setup.pl</literal>, available
-at <ulink url="ftp://cygwin.com/pub/cygwin/unsupported/clean_setup.pl" />.
+at <filename>unsupported/clean_setup.pl</filename> in a Cygwin mirror.
 </para>
 </answer></qandaentry>
 
@@ -576,7 +576,7 @@ installed are <literal>sshd</literal>, <literal>cron</literal>,
 that might be running in the background.  Exit the command prompt and ensure
 that no Cygwin processes remain.  Note: If you want to save your mount points for a later 
 reinstall, first save the output of <literal>mount -m</literal> as described at 
-<ulink url="https://cygwin.com/cygwin-ug-net/using-utils.html#mount"/>.
+<ulink url="https://cygwin.com/cygwin-ug-net/mount.html"/>.
 </para>
 </listitem>
 <listitem><para>If you installed <literal>cyglsa.dll</literal> by running the
@@ -704,7 +704,7 @@ the Cygwin Setup homepage at
 <answer>
 
 <para>While some users have successfully done this, for example Indiana
-University's XLiveCD <ulink url="http://xlivecd.indiana.edu/"/>, there is no
+University's XLiveCD <ulink url="http://racinfo.indiana.edu/research/xlivecd.php"/>, there is no
 easy way to do it. Full instructions for constructing a portable Cygwin
 on CD by hand can be found on the mailing list at
 <ulink url="https://www.cygwin.com/ml/cygwin/2003-07/msg01117.html"/>

@@ -56,9 +56,7 @@ Guide, an API Reference, mailing lists and archives.
 <para>You can find documentation for the individual GNU tools typically
 as man pages or info pages as part of the Cygwin net distribution.
 Additionally you can get the latest docs at
-<ulink url="http://www.gnu.org/manual/"/>.  (You should read GNU manuals from a
-local mirror.  Check <ulink url="http://www.gnu.org/server/list-mirrors.html"/>
-for a list of them.)
+<ulink url="http://www.gnu.org/manual"/>.
 </para>
 </answer></qandaentry>
 
