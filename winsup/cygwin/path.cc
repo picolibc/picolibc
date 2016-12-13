@@ -2810,6 +2810,13 @@ restart:
 	      || status == STATUS_NO_MEDIA_IN_DEVICE)
 	    {
 	      set_error (ENOENT);
+	      if (ext_tacked_on && !had_ext)
+		{
+		  *ext_here = '\0';
+		  ext_tacked_on = false;
+		  ext_here = NULL;
+		  extn = 0;
+		}
 	      goto file_not_symlink;
 	    }
 	  if (status != STATUS_OBJECT_NAME_NOT_FOUND
