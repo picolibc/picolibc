@@ -1608,4 +1608,10 @@ extern "C"
 
   }
 }
+
+/* There's a bug in ntsecapi.h (Mingw as well as MSFT).  SystemFunction036
+   is, in fact, a WINAPI function, but it's not defined as such.  Therefore
+   we have to do it correctly here.  *Strictly*, this is not ntdll... */
+#define RtlGenRandom SystemFunction036
+extern "C" BOOLEAN WINAPI RtlGenRandom (PVOID, ULONG);
 #endif

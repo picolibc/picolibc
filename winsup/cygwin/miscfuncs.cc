@@ -233,12 +233,6 @@ check_iovec (const struct iovec *iov, int iovcnt, bool forwrite)
   return -1;
 }
 
-/* There's a bug in ntsecapi.h (Mingw as well as MSFT).  SystemFunction036
-   is, in fact, a WINAPI function, but it's not defined as such.  Therefore
-   we have to do it correctly here. */
-#define RtlGenRandom SystemFunction036
-extern "C" BOOLEAN WINAPI RtlGenRandom (PVOID, ULONG);
-
 /* Used by arc2random, fhandler_socket and fhandler_random. */
 extern "C" int
 getentropy (void *ptr, size_t len)

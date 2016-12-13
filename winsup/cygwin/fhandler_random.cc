@@ -47,16 +47,26 @@ fhandler_dev_random::write (const void *ptr, size_t len)
     }
 
   /* Limit len to a value <= 4096 since we don't want to overact.
-     Copy to local buffer because CryptGenRandom violates const. */
+     Copy to local buffer because RtlGenRandom violates const. */
   size_t limited_len = MIN (len, 4096);
   unsigned char buf[limited_len];
-  memcpy (buf, ptr, limited_len);
 
   /* Mess up system entropy source. Return error if device is /dev/random. */
-  if (getentropy (buf, limited_len) && dev () == FH_RANDOM)
-    return -1;
-  /* Mess up the pseudo random number generator. */
-  pseudo_write (buf, limited_len);
+  __try
+    {
+      memcpy (buf, ptr, limited_len);
+      if (!RtlGenRandom (buf, limited_len) && dev () == FH_RANDOM)
+	return -1;
+      /* Mess up the pseudo random number generator. */
+      pseudo_write (buf, limited_len);
+    }
+  __except (EFAULT)
+    {
+      len = -1;
+    }
+  __endtry
+  /* Note that we return len, not limited_len.  No reason to confuse the
+     caller... */
   return len;
 }
 
@@ -88,32 +98,40 @@ fhandler_dev_random::read (void *ptr, size_t& len)
       return;
     }
 
-  /* /dev/random has to provide high quality random numbers.  Therefore we
-     re-seed the system PRNG for each block of 512 bytes.  This results in
-     sufficiently random sequences, comparable to the Linux /dev/random. */
-  if (dev () == FH_RANDOM)
+  __try
     {
-      void *dummy = malloc (RESEED_INTERVAL);
-      if (!dummy)
+      /* /dev/random has to provide high quality random numbers.  Therefore we
+	 re-seed the system PRNG for each block of 512 bytes.  This results in
+	 sufficiently random sequences, comparable to the Linux /dev/random. */
+      if (dev () == FH_RANDOM)
 	{
-	  __seterrno ();
-	  len = (size_t) -1;
-	  return;
-	}
-      for (size_t offset = 0; offset < len; offset += 512)
-	{
-	  if (getentropy (dummy, RESEED_INTERVAL) ||
-	      getentropy ((PBYTE) ptr + offset, len - offset))
+	  void *dummy = malloc (RESEED_INTERVAL);
+	  if (!dummy)
 	    {
+	      __seterrno ();
 	      len = (size_t) -1;
-	      break;
+	      return;
 	    }
+	  for (size_t offset = 0; offset < len; offset += 512)
+	    {
+	      if (!RtlGenRandom (dummy, RESEED_INTERVAL) ||
+		  !RtlGenRandom ((PBYTE) ptr + offset, len - offset))
+		{
+		  len = (size_t) -1;
+		  break;
+		}
+	    }
+	  free (dummy);
 	}
-      free (dummy);
-    }
 
-  /* If device is /dev/urandom, just use system RNG as is, with our own
-     PRNG as fallback. */
-  else if (getentropy (ptr, len))
-    len = pseudo_read (ptr, len);
+      /* If device is /dev/urandom, just use system RNG as is, with our own
+	 PRNG as fallback. */
+      else if (!RtlGenRandom (ptr, len))
+	len = pseudo_read (ptr, len);
+    }
+  __except (EFAULT)
+    {
+      len = (size_t) -1;
+    }
+  __endtry
 }
