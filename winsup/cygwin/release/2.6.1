@@ -31,3 +31,10 @@ Bug Fixes
 
 - Fix path handling of ".//" sequences.
   Addresses: https://cygwin.com/ml/cygwin/2016-11/msg00295.html
+
+- cygwin_conv_path/cygwin_create_path now also check for .exe suffix when
+  converting a POSIX path to Windows notation.
+
+- Address Windows bug in path conversion on network shares for non-existing
+  paths.
+  Addresses: https://cygwin.com/ml/cygwin-developers/2016-12/msg00008.html
