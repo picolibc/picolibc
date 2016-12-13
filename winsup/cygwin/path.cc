@@ -3310,7 +3310,7 @@ cygwin_conv_path (cygwin_conv_path_t what, const void *from, void *to,
 	    p.check ((const char *) from,
 		     PC_POSIX | PC_SYM_FOLLOW | PC_SYM_NOFOLLOW_REP
 		     | PC_NO_ACCESS_CHECK | PC_NOWARN
-		     | ((how & CCP_RELATIVE) ? PC_NOFULL : 0));
+		     | ((how & CCP_RELATIVE) ? PC_NOFULL : 0), stat_suffixes);
 	    if (p.error)
 	      {
 	        set_errno (p.error);
@@ -3355,7 +3355,7 @@ cygwin_conv_path (cygwin_conv_path_t what, const void *from, void *to,
 	  p.check ((const char *) from,
 		   PC_POSIX | PC_SYM_FOLLOW | PC_SYM_NOFOLLOW_REP
 		   | PC_NO_ACCESS_CHECK | PC_NOWARN
-		   | ((how & CCP_RELATIVE) ? PC_NOFULL : 0));
+		   | ((how & CCP_RELATIVE) ? PC_NOFULL : 0), stat_suffixes);
 	  if (p.error)
 	    {
 	      set_errno (p.error);
