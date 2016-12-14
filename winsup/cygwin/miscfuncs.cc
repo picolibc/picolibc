@@ -8,6 +8,7 @@ details. */
 
 #include "winsup.h"
 #include "miscfuncs.h"
+#include <ntsecapi.h>
 #include <sys/uio.h>
 #include <assert.h>
 #include <alloca.h>

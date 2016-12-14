@@ -21,6 +21,7 @@
 #undef u_long
 #define u_long __ms_u_long
 #endif
+#include <ntsecapi.h>
 #include <ws2tcpip.h>
 #include <mswsock.h>
 #include <iphlpapi.h>
