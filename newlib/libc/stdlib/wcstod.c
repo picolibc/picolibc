@@ -274,9 +274,14 @@ float
 wcstof_l (const wchar_t *__restrict nptr, wchar_t **__restrict endptr,
 	  locale_t loc)
 {
-  double retval = _wcstod_l (_REENT, nptr, endptr, loc);
-  if (isnan (retval))
+  double val = _wcstod_l (_REENT, nptr, endptr, loc);
+  if (isnan (val))
     return nanf (NULL);
+  float retval = (float) val;
+#ifndef NO_ERRNO
+  if (isinf (retval) && !isinf (val))
+    _REENT->_errno = ERANGE;
+#endif
   return (float)retval;
 }
 
@@ -285,9 +290,15 @@ _DEFUN (wcstof, (nptr, endptr),
 	_CONST wchar_t *__restrict nptr _AND
 	wchar_t **__restrict endptr)
 {
-  double retval = _wcstod_l (_REENT, nptr, endptr, __get_current_locale ());
-  if (isnan (retval))
+  double val = _wcstod_l (_REENT, nptr, endptr, __get_current_locale ());
+  if (isnan (val))
     return nanf (NULL);
+  float retval = (float) val;
+#ifndef NO_ERRNO
+  if (isinf (retval) && !isinf (val))
+    _REENT->_errno = ERANGE;
+#endif
+
   return (float)retval;
 }
 

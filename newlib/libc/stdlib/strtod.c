@@ -1293,9 +1293,14 @@ _DEFUN (strtod, (s00, se),
 float
 strtof_l (const char *__restrict s00, char **__restrict se, locale_t loc)
 {
-  double retval = _strtod_l (_REENT, s00, se, loc);
-  if (isnan (retval))
+  double val = _strtod_l (_REENT, s00, se, loc);
+  if (isnan (val))
     return nanf (NULL);
+  float retval = (float) val;
+#ifndef NO_ERRNO
+  if (isinf (retval) && !isinf (val))
+    _REENT->_errno = ERANGE;
+#endif
   return (float)retval;
 }
 
@@ -1304,9 +1309,14 @@ _DEFUN (strtof, (s00, se),
 	_CONST char *__restrict s00 _AND
 	char **__restrict se)
 {
-  double retval = _strtod_l (_REENT, s00, se, __get_current_locale ());
-  if (isnan (retval))
+  double val = _strtod_l (_REENT, s00, se, __get_current_locale ());
+  if (isnan (val))
     return nanf (NULL);
+  float retval = (float) val;
+#ifndef NO_ERRNO
+  if (isinf (retval) && !isinf (val))
+    _REENT->_errno = ERANGE;
+#endif
   return (float)retval;
 }
 
