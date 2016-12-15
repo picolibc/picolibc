@@ -55,7 +55,7 @@ _DEFUN(__smakebuf_r, (ptr, fp),
     {
       if (!(fp->_flags & __SSTR))
 	{
-	  fp->_flags |= __SNBF;
+	  fp->_flags = (fp->_flags & ~__SLBF) | __SNBF;
 	  fp->_bf._base = fp->_p = fp->_nbuf;
 	  fp->_bf._size = 1;
 	}
@@ -67,7 +67,7 @@ _DEFUN(__smakebuf_r, (ptr, fp),
       fp->_bf._base = fp->_p = (unsigned char *) p;
       fp->_bf._size = size;
       if (couldbetty && _isatty_r (ptr, fp->_file))
-	fp->_flags |= __SLBF;
+	fp->_flags = (fp->_flags & ~__SNBF) | __SLBF;
       fp->_flags |= flags;
     }
 }
