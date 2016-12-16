@@ -14,6 +14,7 @@ details. */
 #include <alloca.h>
 #include <limits.h>
 #include <sys/param.h>
+#include <sys/random.h>
 #include <wchar.h>
 #include "cygtls.h"
 #include "ntdll.h"
@@ -234,17 +235,60 @@ check_iovec (const struct iovec *iov, int iovcnt, bool forwrite)
   return -1;
 }
 
-/* Used by arc2random, fhandler_socket and fhandler_random. */
 extern "C" int
 getentropy (void *ptr, size_t len)
 {
-  if (!RtlGenRandom (ptr, len))
+  /* Per BSD man page: The maximum buffer size permitted is 256 bytes.
+     If buflen exceeds this, an error of EIO will be indicated. */
+  if (len > 256)
     {
-      debug_printf ("%E = RtlGenRandom()");
+      debug_printf ("len (%U) > 256", len);
       set_errno (EIO);
       return -1;
     }
+  __try
+    {
+      if (!RtlGenRandom (ptr, len))
+	{
+	  debug_printf ("RtlGenRandom() = FALSE");
+	  set_errno (EIO);
+	  return -1;
+	}
+    }
+  __except (EFAULT)
+    {
+      return -1;
+    }
+  __endtry
   return 0;
+}
+
+extern "C" ssize_t
+getrandom (void *ptr, size_t len, unsigned int flags)
+{
+  if (flags & ~(GRND_NONBLOCK | GRND_RANDOM))
+    {
+      debug_printf ("invalid flags: %y", flags);
+      set_errno (EINVAL);
+      return -1;
+    }
+  /* Max. bytes returned by Linux call. */
+  len = MAX (len, (flags & GRND_RANDOM) ? 512 : 33554431);
+  __try
+    {
+      if (!RtlGenRandom (ptr, len))
+	{
+	  debug_printf ("RtlGenRandom() = FALSE");
+	  set_errno (EIO);
+	  return -1;
+	}
+    }
+  __except (EFAULT)
+    {
+      return -1;
+    }
+  __endtry
+  return len;
 }
 
 /* Try hard to schedule another thread.  
