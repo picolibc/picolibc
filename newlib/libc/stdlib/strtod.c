@@ -1301,7 +1301,7 @@ strtof_l (const char *__restrict s00, char **__restrict se, locale_t loc)
   if (isinf (retval) && !isinf (val))
     _REENT->_errno = ERANGE;
 #endif
-  return (float)retval;
+  return retval;
 }
 
 float
@@ -1317,7 +1317,7 @@ _DEFUN (strtof, (s00, se),
   if (isinf (retval) && !isinf (val))
     _REENT->_errno = ERANGE;
 #endif
-  return (float)retval;
+  return retval;
 }
 
 #endif
