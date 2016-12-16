@@ -282,7 +282,7 @@ wcstof_l (const wchar_t *__restrict nptr, wchar_t **__restrict endptr,
   if (isinf (retval) && !isinf (val))
     _REENT->_errno = ERANGE;
 #endif
-  return (float)retval;
+  return retval;
 }
 
 float
@@ -299,7 +299,7 @@ _DEFUN (wcstof, (nptr, endptr),
     _REENT->_errno = ERANGE;
 #endif
 
-  return (float)retval;
+  return retval;
 }
 
 #endif
