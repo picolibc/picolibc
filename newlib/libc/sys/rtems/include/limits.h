@@ -69,7 +69,7 @@
 #define PAGESIZE                (1<<12)
 #define RTSIG_MAX               8
 #define SEM_NSEMS_MAX           256
-#define SEM_VALUE_MAX           32767
+#define SEM_VALUE_MAX           INT_MAX
 #define SIGQUEUE_MAX            32
 #define STREAM_MAX              8
 #define TIMER_MAX               32
