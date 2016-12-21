@@ -46,6 +46,7 @@ struct _Thread_queue_Queue {
 	struct _Ticket_lock_Control _Lock;
 	struct _Thread_queue_Heads *_heads;
 	struct _Thread_Control *_owner;
+	const char *_name;
 };
 
 struct _Mutex_Control {
@@ -72,22 +73,48 @@ struct _Futex_Control {
 
 #define _TICKET_LOCK_INITIALIZER { 0, 0 }
 
-#define _THREAD_QUEUE_INITIALIZER { _TICKET_LOCK_INITIALIZER, 0, 0 }
+#define _THREAD_QUEUE_INITIALIZER { _TICKET_LOCK_INITIALIZER, 0, 0, 0 }
+
+#define _THREAD_QUEUE_NAMED_INITIALIZER(_name) \
+    { _TICKET_LOCK_INITIALIZER, 0, 0, _name }
 
 #define _MUTEX_INITIALIZER { _THREAD_QUEUE_INITIALIZER }
 
+#define _MUTEX_NAMED_INITIALIZER(_name) \
+    { _THREAD_QUEUE_NAMED_INITIALIZER(_name) }
+
 #define _MUTEX_RECURSIVE_INITIALIZER { _MUTEX_INITIALIZER, 0 }
+
+#define _MUTEX_RECURSIVE_NAMED_INITIALIZER(_name) \
+    { _MUTEX_NAMED_INITIALIZER(_name), 0 }
 
 #define _CONDITION_INITIALIZER { _THREAD_QUEUE_INITIALIZER }
 
+#define _CONDITION_NAMED_INITIALIZER(_name) \
+    { _THREAD_QUEUE_NAMED_INITIALIZER(_name) }
+
 #define _SEMAPHORE_INITIALIZER(_count) { _THREAD_QUEUE_INITIALIZER, _count }
 
+#define _SEMAPHORE_NAMED_INITIALIZER(_name, _count) \
+    { _THREAD_QUEUE_NAMED_INITIALIZER(_name), _count }
+
 #define _FUTEX_INITIALIZER { _THREAD_QUEUE_INITIALIZER }
+
+#define _FUTEX_NAMED_INITIALIZER(_name) \
+    { _THREAD_QUEUE_NAMED_INITIALIZER(_name) }
 
 static __inline void
 _Mutex_Initialize(struct _Mutex_Control *_mutex)
 {
 	struct _Mutex_Control _init = _MUTEX_INITIALIZER;
+
+	*_mutex = _init;
+}
+
+static __inline void
+_Mutex_Initialize_named(struct _Mutex_Control *_mutex, const char *_name)
+{
+	struct _Mutex_Control _init = _MUTEX_NAMED_INITIALIZER(_name);
 
 	*_mutex = _init;
 }
@@ -115,6 +142,16 @@ _Mutex_recursive_Initialize(struct _Mutex_recursive_Control *_mutex)
 	*_mutex = _init;
 }
 
+static __inline void
+_Mutex_recursive_Initialize_named(struct _Mutex_recursive_Control *_mutex,
+    const char *_name)
+{
+	struct _Mutex_recursive_Control _init =
+	    _MUTEX_RECURSIVE_NAMED_INITIALIZER(_name);
+
+	*_mutex = _init;
+}
+
 void _Mutex_recursive_Acquire(struct _Mutex_recursive_Control *);
 
 int _Mutex_recursive_Acquire_timed(struct _Mutex_recursive_Control *,
@@ -135,6 +172,15 @@ static __inline void
 _Condition_Initialize(struct _Condition_Control *_cond)
 {
 	struct _Condition_Control _init = _CONDITION_INITIALIZER;
+
+	*_cond = _init;
+}
+
+static __inline void
+_Condition_Initialize_named(struct _Condition_Control *_cond,
+    const char *_name)
+{
+	struct _Condition_Control _init = _CONDITION_NAMED_INITIALIZER(_name);
 
 	*_cond = _init;
 }
@@ -170,6 +216,16 @@ _Semaphore_Initialize(struct _Semaphore_Control *_semaphore,
 	*_semaphore = _init;
 }
 
+static __inline void
+_Semaphore_Initialize_named(struct _Semaphore_Control *_semaphore,
+    const char *_name, unsigned int _count)
+{
+	struct _Semaphore_Control _init =
+	    _SEMAPHORE_NAMED_INITIALIZER(_name, _count);
+
+	*_semaphore = _init;
+}
+
 void _Semaphore_Wait(struct _Semaphore_Control *);
 
 void _Semaphore_Post(struct _Semaphore_Control *);
@@ -185,6 +241,14 @@ static __inline void
 _Futex_Initialize(struct _Futex_Control *_futex)
 {
 	struct _Futex_Control _init = _FUTEX_INITIALIZER;
+
+	*_futex = _init;
+}
+
+static __inline void
+_Futex_Initialize_named(struct _Futex_Control *_futex, const char *_name)
+{
+	struct _Futex_Control _init = _FUTEX_NAMED_INITIALIZER(_name);
 
 	*_futex = _init;
 }
