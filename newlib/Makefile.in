@@ -53,6 +53,8 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
+@HAVE_CRT0_TRUE@@HAVE_MULTISUBDIR_TRUE@@USE_LIBTOOL_FALSE@am__append_1 = $(BUILD_MULTISUBDIR)/$(CRT0)
+@HAVE_MULTISUBDIR_TRUE@@USE_LIBTOOL_FALSE@am__append_2 = $(BUILD_MULTISUBDIR)/libc.a $(BUILD_MULTISUBDIR)/libm.a
 subdir = .
 DIST_COMMON = NEWS README ChangeLog $(srcdir)/Makefile.in \
 	$(srcdir)/Makefile.am $(top_srcdir)/configure \
@@ -380,13 +382,14 @@ SUBDIRS = libc libm \
 tooldir = $(exec_prefix)/$(host_alias)
 toollibdir = $(tooldir)/lib$(MULTISUBDIR)
 AR_FLAGS = rc
+noinst_DATA = stmp-targ-include $(am__append_1) $(am__append_2)
 @USE_LIBTOOL_TRUE@toollib_LTLIBRARIES = libm.la \
 @USE_LIBTOOL_TRUE@	libc.la
 
 @USE_LIBTOOL_FALSE@toollib_LIBRARIES = libm.a \
 @USE_LIBTOOL_FALSE@	libc.a
 
-noinst_DATA = stmp-targ-include
+@HAVE_MULTISUBDIR_TRUE@@USE_LIBTOOL_FALSE@BUILD_MULTISUBDIR = $(builddir)$(MULTISUBDIR)
 toollib_DATA = $(CRT0) $(CRT1)
 
 # The functions ldexp, frexp and modf are traditionally supplied in
@@ -930,21 +933,36 @@ uninstall-am: uninstall-toollibDATA uninstall-toollibLIBRARIES \
 
 @USE_LIBTOOL_FALSE@libm.a: libm/libm.a
 @USE_LIBTOOL_FALSE@	rm -f $@
-@USE_LIBTOOL_FALSE@	ln libm/libm.a $@ >/dev/null 2>/dev/null || cp libm/libm.a $@
+@USE_LIBTOOL_FALSE@	ln $< $@ >/dev/null 2>/dev/null || cp $< $@
 
 @USE_LIBTOOL_FALSE@libm/libm.a: ; @true
 
+@HAVE_MULTISUBDIR_TRUE@$(BUILD_MULTISUBDIR):
+@HAVE_MULTISUBDIR_TRUE@	$(MKDIR_P) $@
+
+@HAVE_MULTISUBDIR_TRUE@$(BUILD_MULTISUBDIR)/crt0.o: $(CRT0_DIR)$(CRT0) $(BUILD_MULTISUBDIR)
+@HAVE_MULTISUBDIR_TRUE@	rm -f $@
+@HAVE_MULTISUBDIR_TRUE@	ln $< $@ >/dev/null 2>/dev/null || cp $< $@
+
+@HAVE_MULTISUBDIR_TRUE@$(BUILD_MULTISUBDIR)/libc.a: libc.a $(BUILD_MULTISUBDIR)
+@HAVE_MULTISUBDIR_TRUE@	rm -f $@ $(BUILD_MULTISUBDIR)/libg.a
+@HAVE_MULTISUBDIR_TRUE@	ln $< $@ >/dev/null 2>/dev/null || cp $< $@
+@HAVE_MULTISUBDIR_TRUE@	ln libg.a $(BUILD_MULTISUBDIR)/libg.a >/dev/null 2>/dev/null || \
+@HAVE_MULTISUBDIR_TRUE@	cp libg.a $(BUILD_MULTISUBDIR)/libg.a
+
+@HAVE_MULTISUBDIR_TRUE@$(BUILD_MULTISUBDIR)/libm.a: libm.a $(BUILD_MULTISUBDIR)
+@HAVE_MULTISUBDIR_TRUE@	rm -f $@
+@HAVE_MULTISUBDIR_TRUE@	ln $< $@ >/dev/null 2>/dev/null || cp $< $@
+
 crt0.o: $(CRT0_DIR)$(CRT0)
 	rm -f $@
-	ln $(CRT0_DIR)$(CRT0) $@ >/dev/null 2>/dev/null \
-	 || cp $(CRT0_DIR)$(CRT0) $@
+	ln $< $@ >/dev/null 2>/dev/null || cp $< $@
 
 $(CRT0_DIR)$(CRT0): ; @true
 
 crt1.o: $(CRT1_DIR)$(CRT1)
 	rm -f $@
-	ln $< $@ >/dev/null 2>/dev/null \
-	 || cp $< $@
+	ln $< $@ >/dev/null 2>/dev/null || cp $< $@
 
 $(CRT1_DIR)$(CRT1): ; @true
 

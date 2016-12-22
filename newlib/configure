@@ -632,7 +632,11 @@ CRT1_DIR
 CRT1
 CRT0_DIR
 CRT0
+HAVE_CRT0_FALSE
+HAVE_CRT0_TRUE
 EXTRA_DIRS
+HAVE_MULTISUBDIR_FALSE
+HAVE_MULTISUBDIR_TRUE
 HAVE_DOC_FALSE
 HAVE_DOC_TRUE
 subdirs
@@ -11776,7 +11780,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<_LT_EOF
-#line 11779 "configure"
+#line 11783 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -11882,7 +11886,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<_LT_EOF
-#line 11885 "configure"
+#line 11889 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -12157,18 +12161,40 @@ subdirs="$subdirs libm"
 
 
 if test -z "${with_multisubdir}"; then
+  have_multisubdir=no
   subdirs="$subdirs doc"
 
-  have_doc=yes
 else
-  have_doc=
+  have_multisubdir=yes
 fi
- if test x$have_doc = xyes; then
+ if test x$have_multisubdir = xno; then
   HAVE_DOC_TRUE=
   HAVE_DOC_FALSE='#'
 else
   HAVE_DOC_TRUE='#'
   HAVE_DOC_FALSE=
+fi
+
+
+# Some run-time support libraries provided by GCC (e.g. libgomp) use configure
+# checks to detect certain features, e.g. availability of thread-local storage.
+# The configure script generates a test program and tries to compile and link
+# it.  It should use target libraries and startfiles of the build tree if
+# available and not random ones from the installation prefix for this
+# procedure.  The search directories specified by -B are a bit special, see
+# for_each_path() in gcc.c of the GCC sources.  First a search is performed on
+# all search paths with the multilib directory appended (if desired), then a
+# second search is performed on demand with the base directory only.  For each
+# multilib there is a "newlib" subdirectory.  This directory is specified by a
+# -B option for the support libraries.  In order to find the newlib artifacts
+# (ctr0.o, libc.a, libg.a and libm.a) they must be located in a proper multilib
+# subdirectory withing the build directory.
+ if test x$have_multisubdir = xyes; then
+  HAVE_MULTISUBDIR_TRUE=
+  HAVE_MULTISUBDIR_FALSE='#'
+else
+  HAVE_MULTISUBDIR_TRUE='#'
+  HAVE_MULTISUBDIR_FALSE=
 fi
 
 
@@ -12188,6 +12214,14 @@ if test "x${have_crt0}" = "xyes"; then
   CRT0=crt0.o
   CRT0_DIR=libc/
 fi
+ if test x$have_crt0 = xyes; then
+  HAVE_CRT0_TRUE=
+  HAVE_CRT0_FALSE='#'
+else
+  HAVE_CRT0_TRUE='#'
+  HAVE_CRT0_FALSE=
+fi
+
 
 
 
@@ -12825,6 +12859,14 @@ Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${HAVE_DOC_TRUE}" && test -z "${HAVE_DOC_FALSE}"; then
   as_fn_error $? "conditional \"HAVE_DOC\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${HAVE_MULTISUBDIR_TRUE}" && test -z "${HAVE_MULTISUBDIR_FALSE}"; then
+  as_fn_error $? "conditional \"HAVE_MULTISUBDIR\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${HAVE_CRT0_TRUE}" && test -z "${HAVE_CRT0_FALSE}"; then
+  as_fn_error $? "conditional \"HAVE_CRT0\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${HAVE_LONG_DOUBLE_TRUE}" && test -z "${HAVE_LONG_DOUBLE_FALSE}"; then

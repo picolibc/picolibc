@@ -261,12 +261,27 @@ AC_CONFIG_SUBDIRS(libc)
 AC_CONFIG_SUBDIRS(libm)
 
 if test -z "${with_multisubdir}"; then
+  have_multisubdir=no
   AC_CONFIG_SUBDIRS(doc)
-  have_doc=yes
 else
-  have_doc=
+  have_multisubdir=yes
 fi
-AM_CONDITIONAL(HAVE_DOC, test x$have_doc = xyes)
+AM_CONDITIONAL(HAVE_DOC, test x$have_multisubdir = xno)
+
+# Some run-time support libraries provided by GCC (e.g. libgomp) use configure
+# checks to detect certain features, e.g. availability of thread-local storage.
+# The configure script generates a test program and tries to compile and link
+# it.  It should use target libraries and startfiles of the build tree if
+# available and not random ones from the installation prefix for this
+# procedure.  The search directories specified by -B are a bit special, see
+# for_each_path() in gcc.c of the GCC sources.  First a search is performed on
+# all search paths with the multilib directory appended (if desired), then a
+# second search is performed on demand with the base directory only.  For each
+# multilib there is a "newlib" subdirectory.  This directory is specified by a
+# -B option for the support libraries.  In order to find the newlib artifacts
+# (ctr0.o, libc.a, libg.a and libm.a) they must be located in a proper multilib
+# subdirectory withing the build directory.
+AM_CONDITIONAL(HAVE_MULTISUBDIR, test x$have_multisubdir = xyes)
 
 EXTRA_DIRS=
 case $host in
@@ -283,6 +298,7 @@ if test "x${have_crt0}" = "xyes"; then
   CRT0=crt0.o
   CRT0_DIR=libc/
 fi
+AM_CONDITIONAL(HAVE_CRT0, test x$have_crt0 = xyes)
 AC_SUBST(CRT0)
 AC_SUBST(CRT0_DIR)
 
