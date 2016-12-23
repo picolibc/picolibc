@@ -522,8 +522,9 @@ dist-info: $(INFO_DEPS)
 	done
 
 mostlyclean-aminfo:
-	-rm -rf libm.aux libm.cp libm.cps libm.fn libm.ky libm.kys libm.log libm.pg \
-	  libm.pgs libm.tmp libm.toc libm.tp libm.tps libm.vr libm.vrs
+	-rm -rf libm.aux libm.cp libm.cps libm.fn libm.fns libm.ky libm.kys \
+	  libm.log libm.pg libm.pgs libm.tmp libm.toc libm.tp libm.tps \
+	  libm.vr libm.vrs
 
 clean-aminfo:
 	-test -z "libm.dvi libm.pdf libm.ps libm.html" \

@@ -653,8 +653,9 @@ dist-info: $(INFO_DEPS)
 	done
 
 mostlyclean-aminfo:
-	-rm -rf libc.aux libc.cp libc.cps libc.fn libc.ky libc.kys libc.log libc.pg \
-	  libc.pgs libc.tmp libc.toc libc.tp libc.tps libc.vr libc.vrs
+	-rm -rf libc.aux libc.cp libc.cps libc.fn libc.fns libc.ky libc.kys \
+	  libc.log libc.pg libc.pgs libc.tmp libc.toc libc.tp libc.tps \
+	  libc.vr libc.vrs
 
 clean-aminfo:
 	-test -z "libc.dvi libc.pdf libc.ps libc.html" \

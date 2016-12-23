@@ -74,6 +74,7 @@ am_lib_a_OBJECTS = lib_a-memchr-stub.$(OBJEXT) lib_a-memchr.$(OBJEXT) \
 	lib_a-memcpy-stub.$(OBJEXT) lib_a-memcpy.$(OBJEXT) \
 	lib_a-memmove-stub.$(OBJEXT) lib_a-memmove.$(OBJEXT) \
 	lib_a-memset-stub.$(OBJEXT) lib_a-memset.$(OBJEXT) \
+	lib_a-rawmemchr.$(OBJEXT) lib_a-rawmemchr-stub.$(OBJEXT) \
 	lib_a-setjmp.$(OBJEXT) lib_a-stpcpy-stub.$(OBJEXT) \
 	lib_a-stpcpy.$(OBJEXT) lib_a-strchr-stub.$(OBJEXT) \
 	lib_a-strchr.$(OBJEXT) lib_a-strchrnul-stub.$(OBJEXT) \
@@ -83,8 +84,7 @@ am_lib_a_OBJECTS = lib_a-memchr-stub.$(OBJEXT) lib_a-memchr.$(OBJEXT) \
 	lib_a-strlen.$(OBJEXT) lib_a-strncmp-stub.$(OBJEXT) \
 	lib_a-strncmp.$(OBJEXT) lib_a-strnlen-stub.$(OBJEXT) \
 	lib_a-strnlen.$(OBJEXT) lib_a-strrchr-stub.$(OBJEXT) \
-	lib_a-strrchr.$(OBJEXT) lib_a-rawmemchr-stub.$(OBJEXT) \
-	lib_a-rawmemchr.$(OBJEXT)
+	lib_a-strrchr.$(OBJEXT)
 lib_a_OBJECTS = $(am_lib_a_OBJECTS)
 DEFAULT_INCLUDES = -I.@am__isrc@
 depcomp =
@@ -212,11 +212,11 @@ AM_CCASFLAGS = $(INCLUDES)
 noinst_LIBRARIES = lib.a
 lib_a_SOURCES = memchr-stub.c memchr.S memcmp-stub.c memcmp.S \
 	memcpy-stub.c memcpy.S memmove-stub.c memmove.S memset-stub.c \
-	memset.S setjmp.S stpcpy-stub.c stpcpy.S strchr-stub.c \
-	strchr.S strchrnul-stub.c strchrnul.S strcmp-stub.c strcmp.S \
-	strcpy-stub.c strcpy.S strlen-stub.c strlen.S strncmp-stub.c \
-	strncmp.S strnlen-stub.c strnlen.S strrchr-stub.c strrchr.S \
-	rawmemchr.S rawmemchr-stub.c
+	memset.S rawmemchr.S rawmemchr-stub.c setjmp.S stpcpy-stub.c \
+	stpcpy.S strchr-stub.c strchr.S strchrnul-stub.c strchrnul.S \
+	strcmp-stub.c strcmp.S strcpy-stub.c strcpy.S strlen-stub.c \
+	strlen.S strncmp-stub.c strncmp.S strnlen-stub.c strnlen.S \
+	strrchr-stub.c strrchr.S
 lib_a_CCASFLAGS = $(AM_CCASFLAGS)
 lib_a_CFLAGS = $(AM_CFLAGS)
 ACLOCAL_AMFLAGS = -I ../../.. -I ../../../..
@@ -279,13 +279,6 @@ distclean-compile:
 .S.obj:
 	$(CPPASCOMPILE) -c -o $@ `$(CYGPATH_W) '$<'`
 
-
-lib_a-rawmemchr.o: rawmemchr.S
-	$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-rawmemchr.o `test -f 'rawmemchr.S' || echo '$(srcdir)/'`rawmemchr.S
-
-lib_a-rawmemchr.obj: rawmemchr.S
-	$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-rawmemchr.obj `if test -f 'rawmemchr.S'; then $(CYGPATH_W) 'rawmemchr.S'; else $(CYGPATH_W) '$(srcdir)/rawmemchr.S'; fi`
-
 lib_a-memchr.o: memchr.S
 	$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-memchr.o `test -f 'memchr.S' || echo '$(srcdir)/'`memchr.S
 
@@ -315,6 +308,12 @@ lib_a-memset.o: memset.S
 
 lib_a-memset.obj: memset.S
 	$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-memset.obj `if test -f 'memset.S'; then $(CYGPATH_W) 'memset.S'; else $(CYGPATH_W) '$(srcdir)/memset.S'; fi`
+
+lib_a-rawmemchr.o: rawmemchr.S
+	$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-rawmemchr.o `test -f 'rawmemchr.S' || echo '$(srcdir)/'`rawmemchr.S
+
+lib_a-rawmemchr.obj: rawmemchr.S
+	$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-rawmemchr.obj `if test -f 'rawmemchr.S'; then $(CYGPATH_W) 'rawmemchr.S'; else $(CYGPATH_W) '$(srcdir)/rawmemchr.S'; fi`
 
 lib_a-setjmp.o: setjmp.S
 	$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-setjmp.o `test -f 'setjmp.S' || echo '$(srcdir)/'`setjmp.S
@@ -382,12 +381,6 @@ lib_a-strrchr.obj: strrchr.S
 .c.obj:
 	$(COMPILE) -c `$(CYGPATH_W) '$<'`
 
-lib_a-rawmemchr-stub.o: rawmemchr-stub.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-rawmemchr-stub.o `test -f 'rawmemchr-stub.c' || echo '$(srcdir)/'`rawmemchr-stub.c
-
-lib_a-rawmemchr-stub.obj: rawmemchr-stub.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-rawmemchr-stub.obj `if test -f 'rawmemchr-stub.c'; then $(CYGPATH_W) 'rawmemchr-stub.c'; else $(CYGPATH_W) '$(srcdir)/rawmemchr-stub.c'; fi`
-
 lib_a-memchr-stub.o: memchr-stub.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-memchr-stub.o `test -f 'memchr-stub.c' || echo '$(srcdir)/'`memchr-stub.c
 
@@ -417,6 +410,12 @@ lib_a-memset-stub.o: memset-stub.c
 
 lib_a-memset-stub.obj: memset-stub.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-memset-stub.obj `if test -f 'memset-stub.c'; then $(CYGPATH_W) 'memset-stub.c'; else $(CYGPATH_W) '$(srcdir)/memset-stub.c'; fi`
+
+lib_a-rawmemchr-stub.o: rawmemchr-stub.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-rawmemchr-stub.o `test -f 'rawmemchr-stub.c' || echo '$(srcdir)/'`rawmemchr-stub.c
+
+lib_a-rawmemchr-stub.obj: rawmemchr-stub.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-rawmemchr-stub.obj `if test -f 'rawmemchr-stub.c'; then $(CYGPATH_W) 'rawmemchr-stub.c'; else $(CYGPATH_W) '$(srcdir)/rawmemchr-stub.c'; fi`
 
 lib_a-stpcpy-stub.o: stpcpy-stub.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-stpcpy-stub.o `test -f 'stpcpy-stub.c' || echo '$(srcdir)/'`stpcpy-stub.c
