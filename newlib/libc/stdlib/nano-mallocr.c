@@ -314,7 +314,7 @@ void * nano_malloc(RARG malloc_size_t s)
 
     if (offset)
     {
-        *(int *)((char *)r + offset) = -offset;
+        *(long *)((char *)r + offset) = -offset;
     }
 
     assert(align_ptr + size <= (char *)r + alloc_size);
@@ -587,7 +587,7 @@ void * nano_memalign(RARG size_t align, size_t s)
             /* Padding is used. Need to set a jump offset for aligned pointer
             * to get back to chunk head */
             assert(offset >= sizeof(int));
-            *(int *)((char *)chunk_p + offset) = -offset;
+            *(long *)((char *)chunk_p + offset) = -offset;
         }
     }
 
