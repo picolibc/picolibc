@@ -1,3 +1,9 @@
+2017-01-04  Alan Modra  <amodra@gmail.com>
+
+	* update-copyright.py: New file.
+	* add-log.el: Update copyright year range.
+	* texi2pod.pl: Likewise.
+
 2016-06-13  Nick Clifton  <nickc@redhat.com>
 
 	* texi2pod.pl: Escape curly braces, whilst searching for keyword
