@@ -32,7 +32,7 @@
 </funcprototype></funcsynopsis>
   </refsynopsisdiv>
 
-  <refsect1>
+  <refsect1 id="func-cygwin-attach-handle-to-fd-desc">
     <title>Description</title>
 <para>This function can be used to turn a Win32 "handle" into a
 posix-style file handle. <parameter>fd</parameter> may be -1 to
@@ -70,7 +70,7 @@ much.</para>
 </funcprototype></funcsynopsis>
   </refsynopsisdiv>
 
-  <refsect1>
+  <refsect1 id="func-cygwin-internal-desc">
     <title>Description</title>
 <para>This function gives you access to various internal data and functions.
 It takes two arguments.  The first argument is a type from the 'cygwin_getinfo_types'
@@ -103,7 +103,7 @@ enum.  The second is an optional pointer.</para>
 </funcprototype></funcsynopsis>
   </refsynopsisdiv>
 
-  <refsect1>
+  <refsect1 id="func-cygwin-stackdump-desc">
     <title>Description</title>
 <para> Outputs a stackdump to stderr from the called location.
 </para>

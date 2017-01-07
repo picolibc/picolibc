@@ -31,7 +31,7 @@
 </funcprototype></funcsynopsis>
   </refsynopsisdiv>
 
-  <refsect1>
+  <refsect1 id="func-cygwin-conv-path-desc">
     <title>Description</title>
 <para>Use this function to convert POSIX paths in
 <parameter>from</parameter> to Win32 paths in <parameter>to</parameter>
@@ -75,9 +75,9 @@ error and errno is set to one of the below values.</para>
 </programlisting>
   </refsect1>
 
-  <refsect1>
+  <refsect1 id="func-cygwin-conv-path-example">
     <title>Example</title>
-<example>
+<example id="func-cygwin-conv-path-example-example">
 <title>Example use of cygwin_conv_path</title>
 <programlisting>
 <![CDATA[
@@ -130,7 +130,7 @@ else
 </funcprototype></funcsynopsis>
   </refsynopsisdiv>
 
-  <refsect1>
+  <refsect1 id="func-cygwin-conv-path-list-desc">
     <title>Description</title>
 <para>This is the same as <function>cygwin_conv_path</function>, but the
 input is treated as a path list in $PATH or %PATH% notation.</para>
@@ -144,7 +144,7 @@ convert it to the equivalent POSIX $PATH-style string (i.e. /foo:/bar).</para>
 <parameter>to</parameter> in bytes.</para>
   </refsect1>
 
-<refsect1>
+<refsect1 id="func-cygwin-conv-path-list-also">
   <title>See also</title>
 <para>See also <link linkend="func-cygwin-conv-path">cygwin_conv_path</link></para>
   </refsect1>
@@ -174,7 +174,7 @@ convert it to the equivalent POSIX $PATH-style string (i.e. /foo:/bar).</para>
 </funcprototype></funcsynopsis>
   </refsynopsisdiv>
 
-  <refsect1>
+  <refsect1 id="func-cygwin-create-path-desc">
     <title>Description</title>
 <para>This is equivalent to the <function>cygwin_conv_path</function>, except
 that <function>cygwin_create_path</function> does not take a buffer pointer
@@ -192,7 +192,7 @@ errno can be set to the below value.</para>
 <function>free</function>(3) to deallocate it.</para>
   </refsect1>
 
-<refsect1>
+<refsect1 id="func-cygwin-create-path-also">
   <title>See also</title>
 <para>See also <link linkend="func-cygwin-conv-path">cygwin_conv_path</link></para>
   </refsect1>
@@ -221,7 +221,7 @@ errno can be set to the below value.</para>
 </funcprototype></funcsynopsis>
   </refsynopsisdiv>
 
-  <refsect1>
+  <refsect1 id="func-cygwin-posix-path-list-p-desc">
     <title>Description</title>
 <para>This function tells you if the supplied
 <parameter>path</parameter> is a POSIX-style path (i.e. posix names,
@@ -259,16 +259,16 @@ parameter.</para>
 </funcprototype></funcsynopsis>
   </refsynopsisdiv>
 
-  <refsect1>
+  <refsect1 id="func-cygwin-split-path-desc">
     <title>Description</title>
 <para>Split a path into the directory and the file portions.  Both
 <parameter>dir</parameter> and <parameter>file</parameter> are
 expected to point to buffers of sufficient size.  </para>
   </refsect1>
 
-  <refsect1>
+  <refsect1 id="func-cygwin-split-path-example">
     <title>Example</title>
-<example>
+<example id="func-cygwin-split-path-example-example">
 <title>Example use of cygwin_split_path</title>
 <programlisting>
 char dir[200], file[100];

@@ -29,7 +29,7 @@
 </funcprototype></funcsynopsis>
   </refsynopsisdiv>
 
-  <refsect1>
+  <refsect1 id="func-cygwin-logon_user-desc">
     <title>Description</title>
 <para>Given a pointer to a passwd entry of a user and a cleartext password,
 returns a HANDLE to an impersonation token for this user which can be used
@@ -38,7 +38,7 @@ to impersonate that user.  This function can only be called from a process
 which has the required NT user rights to perform a logon.</para>
   </refsect1>
 
-  <refsect1>
+  <refsect1 id="func-cygwin-logon_user-also">
     <title>See also</title>
 <para>See also the chapter
 <ulink url="../cygwin-ug-net/ntsec.html#ntsec-setuid-overview">Switching the user context</ulink>
@@ -71,7 +71,7 @@ in the Cygwin User's guide.</para>
 </funcprototype></funcsynopsis>
   </refsynopsisdiv>
 
-  <refsect1>
+  <refsect1 id="func-cygwin-set-impersonation-token-desc">
     <title>Description</title>
 <para>Use this function to enable the token given as parameter as
 impersonation token for the next call to <function>setuid</function> or
@@ -81,7 +81,7 @@ impersonation token for the next call to <function>setuid</function> or
 password authentication.</para>
   </refsect1>
 
-  <refsect1>
+  <refsect1 id="func-cygwin-set-impersonation-token-also">
     <title>See also</title>
 <para>See also the chapter
 <ulink url="../cygwin-ug-net/ntsec.html#ntsec-setuid-overview">Switching the user context</ulink>
