@@ -454,8 +454,8 @@ extern const struct __sFILE_fake __sf_fake_stderr;
     (var)->_stderr = (__FILE *)&__sf_fake_stderr; \
   }
 
-/* Only built the assert() calls if we are built with debugging.  */
-#if DEBUG
+/* Only add assert() calls if we are specified to debug.  */
+#ifdef _REENT_CHECK_DEBUG
 #include <assert.h>
 #define __reent_assert(x) assert(x)
 #else
