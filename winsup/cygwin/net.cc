@@ -925,6 +925,14 @@ cygwin_getsockopt (int fd, int level, int optname, void *optval,
 	  res = fh->getpeereid (&cred->pid, &cred->uid, &cred->gid);
 	  __leave;
 	}
+      else if (optname == SO_REUSEADDR && level == SOL_SOCKET)
+	{
+	  unsigned int *reuseaddr = (unsigned int *) optval;
+	  *reuseaddr = fh->saw_reuseaddr();
+	  *optlen = sizeof *reuseaddr;
+	  res = 0;
+	  __leave;
+	}
       /* Old applications still use the old WinSock1 IPPROTO_IP values. */
       if (level == IPPROTO_IP && CYGWIN_VERSION_CHECK_FOR_USING_WINSOCK1_VALUES)
 	optname = convert_ws1_ip_optname (optname);
