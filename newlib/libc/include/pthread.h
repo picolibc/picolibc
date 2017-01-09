@@ -170,6 +170,12 @@ int	_EXFUN(pthread_setschedprio, (pthread_t thread, int prio));
 
 #endif /* defined(_POSIX_THREAD_PRIORITY_SCHEDULING) */
 
+#if __GNU_VISIBLE
+int	pthread_getname_np(pthread_t, char *, size_t) __nonnull(2);
+
+int	pthread_setname_np(pthread_t, const char *) __nonnull(2);
+#endif
+
 #if defined(_POSIX_THREAD_PRIO_INHERIT) || defined(_POSIX_THREAD_PRIO_PROTECT)
 
 /* Mutex Initialization Scheduling Attributes, P1003.1c/Draft 10, p. 128 */
