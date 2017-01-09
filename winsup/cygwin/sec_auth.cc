@@ -993,7 +993,7 @@ out:
   pop_self_privilege ();
   if (token != INVALID_HANDLE_VALUE)
     CloseHandle (token);
-  if (privs)
+  if (privs && privs != (PTOKEN_PRIVILEGES) &sys_privs)
     free (privs);
   lsa_close_policy (lsa);
 
@@ -1229,7 +1229,7 @@ lsaauth (cygsid &usersid, user_groups &new_groups)
   user_token = get_full_privileged_inheritable_token (user_token);
 
 out:
-  if (privs)
+  if (privs && privs != (PTOKEN_PRIVILEGES) &sys_privs)
     free (privs);
   lsa_close_policy (lsa);
   if (lsa_hdl)
