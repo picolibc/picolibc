@@ -45,4 +45,6 @@ extern "C" char __stdcall **cur_environ ();
 char ** __reg3 build_env (const char * const *envp, PWCHAR &envblock,
 			  int &envc, bool need_envblock, HANDLE new_token);
 
+char ** __reg2 win32env_to_cygenv (PWCHAR rawenv, bool posify);
+
 #define ENV_CVT -1

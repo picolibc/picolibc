@@ -758,18 +758,12 @@ ucenv (char *p, const char *eq)
 void
 environ_init (char **envp, int envc)
 {
-  PWCHAR rawenv, w;
-  int i;
+  PWCHAR rawenv;
   char *p;
-  char *newp;
-  int sawTERM = 0;
   bool envp_passed_in;
-  static char NO_COPY cygterm[] = "TERM=cygwin";
-  tmp_pathbuf tp;
 
   __try
     {
-      char *tmpbuf = tp.t_get ();
       if (!envp)
 	envp_passed_in = 0;
       else
@@ -794,9 +788,6 @@ environ_init (char **envp, int envc)
 	  goto out;
 	}
 
-      /* Allocate space for environment + trailing NULL + CYGWIN env. */
-      lastenviron = envp = (char **) malloc ((4 + (envc = 100)) * sizeof (char *));
-
       rawenv = GetEnvironmentStringsW ();
       if (!rawenv)
 	{
@@ -805,32 +796,8 @@ environ_init (char **envp, int envc)
 	}
       debug_printf ("GetEnvironmentStrings returned %p", rawenv);
 
-      /* Current directory information is recorded as variables of the
-	 form "=X:=X:\foo\bar; these must be changed into something legal
-	 (we could just ignore them but maybe an application will
-	 eventually want to use them).  */
-      for (i = 0, w = rawenv; *w != L'\0'; w = wcschr (w, L'\0') + 1, i++)
-	{
-	  sys_wcstombs_alloc_no_path (&newp, HEAP_NOTHEAP, w);
-	  if (i >= envc)
-	    envp = (char **) realloc (envp, (4 + (envc += 100)) * sizeof (char *));
-	  envp[i] = newp;
-	  if (*newp == '=')
-	    *newp = '!';
-	  char *eq = strchrnul (newp, '=');
-	  ucenv (newp, eq);	/* uppercase env vars which need it */
-	  if (*newp == 'T' && strncmp (newp, "TERM=", 5) == 0)
-	    sawTERM = 1;
-	  else if (*newp == 'C' && strncmp (newp, "CYGWIN=", 7) == 0)
-	    parse_options (newp + 7);
-	  if (*eq)
-	    posify_maybe (envp + i, *++eq ? eq : --eq, tmpbuf);
-	  debug_printf ("%p: %s", envp[i], envp[i]);
-	}
+	  lastenviron = envp = win32env_to_cygenv (rawenv, true);
 
-      if (!sawTERM)
-	envp[i++] = strdup (cygterm);
-      envp[i] = NULL;
       FreeEnvironmentStringsW (rawenv);
 
     out:
@@ -850,6 +817,53 @@ environ_init (char **envp, int envc)
 		 "- too many environment variables?");
     }
   __endtry
+}
+
+
+char ** __reg2
+win32env_to_cygenv (PWCHAR rawenv, bool posify)
+{
+  tmp_pathbuf tp;
+  char **envp;
+  int envc;
+  char *newp;
+  int i;
+  int sawTERM = 0;
+  static char NO_COPY cygterm[] = "TERM=cygwin";
+  char *tmpbuf = tp.t_get ();
+  PWCHAR w;
+
+  /* Allocate space for environment + trailing NULL + CYGWIN env. */
+  envp = (char **) malloc ((4 + (envc = 100)) * sizeof (char *));
+
+  /* Current directory information is recorded as variables of the
+     form "=X:=X:\foo\bar; these must be changed into something legal
+     (we could just ignore them but maybe an application will
+     eventually want to use them).  */
+  for (i = 0, w = rawenv; *w != L'\0'; w = wcschr (w, L'\0') + 1, i++)
+    {
+      sys_wcstombs_alloc_no_path (&newp, HEAP_NOTHEAP, w);
+      if (i >= envc)
+        envp = (char **) realloc (envp, (4 + (envc += 100)) * sizeof (char *));
+      envp[i] = newp;
+      if (*newp == '=')
+        *newp = '!';
+      char *eq = strchrnul (newp, '=');
+      ucenv (newp, eq);    /* uppercase env vars which need it */
+      if (*newp == 'T' && strncmp (newp, "TERM=", 5) == 0)
+        sawTERM = 1;
+      else if (*newp == 'C' && strncmp (newp, "CYGWIN=", 7) == 0)
+        parse_options (newp + 7);
+      if (*eq && posify)
+        posify_maybe (envp + i, *++eq ? eq : --eq, tmpbuf);
+      debug_printf ("%p: %s", envp[i], envp[i]);
+    }
+
+  if (!sawTERM)
+    envp[i++] = strdup (cygterm);
+
+  envp[i] = NULL;
+  return envp;
 }
 
 /* Function called by qsort to sort environment strings.  */
