@@ -653,9 +653,9 @@ commune_process (void *arg)
 	else if (!WritePipeOverlapped (tothem, path, n, &nr, 1000L))
 	  sigproc_printf ("WritePipeOverlapped fd failed, %E");
 	break;
-	  }
-	case PICOM_ENVIRON:
-	  {
+      }
+    case PICOM_ENVIRON:
+      {
 	sigproc_printf ("processing PICOM_ENVIRON");
 	unsigned n = 0;
 	char **env = cur_environ ();
@@ -667,12 +667,13 @@ commune_process (void *arg)
 	  for (char **e = env; *e; e++)
 	    if (!WritePipeOverlapped (tothem, *e, strlen (*e) + 1, &nr, 1000L))
 	      {
-	        sigproc_printf ("WritePipeOverlapped arg %d failed, %E", e - env);
+	        sigproc_printf ("WritePipeOverlapped arg %d failed, %E",
+				e - env);
 	        break;
 	      }
 	break;
-	  }
-	}
+      }
+    }
   if (process_sync)
     {
       DWORD res = WaitForSingleObject (process_sync, 5000);
@@ -1056,7 +1057,7 @@ _pinfo::environ (size_t& n)
     env = cur_environ ();
 
   if (env == NULL)
-      return NULL;
+    return NULL;
 
   n = 0;
   for (char **e = env; *e; e++)
