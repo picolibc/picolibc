@@ -4,6 +4,22 @@
 
 <sect1 id="ov-new"><title>What's new and what changed in Cygwin</title>
 
+<sect2 id="ov-new2.7"><title>What's new and what changed in 2.7</title>
+
+<itemizedlist mark="bullet">
+
+<listitem><para>
+Support for /proc/&lt;PID&gt;/environ.
+</para></listitem>
+
+<listitem><para>
+- New API: getentropy, getrandom.
+</para></listitem>
+
+</itemizedlist>
+
+</sect2>
+
 <sect2 id="ov-new2.6"><title>What's new and what changed in 2.6</title>
 
 <itemizedlist mark="bullet">

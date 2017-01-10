@@ -1,6 +1,8 @@
 What's new:
 -----------
 
+- Support for /proc/<PID>/environ.
+
 - New API: getentropy, getrandom.
 
 
