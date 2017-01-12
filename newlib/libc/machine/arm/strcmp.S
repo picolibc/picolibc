@@ -28,7 +28,6 @@
 
 /* Wrapper for the various implementations of strcmp.  */
 
-#include "arm_asm.h"
 #include "acle-compat.h"
 
 #ifdef __ARM_BIG_ENDIAN

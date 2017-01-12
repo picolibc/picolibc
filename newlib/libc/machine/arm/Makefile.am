@@ -25,7 +25,7 @@ lib_a_CFLAGS = $(AM_CFLAGS)
 ACLOCAL_AMFLAGS = -I ../../.. -I ../../../..
 CONFIG_STATUS_DEPENDENCIES = $(newlib_basedir)/configure.host
 
-MEMCHR_DEP=acle-compat.h arm_asm.h
+MEMCHR_DEP=acle-compat.h
 MEMCPY_DEP=memcpy-armv7a.S memcpy-armv7m.S
 STRCMP_DEP=strcmp-arm-tiny.S strcmp-armv4.S strcmp-armv4t.S strcmp-armv6.S \
 	strcmp-armv6m.S strcmp-armv7.S strcmp-armv7m.S

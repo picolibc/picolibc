@@ -26,7 +26,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "arm_asm.h"
+#include "acle-compat.h"
 
 /* NOTE: This ifdef MUST match the one in aeabi_memcpy.c.  */
 #if defined (__ARM_ARCH_7A__) && defined (__ARM_FEATURE_UNALIGNED) && \

@@ -26,8 +26,6 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "arm_asm.h"
-
 .macro	ASM_ALIAS new old
 	.global	\new
 	.type	\new, %function
