@@ -409,34 +409,17 @@ dll::nominate_forkable (PCWCHAR dirx_name)
   if (!*forkable_ntname)
     return; /* denominate */
 
-  if (type < DLL_LOAD)
-    wcpcpy (next, modname);
-  else
+  if (type == DLL_LOAD)
     {
-      /* Avoid lots of extra directories for loaded dll's:
-       * mangle full path into one single directory name,
-       * just keep original filename intact. The original
-       * filename is necessary to serve as linked
-       * dependencies of dynamically loaded dlls. */
-      PWCHAR lastpathsep = wcsrchr (ntname, L'\\');
-      if (!lastpathsep)
-        {
-	  forkable_ntname = NULL;
-	  return;
-	}
-      *lastpathsep = L'\0';
-      HANDLE fh = dll_list::ntopenfile (ntname, NULL, FILE_DIRECTORY_FILE);
-      *lastpathsep = L'\\';
-
-      FILE_INTERNAL_INFORMATION fii = { 0 };
-      if (fh != INVALID_HANDLE_VALUE)
-	{
-	  dll_list::read_fii (fh, &fii);
-	  NtClose (fh);
-	}
+      /* Multiple dynamically loaded dlls can have identical basenames
+       * when loaded from different directories.  But still the original
+       * basename may serve as linked dependency for another dynamically
+       * loaded dll.  So we have to create a separate directory for the
+       * dynamically loaded dll - using the dll's IndexNumber as name. */
       next += format_IndexNumber (next, -1, &fii.IndexNumber);
-      wcpcpy (next, lastpathsep);
+      next = wcpcpy (next, L"\\");
     }
+  wcpcpy (next, modname);
 }
 
 /* Create the nominated hardlink for one indivitual dll,
