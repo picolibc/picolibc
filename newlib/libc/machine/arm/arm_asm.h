@@ -71,25 +71,12 @@
 #endif
 .endm
 
-.macro optpld	base, offset=#0
-#if defined (_ISA_ARM_7)
-	pld	[\base, \offset]
-#endif
-.endm
-
 #else
 asm(".macro  RETURN	cond=\n\t"
 #if defined (_ISA_ARM_4T) || defined (_ISA_THUMB_1)
     "bx\\cond	lr\n\t"
 #else
     "mov\\cond	pc, lr\n\t"
-#endif
-    ".endm"
-    );
-
-asm(".macro optpld	base, offset=#0\n\t"
-#if defined (_ISA_ARM_7)
-    "pld	[\\base, \\offset]\n\t"
 #endif
     ".endm"
     );

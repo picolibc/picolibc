@@ -44,7 +44,9 @@ strcpy (char* dst, const char* src)
   asm (
 #if !(defined(__OPTIMIZE_SIZE__) || defined (PREFER_SIZE_OVER_SPEED) || \
       (defined (__thumb__) && !defined (__thumb2__)))
-       "optpld	r1\n\t"
+#ifdef _ISA_ARM_7
+       "pld	r1\n\t"
+#endif
        "eor	r2, r0, r1\n\t"
        "mov	ip, r0\n\t"
        "tst	r2, #3\n\t"
@@ -75,7 +77,9 @@ strcpy (char* dst, const char* src)
 	  load stalls.  */
        ".p2align 2\n"
   "2:\n\t"
-       "optpld	r1, #8\n\t"
+#ifdef _ISA_ARM_7
+       "pld	r1, #8\n\t"
+#endif
        "ldr	r4, [r1], #4\n\t"
        "sub	r2, r3, "magic1(r5)"\n\t"
        "bics	r2, r2, r3\n\t"
