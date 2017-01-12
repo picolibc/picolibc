@@ -60,26 +60,4 @@
 # define _ISA_THUMB_1
 #endif
 
-
-/* Now some macros for common instruction sequences.  */
-#ifdef __ASSEMBLER__
-.macro  RETURN     cond=
-#if defined (_ISA_ARM_4T) || defined (_ISA_THUMB_1)
-	bx\cond	lr
-#else
-	mov\cond pc, lr
-#endif
-.endm
-
-#else
-asm(".macro  RETURN	cond=\n\t"
-#if defined (_ISA_ARM_4T) || defined (_ISA_THUMB_1)
-    "bx\\cond	lr\n\t"
-#else
-    "mov\\cond	pc, lr\n\t"
-#endif
-    ".endm"
-    );
-#endif
-
 #endif /* ARM_ASM__H */

@@ -168,7 +168,7 @@ strlen (const char* str)
        "addne	len, len, #1\n\t"
 # endif
 #endif
-       "RETURN");
+       "bx	lr\n\t");
 }
 #endif
 #endif

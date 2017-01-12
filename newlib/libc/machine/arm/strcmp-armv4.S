@@ -43,6 +43,18 @@
 #define tmp1		r12
 #define syndrome	r12	/* Overlaps tmp1 */
 
+/* For armv4t and newer, toolchains will transparently convert
+   'bx lr' to 'mov pc, lr' if needed. GCC has deprecated support
+   for anything older than armv4t, but this should handle that
+   corner case in case anyone needs it anyway */
+.macro  RETURN
+#if __ARM_ARCH <= 4 && __ARM_ARCH_ISA_THUMB == 0
+	mov	pc, lr
+#else
+	bx	lr
+#endif
+.endm
+
 	.arm
 def_fn strcmp
 	.cfi_sections .debug_frame

@@ -42,6 +42,6 @@ def_fn strcmp
 	beq	1b
 2:
 	subs	r0, r2, r3
-	RETURN
+	bx	lr
 	.cfi_endproc
 	.size	strcmp, . - strcmp
