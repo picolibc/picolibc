@@ -2509,9 +2509,10 @@ rename (const char *oldpath, const char *newpath)
       if (status == STATUS_ACCESS_DENIED && dstpc->exists ()
 	  && !dstpc->isdir ())
 	{
+	  bool need_open = false;
+
 	  if ((dstpc->fs_flags () & FILE_SUPPORTS_TRANSACTIONS) && !trans)
 	    {
-	      start_transaction (old_trans, trans);
 	      /* As mentioned earlier, opening the file must be part of the
 		 transaction.  Therefore we have to reopen the file here if the
 		 transaction hasn't been started already.  Unfortunately we
@@ -2521,28 +2522,34 @@ rename (const char *oldpath, const char *newpath)
 		 re-open it.  Fortunately nothing has happened yet, so the
 		 atomicity of the rename functionality is not spoiled. */
 	      NtClose (fh);
-    retry_reopen:
-	      status = NtOpenFile (&fh, DELETE,
-				   oldpc.get_object_attr (attr, sec_none_nih),
-				   &io, FILE_SHARE_VALID_FLAGS,
-				   FILE_OPEN_FOR_BACKUP_INTENT
-				   | (oldpc.is_rep_symlink ()
-				      ? FILE_OPEN_REPARSE_POINT : 0));
-	      if (!NT_SUCCESS (status))
-		{
-		  if (NT_TRANSACTIONAL_ERROR (status) && trans)
-		    {
-		      /* If NtOpenFile fails due to transactional problems,
-			 stop transaction and go ahead without. */
-		      stop_transaction (status, old_trans, trans);
-		      debug_printf ("Transaction failure.  Retry open.");
-		      goto retry_reopen;
-		    }
-		  __seterrno_from_nt_status (status);
-		  __leave;
-		}
+	      start_transaction (old_trans, trans);
+	      need_open = true;
 	    }
-	  if (NT_SUCCESS (status = unlink_nt (*dstpc)))
+	  while (true)
+	    {
+	      status = STATUS_SUCCESS;
+	      if (need_open)
+		status = NtOpenFile (&fh, DELETE,
+				     oldpc.get_object_attr (attr, sec_none_nih),
+				     &io, FILE_SHARE_VALID_FLAGS,
+				     FILE_OPEN_FOR_BACKUP_INTENT
+				     | (oldpc.is_rep_symlink ()
+					? FILE_OPEN_REPARSE_POINT : 0));
+	      if (NT_SUCCESS (status))
+		{
+		  status = unlink_nt (*dstpc);
+		  if (NT_SUCCESS (status))
+		    break;
+		}
+	      if (!NT_TRANSACTIONAL_ERROR (status) || !trans)
+		break;
+	      /* If NtOpenFile or unlink_nt fail due to transactional problems,
+		 stop transaction and retry without. */
+	      NtClose (fh);
+	      stop_transaction (status, old_trans, trans);
+	      debug_printf ("Transaction failure %y.  Retry open.", status);
+	    }
+	  if (NT_SUCCESS (status))
 	    status = NtSetInformationFile (fh, &io, pfri,
 					   sizeof *pfri + pfri->FileNameLength,
 					   FileRenameInformation);
