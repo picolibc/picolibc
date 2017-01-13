@@ -123,19 +123,24 @@ typedef size_t malloc_size_t;
 
 typedef struct malloc_chunk
 {
-    /*          ------------------
-     *   chunk->| size (4 bytes) |
-     *          ------------------
-     *          | Padding for    |
-     *          | alignment      |
-     *          | holding neg    |
-     *          | offset to size |
-     *          ------------------
-     * mem_ptr->| point to next  |
-     *          | free when freed|
-     *          | or data load   |
-     *          | when allocated |
-     *          ------------------
+    /*          --------------------------------------
+     *   chunk->| size                               |
+     *          --------------------------------------
+     *          | Padding for alignment              |
+     *          | This includes padding inserted by  |
+     *          | the compiler (to align fields) and |
+     *          | explicit padding inserted by this  |
+     *          | implementation. If any explicit    |
+     *          | padding is being used then the     |
+     *          | sizeof (size) bytes at             |
+     *          | mem_ptr - CHUNK_OFFSET must be     |
+     *          | initialized with the negative      |
+     *          | offset to size.                    |
+     *          --------------------------------------
+     * mem_ptr->| When allocated: data               |
+     *          | When freed: pointer to next free   |
+     *          | chunk                              |
+     *          --------------------------------------
      */
     /* size of the allocated payload area, including size before
        CHUNK_OFFSET */
@@ -187,8 +192,13 @@ extern void * nano_pvalloc(RARG size_t s);
 
 static inline chunk * get_chunk_from_ptr(void * ptr)
 {
+    /* Assume that there is no explicit padding in the
+       chunk, and that the chunk starts at ptr - CHUNK_OFFSET.  */
     chunk * c = (chunk *)((char *)ptr - CHUNK_OFFSET);
-    /* Skip the padding area */
+
+    /* c->size being negative indicates that there is explicit padding in
+       the chunk. In which case, c->size is currently the negative offset to
+       the true size.  */
     if (c->size < 0) c = (chunk *)((char *)c + c->size);
     return c;
 }
@@ -314,6 +324,19 @@ void * nano_malloc(RARG malloc_size_t s)
 
     if (offset)
     {
+        /* Initialize sizeof (malloc_chunk.size) bytes at
+           align_ptr - CHUNK_OFFSET with negative offset to the
+           size field (at the start of the chunk).
+
+           The negative offset to size from align_ptr - CHUNK_OFFSET is
+           the size of any remaining padding minus CHUNK_OFFSET.  This is
+           equivalent to the total size of the padding, because the size of
+           any remaining padding is the total size of the padding minus
+           CHUNK_OFFSET.
+
+           Note that the size of the padding must be at least CHUNK_OFFSET.
+
+           The rest of the padding is not initialized.  */
         *(long *)((char *)r + offset) = -offset;
     }
 
