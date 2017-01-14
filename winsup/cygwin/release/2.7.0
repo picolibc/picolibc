@@ -15,3 +15,7 @@ Bug Fixes
 
 - Fix rename(2) fail with EACCES if newfile is in use.
   Addresses: https://cygwin.com/ml/cygwin/2017-01/msg00108.html
+
+- Always try to write all incoming bytes to blocking pipes, as required
+  by POSIX.
+  Addresses: https://cygwin.com/ml/cygwin/2017-01/msg00087.html
