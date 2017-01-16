@@ -44,6 +44,7 @@ ANSI C requires <<localtime>>.
 <<localtime>> requires no supporting OS subroutines.
 */
 
+#include <stdlib.h>
 #include <time.h>
 #include <reent.h>
 
