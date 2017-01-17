@@ -40,11 +40,11 @@
 #include <stddef.h>
 
 int posix_devctl(
-  int            fd,
-  int            dcmd,
-  void *restrict dev_data_ptr,
-  size_t         nbyte,
-  int *restrict  dev_info_ptr
+  int               fd,
+  int               dcmd,
+  void *__restrict, dev_data_ptr,
+  size_t            nbyte,
+  int *__restrict,  dev_info_ptr
 );
 #endif
 
