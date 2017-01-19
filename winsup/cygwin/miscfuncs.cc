@@ -60,7 +60,7 @@ check_iovec (const struct iovec *iov, int iovcnt, bool forwrite)
 
       size_t tot = 0;
 
-      while (iovcnt != 0)
+      while (iovcnt > 0)
 	{
 	  if (iov->iov_len > SSIZE_MAX || (tot += iov->iov_len) > SSIZE_MAX)
 	    {
