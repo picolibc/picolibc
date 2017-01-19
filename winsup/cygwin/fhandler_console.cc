@@ -363,21 +363,22 @@ fhandler_console::read (void *pv, size_t& buflen)
 	  goto err;		/* seems to be failure */
 	}
 
+      const WCHAR &unicode_char = input_rec.Event.KeyEvent.uChar.UnicodeChar;
+      const DWORD &ctrl_key_state = input_rec.Event.KeyEvent.dwControlKeyState;
+
       /* check the event that occurred */
       switch (input_rec.EventType)
 	{
 	case KEY_EVENT:
-#define virtual_key_code (input_rec.Event.KeyEvent.wVirtualKeyCode)
-#define control_key_state (input_rec.Event.KeyEvent.dwControlKeyState)
 
 	  con.nModifiers = 0;
 
 #ifdef DEBUGGING
 	  /* allow manual switching to/from raw mode via ctrl-alt-scrolllock */
-	  if (input_rec.Event.KeyEvent.bKeyDown &&
-	      virtual_key_code == VK_SCROLL &&
-	      ((control_key_state & (LEFT_ALT_PRESSED | LEFT_CTRL_PRESSED)) == (LEFT_ALT_PRESSED | LEFT_CTRL_PRESSED))
-	    )
+	  if (input_rec.Event.KeyEvent.bKeyDown
+	      && input_rec.Event.KeyEvent.wVirtualKeyCode == VK_SCROLL
+	      && (ctrl_key_state & (LEFT_ALT_PRESSED | LEFT_CTRL_PRESSED))
+		  == (LEFT_ALT_PRESSED | LEFT_CTRL_PRESSED))
 	    {
 	      set_raw_win32_keyboard_mode (!con.raw_win32_keyboard_mode);
 	      continue;
@@ -398,8 +399,6 @@ fhandler_console::read (void *pv, size_t& buflen)
 	      break;
 	    }
 
-#define wch (input_rec.Event.KeyEvent.uChar.UnicodeChar)
-
 	  /* Ignore key up events, except for Alt+Numpad events. */
 	  if (!input_rec.Event.KeyEvent.bKeyDown &&
 	      !is_alt_numpad_event (&input_rec))
@@ -410,13 +409,13 @@ fhandler_console::read (void *pv, size_t& buflen)
 	      && is_alt_numpad_key (&input_rec))
 	    continue;
 
-	  if (control_key_state & SHIFT_PRESSED)
+	  if (ctrl_key_state & SHIFT_PRESSED)
 	    con.nModifiers |= 1;
-	  if (control_key_state & RIGHT_ALT_PRESSED)
+	  if (ctrl_key_state & RIGHT_ALT_PRESSED)
 	    con.nModifiers |= 2;
-	  if (control_key_state & CTRL_PRESSED)
+	  if (ctrl_key_state & CTRL_PRESSED)
 	    con.nModifiers |= 4;
-	  if (control_key_state & LEFT_ALT_PRESSED)
+	  if (ctrl_key_state & LEFT_ALT_PRESSED)
 	    con.nModifiers |= 8;
 
 	  /* Allow Backspace to emit ^? and escape sequences. */
@@ -424,7 +423,7 @@ fhandler_console::read (void *pv, size_t& buflen)
 	    {
 	      char c = con.backspace_keycode;
 	      nread = 0;
-	      if (control_key_state & ALT_PRESSED)
+	      if (ctrl_key_state & ALT_PRESSED)
 		{
 		  if (con.metabit)
 		    c |= 0x80;
@@ -437,10 +436,10 @@ fhandler_console::read (void *pv, size_t& buflen)
 	    }
 	  /* Allow Ctrl-Space to emit ^@ */
 	  else if (input_rec.Event.KeyEvent.wVirtualKeyCode == VK_SPACE
-		   && (control_key_state & CTRL_PRESSED)
-		   && !(control_key_state & ALT_PRESSED))
+		   && (ctrl_key_state & CTRL_PRESSED)
+		   && !(ctrl_key_state & ALT_PRESSED))
 	    toadd = "";
-	  else if (wch == 0
+	  else if (unicode_char == 0
 	      /* arrow/function keys */
 	      || (input_rec.Event.KeyEvent.dwControlKeyState & ENHANCED_KEY))
 	    {
@@ -454,17 +453,17 @@ fhandler_console::read (void *pv, size_t& buflen)
 	    }
 	  else
 	    {
-	      nread = con.con_to_str (tmp + 1, 59, wch);
+	      nread = con.con_to_str (tmp + 1, 59, unicode_char);
 	      /* Determine if the keystroke is modified by META.  The tricky
 		 part is to distinguish whether the right Alt key should be
 		 recognized as Alt, or as AltGr. */
 	      bool meta =
 		     /* Alt but not AltGr (= left ctrl + right alt)? */
-		     (control_key_state & ALT_PRESSED) != 0
-		     && ((control_key_state & CTRL_PRESSED) == 0
+		     (ctrl_key_state & ALT_PRESSED) != 0
+		     && ((ctrl_key_state & CTRL_PRESSED) == 0
 			    /* but also allow Alt-AltGr: */
-			 || (control_key_state & ALT_PRESSED) == ALT_PRESSED
-			 || (wch <= 0x1f || wch == 0x7f));
+			 || (ctrl_key_state & ALT_PRESSED) == ALT_PRESSED
+			 || (unicode_char <= 0x1f || unicode_char == 0x7f));
 	      if (!meta)
 		{
 		  /* Determine if the character is in the current multibyte
@@ -492,7 +491,6 @@ fhandler_console::read (void *pv, size_t& buflen)
 		  con.nModifiers &= ~4;
 		}
 	    }
-#undef wch
 	  break;
 
 	case MOUSE_EVENT:
