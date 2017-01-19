@@ -19,3 +19,6 @@ Bug Fixes
 - Always try to write all incoming bytes to blocking pipes, as required
   by POSIX.
   Addresses: https://cygwin.com/ml/cygwin/2017-01/msg00087.html
+
+- Fix handling of Alt-Numpad sequences in console handler.
+  Addresses: https://cygwin.com/ml/cygwin/2017-01/msg00135.html
