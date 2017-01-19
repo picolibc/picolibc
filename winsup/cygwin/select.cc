@@ -12,7 +12,6 @@ details. */
 #define  __INSIDE_CYGWIN_NET__
 
 #include "winsup.h"
-#include <dinput.h>
 #include <stdlib.h>
 #include <sys/param.h>
 #include "ntdll.h"
@@ -896,26 +895,17 @@ peek_console (select_record *me, bool)
 	  {
 	    if (irec.Event.KeyEvent.bKeyDown)
 	      {
-		/* Ignore Alt+Numpad keys.  These are used to enter codepoints
-		   not available in the current keyboard layout.  They are
-		   eventually handled in the key-up case below.  For details see
-		   http://www.fileformat.info/tip/microsoft/enter_unicode.htm */
-		if (irec.Event.KeyEvent.uChar.UnicodeChar == 0
-		    && irec.Event.KeyEvent.dwControlKeyState == LEFT_ALT_PRESSED
-		    && irec.Event.KeyEvent.wVirtualScanCode >= DIK_NUMPAD7
-		    && irec.Event.KeyEvent.wVirtualScanCode <= DIK_NUMPAD0
-		    && irec.Event.KeyEvent.wVirtualScanCode != DIK_SUBTRACT)
+		/* Ignore Alt+Numpad keys. They are eventually handled in the
+		   key-up case below. */
+		if (is_alt_numpad_key (&irec))
 		   ;
 		/* Handle normal input. */
 		else if (irec.Event.KeyEvent.uChar.UnicodeChar
 			 || fhandler_console::get_nonascii_key (irec, tmpbuf))
 		  return me->read_ready = true;
 	      }
-	    /* Ignore key up events, except for left alt events with
-	       non-zero character */
-	    else if (irec.Event.KeyEvent.uChar.UnicodeChar != 0
-		     && irec.Event.KeyEvent.wVirtualKeyCode == VK_MENU
-		     && irec.Event.KeyEvent.wVirtualScanCode == 0x38)
+	    /* Ignore key up events, except for Alt+Numpad events. */
+	    else if (is_alt_numpad_event (&irec))
 	      return me->read_ready = true;
 	  }
 	else

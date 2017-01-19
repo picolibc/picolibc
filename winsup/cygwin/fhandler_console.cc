@@ -7,7 +7,6 @@ Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
 #include "winsup.h"
-#include <dinput.h>
 #include "miscfuncs.h"
 #include <stdio.h>
 #include <stdlib.h>
@@ -399,33 +398,16 @@ fhandler_console::read (void *pv, size_t& buflen)
 	      break;
 	    }
 
-#define ich (input_rec.Event.KeyEvent.uChar.AsciiChar)
 #define wch (input_rec.Event.KeyEvent.uChar.UnicodeChar)
 
-	  /* Ignore key up events, except for left alt events with non-zero character
-	   */
+	  /* Ignore key up events, except for Alt+Numpad events. */
 	  if (!input_rec.Event.KeyEvent.bKeyDown &&
-	      /*
-		Event for left alt, with a non-zero character, comes from
-		"alt + numerics" key sequence.
-		e.g. <left-alt> 0233 => &eacute;
-	      */
-	      !(wch != 0
-		// ?? experimentally determined on an XP system
-		&& virtual_key_code == VK_MENU
-		// left alt -- see http://www.microsoft.com/hwdev/tech/input/Scancode.asp
-		&& input_rec.Event.KeyEvent.wVirtualScanCode == 0x38))
+	      !is_alt_numpad_event (&input_rec))
 	    continue;
-	  /* Ignore Alt+Numpad keys.  These are used to enter codepoints not
-	     available in the current keyboard layout.  They are eventually
-	     handled below after releasing the Alt key.  For details see
-	     http://www.fileformat.info/tip/microsoft/enter_unicode.htm */
+	  /* Ignore Alt+Numpad keys.  They are eventually handled below after
+	     releasing the Alt key. */
 	  if (input_rec.Event.KeyEvent.bKeyDown
-	      && wch == 0
-	      && input_rec.Event.KeyEvent.dwControlKeyState == LEFT_ALT_PRESSED
-	      && input_rec.Event.KeyEvent.wVirtualScanCode >= DIK_NUMPAD7
-	      && input_rec.Event.KeyEvent.wVirtualScanCode <= DIK_NUMPAD0
-	      && input_rec.Event.KeyEvent.wVirtualScanCode != DIK_SUBTRACT)
+	      && is_alt_numpad_key (&input_rec))
 	    continue;
 
 	  if (control_key_state & SHIFT_PRESSED)
@@ -510,7 +492,6 @@ fhandler_console::read (void *pv, size_t& buflen)
 		  con.nModifiers &= ~4;
 		}
 	    }
-#undef ich
 #undef wch
 	  break;
 
