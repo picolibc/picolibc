@@ -10,22 +10,10 @@ details. */
 #include "miscfuncs.h"
 #include <ntsecapi.h>
 #include <sys/uio.h>
-#include <alloca.h>
-#include <limits.h>
 #include <sys/param.h>
-#include <wchar.h>
-#include "cygtls.h"
 #include "ntdll.h"
 #include "path.h"
 #include "fhandler.h"
-#include "dtable.h"
-#include "cygheap.h"
-#include "pinfo.h"
-#include "exception.h"
-#include "sigproc.h"
-
-long tls_ix = -1;
-
 
 int __reg2
 check_invalid_virtual_addr (const void *s, unsigned sz)
