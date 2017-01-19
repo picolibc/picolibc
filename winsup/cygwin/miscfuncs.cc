@@ -10,7 +10,6 @@ details. */
 #include "miscfuncs.h"
 #include <ntsecapi.h>
 #include <sys/uio.h>
-#include <assert.h>
 #include <alloca.h>
 #include <limits.h>
 #include <sys/param.h>
@@ -81,9 +80,10 @@ check_iovec (const struct iovec *iov, int iovcnt, bool forwrite)
 	  iovcnt--;
 	}
 
-      assert (tot <= SSIZE_MAX);
+      if (tot <= SSIZE_MAX)
+	return (ssize_t) tot;
 
-      return (ssize_t) tot;
+      set_errno (EINVAL);
     }
   __except (EFAULT)
   __endtry
