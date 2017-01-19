@@ -7,6 +7,7 @@ Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
 #include "winsup.h"
+#include <dinput.h>
 #include "miscfuncs.h"
 #include <stdio.h>
 #include <stdlib.h>
@@ -414,6 +415,17 @@ fhandler_console::read (void *pv, size_t& buflen)
 		&& virtual_key_code == VK_MENU
 		// left alt -- see http://www.microsoft.com/hwdev/tech/input/Scancode.asp
 		&& input_rec.Event.KeyEvent.wVirtualScanCode == 0x38))
+	    continue;
+	  /* Ignore Alt+Numpad keys.  These are used to enter codepoints not
+	     available in the current keyboard layout.  They are eventually
+	     handled in the key-up case below.  For details see
+	     http://www.fileformat.info/tip/microsoft/enter_unicode.htm */
+	  if (input_rec.Event.KeyEvent.bKeyDown
+	      && wch == 0
+	      && input_rec.Event.KeyEvent.dwControlKeyState == LEFT_ALT_PRESSED
+	      && input_rec.Event.KeyEvent.wVirtualScanCode >= DIK_NUMPAD7
+	      && input_rec.Event.KeyEvent.wVirtualScanCode <= DIK_NUMPAD0
+	      && input_rec.Event.KeyEvent.wVirtualScanCode != DIK_SUBTRACT)
 	    continue;
 
 	  if (control_key_state & SHIFT_PRESSED)
