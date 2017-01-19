@@ -307,6 +307,7 @@ DLL_OFILES:= \
 	fork.o \
 	fts.o \
 	ftw.o \
+	getentropy.o \
 	getopt.o \
 	glob.o \
 	glob_pattern_p.o \
