@@ -418,7 +418,7 @@ fhandler_console::read (void *pv, size_t& buflen)
 	    continue;
 	  /* Ignore Alt+Numpad keys.  These are used to enter codepoints not
 	     available in the current keyboard layout.  They are eventually
-	     handled in the key-up case below.  For details see
+	     handled below after releasing the Alt key.  For details see
 	     http://www.fileformat.info/tip/microsoft/enter_unicode.htm */
 	  if (input_rec.Event.KeyEvent.bKeyDown
 	      && wch == 0
