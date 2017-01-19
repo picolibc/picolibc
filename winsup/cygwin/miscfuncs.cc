@@ -14,6 +14,7 @@ details. */
 #include "ntdll.h"
 #include "path.h"
 #include "fhandler.h"
+#include "exception.h"
 
 int __reg2
 check_invalid_virtual_addr (const void *s, unsigned sz)
