@@ -304,13 +304,21 @@ enum __nl_item
   _NL_COLLATE_CODESET,
 
   /* This MUST be the last entry since it's used to check for an array
-     index in nl_langinfo(). */
+     index in nl_langinfo(). It also must not exceed _NL_LOCALE_NAME_BASE. */
   _NL_LOCALE_EXTENDED_LAST_ENTRY
 
 #endif /* __HAVE_LOCALE_INFO_EXTENDED__ */
 #endif /* __HAVE_LOCALE_INFO__ */
 
 };
+
+/* As an extension, nl_langinfo can retrive the name of a locale
+   category, with this mapping from setlocale() category (other than
+   LC_ALL) to nl_item. */
+#define _NL_LOCALE_NAME_BASE 100000
+#if __GNU_VISIBLE
+#define NL_LOCALE_NAME(category) (_NL_LOCALE_NAME_BASE + (category))
+#endif
 
 __BEGIN_DECLS
 char	*nl_langinfo (nl_item);

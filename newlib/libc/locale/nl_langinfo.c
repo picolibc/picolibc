@@ -24,6 +24,8 @@
  * SUCH DAMAGE.
  */
 
+#define _GNU_SOURCE
+
 #include <sys/cdefs.h>
 
 #include <locale.h>
@@ -368,6 +370,13 @@ do_codeset:
 		break;
 #endif
 	default:
+		/* Relies on the fact that LC_ALL is 0, and all other
+		   LC_ constants are in ascending order. */
+		if (item > NL_LOCALE_NAME(LC_ALL)
+		    && item < NL_LOCALE_NAME(_LC_LAST)) {
+			return locale->categories[item
+						  - NL_LOCALE_NAME(LC_ALL)];
+		}
 #ifdef __HAVE_LOCALE_INFO_EXTENDED__
 		if (item > _NL_LOCALE_EXTENDED_FIRST_ENTRY
 		    && item < _NL_LOCALE_EXTENDED_LAST_ENTRY) {
