@@ -50,6 +50,10 @@ struct dirent {
 	char		d_name[NAME_MAX + 1];
 };
 
+#if __BSD_VISIBLE
+#define	MAXNAMLEN NAME_MAX
+#endif
+
 int scandir ( const char *dirname,
    struct dirent *** namelist,
    int (*select)(const struct dirent *),
