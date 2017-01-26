@@ -29,7 +29,9 @@
 
 #include "acle-compat.h"
 
-#if __ARM_ARCH_ISA_THUMB >= 2 && defined (__ARM_FEATURE_DSP)
+#if defined (__ARM_NEON__) || defined (__ARM_NEON)
+/* Defined in memchr.S.  */
+#elif __ARM_ARCH_ISA_THUMB >= 2 && defined (__ARM_FEATURE_DSP)
 /* Defined in memchr.S.  */
 #else
 # include "../../string/memchr.c"
