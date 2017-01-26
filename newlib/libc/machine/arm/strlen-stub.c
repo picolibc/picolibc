@@ -59,7 +59,7 @@ strlen (const char* str)
        "addr .req r1\n\t"
 
 #ifdef _ISA_ARM_7
-       "pld r0\n\t"
+       "pld [r0]\n\t"
 #endif
        /* Word-align address */
        "bic	addr, r0, #3\n\t"
@@ -116,7 +116,7 @@ strlen (const char* str)
        /* and 4 more bytes  */
        "addeq	len, len, #4\n\t"
 	/* Unroll the loop a bit.  */
-       "pld	addr, #8\n\t"
+       "pld	[addr, #8]\n\t"
        /*  test (data - 0x01010101)  */
        "ittt	eq\n\t"
        "subeq	r2, data, ip\n\t"
