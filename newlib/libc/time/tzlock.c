@@ -36,14 +36,14 @@ until the corresponding <<__tz_unlock>> call on the same thread is made.
 #include <sys/lock.h>
 
 #ifndef __SINGLE_THREAD__
-__LOCK_INIT(static, __tz_lock_object);
+__LOCK_INIT(static, __tz_mutex);
 #endif
 
 _VOID
 _DEFUN_VOID (__tz_lock)
 {
 #ifndef __SINGLE_THREAD__
-  __lock_acquire(__tz_lock_object);
+  __lock_acquire(__tz_mutex);
 #endif
 }
 
@@ -51,6 +51,6 @@ _VOID
 _DEFUN_VOID (__tz_unlock)
 {
 #ifndef __SINGLE_THREAD__
-  __lock_release(__tz_lock_object);
+  __lock_release(__tz_mutex);
 #endif
 }

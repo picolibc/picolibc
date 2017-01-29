@@ -11,7 +11,7 @@
 /* Make this a weak reference to avoid pulling in free.  */
 void free(void *) _ATTRIBUTE((__weak__));
 
-__LOCK_INIT_RECURSIVE(, __atexit_lock);
+__LOCK_INIT_RECURSIVE(, __atexit_recursive_mutex);
 
 #ifdef _REENT_GLOBAL_ATEXIT
 struct _atexit *_global_atexit = _NULL;
@@ -75,7 +75,7 @@ _DEFUN (__call_exitprocs, (code, d),
 
 
 #ifndef __SINGLE_THREAD__
-  __lock_acquire_recursive(__atexit_lock);
+  __lock_acquire_recursive(__atexit_recursive_mutex);
 #endif
 
  restart:
@@ -157,7 +157,7 @@ _DEFUN (__call_exitprocs, (code, d),
 #endif
     }
 #ifndef __SINGLE_THREAD__
-  __lock_release_recursive(__atexit_lock);
+  __lock_release_recursive(__atexit_recursive_mutex);
 #endif
 
 }

@@ -261,31 +261,31 @@ _DEFUN(__sinit, (s),
 
 #ifndef __SINGLE_THREAD__
 
-__LOCK_INIT_RECURSIVE(static, __sfp_lock);
-__LOCK_INIT_RECURSIVE(static, __sinit_lock);
+__LOCK_INIT_RECURSIVE(static, __sfp_recursive_mutex);
+__LOCK_INIT_RECURSIVE(static, __sinit_recursive_mutex);
 
 _VOID
 _DEFUN_VOID(__sfp_lock_acquire)
 {
-  __lock_acquire_recursive (__sfp_lock);
+  __lock_acquire_recursive (__sfp_recursive_mutex);
 }
 
 _VOID
 _DEFUN_VOID(__sfp_lock_release)
 {
-  __lock_release_recursive (__sfp_lock);
+  __lock_release_recursive (__sfp_recursive_mutex);
 }
 
 _VOID
 _DEFUN_VOID(__sinit_lock_acquire)
 {
-  __lock_acquire_recursive (__sinit_lock);
+  __lock_acquire_recursive (__sinit_recursive_mutex);
 }
 
 _VOID
 _DEFUN_VOID(__sinit_lock_release)
 {
-  __lock_release_recursive (__sinit_lock);
+  __lock_release_recursive (__sinit_recursive_mutex);
 }
 
 /* Walkable file locking routine.  */

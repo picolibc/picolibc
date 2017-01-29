@@ -40,7 +40,7 @@ that it already holds.
 #include <sys/lock.h>
 
 #ifndef __SINGLE_THREAD__
-__LOCK_INIT_RECURSIVE(static, __malloc_lock_object);
+__LOCK_INIT_RECURSIVE(static, __malloc_recursive_mutex);
 #endif
 
 void
@@ -48,7 +48,7 @@ __malloc_lock (ptr)
      struct _reent *ptr;
 {
 #ifndef __SINGLE_THREAD__
-  __lock_acquire_recursive (__malloc_lock_object);
+  __lock_acquire_recursive (__malloc_recursive_mutex);
 #endif
 }
 
@@ -57,7 +57,7 @@ __malloc_unlock (ptr)
      struct _reent *ptr;
 {
 #ifndef __SINGLE_THREAD__
-  __lock_release_recursive (__malloc_lock_object);
+  __lock_release_recursive (__malloc_recursive_mutex);
 #endif
 }
 

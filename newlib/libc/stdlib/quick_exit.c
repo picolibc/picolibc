@@ -44,7 +44,7 @@ struct quick_exit_handler {
 /**
  * Lock protecting the handlers list.
  */
-__LOCK_INIT(static, __atexit_mutex);
+__LOCK_INIT(static, __at_quick_exit_mutex);
 /**
  * Stack of cleanup handlers.  These will be invoked in reverse order when
  */
@@ -60,10 +60,10 @@ at_quick_exit(void (*func)(void))
 	if (NULL == h)
 		return (1);
 	h->cleanup = func;
-	__lock_acquire(__atexit_mutex);
+	__lock_acquire(__at_quick_exit_mutex);
 	h->next = handlers;
 	handlers = h;
-	__lock_release(__atexit_mutex);
+	__lock_release(__at_quick_exit_mutex);
 	return (0);
 }
 

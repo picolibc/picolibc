@@ -39,11 +39,11 @@
 
 #ifndef _ARC4_LOCK_INIT
 
-#define _ARC4_LOCK_INIT __LOCK_INIT(static, _arc4random_mutex);
+#define _ARC4_LOCK_INIT __LOCK_INIT(static, __arc4random_mutex);
 
-#define _ARC4_LOCK() __lock_acquire(_arc4random_mutex)
+#define _ARC4_LOCK() __lock_acquire(__arc4random_mutex)
 
-#define _ARC4_UNLOCK() __lock_release(_arc4random_mutex)
+#define _ARC4_UNLOCK() __lock_release(__arc4random_mutex)
 
 #endif /* _ARC4_LOCK_INIT */
 
