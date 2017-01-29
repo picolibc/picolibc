@@ -1,5 +1,5 @@
 /* Support for cris*-axis-linux-gnu and src/sim/cris simulator.
-   Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005 Axis Communications.
+   Copyright (C) 2000-2005, 2017 Axis Communications.
    All rights reserved.
 
    Redistribution and use in source and binary forms, with or without
@@ -27,6 +27,12 @@
    POSSIBILITY OF SUCH DAMAGE.  */
 
 #include "linunistd.h"
+#include "newlib.h"
+
+#ifdef HAVE_INITFINI_ARRAY
+#define _init __libc_init_array
+#define _fini __libc_fini_array
+#endif
 
 extern void exit (int) __attribute ((__noreturn__));
 

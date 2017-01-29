@@ -1,5 +1,5 @@
 /* Generic simplistic start-up-stub for CRIS/CRISv32.
-   Copyright (C) 1993-2005, 2007 Axis Communications.
+   Copyright (C) 1993-2005, 2007, 2017 Axis Communications.
    All rights reserved.
 
    Redistribution and use in source and binary forms, with or without
@@ -26,12 +26,19 @@
    IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
    POSSIBILITY OF SUCH DAMAGE.  */
 
+#include "newlib.h"
+
 #undef cris
 #undef L
 #ifdef __NO_UNDERSCORES__
 #define L(x) x
 #else
 #define L(x) _ ## x
+#endif
+
+#ifdef HAVE_INITFINI_ARRAY
+#define _init __libc_init_array
+#define _fini __libc_fini_array
 #endif
 
 ; Rudimentary v0..v32-compatible startup stub.
