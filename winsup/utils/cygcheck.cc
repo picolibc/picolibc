@@ -2009,8 +2009,8 @@ check_keys ()
   return 0;
 }
 
-/* RFC1738 says that these do not need to be escaped.  */
-static const char safe_chars[] = "$-_.+!*'(),";
+/* These do not need to be escaped in application/x-www-form-urlencoded */
+static const char safe_chars[] = "$-_.!*'(),";
 
 /* the URL to query.  */
 static const char base_url[] =
