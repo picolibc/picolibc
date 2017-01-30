@@ -70,7 +70,7 @@ struct ddloc {
 static long	dd_loccnt = 1;	/* Index of entry for sequential readdir's */
 static struct	ddloc *dd_hash[NDIRHASH];   /* Hash list heads for ddlocs */
 
-#ifdef HAVE_DD_LOCK
+#if !defined(__SINGLE_THREAD__) && defined(HAVE_DD_LOCK)
 __LOCK_INIT(static, __dd_hash_mutex);
 #endif
 
@@ -92,7 +92,9 @@ _DEFUN(telldir, (dirp),
 
 #ifdef HAVE_DD_LOCK
 	__lock_acquire_recursive(dirp->dd_lock);
+#ifndef __SINGLE_THREAD__
 	__lock_acquire(__dd_hash_mutex);
+#endif
 #endif
 	index = dd_loccnt++;
 	lp->loc_index = index;
@@ -102,7 +104,9 @@ _DEFUN(telldir, (dirp),
 	lp->loc_next = dd_hash[LOCHASH(index)];
 	dd_hash[LOCHASH(index)] = lp;
 #ifdef HAVE_DD_LOCK
+#ifndef __SINGLE_THREAD__
 	__lock_release(__dd_hash_mutex);
+#endif
 	__lock_release_recursive(dirp->dd_lock);
 #endif
 	return (index);
@@ -123,7 +127,7 @@ _DEFUN(_seekdir, (dirp, loc),
 	register struct ddloc **prevlp;
 	struct dirent *dp;
 
-#ifdef HAVE_DD_LOCK
+#if !defined(__SINGLE_THREAD__) && defined(HAVE_DD_LOCK)
 	__lock_acquire(__dd_hash_mutex);
 #endif
 	if (loc != 0) {
@@ -136,7 +140,7 @@ _DEFUN(_seekdir, (dirp, loc),
 			lp = lp->loc_next;
 		}
 		if (lp == NULL) {
-#ifdef HAVE_DD_LOCK
+#if !defined(__SINGLE_THREAD__) && defined(HAVE_DD_LOCK)
 			__lock_release(__dd_hash_mutex);
 #endif
 			return;
@@ -162,7 +166,7 @@ found:
 		dirp->dd_seek = 0;
 		dirp->dd_loc = 0;
 	}
-#ifdef HAVE_DD_LOCK
+#if !defined(__SINGLE_THREAD__) && defined(HAVE_DD_LOCK)
 	__lock_release(__dd_hash_mutex);
 #endif
 }
@@ -174,7 +178,7 @@ _DEFUN(_cleanupdir, (dirp),
 {
 	int i;
 
-#ifdef HAVE_DD_LOCK
+#if !defined(__SINGLE_THREAD__) && defined(HAVE_DD_LOCK)
 	__lock_acquire(__dd_hash_mutex);
 #endif
 	for (i = 0; i < NDIRHASH; ++i) {
@@ -199,7 +203,7 @@ _DEFUN(_cleanupdir, (dirp),
 		}
 		dd_hash[i] = head.loc_next;
 	}
-#ifdef HAVE_DD_LOCK
+#if !defined(__SINGLE_THREAD__) && defined(HAVE_DD_LOCK)
 	__lock_release(__dd_hash_mutex);
 #endif
 

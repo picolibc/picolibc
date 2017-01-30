@@ -47,7 +47,9 @@
 
 #endif /* _ARC4_LOCK_INIT */
 
+#ifndef __SINGLE_THREAD__
 _ARC4_LOCK_INIT
+#endif
 
 #ifdef _ARC4RANDOM_DATA
 _ARC4RANDOM_DATA
