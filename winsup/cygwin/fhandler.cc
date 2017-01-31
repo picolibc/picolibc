@@ -111,26 +111,6 @@ fhandler_base::set_readahead_valid (int val, int ch)
 }
 
 int
-fhandler_base::eat_readahead (int n)
-{
-  int oralen = ralen;
-  if (n < 0)
-    n = ralen;
-  if (n > 0 && ralen)
-    {
-      if ((int) (ralen -= n) < 0)
-	ralen = 0;
-
-      if (raixget >= ralen)
-	raixget = raixput = ralen = 0;
-      else if (raixput > ralen)
-	raixput = ralen;
-    }
-
-  return oralen;
-}
-
-int
 fhandler_base::get_readahead_into_buffer (char *buf, size_t buflen)
 {
   int ch;

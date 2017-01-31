@@ -288,8 +288,6 @@ class fhandler_base
   int get_readahead ();
   int peek_readahead (int queryput = 0);
 
-  int eat_readahead (int n);
-
   void set_readahead_valid (int val, int ch = -1);
 
   int get_readahead_into_buffer (char *buf, size_t buflen);
@@ -1217,6 +1215,8 @@ class fhandler_termios: public fhandler_base
   int ioctl (int, void *);
   tty_min *_tc;
   tty *get_ttyp () {return (tty *) tc ();}
+  int eat_readahead (int n);
+
  public:
   tty_min*& tc () {return _tc;}
   fhandler_termios () :

@@ -115,6 +115,7 @@ POSIX commands */
 #define IUCLC	0x04000
 #define IXANY	0x08000
 #define PARMRK	0x10000
+#define IUTF8	0x20000
 
 /* oflag bits */
 

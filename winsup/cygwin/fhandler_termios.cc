@@ -30,7 +30,7 @@ fhandler_termios::tcinit (bool is_pty_master)
 
   if (is_pty_master || !tc ()->initialized ())
     {
-      tc ()->ti.c_iflag = BRKINT | ICRNL | IXON;
+      tc ()->ti.c_iflag = BRKINT | ICRNL | IXON | IUTF8;
       tc ()->ti.c_oflag = OPOST | ONLCR;
       tc ()->ti.c_cflag = B38400 | CS8 | CREAD;
       tc ()->ti.c_lflag = ISIG | ICANON | ECHO | IEXTEN;
@@ -256,6 +256,33 @@ fhandler_termios::bg_check (int sig, bool dontsignal)
 }
 
 #define set_input_done(x) input_done = input_done || (x)
+
+int
+fhandler_termios::eat_readahead (int n)
+{
+  int oralen = ralen;
+  if (n < 0)
+    n = ralen;
+  if (n > 0 && ralen > 0)
+    {
+      if ((int) (ralen -= n) < 0)
+	ralen = 0;
+      /* If IUTF8 is set, the terminal is in UTF-8 mode.  If so, we erase
+	 a complete UTF-8 multibyte sequence on VERASE/VWERASE.  Otherwise,
+	 if we only erase a single byte, invalid unicode chars are left in
+	 the input. */
+      if (tc ()->ti.c_iflag & IUTF8)
+	while (ralen > 0 && ((unsigned char) rabuf[ralen] & 0xc0) == 0x80)
+	  --ralen;
+
+      if (raixget >= ralen)
+	raixget = raixput = ralen = 0;
+      else if (raixput > ralen)
+	raixput = ralen;
+    }
+
+  return oralen;
+}
 
 inline void
 fhandler_termios::echo_erase (int force)
