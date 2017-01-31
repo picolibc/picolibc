@@ -25,3 +25,6 @@ Bug Fixes
 
 - Fix erasing UTF-8 multibyte characters in cooked mode.
   Addresses: https://cygwin.com/ml/cygwin/2017-01/msg00299.html
+
+- Fix handling of a literal '+' by cygcheck -p
+  Addresses:  https://cygwin.com/ml/cygwin/2014-01/msg00287.html
