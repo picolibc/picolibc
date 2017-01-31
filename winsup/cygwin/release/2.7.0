@@ -22,3 +22,6 @@ Bug Fixes
 
 - Fix handling of Alt-Numpad sequences in console handler.
   Addresses: https://cygwin.com/ml/cygwin/2017-01/msg00135.html
+
+- Fix erasing UTF-8 multibyte characters in cooked mode.
+  Addresses: https://cygwin.com/ml/cygwin/2017-01/msg00299.html
