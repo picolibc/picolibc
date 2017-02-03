@@ -28,3 +28,6 @@ Bug Fixes
 
 - Fix handling of a literal '+' by cygcheck -p
   Addresses:  https://cygwin.com/ml/cygwin/2014-01/msg00287.html
+
+- Fix limited Internet speeds caused by inappropriate socket buffering.
+  Addresses: https://cygwin.com/ml/cygwin-patches/2017-q1/msg00010.html
