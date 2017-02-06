@@ -124,7 +124,7 @@ _lseek_r(struct _reent *reent, int file, _off_t ptr, int dir)
 }
 
 int
-_open(struct _reent *reent, char *file, int flags, int mode)
+_open_r(struct _reent *reent, const char *file, int flags, int mode)
 {
 	reent->_errno = ENOSYS;
 	return -1;
