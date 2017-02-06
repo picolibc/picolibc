@@ -56,9 +56,6 @@ _close_r(struct _reent *reent, int fildes)
 	return -1;
 }
 
-char *__env[1] = { 0 };
-char **environ = __env;
-
 int
 _execve_r(struct _reent *reent, const char *name, char * const *argv,
 		char * const *env)
