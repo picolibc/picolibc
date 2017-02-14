@@ -79,7 +79,8 @@ in the Win32 API:</para>
 <para>Cygwin can't fix this, but it has a method to workaround this
 restriction.  All of the above characters, except for the backslash,
 are converted to special UNICODE characters in the range 0xf000 to 0xf0ff
-(the "Private use area") when creating or accessing files.</para>
+(the "Private use area") when creating or accessing files by adding 0xf000
+to the forbidden characters' code points.</para>
 
 <para>The backslash has to be exempt from this conversion, because Cygwin
 accepts Win32 filenames including backslashes as path separators on input. 
