@@ -1,9 +1,9 @@
 %rename link                nano_link
 %rename link_gcc_c_sequence                nano_link_gcc_c_sequence
-%rename cpp_options		nano_cpp_options
+%rename cpp_unique_options		nano_cpp_unique_options
 
-*cpp_options:
--isystem =/include/newlib-nano %(nano_cpp_options)
+*cpp_unique_options:
+-isystem =/include/newlib-nano %(nano_cpp_unique_options)
 
 *nano_libc:
 -lc_nano
