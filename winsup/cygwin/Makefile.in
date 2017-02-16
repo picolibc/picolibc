@@ -747,9 +747,11 @@ libacl.a: ${LIB_NAME} sec_posixacl.o
 ${EXTRALIBS}: lib%.a: %.o
 	$(AR) cru $@ $?
 
-version.cc winver.o: mkvers.sh include/cygwin/version.h winver.rc $(DLL_OFILES)
+winver.o: mkvers.sh include/cygwin/version.h winver.rc $(DLL_OFILES)
 	@echo "Making version.cc and winver.o";\
 	/bin/sh ${word 1,$^} ${word 2,$^} ${word 3,$^} $(WINDRES) ${CFLAGS} $(addprefix -I,${CCWRAP_SYSTEM_HEADERS} ${CCWRAP_DIRAFTER_HEADERS})
+
+version.cc: winver.o
 
 Makefile: ${srcdir}/Makefile.in
 	/bin/sh ./config.status
