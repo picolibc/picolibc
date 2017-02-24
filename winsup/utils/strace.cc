@@ -13,6 +13,7 @@ details. */
 #define cygwin_internal cygwin_internal_dontuse
 #include <stdio.h>
 #include <fcntl.h>
+#include <io.h>
 #include <getopt.h>
 #include <stdarg.h>
 #include <string.h>
@@ -1053,6 +1054,9 @@ main2 (int argc, char **argv)
 	for (argc = 0, argv = av; *av; av++)
 	  argc++;
     }
+
+  _setmode (1, _O_BINARY);
+  _setmode (2, _O_BINARY);
 
   if (!(pgm = strrchr (*argv, '\\')) && !(pgm = strrchr (*argv, '/')))
     pgm = *argv;

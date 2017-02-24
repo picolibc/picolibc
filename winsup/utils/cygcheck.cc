@@ -14,6 +14,7 @@
 #include <string.h>
 #include <sys/time.h>
 #include <ctype.h>
+#include <fcntl.h>
 #include <io.h>
 #include <windows.h>
 #include <wininet.h>
@@ -2250,6 +2251,9 @@ main (int argc, char **argv)
   int i;
   bool ok = true;
   load_cygwin (argc, argv);
+
+  _setmode (1, _O_BINARY);
+  _setmode (2, _O_BINARY);
 
   /* Need POSIX sorting while parsing args, but don't forget the
      user's original environment.  */
