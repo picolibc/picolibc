@@ -271,9 +271,16 @@ void dll_list::populate_deps (dll* d)
   PIMAGE_DATA_DIRECTORY dd = pef->idata_dir (IMAGE_DIRECTORY_ENTRY_IMPORT);
   /* Annoyance: calling crealloc with a NULL pointer will use the
      wrong heap and crash, so we have to replicate some code */
-  long maxdeps = 4;
-  d->deps = (dll**) cmalloc (HEAP_2_DLL, maxdeps*sizeof (dll*));
-  d->ndeps = 0;
+  long maxdeps;
+  if (!d->ndeps)
+    {
+      maxdeps = 4;
+      d->deps = (dll**) cmalloc (HEAP_2_DLL, maxdeps*sizeof (dll*));
+    }
+  else
+    {
+      maxdeps = d->ndeps;
+    }
   for (PIMAGE_IMPORT_DESCRIPTOR id=
 	(PIMAGE_IMPORT_DESCRIPTOR) pef->rva (dd->VirtualAddress);
       dd->Size && id->Name;
@@ -306,9 +313,45 @@ dll_list::topsort ()
 
   /* make sure we have all the deps available */
   dll* d = &start;
+  dll** dlopen_deps = NULL;
+  long maxdeps = 4;
+  long dlopen_ndeps = 0;
+
+  if (loaded_dlls > 0)
+    dlopen_deps = (dll**) cmalloc (HEAP_2_DLL, maxdeps*sizeof (dll*));
+
   while ((d = d->next))
-    if (!d->ndeps)
-      populate_deps (d);
+    {
+      if (!d->ndeps)
+        {
+          /* Ensure that all dlopen'd DLLs depend on previously dlopen'd DLLs.
+             This prevents topsort from reversing the order of dlopen'd DLLs on
+             calls to fork. */
+          if (d->type == DLL_LOAD)
+            {
+              /* Initialise d->deps with all previously dlopen'd DLLs. */
+              if (dlopen_ndeps)
+                {
+                  d->ndeps = dlopen_ndeps;
+                  d->deps = (dll**) cmalloc (HEAP_2_DLL,
+                                             dlopen_ndeps*sizeof (dll*));
+                  memcpy (d->deps, dlopen_deps, dlopen_ndeps*sizeof (dll*));
+                }
+              /* Add this DLL to the list of previously dlopen'd DLLs. */
+              if (dlopen_ndeps >= maxdeps)
+                {
+                  maxdeps = 2*(1+maxdeps);
+                  dlopen_deps = (dll**) crealloc (dlopen_deps,
+						  maxdeps*sizeof (dll*));
+                }
+              dlopen_deps[dlopen_ndeps++] = d;
+            }
+          populate_deps (d);
+        }
+    }
+
+  if (loaded_dlls > 0)
+    cfree (dlopen_deps);
 
   /* unlink head and tail pointers so the sort can rebuild the list */
   d = start.next;
