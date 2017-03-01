@@ -501,17 +501,56 @@ dll::create_forkable ()
   return false;
 }
 
+bool
+dll_list::forkables_supported ()
+{
+  return cygwin_shared->forkable_hardlink_support >= 0;
+}
+
 /* return the number of characters necessary to store one forkable name */
 size_t
 dll_list::forkable_ntnamesize (dll_type type, PCWCHAR fullntname, PCWCHAR modname)
 {
   /* per process, this is the first forkables-method ever called */
-  if (forkables_needs == forkables_unknown &&
-      !cygwin_shared->prefer_forkable_hardlinks)
-      forkables_needs = forkables_impossible; /* short cut */
+  if (cygwin_shared->forkable_hardlink_support == 0) /* Unknown */
+    {
+      /* check existence of forkables dir */
+      PWCHAR pbuf = nt_max_path_buf ();
+      for (namepart const *part = forkable_nameparts; part->text; ++part)
+	{
+	  if (part->textfunc)
+	    pbuf += part->textfunc (pbuf, -1);
+	  else
+	    pbuf += __small_swprintf (pbuf, L"%W", part->text);
+	  if (part->mutex_from_dir)
+	    break; /* up to first mutex-naming dir */
+	}
+      pbuf = nt_max_path_buf ();
 
-  if (forkables_needs == forkables_impossible)
-    return 0;
+      UNICODE_STRING fn;
+      RtlInitUnicodeString (&fn, pbuf);
+
+      HANDLE dh = INVALID_HANDLE_VALUE;
+      fs_info fsi;
+      if (fsi.update (&fn, NULL) &&
+/* FIXME: !fsi.is_readonly () && */
+	  fsi.is_ntfs ())
+	dh = ntopenfile (pbuf, NULL, FILE_DIRECTORY_FILE);
+      if (dh != INVALID_HANDLE_VALUE)
+	{
+	  cygwin_shared->forkable_hardlink_support = 1; /* Yes */
+	  NtClose (dh);
+	  debug_printf ("enabled");
+	}
+      else
+	{
+	  cygwin_shared->forkable_hardlink_support = -1; /* No */
+	  debug_printf ("disabled, missing or not on NTFS %W", fn.Buffer);
+	}
+    }
+
+  if (!forkables_supported ())
+      return 0;
 
   if (!forkables_dirx_size)
     {
@@ -560,9 +599,6 @@ dll_list::forkable_ntnamesize (dll_type type, PCWCHAR fullntname, PCWCHAR modnam
 void
 dll_list::prepare_forkables_nomination ()
 {
-  if (!forkables_dirx_ntname)
-    return;
-
   dll *d = &dlls.start;
   while ((d = d->next))
     stat_real_file_once (d); /* uses nt_max_path_buf () */
@@ -627,106 +663,19 @@ dll_list::prepare_forkables_nomination ()
 void
 dll_list::update_forkables_needs ()
 {
-  dll *d;
-
-  if (forkables_needs == forkables_unknown)
-    {
-      /* check if filesystem of forkables dir is NTFS */
-      PWCHAR pbuf = nt_max_path_buf ();
-      for (namepart const *part = forkable_nameparts; part->text; ++part)
-	{
-	  if (part->mutex_from_dir)
-	    break; /* leading non-mutex-naming dirs, must exist anyway */
-	  if (part->textfunc)
-	    pbuf += part->textfunc (pbuf, -1);
-	  else
-	    pbuf += __small_swprintf (pbuf, L"%W", part->text);
-	}
-
-      UNICODE_STRING fn;
-      RtlInitUnicodeString (&fn, nt_max_path_buf ());
-
-      fs_info fsi;
-      if (fsi.update (&fn, NULL) &&
-/* FIXME: !fsi.is_readonly () && */
-	  fsi.is_ntfs ())
-	forkables_needs = forkables_disabled; /* check directory itself */
-      else
-	{
-	  debug_printf ("impossible, not on NTFS %W", fn.Buffer);
-	  forkables_needs = forkables_impossible;
-	  cygwin_shared->prefer_forkable_hardlinks = 0;
-	}
-    }
-
-  if (forkables_needs == forkables_impossible)
-    return; /* we have not created any hardlink, nothing to clean up */
-
-  if (forkables_needs == forkables_disabled ||
-      forkables_needs == forkables_needless ||
-      forkables_needs == forkables_created)
-    {
-      /* (re-)check existence of forkables dir */
-      PWCHAR pbuf = nt_max_path_buf ();
-      for (namepart const *part = forkable_nameparts; part->text; ++part)
-	{
-	  if (part->textfunc)
-	    pbuf += part->textfunc (pbuf, -1);
-	  else
-	    pbuf += __small_swprintf (pbuf, L"%W", part->text);
-	  if (part->mutex_from_dir)
-	    break; /* up to first mutex-naming dir */
-	}
-      pbuf = nt_max_path_buf ();
-
-      HANDLE dh = ntopenfile (pbuf, NULL, FILE_DIRECTORY_FILE);
-      if (dh != INVALID_HANDLE_VALUE)
-	{
-	  NtClose (dh);
-	  if (forkables_needs == forkables_disabled)
-	    forkables_needs = forkables_needless;
-	}
-      else if (forkables_needs != forkables_disabled)
-	{
-	  debug_printf ("disabled, disappearing %W", pbuf);
-	  close_mutex ();
-	  denominate_forkables ();
-	  forkables_needs = forkables_disabled;
-	}
-      else
-	debug_printf ("disabled, missing %W", pbuf);
-    }
-
-  if (forkables_needs == forkables_disabled)
-    return;
-
-  if (forkables_needs == forkables_created)
+  if (forkables_created)
     {
       /* already have created hardlinks in this process, ... */
-      forkables_needs = forkables_needless;
-      d = &start;
+      dll *d = &start;
       while ((d = d->next) != NULL)
 	if (d->forkable_ntname && !*d->forkable_ntname)
 	  {
 	    /* ... but another dll was loaded since last fork */
 	    debug_printf ("needed, since last fork loaded %W", d->ntname);
-	    forkables_needs = forkables_needed;
+	    forkables_created = false;
 	    break;
 	  }
     }
-
-  if (forkables_needs > forkables_needless)
-    return; /* no need to check anything else */
-
-  if (forkables_needs != forkables_needless)
-    {
-      /* paranoia */
-      system_printf ("WARNING: invalid forkables_needs value %d",
-		     forkables_needs);
-      return;
-    }
-
-  forkables_needs = forkables_needed;
 }
 
 /* Create the nominated forkable hardlinks and directories as necessary,
@@ -958,7 +907,7 @@ dll_list::close_mutex ()
 void
 dll_list::cleanup_forkables ()
 {
-  if (!forkables_dirx_ntname)
+  if (!forkables_supported ())
     return;
 
   bool locked = close_mutex ();
@@ -1034,58 +983,32 @@ dll_list::set_forkables_inheritance (bool inherit)
 void
 dll_list::request_forkables ()
 {
-  if (!forkables_dirx_ntname)
+  if (!forkables_supported ())
     return;
 
-  /* Even on forkables_impossible, keep the number of open handles
-     stable across the fork, and close them when releasing only. */
   prepare_forkables_nomination ();
 
   update_forkables_needs ();
 
   set_forkables_inheritance (true);
 
-  if (forkables_needs == forkables_disabled)
-    {
-      /* we do not support (re-)enabling on the fly */
-      forkables_needs = forkables_impossible;
-      cygwin_shared->prefer_forkable_hardlinks = 0;
-    }
-
-  if (forkables_needs <= forkables_needless)
-    return;
+  if (forkables_created)
+    return; /* nothing new to create */
 
   dll *d = &start;
   while ((d = d->next))
     d->nominate_forkable (forkables_dirx_ntname);
 
-  bool updated = update_forkables ();
-
-  if (!updated)
-    forkables_needs = forkables_needless;
-  else
-    forkables_needs = forkables_created;
+  if (update_forkables ())
+    forkables_created = true;
 }
 
 
 void
 dll_list::release_forkables ()
 {
-  if (!forkables_dirx_ntname)
+  if (!forkables_supported ())
     return;
 
   set_forkables_inheritance (false);
-
-  if (forkables_needs == forkables_impossible)
-    {
-      cleanup_forkables ();
-
-      dll *d = &start;
-      while ((d = d->next))
-	d->forkable_ntname = NULL;
-
-      cfree (forkables_dirx_ntname);
-      forkables_dirx_ntname = NULL;
-      forkables_mutex_name = NULL;
-    }
 }

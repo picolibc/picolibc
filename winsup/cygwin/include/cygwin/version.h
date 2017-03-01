@@ -518,7 +518,7 @@ details. */
    regions.  It is incremented when incompatible changes are made to the shared
    memory region *or* to any named shared mutexes, semaphores, etc. */
 
-#define CYGWIN_VERSION_SHARED_DATA 6
+#define CYGWIN_VERSION_SHARED_DATA 5
 
 /* An identifier used in the names used to create shared objects.  The full
    names include the CYGWIN_VERSION_SHARED_DATA version as well as this

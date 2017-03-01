@@ -87,17 +87,9 @@ struct dll
 class dll_list
 {
   /* forkables */
-  enum
-    {
-      forkables_unknown,
-      forkables_impossible,
-      forkables_disabled,
-      forkables_needless,
-      forkables_needed,
-      forkables_created,
-    }
-    forkables_needs;
+  bool forkables_supported ();
   DWORD forkables_dirx_size;
+  bool forkables_created;
   PWCHAR forkables_dirx_ntname;
   PWCHAR forkables_mutex_name;
   HANDLE forkables_mutex;
@@ -160,10 +152,11 @@ public:
   void cleanup_forkables ();
   bool setup_forkables (bool with_forkables)
   {
-    if (forkables_needs == forkables_impossible)
-      return true; /* short cut to not retry fork */
-    /* Once used, always use forkables in current process chain. */
-    if (forkables_needs != forkables_unknown)
+    if (!forkables_supported ())
+      return true; /* no need to retry fork */
+    if (forkables_created)
+      /* Once created, use forkables in current
+	 process chain on first fork try already. */
       with_forkables = true;
     if (with_forkables)
       request_forkables ();
