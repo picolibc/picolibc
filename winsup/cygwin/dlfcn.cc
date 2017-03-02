@@ -15,13 +15,13 @@ details. */
 #include "path.h"
 #include "fhandler.h"
 #include "dtable.h"
-#include "dll_init.h"
 #include "cygheap.h"
 #include "perprocess.h"
 #include "cygtls.h"
 #include "tls_pbuf.h"
 #include "ntdll.h"
 #include "shared_info.h"
+#include "dll_init.h"
 #include "pathfinder.h"
 
 /* Dumb allocator using memory from tmp_pathbuf.w_get ().

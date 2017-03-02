@@ -8,6 +8,7 @@ details. */
 #include "cygerrno.h"
 #include "perprocess.h"
 #include "sync.h"
+#include "shared_info.h"
 #include "dll_init.h"
 #include "environ.h"
 #include "security.h"

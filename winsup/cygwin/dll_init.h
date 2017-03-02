@@ -86,8 +86,10 @@ struct dll
 
 class dll_list
 {
-  /* forkables */
-  bool forkables_supported ();
+  bool forkables_supported ()
+  {
+    return cygwin_shared->forkable_hardlink_support >= 0;
+  }
   DWORD forkables_dirx_size;
   bool forkables_created;
   PWCHAR forkables_dirx_ntname;
