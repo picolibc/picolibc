@@ -20,6 +20,7 @@ details. */
 #include "child_info.h"
 #include "cygtls.h"
 #include "tls_pbuf.h"
+#include "shared_info.h"
 #include "dll_init.h"
 #include "cygmalloc.h"
 #include "ntdll.h"

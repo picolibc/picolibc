@@ -10,7 +10,6 @@ details. */
 #include "cygerrno.h"
 #include "perprocess.h"
 #include "sync.h"
-#include "dll_init.h"
 #include "environ.h"
 #include "security.h"
 #include "path.h"
@@ -19,6 +18,7 @@ details. */
 #include "cygheap.h"
 #include "pinfo.h"
 #include "shared_info.h"
+#include "dll_init.h"
 #include "child_info.h"
 #include "cygtls.h"
 #include "exception.h"
@@ -499,12 +499,6 @@ dll::create_forkable ()
     return true;
 
   return false;
-}
-
-bool
-dll_list::forkables_supported ()
-{
-  return cygwin_shared->forkable_hardlink_support >= 0;
 }
 
 /* return the number of characters necessary to store one forkable name */
