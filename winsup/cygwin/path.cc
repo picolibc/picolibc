@@ -4445,11 +4445,23 @@ cwdstuff::set (path_conv *nat_cwd, const char *posix_cwd)
 	{
 	  /* On init, just reopen Win32 CWD with desired access flags.
 	     We can access the PEB without lock, because no other thread
-	     can change the CWD. */
-	  RtlInitUnicodeString (&upath, L"");
-	  InitializeObjectAttributes (&attr, &upath,
-			OBJ_CASE_INSENSITIVE | OBJ_INHERIT,
-			peb.ProcessParameters->CurrentDirectoryHandle, NULL);
+	     can change the CWD.  However, there's a chance that the handle
+	     is NULL, even though CurrentDirectoryName isn't so we have to
+	     be careful. */
+	  if (!peb.ProcessParameters->CurrentDirectoryHandle)
+	    {
+	      InitializeObjectAttributes (&attr,
+			    &peb.ProcessParameters->CurrentDirectoryName,
+			    OBJ_CASE_INSENSITIVE | OBJ_INHERIT, NULL, NULL);
+	    }
+	  else
+	    {
+	      RtlInitUnicodeString (&upath, L"");
+	      InitializeObjectAttributes (&attr,
+			    &upath, OBJ_CASE_INSENSITIVE | OBJ_INHERIT,
+			    peb.ProcessParameters->CurrentDirectoryHandle,
+			    NULL);
+	    }
 	}
       else
 	InitializeObjectAttributes (&attr, &upath,
@@ -4474,9 +4486,31 @@ cwdstuff::set (path_conv *nat_cwd, const char *posix_cwd)
 	}
       if (!NT_SUCCESS (status))
 	{
-	  cwd_lock.release ();
-	  __seterrno_from_nt_status (status);
-	  return -1;
+	  /* Called from chdir?  Just fail. */
+	  if (nat_cwd)
+	    {
+	      cwd_lock.release ();
+	      __seterrno_from_nt_status (status);
+	      return -1;
+	    }
+	  /* Otherwise we're in init and posix hasn't been set yet.  Try to
+	     duplicate the handle instead.  If that fails, too, set dir to NULL
+	     and carry on.  This will at least set posix to some valid path at
+	     process startup, and subsequent getcwd calls don't EFAULT. */
+	  debug_printf ("WARNING: Can't reopen CWD %y '%S', status %y",
+			peb.ProcessParameters->CurrentDirectoryHandle,
+			&peb.ProcessParameters->CurrentDirectoryName,
+			status);
+	  if (!peb.ProcessParameters->CurrentDirectoryHandle
+	      || !DuplicateHandle (GetCurrentProcess (),
+			peb.ProcessParameters->CurrentDirectoryHandle,
+			GetCurrentProcess (), &h, 0, TRUE, 0))
+	    {
+	      cwd_lock.release ();
+	      if (peb.ProcessParameters->CurrentDirectoryHandle)
+		debug_printf ("...and DuplicateHandle failed with %E.");
+	      dir = NULL;
+	    }
 	}
     }
   /* Set new handle.  Note that we simply overwrite the old handle here
