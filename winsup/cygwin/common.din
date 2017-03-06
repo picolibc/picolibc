@@ -1437,6 +1437,8 @@ timer_gettime SIGFE
 timer_settime SIGFE
 times SIGFE
 timezone SIGFE
+timingsafe_bcmp NOSIGFE
+timingsafe_memcmp NOSIGFE
 tmpfile SIGFE
 tmpnam SIGFE
 toascii NOSIGFE
