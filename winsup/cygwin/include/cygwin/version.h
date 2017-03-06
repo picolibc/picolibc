@@ -472,12 +472,13 @@ details. */
   305: [f]pathconf flag _PC_CASE_INSENSITIVE added.
   306: Export getentropy, getrandom.
   307: Export timingsafe_bcmp, timingsafe_memcmp.
+  308: Export dladdr.
 
   Note that we forgot to bump the api for ualarm, strtoll, strtoull,
   sigaltstack, sethostname. */
 
 #define CYGWIN_VERSION_API_MAJOR 0
-#define CYGWIN_VERSION_API_MINOR 307
+#define CYGWIN_VERSION_API_MINOR 308
 
 /* There is also a compatibity version number associated with the shared memory
    regions.  It is incremented when incompatible changes are made to the shared

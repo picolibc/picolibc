@@ -386,3 +386,37 @@ dlerror ()
     }
   return res;
 }
+
+extern "C" int
+dladdr (const void *addr, Dl_info *info)
+{
+  HMODULE hModule;
+  BOOL ret = GetModuleHandleEx (GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS,
+				(LPCSTR) addr,
+				&hModule);
+  if (!ret)
+    return 0;
+
+  /* Module handle happens to be equal to it's base load address. */
+  info->dli_fbase = hModule;
+
+  /* Get the module filename.  This pathname may be in short-, long- or //?/
+     format, depending on how it was specified when loaded, but we assume this
+     is always an absolute pathname. */
+  WCHAR fname[MAX_PATH];
+  DWORD length = GetModuleFileNameW (hModule, fname, MAX_PATH);
+  if ((length == 0) || (length == MAX_PATH))
+    return 0;
+
+  /* Convert to a cygwin pathname */
+  ssize_t conv = cygwin_conv_path (CCP_WIN_W_TO_POSIX | CCP_ABSOLUTE, fname,
+				   info->dli_fname, MAX_PATH);
+  if (conv)
+    return 0;
+
+  /* Always indicate no symbol matching addr could be found. */
+  info->dli_sname = NULL;
+  info->dli_saddr = NULL;
+
+  return 1;
+}

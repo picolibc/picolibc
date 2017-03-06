@@ -1277,6 +1277,7 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     clog10
     clog10f
     clog10l
+    dladdr			(see chapter "Implementation Notes")
     dremf
     dup3
     envz_add
@@ -1664,6 +1665,9 @@ depending on whether _BSD_SOURCE or _GNU_SOURCE is defined when compiling.</para
 
 <para><function>basename</function> is available in both POSIX and GNU flavors,
 depending on whether libgen.h is included or not.</para>
+
+<para><function>dladdr</function> always sets the Dl_info members dli_sname and
+dli_saddr to NULL, indicating no symbol matching addr could be found.</para>
 
 </sect1>
 

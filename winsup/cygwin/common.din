@@ -364,6 +364,7 @@ difftime NOSIGFE
 dirfd SIGFE
 dirname NOSIGFE
 div NOSIGFE
+dladdr SIGFE
 dlclose SIGFE
 dlerror NOSIGFE
 dlfork NOSIGFE
