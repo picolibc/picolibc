@@ -876,10 +876,45 @@ example, single-stepping from these signals may not work as expected.
 <para>A common error is to put the library on the command line before
 the thing that needs things from it.
 </para>
+
 <para>This is wrong <literal>gcc -lstdc++ hello.cc</literal>.
 This is right <literal>gcc hello.cc -lstdc++</literal>.
 </para>
-</answer></qandaentry>
+
+<para>
+  The first command above (usually) works on Linux, because:
+  <itemizedlist mark="bullet">
+    <listitem>A DT_NEEDED tag for libstdc++ is added when the library name is seen.</listitem>
+    <listitem>The executable has unresolved symbols, which can be found in libstdc++.</listitem>
+    <listitem>When executed, the ELF loader resolves those symbols.</listitem>
+  </itemizedlist>
+</para>
+
+<para>
+  Note that this won't work if the linker flags <literal>--as-needed</literal>
+  or <literal>--no-undefined</literal> are used, or if the library being linked
+  with is a static library.
+</para>
+
+<para>
+  PE/COFF executables work very differently, and the dynamic library which
+  provides a symbol must be fully resolved <emphasis>at link time</emphasis>
+  (so the library which provides a symbol must follow a reference to it).
+</para>
+
+<para>
+  See point 3 in <xref linkend="faq.programming.unix-gui"></xref> for more
+  discussion of how this affects plugins.
+</para>
+
+<para>
+  This also has consequences for how weak symbols are resolved. See <ulink
+  url="https://cygwin.com/ml/cygwin/2010-04/msg00281.html"></ulink> for more
+  discussion of that.
+</para>
+
+</answer>
+</qandaentry>
 
 <qandaentry id="faq.programming.stat64">
 <question><para>Why do I get an error using <literal>struct stat64</literal>?</para></question>
