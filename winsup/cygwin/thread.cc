@@ -1266,24 +1266,14 @@ pthread_cond::wait (pthread_mutex_t mutex, PLARGE_INTEGER timeout)
   ++mutex->condwaits;
   mutex->unlock ();
 
-  rv = cygwait (sem_wait, timeout, cw_cancel | cw_sig_eintr);
+  rv = cygwait (sem_wait, timeout, cw_cancel | cw_sig_restart);
 
   mtx_out.lock ();
 
-  if (rv != WAIT_OBJECT_0)
-    {
-      /*
-       * It might happen that a signal is sent while the thread got canceled
-       * or timed out. Try to take one.
-       * If the thread gets one than a signal|broadcast is in progress.
-       */
-      if (WaitForSingleObject (sem_wait, 0) == WAIT_OBJECT_0)
-	/*
-	 * thread got cancelled ot timed out while a signalling is in progress.
-	 * Set wait result back to signaled
-	 */
-	rv = WAIT_OBJECT_0;
-    }
+  if (rv != WAIT_OBJECT_0 && WaitForSingleObject (sem_wait, 0) == WAIT_OBJECT_0)
+    /* Thread got cancelled ot timed out while a signalling is in progress.
+       Set wait result back to signaled */
+    rv = WAIT_OBJECT_0;
 
   InterlockedDecrement (&waiting);
 
@@ -1301,13 +1291,6 @@ pthread_cond::wait (pthread_mutex_t mutex, PLARGE_INTEGER timeout)
 
   if (rv == WAIT_CANCELED)
     pthread::static_cancel_self ();
-  else if (rv == WAIT_SIGNALED)
-    /* SUSv3 states:  If a signal is delivered to a thread waiting for a
-       condition variable, upon return from the signal handler the thread
-       resumes waiting for the condition variable as if it was not
-       interrupted, or it shall return zero due to spurious wakeup.
-       We opt for the latter choice here. */
-    return 0;
   else if (rv == WAIT_TIMEOUT)
     return ETIMEDOUT;
 
