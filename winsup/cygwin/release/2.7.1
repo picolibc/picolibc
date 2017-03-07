@@ -10,6 +10,9 @@ What changed:
 
 - fork now preserves the load order of unrelated dlopen'd modules.
 
+- pthread_cond_wait now acts like Linux and BSD: Resume waiting for the
+  condition variable as if it was not interrupted, rather than returning 0.
+
 
 Bug Fixes
 ---------
