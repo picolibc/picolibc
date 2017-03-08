@@ -549,6 +549,8 @@ public:
     /* If we got an address, remember it for the next allocation attempt. */
     if (real_stackaddr)
       current = (UINT_PTR) real_stackaddr;
+    else
+      set_errno (EAGAIN);
     return real_stackaddr;
   }
 };
