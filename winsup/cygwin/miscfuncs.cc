@@ -85,17 +85,18 @@ check_iovec (const struct iovec *iov, int iovcnt, bool forwrite)
 void
 yield ()
 {
-  int prio = GetThreadPriority (GetCurrentThread ());
-  SetThreadPriority (GetCurrentThread (), THREAD_PRIORITY_IDLE);
-  /* MSDN implies that SleepEx will force scheduling of other threads.
+  /* MSDN implies that Sleep will force scheduling of other threads.
      Unlike SwitchToThread() the documentation does not mention other
      cpus so, presumably (hah!), this + using a lower priority will
      stall this thread temporarily and cause another to run.
      (stackoverflow and others seem to confirm that setting this thread
      to a lower priority and calling Sleep with a 0 paramenter will
-     have this desired effect)  */
+     have this desired effect)
+
+     CV 2017-03-08: Drop lowering the priority.  It leads to potential
+		    starvation and it should not be necessary anymore
+		    since Server 2003.  See the MSDN Sleep man page. */
   Sleep (0L);
-  SetThreadPriority (GetCurrentThread (), prio);
 }
 
 /* Get a default value for the nice factor.  When changing these values,
