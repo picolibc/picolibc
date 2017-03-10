@@ -1041,7 +1041,7 @@ _dll_crt0 ()
      under our own control and avoids collision with the OS. */
   if (!dynamically_loaded)
     {
-      if (!in_forkee || fork_info->from_main)
+      if (!in_forkee)
 	{
 	  /* Must be static since it's referenced after the stack and frame
 	     pointer registers have been changed. */
