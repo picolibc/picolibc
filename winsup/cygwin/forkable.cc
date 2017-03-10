@@ -423,7 +423,14 @@ dll::nominate_forkable (PCWCHAR dirx_name)
 }
 
 /* Create the nominated hardlink for one indivitual dll,
-   inside another subdirectory when dynamically loaded. */
+   inside another subdirectory when dynamically loaded.
+
+   We've not found a performant way yet to protect fork against
+   updates to main executables and/or dlls that do not reside on
+   the same NTFS filesystem as the <cygroot>/var/run/cygfork/
+   directory.  But as long as the main executable can be hardlinked,
+   dll redirection works for any other hardlink-able dll, while
+   non-hardlink-able dlls are used from their original location. */
 bool
 dll::create_forkable ()
 {
@@ -465,14 +472,6 @@ dll::create_forkable ()
   if (devhandle == INVALID_HANDLE_VALUE)
     return false; /* impossible */
 
-  HANDLE fh = dll_list::ntopenfile ((PCWCHAR)&fii.IndexNumber, NULL,
-				    FILE_OPEN_BY_FILE_ID,
-				    FILE_WRITE_ATTRIBUTES,
-				    devhandle);
-  NtClose (devhandle);
-  if (fh == INVALID_HANDLE_VALUE)
-    return false; /* impossible */
-
   int ntlen = wcslen (ntname);
   int bufsize = sizeof (FILE_LINK_INFORMATION) + ntlen * sizeof (*ntname);
   PFILE_LINK_INFORMATION pfli = (PFILE_LINK_INFORMATION) alloca (bufsize);
@@ -483,22 +482,47 @@ dll::create_forkable ()
   pfli->ReplaceIfExists = FALSE; /* allow concurrency */
   pfli->RootDirectory = NULL;
 
-  IO_STATUS_BLOCK iosb;
-  NTSTATUS status = NtSetInformationFile (fh, &iosb, pfli, bufsize,
-					  FileLinkInformation);
-  NtClose (fh);
-  debug_printf ("%y = NtSetInformationFile (%p, FileLink %W, iosb.Status %y)",
-		status, fh, pfli->FileName, iosb.Status);
-  if (NT_SUCCESS (status) || status == STATUS_OBJECT_NAME_COLLISION)
-    /* We've not found a performant way yet to protect fork against updates
-       to main executables and/or dlls that do not reside on the same NTFS
-       filesystem as the <cygroot>/var/run/cygfork/ directory.
-       But as long as the main executable can be hardlinked, dll redirection
-       works for any other hardlink-able dll, while non-hardlink-able dlls
-       are used from their original location. */
-    return true;
+  /* When we get STATUS_TRANSACTION_NOT_ACTIVE from hardlink creation,
+     the current process has renamed the file while it had the readonly
+     attribute.  The rename() function uses a transaction for combined
+     writeable+rename action if possible to provide atomicity.
+     Although the transaction is closed afterwards, creating a hardlink
+     for this file requires the FILE_WRITE_ATTRIBUTES access, for unknown
+     reason.  On the other hand, always requesting FILE_WRITE_ATTRIBUTES
+     would fail for users that do not own the original file. */
+  bool ret = false;
+  int access = 0; /* first attempt */
+  while (true)
+    {
+      HANDLE fh = dll_list::ntopenfile ((PCWCHAR)&fii.IndexNumber, NULL,
+					FILE_OPEN_BY_FILE_ID,
+					access,
+					devhandle);
+      if (fh == INVALID_HANDLE_VALUE)
+	break; /* impossible */
 
-  return false;
+      IO_STATUS_BLOCK iosb;
+      NTSTATUS status = NtSetInformationFile (fh, &iosb, pfli, bufsize,
+					      FileLinkInformation);
+      NtClose (fh);
+      debug_printf ("%y = NtSetInformationFile (%p, FileLink %W, iosb.Status %y)",
+		    status, fh, pfli->FileName, iosb.Status);
+      if (NT_SUCCESS (status) || status == STATUS_OBJECT_NAME_COLLISION)
+	{
+	  ret = true;
+	  break;
+	}
+
+      if (status != STATUS_TRANSACTION_NOT_ACTIVE ||
+	  access == FILE_WRITE_ATTRIBUTES)
+	break;
+
+      access = FILE_WRITE_ATTRIBUTES; /* second attempt */
+    }
+
+  NtClose (devhandle);
+
+  return ret;
 }
 
 /* return the number of characters necessary to store one forkable name */
