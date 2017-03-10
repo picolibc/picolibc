@@ -143,15 +143,11 @@ frok::child (volatile char * volatile here)
 		myself->pid, myself->ppid, __builtin_frame_address (0));
   sigproc_printf ("hParent %p, load_dlls %d", hParent, load_dlls);
 
-  /* If we've played with the stack, stacksize != 0.  That means that
-     fork() was invoked from other than the main thread.  Make sure that
-     the threadinfo information is properly set up.  */
-  if (!fork_info->from_main)
+  /* Make sure threadinfo information is properly set up. */
+  if (&_my_tls != _main_tls)
     {
       _main_tls = &_my_tls;
       _main_tls->init_thread (NULL, NULL);
-      _main_tls->local_clib = *_impure_ptr;
-      _impure_ptr = &_main_tls->local_clib;
     }
 
   set_cygwin_privileges (hProcToken);
@@ -300,7 +296,6 @@ frok::parent (volatile char * volatile stack_here)
 
   ch.forker_finished = forker_finished;
 
-  ch.from_main = &_my_tls == _main_tls;
   ch.stackbase = NtCurrentTeb ()->Tib.StackBase;
   ch.stackaddr = NtCurrentTeb ()->DeallocationStack;
   if (!ch.stackaddr)
