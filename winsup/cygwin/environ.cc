@@ -454,8 +454,7 @@ posify_maybe (char **here, const char *value, char *outenv)
 
   memcpy (outenv, src, len);
   char *newvalue = outenv + len;
-  if (!conv->toposix (value, newvalue, NT_MAX_PATH - len)
-      || _impure_ptr->_errno != EIDRM)
+  if (!conv->toposix (value, newvalue, NT_MAX_PATH - len) || errno != EIDRM)
     conv->add_cache (newvalue, *value != '/' ? value : NULL);
   else
     {

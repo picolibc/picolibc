@@ -30,7 +30,7 @@ extern inline int
 __set_errno (const char *fn, int ln, int val)
 {
   debug_printf ("%s:%d setting errno %d", fn, ln, val);
-  return errno = _impure_ptr->_errno = val;
+  return errno = val;
 }
 #define set_errno(val) __set_errno (__PRETTY_FUNCTION__, __LINE__, (val))
 
@@ -45,7 +45,7 @@ class save_errno
     save_errno (int what) {saved = get_errno (); set_errno (what); }
     void set (int what) {set_errno (what); saved = what;}
     void reset () {saved = get_errno ();}
-    ~save_errno () {errno = _impure_ptr->_errno = saved;}
+    ~save_errno () {errno = saved;}
   };
 
 extern const char *__sp_fn;
