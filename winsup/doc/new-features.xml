@@ -4,6 +4,36 @@
 
 <sect1 id="ov-new"><title>What's new and what changed in Cygwin</title>
 
+<sect2 id="ov-new2.8"><title>What's new and what changed in 2.8</title>
+
+<itemizedlist mark="bullet">
+
+<listitem><para>
+New API: timingsafe_bcmp, timingsafe_memcmp.
+</para></listitem>
+
+<listitem><para>
+New API: dladdr.
+</para></listitem>
+
+<listitem><para>
+Cygcheck and strace now always generate output with Unix LF line endings,
+rather than with DOS/Windows CR LF line endings.
+</para></listitem>
+
+<listitem><para>
+Fork now preserves the load order of unrelated dlopen'd modules.
+</para></listitem>
+
+<listitem><para>
+Pthread_cond_wait now acts like Linux and BSD: Resume waiting for the
+condition variable as if it was not interrupted, rather than returning 0.
+</para></listitem>
+
+</itemizedlist>
+
+</sect2>
+
 <sect2 id="ov-new2.7"><title>What's new and what changed in 2.7</title>
 
 <itemizedlist mark="bullet">
