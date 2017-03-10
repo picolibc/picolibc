@@ -564,7 +564,7 @@ pthread::exit (void *value_ptr)
 
   if (_my_tls.local_clib.__sdidinit < 0)
     _my_tls.local_clib.__sdidinit = 0;
-  (_reclaim_reent) (_REENT);
+  _reclaim_reent (_REENT);
 
   if (InterlockedDecrement (&MT_INTERFACE->threadcount) == 0)
     ::exit (0);
