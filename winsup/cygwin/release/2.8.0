@@ -23,3 +23,5 @@ Bug Fixes
 - Fix a few problems which are the combined culprit of fork failing
   when called recursively from a pthread.
   Addresses: https://cygwin.com/ml/cygwin/2017-03/msg00113.html
+
+- Fix potential buffer overflow in getrandom.

@@ -51,7 +51,7 @@ getrandom (void *ptr, size_t len, unsigned int flags)
       return -1;
     }
   /* Max. bytes returned by Linux call. */
-  len = MAX (len, (flags & GRND_RANDOM) ? 512 : 33554431);
+  len = MIN (len, (flags & GRND_RANDOM) ? 512 : 33554431);
   __try
     {
       if (!RtlGenRandom (ptr, len))
