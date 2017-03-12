@@ -1682,6 +1682,8 @@ class fhandler_dev_null: public fhandler_base
     copyto (fh);
     return fh;
   }
+
+  ssize_t __stdcall write (const void *ptr, size_t len);
 };
 
 class fhandler_dev_zero: public fhandler_base
