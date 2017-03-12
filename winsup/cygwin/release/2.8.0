@@ -25,3 +25,8 @@ Bug Fixes
   Addresses: https://cygwin.com/ml/cygwin/2017-03/msg00113.html
 
 - Fix potential buffer overflow in getrandom.
+
+- Fix write(2) return value for writes > 2 GB.
+
+- Workaround Windows NUL having the same problem for writes > 4 GB.
+  Addresses: https://cygwin.com/ml/cygwin/2017-03/msg00144.html
