@@ -813,7 +813,7 @@ out:
 ssize_t __stdcall
 fhandler_base::write (const void *ptr, size_t len)
 {
-  int res;
+  ssize_t res;
 
   if (did_lseek ())
     {
