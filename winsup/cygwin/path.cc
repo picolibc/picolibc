@@ -2302,22 +2302,13 @@ symlink_info::check_reparse_point (HANDLE h, bool remote)
 		  rp->SymbolicLinkReparseBuffer.SubstituteNameLength);
   else if (!remote && rp->ReparseTag == IO_REPARSE_TAG_MOUNT_POINT)
     {
-      /* Don't handle junctions on remote filesystems as symlinks.  This type
-	 of reparse point is handled transparently by the OS so that the
-	 target of the junction is the remote directory it is supposed to
-	 point to.  If we handle it as symlink, it will be mistreated as
-	 pointing to a dir on the local system. */
+      /* Don't treat junctions as symlink. The return value of -1 is a hint
+         for the caller to treat this as a volume mount point. */
       RtlInitCountedUnicodeString (&subst,
 		  (WCHAR *)((char *)rp->MountPointReparseBuffer.PathBuffer
 			  + rp->MountPointReparseBuffer.SubstituteNameOffset),
 		  rp->MountPointReparseBuffer.SubstituteNameLength);
-      if (RtlEqualUnicodePathPrefix (&subst, &ro_u_volume, TRUE))
-	{
-	  /* Volume mount point.  Not treated as symlink. The return
-	     value of -1 is a hint for the caller to treat this as a
-	     volume mount point. */
-	  return -1;
-	}
+      return RtlEqualUnicodePathPrefix (&subst, &ro_u_volume, TRUE) ? -1 : 0;
     }
   else
     {
