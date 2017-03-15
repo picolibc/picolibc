@@ -37,7 +37,7 @@ QUICKREF
 /*
  *  Written by Joel Sherrill <joel.sherrill@OARcorp.com>.
  *
- *  COPYRIGHT (c) 2010.
+ *  COPYRIGHT (c) 2010, 2017.
  *  On-Line Applications Research Corporation (OAR).
  *
  *  Permission to use, copy, modify, and distribute this software for any
@@ -49,8 +49,6 @@ QUICKREF
  *  WARRANTY.  IN PARTICULAR,  THE AUTHOR MAKES NO REPRESENTATION
  *  OR WARRANTY OF ANY KIND CONCERNING THE MERCHANTABILITY OF THIS
  *  SOFTWARE OR ITS FITNESS FOR ANY PARTICULAR PURPOSE.
- *
- *  $Id$
  */
 
 #include <string.h>
@@ -72,7 +70,7 @@ _DEFUN (strsignal, (signal),
   buffer = _REENT_SIGNAL_BUF(ptr);
 
 #if defined(SIGRTMIN) && defined(SIGRTMAX)
-  if ((signal >= SIGRTMIN) || (signal <= SIGRTMAX)) {
+  if ((signal >= SIGRTMIN) && (signal <= SIGRTMAX)) {
     siprintf (buffer, "Real-time signal %d", signal - SIGRTMIN);
     return buffer;
   }
