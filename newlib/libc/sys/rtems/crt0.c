@@ -68,7 +68,7 @@ RTEMS_STUB(void, _Libatomic_Lock_n(void *ptr, __size_t n), { });
 RTEMS_STUB(void, _Libatomic_Unlock_n(void *ptr, __size_t n), { });
 
 /* Stubs for routines for arc4random (from <unistd.h> and <machine/_arc4random.h> */
-RTEMS_STUB(int,  getentropy(void *ptr, __size_t n), { });
+RTEMS_STUB(int,  getentropy(void *ptr, __size_t n), { return -1; });
 RTEMS_STUB(void, _arc4random_getentropy_fail(void), { });
 
 #if defined(__GNUC__)
