@@ -140,12 +140,8 @@ check: testsuite.exe ; $(<D)/$(<F)
 # the rest of this file contains generic rules
 
 # how to compile a MinGW object
-${MINGW_OBJS}: override CXX:=${MINGW_CXX}
-${MINGW_OBJS}: CCWRAP_HEADERS:=${srcdir}
-${MINGW_OBJS}: CCWRAP_SYSTEM_HEADERS:=
-# ${MINGW_OBJS}: CCWRAP_DIRAFTER_HEADERS:=
 $(MINGW_OBJS): %.o: %.cc
-	c++wrap -c -o $@ ${CXXFLAGS} $(MINGW_CXXFLAGS) $<
+	${MINGW_CXX} -c -o $@ ${CXXFLAGS} $(MINGW_CXXFLAGS) $<
 
 # how to link a MinGW binary
 $(MINGW_BINS): %.exe: %.o

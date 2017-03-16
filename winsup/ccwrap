@@ -26,11 +26,6 @@ if ("@ARGV" !~ / -nostdinc/o) {
     push @compiler, '-I' . $_ for split ' ', $ENV{CCWRAP_HEADERS};
     push @compiler, '-isystem', $_ for split ' ', $ENV{CCWRAP_SYSTEM_HEADERS};
     my $finding_paths = 0;
-    my $mingw_compiler = $compiler[0] =~ /mingw/o;
-    my @dirafters;
-    for my $d (split ' ', $ENV{CCWRAP_DIRAFTER_HEADERS}) {
-	push @dirafters, '-isystem', $d if !$mingw_compiler || $d !~ /w32api/o;
-    }
     while (<$fd>) {
 	if (/^\*\*\*/o) {
 	    print;
@@ -40,13 +35,13 @@ if ("@ARGV" !~ / -nostdinc/o) {
 	    next;
 	} elsif ($_ eq "End of search list.\n") {
 	    last;
-	} elsif (!@dirafters || !m%w32api|mingw.*/include%o) {
+	} elsif (!m%w32api%o) {
 	    chomp;
 	    s/^\s+//;
 	    push @compiler, '-isystem', Cwd::abs_path($_);
 	}
     }
-    push @compiler, @dirafters;
+    push @compiler, '-isystem', $_ for split ' ', $ENV{CCWRAP_DIRAFTER_HEADERS};
     close $fd;
 }
 
