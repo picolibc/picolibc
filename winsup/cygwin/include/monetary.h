@@ -32,7 +32,7 @@
 #include <sys/cdefs.h>
 #include <sys/types.h>
 #if __POSIX_VISIBLE >= 200809
-#include <sys/_locale.h>
+#include <xlocale.h>
 #endif
 
 __BEGIN_DECLS

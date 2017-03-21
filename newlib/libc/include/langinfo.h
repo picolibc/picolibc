@@ -33,7 +33,7 @@
 #include <sys/config.h>
 #include <sys/cdefs.h>
 #if __POSIX_VISIBLE >= 200809
-#include <sys/_locale.h>
+#include <xlocale.h>
 #endif
 
 typedef int nl_item;

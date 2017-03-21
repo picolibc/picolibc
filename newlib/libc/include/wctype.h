@@ -8,7 +8,7 @@
 #include <stddef.h>
 
 #if __POSIX_VISIBLE >= 200809
-#include <sys/_locale.h>
+#include <xlocale.h>
 #endif
 
 #ifndef WEOF
