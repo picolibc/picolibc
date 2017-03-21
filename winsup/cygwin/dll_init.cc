@@ -200,9 +200,8 @@ dll_list::alloc (HINSTANCE h, per_process *p, dll_type type)
   dll *d = (type == DLL_LINK) ? dlls.find_by_modname (modname) : dlls[name];
   if (d)
     {
-      if (!in_forkee)
-	d->count++;	/* Yes.  Bump the usage count. */
-      else if (d->handle != h)
+      /* We only get here in the forkee. */
+      if (d->handle != h)
 	fabort ("%W: Loaded to different address: parent(%p) != child(%p)",
 		name, d->handle, h);
       /* If this DLL has been linked against, and the full path differs, try
@@ -224,15 +223,14 @@ dll_list::alloc (HINSTANCE h, per_process *p, dll_type type)
     }
   else
     {
-      /* FIXME: Change this to new at some point. */
-      d = (dll *) cmalloc (HEAP_2_DLL, sizeof (*d) + (namelen * sizeof (*name)));
-
+      d = (dll *) cmalloc (HEAP_2_DLL,
+			   sizeof (*d) + (namelen * sizeof (*name)));
       /* Now we've allocated a block of information.  Fill it in with the
 	 supplied info about this DLL. */
-      d->count = 1;
       wcscpy (d->name, name);
       d->modname = d->name + (modname - name);
       d->handle = h;
+      d->count = 0;	/* Reference counting performed in dlopen/dlclose. */
       d->has_dtors = true;
       d->p = p;
       d->ndeps = 0;
@@ -438,25 +436,21 @@ dll_list::detach (void *retaddr)
   guard (true);
   if ((d = find (retaddr)))
     {
-      if (d->count <= 0)
-	system_printf ("WARNING: trying to detach an already detached dll ...");
-      if (--d->count == 0)
-	{
-	  /* Ensure our exception handler is enabled for destructors */
-	  exception protect;
-	  /* Call finalize function if we are not already exiting */
-	  if (!exit_state)
-	    __cxa_finalize (d->handle);
-	  d->run_dtors ();
-	  d->prev->next = d->next;
-	  if (d->next)
-	    d->next->prev = d->prev;
-	  if (d->type == DLL_LOAD)
-	    loaded_dlls--;
-	  if (end == d)
-	    end = d->prev;
-	  cfree (d);
-	}
+      system_printf ("HERE %W", d->name);
+      /* Ensure our exception handler is enabled for destructors */
+      exception protect;
+      /* Call finalize function if we are not already exiting */
+      if (!exit_state)
+	__cxa_finalize (d->handle);
+      d->run_dtors ();
+      d->prev->next = d->next;
+      if (d->next)
+	d->next->prev = d->prev;
+      if (d->type == DLL_LOAD)
+	loaded_dlls--;
+      if (end == d)
+	end = d->prev;
+      cfree (d);
     }
   guard (false);
 }
@@ -641,6 +635,9 @@ void dll_list::load_after_fork_impl (HANDLE parent, dll* d, int retries)
       if (h != d->handle)
 	fabort ("unable to map %W to same address as parent: %p != %p",
 		d->modname, d->handle, h);
+      /* Fix OS reference count. */
+      for (int cnt = 1; cnt < d->count; ++cnt)
+	LoadLibraryW (d->name);
     }
 }
 

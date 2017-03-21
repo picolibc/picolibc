@@ -9,14 +9,15 @@ details. */
 #include "winsup.h"
 #include <psapi.h>
 #include <stdlib.h>
+#include <dlfcn.h>
 #include <ctype.h>
 #include <wctype.h>
 #include "path.h"
 #include "fhandler.h"
 #include "dtable.h"
+#include "dll_init.h"
 #include "cygheap.h"
 #include "perprocess.h"
-#include "dlfcn.h"
 #include "cygtls.h"
 #include "tls_pbuf.h"
 #include "ntdll.h"
@@ -291,6 +292,13 @@ dlopen (const char *name, int flags)
 #endif
 
       ret = (void *) LoadLibraryW (wpath);
+      /* reference counting */
+      if (ret)
+	{
+	  dll *d = dlls.find (ret);
+	  if (d)
+	    ++d->count;
+	}
 
 #ifndef __x86_64__
       /* Restore original cxx_malloc pointer. */
@@ -361,13 +369,27 @@ dlsym (void *handle, const char *name)
 extern "C" int
 dlclose (void *handle)
 {
-  int ret;
-  if (handle == GetModuleHandle (NULL))
-    ret = 0;
-  else if (FreeLibrary ((HMODULE) handle))
-    ret = 0;
-  else
-    ret = -1;
+  int ret = 0;
+  if (handle != GetModuleHandle (NULL))
+    {
+      /* reference counting */
+      dll *d = dlls.find (handle);
+      if (d) system_printf ("%W count %d", d->name, d->count);
+      if (!d || d->count <= 0)
+	{
+	  errno = ENOENT;
+	  ret = -1;
+	}
+      else
+	{
+	  --d->count;
+	  if (!FreeLibrary ((HMODULE) handle))
+	    {
+	      __seterrno ();
+	      ret = -1;
+	    }
+	}
+    }
   if (ret)
     set_dl_error ("dlclose");
   return ret;

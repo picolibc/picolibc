@@ -33,3 +33,7 @@ Bug Fixes
 
 - Fix a potential crash in duplocale.
   Addresses: https://sourceware.org/ml/newlib/2017/msg00166.html
+
+- Fix dlopen/dlclose reference counting to make sure FreeLibrary isn't
+  called too early in forked process.
+  Addresses: https://cygwin.com/ml/cygwin/2017-03/msg00220.html
