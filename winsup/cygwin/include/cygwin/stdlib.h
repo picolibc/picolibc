@@ -77,6 +77,10 @@ extern _PTR valloc _PARAMS ((size_t));
 #undef _mstats_r
 #define _mstats_r(r, p) mstats (p)
 
+#if __BSD_VISIBLE
+int getloadavg(double loadavg[], int nelem);
+#endif
+
 #ifdef __cplusplus
 }
 #endif

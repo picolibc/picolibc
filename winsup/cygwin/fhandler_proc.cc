@@ -418,7 +418,7 @@ static off_t
 format_proc_loadavg (void *, char *&destbuf)
 {
   extern int get_process_state (DWORD dwProcessId);
-  unsigned running = 0;
+  unsigned int running = 0;
   winpids pids ((DWORD) 0);
 
   for (unsigned i = 0; i < pids.npids; i++)
@@ -429,9 +429,13 @@ format_proc_loadavg (void *, char *&destbuf)
 	break;
     }
 
+  double loadavg[3] = { 0.0, 0.0, 0.0 };
+  getloadavg (loadavg, 3);
+
   destbuf = (char *) crealloc_abort (destbuf, 48);
-  return __small_sprintf (destbuf, "%u.%02u %u.%02u %u.%02u %u/%u\n",
-				    0, 0, 0, 0, 0, 0, running, pids.npids);
+  return sprintf (destbuf, "%.2f %.2f %.2f %u/%u\n",
+		  loadavg[0], loadavg[1], loadavg[2], running,
+		  (unsigned int)pids.npids);
 }
 
 static off_t

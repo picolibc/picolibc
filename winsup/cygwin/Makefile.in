@@ -323,6 +323,7 @@ DLL_OFILES:= \
 	kernel32.o \
 	ldap.o \
 	libstdcxx_wrapper.o \
+	loadavg.o \
 	localtime.o \
 	lsearch.o \
 	malloc_wrapper.o \

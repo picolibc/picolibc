@@ -11,6 +11,7 @@ details. */
 #include "mtinfo.h"
 #include "limits.h"
 #include "mount.h"
+#include "loadavg.h"
 
 #define CURR_USER_MAGIC 0xab1fcce8U
 
@@ -48,6 +49,7 @@ class shared_info
   LONG last_used_bindresvport;
   DWORD obcaseinsensitive;
   mtinfo mt;
+  loadavginfo loadavg;
 
   void initialize ();
   void init_obcaseinsensitive ();
