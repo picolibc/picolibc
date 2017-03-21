@@ -24,7 +24,7 @@
  * SUCH DAMAGE.
  */
 
-#if __ARM_FP & 0x8
+#if (__ARM_FP & 0x8) && !defined(__SOFTFP__)
 #include <math.h>
 
 double
