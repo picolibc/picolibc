@@ -6,6 +6,8 @@ INCLUDES = -I $(newlib_basedir)/../newlib/libm/common $(NEWLIB_CFLAGS) \
 	$(CROSS_CFLAGS) $(TARGET_CFLAGS)
 
 LIB_SOURCES = \
+	e_sqrt.c \
+	ef_sqrt.c \
 	s_ceil.c \
 	s_floor.c \
 	s_nearbyint.c \
