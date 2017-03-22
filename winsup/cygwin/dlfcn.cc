@@ -374,7 +374,6 @@ dlclose (void *handle)
     {
       /* reference counting */
       dll *d = dlls.find (handle);
-      if (d) system_printf ("%W count %d", d->name, d->count);
       if (!d || d->count <= 0)
 	{
 	  errno = ENOENT;

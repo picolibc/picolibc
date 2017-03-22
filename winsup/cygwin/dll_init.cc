@@ -436,7 +436,6 @@ dll_list::detach (void *retaddr)
   guard (true);
   if ((d = find (retaddr)))
     {
-      system_printf ("HERE %W", d->name);
       /* Ensure our exception handler is enabled for destructors */
       exception protect;
       /* Call finalize function if we are not already exiting */
