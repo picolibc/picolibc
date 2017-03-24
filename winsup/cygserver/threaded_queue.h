@@ -49,6 +49,7 @@ public:
 
 private:
   LONG _workers_count;
+  LONG _workers_busy;
   bool _running;
 
   queue_submission_loop *_submitters_head;

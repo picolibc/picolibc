@@ -32,6 +32,7 @@ queue_request::~queue_request ()
 
 threaded_queue::threaded_queue (const size_t initial_workers)
   : _workers_count (0),
+    _workers_busy (0),
     _running (false),
     _submitters_head (NULL),
     _requests_count (0),
@@ -161,12 +162,6 @@ threaded_queue::add (queue_request *const therequest)
   assert (therequest);
   assert (!therequest->_next);
 
-  if (!_workers_count)
-    {
-      system_printf ("warning: no worker threads to handle request!");
-      // FIXME: And then what?
-    }
-
   EnterCriticalSection (&_queue_lock);
   if (!_requests_head)
     _requests_head = therequest;
@@ -186,6 +181,12 @@ threaded_queue::add (queue_request *const therequest)
   LeaveCriticalSection (&_queue_lock);
 
   (void) ReleaseSemaphore (_requests_sem, 1, NULL);
+
+  if (_workers_busy >= _workers_count)
+    {
+      create_workers (1);
+      system_printf ("All threads busy, added one (now %u)", _workers_count);
+    }
 }
 
 /*static*/ DWORD WINAPI
@@ -205,17 +206,12 @@ threaded_queue::start_routine (const LPVOID lpParam)
   return 0;
 }
 
-/* Called from the constructor: so no need to be thread-safe until the
- * worker threads start to be created; thus the interlocked increment
- * of the `_workers_count' field.
- */
-
 void
 threaded_queue::create_workers (const size_t initial_workers)
 {
   assert (initial_workers > 0);
 
-  for (unsigned int i = 0; i != initial_workers; i++)
+  for (unsigned int i = 0; i < initial_workers; i++)
     {
       const long count = InterlockedIncrement (&_workers_count);
       assert (count > 0);
@@ -265,7 +261,9 @@ threaded_queue::worker_loop ()
       LeaveCriticalSection (&_queue_lock);
 
       assert (reqptr);
+      InterlockedIncrement (&_workers_busy);
       reqptr->process ();
+      InterlockedDecrement (&_workers_busy);
       delete reqptr;
     }
 }
