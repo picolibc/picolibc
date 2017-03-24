@@ -52,7 +52,7 @@ __FBSDID("$FreeBSD: /usr/local/www/cvsroot/FreeBSD/src/sys/kern/sysv_msg.c,v 1.5
 #endif /* __CYGWIN__ */
 
 #ifdef MSG_DEBUG
-#define DPRINTF(a)	debug_printf a
+#define DPRINTF(a)	debug a
 #else
 #define DPRINTF(a)
 #endif

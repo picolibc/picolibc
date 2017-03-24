@@ -63,9 +63,9 @@ win_copyout (struct thread *td, const void *server_src,
 static void
 _enter_critical_section (LPCRITICAL_SECTION pcs, const char *file, int line)
 {
-  _log (file, line, LOG_DEBUG, "Try enter critical section(%p)", pcs);
+  _debug (file, line, "Try enter critical section(%p)", pcs);
   EnterCriticalSection (pcs);
-  _log (file, line, LOG_DEBUG, "Entered   critical section(%p)", pcs);
+  _debug (file, line, "Entered   critical section(%p)", pcs);
 }
 
 #define leave_critical_section(c) _leave_critical_section((c),__FILE__,__LINE__)
@@ -73,7 +73,7 @@ static void
 _leave_critical_section (LPCRITICAL_SECTION pcs, const char *file, int line)
 {
   LeaveCriticalSection (pcs);
-  _log (file, line, LOG_DEBUG, "Left      critical section(%p)", pcs);
+  _debug (file, line, "Left      critical section(%p)", pcs);
 }
 
 CRITICAL_SECTION ipcht_cs;

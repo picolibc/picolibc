@@ -82,12 +82,12 @@ public:
   bool is_active () const { return _exit_status == STILL_ACTIVE; }
 
   void _hold (const char *file, int line) {
-    _log (file, line, LOG_DEBUG, "Try hold(%lu)", _cygpid);
+    _debug (file, line, "Try hold(%lu)", _cygpid);
     EnterCriticalSection (&_access);
-    _log (file, line, LOG_DEBUG, "holding (%lu)", _cygpid);
+    _debug (file, line, "holding (%lu)", _cygpid);
   }
   void _release (const char *file, int line) {
-    _log (file, line, LOG_DEBUG, "leaving (%lu)", _cygpid);
+    _debug (file, line, "leaving (%lu)", _cygpid);
     LeaveCriticalSection (&_access);
   }
 
