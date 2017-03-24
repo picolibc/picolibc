@@ -37,3 +37,6 @@ Bug Fixes
 - Fix dlopen/dlclose reference counting to make sure FreeLibrary isn't
   called too early in forked process.
   Addresses: https://cygwin.com/ml/cygwin/2017-03/msg00220.html
+
+- Fix concurrency problems in cygserver.
+  Addresses: https://cygwin.com/ml/cygwin/2017-03/msg00218.html
