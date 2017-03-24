@@ -63,7 +63,8 @@ _vlog (const char *file, int line, int level,
     return;
   pos = stpcpy (buf, "cygserver: ");
   if (file && log_debug == TUN_TRUE)
-    pos += snprintf (pos, 16384 - (pos - buf), "%s, line %d: ", file, line);
+    pos += snprintf (pos, 16384 - (pos - buf), "%s, line %d: ",
+		     basename ((char *) file), line);
   vsnprintf (pos, 16384 - (pos - buf), fmt, ap);
   if (log_syslog == TUN_TRUE && level != LOG_DEBUG)
     syslog (level, buf);
