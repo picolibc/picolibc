@@ -33,7 +33,7 @@ public:
 /* Data accessible to all tasks */
 
 
-#define CURR_SHARED_MAGIC 0x8fe4d9eeU
+#define CURR_SHARED_MAGIC 0x9b1c0f25U
 
 #define USER_VERSION   1
 
