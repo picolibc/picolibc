@@ -5,6 +5,9 @@ What's new:
 
 - New API: dladdr
 
+- New API: getloadavg
+
+
 What changed:
 -------------
 
@@ -15,6 +18,11 @@ What changed:
 
 - pthread_cond_wait now acts like Linux and BSD: Resume waiting for the
   condition variable as if it was not interrupted, rather than returning 0.
+
+- The internal <sys/_locale.h> header was renamed to <xlocale.h> for
+  source compatibility with other systems.
+
+- Try harder supporting Netapp drives.
 
 
 Bug Fixes

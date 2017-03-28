@@ -9,11 +9,15 @@
 <itemizedlist mark="bullet">
 
 <listitem><para>
-New API: timingsafe_bcmp, timingsafe_memcmp.
+New API: timingsafe_bcmp, timingsafe_memcmp
 </para></listitem>
 
 <listitem><para>
-New API: dladdr.
+New API: dladdr
+</para></listitem>
+
+<listitem><para>
+New API: getloadavg
 </para></listitem>
 
 <listitem><para>
@@ -33,6 +37,10 @@ condition variable as if it was not interrupted, rather than returning 0.
 <listitem><para>
 The internal &lt;sys/_locale.h&gt; header was renamed to &lt;xlocale.h&gt; for
 source compatibility with other systems.
+</para></listitem>
+
+<listitem><para>
+Try harder supporting Netapp drives.
 </para></listitem>
 
 </itemizedlist>
