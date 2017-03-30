@@ -27,7 +27,7 @@
  */
 
 	.arm
-	.syntax divided
+	.syntax unified
 	.global __aeabi_memset
 	.type	__aeabi_memset, %function
 	ASM_ALIAS __aeabi_memset4 __aeabi_memset

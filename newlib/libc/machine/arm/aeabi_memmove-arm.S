@@ -27,7 +27,7 @@
  */
 
 	.arm
-	.syntax divided
+	.syntax unified
 	.global __aeabi_memmove
 	.type	__aeabi_memmove, %function
 	ASM_ALIAS __aeabi_memmove4 __aeabi_memmove
