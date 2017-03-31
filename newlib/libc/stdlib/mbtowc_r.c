@@ -55,11 +55,11 @@ _DEFUN (__ascii_mbtowc, (r, pwc, s, n, state),
 }
 
 #ifdef _MB_CAPABLE
-typedef enum { ESCAPE, DOLLAR, BRACKET, AT, B, J, 
+typedef enum __packed { ESCAPE, DOLLAR, BRACKET, AT, B, J,
                NUL, JIS_CHAR, OTHER, JIS_C_NUM } JIS_CHAR_TYPE;
-typedef enum { ASCII, JIS, A_ESC, A_ESC_DL, JIS_1, J_ESC, J_ESC_BR,
+typedef enum __packed { ASCII, JIS, A_ESC, A_ESC_DL, JIS_1, J_ESC, J_ESC_BR,
                INV, JIS_S_NUM } JIS_STATE; 
-typedef enum { COPY_A, COPY_J1, COPY_J2, MAKE_A, NOOP, EMPTY, ERROR } JIS_ACTION;
+typedef enum __packed { COPY_A, COPY_J1, COPY_J2, MAKE_A, NOOP, EMPTY, ERROR } JIS_ACTION;
 
 /************************************************************************************** 
  * state/action tables for processing JIS encoding
