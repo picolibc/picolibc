@@ -302,6 +302,9 @@ report (const char *in_fn, bool multiple)
   dlls dll_list = {};
   dlls *dll_last = &dll_list;
   const wchar_t *process_fn = NULL;
+
+  int res = 0;
+
   while (1)
     {
       bool exitnow = false;
@@ -356,6 +359,11 @@ report (const char *in_fn, bool multiple)
 		TerminateProcess (hProcess, 0);
 	      break;
 	    }
+	  if (ev.u.Exception.ExceptionRecord.ExceptionFlags &
+	      EXCEPTION_NONCONTINUABLE) {
+	    res = 1;
+	    goto print_and_exit;
+	  }
 	  break;
 	case EXIT_PROCESS_DEBUG_EVENT:
 print_and_exit:
@@ -374,7 +382,7 @@ print_and_exit:
 	break;
     }
 
-  return 0;
+  return res;
 }
 
 int
