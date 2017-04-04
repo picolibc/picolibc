@@ -52,6 +52,7 @@ GENERAL_SOURCES = \
 	rand_r.c	\
 	random.c	\
 	realloc.c	\
+	reallocarray.c	\
 	reallocf.c	\
 	sb_charsets.c	\
 	strtod.c	\

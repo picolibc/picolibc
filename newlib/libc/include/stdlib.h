@@ -140,6 +140,8 @@ _VOID	_EXFUN(qsort,(_PTR __base, size_t __nmemb, size_t __size, __compar_fn_t _c
 int	_EXFUN(rand,(_VOID));
 _PTR	_EXFUN_NOTHROW(realloc,(_PTR __r, size_t __size));
 #if __BSD_VISIBLE
+void	*reallocarray(void *, size_t, size_t) __result_use_check __alloc_size(2)
+	    __alloc_size(3);
 _PTR	_EXFUN(reallocf,(_PTR __r, size_t __size));
 #endif
 #if __BSD_VISIBLE || __XSI_VISIBLE >= 4
