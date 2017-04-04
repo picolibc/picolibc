@@ -1139,6 +1139,7 @@ readlink SIGFE
 readlinkat SIGFE
 readv SIGFE
 realloc SIGFE
+reallocarray SIGFE
 reallocf SIGFE
 realpath SIGFE
 recv = cygwin_recv SIGFE

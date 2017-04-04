@@ -1198,6 +1198,7 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     qsort_r			(see chapter "Implementation Notes")
     rcmd
     rcmd_af
+    reallocarray
     reallocf
     res_close
     res_init

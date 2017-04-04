@@ -474,12 +474,13 @@ details. */
   307: Export timingsafe_bcmp, timingsafe_memcmp.
   308: Export dladdr.
   309: Export getloadavg.
+  310: Export reallocarray.
 
   Note that we forgot to bump the api for ualarm, strtoll, strtoull,
   sigaltstack, sethostname. */
 
 #define CYGWIN_VERSION_API_MAJOR 0
-#define CYGWIN_VERSION_API_MINOR 309
+#define CYGWIN_VERSION_API_MINOR 310
 
 /* There is also a compatibity version number associated with the shared memory
    regions.  It is incremented when incompatible changes are made to the shared
