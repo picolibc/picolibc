@@ -34,7 +34,7 @@ done
   echo "**** Couldn't open file '$incfile'.  Aborting."
 }
 
-function parse_preproc_flags() {
+parse_preproc_flags() {
   # Since we're manually specifying the preprocessor, pass the default flags
   # normally defined.
   ccflags="--preprocessor=$1 --preprocessor-arg=-E \
