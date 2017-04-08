@@ -30,6 +30,7 @@ details. */
 #include <wctype.h>
 #include "cpuid.h"
 #include "mount.h"
+#include <math.h>
 
 #define _COMPILING_NEWLIB
 #include <dirent.h>
@@ -432,10 +433,14 @@ format_proc_loadavg (void *, char *&destbuf)
   double loadavg[3] = { 0.0, 0.0, 0.0 };
   getloadavg (loadavg, 3);
 
+#define HUNDRETHS(l) (int)((l - floor(l))*100)
+
   destbuf = (char *) crealloc_abort (destbuf, 48);
-  return sprintf (destbuf, "%.2f %.2f %.2f %u/%u\n",
-		  loadavg[0], loadavg[1], loadavg[2], running,
-		  (unsigned int)pids.npids);
+  return __small_sprintf (destbuf, "%u.%02u %u.%02u %u.%02u %u/%u\n",
+			  (int)loadavg[0], HUNDRETHS(loadavg[0]),
+			  (int)loadavg[1], HUNDRETHS(loadavg[1]),
+			  (int)loadavg[2], HUNDRETHS(loadavg[2]),
+			  running, (unsigned int)pids.npids);
 }
 
 static off_t
