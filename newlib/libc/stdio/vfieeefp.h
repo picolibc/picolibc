@@ -35,6 +35,7 @@
 #include <float.h>
 #include <errno.h>
 #include <sys/config.h>
+#include <sys/cdefs.h>
 
 #ifdef __IEEE_LITTLE_ENDIAN
 #define IEEE_8087
@@ -71,7 +72,7 @@ struct ldieee
   unsigned manh:23;
   unsigned exp:8;
   unsigned sign:1;
-};
+} __packed;
 #elif LDBL_MANT_DIG == 53
 struct ldieee
 {
@@ -79,7 +80,7 @@ struct ldieee
   unsigned manh:32;
   unsigned exp:11;
   unsigned sign:1;
-};
+} __packed;
 #elif LDBL_MANT_DIG == 64
 struct ldieee
 {
@@ -87,7 +88,7 @@ struct ldieee
   unsigned manh:32;
   unsigned exp:15;
   unsigned sign:1;
-};
+} __packed;
 #elif LDBL_MANT_DIG > 64
 struct ldieee
 {
@@ -97,7 +98,7 @@ struct ldieee
   unsigned manh:32;
   unsigned exp:15;
   unsigned sign:1;
-};
+} __packed;
 #endif /* LDBL_MANT_DIG */
 #else  /* !IEEE_8087 */
 #if LDBL_MANT_DIG == 24
@@ -106,7 +107,7 @@ struct ldieee
   unsigned sign:1;
   unsigned exp:8;
   unsigned manh:23;
-};
+} __packed;
 #elif LDBL_MANT_DIG == 53
 struct ldieee
 {
@@ -114,7 +115,7 @@ struct ldieee
   unsigned exp:11;
   unsigned manh:32;
   unsigned manl:20;
-};
+} __packed;
 #elif LDBL_MANT_DIG == 64
 struct ldieee
 {
@@ -122,7 +123,7 @@ struct ldieee
   unsigned exp:15;
   unsigned manh:32;
   unsigned manl:32;
-};
+} __packed;
 #elif LDBL_MANT_DIG > 64
 struct ldieee
 {
@@ -132,7 +133,7 @@ struct ldieee
   unsigned manl:32;
   unsigned manl2:32;
   unsigned manl3:16;
-};
+} __packed;
 #endif /* LDBL_MANT_DIG */
 #endif /* !IEEE_8087 */
 #endif /* _WANT_IO_LONG_DOUBLE */
