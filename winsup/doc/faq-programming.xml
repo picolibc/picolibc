@@ -15,18 +15,15 @@ volunteers to prepare and maintain packages, because the priority of the
 Cygwin Team is Cygwin itself.
 </para>
 <para>The Cygwin Package Contributor's Guide at
-<ulink url="https://cygwin.com/setup.html"/> details everything you need to know
-about being a package maintainer. The quickest way to get started is to
-read the <emphasis>Initial packaging procedure, script-based</emphasis> section on
-that page.  The <literal>generic-build-script</literal> found there works well for
-most packages. 
+<ulink url="https://cygwin.com/packages.html"/> details everything you need to know
+about Cygwin packaging.
 </para>
 <para>For questions about package maintenance, use the cygwin-apps mailing
 list (start at <ulink url="https://cygwin.com/lists.html"/>) <emphasis>after</emphasis>
 searching and browsing the cygwin-apps list archives, of course.  Be
 sure to look at the <emphasis>Submitting a package</emphasis> checklist at
-<ulink url="https://cygwin.com/setup.html"/> before sending an ITP (Intent To
-Package) email to cygwin-apps.
+<ulink url="https://cygwin.com/packaging-contributors-guide.html#submitting"/>
+before sending an ITP (Intent To Package) email to cygwin-apps.
 </para>
 <para>You should also announce your intentions to the general cygwin list, in
 case others were thinking the same thing.

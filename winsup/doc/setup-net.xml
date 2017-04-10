@@ -254,11 +254,7 @@ in <filename>/etc/passwd</filename>.
 <sect2 id="setup-postinstall"><title>Post-Install Scripts</title>
 <para>
 Last of all, <command>setup.exe</command> will run any post-install
-scripts to finish correctly setting up installed packages. Since each
-script is run separately, several windows may pop up. If you are 
-interested in what is being done, see the Cygwin Package Contributor's
-Guide at <ulink 
-url="https://cygwin.com/setup.html"/>
+scripts to finish correctly setting up installed packages.
 When the last post-install script is completed, <command>setup.exe</command> 
 will display a box announcing the completion. A few packages, such as
 the OpenSSH server, require some manual site-specific configuration. 
