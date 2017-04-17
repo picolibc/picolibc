@@ -9,29 +9,6 @@
 
 _BEGIN_STD_C
 
-/* __dmath, __fmath, and __ldmath are only here for backwards compatibility
- * in case any code used them.  They are no longer used by Newlib, itself,
- * other than legacy.  */
-union __dmath
-{
-  double d;
-  __ULong i[2];
-};
-
-union __fmath
-{
-  float f;
-  __ULong i[1];
-};
-
-#if defined(_HAVE_LONG_DOUBLE)
-union __ldmath
-{
-  long double ld;
-  __ULong i[4];
-};
-#endif
-
 /* Natural log of 2 */
 #define _M_LN2        0.693147180559945309417
 
