@@ -78,7 +78,7 @@ am__objects_1 = lib_a-s_finite.$(OBJEXT) lib_a-s_copysign.$(OBJEXT) \
 	lib_a-s_modf.$(OBJEXT) lib_a-s_scalbn.$(OBJEXT) \
 	lib_a-s_cbrt.$(OBJEXT) lib_a-s_exp10.$(OBJEXT) \
 	lib_a-s_expm1.$(OBJEXT) lib_a-s_ilogb.$(OBJEXT) \
-	lib_a-s_infconst.$(OBJEXT) lib_a-s_infinity.$(OBJEXT) \
+	lib_a-s_infinity.$(OBJEXT) \
 	lib_a-s_isinf.$(OBJEXT) lib_a-s_isinfd.$(OBJEXT) \
 	lib_a-s_isnan.$(OBJEXT) lib_a-s_isnand.$(OBJEXT) \
 	lib_a-s_log1p.$(OBJEXT) lib_a-s_nan.$(OBJEXT) \
@@ -148,7 +148,7 @@ lib_a_OBJECTS = $(am_lib_a_OBJECTS)
 LTLIBRARIES = $(noinst_LTLIBRARIES)
 libcommon_la_LIBADD =
 am__objects_5 = s_finite.lo s_copysign.lo s_modf.lo s_scalbn.lo \
-	s_cbrt.lo s_exp10.lo s_expm1.lo s_ilogb.lo s_infconst.lo \
+	s_cbrt.lo s_exp10.lo s_expm1.lo s_ilogb.lo \
 	s_infinity.lo s_isinf.lo s_isinfd.lo s_isnan.lo s_isnand.lo \
 	s_log1p.lo s_nan.lo s_nextafter.lo s_pow10.lo s_rint.lo \
 	s_logb.lo s_log2.lo s_matherr.lo s_lib_ver.lo s_fdim.lo \
@@ -334,7 +334,7 @@ top_srcdir = @top_srcdir@
 AUTOMAKE_OPTIONS = cygnus
 INCLUDES = $(NEWLIB_CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLAGS)
 src = s_finite.c s_copysign.c s_modf.c s_scalbn.c \
-	s_cbrt.c s_exp10.c s_expm1.c s_ilogb.c s_infconst.c \
+	s_cbrt.c s_exp10.c s_expm1.c s_ilogb.c \
 	s_infinity.c s_isinf.c s_isinfd.c s_isnan.c s_isnand.c \
 	s_log1p.c s_nan.c s_nextafter.c s_pow10.c \
 	s_rint.c s_logb.c s_log2.c s_matherr.c s_lib_ver.c \
@@ -507,12 +507,6 @@ lib_a-s_ilogb.o: s_ilogb.c
 
 lib_a-s_ilogb.obj: s_ilogb.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-s_ilogb.obj `if test -f 's_ilogb.c'; then $(CYGPATH_W) 's_ilogb.c'; else $(CYGPATH_W) '$(srcdir)/s_ilogb.c'; fi`
-
-lib_a-s_infconst.o: s_infconst.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-s_infconst.o `test -f 's_infconst.c' || echo '$(srcdir)/'`s_infconst.c
-
-lib_a-s_infconst.obj: s_infconst.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-s_infconst.obj `if test -f 's_infconst.c'; then $(CYGPATH_W) 's_infconst.c'; else $(CYGPATH_W) '$(srcdir)/s_infconst.c'; fi`
 
 lib_a-s_infinity.o: s_infinity.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-s_infinity.o `test -f 's_infinity.c' || echo '$(srcdir)/'`s_infinity.c
