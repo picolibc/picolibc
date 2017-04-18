@@ -156,10 +156,11 @@
 	bl	FUNCTION (_init)
 
 	/* Fetch and parse the command line.  */
-	adr	x1, .Lcmdline		/* Command line descriptor.  */
+	ldr	x1, .Lcmdline		/* Command line descriptor.  */
 	mov	w0, #AngelSVC_Reason_GetCmdLine
 	AngelSVCAsm AngelSVC
 	ldr	x8, .Lcmdline
+	ldr	x8, [x8]
 
 	mov	x0, #0		/* argc */
 	mov	x1, sp		/* argv */
@@ -239,9 +240,7 @@ FUNCTION (_cpu_init_hook):
 .Lenvp:
 	GEN_DWORD env
 .Lcmdline:
-	GEN_DWORD CommandLine
-	.dword	255
-
+	GEN_DWORD AngelSVCArgs
 /*  Workspace for Angel calls.  */
 	.data
 	.align 3
@@ -258,3 +257,6 @@ StackBase:	.dword	0
 StackLimit:	.dword	0
 env:		.dword	0	/* Dummy environment array */
 CommandLine:	.space	256,0	/*  Maximum length of 255 chars handled.  */
+AngelSVCArgs:
+	GEN_DWORD CommandLine
+	.dword	255
