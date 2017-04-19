@@ -75,10 +75,10 @@ install-pdf: cygwin-ug-net/cygwin-ug-net.pdf cygwin-api/cygwin-api.pdf
 install-html: cygwin-ug-net/cygwin-ug-net.html cygwin-api/cygwin-api.html
 	@$(MKDIRP) $(DESTDIR)$(htmldir)/cygwin-ug-net
 	$(INSTALL_DATA) cygwin-ug-net/*.html $(DESTDIR)$(htmldir)/cygwin-ug-net
-	$(INSTALL_DATA) cygwin-ug-net/cygwin-ug-net.html $(DESTDIR)$(htmldir)/cygwin-ug-net/index.html
+	-ln $(DESTDIR)$(htmldir)/cygwin-ug-net/cygwin-ug-net.html $(DESTDIR)$(htmldir)/cygwin-ug-net/index.html
 	@$(MKDIRP) $(DESTDIR)$(htmldir)/cygwin-api
 	$(INSTALL_DATA) cygwin-api/*.html $(DESTDIR)$(htmldir)/cygwin-api
-	$(INSTALL_DATA) cygwin-api/cygwin-api.html $(DESTDIR)$(htmldir)/cygwin-api/index.html
+	-ln $(DESTDIR)$(htmldir)/cygwin-api/cygwin-api.html $(DESTDIR)$(htmldir)/cygwin-api/index.html
 
 install-man: utils2man.stamp api2man.stamp intro2man.stamp
 	@$(MKDIRP) $(DESTDIR)$(man1dir)
