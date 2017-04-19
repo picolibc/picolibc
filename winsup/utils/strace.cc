@@ -1191,7 +1191,7 @@ main (int argc, char **argv)
      registry setting to 0x100000 (TOP_DOWN). */
   char buf[CYGTLS_PADSIZE];
 
-  memset (buf, 0, sizeof (buf));
+  RtlSecureZeroMemory (buf, sizeof (buf));
   exit (main2 (argc, argv));
 }
 
