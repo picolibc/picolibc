@@ -72,9 +72,9 @@ START_CRT_FUNC 0100 init_bss
 
 	mov_	#__bssstart, R12
 	clr.w	R13
-	mov.w	#__bsssize, R14
+	mov_	#__bsssize, R14
 #ifdef __MSP430X_LARGE__
-	clr.w	R15		; We assume that __bsssize is never > 64M
+	clr.w	R15		; We assume that __bsssize is never > 64K
 #endif
 	call_	#memset
 
