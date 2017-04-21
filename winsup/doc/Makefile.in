@@ -18,6 +18,7 @@ mandir = @mandir@
 man1dir = $(mandir)/man1
 man3dir = $(mandir)/man3
 infodir:=@infodir@
+sysconfdir:=@sysconfdir@
 
 override INSTALL:=@INSTALL@
 override INSTALL_DATA:=@INSTALL_DATA@
@@ -39,7 +40,7 @@ include $(srcdir)/../Makefile.common
 	$(srcdir)/bodysnatcher.pl $<
 
 .PHONY: all clean install install-all install-pdf install-html install-man \
-	info install-info
+	info install-info install-etc
 
 all: Makefile Makefile.dep \
 	cygwin-ug-net/cygwin-ug-net.html \
@@ -66,7 +67,7 @@ clean:
 
 install: install-all
 
-install-all: install-pdf install-html install-man install-info
+install-all: install-pdf install-html install-man install-info install-etc
 
 install-pdf: cygwin-ug-net/cygwin-ug-net.pdf cygwin-api/cygwin-api.pdf
 	@$(MKDIRP) $(DESTDIR)$(docdir)
@@ -91,6 +92,12 @@ install-man: utils2man.stamp api2man.stamp intro2man.stamp
 install-info: cygwin-ug-net.info cygwin-api.info
 	$(MKDIRP) $(DESTDIR)$(infodir)
 	$(INSTALL_DATA) *.info* $(DESTDIR)$(infodir)
+
+install-etc:
+	@$(MKDIRP) $(DESTDIR)$(sysconfdir)/postinstall
+	$(INSTALL) $(srcdir)/etc.postinstall.cygwin-doc.sh $(DESTDIR)$(sysconfdir)/postinstall/cygwin-doc.sh
+	@$(MKDIRP) $(DESTDIR)$(sysconfdir)/preremove
+	$(INSTALL) $(srcdir)/etc.preremove.cygwin-doc.sh $(DESTDIR)$(sysconfdir)/preremove/cygwin-doc.sh
 
 cygwin-ug-net/cygwin-ug-net-nochunks.html.gz : $(cygwin-ug-net_SOURCES) html.xsl
 	-$(XMLTO) html-nochunks -m $(srcdir)/html.xsl $<
