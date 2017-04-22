@@ -463,18 +463,25 @@ fhandler_base::fstat_helper (struct stat *buf)
 
   buf->st_blksize = PREFERRED_IO_BLKSIZE;
 
-  if (pfai->StandardInformation.AllocationSize.QuadPart >= 0LL)
+  if (buf->st_size == 0
+      && pfai->StandardInformation.AllocationSize.QuadPart == 0LL)
+    /* File is empty and no blocks are preallocated. */
+    buf->st_blocks = 0;
+  else if (pfai->StandardInformation.AllocationSize.QuadPart > 0LL)
     /* A successful NtQueryInformationFile returns the allocation size
-       correctly for compressed and sparse files as well. */
+       correctly for compressed and sparse files as well.
+       Allocation size 0 is ignored here because (at least) Windows 10
+       1607 always returns 0 for CompactOS compressed files. */
     buf->st_blocks = (pfai->StandardInformation.AllocationSize.QuadPart
 		      + S_BLKSIZE - 1) / S_BLKSIZE;
-  else if (::has_attribute (attributes, FILE_ATTRIBUTE_COMPRESSED
-					| FILE_ATTRIBUTE_SPARSE_FILE)
+  else if ((pfai->StandardInformation.AllocationSize.QuadPart == 0LL
+	    || ::has_attribute (attributes, FILE_ATTRIBUTE_COMPRESSED
+					  | FILE_ATTRIBUTE_SPARSE_FILE))
 	   && h && !is_fs_special ()
 	   && !NtQueryInformationFile (h, &st, (PVOID) &fci, sizeof fci,
 				       FileCompressionInformation))
     /* Otherwise we request the actual amount of bytes allocated for
-       compressed and sparsed files. */
+       compressed, sparsed and CompactOS files. */
     buf->st_blocks = (fci.CompressedFileSize.QuadPart + S_BLKSIZE - 1)
 		     / S_BLKSIZE;
   else
