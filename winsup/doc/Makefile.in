@@ -75,12 +75,12 @@ install-pdf: cygwin-ug-net/cygwin-ug-net.pdf cygwin-api/cygwin-api.pdf
 install-html: cygwin-ug-net/cygwin-ug-net.html cygwin-api/cygwin-api.html
 	@$(MKDIRP) $(DESTDIR)$(htmldir)/cygwin-ug-net
 	$(INSTALL_DATA) cygwin-ug-net/*.html $(DESTDIR)$(htmldir)/cygwin-ug-net
-	-ln $(DESTDIR)$(htmldir)/cygwin-ug-net/cygwin-ug-net.html $(DESTDIR)$(htmldir)/cygwin-ug-net/index.html
-	$(INSTALL_DATA) docbook.css $(DESTDIR)$(htmldir)/cygwin-ug-net
+	-(cd $(DESTDIR)$(htmldir)/cygwin-ug-net && ln -f cygwin-ug-net.html index.html)
+	$(INSTALL_DATA) $(srcdir)/docbook.css $(DESTDIR)$(htmldir)/cygwin-ug-net
 	@$(MKDIRP) $(DESTDIR)$(htmldir)/cygwin-api
 	$(INSTALL_DATA) cygwin-api/*.html $(DESTDIR)$(htmldir)/cygwin-api
-	-ln $(DESTDIR)$(htmldir)/cygwin-api/cygwin-api.html $(DESTDIR)$(htmldir)/cygwin-api/index.html
-	$(INSTALL_DATA) docbook.css $(DESTDIR)$(htmldir)/cygwin-api
+	-(cd $(DESTDIR)$(htmldir)/cygwin-api && ln -f cygwin-api.html index.html)
+	$(INSTALL_DATA) $(srcdir)/docbook.css $(DESTDIR)$(htmldir)/cygwin-api
 
 install-man: utils2man.stamp api2man.stamp intro2man.stamp
 	@$(MKDIRP) $(DESTDIR)$(man1dir)
