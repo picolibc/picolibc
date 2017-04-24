@@ -26,6 +26,7 @@ struct wincaps
     unsigned has_broken_prefetchvm		: 1;
     unsigned has_new_pebteb_region		: 1;
     unsigned has_broken_whoami			: 1;
+    unsigned has_unprivileged_createsymlink	: 1;
   };
 };
 
@@ -67,6 +68,7 @@ public:
   bool	IMPLEMENT (has_broken_prefetchvm)
   bool	IMPLEMENT (has_new_pebteb_region)
   bool	IMPLEMENT (has_broken_whoami)
+  bool	IMPLEMENT (has_unprivileged_createsymlink)
 
 #undef IMPLEMENT
 };
