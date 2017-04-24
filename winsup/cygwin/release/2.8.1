@@ -19,5 +19,11 @@ Bug Fixes
 - Fix stat.st_blocks for files compressed with CompactOS method.
   Addresses: https://cygwin.com/ml/cygwin-patches/2017-q2/msg00026.html
 
-- Fix extrem lagging during strae in certain scenarios.
+- Fix extreme lagging during strace in certain scenarios.
   Addresses: https://cygwin.com/ml/cygwin/2017-04/msg00240.html
+
+- Fix unwanted decimal point localization in /proc/loadavg
+  Addresses: https://cygwin.com/ml/cygwin-patches/2017-q2/msg00002.html
+
+- Fix ldd potentially looping on non-continuable exception
+  Addresses: Reported on IRC.
