@@ -118,6 +118,7 @@ wincapc::init ()
   RtlGetNtVersionNumbers (&version.dwMajorVersion,
 			  &version.dwMinorVersion,
 			  &version.dwBuildNumber);
+  version.dwBuildNumber &= 0xffff;
 
   switch (version.dwMajorVersion)
     {
