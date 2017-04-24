@@ -314,12 +314,17 @@ pinfo::init (pid_t n, DWORD flag, HANDLE h0)
       /* Detect situation where a transitional memory block is being retrieved.
 	 If the block has been allocated with PINFO_REDIR_SIZE but not yet
 	 updated with a PID_EXECED state then we'll retry.  */
-      if (!created && !(flag & PID_NEW))
-	/* If not populated, wait 2 seconds for procinfo to become populated.
-	   Would like to wait with finer granularity but that is not easily
-	   doable.  */
-	for (int i = 0; i < 200 && !procinfo->ppid; i++)
-	  Sleep (10);
+      if (!created && !(flag & PID_NEW) && !procinfo->ppid)
+	{
+	  /* Fetching process info for /proc or ps?  just ignore this one. */
+	  if (flag & PID_NOREDIR)
+	    break;
+	  /* If not populated, wait 2 seconds for procinfo to become populated.
+	     Would like to wait with finer granularity but that is not easily
+	     doable.  */
+	  for (int i = 0; i < 200 && !procinfo->ppid; i++)
+	    Sleep (10);
+	}
 
       if (!created && createit && (procinfo->process_state & PID_REAPED))
 	{
