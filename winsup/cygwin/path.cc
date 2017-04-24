@@ -1621,6 +1621,10 @@ cnt_bs (PWCHAR s, PWCHAR e)
   return num;
 }
 
+#ifndef SYMBOLIC_LINK_FLAG_ALLOW_UNPRIVILEGED_CREATE
+#define SYMBOLIC_LINK_FLAG_ALLOW_UNPRIVILEGED_CREATE 2
+#endif
+
 static int
 symlink_native (const char *oldpath, path_conv &win32_newpath)
 {
@@ -1628,6 +1632,7 @@ symlink_native (const char *oldpath, path_conv &win32_newpath)
   path_conv win32_oldpath;
   PUNICODE_STRING final_oldpath, final_newpath;
   UNICODE_STRING final_oldpath_buf;
+  DWORD flags;
 
   if (isabspath (oldpath))
     {
@@ -1724,9 +1729,11 @@ symlink_native (const char *oldpath, path_conv &win32_newpath)
 	final_oldpath->Buffer[1] = L'\\';
     }
   /* Try to create native symlink. */
+  flags = win32_oldpath.isdir () ? SYMBOLIC_LINK_FLAG_DIRECTORY : 0;
+  if (wincap.has_unprivileged_createsymlink ())
+    flags |= SYMBOLIC_LINK_FLAG_ALLOW_UNPRIVILEGED_CREATE;
   if (!CreateSymbolicLinkW (final_newpath->Buffer, final_oldpath->Buffer,
-			    win32_oldpath.isdir ()
-			    ? SYMBOLIC_LINK_FLAG_DIRECTORY : 0))
+			    flags))
     {
       /* Repair native newpath, we still need it. */
       final_newpath->Buffer[1] = L'?';
