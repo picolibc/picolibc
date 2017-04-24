@@ -226,8 +226,6 @@ public:
   inline void reset () { release (); npids = 0;}
   void set (bool winpid);
   winpids (): make_copy (true) {}
-  winpids (int): make_copy (false), npidlist (0), pidlist (NULL),
-		 pinfolist (NULL), pinfo_access (0), npids (0) {}
   winpids (DWORD acc): make_copy (false), npidlist (0), pidlist (NULL),
 		       pinfolist (NULL), pinfo_access (acc), npids (0)
   {
