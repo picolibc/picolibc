@@ -3,8 +3,9 @@
 AUTOMAKE_OPTIONS = cygnus
 
 INCLUDES = $(NEWLIB_CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLAGS)
+PSRAM_FLAG = $(if $(filter -mfix-esp32-psram-cache-issue,$(CCAS) $(INCLUDES)),-DPSRAM_FIX=1,)
 
-AM_CCASFLAGS = $(INCLUDES)
+AM_CCASFLAGS = $(INCLUDES) $(PSRAM_FLAG)
 
 noinst_LIBRARIES = lib.a
 
