@@ -59,6 +59,9 @@ __memset_aux:
 	add	a6, a5, a4	// a6 = ending address
 #endif
 1:	s8i	a3, a5, 0
+#ifdef PSRAM_FIX
+	memw
+#endif
 	addi	a5, a5, 1
 #if !XCHAL_HAVE_LOOPS
 	bltu	a5, a6, 1b
@@ -79,6 +82,9 @@ __memset_aux:
 	s8i	a3, a5, 0
 	addi	a5, a5, 1
 	addi	a4, a4, -1
+#ifdef PSRAM_FIX
+	memw
+#endif
 
 	/* Now retest if dst is aligned.  */
 	_bbci.l	a5, 1, .Ldstaligned
@@ -92,6 +98,9 @@ __memset_aux:
 	s16i	a3, a5, 0
 	addi	a5, a5, 2
 	addi	a4, a4, -2
+#ifdef PSRAM_FIX
+	memw
+#endif
 
 	/* dst is now aligned; return to main algorithm */
 	j	.Ldstaligned
@@ -158,11 +167,17 @@ memset:
 	/* Set 2 bytes.  */
 	s16i	a3, a5, 0
 	addi	a5, a5, 2
+#ifdef PSRAM_FIX
+	memw
+#endif
 
 5:	bbci.l	a4, 0, 6f
 
 	/* Set 1 byte.  */
 	s8i	a3, a5, 0
+#ifdef PSRAM_FIX
+	memw
+#endif
 6:	leaf_return
 
 	.end schedule

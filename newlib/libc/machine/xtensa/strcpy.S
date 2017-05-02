@@ -51,7 +51,15 @@ strcpy:
 .Lsrc1mod2: // src address is odd
 	l8ui	a8, a3, 0	// get byte 0
 	addi	a3, a3, 1	// advance src pointer
+#ifdef PSRAM_FIX
+	nop
+	nop
+	nop
+#endif
 	s8i	a8, a10, 0	// store byte 0
+#ifdef PSRAM_FIX
+	memw
+#endif
 	beqz	a8, 1f		// if byte 0 is zero
 	addi	a10, a10, 1	// advance dst pointer
 	bbci.l	a3, 1, .Lsrcaligned // if src is now word-aligned
@@ -59,12 +67,29 @@ strcpy:
 .Lsrc2mod4: // src address is 2 mod 4
 	l8ui	a8, a3, 0	// get byte 0
 	/* 1-cycle interlock */
+#ifdef PSRAM_FIX
+	nop
+	nop
+	nop
+	nop
+#endif
 	s8i	a8, a10, 0	// store byte 0
+#ifdef PSRAM_FIX
+	memw
+#endif
 	beqz	a8, 1f		// if byte 0 is zero
 	l8ui	a8, a3, 1	// get byte 0
 	addi	a3, a3, 2	// advance src pointer
+#ifdef PSRAM_FIX
+	nop
+	nop
+	nop
+#endif
 	s8i	a8, a10, 1	// store byte 0
 	addi	a10, a10, 2	// advance dst pointer
+#ifdef PSRAM_FIX
+	memw
+#endif
 	bnez	a8, .Lsrcaligned
 1:	leaf_return
 
@@ -117,6 +142,9 @@ strcpy:
 	movi	a8, 0
 #endif
 	s8i	a8, a10, 0
+#ifdef PSRAM_FIX
+	memw
+#endif
 	leaf_return
 
 .Lz1:	/* Byte 1 is zero.  */
@@ -124,6 +152,9 @@ strcpy:
         extui   a8, a8, 16, 16
 #endif
 	s16i	a8, a10, 0
+#ifdef PSRAM_FIX
+	memw
+#endif
 	leaf_return
 
 .Lz2:	/* Byte 2 is zero.  */
@@ -133,6 +164,9 @@ strcpy:
 	s16i	a8, a10, 0
 	movi	a8, 0
 	s8i	a8, a10, 2
+#ifdef PSRAM_FIX
+	memw
+#endif
 	leaf_return
 
 #if 1
@@ -160,8 +194,16 @@ strcpy:
 #endif
 1:	l8ui	a8, a3, 0
 	addi	a3, a3, 1
+#ifdef PSRAM_FIX
+	nop
+	nop
+	nop
+#endif
 	s8i	a8, a10, 0
 	addi	a10, a10, 1
+#ifdef PSRAM_FIX
+	memw
+#endif
 #if XCHAL_HAVE_LOOPS
 	beqz	a8, 2f
 #else
@@ -214,6 +256,9 @@ strcpy:
 	movi	a8, 0
 #endif
 	s8i	a8, a10, 0
+#ifdef PSRAM_FIX
+	memw
+#endif
 	leaf_return
 
 .Lu1:	/* Byte 1 is zero.  */
@@ -221,12 +266,18 @@ strcpy:
         extui   a8, a8, 16, 16
 #endif
 	s16i	a8, a10, 0
+#ifdef PSRAM_FIX
+	memw
+#endif
 	leaf_return
 
 .Lu2:	/* Byte 2 is zero.  */
 	s16i	a8, a10, 0
 	movi	a8, 0
 	s8i	a8, a10, 2
+#ifdef PSRAM_FIX
+	memw
+#endif
 	leaf_return
 
 #endif /* 0 */
