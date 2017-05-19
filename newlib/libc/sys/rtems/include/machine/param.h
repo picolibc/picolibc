@@ -14,17 +14,10 @@
 #define MID_MACHINE	MID_I386
 */
 
-/*
- * Round p (pointer or byte index) up to a correctly-aligned value
- * for all data types (int, long, ...).   The result is unsigned int
- * and must be cast to any desired pointer type.
- */
-#if defined(__sparc__)
-#define ALIGNBYTES	(sizeof(double) - 1)
-#else
-#define ALIGNBYTES	(sizeof(int) - 1)
-#endif
-#define ALIGN(p)	(((unsigned)(p) + ALIGNBYTES) & ~ALIGNBYTES)
+#include <machine/_align.h>
+
+#define	ALIGNBYTES	_ALIGNBYTES
+#define	ALIGN(p)	_ALIGN(p)
 
 #define PAGE_SHIFT	12		/* LOG2(PAGE_SIZE) */
 #define PAGE_SIZE	(1<<PAGE_SHIFT)	/* bytes/page */
