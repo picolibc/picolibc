@@ -99,7 +99,7 @@
  * MCLBYTES must be no larger than PAGE_SIZE.
  */
 #ifndef	MSIZE
-#define	MSIZE		128		/* size of an mbuf */
+#define	MSIZE		256		/* size of an mbuf */
 #endif
 
 #ifndef	MCLSHIFT
