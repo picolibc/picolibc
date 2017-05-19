@@ -15,7 +15,7 @@
  * 2. Redistributions in binary form must reproduce the above copyright
  *    notice, this list of conditions and the following disclaimer in the
  *    documentation and/or other materials provided with the distribution.
- * 4. Neither the name of the University nor the names of its contributors
+ * 3. Neither the name of the University nor the names of its contributors
  *    may be used to endorse or promote products derived from this software
  *    without specific prior written permission.
  *
@@ -32,28 +32,15 @@
  * SUCH DAMAGE.
  *
  *	@(#)param.h	8.3 (Berkeley) 4/4/95
- * $Id$
+ * $FreeBSD: head/sys/sys/param.h 317383 2017-04-24 21:21:49Z brooks $
  */
 
 #ifndef _SYS_PARAM_H_
 #define _SYS_PARAM_H_
 
-/* from newlib's <sys/param.h> */
-
-#include <sys/config.h>
-#include <machine/endian.h>
-
-# define PATHSIZE (1024)
-
-/* end of from newlib's <sys/param.h> */
-
 #define	BSD	199506		/* System version (year & month). */
 #define BSD4_3	1
 #define BSD4_4	1
-
-#ifndef NULL
-#define	NULL	0
-#endif
 
 #ifndef LOCORE
 #include <sys/types.h>
@@ -78,32 +65,95 @@
 #define MAXHOSTNAMELEN	256		/* max hostname size */
 #define SPECNAMELEN	63		/* max length of devicename */
 
-/* More types and definitions used throughout the kernel. */
-#if defined(KERNEL) || defined(_KERNEL)
-#include <sys/cdefs.h>
-#include <sys/errno.h>
-#include <sys/time.h>
-#include <sys/resource.h>
-#include <sys/uio.h>
-#include <sys/priority.h>
-
-#ifndef FALSE
-#define	FALSE	0
-#endif
-#ifndef TRUE
-#define	TRUE	1
-#endif
-#endif
-
+#ifndef _KERNEL
 /* Signals. */
 #include <sys/signal.h>
+#endif
 
 /* Machine type dependent parameters. */
 #include <machine/param.h>
-#include <machine/limits.h>
+#ifndef _KERNEL
+#include <limits.h>
+#endif
+
+#ifndef DEV_BSHIFT
+#define	DEV_BSHIFT	9		/* log2(DEV_BSIZE) */
+#endif
+#define	DEV_BSIZE	(1<<DEV_BSHIFT)
+
+#ifndef BLKDEV_IOSIZE
+#define BLKDEV_IOSIZE  PAGE_SIZE	/* default block device I/O size */
+#endif
+#ifndef DFLTPHYS
+#define DFLTPHYS	(64 * 1024)	/* default max raw I/O transfer size */
+#endif
+#ifndef MAXPHYS
+#define MAXPHYS		(128 * 1024)	/* max raw I/O transfer size */
+#endif
+#ifndef MAXDUMPPGS
+#define MAXDUMPPGS	(DFLTPHYS/PAGE_SIZE)
+#endif
+
+/*
+ * Constants related to network buffer management.
+ * MCLBYTES must be no larger than PAGE_SIZE.
+ */
+#ifndef	MSIZE
+#define	MSIZE		128		/* size of an mbuf */
+#endif
+
+#ifndef	MCLSHIFT
+#define MCLSHIFT	11		/* convert bytes to mbuf clusters */
+#endif	/* MCLSHIFT */
+
+#define MCLBYTES	(1 << MCLSHIFT)	/* size of an mbuf cluster */
+
+#if PAGE_SIZE < 2048
+#define	MJUMPAGESIZE	MCLBYTES
+#elif PAGE_SIZE <= 8192
+#define	MJUMPAGESIZE	PAGE_SIZE
+#else
+#define	MJUMPAGESIZE	(8 * 1024)
+#endif
+
+#define	MJUM9BYTES	(9 * 1024)	/* jumbo cluster 9k */
+#define	MJUM16BYTES	(16 * 1024)	/* jumbo cluster 16k */
+
+/*
+ * Some macros for units conversion
+ */
+
+/* clicks to bytes */
+#ifndef ctob
+#define ctob(x)	((x)<<PAGE_SHIFT)
+#endif
+
+/* bytes to clicks */
+#ifndef btoc
+#define btoc(x)	(((vm_offset_t)(x)+PAGE_MASK)>>PAGE_SHIFT)
+#endif
+
+/*
+ * btodb() is messy and perhaps slow because `bytes' may be an off_t.  We
+ * want to shift an unsigned type to avoid sign extension and we don't
+ * want to widen `bytes' unnecessarily.  Assume that the result fits in
+ * a daddr_t.
+ */
+#ifndef btodb
+#define btodb(bytes)	 		/* calculates (bytes / DEV_BSIZE) */ \
+	(sizeof (bytes) > sizeof(long) \
+	 ? (daddr_t)((unsigned long long)(bytes) >> DEV_BSHIFT) \
+	 : (daddr_t)((unsigned long)(bytes) >> DEV_BSHIFT))
+#endif
+
+#ifndef dbtob
+#define dbtob(db)			/* calculates (db * DEV_BSIZE) */ \
+	((off_t)(db) << DEV_BSHIFT)
+#endif
 
 #define	PRIMASK	0x0ff
 #define	PCATCH	0x100		/* OR'd with pri for tsleep to check signals */
+#define	PDROP	0x200	/* OR'd with pri to stop re-entry of interlock mutex */
 
 #define	NZERO	0		/* default "nice" */
 
@@ -111,13 +161,8 @@
 #define	NBPW	sizeof(int)	/* number of bytes per word (integer) */
 
 #define	CMASK	022		/* default file mask: S_IWGRP|S_IWOTH */
-#define	NODEV	(dev_t)(-1)	/* non-existent device */
 
-#define	CBLOCK	128		/* Clist block size, must be a power of 2. */
-#define CBQSIZE	(CBLOCK/NBBY)	/* Quote bytes/cblock - can do better. */
-				/* Data chars/clist. */
-#define	CBSIZE	(CBLOCK - sizeof(struct cblock *) - CBQSIZE)
-#define	CROUND	(CBLOCK - 1)	/* Clist rounding. */
+#define	NODEV	(dev_t)(-1)	/* non-existent device */
 
 /*
  * File system parameters and macros.
@@ -128,10 +173,19 @@
  *		and may be made smaller at the risk of not being able to use
  *		filesystems which require a block size exceeding MAXBSIZE.
  *
+ * MAXBCACHEBUF - Maximum size of a buffer in the buffer cache.  This must
+ *		be >= MAXBSIZE and can be set differently for different
+ *		architectures by defining it in <machine/param.h>.
+ *		Making this larger allows NFS to do larger reads/writes.
+ *
  * BKVASIZE -	Nominal buffer space per buffer, in bytes.  BKVASIZE is the
  *		minimum KVM memory reservation the kernel is willing to make.
  *		Filesystems can of course request smaller chunks.  Actual
  *		backing memory uses a chunk size of a page (PAGE_SIZE).
+ *		The default value here can be overridden on a per-architecture
+ *		basis by defining it in <machine/param.h>.  This should
+ *		probably be done to increase its value, when MAXBCACHEBUF is
+ *		defined as a larger value in <machine/param.h>.
  *
  *		If you make BKVASIZE too small you risk seriously fragmenting
  *		the buffer KVM map which may slow things down a bit.  If you
@@ -143,7 +197,12 @@
  *		normal UFS filesystem.
  */
 #define MAXBSIZE	65536	/* must be power of 2 */
+#ifndef	MAXBCACHEBUF
+#define	MAXBCACHEBUF	MAXBSIZE /* must be a power of 2 >= MAXBSIZE */
+#endif
+#ifndef	BKVASIZE
 #define BKVASIZE	16384	/* must be power of 2 */
+#endif
 #define BKVAMASK	(BKVASIZE-1)
 
 /*
@@ -170,34 +229,16 @@
 #ifndef howmany
 #define	howmany(x, y)	(((x)+((y)-1))/(y))
 #endif
+#define	nitems(x)	(sizeof((x)) / sizeof((x)[0]))
 #define	rounddown(x, y)	(((x)/(y))*(y))
+#define	rounddown2(x, y) ((x)&(~((y)-1)))          /* if y is power of two */
 #define	roundup(x, y)	((((x)+((y)-1))/(y))*(y))  /* to any y */
 #define	roundup2(x, y)	(((x)+((y)-1))&(~((y)-1))) /* if y is powers of two */
 #define powerof2(x)	((((x)-1)&(x))==0)
 
 /* Macros for min/max. */
-#if !(defined(KERNEL) || defined(_KERNEL))
 #define	MIN(a,b) (((a)<(b))?(a):(b))
 #define	MAX(a,b) (((a)>(b))?(a):(b))
-#endif
-
-/*
- * Constants for setting the parameters of the kernel memory allocator.
- *
- * 2 ** MINBUCKET is the smallest unit of memory that will be
- * allocated. It must be at least large enough to hold a pointer.
- *
- * Units of memory less or equal to MAXALLOCSAVE will permanently
- * allocate physical memory; requests for these size pieces of
- * memory are quite fast. Allocations greater than MAXALLOCSAVE must
- * always allocate and free physical memory; requests for these
- * size allocations should be done infrequently as they will be slow.
- *
- * Constraints: PAGE_SIZE <= MAXALLOCSAVE <= 2 ** (MINBUCKET + 14), and
- * MAXALLOCSIZE must be a power of two.
- */
-#define MINBUCKET	4		/* 4 => min allocation of 16 bytes */
-#define MAXALLOCSAVE	(2 * PAGE_SIZE)
 
 /*
  * Scale factor for scaled integers used to count %cpu time and load avgs.
@@ -212,5 +253,28 @@
  */
 #define	FSHIFT	11		/* bits to right of fixed binary point */
 #define FSCALE	(1<<FSHIFT)
+
+#define dbtoc(db)			/* calculates devblks to pages */ \
+	((db + (ctodb(1) - 1)) >> (PAGE_SHIFT - DEV_BSHIFT))
+
+#define ctodb(db)			/* calculates pages to devblks */ \
+	((db) << (PAGE_SHIFT - DEV_BSHIFT))
+
+/*
+ * Old spelling of __containerof().
+ */
+#define	member2struct(s, m, x)						\
+	((struct s *)(void *)((char *)(x) - offsetof(struct s, m)))
+
+/*
+ * Access a variable length array that has been declared as a fixed
+ * length array.
+ */
+#define __PAST_END(array, offset) (((__typeof__(*(array)) *)(array))[offset])
+
+#ifdef _KERNEL
+/* Header file provided outside of Newlib */
+#include <machine/_kernel_param.h>
+#endif
 
 #endif	/* _SYS_PARAM_H_ */

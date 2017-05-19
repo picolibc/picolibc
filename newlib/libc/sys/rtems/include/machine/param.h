@@ -1,94 +1,85 @@
-/*
- *  $Id$
+/*-
+ * Copyright (c) 1990 The Regents of the University of California.
+ * All rights reserved.
+ *
+ * This code is derived from software contributed to Berkeley by
+ * William Jolitz.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ * 1. Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright
+ *    notice, this list of conditions and the following disclaimer in the
+ *    documentation and/or other materials provided with the distribution.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS ``AS IS'' AND
+ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED.  IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE
+ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
+ * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+ * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+ * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+ * SUCH DAMAGE.
+ *
+ *	from: @(#)param.h	5.8 (Berkeley) 6/28/91
  */
 
 #ifndef _MACHINE_PARAM_H_
 #define	_MACHINE_PARAM_H_
 
 /*
- * These aren't really machine-dependent for RTEMS.....
+ * Machine dependent constants for RTEMS.
  */
-
-/*
-#define MACHINE		"i386"
-#define MID_MACHINE	MID_I386
-*/
 
 #include <machine/_align.h>
 
-#define	ALIGNBYTES	_ALIGNBYTES
-#define	ALIGN(p)	_ALIGN(p)
-
-#define PAGE_SHIFT	12		/* LOG2(PAGE_SIZE) */
-#define PAGE_SIZE	(1<<PAGE_SHIFT)	/* bytes/page */
-#define PAGE_MASK	(PAGE_SIZE-1)
-#define NPTEPG		(PAGE_SIZE/(sizeof (pt_entry_t)))
-
-#define NPDEPG		(PAGE_SIZE/(sizeof (pd_entry_t)))
-#define PDRSHIFT	22		/* LOG2(NBPDR) */
-#define NBPDR		(1<<PDRSHIFT)	/* bytes/page dir */
-
-#define DEV_BSHIFT	9		/* log2(DEV_BSIZE) */
-#define DEV_BSIZE	(1<<DEV_BSHIFT)
-
-#if defined(__AVR__) || defined(__h8300__)
-#define BLKDEV_IOSIZE	1024
-#define MAXPHYS		(1 * 1024)	/* max raw I/O transfer size */
-#else
-#define BLKDEV_IOSIZE	2048
-#define MAXPHYS		(64 * 1024)	/* max raw I/O transfer size */
+#ifndef MAXCPU
+#define	MAXCPU		32
 #endif
 
-#define UPAGES	2		/* pages of u-area */
+#ifndef MAXMEMDOM
+#define	MAXMEMDOM	1
+#endif
+
+#define	ALIGNBYTES	_ALIGNBYTES
+#define	ALIGN(p)	_ALIGN(p)
+/*
+ * ALIGNED_POINTER is a boolean macro that checks whether an address
+ * is valid to fetch data elements of type t from on this architecture.
+ * This does not reflect the optimal alignment, just the possibility
+ * (within reasonable limits).
+ */
+#define	ALIGNED_POINTER(p, t)	((((unsigned long)(p)) & (sizeof(t) - 1)) == 0)
 
 /*
- * Constants related to network buffer management.
- * MCLBYTES must be no larger than CLBYTES (the software page size), and,
- * on machines that exchange pages of input or output buffers with mbuf
- * clusters (MAPPED_MBUFS), MCLBYTES must also be an integral multiple
- * of the hardware page size.
+ * CACHE_LINE_SIZE is the compile-time maximum cache line size for an
+ * architecture.  It should be used with appropriate caution.
  */
-#ifndef	MSIZE
-#define MSIZE		128		/* size of an mbuf */
-#endif	/* MSIZE */
+#ifndef CACHE_LINE_SHIFT
+#define	CACHE_LINE_SHIFT	6
+#endif
+#define	CACHE_LINE_SIZE		(1 << CACHE_LINE_SHIFT)
 
-#ifndef	MCLSHIFT
-#define MCLSHIFT	11		/* convert bytes to m_buf clusters */
-#endif	/* MCLSHIFT */
-#define MCLBYTES	(1 << MCLSHIFT)	/* size of an m_buf cluster */
-#define MCLOFSET	(MCLBYTES - 1)	/* offset within an m_buf cluster */
+#define	PAGE_SHIFT	12
+#define	PAGE_SIZE	(1 << PAGE_SHIFT)	/* Page size */
+#define	PAGE_MASK	(PAGE_SIZE - 1)
 
-/*
- * Some macros for units conversion
- */
-
-/* clicks to bytes */
-#define ctob(x)	((x)<<PAGE_SHIFT)
-
-/* bytes to clicks */
-#define btoc(x)	(((unsigned)(x)+PAGE_MASK)>>PAGE_SHIFT)
-
-/*
- * btodb() is messy and perhaps slow because `bytes' may be an off_t.  We
- * want to shift an unsigned type to avoid sign extension and we don't
- * want to widen `bytes' unnecessarily.  Assume that the result fits in
- * a daddr_t.
- */
-#define btodb(bytes)	 		/* calculates (bytes / DEV_BSIZE) */ \
-	(sizeof (bytes) > sizeof(long) \
-	 ? (daddr_t)((unsigned long long)(bytes) >> DEV_BSHIFT) \
-	 : (daddr_t)((unsigned long)(bytes) >> DEV_BSHIFT))
-
-#define dbtob(db)			/* calculates (db * DEV_BSIZE) */ \
-	((off_t)(db) << DEV_BSHIFT)
+#define	MAXPAGESIZES	1		/* maximum number of supported page sizes */
 
 /*
  * Mach derived conversion macros
  */
-#define trunc_page(x)		((unsigned)(x) & ~PAGE_MASK)
-#define round_page(x)		((((unsigned)(x)) + PAGE_MASK) & ~PAGE_MASK)
+#define	round_page(x)		(((unsigned long)(x) + PAGE_MASK) & ~PAGE_MASK)
+#define	trunc_page(x)		((unsigned long)(x) & ~PAGE_MASK)
 
-#define atop(x)			((unsigned)(x) >> PAGE_SHIFT)
-#define ptoa(x)			((unsigned)(x) << PAGE_SHIFT)
+#define	atop(x)			((unsigned long)(x) >> PAGE_SHIFT)
+#define	ptoa(x)			((unsigned long)(x) << PAGE_SHIFT)
+
+#define	pgtok(x)		((unsigned long)(x) * (PAGE_SIZE / 1024))
 
 #endif /* !_MACHINE_PARAM_H_ */
