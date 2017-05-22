@@ -69,9 +69,8 @@ LIBRARIES = $(noinst_LIBRARIES)
 ARFLAGS = cru
 lib_a_AR = $(AR) $(ARFLAGS)
 lib_a_LIBADD =
-am_lib_a_OBJECTS = lib_a-setjmp.$(OBJEXT) lib_a-access.$(OBJEXT) \
-	lib_a-strcmp.$(OBJEXT) lib_a-strcpy.$(OBJEXT) \
-	lib_a-aeabi_memcpy.$(OBJEXT) \
+am_lib_a_OBJECTS = lib_a-setjmp.$(OBJEXT) lib_a-strcmp.$(OBJEXT) \
+	lib_a-strcpy.$(OBJEXT) lib_a-aeabi_memcpy.$(OBJEXT) \
 	lib_a-aeabi_memcpy-armv7a.$(OBJEXT) \
 	lib_a-aeabi_memmove.$(OBJEXT) \
 	lib_a-aeabi_memmove-soft.$(OBJEXT) \
@@ -206,7 +205,7 @@ AUTOMAKE_OPTIONS = cygnus
 INCLUDES = $(NEWLIB_CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLAGS)
 AM_CCASFLAGS = $(INCLUDES)
 noinst_LIBRARIES = lib.a
-lib_a_SOURCES = setjmp.S access.c strcmp.S strcpy.c aeabi_memcpy.c \
+lib_a_SOURCES = setjmp.S strcmp.S strcpy.c aeabi_memcpy.c \
 	aeabi_memcpy-armv7a.S aeabi_memmove.c aeabi_memmove-soft.S \
 	aeabi_memset.c aeabi_memset-soft.S aeabi_memclr.c \
 	memchr-stub.c memchr.S memcpy-stub.c memcpy.S strlen-stub.c \
@@ -337,12 +336,6 @@ lib_a-strlen.obj: strlen.S
 
 .c.obj:
 	$(COMPILE) -c `$(CYGPATH_W) '$<'`
-
-lib_a-access.o: access.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-access.o `test -f 'access.c' || echo '$(srcdir)/'`access.c
-
-lib_a-access.obj: access.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-access.obj `if test -f 'access.c'; then $(CYGPATH_W) 'access.c'; else $(CYGPATH_W) '$(srcdir)/access.c'; fi`
 
 lib_a-strcpy.o: strcpy.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-strcpy.o `test -f 'strcpy.c' || echo '$(srcdir)/'`strcpy.c
