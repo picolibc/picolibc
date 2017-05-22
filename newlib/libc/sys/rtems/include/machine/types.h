@@ -28,6 +28,8 @@
 #error "must be included via <sys/types.h>"
 #endif /* !_SYS_TYPES_H */
 
+#include <machine/_bitcount.h>
+
 #if __BSD_VISIBLE
 
 #ifndef _ACCMODE_T_DECLARED
