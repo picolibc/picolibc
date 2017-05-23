@@ -142,6 +142,11 @@ __start:
 	bset	r2, r2, 19
 	flag	r2
 #endif
+
+#if defined (__ARC_CODE_DENSITY__)
+	;; Initialize jli_base
+	sr	@__JLI_TABLE__,[jli_base]
+#endif
 	mov	gp, @__SDATA_BEGIN__
 	mov_s	r2, @__sbss_start	; r2 = start of the bss section
 	sub	r3, @_end, r2		; r3 = size of the bss section in bytes
@@ -189,7 +194,7 @@ __start:
 	mov_s	r0, 1
 	st_s	r0, [r1, 4]		; _GLOBAL_REENT->atexit0._ind
 ; branch to _init
-#if defined (__EM__) || defined (__HS__)
+#if defined (__ARCEM__) || defined (__ARCHS__)
 	jl	@_init
 #else
 	bl	@_init
