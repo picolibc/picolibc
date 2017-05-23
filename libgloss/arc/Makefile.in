@@ -47,14 +47,15 @@ OBJCOPY = `if [ -f ${objroot}/../binutils/objcopy ] ; \
 	then echo ${objroot}/../binutils/objcopy ; \
 	else t='$(program_transform_name)'; echo objcopy | sed -e $$t ; fi`
 
-CRT0		= crt0.o
+CRT0		= gcrt0.o crt0.o
 CRT0_INSTALL	= install-crt0
 
 NSIM_BSP = libnsim.a
 NSIM_OBJS = \
-	    libcfunc.o \
-	    nsim-syscalls.o \
-	    sbrk.o
+	libcfunc.o \
+	nsim-syscalls.o \
+	sbrk.o \
+	mcount.o
 NSIM_INSTALL = install-nsim
 NSIM_SCRIPTS = nsim.specs
 
@@ -75,9 +76,9 @@ $(NSIM_BSP): $(NSIM_OBJS)
 libcfunc.o: libcfunc.c
 nsim-syscalls.o: nsim-syscalls.c
 sbrk.o: sbrk.c
-
-#
-$(CRT0): crt0.S
+mcount.o: mcount.c
+gcrt0.o: gcrt0.S crt0.S
+crt0.o: crt0.S
 
 clean mostlyclean:
 	rm -f *.o *.a
@@ -95,7 +96,10 @@ install: $(CRT0_INSTALL) $(NSIM_INSTALL) $(NANO_INSTALL)
 
 $(CRT0_INSTALL):
 	$(mkinstalldirs) $(DESTDIR)${tooldir}/lib${MULTISUBDIR}
-	${INSTALL_DATA} ${CRT0} $(DESTDIR)${tooldir}/lib${MULTISUBDIR}/$(CRT0)
+	for c in $(CRT0); do \
+	  b=`basename $$c`; \
+	  ${INSTALL_DATA} $$c $(DESTDIR)${tooldir}/lib${MULTISUBDIR}/$$b ;\
+	done
 
 $(NSIM_INSTALL):
 	$(mkinstalldirs) $(DESTDIR)${tooldir}/lib${MULTISUBDIR}

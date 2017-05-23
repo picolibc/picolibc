@@ -194,6 +194,13 @@ __start:
 #else
 	bl	@_init
 #endif /* __ARCEM__ || __ARCHS__ */
+
+#ifdef PROFILE_SUPPORT /* Defined in gcrt0.S.  */
+	mov	r0,@__start
+	mov	r1,@_etext
+	jl	@_monstartup
+#endif /* PROFILE_SUPPORT */
+
 	mov_s	r0, r13
 	mov_s	r1, r14
 ; branch to main
@@ -204,6 +211,13 @@ __start:
 	bl.d	@main
 	mov	fp, 0			; initialize frame pointer
 #endif /* __ARCEM__ || __ARCHS__ */
+
+#ifdef PROFILE_SUPPORT
+	mov	r13, r0		; Save return code
+	jl	@_mcleanup
+	mov	r0, r13
+#endif /* PROFILE_SUPPORT */
+
 	; r0 contains exit code
 	j	@exit
 
