@@ -18,11 +18,14 @@ fsrc =	sf_finite.c sf_copysign.c sf_modf.c sf_scalbn.c \
 	sf_cbrt.c sf_exp10.c sf_expm1.c sf_ilogb.c \
 	sf_infinity.c sf_isinf.c sf_isinff.c sf_isnan.c sf_isnanf.c \
 	sf_log1p.c sf_nan.c sf_nextafter.c sf_pow10.c \
-	sf_rint.c sf_logb.c sf_log2.c \
+	sf_rint.c sf_logb.c \
 	sf_fdim.c sf_fma.c sf_fmax.c sf_fmin.c sf_fpclassify.c \
 	sf_lrint.c sf_llrint.c \
 	sf_lround.c sf_llround.c sf_nearbyint.c sf_remquo.c sf_round.c \
-	sf_scalbln.c sf_trunc.c
+	sf_scalbln.c sf_trunc.c \
+	sf_exp.c sf_exp2.c sf_exp2_data.c sf_log.c sf_log_data.c \
+	sf_log2.c sf_log2_data.c sf_pow_log2_data.c sf_pow.c \
+	math_errf.c
 
 lsrc =	atanl.c cosl.c sinl.c tanl.c tanhl.c frexpl.c modfl.c ceill.c fabsl.c \
 	floorl.c log1pl.c expm1l.c acosl.c asinl.c atan2l.c coshl.c sinhl.c \

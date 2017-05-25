@@ -18,6 +18,7 @@
  */
 
 #include "fdlibm.h"
+#if __OBSOLETE_MATH
 #include <errno.h>
 
 #ifdef __STDC__
@@ -177,3 +178,4 @@
 }
 
 #endif /* defined(_DOUBLE_IS_32BITS) */
+#endif /* __OBSOLETE_MATH */

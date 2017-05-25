@@ -15,6 +15,7 @@
 
 #include "fdlibm.h"
 
+#if __OBSOLETE_MATH
 #ifdef __v810__
 #define const
 #endif
@@ -97,3 +98,4 @@ P5   =  4.1381369442e-08; /* 0x3331bb4c */
 	    return y*twom100;
 	}
 }
+#endif /* __OBSOLETE_MATH */

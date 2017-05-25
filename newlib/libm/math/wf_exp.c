@@ -18,6 +18,7 @@
  */
 
 #include "fdlibm.h"
+#if __OBSOLETE_MATH
 #include <errno.h>
 
 #ifdef __STDC__
@@ -101,3 +102,4 @@ u_threshold= -1.0397208405e+02;  /* 0xc2cff1b5 */
 }
 
 #endif /* defined(_DOUBLE_IS_32BITS) */
+#endif /* __OBSOLETE_MATH */

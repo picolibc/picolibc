@@ -48,7 +48,8 @@ fsrc =	kf_rem_pio2.c \
 	sf_frexp.c sf_ldexp.c \
 	sf_signif.c sf_sin.c \
 	sf_tan.c sf_tanh.c \
-	wf_exp2.c wf_tgamma.c
+	wf_exp2.c wf_tgamma.c \
+	wf_log2.c
 
 lsrc = el_hypot.c
 

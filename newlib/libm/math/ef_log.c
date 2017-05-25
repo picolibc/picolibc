@@ -15,6 +15,7 @@
 
 #include "fdlibm.h"
 
+#if __OBSOLETE_MATH
 #ifdef __STDC__
 static const float
 #else
@@ -90,3 +91,4 @@ static float zero   =  0.0;
 		     return dk*ln2_hi-((s*(f-R)-dk*ln2_lo)-f);
 	}
 }
+#endif /* __OBSOLETE_MATH */

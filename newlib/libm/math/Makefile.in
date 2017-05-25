@@ -137,7 +137,8 @@ am__objects_2 = lib_a-kf_rem_pio2.$(OBJEXT) lib_a-kf_cos.$(OBJEXT) \
 	lib_a-sf_frexp.$(OBJEXT) lib_a-sf_ldexp.$(OBJEXT) \
 	lib_a-sf_signif.$(OBJEXT) lib_a-sf_sin.$(OBJEXT) \
 	lib_a-sf_tan.$(OBJEXT) lib_a-sf_tanh.$(OBJEXT) \
-	lib_a-wf_exp2.$(OBJEXT) lib_a-wf_tgamma.$(OBJEXT)
+	lib_a-wf_exp2.$(OBJEXT) lib_a-wf_tgamma.$(OBJEXT) \
+	lib_a-wf_log2.$(OBJEXT)
 am__objects_3 = lib_a-el_hypot.$(OBJEXT)
 @USE_LIBTOOL_FALSE@am_lib_a_OBJECTS = $(am__objects_1) \
 @USE_LIBTOOL_FALSE@	$(am__objects_2) $(am__objects_3)
@@ -169,7 +170,7 @@ am__objects_5 = kf_rem_pio2.lo kf_cos.lo kf_sin.lo kf_tan.lo \
 	wf_sincos.lo wf_drem.lo sf_asinh.lo sf_atan.lo sf_ceil.lo \
 	sf_cos.lo sf_erf.lo sf_fabs.lo sf_floor.lo sf_frexp.lo \
 	sf_ldexp.lo sf_signif.lo sf_sin.lo sf_tan.lo sf_tanh.lo \
-	wf_exp2.lo wf_tgamma.lo
+	wf_exp2.lo wf_tgamma.lo wf_log2.lo
 am__objects_6 = el_hypot.lo
 @USE_LIBTOOL_TRUE@am_libmath_la_OBJECTS = $(am__objects_4) \
 @USE_LIBTOOL_TRUE@	$(am__objects_5) $(am__objects_6)
@@ -372,7 +373,8 @@ fsrc = kf_rem_pio2.c \
 	sf_frexp.c sf_ldexp.c \
 	sf_signif.c sf_sin.c \
 	sf_tan.c sf_tanh.c \
-	wf_exp2.c wf_tgamma.c
+	wf_exp2.c wf_tgamma.c \
+	wf_log2.c
 
 lsrc = el_hypot.c
 libmath_la_LDFLAGS = -Xcompiler -nostdlib
@@ -1269,6 +1271,12 @@ lib_a-wf_tgamma.o: wf_tgamma.c
 
 lib_a-wf_tgamma.obj: wf_tgamma.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-wf_tgamma.obj `if test -f 'wf_tgamma.c'; then $(CYGPATH_W) 'wf_tgamma.c'; else $(CYGPATH_W) '$(srcdir)/wf_tgamma.c'; fi`
+
+lib_a-wf_log2.o: wf_log2.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-wf_log2.o `test -f 'wf_log2.c' || echo '$(srcdir)/'`wf_log2.c
+
+lib_a-wf_log2.obj: wf_log2.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-wf_log2.obj `if test -f 'wf_log2.c'; then $(CYGPATH_W) 'wf_log2.c'; else $(CYGPATH_W) '$(srcdir)/wf_log2.c'; fi`
 
 lib_a-el_hypot.o: el_hypot.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-el_hypot.o `test -f 'el_hypot.c' || echo '$(srcdir)/'`el_hypot.c

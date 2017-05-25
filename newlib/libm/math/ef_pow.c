@@ -15,6 +15,7 @@
 
 #include "fdlibm.h"
 
+#if __OBSOLETE_MATH
 #ifdef __v810__
 #define const 
 #endif
@@ -253,3 +254,4 @@ ivln2_l  =  7.0526075433e-06; /* 0x36eca570 =1/ln2 tail*/
 	else SET_FLOAT_WORD(z,j);
 	return s*z;
 }
+#endif /* __OBSOLETE_MATH */

@@ -1,4 +1,4 @@
-/* Single-precision log2 function.
+/* Single-precision 2^x function.
    Copyright (c) 2017 ARM Ltd.  All rights reserved.
 
    Redistribution and use in source and binary forms, with or without
@@ -32,68 +32,68 @@
 #include "math_config.h"
 
 /*
-LOG2F_TABLE_BITS = 4
-LOG2F_POLY_ORDER = 4
+EXP2F_TABLE_BITS = 5
+EXP2F_POLY_ORDER = 3
 
-ULP error: 0.752 (nearest rounding.)
-Relative error: 1.9 * 2^-26 (before rounding.)
+ULP error: 0.502 (nearest rounding.)
+Relative error: 1.69 * 2^-34 in [-1/64, 1/64] (before rounding.)
+Wrong count: 168353 (all nearest rounding wrong results with fma.)
+Non-nearest ULP error: 1 (rounded ULP error)
 */
 
-#define N (1 << LOG2F_TABLE_BITS)
-#define T __log2f_data.tab
-#define A __log2f_data.poly
-#define OFF 0x3f330000
+#define N (1 << EXP2F_TABLE_BITS)
+#define T __exp2f_data.tab
+#define C __exp2f_data.poly
+#define SHIFT __exp2f_data.shift_scaled
+
+static inline uint32_t
+top12 (float x)
+{
+  return asuint (x) >> 20;
+}
 
 float
-log2f (float x)
+exp2f (float x)
 {
+  uint32_t abstop;
+  uint64_t ki, t;
   /* double_t for better performance on targets with FLT_EVAL_METHOD==2.  */
-  double_t z, r, r2, p, y, y0, invc, logc;
-  uint32_t ix, iz, top, tmp;
-  int k, i;
+  double_t kd, xd, z, r, r2, y, s;
 
-  ix = asuint (x);
-#if WANT_ROUNDING
-  /* Fix sign of zero with downward rounding when x==1.  */
-  if (__builtin_expect (ix == 0x3f800000, 0))
-    return 0;
-#endif
-  if (__builtin_expect (ix - 0x00800000 >= 0x7f800000 - 0x00800000, 0))
+  xd = (double_t) x;
+  abstop = top12 (x) & 0x7ff;
+  if (__builtin_expect (abstop >= top12 (128.0f), 0))
     {
-      /* x < 0x1p-126 or inf or nan.  */
-      if (ix * 2 == 0)
-	return __math_divzerof (1);
-      if (ix == 0x7f800000) /* log2(inf) == inf.  */
-	return x;
-      if ((ix & 0x80000000) || ix * 2 >= 0xff000000)
-	return __math_invalidf (x);
-      /* x is subnormal, normalize it.  */
-      ix = asuint (x * 0x1p23f);
-      ix -= 23 << 23;
+      /* |x| >= 128 or x is nan.  */
+      if (asuint (x) == asuint (-INFINITY))
+	return 0.0f;
+      if (abstop >= top12 (INFINITY))
+	return x + x;
+      if (x > 0.0f)
+	return __math_oflowf (0);
+      if (x <= -150.0f)
+	return __math_uflowf (0);
+#if WANT_ERRNO_UFLOW
+      if (x < -149.0f)
+	return __math_may_uflowf (0);
+#endif
     }
 
-  /* x = 2^k z; where z is in range [OFF,2*OFF] and exact.
-     The range is split into N subintervals.
-     The ith subinterval contains z and c is near its center.  */
-  tmp = ix - OFF;
-  i = (tmp >> (23 - LOG2F_TABLE_BITS)) % N;
-  top = tmp & 0xff800000;
-  iz = ix - top;
-  k = (int32_t) tmp >> 23; /* arithmetic shift */
-  invc = T[i].invc;
-  logc = T[i].logc;
-  z = (double_t) asfloat (iz);
+  /* x = k/N + r with r in [-1/(2N), 1/(2N)] and int k.  */
+  kd = (double) (xd + SHIFT); /* Rounding to double precision is required.  */
+  ki = asuint64 (kd);
+  kd -= SHIFT; /* k/N for int k.  */
+  r = xd - kd;
 
-  /* log2(x) = log1p(z/c-1)/ln2 + log2(c) + k */
-  r = z * invc - 1;
-  y0 = logc + (double_t) k;
-
-  /* Pipelined polynomial evaluation to approximate log1p(r)/ln2.  */
+  /* exp2(x) = 2^(k/N) * 2^r ~= s * (C0*r^3 + C1*r^2 + C2*r + 1) */
+  t = T[ki % N];
+  t += ki << (52 - EXP2F_TABLE_BITS);
+  s = asdouble (t);
+  z = C[0] * r + C[1];
   r2 = r * r;
-  y = A[1] * r + A[2];
-  y = A[0] * r2 + y;
-  p = A[3] * r + y0;
-  y = y * r2 + p;
+  y = C[2] * r + 1;
+  y = z * r2 + y;
+  y = y * s;
   return (float) y;
 }
 #endif /* !__OBSOLETE_MATH */
