@@ -53,45 +53,59 @@ For other options, search the mailing lists with terms such as
 <question><para>Does Setup accept command-line arguments?</para></question>
 <answer>
 
-<para>Yes, the full listing is written to the <literal>setup.log</literal> file 
-when you run <literal>setup-x86.exe --help</literal> or
-<literal>setup-x86_64.exe --help</literal>. The current options are:
+<para>Yes, run <literal>setup-x86.exe --help</literal> or
+<literal>setup-x86_64.exe --help</literal> for a list.
+</para>
+
 <screen>
-Command Line Options:
- -D --download                     Download from internet
- -L --local-install                Install from local directory
- -s --site                         Download site
- -O --only-site                    Ignore all sites except for -s
- -R --root                         Root installation directory
- -x --remove-packages              Specify packages to uninstall
- -c --remove-categories            Specify categories to uninstall
- -P --packages                     Specify packages to install
- -C --categories                   Specify entire categories to install
- -p --proxy                        HTTP/FTP proxy (host:port)
+    --allow-unsupported-windows    Allow old, unsupported Windows versions
  -a --arch                         architecture to install (x86_64 or x86)
- -q --quiet-mode                   Unattended setup mode
- -M --package-manager              Semi-attended chooser-only mode
- -B --no-admin                     Do not check for and enforce running as
-                                   Administrator
- -h --help                         print help
- -l --local-package-dir            Local package directory
- -r --no-replaceonreboot           Disable replacing in-use files on next
-                                   reboot.
- -X --no-verify                    Don't verify setup.ini signatures
- -n --no-shortcuts                 Disable creation of desktop and start menu
-                                   shortcuts
- -N --no-startmenu                 Disable creation of start menu shortcut
- -d --no-desktop                   Disable creation of desktop shortcut
- -K --pubkey                       URL of extra public key file (gpg format)
- -S --sexpr-pubkey                 Extra public key in s-expr format
- -u --untrusted-keys               Use untrusted keys from last-extrakeys
- -U --keep-untrusted-keys          Use untrusted keys and retain all
- -g --upgrade-also                 also upgrade installed packages
+ -C --categories                   Specify entire categories to install
  -o --delete-orphans               remove orphaned packages
  -A --disable-buggy-antivirus      Disable known or suspected buggy anti virus
                                    software packages during execution.
+ -D --download                     Download from internet
+ -f --force-current                select the current version for all packages
+ -h --help                         print help
+ -I --include-source               Automatically include source download
+ -i --ini-basename                 Use a different basename, e.g. "foo",
+                                   instead of "setup"
+ -U --keep-untrusted-keys          Use untrusted keys and retain all
+ -L --local-install                Install from local directory
+ -l --local-package-dir            Local package directory
+ -m --mirror-mode                  Skip availability check when installing from
+                                   local directory (requires local directory to
+                                   be clean mirror!)
+ -B --no-admin                     Do not check for and enforce running as
+                                   Administrator
+ -d --no-desktop                   Disable creation of desktop shortcut
+ -r --no-replaceonreboot           Disable replacing in-use files on next
+                                   reboot.
+ -n --no-shortcuts                 Disable creation of desktop and start menu
+                                   shortcuts
+ -N --no-startmenu                 Disable creation of start menu shortcut
+ -X --no-verify                    Don't verify setup.ini signatures
+ -O --only-site                    Ignore all sites except for -s
+ -M --package-manager              Semi-attended chooser-only mode
+ -P --packages                     Specify packages to install
+ -p --proxy                        HTTP/FTP proxy (host:port)
+ -Y --prune-install                prune the installation to only the requested
+                                   packages
+ -K --pubkey                       URL of extra public key file (gpg format)
+ -q --quiet-mode                   Unattended setup mode
+ -c --remove-categories            Specify categories to uninstall
+ -x --remove-packages              Specify packages to uninstall
+ -R --root                         Root installation directory
+ -S --sexpr-pubkey                 Extra public key in s-expr format
+ -s --site                         Download site
+ -u --untrusted-keys               Use untrusted keys from last-extrakeys
+ -g --upgrade-also                 also upgrade installed packages
+    --user-agent                   User agent string for HTTP requests
+ -v --verbose                      Verbose output
+ -W --wait                         When elevating, wait for elevated child
+                                   process
 </screen>
-</para>
+
 </answer></qandaentry>
 
 <qandaentry id="faq.setup.noroot">
