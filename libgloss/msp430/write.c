@@ -55,5 +55,5 @@ write (int fd, char *buf, int len)
       len -= l;
       buf += l;
     }
-  return c;
+  return rv;
 }
