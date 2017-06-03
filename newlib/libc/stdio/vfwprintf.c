@@ -970,6 +970,8 @@ reswitch:	switch (ch) {
 				break;
 			}
 			if (isnan (_fpvalue)) {
+				if (signbit (_fpvalue))
+					sign = L'-';
 				if (ch <= L'G') /* 'A', 'E', 'F', or 'G' */
 					cp = L"NAN";
 				else
@@ -1001,6 +1003,8 @@ reswitch:	switch (ch) {
 				break;
 			}
 			if (expt == 1) {
+				if (signbit (_fpvalue))
+					sign = L'-';
 				if (ch <= L'G') /* 'A', 'E', 'F', or 'G' */
 					cp = L"NAN";
 				else
