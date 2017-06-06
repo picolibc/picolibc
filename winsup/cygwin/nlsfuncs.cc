@@ -1196,15 +1196,21 @@ wcsxfrm_l (wchar_t *__restrict ws1, const wchar_t *__restrict ws2, size_t wsn,
 
   if (!collate_lcid)
     return wcslcpy (ws1, ws2, wsn);
-  ret = LCMapStringW (collate_lcid, LCMAP_SORTKEY | LCMAP_BYTEREV,
-		      ws2, -1, ws1, wsn * sizeof (wchar_t));
-  /* LCMapStringW returns byte count including the terminating NUL character,
-     wcsxfrm is supposed to return length in wchar_t excluding the NUL.
-     Since the array is only single byte NUL-terminated we must make sure
-     the result is wchar_t-NUL terminated. */
+  /* Don't use LCMAP_SORTKEY in conjunction with LCMAP_BYTEREV.  The cchDest
+     parameter is used as byte count with LCMAP_SORTKEY but as char count with
+     LCMAP_BYTEREV. */
+  ret = LCMapStringW (collate_lcid, LCMAP_SORTKEY, ws2, -1, ws1,
+		      wsn * sizeof (wchar_t));
   if (ret)
     {
       ret /= sizeof (wchar_t);
+     /* Byte swap the array ourselves here. */
+      for (size_t idx = 0; idx < ret; ++idx)
+	ws1[idx] = __builtin_bswap16 (ws1[idx]);
+      /* LCMapStringW returns byte count including the terminating NUL char.
+	 wcsxfrm is supposed to return length in wchar_t excluding the NUL.
+	 Since the array is only single byte NUL-terminated yet, make sure
+	 the result is wchar_t-NUL terminated. */
       if (ret < wsn)
 	ws1[ret] = L'\0';
       return ret;
@@ -1213,8 +1219,7 @@ wcsxfrm_l (wchar_t *__restrict ws1, const wchar_t *__restrict ws2, size_t wsn,
     set_errno (EINVAL);
   else
     {
-      ret = LCMapStringW (collate_lcid, LCMAP_SORTKEY | LCMAP_BYTEREV, ws2, -1,
-			  NULL, 0);
+      ret = LCMapStringW (collate_lcid, LCMAP_SORTKEY, ws2, -1, NULL, 0);
       if (ret)
 	wsn = ret / sizeof (wchar_t);
     }
