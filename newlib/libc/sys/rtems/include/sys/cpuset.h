@@ -202,7 +202,7 @@ static __inline int CPU_COUNT(const cpu_set_t *set)
 static __inline int CPU_EQUAL_S(size_t setsize, const cpu_set_t *set1,
   const cpu_set_t *set2)
 {
-  return BIT_CMP(_cpu_set_bits(setsize), set1, set2);
+  return !BIT_CMP(_cpu_set_bits(setsize), set1, set2);
 }
 
 static __inline int CPU_EQUAL(const cpu_set_t *set1, const cpu_set_t *set2)
@@ -212,7 +212,7 @@ static __inline int CPU_EQUAL(const cpu_set_t *set1, const cpu_set_t *set2)
 
 static __inline int CPU_CMP(const cpu_set_t *set1, const cpu_set_t *set2)
 {
-  return CPU_EQUAL(set1, set2);
+  return BIT_CMP(CPU_SETSIZE, set1, set2);
 }
 
 static __inline int CPU_EMPTY(const cpu_set_t *set)
