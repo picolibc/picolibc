@@ -50,17 +50,17 @@
 
 #define	CPUSETBUFSIZ	((2 + sizeof(long) * 2) * _NCPUWORDS)
 
-#define	CPU_SETOF(n, p)			BIT_SETOF(_cpu_set_bits(setsize), n, p)
-#define	CPU_ISFULLSET(p)		BIT_ISFULLSET(_cpu_set_bits(setsize), p)
-#define	CPU_SUBSET(p, c)		BIT_SUBSET(_cpu_set_bits(setsize), p, c)
-#define	CPU_OVERLAP(p, c)		BIT_OVERLAP(_cpu_set_bits(setsize), p, c)
-#define	CPU_CLR_ATOMIC(n, p)		BIT_CLR_ATOMIC(_cpu_set_bits(setsize), n, p)
-#define	CPU_SET_ATOMIC(n, p)		BIT_SET_ATOMIC(_cpu_set_bits(setsize), n, p)
-#define	CPU_SET_ATOMIC_ACQ(n, p)	BIT_SET_ATOMIC_ACQ(_cpu_set_bits(setsize), n, p)
-#define	CPU_AND_ATOMIC(n, p)		BIT_AND_ATOMIC(_cpu_set_bits(setsize), n, p)
-#define	CPU_OR_ATOMIC(d, s)		BIT_OR_ATOMIC(_cpu_set_bits(setsize), d, s)
-#define	CPU_COPY_STORE_REL(f, t)	BIT_COPY_STORE_REL(_cpu_set_bits(setsize), f, t)
-#define	CPU_FFS(p)			BIT_FFS(_cpu_set_bits(setsize), p)
+#define	CPU_SETOF(n, p)			BIT_SETOF(CPU_SETSIZE, n, p)
+#define	CPU_ISFULLSET(p)		BIT_ISFULLSET(CPU_SETSIZE, p)
+#define	CPU_SUBSET(p, c)		BIT_SUBSET(CPU_SETSIZE, p, c)
+#define	CPU_OVERLAP(p, c)		BIT_OVERLAP(CPU_SETSIZE, p, c)
+#define	CPU_CLR_ATOMIC(n, p)		BIT_CLR_ATOMIC(CPU_SETSIZE, n, p)
+#define	CPU_SET_ATOMIC(n, p)		BIT_SET_ATOMIC(CPU_SETSIZE, n, p)
+#define	CPU_SET_ATOMIC_ACQ(n, p)	BIT_SET_ATOMIC_ACQ(CPU_SETSIZE, n, p)
+#define	CPU_AND_ATOMIC(n, p)		BIT_AND_ATOMIC(CPU_SETSIZE, n, p)
+#define	CPU_OR_ATOMIC(d, s)		BIT_OR_ATOMIC(CPU_SETSIZE, d, s)
+#define	CPU_COPY_STORE_REL(f, t)	BIT_COPY_STORE_REL(CPU_SETSIZE, f, t)
+#define	CPU_FFS(p)			BIT_FFS(CPU_SETSIZE, p)
 #define	CPUSET_FSET			BITSET_FSET(_NCPUWORDS)
 #define	CPUSET_T_INITIALIZER		BITSET_T_INITIALIZER
 
