@@ -36,7 +36,7 @@
 #include <sys/types.h>
 #include <stdint.h>
 
-typedef uint32_t ioctl_command_t;
+typedef unsigned long ioctl_command_t;
 
 /*
  * Ioctl's have the command encoded in the lower word, and the size of
@@ -79,7 +79,7 @@ typedef uint32_t ioctl_command_t;
 #include <sys/cdefs.h>
 
 __BEGIN_DECLS
-int	ioctl(int, unsigned long, ...);
+int	ioctl(int, ioctl_command_t, ...);
 __END_DECLS
 
 #endif
