@@ -1273,6 +1273,8 @@ behaviour which affect the operation of other programs, such as Cygwin.
 <listitem><para>Bufferzone from Trustware</para></listitem>
 <listitem><para>ByteMobile laptop optimization client</para></listitem>
 <listitem><para>COMODO Firewall Pro</para></listitem>
+<listitem><para>COMODO Internet Security</para></listitem>
+<listitem><para>ConEmu (try disabling "Inject ConEmuHk" or see <ulink url="https://conemu.github.io/en/ConEmuHk.html#Third_party_problems">ConEmuHk documentation</ulink>)</para></listitem>
 <listitem><para>Citrix Metaframe Presentation Server/XenApp (see <ulink url="http://support.citrix.com/article/CTX107825">Citrix Support page</ulink>)</para></listitem>
 <listitem><para>Credant Guardian Shield</para></listitem>
 <listitem><para>Earthlink Total-Access</para></listitem>
@@ -1298,7 +1300,7 @@ behaviour which affect the operation of other programs, such as Cygwin.
 <listitem><para>Webroot Spy Sweeper with Antivirus</para></listitem>
 <listitem><para>Windows Defender </para></listitem>
 <listitem><para>Windows LiveOneCare</para></listitem>
-<listitem><para>IBM Security Trusteer Rapport (see <ulink url="http://www-03.ibm.com/software/products/en/trusteer-rapport">its home page</ulink></para></listitem>
+<listitem><para>IBM Security Trusteer Rapport (see <ulink url="http://www-03.ibm.com/software/products/en/trusteer-rapport">its home page</ulink>)</para></listitem>
 </itemizedlist></para>
 <para>Sometimes these problems can be worked around, by temporarily or partially
 disabling the offending software.  For instance, it may be possible to disable
