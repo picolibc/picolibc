@@ -10,7 +10,7 @@ src = cabs.c cacos.c cacosh.c carg.c casin.c casinh.c \
       cpow.c cproj.c  creal.c  \
       csin.c csinh.c csqrt.c ctan.c ctanh.c
 
-lsrc = cabsl.c creall.c cimagl.c
+lsrc = cabsl.c creall.c cimagl.c ccoshl.c
 
 fsrc =	cabsf.c casinf.c ccosf.c cimagf.c cprojf.c  \
         csqrtf.c cacosf.c casinhf.c ccoshf.c clogf.c clog10f.c \
