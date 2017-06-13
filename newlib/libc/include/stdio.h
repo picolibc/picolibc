@@ -718,6 +718,7 @@ _ELIDABLE_INLINE int __sputc_r(struct _reent *_ptr, int _c, FILE *_p) {
 #define	__sclearerr(p)	((void)((p)->_flags &= ~(__SERR|__SEOF)))
 #define	__sfileno(p)	((p)->_file)
 
+#ifndef __cplusplus
 #ifndef _REENT_SMALL
 #define	feof(p)		__sfeof(p)
 #define	ferror(p)	__sferror(p)
@@ -740,6 +741,7 @@ _ELIDABLE_INLINE int __sputc_r(struct _reent *_ptr, int _c, FILE *_p) {
 #define putc(x, fp)	__sputc_r(_REENT, x, fp)
 #endif /* lint */
 #endif /* __CYGWIN__ */
+#endif /* __cplusplus */
 
 #if __MISC_VISIBLE
 /* fast always-buffered version, true iff error */
