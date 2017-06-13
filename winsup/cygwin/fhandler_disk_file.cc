@@ -178,10 +178,10 @@ path_conv::isgood_inode (ino_t ino) const
    are directory mount points, which are treated as symlinks.
    IO_REPARSE_TAG_SYMLINK types are always symlinks.  We don't know
    anything about other reparse points, so they are treated as unknown.  */
-static inline int
+static inline uint8_t
 readdir_check_reparse_point (POBJECT_ATTRIBUTES attr)
 {
-  DWORD ret = DT_UNKNOWN;
+  uint8_t ret = DT_UNKNOWN;
   IO_STATUS_BLOCK io;
   HANDLE reph;
   UNICODE_STRING subst;
@@ -2016,32 +2016,19 @@ fhandler_disk_file::readdir_helper (DIR *dir, dirent *de, DWORD w32_err,
 	de->d_type = DT_REG;
     }
 
-  /* Check for directory reparse point.  These are potential volume mount
-     points which have another inode than the underlying directory. */
+  /* Check for directory reparse point. These may be treated as a posix
+     symlink, or as mount point, so need to figure out whether to return
+     a directory or link type. In all cases, returning the INO of the
+     reparse point (not of the target) matches behavior of posix systems.
+     */
   if ((attr & (FILE_ATTRIBUTE_DIRECTORY | FILE_ATTRIBUTE_REPARSE_POINT))
       == (FILE_ATTRIBUTE_DIRECTORY | FILE_ATTRIBUTE_REPARSE_POINT))
     {
-      HANDLE reph;
-      OBJECT_ATTRIBUTES attr;
-      IO_STATUS_BLOCK io;
+      OBJECT_ATTRIBUTES oattr;
 
-      InitializeObjectAttributes (&attr, fname, pc.objcaseinsensitive (),
+      InitializeObjectAttributes (&oattr, fname, pc.objcaseinsensitive (),
 				  get_handle (), NULL);
-      de->d_type = readdir_check_reparse_point (&attr);
-      if (de->d_type == DT_DIR)
-	{
-	  /* Volume mountpoints are treated as directories.  We have to fix
-	     the inode number, otherwise we have the inode number of the
-	     mount point, rather than the inode number of the toplevel
-	     directory of the mounted drive. */
-	  if (NT_SUCCESS (NtOpenFile (&reph, READ_CONTROL, &attr, &io,
-				      FILE_SHARE_VALID_FLAGS,
-				      FILE_OPEN_FOR_BACKUP_INTENT)))
-	    {
-	      de->d_ino = pc.get_ino_by_handle (reph);
-	      NtClose (reph);
-	    }
-	}
+      de->d_type = readdir_check_reparse_point (&oattr);
     }
 
   /* Check for Windows shortcut. If it's a Cygwin or U/WIN symlink, drop the
