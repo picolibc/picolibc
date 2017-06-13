@@ -152,13 +152,15 @@ typedef struct sigaltstack {
   size_t    ss_size;  /* Stack size.  */
 } stack_t;
 
+#if __POSIX_VISIBLE
 #define SIG_SETMASK 0	/* set mask with sigprocmask() */
 #define SIG_BLOCK 1	/* set of signals to block */
 #define SIG_UNBLOCK 2	/* set of signals to, well, unblock */
 
 int _EXFUN(sigprocmask, (int how, const sigset_t *set, sigset_t *oset));
+#endif
 
-#if defined(_POSIX_THREADS)
+#if __POSIX_VISIBLE >= 199506
 int _EXFUN(pthread_sigmask, (int how, const sigset_t *set, sigset_t *oset));
 #endif
 
@@ -168,10 +170,14 @@ int _EXFUN(_kill, (pid_t, int));
 #endif /* _COMPILING_NEWLIB */
 #endif /* __CYGWIN__ || __rtems__ */
 
+#if __POSIX_VISIBLE
 int _EXFUN(kill, (pid_t, int));
+#endif
 
 #if __BSD_VISIBLE || __XSI_VISIBLE >= 4
 int _EXFUN(killpg, (pid_t, int));
+#endif
+#if __POSIX_VISIBLE
 int _EXFUN(sigaction, (int, const struct sigaction *, struct sigaction *));
 int _EXFUN(sigaddset, (sigset_t *, const int));
 int _EXFUN(sigdelset, (sigset_t *, const int));
@@ -180,7 +186,7 @@ int _EXFUN(sigfillset, (sigset_t *));
 int _EXFUN(sigemptyset, (sigset_t *));
 int _EXFUN(sigpending, (sigset_t *));
 int _EXFUN(sigsuspend, (const sigset_t *));
-int _EXFUN(sigpause, (int));
+int _EXFUN(sigwait, (const sigset_t *set, int *sig));
 
 #if !defined(__CYGWIN__) && !defined(__rtems__)
 /* These depend upon the type of sigset_t, which right now 
@@ -192,17 +198,21 @@ int _EXFUN(sigpause, (int));
 #define sigfillset(what)    (*(what) = ~(0), 0)
 #define sigismember(what,sig) (((*(what)) & (1<<(sig))) != 0)
 #endif /* !__CYGWIN__ && !__rtems__ */
-#endif /* __BSD_VISIBLE || __XSI_VISIBLE >= 4 */
+#endif /* __POSIX_VISIBLE */
+
+#if __BSD_VISIBLE
+int _EXFUN(sigpause, (int));
+#endif
 
 #if __BSD_VISIBLE || __XSI_VISIBLE >= 4 || __POSIX_VISIBLE >= 200809
 int _EXFUN(sigaltstack, (const stack_t *__restrict, stack_t *__restrict));
 #endif
 
-#if defined(_POSIX_THREADS)
+#if __POSIX_VISIBLE >= 199506
 int _EXFUN(pthread_kill, (pthread_t thread, int sig));
 #endif
 
-#if defined(_POSIX_REALTIME_SIGNALS)
+#if __POSIX_VISIBLE >= 199309
 
 /*  3.3.8 Synchronously Accept a Signal, P1003.1b-1993, p. 76
     NOTE: P1003.1c/D10, p. 39 adds sigwait().  */
@@ -211,12 +221,10 @@ int _EXFUN(sigwaitinfo, (const sigset_t *set, siginfo_t *info));
 int _EXFUN(sigtimedwait,
   (const sigset_t *set, siginfo_t *info, const struct timespec  *timeout)
 );
-int _EXFUN(sigwait, (const sigset_t *set, int *sig));
-
 /*  3.3.9 Queue a Signal to a Process, P1003.1b-1993, p. 78 */
 int _EXFUN(sigqueue, (pid_t pid, int signo, const union sigval value));
 
-#endif /* defined(_POSIX_REALTIME_SIGNALS) */
+#endif /* __POSIX_VISIBLE >= 199309 */
 
 #if defined(___AM29K__)
 /* These all need to be defined for ANSI C, but I don't think they are
