@@ -45,6 +45,12 @@ aarch64			Richard Earnshaw	richard.earnshaw@arm.com
 msp430			DJ Delorie		dj@redhat.com
 			Nick Clifton		nickc@redhat.com
 
+			OS Port Maintainers	(OS alphabetical order)
+
+OS port maintainers may make changes in OS-specific directories, as
+well as OS-specific portions of the build system, without approval.
+
+RTEMS			Joel Sherrill		joel.sherrill@oarcorp.com
 
 			Write After Approval
 
@@ -57,3 +63,4 @@ Nick Clifton			nickc@redhat.com
 Eric Blake			eblake@redhat.com
 Will Newton			will.newton@linaro.org
 Sebastian Huber			sebastian.huber@embedded-brains.de
+Joel Sherrill			joel.sherrill@oarcorp.com
