@@ -112,6 +112,7 @@ ELIX_4_SOURCES = \
 	strcasecmp_l.c \
 	strcoll_l.c \
 	strncasecmp_l.c \
+	strverscmp.c \
 	strxfrm_l.c \
 	wcscasecmp.c \
 	wcscasecmp_l.c \
@@ -156,6 +157,7 @@ wcswidth.def	wcsxfrm.def	wcwidth.def	wmemchr.def \
 wmemcmp.def	wmemcpy.def	wmemmove.def	wmemset.def \
 memmem.def	memrchr.def	rawmemchr.def	strchrnul.def \
 strcasecmp_l.def strcoll_l.def	strncasecmp_l.def strxfrm_l.def \
-wcscasecmp_l.def wcscoll_l.def	wcsncasecmp_l.def wcsxfrm_l.def
+wcscasecmp_l.def wcscoll_l.def	wcsncasecmp_l.def wcsxfrm_l.def \
+strverscmp.def
 
 CHAPTERS = strings.tex wcstrings.tex

@@ -127,6 +127,7 @@ am__objects_1 = lib_a-bcopy.$(OBJEXT) lib_a-bzero.$(OBJEXT) \
 @ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	lib_a-strcasecmp_l.$(OBJEXT) \
 @ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	lib_a-strcoll_l.$(OBJEXT) \
 @ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	lib_a-strncasecmp_l.$(OBJEXT) \
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	lib_a-strverscmp.$(OBJEXT) \
 @ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	lib_a-strxfrm_l.$(OBJEXT) \
 @ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	lib_a-wcscasecmp.$(OBJEXT) \
 @ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	lib_a-wcscasecmp_l.$(OBJEXT) \
@@ -164,6 +165,7 @@ am__objects_4 = bcopy.lo bzero.lo explicit_bzero.lo index.lo memchr.lo \
 @ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	strcasecmp_l.lo \
 @ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	strcoll_l.lo \
 @ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	strncasecmp_l.lo \
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	strverscmp.lo \
 @ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	strxfrm_l.lo \
 @ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	wcscasecmp.lo \
 @ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	wcscasecmp_l.lo \
@@ -441,6 +443,7 @@ GENERAL_SOURCES = \
 @ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	strcasecmp_l.c \
 @ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	strcoll_l.c \
 @ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	strncasecmp_l.c \
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	strverscmp.c \
 @ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	strxfrm_l.c \
 @ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	wcscasecmp.c \
 @ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	wcscasecmp_l.c \
@@ -488,7 +491,8 @@ wcswidth.def	wcsxfrm.def	wcwidth.def	wmemchr.def \
 wmemcmp.def	wmemcpy.def	wmemmove.def	wmemset.def \
 memmem.def	memrchr.def	rawmemchr.def	strchrnul.def \
 strcasecmp_l.def strcoll_l.def	strncasecmp_l.def strxfrm_l.def \
-wcscasecmp_l.def wcscoll_l.def	wcsncasecmp_l.def wcsxfrm_l.def
+wcscasecmp_l.def wcscoll_l.def	wcsncasecmp_l.def wcsxfrm_l.def \
+strverscmp.def
 
 CHAPTERS = strings.tex wcstrings.tex
 all: all-am
@@ -1099,6 +1103,12 @@ lib_a-strncasecmp_l.o: strncasecmp_l.c
 
 lib_a-strncasecmp_l.obj: strncasecmp_l.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-strncasecmp_l.obj `if test -f 'strncasecmp_l.c'; then $(CYGPATH_W) 'strncasecmp_l.c'; else $(CYGPATH_W) '$(srcdir)/strncasecmp_l.c'; fi`
+
+lib_a-strverscmp.o: strverscmp.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-strverscmp.o `test -f 'strverscmp.c' || echo '$(srcdir)/'`strverscmp.c
+
+lib_a-strverscmp.obj: strverscmp.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-strverscmp.obj `if test -f 'strverscmp.c'; then $(CYGPATH_W) 'strverscmp.c'; else $(CYGPATH_W) '$(srcdir)/strverscmp.c'; fi`
 
 lib_a-strxfrm_l.o: strxfrm_l.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-strxfrm_l.o `test -f 'strxfrm_l.c' || echo '$(srcdir)/'`strxfrm_l.c

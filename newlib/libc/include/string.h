@@ -159,6 +159,10 @@ char	*_EXFUN(strsignal, (int __signo));
 int	_EXFUN(strtosigno, (const char *__name));
 #endif
 
+#if __GNU_VISIBLE
+int	 _EXFUN(strverscmp,(const char *, const char *));
+#endif
+
 #if __GNU_VISIBLE && defined(__GNUC__)
 #define strdupa(__s) \
 	(__extension__ ({const char *__in = (__s); \
