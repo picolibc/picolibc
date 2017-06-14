@@ -161,15 +161,19 @@ path_conv::isgood_inode (ino_t ino) const
   return true;
 }
 
-/* Check reparse point for type.  IO_REPARSE_TAG_MOUNT_POINT types are
-   either volume mount points, which are treated as directories, or they
-   are directory mount points, which are treated as symlinks.
-   IO_REPARSE_TAG_SYMLINK types are always symlinks.  We don't know
-   anything about other reparse points, so they are treated as unknown.  */
-static inline uint8_t
-readdir_check_reparse_point (POBJECT_ATTRIBUTES attr)
+/* Check reparse point to determine if it should be treated as a posix symlink
+   or as a normal file/directory. Mount points are treated as normal directories
+   to match behavior of other systems. Unknown reparse tags are used for
+   things other than links (HSM, compression, dedup), and generally should be
+   treated as a normal file/directory. Native symlinks and mount points are
+   treated as posix symlinks, depending on the prefix of the target name.
+   This logic needs to agree with equivalent logic in path.cc
+   symlink_info::check_reparse_point() .
+   */
+static inline bool
+readdir_check_reparse_point (POBJECT_ATTRIBUTES attr, bool remote)
 {
-  uint8_t ret = DT_UNKNOWN;
+  bool ret = false;
   IO_STATUS_BLOCK io;
   HANDLE reph;
   UNICODE_STRING subst;
@@ -185,20 +189,29 @@ readdir_check_reparse_point (POBJECT_ATTRIBUTES attr)
 		      &io, FSCTL_GET_REPARSE_POINT, NULL, 0,
 		      (LPVOID) rp, MAXIMUM_REPARSE_DATA_BUFFER_SIZE)))
 	{
-	  if (rp->ReparseTag == IO_REPARSE_TAG_MOUNT_POINT)
+	  if (!remote && rp->ReparseTag == IO_REPARSE_TAG_MOUNT_POINT)
 	    {
 	      RtlInitCountedUnicodeString (&subst,
 		  (WCHAR *)((char *)rp->MountPointReparseBuffer.PathBuffer
 			    + rp->MountPointReparseBuffer.SubstituteNameOffset),
 		  rp->MountPointReparseBuffer.SubstituteNameLength);
-	      /* Only volume mountpoints are treated as directories. */
-	      if (RtlEqualUnicodePathPrefix (&subst, &ro_u_volume, TRUE))
-		ret = DT_DIR;
-	      else
-		ret = DT_LNK;
+	      if (check_reparse_point_target (&subst))
+	        ret = true;
 	    }
 	  else if (rp->ReparseTag == IO_REPARSE_TAG_SYMLINK)
-	    ret = DT_LNK;
+	    {
+	      if (rp->SymbolicLinkReparseBuffer.Flags & SYMLINK_FLAG_RELATIVE)
+		ret = true;
+	      else
+		{
+		  RtlInitCountedUnicodeString (&subst,
+		      (WCHAR *)((char *)rp->SymbolicLinkReparseBuffer.PathBuffer
+			    + rp->SymbolicLinkReparseBuffer.SubstituteNameOffset),
+		      rp->SymbolicLinkReparseBuffer.SubstituteNameLength);
+		  if (check_reparse_point_target (&subst))
+		    ret = true;
+		}
+	    }
 	  NtClose (reph);
 	}
     }
@@ -1995,8 +2008,7 @@ fhandler_disk_file::readdir_helper (DIR *dir, dirent *de, DWORD w32_err,
   /* Set d_type if type can be determined from file attributes.  For .lnk
      symlinks, d_type will be reset below.  Reparse points can be NTFS
      symlinks, even if they have the FILE_ATTRIBUTE_DIRECTORY flag set. */
-  if (attr &&
-      !(attr & (~FILE_ATTRIBUTE_VALID_FLAGS | FILE_ATTRIBUTE_REPARSE_POINT)))
+  if (attr && !(attr & ~FILE_ATTRIBUTE_VALID_FLAGS))
     {
       if (attr & FILE_ATTRIBUTE_DIRECTORY)
 	de->d_type = DT_DIR;
@@ -2005,19 +2017,22 @@ fhandler_disk_file::readdir_helper (DIR *dir, dirent *de, DWORD w32_err,
 	de->d_type = DT_REG;
     }
 
-  /* Check for directory reparse point. These may be treated as a posix
-     symlink, or as mount point, so need to figure out whether to return
-     a directory or link type. In all cases, returning the INO of the
-     reparse point (not of the target) matches behavior of posix systems.
+  /* Check for reparse points that can be treated as posix symlinks.
+     Mountpoints and unknown or unhandled reparse points will be treated
+     as normal file/directory/unknown. In all cases, returning the INO of
+     the reparse point (not of the target) matches behavior of posix systems.
      */
-  if ((attr & (FILE_ATTRIBUTE_DIRECTORY | FILE_ATTRIBUTE_REPARSE_POINT))
-      == (FILE_ATTRIBUTE_DIRECTORY | FILE_ATTRIBUTE_REPARSE_POINT))
+  if (attr & FILE_ATTRIBUTE_REPARSE_POINT)
     {
       OBJECT_ATTRIBUTES oattr;
 
       InitializeObjectAttributes (&oattr, fname, pc.objcaseinsensitive (),
 				  get_handle (), NULL);
-      de->d_type = readdir_check_reparse_point (&oattr);
+      /* FUTURE: Ideally would know at this point if reparse point
+         is stored on a remote volume. Without this, may return DT_LNK
+         for remote names that end up lstat-ing as a normal directory. */
+      if (readdir_check_reparse_point (&oattr, false/*remote*/))
+        de->d_type = DT_LNK;
     }
 
   /* Check for Windows shortcut. If it's a Cygwin or U/WIN symlink, drop the
