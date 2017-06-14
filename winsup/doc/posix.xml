@@ -877,7 +877,7 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     signal
     signbit			(see chapter "Implementation Notes")
     signgam
-    sigpause
+    sigpause			(see chapter "Implementation Notes")
     sigpending
     sigprocmask
     sigqueue
@@ -925,7 +925,7 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     strdup
     strerror
     strerror_l
-    strerror_r
+    strerror_r			(see chapter "Implementation Notes")
     strfmon
     strfmon_l
     strftime
@@ -1667,6 +1667,12 @@ depending on whether _BSD_SOURCE or _GNU_SOURCE is defined when compiling.</para
 
 <para><function>basename</function> is available in both POSIX and GNU flavors,
 depending on whether libgen.h is included or not.</para>
+
+<para><function>sigpause</function> is available in both BSD and SysV/XSI
+flavors, depending on whether _XOPEN_SOURCE is defined when compiling.</para>
+
+<para><function>strerror_r</function> is available in both POSIX and GNU
+flavors, depending on whether _GNU_SOURCE is defined when compiling.</para>
 
 <para><function>dladdr</function> always sets the Dl_info members dli_sname and
 dli_saddr to NULL, indicating no symbol matching addr could be found.</para>

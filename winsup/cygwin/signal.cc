@@ -524,6 +524,18 @@ sigpause (int signal_mask)
 }
 
 extern "C" int
+__xpg_sigpause (int sig)
+{
+  int res;
+  sigset_t signal_mask;
+  sigprocmask (0, NULL, &signal_mask);
+  sigdelset (&signal_mask, sig);
+  res = handle_sigsuspend (signal_mask);
+  syscall_printf ("%R = __xpg_sigpause(%y)", res, sig);
+  return res;
+}
+
+extern "C" int
 pause (void)
 {
   int res = handle_sigsuspend (_my_tls.sigmask);

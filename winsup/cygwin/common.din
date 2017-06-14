@@ -102,6 +102,7 @@ __wrap__ZdlPv NOSIGFE               # void operator delete(void *p) throw()
 __wrap__ZdlPvRKSt9nothrow_t NOSIGFE # void operator delete(void *p, const std::nothrow_t &nt) throw()
 __xdrrec_getrec SIGFE
 __xdrrec_setnonblock SIGFE
+__xpg_sigpause SIGFE
 __xpg_strerror_r SIGFE
 _exit SIGFE
 _feinitialise NOSIGFE

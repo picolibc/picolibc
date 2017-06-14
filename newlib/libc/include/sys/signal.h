@@ -200,7 +200,19 @@ int _EXFUN(sigwait, (const sigset_t *set, int *sig));
 #endif /* !__CYGWIN__ && !__rtems__ */
 #endif /* __POSIX_VISIBLE */
 
-#if __BSD_VISIBLE
+/* There are two common sigpause variants, both of which take an int argument.
+   If you request _XOPEN_SOURCE or _GNU_SOURCE, you get the System V version,
+   which removes the given signal from the process's signal mask; otherwise
+   you get the BSD version, which sets the process's signal mask to the given
+   value. */
+#if __XSI_VISIBLE && !defined(__INSIDE_CYGWIN__)
+# ifdef __GNUC__
+int _EXFUN(sigpause, (int)) __asm__ (__ASMNAME ("__xpg_sigpause"));
+# else
+int _EXFUN(__xpg_sigpause, (int));
+#  define sigpause __xpg_sigpause
+# endif
+#elif __BSD_VISIBLE
 int _EXFUN(sigpause, (int));
 #endif
 
