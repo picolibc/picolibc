@@ -20,6 +20,12 @@ alphasort (const struct dirent **a, const struct dirent **b)
 }
 
 extern "C" int
+versionsort (const struct dirent **a, const struct dirent **b)
+{
+  return strverscmp ((*a)->d_name, (*b)->d_name);
+}
+
+extern "C" int
 scandir (const char *dir,
 	 struct dirent ***namelist,
 	 int (*select) (const struct dirent *),

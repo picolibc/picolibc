@@ -1367,6 +1367,7 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     strtoll_l
     strtoul_l
     strtoull_l
+    strverscmp
     sysinfo
     tdestroy
     timegm
@@ -1377,6 +1378,7 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     vasnprintf
     vasprintf
     vasprintf_r
+    versionsort
     wcsftime_l
     wcstod_l
     wcstof_l

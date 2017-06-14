@@ -1396,6 +1396,7 @@ strtoull NOSIGFE
 strtoull_l NOSIGFE
 strtoumax = strtoull NOSIGFE
 strupr NOSIGFE
+strverscmp NOSIGFE
 strxfrm NOSIGFE
 strxfrm_l NOSIGFE
 swab NOSIGFE
@@ -1492,6 +1493,7 @@ vasprintf SIGFE
 vdprintf SIGFE
 verr SIGFE
 verrx SIGFE
+versionsort NOSIGFE
 vfiprintf SIGFE
 vfork SIGFE
 vfprintf SIGFE

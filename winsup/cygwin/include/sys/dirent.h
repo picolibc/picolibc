@@ -89,6 +89,7 @@ int alphasort (const struct dirent **__a, const struct dirent **__b);
 int scandirat (int __dirfd, const char *__dir, struct dirent ***__namelist,
 	       int (*select) (const struct dirent *),
 	       int (*compar) (const struct dirent **, const struct dirent **));
+int versionsort (const struct dirent **__a, const struct dirent **__b);
 #endif
 
 #if __BSD_VISIBLE
