@@ -28,6 +28,12 @@ details. */
 #define _COMPILING_NEWLIB
 #include <dirent.h>
 
+enum __DIR_mount_type {
+  __DIR_mount_none = 0,
+  __DIR_mount_target,
+  __DIR_mount_virt_target
+};
+
 class __DIR_mounts
 {
   int		 count;
@@ -40,23 +46,6 @@ class __DIR_mounts
 #define __DIR_PROC	(MAX_MOUNTS)
 #define __DIR_CYGDRIVE	(MAX_MOUNTS+1)
 #define __DIR_DEV	(MAX_MOUNTS+2)
-
-  ino_t eval_ino (int idx)
-    {
-      ino_t ino = 0;
-      char fname[parent_dir_len + mounts[idx].Length + 2];
-      struct stat st;
-
-      char *c = stpcpy (fname, parent_dir);
-      if (c[- 1] != '/')
-	*c++ = '/';
-      sys_wcstombs (c, mounts[idx].Length + 1,
-		    mounts[idx].Buffer, mounts[idx].Length / sizeof (WCHAR));
-      path_conv pc (fname, PC_SYM_NOFOLLOW | PC_POSIX | PC_KEEP_HANDLE);
-      if (!stat_worker (pc, &st))
-	ino = st.st_ino;
-      return ino;
-    }
 
 public:
   __DIR_mounts (const char *posix_path)
@@ -73,48 +62,47 @@ public:
 	RtlFreeUnicodeString (&mounts[i]);
       RtlFreeUnicodeString (&cygdrive);
     }
-  ino_t check_mount (PUNICODE_STRING fname, ino_t ino,
-			 bool eval = true)
+  /* For an entry within this dir, check if a mount point exists. */
+  bool check_mount (PUNICODE_STRING fname)
     {
       if (parent_dir_len == 1)	/* root dir */
 	{
 	  if (RtlEqualUnicodeString (fname, &ro_u_proc, FALSE))
 	    {
 	      found[__DIR_PROC] = true;
-	      return 2;
+	      return true;
 	    }
 	  if (RtlEqualUnicodeString (fname, &ro_u_dev, FALSE))
 	    {
 	      found[__DIR_DEV] = true;
-	      return 2;
+	      return true;
 	    }
 	  if (fname->Length / sizeof (WCHAR) == mount_table->cygdrive_len - 2
 	      && RtlEqualUnicodeString (fname, &cygdrive, FALSE))
 	    {
 	      found[__DIR_CYGDRIVE] = true;
-	      return 2;
+	      return true;
 	    }
 	}
       for (int i = 0; i < count; ++i)
 	if (RtlEqualUnicodeString (fname, &mounts[i], FALSE))
 	  {
 	    found[i] = true;
-	    return eval ? eval_ino (i) : 1;
+	    return true;
 	  }
-      return ino;
+      return false;
     }
-  ino_t check_missing_mount (PUNICODE_STRING retname = NULL)
+  /* On each call, add another mount point within this directory, which is
+     not backed by a real subdir. */
+  __DIR_mount_type check_missing_mount (PUNICODE_STRING retname = NULL)
     {
       for (int i = 0; i < count; ++i)
 	if (!found[i])
 	  {
 	    found[i] = true;
 	    if (retname)
-	      {
-		*retname = mounts[i];
-		return eval_ino (i);
-	      }
-	    return 1;
+	      *retname = mounts[i];
+	    return __DIR_mount_target;
 	  }
       if (parent_dir_len == 1)  /* root dir */
 	{
@@ -123,14 +111,14 @@ public:
 	      found[__DIR_PROC] = true;
 	      if (retname)
 		*retname = ro_u_proc;
-	      return 2;
+	      return __DIR_mount_virt_target;
 	    }
 	  if (!found[__DIR_DEV])
 	    {
 	      found[__DIR_DEV] = true;
 	      if (retname)
 		*retname = ro_u_dev;
-	      return 2;
+	      return __DIR_mount_virt_target;
 	    }
 	  if (!found[__DIR_CYGDRIVE])
 	    {
@@ -139,11 +127,11 @@ public:
 		{
 		  if (retname)
 		    *retname = cygdrive;
-		  return 2;
+		  return __DIR_mount_virt_target;
 		}
 	    }
 	}
-      return 0;
+      return __DIR_mount_none;
     }
     void rewind () { memset (found, 0, sizeof found); }
 };
@@ -1989,16 +1977,17 @@ fhandler_disk_file::readdir_helper (DIR *dir, dirent *de, DWORD w32_err,
 {
   if (w32_err)
     {
-      bool added = false;
-      if ((de->d_ino = d_mounts (dir)->check_missing_mount (fname)))
-	added = true;
-      if (!added)
+      switch (d_mounts (dir)->check_missing_mount (fname))
 	{
+	case __DIR_mount_none:
 	  fname->Length = 0;
 	  return geterrno_from_win_error (w32_err);
+	case __DIR_mount_virt_target:
+	  de->d_type = DT_DIR;
+	  break;
+	default:
+	  break;
 	}
-      if (de->d_ino == 2)	/* Inode number for virtual dirs. */
-	de->d_type = DT_DIR;
       attr = 0;
       dir->__flags &= ~dirent_set_d_ino;
     }
@@ -2216,7 +2205,7 @@ go_ahead:
 		((PFILE_BOTH_DIR_INFORMATION) buf)->FileAttributes;
 	}
       RtlInitCountedUnicodeString (&fname, FileName, FileNameLength);
-      de->d_ino = d_mounts (dir)->check_mount (&fname, de->d_ino);
+      d_mounts (dir)->check_mount (&fname);
       if (de->d_ino == 0 && (dir->__flags & dirent_set_d_ino))
 	{
 	  /* Don't try to optimize relative to dir->__d_position.  On several
