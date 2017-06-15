@@ -18,9 +18,11 @@ extern "C" {
 typedef	__sigset_t	sigset_t;
 #endif
 
-#if defined(__rtems__)
+#if defined(__CYGWIN__)
+#include <cygwin/signal.h>
+#else
 
-#if defined(_POSIX_REALTIME_SIGNALS)
+#if defined(_POSIX_REALTIME_SIGNALS) || __POSIX_VISIBLE >= 199309
 
 /* sigev_notify values
    NOTE: P1003.1c/D10, p. 34 adds SIGEV_THREAD.  */
@@ -68,7 +70,9 @@ typedef struct {
   int          si_code;     /* Cause of the signal */
   union sigval si_value;    /* Signal value */
 } siginfo_t;
-#endif
+#endif /* defined(_POSIX_REALTIME_SIGNALS) || __POSIX_VISIBLE >= 199309 */
+
+#if defined(__rtems__)
 
 /*  3.3.8 Synchronously Accept a Signal, P1003.1b-1993, p. 76 */
 
@@ -108,9 +112,8 @@ struct sigaction {
 #define sa_sigaction  _signal_handlers._sigaction
 #endif
 
-#elif defined(__CYGWIN__)
-#include <cygwin/signal.h>
-#else
+#else /* defined(__rtems__) */
+
 #define SA_NOCLDSTOP 1  /* only value supported now for sa_flags */
 
 typedef void (*_sig_func_ptr)(int);
@@ -122,6 +125,7 @@ struct sigaction
 	int sa_flags;
 };
 #endif /* defined(__rtems__) */
+#endif /* defined(__CYGWIN__) */
 
 #if __BSD_VISIBLE || __XSI_VISIBLE >= 4 || __POSIX_VISIBLE >= 200809
 /*
