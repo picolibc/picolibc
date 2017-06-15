@@ -1769,7 +1769,7 @@ inline ssize_t
 fhandler_socket::send_internal (struct _WSAMSG *wsamsg, int flags)
 {
   ssize_t res = 0;
-  DWORD ret = 0, err = 0, sum = 0;
+  DWORD ret = 0, sum = 0;
   WSABUF out_buf[wsamsg->dwBufferCount];
   bool use_sendmsg = false;
   DWORD wait_flags = flags & MSG_DONTWAIT;
@@ -1830,14 +1830,14 @@ fhandler_socket::send_internal (struct _WSAMSG *wsamsg, int flags)
 	    res = WSASendTo (get_socket (), wsamsg->lpBuffers,
 			     wsamsg->dwBufferCount, &ret, flags,
 			     wsamsg->name, wsamsg->namelen, NULL, NULL);
-	  if (res && (err = WSAGetLastError ()) == WSAEWOULDBLOCK)
+	  if (res && (WSAGetLastError () == WSAEWOULDBLOCK))
 	    {
 	      LOCK_EVENTS;
 	      wsock_events->events &= ~FD_WRITE;
 	      UNLOCK_EVENTS;
 	    }
 	}
-      while (res && err == WSAEWOULDBLOCK
+      while (res && (WSAGetLastError () == WSAEWOULDBLOCK)
 	     && !(res = wait_for_events (FD_WRITE | FD_CLOSE, wait_flags)));
 
       if (!res)
@@ -1851,7 +1851,7 @@ fhandler_socket::send_internal (struct _WSAMSG *wsamsg, int flags)
 	  if (get_socket_type () != SOCK_STREAM || ret < out_len)
 	    break;
 	}
-      else if (is_nonblocking () || err != WSAEWOULDBLOCK)
+      else if (is_nonblocking () || WSAGetLastError() != WSAEWOULDBLOCK)
 	break;
     }
 
