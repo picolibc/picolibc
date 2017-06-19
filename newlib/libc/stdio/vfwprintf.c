@@ -1631,17 +1631,11 @@ wcvt(struct _reent *data, _PRINTF_FLOAT_TYPE value, int ndigits, int flags,
 
 	{
 	  char *digits, *bp, *rve;
+#ifndef _MB_CAPABLE
 	  int i;
+#endif
 
 	  digits = _DTOA_R (data, value, mode, ndigits, decpt, &dsgn, &rve);
-
-#ifdef _MB_CAPABLE
-	  _mbsnrtowcs_r (data, buf, (const char **) &digits, rve - digits,
-			 len, NULL);
-#else
-	  for (i = 0; i < rve - digits && i < len; ++i)
-	    buf[i] = (wchar_t) digits[i];
-#endif
 
 	  if ((ch != L'g' && ch != L'G') || flags & ALT) {	/* Print trailing zeros */
 		bp = digits + ndigits;
@@ -1652,13 +1646,18 @@ wcvt(struct _reent *data, _PRINTF_FLOAT_TYPE value, int ndigits, int flags,
 		}
 		if (value == 0)	/* kludge for __dtoa irregularity */
 			rve = bp;
-
-		for (i = rve - digits; i < bp - digits && i < len; ++i)
-			buf[i] = L'0';
-
-		rve = rve > bp ? rve : bp;
+		while (rve < bp)
+			*rve++ = '0';
 	  }
+
 	  *length = rve - digits; /* full length of the string */
+#ifdef _MB_CAPABLE
+	  _mbsnrtowcs_r (data, buf, (const char **) &digits, *length,
+			 len, NULL);
+#else
+	  for (i = 0; i < *length && i < len; ++i)
+	    buf[i] = (wchar_t) digits[i];
+#endif
 	  return buf;
 	}
 }
