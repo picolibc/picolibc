@@ -132,14 +132,11 @@ or in case you need to reinstall a package.
 
 <sect2 id="setup-connection"><title>Connection Method</title>
 <para>
-The <literal>Direct Connection</literal> method of downloading will 
-directly download the packages, while the IE5 method will leverage your 
-IE5 cache for performance. If your organisation uses a proxy server or
-auto-configuration scripts, the IE5 method also uses these settings.
-If you have a proxy server, you can manually type it into 
-the <literal>Use Proxy</literal> section. Unfortunately, 
-<command>setup.exe</command> does not currently support password
-authorization for proxy servers.
+The <literal>Direct Connection</literal> method of downloading will
+directly connect.  If your system is configured to use a proxy server or
+auto-configuration scripts, the <literal>Use System Proxy Settings</literal>
+method uses those settings.  Alternatively, you can manually enter proxy
+settings into the <literal>Use HTTP/FTP Proxy</literal> section.
 </para>
 </sect2>
 
