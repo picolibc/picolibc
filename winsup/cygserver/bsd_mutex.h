@@ -26,12 +26,6 @@ struct mtx {
   unsigned long cnt;
 };
 
-enum ipc_type {
-  SHM,
-  MSQ,
-  SEM
-};
-
 /* Some BSD kernel global mutex. */
 extern struct mtx Giant;
 
@@ -47,10 +41,10 @@ void _mtx_unlock (mtx *, const char *, int);
 void mtx_destroy (mtx *);
 
 void msleep_init (void);
-int _sleep (ipc_type, int, struct mtx *, int, const char *, int, struct thread *);
-#define _msleep(T,i,m,p,w,t) _sleep((T),(i),(m),(p),(w),(t),(td))
-#define _tsleep(T,i,p,w,t)   _sleep((T),(i),NULL,(p),(w),(t),(td))
-int _wakeup (ipc_type, int);
+int _msleep (void *, struct mtx *, int, const char *, int, struct thread *);
+#define msleep(i,m,p,w,t) _msleep((i),(m),(p),(w),(t),(td))
+#define tsleep(i,p,w,t)   _msleep((i),NULL,(p),(w),(t),(td))
+int wakeup (void *);
 void wakeup_all (void);
 
 #endif /* _BSD_MUTEX_H */

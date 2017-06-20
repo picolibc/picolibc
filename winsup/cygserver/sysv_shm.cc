@@ -60,12 +60,6 @@ __FBSDID("$FreeBSD: /repoman/r/ncvs/src/sys/kern/sysv_shm.c,v 1.89 2003/11/07 04
 #include "cygserver_ipc.h"
 
 #ifdef __CYGWIN__
-#define _mk_shmid(P)		((P) - shmsegs)
-#define tsleep(P,p,w,t)		_tsleep(SHM,_mk_shmid(P),(p),(w),(t))
-#define wakeup(P)		_wakeup(SHM,_mk_shmid(P))
-#endif
-
-#ifdef __CYGWIN__
 #ifndef PAGE_SIZE
 #define PAGE_SIZE (getpagesize ())
 #endif

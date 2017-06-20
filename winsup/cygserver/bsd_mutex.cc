@@ -13,11 +13,9 @@ details. */
 #include <sys/smallprint.h>
 #include <limits.h>
 #include <stdlib.h>
-#include <sys/shm.h>
 #include <sys/msg.h>
 #include <sys/sem.h>
 
-#include "bsd_helper.h"
 #include "process.h"
 #include "cygserver_ipc.h"
 
@@ -174,91 +172,141 @@ class msleep_sync_array
   };
 
   CRITICAL_SECTION cs;
-  PHANDLE wakeup_evt;
+  long cnt;
+  long max_cnt;
+  struct msleep_record {
+    void *ident;
+    HANDLE wakeup_evt;
+    LONG threads;
+  } *a;
+
+  int find_ident (void *ident, msleep_action action)
+  {
+    int i;
+    for (i = 0; i < cnt; ++i)
+      if (a[i].ident == ident)
+	return i;
+    if (i >= max_cnt)
+      panic ("ident %x not found and run out of slots.", ident);
+    if (i >= cnt && action == MSLEEP_LEAVE)
+      panic ("ident %x not found (%d).", ident, action);
+    return i;
+  }
+
+  HANDLE first_entry (int i, void *ident)
+  {
+    debug ("New ident %x, index %d", ident, i);
+    a[i].ident = ident;
+    a[i].wakeup_evt = CreateEvent (NULL, TRUE, FALSE, NULL);
+    if (!a[i].wakeup_evt)
+      panic ("CreateEvent failed: %u", GetLastError ());
+    debug ("i = %d, CreateEvent: %x", i, a[i].wakeup_evt);
+    a[i].threads = 1;
+    ++cnt;
+    return a[i].wakeup_evt;
+  }
+
+  HANDLE next_entry (int i)
+  {
+    if (a[i].ident && WaitForSingleObject (a[i].wakeup_evt, 0) != WAIT_OBJECT_0)
+      {
+        ++a[i].threads;
+	return a[i].wakeup_evt;
+      }
+    return NULL;
+  }
 
 public:
 
-  msleep_sync_array (int count)
+  msleep_sync_array (int count) : cnt (0), max_cnt (count)
   {
     InitializeCriticalSection (&cs);
-    wakeup_evt = (PHANDLE) calloc (count, sizeof (HANDLE));
-    if (!wakeup_evt)
+    if (!(a = new msleep_record[count]))
       panic ("Allocating msleep records failed: %d", errno);
   }
 
-  ~msleep_sync_array () { free (wakeup_evt); }
+  ~msleep_sync_array () { delete a; }
 
-  HANDLE enter (int idx)
+  HANDLE enter (void *ident)
   {
-    if (!wakeup_evt[idx])
+    HANDLE evt = NULL;
+    while (!evt)
       {
-	EnterCriticalSection (&cs);
-	if (!wakeup_evt[idx])
+        EnterCriticalSection (&cs);
+	int i = find_ident (ident, MSLEEP_ENTER);
+	if (i >= cnt)
+	  evt = first_entry (i, ident);
+	else if (!(evt = next_entry (i)))
 	  {
-	    wakeup_evt[idx] = CreateSemaphore (NULL, 0, 1024, NULL);
-	    if (!wakeup_evt[idx])
-	      panic ("CreateSemaphore failed: %u", GetLastError ());
+	    /* wakeup has been called, so sleep to wait until all
+	       formerly waiting threads have left and retry. */
+	    LeaveCriticalSection (&cs);
+	    Sleep (1L);
 	  }
-	LeaveCriticalSection (&cs);
       }
-    return wakeup_evt[idx];
+    LeaveCriticalSection (&cs);
+    return evt;
   }
 
-  void leave (int idx)
+  void leave (void *ident)
   {
-    /* Placeholder */
+    EnterCriticalSection (&cs);
+    int i = find_ident (ident, MSLEEP_LEAVE);
+    if (--a[i].threads == 0)
+      {
+	debug ("i = %d, CloseEvent: %x", i, a[i].wakeup_evt);
+	CloseHandle (a[i].wakeup_evt);
+	a[i].ident = NULL;
+	--cnt;
+	if (i < cnt)
+	  a[i] = a[cnt];
+      }
+    LeaveCriticalSection (&cs);
   }
 
-  void wakeup (int idx)
+  void wakeup (void *ident)
   {
-    ReleaseSemaphore (wakeup_evt[idx], 1, NULL);
+    EnterCriticalSection (&cs);
+    int i = find_ident (ident, MSLEEP_WAKEUP);
+    if (i < cnt && a[i].ident)
+      SetEvent (a[i].wakeup_evt);
+    LeaveCriticalSection (&cs);
   }
 };
 
 static msleep_sync_array *msleep_sync;
 
-extern struct msginfo msginfo;
-extern struct seminfo seminfo;
-extern struct shminfo shminfo;
-int32_t mni[3];
-int32_t off[3];
-
 void
 msleep_init (void)
 {
+  extern struct msginfo msginfo;
+  extern struct seminfo seminfo;
+
   msleep_glob_evt = CreateEvent (NULL, TRUE, FALSE, NULL);
   if (!msleep_glob_evt)
     panic ("CreateEvent in msleep_init failed: %u", GetLastError ());
-  mni[SHM] = support_sharedmem ? shminfo.shmmni : 0;
-  mni[MSQ] = support_msgqueues ? msginfo.msgmni : 0;
-  mni[SEM] = support_semaphores ? seminfo.semmni : 0;
-  TUNABLE_INT_FETCH ("kern.ipc.shmmni", &mni[SHM]);
-  TUNABLE_INT_FETCH ("kern.ipc.msgmni", &mni[MSQ]);
-  TUNABLE_INT_FETCH ("kern.ipc.semmni", &mni[SEM]);
-  debug ("Allocating shmmni (%d) + msgmni (%d) + semmni (%d) msleep records",
-	 mni[SHM], mni[MSQ], mni[SEM]);
-  msleep_sync = new msleep_sync_array (mni[SHM] + mni[MSQ] + mni[SEM]);
+  int32_t msgmni = support_msgqueues ? msginfo.msgmni : 0;
+  int32_t semmni = support_semaphores ? seminfo.semmni : 0;
+  TUNABLE_INT_FETCH ("kern.ipc.msgmni", &msgmni);
+  TUNABLE_INT_FETCH ("kern.ipc.semmni", &semmni);
+  debug ("Try allocating msgmni (%d) + semmni (%d) msleep records",
+  	 msgmni, semmni);
+  msleep_sync = new msleep_sync_array (msgmni + semmni);
   if (!msleep_sync)
     panic ("Allocating msleep records in msleep_init failed: %d", errno);
-  /* Convert mni values to offsets. */
-  off[SHM] = 0;
-  off[MSQ] = mni[SHM];
-  off[SEM] = mni[SHM] + mni[MSQ];
 }
 
 int
-_sleep (ipc_type type, int ident, struct mtx *mtx, int priority,
+_msleep (void *ident, struct mtx *mtx, int priority,
 	const char *wmesg, int timo, struct thread *td)
 {
   int ret = -1;
 
-  HANDLE evt = msleep_sync->enter (off[type] + ident);
+  HANDLE evt = msleep_sync->enter (ident);
 
   if (mtx)
     mtx_unlock (mtx);
-
   int old_priority = set_priority (priority);
-
   HANDLE obj[4] =
     {
       evt,
@@ -271,7 +319,6 @@ _sleep (ipc_type type, int ident, struct mtx *mtx, int priority,
   int obj_cnt = 3;
   if ((priority & PCATCH) && obj[3])
     obj_cnt = 4;
-
   switch (WaitForMultipleObjects (obj_cnt, obj, FALSE, timo ?: INFINITE))
     {
       case WAIT_OBJECT_0:	/* wakeup() has been called. */
@@ -307,13 +354,12 @@ _sleep (ipc_type type, int ident, struct mtx *mtx, int priority,
 	break;
     }
 
+  msleep_sync->leave (ident);
+
   set_priority (old_priority);
 
   if (mtx && !(priority & PDROP))
     mtx_lock (mtx);
-
-  msleep_sync->leave (off[type] + ident);
-
   return ret;
 }
 
@@ -321,9 +367,9 @@ _sleep (ipc_type type, int ident, struct mtx *mtx, int priority,
  * Make all threads sleeping on the specified identifier runnable.
  */
 int
-_wakeup (ipc_type type, int ident)
+wakeup (void *ident)
 {
-  msleep_sync->wakeup (off[type] + ident);
+  msleep_sync->wakeup (ident);
   return 0;
 }
 

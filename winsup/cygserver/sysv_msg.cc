@@ -46,9 +46,6 @@ __FBSDID("$FreeBSD: /usr/local/www/cvsroot/FreeBSD/src/sys/kern/sysv_msg.c,v 1.5
 
 #ifdef __CYGWIN__
 #define MSG_DEBUG
-#define _mk_msgid(P)		((P) - msqids)
-#define msleep(P,m,p,w,t)	_msleep(MSQ,_mk_msgid(P),(m),(p),(w),(t))
-#define wakeup(P)		_wakeup(MSQ,_mk_msgid(P))
 #endif /* __CYGWIN__ */
 
 #ifdef MSG_DEBUG
