@@ -189,6 +189,10 @@ readdir_check_reparse_point (POBJECT_ATTRIBUTES attr, bool remote)
 		      &io, FSCTL_GET_REPARSE_POINT, NULL, 0,
 		      (LPVOID) rp, MAXIMUM_REPARSE_DATA_BUFFER_SIZE)))
 	{
+	  /* If reparse point is stored on a remote volume, lstat returns
+	     them as normal files or dirs, not as symlink.  For a description,
+	     see the comment preceeding remote check in
+	     symlink_info::check_reparse_point. */
 	  if (!remote && rp->ReparseTag == IO_REPARSE_TAG_MOUNT_POINT)
 	    {
 	      RtlInitCountedUnicodeString (&subst,
@@ -2028,10 +2032,7 @@ fhandler_disk_file::readdir_helper (DIR *dir, dirent *de, DWORD w32_err,
 
       InitializeObjectAttributes (&oattr, fname, pc.objcaseinsensitive (),
 				  get_handle (), NULL);
-      /* FUTURE: Ideally would know at this point if reparse point
-         is stored on a remote volume. Without this, may return DT_LNK
-         for remote names that end up lstat-ing as a normal directory. */
-      if (readdir_check_reparse_point (&oattr, false/*remote*/))
+      if (readdir_check_reparse_point (&oattr, isremote ()))
         de->d_type = DT_LNK;
     }
 
