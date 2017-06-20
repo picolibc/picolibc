@@ -197,13 +197,14 @@ print_version ()
 void
 Fail (unsigned int rv)
 {
-  char *buf;
+  wchar_t *buf;
+
   if (!quiet)
     {
-      FormatMessage (FORMAT_MESSAGE_ALLOCATE_BUFFER
-		     | FORMAT_MESSAGE_FROM_SYSTEM,
-		     0, rv, 0, (CHAR *) & buf, 0, 0);
-      fprintf (stderr, "Error (%d): %s\n", rv, buf);
+      FormatMessageW (FORMAT_MESSAGE_ALLOCATE_BUFFER
+		      | FORMAT_MESSAGE_FROM_SYSTEM,
+		      0, rv, 0, (WCHAR *)& buf, 0, 0);
+      fprintf (stderr, "Error (%d): %ls\n", rv, buf);
       LocalFree (buf);
     }
   exit (1);
