@@ -35,6 +35,10 @@ const struct __sFILE_fake __sf_fake_stderr =
     {_NULL, 0, 0, 0, 0, {_NULL, 0}, 0, _NULL};
 #endif
 
+#ifdef _REENT_GLOBAL_STDIO_STREAMS
+__FILE __sf[3];
+#endif
+
 #if (defined (__OPTIMIZE_SIZE__) || defined (PREFER_SIZE_OVER_SPEED))
 _NOINLINE_STATIC _VOID
 #else
@@ -218,6 +222,14 @@ _DEFUN(_cleanup_r, (ptr),
   cleanup_func = _fclose_r;
 #endif
 #endif
+#ifdef _REENT_GLOBAL_STDIO_STREAMS
+  if (ptr->_stdin != &__sf[0])
+    (*cleanup_func) (ptr, ptr->_stdin);
+  if (ptr->_stdout != &__sf[1])
+    (*cleanup_func) (ptr, ptr->_stdout);
+  if (ptr->_stderr != &__sf[2])
+    (*cleanup_func) (ptr, ptr->_stderr);
+#endif
   _CAST_VOID _fwalk_reent (ptr, cleanup_func);
 }
 
@@ -250,8 +262,10 @@ _DEFUN(__sinit, (s),
 
   s->__sglue._next = NULL;
 #ifndef _REENT_SMALL
+# ifndef _REENT_GLOBAL_STDIO_STREAMS
   s->__sglue._niobs = 3;
   s->__sglue._iobs = &s->__sf[0];
+# endif
 #else
   s->__sglue._niobs = 0;
   s->__sglue._iobs = NULL;
@@ -265,9 +279,19 @@ _DEFUN(__sinit, (s),
   s->_stderr = __sfp(s);
 #endif
 
+#ifdef _REENT_GLOBAL_STDIO_STREAMS
+  if (__sf[0]._cookie == NULL) {
+    _GLOBAL_REENT->__sglue._niobs = 3;
+    _GLOBAL_REENT->__sglue._iobs = &__sf[0];
+    stdin_init (&__sf[0]);
+    stdout_init (&__sf[1]);
+    stderr_init (&__sf[2]);
+  }
+#else
   stdin_init (s->_stdin);
   stdout_init (s->_stdout);
   stderr_init (s->_stderr);
+#endif
 
   s->__sdidinit = 1;
 
