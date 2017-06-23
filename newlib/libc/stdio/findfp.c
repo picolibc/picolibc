@@ -40,11 +40,10 @@ _NOINLINE_STATIC _VOID
 #else
 static _VOID
 #endif
-_DEFUN(std, (ptr, flags, file, data),
+_DEFUN(std, (ptr, flags, file),
             FILE *ptr _AND
             int flags _AND
-            int file  _AND
-            struct _reent *data)
+            int file)
 {
   ptr->_p = 0;
   ptr->_r = 0;
@@ -236,7 +235,7 @@ _DEFUN(__sinit, (s),
   s->_stderr = __sfp(s);
 #endif
 
-  std (s->_stdin,  __SRD, 0, s);
+  std (s->_stdin,  __SRD, 0);
 
   /* On platforms that have true file system I/O, we can verify
      whether stdout is an interactive terminal or not, as part of
@@ -245,14 +244,14 @@ _DEFUN(__sinit, (s),
      requires both stdin and stdout to be line-buffered, but tradition
      leaves stdin alone on systems without fcntl.  */
 #ifdef HAVE_FCNTL
-  std (s->_stdout, __SWR, 1, s);
+  std (s->_stdout, __SWR, 1);
 #else
-  std (s->_stdout, __SWR | __SLBF, 1, s);
+  std (s->_stdout, __SWR | __SLBF, 1);
 #endif
 
   /* POSIX requires stderr to be opened for reading and writing, even
      when the underlying fd 2 is write-only.  */
-  std (s->_stderr, __SRW | __SNBF, 2, s);
+  std (s->_stderr, __SRW | __SNBF, 2);
 
   s->__sdidinit = 1;
 
