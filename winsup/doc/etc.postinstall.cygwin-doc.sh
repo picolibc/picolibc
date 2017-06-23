@@ -26,9 +26,7 @@ do
 	fi
 done
 
-cygver=$($un -r)	# release - numeric version (build info)
-cygver=${cygver%\(*\)}	# strip build info
-doc=/usr/share/doc/cygwin-$cygver
+doc=/usr/share/doc/cygwin-doc
 html=$doc/html
 smpc_dir="$($cygp $CYGWINFORALL -P -U)/Cygwin"
 
