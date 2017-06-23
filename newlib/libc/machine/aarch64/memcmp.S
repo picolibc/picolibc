@@ -1,6 +1,7 @@
 /* memcmp - compare memory
 
    Copyright (c) 2013, Linaro Limited
+   Copyright (c) 2017, Samsung Austin R&D Center
    All rights reserved.
 
    Redistribution and use in source and binary forms, with or without
@@ -152,9 +153,61 @@ def_fn memcmp p2align=6
 
 	.p2align 6
 .Lmisaligned8:
+
+	cmp	limit, #8
+	b.lo	.LmisalignedLt8
+
+.LunalignedGe8 :
+
+	/* Load the first dword with both src potentially unaligned. */
+	ldr	data1, [src1]
+	ldr	data2, [src2]
+
+	eor	diff, data1, data2	/* Non-zero if differences found. */
+	cbnz	diff, .Lnot_limit
+
+	/* Sources are not aligned: align one of the sources. */
+
+	and	tmp1, src1, #0x7
+	orr	tmp3, xzr, #0x8
+	sub	pos, tmp3, tmp1
+
+	/* Increment SRC pointers by POS so SRC1 is word-aligned. */
+	add	src1, src1, pos
+	add	src2, src2, pos
+
+	sub	limit, limit, pos
+	lsr	limit_wd, limit, #3
+
+	cmp limit_wd, #0
+
+	/* save #bytes to go back to be able to read 8byte at end
+	   pos=negative offset position to read 8 bytes when len%8 != 0 */
+	and	limit, limit, #7
+	sub	pos, limit, #8
+
+	b	.Lstart_part_realigned
+
+	.p2align 5
+.Lloop_part_aligned:
+	ldr	data1, [src1], #8
+	ldr	data2, [src2], #8
+	subs	limit_wd, limit_wd, #1
+.Lstart_part_realigned:
+	eor	diff, data1, data2	/* Non-zero if differences found. */
+	cbnz	diff, .Lnot_limit
+	b.ne	.Lloop_part_aligned
+
+	/* process leftover bytes: read the leftover bytes, starting with
+	   negative offset - so we can load 8 bytes. */
+	ldr	data1, [src1, pos]
+	ldr	data2, [src2, pos]
+	eor	diff, data1, data2	/* Non-zero if differences found.  */
+	b .Lnot_limit
+
+.LmisalignedLt8:
 	sub	limit, limit, #1
 1:
-	/* Perhaps we can do better than this.  */
 	ldrb	data1w, [src1], #1
 	ldrb	data2w, [src2], #1
 	subs	limit, limit, #1
