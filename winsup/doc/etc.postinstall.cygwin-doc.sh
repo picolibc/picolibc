@@ -1,11 +1,7 @@
-#!/bin/bash
+#!/bin/sh
 # /etc/postinstall/cygwin-doc.sh - cygwin-doc postinstall script.
 # installs Cygwin Start Menu shortcuts for Cygwin User Guide and API PDF and
 # HTML if in doc dir, and links to Cygwin web site home page and FAQ
-#
-# Assumes you are running setup.exe 2.510.2.2 or newer, executed by /bin/bash
-# and not /bin/[da]sh (if you are running an older setup.exe, this postinstall
-# script can't do anything).
 #
 # CYGWINFORALL=-A if install for All Users
 # installs local shortcuts for All Users or Current User in
@@ -48,43 +44,23 @@ fi
 # mkshortcut works only in current directory - change to Cygwin Start Menu
 cd "$smpc_dir" || exit 2	# quit if not found
 
-# User Guide PDF & HTML
-p=$doc/cygwin-ug-net.pdf
-n="User Guide (PDF)"
-d="PDF Cygwin User Guide"
+# create User Guide and API PDF and HTML shortcuts
+while read target name desc
+do
+	[ -r $t ] && $mks -n "$name" -d "$desc" $target
+done <<EOF
+$doc/cygwin-ug-net.pdf		User\ Guide\ \(PDF\)  Cygwin\ User\ Guide\ PDF
+$html/cygwin-ug-net/index.html	User\ Guide\ \(HTML\) Cygwin\ User\ Guide\ HTML
+$doc/cygwin-api.pdf		API\ \(PDF\)	Cygwin\ API\ Reference\ PDF
+$html/cygwin-api/index.html	API\ \(HTML\)	Cygwin\ API\ Reference\ HTML
+EOF
 
-[ -r $p ] && $mks -n "$n" -d "$d" $p
-
-i=$html/cygwin-ug-net/index.html
-n="User Guide (HTML)"
-d="HTML Cygwin User Guide"
-
-[ -r $i ] && $mks -n "$n" -d "$d" $i
-
-# API PDF & HTML
-p=$doc/cygwin-api.pdf
-n="API (PDF)"
-d="PDF Cygwin API Reference"
-
-[ -r $p ] && $mks -n "$n" -d "$d" $p
-
-i=$html/cygwin-api/index.html
-n="API (HTML)"
-d="HTML Cygwin API Reference"
-
-[ -r $i ] && $mks -n "$n" -d "$d" $i
-
-# Home Page URL
-h=$site/index.html
-n="Home Page"
-d="Cygwin $n"
-
-$mks -n "$n" -d "$d" $h
-
-# FAQ URL
-h=$site/faq.html
-n="FAQ"
-d="Cygwin Frequently Asked Questions (with answers)"
-
-$mks -n "$n" -d "$d" $h
+# create Home Page and FAQ URL link shortcuts
+while read target name desc
+do
+	$mks -n "$name" -d "$desc" $target
+done <<EOF
+$site/index.html	Home\ Page	Cygwin\ Home\ Page\ Link
+$site/faq.html		FAQ	Cygwin\ Frequently\ Asked\ Questions\ Link
+EOF
 
