@@ -13,7 +13,7 @@ src = cabs.c cacos.c cacosh.c carg.c casin.c casinh.c \
 lsrc = cabsl.c creall.c cimagl.c ccoshl.c cacoshl.c \
        clogl.c csqrtl.c cargl.c cprojl.c cexpl.c \
        cephes_subrl.c cacosl.c ccosl.c casinl.c \
-       catanhl.c conjl.c cpowl.c
+       catanhl.c conjl.c cpowl.c ctanhl.c
 
 fsrc =	cabsf.c casinf.c ccosf.c cimagf.c cprojf.c  \
         csqrtf.c cacosf.c casinhf.c ccoshf.c clogf.c clog10f.c \
