@@ -11,7 +11,8 @@ src = cabs.c cacos.c cacosh.c carg.c casin.c casinh.c \
       csin.c csinh.c csqrt.c ctan.c ctanh.c
 
 lsrc = cabsl.c creall.c cimagl.c ccoshl.c cacoshl.c \
-       clogl.c csqrtl.c cargl.c cprojl.c cexpl.c
+       clogl.c csqrtl.c cargl.c cprojl.c cexpl.c \
+       cephes_subrl.c 
 
 fsrc =	cabsf.c casinf.c ccosf.c cimagf.c cprojf.c  \
         csqrtf.c cacosf.c casinhf.c ccoshf.c clogf.c clog10f.c \
@@ -44,4 +45,4 @@ CHAPTERS = complex.tex
 
 # A partial dependency list.
 
-$(lib_a_OBJECTS): $(srcdir)/../../libc/include/complex.h $(srcdir)/cephes_subr.h $(srcdir)/cephes_subrf.h
+$(lib_a_OBJECTS): $(srcdir)/../../libc/include/complex.h $(srcdir)/cephes_subr.h $(srcdir)/cephes_subrf.h  $(srcdir)/cephes_subrl.h
