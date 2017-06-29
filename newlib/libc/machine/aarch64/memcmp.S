@@ -1,220 +1,140 @@
-/* memcmp - compare memory
-
-   Copyright (c) 2013, Linaro Limited
-   Copyright (c) 2017, Samsung Austin R&D Center
-   All rights reserved.
-
-   Redistribution and use in source and binary forms, with or without
-   modification, are permitted provided that the following conditions are met:
-       * Redistributions of source code must retain the above copyright
-         notice, this list of conditions and the following disclaimer.
-       * Redistributions in binary form must reproduce the above copyright
-         notice, this list of conditions and the following disclaimer in the
-         documentation and/or other materials provided with the distribution.
-       * Neither the name of the Linaro nor the
-         names of its contributors may be used to endorse or promote products
-         derived from this software without specific prior written permission.
-
-   THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-   "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
-   LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
-   A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
-   HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
-   SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
-   LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
-   DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
-   THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-   (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
+/*
+ * Copyright (c) 2017 ARM Ltd
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ * 1. Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright
+ *    notice, this list of conditions and the following disclaimer in the
+ *    documentation and/or other materials provided with the distribution.
+ * 3. The name of the company may not be used to endorse or promote
+ *    products derived from this software without specific prior written
+ *    permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY ARM LTD ``AS IS'' AND ANY EXPRESS OR IMPLIED
+ * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+ * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+ * IN NO EVENT SHALL ARM LTD BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED
+ * TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+ * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+ * LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+ * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+ * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
 
 #if (defined (__OPTIMIZE_SIZE__) || defined (PREFER_SIZE_OVER_SPEED))
 /* See memcmp-stub.c  */
 #else
+
 /* Assumptions:
  *
- * ARMv8-a, AArch64
+ * ARMv8-a, AArch64, unaligned accesses.
  */
-
-	.macro def_fn f p2align=0
-	.text
-	.p2align \p2align
-	.global \f
-	.type \f, %function
-\f:
-	.endm
 
 /* Parameters and result.  */
 #define src1		x0
 #define src2		x1
 #define limit		x2
-#define result		x0
+#define result		w0
 
 /* Internal variables.  */
 #define data1		x3
 #define data1w		w3
 #define data2		x4
 #define data2w		w4
-#define has_nul		x5
-#define diff		x6
-#define endloop		x7
-#define tmp1		x8
-#define tmp2		x9
-#define tmp3		x10
-#define pos		x11
-#define limit_wd	x12
-#define mask		x13
+#define tmp1		x5
+
+        .macro def_fn f p2align=0
+        .text
+        .p2align \p2align
+        .global \f
+        .type \f, %function
+\f:
+        .endm
+
+/* Small inputs of less than 8 bytes are handled separately.  This allows the
+   main code to be sped up using unaligned loads since there are now at least
+   8 bytes to be compared.  If the first 8 bytes are equal, align src1.
+   This ensures each iteration does at most one unaligned access even if both
+   src1 and src2 are unaligned, and mutually aligned inputs behave as if
+   aligned.  After the main loop, process the last 8 bytes using unaligned
+   accesses.  */
 
 def_fn memcmp p2align=6
-	cbz	limit, .Lret0
-	eor	tmp1, src1, src2
-	tst	tmp1, #7
-	b.ne	.Lmisaligned8
-	ands	tmp1, src1, #7
-	b.ne	.Lmutual_align
-	add	limit_wd, limit, #7
-	lsr	limit_wd, limit_wd, #3
-	/* Start of performance-critical section  -- one 64B cache line.  */
-.Lloop_aligned:
-	ldr	data1, [src1], #8
-	ldr	data2, [src2], #8
-.Lstart_realigned:
-	subs	limit_wd, limit_wd, #1
-	eor	diff, data1, data2	/* Non-zero if differences found.  */
-	csinv	endloop, diff, xzr, ne	/* Last Dword or differences.  */
-	cbz	endloop, .Lloop_aligned
-	/* End of performance-critical section  -- one 64B cache line.  */
+	subs	limit, limit, 8
+	b.lo	.Lless8
 
-	/* Not reached the limit, must have found a diff.  */
-	cbnz	limit_wd, .Lnot_limit
+	/* Limit >= 8, so check first 8 bytes using unaligned loads.  */
+	ldr	data1, [src1], 8
+	ldr	data2, [src2], 8
+	and	tmp1, src1, 7
+	add	limit, limit, tmp1
+	cmp	data1, data2
+	bne	.Lreturn
 
-	/* Limit % 8 == 0 => all bytes significant.  */
-	ands	limit, limit, #7
-	b.eq	.Lnot_limit
+	/* Align src1 and adjust src2 with bytes not yet done.  */
+	sub	src1, src1, tmp1
+	sub	src2, src2, tmp1
 
-	lsl	limit, limit, #3	/* Bits -> bytes.  */
-	mov	mask, #~0
-#ifdef __AARCH64EB__
-	lsr	mask, mask, limit
-#else
-	lsl	mask, mask, limit
-#endif
-	bic	data1, data1, mask
-	bic	data2, data2, mask
+	subs	limit, limit, 8
+	b.ls	.Llast_bytes
 
-	orr	diff, diff, mask
-.Lnot_limit:
+	/* Loop performing 8 bytes per iteration using aligned src1.
+	   Limit is pre-decremented by 8 and must be larger than zero.
+	   Exit if <= 8 bytes left to do or if the data is not equal.  */
+	.p2align 4
+.Lloop8:
+	ldr	data1, [src1], 8
+	ldr	data2, [src2], 8
+	subs	limit, limit, 8
+	ccmp	data1, data2, 0, hi  /* NZCV = 0b0000.  */
+	b.eq	.Lloop8
 
-#ifndef	__AARCH64EB__
-	rev	diff, diff
+	cmp	data1, data2
+	bne	.Lreturn
+
+	/* Compare last 1-8 bytes using unaligned access.  */
+.Llast_bytes:
+	ldr	data1, [src1, limit]
+	ldr	data2, [src2, limit]
+
+	/* Compare data bytes and set return value to 0, -1 or 1.  */
+.Lreturn:
+#ifndef __AARCH64EB__
 	rev	data1, data1
 	rev	data2, data2
 #endif
-	/* The MS-non-zero bit of DIFF marks either the first bit
-	   that is different, or the end of the significant data.
-	   Shifting left now will bring the critical information into the
-	   top bits.  */
-	clz	pos, diff
-	lsl	data1, data1, pos
-	lsl	data2, data2, pos
-	/* But we need to zero-extend (char is unsigned) the value and then
-	   perform a signed 32-bit subtraction.  */
-	lsr	data1, data1, #56
-	sub	result, data1, data2, lsr #56
+	cmp     data1, data2
+.Lret_eq:
+	cset	result, ne
+	cneg	result, result, lo
+        ret
+
+	.p2align 4
+	/* Compare up to 8 bytes.  Limit is [-8..-1].  */
+.Lless8:
+	adds	limit, limit, 4
+	b.lo	.Lless4
+	ldr	data1w, [src1], 4
+	ldr	data2w, [src2], 4
+	cmp	data1w, data2w
+	b.ne	.Lreturn
+	sub	limit, limit, 4
+.Lless4:
+	adds	limit, limit, 4
+	beq	.Lret_eq
+.Lbyte_loop:
+	ldrb	data1w, [src1], 1
+	ldrb	data2w, [src2], 1
+	subs	limit, limit, 1
+	ccmp	data1w, data2w, 0, ne	/* NZCV = 0b0000.  */
+	b.eq	.Lbyte_loop
+	sub	result, data1w, data2w
 	ret
 
-.Lmutual_align:
-	/* Sources are mutually aligned, but are not currently at an
-	   alignment boundary.  Round down the addresses and then mask off
-	   the bytes that precede the start point.  */
-	bic	src1, src1, #7
-	bic	src2, src2, #7
-	add	limit, limit, tmp1	/* Adjust the limit for the extra.  */
-	lsl	tmp1, tmp1, #3		/* Bytes beyond alignment -> bits.  */
-	ldr	data1, [src1], #8
-	neg	tmp1, tmp1		/* Bits to alignment -64.  */
-	ldr	data2, [src2], #8
-	mov	tmp2, #~0
-#ifdef __AARCH64EB__
-	/* Big-endian.  Early bytes are at MSB.  */
-	lsl	tmp2, tmp2, tmp1	/* Shift (tmp1 & 63).  */
-#else
-	/* Little-endian.  Early bytes are at LSB.  */
-	lsr	tmp2, tmp2, tmp1	/* Shift (tmp1 & 63).  */
-#endif
-	add	limit_wd, limit, #7
-	orr	data1, data1, tmp2
-	orr	data2, data2, tmp2
-	lsr	limit_wd, limit_wd, #3
-	b	.Lstart_realigned
-
-.Lret0:
-	mov	result, #0
-	ret
-
-	.p2align 6
-.Lmisaligned8:
-
-	cmp	limit, #8
-	b.lo	.LmisalignedLt8
-
-.LunalignedGe8 :
-
-	/* Load the first dword with both src potentially unaligned. */
-	ldr	data1, [src1]
-	ldr	data2, [src2]
-
-	eor	diff, data1, data2	/* Non-zero if differences found. */
-	cbnz	diff, .Lnot_limit
-
-	/* Sources are not aligned: align one of the sources. */
-
-	and	tmp1, src1, #0x7
-	orr	tmp3, xzr, #0x8
-	sub	pos, tmp3, tmp1
-
-	/* Increment SRC pointers by POS so SRC1 is word-aligned. */
-	add	src1, src1, pos
-	add	src2, src2, pos
-
-	sub	limit, limit, pos
-	lsr	limit_wd, limit, #3
-
-	cmp limit_wd, #0
-
-	/* save #bytes to go back to be able to read 8byte at end
-	   pos=negative offset position to read 8 bytes when len%8 != 0 */
-	and	limit, limit, #7
-	sub	pos, limit, #8
-
-	b	.Lstart_part_realigned
-
-	.p2align 5
-.Lloop_part_aligned:
-	ldr	data1, [src1], #8
-	ldr	data2, [src2], #8
-	subs	limit_wd, limit_wd, #1
-.Lstart_part_realigned:
-	eor	diff, data1, data2	/* Non-zero if differences found. */
-	cbnz	diff, .Lnot_limit
-	b.ne	.Lloop_part_aligned
-
-	/* process leftover bytes: read the leftover bytes, starting with
-	   negative offset - so we can load 8 bytes. */
-	ldr	data1, [src1, pos]
-	ldr	data2, [src2, pos]
-	eor	diff, data1, data2	/* Non-zero if differences found.  */
-	b .Lnot_limit
-
-.LmisalignedLt8:
-	sub	limit, limit, #1
-1:
-	ldrb	data1w, [src1], #1
-	ldrb	data2w, [src2], #1
-	subs	limit, limit, #1
-	ccmp	data1w, data2w, #0, cs	/* NZCV = 0b0000.  */
-	b.eq	1b
-	sub	result, data1, data2
-	ret
-	.size memcmp, . - memcmp
-
+	.size	memcmp, . - memcmp
 #endif
