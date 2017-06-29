@@ -259,15 +259,18 @@ int     _EXFUN(truncate, (const char *, off_t __length));
 #endif
 #endif
 
-#if defined(__CYGWIN__) || defined(__rtems__)
+#if defined(__BSD_VISIBLE) || (__XSI_VISIBLE >= 500)
 int	_EXFUN(getdtablesize, (void));
-int	_EXFUN(setdtablesize, (int));
 useconds_t _EXFUN(ualarm, (useconds_t __useconds, useconds_t __interval));
 #if !(defined  (_WINSOCK_H) || defined (_WINSOCKAPI_) || defined (__USE_W32_SOCKETS))
 /* winsock[2].h defines as __stdcall, and with int as 2nd arg */
  int	_EXFUN(gethostname, (char *__name, size_t __len));
 #endif
 char *	_EXFUN(mktemp, (char *));
+#endif
+
+#if defined(__CYGWIN__) || defined(__rtems__)
+int	_EXFUN(setdtablesize, (int));
 #endif
 
 #if defined(__CYGWIN__) || defined(__SPU__) || defined(__rtems__)
