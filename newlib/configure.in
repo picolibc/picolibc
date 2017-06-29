@@ -136,6 +136,15 @@ AC_ARG_ENABLE(newlib-reent-small,
   no)  newlib_reent_small=no ;;
   *)   AC_MSG_ERROR(bad value ${enableval} for newlib-reent-small option) ;;
  esac], [newlib_reent_small=])dnl
+
+dnl Support --enable-newlib-global-stdio-streams
+AC_ARG_ENABLE(newlib-global-stdio-streams,
+[  --enable-newlib-global-stdio-streams   enable global stdio streams],
+[case "${enableval}" in
+  yes) newlib_global_stdio_streams=yes;;
+  no)  newlib_global_stdio_streams=no ;;
+  *)   AC_MSG_ERROR(bad value ${enableval} for newlib-global-stdio-streams option) ;;
+ esac], [newlib_global_stdio_streams=])dnl
  
 dnl Support --disable-newlib-fvwrite-in-streamio
 AC_ARG_ENABLE(newlib-fvwrite-in-streamio,
@@ -398,6 +407,10 @@ fi
 
 if test "${newlib_reent_small}" = "yes"; then
 AC_DEFINE_UNQUOTED(_WANT_REENT_SMALL)
+fi
+
+if test "${newlib_global_stdio_streams}" = "yes"; then
+AC_DEFINE_UNQUOTED(_WANT_REENT_GLOBAL_STDIO_STREAMS)
 fi
 
 if test "${newlib_mb}" = "yes"; then

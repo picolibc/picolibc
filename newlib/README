@@ -297,6 +297,12 @@ One feature can be enabled by specifying `--enable-FEATURE=yes' or
      is not referenced.
      Disabled by default.
 
+`--enable-newlib-global-stdio-streams'
+     Enable to move the stdio stream FILE objects out of struct _reent and make
+     them global.  The stdio stream pointers of struct _reent are initialized
+     to point to the global stdio FILE stream objects.
+     Disabled by default.
+
 `--enable-newlib-reent-small'
      Enable small reentrant struct support.
      Disabled by default.

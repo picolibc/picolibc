@@ -276,6 +276,12 @@
 #endif
 #endif
 
+#ifdef _WANT_REENT_GLOBAL_STDIO_STREAMS
+#ifndef _REENT_GLOBAL_STDIO_STREAMS
+#define _REENT_GLOBAL_STDIO_STREAMS
+#endif
+#endif
+
 /* If _MB_EXTENDED_CHARSETS_ALL is set, we want all of the extended
    charsets.  The extended charsets add a few functions and a couple
    of tables of a few K each. */
