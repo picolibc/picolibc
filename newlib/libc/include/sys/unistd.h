@@ -207,15 +207,21 @@ int     _EXFUN(setuid, (uid_t __uid ));
 void	_EXFUN(setusershell, (void));
 #endif
 unsigned _EXFUN(sleep, (unsigned int __seconds ));
+#if __XSI_VISIBLE
 void    _EXFUN(swab, (const void *__restrict, void *__restrict, ssize_t));
+#endif
 long    _EXFUN(sysconf, (int __name ));
 pid_t   _EXFUN(tcgetpgrp, (int __fildes ));
 int     _EXFUN(tcsetpgrp, (int __fildes, pid_t __pgrp_id ));
 char *  _EXFUN(ttyname, (int __fildes ));
 int     _EXFUN(ttyname_r, (int, char *, size_t));
 int     _EXFUN(unlink, (const char *__path ));
+#if __XSI_VISIBLE >= 500 && __POSIX_VISIBLE < 200809 || __BSD_VISIBLE
 int 	_EXFUN(usleep, (useconds_t __useconds));
+#endif
+#if __BSD_VISIBLE
 int     _EXFUN(vhangup, (void ));
+#endif
 _READ_WRITE_RETURN_TYPE _EXFUN(write, (int __fd, const void *__buf, size_t __nbyte ));
 
 #ifdef __CYGWIN__
@@ -252,27 +258,34 @@ _READ_WRITE_RETURN_TYPE _EXFUN(_write, (int __fd, const void *__buf, size_t __nb
 int     _EXFUN(_execve, (const char *__path, char * const __argv[], char * const __envp[] ));
 #endif
 
-#if defined(__CYGWIN__) || defined(__rtems__) || defined(__aarch64__) || defined (__arm__) || defined(__sh__) || defined(__SPU__)
 #if !defined(__INSIDE_CYGWIN__)
+#if __POSIX_VISIBLE >= 200112 || __XSI_VISIBLE >= 500
 int     _EXFUN(ftruncate, (int __fd, off_t __length));
+#endif
+#if __POSIX_VISIBLE >= 200809 || __XSI_VISIBLE >= 500
 int     _EXFUN(truncate, (const char *, off_t __length));
 #endif
 #endif
 
-#if defined(__BSD_VISIBLE) || (__XSI_VISIBLE >= 500)
+#if __BSD_VISIBLE || __POSIX_VISIBLE < 200112
 int	_EXFUN(getdtablesize, (void));
+#endif
+#if __BSD_VISIBLE || __POSIX_VISIBLE >= 200809 || __XSI_VISIBLE >= 500
 useconds_t _EXFUN(ualarm, (useconds_t __useconds, useconds_t __interval));
+#endif
+
+#if __BSD_VISIBLE || __POSIX_VISIBLE >= 200112 || __XSI_VISIBLE >= 500
 #if !(defined  (_WINSOCK_H) || defined (_WINSOCKAPI_) || defined (__USE_W32_SOCKETS))
 /* winsock[2].h defines as __stdcall, and with int as 2nd arg */
  int	_EXFUN(gethostname, (char *__name, size_t __len));
 #endif
 #endif
 
-#if defined(__CYGWIN__) || defined(__rtems__)
+#if __MISC_VISIBLE
 int	_EXFUN(setdtablesize, (int));
 #endif
 
-#if defined(__CYGWIN__) || defined(__SPU__) || defined(__rtems__)
+#if __BSD_VISIBLE || __XSI_VISIBLE >= 500
 void    _EXFUN(sync, (void));
 #endif
 
