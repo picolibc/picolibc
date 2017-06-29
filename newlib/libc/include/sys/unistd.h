@@ -266,7 +266,6 @@ useconds_t _EXFUN(ualarm, (useconds_t __useconds, useconds_t __interval));
 /* winsock[2].h defines as __stdcall, and with int as 2nd arg */
  int	_EXFUN(gethostname, (char *__name, size_t __len));
 #endif
-char *	_EXFUN(mktemp, (char *));
 #endif
 
 #if defined(__CYGWIN__) || defined(__rtems__)
