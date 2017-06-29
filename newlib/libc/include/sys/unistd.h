@@ -212,7 +212,7 @@ long    _EXFUN(sysconf, (int __name ));
 pid_t   _EXFUN(tcgetpgrp, (int __fildes ));
 int     _EXFUN(tcsetpgrp, (int __fildes, pid_t __pgrp_id ));
 char *  _EXFUN(ttyname, (int __fildes ));
-int     _EXFUN(ttyname_r, (int, char *, size_t)); 
+int     _EXFUN(ttyname_r, (int, char *, size_t));
 int     _EXFUN(unlink, (const char *__path ));
 int 	_EXFUN(usleep, (useconds_t __useconds));
 int     _EXFUN(vhangup, (void ));
