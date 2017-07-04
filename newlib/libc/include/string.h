@@ -20,6 +20,10 @@
 #include <xlocale.h>
 #endif
 
+#if __BSD_VISIBLE
+#include <strings.h>
+#endif
+
 _BEGIN_STD_C
 
 _PTR 	 _EXFUN(memchr,(const _PTR, int, size_t));
@@ -52,26 +56,12 @@ int	 strcoll_l (const char *, const char *, locale_t);
 char	*strerror_l (int, locale_t);
 size_t	 strxfrm_l (char *__restrict, const char *__restrict, size_t, locale_t);
 #endif
-#if __GNU_VISIBLE
-int	 strcasecmp_l (const char *, const char *, locale_t);
-int	 strncasecmp_l (const char *, const char *, size_t, locale_t);
-#endif
 #if __MISC_VISIBLE || __POSIX_VISIBLE
 char 	*_EXFUN(strtok_r,(char *__restrict, const char *__restrict, char **__restrict));
 #endif
-#if __BSD_VISIBLE /* POSIX declaration is in <strings.h> */
-int	 _EXFUN(bcmp,(const void *, const void *, size_t));
-void	 _EXFUN(bcopy,(const void *, void *, size_t));
-void	 _EXFUN(bzero,(void *, size_t));
-#endif
 #if __BSD_VISIBLE
-void	 _EXFUN(explicit_bzero,(void *, size_t));
 int	 _EXFUN(timingsafe_bcmp,(const void *, const void *, size_t));
 int	 _EXFUN(timingsafe_memcmp,(const void *, const void *, size_t));
-#endif
-#if __BSD_VISIBLE /* POSIX declaration is in <strings.h> */
-int	 _EXFUN(ffs,(int));
-char 	*_EXFUN(index,(const char *, int));
 #endif
 #if __MISC_VISIBLE || __POSIX_VISIBLE
 _PTR	 _EXFUN(memccpy,(_PTR __restrict, const _PTR __restrict, int, size_t));
@@ -82,15 +72,9 @@ _PTR	 _EXFUN(memmem, (const _PTR, size_t, const _PTR, size_t));
 _PTR 	 _EXFUN(memrchr,(const _PTR, int, size_t));
 _PTR 	 _EXFUN(rawmemchr,(const _PTR, int));
 #endif
-#if __BSD_VISIBLE /* POSIX declaration is in <strings.h> */
-char 	*_EXFUN(rindex,(const char *, int));
-#endif
 #if __POSIX_VISIBLE >= 200809
 char 	*_EXFUN(stpcpy,(char *__restrict, const char *__restrict));
 char 	*_EXFUN(stpncpy,(char *__restrict, const char *__restrict, size_t));
-#endif
-#if __BSD_VISIBLE /* POSIX declaration is in <strings.h> */
-int	 _EXFUN(strcasecmp,(const char *, const char *));
 #endif
 #if __GNU_VISIBLE
 char	*_EXFUN(strcasestr,(const char *, const char *));
@@ -104,11 +88,6 @@ char 	*_EXFUN(_strdup_r,(struct _reent *, const char *));
 char 	*_EXFUN(strndup,(const char *, size_t));
 #endif
 char 	*_EXFUN(_strndup_r,(struct _reent *, const char *, size_t));
-
-#if __GNU_VISIBLE
-int	 _EXFUN(ffsl,(long));
-int	 _EXFUN(ffsll, (long long));
-#endif
 
 /* There are two common strerror_r variants.  If you request
    _GNU_SOURCE, you get the GNU version; otherwise you get the POSIX
@@ -135,9 +114,6 @@ char *	_EXFUN(_strerror_r, (struct _reent *, int, int, int *));
 #if __BSD_VISIBLE
 size_t	_EXFUN(strlcat,(char *, const char *, size_t));
 size_t	_EXFUN(strlcpy,(char *, const char *, size_t));
-#endif
-#if __BSD_VISIBLE /* POSIX declaration is in <strings.h> */
-int	_EXFUN(strncasecmp,(const char *, const char *, size_t));
 #endif
 #if __POSIX_VISIBLE >= 200809
 size_t	 _EXFUN(strnlen,(const char *, size_t));
