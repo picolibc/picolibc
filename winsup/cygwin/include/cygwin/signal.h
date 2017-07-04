@@ -325,7 +325,9 @@ struct sigaction
   __extension__ union
   {
     _sig_func_ptr sa_handler;  		/* SIG_DFL, SIG_IGN, or pointer to a function */
+#if __POSIX_VISIBLE >= 199309
     void  (*sa_sigaction) ( int, siginfo_t *, void * );
+#endif
   };
   sigset_t sa_mask;
   int sa_flags;
