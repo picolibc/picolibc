@@ -4771,7 +4771,7 @@ scandirat (int dirfd, const char *pathname, struct dirent ***namelist,
       char *path = tp.c_get ();
       if (gen_full_path_at (path, dirfd, pathname))
 	__leave;
-      return scandir (pathname, namelist, select, compar);
+      return scandir (path, namelist, select, compar);
     }
   __except (EFAULT) {}
   __endtry
