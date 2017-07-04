@@ -8,6 +8,11 @@ GENERAL_SOURCES = \
 	bcopy.c \
 	bzero.c \
 	explicit_bzero.c \
+	ffsl.c \
+	ffsll.c \
+	fls.c \
+	flsl.c \
+	flsll.c \
 	index.c \
 	memchr.c \
 	memcmp.c \

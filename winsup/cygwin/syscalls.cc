@@ -3784,28 +3784,6 @@ nice (int incr)
   return setpriority (PRIO_PROCESS, myself->pid, myself->nice + incr);
 }
 
-/*
- * Find the first bit set in I.
- */
-
-extern "C" int
-ffs (int i)
-{
-  return __builtin_ffs (i);
-}
-
-extern "C" int
-ffsl (long i)
-{
-  return __builtin_ffsl (i);
-}
-
-extern "C" int
-ffsll (long long i)
-{
-  return __builtin_ffsll (i);
-}
-
 static void
 locked_append (int fd, const void * buf, size_t size)
 {
