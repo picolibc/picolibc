@@ -30,14 +30,11 @@ Neither ANSI C nor the System V Interface Definition (Issue 2) require
 <<bzero>> requires no supporting OS subroutines.
 */
 
-#include <strings.h>
+#include <string.h>
 
-_VOID
-_DEFUN (bzero, (b, length),
-	void *b _AND
-	size_t length)
+void
+bzero(void *b, size_t length)
 {
-  char *ptr = (char *)b;
-  while (length--)
-    *ptr++ = 0;
+
+	memset(b, 0, length);
 }
