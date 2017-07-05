@@ -24,10 +24,12 @@ float complex cacosf(float complex);
 /* 7.3.5.2 The casin functions */
 double complex casin(double complex);
 float complex casinf(float complex);
+long double complex casinl(long double complex);
 
 /* 7.3.5.1 The catan functions */
 double complex catan(double complex);
 float complex catanf(float complex);
+long double complex catanl(long double complex);
 
 /* 7.3.5.1 The ccos functions */
 double complex ccos(double complex);
@@ -74,6 +76,7 @@ float complex cexpf(float complex);
 /* 7.3.7.2 The clog functions */
 double complex clog(double complex);
 float complex clogf(float complex);
+long double complex clogl(long double complex);
 
 /* 7.3.8 Power and absolute-value functions */
 /* 7.3.8.1 The cabs functions */
@@ -94,11 +97,13 @@ float complex cpowf(float complex, float complex);
 /* 7.3.8.3 The csqrt functions */
 double complex csqrt(double complex);
 float complex csqrtf(float complex);
+long double complex csqrtl(long double complex);
 
 /* 7.3.9 Manipulation functions */
 /* 7.3.9.1 The carg functions */ 
 double carg(double complex);
 float cargf(float complex);
+long double cargl(long double complex);
 
 /* 7.3.9.2 The cimag functions */
 double cimag(double complex);
@@ -125,8 +130,6 @@ float complex clog10f(float complex);
 
 #if defined(__CYGWIN__)
 long double complex cacosl(long double complex);
-long double complex casinl(long double complex);
-long double complex catanl(long double complex);
 long double complex ccosl(long double complex);
 long double complex csinl(long double complex);
 long double complex ctanl(long double complex);
@@ -137,10 +140,7 @@ long double complex ccoshl(long double complex);
 long double complex csinhl(long double complex);
 long double complex ctanhl(long double complex);
 long double complex cexpl(long double complex);
-long double complex clogl(long double complex);
 long double complex cpowl(long double complex, long double complex);
-long double complex csqrtl(long double complex);
-long double cargl(long double complex);
 long double complex conjl(long double complex);
 long double complex cprojl(long double complex);
 #if __GNU_VISIBLE
