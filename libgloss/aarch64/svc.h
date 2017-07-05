@@ -23,37 +23,59 @@
  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
+#include <_ansi.h>
+
 /* Now the SWI numbers and reason codes for RDI (Angel) monitors.  */
-#define AngelSVC			0xF000
-#define AngelSVCInsn			"hlt"
-#define AngelSVCAsm			hlt
+#define AngelSVC				0xF000
+#define AngelSVCInsn				"hlt"
+#define AngelSVCAsm				hlt
 
 /* The reason codes:  */
-#define AngelSVC_Reason_Open		0x01
-#define AngelSVC_Reason_Close		0x02
-#define AngelSVC_Reason_WriteC		0x03
-#define AngelSVC_Reason_Write0		0x04
-#define AngelSVC_Reason_Write		0x05
-#define AngelSVC_Reason_Read		0x06
-#define AngelSVC_Reason_ReadC		0x07
-#define AngelSVC_Reason_IsTTY		0x09
-#define AngelSVC_Reason_Seek		0x0A
-#define AngelSVC_Reason_FLen		0x0C
-#define AngelSVC_Reason_TmpNam		0x0D
-#define AngelSVC_Reason_Remove		0x0E
-#define AngelSVC_Reason_Rename		0x0F
-#define AngelSVC_Reason_Clock		0x10
-#define AngelSVC_Reason_Time		0x11
-#define AngelSVC_Reason_System		0x12
-#define AngelSVC_Reason_Errno		0x13
-#define AngelSVC_Reason_GetCmdLine	0x15
-#define AngelSVC_Reason_HeapInfo	0x16
-#define AngelSVC_Reason_EnterSVC	0x17
-#define AngelSVC_Reason_ReportException 0x18
-#define AngelSVC_Reason_SyncCacheRange	0x19
-#define AngelSVC_Reason_Elapsed         0x30
-#define ADP_Stopped_ApplicationExit	((2 << 16) + 38)
-#define ADP_Stopped_RunTimeError	((2 << 16) + 35)
+#define AngelSVC_Reason_Open			0x01
+#define AngelSVC_Reason_Close			0x02
+#define AngelSVC_Reason_WriteC			0x03
+#define AngelSVC_Reason_Write0			0x04
+#define AngelSVC_Reason_Write			0x05
+#define AngelSVC_Reason_Read			0x06
+#define AngelSVC_Reason_ReadC			0x07
+#define AngelSVC_Reason_IsError			0x08
+#define AngelSVC_Reason_IsTTY			0x09
+#define AngelSVC_Reason_Seek			0x0A
+#define AngelSVC_Reason_FLen			0x0C
+#define AngelSVC_Reason_TmpNam			0x0D
+#define AngelSVC_Reason_Remove			0x0E
+#define AngelSVC_Reason_Rename			0x0F
+#define AngelSVC_Reason_Clock			0x10
+#define AngelSVC_Reason_Time			0x11
+#define AngelSVC_Reason_System			0x12
+#define AngelSVC_Reason_Errno			0x13
+#define AngelSVC_Reason_GetCmdLine		0x15
+#define AngelSVC_Reason_HeapInfo		0x16
+#define AngelSVC_Reason_EnterSVC		0x17
+#define AngelSVC_Reason_ReportException 	0x18
+#define AngelSVC_Reason_SyncCacheRange		0x19
+#define AngelSVC_Reason_ReportExceptionExtended 0x20
+#define AngelSVC_Reason_Elapsed			0x30
+#define AngelSVC_Reason_TickFreq		0x31
+#define ADP_Stopped_ApplicationExit		((2 << 16) + 38)
+#define ADP_Stopped_RunTimeError		((2 << 16) + 35)
+
+/* Semihosting feature magic numbers.  */
+#define NUM_SHFB_MAGIC			4
+#define SHFB_MAGIC_0			0x53
+#define SHFB_MAGIC_1			0x48
+#define SHFB_MAGIC_2			0x46
+#define SHFB_MAGIC_3			0x42
+
+/* Semihosting extensions.  */
+#define SH_EXT_EXIT_EXTENDED_BITNUM	0x0
+#define SH_EXT_STDOUT_STDERR_BITNUM	0x1
+
+#if !defined (__ASSEMBLER__)
+extern int _get_semihosting_exts _PARAMS ((char*, int, int));
+extern int _has_ext_exit_extended _PARAMS ((void));
+extern int _has_ext_stdout_stderr _PARAMS ((void));
+#endif
 
 #if defined(ARM_RDI_MONITOR) && !defined(__ASSEMBLER__)
 

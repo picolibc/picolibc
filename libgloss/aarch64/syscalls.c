@@ -76,6 +76,9 @@ static int checkerror _PARAMS ((int));
 static int error _PARAMS ((int));
 static int get_errno _PARAMS ((void));
 
+/* Semihosting utilities.  */
+static void initialise_semihosting_exts _PARAMS ((void));
+
 /* Struct used to keep track of the file position, just so we
    can implement fseek(fh,x,SEEK_CUR).  */
 struct fdent
@@ -129,6 +132,9 @@ extern void _EXFUN (__sinit, (struct _reent *));
 static int monitor_stdin;
 static int monitor_stdout;
 static int monitor_stderr;
+
+static int supports_ext_exit_extended = -1;
+static int supports_ext_stdout_stderr = -1;
 
 /* Return a pointer to the structure associated with
    the user file descriptor fd. */
@@ -188,32 +194,131 @@ initialise_monitor_handles (void)
   block[1] = 0;			/* mode "r" */
   monitor_stdin = do_AngelSVC (AngelSVC_Reason_Open, block);
 
-  block[0] = POINTER_TO_PARAM_BLOCK_T (":tt");
-  block[2] = 3;			/* length of filename */
-  block[1] = 4;			/* mode "w" */
-  monitor_stdout = do_AngelSVC (AngelSVC_Reason_Open, block);
+  for (i = 0; i < MAX_OPEN_FILES; i++)
+    openfiles[i].handle = -1;;
 
-  block[0] = POINTER_TO_PARAM_BLOCK_T (":tt");
-  block[2] = 3;			/* length of filename */
-  block[1] = 8;			/* mode "a" */
-  monitor_stderr = do_AngelSVC (AngelSVC_Reason_Open, block);
+  if (_has_ext_stdout_stderr ())
+  {
+    block[0] = POINTER_TO_PARAM_BLOCK_T (":tt");
+    block[2] = 3;			/* length of filename */
+    block[1] = 4;			/* mode "w" */
+    monitor_stdout = do_AngelSVC (AngelSVC_Reason_Open, block);
+
+    block[0] = POINTER_TO_PARAM_BLOCK_T (":tt");
+    block[2] = 3;			/* length of filename */
+    block[1] = 8;			/* mode "a" */
+    monitor_stderr = do_AngelSVC (AngelSVC_Reason_Open, block);
+  }
 
   /* If we failed to open stderr, redirect to stdout. */
   if (monitor_stderr == -1)
     monitor_stderr = monitor_stdout;
 
-  for (i = 0; i < MAX_OPEN_FILES; i++)
-    openfiles[i].handle = -1;
-
   openfiles[0].handle = monitor_stdin;
   openfiles[0].flags = _FREAD;
   openfiles[0].pos = 0;
-  openfiles[1].handle = monitor_stdout;
-  openfiles[0].flags = _FWRITE;
-  openfiles[1].pos = 0;
-  openfiles[2].handle = monitor_stderr;
-  openfiles[0].flags = _FWRITE;
-  openfiles[2].pos = 0;
+
+  if (_has_ext_stdout_stderr ())
+  {
+    openfiles[1].handle = monitor_stdout;
+    openfiles[0].flags = _FWRITE;
+    openfiles[1].pos = 0;
+    openfiles[2].handle = monitor_stderr;
+    openfiles[0].flags = _FWRITE;
+    openfiles[2].pos = 0;
+  }
+}
+
+int
+_has_ext_exit_extended (void)
+{
+  if (supports_ext_exit_extended < 0)
+  {
+    initialise_semihosting_exts ();
+  }
+
+  return supports_ext_exit_extended;
+}
+
+int
+_has_ext_stdout_stderr (void)
+{
+  if (supports_ext_stdout_stderr < 0)
+  {
+    initialise_semihosting_exts ();
+  }
+
+  return supports_ext_stdout_stderr;
+}
+
+static void
+initialise_semihosting_exts (void)
+{
+  supports_ext_exit_extended = 0;
+  supports_ext_stdout_stderr = 1;
+
+#if SEMIHOST_V2
+  char features[1];
+  if (_get_semihosting_exts (features, 0, 1) > 0)
+  {
+     supports_ext_exit_extended
+       = features[0] & (1 << SH_EXT_EXIT_EXTENDED_BITNUM);
+     supports_ext_stdout_stderr
+       = features[0] & (1 << SH_EXT_STDOUT_STDERR_BITNUM);
+  }
+#endif
+}
+
+int
+_get_semihosting_exts (char* features, int offset, int num)
+{
+  int fd = _open (":semihosting-features", O_RDONLY);
+  memset (features, 0, num);
+
+  if (fd == -1)
+  {
+    return -1;
+  }
+
+  struct fdent *pfd;
+  pfd = findslot (fd);
+
+  param_block_t block[1];
+  block[0] = pfd->handle;
+
+  int len = do_AngelSVC (AngelSVC_Reason_FLen, block);
+
+  if (len < NUM_SHFB_MAGIC
+      || num > (len - NUM_SHFB_MAGIC))
+  {
+     _close (fd);
+     return -1;
+  }
+
+  char buffer[NUM_SHFB_MAGIC];
+  int n_read = _read (fd, buffer, NUM_SHFB_MAGIC);
+
+  if (n_read < NUM_SHFB_MAGIC
+      || buffer[0] != SHFB_MAGIC_0
+      || buffer[1] != SHFB_MAGIC_1
+      || buffer[2] != SHFB_MAGIC_2
+      || buffer[3] != SHFB_MAGIC_3)
+  {
+     _close (fd);
+     return -1;
+  }
+
+  if (_lseek (fd, offset, SEEK_CUR) < 0)
+  {
+     _close (fd);
+     return -1;
+  }
+
+  n_read = _read (fd, features, num);
+
+  _close (fd);
+
+  return checkerror (n_read);
 }
 
 static int
