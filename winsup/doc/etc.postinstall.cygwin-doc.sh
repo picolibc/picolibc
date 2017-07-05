@@ -6,27 +6,17 @@
 # CYGWINFORALL=-A if install for All Users
 # installs local shortcuts for All Users or Current User in
 # {ProgramData,~/Appdata/Roaming}/Microsoft/Windows/Start Menu/Programs/Cygwin/
-
-cygp=/bin/cygpath
-mks=/bin/mkshortcut
-un=/bin/uname
-site=https://cygwin.com
-
-# check for programs
-for p in $un $cygp $mks
-do
-	if [ ! -x $p ]
-	then
-		echo "Can't find program '$p'"
-		exit 2
-	fi
-done
+# exits quietly if directory does not exist as presumably no shortcuts desired
 
 doc=/usr/share/doc/cygwin-doc
-html=$doc/html
-smpc_dir="$($cygp $CYGWINFORALL -P -U)/Cygwin"
+site=https://cygwin.com
+cygp=/bin/cygpath
+mks=/bin/mkshortcut
 
-for d in $doc $html "$smpc_dir"
+html=$doc/html
+
+# check source directories created
+for d in $doc $html
 do
 	if [ ! -d "$d/" ]
 	then
@@ -35,6 +25,23 @@ do
 	fi
 done
 
+# check for programs
+for p in $cygp $mks
+do
+	if [ ! -x $p ]
+	then
+		echo "Can't find program '$p'"
+		exit 2
+	fi
+done
+
+# Cygwin Start Menu directory
+smpc_dir="$($cygp $CYGWINFORALL -P -U --)/Cygwin"
+
+# check Cygwin Start Menu directory still exists
+[ -d "$smpc_dir/" ] || exit 0
+
+# check Cygwin Start Menu directory writable
 if [ ! -w "$smpc_dir/" ]
 then
 	echo "Can't write to directory '$smpc_dir'"
@@ -42,7 +49,7 @@ then
 fi
 
 # mkshortcut works only in current directory - change to Cygwin Start Menu
-cd "$smpc_dir" || exit 2	# quit if not found
+cd "$smpc_dir/" || exit 0	# quit if not found
 
 # create User Guide and API PDF and HTML shortcuts
 while read target name desc
