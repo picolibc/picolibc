@@ -1,3 +1,10 @@
+# rdimon.specs
+#
+# Spec file for AArch64 baremetal newlib with version 2 of the
+# AngelAPI semi-hosting using the SVC trap instruction.
+#
+# This version supports extensibility through an extension mechanism.
+
 %rename link                old_link
 
 *link:
