@@ -1,7 +1,7 @@
 # aem-ve.specs
 #
-# Spec file for AArch64 baremetal newlib, libgloss on VE platform with AngelAPI
-# semi-hosting.
+# Spec file for AArch64 baremetal newlib, libgloss on VE platform with version 2
+# of AngelAPI semi-hosting.
 #
 # This Spec file is also appropriate for the foundation model.
 

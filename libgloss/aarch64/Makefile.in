@@ -52,8 +52,11 @@ MULTISRCTOP =
 MULTIBUILDTOP =
 MULTIDIRS =
 MULTISUBDIR =
+MULTILIBNAME =
 MULTIDO = true
 MULTICLEAN = true
+MULTI_FLAGS_FOR_TARGET = MULTI_DEFAULT_FLAGS
+MULTI_DEFAULT_FLAGS = -DSEMIHOST_V2
 
 SHELL =	/bin/sh
 
@@ -77,11 +80,12 @@ OBJS = ftruncate.o libcfunc.o syscalls.o truncate.o _exit.o _kill.o
 CRT0		= crt0.o
 CRT0_INSTALL	= install-crt0
 
-CRT0_INSTALL	= install-crt0
-RDIMON_CRT0	= rdimon-crt0.o
-RDIMON_BSP	= librdimon.a
+RDIMON_CRT0	= rdimon-crt0${${MULTILIBNAME}}.o
+RDIMON_BSP	= librdimon${${MULTILIBNAME}}.a
 RDIMON_OBJS	= $(patsubst %,rdimon-%,$(OBJS))
-RDIMON_SCRIPTS	= rdimon.specs aem-ve.specs aem-validation.specs
+RDIMON_SCRIPTS	= rdimon${${MULTILIBNAME}}.specs \
+		  aem-ve${${MULTILIBNAME}}.specs \
+		  aem-validation${${MULTILIBNAME}}.specs
 RDIMON_INSTALL	= install-rdimon
 
 CFLAGS		= -g
@@ -93,6 +97,7 @@ CFLAGS		= -g
 # build a test program for each target board. Just trying to get
 # it to link is a good test, so we ignore all the errors for now.
 #
+
 all: ${CRT0} ${RDIMON_CRT0} ${RDIMON_BSP} ${RDIMON_SCRIPTS}
 	@rootpre=`pwd`/; export rootpre; \
 	srcrootpre=`cd $(srcdir); pwd`/; export srcrootpre; \
@@ -103,6 +108,7 @@ all: ${CRT0} ${RDIMON_CRT0} ${RDIMON_BSP} ${RDIMON_SCRIPTS}
 	    else true; fi; \
 	  else true; fi; \
 	done
+	$(MAKE) $(AM_MAKEFLAGS) all-recursive
 
 #
 # here's where we build the test programs for each target
@@ -112,34 +118,52 @@ test:
 
 #
 crt0.o: crt0.S
+	$(CC) $(CFLAGS_FOR_TARGET) $($(MULTI_FLAGS_FOR_TARGET)) $(CFLAGS) $(INCLUDES) -o $@ -c $<
 
-rdimon-crt0.o: crt0.S
-	$(CC) $(CFLAGS_FOR_TARGET) $(CFLAGS) $(INCLUDES) -DARM_RDI_MONITOR -o $@ -c $<
+rdimon-crt0${${MULTILIBNAME}}.o: crt0.S
+	$(CC) $(CFLAGS_FOR_TARGET) $($(MULTI_FLAGS_FOR_TARGET)) $(CFLAGS) $(INCLUDES) -DARM_RDI_MONITOR -o $@ -c $<
 
 #rdimon-trap.o: trap.S
-#	$(CC) $(CFLAGS_FOR_TARGET) $(CFLAGS) $(INCLUDES) -DARM_RDI_MONITOR -o $@ -c $<
+#	$(CC) $(CFLAGS_FOR_TARGET) $($(MULTI_FLAGS_FOR_TARGET)) $(CFLAGS) $(INCLUDES) -DARM_RDI_MONITOR -o $@ -c $<
 
 rdimon-_exit.o: _exit.c
-	$(CC) $(CFLAGS_FOR_TARGET) $(CFLAGS) $(INCLUDES) -DARM_RDI_MONITOR -o $@ -c $<
+	$(CC) $(CFLAGS_FOR_TARGET) $($(MULTI_FLAGS_FOR_TARGET)) $(CFLAGS) $(INCLUDES) -DARM_RDI_MONITOR -o $@ -c $<
 
 rdimon-ftruncate.o: ftruncate.c
-	$(CC) $(CFLAGS_FOR_TARGET) $(CFLAGS) $(INCLUDES) -DARM_RDI_MONITOR -o $@ -c $<
+	$(CC) $(CFLAGS_FOR_TARGET) $($(MULTI_FLAGS_FOR_TARGET)) $(CFLAGS) $(INCLUDES) -DARM_RDI_MONITOR -o $@ -c $<
 
 rdimon-_kill.o: _kill.c
-	$(CC) $(CFLAGS_FOR_TARGET) $(CFLAGS) $(INCLUDES) -DARM_RDI_MONITOR -o $@ -c $<
+	$(CC) $(CFLAGS_FOR_TARGET) $($(MULTI_FLAGS_FOR_TARGET)) $(CFLAGS) $(INCLUDES) -DARM_RDI_MONITOR -o $@ -c $<
 
 rdimon-libcfunc.o: libcfunc.c
-	$(CC) $(CFLAGS_FOR_TARGET) $(CFLAGS) $(INCLUDES) -DARM_RDI_MONITOR -o $@ -c $<
+	$(CC) $(CFLAGS_FOR_TARGET) $($(MULTI_FLAGS_FOR_TARGET)) $(CFLAGS) $(INCLUDES) -DARM_RDI_MONITOR -o $@ -c $<
 
 rdimon-syscalls.o: syscalls.c
-	$(CC) $(CFLAGS_FOR_TARGET) $(CFLAGS) $(INCLUDES) -DARM_RDI_MONITOR -o $@ -c $<
+	$(CC) $(CFLAGS_FOR_TARGET) $($(MULTI_FLAGS_FOR_TARGET)) $(CFLAGS) $(INCLUDES) -DARM_RDI_MONITOR -o $@ -c $<
 
 rdimon-truncate.o: truncate.c
-	$(CC) $(CFLAGS_FOR_TARGET) $(CFLAGS) $(INCLUDES) -DARM_RDI_MONITOR -o $@ -c $<
+	$(CC) $(CFLAGS_FOR_TARGET) $($(MULTI_FLAGS_FOR_TARGET)) $(CFLAGS) $(INCLUDES) -DARM_RDI_MONITOR -o $@ -c $<
 
 $(RDIMON_BSP): $(RDIMON_OBJS)
 	${AR} ${ARFLAGS} $@ $^
 	${RANLIB} $@
+
+# Multilib support.
+.PHONY:  multi-do all-multi clean-multi install-multi
+
+all-recursive: all-multi
+clean-recursive: clean-multi
+install-recursive: install-multi
+
+# The $(MAKE) comments below are to enable parallel building.
+all-multi:
+	$(MAKE) $(AM_MAKEFLAGS) DO=all multi-do
+
+clean-multi:
+	$(MAKE) $(AM_MAKEFLAGS) DO=clean multi-do
+
+install-multi:
+	$(MAKE) $(AM_MAKEFLAGS) DO=install multi-do
 
 clean mostlyclean:
 	rm -f a.out core *.i *.o *-test *.srec *.dis *.x $(SIM_BSP) ${RDIMON_SCRIPTS}
@@ -152,6 +176,7 @@ clean mostlyclean:
 	    else true; fi; \
 	  else true; fi; \
 	done
+	$(MAKE) $(AM_MAKEFLAGS) clean-recursive
 
 distclean maintainer-clean realclean: clean
 	rm -f Makefile config.status *~
@@ -167,6 +192,7 @@ install: ${CRT0_INSTALL} ${RDIMON_INSTALL}
 	    else true; fi; \
 	  else true; fi; \
 	done
+	$(MAKE) $(AM_MAKEFLAGS) install-recursive
 
 install-crt0:
 	${INSTALL_DATA} ${CRT0} $(DESTDIR)${tooldir}/lib${MULTISUBDIR}/$$x
@@ -189,3 +215,5 @@ Makefile: Makefile.in config.status @host_makefile_frag_path@
 
 config.status: configure
 	$(SHELL) config.status --recheck
+
+include $(srcdir)/../multi-build.in

@@ -1,3 +1,8 @@
+# rdimon.specs
+#
+# Spec file for AArch64 baremetal newlib with version 2 of the
+# AngelAPI semi-hosting.
+
 %rename lib libc
 
 *libgloss:
