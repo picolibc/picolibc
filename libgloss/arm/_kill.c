@@ -10,15 +10,36 @@ _kill (int pid, int sig)
   (void) pid; (void) sig;
 #ifdef ARM_RDI_MONITOR
   /* Note: The pid argument is thrown away.  */
+  int block[2];
+  block[1] = sig;
+  int insn;
+
+#if SEMIHOST_V2
+  if (_has_ext_exit_extended ())
+    {
+      insn = AngelSWI_Reason_ReportExceptionExtended;
+    }
+  else
+#endif
+    {
+      insn = AngelSWI_Reason_ReportException;
+    }
+
   switch (sig)
     {
     case SIGABRT:
-      return do_AngelSWI (AngelSWI_Reason_ReportException,
-			  (void *) ADP_Stopped_RunTimeError);
+      {
+	block[0] = ADP_Stopped_RunTimeError;
+	break;
+      }
     default:
-      return do_AngelSWI (AngelSWI_Reason_ReportException,
-			  (void *) ADP_Stopped_ApplicationExit);
+      {
+	block[0] = ADP_Stopped_ApplicationExit;
+	break;
+      }
     }
+
+  return do_AngelSWI (insn, block);
 #else
   asm ("swi %a0" :: "i" (SWI_Exit));
 #endif
