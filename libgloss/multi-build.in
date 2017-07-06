@@ -20,10 +20,10 @@ multi-do:
 		cp config.status $${destpre}; \
 		cd $${destpre}; \
 		$(SHELL) config.status; \
-		sed -e "s:^MULTIDIRS\s*+=.*$$:MULTIDIRS = :" \
-		    -e "s:^MULTILIBNAME\s*=.*$$:MULTILIBNAME = MULTIDIR_$${dir}_NAME:" \
-		    -e "s:^MULTI_FLAGS_FOR_TARGET\s*=.*$$:MULTI_FLAGS_FOR_TARGET = MULTIDIR_$${dir}_FLAGS:" \
-		    -e "s:^objdir\s*=.*$$:objdir = ..:" \
+		sed -e "s:^MULTIDIRS[[:space:]]*+=.*$$:MULTIDIRS = :" \
+		    -e "s:^MULTILIBNAME[[:space:]]*=.*$$:MULTILIBNAME = MULTIDIR_$${dir}_NAME:" \
+		    -e "s:^MULTI_FLAGS_FOR_TARGET[[:space:]]*=.*$$:MULTI_FLAGS_FOR_TARGET = MULTIDIR_$${dir}_FLAGS:" \
+		    -e "s:^objdir[[:space:]]*=.*$$:objdir = ..:" \
 			Makefile > Makefile.tem; \
 		rm -f Makefile; \
 		mv Makefile.tem Makefile; \
