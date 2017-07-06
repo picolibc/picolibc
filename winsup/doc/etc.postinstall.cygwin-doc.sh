@@ -12,6 +12,7 @@ doc=/usr/share/doc/cygwin-doc
 site=https://cygwin.com
 cygp=/bin/cygpath
 mks=/bin/mkshortcut
+launch=/bin/cygstart
 
 html=$doc/html
 
@@ -26,7 +27,7 @@ do
 done
 
 # check for programs
-for p in $cygp $mks
+for p in $cygp $mks $launch
 do
 	if [ ! -x $p ]
 	then
@@ -38,7 +39,7 @@ done
 # Cygwin Start Menu directory
 smpc_dir="$($cygp $CYGWINFORALL -P -U --)/Cygwin"
 
-# check Cygwin Start Menu directory still exists
+# check Cygwin Start Menu directory exists
 [ -d "$smpc_dir/" ] || exit 0
 
 # check Cygwin Start Menu directory writable
@@ -48,13 +49,10 @@ then
 	exit 1
 fi
 
-# mkshortcut works only in current directory - change to Cygwin Start Menu
-cd "$smpc_dir/" || exit 0	# quit if not found
-
 # create User Guide and API PDF and HTML shortcuts
 while read target name desc
 do
-	[ -r $t ] && $mks -n "$name" -d "$desc" $target
+	[ -r $t ] && $mks $CYGWINFORALL -P -n "Cygwin/$name" -d "$desc" -- $target
 done <<EOF
 $doc/cygwin-ug-net.pdf		User\ Guide\ \(PDF\)  Cygwin\ User\ Guide\ PDF
 $html/cygwin-ug-net/index.html	User\ Guide\ \(HTML\) Cygwin\ User\ Guide\ HTML
@@ -65,7 +63,7 @@ EOF
 # create Home Page and FAQ URL link shortcuts
 while read target name desc
 do
-	$mks -n "$name" -d "$desc" $target
+	$mks $CYGWINFORALL -P -n "Cygwin/$name" -d "$desc" -a $target -- $launch
 done <<EOF
 $site/index.html	Home\ Page	Cygwin\ Home\ Page\ Link
 $site/faq.html		FAQ	Cygwin\ Frequently\ Asked\ Questions\ Link
