@@ -51,6 +51,7 @@ OS port maintainers may make changes in OS-specific directories, as
 well as OS-specific portions of the build system, without approval.
 
 RTEMS			Joel Sherrill		joel.sherrill@oarcorp.com
+			Sebastian Huber		sebastian.huber@embedded-brains.de
 
 			Write After Approval
 
