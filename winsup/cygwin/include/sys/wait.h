@@ -88,7 +88,7 @@ inline int __wait_status_to_int (const union wait & __status)
 #else /* !__cplusplus */
 
 #define __wait_status_to_int(__status)  (__extension__ \
-  (((union { __typeof(__status) __in; int __out; }) { .__in = (__status) }).__out))
+  (((union { __typeof(__status) __sin; int __sout; }) { .__sin = (__status) }).__sout))
 
 #endif /* __cplusplus */
 

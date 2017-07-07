@@ -141,16 +141,16 @@ int	 _EXFUN(strverscmp,(const char *, const char *));
 
 #if __GNU_VISIBLE && defined(__GNUC__)
 #define strdupa(__s) \
-	(__extension__ ({const char *__in = (__s); \
-			 size_t __len = strlen (__in) + 1; \
-			 char * __out = (char *) __builtin_alloca (__len); \
-			 (char *) memcpy (__out, __in, __len);}))
+	(__extension__ ({const char *__sin = (__s); \
+			 size_t __len = strlen (__sin) + 1; \
+			 char * __sout = (char *) __builtin_alloca (__len); \
+			 (char *) memcpy (__sout, __sin, __len);}))
 #define strndupa(__s, __n) \
-	(__extension__ ({const char *__in = (__s); \
-			 size_t __len = strnlen (__in, (__n)) + 1; \
-			 char *__out = (char *) __builtin_alloca (__len); \
-			 __out[__len-1] = '\0'; \
-			 (char *) memcpy (__out, __in, __len-1);}))
+	(__extension__ ({const char *__sin = (__s); \
+			 size_t __len = strnlen (__sin, (__n)) + 1; \
+			 char *__sout = (char *) __builtin_alloca (__len); \
+			 __sout[__len-1] = '\0'; \
+			 (char *) memcpy (__sout, __sin, __len-1);}))
 #endif /* __GNU_VISIBLE && __GNUC__ */
 
 /* There are two common basename variants.  If you do NOT #include <libgen.h>
