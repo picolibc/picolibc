@@ -175,7 +175,10 @@ typedef struct sigevent
   pthread_attr_t *sigev_notify_attributes; /* notification attributes */
 } sigevent_t;
 
+#if __POSIX_VISIBLE >= 199309
+
 #pragma pack(push,4)
+
 struct _sigcommune
 {
   __uint32_t _si_code;
@@ -189,8 +192,6 @@ struct _sigcommune
     char *_si_str;
   };
 };
-
-#if __POSIX_VISIBLE >= 199309
 
 #define __SI_PAD_SIZE 32
 #ifdef __INSIDE_CYGWIN__
@@ -251,6 +252,7 @@ typedef struct
 #endif /*__INSIDE_CYGWIN__*/
   };
 } siginfo_t;
+
 #pragma pack(pop)
 
 #endif /* __POSIX_VISIBLE >= 199309 */
