@@ -154,6 +154,7 @@
 #define _REENT_SMALL
 #endif
 
+#define __BUFSIZ__ 256
 #define __SMALL_BITFIELDS
 
 #ifdef __MSP430X_LARGE__
