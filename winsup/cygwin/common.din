@@ -506,6 +506,9 @@ flockfile SIGFE
 floor NOSIGFE
 floorf NOSIGFE
 floorl NOSIGFE
+fls NOSIGFE
+flsl NOSIGFE
+flsll NOSIGFE
 fma NOSIGFE
 fmaf NOSIGFE
 fmal NOSIGFE
