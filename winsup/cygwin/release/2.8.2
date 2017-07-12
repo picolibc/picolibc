@@ -16,3 +16,9 @@ Bug Fixes
 - Fix signal.h with strict features enabled
   Addresses: https://cygwin.com/ml/cygwin/2017-07/msg00051.html
   Addresses: https://cygwin.com/ml/cygwin/2017-07/msg00088.html
+
+- Drop _in and _out in POSIX headers to avoid collision with Windows headers
+  Addresses: https://github.com/Alexpux/MSYS2-packages/issues/934
+
+- Handle different environments in cygwin-doc postinstall script
+  Addresses: https://cygwin.com/ml/cygwin/2017-07/msg00070.html
