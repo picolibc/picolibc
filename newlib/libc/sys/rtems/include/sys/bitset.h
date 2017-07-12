@@ -26,7 +26,7 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * $FreeBSD: head/sys/sys/bitset.h 320755 2017-07-06 21:47:17Z kib $
+ * $FreeBSD: head/sys/sys/bitset.h 320893 2017-07-11 12:35:44Z kib $
  */
 
 #ifndef _SYS_BITSET_H_
@@ -221,10 +221,10 @@
 	int __bit;							\
 									\
 	__bit = 0;							\
-	for (__i = __bitset_words((_s)) - 1; __i >= 0; __i--) {		\
-		if ((p)->__bits[__i] != 0) {				\
-			__bit = flsl((p)->__bits[__i]);			\
-			__bit += __i * _BITSET_BITS;			\
+	for (__i = __bitset_words((_s)); __i > 0; __i--) {		\
+		if ((p)->__bits[__i - 1] != 0) {			\
+			__bit = flsl((p)->__bits[__i - 1]);		\
+			__bit += (__i - 1) * _BITSET_BITS;		\
 			break;						\
 		}							\
 	}								\
