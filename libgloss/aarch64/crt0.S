@@ -144,8 +144,10 @@
 	sub	x2, x2, x0		/* Third arg: length of block */
 	bl	FUNCTION (memset)
 
+#ifdef ARM_RDI_MONITOR
 	/* Need to set up standard file handles */
 	bl	FUNCTION (initialise_monitor_handles)
+#endif
 
 	/* .init and .fini sections are used to create constructors
 	   and destructors.  Here we call the _init function and arrange
