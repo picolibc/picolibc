@@ -45,7 +45,7 @@ multi-do:
 		    LIBCXXFLAGS="$(LIBCXXFLAGS)" \
 		    LDFLAGS="$(LDFLAGS)" \
 		    MULTIFLAGS="" \
-		    DESTDIR="" \
+		    DESTDIR="$(DESTDIR)" \
 		    SOURCE="${srcdir}/" \
 		    INSTALL="$(INSTALL)" \
 		    INSTALL_DATA="$(INSTALL_DATA)" \
