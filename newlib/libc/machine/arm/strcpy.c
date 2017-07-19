@@ -42,6 +42,7 @@ char* __attribute__((naked))
 strcpy (char* dst, const char* src)
 {
   asm (
+      ".syntax unified\n\t"
 #if !(defined(__OPTIMIZE_SIZE__) || defined (PREFER_SIZE_OVER_SPEED) || \
       (defined (__thumb__) && !defined (__thumb2__)))
 #ifdef _ISA_ARM_7
@@ -127,15 +128,15 @@ strcpy (char* dst, const char* src)
 #ifdef __ARMEB__
        "tst	r2, #0xff00\n\t"
        "iteet	ne\n\t"
-       "strneh	r2, [ip], #2\n\t"
+       "strhne	r2, [ip], #2\n\t"
        "lsreq	r2, r2, #8\n\t"
-       "streqb	r2, [ip]\n\t"
+       "strbeq	r2, [ip]\n\t"
        "tstne	r2, #0xff\n\t"
 #else
        "tst	r2, #0xff\n\t"
        "itet	ne\n\t"
-       "strneh	r2, [ip], #2\n\t"
-       "streqb	r2, [ip]\n\t"
+       "strhne	r2, [ip], #2\n\t"
+       "strbeq	r2, [ip]\n\t"
        "tstne	r2, #0xff00\n\t"
 #endif
        "bne	5b\n\t"
@@ -162,9 +163,9 @@ strcpy (char* dst, const char* src)
        "mov	r3, r0\n\t"
   "1:\n\t"
        "ldrb	r2, [r1]\n\t"
-       "add	r1, r1, #1\n\t"
+       "adds	r1, #1\n\t"
        "strb	r2, [r3]\n\t"
-       "add	r3, r3, #1\n\t"
+       "adds	r3, #1\n\t"
        "cmp	r2, #0\n\t"
        "bne	1b\n\t"
        "bx	lr\n\t"
