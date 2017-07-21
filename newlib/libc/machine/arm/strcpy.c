@@ -160,7 +160,7 @@ strcpy (char* dst, const char* src)
        "bne	1b\n\t"
        "bx	lr\n\t"
 #else
-       "mov	r3, r0\n\t"
+       "movs	r3, r0\n\t"
   "1:\n\t"
        "ldrb	r2, [r1]\n\t"
        "adds	r1, #1\n\t"
