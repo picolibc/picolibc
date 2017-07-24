@@ -11,3 +11,8 @@ Bug Fixes
 
 - Fix a regression in fflush introduced in 2.8.0.
   Addresses: https://sourceware.org/ml/cygwin-apps/2017-07/msg00041.html
+
+- Fix a regression in reparse point handling introduced in 2.8.1.
+  Addresses: https://cygwin.com/ml/cygwin/2017-07/msg00114.html
+
+- Fix a potential resource leak when checking reparse points during readdir.
