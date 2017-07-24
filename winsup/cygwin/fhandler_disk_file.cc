@@ -216,8 +216,8 @@ readdir_check_reparse_point (POBJECT_ATTRIBUTES attr, bool remote)
 		    ret = true;
 		}
 	    }
-	  NtClose (reph);
 	}
+      NtClose (reph);
     }
   return ret;
 }
