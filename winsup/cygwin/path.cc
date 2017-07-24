@@ -2276,10 +2276,10 @@ check_reparse_point_target (PUNICODE_STRING subst)
      */
   if (RtlEqualUnicodePathPrefix (subst, &ro_u_natp, FALSE))
     {
-      if (subst->Length >= 6*sizeof(WCHAR) && subst->Buffer[5] == L':' &&
-          (subst->Length == 6*sizeof(WCHAR) || subst->Buffer[6] == L'\\'))
+      if (subst->Length >= 6 * sizeof(WCHAR) && subst->Buffer[5] == L':' &&
+          (subst->Length == 6 * sizeof(WCHAR) || subst->Buffer[6] == L'\\'))
         return true;
-      else if (subst->Length >= 8*sizeof(WCHAR) &&
+      else if (subst->Length >= 8 * sizeof(WCHAR) &&
           wcsncmp (subst->Buffer + 4, L"UNC\\", 4) == 0)
         return true;
     }
