@@ -88,7 +88,8 @@ enum path_types
 };
 
 NTSTATUS file_get_fai (HANDLE, PFILE_ALL_INFORMATION);
-bool check_reparse_point_target (PUNICODE_STRING);
+int check_reparse_point_target (HANDLE, bool, PREPARSE_DATA_BUFFER,
+				PUNICODE_STRING);
 
 class symlink_info;
 
