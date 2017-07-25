@@ -33,6 +33,7 @@ GENERAL_SOURCES = \
 	getenv.c  	\
 	getenv_r.c	\
 	imaxabs.c	\
+	imaxdiv.c	\
 	itoa.c          \
 	labs.c 		\
 	ldiv.c  	\
