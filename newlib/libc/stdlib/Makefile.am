@@ -32,6 +32,7 @@ GENERAL_SOURCES = \
 	gdtoa-hexnan.c	\
 	getenv.c  	\
 	getenv_r.c	\
+	imaxabs.c	\
 	itoa.c          \
 	labs.c 		\
 	ldiv.c  	\
