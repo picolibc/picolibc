@@ -505,10 +505,9 @@ extern "C" {
 /* #define _XOPEN_UNIX				    -1 */
 #endif /* __XSI_VISIBLE */
 
-/* The value corresponds to UNICODE version 4.0, which is the version
-   supported by XP.  Newlib supports 5.2 (2011) but so far Cygwin needs
-   the MS conversions for double-byte charsets. */
-#define __STDC_ISO_10646__ 200305L
+/* The value corresponds to UNICODE version 5.2, which is the current
+   state of newlib's wide char conversion functions. */
+#define __STDC_ISO_10646__ 200910L
 
 #endif /* __CYGWIN__ */
 
