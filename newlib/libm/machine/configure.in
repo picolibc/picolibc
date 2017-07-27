@@ -30,6 +30,7 @@ if test -n "${libm_machine_dir}"; then
 	i386) AC_CONFIG_SUBDIRS(i386) ;;
 	nds32) AC_CONFIG_SUBDIRS(nds32) ;;
 	spu) AC_CONFIG_SUBDIRS(spu) ;;
+	riscv) AC_CONFIG_SUBDIRS(riscv) ;;
   esac;
   if test "${use_libtool}" = "yes"; then
     machlib=${libm_machine_dir}/lib${libm_machine_dir}.${aext}
