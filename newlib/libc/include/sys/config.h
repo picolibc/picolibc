@@ -75,7 +75,7 @@
 #define _POINTER_INT short
 #endif
 
-#if defined(__m68k__) || defined(__mc68000__)
+#if defined(__m68k__) || defined(__mc68000__) || defined(__riscv)
 #define _READ_WRITE_RETURN_TYPE _ssize_t
 #endif
 

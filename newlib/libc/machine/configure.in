@@ -52,6 +52,7 @@ if test -n "${machine_dir}"; then
 	mep ) AC_CONFIG_SUBDIRS(mep) ;;
 	microblaze ) AC_CONFIG_SUBDIRS(microblaze) ;;
 	mips) AC_CONFIG_SUBDIRS(mips) ;;
+	riscv) AC_CONFIG_SUBDIRS(riscv) ;;
 	mn10200) AC_CONFIG_SUBDIRS(mn10200) ;;
 	mn10300) AC_CONFIG_SUBDIRS(mn10300) ;;
 	moxie) AC_CONFIG_SUBDIRS(moxie) ;;

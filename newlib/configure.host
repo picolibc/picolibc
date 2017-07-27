@@ -255,6 +255,12 @@ case "${host_cpu}" in
   powerpc*)
 	machine_dir=powerpc
 	;;
+  riscv*)
+	libm_machine_dir=riscv
+	machine_dir=riscv
+	newlib_cflags="${newlib_cflags}"
+	default_newlib_atexit_dynamic_alloc="no"
+	;;
   rl78)
 	machine_dir=rl78
 	newlib_cflags="${newlib_cflags} -DPREFER_SIZE_OVER_SPEED -DSMALL_MEMORY"
@@ -804,6 +810,9 @@ case "${host}" in
 	;;
   powerpcle-*-pe)
 	newlib_cflags="${newlib_cflags} -DHAVE_OPENDIR -DHAVE_RENAME -DHAVE_FCNTL -D_NO_POSIX_SPAWN"
+	syscall_dir=syscalls
+	;;
+  riscv*-*-*)
 	syscall_dir=syscalls
 	;;
   sh*-*-*)
