@@ -78,6 +78,9 @@ case "${target}" in
   mips*-*-*)
 	AC_CONFIG_SUBDIRS([mips])
 	;;
+  riscv*-*-*)
+	AC_CONFIG_SUBDIRS([riscv])
+	;;
   powerpc-*-*|powerpcle-*-*)
 	AC_CONFIG_SUBDIRS([rs6000])
 	;;
