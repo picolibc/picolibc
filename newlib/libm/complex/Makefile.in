@@ -101,7 +101,8 @@ am__objects_3 = lib_a-cabsl.$(OBJEXT) lib_a-creall.$(OBJEXT) \
 	lib_a-catanhl.$(OBJEXT) lib_a-conjl.$(OBJEXT) \
 	lib_a-cpowl.$(OBJEXT) lib_a-ctanhl.$(OBJEXT) \
 	lib_a-ctanl.$(OBJEXT) lib_a-casinhl.$(OBJEXT) \
-	lib_a-csinhl.$(OBJEXT) lib_a-csinl.$(OBJEXT)
+	lib_a-csinhl.$(OBJEXT) lib_a-csinl.$(OBJEXT) \
+	lib_a-catanl.$(OBJEXT)
 @USE_LIBTOOL_FALSE@am_lib_a_OBJECTS = $(am__objects_1) \
 @USE_LIBTOOL_FALSE@	$(am__objects_2) $(am__objects_3)
 lib_a_OBJECTS = $(am_lib_a_OBJECTS)
@@ -119,7 +120,7 @@ am__objects_5 = cabsf.lo casinf.lo ccosf.lo cimagf.lo cprojf.lo \
 am__objects_6 = cabsl.lo creall.lo cimagl.lo ccoshl.lo cacoshl.lo \
 	clogl.lo csqrtl.lo cargl.lo cprojl.lo cexpl.lo cephes_subrl.lo \
 	cacosl.lo ccosl.lo casinl.lo catanhl.lo conjl.lo cpowl.lo \
-	ctanhl.lo ctanl.lo casinhl.lo csinhl.lo csinl.lo
+	ctanhl.lo ctanl.lo casinhl.lo csinhl.lo csinl.lo catanl.lo
 @USE_LIBTOOL_TRUE@am_libcomplex_la_OBJECTS = $(am__objects_4) \
 @USE_LIBTOOL_TRUE@	$(am__objects_5) $(am__objects_6)
 libcomplex_la_OBJECTS = $(am_libcomplex_la_OBJECTS)
@@ -290,7 +291,7 @@ lsrc = cabsl.c creall.c cimagl.c ccoshl.c cacoshl.c \
        clogl.c csqrtl.c cargl.c cprojl.c cexpl.c \
        cephes_subrl.c cacosl.c ccosl.c casinl.c \
        catanhl.c conjl.c cpowl.c ctanhl.c ctanl.c \
-       casinhl.c csinhl.c csinl.c
+       casinhl.c csinhl.c csinl.c catanl.c
 
 fsrc = cabsf.c casinf.c ccosf.c cimagf.c cprojf.c  \
         csqrtf.c cacosf.c casinhf.c ccoshf.c clogf.c clog10f.c \
@@ -813,6 +814,12 @@ lib_a-csinl.o: csinl.c
 
 lib_a-csinl.obj: csinl.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-csinl.obj `if test -f 'csinl.c'; then $(CYGPATH_W) 'csinl.c'; else $(CYGPATH_W) '$(srcdir)/csinl.c'; fi`
+
+lib_a-catanl.o: catanl.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-catanl.o `test -f 'catanl.c' || echo '$(srcdir)/'`catanl.c
+
+lib_a-catanl.obj: catanl.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-catanl.obj `if test -f 'catanl.c'; then $(CYGPATH_W) 'catanl.c'; else $(CYGPATH_W) '$(srcdir)/catanl.c'; fi`
 
 mostlyclean-libtool:
 	-rm -f *.lo
