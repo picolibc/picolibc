@@ -47,7 +47,7 @@ ctanl(long double complex z)
 
 	if (d == 0.0L) {
 		/* mtherr ("ctan", OVERFLOW); */
-		w = HUGE_VALF + HUGE_VALF * I;
+		w = HUGE_VALL + HUGE_VALL * I;
 		return w;
 	}
 
