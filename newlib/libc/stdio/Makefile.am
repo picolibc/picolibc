@@ -182,7 +182,6 @@ ELIX_4_SOURCES = \
 	swscanf.c		\
 	ungetwc.c		\
 	vasnprintf.c		\
-	vfwscanf.c		\
 	vswprintf.c		\
 	vswscanf.c		\
 	vwprintf.c		\
