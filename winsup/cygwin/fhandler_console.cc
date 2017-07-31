@@ -1319,7 +1319,7 @@ dev_console::clear_screen (HANDLE h, int x1, int y1, int x2, int y2)
       tlc.X = x2;
       tlc.Y = y2;
     }
-  FillConsoleOutputCharacterA (h, ' ', num, tlc, &done);
+  FillConsoleOutputCharacterW (h, L' ', num, tlc, &done);
   FillConsoleOutputAttribute (h, current_win32_attr, num, tlc, &done);
 }
 
