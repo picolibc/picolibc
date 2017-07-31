@@ -886,7 +886,7 @@ peek_console (select_record *me, bool)
   for (;;)
     if (fh->bg_check (SIGTTIN, true) <= bg_eof)
       return me->read_ready = true;
-    else if (!PeekConsoleInput (h, &irec, 1, &events_read) || !events_read)
+    else if (!PeekConsoleInputW (h, &irec, 1, &events_read) || !events_read)
       break;
     else
       {
@@ -918,7 +918,7 @@ peek_console (select_record *me, bool)
 	  }
 
 	/* Read and discard the event */
-	ReadConsoleInput (h, &irec, 1, &events_read);
+	ReadConsoleInputW (h, &irec, 1, &events_read);
       }
 
   return me->write_ready;
