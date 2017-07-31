@@ -2216,12 +2216,11 @@ fhandler_console::write (const void *vsrc, size_t len)
 	  if (*src == '[')		/* CSI Control Sequence Introducer */
 	    {
 	      con.state = gotsquare;
+	      memset (con.args, 0, sizeof con.args);
+	      con.nargs = 0;
 	      con.saw_question_mark = false;
 	      con.saw_greater_than_sign = false;
 	      con.saw_space = false;
-	      for (con.nargs = 0; con.nargs < MAXARGS; con.nargs++)
-		con.args[con.nargs] = 0;
-	      con.nargs = 0;
 	    }
 	  else if (*src == ']')		/* OSC Operating System Command */
 	    {
