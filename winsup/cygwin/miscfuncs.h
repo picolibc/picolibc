@@ -20,8 +20,14 @@ details. */
 static inline bool
 is_alt_numpad_key (PINPUT_RECORD pirec)
 {
+  /* Remove lock key state from ControlKeyState.  Do not remove enhanced key
+     state since it helps to distinguish between cursor (EK) and numpad keys
+     (non-EK). */
+  DWORD ctrl_state = pirec->Event.KeyEvent.dwControlKeyState
+		     & ~(CAPSLOCK_ON | NUMLOCK_ON | SCROLLLOCK_ON);
+
   return pirec->Event.KeyEvent.uChar.UnicodeChar == 0
-	 && pirec->Event.KeyEvent.dwControlKeyState == LEFT_ALT_PRESSED
+	 && ctrl_state == LEFT_ALT_PRESSED
 	 && pirec->Event.KeyEvent.wVirtualScanCode >= DIK_NUMPAD7
 	 && pirec->Event.KeyEvent.wVirtualScanCode <= DIK_NUMPAD0
 	 && pirec->Event.KeyEvent.wVirtualScanCode != DIK_SUBTRACT;
