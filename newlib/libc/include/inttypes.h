@@ -329,11 +329,13 @@ extern uintmax_t _strtoumax_r(struct _reent *, const char *__restrict, char **__
 extern intmax_t  wcstoimax(const wchar_t *__restrict, wchar_t **__restrict, int);
 extern intmax_t  _wcstoimax_r(struct _reent *, const wchar_t *__restrict, wchar_t **__restrict, int);
 extern uintmax_t wcstoumax(const wchar_t *__restrict, wchar_t **__restrict, int);
+extern uintmax_t _wcstoumax_r(struct _reent *, const wchar_t *__restrict, wchar_t **__restrict, int);
 
 #if __BSD_VISIBLE
 extern intmax_t  strtoimax_l(const char *__restrict, char **_restrict, int, locale_t);
 extern uintmax_t strtoumax_l(const char *__restrict, char **_restrict, int, locale_t);
 extern intmax_t  wcstoimax_l(const wchar_t *__restrict, wchar_t **_restrict, int, locale_t);
+extern uintmax_t wcstoumax_l(const wchar_t *__restrict, wchar_t **_restrict, int, locale_t);
 #endif
 
 #ifdef __cplusplus
