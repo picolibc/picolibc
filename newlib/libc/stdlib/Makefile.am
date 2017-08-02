@@ -66,6 +66,7 @@ GENERAL_SOURCES = \
 	strtoumax.c	\
 	utoa.c          \
 	wcstod.c	\
+	wcstoimax.c	\
 	wcstol.c	\
 	wcstoul.c	\
 	wcstombs.c	\
