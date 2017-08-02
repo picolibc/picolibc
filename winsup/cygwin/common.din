@@ -433,6 +433,7 @@ exp2f NOSIGFE
 exp2l NOSIGFE
 expf NOSIGFE
 expl NOSIGFE
+explicit_bzero NOSIGFE
 expm1 NOSIGFE
 expm1f NOSIGFE
 expm1l NOSIGFE
