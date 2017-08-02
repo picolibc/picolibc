@@ -325,11 +325,13 @@ extern imaxdiv_t imaxdiv(intmax_t numer, intmax_t denomer);
 extern intmax_t  strtoimax(const char *__restrict, char **__restrict, int);
 extern intmax_t  _strtoimax_r(struct _reent *, const char *__restrict, char **__restrict, int);
 extern uintmax_t strtoumax(const char *__restrict, char **__restrict, int);
+extern uintmax_t _strtoumax_r(struct _reent *, const char *__restrict, char **__restrict, int);
 extern intmax_t  wcstoimax(const wchar_t *__restrict, wchar_t **__restrict, int);
 extern uintmax_t wcstoumax(const wchar_t *__restrict, wchar_t **__restrict, int);
 
 #if __BSD_VISIBLE
 extern intmax_t  strtoimax_l(const char *__restrict, char **_restrict, int, locale_t);
+extern uintmax_t strtoumax_l(const char *__restrict, char **_restrict, int, locale_t);
 #endif
 
 #ifdef __cplusplus

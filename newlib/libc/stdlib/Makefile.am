@@ -63,6 +63,7 @@ GENERAL_SOURCES = \
 	strtol.c	\
 	strtorx.c	\
 	strtoul.c	\
+	strtoumax.c	\
 	utoa.c          \
 	wcstod.c	\
 	wcstol.c	\
