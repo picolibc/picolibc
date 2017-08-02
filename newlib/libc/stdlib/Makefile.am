@@ -59,6 +59,7 @@ GENERAL_SOURCES = \
 	sb_charsets.c	\
 	strtod.c	\
 	strtodg.c	\
+	strtoimax.c	\
 	strtol.c	\
 	strtorx.c	\
 	strtoul.c	\
