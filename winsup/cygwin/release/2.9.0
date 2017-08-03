@@ -1,7 +1,7 @@
 What's new:
 -----------
 
-- New API: explicit_bzero.
+- New APIs: explicit_bzero, pthread_mutex_timedwait.
 
 
 What changed:
