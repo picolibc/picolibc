@@ -1426,7 +1426,7 @@ pthread_rwlock::rdlock (PLARGE_INTEGER timeout)
       if (reader->n < UINT32_MAX)
 	++reader->n;
       else
-	errno = EAGAIN;
+	result = EAGAIN;
       goto DONE;
     }
 
