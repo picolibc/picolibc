@@ -163,6 +163,7 @@ int pthread_mutex_getprioceiling (const pthread_mutex_t *, int *);
 int pthread_mutex_init (pthread_mutex_t *, const pthread_mutexattr_t *);
 int pthread_mutex_lock (pthread_mutex_t *);
 int pthread_mutex_setprioceiling (pthread_mutex_t *, int, int *);
+int pthread_mutex_timedlock (pthread_mutex_t *, const struct timespec *);
 int pthread_mutex_trylock (pthread_mutex_t *);
 int pthread_mutex_unlock (pthread_mutex_t *);
 int pthread_mutexattr_destroy (pthread_mutexattr_t *);

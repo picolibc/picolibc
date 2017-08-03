@@ -1765,7 +1765,7 @@ pthread_mutex::~pthread_mutex ()
 }
 
 int
-pthread_mutex::lock ()
+pthread_mutex::lock (PLARGE_INTEGER timeout)
 {
   pthread_t self = ::pthread_self ();
   int result = 0;
@@ -1775,7 +1775,7 @@ pthread_mutex::lock ()
   else if (type == PTHREAD_MUTEX_NORMAL /* potentially causes deadlock */
 	   || !pthread::equal (owner, self))
     {
-      cygwait (win32_obj_id, cw_infinite, cw_sig | cw_sig_restart);
+      cygwait (win32_obj_id, timeout, cw_sig | cw_sig_restart);
       set_owner (self);
     }
   else
@@ -3282,6 +3282,34 @@ pthread_mutex_lock (pthread_mutex_t *mutex)
   if (!pthread_mutex::is_good_object (mutex))
     return EINVAL;
   return (*mutex)->lock ();
+}
+
+extern "C" int
+pthread_mutex_timedlock (pthread_mutex_t *mutex, const struct timespec *abstime)
+{
+  LARGE_INTEGER timeout;
+
+  if (pthread_mutex::is_initializer (mutex))
+    pthread_mutex::init (mutex, NULL, *mutex);
+  if (!pthread_mutex::is_good_object (mutex))
+    return EINVAL;
+
+  /* According to SUSv3, abstime need not be checked for validity,
+     if the mutex can be locked immediately. */
+  if (!(*mutex)->trylock ())
+    return 0;
+
+  __try
+    {
+      int err = pthread_convert_abstime (CLOCK_REALTIME, abstime, &timeout);
+      if (err)
+	return err;
+
+      return (*mutex)->lock (&timeout);
+    }
+  __except (NO_ERROR) {}
+  __endtry
+  return EINVAL;
 }
 
 extern "C" int

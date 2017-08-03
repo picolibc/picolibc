@@ -267,7 +267,7 @@ public:
   static bool is_initializer_or_object (pthread_mutex_t const *);
   static bool is_initializer_or_bad_object (pthread_mutex_t const *);
 
-  int lock ();
+  int lock (PLARGE_INTEGER timeout = NULL);
   int trylock ();
   int unlock ();
   int destroy ();
