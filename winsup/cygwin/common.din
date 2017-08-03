@@ -1085,6 +1085,8 @@ pthread_once SIGFE
 pthread_rwlock_destroy SIGFE
 pthread_rwlock_init SIGFE
 pthread_rwlock_rdlock SIGFE
+pthread_rwlock_timedrdlock SIGFE
+pthread_rwlock_timedwrlock SIGFE
 pthread_rwlock_tryrdlock SIGFE
 pthread_rwlock_trywrlock SIGFE
 pthread_rwlock_unlock SIGFE

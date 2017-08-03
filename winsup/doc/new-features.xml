@@ -9,7 +9,12 @@
 <itemizedlist mark="bullet">
 
 <listitem><para>
-New APIs: explicit_bzero, pthread_mutex_timedwait.
+New APIs: explicit_bzero.
+</para></listitem>
+
+<listitem><para>
+New APIs: pthread_mutex_timedwait, pthread_rwlock_timedrdlock,
+pthread_rwlock_timedwrlock.
 </para></listitem>
 
 <listitem><para>

@@ -587,10 +587,10 @@ public:
   } *readers;
   fast_mutex readers_mx;
 
-  int rdlock ();
+  int rdlock (PLARGE_INTEGER timeout = NULL);
   int tryrdlock ();
 
-  int wrlock ();
+  int wrlock (PLARGE_INTEGER timeout = NULL);
   int trywrlock ();
 
   int unlock ();

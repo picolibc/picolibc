@@ -480,12 +480,13 @@ details. */
   313: Export fls, flsl, flsll.
   314: Export explicit_bzero.
   315: Export pthread_mutex_timedlock.
+  316: Export pthread_rwlock_timedrdlock, pthread_rwlock_timedwrlock.
 
   Note that we forgot to bump the api for ualarm, strtoll, strtoull,
   sigaltstack, sethostname. */
 
 #define CYGWIN_VERSION_API_MAJOR 0
-#define CYGWIN_VERSION_API_MINOR 315
+#define CYGWIN_VERSION_API_MINOR 316
 
 /* There is also a compatibity version number associated with the shared memory
    regions.  It is incremented when incompatible changes are made to the shared

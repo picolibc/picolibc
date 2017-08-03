@@ -1,7 +1,10 @@
 What's new:
 -----------
 
-- New APIs: explicit_bzero, pthread_mutex_timedwait.
+- New APIs: explicit_bzero.
+
+- New APIs: pthread_mutex_timedwait, pthread_rwlock_timedrdlock,
+	    pthread_rwlock_timedwrlock.
 
 
 What changed:

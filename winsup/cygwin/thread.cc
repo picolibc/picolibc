@@ -1413,7 +1413,7 @@ pthread_rwlock::~pthread_rwlock ()
 }
 
 int
-pthread_rwlock::rdlock ()
+pthread_rwlock::rdlock (PLARGE_INTEGER timeout)
 {
   int result = 0;
   struct RWLOCK_READER *reader;
@@ -1435,7 +1435,7 @@ pthread_rwlock::rdlock ()
       pthread_cleanup_push (pthread_rwlock::rdlock_cleanup, this);
 
       ++waiting_readers;
-      cond_readers.wait (&mtx);
+      cond_readers.wait (&mtx, timeout);
       --waiting_readers;
 
       pthread_cleanup_pop (0);
@@ -1481,7 +1481,7 @@ pthread_rwlock::tryrdlock ()
 }
 
 int
-pthread_rwlock::wrlock ()
+pthread_rwlock::wrlock (PLARGE_INTEGER timeout)
 {
   int result = 0;
   pthread_t self = pthread::self ();
@@ -1499,7 +1499,7 @@ pthread_rwlock::wrlock ()
       pthread_cleanup_push (pthread_rwlock::wrlock_cleanup, this);
 
       ++waiting_writers;
-      cond_writers.wait (&mtx);
+      cond_writers.wait (&mtx, timeout);
       --waiting_writers;
 
       pthread_cleanup_pop (0);
@@ -3046,6 +3046,37 @@ pthread_rwlock_rdlock (pthread_rwlock_t *rwlock)
 }
 
 extern "C" int
+pthread_rwlock_timedrdlock (pthread_rwlock_t *rwlock,
+			    const struct timespec *abstime)
+{
+  LARGE_INTEGER timeout;
+
+  pthread_testcancel ();
+
+  if (pthread_rwlock::is_initializer (rwlock))
+    pthread_rwlock::init (rwlock, NULL);
+  if (!pthread_rwlock::is_good_object (rwlock))
+    return EINVAL;
+
+  /* According to SUSv3, abstime need not be checked for validity,
+     if the rwlock can be locked immediately. */
+  if (!(*rwlock)->tryrdlock ())
+    return 0;
+
+  __try
+    {
+      int err = pthread_convert_abstime (CLOCK_REALTIME, abstime, &timeout);
+      if (err)
+	return err;
+
+      return (*rwlock)->rdlock (&timeout);
+    }
+  __except (NO_ERROR) {}
+  __endtry
+  return EINVAL;
+}
+
+extern "C" int
 pthread_rwlock_tryrdlock (pthread_rwlock_t *rwlock)
 {
   if (pthread_rwlock::is_initializer (rwlock))
@@ -3067,6 +3098,37 @@ pthread_rwlock_wrlock (pthread_rwlock_t *rwlock)
     return EINVAL;
 
   return (*rwlock)->wrlock ();
+}
+
+extern "C" int
+pthread_rwlock_timedwrlock (pthread_rwlock_t *rwlock,
+			    const struct timespec *abstime)
+{
+  LARGE_INTEGER timeout;
+
+  pthread_testcancel ();
+
+  if (pthread_rwlock::is_initializer (rwlock))
+    pthread_rwlock::init (rwlock, NULL);
+  if (!pthread_rwlock::is_good_object (rwlock))
+    return EINVAL;
+
+  /* According to SUSv3, abstime need not be checked for validity,
+     if the rwlock can be locked immediately. */
+  if (!(*rwlock)->trywrlock ())
+    return 0;
+
+  __try
+    {
+      int err = pthread_convert_abstime (CLOCK_REALTIME, abstime, &timeout);
+      if (err)
+	return err;
+
+      return (*rwlock)->wrlock (&timeout);
+    }
+  __except (NO_ERROR) {}
+  __endtry
+  return EINVAL;
 }
 
 extern "C" int
