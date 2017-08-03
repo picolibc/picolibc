@@ -1432,13 +1432,21 @@ pthread_rwlock::rdlock (PLARGE_INTEGER timeout)
 
   while (writer || waiting_writers)
     {
+      int ret;
+
       pthread_cleanup_push (pthread_rwlock::rdlock_cleanup, this);
 
       ++waiting_readers;
-      cond_readers.wait (&mtx, timeout);
+      ret = cond_readers.wait (&mtx, timeout);
       --waiting_readers;
 
       pthread_cleanup_pop (0);
+
+      if (ret == ETIMEDOUT)
+	{
+	  result = ETIMEDOUT;
+	  goto DONE;
+	}
     }
 
   if ((reader = add_reader ()))
@@ -1496,13 +1504,21 @@ pthread_rwlock::wrlock (PLARGE_INTEGER timeout)
 
   while (writer || readers)
     {
+      int ret;
+
       pthread_cleanup_push (pthread_rwlock::wrlock_cleanup, this);
 
       ++waiting_writers;
-      cond_writers.wait (&mtx, timeout);
+      ret = cond_writers.wait (&mtx, timeout);
       --waiting_writers;
 
       pthread_cleanup_pop (0);
+
+      if (ret == ETIMEDOUT)
+	{
+	  result = ETIMEDOUT;
+	  goto DONE;
+	}
     }
 
   writer = self;
@@ -1775,8 +1791,14 @@ pthread_mutex::lock (PLARGE_INTEGER timeout)
   else if (type == PTHREAD_MUTEX_NORMAL /* potentially causes deadlock */
 	   || !pthread::equal (owner, self))
     {
-      cygwait (win32_obj_id, timeout, cw_sig | cw_sig_restart);
-      set_owner (self);
+      if (cygwait (win32_obj_id, timeout, cw_sig | cw_sig_restart)
+	  != WAIT_TIMEOUT)
+	set_owner (self);
+      else
+	{
+	  InterlockedDecrement (&lock_counter);
+	  result = ETIMEDOUT;
+	}
     }
   else
     {
