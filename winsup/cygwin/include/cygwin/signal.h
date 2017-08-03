@@ -265,7 +265,8 @@ enum
   SI_MESGQ,				/* sent by real time mesq state change
 					   (currently unimplemented) */
   SI_TIMER,				/* sent by timer expiration */
-  SI_QUEUE,				/* sent by sigqueue */
+  SI_QUEUE,				/* sent by sigqueue (currently
+					   unimplemented) */
   SI_KERNEL,				/* sent by system */
 
   ILL_ILLOPC,				/* illegal opcode */
