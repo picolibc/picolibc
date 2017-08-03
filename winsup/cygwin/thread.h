@@ -693,11 +693,10 @@ public:
   }
 
 private:
-  int _wait ();
   void _post ();
   int _getvalue (int *sval);
   int _trywait ();
-  int _timedwait (const struct timespec *abstime);
+  int _wait (PLARGE_INTEGER timeout = NULL);
 
   void _fixup_before_fork ();
   void _fixup_after_fork ();
