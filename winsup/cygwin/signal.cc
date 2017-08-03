@@ -623,14 +623,9 @@ sigwaitinfo (const sigset_t *set, siginfo_t *info)
   return res;
 }
 
-/* FIXME: SUSv3 says that this function should block until the signal has
-   actually been delivered.  Currently, this will only happen when sending
-   signals to the current process.  It will not happen when sending signals
-   to other processes.  */
-extern "C" int
-sigqueue (pid_t pid, int sig, const union sigval value)
+int
+__SYS_rt_sigqueueinfo (pid_t pid, int sig, siginfo_t *si)
 {
-  siginfo_t si = {0};
   pinfo dest (pid);
   if (!dest)
     {
@@ -639,15 +634,27 @@ sigqueue (pid_t pid, int sig, const union sigval value)
     }
   if (sig == 0)
     return 0;
-  if (sig < 0 || sig >= NSIG)
+  if (sig < 0 || sig >= NSIG
+      || !si || si->si_code < SI_ASYNCIO || si->si_code > SI_KERNEL)
     {
       set_errno (EINVAL);
       return -1;
     }
+  return sig_send (dest, *si);
+}
+
+/* FIXME: SUSv3 says that this function should block until the signal has
+   actually been delivered.  Currently, this will only happen when sending
+   signals to the current process.  It will not happen when sending signals
+   to other processes.  */
+extern "C" int
+sigqueue (pid_t pid, int sig, const union sigval value)
+{
+  siginfo_t si = {0};
   si.si_signo = sig;
   si.si_code = SI_QUEUE;
   si.si_value = value;
-  return sig_send (dest, si);
+  return __SYS_rt_sigqueueinfo (pid, sig, &si);
 }
 
 extern "C" int
