@@ -368,7 +368,7 @@ typedef	int jmp_buf[_JBLEN];
 
 _END_STD_C
 
-#if defined(__CYGWIN__) || defined(__rtems__)
+#if (defined(__CYGWIN__) || defined(__rtems__)) && __POSIX_VISIBLE
 #include <signal.h>
 
 #ifdef __cplusplus
@@ -450,4 +450,4 @@ extern int _setjmp (jmp_buf);
 #ifdef __cplusplus
 }
 #endif
-#endif /* __CYGWIN__ or __rtems__ */
+#endif /* (__CYGWIN__ or __rtems__) and __POSIX_VISIBLE */
