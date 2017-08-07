@@ -735,13 +735,36 @@ _ELIDABLE_INLINE int __sputc_r(struct _reent *_ptr, int _c, FILE *_p) {
 #define	fileno(p)	__sfileno(p)
 #endif
 
-#ifndef __CYGWIN__
-#ifndef lint
-#define	getc(fp)	__sgetc_r(_REENT, fp)
-#define putc(x, fp)	__sputc_r(_REENT, x, fp)
-#endif /* lint */
-#endif /* __CYGWIN__ */
+static __inline int
+_getchar_unlocked(void)
+{
+	struct _reent *_ptr;
+
+	_ptr = _REENT;
+	return (__sgetc_r(_ptr, _stdin_r(_ptr)));
+}
+
+static __inline int
+_putchar_unlocked(int _c)
+{
+	struct _reent *_ptr;
+
+	_ptr = _REENT;
+	return (__sputc_r(_ptr, _c, _stdout_r(_ptr)));
+}
+
+#ifdef __SINGLE_THREAD__
+#define	getc(_p)	__sgetc_r(_REENT, _p)
+#define	putc(_c, _p)	__sputc_r(_REENT, _c, _p)
+#define	getchar()	_getchar_unlocked()
+#define	putchar(_c)	_putchar_unlocked(_c)
+#endif /* __SINGLE_THREAD__ */
 #endif /* __cplusplus */
+
+#if __MISC_VISIBLE || __POSIX_VISIBLE
+#define	getchar_unlocked()	_getchar_unlocked()
+#define	putchar_unlocked(_c)	_putchar_unlocked(_c)
+#endif
 
 #if __MISC_VISIBLE
 /* fast always-buffered version, true iff error */
@@ -756,7 +779,7 @@ _ELIDABLE_INLINE int __sputc_r(struct _reent *_ptr, int _c, FILE *_p) {
 #define L_ctermid       16
 #endif
 
-#endif /* !__CUSTOM_FILE_IO__ */
+#else /* __CUSTOM_FILE_IO__ */
 
 #define	getchar()	getc(stdin)
 #define	putchar(x)	putc(x, stdout)
@@ -765,6 +788,8 @@ _ELIDABLE_INLINE int __sputc_r(struct _reent *_ptr, int _c, FILE *_p) {
 #define	getchar_unlocked()	getc_unlocked(stdin)
 #define	putchar_unlocked(x)	putc_unlocked(x, stdout)
 #endif
+
+#endif /* !__CUSTOM_FILE_IO__ */
 
 _END_STD_C
 
