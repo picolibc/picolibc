@@ -157,6 +157,7 @@
 
 	bl	FUNCTION (_init)
 
+#ifdef ARM_RDI_MONITOR
 	/* Fetch and parse the command line.  */
 	ldr	x1, .Lcmdline		/* Command line descriptor.  */
 	mov	w0, #AngelSVC_Reason_GetCmdLine
@@ -218,6 +219,11 @@
 	/* Move sp to the 16B boundary below argv.  */
 	and	x4, x1, ~15
 	mov	sp, x4
+
+#else
+	mov	x0, #0	/* argc = 0 */
+	mov	x1, #0	/* argv = NULL */
+#endif
 
 	bl	FUNCTION (main)
 
