@@ -103,10 +103,12 @@ am__objects_2 = lib_a-__adjust.$(OBJEXT) lib_a-__atexit.$(OBJEXT) \
 	lib_a-realloc.$(OBJEXT) lib_a-reallocarray.$(OBJEXT) \
 	lib_a-reallocf.$(OBJEXT) lib_a-sb_charsets.$(OBJEXT) \
 	lib_a-strtod.$(OBJEXT) lib_a-strtodg.$(OBJEXT) \
-	lib_a-strtol.$(OBJEXT) lib_a-strtorx.$(OBJEXT) \
-	lib_a-strtoul.$(OBJEXT) lib_a-utoa.$(OBJEXT) \
-	lib_a-wcstod.$(OBJEXT) lib_a-wcstol.$(OBJEXT) \
-	lib_a-wcstoul.$(OBJEXT) lib_a-wcstombs.$(OBJEXT) \
+	lib_a-strtoimax.$(OBJEXT) lib_a-strtol.$(OBJEXT) \
+	lib_a-strtorx.$(OBJEXT) lib_a-strtoul.$(OBJEXT) \
+	lib_a-strtoumax.$(OBJEXT) lib_a-utoa.$(OBJEXT) \
+	lib_a-wcstod.$(OBJEXT) lib_a-wcstoimax.$(OBJEXT) \
+	lib_a-wcstol.$(OBJEXT) lib_a-wcstoul.$(OBJEXT) \
+	lib_a-wcstoumax.$(OBJEXT) lib_a-wcstombs.$(OBJEXT) \
 	lib_a-wcstombs_r.$(OBJEXT) lib_a-wctomb.$(OBJEXT) \
 	lib_a-wctomb_r.$(OBJEXT) $(am__objects_1)
 am__objects_3 = lib_a-arc4random.$(OBJEXT) \
@@ -158,8 +160,9 @@ am__objects_9 = __adjust.lo __atexit.lo __call_atexit.lo __exp10.lo \
 	mbtowc.lo mbtowc_r.lo mlock.lo mprec.lo mstats.lo \
 	on_exit_args.lo quick_exit.lo rand.lo rand_r.lo random.lo \
 	realloc.lo reallocarray.lo reallocf.lo sb_charsets.lo \
-	strtod.lo strtodg.lo strtol.lo strtorx.lo strtoul.lo utoa.lo \
-	wcstod.lo wcstol.lo wcstoul.lo wcstombs.lo wcstombs_r.lo \
+	strtod.lo strtodg.lo strtoimax.lo strtol.lo strtorx.lo \
+	strtoul.lo strtoumax.lo utoa.lo wcstod.lo wcstoimax.lo \
+	wcstol.lo wcstoul.lo wcstoumax.lo wcstombs.lo wcstombs_r.lo \
 	wctomb.lo wctomb_r.lo $(am__objects_8)
 am__objects_10 = arc4random.lo arc4random_uniform.lo cxa_atexit.lo \
 	cxa_finalize.lo drand48.lo ecvtbuf.lo efgcvt.lo erand48.lo \
@@ -366,9 +369,9 @@ GENERAL_SOURCES = __adjust.c __atexit.c __call_atexit.c __exp10.c \
 	mbstowcs_r.c mbtowc.c mbtowc_r.c mlock.c mprec.c mstats.c \
 	on_exit_args.c quick_exit.c rand.c rand_r.c random.c realloc.c \
 	reallocarray.c reallocf.c sb_charsets.c strtod.c strtodg.c \
-	strtol.c strtorx.c strtoul.c utoa.c wcstod.c wcstol.c \
-	wcstoul.c wcstombs.c wcstombs_r.c wctomb.c wctomb_r.c \
-	$(am__append_1)
+	strtoimax.c strtol.c strtorx.c strtoul.c strtoumax.c utoa.c \
+	wcstod.c wcstoimax.c wcstol.c wcstoul.c wcstoumax.c wcstombs.c \
+	wcstombs_r.c wctomb.c wctomb_r.c $(am__append_1)
 @NEWLIB_NANO_MALLOC_FALSE@MALIGNR = malignr
 @NEWLIB_NANO_MALLOC_TRUE@MALIGNR = nano-malignr
 @NEWLIB_NANO_MALLOC_FALSE@MALLOPTR = malloptr
@@ -945,6 +948,12 @@ lib_a-strtodg.o: strtodg.c
 lib_a-strtodg.obj: strtodg.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-strtodg.obj `if test -f 'strtodg.c'; then $(CYGPATH_W) 'strtodg.c'; else $(CYGPATH_W) '$(srcdir)/strtodg.c'; fi`
 
+lib_a-strtoimax.o: strtoimax.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-strtoimax.o `test -f 'strtoimax.c' || echo '$(srcdir)/'`strtoimax.c
+
+lib_a-strtoimax.obj: strtoimax.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-strtoimax.obj `if test -f 'strtoimax.c'; then $(CYGPATH_W) 'strtoimax.c'; else $(CYGPATH_W) '$(srcdir)/strtoimax.c'; fi`
+
 lib_a-strtol.o: strtol.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-strtol.o `test -f 'strtol.c' || echo '$(srcdir)/'`strtol.c
 
@@ -963,6 +972,12 @@ lib_a-strtoul.o: strtoul.c
 lib_a-strtoul.obj: strtoul.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-strtoul.obj `if test -f 'strtoul.c'; then $(CYGPATH_W) 'strtoul.c'; else $(CYGPATH_W) '$(srcdir)/strtoul.c'; fi`
 
+lib_a-strtoumax.o: strtoumax.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-strtoumax.o `test -f 'strtoumax.c' || echo '$(srcdir)/'`strtoumax.c
+
+lib_a-strtoumax.obj: strtoumax.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-strtoumax.obj `if test -f 'strtoumax.c'; then $(CYGPATH_W) 'strtoumax.c'; else $(CYGPATH_W) '$(srcdir)/strtoumax.c'; fi`
+
 lib_a-utoa.o: utoa.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-utoa.o `test -f 'utoa.c' || echo '$(srcdir)/'`utoa.c
 
@@ -975,6 +990,12 @@ lib_a-wcstod.o: wcstod.c
 lib_a-wcstod.obj: wcstod.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-wcstod.obj `if test -f 'wcstod.c'; then $(CYGPATH_W) 'wcstod.c'; else $(CYGPATH_W) '$(srcdir)/wcstod.c'; fi`
 
+lib_a-wcstoimax.o: wcstoimax.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-wcstoimax.o `test -f 'wcstoimax.c' || echo '$(srcdir)/'`wcstoimax.c
+
+lib_a-wcstoimax.obj: wcstoimax.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-wcstoimax.obj `if test -f 'wcstoimax.c'; then $(CYGPATH_W) 'wcstoimax.c'; else $(CYGPATH_W) '$(srcdir)/wcstoimax.c'; fi`
+
 lib_a-wcstol.o: wcstol.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-wcstol.o `test -f 'wcstol.c' || echo '$(srcdir)/'`wcstol.c
 
@@ -986,6 +1007,12 @@ lib_a-wcstoul.o: wcstoul.c
 
 lib_a-wcstoul.obj: wcstoul.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-wcstoul.obj `if test -f 'wcstoul.c'; then $(CYGPATH_W) 'wcstoul.c'; else $(CYGPATH_W) '$(srcdir)/wcstoul.c'; fi`
+
+lib_a-wcstoumax.o: wcstoumax.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-wcstoumax.o `test -f 'wcstoumax.c' || echo '$(srcdir)/'`wcstoumax.c
+
+lib_a-wcstoumax.obj: wcstoumax.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-wcstoumax.obj `if test -f 'wcstoumax.c'; then $(CYGPATH_W) 'wcstoumax.c'; else $(CYGPATH_W) '$(srcdir)/wcstoumax.c'; fi`
 
 lib_a-wcstombs.o: wcstombs.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-wcstombs.o `test -f 'wcstombs.c' || echo '$(srcdir)/'`wcstombs.c
