@@ -83,7 +83,7 @@
 	FUNC_START	_start
 
 /* Start by setting up a stack */
-
+#ifdef ARM_RDI_MONITOR
 	/*  Issue Angel SVC to read memory info.
 
 	    ptr to ptr to 4 words to receive data.  */
@@ -101,6 +101,10 @@
 	   exposed here in the HeapInfo Angel call.  */
 	ldr	x0, .LC0		/* point at returned values */
 	ldr	x1, [x0, #8]		/* get heap_limit */
+#else
+	/* Set up the stack pointer to a fixed value.  */
+	ldr     x1, .Lstack
+#endif
 #ifdef __ILP32__
 	/* Sanity check on the heap base.  */
 	ldr	x0, [x0]		/* get heap_base */
@@ -149,10 +153,12 @@
 	bl	FUNCTION (initialise_monitor_handles)
 #endif
 
+#ifdef __USES_INITFINI__
 	/* .init and .fini sections are used to create constructors
 	   and destructors.  Here we call the _init function and arrange
 	   for _fini to be called at program exit.  */
 	ldr	x0, .Lfini
+#endif
 	bl	FUNCTION (atexit)
 
 	bl	FUNCTION (_init)
@@ -237,14 +243,24 @@ FUNCTION (_cpu_init_hook):
 	ret
 
 	.align 3
+#ifdef ARM_RDP_MONITOR
 .LC0:
 	GEN_DWORD HeapBase
+#else
+.Lstack:
+	GEN_DWORD __stack
+
+	.weak __stack
+#endif
 .LC1:
 	GEN_DWORD __bss_start__
 .LC2:
 	GEN_DWORD __bss_end__
+#ifdef __USES_INITFINI__
 .Lfini:
 	GEN_DWORD FUNCTION(_fini)
+#endif
+#ifdef ARM_RDI_MONITOR
 .Lenvp:
 	GEN_DWORD env
 .Lcmdline:
@@ -268,3 +284,4 @@ CommandLine:	.space	256,0	/*  Maximum length of 255 chars handled.  */
 AngelSVCArgs:
 	GEN_DWORD CommandLine
 	.dword	255
+#endif
