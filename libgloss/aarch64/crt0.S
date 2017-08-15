@@ -243,7 +243,7 @@ FUNCTION (_cpu_init_hook):
 	ret
 
 	.align 3
-#ifdef ARM_RDP_MONITOR
+#ifdef ARM_RDI_MONITOR
 .LC0:
 	GEN_DWORD HeapBase
 #else
