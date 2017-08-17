@@ -35,7 +35,7 @@
 
 extern char **environ;
 
-void _exit(int status) _ATTRIBUTE ((noreturn));
+void _exit(int status) _ATTRIBUTE ((__noreturn__));
 
 int	access(const char *pathname, int mode);
 unsigned int alarm(unsigned seconds);
