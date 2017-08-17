@@ -153,12 +153,10 @@
 	bl	FUNCTION (initialise_monitor_handles)
 #endif
 
-#ifdef __USES_INITFINI__
 	/* .init and .fini sections are used to create constructors
 	   and destructors.  Here we call the _init function and arrange
 	   for _fini to be called at program exit.  */
 	ldr	x0, .Lfini
-#endif
 	bl	FUNCTION (atexit)
 
 	bl	FUNCTION (_init)
@@ -256,10 +254,8 @@ FUNCTION (_cpu_init_hook):
 	GEN_DWORD __bss_start__
 .LC2:
 	GEN_DWORD __bss_end__
-#ifdef __USES_INITFINI__
 .Lfini:
 	GEN_DWORD FUNCTION(_fini)
-#endif
 #ifdef ARM_RDI_MONITOR
 .Lenvp:
 	GEN_DWORD env
