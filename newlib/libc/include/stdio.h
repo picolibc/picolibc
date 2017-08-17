@@ -384,6 +384,9 @@ int	_EXFUN(vdprintf, (int, const char *__restrict, __VALIST)
 #endif
 #if __ATFILE_VISIBLE
 int	_EXFUN(renameat, (int, const char *, int, const char *));
+# ifdef __CYGWIN__
+int	_EXFUN(renameat2, (int, const char *, int, const char *, unsigned int));
+# endif
 #endif
 
 /*

@@ -1168,6 +1168,7 @@ remquof NOSIGFE
 remquol NOSIGFE
 rename SIGFE
 renameat SIGFE
+renameat2 SIGFE
 res_close = __res_close SIGFE
 res_init = __res_init SIGFE
 res_mkquery = __res_mkquery SIGFE
