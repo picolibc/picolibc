@@ -41,7 +41,7 @@ extern "C" {
 #else
 #include "../tlsoffsets.h"
 #endif
-__attribute__((gnu_inline))
+__attribute__((__gnu_inline__))
 extern inline struct _reent *__getreent (void)
 {
   register char *ret;
