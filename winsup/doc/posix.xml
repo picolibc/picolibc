@@ -1356,6 +1356,7 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     ptsname_r
     putwc_unlocked
     putwchar_unlocked
+    renameat2			(see chapter "Implementation Notes")
     qsort_r			(see chapter "Implementation Notes")
     quotactl
     rawmemchr
@@ -1670,6 +1671,9 @@ group quotas, no inode quotas, no time constraints.</para>
 
 <para><function>qsort_r</function> is available in both BSD and GNU flavors,
 depending on whether _BSD_SOURCE or _GNU_SOURCE is defined when compiling.</para>
+
+<para>The Linux-specific function <function>renameat2</function> only
+supports the RENAME_NOREPLACE flag.</para>
 
 <para><function>basename</function> is available in both POSIX and GNU flavors,
 depending on whether libgen.h is included or not.</para>

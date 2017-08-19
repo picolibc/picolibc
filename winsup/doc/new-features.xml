@@ -18,6 +18,10 @@ pthread_rwlock_timedwrlock.
 </para></listitem>
 
 <listitem><para>
+New API: renameat2.
+</para></listitem>
+
+<listitem><para>
 Improved implementation of &lt;elf.h&gt;.
 </para></listitem>
 

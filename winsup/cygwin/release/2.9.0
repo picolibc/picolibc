@@ -6,6 +6,8 @@ What's new:
 - New APIs: pthread_mutex_timedwait, pthread_rwlock_timedrdlock,
 	    pthread_rwlock_timedwrlock.
 
+- New API: renameat2.
+
 
 What changed:
 -------------
