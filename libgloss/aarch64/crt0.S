@@ -101,10 +101,7 @@
 	   exposed here in the HeapInfo Angel call.  */
 	ldr	x0, .LC0		/* point at returned values */
 	ldr	x1, [x0, #8]		/* get heap_limit */
-#else
-	/* Set up the stack pointer to a fixed value.  */
-	ldr     x1, .Lstack
-#endif
+
 #ifdef __ILP32__
 	/* Sanity check on the heap base.  */
 	ldr	x0, [x0]		/* get heap_base */
@@ -127,6 +124,10 @@
 	   Angel API call is larger than or equal to 4 GiB.  */
 	tst	x1, #0xffffffff00000000
 	csinv	w1, w1, wzr, eq
+#endif
+#else
+	/* Set up the stack pointer to a fixed value.  */
+	ldr     x1, .Lstack
 #endif
 
 	/* Ensure quad-word stack alignment.  */
