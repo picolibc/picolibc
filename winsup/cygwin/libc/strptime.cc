@@ -573,6 +573,26 @@ literal:
 			bp = conv_num(bp, &tm->tm_sec, 0, 61, ALT_DIGITS);
 			continue;
 
+		case 's' :	/* The seconds since Unix epoch - GNU extension */
+		    {
+			long long sec;
+			time_t t;
+			char *end;
+			save_errno save;
+
+			LEGAL_ALT(0);
+			sec = strtoll_l ((char *)bp, &end, 10, locale);
+			t = sec;
+			if (end == (char *)bp
+			    || errno != 0
+			    || t != sec
+			    || localtime_r (&t, tm) != tm)
+			    return NULL;
+			bp = (const unsigned char *)end;
+			ymd |= SET_YDAY | SET_WDAY | SET_YMD;
+			break;
+		    }
+
 		case 'U':	/* The week of year, beginning on sunday. */
 		case 'W':	/* The week of year, beginning on monday. */
 			/*
