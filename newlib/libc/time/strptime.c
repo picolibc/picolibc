@@ -38,6 +38,9 @@
 #include <strings.h>
 #include <ctype.h>
 #include <stdlib.h>
+#include <errno.h>
+#include <inttypes.h>
+#include <limits.h>
 #include "../locale/setlocale.h"
 
 #define _ctloc(x) (_CurrentTimeLocale->x)
@@ -230,8 +233,15 @@ strptime_l (const char *buf, const char *format, struct tm *timeptr,
 		buf = s;
 		ymd |= SET_MDAY;
 		break;
+	    case 'F' :		/* %Y-%m-%d - GNU extension */
+		s = strptime_l (buf, "%Y-%m-%d", timeptr, locale);
+		if (s == NULL || s == buf)
+		    return NULL;
+		buf = s;
+		ymd |= SET_YMD;
+		break;
 	    case 'H' :
-	    case 'k' :
+	    case 'k' :		/* hour with leading space - GNU extension */
 		ret = strtol_l (buf, &s, 10, locale);
 		if (s == buf)
 		    return NULL;
@@ -239,7 +249,7 @@ strptime_l (const char *buf, const char *format, struct tm *timeptr,
 		buf = s;
 		break;
 	    case 'I' :
-	    case 'l' :
+	    case 'l' :		/* hour with leading space - GNU extension */
 		ret = strtol_l (buf, &s, 10, locale);
 		if (s == buf)
 		    return NULL;
@@ -300,6 +310,26 @@ strptime_l (const char *buf, const char *format, struct tm *timeptr,
 		    return NULL;
 		buf = s;
 		break;
+	    case 's' :		/* seconds since Unix epoch - GNU extension */
+		{
+		    long long sec;
+		    time_t t;
+		    int save_errno;
+
+		    save_errno = errno;
+		    errno = 0;
+		    sec = strtoll_l (buf, &s, 10, locale);
+		    t = sec;
+		    if (s == buf
+			|| errno != 0
+			|| t != sec
+			|| localtime_r (&t, timeptr) != timeptr)
+			return NULL;
+		    errno = save_errno;
+		    buf = s;
+		    ymd |= SET_YDAY | SET_WDAY | SET_YMD;
+		    break;
+		}
 	    case 'S' :
 		ret = strtol_l (buf, &s, 10, locale);
 		if (s == buf)
