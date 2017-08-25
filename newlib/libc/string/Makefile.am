@@ -40,6 +40,7 @@ GENERAL_SOURCES = \
 	strncmp.c \
 	strncpy.c \
 	strnlen.c \
+	strnstr.c \
 	strpbrk.c \
 	strrchr.c \
 	strsep.c \

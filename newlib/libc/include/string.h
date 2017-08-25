@@ -121,6 +121,9 @@ size_t	 _EXFUN(strnlen,(const char *, size_t));
 #if __BSD_VISIBLE
 char 	*_EXFUN(strsep,(char **, const char *));
 #endif
+#if __BSD_VISIBLE
+char    *strnstr(const char *, const char *, size_t) __pure;
+#endif
 
 #if __MISC_VISIBLE
 char	*_EXFUN(strlwr,(char *));
