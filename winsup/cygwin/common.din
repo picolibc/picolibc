@@ -1376,6 +1376,7 @@ strncmp NOSIGFE
 strncpy NOSIGFE
 strndup SIGFE
 strnlen NOSIGFE
+strnstr NOSIGFE
 strpbrk NOSIGFE
 strptime SIGFE
 strptime_l SIGFE

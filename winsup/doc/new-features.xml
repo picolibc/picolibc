@@ -9,7 +9,7 @@
 <itemizedlist mark="bullet">
 
 <listitem><para>
-New APIs: explicit_bzero.
+New APIs: explicit_bzero, strnstr.
 </para></listitem>
 
 <listitem><para>
