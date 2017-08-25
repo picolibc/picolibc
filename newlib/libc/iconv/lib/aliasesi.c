@@ -34,49 +34,6 @@
 #include "local.h"
 
 /*
- * strnstr - locate a substring in a fixed-size string.
- *
- * PARAMETERS:
- *   _CONST char *haystack - the string in which to search.
- *   _CONST char *needle   - the string which to search.
- *   int length            - the maximum 'haystack' string length.
- *
- * DESCRIPTION:
- *   The  strstr() function finds the first occurrence of the substring 
- *   'needle' in the string 'haystack'. At most 'length' bytes are searched.
- *
- * RETURN:
- *   Returns a pointer to the beginning of substring, or NULL if substring
- *   was not found.
- */
-static char *
-_DEFUN(strnstr, (haystack, needle, length),
-                _CONST char *haystack _AND
-                _CONST char *needle   _AND
-                int length)
-{
-  _CONST char *max = haystack + length;
-
-  if (*haystack == '\0')
-    return *needle == '\0' ? (char *)haystack : (char *)NULL;
-
-  while (haystack < max)
-    {
-      int i = 0;
-      while (1)
-        {
-          if (needle[i] == '\0')
-            return (char *)haystack;
-          if (needle[i] != haystack[i])
-            break;
-          i += 1;
-        }
-      haystack += 1;
-    }
-  return (char *)NULL;
-}
-
-/*
  * canonical_form - canonize 'str'.
  *
  * PARAMETERS:
