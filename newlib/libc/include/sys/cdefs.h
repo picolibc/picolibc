@@ -681,42 +681,44 @@
 #endif
 
 /* Structure implements a lock. */
-#define	__lockable		__lock_annotate(__lockable__)
+/* FIXME: Use __lockable__, etc. to avoid colliding with user namespace macros,
+ * once clang is fixed: https://bugs.llvm.org/show_bug.cgi?id=34319 */
+#define	__lockable		__lock_annotate(lockable)
 
 /* Function acquires an exclusive or shared lock. */
 #define	__locks_exclusive(...) \
-	__lock_annotate(__exclusive_lock_function__(__VA_ARGS__))
+	__lock_annotate(exclusive_lock_function(__VA_ARGS__))
 #define	__locks_shared(...) \
-	__lock_annotate(__shared_lock_function__(__VA_ARGS__))
+	__lock_annotate(shared_lock_function(__VA_ARGS__))
 
 /* Function attempts to acquire an exclusive or shared lock. */
 #define	__trylocks_exclusive(...) \
-	__lock_annotate(__exclusive_trylock_function__(__VA_ARGS__))
+	__lock_annotate(exclusive_trylock_function(__VA_ARGS__))
 #define	__trylocks_shared(...) \
-	__lock_annotate(__shared_trylock_function__(__VA_ARGS__))
+	__lock_annotate(shared_trylock_function(__VA_ARGS__))
 
 /* Function releases a lock. */
-#define	__unlocks(...)		__lock_annotate(__unlock_function__(__VA_ARGS__))
+#define	__unlocks(...)		__lock_annotate(unlock_function(__VA_ARGS__))
 
 /* Function asserts that an exclusive or shared lock is held. */
 #define	__asserts_exclusive(...) \
-	__lock_annotate(__assert_exclusive_lock__(__VA_ARGS__))
+	__lock_annotate(assert_exclusive_lock(__VA_ARGS__))
 #define	__asserts_shared(...) \
-	__lock_annotate(__assert_shared_lock__(__VA_ARGS__))
+	__lock_annotate(assert_shared_lock(__VA_ARGS__))
 
 /* Function requires that an exclusive or shared lock is or is not held. */
 #define	__requires_exclusive(...) \
-	__lock_annotate(__exclusive_locks_required__(__VA_ARGS__))
+	__lock_annotate(exclusive_locks_required(__VA_ARGS__))
 #define	__requires_shared(...) \
-	__lock_annotate(__shared_locks_required__(__VA_ARGS__))
+	__lock_annotate(shared_locks_required(__VA_ARGS__))
 #define	__requires_unlocked(...) \
-	__lock_annotate(__locks_excluded__(__VA_ARGS__))
+	__lock_annotate(locks_excluded(__VA_ARGS__))
 
 /* Function should not be analyzed. */
-#define	__no_lock_analysis	__lock_annotate(__no_thread_safety_analysis__)
+#define	__no_lock_analysis	__lock_annotate(no_thread_safety_analysis)
 
 /* Guard variables and structure members by lock. */
-#define	__guarded_by(x)		__lock_annotate(__guarded_by__(x))
-#define	__pt_guarded_by(x)	__lock_annotate(__pt_guarded_by__(x))
+#define	__guarded_by(x)		__lock_annotate(guarded_by(x))
+#define	__pt_guarded_by(x)	__lock_annotate(pt_guarded_by(x))
 
 #endif /* !_SYS_CDEFS_H_ */
