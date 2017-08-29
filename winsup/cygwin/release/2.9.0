@@ -33,3 +33,6 @@ Bug Fixes
 
 - Fix a clear screen issue in Windows console when running under codepage 65001.
   Addresses: https://cygwin.com/ml/cygwin/2017-07/msg00430.html
+
+- Fix bug in strptime %F field width handling.
+  Addresses: https://cygwin.com/ml/cygwin-patches/2017-q3/msg00033.html
