@@ -413,13 +413,15 @@ literal:
 		case 'F':	/* The date as "%Y-%m-%d". */
 			{
 			  LEGAL_ALT(0);
-			  ymd |= SET_YMD;
 			  char *tmp = __strptime ((const char *) bp, "%Y-%m-%d",
 						  tm, era_info, alt_digits,
 						  locale);
-			  if (tmp && (uint) (tmp - (char *) bp) > width)
+			  /* width max chars converted, default 10, < 6 => 6 */
+			  if (tmp && (char *) bp +
+				(!width ? 10 : width < 6 ? 6 : width) < tmp)
 			    return NULL;
 			  bp = (const unsigned char *) tmp;
+			  ymd |= SET_YMD;
 			  continue;
 			}
 
