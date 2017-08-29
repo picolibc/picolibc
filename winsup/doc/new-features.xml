@@ -25,6 +25,10 @@ New API: renameat2.
 Improved implementation of &lt;elf.h&gt;.
 </para></listitem>
 
+<listitem><para>
+strptime(3) supports %s (seconds since Epoch) now, analogue to strftime.
+</para></listitem>
+
 </itemizedlist>
 
 </sect2>
