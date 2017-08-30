@@ -9,13 +9,6 @@ ANSI_SYNOPSIS
 	#include <string.h>
 	size_t strnstr(const char *<[s1]>, const char *<[s2]>, size_t <[n]>);
 
-TRAD_SYNOPSIS
-	#include <string.h>
-	size_t strnstr(<[s1]>, <[s2]>, <[n]>)
-	char *<[s1]>;
-        char *<[s2]>;
-	size_t <[n]>;
-
 DESCRIPTION
 	Locates the first occurrence in the string pointed to by <[s1]> of
 	the sequence of limited to the <[n]> characters in the string
