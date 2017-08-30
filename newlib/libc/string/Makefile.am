@@ -164,6 +164,6 @@ wmemcmp.def	wmemcpy.def	wmemmove.def	wmemset.def \
 memmem.def	memrchr.def	rawmemchr.def	strchrnul.def \
 strcasecmp_l.def strcoll_l.def	strncasecmp_l.def strxfrm_l.def \
 wcscasecmp_l.def wcscoll_l.def	wcsncasecmp_l.def wcsxfrm_l.def \
-strverscmp.def
+strverscmp.def	strnstr.def
 
 CHAPTERS = strings.tex wcstrings.tex
