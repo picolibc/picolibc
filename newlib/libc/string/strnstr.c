@@ -1,3 +1,42 @@
+/*
+FUNCTION
+	<<strnstr>>---find string segment
+
+INDEX
+	strnstr
+
+ANSI_SYNOPSIS
+	#include <string.h>
+	size_t strnstr(const char *<[s1]>, const char *<[s2]>, size_t <[n]>);
+
+TRAD_SYNOPSIS
+	#include <string.h>
+	size_t strnstr(<[s1]>, <[s2]>, <[n]>)
+	char *<[s1]>;
+        char *<[s2]>;
+	size_t <[n]>;
+
+DESCRIPTION
+	Locates the first occurrence in the string pointed to by <[s1]> of
+	the sequence of limited to the <[n]> characters in the string
+        pointed to by <[s2]>
+
+RETURNS
+	Returns a pointer to the located string segment, or a null
+	pointer if the string <[s2]> is not found. If <[s2]> points to
+	a string with zero length, <[s1]> is returned.
+
+
+PORTABILITY
+<<strnstr>> is ANSI C.
+
+<<strnstr>> requires no supporting OS subroutines.
+
+QUICKREF
+	strnstr ansi pure
+
+*/
+
 #undef __STRICT_ANSI__
 #include <_ansi.h>
 #include <string.h>
