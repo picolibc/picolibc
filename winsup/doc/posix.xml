@@ -1286,6 +1286,7 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     clog10
     clog10f
     clog10l
+    crypt_r			(available in external "crypt" library)
     dladdr			(see chapter "Implementation Notes")
     dremf
     dup3
