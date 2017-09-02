@@ -610,16 +610,20 @@ folders that are causing the error.  For example, sometimes files used by
 system services end up owned by the SYSTEM account and not writable by regular
 users.</para>
 <para>The quickest way to delete the entire tree if you run into this problem
-is to change the ownership of all files and folders to your account.  To do
+is to take ownership of all files and folders to your account.  To do
 this in Windows Explorer, right click on the root Cygwin folder, choose
 Properties, then the Security tab.  If you are using Simple File Sharing, you
 will need to boot into Safe Mode to access the Security tab.  Select Advanced,
 then go to the Owner tab and make sure your account is listed as the owner.
 Select the 'Replace owner on subcontainers and objects' checkbox and press Ok.
 After Explorer applies the changes you should be able to delete the entire tree
-in one operation.  Note that you can also achieve this in Cygwin by typing
-<literal>chown -R user /</literal> or by using other tools such as
-<literal>icacls.exe</literal>. 
+in one operation.  Note that you can also achieve by using other tools such as
+<literal>icacls.exe</literal> or directly from Cygwin by using
+<literal>chown</literal>.  Please note that you shouldn't use the
+recursive form of chown on directories that have other file systems
+mounted under them (specifically you must avoid
+<literal>/proc</literal>) since you'd change ownership of the files under those
+mount points as well.
 </para>
 </listitem>
 <listitem><para>Delete the Cygwin shortcuts on the Desktop and Start Menu, and
