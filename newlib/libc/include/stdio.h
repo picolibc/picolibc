@@ -762,12 +762,12 @@ _putchar_unlocked(int _c)
 #define	getchar()	_getchar_unlocked()
 #define	putchar(_c)	_putchar_unlocked(_c)
 #endif /* __SINGLE_THREAD__ */
-#endif /* __cplusplus */
 
 #if __MISC_VISIBLE || __POSIX_VISIBLE
 #define	getchar_unlocked()	_getchar_unlocked()
 #define	putchar_unlocked(_c)	_putchar_unlocked(_c)
 #endif
+#endif /* __cplusplus */
 
 #if __MISC_VISIBLE
 /* fast always-buffered version, true iff error */
