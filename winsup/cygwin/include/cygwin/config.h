@@ -79,6 +79,7 @@ extern inline struct _reent *__getreent (void)
 #define _STDIO_BSD_SEMANTICS 1
 #define __TM_GMTOFF tm_gmtoff
 #define __TM_ZONE   tm_zone
+#define _USE_LONG_TIME_T 1
 
 #if defined(__INSIDE_CYGWIN__) || defined(_COMPILING_NEWLIB)
 #define __EXPORT __declspec(dllexport)

@@ -343,6 +343,12 @@ One feature can be enabled by specifying `--enable-FEATURE=yes' or
      disables the optimization and saves size of text and stack.
      Enabled by default.
 
+`--enable-newlib-long-time_t'
+     Define time_t to long.  On platforms with a 32-bit long type, this gives
+     raise to the year 2038 problem.  The default type for time_t is a signed
+     64-bit integer on most systems.
+     Disabled by default.
+
 `--enable-multilib'
      Build many library versions.
      Enabled by default.

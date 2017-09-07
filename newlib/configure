@@ -804,6 +804,7 @@ enable_newlib_unbuf_stream_opt
 enable_lite_exit
 enable_newlib_nano_formatted_io
 enable_newlib_retargetable_locking
+enable_newlib_long_time_t
 enable_multilib
 enable_target_optspace
 enable_malloc_debugging
@@ -1477,6 +1478,7 @@ Optional Features:
   --enable-lite-exit	enable light weight exit
   --enable-newlib-nano-formatted-io    Use nano version formatted IO
   --enable-newlib-retargetable-locking    Allow locking routines to be retargeted at link time
+  --enable-newlib-long-time_t   define time_t to long
   --enable-multilib         build many library versions (default)
   --enable-target-optspace  optimize for space
   --enable-malloc-debugging indicate malloc debugging requested
@@ -2500,6 +2502,19 @@ else
   newlib_retargetable_locking=no
 fi
 
+
+# Check whether --enable-newlib-long-time_t was given.
+if test "${enable_newlib_long_time_t+set}" = set; then :
+  enableval=$enable_newlib_long_time_t; if test "${newlib_long_time_t+set}" != set; then
+  case "${enableval}" in
+    yes) newlib_long_time_t=yes ;;
+    no)  newlib_long_time_t=no  ;;
+    *)   as_fn_error $? "bad value ${enableval} for newlib-long-time_t option" "$LINENO" 5 ;;
+  esac
+ fi
+else
+  newlib_nano_malloc=
+fi
 
 
 # Make sure we can run config.sub.
@@ -11807,7 +11822,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<_LT_EOF
-#line 11810 "configure"
+#line 11825 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -11913,7 +11928,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<_LT_EOF
-#line 11916 "configure"
+#line 11931 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -12492,6 +12507,13 @@ fi
 if test "${newlib_retargetable_locking}" = "yes"; then
 cat >>confdefs.h <<_ACEOF
 #define _RETARGETABLE_LOCKING 1
+_ACEOF
+
+fi
+
+if test "${newlib_long_time_t}" = "yes"; then
+cat >>confdefs.h <<_ACEOF
+#define _WANT_USE_LONG_TIME_T 1
 _ACEOF
 
 fi
