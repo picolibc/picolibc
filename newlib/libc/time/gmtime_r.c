@@ -56,8 +56,8 @@ _DEFUN (gmtime_r, (tim_p, res),
   unsigned erayear, yearday, month, day;
   unsigned long eraday;
 
-  days = ((long)lcltime) / SECSPERDAY + EPOCH_ADJUSTMENT_DAYS;
-  rem = ((long)lcltime) % SECSPERDAY;
+  days = lcltime / SECSPERDAY + EPOCH_ADJUSTMENT_DAYS;
+  rem = lcltime % SECSPERDAY;
   if (rem < 0)
     {
       rem += SECSPERDAY;
