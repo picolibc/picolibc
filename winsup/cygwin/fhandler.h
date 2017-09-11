@@ -1439,7 +1439,7 @@ private:
   ssize_t __stdcall write (const void *ptr, size_t len);
   void doecho (const void *str, DWORD len) { (void) write (str, len); }
   int close ();
-  static bool exists () {return shared_console_info && !!GetConsoleCP ();}
+  static bool exists () {return !!GetConsoleCP ();}
 
   int tcflush (int);
   int tcsetattr (int a, const struct termios *t);
