@@ -23,7 +23,9 @@ static void WINAPI
 threadfunc_fe (VOID *arg)
 {
 #ifndef __x86_64__
+#pragma GCC diagnostic ignored "-Wframe-address"
   (void)__builtin_return_address(1);
+#pragma GCC diagnostic pop
   asm volatile ("andl $-16,%%esp" ::: "%esp");
 #endif
   _cygtls::call ((DWORD (*)  (void *, void *)) TlsGetValue (_my_oldfunc), arg);

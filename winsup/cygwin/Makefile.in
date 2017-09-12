@@ -73,11 +73,11 @@ CRT0:=$(cygwin_build)/crt0.o
 #
 MT_SAFE:=@MT_SAFE@
 CCEXTRA=
-COMMON_CFLAGS=-MMD ${$(*F)_CFLAGS} -Werror -fmerge-constants -ftracer $(CCEXTRA)
+COMMON_CFLAGS=-MMD ${$(*F)_CFLAGS} -Werror -fno-delete-null-pointer-checks -fmerge-constants -ftracer $(CCEXTRA)
 ifeq ($(target_cpu),x86_64)
 COMMON_CFLAGS+=-mcmodel=small
 endif
-COMPILE.cc+=${COMMON_CFLAGS}
+COMPILE.cc+=${COMMON_CFLAGS} -std=gnu++98
 COMPILE.c+=${COMMON_CFLAGS}
 
 AR:=@AR@
