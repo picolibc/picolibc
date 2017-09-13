@@ -21,17 +21,16 @@ RETURNS
 
 
 PORTABILITY
-<<strnstr>> is ANSI C.
+<<strnstr>> is a BSD extension.
 
 <<strnstr>> requires no supporting OS subroutines.
 
 QUICKREF
-	strnstr ansi pure
+	strnstr pure
 
 */
 
-#undef __STRICT_ANSI__
-#include <_ansi.h>
+#define	_GNU_SOURCE
 #include <string.h>
 
 /*
