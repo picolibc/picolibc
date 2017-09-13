@@ -24,7 +24,7 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * $FreeBSD$
+ * $FreeBSD: head/include/semaphore.h 314424 2017-02-28 21:47:00Z vangyzen $
  */
 
 /* semaphore.h: POSIX 1003.1b semaphores */
@@ -33,10 +33,14 @@
 #define _SEMAPHORE_H_
 
 #include <sys/cdefs.h>
+#include <sys/lock.h>
 #include <sys/_types.h>
 #include <sys/_timespec.h>
 
-typedef	__uint32_t	sem_t;
+typedef struct {
+	unsigned long _flags;
+	struct _Semaphore_Control _Semaphore;
+} sem_t;
 
 #define	SEM_FAILED	((sem_t *)0)
 
