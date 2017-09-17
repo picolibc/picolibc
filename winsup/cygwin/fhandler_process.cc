@@ -583,7 +583,7 @@ format_process_environ (void *data, char *&destbuf)
       cfree (destbuf);
       destbuf = NULL;
     }
-  destbuf = p->environ (fs);
+  destbuf = p ? p->environ (fs) : NULL;
   if (!destbuf || !*destbuf)
     {
       destbuf = cstrdup ("<defunct>");
