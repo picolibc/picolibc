@@ -260,7 +260,7 @@ _pinfo::kill (siginfo_t& si)
 	}
       this_pid = pid;
     }
-  else if (this && process_state == PID_EXITED)
+  else if (process_state == PID_EXITED)
     {
       this_process_state = process_state;
       this_pid = pid;
@@ -296,8 +296,17 @@ kill0 (pid_t pid, siginfo_t& si)
       syscall_printf ("signal %d out of range", si.si_signo);
       return -1;
     }
-
-  return (pid > 0) ? pinfo (pid)->kill (si) : kill_pgrp (-pid, si);
+  if (pid > 0)
+    {
+      pinfo p (pid);
+      if (!p)
+	{
+	  set_errno (ESRCH);
+	  return -1;
+	}
+      return p->kill (si);
+    }
+  return kill_pgrp (-pid, si);
 }
 
 int
