@@ -522,7 +522,7 @@ clock_gettime (clockid_t clk_id, struct timespec *tp)
 	pid = getpid ();
 
       pinfo p (pid);
-      if (!p->exists ())
+      if (!p || !p->exists ())
 	{
 	  set_errno (EINVAL);
 	  return -1;
@@ -746,8 +746,12 @@ clock_setres (clockid_t clk_id, struct timespec *tp)
 extern "C" int
 clock_getcpuclockid (pid_t pid, clockid_t *clk_id)
 {
-  if (pid != 0 && !pinfo (pid)->exists ())
-    return (ESRCH);
+  if (pid != 0)
+    {
+      pinfo p (pid);
+      if (!p || !p->exists ())
+	return (ESRCH);
+    }
   *clk_id = (clockid_t) PID_TO_CLOCKID (pid);
   return 0;
 }
