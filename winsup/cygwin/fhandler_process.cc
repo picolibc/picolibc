@@ -391,7 +391,7 @@ format_process_fd (void *data, char *&destbuf)
 	  set_errno (ENOENT);
 	  return 0;
 	}
-      destbuf = p->fd (fd, fs);
+      destbuf = p ? p->fd (fd, fs) : NULL;
       if (!destbuf || !*destbuf)
 	{
 	  set_errno (ENOENT);
