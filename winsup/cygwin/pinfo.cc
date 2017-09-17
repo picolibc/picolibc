@@ -884,7 +884,7 @@ char *
 _pinfo::root (size_t& n)
 {
   char *s;
-  if (!this || !pid)
+  if (!pid)
     return NULL;
   if (pid != myself->pid && !ISSTATE (this, PID_NOTCYGWIN))
     {
