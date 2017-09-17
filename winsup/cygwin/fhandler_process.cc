@@ -375,7 +375,7 @@ format_process_fd (void *data, char *&destbuf)
     {
       if (destbuf)
 	cfree (destbuf);
-      destbuf = p->fds (fs);
+      destbuf = p ? p->fds (fs) : NULL;
       *((process_fd_t *) data)->fd_type = virt_symlink;
     }
   else
