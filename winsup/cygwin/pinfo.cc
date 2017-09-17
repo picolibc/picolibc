@@ -720,7 +720,7 @@ _pinfo::commune_request (__uint32_t code, ...)
   res.s = NULL;
   res.n = 0;
 
-  if (!this || !pid)
+  if (!pid)
     {
       set_errno (ESRCH);
       goto err;
