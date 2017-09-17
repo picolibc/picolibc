@@ -930,7 +930,7 @@ char *
 _pinfo::cwd (size_t& n)
 {
   char *s = NULL;
-  if (!this || !pid)
+  if (!pid)
     return NULL;
   if (ISSTATE (this, PID_NOTCYGWIN))
     {

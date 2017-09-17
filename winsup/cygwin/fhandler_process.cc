@@ -498,7 +498,7 @@ format_process_cwd (void *data, char *&destbuf)
       cfree (destbuf);
       destbuf = NULL;
     }
-  destbuf = p->cwd (fs);
+  destbuf = p ? p->cwd (fs) : NULL;
   if (!destbuf || !*destbuf)
     {
       destbuf = cstrdup ("<defunct>");
