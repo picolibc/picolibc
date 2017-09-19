@@ -169,11 +169,11 @@ typedef struct {
 typedef __uint32_t pthread_key_t;        /* thread-specific data keys */
 
 typedef struct {
-  int   is_initialized;  /* is this structure initialized? */
-  int   init_executed;   /* has the initialization routine been run? */
-} pthread_once_t;       /* dynamic package initialization */
+  unsigned char _flags;
+} pthread_once_t;
 
-#define _PTHREAD_ONCE_INIT  { 1, 0 }  /* is initialized and not run */
+#define _PTHREAD_ONCE_INIT { 0 }
+
 #endif /* defined(_POSIX_THREADS) */
 
 /* POSIX Barrier Types */

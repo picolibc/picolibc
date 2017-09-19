@@ -41,12 +41,11 @@ typedef __uint32_t tss_t;
 
 /* pthread_once_t */
 typedef struct {
-	int	_is_initialized;
-	int	_init_executed;
+	unsigned char _flags;
 } once_flag;
 
 /* PTHREAD_ONCE_INIT */
-#define	ONCE_FLAG_INIT { 1, 0 }
+#define	ONCE_FLAG_INIT { 0 }
 
 /* PTHREAD_DESTRUCTOR_ITERATIONS */
 #define	TSS_DTOR_ITERATIONS 4
