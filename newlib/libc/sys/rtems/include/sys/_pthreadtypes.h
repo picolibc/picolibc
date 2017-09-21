@@ -206,9 +206,14 @@ typedef struct {
 /* POSIX Reader/Writer Lock Types */
 
 #if defined(_POSIX_READER_WRITER_LOCKS)
-typedef __uint32_t pthread_rwlock_t;         /* POSIX RWLock Object */
+typedef struct {
+  unsigned long _flags;
+  struct _Thread_queue_Queue _Queue;
+  unsigned int _current_state;
+  unsigned int _number_of_readers;
+} pthread_rwlock_t;
 
-#define _PTHREAD_RWLOCK_INITIALIZER ((pthread_rwlock_t) 0xFFFFFFFF)
+#define _PTHREAD_RWLOCK_INITIALIZER { 0, _THREAD_QUEUE_INITIALIZER, 0, 0 }
 
 typedef struct {
   int   is_initialized;       /* is this structure initialized? */
