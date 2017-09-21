@@ -179,7 +179,13 @@ typedef struct {
 /* POSIX Barrier Types */
 
 #if defined(_POSIX_BARRIERS)
-typedef __uint32_t pthread_barrier_t;        /* POSIX Barrier Object */
+typedef struct {
+  unsigned long _flags;
+  struct _Thread_queue_Queue _Queue;
+  unsigned int _count;
+  unsigned int _waiting_threads;
+} pthread_barrier_t;
+
 typedef struct {
   int   is_initialized;  /* is this structure initialized? */
 #if defined(_POSIX_THREAD_PROCESS_SHARED)
