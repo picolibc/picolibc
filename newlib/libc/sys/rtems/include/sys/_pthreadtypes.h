@@ -152,9 +152,13 @@ typedef struct {
 
 /* Condition Variables */
 
-typedef __uint32_t pthread_cond_t;       /* identify a condition variable */
+typedef struct {
+  unsigned long _flags;
+  struct _Thread_queue_Queue _Queue;
+  pthread_mutex_t *_mutex;
+} pthread_cond_t;
 
-#define _PTHREAD_COND_INITIALIZER ((pthread_cond_t) 0xFFFFFFFF)
+#define _PTHREAD_COND_INITIALIZER { 0, _THREAD_QUEUE_INITIALIZER, 0 }
 
 typedef struct {
   int      is_initialized;
