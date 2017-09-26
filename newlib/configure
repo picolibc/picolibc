@@ -2513,7 +2513,7 @@ if test "${enable_newlib_long_time_t+set}" = set; then :
   esac
  fi
 else
-  newlib_nano_malloc=
+  newlib_long_time_t=no
 fi
 
 

@@ -247,7 +247,7 @@ AC_ARG_ENABLE(newlib-long-time_t,
     no)  newlib_long_time_t=no  ;;
     *)   AC_MSG_ERROR(bad value ${enableval} for newlib-long-time_t option) ;;
   esac
- fi], [newlib_nano_malloc=])dnl
+ fi], [newlib_long_time_t=no])dnl
 
 NEWLIB_CONFIGURE(.)
 
