@@ -17,9 +17,9 @@ multi-do:
 	      destpre=`echo $${rootpre}/$${dir}`/; export destpre; \
 	      if ! test -d $${destpre} ; then \
 		mkdir -p $${destpre}; \
-		cp config.status $${destpre}; \
 		cd $${destpre}; \
-		$(SHELL) config.status; \
+		config_cmd=`../config.status --config | sed -re "s:--srcdir=([^/]):--srcdir=../\1:"`; \
+		$(SHELL) -c "$(SHELL) $${srcrootpre}/configure $${config_cmd}";\
 		sed -e "s:^MULTIDIRS[[:space:]]*+=.*$$:MULTIDIRS = :" \
 		    -e "s:^MULTILIBNAME[[:space:]]*=.*$$:MULTILIBNAME = MULTIDIR_$${dir}_NAME:" \
 		    -e "s:^MULTI_FLAGS_FOR_TARGET[[:space:]]*=.*$$:MULTI_FLAGS_FOR_TARGET = MULTIDIR_$${dir}_FLAGS:" \
