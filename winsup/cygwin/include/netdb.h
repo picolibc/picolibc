@@ -228,7 +228,7 @@ void		endnetent (void);
 void		endprotoent (void);
 void		endservent (void);
 void		endrpcent  (void);
-struct hostent	*gethostbyaddr (const char *, int, int);
+struct hostent	*gethostbyaddr (const void *, socklen_t, int);
 struct hostent	*gethostbyname (const char *);
 #if __MISC_VISIBLE
 struct hostent	*gethostbyname2 (const char *, int);

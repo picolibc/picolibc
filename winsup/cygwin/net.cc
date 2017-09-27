@@ -1152,13 +1152,13 @@ cygwin_gethostbyname (const char *name)
 
 /* exported as gethostbyaddr: standards? */
 extern "C" struct hostent *
-cygwin_gethostbyaddr (const char *addr, int len, int type)
+cygwin_gethostbyaddr (const void *addr, socklen_t len, int type)
 {
   hostent *res = NULL;
 
   __try
     {
-      res = dup_ent (gethostbyaddr (addr, len, type));
+      res = dup_ent (gethostbyaddr ((const char *) addr, len, type));
       if (res)
 	debug_printf ("h_name %s", res->h_name);
       else
