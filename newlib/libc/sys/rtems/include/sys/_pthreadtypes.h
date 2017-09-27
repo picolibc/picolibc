@@ -131,9 +131,35 @@ typedef struct {
 
 #endif /* !defined(_UNIX98_THREAD_MUTEX_ATTRIBUTES) */
 
-typedef __uint32_t pthread_mutex_t;      /* identify a mutex */
+struct _Chain_Node {
+  struct _Chain_Node *_next;
+  struct _Chain_Node *_previous;
+};
 
-#define _PTHREAD_MUTEX_INITIALIZER ((pthread_mutex_t) 0xFFFFFFFF)
+struct _RBTree_Node {
+  struct _RBTree_Node *_left;
+  struct _RBTree_Node *_right;
+  struct _RBTree_Node *_parent;
+  int _color;
+};
+
+struct _Priority_Node {
+  union {
+    struct _RBTree_Node _RBTree;
+    struct _Chain_Node _Chain;
+  } _Node;
+  __uint64_t _priority;
+};
+
+typedef struct {
+  unsigned long _flags;
+  struct _Mutex_recursive_Control _Recursive;
+  struct _Priority_Node _Priority_ceiling;
+  const struct _Scheduler_Control *_scheduler;
+} pthread_mutex_t;
+
+#define _PTHREAD_MUTEX_INITIALIZER \
+  { 0, _MUTEX_RECURSIVE_INITIALIZER, { { 0, 0, 0, 0 }, 0 }, 0 }
 
 typedef struct {
   int   is_initialized;
