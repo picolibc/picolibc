@@ -117,7 +117,7 @@ struct rpcent {
 	int	r_number;	/* rpc program number */
 };
 
-#ifndef __INSIDE_CYGWIN_NET__
+#if __POSIX_VISIBLE >= 200112 && !defined(__INSIDE_CYGWIN_NET__)
 struct addrinfo {
   int             ai_flags;		/* input flags */
   int             ai_family;		/* address family of socket */
@@ -134,6 +134,8 @@ struct addrinfo {
  * Error return codes from gethostbyname() and gethostbyaddr()
  * (left in extern int h_errno).
  */
+
+#if __MISC_VISIBLE || __POSIX_VISIBLE < 200809
 
 #ifdef  __INSIDE_CYGWIN_NET__
 extern int h_errno;
@@ -152,6 +154,10 @@ extern __declspec(dllimport) int h_errno;
 #define	NO_DATA		4 /* Valid name, no data record of requested type */
 #define	NO_ADDRESS	NO_DATA		/* no address, look for MX record */
 
+#endif /* __MISC_VISIBLE || __POSIX_VISIBLE < 200809 */
+
+#if __POSIX_VISIBLE >= 200112
+
 /* Flag values for getaddrinfo function. */
 #define AI_PASSIVE      0x1	/* Intend socket address for bind. */
 #define AI_CANONNAME    0x2	/* Return canonical node name. */
@@ -161,6 +167,7 @@ extern __declspec(dllimport) int h_errno;
 #define AI_ADDRCONFIG   0x400	/* Only return address types available on
 				   this host. */
 #define AI_V4MAPPED     0x800	/* IPv4 mapped addresses are acceptable. */
+#ifdef __GNU_VISIBLE
 /* Glibc extensions. We use numerical values taken by winsock-specific
    extensions. */
 #define AI_IDN          0x4000	/* Encode IDN input from current local to
@@ -171,6 +178,7 @@ extern __declspec(dllimport) int h_errno;
 					       input string.  */
 #define AI_IDN_USE_STD3_ASCII_RULES 0x20000 /* Filter ASCII chars according to
 					       STD3 rules.  */
+#endif /* __GNU_VISIBLE */
 
 /* Flag values for getnameinfo function. */
 #define NI_NOFQDN       0x1	/* Don't lookup hostname. */
@@ -178,6 +186,7 @@ extern __declspec(dllimport) int h_errno;
 #define NI_NAMEREQD     0x4	/* Not being able to resolve is an error. */
 #define NI_NUMERICSERV  0x8	/* Return port number, rather than name. */
 #define NI_DGRAM        0x10	/* Lookup datagram (UDP) service. */
+#ifdef __GNU_VISIBLE
 /* Glibc extensions. We use numerical values taken by winsock-specific
    extensions. */
 #define NI_IDN          0x4000	/* Decode name from punycode to IDN in
@@ -186,6 +195,7 @@ extern __declspec(dllimport) int h_errno;
 					       output string.  */
 #define NI_IDN_USE_STD3_ASCII_RULES 0x20000 /* Filter ASCII chars according to
 					       STD3 rules.  */
+#endif /* __GNU_VISIBLE */
 
 #define NI_MAXHOST      1025	/* Best effort maximum hostname length. */
 #define NI_MAXSERV      32	/* Best effort maximum service name length. */
@@ -205,8 +215,12 @@ extern __declspec(dllimport) int h_errno;
 #define EAI_BADHINTS    12	/* Invalid value for hints */
 #define EAI_PROTOCOL    13	/* Resolved protocol is unknown */
 #define EAI_OVERFLOW    14	/* An argument buffer overflowed */
+#ifdef __GNU_VISIBLE
 /* Glibc extensions. */
 #define EAI_IDN_ENCODE	15	/* Parameter string not correctly encoded */
+#endif
+
+#endif /* __POSIX_VISIBLE >= 200112 */
 
 #ifndef __INSIDE_CYGWIN_NET__
 void		endhostent (void);
@@ -216,7 +230,9 @@ void		endservent (void);
 void		endrpcent  (void);
 struct hostent	*gethostbyaddr (const char *, int, int);
 struct hostent	*gethostbyname (const char *);
+#if __MISC_VISIBLE
 struct hostent	*gethostbyname2 (const char *, int);
+#endif
 struct hostent	*gethostent (void);
 struct netent	*getnetbyaddr (uint32_t, int);
 struct netent	*getnetbyname (const char *);
@@ -230,20 +246,25 @@ struct servent	*getservent (void);
 struct rpcent	*getrpcent (void);
 struct rpcent	*getrpcbyname (const char *);
 struct rpcent	*getrpcbynumber (int);
+#if __MISC_VISIBLE
 const char      *hstrerror (int);
 void		herror (const char *);
+#endif
 void		sethostent (int);
 void		setnetent (int);
 void		setprotoent (int);
 void		setservent (int);
 void		setrpcent (int);
+#if __POSIX_VISIBLE >= 200112
 void		freeaddrinfo (struct addrinfo *);
 const char	*gai_strerror (int);
 int		getaddrinfo (const char *, const char *,
 			     const struct addrinfo *, struct addrinfo **);
 int		getnameinfo (const struct sockaddr *, socklen_t, char *,
 			     socklen_t, char *, socklen_t, int);
+#endif
 
+#if __BSD_VISIBLE
 int		rcmd (char **, uint16_t, const char *, const char *,
 		      const char *, int *);
 int		rcmd_af (char **, uint16_t, const char *, const char *,
@@ -255,7 +276,8 @@ int		iruserok (unsigned long, int, const char *, const char *);
 int		iruserok_sa (const void *, int, int, const char *,
 			     const char *);
 int		ruserok (const char *, int, const char *, const char *);
-#endif
+#endif /* __BSD_VISIBLE */
+#endif /* !__INSIDE_CYGWIN_NET__ */
 
 #ifdef __cplusplus
 };
