@@ -2009,6 +2009,8 @@ case "${target}" in
 	;;
   a29k-amd-udi)
 	;;
+  aarch64*-*-*)
+	;;
   arc-*-*)
 	;;
   arm*-*-*)
