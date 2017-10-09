@@ -193,8 +193,8 @@ __small_vsprintf (char *dst, const char *fmt, va_list ap)
 		case 'C':
 		  {
 		    WCHAR wc = (WCHAR) va_arg (ap, int);
-		    char buf[4], *c;
-		    sys_wcstombs (buf, 4, &wc, 1);
+		    char buf[MB_LEN_MAX+1] = "", *c;
+		    sys_wcstombs (buf, MB_LEN_MAX+1, &wc, 1);
 		    for (c = buf; *c; ++c)
 		      *dst++ = *c;
 		  }
