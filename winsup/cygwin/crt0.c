@@ -20,9 +20,13 @@ void
 mainCRTStartup ()
 {
 #ifdef __i386__
+#if __GNUC_PREREQ(6,0)
 #pragma GCC diagnostic ignored "-Wframe-address"
+#endif
   (void)__builtin_return_address(1);
+#if __GNUC_PREREQ(6,0)
 #pragma GCC diagnostic pop
+#endif
   asm volatile ("andl $-16,%%esp" ::: "%esp");
 #endif
 
