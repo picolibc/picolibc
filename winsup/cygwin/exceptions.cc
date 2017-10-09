@@ -280,7 +280,7 @@ __unwind_single_frame (PCONTEXT ctx)
 {
   PRUNTIME_FUNCTION f;
   ULONG64 imagebase;
-  UNWIND_HISTORY_TABLE hist;
+  UNWIND_HISTORY_TABLE hist = {0};
   DWORD64 establisher;
   PVOID hdl;
 
