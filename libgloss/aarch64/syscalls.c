@@ -625,6 +625,9 @@ _getpid (int n __attribute__ ((unused)))
   return 1;
 }
 
+/* Heap limit returned from SYS_HEAPINFO Angel semihost call.  */
+ulong __heap_limit __attribute__ ((aligned (8))) = 0xcafedead;
+
 caddr_t
 _sbrk (int incr)
 {
@@ -637,7 +640,9 @@ _sbrk (int incr)
 
   prev_heap_end = heap_end;
 
-  if (heap_end + incr > stack_ptr)
+  if ((heap_end + incr > stack_ptr)
+      /* Honour heap limit if it's valid.  */
+      || ((__heap_limit != 0xcafedead) && (heap_end + incr > __heap_limit)))
     {
       /* Some of the libstdc++-v3 tests rely upon detecting
          out of memory errors, so do not abort here.  */
