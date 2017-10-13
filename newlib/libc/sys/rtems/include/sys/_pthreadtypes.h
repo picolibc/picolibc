@@ -159,7 +159,7 @@ typedef struct {
 } pthread_mutex_t;
 
 #define _PTHREAD_MUTEX_INITIALIZER \
-  { 0, _MUTEX_RECURSIVE_INITIALIZER, { { 0, 0, 0, 0 }, 0 }, 0 }
+  { 0, _MUTEX_RECURSIVE_INITIALIZER, { { { 0, 0, 0, 0 } }, 0 }, 0 }
 
 typedef struct {
   int   is_initialized;
