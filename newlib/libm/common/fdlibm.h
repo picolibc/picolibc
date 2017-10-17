@@ -225,6 +225,17 @@ extern float __ieee754_scalbf __P((float,int));
 extern float __ieee754_scalbf __P((float,float));
 #endif
 
+#if !__OBSOLETE_MATH
+/* The new math code does not provide separate wrapper function
+   for error handling, so the extern symbol is called directly.
+   This is valid as long as there are no namespace issues (the
+   extern symbol is reserved whenever the caller is reserved)
+   and there are no observable error handling side effects.  */
+# define __ieee754_expf(x) expf(x)
+# define __ieee754_logf(x) logf(x)
+# define __ieee754_powf(x,y) powf(x,y)
+#endif
+
 /* float versions of fdlibm kernel functions */
 extern float __kernel_sinf __P((float,float,int));
 extern float __kernel_cosf __P((float,float));
