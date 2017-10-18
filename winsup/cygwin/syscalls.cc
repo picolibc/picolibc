@@ -520,6 +520,8 @@ try_to_bin (path_conv &pc, HANDLE &fh, ACCESS_MASK access, ULONG flags)
 	  bin_stat = dir_not_empty;
 	  goto out;
 	}
+      debug_printf ("Renaming dir %S back to %S failed, status = %y",
+		    &recycler, pc.get_nt_native_path (), status);
     }
   /* In case of success, restore R/O attribute to accommodate hardlinks.
      That leaves potentially hardlinks around with the R/O bit suddenly
@@ -548,7 +550,8 @@ try_to_bin (path_conv &pc, HANDLE &fh, ACCESS_MASK access, ULONG flags)
 			 NULL, 0);
   if (!NT_SUCCESS (status))
     {
-      debug_printf ("Creating file for overwriting failed, status = %y",
+      debug_printf ("Creating file %S for overwriting %S (%S) failed, "
+		    "status = %y", &fname, &recycler, pc.get_nt_native_path (),
 		    status);
       goto out;
     }
@@ -556,7 +559,8 @@ try_to_bin (path_conv &pc, HANDLE &fh, ACCESS_MASK access, ULONG flags)
 				 FileRenameInformation);
   NtClose (tmp_fh);
   if (!NT_SUCCESS (status))
-    debug_printf ("Overwriting with another file failed, status = %y", status);
+    debug_printf ("Overwriting %S (%S) with %S failed, status = %y",
+		  &recycler, pc.get_nt_native_path (), &fname, status);
 
 out:
   if (rootdir)
