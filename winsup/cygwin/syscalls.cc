@@ -532,8 +532,8 @@ try_to_bin (path_conv &pc, HANDLE &fh, ACCESS_MASK access, ULONG flags)
   NtClose (fh);
   fh = NULL; /* So unlink_nt doesn't close the handle twice. */
   /* On success or when trying to unlink a directory we just return here.
-     The below code only works for files. */
-  if (NT_SUCCESS (status) || pc.isdir ())
+     The below code only works for files.  It also fails on NFS. */
+  if (NT_SUCCESS (status) || pc.isdir () || pc.fs_is_nfs ())
     goto out;
   /* The final trick.  We create a temporary file with delete-on-close
      semantic and rename that file to the file just moved to the bin.
