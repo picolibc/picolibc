@@ -542,8 +542,22 @@ try_to_bin (path_conv &pc, HANDLE &fh, ACCESS_MASK access, ULONG flags)
      delete-on-close on the original file succeeds.  There are still
      cases in which this fails, for instance, when trying to delete a
      hardlink to a DLL used by the unlinking application itself. */
-  RtlAppendUnicodeToString (&recycler, L"X");
-  InitializeObjectAttributes (&attr, &recycler, 0, rootdir, NULL);
+  if (pc.isremote ())
+    {
+      /* In the remote case we need the full path, but recycler is only
+	 a relative path.  Convert to absolute path. */
+      RtlInitEmptyUnicodeString (&fname, (PCWSTR) tp.w_get (),
+				 (NT_MAX_PATH - 1) * sizeof (WCHAR));
+      RtlCopyUnicodeString (&fname, pc.get_nt_native_path ());
+      RtlSplitUnicodePath (&fname, &fname, NULL);
+      /* Reset max length, overwritten by RtlSplitUnicodePath. */
+      fname.MaximumLength = (NT_MAX_PATH - 1) * sizeof (WCHAR); /* reset */
+      RtlAppendUnicodeStringToString (&fname, &recycler);
+    }
+  else
+    fname = recycler;
+  RtlAppendUnicodeToString (&fname, L"X");
+  InitializeObjectAttributes (&attr, &fname, 0, rootdir, NULL);
   status = NtCreateFile (&tmp_fh, DELETE, &attr, &io, NULL,
 			 FILE_ATTRIBUTE_NORMAL, 0, FILE_SUPERSEDE,
 			 FILE_NON_DIRECTORY_FILE | FILE_DELETE_ON_CLOSE,
