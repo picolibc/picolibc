@@ -394,7 +394,7 @@ try_to_bin (path_conv &pc, HANDLE &fh, ACCESS_MASK access, ULONG flags)
   /* Shoot. */
   pfri = (PFILE_RENAME_INFORMATION) infobuf;
   pfri->ReplaceIfExists = TRUE;
-  pfri->RootDirectory = pc.isremote () ? NULL : rootdir;
+  pfri->RootDirectory = rootdir;
   pfri->FileNameLength = recycler.Length;
   memcpy (pfri->FileName, recycler.Buffer, recycler.Length);
   frisiz = sizeof *pfri + pfri->FileNameLength - sizeof (WCHAR);
