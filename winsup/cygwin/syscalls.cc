@@ -273,7 +273,7 @@ try_to_bin (path_conv &pc, HANDLE &fh, ACCESS_MASK access, ULONG flags)
      mixed case or in all upper case.  That's a problem when using
      casesensitivity.  If the file handle given to FileRenameInformation
      has been opened casesensitive, the call also handles the path to the
-     target dir casesensitive.  Rather then trying to find the right name
+     target dir casesensitive.  Rather than trying to find the right name
      of the recycler, we just reopen the file to move with OBJ_CASE_INSENSITIVE,
      so the subsequent FileRenameInformation works caseinsensitive in terms of
      the recycler directory name, too. */
@@ -308,7 +308,7 @@ try_to_bin (path_conv &pc, HANDLE &fh, ACCESS_MASK access, ULONG flags)
       /* Is fname really a subcomponent of the full path?  If not, there's
 	 a high probability we're acessing the file via a virtual drive
 	 created with "subst".  Check and accommodate it.  Note that we
-	 ony get here if the virtual drive is really pointing to a local
+	 only get here if the virtual drive is really pointing to a local
 	 drive.  Otherwise pc.isremote () returns "true". */
       if (!RtlEqualUnicodePathSuffix (pc.get_nt_native_path (), &fname, TRUE))
 	{
