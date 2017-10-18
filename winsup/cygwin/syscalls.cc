@@ -501,8 +501,11 @@ try_to_bin (path_conv &pc, HANDLE &fh, ACCESS_MASK access, ULONG flags)
      Otherwise the below code closes the handle to allow replacing the file. */
   status = NtSetInformationFile (fh, &io, &disp, sizeof disp,
 				 FileDispositionInformation);
-  if (status == STATUS_DIRECTORY_NOT_EMPTY)
+  switch (status)
     {
+    case STATUS_SUCCESS:
+      break;
+    case STATUS_DIRECTORY_NOT_EMPTY:
       /* Uh oh!  This was supposed to be avoided by the check_dir_not_empty
 	 test in unlink_nt, but given that the test isn't atomic, this *can*
 	 happen.  Try to move the dir back ASAP. */
@@ -522,6 +525,34 @@ try_to_bin (path_conv &pc, HANDLE &fh, ACCESS_MASK access, ULONG flags)
 	}
       debug_printf ("Renaming dir %S back to %S failed, status = %y",
 		    &recycler, pc.get_nt_native_path (), status);
+      break;
+    case STATUS_FILE_RENAMED:
+      /* On NFS, the subsequent request to set the delete disposition fails
+	 with STATUS_FILE_RENAMED.  We have to reopen the file, close the
+	 original handle, and set the delete disposition on the reopened
+	 handle to make sure setting delete disposition works. */
+      InitializeObjectAttributes (&attr, &ro_u_empty, 0, fh, NULL);
+      status = NtOpenFile (&tmp_fh, access, &attr, &io,
+			   FILE_SHARE_VALID_FLAGS, flags);
+      if (!NT_SUCCESS (status))
+	debug_printf ("NtOpenFile (%S) for reopening in renamed case failed, "
+		      "status = %y", pc.get_nt_native_path (), status);
+      else
+	{
+	  NtClose (fh);
+	  fh = tmp_fh;
+	  status = NtSetInformationFile (fh, &io, &disp, sizeof disp,
+					 FileDispositionInformation);
+	  if (!NT_SUCCESS (status))
+	    debug_printf ("Setting delete disposition %S (%S) in renamed "
+			  "case failed, status = %y",
+			  &recycler, pc.get_nt_native_path (), status);
+	}
+      break;
+    default:
+      debug_printf ("Setting delete disposition on %S (%S) failed, status = %y",
+		    &recycler, pc.get_nt_native_path (), status);
+      break;
     }
   /* In case of success, restore R/O attribute to accommodate hardlinks.
      That leaves potentially hardlinks around with the R/O bit suddenly
@@ -759,15 +790,19 @@ retry_open:
     {
       debug_printf ("Sharing violation when opening %S",
 		    pc.get_nt_native_path ());
-      /* We never call try_to_bin on NFS and NetApp for the follwing reasons:
+      /* We never call try_to_bin on NetApp.  Netapp filesystems don't
+	 understand the "move and delete" method at all and have all kinds
+	 of weird effects.  Just setting the delete dispositon usually
+	 works fine, though.
 
 	 NFS implements its own mechanism to remove in-use files, which looks
-	 quite similar to what we do in try_to_bin for remote files.
-
-	 Netapp filesystems don't understand the "move and delete" method
-	 at all and have all kinds of weird effects.  Just setting the delete
-	 dispositon usually works fine, though. */
-      if (!pc.fs_is_nfs () && !pc.fs_is_netapp ())
+	 quite similar to what we do in try_to_bin for remote files.  However,
+	 apparently it doesn't work as desired in all cases.  This has been
+	 observed when running the gawk 4.1.62++ testcase "testext.awk" under
+	 Windows 10.  So for NFS we still call try_to_bin to rename the file,
+	 at least to make room for subsequent creation of a file with the
+	 same filename. */
+      if (!pc.fs_is_netapp ())
 	bin_stat = move_to_bin;
       /* If the file is not a directory, of if we didn't set the move_to_bin
 	 flag, just proceed with the FILE_SHARE_VALID_FLAGS set. */
