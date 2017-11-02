@@ -1075,10 +1075,7 @@ int
 fhandler_disk_file::fadvise (off_t offset, off_t length, int advice)
 {
   if (advice < POSIX_FADV_NORMAL || advice > POSIX_FADV_NOREUSE)
-    {
-      set_errno (EINVAL);
-      return -1;
-    }
+    return EINVAL;
 
   /* Windows only supports advice flags for the whole file.  We're using
      a simplified test here so that we don't have to ask for the actual
@@ -1097,9 +1094,7 @@ fhandler_disk_file::fadvise (off_t offset, off_t length, int advice)
   NTSTATUS status = NtQueryInformationFile (get_handle (), &io,
 					    &fmi, sizeof fmi,
 					    FileModeInformation);
-  if (!NT_SUCCESS (status))
-    __seterrno_from_nt_status (status);
-  else
+  if (NT_SUCCESS (status))
     {
       fmi.Mode &= ~FILE_SEQUENTIAL_ONLY;
       if (advice == POSIX_FADV_SEQUENTIAL)
@@ -1111,7 +1106,7 @@ fhandler_disk_file::fadvise (off_t offset, off_t length, int advice)
       __seterrno_from_nt_status (status);
     }
 
-  return -1;
+  return geterrno_from_nt_status (status);
 }
 
 int
