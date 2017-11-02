@@ -2967,12 +2967,14 @@ ftruncate64 (int fd, off_t length)
   int res = -1;
   cygheap_fdget cfd (fd);
   if (cfd >= 0)
-    res = cfd->ftruncate (length, true);
-    if (res)
-      {
-        set_errno (res);
-        res = -1;
-      }
+    {
+      res = cfd->ftruncate (length, true);
+      if (res)
+	{
+	  set_errno (res);
+	  res = -1;
+	}
+    }
   else
     set_errno (EBADF);
   syscall_printf ("%R = ftruncate(%d, %D)", res, fd, length);
