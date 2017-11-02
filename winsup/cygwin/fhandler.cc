@@ -1771,8 +1771,7 @@ fhandler_base::fadvise (off_t offset, off_t length, int advice)
 int
 fhandler_base::ftruncate (off_t length, bool allow_truncate)
 {
-  set_errno (EINVAL);
-  return -1;
+  return EINVAL;
 }
 
 int

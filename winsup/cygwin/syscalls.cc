@@ -2946,16 +2946,16 @@ posix_fadvise (int fd, off_t offset, off_t len, int advice)
 extern "C" int
 posix_fallocate (int fd, off_t offset, off_t len)
 {
-  int res = -1;
+  int res = 0;
   if (offset < 0 || len == 0)
-    set_errno (EINVAL);
+    res = EINVAL;
   else
     {
       cygheap_fdget cfd (fd);
       if (cfd >= 0)
 	res = cfd->ftruncate (offset + len, false);
       else
-	set_errno (EBADF);
+	res = EBADF;
     }
   syscall_printf ("%R = posix_fallocate(%d, %D, %D)", res, fd, offset, len);
   return res;
@@ -2968,6 +2968,11 @@ ftruncate64 (int fd, off_t length)
   cygheap_fdget cfd (fd);
   if (cfd >= 0)
     res = cfd->ftruncate (length, true);
+    if (res)
+      {
+        set_errno (res);
+        res = -1;
+      }
   else
     set_errno (EBADF);
   syscall_printf ("%R = ftruncate(%d, %D)", res, fd, length);

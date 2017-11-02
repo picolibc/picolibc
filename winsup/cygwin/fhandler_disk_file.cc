@@ -1112,14 +1112,14 @@ fhandler_disk_file::fadvise (off_t offset, off_t length, int advice)
 int
 fhandler_disk_file::ftruncate (off_t length, bool allow_truncate)
 {
-  int res = -1;
+  int res = 0;
 
   if (length < 0 || !get_handle ())
-    set_errno (EINVAL);
+    res = EINVAL;
   else if (pc.isdir ())
-    set_errno (EISDIR);
+    res = EISDIR;
   else if (!(get_access () & GENERIC_WRITE))
-    set_errno (EBADF);
+    res = EBADF;
   else
     {
       NTSTATUS status;
@@ -1130,10 +1130,7 @@ fhandler_disk_file::ftruncate (off_t length, bool allow_truncate)
       status = NtQueryInformationFile (get_handle (), &io, &fsi, sizeof fsi,
 				       FileStandardInformation);
       if (!NT_SUCCESS (status))
-	{
-	  __seterrno_from_nt_status (status);
-	  return -1;
-	}
+	return geterrno_from_nt_status (status);
 
       /* If called through posix_fallocate, silently succeed if length
 	 is less than the file's actual length. */
@@ -1159,9 +1156,7 @@ fhandler_disk_file::ftruncate (off_t length, bool allow_truncate)
 				     &feofi, sizeof feofi,
 				     FileEndOfFileInformation);
       if (!NT_SUCCESS (status))
-	__seterrno_from_nt_status (status);
-      else
-	res = 0;
+	res = geterrno_from_nt_status (status);
     }
   return res;
 }
