@@ -623,7 +623,7 @@ fhandler_socket::init_events ()
       NtClose (wsock_mtx);
       return false;
     }
-  if (!(wsock_events = search_wsa_event_slot (new_serial_number)));
+  if (!(wsock_events = search_wsa_event_slot (new_serial_number)))
     {
       set_errno (ENOBUFS);
       NtClose (wsock_evt);
