@@ -1541,14 +1541,20 @@ fhandler_disk_file::pread (void *buf, size_t count, off_t offset)
 	  if (status == (NTSTATUS) STATUS_ACCESS_VIOLATION)
 	    {
 	      if (is_at_eof (prw_handle))
-		return 0;
+		{
+		  res = 0;
+		  goto out;
+		}
 	      switch (mmap_is_attached_or_noreserve (buf, count))
 		{
 		case MMAP_NORESERVE_COMMITED:
 		  status = NtReadFile (prw_handle, NULL, NULL, NULL, &io,
 				       buf, count, &off, NULL);
 		  if (NT_SUCCESS (status))
-		    return io.Information;
+		    {
+		      res = io.Information;
+		      goto out;
+		    }
 		  break;
 		case MMAP_RAISE_SIGBUS:
 		  raise (SIGBUS);
@@ -1579,6 +1585,7 @@ non_atomic:
 	    res = -1;
 	}
     }
+out:
   debug_printf ("%d = pread(%p, %ld, %D)\n", res, buf, count, offset);
   return res;
 }
