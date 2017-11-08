@@ -1566,7 +1566,7 @@ fhandler_disk_file::pread (void *buf, size_t count, off_t offset)
 	  return -1;
 	}
       else
-	res = io.Information;	/* Valid on EOF. */
+	res = io.Information;
     }
   else
     {
