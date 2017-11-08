@@ -1529,7 +1529,9 @@ fhandler_disk_file::pread (void *buf, size_t count, off_t offset)
 	goto non_atomic;
       status = NtReadFile (prw_handle, NULL, NULL, NULL, &io, buf, count,
 			   &off, NULL);
-      if (!NT_SUCCESS (status) && status != STATUS_END_OF_FILE)
+      if (status == STATUS_END_OF_FILE)
+	res = 0;
+      else if (!NT_SUCCESS (status))
 	{
 	  if (pc.isdir ())
 	    {
@@ -1557,7 +1559,8 @@ fhandler_disk_file::pread (void *buf, size_t count, off_t offset)
 	  __seterrno_from_nt_status (status);
 	  return -1;
 	}
-      res = io.Information;	/* Valid on EOF. */
+      else
+	res = io.Information;	/* Valid on EOF. */
     }
   else
     {
