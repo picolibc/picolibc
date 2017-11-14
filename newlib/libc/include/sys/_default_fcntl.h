@@ -53,6 +53,7 @@ extern "C" {
 #define _FDIRECTORY     0x200000
 #define _FEXECSRCH      0x400000
 #define _FTMPFILE       0x800000
+#define _FNOATIME       0x1000000
 
 #define O_BINARY	_FBINARY
 #define O_TEXT		_FTEXT
@@ -65,6 +66,7 @@ extern "C" {
 #define O_EXEC          _FEXECSRCH
 #define O_SEARCH        _FEXECSRCH
 #define O_TMPFILE	_FTMPFILE
+#define O_NOATIME	_FNOATIME
 #endif
 
 #if __MISC_VISIBLE
