@@ -1361,6 +1361,7 @@ open (const char *unix_path, int flags, ...)
   int res = -1;
   va_list ap;
   mode_t mode = 0;
+  fhandler_base *fh = NULL;
 
   pthread_testcancel ();
 
@@ -1368,69 +1369,66 @@ open (const char *unix_path, int flags, ...)
     {
       syscall_printf ("open(%s, %y)", unix_path, flags);
       if (!*unix_path)
-	set_errno (ENOENT);
-      else
 	{
-	  /* check for optional mode argument */
-	  va_start (ap, flags);
-	  mode = va_arg (ap, mode_t);
-	  va_end (ap);
-
-	  fhandler_base *fh;
-	  cygheap_fdnew fd;
-
-	  if (fd >= 0)
-	    {
-	      /* This is a temporary kludge until all utilities can catch up
-		 with a change in behavior that implements linux functionality: 
-		 opening a tty should not automatically cause it to become the
-		 controlling tty for the process.  */
-	      int opt = PC_OPEN | ((flags & (O_NOFOLLOW | O_EXCL))
-				   ?  PC_SYM_NOFOLLOW : PC_SYM_FOLLOW);
-	      if (!(flags & O_NOCTTY) && fd > 2 && myself->ctty != -2)
-		{
-		  flags |= O_NOCTTY;
-		  /* flag that, if opened, this fhandler could later be capable
-		     of being a controlling terminal if /dev/tty is opened. */
-		  opt |= PC_CTTY;
-		}
-	      if (!(fh = build_fh_name (unix_path, opt, stat_suffixes)))
-		;		// errno already set
-	      else if ((flags & O_NOFOLLOW) && fh->issymlink ())
-		{
-		  delete fh;
-		  set_errno (ELOOP);
-		}
-	      else if ((flags & O_DIRECTORY) && fh->exists ()
-		       && !fh->pc.isdir ())
-		{
-		  delete fh;
-		  set_errno (ENOTDIR);
-		}
-	      else if (((flags & (O_CREAT | O_EXCL)) == (O_CREAT | O_EXCL))
-		       && fh->exists ())
-		{
-		  delete fh;
-		  set_errno (EEXIST);
-		}
-	      else if ((fh->is_fs_special ()
-	      		&& fh->device_access_denied (flags))
-		       || !fh->open_with_arch (flags, mode & 07777))
-		delete fh;
-	      else
-		{
-		  fd = fh;
-		  if (fd <= 2)
-		    set_std_handle (fd);
-		  res = fd;
-		}
-	    }
+	  set_errno (ENOENT);
+	  __leave;
 	}
 
-      syscall_printf ("%R = open(%s, %y)", res, unix_path, flags);
+      /* check for optional mode argument */
+      va_start (ap, flags);
+      mode = va_arg (ap, mode_t);
+      va_end (ap);
+
+      cygheap_fdnew fd;
+
+      if (fd < 0)
+	__leave;		/* errno already set */
+
+      /* This is a temporary kludge until all utilities can catch up
+	 with a change in behavior that implements linux functionality:
+	 opening a tty should not automatically cause it to become the
+	 controlling tty for the process.  */
+      int opt = PC_OPEN | ((flags & (O_NOFOLLOW | O_EXCL))
+			   ?  PC_SYM_NOFOLLOW : PC_SYM_FOLLOW);
+      if (!(flags & O_NOCTTY) && fd > 2 && myself->ctty != -2)
+	{
+	  flags |= O_NOCTTY;
+	  /* flag that, if opened, this fhandler could later be capable
+	     of being a controlling terminal if /dev/tty is opened. */
+	  opt |= PC_CTTY;
+	}
+
+      if (!(fh = build_fh_name (unix_path, opt, stat_suffixes)))
+	__leave;		/* errno already set */
+      if ((flags & O_NOFOLLOW) && fh->issymlink ())
+	{
+	  set_errno (ELOOP);
+	  __leave;
+	}
+      if ((flags & O_DIRECTORY) && fh->exists () && !fh->pc.isdir ())
+	{
+	  set_errno (ENOTDIR);
+	  __leave;
+	}
+      if (((flags & (O_CREAT | O_EXCL)) == (O_CREAT | O_EXCL)) && fh->exists ())
+	{
+	  set_errno (EEXIST);
+	  __leave;
+	}
+      if ((fh->is_fs_special () && fh->device_access_denied (flags))
+	  || !fh->open_with_arch (flags, mode & 07777))
+	__leave;		/* errno already set */
+
+      fd = fh;
+      if (fd <= 2)
+	set_std_handle (fd);
+      res = fd;
     }
   __except (EFAULT) {}
   __endtry
+  if (res < 0 && fh)
+    delete fh;
+  syscall_printf ("%R = open(%s, %y)", res, unix_path, flags);
   return res;
 }
 
