@@ -1,6 +1,8 @@
 What's new:
 -----------
 
+- New open(2) flags O_TMPFILE and O_NOATIME.
+
 
 What changed:
 -------------
