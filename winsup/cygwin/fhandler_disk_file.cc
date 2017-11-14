@@ -1237,16 +1237,11 @@ fhandler_disk_file::link (const char *newpath)
     {
       if (status == STATUS_INVALID_DEVICE_REQUEST
 	  || status == STATUS_NOT_SUPPORTED)
-	{
-	  /* FS doesn't support hard links.  Linux returns EPERM. */
-	  set_errno (EPERM);
-	  return -1;
-	}
+	/* FS doesn't support hard links.  Linux returns EPERM. */
+	set_errno (EPERM);
       else
-	{
-	  __seterrno_from_nt_status (status);
-	  return -1;
-	}
+	__seterrno_from_nt_status (status);
+      return -1;
     }
   else if (pc.file_attributes () & FILE_ATTRIBUTE_TEMPORARY)
     {
