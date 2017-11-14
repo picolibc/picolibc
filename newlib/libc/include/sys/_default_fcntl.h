@@ -52,6 +52,7 @@ extern "C" {
 #define _FNOFOLLOW      0x100000
 #define _FDIRECTORY     0x200000
 #define _FEXECSRCH      0x400000
+#define _FTMPFILE       0x800000
 
 #define O_BINARY	_FBINARY
 #define O_TEXT		_FTEXT
@@ -63,6 +64,7 @@ extern "C" {
 #define O_DIRECTORY     _FDIRECTORY
 #define O_EXEC          _FEXECSRCH
 #define O_SEARCH        _FEXECSRCH
+#define O_TMPFILE	_FTMPFILE
 #endif
 
 #if __MISC_VISIBLE

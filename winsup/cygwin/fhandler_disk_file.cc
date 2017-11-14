@@ -1248,6 +1248,37 @@ fhandler_disk_file::link (const char *newpath)
 	  return -1;
 	}
     }
+  else if (pc.file_attributes () & FILE_ATTRIBUTE_TEMPORARY)
+    {
+      /* If the original file has been opened with O_TMPFILE the file has
+	 FILE_ATTRIBUTE_TEMPORARY set.  After a successful hardlink the
+	 file is not temporary anymore in the usual sense.  So we remove
+	 FILE_ATTRIBUTE_TEMPORARY here, even if this makes the original file
+	 visible in directory enumeration. */
+      OBJECT_ATTRIBUTES attr;
+      status = NtOpenFile (&fh, FILE_WRITE_ATTRIBUTES,
+			   pc.init_reopen_attr (attr, fh), &io,
+			   FILE_SHARE_VALID_FLAGS, FILE_OPEN_FOR_BACKUP_INTENT);
+      if (!NT_SUCCESS (status))
+	debug_printf ("Opening for removing TEMPORARY attrib failed, "
+		      "status = %y", status);
+      else
+	{
+	  FILE_BASIC_INFORMATION fbi;
+
+	  fbi.CreationTime.QuadPart = fbi.LastAccessTime.QuadPart
+	  = fbi.LastWriteTime.QuadPart = fbi.ChangeTime.QuadPart = 0LL;
+	  fbi.FileAttributes = (pc.file_attributes ()
+				& ~FILE_ATTRIBUTE_TEMPORARY)
+			       ?: FILE_ATTRIBUTE_NORMAL;
+	  status = NtSetInformationFile (fh, &io, &fbi, sizeof fbi,
+					 FileBasicInformation);
+	  if (!NT_SUCCESS (status))
+	    debug_printf ("Removing the TEMPORARY attrib failed, status = %y",
+			  status);
+	  NtClose (fh);
+	}
+    }
   return 0;
 }
 
@@ -2064,12 +2095,14 @@ fhandler_disk_file::readdir (DIR *dir, dirent *de)
   PFILE_ID_BOTH_DIR_INFORMATION buf = NULL;
   PWCHAR FileName;
   ULONG FileNameLength;
-  ULONG FileAttributes = 0;
+  ULONG FileAttributes;
   IO_STATUS_BLOCK io;
   UNICODE_STRING fname;
 
   /* d_cachepos always refers to the next cache entry to use.  If it's 0
      we must reload the cache. */
+restart:
+  FileAttributes = 0;
   if (d_cachepos (dir) == 0)
     {
       if ((dir->__flags & dirent_get_d_ino))
@@ -2183,6 +2216,10 @@ go_ahead:
 	  FileAttributes =
 		((PFILE_BOTH_DIR_INFORMATION) buf)->FileAttributes;
 	}
+      /* We don't show O_TMPFILE files in the filesystem.  This is a kludge,
+	 so we may end up removing this snippet again. */
+      if (FileAttributes & FILE_ATTRIBUTE_TEMPORARY)
+	goto restart;
       RtlInitCountedUnicodeString (&fname, FileName, FileNameLength);
       d_mounts (dir)->check_mount (&fname);
       if (de->d_ino == 0 && (dir->__flags & dirent_set_d_ino))

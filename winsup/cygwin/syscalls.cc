@@ -36,6 +36,7 @@ details. */
 #include <unistd.h>
 #include <sys/wait.h>
 #include <dirent.h>
+#include <ntsecapi.h>
 #include "ntdll.h"
 
 #undef fstat
@@ -1415,6 +1416,49 @@ open (const char *unix_path, int flags, ...)
 	  set_errno (EEXIST);
 	  __leave;
 	}
+      if (flags & O_TMPFILE)
+	{
+	  if ((flags & O_ACCMODE) != O_WRONLY && (flags & O_ACCMODE) != O_RDWR)
+	    {
+	      set_errno (EINVAL);
+	      __leave;
+	    }
+	  if (!fh->pc.isdir ())
+	    {
+	      set_errno (fh->exists () ? ENOTDIR : ENOENT);
+	      __leave;
+	    }
+	  /* Unfortunately Windows does not allow to create a nameless file.
+	     So create unique filename instead.  It starts with ".cyg_tmp_",
+	     followed by an 8 byte unique hex number, followed by an 8 byte
+	     random hex number. */
+	  int64_t rnd;
+	  fhandler_base *fh_file;
+	  char *new_path;
+
+	  new_path = (char *) malloc (strlen (fh->get_name ())
+				      + 1  /* slash */
+				      + 10 /* prefix */
+				      + 16 /* 64 bit unique id as hex*/
+				      + 16 /* 64 bit random number as hex */
+				      + 1  /* trailing NUL */);
+	  if (!new_path)
+	    __leave;
+	  fh->set_unique_id ();
+	  RtlGenRandom (&rnd, sizeof rnd);
+	  __small_sprintf (new_path, "%s/%s%016X%016X",
+			   fh->get_name (), ".cyg_tmp_",
+			   fh->get_unique_id (), rnd);
+
+	  if (!(fh_file = build_fh_name (new_path, opt, NULL)))
+	    {
+	      free (new_path);
+	      __leave;		/* errno already set */
+	    }
+	  delete fh;
+	  fh = fh_file;
+	}
+
       if ((fh->is_fs_special () && fh->device_access_denied (flags))
 	  || !fh->open_with_arch (flags, mode & 07777))
 	__leave;		/* errno already set */
