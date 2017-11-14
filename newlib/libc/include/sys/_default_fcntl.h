@@ -57,16 +57,24 @@ extern "C" {
 
 #define O_BINARY	_FBINARY
 #define O_TEXT		_FTEXT
-#define O_CLOEXEC	_FNOINHERIT
-#define O_DIRECT        _FDIRECT
-#define O_NOFOLLOW      _FNOFOLLOW
 #define O_DSYNC         _FSYNC
 #define O_RSYNC         _FSYNC
-#define O_DIRECTORY     _FDIRECTORY
 #define O_EXEC          _FEXECSRCH
 #define O_SEARCH        _FEXECSRCH
+
+/* POSIX-1.2008 specific flags */
+#if __POSIX_VISIBLE >= 200809
+#define O_CLOEXEC	_FNOINHERIT
+#define O_NOFOLLOW      _FNOFOLLOW
+#define O_DIRECTORY     _FDIRECTORY
+#endif
+
+/* Linux-specific flags */
+#if __GNU_VISIBLE
+#define O_DIRECT        _FDIRECT
 #define O_TMPFILE	_FTMPFILE
 #define O_NOATIME	_FNOATIME
+#endif
 #endif
 
 #if __MISC_VISIBLE
