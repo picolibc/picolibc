@@ -626,14 +626,6 @@ fhandler_base::open (int flags, mode_t mode)
 	    }
 	}
 
-      /* Trying to overwrite an already existing file with FILE_ATTRIBUTE_HIDDEN
-	 and/or FILE_ATTRIBUTE_SYSTEM attribute set, NtCreateFile fails with
-	 STATUS_ACCESS_DENIED.  Per MSDN you have to create the file with the
-	 same attributes as already specified for the file. */
-      if (create_disposition == FILE_CREATE
-	  && has_attribute (FILE_ATTRIBUTE_HIDDEN | FILE_ATTRIBUTE_SYSTEM))
-	file_attributes |= pc.file_attributes ();
-
       if (flags & (O_CREAT | O_TMPFILE))
 	{
 	  file_attributes |= FILE_ATTRIBUTE_NORMAL;
