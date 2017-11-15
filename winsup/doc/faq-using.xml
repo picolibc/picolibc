@@ -1419,4 +1419,54 @@ such as virtual memory paging and file caching.</para>
   difficult to make <literal>fork()</literal> work reliably.</para>
 </answer>
 </qandaentry>
+
+<qandaentry id='faq.using.fixing-find_fast_cwd-warnings'>
+  <question><para>How do I fix <literal>find_fast_cwd</literal> warnings?</para></question>
+  <answer>
+    <para>Older Cygwin releases asked users to report problems to the mailing
+	list with the message:</para>
+    <screen>
+	find_fast_cwd: WARNING: Couldn't compute FAST_CWD pointer. Please report
+	this problem to the public mailing list <ulink url="mailto:cygwin@cygwin.com">cygwin@cygwin.com</ulink></screen>
+    <para>Recent Cygwin releases changed this to the message:</para>
+    <screen>
+	This typically occurs if you're using an older Cygwin version on a newer Windows.
+	Please update to the latest available Cygwin version from <ulink url="https://cygwin.com/">https://cygwin.com/</ulink>.
+	If the problem persists, please see <ulink url="https://cygwin.com/problems.html">https://cygwin.com/problems.html</ulink>.</screen>
+    <para>This is not serious, just a warning that Cygwin may not always be
+	able to exactly emulate all aspects of Unix current directory handling
+	under your Windows release.</para>
+    <para>Unfortunately some projects and products still distribute older
+	Cygwin releases which may not fully support newer Windows releases,
+	instead of installing the current release from the Cygwin project.
+	They also may not provide any obvious way to keep the Cygwin packages
+	their application uses up to date with fixes for security issues and
+	upgrades.</para>
+    <para>The solution is simply downloading and running Cygwin Setup,
+	following the instructions in the Internet Setup section of
+	<ulink url="https://cygwin.com/cygwin-ug-net/setup-net.html#internet-setup">
+	    Setting Up Cygwin</ulink> in the Cygwin User's Guide.</para>
+    <para>Please exit from all applications before running Cygwin Setup.
+	When running Setup, you should not change most of the values presented,
+	just select the <literal>Next</literal> button in most cases, as you
+	already have a Cygwin release installed, and only want to upgrade your
+	current installation.
+	You should make your own selection if the internet connection to your
+	system requires a proxy; and you must always pick an up to date Cygwin
+	download (mirror) site, preferably the site nearest to your system for
+	faster downloads, as shown, with more details to help you choose, on the
+	<ulink url="https://cygwin.com/mirrors.html">
+	    Mirror Sites</ulink> web page.</para>
+    <para>Cygwin Setup will download and apply upgrades to all packages
+	required for Cygwin itself and installed applications.
+	Any problems with applying updates, or the application after updates,
+	should be reported to the project or product supplier for remedial
+	action.</para>
+    <para>As Cygwin is a volunteer project, unable to provide support for older
+	releases installed by projects or products, it would be helpful to let
+	other users know what project or product you installed, in a quick
+	<ulink url="mailto:cygwin@cygwin.com?subject=Application%20with%20old%20Cygwin%20warning%20about%20FAST_CWD">
+	    email</ulink>.</para>
+  </answer>
+</qandaentry>
 </qandadiv>
