@@ -568,45 +568,58 @@ pipe_data_available (int fd, fhandler_base *fh, HANDLE h, bool writing)
 {
   IO_STATUS_BLOCK iosb = {{0}, 0};
   FILE_PIPE_LOCAL_INFORMATION fpli = {0};
+  NTSTATUS status;
 
-  bool res;
   if (fh->has_ongoing_io ())
-    res = false;
-  else if (NtQueryInformationFile (h, &iosb, &fpli, sizeof (fpli),
-				   FilePipeLocalInformation))
+    return 0;
+
+  status = NtQueryInformationFile (h, &iosb, &fpli, sizeof (fpli),
+				   FilePipeLocalInformation);
+  if (!NT_SUCCESS (status))
     {
       /* If NtQueryInformationFile fails, optimistically assume the
 	 pipe is writable.  This could happen if we somehow
 	 inherit a pipe that doesn't permit FILE_READ_ATTRIBUTES
 	 access on the write end.  */
-      select_printf ("fd %d, %s, NtQueryInformationFile failed",
-		     fd, fh->get_name ());
-      res = writing ? true : -1;
+      select_printf ("fd %d, %s, NtQueryInformationFile failed, status %y",
+		     fd, fh->get_name (), status);
+      return writing ? 1 : -1;
     }
-  else if (!writing)
+  if (writing)
+    {
+	/* If there is anything available in the pipe buffer then signal
+	   that.  This means that a pipe could still block since you could
+	   be trying to write more to the pipe than is available in the
+	   buffer but that is the hazard of select().  */
+      fpli.WriteQuotaAvailable = fpli.OutboundQuota - fpli.ReadDataAvailable;
+      if (fpli.WriteQuotaAvailable > 0)
+	{
+	  paranoid_printf ("fd %d, %s, write: size %u, avail %u", fd,
+			   fh->get_name (), fpli.OutboundQuota,
+			   fpli.WriteQuotaAvailable);
+	  return 1;
+	}
+      /* If we somehow inherit a tiny pipe (size < PIPE_BUF), then consider
+	 the pipe writable only if it is completely empty, to minimize the
+	 probability that a subsequent write will block.  */
+      if (fpli.OutboundQuota < PIPE_BUF
+	  && fpli.WriteQuotaAvailable == fpli.OutboundQuota)
+	{
+	  select_printf ("fd, %s, write tiny pipe: size %u, avail %u",
+			 fd, fh->get_name (), fpli.OutboundQuota,
+			 fpli.WriteQuotaAvailable);
+	  return 1;
+	}
+    }
+  else if (fpli.ReadDataAvailable)
     {
       paranoid_printf ("fd %d, %s, read avail %u", fd, fh->get_name (),
 		       fpli.ReadDataAvailable);
-      res = !!fpli.ReadDataAvailable;
+      return 1;
     }
-  else if ((res = (fpli.WriteQuotaAvailable = (fpli.OutboundQuota -
-					       fpli.ReadDataAvailable))))
-    /* If there is anything available in the pipe buffer then signal
-       that.  This means that a pipe could still block since you could
-       be trying to write more to the pipe than is available in the
-       buffer but that is the hazard of select().  */
-    paranoid_printf ("fd %d, %s, write: size %u, avail %u", fd,
-		     fh->get_name (), fpli.OutboundQuota,
-		     fpli.WriteQuotaAvailable);
-  else if ((res = (fpli.OutboundQuota < PIPE_BUF &&
-		   fpli.WriteQuotaAvailable == fpli.OutboundQuota)))
-    /* If we somehow inherit a tiny pipe (size < PIPE_BUF), then consider
-       the pipe writable only if it is completely empty, to minimize the
-       probability that a subsequent write will block.  */
-    select_printf ("fd, %s, write tiny pipe: size %u, avail %u",
-		   fd, fh->get_name (), fpli.OutboundQuota,
-		   fpli.WriteQuotaAvailable);
-  return res ?: -!!(fpli.NamedPipeState & FILE_PIPE_CLOSING_STATE);
+  if (fpli.NamedPipeState & FILE_PIPE_CLOSING_STATE)
+    return -1;
+  return 0;
 }
 
 static int
