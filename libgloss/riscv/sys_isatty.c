@@ -13,5 +13,5 @@ _isatty(int file)
 {
   struct stat s;
   int ret = _fstat (file, &s);
-  return ret == -1 ? -1 : !!(s.st_mode & S_IFCHR);
+  return ret == -1 ? 0 : !!(s.st_mode & S_IFCHR);
 }
