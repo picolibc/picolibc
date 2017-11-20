@@ -146,6 +146,7 @@ RTEMS_STUB(int, _fstat_r (struct _reent *r, int fd, struct stat *buf), { return 
 RTEMS_STUB(uid_t, geteuid (), { return -1; })
 RTEMS_STUB(gid_t, getgid (), { return -1; })
 RTEMS_STUB(gid_t, _getgid_r (struct _reent *r), { return -1; })
+RTEMS_STUB(struct _reent *, __getreent (void), { return 0; })
 RTEMS_STUB(pid_t, getpid (), { return -1; })
 RTEMS_STUB(pid_t, getppid (), { return -1; })
 RTEMS_STUB(pid_t, _getpid_r (struct _reent *r), { return -1; })
