@@ -1,6 +1,8 @@
 #ifndef HAVE_OPENDIR
 
 /*
+ * SPDX-License-Identifier: BSD-3-Clause
+ *
  * Copyright (c) 1983 Regents of the University of California.
  * All rights reserved.
  *
