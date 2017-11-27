@@ -79,10 +79,7 @@ fcntl64 (int fd, int cmd, ...)
   return res;
 }
 
-#ifdef __x86_64__
-EXPORT_ALIAS (fcntl64, fcntl)
-EXPORT_ALIAS (fcntl64, _fcntl)
-#else
+#ifdef __i386__
 extern "C" int
 _fcntl (int fd, int cmd, ...)
 {
@@ -121,4 +118,7 @@ _fcntl (int fd, int cmd, ...)
   __endtry
   return -1;
 }
+#else
+EXPORT_ALIAS (fcntl64, fcntl)
+EXPORT_ALIAS (fcntl64, _fcntl)
 #endif

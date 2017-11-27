@@ -399,7 +399,7 @@ pthread_wrapper (PVOID arg)
   /* Initialize new _cygtls. */
   _my_tls.init_thread (wrapper_arg.stackbase - CYGTLS_PADSIZE,
 		       (DWORD (*)(void*, void*)) wrapper_arg.func);
-#ifndef __x86_64__
+#ifdef __i386__
   /* Copy exception list over to new stack.  I'm not quite sure how the
      exception list is extended by Windows itself.  What's clear is that it
      always grows downwards and that it starts right at the stackbase.

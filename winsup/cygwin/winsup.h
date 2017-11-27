@@ -160,10 +160,10 @@ extern "C" PVOID dll_dllcrt0 (HMODULE, per_process *);
 
 extern "C" void _pei386_runtime_relocator (per_process *);
 
-#ifndef __x86_64__
+#ifdef __i386__
 /* dynamically loaded dll initialization for non-cygwin apps */
 extern "C" int dll_noncygwin_dllcrt0 (HMODULE, per_process *);
-#endif /* !__x86_64__ */
+#endif /* __i386__ */
 
 void __reg1 do_exit (int) __attribute__ ((noreturn));
 

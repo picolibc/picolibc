@@ -61,7 +61,7 @@ extern int __dynamically_loaded;
 
 extern "C"
 {
-#ifndef __x86_64__
+#ifdef __i386__
 char **environ;
 #endif
 int _fmode;
@@ -114,7 +114,7 @@ _cygwin_crt0_common (MainFunc f, per_process *u)
 
   u->ctors = &__CTOR_LIST__;
   u->dtors = &__DTOR_LIST__;
-#ifndef __x86_64__
+#ifdef __i386__
   u->envptr = &environ;
 #endif
   if (uwasnull)

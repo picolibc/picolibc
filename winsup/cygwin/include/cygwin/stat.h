@@ -33,7 +33,7 @@ struct stat
 };
 
 #if defined (__INSIDE_CYGWIN__) || defined (_COMPILING_NEWLIB)
-#ifndef __x86_64__
+#ifdef __i386__
 struct __stat32
 {
   __dev16_t	st_dev;

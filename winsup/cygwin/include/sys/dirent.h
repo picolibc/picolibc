@@ -15,7 +15,7 @@
 
 #define __DIRENT_VERSION	2
 
-#ifndef __x86_64__
+#ifdef __i386__
 #pragma pack(push,4)
 #endif
 #define _DIRENT_HAVE_D_TYPE
@@ -28,7 +28,7 @@ struct dirent
   __uint32_t __d_internal1;
   char d_name[NAME_MAX + 1];
 };
-#ifndef __x86_64__
+#ifdef __i386__
 #pragma pack(pop)
 #endif
 
@@ -40,7 +40,7 @@ struct dirent
 #define __DIRENT_COOKIE 0xdede4242
 #endif
 
-#ifndef __x86_64__
+#ifdef __i386__
 #pragma pack(push,4)
 #endif
 typedef struct __DIR
@@ -56,7 +56,7 @@ typedef struct __DIR
   void *__fh;
   unsigned __flags;
 } DIR;
-#ifndef __x86_64__
+#ifdef __i386__
 #pragma pack(pop)
 #endif
 

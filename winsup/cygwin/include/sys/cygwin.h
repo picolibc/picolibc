@@ -20,7 +20,7 @@ extern "C" {
 
 #define _CYGWIN_SIGNAL_STRING "cYgSiGw00f"
 
-#ifndef __x86_64__
+#ifdef __i386__
 /* DEPRECATED INTERFACES.  These are restricted to MAX_PATH length.
    Don't use in modern applications.  They don't exist on x86_64. */
 extern int cygwin_win32_to_posix_path_list (const char *, char *)
@@ -39,7 +39,7 @@ extern int cygwin_conv_to_posix_path (const char *, char *)
   __attribute__ ((__deprecated__));
 extern int cygwin_conv_to_full_posix_path (const char *, char *)
   __attribute__ ((__deprecated__));
-#endif /* !__x86_64__ */
+#endif /* __i386__ */
 
 /* Use these interfaces in favor of the above. */
 
@@ -310,7 +310,7 @@ struct per_process
   uint32_t dll_minor;
 
   struct _reent **impure_ptr_ptr;
-#ifndef __x86_64__
+#ifdef __i386__
   char ***envptr;
 #endif
 

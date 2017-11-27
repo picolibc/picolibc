@@ -284,14 +284,14 @@ getuid32 (void)
   return cygheap->user.real_uid;
 }
 
-#ifdef __x86_64__
-EXPORT_ALIAS (getuid32, getuid)
-#else
+#ifdef __i386__
 extern "C" __uid16_t
 getuid (void)
 {
   return cygheap->user.real_uid;
 }
+#else
+EXPORT_ALIAS (getuid32, getuid)
 #endif
 
 extern "C" gid_t
@@ -300,14 +300,14 @@ getgid32 (void)
   return cygheap->user.real_gid;
 }
 
-#ifdef __x86_64__
-EXPORT_ALIAS (getgid32, getgid)
-#else
+#ifdef __i386__
 extern "C" __gid16_t
 getgid (void)
 {
   return cygheap->user.real_gid;
 }
+#else
+EXPORT_ALIAS (getgid32, getgid)
 #endif
 
 extern "C" uid_t
@@ -316,14 +316,14 @@ geteuid32 (void)
   return myself->uid;
 }
 
-#ifdef __x86_64__
-EXPORT_ALIAS (geteuid32, geteuid)
-#else
+#ifdef __i386__
 extern "C" uid_t
 geteuid (void)
 {
   return myself->uid;
 }
+#else
+EXPORT_ALIAS (geteuid32, geteuid)
 #endif
 
 extern "C" gid_t
@@ -332,14 +332,14 @@ getegid32 (void)
   return myself->gid;
 }
 
-#ifdef __x86_64__
-EXPORT_ALIAS (getegid32, getegid)
-#else
+#ifdef __i386__
 extern "C" __gid16_t
 getegid (void)
 {
   return myself->gid;
 }
+#else
+EXPORT_ALIAS (getegid32, getegid)
 #endif
 
 /* Not quite right - cuserid can change, getlogin can't */

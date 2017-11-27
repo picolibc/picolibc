@@ -17,7 +17,7 @@ extern "C" {
 #endif
 
 #ifdef __INSIDE_CYGWIN__
-#ifndef __x86_64__
+#ifdef __i386__
 struct __group16
 {
   char *gr_name;

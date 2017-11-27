@@ -273,7 +273,7 @@ dlopen (const char *name, int flags)
 	    break;
 	}
 
-#ifndef __x86_64__
+#ifdef __i386__
       /* Workaround for broken DLLs built against Cygwin versions 1.7.0-49
 	 up to 1.7.0-57.  They override the cxx_malloc pointer in their
 	 DLL initialization code even if loaded dynamically.  This is a
@@ -300,7 +300,7 @@ dlopen (const char *name, int flags)
 	    ++d->count;
 	}
 
-#ifndef __x86_64__
+#ifdef __i386__
       /* Restore original cxx_malloc pointer. */
       __cygwin_user_data.cxx_malloc = tmp_malloc;
 #endif

@@ -1227,7 +1227,7 @@ acl32 (const char *path, int cmd, int nentries, aclent_t *aclbufp)
   return res;
 }
 
-#ifndef __x86_64__
+#ifdef __i386__
 extern "C" int
 lacl32 (const char *path, int cmd, int nentries, aclent_t *aclbufp)
 {
@@ -1969,18 +1969,7 @@ aclfromtext32 (char *acltextp, int *aclcnt)
   return (aclent_t *) __aclfromtext (acltextp, aclcnt, false);
 }
 
-#ifdef __x86_64__
-EXPORT_ALIAS (acl32, acl)
-EXPORT_ALIAS (facl32, facl)
-EXPORT_ALIAS (aclcheck32, aclcheck)
-EXPORT_ALIAS (aclsort32, aclsort)
-EXPORT_ALIAS (acltomode32, acltomode)
-EXPORT_ALIAS (aclfrommode32, aclfrommode)
-EXPORT_ALIAS (acltopbits32, acltopbits)
-EXPORT_ALIAS (aclfrompbits32, aclfrompbits)
-EXPORT_ALIAS (acltotext32, acltotext)
-EXPORT_ALIAS (aclfromtext32, aclfromtext)
-#else
+#ifdef __i386__
 typedef struct __acl16 {
     int          a_type;
     __uid16_t    a_id;
@@ -2066,4 +2055,15 @@ aclfromtext (char *acltextp, int *aclcnt)
 {
   return (__aclent16_t *) aclfromtext32 (acltextp, aclcnt);
 }
-#endif /* !__x86_64__ */
+#else
+EXPORT_ALIAS (acl32, acl)
+EXPORT_ALIAS (facl32, facl)
+EXPORT_ALIAS (aclcheck32, aclcheck)
+EXPORT_ALIAS (aclsort32, aclsort)
+EXPORT_ALIAS (acltomode32, acltomode)
+EXPORT_ALIAS (aclfrommode32, aclfrommode)
+EXPORT_ALIAS (acltopbits32, acltopbits)
+EXPORT_ALIAS (aclfrompbits32, aclfrompbits)
+EXPORT_ALIAS (acltotext32, acltotext)
+EXPORT_ALIAS (aclfromtext32, aclfromtext)
+#endif

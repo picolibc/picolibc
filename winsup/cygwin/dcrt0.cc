@@ -390,7 +390,7 @@ check_sanity_and_sync (per_process *p)
     api_fatal ("cygwin DLL and APP are out of sync -- API version mismatch %u > %u",
 	       p->api_major, cygwin_version.api_major);
 
-#ifndef __x86_64__
+#ifdef __i386__
   /* This is a kludge to work around a version of _cygwin_common_crt0
      which overwrote the cxx_malloc field with the local DLL copy.
      Hilarity ensues if the DLL is not loaded while the process
@@ -712,7 +712,7 @@ init_windows_system_directory ()
 	api_fatal ("can't find windows system directory");
       windows_system_directory[windows_system_directory_length++] = L'\\';
       windows_system_directory[windows_system_directory_length] = L'\0';
-#ifndef __x86_64__
+#ifdef __i386__
       system_wow64_directory_length =
 	GetSystemWow64DirectoryW (system_wow64_directory, MAX_PATH);
       if (system_wow64_directory_length)
@@ -720,7 +720,7 @@ init_windows_system_directory ()
 	  system_wow64_directory[system_wow64_directory_length++] = L'\\';
 	  system_wow64_directory[system_wow64_directory_length] = L'\0';
 	}
-#endif /* !__x86_64__ */
+#endif /* __i386__ */
     }
 }
 
@@ -1103,14 +1103,14 @@ dll_crt0 (per_process *uptr)
 extern "C" void
 cygwin_dll_init ()
 {
-#ifndef __x86_64__
+#ifdef __i386__
   static char **envp;
 #endif
   static int _fmode;
 
   user_data->magic_biscuit = sizeof (per_process);
 
-#ifndef __x86_64__
+#ifdef __i386__
   user_data->envptr = &envp;
 #endif
   user_data->fmode_ptr = &_fmode;

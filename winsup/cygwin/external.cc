@@ -242,7 +242,7 @@ cygwin_internal (cygwin_getinfo_types t, ...)
 	break;
 
       case CW_USER_DATA:
-#ifndef __x86_64__
+#ifdef __i386__
 	/* This is a kludge to work around a version of _cygwin_common_crt0
 	   which overwrote the cxx_malloc field with the local DLL copy.
 	   Hilarity ensues if the DLL is not loaded like while the process

@@ -391,7 +391,7 @@ typedef struct
   uint32_t bsize;		/* uninitialized data "   "		*/
   uint32_t entry;		/* entry pt.				*/
   uint32_t text_start;	/* base of text used for this file */
-#ifndef __x86_64__
+#ifdef __i386__
   uint32_t data_start;	/* base of all data used for this file */
 #endif
 

@@ -84,7 +84,7 @@ dll::init ()
 {
   int ret = 1;
 
-#ifndef __x86_64__
+#ifdef __i386__
   /* This should be a no-op.  Why didn't we just import this variable? */
   if (!p.envptr)
     p.envptr = &__cygwin_environ;
@@ -243,7 +243,7 @@ dll_list::alloc (HINSTANCE h, per_process *p, dll_type type)
 	loaded_dlls++;
     }
   guard (false);
-#ifndef __x86_64__
+#ifdef __i386__
   assert (p->envptr != NULL);
 #endif
   return d;
@@ -725,7 +725,7 @@ dll_dllcrt0_1 (VOID *x)
     res = (PVOID) d;
 }
 
-#ifndef __x86_64__
+#ifdef __i386__
 /* OBSOLETE: This function is obsolete and will go away in the
    future.  Cygwin can now handle being loaded from a noncygwin app
    using the same entry point. */
@@ -734,7 +734,7 @@ dll_noncygwin_dllcrt0 (HMODULE h, per_process *p)
 {
   return (int) dll_dllcrt0 (h, p);
 }
-#endif /* !__x86_64__ */
+#endif /* __i386__ */
 
 extern "C" void
 cygwin_detach_dll (dll *)
@@ -753,7 +753,7 @@ dlfork (int val)
   dlls.reload_on_fork = val;
 }
 
-#ifndef __x86_64__
+#ifdef __i386__
 /* Called from various places to update all of the individual
    ideas of the environ block.  Explain to me again why we didn't
    just import __cygwin_environ? */

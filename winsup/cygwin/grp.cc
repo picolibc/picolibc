@@ -237,7 +237,7 @@ internal_getgrgid (gid_t gid, cyg_ldap *pldap)
   return NULL;
 }
 
-#ifndef __x86_64__
+#ifdef __i386__
 static struct __group16 *
 grp32togrp16 (struct __group16 *gp16, struct group *gp32)
 {
@@ -837,9 +837,7 @@ setgroups32 (int ngroups, const gid_t *grouplist)
   return 0;
 }
 
-#ifdef __x86_64__
-EXPORT_ALIAS (setgroups32, setgroups)
-#else
+#ifdef __i386__
 extern "C" int
 setgroups (int ngroups, const __gid16_t *grouplist)
 {
@@ -855,4 +853,6 @@ setgroups (int ngroups, const __gid16_t *grouplist)
     }
   return setgroups32 (ngroups, grouplist32);
 }
+#else
+EXPORT_ALIAS (setgroups32, setgroups)
 #endif

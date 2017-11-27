@@ -8,7 +8,7 @@ details. */
 
 struct per_module
 {
-#ifndef __x86_64__
+#ifdef __i386__
   char ***envptr;
 #endif
   void (**ctors)(void);
@@ -20,7 +20,7 @@ struct per_module
   int (*main)(int, char **, char **);
   per_module &operator = (per_process *p)
   {
-#ifndef __x86_64__
+#ifdef __i386__
     envptr = p->envptr;
 #endif
     ctors = p->ctors;

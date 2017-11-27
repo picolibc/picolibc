@@ -1065,7 +1065,7 @@ mmap64 (void *addr, size_t len, int prot, int flags, int fd, off_t off)
 	 Note that this isn't done in 64 bit environments since apparently
 	 64 bit systems don't support the AT_ROUND_TO_PAGE flag, which is
 	 required to get this right.  Too bad. */
-#ifndef __x86_64__
+#ifdef __i386__
       if (!wincap.is_wow64 ()
 	  && (((off_t) len > fsiz && !autogrow (flags))
 	      || roundup2 (len, wincap.page_size ())
@@ -1228,14 +1228,14 @@ out:
   return ret;
 }
 
-#ifdef __x86_64__
-EXPORT_ALIAS (mmap64, mmap)
-#else
+#ifdef __i386__
 extern "C" void *
 mmap (void *addr, size_t len, int prot, int flags, int fd, _off_t off)
 {
   return mmap64 (addr, len, prot, flags, fd, (off_t)off);
 }
+#else
+EXPORT_ALIAS (mmap64, mmap)
 #endif
 
 /* munmap () removes all mmapped pages between addr and addr+len. */

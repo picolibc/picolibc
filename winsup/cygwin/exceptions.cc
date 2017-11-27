@@ -434,7 +434,7 @@ _cygtls::inside_kernel (CONTEXT *cx)
 	checkdir += 4;
       res = wcsncasecmp (windows_system_directory, checkdir,
 			 windows_system_directory_length) == 0;
-#ifndef __x86_64__
+#ifdef __i386__
       if (!res && system_wow64_directory_length)
 	res = wcsncasecmp (system_wow64_directory, checkdir,
 			   system_wow64_directory_length) == 0;
@@ -628,7 +628,7 @@ exception::handle (EXCEPTION_RECORD *e, exception_list *frame, CONTEXT *in,
   static int NO_COPY debugging = 0;
   _cygtls& me = _my_tls;
 
-#ifndef __x86_64__
+#ifdef __i386__
   if (me.andreas)
     me.andreas->leave ();	/* Return from a "san" caught fault */
 #endif

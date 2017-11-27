@@ -225,14 +225,14 @@ getpwuid32 (uid_t uid)
   return getpw_cp (temppw);
 }
 
-#ifdef __x86_64__
-EXPORT_ALIAS (getpwuid32, getpwuid)
-#else
+#ifdef __i386__
 extern "C" struct passwd *
 getpwuid (__uid16_t uid)
 {
   return getpwuid32 (uid16touid32 (uid));
 }
+#else
+EXPORT_ALIAS (getpwuid32, getpwuid)
 #endif
 
 extern "C" int
@@ -754,7 +754,7 @@ endpwent_filtered (void *pw)
   ((pw_ent *) pw)->endpwent ();
 }
 
-#ifndef __x86_64__
+#ifdef __i386__
 extern "C" struct passwd *
 getpwduid (__uid16_t)
 {
