@@ -774,7 +774,10 @@ sigfe.o: sigfe.s $(srcdir)/$(TLSOFFSETS_H)
 ctags: CTAGS
 tags:  CTAGS
 CTAGS:
-	-cd $(srcdir) && ctags -R --regex-C++='/^([a-zA-Z0-9_]*::[a-zA-Z0-9_]*) /\1/f/' .
+	-cd $(srcdir) && \
+	ctags -R --c++-kinds=+p --fields=+iaS --extra=+q \
+	--regex-C++='/EXPORT_ALIAS *\([[a-zA-Z0-9_]*, *([a-zA-Z0-9_]*)\)/\1/' \
+	@newlib_headers@ .
 
 deps:=${wildcard *.d}
 ifneq (,$(deps))
