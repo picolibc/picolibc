@@ -801,14 +801,16 @@ fhandler_socket::wait_for_events (const long event_mask, const DWORD flags)
 void
 fhandler_socket::release_events ()
 {
-  HANDLE evt = wsock_evt;
-  HANDLE mtx = wsock_mtx;
+  if (WaitForSingleObject (wsock_mtx, INFINITE) != WAIT_FAILED)
+    {
+      HANDLE evt = wsock_evt;
+      HANDLE mtx = wsock_mtx;
 
-  LOCK_EVENTS;
-  wsock_evt = wsock_mtx = NULL;
-  } ReleaseMutex (mtx);	/* == UNLOCK_EVENTS, but note using local mtx here. */
-  NtClose (evt);
-  NtClose (mtx);
+      wsock_evt = wsock_mtx = NULL;
+      ReleaseMutex (mtx);
+      NtClose (evt);
+      NtClose (mtx);
+    }
 }
 
 /* Called from net.cc:fdsock() if a freshly created socket is not
