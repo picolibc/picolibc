@@ -73,4 +73,8 @@ int	 strncasecmp_l (const char *, const char *, size_t, locale_t);
 #endif
 __END_DECLS
 
+#if __SSP_FORTIFY_LEVEL > 0
+#include <ssp/strings.h>
+#endif
+
 #endif /* _STRINGS_H_ */
