@@ -324,6 +324,10 @@ endif
 	  for i in $(srcdir)/libc/include/rpc/*.h; do \
 	   $(INSTALL_DATA) $$i $(DESTDIR)$(tooldir)/include/rpc/`basename $$i`; \
 	  done; \
+	  $(mkinstalldirs) $(DESTDIR)$(tooldir)/include/ssp; \
+	  for i in $(srcdir)/libc/include/ssp/*.h; do \
+	   $(INSTALL_DATA) $$i $(DESTDIR)$(tooldir)/include/ssp/`basename $$i`; \
+	  done; \
 	  $(mkinstalldirs) $(DESTDIR)$(tooldir)/include/sys; \
 	  for i in $(srcdir)/libc/include/sys/*.h; do \
 	   $(INSTALL_DATA) $$i $(DESTDIR)$(tooldir)/include/sys/`basename $$i`; \

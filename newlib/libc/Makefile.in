@@ -90,9 +90,10 @@ am__DEPENDENCIES_1 =
 @USE_LIBTOOL_FALSE@	time/lib.$(aext) locale/lib.$(aext) \
 @USE_LIBTOOL_FALSE@	reent/lib.$(aext) $(am__DEPENDENCIES_1) \
 @USE_LIBTOOL_FALSE@	errno/lib.$(aext) misc/lib.$(aext) \
+@USE_LIBTOOL_FALSE@	ssp/lib.$(aext) $(am__DEPENDENCIES_1) \
 @USE_LIBTOOL_FALSE@	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
-@USE_LIBTOOL_FALSE@	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_2) \
-@USE_LIBTOOL_FALSE@	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1)
+@USE_LIBTOOL_FALSE@	$(am__DEPENDENCIES_2) $(am__DEPENDENCIES_1) \
+@USE_LIBTOOL_FALSE@	$(am__DEPENDENCIES_1)
 @USE_LIBTOOL_TRUE@am__DEPENDENCIES_3 = argz/libargz.$(aext) \
 @USE_LIBTOOL_TRUE@	stdlib/libstdlib.$(aext) \
 @USE_LIBTOOL_TRUE@	ctype/libctype.$(aext) \
@@ -104,9 +105,9 @@ am__DEPENDENCIES_1 =
 @USE_LIBTOOL_TRUE@	locale/liblocale.$(aext) \
 @USE_LIBTOOL_TRUE@	reent/libreent.$(aext) $(am__DEPENDENCIES_1) \
 @USE_LIBTOOL_TRUE@	errno/liberrno.$(aext) misc/libmisc.$(aext) \
+@USE_LIBTOOL_TRUE@	ssp/libssp.$(aext) $(am__DEPENDENCIES_1) \
 @USE_LIBTOOL_TRUE@	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
-@USE_LIBTOOL_TRUE@	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) \
-@USE_LIBTOOL_TRUE@	$(am__DEPENDENCIES_1)
+@USE_LIBTOOL_TRUE@	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1)
 am_libc_la_OBJECTS =
 libc_la_OBJECTS = $(am_libc_la_OBJECTS)
 libc_la_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
@@ -191,7 +192,7 @@ ETAGS = etags
 CTAGS = ctags
 DIST_SUBDIRS = argz stdlib ctype search stdio stdio64 string signal \
 	time locale sys reent @extra_dir@ errno misc machine unix \
-	posix syscalls iconv xdr .
+	posix syscalls iconv xdr ssp .
 ACLOCAL = @ACLOCAL@
 AMTAR = @AMTAR@
 AR = @AR@
@@ -353,7 +354,7 @@ AUTOMAKE_OPTIONS = cygnus
 # Do not change the order without considering the doc impact.
 SUBDIRS = argz stdlib ctype search $(STDIO_SUBDIR) $(STDIO64_SUBDIR) string $(SIGNAL_SUBDIR) time locale sys reent \
 	$(extra_dir) errno misc machine $(UNIX_SUBDIR) $(POSIX_SUBDIR) $(SYSCALLS_SUBDIR) $(NEWLIB_ICONV_DIRS) \
-	$(XDR_SUBDIR) .
+	$(XDR_SUBDIR) ssp .
 
 noinst_DATA = $(CRT0)
 @USE_LIBTOOL_TRUE@noinst_LTLIBRARIES = libc.la
@@ -373,6 +374,7 @@ noinst_DATA = $(CRT0)
 @USE_LIBTOOL_FALSE@	$(LIBC_EXTRA_LIB) \
 @USE_LIBTOOL_FALSE@	errno/lib.$(aext) \
 @USE_LIBTOOL_FALSE@	misc/lib.$(aext) \
+@USE_LIBTOOL_FALSE@	ssp/lib.$(aext) \
 @USE_LIBTOOL_FALSE@	$(LIBC_UNIX_LIB) \
 @USE_LIBTOOL_FALSE@	$(LIBC_POSIX_LIB) \
 @USE_LIBTOOL_FALSE@	$(LIBC_SYSCALL_LIB) \
@@ -396,6 +398,7 @@ noinst_DATA = $(CRT0)
 @USE_LIBTOOL_TRUE@	$(LIBC_EXTRA_LIB) \
 @USE_LIBTOOL_TRUE@	errno/liberrno.$(aext) \
 @USE_LIBTOOL_TRUE@	misc/libmisc.$(aext) \
+@USE_LIBTOOL_TRUE@	ssp/libssp.$(aext) \
 @USE_LIBTOOL_TRUE@	$(LIBC_UNIX_LIB) \
 @USE_LIBTOOL_TRUE@	$(LIBC_POSIX_LIB) \
 @USE_LIBTOOL_TRUE@	$(LIBC_SYSCALL_LIB) \
