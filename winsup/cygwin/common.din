@@ -7,6 +7,7 @@ __cygwin_user_data DATA
 __mb_cur_max DATA
 __progname DATA
 __rcmd_errstr DATA
+__stack_chk_guard DATA
 _check_for_executable DATA
 _ctype_ DATA
 _daylight DATA
@@ -42,6 +43,7 @@ __assertfail NOSIGFE
 __b64_ntop NOSIGFE
 __b64_pton NOSIGFE
 __bsd_qsort_r NOSIGFE
+__chk_fail SIGFE
 __cxa_atexit = cygwin__cxa_atexit SIGFE
 __cxa_finalize SIGFE
 __dn_comp SIGFE
@@ -62,6 +64,7 @@ __fwritable NOSIGFE
 __fwriting NOSIGFE
 __getpagesize = getpagesize SIGFE
 __getreent NOSIGFE
+__gets_chk SIGFE
 __gnu_basename NOSIGFE
 __infinity NOSIGFE
 __isinfd = isinf NOSIGFE
@@ -72,7 +75,11 @@ __locale_ctype_ptr NOSIGFE
 __locale_ctype_ptr_l NOSIGFE
 __locale_mb_cur_max NOSIGFE
 __main NOSIGFE
+__memcpy_chk NOSIGFE
+__memmove_chk NOSIGFE
 __mempcpy = mempcpy NOSIGFE
+__mempcpy_chk NOSIGFE
+__memset_chk NOSIGFE
 __opendir_with_d_ino SIGFE
 __res_close SIGFE
 __res_init SIGFE
@@ -92,10 +99,22 @@ __res_state SIGFE
 __signbitd NOSIGFE
 __signbitf NOSIGFE
 __signgam NOSIGFE
+__snprintf_chk SIGFE
+__sprintf_chk SIGFE
 __srget SIGFE
 __srget_r SIGFE
+__stack_chk_fail SIGFE
+__stack_chk_fail_local = __stack_chk_fail SIGFE
+__stpcpy_chk NOSIGFE
+__stpncpy_chk NOSIGFE
+__strcat_chk NOSIGFE
+__strcpy_chk NOSIGFE
+__strncat_chk NOSIGFE
+__strncpy_chk NOSIGFE
 __swbuf SIGFE
 __swbuf_r SIGFE
+__vsnprintf_chk SIGFE
+__vsprintf_chk SIGFE
 __wrap__ZdaPv NOSIGFE               # void operator delete[](void *p) throw()
 __wrap__ZdaPvRKSt9nothrow_t NOSIGFE # void operator delete[](void *p, const std::nothrow_t &nt) throw()
 __wrap__ZdlPv NOSIGFE               # void operator delete(void *p) throw()
