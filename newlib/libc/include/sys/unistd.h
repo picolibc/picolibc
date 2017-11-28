@@ -567,4 +567,9 @@ int	_EXFUN(unlinkat, (int, const char *, int));
 #ifdef __cplusplus
 }
 #endif
+
+#if __SSP_FORTIFY_LEVEL > 0
+#include <ssp/unistd.h>
+#endif
+
 #endif /* _SYS_UNISTD_H */
