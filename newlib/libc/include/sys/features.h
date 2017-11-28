@@ -448,7 +448,7 @@ extern "C" {
 #define _POSIX_THREAD_SAFE_FUNCTIONS		200809L
 /* #define _POSIX_THREAD_SPORADIC_SERVER	    -1 */
 #define _POSIX_THREADS				200809L
-/* #define _POSIX_TIMEOUTS			    -1 */
+#define _POSIX_TIMEOUTS				200809L
 #define _POSIX_TIMERS				200809L
 /* #define _POSIX_TRACE				    -1 */
 /* #define _POSIX_TRACE_EVENT_FILTER		    -1 */

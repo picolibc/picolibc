@@ -588,7 +588,7 @@ static struct
   {cons, {c:SYMLOOP_MAX}},		/*  79, _SC_SYMLOOP_MAX */
   {cons, {c:_POSIX_THREAD_CPUTIME}},	/*  80, _SC_THREAD_CPUTIME */
   {cons, {c:-1L}},			/*  81, _SC_THREAD_SPORADIC_SERVER */
-  {cons, {c:-1L}},			/*  82, _SC_TIMEOUTS */
+  {cons, {c:_POSIX_TIMEOUTS}},		/*  82, _SC_TIMEOUTS */
   {cons, {c:-1L}},			/*  83, _SC_TRACE */
   {cons, {c:-1L}},			/*  84, _SC_TRACE_EVENT_FILTER */
   {nsup, {c:0}},			/*  85, _SC_TRACE_EVENT_NAME_MAX */
