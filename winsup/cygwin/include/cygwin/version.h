@@ -484,12 +484,17 @@ details. */
   317: Export renameat2.
   318: Export strnstr.
   319: Define O_TMPFILE, O_NOATIME.
+  320: Export __chk_fail, __gets_chk, __memcpy_chk, __memmove_chk,
+       __mempcpy_chk, __memset_chk, __snprintf_chk, __sprintf_chk,
+       __stack_chk_fail, __stack_chk_guard, __stpcpy_chk, __stpncpy_chk,
+       __strcat_chk, __strcpy_chk, __strncat_chk, __strncpy_chk,
+       __vsnprintf_chk, __vsprintf_chk.
 
   Note that we forgot to bump the api for ualarm, strtoll, strtoull,
   sigaltstack, sethostname. */
 
 #define CYGWIN_VERSION_API_MAJOR 0
-#define CYGWIN_VERSION_API_MINOR 319
+#define CYGWIN_VERSION_API_MINOR 320
 
 /* There is also a compatibity version number associated with the shared memory
    regions.  It is incremented when incompatible changes are made to the shared
