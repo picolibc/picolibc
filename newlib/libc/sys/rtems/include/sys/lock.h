@@ -137,6 +137,8 @@ void _Mutex_Acquire(struct _Mutex_Control *);
 
 int _Mutex_Acquire_timed(struct _Mutex_Control *, const struct timespec *);
 
+int _Mutex_Acquire_timed_ticks(struct _Mutex_Control *, __uint32_t);
+
 int _Mutex_Try_acquire(struct _Mutex_Control *);
 
 void _Mutex_Release(struct _Mutex_Control *);
@@ -185,6 +187,9 @@ void _Mutex_recursive_Acquire(struct _Mutex_recursive_Control *);
 int _Mutex_recursive_Acquire_timed(struct _Mutex_recursive_Control *,
     const struct timespec *);
 
+int _Mutex_recursive_Acquire_timed_ticks(struct _Mutex_recursive_Control *,
+    __uint32_t);
+
 int _Mutex_recursive_Try_acquire(struct _Mutex_recursive_Control *);
 
 void _Mutex_recursive_Release(struct _Mutex_recursive_Control *);
@@ -232,11 +237,17 @@ void _Condition_Wait(struct _Condition_Control *, struct _Mutex_Control *);
 int _Condition_Wait_timed(struct _Condition_Control *,
     struct _Mutex_Control *, const struct timespec *);
 
+int _Condition_Wait_timed_ticks(struct _Condition_Control *,
+    struct _Mutex_Control *, __uint32_t);
+
 void _Condition_Wait_recursive(struct _Condition_Control *,
     struct _Mutex_recursive_Control *);
 
 int _Condition_Wait_recursive_timed(struct _Condition_Control *,
     struct _Mutex_recursive_Control *, const struct timespec *);
+
+int _Condition_Wait_recursive_timed_ticks(struct _Condition_Control *,
+    struct _Mutex_recursive_Control *, __uint32_t);
 
 void _Condition_Signal(struct _Condition_Control *);
 
@@ -283,6 +294,11 @@ _Semaphore_Get_name(const struct _Semaphore_Control *_semaphore)
 }
 
 void _Semaphore_Wait(struct _Semaphore_Control *);
+
+int _Semaphore_Wait_timed(struct _Semaphore_Control *,
+    const struct timespec *);
+
+int _Semaphore_Wait_timed_ticks(struct _Semaphore_Control *, __uint32_t);
 
 void _Semaphore_Post(struct _Semaphore_Control *);
 
