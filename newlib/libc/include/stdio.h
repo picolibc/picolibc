@@ -796,4 +796,8 @@ _putchar_unlocked(int _c)
 
 _END_STD_C
 
+#if __SSP_FORTIFY_LEVEL > 0
+#include <ssp/stdio.h>
+#endif
+
 #endif /* _STDIO_H_ */
