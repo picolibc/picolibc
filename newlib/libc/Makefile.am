@@ -42,7 +42,7 @@ endif
 # Do not change the order without considering the doc impact.
 SUBDIRS = argz stdlib ctype search $(STDIO_SUBDIR) $(STDIO64_SUBDIR) string $(SIGNAL_SUBDIR) time locale sys reent \
 	$(extra_dir) errno misc machine $(UNIX_SUBDIR) $(POSIX_SUBDIR) $(SYSCALLS_SUBDIR) $(NEWLIB_ICONV_DIRS) \
-	$(XDR_SUBDIR) .
+	$(XDR_SUBDIR) ssp .
 
 noinst_DATA = $(CRT0)
 
@@ -64,6 +64,7 @@ SUBLIBS = \
 	$(LIBC_EXTRA_LIB) \
 	errno/liberrno.$(aext) \
 	misc/libmisc.$(aext) \
+	ssp/libssp.$(aext) \
 	$(LIBC_UNIX_LIB) \
 	$(LIBC_POSIX_LIB) \
 	$(LIBC_SYSCALL_LIB) \
@@ -87,6 +88,7 @@ SUBLIBS = \
 	$(LIBC_EXTRA_LIB) \
 	errno/lib.$(aext) \
 	misc/lib.$(aext) \
+	ssp/lib.$(aext) \
 	$(LIBC_UNIX_LIB) \
 	$(LIBC_POSIX_LIB) \
 	$(LIBC_SYSCALL_LIB) \

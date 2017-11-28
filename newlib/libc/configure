@@ -12121,7 +12121,7 @@ fi
 
 
 
-ac_config_files="$ac_config_files Makefile argz/Makefile ctype/Makefile errno/Makefile locale/Makefile misc/Makefile reent/Makefile search/Makefile stdio/Makefile stdio64/Makefile stdlib/Makefile string/Makefile time/Makefile posix/Makefile signal/Makefile syscalls/Makefile unix/Makefile iconv/Makefile iconv/ces/Makefile iconv/ccs/Makefile iconv/ccs/binary/Makefile iconv/lib/Makefile xdr/Makefile"
+ac_config_files="$ac_config_files Makefile argz/Makefile ctype/Makefile errno/Makefile locale/Makefile misc/Makefile reent/Makefile search/Makefile stdio/Makefile stdio64/Makefile stdlib/Makefile string/Makefile time/Makefile posix/Makefile signal/Makefile syscalls/Makefile unix/Makefile iconv/Makefile iconv/ces/Makefile iconv/ccs/Makefile iconv/ccs/binary/Makefile iconv/lib/Makefile ssp/Makefile xdr/Makefile"
 
 cat >confcache <<\_ACEOF
 # This file is a shell script that caches the results of configure
@@ -13240,6 +13240,7 @@ do
     "iconv/ccs/Makefile") CONFIG_FILES="$CONFIG_FILES iconv/ccs/Makefile" ;;
     "iconv/ccs/binary/Makefile") CONFIG_FILES="$CONFIG_FILES iconv/ccs/binary/Makefile" ;;
     "iconv/lib/Makefile") CONFIG_FILES="$CONFIG_FILES iconv/lib/Makefile" ;;
+    "ssp/Makefile") CONFIG_FILES="$CONFIG_FILES ssp/Makefile" ;;
     "xdr/Makefile") CONFIG_FILES="$CONFIG_FILES xdr/Makefile" ;;
 
   *) as_fn_error $? "invalid argument: \`$ac_config_target'" "$LINENO" 5;;
