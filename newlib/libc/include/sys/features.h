@@ -100,6 +100,9 @@ extern "C" {
  * _SVID_SOURCE (deprecated by _DEFAULT_SOURCE)
  * _DEFAULT_SOURCE (or none of the above)
  * 	POSIX-1.2008 with BSD and SVr4 extensions
+ *
+ * _FORTIFY_SOURCE = 1 or 2
+ * 	Object Size Checking function wrappers
  */
 
 #ifdef _GNU_SOURCE
@@ -233,9 +236,11 @@ extern "C" {
  * __GNU_VISIBLE
  * 	GNU extensions; enabled with _GNU_SOURCE.
  *
+ * __SSP_FORTIFY_LEVEL
+ * 	Object Size Checking; defined to 0 (off), 1, or 2.
+ *
  * In all cases above, "enabled by default" means either by defining
  * _DEFAULT_SOURCE, or by not defining any of the public feature test macros.
- * Defining _GNU_SOURCE makes all of the above avaliable.
  */
 
 #ifdef _ATFILE_SOURCE
@@ -312,6 +317,17 @@ extern "C" {
 #define	__XSI_VISIBLE		1
 #else
 #define	__XSI_VISIBLE		0
+#endif
+
+#if _FORTIFY_SOURCE > 0 && !defined(__cplusplus) && !defined(__lint__) && \
+   (__OPTIMIZE__ > 0 || defined(__clang__)) && __GNUC_PREREQ__(4, 1)
+#  if _FORTIFY_SOURCE > 1
+#    define __SSP_FORTIFY_LEVEL 2
+#  else
+#    define __SSP_FORTIFY_LEVEL 1
+#  endif
+#else
+#  define __SSP_FORTIFY_LEVEL 0
 #endif
 
 /* RTEMS adheres to POSIX -- 1003.1b with some features from annexes.  */
