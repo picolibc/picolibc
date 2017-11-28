@@ -1635,10 +1635,8 @@ fhandler_disk_file::pwrite (void *buf, size_t count, off_t offset)
 
       if (!prw_handle && prw_open (true))
 	goto non_atomic;
-      debug_printf ("Before NtWriteFile, io %Y", io.Information);
       status = NtWriteFile (prw_handle, NULL, NULL, NULL, &io, buf, count,
 			    &off, NULL);
-      debug_printf ("After NtWriteFile, io %Y, status %y", io.Information);
       if (!NT_SUCCESS (status))
 	{
 	  __seterrno_from_nt_status (status);
