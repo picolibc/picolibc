@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015, 2016 embedded brains GmbH.  All rights reserved.
+ * Copyright (c) 2015, 2017 embedded brains GmbH.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -119,6 +119,20 @@ _Mutex_Initialize_named(struct _Mutex_Control *_mutex, const char *_name)
 	*_mutex = _init;
 }
 
+static __inline void
+_Mutex_Set_name(struct _Mutex_Control *_mutex, const char *_name)
+{
+
+	_mutex->_Queue._name = _name;
+}
+
+static __inline const char *
+_Mutex_Get_name(const struct _Mutex_Control *_mutex)
+{
+
+	return (_mutex->_Queue._name);
+}
+
 void _Mutex_Acquire(struct _Mutex_Control *);
 
 int _Mutex_Acquire_timed(struct _Mutex_Control *, const struct timespec *);
@@ -152,6 +166,20 @@ _Mutex_recursive_Initialize_named(struct _Mutex_recursive_Control *_mutex,
 	*_mutex = _init;
 }
 
+static __inline void
+_Mutex_recursive_Set_name(struct _Mutex_recursive_Control *_mutex, const char *_name)
+{
+
+	_mutex->_Mutex._Queue._name = _name;
+}
+
+static __inline const char *
+_Mutex_recursive_Get_name(const struct _Mutex_recursive_Control *_mutex)
+{
+
+	return (_mutex->_Mutex._Queue._name);
+}
+
 void _Mutex_recursive_Acquire(struct _Mutex_recursive_Control *);
 
 int _Mutex_recursive_Acquire_timed(struct _Mutex_recursive_Control *,
@@ -183,6 +211,20 @@ _Condition_Initialize_named(struct _Condition_Control *_cond,
 	struct _Condition_Control _init = _CONDITION_NAMED_INITIALIZER(_name);
 
 	*_cond = _init;
+}
+
+static __inline void
+_Condition_Set_name(struct _Condition_Control *_condition, const char *_name)
+{
+
+	_condition->_Queue._name = _name;
+}
+
+static __inline const char *
+_Condition_Get_name(const struct _Condition_Control *_condition)
+{
+
+	return (_condition->_Queue._name);
 }
 
 void _Condition_Wait(struct _Condition_Control *, struct _Mutex_Control *);
@@ -226,6 +268,20 @@ _Semaphore_Initialize_named(struct _Semaphore_Control *_semaphore,
 	*_semaphore = _init;
 }
 
+static __inline void
+_Semaphore_Set_name(struct _Semaphore_Control *_semaphore, const char *_name)
+{
+
+	_semaphore->_Queue._name = _name;
+}
+
+static __inline const char *
+_Semaphore_Get_name(const struct _Semaphore_Control *_semaphore)
+{
+
+	return (_semaphore->_Queue._name);
+}
+
 void _Semaphore_Wait(struct _Semaphore_Control *);
 
 void _Semaphore_Post(struct _Semaphore_Control *);
@@ -251,6 +307,20 @@ _Futex_Initialize_named(struct _Futex_Control *_futex, const char *_name)
 	struct _Futex_Control _init = _FUTEX_NAMED_INITIALIZER(_name);
 
 	*_futex = _init;
+}
+
+static __inline void
+_Futex_Set_name(struct _Futex_Control *_futex, const char *_name)
+{
+
+	_futex->_Queue._name = _name;
+}
+
+static __inline const char *
+_Futex_Get_name(const struct _Futex_Control *_futex)
+{
+
+	return (_futex->_Queue._name);
 }
 
 int _Futex_Wait(struct _Futex_Control *, int *, int);
