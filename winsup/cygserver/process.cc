@@ -172,7 +172,6 @@ process::cleanup ()
 void
 process_cache::submission_loop::request_loop ()
 {
-  assert (this);
   assert (_cache);
   assert (_interrupt_event);
 
@@ -377,7 +376,6 @@ process_cache::wait_for_processes (const HANDLE interrupt_event)
 size_t
 process_cache::sync_wait_array (const HANDLE interrupt_event)
 {
-  assert (this);
   assert (interrupt_event && interrupt_event != INVALID_HANDLE_VALUE);
 
   /* Always reset _cache_add_trigger before filling up the array again. */
@@ -424,7 +422,6 @@ process_cache::sync_wait_array (const HANDLE interrupt_event)
 void
 process_cache::check_and_remove_process (const size_t index)
 {
-  assert (this);
   assert (index < elements (_wait_array) - SPECIALS_COUNT);
 
   class process *const process = _process_array[index];

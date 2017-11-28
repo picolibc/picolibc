@@ -85,7 +85,6 @@ threaded_queue::~threaded_queue ()
 void
 threaded_queue::add_submission_loop (queue_submission_loop *const submitter)
 {
-  assert (this);
   assert (submitter);
   assert (submitter->_queue == this);
   assert (!submitter->_next);
@@ -158,7 +157,6 @@ threaded_queue::stop ()
 void
 threaded_queue::add (queue_request *const therequest)
 {
-  assert (this);
   assert (therequest);
   assert (!therequest->_next);
 
@@ -313,7 +311,6 @@ queue_submission_loop::~queue_submission_loop ()
 bool
 queue_submission_loop::start ()
 {
-  assert (this);
   assert (!_hThread);
 
   const bool was_running = _running;
@@ -337,7 +334,6 @@ queue_submission_loop::start ()
 bool
 queue_submission_loop::stop ()
 {
-  assert (this);
   assert (_hThread && _hThread != INVALID_HANDLE_VALUE);
 
   const bool was_running = _running;
