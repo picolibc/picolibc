@@ -27,6 +27,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
+#define _XOPEN_SOURCE
 #include <error.h>
 #include <errno.h>
 #include <limits.h>
