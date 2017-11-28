@@ -176,4 +176,8 @@ char	*_EXFUN(__nonnull ((1)) basename,(const char *)) __asm__(__ASMNAME("__gnu_b
 
 _END_STD_C
 
+#if __SSP_FORTIFY_LEVEL > 0
+#include <ssp/string.h>
+#endif
+
 #endif /* _STRING_H_ */
