@@ -300,7 +300,11 @@ int _Semaphore_Wait_timed(struct _Semaphore_Control *,
 
 int _Semaphore_Wait_timed_ticks(struct _Semaphore_Control *, __uint32_t);
 
+int _Semaphore_Try_wait(struct _Semaphore_Control *);
+
 void _Semaphore_Post(struct _Semaphore_Control *);
+
+void _Semaphore_Post_binary(struct _Semaphore_Control *);
 
 static __inline void
 _Semaphore_Destroy(struct _Semaphore_Control *_semaphore)
