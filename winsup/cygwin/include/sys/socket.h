@@ -50,4 +50,8 @@ extern "C"
 };
 #endif
 
+#if __SSP_FORTIFY_LEVEL > 0
+#include <ssp/socket.h>
+#endif
+
 #endif /* _SYS_SOCKET_H */
