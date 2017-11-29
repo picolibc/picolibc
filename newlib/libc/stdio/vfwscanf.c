@@ -740,14 +740,7 @@ _DEFUN(__SVFWSCANF_R, (rptr, fp, fmt0, ap),
 	    }
 	  continue;
 
-	  /*
-	   * Disgusting backwards compatibility hacks.	XXX
-	   */
-	case L'\0':		/* compat */
-	  _newlib_flockfile_exit (fp);
-	  return EOF;
-
-	default:		/* compat */
+	default:
 	  goto match_failure;
 	}
 

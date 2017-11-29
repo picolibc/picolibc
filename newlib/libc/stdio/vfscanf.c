@@ -787,20 +787,8 @@ _DEFUN(__SVFSCANF_R, (rptr, fp, fmt0, ap),
 	    }
 	  continue;
 
-	  /*
-	   * Disgusting backwards compatibility hacks.	XXX
-	   */
-	case '\0':		/* compat */
-	  _newlib_flockfile_exit (fp);
-	  return EOF;
-
-	default:		/* compat */
-	  if (isupper (c))
-	    flags |= LONG;
-	  c = CT_INT;
-	  ccfn = (u_long (*)CCFN_PARAMS)_strtol_r;
-	  base = 10;
-	  break;
+	default:
+	  goto match_failure;
 	}
 
       /*
