@@ -47,4 +47,8 @@ extern int ppoll __P ((struct pollfd *fds, nfds_t nfds,
 
 __END_DECLS
 
+#if __SSP_FORTIFY_LEVEL > 0
+#include <ssp/poll.h>
+#endif
+
 #endif /* _SYS_POLL_H */
