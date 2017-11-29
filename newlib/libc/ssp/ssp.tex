@@ -1,0 +1,44 @@
+@node Overflow Protection
+@chapter Overflow Protection
+
+@menu
+* Stack Smashing Protection::    Checks enabled with -fstack-protector*
+* Object Size Checking::         Checks enabled with _FORTIFY_SOURCE
+@end menu
+
+@node Stack Smashing Protection
+@section Stack Smashing Protection
+Stack Smashing Protection is a compiler feature which emits extra code
+to check for stack smashing attacks.  It depends on a canary, which is
+initialized with the process, and functions for process termination when
+an overflow is detected.  These are private entry points intended solely
+for use by the compiler, and are used when any of the @code{-fstack-protector},
+@code{-fstack-protector-all}, @code{-fstack-protector-explicit}, or
+@code{-fstack-protector-strong} compiler flags are enabled.
+
+@node Object Size Checking
+@section Object Size Checking
+Object Size Checking is a feature which wraps certain functions with checks
+to prevent buffer overflows.  These are enabled when compiling with
+optimization (@code{-O1} and higher) and @code{_FORTIFY_SOURCE} defined
+to 1, or for stricter checks, to 2.
+
+@cindex list of overflow protected functions
+The following functions use object size checking to detect buffer overflows
+when enabled:
+
+@example
+@exdent @emph{String functions:}
+bcopy           memmove         strcpy
+bzero           mempcpy         strcat
+explicit_bzero  memset          strncat
+memcpy          stpcpy          strncpy
+
+@exdent @emph{Stdio functions:}
+fgets           fread_unlocked  sprintf
+fgets_unlocked  gets            vsnprintf
+fread           snprintf        vsprintf
+
+@exdent @emph{System functions:}
+getcwd          read            readlink
+@end example

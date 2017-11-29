@@ -171,6 +171,7 @@ into another language, under the above conditions for modified versions.
 @ifset ICONV
 * Iconv::
 @end ifset
+* Overflow Protection::
 
 * Document Index::
 @end menu

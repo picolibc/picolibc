@@ -35,6 +35,7 @@
   <xi:include href="iconv.xml">
       <xi:fallback/>
   </xi:include>
+  <!-- ssp.tex contains fixed content -->
 
   <!-- processing should insert index here -->
   <index/>
