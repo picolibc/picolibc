@@ -16,7 +16,7 @@ INDEX
 INDEX
 	_vdiprintf_r
 
-ANSI_SYNOPSIS
+SYNOPSIS
 	#include <stdio.h>
 	#include <stdarg.h>
 	int diprintf(int <[fd]>, const char *<[format]>, ...);

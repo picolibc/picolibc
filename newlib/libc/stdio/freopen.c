@@ -24,25 +24,12 @@ INDEX
 INDEX
 	_freopen_r
 
-ANSI_SYNOPSIS
+SYNOPSIS
 	#include <stdio.h>
 	FILE *freopen(const char *restrict <[file]>, const char *restrict <[mode]>,
 		      FILE *restrict <[fp]>);
 	FILE *_freopen_r(struct _reent *<[ptr]>, const char *restrict <[file]>,
 		      const char *restrict <[mode]>, FILE *restrict <[fp]>);
-
-TRAD_SYNOPSIS
-	#include <stdio.h>
-	FILE *freopen(<[file]>, <[mode]>, <[fp]>)
-	char *<[file]>;
-	char *<[mode]>;
-	FILE *<[fp]>;
-
-	FILE *_freopen_r(<[ptr]>, <[file]>, <[mode]>, <[fp]>)
-	struct _reent *<[ptr]>;
-	char *<[file]>;
-	char *<[mode]>;
-	FILE *<[fp]>;
 
 DESCRIPTION
 Use this variant of <<fopen>> if you wish to specify a particular file

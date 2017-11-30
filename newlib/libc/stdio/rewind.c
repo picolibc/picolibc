@@ -24,19 +24,10 @@ INDEX
 INDEX
 	_rewind_r
 
-ANSI_SYNOPSIS
+SYNOPSIS
 	#include <stdio.h>
 	void rewind(FILE *<[fp]>);
 	void _rewind_r(struct _reent *<[ptr]>, FILE *<[fp]>);
-
-TRAD_SYNOPSIS
-	#include <stdio.h>
-	void rewind(<[fp]>)
-	FILE *<[fp]>;
-
-	void _rewind_r(<[ptr]>, <[fp]>)
-	struct _reent *<[ptr]>;
-	FILE *<[fp]>;
 
 DESCRIPTION
 <<rewind>> returns the file position indicator (if any) for the file

@@ -28,7 +28,7 @@ INDEX
 INDEX
 	_fwrite_unlocked_r
 
-ANSI_SYNOPSIS
+SYNOPSIS
 	#include <stdio.h>
 	size_t fwrite(const void *restrict <[buf]>, size_t <[size]>,
 		      size_t <[count]>, FILE *restrict <[fp]>);
@@ -45,38 +45,6 @@ ANSI_SYNOPSIS
 	#include <stdio.h>
 	size_t _fwrite_unlocked_r(struct _reent *<[ptr]>, const void *restrict <[buf]>, size_t <[size]>,
 		      size_t <[count]>, FILE *restrict <[fp]>);
-
-TRAD_SYNOPSIS
-	#include <stdio.h>
-	size_t fwrite(<[buf]>, <[size]>, <[count]>, <[fp]>)
-	char *<[buf]>;
-	size_t <[size]>;
-	size_t <[count]>;
-	FILE *<[fp]>;
-
-	#define _BSD_SOURCE
-	#include <stdio.h>
-	size_t fwrite_unlocked(<[buf]>, <[size]>, <[count]>, <[fp]>)
-	char *<[buf]>;
-	size_t <[size]>;
-	size_t <[count]>;
-	FILE *<[fp]>;
-
-	#include <stdio.h>
-	size_t _fwrite_r(<[ptr]>, <[buf]>, <[size]>, <[count]>, <[fp]>)
-	struct _reent *<[ptr]>;
-	char *<[buf]>;
-	size_t <[size]>;
-	size_t <[count]>;
-	FILE *<[fp]>;
-
-	#include <stdio.h>
-	size_t _fwrite_unlocked_r(<[ptr]>, <[buf]>, <[size]>, <[count]>, <[fp]>)
-	struct _reent *<[ptr]>;
-	char *<[buf]>;
-	size_t <[size]>;
-	size_t <[count]>;
-	FILE *<[fp]>;
 
 DESCRIPTION
 <<fwrite>> attempts to copy, starting from the memory location

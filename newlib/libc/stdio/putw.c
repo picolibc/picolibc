@@ -22,15 +22,9 @@ FUNCTION
 INDEX
 	putw
 
-ANSI_SYNOPSIS
+SYNOPSIS
 	#include <stdio.h>
 	int putw(int <[w]>, FILE *<[fp]>);
-
-TRAD_SYNOPSIS
-	#include <stdio.h>
-	int putw(<w>, <[fp]>)
-	int <w>;
-	FILE *<[fp]>;
 
 DESCRIPTION
 <<putw>> is a function, defined in <<stdio.h>>.  You can use <<putw>>

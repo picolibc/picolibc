@@ -24,22 +24,12 @@ INDEX
 INDEX
 	_getc_r
 
-ANSI_SYNOPSIS
+SYNOPSIS
 	#include <stdio.h>
 	int getc(FILE *<[fp]>);
 
 	#include <stdio.h>
 	int _getc_r(struct _reent *<[ptr]>, FILE *<[fp]>);
-
-TRAD_SYNOPSIS
-	#include <stdio.h>
-	int getc(<[fp]>)
-	FILE *<[fp]>;
-
-	#include <stdio.h>
-	int _getc_r(<[ptr]>, <[fp]>)
-	struct _reent *<[ptr]>;
-	FILE *<[fp]>;
 
 DESCRIPTION
 <<getc>> is a macro, defined in <<stdio.h>>.  You can use <<getc>>

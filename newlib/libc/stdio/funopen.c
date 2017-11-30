@@ -14,7 +14,7 @@ INDEX
 INDEX
 	fwopen
 
-ANSI_SYNOPSIS
+SYNOPSIS
 	#include <stdio.h>
 	FILE *funopen(const void *<[cookie]>,
 	              int (*<[readfn]>) (void *cookie, char *buf, int n),

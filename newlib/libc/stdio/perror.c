@@ -24,20 +24,11 @@ INDEX
 INDEX
 	_perror_r
 
-ANSI_SYNOPSIS
+SYNOPSIS
 	#include <stdio.h>
 	void perror(char *<[prefix]>);
 
 	void _perror_r(struct _reent *<[reent]>, char *<[prefix]>);
-
-TRAD_SYNOPSIS
-	#include <stdio.h>
-	void perror(<[prefix]>)
-	char *<[prefix]>;
-
-	void _perror_r(<[reent]>, <[prefix]>)
-	struct _reent *<[reent]>;
-	char *<[prefix]>;
 
 DESCRIPTION
 Use <<perror>> to print (on standard error) an error message

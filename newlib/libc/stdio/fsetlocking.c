@@ -30,7 +30,7 @@ FUNCTION
 INDEX
 	__fsetlocking
 
-ANSI_SYNOPSIS
+SYNOPSIS
 	#include <stdio.h>
 	#include <stdio_ext.h>
 	int __fsetlocking(FILE *<[fp]>, int <[type]>);

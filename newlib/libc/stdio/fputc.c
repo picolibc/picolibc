@@ -28,7 +28,7 @@ INDEX
 INDEX
 	_fputc_unlocked_r
 
-ANSI_SYNOPSIS
+SYNOPSIS
 	#include <stdio.h>
 	int fputc(int <[ch]>, FILE *<[fp]>);
 
@@ -41,30 +41,6 @@ ANSI_SYNOPSIS
 
 	#include <stdio.h>
 	int _fputc_unlocked_r(struct _rent *<[ptr]>, int <[ch]>, FILE *<[fp]>);
-
-TRAD_SYNOPSIS
-	#include <stdio.h>
-	int fputc(<[ch]>, <[fp]>)
-	int <[ch]>;
-	FILE *<[fp]>;
-
-	#define _BSD_SOURCE
-	#include <stdio.h>
-	int fputc_unlocked(<[ch]>, <[fp]>)
-	int <[ch]>;
-	FILE *<[fp]>;
-
-	#include <stdio.h>
-	int _fputc_r(<[ptr]>, <[ch]>, <[fp]>)
-	struct _reent *<[ptr]>;
-	int <[ch]>;
-	FILE *<[fp]>;
-
-	#include <stdio.h>
-	int _fputc_unlocked_r(<[ptr]>, <[ch]>, <[fp]>)
-	struct _reent *<[ptr]>;
-	int <[ch]>;
-	FILE *<[fp]>;
 
 DESCRIPTION
 <<fputc>> converts the argument <[ch]> from an <<int>> to an

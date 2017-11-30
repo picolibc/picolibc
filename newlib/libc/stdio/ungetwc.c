@@ -33,7 +33,7 @@ INDEX
 INDEX
         _ungetwc_r
 
-ANSI_SYNOPSIS
+SYNOPSIS
         #include <stdio.h>
         #include <wchar.h>
         wint_t ungetwc(wint_t <[wc]>, FILE *<[stream]>);

@@ -45,7 +45,7 @@ INDEX
 INDEX
 	_getwc_unlocked_r
 
-ANSI_SYNOPSIS
+SYNOPSIS
 	#include <stdio.h>
 	#include <wchar.h>
 	wint_t fgetwc(FILE *<[fp]>);
@@ -79,53 +79,6 @@ ANSI_SYNOPSIS
 	#include <stdio.h>
 	#include <wchar.h>
 	wint_t _getwc_unlocked_r(struct _reent *<[ptr]>, FILE *<[fp]>);
-
-TRAD_SYNOPSIS
-	#include <stdio.h>
-	#include <wchar.h>
-	wint_t fgetwc(<[fp]>)
-	FILE *<[fp]>;
-
-	#define _GNU_SOURCE
-	#include <stdio.h>
-	#include <wchar.h>
-	wint_t fgetwc_unlocked(<[fp]>)
-	FILE *<[fp]>;
-
-	#include <stdio.h>
-	#include <wchar.h>
-	wint_t _fgetwc_r(<[ptr]>, <[fp]>)
-	struct _reent *<[ptr]>;
-	FILE *<[fp]>;
-
-	#include <stdio.h>
-	#include <wchar.h>
-	wint_t _fgetwc_unlocked_r(<[ptr]>, <[fp]>)
-	struct _reent *<[ptr]>;
-	FILE *<[fp]>;
-
-	#include <stdio.h>
-	#include <wchar.h>
-	wint_t getwc(<[fp]>)
-	FILE *<[fp]>;
-
-	#define _GNU_SOURCE
-	#include <stdio.h>
-	#include <wchar.h>
-	wint_t getwc_unlocked(<[fp]>)
-	FILE *<[fp]>;
-
-	#include <stdio.h>
-	#include <wchar.h>
-	wint_t _getwc_r(<[ptr]>, <[fp]>)
-	struct _reent *<[ptr]>;
-	FILE *<[fp]>;
-
-	#include <stdio.h>
-	#include <wchar.h>
-	wint_t _getwc_unlocked_r(<[ptr]>, <[fp]>)
-	struct _reent *<[ptr]>;
-	FILE *<[fp]>;
 
 DESCRIPTION
 Use <<fgetwc>> to get the next wide character from the file or stream

@@ -24,20 +24,11 @@ INDEX
 INDEX
 	_puts_r
 
-ANSI_SYNOPSIS
+SYNOPSIS
 	#include <stdio.h>
 	int puts(const char *<[s]>);
 
 	int _puts_r(struct _reent *<[reent]>, const char *<[s]>);
-
-TRAD_SYNOPSIS
-	#include <stdio.h>
-	int puts(<[s]>)
-	char *<[s]>;
-
-	int _puts_r(<[reent]>, <[s]>)
-	struct _reent *<[reent]>;
-	char *<[s]>;
 
 DESCRIPTION
 <<puts>> writes the string at <[s]> (followed by a newline, instead of

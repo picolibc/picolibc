@@ -12,7 +12,7 @@ INDEX
 INDEX
 	open_wmemstream
 
-ANSI_SYNOPSIS
+SYNOPSIS
 	#include <stdio.h>
 	FILE *open_memstream(char **restrict <[buf]>,
 			     size_t *restrict <[size]>);

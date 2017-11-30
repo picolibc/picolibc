@@ -24,20 +24,11 @@ INDEX
 INDEX
 	_putchar_r
 
-ANSI_SYNOPSIS
+SYNOPSIS
 	#include <stdio.h>
 	int putchar(int <[ch]>);
 
 	int _putchar_r(struct _reent *<[reent]>, int <[ch]>);
-
-TRAD_SYNOPSIS
-	#include <stdio.h>
-	int putchar(<[ch]>)
-	int <[ch]>;
-
-	int _putchar_r(<[reent]>, <[ch]>)
-	struct _reent *<[reent]>;
-	int <[ch]>;
 
 DESCRIPTION
 <<putchar>> is a macro, defined in <<stdio.h>>.  <<putchar>>

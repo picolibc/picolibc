@@ -28,7 +28,7 @@ INDEX
 INDEX
 	_fgets_unlocked_r
 
-ANSI_SYNOPSIS
+SYNOPSIS
         #include <stdio.h>
 	char *fgets(char *restrict <[buf]>, int <[n]>, FILE *restrict <[fp]>);
 
@@ -41,34 +41,6 @@ ANSI_SYNOPSIS
 
         #include <stdio.h>
 	char *_fgets_unlocked_r(struct _reent *<[ptr]>, char *restrict <[buf]>, int <[n]>, FILE *restrict <[fp]>);
-
-TRAD_SYNOPSIS
-	#include <stdio.h>
-	char *fgets(<[buf]>,<[n]>,<[fp]>)
-        char *<[buf]>;
-	int <[n]>;
-	FILE *<[fp]>;
-
-	#define _GNU_SOURCE
-	#include <stdio.h>
-	char *fgets_unlocked(<[buf]>,<[n]>,<[fp]>)
-        char *<[buf]>;
-	int <[n]>;
-	FILE *<[fp]>;
-
-	#include <stdio.h>
-	char *_fgets_r(<[ptr]>, <[buf]>,<[n]>,<[fp]>)
-	struct _reent *<[ptr]>;
-        char *<[buf]>;
-	int <[n]>;
-	FILE *<[fp]>;
-
-	#include <stdio.h>
-	char *_fgets_unlocked_r(<[ptr]>, <[buf]>,<[n]>,<[fp]>)
-	struct _reent *<[ptr]>;
-        char *<[buf]>;
-	int <[n]>;
-	FILE *<[fp]>;
 
 DESCRIPTION
 	Reads at most <[n-1]> characters from <[fp]> until a newline

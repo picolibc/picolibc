@@ -7,22 +7,11 @@ INDEX
 INDEX
 	_fwide_r
 
-ANSI_SYNOPSIS
+SYNOPSIS
 	#include <wchar.h>
 	int fwide(FILE *<[fp]>, int <[mode]>);
 
 	int _fwide_r(struct _reent *<[ptr]>, FILE *<[fp]>, int <[mode]>);
-
-TRAD_SYNOPSIS
-	#include <wchar.h>
-	int fwide(<[fp]>, <[mode]>);
-	FILE *<[fp]>;
-	int <[mode]>;
-
-	int _fwide_r(<[ptr]>, <[fp]>, <[mode]>);
-	struct _reent *<[ptr]>;
-	FILE *<[fp]>;
-	int <[mode]>;
 
 DESCRIPTION
 When <[mode]> is zero, the <<fwide>> function determines the current

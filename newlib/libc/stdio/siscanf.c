@@ -32,7 +32,7 @@ INDEX
 INDEX
 	_siscanf_r
 
-ANSI_SYNOPSIS
+SYNOPSIS
         #include <stdio.h>
 
         int iscanf(const char *<[format]>, ...);
@@ -44,36 +44,6 @@ ANSI_SYNOPSIS
                        const char *<[format]>, ...);
         int _siscanf_r(struct _reent *<[ptr]>, const char *<[str]>,
                    const char *<[format]>, ...);
-
-
-TRAD_SYNOPSIS
-	#include <stdio.h>
-
-	int iscanf(<[format]> [, <[arg]>, ...])
-	char *<[format]>;
-
-	int fiscanf(<[fd]>, <[format]> [, <[arg]>, ...]);
-	FILE *<[fd]>;
-	char *<[format]>;
-
-	int siscanf(<[str]>, <[format]> [, <[arg]>, ...]);
-	char *<[str]>;
-	char *<[format]>;
-
-	int _iscanf_r(<[ptr]>, <[format]> [, <[arg]>, ...])
-        struct _reent *<[ptr]>;
-	char *<[format]>;
-
-	int _fiscanf_r(<[ptr]>, <[fd]>, <[format]> [, <[arg]>, ...]);
-        struct _reent *<[ptr]>;
-	FILE *<[fd]>;
-	char *<[format]>;
-
-	int _siscanf_r(<[ptr]>, <[str]>, <[format]> [, <[arg]>, ...]);
-        struct _reent *<[ptr]>;
-	char *<[str]>;
-	char *<[format]>;
-
 
 DESCRIPTION
         <<iscanf>>, <<fiscanf>>, and <<siscanf>> are the same as

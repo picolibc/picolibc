@@ -6,18 +6,10 @@ FUNCTION
 INDEX
 	getdelim
 
-ANSI_SYNOPSIS
+SYNOPSIS
 	#include <stdio.h>
 	int getdelim(char **<[bufptr]>, size_t *<[n]>,
                      int <[delim]>, FILE *<[fp]>);
-
-TRAD_SYNOPSIS
-	#include <stdio.h>
-	int getdelim(<[bufptr]>, <[n]>, <[delim]>, <[fp]>)
-	char **<[bufptr]>;
-	size_t *<[n]>;
-	int <[delim]>;
-	FILE *<[fp]>;
 
 DESCRIPTION
 <<getdelim>> reads a file <[fp]> up to and possibly including a specified

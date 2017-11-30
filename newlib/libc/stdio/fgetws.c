@@ -37,7 +37,7 @@ INDEX
 INDEX
 	_fgetws_unlocked_r
 
-ANSI_SYNOPSIS
+SYNOPSIS
 	#include <wchar.h>
 	wchar_t *fgetws(wchar_t *__restrict <[ws]>, int <[n]>,
                         FILE *__restrict <[fp]>);
@@ -54,34 +54,6 @@ ANSI_SYNOPSIS
 	#include <wchar.h>
 	wchar_t *_fgetws_unlocked_r(struct _reent *<[ptr]>, wchar_t *<[ws]>,
                            int <[n]>, FILE *<[fp]>);
-
-TRAD_SYNOPSIS
-	#include <wchar.h>
-	wchar_t *fgetws(<[ws]>,<[n]>,<[fp]>)
-	wchar_t *__restrict <[ws]>;
-	int <[n]>;
-	FILE *__restrict <[fp]>;
-
-	#define _GNU_SOURCE
-	#include <wchar.h>
-	wchar_t *fgetws_unlocked(<[ws]>,<[n]>,<[fp]>)
-	wchar_t *__restrict <[ws]>;
-	int <[n]>;
-	FILE *__restrict <[fp]>;
-
-	#include <wchar.h>
-	wchar_t *_fgetws_r(<[ptr]>, <[ws]>,<[n]>,<[fp]>)
-	struct _reent *<[ptr]>;
-	wchar_t *<[ws]>;
-	int <[n]>;
-	FILE *<[fp]>;
-
-	#include <wchar.h>
-	wchar_t *_fgetws_unlocked_r(<[ptr]>, <[ws]>,<[n]>,<[fp]>)
-	struct _reent *<[ptr]>;
-	wchar_t *<[ws]>;
-	int <[n]>;
-	FILE *<[fp]>;
 
 DESCRIPTION
 Reads at most <[n-1]> wide characters from <[fp]> until a newline

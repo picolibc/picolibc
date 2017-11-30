@@ -24,23 +24,12 @@ INDEX
 INDEX
 	_fopen_r
 
-ANSI_SYNOPSIS
+SYNOPSIS
 	#include <stdio.h>
 	FILE *fopen(const char *<[file]>, const char *<[mode]>);
 
 	FILE *_fopen_r(struct _reent *<[reent]>, 
                        const char *<[file]>, const char *<[mode]>);
-
-TRAD_SYNOPSIS
-	#include <stdio.h>
-	FILE *fopen(<[file]>, <[mode]>)
-	char *<[file]>;
-	char *<[mode]>;
-
-	FILE *_fopen_r(<[reent]>, <[file]>, <[mode]>)
-	struct _reent *<[reent]>;
-	char *<[file]>;
-	char *<[mode]>;
 
 DESCRIPTION
 <<fopen>> initializes the data structures needed to read or write a

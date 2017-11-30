@@ -6,16 +6,9 @@ FUNCTION
 INDEX
         getline
 
-ANSI_SYNOPSIS
+SYNOPSIS
         #include <stdio.h>
         ssize_t getline(char **<[bufptr]>, size_t *<[n]>, FILE *<[fp]>);
-
-TRAD_SYNOPSIS
-        #include <stdio.h>
-        ssize_t getline(<[bufptr]>, <[n]>, <[fp]>)
-        char **<[bufptr]>;
-        size_t *<[n]>;
-        FILE *<[fp]>;
 
 DESCRIPTION
 <<getline>> reads a file <[fp]> up to and possibly including the

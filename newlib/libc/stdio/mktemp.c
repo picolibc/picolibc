@@ -52,7 +52,7 @@ INDEX
 INDEX
 	_mkostemps_r
 
-ANSI_SYNOPSIS
+SYNOPSIS
 	#include <stdlib.h>
 	char *mktemp(char *<[path]>);
 	char *mkdtemp(char *<[path]>);

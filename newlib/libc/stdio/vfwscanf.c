@@ -32,7 +32,7 @@ INDEX
 INDEX
 	_vswscanf
 
-ANSI_SYNOPSIS
+SYNOPSIS
 	#include <stdio.h>
 	#include <stdarg.h>
 	int vwscanf(const wchar_t *__restrict <[fmt]>, va_list <[list]>);
@@ -47,40 +47,6 @@ ANSI_SYNOPSIS
                       const wchar_t *<[fmt]>, va_list <[list]>);
 	int _vswscanf(struct _reent *<[reent]>, const wchar_t *<[str]>,
                        const wchar_t *<[fmt]>, va_list <[list]>);
-
-TRAD_SYNOPSIS
-	#include <stdio.h>
-	#include <varargs.h>
-	int vwscanf( <[fmt]>, <[ist]>)
-	wchar_t *__restrict <[fmt]>;
-	va_list <[list]>;
-
-	int vfwscanf( <[fp]>, <[fmt]>, <[list]>)
-	FILE *__restrict <[fp]>;
-	wchar_t *__restrict <[fmt]>;
-	va_list <[list]>;
-
-	int vswscanf( <[str]>, <[fmt]>, <[list]>)
-	wchar_t *__restrict <[str]>;
-	wchar_t *__restrict <[fmt]>;
-	va_list <[list]>;
-
-	int _vwscanf( <[reent]>, <[fmt]>, <[ist]>)
-	struct _reent *<[reent]>;
-	wchar_t *<[fmt]>;
-	va_list <[list]>;
-
-	int _vfwscanf( <[reent]>, <[fp]>, <[fmt]>, <[list]>)
-	struct _reent *<[reent]>;
-	FILE *<[fp]>;
-	wchar_t *<[fmt]>;
-	va_list <[list]>;
-
-	int _vswscanf( <[reent]>, <[str]>, <[fmt]>, <[list]>)
-	struct _reent *<[reent]>;
-	wchar_t *<[str]>;
-	wchar_t *<[fmt]>;
-	va_list <[list]>;
 
 DESCRIPTION
 <<vwscanf>>, <<vfwscanf>>, and <<vswscanf>> are (respectively) variants

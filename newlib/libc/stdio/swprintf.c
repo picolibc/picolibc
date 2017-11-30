@@ -32,7 +32,7 @@ INDEX
 INDEX
 	_swprintf_r
 
-ANSI_SYNOPSIS
+SYNOPSIS
         #include <wchar.h>
 
         int wprintf(const wchar_t *<[format]>, ...);

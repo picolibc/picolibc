@@ -10,7 +10,7 @@ FUNCTION
 INDEX
 	fopencookie
 
-ANSI_SYNOPSIS
+SYNOPSIS
 	#include <stdio.h>
 	FILE *fopencookie(const void *<[cookie]>, const char *<[mode]>,
 			  cookie_io_functions_t <[functions]>);

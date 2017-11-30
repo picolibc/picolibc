@@ -47,7 +47,7 @@ INDEX
 INDEX
 	_vswprintf_r
 
-ANSI_SYNOPSIS
+SYNOPSIS
 	#include <stdio.h>
 	#include <stdarg.h>
 	#include <wchar.h>

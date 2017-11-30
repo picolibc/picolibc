@@ -24,20 +24,11 @@ INDEX
 INDEX
 	_remove_r
 
-ANSI_SYNOPSIS
+SYNOPSIS
 	#include <stdio.h>
 	int remove(char *<[filename]>);
 
 	int _remove_r(struct _reent *<[reent]>, char *<[filename]>);
-
-TRAD_SYNOPSIS
-	#include <stdio.h>
-	int remove(<[filename]>)
-	char *<[filename]>;
-
-	int _remove_r(<[reent]>, <[filename]>)
-	struct _reent *<[reent]>;
-	char *<[filename]>;
 
 DESCRIPTION
 Use <<remove>> to dissolve the association between a particular

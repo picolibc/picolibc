@@ -28,7 +28,7 @@ INDEX
 INDEX
 	_fflush_unlocked_r
 
-ANSI_SYNOPSIS
+SYNOPSIS
 	#include <stdio.h>
 	int fflush(FILE *<[fp]>);
 

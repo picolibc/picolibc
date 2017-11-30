@@ -14,7 +14,7 @@ INDEX
 INDEX
 	__fpurge
 
-ANSI_SYNOPSIS
+SYNOPSIS
 	#include <stdio.h>
 	int fpurge(FILE *<[fp]>);
 

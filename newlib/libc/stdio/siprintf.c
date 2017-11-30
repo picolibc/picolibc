@@ -44,7 +44,7 @@ INDEX
 INDEX
 	_asniprintf_r
 
-ANSI_SYNOPSIS
+SYNOPSIS
         #include <stdio.h>
 
         int iprintf(const char *<[format]>, ...);

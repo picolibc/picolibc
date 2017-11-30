@@ -24,23 +24,13 @@ INDEX
 INDEX
 	clearerr_unlocked
 
-ANSI_SYNOPSIS
+SYNOPSIS
 	#include <stdio.h>
 	void clearerr(FILE *<[fp]>);
 
 	#define _BSD_SOURCE
 	#include <stdio.h>
 	void clearerr_unlocked(FILE *<[fp]>);
-
-TRAD_SYNOPSIS
-	#include <stdio.h>
-	void clearerr(<[fp]>)
-	FILE *<[fp]>;
-
-	#define _BSD_SOURCE
-	#include <stdio.h>
-	void clearerr_unlocked(<[fp]>)
-	FILE *<[fp]>;
 
 DESCRIPTION
 The <<stdio>> functions maintain an error indicator with each file

@@ -28,7 +28,7 @@ INDEX
 INDEX
 	_fread_unlocked_r
 
-ANSI_SYNOPSIS
+SYNOPSIS
 	#include <stdio.h>
 	size_t fread(void *restrict <[buf]>, size_t <[size]>, size_t <[count]>,
 		     FILE *restrict <[fp]>);
@@ -45,38 +45,6 @@ ANSI_SYNOPSIS
 	#include <stdio.h>
 	size_t _fread_unlocked_r(struct _reent *<[ptr]>, void *restrict <[buf]>,
 	                size_t <[size]>, size_t <[count]>, FILE *restrict <[fp]>);
-
-TRAD_SYNOPSIS
-	#include <stdio.h>
-	size_t fread(<[buf]>, <[size]>, <[count]>, <[fp]>)
-	char *<[buf]>;
-	size_t <[size]>;
-	size_t <[count]>;
-	FILE *<[fp]>;
-
-	#define _BSD_SOURCE
-	#include <stdio.h>
-	size_t fread_unlocked(<[buf]>, <[size]>, <[count]>, <[fp]>)
-	char *<[buf]>;
-	size_t <[size]>;
-	size_t <[count]>;
-	FILE *<[fp]>;
-
-	#include <stdio.h>
-	size_t _fread_r(<[ptr]>, <[buf]>, <[size]>, <[count]>, <[fp]>)
-	struct _reent *<[ptr]>;
-	char *<[buf]>;
-	size_t <[size]>;
-	size_t <[count]>;
-	FILE *<[fp]>;
-
-	#include <stdio.h>
-	size_t _fread_unlocked_r(<[ptr]>, <[buf]>, <[size]>, <[count]>, <[fp]>)
-	struct _reent *<[ptr]>;
-	char *<[buf]>;
-	size_t <[size]>;
-	size_t <[count]>;
-	FILE *<[fp]>;
 
 DESCRIPTION
 <<fread>> attempts to copy, from the file or stream identified by

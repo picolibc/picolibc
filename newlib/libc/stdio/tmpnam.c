@@ -15,30 +15,12 @@ INDEX
 INDEX
 	_tempnam_r
 
-ANSI_SYNOPSIS
+SYNOPSIS
 	#include <stdio.h>
 	char *tmpnam(char *<[s]>);
 	char *tempnam(char *<[dir]>, char *<[pfx]>);
 	char *_tmpnam_r(struct _reent *<[reent]>, char *<[s]>);
 	char *_tempnam_r(struct _reent *<[reent]>, char *<[dir]>, char *<[pfx]>);
-
-TRAD_SYNOPSIS
-	#include <stdio.h>
-	char *tmpnam(<[s]>)
-	char *<[s]>;
-
-	char *tempnam(<[dir]>, <[pfx]>)
-	char *<[dir]>;
-	char *<[pfx]>;
-
-	char *_tmpnam_r(<[reent]>, <[s]>)
-	struct _reent *<[reent]>;
-	char *<[s]>;
-
-	char *_tempnam_r(<[reent]>, <[dir]>, <[pfx]>)
-	struct *<[reent]>;
-	char *<[dir]>;
-	char *<[pfx]>;
 
 DESCRIPTION
 Use either of these functions to generate a name for a temporary file.

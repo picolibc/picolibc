@@ -22,15 +22,9 @@ FUNCTION
 INDEX
 	setbuf
 
-ANSI_SYNOPSIS
+SYNOPSIS
 	#include <stdio.h>
 	void setbuf(FILE *<[fp]>, char *<[buf]>);
-
-TRAD_SYNOPSIS
-	#include <stdio.h>
-	void setbuf(<[fp]>, <[buf]>)
-	FILE *<[fp]>;
-	char *<[buf]>;
 
 DESCRIPTION
 <<setbuf>> specifies that output to the file or stream identified by <[fp]>

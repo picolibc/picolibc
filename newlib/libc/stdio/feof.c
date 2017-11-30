@@ -24,23 +24,13 @@ INDEX
 INDEX
 	feof_unlocked
 
-ANSI_SYNOPSIS
+SYNOPSIS
 	#include <stdio.h>
 	int feof(FILE *<[fp]>);
 
 	#define _BSD_SOURCE
 	#include <stdio.h>
 	int feof_unlocked(FILE *<[fp]>);
-
-TRAD_SYNOPSIS
-	#include <stdio.h>
-	int feof(<[fp]>)
-	FILE *<[fp]>;
-
-	#define _BSD_SOURCE
-	#include <stdio.h>
-	int feof_unlocked(<[fp]>)
-	FILE *<[fp]>;
 
 DESCRIPTION
 <<feof>> tests whether or not the end of the file identified by <[fp]>

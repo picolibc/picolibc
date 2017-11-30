@@ -24,24 +24,12 @@ INDEX
 INDEX
 	_putc_r
 
-ANSI_SYNOPSIS
+SYNOPSIS
 	#include <stdio.h>
 	int putc(int <[ch]>, FILE *<[fp]>);
 
 	#include <stdio.h>
 	int _putc_r(struct _reent *<[ptr]>, int <[ch]>, FILE *<[fp]>);
-
-TRAD_SYNOPSIS
-	#include <stdio.h>
-	int putc(<[ch]>, <[fp]>)
-	int <[ch]>;
-	FILE *<[fp]>;
-
-	#include <stdio.h>
-	int _putc_r(<[ptr]>, <[ch]>, <[fp]>)
-	struct _reent *<[ptr]>;
-	int <[ch]>;
-	FILE *<[fp]>;
 
 DESCRIPTION
 <<putc>> is a macro, defined in <<stdio.h>>.  <<putc>>

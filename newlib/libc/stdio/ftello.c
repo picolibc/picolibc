@@ -28,28 +28,12 @@ INDEX
 INDEX
 	_ftello_r
 
-ANSI_SYNOPSIS
+SYNOPSIS
 	#include <stdio.h>
 	long ftell(FILE *<[fp]>);
 	off_t ftello(FILE *<[fp]>);
 	long _ftell_r(struct _reent *<[ptr]>, FILE *<[fp]>);
 	off_t _ftello_r(struct _reent *<[ptr]>, FILE *<[fp]>);
-
-TRAD_SYNOPSIS
-	#include <stdio.h>
-	long ftell(<[fp]>)
-	FILE *<[fp]>;
-
-	off_t ftello(<[fp]>)
-	FILE *<[fp]>;
-
-	long _ftell_r(<[ptr]>, <[fp]>)
-	struct _reent *<[ptr]>;
-	FILE *<[fp]>;
-
-	off_t _ftello_r(<[ptr]>, <[fp]>)
-	struct _reent *<[ptr]>;
-	FILE *<[fp]>;
 
 DESCRIPTION
 Objects of type <<FILE>> can have a ``position'' that records how much

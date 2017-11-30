@@ -22,18 +22,10 @@ FUNCTION
 INDEX
 	setvbuf
 
-ANSI_SYNOPSIS
+SYNOPSIS
 	#include <stdio.h>
 	int setvbuf(FILE *<[fp]>, char *<[buf]>,
 	            int <[mode]>, size_t <[size]>);
-
-TRAD_SYNOPSIS
-	#include <stdio.h>
-	int setvbuf(<[fp]>, <[buf]>, <[mode]>, <[size]>)
-	FILE *<[fp]>;
-	char *<[buf]>;
-	int <[mode]>;
-	size_t <[size]>;
 
 DESCRIPTION
 Use <<setvbuf>> to specify what kind of buffering you want for the

@@ -44,7 +44,7 @@ INDEX
 INDEX
 	_vasniprintf_r
 
-ANSI_SYNOPSIS
+SYNOPSIS
 	#include <stdio.h>
 	#include <stdarg.h>
 	int viprintf(const char *<[fmt]>, va_list <[list]>);

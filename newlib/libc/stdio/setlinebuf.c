@@ -27,14 +27,9 @@ FUNCTION
 INDEX
 	setlinebuf
 
-ANSI_SYNOPSIS
+SYNOPSIS
 	#include <stdio.h>
 	void setlinebuf(FILE *<[fp]>);
-
-TRAD_SYNOPSIS
-	#include <stdio.h>
-	void setlinebuf(<[fp]>)
-	FILE *<[fp]>;
 
 DESCRIPTION
 <<setlinebuf>> specifies that output to the file or stream identified by

@@ -27,16 +27,9 @@ FUNCTION
 INDEX
 	setbuffer
 
-ANSI_SYNOPSIS
+SYNOPSIS
 	#include <stdio.h>
 	void setbuffer(FILE *<[fp]>, char *<[buf]>, int <[size]>);
-
-TRAD_SYNOPSIS
-	#include <stdio.h>
-	void setbuffer(<[fp]>, <[buf]>, <[size]>)
-	FILE *<[fp]>;
-	char *<[buf]>;
-	int <[size]>;
 
 DESCRIPTION
 <<setbuffer>> specifies that output to the file or stream identified by

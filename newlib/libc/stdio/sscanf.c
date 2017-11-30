@@ -32,7 +32,7 @@ INDEX
 INDEX
 	_sscanf_r
 
-ANSI_SYNOPSIS
+SYNOPSIS
         #include <stdio.h>
 
         int scanf(const char *restrict <[format]>, ...);
@@ -44,36 +44,6 @@ ANSI_SYNOPSIS
                       const char *restrict <[format]>, ...);
         int _sscanf_r(struct _reent *<[ptr]>, const char *restrict <[str]>,
                       const char *restrict <[format]>, ...);
-
-
-TRAD_SYNOPSIS
-	#include <stdio.h>
-
-	int scanf(<[format]> [, <[arg]>, ...])
-	char *<[format]>;
-
-	int fscanf(<[fd]>, <[format]> [, <[arg]>, ...]);
-	FILE *<[fd]>;
-	char *<[format]>;
-
-	int sscanf(<[str]>, <[format]> [, <[arg]>, ...]);
-	char *<[str]>;
-	char *<[format]>;
-
-	int _scanf_r(<[ptr]>, <[format]> [, <[arg]>, ...])
-        struct _reent *<[ptr]>;
-	char *<[format]>;
-
-	int _fscanf_r(<[ptr]>, <[fd]>, <[format]> [, <[arg]>, ...]);
-        struct _reent *<[ptr]>;
-	FILE *<[fd]>;
-	char *<[format]>;
-
-	int _sscanf_r(<[ptr]>, <[str]>, <[format]> [, <[arg]>, ...]);
-        struct _reent *<[ptr]>;
-	char *<[str]>;
-	char *<[format]>;
-
 
 DESCRIPTION
         <<scanf>> scans a series of input fields from standard input,

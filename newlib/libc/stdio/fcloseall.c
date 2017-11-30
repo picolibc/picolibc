@@ -24,17 +24,10 @@ INDEX
 INDEX
 	_fcloseall_r
 
-ANSI_SYNOPSIS
+SYNOPSIS
 	#include <stdio.h>
 	int fcloseall(void);
 	int _fcloseall_r (struct _reent *<[ptr]>);
-
-TRAD_SYNOPSIS
-	#include <stdio.h>
-	int fcloseall()
-
-	int _fcloseall_r (<[ptr]>)
-	struct _reent *<[ptr]>;
 
 DESCRIPTION
 <<fcloseall>> closes all files in the current reentrancy struct's domain.

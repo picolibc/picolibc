@@ -24,22 +24,12 @@ INDEX
 INDEX
 	_gets_r
 
-ANSI_SYNOPSIS
+SYNOPSIS
         #include <stdio.h>
 
 	char *gets(char *<[buf]>);
 
 	char *_gets_r(struct _reent *<[reent]>, char *<[buf]>);
-
-TRAD_SYNOPSIS
-	#include <stdio.h>
-
-	char *gets(<[buf]>)
-	char *<[buf]>;
-
-	char *_gets_r(<[reent]>, <[buf]>)
-	struct _reent *<[reent]>;
-	char *<[buf]>;
 
 DESCRIPTION
 	Reads characters from standard input until a newline is found.

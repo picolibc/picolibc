@@ -22,15 +22,9 @@ FUNCTION
 INDEX
 	rename
 
-ANSI_SYNOPSIS
+SYNOPSIS
 	#include <stdio.h>
 	int rename(const char *<[old]>, const char *<[new]>);
-
-TRAD_SYNOPSIS
-	#include <stdio.h>
-	int rename(<[old]>, <[new]>)
-	char *<[old]>;
-	char *<[new]>;
 
 DESCRIPTION
 Use <<rename>> to establish a new name (the string at <[new]>) for a

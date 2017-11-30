@@ -24,18 +24,11 @@ INDEX
 INDEX
 	_getchar_r
 
-ANSI_SYNOPSIS
+SYNOPSIS
 	#include <stdio.h>
 	int getchar(void);
 
 	int _getchar_r(struct _reent *<[reent]>);
-
-TRAD_SYNOPSIS
-	#include <stdio.h>
-	int getchar();
-
-	int _getchar_r(<[reent]>)
-	char * <[reent]>;
 
 DESCRIPTION
 <<getchar>> is a macro, defined in <<stdio.h>>.  You can use <<getchar>>

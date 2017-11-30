@@ -24,21 +24,10 @@ INDEX
 INDEX
 	_fgetpos_r
 
-ANSI_SYNOPSIS
+SYNOPSIS
 	#include <stdio.h>
 	int fgetpos(FILE *restrict <[fp]>, fpos_t *restrict <[pos]>);
 	int _fgetpos_r(struct _reent *<[ptr]>, FILE *restrict <[fp]>, fpos_t *restrict <[pos]>);
-
-TRAD_SYNOPSIS
-	#include <stdio.h>
-	int fgetpos(<[fp]>, <[pos]>)
-	FILE *<[fp]>;
-	fpos_t *<[pos]>;
-
-	int _fgetpos_r(<[ptr]>, <[fp]>, <[pos]>)
-	struct _reent *<[ptr]>;
-	FILE *<[fp]>;
-	fpos_t *<[pos]>;
 
 DESCRIPTION
 Objects of type <<FILE>> can have a ``position'' that records how much

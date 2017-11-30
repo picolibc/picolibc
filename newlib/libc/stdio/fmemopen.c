@@ -10,7 +10,7 @@ FUNCTION
 INDEX
 	fmemopen
 
-ANSI_SYNOPSIS
+SYNOPSIS
 	#include <stdio.h>
 	FILE *fmemopen(void *restrict <[buf]>, size_t <[size]>,
 		       const char *restrict <[mode]>);

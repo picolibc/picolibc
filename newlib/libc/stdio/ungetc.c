@@ -23,7 +23,7 @@ INDEX
 INDEX
 	_ungetc_r
 
-ANSI_SYNOPSIS
+SYNOPSIS
 	#include <stdio.h>
 	int ungetc(int <[c]>, FILE *<[stream]>);
 

@@ -28,7 +28,7 @@ INDEX
 INDEX
 	_fputs_unlocked_r
 
-ANSI_SYNOPSIS
+SYNOPSIS
 	#include <stdio.h>
 	int fputs(const char *restrict <[s]>, FILE *restrict <[fp]>);
 
@@ -41,30 +41,6 @@ ANSI_SYNOPSIS
 
 	#include <stdio.h>
 	int _fputs_unlocked_r(struct _reent *<[ptr]>, const char *restrict <[s]>, FILE *restrict <[fp]>);
-
-TRAD_SYNOPSIS
-	#include <stdio.h>
-	int fputs(<[s]>, <[fp]>)
-	char *<[s]>;
-	FILE *<[fp]>;
-
-	#define _GNU_SOURCE
-	#include <stdio.h>
-	int fputs_unlocked(<[s]>, <[fp]>)
-	char *<[s]>;
-	FILE *<[fp]>;
-
-	#include <stdio.h>
-	int _fputs_r(<[ptr]>, <[s]>, <[fp]>)
-	struct _reent *<[ptr]>;
-	char *<[s]>;
-	FILE *<[fp]>;
-
-	#include <stdio.h>
-	int _fputs_unlocked_r(<[ptr]>, <[s]>, <[fp]>)
-	struct _reent *<[ptr]>;
-	char *<[s]>;
-	FILE *<[fp]>;
 
 DESCRIPTION
 <<fputs>> writes the string at <[s]> (but without the trailing null)

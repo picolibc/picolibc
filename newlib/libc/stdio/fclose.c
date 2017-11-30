@@ -24,19 +24,10 @@ INDEX
 INDEX
 	_fclose_r
 
-ANSI_SYNOPSIS
+SYNOPSIS
 	#include <stdio.h>
 	int fclose(FILE *<[fp]>);
 	int _fclose_r(struct _reent *<[reent]>, FILE *<[fp]>);
-
-TRAD_SYNOPSIS
-	#include <stdio.h>
-	int fclose(<[fp]>)
-	FILE *<[fp]>;
-
-	int fclose(<[fp]>)
-        struct _reent *<[reent]>
-	FILE *<[fp]>;
 
 DESCRIPTION
 If the file or stream identified by <[fp]> is open, <<fclose>> closes

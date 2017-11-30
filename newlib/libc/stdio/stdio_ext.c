@@ -17,7 +17,7 @@ INDEX
 INDEX
 	__fwriting
 
-ANSI_SYNOPSIS
+SYNOPSIS
 	#include <stdio.h>
 	#include <stdio_ext.h>
 	size_t __fbufsize(FILE *<[fp]>);

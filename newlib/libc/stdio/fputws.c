@@ -37,7 +37,7 @@ INDEX
 INDEX
 	_fputws_unlocked_r
 
-ANSI_SYNOPSIS
+SYNOPSIS
 	#include <wchar.h>
 	int fputws(const wchar_t *__restrict <[ws]>, FILE *__restrict <[fp]>);
 
@@ -52,30 +52,6 @@ ANSI_SYNOPSIS
 	#include <wchar.h>
 	int _fputws_unlocked_r(struct _reent *<[ptr]>, const wchar_t *<[ws]>,
                                FILE *<[fp]>);
-
-TRAD_SYNOPSIS   
-	#include <wchar.h>
-	int fputws(<[ws]>, <[fp]>)
-	wchar_t *__restrict <[ws]>;
-	FILE *__restrict <[fp]>;
-
-	#define _GNU_SOURCE
-	#include <wchar.h>
-	int fputws_unlocked(<[ws]>, <[fp]>)
-	wchar_t *__restrict <[ws]>;
-	FILE *__restrict <[fp]>;
-
-	#include <wchar.h>
-	int _fputws_r(<[ptr]>, <[ws]>, <[fp]>)
-	struct _reent *<[ptr]>;
-	wchar_t *<[ws]>;
-	FILE *<[fp]>;
-
-	#include <wchar.h>
-	int _fputws_unlocked_r(<[ptr]>, <[ws]>, <[fp]>)
-	struct _reent *<[ptr]>;
-	wchar_t *<[ws]>;
-	FILE *<[fp]>;
 
 DESCRIPTION
 <<fputws>> writes the wide character string at <[ws]> (but without the

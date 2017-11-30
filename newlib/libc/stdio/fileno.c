@@ -24,23 +24,13 @@ INDEX
 INDEX
 	fileno_unlocked
 
-ANSI_SYNOPSIS
+SYNOPSIS
 	#include <stdio.h>
 	int fileno(FILE *<[fp]>);
 
 	#define _BSD_SOURCE
 	#include <stdio.h>
 	int fileno_unlocked(FILE *<[fp]>);
-
-TRAD_SYNOPSIS
-	#include <stdio.h>
-	int fileno(<[fp]>)
-	FILE *<[fp]>;
-
-	#define _BSD_SOURCE
-	#include <stdio.h>
-	int fileno_unlocked(<[fp]>)
-	FILE *<[fp]>;
 
 DESCRIPTION
 You can use <<fileno>> to return the file descriptor identified by <[fp]>.

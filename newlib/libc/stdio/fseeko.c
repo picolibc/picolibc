@@ -28,7 +28,7 @@ INDEX
 INDEX
 	_fseeko_r
 
-ANSI_SYNOPSIS
+SYNOPSIS
 	#include <stdio.h>
 	int fseek(FILE *<[fp]>, long <[offset]>, int <[whence]>)
 	int fseeko(FILE *<[fp]>, off_t <[offset]>, int <[whence]>)
@@ -36,30 +36,6 @@ ANSI_SYNOPSIS
 	             long <[offset]>, int <[whence]>)
 	int _fseeko_r(struct _reent *<[ptr]>, FILE *<[fp]>,
 	             off_t <[offset]>, int <[whence]>)
-
-TRAD_SYNOPSIS
-	#include <stdio.h>
-	int fseek(<[fp]>, <[offset]>, <[whence]>)
-	FILE *<[fp]>;
-	long <[offset]>;
-	int <[whence]>;
-
-	int fseeko(<[fp]>, <[offset]>, <[whence]>)
-	FILE *<[fp]>;
-	off_t <[offset]>;
-	int <[whence]>;
-
-	int _fseek_r(<[ptr]>, <[fp]>, <[offset]>, <[whence]>)
-	struct _reent *<[ptr]>;
-	FILE *<[fp]>;
-	long <[offset]>;
-	int <[whence]>;
-
-	int _fseeko_r(<[ptr]>, <[fp]>, <[offset]>, <[whence]>)
-	struct _reent *<[ptr]>;
-	FILE *<[fp]>;
-	off_t <[offset]>;
-	int <[whence]>;
 
 DESCRIPTION
 Objects of type <<FILE>> can have a ``position'' that records how much
