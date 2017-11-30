@@ -7,18 +7,11 @@ INDEX
 INDEX
 	_tmpfile64_r
 
-ANSI_SYNOPSIS
+SYNOPSIS
 	#include <stdio.h>
 	FILE *tmpfile64(void);
 
 	FILE *_tmpfile64_r(void *<[reent]>);
-
-TRAD_SYNOPSIS
-	#include <stdio.h>
-	FILE *tmpfile64();
-
-	FILE *_tmpfile64_r(<[reent]>)
-	char *<[reent]>;
 
 DESCRIPTION
 Create a large temporary file (a file which will be deleted automatically),

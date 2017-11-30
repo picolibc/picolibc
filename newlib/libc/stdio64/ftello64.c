@@ -24,19 +24,10 @@ INDEX
 INDEX
 	_ftello64_r
 
-ANSI_SYNOPSIS
+SYNOPSIS
 	#include <stdio.h>
 	_off64_t ftello64(FILE *<[fp]>);
 	_off64_t _ftello64_r(struct _reent *<[ptr]>, FILE *<[fp]>);
-
-TRAD_SYNOPSIS
-	#include <stdio.h>
-	_off64_t ftello64(<[fp]>)
-	FILE *<[fp]>;
-
-	_off64_t _ftello64_r(<[ptr]>, <[fp]>)
-	struct _reent *<[ptr]>;
-	FILE *<[fp]>;
 
 DESCRIPTION
 Objects of type <<FILE>> can have a ``position'' that records how much

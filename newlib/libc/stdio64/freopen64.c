@@ -24,25 +24,12 @@ INDEX
 INDEX
 	_freopen64_r
 
-ANSI_SYNOPSIS
+SYNOPSIS
 	#include <stdio.h>
 	FILE *freopen64(const char *<[file]>, const char *<[mode]>,
 		        FILE *<[fp]>);
 	FILE *_freopen64_r(struct _reent *<[ptr]>, const char *<[file]>,
 		        const char *<[mode]>, FILE *<[fp]>);
-
-TRAD_SYNOPSIS
-	#include <stdio.h>
-	FILE *freopen64(<[file]>, <[mode]>, <[fp]>)
-	char *<[file]>;
-	char *<[mode]>;
-	FILE *<[fp]>;
-
-	FILE *_freopen64_r(<[ptr]>, <[file]>, <[mode]>, <[fp]>)
-	struct _reent *<[ptr]>;
-	char *<[file]>;
-	char *<[mode]>;
-	FILE *<[fp]>;
 
 DESCRIPTION
 Use this variant of <<fopen64>> if you wish to specify a particular file

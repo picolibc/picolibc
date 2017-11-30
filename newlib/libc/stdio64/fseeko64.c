@@ -24,24 +24,11 @@ INDEX
 INDEX
 	_fseeko64_r
 
-ANSI_SYNOPSIS
+SYNOPSIS
 	#include <stdio.h>
 	int fseeko64(FILE *<[fp]>, _off64_t <[offset]>, int <[whence]>);
 	int _fseeko64_r (struct _reent *<[ptr]>, FILE *<[fp]>,
                          _off64_t <[offset]>, int <[whence]>);
-TRAD_SYNOPSIS
-	#include <stdio.h>
-
-	int fseeko64(<[fp]>, <[offset]>, <[whence]>);
-	FILE *<[fp]>;
-	_off64_t <[offset]>;
-	int <[whence]>;
-
-	int _fseeko64_r (<[ptr]>, <[fp]>, <[offset]>, <[whence]>);
-	struct _reent *<[ptr]>;
-	FILE *<[fp]>;
-	_off64_t <[offset]>;
-	int <[whence]>;
 
 DESCRIPTION
 Objects of type <<FILE>> can have a ``position'' that records how much

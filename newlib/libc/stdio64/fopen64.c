@@ -24,22 +24,11 @@ INDEX
 INDEX
 	_fopen64_r
 
-ANSI_SYNOPSIS
+SYNOPSIS
 	#include <stdio.h>
 	FILE *fopen64(const char *<[file]>, const char *<[mode]>);
 	FILE *_fopen64_r(void *<[reent]>,
                        const char *<[file]>, const char *<[mode]>);
-
-TRAD_SYNOPSIS
-	#include <stdio.h>
-	FILE *fopen64(<[file]>, <[mode]>)
-	char *<[file]>;
-	char *<[mode]>;
-
-	FILE *_fopen64_r(<[reent]>, <[file]>, <[mode]>)
-	char *<[reent]>;
-	char *<[file]>;
-	char *<[mode]>;
 
 DESCRIPTION
 <<fopen64>> is identical to <<fopen>> except it opens a large file that

@@ -7,22 +7,11 @@ INDEX
 INDEX
 	_fsetpos64_r
 
-ANSI_SYNOPSIS
+SYNOPSIS
 	#include <stdio.h>
 	int fsetpos64(FILE *<[fp]>, const _fpos64_t *<[pos]>);
 	int _fsetpos64_r(struct _reent *<[ptr]>, FILE *<[fp]>, 
 	                 const _fpos64_t *<[pos]>);
-
-TRAD_SYNOPSIS
-	#include <stdio.h>
-	int fsetpos64(<[fp]>, <[pos]>)
-	FILE *<[fp]>;
-	_fpos64_t *<[pos]>;
-
-	int _fsetpos64_r(<[ptr]>, <[fp]>, <[pos]>)
-	struct _reent *<[ptr]>;
-	FILE *<[fp]>;
-	_fpos64_t *<[pos]>;
 
 DESCRIPTION
 Objects of type <<FILE>> can have a ``position'' that records how much
