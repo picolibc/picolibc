@@ -41,7 +41,7 @@ INDEX
 INDEX
 	_iconv_close_r
 
-ANSI_SYNOPSIS
+SYNOPSIS
 	#include <iconv.h>
 	iconv_t iconv_open (const char *<[to]>, const char *<[from]>);
 	int iconv_close (iconv_t <[cd]>);
@@ -57,44 +57,6 @@ ANSI_SYNOPSIS
 			 iconv_t <[cd]>, const char **<[inbuf]>, 
 	                 size_t *<[inbytesleft]>, 
 		         char **<[outbuf]>, size_t *<[outbytesleft]>);
-
-TRAD_SYNOPSIS
-	#include <iconv.h>
-        size_t iconv (<[cd]>, <[in]>, <[inleft]>, <[out]>, <[outleft]>);
-	iconv_t <[cd]>;
-	char **<[in]>;
-	size_t *<[inleft]>; 
-        char **<[out]>;
-       	size_t *<[outleft]>);
-
-	#include <iconv.h>
-	iconv_t iconv_open (<[to]>, <[from]>);
-	const char *<[to]>;
-       	const char *<[from]>;
-
-	#include <iconv.h>
-	int iconv_close (<[cd]>);
-	iconv_t <[cd]>;
-
-	#include <iconv.h>
-        size_t _iconv_r (<[rptr]>, <[cd]>, <[in]>, <[inleft]>, <[out]>, <[outleft]>);
-	struct _reent *<[rptr]>;
-	iconv_t <[cd]>;
-	const char **<[in]>;
-	size_t *<[inleft]>; 
-        char **<[out]>;
-       	size_t *<[outleft]>);
-
-	#include <iconv.h>
-	iconv_t _iconv_open_r (<[rptr]>, <[to]>, <[from]>);
-	struct _reent *<[rptr]>;
-	const char *<[to]>;
-       	const char *<[from]>;
-
-	#include <iconv.h>
-	int iconv_close (<[rptr]>, <[cd]>);
-	struct _reent *<[rptr]>;
-	iconv_t <[cd]>;
 
 DESCRIPTION
 The function <<iconv>> converts characters from <[in]> which are in one
