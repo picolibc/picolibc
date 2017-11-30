@@ -12,19 +12,10 @@ INDEX
 INDEX
 	ctime_r
 
-ANSI_SYNOPSIS
+SYNOPSIS
 	#include <time.h>
 	char *ctime(const time_t *<[clock]>);
 	char *ctime_r(const time_t *<[clock]>, char *<[buf]>);
-
-TRAD_SYNOPSIS
-	#include <time.h>
-	char *ctime(<[clock]>)
-	time_t *<[clock]>;
-
-	char *ctime_r(<[clock]>, <[buf]>)
-	time_t *<[clock]>;
-	char *<[buf]>;
 
 DESCRIPTION
 Convert the time value at <[clock]> to local time (like <<localtime>>)

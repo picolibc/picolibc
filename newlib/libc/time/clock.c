@@ -25,13 +25,9 @@ FUNCTION
 INDEX
 	clock
 
-ANSI_SYNOPSIS
+SYNOPSIS
 	#include <time.h>
 	clock_t clock(void);
-
-TRAD_SYNOPSIS
-	#include <time.h>
-	clock_t clock();
 
 DESCRIPTION
 Calculates the best available approximation of the cumulative amount

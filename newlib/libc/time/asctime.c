@@ -19,18 +19,10 @@ INDEX
 INDEX
 	_asctime_r
 
-ANSI_SYNOPSIS
+SYNOPSIS
 	#include <time.h>
 	char *asctime(const struct tm *<[clock]>);
 	char *_asctime_r(const struct tm *<[clock]>, char *<[buf]>);
-
-TRAD_SYNOPSIS
-	#include <time.h>
-	char *asctime(<[clock]>)
-	struct tm *<[clock]>;
-	char *asctime_r(<[clock]>)
-	struct tm *<[clock]>;
-	char *<[buf]>;
 
 DESCRIPTION
 Format the time value at <[clock]> into a string of the form

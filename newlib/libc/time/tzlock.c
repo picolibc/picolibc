@@ -7,14 +7,10 @@ INDEX
 INDEX
 	__tz_unlock
 
-ANSI_SYNOPSIS
+SYNOPSIS
 	#include "local.h"
 	void __tz_lock (void);
 	void __tz_unlock (void);
-
-TRAD_SYNOPSIS
-	void __tz_lock();
-	void __tz_unlock();
 
 DESCRIPTION
 The <<tzset>> facility functions call these functions when they need to

@@ -25,7 +25,7 @@ INDEX
 INDEX
 	strftime_l
 
-ANSI_SYNOPSIS
+SYNOPSIS
 	#include <time.h>
 	size_t strftime(char *restrict <[s]>, size_t <[maxsize]>,
 			const char *restrict <[format]>,
@@ -34,14 +34,6 @@ ANSI_SYNOPSIS
 			  const char *restrict <[format]>,
 			  const struct tm *restrict <[timp]>,
 			  locale_t <[locale]>);
-
-TRAD_SYNOPSIS
-	#include <time.h>
-	size_t strftime(<[s]>, <[maxsize]>, <[format]>, <[timp]>)
-	char *<[s]>;
-	size_t <[maxsize]>;
-	char *<[format]>;
-	struct tm *<[timp]>;
 
 DESCRIPTION
 <<strftime>> converts a <<struct tm>> representation of the time (at

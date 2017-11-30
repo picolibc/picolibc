@@ -5,14 +5,9 @@ FUNCTION
 INDEX
 	time
 
-ANSI_SYNOPSIS
+SYNOPSIS
 	#include <time.h>
 	time_t time(time_t *<[t]>);
-
-TRAD_SYNOPSIS
-	#include <time.h>
-	time_t time(<[t]>)
-	time_t *<[t]>;
 
 DESCRIPTION
 <<time>> looks up the best available representation of the current

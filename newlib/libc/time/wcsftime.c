@@ -13,7 +13,7 @@ FUNCTION
 INDEX
 	wcsftime
 
-ANSI_SYNOPSIS
+SYNOPSIS
 	#include <time.h>
 	#include <wchar.h>
 	size_t wcsftime(wchar_t *<[s]>, size_t <[maxsize]>,

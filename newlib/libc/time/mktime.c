@@ -20,14 +20,9 @@ FUNCTION
 INDEX
 	mktime
 
-ANSI_SYNOPSIS
+SYNOPSIS
 	#include <time.h>
 	time_t mktime(struct tm *<[timp]>);
-
-TRAD_SYNOPSIS
-	#include <time.h>
-	time_t mktime(<[timp]>)
-	struct tm *<[timp]>;
 
 DESCRIPTION
 <<mktime>> assumes the time at <[timp]> is a local time, and converts
