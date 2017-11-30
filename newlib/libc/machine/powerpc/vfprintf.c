@@ -11,7 +11,7 @@ INDEX
 INDEX
 	vsnprintf
 
-ANSI_SYNOPSIS
+SYNOPSIS
 	#include <stdio.h>
 	#include <stdarg.h>
 	int vprintf(const char *<[fmt]>, va_list <[list]>);
@@ -27,53 +27,6 @@ ANSI_SYNOPSIS
                         va_list <[list]>);
 	int _vsnprintf_r(void *<[reent]>, char *<[str]>, size_t <[size]>, const char *<[fmt]>,
                         va_list <[list]>);
-
-TRAD_SYNOPSIS
-	#include <stdio.h>
-	#include <varargs.h>
-	int vprintf( <[fmt]>, <[list]>)
-	char *<[fmt]>;
-	va_list <[list]>;
-
-	int vfprintf(<[fp]>, <[fmt]>, <[list]>)
-	FILE *<[fp]>;
-	char *<[fmt]>;
-	va_list <[list]>;
-
-	int vsprintf(<[str]>, <[fmt]>, <[list]>)
-	char *<[str]>;
-	char *<[fmt]>;
-	va_list <[list]>;
-
-	int vsnprintf(<[str]>, <[size]>, <[fmt]>, <[list]>)
-	char *<[str]>;
-        size_t <[size]>;
-	char *<[fmt]>;
-	va_list <[list]>;
-
-	int _vprintf_r(<[reent]>, <[fmt]>, <[list]>)
-	char *<[reent]>;
-	char *<[fmt]>;
-	va_list <[list]>;
-
-	int _vfprintf_r(<[reent]>, <[fp]>, <[fmt]>, <[list]>)
-	char *<[reent]>;
-	FILE *<[fp]>;
-	char *<[fmt]>;
-	va_list <[list]>;
-
-	int _vsprintf_r(<[reent]>, <[str]>, <[fmt]>, <[list]>)
-	char *<[reent]>;
-	char *<[str]>;
-	char *<[fmt]>;
-	va_list <[list]>;
-
-	int _vsnprintf_r(<[reent]>, <[str]>, <[size]>, <[fmt]>, <[list]>)
-	char *<[reent]>;
-	char *<[str]>;
-        size_t <[size]>;
-	char *<[fmt]>;
-	va_list <[list]>;
 
 DESCRIPTION
 <<vprintf>>, <<vfprintf>>, <<vsprintf>> and <<vsnprintf>> are (respectively)

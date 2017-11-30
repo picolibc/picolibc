@@ -15,7 +15,7 @@ INDEX
 INDEX
 	_atosfix64_r
 
-ANSI_SYNOPSIS
+SYNOPSIS
 	#include <stdlib.h>
         __int16_t atosfix16(const char *<[s]>);
 	__int32_t atosfix32(const char *<[s]>);
@@ -25,29 +25,6 @@ ANSI_SYNOPSIS
 	__int32_t _atosfix32_r(struct __reent *, const char *<[s]>);
 	__int64_t _atosfix32_r(struct __reent *, const char *<[s]>);
 
-TRAD_SYNOPSIS
-	#include <stdlib.h>
-	__int16_t atosfix16(<[s]>)
-	const char *<[s]>;
-	
-	__int32_t atosfix32(<[s]>)
-	const char *<[s]>;
-
-	__int64_t atosfix64(<[s]>)
-	const char *<[s]>;
-
-	__int16_t _atosfix16_r(<reent>, <[s]>)
-	struct _reent *<[reent]>;
-	const char *<[s]>;
-	
-	__int32_t _atosfix32_r(<reent>, <[s]>)
-	struct _reent *<[reent]>;
-	const char *<[s]>;
-	
-	__int64_t _atosfix64_r(<reent>, <[s]>)
-	struct _reent *<[reent]>;
-	const char *<[s]>;
-	
 DESCRIPTION
 	<<atosfix16>> converts the initial portion of a string to a sign
 	+ 15-bit fraction fixed point value.

@@ -8,22 +8,10 @@ INDEX
 INDEX
 	_vec_calloc_r
 
-ANSI_SYNOPSIS
+SYNOPSIS
 	#include <stdlib.h>
 	void *vec_calloc(size_t <[n]>, size_t <[s]>);
 	void *vec_calloc_r(void *<[reent]>, size_t <n>, <size_t> <[s]>);
-	
-TRAD_SYNOPSIS
-	#include <stdlib.h>
-	char *vec_calloc(<[n]>, <[s]>)
-	size_t <[n]>, <[s]>;
-
-	char *_vec_calloc_r(<[reent]>, <[n]>, <[s]>)
-	char *<[reent]>;
-	size_t <[n]>;
-	size_t <[s]>;
-
-
 
 DESCRIPTION
 Use <<vec_calloc>> to request a block of memory sufficient to hold an

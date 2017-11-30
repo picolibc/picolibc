@@ -15,7 +15,7 @@ INDEX
 INDEX
 	_strtoufix64_r
 
-ANSI_SYNOPSIS
+SYNOPSIS
 	#include <stdlib.h>
         __uint16_t strtoufix16 (const char *<[s]>, char **<[ptr]>);
 
@@ -31,35 +31,6 @@ ANSI_SYNOPSIS
 
         __uint64_t _strtoufix64_r (void *<[reent]>, 
                        const char *<[s]>, char **<[ptr]>);
-
-TRAD_SYNOPSIS
-	#include <stdlib.h>
-	__uint16_t strtoufix16 (<[s]>, <[ptr]>)
-        char *<[s]>;
-        char **<[ptr]>;
-
-	__uint32_t strtoufix32 (<[s]>, <[ptr]>)
-        char *<[s]>;
-        char **<[ptr]>;
-
-	__uint64_t strtoufix64 (<[s]>, <[ptr]>)
-        char *<[s]>;
-        char **<[ptr]>;
-
-	__uint16_t _strtoufix16_r (<[reent]>, <[s]>, <[ptr]>)
-	char *<[reent]>;
-        char *<[s]>;
-        char **<[ptr]>;
-
-	__uint32_t _strtoufix32_r (<[reent]>, <[s]>, <[ptr]>)
-	char *<[reent]>;
-        char *<[s]>;
-        char **<[ptr]>;
-
-	__uint64_t _strtoufix64_r (<[reent]>, <[s]>, <[ptr]>)
-	char *<[reent]>;
-        char *<[s]>;
-        char **<[ptr]>;
 
 DESCRIPTION
         The function <<strtoufix16>> converts the string <<*<[s]>>> to

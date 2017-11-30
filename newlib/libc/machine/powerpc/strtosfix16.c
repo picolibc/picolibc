@@ -15,7 +15,7 @@ INDEX
 INDEX
 	_strtosfix64_r
 
-ANSI_SYNOPSIS
+SYNOPSIS
 	#include <stdlib.h>
         __int16 strtosfix16 (const char *<[s]>, char **<[ptr]>);
 
@@ -31,35 +31,6 @@ ANSI_SYNOPSIS
 
         __int64 _strtosfix64_r (void *<[reent]>, 
                        const char *<[s]>, char **<[ptr]>);
-
-TRAD_SYNOPSIS
-	#include <stdlib.h>
-	__int16 strtosfix16 (<[s]>, <[ptr]>)
-        char *<[s]>;
-        char **<[ptr]>;
-
-	__int32 strtosfix32 (<[s]>, <[ptr]>)
-        char *<[s]>;
-        char **<[ptr]>;
-
-	__int64 strtosfix64 (<[s]>, <[ptr]>)
-        char *<[s]>;
-        char **<[ptr]>;
-
-	__int16 _strtosfix16_r (<[reent]>, <[s]>, <[ptr]>)
-	char *<[reent]>;
-        char *<[s]>;
-        char **<[ptr]>;
-
-	__int32 _strtosfix32_r (<[reent]>, <[s]>, <[ptr]>)
-	char *<[reent]>;
-        char *<[s]>;
-        char **<[ptr]>;
-
-	__int64 _strtosfix64_r (<[reent]>, <[s]>, <[ptr]>)
-	char *<[reent]>;
-        char *<[s]>;
-        char **<[ptr]>;
 
 DESCRIPTION
         The function <<strtosfix16>> converts the string <<*<[s]>>> to
