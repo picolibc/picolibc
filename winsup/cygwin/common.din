@@ -1609,6 +1609,7 @@ wmemchr NOSIGFE
 wmemcmp NOSIGFE
 wmemcpy NOSIGFE
 wmemmove NOSIGFE
+wmempcpy NOSIGFE
 wmemset NOSIGFE
 wordexp NOSIGFE
 wordfree NOSIGFE

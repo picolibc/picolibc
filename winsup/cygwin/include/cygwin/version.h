@@ -489,12 +489,13 @@ details. */
        __stack_chk_fail, __stack_chk_guard, __stpcpy_chk, __stpncpy_chk,
        __strcat_chk, __strcpy_chk, __strncat_chk, __strncpy_chk,
        __vsnprintf_chk, __vsprintf_chk.
+  321: Export wmempcpy.
 
   Note that we forgot to bump the api for ualarm, strtoll, strtoull,
   sigaltstack, sethostname. */
 
 #define CYGWIN_VERSION_API_MAJOR 0
-#define CYGWIN_VERSION_API_MINOR 320
+#define CYGWIN_VERSION_API_MINOR 321
 
 /* There is also a compatibity version number associated with the shared memory
    regions.  It is incremented when incompatible changes are made to the shared
