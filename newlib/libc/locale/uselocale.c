@@ -8,7 +8,7 @@ INDEX
 INDEX
 	_uselocale_r
 
-ANSI_SYNOPSIS
+SYNOPSIS
 	#include <locale.h>
 	locale_t uselocale(locale_t <[locobj]>);
 

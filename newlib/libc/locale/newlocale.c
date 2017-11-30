@@ -8,7 +8,7 @@ INDEX
 INDEX
 	_newlocale_r
 
-ANSI_SYNOPSIS
+SYNOPSIS
 	#include <locale.h>
 	locale_t newlocale(int <[category_mask]>, const char *<[locale]>,
 			   locale_t <[locobj]>);

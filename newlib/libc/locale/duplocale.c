@@ -8,7 +8,7 @@ INDEX
 INDEX
 	_duplocale_r
 
-ANSI_SYNOPSIS
+SYNOPSIS
 	#include <locale.h>
 	locale_t duplocale(locale_t <[locobj]>);
 

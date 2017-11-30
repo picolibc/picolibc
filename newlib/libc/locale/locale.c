@@ -11,7 +11,7 @@ INDEX
 INDEX
 	_localeconv_r
 
-ANSI_SYNOPSIS
+SYNOPSIS
 	#include <locale.h>
 	char *setlocale(int <[category]>, const char *<[locale]>);
 	lconv *localeconv(void);
@@ -19,22 +19,6 @@ ANSI_SYNOPSIS
 	char *_setlocale_r(void *<[reent]>,
                         int <[category]>, const char *<[locale]>);
 	lconv *_localeconv_r(void *<[reent]>);
-
-TRAD_SYNOPSIS
-	#include <locale.h>
-	char *setlocale(<[category]>, <[locale]>)
-	int <[category]>;
-	char *<[locale]>;
-
-	lconv *localeconv();
-
-	char *_setlocale_r(<[reent]>, <[category]>, <[locale]>)
-	char *<[reent]>;
-	int <[category]>;
-	char *<[locale]>;
-
-	lconv *_localeconv_r(<[reent]>);
-	char *<[reent]>;
 
 DESCRIPTION
 <<setlocale>> is the facility defined by ANSI C to condition the

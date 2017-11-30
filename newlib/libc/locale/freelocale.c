@@ -8,7 +8,7 @@ INDEX
 INDEX
 	_freelocale_r
 
-ANSI_SYNOPSIS
+SYNOPSIS
 	#include <locale.h>
 	locale_t freelocale(locale_t <[locobj]>);
 
