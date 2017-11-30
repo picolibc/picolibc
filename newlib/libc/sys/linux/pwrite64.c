@@ -5,17 +5,9 @@ FUNCTION
 INDEX
 	pwrite64
 
-ANSI_SYNOPSIS
+SYNOPSIS
 	#include <unistd.h>
 	ssize_t pwrite64(int <[fd]>, void *<[buf]>, size_t <[n]>, loff_t <[off]>);
-
-TRAD_SYNOPSIS
-	#include <unistd.h>
-	ssize_t pwrite64(<[fd]>, <[buf]>, <[n]>, <[off]>)
-	int <[fd]>;
-	void *<[buf]>;
-	size_t <[n]>;
-	loff_t <[off]>;
 
 DESCRIPTION
 The <<pwrite64>> function is similar to <<pwrite>>.  The only difference is

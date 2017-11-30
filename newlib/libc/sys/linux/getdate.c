@@ -27,19 +27,10 @@ INDEX
 INDEX
         getdate_r
 
-ANSI_SYNOPSIS
+SYNOPSIS
         #include <time.h>
         struct tm *getdate(const char *<[string]>);
         int getdate_r(const char *<[string]>, struct tm *<[res]>);
-
-TRAD_SYNOPSIS
-        #include <time.h>
-        struct tm *getdate(<[string]>);
-        const char *<[string]>;
-
-        int getdate_r(<[string]>, <[res]>);
-        const char *<[string]>;
-        struct tm *<[res]>;
 
 DESCRIPTION
 <<getdate>> reads a file which is specified by the environment variable:
