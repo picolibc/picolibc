@@ -41,7 +41,7 @@ INDEX
 INDEX
 	pclose
 
-ANSI_SYNOPSIS
+SYNOPSIS
 	#include <stdio.h>
 	FILE *popen(const char *<[s]>, const char *<[mode]>);
 

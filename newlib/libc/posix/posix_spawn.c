@@ -33,7 +33,7 @@ INDEX
 INDEX
 	posix_spawnp
 
-ANSI_SYNOPSIS
+SYNOPSIS
 	#include <spawn.h>
 
 	int posix_spawn(pid_t *<[pid]>, const char *<[path]>,
