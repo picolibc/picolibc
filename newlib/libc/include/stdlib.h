@@ -334,4 +334,8 @@ _Noreturn void
 
 _END_STD_C
 
+#if __SSP_FORTIFY_LEVEL > 0
+#include <ssp/stdlib.h>
+#endif
+
 #endif /* _STDLIB_H_ */
