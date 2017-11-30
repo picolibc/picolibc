@@ -212,6 +212,7 @@ static void * get_arg (int, va_list *, int *, void **);
 #define	SUPPRESS	0x10	/* suppress assignment */
 #define	POINTER		0x20	/* weird %p pointer (`fake hex') */
 #define	NOSKIP		0x40	/* do not skip blanks */
+#define	MALLOC 		0x80	/* handle 'm' modifier */
 
 /*
  * The following are used in numeric conversions only:
@@ -453,6 +454,122 @@ _DEFUN(__SVFSCANF_R, (rptr, fp, fmt0, ap),
 #ifdef _MB_CAPABLE
   mbstate_t state;              /* value to keep track of multibyte state */
 #endif
+#ifdef _WANT_IO_C99_FORMATS
+#define _WANT_IO_POSIX_EXTENSIONS
+#endif
+#ifdef _WANT_IO_POSIX_EXTENSIONS
+  /* POSIX requires that fscanf frees all allocated strings from 'm'
+     conversions in case it returns EOF.  m_ptr is used to keep track.
+     It will be allocated on the stack the first time an 'm' conversion
+     takes place, and it will be free'd on return from the function.
+     This implementation tries to save space by only allocating 8
+     pointer slots at a time.  Most scenarios should never have to call
+     realloc again.  This implementation allows only up to 65528 'm'
+     conversions per fscanf invocation for now.  That should be enough
+     for almost all scenarios, right? */
+  struct m_ptrs {
+    void ***m_arr;		/* Array of pointer args to 'm' conversion */
+    uint16_t m_siz;		/* Number of slots in m_arr */
+    uint16_t m_cnt;		/* Number of valid entries in m_arr */
+  } *m_ptr = NULL;
+  #define init_m_ptr()							\
+    do									\
+      {									\
+	if (!m_ptr)							\
+	  {								\
+	    m_ptr = (struct m_ptrs *) alloca (sizeof *m_ptr);		\
+	    m_ptr->m_arr = NULL;					\
+	    m_ptr->m_siz = 0;						\
+	    m_ptr->m_cnt = 0;						\
+	  }								\
+      }									\
+    while (0)
+  #define push_m_ptr(arg)						\
+    do									\
+      {									\
+	if (m_ptr->m_cnt >= m_ptr->m_siz)				\
+	  {								\
+	    void ***n = NULL;						\
+									\
+	    if (m_ptr->m_siz + 8 > 0 && m_ptr->m_siz + 8 < UINT16_MAX)	\
+	      n = (void ***) realloc (m_ptr->m_arr,			\
+				      (m_ptr->m_siz + 8) *		\
+				      sizeof (void **));		\
+	    if (!n)							\
+	      {								\
+		nassigned = EOF;					\
+		goto match_failure;					\
+	      }								\
+	    m_ptr->m_arr = n;						\
+	    m_ptr->m_siz += 8;						\
+	  }								\
+	m_ptr->m_arr[m_ptr->m_cnt++] = (void **) (arg);				\
+      }									\
+    while (0)
+  #define alloc_m_ptr(_type, _p, _p0, _p_p, _w)				\
+    ({									\
+      _p_p = GET_ARG (N, ap, _type **);					\
+      if (!_p_p)							\
+	goto match_failure;						\
+      _p0 = (_type *) malloc ((_w) * sizeof (_type));			\
+      if (!_p0)								\
+	{								\
+	  nassigned = EOF;						\
+	  goto match_failure;						\
+	}								\
+      *_p_p = _p0;							\
+      push_m_ptr (_p_p);						\
+      _p = _p0;								\
+      _w;								\
+    })
+  #define realloc_m_ptr(_type, _p, _p0, _p_p, _w)			\
+    ({									\
+      size_t _nw = (_w);						\
+      if (_p_p && _p - _p0 == _nw)					\
+	{								\
+	  _p0 = (_type *) realloc (_p0, (_nw << 1) * sizeof (_type));			\
+	  if (!_p0)							\
+	    {								\
+	      nassigned = EOF;						\
+	      goto match_failure;					\
+	    }								\
+	  _p = _p0 + _nw;						\
+	  *_p_p = _p0;							\
+	  _nw <<= 1;							\
+	}								\
+      _nw;								\
+    })
+  #define shrink_m_ptr(_type, _p_p, _w, _cw)				\
+    ({									\
+	size_t _nw = (_w);						\
+	if (_p_p && _nw < _cw)						\
+	  {								\
+	    _type *_np_p = (_type *)					\
+			   realloc (*_p_p, _nw * sizeof (_type));	\
+	    if (_np_p)							\
+	      *_p_p = _np_p;						\
+	  }								\
+    })
+  #define free_m_ptr()							\
+    do									\
+      {									\
+	if (m_ptr)							\
+	  {								\
+	    if (nassigned == EOF)					\
+	      {								\
+		int i;							\
+		for (i = 0; i < m_ptr->m_cnt; ++i)			\
+		  {							\
+		    free (*m_ptr->m_arr[i]);				\
+		    *m_ptr->m_arr[i] = NULL;				\
+		  }							\
+	      }								\
+	    if (m_ptr->m_arr)						\
+	      free (m_ptr->m_arr);					\
+	  }								\
+      }									\
+    while (0)
+#endif
 
   #define CCFN_PARAMS	_PARAMS((struct _reent *, const char *, char **, int))
   u_long (*ccfn)CCFN_PARAMS=0;	/* conversion function (strtol/strtoul) */
@@ -564,7 +681,7 @@ _DEFUN(__SVFSCANF_R, (rptr, fp, fmt0, ap),
 	  continue;
 
 	case '*':
-	  if ((flags & (CHAR | SHORT | LONG | LONGDBL | SUPPRESS))
+	  if ((flags & (CHAR | SHORT | LONG | LONGDBL | SUPPRESS | MALLOC))
 	      || width)
 	    goto match_failure;
 	  flags |= SUPPRESS;
@@ -645,6 +762,14 @@ _DEFUN(__SVFSCANF_R, (rptr, fp, fmt0, ap),
 	    flags |= LONGDBL;
 	  goto again;
 #endif /* _WANT_IO_C99_FORMATS */
+#ifdef _WANT_IO_POSIX_EXTENSIONS
+	case 'm':
+	  if (flags & (CHAR | SHORT | LONG | LONGDBL | MALLOC))
+	    goto match_failure;
+	  init_m_ptr ();
+	  flags |= MALLOC;
+	  goto again;
+#endif
 
 	case '0':
 	case '1':
@@ -656,14 +781,14 @@ _DEFUN(__SVFSCANF_R, (rptr, fp, fmt0, ap),
 	case '7':
 	case '8':
 	case '9':
-	  if (flags & (CHAR | SHORT | LONG | LONGDBL))
+	  if (flags & (CHAR | SHORT | LONG | LONGDBL | MALLOC))
 	    goto match_failure;
 	  width = width * 10 + c - '0';
 	  goto again;
 
 #ifndef _NO_POS_ARGS
 	case '$':
-	  if (flags & (CHAR | SHORT | LONG | LONGDBL | SUPPRESS))
+	  if (flags & (CHAR | SHORT | LONG | LONGDBL | SUPPRESS | MALLOC))
 	    goto match_failure;
 	  if (width <= MAX_POS_ARGS)
 	    {
@@ -851,12 +976,21 @@ _DEFUN(__SVFSCANF_R, (rptr, fp, fmt0, ap),
 #if !defined(_ELIX_LEVEL) || _ELIX_LEVEL >= 2
           if (flags & LONG)
             {
+#ifdef _WANT_IO_POSIX_EXTENSIONS
+	      wchar_t **wcp_p = NULL;
+	      wchar_t *wcp0 = NULL;
+	      size_t width0 = 0;
+#endif
               mbstate_t state;
               memset (&state, 0, sizeof (mbstate_t));
-              if ((flags & SUPPRESS) == 0)
-                wcp = GET_ARG (N, ap, wchar_t *);
-              else
+              if (flags & SUPPRESS)
                 wcp = NULL;
+#ifdef _WANT_IO_POSIX_EXTENSIONS
+	      else if (flags & MALLOC)
+		width0 = alloc_m_ptr (wchar_t, wcp, wcp0, wcp_p, width);
+#endif
+              else
+                wcp = GET_ARG (N, ap, wchar_t *);
               n = 0;
               while (width != 0)
                 {
@@ -885,6 +1019,9 @@ _DEFUN(__SVFSCANF_R, (rptr, fp, fmt0, ap),
                       break;
                     }
                 }
+#ifdef _WANT_IO_POSIX_EXTENSIONS
+	      shrink_m_ptr (wchar_t, wcp_p, width0 - width, width0);
+#endif
               if (!(flags & SUPPRESS))
                 nassigned++;
             }
@@ -919,10 +1056,20 @@ _DEFUN(__SVFSCANF_R, (rptr, fp, fmt0, ap),
 	    }
 	  else
 	    {
-	      size_t r = _fread_r (rptr, (_PTR) GET_ARG (N, ap, char *), 1, width, fp);
-
+	      size_t r;
+#ifdef _WANT_IO_POSIX_EXTENSIONS
+	      char **p_p = NULL;
+	      if (flags & MALLOC)
+		alloc_m_ptr (char, p, p0, p_p, width);
+	      else
+#endif
+		p = GET_ARG (N, ap, char *);
+	      r = _fread_r (rptr, p, 1, width, fp);
 	      if (r == 0)
 		goto input_failure;
+#ifdef _WANT_IO_POSIX_EXTENSIONS
+	      shrink_m_ptr (char, p_p, r, width);
+#endif
 	      nread += r;
 	      nassigned++;
 	    }
@@ -953,11 +1100,22 @@ _DEFUN(__SVFSCANF_R, (rptr, fp, fmt0, ap),
 	    }
 	  else
 	    {
-	      p0 = p = GET_ARG (N, ap, char *);
+#ifdef _WANT_IO_POSIX_EXTENSIONS
+	      char **p_p = NULL;
+	      size_t p_siz = 0;
+
+	      if (flags & MALLOC)
+		p_siz = alloc_m_ptr (char, p, p0, p_p, 32);
+	      else
+#endif
+		p0 = p = GET_ARG (N, ap, char *);
 	      while (ccltab[*fp->_p])
 		{
 		  fp->_r--;
 		  *p++ = *fp->_p++;
+#ifdef _WANT_IO_POSIX_EXTENSIONS
+		  p_siz = realloc_m_ptr (char, p, p0, p_p, p_siz);
+#endif
 		  if (--width == 0)
 		    break;
 		  if (BufferEmpty)
@@ -971,6 +1129,9 @@ _DEFUN(__SVFSCANF_R, (rptr, fp, fmt0, ap),
 	      if (n == 0)
 		goto match_failure;
 	      *p = 0;
+#ifdef _WANT_IO_POSIX_EXTENSIONS
+	      shrink_m_ptr (char, p_p, n + 1, p_siz);
+#endif
 	      nassigned++;
 	    }
 	  nread += n;
@@ -983,13 +1144,22 @@ _DEFUN(__SVFSCANF_R, (rptr, fp, fmt0, ap),
 #if !defined(_ELIX_LEVEL) || _ELIX_LEVEL >= 2
           if (flags & LONG)
             {
+#ifdef _WANT_IO_POSIX_EXTENSIONS
+	      wchar_t **wcp_p = NULL;
+	      wchar_t *wcp0 = NULL;
+	      size_t wcp_siz = 0;
+#endif
               /* Process %S and %ls placeholders */
               mbstate_t state;
               memset (&state, 0, sizeof (mbstate_t));
-              if ((flags & SUPPRESS) == 0)
-                wcp = GET_ARG (N, ap, wchar_t *);
-              else
+              if (flags & SUPPRESS)
                 wcp = &wc;
+#ifdef _WANT_IO_POSIX_EXTENSIONS
+	      else if (flags & MALLOC)
+		wcp_siz = alloc_m_ptr (wchar_t, wcp, wcp0, wcp_p, 32);
+#endif
+              else
+		wcp = GET_ARG (N, ap, wchar_t *);
               n = 0;
               while (!isspace (*fp->_p) && width != 0)
                 {
@@ -1014,7 +1184,13 @@ _DEFUN(__SVFSCANF_R, (rptr, fp, fmt0, ap),
                       nread += n;
                       width -= 1;
                       if ((flags & SUPPRESS) == 0)
-                        wcp += 1;
+			{
+			  wcp += 1;
+#ifdef _WANT_IO_POSIX_EXTENSIONS
+			  wcp_siz = realloc_m_ptr (wchar_t, wcp, wcp0, wcp_p,
+						   wcp_siz);
+#endif
+			}
                       n = 0;
                     }
                   if (BufferEmpty)
@@ -1027,6 +1203,9 @@ _DEFUN(__SVFSCANF_R, (rptr, fp, fmt0, ap),
               if (!(flags & SUPPRESS))
                 {
                   *wcp = L'\0';
+#ifdef _WANT_IO_POSIX_EXTENSIONS
+		  shrink_m_ptr (wchar_t, wcp_p, wcp - wcp0 + 1, wcp_siz);
+#endif
                   nassigned++;
                 }
             }
@@ -1047,17 +1226,32 @@ _DEFUN(__SVFSCANF_R, (rptr, fp, fmt0, ap),
 	    }
 	  else
 	    {
-	      p0 = p = GET_ARG (N, ap, char *);
+#ifdef _WANT_IO_POSIX_EXTENSIONS
+	      char **p_p = NULL;
+	      size_t p_siz = 0;
+
+	      if (flags & MALLOC)
+		p_siz = alloc_m_ptr (char, p, p0, p_p, 32);
+	      else
+#endif
+		p0 = GET_ARG (N, ap, char *);
+	      p = p0;
 	      while (!isspace (*fp->_p))
 		{
 		  fp->_r--;
 		  *p++ = *fp->_p++;
+#ifdef _WANT_IO_POSIX_EXTENSIONS
+		  p_siz = realloc_m_ptr (char, p, p0, p_p, p_siz);
+#endif
 		  if (--width == 0)
 		    break;
 		  if (BufferEmpty)
 		    break;
 		}
 	      *p = 0;
+#ifdef _WANT_IO_POSIX_EXTENSIONS
+	      shrink_m_ptr (char, p_p, p - p0 + 1, p_siz);
+#endif
 	      nread += p - p0;
 	      nassigned++;
 	    }
@@ -1647,6 +1841,9 @@ match_failure:
 all_done:
   /* Return number of matches, which can be 0 on match failure.  */
   _newlib_flockfile_end (fp);
+#ifdef _WANT_IO_POSIX_EXTENSIONS
+  free_m_ptr ();
+#endif
   return nassigned;
 }
 
