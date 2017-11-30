@@ -5,13 +5,9 @@ FUNCTION
 INDEX
 	abort
 
-ANSI_SYNOPSIS
+SYNOPSIS
 	#include <stdlib.h>
 	void abort(void);
-
-TRAD_SYNOPSIS
-	#include <stdlib.h>
-	void abort();
 
 DESCRIPTION
 Use <<abort>> to signal that your program has detected a condition it
