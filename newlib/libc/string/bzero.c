@@ -5,15 +5,9 @@ FUNCTION
 INDEX
 	bzero
 
-ANSI_SYNOPSIS
+SYNOPSIS
 	#include <strings.h>
 	void bzero(void *<[b]>, size_t <[length]>);
-
-TRAD_SYNOPSIS
-	#include <strings.h>
-	void bzero(<[b]>, <[length]>)
-	void *<[b]>;
-	size_t <[length]>;
 
 DESCRIPTION
 <<bzero>> initializes <[length]> bytes of memory, starting at address

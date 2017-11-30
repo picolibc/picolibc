@@ -5,17 +5,10 @@ FUNCTION
 INDEX
 	strverscmp
 
-ANSI_SYNOPSIS
+SYNOPSIS
 	#define _GNU_SOURCE
 	#include <string.h>
 	int strverscmp(const char *<[a]>, const char *<[b]>);
-
-TRAD_SYNOPSIS
-	#define _GNU_SOURCE
-	#include <string.h>
-	int strverscmp(<[a]>, <[b]>)
-	char *<[a]>;
-	char *<[b]>;
 
 DESCRIPTION
 	<<strverscmp>> compares the string at <[a]> to

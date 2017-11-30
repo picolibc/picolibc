@@ -2,15 +2,9 @@
 FUNCTION
         <<mempcpy>>---copy memory regions and return end pointer
 
-ANSI_SYNOPSIS
+SYNOPSIS
         #include <string.h>
         void* mempcpy(void *<[out]>, const void *<[in]>, size_t <[n]>);
-
-TRAD_SYNOPSIS
-        void *mempcpy(<[out]>, <[in]>, <[n]>
-        void *<[out]>;
-        void *<[in]>;
-        size_t <[n]>;
 
 DESCRIPTION
         This function copies <[n]> bytes from the memory region

@@ -5,15 +5,9 @@ FUNCTION
 INDEX
 	wcscasecmp
 
-ANSI_SYNOPSIS
+SYNOPSIS
 	#include <wchar.h>
 	int wcscasecmp(const wchar_t *<[a]>, const wchar_t *<[b]>);
-
-TRAD_SYNOPSIS
-	#include <wchar.h>
-	int wcscasecmp(<[a]>, <[b]>)
-	wchar_t *<[a]>;
-	wchar_t *<[b]>;
 
 DESCRIPTION
 	<<wcscasecmp>> compares the wide character string at <[a]> to

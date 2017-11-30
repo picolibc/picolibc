@@ -2,17 +2,10 @@
 FUNCTION
         <<memcpy>>---copy memory regions
 
-ANSI_SYNOPSIS
+SYNOPSIS
         #include <string.h>
         void* memcpy(void *restrict <[out]>, const void *restrict <[in]>,
                      size_t <[n]>);
-
-TRAD_SYNOPSIS
-        #include <string.h>
-        void *memcpy(<[out]>, <[in]>, <[n]>
-        void *<[out]>;
-        void *<[in]>;
-        size_t <[n]>;
 
 DESCRIPTION
         This function copies <[n]> bytes from the memory region

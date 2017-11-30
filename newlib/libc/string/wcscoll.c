@@ -5,15 +5,9 @@ FUNCTION
 INDEX
 	wcscoll
 
-ANSI_SYNOPSIS
+SYNOPSIS
 	#include <wchar.h>
 	int wcscoll(const wchar_t *<[stra]>, const wchar_t * <[strb]>);
-
-TRAD_SYNOPSIS
-	#include <wchar.h>
-	int wcscoll(<[stra]>, <[strb]>)
-	wchar_t *<[stra]>;
-	wchar_t *<[strb]>;
 
 DESCRIPTION
 	<<wcscoll>> compares the wide-character string pointed to by

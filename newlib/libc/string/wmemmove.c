@@ -2,15 +2,9 @@
 FUNCTION
 	<<wmemmove>>---copy wide characters in memory with overlapping areas 
 
-ANSI_SYNOPSIS
+SYNOPSIS
 	#include <wchar.h>
 	wchar_t *wmemmove(wchar_t *<[d]>, const wchar_t *<[s]>, size_t <[n]>);
-
-TRAD_SYNOPSIS
-	wchar_t *wmemmove(<[d]>, <[s]>, <[n]>
-	wchar_t *<[d]>;
-	const wchar_t *<[s]>;
-	size_t <[n]>;
 
 DESCRIPTION
 	The <<wmemmove>> function copies <[n]> wide characters from the object

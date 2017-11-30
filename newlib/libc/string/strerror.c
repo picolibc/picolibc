@@ -15,17 +15,12 @@ INDEX
 INDEX
 	strerror_l
 
-ANSI_SYNOPSIS
+SYNOPSIS
 	#include <string.h>
 	char *strerror(int <[errnum]>);
 	char *strerror_l(int <[errnum]>, locale_t <[locale]>);
 	char *_strerror_r(struct _reent <[ptr]>, int <[errnum]>,
 			  int <[internal]>, int *<[error]>);
-
-TRAD_SYNOPSIS
-	#include <string.h>
-	char *strerror(<[errnum]>)
-	int <[errnum]>;
 
 DESCRIPTION
 <<strerror>> converts the error number <[errnum]> into a

@@ -5,15 +5,9 @@ FUNCTION
 INDEX
 	strcat
 
-ANSI_SYNOPSIS
+SYNOPSIS
 	#include <string.h>
 	char *strcat(char *restrict <[dst]>, const char *restrict <[src]>);
-
-TRAD_SYNOPSIS
-	#include <string.h>
-	char *strcat(<[dst]>, <[src]>)
-	char *<[dst]>;
-	char *<[src]>;
 
 DESCRIPTION
 	<<strcat>> appends a copy of the string pointed to by <[src]>

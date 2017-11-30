@@ -5,7 +5,7 @@ FUNCTION
 INDEX
 	strcasecmp_l
 
-ANSI_SYNOPSIS
+SYNOPSIS
 	#include <strings.h>
 	int strcasecmp_l(const char *<[a]>, const char *<[b]>,
 			 locale_t <[locale]>);

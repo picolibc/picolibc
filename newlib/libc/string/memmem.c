@@ -11,7 +11,7 @@ FUNCTION
 INDEX
 	memmem
 
-ANSI_SYNOPSIS
+SYNOPSIS
 	#include <string.h>
 	char *memmem(const void *<[s1]>, size_t <[l1]>, const void *<[s2]>,
 		     size_t <[l2]>);

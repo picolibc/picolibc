@@ -2,14 +2,9 @@
 FUNCTION
 	<<wcsspn>>---get length of a wide substring 
 
-ANSI_SYNOPSIS
+SYNOPSIS
 	#include <wchar.h>
 	size_t wcsspn(const wchar_t *<[s]>, const wchar_t *<[set]>);
-
-TRAD_SYNOPSIS
-	size_t wcsspn(<[s]>, <[set]>
-	const wchar_t *<[s]>;
-	const wchar_t *<[set]>;
 
 DESCRIPTION
 	The <<wcsspn>> function computes the length of the maximum initial

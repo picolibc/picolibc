@@ -6,18 +6,11 @@ INDEX
 	wcstok
 
 
-ANSI_SYNOPSIS
+SYNOPSIS
 	#include <wchar.h>
       	wchar_t *wcstok(wchar_t *__restrict <[source]>,
       			const wchar_t *__restrict <[delimiters]>,
 			wchar_t **__restrict <[lasts]>);
-
-TRAD_SYNOPSIS
-	#include <wchar.h>
-	wchar_t *wcstok(<[source]>, <[delimiters]>, <[lasts]>);
-	wchar_t *__restrict <[source]>;
-	wchar_t *__restrict <[delimiters]>;
-	wchar_t **__restrict <[lasts]>;
 
 DESCRIPTION
 	The <<wcstok>> function is the wide-character equivalent of the

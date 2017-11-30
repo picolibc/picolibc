@@ -5,16 +5,9 @@ FUNCTION
 INDEX
 	wcsncasecmp
 
-ANSI_SYNOPSIS
+SYNOPSIS
 	#include <wchar.h>
 	int wcsncasecmp(const wchar_t *<[a]>, const wchar_t * <[b]>, size_t <[length]>);
-
-TRAD_SYNOPSIS
-	#include <wchar.h>
-	int wcsncasecmp(<[a]>, <[b]>, <[length]>)
-	wchar_t *<[a]>;
-	wchar_t *<[b]>;
-	size_t <[length]>
 
 DESCRIPTION
 	<<wcsncasecmp>> compares up to <[length]> wide characters

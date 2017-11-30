@@ -6,20 +6,13 @@ FUNCTION
 INDEX
 	strerror_r
 
-ANSI_SYNOPSIS
+SYNOPSIS
 	#include <string.h>
 	#ifdef _GNU_SOURCE
 	char *strerror_r(int <[errnum]>, char *<[buffer]>, size_t <[n]>);
 	#else
 	int strerror_r(int <[errnum]>, char *<[buffer]>, size_t <[n]>);
 	#endif
-
-TRAD_SYNOPSIS
-	#include <string.h>
-	char *strerror_r(<[errnum]>, <[buffer]>, <[n]>)
-	int <[errnum]>;
-	char *<[buffer]>;
-	size_t <[n]>;
 
 DESCRIPTION
 <<strerror_r>> converts the error number <[errnum]> into a

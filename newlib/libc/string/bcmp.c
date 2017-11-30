@@ -5,16 +5,9 @@ FUNCTION
 INDEX
 	bcmp
 
-ANSI_SYNOPSIS
+SYNOPSIS
 	#include <strings.h>
 	int bcmp(const void *<[s1]>, const void *<[s2]>, size_t <[n]>);
-
-TRAD_SYNOPSIS
-	#include <strings.h>
-	int bcmp(<[s1]>, <[s2]>, <[n]>)
-	const void *<[s1]>;
-	const void *<[s2]>;
-	size_t <[n]>;
 
 DESCRIPTION
 	This function compares not more than <[n]> bytes of the

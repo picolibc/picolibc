@@ -5,14 +5,9 @@ FUNCTION
 INDEX
 	strlwr
 
-ANSI_SYNOPSIS
+SYNOPSIS
 	#include <string.h>
 	char *strlwr(char *<[a]>);
-
-TRAD_SYNOPSIS
-	#include <string.h>
-	char *strlwr(<[a]>)
-	char *<[a]>;
 
 DESCRIPTION
 	<<strlwr>> converts each character in the string at <[a]> to

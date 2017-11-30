@@ -5,16 +5,9 @@ FUNCTION
 INDEX
 	strncasecmp
 
-ANSI_SYNOPSIS
+SYNOPSIS
 	#include <strings.h>
 	int strncasecmp(const char *<[a]>, const char * <[b]>, size_t <[length]>);
-
-TRAD_SYNOPSIS
-	#include <strings.h>
-	int strncasecmp(<[a]>, <[b]>, <[length]>)
-	char *<[a]>;
-	char *<[b]>;
-	size_t <[length]>
 
 DESCRIPTION
 	<<strncasecmp>> compares up to <[length]> characters

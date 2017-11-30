@@ -5,17 +5,10 @@ FUNCTION
 INDEX
 	strncpy
 
-ANSI_SYNOPSIS
+SYNOPSIS
 	#include <string.h>
 	char *strncpy(char *restrict <[dst]>, const char *restrict <[src]>,
                       size_t <[length]>);
-
-TRAD_SYNOPSIS
-	#include <string.h>
-	char *strncpy(<[dst]>, <[src]>, <[length]>)
-	char *<[dst]>;
-	char *<[src]>;
-	size_t <[length]>;
 
 DESCRIPTION
 	<<strncpy>> copies not more than <[length]> characters from the

@@ -5,15 +5,9 @@ FUNCTION
 INDEX
 	strchr
 
-ANSI_SYNOPSIS
+SYNOPSIS
 	#include <string.h>
 	char * strchr(const char *<[string]>, int <[c]>);
-
-TRAD_SYNOPSIS
-	#include <string.h>
-	char * strchr(<[string]>, <[c]>);
-	const char *<[string]>;
-	int <[c]>;
 
 DESCRIPTION
 	This function finds the first occurence of <[c]> (converted to

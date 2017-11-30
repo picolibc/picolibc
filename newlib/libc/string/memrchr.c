@@ -5,16 +5,9 @@ FUNCTION
 INDEX
 	memrchr
 
-ANSI_SYNOPSIS
+SYNOPSIS
 	#include <string.h>
 	void *memrchr(const void *<[src]>, int <[c]>, size_t <[length]>);
-
-TRAD_SYNOPSIS
-	#include <string.h>
-	void *memrchr(<[src]>, <[c]>, <[length]>)
-	void *<[src]>;
-	void *<[c]>;
-	size_t <[length]>;
 
 DESCRIPTION
 	This function searches memory starting at <[length]> bytes

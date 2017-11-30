@@ -5,7 +5,7 @@ FUNCTION
 INDEX
 	strcoll_l
 
-ANSI_SYNOPSIS
+SYNOPSIS
 	#include <string.h>
 	int strcoll_l(const char *<[stra]>, const char * <[strb]>,
 		      locale_t <[locale]>);

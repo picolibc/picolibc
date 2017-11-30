@@ -5,7 +5,7 @@ FUNCTION
 INDEX
 	strncasecmp_l
 
-ANSI_SYNOPSIS
+SYNOPSIS
 	#include <strings.h>
 	int strncasecmp_l(const char *<[a]>, const char * <[b]>,
 			  size_t <[length]>, locale_t <[locale]>);

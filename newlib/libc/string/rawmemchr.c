@@ -5,15 +5,9 @@ FUNCTION
 INDEX
 	rawmemchr
 
-ANSI_SYNOPSIS
+SYNOPSIS
 	#include <string.h>
 	void *rawmemchr(const void *<[src]>, int <[c]>);
-
-TRAD_SYNOPSIS
-	#include <string.h>
-	void *rawmemchr(<[src]>, <[c]>)
-	void *<[src]>;
-	void *<[c]>;
 
 DESCRIPTION
 	This function searches memory starting at <<*<[src]>>> for the

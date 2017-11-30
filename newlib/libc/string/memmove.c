@@ -5,16 +5,9 @@ FUNCTION
 INDEX
 	memmove
 
-ANSI_SYNOPSIS
+SYNOPSIS
 	#include <string.h>
 	void *memmove(void *<[dst]>, const void *<[src]>, size_t <[length]>);
-
-TRAD_SYNOPSIS
-	#include <string.h>
-	void *memmove(<[dst]>, <[src]>, <[length]>)
-	void *<[dst]>;
-	void *<[src]>;
-	size_t <[length]>;
 
 DESCRIPTION
 	This function moves <[length]> characters from the block of

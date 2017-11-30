@@ -5,7 +5,7 @@ FUNCTION
 INDEX
 	wcsncasecmp_l
 
-ANSI_SYNOPSIS
+SYNOPSIS
 	#include <wchar.h>
 	int wcsncasecmp_l(const wchar_t *<[a]>, const wchar_t * <[b]>,
 			  size_t <[length]>, locale_t <[locale]>);

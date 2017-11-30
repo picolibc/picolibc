@@ -2,13 +2,9 @@
 FUNCTION
 	<<wcscmp>>---compare two wide-character strings
 
-ANSI_SYNOPSIS
+SYNOPSIS
 	#include <wchar.h>
 	int wcscmp(const wchar_t *<[s1]>, *<[s2]>);
-
-TRAD_SYNOPSIS
-	int wcscmp(<[s1]>, <[s2]>
-	const wchar_t *<[s1]>, <[s2]>;
 
 DESCRIPTION
 	The <<wcscmp>> function compares the wide-character string pointed to

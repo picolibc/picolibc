@@ -5,15 +5,9 @@ FUNCTION
 INDEX
         wcsnlen
 
-ANSI_SYNOPSIS
+SYNOPSIS
         #include <wchar.h>
         size_t wcsnlen(const wchar_t *<[s]>, size_t <[maxlen]>);
-
-TRAD_SYNOPSIS
-        #include <wchar.h>
-        size_t wcsnlen(<[s]>, <[maxlen]>)
-        wchar_t *<[s]>;
-        size_t <[maxlen]>;
 
 DESCRIPTION
         The <<wcsnlen>> function computes the number of wide-character codes

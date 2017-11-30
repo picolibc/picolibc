@@ -5,17 +5,10 @@ FUNCTION
 INDEX
 	strncat
 
-ANSI_SYNOPSIS
+SYNOPSIS
 	#include <string.h>
 	char *strncat(char *restrict <[dst]>, const char *restrict <[src]>,
                       size_t <[length]>);
-
-TRAD_SYNOPSIS
-	#include <string.h>
-	char *strncat(<[dst]>, <[src]>, <[length]>)
-	char *<[dst]>;
-	char *<[src]>;
-	size_t <[length]>;
 
 DESCRIPTION
 	<<strncat>> appends not more than <[length]> characters from

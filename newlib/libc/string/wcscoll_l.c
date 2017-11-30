@@ -5,7 +5,7 @@ FUNCTION
 INDEX
 	wcscoll_l
 
-ANSI_SYNOPSIS
+SYNOPSIS
 	#include <wchar.h>
 	int wcscoll_l(const wchar_t *<[stra]>, const wchar_t * <[strb]>,
 		      locale_t <[locale]>);

@@ -2,17 +2,10 @@
 FUNCTION
         <<memccpy>>---copy memory regions with end-token check
 
-ANSI_SYNOPSIS
+SYNOPSIS
         #include <string.h>
         void* memccpy(void *restrict <[out]>, const void *restrict <[in]>, 
                       int <[endchar]>, size_t <[n]>);
-
-TRAD_SYNOPSIS
-        void *memccpy(<[out]>, <[in]>, <[endchar]>, <[n]>
-        void *<[out]>;
-        void *<[in]>;
-	int <[endchar]>;
-        size_t <[n]>;
 
 DESCRIPTION
         This function copies up to <[n]> bytes from the memory region

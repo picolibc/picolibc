@@ -2,14 +2,9 @@
 FUNCTION
 	<<wcpcpy>>---copy a wide-character string returning a pointer to its end
 
-ANSI_SYNOPSIS
+SYNOPSIS
 	#include <wchar.h>
 	wchar_t *wcpcpy(wchar_t *<[s1]>, const wchar_t *<[s2]>);
-
-TRAD_SYNOPSIS
-	wchar_t *wcpcpy(<[s1]>, <[s2]>
-	wchar_t *__restrict <[s1]>;
-	const wchar_t *__restrict <[s2]>;
 
 DESCRIPTION
 	The <<wcpcpy>> function copies the wide-character string pointed to by

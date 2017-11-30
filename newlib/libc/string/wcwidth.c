@@ -5,14 +5,9 @@ FUNCTION
 INDEX
 	wcwidth
 
-ANSI_SYNOPSIS
+SYNOPSIS
 	#include <wchar.h>
 	int wcwidth(const wchar_t <[wc]>);
-
-TRAD_SYNOPSIS
-	#include <wchar.h>
-	int wcwidth(<[wc]>)
-	wchar_t *<[wc]>;
 
 DESCRIPTION
 	The <<wcwidth>> function shall determine the number of column

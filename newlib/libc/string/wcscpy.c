@@ -2,15 +2,10 @@
 FUNCTION
 	<<wcscpy>>---copy a wide-character string 
 
-ANSI_SYNOPSIS
+SYNOPSIS
 	#include <wchar.h>
 	wchar_t *wcscpy(wchar_t *__restrict <[s1]>,
 			const wchar_t *__restrict <[s2]>);
-
-TRAD_SYNOPSIS
-	wchar_t *wcscpy(<[s1]>, <[s2]>
-	wchar_t *__restrict <[s1]>;
-	const wchar_t *__restrict <[s2]>;
 
 DESCRIPTION
 	The <<wcscpy>> function copies the wide-character string pointed to by

@@ -7,18 +7,12 @@ INDEX
 INDEX
 	_wcsdup_r
 
-ANSI_SYNOPSIS
+SYNOPSIS
 	#include <wchar.h>
 	wchar_t *wcsdup(const wchar_t *<[str]>);
 
 	#include <wchar.h>
 	wchar_t *_wcsdup_r(struct _reent *<[ptr]>, const wchar_t *<[str]>);
-
-TRAD_SYNOPSIS
-	#include <wchar.h>
-	wchar_t *wcsdup(<[ptr]>, <[str]>)
-	struct _reent *<[ptr]>;
-	wchar_t *<[str]>;
 
 DESCRIPTION
 	<<wcsdup>> allocates a new wide character string using <<malloc>>,

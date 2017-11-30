@@ -5,7 +5,7 @@ FUNCTION
 INDEX
 	wcsxfrm_l
 
-ANSI_SYNOPSIS
+SYNOPSIS
 	#include <wchar.h>
 	int wcsxfrm_l(wchar_t *__restrict <[stra]>,
 		      const wchar_t *__restrict <[strb]>, size_t <[n]>,

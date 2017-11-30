@@ -2,16 +2,10 @@
 FUNCTION
 	<<wcsncat>>---concatenate part of two wide-character strings 
 
-ANSI_SYNOPSIS
+SYNOPSIS
 	#include <wchar.h>
 	wchar_t *wcsncat(wchar_t *__restrict <[s1]>,
 			const wchar_t *__restrict <[s2]>, size_t <[n]>);
-
-TRAD_SYNOPSIS
-	wchar_t *wcsncat(<[s1]>, <[s2]>, <[n]>
-	wchar_t *__restrict <[s1]>;
-	const wchar_t *__restrict <[s2]>;
-	size_t <[n]>;
 
 DESCRIPTION
 	The <<wcsncat>> function appends not more than <[n]> wide-character

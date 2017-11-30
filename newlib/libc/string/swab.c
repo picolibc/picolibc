@@ -2,15 +2,9 @@
 FUNCTION
 	<<swab>>---swap adjacent bytes
 
-ANSI_SYNOPSIS
+SYNOPSIS
 	#include <unistd.h>
 	void swab(const void *<[in]>, void *<[out]>, ssize_t <[n]>);
-
-TRAD_SYNOPSIS
-	void swab(<[in]>, <[out]>, <[n]>
-	void *<[in]>;
-	void *<[out]>;
-	ssize_t <[n]>;
 
 DESCRIPTION
 	This function copies <[n]> bytes from the memory region

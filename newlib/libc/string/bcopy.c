@@ -2,15 +2,9 @@
 FUNCTION
 	<<bcopy>>---copy memory regions
 
-ANSI_SYNOPSIS
+SYNOPSIS
 	#include <strings.h>
 	void bcopy(const void *<[in]>, void *<[out]>, size_t <[n]>);
-
-TRAD_SYNOPSIS
-	void bcopy(<[in]>, <[out]>, <[n]>
-	const void *<[in]>;
-	void *<[out]>;
-	size_t <[n]>;
 
 DESCRIPTION
 	This function copies <[n]> bytes from the memory region

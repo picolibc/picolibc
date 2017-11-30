@@ -5,15 +5,9 @@ FUNCTION
 INDEX
 	strstr
 
-ANSI_SYNOPSIS
+SYNOPSIS
 	#include <string.h>
 	char *strstr(const char *<[s1]>, const char *<[s2]>);
-
-TRAD_SYNOPSIS
-	#include <string.h>
-	char *strstr(<[s1]>, <[s2]>)
-	char *<[s1]>;
-	char *<[s2]>;
 
 DESCRIPTION
 	Locates the first occurrence in the string pointed to by <[s1]> of

@@ -2,16 +2,10 @@
 FUNCTION
 	<<wcsncpy>>---copy part of a wide-character string 
 
-ANSI_SYNOPSIS
+SYNOPSIS
 	#include <wchar.h>
 	wchar_t *wcsncpy(wchar_t *__restrict <[s1]>,
 			const wchar_t *__restrict <[s2]>, size_t <[n]>);
-
-TRAD_SYNOPSIS
-	wchar_t *wcsncpy(<[s1]>, <[s2]>, <[n]>
-	wchar_t *__restrict <[s1]>;
-	const wchar_t *__restrict <[s2]>;
-	size_t <[n]>;
 
 DESCRIPTION
 	The <<wcsncpy>> function copies not more than <[n]> wide-character codes

@@ -2,15 +2,9 @@
 FUNCTION
        <<wmemset>>---set wide characters in memory 
 
-ANSI_SYNOPSIS
+SYNOPSIS
        #include <wchar.h>
        wchar_t *wmemset(wchar_t *<[s]>, wchar_t <[c]>, size_t <[n]>);
-
-TRAD_SYNOPSIS
-       wchar_t *wmemset(<[s]>, <[c]>, <[n]>
-       wchar_t *<[s]>;
-       wchar_t <[c]>;
-       size_t <[n]>;
 
 DESCRIPTION
        The <<wmemset>> function copies the value of <[c]> into each of the

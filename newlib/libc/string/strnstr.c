@@ -5,7 +5,7 @@ FUNCTION
 INDEX
 	strnstr
 
-ANSI_SYNOPSIS
+SYNOPSIS
 	#include <string.h>
 	size_t strnstr(const char *<[s1]>, const char *<[s2]>, size_t <[n]>);
 

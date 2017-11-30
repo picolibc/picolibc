@@ -5,15 +5,9 @@ FUNCTION
 INDEX
 	stpcpy
 
-ANSI_SYNOPSIS
+SYNOPSIS
 	#include <string.h>
 	char *stpcpy(char *restrict <[dst]>, const char *restrict <[src]>);
-
-TRAD_SYNOPSIS
-	#include <string.h>
-	char *stpcpy(<[dst]>, <[src]>)
-	char *<[dst]>;
-	char *<[src]>;
 
 DESCRIPTION
 	<<stpcpy>> copies the string pointed to by <[src]>

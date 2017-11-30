@@ -5,15 +5,9 @@ FUNCTION
 INDEX
 	strpbrk
 
-ANSI_SYNOPSIS
+SYNOPSIS
 	#include <string.h>
 	char *strpbrk(const char *<[s1]>, const char *<[s2]>);
-
-TRAD_SYNOPSIS
-	#include <string.h>
-	char *strpbrk(<[s1]>, <[s2]>)
-	char *<[s1]>;
-	char *<[s2]>;
 
 DESCRIPTION
 	This function locates the first occurence in the string

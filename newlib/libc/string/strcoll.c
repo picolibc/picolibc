@@ -5,15 +5,9 @@ FUNCTION
 INDEX
 	strcoll
 
-ANSI_SYNOPSIS
+SYNOPSIS
 	#include <string.h>
 	int strcoll(const char *<[stra]>, const char * <[strb]>);
-
-TRAD_SYNOPSIS
-	#include <string.h>
-	int strcoll(<[stra]>, <[strb]>)
-	char *<[stra]>;
-	char *<[strb]>;
 
 DESCRIPTION
 	<<strcoll>> compares the string pointed to by <[stra]> to

@@ -5,14 +5,9 @@ FUNCTION
 INDEX
 	strupr
 
-ANSI_SYNOPSIS
+SYNOPSIS
 	#include <string.h>
 	char *strupr(char *<[a]>);
-
-TRAD_SYNOPSIS
-	#include <string.h>
-	char *strupr(<[a]>)
-	char *<[a]>;
 
 DESCRIPTION
 	<<strupr>> converts each character in the string at <[a]> to

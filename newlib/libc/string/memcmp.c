@@ -5,16 +5,9 @@ FUNCTION
 INDEX
 	memcmp
 
-ANSI_SYNOPSIS
+SYNOPSIS
 	#include <string.h>
 	int memcmp(const void *<[s1]>, const void *<[s2]>, size_t <[n]>);
-
-TRAD_SYNOPSIS
-	#include <string.h>
-	int memcmp(<[s1]>, <[s2]>, <[n]>)
-	void *<[s1]>;
-	void *<[s2]>;
-	size_t <[n]>;
 
 DESCRIPTION
 	This function compares not more than <[n]> characters of the

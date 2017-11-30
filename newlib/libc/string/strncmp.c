@@ -5,16 +5,9 @@ FUNCTION
 INDEX
 	strncmp
 
-ANSI_SYNOPSIS
+SYNOPSIS
 	#include <string.h>
 	int strncmp(const char *<[a]>, const char * <[b]>, size_t <[length]>);
-
-TRAD_SYNOPSIS
-	#include <string.h>
-	int strncmp(<[a]>, <[b]>, <[length]>)
-	char *<[a]>;
-	char *<[b]>;
-	size_t <[length]>
 
 DESCRIPTION
 	<<strncmp>> compares up to <[length]> characters

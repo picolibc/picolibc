@@ -5,15 +5,9 @@ FUNCTION
 INDEX
 	index
 
-ANSI_SYNOPSIS
+SYNOPSIS
 	#include <strings.h>
 	char * index(const char *<[string]>, int <[c]>);
-
-TRAD_SYNOPSIS
-	#include <strings.h>
-	char * index(<[string]>, <[c]>);
-	char *<[string]>;
-	int *<[c]>;
 
 DESCRIPTION
 	This function finds the first occurence of <[c]> (converted to

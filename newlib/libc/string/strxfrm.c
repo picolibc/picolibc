@@ -5,17 +5,10 @@ FUNCTION
 INDEX
 	strxfrm
 
-ANSI_SYNOPSIS
+SYNOPSIS
 	#include <string.h>
 	size_t strxfrm(char *restrict <[s1]>, const char *restrict <[s2]>,
                        size_t <[n]>);
-
-TRAD_SYNOPSIS
-	#include <string.h>
-	size_t strxfrm(<[s1]>, <[s2]>, <[n]>);
-	char *<[s1]>;
-	char *<[s2]>;
-	size_t <[n]>;
 
 DESCRIPTION
 	This function transforms the string pointed to by <[s2]> and

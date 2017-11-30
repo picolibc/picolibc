@@ -2,16 +2,10 @@
 FUNCTION
 	<<wmemcpy>>---copy wide characters in memory 
 
-ANSI_SYNOPSIS
+SYNOPSIS
 	#include <wchar.h>
 	wchar_t *wmemcpy(wchar_t *__restrict <[d]>,
 			 const wchar_t *__restrict <[s]>, size_t <[n]>);
-
-TRAD_SYNOPSIS
-	wchar_t *wmemcpy(<[d]>, <[s]>, <[n]>
-	wchar_t *__restrict <[d]>;
-	const wchar_t *__restrict <[s]>;
-	size_t <[n]>;
 
 DESCRIPTION
 	The <<wmemcpy>> function copies <[n]> wide characters from the object

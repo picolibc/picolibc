@@ -2,16 +2,9 @@
 FUNCTION
 	<<wcslcat>>---concatenate wide-character strings to specified length
 
-ANSI_SYNOPSIS
+SYNOPSIS
 	#include <wchar.h>
 	size_t wcslcat(wchar_t *<[dst]>, const wchar_t *<[src]>, size_t <[siz]>);
-
-TRAD_SYNOPSIS
-	#include <wchar.h>
-	size_t wcslcat(<[dst]>, <[src]>, <[siz]>
-	wchar_t *<[dst]>;
-	const wchar_t *<[src]>;
-	size_t <[siz]>;
 
 DESCRIPTION
 	The <<wcslcat>> function appends wide characters from <[src]> to

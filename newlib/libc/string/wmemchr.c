@@ -3,15 +3,9 @@ FUNCTION
 	<<wmemchr>>---find a wide character in memory
  
 
-ANSI_SYNOPSIS
+SYNOPSIS
 	#include <wchar.h>
 	wchar_t	*wmemchr(const wchar_t *<[s]>, wchar_t <[c]>, size_t <[n]>);
-
-TRAD_SYNOPSIS
-	wchar_t	*wmemchr(<[s]>, <[c]>, <[n]>
-	const wchar_t *<[s]>;
-	wchar_t <[c]>;
-	size_t <[n]>;
 
 DESCRIPTION
 	The <<wmemchr>> function locates the first occurrence of <[c]> in the
