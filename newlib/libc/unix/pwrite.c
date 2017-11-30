@@ -8,27 +8,12 @@ INDEX
 INDEX
 	_pwrite_r
 
-ANSI_SYNOPSIS
+SYNOPSIS
 	#include <unistd.h>
 	ssize_t pwrite(int <[fd]>, const void *<[buf]>, 
                        size_t <[n]>, off_t <[off]>);
 	ssize_t _pwrite_r(struct _reent *<[rptr]>, int <[fd]>, 
                           const void *<[buf]>, size_t <[n]>, off_t <[off]>);
-
-TRAD_SYNOPSIS
-	#include <unistd.h>
-	ssize_t pwrite(<[fd]>, <[buf]>, <[n]>, <[off]>)
-	int <[fd]>;
-	const void *<[buf]>;
-	size_t <[n]>;
-	off_t <[off]>;
-
-	ssize_t _pwrite_r(<[rptr]>, <[fd]>, <[buf]>, <[n]>, <[off]>)
-	struct _reent *<[rptr]>;
-	int <[fd]>;
-	const void *<[buf]>;
-	size_t <[n]>;
-	off_t <[off]>;
 
 DESCRIPTION
 The <<pwrite>> function is similar to <<write>>.  One difference is that
