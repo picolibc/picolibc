@@ -14,15 +14,9 @@ FUNCTION
 INDEX
 	on_exit
 
-ANSI_SYNOPSIS
+SYNOPSIS
 	#include <stdlib.h>
 	int on_exit (void (*<[function]>)(int, void *), void *<[arg]>);
-
-TRAD_SYNOPSIS
-	#include <stdlib.h>
-	int on_exit ((<[function]>, <[arg]>)
-	  void (*<[function]>)(int, void *);
-	  void *<[arg]>;
 
 DESCRIPTION
 You can use <<on_exit>> to enroll functions in a list of functions that

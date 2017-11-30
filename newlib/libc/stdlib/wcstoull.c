@@ -11,7 +11,7 @@ INDEX
 INDEX
 	_wcstoull_r
 
-ANSI_SYNOPSIS
+SYNOPSIS
 	#include <wchar.h>
         unsigned long long wcstoull(const wchar_t *__restrict <[s]>,
 				    wchar_t **__restrict <[ptr]>,
@@ -25,19 +25,6 @@ ANSI_SYNOPSIS
 
         unsigned long long _wcstoull_r(void *<[reent]>, const wchar_t *<[s]>,
 				       wchar_t **<[ptr]>, int <[base]>);
-
-TRAD_SYNOPSIS
-	#include <wchar.h>
-        unsigned long long wcstoull(<[s]>, <[ptr]>, <[base]>)
-        wchar_t *__restrict <[s]>;
-        wchar_t **__restrict <[ptr]>;
-        int <[base]>;
-
-        unsigned long long _wcstoull_r(<[reent]>, <[s]>, <[ptr]>, <[base]>)
-	wchar_t *<[reent]>;
-        wchar_t *<[s]>;
-        wchar_t **<[ptr]>;
-        int <[base]>;
 
 DESCRIPTION
 The function <<wcstoull>> converts the wide string <<*<[s]>>> to

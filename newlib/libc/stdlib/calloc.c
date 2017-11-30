@@ -11,22 +11,10 @@ INDEX
 INDEX
 	_calloc_r
 
-ANSI_SYNOPSIS
+SYNOPSIS
 	#include <stdlib.h>
 	void *calloc(size_t <[n]>, size_t <[s]>);
 	void *_calloc_r(void *<[reent]>, size_t <[n]>, size_t <[s]>);
-	
-TRAD_SYNOPSIS
-	#include <stdlib.h>
-	char *calloc(<[n]>, <[s]>)
-	size_t <[n]>, <[s]>;
-
-	char *_calloc_r(<[reent]>, <[n]>, <[s]>)
-	char *<[reent]>;
-	size_t <[n]>;
-	size_t <[s]>;
-
-
 
 DESCRIPTION
 Use <<calloc>> to request a block of memory sufficient to hold an

@@ -8,17 +8,10 @@ INDEX
 INDEX
 	__malloc_unlock
 
-ANSI_SYNOPSIS
+SYNOPSIS
 	#include <malloc.h>
 	void __malloc_lock (struct _reent *<[reent]>);
 	void __malloc_unlock (struct _reent *<[reent]>);
-
-TRAD_SYNOPSIS
-	void __malloc_lock(<[reent]>)
-	struct _reent *<[reent]>;
-
-	void __malloc_unlock(<[reent]>)
-	struct _reent *<[reent]>;
 
 DESCRIPTION
 The <<malloc>> family of routines call these functions when they need to lock

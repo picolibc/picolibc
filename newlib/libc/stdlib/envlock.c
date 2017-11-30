@@ -7,17 +7,10 @@ INDEX
 INDEX
 	__env_unlock
 
-ANSI_SYNOPSIS
+SYNOPSIS
 	#include <envlock.h>
 	void __env_lock (struct _reent *<[reent]>);
 	void __env_unlock (struct _reent *<[reent]>);
-
-TRAD_SYNOPSIS
-	void __env_lock(<[reent]>)
-	struct _reent *<[reent]>;
-
-	void __env_unlock(<[reent]>)
-	struct _reent *<[reent]>;
 
 DESCRIPTION
 The <<setenv>> family of routines call these functions when they need to

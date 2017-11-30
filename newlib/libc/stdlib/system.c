@@ -7,20 +7,11 @@ INDEX
 INDEX
 	_system_r
 
-ANSI_SYNOPSIS
+SYNOPSIS
 	#include <stdlib.h>
 	int system(char *<[s]>);
 
 	int _system_r(void *<[reent]>, char *<[s]>);
-
-TRAD_SYNOPSIS
-	#include <stdlib.h>
-	int system(<[s]>)
-	char *<[s]>;
-
-	int _system_r(<[reent]>, <[s]>)
-	char *<[reent]>;
-	char *<[s]>;
 
 DESCRIPTION
 

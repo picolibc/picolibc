@@ -5,7 +5,7 @@ FUNCTION
 INDEX
 	itoa
 
-ANSI_SYNOPSIS
+SYNOPSIS
 	#include <stdlib.h>
 	char *itoa(int <[value]>, char *<[str]>, int <[base]>);
 	char *__itoa(int <[value]>, char *<[str]>, int <[base]>);

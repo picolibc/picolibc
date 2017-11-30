@@ -11,7 +11,7 @@ INDEX
 INDEX
 	fcvtf
 
-ANSI_SYNOPSIS
+SYNOPSIS
 	#include <stdlib.h>
 
 	char *ecvt(double <[val]>, int <[chars]>, int *<[decpt]>, int *<[sgn]>);
@@ -21,31 +21,6 @@ ANSI_SYNOPSIS
                    int *<[decpt]>, int *<[sgn]>);
 	char *fcvtf(float <[val]>, int <[decimals]>, 
                     int *<[decpt]>, int *<[sgn]>);
-
-TRAD_SYNOPSIS
-	#include <stdlib.h>
-
-	char *ecvt(<[val]>, <[chars]>, <[decpt]>, <[sgn]>);
-	double <[val]>;
-	int <[chars]>;
-	int *<[decpt]>;
-	int *<[sgn]>;
-	char *ecvtf(<[val]>, <[chars]>, <[decpt]>, <[sgn]>);
-	float <[val]>;
-	int <[chars]>;
-	int *<[decpt]>;
-	int *<[sgn]>;
-
-	char *fcvt(<[val]>, <[decimals]>, <[decpt]>, <[sgn]>);
-	double <[val]>;
-	int <[decimals]>;
-	int *<[decpt]>;
-	int *<[sgn]>;
-	char *fcvtf(<[val]>, <[decimals]>, <[decpt]>, <[sgn]>);
-	float <[val]>;
-	int <[decimals]>;
-	int *<[decpt]>;
-	int *<[sgn]>;
 
 DESCRIPTION
 <<ecvt>> and <<fcvt>> produce (null-terminated) strings of digits
@@ -91,23 +66,11 @@ INDEX
 INDEX
 	gcvtf
 
-ANSI_SYNOPSIS
+SYNOPSIS
 	#include <stdlib.h>
 
 	char *gcvt(double <[val]>, int <[precision]>, char *<[buf]>);
 	char *gcvtf(float <[val]>, int <[precision]>, char *<[buf]>);
-
-TRAD_SYNOPSIS
-	#include <stdlib.h>
-
-	char *gcvt(<[val]>, <[precision]>, <[buf]>);
-	double <[val]>;
-	int <[precision]>;
-	char *<[buf]>;
-	char *gcvtf(<[val]>, <[precision]>, <[buf]>);
-	float <[val]>;
-	int <[precision]>;
-	char *<[buf]>;
 
 DESCRIPTION
 <<gcvt>> writes a fully formatted number as a null-terminated

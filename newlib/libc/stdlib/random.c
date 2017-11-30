@@ -7,7 +7,7 @@ INDEX
 INDEX
 	srandom
 
-ANSI_SYNOPSIS
+SYNOPSIS
 	#define _XOPEN_SOURCE 500
 	#include <stdlib.h>
 	long int random(void);

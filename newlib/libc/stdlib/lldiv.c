@@ -5,14 +5,9 @@ FUNCTION
 INDEX
         lldiv
 
-ANSI_SYNOPSIS
+SYNOPSIS
         #include <stdlib.h>
         lldiv_t lldiv(long long <[n]>, long long <[d]>);
-
-TRAD_SYNOPSIS
-        #include <stdlib.h>
-        lldiv_t lldiv(<[n]>, <[d]>)
-        long long <[n]>, <[d]>;
 
 DESCRIPTION
 Divide

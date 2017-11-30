@@ -5,7 +5,7 @@ FUNCTION
 INDEX
 	assert
 
-ANSI_SYNOPSIS
+SYNOPSIS
 	#include <assert.h>
 	void assert(int <[expression]>);
 

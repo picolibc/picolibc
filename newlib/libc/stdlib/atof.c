@@ -7,18 +7,10 @@ INDEX
 INDEX
 	atoff
 
-ANSI_SYNOPSIS
+SYNOPSIS
 	#include <stdlib.h>
         double atof(const char *<[s]>);
         float atoff(const char *<[s]>);
-
-TRAD_SYNOPSIS
-	#include <stdlib.h>
-        double atof(<[s]>)
-        char *<[s]>;
-
-        float atoff(<[s]>)
-        char *<[s]>;
 
 DESCRIPTION
 <<atof>> converts the initial portion of a string to a <<double>>.

@@ -11,7 +11,7 @@ INDEX
 INDEX
 	_wcstol_r
 
-ANSI_SYNOPSIS
+SYNOPSIS
 	#include <wchar.h>
         long wcstol(const wchar_t *__restrict <[s]>,
 		    wchar_t **__restrict <[ptr]>, int <[base]>);
@@ -23,19 +23,6 @@ ANSI_SYNOPSIS
 
         long _wcstol_r(void *<[reent]>, const wchar_t *<[s]>,
 		       wchar_t **<[ptr]>, int <[base]>);
-
-TRAD_SYNOPSIS
-	#include <stdlib.h>
-	long wcstol (<[s]>, <[ptr]>, <[base]>)
-        wchar_t *__restrict <[s]>;
-        wchar_t **__restrict <[ptr]>;
-        int <[base]>;
-
-	long _wcstol_r (<[reent]>, <[s]>, <[ptr]>, <[base]>)
-	struct _reent *<[reent]>;
-        wchar_t *<[s]>;
-        wchar_t **<[ptr]>;
-        int <[base]>;
 
 DESCRIPTION
 The function <<wcstol>> converts the wide string <<*<[s]>>> to

@@ -5,14 +5,9 @@ FUNCTION
 INDEX
 	abs
 
-ANSI_SYNOPSIS
+SYNOPSIS
 	#include <stdlib.h>
 	int abs(int <[i]>);
-
-TRAD_SYNOPSIS
-	#include <stdlib.h>
-	int abs(<[i]>)
-	int <[i]>;
 
 DESCRIPTION
 <<abs>> returns

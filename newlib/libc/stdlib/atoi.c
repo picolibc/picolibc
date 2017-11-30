@@ -11,29 +11,12 @@ INDEX
 INDEX
 	_atol_r
 
-ANSI_SYNOPSIS
+SYNOPSIS
 	#include <stdlib.h>
         int atoi(const char *<[s]>);
 	long atol(const char *<[s]>);
         int _atoi_r(struct _reent *<[ptr]>, const char *<[s]>);
         long _atol_r(struct _reent *<[ptr]>, const char *<[s]>);
-
-TRAD_SYNOPSIS
-	#include <stdlib.h>
-       int atoi(<[s]>)
-       char *<[s]>;
-
-       long atol(<[s]>)
-       char *<[s]>;
-
-       int _atoi_r(<[ptr]>, <[s]>)
-       struct _reent *<[ptr]>;
-       char *<[s]>;
-
-       long _atol_r(<[ptr]>, <[s]>)
-       struct _reent *<[ptr]>;
-       char *<[s]>;
-
 
 DESCRIPTION
    <<atoi>> converts the initial portion of a string to an <<int>>.

@@ -11,7 +11,7 @@ INDEX
 INDEX
 	_strtoul_r
 
-ANSI_SYNOPSIS
+SYNOPSIS
 	#include <stdlib.h>
         unsigned long strtoul(const char *restrict <[s]>,
 			      char **restrict <[ptr]>, int <[base]>);
@@ -23,19 +23,6 @@ ANSI_SYNOPSIS
 
         unsigned long _strtoul_r(void *<[reent]>, const char *restrict <[s]>,
 				 char **restrict <[ptr]>, int <[base]>);
-
-TRAD_SYNOPSIS
-	#include <stdlib.h>
-        unsigned long strtoul(<[s]>, <[ptr]>, <[base]>)
-        char *<[s]>;
-        char **<[ptr]>;
-        int <[base]>;
-
-        unsigned long _strtoul_r(<[reent]>, <[s]>, <[ptr]>, <[base]>)
-	char *<[reent]>;
-        char *<[s]>;
-        char **<[ptr]>;
-        int <[base]>;
 
 DESCRIPTION
 The function <<strtoul>> converts the string <<*<[s]>>> to

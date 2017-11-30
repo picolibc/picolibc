@@ -9,22 +9,11 @@ INDEX
 INDEX
 	rand_r
 
-ANSI_SYNOPSIS
+SYNOPSIS
 	#include <stdlib.h>
 	int rand(void);
 	void srand(unsigned int <[seed]>);
 	int rand_r(unsigned int *<[seed]>);
-
-TRAD_SYNOPSIS
-	#include <stdlib.h>
-	int rand();
-
-	void srand(<[seed]>)
-	unsigned int <[seed]>;
-
-	void rand_r(<[seed]>)
-	unsigned int *<[seed]>;
-
 
 DESCRIPTION
 <<rand>> returns a different integer each time it is called; each

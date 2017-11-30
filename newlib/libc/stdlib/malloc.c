@@ -43,7 +43,7 @@ INDEX
 INDEX
 	_malloc_usable_size_r
 
-ANSI_SYNOPSIS
+SYNOPSIS
 	#include <stdlib.h>
 	void *malloc(size_t <[nbytes]>);
 	void *realloc(void *<[aptr]>, size_t <[nbytes]>);
@@ -65,56 +65,6 @@ ANSI_SYNOPSIS
 			  size_t <[align]>, size_t <[nbytes]>);
 
 	size_t _malloc_usable_size_r(void *<[reent]>, void *<[aptr]>);
-
-TRAD_SYNOPSIS
-	#include <stdlib.h>
-	char *malloc(<[nbytes]>)
-	size_t <[nbytes]>;
-
-	char *realloc(<[aptr]>, <[nbytes]>)
-	char *<[aptr]>;
-	size_t <[nbytes]>;
-
-	char *reallocf(<[aptr]>, <[nbytes]>)
-	char *<[aptr]>;
-	size_t <[nbytes]>;
-
-	void free(<[aptr]>)
-	char *<[aptr]>;
-
-	char *memalign(<[align]>, <[nbytes]>)
-	size_t <[align]>;
-	size_t <[nbytes]>;
-
-	size_t malloc_usable_size(<[aptr]>)
-	char *<[aptr]>;
-
-	char *_malloc_r(<[reent]>,<[nbytes]>)
-	char *<[reent]>;
-	size_t <[nbytes]>;
-
-	char *_realloc_r(<[reent]>, <[aptr]>, <[nbytes]>)
-	char *<[reent]>;
-	char *<[aptr]>;
-	size_t <[nbytes]>;
-
-	char *_reallocf_r(<[reent]>, <[aptr]>, <[nbytes]>)
-	char *<[reent]>;
-	char *<[aptr]>;
-	size_t <[nbytes]>;
-
-	void _free_r(<[reent]>, <[aptr]>)
-	char *<[reent]>;
-	char *<[aptr]>;
-
-	char *_memalign_r(<[reent]>, <[align]>, <[nbytes]>)
-	char *<[reent]>;
-	size_t <[align]>;
-	size_t <[nbytes]>;
-
-	size_t malloc_usable_size(<[reent]>, <[aptr]>)
-	char *<[reent]>;
-	char *<[aptr]>;
 
 DESCRIPTION
 These functions manage a pool of system memory.

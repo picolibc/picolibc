@@ -11,7 +11,7 @@ INDEX
 INDEX
 	_strtol_r
 
-ANSI_SYNOPSIS
+SYNOPSIS
 	#include <stdlib.h>
         long strtol(const char *restrict <[s]>, char **restrict <[ptr]>,
 		    int <[base]>);
@@ -22,19 +22,6 @@ ANSI_SYNOPSIS
 
         long _strtol_r(void *<[reent]>, const char *restrict <[s]>,
 		       char **restrict <[ptr]>,int <[base]>);
-
-TRAD_SYNOPSIS
-	#include <stdlib.h>
-	long strtol (<[s]>, <[ptr]>, <[base]>)
-        char *<[s]>;
-        char **<[ptr]>;
-        int <[base]>;
-
-	long _strtol_r (<[reent]>, <[s]>, <[ptr]>, <[base]>)
-	char *<[reent]>;
-        char *<[s]>;
-        char **<[ptr]>;
-        int <[base]>;
 
 DESCRIPTION
 The function <<strtol>> converts the string <<*<[s]>>> to

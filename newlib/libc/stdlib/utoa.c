@@ -5,7 +5,7 @@ FUNCTION
 INDEX
 	utoa
 
-ANSI_SYNOPSIS
+SYNOPSIS
 	#include <stdlib.h>
 	char *utoa(unsigned <[value]>, char *<[str]>, int <[base]>);
 	char *__utoa(unsigned <[value]>, char *<[str]>, int <[base]>);

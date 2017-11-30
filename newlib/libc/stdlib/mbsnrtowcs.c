@@ -11,7 +11,7 @@ INDEX
 INDEX
 	_mbsnrtowcs_r
 
-ANSI_SYNOPSIS
+SYNOPSIS
 	#include <wchar.h>
 	size_t mbsrtowcs(wchar_t *__restrict <[dst]>,
 			 const char **__restrict <[src]>,
@@ -32,39 +32,6 @@ ANSI_SYNOPSIS
 	size_t _mbsnrtowcs_r(struct _reent *<[ptr]>, wchar_t *<[dst]>,
 			     const char **<[src]>, size_t <[nms]>,
 			     size_t <[len]>, mbstate_t *<[ps]>);
-
-TRAD_SYNOPSIS
-	#include <wchar.h>
-	size_t mbsrtowcs(<[dst]>, <[src]>, <[len]>, <[ps]>)
-	wchar_t *__restrict <[dst]>;
-	const char **__restrict <[src]>;
-	size_t <[len]>;
-	mbstate_t *__restrict <[ps]>;
-
-	#include <wchar.h>
-	size_t _mbsrtowcs_r(<[ptr]>, <[dst]>, <[src]>, <[len]>, <[ps]>)
-	struct _reent *<[ptr]>;
-	wchar_t *<[dst]>;
-	const char **<[src]>;
-	size_t <[len]>;
-	mbstate_t *<[ps]>;
-
-	#include <wchar.h>
-	size_t mbsnrtowcs(<[dst]>, <[src]>, <[nms]>, <[len]>, <[ps]>)
-	wchar_t *__restrict <[dst]>;
-	const char **__restrict <[src]>;
-	size_t <[nms]>;
-	size_t <[len]>;
-	mbstate_t *__restrict <[ps]>;
-
-	#include <wchar.h>
-	size_t _mbsnrtowcs_r(<[ptr]>, <[dst]>, <[src]>, <[nms]>, <[len]>, <[ps]>)
-	struct _reent *<[ptr]>;
-	wchar_t *<[dst]>;
-	const char **<[src]>;
-	size_t <[nms]>;
-	size_t <[len]>;
-	mbstate_t *<[ps]>;
 
 DESCRIPTION
 The <<mbsrtowcs>> function converts a sequence of multibyte characters

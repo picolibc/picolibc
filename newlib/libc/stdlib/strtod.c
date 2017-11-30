@@ -23,7 +23,7 @@ INDEX
 INDEX
 	_strtod_r
 
-ANSI_SYNOPSIS
+SYNOPSIS
         #include <stdlib.h>
         double strtod(const char *restrict <[str]>, char **restrict <[tail]>);
         float strtof(const char *restrict <[str]>, char **restrict <[tail]>);
@@ -41,21 +41,6 @@ ANSI_SYNOPSIS
 
         double _strtod_r(void *<[reent]>,
                          const char *restrict <[str]>, char **restrict <[tail]>);
-
-TRAD_SYNOPSIS
-        #include <stdlib.h>
-        double strtod(<[str]>,<[tail]>)
-        char *<[str]>;
-        char **<[tail]>;
-
-        float strtof(<[str]>,<[tail]>)
-        char *<[str]>;
-        char **<[tail]>;
-
-        double _strtod_r(<[reent]>,<[str]>,<[tail]>)
-	char *<[reent]>;
-        char *<[str]>;
-        char **<[tail]>;
 
 DESCRIPTION
 	<<strtod>>, <<strtof>>, <<strtold>> parse the character string

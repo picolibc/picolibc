@@ -5,15 +5,9 @@ FUNCTION
 INDEX
 	wctomb
 
-ANSI_SYNOPSIS
+SYNOPSIS
 	#include <stdlib.h>
 	int wctomb(char *<[s]>, wchar_t <[wchar]>);
-
-TRAD_SYNOPSIS
-	#include <stdlib.h>
-	int wctomb(<[s]>, <[wchar]>)
-	char *<[s]>;
-	wchar_t <[wchar]>;
 
 DESCRIPTION
 When _MB_CAPABLE is not defined, this is a minimal ANSI-conforming 

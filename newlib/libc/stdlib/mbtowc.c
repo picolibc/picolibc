@@ -5,16 +5,9 @@ FUNCTION
 INDEX
 	mbtowc
 
-ANSI_SYNOPSIS
+SYNOPSIS
 	#include <stdlib.h>
 	int mbtowc(wchar_t *restrict <[pwc]>, const char *restrict <[s]>, size_t <[n]>);
-
-TRAD_SYNOPSIS
-	#include <stdlib.h>
-	int mbtowc(<[pwc]>, <[s]>, <[n]>)
-	wchar_t *<[pwc]>;
-	const char *<[s]>;
-	size_t <[n]>;
 
 DESCRIPTION
 When _MB_CAPABLE is not defined, this is a minimal ANSI-conforming 

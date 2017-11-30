@@ -5,17 +5,9 @@ FUNCTION
 INDEX
 	_mblen_r
 
-ANSI_SYNOPSIS
+SYNOPSIS
 	#include <stdlib.h>
 	int _mblen_r(struct _reent *<[r]>, const char *<[s]>, size_t <[n]>, int *<[state]>);
-
-TRAD_SYNOPSIS
-	#include <stdlib.h>
-	int _mblen_r(<[r]>, <[s]>, <[n]>, <[state]>)
-        struct _reent *<[r]>;
-	const char *<[s]>;
-	size_t <[n]>;
-        int *<[state]>;
 
 DESCRIPTION
 When _MB_CAPABLE is not defined, this is a minimal ANSI-conforming 

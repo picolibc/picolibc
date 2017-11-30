@@ -7,18 +7,10 @@ INDEX
 INDEX
 	l64a
 
-ANSI_SYNOPSIS
+SYNOPSIS
         #include <stdlib.h>
         long a64l(const char *<[input]>);
         char *l64a(long <[input]>);
-
-TRAD_SYNOPSIS
-        #include <stdlib.h>
-        long a64l(<[input]>)
-        const char *<[input]>;
-
-        char *l64a(<[input]>)
-        long <[input]>;
 
 DESCRIPTION
 Conversion is performed between long and radix-64 characters.  The

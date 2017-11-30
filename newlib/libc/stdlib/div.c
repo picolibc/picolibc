@@ -5,14 +5,9 @@ FUNCTION
 INDEX
 	div
 
-ANSI_SYNOPSIS
+SYNOPSIS
 	#include <stdlib.h>
 	div_t div(int <[n]>, int <[d]>);
-
-TRAD_SYNOPSIS
-	#include <stdlib.h>
-	div_t div(<[n]>, <[d]>)
-	int <[n]>, <[d]>;
 
 DESCRIPTION
 Divide

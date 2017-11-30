@@ -12,14 +12,9 @@ FUNCTION
 INDEX
 	exit
 
-ANSI_SYNOPSIS
+SYNOPSIS
 	#include <stdlib.h>
 	void exit(int <[code]>);
-
-TRAD_SYNOPSIS
-	#include <stdlib.h>
-	void exit(<[code]>)
-	int <[code]>;
 
 DESCRIPTION
 Use <<exit>> to return control from a program to the host operating

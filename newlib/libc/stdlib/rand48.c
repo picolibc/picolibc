@@ -36,7 +36,7 @@ INDEX
 INDEX
        lcong48
 
-ANSI_SYNOPSIS
+SYNOPSIS
        #include <stdlib.h>
        double drand48(void);
        double erand48(unsigned short <[xseed]>[3]);
@@ -47,32 +47,6 @@ ANSI_SYNOPSIS
        void srand48(long <[seed]>);
        unsigned short *seed48(unsigned short <[xseed]>[3]);
        void lcong48(unsigned short <[p]>[7]);
-
-TRAD_SYNOPSIS
-       #include <stdlib.h>
-       double drand48();
-
-       double erand48(<[xseed]>)
-       unsigned short <[xseed]>[3];
-
-       long lrand48();
-
-       long nrand48(<[xseed]>)
-       unsigned short <[xseed]>[3];
-
-       long mrand48();
-
-       long jrand48(<[xseed]>)
-       unsigned short <[xseed]>[3];
-
-       void srand48(<[seed]>)
-       long <[seed]>;
-
-       unsigned short *seed48(<[xseed]>)
-       unsigned short <[xseed]>[3];
-
-       void lcong48(<[p]>)
-       unsigned short <[p]>[7];
 
 DESCRIPTION
 The <<rand48>> family of functions generates pseudo-random numbers

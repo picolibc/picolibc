@@ -5,14 +5,9 @@ FUNCTION
 INDEX
         llabs
 
-ANSI_SYNOPSIS
+SYNOPSIS
         #include <stdlib.h>
         long long llabs(long long <[j]>);
-
-TRAD_SYNOPSIS
-        #include <stdlib.h>
-        long long llabs(<[j]>)
-        long long <[j]>;
 
 DESCRIPTION
 The <<llabs>> function computes the absolute value of the long long integer 

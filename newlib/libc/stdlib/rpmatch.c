@@ -5,14 +5,9 @@ FUNCTION
 INDEX
 	rpmatch
 
-ANSI_SYNOPSIS
+SYNOPSIS
 	#include <stdlib.h>
 	int rpmatch(const char *<[response]>);
-
-TRAD_SYNOPSIS
-	#include <stdlib.h>
-	int rpmatch(<[response]>)
-	const char *<[response]>;
 
 DESCRIPTION
 The <<rpmatch>> function determines whether <[response]> is an affirmative

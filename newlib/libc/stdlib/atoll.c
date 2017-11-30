@@ -7,19 +7,10 @@ INDEX
 INDEX
         _atoll_r
 
-ANSI_SYNOPSIS
+SYNOPSIS
         #include <stdlib.h>
         long long atoll(const char *<[str]>);
         long long _atoll_r(struct _reent *<[ptr]>, const char *<[str]>);
-
-TRAD_SYNOPSIS
-        #include <stdlib.h>
-        long long atoll(<[str]>)
-        const char *<[str]>;
-
-        long long _atoll_r(<[ptr]>, <[str]>)
-	struct _reent *<[ptr]>;
-        const char *<[str]>;
 
 DESCRIPTION
 The function <<atoll>> converts the initial portion of the string 

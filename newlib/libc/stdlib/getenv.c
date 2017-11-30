@@ -7,14 +7,9 @@ INDEX
 INDEX
 	environ
 
-ANSI_SYNOPSIS
+SYNOPSIS
 	#include <stdlib.h>
 	char *getenv(const char *<[name]>);
-
-TRAD_SYNOPSIS
-	#include <stdlib.h>
-	char *getenv(<[name]>)
-	char *<[name]>;
 
 DESCRIPTION
 <<getenv>> searches the list of environment variable names and values

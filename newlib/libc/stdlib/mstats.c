@@ -25,7 +25,7 @@ INDEX
 INDEX
 	_mallopt_r
 
-ANSI_SYNOPSIS
+SYNOPSIS
 	#include <malloc.h>
 	struct mallinfo mallinfo(void);
 	void malloc_stats(void);
@@ -34,27 +34,6 @@ ANSI_SYNOPSIS
 	struct mallinfo _mallinfo_r(void *<[reent]>);
 	void _malloc_stats_r(void *<[reent]>);
 	int _mallopt_r(void *<[reent]>, int <[parameter]>, <[value]>);
-
-TRAD_SYNOPSIS
-	#include <malloc.h>
-	struct mallinfo mallinfo();
-
-	void malloc_stats();
-
-	int mallopt(<[parameter]>, <[value]>)
-	int <[parameter]>;
-	int <[value]>;
-
-	struct mallinfo _mallinfo_r(<[reent]>);
-	char *<[reent]>;
-
-	void _malloc_stats_r(<[reent]>);
-	char *<[reent]>;
-
-	int _mallopt_r(<[reent]>, <[parameter]>, <[value]>)
-	char *<[reent]>;
-	int <[parameter]>;
-	int <[value]>;
 
 DESCRIPTION
 <<mallinfo>> returns a structure describing the current state of

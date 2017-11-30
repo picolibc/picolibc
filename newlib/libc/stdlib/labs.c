@@ -5,14 +5,9 @@ FUNCTION
 INDEX
 	labs
 
-ANSI_SYNOPSIS
+SYNOPSIS
 	#include <stdlib.h>
 	long labs(long <[i]>);
-
-TRAD_SYNOPSIS
-	#include <stdlib.h>
-	long labs(<[i]>)
-	long <[i]>;
 
 DESCRIPTION
 <<labs>> returns

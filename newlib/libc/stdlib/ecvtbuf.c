@@ -7,7 +7,7 @@ INDEX
 INDEX
 	fcvtbuf
 
-ANSI_SYNOPSIS
+SYNOPSIS
 	#include <stdio.h>
 
 	char *ecvtbuf(double <[val]>, int <[chars]>, int *<[decpt]>,
@@ -15,23 +15,6 @@ ANSI_SYNOPSIS
 
 	char *fcvtbuf(double <[val]>, int <[decimals]>, int *<[decpt]>,
                        int *<[sgn]>, char *<[buf]>);
-
-TRAD_SYNOPSIS
-	#include <stdio.h>
-
-	char *ecvtbuf(<[val]>, <[chars]>, <[decpt]>, <[sgn]>, <[buf]>);
-	double <[val]>;
-	int <[chars]>;
-	int *<[decpt]>;
-	int *<[sgn]>;
-	char *<[buf]>;
-
-	char *fcvtbuf(<[val]>, <[decimals]>, <[decpt]>, <[sgn]>, <[buf]>);
-	double <[val]>;
-	int <[decimals]>;
-	int *<[decpt]>;
-	int *<[sgn]>;
-	char *<[buf]>;
 
 DESCRIPTION
 	<<ecvtbuf>> and <<fcvtbuf>> produce (null-terminated) strings

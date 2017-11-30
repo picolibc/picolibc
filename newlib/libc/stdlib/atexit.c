@@ -12,14 +12,9 @@ FUNCTION
 INDEX
 	atexit
 
-ANSI_SYNOPSIS
+SYNOPSIS
 	#include <stdlib.h>
 	int atexit (void (*<[function]>)(void));
-
-TRAD_SYNOPSIS
-	#include <stdlib.h>
-	int atexit ((<[function]>)
-	  void (*<[function]>)();
 
 DESCRIPTION
 You can use <<atexit>> to enroll functions in a list of functions that

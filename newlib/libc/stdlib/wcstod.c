@@ -26,7 +26,7 @@ INDEX
 INDEX
 	_wcstof_r
 
-ANSI_SYNOPSIS
+SYNOPSIS
         #include <stdlib.h>
         double wcstod(const wchar_t *__restrict <[str]>,
 		      wchar_t **__restrict <[tail]>);
@@ -48,26 +48,6 @@ ANSI_SYNOPSIS
                          const wchar_t *<[str]>, wchar_t **<[tail]>);
         float _wcstof_r(void *<[reent]>,
                          const wchar_t *<[str]>, wchar_t **<[tail]>);
-
-TRAD_SYNOPSIS
-        #include <stdlib.h>
-        double wcstod(<[str]>,<[tail]>)
-        wchar_t *__restrict <[str]>;
-        wchar_t **__restrict <[tail]>;
-
-        float wcstof(<[str]>,<[tail]>)
-        wchar_t *__restrict <[str]>;
-        wchar_t **__restrict <[tail]>;
-
-        double _wcstod_r(<[reent]>,<[str]>,<[tail]>)
-	wchar_t *<[reent]>;
-        wchar_t *<[str]>;
-        wchar_t **<[tail]>;
-
-        float _wcstof_r(<[reent]>,<[str]>,<[tail]>)
-	wchar_t *<[reent]>;
-        wchar_t *<[str]>;
-        wchar_t **<[tail]>;
 
 DESCRIPTION
 	<<wcstod>>, <<wcstof>>, <<wcstold>> parse the wide-character string
