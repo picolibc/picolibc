@@ -1623,8 +1623,7 @@ input_failure:
      should have been set prior to here.  On EOF failure (including
      invalid format string), return EOF if no matches yet, else number
      of matches made prior to failure.  */
-  _newlib_flockfile_exit (fp);
-  return nassigned && !(fp->_flags & __SERR) ? nassigned : EOF;
+  nassigned = nassigned && !(fp->_flags & __SERR) ? nassigned : EOF;
 match_failure:
 all_done:
   /* Return number of matches, which can be 0 on match failure.  */
