@@ -7,15 +7,10 @@ INDEX
 INDEX
 	unctrllen
 
-ANSI_SYNOPSIS
+SYNOPSIS
 	#include <unctrl.h>
 	char *unctrl(int <[c]>);
 	int unctrllen(int <[c]>);
-
-TRAD_SYNOPSIS
-	#include <unctrl.h>
-	char *unctrl(<[c]>);
-	int unctrllen(<[c]>);
 
 DESCRIPTION
 <<unctrl>> is a macro which returns the printable representation of <[c]>

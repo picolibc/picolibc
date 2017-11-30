@@ -42,7 +42,7 @@ INDEX
 INDEX
 	__retarget_lock_release_recursive
 
-ANSI_SYNOPSIS
+SYNOPSIS
 	#include <lock.h>
 	struct __lock __lock___sinit_recursive_mutex;
 	struct __lock __lock___sfp_recursive_mutex;
