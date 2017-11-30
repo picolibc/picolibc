@@ -5,7 +5,7 @@ FUNCTION
 INDEX
 	qsort_r
 
-ANSI_SYNOPSIS
+SYNOPSIS
 	#define _BSD_SOURCE
 	#include <stdlib.h>
 	void qsort_r(void *<[base]>, size_t <[nmemb]>, size_t <[size]>,
@@ -17,15 +17,6 @@ ANSI_SYNOPSIS
 	void qsort_r(void *<[base]>, size_t <[nmemb]>, size_t <[size]>,
 		     int (*<[compar]>)(const void *, const void *, void *),
 		     void *<[thunk]>);
-
-TRAD_SYNOPSIS
-	#include <stdlib.h>
-	qsort_r(<[base]>, <[nmemb]>, <[size]>, <[compar]>, <[thumb]>)
-	char *<[base]>;
-	size_t <[nmemb]>;
-	size_t <[size]>;
-	int (*<[compar]>)();
-	char *<[thumb]>;
 
 DESCRIPTION
 <<qsort_r>> sorts an array (beginning at <[base]>) of <[nmemb]> objects.

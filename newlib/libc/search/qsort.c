@@ -5,18 +5,10 @@ FUNCTION
 INDEX
 	qsort
 
-ANSI_SYNOPSIS
+SYNOPSIS
 	#include <stdlib.h>
 	void qsort(void *<[base]>, size_t <[nmemb]>, size_t <[size]>,
 		   int (*<[compar]>)(const void *, const void *) );
-
-TRAD_SYNOPSIS
-	#include <stdlib.h>
-	qsort(<[base]>, <[nmemb]>, <[size]>, <[compar]> )
-	char *<[base]>;
-	size_t <[nmemb]>;
-	size_t <[size]>;
-	int (*<[compar]>)();
 
 DESCRIPTION
 <<qsort>> sorts an array (beginning at <[base]>) of <[nmemb]> objects.
