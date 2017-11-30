@@ -20,18 +20,10 @@ INDEX
 INDEX
 	atanhf
 
-ANSI_SYNOPSIS
+SYNOPSIS
 	#include <math.h>
 	double atanh(double <[x]>);
 	float atanhf(float <[x]>);
-
-TRAD_SYNOPSIS
-	#include <math.h>
-	double atanh(<[x]>)
-	double <[x]>;
-
-	float atanhf(<[x]>)
-	float <[x]>;
 
 DESCRIPTION
 	<<atanh>> calculates the inverse hyperbolic tangent of <[x]>.

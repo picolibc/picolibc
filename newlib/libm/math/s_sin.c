@@ -22,24 +22,12 @@ INDEX
 cos
 INDEX
 cosf
-ANSI_SYNOPSIS
+SYNOPSIS
         #include <math.h>
         double sin(double <[x]>);
         float  sinf(float <[x]>);
         double cos(double <[x]>);
         float cosf(float <[x]>);
-
-TRAD_SYNOPSIS
-        #include <math.h>
-        double sin(<[x]>)
-        double <[x]>;
-        float  sinf(<[x]>)
-        float <[x]>;
-
-        double cos(<[x]>)
-        double <[x]>;
-        float cosf(<[x]>)
-        float <[x]>;
 
 DESCRIPTION
 	<<sin>> and <<cos>> compute (respectively) the sine and cosine

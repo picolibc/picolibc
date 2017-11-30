@@ -21,18 +21,10 @@ INDEX
 INDEX
 	sinhf
 
-ANSI_SYNOPSIS
+SYNOPSIS
         #include <math.h>
         double sinh(double <[x]>);
         float  sinhf(float <[x]>);
-
-TRAD_SYNOPSIS
-        #include <math.h>
-        double sinh(<[x]>)
-        double <[x]>;
-
-        float  sinhf(<[x]>)
-        float <[x]>;
 
 DESCRIPTION
 	<<sinh>> computes the hyperbolic sine of the argument <[x]>.

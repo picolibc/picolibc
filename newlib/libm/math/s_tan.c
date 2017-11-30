@@ -22,19 +22,10 @@ tan
 INDEX
 tanf
 
-ANSI_SYNOPSIS
+SYNOPSIS
         #include <math.h>
         double tan(double <[x]>);
         float tanf(float <[x]>);
-
-TRAD_SYNOPSIS
-        #include <math.h>
-        double tan(<[x]>)
-        double <[x]>;
-
-        float tanf(<[x]>)
-        float <[x]>;
-
 
 DESCRIPTION
 <<tan>> computes the tangent of the argument <[x]>.  

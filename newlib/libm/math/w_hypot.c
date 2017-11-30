@@ -19,17 +19,10 @@ INDEX
 INDEX
 	hypotf
 
-ANSI_SYNOPSIS
+SYNOPSIS
 	#include <math.h>
 	double hypot(double <[x]>, double <[y]>);
 	float hypotf(float <[x]>, float <[y]>);
-
-TRAD_SYNOPSIS
-	double hypot(<[x]>, <[y]>)
-	double <[x]>, <[y]>;
-
-	float hypotf(<[x]>, <[y]>)
-	float <[x]>, <[y]>;
 
 DESCRIPTION
 	<<hypot>> calculates the Euclidean distance

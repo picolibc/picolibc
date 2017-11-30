@@ -19,7 +19,7 @@ INDEX
 INDEX
 	exp2f
 
-ANSI_SYNOPSIS
+SYNOPSIS
 	#include <math.h>
 	double exp2(double <[x]>);
 	float exp2f(float <[x]>);

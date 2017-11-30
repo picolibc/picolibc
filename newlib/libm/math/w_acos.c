@@ -20,20 +20,10 @@ INDEX
 INDEX
 	acosf
 
-ANSI_SYNOPSIS
+SYNOPSIS
         #include <math.h>
         double acos(double <[x]>);
         float acosf(float <[x]>);
-
-TRAD_SYNOPSIS
-        #include <math.h>
-        double acos(<[x]>)
-        double <[x]>;
-
-        float acosf(<[x]>)
-        float <[x]>;
-
-
 
 DESCRIPTION
 

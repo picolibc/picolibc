@@ -20,18 +20,10 @@ log10
 INDEX
 log10f
 
-ANSI_SYNOPSIS
+SYNOPSIS
 	#include <math.h>
 	double log10(double <[x]>);
 	float log10f(float <[x]>);
-
-TRAD_SYNOPSIS
-	#include <math.h>
-	double log10(<[x]>)
-	double <[x]>;
-
-	float log10f(<[x]>)
-	float <[x]>;
 
 DESCRIPTION
 <<log10>> returns the base 10 logarithm of <[x]>.

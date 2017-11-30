@@ -21,19 +21,10 @@ INDEX
 INDEX
    asinf
 
-ANSI_SYNOPSIS
+SYNOPSIS
         #include <math.h>
         double asin(double <[x]>);
         float asinf(float <[x]>);
-
-TRAD_SYNOPSIS
-        #include <math.h>
-        double asin(<[x]>)
-        double <[x]>;
-
-        float asinf(<[x]>)
-        float <[x]>;
-
 
 DESCRIPTION
 

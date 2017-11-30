@@ -19,21 +19,10 @@ INDEX
 INDEX
 	frexpf
 
-ANSI_SYNOPSIS
+SYNOPSIS
 	#include <math.h>
         double frexp(double <[val]>, int *<[exp]>);
         float frexpf(float <[val]>, int *<[exp]>);
-
-TRAD_SYNOPSIS
-	#include <math.h>
-        double frexp(<[val]>, <[exp]>)
-        double <[val]>;
-        int *<[exp]>;
-
-        float frexpf(<[val]>, <[exp]>)
-        float <[val]>;
-        int *<[exp]>;
-
 
 DESCRIPTION
 	All nonzero, normal numbers can be described as <[m]> * 2**<[p]>.

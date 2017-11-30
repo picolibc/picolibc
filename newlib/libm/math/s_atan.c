@@ -21,18 +21,10 @@ INDEX
 INDEX
    atanf
 
-ANSI_SYNOPSIS
+SYNOPSIS
         #include <math.h>
         double atan(double <[x]>);
         float atanf(float <[x]>);
-
-TRAD_SYNOPSIS
-        #include <math.h>
-        double atan(<[x]>);
-        double <[x]>;
-
-        float atanf(<[x]>);
-        float <[x]>;
 
 DESCRIPTION
 

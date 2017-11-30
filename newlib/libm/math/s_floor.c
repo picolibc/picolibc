@@ -23,23 +23,12 @@ INDEX
 INDEX
 	ceilf
 
-ANSI_SYNOPSIS
+SYNOPSIS
 	#include <math.h>
 	double floor(double <[x]>);
         float floorf(float <[x]>);
         double ceil(double <[x]>);
         float ceilf(float <[x]>);
-
-TRAD_SYNOPSIS
-	#include <math.h>
-        double floor(<[x]>)
-	double <[x]>;
-        float floorf(<[x]>) 
-	float <[x]>;
-        double ceil(<[x]>) 
-	double <[x]>;
-        float ceilf(<[x]>) 
-	float <[x]>;
 
 DESCRIPTION
 <<floor>> and <<floorf>> find 

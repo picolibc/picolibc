@@ -47,7 +47,7 @@ tgamma
 INDEX
 tgammaf
 
-ANSI_SYNOPSIS
+SYNOPSIS
 #include <math.h>
 double gamma(double <[x]>);
 float gammaf(float <[x]>);
@@ -59,33 +59,6 @@ double lgamma_r(double <[x]>, int *<[signgamp]>);
 float lgammaf_r(float <[x]>, int *<[signgamp]>);
 double tgamma(double <[x]>);
 float tgammaf(float <[x]>);
-
-TRAD_SYNOPSIS
-#include <math.h>
-double gamma(<[x]>)
-double <[x]>;
-float gammaf(<[x]>)
-float <[x]>;
-double lgamma(<[x]>)
-double <[x]>;
-float lgammaf(<[x]>)
-float <[x]>;
-double gamma_r(<[x]>, <[signgamp]>)
-double <[x]>;
-int <[signgamp]>;
-float gammaf_r(<[x]>, <[signgamp]>)
-float <[x]>;
-int <[signgamp]>;
-double lgamma_r(<[x]>, <[signgamp]>)
-double <[x]>;
-int <[signgamp]>;
-float lgammaf_r(<[x]>, <[signgamp]>)
-float <[x]>;
-int <[signgamp]>;
-double tgamma(<[x]>)
-double <[x]>;
-float tgammaf(<[x]>)
-float <[x]>;
 
 DESCRIPTION
 <<gamma>> calculates

@@ -16,18 +16,10 @@
 FUNCTION
         <<cosh>>, <<coshf>>---hyperbolic cosine
 
-ANSI_SYNOPSIS
+SYNOPSIS
         #include <math.h>
         double cosh(double <[x]>);
         float coshf(float <[x]>);
-
-TRAD_SYNOPSIS
-        #include <math.h>
-        double cosh(<[x]>);
-        double <[x]>;
-
-        float coshf(<[x]>);
-        float <[x]>;
 
 DESCRIPTION
 

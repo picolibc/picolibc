@@ -21,18 +21,10 @@ INDEX
 	powf
 
 
-ANSI_SYNOPSIS
+SYNOPSIS
 	#include <math.h>
 	double pow(double <[x]>, double <[y]>);
 	float powf(float <[x]>, float <[y]>);
-
-TRAD_SYNOPSIS
-	#include <math.h>
-	double pow(<[x]>, <[y]>);
-	double <[x]>, <[y]>;
-
-	float powf(<[x]>, <[y]>);
-	float <[x]>, <[y]>;
 
 DESCRIPTION
 	<<pow>> and <<powf>> calculate <[x]> raised to the exponent <[y]>.
