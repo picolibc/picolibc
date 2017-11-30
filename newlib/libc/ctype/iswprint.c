@@ -37,17 +37,12 @@ INDEX
 INDEX
 	iswprint_l
 
-ANSI_SYNOPSIS
+SYNOPSIS
 	#include <wctype.h>
 	int iswprint(wint_t <[c]>);
 
 	#include <wctype.h>
 	int iswprint_l(wint_t <[c]>, locale_t <[locale]>);
-
-TRAD_SYNOPSIS
-	#include <wctype.h>
-	int iswprint(<[c]>)
-	wint_t <[c]>;
 
 DESCRIPTION
 <<iswprint>> is a function which classifies wide-character values that

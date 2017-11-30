@@ -11,18 +11,13 @@ INDEX
 INDEX
 	_tolower
 
-ANSI_SYNOPSIS
+SYNOPSIS
 	#include <ctype.h>
 	int tolower(int <[c]>);
 	int _tolower(int <[c]>);
 
 	#include <ctype.h>
 	int tolower_l(int <[c]>, locale_t <[locale]>);
-
-TRAD_SYNOPSIS
-	#include <ctype.h>
-	int tolower(<[c]>);
-	int _tolower(<[c]>);
 
 
 DESCRIPTION

@@ -8,17 +8,12 @@ INDEX
 INDEX
 	toascii_l
 
-ANSI_SYNOPSIS
+SYNOPSIS
 	#include <ctype.h>
 	int toascii(int <[c]>);
 
 	#include <ctype.h>
 	int toascii_l(int <[c]>, locale_t <[locale]>);
-
-TRAD_SYNOPSIS
-	#include <ctype.h>
-	int toascii(<[c]>);
-	int (<[c]>);
 
 DESCRIPTION
 <<toascii>> is a macro which coerces integers to the ASCII range (0--127) by zeroing any higher-order bits.

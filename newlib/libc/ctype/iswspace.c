@@ -37,17 +37,12 @@ INDEX
 INDEX
 	iswspace_l
 
-ANSI_SYNOPSIS
+SYNOPSIS
 	#include <wctype.h>
 	int iswspace(wint_t <[c]>);
 
 	#include <wctype.h>
 	int iswspace_l(wint_t <[c]>, locale_t <[locale]>);
-
-TRAD_SYNOPSIS
-	#include <wctype.h>
-	int iswspace(<[c]>)
-	wint_t <[c]>;
 
 DESCRIPTION
 <<iswspace>> is a function which classifies wide-character values that

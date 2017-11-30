@@ -11,18 +11,13 @@ INDEX
 INDEX
 	_toupper
 
-ANSI_SYNOPSIS
+SYNOPSIS
 	#include <ctype.h>
 	int toupper(int <[c]>);
 	int _toupper(int <[c]>);
 
 	#include <ctype.h>
 	int toupper_l(int <[c]>, locale_t <[locale]>);
-
-TRAD_SYNOPSIS
-	#include <ctype.h>
-	int toupper(<[c]>);
-	int _toupper(<[c]>);
 
 
 DESCRIPTION

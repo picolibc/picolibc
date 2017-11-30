@@ -8,16 +8,12 @@ INDEX
 INDEX
 	isblank_l
 
-ANSI_SYNOPSIS
+SYNOPSIS
 	#include <ctype.h>
 	int isblank(int <[c]>);
 
 	#include <ctype.h>
 	int isblank_l(int <[c]>, locale_t <[locale]>);
-
-TRAD_SYNOPSIS
-	#include <ctype.h>
-	int isblank(<[c]>);
 
 DESCRIPTION
 <<isblank>> is a function which classifies singlebyte charset values by table

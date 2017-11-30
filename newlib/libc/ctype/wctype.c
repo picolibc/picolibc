@@ -37,17 +37,12 @@ INDEX
 INDEX
 	wctype_l
 
-ANSI_SYNOPSIS
+SYNOPSIS
 	#include <wctype.h>
 	wctype_t wctype(const char *<[c]>);
 
 	#include <wctype.h>
 	wctype_t wctype_l(const char *<[c]>, locale_t <[locale]>);
-
-TRAD_SYNOPSIS
-	#include <wctype.h>
-	wctype_t wctype(<[c]>)
-	const char * <[c]>;
 
 
 DESCRIPTION

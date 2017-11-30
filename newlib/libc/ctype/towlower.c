@@ -37,17 +37,12 @@ INDEX
 INDEX
 	towlower_l
 
-ANSI_SYNOPSIS
+SYNOPSIS
 	#include <wctype.h>
 	wint_t towlower(wint_t <[c]>);
 
 	#include <wctype.h>
 	wint_t towlower_l(wint_t <[c]>, locale_t <[locale]>);
-
-TRAD_SYNOPSIS
-	#include <wctype.h>
-	wint_t towlower(<[c]>)
-	wint_t <[c]>;
 
 
 DESCRIPTION

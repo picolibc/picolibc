@@ -8,16 +8,12 @@ INDEX
 INDEX
 	isascii_l
 
-ANSI_SYNOPSIS
+SYNOPSIS
 	#include <ctype.h>
 	int isascii(int <[c]>);
 
 	#include <ctype.h>
 	int isascii_l(int <[c]>, locale_t <[locale]>);
-
-TRAD_SYNOPSIS
-	#include <ctype.h>
-	int isascii(<[c]>);
 
 DESCRIPTION
 <<isascii>> is a macro which returns non-zero when <[c]> is an ASCII

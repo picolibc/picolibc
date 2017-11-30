@@ -8,16 +8,12 @@ INDEX
 INDEX
 	ispunct_l
 
-ANSI_SYNOPSIS
+SYNOPSIS
 	#include <ctype.h>
 	int ispunct(int <[c]>);
 
 	#include <ctype.h>
 	int ispunct_l(int <[c]>, locale_t <[locale]>);
-
-TRAD_SYNOPSIS
-	#include <ctype.h>
-	int ispunct(<[c]>);
 
 DESCRIPTION
 <<ispunct>> is a macro which classifies singlebyte charset values by table

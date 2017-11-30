@@ -37,18 +37,12 @@ INDEX
 INDEX
 	towctrans_l
 
-ANSI_SYNOPSIS
+SYNOPSIS
 	#include <wctype.h>
 	wint_t towctrans(wint_t <[c]>, wctrans_t <[w]>);
 
 	#include <wctype.h>
 	wint_t towctrans_l(wint_t <[c]>, wctrans_t <[w]>, locale_t <[locale]>);
-
-TRAD_SYNOPSIS
-	#include <wctype.h>
-	wint_t towctrans(<[c]>, <[w]>)
-	wint_t <[c]>;
-	wctrans_t <[w]>;
 
 
 DESCRIPTION

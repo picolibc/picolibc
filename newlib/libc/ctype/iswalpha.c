@@ -37,17 +37,12 @@ INDEX
 INDEX
 	iswalpha_l
 
-ANSI_SYNOPSIS
+SYNOPSIS
 	#include <wctype.h>
 	int iswalpha(wint_t <[c]>);
 
 	#include <wctype.h>
 	int iswalpha_l(wint_t <[c]>, locale_t <[locale]>);
-
-TRAD_SYNOPSIS
-	#include <wctype.h>
-	int iswalpha(<[c]>)
-	wint_t <[c]>;
 
 DESCRIPTION
 <<iswalpha>> is a function which classifies wide-character values that

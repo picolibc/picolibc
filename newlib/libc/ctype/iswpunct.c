@@ -37,17 +37,12 @@ INDEX
 INDEX
 	iswpunct_l
 
-ANSI_SYNOPSIS
+SYNOPSIS
 	#include <wctype.h>
 	int iswpunct(wint_t <[c]>);
 
 	#include <wctype.h>
 	int iswpunct_l(wint_t <[c]>, locale_t <[locale]>);
-
-TRAD_SYNOPSIS
-	#include <wctype.h>
-	int iswpunct(<[c]>)
-	wint_t <[c]>;
 
 DESCRIPTION
 <<iswpunct>> is a function which classifies wide-character values that

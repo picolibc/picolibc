@@ -8,16 +8,12 @@ INDEX
 INDEX
 	isdigit_l
 
-ANSI_SYNOPSIS
+SYNOPSIS
 	#include <ctype.h>
 	int isdigit(int <[c]>);
 
 	#include <ctype.h>
 	int isdigit_l(int <[c]>, locale_t <[locale]>);
-
-TRAD_SYNOPSIS
-	#include <ctype.h>
-	int isdigit(<[c]>);
 
 DESCRIPTION
 <<isdigit>> is a macro which classifies singlebyte charset values by table

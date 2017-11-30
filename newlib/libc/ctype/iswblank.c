@@ -37,17 +37,12 @@ INDEX
 INDEX
 	iswblank_l
 
-ANSI_SYNOPSIS
+SYNOPSIS
 	#include <wctype.h>
 	int iswblank(wint_t <[c]>);
 
 	#include <wctype.h>
 	int iswblank_l(wint_t <[c]>, locale_t <[locale]>);
-
-TRAD_SYNOPSIS
-	#include <wctype.h>
-	int iswblank(<[c]>)
-	wint_t <[c]>;
 
 DESCRIPTION
 <<iswblank>> is a function which classifies wide-character values that

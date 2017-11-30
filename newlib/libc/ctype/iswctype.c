@@ -8,18 +8,12 @@ INDEX
 INDEX
 	iswctype_l
 
-ANSI_SYNOPSIS
+SYNOPSIS
 	#include <wctype.h>
 	int iswctype(wint_t <[c]>, wctype_t <[desc]>);
 
 	#include <wctype.h>
 	int iswctype_l(wint_t <[c]>, wctype_t <[desc]>, locale_t <[locale]>);
-
-TRAD_SYNOPSIS
-	#include <wctype.h>
-	int iswctype(<[c]>, <[desc]>)
-	wint_t <[c]>;
-	wctype_t <[desc]>;
 
 DESCRIPTION
 <<iswctype>> is a function which classifies wide-character values using the
