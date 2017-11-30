@@ -21,14 +21,11 @@ INDEX
 INDEX
 	rintl
 
-ANSI_SYNOPSIS
+SYNOPSIS
 	#include <math.h>
 	double rint(double x);
         float rintf(float x);
         long double rintl(long double x);
-
-TRAD_SYNOPSIS
-	ANSI-only.
 
 DESCRIPTION
 The <<rint>>, <<rintf>> and <<rintl>> functions round <[x]> to an integer value

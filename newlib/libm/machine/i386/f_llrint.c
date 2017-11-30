@@ -22,14 +22,11 @@ INDEX
 INDEX
 	llrintl
 
-ANSI_SYNOPSIS
+SYNOPSIS
 	#include <math.h>
 	long long int llrint(double x);
         long long int llrintf(float x);
         long long int llrintl(long double x);
-
-TRAD_SYNOPSIS
-	ANSI-only.
 
 DESCRIPTION
 The <<llrint>>, <<llrintf>> and <<llrintl>> functions round <[x]> to the nearest integer value,
