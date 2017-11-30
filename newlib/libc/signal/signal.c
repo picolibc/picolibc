@@ -7,22 +7,11 @@ INDEX
 INDEX
 	_signal_r
 
-ANSI_SYNOPSIS
+SYNOPSIS
 	#include <signal.h>
 	void (*signal(int <[sig]>, void(*<[func]>)(int))) (int);
 
 	void (*_signal_r(void *<[reent]>, int <[sig]>, void(*<[func]>)(int))) (int);
-
-TRAD_SYNOPSIS
-	#include <signal.h>
-	char ( * signal(<[sig]>, <[func]>) )()
-	int <[sig]>;
-	char ( * <[func]> )();
-
-	char ( * _signal_r(<[reent]>, <[sig]>, <[func]>) )()
-	char *<[reent]>;
-	int <[sig]>;
-	char ( * <[func]> )();
 
 DESCRIPTION
 <<signal>> provides a simple signal-handling implementation for embedded

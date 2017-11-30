@@ -6,15 +6,9 @@ FUNCTION
 INDEX
 	psignal
 
-ANSI_SYNOPSIS
+SYNOPSIS
 	#include <stdio.h>
 	void psignal(int <[signal]>, const char *<[prefix]>);
-
-TRAD_SYNOPSIS
-	#include <stdio.h>
-	void psignal(<[signal]>, <[prefix]>)
-	int <[signal]>;
-	const char *<[prefix]>;
 
 DESCRIPTION
 Use <<psignal>> to print (on standard error) a signal message

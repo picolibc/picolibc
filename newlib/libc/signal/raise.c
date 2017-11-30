@@ -12,20 +12,11 @@ INDEX
 INDEX
 	_raise_r
 
-ANSI_SYNOPSIS
+SYNOPSIS
 	#include <signal.h>
 	int raise(int <[sig]>);
 
 	int _raise_r(void *<[reent]>, int <[sig]>);
-
-TRAD_SYNOPSIS
-	#include <signal.h>
-	int raise(<[sig]>)
-	int <[sig]>;
-
-	int _raise_r(<[reent]>, <[sig]>)
-	char *<[reent]>;
-	int <[sig]>;
 
 DESCRIPTION
 Send the signal <[sig]> (one of the macros from `<<sys/signal.h>>').
