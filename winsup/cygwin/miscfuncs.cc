@@ -881,9 +881,9 @@ memcpy:									\n\
 	jmp	_memcpy							\n\
 	.seh_endproc							\n\
 									\n\
-	.globl  memcpy							\n\
-	.seh_proc memcpy						\n\
-mempcpy:									\n\
+	.globl  mempcpy							\n\
+	.seh_proc mempcpy						\n\
+mempcpy:								\n\
 	.seh_endprologue						\n\
 	movq	%rcx,%rax	/* return dst  */			\n\
 	addq	%r8,%rax	/*         + n */			\n\
@@ -908,8 +908,8 @@ wmemcpy:								\n\
 	jmp	_memcpy							\n\
 	.seh_endproc							\n\
 									\n\
-	.globl  wmemcpy							\n\
-	.seh_proc wmemcpy						\n\
+	.globl  wmempcpy						\n\
+	.seh_proc wmempcpy						\n\
 wmempcpy:								\n\
 	.seh_endprologue						\n\
 	shlq	$1,%r8		/* cnt * sizeof (wchar_t) */		\n\
