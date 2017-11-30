@@ -871,7 +871,7 @@ _DEFUN(__SVFSCANF_R, (rptr, fp, fmt0, ap),
             }
           else
 #endif
-        	  if (flags & SUPPRESS)
+	  if (flags & SUPPRESS)
 	    {
 	      size_t sum = 0;
 	      for (;;)
@@ -1013,7 +1013,7 @@ _DEFUN(__SVFSCANF_R, (rptr, fp, fmt0, ap),
             }
           else
 #endif
-        	  if (flags & SUPPRESS)
+	  if (flags & SUPPRESS)
 	    {
 	      n = 0;
 	      while (!isspace (*fp->_p))
