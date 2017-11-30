@@ -41,7 +41,7 @@ INDEX
 INDEX
         ccoshf
 
-ANSI_SYNOPSIS
+SYNOPSIS
        #include <complex.h>
        double complex ccosh(double complex <[z]>);
        float complex ccoshf(float complex <[z]>);

@@ -41,7 +41,7 @@ INDEX
 INDEX
         casinf
 
-ANSI_SYNOPSIS
+SYNOPSIS
        #include <complex.h>
        double complex casin(double complex <[z]>);
        float complex casinf(float complex <[z]>);

@@ -41,7 +41,7 @@ INDEX
 INDEX
         clogf
 
-ANSI_SYNOPSIS
+SYNOPSIS
        #include <complex.h>
        double complex clog(double complex <[z]>);
        float complex clogf(float complex <[z]>);

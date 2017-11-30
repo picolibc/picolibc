@@ -17,7 +17,7 @@ INDEX
 INDEX
         cargf
 
-ANSI_SYNOPSIS
+SYNOPSIS
        #include <complex.h>
        double carg(double complex <[z]>);
        float cargf(float complex <[z]>);

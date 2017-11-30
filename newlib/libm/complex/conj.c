@@ -17,7 +17,7 @@ INDEX
 INDEX
         conjf
 
-ANSI_SYNOPSIS
+SYNOPSIS
        #include <complex.h>
        double complex conj(double complex <[z]>);
        float complex conjf(float complex <[z]>);

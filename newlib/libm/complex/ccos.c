@@ -41,7 +41,7 @@ INDEX
 INDEX
         ccosf
 
-ANSI_SYNOPSIS
+SYNOPSIS
        #include <complex.h>
        double complex ccos(double complex <[z]>);
        float complex ccosf(float complex <[z]>);

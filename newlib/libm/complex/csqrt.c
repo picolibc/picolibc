@@ -41,7 +41,7 @@ INDEX
 INDEX
         csqrtf
 
-ANSI_SYNOPSIS
+SYNOPSIS
        #include <complex.h>
        double complex csqrt(double complex <[z]>);
        float complex csqrtf(float complex <[z]>);

@@ -38,7 +38,7 @@ INDEX
 INDEX
         cprojf
 
-ANSI_SYNOPSIS
+SYNOPSIS
        #include <complex.h>
        double complex cproj(double complex <[z]>);
        float complex cprojf(float complex <[z]>);

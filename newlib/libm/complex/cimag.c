@@ -19,7 +19,7 @@ INDEX
 INDEX
         cimagl
 
-ANSI_SYNOPSIS
+SYNOPSIS
        #include <complex.h>
        double cimag(double complex <[z]>);
        float cimagf(float complex <[z]>);

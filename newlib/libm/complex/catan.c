@@ -41,7 +41,7 @@ INDEX
 INDEX
         catanf
 
-ANSI_SYNOPSIS
+SYNOPSIS
        #include <complex.h>
        double complex catan(double complex <[z]>);
        float complex catanf(float complex <[z]>);

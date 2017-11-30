@@ -41,7 +41,7 @@ INDEX
 INDEX
         casinhf
 
-ANSI_SYNOPSIS
+SYNOPSIS
        #include <complex.h>
        double complex casinh(double complex <[z]>);
        float complex casinhf(float complex <[z]>);

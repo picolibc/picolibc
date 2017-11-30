@@ -41,7 +41,7 @@ INDEX
 INDEX
         cacoshf
 
-ANSI_SYNOPSIS
+SYNOPSIS
        #include <complex.h>
        double complex cacosh(double complex <[z]>);
        float complex cacoshf(float complex <[z]>);

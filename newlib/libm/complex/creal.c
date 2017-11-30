@@ -19,7 +19,7 @@ INDEX
 INDEX
         creall
 
-ANSI_SYNOPSIS
+SYNOPSIS
        #include <complex.h>
        double creal(double complex <[z]>);
        float crealf(float complex <[z]>);

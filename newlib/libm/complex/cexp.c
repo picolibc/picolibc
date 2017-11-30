@@ -41,7 +41,7 @@ INDEX
 INDEX
         cexpf
 
-ANSI_SYNOPSIS
+SYNOPSIS
        #include <complex.h>
        double complex cexp(double complex <[z]>);
        float complex cexpf(float complex <[z]>);

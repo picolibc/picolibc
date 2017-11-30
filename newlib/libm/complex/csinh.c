@@ -41,7 +41,7 @@ INDEX
 INDEX
         csinhf
 
-ANSI_SYNOPSIS
+SYNOPSIS
        #include <complex.h>
        double complex csinh(double complex <[z]>);
        float complex csinhf(float complex <[z]>);

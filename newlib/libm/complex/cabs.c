@@ -19,7 +19,7 @@ INDEX
 INDEX
         cabsl
 
-ANSI_SYNOPSIS
+SYNOPSIS
        #include <complex.h>
        double cabs(double complex <[z]>);
        float cabsf(float complex <[z]>);

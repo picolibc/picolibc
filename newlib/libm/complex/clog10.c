@@ -7,7 +7,7 @@ INDEX
 INDEX
         clog10f
 
-ANSI_SYNOPSIS
+SYNOPSIS
        #define _GNU_SOURCE
        #include <complex.h>
        double complex clog10(double complex <[z]>);
