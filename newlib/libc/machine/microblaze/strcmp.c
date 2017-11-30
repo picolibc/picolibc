@@ -34,15 +34,9 @@ FUNCTION
 INDEX
 	strcmp
 
-ANSI_SYNOPSIS
+SYNOPSIS
 	#include <string.h>
 	int strcmp(const char *<[a]>, const char *<[b]>);
-
-TRAD_SYNOPSIS
-	#include <string.h>
-	int strcmp(<[a]>, <[b]>)
-	char *<[a]>;
-	char *<[b]>;
 
 DESCRIPTION
 	<<strcmp>> compares the string at <[a]> to

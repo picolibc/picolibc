@@ -34,14 +34,9 @@ FUNCTION
 INDEX
 	strlen
 
-ANSI_SYNOPSIS
+SYNOPSIS
 	#include <string.h>
 	size_t strlen(const char *<[str]>);
-
-TRAD_SYNOPSIS
-	#include <string.h>
-	size_t strlen(<[str]>)
-	char *<[src]>;
 
 DESCRIPTION
 	The <<strlen>> function works out the length of the string
