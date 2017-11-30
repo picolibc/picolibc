@@ -17,19 +17,10 @@ tanh
 INDEX
 tanhf
 
-ANSI_SYNOPSIS
+SYNOPSIS
         #include <math.h>
         double tanh(double <[x]>);
         float tanhf(float <[x]>);
-
-TRAD_SYNOPSIS
-        #include <math.h>
-        double tanh(<[x]>)
-        double <[x]>;
-
-        float tanhf(<[x]>)
-        float <[x]>;
-
 
 DESCRIPTION
 

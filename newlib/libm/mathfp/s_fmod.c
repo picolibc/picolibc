@@ -20,18 +20,10 @@ fmod
 INDEX
 fmodf
 
-ANSI_SYNOPSIS
+SYNOPSIS
 #include <math.h>
 double fmod(double <[x]>, double <[y]>);
 float fmodf(float <[x]>, float <[y]>);
-
-TRAD_SYNOPSIS
-#include <math.h>
-double fmod(<[x]>, <[y]>);
-double (<[x]>, <[y]>);
-
-float fmodf(<[x]>, <[y]>);
-float (<[x]>, <[y]>);
 
 DESCRIPTION
 The <<fmod>> and <<fmodf>> functions compute the floating-point

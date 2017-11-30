@@ -23,26 +23,12 @@ INDEX
 INDEX
 	erfcf
 
-ANSI_SYNOPSIS
+SYNOPSIS
 	#include <math.h>
 	double erf(double <[x]>);
 	float erff(float <[x]>);
 	double erfc(double <[x]>);
 	float erfcf(float <[x]>);
-TRAD_SYNOPSIS
-	#include <math.h>
-
-	double erf(<[x]>)
-	double <[x]>;
-
-	float erff(<[x]>)
-	float <[x]>;
-
-	double erfc(<[x]>)
-	double <[x]>;
-
-	float erfcf(<[x]>)
-	float <[x]>;
 
 DESCRIPTION
 	<<erf>> calculates an approximation to the ``error function'',

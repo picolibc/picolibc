@@ -19,17 +19,10 @@ INDEX
 INDEX
         remainderf
 
-ANSI_SYNOPSIS
+SYNOPSIS
         #include <math.h>
         double remainder(double <[x]>, double <[y]>);
         float remainderf(float <[x]>, float <[y]>);
-
-TRAD_SYNOPSIS
-        #include <math.h>
-        double remainder(<[x]>,<[y]>)
-        double <[x]>, <[y]>;
-        float remainderf(<[x]>,<[y]>)
-        float <[x]>, <[y]>;
 
 DESCRIPTION
 <<remainder>> and <<remainderf>> find the remainder of

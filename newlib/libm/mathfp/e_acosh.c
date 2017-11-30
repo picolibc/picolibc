@@ -10,18 +10,10 @@ acosh
 INDEX
 acoshf
 
-ANSI_SYNOPSIS
+SYNOPSIS
         #include <math.h>
         double acosh(double <[x]>);
         float acoshf(float <[x]>);
-
-TRAD_SYNOPSIS
-        #include <math.h>
-        double acosh(<[x]>)
-        double <[x]>;
-
-        float acoshf(<[x]>)
-        float <[x]>;
 
 DESCRIPTION
 <<acosh>> calculates the inverse hyperbolic cosine of <[x]>.

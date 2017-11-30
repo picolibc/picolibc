@@ -20,25 +20,12 @@ INDEX
 INDEX
         coshf
 
-ANSI_SYNOPSIS
+SYNOPSIS
         #include <math.h>
         double sinh(double <[x]>);
         float  sinhf(float <[x]>);
         double cosh(double <[x]>);
         float  coshf(float <[x]>);
-TRAD_SYNOPSIS
-        #include <math.h>
-        double sinh(<[x]>)
-        double <[x]>;
-
-        float  sinhf(<[x]>)
-        float <[x]>;
-
-        double cosh(<[x]>)
-        double <[x]>;
-
-        float  coshf(<[x]>)
-        float <[x]>;
 
 DESCRIPTION
         <<sinh>> and <<cosh>> compute the hyperbolic sine or cosine

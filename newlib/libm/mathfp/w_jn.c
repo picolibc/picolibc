@@ -40,7 +40,7 @@ yn
 INDEX
 ynf
 
-ANSI_SYNOPSIS
+SYNOPSIS
 #include <math.h>
 double j0(double <[x]>);
 float j0f(float <[x]>);
@@ -54,39 +54,6 @@ double y1(double <[x]>);
 float y1f(float <[x]>);
 double yn(int <[n]>, double <[x]>);
 float ynf(int <[n]>, float <[x]>);
-
-TRAD_SYNOPSIS
-#include <math.h>
-
-double j0(<[x]>)
-double <[x]>;
-float j0f(<[x]>)
-float <[x]>;
-double j1(<[x]>)
-double <[x]>;
-float j1f(<[x]>)
-float <[x]>;
-double jn(<[n]>, <[x]>)
-int <[n]>;
-double <[x]>;
-float jnf(<[n]>, <[x]>)
-int <[n]>;
-float <[x]>;
-
-double y0(<[x]>)
-double <[x]>;
-float y0f(<[x]>)
-float <[x]>;
-double y1(<[x]>)
-double <[x]>;
-float y1f(<[x]>)
-float <[x]>;
-double yn(<[n]>, <[x]>)
-int <[n]>;
-double <[x]>;
-float ynf(<[n]>, <[x]>)
-int <[n]>;
-float <[x]>;
 
 DESCRIPTION
 The Bessel functions are a family of functions that solve the

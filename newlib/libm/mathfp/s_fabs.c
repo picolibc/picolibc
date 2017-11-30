@@ -9,18 +9,10 @@ INDEX
 INDEX
         fabsf
 
-ANSI_SYNOPSIS
+SYNOPSIS
         #include <math.h>
        double fabs(double <[x]>);
        float fabsf(float <[x]>);
-
-TRAD_SYNOPSIS
-        #include <math.h>
-       double fabs(<[x]>)
-       double <[x]>;
-
-       float fabsf(<[x]>)
-       float <[x]>;
 
 DESCRIPTION
 <<fabs>> and <<fabsf>> calculate

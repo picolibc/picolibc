@@ -20,18 +20,10 @@ INDEX
 INDEX
 	asinhf
 
-ANSI_SYNOPSIS
+SYNOPSIS
 	#include <math.h>
 	double asinh(double <[x]>);
 	float asinhf(float <[x]>);
-
-TRAD_SYNOPSIS
-	#include <math.h>
-	double asinh(<[x]>)
-	double <[x]>;
-
-	float asinhf(<[x]>)
-	float <[x]>;
 
 DESCRIPTION
 <<asinh>> calculates the inverse hyperbolic sine of <[x]>.
