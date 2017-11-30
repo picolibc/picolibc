@@ -4,6 +4,26 @@
 
 <sect1 id="ov-new"><title>What's new and what changed in Cygwin</title>
 
+<sect2 id="ov-new2.10"><title>What's new and what changed in 2.10</title>
+
+<itemizedlist mark="bullet">
+
+<listitem><para>
+New open(2) flags O_TMPFILE and O_NOATIME.
+</para></listitem>
+
+<listitem><para>
+scanf/wscanf now handle the POSIX %m modifier.
+</para></listitem>
+
+<listitem><para>
+New API: wmempcpy.
+</para></listitem>
+
+</itemizedlist>
+
+</sect2>
+
 <sect2 id="ov-new2.9"><title>What's new and what changed in 2.9</title>
 
 <itemizedlist mark="bullet">

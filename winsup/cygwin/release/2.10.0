@@ -3,6 +3,10 @@ What's new:
 
 - New open(2) flags O_TMPFILE and O_NOATIME.
 
+- scanf/wscanf now handle the POSIX %m modifier.
+
+- New API: wmempcpy.
+
 
 What changed:
 -------------
