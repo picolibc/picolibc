@@ -47,14 +47,8 @@ but these, however, should be carefully limited and be given alternates for
 when a non-printed manual is produced--such as when info pages are produced.
 For an example of this kind of usage, see libm/common/s_logb.c.
 
-     Please note that most files with documentation contain both an
-ANSI_SYNOPSIS and a TRAD_SYNOPSIS section.  The TRAD_SYNOPSIS section gets
-deleted (since at least 2000) by makedoc, so when working on files these
-can safely be deleted and if you're making a new file, there is no need
-to add the TRAD_SYNOPSIS section.
-
      If writing a new function that requires documentation, the required
-sections are FUNCTION, INDEX, ANSI_SYNOPSIS (or SYNOPSIS), DESCRIPTION, RETURNS,
+sections are FUNCTION, INDEX, SYNOPSIS, DESCRIPTION, RETURNS,
 and PORTABILITY.  BUGS and SEEALSO should be added as appropriate.
 
      Source files which contain documentation are processed into ".def"
