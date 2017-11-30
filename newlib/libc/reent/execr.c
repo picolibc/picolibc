@@ -33,18 +33,10 @@ FUNCTION
 INDEX
 	_execve_r
 
-ANSI_SYNOPSIS
+SYNOPSIS
 	#include <reent.h>
 	int _execve_r(struct _reent *<[ptr]>, const char *<[name]>,
                       char *const <[argv]>[], char *const <[env]>[]);
-
-TRAD_SYNOPSIS
-	#include <reent.h>
-	int _execve_r(<[ptr]>, <[name]>, <[argv]>, <[env]>)
-	struct _reent *<[ptr]>;
-        char *<[name]>;
-        char *<[argv]>[];
-        char *<[env]>[];
 
 DESCRIPTION
 	This is a reentrant version of <<execve>>.  It
@@ -76,14 +68,9 @@ FUNCTION
 INDEX
 	_fork_r
 
-ANSI_SYNOPSIS
+SYNOPSIS
 	#include <reent.h>
 	int _fork_r(struct _reent *<[ptr]>);
-
-TRAD_SYNOPSIS
-	#include <reent.h>
-	int _fork_r(<[ptr]>)
-	struct _reent *<[ptr]>;
 
 DESCRIPTION
 	This is a reentrant version of <<fork>>.  It
@@ -115,15 +102,9 @@ FUNCTION
 INDEX
 	_wait_r
 
-ANSI_SYNOPSIS
+SYNOPSIS
 	#include <reent.h>
 	int _wait_r(struct _reent *<[ptr]>, int *<[status]>);
-
-TRAD_SYNOPSIS
-	#include <reent.h>
-	int _wait_r(<[ptr]>, <[status]>)
-	struct _reent *<[ptr]>;
-	int *<[status]>;
 
 DESCRIPTION
 	This is a reentrant version of <<wait>>.  It

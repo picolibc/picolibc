@@ -28,17 +28,10 @@ FUNCTION
 INDEX
 	_rename_r
 
-ANSI_SYNOPSIS
+SYNOPSIS
 	#include <reent.h>
 	int _rename_r(struct _reent *<[ptr]>,
 		const char *<[old]>, const char *<[new]>);
-
-TRAD_SYNOPSIS
-	#include <reent.h>
-	int _rename_r(<[ptr]>, <[old]>, <[new]>)
-	struct _reent *<[ptr]>;
-	char *<[old]>;
-	char *<[new]>;
 
 DESCRIPTION
 	This is a reentrant version of <<rename>>.  It

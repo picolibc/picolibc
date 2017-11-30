@@ -30,16 +30,10 @@ FUNCTION
 INDEX
 	_isatty_r
 
-ANSI_SYNOPSIS
+SYNOPSIS
 	#include <reent.h>
 	int _isatty_r(struct _reent *<[ptr]>,
 		     int <[fd]>);
-
-TRAD_SYNOPSIS
-	#include <reent.h>
-	int _isatty_r(<[ptr]>, <[fd]>)
-	struct _reent *<[ptr]>;
-	int <[fd]>;
 
 DESCRIPTION
 	This is a reentrant version of <<isatty>>.  It

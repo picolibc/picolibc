@@ -31,17 +31,10 @@ FUNCTION
 INDEX
 	_link_r
 
-ANSI_SYNOPSIS
+SYNOPSIS
 	#include <reent.h>
 	int _link_r(struct _reent *<[ptr]>,
 		    const char *<[old]>, const char *<[new]>);
-
-TRAD_SYNOPSIS
-	#include <reent.h>
-	int _link_r(<[ptr]>, <[old]>, <[new]>)
-	struct _reent *<[ptr]>;
-	char *<[old]>;
-	char *<[new]>;
 
 DESCRIPTION
 	This is a reentrant version of <<link>>.  It

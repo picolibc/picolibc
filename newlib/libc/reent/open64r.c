@@ -29,18 +29,10 @@ FUNCTION
 INDEX
 	_open64_r
 
-ANSI_SYNOPSIS
+SYNOPSIS
 	#include <reent.h>
 	int _open64_r(struct _reent *<[ptr]>,
   		      const char *<[file]>, int <[flags]>, int <[mode]>);
-
-TRAD_SYNOPSIS
-	#include <reent.h>
-	int _open64_r(<[ptr]>, <[file]>, <[flags]>, <[mode]>)
-	struct _reent *<[ptr]>;
-	char *<[file]>;
-	int <[flags]>;
-	int <[mode]>;
 
 DESCRIPTION
 	This is a reentrant version of <<open64>>.  It

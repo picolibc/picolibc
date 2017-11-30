@@ -26,18 +26,10 @@ FUNCTION
 INDEX
 	_write_r
 
-ANSI_SYNOPSIS
+SYNOPSIS
 	#include <reent.h>
 	_ssize_t _write_r(struct _reent *<[ptr]>,
 		          int <[fd]>, const void *<[buf]>, size_t <[cnt]>);
-
-TRAD_SYNOPSIS
-	#include <reent.h>
-	_ssize_t _write_r(<[ptr]>, <[fd]>, <[buf]>, <[cnt]>)
-	struct _reent *<[ptr]>;
-	int <[fd]>;
-	char *<[buf]>;
-	size_t <[cnt]>;
 
 DESCRIPTION
 	This is a reentrant version of <<write>>.  It

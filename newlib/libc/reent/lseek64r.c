@@ -28,18 +28,10 @@ FUNCTION
 INDEX
 	_lseek64_r
 
-ANSI_SYNOPSIS
+SYNOPSIS
 	#include <reent.h>
 	off64_t _lseek64_r(struct _reent *<[ptr]>,
 		           int <[fd]>, off64_t <[pos]>, int <[whence]>);
-
-TRAD_SYNOPSIS
-	#include <reent.h>
-	off64_t _lseek64_r(<[ptr]>, <[fd]>, <[pos]>, <[whence]>)
-	struct _reent *<[ptr]>;
-	int <[fd]>;
-	off64_t <[pos]>;
-	int <[whence]>;
 
 DESCRIPTION
 	This is a reentrant version of <<lseek64>>.  It

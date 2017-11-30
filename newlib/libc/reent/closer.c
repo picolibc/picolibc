@@ -26,15 +26,9 @@ FUNCTION
 INDEX
 	_close_r
 
-ANSI_SYNOPSIS
+SYNOPSIS
 	#include <reent.h>
 	int _close_r(struct _reent *<[ptr]>, int <[fd]>);
-
-TRAD_SYNOPSIS
-	#include <reent.h>
-	int _close_r(<[ptr]>, <[fd]>)
-	struct _reent *<[ptr]>;
-	int <[fd]>;
 
 DESCRIPTION
 	This is a reentrant version of <<close>>.  It
