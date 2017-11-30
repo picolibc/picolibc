@@ -186,6 +186,10 @@ int	_EXFUN(wmemcmp, (const wchar_t *, const wchar_t *, size_t));
 wchar_t	*_EXFUN(wmemcpy, (wchar_t *__restrict, const wchar_t *__restrict,
 				 size_t));
 wchar_t	*_EXFUN(wmemmove, (wchar_t *, const wchar_t *, size_t));
+#if __GNU_VISIBLE
+wchar_t	*_EXFUN(wmempcpy, (wchar_t *__restrict, const wchar_t *__restrict,
+				 size_t));
+#endif
 wchar_t	*_EXFUN(wmemset, (wchar_t *, wchar_t, size_t));
 
 long    _EXFUN(wcstol, (const wchar_t *__restrict, wchar_t **__restrict, int));
