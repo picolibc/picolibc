@@ -879,7 +879,7 @@ _DEFUN(__SVFWSCANF_R, (rptr, fp, fmt0, ap),
 	      n = 0;
 	      memset ((_PTR) &mbs, '\0', sizeof (mbstate_t));
 	      while ((wi = _fgetwc_r (rptr, fp)) != WEOF
-		     && width-- != 0 && INCCL (wi))
+		     && width != 0 && INCCL (wi))
 		{
 		  if (width >= MB_CUR_MAX && !(flags & SUPPRESS))
 		    {
