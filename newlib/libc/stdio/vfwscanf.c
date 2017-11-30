@@ -827,7 +827,7 @@ _DEFUN(__SVFWSCANF_R, (rptr, fp, fmt0, ap),
 	case CT_CCL:
 	  /* scan a (nonempty) character class (sets NOSKIP) */
 	  if (width == 0)
-	    width = (size_t) ~0;		/* `infinity' */
+	    width = SIZE_MAX;		/* `infinity' */
 	  /* take only those things in the class */
 	  if ((flags & SUPPRESS) && (flags & LONG))
 	    {
@@ -898,7 +898,7 @@ _DEFUN(__SVFWSCANF_R, (rptr, fp, fmt0, ap),
 	case CT_STRING:
 	  /* like CCL, but zero-length string OK, & no NOSKIP */
 	  if (width == 0)
-            width = (size_t)~0;
+            width = SIZE_MAX;
 	  if ((flags & SUPPRESS) && (flags & LONG))
 	    {
 	      while ((wi = _fgetwc_r (rptr, fp)) != WEOF
