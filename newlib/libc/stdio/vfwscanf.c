@@ -518,9 +518,13 @@ _DEFUN(__SVFWSCANF_R, (rptr, fp, fmt0, ap),
 	  continue;
 
 	case L'*':
+	  if ((flags & (CHAR | SHORT | LONG | LONGDBL | SUPPRESS))
+	      || width)
 	  flags |= SUPPRESS;
 	  goto again;
 	case L'l':
+	  if (flags & (CHAR | SHORT | LONG | LONGDBL))
+	    goto match_failure;
 #if defined _WANT_IO_C99_FORMATS || !defined _NO_LONGLONG
 	  if (*fmt == L'l')	/* Check for 'll' = long long (SUSv3) */
 	    {
@@ -532,10 +536,14 @@ _DEFUN(__SVFWSCANF_R, (rptr, fp, fmt0, ap),
 	    flags |= LONG;
 	  goto again;
 	case L'L':
+	  if (flags & (CHAR | SHORT | LONG | LONGDBL))
+	    goto match_failure;
 	  flags |= LONGDBL;
 	  goto again;
 	case L'h':
 #ifdef _WANT_IO_C99_FORMATS
+	  if (flags & (CHAR | SHORT | LONG | LONGDBL))
+	    goto match_failure;
 	  if (*fmt == 'h')	/* Check for 'hh' = char int (SUSv3) */
 	    {
 	      ++fmt;
@@ -547,12 +555,16 @@ _DEFUN(__SVFWSCANF_R, (rptr, fp, fmt0, ap),
 	  goto again;
 #ifdef _WANT_IO_C99_FORMATS
 	case L'j': /* intmax_t */
+	  if (flags & (CHAR | SHORT | LONG | LONGDBL))
+	    goto match_failure;
 	  if (sizeof (intmax_t) == sizeof (long))
 	    flags |= LONG;
 	  else
 	    flags |= LONGDBL;
 	  goto again;
 	case L't': /* ptrdiff_t */
+	  if (flags & (CHAR | SHORT | LONG | LONGDBL))
+	    goto match_failure;
 	  if (sizeof (ptrdiff_t) < sizeof (int))
 	    /* POSIX states ptrdiff_t is 16 or more bits, as
 	       is short.  */
@@ -569,6 +581,8 @@ _DEFUN(__SVFWSCANF_R, (rptr, fp, fmt0, ap),
 	    flags |= LONGDBL;
 	  goto again;
 	case L'z': /* size_t */
+	  if (flags & (CHAR | SHORT | LONG | LONGDBL))
+	    goto match_failure;
 	  if (sizeof (size_t) < sizeof (int))
 	    /* POSIX states size_t is 16 or more bits, as is short.  */
 	    flags |= SHORT;
@@ -595,11 +609,15 @@ _DEFUN(__SVFWSCANF_R, (rptr, fp, fmt0, ap),
 	case L'7':
 	case L'8':
 	case L'9':
+	  if (flags & (CHAR | SHORT | LONG | LONGDBL))
+	    goto match_failure;
 	  width = width * 10 + c - L'0';
 	  goto again;
 
 #ifndef _NO_POS_ARGS
 	case L'$':
+	  if (flags & (CHAR | SHORT | LONG | LONGDBL | SUPPRESS))
+	    goto match_failure;
 	  if (width <= MAX_POS_ARGS)
 	    {
 	      N = width - 1;
