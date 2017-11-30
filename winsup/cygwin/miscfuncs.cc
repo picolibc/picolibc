@@ -824,16 +824,8 @@ asm volatile ("								\n\
  * DAMAGE.								\n\
  */									\n\
 									\n\
-	.globl  memmove							\n\
-	.seh_proc memmove						\n\
-memmove:								\n\
-	.seh_endprologue						\n\
-	nop			/* FALLTHRU */				\n\
-	.seh_endproc							\n\
-									\n\
-	.globl  memcpy							\n\
-	.seh_proc memcpy						\n\
-memcpy:									\n\
+	.seh_proc _memcpy						\n\
+_memcpy:								\n\
 	movq	%rsi,8(%rsp)						\n\
 	movq	%rdi,16(%rsp)						\n\
 	.seh_endprologue						\n\
@@ -841,7 +833,6 @@ memcpy:									\n\
 	movq	%rdx,%rsi						\n\
 	movq	%r8,%rdx						\n\
 									\n\
-	movq	%rdi,%rax	/* return dst */			\n\
 	movq    %rdx,%rcx						\n\
 	movq    %rdi,%r8						\n\
 	subq    %rsi,%r8						\n\
@@ -873,14 +864,39 @@ memcpy:									\n\
 	movq	16(%rsp),%rdi						\n\
 	ret								\n\
 	.seh_endproc							\n\
-");
-
-asm volatile ("								\n\
+									\n\
+	.globl  memmove							\n\
+	.seh_proc memmove						\n\
+memmove:								\n\
+	.seh_endprologue						\n\
+	movq	%rcx,%rax	/* return dst */			\n\
+	jmp	_memcpy							\n\
+	.seh_endproc							\n\
+									\n\
+	.globl  memcpy							\n\
+	.seh_proc memcpy						\n\
+memcpy:									\n\
+	.seh_endprologue						\n\
+	movq	%rcx,%rax	/* return dst */			\n\
+	jmp	_memcpy							\n\
+	.seh_endproc							\n\
+									\n\
+	.globl  memcpy							\n\
+	.seh_proc memcpy						\n\
+mempcpy:									\n\
+	.seh_endprologue						\n\
+	movq	%rcx,%rax	/* return dst  */			\n\
+	addq	%r8,%rax	/*         + n */			\n\
+	jmp	_memcpy							\n\
+	.seh_endproc							\n\
+									\n\
 	.globl  wmemmove						\n\
 	.seh_proc wmemmove						\n\
 wmemmove:								\n\
 	.seh_endprologue						\n\
-	nop			/* FALLTHRU */				\n\
+	shlq	$1,%r8		/* cnt * sizeof (wchar_t) */		\n\
+	movq	%rcx,%rax	/* return dst */			\n\
+	jmp	_memcpy							\n\
 	.seh_endproc							\n\
 									\n\
 	.globl  wmemcpy							\n\
@@ -888,9 +904,21 @@ wmemmove:								\n\
 wmemcpy:								\n\
 	.seh_endprologue						\n\
 	shlq	$1,%r8		/* cnt * sizeof (wchar_t) */		\n\
-	jmp	memcpy							\n\
+	movq	%rcx,%rax	/* return dst */			\n\
+	jmp	_memcpy							\n\
+	.seh_endproc							\n\
+									\n\
+	.globl  wmemcpy							\n\
+	.seh_proc wmemcpy						\n\
+wmempcpy:								\n\
+	.seh_endprologue						\n\
+	shlq	$1,%r8		/* cnt * sizeof (wchar_t) */		\n\
+	movq	%rcx,%rax	/* return dst */			\n\
+	addq	%r8,%rax	/*         + n */			\n\
+	jmp	_memcpy							\n\
 	.seh_endproc							\n\
 ");
+
 #endif
 
 /* Signal the thread name to any attached debugger
