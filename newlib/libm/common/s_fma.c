@@ -6,7 +6,7 @@ INDEX
 INDEX
 	fmaf
 
-ANSI_SYNOPSIS
+SYNOPSIS
 	#include <math.h>
 	double fma(double <[x]>, double <[y]>, double <[z]>);
 	float fmaf(float <[x]>, float <[y]>, float <[z]>);

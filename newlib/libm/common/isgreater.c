@@ -17,7 +17,7 @@ INDEX
 INDEX
 	isunordered
 
-ANSI_SYNOPSIS
+SYNOPSIS
 	#include <math.h>
 	int isgreater(real-floating <[x]>, real-floating <[y]>);
 	int isgreaterequal(real-floating <[x]>, real-floating <[y]>);

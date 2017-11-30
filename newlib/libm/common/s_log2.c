@@ -20,7 +20,7 @@ INDEX
 INDEX
 	log2f
 
-ANSI_SYNOPSIS
+SYNOPSIS
 	#include <math.h>
 	double log2(double <[x]>);
 	float log2f(float <[x]>);

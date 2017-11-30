@@ -12,15 +12,10 @@ INDEX
 INDEX
 	nanf
 
-ANSI_SYNOPSIS
+SYNOPSIS
 	#include <math.h>
 	double nan(const char *<[unused]>);
 	float nanf(const char *<[unused]>);
-
-TRAD_SYNOPSIS
-	#include <math.h>
-	double nan();
-	float nanf();
 
 
 DESCRIPTION

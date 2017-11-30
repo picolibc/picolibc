@@ -19,19 +19,10 @@ INDEX
 INDEX
 	ilogbf
 
-ANSI_SYNOPSIS
+SYNOPSIS
 	#include <math.h>
         int ilogb(double <[val]>);
         int ilogbf(float <[val]>);
-
-TRAD_SYNOPSIS
-	#include <math.h>
-        int ilogb(<[val]>)
-        double <[val]>;
-
-        int ilogbf(<[val]>)
-        float <[val]>;
-
 
 DESCRIPTION
 

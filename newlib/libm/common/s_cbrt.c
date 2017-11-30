@@ -21,15 +21,10 @@ INDEX
 INDEX
 	cbrtf
 
-ANSI_SYNOPSIS
+SYNOPSIS
 	#include <math.h>
 	double cbrt(double <[x]>);
 	float  cbrtf(float <[x]>);
-
-TRAD_SYNOPSIS
-	#include <math.h>
-	double cbrt(<[x]>);
-	float  cbrtf(<[x]>);
 
 DESCRIPTION
 	<<cbrt>> computes the cube root of the argument.

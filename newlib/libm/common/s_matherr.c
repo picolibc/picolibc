@@ -19,14 +19,9 @@ FUNCTION
 INDEX 
 	matherr
 
-ANSI_SYNOPSIS
+SYNOPSIS
 	#include <math.h>
 	int matherr(struct exception *<[e]>);
-
-TRAD_SYNOPSIS
-	#include <math.h>
-	int matherr(*<[e]>)
-	struct exception *<[e]>;
 
 DESCRIPTION
 <<matherr>> is called whenever a math library function generates an error.

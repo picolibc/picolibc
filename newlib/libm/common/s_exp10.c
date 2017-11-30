@@ -20,18 +20,10 @@ INDEX
 INDEX
 	exp10f
 
-ANSI_SYNOPSIS
+SYNOPSIS
 	#include <math.h>
 	double exp10(double <[x]>);
 	float exp10f(float <[x]>);
-
-TRAD_SYNOPSIS
-	#include <math.h>
-	double exp10(<[x]>);
-	double <[x]>;
-
-	float exp10f(<[x]>);
-	float <[x]>;
 
 DESCRIPTION
 	<<exp10>> and <<exp10f>> calculate 10 ^ <[x]>, that is, 

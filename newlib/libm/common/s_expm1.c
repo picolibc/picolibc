@@ -19,18 +19,10 @@ INDEX
 INDEX
 	expm1f
 
-ANSI_SYNOPSIS
+SYNOPSIS
 	#include <math.h>
 	double expm1(double <[x]>);
 	float expm1f(float <[x]>);
-
-TRAD_SYNOPSIS
-	#include <math.h>
-	double expm1(<[x]>);
-	double <[x]>;
-
-	float expm1f(<[x]>);
-	float <[x]>;
 
 DESCRIPTION
 	<<expm1>> and <<expm1f>> calculate the exponential of <[x]>

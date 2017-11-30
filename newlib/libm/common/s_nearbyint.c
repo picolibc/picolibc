@@ -16,7 +16,7 @@ INDEX
 INDEX
 	nearbyintf
 
-ANSI_SYNOPSIS
+SYNOPSIS
 	#include <math.h>
 	double nearbyint(double <[x]>);
 	float nearbyintf(float <[x]>);

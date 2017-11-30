@@ -23,7 +23,7 @@ INDEX
 INDEX
 	scalblnf
 
-ANSI_SYNOPSIS
+SYNOPSIS
 	#include <math.h>
 	double scalbn(double <[x]>, int <[n]>);
 	float scalbnf(float <[x]>, int <[n]>);

@@ -11,7 +11,7 @@ INDEX
 INDEX
 	fminf
 
-ANSI_SYNOPSIS
+SYNOPSIS
 	#include <math.h>
 	double fmin(double <[x]>, double <[y]>);
 	float fminf(float <[x]>, float <[y]>);

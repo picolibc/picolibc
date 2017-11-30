@@ -20,20 +20,10 @@ INDEX
 INDEX
 	modff
 
-ANSI_SYNOPSIS
+SYNOPSIS
 	#include <math.h>
 	double modf(double <[val]>, double *<[ipart]>);
         float modff(float <[val]>, float *<[ipart]>);
-
-TRAD_SYNOPSIS
-	#include <math.h>
-	double modf(<[val]>, <[ipart]>)
-        double <[val]>;
-        double *<[ipart]>;
-
-	float modff(<[val]>, <[ipart]>)
-	float <[val]>;
-        float *<[ipart]>;
 
 DESCRIPTION
 	<<modf>> splits the double <[val]> apart into an integer part

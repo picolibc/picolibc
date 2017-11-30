@@ -20,7 +20,7 @@ INDEX
 INDEX
 	llroundf
 
-ANSI_SYNOPSIS
+SYNOPSIS
 	#include <math.h>
 	long int lround(double <[x]>);
 	long int lroundf(float <[x]>);

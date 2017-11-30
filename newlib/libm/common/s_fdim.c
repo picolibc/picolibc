@@ -11,7 +11,7 @@ INDEX
 INDEX
 	fdimf
 
-ANSI_SYNOPSIS
+SYNOPSIS
 	#include <math.h>
 	double fdim(double <[x]>, double <[y]>);
 	float fdimf(float <[x]>, float <[y]>);

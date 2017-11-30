@@ -20,18 +20,10 @@ INDEX
 INDEX
 	log1pf
 
-ANSI_SYNOPSIS
+SYNOPSIS
 	#include <math.h>
 	double log1p(double <[x]>);
 	float log1pf(float <[x]>);
-
-TRAD_SYNOPSIS
-	#include <math.h>
-	double log1p(<[x]>)
-	double <[x]>;
-
-	float log1pf(<[x]>)
-	float <[x]>;
 
 DESCRIPTION
 <<log1p>> calculates 

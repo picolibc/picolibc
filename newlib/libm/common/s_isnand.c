@@ -27,7 +27,7 @@ INDEX
 INDEX
 	finitef
 
-ANSI_SYNOPSIS
+SYNOPSIS
 	#include <math.h>
 	int isnan(double <[arg]>);
 	int isinf(double <[arg]>);
@@ -35,21 +35,6 @@ ANSI_SYNOPSIS
 	int isnanf(float <[arg]>);
 	int isinff(float <[arg]>);
 	int finitef(float <[arg]>);
-
-TRAD_SYNOPSIS
-	#include <math.h>
-	int isnan(<[arg]>)
-	double <[arg]>;
-	int isinf(<[arg]>)
-	double <[arg]>;
-	int finite(<[arg]>);
-	double <[arg]>;
-	int isnanf(<[arg]>);
-	float <[arg]>;
-	int isinff(<[arg]>);
-	float <[arg]>;
-	int finitef(<[arg]>);
-	float <[arg]>;
 
 
 DESCRIPTION

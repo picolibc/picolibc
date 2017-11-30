@@ -20,20 +20,10 @@ INDEX
 INDEX
 	copysignf
 
-ANSI_SYNOPSIS
+SYNOPSIS
 	#include <math.h>
 	double copysign (double <[x]>, double <[y]>);
 	float copysignf (float <[x]>, float <[y]>);
-
-TRAD_SYNOPSIS
-	#include <math.h>
-	double copysign (<[x]>, <[y]>)
-	double <[x]>;
-	double <[y]>;
-
-	float copysignf (<[x]>, <[y]>)
-	float <[x]>;
-	float <[y]>;
 
 DESCRIPTION
 <<copysign>> constructs a number with the magnitude (absolute value)

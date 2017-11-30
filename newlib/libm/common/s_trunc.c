@@ -16,7 +16,7 @@ INDEX
 INDEX
 	truncf
 
-ANSI_SYNOPSIS
+SYNOPSIS
 	#include <math.h>
 	double trunc(double <[x]>);
 	float truncf(float <[x]>);

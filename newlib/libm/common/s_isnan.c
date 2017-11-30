@@ -43,7 +43,7 @@ INDEX
 	finitef
 @c SUSv2 end)
 
-ANSI_SYNOPSIS
+SYNOPSIS
 	[C99 standard macros:]
 	#include <math.h>
 	int fpclassify(real-floating <[x]>);

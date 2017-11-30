@@ -20,22 +20,10 @@ INDEX
 INDEX
 	nextafterf
 
-ANSI_SYNOPSIS
+SYNOPSIS
        #include <math.h>
        double nextafter(double <[val]>, double <[dir]>);
        float nextafterf(float <[val]>, float <[dir]>);
-
-TRAD_SYNOPSIS
-       #include <math.h>
-
-       double nextafter(<[val]>, <[dir]>)
-              double <[val]>;
-              double <[exp]>;
-
-       float nextafter(<[val]>, <[dir]>)
-              float <[val]>;
-              float <[dir]>;
-
 
 DESCRIPTION
 <<nextafter>> returns the double-precision floating-point number

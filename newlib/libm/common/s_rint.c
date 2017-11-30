@@ -18,7 +18,7 @@ INDEX
 INDEX
 	rintf
 
-ANSI_SYNOPSIS
+SYNOPSIS
 	#include <math.h>
 	double rint(double <[x]>);
 	float rintf(float <[x]>);

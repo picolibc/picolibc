@@ -10,7 +10,7 @@ FUNCTION
 INDEX
 	signbit
 
-ANSI_SYNOPSIS
+SYNOPSIS
 	#include <math.h>
 	int signbit(real-floating <[x]>);
 

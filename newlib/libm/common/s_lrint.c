@@ -22,7 +22,7 @@ INDEX
 INDEX
 	llrintf
 
-ANSI_SYNOPSIS
+SYNOPSIS
 	#include <math.h>
 	long int lrint(double <[x]>);
 	long int lrintf(float <[x]>);

@@ -16,7 +16,7 @@ INDEX
 INDEX
 	roundf
 
-ANSI_SYNOPSIS
+SYNOPSIS
 	#include <math.h>
 	double round(double <[x]>);
 	float roundf(float <[x]>);
