@@ -34,6 +34,14 @@ bzero           mempcpy         strcat
 explicit_bzero  memset          strncat
 memcpy          stpcpy          strncpy
 
+@exdent @emph{Wide Character String functions:}
+fgetws          wcrtomb         wcsrtombs
+fgetws_unlocked wcscat          wmemcpy
+mbsnrtowcs      wcscpy          wmemmove
+mbsrtowcs       wcsncat         wmempcpy
+wcpcpy          wcsncpy         wmemset
+wcpncpy         wcsnrtombs
+
 @exdent @emph{Stdio functions:}
 fgets           fread_unlocked  sprintf
 fgets_unlocked  gets            vsnprintf

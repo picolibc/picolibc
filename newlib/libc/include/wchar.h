@@ -332,4 +332,8 @@ int	_EXFUN(_wscanf_r, (struct _reent *, const wchar_t *, ...));
 
 _END_STD_C
 
+#if __SSP_FORTIFY_LEVEL > 0
+#include <ssp/wchar.h>
+#endif
+
 #endif /* _WCHAR_H_ */
