@@ -5,6 +5,8 @@ What's new:
 
 - scanf/wscanf now handle the POSIX %m modifier.
 
+- scanf now handles the %l[ conversion.
+
 - New API: wmempcpy.
 
 

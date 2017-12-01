@@ -17,6 +17,10 @@ scanf/wscanf now handle the POSIX %m modifier.
 </para></listitem>
 
 <listitem><para>
+- scanf now handles the %l[ conversion.
+</para></listitem>
+
+<listitem><para>
 New API: wmempcpy.
 </para></listitem>
 
