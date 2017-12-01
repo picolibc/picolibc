@@ -945,7 +945,7 @@ _DEFUN(__SVFSCANF_R, (rptr, fp, fmt0, ap),
 #ifdef _WANT_IO_POSIX_EXTENSIONS
 	      wchar_t **wcp_p = NULL;
 	      wchar_t *wcp0 = NULL;
-	      size_t width0 = 0;
+	      size_t wcp_siz = 0;
 #endif
               mbstate_t state;
               memset (&state, 0, sizeof (mbstate_t));
@@ -953,12 +953,12 @@ _DEFUN(__SVFSCANF_R, (rptr, fp, fmt0, ap),
                 wcp = NULL;
 #ifdef _WANT_IO_POSIX_EXTENSIONS
 	      else if (flags & MALLOC)
-		width0 = alloc_m_ptr (wchar_t, wcp, wcp0, wcp_p, width);
+		wcp_siz = alloc_m_ptr (wchar_t, wcp, wcp0, wcp_p, 32);
 #endif
               else
                 wcp = GET_ARG (N, ap, wchar_t *);
               n = 0;
-              while (width != 0)
+              while (width-- != 0)
                 {
                   if (n == MB_CUR_MAX)
                     goto input_failure;
@@ -973,9 +973,14 @@ _DEFUN(__SVFSCANF_R, (rptr, fp, fmt0, ap),
                   if (mbslen != (size_t)-2) /* Incomplete sequence */
                     {
                       nread += n;
-                      width -= 1;
                       if (!(flags & SUPPRESS))
-                        wcp += 1;
+			{
+#ifdef _WANT_IO_POSIX_EXTENSIONS
+			  wcp_siz = realloc_m_ptr (wchar_t, wcp, wcp0, wcp_p,
+						   wcp_siz);
+#endif
+			  wcp++;
+			}
                       n = 0;
                     }
                   if (BufferEmpty)
@@ -986,7 +991,7 @@ _DEFUN(__SVFSCANF_R, (rptr, fp, fmt0, ap),
                     }
                 }
 #ifdef _WANT_IO_POSIX_EXTENSIONS
-	      shrink_m_ptr (wchar_t, wcp_p, width0 - width, width0);
+	      shrink_m_ptr (wchar_t, wcp_p, wcp - wcp0, wcp_siz);
 #endif
               if (!(flags & SUPPRESS))
                 nassigned++;
@@ -1134,6 +1139,7 @@ _DEFUN(__SVFSCANF_R, (rptr, fp, fmt0, ap),
                   buf[n++] = *fp->_p;
                   fp->_r -= 1;
                   fp->_p += 1;
+		  width--;
                   if ((mbslen = _mbrtowc_r (rptr, wcp, buf, n, &state))
                                                         == (size_t)-1)
                     goto input_failure;
@@ -1148,7 +1154,6 @@ _DEFUN(__SVFSCANF_R, (rptr, fp, fmt0, ap),
                           break;
                         }
                       nread += n;
-                      width -= 1;
                       if ((flags & SUPPRESS) == 0)
 			{
 			  wcp += 1;

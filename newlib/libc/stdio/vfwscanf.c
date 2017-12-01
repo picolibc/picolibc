@@ -376,7 +376,6 @@ _DEFUN(__SVFWSCANF_R, (rptr, fp, fmt0, ap),
   wint_t wi;                    /* handy wint_t */
   char *mbp = NULL;             /* multibyte string pointer for %c %s %[ */
   size_t nconv;                 /* number of bytes in mb. conversion */
-  char mbbuf[MB_LEN_MAX];       /* temporary mb. character buffer */
 
   char *cp;
   short *sp;
@@ -884,14 +883,14 @@ _DEFUN(__SVFWSCANF_R, (rptr, fp, fmt0, ap),
 #ifdef _WANT_IO_POSIX_EXTENSIONS
 	      wchar_t **p_p = NULL;
 	      wchar_t *p0 = NULL;
-	      size_t width0 = 0;
+	      size_t p_siz = 0;
 #endif
 
 	      if (flags & SUPPRESS)
 		;
 #ifdef _WANT_IO_POSIX_EXTENSIONS
 	      else if (flags & MALLOC)
-		width0 = alloc_m_ptr (wchar_t, p, p0, p_p, width);
+		p_siz = alloc_m_ptr (wchar_t, p, p0, p_p, 32);
 #endif
 	      else
 		p = GET_ARG(N, ap, wchar_t *);
@@ -899,14 +898,20 @@ _DEFUN(__SVFWSCANF_R, (rptr, fp, fmt0, ap),
 	      while (width-- != 0 && (wi = _fgetwc_r (rptr, fp)) != WEOF)
 		{
 		  if (!(flags & SUPPRESS))
-		    *p++ = (wchar_t) wi;
+		    {
+#ifdef _WANT_IO_POSIX_EXTENSIONS
+		      /* Check before ++ because we never add a \0 */
+		      p_siz = realloc_m_ptr (wchar_t, p, p0, p_p, p_siz);
+#endif
+		      *p++ = (wchar_t) wi;
+		    }
 		  n++;
 		}
 	      if (n == 0)
 		goto input_failure;
 	      nread += n;
 #ifdef _WANT_IO_POSIX_EXTENSIONS
-	      shrink_m_ptr (wchar_t, p_p, width0 - width, width0);
+	      shrink_m_ptr (wchar_t, p_p, p - p0, p_siz);
 #endif
 	      if (!(flags & SUPPRESS))
 		nassigned++;
@@ -916,50 +921,38 @@ _DEFUN(__SVFWSCANF_R, (rptr, fp, fmt0, ap),
 #ifdef _WANT_IO_POSIX_EXTENSIONS
 	      char **mbp_p = NULL;
 	      char *mbp0 = NULL;
-	      size_t width0 = 0;
+	      size_t mbp_siz = 0;
 #endif
 
 	      if (flags & SUPPRESS)
 		;
 #ifdef _WANT_IO_POSIX_EXTENSIONS
 	      else if (flags & MALLOC)
-		width0 = alloc_m_ptr (char, mbp, mbp0, mbp_p, width);
+		mbp_siz = alloc_m_ptr (char, mbp, mbp0, mbp_p, 32);
 #endif
 	      else
 		mbp = GET_ARG(N, ap, char *);
 	      n = 0;
 	      memset ((_PTR)&mbs, '\0', sizeof (mbstate_t));
-	      while (width != 0 && (wi = _fgetwc_r (rptr, fp)) != WEOF)
+	      while (width-- != 0 && (wi = _fgetwc_r (rptr, fp)) != WEOF)
 		{
-		  if (width >= MB_CUR_MAX && !(flags & SUPPRESS))
+#ifdef _WANT_IO_POSIX_EXTENSIONS
+		  mbp_siz = realloc_m_ptr (char, mbp, mbp0, mbp_p, mbp_siz);
+#endif
+		  if (!(flags & SUPPRESS))
 		    {
 		      nconv = _wcrtomb_r (rptr, mbp, wi, &mbs);
 		      if (nconv == (size_t) -1)
 			goto input_failure;
+		      mbp += nconv;
 		    }
-		  else
-		    {
-		      nconv = _wcrtomb_r (rptr, mbbuf, wi, &mbs);
-		      if (nconv == (size_t) -1)
-			goto input_failure;
-		      if (nconv > width)
-			{
-			  _ungetwc_r (rptr, wi, fp);
-			  break;
-			}
-		      if (!(flags & SUPPRESS))
-			memcpy(mbp, mbbuf, nconv);
-		    }
-		  if (!(flags & SUPPRESS))
-		    mbp += nconv;
-		  width -= nconv;
 		  n++;
 		}
 	      if (n == 0)
 		goto input_failure;
 	      nread += n;
 #ifdef _WANT_IO_POSIX_EXTENSIONS
-	      shrink_m_ptr (char, mbp_p, width0 - width, width0);
+	      shrink_m_ptr (char, mbp_p, mbp - mbp0, mbp_siz);
 #endif
 	      if (!(flags & SUPPRESS))
 		nassigned++;
@@ -1031,30 +1024,18 @@ _DEFUN(__SVFWSCANF_R, (rptr, fp, fmt0, ap),
 	      n = 0;
 	      memset ((_PTR) &mbs, '\0', sizeof (mbstate_t));
 	      while ((wi = _fgetwc_r (rptr, fp)) != WEOF
-		     && width != 0 && INCCL (wi))
+		     && width-- != 0 && INCCL (wi))
 		{
-#ifdef _WANT_IO_POSIX_EXTENSIONS
-		  mbp_siz = realloc_m_ptr (char, mbp, mbp0, mbp_p, mbp_siz);
-#endif
-		  if (width >= MB_CUR_MAX && !(flags & SUPPRESS))
+		  if (!(flags & SUPPRESS))
 		    {
 		      nconv = _wcrtomb_r (rptr, mbp, wi, &mbs);
 		      if (nconv == (size_t) -1)
 			goto input_failure;
+		      mbp += nconv;
+#ifdef _WANT_IO_POSIX_EXTENSIONS
+		      mbp_siz = realloc_m_ptr (char, mbp, mbp0, mbp_p, mbp_siz);
+#endif
 		    }
-		  else
-		    {
-		      nconv = wcrtomb(mbbuf, wi, &mbs);
-		      if (nconv == (size_t) -1)
-			goto input_failure;
-		      if (nconv > width)
-			break;
-		      if (!(flags & SUPPRESS))
-			memcpy(mbp, mbbuf, nconv);
-		    }
-		  if (!(flags & SUPPRESS))
-		    mbp += nconv;
-		  width -= nconv;
 		  n++;
 		}
 	      if (wi != WEOF)
@@ -1098,10 +1079,10 @@ _DEFUN(__SVFWSCANF_R, (rptr, fp, fmt0, ap),
 		     && width-- != 0 && !iswspace (wi))
 		{
 		  *p++ = (wchar_t) wi;
-		  nread++;
 #ifdef _WANT_IO_POSIX_EXTENSIONS
 		  p_siz = realloc_m_ptr (wchar_t, p, p0, p_p, p_siz);
 #endif
+		  nread++;
 		}
 	      if (wi != WEOF)
 		_ungetwc_r (rptr, wi, fp);
@@ -1129,30 +1110,18 @@ _DEFUN(__SVFWSCANF_R, (rptr, fp, fmt0, ap),
 		mbp = GET_ARG(N, ap, char *);
 	      memset ((_PTR) &mbs, '\0', sizeof (mbstate_t));
 	      while ((wi = _fgetwc_r (rptr, fp)) != WEOF
-		     && width != 0 && !iswspace (wi))
+		     && width-- != 0 && !iswspace (wi))
 		{
-#ifdef _WANT_IO_POSIX_EXTENSIONS
-		  mbp_siz = realloc_m_ptr (char, mbp, mbp0, mbp_p, mbp_siz);
-#endif
-		  if (width >= MB_CUR_MAX && !(flags & SUPPRESS))
+		  if (!(flags & SUPPRESS))
 		    {
 		      nconv = wcrtomb(mbp, wi, &mbs);
 		      if (nconv == (size_t)-1)
 			goto input_failure;
+		      mbp += nconv;
+#ifdef _WANT_IO_POSIX_EXTENSIONS
+		      mbp_siz = realloc_m_ptr (char, mbp, mbp0, mbp_p, mbp_siz);
+#endif
 		    }
-		  else
-		    {
-		      nconv = wcrtomb(mbbuf, wi, &mbs);
-		      if (nconv == (size_t)-1)
-			goto input_failure;
-		      if (nconv > width)
-			break;
-		      if (!(flags & SUPPRESS))
-			memcpy(mbp, mbbuf, nconv);
-		    }
-		  if (!(flags & SUPPRESS))
-		    mbp += nconv;
-		  width -= nconv;
 		  nread++;
 		}
 	      if (wi != WEOF)
