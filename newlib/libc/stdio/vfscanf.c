@@ -389,6 +389,18 @@ int _EXFUN (__ssrefill_r, (struct _reent *, register FILE *));
 size_t _EXFUN (_sfread_r, (struct _reent *, _PTR buf, size_t, size_t, FILE *));
 #endif /* !STRING_ONLY || !INTEGER_ONLY */
 
+static inline int
+__wctob (struct _reent *rptr, wint_t wc)
+{
+  mbstate_t mbs;
+  unsigned char pmb[MB_LEN_MAX];
+
+  if (wc == WEOF)
+    return EOF;
+  memset (&mbs, '\0', sizeof (mbs));
+  return __WCTOMB (rptr, (char *) pmb, wc, &mbs) == 1 ? (int) pmb[0] : 0;
+}
+
 int
 _DEFUN(__SVFSCANF_R, (rptr, fp, fmt0, ap),
        struct _reent *rptr _AND
@@ -1008,7 +1020,7 @@ _DEFUN(__SVFSCANF_R, (rptr, fp, fmt0, ap),
                 nassigned++;
             }
           else
-#endif
+#endif /* ELIX_LEVEL */
 	  if (flags & SUPPRESS)
 	    {
 	      size_t sum = 0;
@@ -1062,6 +1074,79 @@ _DEFUN(__SVFSCANF_R, (rptr, fp, fmt0, ap),
 	  if (width == 0)
 	    width = SIZE_MAX;
 	  /* take only those things in the class */
+#if !defined(_ELIX_LEVEL) || _ELIX_LEVEL >= 2
+	  if (flags & LONG)
+	    {
+#ifdef _WANT_IO_POSIX_EXTENSIONS
+	      wchar_t **wcp_p = NULL;
+	      wchar_t *wcp0 = NULL;
+	      size_t wcp_siz = 0;
+#endif
+              mbstate_t state;
+              if (flags & SUPPRESS)
+                wcp = &wc;
+#ifdef _WANT_IO_POSIX_EXTENSIONS
+	      else if (flags & MALLOC)
+		wcp_siz = alloc_m_ptr (wchar_t, wcp, wcp0, wcp_p, 32);
+#endif
+              else
+		wcp = GET_ARG (N, ap, wchar_t *);
+              n = 0;
+              while (width != 0) {
+                  if (n == MB_CUR_MAX)
+                    goto input_failure;
+                  buf[n++] = *fp->_p;
+                  fp->_r -= 1;
+                  fp->_p += 1;
+		  /* Got a high surrogate, allow low surrogate to slip
+		     through */
+		  if (mbslen != 3 || state.__count != 4)
+		    memset (&state, 0, sizeof (mbstate_t));
+                  if ((mbslen = _mbrtowc_r (rptr, wcp, buf, n, &state))
+                                                        == (size_t)-1)
+                    goto input_failure;
+                  if (mbslen == 0)
+                    *wcp = L'\0';
+                  if (mbslen != (size_t)-2) /* Incomplete sequence */
+                    {
+                      if (!ccltab[__wctob (rptr, *wcp)])
+                        {
+                          while (n != 0)
+                            _ungetc_r (rptr, (unsigned char) buf[--n], fp);
+                          break;
+                        }
+                      nread += n;
+		      /* Handle high surrogate */
+		      if (mbslen != 3 || state.__count != 4)
+			width -= 1;
+                      if ((flags & SUPPRESS) == 0)
+			{
+			  wcp += 1;
+#ifdef _WANT_IO_POSIX_EXTENSIONS
+			  wcp_siz = realloc_m_ptr (wchar_t, wcp, wcp0, wcp_p,
+						   wcp_siz);
+#endif
+			}
+                      n = 0;
+                    }
+                  if (BufferEmpty)
+                    {
+                      if (n != 0)
+                        goto input_failure;
+                      break;
+                    }
+                }
+              if (!(flags & SUPPRESS))
+                {
+                  *wcp = L'\0';
+#ifdef _WANT_IO_POSIX_EXTENSIONS
+		  shrink_m_ptr (wchar_t, wcp_p, wcp - wcp0 + 1, wcp_siz);
+#endif
+                  nassigned++;
+                }
+	    }
+	  else
+#endif /* ELIX_LEVEL */
 	  if (flags & SUPPRESS)
 	    {
 	      n = 0;
@@ -1079,6 +1164,7 @@ _DEFUN(__SVFSCANF_R, (rptr, fp, fmt0, ap),
 		}
 	      if (n == 0)
 		goto match_failure;
+	      nread += n;
 	    }
 	  else
 	    {
@@ -1115,8 +1201,8 @@ _DEFUN(__SVFSCANF_R, (rptr, fp, fmt0, ap),
 	      shrink_m_ptr (char, p_p, n + 1, p_siz);
 #endif
 	      nassigned++;
+	      nread += n;
 	    }
-	  nread += n;
 	  break;
 
 	case CT_STRING:
