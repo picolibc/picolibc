@@ -488,10 +488,15 @@ _DEFUN(__SVFSCANF_R, (rptr, fp, fmt0, ap),
       _p = _p0;								\
       _w;								\
     })
+  /* For systems with wchar_t == 2 (UTF-16) check if there's room for
+     at least 2 wchar_t's (surrogate pairs). */
   #define realloc_m_ptr(_type, _p, _p0, _p_p, _w)			\
     ({									\
       size_t _nw = (_w);						\
-      if (_p_p && _p - _p0 == _nw)					\
+      ptrdiff_t _dif = _p - _p0;					\
+      if (_p_p &&							\
+	  ((sizeof (_type) == 2 && _dif >= _nw - 1)			\
+	   || _dif >= _nw))						\
 	{								\
 	  _p0 = (_type *) realloc (_p0, (_nw << 1) * sizeof (_type));			\
 	  if (!_p0)							\
@@ -499,7 +504,7 @@ _DEFUN(__SVFSCANF_R, (rptr, fp, fmt0, ap),
 	      nassigned = EOF;						\
 	      goto match_failure;					\
 	    }								\
-	  _p = _p0 + _nw;						\
+	  _p = _p0 + _dif;						\
 	  *_p_p = _p0;							\
 	  _nw <<= 1;							\
 	}								\
@@ -948,7 +953,6 @@ _DEFUN(__SVFSCANF_R, (rptr, fp, fmt0, ap),
 	      size_t wcp_siz = 0;
 #endif
               mbstate_t state;
-              memset (&state, 0, sizeof (mbstate_t));
               if (flags & SUPPRESS)
                 wcp = NULL;
 #ifdef _WANT_IO_POSIX_EXTENSIONS
@@ -958,13 +962,17 @@ _DEFUN(__SVFSCANF_R, (rptr, fp, fmt0, ap),
               else
                 wcp = GET_ARG (N, ap, wchar_t *);
               n = 0;
-              while (width-- != 0)
+              while (width != 0)
                 {
                   if (n == MB_CUR_MAX)
                     goto input_failure;
                   buf[n++] = *fp->_p;
                   fp->_r -= 1;
                   fp->_p += 1;
+		  /* Got a high surrogate, allow low surrogate to slip
+		     through */
+		  if (mbslen != 3 || state.__count != 4)
+		    memset (&state, 0, sizeof (mbstate_t));
                   if ((mbslen = _mbrtowc_r (rptr, wcp, buf, n, &state))
                                                          == (size_t)-1)
                     goto input_failure; /* Invalid sequence */
@@ -973,6 +981,9 @@ _DEFUN(__SVFSCANF_R, (rptr, fp, fmt0, ap),
                   if (mbslen != (size_t)-2) /* Incomplete sequence */
                     {
                       nread += n;
+		      /* Handle high surrogate */
+		      if (mbslen != 3 || state.__count != 4)
+			width -= 1;
                       if (!(flags & SUPPRESS))
 			{
 #ifdef _WANT_IO_POSIX_EXTENSIONS
@@ -1122,7 +1133,6 @@ _DEFUN(__SVFSCANF_R, (rptr, fp, fmt0, ap),
 #endif
               /* Process %S and %ls placeholders */
               mbstate_t state;
-              memset (&state, 0, sizeof (mbstate_t));
               if (flags & SUPPRESS)
                 wcp = &wc;
 #ifdef _WANT_IO_POSIX_EXTENSIONS
@@ -1139,7 +1149,10 @@ _DEFUN(__SVFSCANF_R, (rptr, fp, fmt0, ap),
                   buf[n++] = *fp->_p;
                   fp->_r -= 1;
                   fp->_p += 1;
-		  width--;
+		  /* Got a high surrogate, allow low surrogate to slip
+		     through */
+		  if (mbslen != 3 || state.__count != 4)
+		    memset (&state, 0, sizeof (mbstate_t));
                   if ((mbslen = _mbrtowc_r (rptr, wcp, buf, n, &state))
                                                         == (size_t)-1)
                     goto input_failure;
@@ -1154,6 +1167,9 @@ _DEFUN(__SVFSCANF_R, (rptr, fp, fmt0, ap),
                           break;
                         }
                       nread += n;
+		      /* Handle high surrogate */
+		      if (mbslen != 3 || state.__count != 4)
+			width -= 1;
                       if ((flags & SUPPRESS) == 0)
 			{
 			  wcp += 1;

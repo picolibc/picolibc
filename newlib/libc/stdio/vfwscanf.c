@@ -376,6 +376,7 @@ _DEFUN(__SVFWSCANF_R, (rptr, fp, fmt0, ap),
   wint_t wi;                    /* handy wint_t */
   char *mbp = NULL;             /* multibyte string pointer for %c %s %[ */
   size_t nconv;                 /* number of bytes in mb. conversion */
+  char mbbuf[MB_LEN_MAX];	/* temporary mb. character buffer */
 
   char *cp;
   short *sp;
@@ -458,13 +459,15 @@ _DEFUN(__SVFWSCANF_R, (rptr, fp, fmt0, ap),
       _p = _p0;								\
       _w;								\
     })
+  /* For char output, check if there's room for at least MB_CUR_MAX
+     characters. */
   #define realloc_m_ptr(_type, _p, _p0, _p_p, _w)			\
     ({									\
       size_t _nw = (_w);						\
       ptrdiff_t _dif = _p - _p0;					\
       if (_p_p &&							\
 	  ((sizeof (_type) == 1 && _dif >= _nw - MB_CUR_MAX)		\
-	   || (sizeof (_type) != 1 && _dif == _nw)))			\
+	   || _dif >= _nw))						\
 	{								\
 	  _p0 = (_type *) realloc (_p0, (_nw << 1) * sizeof (_type));	\
 	  if (!_p0)							\
@@ -925,7 +928,7 @@ _DEFUN(__SVFWSCANF_R, (rptr, fp, fmt0, ap),
 #endif
 
 	      if (flags & SUPPRESS)
-		;
+		mbp = mbbuf;
 #ifdef _WANT_IO_POSIX_EXTENSIONS
 	      else if (flags & MALLOC)
 		mbp_siz = alloc_m_ptr (char, mbp, mbp0, mbp_p, 32);
@@ -934,16 +937,19 @@ _DEFUN(__SVFWSCANF_R, (rptr, fp, fmt0, ap),
 		mbp = GET_ARG(N, ap, char *);
 	      n = 0;
 	      memset ((_PTR)&mbs, '\0', sizeof (mbstate_t));
-	      while (width-- != 0 && (wi = _fgetwc_r (rptr, fp)) != WEOF)
+	      while (width != 0 && (wi = _fgetwc_r (rptr, fp)) != WEOF)
 		{
-#ifdef _WANT_IO_POSIX_EXTENSIONS
-		  mbp_siz = realloc_m_ptr (char, mbp, mbp0, mbp_p, mbp_siz);
-#endif
+		  nconv = _wcrtomb_r (rptr, mbp, wi, &mbs);
+		  if (nconv == (size_t) -1)
+		    goto input_failure;
+		  /* Ignore high surrogate in width counting */
+		  if (nconv != 0 || mbs.__count != -4)
+		    width--;
 		  if (!(flags & SUPPRESS))
 		    {
-		      nconv = _wcrtomb_r (rptr, mbp, wi, &mbs);
-		      if (nconv == (size_t) -1)
-			goto input_failure;
+#ifdef _WANT_IO_POSIX_EXTENSIONS
+		      mbp_siz = realloc_m_ptr (char, mbp, mbp0, mbp_p, mbp_siz);
+#endif
 		      mbp += nconv;
 		    }
 		  n++;
@@ -1014,7 +1020,7 @@ _DEFUN(__SVFWSCANF_R, (rptr, fp, fmt0, ap),
 #endif
 
 	      if (flags & SUPPRESS)
-		;
+		mbp = mbbuf;
 #ifdef _WANT_IO_POSIX_EXTENSIONS
 	      else if (flags & MALLOC)
 		mbp_siz = alloc_m_ptr (char, mbp, mbp0, mbp_p, 32);
@@ -1024,13 +1030,16 @@ _DEFUN(__SVFWSCANF_R, (rptr, fp, fmt0, ap),
 	      n = 0;
 	      memset ((_PTR) &mbs, '\0', sizeof (mbstate_t));
 	      while ((wi = _fgetwc_r (rptr, fp)) != WEOF
-		     && width-- != 0 && INCCL (wi))
+		     && width != 0 && INCCL (wi))
 		{
+		  nconv = _wcrtomb_r (rptr, mbp, wi, &mbs);
+		  if (nconv == (size_t) -1)
+		    goto input_failure;
+		  /* Ignore high surrogate in width counting */
+		  if (nconv != 0 || mbs.__count != -4)
+		    width--;
 		  if (!(flags & SUPPRESS))
 		    {
-		      nconv = _wcrtomb_r (rptr, mbp, wi, &mbs);
-		      if (nconv == (size_t) -1)
-			goto input_failure;
 		      mbp += nconv;
 #ifdef _WANT_IO_POSIX_EXTENSIONS
 		      mbp_siz = realloc_m_ptr (char, mbp, mbp0, mbp_p, mbp_siz);
@@ -1101,7 +1110,7 @@ _DEFUN(__SVFWSCANF_R, (rptr, fp, fmt0, ap),
 #endif
 
 	      if (flags & SUPPRESS)
-		;
+		mbp = mbbuf;
 #ifdef _WANT_IO_POSIX_EXTENSIONS
 	      else if (flags & MALLOC)
 		mbp_siz = alloc_m_ptr (char, mbp, mbp0, mbp_p, 32);
@@ -1110,13 +1119,16 @@ _DEFUN(__SVFWSCANF_R, (rptr, fp, fmt0, ap),
 		mbp = GET_ARG(N, ap, char *);
 	      memset ((_PTR) &mbs, '\0', sizeof (mbstate_t));
 	      while ((wi = _fgetwc_r (rptr, fp)) != WEOF
-		     && width-- != 0 && !iswspace (wi))
+		     && width != 0 && !iswspace (wi))
 		{
+		  nconv = wcrtomb(mbp, wi, &mbs);
+		  if (nconv == (size_t)-1)
+		    goto input_failure;
+		  /* Ignore high surrogate in width counting */
+		  if (nconv != 0 || mbs.__count != -4)
+		    width--;
 		  if (!(flags & SUPPRESS))
 		    {
-		      nconv = wcrtomb(mbp, wi, &mbs);
-		      if (nconv == (size_t)-1)
-			goto input_failure;
 		      mbp += nconv;
 #ifdef _WANT_IO_POSIX_EXTENSIONS
 		      mbp_siz = realloc_m_ptr (char, mbp, mbp0, mbp_p, mbp_siz);
