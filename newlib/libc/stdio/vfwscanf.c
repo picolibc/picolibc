@@ -783,7 +783,6 @@ _DEFUN(__SVFWSCANF_R, (rptr, fp, fmt0, ap),
 	  break;
 
 	case L'[':
-	  ccls = fmt;
 	  if (*fmt == '^')
 	    {
 	      cclcompl = 1;
@@ -791,6 +790,7 @@ _DEFUN(__SVFWSCANF_R, (rptr, fp, fmt0, ap),
 	    }
 	  else
 	    cclcompl = 0;
+	  ccls = fmt;
 	  if (*fmt == ']')
 	    fmt++;
 	  while (*fmt != '\0' && *fmt != ']')
