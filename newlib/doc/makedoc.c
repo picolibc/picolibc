@@ -35,7 +35,6 @@ There is  no
 
 
 
-#include "ansidecl.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <ctype.h>
@@ -67,25 +66,23 @@ typedef struct buffer
 
 
 
-static void DEFUN(init_string_with_size,(buffer, size),
-	   string_type *buffer AND
-	   unsigned int size )
+static void
+init_string_with_size (string_type *buffer, unsigned int size)
 {
   buffer->write_idx = 0;
   buffer->size = size;
   buffer->ptr = malloc(size);
 }
 
-static void DEFUN(init_string,(buffer),
-	   string_type *buffer)
+static void
+init_string (string_type *buffer)
 {
     init_string_with_size(buffer, DEF_SIZE);
 
 }
 
-static int DEFUN(find, (str, what),
-	  string_type *str AND
-	  char *what)
+static int
+find (string_type *str, char *what)
 {
     unsigned int i;
     char *p;
@@ -101,30 +98,28 @@ static int DEFUN(find, (str, what),
     
 }
 
-static void DEFUN(write_buffer,(buffer),
-	   string_type *buffer)
+static void
+write_buffer (string_type *buffer)
 {
     fwrite(buffer->ptr, buffer->write_idx, 1, stdout);
 }
 
 
-static void DEFUN(delete_string,(buffer),
-	   string_type *buffer)
+static void
+delete_string (string_type *buffer)
 {
     free(buffer->ptr);
 }
 
 
-static char *DEFUN(addr, (buffer, idx),
-	    string_type *buffer AND
-	    unsigned int idx)
+static char *
+addr (string_type *buffer, unsigned int idx)
 {
     return buffer->ptr + idx;
 }
 
-static char DEFUN(at,(buffer, pos),
-	   string_type *buffer AND
-	   unsigned int pos) 
+static char
+at (string_type *buffer, unsigned int pos)
 {
     if ( pos >= buffer->write_idx) 
     {
@@ -133,9 +128,8 @@ static char DEFUN(at,(buffer, pos),
     return buffer->ptr[pos];
 }
 
-static void DEFUN(catchar,(buffer, ch), 
-	   string_type *buffer AND
-	   char ch)
+static void
+catchar (string_type *buffer, char ch)
 {
   if (buffer->write_idx == buffer->size) 
   {
@@ -147,9 +141,8 @@ static void DEFUN(catchar,(buffer, ch),
 }
 
 
-static void DEFUN(overwrite_string,(dst,   src),
-	   string_type *dst AND
-	   string_type *src)
+static void
+overwrite_string (string_type *dst, string_type *src)
 {
     free(dst->ptr);
     dst->size = src->size;
@@ -157,9 +150,8 @@ static void DEFUN(overwrite_string,(dst,   src),
     dst->ptr = src->ptr;
 }
 
-static void DEFUN(catstr,(dst, src),
-	   string_type *dst AND
-	   string_type *src)
+static void
+catstr (string_type *dst, string_type *src)
 {
     unsigned int i;
     for (i = 0; i < src->write_idx; i++) 
@@ -169,9 +161,8 @@ static void DEFUN(catstr,(dst, src),
 }
 
 
-static void DEFUN(cattext,(buffer, string),
-	   string_type *buffer AND
-	   char *string)
+static void
+cattext (string_type *buffer, char *string)
 {
     
     while (*string) 
@@ -181,10 +172,8 @@ static void DEFUN(cattext,(buffer, string),
     }
 }
 
-static void DEFUN(catbuf,(buffer, buf, len),
-	   string_type *buffer AND
-	   char *buf AND
-	   unsigned int len)
+static void
+catbuf (string_type *buffer, char *buf, unsigned int len)
 {
     
     while (len--) 
@@ -197,9 +186,7 @@ static void DEFUN(catbuf,(buffer, buf, len),
 
 
 static unsigned int 
-DEFUN(skip_white_and_stars,(src, idx),
-      string_type *src AND
-      unsigned int idx)
+skip_white_and_stars (string_type *src, unsigned int idx)
 {
     while (isspace(at(src,idx)) 
 	   || (at(src,idx) == '*' && at(src,idx +1) !='/')) 
@@ -216,7 +203,7 @@ string_type *tos;
 
 unsigned int idx = 0; /* Pos in input buffer */
 string_type *ptr; /* and the buffer */
-typedef void (*stinst_type)(NOARGS);
+typedef void (*stinst_type)(void);
 stinst_type *pc;
 stinst_type sstack[STACK];
 stinst_type *ssp = &sstack[0];
@@ -238,10 +225,10 @@ struct dict_struct
     
 };
 typedef struct dict_struct dict_type;
-#define WORD(x) static void x(NOARGS)
+#define WORD(x) static void x(void)
 
-static void DEFUN(exec,(word),
-		  dict_type *word)
+static void
+exec (dict_type *word)
 {
     pc = word->code;
     while (*pc) 
@@ -299,9 +286,7 @@ WORD(push_text)
  */
 
 static void 
-DEFUN(remove_noncomments,(src,dst),
-	   string_type *src AND
-	   string_type *dst)
+remove_noncomments (string_type *src, string_type *dst)
 {
     unsigned int idx = 0;
     
@@ -354,7 +339,7 @@ DEFUN(remove_noncomments,(src,dst),
  */
 
 static void
-DEFUN_VOID(exfunstuff)
+exfunstuff (void)
 {
     unsigned int openp;
     unsigned int fname;
@@ -482,7 +467,7 @@ WORD(manglecomments)
 
 /* Mod tos so that only lines with leading dots remain */
 static void
-DEFUN_VOID(outputdots)
+outputdots (void)
 {
     unsigned int idx = 0;
     string_type out;
@@ -726,9 +711,7 @@ WORD(do_fancy_stuff)
 }
 /* A command is all upper case,and alone on a line */
 static int 
-DEFUN( iscommand,(ptr, idx),
-      string_type *ptr AND
-      unsigned int idx)
+iscommand (string_type *ptr, unsigned int idx)
 {
     unsigned int len = 0;
 
@@ -757,10 +740,7 @@ DEFUN( iscommand,(ptr, idx),
 
 
 unsigned int
-DEFUN(copy_past_newline,(ptr, idx, dst),
-      string_type *ptr AND
-      unsigned int idx AND
-      string_type *dst)
+copy_past_newline (string_type *ptr, unsigned int idx, string_type *dst)
 {
     while (at(ptr, idx) && at(ptr, idx) != '\n') 
     {
@@ -1031,9 +1011,7 @@ WORD(warn)
 }
 
 char *
-DEFUN(nextword,(string, word),
-      char *string AND
-      char **word)
+nextword (char *string, char **word)
 {
   char *word_start;
   int idx;
@@ -1109,8 +1087,7 @@ DEFUN(nextword,(string, word),
 }
 dict_type *root;
 dict_type *
-DEFUN(lookup_word,(word),
-      char *word)
+lookup_word (char *word)
 {
     dict_type *ptr = root;
     while (ptr) {
@@ -1124,7 +1101,8 @@ DEFUN(lookup_word,(word),
     
 }
 
-static int DEFUN_VOID(perform)
+static int
+perform (void)
 {
     tos = stack;
     int errors = 0;
@@ -1164,8 +1142,7 @@ static int DEFUN_VOID(perform)
 }
 
 dict_type *
-DEFUN(newentry,(word),
-      char *word)
+newentry (char *word)
 {
     dict_type *new = (dict_type *)malloc(sizeof(dict_type));
     new->word = word;
@@ -1180,9 +1157,7 @@ DEFUN(newentry,(word),
 
 
 unsigned int
-DEFUN(add_to_definition,(entry, word), 
-      dict_type *entry AND
-      stinst_type word)
+add_to_definition (dict_type *entry, stinst_type word)
 {
     if (entry->code_end == entry->code_length) 
     {
@@ -1203,9 +1178,7 @@ return     entry->code_end++;
 
 
 void
-DEFUN(add_intrinsic,(name, func),
-      char *name AND
-      void (*func)(NOARGS))
+add_intrinsic (char *name, void (*func)(void))
 {
     dict_type *new = newentry(name);
     add_to_definition(new, func);
@@ -1213,8 +1186,7 @@ DEFUN(add_intrinsic,(name, func),
 }
 
 void
-DEFUN(add_var,(name),
-      char *name)
+add_var (char *name)
 {
     dict_type *new = newentry(name);
     add_to_definition(new, push_number);
@@ -1227,9 +1199,7 @@ DEFUN(add_var,(name),
 
 
 int
-DEFUN(compile, (string), 
-      char *string)
-
+compile (char *string)
 {
     int  ret=0;
     /* add words to the dictionary */
@@ -1312,7 +1282,8 @@ return(ret);
 }
 
  
-static void DEFUN_VOID(bang)
+static void
+bang (void)
 {
 *(uintptr_t *)((isp[0])) = isp[-1];
 isp-=2;
@@ -1335,9 +1306,8 @@ WORD(hello)
 
 
 
-static void DEFUN(read_in, (str, file), 
-	   string_type *str AND
-		  FILE *file)
+static void
+read_in (string_type *str, FILE *file)
 {
     char buff[10000];    
     unsigned int r;
@@ -1355,16 +1325,16 @@ static void DEFUN(read_in, (str, file),
 
 
 #if 0
-static void DEFUN_VOID(usage)
+static void
+usage (void)
 {
     fprintf(stderr,"usage: -[i|v] -f macrofile <file >file\n");
     exit(33);    
 }
 #endif
 
-int DEFUN(main,(ac,av),
-int ac AND
-char *av[])
+int
+main (int ac, char *av[])
 {
     unsigned int i;
     int status = 0;
