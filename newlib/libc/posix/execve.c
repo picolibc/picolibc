@@ -10,8 +10,7 @@
 
 
 int
-_DEFUN(execve, (path, argv, envp),
-      const char *path,
+execve (const char *path,
       char * const argv[],
       char * const envp[])
 {

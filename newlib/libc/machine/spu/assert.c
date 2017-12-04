@@ -10,8 +10,7 @@
 
 /* func can be NULL, in which case no function information is given.  */
 void
-_DEFUN (__assert_func, (file, line, func, failedexpr),
-	const char *file,
+__assert_func (const char *file,
 	int line,
 	const char *func,
 	const char *failedexpr)
@@ -31,8 +30,7 @@ _DEFUN (__assert_func, (file, line, func, failedexpr),
 }
 
 void
-_DEFUN (__assert, (file, line, failedexpr),
-	const char *file,
+__assert (const char *file,
 	int line,
 	const char *failedexpr)
 {

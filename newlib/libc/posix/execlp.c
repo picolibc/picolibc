@@ -13,8 +13,7 @@
 #include <stdarg.h>
 
 int
-_DEFUN(execlp, (path, arg0, ...),
-      const char *path,
+execlp (const char *path,
       const char *arg0, ...)
 
 #else
@@ -22,8 +21,7 @@ _DEFUN(execlp, (path, arg0, ...),
 #include <varargs.h>
 
 int
-_DEFUN(execlp, (path, arg0, va_alist),
-     const char *path,
+execlp (const char *path,
      const char *arg0,
      va_dcl)
 

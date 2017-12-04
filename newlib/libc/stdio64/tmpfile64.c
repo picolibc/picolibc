@@ -53,8 +53,7 @@ Supporting OS subroutines required: <<close>>, <<fstat>>, <<getpid>>,
 #ifdef __LARGE64_FILES
 
 FILE *
-_DEFUN (_tmpfile64_r, (ptr),
-	struct _reent *ptr)
+_tmpfile64_r (struct _reent *ptr)
 {
   FILE *fp;
   int e;

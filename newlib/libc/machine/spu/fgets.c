@@ -46,8 +46,7 @@ typedef struct
 #ifndef _REENT_ONLY
 
 char *
-_DEFUN (fgets, (buf, n, fp),
-	char *__restrict buf,
+fgets (char *__restrict buf,
 	int n,
 	FILE *__restrict fp)
 {

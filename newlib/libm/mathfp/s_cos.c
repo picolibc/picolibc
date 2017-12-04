@@ -20,8 +20,7 @@
 #ifndef _DOUBLE_IS_32BITS
 
 double
-_DEFUN (cos, (double),
-        double x)
+cos (double x)
 {
   return (sine (x, 1));
 }

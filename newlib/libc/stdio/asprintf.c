@@ -25,8 +25,7 @@
 #include "local.h"
 
 int
-_DEFUN(_asprintf_r, (ptr, strp, fmt),
-       struct _reent *ptr,
+_asprintf_r (struct _reent *ptr,
        char **__restrict strp,
        const char *__restrict fmt, ...)
 {
@@ -59,8 +58,7 @@ _EXFUN(_asiprintf_r, (struct _reent *, char **, const char *, ...)
 #ifndef _REENT_ONLY
 
 int
-_DEFUN(asprintf, (strp, fmt),
-       char **__restrict strp,
+asprintf (char **__restrict strp,
        const char *__restrict fmt, ...)
 {
   int ret;

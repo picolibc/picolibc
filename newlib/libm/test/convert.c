@@ -49,8 +49,7 @@ test_atoff (void)
 
 static
 void 
-_DEFUN(iterate,(func, name),
-       void _EXFUN((*func),(void)),
+iterate (void _EXFUN((*func),(void)),
        char *name)
 {
 
@@ -70,8 +69,7 @@ int_type *p = ints;
 
 
 static void
-_DEFUN(int_iterate,(func, name),
-       void (*func)(),
+int_iterate (void (*func)(),
        char *name)
 {
   newfunc(name);
@@ -86,8 +84,7 @@ _DEFUN(int_iterate,(func, name),
 }
 
 void
-_DEFUN(test_strtol_base,(base, pi, string),
-       int base,
+test_strtol_base (int base,
        int_scan_type *pi,
        char *string)
 {
@@ -206,8 +203,7 @@ test_fcvt (void)
 
 static void
 
-_DEFUN(diterate,(func, name),
-       void (*func)(),
+diterate (void (*func)(),
        char *name)
 {
   newfunc(name);

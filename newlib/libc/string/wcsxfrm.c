@@ -36,8 +36,7 @@ PORTABILITY
 #include <wchar.h>
 
 size_t
-_DEFUN (wcsxfrm, (a, b, n),
-	wchar_t *__restrict a,
+wcsxfrm (wchar_t *__restrict a,
 	const wchar_t *__restrict b,
 	size_t n)
 

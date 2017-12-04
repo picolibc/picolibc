@@ -23,8 +23,7 @@
 #define FLOAT_EXP_OFFS 127
 
 float
-_DEFUN (ldexpf, (float, int),
-        float d,
+ldexpf (float d,
         int e)
 {
   int exp;

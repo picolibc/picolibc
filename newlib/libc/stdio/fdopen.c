@@ -53,8 +53,7 @@ PORTABILITY
 #include <_syslist.h>
 
 FILE *
-_DEFUN(_fdopen_r, (ptr, fd, mode),
-       struct _reent *ptr,
+_fdopen_r (struct _reent *ptr,
        int fd,
        const char *mode)
 {
@@ -123,8 +122,7 @@ _DEFUN(_fdopen_r, (ptr, fd, mode),
 #ifndef _REENT_ONLY
 
 FILE *
-_DEFUN(fdopen, (fd, mode),
-       int fd,
+fdopen (int fd,
        const char *mode)
 {
   return _fdopen_r (_REENT, fd, mode);

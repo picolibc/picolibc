@@ -34,8 +34,7 @@ POSSIBILITY OF SUCH DAMAGE.
 #ifndef _REENT_ONLY
 /* Just a stub for now.  */
 FILE *
-_DEFUN (fdopen, (fd, mode),
-        int fd,
+fdopen (int fd,
         const char *mode)
 {
   errno = ENOSYS;

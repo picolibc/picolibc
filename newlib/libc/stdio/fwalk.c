@@ -28,8 +28,7 @@ static char sccsid[] = "%W% (Berkeley) %G%";
 #include "local.h"
 
 int
-_DEFUN(_fwalk, (ptr, function),
-       struct _reent *ptr,
+_fwalk (struct _reent *ptr,
        register int (*function) (FILE *))
 {
   register FILE *fp;
@@ -55,8 +54,7 @@ _DEFUN(_fwalk, (ptr, function),
 /* Special version of __fwalk where the function pointer is a reentrant
    I/O function (e.g. _fclose_r).  */
 int
-_DEFUN(_fwalk_reent, (ptr, reent_function),
-       struct _reent *ptr,
+_fwalk_reent (struct _reent *ptr,
        register int (*reent_function) (struct _reent *, FILE *))
 {
   register FILE *fp;

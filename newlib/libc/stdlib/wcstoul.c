@@ -192,8 +192,7 @@ _wcstoul_l (struct _reent *rptr, const wchar_t *nptr, wchar_t **endptr,
 }
 
 unsigned long
-_DEFUN (_wcstoul_r, (rptr, nptr, endptr, base),
-	struct _reent *rptr,
+_wcstoul_r (struct _reent *rptr,
 	const wchar_t *nptr,
 	wchar_t **endptr,
 	int base)
@@ -211,8 +210,7 @@ wcstoul_l (const wchar_t *__restrict s, wchar_t **__restrict ptr, int base,
 }
 
 unsigned long
-_DEFUN (wcstoul, (s, ptr, base),
-	const wchar_t *__restrict s,
+wcstoul (const wchar_t *__restrict s,
 	wchar_t **__restrict ptr,
 	int base)
 {

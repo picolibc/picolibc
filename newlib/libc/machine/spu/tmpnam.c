@@ -35,8 +35,7 @@ Author: Joel Schopp <jschopp@austin.ibm.com>
 #include "c99ppe.h"
 
 char *
-_DEFUN (tmpnam, (s),
-	char *s)
+tmpnam (char *s)
 {
   /* The return value gets written over buf
    */

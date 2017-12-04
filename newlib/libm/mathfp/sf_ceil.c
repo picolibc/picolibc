@@ -18,8 +18,7 @@
 #include "zmath.h"
 
 float
-_DEFUN (ceilf, (float),
-        float x)
+ceilf (float x)
 {
   float f, y;
 

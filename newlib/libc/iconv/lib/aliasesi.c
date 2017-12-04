@@ -48,8 +48,7 @@
  *   Returns canonical form of 'str' if success, NULL if failure.
  */
 static const char *
-_DEFUN(canonical_form, (rptr, str), 
-                       struct _reent *rptr,
+canonical_form (struct _reent *rptr,
                        const char *str)
 {
   char *p, *p1;
@@ -93,8 +92,7 @@ _DEFUN(canonical_form, (rptr, str),
  *   and sets current thread's/process's errno.
  */
 static char *
-_DEFUN(find_alias, (rptr, alias, table, len),
-                   struct _reent *rptr,
+find_alias (struct _reent *rptr,
                    const char *alias,
                    const char *table,
                    int len)
@@ -147,8 +145,7 @@ search_again:
  *   and sets current thread's/process's errno.
  */
 char *
-_DEFUN(_iconv_resolve_encoding_name, (rptr, cname, path), 
-                                     struct _reent *rptr,
+_iconv_resolve_encoding_name (struct _reent *rptr,
                                      const char *ca)
 {
   char *p = (char *)ca;

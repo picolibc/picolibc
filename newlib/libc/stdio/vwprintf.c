@@ -26,8 +26,7 @@
 #ifndef _REENT_ONLY
 
 int
-_DEFUN(vwprintf, (fmt, ap),
-       const wchar_t *__restrict fmt,
+vwprintf (const wchar_t *__restrict fmt,
        va_list ap)
 {
   struct _reent *reent = _REENT;
@@ -39,8 +38,7 @@ _DEFUN(vwprintf, (fmt, ap),
 #endif /* !_REENT_ONLY */
 
 int
-_DEFUN(_vwprintf_r, (ptr, fmt, ap),
-       struct _reent *ptr,
+_vwprintf_r (struct _reent *ptr,
        const wchar_t *fmt,
        va_list ap)
 {

@@ -51,8 +51,7 @@ PORTABILITY
 #ifndef _DOUBLE_IS_32BITS
 
 double
-_DEFUN (log10, (double),
-        double x)
+log10 (double x)
 {
   return (logarithm (x, 1));
 }

@@ -98,8 +98,7 @@ typedef struct fccookie {
 } fccookie;
 
 static _READ_WRITE_RETURN_TYPE
-_DEFUN(fcreader, (ptr, cookie, buf, n),
-       struct _reent *ptr,
+fcreader (struct _reent *ptr,
        void *cookie,
        char *buf,
        _READ_WRITE_BUFSIZE_TYPE n)
@@ -113,8 +112,7 @@ _DEFUN(fcreader, (ptr, cookie, buf, n),
 }
 
 static _READ_WRITE_RETURN_TYPE
-_DEFUN(fcwriter, (ptr, cookie, buf, n),
-       struct _reent *ptr,
+fcwriter (struct _reent *ptr,
        void *cookie,
        const char *buf,
        _READ_WRITE_BUFSIZE_TYPE n)
@@ -136,8 +134,7 @@ _DEFUN(fcwriter, (ptr, cookie, buf, n),
 }
 
 static _fpos_t
-_DEFUN(fcseeker, (ptr, cookie, pos, whence),
-       struct _reent *ptr,
+fcseeker (struct _reent *ptr,
        void *cookie,
        _fpos_t pos,
        int whence)
@@ -164,8 +161,7 @@ _DEFUN(fcseeker, (ptr, cookie, pos, whence),
 
 #ifdef __LARGE64_FILES
 static _fpos64_t
-_DEFUN(fcseeker64, (ptr, cookie, pos, whence),
-       struct _reent *ptr,
+fcseeker64 (struct _reent *ptr,
        void *cookie,
        _fpos64_t pos,
        int whence)
@@ -180,8 +176,7 @@ _DEFUN(fcseeker64, (ptr, cookie, pos, whence),
 #endif /* __LARGE64_FILES */
 
 static int
-_DEFUN(fccloser, (ptr, cookie),
-       struct _reent *ptr,
+fccloser (struct _reent *ptr,
        void *cookie)
 {
   int result = 0;
@@ -197,8 +192,7 @@ _DEFUN(fccloser, (ptr, cookie),
 }
 
 FILE *
-_DEFUN(_fopencookie_r, (ptr, cookie, mode, functions),
-       struct _reent *ptr,
+_fopencookie_r (struct _reent *ptr,
        void *cookie,
        const char *mode,
        cookie_io_functions_t functions)
@@ -253,8 +247,7 @@ _DEFUN(_fopencookie_r, (ptr, cookie, mode, functions),
 
 #ifndef _REENT_ONLY
 FILE *
-_DEFUN(fopencookie, (cookie, mode, functions),
-       void *cookie,
+fopencookie (void *cookie,
        const char *mode,
        cookie_io_functions_t functions)
 {

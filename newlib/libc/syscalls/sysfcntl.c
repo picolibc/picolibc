@@ -5,8 +5,7 @@
 #include <errno.h>
 
 int
-_DEFUN (fcntl, (fd, flag, arg),
-     int fd,
+fcntl (int fd,
      int flag,
      int arg)
 {

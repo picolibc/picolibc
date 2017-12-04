@@ -59,8 +59,7 @@ Supporting OS subroutines required: <<close>>, <<fstat>>, <<isatty>>,
 #include <stdio.h>
 
 int
-_DEFUN(_fsetpos_r, (ptr, iop, pos),
-       struct _reent * ptr,
+_fsetpos_r (struct _reent * ptr,
        FILE * iop,
        const _fpos_t * pos)
 {
@@ -74,8 +73,7 @@ _DEFUN(_fsetpos_r, (ptr, iop, pos),
 #ifndef _REENT_ONLY
 
 int
-_DEFUN(fsetpos, (iop, pos),
-       FILE * iop,
+fsetpos (FILE * iop,
        const _fpos_t * pos)
 {
   return _fsetpos_r (_REENT, iop, pos);

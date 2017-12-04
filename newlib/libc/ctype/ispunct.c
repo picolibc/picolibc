@@ -45,7 +45,7 @@ No supporting OS subroutines are required.
 
 #undef ispunct
 int
-_DEFUN(ispunct,(c),int c)
+ispunct (int c)
 {
 	return(__CTYPE_PTR[c+1] & _P);
 }

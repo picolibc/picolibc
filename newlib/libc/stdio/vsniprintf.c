@@ -32,8 +32,7 @@ static char sccsid[] = "%W% (Berkeley) %G%";
 #ifndef _REENT_ONLY
 
 int
-_DEFUN(vsniprintf, (str, size, fmt, ap),
-       char *str,
+vsniprintf (char *str,
        size_t size,
        const char *fmt,
        va_list ap)
@@ -44,8 +43,7 @@ _DEFUN(vsniprintf, (str, size, fmt, ap),
 #endif /* !_REENT_ONLY */
 
 int
-_DEFUN(_vsniprintf_r, (ptr, str, size, fmt, ap),
-       struct _reent *ptr,
+_vsniprintf_r (struct _reent *ptr,
        char *str,
        size_t size,
        const char *fmt,

@@ -42,7 +42,7 @@ No supporting OS subroutines are required.
 
 #undef isblank
 int
-_DEFUN(isblank,(c),int c)
+isblank (int c)
 {
 	return ((__CTYPE_PTR[c+1] & _B) || (c == '\t'));
 }

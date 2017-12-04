@@ -44,8 +44,7 @@ Supporting OS subroutines required: <<close>>, <<fstat>>, <<isatty>>,
 #ifndef _REENT_ONLY
 
 void *
-_DEFUN (vec_calloc, (n, size),
-	size_t n,
+vec_calloc (size_t n,
 	size_t size)
 {
   return _vec_calloc_r (_REENT, n, size);

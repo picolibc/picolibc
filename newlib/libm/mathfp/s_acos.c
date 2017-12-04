@@ -75,8 +75,7 @@ MATHREF
 #ifndef _DOUBLE_IS_32BITS
 
 double
-_DEFUN (acos, (double),
-        double x)
+acos (double x)
 {
   return (asine (x, 1));
 }

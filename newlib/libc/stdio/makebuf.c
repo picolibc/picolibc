@@ -35,8 +35,7 @@
  */
 
 void
-_DEFUN(__smakebuf_r, (ptr, fp),
-       struct _reent *ptr,
+__smakebuf_r (struct _reent *ptr,
        register FILE *fp)
 {
   register void *p;
@@ -76,8 +75,7 @@ _DEFUN(__smakebuf_r, (ptr, fp),
  * Internal routine to determine `proper' buffering for a file.
  */
 int
-_DEFUN(__swhatbuf_r, (ptr, fp, bufsize, couldbetty),
-	struct _reent *ptr,
+__swhatbuf_r (struct _reent *ptr,
 	FILE *fp,
 	size_t *bufsize,
 	int *couldbetty)

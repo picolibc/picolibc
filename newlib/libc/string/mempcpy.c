@@ -43,8 +43,7 @@ PORTABILITY
 #define TOO_SMALL(LEN)  ((LEN) < BIGBLOCKSIZE)
 
 void *
-_DEFUN (mempcpy, (dst0, src0, len0),
-	void *dst0,
+mempcpy (void *dst0,
 	const void *src0,
 	size_t len0)
 {

@@ -59,8 +59,7 @@ QUICKREF
 #define TOO_SMALL(LEN) ((LEN) < sizeof (long))
 
 char *
-_DEFUN (strncpy, (dst0, src0),
-	char *__restrict dst0,
+strncpy (char *__restrict dst0,
 	const char *__restrict src0,
 	size_t count)
 {

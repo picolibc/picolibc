@@ -52,8 +52,7 @@ int _dummy_raise;
 #ifndef _REENT_ONLY
 
 int
-_DEFUN (raise, (sig),
-	int sig)
+raise (int sig)
 {
   return _raise_r (_REENT, sig);
 }
@@ -61,8 +60,7 @@ _DEFUN (raise, (sig),
 #endif
 
 int
-_DEFUN (_raise_r, (reent, sig),
-	struct _reent *reent,
+_raise_r (struct _reent *reent,
 	int sig)
 {
   return _kill_r (reent, _getpid_r (reent), sig);

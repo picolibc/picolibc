@@ -35,8 +35,7 @@
 #ifndef _REENT_ONLY
 
 int
-_DEFUN(vsscanf, (str, fmt, ap), 
-       const char *__restrict str,
+vsscanf (const char *__restrict str,
        const char *__restrict fmt,
        va_list ap)
 {
@@ -52,8 +51,7 @@ _EXFUN(vsiscanf, (const char *, const char *, __VALIST)
 #endif /* !_REENT_ONLY */
 
 int
-_DEFUN(_vsscanf_r, (ptr, str, fmt, ap),
-       struct _reent *ptr,
+_vsscanf_r (struct _reent *ptr,
        const char *__restrict str,
        const char *__restrict fmt,
        va_list ap)

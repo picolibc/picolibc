@@ -81,8 +81,7 @@ Supporting OS subroutines required: <<close>>, <<fstat>>, <<isatty>>,
 #include "local.h"
 
 int
-_DEFUN(_fseek_r, (ptr, fp, offset, whence),
-       struct _reent *ptr,
+_fseek_r (struct _reent *ptr,
        register FILE *fp,
        long offset,
        int whence)
@@ -93,8 +92,7 @@ _DEFUN(_fseek_r, (ptr, fp, offset, whence),
 #ifndef _REENT_ONLY
 
 int
-_DEFUN(fseek, (fp, offset, whence),
-       register FILE *fp,
+fseek (register FILE *fp,
        long offset,
        int whence)
 {

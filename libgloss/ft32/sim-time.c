@@ -21,8 +21,7 @@
  * _times -- no clock, so return an error.
  */
 int
-_DEFUN (_times, _times (buf),
-        struct tms *buf)
+_times (struct tms *buf)
 {
   errno = EINVAL;
   return (-1);
@@ -33,8 +32,7 @@ _DEFUN (_times, _times (buf),
  * microseconds.
  */
 int
-_DEFUN (_gettimeofday, _gettimeofday (tv, tz),
-        struct timeval *tv,
+_gettimeofday (struct timeval *tv,
         void *tzvp)
 {
   struct timezone *tz = tzvp;

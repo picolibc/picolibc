@@ -7,8 +7,7 @@
 #include "local.h"
 
 int
-_DEFUN (_wctomb_r, (r, s, wchar, state),
-        struct _reent *r,
+_wctomb_r (struct _reent *r,
         char          *s,
         wchar_t        _wchar,
         mbstate_t     *state)
@@ -17,8 +16,7 @@ _DEFUN (_wctomb_r, (r, s, wchar, state),
 }
 
 int
-_DEFUN (__ascii_wctomb, (r, s, wchar, state),
-        struct _reent *r,
+__ascii_wctomb (struct _reent *r,
         char          *s,
         wchar_t        _wchar,
         mbstate_t     *state)
@@ -50,8 +48,7 @@ _DEFUN (__ascii_wctomb, (r, s, wchar, state),
 #define __state __count
 
 int
-_DEFUN (__utf8_wctomb, (r, s, wchar, state),
-        struct _reent *r,
+__utf8_wctomb (struct _reent *r,
         char          *s,
         wchar_t        _wchar,
         mbstate_t     *state)
@@ -144,8 +141,7 @@ _DEFUN (__utf8_wctomb, (r, s, wchar, state),
    because the underlying OS requires wchar_t == UTF-16. */
 #ifndef __CYGWIN__
 int
-_DEFUN (__sjis_wctomb, (r, s, wchar, state),
-        struct _reent *r,
+__sjis_wctomb (struct _reent *r,
         char          *s,
         wchar_t        _wchar,
         mbstate_t     *state)
@@ -178,8 +174,7 @@ _DEFUN (__sjis_wctomb, (r, s, wchar, state),
 }
 
 int
-_DEFUN (__eucjp_wctomb, (r, s, wchar, state),
-        struct _reent *r,
+__eucjp_wctomb (struct _reent *r,
         char          *s,
         wchar_t        _wchar,
         mbstate_t     *state)
@@ -218,8 +213,7 @@ _DEFUN (__eucjp_wctomb, (r, s, wchar, state),
 }
 
 int
-_DEFUN (__jis_wctomb, (r, s, wchar, state),
-        struct _reent *r,
+__jis_wctomb (struct _reent *r,
         char          *s,
         wchar_t        _wchar,
         mbstate_t     *state)

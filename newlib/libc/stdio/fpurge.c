@@ -60,8 +60,7 @@ No supporting OS subroutines are required.
 /* Discard I/O from a single file.  */
 
 int
-_DEFUN(_fpurge_r, (ptr, fp),
-       struct _reent *ptr,
+_fpurge_r (struct _reent *ptr,
        register FILE * fp)
 {
   int t;
@@ -93,8 +92,7 @@ _DEFUN(_fpurge_r, (ptr, fp),
 #ifndef _REENT_ONLY
 
 int
-_DEFUN(fpurge, (fp),
-       register FILE * fp)
+fpurge (register FILE * fp)
 {
   return _fpurge_r (_REENT, fp);
 }
@@ -102,8 +100,7 @@ _DEFUN(fpurge, (fp),
 #ifndef __rtems__
 
 void
-_DEFUN(__fpurge, (fp),
-       register FILE * fp)
+__fpurge (register FILE * fp)
 {
   _fpurge_r (_REENT, fp);
 }

@@ -17,8 +17,7 @@
 #include <_ansi.h>
 
 void
-_DEFUN (_exit, (rc),
-	int rc)
+_exit (int rc)
 {
   while (1)
     asm volatile ("EXCPT 0;");

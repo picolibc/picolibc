@@ -18,8 +18,7 @@
  * close -- We don't need to do anything, but pretend we did.
  */
 int
-_DEFUN (_close ,(fd),
-       int fd)
+_close  (int fd)
 {
   return (0);
 }

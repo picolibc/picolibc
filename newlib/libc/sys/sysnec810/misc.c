@@ -30,8 +30,7 @@ isatty() {
 }
 
 int
-_DEFUN(_fstat,(file, st),
-       int file,
+_fstat (int file,
        struct stat *st)
 {
   st->st_mode = S_IFCHR;

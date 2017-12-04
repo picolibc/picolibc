@@ -45,8 +45,7 @@ _EXFUN(find_encoding_name, (const char *searchee,
  */
 
 static void *
-_DEFUN(ucs_based_conversion_open, (rptr, to, from),
-                                  struct _reent *rptr,
+ucs_based_conversion_open (struct _reent *rptr,
                                   const char *to,
                                   const char *from)
 {
@@ -123,8 +122,7 @@ error:
 
 
 static size_t
-_DEFUN(ucs_based_conversion_close, (rptr, data),
-                                   struct _reent *rptr,
+ucs_based_conversion_close (struct _reent *rptr,
                                    void *data)
 {
   iconv_ucs_conversion_t *uc;
@@ -144,9 +142,7 @@ _DEFUN(ucs_based_conversion_close, (rptr, data),
 
 
 static size_t
-_DEFUN(ucs_based_conversion_convert,
-                 (rptr, data, inbuf, inbytesleft, outbuf, outbytesleft, flags),
-                 struct _reent *rptr,
+ucs_based_conversion_convert (struct _reent *rptr,
                  void *data,
                  const unsigned char **inbuf,
                  size_t *inbytesleft,
@@ -238,8 +234,7 @@ _DEFUN(ucs_based_conversion_convert,
 
 
 static int
-_DEFUN(ucs_based_conversion_get_mb_cur_max, (data, direction),
-                                            void *data,
+ucs_based_conversion_get_mb_cur_max (void *data,
                                             int direction)
 {
   iconv_ucs_conversion_t *uc = (iconv_ucs_conversion_t *)data;
@@ -252,8 +247,7 @@ _DEFUN(ucs_based_conversion_get_mb_cur_max, (data, direction),
 
 
 static void
-_DEFUN(ucs_based_conversion_get_state, (data, state, direction),
-                                       void *data,
+ucs_based_conversion_get_state (void *data,
                                        mbstate_t *state,
                                        int direction)
 {
@@ -280,8 +274,7 @@ _DEFUN(ucs_based_conversion_get_state, (data, state, direction),
 
 
 static int
-_DEFUN(ucs_based_conversion_set_state, (data, state, direction),
-                                       void *data,
+ucs_based_conversion_set_state (void *data,
                                        mbstate_t *state,
                                        int direction)
 {
@@ -302,8 +295,7 @@ _DEFUN(ucs_based_conversion_set_state, (data, state, direction),
 }
 
 static int
-_DEFUN(ucs_based_conversion_is_stateful, (data, direction),
-                                         void *data,
+ucs_based_conversion_is_stateful (void *data,
                                          int direction)
 {
   iconv_ucs_conversion_t *uc = (iconv_ucs_conversion_t *)data;
@@ -342,8 +334,7 @@ _iconv_ucs_conversion_handlers =
  */
 
 static int
-_DEFUN(find_encoding_name, (searchee, names),
-                           const char *searchee,
+find_encoding_name (const char *searchee,
                            const char **names)
 {
   const char *p;

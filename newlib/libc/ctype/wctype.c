@@ -76,8 +76,7 @@ No supporting OS subroutines are required.
 #include "local.h"
 
 wctype_t
-_DEFUN (_wctype_r, (r, c), 
-	struct _reent *r,
+_wctype_r (struct _reent *r,
 	const char *c)
 {
   switch (*c)
@@ -135,8 +134,7 @@ _DEFUN (_wctype_r, (r, c),
 
 #ifndef _REENT_ONLY
 wctype_t
-_DEFUN (wctype, (c),
-	const char *c)
+wctype (const char *c)
 {
   return _wctype_r (_REENT, c);
 }

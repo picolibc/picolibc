@@ -33,8 +33,7 @@ No supporting OS subroutine calls are required.
 #include <stdlib.h>
 
 long
-_DEFUN (labs, (x),
-	long x)
+labs (long x)
 {
   if (x < 0)
     {

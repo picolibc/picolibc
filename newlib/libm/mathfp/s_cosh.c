@@ -63,8 +63,7 @@ QUICKREF
 #ifndef _DOUBLE_IS_32BITS
 
 double
-_DEFUN (cosh, (double),
-        double x)
+cosh (double x)
 {
   return (sineh (x, 1));
 }

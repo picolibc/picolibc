@@ -5,8 +5,7 @@
 #include <unistd.h>
 
 int
-_DEFUN (stat, (file, pstat),
-     const char *file,
+stat (const char *file,
      struct stat *pstat)
 {
   return _stat_r (_REENT, file, pstat);

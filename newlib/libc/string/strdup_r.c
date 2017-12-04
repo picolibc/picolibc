@@ -3,8 +3,7 @@
 #include <string.h>
 
 char *
-_DEFUN (_strdup_r, (reent_ptr, str), 
-        struct _reent *reent_ptr,
+_strdup_r (struct _reent *reent_ptr,
         const char   *str)
 {
   size_t len = strlen (str) + 1;

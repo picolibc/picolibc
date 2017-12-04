@@ -9,8 +9,7 @@
 #define abs(x) (((x) < 0) ? -(x) : (x))
 
 double
-_DEFUN (__adjust, (ptr, acc, dexp, sign),
-	struct _reent *ptr,
+__adjust (struct _reent *ptr,
 	double *acc,
 	int dexp,
 	int sign)

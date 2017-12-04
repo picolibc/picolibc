@@ -4,8 +4,7 @@
 #include <unistd.h>
 
 off_t
-_DEFUN (lseek, (fd, pos, whence),
-     int fd,
+lseek (int fd,
      off_t pos,
      int whence)
 {

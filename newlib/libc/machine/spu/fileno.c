@@ -37,8 +37,7 @@ Author: Joel Schopp <jschopp@austin.ibm.com>
 #ifndef _REENT_ONLY
 
 int
-_DEFUN (fileno, (fp),
-	FILE *fp)
+fileno (FILE *fp)
 
 {
   int ret;

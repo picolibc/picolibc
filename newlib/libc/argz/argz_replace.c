@@ -13,8 +13,7 @@
 #include "buf_findstr.h"
 
 error_t
-_DEFUN (argz_replace, (argz, argz_len, str, with, replace_count),
-       char **argz,
+argz_replace (char **argz,
        size_t *argz_len,
        const char *str,
        const char *with,

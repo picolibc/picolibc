@@ -57,7 +57,7 @@ algorithm as <<rand>>.
 #include <reent.h>
 
 void
-_DEFUN (srandom, (seed), unsigned int seed)
+srandom (unsigned int seed)
 {
   struct _reent *reent = _REENT;
 

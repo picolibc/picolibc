@@ -61,8 +61,7 @@ No supporting OS subroutines are required.
 #include <wchar.h>
 
 wchar_t *
-_DEFUN (wmemcpy, (d, s, n),
-	wchar_t *__restrict d,
+wmemcpy (wchar_t *__restrict d,
 	const wchar_t *__restrict s,
 	size_t n)
 {

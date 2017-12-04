@@ -182,8 +182,7 @@ typedef union
 #ifndef _REENT_ONLY
 
 int
-_DEFUN (vfscanf, (fp, fmt, ap), 
-    register FILE *__restrict fp,
+vfscanf (register FILE *__restrict fp,
     const char *__restrict fmt,
     va_list ap)
 {
@@ -203,8 +202,7 @@ __svfscanf (fp, fmt0, ap)
 #endif /* !_REENT_ONLY */
 
 int
-_DEFUN (_vfscanf_r, (data, fp, fmt, ap),
-    struct _reent *data,
+_vfscanf_r (struct _reent *data,
     register FILE *__restrict fp,
     const char *__restrict fmt,
     va_list ap)

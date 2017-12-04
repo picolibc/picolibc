@@ -50,8 +50,7 @@ effects vary with the locale.
 #include "local.h"
 
 int
-_DEFUN (mbtowc, (pwc, s, n),
-        wchar_t *__restrict pwc,
+mbtowc (wchar_t *__restrict pwc,
         const char *__restrict s,
         size_t n)
 {

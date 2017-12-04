@@ -20,8 +20,7 @@
  *         we return an error.
  */
 int
-_DEFUN (open, (buf, flags, mode),
-       const char *buf,
+open (const char *buf,
        int flags,
        int mode)
 {

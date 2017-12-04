@@ -43,7 +43,7 @@ No supporting OS subroutines are required.
 
 #undef isalpha
 int
-_DEFUN(isalpha,(c),int c)
+isalpha (int c)
 {
 	return(__CTYPE_PTR[c+1] & (_U|_L));
 }

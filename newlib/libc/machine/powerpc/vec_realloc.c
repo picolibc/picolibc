@@ -7,8 +7,7 @@
 #ifndef _REENT_ONLY
 
 void *
-_DEFUN (vec_realloc, (ap, nbytes),
-	void *ap,
+vec_realloc (void *ap,
 	size_t nbytes)
 {
   return _vec_realloc_r (_REENT, ap, nbytes);

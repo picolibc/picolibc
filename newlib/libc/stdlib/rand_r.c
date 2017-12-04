@@ -22,7 +22,7 @@
 */
       
 int
-_DEFUN (rand_r, (seed), unsigned int *seed)
+rand_r (unsigned int *seed)
 {
         long k;
         long s = (long)(*seed);

@@ -85,8 +85,7 @@ static const double p[] = { -0.13688768894191926929e+2,
                      -0.83758299368150059274 };
 
 double
-_DEFUN (atangent, (double, double, double, int),
-        double x,
+atangent (double x,
         double v,
         double u,
         int arctan2)

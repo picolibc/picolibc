@@ -30,8 +30,7 @@ No supporting OS subroutine calls are required.
 #include <stdlib.h>
 
 char *
-_DEFUN (__itoa, (value, str, base),
-        int value,
+__itoa (int value,
         char *str,
         int base)
 {
@@ -60,8 +59,7 @@ _DEFUN (__itoa, (value, str, base),
 }
 
 char *  
-_DEFUN (itoa, (value, str, base),
-        int value,
+itoa (int value,
         char *str,
         int base)
 {

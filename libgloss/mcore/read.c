@@ -21,8 +21,7 @@ extern char inbyte (void);
  *          we only have stdin.
  */
 int
-_DEFUN (_read, (fd, buf, nbytes),
-       int fd,
+_read (int fd,
        char *buf,
        int nbytes)
 {

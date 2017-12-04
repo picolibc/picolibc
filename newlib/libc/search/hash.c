@@ -104,8 +104,7 @@ int hash_accesses, hash_collisions, hash_expansions, hash_overflows;
 /* OPEN/CLOSE */
 
 extern DB *
-_DEFUN(__hash_open, (file, flags, mode, info, dflags),
-	const char *file,
+__hash_open (const char *file,
 	int flags,
 	int mode,
 	int dflags,

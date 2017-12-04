@@ -81,8 +81,7 @@ QUICKREF
 #endif
 
 char*
-_DEFUN (strcpy, (dst0, src0),
-	char *__restrict dst0,
+strcpy (char *__restrict dst0,
 	const char *__restrict src0)
 {
 

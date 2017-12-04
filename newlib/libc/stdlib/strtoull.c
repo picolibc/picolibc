@@ -189,8 +189,7 @@ _strtoull_l (struct _reent *rptr, const char *__restrict nptr,
 }
 
 unsigned long long
-_DEFUN (_strtoull_r, (rptr, nptr, endptr, base),
-	struct _reent *rptr,
+_strtoull_r (struct _reent *rptr,
 	const char *__restrict nptr,
 	char **__restrict endptr,
 	int base)
@@ -208,8 +207,7 @@ strtoull_l (const char *__restrict s, char **__restrict ptr, int base,
 }
 
 unsigned long long
-_DEFUN (strtoull, (s, ptr, base),
-	const char *__restrict s,
+strtoull (const char *__restrict s,
 	char **__restrict ptr,
 	int base)
 {

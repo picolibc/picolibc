@@ -5,8 +5,7 @@
 #include <time.h>
 
 char *
-_DEFUN (ctime_r, (tim_p, result),
-	const time_t * tim_p,
+ctime_r (const time_t * tim_p,
         char * result)
 
 {

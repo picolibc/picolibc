@@ -75,8 +75,7 @@ No supporting OS subroutines are required.
 #include "local.h"
 
 wctrans_t
-_DEFUN (_wctrans_r, (r, c), 
-	struct _reent *r,
+_wctrans_r (struct _reent *r,
 	const char *c)
 {
   if (!strcmp (c, "tolower"))
@@ -92,8 +91,7 @@ _DEFUN (_wctrans_r, (r, c),
 
 #ifndef _REENT_ONLY
 wctrans_t
-_DEFUN (wctrans, (c),
-	const char *c)
+wctrans (const char *c)
 {
   return _wctrans_r (_REENT, c);
 }

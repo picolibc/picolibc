@@ -30,8 +30,7 @@ static const float a[] = { 0.0, 0.785398163 };
 static const float b[] = { 1.570796326, 0.785398163 };
 
 float
-_DEFUN (asinef, (float, int),
-        float x,
+asinef (float x,
         int acosine)
 {
   int flag, i;

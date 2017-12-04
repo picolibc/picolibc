@@ -4,8 +4,7 @@
 #include <sys/times.h>
 
 clock_t
-_DEFUN (times, (buf),
-     struct tms *buf)
+times (struct tms *buf)
 {
   return _times_r (_REENT, buf);
 }

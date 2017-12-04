@@ -44,8 +44,7 @@ _NOINLINE_STATIC void
 #else
 static void
 #endif
-_DEFUN(std, (ptr, flags, file),
-            FILE *ptr,
+std (FILE *ptr,
             int flags,
             int file)
 {
@@ -124,8 +123,7 @@ struct glue_with_file {
 };
 
 struct _glue *
-_DEFUN(__sfmoreglue, (d, n),
-       struct _reent *d,
+__sfmoreglue (struct _reent *d,
        register int n)
 {
   struct glue_with_file *g;
@@ -146,8 +144,7 @@ _DEFUN(__sfmoreglue, (d, n),
  */
 
 FILE *
-_DEFUN(__sfp, (d),
-       struct _reent *d)
+__sfp (struct _reent *d)
 {
   FILE *fp;
   int n;
@@ -204,8 +201,7 @@ found:
  */
 
 void
-_DEFUN(_cleanup_r, (ptr),
-       struct _reent *ptr)
+_cleanup_r (struct _reent *ptr)
 {
   int (*cleanup_func) (struct _reent *, FILE *);
 #ifdef _STDIO_BSD_SEMANTICS
@@ -246,8 +242,7 @@ _cleanup (void)
  */
 
 void
-_DEFUN(__sinit, (s),
-       struct _reent *s)
+__sinit (struct _reent *s)
 {
   __sinit_lock_acquire ();
 
@@ -329,8 +324,7 @@ __sinit_lock_release (void)
 
 /* Walkable file locking routine.  */
 static int
-_DEFUN(__fp_lock, (ptr),
-       FILE * ptr)
+__fp_lock (FILE * ptr)
 {
   if (!(ptr->_flags2 & __SNLK))
     _flockfile (ptr);
@@ -340,8 +334,7 @@ _DEFUN(__fp_lock, (ptr),
 
 /* Walkable file unlocking routine.  */
 static int
-_DEFUN(__fp_unlock, (ptr),
-       FILE * ptr)
+__fp_unlock (FILE * ptr)
 {
   if (!(ptr->_flags2 & __SNLK))
     _funlockfile (ptr);

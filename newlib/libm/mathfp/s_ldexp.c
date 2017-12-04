@@ -63,8 +63,7 @@ PORTABILITY
 #define DOUBLE_EXP_OFFS 1023
 
 double
-_DEFUN (ldexp, (double, int),
-        double d,
+ldexp (double d,
         int e)
 {
   int exp;

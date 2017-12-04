@@ -94,7 +94,7 @@
 */
 
 _Bigint *
-_DEFUN (Balloc, (ptr, k), struct _reent *ptr, int k)
+Balloc (struct _reent *ptr, int k)
 {
   int x;
   _Bigint *rv ;
@@ -133,7 +133,7 @@ _DEFUN (Balloc, (ptr, k), struct _reent *ptr, int k)
 }
 
 void
-_DEFUN (Bfree, (ptr, v), struct _reent *ptr, _Bigint * v)
+Bfree (struct _reent *ptr, _Bigint * v)
 {
   _REENT_CHECK_MP(ptr);
   if (v)
@@ -144,8 +144,7 @@ _DEFUN (Bfree, (ptr, v), struct _reent *ptr, _Bigint * v)
 }
 
 _Bigint *
-_DEFUN (multadd, (ptr, b, m, a),
-	struct _reent *ptr,
+multadd (struct _reent *ptr,
 	_Bigint * b,
 	int m,
 	int a)
@@ -191,8 +190,7 @@ _DEFUN (multadd, (ptr, b, m, a),
 }
 
 _Bigint *
-_DEFUN (s2b, (ptr, s, nd0, nd, y9),
-	struct _reent * ptr,
+s2b (struct _reent * ptr,
 	const char *s,
 	int nd0,
 	int nd,
@@ -231,8 +229,7 @@ _DEFUN (s2b, (ptr, s, nd0, nd, y9),
 }
 
 int
-_DEFUN (hi0bits,
-	(x), register __ULong x)
+hi0bits (register __ULong x)
 {
   register int k = 0;
 
@@ -266,7 +263,7 @@ _DEFUN (hi0bits,
 }
 
 int
-_DEFUN (lo0bits, (y), __ULong *y)
+lo0bits (__ULong *y)
 {
   register int k;
   register __ULong x = *y;
@@ -316,7 +313,7 @@ _DEFUN (lo0bits, (y), __ULong *y)
 }
 
 _Bigint *
-_DEFUN (i2b, (ptr, i), struct _reent * ptr, int i)
+i2b (struct _reent * ptr, int i)
 {
   _Bigint *b;
 
@@ -327,7 +324,7 @@ _DEFUN (i2b, (ptr, i), struct _reent * ptr, int i)
 }
 
 _Bigint *
-_DEFUN (mult, (ptr, a, b), struct _reent * ptr, _Bigint * a, _Bigint * b)
+mult (struct _reent * ptr, _Bigint * a, _Bigint * b)
 {
   _Bigint *c;
   int k, wa, wb, wc;
@@ -419,8 +416,7 @@ _DEFUN (mult, (ptr, a, b), struct _reent * ptr, _Bigint * a, _Bigint * b)
 }
 
 _Bigint *
-_DEFUN (pow5mult,
-	(ptr, b, k), struct _reent * ptr, _Bigint * b, int k)
+pow5mult (struct _reent * ptr, _Bigint * b, int k)
 {
   _Bigint *b1, *p5, *p51;
   int i;
@@ -459,7 +455,7 @@ _DEFUN (pow5mult,
 }
 
 _Bigint *
-_DEFUN (lshift, (ptr, b, k), struct _reent * ptr, _Bigint * b, int k)
+lshift (struct _reent * ptr, _Bigint * b, int k)
 {
   int i, k1, n, n1;
   _Bigint *b1;
@@ -519,7 +515,7 @@ _DEFUN (lshift, (ptr, b, k), struct _reent * ptr, _Bigint * b, int k)
 }
 
 int
-_DEFUN (cmp, (a, b), _Bigint * a, _Bigint * b)
+cmp (_Bigint * a, _Bigint * b)
 {
   __ULong *xa, *xa0, *xb, *xb0;
   int i, j;
@@ -549,7 +545,7 @@ _DEFUN (cmp, (a, b), _Bigint * a, _Bigint * b)
 }
 
 _Bigint *
-_DEFUN (diff, (ptr, a, b), struct _reent * ptr,
+diff (struct _reent * ptr,
 	_Bigint * a, _Bigint * b)
 {
   _Bigint *c;
@@ -633,7 +629,7 @@ _DEFUN (diff, (ptr, a, b), struct _reent * ptr,
 }
 
 double
-_DEFUN (ulp, (_x), double _x)
+ulp (double _x)
 {
   union double_union x, a;
   register __Long L;
@@ -679,8 +675,7 @@ _DEFUN (ulp, (_x), double _x)
 }
 
 double
-_DEFUN (b2d, (a, e),
-	_Bigint * a, int *e)
+b2d (_Bigint * a, int *e)
 {
   __ULong *xa, *xa0, w, y, z;
   int k;
@@ -756,9 +751,7 @@ ret_d:
 }
 
 _Bigint *
-_DEFUN (d2b,
-	(ptr, _d, e, bits),
-	struct _reent * ptr,
+d2b (struct _reent * ptr,
 	double _d,
 	int *e,
 	int *bits)
@@ -911,7 +904,7 @@ _DEFUN (d2b,
 #undef d1
 
 double
-_DEFUN (ratio, (a, b), _Bigint * a, _Bigint * b)
+ratio (_Bigint * a, _Bigint * b)
 
 {
   union double_union da, db;
@@ -976,8 +969,7 @@ const double tinytens[] =
 
 
 double
-_DEFUN (_mprec_log10, (dig),
-	int dig)
+_mprec_log10 (int dig)
 {
   double v = 1.0;
   if (dig < 24)
@@ -991,8 +983,7 @@ _DEFUN (_mprec_log10, (dig),
 }
 
 void
-_DEFUN (copybits, (c, n, b),
-	__ULong *c,
+copybits (__ULong *c,
 	int n,
 	_Bigint *b)
 {
@@ -1020,8 +1011,7 @@ _DEFUN (copybits, (c, n, b),
 }
 
 __ULong
-_DEFUN (any_on, (b, k),
-	_Bigint *b,
+any_on (_Bigint *b,
 	int k)
 {
 	int n, nwds;

@@ -59,7 +59,7 @@ on two different systems.
 #include <reent.h>
 
 void
-_DEFUN (srand, (seed), unsigned int seed)
+srand (unsigned int seed)
 {
   struct _reent *reent = _REENT;
 

@@ -44,7 +44,7 @@ No supporting OS subroutines are required.
 #undef isascii
 
 int 
-_DEFUN(isascii,(c),int c)
+isascii (int c)
 {
 	return c >= 0 && c< 128;
 }

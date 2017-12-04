@@ -74,8 +74,7 @@ _EXFUN(load_file, (struct _reent *rptr, const char *name, int direction));
  * Interface data and functions implementation.
  */
 static size_t
-_DEFUN(table_close, (rptr, data),
-                    struct _reent *rptr,
+table_close (struct _reent *rptr,
                     void *data)
 {
   const iconv_ccs_desc_t *ccsp = (iconv_ccs_desc_t *)data;
@@ -89,8 +88,7 @@ _DEFUN(table_close, (rptr, data),
 
 #if defined (ICONV_FROM_UCS_CES_TABLE)
 static void *
-_DEFUN(table_init_from_ucs, (rptr, encoding),
-                            struct _reent *rptr,
+table_init_from_ucs (struct _reent *rptr,
                             const char *encoding)
 {
   int i;
@@ -127,8 +125,7 @@ _DEFUN(table_init_from_ucs, (rptr, encoding),
 }
 
 static size_t
-_DEFUN(table_convert_from_ucs, (data, in, outbuf, outbytesleft),
-                               void *data,
+table_convert_from_ucs (void *data,
                                ucs4_t in,
                                unsigned char **outbuf,
                                size_t *outbytesleft)
@@ -172,8 +169,7 @@ _DEFUN(table_convert_from_ucs, (data, in, outbuf, outbytesleft),
 
 #if defined (ICONV_TO_UCS_CES_TABLE)
 static void *
-_DEFUN(table_init_to_ucs, (rptr, encoding),
-                          struct _reent *rptr,
+table_init_to_ucs (struct _reent *rptr,
                           const char *encoding)
 {
   int i;
@@ -210,8 +206,7 @@ _DEFUN(table_init_to_ucs, (rptr, encoding),
 }
 
 static ucs4_t
-_DEFUN(table_convert_to_ucs, (data, inbuf, inbytesleft),
-                             void *data,
+table_convert_to_ucs (void *data,
                              const unsigned char **inbuf,
                              size_t *inbytesleft)
 {
@@ -253,8 +248,7 @@ _DEFUN(table_convert_to_ucs, (data, inbuf, inbytesleft),
 #endif /* ICONV_TO_UCS_CES_TABLE */
 
 static int
-_DEFUN(table_get_mb_cur_max, (data),
-                             void *data)
+table_get_mb_cur_max (void *data)
 {
   return ((iconv_ccs_desc_t *)data)->bits/8;
 }
@@ -303,8 +297,7 @@ _iconv_from_ucs_ces_handlers_table =
  *     Code that corresponds to 'code'.
  */
 static __inline ucs2_t
-_DEFUN(find_code_speed, (code, tblp),
-                        ucs2_t code,
+find_code_speed (ucs2_t code,
                         const __uint16_t *tblp)
 {
   int idx = tblp[code >> 8];
@@ -326,8 +319,7 @@ _DEFUN(find_code_speed, (code, tblp),
  *     Code that corresponds to 'code'.
  */
 static __inline ucs2_t
-_DEFUN(find_code_speed_8bit, (code, tblp),
-                             ucs2_t code,
+find_code_speed_8bit (ucs2_t code,
                              const unsigned char *tblp)
 {
   int idx;
@@ -366,8 +358,7 @@ _DEFUN(find_code_speed_8bit, (code, tblp),
  *     Code that corresponds to 'code'.
  */
 static ucs2_t
-_DEFUN(find_code_size, (code, tblp),
-                       ucs2_t code,
+find_code_size (ucs2_t code,
                        const __uint16_t *tblp)
 {
   int first, last, cur, center;
@@ -460,8 +451,7 @@ _DEFUN(find_code_size, (code, tblp),
  *    iconv_ccs_desc_t * pointer is success, NULL if failure.
  */
 static const iconv_ccs_desc_t *
-_DEFUN(load_file, (rptr, name, direction), 
-                  struct _reent *rptr,
+load_file (struct _reent *rptr,
                   const char *name,
                   int direction)
 {

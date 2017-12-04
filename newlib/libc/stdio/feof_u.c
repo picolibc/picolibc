@@ -32,8 +32,7 @@
 #undef feof_unlocked
 
 int
-_DEFUN(feof_unlocked, (fp),
-       FILE * fp)
+feof_unlocked (FILE * fp)
 {
   CHECK_INIT(_REENT, fp);
   return __sfeof (fp);

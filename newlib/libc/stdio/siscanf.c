@@ -87,8 +87,7 @@ Supporting OS subroutines required: <<close>>, <<fstat>>, <<isatty>>,
 
 #ifdef _HAVE_STDC
 int 
-_DEFUN(siscanf, (str, fmt),
-       const char *str,
+siscanf (const char *str,
        const char *fmt, ...)
 #else
 int 
@@ -123,8 +122,7 @@ siscanf(str, fmt, va_alist)
 
 #ifdef _HAVE_STDC
 int 
-_DEFUN(_siscanf_r, (ptr, str, fmt), 
-       struct _reent *ptr,
+_siscanf_r (struct _reent *ptr,
        const char *str,
        const char *fmt, ...)
 #else

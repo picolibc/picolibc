@@ -69,7 +69,7 @@ No supporting OS subroutines are required.
 #include "local.h"
 
 int
-_DEFUN(iswpunct,(c), wint_t c)
+iswpunct (wint_t c)
 {
   return (!iswalnum (c) && iswgraph (c));
 }

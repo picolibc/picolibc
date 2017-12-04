@@ -52,8 +52,7 @@ QUICKREF
 #endif
 
 char*
-_DEFUN (strcpy, (dst0, src0),
-	char *dst0,
+strcpy (char *dst0,
 	const char *src0)
 {
 #if defined(PREFER_SIZE_OVER_SPEED) || defined(__OPTIMIZE_SIZE__)

@@ -22,8 +22,7 @@
 #include <stdarg.h>
 
 int
-_DEFUN(_fiprintf_r, (ptr, fp, fmt),
-       struct _reent *ptr,
+_fiprintf_r (struct _reent *ptr,
        FILE * fp,
        const char *fmt, ...)
 {
@@ -39,8 +38,7 @@ _DEFUN(_fiprintf_r, (ptr, fp, fmt),
 #ifndef _REENT_ONLY
 
 int
-_DEFUN(fiprintf, (fp, fmt),
-       FILE * fp,
+fiprintf (FILE * fp,
        const char *fmt, ...)
 {
   int ret;

@@ -5,8 +5,7 @@
 #include <wchar.h>
 
 size_t
-_DEFUN (_wcsrtombs_r, (r, dst, src, len, ps),
-	struct _reent *r,
+_wcsrtombs_r (struct _reent *r,
 	char *dst,
 	const wchar_t **src,
 	size_t len,
@@ -17,8 +16,7 @@ _DEFUN (_wcsrtombs_r, (r, dst, src, len, ps),
 
 #ifndef _REENT_ONLY
 size_t
-_DEFUN (wcsrtombs, (dst, src, len, ps),
-	char *__restrict dst,
+wcsrtombs (char *__restrict dst,
 	const wchar_t **__restrict src,
 	size_t len,
 	mbstate_t *__restrict ps)

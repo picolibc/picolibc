@@ -62,8 +62,7 @@ No supporting OS subroutines are required.
  * Returns wcslen(src); if retval >= siz, truncation occurred.
  */
 size_t
-_DEFUN (wcslcpy, (dst, src, siz),
-	wchar_t * dst,
+wcslcpy (wchar_t * dst,
 	const wchar_t * src,
 	size_t siz)
 {

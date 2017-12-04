@@ -100,8 +100,7 @@ No supporting OS subroutines are required.
 /* Core function which does not lock file pointer.  This gets called
    directly from __srefill. */
 int
-_DEFUN(__sflush_r, (ptr, fp),
-       struct _reent *ptr,
+__sflush_r (struct _reent *ptr,
        register FILE * fp)
 {
   register unsigned char *p;
@@ -239,8 +238,7 @@ _DEFUN(__sflush_r, (ptr, fp),
    and we don't want to move the underlying file pointer unless we're
    writing. */
 int
-_DEFUN(__sflushw_r, (ptr, fp),
-       struct _reent *ptr,
+__sflushw_r (struct _reent *ptr,
        register FILE *fp)
 {
   return (fp->_flags & __SWR) ?  __sflush_r (ptr, fp) : 0;
@@ -250,8 +248,7 @@ _DEFUN(__sflushw_r, (ptr, fp),
 #endif /* __IMPL_UNLOCKED__ */
 
 int
-_DEFUN(_fflush_r, (ptr, fp),
-       struct _reent *ptr,
+_fflush_r (struct _reent *ptr,
        register FILE * fp)
 {
   int ret;
@@ -286,8 +283,7 @@ _DEFUN(_fflush_r, (ptr, fp),
 #ifndef _REENT_ONLY
 
 int
-_DEFUN(fflush, (fp),
-       register FILE * fp)
+fflush (register FILE * fp)
 {
   if (fp == NULL)
     return _fwalk_reent (_GLOBAL_REENT, _fflush_r);

@@ -69,16 +69,14 @@ No supporting OS subroutines are required.
 
 #ifndef _REENT_ONLY
 long long
-_DEFUN(atoll, (str),
-       const char *str)
+atoll (const char *str)
 {
 	return strtoll(str, (char **)NULL, 10);
 }
 #endif /* !_REENT_ONLY */
 
 long long
-_DEFUN(_atoll_r, (ptr, str),
-       struct _reent *ptr,
+_atoll_r (struct _reent *ptr,
        const char *str)
 {
 	return _strtoll_r(ptr, str, (char **)NULL, 10);

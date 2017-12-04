@@ -18,8 +18,7 @@
  * kill -- go out via exit...
  */
 int
-_DEFUN (_kill, (pid, sig),
-        int pid,
+_kill (int pid,
         int sig)
 {
   if(pid == __MYPID)

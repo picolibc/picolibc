@@ -553,8 +553,7 @@ Supporting OS subroutines required: <<close>>, <<fstat>>, <<isatty>>,
  * a variable set to _REENT.  */
 
 int
-_DEFUN(_swprintf_r, (ptr, str, size, fmt),
-       struct _reent *ptr,
+_swprintf_r (struct _reent *ptr,
        wchar_t *str,
        size_t size,
        const wchar_t *fmt, ...)
@@ -594,8 +593,7 @@ _DEFUN(_swprintf_r, (ptr, str, size, fmt),
 #ifndef _REENT_ONLY
 
 int
-_DEFUN(swprintf, (str, size, fmt),
-       wchar_t *__restrict str,
+swprintf (wchar_t *__restrict str,
        size_t size,
        const wchar_t *__restrict fmt, ...)
 {

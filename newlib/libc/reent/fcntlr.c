@@ -40,8 +40,7 @@ DESCRIPTION
 */
 
 int
-_DEFUN (_fcntl_r, (ptr, fd, cmd, arg),
-     struct _reent *ptr,
+_fcntl_r (struct _reent *ptr,
      int fd,
      int cmd,
      int arg)

@@ -26,8 +26,7 @@ PORTABILITY
 #include <string.h>
 
 size_t
-_DEFUN (strcspn, (s1, s2),
-	const char *s1,
+strcspn (const char *s1,
 	const char *s2)
 {
   const char *s = s1;

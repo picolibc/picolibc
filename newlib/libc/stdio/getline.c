@@ -37,8 +37,7 @@ No supporting OS subroutines are directly required.
 extern ssize_t _EXFUN(__getdelim, (char **, size_t *, int, FILE *));
 
 ssize_t
-_DEFUN(__getline, (lptr, n, fp),
-       char **lptr,
+__getline (char **lptr,
        size_t *n,
        FILE *fp)
 {

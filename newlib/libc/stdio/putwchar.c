@@ -87,8 +87,7 @@ PORTABILITY
 #undef putwchar
 
 wint_t
-_DEFUN(_putwchar_r, (ptr, wc),
-	struct _reent *ptr,
+_putwchar_r (struct _reent *ptr,
 	wchar_t wc)
 {
   return _fputwc_r (ptr, wc, stdout);
@@ -98,8 +97,7 @@ _DEFUN(_putwchar_r, (ptr, wc),
  * Synonym for fputwc(wc, stdout).
  */
 wint_t
-_DEFUN(putwchar, (wc),
-	wchar_t wc)
+putwchar (wchar_t wc)
 {
   _REENT_SMALL_CHECK_INIT (_REENT);
   return fputwc (wc, stdout);

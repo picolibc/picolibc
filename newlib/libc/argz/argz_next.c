@@ -11,8 +11,7 @@
 #include <stdlib.h>
 
 char *
-_DEFUN (argz_next, (argz, argz_len, entry),
-       char *argz,
+argz_next (char *argz,
        size_t argz_len,
        const char *entry)
 {

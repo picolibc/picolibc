@@ -61,8 +61,7 @@ PORTABILITY
 #include <wchar.h>
 
 wchar_t *
-_DEFUN (wcsstr, (big, little),
-	const wchar_t *__restrict big,
+wcsstr (const wchar_t *__restrict big,
 	const wchar_t *__restrict little)
 {
   const wchar_t *p;

@@ -23,8 +23,7 @@ typedef struct
 #ifndef _REENT_ONLY
 
 int
-_DEFUN (vprintf, (fmt, ap),
-     const char *fmt,
+vprintf (const char *fmt,
      va_list ap)
 {
   c99_vprintf_t args;

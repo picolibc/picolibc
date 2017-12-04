@@ -25,8 +25,7 @@
 #ifndef _DOUBLE_IS_32BITS
 
 int 
-_DEFUN (numtest, (double),
-        double x)
+numtest (double x)
 {
   __uint32_t hx, lx;
   int exp;

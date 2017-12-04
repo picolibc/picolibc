@@ -14,8 +14,7 @@
 #include "rand48.h"
 
 void
-_DEFUN (_lcong48_r, (r, p),
-       struct _reent *r,
+_lcong48_r (struct _reent *r,
        unsigned short p[7])
 {
   _REENT_CHECK_RAND48(r);
@@ -30,8 +29,7 @@ _DEFUN (_lcong48_r, (r, p),
 
 #ifndef _REENT_ONLY
 void
-_DEFUN (lcong48, (p),
-       unsigned short p[7])
+lcong48 (unsigned short p[7])
 {
   _lcong48_r (_REENT, p);
 }

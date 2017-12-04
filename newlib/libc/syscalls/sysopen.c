@@ -10,8 +10,7 @@
 #include <stdarg.h>
 
 int
-_DEFUN (open, (file, flags, ...),
-        const char *file,
+open (const char *file,
         int flags, ...)
 {
   va_list ap;

@@ -2,8 +2,7 @@
 #include <machine/registers.h>
 
 
-fp_except _DEFUN(fpsetmask,(newmask),
-		fp_except newmask)
+fp_except fpsetmask (fp_except newmask)
 
 {
   fp_except oldmask;
@@ -32,8 +31,7 @@ fp_rnd fpgetround (void)
   return tkcw.fp_rounding;
 }
 
-fp_rnd _DEFUN(fpsetround,(rnd),
-	     fp_rnd rnd)
+fp_rnd fpsetround (fp_rnd rnd)
 {
   fp_rnd oldrnd;
   v60_tkcw_type tkcw;
@@ -56,8 +54,7 @@ fp_rdi fpgetroundtoi (void)
   return tkcw.integer_rounding;
 }
 
-fp_rdi _DEFUN(fpsetroundtoi,(rnd),
-	     fp_rdi rnd)
+fp_rdi fpsetroundtoi (fp_rdi rnd)
 {
   fp_rdi oldrnd;
   v60_tkcw_type tkcw;

@@ -75,8 +75,7 @@ Supporting OS subroutines required: <<close>>, <<fstat>>, <<isatty>>,
  */
 
 FILE *
-_DEFUN(_freopen_r, (ptr, file, mode, fp),
-       struct _reent *ptr,
+_freopen_r (struct _reent *ptr,
        const char *__restrict file,
        const char *__restrict mode,
        register FILE *__restrict fp)
@@ -243,8 +242,7 @@ _DEFUN(_freopen_r, (ptr, file, mode, fp),
 #ifndef _REENT_ONLY
 
 FILE *
-_DEFUN(freopen, (file, mode, fp),
-       const char *__restrict file,
+freopen (const char *__restrict file,
        const char *__restrict mode,
        register FILE *__restrict fp)
 {

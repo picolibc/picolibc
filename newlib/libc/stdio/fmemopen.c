@@ -83,8 +83,7 @@ typedef struct fmemcookie {
 /* Read up to non-zero N bytes into BUF from stream described by
    COOKIE; return number of bytes read (0 on EOF).  */
 static _READ_WRITE_RETURN_TYPE
-_DEFUN(fmemreader, (ptr, cookie, buf, n),
-       struct _reent *ptr,
+fmemreader (struct _reent *ptr,
        void *cookie,
        char *buf,
        _READ_WRITE_BUFSIZE_TYPE n)
@@ -103,8 +102,7 @@ _DEFUN(fmemreader, (ptr, cookie, buf, n),
 /* Write up to non-zero N bytes of BUF into the stream described by COOKIE,
    returning the number of bytes written or EOF on failure.  */
 static _READ_WRITE_RETURN_TYPE
-_DEFUN(fmemwriter, (ptr, cookie, buf, n),
-       struct _reent *ptr,
+fmemwriter (struct _reent *ptr,
        void *cookie,
        const char *buf,
        _READ_WRITE_BUFSIZE_TYPE n)
@@ -159,8 +157,7 @@ _DEFUN(fmemwriter, (ptr, cookie, buf, n),
 /* Seek to position POS relative to WHENCE within stream described by
    COOKIE; return resulting position or fail with EOF.  */
 static _fpos_t
-_DEFUN(fmemseeker, (ptr, cookie, pos, whence),
-       struct _reent *ptr,
+fmemseeker (struct _reent *ptr,
        void *cookie,
        _fpos_t pos,
        int whence)
@@ -214,8 +211,7 @@ _DEFUN(fmemseeker, (ptr, cookie, pos, whence),
    COOKIE; return resulting position or fail with EOF.  */
 #ifdef __LARGE64_FILES
 static _fpos64_t
-_DEFUN(fmemseeker64, (ptr, cookie, pos, whence),
-       struct _reent *ptr,
+fmemseeker64 (struct _reent *ptr,
        void *cookie,
        _fpos64_t pos,
        int whence)
@@ -256,8 +252,7 @@ _DEFUN(fmemseeker64, (ptr, cookie, pos, whence),
 
 /* Reclaim resources used by stream described by COOKIE.  */
 static int
-_DEFUN(fmemcloser, (ptr, cookie),
-       struct _reent *ptr,
+fmemcloser (struct _reent *ptr,
        void *cookie)
 {
   fmemcookie *c = (fmemcookie *) cookie;
@@ -268,8 +263,7 @@ _DEFUN(fmemcloser, (ptr, cookie),
 /* Open a memstream around buffer BUF of SIZE bytes, using MODE.
    Return the new stream, or fail with NULL.  */
 FILE *
-_DEFUN(_fmemopen_r, (ptr, buf, size, mode),
-       struct _reent *ptr,
+_fmemopen_r (struct _reent *ptr,
        void *__restrict buf,
        size_t size,
        const char *__restrict mode)
@@ -361,8 +355,7 @@ _DEFUN(_fmemopen_r, (ptr, buf, size, mode),
 
 #ifndef _REENT_ONLY
 FILE *
-_DEFUN(fmemopen, (buf, size, mode),
-       void *__restrict buf,
+fmemopen (void *__restrict buf,
        size_t size,
        const char *__restrict mode)
 {

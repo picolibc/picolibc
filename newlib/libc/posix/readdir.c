@@ -45,8 +45,7 @@ extern int getdents (int fd, void *dp, int count);
  * get next entry in a directory.
  */
 struct dirent *
-_DEFUN(readdir, (dirp),
-       register DIR *dirp)
+readdir (register DIR *dirp)
 {
   register struct dirent *dp;
  

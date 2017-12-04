@@ -30,8 +30,7 @@
  */
 
 _READ_WRITE_RETURN_TYPE
-_DEFUN(__sread, (ptr, cookie, buf, n),
-       struct _reent *ptr,
+__sread (struct _reent *ptr,
        void *cookie,
        char *buf,
        _READ_WRITE_BUFSIZE_TYPE n)
@@ -63,8 +62,7 @@ _DEFUN(__sread, (ptr, cookie, buf, n),
 
 /* Dummy function used in sscanf/swscanf. */
 _READ_WRITE_RETURN_TYPE
-_DEFUN(__seofread, (ptr, cookie, buf, len),
-       struct _reent *_ptr,
+__seofread (struct _reent *_ptr,
        void *cookie,
        char *buf,
        _READ_WRITE_BUFSIZE_TYPE len)
@@ -73,8 +71,7 @@ _DEFUN(__seofread, (ptr, cookie, buf, len),
 }
 
 _READ_WRITE_RETURN_TYPE
-_DEFUN(__swrite, (ptr, cookie, buf, n),
-       struct _reent *ptr,
+__swrite (struct _reent *ptr,
        void *cookie,
        char const *buf,
        _READ_WRITE_BUFSIZE_TYPE n)
@@ -105,8 +102,7 @@ _DEFUN(__swrite, (ptr, cookie, buf, n),
 }
 
 _fpos_t
-_DEFUN(__sseek, (ptr, cookie, offset, whence),
-       struct _reent *ptr,
+__sseek (struct _reent *ptr,
        void *cookie,
        _fpos_t offset,
        int whence)
@@ -126,8 +122,7 @@ _DEFUN(__sseek, (ptr, cookie, offset, whence),
 }
 
 int
-_DEFUN(__sclose, (ptr, cookie),
-       struct _reent *ptr,
+__sclose (struct _reent *ptr,
        void *cookie)
 {
   FILE *fp = (FILE *) cookie;
@@ -137,8 +132,7 @@ _DEFUN(__sclose, (ptr, cookie),
 
 #ifdef __SCLE
 int
-_DEFUN(__stextmode, (fd),
-       int fd)
+__stextmode (int fd)
 {
 #ifdef __CYGWIN__
   extern int _cygwin_istext_for_stdio (int);

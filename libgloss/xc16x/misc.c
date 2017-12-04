@@ -17,21 +17,19 @@
 /* _raise(), getpid(), and kill() are required by abort().
    getpid/kill are prefixed with '_' because of MISSING_SYSCALL_NAMES.  */
 
-int _DEFUN(_raise,(sig),
-	   int sig)
+int _raise (int sig)
 {
   errno = ENOSYS;
   return -1;
 }
 
-int _DEFUN(_getpid,(),)
+int _getpid (void)
 {
   errno = ENOSYS;
   return -1;
 }
 
-int _DEFUN(_kill,(pid, sig),
-	   int pid,
+int _kill (int pid,
 	   int sig)
 {
   errno = ENOSYS;

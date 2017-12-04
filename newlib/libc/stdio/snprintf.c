@@ -31,8 +31,7 @@
 
 int
 #ifdef _HAVE_STDC
-_DEFUN(_snprintf_r, (ptr, str, size, fmt),
-       struct _reent *ptr,
+_snprintf_r (struct _reent *ptr,
        char *__restrict str,
        size_t size,
        const char *__restrict fmt, ...)
@@ -82,8 +81,7 @@ _EXFUN(_sniprintf_r, (struct _reent *, char *, size_t, const char *, ...)
 
 int
 #ifdef _HAVE_STDC
-_DEFUN(snprintf, (str, size, fmt),
-       char *__restrict str,
+snprintf (char *__restrict str,
        size_t size,
        const char *__restrict fmt, ...)
 #else

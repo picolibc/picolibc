@@ -12,8 +12,7 @@ extern int errno;
 #include "warning.h"
 
 clock_t
-_DEFUN (_times, (buf),
-        struct tms *buf)
+_times (struct tms *buf)
 {
   errno = ENOSYS;
   return -1;

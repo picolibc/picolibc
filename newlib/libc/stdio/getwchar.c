@@ -93,8 +93,7 @@ PORTABILITY
 #undef getwchar
 
 wint_t
-_DEFUN (_getwchar_r, (ptr),
-	struct _reent *ptr)
+_getwchar_r (struct _reent *ptr)
 {
   return _fgetwc_r (ptr, stdin);
 }

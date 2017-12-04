@@ -18,8 +18,7 @@
 #include "zmath.h"
 
 float
-_DEFUN (acosf, (float),
-        float x)
+acosf (float x)
 {
   return (asinef (x, 1));
 }

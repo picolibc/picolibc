@@ -104,8 +104,7 @@ Supporting OS subroutines required: <<close>>, <<fstat>>, <<isatty>>,
 
 int
 #ifdef _HAVE_STDC
-_DEFUN(_siprintf_r, (ptr, str, fmt),
-       struct _reent *ptr,
+_siprintf_r (struct _reent *ptr,
        char *str,
        const char *fmt, ...)
 #else
@@ -139,8 +138,7 @@ _siprintf_r(ptr, str, fmt, va_alist)
 
 int
 #ifdef _HAVE_STDC
-_DEFUN(siprintf, (str, fmt),
-       char *str,
+siprintf (char *str,
        const char *fmt, ...)
 #else
 siprintf(str, fmt, va_alist)

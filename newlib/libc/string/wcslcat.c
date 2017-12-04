@@ -68,8 +68,7 @@ No supporting OS subroutines are required.
  * truncation occurred.
  */
 size_t
-_DEFUN (wcslcat, (dst, src, siz),
-	wchar_t * dst,
+wcslcat (wchar_t * dst,
 	const wchar_t * src,
 	size_t siz)
 {

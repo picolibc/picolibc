@@ -385,8 +385,7 @@ QUICKREF
 #include <string.h>
 
 char *
-_DEFUN (_strerror_r, (ptr, errnum, internal, errptr),
-	struct _reent *ptr,
+_strerror_r (struct _reent *ptr,
 	int errnum,
 	int internal,
 	int *errptr)
@@ -893,8 +892,7 @@ _DEFUN (_strerror_r, (ptr, errnum, internal, errptr),
 }
 
 char *
-_DEFUN(strerror, (int),
-       int errnum)
+strerror (int errnum)
 {
   return _strerror_r (_REENT, errnum, 0, NULL);
 }

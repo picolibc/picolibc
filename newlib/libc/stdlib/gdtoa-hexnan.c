@@ -45,8 +45,7 @@ THIS SOFTWARE.
 
 #ifdef INFNAN_CHECK
 int
-_DEFUN (match, (sp, t),
-	const char **sp,
+match (const char **sp,
 	char *t)
 {
 	int c, d;
@@ -63,8 +62,7 @@ _DEFUN (match, (sp, t),
 }
 
 static void
-_DEFUN (L_shift, (x, x1, i),
-	__ULong *x,
+L_shift (__ULong *x,
 	__ULong *x1,
 	int i)
 {
@@ -80,8 +78,7 @@ _DEFUN (L_shift, (x, x1, i),
 }
 
 int
-_DEFUN (hexnan, (sp, fpi, x0),
-	const char **sp,
+hexnan (const char **sp,
 	const FPI *fpi,
 	__ULong *x0)
 {

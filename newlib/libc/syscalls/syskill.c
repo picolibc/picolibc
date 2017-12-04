@@ -4,8 +4,7 @@
 #include <signal.h>
 
 int
-_DEFUN (kill, (pid, sig),
-     int pid,
+kill (int pid,
      int sig)
 {
   return _kill_r (_REENT, pid, sig);

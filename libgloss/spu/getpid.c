@@ -31,7 +31,7 @@ Author: Andreas Neukoetter (ti95neuk@de.ibm.com)
 */
 
 int
-getpid ()
+getpid (void)
 {
 	return (1);
 }

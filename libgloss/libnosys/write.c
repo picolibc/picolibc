@@ -11,8 +11,7 @@ extern int errno;
 #include "warning.h"
 
 int
-_DEFUN (_write, (file, ptr, len),
-        int   file,
+_write (int   file,
         char *ptr,
         int   len)
 {

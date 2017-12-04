@@ -16,8 +16,7 @@
 #include "local.h"
 
 struct tm *
-_DEFUN (localtime_r, (tim_p, res),
-	const time_t *__restrict tim_p,
+localtime_r (const time_t *__restrict tim_p,
 	struct tm *__restrict res)
 {
   long offset;

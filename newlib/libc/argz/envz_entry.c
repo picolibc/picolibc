@@ -13,8 +13,7 @@
 #include "buf_findstr.h"
 
 char *
-_DEFUN (envz_entry, (envz, envz_len, name),
-       const char *envz,
+envz_entry (const char *envz,
        size_t envz_len,
        const char *name)
 {

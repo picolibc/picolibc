@@ -11,8 +11,7 @@
 #include <stdlib.h>
 
 error_t
-_DEFUN (argz_create_sep, (string, sep, argz, argz_len),
-       const char *string,
+argz_create_sep (const char *string,
        int sep,
        char **argz,
        size_t *argz_len)

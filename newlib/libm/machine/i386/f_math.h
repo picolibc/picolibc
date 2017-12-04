@@ -7,8 +7,7 @@
 __inline__
 static 
 int 
-_DEFUN (check_finite, (x),
-         double x)
+check_finite (double x)
 {  
   __int32_t hx;
   GET_HIGH_WORD(hx,x);
@@ -18,8 +17,7 @@ _DEFUN (check_finite, (x),
 __inline__
 static 
 int 
-_DEFUN (check_finitef, (x),
-         float x)
+check_finitef (float x)
 {  
   __int32_t ix;
   GET_FLOAT_WORD(ix,x);

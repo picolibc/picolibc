@@ -89,8 +89,7 @@ Supporting OS subroutines required:
 #ifndef _REENT_ONLY
 
 int
-_DEFUN(viscanf, (fmt, ap), 
-       const char *fmt,
+viscanf (const char *fmt,
        va_list ap)
 {
   struct _reent *reent = _REENT;
@@ -102,8 +101,7 @@ _DEFUN(viscanf, (fmt, ap),
 #endif /* !_REENT_ONLY */
 
 int
-_DEFUN(_viscanf_r, (ptr, fmt, ap),
-       struct _reent *ptr,
+_viscanf_r (struct _reent *ptr,
        const char *fmt,
        va_list ap)
 {

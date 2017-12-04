@@ -59,8 +59,7 @@ No supporting OS subroutines are required.
 #include <stdlib.h>
 
 int
-_DEFUN(rpmatch, (response),
-       const char *response)
+rpmatch (const char *response)
 {
 	regex_t yes, no;
 	int ret;

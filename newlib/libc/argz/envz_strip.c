@@ -12,8 +12,7 @@
 #include <envz.h>
 
 void
-_DEFUN (envz_strip, (envz, envz_len),
-       char **envz,
+envz_strip (char **envz,
        size_t *envz_len)
 {
   char *entry = 0;

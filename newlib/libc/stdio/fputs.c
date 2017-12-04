@@ -86,8 +86,7 @@ Supporting OS subroutines required: <<close>>, <<fstat>>, <<isatty>>,
  * Write the given string to the given file.
  */
 int
-_DEFUN(_fputs_r, (ptr, s, fp),
-       struct _reent * ptr,
+_fputs_r (struct _reent * ptr,
        char const *__restrict s,
        FILE *__restrict fp)
 {
@@ -135,8 +134,7 @@ error:
 
 #ifndef _REENT_ONLY
 int
-_DEFUN(fputs, (s, fp),
-       char const *__restrict s,
+fputs (char const *__restrict s,
        FILE *__restrict fp)
 {
   return _fputs_r (_REENT, s, fp);

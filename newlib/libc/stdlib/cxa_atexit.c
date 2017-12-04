@@ -22,9 +22,7 @@ const void * const __cxa_atexit_dummy = &__on_exit_args;
  */
 
 int
-_DEFUN (__cxa_atexit,
-	(fn, arg, d),
-	void (*fn) (void *),
+__cxa_atexit (void (*fn) (void *),
 	void *arg,
 	void *d)
 {

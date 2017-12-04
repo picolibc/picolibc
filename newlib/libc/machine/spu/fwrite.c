@@ -49,8 +49,7 @@ typedef struct
 } c99_fwrite_t;
 
 size_t
-_DEFUN (fwrite, (buf, size, count, fp),
-	const void *__restrict buf,
+fwrite (const void *__restrict buf,
 	size_t size,
 	size_t count,
 	FILE * fp)

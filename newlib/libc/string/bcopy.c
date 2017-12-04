@@ -24,8 +24,7 @@ QUICKREF
 #include <strings.h>
 
 void
-_DEFUN (bcopy, (b1, b2, length),
-	const void *b1,
+bcopy (const void *b1,
 	void *b2,
 	size_t length)
 {

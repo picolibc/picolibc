@@ -37,8 +37,7 @@ ANSI C requires <<ctime>>.
 #ifndef _REENT_ONLY
 
 char *
-_DEFUN (ctime, (tim_p),
-	const time_t * tim_p)
+ctime (const time_t * tim_p)
 {
   return asctime (localtime (tim_p));
 }

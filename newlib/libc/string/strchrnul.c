@@ -31,8 +31,7 @@ QUICKREF
 #include <string.h>
 
 char *
-_DEFUN (strchrnul, (s1, i),
-	const char *s1,
+strchrnul (const char *s1,
 	int i)
 {
   char *s = strchr(s1, i);

@@ -72,8 +72,7 @@ No supporting OS subroutines are required.
 #undef	clearerr
 
 void
-_DEFUN(clearerr, (fp),
-       FILE * fp)
+clearerr (FILE * fp)
 {
   CHECK_INIT(_REENT, fp);
   _newlib_flockfile_start (fp);

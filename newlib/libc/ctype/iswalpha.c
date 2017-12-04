@@ -74,7 +74,7 @@ No supporting OS subroutines are required.
 #endif /* _MB_CAPABLE */
 
 int
-_DEFUN(iswalpha,(c), wint_t c)
+iswalpha (wint_t c)
 {
 #ifdef _MB_CAPABLE
   unsigned const char *table;

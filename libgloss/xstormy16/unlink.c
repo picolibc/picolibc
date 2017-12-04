@@ -20,8 +20,7 @@
  *           we just return an error.
  */
 int
-_DEFUN (_unlink, (path),
-        char * path)
+_unlink (char * path)
 {
   errno = EIO;
   return (-1);

@@ -65,8 +65,7 @@ No supporting OS subroutines are required.
 #include "local.h"
 
 int
-_DEFUN(__fsetlocking, (fp, type),
-       FILE * fp,
+__fsetlocking (FILE * fp,
        int type)
 {
   int result;

@@ -30,8 +30,7 @@ PORTABILITY
 #include <string.h>
 
 size_t
-_DEFUN (strnlen, (str, n),
-	const char *str,
+strnlen (const char *str,
 	size_t n)
 {
   const char *start = str;

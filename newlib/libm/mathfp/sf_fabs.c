@@ -18,8 +18,7 @@
 #include "zmath.h"
 
 float
-_DEFUN (fabsf, (float),
-        float x)
+fabsf (float x)
 {
   switch (numtestf (x))
     {

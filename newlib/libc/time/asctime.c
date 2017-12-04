@@ -48,8 +48,7 @@ ANSI C requires <<asctime>>.
 #ifndef _REENT_ONLY
 
 char *
-_DEFUN (asctime, (tim_p),
-	const struct tm *tim_p)
+asctime (const struct tm *tim_p)
 {
   struct _reent *reent = _REENT;
 

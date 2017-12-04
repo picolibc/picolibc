@@ -9,8 +9,7 @@
 #ifndef _REENT_ONLY
 
 int
-_DEFUN (malloc_trim, (pad),
-	size_t pad)
+malloc_trim (size_t pad)
 {
   return _malloc_trim_r (_REENT, pad);
 }

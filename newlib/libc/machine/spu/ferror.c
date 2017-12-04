@@ -37,8 +37,7 @@ Author: Joel Schopp <jschopp@austin.ibm.com>
 #ifndef _REENT_ONLY
 
 int
-_DEFUN (ferror, (fp),
-	FILE * fp)
+ferror (FILE * fp)
 {
   int result;
 

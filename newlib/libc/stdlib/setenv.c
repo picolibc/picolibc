@@ -32,8 +32,7 @@ extern int _unsetenv_r (struct _reent *, const char *);
  */
 
 int
-_DEFUN (setenv, (name, value, rewrite),
-	const char *name,
+setenv (const char *name,
 	const char *value,
 	int rewrite)
 {
@@ -45,8 +44,7 @@ _DEFUN (setenv, (name, value, rewrite),
  *	Delete environmental variable "name".
  */
 int
-_DEFUN (unsetenv, (name),
-        const char *name)
+unsetenv (const char *name)
 {
   return _unsetenv_r (_REENT, name);
 }

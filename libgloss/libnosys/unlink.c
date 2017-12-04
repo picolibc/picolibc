@@ -11,8 +11,7 @@ extern int errno;
 #include "warning.h"
 
 int
-_DEFUN (_unlink, (name),
-        char *name)
+_unlink (char *name)
 {
   errno = ENOSYS;
   return -1;

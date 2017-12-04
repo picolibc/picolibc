@@ -41,8 +41,7 @@ DESCRIPTION
 */
 
 void *
-_DEFUN (_sbrk_r, (ptr, incr),
-     struct _reent *ptr,
+_sbrk_r (struct _reent *ptr,
      ptrdiff_t incr)
 {
   char *ret;

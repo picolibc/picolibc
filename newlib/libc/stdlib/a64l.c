@@ -56,8 +56,7 @@ Supporting OS subroutines required: None.
 #include <limits.h>
 
 long
-_DEFUN (a64l, (input),
-	const char *input)
+a64l (const char *input)
 {
   const char *ptr;
   char ch;

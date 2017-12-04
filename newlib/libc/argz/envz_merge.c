@@ -12,8 +12,7 @@
 #include <envz.h>
 
 error_t
-_DEFUN (envz_merge, (envz, envz_len, envz2, envz2_len, override),
-       char **envz,
+envz_merge (char **envz,
        size_t *envz_len,
        const char *envz2,
        size_t envz2_len,

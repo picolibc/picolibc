@@ -45,7 +45,7 @@ No supporting OS subroutines are required.
 
 #undef isdigit
 int
-_DEFUN(isdigit,(c),int c)
+isdigit (int c)
 {
 	return(__CTYPE_PTR[c+1] & _N);
 }

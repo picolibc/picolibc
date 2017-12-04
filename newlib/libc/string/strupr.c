@@ -29,8 +29,7 @@ QUICKREF
 #include <ctype.h>
 
 char *
-_DEFUN (strupr, (s),
-	char *s)
+strupr (char *s)
 {
   unsigned char *ucs = (unsigned char *) s;
   for ( ; *ucs != '\0'; ucs++)

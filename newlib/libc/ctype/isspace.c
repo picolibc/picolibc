@@ -44,7 +44,7 @@ No supporting OS subroutines are required.
 
 #undef isspace
 int
-_DEFUN(isspace,(c),int c)
+isspace (int c)
 {
 	return(__CTYPE_PTR[c+1] & _S);
 }

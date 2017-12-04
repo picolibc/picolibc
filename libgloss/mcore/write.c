@@ -22,8 +22,7 @@ extern int  _EXFUN (outbyte, (char x));
  *          open will only return an error.
  */
 int
-_DEFUN (_write, (fd, buf, nbytes),
-       int fd,
+_write (int fd,
        char *buf,
        int nbytes)
 {

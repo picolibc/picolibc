@@ -47,8 +47,7 @@ typedef struct
 #ifndef _REENT_ONLY
 
 FILE *
-_DEFUN (freopen, (file, mode, fp),
-	const char *__restrict file,
+freopen (const char *__restrict file,
 	const char *__restrict mode,
 	FILE *__restrict fp)
 {

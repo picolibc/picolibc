@@ -35,8 +35,7 @@ QUICKREF
 
 void *
 __inhibit_loop_to_libcall
-_DEFUN (memset, (m, c, n),
-	void *m,
+memset (void *m,
 	int c,
 	size_t n)
 {

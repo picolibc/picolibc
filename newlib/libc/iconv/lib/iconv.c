@@ -120,8 +120,7 @@ No supporting OS subroutine calls are required.
  */
 
 iconv_t
-_DEFUN(iconv_open, (to, from), 
-                   const char *to,
+iconv_open (const char *to,
                    const char *from)
 {
   return _iconv_open_r (_REENT, to, from);
@@ -129,8 +128,7 @@ _DEFUN(iconv_open, (to, from),
 
 
 size_t
-_DEFUN(iconv, (cd, inbuf, inbytesleft, outbuf, outbytesleft),
-              iconv_t cd,
+iconv (iconv_t cd,
               char **__restrict inbuf,
               size_t *__restrict inbytesleft,
               char **__restrict outbuf,
@@ -142,7 +140,7 @@ _DEFUN(iconv, (cd, inbuf, inbytesleft, outbuf, outbytesleft),
 
 
 int
-_DEFUN(iconv_close, (cd), iconv_t cd)
+iconv_close (iconv_t cd)
 {
     return _iconv_close_r (_REENT, cd);
 }
@@ -150,8 +148,7 @@ _DEFUN(iconv_close, (cd), iconv_t cd)
 
 #ifndef _REENT_ONLY
 iconv_t
-_DEFUN(_iconv_open_r, (rptr, to, from),
-                      struct _reent *rptr,
+_iconv_open_r (struct _reent *rptr,
                       const char *to,
                       const char *from)
 {
@@ -201,8 +198,7 @@ _DEFUN(_iconv_open_r, (rptr, to, from),
 
 
 size_t
-_DEFUN(_iconv_r, (rptr, cd, inbuf, inbytesleft, outbuf, outbytesleft),
-                 struct _reent *rptr,
+_iconv_r (struct _reent *rptr,
                  iconv_t cd,
                  const char **inbuf,
                  size_t *inbytesleft,
@@ -288,8 +284,7 @@ _DEFUN(_iconv_r, (rptr, cd, inbuf, inbytesleft, outbuf, outbytesleft),
 
 
 int
-_DEFUN(_iconv_close_r, (rptr, cd),
-                       struct _reent *rptr,
+_iconv_close_r (struct _reent *rptr,
                        iconv_t cd)
 {
   int res;

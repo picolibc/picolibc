@@ -94,8 +94,7 @@ PORTABILITY
 #endif
 
 int
-_DEFUN(_fputws_r, (ptr, ws, fp),
-	struct _reent *ptr,
+_fputws_r (struct _reent *ptr,
 	const wchar_t *ws,
 	FILE *fp)
 {
@@ -158,8 +157,7 @@ error:
 }
 
 int
-_DEFUN(fputws, (ws, fp),
-	const wchar_t *__restrict ws,
+fputws (const wchar_t *__restrict ws,
 	FILE *__restrict fp)
 {
   struct _reent *reent = _REENT;

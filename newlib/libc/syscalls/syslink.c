@@ -4,8 +4,7 @@
 #include <unistd.h>
 
 int
-_DEFUN (link, (old, new),
-     const char *old,
+link (const char *old,
      const char *new)
 {
   return _link_r (_REENT, old, new);

@@ -76,8 +76,7 @@ No supporting OS subroutines are required.
 #include "local.h"
 
 wint_t
-_DEFUN (_towctrans_r, (r, c, w), 
-	struct _reent *r,
+_towctrans_r (struct _reent *r,
 	wint_t c,
 	wctrans_t w)
 {
@@ -94,8 +93,7 @@ _DEFUN (_towctrans_r, (r, c, w),
 
 #ifndef _REENT_ONLY
 wint_t
-_DEFUN (towctrans, (c, w),
-	wint_t c,
+towctrans (wint_t c,
         wctrans_t w)
 {
   return _towctrans_r (_REENT, c, w);

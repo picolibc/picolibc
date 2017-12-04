@@ -20,8 +20,7 @@
  * lseek --  Since a serial port is non-seekable, we return an error.
  */
 off_t
-_DEFUN (_lseek, (fd,  offset, whence),
-       int fd,
+_lseek (int fd,
        off_t offset,
        int whence)
 {

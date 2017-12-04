@@ -5,8 +5,7 @@
 #ifndef _REENT_ONLY
 
 int
-_DEFUN (puts, (s),
-	char const * s)
+puts (char const * s)
 {
   CHECK_STD_INIT(_REENT);
 

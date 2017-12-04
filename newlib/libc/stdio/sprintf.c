@@ -580,8 +580,7 @@ Supporting OS subroutines required: <<close>>, <<fstat>>, <<isatty>>,
 
 int
 #ifdef _HAVE_STDC
-_DEFUN(_sprintf_r, (ptr, str, fmt),
-       struct _reent *ptr,
+_sprintf_r (struct _reent *ptr,
        char *__restrict str,
        const char *__restrict fmt, ...)
 #else
@@ -621,8 +620,7 @@ _EXFUN(_siprintf_r, (struct _reent *, char *, const char *, ...)
 
 int
 #ifdef _HAVE_STDC
-_DEFUN(sprintf, (str, fmt),
-       char *__restrict str,
+sprintf (char *__restrict str,
        const char *__restrict fmt, ...)
 #else
 sprintf(str, fmt, va_alist)

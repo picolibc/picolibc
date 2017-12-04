@@ -1,8 +1,7 @@
 #include <_ansi.h>
 
 char *
-_DEFUN(_user_strerror, (errnum, internal, errptr),
-       int errnum,
+_user_strerror (int errnum,
        int internal,
        int *errptr)
 {

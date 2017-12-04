@@ -34,8 +34,7 @@
 #undef getwchar_unlocked
 
 wint_t
-_DEFUN (_getwchar_unlocked_r, (ptr),
-	struct _reent *ptr)
+_getwchar_unlocked_r (struct _reent *ptr)
 {
   return _fgetwc_unlocked_r (ptr, stdin);
 }

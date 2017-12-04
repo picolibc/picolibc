@@ -10,8 +10,7 @@
 #include <sys/types.h>
 
 void
-_DEFUN (argz_stringify, (argz, argz_len, sep),
-       char *argz,
+argz_stringify (char *argz,
        size_t argz_len,
        int sep)
 {

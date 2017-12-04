@@ -23,8 +23,7 @@
 #include <stdarg.h>
 
 int
-_DEFUN(_fwprintf_r, (ptr, fp, fmt),
-       struct _reent *ptr,
+_fwprintf_r (struct _reent *ptr,
        FILE *fp,
        const wchar_t *fmt, ...)
 {
@@ -40,8 +39,7 @@ _DEFUN(_fwprintf_r, (ptr, fp, fmt),
 #ifndef _REENT_ONLY
 
 int
-_DEFUN(fwprintf, (fp, fmt),
-       FILE *__restrict fp,
+fwprintf (FILE *__restrict fp,
        const wchar_t *__restrict fmt, ...)
 {
   int ret;

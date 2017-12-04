@@ -70,8 +70,7 @@ static char sccsid[] = "%W% (Berkeley) %G%";
 #undef getchar_unlocked
 
 int
-_DEFUN(_getchar_unlocked_r, (ptr),
-       struct _reent *ptr)
+_getchar_unlocked_r (struct _reent *ptr)
 {
   return _getc_unlocked_r (ptr, _stdin_r (ptr));
 }

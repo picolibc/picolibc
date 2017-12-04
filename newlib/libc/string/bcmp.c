@@ -32,8 +32,7 @@ QUICKREF
 #include <strings.h>
 
 int
-_DEFUN (bcmp, (m1, m2, n),
-	const void *m1,
+bcmp (const void *m1,
 	const void *m2,
 	size_t n)
 

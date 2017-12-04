@@ -44,8 +44,7 @@ QUICKREF
 #define TOO_SMALL(LEN)  ((LEN) < BIGBLOCKSIZE)
 
 void *
-_DEFUN (memcpy, (dst0, src0, len0),
-	void *__restrict dst0,
+memcpy (void *__restrict dst0,
 	const void *__restrict src0,
 	size_t len0)
 {

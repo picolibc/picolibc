@@ -65,8 +65,7 @@ register_fini(void)
  */
 
 void 
-_DEFUN (__call_exitprocs, (code, d),
-	int code, void *d)
+__call_exitprocs (int code, void *d)
 {
   register struct _atexit *p;
   struct _atexit **lastp;

@@ -16,8 +16,7 @@
 #undef isinf
 
 int
-_DEFUN (isinf, (x),
-	double x)
+isinf (double x)
 {
 	__int32_t hx,lx;
 	EXTRACT_WORDS(hx,lx,x);

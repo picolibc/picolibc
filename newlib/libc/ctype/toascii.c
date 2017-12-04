@@ -41,7 +41,7 @@ No supporting OS subroutines are required.
 #undef toascii
 
 int
-_DEFUN(toascii,(c),int c)
+toascii (int c)
 {
   return (c)&0177;
 }

@@ -36,8 +36,7 @@ Author: Joel Schopp <jschopp@austin.ibm.com>
 
 #ifndef _REENT_ONLY
 int
-_DEFUN (fflush, (fp),
-	FILE * fp)
+fflush (FILE * fp)
 {
   int result;
 

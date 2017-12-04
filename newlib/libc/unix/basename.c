@@ -8,8 +8,7 @@
 #include <string.h>
 
 char* 
-_DEFUN (basename, (path),
-	char *path)
+basename (char *path)
 {
 	char *p;
 	if( path == NULL || *path == '\0' )

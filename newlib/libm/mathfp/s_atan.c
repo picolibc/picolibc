@@ -54,8 +54,7 @@ PORTABILITY
 #ifndef _DOUBLE_IS_32BITS
 
 double
-_DEFUN (atan, (double),
-        double x)
+atan (double x)
 {
   switch (numtest (x))
     {

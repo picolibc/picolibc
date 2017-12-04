@@ -169,8 +169,7 @@ bool_t _EXFUN (__xdrrec_setnonblock, (XDR *, int));
  * calls except that they take an opaque handle rather than an fd.
  */
 void
-_DEFUN (xdrrec_create, (xdrs, sendsize, recvsize, tcp_handle, readit, writeit),
-        XDR * xdrs,
+xdrrec_create (XDR * xdrs,
 	u_int sendsize,
 	u_int recvsize,
 	void *tcp_handle,
@@ -261,8 +260,7 @@ _DEFUN (xdrrec_create, (xdrs, sendsize, recvsize, tcp_handle, readit, writeit),
  */
 
 static bool_t
-_DEFUN (xdrrec_getlong, (xdrs, lp),
-        XDR * xdrs,
+xdrrec_getlong (XDR * xdrs,
 	long *lp)
 {
   RECSTREAM *rstrm = (RECSTREAM *) (xdrs->x_private);
@@ -288,8 +286,7 @@ _DEFUN (xdrrec_getlong, (xdrs, lp),
 }
 
 static bool_t
-_DEFUN (xdrrec_putlong, (xdrs, lp),
-        XDR * xdrs,
+xdrrec_putlong (XDR * xdrs,
 	const long *lp)
 {
   RECSTREAM *rstrm = (RECSTREAM *) (xdrs->x_private);
@@ -313,8 +310,7 @@ _DEFUN (xdrrec_putlong, (xdrs, lp),
 }
 
 static bool_t                   /* must manage buffers, fragments, and records */
-_DEFUN (xdrrec_getbytes, (xdrs, addr, len),
-        XDR * xdrs,
+xdrrec_getbytes (XDR * xdrs,
 	char *addr,
 	u_int len)
 {
@@ -343,8 +339,7 @@ _DEFUN (xdrrec_getbytes, (xdrs, addr, len),
 }
 
 static bool_t
-_DEFUN (xdrrec_putbytes, (xdrs, addr, len),
-        XDR * xdrs,
+xdrrec_putbytes (XDR * xdrs,
         const char *addr,
 	u_int len)
 {
@@ -371,8 +366,7 @@ _DEFUN (xdrrec_putbytes, (xdrs, addr, len),
 }
 
 static u_int
-_DEFUN (xdrrec_getpos, (xdrs),
-        XDR * xdrs)
+xdrrec_getpos (XDR * xdrs)
 {
   RECSTREAM *rstrm = (RECSTREAM *) xdrs->x_private;
   off_t pos;
@@ -398,8 +392,7 @@ _DEFUN (xdrrec_getpos, (xdrs),
 }
 
 static bool_t
-_DEFUN (xdrrec_setpos, (xdrs, pos),
-        XDR * xdrs,
+xdrrec_setpos (XDR * xdrs,
 	u_int pos)
 {
   RECSTREAM *rstrm = (RECSTREAM *) xdrs->x_private;
@@ -439,8 +432,7 @@ _DEFUN (xdrrec_setpos, (xdrs, pos),
 }
 
 static int32_t *
-_DEFUN (xdrrec_inline, (xdrs, len),
-        XDR * xdrs,
+xdrrec_inline (XDR * xdrs,
 	u_int len)
 {
   RECSTREAM *rstrm = (RECSTREAM *) xdrs->x_private;
@@ -482,8 +474,7 @@ _DEFUN (xdrrec_inline, (xdrs, len),
 }
 
 static void
-_DEFUN (xdrrec_destroy, (xdrs),
-        XDR * xdrs)
+xdrrec_destroy (XDR * xdrs)
 {
   RECSTREAM *rstrm = (RECSTREAM *) xdrs->x_private;
 
@@ -493,8 +484,7 @@ _DEFUN (xdrrec_destroy, (xdrs),
 }
 
 static bool_t
-_DEFUN (xdrrec_getint32, (xdrs, ip),
-        XDR *xdrs,
+xdrrec_getint32 (XDR *xdrs,
 	int32_t *ip)
 {
   RECSTREAM *rstrm = (RECSTREAM *) (xdrs->x_private);
@@ -520,8 +510,7 @@ _DEFUN (xdrrec_getint32, (xdrs, ip),
 }
 
 static bool_t
-_DEFUN (xdrrec_putint32, (xdrs, ip),
-        XDR *xdrs,
+xdrrec_putint32 (XDR *xdrs,
 	const int32_t *ip)
 {
   RECSTREAM *rstrm = (RECSTREAM *) (xdrs->x_private);
@@ -553,8 +542,7 @@ _DEFUN (xdrrec_putint32, (xdrs, ip),
  * this procedure to guarantee proper record alignment.
  */
 bool_t
-_DEFUN (xdrrec_skiprecord, (xdrs),
-        XDR * xdrs)
+xdrrec_skiprecord (XDR * xdrs)
 {
   RECSTREAM *rstrm = (RECSTREAM *) (xdrs->x_private);
   enum xprt_stat xstat;
@@ -592,8 +580,7 @@ _DEFUN (xdrrec_skiprecord, (xdrs),
  * after consuming the rest of the current record.
  */
 bool_t
-_DEFUN (xdrrec_eof, (xdrs),
-        XDR * xdrs)
+xdrrec_eof (XDR * xdrs)
 {
   RECSTREAM *rstrm = (RECSTREAM *) (xdrs->x_private);
 
@@ -617,8 +604,7 @@ _DEFUN (xdrrec_eof, (xdrs),
  * pipelined procedure calls.)  TRUE => immmediate flush to tcp connection.
  */
 bool_t
-_DEFUN (xdrrec_endofrecord, (xdrs, sendnow),
-        XDR * xdrs,
+xdrrec_endofrecord (XDR * xdrs,
 	bool_t sendnow)
 {
   RECSTREAM *rstrm = (RECSTREAM *) (xdrs->x_private);
@@ -644,8 +630,7 @@ _DEFUN (xdrrec_endofrecord, (xdrs, sendnow),
  * Return true if a record is available in the buffer, false if not.
  */
 bool_t
-_DEFUN (__xdrrec_getrec, (xdrs, statp, expectdata),
-        XDR * xdrs,
+__xdrrec_getrec (XDR * xdrs,
 	enum xprt_stat * statp,
 	bool_t expectdata)
 {
@@ -737,8 +722,7 @@ _DEFUN (__xdrrec_getrec, (xdrs, statp, expectdata),
 }
 
 bool_t
-_DEFUN (__xdrrec_setnonblock, (xdrs, maxrec),
-        XDR * xdrs,
+__xdrrec_setnonblock (XDR * xdrs,
 	int maxrec)
 {
   RECSTREAM *rstrm = (RECSTREAM *) (xdrs->x_private);
@@ -754,8 +738,7 @@ _DEFUN (__xdrrec_setnonblock, (xdrs, maxrec),
  * Internal useful routines
  */
 static bool_t
-_DEFUN (flush_out, (rstrm, eor),
-        RECSTREAM * rstrm,
+flush_out (RECSTREAM * rstrm,
 	bool_t eor)
 {
   u_int32_t eormask = (eor == TRUE) ? LAST_FRAG : 0;
@@ -775,8 +758,7 @@ _DEFUN (flush_out, (rstrm, eor),
 }
 
 static bool_t                   /* knows nothing about records!  Only about input buffers */
-_DEFUN (fill_input_buf, (rstrm),
-        RECSTREAM * rstrm)
+fill_input_buf (RECSTREAM * rstrm)
 {
   char *where;
   u_int32_t i;
@@ -798,8 +780,7 @@ _DEFUN (fill_input_buf, (rstrm),
 }
 
 static bool_t                   /* knows nothing about records!  Only about input buffers */
-_DEFUN (get_input_bytes, (rstrm, addr, len),
-        RECSTREAM * rstrm,
+get_input_bytes (RECSTREAM * rstrm,
 	char *addr,
 	size_t len)
 {
@@ -834,8 +815,7 @@ _DEFUN (get_input_bytes, (rstrm, addr, len),
 }
 
 static bool_t                   /* next two bytes of the input stream are treated as a header */
-_DEFUN (set_input_fragment, (rstrm),
-        RECSTREAM * rstrm)
+set_input_fragment (RECSTREAM * rstrm)
 {
   u_int32_t header;
 
@@ -860,8 +840,7 @@ _DEFUN (set_input_fragment, (rstrm),
 }
 
 static bool_t                   /* consumes input bytes; knows nothing about records! */
-_DEFUN (skip_input_bytes, (rstrm, cnt),
-        RECSTREAM * rstrm,
+skip_input_bytes (RECSTREAM * rstrm,
 	long cnt)
 {
   size_t current;
@@ -884,8 +863,7 @@ _DEFUN (skip_input_bytes, (rstrm, cnt),
 }
 
 static u_int
-_DEFUN (fix_buf_size, (s),
-        u_int s)
+fix_buf_size (u_int s)
 {
 
   if (s < 100)
@@ -897,8 +875,7 @@ _DEFUN (fix_buf_size, (s),
  * Reallocate the input buffer for a non-block stream.
  */
 static bool_t
-_DEFUN (realloc_stream, (rstrm, size),
-        RECSTREAM * rstrm,
+realloc_stream (RECSTREAM * rstrm,
 	int size)
 {
   ptrdiff_t diff;

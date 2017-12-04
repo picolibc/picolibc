@@ -49,8 +49,7 @@ trecurse(root, action, level)
 
 /* Walk the nodes of a tree */
 void
-_DEFUN(twalk, (vroot, action),
-	const void *vroot,	/* Root of the tree to be walked */
+twalk (const void *vroot,	/* Root of the tree to be walked */
 	void (*action)(const void *, VISIT, int))
 {
 	if (vroot != NULL && action != NULL)

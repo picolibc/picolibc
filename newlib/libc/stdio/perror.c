@@ -59,8 +59,7 @@ Supporting OS subroutines required: <<close>>, <<fstat>>, <<isatty>>,
 #include "local.h"
 
 void
-_DEFUN(_perror_r, (ptr, s),
-       struct _reent *ptr,
+_perror_r (struct _reent *ptr,
        const char *s)
 {
   char *error;
@@ -82,8 +81,7 @@ _DEFUN(_perror_r, (ptr, s),
 #ifndef _REENT_ONLY
 
 void
-_DEFUN(perror, (s),
-       const char *s)
+perror (const char *s)
 {
   _perror_r (_REENT, s);
 }

@@ -33,8 +33,7 @@
  *           other files are not. 
  */
 int
-_DEFUN (_isatty, (fd),
-       int fd)
+_isatty (int fd)
 {
   if ((fd == 0) || (fd == 1) || (fd == 2))
     return 1;

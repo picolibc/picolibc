@@ -63,8 +63,7 @@ Supporting OS subroutines required: none.
 #include "local.h"
 
 int
-_DEFUN(fileno, (f),
-       FILE * f)
+fileno (FILE * f)
 {
   int result;
   CHECK_INIT (_REENT, f);

@@ -4,8 +4,7 @@
 #include <sys/wait.h>
 
 pid_t
-_DEFUN (wait, (status),
-        int *status)
+wait (int *status)
 {
   return _wait_r (_REENT, status);
 }

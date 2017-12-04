@@ -19,8 +19,7 @@
  * fstat -- Since we have no file system, we just return an error.
  */
 int
-_DEFUN (_fstat, (fd, buf),
-       int fd,
+_fstat (int fd,
        struct stat *buf)
 {
   buf->st_mode = S_IFCHR;        /* Always pretend to be a tty */

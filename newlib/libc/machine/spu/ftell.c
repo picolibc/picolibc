@@ -38,8 +38,7 @@ Author: Joel Schopp <jschopp@austin.ibm.com>
 #ifndef _REENT_ONLY
 
 long
-_DEFUN (ftell, (fp),
-	FILE * fp)
+ftell (FILE * fp)
 {
   long ret;
 

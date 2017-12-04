@@ -52,8 +52,7 @@ PORTABILITY
 #include <wchar.h>
 
 size_t
-_DEFUN(wcsnlen, (s, maxlen), 
-                 const wchar_t *s,
+wcsnlen (const wchar_t *s,
                  size_t maxlen)
 {
   const wchar_t *p;

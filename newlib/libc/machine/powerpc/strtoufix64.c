@@ -13,8 +13,7 @@
  * Ignores `locale' stuff.
  */
 __uint64_t
-_DEFUN (_strtoufix64_r, (rptr, nptr, endptr),
-	struct _reent *rptr,
+_strtoufix64_r (struct _reent *rptr,
 	const char *nptr,
 	char **endptr)
 {
@@ -104,8 +103,7 @@ _DEFUN (_strtoufix64_r, (rptr, nptr, endptr),
 #ifndef _REENT_ONLY
 
 __uint64_t
-_DEFUN (strtoufix64, (s, ptr, base),
-	const char *s,
+strtoufix64 (const char *s,
 	char **ptr)
 {
   return _strtoufix64_r (_REENT, s, ptr);

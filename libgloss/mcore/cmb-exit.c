@@ -18,8 +18,7 @@
  * _exit --  Just cause a breakpoint so user can see why we exited.
  */
 void
-_DEFUN (_exit, (val),
-       int val)
+_exit (int val)
 {
     while (1) {
 	asm("bkpt");

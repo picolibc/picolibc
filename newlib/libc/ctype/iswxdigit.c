@@ -36,7 +36,7 @@ No supporting OS subroutines are required.
 #include <wctype.h>
 
 int
-_DEFUN(iswxdigit,(c), wint_t c)
+iswxdigit (wint_t c)
 {
   return ((c >= (wint_t)'0' && c <= (wint_t)'9') ||
 	  (c >= (wint_t)'a' && c <= (wint_t)'f') ||

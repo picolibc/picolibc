@@ -213,8 +213,7 @@ _wcstoll_l (struct _reent *rptr, const wchar_t *nptr, wchar_t **endptr,
 }
 
 long long
-_DEFUN (_wcstoll_r, (rptr, nptr, endptr, base),
-	struct _reent *rptr,
+_wcstoll_r (struct _reent *rptr,
 	const wchar_t *nptr,
 	wchar_t **endptr,
 	int base)
@@ -232,8 +231,7 @@ wcstoll_l (const wchar_t *__restrict s, wchar_t **__restrict ptr, int base,
 }
 
 long long
-_DEFUN (wcstoll, (s, ptr, base),
-	const wchar_t *__restrict s,
+wcstoll (const wchar_t *__restrict s,
 	wchar_t **__restrict ptr,
 	int base)
 {

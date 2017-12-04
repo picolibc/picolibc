@@ -12,8 +12,7 @@
 #include <envz.h>
 
 error_t
-_DEFUN (envz_add, (envz, envz_len, name, value),
-       char **envz,
+envz_add (char **envz,
        size_t *envz_len,
        const char *name,
        const char *value)

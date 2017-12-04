@@ -50,8 +50,7 @@ Supporting OS subroutines required: <<_exit>>.
  */
 
 void
-_DEFUN (exit, (code),
-	int code)
+exit (int code)
 {
 #ifdef _LITE_EXIT
   /* Refer to comments in __atexit.c for more details of lite exit.  */

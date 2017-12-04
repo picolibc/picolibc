@@ -52,8 +52,7 @@ QUICKREF
 #define DETECTCHAR(X,MASK) (DETECTNULL(X ^ MASK))
 
 char *
-_DEFUN (strchr, (s1, i),
-	const char *s1,
+strchr (const char *s1,
 	int i)
 {
   const unsigned char *s = (const unsigned char *)s1;

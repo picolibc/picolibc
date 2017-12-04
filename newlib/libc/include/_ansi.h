@@ -58,14 +58,12 @@
 #define _EXPARM(name, proto)		(* name) proto
 #define _EXFNPTR(name, proto)		(* name) proto
 #endif
-#define	_DEFUN(name, arglist, args)	name(args)
 #ifndef _LONG_DOUBLE
 #define _LONG_DOUBLE long double
 #endif
 #else	
 #define	_EXFUN(name, proto)		name()
 #define	_EXFUN_NOTHROW(name, proto)	name()
-#define	_DEFUN(name, arglist, args)	name arglist args;
 #define _LONG_DOUBLE double
 #endif
 

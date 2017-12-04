@@ -30,8 +30,7 @@
 #include "local.h"
 
 wint_t
-_DEFUN(_fputwc_unlocked_r, (ptr, wc, fp),
-	struct _reent *ptr,
+_fputwc_unlocked_r (struct _reent *ptr,
 	wchar_t wc,
 	FILE *fp)
 {
@@ -40,8 +39,7 @@ _DEFUN(_fputwc_unlocked_r, (ptr, wc, fp),
 }
 
 wint_t
-_DEFUN(fputwc_unlocked, (wc, fp),
-	wchar_t wc,
+fputwc_unlocked (wchar_t wc,
 	FILE *fp)
 {
   struct _reent *reent = _REENT;

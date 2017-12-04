@@ -94,8 +94,7 @@ Supporting OS subroutines required: <<close>>, <<fstat>>, <<isatty>>,
  */
 
 char *
-_DEFUN(_fgets_r, (ptr, buf, n, fp),
-       struct _reent * ptr,
+_fgets_r (struct _reent * ptr,
        char *__restrict buf,
        int n,
        FILE *__restrict fp)
@@ -189,8 +188,7 @@ _DEFUN(_fgets_r, (ptr, buf, n, fp),
 #ifndef _REENT_ONLY
 
 char *
-_DEFUN(fgets, (buf, n, fp),
-       char *__restrict buf,
+fgets (char *__restrict buf,
        int n,
        FILE *__restrict fp)
 {

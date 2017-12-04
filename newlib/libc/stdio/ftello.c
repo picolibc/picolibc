@@ -83,8 +83,7 @@ static char sccsid[] = "%W% (Berkeley) %G%";
 #include "local.h"
 
 _off_t
-_DEFUN(_ftello_r, (ptr, fp),
-       struct _reent * ptr,
+_ftello_r (struct _reent * ptr,
        register FILE * fp)
 {
   _fpos_t pos;
@@ -153,8 +152,7 @@ _DEFUN(_ftello_r, (ptr, fp),
 #ifndef _REENT_ONLY
 
 _off_t
-_DEFUN(ftello, (fp),
-       register FILE * fp)
+ftello (register FILE * fp)
 {
   return _ftello_r (_REENT, fp);
 }

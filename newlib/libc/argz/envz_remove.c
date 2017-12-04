@@ -12,8 +12,7 @@
 #include <envz.h>
 
 void
-_DEFUN (envz_remove, (envz, envz_len, name),
-       char **envz,
+envz_remove (char **envz,
        size_t *envz_len,
        const char *name)
 {

@@ -37,8 +37,7 @@ Author: Joel Schopp <jschopp@austin.ibm.com>
 #ifndef _REENT_ONLY
 
 void
-_DEFUN (rewind, (fp),
-	FILE * fp)
+rewind (FILE * fp)
 {
   int ret;
 

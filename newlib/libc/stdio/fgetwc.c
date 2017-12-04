@@ -125,8 +125,7 @@ PORTABILITY
 #include "local.h"
 
 wint_t
-_DEFUN(__fgetwc, (ptr, fp),
-	struct _reent *ptr,
+__fgetwc (struct _reent *ptr,
 	register FILE *fp)
 {
   wchar_t wc;
@@ -172,8 +171,7 @@ _DEFUN(__fgetwc, (ptr, fp),
 }
 
 wint_t
-_DEFUN(_fgetwc_r, (ptr, fp),
-	struct _reent *ptr,
+_fgetwc_r (struct _reent *ptr,
 	register FILE *fp)
 {
   wint_t r;
@@ -186,8 +184,7 @@ _DEFUN(_fgetwc_r, (ptr, fp),
 }
 
 wint_t
-_DEFUN(fgetwc, (fp),
-	FILE *fp)
+fgetwc (FILE *fp)
 {
   struct _reent *reent = _REENT;
 

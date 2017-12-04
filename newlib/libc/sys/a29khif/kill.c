@@ -6,8 +6,7 @@
 /* The pid argument should be of type pid_t.  */
 
 int
-_DEFUN (_kill, (pid, sig),
-	int pid,
+_kill (int pid,
 	int sig)
 {
   if (pid == 1 || pid < 0)

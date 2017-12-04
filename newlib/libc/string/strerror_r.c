@@ -65,8 +65,7 @@ a non-empty alternate string without assigning into its third argument.
 /* For backwards-compatible linking, this must be the GNU signature;
    see xpg_strerror_r.c for the POSIX version.  */
 char *
-_DEFUN (strerror_r, (errnum, buffer, n),
-	int errnum,
+strerror_r (int errnum,
 	char *buffer,
 	size_t n)
 {

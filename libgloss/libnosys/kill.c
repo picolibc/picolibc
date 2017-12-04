@@ -11,8 +11,7 @@ extern int errno;
 #include "warning.h"
 
 int
-_DEFUN (_kill, (pid, sig),
-        int pid,
+_kill (int pid,
         int sig)
 {
   errno = ENOSYS;

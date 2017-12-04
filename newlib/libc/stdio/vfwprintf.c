@@ -174,8 +174,7 @@ int _EXFUN(__SPRINT, (struct _reent *, FILE *, const char *, size_t));
  * worries about ungetc buffers and so forth.
  */
 static int
-_DEFUN(__sbwprintf, (rptr, fp, fmt, ap),
-       struct _reent *rptr,
+__sbwprintf (struct _reent *rptr,
        register FILE *fp,
        const wchar_t *fmt,
        va_list ap)
@@ -366,8 +365,7 @@ _EXFUN(get_arg, (struct _reent *data, int n, wchar_t *fmt,
 
 #ifndef STRING_ONLY
 int
-_DEFUN(VFWPRINTF, (fp, fmt0, ap),
-       FILE *__restrict fp,
+VFWPRINTF (FILE *__restrict fp,
        const wchar_t *__restrict fmt0,
        va_list ap)
 {
@@ -378,8 +376,7 @@ _DEFUN(VFWPRINTF, (fp, fmt0, ap),
 #endif /* STRING_ONLY */
 
 int
-_DEFUN(_VFWPRINTF_R, (data, fp, fmt0, ap),
-       struct _reent *data,
+_VFWPRINTF_R (struct _reent *data,
        FILE * fp,
        const wchar_t *fmt0,
        va_list ap)
@@ -1734,8 +1731,7 @@ wexponent(wchar_t *p0, int exp, int fmtch)
 
 /* function to get positional parameter N where n = N - 1 */
 static union arg_val *
-_DEFUN(get_arg, (data, n, fmt, ap, numargs_p, args, arg_type, last_fmt),
-       struct _reent *data,
+get_arg (struct _reent *data,
        int n,
        wchar_t *fmt,
        va_list *ap,

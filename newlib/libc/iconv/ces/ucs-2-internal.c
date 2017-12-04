@@ -44,8 +44,7 @@
  
 #if defined (ICONV_FROM_UCS_CES_UCS_2_INTERNAL)
 static size_t
-_DEFUN(ucs_2_internal_convert_from_ucs, (data, in, outbuf, outbytesleft),
-                                        void *data,
+ucs_2_internal_convert_from_ucs (void *data,
                                         register ucs4_t in,
                                         unsigned char **outbuf,
                                         size_t *outbytesleft)
@@ -66,8 +65,7 @@ _DEFUN(ucs_2_internal_convert_from_ucs, (data, in, outbuf, outbytesleft),
 
 #if defined (ICONV_TO_UCS_CES_UCS_2_INTERNAL)
 static ucs4_t
-_DEFUN(ucs_2_internal_convert_to_ucs, (data, inbuf, inbytesleft),
-                                      void *data,
+ucs_2_internal_convert_to_ucs (void *data,
                                       const unsigned char **inbuf,
                                       size_t *inbytesleft)
 {
@@ -89,8 +87,7 @@ _DEFUN(ucs_2_internal_convert_to_ucs, (data, inbuf, inbytesleft),
 #endif /* ICONV_TO_UCS_CES_UCS_2_INTERNAL */
 
 static int
-_DEFUN(ucs_2_internal_get_mb_cur_max, (data),
-                                      void *data)
+ucs_2_internal_get_mb_cur_max (void *data)
 {
   return 2;
 }

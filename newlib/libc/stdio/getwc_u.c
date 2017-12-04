@@ -34,8 +34,7 @@
 #undef getwc_unlocked
 
 wint_t
-_DEFUN(_getwc_unlocked_r, (ptr, fp),
-	struct _reent *ptr,
+_getwc_unlocked_r (struct _reent *ptr,
 	FILE *fp)
 {
   return _fgetwc_unlocked_r (ptr, fp);
@@ -46,8 +45,7 @@ _DEFUN(_getwc_unlocked_r, (ptr, fp),
  * a macro, may evaluate `fp' more than once.
  */
 wint_t
-_DEFUN(getwc_unlocked, (fp),
-	FILE *fp)
+getwc_unlocked (FILE *fp)
 {
   return fgetwc_unlocked(fp);
 }

@@ -65,8 +65,7 @@ Supporting OS subroutines required: <<close>>, <<fstat>>, <<isatty>>,
 #include "local.h"
 
 void
-_DEFUN(setbuffer, (fp, buf, size),
-       FILE * fp,
+setbuffer (FILE * fp,
        char *buf,
        int size)
 {

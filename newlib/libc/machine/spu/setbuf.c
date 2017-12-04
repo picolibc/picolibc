@@ -46,8 +46,7 @@ typedef struct
 #ifndef _REENT_ONLY
 
 void
-_DEFUN (setbuf, (fp, buf),
-	FILE *__restrict fp,
+setbuf (FILE *__restrict fp,
 	char *__restrict buf)
 {
   c99_setbuf_t args;

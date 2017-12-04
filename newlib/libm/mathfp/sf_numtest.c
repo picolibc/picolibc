@@ -23,8 +23,7 @@
 #include "zmath.h"
 
 int 
-_DEFUN (numtestf, (float),
-        float x)
+numtestf (float x)
 {
   __int32_t wx;
   int exp;

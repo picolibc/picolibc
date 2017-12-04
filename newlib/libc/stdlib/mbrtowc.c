@@ -8,8 +8,7 @@
 #include "local.h"
 
 size_t
-_DEFUN (_mbrtowc_r, (ptr, pwc, s, n, ps),
-	struct _reent *ptr,
+_mbrtowc_r (struct _reent *ptr,
 	wchar_t *pwc,
 	const char *s,
 	size_t n,
@@ -42,8 +41,7 @@ _DEFUN (_mbrtowc_r, (ptr, pwc, s, n, ps),
 
 #ifndef _REENT_ONLY
 size_t
-_DEFUN (mbrtowc, (pwc, s, n, ps),
-	wchar_t *__restrict pwc,
+mbrtowc (wchar_t *__restrict pwc,
 	const char *__restrict s,
 	size_t n,
 	mbstate_t *__restrict ps)

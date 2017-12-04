@@ -45,8 +45,7 @@ typedef struct
 #ifndef _REENT_ONLY
 
 int
-_DEFUN (fsetpos, (iop, pos),
-	FILE * iop,
+fsetpos (FILE * iop,
 	const _fpos_t * pos)
 {
   c99_fsetpos_t args;

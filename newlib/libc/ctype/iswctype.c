@@ -38,7 +38,7 @@ No supporting OS subroutines are required.
 #include "local.h"
 
 int
-_DEFUN(iswctype,(c, desc), wint_t c, wctype_t desc)
+iswctype (wint_t c, wctype_t desc)
 {
   switch (desc)
     {

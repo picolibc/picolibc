@@ -46,7 +46,7 @@ No supporting OS subroutines are required.
 
 #undef iscntrl
 int
-_DEFUN(iscntrl,(c),int c)
+iscntrl (int c)
 {
 	return(__CTYPE_PTR[c+1] & _C);
 }

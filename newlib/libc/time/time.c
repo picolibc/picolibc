@@ -33,8 +33,7 @@ Supporting OS subroutine required: Some implementations require
 #include <sys/time.h>
 
 time_t
-_DEFUN (time, (t),
-	time_t * t)
+time (time_t * t)
 {
   struct timeval now;
 

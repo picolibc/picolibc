@@ -53,8 +53,7 @@ QUICKREF
 #include <reent.h>
 
 char *
-_DEFUN (strsignal, (signal),
-	int signal)
+strsignal (int signal)
 {
   char *buffer;
   struct _reent *ptr;

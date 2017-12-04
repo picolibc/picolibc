@@ -25,8 +25,7 @@ extern char *_simdldtoa_r (struct _reent *, LONG_DOUBLE_UNION *, int,
  */
 
 char *
-_DEFUN (_ufix64toa_r, (rptr, value, mode, ndigits, decpt, sign, rve),
-	struct _reent *rptr,
+_ufix64toa_r (struct _reent *rptr,
 	__uint64_t value,
 	int mode,
 	int ndigits,

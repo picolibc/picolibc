@@ -73,7 +73,7 @@ No supporting OS subroutines are required.
 #endif /* _MB_CAPABLE */
 
 int
-_DEFUN(iswprint,(c), wint_t c)
+iswprint (wint_t c)
 {
 #ifdef _MB_CAPABLE
   unsigned const char *table;

@@ -13,8 +13,7 @@ extern int errno;
 #include "warning.h"
 
 int
-_DEFUN (_stat, (file, st),
-        const char  *file,
+_stat (const char  *file,
         struct stat *st)
 {
   errno = ENOSYS;

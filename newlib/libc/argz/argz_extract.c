@@ -9,8 +9,7 @@
 #include <sys/types.h>
 
 void
-_DEFUN (argz_extract, (argz, argz_len, argv),
-       char *argz,
+argz_extract (char *argz,
        size_t argz_len,
        char **argv)
 {

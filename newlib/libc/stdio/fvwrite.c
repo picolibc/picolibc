@@ -45,8 +45,7 @@
  */
 
 int
-_DEFUN(__sfvwrite_r, (ptr, fp, uio),
-       struct _reent *ptr,
+__sfvwrite_r (struct _reent *ptr,
        register FILE *fp,
        register struct __suio *uio)
 {

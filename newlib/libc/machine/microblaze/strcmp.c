@@ -81,8 +81,7 @@ QUICKREF
 #endif
 
 int
-_DEFUN (strcmp, (s1, s2),
-	const char *s1,
+strcmp (const char *s1,
 	const char *s2)
 { 
 

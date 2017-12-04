@@ -39,8 +39,7 @@ Author: Kazunori Asayama <asayama@sm.sony.co.jp>
 static FILE __fp[SPE_FOPEN_MAX];
 
 FILE *
-_DEFUN (__sfp, (d),
-	struct _reent *d)
+__sfp (struct _reent *d)
 {
   int i;
   for (i = 0; i < SPE_FOPEN_MAX; i++) {
@@ -53,8 +52,7 @@ _DEFUN (__sfp, (d),
 }
 
 static void
-_DEFUN (__cleanup, (s),
-	struct _reent *s)
+__cleanup (struct _reent *s)
 {
   int i;
   for (i = 0; i < SPE_FOPEN_MAX; i++) {
@@ -65,8 +63,7 @@ _DEFUN (__cleanup, (s),
 }
 
 void
-_DEFUN (__sinit, (s),
-	struct _reent *s)
+__sinit (struct _reent *s)
 {
   s->__cleanup = __cleanup;
   s->__sdidinit = 1;

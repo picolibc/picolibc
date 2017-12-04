@@ -61,8 +61,7 @@ No supporting OS subroutines are required.
 #include <wchar.h>
 
 wchar_t *
-_DEFUN (wcscat, (s1, s2),
-	wchar_t *__restrict s1,
+wcscat (wchar_t *__restrict s1,
 	const wchar_t *__restrict s2)
 {
   wchar_t *p;

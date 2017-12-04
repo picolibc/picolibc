@@ -62,8 +62,7 @@ PORTABILITY
 #ifndef _DOUBLE_IS_32BITS
 
 double
-_DEFUN (sqrt, (double),
-        double x)
+sqrt (double x)
 {
   double f, y;
   int exp, i, odd;

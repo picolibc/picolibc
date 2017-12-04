@@ -28,8 +28,7 @@ No supporting OS subroutine calls are required.
 #include <stdlib.h>
 
 char *
-_DEFUN (__utoa, (value, str, base),
-        unsigned value,
+__utoa (unsigned value,
         char *str,
         int base)
 {
@@ -67,8 +66,7 @@ _DEFUN (__utoa, (value, str, base),
 }
 
 char *  
-_DEFUN (utoa, (value, str, base),
-        unsigned value,
+utoa (unsigned value,
         char *str,
         int base)
 {

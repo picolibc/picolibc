@@ -41,7 +41,7 @@ No supporting OS subroutines are required.
 
 #undef isupper
 int
-_DEFUN(isupper,(c),int c)
+isupper (int c)
 {
 	return ((__CTYPE_PTR[c+1] & (_U|_L)) == _U);
 }

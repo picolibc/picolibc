@@ -85,8 +85,7 @@ Supporting OS subroutines required: <<close>>, <<fstat>>, <<isatty>>,
 #include "local.h"
 
 int
-_DEFUN(_fgetc_r, (ptr, fp),
-       struct _reent * ptr,
+_fgetc_r (struct _reent * ptr,
        FILE * fp)
 {
   int result;
@@ -100,8 +99,7 @@ _DEFUN(_fgetc_r, (ptr, fp),
 #ifndef _REENT_ONLY
 
 int
-_DEFUN(fgetc, (fp),
-       FILE * fp)
+fgetc (FILE * fp)
 {
 #if !defined(PREFER_SIZE_OVER_SPEED) && !defined(__OPTIMIZE_SIZE__)
   int result;

@@ -46,8 +46,7 @@ effects vary with the locale.
 #include "local.h"
 
 int
-_DEFUN (wctomb, (s, wchar),
-        char *s,
+wctomb (char *s,
         wchar_t wchar)
 {
 #ifdef _MB_CAPABLE

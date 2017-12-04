@@ -32,8 +32,7 @@
 #include "zmath.h"
 
 float
-_DEFUN (sqrtf, (float),
-        float x)
+sqrtf (float x)
 {
   float f, y;
   int exp, i, odd;

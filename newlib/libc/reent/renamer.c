@@ -40,8 +40,7 @@ DESCRIPTION
 */
 
 int
-_DEFUN (_rename_r, (ptr, old, new),
-     struct _reent *ptr,
+_rename_r (struct _reent *ptr,
      const char *old,
      const char *new)
 {

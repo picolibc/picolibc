@@ -20,8 +20,7 @@
  * stat -- Since we have no file system, we just return an error.
  */
 int
-_DEFUN (stat, (path, buf),
-       const char *path,
+stat (const char *path,
        struct stat *buf)
 {
   errno = EIO;

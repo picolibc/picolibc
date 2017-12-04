@@ -93,8 +93,7 @@ Supporting OS subroutines required: <<close>>, <<fstat>>, <<isatty>>,
  */
 
 int
-_DEFUN(_fseeko_r, (ptr, fp, offset, whence),
-       struct _reent *ptr,
+_fseeko_r (struct _reent *ptr,
        register FILE *fp,
        _off_t offset,
        int whence)
@@ -359,8 +358,7 @@ dumb:
 #ifndef _REENT_ONLY
 
 int
-_DEFUN(fseeko, (fp, offset, whence),
-       register FILE *fp,
+fseeko (register FILE *fp,
        _off_t offset,
        int whence)
 {

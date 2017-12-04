@@ -62,50 +62,43 @@ No supporting OS subroutines are required.
 /* Subroutine versions of the inline or macro functions. */
 
 size_t
-_DEFUN(__fbufsize, (fp),
-       FILE * fp)
+__fbufsize (FILE * fp)
 {
   return (size_t) fp->_bf._size;
 }
 
 size_t
-_DEFUN(__fpending, (fp),
-       FILE * fp)
+__fpending (FILE * fp)
 {
   return fp->_p - fp->_bf._base;
 }
 
 int
-_DEFUN(__flbf, (fp),
-       FILE * fp)
+__flbf (FILE * fp)
 {
   return (fp->_flags & __SLBF) != 0;
 }
 
 int
-_DEFUN(__freadable, (fp),
-       FILE * fp)
+__freadable (FILE * fp)
 {
   return (fp->_flags & (__SRD | __SRW)) != 0;
 }
 
 int
-_DEFUN(__fwritable, (fp),
-       FILE * fp)
+__fwritable (FILE * fp)
 {
   return (fp->_flags & (__SWR | __SRW)) != 0;
 }
 
 int
-_DEFUN(__freading, (fp),
-       FILE * fp)
+__freading (FILE * fp)
 {
   return (fp->_flags & __SRD) != 0;
 }
 
 int
-_DEFUN(__fwriting, (fp),
-       FILE * fp)
+__fwriting (FILE * fp)
 {
   return (fp->_flags & __SWR) != 0;
 }

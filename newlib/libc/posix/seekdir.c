@@ -46,8 +46,7 @@ static char sccsid[] = "@(#)seekdir.c	5.7 (Berkeley) 6/1/90";
  * _seekdir is in telldir.c so that it can share opaque data structures.
  */
 void
-_DEFUN(seekdir, (dirp, loc),
-	DIR *dirp,
+seekdir (DIR *dirp,
 	long loc)
 {
 #ifdef HAVE_DD_LOCK

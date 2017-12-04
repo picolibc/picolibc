@@ -113,8 +113,7 @@ static char sccsid[] = "%W% (Berkeley) %G%";
 #include "local.h"
 
 FILE *
-_DEFUN(_fopen_r, (ptr, file, mode),
-       struct _reent *ptr,
+_fopen_r (struct _reent *ptr,
        const char *__restrict file,
        const char *__restrict mode)
 {
@@ -163,8 +162,7 @@ _DEFUN(_fopen_r, (ptr, file, mode),
 #ifndef _REENT_ONLY
 
 FILE *
-_DEFUN(fopen, (file, mode),
-       const char *file,
+fopen (const char *file,
        const char *mode)
 {
   return _fopen_r (_REENT, file, mode);

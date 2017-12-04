@@ -61,8 +61,7 @@ QUICKREF
 #define DETECTCHAR(X,MASK) (DETECTNULL(X ^ MASK))
 
 void *
-_DEFUN (rawmemchr, (src_void, c),
-	const void *src_void,
+rawmemchr (const void *src_void,
 	int c)
 {
   const unsigned char *src = (const unsigned char *) src_void;

@@ -58,8 +58,7 @@ Supporting OS subroutines required: <<close>>, <<fstat>>, <<isatty>>,
 #include "local.h"
 
 static void
-_DEFUN (print_f, (ptr, buf, invalue, ndigit, type, dot, mode),
-	struct _reent *ptr,
+print_f (struct _reent *ptr,
 	char *buf,
 	double invalue,
 	int ndigit,
@@ -126,8 +125,7 @@ _DEFUN (print_f, (ptr, buf, invalue, ndigit, type, dot, mode),
    WIDTH is the number of digits of precision after the decimal point.  */
 
 static void
-_DEFUN (print_e, (ptr, buf, invalue, width, type, dot),
-	struct _reent *ptr,
+print_e (struct _reent *ptr,
 	char *buf,
 	double invalue,
 	int width,
@@ -209,8 +207,7 @@ _DEFUN (print_e, (ptr, buf, invalue, width, type, dot),
    support ecvt and fcvt, which aren't ANSI anyway.  */
 
 char *
-_DEFUN (fcvtbuf, (invalue, ndigit, decpt, sign, fcvt_buf),
-	double invalue,
+fcvtbuf (double invalue,
 	int ndigit,
 	int *decpt,
 	int *sign,
@@ -266,8 +263,7 @@ _DEFUN (fcvtbuf, (invalue, ndigit, decpt, sign, fcvt_buf),
 }
 
 char *
-_DEFUN (ecvtbuf, (invalue, ndigit, decpt, sign, fcvt_buf),
-	double invalue,
+ecvtbuf (double invalue,
 	int ndigit,
 	int *decpt,
 	int *sign,
@@ -317,8 +313,7 @@ _DEFUN (ecvtbuf, (invalue, ndigit, decpt, sign, fcvt_buf),
 #endif
 
 char *
-_DEFUN (_gcvt, (ptr, invalue, ndigit, buf, type, dot),
-	struct _reent *ptr,
+_gcvt (struct _reent *ptr,
 	double invalue,
 	int ndigit,
 	char *buf,
@@ -425,8 +420,7 @@ _DEFUN (_gcvt, (ptr, invalue, ndigit, buf, type, dot),
 }
 
 char *
-_DEFUN (_dcvt, (ptr, buffer, invalue, precision, width, type, dot),
-	struct _reent *ptr,
+_dcvt (struct _reent *ptr,
 	char *buffer,
 	double invalue,
 	int precision,

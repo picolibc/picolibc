@@ -49,8 +49,7 @@ QUICKREF
 #endif
 
 size_t
-_DEFUN (strlen, (str),
-	const char *str)
+strlen (const char *str)
 {
   const char *start = str;
 

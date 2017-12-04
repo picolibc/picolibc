@@ -36,8 +36,7 @@ QUICKREF
 #include <ctype.h>
 
 int
-_DEFUN (strcasecmp, (s1, s2),
-	const char *s1,
+strcasecmp (const char *s1,
 	const char *s2)
 {
   int d = 0;

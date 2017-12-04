@@ -20,8 +20,7 @@
 #ifndef _DOUBLE_IS_32BITS
 
 double
-_DEFUN (ceil, (double),
-        double x)
+ceil (double x)
 {
   double f, y;
 

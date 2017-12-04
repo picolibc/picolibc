@@ -30,8 +30,7 @@
  */
 
 int
-_DEFUN(__swsetup_r, (ptr, fp),
-       struct _reent *ptr,
+__swsetup_r (struct _reent *ptr,
        register FILE * fp)
 {
   /* Make sure stdio is set up.  */

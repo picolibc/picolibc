@@ -53,8 +53,7 @@ QUICKREF
 #endif
 
 char*
-_DEFUN (stpcpy, (dst, src),
-	char *__restrict dst,
+stpcpy (char *__restrict dst,
 	const char *__restrict src)
 {
 #if !defined(PREFER_SIZE_OVER_SPEED) && !defined(__OPTIMIZE_SIZE__)

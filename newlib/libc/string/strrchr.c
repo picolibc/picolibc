@@ -30,8 +30,7 @@ QUICKREF
 #include <string.h>
 
 char *
-_DEFUN (strrchr, (s, i),
-	const char *s,
+strrchr (const char *s,
 	int i)
 {
   const char *last = NULL;

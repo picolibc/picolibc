@@ -33,8 +33,7 @@
 #undef ferror_unlocked
 
 int
-_DEFUN(ferror_unlocked, (fp),
-       FILE * fp)
+ferror_unlocked (FILE * fp)
 {
   CHECK_INIT(_REENT, fp);
   return __sferror (fp);

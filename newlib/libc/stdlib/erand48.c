@@ -14,8 +14,7 @@
 #include "rand48.h"
 
 double
-_DEFUN (_erand48_r, (r, xseed),
-       struct _reent *r,
+_erand48_r (struct _reent *r,
        unsigned short xseed[3])
 {
   __dorand48(r, xseed);
@@ -26,8 +25,7 @@ _DEFUN (_erand48_r, (r, xseed),
 
 #ifndef _REENT_ONLY
 double
-_DEFUN (erand48, (xseed),
-       unsigned short xseed[3])
+erand48 (unsigned short xseed[3])
 {
   return _erand48_r (_REENT, xseed);
 }

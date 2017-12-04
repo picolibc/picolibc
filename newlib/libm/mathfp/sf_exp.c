@@ -30,8 +30,7 @@ static const float p[] = { 0.249999999950, 0.00416028863 };
 static const float q[] = { 0.5, 0.04998717878 };
 
 float
-_DEFUN (expf, (float),
-        float x)
+expf (float x)
 {
   int N;
   float g, z, R, P, Q;

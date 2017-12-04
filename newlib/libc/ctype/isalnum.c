@@ -44,7 +44,7 @@ No OS subroutines are required.
 #undef isalnum
 
 int
-_DEFUN(isalnum,(c),int c)
+isalnum (int c)
 {
 	return(__CTYPE_PTR[c+1] & (_U|_L|_N));
 }

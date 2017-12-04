@@ -39,8 +39,7 @@ Supporting OS subroutine required: <<write>>, <<lseek>>.
 #include <reent.h>
 
 ssize_t
-_DEFUN (_pwrite_r, (rptr, fd, buf, n, off),
-     struct _reent *rptr,
+_pwrite_r (struct _reent *rptr,
      int fd,
      const void *buf,
      size_t n,
@@ -66,8 +65,7 @@ _DEFUN (_pwrite_r, (rptr, fd, buf, n, off),
 #ifndef _REENT_ONLY
 
 ssize_t
-_DEFUN (pwrite, (fd, buf, n, off),
-     int fd,
+pwrite (int fd,
      const void *buf,
      size_t n,
      off_t off)

@@ -27,15 +27,13 @@
 static const char R64_ARRAY[] = "./0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
 
 char *
-_DEFUN (l64a, (value),
-     long value)
+l64a (long value)
 {
   return _l64a_r (_REENT, value);
 }
 
 char *
-_DEFUN (_l64a_r, (rptr, value),
-     struct _reent *rptr,
+_l64a_r (struct _reent *rptr,
      long value)
 {
   char *ptr;

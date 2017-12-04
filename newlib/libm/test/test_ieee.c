@@ -82,8 +82,7 @@ test_getroundtoi (void)
 }
 
 double
- _DEFUN(dnumber,(msw, lsw),
-	int msw,
+ dnumber (int msw,
 	int lsw)
 {
   

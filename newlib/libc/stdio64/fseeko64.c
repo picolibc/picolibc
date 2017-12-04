@@ -85,8 +85,7 @@ Supporting OS subroutines required: <<close>>, <<fstat64>>, <<isatty>>,
  */
 
 _off64_t
-_DEFUN (_fseeko64_r, (ptr, fp, offset, whence),
-     struct _reent *ptr,
+_fseeko64_r (struct _reent *ptr,
      register FILE *fp,
      _off64_t offset,
      int whence)
@@ -342,8 +341,7 @@ dumb:
 #ifndef _REENT_ONLY
 
 _off64_t
-_DEFUN (fseeko64, (fp, offset, whence),
-     register FILE *fp,
+fseeko64 (register FILE *fp,
      _off64_t offset,
      int whence)
 {

@@ -18,8 +18,7 @@
 #include "zmath.h"
 
 float
-_DEFUN (sinhf, (float),
-        float x)
+sinhf (float x)
 {
   return (sinehf (x, 0));
 }

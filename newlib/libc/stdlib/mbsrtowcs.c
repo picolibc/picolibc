@@ -8,8 +8,7 @@
 #include <errno.h>
 
 size_t
-_DEFUN (_mbsrtowcs_r, (r, dst, src, len, ps), 
-	struct _reent *r,
+_mbsrtowcs_r (struct _reent *r,
 	wchar_t *dst,
 	const char **src,
 	size_t len,
@@ -20,8 +19,7 @@ _DEFUN (_mbsrtowcs_r, (r, dst, src, len, ps),
 
 #ifndef _REENT_ONLY
 size_t
-_DEFUN (mbsrtowcs, (dst, src, len, ps),
-	wchar_t *__restrict dst,
+mbsrtowcs (wchar_t *__restrict dst,
 	const char **__restrict src,
 	size_t len,
 	mbstate_t *__restrict ps)

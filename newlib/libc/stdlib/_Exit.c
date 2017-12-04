@@ -34,8 +34,7 @@ Supporting OS subroutines required: <<_exit>>.
 #include <reent.h>
 
 void 
-_DEFUN (_Exit, (code),
-	int code)
+_Exit (int code)
 {
   _exit (code);
 }

@@ -70,8 +70,7 @@ static char sccsid[] = "%W% (Berkeley) %G%";
 #undef putc_unlocked
 
 int
-_DEFUN(_putc_unlocked_r, (ptr, c, fp),
-       struct _reent *ptr,
+_putc_unlocked_r (struct _reent *ptr,
        int c,
        register FILE *fp)
 {
@@ -82,8 +81,7 @@ _DEFUN(_putc_unlocked_r, (ptr, c, fp),
 
 #ifndef _REENT_ONLY
 int
-_DEFUN(putc_unlocked, (c, fp),
-       int c,
+putc_unlocked (int c,
        register FILE *fp)
 {
   /* CHECK_INIT is (eventually) called by __swbuf.  */

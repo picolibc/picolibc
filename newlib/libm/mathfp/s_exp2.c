@@ -9,8 +9,7 @@
 #ifndef _DOUBLE_IS_32BITS
 
 double
-_DEFUN (exp2, (double),
-        double x)
+exp2 (double x)
 {
   return pow(2.0, x);
 }

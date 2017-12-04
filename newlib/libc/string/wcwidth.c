@@ -163,8 +163,7 @@ bisearch(wint_t ucs, const struct interval *table, int max)
  */
 
 int
-_DEFUN (__wcwidth, (ucs),
-	const wint_t ucs)
+__wcwidth (const wint_t ucs)
 {
 #ifdef _MB_CAPABLE
   /* sorted list of non-overlapping intervals of East Asian Ambiguous
@@ -329,8 +328,7 @@ _DEFUN (__wcwidth, (ucs),
 }
 
 int     
-_DEFUN (wcwidth, (wc),
-	const wchar_t wc)
+wcwidth (const wchar_t wc)
 { 
   wint_t wi = wc;
 

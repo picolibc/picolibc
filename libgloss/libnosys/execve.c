@@ -11,8 +11,7 @@ extern int errno;
 #include "warning.h"
 
 int
-_DEFUN (_execve, (name, argv, env),
-        char  *name,
+_execve (char  *name,
         char **argv,
         char **env)
 {

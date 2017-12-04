@@ -34,8 +34,7 @@ Supporting OS subroutines required: <<close>>, <<fstat>>, <<isatty>>,
 #include <string.h>
 
 void
-_DEFUN(psignal, (sig, s),
-       int sig,
+psignal (int sig,
        const char *s)
 {
   if (s != NULL && *s != '\0')

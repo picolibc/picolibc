@@ -81,8 +81,7 @@ No supporting OS subroutines are required.
 #include <stdlib.h>		/* div_t */
 
 div_t
-_DEFUN (div, (num, denom),
-	int num,
+div (int num,
 	int denom)
 {
 	div_t r;

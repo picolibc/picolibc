@@ -29,8 +29,7 @@
 #include "local.h"
 
 int
-_DEFUN(_fgetc_unlocked_r, (ptr, fp),
-       struct _reent * ptr,
+_fgetc_unlocked_r (struct _reent * ptr,
        FILE * fp)
 {
   CHECK_INIT(ptr, fp);
@@ -40,8 +39,7 @@ _DEFUN(_fgetc_unlocked_r, (ptr, fp),
 #ifndef _REENT_ONLY
 
 int
-_DEFUN(fgetc_unlocked, (fp),
-       FILE * fp)
+fgetc_unlocked (FILE * fp)
 {
 #if !defined(PREFER_SIZE_OVER_SPEED) && !defined(__OPTIMIZE_SIZE__)
   struct _reent *reent = _REENT;

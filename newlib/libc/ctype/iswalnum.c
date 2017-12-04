@@ -37,7 +37,7 @@ No supporting OS subroutines are required.
 #include <wctype.h>
 
 int
-_DEFUN(iswalnum,(c),wint_t c)
+iswalnum (wint_t c)
 {
   return (iswalpha (c) || iswdigit (c));
 }

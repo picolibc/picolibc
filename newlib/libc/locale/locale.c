@@ -289,8 +289,7 @@ static char *currentlocale (void);
 #endif /* _MB_CAPABLE */
 
 char *
-_DEFUN(_setlocale_r, (p, category, locale),
-       struct _reent *p,
+_setlocale_r (struct _reent *p,
        int category,
        const char *locale)
 {
@@ -990,8 +989,7 @@ __locale_ctype_ptr (void)
 #ifndef _REENT_ONLY
 
 char *
-_DEFUN (setlocale, (category, locale),
-	int category,
+setlocale (int category,
 	const char *locale)
 {
   return _setlocale_r (_REENT, category, locale);

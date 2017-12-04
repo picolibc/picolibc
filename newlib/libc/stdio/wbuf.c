@@ -33,8 +33,7 @@ static char sccsid[] = "%W% (Berkeley) %G%";
  */
 
 int
-_DEFUN(__swbuf_r, (ptr, c, fp),
-       struct _reent *ptr,
+__swbuf_r (struct _reent *ptr,
        register int c,
        register FILE *fp)
 {
@@ -88,8 +87,7 @@ _DEFUN(__swbuf_r, (ptr, c, fp),
    required for backward compatibility with applications built against
    earlier dynamically built newlib libraries. */
 int
-_DEFUN(__swbuf, (c, fp),
-       register int c,
+__swbuf (register int c,
        register FILE *fp)
 {
   return __swbuf_r (_REENT, c, fp);

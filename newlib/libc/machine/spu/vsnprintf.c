@@ -27,8 +27,7 @@ typedef struct
 #ifndef _REENT_ONLY
 
 int
-_DEFUN (vsnprintf, (str, size, fmt, ap),
-     char *__restrict str,
+vsnprintf (char *__restrict str,
      size_t size,
      const char *__restrict fmt,
      va_list ap)

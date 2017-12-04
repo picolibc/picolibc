@@ -63,8 +63,7 @@ static const double q[] = { -0.46671683339755294240,
                              0.49819433993786512270e-6 };
 
 double
-_DEFUN (tan, (double),
-        double x)
+tan (double x)
 {
   double y, f, g, XN, xnum, xden, res;
   int N;

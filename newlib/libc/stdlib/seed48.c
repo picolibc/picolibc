@@ -14,8 +14,7 @@
 #include "rand48.h"
 
 unsigned short *
-_DEFUN (_seed48_r, (r, xseed),
-       struct _reent *r,
+_seed48_r (struct _reent *r,
        unsigned short xseed[3])
 {
   static unsigned short sseed[3];
@@ -36,8 +35,7 @@ _DEFUN (_seed48_r, (r, xseed),
 
 #ifndef _REENT_ONLY
 unsigned short *
-_DEFUN (seed48, (xseed),
-       unsigned short xseed[3])
+seed48 (unsigned short xseed[3])
 {
   return _seed48_r (_REENT, xseed);
 }

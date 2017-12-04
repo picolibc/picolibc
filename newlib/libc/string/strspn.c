@@ -30,8 +30,7 @@ QUICKREF
 #include <string.h>
 
 size_t
-_DEFUN (strspn, (s1, s2),
-	const char *s1,
+strspn (const char *s1,
 	const char *s2)
 {
   const char *s = s1;

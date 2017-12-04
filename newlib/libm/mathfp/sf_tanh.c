@@ -31,8 +31,7 @@ static const float q[] = {  0.6178299136,
                             0.25 };
 
 float
-_DEFUN (tanhf, (float),
-        float x)
+tanhf (float x)
 {
   float f, res, g, P, Q, R;
 

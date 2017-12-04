@@ -3,8 +3,7 @@
 #include "local.h"
 
 size_t
-_DEFUN (_wcstombs_r, (reent, s, pwcs, n, state),
-        struct _reent *r,
+_wcstombs_r (struct _reent *r,
         char          *__restrict s,
         const wchar_t *__restrict pwcs,
         size_t         n,

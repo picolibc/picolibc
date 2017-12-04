@@ -14,8 +14,7 @@
 #include "rand48.h"
 
 double
-_DEFUN (_drand48_r, (r),
-       struct _reent *r)
+_drand48_r (struct _reent *r)
 {
   _REENT_CHECK_RAND48(r);
   return _erand48_r(r, __rand48_seed);

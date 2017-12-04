@@ -18,8 +18,7 @@ static char ***p_environ = &environ;
 #include <stdarg.h>
 
 int
-_DEFUN(execl, (path, arg0, ...), 
-      const char *path,
+execl (const char *path,
       const char *arg0, ...)
 
 #else
@@ -27,8 +26,7 @@ _DEFUN(execl, (path, arg0, ...),
 #include <varargs.h>
 
 int
-_DEFUN(execl, (path, arg0, va_alist),
-     const char *path,
+execl (const char *path,
      const char *arg0,
      va_dcl)
 

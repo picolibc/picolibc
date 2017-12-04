@@ -18,8 +18,7 @@
 #include "zmath.h"
 
 float
-_DEFUN (log10f, (float),
-        float x)
+log10f (float x)
 {
   return (logarithmf (x, 1));
 }

@@ -32,8 +32,7 @@ static char sccsid[] = "%W% (Berkeley) %G%";
  */
 
 int
-_DEFUN(__srget_r, (ptr, fp),
-       struct _reent *ptr,
+__srget_r (struct _reent *ptr,
        register FILE *fp)
 {
   /* Ensure that any fake std stream is resolved before
@@ -52,8 +51,7 @@ _DEFUN(__srget_r, (ptr, fp),
    required for backward compatibility with applications built against
    earlier dynamically built newlib libraries. */
 int
-_DEFUN(__srget, (fp),
-       register FILE *fp)
+__srget (register FILE *fp)
 {
   return __srget_r (_REENT, fp);
 }

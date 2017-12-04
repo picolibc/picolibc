@@ -14,8 +14,7 @@
 #include <string.h>
 
 char *
-_DEFUN (__gnu_basename, (path),
-	const char *path)
+__gnu_basename (const char *path)
 {
   char *p;
   if ((p = strrchr (path, '/')))

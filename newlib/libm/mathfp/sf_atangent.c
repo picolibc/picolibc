@@ -31,8 +31,7 @@ static const float q[] = { 0.1412500740e+1 };
 static const float p[] = { -0.4708325141, -0.5090958253e-1 };
 
 float
-_DEFUN (atangentf, (float, float, float, int),
-        float x,
+atangentf (float x,
         float v,
         float u,
         int arctan2)

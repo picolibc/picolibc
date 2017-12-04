@@ -47,8 +47,7 @@ effects vary with the locale.
 #include <wchar.h>
 
 size_t
-_DEFUN (mbstowcs, (pwcs, s, n),
-        wchar_t *__restrict pwcs,
+mbstowcs (wchar_t *__restrict pwcs,
         const char *__restrict s,
         size_t n)
 {

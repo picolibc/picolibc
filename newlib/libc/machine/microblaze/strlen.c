@@ -78,8 +78,7 @@ QUICKREF
 #endif
 
 size_t
-_DEFUN (strlen, (str),
-	const char *str)
+strlen (const char *str)
 {
 
 #ifndef HAVE_HW_PCMP

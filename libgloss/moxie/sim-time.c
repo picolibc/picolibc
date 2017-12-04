@@ -37,8 +37,7 @@ extern time_t _sim_time (void) __asm__("_sim_time");
  * time -- return current time in seconds.
  */
 time_t
-_DEFUN (time, time (t),
-	time_t *t)
+time (time_t *t)
 {
   time_t ret = _sim_time ();
 
@@ -52,8 +51,7 @@ _DEFUN (time, time (t),
  * _times -- no clock, so return an error.
  */
 int
-_DEFUN (_times, _times (buf),
-	struct tms *buf)
+_times (struct tms *buf)
 {
   errno = EINVAL;
   return (-1);
@@ -64,8 +62,7 @@ _DEFUN (_times, _times (buf),
  * microseconds.
  */
 int
-_DEFUN (_gettimeofday, _gettimeofday (tv, tz),
-	struct timeval *tv,
+_gettimeofday (struct timeval *tv,
 	void *tzvp)
 {
   struct timezone *tz = tzvp;

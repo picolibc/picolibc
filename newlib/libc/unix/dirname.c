@@ -9,8 +9,7 @@
 #include <string.h>
 
 char *
-_DEFUN (dirname, (path),
-	char *path)
+dirname (char *path)
 {
 	char *p;
 	if( path == NULL || *path == '\0' )

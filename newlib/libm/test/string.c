@@ -10,8 +10,7 @@ int  errors = 0;
 #define check(thing) checkit(thing, __LINE__)
 
 void
-_DEFUN(checkit,(ok,l),
-       int ok,
+checkit (int ok,
        int l )
 
 {
@@ -31,8 +30,7 @@ _DEFUN(checkit,(ok,l),
 #define equal(a, b)  funcqual(a,b,__LINE__);
 
 void
-_DEFUN(funcqual,(a,b,l),
-       char *a,
+funcqual (char *a,
        char *b,
        int l)
 {

@@ -55,8 +55,7 @@ typedef struct
 #ifndef _REENT_ONLY
 
 int
-_DEFUN (vscanf, (fmt, ap),
-     const char *fmt,
+vscanf (const char *fmt,
      va_list ap)
 {
   c99_vscanf_t args;

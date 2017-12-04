@@ -30,8 +30,7 @@ Supporting OS subroutine required: <<read>>, <<lseek64>>.
 #include <machine/weakalias.h>
 
 ssize_t
-_DEFUN (__libc_pread64, (fd, buf, n, off),
-     int fd,
+__libc_pread64 (int fd,
      void *buf,
      size_t n,
      loff_t off)

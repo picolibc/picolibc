@@ -19,8 +19,7 @@
  * getpid -- only one process, so just return 1.
  */
 int
-_DEFUN (getpid, (),
-        )
+getpid (void)
 {
   return __MYPID;
 }

@@ -59,8 +59,7 @@ const unsigned char __hexdig[256]=
 };
 #else /* !defined(PREFER_SIZE_OVER_SPEED) && !defined(__OPTIMIZE_SIZE__) && !defined(_SMALL_HEXDIG) */
 unsigned char
-_DEFUN (__hexdig_fun, (c),
-		unsigned char c)
+__hexdig_fun (unsigned char c)
 {
 	if(c>='0' && c<='9') return c-'0'+0x10;
 	else if(c>='a' && c<='f') return c-'a'+0x10+10;
@@ -70,8 +69,7 @@ _DEFUN (__hexdig_fun, (c),
 #endif /* !defined(PREFER_SIZE_OVER_SPEED) && !defined(__OPTIMIZE_SIZE__) && !defined(_SMALL_HEXDIG) */
 
 static void
-_DEFUN(rshift, (b, k),
-	_Bigint *b,
+rshift (_Bigint *b,
 	int k)
 {
 	__ULong *x, *x1, *xe, y;
@@ -101,8 +99,7 @@ _DEFUN(rshift, (b, k),
 }
 
 static _Bigint *
-_DEFUN (increment, (ptr, b),
-	struct _reent *ptr,
+increment (struct _reent *ptr,
 	_Bigint *b)
 {
 	__ULong *x, *xe;

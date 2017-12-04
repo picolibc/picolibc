@@ -41,8 +41,7 @@ static char ttyname_buf[TTYNAME_BUFSIZE] = _PATH_DEV;
  *  ttyname() - POSIX 1003.1b 4.7.2 - Determine Terminal Device Name
  */
 char *
-_DEFUN( ttyname,(fd),
-	int fd)
+ ttyname (int fd)
 {
   register int  fail;
   register char *ret=NULL;

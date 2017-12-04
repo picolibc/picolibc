@@ -12,8 +12,7 @@ extern int errno;
 #include "warning.h"
 
 int
-_DEFUN (_chown, (path, owner, group),
-        const char *path,
+_chown (const char *path,
         uid_t owner,
         gid_t group)
 {

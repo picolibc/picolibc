@@ -13,8 +13,7 @@
  * Ignores `locale' stuff.
  */
 __int32_t
-_DEFUN (_strtosfix32_r, (rptr, nptr, endptr),
-	struct _reent *rptr,
+_strtosfix32_r (struct _reent *rptr,
 	const char *nptr,
 	char **endptr)
 {
@@ -92,8 +91,7 @@ _DEFUN (_strtosfix32_r, (rptr, nptr, endptr),
 #ifndef _REENT_ONLY
 
 __int32_t
-_DEFUN (strtosfix32, (s, ptr, base),
-	const char *s,
+strtosfix32 (const char *s,
 	char **ptr)
 {
   return _strtosfix32_r (_REENT, s, ptr);

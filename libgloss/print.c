@@ -18,8 +18,7 @@
  * print -- do a raw print of a string
  */ 
 void
-_DEFUN (print, (ptr),
-char *ptr)
+print (char *ptr)
 {
   while (*ptr) {
     outbyte (*ptr++);

@@ -15,8 +15,7 @@ extern int errno;
 struct timeval;
 
 int
-_DEFUN (_gettimeofday, (ptimeval, ptimezone),
-        struct timeval  *ptimeval,
+_gettimeofday (struct timeval  *ptimeval,
         void *ptimezone)
 {
   errno = ENOSYS;

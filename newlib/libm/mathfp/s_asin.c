@@ -20,8 +20,7 @@
 #ifndef _DOUBLE_IS_32BITS
 
 double
-_DEFUN (asin, (double),
-        double x)
+asin (double x)
 {
   return (asine (x, 0));
 }

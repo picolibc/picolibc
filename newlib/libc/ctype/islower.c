@@ -43,7 +43,7 @@ No supporting OS subroutines are required.
 
 #undef islower
 int
-_DEFUN(islower,(c),int c)
+islower (int c)
 {
 	return ((__CTYPE_PTR[c+1] & (_U|_L)) == _L);
 }

@@ -65,7 +65,7 @@ No supporting OS subroutines are required.
 #include <wctype.h>
 
 int
-_DEFUN(iswgraph,(c),wint_t c)
+iswgraph (wint_t c)
 {
   return (iswprint (c) && !iswspace (c));
 }

@@ -59,8 +59,7 @@
  *   and sets current thread's/process's errno.
  */
 const char *
-_DEFUN(_iconv_nls_construct_filename, (rptr, file, ext),
-                                      struct _reent *rptr,
+_iconv_nls_construct_filename (struct _reent *rptr,
                                       const char *file,
                                       const char *dir,
                                       const char *ext)
@@ -114,8 +113,7 @@ _DEFUN(_iconv_nls_construct_filename, (rptr, file, ext),
  *    "to" encoding's value if 'direction' isn't 0.
  */
 int
-_DEFUN(_iconv_nls_get_mb_cur_max, (cd, direction),
-                                  iconv_t cd,
+_iconv_nls_get_mb_cur_max (iconv_t cd,
                                   int direction)
 {
   iconv_conversion_t *ic = (iconv_conversion_t *)cd;
@@ -137,8 +135,7 @@ _DEFUN(_iconv_nls_get_mb_cur_max, (cd, direction),
 
  */
 int
-_DEFUN(_iconv_nls_is_stateful, (cd, direction),
-                               iconv_t cd,
+_iconv_nls_is_stateful (iconv_t cd,
                                int direction)
 {
   iconv_conversion_t *ic = (iconv_conversion_t *)cd;
@@ -166,8 +163,7 @@ _DEFUN(_iconv_nls_is_stateful, (cd, direction),
  *    Same as _iconv_r.
  */
 size_t
-_DEFUN(_iconv_nls_conv, (rptr, cd, inbuf, inbytesleft, outbuf, outbytesleft),
-                        struct _reent *rptr,
+_iconv_nls_conv (struct _reent *rptr,
                         iconv_t cd,
                         const char **inbuf,
                         size_t *inbytesleft,
@@ -220,8 +216,7 @@ _DEFUN(_iconv_nls_conv, (rptr, cd, inbuf, inbytesleft, outbuf, outbytesleft),
  *    if 'direction' isn't 0.
  */
 void
-_DEFUN(_iconv_nls_get_state, (cd, ps, direction),
-                             iconv_t cd,
+_iconv_nls_get_state (iconv_t cd,
                              mbstate_t *ps,
                              int direction)
 {
@@ -247,8 +242,7 @@ _DEFUN(_iconv_nls_get_state, (cd, ps, direction),
  *    0 if success, -1 if failure.
  */
 int
-_DEFUN(_iconv_nls_set_state, (cd, ps, direction),
-                             iconv_t cd,
+_iconv_nls_set_state (iconv_t cd,
                              mbstate_t *ps,
                              int direction)
 {
@@ -259,8 +253,7 @@ _DEFUN(_iconv_nls_set_state, (cd, ps, direction),
 
 /* Same as iconv_open() but don't perform name resolving */
 static iconv_t
-_DEFUN(iconv_open1, (rptr, to, from),
-                     struct _reent *rptr,
+iconv_open1 (struct _reent *rptr,
                      const char *to,
                      const char *from)
 {
@@ -316,8 +309,7 @@ _DEFUN(iconv_open1, (rptr, to, from),
  *     If successful - return 0, else set errno and return -1.
  */
 int
-_DEFUN(_iconv_nls_open, (rptr, encoding, towc, tomb),
-                        struct _reent *rptr,
+_iconv_nls_open (struct _reent *rptr,
                         const char *encoding,
                         iconv_t *tomb,
                         iconv_t *towc,

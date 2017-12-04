@@ -94,8 +94,7 @@ No supporting OS subroutines are required.
  * subtract denom from r.rem.
  */
 lldiv_t
-_DEFUN (lldiv, (number, denom), 
-       long long numer, long long denom)
+lldiv (long long numer, long long denom)
 {
 	lldiv_t retval;
 

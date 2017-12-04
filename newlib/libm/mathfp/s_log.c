@@ -20,8 +20,7 @@
 #ifndef _DOUBLE_IS_32BITS
 
 double
-_DEFUN (log, (double),
-        double x)
+log (double x)
 {
   return (logarithm (x, 0));
 }

@@ -59,8 +59,7 @@
 #if defined(__IEEE_LITTLE_ENDIAN) || defined(__IEEE_BIG_ENDIAN)
 
 bool_t
-_DEFUN (xdr_float, (xdrs, fp),
-       XDR * xdrs,
+xdr_float (XDR * xdrs,
        float *fp)
 {
   switch (xdrs->x_op)
@@ -80,8 +79,7 @@ _DEFUN (xdr_float, (xdrs, fp),
 
 #if !defined(_DOUBLE_IS_32BITS)
 bool_t
-_DEFUN (xdr_double, (xdrs, dp),
-        XDR * xdrs,
+xdr_double (XDR * xdrs,
 	double *dp)
 {
   int32_t *i32p;

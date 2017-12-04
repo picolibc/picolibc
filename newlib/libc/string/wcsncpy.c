@@ -35,8 +35,7 @@ No supporting OS subroutines are required.
 #include <wchar.h>
 
 wchar_t *
-_DEFUN (wcsncpy, (s1, s2, n),
-	wchar_t *__restrict s1,
+wcsncpy (wchar_t *__restrict s1,
 	const wchar_t *__restrict s2,
 	size_t n)
 {

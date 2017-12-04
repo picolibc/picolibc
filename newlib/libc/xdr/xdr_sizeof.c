@@ -43,8 +43,7 @@
 
 /* ARGSUSED */
 static bool_t
-_DEFUN (x_putlong, (xdrs, longp),
-        XDR * xdrs,
+x_putlong (XDR * xdrs,
 	const long *longp)
 {
   xdrs->x_handy += BYTES_PER_XDR_UNIT;
@@ -53,8 +52,7 @@ _DEFUN (x_putlong, (xdrs, longp),
 
 /* ARGSUSED */
 static bool_t
-_DEFUN (x_putbytes, (xdrs, bp, len),
-        XDR * xdrs,
+x_putbytes (XDR * xdrs,
 	const char *bp,
 	u_int len)
 {
@@ -63,16 +61,14 @@ _DEFUN (x_putbytes, (xdrs, bp, len),
 }
 
 static u_int
-_DEFUN (x_getpostn, (xdrs),
-        XDR * xdrs)
+x_getpostn (XDR * xdrs)
 {
   return xdrs->x_handy;
 }
 
 /* ARGSUSED */
 static bool_t
-_DEFUN (x_setpostn, (xdrs, pos),
-        XDR * xdrs,
+x_setpostn (XDR * xdrs,
 	u_int pos)
 {
   /* This is not allowed */
@@ -80,8 +76,7 @@ _DEFUN (x_setpostn, (xdrs, pos),
 }
 
 static int32_t *
-_DEFUN (x_inline, (xdrs, len),
-        XDR * xdrs,
+x_inline (XDR * xdrs,
 	u_int len)
 {
   if (len == 0)
@@ -118,8 +113,7 @@ harmless (void)
 }
 
 static void
-_DEFUN (x_destroy, (xdrs),
-        XDR * xdrs)
+x_destroy (XDR * xdrs)
 {
   xdrs->x_handy = 0;
   xdrs->x_base = 0;
@@ -132,8 +126,7 @@ _DEFUN (x_destroy, (xdrs),
 }
 
 static bool_t
-_DEFUN (x_putint32, (xdrs, int32p),
-        XDR *xdrs,
+x_putint32 (XDR *xdrs,
 	const int32_t *int32p)
 {
   xdrs->x_handy += BYTES_PER_XDR_UNIT;
@@ -142,8 +135,7 @@ _DEFUN (x_putint32, (xdrs, int32p),
 
 
 unsigned long
-_DEFUN (xdr_sizeof, (func, data),
-        xdrproc_t func,
+xdr_sizeof (xdrproc_t func,
 	void *data)
 {
   XDR x;

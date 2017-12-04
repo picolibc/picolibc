@@ -43,8 +43,7 @@ DESCRIPTION
 */
 
 int
-_DEFUN (_link_r, (ptr, old, new),
-     struct _reent *ptr,
+_link_r (struct _reent *ptr,
      const char *old,
      const char *new)
 {

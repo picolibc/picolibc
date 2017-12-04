@@ -14,8 +14,7 @@
 #include "local.h"
 
 char *
-_DEFUN(_vasniprintf_r, (ptr, buf, lenp, fmt, ap),
-       struct _reent *ptr,
+_vasniprintf_r (struct _reent *ptr,
        char *buf,
        size_t *lenp,
        const char *fmt,
@@ -59,8 +58,7 @@ _DEFUN(_vasniprintf_r, (ptr, buf, lenp, fmt, ap),
 #ifndef _REENT_ONLY
 
 char *
-_DEFUN(vasniprintf, (buf, lenp, fmt, ap),
-       char *buf,
+vasniprintf (char *buf,
        size_t *lenp,
        const char *fmt,
        va_list ap)

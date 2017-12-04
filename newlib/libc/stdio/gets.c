@@ -63,8 +63,7 @@ Supporting OS subroutines required: <<close>>, <<fstat>>, <<isatty>>,
 #include "local.h"
 
 char *
-_DEFUN(_gets_r, (ptr, buf),
-       struct _reent *ptr,
+_gets_r (struct _reent *ptr,
        char *buf)
 {
   register int c;
@@ -94,8 +93,7 @@ _DEFUN(_gets_r, (ptr, buf),
 #ifndef _REENT_ONLY
 
 char *
-_DEFUN(gets, (buf),
-       char *buf)
+gets (char *buf)
 {
   return _gets_r (_REENT, buf);
 }

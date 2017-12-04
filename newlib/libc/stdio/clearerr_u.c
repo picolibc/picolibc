@@ -33,8 +33,7 @@
 #undef	clearerr_unlocked
 
 void
-_DEFUN(clearerr_unlocked, (fp),
-       FILE * fp)
+clearerr_unlocked (FILE * fp)
 {
   CHECK_INIT(_REENT, fp);
   __sclearerr (fp);

@@ -348,8 +348,7 @@ static const int dname_len[7] =
    -1, 0, or 1 as the adjustment to add to the year for the ISO week
    numbering used in "%g%G%V", avoiding overflow.  */
 static int
-_DEFUN (iso_year_adjust, (tim_p),
-	const struct tm *tim_p)
+iso_year_adjust (const struct tm *tim_p)
 {
   /* Account for fact that tm_year==0 is year 1900.  */
   int leap = isleap (tim_p->tm_year + (YEAR_BASE
@@ -1431,8 +1430,7 @@ recurse:
 }
 
 size_t
-_DEFUN (strftime, (s, maxsize, format, tim_p),
-	CHAR *__restrict s,
+strftime (CHAR *__restrict s,
 	size_t maxsize,
 	const CHAR *__restrict format,
 	const struct tm *__restrict tim_p)

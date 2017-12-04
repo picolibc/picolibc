@@ -23,8 +23,7 @@
 #include "local.h"
 
 static int
-_DEFUN(lflush, (fp),
-       FILE *fp)
+lflush (FILE *fp)
 {
   if ((fp->_flags & (__SLBF | __SWR)) == (__SLBF | __SWR))
     return fflush (fp);
@@ -37,8 +36,7 @@ _DEFUN(lflush, (fp),
  */
 
 int
-_DEFUN(__srefill_r, (ptr, fp),
-       struct _reent * ptr,
+__srefill_r (struct _reent * ptr,
        register FILE * fp)
 {
   /* make sure stdio is set up */

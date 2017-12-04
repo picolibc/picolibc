@@ -16,8 +16,7 @@
 #include "fdlibm.h"
 
 int
-_DEFUN (__isnanf, (x),
-	float x)
+__isnanf (float x)
 {
 	__int32_t ix;
 	GET_FLOAT_WORD(ix,x);
@@ -28,8 +27,7 @@ _DEFUN (__isnanf, (x),
 #ifdef _DOUBLE_IS_32BITS
 
 int
-_DEFUN (__isnand, (x),
-	double x)
+__isnand (double x)
 {
 	return __isnanf((float) x);
 }

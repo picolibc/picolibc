@@ -68,8 +68,7 @@ static char sccsid[] = "@(#)scandir.c	5.10 (Berkeley) 2/23/91";
 #endif
 
 int
-_DEFUN(scandir, (dirname, namelist, select, dcomp),
-	const char *dirname,
+scandir (const char *dirname,
 	struct dirent ***namelist,
 	int (*select) __P((const struct dirent *)),
 	int (*dcomp) __P((const struct dirent **, const struct dirent **)))
@@ -169,8 +168,7 @@ cleanup:
  * Alphabetic order comparison routine for those who want it.
  */
 int
-_DEFUN(alphasort, (d1, d2),
-       const struct dirent **d1,
+alphasort (const struct dirent **d1,
        const struct dirent **d2)
 {
        return(strcmp((*d1)->d_name, (*d2)->d_name));

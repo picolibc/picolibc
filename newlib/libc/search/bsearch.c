@@ -56,8 +56,7 @@ No supporting OS subroutines are required.
 #include <stdlib.h>
 
 void *
-_DEFUN (bsearch, (key, base, nmemb, size, compar),
-	const void *key,
+bsearch (const void *key,
 	const void *base,
 	size_t nmemb,
 	size_t size,

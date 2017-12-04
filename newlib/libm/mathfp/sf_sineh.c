@@ -32,8 +32,7 @@ static const float INV_V2 = 0.2499930850;
 static const float V_OVER2_MINUS1 = 0.1383027787e-4;
 
 float
-_DEFUN (sinehf, (float, int),
-        float x,
+sinehf (float x,
         int cosineh)
 {
   float y, f, P, Q, R, res, z, w;

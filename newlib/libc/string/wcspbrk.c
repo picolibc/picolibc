@@ -57,8 +57,7 @@ No supporting OS subroutines are required.
 #include <wchar.h>
 
 wchar_t *
-_DEFUN (wcspbrk, (s, set),
-	const wchar_t * s,
+wcspbrk (const wchar_t * s,
 	const wchar_t * set)
 {
   const wchar_t *p;

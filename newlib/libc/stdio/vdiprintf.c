@@ -13,8 +13,7 @@
 #include "local.h"
 
 int
-_DEFUN(_vdiprintf_r, (ptr, fd, format, ap),
-       struct _reent *ptr,
+_vdiprintf_r (struct _reent *ptr,
        int fd,
        const char *format,
        va_list ap)
@@ -36,8 +35,7 @@ _DEFUN(_vdiprintf_r, (ptr, fd, format, ap),
 #ifndef _REENT_ONLY
 
 int
-_DEFUN(vdiprintf, (fd, format, ap),
-       int fd,
+vdiprintf (int fd,
        const char *format,
        va_list ap)
 {

@@ -48,8 +48,7 @@ effects vary with the locale.
 #include <wchar.h>
 
 size_t
-_DEFUN (wcstombs, (s, pwcs, n),
-        char          *__restrict s,
+wcstombs (char          *__restrict s,
         const wchar_t *__restrict pwcs,
         size_t         n)
 {

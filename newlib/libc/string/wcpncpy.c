@@ -33,8 +33,7 @@ No supporting OS subroutines are required.
 #include <wchar.h>
 
 wchar_t *
-_DEFUN (wcpncpy, (dst, src, count),
-	wchar_t *__restrict dst,
+wcpncpy (wchar_t *__restrict dst,
 	const wchar_t *__restrict src,
 	size_t count)
 {

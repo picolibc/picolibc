@@ -18,8 +18,7 @@
 #include "zmath.h"
 
 float
-_DEFUN (cosf, (float),
-        float x)
+cosf (float x)
 {
   return (sinef (x, 1));
 }

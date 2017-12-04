@@ -16,8 +16,7 @@ fpgetround (void)
 }
 
 fp_rnd
-_DEFUN(fpsetround,(new),
-       fp_rnd new)
+fpsetround (fp_rnd new)
 {
   fp_rnd old = fpgetround();
   char *dummy;
@@ -60,8 +59,7 @@ fpgetmask (void)
 }
 
 fp_except
-_DEFUN(fpsetmask,(mask),
-       fp_except mask)
+fpsetmask (fp_except mask)
 {
   fp_except old = fpgetmask();  
 
@@ -85,8 +83,7 @@ _DEFUN(fpsetmask,(mask),
 }
 
 fp_except 
-_DEFUN(fpsetsticky,(mask),
-       fp_except mask)
+fpsetsticky (fp_except mask)
 {
   return fpsetmask(mask);
 }
@@ -98,8 +95,7 @@ fpgetsticky (void)
 }
 
 int
-_DEFUN(fpsetroundtoi,(rdi_mode),
-       fp_rdi rdi_mode)
+fpsetroundtoi (fp_rdi rdi_mode)
 {
   
   return 0;

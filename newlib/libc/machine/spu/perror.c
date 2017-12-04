@@ -14,8 +14,7 @@ typedef struct
 } c99_perror_t;
 
 void
-_DEFUN (perror, (s),
-	const char *s)
+perror (const char *s)
 
 {
   c99_perror_t arg;

@@ -43,8 +43,7 @@
 
 #if defined (ICONV_FROM_UCS_CES_UTF_8)
 static size_t
-_DEFUN(convert_from_ucs, (data, in, outbuf, outbytesleft),
-                         void *data,
+convert_from_ucs (void *data,
                          register ucs4_t in,
                          unsigned char **outbuf,
                          size_t *outbytesleft)
@@ -125,8 +124,7 @@ _DEFUN(convert_from_ucs, (data, in, outbuf, outbytesleft),
 
 #if defined (ICONV_TO_UCS_CES_UTF_8)
 static ucs4_t
-_DEFUN(convert_to_ucs, (data, inbuf, inbytesleft),
-                       void *data,
+convert_to_ucs (void *data,
                        const unsigned char **inbuf,
                        size_t *inbytesleft)
 {
@@ -259,8 +257,7 @@ _DEFUN(convert_to_ucs, (data, inbuf, inbytesleft),
 #endif /* ICONV_TO_UCS_CES_UTF_8 */
 
 static int
-_DEFUN(get_mb_cur_max, (data),
-                       void *data)
+get_mb_cur_max (void *data)
 {
   return UTF8_MB_CUR_MAX;
 }

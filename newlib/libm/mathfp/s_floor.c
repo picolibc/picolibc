@@ -62,8 +62,7 @@ PORTABILITY
 #ifndef _DOUBLE_IS_32BITS
 
 double 
-_DEFUN (floor, (double),
-              double x)
+floor (double x)
 {
   double f, y;
 

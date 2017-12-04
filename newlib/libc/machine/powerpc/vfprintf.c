@@ -271,8 +271,7 @@ static char *cvt_ufix64 (struct _reent *, unsigned long long, int,  int *, int *
 #define FIXEDPOINT	0x400		/* fixed-point */
 
 int 
-_DEFUN (VFPRINTF, (fp, fmt0, ap),
-	FILE * fp,
+VFPRINTF (FILE * fp,
 	const char *fmt0,
 	va_list ap)
 {
@@ -281,8 +280,7 @@ _DEFUN (VFPRINTF, (fp, fmt0, ap),
 }
 
 int 
-_DEFUN (_VFPRINTF_R, (data, fp, fmt0, ap),
-	struct _reent *data,
+_VFPRINTF_R (struct _reent *data,
 	FILE * fp,
 	const char *fmt0,
 	va_list ap)

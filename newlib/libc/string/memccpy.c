@@ -56,8 +56,7 @@ PORTABILITY
 
 
 void *
-_DEFUN (memccpy, (dst0, src0, endchar, len0),
-	void *__restrict dst0,
+memccpy (void *__restrict dst0,
 	const void *__restrict src0,
 	int endchar0,
 	size_t len0)

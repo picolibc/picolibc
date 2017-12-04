@@ -21,8 +21,7 @@
  */
 
 static char *
-_DEFUN (strccpy, (s1, s2, c),
-	char *s1,
+strccpy (char *s1,
 	char *s2,
 	char c)
 {
@@ -36,8 +35,7 @@ _DEFUN (strccpy, (s1, s2, c),
 }
 
 int
-_DEFUN (execvp, (file, argv),
-	const char *file,
+execvp (const char *file,
 	char * const argv[])
 {
   char *path = getenv ("PATH");

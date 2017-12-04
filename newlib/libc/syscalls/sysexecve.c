@@ -4,8 +4,7 @@
 #include <unistd.h>
 
 int
-_DEFUN (execve, (name, argv, env),
-     const char *name,
+execve (const char *name,
      char *const argv[],
      char *const env[])
 {

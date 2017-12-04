@@ -62,8 +62,7 @@ QUICKREF
 #define DETECTCHAR(X,MASK) (DETECTNULL(X ^ MASK))
 
 void *
-_DEFUN (memchr, (src_void, c, length),
-	const void *src_void,
+memchr (const void *src_void,
 	int c,
 	size_t length)
 {

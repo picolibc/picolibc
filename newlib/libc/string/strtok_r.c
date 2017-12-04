@@ -30,8 +30,7 @@
 #include <string.h>
 
 char *
-_DEFUN (__strtok_r, (s, delim, lasts, skip_leading_delim),
-	register char *s,
+__strtok_r (register char *s,
 	register const char *delim,
 	char **lasts,
 	int skip_leading_delim)
@@ -90,8 +89,7 @@ cont:
 }
 
 char *
-_DEFUN (strtok_r, (s, delim, lasts),
-	register char *__restrict s,
+strtok_r (register char *__restrict s,
 	register const char *__restrict delim,
 	char **__restrict lasts)
 {

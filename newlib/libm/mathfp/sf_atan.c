@@ -18,8 +18,7 @@
 #include "zmath.h"
 
 float
-_DEFUN (atanf, (float),
-        float x)
+atanf (float x)
 {
   switch (numtestf (x))
     {

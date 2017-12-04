@@ -73,7 +73,7 @@ No supporting OS subroutines are required.
 #include "local.h"
 
 wint_t
-_DEFUN(towupper,(c), wint_t c)
+towupper (wint_t c)
 {
 #ifdef _MB_CAPABLE
   c = _jp2uc (c);

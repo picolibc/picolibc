@@ -8,9 +8,7 @@
 #ifndef _REENT_ONLY
 
 char *
-_DEFUN (__dtoa,
-	(d, mode, ndigits, decpt, sign, rve),
-	double d,
+__dtoa (double d,
 	int mode,
 	int ndigits,
 	int *decpt,

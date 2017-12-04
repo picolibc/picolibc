@@ -20,8 +20,7 @@
  *           serial port, we'll say yes and return a 1.
  */
 int
-_DEFUN (_isatty, (fd),
-       int fd)
+_isatty (int fd)
 {
   return (1);
 }

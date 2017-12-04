@@ -51,8 +51,7 @@
 #define UCS_4LE "ucs_4le"
 
 static void *
-_DEFUN(ucs_4_init, (rptr, encoding),
-                   struct _reent *rptr,
+ucs_4_init (struct _reent *rptr,
                    const char *encoding)
 {
   int *data;
@@ -69,8 +68,7 @@ _DEFUN(ucs_4_init, (rptr, encoding),
 }
 
 static size_t
-_DEFUN(ucs_4_close, (rptr, data),
-                    struct _reent *rptr,
+ucs_4_close (struct _reent *rptr,
                     void *data)
 {
   _free_r(rptr, data);
@@ -80,8 +78,7 @@ _DEFUN(ucs_4_close, (rptr, data),
 
 #if defined (ICONV_FROM_UCS_CES_UCS_4)
 static size_t
-_DEFUN(ucs_4_convert_from_ucs, (data, in, outbuf, outbytesleft),
-                               void *data,
+ucs_4_convert_from_ucs (void *data,
                                ucs4_t in,
                                unsigned char **outbuf,
                                size_t *outbytesleft)
@@ -107,8 +104,7 @@ _DEFUN(ucs_4_convert_from_ucs, (data, in, outbuf, outbytesleft),
 
 #if defined (ICONV_TO_UCS_CES_UCS_4)
 static ucs4_t
-_DEFUN(ucs_4_convert_to_ucs, (data, inbuf, inbytesleft),
-                             void *data,
+ucs_4_convert_to_ucs (void *data,
                              const unsigned char **inbuf,
                              size_t *inbytesleft)
 {
@@ -134,8 +130,7 @@ _DEFUN(ucs_4_convert_to_ucs, (data, inbuf, inbytesleft),
 #endif /* ICONV_TO_UCS_CES_UCS_4 */
 
 static int
-_DEFUN(ucs_4_get_mb_cur_max, (data),
-                             void *data)
+ucs_4_get_mb_cur_max (void *data)
 {
   return 4;
 }

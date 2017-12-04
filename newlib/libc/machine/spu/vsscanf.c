@@ -57,8 +57,7 @@ typedef struct
 #ifndef _REENT_ONLY
 
 int
-_DEFUN (vsscanf, (str, fmt, ap),
-    const char *__restrict str,
+vsscanf (const char *__restrict str,
     const char *__restrict fmt,
     va_list ap)
 {

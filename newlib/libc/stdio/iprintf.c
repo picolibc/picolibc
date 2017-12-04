@@ -25,8 +25,7 @@
 #ifndef _REENT_ONLY
 
 int
-_DEFUN(iprintf, (fmt),
-       const char *fmt, ...)
+iprintf (const char *fmt, ...)
 {
   int ret;
   va_list ap;
@@ -42,8 +41,7 @@ _DEFUN(iprintf, (fmt),
 #endif /* ! _REENT_ONLY */
 
 int
-_DEFUN(_iprintf_r, (ptr, fmt),
-       struct _reent *ptr,
+_iprintf_r (struct _reent *ptr,
        const char *fmt, ...)
 {
   int ret;

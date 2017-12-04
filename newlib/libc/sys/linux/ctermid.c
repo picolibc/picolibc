@@ -6,8 +6,7 @@
 static char devname[] = "/dev/tty";
 
 char *
-_DEFUN (ctermid, (buf),
-     char *buf)
+ctermid (char *buf)
 {
   if (buf == NULL)
     return devname;

@@ -26,8 +26,7 @@ __RCSID("$NetBSD: tdelete.c,v 1.2 1999/09/16 11:45:37 lukem Exp $");
 
 /* delete node with given key */
 void *
-_DEFUN(tdelete, (vkey, vrootp, compar),
-	const void *__restrict vkey,	/* key to be deleted */
+tdelete (const void *__restrict vkey,	/* key to be deleted */
 	void      **__restrict vrootp,	/* address of the root of tree */
 	int       (*compar)(const void *, const void *))
 {

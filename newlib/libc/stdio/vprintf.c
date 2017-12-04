@@ -29,8 +29,7 @@
 #ifndef _REENT_ONLY
 
 int
-_DEFUN(vprintf, (fmt, ap),
-       const char *fmt,
+vprintf (const char *fmt,
        va_list ap)
 {
   struct _reent *reent = _REENT;
@@ -47,8 +46,7 @@ _EXFUN(viprintf, (const char *, __VALIST) _ATTRIBUTE ((__alias__("vprintf"))));
 #endif /* !_REENT_ONLY */
 
 int
-_DEFUN(_vprintf_r, (ptr, fmt, ap),
-       struct _reent *ptr,
+_vprintf_r (struct _reent *ptr,
        const char *__restrict fmt,
        va_list ap)
 {

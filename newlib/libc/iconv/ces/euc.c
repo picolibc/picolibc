@@ -101,8 +101,7 @@ static euc_cs_desc_t euc_kr_cs_desc [] =
 
 #if defined (ICONV_FROM_UCS_CES_EUC)
 static void *
-_DEFUN(euc_from_ucs_init, (rptr, encoding),
-                          struct _reent *rptr,
+euc_from_ucs_init (struct _reent *rptr,
                           const char *encoding)
 {
   int i;
@@ -165,8 +164,7 @@ error1:
 }
 
 static size_t
-_DEFUN(euc_from_ucs_close, (rptr, data),
-                           struct _reent *rptr,
+euc_from_ucs_close (struct _reent *rptr,
                            void *data)
 {
   int i;
@@ -185,8 +183,7 @@ _DEFUN(euc_from_ucs_close, (rptr, data),
 }
 
 static size_t
-_DEFUN(euc_convert_from_ucs, (data, in, outbuf, outbytesleft),
-                             void *data,
+euc_convert_from_ucs (void *data,
                              register ucs4_t in,
                              unsigned char **outbuf,
                              size_t *outbytesleft)
@@ -261,8 +258,7 @@ _DEFUN(euc_convert_from_ucs, (data, in, outbuf, outbytesleft),
 
 #if defined (ICONV_TO_UCS_CES_EUC)
 static void *
-_DEFUN(euc_to_ucs_init, (rptr, encoding),
-                        struct _reent *rptr,
+euc_to_ucs_init (struct _reent *rptr,
                         const char *encoding)
 {
   int i;
@@ -325,8 +321,7 @@ error1:
 }
 
 static size_t
-_DEFUN(euc_to_ucs_close, (rptr, data),
-                         struct _reent *rptr,
+euc_to_ucs_close (struct _reent *rptr,
                          void *data)
 {
   int i;
@@ -345,8 +340,7 @@ _DEFUN(euc_to_ucs_close, (rptr, data),
 }
 
 static ucs4_t
-_DEFUN(euc_convert_to_ucs, (data, inbuf, inbytesleft),
-                           void *data,
+euc_convert_to_ucs (void *data,
                            const unsigned char **inbuf,
                            size_t *inbytesleft)
 {
@@ -432,8 +426,7 @@ _DEFUN(euc_convert_to_ucs, (data, inbuf, inbytesleft),
 #endif /* ICONV_TO_UCS_CES_EUC */
 
 static int
-_DEFUN(euc_get_mb_cur_max, (data),
-                           void *data)
+euc_get_mb_cur_max (void *data)
 {
   return ((euc_data_t *)data)->mb_cur_max;
 }

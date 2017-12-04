@@ -53,8 +53,7 @@ Supporting OS subroutines required: <<sbrk>>, <<write>>.
 #include "local.h"
 
 int
-_DEFUN(_dprintf_r, (ptr, fd, format),
-       struct _reent *ptr,
+_dprintf_r (struct _reent *ptr,
        int fd,
        const char *__restrict format, ...)
 {
@@ -76,8 +75,7 @@ _EXFUN(_diprintf_r, (struct _reent *, int, const char *, ...)
 #ifndef _REENT_ONLY
 
 int
-_DEFUN(dprintf, (fd, format),
-       int fd,
+dprintf (int fd,
        const char *__restrict format, ...)
 {
   va_list ap;

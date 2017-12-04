@@ -15,8 +15,7 @@
 #include "glue.h"
 
 int
-_DEFUN (_raise, (sig),
-	int sig)
+_raise (int sig)
 {
   return _kill (_getpid (), sig);
 }

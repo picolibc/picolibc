@@ -214,8 +214,7 @@ _wcstod_l (struct _reent *ptr, const wchar_t *nptr, wchar_t **endptr,
 }
 
 double
-_DEFUN (_wcstod_r, (ptr, nptr, endptr),
-	struct _reent *ptr,
+_wcstod_r (struct _reent *ptr,
 	const wchar_t *nptr,
 	wchar_t **endptr)
 {
@@ -223,8 +222,7 @@ _DEFUN (_wcstod_r, (ptr, nptr, endptr),
 }
 
 float
-_DEFUN (_wcstof_r, (ptr, nptr, endptr),
-	struct _reent *ptr,
+_wcstof_r (struct _reent *ptr,
 	const wchar_t *nptr,
 	wchar_t **endptr)
 {
@@ -244,8 +242,7 @@ wcstod_l (const wchar_t *__restrict nptr, wchar_t **__restrict endptr,
 }
 
 double
-_DEFUN (wcstod, (nptr, endptr),
-	const wchar_t *__restrict nptr, wchar_t **__restrict endptr)
+wcstod (const wchar_t *__restrict nptr, wchar_t **__restrict endptr)
 {
   return _wcstod_l (_REENT, nptr, endptr, __get_current_locale ());
 }
@@ -266,8 +263,7 @@ wcstof_l (const wchar_t *__restrict nptr, wchar_t **__restrict endptr,
 }
 
 float
-_DEFUN (wcstof, (nptr, endptr),
-	const wchar_t *__restrict nptr,
+wcstof (const wchar_t *__restrict nptr,
 	wchar_t **__restrict endptr)
 {
   double val = _wcstod_l (_REENT, nptr, endptr, __get_current_locale ());

@@ -26,8 +26,7 @@
 
 #ifdef __LARGE64_FILES
 _fpos64_t
-_DEFUN(__sseek64, (ptr, cookie, offset, whence),
-       struct _reent *ptr,
+__sseek64 (struct _reent *ptr,
        void *cookie,
        _fpos64_t offset,
        int whence)
@@ -47,8 +46,7 @@ _DEFUN(__sseek64, (ptr, cookie, offset, whence),
 }
 
 _READ_WRITE_RETURN_TYPE
-_DEFUN(__swrite64, (ptr, cookie, buf, n),
-       struct _reent *ptr,
+__swrite64 (struct _reent *ptr,
        void *cookie,
        char const *buf,
        _READ_WRITE_BUFSIZE_TYPE n)

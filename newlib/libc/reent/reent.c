@@ -30,8 +30,7 @@ int errno;
 /* Interim cleanup code */
 
 void
-_DEFUN (cleanup_glue, (ptr, glue),
-     struct _reent *ptr,
+cleanup_glue (struct _reent *ptr,
      struct _glue *glue)
 {
   /* Have to reclaim these in reverse order: */
@@ -42,8 +41,7 @@ _DEFUN (cleanup_glue, (ptr, glue),
 }
 
 void
-_DEFUN (_reclaim_reent, (ptr),
-     struct _reent *ptr)
+_reclaim_reent (struct _reent *ptr)
 {
   if (ptr != _impure_ptr)
     {

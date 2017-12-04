@@ -82,8 +82,7 @@ No supporting OS subroutines are required.
 #include <stdlib.h>		/* ldiv_t */
 
 ldiv_t
-_DEFUN (ldiv, (num, denom),
-        long num,
+ldiv (long num,
         long denom)
 {
 	ldiv_t r;

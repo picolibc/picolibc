@@ -41,8 +41,7 @@ effects vary with the locale.
 #include "local.h"
 
 int
-_DEFUN (_mblen_r, (r, s, n, state), 
-        struct _reent *r,
+_mblen_r (struct _reent *r,
         const char *s,
         size_t n,
         mbstate_t *state)

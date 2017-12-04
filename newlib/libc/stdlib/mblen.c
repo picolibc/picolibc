@@ -43,8 +43,7 @@ effects vary with the locale.
 #include "local.h"
 
 int
-_DEFUN (mblen, (s, n), 
-        const char *s,
+mblen (const char *s,
         size_t n)
 {
 #ifdef _MB_CAPABLE

@@ -64,8 +64,7 @@ static char sccsid[] = "%W% (Berkeley) %G%";
 #ifdef __LARGE64_FILES
 
 FILE *
-_DEFUN (_fopen64_r, (ptr, file, mode),
-	struct _reent *ptr,
+_fopen64_r (struct _reent *ptr,
 	const char *file,
 	const char *mode)
 {
@@ -117,8 +116,7 @@ _DEFUN (_fopen64_r, (ptr, file, mode),
 #ifndef _REENT_ONLY
 
 FILE *
-_DEFUN (fopen64, (file, mode),
-	const char *file,
+fopen64 (const char *file,
 	const char *mode)
 {
   return _fopen64_r (_REENT, file, mode);

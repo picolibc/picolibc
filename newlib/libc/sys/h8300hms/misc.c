@@ -7,19 +7,17 @@
 /* _raise(), getpid(), and kill() are required by abort().
    getpid/kill are prefixed with '_' because of MISSING_SYSCALL_NAMES.  */
 
-int _DEFUN(_raise,(sig),
-	   int sig)
+int _raise (int sig)
 {
   return 0;
 }
 
-int _DEFUN(_getpid,(),)
+int _getpid (void)
 {
   return 0;
 }
 
-int _DEFUN(_kill,(pid, sig),
-	   int pid,
+int _kill (int pid,
 	   int sig)
 {
   if (pid == 0)

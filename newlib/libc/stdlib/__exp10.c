@@ -6,8 +6,7 @@
 #include "std.h"
 
 double
-_DEFUN (__exp10, (x),
-	unsigned x)
+__exp10 (unsigned x)
 {
   static const double powtab[] =
   {1.0,

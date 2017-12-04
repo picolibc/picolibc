@@ -8,8 +8,7 @@
 #include "local.h"
 
 int
-_DEFUN (_mbtowc_r, (r, pwc, s, n, state),
-        struct _reent *r,
+_mbtowc_r (struct _reent *r,
         wchar_t       *__restrict pwc,
         const char    *__restrict s,
         size_t         n,
@@ -19,8 +18,7 @@ _DEFUN (_mbtowc_r, (r, pwc, s, n, state),
 }
 
 int
-_DEFUN (__ascii_mbtowc, (r, pwc, s, n, state),
-        struct _reent *r,
+__ascii_mbtowc (struct _reent *r,
         wchar_t       *pwc,
         const char    *s,
         size_t         n,
@@ -528,8 +526,7 @@ __cp_mbtowc (int val)
 #endif /* _MB_EXTENDED_CHARSETS_WINDOWS */
 
 int
-_DEFUN (__utf8_mbtowc, (r, pwc, s, n, state),
-        struct _reent *r,
+__utf8_mbtowc (struct _reent *r,
         wchar_t       *pwc,
         const char    *s,
         size_t         n,
@@ -730,8 +727,7 @@ _DEFUN (__utf8_mbtowc, (r, pwc, s, n, state),
    because the underlying OS requires wchar_t == UTF-16. */
 #ifndef  __CYGWIN__
 int
-_DEFUN (__sjis_mbtowc, (r, pwc, s, n, state),
-        struct _reent *r,
+__sjis_mbtowc (struct _reent *r,
         wchar_t       *pwc,
         const char    *s,
         size_t         n,
@@ -787,8 +783,7 @@ _DEFUN (__sjis_mbtowc, (r, pwc, s, n, state),
 }
 
 int
-_DEFUN (__eucjp_mbtowc, (r, pwc, s, n, state),
-        struct _reent *r,
+__eucjp_mbtowc (struct _reent *r,
         wchar_t       *pwc,
         const char    *s,
         size_t         n,
@@ -870,8 +865,7 @@ _DEFUN (__eucjp_mbtowc, (r, pwc, s, n, state),
 }
 
 int
-_DEFUN (__jis_mbtowc, (r, pwc, s, n, state),
-        struct _reent *r,
+__jis_mbtowc (struct _reent *r,
         wchar_t       *pwc,
         const char    *s,
         size_t         n,

@@ -20,8 +20,7 @@
 #ifndef _DOUBLE_IS_32BITS
 
 double
-_DEFUN (sinh, (double),
-        double x)
+sinh (double x)
 {
   return (sineh (x, 0));
 }

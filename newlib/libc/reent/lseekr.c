@@ -38,8 +38,7 @@ DESCRIPTION
 */
 
 _off_t
-_DEFUN (_lseek_r, (ptr, fd, pos, whence),
-     struct _reent *ptr,
+_lseek_r (struct _reent *ptr,
      int fd,
      _off_t pos,
      int whence)

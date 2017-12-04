@@ -30,8 +30,7 @@
 #include "local.h"
 
 int
-_DEFUN(fileno_unlocked, (f),
-       FILE * f)
+fileno_unlocked (FILE * f)
 {
   int result;
   CHECK_INIT (_REENT, f);

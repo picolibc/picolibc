@@ -31,8 +31,7 @@ static char sccsid[] = "%W% (Berkeley) %G%";
 #include "local.h"
 
 int
-_DEFUN(_vswprintf_r, (ptr, str, size, fmt, ap),
-       struct _reent *ptr,
+_vswprintf_r (struct _reent *ptr,
        wchar_t *str,
        size_t size,
        const wchar_t *fmt,
@@ -70,8 +69,7 @@ _DEFUN(_vswprintf_r, (ptr, str, size, fmt, ap),
 #ifndef _REENT_ONLY
 
 int
-_DEFUN(vswprintf, (str, size, fmt, ap),
-       wchar_t *__restrict str,
+vswprintf (wchar_t *__restrict str,
        size_t size,
        const wchar_t *__restrict fmt,
        va_list ap)

@@ -41,8 +41,7 @@ DESCRIPTION
 */
 
 _off64_t
-_DEFUN (_lseek64_r, (ptr, fd, pos, whence),
-     struct _reent *ptr,
+_lseek64_r (struct _reent *ptr,
      int fd,
      _off64_t pos,
      int whence)

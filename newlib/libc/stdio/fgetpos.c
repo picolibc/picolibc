@@ -65,8 +65,7 @@ No supporting OS subroutines are required.
 #include <stdio.h>
 
 int
-_DEFUN(_fgetpos_r, (ptr, fp, pos),
-       struct _reent * ptr,
+_fgetpos_r (struct _reent * ptr,
        FILE *__restrict fp,
        _fpos_t *__restrict pos)
 {
@@ -82,8 +81,7 @@ _DEFUN(_fgetpos_r, (ptr, fp, pos),
 #ifndef _REENT_ONLY
 
 int
-_DEFUN(fgetpos, (fp, pos),
-       FILE *__restrict fp,
+fgetpos (FILE *__restrict fp,
        _fpos_t *__restrict pos)
 {
   return _fgetpos_r (_REENT, fp, pos);

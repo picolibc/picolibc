@@ -18,8 +18,7 @@ int mygraph;
 int mypunct;
 
 void
-_DEFUN(test_is_single,(i),
-       int i)
+test_is_single (int i)
 {
   setascii = 0;
   setlower = 0;
@@ -1913,28 +1912,27 @@ _DEFUN(test_is_single,(i),
 }
 
 
-int _DEFUN(def_isascii,(i), int i) { return isascii(i); }
-int _DEFUN(def_iscntrl,(i), int i) { return iscntrl(i); }
-int _DEFUN(def_isspace,(i), int i) { return isspace(i); }
-int _DEFUN(def_isprint,(i), int i) { return isprint(i); }
-int _DEFUN(def_isalnum,(i), int i) { return isalnum(i); }
-int _DEFUN(def_isdigit,(i), int i) { return isdigit(i); }
-int _DEFUN(def_isxdigit,(i), int i) { return isxdigit(i); }
-int _DEFUN(def_isalpha,(i), int i) { return isalpha(i); }
-int _DEFUN(def_isupper,(i), int i) { return isupper(i); }
-int _DEFUN(def_islower,(i), int i) { return islower(i); }
-int _DEFUN(def_isgraph,(i), int i) { return isgraph(i); }
-int _DEFUN(def_ispunct,(i), int i) { return ispunct(i); }
-int _DEFUN(def_tolower,(i), int i) { return tolower(i); }
-int _DEFUN(def_toupper,(i), int i) { return toupper(i); }
-int _DEFUN(def_toascii,(i), int i) { return toascii(i); }
-int _DEFUN(def__tolower,(i), int i) { return _tolower(i); }
-int _DEFUN(def__toupper,(i), int i) { return _toupper(i); }
+int def_isascii (int i) { return isascii(i); }
+int def_iscntrl (int i) { return iscntrl(i); }
+int def_isspace (int i) { return isspace(i); }
+int def_isprint (int i) { return isprint(i); }
+int def_isalnum (int i) { return isalnum(i); }
+int def_isdigit (int i) { return isdigit(i); }
+int def_isxdigit (int i) { return isxdigit(i); }
+int def_isalpha (int i) { return isalpha(i); }
+int def_isupper (int i) { return isupper(i); }
+int def_islower (int i) { return islower(i); }
+int def_isgraph (int i) { return isgraph(i); }
+int def_ispunct (int i) { return ispunct(i); }
+int def_tolower (int i) { return tolower(i); }
+int def_toupper (int i) { return toupper(i); }
+int def_toascii (int i) { return toascii(i); }
+int def__tolower (int i) { return _tolower(i); }
+int def__toupper (int i) { return _toupper(i); }
 
 extern int inacc;
 void
-_DEFUN(test_is_set,(func, name, p),
-       int (*func)(),
+test_is_set (int (*func)(),
        char *name,
        int *p)
 {
@@ -1952,8 +1950,7 @@ _DEFUN(test_is_set,(func, name, p),
   }
 }
 void
-_DEFUN(test_to_set,(func, name, p, low, high),
-       int (*func)(),
+test_to_set (int (*func)(),
        char *name,
        int *p,
        int low,

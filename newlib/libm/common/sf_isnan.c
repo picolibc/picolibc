@@ -24,8 +24,7 @@
 #undef isnanf
 
 int
-_DEFUN (isnanf, (x),
-	float x)
+isnanf (float x)
 {
 	__int32_t ix;
 	GET_FLOAT_WORD(ix,x);
@@ -38,8 +37,7 @@ _DEFUN (isnanf, (x),
 #undef isnan
 
 int
-_DEFUN (isnan, (x),
-	double x)
+isnan (double x)
 {
 	return isnanf((float) x);
 }

@@ -11,8 +11,7 @@
 extern char *__strtok_r (char *, const char *, char **, int);
 
 char *
-_DEFUN (strsep, (source_ptr, delim),
-	register char **source_ptr,
+strsep (register char **source_ptr,
 	register const char *delim)
 {
 	return __strtok_r (*source_ptr, delim, source_ptr, 0);

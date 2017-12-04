@@ -25,8 +25,7 @@
  *          prompt. It can be restarted from there.
  */
 void
-_DEFUN (_exit, (status),
-	int_status)
+_exit (int_status)
 {
   /* Use `i' constraint to get proper immediate-operand syntax for
      target assembler configuration.  */
@@ -38,8 +37,7 @@ _DEFUN (_exit, (status),
  *          use the timer, but I'm waiting for docs. (sigh)
  */
 void
-_DEFUN (delay, (num),
-        int num)
+delay (int num)
 {
   while (num--)
     {

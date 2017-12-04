@@ -43,8 +43,7 @@ QUICKREF
 #define TOO_SMALL(LEN)  ((LEN) < LBLOCKSIZE)
 
 int
-_DEFUN (memcmp, (m1, m2, n),
-	const void *m1,
+memcmp (const void *m1,
 	const void *m2,
 	size_t n)
 {

@@ -30,8 +30,7 @@
 #ifndef _REENT_ONLY
 
 int
-_DEFUN(vscanf, (fmt, ap), 
-       const char *fmt,
+vscanf (const char *fmt,
        va_list ap)
 {
   struct _reent *reent = _REENT;
@@ -48,8 +47,7 @@ _EXFUN(viscanf, (const char *, __VALIST) _ATTRIBUTE ((__alias__("vscanf"))));
 #endif /* !_REENT_ONLY */
 
 int
-_DEFUN(_vscanf_r, (ptr, fmt, ap),
-       struct _reent *ptr,
+_vscanf_r (struct _reent *ptr,
        const char *__restrict fmt,
        va_list ap)
 {

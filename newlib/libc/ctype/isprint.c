@@ -57,7 +57,7 @@ No supporting OS subroutines are required.
 
 #undef isgraph
 int
-_DEFUN(isgraph,(c),int c)
+isgraph (int c)
 {
 	return(__CTYPE_PTR[c+1] & (_P|_U|_L|_N));
 }
@@ -65,7 +65,7 @@ _DEFUN(isgraph,(c),int c)
 
 #undef isprint
 int
-_DEFUN(isprint,(c),int c)
+isprint (int c)
 {
 	return(__CTYPE_PTR[c+1] & (_P|_U|_L|_N|_B));
 }

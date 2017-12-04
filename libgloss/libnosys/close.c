@@ -11,8 +11,7 @@ extern int errno;
 #include "warning.h"
 
 int
-_DEFUN (_close, (fildes),
-        int fildes)
+_close (int fildes)
 {
   errno = ENOSYS;
   return -1;

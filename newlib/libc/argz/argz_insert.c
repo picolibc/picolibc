@@ -13,8 +13,7 @@
 #include <stddef.h>
 
 error_t
-_DEFUN (argz_insert, (argz, argz_len, before, entry),
-       char **argz,
+argz_insert (char **argz,
        size_t *argz_len,
        char *before,
        const char *entry)

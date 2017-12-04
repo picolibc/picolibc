@@ -3,8 +3,7 @@
 #include <pwd.h>
 
 struct passwd *
-_DEFUN (getpwnam, (name),
-	const char *name)
+getpwnam (const char *name)
 {
   errno = ENOSYS;
   return NULL;
@@ -12,8 +11,7 @@ _DEFUN (getpwnam, (name),
 
 /* FIXME: dummy stub for now.  */
 struct passwd *
-_DEFUN (getpwuid, (uid),
-	uid_t uid)
+getpwuid (uid_t uid)
 {
   errno = ENOSYS;
   return NULL;
@@ -21,8 +19,7 @@ _DEFUN (getpwuid, (uid),
 
 /* FIXME: dummy stub for now.  */
 struct passwd *
-_DEFUN (getpwent, (uid),
-	uid_t uid)
+getpwent (uid_t uid)
 {
   errno = ENOSYS;
   return NULL;

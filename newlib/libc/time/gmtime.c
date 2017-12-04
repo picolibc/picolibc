@@ -50,8 +50,7 @@ ANSI C requires <<gmtime>>.
 #ifndef _REENT_ONLY
 
 struct tm *
-_DEFUN (gmtime, (tim_p),
-	const time_t * tim_p)
+gmtime (const time_t * tim_p)
 {
   struct _reent *reent = _REENT;
 

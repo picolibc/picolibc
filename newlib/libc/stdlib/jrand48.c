@@ -14,8 +14,7 @@
 #include "rand48.h"
 
 long
-_DEFUN (_jrand48_r, (r, xseed),
-       struct _reent *r,
+_jrand48_r (struct _reent *r,
        unsigned short xseed[3])
 {
   __dorand48(r, xseed);
@@ -24,8 +23,7 @@ _DEFUN (_jrand48_r, (r, xseed),
 
 #ifndef _REENT_ONLY
 long
-_DEFUN (jrand48, (xseed),
-       unsigned short xseed[3])
+jrand48 (unsigned short xseed[3])
 {
   return _jrand48_r (_REENT, xseed);
 }

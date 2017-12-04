@@ -226,8 +226,7 @@ static void * get_arg (int, va_list *, int *, void **);
 #ifndef _REENT_ONLY
 
 int
-_DEFUN(VFWSCANF, (fp, fmt, ap),
-       register FILE *__restrict fp,
+VFWSCANF (register FILE *__restrict fp,
        const wchar_t *__restrict fmt,
        va_list ap)
 {
@@ -238,8 +237,7 @@ _DEFUN(VFWSCANF, (fp, fmt, ap),
 }
 
 int
-_DEFUN(__SVFWSCANF, (fp, fmt0, ap),
-       register FILE *fp,
+__SVFWSCANF (register FILE *fp,
        wchar_t const *fmt0,
        va_list ap)
 {
@@ -249,8 +247,7 @@ _DEFUN(__SVFWSCANF, (fp, fmt0, ap),
 #endif /* !_REENT_ONLY */
 
 int
-_DEFUN(_VFWSCANF_R, (data, fp, fmt, ap),
-       struct _reent *data,
+_VFWSCANF_R (struct _reent *data,
        register FILE *fp,
        const wchar_t *fmt,
        va_list ap)
@@ -265,8 +262,7 @@ _DEFUN(_VFWSCANF_R, (data, fp, fmt, ap),
  * regular ungetwc which will drag in file I/O items we don't need.
  * So, we create our own trimmed-down version.  */
 static wint_t
-_DEFUN(_sungetwc_r, (data, fp, ch),
-	struct _reent *data,
+_sungetwc_r (struct _reent *data,
 	wint_t wc,
 	register FILE *fp)
 {
@@ -325,8 +321,7 @@ _DEFUN(_sungetwc_r, (data, fp, ch),
 extern int __ssrefill_r (struct _reent *ptr, register FILE * fp);
 
 static size_t
-_DEFUN(_sfgetwc_r, (ptr, fp),
-       struct _reent * ptr,
+_sfgetwc_r (struct _reent * ptr,
        FILE * fp)
 {
   wchar_t wc;
@@ -341,8 +336,7 @@ _DEFUN(_sfgetwc_r, (ptr, fp),
 #endif /* STRING_ONLY */
 
 int
-_DEFUN(__SVFWSCANF_R, (rptr, fp, fmt0, ap),
-       struct _reent *rptr,
+__SVFWSCANF_R (struct _reent *rptr,
        register FILE *fp,
        wchar_t const *fmt0,
        va_list ap)

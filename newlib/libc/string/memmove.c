@@ -50,8 +50,7 @@ QUICKREF
 /*SUPPRESS 20*/
 void *
 __inhibit_loop_to_libcall
-_DEFUN (memmove, (dst_void, src_void, length),
-	void *dst_void,
+memmove (void *dst_void,
 	const void *src_void,
 	size_t length)
 {

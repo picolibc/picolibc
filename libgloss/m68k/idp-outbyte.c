@@ -32,8 +32,7 @@
  *           to channel A.
  */
 static void
-_DEFUN (raw_outbyte, (byte),
-	char byte)
+raw_outbyte (char byte)
 {
   /* First, wait for the UART to finish clocking out the last
      character we sent, if any.  Then, give it the next character to
@@ -64,8 +63,7 @@ _DEFUN (raw_outbyte, (byte),
  *      latter we put in libidp.a, which is selected by idp.ld.
  */
 void
-_DEFUN (outbyte, (byte),
-        char byte)
+outbyte (char byte)
 {
 #ifdef GDB_MONITOR_OUTPUT
   raw_outbyte (0x0f);

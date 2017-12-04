@@ -46,8 +46,7 @@
 #define YEARS_PER_ERA		400
 
 struct tm *
-_DEFUN (gmtime_r, (tim_p, res),
-	const time_t *__restrict tim_p,
+gmtime_r (const time_t *__restrict tim_p,
 	struct tm *__restrict res)
 {
   long days, rem;

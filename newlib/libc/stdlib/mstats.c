@@ -97,8 +97,7 @@ malloc_stats (void)
 }
 
 int
-_DEFUN (mallopt, (p, v),
-	int p,
+mallopt (int p,
 	int v)
 {
   return _mallopt_r (_REENT, p, v);
@@ -115,8 +114,7 @@ _DEFUN (mallopt, (p, v),
    malloc_stats.  */
 
 void
-_DEFUN (_mstats_r, (ptr, s),
-	struct _reent *ptr,
+_mstats_r (struct _reent *ptr,
 	char *s)
 {
   _REENT_SMALL_CHECK_INIT(ptr);
@@ -126,8 +124,7 @@ _DEFUN (_mstats_r, (ptr, s),
 
 #ifndef _REENT_ONLY
 void
-_DEFUN (mstats, (s),
-	char *s)
+mstats (char *s)
 {
   _mstats_r (_REENT, s);
 }

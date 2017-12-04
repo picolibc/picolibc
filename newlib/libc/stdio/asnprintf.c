@@ -14,8 +14,7 @@
 #include "local.h"
 
 char *
-_DEFUN(_asnprintf_r, (ptr, buf, lenp, fmt),
-       struct _reent *__restrict ptr,
+_asnprintf_r (struct _reent *__restrict ptr,
        char *buf,
        size_t *lenp,
        const char *__restrict fmt, ...)
@@ -67,8 +66,7 @@ _EXFUN(_asniprintf_r, (struct _reent *, char *, size_t *, const char *, ...)
 #ifndef _REENT_ONLY
 
 char *
-_DEFUN(asnprintf, (buf, lenp, fmt),
-       char *__restrict buf,
+asnprintf (char *__restrict buf,
        size_t *__restrict lenp,
        const char *__restrict fmt, ...)
 {

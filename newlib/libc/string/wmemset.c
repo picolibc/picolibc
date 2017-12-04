@@ -59,8 +59,7 @@ No supporting OS subroutines are required.
 #include <wchar.h>
 
 wchar_t	*
-_DEFUN(wmemset, (s, c, n),
-	wchar_t *s,
+wmemset (wchar_t *s,
 	wchar_t c,
 	size_t n)
 {

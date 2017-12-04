@@ -49,8 +49,7 @@ typedef struct
 #ifndef _REENT_ONLY
 
 size_t
-_DEFUN (fread, (buf, size, count, fp),
-	void *__restrict  buf,
+fread (void *__restrict  buf,
 	size_t size,
 	size_t count,
 	FILE *__restrict fp)

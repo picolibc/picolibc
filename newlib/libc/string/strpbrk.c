@@ -25,8 +25,7 @@ PORTABILITY
 #include <string.h>
 
 char *
-_DEFUN (strpbrk, (s1, s2),
-	const char *s1,
+strpbrk (const char *s1,
 	const char *s2)
 {
   const char *c = s2;

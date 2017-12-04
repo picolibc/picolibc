@@ -138,8 +138,7 @@ _wcsnrtombs_l (struct _reent *r, char *dst, const wchar_t **src, size_t nwc,
 } 
 
 size_t
-_DEFUN (_wcsnrtombs_r, (r, dst, src, nwc, len, ps),
-	struct _reent *r,
+_wcsnrtombs_r (struct _reent *r,
 	char *dst,
 	const wchar_t **src,
 	size_t nwc,
@@ -152,8 +151,7 @@ _DEFUN (_wcsnrtombs_r, (r, dst, src, nwc, len, ps),
 
 #ifndef _REENT_ONLY
 size_t
-_DEFUN (wcsnrtombs, (dst, src, nwc, len, ps),
-	char *__restrict dst,
+wcsnrtombs (char *__restrict dst,
 	const wchar_t **__restrict src,
 	size_t nwc,
 	size_t len,

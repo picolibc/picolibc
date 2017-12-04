@@ -36,8 +36,7 @@ QUICKREF
 #include <string.h>
 
 int
-_DEFUN (strcoll, (a, b),
-	const char *a,
+strcoll (const char *a,
 	const char *b)
 
 {

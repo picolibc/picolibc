@@ -33,8 +33,7 @@
 #undef putwc
 
 wint_t
-_DEFUN(_putwc_r, (ptr, wc, fp),
-	struct _reent *ptr,
+_putwc_r (struct _reent *ptr,
 	wchar_t wc,
 	FILE *fp)
 {
@@ -45,8 +44,7 @@ _DEFUN(_putwc_r, (ptr, wc, fp),
  * macro, may evaluate `fp' more than once.
  */
 wint_t
-_DEFUN(putwc, (wc, fp),
-	wchar_t wc,
+putwc (wchar_t wc,
 	FILE *fp)
 {
   return fputwc (wc, fp);

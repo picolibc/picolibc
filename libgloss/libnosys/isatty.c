@@ -11,8 +11,7 @@ extern int errno;
 #include "warning.h"
 
 int
-_DEFUN (_isatty, (file),
-        int file)
+_isatty (int file)
 {
   errno = ENOSYS;
   return 0;

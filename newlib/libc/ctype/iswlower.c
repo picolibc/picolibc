@@ -36,7 +36,7 @@ No supporting OS subroutines are required.
 #include <wctype.h>
 
 int
-_DEFUN(iswlower,(c),wint_t c)
+iswlower (wint_t c)
 {
 	return (towupper (c) != c);
 }

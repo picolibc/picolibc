@@ -62,7 +62,7 @@ No supporting OS subroutines are required.
 
 #undef toupper
 int
-_DEFUN(toupper,(c),int c)
+toupper (int c)
 {
 #if defined (_MB_EXTENDED_CHARSETS_ISO) || defined (_MB_EXTENDED_CHARSETS_WINDOWS)
   if ((unsigned char) c <= 0x7f)

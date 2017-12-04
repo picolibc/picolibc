@@ -44,8 +44,7 @@ DESCRIPTION
 */
 
 clock_t
-_DEFUN (_times_r, (ptr, ptms),
-     struct _reent *ptr,
+_times_r (struct _reent *ptr,
      struct tms *ptms)
 {
   clock_t ret;

@@ -18,8 +18,7 @@
 #include "zmath.h"
 
 float
-_DEFUN (floorf, (float),
-        float x)
+floorf (float x)
 {
   float f, y;
 

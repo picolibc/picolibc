@@ -49,8 +49,7 @@ extern char *_findenv_r (struct _reent *, const char *, int *);
  */
 
 int
-_DEFUN (_setenv_r, (reent_ptr, name, value, rewrite),
-        struct _reent *reent_ptr,
+_setenv_r (struct _reent *reent_ptr,
 	const char *name,
 	const char *value,
 	int rewrite)
@@ -133,8 +132,7 @@ _DEFUN (_setenv_r, (reent_ptr, name, value, rewrite),
  *	Delete environmental variable "name".
  */
 int
-_DEFUN (_unsetenv_r, (reent_ptr, name),
-        struct _reent *reent_ptr,
+_unsetenv_r (struct _reent *reent_ptr,
         const char *name)
 {
   register char **P;

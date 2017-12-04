@@ -4,8 +4,7 @@
 #include <unistd.h>
 
 _READ_WRITE_RETURN_TYPE
-_DEFUN (write, (fd, buf, cnt),
-     int fd,
+write (int fd,
      const void *buf,
      size_t cnt)
 {

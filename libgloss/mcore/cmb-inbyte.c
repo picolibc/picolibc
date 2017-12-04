@@ -15,8 +15,7 @@
 #include <_ansi.h>
 
 int
-_DEFUN (inbyte, (),
-	void)
+inbyte (void)
 
 {
     return -1;

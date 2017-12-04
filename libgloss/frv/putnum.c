@@ -18,8 +18,7 @@
  * putnum -- print a 32 bit number in hex
  */
 void
-_DEFUN (_putnum, (num),
-	unsigned int num)
+_putnum (unsigned int num)
 {
   char  buf[9];
   int   cnt;

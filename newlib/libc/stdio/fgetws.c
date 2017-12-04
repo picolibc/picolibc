@@ -99,8 +99,7 @@ PORTABILITY
 #endif
 
 wchar_t *
-_DEFUN(_fgetws_r, (ptr, ws, n, fp),
-	struct _reent *ptr,
+_fgetws_r (struct _reent *ptr,
 	wchar_t * ws,
 	int n,
 	FILE * fp)
@@ -172,8 +171,7 @@ error:
 }
 
 wchar_t *
-_DEFUN(fgetws, (ws, n, fp),
-	wchar_t *__restrict ws,
+fgetws (wchar_t *__restrict ws,
 	int n,
 	FILE *__restrict fp)
 {

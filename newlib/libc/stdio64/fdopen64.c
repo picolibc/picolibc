@@ -35,8 +35,7 @@ File pointer or <<NULL>>, as for <<fopen>>.
 extern int __sflags ();
 
 FILE *
-_DEFUN (_fdopen64_r, (ptr, fd, mode),
-	struct _reent *ptr,
+_fdopen64_r (struct _reent *ptr,
 	int fd,
 	const char *mode)
 {
@@ -108,8 +107,7 @@ _DEFUN (_fdopen64_r, (ptr, fd, mode),
 #ifndef _REENT_ONLY
 
 FILE *
-_DEFUN (fdopen64, (fd, mode),
-	int fd,
+fdopen64 (int fd,
 	const char *mode)
 {
   return _fdopen64_r (_REENT, fd, mode);

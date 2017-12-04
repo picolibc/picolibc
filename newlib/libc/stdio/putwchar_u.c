@@ -34,8 +34,7 @@
 #undef putwchar_unlocked
 
 wint_t
-_DEFUN(_putwchar_unlocked_r, (ptr, wc),
-	struct _reent *ptr,
+_putwchar_unlocked_r (struct _reent *ptr,
 	wchar_t wc)
 {
   return _fputwc_unlocked_r (ptr, wc, stdout);
@@ -45,8 +44,7 @@ _DEFUN(_putwchar_unlocked_r, (ptr, wc),
  * Synonym for fputwc_unlocked(wc, stdout).
  */
 wint_t
-_DEFUN(putwchar_unlocked, (wc),
-	wchar_t wc)
+putwchar_unlocked (wchar_t wc)
 {
   _REENT_SMALL_CHECK_INIT (_REENT);
   return fputwc_unlocked (wc, stdout);

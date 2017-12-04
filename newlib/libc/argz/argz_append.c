@@ -11,8 +11,7 @@
 #include <stdlib.h>
 
 error_t
-_DEFUN (argz_append, (argz, argz_len, buf, buf_len),
-       char **argz,
+argz_append (char **argz,
        size_t *argz_len,
        const char *buf,
        size_t buf_len)

@@ -74,8 +74,7 @@ C99
 #include "local.h"
 
 wint_t
-_DEFUN(_ungetwc_r, (ptr, wc, fp),
-	struct _reent *ptr,
+_ungetwc_r (struct _reent *ptr,
 	wint_t wc,
 	register FILE *fp)
 {
@@ -106,8 +105,7 @@ _DEFUN(_ungetwc_r, (ptr, wc, fp),
  * MT-safe version.
  */
 wint_t
-_DEFUN(ungetwc, (wint_t wc, FILE *fp),
-	wint_t wc,
+ungetwc (wint_t wc,
 	FILE *fp)
 {
   struct _reent *reent = _REENT;

@@ -33,8 +33,7 @@
 #undef getwc
 
 wint_t
-_DEFUN(_getwc_r, (ptr, fp),
-	struct _reent *ptr,
+_getwc_r (struct _reent *ptr,
 	FILE *fp)
 {
   return _fgetwc_r (ptr, fp);
@@ -45,8 +44,7 @@ _DEFUN(_getwc_r, (ptr, fp),
  * macro, may evaluate `fp' more than once.
  */
 wint_t
-_DEFUN(getwc, (fp),
-	FILE *fp)
+getwc (FILE *fp)
 {
   return fgetwc(fp);
 }

@@ -67,8 +67,7 @@ No supporting OS subroutines are required.
  * Compare strings.
  */
 int
-_DEFUN (wcscmp, (s1, s2),
-	const wchar_t * s1,
+wcscmp (const wchar_t * s1,
 	const wchar_t * s2)
 {
 

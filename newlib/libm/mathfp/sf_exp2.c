@@ -7,8 +7,7 @@
 #include "fdlibm.h"
 
 float
-_DEFUN (exp2f, (float),
-        float x)
+exp2f (float x)
 {
   return powf(2.0, x);
 }

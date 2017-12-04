@@ -40,8 +40,7 @@ DESCRIPTION
 #include <sys/stat.h>
 
 int
-_DEFUN (_mkdir_r, (ptr, path, mode),
-     struct _reent *ptr,
+_mkdir_r (struct _reent *ptr,
      const char *path,
      int mode)
 {

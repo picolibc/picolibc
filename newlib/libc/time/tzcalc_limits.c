@@ -11,8 +11,7 @@
 #include "local.h"
 
 int
-_DEFUN (__tzcalc_limits, (year),
-	int year)
+__tzcalc_limits (int year)
 {
   int days, year_days, years;
   int i, j;

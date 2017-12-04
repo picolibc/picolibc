@@ -54,8 +54,7 @@ static char sccsid[] = "%W% (Berkeley) %G%";
 #include <stdio.h>
 
 int
-_DEFUN(getw, (fp),
-       register FILE *fp)
+getw (register FILE *fp)
 {
   int result;
   if (fread ((char*)&result, sizeof (result), 1, fp) != 1)

@@ -6,8 +6,7 @@
 #include <time.h>
 
 char *
-_DEFUN (asctime_r, (tim_p, result),
-	const struct tm *__restrict tim_p,
+asctime_r (const struct tm *__restrict tim_p,
 	char *__restrict result)
 {
   static const char day_name[7][3] = {

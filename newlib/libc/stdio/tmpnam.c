@@ -86,8 +86,7 @@ The global pointer <<environ>> is also required.
    another one.  Return nonzero if successful, otherwise zero.  */
 
 static int
-_DEFUN(worker, (ptr, result, part1, part2, part3, part4),
-       struct _reent *ptr,
+worker (struct _reent *ptr,
        char *result,
        const char *part1,
        const char *part2,
@@ -118,8 +117,7 @@ _DEFUN(worker, (ptr, result, part1, part2, part3, part4),
 }
 
 char *
-_DEFUN(_tmpnam_r, (p, s),
-       struct _reent *p,
+_tmpnam_r (struct _reent *p,
        char *s)
 {
   char *result;
@@ -147,8 +145,7 @@ _DEFUN(_tmpnam_r, (p, s),
 }
 
 char *
-_DEFUN(_tempnam_r, (p, dir, pfx),
-       struct _reent *p,
+_tempnam_r (struct _reent *p,
        const char *dir,
        const char *pfx)
 {
@@ -174,16 +171,14 @@ _DEFUN(_tempnam_r, (p, dir, pfx),
 #ifndef _REENT_ONLY
 
 char *
-_DEFUN(tempnam, (dir, pfx),
-       const char *dir,
+tempnam (const char *dir,
        const char *pfx)
 {
   return _tempnam_r (_REENT, dir, pfx);
 }
 
 char *
-_DEFUN(tmpnam, (s),
-       char *s)
+tmpnam (char *s)
 {
   return _tmpnam_r (_REENT, s);
 }

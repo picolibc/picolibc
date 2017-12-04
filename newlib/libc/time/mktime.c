@@ -62,8 +62,7 @@ static const int _DAYS_BEFORE_MONTH[12] =
 #define _DAYS_IN_YEAR(year) (_ISLEAP(year) ? 366 : 365)
 
 static void 
-_DEFUN(validate_structure, (tim_p),
-     struct tm *tim_p)
+validate_structure (struct tm *tim_p)
 {
   div_t res;
   int days_in_feb = 28;
@@ -149,8 +148,7 @@ _DEFUN(validate_structure, (tim_p),
 }
 
 time_t 
-_DEFUN(mktime, (tim_p),
-     struct tm *tim_p)
+mktime (struct tm *tim_p)
 {
   time_t tim = 0;
   long days = 0;

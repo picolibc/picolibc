@@ -13,8 +13,7 @@
  */
 
 void 
-_DEFUN (__cxa_finalize, (d),
-	void * d)
+__cxa_finalize (void * d)
 {
   __call_exitprocs (0, d);
 }

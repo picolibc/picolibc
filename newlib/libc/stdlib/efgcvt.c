@@ -103,8 +103,7 @@ Supporting OS subroutines required: <<close>>, <<fstat>>, <<isatty>>,
 #include "local.h"
 
 char *
-_DEFUN (fcvt, (d, ndigit, decpt, sign),
-	double d,
+fcvt (double d,
 	int ndigit,
 	int *decpt,
 	int *sign)
@@ -113,8 +112,7 @@ _DEFUN (fcvt, (d, ndigit, decpt, sign),
 }
 
 char *
-_DEFUN (fcvtf, (d, ndigit, decpt, sign),
-	float d,
+fcvtf (float d,
 	int ndigit,
 	int *decpt,
 	int *sign)
@@ -124,8 +122,7 @@ _DEFUN (fcvtf, (d, ndigit, decpt, sign),
 
 
 char *
-_DEFUN (gcvtf, (d, ndigit, buf),
-	float d,
+gcvtf (float d,
 	int ndigit,
 	char *buf)
 {
@@ -135,8 +132,7 @@ _DEFUN (gcvtf, (d, ndigit, buf),
 
 
 char *
-_DEFUN (ecvt, (d, ndigit, decpt, sign),
-	double d,
+ecvt (double d,
 	int ndigit,
 	int *decpt,
 	int *sign)
@@ -145,8 +141,7 @@ _DEFUN (ecvt, (d, ndigit, decpt, sign),
 }
 
 char *
-_DEFUN (ecvtf, (d, ndigit, decpt, sign),
-	float d,
+ecvtf (float d,
 	int ndigit,
 	int *decpt,
 	int *sign)
@@ -156,8 +151,7 @@ _DEFUN (ecvtf, (d, ndigit, decpt, sign),
 
 
 char *
-_DEFUN (gcvt, (d, ndigit, buf),
-	double d,
+gcvt (double d,
 	int ndigit,
 	char *buf)
 {

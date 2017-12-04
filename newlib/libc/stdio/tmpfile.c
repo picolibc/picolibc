@@ -50,8 +50,7 @@ Supporting OS subroutines required: <<close>>, <<fstat>>, <<getpid>>,
 #endif
 
 FILE *
-_DEFUN(_tmpfile_r, (ptr),
-       struct _reent *ptr)
+_tmpfile_r (struct _reent *ptr)
 {
   FILE *fp;
   int e;

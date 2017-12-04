@@ -33,8 +33,7 @@
  * outbyte -- send a byte to the UART.
  */
 void
-_DEFUN (outbyte, (ch),
-	char ch)
+outbyte (char ch)
 {
     while (!(*SRREG & TRDY))
 	;

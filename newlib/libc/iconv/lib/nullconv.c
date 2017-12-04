@@ -36,8 +36,7 @@ static int null_conversion_dummy_data;
 
 
 static void *
-_DEFUN(null_conversion_open, (rptr, to, from),
-                             struct _reent *rptr,
+null_conversion_open (struct _reent *rptr,
                              const char *to,
                              const char *from)
 {
@@ -46,8 +45,7 @@ _DEFUN(null_conversion_open, (rptr, to, from),
 
 
 static size_t
-_DEFUN(null_conversion_close, (rptr, data),
-                              struct _reent *rptr,
+null_conversion_close (struct _reent *rptr,
                               void *data)
 {
   return 0;
@@ -55,9 +53,7 @@ _DEFUN(null_conversion_close, (rptr, data),
 
 
 static size_t
-_DEFUN(null_conversion_convert,
-                     (rptr, data, inbuf, inbytesleft, outbuf, outbytesleft),
-                     struct _reent *rptr,
+null_conversion_convert (struct _reent *rptr,
                      void *data,
                      const unsigned char **inbuf,
                      size_t *inbytesleft,
@@ -93,8 +89,7 @@ _DEFUN(null_conversion_convert,
 
 
 static int
-_DEFUN(null_conversion_get_mb_cur_max, (data, direction),
-                                       void *data,
+null_conversion_get_mb_cur_max (void *data,
                                        int direction)
 {
   return ICONV_MB_LEN_MAX;
@@ -102,8 +97,7 @@ _DEFUN(null_conversion_get_mb_cur_max, (data, direction),
 
 
 static void
-_DEFUN(null_conversion_get_state, (data, state, size),
-                                  void *data,
+null_conversion_get_state (void *data,
                                   mbstate_t *state,
                                   int direction)
 {
@@ -112,8 +106,7 @@ _DEFUN(null_conversion_get_state, (data, state, size),
 
 
 static int
-_DEFUN(null_conversion_set_state, (data, state, direction),
-                                  void *data,
+null_conversion_set_state (void *data,
                                   mbstate_t *state,
                                   int direction)
 {
@@ -121,8 +114,7 @@ _DEFUN(null_conversion_set_state, (data, state, direction),
 }
 
 static int
-_DEFUN(null_conversion_is_stateful, (data, direction),
-                                    void *data,
+null_conversion_is_stateful (void *data,
                                     int direction)
 {
   return 0;

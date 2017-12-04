@@ -4,8 +4,7 @@
 #include <string.h>
 
 int
-_DEFUN (__xpg_strerror_r, (errnum, buffer, n),
-	int errnum,
+__xpg_strerror_r (int errnum,
 	char *buffer,
 	size_t n)
 {

@@ -13,8 +13,7 @@
 #undef isinff
 
 int
-_DEFUN (isinff, (x),
-	float x)
+isinff (float x)
 {
 	__int32_t ix;
 	GET_FLOAT_WORD(ix,x);
@@ -27,8 +26,7 @@ _DEFUN (isinff, (x),
 #undef isinf
 
 int
-_DEFUN (isinf, (x),
-	double x)
+isinf (double x)
 {
 	return isinff((float) x);
 }

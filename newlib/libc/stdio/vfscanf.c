@@ -224,8 +224,7 @@ typedef unsigned long long u_long_long;
 #ifndef _REENT_ONLY
 
 int
-_DEFUN(VFSCANF, (fp, fmt, ap),
-       register FILE *fp,
+VFSCANF (register FILE *fp,
        const char *fmt,
        va_list ap)
 {
@@ -236,8 +235,7 @@ _DEFUN(VFSCANF, (fp, fmt, ap),
 }
 
 int
-_DEFUN(__SVFSCANF, (fp, fmt0, ap),
-       register FILE *fp,
+__SVFSCANF (register FILE *fp,
        char const *fmt0,
        va_list ap)
 {
@@ -247,8 +245,7 @@ _DEFUN(__SVFSCANF, (fp, fmt0, ap),
 #endif /* !_REENT_ONLY */
 
 int
-_DEFUN(_VFSCANF_R, (data, fp, fmt, ap),
-       struct _reent *data,
+_VFSCANF_R (struct _reent *data,
        register FILE *fp,
        const char *fmt,
        va_list ap)
@@ -263,8 +260,7 @@ _DEFUN(_VFSCANF_R, (data, fp, fmt, ap),
  * regular ungetc which will drag in file I/O items we don't need.
  * So, we create our own trimmed-down version.  */
 int
-_DEFUN(_sungetc_r, (data, fp, ch),
-	struct _reent *data,
+_sungetc_r (struct _reent *data,
 	int c,
 	register FILE *fp)
 {
@@ -321,8 +317,7 @@ _DEFUN(_sungetc_r, (data, fp, ch),
 
 /* String only version of __srefill_r for sscanf family.  */
 int
-_DEFUN(__ssrefill_r, (ptr, fp),
-       struct _reent * ptr,
+__ssrefill_r (struct _reent * ptr,
        register FILE * fp)
 {
   /*
@@ -347,8 +342,7 @@ _DEFUN(__ssrefill_r, (ptr, fp),
 }
 
 size_t
-_DEFUN(_sfread_r, (ptr, buf, size, count, fp),
-       struct _reent * ptr,
+_sfread_r (struct _reent * ptr,
        void *buf,
        size_t size,
        size_t count,
@@ -402,8 +396,7 @@ __wctob (struct _reent *rptr, wint_t wc)
 }
 
 int
-_DEFUN(__SVFSCANF_R, (rptr, fp, fmt0, ap),
-       struct _reent *rptr,
+__SVFSCANF_R (struct _reent *rptr,
        register FILE *fp,
        char const *fmt0,
        va_list ap)

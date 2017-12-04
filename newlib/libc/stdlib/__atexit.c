@@ -63,9 +63,7 @@ static struct _atexit _global_atexit0 = _ATEXIT_INIT;
  */
 
 int
-_DEFUN (__register_exitproc,
-	(type, fn, arg, d),
-	int type,
+__register_exitproc (int type,
 	void (*fn) (void),
 	void *arg,
 	void *d)

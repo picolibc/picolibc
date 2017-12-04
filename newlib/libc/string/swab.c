@@ -18,8 +18,7 @@ PORTABILITY
 #include <unistd.h>
 
 void
-_DEFUN (swab, (b1, b2, length),
-	const void *b1,
+swab (const void *b1,
 	void *b2,
 	ssize_t length)
 {

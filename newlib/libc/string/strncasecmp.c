@@ -37,8 +37,7 @@ QUICKREF
 #include <ctype.h>
 
 int 
-_DEFUN (strncasecmp, (s1, s2, n),
-	const char *s1,
+strncasecmp (const char *s1,
 	const char *s2,
 	size_t n)
 {

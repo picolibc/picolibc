@@ -6,8 +6,7 @@
 #include <string.h>
 
 char *
-_DEFUN (strndup, (str, n), 
-	const char *str,
+strndup (const char *str,
 	size_t n)
 {
   return _strndup_r (_REENT, str, n);

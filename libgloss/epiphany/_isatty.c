@@ -20,7 +20,7 @@
 #include <errno.h>
 
 int
-_DEFUN(_isatty, (fd), int fd)
+_isatty (int fd)
 {
   struct stat buf;
 

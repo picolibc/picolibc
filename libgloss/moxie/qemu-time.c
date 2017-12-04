@@ -40,8 +40,7 @@
  * _times -- FIXME
  */
 int
-_DEFUN (_times, _times (buf),
-	struct tms *buf)
+_times (struct tms *buf)
 {
   errno = EINVAL;
   return (-1);
@@ -70,8 +69,7 @@ rtc_write (unsigned char reg, unsigned char val)
  * time -- return current time in seconds.
  */
 time_t
-_DEFUN (time, time (t),
-	time_t *t)
+time (time_t *t)
 {
   struct tm tm;
   time_t ret;
@@ -100,8 +98,7 @@ _DEFUN (time, time (t),
  * return the microseconds.
  */
 int
-_DEFUN (_gettimeofday, _gettimeofday (tv, tz),
-	struct timeval *tv,
+_gettimeofday (struct timeval *tv,
 	void *tzvp)
 {
   struct timezone *tz = tzvp;

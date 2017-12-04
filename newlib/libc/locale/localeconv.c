@@ -51,8 +51,7 @@ __localeconv_l (struct __locale_t *locale)
 }
 
 struct lconv *
-_DEFUN (_localeconv_r, (data), 
-	struct _reent *data)
+_localeconv_r (struct _reent *data)
 {
   /* Note that we always fall back to the global locale, even in case
      of specifying a reent.  Otherwise a call to _localeconv_r would just

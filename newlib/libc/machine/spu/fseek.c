@@ -47,8 +47,7 @@ typedef struct
 #ifndef _REENT_ONLY
 
 int
-_DEFUN (fseek, (fp, offset, whence),
-     register FILE *fp,
+fseek (register FILE *fp,
      long offset,
      int whence)
 {

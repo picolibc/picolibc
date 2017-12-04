@@ -69,7 +69,7 @@ No supporting OS subroutines are required.
 #include "local.h"
 
 int
-_DEFUN(iswcntrl,(c), wint_t c)
+iswcntrl (wint_t c)
 {
 #ifdef _MB_CAPABLE
   c = _jp2uc (c);

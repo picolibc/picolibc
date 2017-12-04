@@ -198,8 +198,7 @@ static char *rcsid = "$Id$";
 #ifdef INTEGER_ONLY
 #ifndef _FVWRITE_IN_STREAMIO
 int
-_DEFUN(__ssputs_r, (ptr, fp, buf, len),
-       struct _reent *ptr,
+__ssputs_r (struct _reent *ptr,
        FILE *fp,
        const char *buf,
        size_t len)
@@ -267,8 +266,7 @@ err:
 #endif
 
 int
-_DEFUN(__ssprint_r, (ptr, fp, uio),
-       struct _reent *ptr,
+__ssprint_r (struct _reent *ptr,
        FILE *fp,
        register struct __suio *uio)
 {
@@ -369,8 +367,7 @@ int __ssprint_r (struct _reent *, FILE *, register struct __suio *);
 
 #ifndef _FVWRITE_IN_STREAMIO
 int
-_DEFUN(__sfputs_r, (ptr, fp, buf, len),
-       struct _reent *ptr,
+__sfputs_r (struct _reent *ptr,
        FILE *fp,
        const char *buf,
        size_t len)
@@ -403,8 +400,7 @@ _DEFUN(__sfputs_r, (ptr, fp, buf, len),
  * then reset it so that it can be reused.
  */
 int
-_DEFUN(__sprint_r, (ptr, fp, uio),
-       struct _reent *ptr,
+__sprint_r (struct _reent *ptr,
        FILE *fp,
        register struct __suio *uio)
 {
@@ -456,8 +452,7 @@ int __sprint_r (struct _reent *, FILE *, register struct __suio *);
  * Make sure to avoid inlining.
  */
 _NOINLINE_STATIC int
-_DEFUN(__sbprintf, (rptr, fp, fmt, ap),
-       struct _reent *rptr,
+__sbprintf (struct _reent *rptr,
        register FILE *fp,
        const char *fmt,
        va_list ap)
@@ -648,8 +643,7 @@ int _EXFUN(_VFPRINTF_R, (struct _reent *, FILE *, const char *, va_list));
 
 #ifndef STRING_ONLY
 int
-_DEFUN(VFPRINTF, (fp, fmt0, ap),
-       FILE * fp,
+VFPRINTF (FILE * fp,
        const char *fmt0,
        va_list ap)
 {
@@ -660,8 +654,7 @@ _DEFUN(VFPRINTF, (fp, fmt0, ap),
 #endif /* STRING_ONLY */
 
 int
-_DEFUN(_VFPRINTF_R, (data, fp, fmt0, ap),
-       struct _reent *data,
+_VFPRINTF_R (struct _reent *data,
        FILE * fp,
        const char *fmt0,
        va_list ap)
@@ -2043,8 +2036,7 @@ const __ACTION __action_table[MAX_STATE][MAX_CH_CLASS] = {
 
 /* function to get positional parameter N where n = N - 1 */
 static union arg_val *
-_DEFUN(get_arg, (data, n, fmt, ap, numargs_p, args, arg_type, last_fmt),
-       struct _reent *data,
+get_arg (struct _reent *data,
        int n,
        char *fmt,
        va_list *ap,
