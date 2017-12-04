@@ -39,17 +39,17 @@ extern float   z_rooteps_f;
 
 /* Core math routines. */
 
-int    _EXFUN (numtest, (double));
-int    _EXFUN (numtestf, (float));
-double _EXFUN (logarithm, (double, int));
-float  _EXFUN (logarithmf, (float, int));
-double _EXFUN (sine, (double, int));
-float  _EXFUN (sinef, (float, int));
-double _EXFUN (asine, (double, int));
-float  _EXFUN (asinef, (float, int));
-double _EXFUN (atangent, (double, double, double, int));
-float  _EXFUN (atangentf, (float, float, float, int));
-double _EXFUN (sineh, (double, int));
-float  _EXFUN (sinehf, (float, int));
+int    numtest (double);
+int    numtestf (float);
+double logarithm (double, int);
+float  logarithmf (float, int);
+double sine (double, int);
+float  sinef (float, int);
+double asine (double, int);
+float  asinef (float, int);
+double atangent (double, double, double, int);
+float  atangentf (float, float, float, int);
+double sineh (double, int);
+float  sinehf (float, int);
 
 #endif /* no __ZMATH_H */

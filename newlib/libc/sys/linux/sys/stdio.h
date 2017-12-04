@@ -16,6 +16,6 @@
 #define getline __getline
 #define getdelim __getdelim
 
-char *	_EXFUN(ctermid, (char *));
+char *	ctermid (char *);
 
 #endif /* _NEWLIB_STDIO_H */

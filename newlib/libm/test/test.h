@@ -34,7 +34,7 @@ typedef struct
 #define MVEC_END    0,};
 
 
-int _EXFUN(mag_of_error,(double, double));
+int mag_of_error (double, double);
 
 
 #define ERROR_PERFECT 20
@@ -128,18 +128,18 @@ typedef struct
 } sprint_int_type;
 
 
-void _EXFUN(test_ieee,(void));
-void _EXFUN(test_math2,(void));
-void _EXFUN(test_math,(void));
-void _EXFUN(test_string,(void));
-void _EXFUN(test_is,(void));
-void _EXFUN(test_cvt,(void));
+void test_ieee (void);
+void test_math2 (void);
+void test_math (void);
+void test_string (void);
+void test_is (void);
+void test_cvt (void);
 
-void _EXFUN(line,(int));
+void line (int);
 
-void _EXFUN(test_mok, (double, double, int));
-void _EXFUN(test_iok, (int, int));
-void _EXFUN(test_eok, (int, int));
-void _EXFUN(test_sok, (char *, char*));
-void _EXFUN(test_scok, (char *, char*, int));
-void _EXFUN(newfunc,(const char *));
+void test_mok (double, double, int);
+void test_iok (int, int);
+void test_eok (int, int);
+void test_sok (char *, char*);
+void test_scok (char *, char*, int);
+void newfunc (const char *);

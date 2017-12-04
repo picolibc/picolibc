@@ -27,5 +27,5 @@
    to the requirements of the underlying OS. */
 #define _jp2uc(c) (c)
 #else
-wint_t _EXFUN (_jp2uc, (wint_t));
+wint_t _jp2uc (wint_t);
 #endif

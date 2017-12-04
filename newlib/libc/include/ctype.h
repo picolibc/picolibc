@@ -10,27 +10,27 @@
 
 _BEGIN_STD_C
 
-int _EXFUN(isalnum, (int __c));
-int _EXFUN(isalpha, (int __c));
-int _EXFUN(iscntrl, (int __c));
-int _EXFUN(isdigit, (int __c));
-int _EXFUN(isgraph, (int __c));
-int _EXFUN(islower, (int __c));
-int _EXFUN(isprint, (int __c));
-int _EXFUN(ispunct, (int __c));
-int _EXFUN(isspace, (int __c));
-int _EXFUN(isupper, (int __c));
-int _EXFUN(isxdigit,(int __c));
-int _EXFUN(tolower, (int __c));
-int _EXFUN(toupper, (int __c));
+int isalnum (int __c);
+int isalpha (int __c);
+int iscntrl (int __c);
+int isdigit (int __c);
+int isgraph (int __c);
+int islower (int __c);
+int isprint (int __c);
+int ispunct (int __c);
+int isspace (int __c);
+int isupper (int __c);
+int isxdigit (int __c);
+int tolower (int __c);
+int toupper (int __c);
 
 #if __ISO_C_VISIBLE >= 1999
-int _EXFUN(isblank, (int __c));
+int isblank (int __c);
 #endif
 
 #if __MISC_VISIBLE || __XSI_VISIBLE
-int _EXFUN(isascii, (int __c));
-int _EXFUN(toascii, (int __c));
+int isascii (int __c);
+int toascii (int __c);
 #define _tolower(__c) ((unsigned char)(__c) - 'A' + 'a')
 #define _toupper(__c) ((unsigned char)(__c) - 'a' + 'A')
 #endif

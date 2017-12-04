@@ -9,6 +9,6 @@ struct utimbuf
     time_t modtime;		/* Modification time.  */
   };
 
-int _EXFUN(utime, (const char *__file, const struct utimbuf *__times));
+int utime (const char *__file, const struct utimbuf *__times);
 
 #endif /* _SYS_UTIME_H */

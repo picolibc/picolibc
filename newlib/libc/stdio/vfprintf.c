@@ -517,7 +517,7 @@ extern char *_dtoa_r (struct _reent *, double, int,
 extern char *_ldtoa_r (struct _reent *, _LONG_DOUBLE, int,
 			      int, int *, int *, char **);
 
-extern int _EXFUN(_ldcheck,(_LONG_DOUBLE *));
+extern int _ldcheck (_LONG_DOUBLE *);
 
 #  define _PRINTF_FLOAT_TYPE _LONG_DOUBLE
 #  define _DTOA_R _ldtoa_r
@@ -600,9 +600,9 @@ union arg_val
 };
 
 static union arg_val *
-_EXFUN(get_arg, (struct _reent *data, int n, char *fmt,
+get_arg (struct _reent *data, int n, char *fmt,
                  va_list *ap, int *numargs, union arg_val *args,
-                 int *arg_type, char **last_fmt));
+                 int *arg_type, char **last_fmt);
 #endif /* !_NO_POS_ARGS */
 
 /*
@@ -639,7 +639,7 @@ _EXFUN(get_arg, (struct _reent *data, int n, char *fmt,
 # define GROUPING	0x400		/* use grouping ("'" flag) */
 #endif
 
-int _EXFUN(_VFPRINTF_R, (struct _reent *, FILE *, const char *, va_list));
+int _VFPRINTF_R (struct _reent *, FILE *, const char *, va_list);
 
 #ifndef STRING_ONLY
 int

@@ -140,59 +140,59 @@
 
 #endif /* __SINGLE_THREAD__ || __IMPL_UNLOCKED__ */
 
-extern wint_t _EXFUN(__fgetwc, (struct _reent *, FILE *));
-extern wint_t _EXFUN(__fputwc, (struct _reent *, wchar_t, FILE *));
-extern u_char *_EXFUN(__sccl, (char *, u_char *fmt));
-extern int    _EXFUN(__svfscanf_r,(struct _reent *,FILE *, const char *,va_list));
-extern int    _EXFUN(__ssvfscanf_r,(struct _reent *,FILE *, const char *,va_list));
-extern int    _EXFUN(__svfiscanf_r,(struct _reent *,FILE *, const char *,va_list));
-extern int    _EXFUN(__ssvfiscanf_r,(struct _reent *,FILE *, const char *,va_list));
-extern int    _EXFUN(__svfwscanf_r,(struct _reent *,FILE *, const wchar_t *,va_list));
-extern int    _EXFUN(__ssvfwscanf_r,(struct _reent *,FILE *, const wchar_t *,va_list));
-extern int    _EXFUN(__svfiwscanf_r,(struct _reent *,FILE *, const wchar_t *,va_list));
-extern int    _EXFUN(__ssvfiwscanf_r,(struct _reent *,FILE *, const wchar_t *,va_list));
-int	      _EXFUN(_svfprintf_r,(struct _reent *, FILE *, const char *, 
+extern wint_t __fgetwc (struct _reent *, FILE *);
+extern wint_t __fputwc (struct _reent *, wchar_t, FILE *);
+extern u_char *__sccl (char *, u_char *fmt);
+extern int    __svfscanf_r (struct _reent *,FILE *, const char *,va_list);
+extern int    __ssvfscanf_r (struct _reent *,FILE *, const char *,va_list);
+extern int    __svfiscanf_r (struct _reent *,FILE *, const char *,va_list);
+extern int    __ssvfiscanf_r (struct _reent *,FILE *, const char *,va_list);
+extern int    __svfwscanf_r (struct _reent *,FILE *, const wchar_t *,va_list);
+extern int    __ssvfwscanf_r (struct _reent *,FILE *, const wchar_t *,va_list);
+extern int    __svfiwscanf_r (struct _reent *,FILE *, const wchar_t *,va_list);
+extern int    __ssvfiwscanf_r (struct _reent *,FILE *, const wchar_t *,va_list);
+int	      _svfprintf_r (struct _reent *, FILE *, const char *, 
 				  va_list)
-               			_ATTRIBUTE ((__format__ (__printf__, 3, 0))));
-int	      _EXFUN(_svfiprintf_r,(struct _reent *, FILE *, const char *, 
+               			_ATTRIBUTE ((__format__ (__printf__, 3, 0)));
+int	      _svfiprintf_r (struct _reent *, FILE *, const char *, 
 				  va_list)
-               			_ATTRIBUTE ((__format__ (__printf__, 3, 0))));
-int	      _EXFUN(_svfwprintf_r,(struct _reent *, FILE *, const wchar_t *, 
-				  va_list));
-int	      _EXFUN(_svfiwprintf_r,(struct _reent *, FILE *, const wchar_t *, 
-				  va_list));
-extern FILE  *_EXFUN(__sfp,(struct _reent *));
-extern int    _EXFUN(__sflags,(struct _reent *,const char*, int*));
-extern int    _EXFUN(__sflush_r,(struct _reent *,FILE *));
+               			_ATTRIBUTE ((__format__ (__printf__, 3, 0)));
+int	      _svfwprintf_r (struct _reent *, FILE *, const wchar_t *, 
+				  va_list);
+int	      _svfiwprintf_r (struct _reent *, FILE *, const wchar_t *, 
+				  va_list);
+extern FILE  *__sfp (struct _reent *);
+extern int    __sflags (struct _reent *,const char*, int*);
+extern int    __sflush_r (struct _reent *,FILE *);
 #ifdef _STDIO_BSD_SEMANTICS
-extern int    _EXFUN(__sflushw_r,(struct _reent *,FILE *));
+extern int    __sflushw_r (struct _reent *,FILE *);
 #endif
-extern int    _EXFUN(__srefill_r,(struct _reent *,FILE *));
-extern _READ_WRITE_RETURN_TYPE _EXFUN(__sread,(struct _reent *, void *, char *,
-					       _READ_WRITE_BUFSIZE_TYPE));
-extern _READ_WRITE_RETURN_TYPE _EXFUN(__seofread,(struct _reent *, void *,
+extern int    __srefill_r (struct _reent *,FILE *);
+extern _READ_WRITE_RETURN_TYPE __sread (struct _reent *, void *, char *,
+					       _READ_WRITE_BUFSIZE_TYPE);
+extern _READ_WRITE_RETURN_TYPE __seofread (struct _reent *, void *,
 						  char *,
-						  _READ_WRITE_BUFSIZE_TYPE));
-extern _READ_WRITE_RETURN_TYPE _EXFUN(__swrite,(struct _reent *, void *,
+						  _READ_WRITE_BUFSIZE_TYPE);
+extern _READ_WRITE_RETURN_TYPE __swrite (struct _reent *, void *,
 						const char *,
-						_READ_WRITE_BUFSIZE_TYPE));
-extern _fpos_t _EXFUN(__sseek,(struct _reent *, void *, _fpos_t, int));
-extern int    _EXFUN(__sclose,(struct _reent *, void *));
-extern int    _EXFUN(__stextmode,(int));
-extern void   _EXFUN(__sinit,(struct _reent *));
-extern void   _EXFUN(_cleanup_r,(struct _reent *));
-extern void   _EXFUN(__smakebuf_r,(struct _reent *, FILE *));
-extern int    _EXFUN(__swhatbuf_r,(struct _reent *, FILE *, size_t *, int *));
-extern int    _EXFUN(_fwalk,(struct _reent *, int (*)(FILE *)));
-extern int    _EXFUN(_fwalk_reent,(struct _reent *, int (*)(struct _reent *, FILE *)));
-struct _glue * _EXFUN(__sfmoreglue,(struct _reent *,int n));
-extern int _EXFUN(__submore, (struct _reent *, FILE *));
+						_READ_WRITE_BUFSIZE_TYPE);
+extern _fpos_t __sseek (struct _reent *, void *, _fpos_t, int);
+extern int    __sclose (struct _reent *, void *);
+extern int    __stextmode (int);
+extern void   __sinit (struct _reent *);
+extern void   _cleanup_r (struct _reent *);
+extern void   __smakebuf_r (struct _reent *, FILE *);
+extern int    __swhatbuf_r (struct _reent *, FILE *, size_t *, int *);
+extern int    _fwalk (struct _reent *, int (*)(FILE *));
+extern int    _fwalk_reent (struct _reent *, int (*)(struct _reent *, FILE *));
+struct _glue * __sfmoreglue (struct _reent *,int n);
+extern int __submore (struct _reent *, FILE *);
 
 #ifdef __LARGE64_FILES
-extern _fpos64_t _EXFUN(__sseek64,(struct _reent *, void *, _fpos64_t, int));
-extern _READ_WRITE_RETURN_TYPE _EXFUN(__swrite64,(struct _reent *, void *,
+extern _fpos64_t __sseek64 (struct _reent *, void *, _fpos64_t, int);
+extern _READ_WRITE_RETURN_TYPE __swrite64 (struct _reent *, void *,
 						  const char *,
-						  _READ_WRITE_BUFSIZE_TYPE));
+						  _READ_WRITE_BUFSIZE_TYPE);
 #endif
 
 /* Called by the main entry point fns to ensure stdio has been initialized.  */
@@ -279,12 +279,12 @@ extern _READ_WRITE_RETURN_TYPE _EXFUN(__swrite64,(struct _reent *, void *,
 
 /* WARNING: _dcvt is defined in the stdlib directory, not here!  */
 
-char *_EXFUN(_dcvt,(struct _reent *, char *, double, int, int, char, int));
-char *_EXFUN(_sicvt,(char *, short, char));
-char *_EXFUN(_icvt,(char *, int, char));
-char *_EXFUN(_licvt,(char *, long, char));
+char *_dcvt (struct _reent *, char *, double, int, int, char, int);
+char *_sicvt (char *, short, char);
+char *_icvt (char *, int, char);
+char *_licvt (char *, long, char);
 #ifdef __GNUC__
-char *_EXFUN(_llicvt,(char *, long long, char));
+char *_llicvt (char *, long long, char);
 #endif
 
 #define CVT_BUF_SIZE 128
@@ -297,10 +297,10 @@ char *_EXFUN(_llicvt,(char *, long long, char));
 #define __sinit_lock_acquire()
 #define __sinit_lock_release()
 #else
-void _EXFUN(__sfp_lock_acquire,(void));
-void _EXFUN(__sfp_lock_release,(void));
-void _EXFUN(__sinit_lock_acquire,(void));
-void _EXFUN(__sinit_lock_release,(void));
+void __sfp_lock_acquire (void);
+void __sfp_lock_release (void);
+void __sinit_lock_acquire (void);
+void __sinit_lock_release (void);
 #endif
 
 /* Types used in positional argument support in vfprinf/vfwprintf.

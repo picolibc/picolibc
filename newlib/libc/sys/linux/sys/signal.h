@@ -36,16 +36,16 @@ typedef _sig_func_ptr __sighandler_t;
 
 #include <_ansi.h>
 
-int 	_EXFUN(kill, (int, int));
-int 	_EXFUN(sigaction, (int, const struct sigaction *, struct sigaction *));
-int 	_EXFUN(sigaddset, (sigset_t *, const int));
-int 	_EXFUN(sigdelset, (sigset_t *, const int));
-int 	_EXFUN(sigismember, (const sigset_t *, int));
-int 	_EXFUN(sigfillset, (sigset_t *));
-int 	_EXFUN(sigemptyset, (sigset_t *));
-int 	_EXFUN(sigpending, (sigset_t *));
-int 	_EXFUN(sigsuspend, (const sigset_t *));
-int 	_EXFUN(sigpause, (int));
+int 	kill (int, int);
+int 	sigaction (int, const struct sigaction *, struct sigaction *);
+int 	sigaddset (sigset_t *, const int);
+int 	sigdelset (sigset_t *, const int);
+int 	sigismember (const sigset_t *, int);
+int 	sigfillset (sigset_t *);
+int 	sigemptyset (sigset_t *);
+int 	sigpending (sigset_t *);
+int 	sigsuspend (const sigset_t *);
+int 	sigpause (int);
 
 #ifndef _POSIX_SOURCE
 extern const char *const sys_siglist[];

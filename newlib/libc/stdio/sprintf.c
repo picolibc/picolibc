@@ -612,8 +612,8 @@ _sprintf_r(ptr, str, fmt, va_alist)
 
 #ifdef _NANO_FORMATTED_IO
 int
-_EXFUN(_siprintf_r, (struct _reent *, char *, const char *, ...)
-       _ATTRIBUTE ((__alias__("_sprintf_r"))));
+_siprintf_r (struct _reent *, char *, const char *, ...)
+       _ATTRIBUTE ((__alias__("_sprintf_r")));
 #endif
 
 #ifndef _REENT_ONLY
@@ -650,7 +650,7 @@ sprintf(str, fmt, va_alist)
 
 #ifdef _NANO_FORMATTED_IO
 int
-_EXFUN(siprintf, (char *, const char *, ...)
-       _ATTRIBUTE ((__alias__("sprintf"))));
+siprintf (char *, const char *, ...)
+       _ATTRIBUTE ((__alias__("sprintf")));
 #endif
 #endif

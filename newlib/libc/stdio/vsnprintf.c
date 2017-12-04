@@ -42,8 +42,8 @@ vsnprintf (char *__restrict str,
 
 #ifdef _NANO_FORMATTED_IO
 int
-_EXFUN(vsniprintf, (char *, size_t, const char *, __VALIST)
-       _ATTRIBUTE ((__alias__("vsnprintf"))));
+vsniprintf (char *, size_t, const char *, __VALIST)
+       _ATTRIBUTE ((__alias__("vsnprintf")));
 #endif
 
 #endif /* !_REENT_ONLY */
@@ -77,6 +77,6 @@ _vsnprintf_r (struct _reent *ptr,
 
 #ifdef _NANO_FORMATTED_IO
 int
-_EXFUN(_vsniprintf_r, (struct _reent *, char *, size_t, const char *, __VALIST)
-       _ATTRIBUTE ((__alias__("_vsnprintf_r"))));
+_vsniprintf_r (struct _reent *, char *, size_t, const char *, __VALIST)
+       _ATTRIBUTE ((__alias__("_vsnprintf_r")));
 #endif

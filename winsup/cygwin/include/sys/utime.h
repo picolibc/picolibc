@@ -19,7 +19,7 @@ struct utimbuf
   time_t modtime;
 };
 
-int _EXFUN(utime, (const char *__path, const struct utimbuf *__buf));
+int utime (const char *__path, const struct utimbuf *__buf);
 
 #ifdef __cplusplus
 };

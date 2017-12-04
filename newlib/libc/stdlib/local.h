@@ -3,7 +3,7 @@
 #ifndef _LOCAL_H_
 #define _LOCAL_H_
 
-char *	_EXFUN(_gcvt,(struct _reent *, double , int , char *, char, int));
+char *	_gcvt (struct _reent *, double , int , char *, char, int);
 
 #include "../locale/setlocale.h"
 

@@ -41,7 +41,7 @@ vscanf (const char *fmt,
 
 #ifdef _NANO_FORMATTED_IO
 int
-_EXFUN(viscanf, (const char *, __VALIST) _ATTRIBUTE ((__alias__("vscanf"))));
+viscanf (const char *, __VALIST) _ATTRIBUTE ((__alias__("vscanf")));
 #endif
 
 #endif /* !_REENT_ONLY */
@@ -57,6 +57,6 @@ _vscanf_r (struct _reent *ptr,
 
 #ifdef _NANO_FORMATTED_IO
 int
-_EXFUN(_viscanf_r, (struct _reent *, const char *, __VALIST)
-       _ATTRIBUTE ((__alias__("_vscanf_r"))));
+_viscanf_r (struct _reent *, const char *, __VALIST)
+       _ATTRIBUTE ((__alias__("_vscanf_r")));
 #endif

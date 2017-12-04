@@ -57,17 +57,17 @@
  */
 
 static ucs2_t
-_EXFUN(find_code_size, (ucs2_t code, const __uint16_t *tblp));
+find_code_size (ucs2_t code, const __uint16_t *tblp);
 
 static __inline ucs2_t
-_EXFUN(find_code_speed, (ucs2_t code, const __uint16_t *tblp));
+find_code_speed (ucs2_t code, const __uint16_t *tblp);
 
 static __inline ucs2_t
-_EXFUN(find_code_speed_8bit, (ucs2_t code, const unsigned char *tblp));
+find_code_speed_8bit (ucs2_t code, const unsigned char *tblp);
 
 #ifdef _ICONV_ENABLE_EXTERNAL_CCS
 static const iconv_ccs_desc_t *
-_EXFUN(load_file, (struct _reent *rptr, const char *name, int direction));
+load_file (struct _reent *rptr, const char *name, int direction);
 #endif
 
 /*

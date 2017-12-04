@@ -32,8 +32,8 @@ details. */
 
 __BEGIN_DECLS
 
-ssize_t	_EXFUN(getline, (char **, size_t *, FILE *));
-ssize_t	_EXFUN(getdelim, (char **, size_t *, int, FILE *));
+ssize_t	getline (char **, size_t *, FILE *);
+ssize_t	getdelim (char **, size_t *, int, FILE *);
 
 __END_DECLS
 

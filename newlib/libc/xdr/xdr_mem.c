@@ -53,22 +53,22 @@
 # define htonl(x) xdr_htonl(x)
 #endif
 
-static void _EXFUN (xdrmem_destroy, (XDR *));
-static bool_t _EXFUN (xdrmem_getlong_aligned, (XDR *, long *));
-static bool_t _EXFUN (xdrmem_putlong_aligned, (XDR *, const long *));
-static bool_t _EXFUN (xdrmem_getlong_unaligned, (XDR *, long *));
-static bool_t _EXFUN (xdrmem_putlong_unaligned, (XDR *, const long *));
-static bool_t _EXFUN (xdrmem_getbytes, (XDR *, char *, u_int));
-static bool_t _EXFUN (xdrmem_putbytes, (XDR *, const char *, u_int));
+static void xdrmem_destroy (XDR *);
+static bool_t xdrmem_getlong_aligned (XDR *, long *);
+static bool_t xdrmem_putlong_aligned (XDR *, const long *);
+static bool_t xdrmem_getlong_unaligned (XDR *, long *);
+static bool_t xdrmem_putlong_unaligned (XDR *, const long *);
+static bool_t xdrmem_getbytes (XDR *, char *, u_int);
+static bool_t xdrmem_putbytes (XDR *, const char *, u_int);
 /* XXX: w/64-bit pointers, u_int not enough! */
-static u_int _EXFUN (xdrmem_getpos, (XDR *));
-static bool_t _EXFUN (xdrmem_setpos, (XDR *, u_int));
-static int32_t * _EXFUN (xdrmem_inline_aligned, (XDR *, u_int));
-static int32_t * _EXFUN (xdrmem_inline_unaligned, (XDR *, u_int));
-static bool_t  _EXFUN (xdrmem_getint32_aligned, (XDR *, int32_t *));
-static bool_t  _EXFUN (xdrmem_putint32_aligned, (XDR *, const int32_t *));
-static bool_t  _EXFUN (xdrmem_getint32_unaligned, (XDR *, int32_t *));
-static bool_t  _EXFUN (xdrmem_putint32_unaligned, (XDR *, const int32_t *));
+static u_int xdrmem_getpos (XDR *);
+static bool_t xdrmem_setpos (XDR *, u_int);
+static int32_t * xdrmem_inline_aligned (XDR *, u_int);
+static int32_t * xdrmem_inline_unaligned (XDR *, u_int);
+static bool_t  xdrmem_getint32_aligned (XDR *, int32_t *);
+static bool_t  xdrmem_putint32_aligned (XDR *, const int32_t *);
+static bool_t  xdrmem_getint32_unaligned (XDR *, int32_t *);
+static bool_t  xdrmem_putint32_unaligned (XDR *, const int32_t *);
 
 static const struct xdr_ops xdrmem_ops_aligned = {
   xdrmem_getlong_aligned,

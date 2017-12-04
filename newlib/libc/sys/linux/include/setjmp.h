@@ -22,10 +22,10 @@ typedef struct __sigjmpbuf
 
 typedef __jmp_buf jmp_buf;
 
-void	_EXFUN(longjmp,(jmp_buf __jmpb, int __retval));
-int	_EXFUN(setjmp,(jmp_buf __jmpb));
-void	_EXFUN(siglongjmp,(sigjmp_buf __jmpb, int __retval));
-int	_EXFUN(sigsetjmp,(sigjmp_buf __jmpb, int __savemask));
+void	longjmp (jmp_buf __jmpb, int __retval);
+int	setjmp (jmp_buf __jmpb);
+void	siglongjmp (sigjmp_buf __jmpb, int __retval);
+int	sigsetjmp (sigjmp_buf __jmpb, int __savemask);
 
 /* sigsetjmp is implemented as macro using setjmp */
 

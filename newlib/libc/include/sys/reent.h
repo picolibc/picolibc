@@ -165,7 +165,7 @@ struct __sFILE_fake {
 /* Following is needed both in libc/stdio and libc/stdlib so we put it
  * here instead of libc/stdio/local.h where it was previously. */
 
-extern void   _EXFUN(__sinit,(struct _reent *));
+extern void   __sinit (struct _reent *);
 
 # define _REENT_SMALL_CHECK_INIT(ptr)		\
   do						\
@@ -781,7 +781,7 @@ void _reclaim_reent (struct _reent *);
 
 #if defined(__DYNAMIC_REENT__) && !defined(__SINGLE_THREAD__)
 #ifndef __getreent
-  struct _reent * _EXFUN(__getreent, (void));
+  struct _reent * __getreent (void);
 #endif
 # define _REENT (__getreent())
 #else /* __SINGLE_THREAD__ || !__DYNAMIC_REENT__ */

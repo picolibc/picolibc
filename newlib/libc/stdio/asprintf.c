@@ -51,8 +51,8 @@ _asprintf_r (struct _reent *ptr,
 
 #ifdef _NANO_FORMATTED_IO
 int
-_EXFUN(_asiprintf_r, (struct _reent *, char **, const char *, ...)
-       _ATTRIBUTE ((__alias__("_asprintf_r"))));
+_asiprintf_r (struct _reent *, char **, const char *, ...)
+       _ATTRIBUTE ((__alias__("_asprintf_r")));
 #endif
 
 #ifndef _REENT_ONLY
@@ -83,7 +83,7 @@ asprintf (char **__restrict strp,
 
 #ifdef _NANO_FORMATTED_IO
 int
-_EXFUN(asiprintf, (char **, const char *, ...)
-       _ATTRIBUTE ((__alias__("asprintf"))));
+asiprintf (char **, const char *, ...)
+       _ATTRIBUTE ((__alias__("asprintf")));
 #endif
 #endif /* ! _REENT_ONLY */

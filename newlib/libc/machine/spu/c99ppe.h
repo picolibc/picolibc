@@ -99,8 +99,8 @@ struct spe_reg128{
   unsigned int slot[4];
 };
 
-void _EXFUN(__sinit,(struct _reent *));
-FILE  *_EXFUN(__sfp,(struct _reent *));
+void __sinit (struct _reent *);
+FILE  *__sfp (struct _reent *);
 #define __sfp_free(fp) ( (fp)->_fp = 0 )
 
 #define CHECK_INIT(ptr) \

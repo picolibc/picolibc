@@ -68,8 +68,8 @@ _dprintf_r (struct _reent *ptr,
 
 #ifdef _NANO_FORMATTED_IO
 int
-_EXFUN(_diprintf_r, (struct _reent *, int, const char *, ...)
-       _ATTRIBUTE ((__alias__("_dprintf_r"))));
+_diprintf_r (struct _reent *, int, const char *, ...)
+       _ATTRIBUTE ((__alias__("_dprintf_r")));
 #endif
 
 #ifndef _REENT_ONLY
@@ -91,7 +91,7 @@ dprintf (int fd,
 
 #ifdef _NANO_FORMATTED_IO
 int
-_EXFUN(diprintf, (int, const char *, ...)
-       _ATTRIBUTE ((__alias__("dprintf"))));
+diprintf (int, const char *, ...)
+       _ATTRIBUTE ((__alias__("dprintf")));
 #endif
 #endif /* ! _REENT_ONLY */

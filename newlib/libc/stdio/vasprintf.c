@@ -40,8 +40,8 @@ vasprintf (char **strp,
 
 #ifdef _NANO_FORMATTED_IO
 int
-_EXFUN(vasiprintf, (char **, const char *, __VALIST)
-       _ATTRIBUTE ((__alias__("vasprintf"))));
+vasiprintf (char **, const char *, __VALIST)
+       _ATTRIBUTE ((__alias__("vasprintf")));
 #endif
 
 #endif /* !_REENT_ONLY */
@@ -70,6 +70,6 @@ _vasprintf_r (struct _reent *ptr,
 
 #ifdef _NANO_FORMATTED_IO
 int
-_EXFUN(_vasiprintf_r, (struct _reent *, char **, const char *, __VALIST)
-       _ATTRIBUTE ((__alias__("_vasprintf_r"))));
+_vasiprintf_r (struct _reent *, char **, const char *, __VALIST)
+       _ATTRIBUTE ((__alias__("_vasprintf_r")));
 #endif

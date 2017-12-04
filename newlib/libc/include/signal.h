@@ -21,13 +21,13 @@ typedef _sig_func_ptr sighandler_t;	/* glibc naming */
 
 struct _reent;
 
-_sig_func_ptr _EXFUN(_signal_r, (struct _reent *, int, _sig_func_ptr));
-int	_EXFUN(_raise_r, (struct _reent *, int));
+_sig_func_ptr _signal_r (struct _reent *, int, _sig_func_ptr);
+int	_raise_r (struct _reent *, int);
 
 #ifndef _REENT_ONLY
-_sig_func_ptr _EXFUN(signal, (int, _sig_func_ptr));
-int	_EXFUN(raise, (int));
-void	_EXFUN(psignal, (int, const char *));
+_sig_func_ptr signal (int, _sig_func_ptr);
+int	raise (int);
+void	psignal (int, const char *);
 #endif
 
 _END_STD_C

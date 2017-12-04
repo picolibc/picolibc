@@ -37,8 +37,8 @@ _fprintf_r (struct _reent *ptr,
 
 #ifdef _NANO_FORMATTED_IO
 int
-_EXFUN(_fiprintf_r, (struct _reent *, FILE *, const char *, ...)
-       _ATTRIBUTE ((__alias__("_fprintf_r"))));
+_fiprintf_r (struct _reent *, FILE *, const char *, ...)
+       _ATTRIBUTE ((__alias__("_fprintf_r")));
 #endif
 
 #ifndef _REENT_ONLY
@@ -58,7 +58,7 @@ fprintf (FILE *__restrict fp,
 
 #ifdef _NANO_FORMATTED_IO
 int
-_EXFUN(fiprintf, (FILE *, const char *, ...)
-       _ATTRIBUTE ((__alias__("fprintf"))));
+fiprintf (FILE *, const char *, ...)
+       _ATTRIBUTE ((__alias__("fprintf")));
 #endif
 #endif /* ! _REENT_ONLY */

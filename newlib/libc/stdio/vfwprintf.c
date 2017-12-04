@@ -149,7 +149,7 @@ SEEALSO
 # undef _NO_LONGLONG
 #endif
 
-int _EXFUN(_VFWPRINTF_R, (struct _reent *, FILE *, const wchar_t *, va_list));
+int _VFWPRINTF_R (struct _reent *, FILE *, const wchar_t *, va_list);
 /* Defined in vfprintf.c. */
 #ifdef _FVWRITE_IN_STREAMIO
 # ifdef STRING_ONLY
@@ -157,14 +157,14 @@ int _EXFUN(_VFWPRINTF_R, (struct _reent *, FILE *, const wchar_t *, va_list));
 # else
 #  define __SPRINT __sprint_r
 # endif
-int _EXFUN(__SPRINT, (struct _reent *, FILE *, register struct __suio *));
+int __SPRINT (struct _reent *, FILE *, register struct __suio *);
 #else
 # ifdef STRING_ONLY
 #  define __SPRINT __ssputs_r
 # else
 #  define __SPRINT __sfputs_r
 # endif
-int _EXFUN(__SPRINT, (struct _reent *, FILE *, const char *, size_t));
+int __SPRINT (struct _reent *, FILE *, const char *, size_t);
 #endif
 #ifndef STRING_ONLY
 #ifdef _UNBUF_STREAM_OPT
@@ -239,7 +239,7 @@ extern char *_dtoa_r (struct _reent *, double, int,
 extern char *_ldtoa_r (struct _reent *, _LONG_DOUBLE, int,
 			      int, int *, int *, char **);
 
-extern int _EXFUN(_ldcheck,(_LONG_DOUBLE *));
+extern int _ldcheck (_LONG_DOUBLE *);
 
 #  define _PRINTF_FLOAT_TYPE _LONG_DOUBLE
 #  define _DTOA_R _ldtoa_r
@@ -324,9 +324,9 @@ union arg_val
 };
 
 static union arg_val *
-_EXFUN(get_arg, (struct _reent *data, int n, wchar_t *fmt,
+get_arg (struct _reent *data, int n, wchar_t *fmt,
                  va_list *ap, int *numargs, union arg_val *args,
-                 int *arg_type, wchar_t **last_fmt));
+                 int *arg_type, wchar_t **last_fmt);
 #endif /* !_NO_POS_ARGS */
 
 /*

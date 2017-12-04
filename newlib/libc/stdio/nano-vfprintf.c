@@ -443,7 +443,7 @@ __sfputs_r (struct _reent *ptr,
 }
 #endif /* STRING_ONLY.  */
 
-int _EXFUN(_VFPRINTF_R, (struct _reent *, FILE *, const char *, va_list));
+int _VFPRINTF_R (struct _reent *, FILE *, const char *, va_list);
 
 #ifndef STRING_ONLY
 int
@@ -457,8 +457,8 @@ VFPRINTF (FILE * fp,
 }
 
 int
-_EXFUN(vfiprintf, (FILE *, const char *, __VALIST)
-       _ATTRIBUTE ((__alias__("vfprintf"))));
+vfiprintf (FILE *, const char *, __VALIST)
+       _ATTRIBUTE ((__alias__("vfprintf")));
 #endif
 
 #ifdef STRING_ONLY
@@ -659,10 +659,10 @@ error:
 
 #ifdef STRING_ONLY
 int
-_EXFUN(_svfiprintf_r, (struct _reent *, FILE *, const char *, __VALIST)
-       _ATTRIBUTE ((__alias__("_svfprintf_r"))));
+_svfiprintf_r (struct _reent *, FILE *, const char *, __VALIST)
+       _ATTRIBUTE ((__alias__("_svfprintf_r")));
 #else
 int
-_EXFUN(_vfiprintf_r, (struct _reent *, FILE *, const char *, __VALIST)
-       _ATTRIBUTE ((__alias__("_vfprintf_r"))));
+_vfiprintf_r (struct _reent *, FILE *, const char *, __VALIST)
+       _ATTRIBUTE ((__alias__("_vfprintf_r")));
 #endif

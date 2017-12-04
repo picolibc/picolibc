@@ -27,26 +27,26 @@ typedef int wctype_t;
 typedef int wctrans_t;
 #endif
 
-int	_EXFUN(iswalpha, (wint_t));
-int	_EXFUN(iswalnum, (wint_t));
+int	iswalpha (wint_t);
+int	iswalnum (wint_t);
 #if __ISO_C_VISIBLE >= 1999
-int	_EXFUN(iswblank, (wint_t));
+int	iswblank (wint_t);
 #endif
-int	_EXFUN(iswcntrl, (wint_t));
-int	_EXFUN(iswctype, (wint_t, wctype_t));
-int	_EXFUN(iswdigit, (wint_t));
-int	_EXFUN(iswgraph, (wint_t));
-int	_EXFUN(iswlower, (wint_t));
-int	_EXFUN(iswprint, (wint_t));
-int	_EXFUN(iswpunct, (wint_t));
-int	_EXFUN(iswspace, (wint_t));
-int	_EXFUN(iswupper, (wint_t));
-int	_EXFUN(iswxdigit, (wint_t));
-wint_t	_EXFUN(towctrans, (wint_t, wctrans_t));
-wint_t	_EXFUN(towupper, (wint_t));
-wint_t	_EXFUN(towlower, (wint_t));
-wctrans_t _EXFUN(wctrans, (const char *));
-wctype_t _EXFUN(wctype, (const char *));
+int	iswcntrl (wint_t);
+int	iswctype (wint_t, wctype_t);
+int	iswdigit (wint_t);
+int	iswgraph (wint_t);
+int	iswlower (wint_t);
+int	iswprint (wint_t);
+int	iswpunct (wint_t);
+int	iswspace (wint_t);
+int	iswupper (wint_t);
+int	iswxdigit (wint_t);
+wint_t	towctrans (wint_t, wctrans_t);
+wint_t	towupper (wint_t);
+wint_t	towlower (wint_t);
+wctrans_t wctrans (const char *);
+wctype_t wctype (const char *);
 
 #if __POSIX_VISIBLE >= 200809
 extern int	iswalpha_l (wint_t, locale_t);

@@ -263,7 +263,7 @@ run_vector_1 (int vector,
 
     if (strcmp(args,"dd")==0)
     {
-      typedef double _EXFUN((*pdblfunc),(double));
+      typedef double (*pdblfunc) (double);
       
       /* Double function returning a double */
       
@@ -276,7 +276,7 @@ run_vector_1 (int vector,
       float arga;
       double a;
       
-      typedef float _EXFUN((*pdblfunc),(float));
+      typedef float (*pdblfunc) (float);
       
       /* Double function returning a double */
       
@@ -289,7 +289,7 @@ run_vector_1 (int vector,
     }      
     else if (strcmp(args,"ddd")==0)
      {
-       typedef double _EXFUN((*pdblfunc),(double,double));
+       typedef double (*pdblfunc) (double,double);
       
        result = ((pdblfunc)(func))(arg1,arg2);
        finish(f, vector, result, p,args, name);       
@@ -301,7 +301,7 @@ run_vector_1 (int vector,
        float arga;
        float argb;
       
-       typedef float _EXFUN((*pdblfunc),(float,float));
+       typedef float (*pdblfunc) (float,float);
       
 
        if (arg1 < FLT_MAX && arg2 < FLT_MAX) 
@@ -314,7 +314,7 @@ run_vector_1 (int vector,
      }      
      else if (strcmp(args,"did")==0)
      {
-       typedef double _EXFUN((*pdblfunc),(int,double));
+       typedef double (*pdblfunc) (int,double);
       
        result = ((pdblfunc)(func))((int)arg1,arg2);
        finish(f, vector, result, p,args, name);       
@@ -326,7 +326,7 @@ run_vector_1 (int vector,
        float arga;
        float argb;
       
-       typedef float _EXFUN((*pdblfunc),(int,float));
+       typedef float (*pdblfunc) (int,float);
       
 
        if (arg1 < FLT_MAX && arg2 < FLT_MAX) 

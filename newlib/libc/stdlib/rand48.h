@@ -17,7 +17,7 @@
 #include <math.h>
 #include <stdlib.h>
 
-extern void _EXFUN(__dorand48,(struct _reent *r, unsigned short[3]));
+extern void __dorand48 (struct _reent *r, unsigned short[3]);
 #define __rand48_seed	_REENT_RAND48_SEED(r)
 #define __rand48_mult	_REENT_RAND48_MULT(r)
 #define __rand48_add	_REENT_RAND48_ADD(r)

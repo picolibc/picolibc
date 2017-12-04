@@ -68,8 +68,8 @@ struct lconv
 };
 
 struct _reent;
-char *_EXFUN(_setlocale_r,(struct _reent *, int, const char *));
-struct lconv *_EXFUN(_localeconv_r,(struct _reent *));
+char *_setlocale_r (struct _reent *, int, const char *);
+struct lconv *_localeconv_r (struct _reent *);
 
 struct __locale_t *_newlocale_r (struct _reent *, int, const char *,
 				 struct __locale_t *);
@@ -79,8 +79,8 @@ struct __locale_t *_uselocale_r (struct _reent *, struct __locale_t *);
 
 #ifndef _REENT_ONLY
 
-char *_EXFUN(setlocale,(int, const char *));
-struct lconv *_EXFUN(localeconv,(void));
+char *setlocale (int, const char *);
+struct lconv *localeconv (void);
 
 #if __POSIX_VISIBLE >= 200809
 locale_t newlocale (int, const char *, locale_t);

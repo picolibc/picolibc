@@ -119,12 +119,12 @@ struct	stat
 #define	S_ISLNK(m)	(((m)&_IFMT) == _IFLNK)
 #define	S_ISSOCK(m)	(((m)&_IFMT) == _IFSOCK)
 
-int	_EXFUN(chmod,( const char *_path, mode_t _mode ));
-int	_EXFUN(fstat,( int _fd, struct stat *_sbuf ));
-int	_EXFUN(mkdir,( char *_path, mode_t _mode ));
-int	_EXFUN(mkfifo,( char *_path, mode_t _mode ));
-int	_EXFUN(stat,( const char *__restrict _path, struct stat *__restrict _sbuf ));
-mode_t	_EXFUN(umask,( mode_t _mask ));
+int	chmod (const char *_path, mode_t _mode);
+int	fstat (int _fd, struct stat *_sbuf);
+int	mkdir (char *_path, mode_t _mode);
+int	mkfifo (char *_path, mode_t _mode);
+int	stat (const char *__restrict _path, struct stat *__restrict _sbuf);
+mode_t	umask (mode_t _mask);
 
 #ifdef __cplusplus
 }

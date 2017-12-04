@@ -30,8 +30,8 @@
 #include <asm-leon/param.h>
 
 #ifndef __ASSEMBLER__
-int _EXFUN (gettimeofday, (struct timeval * __p, void *__tz));
-int _EXFUN (settimeofday, (const struct timeval *, const struct timezone *));
+int gettimeofday (struct timeval * __p, void *__tz);
+int settimeofday (const struct timeval *, const struct timezone *);
 void do_gettimeofday (struct timeval *tv);
 #endif
 

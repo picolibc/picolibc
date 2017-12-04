@@ -21,9 +21,9 @@ struct tms {
 	clock_t	tms_cstime;		/* system time, children */
 };
 
-clock_t _EXFUN(times,(struct tms *));
+clock_t times (struct tms *);
 #ifdef _COMPILING_NEWLIB
-clock_t _EXFUN(_times,(struct tms *));
+clock_t _times (struct tms *);
 #endif
 
 #ifdef __cplusplus

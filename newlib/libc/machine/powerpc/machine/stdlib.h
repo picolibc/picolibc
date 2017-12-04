@@ -5,14 +5,14 @@
 
 # if defined(__ALTIVEC__)
 
-void *_EXFUN(vec_calloc,(size_t __nmemb, size_t __size));
-void *_EXFUN(_vec_calloc_r,(struct _reent *, size_t __nmemb, size_t __size));
-void   _EXFUN(vec_free,(void *));
+void *vec_calloc (size_t __nmemb, size_t __size);
+void *_vec_calloc_r (struct _reent *, size_t __nmemb, size_t __size);
+void   vec_free (void *);
 #define _vec_freer _freer
-void *_EXFUN(vec_malloc,(size_t __size));
+void *vec_malloc (size_t __size);
 #define _vec_mallocr _memalign_r
-void *_EXFUN(vec_realloc,(void *__r, size_t __size));
-void *_EXFUN(_vec_realloc_r,(struct _reent *, void *__r, size_t __size));
+void *vec_realloc (void *__r, size_t __size);
+void *_vec_realloc_r (struct _reent *, void *__r, size_t __size);
 
 # endif /* __ALTIVEC__ */
 
@@ -24,39 +24,39 @@ void *_EXFUN(_vec_realloc_r,(struct _reent *, void *__r, size_t __size));
 #ifdef __cplusplus
 extern "C" {
 #endif
-__int16_t   _EXFUN(atosfix16,(const char *__str));
-__int16_t   _EXFUN(_atosfix16_r,(struct _reent *, const char *__str));
-__int32_t   _EXFUN(atosfix32,(const char *__str));
-__int32_t   _EXFUN(_atosfix32_r,(struct _reent *, const char *__str));
-__int64_t   _EXFUN(atosfix64,(const char *__str));
-__int64_t   _EXFUN(_atosfix64_r,(struct _reent *, const char *__str));
+__int16_t   atosfix16 (const char *__str);
+__int16_t   _atosfix16_r (struct _reent *, const char *__str);
+__int32_t   atosfix32 (const char *__str);
+__int32_t   _atosfix32_r (struct _reent *, const char *__str);
+__int64_t   atosfix64 (const char *__str);
+__int64_t   _atosfix64_r (struct _reent *, const char *__str);
 
-__uint16_t _EXFUN(atoufix16,(const char *__str));
-__uint16_t _EXFUN(_atoufix16_r,(struct _reent *, const char *__str));
-__uint32_t _EXFUN(atoufix32,(const char *__str));
-__uint32_t _EXFUN(_atoufix32_r,(struct _reent *, const char *__str));
-__uint64_t _EXFUN(atoufix64,(const char *__str));
-__uint64_t _EXFUN(_atoufix64_r,(struct _reent *, const char *__str));
+__uint16_t atoufix16 (const char *__str);
+__uint16_t _atoufix16_r (struct _reent *, const char *__str);
+__uint32_t atoufix32 (const char *__str);
+__uint32_t _atoufix32_r (struct _reent *, const char *__str);
+__uint64_t atoufix64 (const char *__str);
+__uint64_t _atoufix64_r (struct _reent *, const char *__str);
 
-__int16_t   _EXFUN(strtosfix16,(const char *__str, char **__endptr));
-__int16_t   _EXFUN(_strtosfix16_r,(struct _reent *, const char *__str, 
-                 char **__endptr));
-__int32_t   _EXFUN(strtosfix32,(const char *__str, char **__endptr));
-__int32_t   _EXFUN(_strtosfix32_r,(struct _reent *, const char *__str, 
-                 char **__endptr));
-__int64_t   _EXFUN(strtosfix64,(const char *__str, char **__endptr));
-__int64_t   _EXFUN(_strtosfix64_r,(struct _reent *, const char *__str, 
-                 char **__endptr));
+__int16_t   strtosfix16 (const char *__str, char **__endptr);
+__int16_t   _strtosfix16_r (struct _reent *, const char *__str, 
+                 char **__endptr);
+__int32_t   strtosfix32 (const char *__str, char **__endptr);
+__int32_t   _strtosfix32_r (struct _reent *, const char *__str, 
+                 char **__endptr);
+__int64_t   strtosfix64 (const char *__str, char **__endptr);
+__int64_t   _strtosfix64_r (struct _reent *, const char *__str, 
+                 char **__endptr);
 
-__uint16_t _EXFUN(strtoufix16,(const char *__str, char **__endptr));
-__uint16_t _EXFUN(_strtoufix16_r,(struct _reent *, const char *__str, 
-                 char **__endptr));
-__uint32_t _EXFUN(strtoufix32,(const char *__str, char **__endptr));
-__uint32_t _EXFUN(_strtoufix32_r,(struct _reent *, const char *__str, 
-                 char **__endptr));
-__uint64_t _EXFUN(strtoufix64,(const char *__str, char **__endptr));
-__uint64_t _EXFUN(_strtoufix64_r,(struct _reent *, const char *__str, 
-                 char **__endptr));
+__uint16_t strtoufix16 (const char *__str, char **__endptr);
+__uint16_t _strtoufix16_r (struct _reent *, const char *__str, 
+                 char **__endptr);
+__uint32_t strtoufix32 (const char *__str, char **__endptr);
+__uint32_t _strtoufix32_r (struct _reent *, const char *__str, 
+                 char **__endptr);
+__uint64_t strtoufix64 (const char *__str, char **__endptr);
+__uint64_t _strtoufix64_r (struct _reent *, const char *__str, 
+                 char **__endptr);
 #ifdef __cplusplus
 }
 #endif

@@ -36,8 +36,8 @@
 static int fake_data;
 
 static int 
-_EXFUN(find_encoding_name, (const char *searchee,
-                            const char **names));
+find_encoding_name (const char *searchee,
+                            const char **names);
 
 
 /*

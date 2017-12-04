@@ -20,10 +20,10 @@
 static char *parse_number ();
 #endif
 
-static long _EXFUN(get_number, (char *, long, int));
-static void _EXFUN(print_number, (int, int, long));
-static void _EXFUN(write_char, (char c));
-static void _EXFUN(write_string, (const char *s));
+static long get_number (char *, long, int);
+static void print_number (int, int, long);
+static void write_char (char c);
+static void write_string (const char *s);
 
 /* Non-zero for big-endian systems.  */
 static int big_endian_p;

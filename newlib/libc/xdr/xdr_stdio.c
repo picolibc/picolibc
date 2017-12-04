@@ -50,16 +50,16 @@
 # define htonl(x) xdr_htonl(x)
 #endif
 
-static void _EXFUN (xdrstdio_destroy, (XDR *));
-static bool_t _EXFUN (xdrstdio_getlong, (XDR *, long *));
-static bool_t _EXFUN (xdrstdio_putlong, (XDR *, const long *));
-static bool_t _EXFUN (xdrstdio_getbytes, (XDR *, char *, u_int));
-static bool_t _EXFUN (xdrstdio_putbytes, (XDR *, const char *, u_int));
-static u_int _EXFUN (xdrstdio_getpos, (XDR *));
-static bool_t _EXFUN (xdrstdio_setpos, (XDR *, u_int));
-static int32_t * _EXFUN (xdrstdio_inline, (XDR *, u_int));
-static bool_t _EXFUN (xdrstdio_getint32, (XDR*, int32_t *));
-static bool_t _EXFUN (xdrstdio_putint32, (XDR*, const int32_t *));
+static void xdrstdio_destroy (XDR *);
+static bool_t xdrstdio_getlong (XDR *, long *);
+static bool_t xdrstdio_putlong (XDR *, const long *);
+static bool_t xdrstdio_getbytes (XDR *, char *, u_int);
+static bool_t xdrstdio_putbytes (XDR *, const char *, u_int);
+static u_int xdrstdio_getpos (XDR *);
+static bool_t xdrstdio_setpos (XDR *, u_int);
+static int32_t * xdrstdio_inline (XDR *, u_int);
+static bool_t xdrstdio_getint32 (XDR*, int32_t *);
+static bool_t xdrstdio_putint32 (XDR*, const int32_t *);
 
 /*
  * Ops vector for stdio type XDR

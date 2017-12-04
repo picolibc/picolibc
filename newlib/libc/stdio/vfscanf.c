@@ -378,9 +378,9 @@ _sfread_r (struct _reent * ptr,
   return count;
 }
 #else /* !STRING_ONLY || !INTEGER_ONLY */
-int _EXFUN (_sungetc_r, (struct _reent *, int, register FILE *));
-int _EXFUN (__ssrefill_r, (struct _reent *, register FILE *));
-size_t _EXFUN (_sfread_r, (struct _reent *, void *buf, size_t, size_t, FILE *));
+int _sungetc_r (struct _reent *, int, register FILE *);
+int __ssrefill_r (struct _reent *, register FILE *);
+size_t _sfread_r (struct _reent *, void *buf, size_t, size_t, FILE *);
 #endif /* !STRING_ONLY || !INTEGER_ONLY */
 
 static inline int

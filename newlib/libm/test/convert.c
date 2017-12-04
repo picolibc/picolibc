@@ -49,7 +49,7 @@ test_atoff (void)
 
 static
 void 
-iterate (void _EXFUN((*func),(void)),
+iterate (void (*func) (void),
        char *name)
 {
 

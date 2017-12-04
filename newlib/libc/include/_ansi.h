@@ -47,19 +47,10 @@
 #endif
 
 #ifdef _HAVE_STDC
-#ifdef __CYGWIN__
-#define	_EXFUN_NOTHROW(name, proto)	__cdecl name proto _NOTHROW
-#define	_EXFUN(name, proto)		__cdecl name proto
-#else
-#define	_EXFUN_NOTHROW(name, proto)	name proto _NOTHROW
-#define	_EXFUN(name, proto)		name proto
-#endif
 #ifndef _LONG_DOUBLE
 #define _LONG_DOUBLE long double
 #endif
 #else	
-#define	_EXFUN(name, proto)		name()
-#define	_EXFUN_NOTHROW(name, proto)	name()
 #define _LONG_DOUBLE double
 #endif
 

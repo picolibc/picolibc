@@ -26,18 +26,18 @@ details. */
 
 _BEGIN_STD_C
 
-ssize_t _EXFUN(getxattr,(const char *, const char *, void *, size_t ));
-ssize_t _EXFUN(lgetxattr,(const char *, const char *, void *, size_t ));
-ssize_t _EXFUN(fgetxattr,(int , const char *, void *, size_t ));
-ssize_t _EXFUN(listxattr,(const char *, char *, size_t ));
-ssize_t _EXFUN(llistxattr,(const char *, char *, size_t ));
-ssize_t _EXFUN(flistxattr,(int , char *, size_t ));
-int _EXFUN(setxattr,(const char *, const char *, const void *, size_t , int ));
-int _EXFUN(lsetxattr,(const char *, const char *, const void *, size_t , int ));
-int _EXFUN(fsetxattr,(int , const char *, const void *, size_t , int ));
-int _EXFUN(removexattr,(const char *, const char *));
-int _EXFUN(lremovexattr,(const char *, const char *));
-int _EXFUN(fremovexattr,(int ,   const char *));
+ssize_t getxattr (const char *, const char *, void *, size_t);
+ssize_t lgetxattr (const char *, const char *, void *, size_t);
+ssize_t fgetxattr (int , const char *, void *, size_t);
+ssize_t listxattr (const char *, char *, size_t);
+ssize_t llistxattr (const char *, char *, size_t);
+ssize_t flistxattr (int , char *, size_t);
+int setxattr (const char *, const char *, const void *, size_t , int);
+int lsetxattr (const char *, const char *, const void *, size_t , int);
+int fsetxattr (int , const char *, const void *, size_t , int);
+int removexattr (const char *, const char *);
+int lremovexattr (const char *, const char *);
+int fremovexattr (int ,   const char *);
 
 _END_STD_C
 

@@ -72,16 +72,16 @@ enum xprt_stat
   XPRT_IDLE
 };
 
-static bool_t _EXFUN (xdrrec_getlong, (XDR *, long *));
-static bool_t _EXFUN (xdrrec_putlong, (XDR *, const long *));
-static bool_t _EXFUN (xdrrec_getbytes, (XDR *, char *, u_int));
-static bool_t _EXFUN (xdrrec_putbytes, (XDR *, const char *, u_int));
-static u_int _EXFUN (xdrrec_getpos, (XDR *));
-static bool_t _EXFUN (xdrrec_setpos, (XDR *, u_int));
-static int32_t * _EXFUN (xdrrec_inline, (XDR *, u_int));
-static void _EXFUN (xdrrec_destroy, (XDR *));
-static bool_t _EXFUN (xdrrec_getint32, (XDR *, int32_t *));
-static bool_t _EXFUN (xdrrec_putint32, (XDR *, const int32_t *));
+static bool_t xdrrec_getlong (XDR *, long *);
+static bool_t xdrrec_putlong (XDR *, const long *);
+static bool_t xdrrec_getbytes (XDR *, char *, u_int);
+static bool_t xdrrec_putbytes (XDR *, const char *, u_int);
+static u_int xdrrec_getpos (XDR *);
+static bool_t xdrrec_setpos (XDR *, u_int);
+static int32_t * xdrrec_inline (XDR *, u_int);
+static void xdrrec_destroy (XDR *);
+static bool_t xdrrec_getint32 (XDR *, int32_t *);
+static bool_t xdrrec_putint32 (XDR *, const int32_t *);
 
 static const struct xdr_ops xdrrec_ops = {
   xdrrec_getlong,
@@ -156,8 +156,8 @@ static bool_t set_input_fragment (RECSTREAM *);
 static bool_t skip_input_bytes (RECSTREAM *, long);
 static bool_t realloc_stream (RECSTREAM *, int);
 
-bool_t _EXFUN (__xdrrec_getrec, (XDR *, enum xprt_stat *, bool_t));
-bool_t _EXFUN (__xdrrec_setnonblock, (XDR *, int));
+bool_t __xdrrec_getrec (XDR *, enum xprt_stat *, bool_t);
+bool_t __xdrrec_setnonblock (XDR *, int);
 
 /*
  * Create an xdr handle for xdrrec
