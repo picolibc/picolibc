@@ -60,7 +60,7 @@ bsearch (const void *key,
 	const void *base,
 	size_t nmemb,
 	size_t size,
-	int _EXFNPTR(compar, (const void *, const void *)))
+	int (*compar) (const void *, const void *))
 {
   void *current;
   size_t lower = 0;

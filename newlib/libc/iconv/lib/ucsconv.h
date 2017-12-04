@@ -68,8 +68,8 @@ typedef struct
    *   Returns CES-specific data pointer if success. In case of error returns
    *   NULL and sets current thread's/process's errno.
    */
-  void *_EXFNPTR(init, (struct _reent *rptr,
-                          const char *encoding));
+  void *(*init) (struct _reent *rptr,
+                          const char *encoding);
 
   /*
    * close - close CES converter.
@@ -84,8 +84,8 @@ typedef struct
    *   Returns (size_t)0 if success. In case of error returns (size_t)-1 and
    *   sets current thread's/process's errno.
    */
-  size_t _EXFNPTR(close, (struct _reent *rptr,
-                        void *data));
+  size_t (*close) (struct _reent *rptr,
+                        void *data);
 
   /*
    * get_mb_cur_max - get maximum character length in bytes.
@@ -96,7 +96,7 @@ typedef struct
    * DESCRIPTION:
    *   Returns encoding's maximum character length.
    */
-  int _EXFNPTR(get_mb_cur_max, (void *data));
+  int (*get_mb_cur_max) (void *data);
   
   /*
    * get_state - get current shift state.
@@ -108,8 +108,8 @@ typedef struct
    * DESCRIPTION:
    *   Returns encoding's current shift sequence.
    */
-  void _EXFNPTR(get_state, (void *data,
-                           mbstate_t *state));
+  void (*get_state) (void *data,
+                           mbstate_t *state);
 
   /*
    * set_state - set shift state.
@@ -123,8 +123,8 @@ typedef struct
    *   object is zero-object - reset current shift state.
    *   Returns 0 if '*state' object has right format, -1 else.
    */
-  int _EXFNPTR(set_state, (void *data,
-                         mbstate_t *state));
+  int (*set_state) (void *data,
+                         mbstate_t *state);
 
   /*
    * is_stateful - is encoding stateful state.
@@ -135,7 +135,7 @@ typedef struct
    * DESCRIPTION:
    *   Returns 0 if encoding is stateless, else returns 1.
    */
-  int _EXFNPTR(is_stateful, (void *data));
+  int (*is_stateful) (void *data);
   
   /*
    * convert_to_ucs - convert character to UCS.
@@ -155,9 +155,9 @@ typedef struct
    *   returns ICONV_CES_INVALID_CHARACTER. If invalid or incomplete bytes
    *   sequence was met, returns ICONV_CES_BAD_SEQUENCE.
    */
-  ucs4_t _EXFNPTR(convert_to_ucs, (void *data,
+  ucs4_t (*convert_to_ucs) (void *data,
                                  const unsigned char **inbuf,
-                                 size_t *inbytesleft));
+                                 size_t *inbytesleft);
 } iconv_to_ucs_ces_handlers_t;
 
 
@@ -172,26 +172,26 @@ typedef struct
 typedef struct
 {
   /* Same as in iconv_to_ucs_ces_handlers_t */
-  void *_EXFNPTR(init, (struct _reent *rptr,
-                          const char *encoding));
+  void *(*init) (struct _reent *rptr,
+                          const char *encoding);
 
   /* Same as in iconv_to_ucs_ces_handlers_t */
-  size_t _EXFNPTR(close, (struct _reent *rptr,
-                        void *data));
+  size_t (*close) (struct _reent *rptr,
+                        void *data);
 
   /* Same as in iconv_to_ucs_ces_handlers_t */
-  int _EXFNPTR(get_mb_cur_max, (void *data));
+  int (*get_mb_cur_max) (void *data);
 
   /* Same as in iconv_to_ucs_ces_handlers_t */
-  void _EXFNPTR(get_state, (void *data,
-                           mbstate_t *state));
+  void (*get_state) (void *data,
+                           mbstate_t *state);
 
   /* Same as in iconv_to_ucs_ces_handlers_t */
-  int _EXFNPTR(set_state, (void *data,
-                         mbstate_t *state));
+  int (*set_state) (void *data,
+                         mbstate_t *state);
 
   /* Same as in iconv_to_ucs_ces_handlers_t */
-  int _EXFNPTR(is_stateful, (void *data));
+  int (*is_stateful) (void *data);
   
   /*
    * convert_from_ucs - convert UCS character to destination encoding.
@@ -215,10 +215,10 @@ typedef struct
    *   If there is no corresponding character in destination encoding, returns
    *   ICONV_CES_INVALID_CHARACTER.
    */
-  size_t _EXFNPTR(convert_from_ucs, (void *data,
+  size_t (*convert_from_ucs) (void *data,
                                    ucs4_t in,
                                    unsigned char **outbuf,
-                                   size_t *outbytesleft));
+                                   size_t *outbytesleft);
 } iconv_from_ucs_ces_handlers_t;
 
 

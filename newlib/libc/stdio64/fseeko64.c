@@ -90,7 +90,7 @@ _fseeko64_r (struct _reent *ptr,
      _off64_t offset,
      int whence)
 {
-  _fpos64_t _EXFNPTR(seekfn, (struct _reent *, void *, _fpos64_t, int));
+  _fpos64_t (*seekfn) (struct _reent *, void *, _fpos64_t, int);
   _fpos64_t target, curoff;
   size_t n;
 

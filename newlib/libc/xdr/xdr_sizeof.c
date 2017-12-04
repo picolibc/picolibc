@@ -142,9 +142,9 @@ xdr_sizeof (xdrproc_t func,
   struct xdr_ops ops;
   bool_t stat;
   /* to stop ANSI-C compiler from complaining */
-  typedef bool_t _EXFNPTR (dummyfunc1, (XDR *, long *));
-  typedef bool_t _EXFNPTR (dummyfunc2, (XDR *, caddr_t, u_int));
-  typedef bool_t _EXFNPTR (dummyfunc3, (XDR *, int32_t *));
+  typedef bool_t (*dummyfunc1) (XDR *, long *);
+  typedef bool_t (*dummyfunc2) (XDR *, caddr_t, u_int);
+  typedef bool_t (*dummyfunc3) (XDR *, int32_t *);
 
   ops.x_putlong = x_putlong;
   ops.x_putbytes = x_putbytes;

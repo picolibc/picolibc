@@ -41,7 +41,7 @@
 extern "C" {
 #endif
 
-typedef void _EXFNPTR (xdr_vprintf_t, (const char *, va_list));
+typedef void (*xdr_vprintf_t) (const char *, va_list);
 
 xdr_vprintf_t _EXFUN (xdr_set_vprintf, (xdr_vprintf_t));
 

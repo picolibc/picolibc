@@ -63,9 +63,9 @@ typedef struct
    *   Pointer to conversion-specific data if success. In case of error
    *   returns NULL and sets current thread's/process's errno.
    */
-  void *_EXFNPTR(open, (struct _reent *rptr,
+  void *(*open) (struct _reent *rptr,
                           const char *to,
-                          const char *from));
+                          const char *from);
   
   /*
    * close - close conversion.
@@ -81,8 +81,8 @@ typedef struct
    *   When successful, returns (size_t)0. In case of error, sets current
    *   thread's/process's errno and returns (size_t)-1 (same as iconv_open()).
    */
-  size_t _EXFNPTR(close, (struct _reent *rptr,
-                        void *data));
+  size_t (*close) (struct _reent *rptr,
+                        void *data);
   
   /* convert - perform encoding conversion.
    *
@@ -114,13 +114,13 @@ typedef struct
    *   Reversible conversions are not counted. In case of error, sets current
    *   thread's/process's errno and returns (size_t)-1 (same as iconv()).
    */
-  size_t _EXFNPTR(convert, (struct _reent *rptr,
+  size_t (*convert) (struct _reent *rptr,
                            void *data,
                            const unsigned char **inbuf,
                            size_t *inbytesleft,
                            unsigned char **outbuf,
                            size_t *outbytesleft,
-                           int flags));
+                           int flags);
   
   /*
    * get_state - get current shift state.
@@ -135,9 +135,9 @@ typedef struct
    *   If 'direction' is 0, "from" encoding is tested, else
    *   "to" encoding is tested.
    */
-  void _EXFNPTR(get_state, (void *data,
+  void (*get_state) (void *data,
                            mbstate_t *state,
-                           int direction));
+                           int direction);
 
   /*
    * set_state - set shift state.
@@ -154,9 +154,9 @@ typedef struct
    *   "to" encoding is set.
    *   Returns 0 if '*state' object has right format, -1 else.
    */
-  int _EXFNPTR(set_state, (void *data,
+  int (*set_state) (void *data,
                          mbstate_t *state,
-                         int direction));
+                         int direction);
   
   /*
    * get_mb_cur_max - get maximum character length in bytes.
@@ -170,8 +170,8 @@ typedef struct
    *   If 'direction' is 0, "from" encoding is tested, else
    *   "to" encoding is tested.
    */
-  int _EXFNPTR(get_mb_cur_max, (void *data,
-                              int direction));
+  int (*get_mb_cur_max) (void *data,
+                              int direction);
   
   /*
    * is_stateful - is encoding stateful or stateless.
@@ -185,8 +185,8 @@ typedef struct
    *   If 'direction' is 0, "from" encoding is tested, else
    *   "to" encoding is tested.
    */
-  int _EXFNPTR(is_stateful, (void *data,
-                           int direction));
+  int (*is_stateful) (void *data,
+                           int direction);
   
 } iconv_conversion_handlers_t;
 

@@ -53,7 +53,7 @@ Supporting OS subroutines required: <<close>>, <<fstat>>, <<isatty>>,
  */
 
 int
-atexit (void _EXFNPTR(fn, (void)))
+atexit (void (*fn) (void))
 {
   return __register_exitproc (__et_atexit, fn, NULL, NULL);
 }

@@ -98,7 +98,7 @@ _fseeko_r (struct _reent *ptr,
        _off_t offset,
        int whence)
 {
-  _fpos_t _EXFNPTR(seekfn, (struct _reent *, void *, _fpos_t, int));
+  _fpos_t (*seekfn) (struct _reent *, void *, _fpos_t, int);
   _fpos_t target;
   _fpos_t curoff = 0;
   size_t n;

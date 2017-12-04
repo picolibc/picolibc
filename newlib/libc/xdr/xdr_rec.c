@@ -173,8 +173,8 @@ xdrrec_create (XDR * xdrs,
 	u_int sendsize,
 	u_int recvsize,
 	void *tcp_handle,
-        int _EXPARM (readit, (void *, void *, int)),
-        int _EXPARM (writeit, (void *, void *, int)))
+        int (*readit) (void *, void *, int),
+        int (*writeit) (void *, void *, int))
 {
   RECSTREAM *rstrm;
   /* Although sendsize and recvsize are u_int, we require
