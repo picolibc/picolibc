@@ -4,11 +4,7 @@
 
 #include "c99ppe.h"
 
-#ifdef _HAVE_STDC
 #include <stdarg.h>
-#else
-#include <varargs.h>
-#endif
 
 #ifdef INTEGER_ONLY
 #  define vsprintf vsiprintf

@@ -22,12 +22,6 @@
 #define ESIGN	0x02
 #define DECP	0x04
 
-#ifdef _HAVE_STDC
 int    		__ten_mul(double *acc, int digit);
 double		__adjust(struct _reent *ptr, double *acc, int dexp, int sign);
 double		__exp10(unsigned x);
-#else
-int    		__ten_mul();
-double		__adjust();
-double		__exp10();
-#endif

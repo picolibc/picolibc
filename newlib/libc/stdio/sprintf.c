@@ -570,26 +570,14 @@ Supporting OS subroutines required: <<close>>, <<fstat>>, <<isatty>>,
 #include <_ansi.h>
 #include <reent.h>
 #include <stdio.h>
-#ifdef _HAVE_STDC
 #include <stdarg.h>
-#else
-#include <varargs.h>
-#endif
 #include <limits.h>
 #include "local.h"
 
 int
-#ifdef _HAVE_STDC
 _sprintf_r (struct _reent *ptr,
        char *__restrict str,
        const char *__restrict fmt, ...)
-#else
-_sprintf_r(ptr, str, fmt, va_alist)
-           struct _reent *ptr;
-           char *__restrict str;
-           const char *__restrict fmt;
-           va_dcl
-#endif
 {
   int ret;
   va_list ap;
@@ -599,11 +587,7 @@ _sprintf_r(ptr, str, fmt, va_alist)
   f._bf._base = f._p = (unsigned char *) str;
   f._bf._size = f._w = INT_MAX;
   f._file = -1;  /* No file. */
-#ifdef _HAVE_STDC
   va_start (ap, fmt);
-#else
-  va_start (ap);
-#endif
   ret = _svfprintf_r (ptr, &f, fmt, ap);
   va_end (ap);
   *f._p = '\0';	/* terminate the string */
@@ -619,15 +603,8 @@ _siprintf_r (struct _reent *, char *, const char *, ...)
 #ifndef _REENT_ONLY
 
 int
-#ifdef _HAVE_STDC
 sprintf (char *__restrict str,
        const char *__restrict fmt, ...)
-#else
-sprintf(str, fmt, va_alist)
-        char *str;
-        const char *fmt;
-        va_dcl
-#endif
 {
   int ret;
   va_list ap;
@@ -637,11 +614,7 @@ sprintf(str, fmt, va_alist)
   f._bf._base = f._p = (unsigned char *) str;
   f._bf._size = f._w = INT_MAX;
   f._file = -1;  /* No file. */
-#ifdef _HAVE_STDC
   va_start (ap, fmt);
-#else
-  va_start (ap);
-#endif
   ret = _svfprintf_r (_REENT, &f, fmt, ap);
   va_end (ap);
   *f._p = '\0';	/* terminate the string */

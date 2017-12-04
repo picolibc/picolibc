@@ -8,7 +8,6 @@
 #include <_ansi.h>
 #include <unistd.h>
 
-#ifdef _HAVE_STDC
 
 #include <stdarg.h>
 
@@ -16,16 +15,6 @@ int
 execlp (const char *path,
       const char *arg0, ...)
 
-#else
-
-#include <varargs.h>
-
-int
-execlp (const char *path,
-     const char *arg0,
-     va_dcl)
-
-#endif
 
 {
   int i;

@@ -1,11 +1,6 @@
 /* Provide support for both ANSI and non-ANSI environments.  */
 
-/* Some ANSI environments are "broken" in the sense that __STDC__ cannot be
-   relied upon to have it's intended meaning.  Therefore we must use our own
-   concoction: _HAVE_STDC.  Always use _HAVE_STDC instead of __STDC__ in newlib
-   sources!
-
-   To get a strict ANSI C environment, define macro __STRICT_ANSI__.  This will
+/* To get a strict ANSI C environment, define macro __STRICT_ANSI__.  This will
    "comment out" the non-ANSI parts of the ANSI header files (non-ANSI header
    files aren't affected).  */
 
@@ -14,14 +9,6 @@
 
 #include <newlib.h>
 #include <sys/config.h>
-
-/* First try to figure out whether we really are in an ANSI C environment.  */
-/* FIXME: This probably needs some work.  Perhaps sys/config.h can be
-   prevailed upon to give us a clue.  */
-
-#ifdef __STDC__
-#define _HAVE_STDC
-#endif
 
 /*  ISO C++.  */
 
@@ -46,12 +33,8 @@
 #define _NOTHROW
 #endif
 
-#ifdef _HAVE_STDC
 #ifndef _LONG_DOUBLE
 #define _LONG_DOUBLE long double
-#endif
-#else	
-#define _LONG_DOUBLE double
 #endif
 
 /* Support gcc's __attribute__ facility.  */

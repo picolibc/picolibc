@@ -21,11 +21,7 @@
 #include <reent.h>
 #include <stdio.h>
 #include <string.h>
-#ifdef _HAVE_STDC
 #include <stdarg.h>
-#else
-#include <varargs.h>
-#endif
 #include "local.h"
 
 /*

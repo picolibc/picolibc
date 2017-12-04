@@ -18,33 +18,18 @@
 #include <_ansi.h>
 #include <reent.h>
 #include <stdio.h>
-#ifdef _HAVE_STDC
 #include <stdarg.h>
-#else
-#include <varargs.h>
-#endif
 #include "local.h"
 
 #ifndef _REENT_ONLY
 
 int
-#ifdef _HAVE_STDC
 fscanf(FILE *__restrict fp, const char *__restrict fmt, ...)
-#else
-fscanf(FILE *fp, fmt, va_alist)
-       FILE *fp;
-       char *fmt;
-       va_dcl
-#endif
 {
   int ret;
   va_list ap;
 
-#ifdef _HAVE_STDC
   va_start (ap, fmt);
-#else
-  va_start (ap);
-#endif
   ret = _vfscanf_r (_REENT, fp, fmt, ap);
   va_end (ap);
   return ret;
@@ -59,24 +44,12 @@ fiscanf (FILE *, const char *, ...)
 #endif /* !_REENT_ONLY */
 
 int
-#ifdef _HAVE_STDC
 _fscanf_r(struct _reent *ptr, FILE *__restrict fp, const char *__restrict fmt, ...)
-#else
-_fscanf_r(ptr, FILE *fp, fmt, va_alist)
-          struct _reent *ptr;
-          FILE *fp;
-          char *fmt;
-          va_dcl
-#endif
 {
   int ret;
   va_list ap;
 
-#ifdef _HAVE_STDC
   va_start (ap, fmt);
-#else
-  va_start (ap);
-#endif
   ret = _vfscanf_r (ptr, fp, fmt, ap);
   va_end (ap);
   return (ret);

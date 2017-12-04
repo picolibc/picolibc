@@ -20,12 +20,7 @@
 #include "fdlibm.h"
 #include <errno.h>
 
-#ifdef _HAVE_STDC
 	float acosf(float x)		/* wrapper acosf */
-#else
-	float acosf(x)			/* wrapper acosf */
-	float x;
-#endif
 {
 #ifdef _IEEE_LIBM
 	return __ieee754_acosf(x);

@@ -76,26 +76,14 @@ Supporting OS subroutines required: <<close>>, <<fstat>>, <<isatty>>,
 #include <reent.h>
 #include <stdio.h>
 #include <string.h>
-#ifdef _HAVE_STDC
 #include <stdarg.h>
-#else
-#include <varargs.h>
-#endif
 #include "local.h"
 
 #ifndef _REENT_ONLY 
 
-#ifdef _HAVE_STDC
 int 
 siscanf (const char *str,
        const char *fmt, ...)
-#else
-int 
-siscanf(str, fmt, va_alist)
-       const char *str;
-       const char *fmt;
-       va_dcl
-#endif
 {
   int ret;
   va_list ap;
@@ -108,11 +96,7 @@ siscanf(str, fmt, va_alist)
   f._ub._base = NULL;
   f._lb._base = NULL;
   f._file = -1;  /* No file. */
-#ifdef _HAVE_STDC
   va_start (ap, fmt);
-#else
-  va_start (ap);
-#endif
   ret = __ssvfiscanf_r (_REENT, &f, fmt, ap);
   va_end (ap);
   return ret;
@@ -120,19 +104,10 @@ siscanf(str, fmt, va_alist)
 
 #endif /* !_REENT_ONLY */
 
-#ifdef _HAVE_STDC
 int 
 _siscanf_r (struct _reent *ptr,
        const char *str,
        const char *fmt, ...)
-#else
-int 
-_siscanf_r(ptr, str, fmt, va_alist)
-          struct _reent *ptr;
-          const char *str;
-          const char *fmt;
-          va_dcl
-#endif
 {
   int ret;
   va_list ap;
@@ -145,11 +120,7 @@ _siscanf_r(ptr, str, fmt, va_alist)
   f._ub._base = NULL;
   f._lb._base = NULL;
   f._file = -1;  /* No file. */
-#ifdef _HAVE_STDC
   va_start (ap, fmt);
-#else
-  va_start (ap);
-#endif
   ret = __ssvfiscanf_r (ptr, &f, fmt, ap);
   va_end (ap);
   return ret;

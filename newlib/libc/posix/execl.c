@@ -13,7 +13,6 @@
    'environ'.  */
 static char ***p_environ = &environ;
 
-#ifdef _HAVE_STDC
 
 #include <stdarg.h>
 
@@ -21,16 +20,6 @@ int
 execl (const char *path,
       const char *arg0, ...)
 
-#else
-
-#include <varargs.h>
-
-int
-execl (const char *path,
-     const char *arg0,
-     va_dcl)
-
-#endif
 
 {
   int i;

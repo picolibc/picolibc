@@ -120,11 +120,7 @@ static char *rcsid = "$Id$";
 #include <altivec.h>
 #endif
 
-#ifdef _HAVE_STDC
 #include <stdarg.h>
-#else
-#include <varargs.h>
-#endif
 
 #include "local.h"
 #include "fvwrite.h"

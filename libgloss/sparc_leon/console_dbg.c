@@ -25,11 +25,7 @@
 
 #include <stdlib.h>
 #include <ctype.h>
-#ifdef _HAVE_STDC
 #include <stdarg.h>
-#else
-#include <varargs.h>
-#endif
 #include <asm-leon/leoncompat.h>
 #include <asm-leon/leon.h>
 

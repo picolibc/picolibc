@@ -74,7 +74,6 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.  */
 /* LINTLIBRARY */
 
 
-#ifdef	_HAVE_STDC
 
 #define	PTR		void *
 #define	PTRCONST	void *CONST
@@ -91,26 +90,6 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.  */
 #define	DEFUN(name, arglist, args)	name(args)
 #define	DEFUN_VOID(name)		name(NOARGS)
 
-#else	/* Not ANSI C.  */
-
-#define	PTR		char *
-#define	PTRCONST	PTR
-#define	LONG_DOUBLE	double
-
-#define	AND		;
-#define	NOARGS
-#define	CONST
-#define	VOLATILE
-#define	SIGNED
-#define	DOTS
-
-#define const
-
-#define	EXFUN(name, proto)		name()
-#define	DEFUN(name, arglist, args)	name arglist args;
-#define	DEFUN_VOID(name)		name()
-
-#endif	/* ANSI C.  */
 
 
 #endif	/* ansidecl.h	*/
