@@ -254,7 +254,7 @@ _DEFUN(__ssputs_r, (ptr, fp, buf, len),
 	}
 	if (len < w)
 		w = len;
-	(void)memmove ((_PTR) fp->_p, (_PTR) buf, (size_t) (w));
+	(void)memmove ((void *) fp->_p, (void *) buf, (size_t) (w));
 	fp->_w -= w;
 	fp->_p += w;
 
@@ -339,7 +339,7 @@ _DEFUN(__ssprint_r, (ptr, fp, uio),
 		}
 		if (len < w)
 			w = len;
-		(void)memmove ((_PTR) fp->_p, (_PTR) p, (size_t) (w));
+		(void)memmove ((void *) fp->_p, (void *) p, (size_t) (w));
 		fp->_w -= w;
 		fp->_p += w;
 		w = len;          /* pretend we copied all */
@@ -571,7 +571,7 @@ static int exponent(char *, int, int);
 #endif
 
 typedef quad_t * quad_ptr_t;
-typedef _PTR     void_ptr_t;
+typedef void *void_ptr_t;
 typedef char *   char_ptr_t;
 typedef long *   long_ptr_t;
 typedef int  *   int_ptr_t;
@@ -1175,7 +1175,7 @@ reswitch:	switch (ch) {
 			if (ch == 'C' || (flags & LONGINT)) {
 				mbstate_t ps;
 
-				memset ((_PTR)&ps, '\0', sizeof (mbstate_t));
+				memset ((void *)&ps, '\0', sizeof (mbstate_t));
 				if ((size = (int)_wcrtomb_r (data, cp,
 					       (wchar_t)GET_ARG (N, ap, wint_t),
 						&ps)) == -1) {
@@ -1463,7 +1463,7 @@ string:
 
 				wcp = (const wchar_t *)cp;
 				size = m = 0;
-				memset ((_PTR)&ps, '\0', sizeof (mbstate_t));
+				memset ((void *)&ps, '\0', sizeof (mbstate_t));
 
 				/* Count number of bytes needed for multibyte
 				   string that will be produced from widechar
@@ -1509,7 +1509,7 @@ string:
 					cp = buf;
 
 				/* Convert widechar string to multibyte string. */
-				memset ((_PTR)&ps, '\0', sizeof (mbstate_t));
+				memset ((void *)&ps, '\0', sizeof (mbstate_t));
 				if (_wcsrtombs_r (data, cp, &wcp, size, &ps)
 				    != size) {
 					fp->_flags |= __SERR;

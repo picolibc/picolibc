@@ -32,7 +32,7 @@ Supporting OS subroutine required: <<read>>, <<lseek64>>.
 ssize_t
 _DEFUN (__libc_pread64, (fd, buf, n, off),
      int fd,
-     _PTR buf,
+     void *buf,
      size_t n,
      loff_t off)
 {

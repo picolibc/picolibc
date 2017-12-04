@@ -26,7 +26,7 @@
 #include "fvwrite.h"
 
 #define	MIN(a, b) ((a) < (b) ? (a) : (b))
-#define	COPY(n)	  _CAST_VOID memmove ((_PTR) fp->_p, (_PTR) p, (size_t) (n))
+#define	COPY(n)	  _CAST_VOID memmove ((void *) fp->_p, (void *) p, (size_t) (n))
 
 #define GETIOV(extra_work) \
   while (len == 0) \
@@ -219,7 +219,7 @@ _DEFUN(__sfvwrite_r, (ptr, fp, uio),
 	  GETIOV (nlknown = 0);
 	  if (!nlknown)
 	    {
-	      nl = memchr ((_PTR) p, '\n', len);
+	      nl = memchr ((void *) p, '\n', len);
 	      nldist = nl ? nl + 1 - p : len + 1;
 	      nlknown = 1;
 	    }

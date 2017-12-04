@@ -114,7 +114,7 @@ extern char *_dtoa_r (struct _reent *, double, int,
 #define u_quad_t unsigned long
 
 typedef quad_t * quad_ptr_t;
-typedef _PTR     void_ptr_t;
+typedef void *void_ptr_t;
 typedef char *   char_ptr_t;
 typedef long *   long_ptr_t;
 typedef int  *   int_ptr_t;

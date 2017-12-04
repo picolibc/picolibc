@@ -8,7 +8,7 @@
 
 #ifndef _REENT_ONLY
 
-_PTR
+void *
 _DEFUN (memalign, (align, nbytes),
 	size_t align,
 	size_t nbytes)

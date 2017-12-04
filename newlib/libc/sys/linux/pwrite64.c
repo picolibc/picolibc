@@ -32,7 +32,7 @@ Supporting OS subroutine required: <<write>>, <<lseek64>>.
 ssize_t
 _DEFUN (__libc_pwrite64, (fd, buf, n, off),
      int fd,
-     _PTR buf,
+     void *buf,
      size_t n,
      loff_t off)
 {

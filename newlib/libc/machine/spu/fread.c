@@ -50,7 +50,7 @@ typedef struct
 
 size_t
 _DEFUN (fread, (buf, size, count, fp),
-	_PTR __restrict  buf,
+	void *__restrict  buf,
 	size_t size,
 	size_t count,
 	FILE *__restrict fp)

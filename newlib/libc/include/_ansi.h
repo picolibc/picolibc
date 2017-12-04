@@ -47,7 +47,6 @@
 #endif
 
 #ifdef _HAVE_STDC
-#define	_PTR		void *
 #define	_VOLATILE	volatile
 #define	_SIGNED		signed
 #define _VOID void
@@ -69,7 +68,6 @@
 #define _LONG_DOUBLE long double
 #endif
 #else	
-#define	_PTR		char *
 #define	_VOLATILE
 #define	_SIGNED
 #define _VOID void

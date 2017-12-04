@@ -22,7 +22,7 @@
  * I/O descriptors for __sfvwrite_r().
  */
 struct __siov {
-	const _PTR     iov_base;
+	const void *iov_base;
 	size_t	iov_len;
 };
 struct __suio {

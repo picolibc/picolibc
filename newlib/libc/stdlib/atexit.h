@@ -9,6 +9,6 @@ enum __atexit_types
   __et_cxa
 };
 
-void __call_exitprocs (int, _PTR);
-int __register_exitproc (int, void (*fn) (void), _PTR, _PTR);
+void __call_exitprocs (int, void *);
+int __register_exitproc (int, void (*fn) (void), void *, void *);
 

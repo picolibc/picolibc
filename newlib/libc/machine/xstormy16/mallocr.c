@@ -1,7 +1,7 @@
 #include <malloc.h>
 
 #ifdef DEFINE_MALLOC
-_PTR 
+void *
 _malloc_r (struct _reent *r, size_t sz)
 {
   return malloc (sz);
@@ -9,7 +9,7 @@ _malloc_r (struct _reent *r, size_t sz)
 #endif
 
 #ifdef DEFINE_CALLOC
-_PTR 
+void *
 _calloc_r (struct _reent *r, size_t a, size_t b)
 {
   return calloc (a, b);
@@ -18,15 +18,15 @@ _calloc_r (struct _reent *r, size_t a, size_t b)
 
 #ifdef DEFINE_FREE
 void
-_free_r (struct _reent *r, _PTR x)
+_free_r (struct _reent *r, void *x)
 {
   free (x);
 }
 #endif
 
 #ifdef DEFINE_REALLOC
-_PTR 
-_realloc_r (struct _reent *r, _PTR x, size_t sz)
+void *
+_realloc_r (struct _reent *r, void *x, size_t sz)
 {
   return realloc (x, sz);
 }

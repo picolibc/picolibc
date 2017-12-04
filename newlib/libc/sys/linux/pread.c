@@ -9,7 +9,7 @@ ssize_t
 _DEFUN (_pread_r, (rptr, fd, buf, n, off),
      struct _reent *rptr,
      int fd,
-     _PTR buf,
+     void *buf,
      size_t n,
      off_t off)
 {
@@ -35,7 +35,7 @@ _DEFUN (_pread_r, (rptr, fd, buf, n, off),
 ssize_t
 _DEFUN (__libc_pread, (fd, buf, n, off),
      int fd,
-     _PTR buf,
+     void *buf,
      size_t n,
      off_t off)
 {

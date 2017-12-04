@@ -10,9 +10,9 @@ int _dummy_realloc = 1;
 
 #ifndef _REENT_ONLY
 
-_PTR
+void *
 _DEFUN (realloc, (ap, nbytes),
-	_PTR ap,
+	void *ap,
 	size_t nbytes)
 {
   return _realloc_r (_REENT, ap, nbytes);

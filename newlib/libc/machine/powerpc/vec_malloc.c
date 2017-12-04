@@ -95,7 +95,7 @@ Supporting OS subroutines required: <<sbrk>>.  */
 
 #ifndef _REENT_ONLY
 
-_PTR
+void *
 _DEFUN (vec_malloc, (nbytes),
 	size_t nbytes)		/* get a block */
 {

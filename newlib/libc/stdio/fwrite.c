@@ -110,7 +110,7 @@ static char sccsid[] = "%W% (Berkeley) %G%";
 size_t
 _DEFUN(_fwrite_r, (ptr, buf, size, count, fp),
        struct _reent * ptr,
-       const _PTR __restrict buf,
+       const void *__restrict buf,
        size_t size,
        size_t count,
        FILE * __restrict fp)
@@ -171,7 +171,7 @@ ret:
 #ifndef _REENT_ONLY
 size_t
 _DEFUN(fwrite, (buf, size, count, fp),
-       const _PTR __restrict buf,
+       const void *__restrict buf,
        size_t size,
        size_t count,
        FILE * fp)

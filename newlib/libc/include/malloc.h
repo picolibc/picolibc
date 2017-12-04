@@ -34,44 +34,44 @@ struct mallinfo {
 
 /* The routines.  */
 
-extern _PTR malloc (size_t);
+extern void *malloc (size_t);
 #ifdef __CYGWIN__
 #undef _malloc_r
 #define _malloc_r(r, s) malloc (s)
 #else
-extern _PTR _malloc_r (struct _reent *, size_t);
+extern void *_malloc_r (struct _reent *, size_t);
 #endif
 
-extern _VOID free (_PTR);
+extern _VOID free (void *);
 #ifdef __CYGWIN__
 #undef _free_r
 #define _free_r(r, p) free (p)
 #else
-extern _VOID _free_r (struct _reent *, _PTR);
+extern _VOID _free_r (struct _reent *, void *);
 #endif
 
-extern _PTR realloc (_PTR, size_t);
+extern void *realloc (void *, size_t);
 #ifdef __CYGWIN__
 #undef _realloc_r
 #define _realloc_r(r, p, s) realloc (p, s)
 #else
-extern _PTR _realloc_r (struct _reent *, _PTR, size_t);
+extern void *_realloc_r (struct _reent *, void *, size_t);
 #endif
 
-extern _PTR calloc (size_t, size_t);
+extern void *calloc (size_t, size_t);
 #ifdef __CYGWIN__
 #undef _calloc_r
 #define _calloc_r(r, s1, s2) calloc (s1, s2);
 #else
-extern _PTR _calloc_r (struct _reent *, size_t, size_t);
+extern void *_calloc_r (struct _reent *, size_t, size_t);
 #endif
 
-extern _PTR memalign (size_t, size_t);
+extern void *memalign (size_t, size_t);
 #ifdef __CYGWIN__
 #undef _memalign_r
 #define _memalign_r(r, s1, s2) memalign (s1, s2);
 #else
-extern _PTR _memalign_r (struct _reent *, size_t, size_t);
+extern void *_memalign_r (struct _reent *, size_t, size_t);
 #endif
 
 extern struct mallinfo mallinfo (void);
@@ -98,31 +98,31 @@ extern int mallopt (int, int);
 extern int _mallopt_r (struct _reent *, int, int);
 #endif
 
-extern size_t malloc_usable_size (_PTR);
+extern size_t malloc_usable_size (void *);
 #ifdef __CYGWIN__
 #undef _malloc_usable_size_r
 #define _malloc_usable_size_r(r, p) malloc_usable_size (p)
 #else
-extern size_t _malloc_usable_size_r (struct _reent *, _PTR);
+extern size_t _malloc_usable_size_r (struct _reent *, void *);
 #endif
 
 /* These aren't too useful on an embedded system, but we define them
    anyhow.  */
 
-extern _PTR valloc (size_t);
+extern void *valloc (size_t);
 #ifdef __CYGWIN__
 #undef _valloc_r
 #define _valloc_r(r, s) valloc (s)
 #else
-extern _PTR _valloc_r (struct _reent *, size_t);
+extern void *_valloc_r (struct _reent *, size_t);
 #endif
 
-extern _PTR pvalloc (size_t);
+extern void *pvalloc (size_t);
 #ifdef __CYGWIN__
 #undef _pvalloc_r
 #define _pvalloc_r(r, s) pvalloc (s)
 #else
-extern _PTR _pvalloc_r (struct _reent *, size_t);
+extern void *_pvalloc_r (struct _reent *, size_t);
 #endif
 
 extern int malloc_trim (size_t);
@@ -159,7 +159,7 @@ extern _VOID _mstats_r (struct _reent *, char *);
 
 #ifndef __CYGWIN__
 /* Some systems provide this, so do too for compatibility.  */
-extern void cfree (_PTR);
+extern void cfree (void *);
 #endif /* __CYGWIN__ */
 
 #ifdef __cplusplus

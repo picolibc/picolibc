@@ -6,9 +6,9 @@
 
 #ifndef _REENT_ONLY
 
-_PTR
+void *
 _DEFUN (vec_realloc, (ap, nbytes),
-	_PTR ap,
+	void *ap,
 	size_t nbytes)
 {
   return _vec_realloc_r (_REENT, ap, nbytes);

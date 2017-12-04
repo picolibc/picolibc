@@ -30,10 +30,10 @@
 
 #include <stdlib.h>
 
-_PTR
+void *
 _DEFUN (_reallocf_r, (reentptr, ptr, size),
 	struct _reent *reentptr,
-	_PTR ptr,
+	void *ptr,
 	size_t size)
 {
 	void *nptr;
@@ -45,9 +45,9 @@ _DEFUN (_reallocf_r, (reentptr, ptr, size),
 }
 
 #ifndef _REENT_ONLY
-_PTR
+void *
 _DEFUN (reallocf, (ptr, size),
-	_PTR ptr,
+	void *ptr,
 	size_t size)
 {
   return _reallocf_r(_REENT, ptr, size);

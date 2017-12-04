@@ -55,15 +55,15 @@ No supporting OS subroutines are required.
 
 #include <stdlib.h>
 
-_PTR
+void *
 _DEFUN (bsearch, (key, base, nmemb, size, compar),
-	const _PTR key,
-	const _PTR base,
+	const void *key,
+	const void *base,
 	size_t nmemb,
 	size_t size,
-	int _EXFNPTR(compar, (const _PTR, const _PTR)))
+	int _EXFNPTR(compar, (const void *, const void *)))
 {
-  _PTR current;
+  void *current;
   size_t lower = 0;
   size_t upper = nmemb;
   size_t index;
@@ -75,7 +75,7 @@ _DEFUN (bsearch, (key, base, nmemb, size, compar),
   while (lower < upper)
     {
       index = (lower + upper) / 2;
-      current = (_PTR) (((char *) base) + (index * size));
+      current = (void *) (((char *) base) + (index * size));
 
       result = compar (key, current);
 

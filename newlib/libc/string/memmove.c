@@ -48,11 +48,11 @@ QUICKREF
 #define TOO_SMALL(LEN)  ((LEN) < BIGBLOCKSIZE)
 
 /*SUPPRESS 20*/
-_PTR
+void *
 __inhibit_loop_to_libcall
 _DEFUN (memmove, (dst_void, src_void, length),
-	_PTR dst_void,
-	const _PTR src_void,
+	void *dst_void,
+	const void *src_void,
 	size_t length)
 {
 #if defined(PREFER_SIZE_OVER_SPEED) || defined(__OPTIMIZE_SIZE__)

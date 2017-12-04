@@ -264,7 +264,7 @@ _DEFUN(__ssrefill_r, (ptr, fp),
 #else
 int _EXFUN (_sungetc_r, (struct _reent *, int, register FILE *));
 int _EXFUN (__ssrefill_r, (struct _reent *, register FILE *));
-size_t _EXFUN (_sfread_r, (struct _reent *, _PTR buf, size_t, size_t, FILE *));
+size_t _EXFUN (_sfread_r, (struct _reent *, void *buf, size_t, size_t, FILE *));
 #endif /* !STRING_ONLY.  */
 
 int

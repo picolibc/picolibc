@@ -289,7 +289,7 @@ static int wexponent(wchar_t *, int, int);
 #endif
 
 typedef quad_t * quad_ptr_t;
-typedef _PTR     void_ptr_t;
+typedef void *void_ptr_t;
 typedef char *   char_ptr_t;
 typedef wchar_t* wchar_ptr_t;
 typedef long *   long_ptr_t;
@@ -1199,7 +1199,7 @@ string:
 
 				if (prec >= 0) {
 					char *p = arg;
-					memset ((_PTR)&ps, '\0', sizeof (mbstate_t));
+					memset ((void *)&ps, '\0', sizeof (mbstate_t));
 					while (nchars < (size_t)prec) {
 						nconv = mbrlen (p, MB_CUR_MAX, &ps);
 						if (nconv == 0 || nconv == (size_t)-1 ||
@@ -1224,7 +1224,7 @@ string:
 					cp = malloc_buf;
 				} else
 					cp = buf;
-				memset ((_PTR)&ps, '\0', sizeof (mbstate_t));
+				memset ((void *)&ps, '\0', sizeof (mbstate_t));
 				p = cp;
 				while (insize != 0) {
 					nconv = _mbrtowc_r (data, p, arg, insize, &ps);

@@ -222,7 +222,7 @@ _DEFUN (_freopen64_r, (ptr, file, mode, fp),
 
   fp->_flags = flags;
   fp->_file = f;
-  fp->_cookie = (_PTR) fp;
+  fp->_cookie = (void *) fp;
   fp->_read = __sread;
   fp->_write = __swrite64;
   fp->_seek = __sseek;

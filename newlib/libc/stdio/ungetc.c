@@ -100,10 +100,10 @@ _DEFUN(__submore, (rptr, fp),
       return 0;
     }
   i = fp->_ub._size;
-  p = (unsigned char *) _realloc_r (rptr, (_PTR) (fp->_ub._base), i << 1);
+  p = (unsigned char *) _realloc_r (rptr, (void *) (fp->_ub._base), i << 1);
   if (p == NULL)
     return EOF;
-  _CAST_VOID memcpy ((_PTR) (p + i), (_PTR) p, (size_t) i);
+  _CAST_VOID memcpy ((void *) (p + i), (void *) p, (size_t) i);
   fp->_p = p + i;
   fp->_ub._base = p;
   fp->_ub._size = i << 1;

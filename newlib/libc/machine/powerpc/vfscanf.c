@@ -928,7 +928,7 @@ __svfscanf_r (rptr, fp, fmt0, ap)
 	      *p = 0;
 	      res = (*ccfn) (rptr, buf, (char **) NULL, base);
 	      if ((flags & POINTER) && !(flags & VECTOR))
-		*(va_arg (ap, _PTR *)) = (_PTR) (unsigned _POINTER_INT) res;
+		*(va_arg (ap, void **)) = (void *) (unsigned _POINTER_INT) res;
 	      else if (flags & SHORT)
 		{
 		  if (!(flags & VECTOR))

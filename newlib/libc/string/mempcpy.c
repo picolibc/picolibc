@@ -42,10 +42,10 @@ PORTABILITY
 /* Threshhold for punting to the byte copier.  */
 #define TOO_SMALL(LEN)  ((LEN) < BIGBLOCKSIZE)
 
-_PTR
+void *
 _DEFUN (mempcpy, (dst0, src0, len0),
-	_PTR dst0,
-	const _PTR src0,
+	void *dst0,
+	const void *src0,
 	size_t len0)
 {
 #if defined(PREFER_SIZE_OVER_SPEED) || defined(__OPTIMIZE_SIZE__)

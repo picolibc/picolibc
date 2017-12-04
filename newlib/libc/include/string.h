@@ -26,11 +26,11 @@
 
 _BEGIN_STD_C
 
-_PTR 	 _EXFUN(memchr,(const _PTR, int, size_t));
-int 	 _EXFUN(memcmp,(const _PTR, const _PTR, size_t));
-_PTR 	 _EXFUN(memcpy,(_PTR __restrict, const _PTR __restrict, size_t));
-_PTR	 _EXFUN(memmove,(_PTR, const _PTR, size_t));
-_PTR	 _EXFUN(memset,(_PTR, int, size_t));
+void *	 _EXFUN(memchr,(const void *, int, size_t));
+int 	 _EXFUN(memcmp,(const void *, const void *, size_t));
+void *	 _EXFUN(memcpy,(void *__restrict, const void *__restrict, size_t));
+void *	 _EXFUN(memmove,(void *, const void *, size_t));
+void *	 _EXFUN(memset,(void *, int, size_t));
 char 	*_EXFUN(strcat,(char *__restrict, const char *__restrict));
 char 	*_EXFUN(strchr,(const char *, int));
 int	 _EXFUN(strcmp,(const char *, const char *));
@@ -64,13 +64,13 @@ int	 _EXFUN(timingsafe_bcmp,(const void *, const void *, size_t));
 int	 _EXFUN(timingsafe_memcmp,(const void *, const void *, size_t));
 #endif
 #if __MISC_VISIBLE || __POSIX_VISIBLE
-_PTR	 _EXFUN(memccpy,(_PTR __restrict, const _PTR __restrict, int, size_t));
+void *	 _EXFUN(memccpy,(void *__restrict, const void *__restrict, int, size_t));
 #endif
 #if __GNU_VISIBLE
-_PTR	 _EXFUN(mempcpy,(_PTR, const _PTR, size_t));
-_PTR	 _EXFUN(memmem, (const _PTR, size_t, const _PTR, size_t));
-_PTR 	 _EXFUN(memrchr,(const _PTR, int, size_t));
-_PTR 	 _EXFUN(rawmemchr,(const _PTR, int));
+void *	 _EXFUN(mempcpy,(void *, const void *, size_t));
+void *	 _EXFUN(memmem, (const void *, size_t, const void *, size_t));
+void *	 _EXFUN(memrchr,(const void *, int, size_t));
+void *	 _EXFUN(rawmemchr,(const void *, int));
 #endif
 #if __POSIX_VISIBLE >= 200809
 char 	*_EXFUN(stpcpy,(char *__restrict, const char *__restrict));

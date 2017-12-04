@@ -41,7 +41,7 @@ _ssize_t
 _DEFUN (_write_r, (ptr, fd, buf, cnt),
      struct _reent *ptr,
      int fd,
-     const _PTR buf,
+     const void *buf,
      size_t cnt)
 {
   _ssize_t ret;

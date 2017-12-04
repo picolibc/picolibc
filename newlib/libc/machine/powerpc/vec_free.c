@@ -7,7 +7,7 @@
 
 void
 _DEFUN (vec_free, (aptr),
-        _PTR aptr)
+        void *aptr)
 {
   _free_r (_REENT, aptr);
 }

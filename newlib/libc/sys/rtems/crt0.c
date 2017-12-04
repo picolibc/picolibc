@@ -30,7 +30,7 @@ ret func body
 RTEMS_STUB(void *,malloc(size_t s), { return 0; })
 RTEMS_STUB(void *,realloc(void* p, size_t s), { return 0; })
 RTEMS_STUB(void, free(void* ptr), { })
-RTEMS_STUB(_PTR, calloc(size_t s1, size_t s2), { return 0; })
+RTEMS_STUB(void *, calloc(size_t s1, size_t s2), { return 0; })
 RTEMS_STUB(int, posix_memalign(void **p, size_t si, size_t s2), { return -1; })
 
 /* Stubs for routines from RTEMS <sys/lock.h> */
@@ -186,10 +186,10 @@ RTEMS_STUB(int, issetugid (void), { return 0; })
 #endif
 
 /* stdlib.h */
-RTEMS_STUB(_PTR, _realloc_r(struct _reent *r, _PTR p, size_t s), { return 0; })
-RTEMS_STUB(_PTR, _calloc_r(struct _reent *r, size_t s1, size_t s2), { return 0; })
-RTEMS_STUB(_PTR, _malloc_r(struct _reent * r, size_t s), { return 0; })
-RTEMS_STUB(_VOID, _free_r(struct _reent *r, _PTR *p), { })
+RTEMS_STUB(void *, _realloc_r(struct _reent *r, void *p, size_t s), { return 0; })
+RTEMS_STUB(void *, _calloc_r(struct _reent *r, size_t s1, size_t s2), { return 0; })
+RTEMS_STUB(void *, _malloc_r(struct _reent * r, size_t s), { return 0; })
+RTEMS_STUB(_VOID, _free_r(struct _reent *r, void **p), { })
 
 /* stubs for functions required by libc/stdlib */
 RTEMS_STUB(void, __assert_func(const char *file, int line, const char *failedexpr), { })

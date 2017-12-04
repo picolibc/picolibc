@@ -45,9 +45,9 @@ int posix_openpt (int);
 #define _unsetenv_r UNUSED__unsetenv_r
 #endif
 
-extern _PTR memalign (size_t, size_t);
+extern void *memalign (size_t, size_t);
 #if __BSD_VISIBLE || (__XSI_VISIBLE >= 4 && __POSIX_VISIBLE < 200112)
-extern _PTR valloc (size_t);
+extern void *valloc (size_t);
 #endif
 
 #undef _malloc_r

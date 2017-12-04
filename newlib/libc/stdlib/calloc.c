@@ -45,7 +45,7 @@ Supporting OS subroutines required: <<close>>, <<fstat>>, <<isatty>>,
 
 #ifndef _REENT_ONLY
 
-_PTR
+void *
 _DEFUN (calloc, (n, size),
 	size_t n,
 	size_t size)

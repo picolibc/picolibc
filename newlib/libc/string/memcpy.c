@@ -43,17 +43,17 @@ QUICKREF
 /* Threshhold for punting to the byte copier.  */
 #define TOO_SMALL(LEN)  ((LEN) < BIGBLOCKSIZE)
 
-_PTR
+void *
 _DEFUN (memcpy, (dst0, src0, len0),
-	_PTR __restrict dst0,
-	const _PTR __restrict src0,
+	void *__restrict dst0,
+	const void *__restrict src0,
 	size_t len0)
 {
 #if defined(PREFER_SIZE_OVER_SPEED) || defined(__OPTIMIZE_SIZE__)
   char *dst = (char *) dst0;
   char *src = (char *) src0;
 
-  _PTR save = dst0;
+  void *save = dst0;
 
   while (len0--)
     {

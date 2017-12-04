@@ -10,7 +10,7 @@
 
 size_t
 _DEFUN (malloc_usable_size, (ptr),
-	_PTR ptr)
+	void *ptr)
 {
   return _malloc_usable_size_r (_REENT, ptr);
 }

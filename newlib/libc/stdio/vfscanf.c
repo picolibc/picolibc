@@ -349,7 +349,7 @@ _DEFUN(__ssrefill_r, (ptr, fp),
 size_t
 _DEFUN(_sfread_r, (ptr, buf, size, count, fp),
        struct _reent * ptr,
-       _PTR buf,
+       void *buf,
        size_t size,
        size_t count,
        FILE * fp)
@@ -367,7 +367,7 @@ _DEFUN(_sfread_r, (ptr, buf, size, count, fp),
 
   while (resid > (r = fp->_r))
     {
-      _CAST_VOID memcpy ((_PTR) p, (_PTR) fp->_p, (size_t) r);
+      _CAST_VOID memcpy ((void *) p, (void *) fp->_p, (size_t) r);
       fp->_p += r;
       fp->_r = 0;
       p += r;
@@ -378,7 +378,7 @@ _DEFUN(_sfread_r, (ptr, buf, size, count, fp),
           return (total - resid) / size;
         }
     }
-  _CAST_VOID memcpy ((_PTR) p, (_PTR) fp->_p, resid);
+  _CAST_VOID memcpy ((void *) p, (void *) fp->_p, resid);
   fp->_r -= resid;
   fp->_p += resid;
   return count;
@@ -386,7 +386,7 @@ _DEFUN(_sfread_r, (ptr, buf, size, count, fp),
 #else /* !STRING_ONLY || !INTEGER_ONLY */
 int _EXFUN (_sungetc_r, (struct _reent *, int, register FILE *));
 int _EXFUN (__ssrefill_r, (struct _reent *, register FILE *));
-size_t _EXFUN (_sfread_r, (struct _reent *, _PTR buf, size_t, size_t, FILE *));
+size_t _EXFUN (_sfread_r, (struct _reent *, void *buf, size_t, size_t, FILE *));
 #endif /* !STRING_ONLY || !INTEGER_ONLY */
 
 static inline int

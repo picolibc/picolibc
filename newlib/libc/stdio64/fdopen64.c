@@ -76,7 +76,7 @@ _DEFUN (_fdopen64_r, (ptr, fd, mode),
     _fcntl_r (ptr, fd, F_SETFL, fdflags | O_APPEND);
 #endif
   fp->_file = fd;
-  fp->_cookie = (_PTR) fp;
+  fp->_cookie = (void *) fp;
 
 #undef _read
 #undef _write

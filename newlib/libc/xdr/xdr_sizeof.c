@@ -144,7 +144,7 @@ _DEFUN (x_putint32, (xdrs, int32p),
 unsigned long
 _DEFUN (xdr_sizeof, (func, data),
         xdrproc_t func,
-	_PTR data)
+	void *data)
 {
   XDR x;
   struct xdr_ops ops;

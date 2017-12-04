@@ -936,7 +936,7 @@ _DEFUN(__SVFWSCANF_R, (rptr, fp, fmt0, ap),
 	      else
 		mbp = GET_ARG(N, ap, char *);
 	      n = 0;
-	      memset ((_PTR)&mbs, '\0', sizeof (mbstate_t));
+	      memset ((void *)&mbs, '\0', sizeof (mbstate_t));
 	      while (width != 0 && (wi = _fgetwc_r (rptr, fp)) != WEOF)
 		{
 		  nconv = _wcrtomb_r (rptr, mbp, wi, &mbs);
@@ -1028,7 +1028,7 @@ _DEFUN(__SVFWSCANF_R, (rptr, fp, fmt0, ap),
 	      else
 		mbp = GET_ARG(N, ap, char *);
 	      n = 0;
-	      memset ((_PTR) &mbs, '\0', sizeof (mbstate_t));
+	      memset ((void *) &mbs, '\0', sizeof (mbstate_t));
 	      while ((wi = _fgetwc_r (rptr, fp)) != WEOF
 		     && width != 0 && INCCL (wi))
 		{
@@ -1117,7 +1117,7 @@ _DEFUN(__SVFWSCANF_R, (rptr, fp, fmt0, ap),
 #endif
 	      else
 		mbp = GET_ARG(N, ap, char *);
-	      memset ((_PTR) &mbs, '\0', sizeof (mbstate_t));
+	      memset ((void *) &mbs, '\0', sizeof (mbstate_t));
 	      while ((wi = _fgetwc_r (rptr, fp)) != WEOF
 		     && width != 0 && !iswspace (wi))
 		{

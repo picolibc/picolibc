@@ -192,15 +192,15 @@ struct __sFILE {
 #endif
 
   /* operations */
-  _PTR	_cookie;	/* cookie passed to io functions */
+  void *	_cookie;	/* cookie passed to io functions */
 
-  _READ_WRITE_RETURN_TYPE _EXFNPTR(_read, (struct _reent *, _PTR,
+  _READ_WRITE_RETURN_TYPE _EXFNPTR(_read, (struct _reent *, void *,
 					   char *, _READ_WRITE_BUFSIZE_TYPE));
-  _READ_WRITE_RETURN_TYPE _EXFNPTR(_write, (struct _reent *, _PTR,
+  _READ_WRITE_RETURN_TYPE _EXFNPTR(_write, (struct _reent *, void *,
 					    const char *,
 					    _READ_WRITE_BUFSIZE_TYPE));
-  _fpos_t _EXFNPTR(_seek, (struct _reent *, _PTR, _fpos_t, int));
-  int _EXFNPTR(_close, (struct _reent *, _PTR));
+  _fpos_t _EXFNPTR(_seek, (struct _reent *, void *, _fpos_t, int));
+  int _EXFNPTR(_close, (struct _reent *, void *));
 
   /* separate buffer for long sequences of ungetc() */
   struct __sbuf _ub;	/* ungetc buffer */
@@ -248,15 +248,15 @@ struct __sFILE64 {
   struct _reent *_data;
 
   /* operations */
-  _PTR	_cookie;	/* cookie passed to io functions */
+  void *	_cookie;	/* cookie passed to io functions */
 
-  _READ_WRITE_RETURN_TYPE _EXFNPTR(_read, (struct _reent *, _PTR,
+  _READ_WRITE_RETURN_TYPE _EXFNPTR(_read, (struct _reent *, void *,
 					   char *, _READ_WRITE_BUFSIZE_TYPE));
-  _READ_WRITE_RETURN_TYPE _EXFNPTR(_write, (struct _reent *, _PTR,
+  _READ_WRITE_RETURN_TYPE _EXFNPTR(_write, (struct _reent *, void *,
 					    const char *,
 					    _READ_WRITE_BUFSIZE_TYPE));
-  _fpos_t _EXFNPTR(_seek, (struct _reent *, _PTR, _fpos_t, int));
-  int _EXFNPTR(_close, (struct _reent *, _PTR));
+  _fpos_t _EXFNPTR(_seek, (struct _reent *, void *, _fpos_t, int));
+  int _EXFNPTR(_close, (struct _reent *, void *));
 
   /* separate buffer for long sequences of ungetc() */
   struct __sbuf _ub;	/* ungetc buffer */
@@ -275,7 +275,7 @@ struct __sFILE64 {
   int   _flags2;        /* for future use */
 
   _off64_t _offset;     /* current lseek offset */
-  _fpos64_t _EXFNPTR(_seek64, (struct _reent *, _PTR, _fpos64_t, int));
+  _fpos64_t _EXFNPTR(_seek64, (struct _reent *, void *, _fpos64_t, int));
 
 #ifndef __SINGLE_THREAD__
   _flock_t _lock;	/* for thread-safety locking */

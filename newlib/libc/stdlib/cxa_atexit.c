@@ -30,7 +30,7 @@ _DEFUN (__cxa_atexit,
 {
 #ifdef _LITE_EXIT
   /* Refer to comments in __atexit.c for more details of lite exit.  */
-  int __register_exitproc (int, void (*fn) (void), _PTR, _PTR)
+  int __register_exitproc (int, void (*fn) (void), void *, void *)
     __attribute__ ((weak));
 
   if (!__register_exitproc)

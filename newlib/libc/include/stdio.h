@@ -220,8 +220,8 @@ int	_EXFUN(putc, (int, FILE *));
 int	_EXFUN(putchar, (int));
 int	_EXFUN(puts, (const char *));
 int	_EXFUN(ungetc, (int, FILE *));
-size_t	_EXFUN(fread, (_PTR __restrict, size_t _size, size_t _n, FILE *__restrict));
-size_t	_EXFUN(fwrite, (const _PTR __restrict , size_t _size, size_t _n, FILE *));
+size_t	_EXFUN(fread, (void *__restrict, size_t _size, size_t _n, FILE *__restrict));
+size_t	_EXFUN(fwrite, (const void *__restrict , size_t _size, size_t _n, FILE *));
 #ifdef _COMPILING_NEWLIB
 int	_EXFUN(fgetpos, (FILE *, _fpos_t *));
 #else
@@ -434,8 +434,8 @@ int	_EXFUN(_fputc_r, (struct _reent *, int, FILE *));
 int	_EXFUN(_fputc_unlocked_r, (struct _reent *, int, FILE *));
 int	_EXFUN(_fputs_r, (struct _reent *, const char *__restrict, FILE *__restrict));
 int	_EXFUN(_fputs_unlocked_r, (struct _reent *, const char *__restrict, FILE *__restrict));
-size_t	_EXFUN(_fread_r, (struct _reent *, _PTR __restrict, size_t _size, size_t _n, FILE *__restrict));
-size_t	_EXFUN(_fread_unlocked_r, (struct _reent *, _PTR __restrict, size_t _size, size_t _n, FILE *__restrict));
+size_t	_EXFUN(_fread_r, (struct _reent *, void *__restrict, size_t _size, size_t _n, FILE *__restrict));
+size_t	_EXFUN(_fread_unlocked_r, (struct _reent *, void *__restrict, size_t _size, size_t _n, FILE *__restrict));
 int	_EXFUN(_fscanf_r, (struct _reent *, FILE *__restrict, const char *__restrict, ...)
                _ATTRIBUTE ((__format__ (__scanf__, 3, 4))));
 int	_EXFUN(_fseek_r, (struct _reent *, FILE *, long, int));
@@ -443,8 +443,8 @@ int	_EXFUN(_fseeko_r,(struct _reent *, FILE *, _off_t, int));
 long	_EXFUN(_ftell_r, (struct _reent *, FILE *));
 _off_t	_EXFUN(_ftello_r,(struct _reent *, FILE *));
 void	_EXFUN(_rewind_r, (struct _reent *, FILE *));
-size_t	_EXFUN(_fwrite_r, (struct _reent *, const _PTR __restrict, size_t _size, size_t _n, FILE *__restrict));
-size_t	_EXFUN(_fwrite_unlocked_r, (struct _reent *, const _PTR __restrict, size_t _size, size_t _n, FILE *__restrict));
+size_t	_EXFUN(_fwrite_r, (struct _reent *, const void *__restrict, size_t _size, size_t _n, FILE *__restrict));
+size_t	_EXFUN(_fwrite_unlocked_r, (struct _reent *, const void *__restrict, size_t _size, size_t _n, FILE *__restrict));
 int	_EXFUN(_getc_r, (struct _reent *, FILE *));
 int	_EXFUN(_getc_unlocked_r, (struct _reent *, FILE *));
 int	_EXFUN(_getchar_r, (struct _reent *));
@@ -539,8 +539,8 @@ int	_EXFUN(fileno_unlocked, (FILE *));
 int	_EXFUN(fflush_unlocked, (FILE *));
 int	_EXFUN(fgetc_unlocked, (FILE *));
 int	_EXFUN(fputc_unlocked, (int, FILE *));
-size_t	_EXFUN(fread_unlocked, (_PTR __restrict, size_t _size, size_t _n, FILE *__restrict));
-size_t	_EXFUN(fwrite_unlocked, (const _PTR __restrict , size_t _size, size_t _n, FILE *));
+size_t	_EXFUN(fread_unlocked, (void *__restrict, size_t _size, size_t _n, FILE *__restrict));
+size_t	_EXFUN(fwrite_unlocked, (const void *__restrict , size_t _size, size_t _n, FILE *));
 #endif
 
 #if __GNU_VISIBLE
@@ -583,35 +583,35 @@ int	_EXFUN(__swbuf_r, (struct _reent *, int, FILE *));
 
 #if __BSD_VISIBLE
 # ifdef __LARGE64_FILES
-FILE	*_EXFUN(funopen,(const _PTR __cookie,
-		int (*__readfn)(_PTR __c, char *__buf,
+FILE	*_EXFUN(funopen,(const void *__cookie,
+		int (*__readfn)(void *__c, char *__buf,
 				_READ_WRITE_BUFSIZE_TYPE __n),
-		int (*__writefn)(_PTR __c, const char *__buf,
+		int (*__writefn)(void *__c, const char *__buf,
 				 _READ_WRITE_BUFSIZE_TYPE __n),
-		_fpos64_t (*__seekfn)(_PTR __c, _fpos64_t __off, int __whence),
-		int (*__closefn)(_PTR __c)));
-FILE	*_EXFUN(_funopen_r,(struct _reent *, const _PTR __cookie,
-		int (*__readfn)(_PTR __c, char *__buf,
+		_fpos64_t (*__seekfn)(void *__c, _fpos64_t __off, int __whence),
+		int (*__closefn)(void *__c)));
+FILE	*_EXFUN(_funopen_r,(struct _reent *, const void *__cookie,
+		int (*__readfn)(void *__c, char *__buf,
 				_READ_WRITE_BUFSIZE_TYPE __n),
-		int (*__writefn)(_PTR __c, const char *__buf,
+		int (*__writefn)(void *__c, const char *__buf,
 				 _READ_WRITE_BUFSIZE_TYPE __n),
-		_fpos64_t (*__seekfn)(_PTR __c, _fpos64_t __off, int __whence),
-		int (*__closefn)(_PTR __c)));
+		_fpos64_t (*__seekfn)(void *__c, _fpos64_t __off, int __whence),
+		int (*__closefn)(void *__c)));
 # else
-FILE	*_EXFUN(funopen,(const _PTR __cookie,
-		int (*__readfn)(_PTR __cookie, char *__buf,
+FILE	*_EXFUN(funopen,(const void *__cookie,
+		int (*__readfn)(void *__cookie, char *__buf,
 				_READ_WRITE_BUFSIZE_TYPE __n),
-		int (*__writefn)(_PTR __cookie, const char *__buf,
+		int (*__writefn)(void *__cookie, const char *__buf,
 				 _READ_WRITE_BUFSIZE_TYPE __n),
-		fpos_t (*__seekfn)(_PTR __cookie, fpos_t __off, int __whence),
-		int (*__closefn)(_PTR __cookie)));
-FILE	*_EXFUN(_funopen_r,(struct _reent *, const _PTR __cookie,
-		int (*__readfn)(_PTR __cookie, char *__buf,
+		fpos_t (*__seekfn)(void *__cookie, fpos_t __off, int __whence),
+		int (*__closefn)(void *__cookie)));
+FILE	*_EXFUN(_funopen_r,(struct _reent *, const void *__cookie,
+		int (*__readfn)(void *__cookie, char *__buf,
 				_READ_WRITE_BUFSIZE_TYPE __n),
-		int (*__writefn)(_PTR __cookie, const char *__buf,
+		int (*__writefn)(void *__cookie, const char *__buf,
 				 _READ_WRITE_BUFSIZE_TYPE __n),
-		fpos_t (*__seekfn)(_PTR __cookie, fpos_t __off, int __whence),
-		int (*__closefn)(_PTR __cookie)));
+		fpos_t (*__seekfn)(void *__cookie, fpos_t __off, int __whence),
+		int (*__closefn)(void *__cookie)));
 # endif /* !__LARGE64_FILES */
 
 # define	fropen(__cookie, __fn) funopen(__cookie, __fn, (int (*)())0, \

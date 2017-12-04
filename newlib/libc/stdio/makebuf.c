@@ -39,7 +39,7 @@ _DEFUN(__smakebuf_r, (ptr, fp),
        struct _reent *ptr,
        register FILE *fp)
 {
-  register _PTR p;
+  register void *p;
   int flags;
   size_t size;
   int couldbetty;

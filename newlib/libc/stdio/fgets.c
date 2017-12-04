@@ -164,20 +164,20 @@ _DEFUN(_fgets_r, (ptr, buf, n, fp),
        */
       if (len > n)
 	len = n;
-      t = (unsigned char *) memchr ((_PTR) p, '\n', len);
+      t = (unsigned char *) memchr ((void *) p, '\n', len);
       if (t != 0)
 	{
 	  len = ++t - p;
 	  fp->_r -= len;
 	  fp->_p = t;
-	  _CAST_VOID memcpy ((_PTR) s, (_PTR) p, len);
+	  _CAST_VOID memcpy ((void *) s, (void *) p, len);
 	  s[len] = 0;
           _newlib_flockfile_exit (fp);
 	  return (buf);
 	}
       fp->_r -= len;
       fp->_p += len;
-      _CAST_VOID memcpy ((_PTR) s, (_PTR) p, len);
+      _CAST_VOID memcpy ((void *) s, (void *) p, len);
       s += len;
     }
   while ((n -= len) != 0);

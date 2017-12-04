@@ -144,7 +144,7 @@ _DEFUN(crlf_r, (ptr, fp, buf, count, eof),
 size_t
 _DEFUN(_fread_r, (ptr, buf, size, count, fp),
        struct _reent * ptr,
-       _PTR __restrict buf,
+       void *__restrict buf,
        size_t size,
        size_t count,
        FILE * __restrict fp)
@@ -173,7 +173,7 @@ _DEFUN(_fread_r, (ptr, buf, size, count, fp),
     {
       /* First copy any available characters from ungetc buffer.  */
       int copy_size = resid > fp->_r ? fp->_r : resid;
-      _CAST_VOID memcpy ((_PTR) p, (_PTR) fp->_p, (size_t) copy_size);
+      _CAST_VOID memcpy ((void *) p, (void *) fp->_p, (size_t) copy_size);
       fp->_p += copy_size;
       fp->_r -= copy_size;
       p += copy_size;
@@ -222,7 +222,7 @@ _DEFUN(_fread_r, (ptr, buf, size, count, fp),
     {
       while (resid > (r = fp->_r))
 	{
-	  _CAST_VOID memcpy ((_PTR) p, (_PTR) fp->_p, (size_t) r);
+	  _CAST_VOID memcpy ((void *) p, (void *) fp->_p, (size_t) r);
 	  fp->_p += r;
 	  /* fp->_r = 0 ... done in __srefill */
 	  p += r;
@@ -241,7 +241,7 @@ _DEFUN(_fread_r, (ptr, buf, size, count, fp),
 	      return (total - resid) / size;
 	    }
 	}
-      _CAST_VOID memcpy ((_PTR) p, (_PTR) fp->_p, resid);
+      _CAST_VOID memcpy ((void *) p, (void *) fp->_p, resid);
       fp->_r -= resid;
       fp->_p += resid;
     }
@@ -261,7 +261,7 @@ _DEFUN(_fread_r, (ptr, buf, size, count, fp),
 #ifndef _REENT_ONLY
 size_t
 _DEFUN(fread, (buf, size, count, fp),
-       _PTR __restrict  buf,
+       void *__restrict  buf,
        size_t size,
        size_t count,
        FILE *__restrict fp)

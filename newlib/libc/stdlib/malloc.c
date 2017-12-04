@@ -158,7 +158,7 @@ Supporting OS subroutines required: <<sbrk>>.  */
 
 #ifndef _REENT_ONLY
 
-_PTR
+void *
 _DEFUN (malloc, (nbytes),
 	size_t nbytes)		/* get a block */
 {
@@ -167,7 +167,7 @@ _DEFUN (malloc, (nbytes),
 
 void
 _DEFUN (free, (aptr),
-	_PTR aptr)
+	void *aptr)
 {
   _free_r (_REENT, aptr);
 }

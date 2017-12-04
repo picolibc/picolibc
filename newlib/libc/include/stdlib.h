@@ -54,7 +54,7 @@ typedef struct
 
 #ifndef __compar_fn_t_defined
 #define __compar_fn_t_defined
-typedef int (*__compar_fn_t) (const _PTR, const _PTR);
+typedef int (*__compar_fn_t) (const void *, const void *);
 #endif
 
 #define EXIT_FAILURE 1
@@ -82,15 +82,15 @@ int	_EXFUN(atoi,(const char *__nptr));
 int	_EXFUN(_atoi_r,(struct _reent *, const char *__nptr));
 long	_EXFUN(atol,(const char *__nptr));
 long	_EXFUN(_atol_r,(struct _reent *, const char *__nptr));
-_PTR	_EXFUN(bsearch,(const _PTR __key,
-		       const _PTR __base,
+void *	_EXFUN(bsearch,(const void *__key,
+		       const void *__base,
 		       size_t __nmemb,
 		       size_t __size,
 		       __compar_fn_t _compar));
-_PTR	_EXFUN_NOTHROW(calloc,(size_t __nmemb, size_t __size));
+void *	_EXFUN_NOTHROW(calloc,(size_t __nmemb, size_t __size));
 div_t	_EXFUN(div,(int __numer, int __denom));
 _VOID	_EXFUN(exit,(int __status) _ATTRIBUTE ((__noreturn__)));
-_VOID	_EXFUN_NOTHROW(free,(_PTR));
+_VOID	_EXFUN_NOTHROW(free,(void *));
 char *  _EXFUN(getenv,(const char *__string));
 char *	_EXFUN(_getenv_r,(struct _reent *, const char *__string));
 char *	_EXFUN(_findenv,(const char *, int *));
@@ -101,7 +101,7 @@ int	_EXFUN(getsubopt,(char **, char * const *, char **));
 #endif
 long	_EXFUN(labs,(long));
 ldiv_t	_EXFUN(ldiv,(long __numer, long __denom));
-_PTR	_EXFUN_NOTHROW(malloc,(size_t __size));
+void *	_EXFUN_NOTHROW(malloc,(size_t __size));
 int	_EXFUN(mblen,(const char *, size_t));
 int	_EXFUN(_mblen_r,(struct _reent *, const char *, size_t, _mbstate_t *));
 int	_EXFUN(mbtowc,(wchar_t *__restrict, const char *__restrict, size_t));
@@ -136,13 +136,13 @@ int	_EXFUN(_mkostemps_r, (struct _reent *, char *, int, int));
 int	_EXFUN(_mkstemp_r, (struct _reent *, char *));
 int	_EXFUN(_mkstemps_r, (struct _reent *, char *, int));
 char *	_EXFUN(_mktemp_r, (struct _reent *, char *) _ATTRIBUTE ((__deprecated__("the use of `mktemp' is dangerous; use `mkstemp' instead"))));
-_VOID	_EXFUN(qsort,(_PTR __base, size_t __nmemb, size_t __size, __compar_fn_t _compar));
+_VOID	_EXFUN(qsort,(void *__base, size_t __nmemb, size_t __size, __compar_fn_t _compar));
 int	_EXFUN(rand,(_VOID));
-_PTR	_EXFUN_NOTHROW(realloc,(_PTR __r, size_t __size));
+void *	_EXFUN_NOTHROW(realloc,(void *__r, size_t __size));
 #if __BSD_VISIBLE
 void	*reallocarray(void *, size_t, size_t) __result_use_check __alloc_size(2)
 	    __alloc_size(3);
-_PTR	_EXFUN(reallocf,(_PTR __r, size_t __size));
+void *	_EXFUN(reallocf,(void *__r, size_t __size));
 #endif
 #if __BSD_VISIBLE || __XSI_VISIBLE >= 4
 char *	_EXFUN(realpath, (const char *__restrict path, char *__restrict resolved_path));
@@ -193,7 +193,7 @@ char *  _EXFUN(l64a,(long __input));
 char *  _EXFUN(_l64a_r,(struct _reent *,long __input));
 #endif
 #if __MISC_VISIBLE
-int	_EXFUN(on_exit,(_VOID (*__func)(int, _PTR),_PTR __arg));
+int	_EXFUN(on_exit,(_VOID (*__func)(int, void *),void *__arg));
 #endif
 #if __ISO_C_VISIBLE >= 1999
 _VOID	_EXFUN(_Exit,(int __status) _ATTRIBUTE ((__noreturn__)));
@@ -202,7 +202,7 @@ _VOID	_EXFUN(_Exit,(int __status) _ATTRIBUTE ((__noreturn__)));
 int	_EXFUN(putenv,(char *__string));
 #endif
 int	_EXFUN(_putenv_r,(struct _reent *, char *__string));
-_PTR	_EXFUN(_reallocf_r,(struct _reent *, _PTR, size_t));
+void *	_EXFUN(_reallocf_r,(struct _reent *, void *, size_t));
 #if __BSD_VISIBLE || __POSIX_VISIBLE >= 200112
 int	_EXFUN(setenv,(const char *__string, const char *__value, int __overwrite));
 #endif
@@ -273,7 +273,7 @@ unsigned long long _EXFUN(_strtoull_r,(struct _reent *, const char *__restrict _
 
 #ifndef __CYGWIN__
 #if __MISC_VISIBLE
-_VOID	_EXFUN(cfree,(_PTR));
+_VOID	_EXFUN(cfree,(void *));
 #endif
 #if __BSD_VISIBLE || __POSIX_VISIBLE >= 200112
 int	_EXFUN(unsetenv,(const char *__string));
@@ -287,10 +287,10 @@ int _EXFUN(__nonnull ((1)) posix_memalign,(void **, size_t, size_t));
 
 char *	_EXFUN(_dtoa_r,(struct _reent *, double, int, int, int *, int*, char**));
 #ifndef __CYGWIN__
-_PTR	_EXFUN_NOTHROW(_malloc_r,(struct _reent *, size_t));
-_PTR	_EXFUN_NOTHROW(_calloc_r,(struct _reent *, size_t, size_t));
-_VOID	_EXFUN_NOTHROW(_free_r,(struct _reent *, _PTR));
-_PTR	_EXFUN_NOTHROW(_realloc_r,(struct _reent *, _PTR, size_t));
+void *	_EXFUN_NOTHROW(_malloc_r,(struct _reent *, size_t));
+void *	_EXFUN_NOTHROW(_calloc_r,(struct _reent *, size_t, size_t));
+_VOID	_EXFUN_NOTHROW(_free_r,(struct _reent *, void *));
+void *	_EXFUN_NOTHROW(_realloc_r,(struct _reent *, void *, size_t));
 _VOID	_EXFUN(_mstats_r,(struct _reent *, char *));
 #endif
 int	_EXFUN(_system_r,(struct _reent *, const char *));
@@ -302,13 +302,13 @@ _VOID	_EXFUN(__eprintf,(const char *, const char *, unsigned int, const char *))
    version.  We want that #undef qsort_r will still let you
    invoke the underlying function, but that requires gcc support. */
 #if __GNU_VISIBLE
-_VOID	_EXFUN(qsort_r,(_PTR __base, size_t __nmemb, size_t __size, int (*_compar)(const _PTR, const _PTR, _PTR), _PTR __thunk));
+_VOID	_EXFUN(qsort_r,(void *__base, size_t __nmemb, size_t __size, int (*_compar)(const void *, const void *, void *), void *__thunk));
 #elif __BSD_VISIBLE
 # ifdef __GNUC__
-_VOID	_EXFUN(qsort_r,(_PTR __base, size_t __nmemb, size_t __size, _PTR __thunk, int (*_compar)(_PTR, const _PTR, const _PTR)))
+_VOID	_EXFUN(qsort_r,(void *__base, size_t __nmemb, size_t __size, void *__thunk, int (*_compar)(void *, const void *, const void *)))
              __asm__ (__ASMNAME ("__bsd_qsort_r"));
 # else
-_VOID	_EXFUN(__bsd_qsort_r,(_PTR __base, size_t __nmemb, size_t __size, _PTR __thunk, int (*_compar)(_PTR, const _PTR, const _PTR)));
+_VOID	_EXFUN(__bsd_qsort_r,(void *__base, size_t __nmemb, size_t __size, void *__thunk, int (*_compar)(void *, const void *, const void *)));
 #  define qsort_r __bsd_qsort_r
 # endif
 #endif

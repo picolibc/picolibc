@@ -65,7 +65,7 @@ _DEFUN(__sread, (ptr, cookie, buf, n),
 _READ_WRITE_RETURN_TYPE
 _DEFUN(__seofread, (ptr, cookie, buf, len),
        struct _reent *_ptr,
-       _PTR cookie,
+       void *cookie,
        char *buf,
        _READ_WRITE_BUFSIZE_TYPE len)
 {

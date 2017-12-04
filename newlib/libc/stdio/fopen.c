@@ -142,7 +142,7 @@ _DEFUN(_fopen_r, (ptr, file, mode),
 
   fp->_file = f;
   fp->_flags = flags;
-  fp->_cookie = (_PTR) fp;
+  fp->_cookie = (void *) fp;
   fp->_read = __sread;
   fp->_write = __swrite;
   fp->_seek = __sseek;

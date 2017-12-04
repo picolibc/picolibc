@@ -55,16 +55,16 @@ PORTABILITY
 #endif
 
 
-_PTR
+void *
 _DEFUN (memccpy, (dst0, src0, endchar, len0),
-	_PTR __restrict dst0,
-	const _PTR __restrict src0,
+	void *__restrict dst0,
+	const void *__restrict src0,
 	int endchar0,
 	size_t len0)
 {
 
 #if defined(PREFER_SIZE_OVER_SPEED) || defined(__OPTIMIZE_SIZE__)
-  _PTR ptr = NULL;
+  void *ptr = NULL;
   char *dst = (char *) dst0;
   char *src = (char *) src0;
   char endchar = endchar0 & 0xff;
@@ -80,7 +80,7 @@ _DEFUN (memccpy, (dst0, src0, endchar, len0),
 
   return ptr;
 #else
-  _PTR ptr = NULL;
+  void *ptr = NULL;
   char *dst = dst0;
   const char *src = src0;
   long *aligned_dst;
