@@ -1113,9 +1113,10 @@ DEFUN(lookup_word,(word),
     
 }
 
-static void DEFUN_VOID(perform)
+static int DEFUN_VOID(perform)
 {
     tos = stack;
+    int errors = 0;
     
     while (at(ptr, idx)) {
 	    /* It's worth looking through the command list */
@@ -1140,6 +1141,7 @@ static void DEFUN_VOID(perform)
 		else
 		{
 		    fprintf(stderr,"warning, %s is not recognised\n",  next);
+		    errors++;
 		    skip_past_newline();
 		}
 		
@@ -1147,6 +1149,7 @@ static void DEFUN_VOID(perform)
 	    else skip_past_newline();
 
 	}
+    return errors;
 }
 
 dict_type *
@@ -1220,6 +1223,8 @@ DEFUN(compile, (string),
     int  ret=0;
     /* add words to the dictionary */
     char *word;
+    dict_type *lookup;
+
     string = nextword(string, &word);
     while (string && *string && word[0]) 
     {
@@ -1275,7 +1280,9 @@ DEFUN(compile, (string),
 		     break;
 		   default:
 		     add_to_definition(ptr, call);
-		     add_to_definition(ptr, lookup_word(word));
+		     lookup = lookup_word(word);
+		     if (!lookup) ret++;
+		     add_to_definition(ptr, lookup);
 		 }
 
 		string = nextword(string, &word);		     
@@ -1349,7 +1356,7 @@ int ac AND
 char *av[])
 {
     unsigned int i;
-    
+    int status = 0;
 
     string_type buffer;
     string_type pptr;
@@ -1410,7 +1417,7 @@ char *av[])
 		  
 		read_in(&b, f);
 		if( compile(b.ptr) )  { fclose(f); exit(1); }
-		perform();	
+		status = perform();
 		fclose(f);
 	    }
 	    else    if (av[i][1] == 'i') 
@@ -1425,8 +1432,5 @@ char *av[])
 
     }      
     write_buffer(stack+0);
-    return 0;
+    return status;
 }
-
-
-
