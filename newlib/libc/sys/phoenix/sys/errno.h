@@ -30,7 +30,7 @@
 
 #ifndef _REENT_ONLY
 #define errno (*__errno())
-extern int *__errno _PARAMS ((void));
+extern int *__errno (void);
 #endif
 
 /* Don't use these variables directly. Use strerror instead. */

@@ -44,7 +44,7 @@ extern "C"
 {
 #endif
 
-extern int flock _PARAMS ((int, int));
+extern int flock (int, int);
 
 #ifdef __cplusplus
 }

@@ -68,9 +68,6 @@
 #ifndef _LONG_DOUBLE
 #define _LONG_DOUBLE long double
 #endif
-#ifndef _PARAMS
-#define _PARAMS(paramlist)		paramlist
-#endif
 #else	
 #define	_PTR		char *
 #define	_VOLATILE
@@ -82,9 +79,6 @@
 #define	_DEFUN_VOID(name)		name()
 #define _CAST_VOID
 #define _LONG_DOUBLE double
-#ifndef _PARAMS
-#define _PARAMS(paramlist)		()
-#endif
 #endif
 
 /* Support gcc's __attribute__ facility.  */

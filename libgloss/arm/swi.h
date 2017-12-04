@@ -96,9 +96,9 @@
 #define SH_EXT_STDOUT_STDERR_BITNUM	0x1
 
 #if !defined (__ASSEMBLER__)
-extern int _get_semihosting_exts _PARAMS ((char*, int, int));
-extern int _has_ext_exit_extended _PARAMS ((void));
-extern int _has_ext_stdout_stderr _PARAMS ((void));
+extern int _get_semihosting_exts (char*, int, int);
+extern int _has_ext_exit_extended (void);
+extern int _has_ext_stdout_stderr (void);
 #endif
 
 #if defined(ARM_RDI_MONITOR) && !defined(__ASSEMBLER__)

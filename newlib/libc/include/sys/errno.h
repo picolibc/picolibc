@@ -12,7 +12,7 @@ extern "C" {
 
 #ifndef _REENT_ONLY
 #define errno (*__errno())
-extern int *__errno _PARAMS ((void));
+extern int *__errno (void);
 #endif
 
 /* Please don't use these variables directly.

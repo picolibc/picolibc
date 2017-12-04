@@ -223,16 +223,16 @@ __sbprintf_r(rptr, fp, fmt, ap)
 #define	DEFPREC		6
 
 #ifdef _NO_LONGDBL
-static char *cvt _PARAMS((struct _reent *, double, int, int, char *, int *, int, int *));
+static char *cvt (struct _reent *, double, int, int, char *, int *, int, int *);
 #else
-static char *cvt _PARAMS((struct _reent *, _LONG_DOUBLE, int, int, char *, int *, int, int *));
-extern int  _ldcheck _PARAMS((_LONG_DOUBLE *));
+static char *cvt (struct _reent *, _LONG_DOUBLE, int, int, char *, int *, int, int *);
+extern int  _ldcheck (_LONG_DOUBLE *);
 #endif
 
-static int exponent _PARAMS((char *, int, int));
+static int exponent (char *, int, int);
 
 #ifdef __SPE__
-static char *cvt_ufix64 _PARAMS((struct _reent *, unsigned long long, int,  int *, int *));
+static char *cvt_ufix64 (struct _reent *, unsigned long long, int,  int *, int *);
 #endif /* __SPE__ */
 
 #else /* no FLOATING_POINT */
@@ -1247,11 +1247,11 @@ error:
 #ifdef FLOATING_POINT
 
 #ifdef _NO_LONGDBL
-extern char *_dtoa_r _PARAMS((struct _reent *, double, int,
-			      int, int *, int *, char **));
+extern char *_dtoa_r (struct _reent *, double, int,
+			      int, int *, int *, char **);
 #else
-extern char *_ldtoa_r _PARAMS((struct _reent *, _LONG_DOUBLE, int,
-			      int, int *, int *, char **));
+extern char *_ldtoa_r (struct _reent *, _LONG_DOUBLE, int,
+			      int, int *, int *, char **);
 #undef word0
 #define word0(x) ldword0(x)
 #endif
@@ -1358,8 +1358,8 @@ exponent(p0, exp, fmtch)
 #endif /* FLOATING_POINT */
 
 #ifdef __SPE__
-extern char *_ufix64toa_r _PARAMS((struct _reent *, unsigned long long, int,
-			           int, int *, int *, char **));
+extern char *_ufix64toa_r (struct _reent *, unsigned long long, int,
+			           int, int *, int *, char **);
 static char *
 cvt_ufix64 (data, value, ndigits, decpt, length)
 	struct _reent *data;

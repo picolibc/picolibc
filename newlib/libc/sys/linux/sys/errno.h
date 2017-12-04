@@ -12,7 +12,7 @@
 
 #ifndef _REENT_ONLY
 #define errno (*__errno())
-extern int *__errno _PARAMS ((void));
+extern int *__errno (void);
 #endif
 
 extern __IMPORT const char * const _sys_errlist[];

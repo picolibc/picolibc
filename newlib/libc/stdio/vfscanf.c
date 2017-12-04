@@ -554,7 +554,7 @@ _DEFUN(__SVFSCANF_R, (rptr, fp, fmt0, ap),
     while (0)
 #endif
 
-  #define CCFN_PARAMS	_PARAMS((struct _reent *, const char *, char **, int))
+  #define CCFN_PARAMS	(struct _reent *, const char *, char **, int)
   u_long (*ccfn)CCFN_PARAMS=0;	/* conversion function (strtol/strtoul) */
   char ccltab[256];		/* character class table for %[...] */
   char buf[BUF];		/* buffer for numeric conversions */

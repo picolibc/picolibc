@@ -510,8 +510,8 @@ _DEFUN(__sbprintf, (rptr, fp, fmt, ap),
 
 # ifdef _NO_LONGDBL
 
-extern char *_dtoa_r _PARAMS((struct _reent *, double, int,
-			      int, int *, int *, char **));
+extern char *_dtoa_r (struct _reent *, double, int,
+			      int, int *, int *, char **);
 
 #  define _PRINTF_FLOAT_TYPE double
 #  define _DTOA_R _dtoa_r
@@ -519,8 +519,8 @@ extern char *_dtoa_r _PARAMS((struct _reent *, double, int,
 
 # else /* !_NO_LONGDBL */
 
-extern char *_ldtoa_r _PARAMS((struct _reent *, _LONG_DOUBLE, int,
-			      int, int *, int *, char **));
+extern char *_ldtoa_r (struct _reent *, _LONG_DOUBLE, int,
+			      int, int *, int *, char **);
 
 extern int _EXFUN(_ldcheck,(_LONG_DOUBLE *));
 

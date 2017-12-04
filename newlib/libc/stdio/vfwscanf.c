@@ -138,7 +138,7 @@ C99, POSIX-1.2008
 #define _NO_LONGDBL
 #if defined _WANT_IO_LONG_DOUBLE && (LDBL_MANT_DIG > DBL_MANT_DIG)
 #undef _NO_LONGDBL
-extern _LONG_DOUBLE _wcstold_r _PARAMS((wchar_t *s, wchar_t **sptr));
+extern _LONG_DOUBLE _wcstold_r (wchar_t *s, wchar_t **sptr);
 #endif
 
 #include "floatio.h"
@@ -322,7 +322,7 @@ _DEFUN(_sungetwc_r, (data, fp, ch),
   return wc;
 }
 
-extern int __ssrefill_r _PARAMS ((struct _reent *ptr, register FILE * fp));
+extern int __ssrefill_r (struct _reent *ptr, register FILE * fp);
 
 static size_t
 _DEFUN(_sfgetwc_r, (ptr, fp),
@@ -367,7 +367,7 @@ _DEFUN(__SVFWSCANF_R, (rptr, fp, fmt0, ap),
 
   mbstate_t mbs;                /* value to keep track of multibyte state */
 
-  #define CCFN_PARAMS	_PARAMS((struct _reent *, const wchar_t *, wchar_t **, int))
+  #define CCFN_PARAMS	(struct _reent *, const wchar_t *, wchar_t **, int)
   unsigned long (*ccfn)CCFN_PARAMS=0;	/* conversion function (wcstol/wcstoul) */
   wchar_t buf[BUF];		/* buffer for numeric conversions */
   const wchar_t *ccls;          /* character class start */

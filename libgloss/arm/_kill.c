@@ -2,7 +2,7 @@
 #include <signal.h>
 #include "swi.h"
 
-int _kill _PARAMS ((int, int));
+int _kill (int, int);
 
 int
 _kill (int pid, int sig)

@@ -26,7 +26,7 @@
 #include <_ansi.h>
 #include "svc.h"
 
-void _exit _PARAMS ((int));
+void _exit (int);
 
 __attribute__ ((noreturn)) void
 _exit (int status)

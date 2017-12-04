@@ -95,7 +95,7 @@ _scanf_i (struct _reent *rptr,
 	  struct _scan_data_t *pdata,
 	  FILE *fp, va_list *ap)
 {
-#define CCFN_PARAMS	_PARAMS((struct _reent *, const char *, char **, int))
+#define CCFN_PARAMS	(struct _reent *, const char *, char **, int)
   /* Conversion function (strtol/strtoul).  */
   u_long (*ccfn)CCFN_PARAMS=0;
   char *p;

@@ -15,8 +15,8 @@
 #include <reent.h>
 #include "fix64.h"
 
-extern char *_simdldtoa_r _PARAMS((struct _reent *, LONG_DOUBLE_UNION *, int,
-			       int, int *, int *, char **));
+extern char *_simdldtoa_r (struct _reent *, LONG_DOUBLE_UNION *, int,
+			       int, int *, int *, char **);
 
 /*
  * Convert an unsigned fixed-point 64-bit value to string.

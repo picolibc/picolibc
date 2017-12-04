@@ -38,7 +38,7 @@ extern char **environ;
 static char ***p_environ = &environ;
 
 /* _findenv_r is defined in getenv_r.c.  */
-extern char *_findenv_r _PARAMS ((struct _reent *, const char *, int *));
+extern char *_findenv_r (struct _reent *, const char *, int *);
 
 /*
  * _setenv_r --

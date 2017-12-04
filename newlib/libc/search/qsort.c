@@ -77,8 +77,8 @@ typedef int		 cmp_t(const void *, const void *, void *);
 #else
 typedef int		 cmp_t(const void *, const void *);
 #endif
-static inline char	*med3 _PARAMS((char *, char *, char *, cmp_t *, void *));
-static inline void	 swapfunc _PARAMS((char *, char *, int, int));
+static inline char	*med3 (char *, char *, char *, cmp_t *, void *);
+static inline void	 swapfunc (char *, char *, int, int);
 
 #define min(a, b)	(a) < (b) ? a : b
 

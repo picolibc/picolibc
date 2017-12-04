@@ -18,37 +18,37 @@
 #include "swi.h"
 
 /* Forward prototypes.  */
-int     _system     _PARAMS ((const char *));
-int     _rename     _PARAMS ((const char *, const char *));
-int     _isatty		_PARAMS ((int));
-clock_t _times		_PARAMS ((struct tms *));
-int     _gettimeofday	_PARAMS ((struct timeval *, void *));
-int     _unlink		_PARAMS ((const char *));
-int     _link 		_PARAMS ((void));
-int     _stat 		_PARAMS ((const char *, struct stat *));
-int     _fstat 		_PARAMS ((int, struct stat *));
-int	_swistat	_PARAMS ((int fd, struct stat * st));
-caddr_t _sbrk		_PARAMS ((int));
-int     _getpid		_PARAMS ((int));
-int     _close		_PARAMS ((int));
-clock_t _clock		_PARAMS ((void));
-int     _swiclose	_PARAMS ((int));
-int     _open		_PARAMS ((const char *, int, ...));
-int     _swiopen	_PARAMS ((const char *, int));
-int     _write 		_PARAMS ((int, char *, int));
-int     _swiwrite	_PARAMS ((int, char *, int));
-int     _lseek		_PARAMS ((int, int, int));
-int     _swilseek	_PARAMS ((int, int, int));
-int     _read		_PARAMS ((int, char *, int));
-int     _swiread	_PARAMS ((int, char *, int));
-void    initialise_monitor_handles _PARAMS ((void));
+int     _system     (const char *);
+int     _rename     (const char *, const char *);
+int     _isatty		(int);
+clock_t _times		(struct tms *);
+int     _gettimeofday	(struct timeval *, void *);
+int     _unlink		(const char *);
+int     _link 		(void);
+int     _stat 		(const char *, struct stat *);
+int     _fstat 		(int, struct stat *);
+int	_swistat	(int fd, struct stat * st);
+caddr_t _sbrk		(int);
+int     _getpid		(int);
+int     _close		(int);
+clock_t _clock		(void);
+int     _swiclose	(int);
+int     _open		(const char *, int, ...);
+int     _swiopen	(const char *, int);
+int     _write 		(int, char *, int);
+int     _swiwrite	(int, char *, int);
+int     _lseek		(int, int, int);
+int     _swilseek	(int, int, int);
+int     _read		(int, char *, int);
+int     _swiread	(int, char *, int);
+void    initialise_monitor_handles (void);
 
-static int	checkerror	_PARAMS ((int));
-static int	error		_PARAMS ((int));
-static int	get_errno	_PARAMS ((void));
+static int	checkerror	(int);
+static int	error		(int);
+static int	get_errno	(void);
 
 /* Semihosting utilities.  */
-static void initialise_semihosting_exts _PARAMS ((void));
+static void initialise_semihosting_exts (void);
 
 /* Struct used to keep track of the file position, just so we
    can implement fseek(fh,x,SEEK_CUR).  */
@@ -77,8 +77,8 @@ struct fdent
 
 static struct fdent openfiles [MAX_OPEN_FILES];
 
-static struct fdent* 	findslot	_PARAMS ((int));
-static int		newslot		_PARAMS ((void));
+static struct fdent* 	findslot	(int);
+static int		newslot		(void);
 
 /* Register name faking - works in collusion with the linker.  */
 register char * stack_ptr asm ("sp");

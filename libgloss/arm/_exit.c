@@ -1,7 +1,7 @@
 #include <_ansi.h>
 
-int _kill _PARAMS ((int, int));
-void _exit _PARAMS ((int));
+int _kill (int, int);
+void _exit (int);
 
 void
 _exit (int status)

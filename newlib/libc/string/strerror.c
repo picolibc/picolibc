@@ -392,7 +392,7 @@ _DEFUN (_strerror_r, (ptr, errnum, internal, errptr),
 	int *errptr)
 {
   char *error;
-  extern char *_user_strerror _PARAMS ((int, int, int *));
+  extern char *_user_strerror (int, int, int *);
 
   switch (errnum)
     {

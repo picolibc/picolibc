@@ -43,8 +43,8 @@ details. */
 #ifdef __cplusplus
 extern "C" {
 #endif
-extern int posix_fadvise _PARAMS ((int, off_t, off_t, int));
-extern int posix_fallocate _PARAMS ((int, off_t, off_t));
+extern int posix_fadvise (int, off_t, off_t, int);
+extern int posix_fallocate (int, off_t, off_t);
 #ifdef __cplusplus
 }
 #endif

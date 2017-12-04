@@ -775,7 +775,7 @@ extern __FILE __sf[3];
 extern struct _reent *_impure_ptr __ATTRIBUTE_IMPURE_PTR__;
 extern struct _reent *const _global_impure_ptr __ATTRIBUTE_IMPURE_PTR__;
 
-void _reclaim_reent _PARAMS ((struct _reent *));
+void _reclaim_reent (struct _reent *);
 
 /* #define _REENT_ONLY define this to get only reentrant routines */
 

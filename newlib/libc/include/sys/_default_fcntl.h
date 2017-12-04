@@ -199,27 +199,27 @@ struct eflock {
 #include <sys/types.h>
 #include <sys/stat.h>		/* sigh. for the mode bits for open/creat */
 
-extern int open _PARAMS ((const char *, int, ...));
+extern int open (const char *, int, ...);
 #if __ATFILE_VISIBLE
-extern int openat _PARAMS ((int, const char *, int, ...));
+extern int openat (int, const char *, int, ...);
 #endif
-extern int creat _PARAMS ((const char *, mode_t));
-extern int fcntl _PARAMS ((int, int, ...));
+extern int creat (const char *, mode_t);
+extern int fcntl (int, int, ...);
 #if __BSD_VISIBLE
-extern int flock _PARAMS ((int, int));
+extern int flock (int, int);
 #endif
 #if __GNU_VISIBLE
 #include <sys/time.h>
-extern int futimesat _PARAMS ((int, const char *, const struct timeval *));
+extern int futimesat (int, const char *, const struct timeval *);
 #endif
 
 /* Provide _<systemcall> prototypes for functions provided by some versions
    of newlib.  */
 #ifdef _COMPILING_NEWLIB
-extern int _open _PARAMS ((const char *, int, ...));
-extern int _fcntl _PARAMS ((int, int, ...));
+extern int _open (const char *, int, ...);
+extern int _fcntl (int, int, ...);
 #ifdef __LARGE64_FILES
-extern int _open64 _PARAMS ((const char *, int, ...));
+extern int _open64 (const char *, int, ...);
 #endif
 #endif
 
