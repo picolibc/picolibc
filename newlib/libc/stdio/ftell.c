@@ -84,7 +84,7 @@ static char sccsid[] = "%W% (Berkeley) %G%";
 
 long
 _DEFUN(_ftell_r, (ptr, fp),
-       struct _reent *ptr _AND
+       struct _reent *ptr,
        register FILE * fp)
 {
   _fpos_t pos;

@@ -41,8 +41,8 @@ static char *rcsid = "$OpenBSD: strlcpy.c,v 1.5 2001/05/13 15:40:16 deraadt Exp 
  */
 size_t
 _DEFUN (strlcpy, (dst, src, siz),
-	char *dst _AND
-	_CONST char *src _AND
+	char *dst,
+	_CONST char *src,
 	size_t siz)
 {
         register char *d = dst;

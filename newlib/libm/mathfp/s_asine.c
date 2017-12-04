@@ -90,7 +90,7 @@ static const double b[] = { 1.57079632679489661923, 0.78539816339744830962 };
 
 double
 _DEFUN (asine, (double, int),
-        double x _AND
+        double x,
         int acosine)
 {
   int flag, i;

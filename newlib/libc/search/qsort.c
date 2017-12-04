@@ -101,9 +101,9 @@ static inline void	 swapfunc _PARAMS((char *, char *, int, int));
 
 static inline void
 _DEFUN(swapfunc, (a, b, n, swaptype),
-	char *a _AND
-	char *b _AND
-	int n _AND
+	char *a,
+	char *b,
+	int n,
 	int swaptype)
 {
 	if(swaptype <= 1)
@@ -132,10 +132,10 @@ _DEFUN(swapfunc, (a, b, n, swaptype),
 
 static inline char *
 _DEFUN(med3, (a, b, c, cmp, thunk),
-	char *a _AND
-	char *b _AND
-	char *c _AND
-	cmp_t *cmp _AND
+	char *a,
+	char *b,
+	char *c,
+	cmp_t *cmp,
 	void *thunk
 #if !defined(I_AM_QSORT_R) && !defined(I_AM_GNU_QSORT_R)
 __unused
@@ -150,26 +150,26 @@ __unused
 #if defined(I_AM_QSORT_R)
 void
 _DEFUN(__bsd_qsort_r, (a, n, es, thunk, cmp),
-	void *a _AND
-	size_t n _AND
-	size_t es _AND
-	void *thunk _AND
+	void *a,
+	size_t n,
+	size_t es,
+	void *thunk,
 	cmp_t *cmp)
 #elif defined(I_AM_GNU_QSORT_R)
 void
 _DEFUN(qsort_r, (a, n, es, cmp, thunk),
-	void *a _AND
-	size_t n _AND
-	size_t es _AND
-	cmp_t *cmp _AND
+	void *a,
+	size_t n,
+	size_t es,
+	cmp_t *cmp,
 	void *thunk)
 #else
 #define thunk NULL
 void
 _DEFUN(qsort, (a, n, es, cmp),
-	void *a _AND
-	size_t n _AND
-	size_t es _AND
+	void *a,
+	size_t n,
+	size_t es,
 	cmp_t *cmp)
 #endif
 {

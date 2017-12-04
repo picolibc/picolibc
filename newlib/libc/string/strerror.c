@@ -386,9 +386,9 @@ QUICKREF
 
 char *
 _DEFUN (_strerror_r, (ptr, errnum, internal, errptr),
-	struct _reent *ptr _AND
-	int errnum _AND
-	int internal _AND
+	struct _reent *ptr,
+	int errnum,
+	int internal,
 	int *errptr)
 {
   char *error;

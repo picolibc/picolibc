@@ -50,8 +50,8 @@ Supporting OS subroutines required: <<sbrk>>, <<write>>.
 
 int
 _DEFUN(_diprintf_r, (ptr, fd, format),
-       struct _reent *ptr _AND
-       int fd _AND
+       struct _reent *ptr,
+       int fd,
        const char *format _DOTS)
 {
   va_list ap;
@@ -67,7 +67,7 @@ _DEFUN(_diprintf_r, (ptr, fd, format),
 
 int
 _DEFUN(diprintf, (fd, format),
-       int fd _AND
+       int fd,
        const char *format _DOTS)
 {
   va_list ap;

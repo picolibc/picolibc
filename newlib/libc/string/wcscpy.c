@@ -58,7 +58,7 @@ No supporting OS subroutines are required.
 
 wchar_t *
 _DEFUN (wcscpy, (s1, s2),
-	wchar_t *__restrict s1 _AND
+	wchar_t *__restrict s1,
 	_CONST wchar_t *__restrict s2)
 {
   wchar_t *p;

@@ -31,9 +31,9 @@ Supporting OS subroutine required: <<read>>, <<lseek64>>.
 
 ssize_t
 _DEFUN (__libc_pread64, (fd, buf, n, off),
-     int fd _AND
-     _PTR buf _AND
-     size_t n _AND
+     int fd,
+     _PTR buf,
+     size_t n,
      loff_t off)
 {
   loff_t cur_pos;

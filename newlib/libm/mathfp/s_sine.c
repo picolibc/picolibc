@@ -73,7 +73,7 @@ static const double r[] = { -0.16666666666666665052,
 
 double
 _DEFUN (sine, (double, int),
-        double x _AND
+        double x,
         int cosine)
 {
   int sgn, N;

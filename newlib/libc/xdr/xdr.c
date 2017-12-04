@@ -63,7 +63,7 @@ static const char xdr_zero[BYTES_PER_XDR_UNIT] = { 0, 0, 0, 0 };
  */
 void
 _DEFUN (xdr_free, (proc, objp),
-        xdrproc_t proc _AND
+        xdrproc_t proc,
 	void * objp)
 {
   XDR x;
@@ -87,7 +87,7 @@ _DEFUN_VOID (xdr_void)
  */
 bool_t
 _DEFUN (xdr_int, (xdrs, ip),
-        XDR * xdrs _AND
+        XDR * xdrs,
 	int * ip)
 {
 #if INT_MAX < LONG_MAX
@@ -122,7 +122,7 @@ _DEFUN (xdr_int, (xdrs, ip),
  */
 bool_t
 _DEFUN (xdr_u_int, (xdrs, up),
-        XDR * xdrs _AND
+        XDR * xdrs,
 	u_int * up)
 {
 #if UINT_MAX < ULONG_MAX
@@ -157,7 +157,7 @@ _DEFUN (xdr_u_int, (xdrs, up),
  */
 bool_t
 _DEFUN (xdr_long, (xdrs, lp),
-        XDR * xdrs _AND
+        XDR * xdrs,
 	long * lp)
 {
   if ((xdrs->x_op == XDR_ENCODE)
@@ -178,7 +178,7 @@ _DEFUN (xdr_long, (xdrs, lp),
  */
 bool_t
 _DEFUN (xdr_u_long, (xdrs, ulp),
-        XDR * xdrs _AND
+        XDR * xdrs,
 	u_long * ulp)
 {
   switch (xdrs->x_op)
@@ -209,7 +209,7 @@ _DEFUN (xdr_u_long, (xdrs, ulp),
  */
 bool_t
 _DEFUN (xdr_int32_t, (xdrs, int32_p),
-        XDR * xdrs _AND
+        XDR * xdrs,
 	int32_t * int32_p)
 {
   switch (xdrs->x_op)
@@ -231,7 +231,7 @@ _DEFUN (xdr_int32_t, (xdrs, int32_p),
  */
 bool_t
 _DEFUN (xdr_u_int32_t, (xdrs, u_int32_p),
-        XDR * xdrs _AND
+        XDR * xdrs,
 	u_int32_t * u_int32_p)
 {
   switch (xdrs->x_op)
@@ -253,7 +253,7 @@ _DEFUN (xdr_u_int32_t, (xdrs, u_int32_p),
  */
 bool_t
 _DEFUN (xdr_uint32_t, (xdrs, uint32_p),
-        XDR * xdrs _AND
+        XDR * xdrs,
 	uint32_t * uint32_p)
 {
   switch (xdrs->x_op)
@@ -275,7 +275,7 @@ _DEFUN (xdr_uint32_t, (xdrs, uint32_p),
  */
 bool_t
 _DEFUN (xdr_short, (xdrs, sp),
-        XDR * xdrs _AND
+        XDR * xdrs,
 	short * sp)
 {
   long l;
@@ -303,7 +303,7 @@ _DEFUN (xdr_short, (xdrs, sp),
  */
 bool_t
 _DEFUN (xdr_u_short, (xdrs, usp),
-        XDR * xdrs _AND
+        XDR * xdrs,
 	u_short * usp)
 {
   long l;
@@ -332,7 +332,7 @@ _DEFUN (xdr_u_short, (xdrs, usp),
  */
 bool_t
 _DEFUN (xdr_int16_t, (xdrs, int16_p),
-        XDR * xdrs _AND
+        XDR * xdrs,
 	int16_t * int16_p)
 {
   int32_t t;
@@ -360,7 +360,7 @@ _DEFUN (xdr_int16_t, (xdrs, int16_p),
  */
 bool_t
 _DEFUN (xdr_u_int16_t, (xdrs, u_int16_p),
-        XDR * xdrs _AND
+        XDR * xdrs,
 	u_int16_t * u_int16_p)
 {
   uint32_t ut;
@@ -388,7 +388,7 @@ _DEFUN (xdr_u_int16_t, (xdrs, u_int16_p),
  */
 bool_t
 _DEFUN (xdr_uint16_t, (xdrs, uint16_p),
-        XDR * xdrs _AND
+        XDR * xdrs,
 	uint16_t * uint16_p)
 {
   uint32_t ut;
@@ -416,7 +416,7 @@ _DEFUN (xdr_uint16_t, (xdrs, uint16_p),
  */
 bool_t
 _DEFUN (xdr_int8_t, (xdrs, int8_p),
-        XDR * xdrs _AND
+        XDR * xdrs,
 	int8_t * int8_p)
 {
   int32_t t;
@@ -444,7 +444,7 @@ _DEFUN (xdr_int8_t, (xdrs, int8_p),
  */
 bool_t
 _DEFUN (xdr_u_int8_t, (xdrs, u_int8_p),
-        XDR * xdrs _AND
+        XDR * xdrs,
 	u_int8_t * u_int8_p)
 {
   uint32_t ut;
@@ -472,7 +472,7 @@ _DEFUN (xdr_u_int8_t, (xdrs, u_int8_p),
  */
 bool_t
 _DEFUN (xdr_uint8_t, (xdrs, uint8_p),
-        XDR * xdrs _AND
+        XDR * xdrs,
 	uint8_t * uint8_p)
 {
   uint32_t ut;
@@ -502,7 +502,7 @@ _DEFUN (xdr_uint8_t, (xdrs, uint8_p),
  */
 bool_t
 _DEFUN (xdr_char, (xdrs, cp),
-        XDR * xdrs _AND
+        XDR * xdrs,
 	char * cp)
 {
   int i;
@@ -519,7 +519,7 @@ _DEFUN (xdr_char, (xdrs, cp),
  */
 bool_t
 _DEFUN (xdr_u_char, (xdrs, ucp),
-        XDR * xdrs _AND
+        XDR * xdrs,
 	u_char * ucp)
 {
   u_int u;
@@ -536,7 +536,7 @@ _DEFUN (xdr_u_char, (xdrs, ucp),
  */
 bool_t
 _DEFUN (xdr_bool, (xdrs, bp),
-        XDR * xdrs _AND
+        XDR * xdrs,
 	bool_t * bp)
 {
   long lb;
@@ -564,7 +564,7 @@ _DEFUN (xdr_bool, (xdrs, bp),
  */
 bool_t
 _DEFUN (xdr_enum, (xdrs, ep),
-        XDR * xdrs _AND
+        XDR * xdrs,
 	enum_t * ep)
 {
   enum sizecheck
@@ -608,8 +608,8 @@ _DEFUN (xdr_enum, (xdrs, ep),
  */
 bool_t
 _DEFUN (xdr_opaque, (xdrs, cp, cnt),
-        XDR * xdrs _AND
-	caddr_t cp _AND
+        XDR * xdrs,
+	caddr_t cp,
 	u_int cnt)
 {
   u_int rndup;
@@ -657,9 +657,9 @@ _DEFUN (xdr_opaque, (xdrs, cp, cnt),
  */
 bool_t
 _DEFUN (xdr_bytes, (xdrs, cpp, sizep, maxsize),
-        XDR * xdrs _AND
-	char ** cpp _AND
-	u_int * sizep _AND
+        XDR * xdrs,
+	char ** cpp,
+	u_int * sizep,
 	u_int maxsize)
 {
   char *sp = *cpp;              /* sp is the actual string pointer */
@@ -712,7 +712,7 @@ _DEFUN (xdr_bytes, (xdrs, cpp, sizep, maxsize),
  */
 bool_t
 _DEFUN (xdr_netobj, (xdrs, np),
-        XDR * xdrs _AND
+        XDR * xdrs,
 	struct netobj * np)
 {
   return (xdr_bytes (xdrs, &np->n_bytes, &np->n_len, MAX_NETOBJ_SZ));
@@ -735,10 +735,10 @@ _DEFUN (xdr_netobj, (xdrs, np),
  */
 bool_t
 _DEFUN (xdr_union, (xdrs, dscmp, unp, choices, dfault),
-        XDR * xdrs _AND
-        enum_t * dscmp _AND
-        char * unp _AND
-        const struct xdr_discrim * choices _AND
+        XDR * xdrs,
+        enum_t * dscmp,
+        char * unp,
+        const struct xdr_discrim * choices,
         xdrproc_t dfault)
 {
   enum_t dscm;
@@ -784,8 +784,8 @@ _DEFUN (xdr_union, (xdrs, dscmp, unp, choices, dfault),
  */
 bool_t
 _DEFUN (xdr_string, (xdrs, cpp, maxsize),
-        XDR * xdrs _AND
-        char ** cpp _AND
+        XDR * xdrs,
+        char ** cpp,
         u_int maxsize)
 {
   char *sp = *cpp;              /* sp is the actual string pointer */
@@ -862,7 +862,7 @@ _DEFUN (xdr_string, (xdrs, cpp, maxsize),
  */
 bool_t
 _DEFUN (xdr_wrapstring, (xdrs, cpp),
-        XDR * xdrs _AND
+        XDR * xdrs,
         char ** cpp)
 {
   return xdr_string (xdrs, cpp, LASTUNSIGNED);
@@ -883,7 +883,7 @@ _DEFUN (xdr_wrapstring, (xdrs, cpp),
  */
 bool_t
 _DEFUN (xdr_int64_t, (xdrs, llp),
-        XDR * xdrs _AND
+        XDR * xdrs,
         int64_t * llp)
 {
   int32_t t1, t2;
@@ -914,7 +914,7 @@ _DEFUN (xdr_int64_t, (xdrs, llp),
  */
 bool_t
 _DEFUN (xdr_u_int64_t, (xdrs, ullp),
-        XDR * xdrs _AND
+        XDR * xdrs,
         u_int64_t * ullp)
 {
   uint32_t t1, t2;
@@ -946,7 +946,7 @@ _DEFUN (xdr_u_int64_t, (xdrs, ullp),
  */
 bool_t
 _DEFUN (xdr_uint64_t, (xdrs, ullp),
-        XDR * xdrs _AND
+        XDR * xdrs,
         uint64_t * ullp)
 {
   uint32_t t1, t2;
@@ -979,7 +979,7 @@ _DEFUN (xdr_uint64_t, (xdrs, ullp),
  */
 bool_t
 _DEFUN (xdr_hyper, (xdrs, llp),
-        XDR * xdrs _AND
+        XDR * xdrs,
         quad_t * llp)
 {
   /*
@@ -995,7 +995,7 @@ _DEFUN (xdr_hyper, (xdrs, llp),
  */
 bool_t
 _DEFUN (xdr_u_hyper, (xdrs, ullp),
-        XDR * xdrs _AND
+        XDR * xdrs,
         u_quad_t * ullp)
 {
   /*
@@ -1011,7 +1011,7 @@ _DEFUN (xdr_u_hyper, (xdrs, ullp),
  */
 bool_t
 _DEFUN (xdr_longlong_t, (xdrs, llp),
-        XDR * xdrs _AND
+        XDR * xdrs,
         quad_t * llp)
 {
   /*
@@ -1027,7 +1027,7 @@ _DEFUN (xdr_longlong_t, (xdrs, llp),
  */
 bool_t
 _DEFUN (xdr_u_longlong_t, (xdrs, ullp),
-        XDR * xdrs _AND
+        XDR * xdrs,
         u_quad_t *ullp)
 {
   /*

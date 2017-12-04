@@ -35,7 +35,7 @@
 static int
 _DEFUN (quorem,
 	(b, S),
-	_Bigint * b _AND _Bigint * S)
+	_Bigint * b, _Bigint * S)
 {
   int n;
   __Long borrow, y;
@@ -179,12 +179,12 @@ _DEFUN (quorem,
 char *
 _DEFUN (_dtoa_r,
 	(ptr, _d, mode, ndigits, decpt, sign, rve),
-	struct _reent *ptr _AND
-	double _d _AND
-	int mode _AND
-	int ndigits _AND
-	int *decpt _AND
-	int *sign _AND
+	struct _reent *ptr,
+	double _d,
+	int mode,
+	int ndigits,
+	int *decpt,
+	int *sign,
 	char **rve)
 {
   /*	Arguments ndigits, decpt, sign are similar to those

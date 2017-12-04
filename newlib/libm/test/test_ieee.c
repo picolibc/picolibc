@@ -83,7 +83,7 @@ _DEFUN_VOID(test_getroundtoi)
 
 double
  _DEFUN(dnumber,(msw, lsw),
-	int msw _AND
+	int msw,
 	int lsw)
 {
   

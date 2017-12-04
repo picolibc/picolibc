@@ -2,8 +2,8 @@
 
 char *
 _DEFUN(_user_strerror, (errnum, internal, errptr),
-       int errnum _AND
-       int internal _AND
+       int errnum,
+       int internal,
        int *errptr)
 {
   /* prevent warning about unused parameters */

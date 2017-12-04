@@ -62,8 +62,8 @@ No supporting OS subroutines are required.
 
 wchar_t *
 _DEFUN (wmemcpy, (d, s, n),
-	wchar_t *__restrict d _AND
-	_CONST wchar_t *__restrict s _AND
+	wchar_t *__restrict d,
+	_CONST wchar_t *__restrict s,
 	size_t n)
 {
 

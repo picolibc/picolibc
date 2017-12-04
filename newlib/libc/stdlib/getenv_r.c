@@ -75,8 +75,8 @@ static char ***p_environ = &environ;
 
 char *
 _DEFUN (_findenv_r, (reent_ptr, name, offset),
-        struct _reent *reent_ptr   _AND
-	register _CONST char *name _AND
+        struct _reent *reent_ptr,
+	register _CONST char *name,
 	int *offset)
 {
   register int len;
@@ -120,7 +120,7 @@ _DEFUN (_findenv_r, (reent_ptr, name, offset),
 
 char *
 _DEFUN (_getenv_r, (reent_ptr, name),
-        struct _reent *reent_ptr _AND
+        struct _reent *reent_ptr,
 	_CONST char *name)
 {
   int offset;

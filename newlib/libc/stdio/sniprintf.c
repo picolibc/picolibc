@@ -33,9 +33,9 @@
 int
 #ifdef _HAVE_STDC
 _DEFUN (_sniprintf_r, (ptr, str, size, fmt),
-	struct _reent *ptr _AND
-	char *str _AND
-	size_t size _AND
+	struct _reent *ptr,
+	char *str,
+	size_t size,
 	_CONST char *fmt _DOTS)
 #else
 _sniprintf_r (ptr, str, size, fmt, va_alist)
@@ -78,8 +78,8 @@ _sniprintf_r (ptr, str, size, fmt, va_alist)
 int
 #ifdef _HAVE_STDC
 _DEFUN (sniprintf, (str, size, fmt),
-	char *str _AND
-	size_t size _AND
+	char *str,
+	size_t size,
 	_CONST char *fmt _DOTS)
 #else
 sniprintf (str, size, fmt, va_alist)

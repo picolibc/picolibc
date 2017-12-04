@@ -47,8 +47,8 @@ QUICKREF
 
 size_t
 _DEFUN (strxfrm, (s1, s2, n),
-	char *__restrict s1 _AND
-	_CONST char *__restrict s2 _AND
+	char *__restrict s1,
+	_CONST char *__restrict s2,
 	size_t n)
 {
   size_t res;

@@ -78,7 +78,7 @@ static char sccsid[] = "%W% (Berkeley) %G%";
 /*static*/
 int
 _DEFUN(__submore, (rptr, fp),
-       struct _reent *rptr _AND
+       struct _reent *rptr,
        register FILE *fp)
 {
   register int i;
@@ -112,8 +112,8 @@ _DEFUN(__submore, (rptr, fp),
 
 int
 _DEFUN(_ungetc_r, (rptr, c, fp),
-       struct _reent *rptr _AND
-       int c               _AND
+       struct _reent *rptr,
+       int c,
        register FILE *fp)
 {
   if (c == EOF)
@@ -209,7 +209,7 @@ _DEFUN(_ungetc_r, (rptr, c, fp),
 #ifndef _REENT_ONLY
 int
 _DEFUN(ungetc, (c, fp),
-       int c               _AND
+       int c,
        register FILE *fp)
 {
   return _ungetc_r (_REENT, c, fp);

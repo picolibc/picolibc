@@ -26,8 +26,8 @@
 
 int
 _DEFUN(_asprintf_r, (ptr, strp, fmt),
-       struct _reent *ptr _AND
-       char **__restrict strp        _AND
+       struct _reent *ptr,
+       char **__restrict strp,
        const char *__restrict fmt _DOTS)
 {
   int ret;
@@ -60,7 +60,7 @@ _EXFUN(_asiprintf_r, (struct _reent *, char **, const char *, ...)
 
 int
 _DEFUN(asprintf, (strp, fmt),
-       char **__restrict strp _AND
+       char **__restrict strp,
        const char *__restrict fmt _DOTS)
 {
   int ret;

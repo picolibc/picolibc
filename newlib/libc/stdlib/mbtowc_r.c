@@ -9,10 +9,10 @@
 
 int
 _DEFUN (_mbtowc_r, (r, pwc, s, n, state),
-        struct _reent *r   _AND
-        wchar_t       *__restrict pwc _AND 
-        const char    *__restrict s   _AND        
-        size_t         n   _AND
+        struct _reent *r,
+        wchar_t       *__restrict pwc,
+        const char    *__restrict s,
+        size_t         n,
         mbstate_t      *state)
 {
   return __MBTOWC (r, pwc, s, n, state);
@@ -20,10 +20,10 @@ _DEFUN (_mbtowc_r, (r, pwc, s, n, state),
 
 int
 _DEFUN (__ascii_mbtowc, (r, pwc, s, n, state),
-        struct _reent *r       _AND
-        wchar_t       *pwc     _AND 
-        const char    *s       _AND        
-        size_t         n       _AND
+        struct _reent *r,
+        wchar_t       *pwc,
+        const char    *s,
+        size_t         n,
         mbstate_t      *state)
 {
   wchar_t dummy;
@@ -529,10 +529,10 @@ __cp_mbtowc (int val)
 
 int
 _DEFUN (__utf8_mbtowc, (r, pwc, s, n, state),
-        struct _reent *r       _AND
-        wchar_t       *pwc     _AND 
-        const char    *s       _AND        
-        size_t         n       _AND
+        struct _reent *r,
+        wchar_t       *pwc,
+        const char    *s,
+        size_t         n,
         mbstate_t      *state)
 {
   wchar_t dummy;
@@ -731,10 +731,10 @@ _DEFUN (__utf8_mbtowc, (r, pwc, s, n, state),
 #ifndef  __CYGWIN__
 int
 _DEFUN (__sjis_mbtowc, (r, pwc, s, n, state),
-        struct _reent *r       _AND
-        wchar_t       *pwc     _AND 
-        const char    *s       _AND        
-        size_t         n       _AND
+        struct _reent *r,
+        wchar_t       *pwc,
+        const char    *s,
+        size_t         n,
         mbstate_t      *state)
 {
   wchar_t dummy;
@@ -788,10 +788,10 @@ _DEFUN (__sjis_mbtowc, (r, pwc, s, n, state),
 
 int
 _DEFUN (__eucjp_mbtowc, (r, pwc, s, n, state),
-        struct _reent *r       _AND
-        wchar_t       *pwc     _AND 
-        const char    *s       _AND        
-        size_t         n       _AND
+        struct _reent *r,
+        wchar_t       *pwc,
+        const char    *s,
+        size_t         n,
         mbstate_t      *state)
 {
   wchar_t dummy;
@@ -871,10 +871,10 @@ _DEFUN (__eucjp_mbtowc, (r, pwc, s, n, state),
 
 int
 _DEFUN (__jis_mbtowc, (r, pwc, s, n, state),
-        struct _reent *r       _AND
-        wchar_t       *pwc     _AND 
-        const char    *s       _AND        
-        size_t         n       _AND
+        struct _reent *r,
+        wchar_t       *pwc,
+        const char    *s,
+        size_t         n,
         mbstate_t      *state)
 {
   wchar_t dummy;

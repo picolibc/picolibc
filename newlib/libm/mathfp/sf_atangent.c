@@ -32,9 +32,9 @@ static const float p[] = { -0.4708325141, -0.5090958253e-1 };
 
 float
 _DEFUN (atangentf, (float, float, float, int),
-        float x _AND
-        float v _AND
-        float u _AND
+        float x,
+        float v,
+        float u,
         int arctan2)
 {
   float f, g, R, P, Q, A, res;

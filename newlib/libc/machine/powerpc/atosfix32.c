@@ -9,7 +9,7 @@
 
 __int32_t
 _DEFUN (_atosfix32_r, (reent, s),
-	struct _reent *reent _AND
+	struct _reent *reent,
 	_CONST char *s)
 {
   return _strtosfix32_r (reent, s, NULL);

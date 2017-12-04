@@ -41,9 +41,9 @@ DESCRIPTION
 
 int
 _DEFUN (_fcntl_r, (ptr, fd, cmd, arg),
-     struct _reent *ptr _AND
-     int fd _AND
-     int cmd _AND
+     struct _reent *ptr,
+     int fd,
+     int cmd,
      int arg)
 {
   int ret;

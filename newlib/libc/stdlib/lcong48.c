@@ -15,7 +15,7 @@
 
 _VOID
 _DEFUN (_lcong48_r, (r, p),
-       struct _reent *r _AND
+       struct _reent *r,
        unsigned short p[7])
 {
   _REENT_CHECK_RAND48(r);

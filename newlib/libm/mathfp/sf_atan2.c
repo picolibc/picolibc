@@ -19,7 +19,7 @@
 
 float
 _DEFUN (atan2f, (float, float),
-        float v _AND
+        float v,
         float u)
 {
   return (atangentf (0.0, v, u, 1));

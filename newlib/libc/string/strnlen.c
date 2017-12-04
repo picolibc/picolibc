@@ -31,7 +31,7 @@ PORTABILITY
 
 size_t
 _DEFUN (strnlen, (str, n),
-	_CONST char *str _AND
+	_CONST char *str,
 	size_t n)
 {
   _CONST char *start = str;

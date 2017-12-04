@@ -11,7 +11,7 @@
 
 int
 _DEFUN (open, (file, flags, ...),
-        const char *file _AND
+        const char *file,
         int flags _DOTS)
 {
   va_list ap;

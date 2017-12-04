@@ -76,7 +76,7 @@ No supporting OS subroutines are required.
 
 wctrans_t
 _DEFUN (_wctrans_r, (r, c), 
-	struct _reent *r _AND
+	struct _reent *r,
 	const char *c)
 {
   if (!strcmp (c, "tolower"))

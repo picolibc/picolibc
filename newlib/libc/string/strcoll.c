@@ -37,7 +37,7 @@ QUICKREF
 
 int
 _DEFUN (strcoll, (a, b),
-	_CONST char *a _AND
+	_CONST char *a,
 	_CONST char *b)
 
 {

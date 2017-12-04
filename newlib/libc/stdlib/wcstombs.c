@@ -49,8 +49,8 @@ effects vary with the locale.
 
 size_t
 _DEFUN (wcstombs, (s, pwcs, n),
-        char          *__restrict s    _AND
-        const wchar_t *__restrict pwcs _AND
+        char          *__restrict s,
+        const wchar_t *__restrict pwcs,
         size_t         n)
 {
 #ifdef _MB_CAPABLE

@@ -24,7 +24,7 @@
 
 int
 _DEFUN(_printf_r, (ptr, fmt),
-       struct _reent *ptr _AND
+       struct _reent *ptr,
        const char *__restrict fmt _DOTS)
 {
   int ret;

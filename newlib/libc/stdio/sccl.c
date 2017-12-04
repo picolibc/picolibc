@@ -32,7 +32,7 @@
 
 u_char *
 _DEFUN(__sccl, (tab, fmt),
-       register char *tab _AND
+       register char *tab,
        register u_char *fmt)
 {
   register int c, n, v;

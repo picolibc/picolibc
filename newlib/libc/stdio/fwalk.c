@@ -29,7 +29,7 @@ static char sccsid[] = "%W% (Berkeley) %G%";
 
 int
 _DEFUN(_fwalk, (ptr, function),
-       struct _reent *ptr _AND
+       struct _reent *ptr,
        register int (*function) (FILE *))
 {
   register FILE *fp;
@@ -56,7 +56,7 @@ _DEFUN(_fwalk, (ptr, function),
    I/O function (e.g. _fclose_r).  */
 int
 _DEFUN(_fwalk_reent, (ptr, reent_function),
-       struct _reent *ptr _AND
+       struct _reent *ptr,
        register int (*reent_function) (struct _reent *, FILE *))
 {
   register FILE *fp;

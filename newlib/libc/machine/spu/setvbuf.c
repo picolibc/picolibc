@@ -51,9 +51,9 @@ typedef struct
 
 int
 _DEFUN (setvbuf, (fp, buf, mode, size),
-	FILE * fp _AND
-	char *buf _AND
-	int mode _AND
+	FILE * fp,
+	char *buf,
+	int mode,
 	size_t size)
 {
   c99_setvbuf_t args;

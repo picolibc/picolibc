@@ -77,8 +77,8 @@ No supporting OS subroutines are required.
 
 wint_t
 _DEFUN (_towctrans_r, (r, c, w), 
-	struct _reent *r _AND
-	wint_t c _AND 
+	struct _reent *r,
+	wint_t c,
 	wctrans_t w)
 {
   if (w == WCT_TOLOWER)
@@ -95,7 +95,7 @@ _DEFUN (_towctrans_r, (r, c, w),
 #ifndef _REENT_ONLY
 wint_t
 _DEFUN (towctrans, (c, w),
-	wint_t c _AND
+	wint_t c,
         wctrans_t w)
 {
   return _towctrans_r (_REENT, c, w);

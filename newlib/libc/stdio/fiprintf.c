@@ -23,8 +23,8 @@
 
 int
 _DEFUN(_fiprintf_r, (ptr, fp, fmt),
-       struct _reent *ptr _AND
-       FILE * fp _AND
+       struct _reent *ptr,
+       FILE * fp,
        const char *fmt _DOTS)
 {
   int ret;
@@ -40,7 +40,7 @@ _DEFUN(_fiprintf_r, (ptr, fp, fmt),
 
 int
 _DEFUN(fiprintf, (fp, fmt),
-       FILE * fp _AND
+       FILE * fp,
        const char *fmt _DOTS)
 {
   int ret;

@@ -10,7 +10,7 @@ int inacc;
 
 int
 _DEFUN(main,(ac, av),
-       int ac _AND
+       int ac,
        char **av)
 {
   int i;
@@ -93,7 +93,7 @@ int strtod_vector = 0;
 
 int 
 _DEFUN(bigger,(a,b),
-	   __ieee_double_shape_type *a  _AND
+	   __ieee_double_shape_type *a,
 	   __ieee_double_shape_type *b)
 {
 
@@ -117,7 +117,7 @@ _DEFUN(bigger,(a,b),
 /* Return the first bit different between two double numbers */
 int 
 _DEFUN(mag_of_error,(is, shouldbe),
-       double is _AND
+       double is,
        double shouldbe)
 {
   __ieee_double_shape_type a,b;
@@ -184,7 +184,7 @@ _DEFUN(mag_of_error,(is, shouldbe),
 
 void
 _DEFUN(test_sok,(is, shouldbe),
-       char *is _AND
+       char *is,
        char *shouldbe)
 {
   if (strcmp(is,shouldbe))
@@ -198,7 +198,7 @@ _DEFUN(test_sok,(is, shouldbe),
 }
 void
 _DEFUN(test_iok,(is, shouldbe),
-       int is _AND
+       int is,
        int shouldbe)
 {
   if (is != shouldbe){
@@ -216,8 +216,8 @@ _DEFUN(test_iok,(is, shouldbe),
 */
 void 
 _DEFUN(test_scok,(is, shouldbe, count),
-       char *is _AND
-       char *shouldbe _AND
+       char *is,
+       char *shouldbe,
        int count)
 {
   if (strncmp(is,shouldbe, count))
@@ -232,7 +232,7 @@ _DEFUN(test_scok,(is, shouldbe, count),
 
 void
 _DEFUN(test_eok,(is, shouldbe),
-       int is _AND
+       int is,
        int shouldbe)
 {
   if (is != shouldbe){
@@ -246,8 +246,8 @@ _DEFUN(test_eok,(is, shouldbe),
 
 void
 _DEFUN(test_mok,(value, shouldbe, okmag),
-       double value _AND
-       double shouldbe _AND
+       double value,
+       double shouldbe,
        int okmag)
 {
   __ieee_double_shape_type a,b;

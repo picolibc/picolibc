@@ -48,7 +48,7 @@
 #define JP_EUCJP	3
 
 static wint_t
-_DEFUN (__jp2uc, (c, type), wint_t c _AND int type)
+_DEFUN (__jp2uc, (c, type), wint_t c, int type)
 {
   int index, adj;
   unsigned char byte1, byte2;

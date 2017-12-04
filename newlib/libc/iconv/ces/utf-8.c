@@ -44,9 +44,9 @@
 #if defined (ICONV_FROM_UCS_CES_UTF_8)
 static size_t
 _DEFUN(convert_from_ucs, (data, in, outbuf, outbytesleft),
-                         _VOID_PTR data         _AND
-                         register ucs4_t in     _AND
-                         unsigned char **outbuf _AND
+                         _VOID_PTR data,
+                         register ucs4_t in,
+                         unsigned char **outbuf,
                          size_t *outbytesleft)
 {
   register unsigned char *cp;
@@ -126,8 +126,8 @@ _DEFUN(convert_from_ucs, (data, in, outbuf, outbytesleft),
 #if defined (ICONV_TO_UCS_CES_UTF_8)
 static ucs4_t
 _DEFUN(convert_to_ucs, (data, inbuf, inbytesleft),
-                       _VOID_PTR data               _AND
-                       _CONST unsigned char **inbuf _AND
+                       _VOID_PTR data,
+                       _CONST unsigned char **inbuf,
                        size_t *inbytesleft)
 {
   register _CONST unsigned char *in = *inbuf;

@@ -47,7 +47,7 @@ typedef struct
 
 int
 _DEFUN (fputs, (s, fp),
-	char _CONST *__restrict s _AND
+	char _CONST *__restrict s,
 	FILE *__restrict fp)
 {
   c99_fputs_t args;

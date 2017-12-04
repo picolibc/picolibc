@@ -427,7 +427,7 @@ Supporting OS subroutines required: <<close>>, <<fstat>>, <<isatty>>,
 #ifdef _HAVE_STDC
 int 
 _DEFUN(sscanf, (str, fmt),
-       _CONST char *__restrict str _AND
+       _CONST char *__restrict str,
        _CONST char * fmt _DOTS)
 #else
 int 
@@ -469,8 +469,8 @@ _EXFUN(siscanf, (const char *, const char *, ...)
 #ifdef _HAVE_STDC
 int 
 _DEFUN(_sscanf_r, (ptr, str, fmt), 
-       struct _reent *ptr _AND
-       _CONST char *__restrict str   _AND
+       struct _reent *ptr,
+       _CONST char *__restrict str,
        _CONST char *__restrict fmt _DOTS)
 #else
 int 

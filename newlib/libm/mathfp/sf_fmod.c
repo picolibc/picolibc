@@ -26,7 +26,7 @@ static const float one = 1.0, Zero[] = {0.0, -0.0,};
 
 float
 _DEFUN (fmodf, (float, float),
-        float x _AND
+        float x,
         float y)
 {
 	__int32_t n,hx,hy,hz,ix,iy,sx,i;

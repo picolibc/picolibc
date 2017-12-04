@@ -14,7 +14,7 @@
 
 int
 _DEFUN(execlp, (path, arg0, ...),
-      _CONST char *path _AND
+      _CONST char *path,
       _CONST char *arg0 _DOTS)
 
 #else
@@ -23,8 +23,8 @@ _DEFUN(execlp, (path, arg0, ...),
 
 int
 _DEFUN(execlp, (path, arg0, va_alist),
-     _CONST char *path _AND
-     _CONST char *arg0 _AND
+     _CONST char *path,
+     _CONST char *arg0,
      va_dcl)
 
 #endif

@@ -227,8 +227,8 @@ static void * get_arg (int, va_list *, int *, void **);
 
 int
 _DEFUN(VFWSCANF, (fp, fmt, ap),
-       register FILE *__restrict fp _AND
-       _CONST wchar_t *__restrict fmt _AND
+       register FILE *__restrict fp,
+       _CONST wchar_t *__restrict fmt,
        va_list ap)
 {
   struct _reent *reent = _REENT;
@@ -239,8 +239,8 @@ _DEFUN(VFWSCANF, (fp, fmt, ap),
 
 int
 _DEFUN(__SVFWSCANF, (fp, fmt0, ap),
-       register FILE *fp _AND
-       wchar_t _CONST *fmt0 _AND
+       register FILE *fp,
+       wchar_t _CONST *fmt0,
        va_list ap)
 {
   return __SVFWSCANF_R (_REENT, fp, fmt0, ap);
@@ -250,9 +250,9 @@ _DEFUN(__SVFWSCANF, (fp, fmt0, ap),
 
 int
 _DEFUN(_VFWSCANF_R, (data, fp, fmt, ap),
-       struct _reent *data _AND
-       register FILE *fp   _AND
-       _CONST wchar_t *fmt    _AND
+       struct _reent *data,
+       register FILE *fp,
+       _CONST wchar_t *fmt,
        va_list ap)
 {
   CHECK_INIT(data, fp);
@@ -266,8 +266,8 @@ _DEFUN(_VFWSCANF_R, (data, fp, fmt, ap),
  * So, we create our own trimmed-down version.  */
 static wint_t
 _DEFUN(_sungetwc_r, (data, fp, ch),
-	struct _reent *data _AND
-	wint_t wc           _AND
+	struct _reent *data,
+	wint_t wc,
 	register FILE *fp)
 {
   if (wc == WEOF)
@@ -326,7 +326,7 @@ extern int __ssrefill_r _PARAMS ((struct _reent *ptr, register FILE * fp));
 
 static size_t
 _DEFUN(_sfgetwc_r, (ptr, fp),
-       struct _reent * ptr _AND
+       struct _reent * ptr,
        FILE * fp)
 {
   wchar_t wc;
@@ -342,9 +342,9 @@ _DEFUN(_sfgetwc_r, (ptr, fp),
 
 int
 _DEFUN(__SVFWSCANF_R, (rptr, fp, fmt0, ap),
-       struct _reent *rptr _AND
-       register FILE *fp   _AND
-       wchar_t _CONST *fmt0   _AND
+       struct _reent *rptr,
+       register FILE *fp,
+       wchar_t _CONST *fmt0,
        va_list ap)
 {
   register wchar_t *fmt = (wchar_t *) fmt0;

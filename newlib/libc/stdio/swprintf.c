@@ -554,9 +554,9 @@ Supporting OS subroutines required: <<close>>, <<fstat>>, <<isatty>>,
 
 int
 _DEFUN(_swprintf_r, (ptr, str, size, fmt),
-       struct _reent *ptr _AND
-       wchar_t *str          _AND
-       size_t size        _AND
+       struct _reent *ptr,
+       wchar_t *str,
+       size_t size,
        _CONST wchar_t *fmt _DOTS)
 {
   int ret;
@@ -595,8 +595,8 @@ _DEFUN(_swprintf_r, (ptr, str, size, fmt),
 
 int
 _DEFUN(swprintf, (str, size, fmt),
-       wchar_t *__restrict str   _AND
-       size_t size _AND
+       wchar_t *__restrict str,
+       size_t size,
        _CONST wchar_t *__restrict fmt _DOTS)
 {
   int ret;

@@ -94,9 +94,9 @@ Supporting OS subroutines required: <<close>>, <<fstat>>, <<isatty>>,
 
 int
 _DEFUN(_fseeko_r, (ptr, fp, offset, whence),
-       struct _reent *ptr _AND
-       register FILE *fp  _AND
-       _off_t offset      _AND
+       struct _reent *ptr,
+       register FILE *fp,
+       _off_t offset,
        int whence)
 {
   _fpos_t _EXFNPTR(seekfn, (struct _reent *, _PTR, _fpos_t, int));
@@ -360,8 +360,8 @@ dumb:
 
 int
 _DEFUN(fseeko, (fp, offset, whence),
-       register FILE *fp _AND
-       _off_t offset     _AND
+       register FILE *fp,
+       _off_t offset,
        int whence)
 {
   return _fseeko_r (_REENT, fp, offset, whence);

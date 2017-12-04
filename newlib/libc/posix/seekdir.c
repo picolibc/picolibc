@@ -47,7 +47,7 @@ static char sccsid[] = "@(#)seekdir.c	5.7 (Berkeley) 6/1/90";
  */
 void
 _DEFUN(seekdir, (dirp, loc),
-	DIR *dirp _AND
+	DIR *dirp,
 	long loc)
 {
 #ifdef HAVE_DD_LOCK

@@ -51,7 +51,7 @@ _DEFUN(matherr,(e),
 
 
 void _DEFUN(translate_to,(file,r),
-	    FILE *file _AND
+	    FILE *file,
 	    double r)
 {
   __ieee_double_shape_type bits;
@@ -61,10 +61,10 @@ void _DEFUN(translate_to,(file,r),
 
 int 
 _DEFUN(ffcheck,( is, p, name, serrno, merror),
-       double is _AND
-       one_line_type *p _AND
-       char *name _AND
-       int serrno _AND
+       double is,
+       one_line_type *p,
+       char *name,
+       int serrno,
        int merror)
 {
   /* Make sure the answer isn't to far wrong from the correct value */
@@ -109,7 +109,7 @@ _DEFUN(ffcheck,( is, p, name, serrno, merror),
 
 double
 _DEFUN(thedouble, (msw, lsw),
-       long msw _AND
+       long msw,
        long lsw)
 {
   __ieee_double_shape_type x;
@@ -124,13 +124,13 @@ int reduce;
 
 
 _DEFUN(frontline,(f, mag, p, result, merror, errno, args, name),
-       FILE *f _AND
-       int mag _AND
-       one_line_type *p _AND
-       double result _AND
-       int merror _AND
-       int errno _AND
-       char *args _AND
+       FILE *f,
+       int mag,
+       one_line_type *p,
+       double result,
+       int merror,
+       int errno,
+       char *args,
        char *name)
 {
   if (reduce && p->error_bit < mag) 
@@ -177,11 +177,11 @@ _DEFUN(frontline,(f, mag, p, result, merror, errno, args, name),
 }
 
 _DEFUN(finish,(f, vector,  result , p, args, name),
-       FILE *f _AND
-       int vector _AND
-       double result _AND
-       one_line_type *p _AND
-       char *args _AND
+       FILE *f,
+       int vector,
+       double result,
+       one_line_type *p,
+       char *args,
        char *name)
 {
   int mag;
@@ -195,10 +195,10 @@ _DEFUN(finish,(f, vector,  result , p, args, name),
 int redo;  
 
 _DEFUN(run_vector_1,(vector, p, func, name, args),
-       int vector _AND
-       one_line_type *p _AND
-       char *func _AND
-       char *name _AND
+       int vector,
+       one_line_type *p,
+       char *func,
+       char *name,
        char *args)
 {
   FILE *f;

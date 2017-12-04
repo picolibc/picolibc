@@ -24,8 +24,8 @@ const void * const __cxa_atexit_dummy = &__on_exit_args;
 int
 _DEFUN (__cxa_atexit,
 	(fn, arg, d),
-	void (*fn) (void *) _AND
-	void *arg _AND
+	void (*fn) (void *),
+	void *arg,
 	void *d)
 {
 #ifdef _LITE_EXIT

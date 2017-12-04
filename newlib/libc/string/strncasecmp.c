@@ -38,8 +38,8 @@ QUICKREF
 
 int 
 _DEFUN (strncasecmp, (s1, s2, n),
-	_CONST char *s1 _AND
-	_CONST char *s2 _AND
+	_CONST char *s1,
+	_CONST char *s2,
 	size_t n)
 {
   int d = 0;

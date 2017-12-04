@@ -170,11 +170,11 @@ bool_t _EXFUN (__xdrrec_setnonblock, (XDR *, int));
  */
 void
 _DEFUN (xdrrec_create, (xdrs, sendsize, recvsize, tcp_handle, readit, writeit),
-        XDR * xdrs _AND
-	u_int sendsize _AND
-	u_int recvsize _AND
-	void *tcp_handle _AND
-        int _EXPARM (readit, (void *, void *, int)) _AND
+        XDR * xdrs,
+	u_int sendsize,
+	u_int recvsize,
+	void *tcp_handle,
+        int _EXPARM (readit, (void *, void *, int)),
         int _EXPARM (writeit, (void *, void *, int)))
 {
   RECSTREAM *rstrm;
@@ -262,7 +262,7 @@ _DEFUN (xdrrec_create, (xdrs, sendsize, recvsize, tcp_handle, readit, writeit),
 
 static bool_t
 _DEFUN (xdrrec_getlong, (xdrs, lp),
-        XDR * xdrs _AND
+        XDR * xdrs,
 	long *lp)
 {
   RECSTREAM *rstrm = (RECSTREAM *) (xdrs->x_private);
@@ -289,7 +289,7 @@ _DEFUN (xdrrec_getlong, (xdrs, lp),
 
 static bool_t
 _DEFUN (xdrrec_putlong, (xdrs, lp),
-        XDR * xdrs _AND
+        XDR * xdrs,
 	_CONST long *lp)
 {
   RECSTREAM *rstrm = (RECSTREAM *) (xdrs->x_private);
@@ -314,8 +314,8 @@ _DEFUN (xdrrec_putlong, (xdrs, lp),
 
 static bool_t                   /* must manage buffers, fragments, and records */
 _DEFUN (xdrrec_getbytes, (xdrs, addr, len),
-        XDR * xdrs _AND
-	char *addr _AND
+        XDR * xdrs,
+	char *addr,
 	u_int len)
 {
   RECSTREAM *rstrm = (RECSTREAM *) (xdrs->x_private);
@@ -344,8 +344,8 @@ _DEFUN (xdrrec_getbytes, (xdrs, addr, len),
 
 static bool_t
 _DEFUN (xdrrec_putbytes, (xdrs, addr, len),
-        XDR * xdrs _AND
-        _CONST char *addr _AND
+        XDR * xdrs,
+        _CONST char *addr,
 	u_int len)
 {
   RECSTREAM *rstrm = (RECSTREAM *) (xdrs->x_private);
@@ -399,7 +399,7 @@ _DEFUN (xdrrec_getpos, (xdrs),
 
 static bool_t
 _DEFUN (xdrrec_setpos, (xdrs, pos),
-        XDR * xdrs _AND
+        XDR * xdrs,
 	u_int pos)
 {
   RECSTREAM *rstrm = (RECSTREAM *) xdrs->x_private;
@@ -440,7 +440,7 @@ _DEFUN (xdrrec_setpos, (xdrs, pos),
 
 static int32_t *
 _DEFUN (xdrrec_inline, (xdrs, len),
-        XDR * xdrs _AND
+        XDR * xdrs,
 	u_int len)
 {
   RECSTREAM *rstrm = (RECSTREAM *) xdrs->x_private;
@@ -494,7 +494,7 @@ _DEFUN (xdrrec_destroy, (xdrs),
 
 static bool_t
 _DEFUN (xdrrec_getint32, (xdrs, ip),
-        XDR *xdrs _AND
+        XDR *xdrs,
 	int32_t *ip)
 {
   RECSTREAM *rstrm = (RECSTREAM *) (xdrs->x_private);
@@ -521,7 +521,7 @@ _DEFUN (xdrrec_getint32, (xdrs, ip),
 
 static bool_t
 _DEFUN (xdrrec_putint32, (xdrs, ip),
-        XDR *xdrs _AND
+        XDR *xdrs,
 	_CONST int32_t *ip)
 {
   RECSTREAM *rstrm = (RECSTREAM *) (xdrs->x_private);
@@ -618,7 +618,7 @@ _DEFUN (xdrrec_eof, (xdrs),
  */
 bool_t
 _DEFUN (xdrrec_endofrecord, (xdrs, sendnow),
-        XDR * xdrs _AND
+        XDR * xdrs,
 	bool_t sendnow)
 {
   RECSTREAM *rstrm = (RECSTREAM *) (xdrs->x_private);
@@ -645,8 +645,8 @@ _DEFUN (xdrrec_endofrecord, (xdrs, sendnow),
  */
 bool_t
 _DEFUN (__xdrrec_getrec, (xdrs, statp, expectdata),
-        XDR * xdrs _AND
-	enum xprt_stat * statp _AND
+        XDR * xdrs,
+	enum xprt_stat * statp,
 	bool_t expectdata)
 {
   RECSTREAM *rstrm = (RECSTREAM *) (xdrs->x_private);
@@ -738,7 +738,7 @@ _DEFUN (__xdrrec_getrec, (xdrs, statp, expectdata),
 
 bool_t
 _DEFUN (__xdrrec_setnonblock, (xdrs, maxrec),
-        XDR * xdrs _AND
+        XDR * xdrs,
 	int maxrec)
 {
   RECSTREAM *rstrm = (RECSTREAM *) (xdrs->x_private);
@@ -755,7 +755,7 @@ _DEFUN (__xdrrec_setnonblock, (xdrs, maxrec),
  */
 static bool_t
 _DEFUN (flush_out, (rstrm, eor),
-        RECSTREAM * rstrm _AND
+        RECSTREAM * rstrm,
 	bool_t eor)
 {
   u_int32_t eormask = (eor == TRUE) ? LAST_FRAG : 0;
@@ -799,8 +799,8 @@ _DEFUN (fill_input_buf, (rstrm),
 
 static bool_t                   /* knows nothing about records!  Only about input buffers */
 _DEFUN (get_input_bytes, (rstrm, addr, len),
-        RECSTREAM * rstrm _AND
-	char *addr _AND
+        RECSTREAM * rstrm,
+	char *addr,
 	size_t len)
 {
   size_t current;
@@ -861,7 +861,7 @@ _DEFUN (set_input_fragment, (rstrm),
 
 static bool_t                   /* consumes input bytes; knows nothing about records! */
 _DEFUN (skip_input_bytes, (rstrm, cnt),
-        RECSTREAM * rstrm _AND
+        RECSTREAM * rstrm,
 	long cnt)
 {
   size_t current;
@@ -898,7 +898,7 @@ _DEFUN (fix_buf_size, (s),
  */
 static bool_t
 _DEFUN (realloc_stream, (rstrm, size),
-        RECSTREAM * rstrm _AND
+        RECSTREAM * rstrm,
 	int size)
 {
   ptrdiff_t diff;

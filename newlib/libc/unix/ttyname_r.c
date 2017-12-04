@@ -45,8 +45,8 @@
  */
 int
 _DEFUN( ttyname_r,(fd, name, namesize),
-	int fd _AND
-	char   *name _AND
+	int fd,
+	char   *name,
 	size_t  namesize)
 {
   struct stat sb;

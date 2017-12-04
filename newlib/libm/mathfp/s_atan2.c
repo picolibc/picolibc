@@ -70,7 +70,7 @@ PORTABILITY
 
 double
 _DEFUN (atan2, (double, double),
-        double v _AND
+        double v,
         double u)
 {
   return (atangent (0.0, v, u, 1));

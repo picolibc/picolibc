@@ -60,9 +60,9 @@
  */
 _CONST char *
 _DEFUN(_iconv_nls_construct_filename, (rptr, file, ext),
-                                      struct _reent *rptr _AND
-                                      _CONST char *file   _AND
-                                      _CONST char *dir    _AND
+                                      struct _reent *rptr,
+                                      _CONST char *file,
+                                      _CONST char *dir,
                                       _CONST char *ext)
 {
   int len1, len2, len3;
@@ -115,7 +115,7 @@ _DEFUN(_iconv_nls_construct_filename, (rptr, file, ext),
  */
 int
 _DEFUN(_iconv_nls_get_mb_cur_max, (cd, direction),
-                                  iconv_t cd _AND
+                                  iconv_t cd,
                                   int direction)
 {
   iconv_conversion_t *ic = (iconv_conversion_t *)cd;
@@ -138,7 +138,7 @@ _DEFUN(_iconv_nls_get_mb_cur_max, (cd, direction),
  */
 int
 _DEFUN(_iconv_nls_is_stateful, (cd, direction),
-                               iconv_t cd _AND
+                               iconv_t cd,
                                int direction)
 {
   iconv_conversion_t *ic = (iconv_conversion_t *)cd;
@@ -167,11 +167,11 @@ _DEFUN(_iconv_nls_is_stateful, (cd, direction),
  */
 size_t
 _DEFUN(_iconv_nls_conv, (rptr, cd, inbuf, inbytesleft, outbuf, outbytesleft),
-                        struct _reent *rptr _AND
-                        iconv_t cd          _AND
-                        _CONST char **inbuf _AND
-                        size_t *inbytesleft _AND
-                        char **outbuf       _AND
+                        struct _reent *rptr,
+                        iconv_t cd,
+                        _CONST char **inbuf,
+                        size_t *inbytesleft,
+                        char **outbuf,
                         size_t *outbytesleft)
 {
   iconv_conversion_t *ic = (iconv_conversion_t *)cd;
@@ -221,8 +221,8 @@ _DEFUN(_iconv_nls_conv, (rptr, cd, inbuf, inbytesleft, outbuf, outbytesleft),
  */
 _VOID
 _DEFUN(_iconv_nls_get_state, (cd, ps, direction),
-                             iconv_t cd    _AND
-                             mbstate_t *ps _AND
+                             iconv_t cd,
+                             mbstate_t *ps,
                              int direction)
 {
   iconv_conversion_t *ic = (iconv_conversion_t *)cd;
@@ -248,8 +248,8 @@ _DEFUN(_iconv_nls_get_state, (cd, ps, direction),
  */
 int
 _DEFUN(_iconv_nls_set_state, (cd, ps, direction),
-                             iconv_t cd    _AND
-                             mbstate_t *ps _AND
+                             iconv_t cd,
+                             mbstate_t *ps,
                              int direction)
 {
   iconv_conversion_t *ic = (iconv_conversion_t *)cd;
@@ -260,8 +260,8 @@ _DEFUN(_iconv_nls_set_state, (cd, ps, direction),
 /* Same as iconv_open() but don't perform name resolving */
 static iconv_t
 _DEFUN(iconv_open1, (rptr, to, from),
-                     struct _reent *rptr _AND
-                     _CONST char *to     _AND
+                     struct _reent *rptr,
+                     _CONST char *to,
                      _CONST char *from)
 {
   iconv_conversion_t *ic;
@@ -317,10 +317,10 @@ _DEFUN(iconv_open1, (rptr, to, from),
  */
 int
 _DEFUN(_iconv_nls_open, (rptr, encoding, towc, tomb),
-                        struct _reent *rptr   _AND
-                        _CONST char *encoding _AND
-                        iconv_t *tomb         _AND
-                        iconv_t *towc         _AND
+                        struct _reent *rptr,
+                        _CONST char *encoding,
+                        iconv_t *tomb,
+                        iconv_t *towc,
                         int flag)
 {
   _CONST char *wchar_encoding;

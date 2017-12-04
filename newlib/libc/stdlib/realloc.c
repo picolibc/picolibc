@@ -12,7 +12,7 @@ int _dummy_realloc = 1;
 
 _PTR
 _DEFUN (realloc, (ap, nbytes),
-	_PTR ap _AND
+	_PTR ap,
 	size_t nbytes)
 {
   return _realloc_r (_REENT, ap, nbytes);

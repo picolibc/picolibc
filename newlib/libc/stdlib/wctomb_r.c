@@ -8,9 +8,9 @@
 
 int
 _DEFUN (_wctomb_r, (r, s, wchar, state),
-        struct _reent *r     _AND 
-        char          *s     _AND
-        wchar_t        _wchar _AND
+        struct _reent *r,
+        char          *s,
+        wchar_t        _wchar,
         mbstate_t     *state)
 {
   return __WCTOMB (r, s, _wchar, state);
@@ -18,9 +18,9 @@ _DEFUN (_wctomb_r, (r, s, wchar, state),
 
 int
 _DEFUN (__ascii_wctomb, (r, s, wchar, state),
-        struct _reent *r       _AND 
-        char          *s       _AND
-        wchar_t        _wchar  _AND
+        struct _reent *r,
+        char          *s,
+        wchar_t        _wchar,
         mbstate_t     *state)
 {
   /* Avoids compiler warnings about comparisons that are always false
@@ -51,9 +51,9 @@ _DEFUN (__ascii_wctomb, (r, s, wchar, state),
 
 int
 _DEFUN (__utf8_wctomb, (r, s, wchar, state),
-        struct _reent *r       _AND 
-        char          *s       _AND
-        wchar_t        _wchar  _AND
+        struct _reent *r,
+        char          *s,
+        wchar_t        _wchar,
         mbstate_t     *state)
 {
   wint_t wchar = _wchar;
@@ -145,9 +145,9 @@ _DEFUN (__utf8_wctomb, (r, s, wchar, state),
 #ifndef __CYGWIN__
 int
 _DEFUN (__sjis_wctomb, (r, s, wchar, state),
-        struct _reent *r       _AND 
-        char          *s       _AND
-        wchar_t        _wchar  _AND
+        struct _reent *r,
+        char          *s,
+        wchar_t        _wchar,
         mbstate_t     *state)
 {
   wint_t wchar = _wchar;
@@ -179,9 +179,9 @@ _DEFUN (__sjis_wctomb, (r, s, wchar, state),
 
 int
 _DEFUN (__eucjp_wctomb, (r, s, wchar, state),
-        struct _reent *r       _AND 
-        char          *s       _AND
-        wchar_t        _wchar  _AND
+        struct _reent *r,
+        char          *s,
+        wchar_t        _wchar,
         mbstate_t     *state)
 {
   wint_t wchar = _wchar;
@@ -219,9 +219,9 @@ _DEFUN (__eucjp_wctomb, (r, s, wchar, state),
 
 int
 _DEFUN (__jis_wctomb, (r, s, wchar, state),
-        struct _reent *r       _AND 
-        char          *s       _AND
-        wchar_t        _wchar  _AND
+        struct _reent *r,
+        char          *s,
+        wchar_t        _wchar,
         mbstate_t     *state)
 {
   wint_t wchar = _wchar;

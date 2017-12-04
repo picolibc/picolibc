@@ -272,8 +272,8 @@ static char *cvt_ufix64 _PARAMS((struct _reent *, unsigned long long, int,  int 
 
 int 
 _DEFUN (VFPRINTF, (fp, fmt0, ap),
-	FILE * fp _AND
-	_CONST char *fmt0 _AND
+	FILE * fp,
+	_CONST char *fmt0,
 	va_list ap)
 {
   CHECK_INIT (_REENT, fp);
@@ -282,9 +282,9 @@ _DEFUN (VFPRINTF, (fp, fmt0, ap),
 
 int 
 _DEFUN (_VFPRINTF_R, (data, fp, fmt0, ap),
-	struct _reent *data _AND
-	FILE * fp _AND
-	_CONST char *fmt0 _AND
+	struct _reent *data,
+	FILE * fp,
+	_CONST char *fmt0,
 	va_list ap)
 {
 	register char *fmt;	/* format string */

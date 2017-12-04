@@ -20,7 +20,7 @@ int _DEFUN(_getpid,(),)
 }
 
 int _DEFUN(_kill,(pid, sig),
-	   int pid _AND
+	   int pid,
 	   int sig)
 {
   if (sig == SIGABRT)

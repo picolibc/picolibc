@@ -52,7 +52,7 @@
 
 static _VOID_PTR
 _DEFUN(ucs_4_init, (rptr, encoding),
-                   struct _reent *rptr _AND
+                   struct _reent *rptr,
                    _CONST char *encoding)
 {
   int *data;
@@ -70,7 +70,7 @@ _DEFUN(ucs_4_init, (rptr, encoding),
 
 static size_t
 _DEFUN(ucs_4_close, (rptr, data),
-                    struct _reent *rptr _AND
+                    struct _reent *rptr,
                     _VOID_PTR data)
 {
   _free_r(rptr, data);
@@ -81,9 +81,9 @@ _DEFUN(ucs_4_close, (rptr, data),
 #if defined (ICONV_FROM_UCS_CES_UCS_4)
 static size_t
 _DEFUN(ucs_4_convert_from_ucs, (data, in, outbuf, outbytesleft),
-                               _VOID_PTR data         _AND
-                               ucs4_t in              _AND
-                               unsigned char **outbuf _AND
+                               _VOID_PTR data,
+                               ucs4_t in,
+                               unsigned char **outbuf,
                                size_t *outbytesleft)
 {
   if ((in  >= 0x0000D800 && in <= 0x0000DFFF) /* Surrogate character */
@@ -108,8 +108,8 @@ _DEFUN(ucs_4_convert_from_ucs, (data, in, outbuf, outbytesleft),
 #if defined (ICONV_TO_UCS_CES_UCS_4)
 static ucs4_t
 _DEFUN(ucs_4_convert_to_ucs, (data, inbuf, inbytesleft),
-                             _VOID_PTR data               _AND
-                             _CONST unsigned char **inbuf _AND
+                             _VOID_PTR data,
+                             _CONST unsigned char **inbuf,
                              size_t *inbytesleft)
 {
   ucs4_t res;

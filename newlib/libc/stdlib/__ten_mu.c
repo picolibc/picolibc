@@ -10,7 +10,7 @@
 
 int
 _DEFUN (__ten_mul, (acc, digit),
-	double *acc _AND
+	double *acc,
 	int digit)
 {
   /*

@@ -59,8 +59,8 @@ QUICKREF
 
 char *
 _DEFUN (strncat, (s1, s2, n),
-	char *__restrict s1 _AND
-	_CONST char *__restrict s2 _AND
+	char *__restrict s1,
+	_CONST char *__restrict s2,
 	size_t n)
 {
 #if defined(PREFER_SIZE_OVER_SPEED) || defined(__OPTIMIZE_SIZE__)

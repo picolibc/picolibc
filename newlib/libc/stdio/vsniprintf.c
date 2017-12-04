@@ -33,9 +33,9 @@ static char sccsid[] = "%W% (Berkeley) %G%";
 
 int
 _DEFUN(vsniprintf, (str, size, fmt, ap),
-       char *str        _AND
-       size_t size      _AND
-       const char *fmt _AND
+       char *str,
+       size_t size,
+       const char *fmt,
        va_list ap)
 {
   return _vsniprintf_r (_REENT, str, size, fmt, ap);
@@ -45,10 +45,10 @@ _DEFUN(vsniprintf, (str, size, fmt, ap),
 
 int
 _DEFUN(_vsniprintf_r, (ptr, str, size, fmt, ap),
-       struct _reent *ptr _AND
-       char *str          _AND
-       size_t size        _AND
-       const char *fmt   _AND
+       struct _reent *ptr,
+       char *str,
+       size_t size,
+       const char *fmt,
        va_list ap)
 {
   int ret;

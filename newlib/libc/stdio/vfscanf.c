@@ -225,8 +225,8 @@ typedef unsigned long long u_long_long;
 
 int
 _DEFUN(VFSCANF, (fp, fmt, ap),
-       register FILE *fp _AND
-       _CONST char *fmt _AND
+       register FILE *fp,
+       _CONST char *fmt,
        va_list ap)
 {
   struct _reent *reent = _REENT;
@@ -237,8 +237,8 @@ _DEFUN(VFSCANF, (fp, fmt, ap),
 
 int
 _DEFUN(__SVFSCANF, (fp, fmt0, ap),
-       register FILE *fp _AND
-       char _CONST *fmt0 _AND
+       register FILE *fp,
+       char _CONST *fmt0,
        va_list ap)
 {
   return __SVFSCANF_R (_REENT, fp, fmt0, ap);
@@ -248,9 +248,9 @@ _DEFUN(__SVFSCANF, (fp, fmt0, ap),
 
 int
 _DEFUN(_VFSCANF_R, (data, fp, fmt, ap),
-       struct _reent *data _AND
-       register FILE *fp   _AND
-       _CONST char *fmt    _AND
+       struct _reent *data,
+       register FILE *fp,
+       _CONST char *fmt,
        va_list ap)
 {
   CHECK_INIT(data, fp);
@@ -264,8 +264,8 @@ _DEFUN(_VFSCANF_R, (data, fp, fmt, ap),
  * So, we create our own trimmed-down version.  */
 int
 _DEFUN(_sungetc_r, (data, fp, ch),
-	struct _reent *data _AND
-	int c               _AND
+	struct _reent *data,
+	int c,
 	register FILE *fp)
 {
   if (c == EOF)
@@ -322,7 +322,7 @@ _DEFUN(_sungetc_r, (data, fp, ch),
 /* String only version of __srefill_r for sscanf family.  */
 int
 _DEFUN(__ssrefill_r, (ptr, fp),
-       struct _reent * ptr _AND
+       struct _reent * ptr,
        register FILE * fp)
 {
   /*
@@ -348,10 +348,10 @@ _DEFUN(__ssrefill_r, (ptr, fp),
 
 size_t
 _DEFUN(_sfread_r, (ptr, buf, size, count, fp),
-       struct _reent * ptr _AND
-       _PTR buf _AND
-       size_t size _AND
-       size_t count _AND
+       struct _reent * ptr,
+       _PTR buf,
+       size_t size,
+       size_t count,
        FILE * fp)
 {
   register size_t resid;
@@ -403,9 +403,9 @@ __wctob (struct _reent *rptr, wint_t wc)
 
 int
 _DEFUN(__SVFSCANF_R, (rptr, fp, fmt0, ap),
-       struct _reent *rptr _AND
-       register FILE *fp   _AND
-       char _CONST *fmt0   _AND
+       struct _reent *rptr,
+       register FILE *fp,
+       char _CONST *fmt0,
        va_list ap)
 {
   register u_char *fmt = (u_char *) fmt0;

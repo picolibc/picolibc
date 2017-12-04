@@ -15,7 +15,7 @@
 
 unsigned short *
 _DEFUN (_seed48_r, (r, xseed),
-       struct _reent *r _AND
+       struct _reent *r,
        unsigned short xseed[3])
 {
   static unsigned short sseed[3];

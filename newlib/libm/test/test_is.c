@@ -1934,8 +1934,8 @@ int _DEFUN(def__toupper,(i), int i) { return _toupper(i); }
 extern int inacc;
 void
 _DEFUN(test_is_set,(func, name, p),
-       int (*func)() _AND
-       char *name _AND
+       int (*func)(),
+       char *name,
        int *p)
 {
   int i;
@@ -1953,10 +1953,10 @@ _DEFUN(test_is_set,(func, name, p),
 }
 void
 _DEFUN(test_to_set,(func, name, p, low, high),
-       int (*func)() _AND
-       char *name _AND
-       int *p _AND
-       int low _AND
+       int (*func)(),
+       char *name,
+       int *p,
+       int low,
        int high)
 {
   int i;

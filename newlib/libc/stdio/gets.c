@@ -64,7 +64,7 @@ Supporting OS subroutines required: <<close>>, <<fstat>>, <<isatty>>,
 
 char *
 _DEFUN(_gets_r, (ptr, buf),
-       struct _reent *ptr _AND
+       struct _reent *ptr,
        char *buf)
 {
   register int c;

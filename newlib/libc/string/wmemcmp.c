@@ -63,8 +63,8 @@ No supporting OS subroutines are required.
 
 int
 _DEFUN (wmemcmp, (s1, s2, n),
-	_CONST wchar_t * s1 _AND
-	_CONST wchar_t * s2 _AND
+	_CONST wchar_t * s1,
+	_CONST wchar_t * s2,
 	size_t n)
 {
   size_t i;

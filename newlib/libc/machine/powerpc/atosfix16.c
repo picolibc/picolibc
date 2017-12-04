@@ -63,7 +63,7 @@ PORTABILITY
 
 __int16_t
 _DEFUN (_atosfix16_r, (reent, s),
-	struct _reent *reent _AND
+	struct _reent *reent,
 	_CONST char *s)
 {
   return _strtosfix16_r (reent, s, NULL);

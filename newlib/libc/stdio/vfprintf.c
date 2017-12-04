@@ -199,9 +199,9 @@ static char *rcsid = "$Id$";
 #ifndef _FVWRITE_IN_STREAMIO
 int
 _DEFUN(__ssputs_r, (ptr, fp, buf, len),
-       struct _reent *ptr _AND
-       FILE *fp _AND
-       _CONST char *buf _AND
+       struct _reent *ptr,
+       FILE *fp,
+       _CONST char *buf,
        size_t len)
 {
 	register int w;
@@ -268,8 +268,8 @@ err:
 
 int
 _DEFUN(__ssprint_r, (ptr, fp, uio),
-       struct _reent *ptr _AND
-       FILE *fp _AND
+       struct _reent *ptr,
+       FILE *fp,
        register struct __suio *uio)
 {
 	register size_t len;
@@ -370,9 +370,9 @@ int __ssprint_r (struct _reent *, FILE *, register struct __suio *);
 #ifndef _FVWRITE_IN_STREAMIO
 int
 _DEFUN(__sfputs_r, (ptr, fp, buf, len),
-       struct _reent *ptr _AND
-       FILE *fp _AND
-       _CONST char *buf _AND
+       struct _reent *ptr,
+       FILE *fp,
+       _CONST char *buf,
        size_t len)
 {
 	register int i;
@@ -404,8 +404,8 @@ _DEFUN(__sfputs_r, (ptr, fp, buf, len),
  */
 int
 _DEFUN(__sprint_r, (ptr, fp, uio),
-       struct _reent *ptr _AND
-       FILE *fp _AND
+       struct _reent *ptr,
+       FILE *fp,
        register struct __suio *uio)
 {
 	register int err = 0;
@@ -457,9 +457,9 @@ int __sprint_r (struct _reent *, FILE *, register struct __suio *);
  */
 _NOINLINE_STATIC int
 _DEFUN(__sbprintf, (rptr, fp, fmt, ap),
-       struct _reent *rptr _AND
-       register FILE *fp   _AND
-       _CONST char *fmt  _AND
+       struct _reent *rptr,
+       register FILE *fp,
+       _CONST char *fmt,
        va_list ap)
 {
 	int ret;
@@ -649,8 +649,8 @@ int _EXFUN(_VFPRINTF_R, (struct _reent *, FILE *, _CONST char *, va_list));
 #ifndef STRING_ONLY
 int
 _DEFUN(VFPRINTF, (fp, fmt0, ap),
-       FILE * fp         _AND
-       _CONST char *fmt0 _AND
+       FILE * fp,
+       _CONST char *fmt0,
        va_list ap)
 {
   int result;
@@ -661,9 +661,9 @@ _DEFUN(VFPRINTF, (fp, fmt0, ap),
 
 int
 _DEFUN(_VFPRINTF_R, (data, fp, fmt0, ap),
-       struct _reent *data _AND
-       FILE * fp           _AND
-       _CONST char *fmt0   _AND
+       struct _reent *data,
+       FILE * fp,
+       _CONST char *fmt0,
        va_list ap)
 {
 	register char *fmt;	/* format string */
@@ -2044,13 +2044,13 @@ _CONST __ACTION __action_table[MAX_STATE][MAX_CH_CLASS] = {
 /* function to get positional parameter N where n = N - 1 */
 static union arg_val *
 _DEFUN(get_arg, (data, n, fmt, ap, numargs_p, args, arg_type, last_fmt),
-       struct _reent *data _AND
-       int n               _AND
-       char *fmt           _AND
-       va_list *ap         _AND
-       int *numargs_p      _AND
-       union arg_val *args _AND
-       int *arg_type       _AND
+       struct _reent *data,
+       int n,
+       char *fmt,
+       va_list *ap,
+       int *numargs_p,
+       union arg_val *args,
+       int *arg_type,
        char **last_fmt)
 {
   int ch;

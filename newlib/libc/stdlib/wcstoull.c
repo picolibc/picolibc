@@ -209,9 +209,9 @@ _wcstoull_l (struct _reent *rptr, const wchar_t *nptr, wchar_t **endptr,
 
 unsigned long long
 _DEFUN (_wcstoull_r, (rptr, nptr, endptr, base),
-	struct _reent *rptr _AND
-	_CONST wchar_t *nptr _AND
-	wchar_t **endptr _AND
+	struct _reent *rptr,
+	_CONST wchar_t *nptr,
+	wchar_t **endptr,
 	int base)
 {
 	return _wcstoull_l (rptr, nptr, endptr, base, __get_current_locale ());
@@ -228,8 +228,8 @@ wcstoull_l (const wchar_t *__restrict s, wchar_t **__restrict ptr, int base,
 
 unsigned long long
 _DEFUN (wcstoull, (s, ptr, base),
-	_CONST wchar_t *__restrict s _AND
-	wchar_t **__restrict ptr _AND
+	_CONST wchar_t *__restrict s,
+	wchar_t **__restrict ptr,
 	int base)
 {
 	return _wcstoull_l (_REENT, s, ptr, base, __get_current_locale ());

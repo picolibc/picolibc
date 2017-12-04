@@ -15,9 +15,9 @@
 
 char *
 _DEFUN(_asniprintf_r, (ptr, buf, lenp, fmt),
-       struct _reent *ptr _AND
-       char *buf _AND
-       size_t *lenp _AND
+       struct _reent *ptr,
+       char *buf,
+       size_t *lenp,
        const char *fmt _DOTS)
 {
   int ret;
@@ -62,8 +62,8 @@ _DEFUN(_asniprintf_r, (ptr, buf, lenp, fmt),
 
 char *
 _DEFUN(asniprintf, (buf, lenp, fmt),
-       char *buf _AND
-       size_t *lenp _AND
+       char *buf,
+       size_t *lenp,
        const char *fmt _DOTS)
 {
   int ret;

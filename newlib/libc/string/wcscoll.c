@@ -34,7 +34,7 @@ PORTABILITY
 
 int
 _DEFUN (wcscoll, (a, b),
-	_CONST wchar_t *a _AND
+	_CONST wchar_t *a,
 	_CONST wchar_t *b)
 
 {

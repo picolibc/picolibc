@@ -66,8 +66,8 @@ a non-empty alternate string without assigning into its third argument.
    see xpg_strerror_r.c for the POSIX version.  */
 char *
 _DEFUN (strerror_r, (errnum, buffer, n),
-	int errnum _AND
-	char *buffer _AND
+	int errnum,
+	char *buffer,
 	size_t n)
 {
   char *error = _strerror_r (_REENT, errnum, 1, NULL);

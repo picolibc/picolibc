@@ -30,7 +30,7 @@
 
 int
 _DEFUN(_fgetc_unlocked_r, (ptr, fp),
-       struct _reent * ptr _AND
+       struct _reent * ptr,
        FILE * fp)
 {
   CHECK_INIT(ptr, fp);

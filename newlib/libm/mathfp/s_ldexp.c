@@ -64,7 +64,7 @@ PORTABILITY
 
 double
 _DEFUN (ldexp, (double, int),
-        double d _AND
+        double d,
         int e)
 {
   int exp;

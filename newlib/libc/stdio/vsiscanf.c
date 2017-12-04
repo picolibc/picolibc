@@ -36,8 +36,8 @@
 
 int
 _DEFUN(vsiscanf, (str, fmt, ap), 
-       _CONST char *str _AND 
-       _CONST char *fmt _AND 
+       _CONST char *str,
+       _CONST char *fmt,
        va_list ap)
 {
   return _vsiscanf_r (_REENT, str, fmt, ap);
@@ -47,9 +47,9 @@ _DEFUN(vsiscanf, (str, fmt, ap),
 
 int
 _DEFUN(_vsiscanf_r, (ptr, str, fmt, ap),
-       struct _reent *ptr _AND 
-       _CONST char *str   _AND 
-       _CONST char *fmt   _AND 
+       struct _reent *ptr,
+       _CONST char *str,
+       _CONST char *fmt,
        va_list ap)
 {
   FILE f;

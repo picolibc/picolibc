@@ -290,8 +290,8 @@ static char *currentlocale (void);
 
 char *
 _DEFUN(_setlocale_r, (p, category, locale),
-       struct _reent *p _AND
-       int category _AND
+       struct _reent *p,
+       int category,
        _CONST char *locale)
 {
 #ifndef _MB_CAPABLE
@@ -991,7 +991,7 @@ __locale_ctype_ptr (void)
 
 char *
 _DEFUN (setlocale, (category, locale),
-	int category _AND
+	int category,
 	_CONST char *locale)
 {
   return _setlocale_r (_REENT, category, locale);

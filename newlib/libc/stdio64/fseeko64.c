@@ -86,9 +86,9 @@ Supporting OS subroutines required: <<close>>, <<fstat64>>, <<isatty>>,
 
 _off64_t
 _DEFUN (_fseeko64_r, (ptr, fp, offset, whence),
-     struct _reent *ptr _AND
-     register FILE *fp _AND
-     _off64_t offset _AND
+     struct _reent *ptr,
+     register FILE *fp,
+     _off64_t offset,
      int whence)
 {
   _fpos64_t _EXFNPTR(seekfn, (struct _reent *, void *, _fpos64_t, int));
@@ -343,8 +343,8 @@ dumb:
 
 _off64_t
 _DEFUN (fseeko64, (fp, offset, whence),
-     register FILE *fp _AND
-     _off64_t offset _AND
+     register FILE *fp,
+     _off64_t offset,
      int whence)
 {
   return _fseeko64_r (_REENT, fp, offset, whence);

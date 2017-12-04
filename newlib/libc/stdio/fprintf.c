@@ -23,8 +23,8 @@
 
 int
 _DEFUN(_fprintf_r, (ptr, fp, fmt),
-       struct _reent *ptr _AND
-       FILE *__restrict fp _AND
+       struct _reent *ptr,
+       FILE *__restrict fp,
        const char *__restrict fmt _DOTS)
 {
   int ret;
@@ -46,7 +46,7 @@ _EXFUN(_fiprintf_r, (struct _reent *, FILE *, const char *, ...)
 
 int
 _DEFUN(fprintf, (fp, fmt),
-       FILE *__restrict fp _AND
+       FILE *__restrict fp,
        const char *__restrict fmt _DOTS)
 {
   int ret;

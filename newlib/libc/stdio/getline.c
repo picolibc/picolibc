@@ -38,8 +38,8 @@ extern ssize_t _EXFUN(__getdelim, (char **, size_t *, int, FILE *));
 
 ssize_t
 _DEFUN(__getline, (lptr, n, fp),
-       char **lptr _AND
-       size_t *n   _AND
+       char **lptr,
+       size_t *n,
        FILE *fp)
 {
   return __getdelim (lptr, n, '\n', fp);

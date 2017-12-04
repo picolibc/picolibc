@@ -31,7 +31,7 @@ QUICKREF
 
 char *
 _DEFUN (strrchr, (s, i),
-	_CONST char *s _AND
+	_CONST char *s,
 	int i)
 {
   _CONST char *last = NULL;

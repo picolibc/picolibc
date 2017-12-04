@@ -70,7 +70,7 @@ static char sccsid[] = "%W% (Berkeley) %G%";
 
 int
 _DEFUN(_getc_unlocked_r, (ptr, fp),
-       struct _reent *ptr _AND
+       struct _reent *ptr,
        register FILE *fp)
 {
   /* CHECK_INIT is called (eventually) by __srefill_r.  */

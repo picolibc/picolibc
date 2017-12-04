@@ -12,7 +12,7 @@ extern int errno;
 
 int
 _DEFUN (_symlink, (path1, path2),
-        const char *path1 _AND
+        const char *path1,
         const char *path2)
 {
   errno = ENOSYS;

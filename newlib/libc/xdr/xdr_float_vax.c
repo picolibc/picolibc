@@ -82,7 +82,7 @@ static struct sgl_limits
 
 bool_t
 _DEFUN (xdr_float, (xdrs, fp),
-       XDR * xdrs _AND
+       XDR * xdrs,
        float *fp)
 {
   struct ieee_single is;
@@ -185,7 +185,7 @@ static struct dbl_limits
 
 bool_t
 _DEFUN (xdr_double, (xdrs, dp),
-        XDR * xdrs _AND
+        XDR * xdrs,
 	double *dp)
 {
   int32_t *lp;

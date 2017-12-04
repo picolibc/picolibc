@@ -120,7 +120,7 @@ _DEFUN(telldir, (dirp),
  */
 void
 _DEFUN(_seekdir, (dirp, loc),
-	register DIR *dirp _AND
+	register DIR *dirp,
 	long loc)
 {
 	register struct ddloc *lp;

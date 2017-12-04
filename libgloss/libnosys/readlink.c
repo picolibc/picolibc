@@ -13,8 +13,8 @@ extern int errno;
 
 int
 _DEFUN (_readlink, (path, buf, bufsize),
-        const char *path _AND
-        char *buf _AND
+        const char *path,
+        char *buf,
         size_t bufsize)
 {
   errno = ENOSYS;

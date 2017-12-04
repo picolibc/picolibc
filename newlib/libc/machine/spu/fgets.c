@@ -47,8 +47,8 @@ typedef struct
 
 char *
 _DEFUN (fgets, (buf, n, fp),
-	char *__restrict buf _AND
-	int n _AND
+	char *__restrict buf,
+	int n,
 	FILE *__restrict fp)
 {
   c99_fgets_t args;

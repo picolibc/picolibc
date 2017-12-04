@@ -45,7 +45,7 @@ Supporting OS subroutines required: <<close>>, <<fstat>>, <<isatty>>,
 
 _PTR
 _DEFUN (vec_calloc, (n, size),
-	size_t n _AND
+	size_t n,
 	size_t size)
 {
   return _vec_calloc_r (_REENT, n, size);

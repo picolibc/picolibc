@@ -95,7 +95,7 @@ No supporting OS subroutines are required.
  */
 lldiv_t
 _DEFUN (lldiv, (number, denom), 
-       long long numer _AND long long denom)
+       long long numer, long long denom)
 {
 	lldiv_t retval;
 

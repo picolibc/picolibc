@@ -22,8 +22,8 @@
 
 static char *
 _DEFUN (strccpy, (s1, s2, c),
-	char *s1 _AND
-	char *s2 _AND
+	char *s1,
+	char *s2,
 	char c)
 {
   char *dest = s1;
@@ -37,7 +37,7 @@ _DEFUN (strccpy, (s1, s2, c),
 
 int
 _DEFUN (execvp, (file, argv),
-	_CONST char *file _AND
+	_CONST char *file,
 	char * _CONST argv[])
 {
   char *path = getenv ("PATH");

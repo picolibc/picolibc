@@ -214,9 +214,9 @@ _wcstol_l (struct _reent *rptr, const wchar_t *nptr, wchar_t **endptr,
 
 long
 _DEFUN (_wcstol_r, (rptr, nptr, endptr, base),
-	struct _reent *rptr _AND
-	_CONST wchar_t *nptr _AND
-	wchar_t **endptr _AND
+	struct _reent *rptr,
+	_CONST wchar_t *nptr,
+	wchar_t **endptr,
 	int base)
 {
 	return _wcstol_l (rptr, nptr, endptr, base, __get_current_locale ());
@@ -233,8 +233,8 @@ wcstol_l (const wchar_t *__restrict s, wchar_t **__restrict ptr, int base,
 
 long
 _DEFUN (wcstol, (s, ptr, base),
-	_CONST wchar_t *__restrict s _AND
-	wchar_t **__restrict ptr _AND
+	_CONST wchar_t *__restrict s,
+	wchar_t **__restrict ptr,
 	int base)
 {
 	return _wcstol_l (_REENT, s, ptr, base, __get_current_locale ());

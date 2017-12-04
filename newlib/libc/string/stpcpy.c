@@ -54,7 +54,7 @@ QUICKREF
 
 char*
 _DEFUN (stpcpy, (dst, src),
-	char *__restrict dst _AND
+	char *__restrict dst,
 	_CONST char *__restrict src)
 {
 #if !defined(PREFER_SIZE_OVER_SPEED) && !defined(__OPTIMIZE_SIZE__)

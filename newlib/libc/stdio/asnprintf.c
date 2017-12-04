@@ -15,9 +15,9 @@
 
 char *
 _DEFUN(_asnprintf_r, (ptr, buf, lenp, fmt),
-       struct _reent *__restrict ptr _AND
-       char *buf _AND
-       size_t *lenp _AND
+       struct _reent *__restrict ptr,
+       char *buf,
+       size_t *lenp,
        const char *__restrict fmt _DOTS)
 {
   int ret;
@@ -68,8 +68,8 @@ _EXFUN(_asniprintf_r, (struct _reent *, char *, size_t *, const char *, ...)
 
 char *
 _DEFUN(asnprintf, (buf, lenp, fmt),
-       char *__restrict buf _AND
-       size_t *__restrict lenp _AND
+       char *__restrict buf,
+       size_t *__restrict lenp,
        const char *__restrict fmt _DOTS)
 {
   int ret;

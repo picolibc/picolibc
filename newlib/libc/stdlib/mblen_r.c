@@ -42,9 +42,9 @@ effects vary with the locale.
 
 int
 _DEFUN (_mblen_r, (r, s, n, state), 
-        struct _reent *r    _AND
-        const char *s _AND
-        size_t n _AND
+        struct _reent *r,
+        const char *s,
+        size_t n,
         mbstate_t *state)
 {
 #ifdef _MB_CAPABLE

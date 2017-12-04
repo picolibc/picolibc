@@ -192,9 +192,9 @@ _strtoul_l (struct _reent *rptr, const char *__restrict nptr,
 
 unsigned long
 _DEFUN (_strtoul_r, (rptr, nptr, endptr, base),
-	struct _reent *rptr _AND
-	_CONST char *__restrict nptr _AND
-	char **__restrict endptr _AND
+	struct _reent *rptr,
+	_CONST char *__restrict nptr,
+	char **__restrict endptr,
 	int base)
 {
   return _strtoul_l (rptr, nptr, endptr, base, __get_current_locale ());
@@ -211,8 +211,8 @@ strtoul_l (const char *__restrict s, char **__restrict ptr, int base,
 
 unsigned long
 _DEFUN (strtoul, (s, ptr, base),
-	_CONST char *__restrict s _AND
-	char **__restrict ptr _AND
+	_CONST char *__restrict s,
+	char **__restrict ptr,
 	int base)
 {
 	return _strtoul_l (_REENT, s, ptr, base, __get_current_locale ());

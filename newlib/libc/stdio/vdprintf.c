@@ -14,9 +14,9 @@
 
 int
 _DEFUN(_vdprintf_r, (ptr, fd, format, ap),
-       struct _reent *ptr _AND
-       int fd _AND
-       const char *__restrict format _AND
+       struct _reent *ptr,
+       int fd,
+       const char *__restrict format,
        va_list ap)
 {
   char *p;
@@ -43,8 +43,8 @@ _EXFUN(_vdiprintf_r, (struct _reent *, int, const char *, __VALIST)
 
 int
 _DEFUN(vdprintf, (fd, format, ap),
-       int fd _AND
-       const char *__restrict format _AND
+       int fd,
+       const char *__restrict format,
        va_list ap)
 {
   return _vdprintf_r (_REENT, fd, format, ap);

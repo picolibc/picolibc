@@ -94,7 +94,7 @@
 */
 
 _Bigint *
-_DEFUN (Balloc, (ptr, k), struct _reent *ptr _AND int k)
+_DEFUN (Balloc, (ptr, k), struct _reent *ptr, int k)
 {
   int x;
   _Bigint *rv ;
@@ -133,7 +133,7 @@ _DEFUN (Balloc, (ptr, k), struct _reent *ptr _AND int k)
 }
 
 void
-_DEFUN (Bfree, (ptr, v), struct _reent *ptr _AND _Bigint * v)
+_DEFUN (Bfree, (ptr, v), struct _reent *ptr, _Bigint * v)
 {
   _REENT_CHECK_MP(ptr);
   if (v)
@@ -145,9 +145,9 @@ _DEFUN (Bfree, (ptr, v), struct _reent *ptr _AND _Bigint * v)
 
 _Bigint *
 _DEFUN (multadd, (ptr, b, m, a),
-	struct _reent *ptr _AND
-	_Bigint * b _AND
-	int m _AND
+	struct _reent *ptr,
+	_Bigint * b,
+	int m,
 	int a)
 {
   int i, wds;
@@ -192,10 +192,10 @@ _DEFUN (multadd, (ptr, b, m, a),
 
 _Bigint *
 _DEFUN (s2b, (ptr, s, nd0, nd, y9),
-	struct _reent * ptr _AND
-	_CONST char *s _AND
-	int nd0 _AND
-	int nd _AND
+	struct _reent * ptr,
+	_CONST char *s,
+	int nd0,
+	int nd,
 	__ULong y9)
 {
   _Bigint *b;
@@ -316,7 +316,7 @@ _DEFUN (lo0bits, (y), __ULong *y)
 }
 
 _Bigint *
-_DEFUN (i2b, (ptr, i), struct _reent * ptr _AND int i)
+_DEFUN (i2b, (ptr, i), struct _reent * ptr, int i)
 {
   _Bigint *b;
 
@@ -327,7 +327,7 @@ _DEFUN (i2b, (ptr, i), struct _reent * ptr _AND int i)
 }
 
 _Bigint *
-_DEFUN (mult, (ptr, a, b), struct _reent * ptr _AND _Bigint * a _AND _Bigint * b)
+_DEFUN (mult, (ptr, a, b), struct _reent * ptr, _Bigint * a, _Bigint * b)
 {
   _Bigint *c;
   int k, wa, wb, wc;
@@ -420,7 +420,7 @@ _DEFUN (mult, (ptr, a, b), struct _reent * ptr _AND _Bigint * a _AND _Bigint * b
 
 _Bigint *
 _DEFUN (pow5mult,
-	(ptr, b, k), struct _reent * ptr _AND _Bigint * b _AND int k)
+	(ptr, b, k), struct _reent * ptr, _Bigint * b, int k)
 {
   _Bigint *b1, *p5, *p51;
   int i;
@@ -459,7 +459,7 @@ _DEFUN (pow5mult,
 }
 
 _Bigint *
-_DEFUN (lshift, (ptr, b, k), struct _reent * ptr _AND _Bigint * b _AND int k)
+_DEFUN (lshift, (ptr, b, k), struct _reent * ptr, _Bigint * b, int k)
 {
   int i, k1, n, n1;
   _Bigint *b1;
@@ -519,7 +519,7 @@ _DEFUN (lshift, (ptr, b, k), struct _reent * ptr _AND _Bigint * b _AND int k)
 }
 
 int
-_DEFUN (cmp, (a, b), _Bigint * a _AND _Bigint * b)
+_DEFUN (cmp, (a, b), _Bigint * a, _Bigint * b)
 {
   __ULong *xa, *xa0, *xb, *xb0;
   int i, j;
@@ -549,8 +549,8 @@ _DEFUN (cmp, (a, b), _Bigint * a _AND _Bigint * b)
 }
 
 _Bigint *
-_DEFUN (diff, (ptr, a, b), struct _reent * ptr _AND
-	_Bigint * a _AND _Bigint * b)
+_DEFUN (diff, (ptr, a, b), struct _reent * ptr,
+	_Bigint * a, _Bigint * b)
 {
   _Bigint *c;
   int i, wa, wb;
@@ -680,7 +680,7 @@ _DEFUN (ulp, (_x), double _x)
 
 double
 _DEFUN (b2d, (a, e),
-	_Bigint * a _AND int *e)
+	_Bigint * a, int *e)
 {
   __ULong *xa, *xa0, w, y, z;
   int k;
@@ -758,9 +758,9 @@ ret_d:
 _Bigint *
 _DEFUN (d2b,
 	(ptr, _d, e, bits),
-	struct _reent * ptr _AND
-	double _d _AND
-	int *e _AND
+	struct _reent * ptr,
+	double _d,
+	int *e,
 	int *bits)
 
 {
@@ -911,7 +911,7 @@ _DEFUN (d2b,
 #undef d1
 
 double
-_DEFUN (ratio, (a, b), _Bigint * a _AND _Bigint * b)
+_DEFUN (ratio, (a, b), _Bigint * a, _Bigint * b)
 
 {
   union double_union da, db;
@@ -992,8 +992,8 @@ _DEFUN (_mprec_log10, (dig),
 
 void
 _DEFUN (copybits, (c, n, b),
-	__ULong *c _AND
-	int n _AND
+	__ULong *c,
+	int n,
 	_Bigint *b)
 {
 	__ULong *ce, *x, *xe;
@@ -1021,7 +1021,7 @@ _DEFUN (copybits, (c, n, b),
 
 __ULong
 _DEFUN (any_on, (b, k),
-	_Bigint *b _AND
+	_Bigint *b,
 	int k)
 {
 	int n, nwds;

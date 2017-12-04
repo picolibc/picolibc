@@ -51,8 +51,8 @@ extern int getdents (int fd, void *dp, int count);
  */
 int
 _DEFUN(readdir_r, (dirp, dp, dpp),
-	register DIR *__restrict dirp _AND
-	struct dirent *__restrict dp _AND
+	register DIR *__restrict dirp,
+	struct dirent *__restrict dp,
 	struct dirent **__restrict dpp) {
 
 struct dirent *tmpdp;

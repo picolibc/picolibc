@@ -32,8 +32,8 @@
 
 _PTR
 _DEFUN (_reallocf_r, (reentptr, ptr, size),
-	struct _reent *reentptr _AND
-	_PTR ptr _AND
+	struct _reent *reentptr,
+	_PTR ptr,
 	size_t size)
 {
 	void *nptr;
@@ -47,7 +47,7 @@ _DEFUN (_reallocf_r, (reentptr, ptr, size),
 #ifndef _REENT_ONLY
 _PTR
 _DEFUN (reallocf, (ptr, size),
-	_PTR ptr _AND
+	_PTR ptr,
 	size_t size)
 {
   return _reallocf_r(_REENT, ptr, size);

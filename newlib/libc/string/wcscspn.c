@@ -57,7 +57,7 @@ No supporting OS subroutines are required.
 
 size_t
 _DEFUN (wcscspn, (s, set),
-	_CONST wchar_t * s _AND
+	_CONST wchar_t * s,
 	_CONST wchar_t * set)
 {
   _CONST wchar_t *p;

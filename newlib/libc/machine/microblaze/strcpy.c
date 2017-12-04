@@ -82,7 +82,7 @@ QUICKREF
 
 char*
 _DEFUN (strcpy, (dst0, src0),
-	char *__restrict dst0 _AND
+	char *__restrict dst0,
 	_CONST char *__restrict src0)
 {
 

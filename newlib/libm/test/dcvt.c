@@ -40,8 +40,8 @@ double *value)
 
 static char *
 _DEFUN(print_nan,(buffer, value, precision),
-       char *buffer _AND
-       double value _AND
+       char *buffer,
+       double value,
        int precision)
 {
   size_t  i;
@@ -134,7 +134,7 @@ _DEFUN(renormalize,(in),
 
 static void 
 _DEFUN(normalize,(value, in),
-       double value _AND
+       double value,
        cvt_info_type *in)
 {
   int j;
@@ -196,9 +196,9 @@ _DEFUN(normalize,(value, in),
 }
 int
 _DEFUN(round,(in, start, now, ch),
-       cvt_info_type *in _AND
-       char *start _AND
-       char *now _AND
+       cvt_info_type *in,
+       char *start,
+       char *now,
        char ch)
 {
   double rounder = 5.0;
@@ -435,11 +435,11 @@ _DEFUN(_cvtf,(in),
 
 char *
 _DEFUN(_dcvt,(buffer, invalue, precision, width, type, dot),
-       char *buffer _AND
-       double invalue _AND
-       int precision _AND
-       int width _AND
-       char type _AND
+       char *buffer,
+       double invalue,
+       int precision,
+       int width,
+       char type,
        int dot)
 {
   cvt_info_type in;
@@ -534,10 +534,10 @@ _DEFUN(_dcvt,(buffer, invalue, precision, width, type, dot),
 
 char *
 _DEFUN(fcvtbuf,(invalue,ndigit,decpt,sign, fcvt_buf),
-       double invalue _AND 
-       int ndigit _AND
-       int *decpt _AND
-       int *sign _AND
+       double invalue,
+       int ndigit,
+       int *decpt,
+       int *sign,
        char *fcvt_buf)
 {
   cvt_info_type in;
@@ -564,10 +564,10 @@ _DEFUN(fcvtbuf,(invalue,ndigit,decpt,sign, fcvt_buf),
 
 char *
 _DEFUN(ecvtbuf,(invalue,ndigit,decpt,sign, fcvt_buf),
-       double invalue _AND 
-       int ndigit _AND
-       int *decpt _AND
-       int *sign _AND
+       double invalue,
+       int ndigit,
+       int *decpt,
+       int *sign,
        char *fcvt_buf)
 {
   cvt_info_type in;
@@ -597,8 +597,8 @@ _DEFUN(ecvtbuf,(invalue,ndigit,decpt,sign, fcvt_buf),
 
 char *
 _DEFUN(gcvt,(d,ndigit,buf),
-   double d _AND
-   int ndigit _AND
+   double d,
+   int ndigit,
    char *buf)
 {
   return _dcvt(buf, d, ndigit, 0, 'g', 1);

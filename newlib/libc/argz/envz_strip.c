@@ -13,7 +13,7 @@
 
 void
 _DEFUN (envz_strip, (envz, envz_len),
-       char **envz _AND
+       char **envz,
        size_t *envz_len)
 {
   char *entry = 0;

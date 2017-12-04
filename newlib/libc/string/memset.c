@@ -36,8 +36,8 @@ QUICKREF
 _PTR
 __inhibit_loop_to_libcall
 _DEFUN (memset, (m, c, n),
-	_PTR m _AND
-	int c _AND
+	_PTR m,
+	int c,
 	size_t n)
 {
   char *s = (char *) m;

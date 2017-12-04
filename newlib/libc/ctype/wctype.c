@@ -77,7 +77,7 @@ No supporting OS subroutines are required.
 
 wctype_t
 _DEFUN (_wctype_r, (r, c), 
-	struct _reent *r _AND
+	struct _reent *r,
 	const char *c)
 {
   switch (*c)

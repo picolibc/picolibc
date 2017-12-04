@@ -15,7 +15,7 @@
 
 double
 _DEFUN (_erand48_r, (r, xseed),
-       struct _reent *r _AND
+       struct _reent *r,
        unsigned short xseed[3])
 {
   __dorand48(r, xseed);

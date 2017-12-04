@@ -33,8 +33,8 @@ QUICKREF
 
 int
 _DEFUN (bcmp, (m1, m2, n),
-	_CONST void *m1 _AND
-	_CONST void *m2 _AND
+	_CONST void *m1,
+	_CONST void *m2,
 	size_t n)
 
 {

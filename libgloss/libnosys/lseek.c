@@ -12,8 +12,8 @@ extern int errno;
 
 int
 _DEFUN (_lseek, (file, ptr, dir),
-        int   file  _AND
-        int   ptr   _AND
+        int   file,
+        int   ptr,
         int   dir)
 {
   errno = ENOSYS;

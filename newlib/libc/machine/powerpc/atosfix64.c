@@ -9,7 +9,7 @@
 
 __int64_t
 _DEFUN (_atosfix64_r, (reent, s),
-	struct _reent *reent _AND
+	struct _reent *reent,
 	_CONST char *s)
 {
   return _strtosfix64_r (reent, s, NULL);

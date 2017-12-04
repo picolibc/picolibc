@@ -62,7 +62,7 @@ static char sccsid[] = "%W% (Berkeley) %G%";
 
 int
 _DEFUN(_putchar_unlocked_r, (ptr, c),
-       struct _reent *ptr _AND
+       struct _reent *ptr,
        int c)
 {
   return putc_unlocked (c, _stdout_r (ptr));

@@ -31,7 +31,7 @@ static const float b[] = { 1.570796326, 0.785398163 };
 
 float
 _DEFUN (asinef, (float, int),
-        float x _AND
+        float x,
         int acosine)
 {
   int flag, i;

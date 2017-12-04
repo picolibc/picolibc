@@ -24,7 +24,7 @@
 
 float
 _DEFUN (ldexpf, (float, int),
-        float d _AND
+        float d,
         int e)
 {
   int exp;

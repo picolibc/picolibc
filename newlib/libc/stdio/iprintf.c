@@ -43,7 +43,7 @@ _DEFUN(iprintf, (fmt),
 
 int
 _DEFUN(_iprintf_r, (ptr, fmt),
-       struct _reent *ptr _AND
+       struct _reent *ptr,
        const char *fmt _DOTS)
 {
   int ret;

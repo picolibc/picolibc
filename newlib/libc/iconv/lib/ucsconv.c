@@ -46,8 +46,8 @@ _EXFUN(find_encoding_name, (_CONST char *searchee,
 
 static _VOID_PTR
 _DEFUN(ucs_based_conversion_open, (rptr, to, from),
-                                  struct _reent *rptr _AND
-                                  _CONST char *to     _AND
+                                  struct _reent *rptr,
+                                  _CONST char *to,
                                   _CONST char *from)
 {
   iconv_ucs_conversion_t *uc;
@@ -124,7 +124,7 @@ error:
 
 static size_t
 _DEFUN(ucs_based_conversion_close, (rptr, data),
-                                   struct _reent *rptr _AND
+                                   struct _reent *rptr,
                                    _VOID_PTR data)
 {
   iconv_ucs_conversion_t *uc;
@@ -146,12 +146,12 @@ _DEFUN(ucs_based_conversion_close, (rptr, data),
 static size_t
 _DEFUN(ucs_based_conversion_convert,
                  (rptr, data, inbuf, inbytesleft, outbuf, outbytesleft, flags),
-                 struct _reent *rptr          _AND
-                 _VOID_PTR data               _AND
-                 _CONST unsigned char **inbuf _AND
-                 size_t *inbytesleft          _AND
-                 unsigned char **outbuf       _AND
-                 size_t *outbytesleft         _AND
+                 struct _reent *rptr,
+                 _VOID_PTR data,
+                 _CONST unsigned char **inbuf,
+                 size_t *inbytesleft,
+                 unsigned char **outbuf,
+                 size_t *outbytesleft,
                  int flags)
 {
   unsigned char outbuf1[ICONV_MB_LEN_MAX];
@@ -239,7 +239,7 @@ _DEFUN(ucs_based_conversion_convert,
 
 static int
 _DEFUN(ucs_based_conversion_get_mb_cur_max, (data, direction),
-                                            _VOID_PTR data _AND
+                                            _VOID_PTR data,
                                             int direction)
 {
   iconv_ucs_conversion_t *uc = (iconv_ucs_conversion_t *)data;
@@ -253,8 +253,8 @@ _DEFUN(ucs_based_conversion_get_mb_cur_max, (data, direction),
 
 static _VOID
 _DEFUN(ucs_based_conversion_get_state, (data, state, direction),
-                                       _VOID_PTR data   _AND
-                                       mbstate_t *state _AND
+                                       _VOID_PTR data,
+                                       mbstate_t *state,
                                        int direction)
 {
   iconv_ucs_conversion_t *uc = (iconv_ucs_conversion_t *)data;
@@ -281,8 +281,8 @@ _DEFUN(ucs_based_conversion_get_state, (data, state, direction),
 
 static int
 _DEFUN(ucs_based_conversion_set_state, (data, state, direction),
-                                       _VOID_PTR data   _AND
-                                       mbstate_t *state _AND
+                                       _VOID_PTR data,
+                                       mbstate_t *state,
                                        int direction)
 {
   iconv_ucs_conversion_t *uc = (iconv_ucs_conversion_t *)data;
@@ -303,7 +303,7 @@ _DEFUN(ucs_based_conversion_set_state, (data, state, direction),
 
 static int
 _DEFUN(ucs_based_conversion_is_stateful, (data, direction),
-                                         _VOID_PTR data _AND
+                                         _VOID_PTR data,
                                          int direction)
 {
   iconv_ucs_conversion_t *uc = (iconv_ucs_conversion_t *)data;
@@ -343,7 +343,7 @@ _iconv_ucs_conversion_handlers =
 
 static int
 _DEFUN(find_encoding_name, (searchee, names),
-                           _CONST char *searchee _AND
+                           _CONST char *searchee,
                            _CONST char **names)
 {
   _CONST char *p;

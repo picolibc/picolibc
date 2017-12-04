@@ -35,8 +35,8 @@
 
 wint_t
 _DEFUN(_putwc_unlocked_r, (ptr, wc, fp),
-	struct _reent *ptr _AND
-	wchar_t wc _AND
+	struct _reent *ptr,
+	wchar_t wc,
 	FILE *fp)
 {
   return _fputwc_unlocked_r (ptr, wc, fp);
@@ -47,7 +47,7 @@ _DEFUN(_putwc_unlocked_r, (ptr, wc, fp),
  */
 wint_t
 _DEFUN(putwc_unlocked, (wc, fp),
-	wchar_t wc _AND
+	wchar_t wc,
 	FILE *fp)
 {
   return fputwc_unlocked (wc, fp);

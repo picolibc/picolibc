@@ -66,7 +66,7 @@ static char sccsid[] = "%W% (Berkeley) %G%";
 
 int
 _DEFUN(_puts_r, (ptr, s),
-       struct _reent *ptr _AND
+       struct _reent *ptr,
        _CONST char * s)
 {
 #ifdef _FVWRITE_IN_STREAMIO

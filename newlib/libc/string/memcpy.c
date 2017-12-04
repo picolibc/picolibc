@@ -45,8 +45,8 @@ QUICKREF
 
 _PTR
 _DEFUN (memcpy, (dst0, src0, len0),
-	_PTR __restrict dst0 _AND
-	_CONST _PTR __restrict src0 _AND
+	_PTR __restrict dst0,
+	_CONST _PTR __restrict src0,
 	size_t len0)
 {
 #if defined(PREFER_SIZE_OVER_SPEED) || defined(__OPTIMIZE_SIZE__)

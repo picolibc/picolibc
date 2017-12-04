@@ -48,8 +48,8 @@ typedef struct
 
 int
 _DEFUN (fseek, (fp, offset, whence),
-     register FILE *fp _AND
-     long offset _AND
+     register FILE *fp,
+     long offset,
      int whence)
 {
   c99_fseek_t args;

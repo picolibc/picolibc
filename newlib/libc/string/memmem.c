@@ -47,9 +47,9 @@ QUICKREF
 
 void *
 _DEFUN (memmem, (haystack_start, haystack_len, needle_start, needle_len),
-	const void *haystack_start _AND
-	size_t haystack_len _AND
-	const void *needle_start _AND
+	const void *haystack_start,
+	size_t haystack_len,
+	const void *needle_start,
 	size_t needle_len)
 {
   /* Abstract memory is considered to be an array of 'unsigned char' values,

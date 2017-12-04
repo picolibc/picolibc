@@ -110,7 +110,7 @@ static struct pid {
 
 FILE *
 _DEFUN(popen, (program, type),
-	const char *program _AND
+	const char *program,
 	const char *type)
 {
 	struct pid *cur;

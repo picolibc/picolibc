@@ -63,8 +63,8 @@ QUICKREF
 
 _PTR
 _DEFUN (memchr, (src_void, c, length),
-	_CONST _PTR src_void _AND
-	int c _AND
+	_CONST _PTR src_void,
+	int c,
 	size_t length)
 {
   _CONST unsigned char *src = (_CONST unsigned char *) src_void;

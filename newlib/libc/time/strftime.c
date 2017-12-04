@@ -1432,9 +1432,9 @@ recurse:
 
 size_t
 _DEFUN (strftime, (s, maxsize, format, tim_p),
-	CHAR *__restrict s _AND
-	size_t maxsize _AND
-	_CONST CHAR *__restrict format _AND
+	CHAR *__restrict s,
+	size_t maxsize,
+	_CONST CHAR *__restrict format,
 	_CONST struct tm *__restrict tim_p)
 {
 #ifdef _WANT_C99_TIME_FORMATS

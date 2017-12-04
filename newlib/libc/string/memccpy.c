@@ -57,9 +57,9 @@ PORTABILITY
 
 _PTR
 _DEFUN (memccpy, (dst0, src0, endchar, len0),
-	_PTR __restrict dst0 _AND
-	_CONST _PTR __restrict src0 _AND
-	int endchar0 _AND
+	_PTR __restrict dst0,
+	_CONST _PTR __restrict src0,
+	int endchar0,
 	size_t len0)
 {
 

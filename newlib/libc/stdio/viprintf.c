@@ -106,7 +106,7 @@ Supporting OS subroutines required: <<close>>, <<fstat>>, <<isatty>>,
 
 int
 _DEFUN(viprintf, (fmt, ap),
-       _CONST char *fmt _AND
+       _CONST char *fmt,
        va_list ap)
 {
   struct _reent *reent = _REENT;
@@ -119,8 +119,8 @@ _DEFUN(viprintf, (fmt, ap),
 
 int
 _DEFUN(_viprintf_r, (ptr, fmt, ap),
-       struct _reent *ptr _AND
-       _CONST char *fmt   _AND
+       struct _reent *ptr,
+       _CONST char *fmt,
        va_list ap)
 {
   _REENT_SMALL_CHECK_INIT (ptr);

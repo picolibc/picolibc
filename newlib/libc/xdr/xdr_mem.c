@@ -102,9 +102,9 @@ static _CONST struct xdr_ops xdrmem_ops_unaligned = {
  */
 void
 _DEFUN (xdrmem_create, (xdrs, addr, size, op),
-        XDR * xdrs _AND
-	caddr_t addr _AND
-	u_int size _AND
+        XDR * xdrs,
+	caddr_t addr,
+	u_int size,
 	enum xdr_op op)
 {
   xdrs->x_op = op;
@@ -123,7 +123,7 @@ _DEFUN (xdrmem_destroy, (xdrs),
 
 static bool_t
 _DEFUN (xdrmem_getlong_aligned, (xdrs, lp),
-        XDR * xdrs _AND
+        XDR * xdrs,
 	long *lp)
 {
   if (xdrs->x_handy < sizeof (int32_t))
@@ -136,7 +136,7 @@ _DEFUN (xdrmem_getlong_aligned, (xdrs, lp),
 
 static bool_t
 _DEFUN (xdrmem_putlong_aligned, (xdrs, lp),
-        XDR * xdrs _AND
+        XDR * xdrs,
 	_CONST long *lp)
 {
   if (xdrs->x_handy < sizeof (int32_t))
@@ -149,7 +149,7 @@ _DEFUN (xdrmem_putlong_aligned, (xdrs, lp),
 
 static bool_t
 _DEFUN (xdrmem_getlong_unaligned, (xdrs, lp),
-        XDR * xdrs _AND
+        XDR * xdrs,
 	long *lp)
 {
   u_int32_t l;
@@ -165,7 +165,7 @@ _DEFUN (xdrmem_getlong_unaligned, (xdrs, lp),
 
 static bool_t
 _DEFUN (xdrmem_putlong_unaligned, (xdrs, lp),
-        XDR * xdrs _AND
+        XDR * xdrs,
 	_CONST long *lp)
 {
   u_int32_t l;
@@ -181,8 +181,8 @@ _DEFUN (xdrmem_putlong_unaligned, (xdrs, lp),
 
 static bool_t
 _DEFUN (xdrmem_getbytes, (xdrs, addr, len),
-        XDR * xdrs _AND
-	char *addr _AND
+        XDR * xdrs,
+	char *addr,
 	u_int len)
 {
   if (xdrs->x_handy < len)
@@ -195,8 +195,8 @@ _DEFUN (xdrmem_getbytes, (xdrs, addr, len),
 
 static bool_t
 _DEFUN (xdrmem_putbytes, (xdrs, addr, len),
-        XDR * xdrs _AND
-	_CONST char *addr _AND
+        XDR * xdrs,
+	_CONST char *addr,
 	u_int len)
 {
   if (xdrs->x_handy < len)
@@ -217,7 +217,7 @@ _DEFUN (xdrmem_getpos, (xdrs),
 
 static bool_t
 _DEFUN (xdrmem_setpos, (xdrs, pos),
-        XDR * xdrs _AND
+        XDR * xdrs,
 	u_int pos)
 {
   caddr_t newaddr = xdrs->x_base + pos;
@@ -237,7 +237,7 @@ _DEFUN (xdrmem_setpos, (xdrs, pos),
 
 static int32_t *
 _DEFUN (xdrmem_inline_aligned, (xdrs, len),
-        XDR * xdrs _AND
+        XDR * xdrs,
 	u_int len)
 {
   int32_t *buf = 0;
@@ -253,7 +253,7 @@ _DEFUN (xdrmem_inline_aligned, (xdrs, len),
 
 static int32_t *
 _DEFUN (xdrmem_inline_unaligned, (xdrs, len),
-        XDR * xdrs _AND
+        XDR * xdrs,
 	u_int len)
 {
   return (0);
@@ -261,7 +261,7 @@ _DEFUN (xdrmem_inline_unaligned, (xdrs, len),
 
 static bool_t
 _DEFUN (xdrmem_getint32_aligned, (xdrs, ip),
-	XDR *xdrs _AND
+	XDR *xdrs,
 	int32_t *ip)
 {
   if (xdrs->x_handy < sizeof(int32_t))
@@ -274,7 +274,7 @@ _DEFUN (xdrmem_getint32_aligned, (xdrs, ip),
 
 static bool_t
 _DEFUN (xdrmem_putint32_aligned, (xdrs, ip),
-        XDR *xdrs _AND
+        XDR *xdrs,
 	_CONST int32_t *ip)
 {
   if (xdrs->x_handy < sizeof(int32_t))
@@ -287,7 +287,7 @@ _DEFUN (xdrmem_putint32_aligned, (xdrs, ip),
 
 static bool_t
 _DEFUN (xdrmem_getint32_unaligned, (xdrs, ip),
-	XDR *xdrs _AND
+	XDR *xdrs,
 	int32_t *ip)
 {
   u_int32_t l;
@@ -303,7 +303,7 @@ _DEFUN (xdrmem_getint32_unaligned, (xdrs, ip),
 
 static bool_t
 _DEFUN (xdrmem_putint32_unaligned, (xdrs, ip),
-        XDR *xdrs _AND
+        XDR *xdrs,
 	_CONST int32_t *ip)
 {
   u_int32_t l;

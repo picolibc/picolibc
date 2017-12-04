@@ -62,8 +62,8 @@ QUICKREF
 
 char *
 _DEFUN (stpncpy, (dst, src),
-	char *__restrict dst _AND
-	_CONST char *__restrict src _AND
+	char *__restrict dst,
+	_CONST char *__restrict src,
 	size_t count)
 {
   char *ret = NULL;

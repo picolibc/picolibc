@@ -83,7 +83,7 @@ No supporting OS subroutines are required.
 
 ldiv_t
 _DEFUN (ldiv, (num, denom),
-        long num _AND
+        long num,
         long denom)
 {
 	ldiv_t r;

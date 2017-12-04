@@ -62,7 +62,7 @@ _DEFUN (raise, (sig),
 
 int
 _DEFUN (_raise_r, (reent, sig),
-	struct _reent *reent _AND
+	struct _reent *reent,
 	int sig)
 {
   return _kill_r (reent, _getpid_r (reent), sig);

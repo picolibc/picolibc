@@ -86,7 +86,7 @@ Supporting OS subroutines required: <<close>>, <<fstat>>, <<isatty>>,
 
 int
 _DEFUN(_fgetc_r, (ptr, fp),
-       struct _reent * ptr _AND
+       struct _reent * ptr,
        FILE * fp)
 {
   int result;

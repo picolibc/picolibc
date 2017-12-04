@@ -10,11 +10,11 @@
 char *
 _DEFUN (__dtoa,
 	(d, mode, ndigits, decpt, sign, rve),
-	double d _AND
-	int mode _AND
-	int ndigits _AND
-	int *decpt _AND
-	int *sign _AND
+	double d,
+	int mode,
+	int ndigits,
+	int *decpt,
+	int *sign,
 	char **rve)
 {
   return _dtoa_r (_REENT, d, mode, ndigits, decpt, sign, rve);

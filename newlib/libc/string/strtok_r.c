@@ -31,9 +31,9 @@
 
 char *
 _DEFUN (__strtok_r, (s, delim, lasts, skip_leading_delim),
-	register char *s _AND
-	register const char *delim _AND
-	char **lasts _AND
+	register char *s,
+	register const char *delim,
+	char **lasts,
 	int skip_leading_delim)
 {
 	register char *spanp;
@@ -91,8 +91,8 @@ cont:
 
 char *
 _DEFUN (strtok_r, (s, delim, lasts),
-	register char *__restrict s _AND
-	register const char *__restrict delim _AND
+	register char *__restrict s,
+	register const char *__restrict delim,
 	char **__restrict lasts)
 {
 	return __strtok_r (s, delim, lasts, 1);

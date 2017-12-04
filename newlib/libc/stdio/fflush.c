@@ -101,7 +101,7 @@ No supporting OS subroutines are required.
    directly from __srefill. */
 int
 _DEFUN(__sflush_r, (ptr, fp),
-       struct _reent *ptr _AND
+       struct _reent *ptr,
        register FILE * fp)
 {
   register unsigned char *p;
@@ -240,7 +240,7 @@ _DEFUN(__sflush_r, (ptr, fp),
    writing. */
 int
 _DEFUN(__sflushw_r, (ptr, fp),
-       struct _reent *ptr _AND
+       struct _reent *ptr,
        register FILE *fp)
 {
   return (fp->_flags & __SWR) ?  __sflush_r (ptr, fp) : 0;
@@ -251,7 +251,7 @@ _DEFUN(__sflushw_r, (ptr, fp),
 
 int
 _DEFUN(_fflush_r, (ptr, fp),
-       struct _reent *ptr _AND
+       struct _reent *ptr,
        register FILE * fp)
 {
   int ret;

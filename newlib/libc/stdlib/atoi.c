@@ -56,7 +56,7 @@ _DEFUN (atoi, (s),
 
 int
 _DEFUN (_atoi_r, (s),
-	struct _reent *ptr _AND
+	struct _reent *ptr,
 	_CONST char *s)
 {
   return (int) _strtol_r (ptr, s, NULL, 10);

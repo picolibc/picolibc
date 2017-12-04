@@ -91,8 +91,8 @@ QUICKREF
 
 wchar_t *
 _DEFUN (wcstok, (s, delim, lasts),
-	register wchar_t *__restrict s _AND
-	register const wchar_t *__restrict delim _AND
+	register wchar_t *__restrict s,
+	register const wchar_t *__restrict delim,
 	wchar_t **__restrict lasts)
 {
 	register const wchar_t *spanp;

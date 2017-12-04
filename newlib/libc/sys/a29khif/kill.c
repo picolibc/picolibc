@@ -7,7 +7,7 @@
 
 int
 _DEFUN (_kill, (pid, sig),
-	int pid _AND
+	int pid,
 	int sig)
 {
   if (pid == 1 || pid < 0)

@@ -175,9 +175,9 @@ int _EXFUN(__SPRINT, (struct _reent *, FILE *, _CONST char *, size_t));
  */
 static int
 _DEFUN(__sbwprintf, (rptr, fp, fmt, ap),
-       struct _reent *rptr _AND
-       register FILE *fp   _AND
-       _CONST wchar_t *fmt  _AND
+       struct _reent *rptr,
+       register FILE *fp,
+       _CONST wchar_t *fmt,
        va_list ap)
 {
 	int ret;
@@ -367,8 +367,8 @@ _EXFUN(get_arg, (struct _reent *data, int n, wchar_t *fmt,
 #ifndef STRING_ONLY
 int
 _DEFUN(VFWPRINTF, (fp, fmt0, ap),
-       FILE *__restrict fp         _AND
-       _CONST wchar_t *__restrict fmt0 _AND
+       FILE *__restrict fp,
+       _CONST wchar_t *__restrict fmt0,
        va_list ap)
 {
   int result;
@@ -379,9 +379,9 @@ _DEFUN(VFWPRINTF, (fp, fmt0, ap),
 
 int
 _DEFUN(_VFWPRINTF_R, (data, fp, fmt0, ap),
-       struct _reent *data _AND
-       FILE * fp           _AND
-       _CONST wchar_t *fmt0   _AND
+       struct _reent *data,
+       FILE * fp,
+       _CONST wchar_t *fmt0,
        va_list ap)
 {
 	register wchar_t *fmt;	/* format string */
@@ -1735,13 +1735,13 @@ wexponent(wchar_t *p0, int exp, int fmtch)
 /* function to get positional parameter N where n = N - 1 */
 static union arg_val *
 _DEFUN(get_arg, (data, n, fmt, ap, numargs_p, args, arg_type, last_fmt),
-       struct _reent *data _AND
-       int n               _AND
-       wchar_t *fmt        _AND
-       va_list *ap         _AND
-       int *numargs_p      _AND
-       union arg_val *args _AND
-       int *arg_type       _AND
+       struct _reent *data,
+       int n,
+       wchar_t *fmt,
+       va_list *ap,
+       int *numargs_p,
+       union arg_val *args,
+       int *arg_type,
        wchar_t **last_fmt)
 {
   wchar_t ch;

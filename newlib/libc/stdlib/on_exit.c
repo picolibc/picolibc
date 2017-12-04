@@ -68,7 +68,7 @@ const void * const __on_exit_dummy = &__on_exit_args;
 int
 _DEFUN (on_exit,
 	(fn, arg),
-	_VOID _EXFNPTR(fn, (int, _PTR)) _AND
+	_VOID _EXFNPTR(fn, (int, _PTR)),
         _PTR arg)
 {
   return __register_exitproc (__et_onexit, (void (*)(void)) fn, arg, NULL);

@@ -14,10 +14,10 @@
 
 error_t
 _DEFUN (argz_replace, (argz, argz_len, str, with, replace_count),
-       char **argz _AND
-       size_t *argz_len _AND
-       const char *str _AND
-       const char *with _AND
+       char **argz,
+       size_t *argz_len,
+       const char *str,
+       const char *with,
        unsigned *replace_count)
 {
   const int str_len = strlen(str);

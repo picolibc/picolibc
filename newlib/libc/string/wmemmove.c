@@ -67,8 +67,8 @@ No supporting OS subroutines are required.
 
 wchar_t *
 _DEFUN (wmemmove, (d, s, n),
-	wchar_t * d _AND
-	_CONST wchar_t * s _AND
+	wchar_t * d,
+	_CONST wchar_t * s,
 	size_t n)
 {
 

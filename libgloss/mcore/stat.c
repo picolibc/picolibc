@@ -21,7 +21,7 @@
  */
 int
 _DEFUN (_stat, (path, buf),
-       const char *path _AND
+       const char *path,
        struct stat *buf)
 {
   errno = EIO;

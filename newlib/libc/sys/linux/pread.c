@@ -7,10 +7,10 @@
 
 ssize_t
 _DEFUN (_pread_r, (rptr, fd, buf, n, off),
-     struct _reent *rptr _AND
-     int fd _AND
-     _PTR buf _AND
-     size_t n _AND
+     struct _reent *rptr,
+     int fd,
+     _PTR buf,
+     size_t n,
      off_t off)
 {
   off_t cur_pos;
@@ -34,9 +34,9 @@ _DEFUN (_pread_r, (rptr, fd, buf, n, off),
 
 ssize_t
 _DEFUN (__libc_pread, (fd, buf, n, off),
-     int fd _AND
-     _PTR buf _AND
-     size_t n _AND
+     int fd,
+     _PTR buf,
+     size_t n,
      off_t off)
 {
   return _pread_r (_REENT, fd, buf, n, off);

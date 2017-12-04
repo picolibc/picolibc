@@ -66,8 +66,8 @@ No supporting OS subroutines are required.
 
 int
 _DEFUN(_fgetpos_r, (ptr, fp, pos),
-       struct _reent * ptr _AND
-       FILE *__restrict fp           _AND
+       struct _reent * ptr,
+       FILE *__restrict fp,
        _fpos_t *__restrict pos)
 {
   *pos = _ftell_r (ptr, fp);
@@ -83,7 +83,7 @@ _DEFUN(_fgetpos_r, (ptr, fp, pos),
 
 int
 _DEFUN(fgetpos, (fp, pos),
-       FILE *__restrict fp _AND
+       FILE *__restrict fp,
        _fpos_t *__restrict pos)
 {
   return _fgetpos_r (_REENT, fp, pos);

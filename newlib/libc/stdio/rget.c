@@ -33,7 +33,7 @@ static char sccsid[] = "%W% (Berkeley) %G%";
 
 int
 _DEFUN(__srget_r, (ptr, fp),
-       struct _reent *ptr _AND
+       struct _reent *ptr,
        register FILE *fp)
 {
   /* Ensure that any fake std stream is resolved before

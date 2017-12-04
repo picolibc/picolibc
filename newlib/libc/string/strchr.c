@@ -53,7 +53,7 @@ QUICKREF
 
 char *
 _DEFUN (strchr, (s1, i),
-	_CONST char *s1 _AND
+	_CONST char *s1,
 	int i)
 {
   _CONST unsigned char *s = (_CONST unsigned char *)s1;

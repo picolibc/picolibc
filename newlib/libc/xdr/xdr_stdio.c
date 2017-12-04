@@ -84,8 +84,8 @@ static _CONST struct xdr_ops xdrstdio_ops = {
  */
 void
 _DEFUN (xdrstdio_create, (xdrs, file, op),
-        XDR * xdrs _AND
-	FILE * file _AND
+        XDR * xdrs,
+	FILE * file,
 	enum xdr_op op)
 {
   xdrs->x_op = op;
@@ -109,7 +109,7 @@ _DEFUN (xdrstdio_destroy, (xdrs),
 
 static bool_t
 _DEFUN (xdrstdio_getlong, (xdrs, lp),
-        XDR * xdrs _AND
+        XDR * xdrs,
 	long *lp)
 {
   u_int32_t temp;
@@ -122,7 +122,7 @@ _DEFUN (xdrstdio_getlong, (xdrs, lp),
 
 static bool_t
 _DEFUN (xdrstdio_putlong, (xdrs, lp),
-        XDR * xdrs _AND
+        XDR * xdrs,
 	_CONST long *lp)
 {
   u_int32_t temp = htonl ((u_int32_t) * lp);
@@ -134,8 +134,8 @@ _DEFUN (xdrstdio_putlong, (xdrs, lp),
 
 static bool_t
 _DEFUN (xdrstdio_getbytes, (xdrs, addr, len),
-        XDR * xdrs _AND
-        char *addr _AND
+        XDR * xdrs,
+        char *addr,
 	u_int len)
 {
   if ((len != 0) && (fread (addr, (size_t) len, 1,
@@ -146,8 +146,8 @@ _DEFUN (xdrstdio_getbytes, (xdrs, addr, len),
 
 static bool_t
 _DEFUN (xdrstdio_putbytes, (xdrs, addr, len),
-        XDR * xdrs _AND
-        _CONST char *addr _AND
+        XDR * xdrs,
+        _CONST char *addr,
 	u_int len)
 {
   if ((len != 0) && (fwrite (addr, (size_t) len, 1,
@@ -165,7 +165,7 @@ _DEFUN (xdrstdio_getpos, (xdrs),
 
 static bool_t
 _DEFUN (xdrstdio_setpos, (xdrs, pos),
-        XDR * xdrs _AND
+        XDR * xdrs,
         u_int pos)
 {
   return ((fseek ((FILE *) xdrs->x_private, (long) pos, 0) < 0) ?
@@ -175,7 +175,7 @@ _DEFUN (xdrstdio_setpos, (xdrs, pos),
 /* ARGSUSED */
 static int32_t *
 _DEFUN (xdrstdio_inline, (xdrs, len),
-        XDR * xdrs _AND
+        XDR * xdrs,
 	u_int len)
 {
   /*
@@ -192,7 +192,7 @@ _DEFUN (xdrstdio_inline, (xdrs, len),
 
 static bool_t
 _DEFUN (xdrstdio_getint32, (xdrs, ip),
-        XDR *xdrs _AND
+        XDR *xdrs,
 	int32_t *ip)
 {
   int32_t temp;
@@ -205,7 +205,7 @@ _DEFUN (xdrstdio_getint32, (xdrs, ip),
 
 static bool_t
 _DEFUN (xdrstdio_putint32, (xdrs, ip),
-        XDR *xdrs _AND
+        XDR *xdrs,
 	_CONST int32_t *ip)
 {
   int32_t temp = htonl (*ip);

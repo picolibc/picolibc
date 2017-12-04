@@ -51,8 +51,8 @@ effects vary with the locale.
 
 int
 _DEFUN (mbtowc, (pwc, s, n),
-        wchar_t *__restrict pwc _AND
-        const char *__restrict s _AND
+        wchar_t *__restrict pwc,
+        const char *__restrict s,
         size_t n)
 {
 #ifdef _MB_CAPABLE

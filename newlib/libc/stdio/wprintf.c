@@ -25,7 +25,7 @@
 
 int
 _DEFUN(_wprintf_r, (ptr, fmt),
-       struct _reent *ptr _AND
+       struct _reent *ptr,
        const wchar_t *fmt _DOTS)
 {
   int ret;

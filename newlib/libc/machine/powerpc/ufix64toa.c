@@ -26,12 +26,12 @@ extern char *_simdldtoa_r _PARAMS((struct _reent *, LONG_DOUBLE_UNION *, int,
 
 char *
 _DEFUN (_ufix64toa_r, (rptr, value, mode, ndigits, decpt, sign, rve),
-	struct _reent *rptr _AND
-	__uint64_t value _AND
-	int mode _AND
-	int ndigits _AND
-	int *decpt _AND
-	int *sign _AND
+	struct _reent *rptr,
+	__uint64_t value,
+	int mode,
+	int ndigits,
+	int *decpt,
+	int *sign,
 	char **rve)
 {
   union long_double_union ldbl;

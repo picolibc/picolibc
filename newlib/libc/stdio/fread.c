@@ -94,10 +94,10 @@ Supporting OS subroutines required: <<close>>, <<fstat>>, <<isatty>>,
 #ifdef __SCLE
 static size_t
 _DEFUN(crlf_r, (ptr, fp, buf, count, eof),
-       struct _reent * ptr _AND
-       FILE * fp _AND
-       char * buf _AND
-       size_t count _AND
+       struct _reent * ptr,
+       FILE * fp,
+       char * buf,
+       size_t count,
        int eof)
 {
   int r;
@@ -143,10 +143,10 @@ _DEFUN(crlf_r, (ptr, fp, buf, count, eof),
 
 size_t
 _DEFUN(_fread_r, (ptr, buf, size, count, fp),
-       struct _reent * ptr _AND
-       _PTR __restrict buf _AND
-       size_t size _AND
-       size_t count _AND
+       struct _reent * ptr,
+       _PTR __restrict buf,
+       size_t size,
+       size_t count,
        FILE * __restrict fp)
 {
   register size_t resid;
@@ -261,9 +261,9 @@ _DEFUN(_fread_r, (ptr, buf, size, count, fp),
 #ifndef _REENT_ONLY
 size_t
 _DEFUN(fread, (buf, size, count, fp),
-       _PTR __restrict  buf _AND
-       size_t size _AND
-       size_t count _AND
+       _PTR __restrict  buf,
+       size_t size,
+       size_t count,
        FILE *__restrict fp)
 {
    return _fread_r (_REENT, buf, size, count, fp);

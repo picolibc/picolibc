@@ -21,8 +21,8 @@
  */
 int
 _DEFUN (open, (buf, flags, mode),
-       const char *buf _AND
-       int flags _AND
+       const char *buf,
+       int flags,
        int mode)
 {
   errno = EIO;

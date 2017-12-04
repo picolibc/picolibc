@@ -61,7 +61,7 @@ No supporting OS subroutines are required.
 
 int
 _DEFUN(_fpurge_r, (ptr, fp),
-       struct _reent *ptr _AND
+       struct _reent *ptr,
        register FILE * fp)
 {
   int t;

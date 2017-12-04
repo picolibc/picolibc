@@ -60,7 +60,7 @@
 
 bool_t
 _DEFUN (xdr_float, (xdrs, fp),
-       XDR * xdrs _AND
+       XDR * xdrs,
        float *fp)
 {
   switch (xdrs->x_op)
@@ -81,7 +81,7 @@ _DEFUN (xdr_float, (xdrs, fp),
 #if !defined(_DOUBLE_IS_32BITS)
 bool_t
 _DEFUN (xdr_double, (xdrs, dp),
-        XDR * xdrs _AND
+        XDR * xdrs,
 	double *dp)
 {
   int32_t *i32p;

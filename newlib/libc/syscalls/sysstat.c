@@ -6,7 +6,7 @@
 
 int
 _DEFUN (stat, (file, pstat),
-     _CONST char *file _AND
+     _CONST char *file,
      struct stat *pstat)
 {
   return _stat_r (_REENT, file, pstat);

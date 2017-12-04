@@ -10,8 +10,8 @@
 
 void
 _DEFUN (argz_extract, (argz, argz_len, argv),
-       char *argz _AND
-       size_t argz_len _AND
+       char *argz,
+       size_t argz_len,
        char **argv)
 {
   size_t i = 0;

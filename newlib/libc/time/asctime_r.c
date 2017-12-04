@@ -7,7 +7,7 @@
 
 char *
 _DEFUN (asctime_r, (tim_p, result),
-	_CONST struct tm *__restrict tim_p _AND
+	_CONST struct tm *__restrict tim_p,
 	char *__restrict result)
 {
   static _CONST char day_name[7][3] = {

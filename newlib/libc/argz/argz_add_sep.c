@@ -12,9 +12,9 @@
 
 error_t
 _DEFUN (argz_add_sep, (argz, argz_len, str, sep),
-       char **argz _AND
-       size_t *argz_len _AND
-       const char *str _AND
+       char **argz,
+       size_t *argz_len,
+       const char *str,
        int sep)
 {
   char *str_argz = 0;

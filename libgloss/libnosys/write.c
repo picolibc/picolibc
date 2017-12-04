@@ -12,8 +12,8 @@ extern int errno;
 
 int
 _DEFUN (_write, (file, ptr, len),
-        int   file  _AND
-        char *ptr   _AND
+        int   file,
+        char *ptr,
         int   len)
 {
   errno = ENOSYS;

@@ -183,8 +183,8 @@ typedef union
 
 int
 _DEFUN (vfscanf, (fp, fmt, ap), 
-    register FILE *__restrict fp _AND 
-    _CONST char *__restrict fmt _AND 
+    register FILE *__restrict fp,
+    _CONST char *__restrict fmt,
     va_list ap)
 {
   CHECK_INIT(_REENT, fp);
@@ -204,9 +204,9 @@ __svfscanf (fp, fmt0, ap)
 
 int
 _DEFUN (_vfscanf_r, (data, fp, fmt, ap),
-    struct _reent *data _AND 
-    register FILE *__restrict fp _AND 
-    _CONST char *__restrict fmt _AND 
+    struct _reent *data,
+    register FILE *__restrict fp,
+    _CONST char *__restrict fmt,
     va_list ap)
 {
   return __svfscanf_r (data, fp, fmt, ap);

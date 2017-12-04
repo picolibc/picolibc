@@ -82,7 +82,7 @@ No supporting OS subroutines are required.
 
 div_t
 _DEFUN (div, (num, denom),
-	int num _AND
+	int num,
 	int denom)
 {
 	div_t r;

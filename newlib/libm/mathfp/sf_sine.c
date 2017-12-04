@@ -33,7 +33,7 @@ static const float r[] = { -0.1666665668,
 
 float
 _DEFUN (sinef, (float, int),
-        float x _AND
+        float x,
         int cosine)
 {
   int sgn, N;

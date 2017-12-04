@@ -54,8 +54,8 @@ Supporting OS subroutines required: <<sbrk>>, <<write>>.
 
 int
 _DEFUN(_dprintf_r, (ptr, fd, format),
-       struct _reent *ptr _AND
-       int fd _AND
+       struct _reent *ptr,
+       int fd,
        const char *__restrict format _DOTS)
 {
 	va_list ap;
@@ -77,7 +77,7 @@ _EXFUN(_diprintf_r, (struct _reent *, int, const char *, ...)
 
 int
 _DEFUN(dprintf, (fd, format),
-       int fd _AND
+       int fd,
        const char *__restrict format _DOTS)
 {
   va_list ap;

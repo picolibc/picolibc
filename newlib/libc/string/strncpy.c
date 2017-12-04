@@ -60,8 +60,8 @@ QUICKREF
 
 char *
 _DEFUN (strncpy, (dst0, src0),
-	char *__restrict dst0 _AND
-	_CONST char *__restrict src0 _AND
+	char *__restrict dst0,
+	_CONST char *__restrict src0,
 	size_t count)
 {
 #if defined(PREFER_SIZE_OVER_SPEED) || defined(__OPTIMIZE_SIZE__)

@@ -183,9 +183,9 @@ static char *rcsid = "$Id$";
 #ifdef STRING_ONLY
 int
 _DEFUN(__ssputs_r, (ptr, fp, buf, len),
-       struct _reent *ptr _AND
-       FILE *fp _AND
-       _CONST char *buf _AND
+       struct _reent *ptr,
+       FILE *fp,
+       _CONST char *buf,
        size_t len)
 {
   register int w;
@@ -254,8 +254,8 @@ err:
    by a serial of functions like svfwprintf for wide char output.  */
 int
 _DEFUN(__ssprint_r, (ptr, fp, uio),
-       struct _reent *ptr _AND
-       FILE *fp _AND
+       struct _reent *ptr,
+       FILE *fp,
        register struct __suio *uio)
 {
   register size_t len;
@@ -358,8 +358,8 @@ err:
    then reset it so that it can be reused.  */
 int
 _DEFUN(__sprint_r, (ptr, fp, uio),
-       struct _reent *ptr _AND
-       FILE *fp _AND
+       struct _reent *ptr,
+       FILE *fp,
        register struct __suio *uio)
 {
   register int err = 0;
@@ -403,8 +403,8 @@ out:
 
 _NOINLINE_STATIC int
 _DEFUN(__sfputc_r, (ptr, c, fp),
-       struct _reent *ptr _AND
-       int c _AND
+       struct _reent *ptr,
+       int c,
        FILE *fp)
 {
   if (--fp->_w >= 0 || (fp->_w >= fp->_lbfsize && (char)c != '\n'))
@@ -415,9 +415,9 @@ _DEFUN(__sfputc_r, (ptr, c, fp),
 
 int
 _DEFUN(__sfputs_r, (ptr, fp, buf, len),
-       struct _reent *ptr _AND
-       FILE *fp _AND
-       _CONST char *buf _AND
+       struct _reent *ptr,
+       FILE *fp,
+       _CONST char *buf,
        size_t len)
 {
   register int i;
@@ -453,8 +453,8 @@ int _EXFUN(_VFPRINTF_R, (struct _reent *, FILE *, _CONST char *, va_list));
 #ifndef STRING_ONLY
 int
 _DEFUN(VFPRINTF, (fp, fmt0, ap),
-       FILE * fp         _AND
-       _CONST char *fmt0 _AND
+       FILE * fp,
+       _CONST char *fmt0,
        va_list ap)
 {
   int result;
@@ -482,9 +482,9 @@ _EXFUN(vfiprintf, (FILE *, const char *, __VALIST)
 
 int
 _DEFUN(_VFPRINTF_R, (data, fp, fmt0, ap),
-       struct _reent *data _AND
-       FILE * fp           _AND
-       _CONST char *fmt0   _AND
+       struct _reent *data,
+       FILE * fp,
+       _CONST char *fmt0,
        va_list ap)
 {
   register char *fmt;	/* Format string.  */

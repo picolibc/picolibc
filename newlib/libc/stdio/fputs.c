@@ -87,8 +87,8 @@ Supporting OS subroutines required: <<close>>, <<fstat>>, <<isatty>>,
  */
 int
 _DEFUN(_fputs_r, (ptr, s, fp),
-       struct _reent * ptr _AND
-       char _CONST *__restrict s _AND
+       struct _reent * ptr,
+       char _CONST *__restrict s,
        FILE *__restrict fp)
 {
 #ifdef _FVWRITE_IN_STREAMIO
@@ -136,7 +136,7 @@ error:
 #ifndef _REENT_ONLY
 int
 _DEFUN(fputs, (s, fp),
-       char _CONST *__restrict s _AND
+       char _CONST *__restrict s,
        FILE *__restrict fp)
 {
   return _fputs_r (_REENT, s, fp);

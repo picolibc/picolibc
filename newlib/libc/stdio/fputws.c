@@ -95,8 +95,8 @@ PORTABILITY
 
 int
 _DEFUN(_fputws_r, (ptr, ws, fp),
-	struct _reent *ptr _AND
-	const wchar_t *ws _AND
+	struct _reent *ptr,
+	const wchar_t *ws,
 	FILE *fp)
 {
   size_t nbytes;
@@ -159,7 +159,7 @@ error:
 
 int
 _DEFUN(fputws, (ws, fp),
-	const wchar_t *__restrict ws _AND
+	const wchar_t *__restrict ws,
 	FILE *__restrict fp)
 {
   struct _reent *reent = _REENT;

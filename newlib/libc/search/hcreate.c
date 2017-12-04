@@ -70,7 +70,7 @@ _DEFUN_VOID (hdestroy)
 
 ENTRY *
 _DEFUN(hsearch, (item, action), 
-       ENTRY item _AND
+       ENTRY item,
        ACTION action)
 {
   ENTRY *retval;

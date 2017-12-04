@@ -23,8 +23,8 @@ extern int  _EXFUN (outbyte, (char x));
  */
 int
 _DEFUN (write, (fd, buf, nbytes),
-       int fd _AND
-       char *buf _AND
+       int fd,
+       char *buf,
        int nbytes)
 {
   int i;

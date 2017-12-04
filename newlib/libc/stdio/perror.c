@@ -60,7 +60,7 @@ Supporting OS subroutines required: <<close>>, <<fstat>>, <<isatty>>,
 
 _VOID
 _DEFUN(_perror_r, (ptr, s),
-       struct _reent *ptr _AND
+       struct _reent *ptr,
        _CONST char *s)
 {
   char *error;

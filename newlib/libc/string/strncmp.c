@@ -53,8 +53,8 @@ QUICKREF
 
 int 
 _DEFUN (strncmp, (s1, s2, n),
-	_CONST char *s1 _AND
-	_CONST char *s2 _AND
+	_CONST char *s1,
+	_CONST char *s2,
 	size_t n)
 {
 #if defined(PREFER_SIZE_OVER_SPEED) || defined(__OPTIMIZE_SIZE__)

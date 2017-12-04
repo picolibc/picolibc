@@ -15,10 +15,10 @@
 
 char *
 _DEFUN(_vasnprintf_r, (ptr, buf, lenp, fmt, ap),
-       struct _reent *ptr _AND
-       char *buf _AND
-       size_t *lenp _AND
-       const char *fmt _AND
+       struct _reent *ptr,
+       char *buf,
+       size_t *lenp,
+       const char *fmt,
        va_list ap)
 {
   int ret;
@@ -67,9 +67,9 @@ _EXFUN(_vasniprintf_r, (struct _reent*, char *, size_t *,
 
 char *
 _DEFUN(vasnprintf, (buf, lenp, fmt, ap),
-       char *buf _AND
-       size_t *lenp _AND
-       const char *fmt _AND
+       char *buf,
+       size_t *lenp,
+       const char *fmt,
        va_list ap)
 {
   return _vasnprintf_r (_REENT, buf, lenp, fmt, ap);

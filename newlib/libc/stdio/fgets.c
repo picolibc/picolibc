@@ -95,9 +95,9 @@ Supporting OS subroutines required: <<close>>, <<fstat>>, <<isatty>>,
 
 char *
 _DEFUN(_fgets_r, (ptr, buf, n, fp),
-       struct _reent * ptr _AND
-       char *__restrict buf _AND
-       int n     _AND
+       struct _reent * ptr,
+       char *__restrict buf,
+       int n,
        FILE *__restrict fp)
 {
   size_t len;
@@ -190,8 +190,8 @@ _DEFUN(_fgets_r, (ptr, buf, n, fp),
 
 char *
 _DEFUN(fgets, (buf, n, fp),
-       char *__restrict buf _AND
-       int n     _AND
+       char *__restrict buf,
+       int n,
        FILE *__restrict fp)
 {
   return _fgets_r (_REENT, buf, n, fp);

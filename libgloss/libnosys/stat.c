@@ -14,7 +14,7 @@ extern int errno;
 
 int
 _DEFUN (_stat, (file, st),
-        const char  *file _AND
+        const char  *file,
         struct stat *st)
 {
   errno = ENOSYS;

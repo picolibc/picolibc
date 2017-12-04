@@ -32,7 +32,7 @@
                with "value" which is specified by str as "name=value". */
 int
 _DEFUN (_putenv_r, (reent_ptr, str),
-	struct _reent *reent_ptr _AND
+	struct _reent *reent_ptr,
 	char   *str)
 {
   register char *p, *equal;

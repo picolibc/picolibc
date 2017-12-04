@@ -33,8 +33,8 @@ extern int _unsetenv_r _PARAMS ((struct _reent *, const char *));
 
 int
 _DEFUN (setenv, (name, value, rewrite),
-	_CONST char *name _AND
-	_CONST char *value _AND
+	_CONST char *name,
+	_CONST char *value,
 	int rewrite)
 {
   return _setenv_r (_REENT, name, value, rewrite);

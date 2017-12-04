@@ -40,10 +40,10 @@ Supporting OS subroutine required: <<write>>, <<lseek>>.
 
 ssize_t
 _DEFUN (_pwrite_r, (rptr, fd, buf, n, off),
-     struct _reent *rptr _AND
-     int fd _AND
-     _CONST _PTR buf _AND
-     size_t n _AND
+     struct _reent *rptr,
+     int fd,
+     _CONST _PTR buf,
+     size_t n,
      off_t off)
 {
   off_t cur_pos;
@@ -67,9 +67,9 @@ _DEFUN (_pwrite_r, (rptr, fd, buf, n, off),
 
 ssize_t
 _DEFUN (pwrite, (fd, buf, n, off),
-     int fd _AND
-     _CONST _PTR buf _AND
-     size_t n _AND
+     int fd,
+     _CONST _PTR buf,
+     size_t n,
      off_t off)
 {
   return _pwrite_r (_REENT, fd, buf, n, off);

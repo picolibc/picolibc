@@ -36,8 +36,8 @@ extern int __sflags ();
 
 FILE *
 _DEFUN (_fdopen64_r, (ptr, fd, mode),
-	struct _reent *ptr _AND
-	int fd _AND
+	struct _reent *ptr,
+	int fd,
 	_CONST char *mode)
 {
   register FILE *fp;
@@ -109,7 +109,7 @@ _DEFUN (_fdopen64_r, (ptr, fd, mode),
 
 FILE *
 _DEFUN (fdopen64, (fd, mode),
-	int fd _AND
+	int fd,
 	_CONST char *mode)
 {
   return _fdopen64_r (_REENT, fd, mode);

@@ -46,7 +46,7 @@ typedef struct
 
 int
 _DEFUN (fsetpos, (iop, pos),
-	FILE * iop _AND
+	FILE * iop,
 	_CONST _fpos_t * pos)
 {
   c99_fsetpos_t args;

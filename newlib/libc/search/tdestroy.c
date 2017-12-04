@@ -41,7 +41,7 @@ trecurse(root, free_action)
 
 void
 _DEFUN(tdestroy, (vrootp, freefct),
-       void *vrootp _AND
+       void *vrootp,
        void (*freefct)(void *))
 {
   node_t *root = (node_t *) vrootp;

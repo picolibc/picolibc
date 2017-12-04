@@ -45,8 +45,8 @@ _NOINLINE_STATIC _VOID
 static _VOID
 #endif
 _DEFUN(std, (ptr, flags, file),
-            FILE *ptr _AND
-            int flags _AND
+            FILE *ptr,
+            int flags,
             int file)
 {
   ptr->_p = 0;
@@ -125,7 +125,7 @@ struct glue_with_file {
 
 struct _glue *
 _DEFUN(__sfmoreglue, (d, n),
-       struct _reent *d _AND
+       struct _reent *d,
        register int n)
 {
   struct glue_with_file *g;

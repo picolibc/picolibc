@@ -59,7 +59,7 @@
 
 static size_t
 _DEFUN(utf_16_close, (rptr, data),
-                     struct _reent *rptr _AND
+                     struct _reent *rptr,
                      _VOID_PTR data)
 {
   _free_r(rptr, data);
@@ -69,7 +69,7 @@ _DEFUN(utf_16_close, (rptr, data),
 #if defined (ICONV_FROM_UCS_CES_UTF_16)
 static _VOID_PTR
 _DEFUN(utf_16_init_from_ucs, (rptr, encoding),
-                             struct _reent *rptr _AND
+                             struct _reent *rptr,
                              _CONST char *encoding)
 {
   int *data;
@@ -89,9 +89,9 @@ _DEFUN(utf_16_init_from_ucs, (rptr, encoding),
 
 static size_t
 _DEFUN(utf_16_convert_from_ucs, (data, in, outbuf, outbytesleft),
-                                _VOID_PTR data         _AND
-                                register ucs4_t in     _AND
-                                unsigned char **outbuf _AND
+                                _VOID_PTR data,
+                                register ucs4_t in,
+                                unsigned char **outbuf,
                                 size_t *outbytesleft)
 {
   register ucs2_t *cp;
@@ -171,7 +171,7 @@ _DEFUN(utf_16_convert_from_ucs, (data, in, outbuf, outbytesleft),
 #if defined (ICONV_TO_UCS_CES_UTF_16)
 static _VOID_PTR
 _DEFUN(utf_16_init_to_ucs, (rptr, encoding),
-                           struct _reent *rptr _AND
+                           struct _reent *rptr,
                            _CONST char *encoding)
 {
   int *data;
@@ -191,8 +191,8 @@ _DEFUN(utf_16_init_to_ucs, (rptr, encoding),
 
 static ucs4_t
 _DEFUN(utf_16_convert_to_ucs, (data, inbuf, inbytesleft),
-                              _VOID_PTR data               _AND
-                              _CONST unsigned char **inbuf _AND
+                              _VOID_PTR data,
+                              _CONST unsigned char **inbuf,
                               size_t *inbytesleft)
 {
   register ucs2_t w1;

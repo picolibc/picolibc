@@ -5,8 +5,8 @@
 
 int
 _DEFUN (__xpg_strerror_r, (errnum, buffer, n),
-	int errnum _AND
-	char *buffer _AND
+	int errnum,
+	char *buffer,
 	size_t n)
 {
   char *error;

@@ -55,7 +55,7 @@ Supporting OS subroutines required: <<link>>, <<unlink>>, or <<rename>>.
 
 int
 _DEFUN(rename, (old, new),
-       _CONST char *old _AND
+       _CONST char *old,
        _CONST char *new)
 {
   return _rename_r (_REENT, old, new);

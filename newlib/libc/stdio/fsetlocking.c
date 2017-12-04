@@ -66,7 +66,7 @@ No supporting OS subroutines are required.
 
 int
 _DEFUN(__fsetlocking, (fp, type),
-       FILE * fp _AND
+       FILE * fp,
        int type)
 {
   int result;

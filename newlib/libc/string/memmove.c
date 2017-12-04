@@ -51,8 +51,8 @@ QUICKREF
 _PTR
 __inhibit_loop_to_libcall
 _DEFUN (memmove, (dst_void, src_void, length),
-	_PTR dst_void _AND
-	_CONST _PTR src_void _AND
+	_PTR dst_void,
+	_CONST _PTR src_void,
 	size_t length)
 {
 #if defined(PREFER_SIZE_OVER_SPEED) || defined(__OPTIMIZE_SIZE__)

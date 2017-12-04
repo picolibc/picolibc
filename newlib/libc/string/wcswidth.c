@@ -35,7 +35,7 @@ PORTABILITY
 
 int
 _DEFUN (wcswidth, (pwcs, n),
-	_CONST wchar_t *pwcs _AND
+	_CONST wchar_t *pwcs,
 	size_t n)
 
 {

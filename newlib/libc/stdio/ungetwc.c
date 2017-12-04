@@ -75,8 +75,8 @@ C99
 
 wint_t
 _DEFUN(_ungetwc_r, (ptr, wc, fp),
-	struct _reent *ptr _AND
-	wint_t wc _AND
+	struct _reent *ptr,
+	wint_t wc,
 	register FILE *fp)
 {
   char buf[MB_LEN_MAX];
@@ -107,7 +107,7 @@ _DEFUN(_ungetwc_r, (ptr, wc, fp),
  */
 wint_t
 _DEFUN(ungetwc, (wint_t wc, FILE *fp),
-	wint_t wc _AND
+	wint_t wc,
 	FILE *fp)
 {
   struct _reent *reent = _REENT;

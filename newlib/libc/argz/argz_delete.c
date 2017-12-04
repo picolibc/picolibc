@@ -12,8 +12,8 @@
 
 error_t
 _DEFUN (argz_delete, (argz, argz_len, entry),
-       char **argz _AND
-       size_t *argz_len _AND
+       char **argz,
+       size_t *argz_len,
        char *entry)
 {
   int len = 0;

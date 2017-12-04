@@ -45,9 +45,9 @@
 #if defined (ICONV_FROM_UCS_CES_UCS_4_INTERNAL)
 static size_t
 _DEFUN(ucs_4_internal_convert_from_ucs, (data, in, outbuf, outbytesleft),
-                                        _VOID_PTR data         _AND
-                                        register ucs4_t in     _AND
-                                        unsigned char **outbuf _AND
+                                        _VOID_PTR data,
+                                        register ucs4_t in,
+                                        unsigned char **outbuf,
                                         size_t *outbytesleft)
 {
   if (in > 0x7FFFFFFF)
@@ -67,8 +67,8 @@ _DEFUN(ucs_4_internal_convert_from_ucs, (data, in, outbuf, outbytesleft),
 #if defined (ICONV_TO_UCS_CES_UCS_4_INTERNAL)
 static ucs4_t
 _DEFUN(ucs_4_internal_convert_to_ucs, (data, inbuf, inbytesleft),
-                                      _VOID_PTR data               _AND
-                                      _CONST unsigned char **inbuf _AND
+                                      _VOID_PTR data,
+                                      _CONST unsigned char **inbuf,
                                       size_t *inbytesleft)
 {
   register ucs4_t res;

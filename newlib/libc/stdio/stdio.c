@@ -31,9 +31,9 @@
 
 _READ_WRITE_RETURN_TYPE
 _DEFUN(__sread, (ptr, cookie, buf, n),
-       struct _reent *ptr _AND
-       void *cookie _AND
-       char *buf _AND
+       struct _reent *ptr,
+       void *cookie,
+       char *buf,
        _READ_WRITE_BUFSIZE_TYPE n)
 {
   register FILE *fp = (FILE *) cookie;
@@ -64,9 +64,9 @@ _DEFUN(__sread, (ptr, cookie, buf, n),
 /* Dummy function used in sscanf/swscanf. */
 _READ_WRITE_RETURN_TYPE
 _DEFUN(__seofread, (ptr, cookie, buf, len),
-       struct _reent *_ptr _AND
-       _PTR cookie _AND
-       char *buf   _AND
+       struct _reent *_ptr,
+       _PTR cookie,
+       char *buf,
        _READ_WRITE_BUFSIZE_TYPE len)
 {
   return 0;
@@ -74,9 +74,9 @@ _DEFUN(__seofread, (ptr, cookie, buf, len),
 
 _READ_WRITE_RETURN_TYPE
 _DEFUN(__swrite, (ptr, cookie, buf, n),
-       struct _reent *ptr _AND
-       void *cookie _AND
-       char const *buf _AND
+       struct _reent *ptr,
+       void *cookie,
+       char const *buf,
        _READ_WRITE_BUFSIZE_TYPE n)
 {
   register FILE *fp = (FILE *) cookie;
@@ -106,9 +106,9 @@ _DEFUN(__swrite, (ptr, cookie, buf, n),
 
 _fpos_t
 _DEFUN(__sseek, (ptr, cookie, offset, whence),
-       struct _reent *ptr _AND
-       void *cookie _AND
-       _fpos_t offset _AND
+       struct _reent *ptr,
+       void *cookie,
+       _fpos_t offset,
        int whence)
 {
   register FILE *fp = (FILE *) cookie;
@@ -127,7 +127,7 @@ _DEFUN(__sseek, (ptr, cookie, offset, whence),
 
 int
 _DEFUN(__sclose, (ptr, cookie),
-       struct _reent *ptr _AND
+       struct _reent *ptr,
        void *cookie)
 {
   FILE *fp = (FILE *) cookie;

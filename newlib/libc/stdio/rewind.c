@@ -53,7 +53,7 @@ static char sccsid[] = "%W% (Berkeley) %G%";
 
 _VOID
 _DEFUN(_rewind_r, (ptr, fp),
-       struct _reent * ptr _AND
+       struct _reent * ptr,
        register FILE * fp)
 {
   _CAST_VOID _fseek_r (ptr, fp, 0L, SEEK_SET);

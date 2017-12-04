@@ -80,7 +80,7 @@ extern char *__strtok_r (char *, const char *, char **, int);
 
 char *
 _DEFUN (strtok, (s, delim),
-	register char *__restrict s _AND
+	register char *__restrict s,
 	register const char *__restrict delim)
 {
 	struct _reent *reent = _REENT;

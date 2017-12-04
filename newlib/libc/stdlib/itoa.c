@@ -31,8 +31,8 @@ No supporting OS subroutine calls are required.
 
 char *
 _DEFUN (__itoa, (value, str, base),
-        int value _AND
-        char *str _AND 
+        int value,
+        char *str,
         int base)
 {
   unsigned uvalue;
@@ -61,8 +61,8 @@ _DEFUN (__itoa, (value, str, base),
 
 char *  
 _DEFUN (itoa, (value, str, base),
-        int value _AND
-        char *str _AND
+        int value,
+        char *str,
         int base)
 {
   return __itoa (value, str, base);

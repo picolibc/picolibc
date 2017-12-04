@@ -50,9 +50,9 @@ extern char *_findenv_r _PARAMS ((struct _reent *, const char *, int *));
 
 int
 _DEFUN (_setenv_r, (reent_ptr, name, value, rewrite),
-        struct _reent *reent_ptr _AND
-	_CONST char *name _AND
-	_CONST char *value _AND
+        struct _reent *reent_ptr,
+	_CONST char *name,
+	_CONST char *value,
 	int rewrite)
 {
   static int alloced;		/* if allocated space before */
@@ -134,7 +134,7 @@ _DEFUN (_setenv_r, (reent_ptr, name, value, rewrite),
  */
 int
 _DEFUN (_unsetenv_r, (reent_ptr, name),
-        struct _reent *reent_ptr _AND
+        struct _reent *reent_ptr,
         _CONST char *name)
 {
   register char **P;

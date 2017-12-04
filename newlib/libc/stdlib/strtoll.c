@@ -215,9 +215,9 @@ _strtoll_l (struct _reent *rptr, _CONST char *__restrict nptr,
 
 long long
 _DEFUN (_strtoll_r, (rptr, nptr, endptr, base),
-	struct _reent *rptr _AND
-	_CONST char *__restrict nptr _AND
-	char **__restrict endptr _AND
+	struct _reent *rptr,
+	_CONST char *__restrict nptr,
+	char **__restrict endptr,
 	int base)
 {
 	return _strtoll_l (rptr, nptr, endptr, base, __get_current_locale ());
@@ -234,8 +234,8 @@ strtoll_l (const char *__restrict s, char **__restrict ptr, int base,
 
 long long
 _DEFUN (strtoll, (s, ptr, base),
-	_CONST char *__restrict s _AND
-	char **__restrict ptr _AND
+	_CONST char *__restrict s,
+	char **__restrict ptr,
 	int base)
 {
 	return _strtoll_l (_REENT, s, ptr, base, __get_current_locale ());

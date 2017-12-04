@@ -131,7 +131,7 @@ No supporting OS subroutines are required.
 
 void
 _DEFUN (__dorand48, (r, xseed),
-       struct _reent *r _AND
+       struct _reent *r,
        unsigned short xseed[3])
 {
   unsigned long accu;

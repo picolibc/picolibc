@@ -89,9 +89,9 @@ Supporting OS subroutines required: <<close>>, <<fstat>>, <<isatty>>,
 
 int
 _DEFUN(setvbuf, (fp, buf, mode, size),
-       register FILE * fp _AND
-       char *buf          _AND
-       register int mode  _AND
+       register FILE * fp,
+       char *buf,
+       register int mode,
        register size_t size)
 {
   int ret = 0;

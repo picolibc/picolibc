@@ -76,9 +76,9 @@ Supporting OS subroutines required: <<close>>, <<fstat>>, <<isatty>>,
 
 FILE *
 _DEFUN (_freopen64_r, (ptr, file, mode, fp),
-	struct _reent *ptr _AND
-	_CONST char *file _AND
-	_CONST char *mode _AND
+	struct _reent *ptr,
+	_CONST char *file,
+	_CONST char *mode,
 	register FILE *fp)
 {
   register int f;
@@ -248,8 +248,8 @@ _DEFUN (_freopen64_r, (ptr, file, mode, fp),
 
 FILE *
 _DEFUN (freopen64, (file, mode, fp),
-	_CONST char *file _AND
-	_CONST char *mode _AND
+	_CONST char *file,
+	_CONST char *mode,
 	register FILE *fp)
 {
   return _freopen64_r (_REENT, file, mode, fp);

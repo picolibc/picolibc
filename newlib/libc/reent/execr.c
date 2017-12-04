@@ -46,9 +46,9 @@ DESCRIPTION
 
 int
 _DEFUN (_execve_r, (ptr, name, argv, env),
-     struct _reent *ptr _AND
-     _CONST char *name _AND
-     char *_CONST argv[] _AND
+     struct _reent *ptr,
+     _CONST char *name,
+     char *_CONST argv[],
      char *_CONST env[])
 {
   int ret;
@@ -114,7 +114,7 @@ DESCRIPTION
 
 int
 _DEFUN (_wait_r, (ptr, status),
-     struct _reent *ptr _AND
+     struct _reent *ptr,
      int *status)
 {
   int ret;

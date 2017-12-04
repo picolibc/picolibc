@@ -10,9 +10,9 @@
 
 double
 _DEFUN (__adjust, (ptr, acc, dexp, sign),
-	struct _reent *ptr _AND
-	double *acc _AND
-	int dexp _AND
+	struct _reent *ptr,
+	double *acc,
+	int dexp,
 	int sign)
      /* *acc	the 64 bit accumulator */
      /* dexp	decimal exponent       */

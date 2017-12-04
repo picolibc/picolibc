@@ -36,7 +36,7 @@
 
 _VOID
 _DEFUN(__smakebuf_r, (ptr, fp),
-       struct _reent *ptr _AND
+       struct _reent *ptr,
        register FILE *fp)
 {
   register _PTR p;
@@ -77,9 +77,9 @@ _DEFUN(__smakebuf_r, (ptr, fp),
  */
 int
 _DEFUN(__swhatbuf_r, (ptr, fp, bufsize, couldbetty),
-	struct _reent *ptr _AND
-	FILE *fp _AND
-	size_t *bufsize _AND
+	struct _reent *ptr,
+	FILE *fp,
+	size_t *bufsize,
 	int *couldbetty)
 {
 #ifdef _FSEEK_OPTIMIZATION

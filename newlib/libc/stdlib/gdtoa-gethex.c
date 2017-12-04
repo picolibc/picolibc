@@ -71,7 +71,7 @@ _DEFUN (__hexdig_fun, (c),
 
 static void
 _DEFUN(rshift, (b, k),
-	_Bigint *b _AND
+	_Bigint *b,
 	int k)
 {
 	__ULong *x, *x1, *xe, y;
@@ -102,7 +102,7 @@ _DEFUN(rshift, (b, k),
 
 static _Bigint *
 _DEFUN (increment, (ptr, b),
-	struct _reent *ptr _AND
+	struct _reent *ptr,
 	_Bigint *b)
 {
 	__ULong *x, *xe;

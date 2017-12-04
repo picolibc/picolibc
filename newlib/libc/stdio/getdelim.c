@@ -41,9 +41,9 @@ No supporting OS subroutines are directly required.
 
 ssize_t
 _DEFUN(__getdelim, (bufptr, n, delim, fp),
-       char **bufptr _AND
-       size_t *n     _AND
-       int delim     _AND 
+       char **bufptr,
+       size_t *n,
+       int delim,
        FILE *fp)
 {
   char *buf;

@@ -8,7 +8,7 @@
 
 _PTR
 _DEFUN (vec_realloc, (ap, nbytes),
-	_PTR ap _AND
+	_PTR ap,
 	size_t nbytes)
 {
   return _vec_realloc_r (_REENT, ap, nbytes);

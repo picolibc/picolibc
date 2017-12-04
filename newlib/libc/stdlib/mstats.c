@@ -98,7 +98,7 @@ _DEFUN_VOID (malloc_stats)
 
 int
 _DEFUN (mallopt, (p, v),
-	int p _AND
+	int p,
 	int v)
 {
   return _mallopt_r (_REENT, p, v);
@@ -116,7 +116,7 @@ _DEFUN (mallopt, (p, v),
 
 void
 _DEFUN (_mstats_r, (ptr, s),
-	struct _reent *ptr _AND
+	struct _reent *ptr,
 	char *s)
 {
   _REENT_SMALL_CHECK_INIT(ptr);

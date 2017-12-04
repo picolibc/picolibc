@@ -15,7 +15,7 @@
 
 _VOID
 _DEFUN (_srand48_r, (r, seed),
-       struct _reent *r _AND
+       struct _reent *r,
        long seed)
 {
   _REENT_CHECK_RAND48(r);

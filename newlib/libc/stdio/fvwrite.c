@@ -46,8 +46,8 @@
 
 int
 _DEFUN(__sfvwrite_r, (ptr, fp, uio),
-       struct _reent *ptr _AND
-       register FILE *fp _AND
+       struct _reent *ptr,
+       register FILE *fp,
        register struct __suio *uio)
 {
   register size_t len;

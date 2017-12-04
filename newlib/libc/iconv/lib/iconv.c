@@ -121,7 +121,7 @@ No supporting OS subroutine calls are required.
 
 iconv_t
 _DEFUN(iconv_open, (to, from), 
-                   _CONST char *to _AND
+                   _CONST char *to,
                    _CONST char *from)
 {
   return _iconv_open_r (_REENT, to, from);
@@ -130,10 +130,10 @@ _DEFUN(iconv_open, (to, from),
 
 size_t
 _DEFUN(iconv, (cd, inbuf, inbytesleft, outbuf, outbytesleft),
-              iconv_t cd          _AND
-              char **__restrict inbuf _AND
-              size_t *__restrict inbytesleft _AND
-              char **__restrict outbuf       _AND
+              iconv_t cd,
+              char **__restrict inbuf,
+              size_t *__restrict inbytesleft,
+              char **__restrict outbuf,
               size_t *__restrict outbytesleft)
 {
     return _iconv_r (_REENT, cd, (_CONST char **) inbuf, inbytesleft,
@@ -151,8 +151,8 @@ _DEFUN(iconv_close, (cd), iconv_t cd)
 #ifndef _REENT_ONLY
 iconv_t
 _DEFUN(_iconv_open_r, (rptr, to, from),
-                      struct _reent *rptr _AND
-                      _CONST char *to     _AND
+                      struct _reent *rptr,
+                      _CONST char *to,
                       _CONST char *from)
 {
   iconv_conversion_t *ic;
@@ -202,11 +202,11 @@ _DEFUN(_iconv_open_r, (rptr, to, from),
 
 size_t
 _DEFUN(_iconv_r, (rptr, cd, inbuf, inbytesleft, outbuf, outbytesleft),
-                 struct _reent *rptr _AND
-                 iconv_t cd          _AND
-                 _CONST char **inbuf _AND
-                 size_t *inbytesleft _AND
-                 char **outbuf       _AND
+                 struct _reent *rptr,
+                 iconv_t cd,
+                 _CONST char **inbuf,
+                 size_t *inbytesleft,
+                 char **outbuf,
                  size_t *outbytesleft)
 {
   iconv_conversion_t *ic = (iconv_conversion_t *)cd;
@@ -289,7 +289,7 @@ _DEFUN(_iconv_r, (rptr, cd, inbuf, inbytesleft, outbuf, outbytesleft),
 
 int
 _DEFUN(_iconv_close_r, (rptr, cd),
-                       struct _reent *rptr _AND
+                       struct _reent *rptr,
                        iconv_t cd)
 {
   int res;

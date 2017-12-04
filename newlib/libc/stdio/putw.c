@@ -50,7 +50,7 @@ static char sccsid[] = "%W% (Berkeley) %G%";
 
 int
 _DEFUN(putw, (w, fp),
-       int w _AND
+       int w,
        register FILE *fp)
 {
   if (fwrite ((_CONST char*)&w, sizeof (w), 1, fp) != 1)

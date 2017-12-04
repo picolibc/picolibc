@@ -78,7 +78,7 @@ _DEFUN(atoll, (str),
 
 long long
 _DEFUN(_atoll_r, (ptr, str),
-       struct _reent *ptr _AND
+       struct _reent *ptr,
        _CONST char *str)
 {
 	return _strtoll_r(ptr, str, (char **)NULL, 10);

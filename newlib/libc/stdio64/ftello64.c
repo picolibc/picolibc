@@ -77,7 +77,7 @@ static char sccsid[] = "%W% (Berkeley) %G%";
 
 _off64_t
 _DEFUN (_ftello64_r, (ptr, fp),
-	struct _reent *ptr _AND
+	struct _reent *ptr,
 	register FILE * fp)
 {
   _fpos64_t pos;

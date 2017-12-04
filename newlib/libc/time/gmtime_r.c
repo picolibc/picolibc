@@ -47,7 +47,7 @@
 
 struct tm *
 _DEFUN (gmtime_r, (tim_p, res),
-	_CONST time_t *__restrict tim_p _AND
+	_CONST time_t *__restrict tim_p,
 	struct tm *__restrict res)
 {
   long days, rem;

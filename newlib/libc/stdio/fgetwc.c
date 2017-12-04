@@ -126,7 +126,7 @@ PORTABILITY
 
 wint_t
 _DEFUN(__fgetwc, (ptr, fp),
-	struct _reent *ptr _AND
+	struct _reent *ptr,
 	register FILE *fp)
 {
   wchar_t wc;
@@ -173,7 +173,7 @@ _DEFUN(__fgetwc, (ptr, fp),
 
 wint_t
 _DEFUN(_fgetwc_r, (ptr, fp),
-	struct _reent *ptr _AND
+	struct _reent *ptr,
 	register FILE *fp)
 {
   wint_t r;

@@ -12,7 +12,7 @@ extern int errno;
 
 int
 _DEFUN (_link, (existing, new),
-        char *existing _AND
+        char *existing,
         char *new)
 {
   errno = ENOSYS;

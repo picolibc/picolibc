@@ -178,8 +178,8 @@ parse_number (s, p)
 
 static long
 _DEFUN(get_number, (s, size, unsigned_p),
-     char *s _AND
-     long size _AND
+     char *s,
+     long size,
      int unsigned_p)
 {
   long x;
@@ -221,8 +221,8 @@ _DEFUN(get_number, (s, size, unsigned_p),
 
 static void
 _DEFUN(print_number, (base, unsigned_p, n),
-     int base _AND
-     int unsigned_p _AND
+     int base,
+     int unsigned_p,
      long n)
 {
   static char chars[16] = "0123456789abcdef";

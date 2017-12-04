@@ -31,7 +31,7 @@ int errno;
 
 void
 _DEFUN (cleanup_glue, (ptr, glue),
-     struct _reent *ptr _AND
+     struct _reent *ptr,
      struct _glue *glue)
 {
   /* Have to reclaim these in reverse order: */

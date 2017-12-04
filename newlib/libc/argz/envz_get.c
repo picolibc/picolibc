@@ -14,8 +14,8 @@
 
 char *
 _DEFUN (envz_get, (envz, envz_len, name),
-       const char *envz _AND 
-       size_t envz_len _AND
+       const char *envz,
+       size_t envz_len,
        const char *name)
 {
   char *buf_ptr = (char *)envz;

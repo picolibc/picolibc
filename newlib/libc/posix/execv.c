@@ -15,7 +15,7 @@ static char ***p_environ = &environ;
 
 int
 _DEFUN (execv, (path, argv), 
-	const char *path _AND
+	const char *path,
 	char * const argv[])
 {
   return _execve (path, (char * _CONST *) argv, *p_environ);

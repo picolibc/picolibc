@@ -65,8 +65,8 @@ static char sccsid[] = "%W% (Berkeley) %G%";
 
 FILE *
 _DEFUN (_fopen64_r, (ptr, file, mode),
-	struct _reent *ptr _AND
-	_CONST char *file _AND
+	struct _reent *ptr,
+	_CONST char *file,
 	_CONST char *mode)
 {
   register FILE *fp;
@@ -118,7 +118,7 @@ _DEFUN (_fopen64_r, (ptr, file, mode),
 
 FILE *
 _DEFUN (fopen64, (file, mode),
-	_CONST char *file _AND
+	_CONST char *file,
 	_CONST char *mode)
 {
   return _fopen64_r (_REENT, file, mode);

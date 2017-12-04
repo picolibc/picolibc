@@ -11,8 +11,8 @@
 
 int
 _DEFUN(execve, (path, argv, envp),
-      const char *path _AND
-      char * const argv[] _AND
+      const char *path,
+      char * const argv[],
       char * const envp[])
 {
   return _execve (path, argv, envp);

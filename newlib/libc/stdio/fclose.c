@@ -57,7 +57,7 @@ Required OS subroutines: <<close>>, <<fstat>>, <<isatty>>, <<lseek>>,
 
 int
 _DEFUN(_fclose_r, (rptr, fp),
-      struct _reent *rptr _AND
+      struct _reent *rptr,
       register FILE * fp)
 {
   int r;

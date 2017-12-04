@@ -88,8 +88,8 @@ Supporting OS subroutines required: <<close>>, <<fstat>>, <<isatty>>,
 
 int
 _DEFUN(_fputc_r, (ptr, ch, file),
-       struct _reent *ptr _AND
-       int ch _AND
+       struct _reent *ptr,
+       int ch,
        FILE * file)
 {
   int result;
@@ -103,7 +103,7 @@ _DEFUN(_fputc_r, (ptr, ch, file),
 #ifndef _REENT_ONLY
 int
 _DEFUN(fputc, (ch, file),
-       int ch _AND
+       int ch,
        FILE * file)
 {
 #if !defined(__OPTIMIZE_SIZE__) && !defined(PREFER_SIZE_OVER_SPEED)

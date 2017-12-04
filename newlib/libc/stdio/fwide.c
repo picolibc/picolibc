@@ -49,8 +49,8 @@ C99, POSIX.1-2001.
 
 int
 _DEFUN(_fwide_r, (ptr, fp, mode),
-	struct _reent *ptr _AND
-	FILE *fp _AND
+	struct _reent *ptr,
+	FILE *fp,
 	int mode)
 {
   int ret;
@@ -71,7 +71,7 @@ _DEFUN(_fwide_r, (ptr, fp, mode),
 
 int
 _DEFUN(fwide, (fp, mode),
-	FILE *fp _AND
+	FILE *fp,
 	int mode)
 {
   return _fwide_r (_REENT, fp, mode);

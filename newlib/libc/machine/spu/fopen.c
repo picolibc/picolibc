@@ -46,7 +46,7 @@ typedef struct
 #ifndef _REENT_ONLY
 FILE *
 _DEFUN (fopen, (file, mode),
-	_CONST char *__restrict file _AND
+	_CONST char *__restrict file,
 	_CONST char *__restrict mode)
 {
   int ret;

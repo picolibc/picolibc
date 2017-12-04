@@ -34,7 +34,7 @@
 
 wint_t
 _DEFUN(_getwc_r, (ptr, fp),
-	struct _reent *ptr _AND
+	struct _reent *ptr,
 	FILE *fp)
 {
   return _fgetwc_r (ptr, fp);

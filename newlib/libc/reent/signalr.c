@@ -44,8 +44,8 @@ DESCRIPTION
 
 int
 _DEFUN (_kill_r, (ptr, pid, sig),
-     struct _reent *ptr _AND
-     int pid _AND
+     struct _reent *ptr,
+     int pid,
      int sig)
 {
   int ret;

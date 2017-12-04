@@ -65,9 +65,9 @@ static struct _atexit _global_atexit0 = _ATEXIT_INIT;
 int
 _DEFUN (__register_exitproc,
 	(type, fn, arg, d),
-	int type _AND
-	void (*fn) (void) _AND
-	void *arg _AND
+	int type,
+	void (*fn) (void),
+	void *arg,
 	void *d)
 {
   struct _on_exit_args * args;

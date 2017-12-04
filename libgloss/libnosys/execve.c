@@ -12,8 +12,8 @@ extern int errno;
 
 int
 _DEFUN (_execve, (name, argv, env),
-        char  *name  _AND
-        char **argv  _AND
+        char  *name,
+        char **argv,
         char **env)
 {
   errno = ENOSYS;

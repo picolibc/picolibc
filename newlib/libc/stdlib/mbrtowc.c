@@ -9,10 +9,10 @@
 
 size_t
 _DEFUN (_mbrtowc_r, (ptr, pwc, s, n, ps),
-	struct _reent *ptr _AND
-	wchar_t *pwc _AND
-	const char *s _AND
-	size_t n _AND
+	struct _reent *ptr,
+	wchar_t *pwc,
+	const char *s,
+	size_t n,
 	mbstate_t *ps)
 {
   int retval = 0;
@@ -43,9 +43,9 @@ _DEFUN (_mbrtowc_r, (ptr, pwc, s, n, ps),
 #ifndef _REENT_ONLY
 size_t
 _DEFUN (mbrtowc, (pwc, s, n, ps),
-	wchar_t *__restrict pwc _AND
-	const char *__restrict s _AND
-	size_t n _AND
+	wchar_t *__restrict pwc,
+	const char *__restrict s,
+	size_t n,
 	mbstate_t *__restrict ps)
 {
 #if defined(PREFER_SIZE_OVER_SPEED) || defined(__OPTIMIZE_SIZE__)

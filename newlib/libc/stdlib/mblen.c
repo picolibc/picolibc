@@ -44,7 +44,7 @@ effects vary with the locale.
 
 int
 _DEFUN (mblen, (s, n), 
-        const char *s _AND
+        const char *s,
         size_t n)
 {
 #ifdef _MB_CAPABLE

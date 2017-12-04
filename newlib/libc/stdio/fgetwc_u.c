@@ -31,7 +31,7 @@
 
 wint_t
 _DEFUN(_fgetwc_unlocked_r, (ptr, fp),
-	struct _reent *ptr _AND
+	struct _reent *ptr,
 	register FILE *fp)
 {
   ORIENT(fp, 1);

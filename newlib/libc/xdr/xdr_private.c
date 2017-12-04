@@ -36,7 +36,7 @@ _DEFUN (xdr_set_vprintf, (fnptr),
 
 void
 _DEFUN (xdr_vwarnx, (format, ap),
-        _CONST char *format _AND
+        _CONST char *format,
 	va_list ap)
 {
   if (xdr_vprintf)

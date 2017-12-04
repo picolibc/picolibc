@@ -41,9 +41,9 @@
 #if defined (ICONV_FROM_UCS_CES_TABLE_PCS)
 static size_t
 _DEFUN(table_pcs_convert_from_ucs, (data, in, outbuf, outbytesleft),
-                               _VOID_PTR data         _AND
-                               ucs4_t in              _AND
-                               unsigned char **outbuf _AND
+                               _VOID_PTR data,
+                               ucs4_t in,
+                               unsigned char **outbuf,
                                size_t *outbytesleft)
 {
   if (*outbytesleft < 1)
@@ -66,7 +66,7 @@ _DEFUN(table_pcs_convert_from_ucs, (data, in, outbuf, outbytesleft),
 
 static _VOID_PTR
 _DEFUN(table_pcs_from_ucs_init, (rptr, encoding),
-                                struct _reent *rptr _AND
+                                struct _reent *rptr,
                                 _CONST char *encoding)
 {
   return _iconv_from_ucs_ces_handlers_table.init (rptr, encoding);
@@ -74,7 +74,7 @@ _DEFUN(table_pcs_from_ucs_init, (rptr, encoding),
 
 static size_t
 _DEFUN(table_pcs_from_ucs_close, (rptr, data),
-                                 struct _reent *rptr _AND
+                                 struct _reent *rptr,
                                  _VOID_PTR data)
 {
   return _iconv_from_ucs_ces_handlers_table.close (rptr, data);
@@ -92,8 +92,8 @@ _DEFUN(table_pcs_from_ucs_get_mb_cur_max, (data),
 #if defined (ICONV_TO_UCS_CES_TABLE_PCS)
 static ucs4_t
 _DEFUN(table_pcs_convert_to_ucs, (data, inbuf, inbytesleft),
-                             _VOID_PTR data               _AND
-                             _CONST unsigned char **inbuf _AND
+                             _VOID_PTR data,
+                             _CONST unsigned char **inbuf,
                              size_t *inbytesleft)
 {
   if (*inbytesleft < 1)
@@ -114,7 +114,7 @@ _DEFUN(table_pcs_convert_to_ucs, (data, inbuf, inbytesleft),
 
 static _VOID_PTR
 _DEFUN(table_pcs_to_ucs_init, (rptr, encoding),
-                              struct _reent *rptr _AND
+                              struct _reent *rptr,
                               _CONST char *encoding)
 {
   return _iconv_to_ucs_ces_handlers_table.init (rptr, encoding);
@@ -122,7 +122,7 @@ _DEFUN(table_pcs_to_ucs_init, (rptr, encoding),
 
 static size_t
 _DEFUN(table_pcs_to_ucs_close, (rptr, data),
-                               struct _reent *rptr _AND
+                               struct _reent *rptr,
                                _VOID_PTR data)
 {
   return _iconv_to_ucs_ces_handlers_table.close (rptr, data);

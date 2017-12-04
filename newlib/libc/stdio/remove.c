@@ -60,7 +60,7 @@ Supporting OS subroutine required: <<unlink>>.
 
 int
 _DEFUN(_remove_r, (ptr, filename),
-       struct _reent *ptr _AND
+       struct _reent *ptr,
        _CONST char *filename)
 {
   if (_unlink_r (ptr, filename) == -1)

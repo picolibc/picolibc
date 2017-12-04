@@ -95,7 +95,7 @@ static const double V_OVER2_MINUS1 = 0.13830277879601902638e-4;
 
 double
 _DEFUN (sineh, (double, int),
-        double x _AND
+        double x,
         int cosineh)
 {
   double y, f, P, Q, R, res, z, w;

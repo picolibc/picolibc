@@ -56,7 +56,7 @@ typedef struct
 
 int
 _DEFUN (vscanf, (fmt, ap),
-     _CONST char *fmt _AND
+     _CONST char *fmt,
      va_list ap)
 {
   c99_vscanf_t args;

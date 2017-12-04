@@ -175,7 +175,7 @@ static _CONST double tinytens[] = { 1e-16, 1e-32,
 #ifdef Avoid_Underflow /*{*/
  static double
 _DEFUN (sulp, (x, scale),
-       	U x _AND
+       	U x,
 	int scale)
 {
         U u;
@@ -198,9 +198,9 @@ _DEFUN (sulp, (x, scale),
 
 static void
 _DEFUN (ULtod, (L, bits, exp, k),
-	__ULong *L _AND
-	__ULong *bits _AND
-	Long exp _AND
+	__ULong *L,
+	__ULong *bits,
+	Long exp,
 	int k)
 {
 	switch(k & STRTOG_Retmask) {
@@ -1253,8 +1253,8 @@ _strtod_l (struct _reent *ptr, const char *__restrict s00, char **__restrict se,
 
 double
 _DEFUN (_strtod_r, (ptr, s00, se),
-	struct _reent *ptr _AND
-	_CONST char *__restrict s00 _AND
+	struct _reent *ptr,
+	_CONST char *__restrict s00,
 	char **__restrict se)
 {
   return _strtod_l (ptr, s00, se, __get_current_locale ());
@@ -1270,7 +1270,7 @@ strtod_l (const char *__restrict s00, char **__restrict se, locale_t loc)
 
 double
 _DEFUN (strtod, (s00, se),
-	_CONST char *__restrict s00 _AND char **__restrict se)
+	_CONST char *__restrict s00, char **__restrict se)
 {
   return _strtod_l (_REENT, s00, se, __get_current_locale ());
 }
@@ -1291,7 +1291,7 @@ strtof_l (const char *__restrict s00, char **__restrict se, locale_t loc)
 
 float
 _DEFUN (strtof, (s00, se),
-	_CONST char *__restrict s00 _AND
+	_CONST char *__restrict s00,
 	char **__restrict se)
 {
   double val = _strtod_l (_REENT, s00, se, __get_current_locale ());

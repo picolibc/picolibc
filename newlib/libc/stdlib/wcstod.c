@@ -215,8 +215,8 @@ _wcstod_l (struct _reent *ptr, const wchar_t *nptr, wchar_t **endptr,
 
 double
 _DEFUN (_wcstod_r, (ptr, nptr, endptr),
-	struct _reent *ptr _AND
-	_CONST wchar_t *nptr _AND
+	struct _reent *ptr,
+	_CONST wchar_t *nptr,
 	wchar_t **endptr)
 {
   return _wcstod_l (ptr, nptr, endptr, __get_current_locale ());
@@ -224,8 +224,8 @@ _DEFUN (_wcstod_r, (ptr, nptr, endptr),
 
 float
 _DEFUN (_wcstof_r, (ptr, nptr, endptr),
-	struct _reent *ptr _AND
-	_CONST wchar_t *nptr _AND
+	struct _reent *ptr,
+	_CONST wchar_t *nptr,
 	wchar_t **endptr)
 {
   double retval = _wcstod_l (ptr, nptr, endptr, __get_current_locale ());
@@ -245,7 +245,7 @@ wcstod_l (const wchar_t *__restrict nptr, wchar_t **__restrict endptr,
 
 double
 _DEFUN (wcstod, (nptr, endptr),
-	_CONST wchar_t *__restrict nptr _AND wchar_t **__restrict endptr)
+	_CONST wchar_t *__restrict nptr, wchar_t **__restrict endptr)
 {
   return _wcstod_l (_REENT, nptr, endptr, __get_current_locale ());
 }
@@ -267,7 +267,7 @@ wcstof_l (const wchar_t *__restrict nptr, wchar_t **__restrict endptr,
 
 float
 _DEFUN (wcstof, (nptr, endptr),
-	_CONST wchar_t *__restrict nptr _AND
+	_CONST wchar_t *__restrict nptr,
 	wchar_t **__restrict endptr)
 {
   double val = _wcstod_l (_REENT, nptr, endptr, __get_current_locale ());

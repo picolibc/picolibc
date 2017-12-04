@@ -21,7 +21,7 @@ extern void _exit (int) __attribute__((__noreturn__));
  */
 int
 _DEFUN (_kill, (pid, sig),
-        int pid _AND
+        int pid,
         int sig)
 {
   if(pid == __MYPID)

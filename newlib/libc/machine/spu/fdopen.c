@@ -35,7 +35,7 @@ POSSIBILITY OF SUCH DAMAGE.
 /* Just a stub for now.  */
 FILE *
 _DEFUN (fdopen, (fd, mode),
-        int fd _AND
+        int fd,
         _CONST char *mode)
 {
   errno = ENOSYS;

@@ -35,7 +35,7 @@ _DEFUN (l64a, (value),
 
 char *
 _DEFUN (_l64a_r, (rptr, value),
-     struct _reent *rptr _AND
+     struct _reent *rptr,
      long value)
 {
   char *ptr;

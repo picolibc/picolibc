@@ -39,9 +39,9 @@ DESCRIPTION
 
 _ssize_t
 _DEFUN (_read_r, (ptr, fd, buf, cnt),
-     struct _reent *ptr _AND
-     int fd _AND
-     _PTR buf _AND
+     struct _reent *ptr,
+     int fd,
+     _PTR buf,
      size_t cnt)
 {
   _ssize_t ret;

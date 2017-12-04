@@ -58,7 +58,7 @@ No supporting OS subroutines are required.
 
 wchar_t *
 _DEFUN (wcspbrk, (s, set),
-	_CONST wchar_t * s _AND
+	_CONST wchar_t * s,
 	_CONST wchar_t * set)
 {
   _CONST wchar_t *p;

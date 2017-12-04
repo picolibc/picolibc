@@ -102,7 +102,7 @@ static euc_cs_desc_t euc_kr_cs_desc [] =
 #if defined (ICONV_FROM_UCS_CES_EUC)
 static _VOID_PTR
 _DEFUN(euc_from_ucs_init, (rptr, encoding),
-                          struct _reent *rptr _AND
+                          struct _reent *rptr,
                           _CONST char *encoding)
 {
   int i;
@@ -166,7 +166,7 @@ error1:
 
 static size_t
 _DEFUN(euc_from_ucs_close, (rptr, data),
-                           struct _reent *rptr _AND
+                           struct _reent *rptr,
                            _VOID_PTR data)
 {
   int i;
@@ -186,9 +186,9 @@ _DEFUN(euc_from_ucs_close, (rptr, data),
 
 static size_t
 _DEFUN(euc_convert_from_ucs, (data, in, outbuf, outbytesleft),
-                             _VOID_PTR data         _AND
-                             register ucs4_t in     _AND
-                             unsigned char **outbuf _AND
+                             _VOID_PTR data,
+                             register ucs4_t in,
+                             unsigned char **outbuf,
                              size_t *outbytesleft)
 {
   int i;
@@ -262,7 +262,7 @@ _DEFUN(euc_convert_from_ucs, (data, in, outbuf, outbytesleft),
 #if defined (ICONV_TO_UCS_CES_EUC)
 static _VOID_PTR
 _DEFUN(euc_to_ucs_init, (rptr, encoding),
-                        struct _reent *rptr _AND
+                        struct _reent *rptr,
                         _CONST char *encoding)
 {
   int i;
@@ -326,7 +326,7 @@ error1:
 
 static size_t
 _DEFUN(euc_to_ucs_close, (rptr, data),
-                         struct _reent *rptr _AND
+                         struct _reent *rptr,
                          _VOID_PTR data)
 {
   int i;
@@ -346,8 +346,8 @@ _DEFUN(euc_to_ucs_close, (rptr, data),
 
 static ucs4_t
 _DEFUN(euc_convert_to_ucs, (data, inbuf, inbytesleft),
-                           _VOID_PTR data               _AND
-                           _CONST unsigned char **inbuf _AND
+                           _VOID_PTR data,
+                           _CONST unsigned char **inbuf,
                            size_t *inbytesleft)
 {
   int i;

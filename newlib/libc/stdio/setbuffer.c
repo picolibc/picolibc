@@ -66,8 +66,8 @@ Supporting OS subroutines required: <<close>>, <<fstat>>, <<isatty>>,
 
 _VOID
 _DEFUN(setbuffer, (fp, buf, size),
-       FILE * fp _AND
-       char *buf _AND
+       FILE * fp,
+       char *buf,
        int size)
 {
   _CAST_VOID setvbuf (fp, buf, buf ? _IOFBF : _IONBF, (size_t) size);

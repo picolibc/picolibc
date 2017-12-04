@@ -12,8 +12,8 @@ extern int errno;
 
 int
 _DEFUN (_open, (file, flags, mode),
-        char *file  _AND
-        int   flags _AND
+        char *file,
+        int   flags,
         int   mode)
 {
   errno = ENOSYS;

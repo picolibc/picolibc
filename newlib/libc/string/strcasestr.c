@@ -91,7 +91,7 @@ QUICKREF
  */
 char *
 _DEFUN (strcasestr, (s, find),
-	_CONST char *s _AND
+	_CONST char *s,
 	_CONST char *find)
 {
 #if defined(PREFER_SIZE_OVER_SPEED) || defined(__OPTIMIZE_SIZE__)

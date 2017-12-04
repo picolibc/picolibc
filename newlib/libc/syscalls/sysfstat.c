@@ -6,7 +6,7 @@
 
 int
 _DEFUN (fstat, (fd, pstat),
-     int fd _AND
+     int fd,
      struct stat *pstat)
 {
   return _fstat_r (_REENT, fd, pstat);

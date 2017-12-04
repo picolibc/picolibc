@@ -49,7 +49,7 @@
  */
 static _CONST char *
 _DEFUN(canonical_form, (rptr, str), 
-                       struct _reent *rptr _AND
+                       struct _reent *rptr,
                        _CONST char *str)
 {
   char *p, *p1;
@@ -94,9 +94,9 @@ _DEFUN(canonical_form, (rptr, str),
  */
 static char *
 _DEFUN(find_alias, (rptr, alias, table, len),
-                   struct _reent *rptr _AND
-                   _CONST char *alias  _AND
-                   _CONST char *table  _AND
+                   struct _reent *rptr,
+                   _CONST char *alias,
+                   _CONST char *table,
                    int len)
 {
   _CONST char *end;
@@ -148,7 +148,7 @@ search_again:
  */
 char *
 _DEFUN(_iconv_resolve_encoding_name, (rptr, cname, path), 
-                                     struct _reent *rptr _AND
+                                     struct _reent *rptr,
                                      _CONST char *ca)
 {
   char *p = (char *)ca;

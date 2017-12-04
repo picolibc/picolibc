@@ -22,8 +22,8 @@ extern char _DEFUN_VOID (inbyte);
  */
 int
 _DEFUN (read, (fd, buf, nbytes),
-       int fd _AND
-       char *buf _AND
+       int fd,
+       char *buf,
        int nbytes)
 {
   int i = 0;

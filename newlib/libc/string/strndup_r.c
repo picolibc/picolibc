@@ -4,8 +4,8 @@
 
 char *
 _DEFUN (_strndup_r, (reent_ptr, str, n), 
-        struct _reent *reent_ptr  _AND
-        _CONST char   *str _AND
+        struct _reent *reent_ptr,
+        _CONST char   *str,
         size_t n)
 {
   _CONST char *ptr = str;

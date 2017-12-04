@@ -20,7 +20,7 @@
  */
 int
 _DEFUN (_fstat, (fd, buf),
-       int fd _AND
+       int fd,
        struct stat *buf)
 {
   buf->st_mode = S_IFCHR;        /* Always pretend to be a tty */

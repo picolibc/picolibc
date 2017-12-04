@@ -13,8 +13,8 @@
 
 void
 _DEFUN (envz_remove, (envz, envz_len, name),
-       char **envz _AND
-       size_t *envz_len _AND
+       char **envz,
+       size_t *envz_len,
        const char *name)
 {
   char *entry = NULL;

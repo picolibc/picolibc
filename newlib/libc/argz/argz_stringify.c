@@ -11,8 +11,8 @@
 
 void
 _DEFUN (argz_stringify, (argz, argz_len, sep),
-       char *argz _AND
-       size_t argz_len _AND
+       char *argz,
+       size_t argz_len,
        int sep)
 {
   size_t i;

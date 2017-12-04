@@ -60,8 +60,8 @@ No supporting OS subroutines are required.
 
 wchar_t	*
 _DEFUN(wmemset, (s, c, n),
-	wchar_t *s _AND
-	wchar_t c _AND
+	wchar_t *s,
+	wchar_t c,
 	size_t n)
 {
 	size_t i;

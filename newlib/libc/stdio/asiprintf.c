@@ -26,8 +26,8 @@
 
 int
 _DEFUN(_asiprintf_r, (ptr, strp, fmt),
-       struct _reent *ptr _AND
-       char **strp        _AND
+       struct _reent *ptr,
+       char **strp,
        const char *fmt _DOTS)
 {
   int ret;
@@ -54,7 +54,7 @@ _DEFUN(_asiprintf_r, (ptr, strp, fmt),
 
 int
 _DEFUN(asiprintf, (strp, fmt),
-       char **strp _AND
+       char **strp,
        const char *fmt _DOTS)
 {
   int ret;

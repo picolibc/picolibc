@@ -11,7 +11,7 @@
 
 size_t
 _DEFUN (argz_count, (argz, argz_len), 
-       const char *argz _AND
+       const char *argz,
        size_t argz_len)
 {
   int i;

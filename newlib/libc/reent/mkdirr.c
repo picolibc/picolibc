@@ -41,8 +41,8 @@ DESCRIPTION
 
 int
 _DEFUN (_mkdir_r, (ptr, path, mode),
-     struct _reent *ptr _AND
-     _CONST char *path _AND
+     struct _reent *ptr,
+     _CONST char *path,
      int mode)
 {
   int ret;

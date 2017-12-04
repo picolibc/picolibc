@@ -59,12 +59,12 @@ Supporting OS subroutines required: <<close>>, <<fstat>>, <<isatty>>,
 
 static void
 _DEFUN (print_f, (ptr, buf, invalue, ndigit, type, dot, mode),
-	struct _reent *ptr _AND
-	char *buf _AND
-	double invalue _AND
-	int ndigit _AND
-	char type _AND
-	int dot _AND
+	struct _reent *ptr,
+	char *buf,
+	double invalue,
+	int ndigit,
+	char type,
+	int dot,
 	int mode)
 {
   int decpt;
@@ -127,11 +127,11 @@ _DEFUN (print_f, (ptr, buf, invalue, ndigit, type, dot, mode),
 
 static void
 _DEFUN (print_e, (ptr, buf, invalue, width, type, dot),
-	struct _reent *ptr _AND
-	char *buf _AND
-	double invalue _AND
-	int width _AND
-	char type _AND
+	struct _reent *ptr,
+	char *buf,
+	double invalue,
+	int width,
+	char type,
 	int dot)
 {
   int sign;
@@ -210,10 +210,10 @@ _DEFUN (print_e, (ptr, buf, invalue, width, type, dot),
 
 char *
 _DEFUN (fcvtbuf, (invalue, ndigit, decpt, sign, fcvt_buf),
-	double invalue _AND
-	int ndigit _AND
-	int *decpt _AND
-	int *sign _AND
+	double invalue,
+	int ndigit,
+	int *decpt,
+	int *sign,
 	char *fcvt_buf)
 {
   struct _reent *reent = _REENT;
@@ -267,10 +267,10 @@ _DEFUN (fcvtbuf, (invalue, ndigit, decpt, sign, fcvt_buf),
 
 char *
 _DEFUN (ecvtbuf, (invalue, ndigit, decpt, sign, fcvt_buf),
-	double invalue _AND
-	int ndigit _AND
-	int *decpt _AND
-	int *sign _AND
+	double invalue,
+	int ndigit,
+	int *decpt,
+	int *sign,
 	char *fcvt_buf)
 {
   struct _reent *reent = _REENT;
@@ -318,11 +318,11 @@ _DEFUN (ecvtbuf, (invalue, ndigit, decpt, sign, fcvt_buf),
 
 char *
 _DEFUN (_gcvt, (ptr, invalue, ndigit, buf, type, dot),
-	struct _reent *ptr _AND
-	double invalue _AND
-	int ndigit _AND
-	char *buf _AND
-	char type _AND
+	struct _reent *ptr,
+	double invalue,
+	int ndigit,
+	char *buf,
+	char type,
 	int dot)
 {
   char *save = buf;
@@ -426,12 +426,12 @@ _DEFUN (_gcvt, (ptr, invalue, ndigit, buf, type, dot),
 
 char *
 _DEFUN (_dcvt, (ptr, buffer, invalue, precision, width, type, dot),
-	struct _reent *ptr _AND
-	char *buffer _AND
-	double invalue _AND
-	int precision _AND
-	int width _AND
-	char type _AND
+	struct _reent *ptr,
+	char *buffer,
+	double invalue,
+	int precision,
+	int width,
+	char type,
 	int dot)
 {
   switch (type)

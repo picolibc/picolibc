@@ -12,7 +12,7 @@ extern int errno;
 
 int
 _DEFUN (_kill, (pid, sig),
-        int pid  _AND
+        int pid,
         int sig)
 {
   errno = ENOSYS;

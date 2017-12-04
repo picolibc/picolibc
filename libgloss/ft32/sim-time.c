@@ -34,7 +34,7 @@ _DEFUN (_times, _times (buf),
  */
 int
 _DEFUN (_gettimeofday, _gettimeofday (tv, tz),
-        struct timeval *tv _AND
+        struct timeval *tv,
         void *tzvp)
 {
   struct timezone *tz = tzvp;

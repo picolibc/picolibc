@@ -21,8 +21,8 @@
 
 void
 _DEFUN (sincos, (x, sinx, cosx),
-        double x _AND
-        double *sinx _AND
+        double x,
+        double *sinx,
         double *cosx)
 {
   *sinx = sin (x);

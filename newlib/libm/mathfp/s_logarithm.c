@@ -80,7 +80,7 @@ static const double C3 =  0.43429448190325182765;
 
 double
 _DEFUN (logarithm, (double, int),
-        double x _AND
+        double x,
         int ten)
 {
   int N;
