@@ -48,7 +48,6 @@
 
 #ifdef _HAVE_STDC
 #define	_PTR		void *
-#define	_NOARGS		void
 #define	_VOLATILE	volatile
 #define	_SIGNED		signed
 #define _VOID void
@@ -64,7 +63,7 @@
 #define _EXFNPTR(name, proto)		(* name) proto
 #endif
 #define	_DEFUN(name, arglist, args)	name(args)
-#define	_DEFUN_VOID(name)		name(_NOARGS)
+#define	_DEFUN_VOID(name)		name(void)
 #define _CAST_VOID (void)
 #ifndef _LONG_DOUBLE
 #define _LONG_DOUBLE long double
@@ -74,7 +73,6 @@
 #endif
 #else	
 #define	_PTR		char *
-#define	_NOARGS
 #define	_VOLATILE
 #define	_SIGNED
 #define _VOID void

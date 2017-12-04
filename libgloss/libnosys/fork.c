@@ -12,7 +12,7 @@ extern int errno;
 
 int
 _DEFUN (_fork, (),
-        _NOARGS)
+        void)
 {
   errno = ENOSYS;
   return -1;

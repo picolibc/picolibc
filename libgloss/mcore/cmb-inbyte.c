@@ -16,7 +16,7 @@
 
 int
 _DEFUN (inbyte, (),
-	_NOARGS)
+	void)
 
 {
     return -1;
