@@ -47,9 +47,9 @@ DESCRIPTION
 int
 _DEFUN (_execve_r, (ptr, name, argv, env),
      struct _reent *ptr,
-     _CONST char *name,
-     char *_CONST argv[],
-     char *_CONST env[])
+     const char *name,
+     char *const argv[],
+     char *const env[])
 {
   int ret;
 

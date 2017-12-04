@@ -87,7 +87,7 @@ static char sccsid[] = "@(#)ctype_.c	5.6 (Berkeley) 6/1/90";
 /* No static const on Cygwin since it's referenced and potentially overwritten
    for compatibility with older applications. */
 #ifndef __CYGWIN__
-_CONST
+const
 #endif
 char _ctype_b[128 + 256] = {
 	_CTYPE_DATA_128_255,
@@ -116,7 +116,7 @@ __asm__ ("					\n\
 #    endif
 #  else /* !__CYGWIN__ */
 
-_CONST char _ctype_[1 + 256] = {
+const char _ctype_[1 + 256] = {
 	0,
 	_CTYPE_DATA_0_127,
 	_CTYPE_DATA_128_255
@@ -125,7 +125,7 @@ _CONST char _ctype_[1 + 256] = {
 
 #else	/* !ALLOW_NEGATIVE_CTYPE_INDEX */
 
-_CONST char _ctype_[1 + 256] = {
+const char _ctype_[1 + 256] = {
 	0,
 	_CTYPE_DATA_0_127,
 	_CTYPE_DATA_128_255

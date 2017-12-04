@@ -10,7 +10,7 @@
 __int64_t
 _DEFUN (_atosfix64_r, (reent, s),
 	struct _reent *reent,
-	_CONST char *s)
+	const char *s)
 {
   return _strtosfix64_r (reent, s, NULL);
 }
@@ -18,7 +18,7 @@ _DEFUN (_atosfix64_r, (reent, s),
 #ifndef _REENT_ONLY
 __int64_t
 _DEFUN (atosfix64, (s),
-	_CONST char *s)
+	const char *s)
 {
   return strtosfix64 (s, NULL);
 }

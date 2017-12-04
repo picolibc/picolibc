@@ -524,12 +524,12 @@ sub generate_cesbi_h($$)
   foreach my $ces (@ces)
   {
     print CESBI_H "#ifdef $macro_to_ucs_ces\U$ces\n";
-    print CESBI_H "extern _CONST iconv_to_ucs_ces_handlers_t\n";
+    print CESBI_H "extern const iconv_to_ucs_ces_handlers_t\n";
     print CESBI_H "$var_to_ucs_handlers$ces;\n";
     print CESBI_H "#endif\n";
 
     print CESBI_H "#ifdef $macro_from_ucs_ces\U$ces\n";
-    print CESBI_H "extern _CONST iconv_from_ucs_ces_handlers_t\n";
+    print CESBI_H "extern const iconv_from_ucs_ces_handlers_t\n";
     print CESBI_H "$var_from_ucs_handlers$ces;\n";
     print CESBI_H "#endif\n\n";
   }
@@ -584,7 +584,7 @@ sub generate_aliasesbi_c($)
   print ALIASESBI_C "$comment_automatic\n\n";
   print ALIASESBI_C "#include <_ansi.h>\n";
   print ALIASESBI_C "#include \"encnames.h\"\n\n";
-  print ALIASESBI_C "_CONST char *\n";
+  print ALIASESBI_C "const char *\n";
   print ALIASESBI_C "$var_aliases =\n";
   print ALIASESBI_C "{\n";
 
@@ -749,7 +749,7 @@ sub generate_ccsbi_h($)
   {
     print CCSBI_H "#if defined ($macro_to_ucs_ccs\U$ccs) \\\n";
     print CCSBI_H " || defined ($macro_from_ucs_ccs\U$ccs)\n";
-    print CCSBI_H "extern _CONST iconv_ccs_t\n";
+    print CCSBI_H "extern const iconv_ccs_t\n";
     print CCSBI_H "$var_ccs$ccs;\n";
     print CCSBI_H "#endif\n";
   }
@@ -789,7 +789,7 @@ sub generate_cesbi_c($)
   {
     print CESBI_C "#if defined ($macro_to_ucs_ces\U$ces) \\\n";
     print CESBI_C " || defined ($macro_from_ucs_ces\U$ces)\n";
-    print CESBI_C "static _CONST char *\n";
+    print CESBI_C "static const char *\n";
     print CESBI_C "$var_ces_names${ces}\[] =\n";
     print CESBI_C "{\n";
     my @encodings = sort @{$cesenc{$ces}};
@@ -808,36 +808,36 @@ sub generate_cesbi_c($)
   print CESBI_C "/*\n";
   print CESBI_C " * The following structure contains the list of \"to UCS\" linked-in CES converters.\n";
   print CESBI_C " */\n";
-  print CESBI_C "_CONST iconv_to_ucs_ces_t\n";
+  print CESBI_C "const iconv_to_ucs_ces_t\n";
   print CESBI_C "_iconv_to_ucs_ces[] =\n";
   print CESBI_C "{\n";
   
   foreach my $ces (@ces)
   {
     print CESBI_C "#ifdef $macro_to_ucs_ces\U$ces\n";
-    print CESBI_C "  {(_CONST char **)$var_ces_names$ces,\n";
+    print CESBI_C "  {(const char **)$var_ces_names$ces,\n";
     print CESBI_C "   &$var_to_ucs_handlers$ces},\n";
     print CESBI_C "#endif\n";
   }
-  print CESBI_C "  {(_CONST char **)NULL,\n";
+  print CESBI_C "  {(const char **)NULL,\n";
   print CESBI_C "  (iconv_to_ucs_ces_handlers_t *)NULL}\n";
   print CESBI_C "};\n\n";
 
   print CESBI_C "/*\n";
   print CESBI_C " * The following structure contains the list of \"from UCS\" linked-in CES converters.\n";
   print CESBI_C " */\n";
-  print CESBI_C "_CONST iconv_from_ucs_ces_t\n";
+  print CESBI_C "const iconv_from_ucs_ces_t\n";
   print CESBI_C "_iconv_from_ucs_ces[] =\n";
   print CESBI_C "{\n";
   
   foreach my $ces (@ces)
   {
     print CESBI_C "#ifdef $macro_from_ucs_ces\U$ces\n";
-    print CESBI_C "  {(_CONST char **)$var_ces_names$ces,\n";
+    print CESBI_C "  {(const char **)$var_ces_names$ces,\n";
     print CESBI_C "   &$var_from_ucs_handlers$ces},\n";
     print CESBI_C "#endif\n";
   }
-  print CESBI_C "  {(_CONST char **)NULL,\n";
+  print CESBI_C "  {(const char **)NULL,\n";
   print CESBI_C "  (iconv_from_ucs_ces_handlers_t *)NULL}\n";
   print CESBI_C "};\n";
 
@@ -866,7 +866,7 @@ sub generate_ccsbi_c($)
   print CESBI_C " * The following array contains the list of built-in CCS tables.\n";
   print CESBI_C " */\n";
 
-  print CESBI_C "_CONST iconv_ccs_t *\n";
+  print CESBI_C "const iconv_ccs_t *\n";
   print CESBI_C "_iconv_ccs[] =\n";
   print CESBI_C "{\n";
 

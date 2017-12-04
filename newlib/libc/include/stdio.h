@@ -552,7 +552,7 @@ int	_EXFUN(fputs_unlocked, (const char *__restrict, FILE *__restrict));
 #if !defined(__CYGWIN__) || defined(_COMPILING_NEWLIB)
 FILE *	_EXFUN(fdopen64, (int, const char *));
 FILE *  _EXFUN(fopen64, (const char *, const char *));
-FILE *  _EXFUN(freopen64, (_CONST char *, _CONST char *, FILE *));
+FILE *  _EXFUN(freopen64, (const char *, const char *, FILE *));
 _off64_t _EXFUN(ftello64, (FILE *));
 _off64_t _EXFUN(fseeko64, (FILE *, _off64_t, int));
 int     _EXFUN(fgetpos64, (FILE *, _fpos64_t *));
@@ -561,7 +561,7 @@ FILE *  _EXFUN(tmpfile64, (void));
 
 FILE *	_EXFUN(_fdopen64_r, (struct _reent *, int, const char *));
 FILE *  _EXFUN(_fopen64_r, (struct _reent *,const char *, const char *));
-FILE *  _EXFUN(_freopen64_r, (struct _reent *, _CONST char *, _CONST char *, FILE *));
+FILE *  _EXFUN(_freopen64_r, (struct _reent *, const char *, const char *, FILE *));
 _off64_t _EXFUN(_ftello64_r, (struct _reent *, FILE *));
 _off64_t _EXFUN(_fseeko64_r, (struct _reent *, FILE *, _off64_t, int));
 int     _EXFUN(_fgetpos64_r, (struct _reent *, FILE *, _fpos64_t *));

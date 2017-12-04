@@ -40,7 +40,7 @@ DESCRIPTION
 int
 _DEFUN (_unlink_r, (ptr, file),
      struct _reent *ptr,
-     _CONST char *file)
+     const char *file)
 {
   int ret;
 

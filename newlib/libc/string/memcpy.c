@@ -46,7 +46,7 @@ QUICKREF
 _PTR
 _DEFUN (memcpy, (dst0, src0, len0),
 	_PTR __restrict dst0,
-	_CONST _PTR __restrict src0,
+	const _PTR __restrict src0,
 	size_t len0)
 {
 #if defined(PREFER_SIZE_OVER_SPEED) || defined(__OPTIMIZE_SIZE__)
@@ -63,9 +63,9 @@ _DEFUN (memcpy, (dst0, src0, len0),
   return save;
 #else
   char *dst = dst0;
-  _CONST char *src = src0;
+  const char *src = src0;
   long *aligned_dst;
-  _CONST long *aligned_src;
+  const long *aligned_src;
 
   /* If the size is small, or either SRC or DST is unaligned,
      then punt into the byte copy loop.  This should be rare.  */

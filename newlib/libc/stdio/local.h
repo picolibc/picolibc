@@ -143,14 +143,14 @@
 extern wint_t _EXFUN(__fgetwc, (struct _reent *, FILE *));
 extern wint_t _EXFUN(__fputwc, (struct _reent *, wchar_t, FILE *));
 extern u_char *_EXFUN(__sccl, (char *, u_char *fmt));
-extern int    _EXFUN(__svfscanf_r,(struct _reent *,FILE *, _CONST char *,va_list));
-extern int    _EXFUN(__ssvfscanf_r,(struct _reent *,FILE *, _CONST char *,va_list));
-extern int    _EXFUN(__svfiscanf_r,(struct _reent *,FILE *, _CONST char *,va_list));
-extern int    _EXFUN(__ssvfiscanf_r,(struct _reent *,FILE *, _CONST char *,va_list));
-extern int    _EXFUN(__svfwscanf_r,(struct _reent *,FILE *, _CONST wchar_t *,va_list));
-extern int    _EXFUN(__ssvfwscanf_r,(struct _reent *,FILE *, _CONST wchar_t *,va_list));
-extern int    _EXFUN(__svfiwscanf_r,(struct _reent *,FILE *, _CONST wchar_t *,va_list));
-extern int    _EXFUN(__ssvfiwscanf_r,(struct _reent *,FILE *, _CONST wchar_t *,va_list));
+extern int    _EXFUN(__svfscanf_r,(struct _reent *,FILE *, const char *,va_list));
+extern int    _EXFUN(__ssvfscanf_r,(struct _reent *,FILE *, const char *,va_list));
+extern int    _EXFUN(__svfiscanf_r,(struct _reent *,FILE *, const char *,va_list));
+extern int    _EXFUN(__ssvfiscanf_r,(struct _reent *,FILE *, const char *,va_list));
+extern int    _EXFUN(__svfwscanf_r,(struct _reent *,FILE *, const wchar_t *,va_list));
+extern int    _EXFUN(__ssvfwscanf_r,(struct _reent *,FILE *, const wchar_t *,va_list));
+extern int    _EXFUN(__svfiwscanf_r,(struct _reent *,FILE *, const wchar_t *,va_list));
+extern int    _EXFUN(__ssvfiwscanf_r,(struct _reent *,FILE *, const wchar_t *,va_list));
 int	      _EXFUN(_svfprintf_r,(struct _reent *, FILE *, const char *, 
 				  va_list)
                			_ATTRIBUTE ((__format__ (__printf__, 3, 0))));
@@ -162,7 +162,7 @@ int	      _EXFUN(_svfwprintf_r,(struct _reent *, FILE *, const wchar_t *,
 int	      _EXFUN(_svfiwprintf_r,(struct _reent *, FILE *, const wchar_t *, 
 				  va_list));
 extern FILE  *_EXFUN(__sfp,(struct _reent *));
-extern int    _EXFUN(__sflags,(struct _reent *,_CONST char*, int*));
+extern int    _EXFUN(__sflags,(struct _reent *,const char*, int*));
 extern int    _EXFUN(__sflush_r,(struct _reent *,FILE *));
 #ifdef _STDIO_BSD_SEMANTICS
 extern int    _EXFUN(__sflushw_r,(struct _reent *,FILE *));
@@ -347,6 +347,6 @@ typedef enum __packed {
   PWPOS,   /* get positional parameter value for variable width or precision */
 } __ACTION;
 
-extern _CONST __CH_CLASS __chclass[256];
-extern _CONST __STATE __state_table[MAX_STATE][MAX_CH_CLASS];
-extern _CONST __ACTION __action_table[MAX_STATE][MAX_CH_CLASS];
+extern const __CH_CLASS __chclass[256];
+extern const __STATE __state_table[MAX_STATE][MAX_CH_CLASS];
+extern const __ACTION __action_table[MAX_STATE][MAX_CH_CLASS];

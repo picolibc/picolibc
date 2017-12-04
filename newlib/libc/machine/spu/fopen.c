@@ -37,17 +37,17 @@ Author: Joel Schopp <jschopp@austin.ibm.com>
 
 typedef struct
 {
-  _CONST char* file;
+  const char* file;
   unsigned int pad0[ 3 ];
-  _CONST char* mode;
+  const char* mode;
   unsigned int pad1[ 3 ];
 } c99_fopen_t;
 
 #ifndef _REENT_ONLY
 FILE *
 _DEFUN (fopen, (file, mode),
-	_CONST char *__restrict file,
-	_CONST char *__restrict mode)
+	const char *__restrict file,
+	const char *__restrict mode)
 {
   int ret;
   c99_fopen_t args;

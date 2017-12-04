@@ -44,7 +44,7 @@ DESCRIPTION
 int
 _open64_r (ptr, file, flags, mode)
      struct _reent *ptr;
-     _CONST char *file;
+     const char *file;
      int flags;
      int mode;
 {

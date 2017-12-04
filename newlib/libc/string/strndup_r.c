@@ -5,10 +5,10 @@
 char *
 _DEFUN (_strndup_r, (reent_ptr, str, n), 
         struct _reent *reent_ptr,
-        _CONST char   *str,
+        const char   *str,
         size_t n)
 {
-  _CONST char *ptr = str;
+  const char *ptr = str;
   size_t len;
   char *copy;
 

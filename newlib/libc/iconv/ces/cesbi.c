@@ -12,7 +12,7 @@
  */
 #if defined (ICONV_TO_UCS_CES_EUC) \
  || defined (ICONV_FROM_UCS_CES_EUC)
-static _CONST char *
+static const char *
 iconv_ces_names_euc[] =
 {
 # if defined (_ICONV_FROM_ENCODING_EUC_JP) \
@@ -33,7 +33,7 @@ iconv_ces_names_euc[] =
 
 #if defined (ICONV_TO_UCS_CES_TABLE) \
  || defined (ICONV_FROM_UCS_CES_TABLE)
-static _CONST char *
+static const char *
 iconv_ces_names_table[] =
 {
 # if defined (_ICONV_FROM_ENCODING_CP775) \
@@ -174,7 +174,7 @@ iconv_ces_names_table[] =
 
 #if defined (ICONV_TO_UCS_CES_TABLE_PCS) \
  || defined (ICONV_FROM_UCS_CES_TABLE_PCS)
-static _CONST char *
+static const char *
 iconv_ces_names_table_pcs[] =
 {
 # if defined (_ICONV_FROM_ENCODING_BIG5) \
@@ -187,7 +187,7 @@ iconv_ces_names_table_pcs[] =
 
 #if defined (ICONV_TO_UCS_CES_UCS_2) \
  || defined (ICONV_FROM_UCS_CES_UCS_2)
-static _CONST char *
+static const char *
 iconv_ces_names_ucs_2[] =
 {
 # if defined (_ICONV_FROM_ENCODING_UCS_2) \
@@ -208,7 +208,7 @@ iconv_ces_names_ucs_2[] =
 
 #if defined (ICONV_TO_UCS_CES_UCS_2_INTERNAL) \
  || defined (ICONV_FROM_UCS_CES_UCS_2_INTERNAL)
-static _CONST char *
+static const char *
 iconv_ces_names_ucs_2_internal[] =
 {
 # if defined (_ICONV_FROM_ENCODING_UCS_2_INTERNAL) \
@@ -221,7 +221,7 @@ iconv_ces_names_ucs_2_internal[] =
 
 #if defined (ICONV_TO_UCS_CES_UCS_4) \
  || defined (ICONV_FROM_UCS_CES_UCS_4)
-static _CONST char *
+static const char *
 iconv_ces_names_ucs_4[] =
 {
 # if defined (_ICONV_FROM_ENCODING_UCS_4) \
@@ -242,7 +242,7 @@ iconv_ces_names_ucs_4[] =
 
 #if defined (ICONV_TO_UCS_CES_UCS_4_INTERNAL) \
  || defined (ICONV_FROM_UCS_CES_UCS_4_INTERNAL)
-static _CONST char *
+static const char *
 iconv_ces_names_ucs_4_internal[] =
 {
 # if defined (_ICONV_FROM_ENCODING_UCS_4_INTERNAL) \
@@ -255,7 +255,7 @@ iconv_ces_names_ucs_4_internal[] =
 
 #if defined (ICONV_TO_UCS_CES_US_ASCII) \
  || defined (ICONV_FROM_UCS_CES_US_ASCII)
-static _CONST char *
+static const char *
 iconv_ces_names_us_ascii[] =
 {
 # if defined (_ICONV_FROM_ENCODING_US_ASCII) \
@@ -268,7 +268,7 @@ iconv_ces_names_us_ascii[] =
 
 #if defined (ICONV_TO_UCS_CES_UTF_16) \
  || defined (ICONV_FROM_UCS_CES_UTF_16)
-static _CONST char *
+static const char *
 iconv_ces_names_utf_16[] =
 {
 # if defined (_ICONV_FROM_ENCODING_UTF_16) \
@@ -289,7 +289,7 @@ iconv_ces_names_utf_16[] =
 
 #if defined (ICONV_TO_UCS_CES_UTF_8) \
  || defined (ICONV_FROM_UCS_CES_UTF_8)
-static _CONST char *
+static const char *
 iconv_ces_names_utf_8[] =
 {
 # if defined (_ICONV_FROM_ENCODING_UTF_8) \
@@ -303,99 +303,99 @@ iconv_ces_names_utf_8[] =
 /*
  * The following structure contains the list of "to UCS" linked-in CES converters.
  */
-_CONST iconv_to_ucs_ces_t
+const iconv_to_ucs_ces_t
 _iconv_to_ucs_ces[] =
 {
 #ifdef ICONV_TO_UCS_CES_EUC
-  {(_CONST char **)iconv_ces_names_euc,
+  {(const char **)iconv_ces_names_euc,
    &_iconv_to_ucs_ces_handlers_euc},
 #endif
 #ifdef ICONV_TO_UCS_CES_TABLE
-  {(_CONST char **)iconv_ces_names_table,
+  {(const char **)iconv_ces_names_table,
    &_iconv_to_ucs_ces_handlers_table},
 #endif
 #ifdef ICONV_TO_UCS_CES_TABLE_PCS
-  {(_CONST char **)iconv_ces_names_table_pcs,
+  {(const char **)iconv_ces_names_table_pcs,
    &_iconv_to_ucs_ces_handlers_table_pcs},
 #endif
 #ifdef ICONV_TO_UCS_CES_UCS_2
-  {(_CONST char **)iconv_ces_names_ucs_2,
+  {(const char **)iconv_ces_names_ucs_2,
    &_iconv_to_ucs_ces_handlers_ucs_2},
 #endif
 #ifdef ICONV_TO_UCS_CES_UCS_2_INTERNAL
-  {(_CONST char **)iconv_ces_names_ucs_2_internal,
+  {(const char **)iconv_ces_names_ucs_2_internal,
    &_iconv_to_ucs_ces_handlers_ucs_2_internal},
 #endif
 #ifdef ICONV_TO_UCS_CES_UCS_4
-  {(_CONST char **)iconv_ces_names_ucs_4,
+  {(const char **)iconv_ces_names_ucs_4,
    &_iconv_to_ucs_ces_handlers_ucs_4},
 #endif
 #ifdef ICONV_TO_UCS_CES_UCS_4_INTERNAL
-  {(_CONST char **)iconv_ces_names_ucs_4_internal,
+  {(const char **)iconv_ces_names_ucs_4_internal,
    &_iconv_to_ucs_ces_handlers_ucs_4_internal},
 #endif
 #ifdef ICONV_TO_UCS_CES_US_ASCII
-  {(_CONST char **)iconv_ces_names_us_ascii,
+  {(const char **)iconv_ces_names_us_ascii,
    &_iconv_to_ucs_ces_handlers_us_ascii},
 #endif
 #ifdef ICONV_TO_UCS_CES_UTF_16
-  {(_CONST char **)iconv_ces_names_utf_16,
+  {(const char **)iconv_ces_names_utf_16,
    &_iconv_to_ucs_ces_handlers_utf_16},
 #endif
 #ifdef ICONV_TO_UCS_CES_UTF_8
-  {(_CONST char **)iconv_ces_names_utf_8,
+  {(const char **)iconv_ces_names_utf_8,
    &_iconv_to_ucs_ces_handlers_utf_8},
 #endif
-  {(_CONST char **)NULL,
+  {(const char **)NULL,
   (iconv_to_ucs_ces_handlers_t *)NULL}
 };
 
 /*
  * The following structure contains the list of "from UCS" linked-in CES converters.
  */
-_CONST iconv_from_ucs_ces_t
+const iconv_from_ucs_ces_t
 _iconv_from_ucs_ces[] =
 {
 #ifdef ICONV_FROM_UCS_CES_EUC
-  {(_CONST char **)iconv_ces_names_euc,
+  {(const char **)iconv_ces_names_euc,
    &_iconv_from_ucs_ces_handlers_euc},
 #endif
 #ifdef ICONV_FROM_UCS_CES_TABLE
-  {(_CONST char **)iconv_ces_names_table,
+  {(const char **)iconv_ces_names_table,
    &_iconv_from_ucs_ces_handlers_table},
 #endif
 #ifdef ICONV_FROM_UCS_CES_TABLE_PCS
-  {(_CONST char **)iconv_ces_names_table_pcs,
+  {(const char **)iconv_ces_names_table_pcs,
    &_iconv_from_ucs_ces_handlers_table_pcs},
 #endif
 #ifdef ICONV_FROM_UCS_CES_UCS_2
-  {(_CONST char **)iconv_ces_names_ucs_2,
+  {(const char **)iconv_ces_names_ucs_2,
    &_iconv_from_ucs_ces_handlers_ucs_2},
 #endif
 #ifdef ICONV_FROM_UCS_CES_UCS_2_INTERNAL
-  {(_CONST char **)iconv_ces_names_ucs_2_internal,
+  {(const char **)iconv_ces_names_ucs_2_internal,
    &_iconv_from_ucs_ces_handlers_ucs_2_internal},
 #endif
 #ifdef ICONV_FROM_UCS_CES_UCS_4
-  {(_CONST char **)iconv_ces_names_ucs_4,
+  {(const char **)iconv_ces_names_ucs_4,
    &_iconv_from_ucs_ces_handlers_ucs_4},
 #endif
 #ifdef ICONV_FROM_UCS_CES_UCS_4_INTERNAL
-  {(_CONST char **)iconv_ces_names_ucs_4_internal,
+  {(const char **)iconv_ces_names_ucs_4_internal,
    &_iconv_from_ucs_ces_handlers_ucs_4_internal},
 #endif
 #ifdef ICONV_FROM_UCS_CES_US_ASCII
-  {(_CONST char **)iconv_ces_names_us_ascii,
+  {(const char **)iconv_ces_names_us_ascii,
    &_iconv_from_ucs_ces_handlers_us_ascii},
 #endif
 #ifdef ICONV_FROM_UCS_CES_UTF_16
-  {(_CONST char **)iconv_ces_names_utf_16,
+  {(const char **)iconv_ces_names_utf_16,
    &_iconv_from_ucs_ces_handlers_utf_16},
 #endif
 #ifdef ICONV_FROM_UCS_CES_UTF_8
-  {(_CONST char **)iconv_ces_names_utf_8,
+  {(const char **)iconv_ces_names_utf_8,
    &_iconv_from_ucs_ces_handlers_utf_8},
 #endif
-  {(_CONST char **)NULL,
+  {(const char **)NULL,
   (iconv_from_ucs_ces_handlers_t *)NULL}
 };

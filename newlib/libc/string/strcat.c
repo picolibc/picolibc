@@ -56,7 +56,7 @@ QUICKREF
 char *
 _DEFUN (strcat, (s1, s2),
 	char *__restrict s1,
-	_CONST char *__restrict s2)
+	const char *__restrict s2)
 {
 #if defined(PREFER_SIZE_OVER_SPEED) || defined(__OPTIMIZE_SIZE__)
   char *s = s1;

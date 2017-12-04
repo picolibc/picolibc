@@ -164,7 +164,7 @@ int
 _printf_float (struct _reent *data,
 	       struct _prt_data_t *pdata,
 	       FILE * fp,
-	       int (*pfunc) (struct _reent *, FILE *, _CONST char *,
+	       int (*pfunc) (struct _reent *, FILE *, const char *,
 			     size_t len), va_list * ap)
 {
 #define _fpvalue (pdata->_double_)

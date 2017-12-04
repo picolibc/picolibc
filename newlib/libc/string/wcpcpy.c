@@ -28,7 +28,7 @@ No supporting OS subroutines are required.
 wchar_t *
 _DEFUN (wcpcpy, (s1, s2),
 	wchar_t *__restrict s1,
-	_CONST wchar_t *__restrict s2)
+	const wchar_t *__restrict s2)
 {
   while ((*s1++ = *s2++))
     ;

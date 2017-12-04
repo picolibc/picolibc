@@ -26,7 +26,7 @@
 #ifndef _REENT_ONLY
 
 int
-wscanf(_CONST wchar_t *__restrict fmt, ...)
+wscanf(const wchar_t *__restrict fmt, ...)
 {
   int ret;
   va_list ap;
@@ -42,7 +42,7 @@ wscanf(_CONST wchar_t *__restrict fmt, ...)
 #endif /* !_REENT_ONLY */
 
 int
-_wscanf_r(struct _reent *ptr, _CONST wchar_t *fmt, ...)
+_wscanf_r(struct _reent *ptr, const wchar_t *fmt, ...)
 {
   int ret;
   va_list ap;

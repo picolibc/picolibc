@@ -88,13 +88,13 @@ Supporting OS subroutines required: <<close>>, <<fstat>>, <<isatty>>,
 #ifdef _HAVE_STDC
 int 
 _DEFUN(siscanf, (str, fmt),
-       _CONST char *str,
-       _CONST char *fmt _DOTS)
+       const char *str,
+       const char *fmt _DOTS)
 #else
 int 
 siscanf(str, fmt, va_alist)
-       _CONST char *str;
-       _CONST char *fmt;
+       const char *str;
+       const char *fmt;
        va_dcl
 #endif
 {
@@ -125,14 +125,14 @@ siscanf(str, fmt, va_alist)
 int 
 _DEFUN(_siscanf_r, (ptr, str, fmt), 
        struct _reent *ptr,
-       _CONST char *str,
-       _CONST char *fmt _DOTS)
+       const char *str,
+       const char *fmt _DOTS)
 #else
 int 
 _siscanf_r(ptr, str, fmt, va_alist)
           struct _reent *ptr;
-          _CONST char *str;
-          _CONST char *fmt;
+          const char *str;
+          const char *fmt;
           va_dcl
 #endif
 {

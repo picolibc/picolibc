@@ -6,7 +6,7 @@
 
 int
 _DEFUN (puts, (s),
-	char _CONST * s)
+	char const * s)
 {
   CHECK_STD_INIT(_REENT);
 

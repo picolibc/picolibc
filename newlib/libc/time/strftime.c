@@ -341,7 +341,7 @@ locale, hard-coding the "C" locale settings.
 #  error "YEAR_BASE < 0"
 #endif
 
-static _CONST int dname_len[7] =
+static const int dname_len[7] =
 {6, 6, 7, 9, 8, 6, 8};
 
 /* Using the tm_year, tm_wday, and tm_yday components of TIM_P, return
@@ -349,7 +349,7 @@ static _CONST int dname_len[7] =
    numbering used in "%g%G%V", avoiding overflow.  */
 static int
 _DEFUN (iso_year_adjust, (tim_p),
-	_CONST struct tm *tim_p)
+	const struct tm *tim_p)
 {
   /* Account for fact that tm_year==0 is year 1900.  */
   int leap = isleap (tim_p->tm_year + (YEAR_BASE
@@ -1434,8 +1434,8 @@ size_t
 _DEFUN (strftime, (s, maxsize, format, tim_p),
 	CHAR *__restrict s,
 	size_t maxsize,
-	_CONST CHAR *__restrict format,
-	_CONST struct tm *__restrict tim_p)
+	const CHAR *__restrict format,
+	const struct tm *__restrict tim_p)
 {
 #ifdef _WANT_C99_TIME_FORMATS
   era_info_t *era_info = NULL;

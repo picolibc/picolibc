@@ -38,7 +38,7 @@ FILE *
 _DEFUN (_fdopen64_r, (ptr, fd, mode),
 	struct _reent *ptr,
 	int fd,
-	_CONST char *mode)
+	const char *mode)
 {
   register FILE *fp;
   int flags, oflags;
@@ -110,7 +110,7 @@ _DEFUN (_fdopen64_r, (ptr, fd, mode),
 FILE *
 _DEFUN (fdopen64, (fd, mode),
 	int fd,
-	_CONST char *mode)
+	const char *mode)
 {
   return _fdopen64_r (_REENT, fd, mode);
 }

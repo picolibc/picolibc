@@ -37,14 +37,14 @@ QUICKREF
 
 int
 _DEFUN (strcasecmp, (s1, s2),
-	_CONST char *s1,
-	_CONST char *s2)
+	const char *s1,
+	const char *s2)
 {
   int d = 0;
   for ( ; ; )
     {
-      _CONST int c1 = tolower(*s1++);
-      _CONST int c2 = tolower(*s2++);
+      const int c1 = tolower(*s1++);
+      const int c2 = tolower(*s2++);
       if (((d = c1 - c2) != 0) || (c2 == '\0'))
         break;
     }

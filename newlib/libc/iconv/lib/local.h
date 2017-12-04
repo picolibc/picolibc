@@ -62,7 +62,7 @@ typedef __uint32_t ucs4_t;
 
 
 /* The list of built-in encoding names and aliases */
-extern _CONST char *
+extern const char *
 _iconv_aliases;
 
 #endif /* !__ICONV_LIB_LOCAL_H__ */

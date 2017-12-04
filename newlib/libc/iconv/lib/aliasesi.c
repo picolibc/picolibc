@@ -38,7 +38,7 @@
  *
  * PARAMETERS:
  *   struct _reent *rptr - reent structure of current thread/process.
- *   _CONST char *str    - string to canonize. 
+ *   const char *str    - string to canonize. 
  *
  * DESCRIPTION:
  *   Converts all letters to small and substitute all '-' characters by '_'
@@ -47,15 +47,15 @@
  * RETURN:
  *   Returns canonical form of 'str' if success, NULL if failure.
  */
-static _CONST char *
+static const char *
 _DEFUN(canonical_form, (rptr, str), 
                        struct _reent *rptr,
-                       _CONST char *str)
+                       const char *str)
 {
   char *p, *p1;
 
   if (str == NULL || (p = p1 = _strdup_r (rptr, str)) == NULL)
-    return (_CONST char *)NULL;
+    return (const char *)NULL;
 
   for (; *str; str++, p++)
     {
@@ -65,7 +65,7 @@ _DEFUN(canonical_form, (rptr, str),
         *p = tolower (*str);
     }
 
-  return (_CONST char *)p1;
+  return (const char *)p1;
 }
 
 /*
@@ -73,8 +73,8 @@ _DEFUN(canonical_form, (rptr, str),
  *
  * PARAMETERS:
  *   struct _reent *rptr - reent structure of current thread/process.
- *   _CONST char *alias  - alias by which "official" name should be found.
- *   _CONST char *table  - aliases table.
+ *   const char *alias  - alias by which "official" name should be found.
+ *   const char *table  - aliases table.
  *   int len             - aliases table length.
  *
  * DESCRIPTION:
@@ -95,15 +95,15 @@ _DEFUN(canonical_form, (rptr, str),
 static char *
 _DEFUN(find_alias, (rptr, alias, table, len),
                    struct _reent *rptr,
-                   _CONST char *alias,
-                   _CONST char *table,
+                   const char *alias,
+                   const char *table,
                    int len)
 {
-  _CONST char *end;
-  _CONST char *p;
+  const char *end;
+  const char *p;
   int l = strlen (alias);
-  _CONST char *ptable = table;
-  _CONST char *table_end = table + len;
+  const char *ptable = table;
+  const char *table_end = table + len;
 
   if (table == NULL || alias == NULL || *table == '\0' || *alias == '\0')
     return NULL;
@@ -136,7 +136,7 @@ search_again:
  *
  * PARAMETERS:
  *   struct _reent *rptr - reent structure of current thread/process.
- *   _CONST char *ca     - encoding alias to resolve.
+ *   const char *ca     - encoding alias to resolve.
  *
  * DESCRIPTION: 
  *   First, tries to find 'ca' among built-in aliases. If not found, tries to 
@@ -149,7 +149,7 @@ search_again:
 char *
 _DEFUN(_iconv_resolve_encoding_name, (rptr, cname, path), 
                                      struct _reent *rptr,
-                                     _CONST char *ca)
+                                     const char *ca)
 {
   char *p = (char *)ca;
 

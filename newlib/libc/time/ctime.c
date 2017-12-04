@@ -38,7 +38,7 @@ ANSI C requires <<ctime>>.
 
 char *
 _DEFUN (ctime, (tim_p),
-	_CONST time_t * tim_p)
+	const time_t * tim_p)
 {
   return asctime (localtime (tim_p));
 }

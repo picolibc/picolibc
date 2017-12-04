@@ -142,4 +142,4 @@ void _EXFUN(test_iok, (int, int));
 void _EXFUN(test_eok, (int, int));
 void _EXFUN(test_sok, (char *, char*));
 void _EXFUN(test_scok, (char *, char*, int));
-void _EXFUN(newfunc,(_CONST char *));
+void _EXFUN(newfunc,(const char *));

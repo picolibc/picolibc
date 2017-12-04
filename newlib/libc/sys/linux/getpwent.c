@@ -4,7 +4,7 @@
 
 struct passwd *
 _DEFUN (getpwnam, (name),
-	_CONST char *name)
+	const char *name)
 {
   errno = ENOSYS;
   return NULL;

@@ -52,7 +52,7 @@
 static _VOID_PTR
 _DEFUN(ucs_2_init, (rptr, encoding),
                    struct _reent *rptr,
-                   _CONST char *encoding)
+                   const char *encoding)
 {
   int *data;
   
@@ -107,7 +107,7 @@ _DEFUN(ucs_2_convert_from_ucs, (data, in, outbuf, outbytesleft),
 static ucs4_t
 _DEFUN(ucs_2_convert_to_ucs, (data, inbuf, inbytesleft),
                              _VOID_PTR data,
-                             _CONST unsigned char **inbuf,
+                             const unsigned char **inbuf,
                              size_t *inbytesleft)
 {
   ucs4_t res;
@@ -139,7 +139,7 @@ _DEFUN(ucs_2_get_mb_cur_max, (data),
 }
 
 #if defined (ICONV_TO_UCS_CES_UCS_2)
-_CONST iconv_to_ucs_ces_handlers_t
+const iconv_to_ucs_ces_handlers_t
 _iconv_to_ucs_ces_handlers_ucs_2 = 
 {
   ucs_2_init,
@@ -153,7 +153,7 @@ _iconv_to_ucs_ces_handlers_ucs_2 =
 #endif
 
 #if defined (ICONV_FROM_UCS_CES_UCS_2)
-_CONST iconv_from_ucs_ces_handlers_t
+const iconv_from_ucs_ces_handlers_t
 _iconv_from_ucs_ces_handlers_ucs_2 =
 {
   ucs_2_init,

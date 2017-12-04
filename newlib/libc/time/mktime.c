@@ -50,12 +50,12 @@ ANSI C requires <<mktime>>.
 #define _SEC_IN_HOUR 3600L
 #define _SEC_IN_DAY 86400L
 
-static _CONST int DAYS_IN_MONTH[12] =
+static const int DAYS_IN_MONTH[12] =
 {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
 
 #define _DAYS_IN_MONTH(x) ((x == 1) ? days_in_feb : DAYS_IN_MONTH[x])
 
-static _CONST int _DAYS_BEFORE_MONTH[12] =
+static const int _DAYS_BEFORE_MONTH[12] =
 {0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334};
 
 #define _ISLEAP(y) (((y) % 4) == 0 && (((y) % 100) != 0 || (((y)+1900) % 400) == 0))

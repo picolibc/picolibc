@@ -65,7 +65,7 @@ variables vary from one system to another.
 
 char *
 _DEFUN (_findenv, (name, offset),
-	register _CONST char *name,
+	register const char *name,
 	int *offset)
 {
   return _findenv_r (_REENT, name, offset);
@@ -78,7 +78,7 @@ _DEFUN (_findenv, (name, offset),
 
 char *
 _DEFUN (getenv, (name),
-	_CONST char *name)
+	const char *name)
 {
   int offset;
 

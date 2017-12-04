@@ -7,7 +7,7 @@
 
 char *
 _DEFUN (strndup, (str, n), 
-	_CONST char *str,
+	const char *str,
 	size_t n)
 {
   return _strndup_r (_REENT, str, n);

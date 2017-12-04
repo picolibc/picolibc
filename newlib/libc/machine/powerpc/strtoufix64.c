@@ -15,7 +15,7 @@
 __uint64_t
 _DEFUN (_strtoufix64_r, (rptr, nptr, endptr),
 	struct _reent *rptr,
-	_CONST char *nptr,
+	const char *nptr,
 	char **endptr)
 {
   union long_double_union ldbl;
@@ -105,7 +105,7 @@ _DEFUN (_strtoufix64_r, (rptr, nptr, endptr),
 
 __uint64_t
 _DEFUN (strtoufix64, (s, ptr, base),
-	_CONST char *s,
+	const char *s,
 	char **ptr)
 {
   return _strtoufix64_r (_REENT, s, ptr);

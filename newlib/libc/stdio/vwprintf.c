@@ -27,7 +27,7 @@
 
 int
 _DEFUN(vwprintf, (fmt, ap),
-       _CONST wchar_t *__restrict fmt,
+       const wchar_t *__restrict fmt,
        va_list ap)
 {
   struct _reent *reent = _REENT;
@@ -41,7 +41,7 @@ _DEFUN(vwprintf, (fmt, ap),
 int
 _DEFUN(_vwprintf_r, (ptr, fmt, ap),
        struct _reent *ptr,
-       _CONST wchar_t *fmt,
+       const wchar_t *fmt,
        va_list ap)
 {
   _REENT_SMALL_CHECK_INIT (ptr);

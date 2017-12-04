@@ -37,7 +37,7 @@
 #ifndef _REENT_ONLY
 
 int
-vswscanf (_CONST wchar_t *__restrict str, _CONST wchar_t * __restrict fmt,
+vswscanf (const wchar_t *__restrict str, const wchar_t * __restrict fmt,
   va_list ap)
 {
   return _vswscanf_r (_REENT, str, fmt, ap);
@@ -46,7 +46,7 @@ vswscanf (_CONST wchar_t *__restrict str, _CONST wchar_t * __restrict fmt,
 #endif /* !_REENT_ONLY */
 
 int
-_vswscanf_r (struct _reent *ptr, _CONST wchar_t *str, _CONST wchar_t *fmt,
+_vswscanf_r (struct _reent *ptr, const wchar_t *str, const wchar_t *fmt,
 	     va_list ap)
 {
   FILE f;

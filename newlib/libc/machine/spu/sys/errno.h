@@ -32,7 +32,7 @@ extern struct _reent _impure_data;
 
 /* Please don't use these variables directly.
    Use strerror instead. */
-extern _CONST char * _CONST _sys_errlist[];
+extern const char * const _sys_errlist[];
 extern int _sys_nerr;
 
 #define __errno_r(ptr) ((ptr)->_errno)

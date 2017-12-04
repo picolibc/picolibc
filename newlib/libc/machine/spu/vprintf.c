@@ -15,7 +15,7 @@
 
 typedef struct
 {
-  _CONST char* fmt;
+  const char* fmt;
   unsigned int pad0[ 3 ];
   va_list ap;
 } c99_vprintf_t;
@@ -24,7 +24,7 @@ typedef struct
 
 int
 _DEFUN (vprintf, (fmt, ap),
-     _CONST char *fmt,
+     const char *fmt,
      va_list ap)
 {
   c99_vprintf_t args;

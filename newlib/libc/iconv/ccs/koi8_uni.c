@@ -28,7 +28,7 @@
  */
 #if defined (ICONV_TO_UCS_CCS_KOI8_UNI)
 
-static _CONST __uint16_t
+static const __uint16_t
 to_ucs_speed_koi8_uni[] =
 {
 	0x0000,0x0001,0x0002,0x0003,0x0004,0x0005,0x0006,0x0007,
@@ -75,7 +75,7 @@ to_ucs_speed_koi8_uni[] =
 
 #if defined (ICONV_FROM_UCS_CCS_KOI8_UNI)
 
-static _CONST unsigned char
+static const unsigned char
 from_ucs_speed_koi8_uni[] =
 {
 	W(0x042A), /* Real 0xFF mapping. 0xFF is used to mark invalid codes */
@@ -350,7 +350,7 @@ from_ucs_speed_koi8_uni[] =
  * koi8_uni CCS description table.
  * ======================================================================
  */
-_CONST iconv_ccs_t
+const iconv_ccs_t
 _iconv_ccs_koi8_uni =
 {
 	TABLE_VERSION_1, /* Table version */

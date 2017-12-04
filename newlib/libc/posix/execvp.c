@@ -37,8 +37,8 @@ _DEFUN (strccpy, (s1, s2, c),
 
 int
 _DEFUN (execvp, (file, argv),
-	_CONST char *file,
-	char * _CONST argv[])
+	const char *file,
+	char * const argv[])
 {
   char *path = getenv ("PATH");
   char buf[MAXNAMLEN];

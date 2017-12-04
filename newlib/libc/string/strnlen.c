@@ -31,10 +31,10 @@ PORTABILITY
 
 size_t
 _DEFUN (strnlen, (str, n),
-	_CONST char *str,
+	const char *str,
 	size_t n)
 {
-  _CONST char *start = str;
+  const char *start = str;
 
   while (n-- > 0 && *str)
     str++;

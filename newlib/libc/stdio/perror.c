@@ -61,7 +61,7 @@ Supporting OS subroutines required: <<close>>, <<fstat>>, <<isatty>>,
 _VOID
 _DEFUN(_perror_r, (ptr, s),
        struct _reent *ptr,
-       _CONST char *s)
+       const char *s)
 {
   char *error;
   int dummy;
@@ -83,7 +83,7 @@ _DEFUN(_perror_r, (ptr, s),
 
 _VOID
 _DEFUN(perror, (s),
-       _CONST char *s)
+       const char *s)
 {
   _perror_r (_REENT, s);
 }

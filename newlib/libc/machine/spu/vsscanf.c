@@ -47,9 +47,9 @@ Author: Joel Schopp <jschopp@austin.ibm.com>
 
 typedef struct
 {
-  _CONST char *str;
+  const char *str;
   unsigned int pad0[ 3 ];
-  _CONST char *fmt;
+  const char *fmt;
   unsigned int pad1[ 3 ];
   va_list ap;
 } c99_vsscanf_t;
@@ -58,8 +58,8 @@ typedef struct
 
 int
 _DEFUN (vsscanf, (str, fmt, ap),
-    _CONST char *__restrict str,
-    _CONST char *__restrict fmt,
+    const char *__restrict str,
+    const char *__restrict fmt,
     va_list ap)
 {
   c99_vsscanf_t args;

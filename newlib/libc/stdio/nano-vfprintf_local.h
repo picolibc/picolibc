@@ -215,11 +215,11 @@ _printf_common (struct _reent *data,
 		int *realsz,
 		FILE *fp,
 		int (*pfunc)(struct _reent *, FILE *,
-			     _CONST char *, size_t len));
+			     const char *, size_t len));
 
 extern int
 _printf_i (struct _reent *data, struct _prt_data_t *pdata, FILE *fp,
-	   int (*pfunc)(struct _reent *, FILE *, _CONST char *, size_t len),
+	   int (*pfunc)(struct _reent *, FILE *, const char *, size_t len),
 	   va_list *ap);
 
 /* Make _printf_float weak symbol, so it won't be linked in if target program
@@ -229,6 +229,6 @@ _printf_float (struct _reent *data,
 	       struct _prt_data_t *pdata,
 	       FILE *fp,
 	       int (*pfunc)(struct _reent *, FILE *,
-			    _CONST char *, size_t len),
+			    const char *, size_t len),
 	       va_list *ap) _ATTRIBUTE((__weak__));
 #endif

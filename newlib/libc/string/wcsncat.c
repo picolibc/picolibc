@@ -64,12 +64,12 @@ No supporting OS subroutines are required.
 wchar_t *
 _DEFUN (wcsncat, (s1, s2, n),
 	wchar_t *__restrict s1,
-	_CONST wchar_t *__restrict s2,
+	const wchar_t *__restrict s2,
 	size_t n)
 {
   wchar_t *p;
   wchar_t *q;
-  _CONST wchar_t *r;
+  const wchar_t *r;
 
   p = s1;
   while (*p)

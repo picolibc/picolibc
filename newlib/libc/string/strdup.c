@@ -5,7 +5,7 @@
 #include <string.h>
 
 char *
-_DEFUN (strdup, (str), _CONST char *str)
+_DEFUN (strdup, (str), const char *str)
 {
   return _strdup_r (_REENT, str);
 }

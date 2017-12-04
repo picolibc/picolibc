@@ -19,8 +19,8 @@ static char ***p_environ = &environ;
 
 int
 _DEFUN(execl, (path, arg0, ...), 
-      _CONST char *path,
-      _CONST char *arg0 _DOTS)
+      const char *path,
+      const char *arg0 _DOTS)
 
 #else
 
@@ -28,8 +28,8 @@ _DEFUN(execl, (path, arg0, ...),
 
 int
 _DEFUN(execl, (path, arg0, va_alist),
-     _CONST char *path,
-     _CONST char *arg0,
+     const char *path,
+     const char *arg0,
      va_dcl)
 
 #endif
@@ -37,16 +37,16 @@ _DEFUN(execl, (path, arg0, va_alist),
 {
   int i;
   va_list args;
-  _CONST char *argv[256];
+  const char *argv[256];
 
   va_start (args, arg0);
   argv[0] = arg0;
   i = 1;
   do
-      argv[i] = va_arg (args, _CONST char *);
+      argv[i] = va_arg (args, const char *);
   while (argv[i++] != NULL);
   va_end (args);
 
-  return _execve (path, (char * _CONST  *) argv, *p_environ);
+  return _execve (path, (char * const  *) argv, *p_environ);
 }
 #endif /* !_NO_EXECVE  */

@@ -62,7 +62,7 @@ _DEFUN(us_ascii_convert_from_ucs, (data, in, outbuf, outbytesleft),
 static ucs4_t
 _DEFUN(us_ascii_convert_to_ucs, (data, inbuf, inbytesleft),
                                 _VOID_PTR data,
-                                _CONST unsigned char **inbuf,
+                                const unsigned char **inbuf,
                                 size_t *inbytesleft)
 {
   ucs4_t res;
@@ -90,7 +90,7 @@ _DEFUN(us_ascii_get_mb_cur_max, (data),
 }
 
 #if defined (ICONV_TO_UCS_CES_US_ASCII)
-_CONST iconv_to_ucs_ces_handlers_t
+const iconv_to_ucs_ces_handlers_t
 _iconv_to_ucs_ces_handlers_us_ascii = 
 {
   NULL,
@@ -104,7 +104,7 @@ _iconv_to_ucs_ces_handlers_us_ascii =
 #endif
 
 #if defined (ICONV_FROM_UCS_CES_US_ASCII)
-_CONST iconv_from_ucs_ces_handlers_t
+const iconv_from_ucs_ces_handlers_t
 _iconv_from_ucs_ces_handlers_us_ascii =
 {
   NULL,

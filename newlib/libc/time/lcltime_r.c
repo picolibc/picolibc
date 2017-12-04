@@ -17,14 +17,14 @@
 
 struct tm *
 _DEFUN (localtime_r, (tim_p, res),
-	_CONST time_t *__restrict tim_p,
+	const time_t *__restrict tim_p,
 	struct tm *__restrict res)
 {
   long offset;
   int hours, mins, secs;
   int year;
-  __tzinfo_type *_CONST tz = __gettzinfo ();
-  _CONST int *ip;
+  __tzinfo_type *const tz = __gettzinfo ();
+  const int *ip;
 
   res = gmtime_r (tim_p, res);
 

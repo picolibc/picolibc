@@ -3,7 +3,7 @@
 #include <errno.h>
 
 
-_CONST char *it = "<UNSET>";	/* Routine name for message routines. */
+const char *it = "<UNSET>";	/* Routine name for message routines. */
 int  errors = 0;
 
 /* Complain if condition is not true.  */

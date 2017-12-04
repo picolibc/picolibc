@@ -47,7 +47,7 @@ DESCRIPTION
 int
 _DEFUN (_stat64_r, (ptr, file, pstat),
      struct _reent *ptr,
-     _CONST char *file,
+     const char *file,
      struct stat64 *pstat)
 {
   int ret;

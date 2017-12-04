@@ -10,7 +10,7 @@
 __uint64_t
 _DEFUN (_atoufix64_r, (reent, s),
 	struct _reent *reent,
-	_CONST char *s)
+	const char *s)
 {
   return _strtoufix64_r (reent, s, NULL);
 }
@@ -18,7 +18,7 @@ _DEFUN (_atoufix64_r, (reent, s),
 #ifndef _REENT_ONLY
 __uint64_t
 _DEFUN (atoufix64, (s),
-	_CONST char *s)
+	const char *s)
 {
   return strtoufix64 (s, NULL);
 }

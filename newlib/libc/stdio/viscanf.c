@@ -90,7 +90,7 @@ Supporting OS subroutines required:
 
 int
 _DEFUN(viscanf, (fmt, ap), 
-       _CONST char *fmt,
+       const char *fmt,
        va_list ap)
 {
   struct _reent *reent = _REENT;
@@ -104,7 +104,7 @@ _DEFUN(viscanf, (fmt, ap),
 int
 _DEFUN(_viscanf_r, (ptr, fmt, ap),
        struct _reent *ptr,
-       _CONST char *fmt,
+       const char *fmt,
        va_list ap)
 {
   _REENT_SMALL_CHECK_INIT (ptr);

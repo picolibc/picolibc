@@ -45,8 +45,8 @@ DESCRIPTION
 int
 _DEFUN (_link_r, (ptr, old, new),
      struct _reent *ptr,
-     _CONST char *old,
-     _CONST char *new)
+     const char *old,
+     const char *new)
 {
   int ret;
 

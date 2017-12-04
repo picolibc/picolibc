@@ -37,9 +37,9 @@ Author: Joel Schopp <jschopp@austin.ibm.com>
 
 typedef struct
 {
-  _CONST char *file;
+  const char *file;
   unsigned int pad0[ 3 ];
-  _CONST char *mode;
+  const char *mode;
   unsigned int pad1[ 3 ];
   int fp;
 } c99_freopen_t;

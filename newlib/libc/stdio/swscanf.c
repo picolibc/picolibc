@@ -415,7 +415,7 @@ Supporting OS subroutines required: <<close>>, <<fstat>>, <<isatty>>,
 #ifndef _REENT_ONLY 
 
 int 
-swscanf (_CONST wchar_t *__restrict str, _CONST wchar_t *__restrict fmt, ...)
+swscanf (const wchar_t *__restrict str, const wchar_t *__restrict fmt, ...)
 {
   int ret;
   va_list ap;
@@ -437,7 +437,7 @@ swscanf (_CONST wchar_t *__restrict str, _CONST wchar_t *__restrict fmt, ...)
 #endif /* !_REENT_ONLY */
 
 int 
-_swscanf_r (struct _reent *ptr, _CONST wchar_t *str, _CONST wchar_t *fmt, ...)
+_swscanf_r (struct _reent *ptr, const wchar_t *str, const wchar_t *fmt, ...)
 {
   int ret;
   va_list ap;

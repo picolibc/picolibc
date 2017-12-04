@@ -51,7 +51,7 @@ ANSI C requires <<gmtime>>.
 
 struct tm *
 _DEFUN (gmtime, (tim_p),
-	_CONST time_t * tim_p)
+	const time_t * tim_p)
 {
   struct _reent *reent = _REENT;
 

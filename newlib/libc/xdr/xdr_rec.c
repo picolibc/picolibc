@@ -73,17 +73,17 @@ enum xprt_stat
 };
 
 static bool_t _EXFUN (xdrrec_getlong, (XDR *, long *));
-static bool_t _EXFUN (xdrrec_putlong, (XDR *, _CONST long *));
+static bool_t _EXFUN (xdrrec_putlong, (XDR *, const long *));
 static bool_t _EXFUN (xdrrec_getbytes, (XDR *, char *, u_int));
-static bool_t _EXFUN (xdrrec_putbytes, (XDR *, _CONST char *, u_int));
+static bool_t _EXFUN (xdrrec_putbytes, (XDR *, const char *, u_int));
 static u_int _EXFUN (xdrrec_getpos, (XDR *));
 static bool_t _EXFUN (xdrrec_setpos, (XDR *, u_int));
 static int32_t * _EXFUN (xdrrec_inline, (XDR *, u_int));
 static void _EXFUN (xdrrec_destroy, (XDR *));
 static bool_t _EXFUN (xdrrec_getint32, (XDR *, int32_t *));
-static bool_t _EXFUN (xdrrec_putint32, (XDR *, _CONST int32_t *));
+static bool_t _EXFUN (xdrrec_putint32, (XDR *, const int32_t *));
 
-static _CONST struct xdr_ops xdrrec_ops = {
+static const struct xdr_ops xdrrec_ops = {
   xdrrec_getlong,
   xdrrec_putlong,
   xdrrec_getbytes,
@@ -290,7 +290,7 @@ _DEFUN (xdrrec_getlong, (xdrs, lp),
 static bool_t
 _DEFUN (xdrrec_putlong, (xdrs, lp),
         XDR * xdrs,
-	_CONST long *lp)
+	const long *lp)
 {
   RECSTREAM *rstrm = (RECSTREAM *) (xdrs->x_private);
   int32_t *dest_lp = ((int32_t *) (void *) (rstrm->out_finger));
@@ -345,7 +345,7 @@ _DEFUN (xdrrec_getbytes, (xdrs, addr, len),
 static bool_t
 _DEFUN (xdrrec_putbytes, (xdrs, addr, len),
         XDR * xdrs,
-        _CONST char *addr,
+        const char *addr,
 	u_int len)
 {
   RECSTREAM *rstrm = (RECSTREAM *) (xdrs->x_private);
@@ -522,7 +522,7 @@ _DEFUN (xdrrec_getint32, (xdrs, ip),
 static bool_t
 _DEFUN (xdrrec_putint32, (xdrs, ip),
         XDR *xdrs,
-	_CONST int32_t *ip)
+	const int32_t *ip)
 {
   RECSTREAM *rstrm = (RECSTREAM *) (xdrs->x_private);
   int32_t *dest_ip = ((int32_t *) (void *) (rstrm->out_finger));

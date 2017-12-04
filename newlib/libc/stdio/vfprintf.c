@@ -201,7 +201,7 @@ int
 _DEFUN(__ssputs_r, (ptr, fp, buf, len),
        struct _reent *ptr,
        FILE *fp,
-       _CONST char *buf,
+       const char *buf,
        size_t len)
 {
 	register int w;
@@ -275,7 +275,7 @@ _DEFUN(__ssprint_r, (ptr, fp, uio),
 	register size_t len;
 	register int w;
 	register struct __siov *iov;
-	register _CONST char *p = NULL;
+	register const char *p = NULL;
 
 	iov = uio->uio_iov;
 	len = 0;
@@ -359,7 +359,7 @@ err:
 }
 #else /* !INTEGER_ONLY */
 #ifndef _FVWRITE_IN_STREAMIO
-int __ssputs_r (struct _reent *, FILE *, _CONST char *, size_t);
+int __ssputs_r (struct _reent *, FILE *, const char *, size_t);
 #endif
 int __ssprint_r (struct _reent *, FILE *, register struct __suio *);
 #endif /* !INTEGER_ONLY */
@@ -372,7 +372,7 @@ int
 _DEFUN(__sfputs_r, (ptr, fp, buf, len),
        struct _reent *ptr,
        FILE *fp,
-       _CONST char *buf,
+       const char *buf,
        size_t len)
 {
 	register int i;
@@ -442,7 +442,7 @@ out:
 }
 #else /* !INTEGER_ONLY */
 #ifndef _FVWRITE_IN_STREAMIO
-int __sfputs_r (struct _reent *, FILE *, _CONST char *buf, size_t);
+int __sfputs_r (struct _reent *, FILE *, const char *buf, size_t);
 #endif
 int __sprint_r (struct _reent *, FILE *, register struct __suio *);
 #endif /* !INTEGER_ONLY */
@@ -459,7 +459,7 @@ _NOINLINE_STATIC int
 _DEFUN(__sbprintf, (rptr, fp, fmt, ap),
        struct _reent *rptr,
        register FILE *fp,
-       _CONST char *fmt,
+       const char *fmt,
        va_list ap)
 {
 	int ret;
@@ -644,13 +644,13 @@ _EXFUN(get_arg, (struct _reent *data, int n, char *fmt,
 # define GROUPING	0x400		/* use grouping ("'" flag) */
 #endif
 
-int _EXFUN(_VFPRINTF_R, (struct _reent *, FILE *, _CONST char *, va_list));
+int _EXFUN(_VFPRINTF_R, (struct _reent *, FILE *, const char *, va_list));
 
 #ifndef STRING_ONLY
 int
 _DEFUN(VFPRINTF, (fp, fmt0, ap),
        FILE * fp,
-       _CONST char *fmt0,
+       const char *fmt0,
        va_list ap)
 {
   int result;
@@ -663,7 +663,7 @@ int
 _DEFUN(_VFPRINTF_R, (data, fp, fmt0, ap),
        struct _reent *data,
        FILE * fp,
-       _CONST char *fmt0,
+       const char *fmt0,
        va_list ap)
 {
 	register char *fmt;	/* format string */
@@ -736,9 +736,9 @@ _DEFUN(_VFPRINTF_R, (data, fp, fmt0, ap),
 	 * below longer.
 	 */
 #define	PADSIZE	16		/* pad chunk size */
-	static _CONST char blanks[PADSIZE] =
+	static const char blanks[PADSIZE] =
 	 {' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' '};
-	static _CONST char zeroes[PADSIZE] =
+	static const char zeroes[PADSIZE] =
 	 {'0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0'};
 
 #ifdef _MB_CAPABLE
@@ -1459,9 +1459,9 @@ string:
 #ifdef _MB_CAPABLE
 			if (ch == 'S' || (flags & LONGINT)) {
 				mbstate_t ps;
-				_CONST wchar_t *wcp;
+				const wchar_t *wcp;
 
-				wcp = (_CONST wchar_t *)cp;
+				wcp = (const wchar_t *)cp;
 				size = m = 0;
 				memset ((_PTR)&ps, '\0', sizeof (mbstate_t));
 
@@ -1491,7 +1491,7 @@ string:
 						fp->_flags |= __SERR;
 						goto error;
 					}
-					wcp = (_CONST wchar_t *)cp;
+					wcp = (const wchar_t *)cp;
 				}
 
 				if (size == 0)
@@ -1974,7 +1974,7 @@ exponent(char *p0, int exp, int fmtch)
    the STRING_ONLY/INTEGER_ONLY versions here. */
 #if defined (STRING_ONLY) && defined(INTEGER_ONLY)
 
-_CONST __CH_CLASS __chclass[256] = {
+const __CH_CLASS __chclass[256] = {
   /* 00-07 */  OTHER,   OTHER,   OTHER,   OTHER,   OTHER,   OTHER,   OTHER,   OTHER,
   /* 08-0f */  OTHER,   OTHER,   OTHER,   OTHER,   OTHER,   OTHER,   OTHER,   OTHER,
   /* 10-17 */  OTHER,   OTHER,   OTHER,   OTHER,   OTHER,   OTHER,   OTHER,   OTHER,
@@ -2009,7 +2009,7 @@ _CONST __CH_CLASS __chclass[256] = {
   /* f8-ff */  OTHER,   OTHER,   OTHER,   OTHER,   OTHER,   OTHER,   OTHER,   OTHER,
 };
 
-_CONST __STATE __state_table[MAX_STATE][MAX_CH_CLASS] = {
+const __STATE __state_table[MAX_STATE][MAX_CH_CLASS] = {
   /*             '0'     '1-9'     '$'     MODFR    SPEC    '.'     '*'    FLAG    OTHER */
   /* START */  { SFLAG,   WDIG,    DONE,   SMOD,    DONE,   SDOT,  VARW,   SFLAG,  DONE },
   /* SFLAG */  { SFLAG,   WDIG,    DONE,   SMOD,    DONE,   SDOT,  VARW,   SFLAG,  DONE },
@@ -2024,7 +2024,7 @@ _CONST __STATE __state_table[MAX_STATE][MAX_CH_CLASS] = {
   /* VPDIG */  { DONE,    DONE,    PREC,   DONE,    DONE,   DONE,  DONE,   DONE,   DONE },
 };
 
-_CONST __ACTION __action_table[MAX_STATE][MAX_CH_CLASS] = {
+const __ACTION __action_table[MAX_STATE][MAX_CH_CLASS] = {
   /*             '0'     '1-9'     '$'     MODFR    SPEC    '.'     '*'    FLAG    OTHER */
   /* START */  { NOOP,    NUMBER,  NOOP,   GETMOD,  GETARG, NOOP,  NOOP,   NOOP,   NOOP },
   /* SFLAG */  { NOOP,    NUMBER,  NOOP,   GETMOD,  GETARG, NOOP,  NOOP,   NOOP,   NOOP },

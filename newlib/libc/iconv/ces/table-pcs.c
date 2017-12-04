@@ -67,7 +67,7 @@ _DEFUN(table_pcs_convert_from_ucs, (data, in, outbuf, outbytesleft),
 static _VOID_PTR
 _DEFUN(table_pcs_from_ucs_init, (rptr, encoding),
                                 struct _reent *rptr,
-                                _CONST char *encoding)
+                                const char *encoding)
 {
   return _iconv_from_ucs_ces_handlers_table.init (rptr, encoding);
 }
@@ -93,7 +93,7 @@ _DEFUN(table_pcs_from_ucs_get_mb_cur_max, (data),
 static ucs4_t
 _DEFUN(table_pcs_convert_to_ucs, (data, inbuf, inbytesleft),
                              _VOID_PTR data,
-                             _CONST unsigned char **inbuf,
+                             const unsigned char **inbuf,
                              size_t *inbytesleft)
 {
   if (*inbytesleft < 1)
@@ -115,7 +115,7 @@ _DEFUN(table_pcs_convert_to_ucs, (data, inbuf, inbytesleft),
 static _VOID_PTR
 _DEFUN(table_pcs_to_ucs_init, (rptr, encoding),
                               struct _reent *rptr,
-                              _CONST char *encoding)
+                              const char *encoding)
 {
   return _iconv_to_ucs_ces_handlers_table.init (rptr, encoding);
 }
@@ -138,7 +138,7 @@ _DEFUN(table_pcs_to_ucs_get_mb_cur_max, (data),
 #endif /* ICONV_TO_UCS_CES_TABLE_PCS */
 
 #if defined (ICONV_FROM_UCS_CES_TABLE_PCS)
-_CONST iconv_from_ucs_ces_handlers_t
+const iconv_from_ucs_ces_handlers_t
 _iconv_from_ucs_ces_handlers_table_pcs =
 {
   table_pcs_from_ucs_init,
@@ -152,7 +152,7 @@ _iconv_from_ucs_ces_handlers_table_pcs =
 #endif
 
 #if defined (ICONV_TO_UCS_CES_TABLE_PCS)
-_CONST iconv_to_ucs_ces_handlers_t
+const iconv_to_ucs_ces_handlers_t
 _iconv_to_ucs_ces_handlers_table_pcs = 
 {
   table_pcs_to_ucs_init,

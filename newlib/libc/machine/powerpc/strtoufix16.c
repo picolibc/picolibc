@@ -93,7 +93,7 @@ PORTABILITY
 __uint16_t
 _DEFUN (_strtoufix16_r, (rptr, nptr, endptr),
 	struct _reent *rptr,
-	_CONST char *nptr,
+	const char *nptr,
 	char **endptr)
 {
   union double_union dbl;
@@ -161,7 +161,7 @@ _DEFUN (_strtoufix16_r, (rptr, nptr, endptr),
 
 __uint16_t
 _DEFUN (strtoufix16, (s, ptr, base),
-	_CONST char *s,
+	const char *s,
 	char **ptr)
 {
   return _strtoufix16_r (_REENT, s, ptr);

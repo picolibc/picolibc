@@ -185,7 +185,7 @@ int
 _DEFUN(__ssputs_r, (ptr, fp, buf, len),
        struct _reent *ptr,
        FILE *fp,
-       _CONST char *buf,
+       const char *buf,
        size_t len)
 {
   register int w;
@@ -261,7 +261,7 @@ _DEFUN(__ssprint_r, (ptr, fp, uio),
   register size_t len;
   register int w;
   register struct __siov *iov;
-  register _CONST char *p = NULL;
+  register const char *p = NULL;
 
   iov = uio->uio_iov;
   len = 0;
@@ -417,7 +417,7 @@ int
 _DEFUN(__sfputs_r, (ptr, fp, buf, len),
        struct _reent *ptr,
        FILE *fp,
-       _CONST char *buf,
+       const char *buf,
        size_t len)
 {
   register int i;
@@ -448,13 +448,13 @@ _DEFUN(__sfputs_r, (ptr, fp, buf, len),
 }
 #endif /* STRING_ONLY.  */
 
-int _EXFUN(_VFPRINTF_R, (struct _reent *, FILE *, _CONST char *, va_list));
+int _EXFUN(_VFPRINTF_R, (struct _reent *, FILE *, const char *, va_list));
 
 #ifndef STRING_ONLY
 int
 _DEFUN(VFPRINTF, (fp, fmt0, ap),
        FILE * fp,
-       _CONST char *fmt0,
+       const char *fmt0,
        va_list ap)
 {
   int result;
@@ -484,7 +484,7 @@ int
 _DEFUN(_VFPRINTF_R, (data, fp, fmt0, ap),
        struct _reent *data,
        FILE * fp,
-       _CONST char *fmt0,
+       const char *fmt0,
        va_list ap)
 {
   register char *fmt;	/* Format string.  */
@@ -494,7 +494,7 @@ _DEFUN(_VFPRINTF_R, (data, fp, fmt0, ap),
   struct _prt_data_t prt_data;	/* All data for decoding format string.  */
 
   /* Output function pointer.  */
-  int (*pfunc)(struct _reent *, FILE *, _CONST char *, size_t len);
+  int (*pfunc)(struct _reent *, FILE *, const char *, size_t len);
 
   pfunc = __SPRINT;
 

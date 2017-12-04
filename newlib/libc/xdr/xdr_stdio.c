@@ -52,19 +52,19 @@
 
 static void _EXFUN (xdrstdio_destroy, (XDR *));
 static bool_t _EXFUN (xdrstdio_getlong, (XDR *, long *));
-static bool_t _EXFUN (xdrstdio_putlong, (XDR *, _CONST long *));
+static bool_t _EXFUN (xdrstdio_putlong, (XDR *, const long *));
 static bool_t _EXFUN (xdrstdio_getbytes, (XDR *, char *, u_int));
-static bool_t _EXFUN (xdrstdio_putbytes, (XDR *, _CONST char *, u_int));
+static bool_t _EXFUN (xdrstdio_putbytes, (XDR *, const char *, u_int));
 static u_int _EXFUN (xdrstdio_getpos, (XDR *));
 static bool_t _EXFUN (xdrstdio_setpos, (XDR *, u_int));
 static int32_t * _EXFUN (xdrstdio_inline, (XDR *, u_int));
 static bool_t _EXFUN (xdrstdio_getint32, (XDR*, int32_t *));
-static bool_t _EXFUN (xdrstdio_putint32, (XDR*, _CONST int32_t *));
+static bool_t _EXFUN (xdrstdio_putint32, (XDR*, const int32_t *));
 
 /*
  * Ops vector for stdio type XDR
  */
-static _CONST struct xdr_ops xdrstdio_ops = {
+static const struct xdr_ops xdrstdio_ops = {
   xdrstdio_getlong,             /* deseraialize a long int */
   xdrstdio_putlong,             /* seraialize a long int */
   xdrstdio_getbytes,            /* deserialize counted bytes */
@@ -123,7 +123,7 @@ _DEFUN (xdrstdio_getlong, (xdrs, lp),
 static bool_t
 _DEFUN (xdrstdio_putlong, (xdrs, lp),
         XDR * xdrs,
-	_CONST long *lp)
+	const long *lp)
 {
   u_int32_t temp = htonl ((u_int32_t) * lp);
 
@@ -147,7 +147,7 @@ _DEFUN (xdrstdio_getbytes, (xdrs, addr, len),
 static bool_t
 _DEFUN (xdrstdio_putbytes, (xdrs, addr, len),
         XDR * xdrs,
-        _CONST char *addr,
+        const char *addr,
 	u_int len)
 {
   if ((len != 0) && (fwrite (addr, (size_t) len, 1,
@@ -206,7 +206,7 @@ _DEFUN (xdrstdio_getint32, (xdrs, ip),
 static bool_t
 _DEFUN (xdrstdio_putint32, (xdrs, ip),
         XDR *xdrs,
-	_CONST int32_t *ip)
+	const int32_t *ip)
 {
   int32_t temp = htonl (*ip);
 

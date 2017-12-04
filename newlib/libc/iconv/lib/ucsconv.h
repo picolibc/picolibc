@@ -57,7 +57,7 @@ typedef struct
    *
    * PARAMETERS:
    *   struct _reent *rptr   - reent structure of current thread/process;
-   *   _CONST char *encoding - encoding name.
+   *   const char *encoding - encoding name.
    *
    * DESCRIPTION:
    *  Initializes CES converter. CES converter may deal with a series of
@@ -69,7 +69,7 @@ typedef struct
    *   NULL and sets current thread's/process's errno.
    */
   _VOID_PTR _EXFNPTR(init, (struct _reent *rptr,
-                          _CONST char *encoding));
+                          const char *encoding));
 
   /*
    * close - close CES converter.
@@ -142,7 +142,7 @@ typedef struct
    *
    * PARAMETERS:
    *   _VOID_PTR data               - CES converter-specific data;
-   *   _CONST unsigned char **inbuf - buffer with input character byte sequence;
+   *   const unsigned char **inbuf - buffer with input character byte sequence;
    *   size_t *inbytesleft          - output buffer bytes count.
    *
    * DESCRIPTION:
@@ -156,7 +156,7 @@ typedef struct
    *   sequence was met, returns ICONV_CES_BAD_SEQUENCE.
    */
   ucs4_t _EXFNPTR(convert_to_ucs, (_VOID_PTR data,
-                                 _CONST unsigned char **inbuf,
+                                 const unsigned char **inbuf,
                                  size_t *inbytesleft));
 } iconv_to_ucs_ces_handlers_t;
 
@@ -173,7 +173,7 @@ typedef struct
 {
   /* Same as in iconv_to_ucs_ces_handlers_t */
   _VOID_PTR _EXFNPTR(init, (struct _reent *rptr,
-                          _CONST char *encoding));
+                          const char *encoding));
 
   /* Same as in iconv_to_ucs_ces_handlers_t */
   size_t _EXFNPTR(close, (struct _reent *rptr,
@@ -231,7 +231,7 @@ typedef struct
 typedef struct
 {
   /* CES converter handlers */
-  _CONST iconv_to_ucs_ces_handlers_t *handlers;
+  const iconv_to_ucs_ces_handlers_t *handlers;
   
   /* "to_ucs" CES converter-specific data. */
   _VOID_PTR data;
@@ -247,7 +247,7 @@ typedef struct
 typedef struct
 {
   /* CES converter handlers */
-  _CONST iconv_from_ucs_ces_handlers_t *handlers;
+  const iconv_from_ucs_ces_handlers_t *handlers;
   
   /* "from_ucs" CES converter-specific data. */
   _VOID_PTR data;
@@ -290,10 +290,10 @@ typedef struct
    * An array of encodings names, supported by CES converter.
    * The end of array should be marked by NULL pointer.
    */
-  _CONST char **names;
+  const char **names;
 
   /* CES converter description structure */
-  _CONST iconv_to_ucs_ces_handlers_t *handlers;
+  const iconv_to_ucs_ces_handlers_t *handlers;
 } iconv_to_ucs_ces_t;
 
 
@@ -308,19 +308,19 @@ typedef struct
    * An array of encodings names, supported by CES converter.
    * The end of array should be marked by NULL pointer.
    */
-  _CONST char **names;
+  const char **names;
 
   /* CES converter description structure */
-  _CONST iconv_from_ucs_ces_handlers_t *handlers;
+  const iconv_from_ucs_ces_handlers_t *handlers;
 } iconv_from_ucs_ces_t;
  
 
 /* List of "to UCS" linked-in CES converters. */
-extern _CONST iconv_to_ucs_ces_t
+extern const iconv_to_ucs_ces_t
 _iconv_to_ucs_ces[];
 
 /* List of "from UCS" linked-in CES converters. */
-extern _CONST iconv_from_ucs_ces_t
+extern const iconv_from_ucs_ces_t
 _iconv_from_ucs_ces[];
 
 #endif /* !__ICONV_UCS_CONVERSION_H__ */

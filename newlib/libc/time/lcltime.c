@@ -44,7 +44,7 @@ ANSI C requires <<localtime>>.
 
 struct tm *
 _DEFUN (localtime, (tim_p),
-	_CONST time_t * tim_p)
+	const time_t * tim_p)
 {
   struct _reent *reent = _REENT;
 

@@ -29,7 +29,7 @@
 
 int
 #ifdef _HAVE_STDC
-iscanf(_CONST char *fmt, ...)
+iscanf(const char *fmt, ...)
 #else
 iscanf(fmt, va_alist)
       char *fmt;
@@ -54,7 +54,7 @@ iscanf(fmt, va_alist)
 
 int
 #ifdef _HAVE_STDC
-_iscanf_r(struct _reent *ptr, _CONST char *fmt, ...)
+_iscanf_r(struct _reent *ptr, const char *fmt, ...)
 #else
 _iscanf_r(ptr, fmt, va_alist)
          struct _reent *ptr;

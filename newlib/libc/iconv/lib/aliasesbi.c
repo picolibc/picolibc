@@ -5,7 +5,7 @@
 #include <_ansi.h>
 #include "encnames.h"
 
-_CONST char *
+const char *
 _iconv_aliases =
 {
 #if defined (_ICONV_FROM_ENCODING_BIG5) \

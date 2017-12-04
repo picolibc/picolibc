@@ -38,8 +38,8 @@ static int null_conversion_dummy_data;
 static _VOID_PTR
 _DEFUN(null_conversion_open, (rptr, to, from),
                              struct _reent *rptr,
-                             _CONST char *to,
-                             _CONST char *from)
+                             const char *to,
+                             const char *from)
 {
   return (_VOID_PTR)&null_conversion_dummy_data;
 }
@@ -59,7 +59,7 @@ _DEFUN(null_conversion_convert,
                      (rptr, data, inbuf, inbytesleft, outbuf, outbytesleft),
                      struct _reent *rptr,
                      _VOID_PTR data,
-                     _CONST unsigned char **inbuf,
+                     const unsigned char **inbuf,
                      size_t *inbytesleft,
                      unsigned char **outbuf,
                      size_t *outbytesleft,
@@ -129,7 +129,7 @@ _DEFUN(null_conversion_is_stateful, (data, direction),
 }
 
 /* Null conversion definition object */
-_CONST iconv_conversion_handlers_t
+const iconv_conversion_handlers_t
 _iconv_null_conversion_handlers =
 {
   null_conversion_open,

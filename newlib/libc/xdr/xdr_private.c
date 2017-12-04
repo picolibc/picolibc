@@ -36,7 +36,7 @@ _DEFUN (xdr_set_vprintf, (fnptr),
 
 void
 _DEFUN (xdr_vwarnx, (format, ap),
-        _CONST char *format,
+        const char *format,
 	va_list ap)
 {
   if (xdr_vprintf)
@@ -49,7 +49,7 @@ _DEFUN (xdr_vwarnx, (format, ap),
 
 void
 _DEFUN (xdr_warnx, (fmt),
-        _CONST char *fmt _DOTS)
+        const char *fmt _DOTS)
 {
   va_list ap;
   va_start (ap, fmt);

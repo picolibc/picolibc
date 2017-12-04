@@ -38,7 +38,7 @@ PORTABILITY
 size_t
 _DEFUN (wcsxfrm, (a, b, n),
 	wchar_t *__restrict a,
-	_CONST wchar_t *__restrict b,
+	const wchar_t *__restrict b,
 	size_t n)
 
 {

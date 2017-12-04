@@ -244,8 +244,8 @@ _DEFUN(_freopen_r, (ptr, file, mode, fp),
 
 FILE *
 _DEFUN(freopen, (file, mode, fp),
-       _CONST char *__restrict file,
-       _CONST char *__restrict mode,
+       const char *__restrict file,
+       const char *__restrict mode,
        register FILE *__restrict fp)
 {
   return _freopen_r (_REENT, file, mode, fp);

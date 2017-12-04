@@ -28,7 +28,7 @@
  */
 #if defined (ICONV_TO_UCS_CCS_JIS_X0201_1976)
 
-static _CONST __uint16_t
+static const __uint16_t
 to_ucs_speed_jis_x0201_1976[] =
 {
 	INVALC,INVALC,INVALC,INVALC,INVALC,INVALC,INVALC,INVALC,
@@ -75,7 +75,7 @@ to_ucs_speed_jis_x0201_1976[] =
 
 #if defined (ICONV_FROM_UCS_CCS_JIS_X0201_1976)
 
-static _CONST unsigned char
+static const unsigned char
 from_ucs_speed_jis_x0201_1976[] =
 {
 	W(0xFFFF), /* Real 0xFF mapping. 0xFF is used to mark invalid codes */
@@ -185,7 +185,7 @@ from_ucs_speed_jis_x0201_1976[] =
  * jis_x0201_1976 CCS description table.
  * ======================================================================
  */
-_CONST iconv_ccs_t
+const iconv_ccs_t
 _iconv_ccs_jis_x0201_1976 =
 {
 	TABLE_VERSION_1, /* Table version */

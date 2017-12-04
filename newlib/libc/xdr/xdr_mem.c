@@ -55,22 +55,22 @@
 
 static void _EXFUN (xdrmem_destroy, (XDR *));
 static bool_t _EXFUN (xdrmem_getlong_aligned, (XDR *, long *));
-static bool_t _EXFUN (xdrmem_putlong_aligned, (XDR *, _CONST long *));
+static bool_t _EXFUN (xdrmem_putlong_aligned, (XDR *, const long *));
 static bool_t _EXFUN (xdrmem_getlong_unaligned, (XDR *, long *));
-static bool_t _EXFUN (xdrmem_putlong_unaligned, (XDR *, _CONST long *));
+static bool_t _EXFUN (xdrmem_putlong_unaligned, (XDR *, const long *));
 static bool_t _EXFUN (xdrmem_getbytes, (XDR *, char *, u_int));
-static bool_t _EXFUN (xdrmem_putbytes, (XDR *, _CONST char *, u_int));
+static bool_t _EXFUN (xdrmem_putbytes, (XDR *, const char *, u_int));
 /* XXX: w/64-bit pointers, u_int not enough! */
 static u_int _EXFUN (xdrmem_getpos, (XDR *));
 static bool_t _EXFUN (xdrmem_setpos, (XDR *, u_int));
 static int32_t * _EXFUN (xdrmem_inline_aligned, (XDR *, u_int));
 static int32_t * _EXFUN (xdrmem_inline_unaligned, (XDR *, u_int));
 static bool_t  _EXFUN (xdrmem_getint32_aligned, (XDR *, int32_t *));
-static bool_t  _EXFUN (xdrmem_putint32_aligned, (XDR *, _CONST int32_t *));
+static bool_t  _EXFUN (xdrmem_putint32_aligned, (XDR *, const int32_t *));
 static bool_t  _EXFUN (xdrmem_getint32_unaligned, (XDR *, int32_t *));
-static bool_t  _EXFUN (xdrmem_putint32_unaligned, (XDR *, _CONST int32_t *));
+static bool_t  _EXFUN (xdrmem_putint32_unaligned, (XDR *, const int32_t *));
 
-static _CONST struct xdr_ops xdrmem_ops_aligned = {
+static const struct xdr_ops xdrmem_ops_aligned = {
   xdrmem_getlong_aligned,
   xdrmem_putlong_aligned,
   xdrmem_getbytes,
@@ -83,7 +83,7 @@ static _CONST struct xdr_ops xdrmem_ops_aligned = {
   xdrmem_putint32_aligned
 };
 
-static _CONST struct xdr_ops xdrmem_ops_unaligned = {
+static const struct xdr_ops xdrmem_ops_unaligned = {
   xdrmem_getlong_unaligned,
   xdrmem_putlong_unaligned,
   xdrmem_getbytes,
@@ -137,7 +137,7 @@ _DEFUN (xdrmem_getlong_aligned, (xdrs, lp),
 static bool_t
 _DEFUN (xdrmem_putlong_aligned, (xdrs, lp),
         XDR * xdrs,
-	_CONST long *lp)
+	const long *lp)
 {
   if (xdrs->x_handy < sizeof (int32_t))
     return FALSE;
@@ -166,7 +166,7 @@ _DEFUN (xdrmem_getlong_unaligned, (xdrs, lp),
 static bool_t
 _DEFUN (xdrmem_putlong_unaligned, (xdrs, lp),
         XDR * xdrs,
-	_CONST long *lp)
+	const long *lp)
 {
   u_int32_t l;
 
@@ -196,7 +196,7 @@ _DEFUN (xdrmem_getbytes, (xdrs, addr, len),
 static bool_t
 _DEFUN (xdrmem_putbytes, (xdrs, addr, len),
         XDR * xdrs,
-	_CONST char *addr,
+	const char *addr,
 	u_int len)
 {
   if (xdrs->x_handy < len)
@@ -275,7 +275,7 @@ _DEFUN (xdrmem_getint32_aligned, (xdrs, ip),
 static bool_t
 _DEFUN (xdrmem_putint32_aligned, (xdrs, ip),
         XDR *xdrs,
-	_CONST int32_t *ip)
+	const int32_t *ip)
 {
   if (xdrs->x_handy < sizeof(int32_t))
     return FALSE;
@@ -304,7 +304,7 @@ _DEFUN (xdrmem_getint32_unaligned, (xdrs, ip),
 static bool_t
 _DEFUN (xdrmem_putint32_unaligned, (xdrs, ip),
         XDR *xdrs,
-	_CONST int32_t *ip)
+	const int32_t *ip)
 {
   u_int32_t l;
 

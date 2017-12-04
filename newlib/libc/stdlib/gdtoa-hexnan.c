@@ -46,11 +46,11 @@ THIS SOFTWARE.
 #ifdef INFNAN_CHECK
 int
 _DEFUN (match, (sp, t),
-	_CONST char **sp,
+	const char **sp,
 	char *t)
 {
 	int c, d;
-	_CONST char *s = *sp;
+	const char *s = *sp;
 
 	while( (d = *t++) !=0) {
 		if ((c = *++s) >= 'A' && c <= 'Z')
@@ -81,12 +81,12 @@ _DEFUN (L_shift, (x, x1, i),
 
 int
 _DEFUN (hexnan, (sp, fpi, x0),
-	_CONST char **sp,
-	_CONST FPI *fpi,
+	const char **sp,
+	const FPI *fpi,
 	__ULong *x0)
 {
 	__ULong c, h, *x, *x1, *xe;
-	_CONST char *s;
+	const char *s;
 	int havedig, hd0, i, nbits;
 
 	nbits = fpi->nbits;
@@ -97,7 +97,7 @@ _DEFUN (hexnan, (sp, fpi, x0),
 	x1 = xe = x;
 	havedig = hd0 = i = 0;
 	s = *sp;
-	while((c = *(_CONST unsigned char*)++s)) {
+	while((c = *(const unsigned char*)++s)) {
 		if (!(h = __get_hexdig(c))) {
 			if (c <= ' ') {
 				if (hd0 < havedig) {

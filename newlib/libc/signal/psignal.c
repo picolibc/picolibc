@@ -36,7 +36,7 @@ Supporting OS subroutines required: <<close>>, <<fstat>>, <<isatty>>,
 _VOID
 _DEFUN(psignal, (sig, s),
        int sig,
-       _CONST char *s)
+       const char *s)
 {
   if (s != NULL && *s != '\0')
     fprintf (stderr, "%s: %s\n", s, strsignal (sig));

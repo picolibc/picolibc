@@ -70,11 +70,11 @@ No supporting OS subroutines are required.
 size_t
 _DEFUN (wcslcat, (dst, src, siz),
 	wchar_t * dst,
-	_CONST wchar_t * src,
+	const wchar_t * src,
 	size_t siz)
 {
   wchar_t *d = dst;
-  _CONST wchar_t *s = src;
+  const wchar_t *s = src;
   size_t n = siz;
   size_t dlen;
 

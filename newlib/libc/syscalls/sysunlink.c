@@ -5,7 +5,7 @@
 
 int
 _DEFUN (unlink, (file),
-        _CONST char *file)
+        const char *file)
 {
   return _unlink_r (_REENT, file);
 }

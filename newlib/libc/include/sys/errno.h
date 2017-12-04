@@ -17,7 +17,7 @@ extern int *__errno _PARAMS ((void));
 
 /* Please don't use these variables directly.
    Use strerror instead. */
-extern __IMPORT _CONST char * _CONST _sys_errlist[];
+extern __IMPORT const char * const _sys_errlist[];
 extern __IMPORT int _sys_nerr;
 #ifdef __CYGWIN__
 extern __IMPORT const char * const sys_errlist[];

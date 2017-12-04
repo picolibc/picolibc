@@ -31,7 +31,7 @@ endutent ()
 }
 
 void
-utmpname (_CONST char *file)
+utmpname (const char *file)
 {
   utmp_file = strdup (file);
 }

@@ -273,7 +273,7 @@ static char *cvt_ufix64 _PARAMS((struct _reent *, unsigned long long, int,  int 
 int 
 _DEFUN (VFPRINTF, (fp, fmt0, ap),
 	FILE * fp,
-	_CONST char *fmt0,
+	const char *fmt0,
 	va_list ap)
 {
   CHECK_INIT (_REENT, fp);
@@ -284,7 +284,7 @@ int
 _DEFUN (_VFPRINTF_R, (data, fp, fmt0, ap),
 	struct _reent *data,
 	FILE * fp,
-	_CONST char *fmt0,
+	const char *fmt0,
 	va_list ap)
 {
 	register char *fmt;	/* format string */
@@ -350,9 +350,9 @@ _DEFUN (_VFPRINTF_R, (data, fp, fmt0, ap),
 	 * below longer.
 	 */
 #define	PADSIZE	16		/* pad chunk size */
-	static _CONST char blanks[PADSIZE] =
+	static const char blanks[PADSIZE] =
 	 {' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' '};
-	static _CONST char zeroes[PADSIZE] =
+	static const char zeroes[PADSIZE] =
 	 {'0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0'};
 
 	/*

@@ -5,8 +5,8 @@
 
 int
 _DEFUN (link, (old, new),
-     _CONST char *old,
-     _CONST char *new)
+     const char *old,
+     const char *new)
 {
   return _link_r (_REENT, old, new);
 }

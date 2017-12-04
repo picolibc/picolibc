@@ -93,8 +93,8 @@ _VOID	_EXFUN(exit,(int __status) _ATTRIBUTE ((__noreturn__)));
 _VOID	_EXFUN_NOTHROW(free,(_PTR));
 char *  _EXFUN(getenv,(const char *__string));
 char *	_EXFUN(_getenv_r,(struct _reent *, const char *__string));
-char *	_EXFUN(_findenv,(_CONST char *, int *));
-char *	_EXFUN(_findenv_r,(struct _reent *, _CONST char *, int *));
+char *	_EXFUN(_findenv,(const char *, int *));
+char *	_EXFUN(_findenv_r,(struct _reent *, const char *, int *));
 #if __POSIX_VISIBLE >= 200809
 extern char *suboptarg;			/* getsubopt(3) external variable */
 int	_EXFUN(getsubopt,(char **, char * const *, char **));

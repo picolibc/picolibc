@@ -57,11 +57,11 @@ No supporting OS subroutines are required.
 
 size_t
 _DEFUN (wcsspn, (s, set),
-	_CONST wchar_t * s,
-	_CONST wchar_t * set)
+	const wchar_t * s,
+	const wchar_t * set)
 {
-  _CONST wchar_t *p;
-  _CONST wchar_t *q;
+  const wchar_t *p;
+  const wchar_t *q;
 
   p = s;
   while (*p)

@@ -32,7 +32,7 @@ QUICKREF
 
 char *
 _DEFUN (strchrnul, (s1, i),
-	_CONST char *s1,
+	const char *s1,
 	int i)
 {
   char *s = strchr(s1, i);

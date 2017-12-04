@@ -70,7 +70,7 @@ No supporting OS subroutines are required.
 #ifndef _REENT_ONLY
 long long
 _DEFUN(atoll, (str),
-       _CONST char *str)
+       const char *str)
 {
 	return strtoll(str, (char **)NULL, 10);
 }
@@ -79,7 +79,7 @@ _DEFUN(atoll, (str),
 long long
 _DEFUN(_atoll_r, (ptr, str),
        struct _reent *ptr,
-       _CONST char *str)
+       const char *str)
 {
 	return _strtoll_r(ptr, str, (char **)NULL, 10);
 }

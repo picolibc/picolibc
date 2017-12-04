@@ -146,7 +146,7 @@ Supporting OS subroutines required:
 int
 _DEFUN(VFSCANF, (fp, fmt, ap),
        register FILE *fp,
-       _CONST char *fmt,
+       const char *fmt,
        va_list ap)
 {
   CHECK_INIT(_REENT, fp);
@@ -160,7 +160,7 @@ _EXFUN(vfiscanf, (FILE *, const char *, __VALIST)
 int
 _DEFUN(__SVFSCANF, (fp, fmt0, ap),
        register FILE *fp,
-       char _CONST *fmt0,
+       char const *fmt0,
        va_list ap)
 {
   return __SVFSCANF_R (_REENT, fp, fmt0, ap);
@@ -172,7 +172,7 @@ int
 _DEFUN(_VFSCANF_R, (data, fp, fmt, ap),
        struct _reent *data,
        register FILE *fp,
-       _CONST char *fmt,
+       const char *fmt,
        va_list ap)
 {
   CHECK_INIT(data, fp);
@@ -271,7 +271,7 @@ int
 _DEFUN(__SVFSCANF_R, (rptr, fp, fmt0, ap),
        struct _reent *rptr,
        register FILE *fp,
-       char _CONST *fmt0,
+       char const *fmt0,
        va_list ap)
 {
   register u_char *fmt = (u_char *) fmt0;

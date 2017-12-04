@@ -121,8 +121,8 @@ No supporting OS subroutine calls are required.
 
 iconv_t
 _DEFUN(iconv_open, (to, from), 
-                   _CONST char *to,
-                   _CONST char *from)
+                   const char *to,
+                   const char *from)
 {
   return _iconv_open_r (_REENT, to, from);
 }
@@ -136,7 +136,7 @@ _DEFUN(iconv, (cd, inbuf, inbytesleft, outbuf, outbytesleft),
               char **__restrict outbuf,
               size_t *__restrict outbytesleft)
 {
-    return _iconv_r (_REENT, cd, (_CONST char **) inbuf, inbytesleft,
+    return _iconv_r (_REENT, cd, (const char **) inbuf, inbytesleft,
 		     outbuf, outbytesleft);
 }
 
@@ -152,18 +152,18 @@ _DEFUN(iconv_close, (cd), iconv_t cd)
 iconv_t
 _DEFUN(_iconv_open_r, (rptr, to, from),
                       struct _reent *rptr,
-                      _CONST char *to,
-                      _CONST char *from)
+                      const char *to,
+                      const char *from)
 {
   iconv_conversion_t *ic;
     
   if (to == NULL || from == NULL || *to == '\0' || *from == '\0')
     return (iconv_t)-1;
 
-  if ((to = (_CONST char *)_iconv_resolve_encoding_name (rptr, to)) == NULL)
+  if ((to = (const char *)_iconv_resolve_encoding_name (rptr, to)) == NULL)
     return (iconv_t)-1;
 
-  if ((from = (_CONST char *)_iconv_resolve_encoding_name (rptr, from)) == NULL)
+  if ((from = (const char *)_iconv_resolve_encoding_name (rptr, from)) == NULL)
     {
       _free_r (rptr, (_VOID_PTR)to);
       return (iconv_t)-1;
@@ -204,7 +204,7 @@ size_t
 _DEFUN(_iconv_r, (rptr, cd, inbuf, inbytesleft, outbuf, outbytesleft),
                  struct _reent *rptr,
                  iconv_t cd,
-                 _CONST char **inbuf,
+                 const char **inbuf,
                  size_t *inbytesleft,
                  char **outbuf,
                  size_t *outbytesleft)
@@ -279,7 +279,7 @@ _DEFUN(_iconv_r, (rptr, cd, inbuf, inbytesleft, outbuf, outbytesleft),
 
   return ic->handlers->convert (rptr,
                                 ic->data,
-                                (_CONST unsigned char**)inbuf,
+                                (const unsigned char**)inbuf,
                                 inbytesleft,
                                 (unsigned char**)outbuf,
                                 outbytesleft,

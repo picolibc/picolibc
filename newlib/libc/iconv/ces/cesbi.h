@@ -183,92 +183,92 @@
  * These handlers are actually defined in correspondent CES converter files.
  */
 #ifdef ICONV_TO_UCS_CES_EUC
-extern _CONST iconv_to_ucs_ces_handlers_t
+extern const iconv_to_ucs_ces_handlers_t
 _iconv_to_ucs_ces_handlers_euc;
 #endif
 #ifdef ICONV_FROM_UCS_CES_EUC
-extern _CONST iconv_from_ucs_ces_handlers_t
+extern const iconv_from_ucs_ces_handlers_t
 _iconv_from_ucs_ces_handlers_euc;
 #endif
 
 #ifdef ICONV_TO_UCS_CES_TABLE
-extern _CONST iconv_to_ucs_ces_handlers_t
+extern const iconv_to_ucs_ces_handlers_t
 _iconv_to_ucs_ces_handlers_table;
 #endif
 #ifdef ICONV_FROM_UCS_CES_TABLE
-extern _CONST iconv_from_ucs_ces_handlers_t
+extern const iconv_from_ucs_ces_handlers_t
 _iconv_from_ucs_ces_handlers_table;
 #endif
 
 #ifdef ICONV_TO_UCS_CES_TABLE_PCS
-extern _CONST iconv_to_ucs_ces_handlers_t
+extern const iconv_to_ucs_ces_handlers_t
 _iconv_to_ucs_ces_handlers_table_pcs;
 #endif
 #ifdef ICONV_FROM_UCS_CES_TABLE_PCS
-extern _CONST iconv_from_ucs_ces_handlers_t
+extern const iconv_from_ucs_ces_handlers_t
 _iconv_from_ucs_ces_handlers_table_pcs;
 #endif
 
 #ifdef ICONV_TO_UCS_CES_UCS_2
-extern _CONST iconv_to_ucs_ces_handlers_t
+extern const iconv_to_ucs_ces_handlers_t
 _iconv_to_ucs_ces_handlers_ucs_2;
 #endif
 #ifdef ICONV_FROM_UCS_CES_UCS_2
-extern _CONST iconv_from_ucs_ces_handlers_t
+extern const iconv_from_ucs_ces_handlers_t
 _iconv_from_ucs_ces_handlers_ucs_2;
 #endif
 
 #ifdef ICONV_TO_UCS_CES_UCS_2_INTERNAL
-extern _CONST iconv_to_ucs_ces_handlers_t
+extern const iconv_to_ucs_ces_handlers_t
 _iconv_to_ucs_ces_handlers_ucs_2_internal;
 #endif
 #ifdef ICONV_FROM_UCS_CES_UCS_2_INTERNAL
-extern _CONST iconv_from_ucs_ces_handlers_t
+extern const iconv_from_ucs_ces_handlers_t
 _iconv_from_ucs_ces_handlers_ucs_2_internal;
 #endif
 
 #ifdef ICONV_TO_UCS_CES_UCS_4
-extern _CONST iconv_to_ucs_ces_handlers_t
+extern const iconv_to_ucs_ces_handlers_t
 _iconv_to_ucs_ces_handlers_ucs_4;
 #endif
 #ifdef ICONV_FROM_UCS_CES_UCS_4
-extern _CONST iconv_from_ucs_ces_handlers_t
+extern const iconv_from_ucs_ces_handlers_t
 _iconv_from_ucs_ces_handlers_ucs_4;
 #endif
 
 #ifdef ICONV_TO_UCS_CES_UCS_4_INTERNAL
-extern _CONST iconv_to_ucs_ces_handlers_t
+extern const iconv_to_ucs_ces_handlers_t
 _iconv_to_ucs_ces_handlers_ucs_4_internal;
 #endif
 #ifdef ICONV_FROM_UCS_CES_UCS_4_INTERNAL
-extern _CONST iconv_from_ucs_ces_handlers_t
+extern const iconv_from_ucs_ces_handlers_t
 _iconv_from_ucs_ces_handlers_ucs_4_internal;
 #endif
 
 #ifdef ICONV_TO_UCS_CES_US_ASCII
-extern _CONST iconv_to_ucs_ces_handlers_t
+extern const iconv_to_ucs_ces_handlers_t
 _iconv_to_ucs_ces_handlers_us_ascii;
 #endif
 #ifdef ICONV_FROM_UCS_CES_US_ASCII
-extern _CONST iconv_from_ucs_ces_handlers_t
+extern const iconv_from_ucs_ces_handlers_t
 _iconv_from_ucs_ces_handlers_us_ascii;
 #endif
 
 #ifdef ICONV_TO_UCS_CES_UTF_16
-extern _CONST iconv_to_ucs_ces_handlers_t
+extern const iconv_to_ucs_ces_handlers_t
 _iconv_to_ucs_ces_handlers_utf_16;
 #endif
 #ifdef ICONV_FROM_UCS_CES_UTF_16
-extern _CONST iconv_from_ucs_ces_handlers_t
+extern const iconv_from_ucs_ces_handlers_t
 _iconv_from_ucs_ces_handlers_utf_16;
 #endif
 
 #ifdef ICONV_TO_UCS_CES_UTF_8
-extern _CONST iconv_to_ucs_ces_handlers_t
+extern const iconv_to_ucs_ces_handlers_t
 _iconv_to_ucs_ces_handlers_utf_8;
 #endif
 #ifdef ICONV_FROM_UCS_CES_UTF_8
-extern _CONST iconv_from_ucs_ces_handlers_t
+extern const iconv_from_ucs_ces_handlers_t
 _iconv_from_ucs_ces_handlers_utf_8;
 #endif
 

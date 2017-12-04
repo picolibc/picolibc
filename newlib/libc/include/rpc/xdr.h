@@ -108,19 +108,19 @@ enum xdr_op
 typedef struct __rpc_xdr
 {
   enum xdr_op x_op;             /* operation; fast additional param */
-  _CONST struct xdr_ops
+  const struct xdr_ops
   {
     /* get a long from underlying stream */
     bool_t _EXFNPTR (x_getlong, (struct __rpc_xdr *, long *));
 
     /* put a long to " */
-    bool_t _EXFNPTR (x_putlong, (struct __rpc_xdr *, _CONST long *));
+    bool_t _EXFNPTR (x_putlong, (struct __rpc_xdr *, const long *));
 
     /* get some bytes from " */
     bool_t _EXFNPTR (x_getbytes, (struct __rpc_xdr *, char *, u_int));
 
     /* put some bytes to " */
-    bool_t _EXFNPTR (x_putbytes, (struct __rpc_xdr *, _CONST char *, u_int));
+    bool_t _EXFNPTR (x_putbytes, (struct __rpc_xdr *, const char *, u_int));
 
     /* returns bytes off from beginning */
     u_int _EXFNPTR (x_getpostn, (struct __rpc_xdr *));
@@ -138,7 +138,7 @@ typedef struct __rpc_xdr
     bool_t _EXFNPTR (x_getint32, (struct __rpc_xdr *, int32_t *));
 
     /* put an int32 to the underlying stream */
-    bool_t _EXFNPTR (x_putint32, (struct __rpc_xdr *, _CONST int32_t *));
+    bool_t _EXFNPTR (x_putint32, (struct __rpc_xdr *, const int32_t *));
 
   } *x_ops;
   char *x_public;               /* users' data */
@@ -320,7 +320,7 @@ extern bool_t _EXFUN (xdr_bytes, (XDR *, char **, u_int *, u_int));
 extern bool_t _EXFUN (xdr_opaque, (XDR *, char *, u_int));
 extern bool_t _EXFUN (xdr_string, (XDR *, char **, u_int));
 extern bool_t _EXFUN (xdr_union, (XDR *, enum_t *, char *,
-                                  _CONST struct xdr_discrim *, xdrproc_t));
+                                  const struct xdr_discrim *, xdrproc_t));
 extern bool_t _EXFUN (xdr_char, (XDR *, char *));
 extern bool_t _EXFUN (xdr_u_char, (XDR *, u_char *));
 extern bool_t _EXFUN (xdr_vector, (XDR *, char *, u_int, u_int, xdrproc_t));

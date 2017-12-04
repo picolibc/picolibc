@@ -103,7 +103,7 @@ static euc_cs_desc_t euc_kr_cs_desc [] =
 static _VOID_PTR
 _DEFUN(euc_from_ucs_init, (rptr, encoding),
                           struct _reent *rptr,
-                          _CONST char *encoding)
+                          const char *encoding)
 {
   int i;
   euc_data_t *data;
@@ -263,7 +263,7 @@ _DEFUN(euc_convert_from_ucs, (data, in, outbuf, outbytesleft),
 static _VOID_PTR
 _DEFUN(euc_to_ucs_init, (rptr, encoding),
                         struct _reent *rptr,
-                        _CONST char *encoding)
+                        const char *encoding)
 {
   int i;
   euc_data_t *data;
@@ -347,7 +347,7 @@ _DEFUN(euc_to_ucs_close, (rptr, data),
 static ucs4_t
 _DEFUN(euc_convert_to_ucs, (data, inbuf, inbytesleft),
                            _VOID_PTR data,
-                           _CONST unsigned char **inbuf,
+                           const unsigned char **inbuf,
                            size_t *inbytesleft)
 {
   int i;
@@ -366,8 +366,8 @@ _DEFUN(euc_convert_to_ucs, (data, inbuf, inbytesleft),
  
   for (i = 1; d->desc[i].csname != NULL; i++)
     {
-      if (memcmp((_CONST _VOID_PTR)(*inbuf),
-                 (_CONST _VOID_PTR)d->desc[i].prefix,
+      if (memcmp((const _VOID_PTR)(*inbuf),
+                 (const _VOID_PTR)d->desc[i].prefix,
                  d->desc[i].prefixbytes) == 0)
         {
           if (((int)*inbytesleft - d->desc[i].prefixbytes - d->desc[i].bytes) < 0)
@@ -388,7 +388,7 @@ _DEFUN(euc_convert_to_ucs, (data, inbuf, inbytesleft),
           
           res = _iconv_to_ucs_ces_handlers_table.convert_to_ucs (
                                              d->data[i],
-                                             (_CONST unsigned char **)&inbuf1,
+                                             (const unsigned char **)&inbuf1,
                                              &inbytesleft1);
           if (((__int32_t)res) > 0)
             {
@@ -419,7 +419,7 @@ _DEFUN(euc_convert_to_ucs, (data, inbuf, inbytesleft),
   
   res = _iconv_to_ucs_ces_handlers_table.convert_to_ucs (
                                         d->data[0],
-                                        (_CONST unsigned char **)&inbuf1,
+                                        (const unsigned char **)&inbuf1,
                                         &inbytesleft1);
   if (((__int32_t)res) > 0)
     {
@@ -439,7 +439,7 @@ _DEFUN(euc_get_mb_cur_max, (data),
 }
 
 #if defined (ICONV_FROM_UCS_CES_EUC)
-_CONST iconv_from_ucs_ces_handlers_t
+const iconv_from_ucs_ces_handlers_t
 _iconv_from_ucs_ces_handlers_euc =
 {
   euc_from_ucs_init,
@@ -453,7 +453,7 @@ _iconv_from_ucs_ces_handlers_euc =
 #endif
 
 #if defined (ICONV_TO_UCS_CES_EUC)
-_CONST iconv_to_ucs_ces_handlers_t
+const iconv_to_ucs_ces_handlers_t
 _iconv_to_ucs_ces_handlers_euc = 
 {
   euc_to_ucs_init,

@@ -19,7 +19,7 @@ PORTABILITY
 
 void
 _DEFUN (swab, (b1, b2, length),
-	_CONST void *b1,
+	const void *b1,
 	void *b2,
 	ssize_t length)
 {

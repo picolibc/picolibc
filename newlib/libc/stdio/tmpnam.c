@@ -89,8 +89,8 @@ static int
 _DEFUN(worker, (ptr, result, part1, part2, part3, part4),
        struct _reent *ptr,
        char *result,
-       _CONST char *part1,
-       _CONST char *part2,
+       const char *part1,
+       const char *part2,
        int part3,
        int *part4)
 {
@@ -149,12 +149,12 @@ _DEFUN(_tmpnam_r, (p, s),
 char *
 _DEFUN(_tempnam_r, (p, dir, pfx),
        struct _reent *p,
-       _CONST char *dir,
-       _CONST char *pfx)
+       const char *dir,
+       const char *pfx)
 {
   char *filename;
   int length;
-  _CONST char *prefix = (pfx) ? pfx : "";
+  const char *prefix = (pfx) ? pfx : "";
   if (dir == NULL && (dir = getenv ("TMPDIR")) == NULL)
     dir = P_tmpdir;
 
@@ -175,8 +175,8 @@ _DEFUN(_tempnam_r, (p, dir, pfx),
 
 char *
 _DEFUN(tempnam, (dir, pfx),
-       _CONST char *dir,
-       _CONST char *pfx)
+       const char *dir,
+       const char *pfx)
 {
   return _tempnam_r (_REENT, dir, pfx);
 }

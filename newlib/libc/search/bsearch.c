@@ -57,8 +57,8 @@ No supporting OS subroutines are required.
 
 _PTR
 _DEFUN (bsearch, (key, base, nmemb, size, compar),
-	_CONST _PTR key,
-	_CONST _PTR base,
+	const _PTR key,
+	const _PTR base,
 	size_t nmemb,
 	size_t size,
 	int _EXFNPTR(compar, (const _PTR, const _PTR)))

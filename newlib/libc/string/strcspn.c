@@ -27,11 +27,11 @@ PORTABILITY
 
 size_t
 _DEFUN (strcspn, (s1, s2),
-	_CONST char *s1,
-	_CONST char *s2)
+	const char *s1,
+	const char *s2)
 {
-  _CONST char *s = s1;
-  _CONST char *c;
+  const char *s = s1;
+  const char *c;
 
   while (*s1)
     {

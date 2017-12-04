@@ -18,7 +18,7 @@ _DEFUN (execv, (path, argv),
 	const char *path,
 	char * const argv[])
 {
-  return _execve (path, (char * _CONST *) argv, *p_environ);
+  return _execve (path, (char * const *) argv, *p_environ);
 }
 
 #endif /* !_NO_EXECVE  */

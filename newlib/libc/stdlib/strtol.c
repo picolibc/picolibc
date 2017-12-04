@@ -214,7 +214,7 @@ _strtol_l (struct _reent *rptr, const char *__restrict nptr,
 long
 _DEFUN (_strtol_r, (rptr, nptr, endptr, base),
 	struct _reent *rptr,
-	_CONST char *__restrict nptr,
+	const char *__restrict nptr,
 	char **__restrict endptr,
 	int base)
 {
@@ -232,7 +232,7 @@ strtol_l (const char *__restrict s, char **__restrict ptr, int base,
 
 long
 _DEFUN (strtol, (s, ptr, base),
-	_CONST char *__restrict s,
+	const char *__restrict s,
 	char **__restrict ptr,
 	int base)
 {

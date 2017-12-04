@@ -5,9 +5,9 @@
 
 int
 _DEFUN (execve, (name, argv, env),
-     _CONST char *name,
-     char *_CONST argv[],
-     char *_CONST env[])
+     const char *name,
+     char *const argv[],
+     char *const env[])
 {
   return _execve_r (_REENT, name, argv, env);
 }

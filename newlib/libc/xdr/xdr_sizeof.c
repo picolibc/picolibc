@@ -45,7 +45,7 @@
 static bool_t
 _DEFUN (x_putlong, (xdrs, longp),
         XDR * xdrs,
-	_CONST long *longp)
+	const long *longp)
 {
   xdrs->x_handy += BYTES_PER_XDR_UNIT;
   return TRUE;
@@ -134,7 +134,7 @@ _DEFUN (x_destroy, (xdrs),
 static bool_t
 _DEFUN (x_putint32, (xdrs, int32p),
         XDR *xdrs,
-	_CONST int32_t *int32p)
+	const int32_t *int32p)
 {
   xdrs->x_handy += BYTES_PER_XDR_UNIT;
   return TRUE;

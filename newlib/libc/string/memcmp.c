@@ -44,8 +44,8 @@ QUICKREF
 
 int
 _DEFUN (memcmp, (m1, m2, n),
-	_CONST _PTR m1,
-	_CONST _PTR m2,
+	const _PTR m1,
+	const _PTR m2,
 	size_t n)
 {
 #if defined(PREFER_SIZE_OVER_SPEED) || defined(__OPTIMIZE_SIZE__)

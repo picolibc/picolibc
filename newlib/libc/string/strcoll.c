@@ -37,8 +37,8 @@ QUICKREF
 
 int
 _DEFUN (strcoll, (a, b),
-	_CONST char *a,
-	_CONST char *b)
+	const char *a,
+	const char *b)
 
 {
   return strcmp (a, b);

@@ -9,7 +9,7 @@ ssize_t
 _DEFUN (_pwrite_r, (rptr, fd, buf, n, off),
      struct _reent *rptr,
      int fd,
-     _CONST _PTR buf,
+     const _PTR buf,
      size_t n,
      off_t off)
 {
@@ -35,7 +35,7 @@ _DEFUN (_pwrite_r, (rptr, fd, buf, n, off),
 ssize_t
 _DEFUN (__libc_pwrite, (fd, buf, n, off),
      int fd,
-     _CONST _PTR buf,
+     const _PTR buf,
      size_t n,
      off_t off)
 {

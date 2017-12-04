@@ -184,7 +184,7 @@ typedef union
 int
 _DEFUN (vfscanf, (fp, fmt, ap), 
     register FILE *__restrict fp,
-    _CONST char *__restrict fmt,
+    const char *__restrict fmt,
     va_list ap)
 {
   CHECK_INIT(_REENT, fp);
@@ -194,7 +194,7 @@ _DEFUN (vfscanf, (fp, fmt, ap),
 int
 __svfscanf (fp, fmt0, ap)
      register FILE *fp;
-     char _CONST *fmt0;
+     char const *fmt0;
      va_list ap;
 {
   return __svfscanf_r (_REENT, fp, fmt0, ap);
@@ -206,7 +206,7 @@ int
 _DEFUN (_vfscanf_r, (data, fp, fmt, ap),
     struct _reent *data,
     register FILE *__restrict fp,
-    _CONST char *__restrict fmt,
+    const char *__restrict fmt,
     va_list ap)
 {
   return __svfscanf_r (data, fp, fmt, ap);
@@ -217,7 +217,7 @@ int
 __svfscanf_r (rptr, fp, fmt0, ap)
      struct _reent *rptr;
      register FILE *fp;
-     char _CONST *fmt0;
+     char const *fmt0;
      va_list ap;
 {
   register u_char *fmt = (u_char *) fmt0;
@@ -262,7 +262,7 @@ __svfscanf_r (rptr, fp, fmt0, ap)
 #endif
 
   /* `basefix' is used to avoid `if' tests in the integer scanner */
-  static _CONST short basefix[17] =
+  static const short basefix[17] =
     {10, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16};
 
   nassigned = 0;

@@ -21,7 +21,7 @@
 #if defined (ICONV_TO_UCS_CCS_BIG5) \
  && !(defined (TABLE_USE_SIZE_OPTIMIZATION))
 
-static _CONST __uint16_t
+static const __uint16_t
 to_ucs_speed_big5[] =
 {
 	/* Heading Block */
@@ -2972,7 +2972,7 @@ to_ucs_speed_big5[] =
 #if defined (ICONV_TO_UCS_CCS_BIG5) \
  && (defined (TABLE_USE_SIZE_OPTIMIZATION))
 
-static _CONST __uint16_t
+static const __uint16_t
 to_ucs_size_big5[] =
 {
 	0x00B0, /* Ranges number */
@@ -5092,7 +5092,7 @@ to_ucs_size_big5[] =
 #if defined (ICONV_FROM_UCS_CCS_BIG5) \
  && !(defined (TABLE_USE_SIZE_OPTIMIZATION))
 
-static _CONST __uint16_t
+static const __uint16_t
 from_ucs_speed_big5[] =
 {
 	/* Heading Block */
@@ -8407,7 +8407,7 @@ from_ucs_speed_big5[] =
 #if defined (ICONV_FROM_UCS_CCS_BIG5) \
  && (defined (TABLE_USE_SIZE_OPTIMIZATION))
 
-static _CONST __uint16_t
+static const __uint16_t
 from_ucs_size_big5[] =
 {
 	0x0235, /* Ranges number */
@@ -12579,7 +12579,7 @@ from_ucs_size_big5[] =
  * big5 CCS description table.
  * ======================================================================
  */
-_CONST iconv_ccs_t
+const iconv_ccs_t
 _iconv_ccs_big5 =
 {
 	TABLE_VERSION_1, /* Table version */

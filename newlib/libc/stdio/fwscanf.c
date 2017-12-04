@@ -26,7 +26,7 @@
 #ifndef _REENT_ONLY
 
 int
-fwscanf (FILE *__restrict fp, _CONST wchar_t *__restrict fmt, ...)
+fwscanf (FILE *__restrict fp, const wchar_t *__restrict fmt, ...)
 {
   int ret;
   va_list ap;
@@ -40,7 +40,7 @@ fwscanf (FILE *__restrict fp, _CONST wchar_t *__restrict fmt, ...)
 #endif /* !_REENT_ONLY */
 
 int
-_fwscanf_r (struct _reent *ptr, FILE *fp, _CONST wchar_t *fmt, ...)
+_fwscanf_r (struct _reent *ptr, FILE *fp, const wchar_t *fmt, ...)
 {
   int ret;
   va_list ap;

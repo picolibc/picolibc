@@ -52,8 +52,8 @@ typedef struct
    *
    * PARAMETERS:
    *   struct _reent *rptr - reent structure of current thread/process;
-   *   _CONST char *to     - output encoding's normalized name;
-   *   _CONST char *from   - input encoding's normalized name.
+   *   const char *to     - output encoding's normalized name;
+   *   const char *from   - input encoding's normalized name.
    * 
    * DESCRIPTION:
    *   This function is called from iconv_open() to open conversion. Returns
@@ -64,8 +64,8 @@ typedef struct
    *   returns NULL and sets current thread's/process's errno.
    */
   _VOID_PTR _EXFNPTR(open, (struct _reent *rptr,
-                          _CONST char *to,
-                          _CONST char *from));
+                          const char *to,
+                          const char *from));
   
   /*
    * close - close conversion.
@@ -89,7 +89,7 @@ typedef struct
    * PARAMETERS:
    *   struct _reent *rptr - reent structure of current thread/process.
    *   _VOID_PTR data      - conversion-specific data;
-   *   _CONST unsigned char **inbuf - input data buffer;
+   *   const unsigned char **inbuf - input data buffer;
    *   size_t *inbytesleft          - input buffer's length;
    *   unsigned char **outbuf       - output data buffer;
    *   size_t *outbytesleft         - output buffer free space;
@@ -116,7 +116,7 @@ typedef struct
    */
   size_t _EXFNPTR(convert, (struct _reent *rptr,
                            _VOID_PTR data,
-                           _CONST unsigned char **inbuf,
+                           const unsigned char **inbuf,
                            size_t *inbytesleft,
                            unsigned char **outbuf,
                            size_t *outbytesleft,
@@ -199,7 +199,7 @@ typedef struct
 typedef struct
 {
   /* Iconv conversion handlers. */
-  _CONST iconv_conversion_handlers_t *handlers;
+  const iconv_conversion_handlers_t *handlers;
   
   /*
    * Conversion-specific data (e.g., points to iconv_ucs_conversion_t
@@ -210,11 +210,11 @@ typedef struct
 
 
 /* UCS-based conversion handlers */
-extern _CONST iconv_conversion_handlers_t
+extern const iconv_conversion_handlers_t
 _iconv_ucs_conversion_handlers;
 
 /* Null conversion handlers */
-extern _CONST iconv_conversion_handlers_t
+extern const iconv_conversion_handlers_t
 _iconv_null_conversion_handlers;
 
 #endif /* !__ICONV_CONVERSION_H__ */

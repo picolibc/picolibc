@@ -39,7 +39,7 @@ Author: Joel Schopp <jschopp@austin.ibm.com>
 
 typedef struct
 {
-  _CONST char* buf;
+  const char* buf;
   unsigned int pad0[ 3 ];
   size_t size;
   unsigned int pad1[ 3 ];
@@ -50,7 +50,7 @@ typedef struct
 
 size_t
 _DEFUN (fwrite, (buf, size, count, fp),
-	_CONST _PTR __restrict buf,
+	const _PTR __restrict buf,
 	size_t size,
 	size_t count,
 	FILE * fp)

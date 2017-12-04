@@ -51,7 +51,7 @@ _printf_common (struct _reent *data,
 		int *realsz,
 		FILE *fp,
 		int (*pfunc)(struct _reent *, FILE *,
-			     _CONST char *, size_t len))
+			     const char *, size_t len))
 {
   int n;
   /*
@@ -106,7 +106,7 @@ error:
 }
 int
 _printf_i (struct _reent *data, struct _prt_data_t *pdata, FILE *fp,
-	   int (*pfunc)(struct _reent *, FILE *, _CONST char *, size_t len),
+	   int (*pfunc)(struct _reent *, FILE *, const char *, size_t len),
 	   va_list *ap)
 {
   /* Field size expanded by dprec.  */

@@ -21,7 +21,7 @@
 #if defined (ICONV_TO_UCS_CCS_CNS11643_PLANE1) \
  && !(defined (TABLE_USE_SIZE_OPTIMIZATION))
 
-static _CONST __uint16_t
+static const __uint16_t
 to_ucs_speed_cns11643_plane1[] =
 {
 	/* Heading Block */
@@ -2213,7 +2213,7 @@ to_ucs_speed_cns11643_plane1[] =
 #if defined (ICONV_TO_UCS_CCS_CNS11643_PLANE1) \
  && (defined (TABLE_USE_SIZE_OPTIMIZATION))
 
-static _CONST __uint16_t
+static const __uint16_t
 to_ucs_size_cns11643_plane1[] =
 {
 	0x0042, /* Ranges number */
@@ -3118,7 +3118,7 @@ to_ucs_size_cns11643_plane1[] =
 #if defined (ICONV_FROM_UCS_CCS_CNS11643_PLANE1) \
  && !(defined (TABLE_USE_SIZE_OPTIMIZATION))
 
-static _CONST __uint16_t
+static const __uint16_t
 from_ucs_speed_cns11643_plane1[] =
 {
 	/* Heading Block */
@@ -6367,7 +6367,7 @@ from_ucs_speed_cns11643_plane1[] =
 #if defined (ICONV_FROM_UCS_CCS_CNS11643_PLANE1) \
  && (defined (TABLE_USE_SIZE_OPTIMIZATION))
 
-static _CONST __uint16_t
+static const __uint16_t
 from_ucs_size_cns11643_plane1[] =
 {
 	0x017D, /* Ranges number */
@@ -11175,7 +11175,7 @@ from_ucs_size_cns11643_plane1[] =
  * cns11643_plane1 CCS description table.
  * ======================================================================
  */
-_CONST iconv_ccs_t
+const iconv_ccs_t
 _iconv_ccs_cns11643_plane1 =
 {
 	TABLE_VERSION_1, /* Table version */

@@ -79,20 +79,20 @@ QUICKREF
 
 size_t
 _DEFUN (strlen, (str),
-	_CONST char *str)
+	const char *str)
 {
 
 #ifndef HAVE_HW_PCMP
 
 #if defined(PREFER_SIZE_OVER_SPEED) || defined(__OPTIMIZE_SIZE__)
-  _CONST char *start = str;
+  const char *start = str;
 
   while (*str)
     str++;
 
   return str - start;
 #else
-  _CONST char *start = str;
+  const char *start = str;
   unsigned long *aligned_addr;
 
   if (!UNALIGNED (str))

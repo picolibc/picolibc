@@ -53,7 +53,7 @@ _DEFUN(putw, (w, fp),
        int w,
        register FILE *fp)
 {
-  if (fwrite ((_CONST char*)&w, sizeof (w), 1, fp) != 1)
+  if (fwrite ((const char*)&w, sizeof (w), 1, fp) != 1)
     return EOF;
   return 0;
 }

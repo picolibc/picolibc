@@ -31,10 +31,10 @@ QUICKREF
 
 char *
 _DEFUN (strrchr, (s, i),
-	_CONST char *s,
+	const char *s,
 	int i)
 {
-  _CONST char *last = NULL;
+  const char *last = NULL;
 
   if (i)
     {

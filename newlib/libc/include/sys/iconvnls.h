@@ -58,20 +58,20 @@ _EXFUN(_iconv_nls_get_mb_cur_max, (iconv_t cd, int direction));
 
 size_t
 _EXFUN(_iconv_nls_conv, (struct _reent *rptr, iconv_t cd,
-                        _CONST char **inbuf, size_t *inbytesleft,
+                        const char **inbuf, size_t *inbytesleft,
                         char **outbuf, size_t *outbytesleft));
 
-_CONST char *
-_EXFUN(_iconv_nls_construct_filename, (struct _reent *rptr, _CONST char *file,
-                                      _CONST char *dir, _CONST char *ext));
+const char *
+_EXFUN(_iconv_nls_construct_filename, (struct _reent *rptr, const char *file,
+                                      const char *dir, const char *ext));
 
 
 int
-_EXFUN(_iconv_nls_open, (struct _reent *rptr, _CONST char *encoding,
+_EXFUN(_iconv_nls_open, (struct _reent *rptr, const char *encoding,
                         iconv_t *towc, iconv_t *fromwc, int flag));
 
 char *
-_EXFUN(_iconv_resolve_encoding_name, (struct _reent *rptr, _CONST char *ca));
+_EXFUN(_iconv_resolve_encoding_name, (struct _reent *rptr, const char *ca));
 
 #endif /* __SYS_ICONVNLS_H__ */
 

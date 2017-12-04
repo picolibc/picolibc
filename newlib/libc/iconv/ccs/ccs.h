@@ -131,12 +131,12 @@
 typedef struct
 {
   __uint16_t ver;               /* Table version */
-  _CONST char *name;            /* CCS name */
+  const char *name;            /* CCS name */
   __uint16_t bits;              /* CCS's bits number */
   int from_ucs_type;            /* UCS -> CCS table optimization type */
-  _CONST __uint16_t *from_ucs;  /* UCS -> CCS table */
+  const __uint16_t *from_ucs;  /* UCS -> CCS table */
   int to_ucs_type;              /* CCS -> UCS table optimization type */
-  _CONST __uint16_t *to_ucs;    /* CCS -> UCS table */
+  const __uint16_t *to_ucs;    /* CCS -> UCS table */
 } iconv_ccs_t;
 
 /*
@@ -147,11 +147,11 @@ typedef struct
   int bits;               /* CCS's bits number */
   int type;               /* Table type (builtin/external) */
   int optimization;       /* Table optimization type (speed/size) */ 
-  _CONST __uint16_t *tbl; /* Table's data */
+  const __uint16_t *tbl; /* Table's data */
 } iconv_ccs_desc_t;
 
 /* Array containing all built-in CCS tables */
-extern _CONST iconv_ccs_t *
+extern const iconv_ccs_t *
 _iconv_ccs[];
 
 #endif /* __CCS_H__ */

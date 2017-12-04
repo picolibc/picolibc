@@ -557,7 +557,7 @@ _DEFUN(_swprintf_r, (ptr, str, size, fmt),
        struct _reent *ptr,
        wchar_t *str,
        size_t size,
-       _CONST wchar_t *fmt _DOTS)
+       const wchar_t *fmt _DOTS)
 {
   int ret;
   va_list ap;
@@ -597,7 +597,7 @@ int
 _DEFUN(swprintf, (str, size, fmt),
        wchar_t *__restrict str,
        size_t size,
-       _CONST wchar_t *__restrict fmt _DOTS)
+       const wchar_t *__restrict fmt _DOTS)
 {
   int ret;
   va_list ap;

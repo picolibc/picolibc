@@ -10,7 +10,7 @@
 size_t
 strlen (const char *str)
 {
-  _CONST char *start = str;
+  const char *start = str;
 
   /* Skip unaligned part.  */
   if ((long)str & 3)

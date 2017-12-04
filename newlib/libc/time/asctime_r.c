@@ -7,13 +7,13 @@
 
 char *
 _DEFUN (asctime_r, (tim_p, result),
-	_CONST struct tm *__restrict tim_p,
+	const struct tm *__restrict tim_p,
 	char *__restrict result)
 {
-  static _CONST char day_name[7][3] = {
+  static const char day_name[7][3] = {
 	"Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"
   };
-  static _CONST char mon_name[12][3] = {
+  static const char mon_name[12][3] = {
 	"Jan", "Feb", "Mar", "Apr", "May", "Jun", 
 	"Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
   };

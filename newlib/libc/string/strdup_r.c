@@ -5,7 +5,7 @@
 char *
 _DEFUN (_strdup_r, (reent_ptr, str), 
         struct _reent *reent_ptr,
-        _CONST char   *str)
+        const char   *str)
 {
   size_t len = strlen (str) + 1;
   char *copy = _malloc_r (reent_ptr, len);

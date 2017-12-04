@@ -63,11 +63,11 @@ QUICKREF
 
 _PTR
 _DEFUN (memrchr, (src_void, c, length),
-	_CONST _PTR src_void,
+	const _PTR src_void,
 	int c,
 	size_t length)
 {
-  _CONST unsigned char *src = (_CONST unsigned char *) src_void + length - 1;
+  const unsigned char *src = (const unsigned char *) src_void + length - 1;
   unsigned char d = c;
 
 #if !defined(PREFER_SIZE_OVER_SPEED) && !defined(__OPTIMIZE_SIZE__)

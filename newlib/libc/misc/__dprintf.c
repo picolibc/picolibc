@@ -23,7 +23,7 @@ static char *parse_number ();
 static long _EXFUN(get_number, (char *, long, int));
 static void _EXFUN(print_number, (int, int, long));
 static void _EXFUN(write_char, (char c));
-static void _EXFUN(write_string, (_CONST char *s));
+static void _EXFUN(write_string, (const char *s));
 
 /* Non-zero for big-endian systems.  */
 static int big_endian_p;
@@ -266,7 +266,7 @@ _DEFUN(write_char, (c),
 
 static void
 _DEFUN(write_string, (s),
-     _CONST char *s)
+     const char *s)
 {
   _write_r (_REENT, CONSOLE_FD, s, strlen (s));
 }

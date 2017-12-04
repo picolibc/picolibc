@@ -38,7 +38,7 @@ _BEGIN_STD_C
 
 #ifndef _REENT_ONLY
 iconv_t
-_EXFUN(iconv_open, (_CONST char *, _CONST char *));
+_EXFUN(iconv_open, (const char *, const char *));
 
 size_t
 _EXFUN(iconv, (iconv_t, char **__restrict, size_t *__restrict, 
@@ -49,10 +49,10 @@ _EXFUN(iconv_close, (iconv_t));
 #endif
 
 iconv_t
-_EXFUN(_iconv_open_r, (struct _reent *, _CONST char *, _CONST char *));
+_EXFUN(_iconv_open_r, (struct _reent *, const char *, const char *));
 
 size_t
-_EXFUN(_iconv_r, (struct _reent *, iconv_t, _CONST char **,
+_EXFUN(_iconv_r, (struct _reent *, iconv_t, const char **,
                   size_t *, char **, size_t *));
 
 int

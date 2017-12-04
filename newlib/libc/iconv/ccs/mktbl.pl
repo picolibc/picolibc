@@ -343,7 +343,7 @@ if ($Source)
  * $CCSName CCS description table.
  * $Separator
  */
-_CONST $TypeBICCS
+const $TypeBICCS
 $VarBICCS =
 {
 \t$MacroVer1Table, /* Table version */
@@ -807,7 +807,7 @@ sub Output8bitToUCS(;$)
  */
 #if defined ($GuardToUCS)
 
-static _CONST __uint16_t
+static const __uint16_t
 ${VarToUCSSpeed}\[] =
 {\n\t";
   }
@@ -872,7 +872,7 @@ sub Output8bitFromUCS(;$)
 
 #if defined ($GuardFromUCS)
 
-static _CONST unsigned char
+static const unsigned char
 ${VarFromUCSSpeed}\[] =
 {
 ";
@@ -995,7 +995,7 @@ sub OutputSpeed($;$)
 #if defined ($GuardToUCS) \\
  && !($GuardSize)
 
-static _CONST __uint16_t
+static const __uint16_t
 ${VarToUCSSpeed}\[] =
 {
 ";
@@ -1018,7 +1018,7 @@ ${VarToUCSSpeed}\[] =
 #if defined ($GuardFromUCS) \\
  && !($GuardSize)
 
-static _CONST __uint16_t
+static const __uint16_t
 ${VarFromUCSSpeed}\[] =
 {
 ";
@@ -1149,7 +1149,7 @@ sub OutputSize($;$)
 #if defined ($GuardToUCS) \\
  && ($GuardSize)
 
-static _CONST __uint16_t
+static const __uint16_t
 ${VarToUCSSize}\[] =
 {
 ";
@@ -1171,7 +1171,7 @@ ${VarToUCSSize}\[] =
 #if defined ($GuardFromUCS) \\
  && ($GuardSize)
 
-static _CONST __uint16_t
+static const __uint16_t
 ${VarFromUCSSize}\[] =
 {
 ";

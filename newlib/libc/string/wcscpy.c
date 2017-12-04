@@ -59,10 +59,10 @@ No supporting OS subroutines are required.
 wchar_t *
 _DEFUN (wcscpy, (s1, s2),
 	wchar_t *__restrict s1,
-	_CONST wchar_t *__restrict s2)
+	const wchar_t *__restrict s2)
 {
   wchar_t *p;
-  _CONST wchar_t *q;
+  const wchar_t *q;
 
   *s1 = '\0';
   p = s1;

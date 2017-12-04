@@ -55,10 +55,10 @@ bt();
 }
 
 
-static _CONST char *iname = "foo";
+static const char *iname = "foo";
 void 
 _DEFUN(newfunc,(string),
-       _CONST char *string)
+       const char *string)
 {
   if (strcmp(iname, string)) 
   {

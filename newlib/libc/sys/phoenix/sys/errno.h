@@ -34,7 +34,7 @@ extern int *__errno _PARAMS ((void));
 #endif
 
 /* Don't use these variables directly. Use strerror instead. */
-extern __IMPORT _CONST char * _CONST _sys_errlist[];
+extern __IMPORT const char * const _sys_errlist[];
 extern __IMPORT int _sys_nerr;
 
 #define __errno_r(ptr) ((ptr)->_errno)

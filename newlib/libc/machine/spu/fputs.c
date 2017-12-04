@@ -37,7 +37,7 @@ Author: Joel Schopp <jschopp@austin.ibm.com>
 
 typedef struct
 {
-  _CONST char* s;
+  const char* s;
   unsigned int pad0[ 3 ];
   int fp;
   unsigned int pad1[ 3 ];
@@ -47,7 +47,7 @@ typedef struct
 
 int
 _DEFUN (fputs, (s, fp),
-	char _CONST *__restrict s,
+	char const *__restrict s,
 	FILE *__restrict fp)
 {
   c99_fputs_t args;

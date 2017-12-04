@@ -21,7 +21,7 @@
 #if defined (ICONV_TO_UCS_CCS_JIS_X0208_1990) \
  && !(defined (TABLE_USE_SIZE_OPTIMIZATION))
 
-static _CONST __uint16_t
+static const __uint16_t
 to_ucs_speed_jis_x0208_1990[] =
 {
 	/* Heading Block */
@@ -2609,7 +2609,7 @@ to_ucs_speed_jis_x0208_1990[] =
 #if defined (ICONV_TO_UCS_CCS_JIS_X0208_1990) \
  && (defined (TABLE_USE_SIZE_OPTIMIZATION))
 
-static _CONST __uint16_t
+static const __uint16_t
 to_ucs_size_jis_x0208_1990[] =
 {
 	0x0055, /* Ranges number */
@@ -3684,7 +3684,7 @@ to_ucs_size_jis_x0208_1990[] =
 #if defined (ICONV_FROM_UCS_CCS_JIS_X0208_1990) \
  && !(defined (TABLE_USE_SIZE_OPTIMIZATION))
 
-static _CONST __uint16_t
+static const __uint16_t
 from_ucs_speed_jis_x0208_1990[] =
 {
 	/* Heading Block */
@@ -6801,7 +6801,7 @@ from_ucs_speed_jis_x0208_1990[] =
 #if defined (ICONV_FROM_UCS_CCS_JIS_X0208_1990) \
  && (defined (TABLE_USE_SIZE_OPTIMIZATION))
 
-static _CONST __uint16_t
+static const __uint16_t
 from_ucs_size_jis_x0208_1990[] =
 {
 	0x01E9, /* Ranges number */
@@ -12125,7 +12125,7 @@ from_ucs_size_jis_x0208_1990[] =
  * jis_x0208_1990 CCS description table.
  * ======================================================================
  */
-_CONST iconv_ccs_t
+const iconv_ccs_t
 _iconv_ccs_jis_x0208_1990 =
 {
 	TABLE_VERSION_1, /* Table version */

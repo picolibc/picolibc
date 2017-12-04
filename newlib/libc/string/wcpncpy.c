@@ -35,7 +35,7 @@ No supporting OS subroutines are required.
 wchar_t *
 _DEFUN (wcpncpy, (dst, src, count),
 	wchar_t *__restrict dst,
-	_CONST wchar_t *__restrict src,
+	const wchar_t *__restrict src,
 	size_t count)
 {
   wchar_t *ret = NULL;

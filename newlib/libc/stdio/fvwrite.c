@@ -51,7 +51,7 @@ _DEFUN(__sfvwrite_r, (ptr, fp, uio),
        register struct __suio *uio)
 {
   register size_t len;
-  register _CONST char *p = NULL;
+  register const char *p = NULL;
   register struct __siov *iov;
   register _READ_WRITE_RETURN_TYPE w, s;
   char *nl;

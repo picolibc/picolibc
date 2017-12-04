@@ -3,7 +3,7 @@
 
 float
 _DEFUN (atoff, (s),
-	_CONST char *s)
+	const char *s)
 {
   return strtof (s, NULL);
 }

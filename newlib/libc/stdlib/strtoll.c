@@ -133,7 +133,7 @@ No supporting OS subroutines are required.
  * Convert a string to a long long integer.
  */
 static long long
-_strtoll_l (struct _reent *rptr, _CONST char *__restrict nptr,
+_strtoll_l (struct _reent *rptr, const char *__restrict nptr,
 	    char **__restrict endptr, int base, locale_t loc)
 {
 	register const unsigned char *s = (const unsigned char *)nptr;
@@ -216,7 +216,7 @@ _strtoll_l (struct _reent *rptr, _CONST char *__restrict nptr,
 long long
 _DEFUN (_strtoll_r, (rptr, nptr, endptr, base),
 	struct _reent *rptr,
-	_CONST char *__restrict nptr,
+	const char *__restrict nptr,
 	char **__restrict endptr,
 	int base)
 {
@@ -234,7 +234,7 @@ strtoll_l (const char *__restrict s, char **__restrict ptr, int base,
 
 long long
 _DEFUN (strtoll, (s, ptr, base),
-	_CONST char *__restrict s,
+	const char *__restrict s,
 	char **__restrict ptr,
 	int base)
 {

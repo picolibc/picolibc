@@ -19,7 +19,7 @@ typedef struct
   unsigned int pad0[ 3 ];
   size_t size;
   unsigned int pad1[ 3 ];
-  _CONST char* fmt;
+  const char* fmt;
   unsigned int pad2[ 3 ];
   va_list ap;
 } c99_vsnprintf_t;
@@ -30,7 +30,7 @@ int
 _DEFUN (vsnprintf, (str, size, fmt, ap),
      char *__restrict str,
      size_t size,
-     _CONST char *__restrict fmt,
+     const char *__restrict fmt,
      va_list ap)
 {
   c99_vsnprintf_t args;

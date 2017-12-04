@@ -46,9 +46,9 @@
  *
  * PARAMETERS:
  *   struct _reent *rptr - reent structure of current thread/process.  
- *   _CONST char *file   - the name of file.
- *   _CONST char *dir    - the name of subdirectory;
- *   _CONST char *ext    - file extension.
+ *   const char *file   - the name of file.
+ *   const char *dir    - the name of subdirectory;
+ *   const char *ext    - file extension.
  *
  * DESCRIPTION:
  *   Function constructs patch to icionv-related file.
@@ -58,12 +58,12 @@
  *   The pointer to file name if success, In case of error returns NULL
  *   and sets current thread's/process's errno.
  */
-_CONST char *
+const char *
 _DEFUN(_iconv_nls_construct_filename, (rptr, file, ext),
                                       struct _reent *rptr,
-                                      _CONST char *file,
-                                      _CONST char *dir,
-                                      _CONST char *ext)
+                                      const char *file,
+                                      const char *dir,
+                                      const char *ext)
 {
   int len1, len2, len3;
   char *path;
@@ -78,7 +78,7 @@ _DEFUN(_iconv_nls_construct_filename, (rptr, file, ext),
   len3 = strlen (ext);
 
   if ((p = _malloc_r (rptr, len1 + dirlen + len2 + len3 + 3)) == NULL)
-    return (_CONST char *)NULL;
+    return (const char *)NULL;
 
   memcpy (p, path, len1);
   if (p[len1 - 1] != '/')
@@ -95,7 +95,7 @@ _DEFUN(_iconv_nls_construct_filename, (rptr, file, ext),
   }
   p[len1] = '\0';
  
-  return (_CONST char *)p;
+  return (const char *)p;
 }
 
 
@@ -169,7 +169,7 @@ size_t
 _DEFUN(_iconv_nls_conv, (rptr, cd, inbuf, inbytesleft, outbuf, outbytesleft),
                         struct _reent *rptr,
                         iconv_t cd,
-                        _CONST char **inbuf,
+                        const char **inbuf,
                         size_t *inbytesleft,
                         char **outbuf,
                         size_t *outbytesleft)
@@ -199,7 +199,7 @@ _DEFUN(_iconv_nls_conv, (rptr, cd, inbuf, inbytesleft, outbuf, outbytesleft),
 
   return ic->handlers->convert (rptr,
                                 ic->data,
-                                (_CONST unsigned char**)inbuf,
+                                (const unsigned char**)inbuf,
                                 inbytesleft,
                                 (unsigned char**)outbuf,
                                 outbytesleft,
@@ -261,8 +261,8 @@ _DEFUN(_iconv_nls_set_state, (cd, ps, direction),
 static iconv_t
 _DEFUN(iconv_open1, (rptr, to, from),
                      struct _reent *rptr,
-                     _CONST char *to,
-                     _CONST char *from)
+                     const char *to,
+                     const char *from)
 {
   iconv_conversion_t *ic;
     
@@ -301,7 +301,7 @@ _DEFUN(iconv_open1, (rptr, to, from),
  *
  * PARAMETERS:
  *     struct _reent *rptr - process's reent structure;
- *     _CONST char *encoding - encoding name;
+ *     const char *encoding - encoding name;
  *     iconv_t *tomb - wchar -> encoding iconv descriptor pointer;
  *     iconv_t *towc - encoding -> wchar iconv descriptor pointer;
  *     int flag - perform encoding name resolving flag.
@@ -318,12 +318,12 @@ _DEFUN(iconv_open1, (rptr, to, from),
 int
 _DEFUN(_iconv_nls_open, (rptr, encoding, towc, tomb),
                         struct _reent *rptr,
-                        _CONST char *encoding,
+                        const char *encoding,
                         iconv_t *tomb,
                         iconv_t *towc,
                         int flag)
 {
-  _CONST char *wchar_encoding;
+  const char *wchar_encoding;
 
   if (sizeof (wchar_t) > 2 && WCHAR_MAX > 0xFFFF)
     wchar_encoding = "ucs_4_internal";

@@ -193,7 +193,7 @@ _DEFUN (multadd, (ptr, b, m, a),
 _Bigint *
 _DEFUN (s2b, (ptr, s, nd0, nd, y9),
 	struct _reent * ptr,
-	_CONST char *s,
+	const char *s,
 	int nd0,
 	int nd,
 	__ULong y9)
@@ -424,7 +424,7 @@ _DEFUN (pow5mult,
 {
   _Bigint *b1, *p5, *p51;
   int i;
-  static _CONST int p05[3] = {5, 25, 125};
+  static const int p05[3] = {5, 25, 125};
 
   if ((i = k & 3) != 0)
     b = multadd (ptr, b, p05[i - 1], 0);
@@ -951,7 +951,7 @@ _DEFUN (ratio, (a, b), _Bigint * a, _Bigint * b)
 }
 
 
-_CONST double
+const double
   tens[] =
 {
   1e0, 1e1, 1e2, 1e3, 1e4, 1e5, 1e6, 1e7, 1e8, 1e9,
@@ -961,16 +961,16 @@ _CONST double
 };
 
 #if !defined(_DOUBLE_IS_32BITS) && !defined(__v800)
-_CONST double bigtens[] =
+const double bigtens[] =
 {1e16, 1e32, 1e64, 1e128, 1e256};
 
-_CONST double tinytens[] =
+const double tinytens[] =
 {1e-16, 1e-32, 1e-64, 1e-128, 1e-256};
 #else
-_CONST double bigtens[] =
+const double bigtens[] =
 {1e16, 1e32};
 
-_CONST double tinytens[] =
+const double tinytens[] =
 {1e-16, 1e-32};
 #endif
 

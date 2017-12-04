@@ -70,7 +70,7 @@ _DEFUN(utf_16_close, (rptr, data),
 static _VOID_PTR
 _DEFUN(utf_16_init_from_ucs, (rptr, encoding),
                              struct _reent *rptr,
-                             _CONST char *encoding)
+                             const char *encoding)
 {
   int *data;
   
@@ -172,7 +172,7 @@ _DEFUN(utf_16_convert_from_ucs, (data, in, outbuf, outbytesleft),
 static _VOID_PTR
 _DEFUN(utf_16_init_to_ucs, (rptr, encoding),
                            struct _reent *rptr,
-                           _CONST char *encoding)
+                           const char *encoding)
 {
   int *data;
   
@@ -192,7 +192,7 @@ _DEFUN(utf_16_init_to_ucs, (rptr, encoding),
 static ucs4_t
 _DEFUN(utf_16_convert_to_ucs, (data, inbuf, inbytesleft),
                               _VOID_PTR data,
-                              _CONST unsigned char **inbuf,
+                              const unsigned char **inbuf,
                               size_t *inbytesleft)
 {
   register ucs2_t w1;
@@ -275,7 +275,7 @@ _DEFUN(utf_16_get_mb_cur_max, (data),
 }
 
 #if defined (ICONV_TO_UCS_CES_UTF_16)
-_CONST iconv_to_ucs_ces_handlers_t
+const iconv_to_ucs_ces_handlers_t
 _iconv_to_ucs_ces_handlers_utf_16 = 
 {
   utf_16_init_to_ucs,
@@ -289,7 +289,7 @@ _iconv_to_ucs_ces_handlers_utf_16 =
 #endif
 
 #if defined (ICONV_FROM_UCS_CES_UTF_16)
-_CONST iconv_from_ucs_ces_handlers_t
+const iconv_from_ucs_ces_handlers_t
 _iconv_from_ucs_ces_handlers_utf_16 =
 {
   utf_16_init_from_ucs,

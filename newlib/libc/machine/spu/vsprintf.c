@@ -28,7 +28,7 @@ typedef struct
 int
 _DEFUN (vsprintf, (str, fmt, ap),
      char *__restrict str,
-     _CONST char *__restrict fmt,
+     const char *__restrict fmt,
      va_list ap)
 {
   c99_vsprintf_t args;

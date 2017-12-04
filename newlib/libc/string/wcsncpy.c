@@ -37,7 +37,7 @@ No supporting OS subroutines are required.
 wchar_t *
 _DEFUN (wcsncpy, (s1, s2, n),
 	wchar_t *__restrict s1,
-	_CONST wchar_t *__restrict s2,
+	const wchar_t *__restrict s2,
 	size_t n)
 {
   wchar_t *dscan=s1;

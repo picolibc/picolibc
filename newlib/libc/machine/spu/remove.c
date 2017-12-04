@@ -36,7 +36,7 @@ Author: Joel Schopp <jschopp@austin.ibm.com>
 
 int
 remove (filename)
-     _CONST char *filename;
+     const char *filename;
 {
 
   /* The return value gets written over buf

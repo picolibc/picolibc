@@ -14,8 +14,8 @@
 
 int
 _DEFUN(execle, (path, arg0, ...),
-      _CONST char *path,
-      _CONST char *arg0 _DOTS)
+      const char *path,
+      const char *arg0 _DOTS)
 
 #else
 
@@ -23,8 +23,8 @@ _DEFUN(execle, (path, arg0, ...),
 
 int
 _DEFUN(execle, (path, arg0, va_alist),
-     _CONST char *path,
-     _CONST char *arg0,
+     const char *path,
+     const char *arg0,
      va_dcl)
 
 #endif
@@ -32,19 +32,19 @@ _DEFUN(execle, (path, arg0, va_alist),
 {
   int i;
   va_list args;
-  _CONST char * _CONST *envp;
-  _CONST char *argv[256];
+  const char * const *envp;
+  const char *argv[256];
 
   va_start (args, arg0);
   argv[0] = arg0;
   i = 1;
   do
-    argv[i] = va_arg (args, _CONST char *);
+    argv[i] = va_arg (args, const char *);
   while (argv[i++] != NULL);
-  envp = va_arg (args, _CONST char * _CONST *);
+  envp = va_arg (args, const char * const *);
   va_end (args);
 
-  return _execve (path, (char * _CONST *) argv, (char * _CONST *) envp);
+  return _execve (path, (char * const *) argv, (char * const *) envp);
 }
 
 #endif /* !_NO_EXECVE  */

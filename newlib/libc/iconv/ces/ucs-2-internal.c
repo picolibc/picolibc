@@ -68,7 +68,7 @@ _DEFUN(ucs_2_internal_convert_from_ucs, (data, in, outbuf, outbytesleft),
 static ucs4_t
 _DEFUN(ucs_2_internal_convert_to_ucs, (data, inbuf, inbytesleft),
                                       _VOID_PTR data,
-                                      _CONST unsigned char **inbuf,
+                                      const unsigned char **inbuf,
                                       size_t *inbytesleft)
 {
   register ucs4_t res;
@@ -96,7 +96,7 @@ _DEFUN(ucs_2_internal_get_mb_cur_max, (data),
 }
 
 #if defined (ICONV_TO_UCS_CES_UCS_2_INTERNAL)
-_CONST iconv_to_ucs_ces_handlers_t
+const iconv_to_ucs_ces_handlers_t
 _iconv_to_ucs_ces_handlers_ucs_2_internal = 
 {
   NULL,
@@ -110,7 +110,7 @@ _iconv_to_ucs_ces_handlers_ucs_2_internal =
 #endif
 
 #if defined (ICONV_FROM_UCS_CES_UCS_2_INTERNAL)
-_CONST iconv_from_ucs_ces_handlers_t
+const iconv_from_ucs_ces_handlers_t
 _iconv_from_ucs_ces_handlers_ucs_2_internal =
 {
   NULL,

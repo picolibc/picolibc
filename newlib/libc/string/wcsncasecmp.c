@@ -38,8 +38,8 @@ QUICKREF
 
 int 
 _DEFUN (wcsncasecmp, (s1, s2, n),
-	_CONST wchar_t *s1,
-	_CONST wchar_t *s2,
+	const wchar_t *s1,
+	const wchar_t *s2,
 	size_t n)
 {
   int d = 0;

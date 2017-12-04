@@ -37,16 +37,16 @@ Author: Joel Schopp <jschopp@austin.ibm.com>
 
 typedef struct
 {
-  _CONST char *old;
+  const char *old;
   unsigned int pad0[ 3 ];
-  _CONST char *new;
+  const char *new;
   unsigned int pad1[ 3 ];
 } c99_rename_t;
 
 int
 rename (old, new)
-     _CONST char *old;
-     _CONST char *new;
+     const char *old;
+     const char *new;
 {
   c99_rename_t args;
   args.old = old;

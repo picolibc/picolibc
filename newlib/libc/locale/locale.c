@@ -292,7 +292,7 @@ char *
 _DEFUN(_setlocale_r, (p, category, locale),
        struct _reent *p,
        int category,
-       _CONST char *locale)
+       const char *locale)
 {
 #ifndef _MB_CAPABLE
   if (locale)
@@ -992,7 +992,7 @@ __locale_ctype_ptr (void)
 char *
 _DEFUN (setlocale, (category, locale),
 	int category,
-	_CONST char *locale)
+	const char *locale)
 {
   return _setlocale_r (_REENT, category, locale);
 }

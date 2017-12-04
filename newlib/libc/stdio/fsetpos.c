@@ -62,7 +62,7 @@ int
 _DEFUN(_fsetpos_r, (ptr, iop, pos),
        struct _reent * ptr,
        FILE * iop,
-       _CONST _fpos_t * pos)
+       const _fpos_t * pos)
 {
   int x = _fseek_r (ptr, iop, *pos, SEEK_SET);
 
@@ -76,7 +76,7 @@ _DEFUN(_fsetpos_r, (ptr, iop, pos),
 int
 _DEFUN(fsetpos, (iop, pos),
        FILE * iop,
-       _CONST _fpos_t * pos)
+       const _fpos_t * pos)
 {
   return _fsetpos_r (_REENT, iop, pos);
 }

@@ -277,7 +277,7 @@ extern int __iso_8859_index (const char *charset_ext);
 #if defined(ALLOW_NEGATIVE_CTYPE_INDEX)
 
 #ifndef __CYGWIN__
-static _CONST
+static const
 #endif
 char __ctype_iso[15][128 + 256] = {
   { _CTYPE_ISO_8859_1_128_254,
@@ -374,7 +374,7 @@ char __ctype_iso[15][128 + 256] = {
 
 #else /* !defined(ALLOW_NEGATIVE_CTYPE_INDEX) */
 
-static _CONST char __ctype_iso[15][1 + 256] = {
+static const char __ctype_iso[15][1 + 256] = {
   { 0,
     _CTYPE_DATA_0_127,
     _CTYPE_ISO_8859_1_128_254,

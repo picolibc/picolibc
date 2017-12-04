@@ -53,10 +53,10 @@ PORTABILITY
 
 size_t
 _DEFUN(wcsnlen, (s, maxlen), 
-                 _CONST wchar_t *s,
+                 const wchar_t *s,
                  size_t maxlen)
 {
-  _CONST wchar_t *p;
+  const wchar_t *p;
 
   p = s;
   while (*p && maxlen-- > 0)

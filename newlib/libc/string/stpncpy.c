@@ -63,14 +63,14 @@ QUICKREF
 char *
 _DEFUN (stpncpy, (dst, src),
 	char *__restrict dst,
-	_CONST char *__restrict src,
+	const char *__restrict src,
 	size_t count)
 {
   char *ret = NULL;
 
 #if !defined(PREFER_SIZE_OVER_SPEED) && !defined(__OPTIMIZE_SIZE__)
   long *aligned_dst;
-  _CONST long *aligned_src;
+  const long *aligned_src;
 
   /* If SRC and DEST is aligned and count large enough, then copy words.  */
   if (!UNALIGNED (src, dst) && !TOO_SMALL (count))

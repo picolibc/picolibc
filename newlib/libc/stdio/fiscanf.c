@@ -29,7 +29,7 @@
 
 int
 #ifdef _HAVE_STDC
-fiscanf(FILE *fp, _CONST char *fmt, ...)
+fiscanf(FILE *fp, const char *fmt, ...)
 #else
 fiscanf(FILE *fp, fmt, va_alist)
        FILE *fp;
@@ -54,7 +54,7 @@ fiscanf(FILE *fp, fmt, va_alist)
 
 int
 #ifdef _HAVE_STDC
-_fiscanf_r(struct _reent *ptr, FILE *fp, _CONST char *fmt, ...)
+_fiscanf_r(struct _reent *ptr, FILE *fp, const char *fmt, ...)
 #else
 _fiscanf_r(ptr, FILE *fp, fmt, va_alist)
           struct _reent *ptr;

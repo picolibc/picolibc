@@ -149,7 +149,7 @@ SEEALSO
 # undef _NO_LONGLONG
 #endif
 
-int _EXFUN(_VFWPRINTF_R, (struct _reent *, FILE *, _CONST wchar_t *, va_list));
+int _EXFUN(_VFWPRINTF_R, (struct _reent *, FILE *, const wchar_t *, va_list));
 /* Defined in vfprintf.c. */
 #ifdef _FVWRITE_IN_STREAMIO
 # ifdef STRING_ONLY
@@ -164,7 +164,7 @@ int _EXFUN(__SPRINT, (struct _reent *, FILE *, register struct __suio *));
 # else
 #  define __SPRINT __sfputs_r
 # endif
-int _EXFUN(__SPRINT, (struct _reent *, FILE *, _CONST char *, size_t));
+int _EXFUN(__SPRINT, (struct _reent *, FILE *, const char *, size_t));
 #endif
 #ifndef STRING_ONLY
 #ifdef _UNBUF_STREAM_OPT
@@ -177,7 +177,7 @@ static int
 _DEFUN(__sbwprintf, (rptr, fp, fmt, ap),
        struct _reent *rptr,
        register FILE *fp,
-       _CONST wchar_t *fmt,
+       const wchar_t *fmt,
        va_list ap)
 {
 	int ret;
@@ -368,7 +368,7 @@ _EXFUN(get_arg, (struct _reent *data, int n, wchar_t *fmt,
 int
 _DEFUN(VFWPRINTF, (fp, fmt0, ap),
        FILE *__restrict fp,
-       _CONST wchar_t *__restrict fmt0,
+       const wchar_t *__restrict fmt0,
        va_list ap)
 {
   int result;
@@ -381,7 +381,7 @@ int
 _DEFUN(_VFWPRINTF_R, (data, fp, fmt0, ap),
        struct _reent *data,
        FILE * fp,
-       _CONST wchar_t *fmt0,
+       const wchar_t *fmt0,
        va_list ap)
 {
 	register wchar_t *fmt;	/* format string */
@@ -452,10 +452,10 @@ _DEFUN(_VFWPRINTF_R, (data, fp, fmt0, ap),
 	 * below longer.
 	 */
 #define	PADSIZE	16		/* pad chunk size */
-	static _CONST wchar_t blanks[PADSIZE] =
+	static const wchar_t blanks[PADSIZE] =
 	 {L' ',L' ',L' ',L' ',L' ',L' ',L' ',L' ',
 	  L' ',L' ',L' ',L' ',L' ',L' ',L' ',L' '};
-	static _CONST wchar_t zeroes[PADSIZE] =
+	static const wchar_t zeroes[PADSIZE] =
 	 {L'0',L'0',L'0',L'0',L'0',L'0',L'0',L'0',
 	  L'0',L'0',L'0',L'0',L'0',L'0',L'0',L'0'};
 
@@ -519,7 +519,7 @@ _DEFUN(_VFWPRINTF_R, (data, fp, fmt0, ap),
 }
 #else
 #define PRINT(ptr, len) {		\
-	if (__SPRINT (data, fp, (_CONST char *)(ptr), (len) * sizeof (wchar_t)) == EOF) \
+	if (__SPRINT (data, fp, (const char *)(ptr), (len) * sizeof (wchar_t)) == EOF) \
 		goto error;		\
 }
 #define	PAD(howmany, with) {		\

@@ -47,7 +47,7 @@ int	_EXFUN(pthread_atfork,(void (*prepare)(void), void (*parent)(void),
 int	_EXFUN(pthread_mutexattr_init, (pthread_mutexattr_t *__attr));
 int	_EXFUN(pthread_mutexattr_destroy, (pthread_mutexattr_t *__attr));
 int	_EXFUN(pthread_mutexattr_getpshared,
-		(_CONST pthread_mutexattr_t *__attr, int  *__pshared));
+		(const pthread_mutexattr_t *__attr, int  *__pshared));
 int	_EXFUN(pthread_mutexattr_setpshared,
 		(pthread_mutexattr_t *__attr, int __pshared));
 
@@ -56,7 +56,7 @@ int	_EXFUN(pthread_mutexattr_setpshared,
 /* Single UNIX Specification 2 Mutex Attributes types */
 
 int _EXFUN(pthread_mutexattr_gettype,
-		(_CONST pthread_mutexattr_t *__attr, int *__kind));
+		(const pthread_mutexattr_t *__attr, int *__kind));
 int _EXFUN(pthread_mutexattr_settype,
 		(pthread_mutexattr_t *__attr, int __kind));
 
@@ -65,7 +65,7 @@ int _EXFUN(pthread_mutexattr_settype,
 /* Initializing and Destroying a Mutex, P1003.1c/Draft 10, p. 87 */
 
 int	_EXFUN(pthread_mutex_init,
-	(pthread_mutex_t *__mutex, _CONST pthread_mutexattr_t *__attr));
+	(pthread_mutex_t *__mutex, const pthread_mutexattr_t *__attr));
 int	_EXFUN(pthread_mutex_destroy, (pthread_mutex_t *__mutex));
 
 /* This is used to statically initialize a pthread_mutex_t. Example:
@@ -85,7 +85,7 @@ int	_EXFUN(pthread_mutex_unlock, (pthread_mutex_t *__mutex));
 #if defined(_POSIX_TIMEOUTS)
 
 int	_EXFUN(pthread_mutex_timedlock,
-	(pthread_mutex_t *__mutex, _CONST struct timespec *__timeout));
+	(pthread_mutex_t *__mutex, const struct timespec *__timeout));
 
 #endif /* _POSIX_TIMEOUTS */
 
@@ -101,14 +101,14 @@ int	_EXFUN(pthread_condattr_setclock,
 		(pthread_condattr_t *__attr, clockid_t __clock_id));
 
 int	_EXFUN(pthread_condattr_getpshared,
-		(_CONST pthread_condattr_t *__attr, int *__pshared));
+		(const pthread_condattr_t *__attr, int *__pshared));
 int	_EXFUN(pthread_condattr_setpshared,
 		(pthread_condattr_t *__attr, int __pshared));
  
 /* Initializing and Destroying a Condition Variable, P1003.1c/Draft 10, p. 87 */
  
 int	_EXFUN(pthread_cond_init,
-	(pthread_cond_t *__cond, _CONST pthread_condattr_t *__attr));
+	(pthread_cond_t *__cond, const pthread_condattr_t *__attr));
 int	_EXFUN(pthread_cond_destroy, (pthread_cond_t *__mutex));
  
 /* This is used to statically initialize a pthread_cond_t. Example:
@@ -130,7 +130,7 @@ int	_EXFUN(pthread_cond_wait,
  
 int	_EXFUN(pthread_cond_timedwait,
 		(pthread_cond_t *__cond, pthread_mutex_t *__mutex,
-		_CONST struct timespec *__abstime));
+		const struct timespec *__abstime));
  
 #if defined(_POSIX_THREAD_PRIORITY_SCHEDULING)
 
@@ -139,22 +139,22 @@ int	_EXFUN(pthread_cond_timedwait,
 int	_EXFUN(pthread_attr_setscope,
 		(pthread_attr_t *__attr, int __contentionscope));
 int	_EXFUN(pthread_attr_getscope,
-	(_CONST pthread_attr_t *__attr, int *__contentionscope));
+	(const pthread_attr_t *__attr, int *__contentionscope));
 int	_EXFUN(pthread_attr_setinheritsched,
 	(pthread_attr_t *__attr, int __inheritsched));
 int	_EXFUN(pthread_attr_getinheritsched,
-	(_CONST pthread_attr_t *__attr, int *__inheritsched));
+	(const pthread_attr_t *__attr, int *__inheritsched));
 int	_EXFUN(pthread_attr_setschedpolicy,
 	(pthread_attr_t *__attr, int __policy));
 int	_EXFUN(pthread_attr_getschedpolicy,
-	(_CONST pthread_attr_t *__attr, int *__policy));
+	(const pthread_attr_t *__attr, int *__policy));
 
 #endif /* defined(_POSIX_THREAD_PRIORITY_SCHEDULING) */
 
 int	_EXFUN(pthread_attr_setschedparam,
-	(pthread_attr_t *__attr, _CONST struct sched_param *__param));
+	(pthread_attr_t *__attr, const struct sched_param *__param));
 int	_EXFUN(pthread_attr_getschedparam,
-	(_CONST pthread_attr_t *__attr, struct sched_param *__param));
+	(const pthread_attr_t *__attr, struct sched_param *__param));
 
 #if defined(_POSIX_THREAD_PRIORITY_SCHEDULING)
 
@@ -183,11 +183,11 @@ int	pthread_setname_np(pthread_t, const char *) __nonnull((2));
 int	_EXFUN(pthread_mutexattr_setprotocol,
 	(pthread_mutexattr_t *__attr, int __protocol));
 int	_EXFUN(pthread_mutexattr_getprotocol,
-	(_CONST pthread_mutexattr_t *__attr, int *__protocol));
+	(const pthread_mutexattr_t *__attr, int *__protocol));
 int	_EXFUN(pthread_mutexattr_setprioceiling,
 	(pthread_mutexattr_t *__attr, int __prioceiling));
 int	_EXFUN(pthread_mutexattr_getprioceiling,
-	(_CONST pthread_mutexattr_t *__attr, int *__prioceiling));
+	(const pthread_mutexattr_t *__attr, int *__prioceiling));
 
 #endif /* _POSIX_THREAD_PRIO_INHERIT || _POSIX_THREAD_PRIO_PROTECT */
 
@@ -208,22 +208,22 @@ int	_EXFUN(pthread_attr_init, (pthread_attr_t *__attr));
 int	_EXFUN(pthread_attr_destroy, (pthread_attr_t *__attr));
 int	_EXFUN(pthread_attr_setstack, (pthread_attr_t *attr,
 	void *__stackaddr, size_t __stacksize));
-int	_EXFUN(pthread_attr_getstack, (_CONST pthread_attr_t *attr,
+int	_EXFUN(pthread_attr_getstack, (const pthread_attr_t *attr,
 	void **__stackaddr, size_t *__stacksize));
 int	_EXFUN(pthread_attr_getstacksize,
-	(_CONST pthread_attr_t *__attr, size_t *__stacksize));
+	(const pthread_attr_t *__attr, size_t *__stacksize));
 int	_EXFUN(pthread_attr_setstacksize,
 	(pthread_attr_t *__attr, size_t __stacksize));
 int	_EXFUN(pthread_attr_getstackaddr,
-	(_CONST pthread_attr_t *__attr, void **__stackaddr));
+	(const pthread_attr_t *__attr, void **__stackaddr));
 int	_EXFUN(pthread_attr_setstackaddr,
 	(pthread_attr_t  *__attr, void *__stackaddr));
 int	_EXFUN(pthread_attr_getdetachstate,
-	(_CONST pthread_attr_t *__attr, int *__detachstate));
+	(const pthread_attr_t *__attr, int *__detachstate));
 int	_EXFUN(pthread_attr_setdetachstate,
 	(pthread_attr_t *__attr, int __detachstate));
 int	_EXFUN(pthread_attr_getguardsize,
-	(_CONST pthread_attr_t *__attr, size_t *__guardsize));
+	(const pthread_attr_t *__attr, size_t *__guardsize));
 int	_EXFUN(pthread_attr_setguardsize,
 	(pthread_attr_t *__attr, size_t __guardsize));
 
@@ -253,7 +253,7 @@ int	_EXFUN(pthread_getattr_np,
 /* Thread Creation, P1003.1c/Draft 10, p. 144 */
 
 int	_EXFUN(pthread_create,
-	(pthread_t *__pthread, _CONST pthread_attr_t  *__attr,
+	(pthread_t *__pthread, const pthread_attr_t  *__attr,
 	void *(*__start_routine)( void * ), void *__arg));
 
 /* Wait for Thread Termination, P1003.1c/Draft 10, p. 147 */
@@ -309,7 +309,7 @@ int	_EXFUN(pthread_key_create,
 /* Thread-Specific Data Management, P1003.1c/Draft 10, p. 165 */
 
 int	_EXFUN(pthread_setspecific,
-	(pthread_key_t __key, _CONST void *__value));
+	(pthread_key_t __key, const void *__value));
 void *	_EXFUN(pthread_getspecific, (pthread_key_t __key));
 
 /* Thread-Specific Data Key Deletion, P1003.1c/Draft 10, p. 167 */
@@ -391,7 +391,7 @@ int	_EXFUN(pthread_getcpuclockid,
 int	_EXFUN(pthread_barrierattr_init, (pthread_barrierattr_t *__attr));
 int	_EXFUN(pthread_barrierattr_destroy, (pthread_barrierattr_t *__attr));
 int	_EXFUN(pthread_barrierattr_getpshared,
-	(_CONST pthread_barrierattr_t *__attr, int *__pshared));
+	(const pthread_barrierattr_t *__attr, int *__pshared));
 int	_EXFUN(pthread_barrierattr_setpshared,
 	(pthread_barrierattr_t *__attr, int __pshared));
 
@@ -399,7 +399,7 @@ int	_EXFUN(pthread_barrierattr_setpshared,
 
 int	_EXFUN(pthread_barrier_init,
 	(pthread_barrier_t *__barrier,
-	_CONST pthread_barrierattr_t *__attr, unsigned __count));
+	const pthread_barrierattr_t *__attr, unsigned __count));
 int	_EXFUN(pthread_barrier_destroy, (pthread_barrier_t *__barrier));
 int	_EXFUN(pthread_barrier_wait,(pthread_barrier_t *__barrier));
 
@@ -428,22 +428,22 @@ int	_EXFUN(pthread_spin_unlock, (pthread_spinlock_t *__spinlock));
 int	_EXFUN(pthread_rwlockattr_init, (pthread_rwlockattr_t *__attr));
 int	_EXFUN(pthread_rwlockattr_destroy, (pthread_rwlockattr_t *__attr));
 int	_EXFUN(pthread_rwlockattr_getpshared,
-	(_CONST pthread_rwlockattr_t *__attr, int *__pshared));
+	(const pthread_rwlockattr_t *__attr, int *__pshared));
 int	_EXFUN(pthread_rwlockattr_setpshared,
 	(pthread_rwlockattr_t *__attr, int __pshared));
 
 int	_EXFUN(pthread_rwlock_init,
-	(pthread_rwlock_t *__rwlock, _CONST pthread_rwlockattr_t *__attr));
+	(pthread_rwlock_t *__rwlock, const pthread_rwlockattr_t *__attr));
 int	_EXFUN(pthread_rwlock_destroy, (pthread_rwlock_t *__rwlock));
 int	_EXFUN(pthread_rwlock_rdlock,(pthread_rwlock_t *__rwlock));
 int	_EXFUN(pthread_rwlock_tryrdlock,(pthread_rwlock_t *__rwlock));
 int	_EXFUN(pthread_rwlock_timedrdlock,
-        (pthread_rwlock_t *__rwlock, _CONST struct timespec *__abstime));
+        (pthread_rwlock_t *__rwlock, const struct timespec *__abstime));
 int	_EXFUN(pthread_rwlock_unlock,(pthread_rwlock_t *__rwlock));
 int	_EXFUN(pthread_rwlock_wrlock,(pthread_rwlock_t *__rwlock));
 int	_EXFUN(pthread_rwlock_trywrlock,(pthread_rwlock_t *__rwlock));
 int	_EXFUN(pthread_rwlock_timedwrlock,
-        (pthread_rwlock_t *__rwlock, _CONST struct timespec *__abstime));
+        (pthread_rwlock_t *__rwlock, const struct timespec *__abstime));
 
 #endif /* defined(_POSIX_READER_WRITER_LOCKS) */
 

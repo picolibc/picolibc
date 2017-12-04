@@ -49,7 +49,7 @@ ANSI C requires <<asctime>>.
 
 char *
 _DEFUN (asctime, (tim_p),
-	_CONST struct tm *tim_p)
+	const struct tm *tim_p)
 {
   struct _reent *reent = _REENT;
 

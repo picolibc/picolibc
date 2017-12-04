@@ -55,11 +55,11 @@ QUICKREF
 char*
 _DEFUN (stpcpy, (dst, src),
 	char *__restrict dst,
-	_CONST char *__restrict src)
+	const char *__restrict src)
 {
 #if !defined(PREFER_SIZE_OVER_SPEED) && !defined(__OPTIMIZE_SIZE__)
   long *aligned_dst;
-  _CONST long *aligned_src;
+  const long *aligned_src;
 
   /* If SRC or DEST is unaligned, then copy bytes.  */
   if (!UNALIGNED (src, dst))

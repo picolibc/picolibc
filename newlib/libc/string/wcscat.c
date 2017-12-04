@@ -63,11 +63,11 @@ No supporting OS subroutines are required.
 wchar_t *
 _DEFUN (wcscat, (s1, s2),
 	wchar_t *__restrict s1,
-	_CONST wchar_t *__restrict s2)
+	const wchar_t *__restrict s2)
 {
   wchar_t *p;
   wchar_t *q;
-  _CONST wchar_t *r;
+  const wchar_t *r;
 
   p = s1;
   while (*p)

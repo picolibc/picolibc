@@ -31,7 +31,7 @@
 
 int
 _DEFUN(vscanf, (fmt, ap), 
-       _CONST char *fmt,
+       const char *fmt,
        va_list ap)
 {
   struct _reent *reent = _REENT;
@@ -50,7 +50,7 @@ _EXFUN(viscanf, (const char *, __VALIST) _ATTRIBUTE ((__alias__("vscanf"))));
 int
 _DEFUN(_vscanf_r, (ptr, fmt, ap),
        struct _reent *ptr,
-       _CONST char *__restrict fmt,
+       const char *__restrict fmt,
        va_list ap)
 {
   _REENT_SMALL_CHECK_INIT (ptr);

@@ -36,8 +36,8 @@
 static int fake_data;
 
 static int 
-_EXFUN(find_encoding_name, (_CONST char *searchee,
-                            _CONST char **names));
+_EXFUN(find_encoding_name, (const char *searchee,
+                            const char **names));
 
 
 /*
@@ -47,12 +47,12 @@ _EXFUN(find_encoding_name, (_CONST char *searchee,
 static _VOID_PTR
 _DEFUN(ucs_based_conversion_open, (rptr, to, from),
                                   struct _reent *rptr,
-                                  _CONST char *to,
-                                  _CONST char *from)
+                                  const char *to,
+                                  const char *from)
 {
   iconv_ucs_conversion_t *uc;
-  _CONST iconv_to_ucs_ces_t   *to_ucs_bices;
-  _CONST iconv_from_ucs_ces_t *from_ucs_bices;
+  const iconv_to_ucs_ces_t   *to_ucs_bices;
+  const iconv_from_ucs_ces_t *from_ucs_bices;
   
   uc = (iconv_ucs_conversion_t *)
              _calloc_r (rptr, 1, sizeof (iconv_ucs_conversion_t));
@@ -148,7 +148,7 @@ _DEFUN(ucs_based_conversion_convert,
                  (rptr, data, inbuf, inbytesleft, outbuf, outbytesleft, flags),
                  struct _reent *rptr,
                  _VOID_PTR data,
-                 _CONST unsigned char **inbuf,
+                 const unsigned char **inbuf,
                  size_t *inbytesleft,
                  unsigned char **outbuf,
                  size_t *outbytesleft,
@@ -163,7 +163,7 @@ _DEFUN(ucs_based_conversion_convert,
     {
       register size_t bytes;
       register ucs4_t ch;
-      _CONST unsigned char *inbuf_save = *inbuf;
+      const unsigned char *inbuf_save = *inbuf;
       size_t inbyteslef_save = *inbytesleft;
 
       if (*outbytesleft == 0)
@@ -324,7 +324,7 @@ _DEFUN(ucs_based_conversion_is_stateful, (data, direction),
 
 
 /* UCS-based conversion definition object */
-_CONST iconv_conversion_handlers_t 
+const iconv_conversion_handlers_t 
 _iconv_ucs_conversion_handlers =
 {
   ucs_based_conversion_open,
@@ -343,10 +343,10 @@ _iconv_ucs_conversion_handlers =
 
 static int
 _DEFUN(find_encoding_name, (searchee, names),
-                           _CONST char *searchee,
-                           _CONST char **names)
+                           const char *searchee,
+                           const char **names)
 {
-  _CONST char *p;
+  const char *p;
 
   for (p = *names; p != NULL; p = *(names++))
     if (strcmp (p, searchee) == 0)

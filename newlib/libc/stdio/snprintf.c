@@ -35,13 +35,13 @@ _DEFUN(_snprintf_r, (ptr, str, size, fmt),
        struct _reent *ptr,
        char *__restrict str,
        size_t size,
-       _CONST char *__restrict fmt _DOTS)
+       const char *__restrict fmt _DOTS)
 #else
 _snprintf_r(ptr, str, size, fmt, va_alist)
             struct _reent *ptr;
             char *str;
             size_t size;
-            _CONST char *fmt;
+            const char *fmt;
             va_dcl
 #endif
 {
@@ -85,12 +85,12 @@ int
 _DEFUN(snprintf, (str, size, fmt),
        char *__restrict str,
        size_t size,
-       _CONST char *__restrict fmt _DOTS)
+       const char *__restrict fmt _DOTS)
 #else
 snprintf(str, size, fmt, va_alist)
          char *str;
          size_t size;
-         _CONST char *fmt;
+         const char *fmt;
          va_dcl
 #endif
 {

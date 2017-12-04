@@ -62,12 +62,12 @@ PORTABILITY
 
 wchar_t *
 _DEFUN (wcsstr, (big, little),
-	_CONST wchar_t *__restrict big,
-	_CONST wchar_t *__restrict little)
+	const wchar_t *__restrict big,
+	const wchar_t *__restrict little)
 {
-  _CONST wchar_t *p;
-  _CONST wchar_t *q;
-  _CONST wchar_t *r;
+  const wchar_t *p;
+  const wchar_t *q;
+  const wchar_t *r;
 
   if (!*little)
     {

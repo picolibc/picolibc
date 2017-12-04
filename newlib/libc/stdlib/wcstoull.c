@@ -210,7 +210,7 @@ _wcstoull_l (struct _reent *rptr, const wchar_t *nptr, wchar_t **endptr,
 unsigned long long
 _DEFUN (_wcstoull_r, (rptr, nptr, endptr, base),
 	struct _reent *rptr,
-	_CONST wchar_t *nptr,
+	const wchar_t *nptr,
 	wchar_t **endptr,
 	int base)
 {
@@ -228,7 +228,7 @@ wcstoull_l (const wchar_t *__restrict s, wchar_t **__restrict ptr, int base,
 
 unsigned long long
 _DEFUN (wcstoull, (s, ptr, base),
-	_CONST wchar_t *__restrict s,
+	const wchar_t *__restrict s,
 	wchar_t **__restrict ptr,
 	int base)
 {

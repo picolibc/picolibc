@@ -6,7 +6,7 @@
 
 char *
 _DEFUN (ctime_r, (tim_p, result),
-	_CONST time_t * tim_p,
+	const time_t * tim_p,
         char * result)
 
 {

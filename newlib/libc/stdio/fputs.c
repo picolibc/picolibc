@@ -88,7 +88,7 @@ Supporting OS subroutines required: <<close>>, <<fstat>>, <<isatty>>,
 int
 _DEFUN(_fputs_r, (ptr, s, fp),
        struct _reent * ptr,
-       char _CONST *__restrict s,
+       char const *__restrict s,
        FILE *__restrict fp)
 {
 #ifdef _FVWRITE_IN_STREAMIO
@@ -109,7 +109,7 @@ _DEFUN(_fputs_r, (ptr, s, fp),
   _newlib_flockfile_end (fp);
   return result;
 #else
-  _CONST char *p = s;
+  const char *p = s;
 
   CHECK_INIT(ptr, fp);
 
@@ -136,7 +136,7 @@ error:
 #ifndef _REENT_ONLY
 int
 _DEFUN(fputs, (s, fp),
-       char _CONST *__restrict s,
+       char const *__restrict s,
        FILE *__restrict fp)
 {
   return _fputs_r (_REENT, s, fp);

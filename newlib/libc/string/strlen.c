@@ -50,9 +50,9 @@ QUICKREF
 
 size_t
 _DEFUN (strlen, (str),
-	_CONST char *str)
+	const char *str)
 {
-  _CONST char *start = str;
+  const char *start = str;
 
 #if !defined(PREFER_SIZE_OVER_SPEED) && !defined(__OPTIMIZE_SIZE__)
   unsigned long *aligned_addr;

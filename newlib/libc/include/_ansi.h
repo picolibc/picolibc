@@ -49,7 +49,6 @@
 #ifdef _HAVE_STDC
 #define	_PTR		void *
 #define	_NOARGS		void
-#define	_CONST		const
 #define	_VOLATILE	volatile
 #define	_SIGNED		signed
 #define	_DOTS		, ...
@@ -77,7 +76,6 @@
 #else	
 #define	_PTR		char *
 #define	_NOARGS
-#define	_CONST
 #define	_VOLATILE
 #define	_SIGNED
 #define	_DOTS

@@ -162,7 +162,7 @@ const char *__locale_ctype_ptr_l (locale_t);
 #endif /* !__cplusplus */
 
 /* For C++ backward-compatibility only.  */
-extern	__IMPORT _CONST char	_ctype_[];
+extern	__IMPORT const char	_ctype_[];
 
 _END_STD_C
 

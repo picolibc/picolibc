@@ -7,14 +7,14 @@
 
 #ifndef _REENT_ONLY
 long
-_DEFUN (atol, (s), _CONST char *s)
+_DEFUN (atol, (s), const char *s)
 {
   return strtol (s, NULL, 10);
 }
 #endif /* !_REENT_ONLY */
 
 long
-_DEFUN (_atol_r, (ptr, s), struct _reent *ptr, _CONST char *s)
+_DEFUN (_atol_r, (ptr, s), struct _reent *ptr, const char *s)
 {
   return _strtol_r (ptr, s, NULL, 10);
 }

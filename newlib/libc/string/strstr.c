@@ -40,8 +40,8 @@ QUICKREF
 
 char *
 _DEFUN (strstr, (searchee, lookfor),
-	_CONST char *searchee,
-	_CONST char *lookfor)
+	const char *searchee,
+	const char *lookfor)
 {
 #if defined(PREFER_SIZE_OVER_SPEED) || defined(__OPTIMIZE_SIZE__)
 
