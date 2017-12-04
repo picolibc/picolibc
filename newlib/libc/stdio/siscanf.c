@@ -89,7 +89,7 @@ Supporting OS subroutines required: <<close>>, <<fstat>>, <<isatty>>,
 int 
 _DEFUN(siscanf, (str, fmt),
        const char *str,
-       const char *fmt _DOTS)
+       const char *fmt, ...)
 #else
 int 
 siscanf(str, fmt, va_alist)
@@ -126,7 +126,7 @@ int
 _DEFUN(_siscanf_r, (ptr, str, fmt), 
        struct _reent *ptr,
        const char *str,
-       const char *fmt _DOTS)
+       const char *fmt, ...)
 #else
 int 
 _siscanf_r(ptr, str, fmt, va_alist)

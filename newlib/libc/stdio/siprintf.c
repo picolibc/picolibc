@@ -107,7 +107,7 @@ int
 _DEFUN(_siprintf_r, (ptr, str, fmt),
        struct _reent *ptr,
        char *str,
-       const char *fmt _DOTS)
+       const char *fmt, ...)
 #else
 _siprintf_r(ptr, str, fmt, va_alist)
            struct _reent *ptr;
@@ -141,7 +141,7 @@ int
 #ifdef _HAVE_STDC
 _DEFUN(siprintf, (str, fmt),
        char *str,
-       const char *fmt _DOTS)
+       const char *fmt, ...)
 #else
 siprintf(str, fmt, va_alist)
         char *str;

@@ -583,7 +583,7 @@ int
 _DEFUN(_sprintf_r, (ptr, str, fmt),
        struct _reent *ptr,
        char *__restrict str,
-       const char *__restrict fmt _DOTS)
+       const char *__restrict fmt, ...)
 #else
 _sprintf_r(ptr, str, fmt, va_alist)
            struct _reent *ptr;
@@ -623,7 +623,7 @@ int
 #ifdef _HAVE_STDC
 _DEFUN(sprintf, (str, fmt),
        char *__restrict str,
-       const char *__restrict fmt _DOTS)
+       const char *__restrict fmt, ...)
 #else
 sprintf(str, fmt, va_alist)
         char *str;

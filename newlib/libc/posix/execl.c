@@ -20,7 +20,7 @@ static char ***p_environ = &environ;
 int
 _DEFUN(execl, (path, arg0, ...), 
       const char *path,
-      const char *arg0 _DOTS)
+      const char *arg0, ...)
 
 #else
 

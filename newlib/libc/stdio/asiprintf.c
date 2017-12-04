@@ -28,7 +28,7 @@ int
 _DEFUN(_asiprintf_r, (ptr, strp, fmt),
        struct _reent *ptr,
        char **strp,
-       const char *fmt _DOTS)
+       const char *fmt, ...)
 {
   int ret;
   va_list ap;
@@ -55,7 +55,7 @@ _DEFUN(_asiprintf_r, (ptr, strp, fmt),
 int
 _DEFUN(asiprintf, (strp, fmt),
        char **strp,
-       const char *fmt _DOTS)
+       const char *fmt, ...)
 {
   int ret;
   va_list ap;

@@ -36,7 +36,7 @@ _DEFUN (_sniprintf_r, (ptr, str, size, fmt),
 	struct _reent *ptr,
 	char *str,
 	size_t size,
-	const char *fmt _DOTS)
+	const char *fmt, ...)
 #else
 _sniprintf_r (ptr, str, size, fmt, va_alist)
      struct _reent *ptr;
@@ -80,7 +80,7 @@ int
 _DEFUN (sniprintf, (str, size, fmt),
 	char *str,
 	size_t size,
-	const char *fmt _DOTS)
+	const char *fmt, ...)
 #else
 sniprintf (str, size, fmt, va_alist)
      char *str;

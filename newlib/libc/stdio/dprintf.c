@@ -56,7 +56,7 @@ int
 _DEFUN(_dprintf_r, (ptr, fd, format),
        struct _reent *ptr,
        int fd,
-       const char *__restrict format _DOTS)
+       const char *__restrict format, ...)
 {
 	va_list ap;
 	int n;
@@ -78,7 +78,7 @@ _EXFUN(_diprintf_r, (struct _reent *, int, const char *, ...)
 int
 _DEFUN(dprintf, (fd, format),
        int fd,
-       const char *__restrict format _DOTS)
+       const char *__restrict format, ...)
 {
   va_list ap;
   int n;

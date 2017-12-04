@@ -12,7 +12,7 @@
 int
 _DEFUN (open, (file, flags, ...),
         const char *file,
-        int flags _DOTS)
+        int flags, ...)
 {
   va_list ap;
   int ret;

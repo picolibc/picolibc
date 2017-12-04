@@ -25,7 +25,7 @@ int
 _DEFUN(_fiprintf_r, (ptr, fp, fmt),
        struct _reent *ptr,
        FILE * fp,
-       const char *fmt _DOTS)
+       const char *fmt, ...)
 {
   int ret;
   va_list ap;
@@ -41,7 +41,7 @@ _DEFUN(_fiprintf_r, (ptr, fp, fmt),
 int
 _DEFUN(fiprintf, (fp, fmt),
        FILE * fp,
-       const char *fmt _DOTS)
+       const char *fmt, ...)
 {
   int ret;
   va_list ap;

@@ -26,7 +26,7 @@
 
 int
 _DEFUN(iprintf, (fmt),
-       const char *fmt _DOTS)
+       const char *fmt, ...)
 {
   int ret;
   va_list ap;
@@ -44,7 +44,7 @@ _DEFUN(iprintf, (fmt),
 int
 _DEFUN(_iprintf_r, (ptr, fmt),
        struct _reent *ptr,
-       const char *fmt _DOTS)
+       const char *fmt, ...)
 {
   int ret;
   va_list ap;

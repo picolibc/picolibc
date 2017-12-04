@@ -18,7 +18,7 @@ _DEFUN(_asnprintf_r, (ptr, buf, lenp, fmt),
        struct _reent *__restrict ptr,
        char *buf,
        size_t *lenp,
-       const char *__restrict fmt _DOTS)
+       const char *__restrict fmt, ...)
 {
   int ret;
   va_list ap;
@@ -70,7 +70,7 @@ char *
 _DEFUN(asnprintf, (buf, lenp, fmt),
        char *__restrict buf,
        size_t *__restrict lenp,
-       const char *__restrict fmt _DOTS)
+       const char *__restrict fmt, ...)
 {
   int ret;
   va_list ap;

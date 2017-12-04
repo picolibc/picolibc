@@ -49,7 +49,7 @@ _DEFUN (xdr_vwarnx, (format, ap),
 
 void
 _DEFUN (xdr_warnx, (fmt),
-        const char *fmt _DOTS)
+        const char *fmt, ...)
 {
   va_list ap;
   va_start (ap, fmt);

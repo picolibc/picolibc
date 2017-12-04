@@ -52,7 +52,7 @@ int
 _DEFUN(_diprintf_r, (ptr, fd, format),
        struct _reent *ptr,
        int fd,
-       const char *format _DOTS)
+       const char *format, ...)
 {
   va_list ap;
   int n;
@@ -68,7 +68,7 @@ _DEFUN(_diprintf_r, (ptr, fd, format),
 int
 _DEFUN(diprintf, (fd, format),
        int fd,
-       const char *format _DOTS)
+       const char *format, ...)
 {
   va_list ap;
   int n;

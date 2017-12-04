@@ -428,7 +428,7 @@ Supporting OS subroutines required: <<close>>, <<fstat>>, <<isatty>>,
 int 
 _DEFUN(sscanf, (str, fmt),
        const char *__restrict str,
-       const char * fmt _DOTS)
+       const char * fmt, ...)
 #else
 int 
 sscanf(str, fmt, va_alist)
@@ -471,7 +471,7 @@ int
 _DEFUN(_sscanf_r, (ptr, str, fmt), 
        struct _reent *ptr,
        const char *__restrict str,
-       const char *__restrict fmt _DOTS)
+       const char *__restrict fmt, ...)
 #else
 int 
 _sscanf_r(ptr, str, fmt, va_alist)

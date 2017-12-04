@@ -51,7 +51,6 @@
 #define	_NOARGS		void
 #define	_VOLATILE	volatile
 #define	_SIGNED		signed
-#define	_DOTS		, ...
 #define _VOID void
 #ifdef __CYGWIN__
 #define	_EXFUN_NOTHROW(name, proto)	__cdecl name proto _NOTHROW
@@ -78,7 +77,6 @@
 #define	_NOARGS
 #define	_VOLATILE
 #define	_SIGNED
-#define	_DOTS
 #define _VOID void
 #define	_EXFUN(name, proto)		name()
 #define	_EXFUN_NOTHROW(name, proto)	name()

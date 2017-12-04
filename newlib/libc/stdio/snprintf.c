@@ -35,7 +35,7 @@ _DEFUN(_snprintf_r, (ptr, str, size, fmt),
        struct _reent *ptr,
        char *__restrict str,
        size_t size,
-       const char *__restrict fmt _DOTS)
+       const char *__restrict fmt, ...)
 #else
 _snprintf_r(ptr, str, size, fmt, va_alist)
             struct _reent *ptr;
@@ -85,7 +85,7 @@ int
 _DEFUN(snprintf, (str, size, fmt),
        char *__restrict str,
        size_t size,
-       const char *__restrict fmt _DOTS)
+       const char *__restrict fmt, ...)
 #else
 snprintf(str, size, fmt, va_alist)
          char *str;
