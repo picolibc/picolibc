@@ -81,7 +81,7 @@ _DEFUN(_tmpfile_r, (ptr),
 #ifndef _REENT_ONLY
 
 FILE *
-_DEFUN_VOID(tmpfile)
+tmpfile (void)
 {
   return _tmpfile_r (_REENT);
 }

@@ -25,7 +25,7 @@ _DEFUN (_lrand48_r, (r),
 
 #ifndef _REENT_ONLY
 long
-_DEFUN_VOID (lrand48)
+lrand48 (void)
 {
   return _lrand48_r (_REENT);
 }

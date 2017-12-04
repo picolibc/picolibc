@@ -14,7 +14,7 @@
  */
 #include "glue.h"
 
-extern char _DEFUN_VOID (inbyte);
+extern char inbyte (void);
 
 /*
  * read  -- read bytes from the serial port. Ignore fd, since

@@ -213,7 +213,7 @@ _DEFUN (signal, (sig, func),
 }
 
 int 
-_DEFUN_VOID (_init_signal)
+_init_signal (void)
 {
   return _init_signal_r (_REENT);
 }

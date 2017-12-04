@@ -66,7 +66,7 @@ _DEFUN (srandom, (seed), unsigned int seed)
 }
 
 long int
-_DEFUN_VOID (random)
+random (void)
 {
   struct _reent *reent = _REENT;
 

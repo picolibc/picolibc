@@ -63,7 +63,7 @@ _DEFUN(hcreate, (nel), size_t nel)
 }
 
 void
-_DEFUN_VOID (hdestroy)
+hdestroy (void)
 {
   hdestroy_r (&htab);
 }

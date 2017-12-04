@@ -82,7 +82,7 @@ _DEFUN(_getchar_r, (reent),
 #ifndef _REENT_ONLY
 
 int
-_DEFUN_VOID(getchar)
+getchar (void)
 {
   struct _reent *reent = _REENT;
 

@@ -13,7 +13,7 @@ extern double_type doubles[];
 double_type *pd = doubles;
 
 void
-_DEFUN_VOID(test_strtod)
+test_strtod (void)
 {
   char *tail;
   double v;
@@ -24,7 +24,7 @@ _DEFUN_VOID(test_strtod)
 }
 
 void
-_DEFUN_VOID(test_strtof)
+test_strtof (void)
 {
   char *tail;
   double v;
@@ -35,13 +35,13 @@ _DEFUN_VOID(test_strtof)
 }
 
 void
-_DEFUN_VOID(test_atof)
+test_atof (void)
 {
   test_mok(atof(pd->string), pd->value, 64);
 }
 
 void
-_DEFUN_VOID(test_atoff)
+test_atoff (void)
 {
   test_mok(atoff(pd->string), pd->value, 32);
 }
@@ -101,7 +101,7 @@ _DEFUN(test_strtol_base,(base, pi, string),
 }
 
 void
-_DEFUN_VOID(test_strtol)
+test_strtol (void)
 {
   test_strtol_base(8,&(p->octal), p->string);
   test_strtol_base(10,&(p->decimal), p->string);
@@ -111,14 +111,14 @@ _DEFUN_VOID(test_strtol)
 }
 
 void
-_DEFUN_VOID(test_atoi)
+test_atoi (void)
 {
   test_iok(atoi(p->string), p->decimal.value);
   test_eok(errno, p->decimal.errno_val);
 }
 
 void
-_DEFUN_VOID(test_atol)
+test_atol (void)
 {
   test_iok(atol(p->string), p->decimal.value);
   test_eok(errno, p->decimal.errno_val);
@@ -128,7 +128,7 @@ _DEFUN_VOID(test_atol)
 extern ddouble_type ddoubles[];
 ddouble_type *pdd;
 void
-_DEFUN_VOID(test_ecvtbuf)
+test_ecvtbuf (void)
 {
   int a2,a3;
   char *s;
@@ -140,7 +140,7 @@ _DEFUN_VOID(test_ecvtbuf)
 }
 
 void
-_DEFUN_VOID(test_ecvt)
+test_ecvt (void)
 {
   int a2,a3;
   char *s;
@@ -158,7 +158,7 @@ _DEFUN_VOID(test_ecvt)
 }
 
 void
-_DEFUN_VOID(test_fcvtbuf)
+test_fcvtbuf (void)
 {
   int a2,a3;
   char *s;
@@ -170,7 +170,7 @@ _DEFUN_VOID(test_fcvtbuf)
 }
 
 void
-_DEFUN_VOID(test_gcvt)
+test_gcvt (void)
 {
   char *s = gcvt(pdd->value, pdd->g1, buffer);  
   test_scok(s, pdd->gstring, 9);
@@ -181,7 +181,7 @@ _DEFUN_VOID(test_gcvt)
 }
 
 void
-_DEFUN_VOID(test_fcvt)
+test_fcvt (void)
 {
   int a2,a3;
   char *sd;
@@ -223,7 +223,7 @@ _DEFUN(diterate,(func, name),
 
 
 void
-_DEFUN_VOID(deltest)
+deltest (void)
 {
   newfunc("rounding");
   line(1);
@@ -255,7 +255,7 @@ _DEFUN_VOID(deltest)
 /* Most of what sprint does is tested with the tests of
    fcvt/ecvt/gcvt, but here are some more */
 void
-_DEFUN_VOID(test_sprint)
+test_sprint (void)
 {
   extern sprint_double_type sprint_doubles[];
   sprint_double_type *s = sprint_doubles;
@@ -286,7 +286,7 @@ _DEFUN_VOID(test_sprint)
 
 /* Scanf calls strtod etc tested elsewhere, but also has some pattern matching skills */
 void
-_DEFUN_VOID(test_scan)
+test_scan (void)
 {
   int i,j;
   extern sprint_double_type sprint_doubles[];
@@ -340,7 +340,7 @@ _DEFUN_VOID(test_scan)
 }
 
 void
-_DEFUN_VOID(test_cvt)
+test_cvt (void)
 {
   deltest();
 

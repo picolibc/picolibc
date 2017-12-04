@@ -36,7 +36,7 @@ __LOCK_INIT(static, __tz_mutex);
 #endif
 
 _VOID
-_DEFUN_VOID (__tz_lock)
+__tz_lock (void)
 {
 #ifndef __SINGLE_THREAD__
   __lock_acquire(__tz_mutex);
@@ -44,7 +44,7 @@ _DEFUN_VOID (__tz_lock)
 }
 
 _VOID
-_DEFUN_VOID (__tz_unlock)
+__tz_unlock (void)
 {
 #ifndef __SINGLE_THREAD__
   __lock_release(__tz_mutex);

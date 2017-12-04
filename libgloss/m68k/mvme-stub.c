@@ -133,7 +133,7 @@ ExceptionHook exceptionHook;  /* hook variable for errors/exceptions */
 /* FORWARD DECLARATIONS */
 /************************/
 /** static void initializeRemcomErrorFrame PARAMS ((void)); **/
-static void _DEFUN_VOID (initializeRemcomErrorFrame);
+static void initializeRemcomErrorFrame (void);
 
 /************************************************************************/
 /* BUFMAX defines the maximum number of characters in inbound/outbound buffers*/
@@ -203,9 +203,9 @@ jmp_buf remcomEnv;
 
 #define BREAKPOINT() asm("   trap #1");
 
-extern void _DEFUN_VOID (return_to_super);
-extern void _DEFUN_VOID (return_to_user);
-extern void _DEFUN_VOID (_catchException);
+extern void return_to_super (void);
+extern void return_to_user (void);
+extern void _catchException (void);
 
 void _returnFromException( Frame *frame )
 {

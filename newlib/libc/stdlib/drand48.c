@@ -23,7 +23,7 @@ _DEFUN (_drand48_r, (r),
 
 #ifndef _REENT_ONLY
 double
-_DEFUN_VOID (drand48)
+drand48 (void)
 {
   return _drand48_r (_REENT);
 }

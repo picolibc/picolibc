@@ -1993,7 +1993,7 @@ _DEFUN(test_to_set,(func, name, p, low, high),
 #undef _toupper
 
 void
-_DEFUN_VOID(test_is)
+test_is (void)
 {
   test_is_set(def_isalnum, "isalnum define", &myalnum);
   test_is_set(def_isalpha, "isalpha define", &myalpha);

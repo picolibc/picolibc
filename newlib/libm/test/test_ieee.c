@@ -6,7 +6,7 @@
 /* Test fp getround and fp setround */
 
 void
-_DEFUN_VOID(test_getround)
+test_getround (void)
 {
 
   newfunc("fpgetround/fpsetround");
@@ -26,7 +26,7 @@ _DEFUN_VOID(test_getround)
 
 /* And fpset/fpgetmask */
 void
-_DEFUN_VOID(test_getmask)
+test_getmask (void)
 {
   newfunc("fpsetmask/fpgetmask");
   line(1);
@@ -47,7 +47,7 @@ _DEFUN_VOID(test_getmask)
 }
 
 void
-_DEFUN_VOID(test_getsticky)
+test_getsticky (void)
 {
   newfunc("fpsetsticky/fpgetsticky");
   line(1);
@@ -68,7 +68,7 @@ _DEFUN_VOID(test_getsticky)
 }
 
 void
-_DEFUN_VOID(test_getroundtoi)
+test_getroundtoi (void)
 {
   newfunc("fpsetroundtoi/fpgetroundtoi");
   line(1);
@@ -105,7 +105,7 @@ double sub_rounded_down ;
 double sub_rounded_up ;
   double r1,r2,r3,r4;
 void
-_DEFUN_VOID(test_round)
+test_round (void)
 {
   n =                dnumber(0x40000000, 0x00000008); /* near 2 */
   m =                dnumber(0x40400000, 0x00000003); /* near 3.4 */
@@ -163,7 +163,7 @@ _DEFUN_VOID(test_round)
 
 
 void
-_DEFUN_VOID(test_ieee)
+test_ieee (void)
 {
   fp_rnd old = fpgetround();
   test_getround();

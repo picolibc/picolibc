@@ -103,7 +103,7 @@ _DEFUN (_getwchar_r, (ptr),
  * Synonym for fgetwc(stdin).
  */
 wint_t
-_DEFUN_VOID (getwchar)
+getwchar (void)
 {
   _REENT_SMALL_CHECK_INIT (_REENT);
   return fgetwc (stdin);

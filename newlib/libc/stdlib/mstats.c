@@ -84,14 +84,14 @@ not portable.
 #ifndef _REENT_ONLY
 
 struct mallinfo
-_DEFUN_VOID (mallinfo)
+mallinfo (void)
 {
   return _mallinfo_r (_REENT);
 }
 
 #if !defined (_ELIX_LEVEL) || _ELIX_LEVEL >= 2
 void
-_DEFUN_VOID (malloc_stats)
+malloc_stats (void)
 {
   _malloc_stats_r (_REENT);
 }

@@ -37,7 +37,7 @@ Author: Joel Schopp <jschopp@austin.ibm.com>
 #ifndef _REENT_ONLY
 
 FILE *
-_DEFUN_VOID (tmpfile)
+tmpfile (void)
 {
   int ret;
   FILE* fp;

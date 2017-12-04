@@ -3,7 +3,7 @@
 
 
 fp_rnd
-_DEFUN_VOID(fpgetround)
+fpgetround (void)
 {
   char *out;
   ieee_flags("get", "direction","", &out);
@@ -44,7 +44,7 @@ _DEFUN(fpsetround,(new),
 
 
 fp_except
-_DEFUN_VOID(fpgetmask)
+fpgetmask (void)
 {
   char *out;
   int r = 0;
@@ -92,7 +92,7 @@ _DEFUN(fpsetsticky,(mask),
 }
 
 fp_except
-_DEFUN_VOID(fpgetsticky)
+fpgetsticky (void)
 {
   return fpgetmask();
 }
@@ -107,7 +107,7 @@ _DEFUN(fpsetroundtoi,(rdi_mode),
 }
 
 int 
-_DEFUN_VOID(fpgetroundtoi)
+fpgetroundtoi (void)
 {
   
   return 0;

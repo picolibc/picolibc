@@ -62,7 +62,7 @@ _DEFUN (_localeconv_r, (data),
 
 #ifndef _REENT_ONLY
 struct lconv *
-_DEFUN_VOID (localeconv)
+localeconv (void)
 {
   return __localeconv_l (__get_current_locale ());
 }

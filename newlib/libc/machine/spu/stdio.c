@@ -82,7 +82,7 @@ _DEFUN (__sinit, (s),
 }
 
 _VOID
-_DEFUN_VOID (__check_init)
+__check_init (void)
 {
     CHECK_INIT(_REENT);
 }

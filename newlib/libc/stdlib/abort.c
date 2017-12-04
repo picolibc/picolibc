@@ -47,7 +47,7 @@ Supporting OS subroutines required: <<_exit>> and optionally, <<write>>.
 #include <signal.h>
 
 _VOID
-_DEFUN_VOID (abort)
+abort (void)
 {
 #ifdef ABORT_MESSAGE
   write (2, "Abort called\n", sizeof ("Abort called\n")-1);

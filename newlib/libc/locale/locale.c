@@ -966,7 +966,7 @@ __get_locale_env (struct _reent *p, int category)
 #endif /* _MB_CAPABLE */
 
 int
-_DEFUN_VOID (__locale_mb_cur_max)
+__locale_mb_cur_max (void)
 {
 #ifdef __HAVE_LOCALE_INFO__
   return __get_current_ctype_locale ()->mb_cur_max[0];

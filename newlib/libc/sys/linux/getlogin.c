@@ -3,7 +3,7 @@
 #include <unistd.h>
 
 char *
-_DEFUN_VOID (getlogin)
+getlogin (void)
 {
   errno = ENOSYS;
   return NULL;

@@ -4,14 +4,14 @@
 
 
 int
-_DEFUN_VOID(randi)
+randi (void)
 {
   static int next;
   next = (next * 1103515245) + 12345;
   return ((next >> 16) & 0xffff);
 }
 
-double _DEFUN_VOID(randx)
+double randx (void)
 {
   double res;
   
@@ -34,7 +34,7 @@ double _DEFUN_VOID(randx)
 }
 
 /* Return a random double, but bias for numbers closer to 0 */
-double _DEFUN_VOID(randy)
+double randy (void)
 {
   int pow;
   double r= randx();
@@ -43,7 +43,7 @@ double _DEFUN_VOID(randy)
 }
 
 void
-_DEFUN_VOID(test_frexp)
+test_frexp (void)
 {
   int i;
   double r;
@@ -131,7 +131,7 @@ _DEFUN_VOID(test_frexp)
 
 */
 void
-_DEFUN_VOID(test_mod)
+test_mod (void)
 {
   int i;
   
@@ -176,7 +176,7 @@ _DEFUN_VOID(test_mod)
 Test pow by multiplying logs  
 */
 void
-_DEFUN_VOID(test_pow)
+test_pow (void)
 {
   unsigned int i;  
   newfunc("pow");
@@ -224,7 +224,7 @@ _DEFUN_VOID(test_pow)
 
 
 void
-_DEFUN_VOID(test_math2)
+test_math2 (void)
 {
   test_mod();  
   test_frexp();

@@ -84,7 +84,7 @@ _DEFUN (_tmpfile64_r, (ptr),
 #ifndef _REENT_ONLY
 
 FILE *
-_DEFUN_VOID (tmpfile64)
+tmpfile64 (void)
 {
   return _tmpfile64_r (_REENT);
 }

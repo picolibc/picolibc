@@ -44,7 +44,7 @@ _DEFUN (_getwchar_unlocked_r, (ptr),
  * Synonym for fgetwc_unlocked(stdin).
  */
 wint_t
-_DEFUN_VOID (getwchar_unlocked)
+getwchar_unlocked (void)
 {
   _REENT_SMALL_CHECK_INIT (_REENT);
   return fgetwc_unlocked (stdin);

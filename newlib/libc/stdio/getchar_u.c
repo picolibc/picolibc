@@ -79,7 +79,7 @@ _DEFUN(_getchar_unlocked_r, (ptr),
 #ifndef _REENT_ONLY
 
 int
-_DEFUN_VOID(getchar_unlocked)
+getchar_unlocked (void)
 {
   /* CHECK_INIT is called (eventually) by __srefill_r.  */
 

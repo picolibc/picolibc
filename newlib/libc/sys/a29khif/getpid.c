@@ -6,7 +6,7 @@
    <sys/types.h>.  */
 
 int
-_DEFUN_VOID (_getpid)
+_getpid (void)
 {
   return 1;
 }

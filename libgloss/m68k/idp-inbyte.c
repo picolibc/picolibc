@@ -32,7 +32,7 @@
  *           from channel A
  */
 char
-_DEFUN_VOID (inbyte)
+inbyte (void)
 {
   while ((READREG (DUART_SRA) & 0x01) == 0x00)
     ;

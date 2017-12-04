@@ -235,7 +235,7 @@ _DEFUN(_cleanup_r, (ptr),
 
 #ifndef _REENT_ONLY
 _VOID
-_DEFUN_VOID(_cleanup)
+_cleanup (void)
 {
   _cleanup_r (_GLOBAL_REENT);
 }
@@ -304,25 +304,25 @@ __LOCK_INIT_RECURSIVE(static, __sfp_recursive_mutex);
 __LOCK_INIT_RECURSIVE(static, __sinit_recursive_mutex);
 
 _VOID
-_DEFUN_VOID(__sfp_lock_acquire)
+__sfp_lock_acquire (void)
 {
   __lock_acquire_recursive (__sfp_recursive_mutex);
 }
 
 _VOID
-_DEFUN_VOID(__sfp_lock_release)
+__sfp_lock_release (void)
 {
   __lock_release_recursive (__sfp_recursive_mutex);
 }
 
 _VOID
-_DEFUN_VOID(__sinit_lock_acquire)
+__sinit_lock_acquire (void)
 {
   __lock_acquire_recursive (__sinit_recursive_mutex);
 }
 
 _VOID
-_DEFUN_VOID(__sinit_lock_release)
+__sinit_lock_release (void)
 {
   __lock_release_recursive (__sinit_recursive_mutex);
 }
@@ -350,7 +350,7 @@ _DEFUN(__fp_unlock, (ptr),
 }
 
 _VOID
-_DEFUN_VOID(__fp_lock_all)
+__fp_lock_all (void)
 {
   __sfp_lock_acquire ();
 
@@ -358,7 +358,7 @@ _DEFUN_VOID(__fp_lock_all)
 }
 
 _VOID
-_DEFUN_VOID(__fp_unlock_all)
+__fp_unlock_all (void)
 {
   (void) _fwalk (_REENT, __fp_unlock);
 

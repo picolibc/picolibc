@@ -62,7 +62,6 @@
 #define _EXFNPTR(name, proto)		(* name) proto
 #endif
 #define	_DEFUN(name, arglist, args)	name(args)
-#define	_DEFUN_VOID(name)		name(void)
 #ifndef _LONG_DOUBLE
 #define _LONG_DOUBLE long double
 #endif
@@ -73,7 +72,6 @@
 #define	_EXFUN(name, proto)		name()
 #define	_EXFUN_NOTHROW(name, proto)	name()
 #define	_DEFUN(name, arglist, args)	name arglist args;
-#define	_DEFUN_VOID(name)		name()
 #define _LONG_DOUBLE double
 #endif
 

@@ -8,7 +8,7 @@
 #include <unistd.h>
 
 int
-_DEFUN_VOID (fork)
+fork (void)
 {
   return _fork_r (_REENT);
 }

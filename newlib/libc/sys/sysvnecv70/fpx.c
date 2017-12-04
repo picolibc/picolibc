@@ -17,7 +17,7 @@ fp_except _DEFUN(fpsetmask,(newmask),
 
 }
 
-fp_except _DEFUN_VOID(fpgetmask)
+fp_except fpgetmask (void)
 {
   v60_tkcw_type tkcw;
   sysv60(0, 8, &tkcw);
@@ -25,7 +25,7 @@ fp_except _DEFUN_VOID(fpgetmask)
 }
 
 
-fp_rnd _DEFUN_VOID(fpgetround)
+fp_rnd fpgetround (void)
 {
   v60_tkcw_type tkcw;
   sysv60(0, 8, &tkcw);
@@ -49,7 +49,7 @@ fp_rnd _DEFUN(fpsetround,(rnd),
 
 
 
-fp_rdi _DEFUN_VOID(fpgetroundtoi)
+fp_rdi fpgetroundtoi (void)
 {
   v60_tkcw_type tkcw;
   sysv60(0, 8, &tkcw);

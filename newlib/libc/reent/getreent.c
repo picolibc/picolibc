@@ -14,7 +14,7 @@ int _dummy_getreent;
 #endif
 
 struct _reent *
-_DEFUN_VOID(__getreent)
+__getreent (void)
 {
   return _impure_ptr;
 }

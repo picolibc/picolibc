@@ -111,7 +111,7 @@ _DEFUN (x_inline, (xdrs, len),
 }
 
 static int
-_DEFUN_VOID (harmless)
+harmless (void)
 {
   /* Always return FALSE/NULL, as the case may be */
   return 0;

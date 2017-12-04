@@ -76,7 +76,7 @@ _DEFUN (xdr_free, (proc, objp),
  * XDR nothing
  */
 bool_t
-_DEFUN_VOID (xdr_void)
+xdr_void (void)
 {
   return TRUE;
 }

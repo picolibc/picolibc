@@ -354,7 +354,7 @@ _DEFUN(run_vector_1,(vector, p, func, name, args),
 }
 
 void
-_DEFUN_VOID(test_math)
+test_math (void)
 {
   test_acos(0);
   test_acosf(0);

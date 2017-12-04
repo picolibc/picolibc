@@ -4,7 +4,7 @@
 #include <unistd.h>
 
 int
-_DEFUN_VOID (getpid)
+getpid (void)
 {
   return _getpid_r (_REENT);
 }
