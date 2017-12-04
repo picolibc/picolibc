@@ -251,7 +251,7 @@ _DEFUN(ucs_based_conversion_get_mb_cur_max, (data, direction),
 }
 
 
-static _VOID
+static void
 _DEFUN(ucs_based_conversion_get_state, (data, state, direction),
                                        void *data,
                                        mbstate_t *state,

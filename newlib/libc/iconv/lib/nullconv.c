@@ -101,7 +101,7 @@ _DEFUN(null_conversion_get_mb_cur_max, (data, direction),
 }
 
 
-static _VOID
+static void
 _DEFUN(null_conversion_get_state, (data, state, size),
                                   void *data,
                                   mbstate_t *state,

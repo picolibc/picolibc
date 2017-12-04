@@ -35,7 +35,7 @@ until the corresponding <<__tz_unlock>> call on the same thread is made.
 __LOCK_INIT(static, __tz_mutex);
 #endif
 
-_VOID
+void
 __tz_lock (void)
 {
 #ifndef __SINGLE_THREAD__
@@ -43,7 +43,7 @@ __tz_lock (void)
 #endif
 }
 
-_VOID
+void
 __tz_unlock (void)
 {
 #ifndef __SINGLE_THREAD__

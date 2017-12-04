@@ -165,7 +165,7 @@ struct __sFILE_fake {
 /* Following is needed both in libc/stdio and libc/stdlib so we put it
  * here instead of libc/stdio/local.h where it was previously. */
 
-extern _VOID   _EXFUN(__sinit,(struct _reent *));
+extern void   _EXFUN(__sinit,(struct _reent *));
 
 # define _REENT_SMALL_CHECK_INIT(ptr)		\
   do						\

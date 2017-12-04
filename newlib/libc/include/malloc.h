@@ -42,12 +42,12 @@ extern void *malloc (size_t);
 extern void *_malloc_r (struct _reent *, size_t);
 #endif
 
-extern _VOID free (void *);
+extern void free (void *);
 #ifdef __CYGWIN__
 #undef _free_r
 #define _free_r(r, p) free (p)
 #else
-extern _VOID _free_r (struct _reent *, void *);
+extern void _free_r (struct _reent *, void *);
 #endif
 
 extern void *realloc (void *, size_t);
@@ -135,12 +135,12 @@ extern int _malloc_trim_r (struct _reent *, size_t);
 
 /* A compatibility routine for an earlier version of the allocator.  */
 
-extern _VOID mstats (char *);
+extern void mstats (char *);
 #ifdef __CYGWIN__
 #undef _mstats_r
 #define _mstats_r(r, p) mstats (p)
 #else
-extern _VOID _mstats_r (struct _reent *, char *);
+extern void _mstats_r (struct _reent *, char *);
 #endif
 
 /* SVID2/XPG mallopt options */

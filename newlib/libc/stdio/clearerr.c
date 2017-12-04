@@ -71,7 +71,7 @@ No supporting OS subroutines are required.
 
 #undef	clearerr
 
-_VOID
+void
 _DEFUN(clearerr, (fp),
        FILE * fp)
 {

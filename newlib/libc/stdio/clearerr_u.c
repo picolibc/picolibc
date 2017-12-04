@@ -32,7 +32,7 @@
 
 #undef	clearerr_unlocked
 
-_VOID
+void
 _DEFUN(clearerr_unlocked, (fp),
        FILE * fp)
 {

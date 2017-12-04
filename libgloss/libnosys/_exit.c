@@ -5,7 +5,7 @@
 #include <_ansi.h>
 #include <_syslist.h>
 
-_VOID
+void
 _DEFUN (_exit, (rc),
 	int rc)
 {

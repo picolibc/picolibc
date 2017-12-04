@@ -13,7 +13,7 @@ static char __tzname_std[11];
 static char __tzname_dst[11];
 static char *prev_tzenv = NULL;
 
-_VOID
+void
 _DEFUN (_tzset_unlocked_r, (reent_ptr),
         struct _reent *reent_ptr)
 {
@@ -183,7 +183,7 @@ _DEFUN (_tzset_unlocked_r, (reent_ptr),
   _daylight = tz->__tzrule[0].offset != tz->__tzrule[1].offset;
 }
 
-_VOID
+void
 _DEFUN (_tzset_r, (reent_ptr),
         struct _reent *reent_ptr)
 {

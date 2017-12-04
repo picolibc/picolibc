@@ -36,7 +36,7 @@ Author: Joel Schopp <jschopp@austin.ibm.com>
 
 #ifndef _REENT_ONLY
 
-_VOID
+void
 _DEFUN (clearerr, (fp),
 	FILE * fp)
 

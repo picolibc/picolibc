@@ -40,9 +40,9 @@ __FILE __sf[3];
 #endif
 
 #if (defined (__OPTIMIZE_SIZE__) || defined (PREFER_SIZE_OVER_SPEED))
-_NOINLINE_STATIC _VOID
+_NOINLINE_STATIC void
 #else
-static _VOID
+static void
 #endif
 _DEFUN(std, (ptr, flags, file),
             FILE *ptr,
@@ -203,7 +203,7 @@ found:
  * The name `_cleanup' is, alas, fairly well known outside stdio.
  */
 
-_VOID
+void
 _DEFUN(_cleanup_r, (ptr),
        struct _reent *ptr)
 {
@@ -234,7 +234,7 @@ _DEFUN(_cleanup_r, (ptr),
 }
 
 #ifndef _REENT_ONLY
-_VOID
+void
 _cleanup (void)
 {
   _cleanup_r (_GLOBAL_REENT);
@@ -245,7 +245,7 @@ _cleanup (void)
  * __sinit() is called whenever stdio's internal variables must be set up.
  */
 
-_VOID
+void
 _DEFUN(__sinit, (s),
        struct _reent *s)
 {
@@ -303,25 +303,25 @@ _DEFUN(__sinit, (s),
 __LOCK_INIT_RECURSIVE(static, __sfp_recursive_mutex);
 __LOCK_INIT_RECURSIVE(static, __sinit_recursive_mutex);
 
-_VOID
+void
 __sfp_lock_acquire (void)
 {
   __lock_acquire_recursive (__sfp_recursive_mutex);
 }
 
-_VOID
+void
 __sfp_lock_release (void)
 {
   __lock_release_recursive (__sfp_recursive_mutex);
 }
 
-_VOID
+void
 __sinit_lock_acquire (void)
 {
   __lock_acquire_recursive (__sinit_recursive_mutex);
 }
 
-_VOID
+void
 __sinit_lock_release (void)
 {
   __lock_release_recursive (__sinit_recursive_mutex);
@@ -349,7 +349,7 @@ _DEFUN(__fp_unlock, (ptr),
   return 0;
 }
 
-_VOID
+void
 __fp_lock_all (void)
 {
   __sfp_lock_acquire ();
@@ -357,7 +357,7 @@ __fp_lock_all (void)
   (void) _fwalk (_REENT, __fp_lock);
 }
 
-_VOID
+void
 __fp_unlock_all (void)
 {
   (void) _fwalk (_REENT, __fp_unlock);

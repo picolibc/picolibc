@@ -49,7 +49,6 @@
 #ifdef _HAVE_STDC
 #define	_VOLATILE	volatile
 #define	_SIGNED		signed
-#define _VOID void
 #ifdef __CYGWIN__
 #define	_EXFUN_NOTHROW(name, proto)	__cdecl name proto _NOTHROW
 #define	_EXFUN(name, proto)		__cdecl name proto
@@ -68,7 +67,6 @@
 #else	
 #define	_VOLATILE
 #define	_SIGNED
-#define _VOID void
 #define	_EXFUN(name, proto)		name()
 #define	_EXFUN_NOTHROW(name, proto)	name()
 #define	_DEFUN(name, arglist, args)	name arglist args;

@@ -62,18 +62,18 @@ typedef int (*__compar_fn_t) (const void *, const void *);
 
 #define RAND_MAX __RAND_MAX
 
-int	_EXFUN(__locale_mb_cur_max,(_VOID));
+int	_EXFUN(__locale_mb_cur_max,(void));
 
 #define MB_CUR_MAX __locale_mb_cur_max()
 
-_VOID	_EXFUN(abort,(_VOID) _ATTRIBUTE ((__noreturn__)));
+void	_EXFUN(abort,(void) _ATTRIBUTE ((__noreturn__)));
 int	_EXFUN(abs,(int));
 #if __BSD_VISIBLE
 __uint32_t _EXFUN(arc4random, (void));
 __uint32_t _EXFUN(arc4random_uniform, (__uint32_t));
 void    _EXFUN(arc4random_buf, (void *, size_t));
 #endif
-int	_EXFUN(atexit,(_VOID (*__func)(_VOID)));
+int	_EXFUN(atexit,(void (*__func)(void)));
 double	_EXFUN(atof,(const char *__nptr));
 #if __MISC_VISIBLE
 float	_EXFUN(atoff,(const char *__nptr));
@@ -89,8 +89,8 @@ void *	_EXFUN(bsearch,(const void *__key,
 		       __compar_fn_t _compar));
 void *	_EXFUN_NOTHROW(calloc,(size_t __nmemb, size_t __size));
 div_t	_EXFUN(div,(int __numer, int __denom));
-_VOID	_EXFUN(exit,(int __status) _ATTRIBUTE ((__noreturn__)));
-_VOID	_EXFUN_NOTHROW(free,(void *));
+void	_EXFUN(exit,(int __status) _ATTRIBUTE ((__noreturn__)));
+void	_EXFUN_NOTHROW(free,(void *));
 char *  _EXFUN(getenv,(const char *__string));
 char *	_EXFUN(_getenv_r,(struct _reent *, const char *__string));
 char *	_EXFUN(_findenv,(const char *, int *));
@@ -136,8 +136,8 @@ int	_EXFUN(_mkostemps_r, (struct _reent *, char *, int, int));
 int	_EXFUN(_mkstemp_r, (struct _reent *, char *));
 int	_EXFUN(_mkstemps_r, (struct _reent *, char *, int));
 char *	_EXFUN(_mktemp_r, (struct _reent *, char *) _ATTRIBUTE ((__deprecated__("the use of `mktemp' is dangerous; use `mkstemp' instead"))));
-_VOID	_EXFUN(qsort,(void *__base, size_t __nmemb, size_t __size, __compar_fn_t _compar));
-int	_EXFUN(rand,(_VOID));
+void	_EXFUN(qsort,(void *__base, size_t __nmemb, size_t __size, __compar_fn_t _compar));
+int	_EXFUN(rand,(void));
 void *	_EXFUN_NOTHROW(realloc,(void *__r, size_t __size));
 #if __BSD_VISIBLE
 void	*reallocarray(void *, size_t, size_t) __result_use_check __alloc_size(2)
@@ -151,9 +151,9 @@ char *	_EXFUN(realpath, (const char *__restrict path, char *__restrict resolved_
 int	_EXFUN(rpmatch, (const char *response));
 #endif
 #if __XSI_VISIBLE
-_VOID	_EXFUN(setkey, (const char *__key));
+void	_EXFUN(setkey, (const char *__key));
 #endif
-_VOID	_EXFUN(srand,(unsigned __seed));
+void	_EXFUN(srand,(unsigned __seed));
 double	_EXFUN(strtod,(const char *__restrict __n, char **__restrict __end_PTR));
 double	_EXFUN(_strtod_r,(struct _reent *,const char *__restrict __n, char **__restrict __end_PTR));
 #if __ISO_C_VISIBLE >= 1999
@@ -193,10 +193,10 @@ char *  _EXFUN(l64a,(long __input));
 char *  _EXFUN(_l64a_r,(struct _reent *,long __input));
 #endif
 #if __MISC_VISIBLE
-int	_EXFUN(on_exit,(_VOID (*__func)(int, void *),void *__arg));
+int	_EXFUN(on_exit,(void (*__func)(int, void *),void *__arg));
 #endif
 #if __ISO_C_VISIBLE >= 1999
-_VOID	_EXFUN(_Exit,(int __status) _ATTRIBUTE ((__noreturn__)));
+void	_EXFUN(_Exit,(int __status) _ATTRIBUTE ((__noreturn__)));
 #endif
 #if __SVID_VISIBLE || __XSI_VISIBLE
 int	_EXFUN(putenv,(char *__string));
@@ -229,17 +229,17 @@ int	_EXFUN(rand_r,(unsigned *__seed));
 #endif
 
 #if __SVID_VISIBLE || __XSI_VISIBLE
-double _EXFUN(drand48,(_VOID));
+double _EXFUN(drand48,(void));
 double _EXFUN(_drand48_r,(struct _reent *));
 double _EXFUN(erand48,(unsigned short [3]));
 double _EXFUN(_erand48_r,(struct _reent *, unsigned short [3]));
 long   _EXFUN(jrand48,(unsigned short [3]));
 long   _EXFUN(_jrand48_r,(struct _reent *, unsigned short [3]));
-_VOID  _EXFUN(lcong48,(unsigned short [7]));
-_VOID  _EXFUN(_lcong48_r,(struct _reent *, unsigned short [7]));
-long   _EXFUN(lrand48,(_VOID));
+void  _EXFUN(lcong48,(unsigned short [7]));
+void  _EXFUN(_lcong48_r,(struct _reent *, unsigned short [7]));
+long   _EXFUN(lrand48,(void));
 long   _EXFUN(_lrand48_r,(struct _reent *));
-long   _EXFUN(mrand48,(_VOID));
+long   _EXFUN(mrand48,(void));
 long   _EXFUN(_mrand48_r,(struct _reent *));
 long   _EXFUN(nrand48,(unsigned short [3]));
 long   _EXFUN(_nrand48_r,(struct _reent *, unsigned short [3]));
@@ -247,14 +247,14 @@ unsigned short *
        _EXFUN(seed48,(unsigned short [3]));
 unsigned short *
        _EXFUN(_seed48_r,(struct _reent *, unsigned short [3]));
-_VOID  _EXFUN(srand48,(long));
-_VOID  _EXFUN(_srand48_r,(struct _reent *, long));
+void  _EXFUN(srand48,(long));
+void  _EXFUN(_srand48_r,(struct _reent *, long));
 #endif /* __SVID_VISIBLE || __XSI_VISIBLE */
 #if __SVID_VISIBLE || __XSI_VISIBLE >= 4 || __BSD_VISIBLE
 char *	_EXFUN(initstate,(unsigned, char *, size_t));
-long	_EXFUN(random,(_VOID));
+long	_EXFUN(random,(void));
 char *	_EXFUN(setstate,(char *));
-_VOID	_EXFUN(srandom,(unsigned));
+void	_EXFUN(srandom,(unsigned));
 #endif
 #if __ISO_C_VISIBLE >= 1999
 long long _EXFUN(atoll,(const char *__nptr));
@@ -273,7 +273,7 @@ unsigned long long _EXFUN(_strtoull_r,(struct _reent *, const char *__restrict _
 
 #ifndef __CYGWIN__
 #if __MISC_VISIBLE
-_VOID	_EXFUN(cfree,(void *));
+void	_EXFUN(cfree,(void *));
 #endif
 #if __BSD_VISIBLE || __POSIX_VISIBLE >= 200112
 int	_EXFUN(unsetenv,(const char *__string));
@@ -289,26 +289,26 @@ char *	_EXFUN(_dtoa_r,(struct _reent *, double, int, int, int *, int*, char**));
 #ifndef __CYGWIN__
 void *	_EXFUN_NOTHROW(_malloc_r,(struct _reent *, size_t));
 void *	_EXFUN_NOTHROW(_calloc_r,(struct _reent *, size_t, size_t));
-_VOID	_EXFUN_NOTHROW(_free_r,(struct _reent *, void *));
+void	_EXFUN_NOTHROW(_free_r,(struct _reent *, void *));
 void *	_EXFUN_NOTHROW(_realloc_r,(struct _reent *, void *, size_t));
-_VOID	_EXFUN(_mstats_r,(struct _reent *, char *));
+void	_EXFUN(_mstats_r,(struct _reent *, char *));
 #endif
 int	_EXFUN(_system_r,(struct _reent *, const char *));
 
-_VOID	_EXFUN(__eprintf,(const char *, const char *, unsigned int, const char *));
+void	_EXFUN(__eprintf,(const char *, const char *, unsigned int, const char *));
 
 /* There are two common qsort_r variants.  If you request
    _BSD_SOURCE, you get the BSD version; otherwise you get the GNU
    version.  We want that #undef qsort_r will still let you
    invoke the underlying function, but that requires gcc support. */
 #if __GNU_VISIBLE
-_VOID	_EXFUN(qsort_r,(void *__base, size_t __nmemb, size_t __size, int (*_compar)(const void *, const void *, void *), void *__thunk));
+void	_EXFUN(qsort_r,(void *__base, size_t __nmemb, size_t __size, int (*_compar)(const void *, const void *, void *), void *__thunk));
 #elif __BSD_VISIBLE
 # ifdef __GNUC__
-_VOID	_EXFUN(qsort_r,(void *__base, size_t __nmemb, size_t __size, void *__thunk, int (*_compar)(void *, const void *, const void *)))
+void	_EXFUN(qsort_r,(void *__base, size_t __nmemb, size_t __size, void *__thunk, int (*_compar)(void *, const void *, const void *)))
              __asm__ (__ASMNAME ("__bsd_qsort_r"));
 # else
-_VOID	_EXFUN(__bsd_qsort_r,(void *__base, size_t __nmemb, size_t __size, void *__thunk, int (*_compar)(void *, const void *, const void *)));
+void	_EXFUN(__bsd_qsort_r,(void *__base, size_t __nmemb, size_t __size, void *__thunk, int (*_compar)(void *, const void *, const void *)));
 #  define qsort_r __bsd_qsort_r
 # endif
 #endif

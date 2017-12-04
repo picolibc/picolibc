@@ -135,7 +135,7 @@ typedef struct
    *   If 'direction' is 0, "from" encoding is tested, else
    *   "to" encoding is tested.
    */
-  _VOID _EXFNPTR(get_state, (void *data,
+  void _EXFNPTR(get_state, (void *data,
                            mbstate_t *state,
                            int direction));
 

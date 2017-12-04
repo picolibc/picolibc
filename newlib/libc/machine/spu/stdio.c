@@ -52,7 +52,7 @@ _DEFUN (__sfp, (d),
   return NULL;
 }
 
-static _VOID
+static void
 _DEFUN (__cleanup, (s),
 	struct _reent *s)
 {
@@ -64,7 +64,7 @@ _DEFUN (__cleanup, (s),
   }
 }
 
-_VOID
+void
 _DEFUN (__sinit, (s),
 	struct _reent *s)
 {
@@ -81,7 +81,7 @@ _DEFUN (__sinit, (s),
   s->_stderr->_fp = SPE_STDERR;
 }
 
-_VOID
+void
 __check_init (void)
 {
     CHECK_INIT(_REENT);

@@ -7,7 +7,7 @@
 
 void *_EXFUN(vec_calloc,(size_t __nmemb, size_t __size));
 void *_EXFUN(_vec_calloc_r,(struct _reent *, size_t __nmemb, size_t __size));
-_VOID   _EXFUN(vec_free,(void *));
+void   _EXFUN(vec_free,(void *));
 #define _vec_freer _freer
 void *_EXFUN(vec_malloc,(size_t __size));
 #define _vec_mallocr _memalign_r

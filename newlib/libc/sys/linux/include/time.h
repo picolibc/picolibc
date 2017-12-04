@@ -81,8 +81,8 @@ struct tm *_EXFUN(localtime_r,	(const time_t *, struct tm *));
 
 #ifndef __STRICT_ANSI__
 char      *_EXFUN(strptime,     (const char *, const char *, struct tm *));
-_VOID      _EXFUN(tzset,	(_VOID));
-_VOID      _EXFUN(_tzset_r,	(struct _reent *));
+void      _EXFUN(tzset,	(void));
+void      _EXFUN(_tzset_r,	(struct _reent *));
 
 typedef struct __tzrule_struct
 {
@@ -102,13 +102,13 @@ typedef struct __tzinfo_struct
   __tzrule_type __tzrule[2];
 } __tzinfo_type;
 
-__tzinfo_type *_EXFUN (__gettzinfo, (_VOID));
+__tzinfo_type *_EXFUN (__gettzinfo, (void));
 
 /* getdate functions */
 
 #ifndef _REENT_ONLY
 #define getdate_err (*__getdate_err())
-int *_EXFUN(__getdate_err,(_VOID));
+int *_EXFUN(__getdate_err,(void));
 
 struct tm *	_EXFUN(getdate, (const char *));
 /* getdate_err is set to one of the following values to indicate the error.

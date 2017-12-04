@@ -33,7 +33,7 @@ Supporting OS subroutines required: <<close>>, <<fstat>>, <<isatty>>,
 #include <stdio.h>
 #include <string.h>
 
-_VOID
+void
 _DEFUN(psignal, (sig, s),
        int sig,
        const char *s)

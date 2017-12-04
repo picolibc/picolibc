@@ -98,9 +98,9 @@ char *strptime_l (const char *__restrict, const char *__restrict,
 #endif
 
 #if __POSIX_VISIBLE
-_VOID      _EXFUN(tzset,	(_VOID));
+void      _EXFUN(tzset,	(void));
 #endif
-_VOID      _EXFUN(_tzset_r,	(struct _reent *));
+void      _EXFUN(_tzset_r,	(struct _reent *));
 
 typedef struct __tzrule_struct
 {
@@ -120,7 +120,7 @@ typedef struct __tzinfo_struct
   __tzrule_type __tzrule[2];
 } __tzinfo_type;
 
-__tzinfo_type *_EXFUN (__gettzinfo, (_VOID));
+__tzinfo_type *_EXFUN (__gettzinfo, (void));
 
 /* getdate functions */
 
@@ -128,7 +128,7 @@ __tzinfo_type *_EXFUN (__gettzinfo, (_VOID));
 #if __XSI_VISIBLE >= 4
 #ifndef _REENT_ONLY
 #define getdate_err (*__getdate_err())
-int *_EXFUN(__getdate_err,(_VOID));
+int *_EXFUN(__getdate_err,(void));
 
 struct tm *	_EXFUN(getdate, (const char *));
 /* getdate_err is set to one of the following values to indicate the error.

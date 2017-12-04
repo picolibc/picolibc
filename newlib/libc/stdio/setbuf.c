@@ -64,7 +64,7 @@ Supporting OS subroutines required: <<close>>, <<fstat>>, <<isatty>>,
 #include <stdio.h>
 #include "local.h"
 
-_VOID
+void
 _DEFUN(setbuf, (fp, buf),
        FILE *__restrict fp,
        char *__restrict buf)

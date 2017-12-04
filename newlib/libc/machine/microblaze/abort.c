@@ -46,7 +46,7 @@ Supporting OS subroutines required: <<_exit>> and optionally, <<write>>.
 #include <unistd.h>
 #include <signal.h>
 
-_VOID
+void
 abort (void)
 {
 #ifdef ABORT_MESSAGE

@@ -34,7 +34,7 @@
  * optimization) right after the _fstat() that finds the buffer size.
  */
 
-_VOID
+void
 _DEFUN(__smakebuf_r, (ptr, fp),
        struct _reent *ptr,
        register FILE *fp)

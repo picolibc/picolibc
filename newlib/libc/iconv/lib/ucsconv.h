@@ -108,7 +108,7 @@ typedef struct
    * DESCRIPTION:
    *   Returns encoding's current shift sequence.
    */
-  _VOID _EXFNPTR(get_state, (void *data,
+  void _EXFNPTR(get_state, (void *data,
                            mbstate_t *state));
 
   /*
@@ -183,7 +183,7 @@ typedef struct
   int _EXFNPTR(get_mb_cur_max, (void *data));
 
   /* Same as in iconv_to_ucs_ces_handlers_t */
-  _VOID _EXFNPTR(get_state, (void *data,
+  void _EXFNPTR(get_state, (void *data,
                            mbstate_t *state));
 
   /* Same as in iconv_to_ucs_ces_handlers_t */

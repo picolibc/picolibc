@@ -16,7 +16,7 @@
 
 #include <_ansi.h>
 
-_VOID
+void
 _DEFUN (_exit, (rc),
 	int rc)
 {

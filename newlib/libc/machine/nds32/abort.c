@@ -28,7 +28,7 @@ Supporting OS subroutines required: <<_exit>>.
 
 #include <unistd.h>
 
-_VOID
+void
 abort (void)
 {
   while (1)

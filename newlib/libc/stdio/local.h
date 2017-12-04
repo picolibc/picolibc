@@ -179,9 +179,9 @@ extern _READ_WRITE_RETURN_TYPE _EXFUN(__swrite,(struct _reent *, void *,
 extern _fpos_t _EXFUN(__sseek,(struct _reent *, void *, _fpos_t, int));
 extern int    _EXFUN(__sclose,(struct _reent *, void *));
 extern int    _EXFUN(__stextmode,(int));
-extern _VOID   _EXFUN(__sinit,(struct _reent *));
-extern _VOID   _EXFUN(_cleanup_r,(struct _reent *));
-extern _VOID   _EXFUN(__smakebuf_r,(struct _reent *, FILE *));
+extern void   _EXFUN(__sinit,(struct _reent *));
+extern void   _EXFUN(_cleanup_r,(struct _reent *));
+extern void   _EXFUN(__smakebuf_r,(struct _reent *, FILE *));
 extern int    _EXFUN(__swhatbuf_r,(struct _reent *, FILE *, size_t *, int *));
 extern int    _EXFUN(_fwalk,(struct _reent *, int (*)(FILE *)));
 extern int    _EXFUN(_fwalk_reent,(struct _reent *, int (*)(struct _reent *, FILE *)));
@@ -297,10 +297,10 @@ char *_EXFUN(_llicvt,(char *, long long, char));
 #define __sinit_lock_acquire()
 #define __sinit_lock_release()
 #else
-_VOID _EXFUN(__sfp_lock_acquire,(_VOID));
-_VOID _EXFUN(__sfp_lock_release,(_VOID));
-_VOID _EXFUN(__sinit_lock_acquire,(_VOID));
-_VOID _EXFUN(__sinit_lock_release,(_VOID));
+void _EXFUN(__sfp_lock_acquire,(void));
+void _EXFUN(__sfp_lock_release,(void));
+void _EXFUN(__sinit_lock_acquire,(void));
+void _EXFUN(__sinit_lock_release,(void));
 #endif
 
 /* Types used in positional argument support in vfprinf/vfwprintf.

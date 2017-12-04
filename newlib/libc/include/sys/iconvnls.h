@@ -44,7 +44,7 @@
 #define ICONV_NLS_FROM 0
 #define ICONV_NLS_TO   1
 
-_VOID
+void
 _EXFUN(_iconv_nls_get_state, (iconv_t cd, mbstate_t *ps, int direction));
 
 int

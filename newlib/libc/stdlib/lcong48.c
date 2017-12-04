@@ -13,7 +13,7 @@
 
 #include "rand48.h"
 
-_VOID
+void
 _DEFUN (_lcong48_r, (r, p),
        struct _reent *r,
        unsigned short p[7])
@@ -29,7 +29,7 @@ _DEFUN (_lcong48_r, (r, p),
 }
 
 #ifndef _REENT_ONLY
-_VOID
+void
 _DEFUN (lcong48, (p),
        unsigned short p[7])
 {

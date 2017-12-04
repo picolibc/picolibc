@@ -259,7 +259,7 @@ off_t	_EXFUN(ftello, ( FILE *));
 #endif
 #endif
 #if __GNU_VISIBLE
-int	_EXFUN(fcloseall, (_VOID));
+int	_EXFUN(fcloseall, (void));
 #endif
 #ifndef _REENT_ONLY
 #if __ISO_C_VISIBLE >= 1999

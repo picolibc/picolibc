@@ -23,8 +23,8 @@ int         _EXFUN (__tzcalc_limits, (int __year));
 
 extern const int __month_lengths[2][MONSPERYEAR];
 
-_VOID _EXFUN(_tzset_unlocked_r, (struct _reent *));
-_VOID _EXFUN(_tzset_unlocked, (_VOID));
+void _EXFUN(_tzset_unlocked_r, (struct _reent *));
+void _EXFUN(_tzset_unlocked, (void));
 
 /* locks for multi-threading */
 #ifdef __SINGLE_THREAD__
@@ -35,6 +35,6 @@ _VOID _EXFUN(_tzset_unlocked, (_VOID));
 #define TZ_UNLOCK __tz_unlock()
 #endif
 
-void _EXFUN(__tz_lock,(_VOID));
-void _EXFUN(__tz_unlock,(_VOID));
+void _EXFUN(__tz_lock,(void));
+void _EXFUN(__tz_unlock,(void));
 

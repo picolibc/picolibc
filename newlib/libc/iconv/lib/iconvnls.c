@@ -219,7 +219,7 @@ _DEFUN(_iconv_nls_conv, (rptr, cd, inbuf, inbytesleft, outbuf, outbytesleft),
  *    shift state if 'direction' is 0 and "to" encodings's shift state
  *    if 'direction' isn't 0.
  */
-_VOID
+void
 _DEFUN(_iconv_nls_get_state, (cd, ps, direction),
                              iconv_t cd,
                              mbstate_t *ps,

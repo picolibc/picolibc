@@ -51,7 +51,7 @@ static char sccsid[] = "%W% (Berkeley) %G%";
 #include <reent.h>
 #include <stdio.h>
 
-_VOID
+void
 _DEFUN(_rewind_r, (ptr, fp),
        struct _reent * ptr,
        register FILE * fp)
@@ -62,7 +62,7 @@ _DEFUN(_rewind_r, (ptr, fp),
 
 #ifndef _REENT_ONLY
 
-_VOID
+void
 _DEFUN(rewind, (fp),
        register FILE * fp)
 {
