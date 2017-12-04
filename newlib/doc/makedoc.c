@@ -444,52 +444,6 @@ WORD(translatecomments)
     
 }
 
-/* find something like
-   QUICKREF
-     memchar ansi  pure
-
-     into
-     merge with words on tos and output them to stderror
-
-*/
-WORD(quickref)
-{
-  string_type *nos = tos-1;
-  unsigned int nosscan = 0;
-  unsigned int idx = 0;
-  
-  while (at(tos, idx)) 
-  {
-    if (at(tos,idx) == '~')
-    {
-      /* Skip the whitespace */
-      while (at(nos, nosscan) == ' ')
-       nosscan++;
-    
-      /* Sub the next word from the nos*/
-      while (at(nos, nosscan) != ' ' &&
-	     at(nos, nosscan) != 0)
-      {
-	fprintf(stderr, "%c", at(nos, nosscan));
-	nosscan++;
-      }
-    }
-  
-    else 
-    {
-      fprintf(stderr,"%c", at(tos, idx));
-    
-    }
-    idx++;
-  }
-
-  delete_string(tos);
-  delete_string(nos);
-  tos-=2;
-  pc++;
-  
-}
-
 #if 0
 /* turn everything not starting with a . into a comment */
 
@@ -1428,7 +1382,6 @@ char *av[])
     add_intrinsic("translatecomments", translatecomments );
     add_intrinsic("kill_bogus_lines", kill_bogus_lines);
     add_intrinsic("indent", indent);
-    add_intrinsic("quickref", quickref);
     add_intrinsic("internalmode", internalmode);
     
     /* Put a nl at the start */

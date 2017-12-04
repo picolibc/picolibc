@@ -300,7 +300,7 @@ CHEW = ${top_builddir}/../doc/makedoc -f $(top_srcdir)/../doc/doc.str
 DOCBOOK_CHEW = ${top_srcdir}/../doc/makedocbook.py
 DOCBOOK_OUT_FILES = $(CHEWOUT_FILES:.def=.xml)
 DOCBOOK_CHAPTERS = $(CHAPTERS:.tex=.xml)
-CLEANFILES = $(CHEWOUT_FILES) $(CHEWOUT_FILES:.def=.ref) $(DOCBOOK_OUT_FILES)
+CLEANFILES = $(CHEWOUT_FILES) $(DOCBOOK_OUT_FILES)
 AM_CFLAGS = -I $(srcdir)/../stdio
 CHEWOUT_FILES = \
 	fdopen64.def		\
@@ -627,8 +627,8 @@ objectlist.awk.in: $(noinst_LTLIBRARIES)
 	done
 
 .c.def:
-	$(CHEW) < $< > $*.def 2> $*.ref
-	touch stmp-def
+	$(CHEW) < $< > $*.def || ( rm $*.def && false )
+	@touch stmp-def
 
 TARGETDOC ?= ../tmp.texi
 

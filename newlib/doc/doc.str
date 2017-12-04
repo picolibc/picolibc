@@ -17,9 +17,10 @@
 
 : QUICKREF
 	skip_past_newline
-	get_stuff_in_command
-	"&&~&&~&&\cr\tablerule\n"
-	quickref
+	;
+
+: MATHREF
+	skip_past_newline
 	;
 
 : EXAMPLE
@@ -152,6 +153,9 @@
 
 : SEEALSO
 	"@strong{See Also}@*\n" catstr subhead ;
+
+: NOTES
+	"@strong{Notes}@*\n" catstr subhead ;
 
 : INTERNAL_FUNCTION
 	;
