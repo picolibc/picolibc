@@ -30,9 +30,6 @@
 #include <sys/types.h>
 #include <limits.h>
 
-/* void* type for K&R compilers compatibility */
-#define _VOID_PTR _PTR
-
 /* Encodings aliases file */
 #define ICONV_ALIASES_FNAME   "encoding.aliases"
 /* iconv CCS data path */

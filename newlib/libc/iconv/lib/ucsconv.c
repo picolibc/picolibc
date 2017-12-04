@@ -44,7 +44,7 @@ _EXFUN(find_encoding_name, (const char *searchee,
  * UCS-based conversion interface functions implementation.
  */
 
-static _VOID_PTR
+static void *
 _DEFUN(ucs_based_conversion_open, (rptr, to, from),
                                   struct _reent *rptr,
                                   const char *to,
@@ -97,7 +97,7 @@ _DEFUN(ucs_based_conversion_open, (rptr, to, from),
         goto error;
     }
   else
-    uc->to_ucs.data = (_VOID_PTR)&fake_data;
+    uc->to_ucs.data = (void *)&fake_data;
     
 
   /* Initialize "from UCS" CES converter */
@@ -108,7 +108,7 @@ _DEFUN(ucs_based_conversion_open, (rptr, to, from),
         goto error;
     }
   else
-    uc->from_ucs.data = (_VOID_PTR)&fake_data;
+    uc->from_ucs.data = (void *)&fake_data;
 
   return uc;
 
@@ -116,7 +116,7 @@ error:
   if (uc->to_ucs.data != NULL && uc->to_ucs.handlers->close != NULL)
     uc->to_ucs.handlers->close (rptr, uc->to_ucs.data);
 
-  _free_r (rptr, (_VOID_PTR)uc);
+  _free_r (rptr, (void *)uc);
 
   return NULL;
 }
@@ -125,7 +125,7 @@ error:
 static size_t
 _DEFUN(ucs_based_conversion_close, (rptr, data),
                                    struct _reent *rptr,
-                                   _VOID_PTR data)
+                                   void *data)
 {
   iconv_ucs_conversion_t *uc;
   size_t res = 0;
@@ -137,7 +137,7 @@ _DEFUN(ucs_based_conversion_close, (rptr, data),
   if (uc->to_ucs.handlers->close != NULL)
     res |= uc->to_ucs.handlers->close (rptr, uc->to_ucs.data);
 
-  _free_r (rptr, (_VOID_PTR)data);
+  _free_r (rptr, (void *)data);
 
   return res;
 }
@@ -147,7 +147,7 @@ static size_t
 _DEFUN(ucs_based_conversion_convert,
                  (rptr, data, inbuf, inbytesleft, outbuf, outbytesleft, flags),
                  struct _reent *rptr,
-                 _VOID_PTR data,
+                 void *data,
                  const unsigned char **inbuf,
                  size_t *inbytesleft,
                  unsigned char **outbuf,
@@ -239,7 +239,7 @@ _DEFUN(ucs_based_conversion_convert,
 
 static int
 _DEFUN(ucs_based_conversion_get_mb_cur_max, (data, direction),
-                                            _VOID_PTR data,
+                                            void *data,
                                             int direction)
 {
   iconv_ucs_conversion_t *uc = (iconv_ucs_conversion_t *)data;
@@ -253,7 +253,7 @@ _DEFUN(ucs_based_conversion_get_mb_cur_max, (data, direction),
 
 static _VOID
 _DEFUN(ucs_based_conversion_get_state, (data, state, direction),
-                                       _VOID_PTR data,
+                                       void *data,
                                        mbstate_t *state,
                                        int direction)
 {
@@ -281,7 +281,7 @@ _DEFUN(ucs_based_conversion_get_state, (data, state, direction),
 
 static int
 _DEFUN(ucs_based_conversion_set_state, (data, state, direction),
-                                       _VOID_PTR data,
+                                       void *data,
                                        mbstate_t *state,
                                        int direction)
 {
@@ -303,7 +303,7 @@ _DEFUN(ucs_based_conversion_set_state, (data, state, direction),
 
 static int
 _DEFUN(ucs_based_conversion_is_stateful, (data, direction),
-                                         _VOID_PTR data,
+                                         void *data,
                                          int direction)
 {
   iconv_ucs_conversion_t *uc = (iconv_ucs_conversion_t *)data;

@@ -41,7 +41,7 @@
 #if defined (ICONV_FROM_UCS_CES_US_ASCII)
 static size_t
 _DEFUN(us_ascii_convert_from_ucs, (data, in, outbuf, outbytesleft),
-                                  _VOID_PTR data,
+                                  void *data,
                                   ucs4_t in,
                                   unsigned char **outbuf,
                                   size_t *outbytesleft)
@@ -61,7 +61,7 @@ _DEFUN(us_ascii_convert_from_ucs, (data, in, outbuf, outbytesleft),
 #if defined (ICONV_TO_UCS_CES_US_ASCII)
 static ucs4_t
 _DEFUN(us_ascii_convert_to_ucs, (data, inbuf, inbytesleft),
-                                _VOID_PTR data,
+                                void *data,
                                 const unsigned char **inbuf,
                                 size_t *inbytesleft)
 {
@@ -84,7 +84,7 @@ _DEFUN(us_ascii_convert_to_ucs, (data, inbuf, inbytesleft),
 
 static int
 _DEFUN(us_ascii_get_mb_cur_max, (data),
-                                _VOID_PTR data)
+                                void *data)
 {
   return 2;
 }

@@ -63,7 +63,7 @@ typedef struct
    *   Pointer to conversion-specific data if success. In case of error
    *   returns NULL and sets current thread's/process's errno.
    */
-  _VOID_PTR _EXFNPTR(open, (struct _reent *rptr,
+  void *_EXFNPTR(open, (struct _reent *rptr,
                           const char *to,
                           const char *from));
   
@@ -72,7 +72,7 @@ typedef struct
    *
    * PARAMETRS:
    *   struct _reent *rptr - reent structure of current thread/process;
-   *   _VOID_PTR data      - conversion-specific data.
+   *   void *data      - conversion-specific data.
    *
    * DESCRIPTION:
    *   This function is called from iconv_close() to close conversion.
@@ -82,13 +82,13 @@ typedef struct
    *   thread's/process's errno and returns (size_t)-1 (same as iconv_open()).
    */
   size_t _EXFNPTR(close, (struct _reent *rptr,
-                        _VOID_PTR data));
+                        void *data));
   
   /* convert - perform encoding conversion.
    *
    * PARAMETERS:
    *   struct _reent *rptr - reent structure of current thread/process.
-   *   _VOID_PTR data      - conversion-specific data;
+   *   void *data      - conversion-specific data;
    *   const unsigned char **inbuf - input data buffer;
    *   size_t *inbytesleft          - input buffer's length;
    *   unsigned char **outbuf       - output data buffer;
@@ -115,7 +115,7 @@ typedef struct
    *   thread's/process's errno and returns (size_t)-1 (same as iconv()).
    */
   size_t _EXFNPTR(convert, (struct _reent *rptr,
-                           _VOID_PTR data,
+                           void *data,
                            const unsigned char **inbuf,
                            size_t *inbytesleft,
                            unsigned char **outbuf,
@@ -126,7 +126,7 @@ typedef struct
    * get_state - get current shift state.
    *
    * PARAMETERS:
-   *   _VOID_PTR data   - conversion-specific data;
+   *   void *data   - conversion-specific data;
    *   mbstate_t *state - mbstate_t object where shift state will be written;
    *   int direction      - 0-"from", 1-"to".
    *
@@ -135,7 +135,7 @@ typedef struct
    *   If 'direction' is 0, "from" encoding is tested, else
    *   "to" encoding is tested.
    */
-  _VOID _EXFNPTR(get_state, (_VOID_PTR data,
+  _VOID _EXFNPTR(get_state, (void *data,
                            mbstate_t *state,
                            int direction));
 
@@ -143,7 +143,7 @@ typedef struct
    * set_state - set shift state.
    *
    * PARAMETERS:
-   *   _VOID_PTR data   - conversion-specific data;
+   *   void *data   - conversion-specific data;
    *   mbstate_t *state - mbstate_t object to which shift state will be set.
    *   int direction     - 0-"from", 1-"to".
    *
@@ -154,7 +154,7 @@ typedef struct
    *   "to" encoding is set.
    *   Returns 0 if '*state' object has right format, -1 else.
    */
-  int _EXFNPTR(set_state, (_VOID_PTR data,
+  int _EXFNPTR(set_state, (void *data,
                          mbstate_t *state,
                          int direction));
   
@@ -162,7 +162,7 @@ typedef struct
    * get_mb_cur_max - get maximum character length in bytes.
    *
    * PARAMETERS:
-   *   _VOID_PTR data     - conversion-specific data;
+   *   void *data     - conversion-specific data;
    *   int direction      - 0-"from", 1-"to".
    *
    * DESCRIPTION:
@@ -170,14 +170,14 @@ typedef struct
    *   If 'direction' is 0, "from" encoding is tested, else
    *   "to" encoding is tested.
    */
-  int _EXFNPTR(get_mb_cur_max, (_VOID_PTR data,
+  int _EXFNPTR(get_mb_cur_max, (void *data,
                               int direction));
   
   /*
    * is_stateful - is encoding stateful or stateless.
    *
    * PARAMETERS:
-   *   _VOID_PTR data - conversion-specific data;
+   *   void *data - conversion-specific data;
    *   int direction  - 0-"from", 1-"to".
    *
    * DESCRIPTION:
@@ -185,7 +185,7 @@ typedef struct
    *   If 'direction' is 0, "from" encoding is tested, else
    *   "to" encoding is tested.
    */
-  int _EXFNPTR(is_stateful, (_VOID_PTR data,
+  int _EXFNPTR(is_stateful, (void *data,
                            int direction));
   
 } iconv_conversion_handlers_t;
@@ -205,7 +205,7 @@ typedef struct
    * Conversion-specific data (e.g., points to iconv_ucs_conversion_t
    * object if UCS-based conversion is used).
    */
-  _VOID_PTR data;
+  void *data;
 } iconv_conversion_t;
 
 

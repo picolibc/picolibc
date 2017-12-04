@@ -62,7 +62,7 @@ typedef struct
   int mb_cur_max;
   euc_cs_desc_t *desc;
   
-  _VOID_PTR data[MAX_CS_NUM];
+  void *data[MAX_CS_NUM];
 } euc_data_t;
 
 #if defined (_ICONV_TO_ENCODING_EUC_JP) \
@@ -100,7 +100,7 @@ static euc_cs_desc_t euc_kr_cs_desc [] =
 #endif
 
 #if defined (ICONV_FROM_UCS_CES_EUC)
-static _VOID_PTR
+static void *
 _DEFUN(euc_from_ucs_init, (rptr, encoding),
                           struct _reent *rptr,
                           const char *encoding)
@@ -160,14 +160,14 @@ error:
   _iconv_from_ucs_ces_handlers_table.close (rptr, data);
   return NULL;
 error1:
-  _free_r (rptr, (_VOID_PTR)data);
+  _free_r (rptr, (void *)data);
   return NULL;
 }
 
 static size_t
 _DEFUN(euc_from_ucs_close, (rptr, data),
                            struct _reent *rptr,
-                           _VOID_PTR data)
+                           void *data)
 {
   int i;
   size_t res = 0;
@@ -186,7 +186,7 @@ _DEFUN(euc_from_ucs_close, (rptr, data),
 
 static size_t
 _DEFUN(euc_convert_from_ucs, (data, in, outbuf, outbytesleft),
-                             _VOID_PTR data,
+                             void *data,
                              register ucs4_t in,
                              unsigned char **outbuf,
                              size_t *outbytesleft)
@@ -260,7 +260,7 @@ _DEFUN(euc_convert_from_ucs, (data, in, outbuf, outbytesleft),
 #endif /* ICONV_FROM_UCS_CES_EUC */
 
 #if defined (ICONV_TO_UCS_CES_EUC)
-static _VOID_PTR
+static void *
 _DEFUN(euc_to_ucs_init, (rptr, encoding),
                         struct _reent *rptr,
                         const char *encoding)
@@ -320,14 +320,14 @@ error:
   _iconv_to_ucs_ces_handlers_table.close (rptr, data);
   return NULL;
 error1:
-  _free_r (rptr, (_VOID_PTR)data);
+  _free_r (rptr, (void *)data);
   return NULL;
 }
 
 static size_t
 _DEFUN(euc_to_ucs_close, (rptr, data),
                          struct _reent *rptr,
-                         _VOID_PTR data)
+                         void *data)
 {
   int i;
   size_t res = 0;
@@ -346,7 +346,7 @@ _DEFUN(euc_to_ucs_close, (rptr, data),
 
 static ucs4_t
 _DEFUN(euc_convert_to_ucs, (data, inbuf, inbytesleft),
-                           _VOID_PTR data,
+                           void *data,
                            const unsigned char **inbuf,
                            size_t *inbytesleft)
 {
@@ -366,8 +366,8 @@ _DEFUN(euc_convert_to_ucs, (data, inbuf, inbytesleft),
  
   for (i = 1; d->desc[i].csname != NULL; i++)
     {
-      if (memcmp((const _VOID_PTR)(*inbuf),
-                 (const _VOID_PTR)d->desc[i].prefix,
+      if (memcmp((const void *)(*inbuf),
+                 (const void *)d->desc[i].prefix,
                  d->desc[i].prefixbytes) == 0)
         {
           if (((int)*inbytesleft - d->desc[i].prefixbytes - d->desc[i].bytes) < 0)
@@ -433,7 +433,7 @@ _DEFUN(euc_convert_to_ucs, (data, inbuf, inbytesleft),
 
 static int
 _DEFUN(euc_get_mb_cur_max, (data),
-                           _VOID_PTR data)
+                           void *data)
 {
   return ((euc_data_t *)data)->mb_cur_max;
 }

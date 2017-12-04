@@ -165,7 +165,7 @@ _DEFUN(_iconv_open_r, (rptr, to, from),
 
   if ((from = (const char *)_iconv_resolve_encoding_name (rptr, from)) == NULL)
     {
-      _free_r (rptr, (_VOID_PTR)to);
+      _free_r (rptr, (void *)to);
       return (iconv_t)-1;
     }
 
@@ -187,16 +187,16 @@ _DEFUN(_iconv_open_r, (rptr, to, from),
       ic->data = ic->handlers->open (rptr, to, from);
     }
 
-  _free_r (rptr, (_VOID_PTR)to);
-  _free_r (rptr, (_VOID_PTR)from);
+  _free_r (rptr, (void *)to);
+  _free_r (rptr, (void *)from);
 
   if (ic->data == NULL)
     {
-      _free_r (rptr, (_VOID_PTR)ic);
+      _free_r (rptr, (void *)ic);
       return (iconv_t)-1;
     }
 
-  return (_VOID_PTR)ic;
+  return (void *)ic;
 }
 
 
@@ -211,7 +211,7 @@ _DEFUN(_iconv_r, (rptr, cd, inbuf, inbytesleft, outbuf, outbytesleft),
 {
   iconv_conversion_t *ic = (iconv_conversion_t *)cd;
 
-  if ((_VOID_PTR)cd == NULL || cd == (iconv_t)-1 || ic->data == NULL
+  if ((void *)cd == NULL || cd == (iconv_t)-1 || ic->data == NULL
        || (ic->handlers != &_iconv_null_conversion_handlers
            && ic->handlers != &_iconv_ucs_conversion_handlers))
     {
@@ -249,7 +249,7 @@ _DEFUN(_iconv_r, (rptr, cd, inbuf, inbytesleft, outbuf, outbytesleft),
           
           if (*outbytesleft >= state_null.__count)
             {
-              memcpy ((_VOID_PTR)(*outbuf), (_VOID_PTR)&state_null, state_null.__count);
+              memcpy ((void *)(*outbuf), (void *)&state_null, state_null.__count);
               
               *outbuf += state_null.__count;
               *outbytesleft -= state_null.__count;
@@ -295,7 +295,7 @@ _DEFUN(_iconv_close_r, (rptr, cd),
   int res;
   iconv_conversion_t *ic = (iconv_conversion_t *)cd;
   
-  if ((_VOID_PTR)cd == NULL || cd == (iconv_t)-1 || ic->data == NULL
+  if ((void *)cd == NULL || cd == (iconv_t)-1 || ic->data == NULL
        || (ic->handlers != &_iconv_null_conversion_handlers
            && ic->handlers != &_iconv_ucs_conversion_handlers))
     {
@@ -305,7 +305,7 @@ _DEFUN(_iconv_close_r, (rptr, cd),
 
   res = (int)ic->handlers->close (rptr, ic->data);
   
-  _free_r (rptr, (_VOID_PTR)cd);
+  _free_r (rptr, (void *)cd);
 
   return res;
 }

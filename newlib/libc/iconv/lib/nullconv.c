@@ -35,20 +35,20 @@
 static int null_conversion_dummy_data;
 
 
-static _VOID_PTR
+static void *
 _DEFUN(null_conversion_open, (rptr, to, from),
                              struct _reent *rptr,
                              const char *to,
                              const char *from)
 {
-  return (_VOID_PTR)&null_conversion_dummy_data;
+  return (void *)&null_conversion_dummy_data;
 }
 
 
 static size_t
 _DEFUN(null_conversion_close, (rptr, data),
                               struct _reent *rptr,
-                              _VOID_PTR data)
+                              void *data)
 {
   return 0;
 }
@@ -58,7 +58,7 @@ static size_t
 _DEFUN(null_conversion_convert,
                      (rptr, data, inbuf, inbytesleft, outbuf, outbytesleft),
                      struct _reent *rptr,
-                     _VOID_PTR data,
+                     void *data,
                      const unsigned char **inbuf,
                      size_t *inbytesleft,
                      unsigned char **outbuf,
@@ -94,7 +94,7 @@ _DEFUN(null_conversion_convert,
 
 static int
 _DEFUN(null_conversion_get_mb_cur_max, (data, direction),
-                                       _VOID_PTR data,
+                                       void *data,
                                        int direction)
 {
   return ICONV_MB_LEN_MAX;
@@ -103,7 +103,7 @@ _DEFUN(null_conversion_get_mb_cur_max, (data, direction),
 
 static _VOID
 _DEFUN(null_conversion_get_state, (data, state, size),
-                                  _VOID_PTR data,
+                                  void *data,
                                   mbstate_t *state,
                                   int direction)
 {
@@ -113,7 +113,7 @@ _DEFUN(null_conversion_get_state, (data, state, size),
 
 static int
 _DEFUN(null_conversion_set_state, (data, state, direction),
-                                  _VOID_PTR data,
+                                  void *data,
                                   mbstate_t *state,
                                   int direction)
 {
@@ -122,7 +122,7 @@ _DEFUN(null_conversion_set_state, (data, state, direction),
 
 static int
 _DEFUN(null_conversion_is_stateful, (data, direction),
-                                    _VOID_PTR data,
+                                    void *data,
                                     int direction)
 {
   return 0;

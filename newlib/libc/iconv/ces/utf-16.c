@@ -60,14 +60,14 @@
 static size_t
 _DEFUN(utf_16_close, (rptr, data),
                      struct _reent *rptr,
-                     _VOID_PTR data)
+                     void *data)
 {
   _free_r(rptr, data);
   return 0;
 }
 
 #if defined (ICONV_FROM_UCS_CES_UTF_16)
-static _VOID_PTR
+static void *
 _DEFUN(utf_16_init_from_ucs, (rptr, encoding),
                              struct _reent *rptr,
                              const char *encoding)
@@ -75,7 +75,7 @@ _DEFUN(utf_16_init_from_ucs, (rptr, encoding),
   int *data;
   
   if ((data = (int *)_malloc_r (rptr, sizeof (int))) == NULL)
-    return (_VOID_PTR)NULL;
+    return (void *)NULL;
   
   if (strcmp (encoding, UTF_16LE) == 0)
     *data = UTF16_LITTLE_ENDIAN;
@@ -84,12 +84,12 @@ _DEFUN(utf_16_init_from_ucs, (rptr, encoding),
   else
     *data = UTF16_SYSTEM_ENDIAN;
      
-  return (_VOID_PTR)data;
+  return (void *)data;
 }
 
 static size_t
 _DEFUN(utf_16_convert_from_ucs, (data, in, outbuf, outbytesleft),
-                                _VOID_PTR data,
+                                void *data,
                                 register ucs4_t in,
                                 unsigned char **outbuf,
                                 size_t *outbytesleft)
@@ -169,7 +169,7 @@ _DEFUN(utf_16_convert_from_ucs, (data, in, outbuf, outbytesleft),
 #endif /* ICONV_FROM_UCS_CES_UTF_16 */
 
 #if defined (ICONV_TO_UCS_CES_UTF_16)
-static _VOID_PTR
+static void *
 _DEFUN(utf_16_init_to_ucs, (rptr, encoding),
                            struct _reent *rptr,
                            const char *encoding)
@@ -177,7 +177,7 @@ _DEFUN(utf_16_init_to_ucs, (rptr, encoding),
   int *data;
   
   if ((data = (int *)_malloc_r (rptr, sizeof (int))) == NULL)
-    return (_VOID_PTR)NULL;
+    return (void *)NULL;
   
   if (strcmp (encoding, UTF_16BE) == 0)
     *data = UTF16_BIG_ENDIAN;
@@ -186,12 +186,12 @@ _DEFUN(utf_16_init_to_ucs, (rptr, encoding),
   else
     *data = UTF16_UNDEFINED;
      
-  return (_VOID_PTR)data;
+  return (void *)data;
 }
 
 static ucs4_t
 _DEFUN(utf_16_convert_to_ucs, (data, inbuf, inbytesleft),
-                              _VOID_PTR data,
+                              void *data,
                               const unsigned char **inbuf,
                               size_t *inbytesleft)
 {
@@ -269,7 +269,7 @@ _DEFUN(utf_16_convert_to_ucs, (data, inbuf, inbytesleft),
 
 static int
 _DEFUN(utf_16_get_mb_cur_max, (data),
-                              _VOID_PTR data)
+                              void *data)
 {
   return 6;
 }

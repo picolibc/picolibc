@@ -163,7 +163,7 @@ _DEFUN(_iconv_resolve_encoding_name, (rptr, cname, path),
 
   p = find_alias (rptr, ca, _iconv_aliases, strlen (_iconv_aliases));
   
-  _free_r (rptr, (_VOID_PTR)ca);
+  _free_r (rptr, (void *)ca);
   return p;
 }
 

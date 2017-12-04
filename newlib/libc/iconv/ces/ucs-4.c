@@ -50,7 +50,7 @@
 #define UCS_4BE "ucs_4be"
 #define UCS_4LE "ucs_4le"
 
-static _VOID_PTR
+static void *
 _DEFUN(ucs_4_init, (rptr, encoding),
                    struct _reent *rptr,
                    const char *encoding)
@@ -58,20 +58,20 @@ _DEFUN(ucs_4_init, (rptr, encoding),
   int *data;
   
   if ((data = (int *)_malloc_r (rptr, sizeof(int))) == NULL)
-    return (_VOID_PTR)NULL;
+    return (void *)NULL;
   
   if (strcmp (encoding, UCS_4LE) == 0)
     *data = UCS_4_LITTLE_ENDIAN;
   else
     *data = UCS_4_BIG_ENDIAN;
      
-  return (_VOID_PTR)data;
+  return (void *)data;
 }
 
 static size_t
 _DEFUN(ucs_4_close, (rptr, data),
                     struct _reent *rptr,
-                    _VOID_PTR data)
+                    void *data)
 {
   _free_r(rptr, data);
   return 0;
@@ -81,7 +81,7 @@ _DEFUN(ucs_4_close, (rptr, data),
 #if defined (ICONV_FROM_UCS_CES_UCS_4)
 static size_t
 _DEFUN(ucs_4_convert_from_ucs, (data, in, outbuf, outbytesleft),
-                               _VOID_PTR data,
+                               void *data,
                                ucs4_t in,
                                unsigned char **outbuf,
                                size_t *outbytesleft)
@@ -108,7 +108,7 @@ _DEFUN(ucs_4_convert_from_ucs, (data, in, outbuf, outbytesleft),
 #if defined (ICONV_TO_UCS_CES_UCS_4)
 static ucs4_t
 _DEFUN(ucs_4_convert_to_ucs, (data, inbuf, inbytesleft),
-                             _VOID_PTR data,
+                             void *data,
                              const unsigned char **inbuf,
                              size_t *inbytesleft)
 {
@@ -135,7 +135,7 @@ _DEFUN(ucs_4_convert_to_ucs, (data, inbuf, inbytesleft),
 
 static int
 _DEFUN(ucs_4_get_mb_cur_max, (data),
-                             _VOID_PTR data)
+                             void *data)
 {
   return 4;
 }

@@ -177,7 +177,7 @@ _DEFUN(_iconv_nls_conv, (rptr, cd, inbuf, inbytesleft, outbuf, outbytesleft),
   iconv_conversion_t *ic = (iconv_conversion_t *)cd;
   int flags = ICONV_FAIL_BIT;
 
-  if ((_VOID_PTR)cd == NULL || cd == (iconv_t)-1 || ic->data == NULL
+  if ((void *)cd == NULL || cd == (iconv_t)-1 || ic->data == NULL
        || (ic->handlers != &_iconv_null_conversion_handlers
            && ic->handlers != &_iconv_ucs_conversion_handlers))
     {
@@ -289,11 +289,11 @@ _DEFUN(iconv_open1, (rptr, to, from),
 
   if (ic->data == NULL)
     {
-      _free_r (rptr, (_VOID_PTR)ic);
+      _free_r (rptr, (void *)ic);
       return (iconv_t)-1;
     }
 
-  return (_VOID_PTR)ic;
+  return (void *)ic;
 }
 
 /*

@@ -76,19 +76,19 @@ _EXFUN(load_file, (struct _reent *rptr, const char *name, int direction));
 static size_t
 _DEFUN(table_close, (rptr, data),
                     struct _reent *rptr,
-                    _VOID_PTR data)
+                    void *data)
 {
   const iconv_ccs_desc_t *ccsp = (iconv_ccs_desc_t *)data;
 
   if (ccsp->type == TABLE_EXTERNAL)
-    _free_r (rptr, (_VOID_PTR)ccsp->tbl);
+    _free_r (rptr, (void *)ccsp->tbl);
 
-  _free_r( rptr, (_VOID_PTR)ccsp);
+  _free_r( rptr, (void *)ccsp);
   return 0;
 }
 
 #if defined (ICONV_FROM_UCS_CES_TABLE)
-static _VOID_PTR
+static void *
 _DEFUN(table_init_from_ucs, (rptr, encoding),
                             struct _reent *rptr,
                             const char *encoding)
@@ -116,11 +116,11 @@ _DEFUN(table_init_from_ucs, (rptr, encoding),
       ccsp->optimization = biccsp->from_ucs_type;
       ccsp->tbl = biccsp->from_ucs;
       
-      return (_VOID_PTR)ccsp;
+      return (void *)ccsp;
     }
     
 #ifdef _ICONV_ENABLE_EXTERNAL_CCS
-  return (_VOID_PTR)load_file (rptr, encoding, 1);
+  return (void *)load_file (rptr, encoding, 1);
 #else
   return NULL;
 #endif
@@ -128,7 +128,7 @@ _DEFUN(table_init_from_ucs, (rptr, encoding),
 
 static size_t
 _DEFUN(table_convert_from_ucs, (data, in, outbuf, outbytesleft),
-                               _VOID_PTR data,
+                               void *data,
                                ucs4_t in,
                                unsigned char **outbuf,
                                size_t *outbytesleft)
@@ -171,7 +171,7 @@ _DEFUN(table_convert_from_ucs, (data, in, outbuf, outbytesleft),
 #endif /* ICONV_FROM_UCS_CES_TABLE */
 
 #if defined (ICONV_TO_UCS_CES_TABLE)
-static _VOID_PTR
+static void *
 _DEFUN(table_init_to_ucs, (rptr, encoding),
                           struct _reent *rptr,
                           const char *encoding)
@@ -199,11 +199,11 @@ _DEFUN(table_init_to_ucs, (rptr, encoding),
       ccsp->optimization = biccsp->to_ucs_type;
       ccsp->tbl = biccsp->to_ucs;
       
-      return (_VOID_PTR)ccsp;
+      return (void *)ccsp;
     }
   
 #ifdef _ICONV_ENABLE_EXTERNAL_CCS
-  return (_VOID_PTR)load_file (rptr, encoding, 0);
+  return (void *)load_file (rptr, encoding, 0);
 #else
   return NULL;
 #endif
@@ -211,7 +211,7 @@ _DEFUN(table_init_to_ucs, (rptr, encoding),
 
 static ucs4_t
 _DEFUN(table_convert_to_ucs, (data, inbuf, inbytesleft),
-                             _VOID_PTR data,
+                             void *data,
                              const unsigned char **inbuf,
                              size_t *inbytesleft)
 {
@@ -254,7 +254,7 @@ _DEFUN(table_convert_to_ucs, (data, inbuf, inbytesleft),
 
 static int
 _DEFUN(table_get_mb_cur_max, (data),
-                             _VOID_PTR data)
+                             void *data)
 {
   return ((iconv_ccs_desc_t *)data)->bits/8;
 }
@@ -490,7 +490,7 @@ _DEFUN(load_file, (rptr, name, direction),
   if ((buf = (const unsigned char *)_malloc_r (rptr, hdrlen)) == NULL)
     goto error2;
 
-  if (_read_r (rptr, fd, (_VOID_PTR)buf, hdrlen) != hdrlen)
+  if (_read_r (rptr, fd, (void *)buf, hdrlen) != hdrlen)
     goto error3;
 
   if (_16BIT_ELT (EXTTABLE_VERSION_OFF) != TABLE_VERSION_1
@@ -559,33 +559,33 @@ _DEFUN(load_file, (rptr, name, direction),
     goto error4;
 
   if (_lseek_r (rptr, fd, off, SEEK_SET) == (off_t)-1
-      || _read_r (rptr, fd, (_VOID_PTR)ccsp->tbl, tbllen) != tbllen)
+      || _read_r (rptr, fd, (void *)ccsp->tbl, tbllen) != tbllen)
     goto error5;
 
   goto normal_exit;
 
 error5:
-  _free_r (rptr, (_VOID_PTR)ccsp->tbl);
+  _free_r (rptr, (void *)ccsp->tbl);
   ccsp->tbl = NULL;
 error4:
-  _free_r (rptr, (_VOID_PTR)ccsp);
+  _free_r (rptr, (void *)ccsp);
   ccsp = NULL;
 error3:
 normal_exit:
-  _free_r (rptr, (_VOID_PTR)buf);
+  _free_r (rptr, (void *)buf);
 error2:
   if (_close_r (rptr, fd) == -1)
     {
       if (ccsp != NULL)
         {
           if (ccsp->tbl != NULL)
-            _free_r (rptr, (_VOID_PTR)ccsp->tbl);
-          _free_r (rptr, (_VOID_PTR)ccsp);
+            _free_r (rptr, (void *)ccsp->tbl);
+          _free_r (rptr, (void *)ccsp);
         }
       ccsp = NULL;
     }
 error1:
-  _free_r (rptr, (_VOID_PTR)fname);
+  _free_r (rptr, (void *)fname);
   return ccsp;
 }
 #endif
