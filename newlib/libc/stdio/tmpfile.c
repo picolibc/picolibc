@@ -73,7 +73,7 @@ _DEFUN(_tmpfile_r, (ptr),
   e = ptr->_errno;
   if (!fp)
     _close_r (ptr, fd);
-  _CAST_VOID _remove_r (ptr, f);
+  (void) _remove_r (ptr, f);
   ptr->_errno = e;
   return fp;
 }

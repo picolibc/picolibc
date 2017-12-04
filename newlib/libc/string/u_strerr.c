@@ -7,9 +7,9 @@ _DEFUN(_user_strerror, (errnum, internal, errptr),
        int *errptr)
 {
   /* prevent warning about unused parameters */
-  _CAST_VOID errnum;
-  _CAST_VOID internal;
-  _CAST_VOID errptr;
+  (void) errnum;
+  (void) internal;
+  (void) errptr;
 
   return 0;
 }

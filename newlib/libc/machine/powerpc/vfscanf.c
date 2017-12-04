@@ -912,7 +912,7 @@ __svfscanf_r (rptr, fp, fmt0, ap)
 	  if (flags & NDIGITS)
 	    {
 	      if (p > buf)
-		_CAST_VOID ungetc (*(u_char *)-- p, fp);
+		(void) ungetc (*(u_char *)-- p, fp);
 	      goto match_failure;
 	    }
 	  c = ((u_char *) p)[-1];
@@ -1112,11 +1112,11 @@ __svfscanf_r (rptr, fp, fmt0, ap)
               --nread;
 	      if (c != 'e' && c != 'E')
 		{
-		  _CAST_VOID ungetc (c, fp);	/* sign */
+		  (void) ungetc (c, fp);	/* sign */
 		  c = *(u_char *)-- p;
                   --nread;
 		}
-	      _CAST_VOID ungetc (c, fp);
+	      (void) ungetc (c, fp);
 	    }
 	  if ((flags & SUPPRESS) == 0)
 	    {

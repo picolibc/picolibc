@@ -170,14 +170,14 @@ _DEFUN(_fgets_r, (ptr, buf, n, fp),
 	  len = ++t - p;
 	  fp->_r -= len;
 	  fp->_p = t;
-	  _CAST_VOID memcpy ((void *) s, (void *) p, len);
+	  (void) memcpy ((void *) s, (void *) p, len);
 	  s[len] = 0;
           _newlib_flockfile_exit (fp);
 	  return (buf);
 	}
       fp->_r -= len;
       fp->_p += len;
-      _CAST_VOID memcpy ((void *) s, (void *) p, len);
+      (void) memcpy ((void *) s, (void *) p, len);
       s += len;
     }
   while ((n -= len) != 0);

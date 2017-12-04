@@ -70,5 +70,5 @@ _DEFUN(setbuffer, (fp, buf, size),
        char *buf,
        int size)
 {
-  _CAST_VOID setvbuf (fp, buf, buf ? _IOFBF : _IONBF, (size_t) size);
+  (void) setvbuf (fp, buf, buf ? _IOFBF : _IONBF, (size_t) size);
 }

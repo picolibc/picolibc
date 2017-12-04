@@ -56,7 +56,7 @@ _DEFUN(_rewind_r, (ptr, fp),
        struct _reent * ptr,
        register FILE * fp)
 {
-  _CAST_VOID _fseek_r (ptr, fp, 0L, SEEK_SET);
+  (void) _fseek_r (ptr, fp, 0L, SEEK_SET);
   clearerr (fp);
 }
 

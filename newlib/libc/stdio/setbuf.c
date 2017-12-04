@@ -69,5 +69,5 @@ _DEFUN(setbuf, (fp, buf),
        FILE *__restrict fp,
        char *__restrict buf)
 {
-  _CAST_VOID setvbuf (fp, buf, buf ? _IOFBF : _IONBF, BUFSIZ);
+  (void) setvbuf (fp, buf, buf ? _IOFBF : _IONBF, BUFSIZ);
 }

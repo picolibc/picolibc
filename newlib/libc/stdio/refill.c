@@ -107,7 +107,7 @@ _DEFUN(__srefill_r, (ptr, fp),
       /* Ignore this file in _fwalk to avoid potential deadlock. */
       short orig_flags = fp->_flags;
       fp->_flags = 1;
-      _CAST_VOID _fwalk (_GLOBAL_REENT, lflush);
+      (void) _fwalk (_GLOBAL_REENT, lflush);
       fp->_flags = orig_flags;
 
       /* Now flush this file without locking it. */

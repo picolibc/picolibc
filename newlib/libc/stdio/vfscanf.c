@@ -367,7 +367,7 @@ _DEFUN(_sfread_r, (ptr, buf, size, count, fp),
 
   while (resid > (r = fp->_r))
     {
-      _CAST_VOID memcpy ((void *) p, (void *) fp->_p, (size_t) r);
+      (void) memcpy ((void *) p, (void *) fp->_p, (size_t) r);
       fp->_p += r;
       fp->_r = 0;
       p += r;
@@ -378,7 +378,7 @@ _DEFUN(_sfread_r, (ptr, buf, size, count, fp),
           return (total - resid) / size;
         }
     }
-  _CAST_VOID memcpy ((void *) p, (void *) fp->_p, resid);
+  (void) memcpy ((void *) p, (void *) fp->_p, resid);
   fp->_r -= resid;
   fp->_p += resid;
   return count;

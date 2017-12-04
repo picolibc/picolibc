@@ -230,7 +230,7 @@ _DEFUN(_cleanup_r, (ptr),
   if (ptr->_stderr != &__sf[2])
     (*cleanup_func) (ptr, ptr->_stderr);
 #endif
-  _CAST_VOID _fwalk_reent (ptr, cleanup_func);
+  (void) _fwalk_reent (ptr, cleanup_func);
 }
 
 #ifndef _REENT_ONLY
@@ -354,13 +354,13 @@ _DEFUN_VOID(__fp_lock_all)
 {
   __sfp_lock_acquire ();
 
-  _CAST_VOID _fwalk (_REENT, __fp_lock);
+  (void) _fwalk (_REENT, __fp_lock);
 }
 
 _VOID
 _DEFUN_VOID(__fp_unlock_all)
 {
-  _CAST_VOID _fwalk (_REENT, __fp_unlock);
+  (void) _fwalk (_REENT, __fp_unlock);
 
   __sfp_lock_release ();
 }

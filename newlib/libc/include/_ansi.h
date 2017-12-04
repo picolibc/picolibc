@@ -63,7 +63,6 @@
 #endif
 #define	_DEFUN(name, arglist, args)	name(args)
 #define	_DEFUN_VOID(name)		name(void)
-#define _CAST_VOID (void)
 #ifndef _LONG_DOUBLE
 #define _LONG_DOUBLE long double
 #endif
@@ -75,7 +74,6 @@
 #define	_EXFUN_NOTHROW(name, proto)	name()
 #define	_DEFUN(name, arglist, args)	name arglist args;
 #define	_DEFUN_VOID(name)		name()
-#define _CAST_VOID
 #define _LONG_DOUBLE double
 #endif
 

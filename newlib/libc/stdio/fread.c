@@ -173,7 +173,7 @@ _DEFUN(_fread_r, (ptr, buf, size, count, fp),
     {
       /* First copy any available characters from ungetc buffer.  */
       int copy_size = resid > fp->_r ? fp->_r : resid;
-      _CAST_VOID memcpy ((void *) p, (void *) fp->_p, (size_t) copy_size);
+      (void) memcpy ((void *) p, (void *) fp->_p, (size_t) copy_size);
       fp->_p += copy_size;
       fp->_r -= copy_size;
       p += copy_size;
@@ -222,7 +222,7 @@ _DEFUN(_fread_r, (ptr, buf, size, count, fp),
     {
       while (resid > (r = fp->_r))
 	{
-	  _CAST_VOID memcpy ((void *) p, (void *) fp->_p, (size_t) r);
+	  (void) memcpy ((void *) p, (void *) fp->_p, (size_t) r);
 	  fp->_p += r;
 	  /* fp->_r = 0 ... done in __srefill */
 	  p += r;
@@ -241,7 +241,7 @@ _DEFUN(_fread_r, (ptr, buf, size, count, fp),
 	      return (total - resid) / size;
 	    }
 	}
-      _CAST_VOID memcpy ((void *) p, (void *) fp->_p, resid);
+      (void) memcpy ((void *) p, (void *) fp->_p, resid);
       fp->_r -= resid;
       fp->_p += resid;
     }
