@@ -62,25 +62,12 @@
 	indent
 	catstr
 	"@end example\n" catstr
-
-	;
-
-: OLDTRAD_SYNOPSIS
-	skip_past_newline
-	"@strong{Traditional Synopsis}\n" catstr
-	"@example\n" catstr
-	get_stuff_in_command  
-	do_fancy_stuff
-	nokill_bogus_lines
-	indent
-	catstr
-	"@end example\n" catstr
-
+	"ANSI_SYNOPSIS is deprecated, use SYNOPSIS instead" warn
 	;
 
 : TRAD_SYNOPSIS
 	skip_past_newline
-
+	"TRAD_SYNOPSIS is obsolete and ignored" warn
 	;
 
 : INDEX 

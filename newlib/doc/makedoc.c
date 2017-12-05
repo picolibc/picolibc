@@ -1019,6 +1019,17 @@ WORD(maybecatstr)
     
 }
 
+/* write tos to stderr */
+WORD(warn)
+{
+    fputs("Warning: ", stderr);
+    fwrite(tos->ptr, tos->write_idx, 1, stderr);
+    fputc('\n', stderr);
+    delete_string(tos);
+    tos--;
+    pc++;
+}
+
 char *
 DEFUN(nextword,(string, word),
       char *string AND
@@ -1390,7 +1401,8 @@ char *av[])
     add_intrinsic("kill_bogus_lines", kill_bogus_lines);
     add_intrinsic("indent", indent);
     add_intrinsic("internalmode", internalmode);
-    
+    add_intrinsic("warn", warn);
+
     /* Put a nl at the start */
     catchar(&buffer,'\n');
 
