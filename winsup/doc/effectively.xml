@@ -96,40 +96,16 @@ programs in your environment.
 
 </sect2>
 
-<sect2 id="using-cygutils"><title>The cygutils package</title>
-
+<sect2 id="using-shortcuts"><title>Creating shortcuts</title>
 <para>
-The optional <systemitem>cygutils</systemitem> package contains
-miscellaneous tools that are small enough to not require their own package.
-It is not included in a default Cygwin install; select it from the Utils
-category in <command>setup.exe</command>. Several of the
-<systemitem>cygutils</systemitem> tools are useful for interacting with
-Windows.</para>
-
-<para>
-One of the hassles of Unix-Windows interoperability is the different line 
-endings on text files.  As mentioned in <xref linkend="using-textbinary"></xref>, 
-Unix tools such as <command>tr</command> can convert between CRLF and LF 
-endings, but <systemitem>cygutils</systemitem> provides several dedicated programs: 
-<command>conv</command>, <command>d2u</command>, <command>dos2unix</command>, 
-<command>u2d</command>, and <command>unix2dos</command>. Use the
-<literal>--help</literal> switch for usage information. 
-</para>
-</sect2>
-
-<sect2 id="using-shortcuts"><title>Creating shortcuts with cygutils</title>
-<para>
-Another problem area is between Unix-style links, which link one file
-to another, and Microsoft .lnk files, which provide a shortcut to a
-file.  They seem similar at first glance but, in reality, are fairly 
-different.  By default, Cygwin does not create symlinks as .lnk files,
-but there's an option to do that, see <xref linkend="using-cygwinenv"></xref>.
+By default, Cygwin does not create symlinks as .lnk files, but there's an
+option to do that, see <xref linkend="using-cygwinenv"></xref>.
 These symlink .lnk files are compatible with Windows-created .lnk files,
 but they are still different.  They do not include much of the information
 that is available in a standard Microsoft shortcut, such as the working
 directory, an icon, etc.  The <systemitem>cygutils</systemitem>
 package includes a <command>mkshortcut</command> utility for creating
-standard native Microsoft .lnk files.
+standard native Microsoft .lnk files from the command line.
 </para>
 
 <para>
@@ -144,11 +120,12 @@ Windows shortcuts.
 </para>
 </sect2>
   
-<sect2 id="using-printing"><title>Printing with cygutils</title>
+<sect2 id="using-printing"><title>Printing</title>
 <para>
 There are several options for printing from Cygwin, including the 
-<command>lpr</command> found in <systemitem>cygutils</systemitem> (not to be confused with the 
-native Windows <command>lpr.exe</command>). The easiest way to use <systemitem>cygutils</systemitem>' 
+<command>lpr</command> found in <systemitem>cygutils-extra</systemitem>
+(not to be confused with the native Windows <command>lpr.exe</command>).
+The easiest way to use <systemitem>cygutils-extra</systemitem>'s
 <command>lpr</command> is to specify a default device name in the 
 <envar>PRINTER</envar> environment variable.  You may also specify a device 
 on the command line with the <literal>-d</literal> or <literal>-P</literal> 

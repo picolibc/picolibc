@@ -71,10 +71,9 @@
       <para>
 	<ulink url="http://cygwin.com/cygwin-ug-net/using-utils.html"/>
       </para>
-      <para>The optional <package>cygutils</package> package also contains
-      utilities that help with common problems, such as
-      <command>dos2unix</command> and <command>unix2dos</command> for the
-      CRLF issue.</para>
+      <para>The optional <package>cygutils</package> and
+      <package>cygutils-extra</package> packages also contain utilities that
+      help with common problems.</para>
     </refsect1>
     <refsect1>
       <title>DOCUMENTATION</title>

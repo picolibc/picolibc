@@ -98,8 +98,8 @@ handle binmode files just fine.  A notable exception is the mini-editor
 and only produces output files with DOS CRLF lineendings.</para>
 
 <para>You can convert files between CRLF and LF lineendings by using
-certain tools in the Cygwin distribution like <command>d2u</command> and
-<command>u2d</command> from the cygutils package.  You can also specify
+certain tools in the Cygwin distribution like <command>dos2unix</command> and
+<command>unix2dos</command> from the dos2unix package.  You can also specify
 a directory in the mount table to be mounted in textmode so you can use
 that directory for exchange purposes.</para>
 
