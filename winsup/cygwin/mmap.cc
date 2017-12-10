@@ -917,6 +917,13 @@ mmap64 (void *addr, size_t len, int prot, int flags, int fd, off_t off)
       goto out;
     }
 
+  /* POSIX: When MAP_FIXED is not set, the implementation uses addr in an
+     implementation-defined manner to arrive at pa [the return address].
+     Given that we refuse addr if it's not exactly at a page boundary, we
+     can just make sure addr does so indiscriminately.  Just round down
+     to the next lower page boundary. */
+  addr = (void *) rounddown ((uintptr_t) addr, pagesize);
+
   if (!anonymous (flags) && fd != -1)
     {
       /* Ensure that fd is open */
