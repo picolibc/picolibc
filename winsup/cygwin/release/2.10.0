@@ -25,3 +25,6 @@ Bug Fixes
 
 - Fix two bugs in the limit of large numbers of sockets.
   Addresses: https://cygwin.com/ml/cygwin/2017-11/msg00052.html
+
+- Fix a fork failure with private anonymous mmaps.
+  Addresses: https://cygwin.com/ml/cygwin/2017-12/msg00061.html
