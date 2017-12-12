@@ -108,7 +108,9 @@
 		    if (_LIB_VERSION == _SVID_) 
 		        exc.retval = 0.0;
 		    else 
-		        exc.retval = 0.0/0.0;	/* X/Open allow NaN */
+		        /* Use a float divide, to avoid a soft-float double
+			   divide call on single-float only targets.  */
+		        exc.retval = (0.0f/0.0f);	/* X/Open allow NaN */
 		    if (_LIB_VERSION == _POSIX_) 
 		        errno = EDOM;
 		    else if (!matherr(&exc)) {
