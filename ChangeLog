@@ -1,3 +1,7 @@
+2017-12-14  Nick Clifton  <nickc@redhat.com>
+
+	* COPYING.LIBGLOSS: Update address of FSF in copyright notice.
+
 2016-06-23  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* Sync toplevel with upstream GCC.
