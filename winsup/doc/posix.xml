@@ -888,6 +888,7 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     sigset
     sigsetjmp
     sigsuspend
+    sigtimedwait
     sigwait
     sigwaitinfo
     sin
@@ -1582,7 +1583,6 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     pthread_mutex_consistent
     putmsg
     setnetent
-    sigtimedwait
     timer_getoverrun
     ulimit
     waitid

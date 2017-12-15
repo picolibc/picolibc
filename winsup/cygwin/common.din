@@ -1326,6 +1326,7 @@ sigrelse SIGFE
 sigset SIGFE
 sigsetjmp NOSIGFE
 sigsuspend SIGFE
+sigtimedwait SIGFE
 sigwait SIGFE
 sigwaitinfo SIGFE
 sin NOSIGFE
