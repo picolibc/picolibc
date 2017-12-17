@@ -168,11 +168,9 @@ int _EXFUN(sigprocmask, (int how, const sigset_t *set, sigset_t *oset));
 int _EXFUN(pthread_sigmask, (int how, const sigset_t *set, sigset_t *oset));
 #endif
 
-#if defined(__CYGWIN__) || defined(__rtems__)
 #ifdef _COMPILING_NEWLIB
 int _EXFUN(_kill, (pid_t, int));
 #endif /* _COMPILING_NEWLIB */
-#endif /* __CYGWIN__ || __rtems__ */
 
 #if __POSIX_VISIBLE
 int _EXFUN(kill, (pid_t, int));
