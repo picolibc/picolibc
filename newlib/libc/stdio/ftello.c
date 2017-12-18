@@ -99,7 +99,7 @@ _DEFUN(_ftello_r, (ptr, fp),
     {
       ptr->_errno = ESPIPE;
       _newlib_flockfile_exit (fp);
-      return -1L;
+      return (_off_t) -1;
     }
 
   /* Find offset of underlying I/O object, then adjust for buffered
@@ -113,10 +113,10 @@ _DEFUN(_ftello_r, (ptr, fp),
   else
     {
       pos = fp->_seek (ptr, fp->_cookie, (_fpos_t) 0, SEEK_CUR);
-      if (pos == -1L)
+      if (pos == (_fpos_t) -1)
         {
           _newlib_flockfile_exit (fp);
-          return pos;
+          return (_off_t) -1;
         }
     }
   if (fp->_flags & __SRD)
@@ -141,7 +141,7 @@ _DEFUN(_ftello_r, (ptr, fp),
     }
 
   _newlib_flockfile_end (fp);
-  return pos;
+  return (_off_t) pos;
 }
 
 #ifndef _REENT_ONLY
