@@ -102,13 +102,19 @@ _DEFUN(_ftello_r, (ptr, fp),
       return (_off_t) -1;
     }
 
-  /* Find offset of underlying I/O object, then adjust for buffered
-     bytes.  Flush a write stream, since the offset may be altered if
-     the stream is appending.  Do not flush a read stream, since we
-     must not lose the ungetc buffer.  */
-  if (fp->_flags & __SWR)
-    _fflush_r (ptr, fp);
-  if (fp->_flags & __SOFF)
+  /* Find offset of underlying I/O object, then adjust for buffered bytes. */
+  if (!(fp->_flags & __SRD) && (fp->_flags & __SWR) &&
+      fp->_p != NULL && fp->_p - fp->_bf._base > 0 &&
+      (fp->_flags & __SAPP))
+    {
+      pos = fp->_seek (ptr, fp->_cookie, (_fpos_t) 0, SEEK_END);
+      if (pos == (_fpos_t) -1)
+	{
+          _newlib_flockfile_exit (fp);
+          return (_off_t) -1;
+	}
+    }
+  else if (fp->_flags & __SOFF)
     pos = fp->_offset;
   else
     {
