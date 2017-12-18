@@ -21,7 +21,7 @@ scanf/wscanf now handle the POSIX %m modifier.
 </para></listitem>
 
 <listitem><para>
-New API: wmempcpy.
+New APIs: sigtimedwait, wmempcpy.
 </para></listitem>
 
 </itemizedlist>

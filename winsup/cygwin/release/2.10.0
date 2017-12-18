@@ -7,7 +7,7 @@ What's new:
 
 - scanf now handles the %l[ conversion.
 
-- New API: wmempcpy.
+- New APIs: sigtimedwait, wmempcpy.
 
 
 What changed:
@@ -28,3 +28,6 @@ Bug Fixes
 
 - Fix a fork failure with private anonymous mmaps.
   Addresses: https://cygwin.com/ml/cygwin/2017-12/msg00061.html
+
+- Remove a call to fflush from ftell{o}, which may result in wrong offsets.
+  Addresses: https://cygwin.com/ml/cygwin/2017-12/msg00151.html
