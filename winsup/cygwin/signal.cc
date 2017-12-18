@@ -575,51 +575,7 @@ siginterrupt (int sig, int flag)
   return res;
 }
 
-static int sigwait_common (const sigset_t *, siginfo_t *, PLARGE_INTEGER);
-
-extern "C" int
-sigtimedwait (const sigset_t *set, siginfo_t *info, const timespec *timeout)
-{
-  LARGE_INTEGER waittime;
-
-  if (timeout)
-    {
-      if (timeout->tv_sec < 0
-	    || timeout->tv_nsec < 0 || timeout->tv_nsec > (NSPERSEC * 100LL))
-	{
-	  set_errno (EINVAL);
-	  return -1;
-	}
-      /* convert timespec to 100ns units */
-      waittime.QuadPart = (LONGLONG) timeout->tv_sec * NSPERSEC
-                          + ((LONGLONG) timeout->tv_nsec + 99LL) / 100LL;
-    }
-
-  return sigwait_common (set, info, timeout ? &waittime : cw_infinite);
-}
-
-extern "C" int
-sigwait (const sigset_t *set, int *sig_ptr)
-{
-  int sig;
-
-  do
-    {
-      sig = sigwait_common (set, NULL, cw_infinite);
-    }
-  while (sig == -1 && get_errno () == EINTR);
-  if (sig > 0)
-    *sig_ptr = sig;
-  return sig > 0 ? 0 : get_errno ();
-}
-
-extern "C" int
-sigwaitinfo (const sigset_t *set, siginfo_t *info)
-{
-  return sigwait_common (set, info, cw_infinite);
-}
-
-static int
+static inline int
 sigwait_common (const sigset_t *set, siginfo_t *info, PLARGE_INTEGER waittime)
 {
   int res = -1;
@@ -662,6 +618,48 @@ sigwait_common (const sigset_t *set, siginfo_t *info, PLARGE_INTEGER waittime)
   __endtry
   sigproc_printf ("returning signal %d", res);
   return res;
+}
+
+extern "C" int
+sigtimedwait (const sigset_t *set, siginfo_t *info, const timespec *timeout)
+{
+  LARGE_INTEGER waittime;
+
+  if (timeout)
+    {
+      if (timeout->tv_sec < 0
+	    || timeout->tv_nsec < 0 || timeout->tv_nsec > (NSPERSEC * 100LL))
+	{
+	  set_errno (EINVAL);
+	  return -1;
+	}
+      /* convert timespec to 100ns units */
+      waittime.QuadPart = (LONGLONG) timeout->tv_sec * NSPERSEC
+                          + ((LONGLONG) timeout->tv_nsec + 99LL) / 100LL;
+    }
+
+  return sigwait_common (set, info, timeout ? &waittime : cw_infinite);
+}
+
+extern "C" int
+sigwait (const sigset_t *set, int *sig_ptr)
+{
+  int sig;
+
+  do
+    {
+      sig = sigwait_common (set, NULL, cw_infinite);
+    }
+  while (sig == -1 && get_errno () == EINTR);
+  if (sig > 0)
+    *sig_ptr = sig;
+  return sig > 0 ? 0 : get_errno ();
+}
+
+extern "C" int
+sigwaitinfo (const sigset_t *set, siginfo_t *info)
+{
+  return sigwait_common (set, info, cw_infinite);
 }
 
 /* FIXME: SUSv3 says that this function should block until the signal has
