@@ -31,3 +31,6 @@ Bug Fixes
 
 - Remove a call to fflush from ftell{o}, which may result in wrong offsets.
   Addresses: https://cygwin.com/ml/cygwin/2017-12/msg00151.html
+
+- Fix file pointer computation after short writes on block devices.
+  Addresses: https://cygwin.com/ml/cygwin/2017-12/msg00151.html
