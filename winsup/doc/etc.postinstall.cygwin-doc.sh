@@ -52,7 +52,7 @@ fi
 # create User Guide and API PDF and HTML shortcuts
 while read target name desc
 do
-	[ -r $t ] && $mks $CYGWINFORALL -P -n "Cygwin/$name" -d "$desc" -- $target
+	[ -r $target ] && $mks $CYGWINFORALL -P -n "Cygwin/$name" -d "$desc" -- $target
 done <<EOF
 $doc/cygwin-ug-net.pdf		User\ Guide\ \(PDF\)  Cygwin\ User\ Guide\ PDF
 $html/cygwin-ug-net/index.html	User\ Guide\ \(HTML\) Cygwin\ User\ Guide\ HTML
