@@ -10,9 +10,9 @@
 
 doc=/usr/share/doc/cygwin-doc
 site=https://cygwin.com
-cygp=/bin/cygpath
-mks=/bin/mkshortcut
-launch=/bin/cygstart
+cygp=/usr/bin/cygpath
+mks=/usr/bin/mkshortcut
+launch=/usr/bin/cygstart
 
 html=$doc/html
 
@@ -29,7 +29,7 @@ done
 # check for programs
 for p in $cygp $mks $launch
 do
-	if [ ! -x $p ]
+	if [ ! -x "$p" ]
 	then
 		echo "Can't find program '$p'"
 		exit 2
@@ -52,7 +52,7 @@ fi
 # create User Guide and API PDF and HTML shortcuts
 while read target name desc
 do
-	[ -r $target ] && $mks $CYGWINFORALL -P -n "Cygwin/$name" -d "$desc" -- $target
+	[ -r "$target" ] && $mks $CYGWINFORALL -P -n "Cygwin/$name" -d "$desc" -- $target
 done <<EOF
 $doc/cygwin-ug-net.pdf		User\ Guide\ \(PDF\)  Cygwin\ User\ Guide\ PDF
 $html/cygwin-ug-net/index.html	User\ Guide\ \(HTML\) Cygwin\ User\ Guide\ HTML

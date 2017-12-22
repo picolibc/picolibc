@@ -9,7 +9,8 @@
 # exits quietly if directory does not exist as presumably no shortcuts desired
 
 doc=/usr/share/doc/cygwin-doc
-cygp=/bin/cygpath
+site=https://cygwin.com
+cygp=/usr/bin/cygpath
 rm=/bin/rm
 
 html=$doc/html
@@ -17,7 +18,7 @@ html=$doc/html
 # check for programs
 for p in $cygp $rm
 do
-	if [ ! -x $p ]
+	if [ ! -x "$p" ]
 	then
 		echo "Can't find program '$p'"
 		exit 2
