@@ -119,6 +119,15 @@ Supporting OS subroutines required:
 #include "../stdlib/local.h"
 #include "nano-vfscanf_local.h"
 
+/* GCC PR 14577 at https://gcc.gnu.org/bugzilla/show_bug.cgi?id=14557 */
+#if __STDC_VERSION__ >= 201112L
+#define va_ptr(ap) _Generic(&(ap), va_list *: &(ap), default: (va_list *)(ap))
+#elif __GNUC__ >= 4
+#define va_ptr(ap) __builtin_choose_expr(__builtin_types_compatible_p(__typeof__(&(ap)), va_list *), &(ap), (va_list *)(ap))
+#else
+#define va_ptr(ap) (sizeof(ap) == sizeof(va_list) ? (va_list *)&(ap) : (va_list *)(ap))
+#endif
+
 #define VFSCANF vfscanf
 #define _VFSCANF_R _vfscanf_r
 #define __SVFSCANF __svfscanf
@@ -424,12 +433,12 @@ _DEFUN(__SVFSCANF_R, (rptr, fp, fmt0, ap),
 	}
       ret = 0;
       if (scan_data.code < CT_INT)
-	ret = _scanf_chars (rptr, &scan_data, fp, &ap);
+	ret = _scanf_chars (rptr, &scan_data, fp, va_ptr(ap));
       else if (scan_data.code < CT_FLOAT)
-	ret = _scanf_i (rptr, &scan_data, fp, &ap);
+	ret = _scanf_i (rptr, &scan_data, fp, va_ptr(ap));
 #ifdef FLOATING_POINT
       else if (_scanf_float)
-	ret = _scanf_float (rptr, &scan_data, fp, &ap);
+	ret = _scanf_float (rptr, &scan_data, fp, va_ptr(ap));
 #endif
 
       if (ret == MATCH_FAILURE)

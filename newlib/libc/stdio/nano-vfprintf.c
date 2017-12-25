@@ -168,6 +168,16 @@ static char *rcsid = "$Id$";
 #include "vfieeefp.h"
 #include "nano-vfprintf_local.h"
 
+
+/* GCC PR 14577 at https://gcc.gnu.org/bugzilla/show_bug.cgi?id=14557 */
+#if __STDC_VERSION__ >= 201112L
+#define va_ptr(ap) _Generic(&(ap), va_list *: &(ap), default: (va_list *)(ap))
+#elif __GNUC__ >= 4
+#define va_ptr(ap) __builtin_choose_expr(__builtin_types_compatible_p(__typeof__(&(ap)), va_list *), &(ap), (va_list *)(ap))
+#else
+#define va_ptr(ap) (sizeof(ap) == sizeof(va_list) ? (va_list *)&(ap) : (va_list *)(ap))
+#endif
+
 /* The __ssputs_r function is shared between all versions of vfprintf
    and vfwprintf.  */
 #ifdef STRING_ONLY
@@ -633,12 +643,12 @@ _DEFUN(_VFPRINTF_R, (data, fp, fmt0, ap),
 	    }
 	  else
 	    {
-	      n = _printf_float (data, &prt_data, fp, pfunc, &ap);
+	      n = _printf_float (data, &prt_data, fp, pfunc, va_ptr(ap));
 	    }
 	}
       else
 #endif
-	n = _printf_i (data, &prt_data, fp, pfunc, &ap);
+	n = _printf_i (data, &prt_data, fp, pfunc, va_ptr(ap));
 
       if (n == -1)
 	goto error;
