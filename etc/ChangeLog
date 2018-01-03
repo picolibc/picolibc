@@ -1,3 +1,9 @@
+2018-01-03  Alan Modra  <amodra@gmail.com>
+
+	* add-log.el: Update copyright year range.
+	* texi2pod.pl: Likewise.
+	* update-copyright.py: Likewise.
+
 2017-12-14  Nick Clifton  <nickc@redhat.com>
 
 	* add-log.el: Update address of FSF in copyright notice.
