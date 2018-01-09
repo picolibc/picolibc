@@ -2098,6 +2098,8 @@ _DEFUN(get_arg, (data, n, fmt, ap, numargs_p, args, arg_type, last_fmt),
 
       if (*fmt == '\0')
 	break;
+
+      fmt++;
 # endif /* ! _MB_CAPABLE */
       state = START;
       flags = 0;
