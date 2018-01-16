@@ -582,6 +582,10 @@ int	_EXFUN(unlinkat, (int, const char *, int));
 #define _CS_POSIX_V7_THREADS_LDFLAGS          19
 #define _CS_V7_ENV                            20
 #define _CS_V6_ENV                            _CS_V7_ENV
+#define _CS_LFS_CFLAGS                        21
+#define _CS_LFS_LDFLAGS                       22
+#define _CS_LFS_LIBS                          23
+#define _CS_LFS_LINTFLAGS                     24
 #endif
 
 #ifdef __cplusplus

@@ -719,10 +719,14 @@ static struct
   {ls ("")},				/* _CS_POSIX_V7_THREADS_CFLAGS */
   {ls ("")},				/* _CS_POSIX_V7_THREADS_LDFLAGS */
   {ls ("POSIXLY_CORRECT=1")},		/* _CS_V7_ENV */
+  {ls ("")},				/* _CS_LFS_CFLAGS */
+  {ls ("")},				/* _CS_LFS_LDFLAGS */
+  {ls ("")},				/* _CS_LFS_LIBS */
+  {ls ("")},				/* _CS_LFS_LINTFLAGS */
 };
 
 #define CS_MIN _CS_PATH
-#define CS_MAX _CS_V7_ENV
+#define CS_MAX _CS_LFS_LINTFLAGS
 
 extern "C" size_t
 confstr (int in, char *buf, size_t len)

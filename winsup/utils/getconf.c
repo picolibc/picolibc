@@ -97,6 +97,10 @@ static const struct conf_variable conf_table[] =
   { "XBS5_WIDTH_RESTRICTED_ENVS",	CONFSTR,	_CS_XBS5_WIDTH_RESTRICTED_ENVS	},
   { "V7_ENV",				CONFSTR,	_CS_V7_ENV	},
   { "V6_ENV",				CONFSTR,	_CS_V6_ENV	},
+  { "LFS_CFLAGS",			CONFSTR,	_CS_LFS_CFLAGS	},
+  { "LFS_LDFLAGS",			CONFSTR,	_CS_LFS_LDFLAGS	},
+  { "LFS_LIBS",				CONFSTR,	_CS_LFS_LIBS	},
+  { "LFS_LINTFLAGS",			CONFSTR,	_CS_LFS_LINTFLAGS	},
 
   /* Symbolic constants from <limits.h> */
   { "_POSIX_AIO_LISTIO_MAX",		CONSTANT,	_POSIX_AIO_LISTIO_MAX	},
