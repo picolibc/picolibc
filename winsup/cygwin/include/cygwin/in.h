@@ -18,7 +18,7 @@
 #ifndef _CYGWIN_IN_H
 #define _CYGWIN_IN_H
 
-#include <cygwin/socket.h>
+#include <sys/socket.h>
 
 #ifndef _IN_ADDR_T_DECLARED
 typedef	__uint32_t	in_addr_t;
