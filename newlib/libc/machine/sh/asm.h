@@ -1,8 +1,4 @@
-#ifdef __STDC__
-# define _C_LABEL(x)    _ ## x
-#else
-# define _C_LABEL(x)    _/**/x
-#endif
+#define _C_LABEL(x)    _ ## x
 #define _ASM_LABEL(x)   x
 
 #if __SH5__

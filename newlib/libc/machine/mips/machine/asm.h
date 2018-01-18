@@ -130,11 +130,7 @@
 #endif
 
 /* Concatenate two names. */
-#ifdef __STDC__
-# define _ASMCONCAT(A, B) A ## B
-#else
-# define _ASMCONCAT(A, B) A/**/B
-#endif
+#define _ASMCONCAT(A, B) A ## B
 
 /* Name of reset code section. */
 #ifndef _RESET_SECTION
