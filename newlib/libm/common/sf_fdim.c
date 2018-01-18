@@ -6,13 +6,7 @@
 
 #include "fdlibm.h"
 
-#ifdef __STDC__
 	float fdimf(float x, float y)
-#else
-	float fdimf(x,y)
-	float x;
-	float y;
-#endif
 {
   int c = __fpclassifyf(x);
   if (c == FP_NAN)  return(x);
@@ -25,13 +19,7 @@
 
 #ifdef _DOUBLE_IS_32BITS
 
-#ifdef __STDC__
 	double fdim(double x, double y)
-#else
-	double fdim(x,y)
-	double x;
-	double y;
-#endif
 {
   return (double) fdimf((float) x, (float) y);
 }

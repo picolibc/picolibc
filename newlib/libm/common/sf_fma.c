@@ -6,14 +6,7 @@
 
 #include "fdlibm.h"
 
-#ifdef __STDC__
 	float fmaf(float x, float y, float z)
-#else
-	float fmaf(x,y,z)
-	float x;
-	float y;
-        float z;
-#endif
 {
   /* NOTE:  The floating-point exception behavior of this is not as
    * required.  But since the basic function is not really done properly,
@@ -27,14 +20,7 @@
 
 #ifdef _DOUBLE_IS_32BITS
 
-#ifdef __STDC__
 	double fma(double x, double y, double z)
-#else
-	double fma(x,y,z)
-	double x;
-	double y;
-        double z;
-#endif
 {
   return (double) fmaf((float) x, (float) y, (float) z);
 }

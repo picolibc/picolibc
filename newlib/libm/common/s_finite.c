@@ -20,12 +20,7 @@
 
 #ifndef _DOUBLE_IS_32BITS
 
-#ifdef __STDC__
 	int finite(double x)
-#else
-	int finite(x)
-	double x;
-#endif
 {
 	__int32_t hx;
 	GET_HIGH_WORD(hx,x);

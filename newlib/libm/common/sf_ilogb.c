@@ -16,12 +16,7 @@
 #include <limits.h>
 #include "fdlibm.h"
 
-#ifdef __STDC__
 	int ilogbf(float x)
-#else
-	int ilogbf(x)
-	float x;
-#endif
 {
 	__int32_t hx,ix;
 
@@ -42,12 +37,7 @@
 
 #ifdef _DOUBLE_IS_32BITS
 
-#ifdef __STDC__
 	int ilogb(double x)
-#else
-	int ilogb(x)
-	double x;
-#endif
 {
 	return ilogbf((float) x);
 }

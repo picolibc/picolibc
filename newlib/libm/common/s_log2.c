@@ -72,12 +72,7 @@ C99, POSIX, System V Interface Definition (Issue 6).
 
 #ifndef _DOUBLE_IS_32BITS
 
-#ifdef __STDC__
 	double log2(double x)		/* wrapper log2 */
-#else
-	double log2(x)			/* wrapper log2 */
-	double x;
-#endif
 {
   return (log(x) / M_LN2);
 }

@@ -55,12 +55,7 @@ Definition (Issue 2).
 
 #ifndef _DOUBLE_IS_32BITS
 
-#ifdef __STDC__
 	double copysign(double x, double y)
-#else
-	double copysign(x,y)
-	double x,y;
-#endif
 {
 	__uint32_t hx,hy;
 	GET_HIGH_WORD(hx,x);

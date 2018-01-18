@@ -20,12 +20,7 @@
 
 #include "fdlibm.h"
 
-#ifdef __STDC__
 	int finitef(float x)
-#else
-	int finitef(x)
-	float x;
-#endif
 {
 	__int32_t ix;
 	GET_FLOAT_WORD(ix,x);
@@ -35,12 +30,7 @@
 
 #ifdef _DOUBLE_IS_32BITS
 
-#ifdef __STDC__
 	int finite(double x)
-#else
-	int finite(x)
-	double x;
-#endif
 {
 	return finitef((float) x);
 }

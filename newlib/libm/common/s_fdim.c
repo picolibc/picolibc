@@ -41,13 +41,7 @@ ANSI C, POSIX.
 
 #ifndef _DOUBLE_IS_32BITS
 
-#ifdef __STDC__
 	double fdim(double x, double y)
-#else
-	double fdim(x,y)
-	double x;
-	double y;
-#endif
 {
   int c = __fpclassifyd(x);
   if (c == FP_NAN)  return(x);

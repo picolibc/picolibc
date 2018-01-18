@@ -21,22 +21,13 @@
 
 #ifndef _DOUBLE_IS_32BITS
 
-#ifdef __STDC__
 static const double
-#else
-static double
-#endif
 two54   =  1.80143985094819840000e+16, /* 0x43500000, 0x00000000 */
 twom54  =  5.55111512312578270212e-17, /* 0x3C900000, 0x00000000 */
 huge   = 1.0e+300,
 tiny   = 1.0e-300;
 
-#ifdef __STDC__
 	double scalbln (double x, long int n)
-#else
-	double scalbln (x,n)
-	double x; long int n;
-#endif
 {
 	__int32_t k,hx,lx;
 	EXTRACT_WORDS(hx,lx,x);

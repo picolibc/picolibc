@@ -192,12 +192,7 @@ QUICKREF
 
 #undef isnan
 
-#ifdef __STDC__
 	int isnan(double x)
-#else
-	int isnan(x)
-	double x;
-#endif
 {
 	__int32_t hx,lx;
 	EXTRACT_WORDS(hx,lx,x);

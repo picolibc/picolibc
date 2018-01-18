@@ -123,12 +123,8 @@
 #define FLT_SMALLEST_EXP -22
 #endif
 
-#ifdef __STDC__
 #undef __P
 #define	__P(p)	p
-#else
-#define	__P(p)	()
-#endif
 
 /* 
  * set X_TLOSS = pi*2**52, which is possibly defined in <values.h>

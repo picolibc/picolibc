@@ -15,12 +15,7 @@
 
 #include "fdlibm.h"
 
-#ifdef __STDC__
 	float nextafterf(float x, float y)
-#else
-	float nextafterf(x,y)
-	float x,y;
-#endif
 {
 	__int32_t	hx,hy,ix,iy;
 
@@ -66,12 +61,7 @@
 
 #ifdef _DOUBLE_IS_32BITS
 
-#ifdef __STDC__
 	double nextafter(double x, double y)
-#else
-	double nextafter(x,y)
-	double x,y;
-#endif
 {
 	return (double) nextafterf((float) x, (float) x);
 }

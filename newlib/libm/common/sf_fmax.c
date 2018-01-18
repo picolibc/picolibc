@@ -6,13 +6,7 @@
 
 #include "fdlibm.h"
 
-#ifdef __STDC__
 	float fmaxf(float x, float y)
-#else
-	float fmaxf(x,y)
-	float x;
-	float y;
-#endif
 {
   if (__fpclassifyf(x) == FP_NAN)
     return y;
@@ -24,13 +18,7 @@
 
 #ifdef _DOUBLE_IS_32BITS
 
-#ifdef __STDC__
 	double fmax(double x, double y)
-#else
-	double fmax(x,y)
-	double x;
-	double y;
-#endif
 {
   return (double) fmaxf((float) x, (float) y);
 }

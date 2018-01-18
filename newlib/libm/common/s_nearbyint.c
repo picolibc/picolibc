@@ -51,12 +51,7 @@ SEEALSO
 
 #ifndef _DOUBLE_IS_32BITS
 
-#ifdef __STDC__
 	double nearbyint(double x)
-#else
-	double nearbyint(x)
-	double x;
-#endif
 {
   return rint(x);
 }

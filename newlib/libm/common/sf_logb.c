@@ -21,12 +21,7 @@
 #include "fdlibm.h"
 
 float
-#ifdef __STDC__
 logbf(float x)
-#else
-logbf(x)
-float x;
-#endif
 {
 	__int32_t hx,ix;
 
@@ -49,12 +44,7 @@ float x;
 
 #ifdef _DOUBLE_IS_32BITS
 
-#ifdef __STDC__
 	double logb(double x)
-#else
-	double logb(x)
-	double x;
-#endif
 {
 	return (double) logbf((float) x);
 }

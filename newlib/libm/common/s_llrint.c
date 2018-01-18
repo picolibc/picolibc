@@ -25,11 +25,7 @@
 
 #ifndef _DOUBLE_IS_32BITS
 
-#ifdef __STDC__
 static const double
-#else
-static double 
-#endif
 
 /* Adding a double, x, to 2^52 will cause the result to be rounded based on
    the fractional part of x, according to the implementation's current rounding
@@ -41,12 +37,7 @@ TWO52[2]={
 };
 
 long long int
-#ifdef __STDC__
 	llrint(double x)
-#else
-	llrint(x)
-	double x;
-#endif
 {
   __int32_t i0,j0,sx;
   __uint32_t i1;

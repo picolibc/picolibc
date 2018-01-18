@@ -15,18 +15,9 @@
 
 #include "fdlibm.h"
 
-#ifdef __STDC__
 static const float one = 1.0;
-#else
-static float one = 1.0;
-#endif
 
-#ifdef __STDC__
 	float modff(float x, float *iptr)
-#else
-	float modff(x, iptr)
-	float x,*iptr;
-#endif
 {
 	__int32_t i0,j0;
 	__uint32_t i;
@@ -60,12 +51,7 @@ static float one = 1.0;
 
 #ifdef _DOUBLE_IS_32BITS
 
-#ifdef __STDC__
 	double modf(double x, double *iptr)
-#else
-	double modf(x, iptr)
-	double x,*iptr;
-#endif
 {
 	return (double) modff((float) x, (float *) iptr);
 }

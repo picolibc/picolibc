@@ -65,12 +65,7 @@ C99, POSIX
 
 #ifndef _DOUBLE_IS_32BITS
 
-#ifdef __STDC__
 	int ilogb(double x)
-#else
-	int ilogb(x)
-	double x;
-#endif
 {
 	__int32_t hx,lx,ix;
 

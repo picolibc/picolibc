@@ -15,22 +15,13 @@
 
 #include "fdlibm.h"
 
-#ifdef __STDC__
 static const float
-#else
-static float 
-#endif
 TWO23[2]={
   8.3886080000e+06, /* 0x4b000000 */
  -8.3886080000e+06, /* 0xcb000000 */
 };
 
-#ifdef __STDC__
 	float rintf(float x)
-#else
-	float rintf(x)
-	float x;
-#endif
 {
 	__int32_t i0,j0,sx;
 	__uint32_t i,i1,ix;
@@ -71,12 +62,7 @@ TWO23[2]={
 
 #ifdef _DOUBLE_IS_32BITS
 
-#ifdef __STDC__
 	double rint(double x)
-#else
-	double rint(x)
-	double x;
-#endif
 {
 	return (double) rintf((float) x);
 }
