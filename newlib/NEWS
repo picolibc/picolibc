@@ -1,3 +1,16 @@
+*** Major changes in newlib version 3.0.0:
+
+- K&R support removed in code and docs
+- 64-bit time_t support
+- riscv platform support added
+- new expf, exp2f, logf, and powf implementations
+- unification of lock object names
+- locking routine retargetting at link time
+- new long double complex math routines
+- various ARM optimizations
+- various POSIX/BSD additions
+- further feature test macros overhaul
+
 *** Major changes in newlib version 2.5.0:
 
 - memory.h added
