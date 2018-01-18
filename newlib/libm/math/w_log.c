@@ -53,12 +53,7 @@ PORTABILITY
 
 #ifndef _DOUBLE_IS_32BITS
 
-#ifdef __STDC__
 	double log(double x)		/* wrapper log */
-#else
-	double log(x)			/* wrapper log */
-	double x;
-#endif
 {
 #ifdef _IEEE_LIBM
 	return __ieee754_log(x);

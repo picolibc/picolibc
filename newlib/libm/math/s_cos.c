@@ -46,12 +46,7 @@
 
 #ifndef _DOUBLE_IS_32BITS
 
-#ifdef __STDC__
 	double cos(double x)
-#else
-	double cos(x)
-	double x;
-#endif
 {
 	double y[2],z=0.0;
 	__int32_t n,ix;

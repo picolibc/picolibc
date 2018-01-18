@@ -21,18 +21,9 @@
 
 #include "fdlibm.h"
 
-#ifdef __STDC__
 static const float one = 1.0, Zero[] = {0.0, -0.0,};
-#else
-static float one = 1.0, Zero[] = {0.0, -0.0,};
-#endif
 
-#ifdef __STDC__
 	float __ieee754_fmodf(float x, float y)
-#else
-	float __ieee754_fmodf(x,y)
-	float x,y ;
-#endif
 {
 	__int32_t n,hx,hy,hz,ix,iy,sx,i;
 

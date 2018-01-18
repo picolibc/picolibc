@@ -20,12 +20,7 @@
 #include "fdlibm.h"
 #include <errno.h>
 
-#ifdef __STDC__
 	float hypotf(float x, float y)	/* wrapper hypotf */
-#else
-	float hypotf(x,y)		/* wrapper hypotf */
-	float x,y;
-#endif
 {
 #ifdef _IEEE_LIBM
 	return __ieee754_hypotf(x,y);
@@ -66,12 +61,7 @@
 
 #ifdef _DOUBLE_IS_32BITS
 
-#ifdef __STDC__
 	double hypot(double x, double y)
-#else
-	double hypot(x,y)
-	double x,y;
-#endif
 {
 	return (double) hypotf((float) x, (float) y);
 }

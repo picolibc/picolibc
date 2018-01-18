@@ -21,12 +21,7 @@
 #include "fdlibm.h"
 #include <errno.h>
 
-#ifdef __STDC__
 	float acoshf(float x)		/* wrapper acoshf */
-#else
-	float acoshf(x)			/* wrapper acoshf */
-	float x;
-#endif
 {
 #ifdef _IEEE_LIBM
 	return __ieee754_acoshf(x);
@@ -57,12 +52,7 @@
 
 #ifdef _DOUBLE_IS_32BITS
 
-#ifdef __STDC__
 	double acosh(double x)
-#else
-	double acosh(x)
-	double x;
-#endif
 {
 	return (double) acoshf((float) x);
 }

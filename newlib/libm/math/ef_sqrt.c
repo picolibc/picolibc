@@ -15,18 +15,9 @@
 
 #include "fdlibm.h"
 
-#ifdef __STDC__
 static	const float	one	= 1.0, tiny=1.0e-30;
-#else
-static	float	one	= 1.0, tiny=1.0e-30;
-#endif
 
-#ifdef __STDC__
 	float __ieee754_sqrtf(float x)
-#else
-	float __ieee754_sqrtf(x)
-	float x;
-#endif
 {
 	float z;
 	__uint32_t r,hx;

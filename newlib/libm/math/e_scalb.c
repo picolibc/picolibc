@@ -22,19 +22,9 @@
 #ifndef _DOUBLE_IS_32BITS
 
 #ifdef _SCALB_INT
-#ifdef __STDC__
 	double __ieee754_scalb(double x, int fn)
 #else
-	double __ieee754_scalb(x,fn)
-	double x; int fn;
-#endif
-#else
-#ifdef __STDC__
 	double __ieee754_scalb(double x, double fn)
-#else
-	double __ieee754_scalb(x,fn)
-	double x, fn;
-#endif
 #endif
 {
 #ifdef _SCALB_INT

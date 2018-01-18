@@ -20,12 +20,7 @@
 #include "fdlibm.h"
 #include <errno.h>
 
-#ifdef __STDC__
 	float fmodf(float x, float y)	/* wrapper fmodf */
-#else
-	float fmodf(x,y)		/* wrapper fmodf */
-	float x,y;
-#endif
 {
 #ifdef _IEEE_LIBM
 	return __ieee754_fmodf(x,y);
@@ -60,12 +55,7 @@
 
 #ifdef _DOUBLE_IS_32BITS
 
-#ifdef __STDC__
 	double fmod(double x, double y)
-#else
-	double fmod(x,y)
-	double x,y;
-#endif
 {
 	return (double) fmodf((float) x, (float) y);
 }

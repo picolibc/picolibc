@@ -143,12 +143,7 @@ is not standard, nor is the <[signgam]> global for <<lgamma>>.
 
 #ifndef _DOUBLE_IS_32BITS
 
-#ifdef __STDC__
 	double gamma(double x)
-#else
-	double gamma(x)
-	double x;
-#endif
 {
 #ifdef _IEEE_LIBM
 	return __ieee754_gamma_r(x,&(_REENT_SIGNGAM(_REENT)));

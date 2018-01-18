@@ -20,12 +20,7 @@
 #include "fdlibm.h"
 #include <errno.h>
 
-#ifdef __STDC__
 	float sinhf(float x)		/* wrapper sinhf */
-#else
-	float sinhf(x)			/* wrapper sinhf */
-	float x;
-#endif
 {
 #ifdef _IEEE_LIBM
 	return __ieee754_sinhf(x);
@@ -65,12 +60,7 @@
 
 #ifdef _DOUBLE_IS_32BITS
 
-#ifdef __STDC__
 	double sinh(double x)
-#else
-	double sinh(x)
-	double x;
-#endif
 {
 	return (double) sinhf((float) x);
 }

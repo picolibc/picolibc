@@ -19,18 +19,9 @@
 #define const
 #endif
 
-#ifdef __STDC__
 static const float one = 1.0, half=0.5, huge = 1.0e30;
-#else
-static float one = 1.0, half=0.5, huge = 1.0e30;
-#endif
 
-#ifdef __STDC__
 	float __ieee754_coshf(float x)
-#else
-	float __ieee754_coshf(x)
-	float x;
-#endif
 {	
 	float t,w;
 	__int32_t ix;

@@ -16,12 +16,7 @@
 #include "math.h"
 #include "fdlibm.h"
 
-#ifdef __STDC__
 	float tgammaf(float x)
-#else
-	float tgammaf(x)
-	float x;
-#endif
 {
         float y;
 	int local_signgam;
@@ -46,12 +41,7 @@
 
 #ifdef _DOUBLE_IS_32BITS
 
-#ifdef __STDC__
 	double tgamma(double x)
-#else
-	double tgamma(x)
-	double x;
-#endif
 {
 	return (double) tgammaf((float) x);
 }

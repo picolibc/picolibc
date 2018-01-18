@@ -21,12 +21,7 @@
 
 #ifndef _DOUBLE_IS_32BITS
 
-#ifdef __STDC__
 	double significand(double x)
-#else
-	double significand(x)
-	double x;
-#endif
 {
 	return __ieee754_scalb(x,(double) -ilogb(x));
 }

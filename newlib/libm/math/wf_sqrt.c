@@ -20,12 +20,7 @@
 #include "fdlibm.h"
 #include <errno.h>
 
-#ifdef __STDC__
 	float sqrtf(float x)		/* wrapper sqrtf */
-#else
-	float sqrtf(x)			/* wrapper sqrtf */
-	float x;
-#endif
 {
 #ifdef _IEEE_LIBM
 	return __ieee754_sqrtf(x);
@@ -59,12 +54,7 @@
 
 #ifdef _DOUBLE_IS_32BITS
 
-#ifdef __STDC__
 	double sqrt(double x)
-#else
-	double sqrt(x)
-	double x;
-#endif
 {
 	return (double) sqrtf((float) x);
 }

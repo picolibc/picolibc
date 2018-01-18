@@ -55,12 +55,7 @@ PORTABILITY
 
 #ifndef _DOUBLE_IS_32BITS
 
-#ifdef __STDC__
 	double hypot(double x, double y)/* wrapper hypot */
-#else
-	double hypot(x,y)		/* wrapper hypot */
-	double x,y;
-#endif
 {
 #ifdef _IEEE_LIBM
 	return __ieee754_hypot(x,y);

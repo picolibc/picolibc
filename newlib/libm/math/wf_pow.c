@@ -21,12 +21,7 @@
 #if __OBSOLETE_MATH
 #include <errno.h>
 
-#ifdef __STDC__
 	float powf(float x, float y)	/* wrapper powf */
-#else
-	float powf(x,y)			/* wrapper powf */
-	float x,y;
-#endif
 {
 #ifdef _IEEE_LIBM
 	return  __ieee754_powf(x,y);
@@ -169,12 +164,7 @@
 
 #ifdef _DOUBLE_IS_32BITS
 
-#ifdef __STDC__
 	double pow(double x, double y)
-#else
-	double pow(x,y)
-	double x,y;
-#endif
 {
 	return (double) powf((float) x, (float) y);
 }

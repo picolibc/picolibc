@@ -19,12 +19,7 @@
 #include "fdlibm.h"
 #include <errno.h>
 
-#ifdef __STDC__
 	float atanhf(float x)		/* wrapper atanhf */
-#else
-	float atanhf(x)			/* wrapper atanhf */
-	float x;
-#endif
 {
 #ifdef _IEEE_LIBM
 	return __ieee754_atanhf(x);
@@ -70,12 +65,7 @@
 
 #ifdef _DOUBLE_IS_32BITS
 
-#ifdef __STDC__
 	double atanh(double x)
-#else
-	double atanh(x)
-	double x;
-#endif
 {
 	return (double) atanhf((float) x);
 }

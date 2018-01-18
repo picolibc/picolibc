@@ -20,12 +20,7 @@
 #include "fdlibm.h"
 #include <errno.h>
 
-#ifdef __STDC__
 	float j0f(float x)		/* wrapper j0f */
-#else
-	float j0f(x)			/* wrapper j0f */
-	float x;
-#endif
 {
 #ifdef _IEEE_LIBM
 	return __ieee754_j0f(x);
@@ -53,12 +48,7 @@
 #endif
 }
 
-#ifdef __STDC__
 	float y0f(float x)		/* wrapper y0f */
-#else
-	float y0f(x)			/* wrapper y0f */
-	float x;
-#endif
 {
 #ifdef _IEEE_LIBM
 	return __ieee754_y0f(x);
@@ -114,22 +104,12 @@
 
 #ifdef _DOUBLE_IS_32BITS
 
-#ifdef __STDC__
 	double j0(double x)
-#else
-	double j0(x)
-	double x;
-#endif
 {
 	return (double) j0f((float) x);
 }
 
-#ifdef __STDC__
 	double y0(double x)
-#else
-	double y0(x)
-	double x;
-#endif
 {
 	return (double) y0f((float) x);
 }

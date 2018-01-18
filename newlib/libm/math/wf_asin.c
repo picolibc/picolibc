@@ -22,12 +22,7 @@
 #include "fdlibm.h"
 #include <errno.h>
 
-#ifdef __STDC__
 	float asinf(float x)		/* wrapper asinf */
-#else
-	float asinf(x)			/* wrapper asinf */
-	float x;
-#endif
 {
 #ifdef _IEEE_LIBM
 	return __ieee754_asinf(x);
@@ -58,12 +53,7 @@
 
 #ifdef _DOUBLE_IS_32BITS
 
-#ifdef __STDC__
 	double asin(double x)
-#else
-	double asin(x)
-	double x;
-#endif
 {
 	return (double) asinf((float) x);
 }

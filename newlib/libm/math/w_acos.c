@@ -72,12 +72,7 @@ MATHREF
 
 #ifndef _DOUBLE_IS_32BITS
 
-#ifdef __STDC__
 	double acos(double x)		/* wrapper acos */
-#else
-	double acos(x)			/* wrapper acos */
-	double x;
-#endif
 {
 #ifdef _IEEE_LIBM
 	return __ieee754_acos(x);

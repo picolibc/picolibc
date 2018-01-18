@@ -49,12 +49,7 @@ PORTABILITY
 
 #ifndef _DOUBLE_IS_32BITS
 
-#ifdef __STDC__
 	double sqrt(double x)		/* wrapper sqrt */
-#else
-	double sqrt(x)			/* wrapper sqrt */
-	double x;
-#endif
 {
 #ifdef _IEEE_LIBM
 	return __ieee754_sqrt(x);

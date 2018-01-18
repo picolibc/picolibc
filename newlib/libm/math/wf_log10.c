@@ -20,12 +20,7 @@
 #include "fdlibm.h"
 #include <errno.h>
 
-#ifdef __STDC__
 	float log10f(float x)		/* wrapper log10f */
-#else
-	float log10f(x)			/* wrapper log10f */
-	float x;
-#endif
 {
 #ifdef _IEEE_LIBM
 	return __ieee754_log10f(x);
@@ -76,12 +71,7 @@
 
 #ifdef _DOUBLE_IS_32BITS
 
-#ifdef __STDC__
 	double log10(double x)
-#else
-	double log10(x)
-	double x;
-#endif
 {
 	return (double) log10f((float) x);
 }

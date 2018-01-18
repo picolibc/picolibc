@@ -21,24 +21,14 @@
 #include "fdlibm.h"
 #include <errno.h>
 
-#ifdef __STDC__
 	float atan2f(float y, float x)		/* wrapper atan2f */
-#else
-	float atan2f(y,x)			/* wrapper atan2 */
-	float y,x;
-#endif
 {
 	return __ieee754_atan2f(y,x);
 }
 
 #ifdef _DOUBLE_IS_32BITS
 
-#ifdef __STDC__
 	double atan2(double y, double x)
-#else
-	double atan2(y,x)
-	double y,x;
-#endif
 {
 	return (double) atan2f((float) y, (float) x);
 }

@@ -22,19 +22,10 @@
 #include "fdlibm.h"
 #include <errno.h>
 
-#ifdef __STDC__
 #ifdef _SCALB_INT
 	float scalbf(float x, int fn)		/* wrapper scalbf */
 #else
 	float scalbf(float x, float fn)		/* wrapper scalbf */
-#endif
-#else
-	float scalbf(x,fn)			/* wrapper scalbf */
-#ifdef _SCALB_INT
-	float x; int fn;
-#else
-	float x,fn;
-#endif
 #endif
 {
 #ifdef _IEEE_LIBM
@@ -93,19 +84,10 @@
 
 #ifdef _DOUBLE_IS_32BITS
 
-#ifdef __STDC__
 #ifdef _SCALB_INT
 	double scalb(double x, int fn)
 #else 
 	double scalb(double x, double fn)
-#endif
-#else
-	double scalb(x, fn)
-#ifdef _SCALB_INT
-	double x; int fn;
-#else
-	double x,fn;
-#endif
 #endif
 {
 #ifdef _SCALB_INT

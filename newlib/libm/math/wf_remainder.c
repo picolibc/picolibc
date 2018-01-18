@@ -20,12 +20,7 @@
 #include "fdlibm.h"
 #include <errno.h>
 
-#ifdef __STDC__
 	float remainderf(float x, float y)	/* wrapper remainder */
-#else
-	float remainderf(x,y)			/* wrapper remainder */
-	float x,y;
-#endif
 {
 #ifdef _IEEE_LIBM
 	return __ieee754_remainderf(x,y);
@@ -57,12 +52,7 @@
 
 #ifdef _DOUBLE_IS_32BITS
 
-#ifdef __STDC__
 	double remainder(double x, double y)
-#else
-	double remainder(x,y)
-	double x,y;
-#endif
 {
 	return (double) remainderf((float) x, (float) y);
 }

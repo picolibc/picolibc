@@ -15,18 +15,9 @@
 
 #include "fdlibm.h"
 
-#ifdef __STDC__
 static const float one=1.0;
-#else
-static float one=1.0;
-#endif
 
-#ifdef __STDC__
 	float cosf(float x)
-#else
-	float cosf(x)
-	float x;
-#endif
 {
 	float y[2],z=0.0;
 	__int32_t n,ix;
@@ -55,12 +46,7 @@ static float one=1.0;
 
 #ifdef _DOUBLE_IS_32BITS
 
-#ifdef __STDC__
 	double cos(double x)
-#else
-	double cos(x)
-	double x;
-#endif
 {
 	return (double) cosf((float) x);
 }

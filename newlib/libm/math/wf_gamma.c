@@ -18,12 +18,7 @@
 #include <reent.h>
 #include <errno.h>
 
-#ifdef __STDC__
 	float gammaf(float x)
-#else
-	float gammaf(x)
-	float x;
-#endif
 {
 #ifdef _IEEE_LIBM
 	return __ieee754_gammaf_r(x,&(_REENT_SIGNGAM(_REENT)));
@@ -80,12 +75,7 @@
 
 #ifdef _DOUBLE_IS_32BITS
 
-#ifdef __STDC__
 	double gamma(double x)
-#else
-	double gamma(x)
-	double x;
-#endif
 {
 	return (double) gammaf((float) x);
 }

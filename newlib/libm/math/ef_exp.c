@@ -20,11 +20,7 @@
 #define const
 #endif
 
-#ifdef __STDC__
 static const float
-#else
-static float
-#endif
 one	= 1.0,
 halF[2]	= {0.5,-0.5,},
 huge	= 1.0e+30,
@@ -40,12 +36,7 @@ P3   =  6.6137559770e-05, /* 0x388ab355 */
 P4   = -1.6533901999e-06, /* 0xb5ddea0e */
 P5   =  4.1381369442e-08; /* 0x3331bb4c */
 
-#ifdef __STDC__
 	float __ieee754_expf(float x)	/* default IEEE double exp */
-#else
-	float __ieee754_expf(x)	/* default IEEE double exp */
-	float x;
-#endif
 {
 	float y,hi,lo,c,t;
 	__int32_t k = 0,xsb,sx;

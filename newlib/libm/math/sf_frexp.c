@@ -15,19 +15,10 @@
 
 #include "fdlibm.h"
 
-#ifdef __STDC__
 static const float
-#else
-static float
-#endif
 two25 =  3.3554432000e+07; /* 0x4c000000 */
 
-#ifdef __STDC__
 	float frexpf(float x, int *eptr)
-#else
-	float frexpf(x, eptr)
-	float x; int *eptr;
-#endif
 {
 	__int32_t hx, ix;
 	GET_FLOAT_WORD(hx,x);
@@ -48,12 +39,7 @@ two25 =  3.3554432000e+07; /* 0x4c000000 */
 
 #ifdef _DOUBLE_IS_32BITS
 
-#ifdef __STDC__
 	double frexp(double x, int *eptr)
-#else
-	double frexp(x, eptr)
-	double x; int *eptr;
-#endif
 {
 	return (double) frexpf((float) x, eptr);
 }

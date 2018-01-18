@@ -6,14 +6,7 @@
 
 #ifndef _DOUBLE_IS_32BITS
 
-#ifdef __STDC__
 	void sincos(double x, double *sinx, double *cosx)
-#else
-	void sincos(x, sinx, cosx)
-	double x;
-        double *sinx;
-        double *cosx;
-#endif
 {
   *sinx = sin (x);
   *cosx = cos (x);

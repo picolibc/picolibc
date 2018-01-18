@@ -15,12 +15,7 @@
 
 #include "fdlibm.h"
 
-#ifdef __STDC__
 	float sinf(float x)
-#else
-	float sinf(x)
-	float x;
-#endif
 {
 	float y[2],z=0.0;
 	__int32_t n,ix;
@@ -49,12 +44,7 @@
 
 #ifdef _DOUBLE_IS_32BITS
 
-#ifdef __STDC__
 	double sin(double x)
-#else
-	double sin(x)
-	double x;
-#endif
 {
 	return (double) sinf((float) x);
 }

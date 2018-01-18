@@ -21,12 +21,7 @@
 #if __OBSOLETE_MATH
 #include <errno.h>
 
-#ifdef __STDC__
 	float logf(float x)		/* wrapper logf */
-#else
-	float logf(x)			/* wrapper logf */
-	float x;
-#endif
 {
 #ifdef _IEEE_LIBM
 	return __ieee754_logf(x);
@@ -74,12 +69,7 @@
 
 #ifdef _DOUBLE_IS_32BITS
 
-#ifdef __STDC__
 	double log(double x)
-#else
-	double log(x)
-	double x;
-#endif
 {
 	return (double) logf((float) x);
 }

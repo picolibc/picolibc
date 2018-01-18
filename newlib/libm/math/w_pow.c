@@ -56,12 +56,7 @@ PORTABILITY
 
 #ifndef _DOUBLE_IS_32BITS
 
-#ifdef __STDC__
 	double pow(double x, double y)	/* wrapper pow */
-#else
-	double pow(x,y)			/* wrapper pow */
-	double x,y;
-#endif
 {
 #ifdef _IEEE_LIBM
 	return  __ieee754_pow(x,y);

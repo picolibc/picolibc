@@ -51,12 +51,7 @@
 
 #ifdef _DOUBLE_IS_32BITS
 
-#ifdef __STDC__
 	double acos(double x)
-#else
-	double acos(x)
-	double x;
-#endif
 {
 	return (double) acosf((float) x);
 }

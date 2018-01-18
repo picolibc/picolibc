@@ -21,20 +21,11 @@
 #if __OBSOLETE_MATH
 #include <errno.h>
 
-#ifdef __STDC__
 static const float
-#else
-static float
-#endif
 o_threshold=  8.8721679688e+01,  /* 0x42b17180 */
 u_threshold= -1.0397208405e+02;  /* 0xc2cff1b5 */
 
-#ifdef __STDC__
 	float expf(float x)		/* wrapper expf */
-#else
-	float expf(x)			/* wrapper expf */
-	float x;
-#endif
 {
 #ifdef _IEEE_LIBM
 	return __ieee754_expf(x);
@@ -91,12 +82,7 @@ u_threshold= -1.0397208405e+02;  /* 0xc2cff1b5 */
 
 #ifdef _DOUBLE_IS_32BITS
 
-#ifdef __STDC__
 	double exp(double x)
-#else
-	double exp(x)
-	double x;
-#endif
 {
 	return (double) expf((float) x);
 }

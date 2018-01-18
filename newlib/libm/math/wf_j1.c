@@ -21,12 +21,7 @@
 #include <errno.h>
 
 
-#ifdef __STDC__
 	float j1f(float x)		/* wrapper j1f */
-#else
-	float j1f(x)			/* wrapper j1f */
-	float x;
-#endif
 {
 #ifdef _IEEE_LIBM
 	return __ieee754_j1f(x);
@@ -55,12 +50,7 @@
 #endif
 }
 
-#ifdef __STDC__
 	float y1f(float x)		/* wrapper y1f */
-#else
-	float y1f(x)			/* wrapper y1f */
-	float x;
-#endif
 {
 #ifdef _IEEE_LIBM
 	return __ieee754_y1f(x);
@@ -116,22 +106,12 @@
 
 #ifdef _DOUBLE_IS_32BITS
 
-#ifdef __STDC__
 	double j1(double x)
-#else
-	double j1(x)
-	double x;
-#endif
 {
 	return (double) j1f((float) x);
 }
 
-#ifdef __STDC__
 	double y1(double x)
-#else
-	double y1(x)
-	double x;
-#endif
 {
 	return (double) y1f((float) x);
 }

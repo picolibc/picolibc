@@ -20,12 +20,7 @@
 #include "fdlibm.h"
 #include <errno.h>
 
-#ifdef __STDC__
 	float coshf(float x)		/* wrapper coshf */
-#else
-	float coshf(x)			/* wrapper coshf */
-	float x;
-#endif
 {
 #ifdef _IEEE_LIBM
 	return __ieee754_coshf(x);
@@ -65,12 +60,7 @@
 
 #ifdef _DOUBLE_IS_32BITS
 
-#ifdef __STDC__
 	double cosh(double x)
-#else
-	double cosh(x)
-	double x;
-#endif
 {
 	return (double) coshf((float) x);
 }

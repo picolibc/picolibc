@@ -16,24 +16,11 @@
 
 #include "fdlibm.h"
 
-#ifdef __STDC__
 static const float one = 1.0, huge = 1e30;
-#else
-static float one = 1.0, huge = 1e30;
-#endif
 
-#ifdef __STDC__
 static const float zero = 0.0;
-#else
-static float zero = 0.0;
-#endif
 
-#ifdef __STDC__
 	float __ieee754_atanhf(float x)
-#else
-	float __ieee754_atanhf(x)
-	float x;
-#endif
 {
 	float t;
 	__int32_t hx,ix;

@@ -67,12 +67,7 @@ PORTABILITY
 
 #ifndef _DOUBLE_IS_32BITS
 
-#ifdef __STDC__
 	double atan2(double y, double x)	/* wrapper atan2 */
-#else
-	double atan2(y,x)			/* wrapper atan2 */
-	double y,x;
-#endif
 {
 	return __ieee754_atan2(y,x);
 }
