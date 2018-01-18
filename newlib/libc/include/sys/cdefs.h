@@ -171,7 +171,6 @@
  * __XSTRING is like __STRING, but it expands any macros in its argument
  * first.  It is only available with ANSI C.
  */
-#if defined(__STDC__) || defined(__cplusplus)
 #define	__P(protos)	protos		/* full-blown ANSI C */
 #define	__CONCAT1(x,y)	x ## y
 #define	__CONCAT(x,y)	__CONCAT1(x,y)
@@ -189,32 +188,6 @@
 #endif /* ! __CC_SUPPORTS___INLINE */
 #endif /* !__cplusplus */
 
-#else	/* !(__STDC__ || __cplusplus) */
-#define	__P(protos)	()		/* traditional C preprocessor */
-#define	__CONCAT(x,y)	x/**/y
-#define	__STRING(x)	"x"
-
-#if !defined(__CC_SUPPORTS___INLINE)
-#define	__const				/* delete pseudo-ANSI C keywords */
-#define	__inline
-#define	__signed
-#define	__volatile
-/*
- * In non-ANSI C environments, new programs will want ANSI-only C keywords
- * deleted from the program and old programs will want them left alone.
- * When using a compiler other than gcc, programs using the ANSI C keywords
- * const, inline etc. as normal identifiers should define -DNO_ANSI_KEYWORDS.
- * When using "gcc -traditional", we assume that this is the intent; if
- * __GNUC__ is defined but __STDC__ is not, we leave the new keywords alone.
- */
-#ifndef	NO_ANSI_KEYWORDS
-#define	const				/* delete ANSI C keywords */
-#define	inline
-#define	signed
-#define	volatile
-#endif	/* !NO_ANSI_KEYWORDS */
-#endif	/* !__CC_SUPPORTS___INLINE */
-#endif	/* !(__STDC__ || __cplusplus) */
 
 /*
  * Compiler-dependent macros to help declare dead (non-returning) and
@@ -553,7 +526,6 @@
 	extern __typeof (sym) aliassym __attribute__ ((__alias__ (#sym)))
 #endif
 #ifdef __ELF__
-#ifdef __STDC__
 #define	__weak_reference(sym,alias)	\
 	__asm__(".weak " #alias);	\
 	__asm__(".equ "  #alias ", " #sym)
@@ -565,35 +537,13 @@
 	__asm__(".symver " #impl ", " #sym "@" #verid)
 #define	__sym_default(sym,impl,verid)	\
 	__asm__(".symver " #impl ", " #sym "@@" #verid)
-#else
-#define	__weak_reference(sym,alias)	\
-	__asm__(".weak alias");		\
-	__asm__(".equ alias, sym")
-#define	__warn_references(sym,msg)	\
-	__asm__(".section .gnu.warning.sym"); \
-	__asm__(".asciz \"msg\"");	\
-	__asm__(".previous")
-#define	__sym_compat(sym,impl,verid)	\
-	__asm__(".symver impl, sym@verid")
-#define	__sym_default(impl,sym,verid)	\
-	__asm__(".symver impl, sym@@verid")
-#endif	/* __STDC__ */
 #else	/* !__ELF__ */
-#ifdef __STDC__
 #define	__weak_reference(sym,alias)	\
 	__asm__(".stabs \"_" #alias "\",11,0,0,0");	\
 	__asm__(".stabs \"_" #sym "\",1,0,0,0")
 #define	__warn_references(sym,msg)	\
 	__asm__(".stabs \"" msg "\",30,0,0,0");		\
 	__asm__(".stabs \"_" #sym "\",1,0,0,0")
-#else
-#define	__weak_reference(sym,alias)	\
-	__asm__(".stabs \"_/**/alias\",11,0,0,0");	\
-	__asm__(".stabs \"_/**/sym\",1,0,0,0")
-#define	__warn_references(sym,msg)	\
-	__asm__(".stabs msg,30,0,0,0");			\
-	__asm__(".stabs \"_/**/sym\",1,0,0,0")
-#endif	/* __STDC__ */
 #endif	/* __ELF__ */
 #endif	/* __GNUC__ || __INTEL_COMPILER */
 
