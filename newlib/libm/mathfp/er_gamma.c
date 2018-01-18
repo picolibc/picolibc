@@ -21,12 +21,7 @@
 
 #include "fdlibm.h"
 
-#ifdef __STDC__
 	double gamma_r(double x, int *signgamp)
-#else
-	double gamma_r(x,signgamp)
-	double x; int *signgamp;
-#endif
 {
 	return exp (lgamma_r(x,signgamp));
 }

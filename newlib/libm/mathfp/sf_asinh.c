@@ -15,21 +15,12 @@
 
 #include "fdlibm.h"
 
-#ifdef __STDC__
 static const float 
-#else
-static float 
-#endif
 one =  1.0000000000e+00, /* 0x3F800000 */
 ln2 =  6.9314718246e-01, /* 0x3f317218 */
 huge=  1.0000000000e+30; 
 
-#ifdef __STDC__
 	float asinhf(float x)
-#else
-	float asinhf(x)
-	float x;
-#endif
 {	
 	float t,w;
 	__int32_t hx,ix;
@@ -53,12 +44,7 @@ huge=  1.0000000000e+30;
 
 #ifdef _DOUBLE_IS_32BITS
 
-#ifdef __STDC__
 	double asinh(double x)
-#else
-	double asinh(x)
-	double x;
-#endif
 {
 	return (double) asinhf((float) x);
 }

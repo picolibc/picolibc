@@ -50,19 +50,10 @@ PORTABILITY
 
 #ifndef _DOUBLE_IS_32BITS
 
-#ifdef __STDC__
 static const double zero = 0.0;
-#else
-static double zero = 0.0;
-#endif
 
 
-#ifdef __STDC__
 	double remainder(double x, double p)
-#else
-	double remainder(x,p)
-	double x,p;
-#endif
 {
 	__int32_t hx,hp;
 	__uint32_t sx,lx,lp;

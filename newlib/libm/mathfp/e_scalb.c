@@ -22,19 +22,9 @@
 #ifndef _DOUBLE_IS_32BITS
 
 #ifdef _SCALB_INT
-#ifdef __STDC__
 	double scalb(double x, int fn)
 #else
-	double scalb(x,fn)
-	double x; int fn;
-#endif
-#else
-#ifdef __STDC__
 	double scalb(double x, double fn)
-#else
-	double scalb(x,fn)
-	double x, fn;
-#endif
 #endif
 {
 #ifdef _SCALB_INT

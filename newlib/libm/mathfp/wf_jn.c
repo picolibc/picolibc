@@ -17,12 +17,7 @@
 #include <errno.h>
 
 
-#ifdef __STDC__
 	float jnf(int n, float x)	/* wrapper jnf */
-#else
-	float jnf(n,x)			/* wrapper jnf */
-	float x; int n;
-#endif
 {
 #ifdef _IEEE_LIBM
 	return jnf(n,x);
@@ -52,12 +47,7 @@
 #endif
 }
 
-#ifdef __STDC__
 	float ynf(int n, float x)	/* wrapper ynf */
-#else
-	float ynf(n,x)			/* wrapper ynf */
-	float x; int n;
-#endif
 {
 #ifdef _IEEE_LIBM
 	return ynf(n,x);
@@ -115,22 +105,12 @@
 
 #ifdef _DOUBLE_IS_32BITS
 
-#ifdef __STDC__
 	double jn(int n, double x)
-#else
-	double jn(n,x)
-	double x; int n;
-#endif
 {
 	return (double) jnf(n, (float) x);
 }
 
-#ifdef __STDC__
 	double yn(int n, double x)
-#else
-	double yn(n,x)
-	double x; int n;
-#endif
 {
 	return (double) ynf(n, (float) x);
 }

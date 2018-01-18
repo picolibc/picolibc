@@ -60,21 +60,12 @@ Neither <<asinh>> nor <<asinhf>> are ANSI C.
 
 #ifndef _DOUBLE_IS_32BITS
 
-#ifdef __STDC__
 static const double 
-#else
-static double 
-#endif
 one =  1.00000000000000000000e+00, /* 0x3FF00000, 0x00000000 */
 ln2 =  6.93147180559945286227e-01, /* 0x3FE62E42, 0xFEFA39EF */
 huge=  1.00000000000000000000e+300; 
 
-#ifdef __STDC__
 	double asinh(double x)
-#else
-	double asinh(x)
-	double x;
-#endif
 {	
 	double t,w;
 	__int32_t hx,ix;

@@ -90,24 +90,11 @@ QUICKREF
 
 #ifndef _DOUBLE_IS_32BITS
 
-#ifdef __STDC__
 static const double one = 1.0, huge = 1e300;
-#else
-static double one = 1.0, huge = 1e300;
-#endif
 
-#ifdef __STDC__
 static const double zero = 0.0;
-#else
-static double zero = 0.0;
-#endif
 
-#ifdef __STDC__
 	double atanh(double x)
-#else
-	double atanh(x)
-	double x;
-#endif
 {
 	double t;
 	__int32_t hx,ix;

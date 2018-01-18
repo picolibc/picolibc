@@ -15,12 +15,7 @@
 
 #include "fdlibm.h"
 
-#ifdef __STDC__
 	float hypotf(float x, float y)
-#else
-	float hypotf(x,y)
-	float x, y;
-#endif
 {
 	float a=x,b=y,t1,t2,y1,y2,w;
 	__int32_t j,k,ha,hb;

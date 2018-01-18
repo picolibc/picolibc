@@ -18,12 +18,7 @@
 #include <math.h>
 #include <errno.h>
 
-#ifdef __STDC__
 	double tgamma(double x)
-#else
-	double tgamma(x)
-	double x;
-#endif
 {
         double y;
 	int local_signgam;

@@ -23,12 +23,7 @@
 
 #include "fdlibm.h"
 
-#ifdef __STDC__
 	float gammaf_r(float x, int *signgamp)
-#else
-	float gammaf_r(x,signgamp)
-	float x; int *signgamp;
-#endif
 {
 	return expf (lgammaf_r(x,signgamp));
 }

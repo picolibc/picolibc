@@ -15,24 +15,14 @@
 
 #include "fdlibm.h"
 
-#ifdef __STDC__
 	float significandf(float x)
-#else
-	float significandf(x)
-	float x;
-#endif
 {
 	return scalbf(x,(float) -ilogbf(x));
 }
 
 #ifdef _DOUBLE_IS_32BITS
 
-#ifdef __STDC__
 	double significand(double x)
-#else
-	double significand(x)
-	double x;
-#endif
 {
 	return (double) significandf((float) x);
 }

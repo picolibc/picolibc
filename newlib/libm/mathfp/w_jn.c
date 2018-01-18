@@ -116,12 +116,7 @@ None of the Bessel functions are in ANSI C.
 
 #ifndef _DOUBLE_IS_32BITS
 
-#ifdef __STDC__
 	double jn(int n, double x)	/* wrapper jn */
-#else
-	double jn(n,x)			/* wrapper jn */
-	double x; int n;
-#endif
 {
 #ifdef _IEEE_LIBM
 	return jn(n,x);
@@ -151,12 +146,7 @@ None of the Bessel functions are in ANSI C.
 #endif
 }
 
-#ifdef __STDC__
 	double yn(int n, double x)	/* wrapper yn */
-#else
-	double yn(n,x)			/* wrapper yn */
-	double x; int n;
-#endif
 {
 #ifdef _IEEE_LIBM
 	return yn(n,x);

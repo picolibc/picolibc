@@ -88,20 +88,11 @@ MATHREF
 
 #ifndef _DOUBLE_IS_32BITS
 
-#ifdef __STDC__
 static const double 
-#else
-static double 
-#endif
 one	= 1.0,
 ln2	= 6.93147180559945286227e-01;  /* 0x3FE62E42, 0xFEFA39EF */
 
-#ifdef __STDC__
 	double acosh(double x)
-#else
-	double acosh(x)
-	double x;
-#endif
 {	
 	double t;
 	__int32_t hx;

@@ -16,12 +16,7 @@
 #include <math.h>
 #include <errno.h>
 
-#ifdef __STDC__
 	float tgammaf(float x)
-#else
-	float tgammaf(x)
-	float x;
-#endif
 {
         float y;
 	int local_signgam;

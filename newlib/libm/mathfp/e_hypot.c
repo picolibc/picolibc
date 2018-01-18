@@ -82,12 +82,7 @@ PORTABILITY
 
 #ifndef _DOUBLE_IS_32BITS
 
-#ifdef __STDC__
 	double hypot(double x, double y)
-#else
-	double hypot(x,y)
-	double x, y;
-#endif
 {
 	double a=x,b=y,t1,t2,y1,y2,w;
 	__int32_t j,k,ha,hb;
