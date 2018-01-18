@@ -4,31 +4,8 @@
 
 /* Preliminaries */
 
-#ifndef __STD_C
-#ifdef __STDC__
-#define __STD_C     1
-#else
-#if __cplusplus
-#define __STD_C     1
-#else
-#define __STD_C     0
-#endif /*__cplusplus*/
-#endif /*__STDC__*/
-#endif /*__STD_C*/
 
-#ifndef Void_t
-#if __STD_C
-#define Void_t      void
-#else
-#define Void_t      char
-#endif
-#endif /*Void_t*/
-
-#if __STD_C
 #include <stddef.h>   /* for size_t */
-#else
-#include <sys/types.h>
-#endif
 
 #ifdef __cplusplus
 extern "C" {
@@ -55,22 +32,11 @@ extern "C" {
 #define malloc_getpagesize (4096)
 #endif
 
-#if __STD_C
 extern void __malloc_lock(struct _reent *);
 extern void __malloc_unlock(struct _reent *);
-#else
-extern void __malloc_lock();
-extern void __malloc_unlock();
-#endif
 
-#if __STD_C
 #define RARG struct _reent *reent_ptr,
 #define RONEARG struct _reent *reent_ptr
-#else
-#define RARG reent_ptr
-#define RONEARG reent_ptr
-#define RDECL struct _reent *reent_ptr;
-#endif
 
 #define RCALL reent_ptr,
 #define RONECALL reent_ptr
@@ -170,14 +136,9 @@ do {                                                                          \
 #define mEMALIGn	_memalign_r
 #define vECREALLOc	_vec_realloc_r
 #
-#if __STD_C
 
-Void_t* vECREALLOc(RARG Void_t*, size_t);
-Void_t* vECCALLOc(RARG size_t, size_t);
-#else
-Void_t* vECREALLOc();
-Void_t* vECCALLOc();
-#endif
+void* vECREALLOc(RARG void*, size_t);
+void* vECCALLOc(RARG size_t, size_t);
 
 
 #ifdef __cplusplus
@@ -208,7 +169,7 @@ typedef struct malloc_chunk* mchunkptr;
 
 /* conversion from malloc headers to user pointers, and back */
 
-#define chunk2mem(p)   ((Void_t*)((char*)(p) + 2*SIZE_SZ))
+#define chunk2mem(p)   ((void*)((char*)(p) + 2*SIZE_SZ))
 #define mem2chunk(mem) ((mchunkptr)((char*)(mem) - 2*SIZE_SZ))
 /* pad request bytes into a usable size */
 
@@ -316,11 +277,7 @@ typedef struct malloc_chunk* mchunkptr;
 #ifdef DEFINE_VECREALLOC
 
 
-#if __STD_C
-Void_t* vECREALLOc(RARG Void_t* oldmem, size_t bytes)
-#else
-Void_t* vECREALLOc(RARG oldmem, bytes) RDECL Void_t* oldmem; size_t bytes;
-#endif
+void* vECREALLOc(RARG void* oldmem, size_t bytes)
 {
   INTERNAL_SIZE_T    nb;      /* padded request size */
 
@@ -329,7 +286,7 @@ Void_t* vECREALLOc(RARG oldmem, bytes) RDECL Void_t* oldmem; size_t bytes;
 
   mchunkptr newp;             /* chunk to return */
   INTERNAL_SIZE_T    newsize; /* its size */
-  Void_t*   newmem;           /* corresponding user mem */
+  void*   newmem;           /* corresponding user mem */
 
   mchunkptr remainder;        /* holds split off extra space from newp */
   INTERNAL_SIZE_T  remainder_size;   /* its size */
@@ -399,15 +356,11 @@ Void_t* vECREALLOc(RARG oldmem, bytes) RDECL Void_t* oldmem; size_t bytes;
 
 */
 
-#if __STD_C
-Void_t* vECCALLOc(RARG size_t n, size_t elem_size)
-#else
-Void_t* vECCALLOc(RARG n, elem_size) RDECL size_t n; size_t elem_size;
-#endif
+void* vECCALLOc(RARG size_t n, size_t elem_size)
 {
   INTERNAL_SIZE_T sz = n * elem_size;
 
-  Void_t* mem;
+  void* mem;
 
   mem = mEMALIGn (RCALL 16, sz);
 

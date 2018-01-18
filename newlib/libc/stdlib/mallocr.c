@@ -35,9 +35,9 @@ int _dummy_mallocr = 1;
   malloc(size_t n);
      Return a pointer to a newly allocated chunk of at least n bytes, or null
      if no space is available.
-  free(Void_t* p);
+  free(void* p);
      Release the chunk of memory pointed to by p, or no effect if p is null.
-  realloc(Void_t* p, size_t n);
+  realloc(void* p, size_t n);
      Return a pointer to a chunk of size n that contains the same data
      as does chunk p up to the minimum of (n, p's size) bytes, or null
      if no space is available. The returned pointer may or may not be
@@ -58,12 +58,12 @@ int _dummy_mallocr = 1;
   calloc(size_t unit, size_t quantity);
      Returns a pointer to quantity * unit bytes, with all locations
      set to zero.
-  cfree(Void_t* p);
+  cfree(void* p);
      Equivalent to free(p).
   malloc_trim(size_t pad);
      Release all but pad bytes of freed top-most memory back 
      to the system. Return 1 if successful, else 0.
-  malloc_usable_size(Void_t* p);
+  malloc_usable_size(void* p);
      Report the number usable allocated bytes associated with allocated
      chunk p. This may or may not report more bytes than were requested,
      due to alignment and minimum size constraints.
@@ -152,9 +152,6 @@ int _dummy_mallocr = 1;
     (for example gcc -O2) that can simplify expressions and control
     paths.
 
-  __STD_C                  (default: derived from C compiler defines)
-     Nonzero if using ANSI-standard C compiler, a C++ compiler, or
-     a C compiler sufficiently close to ANSI to get away with it.
   DEBUG                    (default: NOT defined)
      Define to enable debugging. Adds fairly extensive assertion-based 
      checking to help track down memory errors, but noticeably slows down
@@ -241,31 +238,8 @@ int _dummy_mallocr = 1;
 
 /* Preliminaries */
 
-#ifndef __STD_C
-#ifdef __STDC__
-#define __STD_C     1
-#else
-#if __cplusplus
-#define __STD_C     1
-#else
-#define __STD_C     0
-#endif /*__cplusplus*/
-#endif /*__STDC__*/
-#endif /*__STD_C*/
 
-#ifndef Void_t
-#if __STD_C
-#define Void_t      void
-#else
-#define Void_t      char
-#endif
-#endif /*Void_t*/
-
-#if __STD_C
 #include <stddef.h>   /* for size_t */
-#else
-#include <sys/types.h>
-#endif
 
 #ifdef __cplusplus
 extern "C" {
@@ -324,22 +298,11 @@ extern "C" {
 #endif
 #endif
 
-#if __STD_C
 extern void __malloc_lock(struct _reent *);
 extern void __malloc_unlock(struct _reent *);
-#else
-extern void __malloc_lock();
-extern void __malloc_unlock();
-#endif
 
-#if __STD_C
 #define RARG struct _reent *reent_ptr,
 #define RONEARG struct _reent *reent_ptr
-#else
-#define RARG reent_ptr
-#define RONEARG reent_ptr
-#define RDECL struct _reent *reent_ptr;
-#endif
 
 #define RERRNO reent_ptr->_errno
 #define RCALL reent_ptr,
@@ -507,18 +470,10 @@ extern void __malloc_unlock();
 #endif
 #endif
 
-#if (__STD_C || defined(HAVE_MEMCPY)) 
 
-#if __STD_C
 void* memset(void*, int, size_t);
 void* memcpy(void*, const void*, size_t);
 void* memmove(void*, const void*, size_t);
-#else
-Void_t* memset();
-Void_t* memcpy();
-Void_t* memmove();
-#endif
-#endif
 
 #if USE_MEMCPY
 
@@ -935,17 +890,10 @@ struct mallinfo {
 
 #ifdef INTERNAL_LINUX_C_LIB
 
-#if __STD_C
 
-Void_t * __default_morecore_init (ptrdiff_t);
-Void_t *(*__morecore)(ptrdiff_t) = __default_morecore_init;
+void * __default_morecore_init (ptrdiff_t);
+void *(*__morecore)(ptrdiff_t) = __default_morecore_init;
 
-#else
-
-Void_t * __default_morecore_init ();
-Void_t *(*__morecore)() = __default_morecore_init;
-
-#endif
 
 #define MORECORE (*__morecore)
 #define MORECORE_FAILURE 0
@@ -954,11 +902,7 @@ Void_t *(*__morecore)() = __default_morecore_init;
 #else /* INTERNAL_LINUX_C_LIB */
 
 #ifndef INTERNAL_NEWLIB
-#if __STD_C
-extern Void_t*     sbrk(ptrdiff_t);
-#else
-extern Void_t*     sbrk();
-#endif
+extern void*     sbrk(ptrdiff_t);
 #endif
 
 #ifndef MORECORE
@@ -1043,36 +987,20 @@ extern Void_t*     sbrk();
 
 /* Public routines */
 
-#if __STD_C
 
-Void_t* mALLOc(RARG size_t);
-void    fREe(RARG Void_t*);
-Void_t* rEALLOc(RARG Void_t*, size_t);
-Void_t* mEMALIGn(RARG size_t, size_t);
-Void_t* vALLOc(RARG size_t);
-Void_t* pvALLOc(RARG size_t);
-Void_t* cALLOc(RARG size_t, size_t);
-void    cfree(Void_t*);
+void* mALLOc(RARG size_t);
+void    fREe(RARG void*);
+void* rEALLOc(RARG void*, size_t);
+void* mEMALIGn(RARG size_t, size_t);
+void* vALLOc(RARG size_t);
+void* pvALLOc(RARG size_t);
+void* cALLOc(RARG size_t, size_t);
+void    cfree(void*);
 int     malloc_trim(RARG size_t);
-size_t  malloc_usable_size(RARG Void_t*);
+size_t  malloc_usable_size(RARG void*);
 void    malloc_stats(RONEARG);
 int     mALLOPt(RARG int, int);
 struct mallinfo mALLINFo(RONEARG);
-#else
-Void_t* mALLOc();
-void    fREe();
-Void_t* rEALLOc();
-Void_t* mEMALIGn();
-Void_t* vALLOc();
-Void_t* pvALLOc();
-Void_t* cALLOc();
-void    cfree();
-int     malloc_trim();
-size_t  malloc_usable_size();
-void    malloc_stats();
-int     mALLOPt();
-struct mallinfo mALLINFo();
-#endif
 
 
 #ifdef __cplusplus
@@ -1407,7 +1335,7 @@ nextchunk-> +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
 /* conversion from malloc headers to user pointers, and back */
 
-#define chunk2mem(p)   ((Void_t*)((char*)(p) + 2*SIZE_SZ))
+#define chunk2mem(p)   ((void*)((char*)(p) + 2*SIZE_SZ))
 #define mem2chunk(mem) ((mchunkptr)((char*)(mem) - 2*SIZE_SZ))
 
 /* pad request bytes into a usable size */
@@ -1772,11 +1700,7 @@ extern unsigned long max_mmapped_mem;
   in malloc. In which case, please report it!)
 */
 
-#if __STD_C
 static void do_check_chunk(mchunkptr p) 
-#else
-static void do_check_chunk(p) mchunkptr p;
-#endif
 { 
   INTERNAL_SIZE_T sz = p->size & ~PREV_INUSE;
 
@@ -1793,11 +1717,7 @@ static void do_check_chunk(p) mchunkptr p;
 }
 
 
-#if __STD_C
 static void do_check_free_chunk(mchunkptr p) 
-#else
-static void do_check_free_chunk(p) mchunkptr p;
-#endif
 { 
   INTERNAL_SIZE_T sz = p->size & ~PREV_INUSE;
   mchunkptr next = chunk_at_offset(p, sz);
@@ -1826,11 +1746,7 @@ static void do_check_free_chunk(p) mchunkptr p;
     assert(sz == SIZE_SZ); 
 }
 
-#if __STD_C
 static void do_check_inuse_chunk(mchunkptr p) 
-#else
-static void do_check_inuse_chunk(p) mchunkptr p;
-#endif
 { 
   mchunkptr next = next_chunk(p);
   do_check_chunk(p);
@@ -1858,11 +1774,7 @@ static void do_check_inuse_chunk(p) mchunkptr p;
 
 }
 
-#if __STD_C
 static void do_check_malloced_chunk(mchunkptr p, INTERNAL_SIZE_T s) 
-#else
-static void do_check_malloced_chunk(p, s) mchunkptr p; INTERNAL_SIZE_T s;
-#endif
 {
   INTERNAL_SIZE_T sz = p->size & ~PREV_INUSE;
   long room = long_sub_size_t(sz, s);
@@ -1978,11 +1890,7 @@ static void do_check_malloced_chunk(p, s) mchunkptr p; INTERNAL_SIZE_T s;
 
 #ifdef DEFINE_MALLOC
 
-#if __STD_C
 static mchunkptr mmap_chunk(size_t size)
-#else
-static mchunkptr mmap_chunk(size) size_t size;
-#endif
 {
   size_t page_mask = malloc_getpagesize - 1;
   mchunkptr p;
@@ -2041,11 +1949,7 @@ static mchunkptr mmap_chunk(size) size_t size;
 
 #ifdef DEFINE_FREE
 
-#if __STD_C
 STATIC void munmap_chunk(mchunkptr p)
-#else
-STATIC void munmap_chunk(p) mchunkptr p;
-#endif
 {
   INTERNAL_SIZE_T size = chunksize(p);
   int ret;
@@ -2066,11 +1970,7 @@ STATIC void munmap_chunk(p) mchunkptr p;
 
 #else /* ! DEFINE_FREE */
 
-#if __STD_C
 extern void munmap_chunk(mchunkptr);
-#else
-extern void munmap_chunk();
-#endif
 
 #endif /* ! DEFINE_FREE */
 
@@ -2078,11 +1978,7 @@ extern void munmap_chunk();
 
 #ifdef DEFINE_REALLOC
 
-#if __STD_C
 static mchunkptr mremap_chunk(mchunkptr p, size_t new_size)
-#else
-static mchunkptr mremap_chunk(p, new_size) mchunkptr p; size_t new_size;
-#endif
 {
   size_t page_mask = malloc_getpagesize - 1;
   INTERNAL_SIZE_T offset = p->prev_size;
@@ -2133,11 +2029,7 @@ static mchunkptr mremap_chunk(p, new_size) mchunkptr p; size_t new_size;
   Main interface to sbrk (but see also malloc_trim).
 */
 
-#if __STD_C
 static void malloc_extend_top(RARG INTERNAL_SIZE_T nb)
-#else
-static void malloc_extend_top(RARG nb) RDECL INTERNAL_SIZE_T nb;
-#endif
 {
   char*     brk;                  /* return value from sbrk */
   INTERNAL_SIZE_T front_misalign; /* unusable bytes at front of sbrked space */
@@ -2320,11 +2212,7 @@ static void malloc_extend_top(RARG nb) RDECL INTERNAL_SIZE_T nb;
 
 */
 
-#if __STD_C
-Void_t* mALLOc(RARG size_t bytes)
-#else
-Void_t* mALLOc(RARG bytes) RDECL size_t bytes;
-#endif
+void* mALLOc(RARG size_t bytes)
 {
 #ifdef MALLOC_PROVIDED
 
@@ -2618,11 +2506,7 @@ Void_t* mALLOc(RARG bytes) RDECL size_t bytes;
 */
 
 
-#if __STD_C
-void fREe(RARG Void_t* mem)
-#else
-void fREe(RARG mem) RDECL Void_t* mem;
-#endif
+void fREe(RARG void* mem)
 {
 #ifdef MALLOC_PROVIDED
 
@@ -2764,11 +2648,7 @@ void fREe(RARG mem) RDECL Void_t* mem;
 */
 
 
-#if __STD_C
-Void_t* rEALLOc(RARG Void_t* oldmem, size_t bytes)
-#else
-Void_t* rEALLOc(RARG oldmem, bytes) RDECL Void_t* oldmem; size_t bytes;
-#endif
+void* rEALLOc(RARG void* oldmem, size_t bytes)
 {
 #ifdef MALLOC_PROVIDED
 
@@ -2783,7 +2663,7 @@ Void_t* rEALLOc(RARG oldmem, bytes) RDECL Void_t* oldmem; size_t bytes;
 
   mchunkptr newp;             /* chunk to return */
   INTERNAL_SIZE_T    newsize; /* its size */
-  Void_t*   newmem;           /* corresponding user mem */
+  void*   newmem;           /* corresponding user mem */
 
   mchunkptr next;             /* next contiguous chunk after oldp */
   INTERNAL_SIZE_T  nextsize;  /* its size */
@@ -3021,11 +2901,7 @@ Void_t* rEALLOc(RARG oldmem, bytes) RDECL Void_t* oldmem; size_t bytes;
 */
 
 
-#if __STD_C
-Void_t* mEMALIGn(RARG size_t alignment, size_t bytes)
-#else
-Void_t* mEMALIGn(RARG alignment, bytes) RDECL size_t alignment; size_t bytes;
-#endif
+void* mEMALIGn(RARG size_t alignment, size_t bytes)
 {
   INTERNAL_SIZE_T    nb;      /* padded  request size */
   char*     m;                /* memory returned by malloc call */
@@ -3141,11 +3017,7 @@ Void_t* mEMALIGn(RARG alignment, bytes) RDECL size_t alignment; size_t bytes;
     be figured out from all the includes/defines above.)
 */
 
-#if __STD_C
-Void_t* vALLOc(RARG size_t bytes)
-#else
-Void_t* vALLOc(RARG bytes) RDECL size_t bytes;
-#endif
+void* vALLOc(RARG size_t bytes)
 {
   return mEMALIGn (RCALL malloc_getpagesize, bytes);
 }
@@ -3160,11 +3032,7 @@ Void_t* vALLOc(RARG bytes) RDECL size_t bytes;
 */
 
 
-#if __STD_C
-Void_t* pvALLOc(RARG size_t bytes)
-#else
-Void_t* pvALLOc(RARG bytes) RDECL size_t bytes;
-#endif
+void* pvALLOc(RARG size_t bytes)
 {
   size_t pagesize = malloc_getpagesize;
   return mEMALIGn (RCALL pagesize, (bytes + pagesize - 1) & ~(pagesize - 1));
@@ -3180,11 +3048,7 @@ Void_t* pvALLOc(RARG bytes) RDECL size_t bytes;
 
 */
 
-#if __STD_C
-Void_t* cALLOc(RARG size_t n, size_t elem_size)
-#else
-Void_t* cALLOc(RARG n, elem_size) RDECL size_t n; size_t elem_size;
-#endif
+void* cALLOc(RARG size_t n, size_t elem_size)
 {
   mchunkptr p;
   INTERNAL_SIZE_T csz;
@@ -3195,7 +3059,7 @@ Void_t* cALLOc(RARG n, elem_size) RDECL size_t n; size_t elem_size;
   mchunkptr oldtop;
   INTERNAL_SIZE_T oldtopsize;
 #endif
-  Void_t* mem;
+  void* mem;
 
   /* check if expand_top called, in which case don't need to clear */
 #if MORECORE_CLEARS
@@ -3259,11 +3123,7 @@ Void_t* cALLOc(RARG n, elem_size) RDECL size_t n; size_t elem_size;
 
 #if !defined(INTERNAL_LINUX_C_LIB) || !defined(__ELF__)
 #if !defined(INTERNAL_NEWLIB) || !defined(_REENT_ONLY)
-#if __STD_C
-void cfree(Void_t *mem)
-#else
-void cfree(mem) Void_t *mem;
-#endif
+void cfree(void *mem)
 {
 #ifdef INTERNAL_NEWLIB
   fREe(_REENT, mem);
@@ -3301,11 +3161,7 @@ void cfree(mem) Void_t *mem;
 
 */
 
-#if __STD_C
 int malloc_trim(RARG size_t pad)
-#else
-int malloc_trim(RARG pad) RDECL size_t pad;
-#endif
 {
   long  top_size;        /* Amount of top-most memory */
   long  extra;           /* Amount to release */
@@ -3382,11 +3238,7 @@ int malloc_trim(RARG pad) RDECL size_t pad;
 
 */
 
-#if __STD_C
-size_t malloc_usable_size(RARG Void_t* mem)
-#else
-size_t malloc_usable_size(RARG mem) RDECL Void_t* mem;
-#endif
+size_t malloc_usable_size(RARG void* mem)
 {
   mchunkptr p;
   if (mem == 0)
@@ -3456,11 +3308,7 @@ STATIC void malloc_update_mallinfo()
 
 #else /* ! DEFINE_MALLINFO */
 
-#if __STD_C
 extern void malloc_update_mallinfo(void);
-#else
-extern void malloc_update_mallinfo();
-#endif
 
 #endif /* ! DEFINE_MALLINFO */
 
@@ -3481,11 +3329,7 @@ extern void malloc_update_mallinfo();
 
 */
 
-#if __STD_C
 void malloc_stats(RONEARG)
-#else
-void malloc_stats(RONEARG) RDECL
-#endif
 {
   unsigned long local_max_total_mem;
   int local_sbrked_mem;
@@ -3541,11 +3385,7 @@ void malloc_stats(RONEARG) RDECL
   mallinfo returns a copy of updated current mallinfo.
 */
 
-#if __STD_C
 struct mallinfo mALLINFo(RONEARG)
-#else
-struct mallinfo mALLINFo(RONEARG) RDECL
-#endif
 {
   struct mallinfo ret;
 
@@ -3573,11 +3413,7 @@ struct mallinfo mALLINFo(RONEARG) RDECL
 
 */
 
-#if __STD_C
 int mALLOPt(RARG int param_number, int value)
-#else
-int mALLOPt(RARG param_number, value) RDECL int param_number; int value;
-#endif
 {
   MALLOC_LOCK;
   switch(param_number) 
