@@ -19,10 +19,6 @@
 #include <sys/stat.h>
 #include <sys/unistd.h>
 
-#ifndef __STDC__
-#define const
-#endif
-
 /* Solaris stat packet */
 typedef	long		solaris_off_t;
 typedef	long		solaris_uid_t;
