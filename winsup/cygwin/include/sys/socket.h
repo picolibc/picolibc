@@ -11,7 +11,6 @@ details. */
 
 #include <features.h>
 #include <cygwin/socket.h>
-#include <sys/time.h>
 
 #ifdef __cplusplus
 extern "C"
