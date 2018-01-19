@@ -36,7 +36,10 @@
 #include <xlocale.h>
 #endif
 
+#ifndef _NL_ITEM_DECLARED
 typedef int nl_item;
+#define _NL_ITEM_DECLARED
+#endif
 
 enum __nl_item
 {
