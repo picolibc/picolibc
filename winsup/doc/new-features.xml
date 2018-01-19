@@ -17,7 +17,32 @@ scanf/wscanf now handle the POSIX %m modifier.
 </para></listitem>
 
 <listitem><para>
-- scanf now handles the %l[ conversion.
+scanf now handles the %l[ conversion.
+</para></listitem>
+
+<listitem><para>
+Improved hostprogs compatibility for cross-compiling the Linux kernel.
+New headers: &lt;asm/bitsperlong.h&gt;, &lt;asm/posix_types.h&gt;.
+</para></listitem>
+
+<listitem><para>
+Built-in implementation of Stack Smashing Protection compiler feature.
+New APIs: __stack_chk_fail, __stack_chk_guard.
+</para></listitem>
+
+<listitem><para>
+Built-in implementation of _FORTIFY_SOURCE guards for functions in
+&lt;stdio.h&gt;, &lt;stdlib.h&gt;, &lt;string.h&gt;, &lt;strings.h&gt;,
+&lt;unistd.h&gt;, &lt;wchar.h&gt;, &lt;sys/poll.h&gt;, and &lt;sys/socket.h&gt;.
+New APIs:  __chk_fail, __gets_chk, __memcpy_chk, __memmove_chk, __mempcpy_chk,
+__memset_chk, __snprintf_chk, __sprintf_chk, __stpcpy_chk, __stpncpy_chk,
+__strcat_chk, __strcpy_chk, __strncat_chk, __strncpy_chk, __vsnprintf_chk,
+__vsprintf_chk.
+</para></listitem>
+
+<listitem><para>
+Built-in implementation of POSIX.1-2001 message catalog support.
+New APIs: catclose, catgets, catopen.  New tool: gencat.
 </para></listitem>
 
 <listitem><para>
