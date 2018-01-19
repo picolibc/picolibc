@@ -333,6 +333,7 @@ DLL_OFILES:= \
 	mktemp.o \
 	mmap.o \
 	msg.o \
+	msgcat.o \
 	mount.o \
 	net.o \
 	netdb.o \

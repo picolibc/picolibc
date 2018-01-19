@@ -274,6 +274,9 @@ catanh NOSIGFE
 catanhf NOSIGFE
 catanhl NOSIGFE
 catanl NOSIGFE
+catclose SIGFE
+catgets SIGFE
+catopen SIGFE
 cbrt NOSIGFE
 cbrtf NOSIGFE
 cbrtl NOSIGFE
