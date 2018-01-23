@@ -78,7 +78,9 @@
 # else
 #  define __IEEE_BIG_ENDIAN
 # endif
-# define __OBSOLETE_MATH_DEFAULT 0
+# if __ARM_FP & 0x8
+#  define __OBSOLETE_MATH_DEFAULT 0
+# endif
 #else
 # define __IEEE_BIG_ENDIAN
 # ifdef __ARMEL__
