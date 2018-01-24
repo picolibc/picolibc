@@ -51,7 +51,6 @@
 		__chk_fail()
 #define __ssp_decl(rtype, fun, args) \
 rtype __ssp_real_(fun) args __asm__(__ASMNAME(#fun)); \
-__ssp_inline rtype fun args __asm__(__ASMNAME("__ssp_protected_" #fun)); \
 __ssp_inline rtype fun args
 #define __ssp_redirect_raw(rtype, fun, args, call, cond, bos) \
 __ssp_decl(rtype, fun, args) \
