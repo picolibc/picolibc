@@ -17,6 +17,9 @@ details. */
 /* resource.cc */
 extern size_t get_rlimit_stack (void);
 
+/* thread.cc */
+char *mythreadname (void);
+
 #include <pthread.h>
 #include <limits.h>
 #include "security.h"

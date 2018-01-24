@@ -200,7 +200,7 @@ cygwin_exception::dump_exception ()
   small_printf ("r14=%016X r15=%016X\r\n", ctx->R14, ctx->R15);
   small_printf ("rbp=%016X rsp=%016X\r\n", ctx->Rbp, ctx->Rsp);
   small_printf ("program=%W, pid %u, thread %s\r\n",
-		myself->progname, myself->pid, cygthread::name ());
+		myself->progname, myself->pid, mythreadname ());
 #else
   if (exception_name)
     small_printf ("Exception: %s at eip=%08x\r\n", exception_name, ctx->Eip);
@@ -210,7 +210,7 @@ cygwin_exception::dump_exception ()
 		ctx->Eax, ctx->Ebx, ctx->Ecx, ctx->Edx, ctx->Esi, ctx->Edi);
   small_printf ("ebp=%08x esp=%08x program=%W, pid %u, thread %s\r\n",
 		ctx->Ebp, ctx->Esp, myself->progname, myself->pid,
-		cygthread::name ());
+		mythreadname ());
 #endif
   small_printf ("cs=%04x ds=%04x es=%04x fs=%04x gs=%04x ss=%04x\r\n",
 		ctx->SegCs, ctx->SegDs, ctx->SegEs, ctx->SegFs,

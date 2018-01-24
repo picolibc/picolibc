@@ -138,7 +138,7 @@ strace::vsprntf (char *buf, const char *func, const char *infmt, va_list ap)
   char fmt[80];
   static NO_COPY bool nonewline = false;
   DWORD err = GetLastError ();
-  const char *tn = cygthread::name ();
+  const char *tn = mythreadname ();
 
   int microsec = microseconds ();
   lmicrosec = microsec;

@@ -106,7 +106,7 @@ fhandler_pty_common::__acquire_output_mutex (const char *fn, int ln,
 #else
       ostack[osi].fn = fn;
       ostack[osi].ln = ln;
-      ostack[osi].tname = cygthread::name ();
+      ostack[osi].tname = mythreadname ();
       termios_printf ("acquired for %s:%d, osi %d", fn, ln, osi);
       osi++;
 #endif

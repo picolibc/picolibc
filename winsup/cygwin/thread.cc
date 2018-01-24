@@ -2682,6 +2682,20 @@ pthread_setname_np (pthread_t thread, const char *name)
   return 0;
 }
 
+/* Returns running thread's name; works for both cygthreads and pthreads */
+char *
+mythreadname (void)
+{
+  char *result = (char *) cygthread::name ();
+
+  if (result == _my_tls.locals.unknown_thread_name)
+    {
+      result[0] = '\0';
+      pthread_getname_np (pthread_self (), result, (size_t) THRNAMELEN);
+    }
+
+  return result;
+}
 #undef THRNAMELEN
 
 /* provided for source level compatability.
