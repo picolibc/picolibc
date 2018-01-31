@@ -45,6 +45,8 @@ _setjmp:
 	mov r0,#0
 	rts
 	.size _setjmp, .-_setjmp
+	.global setjmp
+	.set setjmp, _setjmp
 
 	.global _longjmp
 _longjmp:
@@ -63,3 +65,5 @@ _longjmp:
 	movne r0,r1
 	jr lr
         .size   _longjmp, .-_longjmp
+	.global longjmp
+	.set longjmp, _longjmp
