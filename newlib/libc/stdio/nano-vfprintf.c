@@ -168,16 +168,6 @@ static char *rcsid = "$Id$";
 #include "vfieeefp.h"
 #include "nano-vfprintf_local.h"
 
-
-/* GCC PR 14577 at https://gcc.gnu.org/bugzilla/show_bug.cgi?id=14557 */
-#if __STDC_VERSION__ >= 201112L
-#define va_ptr(ap) _Generic(&(ap), va_list *: &(ap), default: (va_list *)(ap))
-#elif __GNUC__ >= 4
-#define va_ptr(ap) __builtin_choose_expr(__builtin_types_compatible_p(__typeof__(&(ap)), va_list *), &(ap), (va_list *)(ap))
-#else
-#define va_ptr(ap) (sizeof(ap) == sizeof(va_list) ? (va_list *)&(ap) : (va_list *)(ap))
-#endif
-
 /* The __ssputs_r function is shared between all versions of vfprintf
    and vfwprintf.  */
 #ifdef STRING_ONLY
@@ -485,6 +475,7 @@ _VFPRINTF_R (struct _reent *data,
   register char *cp;	/* Handy char pointer (short term usage).  */
   const char *flag_chars;
   struct _prt_data_t prt_data;	/* All data for decoding format string.  */
+  va_list ap_copy;
 
   /* Output function pointer.  */
   int (*pfunc)(struct _reent *, FILE *, const char *, size_t len);
@@ -521,6 +512,9 @@ _VFPRINTF_R (struct _reent *data,
   prt_data.ret = 0;
   prt_data.blank = ' ';
   prt_data.zero = '0';
+
+  /* GCC PR 14577 at https://gcc.gnu.org/bugzilla/show_bug.cgi?id=14557 */
+  va_copy (ap_copy, ap);
 
   /* Scan the format for conversions (`%' character).  */
   for (;;)
@@ -577,7 +571,7 @@ _VFPRINTF_R (struct _reent *data,
 	   *	-- ANSI X3J11
 	   * They don't exclude field widths read from args.
 	   */
-	  prt_data.width = GET_ARG (n, ap, int);
+	  prt_data.width = GET_ARG (n, ap_copy, int);
 	  if (prt_data.width < 0)
 	    {
 	      prt_data.width = -prt_data.width;
@@ -598,7 +592,7 @@ _VFPRINTF_R (struct _reent *data,
 	  if (*fmt == '*')
 	    {
 	      fmt++;
-	      prt_data.prec = GET_ARG (n, ap, int);
+	      prt_data.prec = GET_ARG (n, ap_copy, int);
 	      if (prt_data.prec < 0)
 		prt_data.prec = -1;
 	    }
@@ -630,18 +624,16 @@ _VFPRINTF_R (struct _reent *data,
 	  if (_printf_float == NULL)
 	    {
 	      if (prt_data.flags & LONGDBL)
-		GET_ARG (N, ap, _LONG_DOUBLE);
+		GET_ARG (N, ap_copy, _LONG_DOUBLE);
 	      else
-		GET_ARG (N, ap, double);
+		GET_ARG (N, ap_copy, double);
 	    }
 	  else
-	    {
-	      n = _printf_float (data, &prt_data, fp, pfunc, va_ptr(ap));
-	    }
+            n = _printf_float (data, &prt_data, fp, pfunc, &ap_copy);
 	}
       else
 #endif
-	n = _printf_i (data, &prt_data, fp, pfunc, va_ptr(ap));
+	n = _printf_i (data, &prt_data, fp, pfunc, &ap_copy);
 
       if (n == -1)
 	goto error;
@@ -654,6 +646,7 @@ error:
 #ifndef STRING_ONLY
   _newlib_flockfile_end (fp);
 #endif
+  va_end (ap_copy);
   return (__sferror (fp) ? EOF : prt_data.ret);
 }
 

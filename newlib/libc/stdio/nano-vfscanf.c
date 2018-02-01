@@ -119,15 +119,6 @@ Supporting OS subroutines required:
 #include "../stdlib/local.h"
 #include "nano-vfscanf_local.h"
 
-/* GCC PR 14577 at https://gcc.gnu.org/bugzilla/show_bug.cgi?id=14557 */
-#if __STDC_VERSION__ >= 201112L
-#define va_ptr(ap) _Generic(&(ap), va_list *: &(ap), default: (va_list *)(ap))
-#elif __GNUC__ >= 4
-#define va_ptr(ap) __builtin_choose_expr(__builtin_types_compatible_p(__typeof__(&(ap)), va_list *), &(ap), (va_list *)(ap))
-#else
-#define va_ptr(ap) (sizeof(ap) == sizeof(va_list) ? (va_list *)&(ap) : (va_list *)(ap))
-#endif
-
 #define VFSCANF vfscanf
 #define _VFSCANF_R _vfscanf_r
 #define __SVFSCANF __svfscanf
@@ -272,6 +263,7 @@ __SVFSCANF_R (struct _reent *rptr,
   register int c;		/* Character from format, or conversion.  */
   register char *p;		/* Points into all kinds of strings.  */
   char ccltab[256];		/* Character class table for %[...].  */
+  va_list ap_copy;
 
   int ret;
   char *cp;
@@ -286,6 +278,9 @@ __SVFSCANF_R (struct _reent *rptr,
   scan_data.ccltab = ccltab;
   scan_data.pfn_ungetc = _ungetc_r;
   scan_data.pfn_refill = __srefill_r;
+
+  /* GCC PR 14577 at https://gcc.gnu.org/bugzilla/show_bug.cgi?id=14557 */
+  va_copy (ap_copy, ap);
 
   for (;;)
     {
@@ -379,17 +374,18 @@ __SVFSCANF_R (struct _reent *rptr,
 	    continue;
 
 	  if (scan_data.flags & SHORT)
-	    *GET_ARG (N, ap, short *) = scan_data.nread;
+	    *GET_ARG (N, ap_copy, short *) = scan_data.nread;
 	  else if (scan_data.flags & LONG)
-	    *GET_ARG (N, ap, long *) = scan_data.nread;
+	    *GET_ARG (N, ap_copy, long *) = scan_data.nread;
 	  else
-	    *GET_ARG (N, ap, int *) = scan_data.nread;
+	    *GET_ARG (N, ap_copy, int *) = scan_data.nread;
 
 	  continue;
 
 	/* Disgusting backwards compatibility hacks.	XXX.  */
 	case '\0':		/* compat.  */
 	  _newlib_flockfile_exit (fp);
+	  va_end (ap_copy);
 	  return EOF;
 
 #ifdef FLOATING_POINT
@@ -427,12 +423,12 @@ __SVFSCANF_R (struct _reent *rptr,
 	}
       ret = 0;
       if (scan_data.code < CT_INT)
-	ret = _scanf_chars (rptr, &scan_data, fp, va_ptr(ap));
+	ret = _scanf_chars (rptr, &scan_data, fp, &ap_copy);
       else if (scan_data.code < CT_FLOAT)
-	ret = _scanf_i (rptr, &scan_data, fp, va_ptr(ap));
+	ret = _scanf_i (rptr, &scan_data, fp, &ap_copy);
 #ifdef FLOATING_POINT
       else if (_scanf_float)
-	ret = _scanf_float (rptr, &scan_data, fp, va_ptr(ap));
+	ret = _scanf_float (rptr, &scan_data, fp, &ap_copy);
 #endif
 
       if (ret == MATCH_FAILURE)
@@ -446,12 +442,14 @@ input_failure:
      invalid format string), return EOF if no matches yet, else number
      of matches made prior to failure.  */
   _newlib_flockfile_exit (fp);
+  va_end (ap_copy);
   return scan_data.nassigned && !(fp->_flags & __SERR) ? scan_data.nassigned
 						       : EOF;
 match_failure:
 all_done:
   /* Return number of matches, which can be 0 on match failure.  */
   _newlib_flockfile_end (fp);
+  va_end (ap_copy);
   return scan_data.nassigned;
 }
 
