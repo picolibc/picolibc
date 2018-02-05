@@ -16,8 +16,10 @@ extern "C"
 {
 #endif
 
+#if __MISC_VISIBLE
 extern int bindresvport (int, struct sockaddr_in *);
 extern int bindresvport_sa (int, struct sockaddr *);
+#endif
 
 #ifdef __cplusplus
 };
