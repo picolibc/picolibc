@@ -1154,7 +1154,7 @@ fhandler_socket::bind (const struct sockaddr *name, int namelen)
 	     for a more detailed description. */
 	  int on = 1;
 	  int ret = ::setsockopt (get_socket (), SOL_SOCKET,
-				  ~(SO_REUSEADDR),
+				  SO_EXCLUSIVEADDRUSE,
 				  (const char *) &on, sizeof on);
 	  debug_printf ("%d = setsockopt(SO_EXCLUSIVEADDRUSE), %E", ret);
 	}
