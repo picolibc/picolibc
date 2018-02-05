@@ -2461,6 +2461,66 @@ if_freenameindex (struct if_nameindex *ptr)
 #define PORT_HIGH	(IPPORT_RESERVED - 1)
 #define NUM_PORTS	(PORT_HIGH - PORT_LOW + 1)
 
+/* port is in host byte order */
+static in_port_t
+next_free_port (sa_family_t family, in_port_t in_port)
+{
+  DWORD ret;
+  ULONG size = 0;
+  char *tab = NULL;
+  PMIB_TCPTABLE tab4 = NULL;
+  PMIB_TCP6TABLE tab6 = NULL;
+
+  /* Start testing with incoming port number. */
+  in_port_t tst_port = in_port;
+  in_port_t res_port = 0;
+  in_port_t tab_port;
+
+  do
+    {
+      if (family == AF_INET)
+	ret = GetTcpTable ((PMIB_TCPTABLE) tab, &size, TRUE);
+      else
+	ret = GetTcp6Table ((PMIB_TCP6TABLE) tab, &size, TRUE);
+
+      if (ret == ERROR_INSUFFICIENT_BUFFER)
+	tab = (char *) realloc (tab, size);
+    }
+  while (ret == ERROR_INSUFFICIENT_BUFFER);
+
+  tab4 = (PMIB_TCPTABLE) tab;
+  tab6 = (PMIB_TCP6TABLE) tab;
+
+  /* dwNumEntries has offset 0 in both structs. */
+  for (int idx = tab4->dwNumEntries - 1; idx >= 0; --idx)
+    {
+      if (family == AF_INET)
+	tab_port = ntohs (tab4->table[idx].dwLocalPort);
+      else
+	tab_port = ntohs (tab6->table[idx].dwLocalPort);
+      /* Skip table entries with too high port number. */
+      if (tab_port > tst_port)
+	continue;
+      /* Is the current port number free? */
+      if (tab_port < tst_port)
+	{
+	  res_port = tst_port;
+	  break;
+	}
+      /* Decrement port and handle underflow of the reserved area. */
+      if (--tst_port < PORT_LOW)
+	{
+	  tst_port = PORT_HIGH;
+	  idx = tab4->dwNumEntries;
+	}
+      /* Check if we're round to the incoming port. */
+      if (tst_port == in_port)
+	break;
+    }
+  free (tab);
+  return res_port;
+}
+
 extern "C" int
 cygwin_bindresvport_sa (int fd, struct sockaddr *sa)
 {
@@ -2469,6 +2529,7 @@ cygwin_bindresvport_sa (int fd, struct sockaddr *sa)
   struct sockaddr_in6 *sin6 = NULL;
   socklen_t salen;
   int ret = -1;
+  LONG port, next_port;
 
   __try
     {
@@ -2507,21 +2568,34 @@ cygwin_bindresvport_sa (int fd, struct sockaddr *sa)
 	 but that may lead to EADDRINUSE scenarios when calling bindresvport
 	 on the client side.  So we ignore any port value that the caller
 	 supplies, just like glibc. */
-      LONG myport;
 
+      /* Note that repeating this loop NUM_PORTS times is arbitrary.  The
+         job is mainly done by next_free_port() but it doesn't cover bound
+	 sockets.  And calling and checking GetTcpTable and subsequently
+	 calling bind is inevitably racy.  We have to continue if bind fails
+	 with EADDRINUSE. */
       for (int i = 0; i < NUM_PORTS; i++)
 	{
-	  while ((myport = InterlockedExchange (
+	  while ((port = InterlockedExchange (
 			    &cygwin_shared->last_used_bindresvport, -1)) == -1)
 	    yield ();
-	  if (myport == 0 || --myport < PORT_LOW)
-	    myport = PORT_HIGH;
-	  InterlockedExchange (&cygwin_shared->last_used_bindresvport, myport);
-
+	  next_port = port;
+	  if (next_port == 0 || --next_port < PORT_LOW)
+	    next_port = PORT_HIGH;
+	  /* Returns 0 if no reserved port is free. */
+	  next_port = next_free_port (sa->sa_family, next_port);
+	  if (next_port)
+	    port = next_port;
+	  InterlockedExchange (&cygwin_shared->last_used_bindresvport, port);
+	  if (next_port == 0)
+	    {
+	      set_errno (EADDRINUSE);
+	      break;
+	    }
 	  if (sa->sa_family == AF_INET6)
-	    sin6->sin6_port = htons (myport);
+	    sin6->sin6_port = htons (port);
 	  else
-	    sin->sin_port = htons (myport);
+	    sin->sin_port = htons (port);
 	  if (!(ret = fh->bind (sa, salen)))
 	    break;
 	  if (get_errno () != EADDRINUSE && get_errno () != EINVAL)
