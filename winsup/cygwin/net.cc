@@ -2467,7 +2467,6 @@ cygwin_bindresvport_sa (int fd, struct sockaddr *sa)
   struct sockaddr_storage sst;
   struct sockaddr_in *sin = NULL;
   struct sockaddr_in6 *sin6 = NULL;
-  in_port_t port;
   socklen_t salen;
   int ret = -1;
 
@@ -2489,27 +2488,20 @@ cygwin_bindresvport_sa (int fd, struct sockaddr *sa)
 	case AF_INET:
 	  salen = sizeof (struct sockaddr_in);
 	  sin = (struct sockaddr_in *) sa;
-	  port = sin->sin_port;
 	  break;
 	case AF_INET6:
 	  salen = sizeof (struct sockaddr_in6);
 	  sin6 = (struct sockaddr_in6 *) sa;
-	  port = sin6->sin6_port;
 	  break;
 	default:
 	  set_errno (EPFNOSUPPORT);
 	  __leave;
 	}
 
-      /* If a non-zero port number is given, try this first.  If that succeeds,
-	 or if the error message is serious, return. */
-      if (port)
-	{
-	  ret = fh->bind (sa, salen);
-	  if (!ret || (get_errno () != EADDRINUSE && get_errno () != EINVAL))
-	    __leave;
-	}
-
+      /* Originally we tried to use the incoming port number first here,
+	 but that may lead to EADDRINUSE scenarios when calling bindresvport
+	 on the client side.  So we ignore any port value that the caller
+	 supplies, just like glibc. */
       LONG myport;
 
       for (int i = 0; i < NUM_PORTS; i++)
