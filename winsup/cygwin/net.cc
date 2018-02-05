@@ -2482,6 +2482,11 @@ cygwin_bindresvport_sa (int fd, struct sockaddr *sa)
 	  memset (&sst, 0, sizeof sst);
 	  sa->sa_family = fh->get_addr_family ();
 	}
+      else if (sa->sa_family != fh->get_addr_family ())
+	{
+	  set_errno (EPFNOSUPPORT);
+	  __leave;
+	}
 
       switch (sa->sa_family)
 	{
@@ -2529,10 +2534,14 @@ cygwin_bindresvport_sa (int fd, struct sockaddr *sa)
   return ret;
 }
 
-
 extern "C" int
 cygwin_bindresvport (int fd, struct sockaddr_in *sin)
 {
+  if (sin && sin->sin_family != AF_INET)
+    {
+      set_errno (EAFNOSUPPORT);
+      return -1;
+    }
   return cygwin_bindresvport_sa (fd, (struct sockaddr *) sin);
 }
 
