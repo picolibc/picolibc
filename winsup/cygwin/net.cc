@@ -797,6 +797,7 @@ extern "C" int
 cygwin_setsockopt (int fd, int level, int optname, const void *optval,
 		   socklen_t optlen)
 {
+  bool ignore = false;
   int res = -1;
 
   __try
@@ -805,105 +806,130 @@ cygwin_setsockopt (int fd, int level, int optname, const void *optval,
       if (!fh)
 	__leave;
 
-      /* Switch off the AF_LOCAL handshake and thus SO_PEERCRED handling
-	 for AF_LOCAL/SOCK_STREAM sockets.  This allows to handle special
-	 situations in which connect is called before a listening socket
-	 accepts connections.
-	 FIXME: In the long run we should find a more generic solution which
-	 doesn't require a blocking handshake in accept/connect to exchange
-	 SO_PEERCRED credentials. */
-      if (level == SOL_SOCKET && optname == SO_PEERCRED)
+      /* Preprocessing setsockopt.  Set ignore to true if setsockopt call
+	 should get skipped entirely. */
+      switch (level)
 	{
-	  if (optval || optlen)
-	    set_errno (EINVAL);
-	  else
-	    res = fh->af_local_set_no_getpeereid ();
-	  __leave;
+	case SOL_SOCKET:
+	  switch (optname)
+	    {
+	    case SO_PEERCRED:
+	      /* Switch off the AF_LOCAL handshake and thus SO_PEERCRED
+		 handling for AF_LOCAL/SOCK_STREAM sockets.  This allows to
+		 handle special situations in which connect is called before
+		 a listening socket accepts connections.
+		 FIXME: In the long run we should find a more generic solution
+		 which doesn't require a blocking handshake in accept/connect
+		 to exchange SO_PEERCRED credentials. */
+	      if (optval || optlen)
+		set_errno (EINVAL);
+	      else
+		res = fh->af_local_set_no_getpeereid ();
+	      __leave;
+
+	    case SO_REUSEADDR:
+	      /* Per POSIX we must not be able to reuse a complete duplicate
+		 of a local TCP address (same IP, same port), even if
+		 SO_REUSEADDR has been set.  This behaviour is maintained in
+		 WinSock for backward compatibility, while the WinSock
+		 standard behaviour of stream socket binding is equivalent to
+		 the POSIX behaviour as if SO_REUSEADDR has been set.
+		 The SO_EXCLUSIVEADDRUSE option has been added to allow an
+		 application to request POSIX standard behaviour in the
+		 non-SO_REUSEADDR case.
+
+		 To emulate POSIX socket binding behaviour, note that
+		 SO_REUSEADDR has been set but don't call setsockopt.
+		 Instead fhandler_socket::bind sets SO_EXCLUSIVEADDRUSE if
+		 the application did not set SO_REUSEADDR. */
+	      if (fh->get_socket_type () == SOCK_STREAM)
+		ignore = true;
+	      break;
+
+	    default:
+	      break;
+	    }
+	  break;
+
+	case IPPROTO_IP:
+	  /* Old applications still use the old WinSock1 IPPROTO_IP values. */
+	  if (CYGWIN_VERSION_CHECK_FOR_USING_WINSOCK1_VALUES)
+	    optname = convert_ws1_ip_optname (optname);
+	  switch (optname)
+	    {
+	    case IP_TOS:
+	      /* Winsock doesn't support setting the IP_TOS field with
+		 setsockopt and TOS was never implemented for TCP anyway.
+		 setsockopt returns WinSock error 10022, WSAEINVAL when
+		 trying to set the IP_TOS field.  We just return 0 instead. */
+	      ignore = true;
+	      break;
+
+	    default:
+	      break;
+	    }
+	  break;
+
+	case IPPROTO_IPV6:
+	  {
+	  switch (optname)
+	    {
+	    case IPV6_TCLASS:
+	      /* Unsupported */
+	      ignore = true;
+	      break;
+
+	    default:
+	      break;
+	    }
+	  }
+	default:
+	  break;
 	}
 
-      /* Old applications still use the old WinSock1 IPPROTO_IP values. */
-      if (level == IPPROTO_IP && CYGWIN_VERSION_CHECK_FOR_USING_WINSOCK1_VALUES)
-	optname = convert_ws1_ip_optname (optname);
-
-      /* Per POSIX we must not be able to reuse a complete duplicate of a
-	 local TCP address (same IP, same port), even if SO_REUSEADDR has been
-	 set.  That's unfortunately possible in WinSock, and this has never
-	 been changed to maintain backward compatibility.  Instead, the
-	 SO_EXCLUSIVEADDRUSE option has been added to allow an application to
-	 request POSIX standard behaviour in the non-SO_REUSEADDR case.
-
-	 However, the WinSock standard behaviour of stream socket binding
-	 is equivalent to the POSIX behaviour as if SO_REUSEADDR has been set.
-	 So what we do here is to note that SO_REUSEADDR has been set, but not
-	 actually hand over the request to WinSock.  This is tested in
-	 fhandler_socket::bind(), so that SO_EXCLUSIVEADDRUSE can be set if
-	 the application did not set SO_REUSEADDR.  This should reflect the
-	 POSIX socket binding behaviour as close as possible with WinSock. */
-      if (level == SOL_SOCKET && optname == SO_REUSEADDR
-	  && fh->get_socket_type () == SOCK_STREAM)
+      /* Call setsockopt (or not) */
+      if (ignore)
 	res = 0;
       else
-	res = setsockopt (fh->get_socket (), level, optname,
-			  (const char *) optval, optlen);
+	{
+	  res = setsockopt (fh->get_socket (), level, optname,
+			    (const char *) optval, optlen);
+	  if (res == SOCKET_ERROR)
+	    {
+	      set_winsock_errno ();
+	      __leave;
+	    }
+	}
 
       if (optlen == sizeof (int))
-	syscall_printf ("setsockopt optval=%x", *(int *) optval);
+	debug_printf ("setsockopt optval=%x", *(int *) optval);
 
-      if (res)
+      /* Postprocessing setsockopt, setting fhandler_socket members, etc. */
+      switch (level)
 	{
-	  /* KB 248611:
-
-	     Windows 2000 and above don't support setting the IP_TOS field
-	     with setsockopt.  Additionally, TOS was always (also under 9x
-	     and NT) only implemented for UDP and ICMP, never for TCP.
-
-	     The difference is that beginning with Windows 2000 the
-	     setsockopt call returns WinSock error 10022, WSAEINVAL when
-	     trying to set the IP_TOS field, instead of just ignoring the
-	     call.  This is *not* explained in KB 248611, but only in KB
-	     258978.
-
-	     Either case, the official workaround is to add a new registry
-	     DWORD value HKLM/System/CurrentControlSet/Services/Tcpip/...
-	     ...  Parameters/DisableUserTOSSetting, set to 0, and reboot.
-
-	     Sidenote: The reasoning for dropping ToS in Win2K is that ToS
-	     per RFC 1349 is incompatible with DiffServ per RFC 2474/2475.
-
-	     We just ignore the return value of setting IP_TOS entirely.
-	     
-	     CV 2014-04-16: Same for IPV6_TCLASS
-	     FIXME:         Same for IPV6_RECVTCLASS? */
-	  if (level == IPPROTO_IP && optname == IP_TOS
-	      && WSAGetLastError () == WSAEINVAL)
+	case SOL_SOCKET:
+	  switch (optname)
 	    {
-	      debug_printf ("Faked IP_TOS success");
-	      res = 0;
+	    case SO_REUSEADDR:
+	      fh->saw_reuseaddr (*(int *) optval);
+	      break;
+
+	    case SO_RCVBUF:
+	      fh->rmem (*(int *) optval);
+	      break;
+
+	    case SO_SNDBUF:
+	      fh->wmem (*(int *) optval);
+	      break;
+
+	    default:
+	      break;
 	    }
-	  else if (level == IPPROTO_IPV6 && optname == IPV6_TCLASS
-		   && WSAGetLastError () == WSAENOPROTOOPT)
-	    {
-	      debug_printf ("Faked IPV6_TCLASS success");
-	      res = 0;
-	    }
-	  else
-	    set_winsock_errno ();
+	  break;
+
+	default:
+	  break;
 	}
-      else if (level == SOL_SOCKET)
-	switch (optname)
-	  {
-	  case SO_REUSEADDR:
-	    fh->saw_reuseaddr (*(int *) optval);
-	    break;
-	  case SO_RCVBUF:
-	    fh->rmem (*(int *) optval);
-	    break;
-	  case SO_SNDBUF:
-	    fh->wmem (*(int *) optval);
-	    break;
-	  default:
-	    break;
-	  }
     }
   __except (EFAULT)
     {
@@ -920,6 +946,8 @@ extern "C" int
 cygwin_getsockopt (int fd, int level, int optname, void *optval,
 		   socklen_t *optlen)
 {
+  bool ignore = false;
+  bool onebyte = false;
   int res = -1;
 
   __try
@@ -927,49 +955,110 @@ cygwin_getsockopt (int fd, int level, int optname, void *optval,
       fhandler_socket *fh = get (fd);
       if (!fh)
 	__leave;
-      if (optname == SO_PEERCRED && level == SOL_SOCKET)
+
+      /* Preprocessing getsockopt.  Set ignore to true if getsockopt call
+	 should get skipped entirely. */
+      switch (level)
 	{
-	  struct ucred *cred = (struct ucred *) optval;
-	  res = fh->getpeereid (&cred->pid, &cred->uid, &cred->gid);
-	  __leave;
+	case SOL_SOCKET:
+	  switch (optname)
+	    {
+	    case SO_PEERCRED:
+	      {
+		struct ucred *cred = (struct ucred *) optval;
+		res = fh->getpeereid (&cred->pid, &cred->uid, &cred->gid);
+		__leave;
+	      }
+	      break;
+
+	    case SO_REUSEADDR:
+	      {
+		unsigned int *reuseaddr = (unsigned int *) optval;
+		*reuseaddr = fh->saw_reuseaddr();
+		*optlen = sizeof *reuseaddr;
+		ignore = true;
+	      }
+	      break;
+
+	    default:
+	      break;
+	    }
+	  break;
+
+	case IPPROTO_IP:
+	  /* Old applications still use the old WinSock1 IPPROTO_IP values. */
+	  if (CYGWIN_VERSION_CHECK_FOR_USING_WINSOCK1_VALUES)
+	    optname = convert_ws1_ip_optname (optname);
+	  break;
+
+	default:
+	  break;
 	}
-      else if (optname == SO_REUSEADDR && level == SOL_SOCKET)
+
+      /* Call getsockopt (or not) */
+      if (ignore)
+	res = 0;
+      else
 	{
-	  unsigned int *reuseaddr = (unsigned int *) optval;
-	  *reuseaddr = fh->saw_reuseaddr();
-	  *optlen = sizeof *reuseaddr;
-	  res = 0;
-	  __leave;
+	  res = getsockopt (fh->get_socket (), level, optname, (char *) optval,
+			    (int *) optlen);
+	  if (res == SOCKET_ERROR)
+	    {
+	      set_winsock_errno ();
+	      __leave;
+	    }
 	}
-      /* Old applications still use the old WinSock1 IPPROTO_IP values. */
-      if (level == IPPROTO_IP && CYGWIN_VERSION_CHECK_FOR_USING_WINSOCK1_VALUES)
-	optname = convert_ws1_ip_optname (optname);
-      res = getsockopt (fh->get_socket (), level, optname, (char *) optval,
-			(int *) optlen);
-      if (res == SOCKET_ERROR)
-	set_winsock_errno ();
-      else if (level == SOL_SOCKET && optname == SO_ERROR)
+
+      /* Postprocessing getsockopt, setting fhandler_socket members, etc.
+         Set onebyte to true for options returning a BOOLEAN instead of a
+	 boolean DWORD. */
+      switch (level)
 	{
-	  int *e = (int *) optval;
-	  debug_printf ("WinSock SO_ERROR = %d", *e);
-	  *e = find_winsock_errno (*e);
+	case SOL_SOCKET:
+	  switch (optname)
+	    {
+	    case SO_ERROR:
+	      {
+		int *e = (int *) optval;
+		debug_printf ("WinSock SO_ERROR = %d", *e);
+		*e = find_winsock_errno (*e);
+	      }
+	      break;
+
+	    case SO_KEEPALIVE:
+	    case SO_DONTROUTE:
+	      onebyte = true;
+	      break;
+
+	    default:
+	      break;
+	    }
+	  break;
+	case IPPROTO_TCP:	
+	  switch (optname)
+	    {
+	    case TCP_NODELAY:
+	      onebyte = true;
+	      break;
+
+	    default:
+	      break;
+	    }
+	default:
+	  break;
 	}
-      else if (*optlen == 1)
+
+      if (onebyte)
 	{
-	  /* Regression in Vista and later:  instead of a 4 byte BOOL value,
+	  /* Regression in Vista and later: instead of a 4 byte BOOL value,
 	     a 1 byte BOOLEAN value is returned, in contrast to older systems
 	     and the documentation.  Since an int type is expected by the
 	     calling application, we convert the result here.  For some reason
 	     only three BSD-compatible socket options seem to be affected. */
-	  if ((level == SOL_SOCKET
-	       && (optname == SO_KEEPALIVE || optname == SO_DONTROUTE))
-	      || (level == IPPROTO_TCP && optname == TCP_NODELAY))
-	    {
-	      BOOLEAN *in = (BOOLEAN *) optval;
-	      int *out = (int *) optval;
-	      *out = *in;
-	      *optlen = 4;
-	    }
+	  BOOLEAN *in = (BOOLEAN *) optval;
+	  int *out = (int *) optval;
+	  *out = *in;
+	  *optlen = 4;
 	}
     }
   __except (EFAULT)
