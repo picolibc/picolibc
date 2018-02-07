@@ -842,6 +842,11 @@ cygwin_setsockopt (int fd, int level, int optname, const void *optval,
 		 SO_REUSEADDR has been set but don't call setsockopt.
 		 Instead fhandler_socket::bind sets SO_EXCLUSIVEADDRUSE if
 		 the application did not set SO_REUSEADDR. */
+	      if (optlen < (socklen_t) sizeof (int))
+		{
+		  set_errno (EINVAL);
+		  __leave;
+		}
 	      if (fh->get_socket_type () == SOCK_STREAM)
 		ignore = true;
 	      break;
@@ -901,7 +906,7 @@ cygwin_setsockopt (int fd, int level, int optname, const void *optval,
 	    }
 	}
 
-      if (optlen == sizeof (int))
+      if (optlen == (socklen_t) sizeof (int))
 	debug_printf ("setsockopt optval=%x", *(int *) optval);
 
       /* Postprocessing setsockopt, setting fhandler_socket members, etc. */
@@ -966,7 +971,15 @@ cygwin_getsockopt (int fd, int level, int optname, void *optval,
 	    case SO_PEERCRED:
 	      {
 		struct ucred *cred = (struct ucred *) optval;
+
+		if (*optlen < (socklen_t) sizeof *cred)
+		  {
+		    set_errno (EINVAL);
+		    __leave;
+		  }
 		res = fh->getpeereid (&cred->pid, &cred->uid, &cred->gid);
+		if (!res)
+		  *optlen = (socklen_t) sizeof *cred;
 		__leave;
 	      }
 	      break;
@@ -974,8 +987,14 @@ cygwin_getsockopt (int fd, int level, int optname, void *optval,
 	    case SO_REUSEADDR:
 	      {
 		unsigned int *reuseaddr = (unsigned int *) optval;
+
+		if (*optlen < (socklen_t) sizeof *reuseaddr)
+		  {
+		    set_errno (EINVAL);
+		    __leave;
+		  }
 		*reuseaddr = fh->saw_reuseaddr();
-		*optlen = sizeof *reuseaddr;
+		*optlen = (socklen_t) sizeof *reuseaddr;
 		ignore = true;
 	      }
 	      break;
