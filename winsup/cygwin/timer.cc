@@ -14,6 +14,7 @@ details. */
 #include "fhandler.h"
 #include "dtable.h"
 #include "cygheap.h"
+#include <sys/param.h>
 
 #define TT_MAGIC 0x513e4a1c
 struct timer_tracker
@@ -105,12 +106,12 @@ timer_tracker::timer_tracker (clockid_t c, const sigevent *e)
     }
 }
 
-static long long
-to_us (const timespec& ts)
+static inline long long
+timespec_to_us (const timespec& ts)
 {
   long long res = ts.tv_sec;
-  res *= 1000000;
-  res += ts.tv_nsec / 1000 + ((ts.tv_nsec % 1000) ? 1 : 0);
+  res *= USPERSEC;
+  res += (ts.tv_nsec + (NSPERSEC/USPERSEC) - 1) / (NSPERSEC/USPERSEC);
   return res;
 }
 
@@ -131,7 +132,7 @@ timer_thread (VOID *x)
       if (sleep_us > 0)
 	{
 	  tt->sleepto_us = sleepto_us;
-	  sleep_ms = (sleep_us + 999) / 1000;
+	  sleep_ms = (sleep_us + (USPERSEC/HZ) - 1) / (USPERSEC/HZ);
 	}
       else
 	{
@@ -203,10 +204,10 @@ out:
   return 0;
 }
 
-static bool
-it_bad (const timespec& t)
+static inline bool
+timespec_bad (const timespec& t)
 {
-  if (t.tv_nsec < 0 || t.tv_nsec >= 1000000000 || t.tv_sec < 0)
+  if (t.tv_nsec < 0 || t.tv_nsec >= NSPERSEC || t.tv_sec < 0)
     {
       set_errno (EINVAL);
       return true;
@@ -227,7 +228,7 @@ timer_tracker::settime (int in_flags, const itimerspec *value, itimerspec *ovalu
 	  __leave;
 	}
 
-      if (it_bad (value->it_value) || it_bad (value->it_interval))
+      if (timespec_bad (value->it_value) || timespec_bad (value->it_interval))
 	__leave;
 
       long long now = in_flags & TIMER_ABSTIME ? 0 : gtod.usecs ();
@@ -242,8 +243,8 @@ timer_tracker::settime (int in_flags, const itimerspec *value, itimerspec *ovalu
 	interval_us = sleepto_us = 0;
       else
 	{
-	  sleepto_us = now + to_us (value->it_value);
-	  interval_us = to_us (value->it_interval);
+	  sleepto_us = now + timespec_to_us (value->it_value);
+	  interval_us = timespec_to_us (value->it_interval);
 	  it_interval = value->it_interval;
 	  if (!hcancel)
 	    hcancel = CreateEvent (&sec_none_nih, TRUE, FALSE, NULL);
@@ -274,8 +275,8 @@ timer_tracker::gettime (itimerspec *ovalue)
       long long left_us = sleepto_us - now;
       if (left_us < 0)
        left_us = 0;
-      ovalue->it_value.tv_sec = left_us / 1000000;
-      ovalue->it_value.tv_nsec = (left_us % 1000000) * 1000;
+      ovalue->it_value.tv_sec = left_us / USPERSEC;
+      ovalue->it_value.tv_nsec = (left_us % USPERSEC) * (NSPERSEC/USPERSEC);
     }
 }
 
@@ -481,16 +482,18 @@ ualarm (useconds_t value, useconds_t interval)
     Interpret negative arguments as zero */
  if (value > 0)
    {
-     timer.it_value.tv_sec = value / 1000000;
-     timer.it_value.tv_nsec = (value % 1000000) * 1000;
+     timer.it_value.tv_sec = value / USPERSEC;
+     timer.it_value.tv_nsec = (value % USPERSEC) * (NSPERSEC/USPERSEC);
    }
  if (interval > 0)
    {
-     timer.it_interval.tv_sec = interval / 1000000;
-     timer.it_interval.tv_nsec = (interval % 1000000) * 1000;
+     timer.it_interval.tv_sec = interval / USPERSEC;
+     timer.it_interval.tv_nsec = (interval % USPERSEC) * (NSPERSEC/USPERSEC);
    }
  timer_settime ((timer_t) &ttstart, 0, &timer, &otimer);
- useconds_t ret = otimer.it_value.tv_sec * 1000000 + (otimer.it_value.tv_nsec + 999) / 1000;
+ useconds_t ret = otimer.it_value.tv_sec * USPERSEC
+		  + (otimer.it_value.tv_nsec + (NSPERSEC/USPERSEC) - 1)
+		    / (NSPERSEC/USPERSEC);
  syscall_printf ("%d = ualarm(%ld , %ld)", ret, value, interval);
  return ret;
 }

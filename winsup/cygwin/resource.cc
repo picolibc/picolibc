@@ -29,9 +29,9 @@ add_timeval (struct timeval *tv1, struct timeval *tv2)
 {
   tv1->tv_sec += tv2->tv_sec;
   tv1->tv_usec += tv2->tv_usec;
-  if (tv1->tv_usec >= 1000000)
+  if (tv1->tv_usec >= USPERSEC)
     {
-      tv1->tv_usec -= 1000000;
+      tv1->tv_usec -= USPERSEC;
       tv1->tv_sec++;
     }
 }

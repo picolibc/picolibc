@@ -183,7 +183,7 @@ ipc_cond_timedwait (HANDLE evt, HANDLE mtx, const struct timespec *abstime)
     {
       if (abstime->tv_sec < 0
 	       || abstime->tv_nsec < 0
-	       || abstime->tv_nsec > 999999999)
+	       || abstime->tv_nsec >= NSPERSEC)
 	return EINVAL;
 
       /* If a timeout is set, we create a waitable timer to wait for.

@@ -2546,7 +2546,7 @@ pthread_convert_abstime (clockid_t clock_id, const struct timespec *abstime,
   /* According to SUSv3, the abstime value must be checked for validity. */
   if (abstime->tv_sec < 0
       || abstime->tv_nsec < 0
-      || abstime->tv_nsec > 999999999)
+      || abstime->tv_nsec >= NSPERSEC)
     return EINVAL;
 
   /* Check for immediate timeout before converting */
@@ -2556,8 +2556,9 @@ pthread_convert_abstime (clockid_t clock_id, const struct timespec *abstime,
 	  && tp.tv_nsec > abstime->tv_nsec))
     return ETIMEDOUT;
 
-  timeout->QuadPart = abstime->tv_sec * NSPERSEC
-		     + (abstime->tv_nsec + 99LL) / 100LL;
+  timeout->QuadPart = abstime->tv_sec * NS100PERSEC
+		     + (abstime->tv_nsec + (NSPERSEC/NS100PERSEC) - 1)
+		       / (NSPERSEC/NS100PERSEC);
   switch (clock_id)
     {
     case CLOCK_REALTIME:
@@ -2565,7 +2566,8 @@ pthread_convert_abstime (clockid_t clock_id, const struct timespec *abstime,
       break;
     default:
       /* other clocks must be handled as relative timeout */
-      timeout->QuadPart -= tp.tv_sec * NSPERSEC + tp.tv_nsec / 100LL;
+      timeout->QuadPart -= tp.tv_sec * NS100PERSEC + tp.tv_nsec
+			   / (NSPERSEC/NS100PERSEC);
       timeout->QuadPart *= -1LL;
       break;
     }

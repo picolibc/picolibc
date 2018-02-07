@@ -1314,8 +1314,8 @@ fhandler_base::utimens_fs (const struct timespec *tvp)
     tmp[1] = tmp[0] = timeofday;
   else
     {
-      if ((tvp[0].tv_nsec < UTIME_NOW || tvp[0].tv_nsec > 999999999L)
-	  || (tvp[1].tv_nsec < UTIME_NOW || tvp[1].tv_nsec > 999999999L))
+      if ((tvp[0].tv_nsec < UTIME_NOW || tvp[0].tv_nsec >= NSPERSEC)
+	  || (tvp[1].tv_nsec < UTIME_NOW || tvp[1].tv_nsec >= NSPERSEC))
 	{
 	  if (closeit)
 	    close_fs ();

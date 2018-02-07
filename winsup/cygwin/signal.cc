@@ -65,7 +65,7 @@ clock_nanosleep (clockid_t clk_id, int flags, const struct timespec *rqtp,
   sig_dispatch_pending ();
   pthread_testcancel ();
 
-  if (rqtp->tv_sec < 0 || rqtp->tv_nsec < 0 || rqtp->tv_nsec > 999999999L)
+  if (rqtp->tv_sec < 0 || rqtp->tv_nsec < 0 || rqtp->tv_nsec >= NSPERSEC)
     return EINVAL;
 
   /* Explicitly disallowed by POSIX. Needs to be checked first to avoid
@@ -89,8 +89,9 @@ clock_nanosleep (clockid_t clk_id, int flags, const struct timespec *rqtp,
 
   LARGE_INTEGER timeout;
 
-  timeout.QuadPart = (LONGLONG) rqtp->tv_sec * NSPERSEC
-		     + ((LONGLONG) rqtp->tv_nsec + 99LL) / 100LL;
+  timeout.QuadPart = (LONGLONG) rqtp->tv_sec * NS100PERSEC
+		     + ((LONGLONG) rqtp->tv_nsec + (NSPERSEC/NS100PERSEC) - 1)
+		       / (NSPERSEC/NS100PERSEC);
 
   if (abstime)
     {
@@ -107,7 +108,8 @@ clock_nanosleep (clockid_t clk_id, int flags, const struct timespec *rqtp,
       else
 	{
 	  /* other clocks need to be handled with a relative timeout */
-	  timeout.QuadPart -= tp.tv_sec * NSPERSEC + tp.tv_nsec / 100LL;
+	  timeout.QuadPart -= tp.tv_sec * NS100PERSEC
+			      + tp.tv_nsec / (NSPERSEC/NS100PERSEC);
 	  timeout.QuadPart *= -1LL;
 	}
     }
@@ -123,8 +125,9 @@ clock_nanosleep (clockid_t clk_id, int flags, const struct timespec *rqtp,
   /* according to POSIX, rmtp is used only if !abstime */
   if (rmtp && !abstime)
     {
-      rmtp->tv_sec = (time_t) (timeout.QuadPart / NSPERSEC);
-      rmtp->tv_nsec = (long) ((timeout.QuadPart % NSPERSEC) * 100LL);
+      rmtp->tv_sec = (time_t) (timeout.QuadPart / NS100PERSEC);
+      rmtp->tv_nsec = (long) ((timeout.QuadPart % NS100PERSEC)
+			      * (NSPERSEC/NS100PERSEC));
     }
 
   syscall_printf ("%d = clock_nanosleep(%lu, %d, %ld.%09ld, %ld.%09.ld)",
@@ -160,8 +163,8 @@ extern "C" unsigned int
 usleep (useconds_t useconds)
 {
   struct timespec req;
-  req.tv_sec = useconds / 1000000;
-  req.tv_nsec = (useconds % 1000000) * 1000;
+  req.tv_sec = useconds / USPERSEC;
+  req.tv_nsec = (useconds % USPERSEC) * (NSPERSEC/USPERSEC);
   int res = clock_nanosleep (CLOCK_REALTIME, 0, &req, NULL);
   if (res != 0)
     {
@@ -628,14 +631,15 @@ sigtimedwait (const sigset_t *set, siginfo_t *info, const timespec *timeout)
   if (timeout)
     {
       if (timeout->tv_sec < 0
-	    || timeout->tv_nsec < 0 || timeout->tv_nsec > (NSPERSEC * 100LL))
+	    || timeout->tv_nsec < 0 || timeout->tv_nsec > NSPERSEC)
 	{
 	  set_errno (EINVAL);
 	  return -1;
 	}
       /* convert timespec to 100ns units */
-      waittime.QuadPart = (LONGLONG) timeout->tv_sec * NSPERSEC
-                          + ((LONGLONG) timeout->tv_nsec + 99LL) / 100LL;
+      waittime.QuadPart = (LONGLONG) timeout->tv_sec * NS100PERSEC
+                          + ((LONGLONG) timeout->tv_nsec + (NSPERSEC/NS100PERSEC) - 1)
+			    / (NSPERSEC/NS100PERSEC);
     }
 
   return sigwait_common (set, info, timeout ? &waittime : cw_infinite);

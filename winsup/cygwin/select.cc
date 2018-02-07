@@ -107,7 +107,10 @@ pselect (int maxfds, fd_set *readfds, fd_set *writefds, fd_set *exceptfds,
       else
 	{
 	  /* Convert to microseconds or -1 if to == NULL */
-	  LONGLONG us = to ? to->tv_sec * 1000000LL + (to->tv_nsec + 999) / 1000 : -1LL;
+	  LONGLONG us = to ? to->tv_sec * USPERSEC
+			     + (to->tv_nsec + (NSPERSEC/USPERSEC) - 1)
+			       / (NSPERSEC/USPERSEC)
+			   : -1LL;
 
 	  if (to)
 	    select_printf ("to->tv_sec %ld, to->tv_nsec %ld, us %D", to->tv_sec, to->tv_nsec, us);

@@ -19,6 +19,7 @@ details. */
 #include "ntdll.h"
 #include "tls_pbuf.h"
 #include "cpuid.h"
+#include "hires.h"
 
 static long
 get_open_max (int in)
@@ -793,7 +794,7 @@ sysinfo (struct sysinfo *info)
 				     sizeof_stodi, NULL);
   if (NT_SUCCESS (status))
     uptime = (stodi->CurrentTime.QuadPart - stodi->BootTime.QuadPart)
-	     / 10000000ULL;
+	     / NS100PERSEC;
   else
     debug_printf ("NtQuerySystemInformation(SystemTimeOfDayInformation), "
 		  "status %y", status);

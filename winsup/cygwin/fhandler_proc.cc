@@ -535,9 +535,9 @@ format_proc_stat (void *, char *&destbuf)
       for (unsigned long i = 0; i < wincap.cpu_count (); i++)
 	{
 	  kernel_time += (spt[i].KernelTime.QuadPart - spt[i].IdleTime.QuadPart)
-			 * HZ / 10000000ULL;
-	  user_time += spt[i].UserTime.QuadPart * HZ / 10000000ULL;
-	  idle_time += spt[i].IdleTime.QuadPart * HZ / 10000000ULL;
+			 * HZ / NS100PERSEC;
+	  user_time += spt[i].UserTime.QuadPart * HZ / NS100PERSEC;
+	  idle_time += spt[i].IdleTime.QuadPart * HZ / NS100PERSEC;
 	}
 
       eobuf += __small_sprintf (eobuf, "cpu %U %U %U %U\n",
@@ -546,9 +546,9 @@ format_proc_stat (void *, char *&destbuf)
       for (unsigned long i = 0; i < wincap.cpu_count (); i++)
 	{
 	  interrupt_count += spt[i].InterruptCount;
-	  kernel_time = (spt[i].KernelTime.QuadPart - spt[i].IdleTime.QuadPart) * HZ / 10000000ULL;
-	  user_time = spt[i].UserTime.QuadPart * HZ / 10000000ULL;
-	  idle_time = spt[i].IdleTime.QuadPart * HZ / 10000000ULL;
+	  kernel_time = (spt[i].KernelTime.QuadPart - spt[i].IdleTime.QuadPart) * HZ / NS100PERSEC;
+	  user_time = spt[i].UserTime.QuadPart * HZ / NS100PERSEC;
+	  idle_time = spt[i].IdleTime.QuadPart * HZ / NS100PERSEC;
 	  eobuf += __small_sprintf (eobuf, "cpu%d %U %U %U %U\n", i,
 				    user_time, 0ULL, kernel_time, idle_time);
 	}
