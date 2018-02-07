@@ -223,7 +223,7 @@ timeval_to_ms (const struct timeval *time_in, DWORD &ms)
       || time_in->tv_usec >= USPERSEC)
     return false;
   if ((time_in->tv_sec == 0 && time_in->tv_usec == 0)
-      || time_in->tv_sec >= INFINITE / HZ)
+      || time_in->tv_sec >= (time_t) (INFINITE / HZ))
     ms = INFINITE;
   else
     ms = time_in->tv_sec * HZ + (time_in->tv_usec + (USPERSEC/HZ) - 1)
