@@ -851,6 +851,21 @@ cygwin_setsockopt (int fd, int level, int optname, const void *optval,
 		ignore = true;
 	      break;
 
+	    case SO_RCVTIMEO:
+	    case SO_SNDTIMEO:
+	      if (optlen < (socklen_t) sizeof (struct timeval))
+		{
+		  set_errno (EINVAL);
+		  __leave;
+		}
+	      if (timeval_to_ms ((struct timeval *) optval,
+				 (optname == SO_RCVTIMEO)
+				 ? fh->rcvtimeo () : fh->sndtimeo ()))
+		res = 0;
+	      else
+		set_errno (EDOM);
+	      __leave;
+
 	    default:
 	      break;
 	    }
@@ -998,6 +1013,33 @@ cygwin_getsockopt (int fd, int level, int optname, void *optval,
 		ignore = true;
 	      }
 	      break;
+
+	    case SO_RCVTIMEO:
+	    case SO_SNDTIMEO:
+	      {
+		struct timeval *time_out = (struct timeval *) optval;
+
+		if (*optlen < (socklen_t) sizeof *time_out)
+		  {
+		    set_errno (EINVAL);
+		    __leave;
+		  }
+		DWORD ms = (optname == SO_RCVTIMEO) ? fh->rcvtimeo ()
+						    : fh->sndtimeo ();
+		if (ms == 0 || ms == INFINITE)
+		  {
+		    time_out->tv_sec = 0;
+		    time_out->tv_usec = 0;
+		  }
+		else
+		  {
+		    time_out->tv_sec = ms / HZ;
+		    time_out->tv_usec = ((ms % HZ) * USPERSEC) / HZ;
+		  }
+		*optlen = (socklen_t) sizeof *time_out;
+		res = 0;
+		__leave;
+	      }
 
 	    default:
 	      break;

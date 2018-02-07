@@ -524,6 +524,13 @@ class fhandler_socket: public fhandler_base
   void wmem (int nwmem) { _wmem = nwmem; }
 
  private:
+  DWORD _rcvtimeo; /* msecs */
+  DWORD _sndtimeo; /* msecs */
+ public:
+  DWORD &rcvtimeo () { return _rcvtimeo; }
+  DWORD &sndtimeo () { return _sndtimeo; }
+
+ private:
   struct _WSAPROTOCOL_INFOW *prot_info_ptr;
  public:
   void init_fixup_before ();

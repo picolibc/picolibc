@@ -216,6 +216,22 @@ timeval_to_filetime (const struct timeval *time_in, PLARGE_INTEGER out)
 }
 
 /* Cygwin internal */
+bool
+timeval_to_ms (const struct timeval *time_in, DWORD &ms)
+{
+  if (time_in->tv_sec < 0 || time_in->tv_usec < 0
+      || time_in->tv_usec >= USPERSEC)
+    return false;
+  if ((time_in->tv_sec == 0 && time_in->tv_usec == 0)
+      || time_in->tv_sec >= INFINITE / HZ)
+    ms = INFINITE;
+  else
+    ms = time_in->tv_sec * HZ + (time_in->tv_usec + (USPERSEC/HZ) - 1)
+				/ (USPERSEC/HZ);
+  return true;
+}
+
+/* Cygwin internal */
 static timeval __stdcall
 time_t_to_timeval (time_t in)
 {

@@ -206,6 +206,7 @@ void __stdcall to_timestruc_t (PLARGE_INTEGER, timestruc_t *);
 void __stdcall time_as_timestruc_t (timestruc_t *);
 void __stdcall timeval_to_filetime (const struct timeval *, PLARGE_INTEGER);
 void __stdcall timespec_to_filetime (const struct timespec *, PLARGE_INTEGER);
+bool timeval_to_ms (const struct timeval *, DWORD &);
 
 /* Console related */
 void __stdcall set_console_title (char *);

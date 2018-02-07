@@ -227,6 +227,8 @@ fhandler_socket::fhandler_socket () :
   wsock_events (NULL),
   wsock_mtx (NULL),
   wsock_evt (NULL),
+  _rcvtimeo (INFINITE),
+  _sndtimeo (INFINITE),
   prot_info_ptr (NULL),
   sun_path (NULL),
   peer_sun_path (NULL),
@@ -752,6 +754,8 @@ fhandler_socket::wait_for_events (const long event_mask, const DWORD flags)
 
   int ret;
   long events = 0;
+  DWORD wfmo_timeout = 50;
+  DWORD timeout;
 
   WSAEVENT ev[3] = { wsock_evt, NULL, NULL };
   wait_signal_arrived here (ev[1]);
@@ -759,19 +763,32 @@ fhandler_socket::wait_for_events (const long event_mask, const DWORD flags)
   if ((ev[2] = pthread::get_cancel_event ()) != NULL)
     ++ev_cnt;
 
+  if (is_nonblocking () || (flags & MSG_DONTWAIT))
+    timeout = 0;
+  else if (event_mask & FD_READ)
+    timeout = rcvtimeo ();
+  else if (event_mask & FD_WRITE)
+    timeout = sndtimeo ();
+  else
+    timeout = INFINITE;
+
   while (!(ret = evaluate_events (event_mask, events, !(flags & MSG_PEEK)))
 	 && !events)
     {
-      if (is_nonblocking () || (flags & MSG_DONTWAIT))
+      if (timeout == 0)
 	{
 	  WSASetLastError (WSAEWOULDBLOCK);
 	  return SOCKET_ERROR;
 	}
 
-      switch (WSAWaitForMultipleEvents (ev_cnt, ev, FALSE, 50, FALSE))
+      if (timeout < wfmo_timeout)
+	wfmo_timeout = timeout;
+      switch (WSAWaitForMultipleEvents (ev_cnt, ev, FALSE, wfmo_timeout, FALSE))
 	{
 	  case WSA_WAIT_TIMEOUT:
 	  case WSA_WAIT_EVENT_0:
+	    if (timeout != INFINITE)
+	      timeout -= wfmo_timeout;
 	    break;
 
 	  case WSA_WAIT_EVENT_0 + 1:
