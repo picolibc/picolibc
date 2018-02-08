@@ -31,6 +31,9 @@ typedef	__uint32_t	__mode_t;
 typedef	__uint64_t	_CLOCK_T_;
 #define	__machine_clock_t_defined
 
+typedef	int		_CLOCKID_T_;
+#define	__machine_clockid_t_defined
+
 typedef	int		__accmode_t;	/* access permissions */
 typedef	__uint32_t	__fixpt_t;	/* fixed point number */
 typedef	int		__lwpid_t;	/* Thread ID (a.k.a. LWP) */
