@@ -10,6 +10,8 @@
 #include <unistd.h>
 #include "arm.h"
 
+/* forward declaration */
+int main(int argc, char *argv[], char *env[]);
 static int _main(int argc, char *argv[]) __attribute__((noreturn));
 
 #if __thumb__ && !defined(PREFER_THUMB)
