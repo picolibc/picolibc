@@ -35,6 +35,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <errno.h>
+#include <malloc.h>
 
 #if DEBUG
 #include <assert.h>
@@ -150,20 +151,6 @@ typedef struct malloc_chunk
     struct malloc_chunk * next;
 }chunk;
 
-/* Copied from malloc.h */
-struct mallinfo
-{
-  size_t arena;    /* total space allocated from system */
-  size_t ordblks;  /* number of non-inuse chunks */
-  size_t smblks;   /* unused -- always zero */
-  size_t hblks;    /* number of mmapped regions */
-  size_t hblkhd;   /* total space in mmapped regions */
-  size_t usmblks;  /* unused -- always zero */
-  size_t fsmblks;  /* unused -- always zero */
-  size_t uordblks; /* total allocated space */
-  size_t fordblks; /* total non-inuse space */
-  size_t keepcost; /* top-most, releasable (via malloc_trim) space */
-};
 
 #define CHUNK_OFFSET ((malloc_size_t)(&(((struct malloc_chunk *)0)->next)))
 
@@ -181,7 +168,6 @@ extern void * nano_malloc(RARG malloc_size_t);
 extern void nano_free (RARG void * free_p);
 extern void nano_cfree(RARG void * ptr);
 extern void * nano_calloc(RARG malloc_size_t n, malloc_size_t elem);
-extern struct mallinfo nano_mallinfo(RONEARG);
 extern void nano_malloc_stats(RONEARG);
 extern malloc_size_t nano_malloc_usable_size(RARG void * ptr);
 extern void * nano_realloc(RARG void * ptr, malloc_size_t size);

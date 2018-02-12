@@ -133,6 +133,10 @@ extern int malloc_trim (size_t);
 extern int _malloc_trim_r (struct _reent *, size_t);
 #endif
 
+extern void __malloc_lock(struct _reent *);
+
+extern void __malloc_unlock(struct _reent *);
+
 /* A compatibility routine for an earlier version of the allocator.  */
 
 extern void mstats (char *);
