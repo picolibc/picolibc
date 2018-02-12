@@ -1092,7 +1092,8 @@ format_process_stat (void *data, char *&destbuf)
     state = 'T';
   else
     state = get_process_state (p->dwProcessId);
-  start_time = (GetTickCount () / 1000 - time (NULL) + p->start_time) * HZ;
+  start_time = (GetTickCount () / MSPERSEC - time (NULL) + p->start_time)
+	       * CLOCKS_PER_SEC;
 
   NTSTATUS status;
   HANDLE hProcess;
@@ -1139,19 +1140,21 @@ format_process_stat (void *data, char *&destbuf)
       return 0;
     }
   fault_count = vmc.PageFaultCount;
-  utime = put.UserTime.QuadPart * HZ / NS100PERSEC;
-  stime = put.KernelTime.QuadPart * HZ / NS100PERSEC;
+  utime = put.UserTime.QuadPart * CLOCKS_PER_SEC / NS100PERSEC;
+  stime = put.KernelTime.QuadPart * CLOCKS_PER_SEC / NS100PERSEC;
 #if 0
    if (stodi.CurrentTime.QuadPart > put.CreateTime.QuadPart)
      start_time = (spt.KernelTime.QuadPart + spt.UserTime.QuadPart -
-		   stodi.CurrentTime.QuadPart + put.CreateTime.QuadPart) * HZ / NS100PERSEC;
+		   stodi.CurrentTime.QuadPart + put.CreateTime.QuadPart)
+		  * CLOCKS_PER_SEC / NS100PERSEC;
    else
      /*
       * sometimes stodi.CurrentTime is a bit behind
       * Note: some older versions of procps are broken and can't cope
       * with process start times > time(NULL).
       */
-     start_time = (spt.KernelTme.QuadPart + spt.UserTime.QuadPart) * HZ / NS100PERSEC;
+     start_time = (spt.KernelTme.QuadPart + spt.UserTime.QuadPart)
+		  * CLOCKS_PER_SEC / NS100PERSEC;
 #endif
   /* The BasePriority returned to a 32 bit process under WOW64 is
      apparently broken, for 32 and 64 bit target processes.  64 bit

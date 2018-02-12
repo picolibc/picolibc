@@ -1033,8 +1033,8 @@ cygwin_getsockopt (int fd, int level, int optname, void *optval,
 		  }
 		else
 		  {
-		    time_out->tv_sec = ms / HZ;
-		    time_out->tv_usec = ((ms % HZ) * USPERSEC) / HZ;
+		    time_out->tv_sec = ms / MSPERSEC;
+		    time_out->tv_usec = ((ms % MSPERSEC) * USPERSEC) / MSPERSEC;
 		  }
 		*optlen = (socklen_t) sizeof *time_out;
 		res = 0;

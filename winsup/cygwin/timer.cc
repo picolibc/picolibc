@@ -132,7 +132,8 @@ timer_thread (VOID *x)
       if (sleep_us > 0)
 	{
 	  tt->sleepto_us = sleepto_us;
-	  sleep_ms = (sleep_us + (USPERSEC/HZ) - 1) / (USPERSEC/HZ);
+	  sleep_ms = (sleep_us + (USPERSEC / MSPERSEC) - 1)
+		     / (USPERSEC / MSPERSEC);
 	}
       else
 	{

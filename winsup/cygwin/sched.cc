@@ -201,7 +201,7 @@ sched_rr_get_interval (pid_t pid, struct timespec *interval)
     slindex -= 1;
 
   nsec = quantable[vfindex][slindex][qindex] / quantapertick
-	 * clocktickinterval * (NSPERSEC / HZ);
+	 * clocktickinterval * (NSPERSEC / MSPERSEC);
   interval->tv_sec = nsec / NSPERSEC;
   interval->tv_nsec = nsec % NSPERSEC;
 

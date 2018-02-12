@@ -117,7 +117,7 @@ settimeofday (const struct timeval *tv, const struct timezone *tz)
       st.wHour	   = ptm->tm_hour;
       st.wMinute       = ptm->tm_min;
       st.wSecond       = ptm->tm_sec;
-      st.wMilliseconds = tv->tv_usec / (USPERSEC/HZ);
+      st.wMilliseconds = tv->tv_usec / (USPERSEC / MSPERSEC);
 
       res = -!SetSystemTime (&st);
       gtod.reset ();
@@ -223,11 +223,12 @@ timeval_to_ms (const struct timeval *time_in, DWORD &ms)
       || time_in->tv_usec >= USPERSEC)
     return false;
   if ((time_in->tv_sec == 0 && time_in->tv_usec == 0)
-      || time_in->tv_sec >= (time_t) (INFINITE / HZ))
+      || time_in->tv_sec >= (time_t) (INFINITE / MSPERSEC))
     ms = INFINITE;
   else
-    ms = time_in->tv_sec * HZ + (time_in->tv_usec + (USPERSEC/HZ) - 1)
-				/ (USPERSEC/HZ);
+    ms = time_in->tv_sec * MSPERSEC
+	 + (time_in->tv_usec + (USPERSEC / MSPERSEC) - 1)
+	   / (USPERSEC / MSPERSEC);
   return true;
 }
 
