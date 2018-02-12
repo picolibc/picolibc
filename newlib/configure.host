@@ -410,6 +410,7 @@ case "${host}" in
 	signal_dir=
 	;;
   arm*-*-*)
+	newlib_cflags="${newlib_cflags} -D_COMPILING_NEWLIB"
 	sys_dir=arm
 	if [ "x${newlib_may_supply_syscalls}" = "xno" ] ; then
 	  have_crt0="no"
