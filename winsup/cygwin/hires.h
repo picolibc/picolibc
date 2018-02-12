@@ -33,8 +33,10 @@ details. */
 #define NSPERSEC (1000000000)
 /* # of 100ns intervals per second. */
 #define NS100PERSEC (10000000)
-/* # of millisecs per second. */
+/* # of microsecs per second. */
 #define USPERSEC (1000000)
+/* # of millisecs per second. */
+#define MSPERSEC (1000)
 
 class hires_base
 {
