@@ -37,6 +37,8 @@ details. */
    never be used in Cygwin for this function. */
 #define PIPE_ADD_PID	FILE_FLAG_FIRST_PIPE_INSTANCE
 
+#define O_TMPFILE_FILE_ATTRS (FILE_ATTRIBUTE_TEMPORARY | FILE_ATTRIBUTE_HIDDEN)
+
 extern const char *windows_device_names[];
 extern struct __cygwin_perfile *perfile_table;
 #define __fmode (*(user_data->fmode_ptr))

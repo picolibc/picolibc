@@ -603,11 +603,14 @@ fhandler_base::open (int flags, mode_t mode)
 	 as with FILE_ATTRIBUTE_TEMPORARY.  The latter speeds up file access,
 	 because the OS tries to keep the file in memory as much as possible.
 	 In conjunction with FILE_DELETE_ON_CLOSE, ideally the OS never has
-	 to write to the disk at all. */
+	 to write to the disk at all.
+	 Note that O_TMPFILE_FILE_ATTRS also sets the DOS HIDDEN attribute
+	 to help telling Cygwin O_TMPFILE files apart from other files
+	 accidentally setting FILE_ATTRIBUTE_TEMPORARY. */
       if (flags & O_TMPFILE)
 	{
 	  access |= DELETE;
-	  file_attributes |= FILE_ATTRIBUTE_TEMPORARY;
+	  file_attributes |= O_TMPFILE_FILE_ATTRS;
 	  options |= FILE_DELETE_ON_CLOSE;
 	}
 

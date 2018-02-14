@@ -1243,16 +1243,28 @@ fhandler_disk_file::link (const char *newpath)
 	__seterrno_from_nt_status (status);
       return -1;
     }
-  else if (pc.file_attributes () & FILE_ATTRIBUTE_TEMPORARY)
+  else if ((pc.file_attributes () & O_TMPFILE_FILE_ATTRS)
+	   == O_TMPFILE_FILE_ATTRS)
     {
-      /* If the original file has been opened with O_TMPFILE the file has
-	 FILE_ATTRIBUTE_TEMPORARY set.  After a successful hardlink the
-	 file is not temporary anymore in the usual sense.  So we remove
-	 FILE_ATTRIBUTE_TEMPORARY here, even if this makes the original file
-	 visible in directory enumeration. */
+      /* An O_TMPFILE file has FILE_ATTRIBUTE_TEMPORARY and
+	 FILE_ATTRIBUTE_HIDDEN set.  After a successful hardlink the file is
+	 not temporary anymore in the usual sense.  So we remove these
+	 attributes here, even if this makes the original link (temporarily)
+	 visible in directory enumeration.
+
+	 Note that we don't create a reopen attribute for the original
+	 link but rather a normal attribute for the just created link.
+	 The reason is a curious behaviour of Windows:  If we remove
+	 the O_TMPFILE attributes on the original link, the new link
+	 will not show up in file system listings, long after the original
+	 link has been closed and removed.  The file and its metadata will
+	 be kept in memory only as long as Windows sees fit.  By opening
+	 the new link, we request the attribute changes on the new link,
+	 so after closing it Windows will have an increased interest to
+	 write back the metadata. */
       OBJECT_ATTRIBUTES attr;
       status = NtOpenFile (&fh, FILE_WRITE_ATTRIBUTES,
-			   pc.init_reopen_attr (attr, fh), &io,
+			   newpc.get_object_attr (attr, sec_none_nih), &io,
 			   FILE_SHARE_VALID_FLAGS, FILE_OPEN_FOR_BACKUP_INTENT);
       if (!NT_SUCCESS (status))
 	debug_printf ("Opening for removing TEMPORARY attrib failed, "
@@ -1263,8 +1275,7 @@ fhandler_disk_file::link (const char *newpath)
 
 	  fbi.CreationTime.QuadPart = fbi.LastAccessTime.QuadPart
 	  = fbi.LastWriteTime.QuadPart = fbi.ChangeTime.QuadPart = 0LL;
-	  fbi.FileAttributes = (pc.file_attributes ()
-				& ~FILE_ATTRIBUTE_TEMPORARY)
+	  fbi.FileAttributes = (pc.file_attributes () & ~O_TMPFILE_FILE_ATTRS)
 			       ?: FILE_ATTRIBUTE_NORMAL;
 	  status = NtSetInformationFile (fh, &io, &fbi, sizeof fbi,
 					 FileBasicInformation);
@@ -2213,7 +2224,7 @@ go_ahead:
 	}
       /* We don't show O_TMPFILE files in the filesystem.  This is a kludge,
 	 so we may end up removing this snippet again. */
-      if (FileAttributes & FILE_ATTRIBUTE_TEMPORARY)
+      if ((FileAttributes & O_TMPFILE_FILE_ATTRS) == O_TMPFILE_FILE_ATTRS)
 	goto restart;
       RtlInitCountedUnicodeString (&fname, FileName, FileNameLength);
       d_mounts (dir)->check_mount (&fname);
