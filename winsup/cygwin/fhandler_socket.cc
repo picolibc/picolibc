@@ -1411,9 +1411,8 @@ fhandler_socket::getsockname (struct sockaddr *name, int *namelen)
     }
   else
     {
-      /* Always use a local big enough buffer and truncate later as necessary
-	 per POSIX.  WinSock unfortunaltey only returns WSAEFAULT if the buffer
-	 is too small. */
+      /* WinSock just returns WSAEFAULT if the buffer is too small.  Use a
+         big enough local buffer and truncate later as necessary, per POSIX. */
       struct sockaddr_storage sock;
       int len = sizeof sock;
       res = ::getsockname (get_socket (), (struct sockaddr *) &sock, &len);
