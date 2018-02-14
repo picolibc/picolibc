@@ -655,12 +655,42 @@ extern "C" int
 cygwin_socket (int af, int type, int protocol)
 {
   int res = -1;
-  SOCKET soc = 0;
+  const device *dev;
+  fhandler_socket *fh;
 
   int flags = type & _SOCK_FLAG_MASK;
   type &= ~_SOCK_FLAG_MASK;
 
   debug_printf ("socket (%d, %d (flags %y), %d)", af, type, flags, protocol);
+
+  switch (af)
+    {
+    case AF_LOCAL:
+      if (type != SOCK_STREAM && type != SOCK_DGRAM)
+        {
+          set_errno (EINVAL);
+          goto done;
+        }
+      if (protocol != 0)
+        {
+          set_errno (EPROTONOSUPPORT);
+          goto done;
+        }
+      dev = type == SOCK_STREAM ? stream_dev : dgram_dev;
+      break;
+    case AF_INET:
+    case AF_INET6:
+      if (type != SOCK_STREAM && type != SOCK_DGRAM && type != SOCK_RAW)
+        {
+          set_errno (EINVAL);
+          goto done;
+        }
+      dev = type == SOCK_STREAM ? tcp_dev : udp_dev;
+      break;
+    default:
+      set_errno (EAFNOSUPPORT);
+      goto done;
+    }
 
   if ((flags & ~(SOCK_NONBLOCK | SOCK_CLOEXEC)) != 0)
     {
@@ -668,54 +698,22 @@ cygwin_socket (int af, int type, int protocol)
       goto done;
     }
 
-  soc = socket (af == AF_LOCAL ? AF_INET : af, type,
-		af == AF_LOCAL ? 0 : protocol);
-
-  if (soc == INVALID_SOCKET)
     {
-      set_winsock_errno ();
-      goto done;
+      cygheap_fdnew fd;
+
+      if (fd < 0)
+	goto done;
+      fh = (fhandler_socket *) build_fh_dev (*dev);
+      if (fh && fh->socket (af, type, protocol, flags) == 0)
+	{
+	  fd = fh;
+	  if (fd <= 2)
+	    set_std_handle (fd);
+	  res = fd;
+	}
+      else
+        fd.release ();
     }
-
-  const device *dev;
-
-  if (af == AF_LOCAL)
-    dev = type == SOCK_STREAM ? stream_dev : dgram_dev;
-  else
-    dev = type == SOCK_STREAM ? tcp_dev : udp_dev;
-
-  {
-    cygheap_fdnew fd;
-    if (fd < 0 || !fdsock (fd, dev, soc))
-      closesocket (soc);
-    else
-      {
-	((fhandler_socket *) fd)->set_addr_family (af);
-	((fhandler_socket *) fd)->set_socket_type (type);
-	if (flags & SOCK_NONBLOCK)
-	  ((fhandler_socket *) fd)->set_nonblocking (true);
-	if (flags & SOCK_CLOEXEC)
-	  ((fhandler_socket *) fd)->set_close_on_exec (true);
-	if (type == SOCK_DGRAM)
-	  {
-	    /* Workaround the problem that a missing listener on a UDP socket
-	       in a call to sendto will result in select/WSAEnumNetworkEvents
-	       reporting that the socket has pending data and a subsequent call
-	       to recvfrom will return -1 with error set to WSAECONNRESET.
-
-	       This problem is a regression introduced in Windows 2000.
-	       Instead of fixing the problem, a new socket IOCTL code has
-	       been added, see http://support.microsoft.com/kb/263823 */
-	    BOOL cr = FALSE;
-	    DWORD blen;
-	    if (WSAIoctl (soc, SIO_UDP_CONNRESET, &cr, sizeof cr, NULL, 0,
-			  &blen, NULL, NULL) == SOCKET_ERROR)
-	      debug_printf ("Reset SIO_UDP_CONNRESET: WinSock error %u",
-			    WSAGetLastError ());
-	  }
-	res = fd;
-      }
-  }
 
 done:
   syscall_printf ("%R = socket(%d, %d (flags %y), %d)",

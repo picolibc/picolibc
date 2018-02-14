@@ -262,6 +262,120 @@ fhandler_socket::open (int flags, mode_t mode)
   return 0;
 }
 
+int
+fhandler_socket::set_socket_handle (SOCKET sock)
+{
+  DWORD flags;
+  bool lsp_fixup = false;
+
+  /* Usually sockets are inheritable IFS objects.  Unfortunately some virus
+     scanners or other network-oriented software replace normal sockets
+     with their own kind, which is running through a filter driver called
+     "layered service provider" (LSP) which, fortunately, are deprecated.
+
+     LSP sockets are not kernel objects.  They are typically not marked as
+     inheritable, nor are they IFS handles.  They are in fact not inheritable
+     to child processes, and it does not help to mark them inheritable via
+     SetHandleInformation.  Subsequent socket calls in the child process fail
+     with error 10038, WSAENOTSOCK.
+
+     There's a neat way to workaround these annoying LSP sockets.  WSAIoctl
+     allows to fetch the underlying base socket, which is a normal, inheritable
+     IFS handle.  So we fetch the base socket, duplicate it, and close the
+     original socket.  Now we have a standard IFS socket which (hopefully)
+     works as expected.
+
+     If that doesn't work for some reason, mark the sockets for duplication
+     via WSADuplicateSocket/WSASocket.  This requires to start the child
+     process in SUSPENDED state so we only do this if really necessary. */
+  if (!GetHandleInformation ((HANDLE) sock, &flags)
+      || !(flags & HANDLE_FLAG_INHERIT))
+    {
+      int ret;
+      SOCKET base_sock;
+      DWORD bret;
+
+      lsp_fixup = true;
+      debug_printf ("LSP handle: %p", sock);
+      ret = WSAIoctl (sock, SIO_BASE_HANDLE, NULL, 0, (void *) &base_sock,
+                      sizeof (base_sock), &bret, NULL, NULL);
+      if (ret)
+        debug_printf ("WSAIoctl: %u", WSAGetLastError ());
+      else if (base_sock != sock)
+        {
+          if (GetHandleInformation ((HANDLE) base_sock, &flags)
+              && (flags & HANDLE_FLAG_INHERIT))
+            {
+              if (!DuplicateHandle (GetCurrentProcess (), (HANDLE) base_sock,
+                                    GetCurrentProcess (), (PHANDLE) &base_sock,
+                                    0, TRUE, DUPLICATE_SAME_ACCESS))
+                debug_printf ("DuplicateHandle failed, %E");
+              else
+                {
+                  closesocket (sock);
+                  sock = base_sock;
+                  lsp_fixup = false;
+                }
+            }
+        }
+    }
+  set_io_handle ((HANDLE) sock);
+  if (!init_events ())
+    {
+      closesocket (sock);
+      return -1;
+    }
+  if (lsp_fixup)
+    init_fixup_before ();
+  set_flags (O_RDWR | O_BINARY);
+  set_unique_id ();
+  if (get_socket_type () == SOCK_DGRAM)
+    {
+      /* Workaround the problem that a missing listener on a UDP socket
+	 in a call to sendto will result in select/WSAEnumNetworkEvents
+	 reporting that the socket has pending data and a subsequent call
+	 to recvfrom will return -1 with error set to WSAECONNRESET.
+
+	 This problem is a regression introduced in Windows 2000.
+	 Instead of fixing the problem, a new socket IOCTL code has
+	 been added, see http://support.microsoft.com/kb/263823 */
+      BOOL cr = FALSE;
+      DWORD blen;
+      if (WSAIoctl (sock, SIO_UDP_CONNRESET, &cr, sizeof cr, NULL, 0,
+		    &blen, NULL, NULL) == SOCKET_ERROR)
+	debug_printf ("Reset SIO_UDP_CONNRESET: WinSock error %u",
+		      WSAGetLastError ());
+    }
+#ifdef __x86_64__
+  rmem () = 212992;
+  wmem () = 212992;
+#else
+  rmem () = 64512;
+  wmem () = 64512;
+#endif
+  return 0;
+}
+
+int
+fhandler_socket::socket (int af, int type, int protocol, int flags)
+{
+  SOCKET sock;
+
+  sock = ::socket (af == AF_LOCAL ? AF_INET : af, type, protocol);
+  if (sock == INVALID_SOCKET)
+    {
+      set_winsock_errno ();
+      return -1;
+    }
+  set_addr_family (af);
+  set_socket_type (type);
+  if (flags & SOCK_NONBLOCK)
+    set_nonblocking (true);
+  if (flags & SOCK_CLOEXEC)
+    set_close_on_exec (true);
+  return set_socket_handle (sock);
+}
+
 void
 fhandler_socket::af_local_set_sockpair_cred ()
 {
@@ -635,6 +749,9 @@ fhandler_socket::init_events ()
     }
 
   /* sock type not yet set here. */
+  /* FIXME: as soon as we switch to socket method, we're good to use
+     get_socket_type (). */
+
   if (pc.dev == FH_UDP || pc.dev == FH_DGRAM)
     wsock_events->events = FD_WRITE;
   return true;

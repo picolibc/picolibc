@@ -556,6 +556,10 @@ class fhandler_socket: public fhandler_base
       {}
   } status;
 
+#ifdef __INSIDE_CYGWIN_NET__
+  int set_socket_handle (SOCKET sock);
+#endif
+
  public:
   fhandler_socket ();
   ~fhandler_socket ();
@@ -576,6 +580,7 @@ class fhandler_socket: public fhandler_base
   IMPLEMENT_STATUS_FLAG (conn_state, connect_state)
   IMPLEMENT_STATUS_FLAG (bool, no_getpeereid)
 
+  int socket (int af, int type, int protocol, int flags);
   int bind (const struct sockaddr *name, int namelen);
   int connect (const struct sockaddr *name, int namelen);
   int listen (int backlog);
