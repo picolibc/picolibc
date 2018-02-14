@@ -39,6 +39,7 @@
 #include "wininfo.h"
 #include <unistd.h>
 #include <sys/param.h>
+#include <sys/statvfs.h>
 #include <cygwin/acl.h>
 #include "cygtls.h"
 #include <sys/un.h>
@@ -947,8 +948,21 @@ int __reg2
 fhandler_socket::fstat (struct stat *buf)
 {
   int res;
-  if (get_device () == FH_UNIX)
+  if (get_addr_family () == AF_LOCAL)
     {
+      if (!get_sun_path () || get_sun_path ()[0] == '\0')
+	{
+	  memset (buf, 0, sizeof *buf);
+	  buf->st_dev = FH_UNIX;
+	  buf->st_ino = get_plain_ino ();
+	  buf->st_mode = S_IFSOCK | S_IRWXU | S_IRWXG | S_IRWXO;
+	  buf->st_nlink = 1;
+	  buf->st_uid = myself->uid;
+	  buf->st_gid = myself->gid;
+	  time_as_timestruc_t (&buf->st_ctim);
+	  buf->st_blksize = 4096;
+	  return 0;
+	}
       res = fhandler_base::fstat_fs (buf);
       if (!res)
 	{
@@ -975,8 +989,15 @@ fhandler_socket::fstat (struct stat *buf)
 int __reg2
 fhandler_socket::fstatvfs (struct statvfs *sfs)
 {
-  if (get_device () == FH_UNIX)
+  if (get_addr_family () == AF_LOCAL)
     {
+      if (!get_sun_path () || get_sun_path ()[0] == '\0')
+	{
+	  memset (sfs, 0, sizeof (*sfs));
+	  sfs->f_bsize = sfs->f_frsize = 4096;
+	  sfs->f_namemax = NAME_MAX;
+	  return 0;
+	}
       fhandler_disk_file fh (pc);
       fh.get_device () = FH_FS;
       return fh.fstatvfs (sfs);
@@ -988,8 +1009,10 @@ fhandler_socket::fstatvfs (struct statvfs *sfs)
 int
 fhandler_socket::fchmod (mode_t mode)
 {
-  if (get_device () == FH_UNIX)
+  if (get_addr_family () == AF_LOCAL)
     {
+      if (!get_sun_path () || get_sun_path ()[0] == '\0')
+	return 0;
       fhandler_disk_file fh (pc);
       fh.get_device () = FH_FS;
       int ret = fh.fchmod (S_IFSOCK | adjust_socket_file_mode (mode));
@@ -1002,8 +1025,10 @@ fhandler_socket::fchmod (mode_t mode)
 int
 fhandler_socket::fchown (uid_t uid, gid_t gid)
 {
-  if (get_device () == FH_UNIX)
+  if (get_addr_family () == AF_LOCAL)
     {
+      if (!get_sun_path () || get_sun_path ()[0] == '\0')
+	return 0;
       fhandler_disk_file fh (pc);
       return fh.fchown (uid, gid);
     }
@@ -1014,8 +1039,10 @@ fhandler_socket::fchown (uid_t uid, gid_t gid)
 int
 fhandler_socket::facl (int cmd, int nentries, aclent_t *aclbufp)
 {
-  if (get_device () == FH_UNIX)
+  if (get_addr_family () == AF_LOCAL)
     {
+      if (!get_sun_path () || get_sun_path ()[0] == '\0')
+	return fhandler_base::facl (cmd, nentries, aclbufp);
       fhandler_disk_file fh (pc);
       return fh.facl (cmd, nentries, aclbufp);
     }
@@ -1026,7 +1053,7 @@ fhandler_socket::facl (int cmd, int nentries, aclent_t *aclbufp)
 int
 fhandler_socket::link (const char *newpath)
 {
-  if (get_device () == FH_UNIX)
+  if (get_addr_family () == AF_LOCAL)
     {
       fhandler_disk_file fh (pc);
       return fh.link (newpath);
