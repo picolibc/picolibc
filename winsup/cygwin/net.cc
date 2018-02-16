@@ -2767,201 +2767,98 @@ cygwin_bindresvport (int fd, struct sockaddr_in *sin)
   return cygwin_bindresvport_sa (fd, (struct sockaddr *) sin);
 }
 
-/* socketpair: standards? */
-/* Win32 supports AF_INET only, so ignore domain and protocol arguments */
+/* socketpair: POSIX.1-2001, POSIX.1-2008, 4.4BSD. */
 extern "C" int
-socketpair (int family, int type, int protocol, int *sb)
+socketpair (int af, int type, int protocol, int *sb)
 {
   int res = -1;
-  SOCKET insock = INVALID_SOCKET;
-  SOCKET outsock = INVALID_SOCKET;
-  SOCKET newsock = INVALID_SOCKET;
-  struct sockaddr_in sock_in, sock_out;
-  int len;
+  const device *dev;
+  fhandler_socket *fh_in, *fh_out;
 
-  __try
+  int flags = type & _SOCK_FLAG_MASK;
+  type &= ~_SOCK_FLAG_MASK;
+
+  debug_printf ("socket (%d, %d (flags %y), %d)", af, type, flags, protocol);
+
+  switch (af)
     {
-      int flags = type & _SOCK_FLAG_MASK;
-      type &= ~_SOCK_FLAG_MASK;
-
-      if (family != AF_LOCAL && family != AF_INET)
-	{
-	  set_errno (EAFNOSUPPORT);
-	  __leave;
-	}
+    case AF_LOCAL:
       if (type != SOCK_STREAM && type != SOCK_DGRAM)
+        {
+          set_errno (EINVAL);
+          goto done;
+        }
+      if (protocol != 0)
+        {
+          set_errno (EPROTONOSUPPORT);
+          goto done;
+        }
+      dev = type == SOCK_STREAM ? stream_dev : dgram_dev;
+      break;
+#if 0 /* FIXME: Given neither BSD nor Linux support anything other than AF_LOCAL
+	 sockets, we deliberately disable AF_INIT socketpairs now and hope for
+	 the best. */
+    case AF_INET:
+      if (type != SOCK_STREAM && type != SOCK_DGRAM)
+        {
+          set_errno (EINVAL);
+          goto done;
+        }
+      dev = type == SOCK_STREAM ? tcp_dev : udp_dev;
+      break;
+#endif
+    default:
+      set_errno (EAFNOSUPPORT);
+      goto done;
+    }
+
+  if ((flags & ~(SOCK_NONBLOCK | SOCK_CLOEXEC)) != 0)
+    {
+      set_errno (EINVAL);
+      goto done;
+    }
+
+    {
+      cygheap_fdnew fd_in;
+      if (fd_in < 0)
+	goto done;
+
+      cygheap_fdnew fd_out (fd_in, false);
+      if (fd_out < 0)
 	{
-	  set_errno (EPROTOTYPE);
-	  __leave;
-	}
-      if ((flags & ~(SOCK_NONBLOCK | SOCK_CLOEXEC)) != 0)
-	{
-	  set_errno (EINVAL);
-	  __leave;
-	}
-      if ((family == AF_LOCAL && protocol != PF_UNSPEC && protocol != PF_LOCAL)
-	  || (family == AF_INET && protocol != PF_UNSPEC && protocol != PF_INET))
-	{
-	  set_errno (EPROTONOSUPPORT);
-	  __leave;
+	  fd_in.release ();
+	  goto done;
 	}
 
-      /* create the first socket */
-      newsock = socket (AF_INET, type, 0);
-      if (newsock == INVALID_SOCKET)
+      fh_in = (fhandler_socket *) build_fh_dev (*dev);
+      fh_out = (fhandler_socket *) build_fh_dev (*dev);
+      if (fh_in && fh_out
+	  && fh_in->socketpair (af, type, protocol, flags, fh_out) == 0)
 	{
-	  debug_printf ("first socket call failed");
-	  set_winsock_errno ();
-	  __leave;
-	}
-
-      /* bind the socket to any unused port */
-      sock_in.sin_family = AF_INET;
-      sock_in.sin_port = 0;
-      sock_in.sin_addr.s_addr = htonl (INADDR_LOOPBACK);
-      if (bind (newsock, (struct sockaddr *) &sock_in, sizeof (sock_in)) < 0)
-	{
-	  debug_printf ("bind failed");
-	  set_winsock_errno ();
-	  __leave;
-	}
-      len = sizeof (sock_in);
-      if (getsockname (newsock, (struct sockaddr *) &sock_in, &len) < 0)
-	{
-	  debug_printf ("getsockname error");
-	  set_winsock_errno ();
-	  __leave;
-	}
-
-      /* For stream sockets, create a listener */
-      if (type == SOCK_STREAM)
-	listen (newsock, 2);
-
-      /* create a connecting socket */
-      outsock = socket (AF_INET, type, 0);
-      if (outsock == INVALID_SOCKET)
-	{
-	  debug_printf ("second socket call failed");
-	  set_winsock_errno ();
-	  __leave;
-	}
-
-      /* For datagram sockets, bind the 2nd socket to an unused address, too */
-      if (type == SOCK_DGRAM)
-	{
-	  sock_out.sin_family = AF_INET;
-	  sock_out.sin_port = 0;
-	  sock_out.sin_addr.s_addr = htonl (INADDR_LOOPBACK);
-	  if (bind (outsock, (struct sockaddr *) &sock_out, sizeof (sock_out)) < 0)
+	  fd_in = fh_in;
+	  fd_out = fh_out;
+	  if (fd_in <= 2)
+	    set_std_handle (fd_in);
+	  if (fd_out <= 2)
+	    set_std_handle (fd_out);
+	  __try
 	    {
-	      debug_printf ("bind failed");
-	      set_winsock_errno ();
-	      __leave;
-	    }
-	  len = sizeof (sock_out);
-	  if (getsockname (outsock, (struct sockaddr *) &sock_out, &len) < 0)
-	    {
-	      debug_printf ("getsockname error");
-	      set_winsock_errno ();
-	      __leave;
-	    }
-	}
-
-      /* Force IP address to loopback */
-      sock_in.sin_addr.s_addr = htonl (INADDR_LOOPBACK);
-      if (type == SOCK_DGRAM)
-	sock_out.sin_addr.s_addr = htonl (INADDR_LOOPBACK);
-
-      /* Do a connect */
-      if (connect (outsock, (struct sockaddr *) &sock_in, sizeof (sock_in)) < 0)
-	{
-	  debug_printf ("connect error");
-	  set_winsock_errno ();
-	  __leave;
-	}
-
-      if (type == SOCK_STREAM)
-	{
-	  /* For stream sockets, accept the connection and close the listener */
-	  len = sizeof (sock_in);
-	  insock = accept (newsock, (struct sockaddr *) &sock_in, &len);
-	  if (insock == INVALID_SOCKET)
-	    {
-	      debug_printf ("accept error");
-	      set_winsock_errno ();
-	      __leave;
-	    }
-	  closesocket (newsock);
-	  newsock = INVALID_SOCKET;
-	}
-      else
-	{
-	  /* For datagram sockets, connect the 2nd socket */
-	  if (connect (newsock, (struct sockaddr *) &sock_out,
-		       sizeof (sock_out)) < 0)
-	    {
-	      debug_printf ("connect error");
-	      set_winsock_errno ();
-	      __leave;
-	    }
-	  insock = newsock;
-	  newsock = INVALID_SOCKET;
-	}
-
-      cygheap_fdnew sb0;
-      const device *dev;
-
-      if (family == AF_INET)
-	dev = (type == SOCK_STREAM ? tcp_dev : udp_dev);
-      else
-	dev = (type == SOCK_STREAM ? stream_dev : dgram_dev);
-
-      if (sb0 >= 0 && fdsock (sb0, dev, insock))
-	{
-	  ((fhandler_socket *) sb0)->set_addr_family (family);
-	  ((fhandler_socket *) sb0)->set_socket_type (type);
-	  ((fhandler_socket *) sb0)->connect_state (connected);
-	  if (flags & SOCK_NONBLOCK)
-	    ((fhandler_socket *) sb0)->set_nonblocking (true);
-	  if (flags & SOCK_CLOEXEC)
-	    ((fhandler_socket *) sb0)->set_close_on_exec (true);
-	  if (family == AF_LOCAL && type == SOCK_STREAM)
-	    ((fhandler_socket *) sb0)->af_local_set_sockpair_cred ();
-
-	  cygheap_fdnew sb1 (sb0, false);
-
-	  if (sb1 >= 0 && fdsock (sb1, dev, outsock))
-	    {
-	      ((fhandler_socket *) sb1)->set_addr_family (family);
-	      ((fhandler_socket *) sb1)->set_socket_type (type);
-	      ((fhandler_socket *) sb1)->connect_state (connected);
-	      if (flags & SOCK_NONBLOCK)
-		((fhandler_socket *) sb1)->set_nonblocking (true);
-	      if (flags & SOCK_CLOEXEC)
-		((fhandler_socket *) sb1)->set_close_on_exec (true);
-	      if (family == AF_LOCAL && type == SOCK_STREAM)
-		((fhandler_socket *) sb1)->af_local_set_sockpair_cred ();
-
-	      sb[0] = sb0;
-	      sb[1] = sb1;
+	      sb[0] = fd_in;
+	      sb[1] = fd_out;
 	      res = 0;
 	    }
-	  else
-	    sb0.release ();
+	  __except (EFAULT) {}
+	  __endtry
+	}
+      else
+	{
+	  fd_in.release ();
+	  fd_out.release ();
 	}
     }
-  __except (EFAULT) {}
-  __endtry
+
+done:
   syscall_printf ("%R = socketpair(...)", res);
-  if (res == -1)
-    {
-      if (insock != INVALID_SOCKET)
-	closesocket (insock);
-      if (outsock != INVALID_SOCKET)
-	closesocket (outsock);
-      if (newsock != INVALID_SOCKET)
-	closesocket (newsock);
-    }
   return res;
 }
 

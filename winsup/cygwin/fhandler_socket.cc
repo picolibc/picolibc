@@ -377,6 +377,130 @@ fhandler_socket::socket (int af, int type, int protocol, int flags)
   return ret;
 }
 
+/* fhandler_socket::socketpair is called on the fhandler handling the
+   accepting socket, fh_out is the fhandler for the connecting socket. */
+int
+fhandler_socket::socketpair (int af, int type, int protocol, int flags,
+			     fhandler_socket *fh_out)
+{
+  SOCKET insock = INVALID_SOCKET;
+  SOCKET outsock = INVALID_SOCKET;
+  SOCKET sock = INVALID_SOCKET;
+  struct sockaddr_in sock_in, sock_out;
+  int len;
+
+  /* create listening socket */
+  sock = ::socket (AF_INET, type, 0);
+  if (sock == INVALID_SOCKET)
+    {
+      set_winsock_errno ();
+      goto err;
+    }
+  /* bind to unused port */
+  sock_in.sin_family = AF_INET;
+  sock_in.sin_port = 0;
+  sock_in.sin_addr.s_addr = htonl (INADDR_LOOPBACK);
+  if (::bind (sock, (struct sockaddr *) &sock_in, sizeof (sock_in)) < 0)
+    {
+      set_winsock_errno ();
+      goto err;
+    }
+  /* fetch socket name */
+  len = sizeof (sock_in);
+  if (::getsockname (sock, (struct sockaddr *) &sock_in, &len) < 0)
+    {
+      set_winsock_errno ();
+      goto err;
+    }
+  /* on stream sockets, create listener */
+  if (type == SOCK_STREAM && ::listen (sock, 2) < 0)
+    {
+      set_winsock_errno ();
+      goto err;
+    }
+  /* create connecting socket */
+  outsock = ::socket (AF_INET, type, 0);
+  if (outsock == INVALID_SOCKET)
+    {
+      set_winsock_errno ();
+      goto err;
+    }
+  /* on datagram sockets, bind connecting socket */
+  if (type == SOCK_DGRAM)
+    {
+      sock_out.sin_family = AF_INET;
+      sock_out.sin_port = 0;
+      sock_out.sin_addr.s_addr = htonl (INADDR_LOOPBACK);
+      if (::bind (outsock, (struct sockaddr *) &sock_out,
+		  sizeof (sock_out)) < 0)
+	{
+	  set_winsock_errno ();
+	  goto err;
+	}
+      /* ...and fetch name */
+      len = sizeof (sock_out);
+      if (::getsockname (outsock, (struct sockaddr *) &sock_out, &len) < 0)
+	{
+	  set_winsock_errno ();
+	  goto err;
+	}
+    }
+  sock_in.sin_addr.s_addr = htonl (INADDR_LOOPBACK);
+  if (type == SOCK_DGRAM)
+    sock_out.sin_addr.s_addr = htonl (INADDR_LOOPBACK);
+  /* connect */
+  if (::connect (outsock, (struct sockaddr *) &sock_in, sizeof (sock_in)) < 0)
+    {
+      set_winsock_errno ();
+      goto err;
+    }
+  if (type == SOCK_STREAM)
+    {
+      /* on stream sockets, accept connection and close listener */
+      len = sizeof (sock_in);
+      insock = ::accept (sock, (struct sockaddr *) &sock_in, &len);
+      if (insock == INVALID_SOCKET)
+	{
+	  set_winsock_errno ();
+	  goto err;
+	}
+      ::closesocket (sock);
+    }
+  else
+    {
+      /* on datagram sockets, connect vice versa */
+      if (::connect (sock, (struct sockaddr *) &sock_out,
+		   sizeof (sock_out)) < 0)
+	{
+	  set_winsock_errno ();
+	  goto err;
+	}
+      insock = sock;
+    }
+  sock = INVALID_SOCKET;
+
+  /* postprocessing */
+  connect_state (connected);
+  fh_out->connect_state (connected);
+  if (af == AF_LOCAL && type == SOCK_STREAM)
+    {
+      af_local_set_sockpair_cred ();
+      fh_out->af_local_set_sockpair_cred ();
+    }
+  if (set_socket_handle (insock, af, type, flags) < 0
+      || fh_out->set_socket_handle (outsock, af, type, flags) < 0)
+    goto err;
+
+  return 0;
+
+err:
+  if (sock != INVALID_SOCKET)
+    ::closesocket (sock);
+  if (insock != INVALID_SOCKET)
+    ::closesocket (insock);
+  if (outsock != INVALID_SOCKET)
+    ::closesocket (outsock);
+  return -1;
 }
 
 void

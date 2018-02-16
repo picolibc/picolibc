@@ -588,6 +588,8 @@ class fhandler_socket: public fhandler_base
   int getsockname (struct sockaddr *name, int *namelen);
   int getpeername (struct sockaddr *name, int *namelen);
   int getpeereid (pid_t *pid, uid_t *euid, gid_t *egid);
+  socketpair (int af, int type, int protocol, int flags,
+	      fhandler_socket *fh_out);
 
   int open (int flags, mode_t mode = 0);
   void __reg3 read (void *ptr, size_t& len);
