@@ -957,8 +957,8 @@ fhandler_socket::evaluate_events (const long event_mask, long &events,
 		 CV 2014-06-16: Call WSASetLastError *after* setsockopt since,
 		 apparently, setsockopt sets the last WSA error code to 0 on
 		 success. */
-	      setsockopt (get_socket (), SOL_SOCKET, SO_ERROR,
-			  (const char *) &wsa_err, sizeof wsa_err);
+	      ::setsockopt (get_socket (), SOL_SOCKET, SO_ERROR,
+			    (const char *) &wsa_err, sizeof wsa_err);
 	      WSASetLastError (wsa_err);
 	      ret = SOCKET_ERROR;
 	    }
@@ -1654,7 +1654,7 @@ fhandler_socket::accept4 (struct sockaddr *peer, int *len, int flags)
 	}
       else
 	{
-	  closesocket (res);
+	  ::closesocket (res);
 	  res = -1;
 	}
     }
@@ -2331,7 +2331,7 @@ fhandler_socket::close ()
   int res = 0;
 
   release_events ();
-  while ((res = closesocket (get_socket ())) != 0)
+  while ((res = ::closesocket (get_socket ())) != 0)
     {
       if (WSAGetLastError () != WSAEWOULDBLOCK)
 	{
@@ -2557,7 +2557,7 @@ fhandler_socket::ioctl (unsigned int cmd, void *p)
     case _IOR('f', 127, u_long):
 #endif
       /* Make sure to use the Winsock definition of FIONREAD. */
-      res = ioctlsocket (get_socket (), _IOR('f', 127, u_long), (u_long *) p);
+      res = ::ioctlsocket (get_socket (), _IOR('f', 127, u_long), (u_long *) p);
       if (res == SOCKET_ERROR)
 	set_winsock_errno ();
       break;
@@ -2577,7 +2577,7 @@ fhandler_socket::ioctl (unsigned int cmd, void *p)
 	  res = 0;
 	}
       else
-	res = ioctlsocket (get_socket (), cmd, (u_long *) p);
+	res = ::ioctlsocket (get_socket (), cmd, (u_long *) p);
       break;
     }
   syscall_printf ("%d = ioctl_socket(%x, %p)", res, cmd, p);
