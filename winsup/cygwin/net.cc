@@ -490,7 +490,7 @@ dup_ent (servent *src)
   return (servent *) dup_ent (_my_tls.locals.servent_buf, (unionent *) src, unionent::t_servent);
 }
 
-/* exported as getprotobyname: standards? */
+/* exported as getprotobyname: POSIX.1-2001, POSIX.1-2008, 4.3BSD */
 extern "C" struct protoent *
 cygwin_getprotobyname (const char *p)
 {
@@ -503,7 +503,7 @@ cygwin_getprotobyname (const char *p)
   return NULL;
 }
 
-/* exported as getprotobynumber: standards? */
+/* exported as getprotobynumber: POSIX.1-2001, POSIX.1-2008, 4.3BSD */
 extern "C" struct protoent *
 cygwin_getprotobynumber (int number)
 {
@@ -650,7 +650,7 @@ fdsock (cygheap_fdmanip& fd, const device *dev, SOCKET soc)
   return true;
 }
 
-/* exported as socket: standards? */
+/* exported as socket: POSIX.1-2001, POSIX.1-2008, 4.4BSD */
 extern "C" int
 cygwin_socket (int af, int type, int protocol)
 {
@@ -721,7 +721,7 @@ done:
   return res;
 }
 
-/* exported as sendto: standards? */
+/* exported as sendto: 4.4BSD, SVr4, POSIX.1-2001 */
 extern "C" ssize_t
 cygwin_sendto (int fd, const void *buf, size_t len, int flags,
 	       const struct sockaddr *to, socklen_t tolen)
@@ -743,7 +743,7 @@ cygwin_sendto (int fd, const void *buf, size_t len, int flags,
   return res;
 }
 
-/* exported as recvfrom: standards? */
+/* exported as recvfrom: 4.4BSD, SVr4, POSIX.1-2001 */
 extern "C" ssize_t
 cygwin_recvfrom (int fd, void *buf, size_t len, int flags,
 		 struct sockaddr *from, socklen_t *fromlen)
@@ -790,7 +790,7 @@ convert_ws1_ip_optname (int optname)
 	 : ws2_optname[optname];
 }
 
-/* exported as setsockopt: standards? */
+/* exported as setsockopt: POSIX.1-2001,  POSIX.1-2008,  SVr4,  4.4BSD */
 extern "C" int
 cygwin_setsockopt (int fd, int level, int optname, const void *optval,
 		   socklen_t optlen)
@@ -959,7 +959,7 @@ cygwin_setsockopt (int fd, int level, int optname, const void *optval,
   return res;
 }
 
-/* exported as getsockopt: standards? */
+/* exported as getsockopt: POSIX.1-2001,  POSIX.1-2008,  SVr4,  4.4BSD */
 extern "C" int
 cygwin_getsockopt (int fd, int level, int optname, void *optval,
 		   socklen_t *optlen)
@@ -1152,7 +1152,7 @@ getpeereid (int fd, uid_t *euid, gid_t *egid)
   return -1;
 }
 
-/* exported as connect: standards? */
+/* exported as connect: POSIX.1-2001, POSIX.1-2008, SVr4, 4.4BSD */
 extern "C" int
 cygwin_connect (int fd, const struct sockaddr *name, socklen_t namelen)
 {
@@ -1172,7 +1172,7 @@ cygwin_connect (int fd, const struct sockaddr *name, socklen_t namelen)
   return res;
 }
 
-/* exported as getservbyname: standards? */
+/* exported as getservbyname: POSIX.1-2001, POSIX.1-2008, 4.3BSD */
 extern "C" struct servent *
 cygwin_getservbyname (const char *name, const char *proto)
 {
@@ -1188,7 +1188,7 @@ cygwin_getservbyname (const char *name, const char *proto)
   return res;
 }
 
-/* exported as getservbyport: standards? */
+/* exported as getservbyport: POSIX.1-2001, POSIX.1-2008, 4.3BSD */
 extern "C" struct servent *
 cygwin_getservbyport (int port, const char *proto)
 {
@@ -1247,7 +1247,7 @@ sethostname (const char *name, size_t len)
   return 0;
 }
 
-/* exported as gethostbyname: standards? */
+/* exported as gethostbyname: POSIX.1-2001 */
 extern "C" struct hostent *
 cygwin_gethostbyname (const char *name)
 {
@@ -1298,7 +1298,7 @@ cygwin_gethostbyname (const char *name)
   return res;
 }
 
-/* exported as gethostbyaddr: standards? */
+/* exported as gethostbyaddr: POSIX.1-2001 */
 extern "C" struct hostent *
 cygwin_gethostbyaddr (const void *addr, socklen_t len, int type)
 {
@@ -1637,7 +1637,7 @@ corrupted:
   return NULL;
 }
 
-/* gethostbyname2: standards? */
+/* gethostbyname2: GNU extension */
 extern "C" struct hostent *
 gethostbyname2 (const char *name, int af)
 {
@@ -1678,7 +1678,7 @@ gethostbyname2 (const char *name, int af)
   return res;
 }
 
-/* exported as accept: standards? */
+/* exported as accept: POSIX.1-2001,  POSIX.1-2008,  SVr4,  4.4BSD */
 extern "C" int
 cygwin_accept (int fd, struct sockaddr *peer, socklen_t *len)
 {
@@ -1699,6 +1699,7 @@ cygwin_accept (int fd, struct sockaddr *peer, socklen_t *len)
   return res;
 }
 
+/* accept4: GNU extension */
 extern "C" int
 accept4 (int fd, struct sockaddr *peer, socklen_t *len, int flags)
 {
@@ -1722,7 +1723,7 @@ accept4 (int fd, struct sockaddr *peer, socklen_t *len, int flags)
   return res;
 }
 
-/* exported as bind: standards? */
+/* exported as bind: POSIX.1-2001, POSIX.1-2008, SVr4,  4.4BSD */
 extern "C" int
 cygwin_bind (int fd, const struct sockaddr *my_addr, socklen_t addrlen)
 {
@@ -1740,7 +1741,7 @@ cygwin_bind (int fd, const struct sockaddr *my_addr, socklen_t addrlen)
   return res;
 }
 
-/* exported as getsockname: standards? */
+/* exported as getsockname: POSIX.1-2001, POSIX.1-2008, SVr4,  4.4BSD */
 extern "C" int
 cygwin_getsockname (int fd, struct sockaddr *addr, socklen_t *namelen)
 {
@@ -1758,7 +1759,7 @@ cygwin_getsockname (int fd, struct sockaddr *addr, socklen_t *namelen)
   return res;
 }
 
-/* exported as listen: standards? */
+/* exported as listen: POSIX.1-2001, POSIX.1-2008, SVr4,  4.4BSD */
 extern "C" int
 cygwin_listen (int fd, int backlog)
 {
@@ -1776,7 +1777,7 @@ cygwin_listen (int fd, int backlog)
   return res;
 }
 
-/* exported as shutdown: standards? */
+/* exported as shutdown: POSIX.1-2001, POSIX.1-2008, SVr4,  4.4BSD */
 extern "C" int
 cygwin_shutdown (int fd, int how)
 {
@@ -1839,7 +1840,7 @@ cygwin_herror (const char *s)
   __endtry
 }
 
-/* exported as getpeername: standards? */
+/* exported as getpeername: POSIX.1-2001, POSIX.1-2008, SVr4,  4.4BSD */
 extern "C" int
 cygwin_getpeername (int fd, struct sockaddr *name, socklen_t *len)
 {
@@ -1859,7 +1860,7 @@ cygwin_getpeername (int fd, struct sockaddr *name, socklen_t *len)
   return res;
 }
 
-/* exported as recv: standards? */
+/* exported as recv: POSIX.1-2001, POSIX.1-2008, SVr4,  4.4BSD */
 extern "C" ssize_t
 cygwin_recv (int fd, void *buf, size_t len, int flags)
 {
@@ -1883,7 +1884,7 @@ cygwin_recv (int fd, void *buf, size_t len, int flags)
   return res;
 }
 
-/* exported as send: standards? */
+/* exported as send: POSIX.1-2001, POSIX.1-2008, SVr4,  4.4BSD */
 extern "C" ssize_t
 cygwin_send (int fd, const void *buf, size_t len, int flags)
 {
@@ -1903,7 +1904,7 @@ cygwin_send (int fd, const void *buf, size_t len, int flags)
   return res;
 }
 
-/* getdomainname: standards? */
+/* getdomainname: 4.4BSD */
 extern "C" int
 getdomainname (char *domain, size_t len)
 {
@@ -2862,19 +2863,19 @@ done:
   return res;
 }
 
-/* sethostent: standards? */
+/* sethostent: POSIX.1-2001 */
 extern "C" void
 sethostent (int)
 {
 }
 
-/* endhostent: standards? */
+/* endhostent: POSIX.1-2001 */
 extern "C" void
 endhostent (void)
 {
 }
 
-/* exported as recvmsg: standards? */
+/* exported as recvmsg: POSIX.1-2001, POSIX.1-2008, 4.4BSD */
 extern "C" ssize_t
 cygwin_recvmsg (int fd, struct msghdr *msg, int flags)
 {
@@ -2905,7 +2906,7 @@ cygwin_recvmsg (int fd, struct msghdr *msg, int flags)
   return res;
 }
 
-/* exported as sendmsg: standards? */
+/* exported as sendmsg: POSIX.1-2001, POSIX.1-2008, 4.4BSD */
 extern "C" ssize_t
 cygwin_sendmsg (int fd, const struct msghdr *msg, int flags)
 {
@@ -3297,6 +3298,7 @@ cygwin_inet_ntop (int af, const void *src, char *dst, socklen_t size)
   /* NOTREACHED */
 }
 
+/* Exported as freeaddrinfo: POSIX.1-2001, POSIX.1-2008, RFC 2553 */
 extern "C" void
 cygwin_freeaddrinfo (struct addrinfo *addr)
 {
@@ -3455,6 +3457,7 @@ static struct gai_errmap_t
   {0,			  "Parameter string not correctly encoded"}
 };
 
+/* Exported as gai_strerror: POSIX.1-2001, POSIX.1-2008 */
 extern "C" const char *
 cygwin_gai_strerror (int err)
 {
@@ -3473,6 +3476,7 @@ w32_to_gai_err (int w32_err)
   return w32_err;
 }
 
+/* Exported as getaddrinfo: POSIX.1-2001, POSIX.1-2008, RFC 2553 */
 extern "C" int
 cygwin_getaddrinfo (const char *hostname, const char *servname,
 		    const struct addrinfo *hints, struct addrinfo **res)
@@ -3595,6 +3599,7 @@ cygwin_getaddrinfo (const char *hostname, const char *servname,
   return ret;
 }
 
+/* Exported as getnameinfo: POSIX.1-2001, POSIX.1-2008, RFC 2553 */
 extern "C" int
 cygwin_getnameinfo (const struct sockaddr *sa, socklen_t salen,
 		    char *host, size_t hostlen, char *serv,
@@ -3678,28 +3683,28 @@ cygwin_getnameinfo (const struct sockaddr *sa, socklen_t salen,
 #undef htons
 #undef ntohs
 
-/* htonl: standards? */
+/* htonl: POSIX.1-2001, POSIX.1-2008 */
 extern "C" uint32_t
 htonl (uint32_t x)
 {
   return __htonl (x);
 }
 
-/* ntohl: standards? */
+/* ntohl: POSIX.1-2001, POSIX.1-2008 */
 extern "C" uint32_t
 ntohl (uint32_t x)
 {
   return __ntohl (x);
 }
 
-/* htons: standards? */
+/* htons: POSIX.1-2001, POSIX.1-2008 */
 extern "C" uint16_t
 htons (uint16_t x)
 {
   return __htons (x);
 }
 
-/* ntohs: standards? */
+/* ntohs: POSIX.1-2001, POSIX.1-2008 */
 extern "C" uint16_t
 ntohs (uint16_t x)
 {
