@@ -672,7 +672,7 @@ read_mounts ()
 */
 
 static int
-path_prefix_p (const char *path1, const char *path2, int len1)
+path_prefix_p (const char *path1, const char *path2, size_t len1)
 {
   /* Handle case where PATH1 has trailing '/' and when it doesn't.  */
   if (len1 > 0 && isslash (path1[len1 - 1]))
@@ -778,7 +778,7 @@ rel_vconcat (const char *cwd, const char *s, va_list v)
       cwd = pathbuf;
     }
 
-  int max_len = -1;
+  int max_len = 0;
   mnt_t *m, *match = NULL;
 
   for (m = mount_table; m->posix; m++)
@@ -786,7 +786,7 @@ rel_vconcat (const char *cwd, const char *s, va_list v)
       if (m->flags & MOUNT_CYGDRIVE)
 	continue;
 
-      int n = strlen (m->native);
+      size_t n = strlen (m->native);
       if (n < max_len || !path_prefix_p (m->native, cwd, n))
 	continue;
       max_len = n;
@@ -821,7 +821,7 @@ rel_vconcat (const char *cwd, const char *s, va_list v)
 static char *
 vcygpath (const char *cwd, const char *s, va_list v)
 {
-  int max_len = -1;
+  size_t max_len = 0;
   mnt_t *m, *match = NULL;
 
   if (!max_mount_entry)
@@ -843,15 +843,23 @@ vcygpath (const char *cwd, const char *s, va_list v)
 
   for (m = mount_table; m->posix; m++)
     {
-      int n = strlen (m->posix);
+      size_t n = strlen (m->posix);
       if (n < max_len || !path_prefix_p (m->posix, path, n))
 	continue;
-      if ((m->flags & MOUNT_CYGDRIVE)
-	  && ((int) strlen (path) < n + 2
-	      || path[n] != '/'
-	      || !isalpha (path[n + 1])
-	      || path[n + 2] != '/'))
-	continue;
+      if (m->flags & MOUNT_CYGDRIVE)
+	{
+	  if (strlen (path) < n + 2)
+	    continue;
+	  /* If cygdrive path is just '/', fix n for followup evaluation. */
+	  if (n == 1)
+	    n = 0;
+	  if (path[n] != '/')
+	    continue;
+	  if (!isalpha (path[n + 1]))
+	    continue;
+	  if (path[n + 2] != '/')
+	    continue;
+	}
       max_len = n;
       match = m;
     }
@@ -859,7 +867,7 @@ vcygpath (const char *cwd, const char *s, va_list v)
   char *native;
   if (match == NULL)
     native = strdup (path);
-  else if (max_len == (int) strlen (path))
+  else if (max_len == strlen (path))
     native = strdup (match->native);
   else if (match->flags & MOUNT_CYGDRIVE)
     {
