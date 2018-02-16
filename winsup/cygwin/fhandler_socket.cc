@@ -263,9 +263,9 @@ fhandler_socket::open (int flags, mode_t mode)
 }
 
 int
-fhandler_socket::set_socket_handle (SOCKET sock)
+fhandler_socket::set_socket_handle (SOCKET sock, int af, int type, int flags)
 {
-  DWORD flags;
+  DWORD hdl_flags;
   bool lsp_fixup = false;
 
   /* Usually sockets are inheritable IFS objects.  Unfortunately some virus
@@ -288,8 +288,8 @@ fhandler_socket::set_socket_handle (SOCKET sock)
      If that doesn't work for some reason, mark the sockets for duplication
      via WSADuplicateSocket/WSASocket.  This requires to start the child
      process in SUSPENDED state so we only do this if really necessary. */
-  if (!GetHandleInformation ((HANDLE) sock, &flags)
-      || !(flags & HANDLE_FLAG_INHERIT))
+  if (!GetHandleInformation ((HANDLE) sock, &hdl_flags)
+      || !(hdl_flags & HANDLE_FLAG_INHERIT))
     {
       int ret;
       SOCKET base_sock;
@@ -303,7 +303,7 @@ fhandler_socket::set_socket_handle (SOCKET sock)
         debug_printf ("WSAIoctl: %u", WSAGetLastError ());
       else if (base_sock != sock)
         {
-          if (GetHandleInformation ((HANDLE) base_sock, &flags)
+          if (GetHandleInformation ((HANDLE) base_sock, &hdl_flags)
               && (flags & HANDLE_FLAG_INHERIT))
             {
               if (!DuplicateHandle (GetCurrentProcess (), (HANDLE) base_sock,
@@ -312,19 +312,22 @@ fhandler_socket::set_socket_handle (SOCKET sock)
                 debug_printf ("DuplicateHandle failed, %E");
               else
                 {
-                  closesocket (sock);
+                  ::closesocket (sock);
                   sock = base_sock;
                   lsp_fixup = false;
                 }
             }
         }
     }
+  set_addr_family (af);
+  set_socket_type (type);
+  if (flags & SOCK_NONBLOCK)
+    set_nonblocking (true);
+  if (flags & SOCK_CLOEXEC)
+    set_close_on_exec (true);
   set_io_handle ((HANDLE) sock);
   if (!init_events ())
-    {
-      closesocket (sock);
-      return -1;
-    }
+    return -1;
   if (lsp_fixup)
     init_fixup_before ();
   set_flags (O_RDWR | O_BINARY);
@@ -360,6 +363,7 @@ int
 fhandler_socket::socket (int af, int type, int protocol, int flags)
 {
   SOCKET sock;
+  int ret;
 
   sock = ::socket (af == AF_LOCAL ? AF_INET : af, type, protocol);
   if (sock == INVALID_SOCKET)
@@ -367,13 +371,12 @@ fhandler_socket::socket (int af, int type, int protocol, int flags)
       set_winsock_errno ();
       return -1;
     }
-  set_addr_family (af);
-  set_socket_type (type);
-  if (flags & SOCK_NONBLOCK)
-    set_nonblocking (true);
-  if (flags & SOCK_CLOEXEC)
-    set_close_on_exec (true);
-  return set_socket_handle (sock);
+  ret = set_socket_handle (sock, af, type, flags);
+  if (ret < 0)
+    ::closesocket (sock);
+  return ret;
+}
+
 }
 
 void

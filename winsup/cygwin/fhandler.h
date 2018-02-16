@@ -557,7 +557,7 @@ class fhandler_socket: public fhandler_base
   } status;
 
 #ifdef __INSIDE_CYGWIN_NET__
-  int set_socket_handle (SOCKET sock);
+  int set_socket_handle (SOCKET sock, int af, int type, int flags);
 #endif
 
  public:
