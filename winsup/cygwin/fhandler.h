@@ -590,6 +590,10 @@ class fhandler_socket: public fhandler_base
   int getpeereid (pid_t *pid, uid_t *euid, gid_t *egid);
   int socketpair (int af, int type, int protocol, int flags,
 		  fhandler_socket *fh_out);
+  int setsockopt (int level, int optname, const void *optval,
+		  __socklen_t optlen);
+  int getsockopt (int level, int optname, const void *optval,
+		  __socklen_t *optlen);
 
   int open (int flags, mode_t mode = 0);
   void __reg3 read (void *ptr, size_t& len);

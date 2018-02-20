@@ -41,6 +41,7 @@ __set_errno (const char *fn, int ln, int val)
 }
 #define set_errno(val) __set_errno (__PRETTY_FUNCTION__, __LINE__, (val))
 
+int find_winsock_errno (DWORD why);
 void __reg2 __set_winsock_errno (const char *fn, int ln);
 #define set_winsock_errno() __set_winsock_errno (__FUNCTION__, __LINE__)
 
