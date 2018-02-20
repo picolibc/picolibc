@@ -150,14 +150,7 @@ inet_makeaddr (int net, int lna)
   return in;
 }
 
-struct tl
-{
-  int w;
-  const char *s;
-  int e;
-};
-
-static const struct tl errmap[] = {
+static const errmap_t wsock_errmap[] = {
   {WSA_INVALID_HANDLE, "WSA_INVALID_HANDLE", EBADF},
   {WSA_NOT_ENOUGH_MEMORY, "WSA_NOT_ENOUGH_MEMORY", ENOMEM},
   {WSA_INVALID_PARAMETER, "WSA_INVALID_PARAMETER", EINVAL},
@@ -206,11 +199,11 @@ static const struct tl errmap[] = {
 };
 
 static int
-find_winsock_errno (int why)
+find_winsock_errno (DWORD why)
 {
-  for (int i = 0; errmap[i].s != NULL; ++i)
-    if (why == errmap[i].w)
-      return errmap[i].e;
+  for (int i = 0; wsock_errmap[i].s != NULL; ++i)
+    if (why == wsock_errmap[i].w)
+      return wsock_errmap[i].e;
 
   return EPERM;
 }
@@ -229,7 +222,7 @@ __set_winsock_errno (const char *fn, int ln)
  * Since the member `s' isn't used for debug output we can use it
  * for the error text returned by herror and hstrerror.
  */
-static const struct tl host_errmap[] = {
+static const errmap_t host_errmap[] = {
   {WSAHOST_NOT_FOUND, "Unknown host", HOST_NOT_FOUND},
   {WSATRY_AGAIN, "Host name lookup failure", TRY_AGAIN},
   {WSANO_RECOVERY, "Unknown server error", NO_RECOVERY},
@@ -242,7 +235,7 @@ set_host_errno ()
 {
   int i;
 
-  int why = WSAGetLastError ();
+  DWORD why = WSAGetLastError ();
 
   for (i = 0; host_errmap[i].w != 0; ++i)
     if (why == host_errmap[i].w)

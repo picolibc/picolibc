@@ -31,12 +31,7 @@ details. */
 
 #define X(w, e) {ERROR_##w, #w, e}
 
-static const struct
-{
-  DWORD w;		 /* windows version of error */
-  const char *s;	 /* text of windows version */
-  int e;		 /* errno version of error */
-} errmap[] =
+static const errmap_t errmap[] =
 {
   /* FIXME: Some of these choices are arbitrary! */
   X (ACCESS_DENIED,		EACCES),

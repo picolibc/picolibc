@@ -212,9 +212,6 @@ bool timeval_to_ms (const struct timeval *, DWORD &);
 void __stdcall set_console_title (char *);
 void init_console_handler (bool);
 
-void __reg2 __set_winsock_errno (const char *fn, int ln);
-#define set_winsock_errno() __set_winsock_errno (__FUNCTION__, __LINE__)
-
 extern bool wsock_started;
 
 /* Printf type functions */
