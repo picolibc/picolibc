@@ -30,13 +30,13 @@ details. */
 /* 100ns difference between Windows and UNIX timebase. */
 #define FACTOR (0x19db1ded53e8000LL)
 /* # of nanosecs per second. */
-#define NSPERSEC (1000000000)
+#define NSPERSEC (1000000000LL)
 /* # of 100ns intervals per second. */
-#define NS100PERSEC (10000000)
+#define NS100PERSEC (10000000LL)
 /* # of microsecs per second. */
-#define USPERSEC (1000000)
+#define USPERSEC (1000000LL)
 /* # of millisecs per second. */
-#define MSPERSEC (1000)
+#define MSPERSEC (1000L)
 
 class hires_base
 {
