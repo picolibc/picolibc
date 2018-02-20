@@ -59,11 +59,8 @@ extern "C"
 {
   int h_errno;
 
-  int __stdcall rcmd (char **ahost, unsigned short inport, char *locuser,
-		      char *remuser, char *cmd, SOCKET * fd2p);
   int sscanf (const char *, const char *, ...);
   int cygwin_inet_pton(int, const char *, void *);
-  int cygwin_inet_aton(const char *, struct in_addr *);
   const char *cygwin_inet_ntop (int, const void *, char *, socklen_t);
   int dn_length1(const unsigned char *, const unsigned char *,
 		 const unsigned char *);
@@ -1792,7 +1789,7 @@ get_ipv4fromreg (struct ifall *ifp, const char *name, DWORD idx)
 	{ \
 	  char t[64]; \
 	  sys_wcstombs (t, 64, (u)); \
-	  cygwin_inet_aton (t, (a)); \
+	  cygwin_inet_pton (AF_INET, t, (a)); \
 	}
       /* If DHCP is used, we have only one address. */
       if (dhcp)
