@@ -117,7 +117,7 @@ cygheap_user::init ()
 
    This needs careful checking should we use check_token_membership in other
    circumstances. */
-static bool
+bool
 check_token_membership (PSID sid)
 {
   NTSTATUS status;
@@ -142,7 +142,7 @@ check_token_membership (PSID sid)
   return false;
 }
 
-void
+static void
 internal_getlogin (cygheap_user &user)
 {
   struct passwd *pwd;

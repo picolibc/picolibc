@@ -304,8 +304,8 @@ dtable::init_std_file_from_handle (int fd, HANDLE handle)
 	dev.parse (name);
       else if (strcmp (name, ":sock:") == 0
 	       /* NtQueryObject returns an error when called on an LSP socket
-		  handle.  fdsock tries to fetch the underlying base socket,
-		  but this might fail. */
+		  handle.  fhandler_socket::set_socket_handle tries to fetch
+		  the underlying base socket, but this might fail. */
 	       || (strcmp (name, unknown_file) == 0
 		   && !::getsockopt ((SOCKET) handle, SOL_SOCKET, SO_RCVBUF,
 				     (char *) &rcv, &len)))
@@ -517,10 +517,12 @@ fh_alloc (path_conv& pc)
 	case FH_TCP:
 	case FH_UDP:
 	case FH_ICMP:
+	  fh = cnew (fhandler_socket_inet);
+	  break;
 	case FH_UNIX:
 	case FH_STREAM:
 	case FH_DGRAM:
-	  fh = cnew (fhandler_socket);
+	  fh = cnew (fhandler_socket_local);
 	  break;
 	case FH_FS:
 	  fh = cnew (fhandler_disk_file);

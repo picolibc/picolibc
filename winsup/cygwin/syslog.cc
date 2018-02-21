@@ -185,17 +185,12 @@ static enum {
 static int syslogd_sock = -1;
 extern "C" int cygwin_socket (int, int, int);
 extern "C" int cygwin_connect (int, const struct sockaddr *, int);
-extern int get_inet_addr (const struct sockaddr *, int,
-			  struct sockaddr_storage *, int *,
-			  int * = NULL, int * = NULL);
 
 static void
 connect_syslogd ()
 {
   int fd;
   struct sockaddr_un sun;
-  struct sockaddr_storage sst;
-  int len, type;
 
   if (syslogd_inited != not_inited && syslogd_sock >= 0)
     close (syslogd_sock);
@@ -203,20 +198,38 @@ connect_syslogd ()
   syslogd_sock = -1;
   sun.sun_family = AF_LOCAL;
   strncpy (sun.sun_path, _PATH_LOG, sizeof sun.sun_path);
-  if (get_inet_addr ((struct sockaddr *) &sun, sizeof sun, &sst, &len, &type))
-    return;
-  if ((fd = cygwin_socket (AF_LOCAL, type, 0)) < 0)
+  if ((fd = cygwin_socket (AF_LOCAL, SOCK_STREAM | SOCK_CLOEXEC, 0)) < 0)
     return;
   if (cygwin_connect (fd, (struct sockaddr *) &sun, sizeof sun) == 0)
+    syslogd_inited = inited_stream;
+  else
     {
-      /* connect on a dgram socket always succeeds.  We still don't know
-	 if syslogd is actually listening. */
-      if (type == SOCK_DGRAM)
+      close (fd);
+      if ((fd = cygwin_socket (AF_LOCAL, SOCK_DGRAM | SOCK_CLOEXEC, 0)) < 0)
+	return;
+      if (cygwin_connect (fd, (struct sockaddr *) &sun, sizeof sun) == 0)
 	{
+	  /*
+	   * FIXME
+	   *
+	   * As soon as AF_LOCAL sockets are using pipes, this code has to
+	   * got away.
+	   */
+
+	  /* connect on a dgram socket always succeeds.  We still don't know
+	     if syslogd is actually listening. */
+	  cygheap_fdget cfd (fd);
+	  fhandler_socket_local *const fh = (fhandler_socket_local *)
+					    cfd->is_socket ();
 	  tmp_pathbuf tp;
 	  PMIB_UDPTABLE tab = (PMIB_UDPTABLE) tp.w_get ();
 	  DWORD size = 65536;
 	  bool found = false;
+	  struct sockaddr_storage sst;
+	  int len;
+
+	  len = sizeof sst;
+	  ::getsockname (fh->get_socket (), (struct sockaddr *) &sst, &len);
 	  struct sockaddr_in *sa = (struct sockaddr_in *) &sst;
 
 	  if (GetUdpTable (tab, &size, FALSE) == NO_ERROR)
@@ -235,11 +248,12 @@ connect_syslogd ()
 		  return;
 		}
 	    }
+	  syslogd_inited = inited_dgram;
 	}
-      syslogd_inited = type == SOCK_DGRAM ? inited_dgram : inited_stream;
+      else
+      	close (fd);
     }
   syslogd_sock = fd;
-  fcntl64 (syslogd_sock, F_SETFD, FD_CLOEXEC);
   debug_printf ("found /dev/log, fd = %d, type = %s",
 		fd, syslogd_inited == inited_stream ? "STREAM" : "DGRAM");
   return;
