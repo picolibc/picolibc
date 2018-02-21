@@ -10,6 +10,8 @@ details. */
 #include "pinfo.h"
 
 #include "tty.h"
+#include <cygwin/_socketflags.h>
+
 /* fcntl flags used only internaly. */
 #define O_NOSYMLINK	0x080000
 #define O_DIROPEN	0x100000
@@ -488,8 +490,15 @@ class fhandler_socket: public fhandler_base
   int addr_family;
   int type;
   virtual int af_local_connect () = 0;
-  int get_socket_flags ();
-
+  inline int get_socket_flags ()
+  {
+    int ret = 0;
+    if (is_nonblocking ())
+      ret |= SOCK_NONBLOCK;
+    if (close_on_exec ())
+      ret |= SOCK_CLOEXEC;
+    return ret;
+  }
   wsa_event *wsock_events;
   HANDLE wsock_mtx;
   HANDLE wsock_evt;

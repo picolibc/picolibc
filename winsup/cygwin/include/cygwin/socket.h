@@ -130,13 +130,8 @@ struct OLD_msghdr
 #define SOCK_RDM	4		/* reliably-delivered message	*/
 #define SOCK_SEQPACKET	5		/* sequential packet socket	*/
 
-/* GNU extension flags.  Or them to the type parameter in calls to
-   socket(2) to mark socket as nonblocking and/or close-on-exec. */
-#define SOCK_NONBLOCK	0x01000000
-#define SOCK_CLOEXEC	0x02000000
-#ifdef __INSIDE_CYGWIN__
-#define _SOCK_FLAG_MASK	0xff000000	/* Bits left for more extensions */
-#endif
+/* defines SOCK_NONBLOCK / SOCK_CLOEXEC */
+#include <cygwin/_socketflags.h>
 
 /* Supported address families. */
 /*

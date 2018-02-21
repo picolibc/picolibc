@@ -721,17 +721,6 @@ fhandler_socket::link (const char *newpath)
 }
 
 int
-fhandler_socket::get_socket_flags ()
-{
-  int ret = 0;
-  if (is_nonblocking ())
-    ret |= SOCK_NONBLOCK;
-  if (close_on_exec ())
-    ret |= SOCK_CLOEXEC;
-  return ret;
-}
-
-int
 fhandler_socket::shutdown (int how)
 {
   int res = ::shutdown (get_socket (), how);
