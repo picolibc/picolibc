@@ -203,7 +203,7 @@ fhandler_socket_inet::connect (const struct sockaddr *name, int namelen)
   if (res)
     {
       DWORD err = WSAGetLastError ();
-      
+
       /* Some applications use the ugly technique to check if a non-blocking
          connect succeeded by calling connect again, until it returns EISCONN.
 	 This circumvents the event handling and connect_state is never set.
@@ -215,13 +215,13 @@ fhandler_socket_inet::connect (const struct sockaddr *name, int namelen)
       else if (is_nonblocking () && err == WSAEWOULDBLOCK)
 	WSASetLastError (WSAEINPROGRESS);
       /* Winsock returns WSAEINVAL if the socket is already a listener.
-      	 Convert to POSIX/Linux compliant EISCONN. */
+	 Convert to POSIX/Linux compliant EISCONN. */
       else if (err == WSAEINVAL && connect_state () == listener)
 	WSASetLastError (WSAEISCONN);
       /* Any other error except WSAEALREADY during connect_pending means the
          connect failed. */
       else if (connect_state () == connect_pending && err != WSAEALREADY)
-      	connect_state (connect_failed);
+	connect_state (connect_failed);
       set_winsock_errno ();
     }
 
@@ -631,7 +631,7 @@ fhandler_socket_inet::read (void *in_ptr, size_t& len)
   WSABUF wsabuf = { len, ptr };
   WSAMSG wsamsg = { NULL, 0, &wsabuf, 1, { 0,  NULL }, 0 };
 #endif
-  
+
   len = recv_internal (&wsamsg, false);
 }
 
@@ -1132,7 +1132,7 @@ fhandler_socket_inet::getsockopt (int level, int optname, const void *optval,
 	  break;
 	}
       break;
-    case IPPROTO_TCP:	
+    case IPPROTO_TCP:
       switch (optname)
 	{
 	case TCP_NODELAY:

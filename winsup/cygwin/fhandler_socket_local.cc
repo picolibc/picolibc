@@ -1310,7 +1310,7 @@ fhandler_socket_local::read (void *in_ptr, size_t& len)
   WSABUF wsabuf = { len, ptr };
   WSAMSG wsamsg = { NULL, 0, &wsabuf, 1, { 0,  NULL }, 0 };
 #endif
-  
+
   len = recv_internal (&wsamsg, false);
 }
 

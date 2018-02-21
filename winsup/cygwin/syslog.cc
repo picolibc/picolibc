@@ -251,7 +251,7 @@ connect_syslogd ()
 	  syslogd_inited = inited_dgram;
 	}
       else
-      	close (fd);
+	close (fd);
     }
   syslogd_sock = fd;
   debug_printf ("found /dev/log, fd = %d, type = %s",
