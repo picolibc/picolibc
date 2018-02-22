@@ -77,20 +77,6 @@ fhandler_socket::~fhandler_socket ()
     cfree (prot_info_ptr);
 }
 
-char *
-fhandler_socket::get_proc_fd_name (char *buf)
-{
-  __small_sprintf (buf, "socket:[%lu]", get_plain_ino ());
-  return buf;
-}
-
-int
-fhandler_socket::open (int flags, mode_t mode)
-{
-  set_errno (ENXIO);
-  return 0;
-}
-
 int
 fhandler_socket::set_socket_handle (SOCKET sock, int af, int type, int flags)
 {
@@ -521,6 +507,20 @@ fhandler_socket::release_events ()
     }
 }
 
+void
+fhandler_socket::set_close_on_exec (bool val)
+{
+  set_no_inheritance (wsock_mtx, val);
+  set_no_inheritance (wsock_evt, val);
+  if (need_fixup_before ())
+    {
+      close_on_exec (val);
+      debug_printf ("set close_on_exec for %s to %d", get_name (), val);
+    }
+  else
+    fhandler_base::set_close_on_exec (val);
+}
+
 /* Called if a freshly created socket is not inheritable.  In that case we
    have to use fixup_before_fork_exec.  See comment in set_socket_handle for
    a description of the problem. */
@@ -629,95 +629,18 @@ fhandler_socket::dup (fhandler_base *child, int flags)
   return -1;
 }
 
-int __reg2
-fhandler_socket::fstat (struct stat *buf)
+char *
+fhandler_socket::get_proc_fd_name (char *buf)
 {
-  int res;
-
-  res = fhandler_socket::fstat (buf);
-  if (!res)
-    {
-      buf->st_dev = FHDEV (DEV_TCP_MAJOR, 0);
-      if (!(buf->st_ino = get_plain_ino ()))
-	sscanf (get_name (), "/proc/%*d/fd/socket:[%lld]",
-			     (long long *) &buf->st_ino);
-      buf->st_uid = uid;
-      buf->st_gid = gid;
-      buf->st_mode = mode;
-      buf->st_size = 0;
-    }
-  return res;
-}
-
-int __reg2
-fhandler_socket::fstatvfs (struct statvfs *sfs)
-{
-  memset (sfs, 0, sizeof (*sfs));
-  sfs->f_bsize = sfs->f_frsize = 4096;
-  sfs->f_namemax = NAME_MAX;
-  return 0;
+  __small_sprintf (buf, "socket:[%lu]", get_plain_ino ());
+  return buf;
 }
 
 int
-fhandler_socket::fchmod (mode_t newmode)
+fhandler_socket::getpeereid (pid_t *pid, uid_t *euid, gid_t *egid)
 {
-  mode = (newmode & ~S_IFMT) | S_IFSOCK;
-  return 0;
-}
-
-int
-fhandler_socket::fchown (uid_t newuid, gid_t newgid)
-{
-  bool perms = check_token_membership (&well_known_admins_sid);
-
-  /* Admin rulez */
-  if (!perms)
-    {
-      /* Otherwise, new uid == old uid or current uid is fine */
-      if (newuid == ILLEGAL_UID || newuid == uid || newuid == myself->uid)
-	perms = true;
-      /* Otherwise, new gid == old gid or current gid is fine */
-      else if (newgid == ILLEGAL_GID || newgid == gid || newgid == myself->gid)
-	perms = true;
-      else
-	{
-	  /* Last but not least, newgid in supplementary group list is fine */
-	  tmp_pathbuf tp;
-	  gid_t *gids = (gid_t *) tp.w_get ();
-	  int num = getgroups (65536 / sizeof (*gids), gids);
-
-	  for (int idx = 0; idx < num; ++idx)
-	    if (newgid == gids[idx])
-	      {
-		perms = true;
-		break;
-	      }
-	}
-   }
-
-  if (perms)
-    {
-      if (newuid != ILLEGAL_UID)
-	uid = newuid;
-      if (newgid != ILLEGAL_GID)
-	gid = newgid;
-      return 0;
-    }
-  set_errno (EPERM);
+  set_errno (EINVAL);
   return -1;
-}
-
-int
-fhandler_socket::facl (int cmd, int nentries, aclent_t *aclbufp)
-{
-  set_errno (EOPNOTSUPP);
-  return -1;
-}
-
-int
-fhandler_socket::link (const char *newpath)
-{
-  return fhandler_base::link (newpath);
 }
 
 /* Definitions of old ifreq stuff used prior to Cygwin 1.7.0. */
@@ -933,23 +856,100 @@ fhandler_socket::fcntl (int cmd, intptr_t arg)
   return res;
 }
 
-void
-fhandler_socket::set_close_on_exec (bool val)
+int
+fhandler_socket::open (int flags, mode_t mode)
 {
-  set_no_inheritance (wsock_mtx, val);
-  set_no_inheritance (wsock_evt, val);
-  if (need_fixup_before ())
+  set_errno (ENXIO);
+  return 0;
+}
+
+int __reg2
+fhandler_socket::fstat (struct stat *buf)
+{
+  int res;
+
+  res = fhandler_socket::fstat (buf);
+  if (!res)
     {
-      close_on_exec (val);
-      debug_printf ("set close_on_exec for %s to %d", get_name (), val);
+      buf->st_dev = FHDEV (DEV_TCP_MAJOR, 0);
+      if (!(buf->st_ino = get_plain_ino ()))
+	sscanf (get_name (), "/proc/%*d/fd/socket:[%lld]",
+			     (long long *) &buf->st_ino);
+      buf->st_uid = uid;
+      buf->st_gid = gid;
+      buf->st_mode = mode;
+      buf->st_size = 0;
     }
-  else
-    fhandler_base::set_close_on_exec (val);
+  return res;
+}
+
+int __reg2
+fhandler_socket::fstatvfs (struct statvfs *sfs)
+{
+  memset (sfs, 0, sizeof (*sfs));
+  sfs->f_bsize = sfs->f_frsize = 4096;
+  sfs->f_namemax = NAME_MAX;
+  return 0;
 }
 
 int
-fhandler_socket::getpeereid (pid_t *pid, uid_t *euid, gid_t *egid)
+fhandler_socket::fchmod (mode_t newmode)
 {
-  set_errno (EINVAL);
+  mode = (newmode & ~S_IFMT) | S_IFSOCK;
+  return 0;
+}
+
+int
+fhandler_socket::fchown (uid_t newuid, gid_t newgid)
+{
+  bool perms = check_token_membership (&well_known_admins_sid);
+
+  /* Admin rulez */
+  if (!perms)
+    {
+      /* Otherwise, new uid == old uid or current uid is fine */
+      if (newuid == ILLEGAL_UID || newuid == uid || newuid == myself->uid)
+	perms = true;
+      /* Otherwise, new gid == old gid or current gid is fine */
+      else if (newgid == ILLEGAL_GID || newgid == gid || newgid == myself->gid)
+	perms = true;
+      else
+	{
+	  /* Last but not least, newgid in supplementary group list is fine */
+	  tmp_pathbuf tp;
+	  gid_t *gids = (gid_t *) tp.w_get ();
+	  int num = getgroups (65536 / sizeof (*gids), gids);
+
+	  for (int idx = 0; idx < num; ++idx)
+	    if (newgid == gids[idx])
+	      {
+		perms = true;
+		break;
+	      }
+	}
+   }
+
+  if (perms)
+    {
+      if (newuid != ILLEGAL_UID)
+	uid = newuid;
+      if (newgid != ILLEGAL_GID)
+	gid = newgid;
+      return 0;
+    }
+  set_errno (EPERM);
   return -1;
+}
+
+int
+fhandler_socket::facl (int cmd, int nentries, aclent_t *aclbufp)
+{
+  set_errno (EOPNOTSUPP);
+  return -1;
+}
+
+int
+fhandler_socket::link (const char *newpath)
+{
+  return fhandler_base::link (newpath);
 }

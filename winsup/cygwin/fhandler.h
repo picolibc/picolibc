@@ -499,17 +499,18 @@ class fhandler_socket: public fhandler_base
       ret |= SOCK_CLOEXEC;
     return ret;
   }
+
+ protected:
   wsa_event *wsock_events;
   HANDLE wsock_mtx;
   HANDLE wsock_evt;
- public:
   bool init_events ();
-  int evaluate_events (const long event_mask, long &events, const bool erase);
-  const HANDLE wsock_event () const { return wsock_evt; }
-  const LONG serial_number () const { return wsock_events->serial_number; }
- protected:
   int wait_for_events (const long event_mask, const DWORD flags);
   void release_events ();
+ public:
+  const HANDLE wsock_event () const { return wsock_evt; }
+  int evaluate_events (const long event_mask, long &events, const bool erase);
+  const LONG serial_number () const { return wsock_events->serial_number; }
 
  protected:
   int	    _rmem;
@@ -529,9 +530,6 @@ class fhandler_socket: public fhandler_base
 
  protected:
   struct _WSAPROTOCOL_INFOW *prot_info_ptr;
- public:
-  void init_fixup_before ();
-  bool need_fixup_before () const {return prot_info_ptr != NULL;}
 
  protected:
   struct status_flags
@@ -573,6 +571,15 @@ class fhandler_socket: public fhandler_base
   IMPLEMENT_STATUS_FLAG (conn_state, connect_state)
   IMPLEMENT_STATUS_FLAG (bool, no_getpeereid)
 
+  bool need_fixup_before () const {return prot_info_ptr != NULL;}
+  void set_close_on_exec (bool val);
+  void init_fixup_before ();
+  int fixup_before_fork_exec (DWORD);
+  void fixup_after_fork (HANDLE);
+  void fixup_after_exec ();
+  int dup (fhandler_base *child, int);
+  char *get_proc_fd_name (char *buf);
+
   virtual int socket (int af, int type, int protocol, int flags) = 0;
   virtual int bind (const struct sockaddr *name, int namelen) = 0;
   virtual int listen (int backlog) = 0;
@@ -583,12 +590,6 @@ class fhandler_socket: public fhandler_base
   virtual int shutdown (int how) = 0;
   virtual int close () = 0;
   virtual int getpeereid (pid_t *pid, uid_t *euid, gid_t *egid);
-  virtual int setsockopt (int level, int optname, const void *optval,
-			  __socklen_t optlen) = 0;
-  virtual int getsockopt (int level, int optname, const void *optval,
-			  __socklen_t *optlen) = 0;
-
-  int open (int flags, mode_t mode = 0);
   virtual ssize_t recvfrom (void *ptr, size_t len, int flags,
 			    struct sockaddr *from, int *fromlen) = 0;
   virtual ssize_t recvmsg (struct msghdr *msg, int flags) = 0;
@@ -601,23 +602,28 @@ class fhandler_socket: public fhandler_base
   virtual ssize_t sendmsg (const struct msghdr *msg, int flags) = 0;
   virtual ssize_t __stdcall write (const void *ptr, size_t len) = 0;
   virtual ssize_t __stdcall writev (const struct iovec *, int iovcnt, ssize_t tot = -1) = 0;
+  virtual int setsockopt (int level, int optname, const void *optval,
+			  __socklen_t optlen) = 0;
+  virtual int getsockopt (int level, int optname, const void *optval,
+			  __socklen_t *optlen) = 0;
 
   virtual int ioctl (unsigned int cmd, void *);
   virtual int fcntl (int cmd, intptr_t);
 
+  int open (int flags, mode_t mode = 0);
+  int __reg2 fstat (struct stat *buf);
+  int __reg2 fstatvfs (struct statvfs *buf);
+  int __reg1 fchmod (mode_t newmode);
+  int __reg2 fchown (uid_t newuid, gid_t newgid);
+  int __reg3 facl (int, int, struct acl *);
+  int __reg2 link (const char *);
   off_t lseek (off_t, int)
   { 
     set_errno (ESPIPE);
     return -1;
   }
-  void hclose (HANDLE) {close ();}
-  int dup (fhandler_base *child, int);
 
-  void set_close_on_exec (bool val);
-  int fixup_before_fork_exec (DWORD);
-  void fixup_after_fork (HANDLE);
-  void fixup_after_exec ();
-  char *get_proc_fd_name (char *buf);
+  void hclose (HANDLE) {close ();}
 
   select_record *select_read (select_stuff *);
   select_record *select_write (select_stuff *);
@@ -626,13 +632,6 @@ class fhandler_socket: public fhandler_base
   int get_addr_family () {return addr_family;}
   void set_socket_type (int st) { type = st;}
   int get_socket_type () {return type;}
-
-  int __reg2 fstat (struct stat *buf);
-  int __reg2 fstatvfs (struct statvfs *buf);
-  int __reg1 fchmod (mode_t newmode);
-  int __reg2 fchown (uid_t newuid, gid_t newgid);
-  int __reg3 facl (int, int, struct acl *);
-  int __reg2 link (const char *);
 };
 
 class fhandler_socket_inet: public fhandler_socket
@@ -657,10 +656,6 @@ class fhandler_socket_inet: public fhandler_socket
   int getpeername (struct sockaddr *name, int *namelen);
   int shutdown (int how);
   int close ();
-  int setsockopt (int level, int optname, const void *optval,
-		  __socklen_t optlen);
-  int getsockopt (int level, int optname, const void *optval,
-		  __socklen_t *optlen);
   ssize_t recvfrom (void *ptr, size_t len, int flags,
 		    struct sockaddr *from, int *fromlen);
   ssize_t recvmsg (struct msghdr *msg, int flags);
@@ -671,6 +666,11 @@ class fhandler_socket_inet: public fhandler_socket
   ssize_t sendmsg (const struct msghdr *msg, int flags);
   ssize_t __stdcall write (const void *ptr, size_t len);
   ssize_t __stdcall writev (const struct iovec *, int iovcnt, ssize_t tot = -1);
+  int setsockopt (int level, int optname, const void *optval,
+		  __socklen_t optlen);
+  int getsockopt (int level, int optname, const void *optval,
+		  __socklen_t *optlen);
+
   int ioctl (unsigned int cmd, void *);
   int fcntl (int cmd, intptr_t);
 
@@ -747,10 +747,6 @@ class fhandler_socket_local: public fhandler_socket
   int shutdown (int how);
   int close ();
   int getpeereid (pid_t *pid, uid_t *euid, gid_t *egid);
-  int setsockopt (int level, int optname, const void *optval,
-		  __socklen_t optlen);
-  int getsockopt (int level, int optname, const void *optval,
-		  __socklen_t *optlen);
   ssize_t recvfrom (void *ptr, size_t len, int flags,
 		    struct sockaddr *from, int *fromlen);
   ssize_t recvmsg (struct msghdr *msg, int flags);
@@ -761,6 +757,11 @@ class fhandler_socket_local: public fhandler_socket
   ssize_t sendmsg (const struct msghdr *msg, int flags);
   ssize_t __stdcall write (const void *ptr, size_t len);
   ssize_t __stdcall writev (const struct iovec *, int iovcnt, ssize_t tot = -1);
+  int setsockopt (int level, int optname, const void *optval,
+		  __socklen_t optlen);
+  int getsockopt (int level, int optname, const void *optval,
+		  __socklen_t *optlen);
+
   int ioctl (unsigned int cmd, void *);
   int fcntl (int cmd, intptr_t);
 
