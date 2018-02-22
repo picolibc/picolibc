@@ -1549,7 +1549,7 @@ socket_cleanup (select_record *, select_stuff *stuff)
 }
 
 select_record *
-fhandler_socket::select_read (select_stuff *ss)
+fhandler_socket_inet::select_read (select_stuff *ss)
 {
   select_record *s = ss->start.next;
   if (!s->startup)
@@ -1565,7 +1565,7 @@ fhandler_socket::select_read (select_stuff *ss)
 }
 
 select_record *
-fhandler_socket::select_write (select_stuff *ss)
+fhandler_socket_inet::select_write (select_stuff *ss)
 {
   select_record *s = ss->start.next;
   if (!s->startup)
@@ -1586,7 +1586,61 @@ fhandler_socket::select_write (select_stuff *ss)
 }
 
 select_record *
-fhandler_socket::select_except (select_stuff *ss)
+fhandler_socket_inet::select_except (select_stuff *ss)
+{
+  select_record *s = ss->start.next;
+  if (!s->startup)
+    {
+      s->startup = start_thread_socket;
+      s->verify = verify_true;
+      s->cleanup = socket_cleanup;
+    }
+  s->peek = peek_socket;
+  /* FIXME: Is this right?  Should these be used as criteria for except? */
+  s->except_ready = saw_shutdown_write () || saw_shutdown_read ();
+  s->except_selected = true;
+  return s;
+}
+
+select_record *
+fhandler_socket_local::select_read (select_stuff *ss)
+{
+  select_record *s = ss->start.next;
+  if (!s->startup)
+    {
+      s->startup = start_thread_socket;
+      s->verify = verify_true;
+      s->cleanup = socket_cleanup;
+    }
+  s->peek = peek_socket;
+  s->read_ready = saw_shutdown_read ();
+  s->read_selected = true;
+  return s;
+}
+
+select_record *
+fhandler_socket_local::select_write (select_stuff *ss)
+{
+  select_record *s = ss->start.next;
+  if (!s->startup)
+    {
+      s->startup = start_thread_socket;
+      s->verify = verify_true;
+      s->cleanup = socket_cleanup;
+    }
+  s->peek = peek_socket;
+  s->write_ready = saw_shutdown_write () || connect_state () == unconnected;
+  s->write_selected = true;
+  if (connect_state () != unconnected)
+    {
+      s->except_ready = saw_shutdown_write () || saw_shutdown_read ();
+      s->except_on_write = true;
+    }
+  return s;
+}
+
+select_record *
+fhandler_socket_local::select_except (select_stuff *ss)
 {
   select_record *s = ss->start.next;
   if (!s->startup)

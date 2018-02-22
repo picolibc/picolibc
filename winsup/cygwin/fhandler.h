@@ -625,13 +625,15 @@ class fhandler_socket: public fhandler_base
 
   void hclose (HANDLE) {close ();}
 
-  select_record *select_read (select_stuff *);
-  select_record *select_write (select_stuff *);
-  select_record *select_except (select_stuff *);
   void set_addr_family (int af) {addr_family = af;}
   int get_addr_family () {return addr_family;}
   void set_socket_type (int st) { type = st;}
   int get_socket_type () {return type;}
+
+  /* select.cc */
+  virtual select_record *select_read (select_stuff *) = 0;
+  virtual select_record *select_write (select_stuff *) = 0;
+  virtual select_record *select_except (select_stuff *) = 0;
 };
 
 class fhandler_socket_inet: public fhandler_socket
@@ -673,6 +675,11 @@ class fhandler_socket_inet: public fhandler_socket
 
   int ioctl (unsigned int cmd, void *);
   int fcntl (int cmd, intptr_t);
+
+  /* select.cc */
+  select_record *select_read (select_stuff *);
+  select_record *select_write (select_stuff *);
+  select_record *select_except (select_stuff *);
 
   /* from here on: CLONING */
   fhandler_socket_inet (void *) {}
@@ -771,6 +778,11 @@ class fhandler_socket_local: public fhandler_socket
   int __reg2 fchown (uid_t newuid, gid_t newgid);
   int __reg3 facl (int, int, struct acl *);
   int __reg2 link (const char *);
+
+  /* select.cc */
+  select_record *select_read (select_stuff *);
+  select_record *select_write (select_stuff *);
+  select_record *select_except (select_stuff *);
 
   /* from here on: CLONING */
   fhandler_socket_local (void *) {}
