@@ -670,6 +670,7 @@ class fhandler_socket_inet: public fhandler_socket
   ssize_t sendmsg (const struct msghdr *msg, int flags);
   ssize_t __stdcall write (const void *ptr, size_t len);
   ssize_t __stdcall writev (const struct iovec *, int iovcnt, ssize_t tot = -1);
+  int ioctl (unsigned int cmd, void *);
 
   /* from here on: CLONING */
   fhandler_socket_inet (void *) {}
@@ -758,6 +759,7 @@ class fhandler_socket_local: public fhandler_socket
   ssize_t sendmsg (const struct msghdr *msg, int flags);
   ssize_t __stdcall write (const void *ptr, size_t len);
   ssize_t __stdcall writev (const struct iovec *, int iovcnt, ssize_t tot = -1);
+  int ioctl (unsigned int cmd, void *);
 
   int __reg2 fstat (struct stat *buf);
   int __reg2 fstatvfs (struct statvfs *buf);

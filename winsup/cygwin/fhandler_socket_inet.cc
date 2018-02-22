@@ -1217,3 +1217,71 @@ fhandler_socket_inet::getsockopt (int level, int optname, const void *optval,
 
   return ret;
 }
+
+int
+fhandler_socket_inet::ioctl (unsigned int cmd, void *p)
+{
+  int res;
+
+  switch (cmd)
+    {
+    /* Here we handle only ioctl commands which are understood by Winsock.
+       However, we have a problem, which is, the different size of u_long
+       in Windows and 64 bit Cygwin.  This affects the definitions of
+       FIOASYNC, etc, because they are defined in terms of sizeof(u_long).
+       So we have to use case labels which are independent of the sizeof
+       u_long.  Since we're redefining u_long at the start of this file to
+       matching Winsock's idea of u_long, we can use the real definitions in
+       calls to Windows.  In theory we also have to make sure to convert the
+       different ideas of u_long between the application and Winsock, but
+       fortunately, the parameters defined as u_long pointers are on Linux
+       and BSD systems defined as int pointer, so the applications will
+       use a type of the expected size.  Hopefully. */
+    case FIOASYNC:
+#ifdef __x86_64__
+    case _IOW('f', 125, u_long):
+#endif
+      res = WSAAsyncSelect (get_socket (), winmsg, WM_ASYNCIO,
+	      *(int *) p ? ASYNC_MASK : 0);
+      syscall_printf ("Async I/O on socket %s",
+	      *(int *) p ? "started" : "cancelled");
+      async_io (*(int *) p != 0);
+      /* If async_io is switched off, revert the event handling. */
+      if (*(int *) p == 0)
+	WSAEventSelect (get_socket (), wsock_evt, EVENT_MASK);
+      break;
+    case FIONREAD:
+#ifdef __x86_64__
+    case _IOR('f', 127, u_long):
+#endif
+      /* Make sure to use the Winsock definition of FIONREAD. */
+      res = ::ioctlsocket (get_socket (), _IOR('f', 127, u_long), (u_long *) p);
+      if (res == SOCKET_ERROR)
+	set_winsock_errno ();
+      break;
+    case FIONBIO:
+    case SIOCATMARK:
+      /* Sockets are always non-blocking internally.  So we just note the
+	 state here. */
+#ifdef __x86_64__
+      /* Convert the different idea of u_long in the definition of cmd. */
+      if (((cmd >> 16) & IOCPARM_MASK) == sizeof (unsigned long))
+	cmd = (cmd & ~(IOCPARM_MASK << 16)) | (sizeof (u_long) << 16);
+#endif
+      if (cmd == FIONBIO)
+	{
+	  syscall_printf ("socket is now %sblocking",
+			    *(int *) p ? "non" : "");
+	  set_nonblocking (*(int *) p);
+	  res = 0;
+	}
+      else
+	res = ::ioctlsocket (get_socket (), cmd, (u_long *) p);
+      break;
+    default:
+      res = fhandler_socket::ioctl (cmd, p);
+      break;
+    }
+  syscall_printf ("%d = ioctl_socket(%x, %p)", res, cmd, p);
+  return res;
+}
