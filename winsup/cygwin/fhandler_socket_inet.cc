@@ -88,6 +88,20 @@ get_inet_addr_inet (const struct sockaddr *in, int inlen,
     }
 }
 
+/* There's no DLL which exports the symbol WSARecvMsg.  One has to call
+   WSAIoctl as below to fetch the function pointer.  Why on earth did the
+   MS developers decide not to export a normal symbol for these extension
+   functions? */
+inline int
+get_ext_funcptr (SOCKET sock, void *funcptr)
+{
+  DWORD bret;
+  const GUID guid = WSAID_WSARECVMSG;
+  return WSAIoctl (sock, SIO_GET_EXTENSION_FUNCTION_POINTER,
+		   (void *) &guid, sizeof (GUID), funcptr, sizeof (void *),
+		   &bret, NULL, NULL);
+}
+
 static int
 convert_ws1_ip_optname (int optname)
 {
@@ -383,18 +397,70 @@ fhandler_socket_inet::getpeername (struct sockaddr *name, int *namelen)
   return res;
 }
 
-/* There's no DLL which exports the symbol WSARecvMsg.  One has to call
-   WSAIoctl as below to fetch the function pointer.  Why on earth did the
-   MS developers decide not to export a normal symbol for these extension
-   functions? */
-inline int
-get_ext_funcptr (SOCKET sock, void *funcptr)
+int
+fhandler_socket_inet::shutdown (int how)
 {
-  DWORD bret;
-  const GUID guid = WSAID_WSARECVMSG;
-  return WSAIoctl (sock, SIO_GET_EXTENSION_FUNCTION_POINTER,
-		   (void *) &guid, sizeof (GUID), funcptr, sizeof (void *),
-		   &bret, NULL, NULL);
+  int res = ::shutdown (get_socket (), how);
+
+  /* Linux allows to call shutdown for any socket, even if it's not connected.
+     This also disables to call accept on this socket, if shutdown has been
+     called with the SHUT_RD or SHUT_RDWR parameter.  In contrast, WinSock
+     only allows to call shutdown on a connected socket.  The accept function
+     is in no way affected.  So, what we do here is to fake success, and to
+     change the event settings so that an FD_CLOSE event is triggered for the
+     calling Cygwin function.  The evaluate_events method handles the call
+     from accept specially to generate a Linux-compatible behaviour. */
+  if (res && WSAGetLastError () != WSAENOTCONN)
+    set_winsock_errno ();
+  else
+    {
+      res = 0;
+      switch (how)
+	{
+	case SHUT_RD:
+	  saw_shutdown_read (true);
+	  wsock_events->events |= FD_CLOSE;
+	  SetEvent (wsock_evt);
+	  break;
+	case SHUT_WR:
+	  saw_shutdown_write (true);
+	  break;
+	case SHUT_RDWR:
+	  saw_shutdown_read (true);
+	  saw_shutdown_write (true);
+	  wsock_events->events |= FD_CLOSE;
+	  SetEvent (wsock_evt);
+	  break;
+	}
+    }
+  return res;
+}
+
+int
+fhandler_socket_inet::close ()
+{
+  int res = 0;
+
+  release_events ();
+  while ((res = ::closesocket (get_socket ())) != 0)
+    {
+      if (WSAGetLastError () != WSAEWOULDBLOCK)
+	{
+	  set_winsock_errno ();
+	  res = -1;
+	  break;
+	}
+      if (cygwait (10) == WAIT_SIGNALED)
+	{
+	  set_errno (EINTR);
+	  res = -1;
+	  break;
+	}
+      WSASetLastError (0);
+    }
+
+  debug_printf ("%d = fhandler_socket::close()", res);
+  return res;
 }
 
 inline ssize_t

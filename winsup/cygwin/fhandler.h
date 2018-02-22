@@ -580,6 +580,8 @@ class fhandler_socket: public fhandler_base
   virtual int connect (const struct sockaddr *name, int namelen) = 0;
   virtual int getsockname (struct sockaddr *name, int *namelen) = 0;
   virtual int getpeername (struct sockaddr *name, int *namelen) = 0;
+  virtual int shutdown (int how) = 0;
+  virtual int close () = 0;
   virtual int getpeereid (pid_t *pid, uid_t *euid, gid_t *egid);
   virtual int setsockopt (int level, int optname, const void *optval,
 			  __socklen_t optlen) = 0;
@@ -607,8 +609,6 @@ class fhandler_socket: public fhandler_base
     set_errno (ESPIPE);
     return -1;
   }
-  int shutdown (int how);
-  int close ();
   void hclose (HANDLE) {close ();}
   int dup (fhandler_base *child, int);
 
@@ -654,6 +654,8 @@ class fhandler_socket_inet: public fhandler_socket
   int connect (const struct sockaddr *name, int namelen);
   int getsockname (struct sockaddr *name, int *namelen);
   int getpeername (struct sockaddr *name, int *namelen);
+  int shutdown (int how);
+  int close ();
   int setsockopt (int level, int optname, const void *optval,
 		  __socklen_t optlen);
   int getsockopt (int level, int optname, const void *optval,
@@ -739,6 +741,8 @@ class fhandler_socket_local: public fhandler_socket
   int connect (const struct sockaddr *name, int namelen);
   int getsockname (struct sockaddr *name, int *namelen);
   int getpeername (struct sockaddr *name, int *namelen);
+  int shutdown (int how);
+  int close ();
   int getpeereid (pid_t *pid, uid_t *euid, gid_t *egid);
   int setsockopt (int level, int optname, const void *optval,
 		  __socklen_t optlen);
