@@ -602,8 +602,9 @@ class fhandler_socket: public fhandler_base
   virtual ssize_t __stdcall write (const void *ptr, size_t len) = 0;
   virtual ssize_t __stdcall writev (const struct iovec *, int iovcnt, ssize_t tot = -1) = 0;
 
-  int ioctl (unsigned int cmd, void *);
-  int fcntl (int cmd, intptr_t);
+  virtual int ioctl (unsigned int cmd, void *);
+  virtual int fcntl (int cmd, intptr_t);
+
   off_t lseek (off_t, int)
   { 
     set_errno (ESPIPE);
@@ -671,6 +672,7 @@ class fhandler_socket_inet: public fhandler_socket
   ssize_t __stdcall write (const void *ptr, size_t len);
   ssize_t __stdcall writev (const struct iovec *, int iovcnt, ssize_t tot = -1);
   int ioctl (unsigned int cmd, void *);
+  int fcntl (int cmd, intptr_t);
 
   /* from here on: CLONING */
   fhandler_socket_inet (void *) {}
@@ -760,6 +762,7 @@ class fhandler_socket_local: public fhandler_socket
   ssize_t __stdcall write (const void *ptr, size_t len);
   ssize_t __stdcall writev (const struct iovec *, int iovcnt, ssize_t tot = -1);
   int ioctl (unsigned int cmd, void *);
+  int fcntl (int cmd, intptr_t);
 
   int __reg2 fstat (struct stat *buf);
   int __reg2 fstatvfs (struct statvfs *buf);

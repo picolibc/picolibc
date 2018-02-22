@@ -911,18 +911,6 @@ fhandler_socket::fcntl (int cmd, intptr_t arg)
 
   switch (cmd)
     {
-    case F_SETOWN:
-      {
-	pid_t pid = (pid_t) arg;
-	LOCK_EVENTS;
-	wsock_events->owner = pid;
-	UNLOCK_EVENTS;
-	debug_printf ("owner set to %d", pid);
-      }
-      break;
-    case F_GETOWN:
-      res = wsock_events->owner;
-      break;
     case F_SETFL:
       {
 	/* Carefully test for the O_NONBLOCK or deprecated OLD_O_NDELAY flag.

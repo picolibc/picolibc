@@ -1964,3 +1964,29 @@ fhandler_socket_local::ioctl (unsigned int cmd, void *p)
   syscall_printf ("%d = ioctl_socket(%x, %p)", res, cmd, p);
   return res;
 }
+
+int
+fhandler_socket_local::fcntl (int cmd, intptr_t arg)
+{
+  int res = 0;
+
+  switch (cmd)
+    {
+    case F_SETOWN:
+      {
+	pid_t pid = (pid_t) arg;
+	LOCK_EVENTS;
+	wsock_events->owner = pid;
+	UNLOCK_EVENTS;
+	debug_printf ("owner set to %d", pid);
+      }
+      break;
+    case F_GETOWN:
+      res = wsock_events->owner;
+      break;
+    default:
+      res = fhandler_socket::fcntl (cmd, arg);
+      break;
+    }
+  return res;
+}
