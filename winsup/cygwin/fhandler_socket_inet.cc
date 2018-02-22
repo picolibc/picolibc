@@ -136,16 +136,6 @@ fhandler_socket_inet::socket (int af, int type, int protocol, int flags)
   return ret;
 }
 
-/* socketpair is called on the fhandler handling the accepting socket,
-   fh_out is the fhandler for the connecting socket. */
-int
-fhandler_socket_inet::socketpair (int af, int type, int protocol, int flags,
-				  fhandler_socket *fh_out)
-{
-  set_errno (EAFNOSUPPORT);
-  return -1;
-}
-
 int
 fhandler_socket_inet::bind (const struct sockaddr *name, int namelen)
 {

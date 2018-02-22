@@ -241,7 +241,7 @@ fhandler_socket_local::socket (int af, int type, int protocol, int flags)
 
 int
 fhandler_socket_local::socketpair (int af, int type, int protocol, int flags,
-				   fhandler_socket *_fh_out)
+				   fhandler_socket_local *fh_out)
 {
   SOCKET insock = INVALID_SOCKET;
   SOCKET outsock = INVALID_SOCKET;
@@ -249,7 +249,6 @@ fhandler_socket_local::socketpair (int af, int type, int protocol, int flags,
   struct sockaddr_in sock_in, sock_out;
   int len;
 
- fhandler_socket_local *fh_out = (fhandler_socket_local *) _fh_out;
   /* create listening socket */
   sock = ::socket (AF_INET, type, 0);
   if (sock == INVALID_SOCKET)
