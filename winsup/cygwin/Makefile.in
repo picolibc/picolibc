@@ -298,6 +298,7 @@ DLL_OFILES:= \
 	fhandler_socket.o \
 	fhandler_socket_inet.o \
 	fhandler_socket_local.o \
+	fhandler_socket_unix.o \
 	fhandler_tape.o \
 	fhandler_termios.o \
 	fhandler_tty.o \

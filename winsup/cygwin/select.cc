@@ -1602,6 +1602,51 @@ fhandler_socket_wsock::select_except (select_stuff *ss)
   return s;
 }
 
+select_record *
+fhandler_socket_unix::select_read (select_stuff *ss)
+{
+  select_record *s = ss->start.next;
+  if (!s->startup)
+    {
+      s->startup = no_startup;
+      s->verify = verify_ok;
+    }
+  s->h = get_io_handle_cyg ();
+  s->read_selected = true;
+  s->read_ready = true;
+  return s;
+}
+
+select_record *
+fhandler_socket_unix::select_write (select_stuff *ss)
+{
+  select_record *s = ss->start.next;
+  if (!s->startup)
+    {
+      s->startup = no_startup;
+      s->verify = verify_ok;
+    }
+  s->h = get_handle ();
+  s->write_selected = true;
+  s->write_ready = true;
+  return s;
+}
+
+select_record *
+fhandler_socket_unix::select_except (select_stuff *ss)
+{
+  select_record *s = ss->start.next;
+  if (!s->startup)
+    {
+      s->startup = no_startup;
+      s->verify = verify_ok;
+    }
+  s->h = NULL;
+  s->except_selected = true;
+  s->except_ready = false;
+  return s;
+}
+
 static int
 peek_windows (select_record *me, bool)
 {

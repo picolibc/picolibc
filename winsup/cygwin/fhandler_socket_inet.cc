@@ -211,8 +211,7 @@ fhandler_socket_wsock::fhandler_socket_wsock () :
   wsock_events (NULL),
   wsock_mtx (NULL),
   wsock_evt (NULL),
-  prot_info_ptr (NULL),
-  status ()
+  prot_info_ptr (NULL)
 {
   need_fork_fixup (true);
 }
@@ -1429,8 +1428,6 @@ fhandler_socket_inet::sendto (const void *in_ptr, size_t len, int flags,
 ssize_t
 fhandler_socket_inet::sendmsg (const struct msghdr *msg, int flags)
 {
-  /* TODO: Descriptor passing on AF_LOCAL sockets. */
-
   struct sockaddr_storage sst;
   int len = 0;
 
@@ -1449,8 +1446,7 @@ fhandler_socket_inet::sendmsg (const struct msghdr *msg, int flags)
     }
   /* Disappointing but true:  Even if WSASendMsg is supported, it's only
      supported for datagram and raw sockets. */
-  DWORD controllen = (DWORD) (get_socket_type () == SOCK_STREAM
-			      || get_addr_family () == AF_LOCAL
+  DWORD controllen = (DWORD) ((get_socket_type () == SOCK_STREAM)
 			      ? 0 : msg->msg_controllen);
   WSAMSG wsamsg = { msg->msg_name ? (struct sockaddr *) &sst : NULL, len,
 		    wsabuf, (DWORD) msg->msg_iovlen,

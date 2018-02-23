@@ -516,6 +516,7 @@ cygwin_socket (int af, int type, int protocol)
   switch (af)
     {
     case AF_LOCAL:
+    case AF_UNIX:
       if (type != SOCK_STREAM && type != SOCK_DGRAM)
         {
           set_errno (EINVAL);
@@ -526,7 +527,7 @@ cygwin_socket (int af, int type, int protocol)
           set_errno (EPROTONOSUPPORT);
           goto done;
         }
-      dev = af_local_dev;
+      dev = (af == AF_LOCAL) ? af_local_dev : af_unix_dev;
       break;
     case AF_INET:
     case AF_INET6:
@@ -2312,6 +2313,7 @@ socketpair (int af, int type, int protocol, int *sb)
   switch (af)
     {
     case AF_LOCAL:
+    case AF_UNIX:
       if (type != SOCK_STREAM && type != SOCK_DGRAM)
         {
           set_errno (EINVAL);
@@ -2322,7 +2324,7 @@ socketpair (int af, int type, int protocol, int *sb)
           set_errno (EPROTONOSUPPORT);
           goto done;
         }
-      dev = af_local_dev;
+      dev = (af == AF_LOCAL) ? af_local_dev : af_unix_dev;
       break;
     default:
       set_errno (EAFNOSUPPORT);

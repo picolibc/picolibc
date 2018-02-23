@@ -244,6 +244,7 @@ enum fh_devices
   DEV_SOCK_MAJOR = 30,
   FH_SOCKET = FHDEV (DEV_SOCK_MAJOR, 0),
   FH_INET = FHDEV (DEV_SOCK_MAJOR, 36),
+  FH_UNIX = FHDEV (DEV_SOCK_MAJOR, 42),
   FH_LOCAL = FHDEV (DEV_SOCK_MAJOR, 120),
 
   FH_NADA     = FHDEV (0, 0),
@@ -397,6 +398,8 @@ extern const _device dev_af_inet_storage;
 #define af_inet_dev ((device *) &dev_af_inet_storage)
 extern const _device dev_af_local_storage;
 #define af_local_dev ((device *) &dev_af_local_storage)
+extern const _device dev_af_unix_storage;
+#define af_unix_dev ((device *) &dev_af_unix_storage)
 
 extern const _device dev_piper_storage;
 #define piper_dev ((device *) &dev_piper_storage)

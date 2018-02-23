@@ -138,7 +138,13 @@ struct OLD_msghdr
  * Address families.
  */
 #define AF_UNSPEC       0               /* unspecified */
+/* FIXME: This is for testing only, while developing the new
+          fhandler_socket_unix class. */
+#ifdef __INSIDE_CYGWIN__
+#define AF_UNIX         31
+#else
 #define AF_UNIX         1               /* local to host (pipes, portals) */
+#endif
 #define AF_LOCAL        1               /* POSIX name for AF_UNIX */
 #define AF_INET         2               /* internetwork: UDP, TCP, etc. */
 #define AF_IMPLINK      3               /* arpanet imp addresses */
