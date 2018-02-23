@@ -1269,6 +1269,7 @@ behaviour which affect the operation of other programs, such as Cygwin.
 <listitem><para>ATI Catalyst (some versions)</para></listitem>
 <listitem><para>AVAST (disable FILESYSTEM and BEHAVIOR realtime shields)</para></listitem>
 <listitem><para>Avira AntiVir</para></listitem>
+<listitem><para>BeyondTrust PowerBroker</para></listitem>
 <listitem><para>BitDefender</para></listitem>
 <listitem><para>Bufferzone from Trustware</para></listitem>
 <listitem><para>ByteMobile laptop optimization client</para></listitem>
@@ -1277,6 +1278,7 @@ behaviour which affect the operation of other programs, such as Cygwin.
 <listitem><para>ConEmu (try disabling "Inject ConEmuHk" or see <ulink url="https://conemu.github.io/en/ConEmuHk.html#Third_party_problems">ConEmuHk documentation</ulink>)</para></listitem>
 <listitem><para>Citrix Metaframe Presentation Server/XenApp (see <ulink url="http://support.citrix.com/article/CTX107825">Citrix Support page</ulink>)</para></listitem>
 <listitem><para>Credant Guardian Shield</para></listitem>
+<listitem><para>CylancePROTECT</para></listitem>
 <listitem><para>Earthlink Total-Access</para></listitem>
 <listitem><para>Forefront TMG</para></listitem>
 <listitem><para>Google Desktop</para></listitem>
