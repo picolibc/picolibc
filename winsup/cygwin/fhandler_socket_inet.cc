@@ -59,6 +59,89 @@
       ReleaseMutex (wsock_mtx); \
     }
 
+/* Maximum number of concurrently opened sockets from all Cygwin processes
+   per session.  Note that shared sockets (through dup/fork/exec) are
+   counted as one socket. */
+#define NUM_SOCKS       2048U
+
+#define LOCK_EVENTS	\
+  if (wsock_mtx && \
+      WaitForSingleObject (wsock_mtx, INFINITE) != WAIT_FAILED) \
+    {
+
+#define UNLOCK_EVENTS \
+      ReleaseMutex (wsock_mtx); \
+    }
+
+static wsa_event wsa_events[NUM_SOCKS] __attribute__((section (".cygwin_dll_common"), shared));
+
+static LONG socket_serial_number __attribute__((section (".cygwin_dll_common"), shared));
+
+static HANDLE wsa_slot_mtx;
+
+static PWCHAR
+sock_shared_name (PWCHAR buf, LONG num)
+{
+  __small_swprintf (buf, L"socket.%d", num);
+  return buf;
+}
+
+static wsa_event *
+search_wsa_event_slot (LONG new_serial_number)
+{
+  WCHAR name[32], searchname[32];
+  UNICODE_STRING uname;
+  OBJECT_ATTRIBUTES attr;
+  NTSTATUS status;
+
+  if (!wsa_slot_mtx)
+    {
+      RtlInitUnicodeString (&uname, sock_shared_name (name, 0));
+      InitializeObjectAttributes (&attr, &uname, OBJ_INHERIT | OBJ_OPENIF,
+				  get_session_parent_dir (),
+				  everyone_sd (CYG_MUTANT_ACCESS));
+      status = NtCreateMutant (&wsa_slot_mtx, CYG_MUTANT_ACCESS, &attr, FALSE);
+      if (!NT_SUCCESS (status))
+	api_fatal ("Couldn't create/open shared socket mutex %S, %y",
+		   &uname, status);
+    }
+  switch (WaitForSingleObject (wsa_slot_mtx, INFINITE))
+    {
+    case WAIT_OBJECT_0:
+    case WAIT_ABANDONED:
+      break;
+    default:
+      api_fatal ("WFSO failed for shared socket mutex, %E");
+      break;
+    }
+  unsigned int slot = new_serial_number % NUM_SOCKS;
+  while (wsa_events[slot].serial_number)
+    {
+      HANDLE searchmtx;
+      RtlInitUnicodeString (&uname, sock_shared_name (searchname,
+					wsa_events[slot].serial_number));
+      InitializeObjectAttributes (&attr, &uname, 0, get_session_parent_dir (),
+				  NULL);
+      status = NtOpenMutant (&searchmtx, READ_CONTROL, &attr);
+      if (!NT_SUCCESS (status))
+	break;
+      /* Mutex still exists, attached socket is active, try next slot. */
+      NtClose (searchmtx);
+      slot = (slot + 1) % NUM_SOCKS;
+      if (slot == (new_serial_number % NUM_SOCKS))
+	{
+	  /* Did the whole array once.   Too bad. */
+	  debug_printf ("No free socket slot");
+	  ReleaseMutex (wsa_slot_mtx);
+	  return NULL;
+	}
+    }
+  memset (&wsa_events[slot], 0, sizeof (wsa_event));
+  wsa_events[slot].serial_number = new_serial_number;
+  ReleaseMutex (wsa_slot_mtx);
+  return wsa_events + slot;
+}
+
 /* cygwin internal: map sockaddr into internet domain address */
 static int
 get_inet_addr_inet (const struct sockaddr *in, int inlen,
@@ -123,8 +206,496 @@ convert_ws1_ip_optname (int optname)
 	 : ws2_optname[optname];
 }
 
+fhandler_socket_wsock::fhandler_socket_wsock () :
+  fhandler_socket (),
+  wsock_events (NULL),
+  wsock_mtx (NULL),
+  wsock_evt (NULL),
+  prot_info_ptr (NULL),
+  status ()
+{
+  need_fork_fixup (true);
+}
+
+fhandler_socket_wsock::~fhandler_socket_wsock ()
+{
+  if (prot_info_ptr)
+    cfree (prot_info_ptr);
+}
+
+bool
+fhandler_socket_wsock::init_events ()
+{
+  LONG new_serial_number;
+  WCHAR name[32];
+  UNICODE_STRING uname;
+  OBJECT_ATTRIBUTES attr;
+  NTSTATUS status;
+
+  do
+    {
+      new_serial_number =
+	InterlockedIncrement (&socket_serial_number);
+      if (!new_serial_number)	/* 0 is reserved for global mutex */
+	InterlockedIncrement (&socket_serial_number);
+      set_ino (new_serial_number);
+      RtlInitUnicodeString (&uname, sock_shared_name (name, new_serial_number));
+      InitializeObjectAttributes (&attr, &uname, OBJ_INHERIT | OBJ_OPENIF,
+				  get_session_parent_dir (),
+				  everyone_sd (CYG_MUTANT_ACCESS));
+      status = NtCreateMutant (&wsock_mtx, CYG_MUTANT_ACCESS, &attr, FALSE);
+      if (!NT_SUCCESS (status))
+	{
+	  debug_printf ("NtCreateMutant(%S), %y", &uname, status);
+	  set_errno (ENOBUFS);
+	  return false;
+	}
+      if (status == STATUS_OBJECT_NAME_EXISTS)
+	NtClose (wsock_mtx);
+    }
+  while (status == STATUS_OBJECT_NAME_EXISTS);
+  if ((wsock_evt = CreateEvent (&sec_all, TRUE, FALSE, NULL))
+      == WSA_INVALID_EVENT)
+    {
+      debug_printf ("CreateEvent, %E");
+      set_errno (ENOBUFS);
+      NtClose (wsock_mtx);
+      return false;
+    }
+  if (WSAEventSelect (get_socket (), wsock_evt, EVENT_MASK) == SOCKET_ERROR)
+    {
+      debug_printf ("WSAEventSelect, %E");
+      set_winsock_errno ();
+      NtClose (wsock_evt);
+      NtClose (wsock_mtx);
+      return false;
+    }
+  if (!(wsock_events = search_wsa_event_slot (new_serial_number)))
+    {
+      set_errno (ENOBUFS);
+      NtClose (wsock_evt);
+      NtClose (wsock_mtx);
+      return false;
+    }
+  if (get_socket_type () == SOCK_DGRAM)
+    wsock_events->events = FD_WRITE;
+  return true;
+}
+
+int
+fhandler_socket_wsock::evaluate_events (const long event_mask, long &events,
+					const bool erase)
+{
+  int ret = 0;
+  long events_now = 0;
+
+  WSANETWORKEVENTS evts = { 0 };
+  if (!(WSAEnumNetworkEvents (get_socket (), wsock_evt, &evts)))
+    {
+      if (evts.lNetworkEvents)
+	{
+	  LOCK_EVENTS;
+	  wsock_events->events |= evts.lNetworkEvents;
+	  events_now = (wsock_events->events & event_mask);
+	  if (evts.lNetworkEvents & FD_CONNECT)
+	    {
+	      wsock_events->connect_errorcode = evts.iErrorCode[FD_CONNECT_BIT];
+
+	      /* Setting the connect_state and calling the AF_LOCAL handshake 
+		 here allows to handle this stuff from a single point.  This
+		 is independent of FD_CONNECT being requested.  Consider a
+		 server calling connect(2) and then immediately poll(2) with
+		 only polling for POLLIN (example: postfix), or select(2) just
+		 asking for descriptors ready to read.
+
+		 Something weird occurs in Winsock: If you fork off and call
+		 recv/send on the duplicated, already connected socket, another
+		 FD_CONNECT event is generated in the child process.  This
+		 would trigger a call to af_local_connect which obviously fail. 
+		 Avoid this by calling set_connect_state only if connect_state
+		 is connect_pending. */
+	      if (connect_state () == connect_pending)
+		{
+		  if (wsock_events->connect_errorcode)
+		    connect_state (connect_failed);
+		  else if (af_local_connect ())
+		    {
+		      wsock_events->connect_errorcode = WSAGetLastError ();
+		      connect_state (connect_failed);
+		    }
+		  else
+		    connect_state (connected);
+		}
+	    }
+	  UNLOCK_EVENTS;
+	  if ((evts.lNetworkEvents & FD_OOB) && wsock_events->owner)
+	    kill (wsock_events->owner, SIGURG);
+	}
+    }
+
+  LOCK_EVENTS;
+  if ((events = events_now) != 0
+      || (events = (wsock_events->events & event_mask)) != 0)
+    {
+      if (events & FD_CONNECT)
+	{
+	  int wsa_err = wsock_events->connect_errorcode;
+	  if (wsa_err)
+	    {
+	      /* CV 2014-04-23: This is really weird.  If you call connect
+		 asynchronously on a socket and then select, an error like
+		 "Connection refused" is set in the event and in the SO_ERROR
+		 socket option.  If you call connect, then dup, then select,
+		 the error is set in the event, but not in the SO_ERROR socket
+		 option, despite the dup'ed socket handle referring to the same
+		 socket.  We're trying to workaround this problem here by
+		 taking the connect errorcode from the event and write it back
+		 into the SO_ERROR socket option.
+	         
+		 CV 2014-06-16: Call WSASetLastError *after* setsockopt since,
+		 apparently, setsockopt sets the last WSA error code to 0 on
+		 success. */
+	      ::setsockopt (get_socket (), SOL_SOCKET, SO_ERROR,
+			    (const char *) &wsa_err, sizeof wsa_err);
+	      WSASetLastError (wsa_err);
+	      ret = SOCKET_ERROR;
+	    }
+	  else
+	    wsock_events->events |= FD_WRITE;
+	  wsock_events->events &= ~FD_CONNECT;
+	  wsock_events->connect_errorcode = 0;
+	}
+      /* This test makes accept/connect behave as on Linux when accept/connect
+         is called on a socket for which shutdown has been called.  The second
+	 half of this code is in the shutdown method. */
+      if (events & FD_CLOSE)
+	{
+	  if ((event_mask & FD_ACCEPT) && saw_shutdown_read ())
+	    {
+	      WSASetLastError (WSAEINVAL);
+	      ret = SOCKET_ERROR;
+	    }
+	  if (event_mask & FD_CONNECT)
+	    {
+	      WSASetLastError (WSAECONNRESET);
+	      ret = SOCKET_ERROR;
+	    }
+	}
+      if (erase)
+	wsock_events->events &= ~(events & ~(FD_WRITE | FD_CLOSE));
+    }
+  UNLOCK_EVENTS;
+
+  return ret;
+}
+
+int
+fhandler_socket_wsock::wait_for_events (const long event_mask,
+					const DWORD flags)
+{
+  if (async_io ())
+    return 0;
+
+  int ret;
+  long events = 0;
+  DWORD wfmo_timeout = 50;
+  DWORD timeout;
+
+  WSAEVENT ev[3] = { wsock_evt, NULL, NULL };
+  wait_signal_arrived here (ev[1]);
+  DWORD ev_cnt = 2;
+  if ((ev[2] = pthread::get_cancel_event ()) != NULL)
+    ++ev_cnt;
+
+  if (is_nonblocking () || (flags & MSG_DONTWAIT))
+    timeout = 0;
+  else if (event_mask & FD_READ)
+    timeout = rcvtimeo ();
+  else if (event_mask & FD_WRITE)
+    timeout = sndtimeo ();
+  else
+    timeout = INFINITE;
+
+  while (!(ret = evaluate_events (event_mask, events, !(flags & MSG_PEEK)))
+	 && !events)
+    {
+      if (timeout == 0)
+	{
+	  WSASetLastError (WSAEWOULDBLOCK);
+	  return SOCKET_ERROR;
+	}
+
+      if (timeout < wfmo_timeout)
+	wfmo_timeout = timeout;
+      switch (WSAWaitForMultipleEvents (ev_cnt, ev, FALSE, wfmo_timeout, FALSE))
+	{
+	  case WSA_WAIT_TIMEOUT:
+	  case WSA_WAIT_EVENT_0:
+	    if (timeout != INFINITE)
+	      timeout -= wfmo_timeout;
+	    break;
+
+	  case WSA_WAIT_EVENT_0 + 1:
+	    if (_my_tls.call_signal_handler ())
+	      break;
+	    WSASetLastError (WSAEINTR);
+	    return SOCKET_ERROR;
+
+	  case WSA_WAIT_EVENT_0 + 2:
+	    pthread::static_cancel_self ();
+	    break;
+
+	  default:
+	    /* wsock_evt can be NULL.  We're generating the same errno values
+	       as for sockets on which shutdown has been called. */
+	    if (WSAGetLastError () != WSA_INVALID_HANDLE)
+	      WSASetLastError (WSAEFAULT);
+	    else
+	      WSASetLastError ((event_mask & FD_CONNECT) ? WSAECONNRESET
+							 : WSAEINVAL);
+	    return SOCKET_ERROR;
+	}
+    }
+  return ret;
+}
+
+void
+fhandler_socket_wsock::release_events ()
+{
+  if (WaitForSingleObject (wsock_mtx, INFINITE) != WAIT_FAILED)
+    {
+      HANDLE evt = wsock_evt;
+      HANDLE mtx = wsock_mtx;
+
+      wsock_evt = wsock_mtx = NULL;
+      ReleaseMutex (mtx);
+      NtClose (evt);
+      NtClose (mtx);
+    }
+}
+
+void
+fhandler_socket_wsock::set_close_on_exec (bool val)
+{
+  set_no_inheritance (wsock_mtx, val);
+  set_no_inheritance (wsock_evt, val);
+  if (need_fixup_before ())
+    {
+      close_on_exec (val);
+      debug_printf ("set close_on_exec for %s to %d", get_name (), val);
+    }
+  else
+    fhandler_base::set_close_on_exec (val);
+}
+
+/* Called if a freshly created socket is not inheritable.  In that case we
+   have to use fixup_before_fork_exec.  See comment in set_socket_handle for
+   a description of the problem. */
+void
+fhandler_socket_wsock::init_fixup_before ()
+{
+  prot_info_ptr = (LPWSAPROTOCOL_INFOW)
+		  cmalloc_abort (HEAP_BUF, sizeof (WSAPROTOCOL_INFOW));
+  cygheap->fdtab.inc_need_fixup_before ();
+}
+
+int
+fhandler_socket_wsock::fixup_before_fork_exec (DWORD win_pid)
+{
+  SOCKET ret = WSADuplicateSocketW (get_socket (), win_pid, prot_info_ptr);
+  if (ret)
+    set_winsock_errno ();
+  else
+    debug_printf ("WSADuplicateSocket succeeded (%x)", prot_info_ptr->dwProviderReserved);
+  return (int) ret;
+}
+
+void
+fhandler_socket_wsock::fixup_after_fork (HANDLE parent)
+{
+  fork_fixup (parent, wsock_mtx, "wsock_mtx");
+  fork_fixup (parent, wsock_evt, "wsock_evt");
+
+  if (!need_fixup_before ())
+    {
+      fhandler_base::fixup_after_fork (parent);
+      return;
+    }
+
+  SOCKET new_sock = WSASocketW (FROM_PROTOCOL_INFO, FROM_PROTOCOL_INFO,
+				FROM_PROTOCOL_INFO, prot_info_ptr, 0,
+				WSA_FLAG_OVERLAPPED);
+  if (new_sock == INVALID_SOCKET)
+    {
+      set_winsock_errno ();
+      set_io_handle ((HANDLE) INVALID_SOCKET);
+    }
+  else
+    {
+      /* Even though the original socket was not inheritable, the duplicated
+	 socket is potentially inheritable again. */
+      SetHandleInformation ((HANDLE) new_sock, HANDLE_FLAG_INHERIT, 0);
+      set_io_handle ((HANDLE) new_sock);
+      debug_printf ("WSASocket succeeded (%p)", new_sock);
+    }
+}
+
+void
+fhandler_socket_wsock::fixup_after_exec ()
+{
+  if (need_fixup_before () && !close_on_exec ())
+    fixup_after_fork (NULL);
+}
+
+int
+fhandler_socket_wsock::dup (fhandler_base *child, int flags)
+{
+  debug_printf ("here");
+  fhandler_socket_wsock *fhs = (fhandler_socket_wsock *) child;
+
+  if (!DuplicateHandle (GetCurrentProcess (), wsock_mtx,
+			GetCurrentProcess (), &fhs->wsock_mtx,
+			0, TRUE, DUPLICATE_SAME_ACCESS))
+    {
+      __seterrno ();
+      return -1;
+    }
+  if (!DuplicateHandle (GetCurrentProcess (), wsock_evt,
+			GetCurrentProcess (), &fhs->wsock_evt,
+			0, TRUE, DUPLICATE_SAME_ACCESS))
+    {
+      __seterrno ();
+      NtClose (fhs->wsock_mtx);
+      return -1;
+    }
+  if (!need_fixup_before ())
+    {
+      int ret = fhandler_base::dup (child, flags);
+      if (ret)
+	{
+	  NtClose (fhs->wsock_evt);
+	  NtClose (fhs->wsock_mtx);
+	}
+      return ret;
+    }
+
+  cygheap->user.deimpersonate ();
+  fhs->init_fixup_before ();
+  fhs->set_io_handle (get_io_handle ());
+  int ret = fhs->fixup_before_fork_exec (GetCurrentProcessId ());
+  cygheap->user.reimpersonate ();
+  if (!ret)
+    {
+      fhs->fixup_after_fork (GetCurrentProcess ());
+      if (fhs->get_io_handle() != (HANDLE) INVALID_SOCKET)
+	return 0;
+    }
+  cygheap->fdtab.dec_need_fixup_before ();
+  NtClose (fhs->wsock_evt);
+  NtClose (fhs->wsock_mtx);
+  return -1;
+}
+
+int
+fhandler_socket_wsock::set_socket_handle (SOCKET sock, int af, int type,
+					  int flags)
+{
+  DWORD hdl_flags;
+  bool lsp_fixup = false;
+
+  /* Usually sockets are inheritable IFS objects.  Unfortunately some virus
+     scanners or other network-oriented software replace normal sockets
+     with their own kind, which is running through a filter driver called
+     "layered service provider" (LSP) which, fortunately, are deprecated.
+
+     LSP sockets are not kernel objects.  They are typically not marked as
+     inheritable, nor are they IFS handles.  They are in fact not inheritable
+     to child processes, and it does not help to mark them inheritable via
+     SetHandleInformation.  Subsequent socket calls in the child process fail
+     with error 10038, WSAENOTSOCK.
+
+     There's a neat way to workaround these annoying LSP sockets.  WSAIoctl
+     allows to fetch the underlying base socket, which is a normal, inheritable
+     IFS handle.  So we fetch the base socket, duplicate it, and close the
+     original socket.  Now we have a standard IFS socket which (hopefully)
+     works as expected.
+
+     If that doesn't work for some reason, mark the sockets for duplication
+     via WSADuplicateSocket/WSASocket.  This requires to start the child
+     process in SUSPENDED state so we only do this if really necessary. */
+  if (!GetHandleInformation ((HANDLE) sock, &hdl_flags)
+      || !(hdl_flags & HANDLE_FLAG_INHERIT))
+    {
+      int ret;
+      SOCKET base_sock;
+      DWORD bret;
+
+      lsp_fixup = true;
+      debug_printf ("LSP handle: %p", sock);
+      ret = WSAIoctl (sock, SIO_BASE_HANDLE, NULL, 0, (void *) &base_sock,
+                      sizeof (base_sock), &bret, NULL, NULL);
+      if (ret)
+        debug_printf ("WSAIoctl: %u", WSAGetLastError ());
+      else if (base_sock != sock)
+        {
+          if (GetHandleInformation ((HANDLE) base_sock, &hdl_flags)
+              && (flags & HANDLE_FLAG_INHERIT))
+            {
+              if (!DuplicateHandle (GetCurrentProcess (), (HANDLE) base_sock,
+                                    GetCurrentProcess (), (PHANDLE) &base_sock,
+                                    0, TRUE, DUPLICATE_SAME_ACCESS))
+                debug_printf ("DuplicateHandle failed, %E");
+              else
+                {
+                  ::closesocket (sock);
+                  sock = base_sock;
+                  lsp_fixup = false;
+                }
+            }
+        }
+    }
+  set_addr_family (af);
+  set_socket_type (type);
+  if (flags & SOCK_NONBLOCK)
+    set_nonblocking (true);
+  if (flags & SOCK_CLOEXEC)
+    set_close_on_exec (true);
+  set_io_handle ((HANDLE) sock);
+  if (!init_events ())
+    return -1;
+  if (lsp_fixup)
+    init_fixup_before ();
+  set_flags (O_RDWR | O_BINARY);
+  set_unique_id ();
+  if (get_socket_type () == SOCK_DGRAM)
+    {
+      /* Workaround the problem that a missing listener on a UDP socket
+	 in a call to sendto will result in select/WSAEnumNetworkEvents
+	 reporting that the socket has pending data and a subsequent call
+	 to recvfrom will return -1 with error set to WSAECONNRESET.
+
+	 This problem is a regression introduced in Windows 2000.
+	 Instead of fixing the problem, a new socket IOCTL code has
+	 been added, see http://support.microsoft.com/kb/263823 */
+      BOOL cr = FALSE;
+      DWORD blen;
+      if (WSAIoctl (sock, SIO_UDP_CONNRESET, &cr, sizeof cr, NULL, 0,
+		    &blen, NULL, NULL) == SOCKET_ERROR)
+	debug_printf ("Reset SIO_UDP_CONNRESET: WinSock error %u",
+		      WSAGetLastError ());
+    }
+#ifdef __x86_64__
+  rmem () = 212992;
+  wmem () = 212992;
+#else
+  rmem () = 64512;
+  wmem () = 64512;
+#endif
+  return 0;
+}
+
 fhandler_socket_inet::fhandler_socket_inet () :
-  fhandler_socket ()
+  fhandler_socket_wsock ()
 {
 }
 
@@ -398,7 +969,7 @@ fhandler_socket_inet::getpeername (struct sockaddr *name, int *namelen)
 }
 
 int
-fhandler_socket_inet::shutdown (int how)
+fhandler_socket_wsock::shutdown (int how)
 {
   int res = ::shutdown (get_socket (), how);
 
@@ -437,7 +1008,7 @@ fhandler_socket_inet::shutdown (int how)
 }
 
 int
-fhandler_socket_inet::close ()
+fhandler_socket_wsock::close ()
 {
   int res = 0;
 
@@ -458,12 +1029,10 @@ fhandler_socket_inet::close ()
 	}
       WSASetLastError (0);
     }
-
-  debug_printf ("%d = fhandler_socket::close()", res);
   return res;
 }
 
-inline ssize_t
+ssize_t
 fhandler_socket_inet::recv_internal (LPWSAMSG wsamsg, bool use_recvmsg)
 {
   ssize_t res = 0;
@@ -594,8 +1163,8 @@ fhandler_socket_inet::recv_internal (LPWSAMSG wsamsg, bool use_recvmsg)
 }
 
 ssize_t
-fhandler_socket_inet::recvfrom (void *in_ptr, size_t len, int flags,
-				struct sockaddr *from, int *fromlen)
+fhandler_socket_wsock::recvfrom (void *in_ptr, size_t len, int flags,
+				 struct sockaddr *from, int *fromlen)
 {
   char *ptr = (char *) in_ptr;
 
@@ -630,7 +1199,7 @@ fhandler_socket_inet::recvfrom (void *in_ptr, size_t len, int flags,
 }
 
 ssize_t
-fhandler_socket_inet::recvmsg (struct msghdr *msg, int flags)
+fhandler_socket_wsock::recvmsg (struct msghdr *msg, int flags)
 {
   /* Disappointing but true:  Even if WSARecvMsg is supported, it's only
      supported for datagram and raw sockets. */
@@ -665,7 +1234,7 @@ fhandler_socket_inet::recvmsg (struct msghdr *msg, int flags)
 }
 
 void __reg3
-fhandler_socket_inet::read (void *in_ptr, size_t& len)
+fhandler_socket_wsock::read (void *in_ptr, size_t& len)
 {
   char *ptr = (char *) in_ptr;
 
@@ -692,8 +1261,8 @@ fhandler_socket_inet::read (void *in_ptr, size_t& len)
 }
 
 ssize_t
-fhandler_socket_inet::readv (const struct iovec *const iov, const int iovcnt,
-			     ssize_t tot)
+fhandler_socket_wsock::readv (const struct iovec *const iov, const int iovcnt,
+			      ssize_t tot)
 {
   WSABUF wsabuf[iovcnt];
   WSABUF *wsaptr = wsabuf + iovcnt;
@@ -707,8 +1276,8 @@ fhandler_socket_inet::readv (const struct iovec *const iov, const int iovcnt,
   return recv_internal (&wsamsg, false);
 }
 
-inline ssize_t
-fhandler_socket_inet::send_internal (struct _WSAMSG *wsamsg, int flags)
+ssize_t
+fhandler_socket_wsock::send_internal (struct _WSAMSG *wsamsg, int flags)
 {
   ssize_t res = 0;
   DWORD ret = 0, sum = 0;
@@ -891,7 +1460,7 @@ fhandler_socket_inet::sendmsg (const struct msghdr *msg, int flags)
 }
 
 ssize_t
-fhandler_socket_inet::write (const void *in_ptr, size_t len)
+fhandler_socket_wsock::write (const void *in_ptr, size_t len)
 {
   char *ptr = (char *) in_ptr;
 
@@ -917,8 +1486,8 @@ fhandler_socket_inet::write (const void *in_ptr, size_t len)
 }
 
 ssize_t
-fhandler_socket_inet::writev (const struct iovec *const iov, const int iovcnt,
-			      ssize_t tot)
+fhandler_socket_wsock::writev (const struct iovec *const iov, const int iovcnt,
+			       ssize_t tot)
 {
   WSABUF wsabuf[iovcnt];
   WSABUF *wsaptr = wsabuf;
@@ -1219,7 +1788,7 @@ fhandler_socket_inet::getsockopt (int level, int optname, const void *optval,
 }
 
 int
-fhandler_socket_inet::ioctl (unsigned int cmd, void *p)
+fhandler_socket_wsock::ioctl (unsigned int cmd, void *p)
 {
   int res;
 
@@ -1287,7 +1856,7 @@ fhandler_socket_inet::ioctl (unsigned int cmd, void *p)
 }
 
 int
-fhandler_socket_inet::fcntl (int cmd, intptr_t arg)
+fhandler_socket_wsock::fcntl (int cmd, intptr_t arg)
 {
   int res = 0;
 

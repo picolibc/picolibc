@@ -406,6 +406,7 @@ public:
   virtual bool isfifo () const { return false; }
   virtual int ptsname_r (char *, size_t);
   virtual class fhandler_socket *is_socket () { return NULL; }
+  virtual class fhandler_socket_wsock *is_wsock_socket () { return NULL; }
   virtual class fhandler_console *is_console () { return 0; }
   virtual int is_windows () {return 0; }
 
@@ -488,7 +489,6 @@ class fhandler_socket: public fhandler_base
  protected:
   int addr_family;
   int type;
-  virtual int af_local_connect () = 0;
   inline int get_socket_flags ()
   {
     int ret = 0;
@@ -498,18 +498,6 @@ class fhandler_socket: public fhandler_base
       ret |= SOCK_CLOEXEC;
     return ret;
   }
-
- protected:
-  wsa_event *wsock_events;
-  HANDLE wsock_mtx;
-  HANDLE wsock_evt;
-  bool init_events ();
-  int wait_for_events (const long event_mask, const DWORD flags);
-  void release_events ();
- public:
-  const HANDLE wsock_event () const { return wsock_evt; }
-  int evaluate_events (const long event_mask, long &events, const bool erase);
-  const LONG serial_number () const { return wsock_events->serial_number; }
 
  protected:
   int	    _rmem;
@@ -528,55 +516,29 @@ class fhandler_socket: public fhandler_base
   DWORD &sndtimeo () { return _sndtimeo; }
 
  protected:
-  struct _WSAPROTOCOL_INFOW *prot_info_ptr;
-
- protected:
   struct status_flags
   {
     unsigned async_io		   : 1; /* async I/O */
     unsigned saw_shutdown_read     : 1; /* Socket saw a SHUT_RD */
     unsigned saw_shutdown_write    : 1; /* Socket saw a SHUT_WR */
-    unsigned saw_reuseaddr	   : 1; /* Socket saw SO_REUSEADDR call */
     unsigned connect_state	   : 3;
-    unsigned no_getpeereid	   : 1;
    public:
     status_flags () :
       async_io (0), saw_shutdown_read (0), saw_shutdown_write (0),
-      connect_state (unconnected), no_getpeereid (0)
+      connect_state (unconnected)
       {}
   } status;
-
-#ifdef __INSIDE_CYGWIN_NET__
-  int set_socket_handle (SOCKET sock, int af, int type, int flags);
-#endif
+ public:
+  IMPLEMENT_STATUS_FLAG (bool, async_io)
+  IMPLEMENT_STATUS_FLAG (bool, saw_shutdown_read)
+  IMPLEMENT_STATUS_FLAG (bool, saw_shutdown_write)
+  IMPLEMENT_STATUS_FLAG (conn_state, connect_state)
 
  public:
   fhandler_socket ();
   ~fhandler_socket ();
-/* Originally get_socket returned an int, which is not a good idea
-   to cast a handle to on 64 bit.  The right type here is very certainly
-   SOCKET instead.  On the other hand, we don't want to have to include
-   winsock.h just to build fhandler.h.  Therefore we define get_socket
-   now only when building network related code. */
-#ifdef __INSIDE_CYGWIN_NET__
-  SOCKET get_socket () { return (SOCKET) get_handle(); }
-#endif
   fhandler_socket *is_socket () { return this; }
 
-  IMPLEMENT_STATUS_FLAG (bool, async_io)
-  IMPLEMENT_STATUS_FLAG (bool, saw_shutdown_read)
-  IMPLEMENT_STATUS_FLAG (bool, saw_shutdown_write)
-  IMPLEMENT_STATUS_FLAG (bool, saw_reuseaddr)
-  IMPLEMENT_STATUS_FLAG (conn_state, connect_state)
-  IMPLEMENT_STATUS_FLAG (bool, no_getpeereid)
-
-  bool need_fixup_before () const {return prot_info_ptr != NULL;}
-  void set_close_on_exec (bool val);
-  void init_fixup_before ();
-  int fixup_before_fork_exec (DWORD);
-  void fixup_after_fork (HANDLE);
-  void fixup_after_exec ();
-  int dup (fhandler_base *child, int);
   char *get_proc_fd_name (char *buf);
 
   virtual int socket (int af, int type, int protocol, int flags) = 0;
@@ -633,14 +595,96 @@ class fhandler_socket: public fhandler_base
   virtual select_record *select_except (select_stuff *) = 0;
 };
 
-class fhandler_socket_inet: public fhandler_socket
+/* Encapsulate wsock-based socket classes fhandler_socket_inet and
+   fhandler_socket_local during development of fhandler_socket_unix.
+   TODO: Perhaps we should keep it that way, under the assumption that
+   the Windows 10 AF_UNIX class will eventually get useful at one point. */
+class fhandler_socket_wsock: public fhandler_socket
+{
+ protected:
+  virtual int af_local_connect () = 0;
+
+ protected:
+  wsa_event *wsock_events;
+  HANDLE wsock_mtx;
+  HANDLE wsock_evt;
+  bool init_events ();
+  int wait_for_events (const long event_mask, const DWORD flags);
+  void release_events ();
+ public:
+  const HANDLE wsock_event () const { return wsock_evt; }
+  int evaluate_events (const long event_mask, long &events, const bool erase);
+  const LONG serial_number () const { return wsock_events->serial_number; }
+
+ protected:
+  struct _WSAPROTOCOL_INFOW *prot_info_ptr;
+ public:
+  bool need_fixup_before () const {return prot_info_ptr != NULL;}
+  void set_close_on_exec (bool val);
+  void init_fixup_before ();
+  int fixup_before_fork_exec (DWORD);
+  void fixup_after_fork (HANDLE);
+  void fixup_after_exec ();
+  int dup (fhandler_base *child, int);
+
+#ifdef __INSIDE_CYGWIN_NET__
+ protected:
+  int set_socket_handle (SOCKET sock, int af, int type, int flags);
+ public:
+  /* Originally get_socket returned an int, which is not a good idea
+     to cast a handle to on 64 bit.  The right type here is very certainly
+     SOCKET instead.  On the other hand, we don't want to have to include
+     winsock.h just to build fhandler.h.  Therefore we define get_socket
+     now only when building network related code. */
+  SOCKET get_socket () { return (SOCKET) get_handle(); }
+#endif
+
+ protected:
+  struct status_flags
+  {
+    unsigned saw_reuseaddr	   : 1; /* Socket saw SO_REUSEADDR call */
+   public:
+    status_flags () : saw_reuseaddr (0) {}
+  } status;
+ public:
+  IMPLEMENT_STATUS_FLAG (bool, saw_reuseaddr)
+
+ protected:
+  virtual ssize_t recv_internal (struct _WSAMSG *wsamsg, bool use_recvmsg) = 0;
+  ssize_t send_internal (struct _WSAMSG *wsamsg, int flags);
+
+ public:
+  fhandler_socket_wsock ();
+  ~fhandler_socket_wsock ();
+
+  fhandler_socket_wsock *is_wsock_socket () { return this; }
+
+  ssize_t recvfrom (void *ptr, size_t len, int flags,
+		    struct sockaddr *from, int *fromlen);
+  ssize_t recvmsg (struct msghdr *msg, int flags);
+  void __reg3 read (void *ptr, size_t& len);
+  ssize_t __stdcall readv (const struct iovec *, int iovcnt, ssize_t tot = -1);
+  ssize_t __stdcall write (const void *ptr, size_t len);
+  ssize_t __stdcall writev (const struct iovec *, int iovcnt, ssize_t tot = -1);
+  int shutdown (int how);
+  int close ();
+
+  int ioctl (unsigned int cmd, void *);
+  int fcntl (int cmd, intptr_t);
+
+  /* select.cc */
+  select_record *select_read (select_stuff *);
+  select_record *select_write (select_stuff *);
+  select_record *select_except (select_stuff *);
+};
+
+class fhandler_socket_inet: public fhandler_socket_wsock
 {
  protected:
   int af_local_connect () { return 0; }
 
- private:
-  inline ssize_t recv_internal (struct _WSAMSG *wsamsg, bool use_recvmsg);
-  inline ssize_t send_internal (struct _WSAMSG *wsamsg, int flags);
+ protected:
+  ssize_t recv_internal (struct _WSAMSG *wsamsg, bool use_recvmsg);
 
  public:
   fhandler_socket_inet ();
@@ -653,30 +697,13 @@ class fhandler_socket_inet: public fhandler_socket
   int connect (const struct sockaddr *name, int namelen);
   int getsockname (struct sockaddr *name, int *namelen);
   int getpeername (struct sockaddr *name, int *namelen);
-  int shutdown (int how);
-  int close ();
-  ssize_t recvfrom (void *ptr, size_t len, int flags,
-		    struct sockaddr *from, int *fromlen);
-  ssize_t recvmsg (struct msghdr *msg, int flags);
-  void __reg3 read (void *ptr, size_t& len);
-  ssize_t __stdcall readv (const struct iovec *, int iovcnt, ssize_t tot = -1);
   ssize_t sendto (const void *ptr, size_t len, int flags,
 	      const struct sockaddr *to, int tolen);
   ssize_t sendmsg (const struct msghdr *msg, int flags);
-  ssize_t __stdcall write (const void *ptr, size_t len);
-  ssize_t __stdcall writev (const struct iovec *, int iovcnt, ssize_t tot = -1);
   int setsockopt (int level, int optname, const void *optval,
 		  __socklen_t optlen);
   int getsockopt (int level, int optname, const void *optval,
 		  __socklen_t *optlen);
-
-  int ioctl (unsigned int cmd, void *);
-  int fcntl (int cmd, intptr_t);
-
-  /* select.cc */
-  select_record *select_read (select_stuff *);
-  select_record *select_write (select_stuff *);
-  select_record *select_except (select_stuff *);
 
   /* from here on: CLONING */
   fhandler_socket_inet (void *) {}
@@ -697,7 +724,7 @@ class fhandler_socket_inet: public fhandler_socket
   }
 };
 
-class fhandler_socket_local: public fhandler_socket
+class fhandler_socket_local: public fhandler_socket_wsock
 {
  protected:
   char *sun_path;
@@ -729,9 +756,18 @@ class fhandler_socket_local: public fhandler_socket
   int af_local_set_no_getpeereid ();
   void af_local_set_sockpair_cred ();
 
- private:
-  inline ssize_t recv_internal (struct _WSAMSG *wsamsg, bool use_recvmsg);
-  inline ssize_t send_internal (struct _WSAMSG *wsamsg, int flags);
+ protected:
+  ssize_t recv_internal (struct _WSAMSG *wsamsg, bool use_recvmsg);
+
+ protected:
+  struct status_flags
+  {
+    unsigned no_getpeereid	   : 1;
+   public:
+    status_flags () : no_getpeereid (0) {}
+  } status;
+ public:
+  IMPLEMENT_STATUS_FLAG (bool, no_getpeereid)
 
  public:
   fhandler_socket_local ();
@@ -748,26 +784,14 @@ class fhandler_socket_local: public fhandler_socket
   int connect (const struct sockaddr *name, int namelen);
   int getsockname (struct sockaddr *name, int *namelen);
   int getpeername (struct sockaddr *name, int *namelen);
-  int shutdown (int how);
-  int close ();
   int getpeereid (pid_t *pid, uid_t *euid, gid_t *egid);
-  ssize_t recvfrom (void *ptr, size_t len, int flags,
-		    struct sockaddr *from, int *fromlen);
-  ssize_t recvmsg (struct msghdr *msg, int flags);
-  void __reg3 read (void *ptr, size_t& len);
-  ssize_t __stdcall readv (const struct iovec *, int iovcnt, ssize_t tot = -1);
   ssize_t sendto (const void *ptr, size_t len, int flags,
 	      const struct sockaddr *to, int tolen);
   ssize_t sendmsg (const struct msghdr *msg, int flags);
-  ssize_t __stdcall write (const void *ptr, size_t len);
-  ssize_t __stdcall writev (const struct iovec *, int iovcnt, ssize_t tot = -1);
   int setsockopt (int level, int optname, const void *optval,
 		  __socklen_t optlen);
   int getsockopt (int level, int optname, const void *optval,
 		  __socklen_t *optlen);
-
-  int ioctl (unsigned int cmd, void *);
-  int fcntl (int cmd, intptr_t);
 
   int __reg2 fstat (struct stat *buf);
   int __reg2 fstatvfs (struct statvfs *buf);
@@ -775,11 +799,6 @@ class fhandler_socket_local: public fhandler_socket
   int __reg2 fchown (uid_t newuid, gid_t newgid);
   int __reg3 facl (int, int, struct acl *);
   int __reg2 link (const char *);
-
-  /* select.cc */
-  select_record *select_read (select_stuff *);
-  select_record *select_write (select_stuff *);
-  select_record *select_except (select_stuff *);
 
   /* from here on: CLONING */
   fhandler_socket_local (void *) {}
@@ -2357,7 +2376,6 @@ typedef union
   char __pty_master[sizeof (fhandler_pty_master)];
   char __registry[sizeof (fhandler_registry)];
   char __serial[sizeof (fhandler_serial)];
-  char __socket[sizeof (fhandler_socket)];
   char __socket_inet[sizeof (fhandler_socket_inet)];
   char __socket_local[sizeof (fhandler_socket_local)];
   char __termios[sizeof (fhandler_termios)];

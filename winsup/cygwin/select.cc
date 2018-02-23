@@ -501,7 +501,7 @@ set_bits (select_record *me, fd_set *readfds, fd_set *writefds,
 	  fd_set *exceptfds)
 {
   int ready = 0;
-  fhandler_socket *sock;
+  fhandler_socket_wsock *sock;
   select_printf ("me %p, testing fd %d (%s)", me, me->fd, me->fh->get_name ());
   if (me->read_selected && me->read_ready)
     {
@@ -511,7 +511,7 @@ set_bits (select_record *me, fd_set *readfds, fd_set *writefds,
   if (me->write_selected && me->write_ready)
     {
       UNIX_FD_SET (me->fd, writefds);
-      if (me->except_on_write && (sock = me->fh->is_socket ()))
+      if (me->except_on_write && (sock = me->fh->is_wsock_socket ()))
 	{
 	  /* Set readfds entry in case of a failed connect. */
 	  if (!me->read_ready && me->read_selected
@@ -1364,7 +1364,7 @@ fhandler_base::select_except (select_stuff *ss)
 static int
 peek_socket (select_record *me, bool)
 {
-  fhandler_socket *fh = (fhandler_socket *) me->fh;
+  fhandler_socket_wsock *fh = (fhandler_socket_wsock *) me->fh;
   long events;
   /* Don't play with the settings again, unless having taken a deep look into
      Richard W. Stevens Network Programming book.  Thank you. */
@@ -1488,7 +1488,7 @@ start_thread_socket (select_record *me, select_stuff *stuff)
 	/* No event/socket should show up multiple times.  Every socket
 	   is uniquely identified by its serial number in the global
 	   wsock_events record. */
-	const LONG ser_num = ((fhandler_socket *) s->fh)->serial_number ();
+	const LONG ser_num = ((fhandler_socket_wsock *) s->fh)->serial_number ();
 	for (int i = 1; i < si->num_w4; ++i)
 	  if (si->ser_num[i] == ser_num)
 	    goto continue_outer_loop;
@@ -1517,7 +1517,7 @@ start_thread_socket (select_record *me, select_stuff *stuff)
 	    _my_tls.locals.select.max_w4 += MAXIMUM_WAIT_OBJECTS;
 	  }
 	si->ser_num[si->num_w4] = ser_num;
-	si->w4[si->num_w4++] = ((fhandler_socket *) s->fh)->wsock_event ();
+	si->w4[si->num_w4++] = ((fhandler_socket_wsock *) s->fh)->wsock_event ();
       continue_outer_loop:
 	;
       }
@@ -1549,7 +1549,7 @@ socket_cleanup (select_record *, select_stuff *stuff)
 }
 
 select_record *
-fhandler_socket_inet::select_read (select_stuff *ss)
+fhandler_socket_wsock::select_read (select_stuff *ss)
 {
   select_record *s = ss->start.next;
   if (!s->startup)
@@ -1565,7 +1565,7 @@ fhandler_socket_inet::select_read (select_stuff *ss)
 }
 
 select_record *
-fhandler_socket_inet::select_write (select_stuff *ss)
+fhandler_socket_wsock::select_write (select_stuff *ss)
 {
   select_record *s = ss->start.next;
   if (!s->startup)
@@ -1586,61 +1586,7 @@ fhandler_socket_inet::select_write (select_stuff *ss)
 }
 
 select_record *
-fhandler_socket_inet::select_except (select_stuff *ss)
-{
-  select_record *s = ss->start.next;
-  if (!s->startup)
-    {
-      s->startup = start_thread_socket;
-      s->verify = verify_true;
-      s->cleanup = socket_cleanup;
-    }
-  s->peek = peek_socket;
-  /* FIXME: Is this right?  Should these be used as criteria for except? */
-  s->except_ready = saw_shutdown_write () || saw_shutdown_read ();
-  s->except_selected = true;
-  return s;
-}
-
-select_record *
-fhandler_socket_local::select_read (select_stuff *ss)
-{
-  select_record *s = ss->start.next;
-  if (!s->startup)
-    {
-      s->startup = start_thread_socket;
-      s->verify = verify_true;
-      s->cleanup = socket_cleanup;
-    }
-  s->peek = peek_socket;
-  s->read_ready = saw_shutdown_read ();
-  s->read_selected = true;
-  return s;
-}
-
-select_record *
-fhandler_socket_local::select_write (select_stuff *ss)
-{
-  select_record *s = ss->start.next;
-  if (!s->startup)
-    {
-      s->startup = start_thread_socket;
-      s->verify = verify_true;
-      s->cleanup = socket_cleanup;
-    }
-  s->peek = peek_socket;
-  s->write_ready = saw_shutdown_write () || connect_state () == unconnected;
-  s->write_selected = true;
-  if (connect_state () != unconnected)
-    {
-      s->except_ready = saw_shutdown_write () || saw_shutdown_read ();
-      s->except_on_write = true;
-    }
-  return s;
-}
-
-select_record *
-fhandler_socket_local::select_except (select_stuff *ss)
+fhandler_socket_wsock::select_except (select_stuff *ss)
 {
   select_record *s = ss->start.next;
   if (!s->startup)

@@ -94,12 +94,12 @@ poll (struct pollfd *fds, nfds_t nfds, int timeout)
     {
       if (fds[i].fd >= 0 && fds[i].revents != POLLNVAL)
 	{
-	  fhandler_socket *sock;
+	  fhandler_socket_wsock *sock;
 
 	  /* Check if the descriptor has been closed, or if shutdown for the
 	     read side has been called on a socket. */
 	  if (cygheap->fdtab.not_open (fds[i].fd)
-	      || ((sock = cygheap->fdtab[fds[i].fd]->is_socket ())
+	      || ((sock = cygheap->fdtab[fds[i].fd]->is_wsock_socket ())
 		  && sock->saw_shutdown_read ()))
 	    fds[i].revents = POLLHUP;
 	  else
@@ -117,7 +117,7 @@ poll (struct pollfd *fds, nfds_t nfds, int timeout)
 	      /* Handle failed connect.  A failed connect implicitly sets
 	         POLLOUT, if requested, but it doesn't set POLLIN. */
 	      if ((fds[i].events & POLLIN)
-		  && (sock = cygheap->fdtab[fds[i].fd]->is_socket ())
+		  && (sock = cygheap->fdtab[fds[i].fd]->is_wsock_socket ())
 		  && sock->connect_state () == connect_failed)
 		fds[i].revents |= (POLLIN | POLLERR);
 	      else

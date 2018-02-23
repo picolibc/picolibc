@@ -1567,7 +1567,7 @@ fhandler_base::fork_fixup (HANDLE parent, HANDLE &h, const char *name)
 {
   HANDLE oh = h;
   bool res = false;
-  if (/* !is_socket () && */ !close_on_exec ())
+  if (!close_on_exec ())
     debug_printf ("handle %p already opened", h);
   else if (!DuplicateHandle (parent, h, GetCurrentProcess (), &h,
 			     0, !close_on_exec (), DUPLICATE_SAME_ACCESS))
