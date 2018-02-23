@@ -311,7 +311,6 @@ class fhandler_base
   /* Returns name used for /proc/<pid>/fd in buf. */
   virtual char *get_proc_fd_name (char *buf);
 
-  virtual void hclose (HANDLE h) {CloseHandle (h);}
   virtual void set_no_inheritance (HANDLE &, bool);
 
   /* fixup fd possibly non-inherited handles after fork */
@@ -622,8 +621,6 @@ class fhandler_socket: public fhandler_base
     set_errno (ESPIPE);
     return -1;
   }
-
-  void hclose (HANDLE) {close ();}
 
   void set_addr_family (int af) {addr_family = af;}
   int get_addr_family () {return addr_family;}
