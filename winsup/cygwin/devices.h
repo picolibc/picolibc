@@ -242,6 +242,7 @@ enum fh_devices
   FH_OSS_DSP = FHDEV (DEV_SOUND_MAJOR, 3),
 
   DEV_SOCK_MAJOR = 30,
+  FH_SOCKET = FHDEV (DEV_SOCK_MAJOR, 0),
   FH_INET = FHDEV (DEV_SOCK_MAJOR, 36),
   FH_LOCAL = FHDEV (DEV_SOCK_MAJOR, 120),
 
@@ -390,10 +391,12 @@ extern const _device *ptmx_dev;
 extern const _device *ptys_dev;
 extern const _device *urandom_dev;
 
-extern const _device dev_af_local_storage;
-#define af_local_dev ((device *) &dev_af_local_storage)
+extern const _device dev_socket_storage;
+#define socket_dev ((device *) &dev_socket_storage)
 extern const _device dev_af_inet_storage;
 #define af_inet_dev ((device *) &dev_af_inet_storage)
+extern const _device dev_af_local_storage;
+#define af_local_dev ((device *) &dev_af_local_storage)
 
 extern const _device dev_piper_storage;
 #define piper_dev ((device *) &dev_piper_storage)

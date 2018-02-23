@@ -864,7 +864,7 @@ path_conv::check (const char *src, unsigned opt,
 			if (component == 0)
 			  {
 			    fileattr = 0;
-			    dev.parse (FH_INET);
+			    dev.parse (FH_SOCKET);
 			  }
 			break;
 		      case virt_fsdir:
