@@ -58,6 +58,7 @@ details. */
 #define SO_OOBINLINE    0x0100          /* leave received OOB data in line */
 #define SO_DONTLINGER   (unsigned int)(~SO_LINGER)
 #define SO_PEERCRED	0x0200		/* same as getpeereid */
+#define SO_PASSCRED	0x0400		/* enable receiving of credentials */
 
 /*
  * Additional options.

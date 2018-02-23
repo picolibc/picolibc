@@ -107,7 +107,8 @@ struct cmsghdr
 	((unsigned char *) ((struct cmsghdr *)(cmsg) + 1))
 
 /* "Socket"-level control message types: */
-#define	SCM_RIGHTS	0x01		/* access rights (array of int) */
+#define	SCM_RIGHTS	0x01		/* descriptor passing (array of int) */
+#define	SCM_CREDENTIALS	0x02		/* credential passing (struct ucred) */
 
 #ifdef __INSIDE_CYGWIN__
 /* Definition of struct msghdr up to release 1.5.18 */
