@@ -311,7 +311,7 @@ dtable::init_std_file_from_handle (int fd, HANDLE handle)
 				     (char *) &rcv, &len)))
 	{
 	  /* socket */
-	  dev = *tcp_dev;
+	  dev = *af_inet_dev;
 	  name[0] = '\0';
 	}
       else if (fd == 0)
@@ -514,14 +514,10 @@ fh_alloc (path_conv& pc)
 	case FH_PIPEW:
 	  fh = cnew (fhandler_pipe);
 	  break;
-	case FH_TCP:
-	case FH_UDP:
-	case FH_ICMP:
+	case FH_INET:
 	  fh = cnew (fhandler_socket_inet);
 	  break;
-	case FH_UNIX:
-	case FH_STREAM:
-	case FH_DGRAM:
+	case FH_LOCAL:
 	  fh = cnew (fhandler_socket_local);
 	  break;
 	case FH_FS:

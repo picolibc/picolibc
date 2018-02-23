@@ -871,7 +871,7 @@ fhandler_socket::fstat (struct stat *buf)
   res = fhandler_socket::fstat (buf);
   if (!res)
     {
-      buf->st_dev = FHDEV (DEV_TCP_MAJOR, 0);
+      buf->st_dev = FHDEV (DEV_SOCK_MAJOR, 0);
       if (!(buf->st_ino = get_plain_ino ()))
 	sscanf (get_name (), "/proc/%*d/fd/socket:[%lld]",
 			     (long long *) &buf->st_ino);

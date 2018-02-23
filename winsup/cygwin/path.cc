@@ -864,7 +864,7 @@ path_conv::check (const char *src, unsigned opt,
 			if (component == 0)
 			  {
 			    fileattr = 0;
-			    dev.parse (FH_TCP);
+			    dev.parse (FH_INET);
 			  }
 			break;
 		      case virt_fsdir:
@@ -959,7 +959,7 @@ path_conv::check (const char *src, unsigned opt,
 		      return;
 		    }
 		  fileattr = sym.fileattr;
-		  dev.parse (FH_UNIX);
+		  dev.parse (FH_LOCAL);
 		  dev.setfs (1);
 		  goto out;
 		}

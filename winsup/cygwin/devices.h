@@ -241,13 +241,9 @@ enum fh_devices
   DEV_SOUND_MAJOR = 14,
   FH_OSS_DSP = FHDEV (DEV_SOUND_MAJOR, 3),
 
-  DEV_TCP_MAJOR = 30,
-  FH_TCP = FHDEV (DEV_TCP_MAJOR, 36),
-  FH_UDP = FHDEV (DEV_TCP_MAJOR, 39),
-  FH_ICMP = FHDEV (DEV_TCP_MAJOR, 33),
-  FH_UNIX = FHDEV (DEV_TCP_MAJOR, 120),
-  FH_STREAM = FHDEV (DEV_TCP_MAJOR, 121),
-  FH_DGRAM = FHDEV (DEV_TCP_MAJOR, 122),
+  DEV_SOCK_MAJOR = 30,
+  FH_INET = FHDEV (DEV_SOCK_MAJOR, 36),
+  FH_LOCAL = FHDEV (DEV_SOCK_MAJOR, 120),
 
   FH_NADA     = FHDEV (0, 0),
   FH_ERROR   = FHDEV (255, 255)	/* Set by fh constructor when error detected */
@@ -394,14 +390,10 @@ extern const _device *ptmx_dev;
 extern const _device *ptys_dev;
 extern const _device *urandom_dev;
 
-extern const _device dev_dgram_storage;
-#define dgram_dev ((device *) &dev_dgram_storage)
-extern const _device dev_stream_storage;
-#define stream_dev ((device *) &dev_stream_storage)
-extern const _device dev_tcp_storage;
-#define tcp_dev ((device *) &dev_tcp_storage)
-extern const _device dev_udp_storage;
-#define udp_dev ((device *) &dev_udp_storage)
+extern const _device dev_af_local_storage;
+#define af_local_dev ((device *) &dev_af_local_storage)
+extern const _device dev_af_inet_storage;
+#define af_inet_dev ((device *) &dev_af_inet_storage)
 
 extern const _device dev_piper_storage;
 #define piper_dev ((device *) &dev_piper_storage)
