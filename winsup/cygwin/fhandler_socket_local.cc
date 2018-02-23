@@ -650,7 +650,7 @@ int
 fhandler_socket_local::fchmod (mode_t newmode)
 {
   if (!get_sun_path () || get_sun_path ()[0] == '\0')
-    return 0;
+    return fhandler_socket::fchmod (newmode);
   fhandler_disk_file fh (pc);
   fh.get_device () = FH_FS;
   return fh.fchmod (S_IFSOCK | adjust_socket_file_mode (newmode));
