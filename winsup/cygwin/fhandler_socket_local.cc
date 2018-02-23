@@ -100,7 +100,6 @@ get_inet_addr_local (const struct sockaddr *in, int inlen,
       return 0;
     }
 
-  /* AF_LOCAL/AF_UNIX only */
   path_conv pc (in->sa_data, PC_SYM_FOLLOW);
   if (pc.error)
     {
@@ -618,7 +617,7 @@ fhandler_socket_local::dup (fhandler_base *child, int flags)
   fhandler_socket_local *fhs = (fhandler_socket_local *) child;
   fhs->set_sun_path (get_sun_path ());
   fhs->set_peer_sun_path (get_peer_sun_path ());
-  return fhandler_socket::dup (child, flags);
+  return fhandler_socket_wsock::dup (child, flags);
 }
 
 int __reg2
@@ -627,7 +626,7 @@ fhandler_socket_local::fstat (struct stat *buf)
   int res;
 
   if (!get_sun_path () || get_sun_path ()[0] == '\0')
-    return fhandler_socket::fstat (buf);
+    return fhandler_socket_wsock::fstat (buf);
   res = fhandler_base::fstat_fs (buf);
   if (!res)
     {
@@ -641,7 +640,7 @@ int __reg2
 fhandler_socket_local::fstatvfs (struct statvfs *sfs)
 {
   if (!get_sun_path () || get_sun_path ()[0] == '\0')
-    return fhandler_socket::fstatvfs (sfs);
+    return fhandler_socket_wsock::fstatvfs (sfs);
   fhandler_disk_file fh (pc);
   fh.get_device () = FH_FS;
   return fh.fstatvfs (sfs);
@@ -651,7 +650,7 @@ int
 fhandler_socket_local::fchmod (mode_t newmode)
 {
   if (!get_sun_path () || get_sun_path ()[0] == '\0')
-    return fhandler_socket::fchmod (newmode);
+    return fhandler_socket_wsock::fchmod (newmode);
   fhandler_disk_file fh (pc);
   fh.get_device () = FH_FS;
   return fh.fchmod (S_IFSOCK | adjust_socket_file_mode (newmode));
@@ -661,7 +660,7 @@ int
 fhandler_socket_local::fchown (uid_t uid, gid_t gid)
 {
   if (!get_sun_path () || get_sun_path ()[0] == '\0')
-    return fhandler_socket::fchown (uid, gid);
+    return fhandler_socket_wsock::fchown (uid, gid);
   fhandler_disk_file fh (pc);
   return fh.fchown (uid, gid);
 }
@@ -670,7 +669,7 @@ int
 fhandler_socket_local::facl (int cmd, int nentries, aclent_t *aclbufp)
 {
   if (!get_sun_path () || get_sun_path ()[0] == '\0')
-    return fhandler_socket::facl (cmd, nentries, aclbufp);
+    return fhandler_socket_wsock::facl (cmd, nentries, aclbufp);
   fhandler_disk_file fh (pc);
   return fh.facl (cmd, nentries, aclbufp);
 }
@@ -679,7 +678,7 @@ int
 fhandler_socket_local::link (const char *newpath)
 {
   if (!get_sun_path () || get_sun_path ()[0] == '\0')
-    return fhandler_socket::link (newpath);
+    return fhandler_socket_wsock::link (newpath);
   fhandler_disk_file fh (pc);
   return fh.link (newpath);
 }
