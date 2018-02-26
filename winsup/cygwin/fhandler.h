@@ -1350,14 +1350,6 @@ public:
 
 class fhandler_cygdrive: public fhandler_disk_file
 {
-  enum
-  {
-    DRVSZ = sizeof ("x:\\")
-  };
-  int ndrives;
-  const char *pdrive;
-  char pdrive_buf[1 + (2 * 26 * DRVSZ)];
-  void set_drives ();
  public:
   fhandler_cygdrive ();
   int open (int flags, mode_t mode);

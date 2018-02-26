@@ -2362,7 +2362,7 @@ fhandler_disk_file::closedir (DIR *dir)
 }
 
 fhandler_cygdrive::fhandler_cygdrive () :
-  fhandler_disk_file (), ndrives (0), pdrive (NULL)
+  fhandler_disk_file ()
 {
 }
 
@@ -2381,13 +2381,6 @@ fhandler_cygdrive::open (int flags, mode_t mode)
     }
   /* Open a fake handle to \\Device\\Null */
   return open_null (flags);
-}
-
-void
-fhandler_cygdrive::set_drives ()
-{
-  pdrive = pdrive_buf;
-  ndrives = GetLogicalDriveStrings (sizeof pdrive_buf, pdrive_buf) / DRVSZ;
 }
 
 int
@@ -2412,14 +2405,28 @@ fhandler_cygdrive::fstatvfs (struct statvfs *sfs)
   return 0;
 }
 
+#define MAX_DRIVE_BUF_LEN	(sizeof ("x:\\") * 26 + 2)
+
+struct __DIR_drives
+{
+  char *pdrive;
+  char  pbuf[MAX_DRIVE_BUF_LEN];
+};
+
+#define d_drives(d)	((__DIR_drives *) (d)->__d_internal)
+
 DIR *
 fhandler_cygdrive::opendir (int fd)
 {
   DIR *dir;
 
   dir = fhandler_disk_file::opendir (fd);
-  if (dir && !ndrives)
-    set_drives ();
+  if (dir)
+    {
+      dir->__d_internal = (uintptr_t) new __DIR_drives;
+      GetLogicalDriveStrings (MAX_DRIVE_BUF_LEN, d_drives(dir)->pbuf);
+      d_drives(dir)->pdrive = d_drives(dir)->pbuf;
+    }
 
   return dir;
 }
@@ -2431,7 +2438,7 @@ fhandler_cygdrive::readdir (DIR *dir, dirent *de)
 
   while (true)
     {
-      if (!pdrive || !*pdrive)
+      if (!d_drives(dir)->pdrive || !*d_drives(dir)->pdrive)
 	{
 	  if (!(dir->__flags & dirent_saw_dot))
 	    {
@@ -2441,7 +2448,7 @@ fhandler_cygdrive::readdir (DIR *dir, dirent *de)
 	    }
 	  return ENMFILE;
 	}
-      disk_type dt = get_disk_type ((drive[0] = *pdrive, drive));
+      disk_type dt = get_disk_type ((drive[0] = *d_drives(dir)->pdrive, drive));
       if (dt == DT_SHARE_SMB)
 	{
 	  /* Calling NetUseGetInfo on SMB drives allows to fetch the
@@ -2463,16 +2470,16 @@ fhandler_cygdrive::readdir (DIR *dir, dirent *de)
 	    }
 	}
       else if (dt != DT_FLOPPY
-	       && GetFileAttributes (pdrive) != INVALID_FILE_ATTRIBUTES)
+	       && GetFileAttributes (d_drives(dir)->pdrive) != INVALID_FILE_ATTRIBUTES)
 	break;
-      pdrive = strchr (pdrive, '\0') + 1;
+      d_drives(dir)->pdrive = strchr (d_drives(dir)->pdrive, '\0') + 1;
     }
-  *de->d_name = cyg_tolower (*pdrive);
+  *de->d_name = cyg_tolower (*d_drives(dir)->pdrive);
   de->d_name[1] = '\0';
   user_shared->warned_msdos = true;
-  de->d_ino = readdir_get_ino (pdrive, false);
+  de->d_ino = readdir_get_ino (d_drives(dir)->pdrive, false);
   dir->__d_position++;
-  pdrive = strchr (pdrive, '\0') + 1;
+  d_drives(dir)->pdrive = strchr (d_drives(dir)->pdrive, '\0') + 1;
   syscall_printf ("%p = readdir (%p) (%s)", &de, dir, de->d_name);
   return 0;
 }
@@ -2480,13 +2487,13 @@ fhandler_cygdrive::readdir (DIR *dir, dirent *de)
 void
 fhandler_cygdrive::rewinddir (DIR *dir)
 {
-  pdrive = pdrive_buf;
+  d_drives(dir)->pdrive = d_drives(dir)->pbuf;
   dir->__d_position = 0;
 }
 
 int
 fhandler_cygdrive::closedir (DIR *dir)
 {
-  pdrive = pdrive_buf;
+  delete d_drives(dir);
   return 0;
 }
