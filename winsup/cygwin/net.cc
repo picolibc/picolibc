@@ -548,7 +548,10 @@ cygwin_socket (int af, int type, int protocol)
 	  res = fd;
 	}
       else
-        fd.release ();
+	{
+	  delete fh;
+	  fd.release ();
+	}
     }
 
 done:
@@ -2346,6 +2349,8 @@ socketpair (int af, int type, int protocol, int *sb)
 	}
       else
 	{
+	  delete fh_in;
+	  delete fh_out;
 	  fd_in.release ();
 	  fd_out.release ();
 	}
