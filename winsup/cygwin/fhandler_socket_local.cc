@@ -241,6 +241,16 @@ fhandler_socket_local::socket (int af, int type, int protocol, int flags)
   SOCKET sock;
   int ret;
 
+  if (type != SOCK_STREAM && type != SOCK_DGRAM)
+    {
+      set_errno (EINVAL);
+      return -1;
+    }
+  if (protocol != 0)
+    {
+      set_errno (EPROTONOSUPPORT);
+      return -1;
+    }
   sock = ::socket (AF_INET, type, protocol);
   if (sock == INVALID_SOCKET)
     {
@@ -265,6 +275,16 @@ fhandler_socket_local::socketpair (int af, int type, int protocol, int flags,
   fhandler_socket_local *fh_out = reinterpret_cast<fhandler_socket_local *>
 				  (_fh_out);
 
+  if (type != SOCK_STREAM && type != SOCK_DGRAM)
+        {
+          set_errno (EINVAL);
+          return -1;
+        }
+  if (protocol != 0)
+    {
+      set_errno (EPROTONOSUPPORT);
+      return -1;
+    }
   /* create listening socket */
   sock = ::socket (AF_INET, type, 0);
   if (sock == INVALID_SOCKET)

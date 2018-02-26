@@ -708,6 +708,13 @@ fhandler_socket_inet::socket (int af, int type, int protocol, int flags)
   SOCKET sock;
   int ret;
 
+  /* This test should be covered by ::socket, but make sure we don't
+     accidentally try anything else. */
+  if (type != SOCK_STREAM && type != SOCK_DGRAM && type != SOCK_RAW)
+        {
+          set_errno (EINVAL);
+          return -1;
+        }
   sock = ::socket (af, type, protocol);
   if (sock == INVALID_SOCKET)
     {

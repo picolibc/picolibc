@@ -229,6 +229,16 @@ fhandler_socket_unix::dup (fhandler_base *child, int flags)
 int
 fhandler_socket_unix::socket (int af, int type, int protocol, int flags)
 {
+  if (type != SOCK_STREAM && type != SOCK_DGRAM)
+    {
+      set_errno (EINVAL);
+      return -1;
+    }
+  if (protocol != 0)
+    {
+      set_errno (EPROTONOSUPPORT);
+      return -1;
+    }
   set_errno (EAFNOSUPPORT);
   return -1;
 }
@@ -237,6 +247,16 @@ int
 fhandler_socket_unix::socketpair (int af, int type, int protocol, int flags,
 				  fhandler_socket *fh_out)
 {
+  if (type != SOCK_STREAM && type != SOCK_DGRAM)
+    {
+      set_errno (EINVAL);
+      return -1;
+    }
+  if (protocol != 0)
+    {
+      set_errno (EPROTONOSUPPORT);
+      return -1;
+    }
   set_errno (EAFNOSUPPORT);
   return -1;
 }
