@@ -32,33 +32,7 @@
 #include "miscfuncs.h"
 #include "tls_pbuf.h"
 
-extern "C" {
-  int sscanf (const char *, const char *, ...);
-} /* End of "C" section */
 
-#define ASYNC_MASK (FD_READ|FD_WRITE|FD_OOB|FD_ACCEPT|FD_CONNECT)
-#define EVENT_MASK (FD_READ|FD_WRITE|FD_OOB|FD_ACCEPT|FD_CONNECT|FD_CLOSE)
-
-#define LOCK_EVENTS	\
-  if (wsock_mtx && \
-      WaitForSingleObject (wsock_mtx, INFINITE) != WAIT_FAILED) \
-    {
-
-#define UNLOCK_EVENTS \
-      ReleaseMutex (wsock_mtx); \
-    }
-
-static inline mode_t
-adjust_socket_file_mode (mode_t mode)
-{
-  /* Kludge: Don't allow to remove read bit on socket files for
-     user/group/other, if the accompanying write bit is set.  It would
-     be nice to have exact permissions on a socket file, but it's
-     necessary that somebody able to access the socket can always read
-     the contents of the socket file to avoid spurious "permission
-     denied" messages. */
-  return mode | ((mode & (S_IWUSR | S_IWGRP | S_IWOTH)) << 1);
-}
 
 /* cygwin internal: map sockaddr into internet domain address */
 static int __unused
@@ -612,7 +586,7 @@ fhandler_socket_unix::ioctl (unsigned int cmd, void *p)
 int
 fhandler_socket_unix::fcntl (int cmd, intptr_t arg)
 {
-  int ret;
+  int ret = 0;
 
   switch (cmd)
     {
@@ -630,7 +604,7 @@ fhandler_socket_unix::fcntl (int cmd, intptr_t arg)
 int __reg2
 fhandler_socket_unix::fstat (struct stat *buf)
 {
-  int ret;
+  int ret = 0;
 
   if (!get_sun_path () || get_sun_path ()[0] == '\0')
     return fhandler_socket::fstat (buf);
@@ -660,7 +634,14 @@ fhandler_socket_unix::fchmod (mode_t newmode)
     return fhandler_socket::fchmod (newmode);
   fhandler_disk_file fh (pc);
   fh.get_device () = FH_FS;
-  return fh.fchmod (S_IFSOCK | adjust_socket_file_mode (newmode));
+  /* Kludge: Don't allow to remove read bit on socket files for
+     user/group/other, if the accompanying write bit is set.  It would
+     be nice to have exact permissions on a socket file, but it's
+     necessary that somebody able to access the socket can always read
+     the contents of the socket file to avoid spurious "permission
+     denied" messages. */
+  newmode |= (newmode & (S_IWUSR | S_IWGRP | S_IWOTH)) << 1;
+  return fh.fchmod (S_IFSOCK | newmode);
 }
 
 int
