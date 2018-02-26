@@ -544,6 +544,8 @@ class fhandler_socket: public fhandler_base
   char *get_proc_fd_name (char *buf);
 
   virtual int socket (int af, int type, int protocol, int flags) = 0;
+  virtual int socketpair (int af, int type, int protocol, int flags,
+			  fhandler_socket *fh_out) = 0;
   virtual int bind (const struct sockaddr *name, int namelen) = 0;
   virtual int listen (int backlog) = 0;
   virtual int accept4 (struct sockaddr *peer, int *len, int flags) = 0;
@@ -683,6 +685,8 @@ class fhandler_socket_inet: public fhandler_socket_wsock
   ~fhandler_socket_inet ();
 
   int socket (int af, int type, int protocol, int flags);
+  int socketpair (int af, int type, int protocol, int flags,
+		  fhandler_socket *fh_out);
   int bind (const struct sockaddr *name, int namelen);
   int listen (int backlog);
   int accept4 (struct sockaddr *peer, int *len, int flags);
@@ -769,7 +773,7 @@ class fhandler_socket_local: public fhandler_socket_wsock
 
   int socket (int af, int type, int protocol, int flags);
   int socketpair (int af, int type, int protocol, int flags,
-		  fhandler_socket_local *fh_out);
+		  fhandler_socket *fh_out);
   int bind (const struct sockaddr *name, int namelen);
   int listen (int backlog);
   int accept4 (struct sockaddr *peer, int *len, int flags);
@@ -838,7 +842,7 @@ class fhandler_socket_unix : public fhandler_socket
 
   int socket (int af, int type, int protocol, int flags);
   int socketpair (int af, int type, int protocol, int flags,
-		  fhandler_socket_unix *fh_out);
+		  fhandler_socket *fh_out);
   int bind (const struct sockaddr *name, int namelen);
   int listen (int backlog);
   int accept4 (struct sockaddr *peer, int *len, int flags);

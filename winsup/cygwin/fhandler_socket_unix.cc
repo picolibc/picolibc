@@ -235,7 +235,7 @@ fhandler_socket_unix::socket (int af, int type, int protocol, int flags)
 
 int
 fhandler_socket_unix::socketpair (int af, int type, int protocol, int flags,
-				  fhandler_socket_unix *fh_out)
+				  fhandler_socket *fh_out)
 {
   set_errno (EAFNOSUPPORT);
   return -1;

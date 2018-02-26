@@ -721,6 +721,14 @@ fhandler_socket_inet::socket (int af, int type, int protocol, int flags)
 }
 
 int
+fhandler_socket_inet::socketpair (int af, int type, int protocol, int flags,
+				  fhandler_socket *fh_out)
+{
+  set_errno (EAFNOSUPPORT);
+  return -1;
+}
+
+int
 fhandler_socket_inet::bind (const struct sockaddr *name, int namelen)
 {
   int res = -1;

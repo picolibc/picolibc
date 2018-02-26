@@ -2303,7 +2303,7 @@ socketpair (int af, int type, int protocol, int *sb)
 {
   int res = -1;
   const device *dev;
-  fhandler_socket_local *fh_in, *fh_out;
+  fhandler_socket *fh_in, *fh_out;
 
   int flags = type & _SOCK_FLAG_MASK;
   type &= ~_SOCK_FLAG_MASK;
@@ -2349,8 +2349,8 @@ socketpair (int af, int type, int protocol, int *sb)
 	  goto done;
 	}
 
-      fh_in = reinterpret_cast<fhandler_socket_local *> (build_fh_dev (*dev));
-      fh_out = reinterpret_cast<fhandler_socket_local *> (build_fh_dev (*dev));
+      fh_in = reinterpret_cast<fhandler_socket *> (build_fh_dev (*dev));
+      fh_out = reinterpret_cast<fhandler_socket *> (build_fh_dev (*dev));
       if (fh_in && fh_out
 	  && fh_in->socketpair (af, type, protocol, flags, fh_out) == 0)
 	{
