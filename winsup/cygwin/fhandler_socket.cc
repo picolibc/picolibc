@@ -309,7 +309,7 @@ fhandler_socket::fstat (struct stat *buf)
 {
   int res;
 
-  res = fhandler_socket::fstat (buf);
+  res = fhandler_base::fstat (buf);
   if (!res)
     {
       buf->st_dev = FHDEV (DEV_SOCK_MAJOR, 0);
