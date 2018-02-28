@@ -164,15 +164,28 @@ fhandler_socket_unix::~fhandler_socket_unix ()
 }
 
 void
-fhandler_socket_unix::set_sun_path (const char *path)
+fhandler_socket_unix::set_sun_path (struct sockaddr_un *un, socklen_t unlen)
 {
-  sun_path = path ? cstrdup (path) : NULL;
+  if (!un)
+    sun_path = NULL;
+  sun_path = (struct sun_name_t *) cmalloc_abort (HEAP_FHANDLER,
+						  sizeof *sun_path);
+  sun_path->un_len = unlen;
+  memcpy (&sun_path->un, un, sizeof (*un));
+  sun_path->_nul[sizeof (struct sockaddr_un)] = '\0';
 }
 
 void
-fhandler_socket_unix::set_peer_sun_path (const char *path)
+fhandler_socket_unix::set_peer_sun_path (struct sockaddr_un *un,
+					 socklen_t unlen)
 {
-  peer_sun_path = path ? cstrdup (path) : NULL;
+  if (!un)
+    peer_sun_path = NULL;
+  peer_sun_path = (struct sun_name_t *) cmalloc_abort (HEAP_FHANDLER,
+						       sizeof *peer_sun_path);
+  peer_sun_path->un_len = unlen;
+  memcpy (&peer_sun_path->un, un, sizeof (*un));
+  peer_sun_path->_nul[sizeof (struct sockaddr_un)] = '\0';
 }
 
 void
@@ -258,28 +271,34 @@ fhandler_socket_unix::connect (const struct sockaddr *name, int namelen)
 int
 fhandler_socket_unix::getsockname (struct sockaddr *name, int *namelen)
 {
-  struct sockaddr_un sun;
+  sun_name_t sun;
 
-  sun.sun_family = AF_UNIX;
-  sun.sun_path[0] = '\0';
   if (get_sun_path ())
-    strncat (sun.sun_path, get_sun_path (), UNIX_PATH_MAX - 1);
-  memcpy (name, &sun, MIN (*namelen, (int) SUN_LEN (&sun) + 1));
-  *namelen = (int) SUN_LEN (&sun) + (get_sun_path () ? 1 : 0);
+    memcpy (&sun, &get_sun_path ()->un, get_sun_path ()->un_len);
+  else
+    {
+      sun.un_len = sizeof (sa_family_t);
+      sun.un.sun_family = AF_UNIX;
+      sun.un.sun_path[0] = '\0';
+    }
+  memcpy (name, &sun, MIN (*namelen, sun.un_len));
   return 0;
 }
 
 int
 fhandler_socket_unix::getpeername (struct sockaddr *name, int *namelen)
 {
-  struct sockaddr_un sun;
-  memset (&sun, 0, sizeof sun);
-  sun.sun_family = AF_UNIX;
-  sun.sun_path[0] = '\0';
+  sun_name_t sun;
+
   if (get_peer_sun_path ())
-    strncat (sun.sun_path, get_peer_sun_path (), UNIX_PATH_MAX - 1);
-  memcpy (name, &sun, MIN (*namelen, (int) SUN_LEN (&sun) + 1));
-  *namelen = (int) SUN_LEN (&sun) + (get_peer_sun_path () ? 1 : 0);
+    memcpy (&sun, &get_peer_sun_path ()->un, get_peer_sun_path ()->un_len);
+  else
+    {
+      sun.un_len = sizeof (sa_family_t);
+      sun.un.sun_family = AF_UNIX;
+      sun.un.sun_path[0] = '\0';
+    }
+  memcpy (name, &sun, MIN (*namelen, sun.un_len));
   return 0;
 }
 
@@ -598,7 +617,9 @@ fhandler_socket_unix::fstat (struct stat *buf)
 {
   int ret = 0;
 
-  if (!get_sun_path () || get_sun_path ()[0] == '\0')
+  if (!get_sun_path ()
+      || get_sun_path ()->un_len <= (socklen_t) sizeof (sa_family_t)
+      || get_sun_path ()->un.sun_path[0] == '\0')
     return fhandler_socket::fstat (buf);
   ret = fhandler_base::fstat_fs (buf);
   if (!ret)
@@ -612,7 +633,9 @@ fhandler_socket_unix::fstat (struct stat *buf)
 int __reg2
 fhandler_socket_unix::fstatvfs (struct statvfs *sfs)
 {
-  if (!get_sun_path () || get_sun_path ()[0] == '\0')
+  if (!get_sun_path ()
+      || get_sun_path ()->un_len <= (socklen_t) sizeof (sa_family_t)
+      || get_sun_path ()->un.sun_path[0] == '\0')
     return fhandler_socket::fstatvfs (sfs);
   fhandler_disk_file fh (pc);
   fh.get_device () = FH_FS;
@@ -622,7 +645,9 @@ fhandler_socket_unix::fstatvfs (struct statvfs *sfs)
 int
 fhandler_socket_unix::fchmod (mode_t newmode)
 {
-  if (!get_sun_path () || get_sun_path ()[0] == '\0')
+  if (!get_sun_path ()
+      || get_sun_path ()->un_len <= (socklen_t) sizeof (sa_family_t)
+      || get_sun_path ()->un.sun_path[0] == '\0')
     return fhandler_socket::fchmod (newmode);
   fhandler_disk_file fh (pc);
   fh.get_device () = FH_FS;
@@ -639,7 +664,9 @@ fhandler_socket_unix::fchmod (mode_t newmode)
 int
 fhandler_socket_unix::fchown (uid_t uid, gid_t gid)
 {
-  if (!get_sun_path () || get_sun_path ()[0] == '\0')
+  if (!get_sun_path ()
+      || get_sun_path ()->un_len <= (socklen_t) sizeof (sa_family_t)
+      || get_sun_path ()->un.sun_path[0] == '\0')
     return fhandler_socket::fchown (uid, gid);
   fhandler_disk_file fh (pc);
   return fh.fchown (uid, gid);
@@ -648,7 +675,9 @@ fhandler_socket_unix::fchown (uid_t uid, gid_t gid)
 int
 fhandler_socket_unix::facl (int cmd, int nentries, aclent_t *aclbufp)
 {
-  if (!get_sun_path () || get_sun_path ()[0] == '\0')
+  if (!get_sun_path ()
+      || get_sun_path ()->un_len <= (socklen_t) sizeof (sa_family_t)
+      || get_sun_path ()->un.sun_path[0] == '\0')
     return fhandler_socket::facl (cmd, nentries, aclbufp);
   fhandler_disk_file fh (pc);
   return fh.facl (cmd, nentries, aclbufp);
@@ -657,7 +686,9 @@ fhandler_socket_unix::facl (int cmd, int nentries, aclent_t *aclbufp)
 int
 fhandler_socket_unix::link (const char *newpath)
 {
-  if (!get_sun_path () || get_sun_path ()[0] == '\0')
+  if (!get_sun_path ()
+      || get_sun_path ()->un_len <= (socklen_t) sizeof (sa_family_t)
+      || get_sun_path ()->un.sun_path[0] == '\0')
     return fhandler_socket::link (newpath);
   fhandler_disk_file fh (pc);
   return fh.link (newpath);

@@ -12,6 +12,7 @@ details. */
 #include "tty.h"
 #include <cygwin/_socketflags.h>
 #include <cygwin/_ucred.h>
+#include <sys/un.h>
 
 /* fcntl flags used only internaly. */
 #define O_NOSYMLINK	0x080000
@@ -816,15 +817,31 @@ class fhandler_socket_local: public fhandler_socket_wsock
   }
 };
 
+struct sun_name_t
+{
+  __socklen_t un_len;
+  union
+    {
+      struct sockaddr_un un;
+      /* Allows 108 bytes sun_path plus trailing NUL */
+      char _nul[sizeof (struct sockaddr_un) + 1];
+    };
+};
+
 class fhandler_socket_unix : public fhandler_socket
 {
  protected:
-  char *sun_path;
-  char *peer_sun_path;
-  void set_sun_path (const char *path);
-  char *get_sun_path () {return sun_path;}
-  void set_peer_sun_path (const char *path);
-  char *get_peer_sun_path () {return peer_sun_path;}
+  sun_name_t *sun_path;
+  sun_name_t *peer_sun_path;
+  sun_name_t *get_sun_path () {return sun_path;}
+  sun_name_t *get_peer_sun_path () {return peer_sun_path;}
+  void set_sun_path (struct sockaddr_un *un, __socklen_t unlen);
+  void set_sun_path (sun_name_t *snt)
+    { snt ? set_sun_path (&snt->un, snt->un_len) : set_sun_path (NULL, 0); }
+  void set_peer_sun_path (struct sockaddr_un *un, __socklen_t unlen);
+  void set_peer_sun_path (sun_name_t *snt)
+    { snt ? set_peer_sun_path (&snt->un, snt->un_len)
+	  : set_peer_sun_path (NULL, 0); }
 
  protected:
   struct ucred peer_cred;
