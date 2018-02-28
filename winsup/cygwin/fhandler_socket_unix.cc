@@ -178,12 +178,9 @@ fhandler_socket_unix::set_peer_sun_path (const char *path)
 void
 fhandler_socket_unix::set_cred ()
 {
-  sec_pid = getpid ();
-  sec_uid = geteuid32 ();
-  sec_gid = getegid32 ();
-  sec_peer_pid = (pid_t) 0;
-  sec_peer_uid = (uid_t) -1;
-  sec_peer_gid = (gid_t) -1;
+  peer_cred.pid = (pid_t) 0;
+  peer_cred.uid = (uid_t) -1;
+  peer_cred.gid = (gid_t) -1;
 }
 
 int
@@ -317,11 +314,11 @@ fhandler_socket_unix::getpeereid (pid_t *pid, uid_t *euid, gid_t *egid)
   __try
     {
       if (pid)
-	*pid = sec_peer_pid;
+	*pid = peer_cred.pid;
       if (euid)
-	*euid = sec_peer_uid;
+	*euid = peer_cred.uid;
       if (egid)
-	*egid = sec_peer_gid;
+	*egid = peer_cred.gid;
       return 0;
     }
   __except (EFAULT) {}

@@ -11,6 +11,7 @@ details. */
 
 #include "tty.h"
 #include <cygwin/_socketflags.h>
+#include <cygwin/_ucred.h>
 
 /* fcntl flags used only internaly. */
 #define O_NOSYMLINK	0x080000
@@ -824,15 +825,10 @@ class fhandler_socket_unix : public fhandler_socket
   char *get_sun_path () {return sun_path;}
   void set_peer_sun_path (const char *path);
   char *get_peer_sun_path () {return peer_sun_path;}
-  void set_cred ();
 
  protected:
-  pid_t sec_pid;
-  uid_t sec_uid;
-  gid_t sec_gid;
-  pid_t sec_peer_pid;
-  uid_t sec_peer_uid;
-  gid_t sec_peer_gid;
+  struct ucred peer_cred;
+  void set_cred ();
 
  public:
   fhandler_socket_unix ();

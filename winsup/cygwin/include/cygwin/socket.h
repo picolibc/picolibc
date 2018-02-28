@@ -47,12 +47,7 @@ struct sockaddr_storage {
 #include <asm/socket.h>			/* arch-dependent defines	*/
 #include <cygwin/sockios.h>		/* the SIOCxxx I/O controls	*/
 #include <sys/uio.h>			/* iovec support		*/
-
-struct ucred {
-  pid_t			pid;
-  uid_t			uid;
-  gid_t			gid;
-};
+#include <cygwin/_ucred.h>		/* struct ucred			*/
 
 struct linger {
   unsigned short	l_onoff;	/* Linger active	*/
