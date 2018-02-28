@@ -26,7 +26,7 @@
 #include <sys/lock.h>
 #include "local.h"
 
-#ifdef _REENT_SMALL
+#if defined(_REENT_SMALL) && !defined(_REENT_GLOBAL_STDIO_STREAMS)
 const struct __sFILE_fake __sf_fake_stdin =
     {_NULL, 0, 0, 0, 0, {_NULL, 0}, 0, _NULL};
 const struct __sFILE_fake __sf_fake_stdout =
@@ -73,7 +73,7 @@ std (FILE *ptr,
 #else /* _STDIO_CLOSE_STD_STREAMS */
   ptr->_close = NULL;
 #endif /* _STDIO_CLOSE_STD_STREAMS */
-#if !defined(__SINGLE_THREAD__) && !defined(_REENT_SMALL)
+#if !defined(__SINGLE_THREAD__) && !(defined(_REENT_SMALL) && !defined(_REENT_GLOBAL_STDIO_STREAMS))
   __lock_init_recursive (ptr->_lock);
   /*
    * #else
@@ -260,7 +260,7 @@ __sinit (struct _reent *s)
 # ifndef _REENT_GLOBAL_STDIO_STREAMS
   s->__sglue._niobs = 3;
   s->__sglue._iobs = &s->__sf[0];
-# endif
+# endif /* _REENT_GLOBAL_STDIO_STREAMS */
 #else
   s->__sglue._niobs = 0;
   s->__sglue._iobs = NULL;
@@ -269,9 +269,15 @@ __sinit (struct _reent *s)
      __sinit if it's 0. */
   if (s == _GLOBAL_REENT)
     s->__sdidinit = 1;
+# ifndef _REENT_GLOBAL_STDIO_STREAMS
   s->_stdin = __sfp(s);
   s->_stdout = __sfp(s);
   s->_stderr = __sfp(s);
+# else /* _REENT_GLOBAL_STDIO_STREAMS */
+  s->_stdin = &__sf[0];
+  s->_stdout = &__sf[1];
+  s->_stderr = &__sf[2];
+# endif /* _REENT_GLOBAL_STDIO_STREAMS */
 #endif
 
 #ifdef _REENT_GLOBAL_STDIO_STREAMS
@@ -282,11 +288,11 @@ __sinit (struct _reent *s)
     stdout_init (&__sf[1]);
     stderr_init (&__sf[2]);
   }
-#else
+#else /* _REENT_GLOBAL_STDIO_STREAMS */
   stdin_init (s->_stdin);
   stdout_init (s->_stdout);
   stderr_init (s->_stderr);
-#endif
+#endif /* _REENT_GLOBAL_STDIO_STREAMS */
 
   s->__sdidinit = 1;
 
