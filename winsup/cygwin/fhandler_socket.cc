@@ -6,47 +6,17 @@
    Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
    details. */
 
-#define  __INSIDE_CYGWIN_NET__
-#define USE_SYS_TYPES_FD_SET
-
 #include "winsup.h"
-#ifdef __x86_64__
-/* 2014-04-24: Current Mingw headers define sockaddr_in6 using u_long (8 byte)
-   because a redefinition for LP64 systems is missing.  This leads to a wrong
-   definition and size of sockaddr_in6 when building with winsock headers.
-   This definition is also required to use the right u_long type in subsequent
-   function calls. */
-#undef u_long
-#define u_long __ms_u_long
-#endif
-#include <ntsecapi.h>
-#include <ws2tcpip.h>
-#include <mswsock.h>
-#include <iphlpapi.h>
-#include "cygerrno.h"
-#include "security.h"
-#include "path.h"
-#include "fhandler.h"
-#include "dtable.h"
-#include "cygheap.h"
+#include <sys/socket.h>
 #include <asm/byteorder.h>
-#include "cygwin/version.h"
-#include "perprocess.h"
-#include "shared_info.h"
-#include "sigproc.h"
-#include "wininfo.h"
 #include <unistd.h>
 #include <sys/param.h>
 #include <sys/statvfs.h>
 #include <cygwin/acl.h>
-#include "cygtls.h"
-#include <sys/un.h>
-#include "ntdll.h"
-#include "miscfuncs.h"
+#include "cygerrno.h"
+#include "path.h"
+#include "fhandler.h"
 #include "tls_pbuf.h"
-
-#define ASYNC_MASK (FD_READ|FD_WRITE|FD_OOB|FD_ACCEPT|FD_CONNECT)
-#define EVENT_MASK (FD_READ|FD_WRITE|FD_OOB|FD_ACCEPT|FD_CONNECT|FD_CLOSE)
 
 extern "C" {
   int sscanf (const char *, const char *, ...);

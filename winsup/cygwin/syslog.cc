@@ -15,6 +15,7 @@ details. */
 #include <stdio.h>
 #include <syslog.h>
 #include <unistd.h>
+#include <sys/socket.h>
 #include <sys/un.h>
 #include "cygerrno.h"
 #include "security.h"

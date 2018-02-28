@@ -19,35 +19,21 @@ details. */
 #undef u_long
 #define u_long __ms_u_long
 #endif
-#include <ws2tcpip.h>
-#include <mswsock.h>
-#include <iphlpapi.h>
-#include "miscfuncs.h"
-#include <ctype.h>
-#include <wchar.h>
-#include <stdlib.h>
+#include <w32api/ws2tcpip.h>
+#include <w32api/mswsock.h>
+#include <w32api/iphlpapi.h>
 #define gethostname cygwin_gethostname
 #include <unistd.h>
 #undef gethostname
+#include <ifaddrs.h>
 #include <netdb.h>
-#include <cygwin/in.h>
 #include <asm/byteorder.h>
-#include <assert.h>
-#include "cygerrno.h"
-#include "security.h"
-#include "cygwin/version.h"
 #include "shared_info.h"
-#include "perprocess.h"
 #include "path.h"
 #include "fhandler.h"
 #include "dtable.h"
 #include "cygheap.h"
-#include "sigproc.h"
-#include "registry.h"
-#include "cygtls.h"
-#include "ifaddrs.h"
 #include "tls_pbuf.h"
-#include "ntdll.h"
 
 /* Unfortunately defined in Windows header files and arpa/nameser_compat.h. */
 #undef NOERROR
@@ -455,8 +441,6 @@ dup_ent (unionent *&dst, unionent *src, unionent::struct_type type)
 	      dp += DWORD_round (src->h_len);
 	    }
 	}
-      /* Sanity check that we did our bookkeeping correctly. */
-      assert ((dp - (char *) dst) == sz);
     }
   debug_printf ("duped %sent \"%s\", %p", entnames[type], dst ? dst->name : "<null!>", dst);
   return dst;
