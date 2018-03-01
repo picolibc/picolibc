@@ -182,42 +182,6 @@ dup3 (int oldfd, int newfd, int flags)
   return res;
 }
 
-/* Define macro to simplify checking for a transactional error code. */
-#define NT_TRANSACTIONAL_ERROR(s)	\
-		(((ULONG)(s) >= (ULONG)STATUS_TRANSACTIONAL_CONFLICT) \
-		 && ((ULONG)(s) <= (ULONG)STATUS_TRANSACTION_NOT_ENLISTED))
-
-static inline void
-start_transaction (HANDLE &old_trans, HANDLE &trans)
-{
-  NTSTATUS status = NtCreateTransaction (&trans,
-				SYNCHRONIZE | TRANSACTION_ALL_ACCESS,
-				NULL, NULL, NULL, 0, 0, 0, NULL, NULL);
-  if (NT_SUCCESS (status))
-    {
-      old_trans = RtlGetCurrentTransaction ();
-      RtlSetCurrentTransaction (trans);
-    }
-  else
-    {
-      debug_printf ("NtCreateTransaction failed, %y", status);
-      old_trans = trans = NULL;
-    }
-}
-
-static inline NTSTATUS
-stop_transaction (NTSTATUS status, HANDLE old_trans, HANDLE &trans)
-{
-  RtlSetCurrentTransaction (old_trans);
-  if (NT_SUCCESS (status))
-    status = NtCommitTransaction (trans, TRUE);
-  else
-    status = NtRollbackTransaction (trans, TRUE);
-  NtClose (trans);
-  trans = NULL;
-  return status;
-}
-
 static const char desktop_ini[] =
   "[.ShellClassInfo]\r\n"
   "CLSID={645FF040-5081-101B-9F08-00AA002F954E}\r\n"

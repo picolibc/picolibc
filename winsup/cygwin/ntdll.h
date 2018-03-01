@@ -14,6 +14,10 @@
 /* custom status code: */
 #define STATUS_ILLEGAL_DLL_PSEUDO_RELOCATION ((NTSTATUS) 0xe0000269)
 
+/* Simplify checking for a transactional error code. */
+#define NT_TRANSACTIONAL_ERROR(s)	\
+		(((ULONG)(s) >= (ULONG)STATUS_TRANSACTIONAL_CONFLICT) \
+		 && ((ULONG)(s) <= (ULONG)STATUS_TRANSACTION_NOT_ENLISTED))
 
 #define NtCurrentProcess() ((HANDLE) (LONG_PTR) -1)
 #define NtCurrentThread()  ((HANDLE) (LONG_PTR) -2)
@@ -1600,6 +1604,37 @@ extern "C"
 				     &ebi, sizeof ebi, NULL))
 	   && ebi.SignalState != 0;
 
+  }
+
+  static inline void
+  start_transaction (HANDLE &old_trans, HANDLE &trans)
+  {
+    NTSTATUS status = NtCreateTransaction (&trans,
+				  SYNCHRONIZE | TRANSACTION_ALL_ACCESS,
+				  NULL, NULL, NULL, 0, 0, 0, NULL, NULL);
+    if (NT_SUCCESS (status))
+      {
+	old_trans = RtlGetCurrentTransaction ();
+	RtlSetCurrentTransaction (trans);
+      }
+    else
+      {
+	debug_printf ("NtCreateTransaction failed, %y", status);
+	old_trans = trans = NULL;
+      }
+  }
+
+  static inline NTSTATUS
+  stop_transaction (NTSTATUS status, HANDLE old_trans, HANDLE &trans)
+  {
+    RtlSetCurrentTransaction (old_trans);
+    if (NT_SUCCESS (status))
+      status = NtCommitTransaction (trans, TRUE);
+    else
+      status = NtRollbackTransaction (trans, TRUE);
+    NtClose (trans);
+    trans = NULL;
+    return status;
   }
 }
 #endif
