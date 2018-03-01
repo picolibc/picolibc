@@ -52,26 +52,20 @@
    declaration error with the XPG variant implemented herein. */
 #define basename basename
 #include "winsup.h"
-#include "miscfuncs.h"
-#include <ctype.h>
-#include <winioctl.h>
-#include <shlobj.h>
+#include <w32api/winioctl.h>
+#include <w32api/shlobj.h>
 #include <sys/param.h>
 #include <sys/cygwin.h>
+#include <wctype.h>
 #include "cygerrno.h"
-#include "security.h"
 #include "path.h"
 #include "fhandler.h"
 #include "dtable.h"
 #include "cygheap.h"
 #include "shared_info.h"
-#include "cygtls.h"
 #include "tls_pbuf.h"
 #include "environ.h"
-#include <assert.h>
-#include <ntdll.h>
-#include <wchar.h>
-#include <wctype.h>
+#include "uuid.h"
 #undef basename
 
 suffix_info stat_suffixes[] =
@@ -710,8 +704,6 @@ path_conv::check (const char *src, unsigned opt,
       /* This loop handles symlink expansion.  */
       for (;;)
 	{
-	  assert (src);
-
 	  is_relpath = !isabspath (src);
 	  error = normalize_posix_path (src, path_copy, tail);
 	  if (error > 0)
