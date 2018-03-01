@@ -817,8 +817,9 @@ class fhandler_socket_local: public fhandler_socket_wsock
   }
 };
 
-struct sun_name_t
+class sun_name_t
 {
+ public:
   __socklen_t un_len;
   union
     {
@@ -826,6 +827,22 @@ struct sun_name_t
       /* Allows 108 bytes sun_path plus trailing NUL */
       char _nul[sizeof (struct sockaddr_un) + 1];
     };
+  sun_name_t ()
+    {
+      un_len = 0;
+      un.sun_family = 0;
+      _nul[sizeof (struct sockaddr_un)] = '\0';
+    }
+  sun_name_t (const struct sockaddr *name, __socklen_t namelen)
+    {
+      un_len = namelen < (__socklen_t) sizeof un ? namelen : sizeof un;
+      memcpy (&un, name, un_len);
+      _nul[sizeof (struct sockaddr_un)] = '\0';
+    }
+
+  void *operator new (size_t) __attribute__ ((nothrow))
+    { return cmalloc_abort (HEAP_FHANDLER, sizeof (sun_name_t)); }
+  void operator delete (void *p) {cfree (p);}
 };
 
 class fhandler_socket_unix : public fhandler_socket

@@ -158,9 +158,9 @@ fhandler_socket_unix::fhandler_socket_unix () :
 fhandler_socket_unix::~fhandler_socket_unix ()
 {
   if (sun_path)
-    cfree (sun_path);
+    delete sun_path;
   if (peer_sun_path)
-    cfree (peer_sun_path);
+    delete peer_sun_path;
 }
 
 void
@@ -168,11 +168,7 @@ fhandler_socket_unix::set_sun_path (struct sockaddr_un *un, socklen_t unlen)
 {
   if (!un)
     sun_path = NULL;
-  sun_path = (struct sun_name_t *) cmalloc_abort (HEAP_FHANDLER,
-						  sizeof *sun_path);
-  sun_path->un_len = unlen;
-  memcpy (&sun_path->un, un, sizeof (*un));
-  sun_path->_nul[sizeof (struct sockaddr_un)] = '\0';
+  sun_path = new sun_name_t ((const struct sockaddr *) un, unlen);
 }
 
 void
@@ -181,11 +177,7 @@ fhandler_socket_unix::set_peer_sun_path (struct sockaddr_un *un,
 {
   if (!un)
     peer_sun_path = NULL;
-  peer_sun_path = (struct sun_name_t *) cmalloc_abort (HEAP_FHANDLER,
-						       sizeof *peer_sun_path);
-  peer_sun_path->un_len = unlen;
-  memcpy (&peer_sun_path->un, un, sizeof (*un));
-  peer_sun_path->_nul[sizeof (struct sockaddr_un)] = '\0';
+  peer_sun_path = new sun_name_t ((const struct sockaddr *) un, unlen);
 }
 
 void
