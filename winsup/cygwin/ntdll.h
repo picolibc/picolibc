@@ -8,18 +8,12 @@
 
 #pragma once
 
-#include <ntstatus.h>
+#include <w32api/ntstatus.h>
+
 
 /* custom status code: */
 #define STATUS_ILLEGAL_DLL_PSEUDO_RELOCATION ((NTSTATUS) 0xe0000269)
 
-/* As of March 2013, Mingw doesn't define these status codes yet. */
-#ifndef STATUS_NETWORK_OPEN_RESTRICTION
-#define STATUS_NETWORK_OPEN_RESTRICTION ((NTSTATUS)0xC0000201)
-#endif
-#ifndef STATUS_SYMLINK_CLASS_DISABLED
-#define STATUS_SYMLINK_CLASS_DISABLED ((NTSTATUS)0xC0000715)
-#endif
 
 #define NtCurrentProcess() ((HANDLE) (LONG_PTR) -1)
 #define NtCurrentThread()  ((HANDLE) (LONG_PTR) -2)
