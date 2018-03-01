@@ -10,6 +10,9 @@
 
 #include <w32api/ntstatus.h>
 
+/* Special values for Cygwin AF_UNIX socket reparse points. */
+#define IO_REPARSE_TAG_CYGUNIX	(0x00006375)
+#define CYGWIN_SOCKET_UUID	L"efc1714d-7b19-4407-bab3-c5b1f92cb88c"
 
 /* custom status code: */
 #define STATUS_ILLEGAL_DLL_PSEUDO_RELOCATION ((NTSTATUS) 0xe0000269)

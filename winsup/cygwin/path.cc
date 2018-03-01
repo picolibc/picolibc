@@ -951,8 +951,9 @@ path_conv::check (const char *src, unsigned opt,
 		      return;
 		    }
 		  fileattr = sym.fileattr;
-		  dev.parse (FH_LOCAL);
+		  dev.parse ((sym.pflags & PATH_REP) ? FH_UNIX : FH_LOCAL);
 		  dev.setfs (1);
+		  path_flags = sym.pflags;
 		  goto out;
 		}
 
@@ -2329,7 +2330,7 @@ check_reparse_point_target (HANDLE h, bool remote, PREPARSE_DATA_BUFFER rp,
 		rp->SymbolicLinkReparseBuffer.SubstituteNameLength);
       if ((rp->SymbolicLinkReparseBuffer.Flags & SYMLINK_FLAG_RELATIVE) ||
           check_reparse_point_string (psymbuf))
-	return 1;
+	return PATH_SYMLINK | PATH_REP;
     }
   else if (!remote && rp->ReparseTag == IO_REPARSE_TAG_MOUNT_POINT)
     {
@@ -2350,7 +2351,16 @@ check_reparse_point_target (HANDLE h, bool remote, PREPARSE_DATA_BUFFER rp,
 	  return -EPERM;
 	}
       if (check_reparse_point_string (psymbuf))
-	return 1;
+	return PATH_SYMLINK | PATH_REP;
+    }
+  else if (rp->ReparseTag == IO_REPARSE_TAG_CYGUNIX)
+    {
+      PREPARSE_GUID_DATA_BUFFER rgp = (PREPARSE_GUID_DATA_BUFFER) rp;
+      UUID uuid;
+
+      uuid_from_string (CYGWIN_SOCKET_UUID, uuid);
+      if (memcmp (&uuid, &rgp->ReparseGuid, sizeof (UUID)) == 0)
+	return PATH_SOCKET | PATH_REP;
     }
   return 0;
 }
@@ -2377,10 +2387,11 @@ symlink_info::check_reparse_point (HANDLE h, bool remote)
       fileattr &= ~FILE_ATTRIBUTE_REPARSE_POINT;
       return ret;
     }
-  /* ret is > 0, so it's a reparse point, path in symbuf. */
-  sys_wcstombs (srcbuf, SYMLINK_MAX + 7, symbuf.Buffer,
-		symbuf.Length / sizeof (WCHAR));
-  pflags |= PATH_SYMLINK | PATH_REP;
+  /* ret is > 0, so it's a known reparse point, path in symbuf. */
+  pflags |= ret;
+  if (ret & PATH_SYMLINK)
+    sys_wcstombs (srcbuf, SYMLINK_MAX + 7, symbuf.Buffer,
+		  symbuf.Length / sizeof (WCHAR));
   /* A symlink is never a directory. */
   fileattr &= ~FILE_ATTRIBUTE_DIRECTORY;
   return posixify (srcbuf);

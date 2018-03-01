@@ -192,7 +192,8 @@ class path_conv
   int is_fs_device () const {return isdevice () && is_fs_special ();}
   int is_fs_special () const {return dev.is_fs_special ();}
   int is_lnk_special () const {return is_fs_device () || isfifo () || is_lnk_symlink ();}
-  int issocket () const {return dev.is_device (FH_LOCAL);}
+  int issocket () const {return dev.is_device (FH_LOCAL)
+				|| dev.is_device (FH_UNIX);}
   int iscygexec () const {return path_flags & PATH_CYGWIN_EXEC;}
   int isopen () const {return path_flags & PATH_OPEN;}
   int isctty_capable () const {return path_flags & PATH_CTTY;}
