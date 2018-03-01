@@ -594,9 +594,9 @@ fhandler_base::open (int flags, mode_t mode)
 
   if (get_device () == FH_FS)
     {
-      /* Add the reparse point flag to native symlinks, otherwise we open the
-	 target, not the symlink.  This would break lstat. */
-      if (pc.is_rep_symlink ())
+      /* Add the reparse point flag to known repares points, otherwise we
+	 open the target, not the reparse point.  This would break lstat. */
+      if (pc.is_known_reparse_point ())
 	options |= FILE_OPEN_REPARSE_POINT;
 
       /* O_TMPFILE files are created with delete-on-close semantics, as well

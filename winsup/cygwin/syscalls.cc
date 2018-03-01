@@ -705,9 +705,9 @@ unlink_nt (path_conv &pc)
 		  pc.get_nt_native_path (), pc.isdir ());
   ACCESS_MASK access = DELETE;
   ULONG flags = FILE_OPEN_FOR_BACKUP_INTENT;
-  /* Add the reparse point flag to native symlinks, otherwise we remove the
-     target, not the symlink. */
-  if (pc.is_rep_symlink ())
+  /* Add the reparse point flag to known reparse points, otherwise we remove
+     the target, not the reparse point. */
+  if (pc.is_known_reparse_point ())
     flags |= FILE_OPEN_REPARSE_POINT;
 
   pc.get_object_attr (attr, sec_none_nih);
@@ -2477,7 +2477,8 @@ rename2 (const char *oldpath, const char *newpath, unsigned int flags)
 	ULONG sharing = FILE_SHARE_READ | FILE_SHARE_WRITE
 			| (oldpc.fs_is_samba () ? 0 : FILE_SHARE_DELETE);
 	ULONG flags = FILE_OPEN_FOR_BACKUP_INTENT
-		      | (oldpc.is_rep_symlink () ? FILE_OPEN_REPARSE_POINT : 0);
+		      | (oldpc.is_known_reparse_point ()
+			 ? FILE_OPEN_REPARSE_POINT : 0);
 	status = NtOpenFile (&fh, access,
 			     oldpc.get_object_attr (attr, sec_none_nih),
 			     &io, sharing, flags);
@@ -2541,7 +2542,7 @@ rename2 (const char *oldpath, const char *newpath, unsigned int flags)
 			       dstpc->get_object_attr (attr, sec_none_nih),
 			       &io, FILE_SHARE_VALID_FLAGS,
 			       FILE_OPEN_FOR_BACKUP_INTENT
-			       | (dstpc->is_rep_symlink ()
+			       | (dstpc->is_known_reparse_point ()
 				  ? FILE_OPEN_REPARSE_POINT : 0));
 	  if (!NT_SUCCESS (status))
 	    {
@@ -2575,7 +2576,7 @@ rename2 (const char *oldpath, const char *newpath, unsigned int flags)
 		     (removepc ?: dstpc)->get_object_attr (attr, sec_none_nih),
 		     &io, FILE_SHARE_VALID_FLAGS,
 		     FILE_OPEN_FOR_BACKUP_INTENT
-		     | ((removepc ?: dstpc)->is_rep_symlink ()
+		     | ((removepc ?: dstpc)->is_known_reparse_point ()
 			? FILE_OPEN_REPARSE_POINT : 0))))
 	{
 	  FILE_INTERNAL_INFORMATION ofii, nfii;
@@ -2651,7 +2652,7 @@ rename2 (const char *oldpath, const char *newpath, unsigned int flags)
 				     oldpc.get_object_attr (attr, sec_none_nih),
 				     &io, FILE_SHARE_VALID_FLAGS,
 				     FILE_OPEN_FOR_BACKUP_INTENT
-				     | (oldpc.is_rep_symlink ()
+				     | (oldpc.is_known_reparse_point ()
 					? FILE_OPEN_REPARSE_POINT : 0));
 	      if (NT_SUCCESS (status))
 		{

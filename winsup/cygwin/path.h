@@ -183,7 +183,7 @@ class path_conv
   }
   int issymlink () const {return path_flags & PATH_SYMLINK;}
   int is_lnk_symlink () const {return path_flags & PATH_LNK;}
-  int is_rep_symlink () const {return path_flags & PATH_REP;}
+  int is_known_reparse_point () const {return path_flags & PATH_REP;}
   int isdevice () const {return dev.not_device (FH_FS) && dev.not_device (FH_FIFO);}
   int isfifo () const {return dev.is_device (FH_FIFO);}
   int isspecial () const {return dev.not_device (FH_FS);}

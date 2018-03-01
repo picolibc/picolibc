@@ -1013,7 +1013,7 @@ path_conv::check (const char *src, unsigned opt,
 		  saw_symlinks = 1;
 		  if (component == 0 && !need_directory
 		      && (!(opt & PC_SYM_FOLLOW)
-			  || (is_rep_symlink ()
+			  || (is_known_reparse_point ()
 			      && (opt & PC_SYM_NOFOLLOW_REP))))
 		    {
 		      /* last component of path is a symlink. */

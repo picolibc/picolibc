@@ -1977,7 +1977,7 @@ readdir_get_ino (const char *path, bool dot_dot)
 				      pc.get_object_attr (attr, sec_none_nih),
 				      &io, FILE_SHARE_VALID_FLAGS,
 				      FILE_OPEN_FOR_BACKUP_INTENT
-				      | (pc.is_rep_symlink ()
+				      | (pc.is_known_reparse_point ()
 				      ? FILE_OPEN_REPARSE_POINT : 0)))
 	  )
     {
