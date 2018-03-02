@@ -604,35 +604,29 @@ fhandler_socket_unix::socketpair (int af, int type, int protocol, int flags,
 int
 fhandler_socket_unix::bind (const struct sockaddr *name, int namelen)
 {
-  __try
-    {
-      sun_name_t sun (name, namelen);
-      bool unnamed = (sun.un_len == sizeof sun.un.sun_family);
-      HANDLE pipe = NULL;
+  sun_name_t sun (name, namelen);
+  bool unnamed = (sun.un_len == sizeof sun.un.sun_family);
+  HANDLE pipe = NULL;
 
-      if (get_handle ())
-	{
-	  set_errno (EINVAL);
-	  __leave;
-	}
-      gen_pipe_name ();
-      pipe = create_pipe ();
-      if (pipe)
-	{
-	  file = unnamed ? autobind (&sun) : create_file (&sun);
-	  if (!file)
-	    {
-	      NtClose (pipe);
-	      __leave;
-	    }
-	  set_io_handle (pipe);
-	  set_sun_path (&sun);
-	  return 0;
-	}
+  /* If we have a handle, we're already bound. */
+  if (get_handle () || sun.un.sun_family != AF_UNIX)
+    {
+      set_errno (EINVAL);
+      return -1;
     }
-  __except (EFAULT) {}
-  __endtry
-  return -1;
+  gen_pipe_name ();
+  pipe = create_pipe ();
+  if (!pipe)
+    return -1;
+  file = unnamed ? autobind (&sun) : create_file (&sun);
+  if (!file)
+    {
+      NtClose (pipe);
+      return -1;
+    }
+  set_io_handle (pipe);
+  set_sun_path (&sun);
+  return 0;
 }
 
 int
