@@ -34,6 +34,14 @@ static int __unused
 get_inet_addr_unix (const struct sockaddr *in, int inlen,
 		    struct sockaddr_storage *out, int *outlen,
 		    int *type = NULL)
+GUID __cygwin_socket_guid = {
+  .Data1 = 0xefc1714d,
+  .Data2 = 0x7b19,
+  .Data3 = 0x4407,
+  .Data4 = { 0xba, 0xb3, 0xc5, 0xb1, 0xf9, 0x2c, 0xb8, 0x8c }
+};
+
+HANDLE
 {
   /* Check for abstract socket. */
   if (inlen >= (int) sizeof (in->sa_family) + 7

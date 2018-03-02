@@ -65,7 +65,6 @@
 #include "shared_info.h"
 #include "tls_pbuf.h"
 #include "environ.h"
-#include "uuid.h"
 #undef basename
 
 suffix_info stat_suffixes[] =
@@ -2356,10 +2355,8 @@ check_reparse_point_target (HANDLE h, bool remote, PREPARSE_DATA_BUFFER rp,
   else if (rp->ReparseTag == IO_REPARSE_TAG_CYGUNIX)
     {
       PREPARSE_GUID_DATA_BUFFER rgp = (PREPARSE_GUID_DATA_BUFFER) rp;
-      UUID uuid;
 
-      uuid_from_string (CYGWIN_SOCKET_UUID, uuid);
-      if (memcmp (&uuid, &rgp->ReparseGuid, sizeof (UUID)) == 0)
+      if (memcmp (CYGWIN_SOCKET_GUID, &rgp->ReparseGuid, sizeof (GUID)) == 0)
 	return PATH_SOCKET | PATH_REP;
     }
   return 0;
