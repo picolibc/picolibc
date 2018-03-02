@@ -451,7 +451,9 @@ fhandler_socket_unix::create_pipe ()
   ULONG max_instances;
   LARGE_INTEGER timeout;
 
-  access = GENERIC_READ | GENERIC_WRITE | SYNCHRONIZE;
+  access = GENERIC_READ | FILE_READ_ATTRIBUTES
+	   | GENERIC_WRITE |  FILE_WRITE_ATTRIBUTES
+	   | SYNCHRONIZE;
   sharing = FILE_SHARE_READ | FILE_SHARE_WRITE;
   InitializeObjectAttributes (&attr, pc.get_nt_native_path (), OBJ_INHERIT,
 			      NULL, NULL);
@@ -484,8 +486,11 @@ fhandler_socket_unix::create_pipe_instance ()
   ULONG max_instances;
   LARGE_INTEGER timeout;
 
-  access = GENERIC_READ | GENERIC_WRITE | SYNCHRONIZE;
+  access = GENERIC_READ | FILE_READ_ATTRIBUTES
+	   | GENERIC_WRITE |  FILE_WRITE_ATTRIBUTES
+	   | SYNCHRONIZE;
   sharing = FILE_SHARE_READ | FILE_SHARE_WRITE;
+  /* NPFS doesn't understand reopening by handle, unfortunately. */
   InitializeObjectAttributes (&attr, pc.get_nt_native_path (), OBJ_INHERIT,
 			      NULL, NULL);
   nonblocking = is_nonblocking () ? FILE_PIPE_COMPLETE_OPERATION
