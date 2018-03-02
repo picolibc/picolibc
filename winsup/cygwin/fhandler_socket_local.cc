@@ -1012,6 +1012,8 @@ fhandler_socket_local::accept4 (struct sockaddr *peer, int *len, int flags)
 		  *len = (int) sizeof (un.sun_family);
 		}
 	    }
+	  else
+	    fd.release ();
 	}
       if (ret == -1)
 	::closesocket (res);
