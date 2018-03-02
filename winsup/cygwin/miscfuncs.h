@@ -96,6 +96,8 @@ transform_chars (PUNICODE_STRING upath, USHORT start_idx)
 		   upath->Buffer + upath->Length / sizeof (WCHAR) - 1);
 }
 
+PWCHAR transform_chars_af_unix (PWCHAR, const char *, __socklen_t);
+
 /* Memory checking */
 int __reg2 check_invalid_virtual_addr (const void *s, unsigned sz);
 
