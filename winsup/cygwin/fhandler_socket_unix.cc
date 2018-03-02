@@ -270,7 +270,6 @@ int
 fhandler_socket_unix::open_reparse_point (sun_name_t *sun,
 					  PUNICODE_STRING pipe_name)
 {
-  /* TODO: Open reparse point and fetch type and pipe name */
   NTSTATUS status;
   HANDLE fh;
   OBJECT_ATTRIBUTES attr;
