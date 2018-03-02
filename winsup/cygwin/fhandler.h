@@ -848,6 +848,24 @@ class sun_name_t
 class fhandler_socket_unix : public fhandler_socket
 {
  protected:
+   HANDLE file;	/* Either NT symlink or reparse point */
+
+   HANDLE create_abstract_link (const sun_name_t *sun,
+				PUNICODE_STRING pipe_name);
+   HANDLE create_reparse_point (const sun_name_t *sun,
+				PUNICODE_STRING pipe_name);
+   HANDLE create_file (const sun_name_t *sun);
+   int open_abstract_link (sun_name_t *sun, PUNICODE_STRING pipe_name);
+   int open_reparse_point (sun_name_t *sun, PUNICODE_STRING pipe_name);
+   int open_file (sun_name_t *sun, int &type, PUNICODE_STRING pipe_name);
+   HANDLE autobind (sun_name_t *sun);
+   wchar_t get_type_char ();
+   void gen_pipe_name ();
+   void set_wait_state (DWORD wait_state);
+   HANDLE create_pipe ();
+   HANDLE create_pipe_instance ();
+
+ protected:
   sun_name_t *sun_path;
   sun_name_t *peer_sun_path;
   sun_name_t *get_sun_path () {return sun_path;}

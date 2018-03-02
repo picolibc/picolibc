@@ -21,19 +21,47 @@
 #include "path.h"
 #include "fhandler.h"
 #include "dtable.h"
+#include "cygheap.h"
 #include "hires.h"
 #include "shared_info.h"
 #include "ntdll.h"
 #include "miscfuncs.h"
 #include "tls_pbuf.h"
 
+/*
+   Abstract socket:
 
+     An abstract socket is represented by a symlink in the native
+     NT namespace, within the Cygin subdir in BasedNamedObjects.
+     So it's globally available but only exists as long as at least on
+     descriptor on the socket is open, as desired.
 
-/* cygwin internal: map sockaddr into internet domain address */
-static int __unused
-get_inet_addr_unix (const struct sockaddr *in, int inlen,
-		    struct sockaddr_storage *out, int *outlen,
-		    int *type = NULL)
+     The name of the symlink is: "af-unix-<sun_path>"
+
+     <sun_path> is the transposed sun_path string, including the leading
+     NUL.  The transposition is simplified in that it uses every byte
+     in the valid sun_path name as is, no extra multibyte conversion.
+     The content of the symlink is the name of the underlying pipe.
+
+  Named socket:
+
+    A named socket is represented by a reparse point with a Cygwin-specific
+    tag and GUID.  The GenericReparseBuffer content is the name of the
+    underlying pipe.
+
+  Pipe:
+
+    The pipe is named \\.\pipe\cygwin-<installation_key>-unix-[sd]-<uniq_id>
+
+    - <installation_key> is the 8 byte hex Cygwin installation key
+    - [sd] is s for SOCK_STREAM, d for SOCK_DGRAM
+    - <uniq_id> is an 8 byte hex unique number
+
+   Note: We use MAX_PATH here for convenience where sufficient.  It's
+   big enough to hold sun_path's as well as pipe names so we don't have
+   to use tmp_pathbuf as often.
+*/
+
 GUID __cygwin_socket_guid = {
   .Data1 = 0xefc1714d,
   .Data2 = 0x7b19,
@@ -42,17 +70,215 @@ GUID __cygwin_socket_guid = {
 };
 
 HANDLE
+fhandler_socket_unix::create_abstract_link (const sun_name_t *sun,
+					    PUNICODE_STRING pipe_name)
 {
-  /* Check for abstract socket. */
-  if (inlen >= (int) sizeof (in->sa_family) + 7
-      && in->sa_data[0] == '\0' && in->sa_data[1] == 'd'
-      && in->sa_data[6] == '\0')
+  WCHAR name[MAX_PATH];
+  OBJECT_ATTRIBUTES attr;
+  NTSTATUS status;
+  UNICODE_STRING uname;
+  HANDLE fh = NULL;
+
+  PWCHAR p = wcpcpy (name, L"af-unix-");
+  /* NUL bytes have no special meaning in an abstract socket name, so
+     we assume iso-8859-1 for simplicity and transpose the string.
+     transform_chars_af_unix is doing just that. */
+  transform_chars_af_unix (p, sun->un.sun_path, sun->un_len);
+  RtlInitUnicodeString (&uname, name);
+  InitializeObjectAttributes (&attr, &uname, OBJ_CASE_INSENSITIVE,
+			      get_shared_parent_dir (), NULL);
+  /* Fill symlink with name of pipe */
+  status = NtCreateSymbolicLinkObject (&fh, SYMBOLIC_LINK_ALL_ACCESS,
+				       &attr, pipe_name);
+  if (!NT_SUCCESS (status))
     {
-      /* TODO */
-      return 0;
+      if (status == STATUS_OBJECT_NAME_EXISTS
+	  || status == STATUS_OBJECT_NAME_COLLISION)
+	set_errno (EADDRINUSE);
+      else
+	__seterrno_from_nt_status (status);
+    }
+  return fh;
+}
+
+struct rep_pipe_name_t
+{
+  USHORT Length;
+  WCHAR  PipeName[1];
+};
+
+HANDLE
+fhandler_socket_unix::create_reparse_point (const sun_name_t *sun,
+					    PUNICODE_STRING pipe_name)
+{
+  ULONG access;
+  HANDLE old_trans = NULL, trans = NULL;
+  OBJECT_ATTRIBUTES attr;
+  IO_STATUS_BLOCK io;
+  NTSTATUS status;
+  HANDLE fh = NULL;
+  PREPARSE_GUID_DATA_BUFFER rp;
+  rep_pipe_name_t *rep_pipe_name;
+
+  const DWORD data_len = sizeof (*rep_pipe_name) + pipe_name->Length;
+
+  path_conv pc (sun->un.sun_path, PC_SYM_FOLLOW);
+  if (pc.error)
+    {
+      set_errno (pc.error);
+      return NULL;
+    }
+  if (pc.exists ())
+    {
+      set_errno (EADDRINUSE);
+      return NULL;
+    }
+ /* We will overwrite the DACL after the call to NtCreateFile.  This
+    requires READ_CONTROL and WRITE_DAC access, otherwise get_file_sd
+    and set_file_sd both have to open the file again.
+    FIXME: On remote NTFS shares open sometimes fails because even the
+    creator of the file doesn't have the right to change the DACL.
+    I don't know what setting that is or how to recognize such a share,
+    so for now we don't request WRITE_DAC on remote drives. */
+  access = DELETE | FILE_GENERIC_WRITE;
+  if (!pc.isremote ())
+    access |= READ_CONTROL | WRITE_DAC | WRITE_OWNER;
+  if ((pc.fs_flags () & FILE_SUPPORTS_TRANSACTIONS))
+    start_transaction (old_trans, trans);
+
+retry_after_transaction_error:
+  status = NtCreateFile (&fh, DELETE | FILE_GENERIC_WRITE,
+			 pc.get_object_attr (attr, sec_none_nih), &io,
+			 NULL, FILE_ATTRIBUTE_NORMAL, 0, FILE_CREATE,
+			 FILE_SYNCHRONOUS_IO_NONALERT
+			 | FILE_NON_DIRECTORY_FILE
+			 | FILE_OPEN_FOR_BACKUP_INTENT
+			 | FILE_OPEN_REPARSE_POINT,
+			 NULL, 0);
+  if (NT_TRANSACTIONAL_ERROR (status) && trans)
+    {
+      stop_transaction (status, old_trans, trans);
+      goto retry_after_transaction_error;
     }
 
-  path_conv pc (in->sa_data, PC_SYM_FOLLOW);
+  if (!NT_SUCCESS (status))
+    {
+      if (io.Information == FILE_EXISTS)
+	set_errno (EADDRINUSE);
+      else
+	__seterrno_from_nt_status (status);
+      goto out;
+    }
+  rp = (PREPARSE_GUID_DATA_BUFFER)
+       alloca (REPARSE_GUID_DATA_BUFFER_HEADER_SIZE + data_len);
+  rp->ReparseTag = IO_REPARSE_TAG_CYGUNIX;
+  rp->ReparseDataLength = data_len;
+  rp->Reserved = 0;
+  memcpy (&rp->ReparseGuid, CYGWIN_SOCKET_GUID, sizeof (GUID));
+  rep_pipe_name = (rep_pipe_name_t *) rp->GenericReparseBuffer.DataBuffer;
+  rep_pipe_name->Length = pipe_name->Length;
+  memcpy (rep_pipe_name->PipeName, pipe_name->Buffer, pipe_name->Length);
+  rep_pipe_name->PipeName[pipe_name->Length / sizeof (WCHAR)] = L'\0';
+  status = NtFsControlFile (fh, NULL, NULL, NULL, &io,
+			    FSCTL_SET_REPARSE_POINT, rp,
+			    REPARSE_GUID_DATA_BUFFER_HEADER_SIZE
+			    + rp->ReparseDataLength, NULL, 0);
+  if (NT_SUCCESS (status))
+    {
+      set_created_file_access (fh, pc, S_IRUSR | S_IWUSR
+				       | S_IRGRP | S_IWGRP
+				       | S_IROTH | S_IWOTH);
+      NtClose (fh);
+      /* We don't have to keep the file open, but the caller needs to
+         get a value != NULL to know the file creation went fine. */
+      fh = INVALID_HANDLE_VALUE;
+    }
+  else if (!trans)
+    {
+      FILE_DISPOSITION_INFORMATION fdi = { TRUE };
+
+      __seterrno_from_nt_status (status);
+      status = NtSetInformationFile (fh, &io, &fdi, sizeof fdi,
+				     FileDispositionInformation);
+      if (!NT_SUCCESS (status))
+	debug_printf ("Setting delete dispostion failed, status = %y",
+		      status);
+      NtClose (fh);
+      fh = NULL;
+    }
+
+out:
+  if (trans)
+    stop_transaction (status, old_trans, trans);
+  return fh;
+}
+
+HANDLE
+fhandler_socket_unix::create_file (const sun_name_t *sun)
+{
+  if (sun->un_len <= (socklen_t) sizeof (sa_family_t)
+      || (sun->un_len == 3 && sun->un.sun_path[0] == '\0')
+      || sun->un_len > (socklen_t) sizeof sun->un)
+    {
+      set_errno (EINVAL);
+      return NULL;
+    }
+  if (sun->un.sun_path[0] == '\0')
+    return create_abstract_link (sun, pc.get_nt_native_path ());
+  return create_reparse_point (sun, pc.get_nt_native_path ());
+}
+
+int
+fhandler_socket_unix::open_abstract_link (sun_name_t *sun,
+					  PUNICODE_STRING pipe_name)
+{
+  WCHAR name[MAX_PATH];
+  OBJECT_ATTRIBUTES attr;
+  NTSTATUS status;
+  UNICODE_STRING uname;
+  HANDLE fh;
+
+  PWCHAR p = wcpcpy (name, L"af-unix-");
+  p = transform_chars_af_unix (p, sun->un.sun_path, sun->un_len);
+  *p = L'\0';
+  RtlInitUnicodeString (&uname, name);
+  InitializeObjectAttributes (&attr, &uname, OBJ_CASE_INSENSITIVE,
+			      get_shared_parent_dir (), NULL);
+  status = NtOpenSymbolicLinkObject (&fh, SYMBOLIC_LINK_QUERY, &attr);
+  if (!NT_SUCCESS (status))
+    {
+      __seterrno_from_nt_status (status);
+      return -1;
+    }
+  if (pipe_name)
+    status = NtQuerySymbolicLinkObject (fh, pipe_name, NULL);
+  NtClose (fh);
+  if (pipe_name)
+    {
+      if (!NT_SUCCESS (status))
+	{
+	  __seterrno_from_nt_status (status);
+	  return -1;
+	}
+      /* Enforce NUL-terminated pipe name. */
+      pipe_name->Buffer[pipe_name->Length / sizeof (WCHAR)] = L'\0';
+    }
+  return 0;
+}
+
+int
+fhandler_socket_unix::open_reparse_point (sun_name_t *sun,
+					  PUNICODE_STRING pipe_name)
+{
+  /* TODO: Open reparse point and fetch type and pipe name */
+  NTSTATUS status;
+  HANDLE fh;
+  OBJECT_ATTRIBUTES attr;
+  IO_STATUS_BLOCK io;
+  PREPARSE_GUID_DATA_BUFFER rp;
+  tmp_pathbuf tp;
+
+  path_conv pc (sun->un.sun_path, PC_SYM_FOLLOW);
   if (pc.error)
     {
       set_errno (pc.error);
@@ -63,97 +289,220 @@ HANDLE
       set_errno (ENOENT);
       return -1;
     }
-  /* Do NOT test for the file being a socket file here.  The socket file
-     creation is not an atomic operation, so there is a chance that socket
-     files which are just in the process of being created are recognized
-     as non-socket files.  To work around this problem we now create the
-     file with all sharing disabled.  If the below NtOpenFile fails
-     with STATUS_SHARING_VIOLATION we know that the file already exists,
-     but the creating process isn't finished yet.  So we yield and try
-     again, until we can either open the file successfully, or some error
-     other than STATUS_SHARING_VIOLATION occurs.
-     Since we now don't know if the file is actually a socket file, we
-     perform this check here explicitely. */
-  NTSTATUS status;
-  HANDLE fh;
-  OBJECT_ATTRIBUTES attr;
-  IO_STATUS_BLOCK io;
-
   pc.get_object_attr (attr, sec_none_nih);
   do
     {
       status = NtOpenFile (&fh, GENERIC_READ | SYNCHRONIZE, &attr, &io,
 			   FILE_SHARE_VALID_FLAGS,
 			   FILE_SYNCHRONOUS_IO_NONALERT
+			   | FILE_NON_DIRECTORY_FILE
 			   | FILE_OPEN_FOR_BACKUP_INTENT
-			   | FILE_NON_DIRECTORY_FILE);
+			   | FILE_OPEN_REPARSE_POINT);
       if (status == STATUS_SHARING_VIOLATION)
-	{
-	  /* While we hope that the sharing violation is only temporary, we
-	     also could easily get stuck here, waiting for a file in use by
-	     some greedy Win32 application.  Therefore we should never wait
-	     endlessly without checking for signals and thread cancel event. */
-	  pthread_testcancel ();
-	  if (cygwait (NULL, cw_nowait, cw_sig_eintr) == WAIT_SIGNALED
-	      && !_my_tls.call_signal_handler ())
-	    {
-	      set_errno (EINTR);
-	      return -1;
-	    }
-	  yield ();
-	}
+        {
+          /* While we hope that the sharing violation is only temporary, we
+             also could easily get stuck here, waiting for a file in use by
+             some greedy Win32 application.  Therefore we should never wait
+             endlessly without checking for signals and thread cancel event. */
+          pthread_testcancel ();
+          if (cygwait (NULL, cw_nowait, cw_sig_eintr) == WAIT_SIGNALED
+              && !_my_tls.call_signal_handler ())
+            {
+              set_errno (EINTR);
+              return -1;
+            }
+          yield ();
+        }
       else if (!NT_SUCCESS (status))
-	{
-	  __seterrno_from_nt_status (status);
-	  return -1;
-	}
+        {
+          __seterrno_from_nt_status (status);
+          return -1;
+        }
     }
   while (status == STATUS_SHARING_VIOLATION);
-  /* Now test for the SYSTEM bit. */
-  FILE_BASIC_INFORMATION fbi;
-  status = NtQueryInformationFile (fh, &io, &fbi, sizeof fbi,
-				   FileBasicInformation);
-  if (!NT_SUCCESS (status))
-    {
-      __seterrno_from_nt_status (status);
-      return -1;
-    }
-  if (!(fbi.FileAttributes & FILE_ATTRIBUTE_SYSTEM))
-    {
-      NtClose (fh);
-      set_errno (EBADF);
-      return -1;
-    }
-  /* Eventually check the content and fetch the required information. */
-  char buf[128];
-  memset (buf, 0, sizeof buf);
-  status = NtReadFile (fh, NULL, NULL, NULL, &io, buf, 128, NULL, NULL);
+  rp = (PREPARSE_GUID_DATA_BUFFER) tp.c_get ();
+  status = NtFsControlFile (fh, NULL, NULL, NULL, &io, FSCTL_GET_REPARSE_POINT,
+			    NULL, 0, rp, MAXIMUM_REPARSE_DATA_BUFFER_SIZE);
   NtClose (fh);
-  if (NT_SUCCESS (status))
+  if (rp->ReparseTag == IO_REPARSE_TAG_CYGUNIX
+      && memcmp (CYGWIN_SOCKET_GUID, &rp->ReparseGuid, sizeof (GUID)) == 0)
     {
-#if 0 /* TODO */
-      struct sockaddr_in sin;
-      char ctype;
-      sin.sin_family = AF_INET;
-      if (strncmp (buf, SOCKET_COOKIE, strlen (SOCKET_COOKIE)))
+      if (pipe_name)
 	{
-	  set_errno (EBADF);
-	  return -1;
+	  rep_pipe_name_t *rep_pipe_name = (rep_pipe_name_t *)
+					   rp->GenericReparseBuffer.DataBuffer;
+	  pipe_name->Length = rep_pipe_name->Length;
+	  /* pipe name in reparse point is NUL-terminated */
+	  memcpy (pipe_name->Buffer, rep_pipe_name->PipeName,
+		  rep_pipe_name->Length + sizeof (WCHAR));
 	}
-      sscanf (buf + strlen (SOCKET_COOKIE), "%hu %c", &sin.sin_port, &ctype);
-      sin.sin_port = htons (sin.sin_port);
-      sin.sin_addr.s_addr = htonl (INADDR_LOOPBACK);
-      memcpy (out, &sin, sizeof sin);
-      *outlen = sizeof sin;
-      if (type)
-	*type = (ctype == 's' ? SOCK_STREAM :
-		 ctype == 'd' ? SOCK_DGRAM
-			      : 0);
-#endif
       return 0;
     }
-  __seterrno_from_nt_status (status);
   return -1;
+}
+
+int
+fhandler_socket_unix::open_file (sun_name_t *sun, int &type,
+				 PUNICODE_STRING pipe_name)
+{
+  int ret = -1;
+
+  if (sun->un_len <= (socklen_t) sizeof (sa_family_t)
+      || (sun->un_len == 3 && sun->un.sun_path[0] == '\0')
+      || sun->un_len > (socklen_t) sizeof sun->un)
+    set_errno (EINVAL);
+  else if (sun->un.sun_path[0] == '\0')
+    ret = open_abstract_link (sun, pipe_name);
+  else
+    ret = open_reparse_point (sun, pipe_name);
+  if (!ret)
+    switch (pipe_name->Buffer[38])
+      {
+      case 'd':
+	type = SOCK_DGRAM;
+	break;
+      case 's':
+	type = SOCK_STREAM;
+	break;
+      default:
+	set_errno (EINVAL);
+	ret = -1;
+	break;
+      }
+  return ret;
+}
+
+HANDLE
+fhandler_socket_unix::autobind (sun_name_t* sun)
+{
+  uint32_t id;
+  HANDLE fh;
+
+  do
+    {
+      /* Use only 5 hex digits (up to 2^20 sockets) for Linux compat */
+      set_unique_id ();
+      id = get_unique_id () & 0xfffff;
+      sun->un.sun_path[0] = '\0';
+      sun->un_len = sizeof (sa_family_t)
+		    + 1 /* leading NUL */
+		    + __small_sprintf (sun->un.sun_path + 1, "%5X", id);
+    }
+  while ((fh = create_abstract_link (sun, pc.get_nt_native_path ())) == NULL);
+  return fh;
+}
+
+wchar_t
+fhandler_socket_unix::get_type_char ()
+{
+  switch (get_socket_type ())
+    {
+    case SOCK_STREAM:
+      return 's';
+    case SOCK_DGRAM:
+      return 'd';
+    default:
+      return '?';
+    }
+}
+
+void
+fhandler_socket_unix::gen_pipe_name ()
+{
+  WCHAR pipe_name_buf[MAX_PATH];
+  UNICODE_STRING pipe_name;
+
+  __small_swprintf (pipe_name_buf,
+		    L"\\Device\\NamedPipe\\cygwin-%S-unix-%C-%016_X",
+		    &cygheap->installation_key,
+		    get_type_char (),
+		    get_plain_ino ());
+  RtlInitUnicodeString (&pipe_name, pipe_name_buf);
+  pc.set_nt_native_path (&pipe_name);
+}
+
+void
+fhandler_socket_unix::set_wait_state (DWORD wait_state)
+{
+  if (get_handle ())
+    {
+      NTSTATUS status;
+      IO_STATUS_BLOCK io;
+      FILE_PIPE_INFORMATION fpi;
+
+      fpi.ReadMode = FILE_PIPE_MESSAGE_MODE;
+      fpi.CompletionMode = wait_state;
+      status = NtSetInformationFile (get_handle (), &io, &fpi, sizeof fpi,
+				     FilePipeInformation);
+      if (!NT_SUCCESS (status))
+	system_printf ("NtSetInformationFile(FilePipeInformation): %y", status);
+    }
+}
+
+HANDLE
+fhandler_socket_unix::create_pipe ()
+{
+  NTSTATUS status;
+  HANDLE ph;
+  ACCESS_MASK access;
+  OBJECT_ATTRIBUTES attr;
+  IO_STATUS_BLOCK io;
+  ULONG sharing;
+  ULONG nonblocking;
+  ULONG max_instances;
+  LARGE_INTEGER timeout;
+
+  access = GENERIC_READ | GENERIC_WRITE | SYNCHRONIZE;
+  sharing = FILE_SHARE_READ | FILE_SHARE_WRITE;
+  InitializeObjectAttributes (&attr, pc.get_nt_native_path (), OBJ_INHERIT,
+			      NULL, NULL);
+  nonblocking = is_nonblocking () ? FILE_PIPE_COMPLETE_OPERATION
+				  : FILE_PIPE_QUEUE_OPERATION;
+  max_instances = (get_socket_type () == SOCK_DGRAM) ? 1 : -1;
+  timeout.QuadPart = -500000;
+  status = NtCreateNamedPipeFile (&ph, access, &attr, &io, sharing,
+				  FILE_CREATE, FILE_SYNCHRONOUS_IO_NONALERT,
+				  FILE_PIPE_MESSAGE_TYPE,
+				  FILE_PIPE_MESSAGE_MODE,
+				  nonblocking, max_instances,
+				  PREFERRED_IO_BLKSIZE, PREFERRED_IO_BLKSIZE,
+				  &timeout);
+  if (!NT_SUCCESS (status))
+    system_printf ("NtCreateNamedPipeFile: %y", status);
+  return ph;
+}
+
+HANDLE
+fhandler_socket_unix::create_pipe_instance ()
+{
+  NTSTATUS status;
+  HANDLE ph;
+  ACCESS_MASK access;
+  OBJECT_ATTRIBUTES attr;
+  IO_STATUS_BLOCK io;
+  ULONG sharing;
+  ULONG nonblocking;
+  ULONG max_instances;
+  LARGE_INTEGER timeout;
+
+  access = GENERIC_READ | GENERIC_WRITE | SYNCHRONIZE;
+  sharing = FILE_SHARE_READ | FILE_SHARE_WRITE;
+  InitializeObjectAttributes (&attr, pc.get_nt_native_path (), OBJ_INHERIT,
+			      NULL, NULL);
+  nonblocking = is_nonblocking () ? FILE_PIPE_COMPLETE_OPERATION
+				  : FILE_PIPE_QUEUE_OPERATION;
+  max_instances = (get_socket_type () == SOCK_DGRAM) ? 1 : -1;
+  timeout.QuadPart = -500000;
+  status = NtCreateNamedPipeFile (&ph, access, &attr, &io, sharing,
+				  FILE_OPEN, FILE_SYNCHRONOUS_IO_NONALERT,
+				  FILE_PIPE_MESSAGE_TYPE,
+				  FILE_PIPE_MESSAGE_MODE,
+				  nonblocking, max_instances,
+				  PREFERRED_IO_BLKSIZE, PREFERRED_IO_BLKSIZE,
+				  &timeout);
+  if (!NT_SUCCESS (status))
+    system_printf ("NtCreateNamedPipeFile: %y", status);
+  return ph;
 }
 
 fhandler_socket_unix::fhandler_socket_unix () :
@@ -218,8 +567,16 @@ fhandler_socket_unix::socket (int af, int type, int protocol, int flags)
       set_errno (EPROTONOSUPPORT);
       return -1;
     }
-  set_errno (EAFNOSUPPORT);
-  return -1;
+  set_addr_family (af);
+  set_socket_type (type);
+  if (flags & SOCK_NONBLOCK)
+    set_nonblocking (true);
+  if (flags & SOCK_CLOEXEC)
+    set_close_on_exec (true);
+  set_io_handle (NULL);
+  set_unique_id ();
+  set_ino (get_unique_id ());
+  return 0;
 }
 
 int
@@ -243,7 +600,34 @@ fhandler_socket_unix::socketpair (int af, int type, int protocol, int flags,
 int
 fhandler_socket_unix::bind (const struct sockaddr *name, int namelen)
 {
-  set_errno (EAFNOSUPPORT);
+  __try
+    {
+      sun_name_t sun (name, namelen);
+      bool unnamed = (sun.un_len == sizeof sun.un.sun_family);
+      HANDLE pipe = NULL;
+
+      if (get_handle ())
+	{
+	  set_errno (EINVAL);
+	  __leave;
+	}
+      gen_pipe_name ();
+      pipe = create_pipe ();
+      if (pipe)
+	{
+	  file = unnamed ? autobind (&sun) : create_file (&sun);
+	  if (!file)
+	    {
+	      NtClose (pipe);
+	      __leave;
+	    }
+	  set_io_handle (pipe);
+	  set_sun_path (&sun);
+	  return 0;
+	}
+    }
+  __except (EFAULT) {}
+  __endtry
   return -1;
 }
 
@@ -312,8 +696,11 @@ fhandler_socket_unix::shutdown (int how)
 int
 fhandler_socket_unix::close ()
 {
-  set_errno (EAFNOSUPPORT);
-  return -1;
+  if (get_handle ())
+    NtClose (get_handle ());
+  if (file && file != INVALID_HANDLE_VALUE)
+    NtClose (file);
+  return 0;
 }
 
 int
