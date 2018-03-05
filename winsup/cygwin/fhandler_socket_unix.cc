@@ -69,6 +69,23 @@ GUID __cygwin_socket_guid = {
   .Data4 = { 0xba, 0xb3, 0xc5, 0xb1, 0xf9, 0x2c, 0xb8, 0x8c }
 };
 
+sun_name_t::sun_name_t ()
+{
+  un_len = sizeof (sa_family_t);
+  un.sun_family = AF_UNIX;
+  _nul[sizeof (struct sockaddr_un)] = '\0';
+}
+
+sun_name_t::sun_name_t (const struct sockaddr *name, socklen_t namelen)
+{
+  if (namelen < 0)
+    namelen = 0;
+  un_len = namelen < (__socklen_t) sizeof un ? namelen : sizeof un;
+  if (name)
+    memcpy (&un, name, un_len);
+  _nul[sizeof (struct sockaddr_un)] = '\0';
+}
+
 HANDLE
 fhandler_socket_unix::create_abstract_link (const sun_name_t *sun,
 					    PUNICODE_STRING pipe_name)
