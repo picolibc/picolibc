@@ -76,13 +76,21 @@ enum dirent_states
   dirent_info_mask	= 0x0078
 };
 
+enum bind_state
+{
+  unbound = 0,
+  bind_pending = 1,
+  bound = 2
+};
+
 enum conn_state
 {
   unconnected = 0,
   connect_pending = 1,
   connected = 2,
   listener = 3,
-  connect_failed = 4
+  connect_failed = 4	/* FIXME: Do we really need this?  It's basically
+				  the same thing as unconnected. */
 };
 
 enum line_edit_status
@@ -524,19 +532,26 @@ class fhandler_socket: public fhandler_base
     unsigned saw_shutdown_read     : 1; /* Socket saw a SHUT_RD */
     unsigned saw_shutdown_write    : 1; /* Socket saw a SHUT_WR */
     unsigned saw_reuseaddr	   : 1; /* Socket saw SO_REUSEADDR call */
-    unsigned connect_state	   : 3;
    public:
     status_flags () :
       async_io (0), saw_shutdown_read (0), saw_shutdown_write (0),
-      saw_reuseaddr (0), connect_state (unconnected)
+      saw_reuseaddr (0)
       {}
   } status;
+  LONG _connection_state;
+  LONG _binding_state;
  public:
   IMPLEMENT_STATUS_FLAG (bool, async_io)
   IMPLEMENT_STATUS_FLAG (bool, saw_shutdown_read)
   IMPLEMENT_STATUS_FLAG (bool, saw_shutdown_write)
   IMPLEMENT_STATUS_FLAG (bool, saw_reuseaddr)
-  IMPLEMENT_STATUS_FLAG (conn_state, connect_state)
+
+  conn_state connect_state (conn_state val)
+    { return (conn_state) InterlockedExchange (&_connection_state, val); }
+  conn_state connect_state () const { return (conn_state) _connection_state; }
+  bind_state binding_state (bind_state val)
+    { return (bind_state) InterlockedExchange (&_binding_state, val); }
+  bind_state binding_state () const { return (bind_state) _binding_state; }
 
  public:
   fhandler_socket ();
