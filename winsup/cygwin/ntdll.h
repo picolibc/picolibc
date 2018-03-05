@@ -1668,10 +1668,7 @@ extern "C"
 	RtlSetCurrentTransaction (trans);
       }
     else
-      {
-	debug_printf ("NtCreateTransaction failed, %y", status);
-	old_trans = trans = NULL;
-      }
+      old_trans = trans = NULL;
   }
 
   static inline NTSTATUS
