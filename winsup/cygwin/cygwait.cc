@@ -39,7 +39,8 @@ cygwait (HANDLE object, PLARGE_INTEGER timeout, unsigned mask)
     wait_objects[num++] = object;
 
   wait_signal_arrived thread_waiting (is_cw_sig_handle, wait_objects[num]);
-  debug_only_printf ("object %p, thread waiting %d, signal_arrived %p", object, (int) thread_waiting, _my_tls.signal_arrived);
+  debug_only_printf ("object %p, thread waiting %d, signal_arrived %p",
+		     object, (int) thread_waiting, _my_tls.signal_arrived);
   DWORD sig_n;
   if (!thread_waiting)
     sig_n = WAIT_TIMEOUT + 1;
