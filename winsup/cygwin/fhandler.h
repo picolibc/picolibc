@@ -852,6 +852,11 @@ class sun_name_t
 
 class fhandler_socket_unix : public fhandler_socket
 {
+   enum npfs_hdl_t
+   {
+     NPFS_DEVICE,
+     NPFS_DIR
+   };
  protected:
    HANDLE file;	/* Either NT symlink or reparse point */
 
@@ -873,6 +878,7 @@ class fhandler_socket_unix : public fhandler_socket
  protected:
   sun_name_t *sun_path;
   sun_name_t *peer_sun_path;
+  static NTSTATUS npfs_handle (HANDLE &nph, npfs_hdl_t type);
   sun_name_t *get_sun_path () {return sun_path;}
   sun_name_t *get_peer_sun_path () {return peer_sun_path;}
   void set_sun_path (struct sockaddr_un *un, __socklen_t unlen);

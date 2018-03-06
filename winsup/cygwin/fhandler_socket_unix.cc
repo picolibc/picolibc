@@ -41,12 +41,12 @@
      <sun_path> is the transposed sun_path string, including the leading
      NUL.  The transposition is simplified in that it uses every byte
      in the valid sun_path name as is, no extra multibyte conversion.
-     The content of the symlink is the name of the underlying pipe.
+     The content of the symlink is the basename of the underlying pipe.
 
   Named socket:
 
     A named socket is represented by a reparse point with a Cygwin-specific
-    tag and GUID.  The GenericReparseBuffer content is the name of the
+    tag and GUID.  The GenericReparseBuffer content is the basename of the
     underlying pipe.
 
   Pipe:
@@ -61,6 +61,8 @@
    big enough to hold sun_path's as well as pipe names so we don't have
    to use tmp_pathbuf as often.
 */
+/* Character length of pipe name, excluding trailing NUL. */
+#define CYGWIN_PIPE_SOCKET_NAME_LEN     47
 
 GUID __cygwin_socket_guid = {
   .Data1 = 0xefc1714d,
@@ -84,6 +86,23 @@ sun_name_t::sun_name_t (const struct sockaddr *name, socklen_t namelen)
   if (name)
     memcpy (&un, name, un_len);
   _nul[sizeof (struct sockaddr_un)] = '\0';
+}
+
+/* Character position encoding the socket type in a pipe name. */
+#define CYGWIN_PIPE_SOCKET_TYPE_POS	29
+
+void
+fhandler_socket_unix::gen_pipe_name ()
+{
+  WCHAR pipe_name_buf[CYGWIN_PIPE_SOCKET_NAME_LEN + 1];
+  UNICODE_STRING pipe_name;
+
+  __small_swprintf (pipe_name_buf, L"cygwin-%S-unix-%C-%016_X",
+		    &cygheap->installation_key,
+		    get_type_char (),
+		    get_plain_ino ());
+  RtlInitUnicodeString (&pipe_name, pipe_name_buf);
+  pc.set_nt_native_path (&pipe_name);
 }
 
 HANDLE
@@ -372,7 +391,7 @@ fhandler_socket_unix::open_file (sun_name_t *sun, int &type,
   else
     ret = open_reparse_point (sun, pipe_name);
   if (!ret)
-    switch (pipe_name->Buffer[38])
+    switch (pipe_name->Buffer[CYGWIN_PIPE_SOCKET_TYPE_POS])
       {
       case 'd':
 	type = SOCK_DGRAM;
@@ -423,22 +442,6 @@ fhandler_socket_unix::get_type_char ()
 }
 
 void
-fhandler_socket_unix::gen_pipe_name ()
-{
-  WCHAR pipe_name_buf[MAX_PATH];
-  UNICODE_STRING pipe_name;
-
-  __small_swprintf (pipe_name_buf,
-		    L"\\Device\\NamedPipe\\cygwin-%S-unix-%C-%016_X",
-		    &cygheap->installation_key,
-		    get_type_char (),
-		    get_plain_ino ());
-  RtlInitUnicodeString (&pipe_name, pipe_name_buf);
-  pc.set_nt_native_path (&pipe_name);
-}
-
-void
-fhandler_socket_unix::set_wait_state (DWORD wait_state)
 {
   if (get_handle ())
     {
@@ -452,13 +455,36 @@ fhandler_socket_unix::set_wait_state (DWORD wait_state)
 				     FilePipeInformation);
       if (!NT_SUCCESS (status))
 	system_printf ("NtSetInformationFile(FilePipeInformation): %y", status);
+NTSTATUS
+fhandler_socket_unix::npfs_handle (HANDLE &nph, npfs_hdl_t type)
+{
+  static NO_COPY HANDLE npfs_devh;
+  static NO_COPY HANDLE npfs_dirh;
+
+  HANDLE &npfs_ref = (type == NPFS_DEVICE) ? npfs_devh : npfs_dirh;
+  PUNICODE_STRING path = (type == NPFS_DEVICE) ? &ro_u_npfs : &ro_u_npfs_dir;
+  NTSTATUS status;
+  OBJECT_ATTRIBUTES attr;
+  IO_STATUS_BLOCK io;
+
+  if (!npfs_ref)
+    {
+      InitializeObjectAttributes (&attr, path, 0, NULL, NULL);
+      status = NtOpenFile (&npfs_ref, FILE_READ_ATTRIBUTES | SYNCHRONIZE,
+			   &attr, &io, FILE_SHARE_READ | FILE_SHARE_WRITE,
+			   FILE_SYNCHRONOUS_IO_NONALERT);
+      if (!NT_SUCCESS (status))
+	return status;
     }
+  nph = npfs_ref;
+  return STATUS_SUCCESS;
 }
 
 HANDLE
 fhandler_socket_unix::create_pipe ()
 {
   NTSTATUS status;
+  HANDLE npfsh;
   HANDLE ph;
   ACCESS_MASK access;
   OBJECT_ATTRIBUTES attr;
@@ -468,12 +494,19 @@ fhandler_socket_unix::create_pipe ()
   ULONG max_instances;
   LARGE_INTEGER timeout;
 
+  status = npfs_handle (npfsh, NPFS_DIR);
+  if (!NT_SUCCESS (status))
+    {
+      __seterrno_from_nt_status (status);
+      return NULL;
+    }
   access = GENERIC_READ | FILE_READ_ATTRIBUTES
 	   | GENERIC_WRITE |  FILE_WRITE_ATTRIBUTES
 	   | SYNCHRONIZE;
   sharing = FILE_SHARE_READ | FILE_SHARE_WRITE;
-  InitializeObjectAttributes (&attr, pc.get_nt_native_path (), OBJ_INHERIT,
-			      NULL, NULL);
+  InitializeObjectAttributes (&attr, pc.get_nt_native_path (),
+			      OBJ_INHERIT | OBJ_CASE_INSENSITIVE,
+			      npfsh, NULL);
   nonblocking = is_nonblocking () ? FILE_PIPE_COMPLETE_OPERATION
 				  : FILE_PIPE_QUEUE_OPERATION;
   max_instances = (get_socket_type () == SOCK_DGRAM) ? 1 : -1;
@@ -493,6 +526,7 @@ HANDLE
 fhandler_socket_unix::create_pipe_instance ()
 {
   NTSTATUS status;
+  HANDLE npfsh;
   HANDLE ph;
   ACCESS_MASK access;
   OBJECT_ATTRIBUTES attr;
@@ -502,13 +536,19 @@ fhandler_socket_unix::create_pipe_instance ()
   ULONG max_instances;
   LARGE_INTEGER timeout;
 
+  status = npfs_handle (npfsh, NPFS_DIR);
+  if (!NT_SUCCESS (status))
+    {
+      __seterrno_from_nt_status (status);
+      return NULL;
+    }
   access = GENERIC_READ | FILE_READ_ATTRIBUTES
 	   | GENERIC_WRITE |  FILE_WRITE_ATTRIBUTES
 	   | SYNCHRONIZE;
   sharing = FILE_SHARE_READ | FILE_SHARE_WRITE;
   /* NPFS doesn't understand reopening by handle, unfortunately. */
   InitializeObjectAttributes (&attr, pc.get_nt_native_path (), OBJ_INHERIT,
-			      NULL, NULL);
+			      npfsh, NULL);
   nonblocking = is_nonblocking () ? FILE_PIPE_COMPLETE_OPERATION
 				  : FILE_PIPE_QUEUE_OPERATION;
   max_instances = (get_socket_type () == SOCK_DGRAM) ? 1 : -1;
