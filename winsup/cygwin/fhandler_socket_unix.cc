@@ -57,8 +57,8 @@
     - [sd] is s for SOCK_STREAM, d for SOCK_DGRAM
     - <uniq_id> is an 8 byte hex unique number
 
-   Note: We use MAX_PATH here for convenience where sufficient.  It's
-   big enough to hold sun_path's as well as pipe names so we don't have
+   Note: We use MAX_PATH below for convenience where sufficient.  It's
+   big enough to hold sun_paths as well as pipe names so we don't have
    to use tmp_pathbuf as often.
 */
 /* Character length of pipe name, excluding trailing NUL. */
@@ -156,7 +156,8 @@ fhandler_socket_unix::create_reparse_point (const sun_name_t *sun,
   PREPARSE_GUID_DATA_BUFFER rp;
   rep_pipe_name_t *rep_pipe_name;
 
-  const DWORD data_len = sizeof (*rep_pipe_name) + pipe_name->Length;
+  const DWORD data_len = offsetof (rep_pipe_name_t, PipeName)
+			 + pipe_name->Length + sizeof (WCHAR);
 
   path_conv pc (sun->un.sun_path, PC_SYM_FOLLOW);
   if (pc.error)
@@ -221,9 +222,8 @@ retry_after_transaction_error:
 			    + rp->ReparseDataLength, NULL, 0);
   if (NT_SUCCESS (status))
     {
-      set_created_file_access (fh, pc, S_IRUSR | S_IWUSR
-				       | S_IRGRP | S_IWGRP
-				       | S_IROTH | S_IWOTH);
+      mode_t perms = (S_IRWXU | S_IRWXG | S_IRWXO) & ~cygheap->umask;
+      set_created_file_access (fh, pc, perms);
       NtClose (fh);
       /* We don't have to keep the file open, but the caller needs to
          get a value != NULL to know the file creation went fine. */
@@ -253,8 +253,7 @@ HANDLE
 fhandler_socket_unix::create_file (const sun_name_t *sun)
 {
   if (sun->un_len <= (socklen_t) sizeof (sa_family_t)
-      || (sun->un_len == 3 && sun->un.sun_path[0] == '\0')
-      || sun->un_len > (socklen_t) sizeof sun->un)
+      || (sun->un_len == 3 && sun->un.sun_path[0] == '\0'))
     {
       set_errno (EINVAL);
       return NULL;
@@ -327,7 +326,7 @@ fhandler_socket_unix::open_reparse_point (sun_name_t *sun,
   pc.get_object_attr (attr, sec_none_nih);
   do
     {
-      status = NtOpenFile (&fh, GENERIC_READ | SYNCHRONIZE, &attr, &io,
+      status = NtOpenFile (&fh, FILE_GENERIC_READ, &attr, &io,
 			   FILE_SHARE_VALID_FLAGS,
 			   FILE_SYNCHRONOUS_IO_NONALERT
 			   | FILE_NON_DIRECTORY_FILE
@@ -383,8 +382,7 @@ fhandler_socket_unix::open_file (sun_name_t *sun, int &type,
   int ret = -1;
 
   if (sun->un_len <= (socklen_t) sizeof (sa_family_t)
-      || (sun->un_len == 3 && sun->un.sun_path[0] == '\0')
-      || sun->un_len > (socklen_t) sizeof sun->un)
+      || (sun->un_len == 3 && sun->un.sun_path[0] == '\0'))
     set_errno (EINVAL);
   else if (sun->un.sun_path[0] == '\0')
     ret = open_abstract_link (sun, pipe_name);
@@ -512,13 +510,13 @@ fhandler_socket_unix::create_pipe ()
   max_instances = (get_socket_type () == SOCK_DGRAM) ? 1 : -1;
   timeout.QuadPart = -500000;
   status = NtCreateNamedPipeFile (&ph, access, &attr, &io, sharing,
-				  FILE_CREATE, FILE_SYNCHRONOUS_IO_NONALERT,
+				  FILE_CREATE, 0,
 				  FILE_PIPE_MESSAGE_TYPE,
 				  FILE_PIPE_MESSAGE_MODE,
 				  nonblocking, max_instances,
 				  rmem (), wmem (), &timeout);
   if (!NT_SUCCESS (status))
-    system_printf ("NtCreateNamedPipeFile: %y", status);
+    __seterrno_from_nt_status (status);
   return ph;
 }
 
@@ -554,13 +552,13 @@ fhandler_socket_unix::create_pipe_instance ()
   max_instances = (get_socket_type () == SOCK_DGRAM) ? 1 : -1;
   timeout.QuadPart = -500000;
   status = NtCreateNamedPipeFile (&ph, access, &attr, &io, sharing,
-				  FILE_OPEN, FILE_SYNCHRONOUS_IO_NONALERT,
+				  FILE_OPEN, 0,
 				  FILE_PIPE_MESSAGE_TYPE,
 				  FILE_PIPE_MESSAGE_MODE,
 				  nonblocking, max_instances,
 				  rmem (), wmem (), &timeout);
   if (!NT_SUCCESS (status))
-    system_printf ("NtCreateNamedPipeFile: %y", status);
+    __seterrno_from_nt_status (status);
   return ph;
 }
 
@@ -715,12 +713,9 @@ fhandler_socket_unix::getsockname (struct sockaddr *name, int *namelen)
   if (get_sun_path ())
     memcpy (&sun, &get_sun_path ()->un, get_sun_path ()->un_len);
   else
-    {
-      sun.un_len = sizeof (sa_family_t);
-      sun.un.sun_family = AF_UNIX;
-      sun.un.sun_path[0] = '\0';
-    }
+    sun.un_len = 0;
   memcpy (name, &sun, MIN (*namelen, sun.un_len));
+  *namelen = sun.un_len;
   return 0;
 }
 
@@ -732,12 +727,9 @@ fhandler_socket_unix::getpeername (struct sockaddr *name, int *namelen)
   if (get_peer_sun_path ())
     memcpy (&sun, &get_peer_sun_path ()->un, get_peer_sun_path ()->un_len);
   else
-    {
-      sun.un_len = sizeof (sa_family_t);
-      sun.un.sun_family = AF_UNIX;
-      sun.un.sun_path[0] = '\0';
-    }
+    sun.un_len = 0;
   memcpy (name, &sun, MIN (*namelen, sun.un_len));
+  *namelen = sun.un_len;
   return 0;
 }
 
@@ -1013,7 +1005,7 @@ fhandler_socket_unix::getsockopt (int level, int optname, const void *optval,
 int
 fhandler_socket_unix::ioctl (unsigned int cmd, void *p)
 {
-  int ret;
+  int ret = -1;
 
   switch (cmd)
     {
