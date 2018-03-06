@@ -67,4 +67,5 @@ class hires_ms : public hires_base
 };
 
 extern hires_ms gtod;
+extern hires_ns ntod;
 #endif /*__HIRES_H__*/
