@@ -60,7 +60,70 @@
    Note: We use MAX_PATH below for convenience where sufficient.  It's
    big enough to hold sun_paths as well as pipe names so we don't have
    to use tmp_pathbuf as often.
+
+   Every packet sent to a peer is a combination of the socket name of the
+   local socket, the ancillary data, and the actual user data.  The data
+   is always sent in this order.  The header contains length information
+   for the entire packet, as well as for all three data blocks.  The
+   combined maximum size of a packet is 64K, including the header.
+
+   A connecting, bound STREAM socket send it's local sun_path once after
+   a successful connect.  An already connected socket also sends its local
+   sun_path after a successful bind (border case, but still...).  These
+   packages don't contain any other data (cmsg_len == 0, data_len == 0).
+
+   A bound DGRAM socket send its sun_path with each sendmsg/sendto.
 */
+class af_unix_pkt_hdr_t
+{
+ public:
+  uint16_t	pckt_len;	/* size of packet including header	*/
+  uint8_t	shut_info;	/* shutdown info.  SHUT_RD means
+				   SHUT_RD on the local side, so the
+				   peer must not send further packets,
+				   vice versa for SHUT_WR.   SHUT_RDWR
+				   is followed by closing the pipe
+				   handle. */
+  uint8_t	name_len;	/* size of name, a sockaddr_un		*/
+  uint16_t	cmsg_len;	/* size of ancillary data block		*/
+  uint16_t	data_len;	/* size of user data			*/
+
+  void init (uint8_t s, uint8_t n, uint16_t c, uint16_t d)
+    {
+      shut_info = s;
+      name_len = n;
+      cmsg_len = c;
+      data_len = d;
+      pckt_len = sizeof (*this) + name_len + cmsg_len + data_len;
+    }
+};
+
+#define AF_UNIX_PKT_OFFSETOF_NAME(phdr)	\
+	(sizeof (af_unix_pkt_hdr_t))
+#define AF_UNIX_PKT_OFFSETOF_CMSG(phdr)	\
+	(sizeof (af_unix_pkt_hdr_t) + (phdr)->name_len)
+#define AF_UNIX_PKT_OFFSETOF_DATA(phdr)	\
+	({ \
+	   af_unix_pkt_hdr_t *_p = phdr; \
+	   sizeof (af_unix_pkt_hdr_t) + (_p)->name_len + (_p)->cmsg_len; \
+	})
+#define AF_UNIX_PKT_NAME(phdr) \
+	({ \
+	   af_unix_pkt_hdr_t *_p = phdr; \
+	   (struct sockaddr_un *)(((PBYTE)(_p)) \
+				  + AF_UNIX_PKT_OFFSETOF_NAME (_p)); \
+	})
+#define AF_UNIX_PKT_CMSG(phdr) \
+	({ \
+	   af_unix_pkt_hdr_t *_p = phdr; \
+	   (void *)(((PBYTE)(_p)) + AF_UNIX_PKT_OFFSETOF_CMSG (_p)); \
+	})
+#define AF_UNIX_PKT_DATA(phdr) \
+	({ \
+	   af_unix_pkt_hdr_t _p = phdr; \
+	   (void *)(((PBYTE)(_p)) + AF_UNIX_PKT_OFFSETOF_DATA (_p)); \
+	})
+
 /* Character length of pipe name, excluding trailing NUL. */
 #define CYGWIN_PIPE_SOCKET_NAME_LEN     47
 
@@ -439,7 +502,9 @@ fhandler_socket_unix::get_type_char ()
     }
 }
 
+/* This also sets the pipe to message mode unconditionally. */
 void
+fhandler_socket_unix::set_pipe_non_blocking (bool nonblocking)
 {
   if (get_handle ())
     {
@@ -448,11 +513,94 @@ void
       FILE_PIPE_INFORMATION fpi;
 
       fpi.ReadMode = FILE_PIPE_MESSAGE_MODE;
-      fpi.CompletionMode = wait_state;
+      fpi.CompletionMode = nonblocking ? FILE_PIPE_COMPLETE_OPERATION
+				       : FILE_PIPE_QUEUE_OPERATION;
       status = NtSetInformationFile (get_handle (), &io, &fpi, sizeof fpi,
 				     FilePipeInformation);
       if (!NT_SUCCESS (status))
-	system_printf ("NtSetInformationFile(FilePipeInformation): %y", status);
+	debug_printf ("NtSetInformationFile(FilePipeInformation): %y", status);
+    }
+}
+
+int
+fhandler_socket_unix::send_my_name ()
+{
+  size_t name_len = 0;
+  af_unix_pkt_hdr_t *packet;
+  NTSTATUS status;
+  IO_STATUS_BLOCK io;
+
+  AcquireSRWLockShared (&bind_lock);
+  name_len = get_sun_path ()->un_len;
+  packet = (af_unix_pkt_hdr_t *) alloca (sizeof *packet + name_len);
+  memcpy (AF_UNIX_PKT_NAME (packet), &get_sun_path ()->un, name_len);
+  ReleaseSRWLockShared (&bind_lock);
+
+  packet->init (0, name_len, 0, 0);
+
+  /* The theory: Fire and forget. */
+  AcquireSRWLockExclusive (&io_lock);
+  set_pipe_non_blocking (true);
+  status = NtWriteFile (get_handle (), NULL, NULL, NULL, &io, packet,
+			packet->pckt_len, NULL, NULL);
+  set_pipe_non_blocking (is_nonblocking ());
+  ReleaseSRWLockExclusive (&io_lock);
+  if (!NT_SUCCESS (status))
+    {
+      debug_printf ("Couldn't send my name: NtWriteFile: %y", status);
+      return -1;
+    }
+  return 0;
+}
+
+/* Returns an error code.  Locking is not required, user space doesn't know
+   about this socket yet. */
+int
+fhandler_socket_unix::recv_peer_name ()
+{
+  NTSTATUS status;
+  IO_STATUS_BLOCK io;
+  af_unix_pkt_hdr_t *packet;
+  struct sockaddr_un *un;
+  ULONG len;
+  int ret = 0;
+
+  len = sizeof *packet + sizeof *un;
+  packet = (af_unix_pkt_hdr_t *) alloca (len);
+  set_pipe_non_blocking (false);
+  status = NtReadFile (get_handle (), NULL, NULL, NULL, &io, packet, len,
+		       NULL, NULL);
+  if (status == STATUS_PENDING)
+    {
+      DWORD ret;
+      LARGE_INTEGER timeout;
+
+      timeout.QuadPart = -20 * NS100PERSEC;	/* 20 secs */
+      ret = cygwait (connect_wait_thr, &timeout, cw_sig_eintr);
+      switch (ret)
+	{
+	case WAIT_OBJECT_0:
+	  status = io.Status;
+	  break;
+	case WAIT_TIMEOUT:
+	  ret = ECONNABORTED;
+	  break;
+	case WAIT_SIGNALED:
+	  ret = EINTR;
+	  break;
+	default:
+	  ret = EPROTO;
+	  break;
+	}
+    }
+  if (!NT_SUCCESS (status) && ret == 0)
+    ret = geterrno_from_nt_status (status);
+  if (ret == 0 && packet->name_len > 0)
+    set_peer_sun_path (AF_UNIX_PKT_NAME (packet), packet->name_len);
+  set_pipe_non_blocking (is_nonblocking ());
+  return ret;
+}
+
 NTSTATUS
 fhandler_socket_unix::npfs_handle (HANDLE &nph, npfs_hdl_t type)
 {
@@ -562,24 +710,189 @@ fhandler_socket_unix::create_pipe_instance ()
   return ph;
 }
 
-fhandler_socket_unix::fhandler_socket_unix () :
-  sun_path (NULL),
-  peer_sun_path (NULL)
+NTSTATUS
+fhandler_socket_unix::open_pipe (HANDLE &ph, PUNICODE_STRING pipe_name)
 {
-  set_cred ();
+  NTSTATUS status;
+  HANDLE npfsh;
+  ACCESS_MASK access;
+  OBJECT_ATTRIBUTES attr;
+  IO_STATUS_BLOCK io;
+  ULONG sharing;
+
+  status = npfs_handle (npfsh, NPFS_DIR);
+  if (!NT_SUCCESS (status))
+    return status;
+  access = GENERIC_READ | GENERIC_WRITE | SYNCHRONIZE;
+  InitializeObjectAttributes (&attr, pipe_name, OBJ_INHERIT, npfsh, NULL);
+  sharing = FILE_SHARE_READ | FILE_SHARE_WRITE;
+  status = NtOpenFile (&ph, access, &attr, &io, sharing, 0);
+  if (NT_SUCCESS (status))
+    {
+      set_io_handle (ph);
+      send_my_name ();
+    }
+  return status;
 }
 
-fhandler_socket_unix::~fhandler_socket_unix ()
+struct conn_wait_info_t
 {
-  if (sun_path)
-    delete sun_path;
-  if (peer_sun_path)
-    delete peer_sun_path;
+  fhandler_socket_unix *fh;
+  UNICODE_STRING pipe_name;
+  WCHAR pipe_name_buf[CYGWIN_PIPE_SOCKET_NAME_LEN + 1];
+};
+
+/* Just hop to the wait_pipe_thread method. */
+DWORD WINAPI
+connect_wait_func (LPVOID param)
+{
+  conn_wait_info_t *wait_info = (conn_wait_info_t *) param;
+  return wait_info->fh->wait_pipe_thread (&wait_info->pipe_name);
+}
+
+/* Start a waiter thread to wait for a pipe instance to become available.
+   in blocking mode, wait for the thread to finish.  In nonblocking mode
+   just return with errno set to EINPROGRESS. */
+int
+fhandler_socket_unix::wait_pipe (PUNICODE_STRING pipe_name)
+{
+  conn_wait_info_t *wait_info;
+  DWORD waitret, err;
+  int ret = -1;
+
+  wait_info = (conn_wait_info_t *)
+	      cmalloc_abort (HEAP_FHANDLER, sizeof *wait_info);
+  wait_info->fh = this;
+  RtlInitEmptyUnicodeString (&wait_info->pipe_name, wait_info->pipe_name_buf,
+			     sizeof wait_info->pipe_name_buf);
+  RtlCopyUnicodeString (&wait_info->pipe_name, pipe_name);
+
+  cwt_param = (PVOID) wait_info;
+  connect_wait_thr = CreateThread (NULL, PREFERRED_IO_BLKSIZE,
+				   connect_wait_func, cwt_param, 0, NULL);
+  if (!connect_wait_thr)
+    {
+      cfree (wait_info);
+      __seterrno ();
+      return -1;
+    }
+  if (is_nonblocking ())
+    {
+      set_errno (EINPROGRESS);
+      return -1;
+    }
+
+  waitret = cygwait (connect_wait_thr, cw_infinite, cw_cancel | cw_sig_eintr);
+  if (waitret == WAIT_OBJECT_0)
+    GetExitCodeThread (connect_wait_thr, &err);
+  else
+    TerminateThread (connect_wait_thr, 0);
+  HANDLE thr = InterlockedExchangePointer (&connect_wait_thr, NULL);
+  if (thr)
+    CloseHandle (thr);
+  PVOID param = InterlockedExchangePointer (&cwt_param, NULL);
+  if (param)
+    cfree (param);
+  switch (waitret)
+    {
+    case WAIT_CANCELED:
+      pthread::static_cancel_self ();
+      /*NOTREACHED*/
+    case WAIT_SIGNALED:
+      set_errno (EINTR);
+      break;
+    default:
+      InterlockedExchange (&so_error, err);
+      if (err)
+	set_errno (err);
+      else
+	ret = 0;
+      break;
+    }
+  return ret;
+}
+
+int
+fhandler_socket_unix::connect_pipe (PUNICODE_STRING pipe_name)
+{
+  NTSTATUS status;
+  HANDLE ph = NULL;
+
+  /* Try connecting first.  If it doesn't work, wait for the pipe
+     to become available. */
+  status = open_pipe (ph, pipe_name);
+  if (status == STATUS_PIPE_BUSY)
+    return wait_pipe (pipe_name);
+  if (!NT_SUCCESS (status))
+    {
+      __seterrno_from_nt_status (status);
+      InterlockedExchange (&so_error, get_errno ());
+      return -1;
+    }
+  InterlockedExchange (&so_error, 0);
+  return 0;
+}
+
+int
+fhandler_socket_unix::listen_pipe ()
+{
+  NTSTATUS status;
+  IO_STATUS_BLOCK io;
+  OBJECT_ATTRIBUTES attr;
+  HANDLE evt = NULL;
+
+  io.Status = STATUS_PENDING;
+  if (!is_nonblocking ())
+    {
+      /* Create event object and set APC context pointer. */
+      InitializeObjectAttributes (&attr, NULL, 0, NULL, NULL);
+      status = NtCreateEvent (&evt, EVENT_ALL_ACCESS, &attr,
+			      NotificationEvent, FALSE);
+      if (!NT_SUCCESS (status))
+	{
+	  __seterrno_from_nt_status (status);
+	  return -1;
+	}
+    }
+  status = NtFsControlFile (get_handle (), evt, NULL, NULL, &io,
+			    FSCTL_PIPE_LISTEN, NULL, 0, NULL, 0);
+  if (status == STATUS_PENDING)
+    {
+      if (cygwait (evt ?: get_handle ()) == WAIT_OBJECT_0)
+	status = io.Status;
+    }
+  if (evt)
+    NtClose (evt);
+  if (status == STATUS_PIPE_LISTENING)
+    set_errno (EAGAIN);
+  else if (status != STATUS_PIPE_CONNECTED)
+    __seterrno_from_nt_status (status);
+  return (status == STATUS_PIPE_CONNECTED) ? 0 : -1;
+}
+
+int
+fhandler_socket_unix::disconnect_pipe (HANDLE ph)
+{
+  NTSTATUS status;
+  IO_STATUS_BLOCK io;
+
+  status = NtFsControlFile (ph, NULL, NULL, NULL, &io, FSCTL_PIPE_DISCONNECT,
+			    NULL, 0, NULL, 0);
+  if (status == STATUS_PENDING && cygwait (ph) == WAIT_OBJECT_0)
+    status = io.Status;
+  if (!NT_SUCCESS (status))
+    {
+      __seterrno_from_nt_status (status);
+      return -1;
+    }
+  return 0;
 }
 
 void
 fhandler_socket_unix::set_sun_path (struct sockaddr_un *un, socklen_t unlen)
 {
+  if (peer_sun_path)
+    delete peer_sun_path;
   if (!un)
     sun_path = NULL;
   sun_path = new sun_name_t ((const struct sockaddr *) un, unlen);
@@ -589,6 +902,8 @@ void
 fhandler_socket_unix::set_peer_sun_path (struct sockaddr_un *un,
 					 socklen_t unlen)
 {
+  if (peer_sun_path)
+    delete peer_sun_path;
   if (!un)
     peer_sun_path = NULL;
   peer_sun_path = new sun_name_t ((const struct sockaddr *) un, unlen);
@@ -602,13 +917,141 @@ fhandler_socket_unix::set_cred ()
   peer_cred.gid = (gid_t) -1;
 }
 
+void
+fhandler_socket_unix::fixup_after_fork (HANDLE parent)
+{
+  fhandler_socket::fixup_after_fork (parent);
+  if (backing_file_handle && backing_file_handle != INVALID_HANDLE_VALUE)
+    fork_fixup (parent, backing_file_handle, "backing_file_handle");
+  InitializeSRWLock (&conn_lock);
+  InitializeSRWLock (&bind_lock);
+  InitializeSRWLock (&io_lock);
+  connect_wait_thr = NULL;
+  cwt_param = NULL;
+}
+
+void
+fhandler_socket_unix::set_close_on_exec (bool val)
+{
+  fhandler_base::set_close_on_exec (val);
+  if (backing_file_handle && backing_file_handle != INVALID_HANDLE_VALUE)
+    set_no_inheritance (backing_file_handle, val);
+}
+
+/* ========================== public methods ========================= */
+
+fhandler_socket_unix::fhandler_socket_unix ()
+{
+  set_cred ();
+}
+
+fhandler_socket_unix::~fhandler_socket_unix ()
+{
+  if (sun_path)
+    delete sun_path;
+  if (peer_sun_path)
+    delete peer_sun_path;
+}
+
 int
 fhandler_socket_unix::dup (fhandler_base *child, int flags)
 {
   fhandler_socket_unix *fhs = (fhandler_socket_unix *) child;
   fhs->set_sun_path (get_sun_path ());
   fhs->set_peer_sun_path (get_peer_sun_path ());
+  InitializeSRWLock (&fhs->conn_lock);
+  InitializeSRWLock (&fhs->bind_lock);
+  InitializeSRWLock (&fhs->io_lock);
+  fhs->connect_wait_thr = NULL;
+  fhs->cwt_param = NULL;
   return fhandler_socket::dup (child, flags);
+}
+
+/* Waiter thread method.  Here we wait for a pipe instance to become
+   available and connect to it, if so.  This function is running
+   asynchronously if called on a non-blocking pipe.  The important
+   things to do:
+
+   - Set the peer pipe handle if successful
+   - Send own sun_path to peer if successful TODO
+   - Set connect_state
+   - Set so_error for later call to select
+*/
+DWORD
+fhandler_socket_unix::wait_pipe_thread (PUNICODE_STRING pipe_name)
+{
+  HANDLE npfsh;
+  LONG error = 0;
+  NTSTATUS status;
+  IO_STATUS_BLOCK io;
+  ULONG pwbuf_size;
+  PFILE_PIPE_WAIT_FOR_BUFFER pwbuf;
+  LONGLONG stamp;
+  HANDLE ph = NULL;
+
+  status = npfs_handle (npfsh, NPFS_DEVICE);
+  if (!NT_SUCCESS (status))
+    {
+      error = geterrno_from_nt_status (status);
+      goto out;
+    }
+  pwbuf_size = offsetof (FILE_PIPE_WAIT_FOR_BUFFER, Name) + pipe_name->Length;
+  pwbuf = (PFILE_PIPE_WAIT_FOR_BUFFER) alloca (pwbuf_size);
+  pwbuf->Timeout.QuadPart = -20 * NS100PERSEC;	/* 20 secs */
+  pwbuf->NameLength = pipe_name->Length;
+  pwbuf->TimeoutSpecified = TRUE;
+  memcpy (pwbuf->Name, pipe_name->Buffer, pipe_name->Length);
+  stamp = ntod.nsecs ();
+  do
+    {
+      status = NtFsControlFile (npfsh, NULL, NULL, NULL, &io, FSCTL_PIPE_WAIT,
+				pwbuf, pwbuf_size, NULL, 0);
+      switch (status)
+	{
+	  case STATUS_SUCCESS:
+	    {
+	      status = open_pipe (ph, pipe_name);
+	      if (status == STATUS_PIPE_BUSY)
+		{
+		  /* Another concurrent connect grabbed the pipe instance
+		     under our nose.  Fix the timeout value and go waiting
+		     again, unless the timeout has passed. */
+		  pwbuf->Timeout.QuadPart -= (stamp - ntod.nsecs ()) / 100LL;
+		  if (pwbuf->Timeout.QuadPart >= 0)
+		    {
+		      status = STATUS_IO_TIMEOUT;
+		      error = ETIMEDOUT;
+		    }
+		}
+	      else if (!NT_SUCCESS (status))
+		error = geterrno_from_nt_status (status);
+	    }
+	    break;
+	  case STATUS_OBJECT_NAME_NOT_FOUND:
+	    error = EADDRNOTAVAIL;
+	    break;
+	  case STATUS_IO_TIMEOUT:
+	    error = ETIMEDOUT;
+	    break;
+	  case STATUS_INSUFFICIENT_RESOURCES:
+	    error = ENOBUFS;
+	    break;
+	  case STATUS_INVALID_DEVICE_REQUEST:
+	  default:
+	    error = EIO;
+	    break;
+	}
+    }
+  while (status == STATUS_PIPE_BUSY);
+out:
+  PVOID param = InterlockedExchangePointer (&cwt_param, NULL);
+  if (param)
+    cfree (param);
+  AcquireSRWLockExclusive (&conn_lock);
+  InterlockedExchange (&so_error, error);
+  connect_state (error ? connect_failed : connected);
+  ReleaseSRWLockExclusive (&conn_lock);
+  return error;
 }
 
 int
@@ -656,6 +1099,9 @@ fhandler_socket_unix::socketpair (int af, int type, int protocol, int flags,
   return -1;
 }
 
+/* Bind creates the backing file, generates the pipe name and sets
+   bind_state.  On DGRAM sockets it also creates the pipe.  On STREAM
+   sockets either listen or connect will do that. */
 int
 fhandler_socket_unix::bind (const struct sockaddr *name, int namelen)
 {
@@ -663,46 +1109,253 @@ fhandler_socket_unix::bind (const struct sockaddr *name, int namelen)
   bool unnamed = (sun.un_len == sizeof sun.un.sun_family);
   HANDLE pipe = NULL;
 
-  /* If we have a handle, we're already bound. */
-  if (get_handle () || sun.un.sun_family != AF_UNIX)
+  if (sun.un.sun_family != AF_UNIX)
     {
       set_errno (EINVAL);
       return -1;
     }
-  gen_pipe_name ();
-  pipe = create_pipe ();
-  if (!pipe)
-    return -1;
-  file = unnamed ? autobind (&sun) : create_file (&sun);
-  if (!file)
+  AcquireSRWLockExclusive (&bind_lock);
+  if (binding_state () == bind_pending)
     {
-      NtClose (pipe);
+      set_errno (EALREADY);
+      ReleaseSRWLockExclusive (&bind_lock);
       return -1;
     }
-  set_io_handle (pipe);
+  if (binding_state () == bound)
+    {
+      set_errno (EINVAL);
+      ReleaseSRWLockExclusive (&bind_lock);
+      return -1;
+    }
+  binding_state (bind_pending);
+  ReleaseSRWLockExclusive (&bind_lock);
+  gen_pipe_name ();
+  if (get_socket_type () == SOCK_DGRAM)
+    {
+      pipe = create_pipe ();
+      if (!pipe)
+	{
+	  binding_state (unbound);
+	  return -1;
+	}
+      set_io_handle (pipe);
+    }
+  backing_file_handle = unnamed ? autobind (&sun) : create_file (&sun);
+  if (!backing_file_handle)
+    {
+      set_io_handle (NULL);
+      if (pipe)
+	NtClose (pipe);
+      binding_state (unbound);
+      return -1;
+    }
   set_sun_path (&sun);
+  /* If we're already connected, send name to peer. */
+  if (connect_state () == connected)
+    send_my_name ();
+  binding_state (bound);
   return 0;
 }
 
+/* Create pipe on non-DGRAM sockets and set conn_state to listener. */
 int
 fhandler_socket_unix::listen (int backlog)
 {
-  set_errno (EAFNOSUPPORT);
-  return -1;
+  if (get_socket_type () == SOCK_DGRAM)
+    {
+      set_errno (EOPNOTSUPP);
+      return -1;
+    }
+  AcquireSRWLockShared (&bind_lock);
+  while (binding_state () == bind_pending)
+    yield ();
+  if (binding_state () == unbound)
+    {
+      set_errno (EDESTADDRREQ);
+      ReleaseSRWLockShared (&bind_lock);
+      return -1;
+    }
+  ReleaseSRWLockShared (&bind_lock);
+  AcquireSRWLockExclusive (&conn_lock);
+  if (connect_state () != unconnected && connect_state () != connect_failed)
+    {
+      set_errno (connect_state () == listener ? EADDRINUSE : EINVAL);
+      ReleaseSRWLockExclusive (&conn_lock);
+      return -1;
+    }
+  if (get_socket_type () != SOCK_DGRAM)
+    {
+      HANDLE pipe = create_pipe ();
+      if (!pipe)
+	{
+	  connect_state (unconnected);
+	  return -1;
+	}
+      set_io_handle (pipe);
+    }
+  connect_state (listener);
+  ReleaseSRWLockExclusive (&conn_lock);
+  return 0;
 }
 
 int
 fhandler_socket_unix::accept4 (struct sockaddr *peer, int *len, int flags)
 {
-  set_errno (EAFNOSUPPORT);
+  if (get_socket_type () != SOCK_STREAM)
+    {
+      set_errno (EOPNOTSUPP);
+      return -1;
+    }
+  if (connect_state () != listener
+      || (peer && (!len || *len < (int) sizeof (sa_family_t))))
+    {
+      set_errno (EINVAL);
+      return -1;
+    }
+  if (listen_pipe () == 0)
+    {
+      /* Our handle is now connected with a client.  This handle is used
+         for the accepted socket.  Our handle has to be replaced with a
+	 new instance handle for the next accept. */
+      HANDLE accepted = get_handle ();
+      HANDLE new_inst = create_pipe_instance ();
+      int error = ENOBUFS;
+      if (new_inst)
+	{
+	  /* Set new io handle. */
+	  set_io_handle (new_inst);
+	  /* Prepare new file descriptor. */
+	  cygheap_fdnew fd;
+
+	  if (fd >= 0)
+	    {
+	      fhandler_socket_unix *sock = (fhandler_socket_unix *)
+					   build_fh_dev (dev ());
+	      if (sock)
+		{
+		  sock->set_addr_family (get_addr_family ());
+		  sock->set_socket_type (get_socket_type ());
+		  if (flags & SOCK_NONBLOCK)
+		    sock->set_nonblocking (true);
+		  if (flags & SOCK_CLOEXEC)
+		    sock->set_close_on_exec (true);
+		  sock->set_unique_id ();
+		  sock->set_ino (sock->get_unique_id ());
+		  sock->pc.set_nt_native_path (pc.get_nt_native_path ());
+		  sock->connect_state (connected);
+		  sock->binding_state (binding_state ());
+		  sock->set_io_handle (accepted);
+
+		  sock->set_sun_path (get_sun_path ());
+		  error = sock->recv_peer_name ();
+		  if (error == 0)
+		    {
+		      if (peer)
+			{
+			  sun_name_t *sun = sock->get_peer_sun_path ();
+			  if (sun)
+			    {
+			      memcpy (peer, &sun->un, MIN (*len, sun->un_len));
+			      *len = sun->un_len;
+			    }
+			  else if (len)
+			    *len = 0;
+			}
+		      fd = sock;
+		      if (fd <= 2)
+			set_std_handle (fd);
+		      return fd;
+		    }
+		  delete sock;
+		}
+	      fd.release ();
+	    }
+	}
+      /* Ouch!  We can't handle the client if we couldn't
+	 create a new instance to accept more connections.*/
+      disconnect_pipe (accepted);
+      set_errno (error);
+    }
   return -1;
 }
 
 int
 fhandler_socket_unix::connect (const struct sockaddr *name, int namelen)
 {
-  set_errno (EAFNOSUPPORT);
-  return -1;
+  sun_name_t sun (name, namelen);
+  int peer_type;
+  WCHAR pipe_name_buf[CYGWIN_PIPE_SOCKET_NAME_LEN + 1];
+  UNICODE_STRING pipe_name;
+
+  /* Test and set connection state. */
+  AcquireSRWLockExclusive (&conn_lock);
+  if (connect_state () == connect_pending)
+    {
+      set_errno (EALREADY);
+      ReleaseSRWLockExclusive (&conn_lock);
+      return -1;
+    }
+  if (connect_state () == listener)
+    {
+      set_errno (EADDRINUSE);
+      ReleaseSRWLockExclusive (&conn_lock);
+      return -1;
+    }
+  if (connect_state () == connected && get_socket_type () != SOCK_DGRAM)
+    {
+      set_errno (EISCONN);
+      ReleaseSRWLockExclusive (&conn_lock);
+      return -1;
+    }
+  connect_state (connect_pending);
+  ReleaseSRWLockExclusive (&conn_lock);
+  /* Check validity of name */
+  if (sun.un_len <= (int) sizeof (sa_family_t))
+    {
+      set_errno (EINVAL);
+      connect_state (unconnected);
+      return -1;
+    }
+  if (sun.un.sun_family != AF_UNIX)
+    {
+      set_errno (EAFNOSUPPORT);
+      connect_state (unconnected);
+      return -1;
+    }
+  if (sun.un_len == 3 && sun.un.sun_path[0] == '\0')
+    {
+      set_errno (EINVAL);
+      connect_state (unconnected);
+      return -1;
+    }
+  /* Check if peer address exists. */
+  RtlInitEmptyUnicodeString (&pipe_name, pipe_name_buf, sizeof pipe_name_buf);
+  if (open_file (&sun, peer_type, &pipe_name) < 0)
+    {
+      connect_state (unconnected);
+      return -1;
+    }
+  if (peer_type != get_socket_type ())
+    {
+      set_errno (EINVAL);
+      connect_state (unconnected);
+      return -1;
+    }
+  set_peer_sun_path (&sun);
+  if (get_socket_type () != SOCK_DGRAM)
+    {
+      if (connect_pipe (&pipe_name) < 0)
+	{
+	  if (get_errno () != EINPROGRESS)
+	    {
+	      set_peer_sun_path (NULL);
+	      connect_state (connect_failed);
+	    }
+	  return -1;
+	}
+    }
+  connect_state (connected);
+  return 0;
 }
 
 int
@@ -743,40 +1396,52 @@ fhandler_socket_unix::shutdown (int how)
 int
 fhandler_socket_unix::close ()
 {
+  HANDLE thr = InterlockedExchangePointer (&connect_wait_thr, NULL);
+  if (thr)
+    {
+      TerminateThread (thr, 0);
+      CloseHandle (thr);
+    }
+  PVOID param = InterlockedExchangePointer (&cwt_param, NULL);
+  if (param)
+    cfree (param);
   if (get_handle ())
     NtClose (get_handle ());
-  if (file && file != INVALID_HANDLE_VALUE)
-    NtClose (file);
+  if (backing_file_handle && backing_file_handle != INVALID_HANDLE_VALUE)
+    NtClose (backing_file_handle);
   return 0;
 }
 
 int
 fhandler_socket_unix::getpeereid (pid_t *pid, uid_t *euid, gid_t *egid)
 {
+  int ret = -1;
+
   if (get_socket_type () != SOCK_STREAM)
     {
       set_errno (EINVAL);
       return -1;
     }
+  AcquireSRWLockShared (&conn_lock);
   if (connect_state () != connected)
+    set_errno (ENOTCONN);
+  else
     {
-      set_errno (ENOTCONN);
-      return -1;
+      __try
+	{
+	  if (pid)
+	    *pid = peer_cred.pid;
+	  if (euid)
+	    *euid = peer_cred.uid;
+	  if (egid)
+	    *egid = peer_cred.gid;
+	  ret = 0;
+	}
+      __except (EFAULT) {}
+      __endtry
     }
-
-  __try
-    {
-      if (pid)
-	*pid = peer_cred.pid;
-      if (euid)
-	*euid = peer_cred.uid;
-      if (egid)
-	*egid = peer_cred.gid;
-      return 0;
-    }
-  __except (EFAULT) {}
-  __endtry
-  return -1;
+  ReleaseSRWLockShared (&conn_lock);
+  return ret;
 }
 
 ssize_t
@@ -905,7 +1570,10 @@ fhandler_socket_unix::getsockopt (int level, int optname, const void *optval,
 	case SO_ERROR:
 	  {
 	    int *e = (int *) optval;
-	    *e = 0;
+	    LONG err;
+
+	    err = InterlockedExchange (&so_error, 0);
+	    *e = err;
 	    break;
 	  }
 
@@ -1019,6 +1687,15 @@ fhandler_socket_unix::ioctl (unsigned int cmd, void *p)
     case _IOR('f', 127, int):
 #endif
     case FIONBIO:
+      {
+	const bool was_nonblocking = is_nonblocking ();
+	set_nonblocking (*(int *) p);
+	const bool now_nonblocking = is_nonblocking ();
+	if (was_nonblocking != now_nonblocking)
+	  set_pipe_non_blocking (now_nonblocking);
+	ret = 0;
+	break;
+      }
     case SIOCATMARK:
       break;
     default:
@@ -1031,7 +1708,7 @@ fhandler_socket_unix::ioctl (unsigned int cmd, void *p)
 int
 fhandler_socket_unix::fcntl (int cmd, intptr_t arg)
 {
-  int ret = 0;
+  int ret = -1;
 
   switch (cmd)
     {
@@ -1039,6 +1716,20 @@ fhandler_socket_unix::fcntl (int cmd, intptr_t arg)
       break;
     case F_GETOWN:
       break;
+    case F_SETFL:
+      {
+	const bool was_nonblocking = is_nonblocking ();
+	const int allowed_flags = O_APPEND | O_NONBLOCK_MASK;
+	int new_flags = arg & allowed_flags;
+	if ((new_flags & OLD_O_NDELAY) && (new_flags & O_NONBLOCK))
+	  new_flags &= ~OLD_O_NDELAY;
+	set_flags ((get_flags () & ~allowed_flags) | new_flags);
+	const bool now_nonblocking = is_nonblocking ();
+	if (was_nonblocking != now_nonblocking)
+	  set_pipe_non_blocking (now_nonblocking);
+	ret = 0;
+	break;
+      }
     default:
       ret = fhandler_socket::fcntl (cmd, arg);
       break;

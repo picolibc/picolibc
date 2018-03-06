@@ -857,28 +857,43 @@ class fhandler_socket_unix : public fhandler_socket
      NPFS_DEVICE,
      NPFS_DIR
    };
- protected:
-   HANDLE file;	/* Either NT symlink or reparse point */
-
-   HANDLE create_abstract_link (const sun_name_t *sun,
-				PUNICODE_STRING pipe_name);
-   HANDLE create_reparse_point (const sun_name_t *sun,
-				PUNICODE_STRING pipe_name);
-   HANDLE create_file (const sun_name_t *sun);
-   int open_abstract_link (sun_name_t *sun, PUNICODE_STRING pipe_name);
-   int open_reparse_point (sun_name_t *sun, PUNICODE_STRING pipe_name);
-   int open_file (sun_name_t *sun, int &type, PUNICODE_STRING pipe_name);
-   HANDLE autobind (sun_name_t *sun);
-   wchar_t get_type_char ();
-   void gen_pipe_name ();
-   void set_wait_state (DWORD wait_state);
-   HANDLE create_pipe ();
-   HANDLE create_pipe_instance ();
 
  protected:
+  SRWLOCK conn_lock;
+  SRWLOCK bind_lock;
+  SRWLOCK io_lock;
+  HANDLE backing_file_handle;	/* Either NT symlink or INVALID_HANDLE_VALUE,
+				   if the socket is backed by a file in the
+				   file system (actually a reparse point) */
+  HANDLE connect_wait_thr;
+  PVOID cwt_param;
+  LONG so_error;
   sun_name_t *sun_path;
   sun_name_t *peer_sun_path;
+  struct ucred peer_cred;
+
+  void gen_pipe_name ();
+  static HANDLE create_abstract_link (const sun_name_t *sun,
+				      PUNICODE_STRING pipe_name);
+  static HANDLE create_reparse_point (const sun_name_t *sun,
+				      PUNICODE_STRING pipe_name);
+  HANDLE create_file (const sun_name_t *sun);
+  static int open_abstract_link (sun_name_t *sun, PUNICODE_STRING pipe_name);
+  static int open_reparse_point (sun_name_t *sun, PUNICODE_STRING pipe_name);
+  static int open_file (sun_name_t *sun, int &type, PUNICODE_STRING pipe_name);
+  HANDLE autobind (sun_name_t *sun);
+  wchar_t get_type_char ();
+  void set_pipe_non_blocking (bool nonblocking);
+  int send_my_name ();
+  int recv_peer_name ();
   static NTSTATUS npfs_handle (HANDLE &nph, npfs_hdl_t type);
+  HANDLE create_pipe ();
+  HANDLE create_pipe_instance ();
+  NTSTATUS open_pipe (HANDLE &ph, PUNICODE_STRING pipe_name);
+  int wait_pipe (PUNICODE_STRING pipe_name);
+  int connect_pipe (PUNICODE_STRING pipe_name);
+  int listen_pipe ();
+  int disconnect_pipe (HANDLE ph);
   sun_name_t *get_sun_path () {return sun_path;}
   sun_name_t *get_peer_sun_path () {return peer_sun_path;}
   void set_sun_path (struct sockaddr_un *un, __socklen_t unlen);
@@ -888,16 +903,17 @@ class fhandler_socket_unix : public fhandler_socket
   void set_peer_sun_path (sun_name_t *snt)
     { snt ? set_peer_sun_path (&snt->un, snt->un_len)
 	  : set_peer_sun_path (NULL, 0); }
-
- protected:
-  struct ucred peer_cred;
   void set_cred ();
+  void fixup_after_fork (HANDLE parent);
+  void set_close_on_exec (bool val);
 
  public:
   fhandler_socket_unix ();
   ~fhandler_socket_unix ();
 
   int dup (fhandler_base *child, int);
+
+  DWORD wait_pipe_thread (PUNICODE_STRING pipe_name);
 
   int socket (int af, int type, int protocol, int flags);
   int socketpair (int af, int type, int protocol, int flags,
