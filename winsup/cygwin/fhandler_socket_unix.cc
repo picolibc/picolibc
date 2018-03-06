@@ -483,8 +483,7 @@ fhandler_socket_unix::create_pipe ()
 				  FILE_PIPE_MESSAGE_TYPE,
 				  FILE_PIPE_MESSAGE_MODE,
 				  nonblocking, max_instances,
-				  PREFERRED_IO_BLKSIZE, PREFERRED_IO_BLKSIZE,
-				  &timeout);
+				  rmem (), wmem (), &timeout);
   if (!NT_SUCCESS (status))
     system_printf ("NtCreateNamedPipeFile: %y", status);
   return ph;
@@ -519,8 +518,7 @@ fhandler_socket_unix::create_pipe_instance ()
 				  FILE_PIPE_MESSAGE_TYPE,
 				  FILE_PIPE_MESSAGE_MODE,
 				  nonblocking, max_instances,
-				  PREFERRED_IO_BLKSIZE, PREFERRED_IO_BLKSIZE,
-				  &timeout);
+				  rmem (), wmem (), &timeout);
   if (!NT_SUCCESS (status))
     system_printf ("NtCreateNamedPipeFile: %y", status);
   return ph;
@@ -588,6 +586,8 @@ fhandler_socket_unix::socket (int af, int type, int protocol, int flags)
       set_errno (EPROTONOSUPPORT);
       return -1;
     }
+  rmem (262144);
+  wmem (262144);
   set_addr_family (af);
   set_socket_type (type);
   if (flags & SOCK_NONBLOCK)
