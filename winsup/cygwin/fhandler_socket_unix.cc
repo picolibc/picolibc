@@ -1545,18 +1545,33 @@ fhandler_socket_unix::getpeereid (pid_t *pid, uid_t *euid, gid_t *egid)
 }
 
 ssize_t
-fhandler_socket_unix::recvfrom (void *ptr, size_t len, int flags,
-				struct sockaddr *from, int *fromlen)
+fhandler_socket_unix::recvmsg (struct msghdr *msg, int flags)
 {
   set_errno (EAFNOSUPPORT);
   return -1;
 }
 
 ssize_t
-fhandler_socket_unix::recvmsg (struct msghdr *msg, int flags)
+fhandler_socket_unix::recvfrom (void *ptr, size_t len, int flags,
+				struct sockaddr *from, int *fromlen)
 {
-  set_errno (EAFNOSUPPORT);
-  return -1;
+  struct iovec iov;
+  struct msghdr msg;
+  ssize_t ret;
+
+  iov.iov_base = ptr;
+  iov.iov_len = len;
+  msg.msg_name = from;
+  msg.msg_namelen = from && fromlen ? *fromlen : 0;
+  msg.msg_iov = &iov;
+  msg.msg_iovlen = 1;
+  msg.msg_control = NULL;
+  msg.msg_controllen = 0;
+  msg.msg_flags = 0;
+  ret = recvmsg (&msg, flags);
+  if (ret >= 0 && from && fromlen)
+    *fromlen = msg.msg_namelen;
+  return ret;
 }
 
 void __reg3
@@ -1564,21 +1579,35 @@ fhandler_socket_unix::read (void *ptr, size_t& len)
 {
   set_errno (EAFNOSUPPORT);
   len = 0;
+  struct iovec iov;
+  struct msghdr msg;
+
+  iov.iov_base = ptr;
+  iov.iov_len = len;
+  msg.msg_name = NULL;
+  msg.msg_namelen = 0;
+  msg.msg_iov = &iov;
+  msg.msg_iovlen = 1;
+  msg.msg_control = NULL;
+  msg.msg_controllen = 0;
+  msg.msg_flags = 0;
+  len = recvmsg (&msg, 0);
 }
 
 ssize_t __stdcall
-fhandler_socket_unix::readv (const struct iovec *, int iovcnt, ssize_t tot)
+fhandler_socket_unix::readv (const struct iovec *const iov, int iovcnt,
+			     ssize_t tot)
 {
-  set_errno (EAFNOSUPPORT);
-  return -1;
-}
+  struct msghdr msg;
 
-ssize_t
-fhandler_socket_unix::sendto (const void *in_ptr, size_t len, int flags,
-			       const struct sockaddr *to, int tolen)
-{
-  set_errno (EAFNOSUPPORT);
-  return -1;
+  msg.msg_name = NULL;
+  msg.msg_namelen = 0;
+  msg.msg_iov = (struct iovec *) iov;
+  msg.msg_iovlen = iovcnt;
+  msg.msg_control = NULL;
+  msg.msg_controllen = 0;
+  msg.msg_flags = 0;
+  return recvmsg (&msg, 0);
 }
 
 ssize_t
@@ -1588,18 +1617,57 @@ fhandler_socket_unix::sendmsg (const struct msghdr *msg, int flags)
   return -1;
 }
 
-ssize_t __stdcall
-fhandler_socket_unix::write (const void *ptr, size_t len)
+ssize_t
+fhandler_socket_unix::sendto (const void *in_ptr, size_t len, int flags,
+			       const struct sockaddr *to, int tolen)
 {
-  set_errno (EAFNOSUPPORT);
-  return -1;
+  struct iovec iov;
+  struct msghdr msg;
+
+  iov.iov_base = (void *) in_ptr;
+  iov.iov_len = len;
+  msg.msg_name = (void *) to;
+  msg.msg_namelen = to ? tolen : 0;
+  msg.msg_iov = &iov;
+  msg.msg_iovlen = 1;
+  msg.msg_control = NULL;
+  msg.msg_controllen = 0;
+  msg.msg_flags = 0;
+  return sendmsg (&msg, flags);
 }
 
 ssize_t __stdcall
-fhandler_socket_unix::writev (const struct iovec *, int iovcnt, ssize_t tot)
+fhandler_socket_unix::write (const void *ptr, size_t len)
 {
-  set_errno (EAFNOSUPPORT);
-  return -1;
+  struct iovec iov;
+  struct msghdr msg;
+
+  iov.iov_base = (void *) ptr;
+  iov.iov_len = len;
+  msg.msg_name = NULL;
+  msg.msg_namelen = 0;
+  msg.msg_iov = &iov;
+  msg.msg_iovlen = 1;
+  msg.msg_control = NULL;
+  msg.msg_controllen = 0;
+  msg.msg_flags = 0;
+  return sendmsg (&msg, 0);
+}
+
+ssize_t __stdcall
+fhandler_socket_unix::writev (const struct iovec *const iov, int iovcnt,
+			      ssize_t tot)
+{
+  struct msghdr msg;
+
+  msg.msg_name = NULL;
+  msg.msg_namelen = 0;
+  msg.msg_iov = (struct iovec *) iov;
+  msg.msg_iovlen = iovcnt;
+  msg.msg_control = NULL;
+  msg.msg_controllen = 0;
+  msg.msg_flags = 0;
+  return sendmsg (&msg, 0);
 }
 
 int
