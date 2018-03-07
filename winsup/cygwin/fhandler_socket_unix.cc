@@ -620,28 +620,33 @@ fhandler_socket_unix::recv_peer_name ()
 }
 
 NTSTATUS
-fhandler_socket_unix::npfs_handle (HANDLE &nph, npfs_hdl_t type)
+fhandler_socket_unix::npfs_handle (HANDLE &nph)
 {
-  static NO_COPY HANDLE npfs_devh;
+  static NO_COPY SRWLOCK npfs_lock;
   static NO_COPY HANDLE npfs_dirh;
 
-  HANDLE &npfs_ref = (type == NPFS_DEVICE) ? npfs_devh : npfs_dirh;
-  PUNICODE_STRING path = (type == NPFS_DEVICE) ? &ro_u_npfs : &ro_u_npfs_dir;
-  NTSTATUS status;
+  NTSTATUS status = STATUS_SUCCESS;
   OBJECT_ATTRIBUTES attr;
   IO_STATUS_BLOCK io;
 
-  if (!npfs_ref)
+  /* Lockless after first call. */
+  if (npfs_dirh)
     {
-      InitializeObjectAttributes (&attr, path, 0, NULL, NULL);
-      status = NtOpenFile (&npfs_ref, FILE_READ_ATTRIBUTES | SYNCHRONIZE,
+      nph = npfs_dirh;
+      return STATUS_SUCCESS;
+    }
+  AcquireSRWLockExclusive (&npfs_lock);
+  if (!npfs_dirh)
+    {
+      InitializeObjectAttributes (&attr, &ro_u_npfs, 0, NULL, NULL);
+      status = NtOpenFile (&npfs_dirh, FILE_READ_ATTRIBUTES | SYNCHRONIZE,
 			   &attr, &io, FILE_SHARE_READ | FILE_SHARE_WRITE,
 			   FILE_SYNCHRONOUS_IO_NONALERT);
-      if (!NT_SUCCESS (status))
-	return status;
     }
-  nph = npfs_ref;
-  return STATUS_SUCCESS;
+  ReleaseSRWLockExclusive (&npfs_lock);
+  if (NT_SUCCESS (status))
+    nph = npfs_dirh;
+  return status;
 }
 
 HANDLE
@@ -658,7 +663,7 @@ fhandler_socket_unix::create_pipe ()
   ULONG max_instances;
   LARGE_INTEGER timeout;
 
-  status = npfs_handle (npfsh, NPFS_DIR);
+  status = npfs_handle (npfsh);
   if (!NT_SUCCESS (status))
     {
       __seterrno_from_nt_status (status);
@@ -700,7 +705,7 @@ fhandler_socket_unix::create_pipe_instance ()
   ULONG max_instances;
   LARGE_INTEGER timeout;
 
-  status = npfs_handle (npfsh, NPFS_DIR);
+  status = npfs_handle (npfsh);
   if (!NT_SUCCESS (status))
     {
       __seterrno_from_nt_status (status);
@@ -738,7 +743,7 @@ fhandler_socket_unix::open_pipe (HANDLE &ph, PUNICODE_STRING pipe_name)
   IO_STATUS_BLOCK io;
   ULONG sharing;
 
-  status = npfs_handle (npfsh, NPFS_DIR);
+  status = npfs_handle (npfsh);
   if (!NT_SUCCESS (status))
     return status;
   access = GENERIC_READ | GENERIC_WRITE | SYNCHRONIZE;
@@ -996,7 +1001,7 @@ fhandler_socket_unix::wait_pipe_thread (PUNICODE_STRING pipe_name)
   LONGLONG stamp;
   HANDLE ph = NULL;
 
-  status = npfs_handle (npfsh, NPFS_DEVICE);
+  status = npfs_handle (npfsh);
   if (!NT_SUCCESS (status))
     {
       error = geterrno_from_nt_status (status);

@@ -852,12 +852,6 @@ class sun_name_t
 
 class fhandler_socket_unix : public fhandler_socket
 {
-   enum npfs_hdl_t
-   {
-     NPFS_DEVICE,
-     NPFS_DIR
-   };
-
  protected:
   SRWLOCK conn_lock;
   SRWLOCK bind_lock;
@@ -886,7 +880,7 @@ class fhandler_socket_unix : public fhandler_socket
   void set_pipe_non_blocking (bool nonblocking);
   int send_my_name ();
   int recv_peer_name ();
-  static NTSTATUS npfs_handle (HANDLE &nph, npfs_hdl_t type);
+  static NTSTATUS npfs_handle (HANDLE &nph);
   HANDLE create_pipe ();
   HANDLE create_pipe_instance ();
   NTSTATUS open_pipe (HANDLE &ph, PUNICODE_STRING pipe_name);
