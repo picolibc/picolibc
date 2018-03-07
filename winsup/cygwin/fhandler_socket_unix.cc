@@ -67,12 +67,12 @@
    for the entire packet, as well as for all three data blocks.  The
    combined maximum size of a packet is 64K, including the header.
 
-   A connecting, bound STREAM socket send it's local sun_path once after
+   A connecting, bound STREAM socket sends it's local sun_path once after
    a successful connect.  An already connected socket also sends its local
    sun_path after a successful bind (border case, but still...).  These
    packages don't contain any other data (cmsg_len == 0, data_len == 0).
 
-   A bound DGRAM socket send its sun_path with each sendmsg/sendto.
+   A bound DGRAM socket sends its sun_path with each sendmsg/sendto.
 */
 class af_unix_pkt_hdr_t
 {
@@ -123,9 +123,6 @@ class af_unix_pkt_hdr_t
 	   af_unix_pkt_hdr_t _p = phdr; \
 	   (void *)(((PBYTE)(_p)) + AF_UNIX_PKT_OFFSETOF_DATA (_p)); \
 	})
-
-/* Character length of pipe name, excluding trailing NUL. */
-#define CYGWIN_PIPE_SOCKET_NAME_LEN     47
 
 GUID __cygwin_socket_guid = {
   .Data1 = 0xefc1714d,
@@ -973,7 +970,7 @@ fhandler_socket_unix::dup (fhandler_base *child, int flags)
    things to do:
 
    - Set the peer pipe handle if successful
-   - Send own sun_path to peer if successful TODO
+   - Send own sun_path to peer if successful
    - Set connect_state
    - Set so_error for later call to select
 */
