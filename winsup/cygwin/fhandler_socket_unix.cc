@@ -1780,6 +1780,16 @@ fhandler_socket_unix::getsockopt (int level, int optname, const void *optval,
 	    break;
 	  }
 
+	case SO_RCVBUF:
+	case SO_SNDBUF:
+	  if (*optlen < (socklen_t) sizeof (int))
+	    {
+	      set_errno (EINVAL);
+	      return -1;
+	    }
+	  *(int *) optval = (optname == SO_RCVBUF) ? rmem () : wmem ();
+	  break;
+
 	case SO_RCVTIMEO:
 	case SO_SNDTIMEO:
 	  {
