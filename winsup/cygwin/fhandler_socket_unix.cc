@@ -154,6 +154,9 @@ GUID __cygwin_socket_guid = {
 		   _s == STATUS_BUFFER_OVERFLOW \
 		   || _s == STATUS_MORE_PROCESSING_REQUIRED; })
 
+/* Default timeout value of connect: 20 secs, as on Linux. */
+#define AF_UNIX_CONNECT_TIMEOUT (-20 * NS100PERSEC)
+
 sun_name_t::sun_name_t ()
 {
   un_len = sizeof (sa_family_t);
@@ -619,7 +622,7 @@ fhandler_socket_unix::recv_peer_name ()
       DWORD ret;
       LARGE_INTEGER timeout;
 
-      timeout.QuadPart = -20 * NS100PERSEC;	/* 20 secs */
+      timeout.QuadPart = AF_UNIX_CONNECT_TIMEOUT;
       ret = cygwait (evt, &timeout, cw_sig_eintr);
       switch (ret)
 	{
@@ -1062,7 +1065,7 @@ fhandler_socket_unix::wait_pipe_thread (PUNICODE_STRING pipe_name)
     goto out;
   pwbuf_size = offsetof (FILE_PIPE_WAIT_FOR_BUFFER, Name) + pipe_name->Length;
   pwbuf = (PFILE_PIPE_WAIT_FOR_BUFFER) alloca (pwbuf_size);
-  pwbuf->Timeout.QuadPart = -20 * NS100PERSEC;	/* 20 secs */
+  pwbuf->Timeout.QuadPart = AF_UNIX_CONNECT_TIMEOUT;
   pwbuf->NameLength = pipe_name->Length;
   pwbuf->TimeoutSpecified = TRUE;
   memcpy (pwbuf->Name, pipe_name->Buffer, pipe_name->Length);
