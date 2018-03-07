@@ -922,18 +922,19 @@ class fhandler_socket_unix : public fhandler_socket
   int shutdown (int how);
   int close ();
   int getpeereid (pid_t *pid, uid_t *euid, gid_t *egid);
+  ssize_t recvmsg (struct msghdr *msg, int flags);
   ssize_t recvfrom (void *ptr, size_t len, int flags,
 		    struct sockaddr *from, int *fromlen);
-  ssize_t recvmsg (struct msghdr *msg, int flags);
   void __reg3 read (void *ptr, size_t& len);
-  ssize_t __stdcall readv (const struct iovec *, int iovcnt,
+  ssize_t __stdcall readv (const struct iovec *const iov, int iovcnt,
 			   ssize_t tot = -1);
 
+  ssize_t sendmsg (const struct msghdr *msg, int flags);
   ssize_t sendto (const void *ptr, size_t len, int flags,
 		  const struct sockaddr *to, int tolen);
-  ssize_t sendmsg (const struct msghdr *msg, int flags);
   ssize_t __stdcall write (const void *ptr, size_t len);
-  ssize_t __stdcall writev (const struct iovec *, int iovcnt, ssize_t tot = -1);
+  ssize_t __stdcall writev (const struct iovec *const iov, int iovcnt,
+			    ssize_t tot = -1);
   int setsockopt (int level, int optname, const void *optval,
 		  __socklen_t optlen);
   int getsockopt (int level, int optname, const void *optval,
