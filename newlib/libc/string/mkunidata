@@ -1,0 +1,54 @@
+#! /bin/sh
+
+echo generating Unicode width data for newlib/libc/string/wcwidth.c
+
+cd `dirname $0`
+PATH="$PATH":.	# ensure access to uniset tool
+
+#############################################################################
+# checks and (with option -u) downloads
+
+case "$1" in
+-u)
+	#WGET=wget -N -t 1 --timeout=55
+	WGET=curl -R -O --connect-timeout 55
+	WGET+=-z $@
+
+	echo downloading uniset tool
+	$WGET http://www.cl.cam.ac.uk/~mgk25/download/uniset.tar.gz
+	gzip -dc uniset.tar.gz | tar xvf - uniset
+
+	echo downloading data from unicode.org
+	for data in UnicodeData.txt Blocks.txt EastAsianWidth.txt
+	do	$WGET http://unicode.org/Public/UNIDATA/$data
+	done
+	;;
+*)	echo checking package unicode-ucd
+	grep unicode-ucd /etc/setup/installed.db || exit 9
+	;;
+esac
+
+echo checking uniset tool
+type uniset || exit 9
+
+for data in UnicodeData.txt Blocks.txt EastAsianWidth.txt
+do	test -r $data || ln -s /usr/share/unicode/ucd/$data . || exit 9
+done
+
+echo generating from Unicode version `sed -e 's,[^.0-9],,g' -e 1q Blocks.txt`
+exit
+
+#############################################################################
+# table generation
+
+echo generating combining characters table
+uniset +cat=Me +cat=Mn +cat=Cf -00AD +1160-11FF +200B +D7B0-D7C6 +D7CB-D7FB c > combining.t
+
+echo generating ambiguous width characters table
+sh ./mkwidthA && uniset +WIDTH-A -cat=Me -cat=Mn -cat=Cf c > ambiguous.t
+
+echo generating wide characters table
+sh ./mkwide
+
+#############################################################################
+# end
