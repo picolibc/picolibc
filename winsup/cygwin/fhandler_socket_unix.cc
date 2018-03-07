@@ -148,6 +148,24 @@ sun_name_t::sun_name_t (const struct sockaddr *name, socklen_t namelen)
   _nul[sizeof (struct sockaddr_un)] = '\0';
 }
 
+static HANDLE
+create_event ()
+{
+  NTSTATUS status;
+  OBJECT_ATTRIBUTES attr;
+  HANDLE evt = NULL;
+
+  InitializeObjectAttributes (&attr, NULL, 0, NULL, NULL);
+  status = NtCreateEvent (&evt, EVENT_ALL_ACCESS, &attr,
+			  NotificationEvent, FALSE);
+  if (!NT_SUCCESS (status))
+    __seterrno_from_nt_status (status);
+  return evt;
+}
+
+/* Character length of pipe name, excluding trailing NUL. */
+#define CYGWIN_PIPE_SOCKET_NAME_LEN     47
+
 /* Character position encoding the socket type in a pipe name. */
 #define CYGWIN_PIPE_SOCKET_TYPE_POS	29
 
@@ -555,6 +573,7 @@ fhandler_socket_unix::send_my_name ()
 int
 fhandler_socket_unix::recv_peer_name ()
 {
+  HANDLE evt;
   NTSTATUS status;
   IO_STATUS_BLOCK io;
   af_unix_pkt_hdr_t *packet;
@@ -562,10 +581,12 @@ fhandler_socket_unix::recv_peer_name ()
   ULONG len;
   int ret = 0;
 
+  if (!(evt = create_event ()))
+    return ENOBUFS;
   len = sizeof *packet + sizeof *un;
   packet = (af_unix_pkt_hdr_t *) alloca (len);
   set_pipe_non_blocking (false);
-  status = NtReadFile (get_handle (), NULL, NULL, NULL, &io, packet, len,
+  status = NtReadFile (get_handle (), evt, NULL, NULL, &io, packet, len,
 		       NULL, NULL);
   if (status == STATUS_PENDING)
     {
@@ -573,7 +594,7 @@ fhandler_socket_unix::recv_peer_name ()
       LARGE_INTEGER timeout;
 
       timeout.QuadPart = -20 * NS100PERSEC;	/* 20 secs */
-      ret = cygwait (connect_wait_thr, &timeout, cw_sig_eintr);
+      ret = cygwait (evt, &timeout, cw_sig_eintr);
       switch (ret)
 	{
 	case WAIT_OBJECT_0:
@@ -835,22 +856,11 @@ fhandler_socket_unix::listen_pipe ()
 {
   NTSTATUS status;
   IO_STATUS_BLOCK io;
-  OBJECT_ATTRIBUTES attr;
   HANDLE evt = NULL;
 
   io.Status = STATUS_PENDING;
-  if (!is_nonblocking ())
-    {
-      /* Create event object and set APC context pointer. */
-      InitializeObjectAttributes (&attr, NULL, 0, NULL, NULL);
-      status = NtCreateEvent (&evt, EVENT_ALL_ACCESS, &attr,
-			      NotificationEvent, FALSE);
-      if (!NT_SUCCESS (status))
-	{
-	  __seterrno_from_nt_status (status);
-	  return -1;
-	}
-    }
+  if (!is_nonblocking () && !(evt = create_event ()))
+    return -1;
   status = NtFsControlFile (get_handle (), evt, NULL, NULL, &io,
 			    FSCTL_PIPE_LISTEN, NULL, 0, NULL, 0);
   if (status == STATUS_PENDING)
