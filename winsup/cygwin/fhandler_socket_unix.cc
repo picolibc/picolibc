@@ -901,6 +901,7 @@ fhandler_socket_unix::listen_pipe ()
   NTSTATUS status;
   IO_STATUS_BLOCK io;
   HANDLE evt = NULL;
+  DWORD waitret = WAIT_OBJECT_0;
 
   io.Status = STATUS_PENDING;
   if (!is_nonblocking () && !(evt = create_event ()))
@@ -909,12 +910,18 @@ fhandler_socket_unix::listen_pipe ()
 			    FSCTL_PIPE_LISTEN, NULL, 0, NULL, 0);
   if (status == STATUS_PENDING)
     {
-      if (cygwait (evt ?: get_handle ()) == WAIT_OBJECT_0)
+      waitret = cygwait (evt ?: get_handle (), cw_infinite,
+			 cw_cancel | cw_sig_eintr);
+      if (waitret == WAIT_OBJECT_0)
 	status = io.Status;
     }
   if (evt)
     NtClose (evt);
-  if (status == STATUS_PIPE_LISTENING)
+  if (waitret == WAIT_CANCELED)
+    pthread::static_cancel_self ();
+  else if (waitret == WAIT_SIGNALED)
+    set_errno (EINTR);
+  else if (status == STATUS_PIPE_LISTENING)
     set_errno (EAGAIN);
   else if (status != STATUS_PIPE_CONNECTED)
     __seterrno_from_nt_status (status);
@@ -929,7 +936,9 @@ fhandler_socket_unix::disconnect_pipe (HANDLE ph)
 
   status = NtFsControlFile (ph, NULL, NULL, NULL, &io, FSCTL_PIPE_DISCONNECT,
 			    NULL, 0, NULL, 0);
-  if (status == STATUS_PENDING && cygwait (ph) == WAIT_OBJECT_0)
+  /* Short-lived.  Don't use cygwait.  We don't want to be interrupted. */
+  if (status == STATUS_PENDING
+      && WaitForSingleObject (ph, INFINITE) == WAIT_OBJECT_0)
     status = io.Status;
   if (!NT_SUCCESS (status))
     {
@@ -1290,13 +1299,17 @@ fhandler_socket_unix::accept4 (struct sockaddr *peer, int *len, int flags)
       /* Our handle is now connected with a client.  This handle is used
          for the accepted socket.  Our handle has to be replaced with a
 	 new instance handle for the next accept. */
+      AcquireSRWLockExclusive (&io_lock);
       HANDLE accepted = get_handle ();
       HANDLE new_inst = create_pipe_instance ();
       int error = ENOBUFS;
-      if (new_inst)
+      if (!new_inst)
+	ReleaseSRWLockExclusive (&io_lock);
+      else
 	{
 	  /* Set new io handle. */
 	  set_io_handle (new_inst);
+	  ReleaseSRWLockExclusive (&io_lock);
 	  /* Prepare new file descriptor. */
 	  cygheap_fdnew fd;
 
@@ -1323,21 +1336,30 @@ fhandler_socket_unix::accept4 (struct sockaddr *peer, int *len, int flags)
 		  error = sock->recv_peer_name ();
 		  if (error == 0)
 		    {
-		      if (peer)
+		      __try
 			{
-			  sun_name_t *sun = sock->get_peer_sun_path ();
-			  if (sun)
+			  if (peer)
 			    {
-			      memcpy (peer, &sun->un, MIN (*len, sun->un_len));
-			      *len = sun->un_len;
+			      sun_name_t *sun = sock->get_peer_sun_path ();
+			      if (sun)
+				{
+				  memcpy (peer, &sun->un,
+					  MIN (*len, sun->un_len));
+				  *len = sun->un_len;
+				}
+			      else if (len)
+				*len = 0;
 			    }
-			  else if (len)
-			    *len = 0;
+			  fd = sock;
+			  if (fd <= 2)
+			    set_std_handle (fd);
+			  return fd;
 			}
-		      fd = sock;
-		      if (fd <= 2)
-			set_std_handle (fd);
-		      return fd;
+		      __except (NO_ERROR)
+			{
+			  error = EFAULT;
+			}
+		      __endtry
 		    }
 		  delete sock;
 		}
