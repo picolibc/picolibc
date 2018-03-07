@@ -382,6 +382,15 @@ endif
 	  done ; \
 	else true; fi
 
+# Generate Unicode data tables for libc/string/wcwidth and libc/ctype/??w*
+unidata:
+	cd $(srcdir)/libc/string; ./mkunidata
+	cd $(srcdir)/libc/ctype; ./mkunidata
+
+unidate-download:
+	cd $(srcdir)/libc/string; ./mkunidata -u
+	cd $(srcdir)/libc/ctype; ./mkunidata -u
+
 # Force makedoc to be built before building info files.
 info-recursive: doc/makedoc
 dvi-recursive: doc/makedoc
