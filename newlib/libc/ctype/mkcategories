@@ -1,0 +1,69 @@
+#! /bin/sh
+
+# generate table of Unicode character category ranges;
+# note: undefined characters between two characters of the same category
+# are associated to the same category, e.g.
+#0A0A;GURMUKHI LETTER UU;Lo
+#0A0B..0A0E           -> Lo
+#0A0F;GURMUKHI LETTER EE;Lo
+
+if [ -r UnicodeData.txt ]
+then	UnicodeData=UnicodeData.txt
+elif [ -r /usr/share/unicode/ucd/UnicodeData.txt ]
+then	UnicodeData=/usr/share/unicode/ucd/UnicodeData.txt
+else	echo UnicodeData.txt not found >&2
+	exit 1
+fi
+
+# the code assumes foldall=false, foldcase=true
+foldall=false
+foldcase=true
+
+(
+cat <<\/EOS
+first=
+item () {
+	if [ -n "$first" ]
+	then	if [ $(( 0x$1 )) -ne $(( 0x${last-0} + 1 )) ]
+		then	range
+		fi
+	fi
+
+	if [ -z "$first" ]
+	then	first=$1
+		val=$2
+	fi
+
+	last=$1
+}
+range () {
+#	echo "    {0x$first, 0x$last, CAT_$val},"
+#	echo "    {0x$first, $((0x$last - 0x$first)), CAT_$val},"
+#	echo "    {0x$first | (CAT_$val << 24), $((0x$last - 0x$first))},"
+	echo "    {CAT_$val, 0x$first, $((0x$last - 0x$first))},"
+	first=
+}
+/EOS
+
+cat "$UnicodeData" |
+if $foldall
+then sed -e "s,;L[lu];,;LC;," -e "s,;C[fs];,;Cfs;," \
+	 -e "s,;L[mo];,;Lmo;," -e "s,;Nl;,;Lmo;," \
+	 -e "s,;P.;,;P;,"  -e "s,;No;,;P;," \
+	 -e "s,;S.;,;S;," -e "s,;Z[lp];,;Zlp;," \
+	 -e "s,;C[no];,;X;," -e "s,;M[cen];,;M;,"
+elif $foldcase
+then
+# fold Lu/Ll to LC only if lower/upper conversion is available
+ sed -e '/^\([^;]*\);[^;]*;[^;]*;[^;]*;[^;]*;[^;]*;[^;]*;[^;]*;[^;]*;[^;]*;[^;]*;[^;]*;\([^;]*\);\([^;][^;]*\);.*/ s/;Lu;/;LC;/' \
+     -e '/^\([^;]*\);[^;]*;[^;]*;[^;]*;[^;]*;[^;]*;[^;]*;[^;]*;[^;]*;[^;]*;[^;]*;[^;]*;\([^;][^;]*\);\([^;]*\);.*/ s/;Ll;/;LC;/' \
+     -e '/;Co;/ d'
+else cat
+fi |
+sed -e "s,^\([^;]*\);[^;]*;\([^;]*\);.*,\1	\2," |
+uniq -f1 --group=append | sed -e "s,^$,range," -e t -e "s,^,item ,"
+) | sh > categories.t
+
+sed -e "s/.*\(CAT_[A-Za-z]*\).*/  \1,/" categories.t |
+sort | uniq > categories.cat
+

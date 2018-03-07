@@ -1,0 +1,40 @@
+#! /bin/sh
+
+echo generating Unicode character properties data for newlib/libc/ctype
+
+cd `dirname $0`
+
+#############################################################################
+# checks and (with option -u) download
+
+case "$1" in
+-u)
+	#WGET=wget -N -t 1 --timeout=55
+	WGET=curl -R -O --connect-timeout 55
+	WGET+=-z $@
+
+	echo downloading data from unicode.org
+	for data in UnicodeData.txt
+	do	$WGET http://unicode.org/Public/UNIDATA/$data
+	done
+	;;
+*)	echo checking package unicode-ucd
+	grep unicode-ucd /etc/setup/installed.db || exit 9
+	;;
+esac
+
+for data in UnicodeData.txt
+do	test -r $data || ln -s /usr/share/unicode/ucd/$data . || exit 9
+done
+
+#############################################################################
+# table generation
+
+echo generating character category table for "isw*.c"
+	sh ./mkcategories
+
+echo generating case conversion table for "tow*.c"
+	sh ./mkcaseconv
+
+#############################################################################
+# end

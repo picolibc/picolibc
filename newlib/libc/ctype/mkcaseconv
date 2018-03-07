@@ -1,0 +1,128 @@
+#! /bin/sh -f
+
+# generate a table for Unicode case conversion; entries:
+# struct caseconv_entry defined in towctrans_l.c
+
+if [ -r UnicodeData.txt ]
+then	UnicodeData=UnicodeData.txt
+elif [ -r /usr/share/unicode/ucd/UnicodeData.txt ]
+then	UnicodeData=/usr/share/unicode/ucd/UnicodeData.txt
+else	echo UnicodeData.txt not found >&2
+	exit 1
+fi
+
+LC_ALL=C
+export LC_ALL
+
+compact=true
+
+#0041;LATIN CAPITAL LETTER A;Lu;0;L;;;;;N;;;;0061;
+#0061;LATIN SMALL LETTER A;Ll;0;L;;;;;N;;;0041;;0041
+#0130;LATIN CAPITAL LETTER I WITH DOT ABOVE;Lu;0;L;0049 0307;;;;N;LATIN CAPITAL LETTER I DOT;;;0069;
+#01C4;LATIN CAPITAL LETTER DZ WITH CARON;Lu;0;L;<compat> 0044 017D;;;;N;LATIN CAPITAL LETTER D Z HACEK;;;01C6;01C5
+#01C5;LATIN CAPITAL LETTER D WITH SMALL LETTER Z WITH CARON;Lt;0;L;<compat> 0044 017E;;;;N;LATIN LETTER CAPITAL D SMALL Z HACEK;;01C4;01C6;01C5
+#01C6;LATIN SMALL LETTER DZ WITH CARON;Ll;0;L;<compat> 0064 017E;;;;N;LATIN SMALL LETTER D Z HACEK;;01C4;;01C5
+
+tr -d '\015' < $UnicodeData |
+sed \
+-e 's,^\([^;]*\);[^;]*;[^;]*;[^;]*;[^;]*;[^;]*;[^;]*;[^;]*;[^;]*;[^;]*;[^;]*;[^;]*;\([^;][^;]*\);\([^;]*\);\([^;]*\)$,src \1 upper "\2" lower "\3" title "\4",' \
+-e t \
+-e 's,^\([^;]*\);[^;]*;[^;]*;[^;]*;[^;]*;[^;]*;[^;]*;[^;]*;[^;]*;[^;]*;[^;]*;[^;]*;\([^;]*\);\([^;][^;]*\);\([^;]*\)$,src \1 upper "\2" lower "\3" title "\4",' \
+-e t \
+-e 's,^\([^;]*\);[^;]*;[^;]*;[^;]*;[^;]*;[^;]*;[^;]*;[^;]*;[^;]*;[^;]*;[^;]*;[^;]*;\([^;]*\);\([^;]*\);\([^;][^;]*\)$,src \1 upper "\2" lower "\3" title "\4",' \
+-e t \
+-e d |
+(#src 01C5 upper "01C4" lower "01C6" title "01C5"
+if $compact
+then
+  (
+  cat <<\/EOS
+  src () {
+    if [ -n "$3" ]
+    then	tohi=$(( 0x0$3 - 0x0$1 ))
+    else	tohi=0
+    fi
+    if [ -n "$5" ]
+    then	tolo=$(( 0x0$5 - 0x0$1 ))
+    else	tolo=0
+    fi
+    case "$tolo.$tohi" in
+    0.0)	true;;
+    0.*)
+	case "$1.$tohi" in
+	*[02468ACE].1)	echo "'#error' U+$1 ODDSML";;
+	*[02468ACE].-1)	echo "  0x$1 TO1 ODDCAP";;
+	*[13579BDF].1)	echo "'#error' U+$1 EVENSML";;
+	*[13579BDF].-1)	echo "  0x$1 TO1 EVENCAP";;
+	*)		echo "  0x$1 TOUP $tohi";;
+	esac;;
+    *.0)
+	case "$1.$tolo" in
+	*[02468ACE].1)	echo "  0x$1 TO1 EVENCAP";;
+	*[02468ACE].-1)	echo "'#error' U+$1 EVENSML";;
+	*[13579BDF].1)	echo "  0x$1 TO1 ODDCAP";;
+	*[13579BDF].-1)	echo "'#error' U+$1 ODDSML";;
+	*)		echo "  0x$1 TOLO $tolo";;
+	esac;;
+    *)	case "$tolo.$tohi" in
+	1.-1)		echo "  0x$1 TOBOTH 0";;
+	*)		echo "'#error' U+$1";;
+	esac;;
+    esac
+  }
+/EOS
+  cat
+  ) | sh |
+  uniq -f1 --group=append | sed -e "s,^$,range," -e t -e "s,^,item ," |
+  (
+  cat <<\/EOS
+  first=
+  diff=-1
+  max=255
+  range () {
+	# $diff == $(($last - $first))
+	if [ "$diff" -ge 0 ]
+	then	# we have items at all
+		echo "  {$first, $diff, $v2, $v3},"
+	fi
+	first=
+	diff=-1
+  }
+  item () {
+	if [ "$1" == "#error" ]
+	then	echo "$*"
+		return
+	fi
+
+	if [ $diff -eq $max ]
+	then	range
+	elif [ -n "$first" ]
+	then	if [ $(( $1 )) -ne $(( ${last-0} + 1 )) ]
+		then	range
+		fi
+	fi
+
+	if [ -z "$first" ]
+	then	first=$1
+		v2=$2
+		v3=$3
+	fi
+
+	last=$1
+	diff=$(( $diff + 1 ))
+  }
+/EOS
+  cat
+  ) | sh
+elif false
+then
+  sed -e 's/src \([^ ]*\) upper "\([^ ]*\)" lower "\([^ ]*\)" title "\([^ ]*\)"/  {0x\1, 0x\2 - 0x\1, 0x\3 - 0x\1},/' \
+      -e 's/0x - 0x[^ ,}]*/0/g' -e 's/0x}/0}/' \
+      -e 's/\(0x[0-9A-F][0-9A-F]*\) - \(0x[0-9A-F][0-9A-F]*\)/$((`printf %d \1` - `printf %d \2`))/g' \
+      -e 's/^/echo "/' -e 's/$/"/' |
+  sh
+else
+  sed -e 's/src \([^ ]*\) upper "\([^ ]*\)" lower "\([^ ]*\)" title "\([^ ]*\)"/  {0x\1, 0x\2 - 0x\1, 0x\3 - 0x\1},/' \
+      -e 's/0x - 0x[^ ,}]*/0/g' -e 's/0x}/0}/'
+fi
+) > caseconv.t
