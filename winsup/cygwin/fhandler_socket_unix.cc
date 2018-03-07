@@ -131,6 +131,29 @@ GUID __cygwin_socket_guid = {
   .Data4 = { 0xba, 0xb3, 0xc5, 0xb1, 0xf9, 0x2c, 0xb8, 0x8c }
 };
 
+/* Some error conditions on pipes have multiple status codes, unfortunately. */
+#define STATUS_PIPE_NO_INSTANCE_AVAILABLE(status)	\
+		({ NTSTATUS _s = (status); \
+		   _s == STATUS_INSTANCE_NOT_AVAILABLE \
+		   || _s == STATUS_PIPE_NOT_AVAILABLE \
+		   || _s == STATUS_PIPE_BUSY; })
+
+#define STATUS_PIPE_IS_CLOSING(status)	\
+		({ NTSTATUS _s = (status); \
+		   _s == STATUS_PIPE_CLOSING \
+		   || _s == STATUS_PIPE_EMPTY; })
+
+#define STATUS_PIPE_INVALID(status) \
+		({ NTSTATUS _s = (status); \
+		   _s == STATUS_INVALID_INFO_CLASS \
+		   || _s == STATUS_INVALID_PIPE_STATE \
+		   || _s == STATUS_INVALID_READ_MODE; })
+
+#define STATUS_PIPE_MORE_DATA(status) \
+		({ NTSTATUS _s = (status); \
+		   _s == STATUS_BUFFER_OVERFLOW \
+		   || _s == STATUS_MORE_PROCESSING_REQUIRED; })
+
 sun_name_t::sun_name_t ()
 {
   un_len = sizeof (sa_family_t);
@@ -847,7 +870,7 @@ fhandler_socket_unix::connect_pipe (PUNICODE_STRING pipe_name)
   /* Try connecting first.  If it doesn't work, wait for the pipe
      to become available. */
   status = open_pipe (ph, pipe_name);
-  if (status == STATUS_PIPE_BUSY)
+  if (STATUS_PIPE_NO_INSTANCE_AVAILABLE (status))
     return wait_pipe (pipe_name);
   if (!NT_SUCCESS (status))
     {
@@ -1026,7 +1049,7 @@ fhandler_socket_unix::wait_pipe_thread (PUNICODE_STRING pipe_name)
 	  case STATUS_SUCCESS:
 	    {
 	      status = open_pipe (ph, pipe_name);
-	      if (status == STATUS_PIPE_BUSY)
+	      if (STATUS_PIPE_NO_INSTANCE_AVAILABLE (status))
 		{
 		  /* Another concurrent connect grabbed the pipe instance
 		     under our nose.  Fix the timeout value and go waiting
@@ -1057,7 +1080,7 @@ fhandler_socket_unix::wait_pipe_thread (PUNICODE_STRING pipe_name)
 	    break;
 	}
     }
-  while (status == STATUS_PIPE_BUSY);
+  while (STATUS_PIPE_NO_INSTANCE_AVAILABLE (status));
 out:
   PVOID param = InterlockedExchangePointer (&cwt_param, NULL);
   if (param)
