@@ -166,6 +166,19 @@ can be used to force wcwidth/wcswidth to return 1 for the ambiguous width
 characters.
 </para></listitem>
 
+<listitem><para>
+For the same class of "CJK Ambiguous Width" characters, it may be
+desirable to handle them as double-width even when a non-CJK language
+setting is selected.  This supports e.g. certain graphic symbols used
+by "Powerline" and provided by "Powerline fonts".  Some terminals have
+options to enforce this width handling (xterm -cjk_width,
+mintty -o Charwidth=ambig-wide, putty configuration) but that alone
+makes character rendering and locale information inconsistent for those
+characters.  The locale modifier "@cjkwide" supports consistent locale
+response with this option; it forces wcwidth/wcswidth to return 2 for the
+ambiguous width characters.
+</para></listitem>
+
 </itemizedlist>
 
 </sect2>
