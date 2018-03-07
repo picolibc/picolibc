@@ -667,7 +667,7 @@ fhandler_socket_unix::npfs_handle (HANDLE &nph)
       InitializeObjectAttributes (&attr, &ro_u_npfs, 0, NULL, NULL);
       status = NtOpenFile (&npfs_dirh, FILE_READ_ATTRIBUTES | SYNCHRONIZE,
 			   &attr, &io, FILE_SHARE_READ | FILE_SHARE_WRITE,
-			   FILE_SYNCHRONOUS_IO_NONALERT);
+			   0);
     }
   ReleaseSRWLockExclusive (&npfs_lock);
   if (NT_SUCCESS (status))
@@ -808,7 +808,11 @@ fhandler_socket_unix::wait_pipe (PUNICODE_STRING pipe_name)
   conn_wait_info_t *wait_info;
   DWORD waitret, err;
   int ret = -1;
+  HANDLE thr, evt;
+  PVOID param;
 
+  if (!(cwt_termination_evt = create_event ()))
+      return -1;
   wait_info = (conn_wait_info_t *)
 	      cmalloc_abort (HEAP_FHANDLER, sizeof *wait_info);
   wait_info->fh = this;
@@ -823,23 +827,28 @@ fhandler_socket_unix::wait_pipe (PUNICODE_STRING pipe_name)
     {
       cfree (wait_info);
       __seterrno ();
-      return -1;
+      goto out;
     }
   if (is_nonblocking ())
     {
       set_errno (EINPROGRESS);
-      return -1;
+      goto out;
     }
 
   waitret = cygwait (connect_wait_thr, cw_infinite, cw_cancel | cw_sig_eintr);
   if (waitret == WAIT_OBJECT_0)
     GetExitCodeThread (connect_wait_thr, &err);
   else
-    TerminateThread (connect_wait_thr, 0);
-  HANDLE thr = InterlockedExchangePointer (&connect_wait_thr, NULL);
+    {
+      SetEvent (cwt_termination_evt);
+      WaitForSingleObject (connect_wait_thr, INFINITE);
+      GetExitCodeThread (connect_wait_thr, &err);
+      waitret = WAIT_SIGNALED;
+    }
+  thr = InterlockedExchangePointer (&connect_wait_thr, NULL);
   if (thr)
     CloseHandle (thr);
-  PVOID param = InterlockedExchangePointer (&cwt_param, NULL);
+  param = InterlockedExchangePointer (&cwt_param, NULL);
   if (param)
     cfree (param);
   switch (waitret)
@@ -858,6 +867,10 @@ fhandler_socket_unix::wait_pipe (PUNICODE_STRING pipe_name)
 	ret = 0;
       break;
     }
+out:
+  evt = InterlockedExchangePointer (&cwt_termination_evt, NULL);
+  if (evt)
+    NtClose (evt);
   return ret;
 }
 
@@ -965,6 +978,7 @@ fhandler_socket_unix::fixup_after_fork (HANDLE parent)
   InitializeSRWLock (&bind_lock);
   InitializeSRWLock (&io_lock);
   connect_wait_thr = NULL;
+  cwt_termination_evt = NULL;
   cwt_param = NULL;
 }
 
@@ -1001,6 +1015,7 @@ fhandler_socket_unix::dup (fhandler_base *child, int flags)
   InitializeSRWLock (&fhs->bind_lock);
   InitializeSRWLock (&fhs->io_lock);
   fhs->connect_wait_thr = NULL;
+  fhs->cwt_termination_evt = NULL;
   fhs->cwt_param = NULL;
   return fhandler_socket::dup (child, flags);
 }
@@ -1019,6 +1034,7 @@ DWORD
 fhandler_socket_unix::wait_pipe_thread (PUNICODE_STRING pipe_name)
 {
   HANDLE npfsh;
+  HANDLE evt;
   LONG error = 0;
   NTSTATUS status;
   IO_STATUS_BLOCK io;
@@ -1033,6 +1049,8 @@ fhandler_socket_unix::wait_pipe_thread (PUNICODE_STRING pipe_name)
       error = geterrno_from_nt_status (status);
       goto out;
     }
+  if (!(evt = create_event ()))
+    goto out;
   pwbuf_size = offsetof (FILE_PIPE_WAIT_FOR_BUFFER, Name) + pipe_name->Length;
   pwbuf = (PFILE_PIPE_WAIT_FOR_BUFFER) alloca (pwbuf_size);
   pwbuf->Timeout.QuadPart = -20 * NS100PERSEC;	/* 20 secs */
@@ -1042,8 +1060,22 @@ fhandler_socket_unix::wait_pipe_thread (PUNICODE_STRING pipe_name)
   stamp = ntod.nsecs ();
   do
     {
-      status = NtFsControlFile (npfsh, NULL, NULL, NULL, &io, FSCTL_PIPE_WAIT,
+      status = NtFsControlFile (npfsh, evt, NULL, NULL, &io, FSCTL_PIPE_WAIT,
 				pwbuf, pwbuf_size, NULL, 0);
+      if (status == STATUS_PENDING)
+	{
+	  HANDLE w[2] = { evt, cwt_termination_evt };
+	  switch (WaitForMultipleObjects (2, w, FALSE, INFINITE))
+	    {
+	    case WAIT_OBJECT_0:
+	      status = io.Status;
+	      break;
+	    case WAIT_OBJECT_0 + 1:
+	    default:
+	      status = STATUS_THREAD_IS_TERMINATING;
+	      break;
+	    }
+	}
       switch (status)
 	{
 	  case STATUS_SUCCESS:
@@ -1073,6 +1105,9 @@ fhandler_socket_unix::wait_pipe_thread (PUNICODE_STRING pipe_name)
 	    break;
 	  case STATUS_INSUFFICIENT_RESOURCES:
 	    error = ENOBUFS;
+	    break;
+	  case STATUS_THREAD_IS_TERMINATING:
+	    error = EINTR;
 	    break;
 	  case STATUS_INVALID_DEVICE_REQUEST:
 	  default:
@@ -1434,12 +1469,17 @@ fhandler_socket_unix::shutdown (int how)
 int
 fhandler_socket_unix::close ()
 {
+  HANDLE evt = InterlockedExchangePointer (&cwt_termination_evt, NULL);
   HANDLE thr = InterlockedExchangePointer (&connect_wait_thr, NULL);
   if (thr)
     {
-      TerminateThread (thr, 0);
+      if (evt)
+	SetEvent (evt);
+      WaitForSingleObject (thr, INFINITE);
       CloseHandle (thr);
     }
+  if (evt)
+    NtClose (evt);
   PVOID param = InterlockedExchangePointer (&cwt_param, NULL);
   if (param)
     cfree (param);

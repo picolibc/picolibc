@@ -860,6 +860,7 @@ class fhandler_socket_unix : public fhandler_socket
 				   if the socket is backed by a file in the
 				   file system (actually a reparse point) */
   HANDLE connect_wait_thr;
+  HANDLE cwt_termination_evt;
   PVOID cwt_param;
   LONG so_error;
   sun_name_t *sun_path;
