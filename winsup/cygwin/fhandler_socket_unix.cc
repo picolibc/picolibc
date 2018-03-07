@@ -540,15 +540,18 @@ fhandler_socket_unix::set_pipe_non_blocking (bool nonblocking)
 int
 fhandler_socket_unix::send_my_name ()
 {
+  sun_name_t *sun;
   size_t name_len = 0;
   af_unix_pkt_hdr_t *packet;
   NTSTATUS status;
   IO_STATUS_BLOCK io;
 
   AcquireSRWLockShared (&bind_lock);
-  name_len = get_sun_path ()->un_len;
+  sun = get_sun_path ();
+  name_len = sun ? sun->un_len : 0;
   packet = (af_unix_pkt_hdr_t *) alloca (sizeof *packet + name_len);
-  memcpy (AF_UNIX_PKT_NAME (packet), &get_sun_path ()->un, name_len);
+  if (sun)
+    memcpy (AF_UNIX_PKT_NAME (packet), &sun->un, name_len);
   ReleaseSRWLockShared (&bind_lock);
 
   packet->init (0, name_len, 0, 0);
