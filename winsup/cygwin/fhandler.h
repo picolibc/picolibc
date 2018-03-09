@@ -882,9 +882,9 @@ class fhandler_socket_unix : public fhandler_socket
   int send_my_name ();
   int recv_peer_name ();
   static NTSTATUS npfs_handle (HANDLE &nph);
-  HANDLE create_pipe ();
+  HANDLE create_pipe (bool single_instance);
   HANDLE create_pipe_instance ();
-  NTSTATUS open_pipe (HANDLE &ph, PUNICODE_STRING pipe_name);
+  NTSTATUS open_pipe (PUNICODE_STRING pipe_name, bool send_name);
   int wait_pipe (PUNICODE_STRING pipe_name);
   int connect_pipe (PUNICODE_STRING pipe_name);
   int listen_pipe ();

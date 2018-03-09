@@ -679,7 +679,7 @@ fhandler_socket_unix::npfs_handle (HANDLE &nph)
 }
 
 HANDLE
-fhandler_socket_unix::create_pipe ()
+fhandler_socket_unix::create_pipe (bool single_instance)
 {
   NTSTATUS status;
   HANDLE npfsh;
@@ -707,7 +707,7 @@ fhandler_socket_unix::create_pipe ()
 			      npfsh, NULL);
   nonblocking = is_nonblocking () ? FILE_PIPE_COMPLETE_OPERATION
 				  : FILE_PIPE_QUEUE_OPERATION;
-  max_instances = (get_socket_type () == SOCK_DGRAM) ? 1 : -1;
+  max_instances = single_instance ? 1 : -1;
   timeout.QuadPart = -500000;
   status = NtCreateNamedPipeFile (&ph, access, &attr, &io, sharing,
 				  FILE_CREATE, 0,
@@ -763,7 +763,7 @@ fhandler_socket_unix::create_pipe_instance ()
 }
 
 NTSTATUS
-fhandler_socket_unix::open_pipe (HANDLE &ph, PUNICODE_STRING pipe_name)
+fhandler_socket_unix::open_pipe (PUNICODE_STRING pipe_name, bool send_name)
 {
   NTSTATUS status;
   HANDLE npfsh;
@@ -771,6 +771,7 @@ fhandler_socket_unix::open_pipe (HANDLE &ph, PUNICODE_STRING pipe_name)
   OBJECT_ATTRIBUTES attr;
   IO_STATUS_BLOCK io;
   ULONG sharing;
+  HANDLE ph = NULL;
 
   status = npfs_handle (npfsh);
   if (!NT_SUCCESS (status))
@@ -782,7 +783,8 @@ fhandler_socket_unix::open_pipe (HANDLE &ph, PUNICODE_STRING pipe_name)
   if (NT_SUCCESS (status))
     {
       set_io_handle (ph);
-      send_my_name ();
+      if (send_name)
+	send_my_name ();
     }
   return status;
 }
@@ -881,11 +883,10 @@ int
 fhandler_socket_unix::connect_pipe (PUNICODE_STRING pipe_name)
 {
   NTSTATUS status;
-  HANDLE ph = NULL;
 
   /* Try connecting first.  If it doesn't work, wait for the pipe
      to become available. */
-  status = open_pipe (ph, pipe_name);
+  status = open_pipe (pipe_name, get_socket_type () != SOCK_DGRAM);
   if (STATUS_PIPE_NO_INSTANCE_AVAILABLE (status))
     return wait_pipe (pipe_name);
   if (!NT_SUCCESS (status))
@@ -1053,7 +1054,6 @@ fhandler_socket_unix::wait_pipe_thread (PUNICODE_STRING pipe_name)
   ULONG pwbuf_size;
   PFILE_PIPE_WAIT_FOR_BUFFER pwbuf;
   LONGLONG stamp;
-  HANDLE ph = NULL;
 
   status = npfs_handle (npfsh);
   if (!NT_SUCCESS (status))
@@ -1092,7 +1092,7 @@ fhandler_socket_unix::wait_pipe_thread (PUNICODE_STRING pipe_name)
 	{
 	  case STATUS_SUCCESS:
 	    {
-	      status = open_pipe (ph, pipe_name);
+	      status = open_pipe (pipe_name, get_socket_type () != SOCK_DGRAM);
 	      if (STATUS_PIPE_NO_INSTANCE_AVAILABLE (status))
 		{
 		  /* Another concurrent connect grabbed the pipe instance
@@ -1170,6 +1170,10 @@ int
 fhandler_socket_unix::socketpair (int af, int type, int protocol, int flags,
 				  fhandler_socket *fh_out)
 {
+  HANDLE pipe;
+  sun_name_t sun;
+  fhandler_socket_unix *fh = (fhandler_socket_unix *) fh_out;
+
   if (type != SOCK_STREAM && type != SOCK_DGRAM)
     {
       set_errno (EINVAL);
@@ -1180,8 +1184,53 @@ fhandler_socket_unix::socketpair (int af, int type, int protocol, int flags,
       set_errno (EPROTONOSUPPORT);
       return -1;
     }
-  set_errno (EAFNOSUPPORT);
-  return -1;
+
+  /* socket() on both sockets */
+  rmem (262144);
+  fh->rmem (262144);
+  wmem (262144);
+  fh->wmem (262144);
+  set_addr_family (af);
+  fh->set_addr_family (af);
+  set_socket_type (type);
+  fh->set_socket_type (type);
+  set_unique_id ();
+  set_ino (get_unique_id ());
+  /* bind/listen 1st socket */
+  gen_pipe_name ();
+  pipe = create_pipe (true);
+  if (!pipe)
+    return -1;
+  set_io_handle (pipe);
+  backing_file_handle = autobind (&sun);
+  if (!backing_file_handle)
+    {
+      NtClose (pipe);
+      return -1;
+    }
+  set_sun_path (&sun);
+  fh->set_peer_sun_path (&sun);
+  binding_state (bound);
+  connect_state (listener);
+  /* connect 2nd socket */
+  if (type != SOCK_DGRAM
+      && fh->open_pipe (pc.get_nt_native_path (), false) < 0)
+    {
+      NtClose (pipe);
+      return -1;
+    }
+  fh->connect_state (connected);
+  if (flags & SOCK_NONBLOCK)
+    {
+      set_nonblocking (true);
+      fh->set_nonblocking (true);
+    }
+  if (flags & SOCK_CLOEXEC)
+    {
+      set_close_on_exec (true);
+      fh->set_close_on_exec (true);
+    }
+  return 0;
 }
 
 /* Bind creates the backing file, generates the pipe name and sets
@@ -1217,7 +1266,7 @@ fhandler_socket_unix::bind (const struct sockaddr *name, int namelen)
   gen_pipe_name ();
   if (get_socket_type () == SOCK_DGRAM)
     {
-      pipe = create_pipe ();
+      pipe = create_pipe (true);
       if (!pipe)
 	{
 	  binding_state (unbound);
@@ -1268,16 +1317,13 @@ fhandler_socket_unix::listen (int backlog)
       ReleaseSRWLockExclusive (&conn_lock);
       return -1;
     }
-  if (get_socket_type () != SOCK_DGRAM)
+  HANDLE pipe = create_pipe (false);
+  if (!pipe)
     {
-      HANDLE pipe = create_pipe ();
-      if (!pipe)
-	{
-	  connect_state (unconnected);
-	  return -1;
-	}
-      set_io_handle (pipe);
+      connect_state (unconnected);
+      return -1;
     }
+  set_io_handle (pipe);
   connect_state (listener);
   ReleaseSRWLockExclusive (&conn_lock);
   return 0;
