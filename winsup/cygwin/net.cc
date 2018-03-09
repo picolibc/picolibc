@@ -2271,7 +2271,7 @@ cygwin_bindresvport (int fd, struct sockaddr_in *sin)
 
 /* socketpair: POSIX.1-2001, POSIX.1-2008, 4.4BSD. */
 extern "C" int
-socketpair (int af, int type, int protocol, int *sb)
+socketpair (int af, int type, int protocol, int sv[2])
 {
   int res = -1;
   const device *dev;
@@ -2324,8 +2324,8 @@ socketpair (int af, int type, int protocol, int *sb)
 	    set_std_handle (fd_out);
 	  __try
 	    {
-	      sb[0] = fd_in;
-	      sb[1] = fd_out;
+	      sv[0] = fd_in;
+	      sv[1] = fd_out;
 	      res = 0;
 	    }
 	  __except (EFAULT) {}
