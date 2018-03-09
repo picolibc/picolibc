@@ -1,5 +1,6 @@
 /* Copyright (c) 2002 Red Hat Incorporated.
    All rights reserved.
+   Modified (m) 2017 Thomas Wolff to refer to generated Unicode data tables.
 
    Redistribution and use in source and binary forms, with or without
    modification, are permitted provided that the following conditions are met:
@@ -62,24 +63,10 @@ PORTABILITY
 No supporting OS subroutines are required.
 */
 #include <_ansi.h>
-#include <newlib.h>
 #include <wctype.h>
-#include <ctype.h>
-#include <string.h>
-#include "local.h"
 
 int
 iswcntrl (wint_t c)
 {
-#ifdef _MB_CAPABLE
-  c = _jp2uc (c);
-
-  /* Based on Unicode 5.2.  All characters from general category "Cc", "Zl",
-     and "Zp".  */
-  return ((c >= 0x0000 && c <= 0x001f) || 
-	  (c >= 0x007f && c <= 0x009f) ||
-	  c == 0x2028 || c == 0x2029);
-#else
-  return (c < 0x100 ? iscntrl (c) : 0);
-#endif /* _MB_CAPABLE */
+  return iswcntrl_l (c, 0);
 }

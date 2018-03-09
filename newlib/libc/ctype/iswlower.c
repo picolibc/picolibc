@@ -17,7 +17,7 @@ SYNOPSIS
 
 DESCRIPTION
 <<iswlower>> is a function which classifies wide-character values that
-have uppercase translations.
+are categorized as lowercase.
 
 <<iswlower_l>> is like <<iswlower>> but performs the check based on the
 locale specified by the locale object locale.  If <[locale]> is
@@ -38,5 +38,5 @@ No supporting OS subroutines are required.
 int
 iswlower (wint_t c)
 {
-	return (towupper (c) != c);
+  return iswlower_l (c, 0);
 }

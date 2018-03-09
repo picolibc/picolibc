@@ -79,7 +79,8 @@ am__objects_1 = lib_a-ctype_.$(OBJEXT) lib_a-isalnum.$(OBJEXT) \
 	lib_a-ispunct.$(OBJEXT) lib_a-isspace.$(OBJEXT) \
 	lib_a-isxdigit.$(OBJEXT) lib_a-tolower.$(OBJEXT) \
 	lib_a-toupper.$(OBJEXT)
-@ELIX_LEVEL_1_FALSE@am__objects_2 = lib_a-isalnum_l.$(OBJEXT) \
+@ELIX_LEVEL_1_FALSE@am__objects_2 = lib_a-categories.$(OBJEXT) \
+@ELIX_LEVEL_1_FALSE@	lib_a-isalnum_l.$(OBJEXT) \
 @ELIX_LEVEL_1_FALSE@	lib_a-isalpha_l.$(OBJEXT) \
 @ELIX_LEVEL_1_FALSE@	lib_a-isascii.$(OBJEXT) \
 @ELIX_LEVEL_1_FALSE@	lib_a-isascii_l.$(OBJEXT) \
@@ -142,7 +143,7 @@ libctype_la_LIBADD =
 am__objects_3 = ctype_.lo isalnum.lo isalpha.lo iscntrl.lo isdigit.lo \
 	islower.lo isupper.lo isprint.lo ispunct.lo isspace.lo \
 	isxdigit.lo tolower.lo toupper.lo
-@ELIX_LEVEL_1_FALSE@am__objects_4 = isalnum_l.lo isalpha_l.lo \
+@ELIX_LEVEL_1_FALSE@am__objects_4 = categories.lo isalnum_l.lo isalpha_l.lo \
 @ELIX_LEVEL_1_FALSE@	isascii.lo isascii_l.lo isblank.lo \
 @ELIX_LEVEL_1_FALSE@	isblank_l.lo iscntrl_l.lo isdigit_l.lo \
 @ELIX_LEVEL_1_FALSE@	islower_l.lo isupper_l.lo isprint_l.lo \
@@ -351,6 +352,7 @@ GENERAL_SOURCES = \
 	toupper.c
 
 @ELIX_LEVEL_1_FALSE@ELIX_SOURCES = \
+@ELIX_LEVEL_1_FALSE@	categories.c	\
 @ELIX_LEVEL_1_FALSE@	isalnum_l.c	\
 @ELIX_LEVEL_1_FALSE@	isalpha_l.c	\
 @ELIX_LEVEL_1_FALSE@	isascii.c 	\
@@ -608,6 +610,12 @@ lib_a-toupper.o: toupper.c
 
 lib_a-toupper.obj: toupper.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-toupper.obj `if test -f 'toupper.c'; then $(CYGPATH_W) 'toupper.c'; else $(CYGPATH_W) '$(srcdir)/toupper.c'; fi`
+
+lib_a-categories.o: categories.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-categories.o `test -f 'categories.c' || echo '$(srcdir)/'`categories.c
+
+lib_a-categories.obj: categories.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-categories.obj `if test -f 'categories.c'; then $(CYGPATH_W) 'categories.c'; else $(CYGPATH_W) '$(srcdir)/categories.c'; fi`
 
 lib_a-isalnum_l.o: isalnum_l.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-isalnum_l.o `test -f 'isalnum_l.c' || echo '$(srcdir)/'`isalnum_l.c

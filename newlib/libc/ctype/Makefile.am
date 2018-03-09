@@ -24,6 +24,7 @@ if ELIX_LEVEL_1
 ELIX_SOURCES =
 else
 ELIX_SOURCES = \
+	categories.c	\
 	isalnum_l.c	\
 	isalpha_l.c	\
 	isascii.c 	\

@@ -1,5 +1,6 @@
 /* Copyright (c) 2002 Red Hat Incorporated.
    All rights reserved.
+   Modified (m) 2017 Thomas Wolff to refer to generated Unicode data tables.
 
    Redistribution and use in source and binary forms, with or without
    modification, are permitted provided that the following conditions are met:
@@ -69,10 +70,9 @@ No supporting OS subroutines are required.
 */
 
 #include <_ansi.h>
-#include <string.h>
 #include <reent.h>
 #include <wctype.h>
-#include <errno.h>
+//#include <errno.h>
 #include "local.h"
 
 wint_t
@@ -80,13 +80,13 @@ _towctrans_r (struct _reent *r,
 	wint_t c,
 	wctrans_t w)
 {
-  if (w == WCT_TOLOWER)
-    return towlower (c);
-  else if (w == WCT_TOUPPER)
-    return towupper (c);
+  if (w == WCT_TOLOWER || w == WCT_TOUPPER)
+    return towctrans_l (c, w, 0);
   else
     {
-      r->_errno = EINVAL;
+      // skipping this because it was causing trouble (cygwin crash)
+      // and there is no errno specified for towctrans
+      //r->_errno = EINVAL;
       return c;
     }
 }
@@ -94,7 +94,7 @@ _towctrans_r (struct _reent *r,
 #ifndef _REENT_ONLY
 wint_t
 towctrans (wint_t c,
-        wctrans_t w)
+	wctrans_t w)
 {
   return _towctrans_r (_REENT, c, w);
 }

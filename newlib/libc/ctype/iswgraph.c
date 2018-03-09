@@ -1,5 +1,6 @@
 /* Copyright (c) 2002 Red Hat Incorporated.
    All rights reserved.
+   Modified (m) 2017 Thomas Wolff to refer to generated Unicode data tables.
 
    Redistribution and use in source and binary forms, with or without
    modification, are permitted provided that the following conditions are met:
@@ -67,5 +68,5 @@ No supporting OS subroutines are required.
 int
 iswgraph (wint_t c)
 {
-  return (iswprint (c) && !iswspace (c));
+  return iswgraph_l (c, 0);
 }

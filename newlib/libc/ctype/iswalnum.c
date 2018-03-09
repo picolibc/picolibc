@@ -39,5 +39,5 @@ No supporting OS subroutines are required.
 int
 iswalnum (wint_t c)
 {
-  return (iswalpha (c) || iswdigit (c));
+  return iswalnum_l (c, 0);
 }

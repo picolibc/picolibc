@@ -1,7 +1,8 @@
-/* Routine to translate from Japanese characters to Unicode */
+/* Routine to translate between Japanese characters and Unicode */
 
 /* Copyright (c) 2002 Red Hat Incorporated.
    All rights reserved.
+   Modified (m) 2017 Thomas Wolff: consider locale, add dummy uc2jp
 
    Redistribution and use in source and binary forms, with or without
    modification, are permitted provided that the following conditions are met:
@@ -25,7 +26,7 @@
    (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
    LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
    ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-   (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS   
+   (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
    SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
@@ -40,12 +41,14 @@
 #include <string.h>
 #include <wctype.h>
 #include "local.h"
-#include "jp2uc.h"
 
 /* Japanese encoding types supported */
 #define JP_JIS		1
 #define JP_SJIS		2
 #define JP_EUCJP	3
+
+/* Japanese to Unicode conversion routine */
+#include "jp2uc.h"
 
 static wint_t
 __jp2uc (wint_t c, int type)
@@ -104,7 +107,7 @@ __jp2uc (wint_t c, int type)
       return d02f4[index];
     }
 
-  /* handle smaller ranges here */    
+  /* handle smaller ranges here */
   switch (byte1)
     {
     case 0xA1:
@@ -148,18 +151,48 @@ __jp2uc (wint_t c, int type)
       return WEOF;
     }
 
-  return WEOF; 
+  return WEOF;
+}
+
+/* Unicode to Japanese conversion routine */
+static wint_t
+__uc2jp (wint_t c, int type)
+{
+#warning back-conversion Unicode to Japanese not implemented; needed for towupper/towlower
+  return c;
+}
+
+/* Japanese to Unicode conversion interface */
+wint_t
+_jp2uc_l (wint_t c, struct __locale_t * l)
+{
+  char * cs = l ? __locale_charset(l) : __current_locale_charset();
+  if (0 == strcmp (cs, "JIS"))
+    c = __jp2uc (c, JP_JIS);
+  else if (0 == strcmp (cs, "SJIS"))
+    c = __jp2uc (c, JP_SJIS);
+  else if (0 == strcmp (cs, "EUCJP"))
+    c = __jp2uc (c, JP_EUCJP);
+  return c;
 }
 
 wint_t
 _jp2uc (wint_t c)
 {
-  if (!strcmp (__current_locale_charset (), "JIS"))
-    c = __jp2uc (c, JP_JIS);
-  else if (!strcmp (__current_locale_charset (), "SJIS"))
-    c = __jp2uc (c, JP_SJIS);
-  else if (!strcmp (__current_locale_charset (), "EUCJP"))
-    c = __jp2uc (c, JP_EUCJP);
+  return _jp2uc_l (c, 0);
+}
+
+/* Unicode to Japanese conversion interface */
+wint_t
+_uc2jp_l (wint_t c, struct __locale_t * l)
+{
+  char * cs = l ? __locale_charset(l) : __current_locale_charset();
+  if (0 == strcmp (cs, "JIS"))
+    c = __uc2jp (c, JP_JIS);
+  else if (0 == strcmp (cs, "SJIS"))
+    c = __uc2jp (c, JP_SJIS);
+  else if (0 == strcmp (cs, "EUCJP"))
+    c = __uc2jp (c, JP_EUCJP);
   return c;
 }
 

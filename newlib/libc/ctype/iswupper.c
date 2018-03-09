@@ -17,14 +17,14 @@ SYNOPSIS
 
 DESCRIPTION
 <<iswupper>> is a function which classifies wide-character values that
-have uppercase translations.
+are categorized as uppercase.
 
 <<iswupper_l>> is like <<iswupper>> but performs the check based on the
 locale specified by the locale object locale.  If <[locale]> is
 LC_GLOBAL_LOCALE or not a valid locale object, the behaviour is undefined.
 
 RETURNS
-<<iswupper>>, <<iswupper_l>> return non-zero if <[c]> is a uppercase wide character.
+<<iswupper>>, <<iswupper_l>> return non-zero if <[c]> is an uppercase wide character.
 
 PORTABILITY
 <<iswupper>> is C99.
@@ -38,5 +38,5 @@ No supporting OS subroutines are required.
 int
 iswupper (wint_t c)
 {
-  return (towlower (c) != c);
+  return iswupper_l (c, 0);
 }

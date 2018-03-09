@@ -38,5 +38,6 @@ No supporting OS subroutines are required.
 int
 iswdigit (wint_t c)
 {
-  return (c >= (wint_t)'0' && c <= (wint_t)'9');
+  return c >= (wint_t)'0' && c <= (wint_t)'9';
+  // category (c) == CAT_Nd not to be included as of C-99
 }

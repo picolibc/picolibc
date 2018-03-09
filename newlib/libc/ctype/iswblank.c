@@ -1,5 +1,6 @@
 /* Copyright (c) 2002 Red Hat Incorporated.
    All rights reserved.
+   Modified (m) 2017 Thomas Wolff to refer to generated Unicode data tables.
 
    Redistribution and use in source and binary forms, with or without
    modification, are permitted provided that the following conditions are met:
@@ -62,26 +63,10 @@ PORTABILITY
 No supporting OS subroutines are required.
 */
 #include <_ansi.h>
-#include <newlib.h>
 #include <wctype.h>
-#include <ctype.h>
-#include <string.h>
-#include "local.h"
 
 int
 iswblank (wint_t c)
 {
-#ifdef _MB_CAPABLE
-  c = _jp2uc (c);
-  /* Based on Unicode 5.2.  Control char 09, plus all characters
-     from general category "Zs", which are not marked as decomposition
-     type "noBreak". */
-  return (c == 0x0009 || c == 0x0020 ||
-	  c == 0x1680 || c == 0x180e ||
-	  (c >= 0x2000 && c <= 0x2006) ||
-	  (c >= 0x2008 && c <= 0x200a) ||
-	  c == 0x205f || c == 0x3000);
-#else
-  return (c < 0x100 ? isblank (c) : 0);
-#endif /* _MB_CAPABLE */
+  return iswblank_l (c, 0);
 }
