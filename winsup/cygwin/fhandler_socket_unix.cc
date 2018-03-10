@@ -1029,7 +1029,21 @@ fhandler_socket_unix::~fhandler_socket_unix ()
 int
 fhandler_socket_unix::dup (fhandler_base *child, int flags)
 {
+  if (fhandler_socket::dup (child, flags))
+    {
+      __seterrno ();
+      return -1;
+    }
   fhandler_socket_unix *fhs = (fhandler_socket_unix *) child;
+  if (backing_file_handle && backing_file_handle != INVALID_HANDLE_VALUE
+      && !DuplicateHandle (GetCurrentProcess (), backing_file_handle,
+			    GetCurrentProcess (), &fhs->backing_file_handle,
+			    0, TRUE, DUPLICATE_SAME_ACCESS))
+    {
+      __seterrno ();
+      fhs->close ();
+      return -1;
+    }
   fhs->set_sun_path (get_sun_path ());
   fhs->set_peer_sun_path (get_peer_sun_path ());
   InitializeSRWLock (&fhs->conn_lock);
@@ -1038,7 +1052,7 @@ fhandler_socket_unix::dup (fhandler_base *child, int flags)
   fhs->connect_wait_thr = NULL;
   fhs->cwt_termination_evt = NULL;
   fhs->cwt_param = NULL;
-  return fhandler_socket::dup (child, flags);
+  return 0;
 }
 
 /* Waiter thread method.  Here we wait for a pipe instance to become
