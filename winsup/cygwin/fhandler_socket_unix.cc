@@ -982,6 +982,8 @@ fhandler_socket_unix::set_cred ()
   peer_cred.gid = (gid_t) -1;
 }
 
+/* ========================== public methods ========================= */
+
 void
 fhandler_socket_unix::fixup_after_fork (HANDLE parent)
 {
@@ -997,14 +999,19 @@ fhandler_socket_unix::fixup_after_fork (HANDLE parent)
 }
 
 void
+fhandler_socket_unix::fixup_after_exec ()
+{
+  if (!close_on_exec ())
+    fixup_after_fork (NULL);
+}
+
+void
 fhandler_socket_unix::set_close_on_exec (bool val)
 {
   fhandler_base::set_close_on_exec (val);
   if (backing_file_handle && backing_file_handle != INVALID_HANDLE_VALUE)
     set_no_inheritance (backing_file_handle, val);
 }
-
-/* ========================== public methods ========================= */
 
 fhandler_socket_unix::fhandler_socket_unix ()
 {

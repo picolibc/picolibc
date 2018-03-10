@@ -900,6 +900,7 @@ class fhandler_socket_unix : public fhandler_socket
 	  : set_peer_sun_path (NULL, 0); }
   void set_cred ();
   void fixup_after_fork (HANDLE parent);
+  void fixup_after_exec ();
   void set_close_on_exec (bool val);
 
  public:
