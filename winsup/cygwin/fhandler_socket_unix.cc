@@ -223,7 +223,8 @@ fhandler_socket_unix::create_abstract_link (const sun_name_t *sun,
   /* NUL bytes have no special meaning in an abstract socket name, so
      we assume iso-8859-1 for simplicity and transpose the string.
      transform_chars_af_unix is doing just that. */
-  transform_chars_af_unix (p, sun->un.sun_path, sun->un_len);
+  p = transform_chars_af_unix (p, sun->un.sun_path, sun->un_len);
+  *p = L'\0';
   RtlInitUnicodeString (&uname, name);
   InitializeObjectAttributes (&attr, &uname, OBJ_CASE_INSENSITIVE,
 			      get_shared_parent_dir (), NULL);
