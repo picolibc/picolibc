@@ -298,6 +298,7 @@ case "${host_cpu}" in
 	default_newlib_nano_malloc="yes"
 	default_newlib_atexit_dynamic_alloc="no"
 	machine_dir=pru
+	libm_machine_dir=pru
 	;;
   riscv*)
 	libm_machine_dir=riscv

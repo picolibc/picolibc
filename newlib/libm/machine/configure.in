@@ -29,6 +29,7 @@ if test -n "${libm_machine_dir}"; then
 	arm) AC_CONFIG_SUBDIRS(arm) ;;
 	i386) AC_CONFIG_SUBDIRS(i386) ;;
 	nds32) AC_CONFIG_SUBDIRS(nds32) ;;
+	pru) AC_CONFIG_SUBDIRS(pru) ;;
 	spu) AC_CONFIG_SUBDIRS(spu) ;;
 	riscv) AC_CONFIG_SUBDIRS(riscv) ;;
 	x86_64) AC_CONFIG_SUBDIRS(x86_64) ;;
