@@ -352,6 +352,11 @@ _BEGIN_STD_C
 #define _JBTYPE unsigned long
 #endif
 
+#ifdef __PRU__
+#define _JBLEN 48
+#define _JBTYPE unsigned int
+#endif
+
 #ifdef __RX__
 #define _JBLEN 0x44
 #endif

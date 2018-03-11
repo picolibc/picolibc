@@ -176,6 +176,9 @@ case "${target}" in
   or1k-*-* | or1knd-*-* )
 	AC_CONFIG_SUBDIRS([or1k])
 	;;
+  pru-*-*)
+	AC_CONFIG_SUBDIRS([pru])
+	;;
   nios2-*-*)
 	AC_CONFIG_SUBDIRS([nios2])
 	;;

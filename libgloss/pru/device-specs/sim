@@ -1,0 +1,5 @@
+*cpp_device:
+-D__SIM__
+
+*link_device:
+%{!r:-Tpruelf-sim.x}

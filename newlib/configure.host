@@ -87,7 +87,7 @@ case "${target_optspace}:${host}" in
   yes:*)
     newlib_cflags="${newlib_cflags} -Os"
     ;;
-  :m32r-* | :d10v-* | :d30v-* | :avr-* | :m32c-* | :msp430*-* | :nds32* | :rl78-* )
+  :m32r-* | :d10v-* | :d30v-* | :avr-* | :m32c-* | :msp430*-* | :nds32* | :pru-* | :rl78-* )
     newlib_cflags="${newlib_cflags} -Os"
     ;;
   no:* | :*)
@@ -290,6 +290,14 @@ case "${host_cpu}" in
 	;;
   powerpc*)
 	machine_dir=powerpc
+	;;
+  pru*)
+	newlib_cflags="${newlib_cflags} -DPREFER_SIZE_OVER_SPEED"
+	newlib_cflags="${newlib_cflags} -DNO_EXEC"
+	newlib_cflags="${newlib_cflags} -DSMALL_MEMORY"
+	default_newlib_nano_malloc="yes"
+	default_newlib_atexit_dynamic_alloc="no"
+	machine_dir=pru
 	;;
   riscv*)
 	libm_machine_dir=riscv
@@ -856,6 +864,10 @@ newlib_cflags="${newlib_cflags} -DCLOCK_PROVIDED -DMALLOC_PROVIDED -DEXIT_PROVID
   powerpcle-*-pe)
 	newlib_cflags="${newlib_cflags} -DHAVE_OPENDIR -DHAVE_RENAME -DHAVE_FCNTL -D_NO_POSIX_SPAWN"
 	syscall_dir=syscalls
+	;;
+  pru*)
+	syscall_dir=syscalls
+	newlib_cflags="${newlib_cflags} -DSMALL_MEMORY -D_REENT_SMALL"
 	;;
   riscv*-*-*)
 	syscall_dir=syscalls

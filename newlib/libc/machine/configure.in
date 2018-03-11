@@ -65,6 +65,7 @@ if test -n "${machine_dir}"; then
 	nvptx) AC_CONFIG_SUBDIRS(nvptx) ;;
 	or1k) AC_CONFIG_SUBDIRS(or1k) ;;
 	powerpc) AC_CONFIG_SUBDIRS(powerpc) ;;
+	pru) AC_CONFIG_SUBDIRS(pru) ;;
 	rl78) AC_CONFIG_SUBDIRS(rl78) ;;
 	rx) AC_CONFIG_SUBDIRS(rx) ;;
 	sh) AC_CONFIG_SUBDIRS(sh) ;;
