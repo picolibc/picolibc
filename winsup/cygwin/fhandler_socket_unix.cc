@@ -818,9 +818,10 @@ fhandler_socket_unix::wait_pipe (PUNICODE_STRING pipe_name)
   PVOID param;
 
   if (!(cwt_termination_evt = create_event ()))
-      return -1;
-  wait_info = (conn_wait_info_t *)
-	      cmalloc_abort (HEAP_FHANDLER, sizeof *wait_info);
+    return -1;
+  wait_info = (conn_wait_info_t *) cmalloc (HEAP_3_FHANDLER, sizeof *wait_info);
+  if (!wait_info)
+    return -1;
   wait_info->fh = this;
   RtlInitEmptyUnicodeString (&wait_info->pipe_name, wait_info->pipe_name_buf,
 			     sizeof wait_info->pipe_name_buf);
