@@ -204,7 +204,7 @@ fhandler_socket_unix::gen_pipe_name ()
   __small_swprintf (pipe_name_buf, L"cygwin-%S-unix-%C-%016_X",
 		    &cygheap->installation_key,
 		    get_type_char (),
-		    get_plain_ino ());
+		    get_unique_id ());
   RtlInitUnicodeString (&pipe_name, pipe_name_buf);
   pc.set_nt_native_path (&pipe_name);
 }
