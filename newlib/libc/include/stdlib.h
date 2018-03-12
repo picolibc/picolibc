@@ -140,8 +140,7 @@ void	qsort (void *__base, size_t __nmemb, size_t __size, __compar_fn_t _compar);
 int	rand (void);
 void *	realloc (void *__r, size_t __size) _NOTHROW;
 #if __BSD_VISIBLE
-void	*reallocarray(void *, size_t, size_t) __result_use_check __alloc_size(2)
-	    __alloc_size(3);
+void	*reallocarray(void *, size_t, size_t) __result_use_check __alloc_size((2,3));
 void *	reallocf (void *__r, size_t __size);
 #endif
 #if __BSD_VISIBLE || __XSI_VISIBLE >= 4
