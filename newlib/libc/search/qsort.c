@@ -145,6 +145,22 @@ __unused
               :(CMP(thunk, b, c) > 0 ? b : (CMP(thunk, a, c) < 0 ? a : c ));
 }
 
+/*
+ * Classical function call recursion wastes a lot of stack space. Each
+ * recursion level requires a full stack frame comprising all local variables
+ * and additional space as dictated by the processor calling convention.
+ *
+ * This implementation instead stores the variables that are unique for each
+ * recursion level in a parameter stack array, and uses iteration to emulate
+ * recursion. Function call recursion is not used until the array is full.
+ *
+ * To ensure the stack consumption isn't worsened by this design, the size of
+ * the parameter stack array is chosen to be similar to the stack frame
+ * excluding the array. Each function call recursion level can handle this
+ * number of iterative recursion levels.
+ */
+#define PARAMETER_STACK_LEVELS 8u
+
 #if defined(I_AM_QSORT_R)
 void
 __bsd_qsort_r (void *a,
@@ -172,6 +188,8 @@ qsort (void *a,
 	size_t d, r;
 	int cmp_result;
 	int swaptype, swap_cnt;
+	size_t recursion_level = 0;
+	struct { void *a; size_t n; } parameter_stack[PARAMETER_STACK_LEVELS];
 
 	SWAPINIT(a, es);
 loop:	swap_cnt = 0;
@@ -181,7 +199,7 @@ loop:	swap_cnt = 0;
 			for (pl = pm; pl > (char *) a && CMP(thunk, pl - es, pl) > 0;
 			     pl -= es)
 				swap(pl, pl - es);
-		return;
+		goto pop;
 	}
 
 	/* Select a pivot element, move it to the left. */
@@ -239,7 +257,7 @@ loop:	swap_cnt = 0;
 			for (pl = pm; pl > (char *) a && CMP(thunk, pl - es, pl) > 0;
 			     pl -= es)
 				swap(pl, pl - es);
-		return;
+		goto pop;
 	}
 
 	/*
@@ -280,18 +298,48 @@ loop:	swap_cnt = 0;
 	 * recursion depth that is bounded to be less than (log2(n)).
 	 */
 	if (r > es) {  /* Smaller part > 1 element. Both parts need sorting. */
-		/* Sort smaller part using recursion. */
+		if (recursion_level < PARAMETER_STACK_LEVELS) {
+			/*
+			 * The smaller part needs to be recursively sorted
+			 * before the larger part is sorted. To avoid function
+			 * call recursion the parameters for the larger part
+			 * are pushed on the parameter_stack array. The smaller
+			 * part is sorted using iteration and the larger part
+			 * will be sorted when the parameter_stack is popped
+			 * after the smaller part has been sorted.
+			 */
+			parameter_stack[recursion_level].a = a;
+			parameter_stack[recursion_level].n = n / es;
+			recursion_level++;
+			a = pa;
+			n = r / es;
+			goto loop;
+		}
+		else {
+			/*
+			 * The parameter_stack array is full. The smaller part
+			 * is sorted using function call recursion. The larger
+			 * part will be sorted after the function call returns.
+			 */
 #if defined(I_AM_QSORT_R)
-		__bsd_qsort_r(pa, r / es, es, thunk, cmp);
+			__bsd_qsort_r(pa, r / es, es, thunk, cmp);
 #elif defined(I_AM_GNU_QSORT_R)
-		qsort_r(pa, r / es, es, cmp, thunk);
+			qsort_r(pa, r / es, es, cmp, thunk);
 #else
-		qsort(pa, r / es, es, cmp);
+			qsort(pa, r / es, es, cmp);
 #endif
+		}
 	}
 	if (n > es) {  /* The larger part needs sorting. Iterate to sort.  */
 		n = n / es;
 		goto loop;
 	}
 	/* Both left and right parts are one element or less - level done. */
+pop:
+	if (recursion_level != 0) {
+		recursion_level--;
+		a = parameter_stack[recursion_level].a;
+		n = parameter_stack[recursion_level].n;
+		goto loop;
+	}
 }
