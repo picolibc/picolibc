@@ -54,6 +54,7 @@ struct dirent {
 #define	MAXNAMLEN NAME_MAX
 #endif
 
+int alphasort(const struct dirent **, const struct dirent **);
 int scandir ( const char *dirname,
    struct dirent *** namelist,
    int (*select)(const struct dirent *),
