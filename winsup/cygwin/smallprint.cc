@@ -80,7 +80,7 @@ public:
 };
 
 WCHAR tmpbuf::buf[NT_MAX_PATH];
-muto tmpbuf::lock;
+NO_COPY muto tmpbuf::lock;
 
 static char __fastcall *
 __rn (char *dst, int base, int dosign, long long val, int len, int pad, unsigned long long mask)
