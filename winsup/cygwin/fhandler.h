@@ -525,34 +525,6 @@ class fhandler_socket: public fhandler_base
   DWORD &rcvtimeo () { return _rcvtimeo; }
   DWORD &sndtimeo () { return _sndtimeo; }
 
- protected:
-  struct status_flags
-  {
-    unsigned async_io		   : 1; /* async I/O */
-    unsigned saw_shutdown_read     : 1; /* Socket saw a SHUT_RD */
-    unsigned saw_shutdown_write    : 1; /* Socket saw a SHUT_WR */
-    unsigned saw_reuseaddr	   : 1; /* Socket saw SO_REUSEADDR call */
-   public:
-    status_flags () :
-      async_io (0), saw_shutdown_read (0), saw_shutdown_write (0),
-      saw_reuseaddr (0)
-      {}
-  } status;
-  LONG _connection_state;
-  LONG _binding_state;
- public:
-  IMPLEMENT_STATUS_FLAG (bool, async_io)
-  IMPLEMENT_STATUS_FLAG (bool, saw_shutdown_read)
-  IMPLEMENT_STATUS_FLAG (bool, saw_shutdown_write)
-  IMPLEMENT_STATUS_FLAG (bool, saw_reuseaddr)
-
-  conn_state connect_state (conn_state val)
-    { return (conn_state) InterlockedExchange (&_connection_state, val); }
-  conn_state connect_state () const { return (conn_state) _connection_state; }
-  bind_state binding_state (bind_state val)
-    { return (bind_state) InterlockedExchange (&_binding_state, val); }
-  bind_state binding_state () const { return (bind_state) _binding_state; }
-
  public:
   fhandler_socket ();
   ~fhandler_socket ();
@@ -636,6 +608,27 @@ class fhandler_socket_wsock: public fhandler_socket
   const HANDLE wsock_event () const { return wsock_evt; }
   int evaluate_events (const long event_mask, long &events, const bool erase);
   const LONG serial_number () const { return wsock_events->serial_number; }
+
+ protected:
+  struct status_flags
+  {
+    unsigned async_io		   : 1; /* async I/O */
+    unsigned saw_shutdown_read     : 1; /* Socket saw a SHUT_RD */
+    unsigned saw_shutdown_write    : 1; /* Socket saw a SHUT_WR */
+    unsigned saw_reuseaddr	   : 1; /* Socket saw SO_REUSEADDR call */
+    unsigned connect_state	   : 3;
+   public:
+    status_flags () :
+      async_io (0), saw_shutdown_read (0), saw_shutdown_write (0),
+      saw_reuseaddr (0), connect_state (unconnected)
+      {}
+  } status;
+ public:
+  IMPLEMENT_STATUS_FLAG (bool, async_io)
+  IMPLEMENT_STATUS_FLAG (bool, saw_shutdown_read)
+  IMPLEMENT_STATUS_FLAG (bool, saw_shutdown_write)
+  IMPLEMENT_STATUS_FLAG (bool, saw_reuseaddr)
+  IMPLEMENT_STATUS_FLAG (conn_state, connect_state)
 
  protected:
   struct _WSAPROTOCOL_INFOW *prot_info_ptr;
@@ -850,23 +843,101 @@ class sun_name_t
   void operator delete (void *p) {cfree (p);}
 };
 
+/* Internal representation of shutdown states */
+enum shut_state {
+  _SHUT_READ	= 1,
+  _SHUT_WRITE	= 2,
+  _SHUT_RW	= 3
+};
+
+/* For each AF_UNIX socket, we need to maintain socket-wide data,
+   regardless of the number of descriptors.  The shmem region gets created
+   in socket, socketpair or accept4 and reopened by dup, fork or exec. */
+class af_unix_shmem_t
+{
+  SRWLOCK _bind_lock;
+  SRWLOCK _conn_lock;
+  SRWLOCK _io_lock;
+  LONG _connection_state;	/* conn_state */
+  LONG _binding_state;		/* bind_state */
+  LONG _shutdown;		/* shut_state */
+  LONG _so_error;		/* SO_ERROR */
+  LONG _reuseaddr;		/* dummy */
+
+ public:
+  af_unix_shmem_t ()
+  : _connection_state (unconnected), _binding_state (unbound),
+    _shutdown (0), _so_error (0)
+  {
+    InitializeSRWLock (&_bind_lock);
+    InitializeSRWLock (&_conn_lock);
+    InitializeSRWLock (&_io_lock);
+  }
+  void bind_lock () { AcquireSRWLockExclusive (&_bind_lock); }
+  void bind_unlock () { ReleaseSRWLockExclusive (&_bind_lock); }
+  void conn_lock () { AcquireSRWLockExclusive (&_conn_lock); }
+  void conn_unlock () { ReleaseSRWLockExclusive (&_conn_lock); }
+  void io_lock () { AcquireSRWLockExclusive (&_io_lock); }
+  void io_unlock () { ReleaseSRWLockExclusive (&_io_lock); }
+
+  conn_state connect_state (conn_state val)
+    { return (conn_state) InterlockedExchange (&_connection_state, val); }
+  conn_state connect_state () const { return (conn_state) _connection_state; }
+
+  bind_state binding_state (bind_state val)
+    { return (bind_state) InterlockedExchange (&_binding_state, val); }
+  bind_state binding_state () const { return (bind_state) _binding_state; }
+
+  int shutdown (int shut)
+    { return (int) InterlockedExchange (&_shutdown, shut); }
+  int shutdown () const { return (int) _shutdown; }
+
+  int so_error (int err)
+    { return (int) InterlockedExchange (&_so_error, err); }
+  int so_error () const { return _so_error; }
+
+  int reuseaddr (int val)
+    { return (int) InterlockedExchange (&_reuseaddr, val); }
+  int reuseaddr () const { return _reuseaddr; }
+};
+
 class fhandler_socket_unix : public fhandler_socket
 {
  protected:
-  SRWLOCK conn_lock;
-  SRWLOCK bind_lock;
-  SRWLOCK io_lock;
+  HANDLE shmem_handle;		/* Shared memory region used to share
+				   socket-wide state. */
+  af_unix_shmem_t *shmem;
   HANDLE backing_file_handle;	/* Either NT symlink or INVALID_HANDLE_VALUE,
 				   if the socket is backed by a file in the
 				   file system (actually a reparse point) */
   HANDLE connect_wait_thr;
   HANDLE cwt_termination_evt;
   PVOID cwt_param;
-  LONG so_error;
   sun_name_t *sun_path;
   sun_name_t *peer_sun_path;
   struct ucred peer_cred;
 
+  void bind_lock () { shmem->bind_lock (); }
+  void bind_unlock () { shmem->bind_unlock (); }
+  void conn_lock () { shmem->conn_lock (); }
+  void conn_unlock () { shmem->conn_unlock (); }
+  void io_lock () { shmem->io_lock (); }
+  void io_unlock () { shmem->io_unlock (); }
+  conn_state connect_state (conn_state val)
+    { return shmem->connect_state (val); }
+  conn_state connect_state () const { return shmem->connect_state (); }
+  bind_state binding_state (bind_state val)
+    { return shmem->binding_state (val); }
+  bind_state binding_state () const { return shmem->binding_state (); }
+  int saw_shutdown (int shut) { return shmem->shutdown (shut); }
+  int saw_shutdown () const { return shmem->shutdown (); }
+  int so_error (int err) { return shmem->so_error (err); }
+  int so_error () const { return shmem->so_error (); }
+  int reuseaddr (int err) { return shmem->reuseaddr (err); }
+  int reuseaddr () const { return shmem->reuseaddr (); }
+
+  int create_shmem ();
+  int reopen_shmem ();
   void gen_pipe_name ();
   static HANDLE create_abstract_link (const sun_name_t *sun,
 				      PUNICODE_STRING pipe_name);

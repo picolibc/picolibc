@@ -31,8 +31,7 @@ fhandler_socket::fhandler_socket () :
   gid (myself->gid),
   mode (S_IFSOCK | S_IRWXU | S_IRWXG | S_IRWXO),
   _rcvtimeo (INFINITE),
-  _sndtimeo (INFINITE),
-  status ()
+  _sndtimeo (INFINITE)
 {
 }
 

@@ -189,6 +189,60 @@ create_event ()
   return evt;
 }
 
+/* Called from socket, socketpair, accept4 */
+int
+fhandler_socket_unix::create_shmem ()
+{
+  HANDLE sect;
+  OBJECT_ATTRIBUTES attr;
+  NTSTATUS status;
+  LARGE_INTEGER size = { .QuadPart = sizeof (af_unix_shmem_t) };
+  SIZE_T viewsize = sizeof (af_unix_shmem_t);
+  PVOID addr = NULL;
+
+  InitializeObjectAttributes (&attr, NULL, OBJ_INHERIT, NULL, NULL);
+  status = NtCreateSection (&sect, STANDARD_RIGHTS_REQUIRED | SECTION_QUERY
+				   | SECTION_MAP_READ | SECTION_MAP_WRITE,
+			    &attr, &size, PAGE_READWRITE, SEC_COMMIT, NULL);
+  if (!NT_SUCCESS (status))
+    {
+      __seterrno_from_nt_status (status);
+      return -1;
+    }
+  status = NtMapViewOfSection (sect, NtCurrentProcess (), &addr, 0, viewsize,
+			       NULL, &viewsize, ViewShare, 0, PAGE_READWRITE);
+  if (!NT_SUCCESS (status))
+    {
+      NtClose (sect);
+      __seterrno_from_nt_status (status);
+      return -1;
+    }
+  shmem_handle = sect;
+  shmem = (af_unix_shmem_t *) addr;
+  return 0;
+}
+
+/* Called from dup, fixup_after_fork.  Expects shmem_handle to be
+   valid. */
+int
+fhandler_socket_unix::reopen_shmem ()
+{
+  NTSTATUS status;
+  SIZE_T viewsize = PAGESIZE;
+  PVOID addr = NULL;
+
+  status = NtMapViewOfSection (shmem_handle, NtCurrentProcess (), &addr, 0,
+			       PAGESIZE, NULL, &viewsize, ViewShare, 0,
+			       PAGE_READWRITE);
+  if (!NT_SUCCESS (status))
+    {
+      __seterrno_from_nt_status (status);
+      return -1;
+    }
+  shmem = (af_unix_shmem_t *) addr;
+  return 0;
+}
+
 /* Character length of pipe name, excluding trailing NUL. */
 #define CYGWIN_PIPE_SOCKET_NAME_LEN     47
 
@@ -573,23 +627,23 @@ fhandler_socket_unix::send_my_name ()
   NTSTATUS status;
   IO_STATUS_BLOCK io;
 
-  AcquireSRWLockShared (&bind_lock);
+  bind_lock ();
   sun = get_sun_path ();
   name_len = sun ? sun->un_len : 0;
   packet = (af_unix_pkt_hdr_t *) alloca (sizeof *packet + name_len);
   if (sun)
     memcpy (AF_UNIX_PKT_NAME (packet), &sun->un, name_len);
-  ReleaseSRWLockShared (&bind_lock);
+  bind_unlock ();
 
   packet->init (0, name_len, 0, 0);
 
   /* The theory: Fire and forget. */
-  AcquireSRWLockExclusive (&io_lock);
+  io_lock ();
   set_pipe_non_blocking (true);
   status = NtWriteFile (get_handle (), NULL, NULL, NULL, &io, packet,
 			packet->pckt_len, NULL, NULL);
   set_pipe_non_blocking (is_nonblocking ());
-  ReleaseSRWLockExclusive (&io_lock);
+  io_unlock ();
   if (!NT_SUCCESS (status))
     {
       debug_printf ("Couldn't send my name: NtWriteFile: %y", status);
@@ -867,7 +921,7 @@ fhandler_socket_unix::wait_pipe (PUNICODE_STRING pipe_name)
       set_errno (EINTR);
       break;
     default:
-      InterlockedExchange (&so_error, err);
+      so_error (err);
       if (err)
 	set_errno (err);
       else
@@ -894,10 +948,10 @@ fhandler_socket_unix::connect_pipe (PUNICODE_STRING pipe_name)
   if (!NT_SUCCESS (status))
     {
       __seterrno_from_nt_status (status);
-      InterlockedExchange (&so_error, get_errno ());
+      so_error (get_errno ());
       return -1;
     }
-  InterlockedExchange (&so_error, 0);
+  so_error (0);
   return 0;
 }
 
@@ -991,9 +1045,11 @@ fhandler_socket_unix::fixup_after_fork (HANDLE parent)
   fhandler_socket::fixup_after_fork (parent);
   if (backing_file_handle && backing_file_handle != INVALID_HANDLE_VALUE)
     fork_fixup (parent, backing_file_handle, "backing_file_handle");
-  InitializeSRWLock (&conn_lock);
-  InitializeSRWLock (&bind_lock);
-  InitializeSRWLock (&io_lock);
+  if (shmem_handle)
+    {
+      fork_fixup (parent, shmem_handle, "shmem_handle");
+      reopen_shmem ();
+    }
   connect_wait_thr = NULL;
   cwt_termination_evt = NULL;
   cwt_param = NULL;
@@ -1012,6 +1068,8 @@ fhandler_socket_unix::set_close_on_exec (bool val)
   fhandler_base::set_close_on_exec (val);
   if (backing_file_handle && backing_file_handle != INVALID_HANDLE_VALUE)
     set_no_inheritance (backing_file_handle, val);
+  if (shmem_handle)
+    set_no_inheritance (shmem_handle, val);
 }
 
 fhandler_socket_unix::fhandler_socket_unix ()
@@ -1045,11 +1103,22 @@ fhandler_socket_unix::dup (fhandler_base *child, int flags)
       fhs->close ();
       return -1;
     }
+  if (!DuplicateHandle (GetCurrentProcess (), shmem_handle,
+			GetCurrentProcess (), &fhs->shmem_handle,
+			0, TRUE, DUPLICATE_SAME_ACCESS))
+    {
+      __seterrno ();
+      fhs->close ();
+      return -1;
+    }
+  if (reopen_shmem () < 0)
+    {
+      __seterrno ();
+      fhs->close ();
+      return -1;
+    }
   fhs->set_sun_path (get_sun_path ());
   fhs->set_peer_sun_path (get_peer_sun_path ());
-  InitializeSRWLock (&fhs->conn_lock);
-  InitializeSRWLock (&fhs->bind_lock);
-  InitializeSRWLock (&fhs->io_lock);
   fhs->connect_wait_thr = NULL;
   fhs->cwt_termination_evt = NULL;
   fhs->cwt_param = NULL;
@@ -1155,10 +1224,10 @@ out:
   PVOID param = InterlockedExchangePointer (&cwt_param, NULL);
   if (param)
     cfree (param);
-  AcquireSRWLockExclusive (&conn_lock);
-  InterlockedExchange (&so_error, error);
+  conn_lock ();
+  so_error (error);
   connect_state (error ? connect_failed : connected);
-  ReleaseSRWLockExclusive (&conn_lock);
+  conn_unlock ();
   return error;
 }
 
@@ -1175,6 +1244,8 @@ fhandler_socket_unix::socket (int af, int type, int protocol, int flags)
       set_errno (EPROTONOSUPPORT);
       return -1;
     }
+  if (create_shmem () < 0)
+    return -1;
   rmem (262144);
   wmem (262144);
   set_addr_family (af);
@@ -1225,22 +1296,28 @@ fhandler_socket_unix::socketpair (int af, int type, int protocol, int flags,
   if (!pipe)
     return -1;
   set_io_handle (pipe);
-  backing_file_handle = autobind (&sun);
-  if (!backing_file_handle)
+  set_sun_path (&sun);
+  fh->set_peer_sun_path (&sun);
+  if (create_shmem () < 0)
     {
       NtClose (pipe);
       return -1;
     }
-  set_sun_path (&sun);
-  fh->set_peer_sun_path (&sun);
   binding_state (bound);
   connect_state (listener);
   /* connect 2nd socket */
   if (type != SOCK_DGRAM
       && fh->open_pipe (pc.get_nt_native_path (), false) < 0)
     {
+      NtClose (shmem_handle);
       NtClose (pipe);
       return -1;
+    }
+  if (fh->create_shmem () < 0)
+    {
+      NtClose (fh->get_handle ());
+      NtClose (shmem_handle);
+      NtClose (pipe);
     }
   fh->connect_state (connected);
   if (flags & SOCK_NONBLOCK)
@@ -1271,21 +1348,21 @@ fhandler_socket_unix::bind (const struct sockaddr *name, int namelen)
       set_errno (EINVAL);
       return -1;
     }
-  AcquireSRWLockExclusive (&bind_lock);
+  bind_lock ();
   if (binding_state () == bind_pending)
     {
       set_errno (EALREADY);
-      ReleaseSRWLockExclusive (&bind_lock);
+      bind_unlock ();
       return -1;
     }
   if (binding_state () == bound)
     {
       set_errno (EINVAL);
-      ReleaseSRWLockExclusive (&bind_lock);
+      bind_unlock ();
       return -1;
     }
   binding_state (bind_pending);
-  ReleaseSRWLockExclusive (&bind_lock);
+  bind_unlock ();
   gen_pipe_name ();
   if (get_socket_type () == SOCK_DGRAM)
     {
@@ -1323,21 +1400,21 @@ fhandler_socket_unix::listen (int backlog)
       set_errno (EOPNOTSUPP);
       return -1;
     }
-  AcquireSRWLockShared (&bind_lock);
+  bind_lock ();
   while (binding_state () == bind_pending)
     yield ();
   if (binding_state () == unbound)
     {
       set_errno (EDESTADDRREQ);
-      ReleaseSRWLockShared (&bind_lock);
+      bind_unlock ();
       return -1;
     }
-  ReleaseSRWLockShared (&bind_lock);
-  AcquireSRWLockExclusive (&conn_lock);
+  bind_unlock ();
+  conn_lock ();
   if (connect_state () != unconnected && connect_state () != connect_failed)
     {
       set_errno (connect_state () == listener ? EADDRINUSE : EINVAL);
-      ReleaseSRWLockExclusive (&conn_lock);
+      conn_unlock ();
       return -1;
     }
   HANDLE pipe = create_pipe (false);
@@ -1348,7 +1425,7 @@ fhandler_socket_unix::listen (int backlog)
     }
   set_io_handle (pipe);
   connect_state (listener);
-  ReleaseSRWLockExclusive (&conn_lock);
+  conn_unlock ();
   return 0;
 }
 
@@ -1371,17 +1448,17 @@ fhandler_socket_unix::accept4 (struct sockaddr *peer, int *len, int flags)
       /* Our handle is now connected with a client.  This handle is used
          for the accepted socket.  Our handle has to be replaced with a
 	 new instance handle for the next accept. */
-      AcquireSRWLockExclusive (&io_lock);
+      io_lock ();
       HANDLE accepted = get_handle ();
       HANDLE new_inst = create_pipe_instance ();
       int error = ENOBUFS;
       if (!new_inst)
-	ReleaseSRWLockExclusive (&io_lock);
+	io_unlock ();
       else
 	{
 	  /* Set new io handle. */
 	  set_io_handle (new_inst);
-	  ReleaseSRWLockExclusive (&io_lock);
+	  io_unlock ();
 	  /* Prepare new file descriptor. */
 	  cygheap_fdnew fd;
 
@@ -1391,6 +1468,9 @@ fhandler_socket_unix::accept4 (struct sockaddr *peer, int *len, int flags)
 					   build_fh_dev (dev ());
 	      if (sock)
 		{
+		  if (sock->create_shmem () < 0)
+		    goto create_shmem_failed;
+
 		  sock->set_addr_family (get_addr_family ());
 		  sock->set_socket_type (get_socket_type ());
 		  if (flags & SOCK_NONBLOCK)
@@ -1433,6 +1513,7 @@ fhandler_socket_unix::accept4 (struct sockaddr *peer, int *len, int flags)
 			}
 		      __endtry
 		    }
+create_shmem_failed:
 		  delete sock;
 		}
 	      fd.release ();
@@ -1455,27 +1536,27 @@ fhandler_socket_unix::connect (const struct sockaddr *name, int namelen)
   UNICODE_STRING pipe_name;
 
   /* Test and set connection state. */
-  AcquireSRWLockExclusive (&conn_lock);
+  conn_lock ();
   if (connect_state () == connect_pending)
     {
       set_errno (EALREADY);
-      ReleaseSRWLockExclusive (&conn_lock);
+      conn_unlock ();
       return -1;
     }
   if (connect_state () == listener)
     {
       set_errno (EADDRINUSE);
-      ReleaseSRWLockExclusive (&conn_lock);
+      conn_unlock ();
       return -1;
     }
   if (connect_state () == connected && get_socket_type () != SOCK_DGRAM)
     {
       set_errno (EISCONN);
-      ReleaseSRWLockExclusive (&conn_lock);
+      conn_unlock ();
       return -1;
     }
   connect_state (connect_pending);
-  ReleaseSRWLockExclusive (&conn_lock);
+  conn_unlock ();
   /* Check validity of name */
   if (sun.un_len <= (int) sizeof (sa_family_t))
     {
@@ -1577,6 +1658,12 @@ fhandler_socket_unix::close ()
   PVOID param = InterlockedExchangePointer (&cwt_param, NULL);
   if (param)
     cfree (param);
+  HANDLE shm = InterlockedExchangePointer (&shmem_handle, NULL);
+  if (shm)
+    NtClose (shm);
+  param = InterlockedExchangePointer ((PVOID *) &shmem, NULL);
+  if (param)
+    NtUnmapViewOfSection (GetCurrentProcess (), param);
   if (get_handle ())
     NtClose (get_handle ());
   if (backing_file_handle && backing_file_handle != INVALID_HANDLE_VALUE)
@@ -1594,7 +1681,7 @@ fhandler_socket_unix::getpeereid (pid_t *pid, uid_t *euid, gid_t *egid)
       set_errno (EINVAL);
       return -1;
     }
-  AcquireSRWLockShared (&conn_lock);
+  conn_lock ();
   if (connect_state () != connected)
     set_errno (ENOTCONN);
   else
@@ -1612,7 +1699,7 @@ fhandler_socket_unix::getpeereid (pid_t *pid, uid_t *euid, gid_t *egid)
       __except (EFAULT) {}
       __endtry
     }
-  ReleaseSRWLockShared (&conn_lock);
+  conn_unlock ();
   return ret;
 }
 
@@ -1756,7 +1843,7 @@ fhandler_socket_unix::setsockopt (int level, int optname, const void *optval,
 	  break;
 
 	case SO_REUSEADDR:
-	  saw_reuseaddr (*(int *) optval);
+	  reuseaddr (*(int *) optval);
 	  break;
 
 	case SO_RCVBUF:
@@ -1812,7 +1899,7 @@ fhandler_socket_unix::getsockopt (int level, int optname, const void *optval,
 	    int *e = (int *) optval;
 	    LONG err;
 
-	    err = InterlockedExchange (&so_error, 0);
+	    err = so_error (0);
 	    *e = err;
 	    break;
 	  }
@@ -1837,15 +1924,15 @@ fhandler_socket_unix::getsockopt (int level, int optname, const void *optval,
 
 	case SO_REUSEADDR:
 	  {
-	    unsigned int *reuseaddr = (unsigned int *) optval;
+	    unsigned int *reuse = (unsigned int *) optval;
 
-	    if (*optlen < (socklen_t) sizeof *reuseaddr)
+	    if (*optlen < (socklen_t) sizeof *reuse)
 	      {
 		set_errno (EINVAL);
 		return -1;
 	      }
-	    *reuseaddr = saw_reuseaddr();
-	    *optlen = (socklen_t) sizeof *reuseaddr;
+	    *reuse = reuseaddr ();
+	    *optlen = (socklen_t) sizeof *reuse;
 	    break;
 	  }
 

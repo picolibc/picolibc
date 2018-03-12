@@ -201,6 +201,7 @@ fhandler_socket_wsock::fhandler_socket_wsock () :
   wsock_events (NULL),
   wsock_mtx (NULL),
   wsock_evt (NULL),
+  status (),
   prot_info_ptr (NULL)
 {
   need_fork_fixup (true);
