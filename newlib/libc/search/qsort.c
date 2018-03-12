@@ -173,15 +173,18 @@ qsort (void *a,
 	int cmp_result;
 	int swaptype, swap_cnt;
 
-loop:	SWAPINIT(a, es);
-	swap_cnt = 0;
+	SWAPINIT(a, es);
+loop:	swap_cnt = 0;
 	if (n < 7) {
+		/* Short arrays are insertion sorted. */
 		for (pm = (char *) a + es; pm < (char *) a + n * es; pm += es)
 			for (pl = pm; pl > (char *) a && CMP(thunk, pl - es, pl) > 0;
 			     pl -= es)
 				swap(pl, pl - es);
 		return;
 	}
+
+	/* Select a pivot element, move it to the left. */
 	pm = (char *) a + (n / 2) * es;
 	if (n > 7) {
 		pl = a;
@@ -195,11 +198,17 @@ loop:	SWAPINIT(a, es);
 		pm = med3(pl, pm, pn, cmp, thunk);
 	}
 	swap(a, pm);
-	pa = pb = (char *) a + es;
 
+	/*
+	 * Sort the array relative the pivot in four ranges as follows:
+	 * { elems == pivot, elems < pivot, elems > pivot, elems == pivot }
+	 */
+	pa = pb = (char *) a + es;
 	pc = pd = (char *) a + (n - 1) * es;
 	for (;;) {
+		/* Scan left to right stopping at first element > pivot. */
 		while (pb <= pc && (cmp_result = CMP(thunk, pb, a)) <= 0) {
+			/* Move elements == pivot to the left (to pa) */
 			if (cmp_result == 0) {
 				swap_cnt = 1;
 				swap(pa, pb);
@@ -207,7 +216,9 @@ loop:	SWAPINIT(a, es);
 			}
 			pb += es;
 		}
+		/* Scan right to left stopping at first element < pivot. */
 		while (pb <= pc && (cmp_result = CMP(thunk, pc, a)) >= 0) {
+			/* Move elements == pivot to the right (to pd) */
 			if (cmp_result == 0) {
 				swap_cnt = 1;
 				swap(pc, pd);
@@ -217,6 +228,7 @@ loop:	SWAPINIT(a, es);
 		}
 		if (pb > pc)
 			break;
+		/* The scan has found two elements to swap with each other. */
 		swap(pb, pc);
 		swap_cnt = 1;
 		pb += es;
@@ -230,24 +242,56 @@ loop:	SWAPINIT(a, es);
 		return;
 	}
 
+	/*
+	 * Rearrange the array in three parts sorted like this:
+	 * { elements < pivot, elements == pivot, elements > pivot }
+	 */
 	pn = (char *) a + n * es;
 	r = min(pa - (char *)a, pb - pa);
 	vecswap(a, pb - r, r);
 	r = min(pd - pc, pn - pd - es);
 	vecswap(pb, pn - r, r);
-	if ((r = pb - pa) > es)
+	d = pb - pa; /* d = Size of left part. */
+	r = pd - pc; /* r = Size of right part. */
+	pn -= r;     /* pn = Base of right part. */
+
+	/*
+	 * Check which of the left and right parts are larger.
+	 * Set (a, n)  to (base, size) of the larger part.
+	 * Set (pa, r) to (base, size) of the smaller part.
+	 */
+	if (r > d) { /* Right part is the larger part */
+		pa = a;
+		a = pn;
+		n = r;
+		r = d;
+	}
+	else { /* Left part is the larger part, or both are equal. */
+		pa = pn;
+		n = d;
+	}
+
+	/*
+	 * The left and right parts each need further sorting if they
+	 * contain two elements or more. If both need sorting we use
+	 * recursion to sort the smaller part and save the larger part
+	 * to be sorted by iteration after the recursion.
+	 * Using recursion only for the smaller part guarantees a
+	 * recursion depth that is bounded to be less than (log2(n)).
+	 */
+	if (r > es) {  /* Smaller part > 1 element. Both parts need sorting. */
+		/* Sort smaller part using recursion. */
 #if defined(I_AM_QSORT_R)
-		__bsd_qsort_r(a, r / es, es, thunk, cmp);
+		__bsd_qsort_r(pa, r / es, es, thunk, cmp);
 #elif defined(I_AM_GNU_QSORT_R)
-		qsort_r(a, r / es, es, cmp, thunk);
+		qsort_r(pa, r / es, es, cmp, thunk);
 #else
-		qsort(a, r / es, es, cmp);
+		qsort(pa, r / es, es, cmp);
 #endif
-	if ((r = pd - pc) > es) {
-		/* Iterate rather than recurse to save stack space */
-		a = pn - r;
-		n = r / es;
+	}
+	if (n > es) {  /* The larger part needs sorting. Iterate to sort.  */
+		n = n / es;
 		goto loop;
 	}
-/*		qsort(pn - r, r / es, es, cmp);*/
+	/* Both left and right parts are one element or less - level done. */
 }
