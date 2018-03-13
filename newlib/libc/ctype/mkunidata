@@ -1,6 +1,6 @@
 #! /bin/sh
 
-echo generating Unicode character properties data for newlib/libc/ctype
+echo Generating Unicode character properties data for newlib/libc/ctype
 
 cd `dirname $0`
 
@@ -8,23 +8,41 @@ cd `dirname $0`
 # checks and (with option -u) download
 
 case "$1" in
+-h)	echo "Usage: $0 [-h|-u|-i]"
+	echo "Generate case conversion table caseconv.t and character category table categories.t"
+	echo "from local Unicode file UnicodeData.txt."
+	echo ""
+	echo "Options:"
+	echo "  -u    download file from unicode.org first"
+	echo "  -i    copy file from /usr/share/unicode/ucd first"
+	echo "  -h    show this"
+	exit
+	;;
 -u)
-	#WGET=wget -N -t 1 --timeout=55
-	WGET=curl -R -O --connect-timeout 55
-	WGET+=-z $@
+	wget () {
+		curl -R -O --connect-timeout 55 -z "`basename $1`" "$1"
+	}
 
 	echo downloading data from unicode.org
 	for data in UnicodeData.txt
-	do	$WGET http://unicode.org/Public/UNIDATA/$data
+	do	wget http://unicode.org/Public/UNIDATA/$data
 	done
 	;;
-*)	echo checking package unicode-ucd
-	grep unicode-ucd /etc/setup/installed.db || exit 9
+-i)
+	echo copying data from /usr/share/unicode/ucd
+	for data in UnicodeData.txt
+	do	cp /usr/share/unicode/ucd/$data .
+	done
 	;;
 esac
 
+echo checking Unicode data file
 for data in UnicodeData.txt
-do	test -r $data || ln -s /usr/share/unicode/ucd/$data . || exit 9
+do	if [ -r $data ]
+	then	true
+	else	echo $data not available, skipping table generation
+		exit
+	fi
 done
 
 #############################################################################

@@ -1,6 +1,6 @@
 #! /bin/sh
 
-echo generating Unicode width data for newlib/libc/string/wcwidth.c
+echo Generating Unicode width data for newlib/libc/string/wcwidth.c
 
 cd `dirname $0`
 PATH="$PATH":.	# ensure access to uniset tool
@@ -9,34 +9,51 @@ PATH="$PATH":.	# ensure access to uniset tool
 # checks and (with option -u) downloads
 
 case "$1" in
+-h)	echo "Usage: $0 [-h|-u|-i]"
+	echo "Generate width data tables ambiguous.t, combining.t, wide.t"
+	echo "from local Unicode files UnicodeData.txt, Blocks.txt, EastAsianWidth.txt."
+	echo ""
+	echo "Options:"
+	echo "  -u    download files from unicode.org first, download uniset tool"
+	echo "  -i    copy files from /usr/share/unicode/ucd first"
+	echo "  -h    show this"
+	exit
+	;;
 -u)
-	#WGET=wget -N -t 1 --timeout=55
-	WGET=curl -R -O --connect-timeout 55
-	WGET+=-z $@
+	wget () {
+		curl -R -O --connect-timeout 55 -z "`basename $1`" "$1"
+	}
 
 	echo downloading uniset tool
-	$WGET http://www.cl.cam.ac.uk/~mgk25/download/uniset.tar.gz
+	wget http://www.cl.cam.ac.uk/~mgk25/download/uniset.tar.gz
 	gzip -dc uniset.tar.gz | tar xvf - uniset
 
 	echo downloading data from unicode.org
 	for data in UnicodeData.txt Blocks.txt EastAsianWidth.txt
-	do	$WGET http://unicode.org/Public/UNIDATA/$data
+	do	wget http://unicode.org/Public/UNIDATA/$data
 	done
 	;;
-*)	echo checking package unicode-ucd
-	grep unicode-ucd /etc/setup/installed.db || exit 9
+-i)
+	echo copying data from /usr/share/unicode/ucd
+	for data in UnicodeData.txt Blocks.txt EastAsianWidth.txt
+	do	cp /usr/share/unicode/ucd/$data .
+	done
 	;;
 esac
 
 echo checking uniset tool
 type uniset || exit 9
 
+echo checking Unicode data files
 for data in UnicodeData.txt Blocks.txt EastAsianWidth.txt
-do	test -r $data || ln -s /usr/share/unicode/ucd/$data . || exit 9
+do	if [ -r $data ]
+	then	true
+	else	echo $data not available, skipping table generation
+		exit
+	fi
 done
 
 echo generating from Unicode version `sed -e 's,[^.0-9],,g' -e 1q Blocks.txt`
-exit
 
 #############################################################################
 # table generation
