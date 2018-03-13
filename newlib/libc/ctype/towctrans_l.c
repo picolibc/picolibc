@@ -20,7 +20,7 @@ caseconv_table [] = {
 
 /* auxiliary function for binary search in interval properties table */
 static const struct caseconv_entry *
-bisearch(wint_t ucs, const struct caseconv_entry *table, int max)
+bisearch (wint_t ucs, const struct caseconv_entry *table, int max)
 {
   int min = 0;
   int mid;
@@ -46,17 +46,32 @@ toulower (wint_t c)
   const struct caseconv_entry * cce =
     bisearch(c, caseconv_table,
              sizeof(caseconv_table) / sizeof(*caseconv_table) - 1);
+
   if (cce)
-    switch (cce->mode) {
-      case TOLO: return c + cce->delta;
-      case TOBOTH: return c + 1;
-      case TO1: switch (cce->delta) {
-        case EVENCAP: if (!(c & 1)) return c + 1; break;
-        case ODDCAP: if (c & 1) return c + 1; break;
+    switch (cce->mode)
+      {
+      case TOLO:
+	return c + cce->delta;
+      case TOBOTH:
+	return c + 1;
+      case TO1:
+	switch (cce->delta)
+	  {
+	    case EVENCAP:
+	      if (!(c & 1))
+		return c + 1;
+	      break;
+	    case ODDCAP:
+	      if (c & 1)
+		return c + 1;
+	      break;
+	    default:
+	      break;
+	  }
+	default:
+	  break;
       }
-    }
-  else
-    return c;
+  return c;
 }
 
 static wint_t
@@ -65,17 +80,32 @@ touupper (wint_t c)
   const struct caseconv_entry * cce =
     bisearch(c, caseconv_table,
              sizeof(caseconv_table) / sizeof(*caseconv_table) - 1);
+
   if (cce)
-    switch (cce->mode) {
-      case TOUP: return c + cce->delta;
-      case TOBOTH: return c - 1;
-      case TO1: switch (cce->delta) {
-        case EVENCAP: if (c & 1) return c - 1; break;
-        case ODDCAP: if (!(c & 1)) return c - 1; break;
+    switch (cce->mode)
+      {
+      case TOUP:
+	return c + cce->delta;
+      case TOBOTH:
+	return c - 1;
+      case TO1:
+	switch (cce->delta)
+	  {
+	  case EVENCAP:
+	    if (c & 1)
+	      return c - 1;
+	    break;
+	  case ODDCAP:
+	    if (!(c & 1))
+	      return c - 1;
+	    break;
+	  default:
+	    break;
+	  }
+	default:
+	  break;
       }
-    }
-  else
-    return c;
+  return c;
 }
 
 wint_t
