@@ -156,7 +156,7 @@ int	pthread_attr_getschedparam (const pthread_attr_t *__attr,
 int	pthread_getschedparam (pthread_t __pthread, int *__policy,
 			       struct sched_param *__param);
 int	pthread_setschedparam (pthread_t __pthread, int __policy,
-			       struct sched_param *__param);
+			       const struct sched_param *__param);
 
 /* Set Scheduling Priority of a Thread */
 int	pthread_setschedprio (pthread_t thread, int prio);
@@ -190,7 +190,7 @@ int	pthread_mutexattr_getprioceiling (const pthread_mutexattr_t *__attr,
 
 int	pthread_mutex_setprioceiling (pthread_mutex_t *__mutex,
 				      int __prioceiling, int *__old_ceiling);
-int	pthread_mutex_getprioceiling (pthread_mutex_t *__mutex,
+int	pthread_mutex_getprioceiling (const pthread_mutex_t *__restrict __mutex,
 				      int *__prioceiling);
 
 #endif /* _POSIX_THREAD_PRIO_PROTECT */
