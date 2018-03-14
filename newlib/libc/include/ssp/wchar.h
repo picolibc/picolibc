@@ -75,7 +75,7 @@ __ssp_redirect_raw(size_t, wcsnrtombs, \
     (__buf, __src, __nwc, __len, __ps), __buf != NULL, __ssp_bos)
 #endif
 
-__ssp_decl(wchar_t *, fgetws, (wchar_t *__restrict __buf, int __wlen, FILE *__restrict __fp))
+__ssp_decl(wchar_t *, fgetws, (wchar_t *__restrict __buf, int __wlen, __FILE *__restrict __fp))
 {
   if (__wlen > 0)
     __ssp_check(__buf, (size_t)__wlen * sizeof(wchar_t) , __ssp_bos);
@@ -83,7 +83,7 @@ __ssp_decl(wchar_t *, fgetws, (wchar_t *__restrict __buf, int __wlen, FILE *__re
 }
 
 #if __GNU_VISIBLE
-__ssp_decl(wchar_t *, fgetws_unlocked, (wchar_t *__buf, int __wlen, FILE *__fp))
+__ssp_decl(wchar_t *, fgetws_unlocked, (wchar_t *__buf, int __wlen, __FILE *__fp))
 {
   if (__wlen > 0)
     __ssp_check(__buf, (size_t)__wlen * sizeof(wchar_t) , __ssp_bos);
