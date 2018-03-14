@@ -2,8 +2,8 @@
 #include "categories.h"
 
 struct _category {
-  enum category cat: 11;
-  unsigned int first: 21;
+  enum category cat: 8;
+  unsigned int first: 24;
   unsigned short delta;
 } __attribute__((packed));
 
