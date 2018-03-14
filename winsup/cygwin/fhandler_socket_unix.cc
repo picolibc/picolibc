@@ -88,8 +88,6 @@ class af_unix_pkt_hdr_t
   uint16_t	cmsg_len;	/* size of ancillary data block		*/
   uint16_t	data_len;	/* size of user data			*/
 
-  af_unix_pkt_hdr_t (uint8_t s, uint8_t n, uint16_t c, uint16_t d)
-    { init (s, n, c, d); }
   void init (uint8_t s, uint8_t n, uint16_t c, uint16_t d)
     {
       shut_info = s;
@@ -159,14 +157,19 @@ GUID __cygwin_socket_guid = {
 /* Default timeout value of connect: 20 secs, as on Linux. */
 #define AF_UNIX_CONNECT_TIMEOUT (-20 * NS100PERSEC)
 
-void
-sun_name_t::set (const struct sockaddr_un *name, socklen_t namelen)
+sun_name_t::sun_name_t ()
+{
+  un_len = sizeof (sa_family_t);
+  un.sun_family = AF_UNIX;
+  _nul[sizeof (struct sockaddr_un)] = '\0';
+}
+
+sun_name_t::sun_name_t (const struct sockaddr *name, socklen_t namelen)
 {
   if (namelen < 0)
     namelen = 0;
   un_len = namelen < (__socklen_t) sizeof un ? namelen : sizeof un;
-  un.sun_family = AF_UNIX;
-  if (name && un_len)
+  if (name)
     memcpy (&un, name, un_len);
   _nul[sizeof (struct sockaddr_un)] = '\0';
 }
@@ -619,18 +622,20 @@ int
 fhandler_socket_unix::send_my_name ()
 {
   sun_name_t *sun;
+  size_t name_len = 0;
   af_unix_pkt_hdr_t *packet;
   NTSTATUS status;
   IO_STATUS_BLOCK io;
 
   bind_lock ();
   sun = get_sun_path ();
-  packet = (af_unix_pkt_hdr_t *) alloca (sizeof *packet + sun->un_len);
+  name_len = sun ? sun->un_len : 0;
+  packet = (af_unix_pkt_hdr_t *) alloca (sizeof *packet + name_len);
   if (sun)
-    memcpy (AF_UNIX_PKT_NAME (packet), &sun->un, sun->un_len);
-
-  packet->init (0, sun->un_len, 0, 0);
+    memcpy (AF_UNIX_PKT_NAME (packet), &sun->un, name_len);
   bind_unlock ();
+
+  packet->init (0, name_len, 0, 0);
 
   /* The theory: Fire and forget. */
   io_lock ();
@@ -1004,6 +1009,27 @@ fhandler_socket_unix::disconnect_pipe (HANDLE ph)
 }
 
 void
+fhandler_socket_unix::set_sun_path (struct sockaddr_un *un, socklen_t unlen)
+{
+  if (peer_sun_path)
+    delete peer_sun_path;
+  if (!un)
+    sun_path = NULL;
+  sun_path = new sun_name_t ((const struct sockaddr *) un, unlen);
+}
+
+void
+fhandler_socket_unix::set_peer_sun_path (struct sockaddr_un *un,
+					 socklen_t unlen)
+{
+  if (peer_sun_path)
+    delete peer_sun_path;
+  if (!un)
+    peer_sun_path = NULL;
+  peer_sun_path = new sun_name_t ((const struct sockaddr *) un, unlen);
+}
+
+void
 fhandler_socket_unix::set_cred ()
 {
   peer_cred.pid = (pid_t) 0;
@@ -1053,6 +1079,10 @@ fhandler_socket_unix::fhandler_socket_unix ()
 
 fhandler_socket_unix::~fhandler_socket_unix ()
 {
+  if (sun_path)
+    delete sun_path;
+  if (peer_sun_path)
+    delete peer_sun_path;
 }
 
 int
@@ -1064,12 +1094,6 @@ fhandler_socket_unix::dup (fhandler_base *child, int flags)
       return -1;
     }
   fhandler_socket_unix *fhs = (fhandler_socket_unix *) child;
-  if (reopen_shmem () < 0)
-    {
-      __seterrno ();
-      fhs->close ();
-      return -1;
-    }
   if (backing_file_handle && backing_file_handle != INVALID_HANDLE_VALUE
       && !DuplicateHandle (GetCurrentProcess (), backing_file_handle,
 			    GetCurrentProcess (), &fhs->backing_file_handle,
@@ -1082,6 +1106,12 @@ fhandler_socket_unix::dup (fhandler_base *child, int flags)
   if (!DuplicateHandle (GetCurrentProcess (), shmem_handle,
 			GetCurrentProcess (), &fhs->shmem_handle,
 			0, TRUE, DUPLICATE_SAME_ACCESS))
+    {
+      __seterrno ();
+      fhs->close ();
+      return -1;
+    }
+  if (reopen_shmem () < 0)
     {
       __seterrno ();
       fhs->close ();
@@ -1218,7 +1248,7 @@ fhandler_socket_unix::socket (int af, int type, int protocol, int flags)
     return -1;
   rmem (262144);
   wmem (262144);
-  set_addr_family (AF_UNIX);
+  set_addr_family (af);
   set_socket_type (type);
   if (flags & SOCK_NONBLOCK)
     set_nonblocking (true);
@@ -1249,17 +1279,13 @@ fhandler_socket_unix::socketpair (int af, int type, int protocol, int flags,
       return -1;
     }
 
-  if (create_shmem () < 0)
-    return -1;
-  if (fh->create_shmem () < 0)
-    goto fh_shmem_failed;
   /* socket() on both sockets */
   rmem (262144);
   fh->rmem (262144);
   wmem (262144);
   fh->wmem (262144);
-  set_addr_family (AF_UNIX);
-  fh->set_addr_family (AF_UNIX);
+  set_addr_family (af);
+  fh->set_addr_family (af);
   set_socket_type (type);
   fh->set_socket_type (type);
   set_unique_id ();
@@ -1268,15 +1294,31 @@ fhandler_socket_unix::socketpair (int af, int type, int protocol, int flags,
   gen_pipe_name ();
   pipe = create_pipe (true);
   if (!pipe)
-    goto create_pipe_failed;
+    return -1;
   set_io_handle (pipe);
   set_sun_path (&sun);
   fh->set_peer_sun_path (&sun);
+  if (create_shmem () < 0)
+    {
+      NtClose (pipe);
+      return -1;
+    }
+  binding_state (bound);
   connect_state (listener);
-  /* connect 2nd socket, even for DGRAM.  There's no difference as far
-     as socketpairs are concerned. */
-  if (fh->open_pipe (pc.get_nt_native_path (), false) < 0)
-    goto fh_open_pipe_failed;
+  /* connect 2nd socket */
+  if (type != SOCK_DGRAM
+      && fh->open_pipe (pc.get_nt_native_path (), false) < 0)
+    {
+      NtClose (shmem_handle);
+      NtClose (pipe);
+      return -1;
+    }
+  if (fh->create_shmem () < 0)
+    {
+      NtClose (fh->get_handle ());
+      NtClose (shmem_handle);
+      NtClose (pipe);
+    }
   fh->connect_state (connected);
   if (flags & SOCK_NONBLOCK)
     {
@@ -1289,16 +1331,6 @@ fhandler_socket_unix::socketpair (int af, int type, int protocol, int flags,
       fh->set_close_on_exec (true);
     }
   return 0;
-
-fh_open_pipe_failed:
-  NtClose (pipe);
-create_pipe_failed:
-  NtUnmapViewOfSection (GetCurrentProcess (), fh->shmem);
-  NtClose (fh->shmem_handle);
-fh_shmem_failed:
-  NtUnmapViewOfSection (GetCurrentProcess (), shmem);
-  NtClose (shmem_handle);
-  return -1;
 }
 
 /* Bind creates the backing file, generates the pipe name and sets
@@ -1439,7 +1471,7 @@ fhandler_socket_unix::accept4 (struct sockaddr *peer, int *len, int flags)
 		  if (sock->create_shmem () < 0)
 		    goto create_shmem_failed;
 
-		  sock->set_addr_family (AF_UNIX);
+		  sock->set_addr_family (get_addr_family ());
 		  sock->set_socket_type (get_socket_type ());
 		  if (flags & SOCK_NONBLOCK)
 		    sock->set_nonblocking (true);
@@ -1577,60 +1609,36 @@ fhandler_socket_unix::connect (const struct sockaddr *name, int namelen)
 int
 fhandler_socket_unix::getsockname (struct sockaddr *name, int *namelen)
 {
-  sun_name_t *sun = get_sun_path ();
+  sun_name_t sun;
 
-  memcpy (name, sun, MIN (*namelen, sun->un_len));
-  *namelen = sun->un_len;
+  if (get_sun_path ())
+    memcpy (&sun, &get_sun_path ()->un, get_sun_path ()->un_len);
+  else
+    sun.un_len = 0;
+  memcpy (name, &sun, MIN (*namelen, sun.un_len));
+  *namelen = sun.un_len;
   return 0;
 }
 
 int
 fhandler_socket_unix::getpeername (struct sockaddr *name, int *namelen)
 {
-  sun_name_t *sun = get_peer_sun_path ();
-  memcpy (name, sun, MIN (*namelen, sun->un_len));
-  *namelen = sun->un_len;
+  sun_name_t sun;
+
+  if (get_peer_sun_path ())
+    memcpy (&sun, &get_peer_sun_path ()->un, get_peer_sun_path ()->un_len);
+  else
+    sun.un_len = 0;
+  memcpy (name, &sun, MIN (*namelen, sun.un_len));
+  *namelen = sun.un_len;
   return 0;
 }
 
 int
 fhandler_socket_unix::shutdown (int how)
 {
-  NTSTATUS status = STATUS_SUCCESS;
-  IO_STATUS_BLOCK io;
-
-  if (how < SHUT_RD || how > SHUT_RDWR)
-    {
-      set_errno (EINVAL);
-      return -1;
-    }
-  /* Convert SHUT_RD/SHUT_WR/SHUT_RDWR to _SHUT_RECV/_SHUT_SEND bits. */
-  ++how;
-  state_lock ();
-  int old_shutdown_mask = saw_shutdown ();
-  int new_shutdown_mask = old_shutdown_mask | how;
-  if (new_shutdown_mask != old_shutdown_mask)
-    saw_shutdown (new_shutdown_mask);
-  state_unlock ();
-  if (new_shutdown_mask != old_shutdown_mask)
-    {
-      /* Send shutdown info to peer.  Note that it's not necessarily fatal
-	 if the info isn't sent here.  The info will be reproduced by any
-	 followup package sent to the peer. */
-      af_unix_pkt_hdr_t packet (new_shutdown_mask, 0, 0, 0);
-      io_lock ();
-      set_pipe_non_blocking (true);
-      status = NtWriteFile (get_handle (), NULL, NULL, NULL, &io, &packet,
-			    packet.pckt_len, NULL, NULL);
-      set_pipe_non_blocking (is_nonblocking ());
-      io_unlock ();
-    }
-  if (!NT_SUCCESS (status))
-    {
-      debug_printf ("Couldn't send shutdown info: NtWriteFile: %y", status);
-      return -1;
-    }
-  return 0;
+  set_errno (EAFNOSUPPORT);
+  return -1;
 }
 
 int
@@ -1650,17 +1658,16 @@ fhandler_socket_unix::close ()
   PVOID param = InterlockedExchangePointer (&cwt_param, NULL);
   if (param)
     cfree (param);
-  HANDLE hdl = InterlockedExchangePointer (&get_handle (), NULL);
-  if (hdl)
-    NtClose (hdl);
-  if (backing_file_handle && backing_file_handle != INVALID_HANDLE_VALUE)
-    NtClose (backing_file_handle);
   HANDLE shm = InterlockedExchangePointer (&shmem_handle, NULL);
   if (shm)
     NtClose (shm);
   param = InterlockedExchangePointer ((PVOID *) &shmem, NULL);
   if (param)
     NtUnmapViewOfSection (GetCurrentProcess (), param);
+  if (get_handle ())
+    NtClose (get_handle ());
+  if (backing_file_handle && backing_file_handle != INVALID_HANDLE_VALUE)
+    NtClose (backing_file_handle);
   return 0;
 }
 
@@ -1674,77 +1681,33 @@ fhandler_socket_unix::getpeereid (pid_t *pid, uid_t *euid, gid_t *egid)
       set_errno (EINVAL);
       return -1;
     }
+  conn_lock ();
   if (connect_state () != connected)
     set_errno (ENOTCONN);
   else
     {
       __try
 	{
-	  state_lock ();
 	  if (pid)
 	    *pid = peer_cred.pid;
 	  if (euid)
 	    *euid = peer_cred.uid;
 	  if (egid)
 	    *egid = peer_cred.gid;
-	  state_unlock ();
 	  ret = 0;
 	}
       __except (EFAULT) {}
       __endtry
     }
+  conn_unlock ();
   return ret;
-}
-
-ssize_t
-fhandler_socket_unix::recv_dgram (af_unix_pkt_hdr_t *packet, int flags)
-{
-  /* socketpair sockets already have a valid pipe handle! */
-  return 0;
-}
-
-ssize_t
-fhandler_socket_unix::recv_stream (af_unix_pkt_hdr_t *packet, int flags)
-{
-
-  io_lock ();
-  io_unlock ();
-  return 0;
-}
-
-ssize_t
-fhandler_socket_unix::recv_eval (af_unix_pkt_hdr_t *packet, struct msghdr *msg,
-				 int flags)
-{
-  return 0;
 }
 
 ssize_t
 fhandler_socket_unix::recvmsg (struct msghdr *msg, int flags)
 {
-  tmp_pathbuf tp;
-  af_unix_pkt_hdr_t *packet;
-  ssize_t ret;
-
-  if ((flags & ~(MSG_CMSG_CLOEXEC | MSG_DONTWAIT | MSG_OOB | MSG_PEEK
-		 | MSG_TRUNC | MSG_WAITALL)) != 0)
-    {
-      set_errno (EINVAL);
-      return -1;
-    }
-  if (flags & MSG_OOB)
-    {
-      set_errno (EOPNOTSUPP);
-      return -1;
-    }
-  if (saw_shutdown () & _SHUT_RECV)
-    return 0; /* EOF */
-  packet = (af_unix_pkt_hdr_t *) tp.t_get ();
-  ret = (get_socket_type () == SOCK_DGRAM) ? recv_dgram (packet, flags)
-					   : recv_stream (packet, flags);
-  if (ret > 0)
-    ret = recv_eval (packet, msg, flags);
-  return ret;
+  set_errno (EAFNOSUPPORT);
+  return -1;
 }
 
 ssize_t
