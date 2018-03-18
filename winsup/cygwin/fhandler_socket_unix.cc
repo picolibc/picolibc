@@ -1225,8 +1225,10 @@ out:
   if (param)
     cfree (param);
   conn_lock ();
+  state_lock ();
   so_error (error);
   connect_state (error ? connect_failed : connected);
+  state_unlock ();
   conn_unlock ();
   return error;
 }
@@ -1688,12 +1690,14 @@ fhandler_socket_unix::getpeereid (pid_t *pid, uid_t *euid, gid_t *egid)
     {
       __try
 	{
+	  state_lock ();
 	  if (pid)
 	    *pid = peer_cred.pid;
 	  if (euid)
 	    *euid = peer_cred.uid;
 	  if (egid)
 	    *egid = peer_cred.gid;
+	  state_unlock ();
 	  ret = 0;
 	}
       __except (EFAULT) {}

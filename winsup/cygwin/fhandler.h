@@ -887,6 +887,7 @@ class af_unix_shmem_t
      deadlocks. */
   af_unix_spinlock_t _bind_lock;
   af_unix_spinlock_t _conn_lock;
+  af_unix_spinlock_t _state_lock;
   af_unix_spinlock_t _io_lock;
   LONG _connection_state;	/* conn_state */
   LONG _binding_state;		/* bind_state */
@@ -899,6 +900,8 @@ class af_unix_shmem_t
   void bind_unlock () { _bind_lock.unlock (); }
   void conn_lock () { _conn_lock.lock (); }
   void conn_unlock () { _conn_lock.unlock (); }
+  void state_lock () { _state_lock.lock (); }
+  void state_unlock () { _state_lock.unlock (); }
   void io_lock () { _io_lock.lock (); }
   void io_unlock () { _io_lock.unlock (); }
 
@@ -943,6 +946,8 @@ class fhandler_socket_unix : public fhandler_socket
   void bind_unlock () { shmem->bind_unlock (); }
   void conn_lock () { shmem->conn_lock (); }
   void conn_unlock () { shmem->conn_unlock (); }
+  void state_lock () { shmem->state_lock (); }
+  void state_unlock () { shmem->state_unlock (); }
   void io_lock () { shmem->io_lock (); }
   void io_unlock () { shmem->io_unlock (); }
   conn_state connect_state (conn_state val)
