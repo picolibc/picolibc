@@ -825,6 +825,32 @@ class fhandler_socket_local: public fhandler_socket_wsock
   }
 };
 
+/* Sharable spinlock with low CPU profile.  These locks are NOT recursive! */
+class af_unix_spinlock_t
+{
+  LONG  locked;          /* 0 oder 1 */
+
+public:
+  void lock ()
+  {
+    LONG ret = InterlockedExchange (&locked, 1);
+    if (ret)
+      {
+	/* This loop counts the ms Sleep up from 0 to 45 in loop, 15ms steps,
+	   with 256 iterations each, . */
+        for (uint16_t i = 0; ret; i += 64)
+          {
+            Sleep (15 * (i >> 14));
+            ret = InterlockedExchange (&locked, 1);
+          }
+      }
+  }
+  void unlock ()
+  {
+    InterlockedExchange (&locked, 0);
+  }
+};
+
 class sun_name_t
 {
  public:
@@ -855,9 +881,13 @@ enum shut_state {
    in socket, socketpair or accept4 and reopened by dup, fork or exec. */
 class af_unix_shmem_t
 {
-  SRWLOCK _bind_lock;
-  SRWLOCK _conn_lock;
-  SRWLOCK _io_lock;
+  /* Don't use SRWLOCKs here.  They are not sharable.  If you must lock
+     multiple locks at the same time, always lock in the order bind ->
+     conn -> state -> io and unlock io -> state -> conn -> bind to avoid
+     deadlocks. */
+  af_unix_spinlock_t _bind_lock;
+  af_unix_spinlock_t _conn_lock;
+  af_unix_spinlock_t _io_lock;
   LONG _connection_state;	/* conn_state */
   LONG _binding_state;		/* bind_state */
   LONG _shutdown;		/* shut_state */
@@ -865,20 +895,12 @@ class af_unix_shmem_t
   LONG _reuseaddr;		/* dummy */
 
  public:
-  af_unix_shmem_t ()
-  : _connection_state (unconnected), _binding_state (unbound),
-    _shutdown (0), _so_error (0)
-  {
-    InitializeSRWLock (&_bind_lock);
-    InitializeSRWLock (&_conn_lock);
-    InitializeSRWLock (&_io_lock);
-  }
-  void bind_lock () { AcquireSRWLockExclusive (&_bind_lock); }
-  void bind_unlock () { ReleaseSRWLockExclusive (&_bind_lock); }
-  void conn_lock () { AcquireSRWLockExclusive (&_conn_lock); }
-  void conn_unlock () { ReleaseSRWLockExclusive (&_conn_lock); }
-  void io_lock () { AcquireSRWLockExclusive (&_io_lock); }
-  void io_unlock () { ReleaseSRWLockExclusive (&_io_lock); }
+  void bind_lock () { _bind_lock.lock (); }
+  void bind_unlock () { _bind_lock.unlock (); }
+  void conn_lock () { _conn_lock.lock (); }
+  void conn_unlock () { _conn_lock.unlock (); }
+  void io_lock () { _io_lock.lock (); }
+  void io_unlock () { _io_lock.unlock (); }
 
   conn_state connect_state (conn_state val)
     { return (conn_state) InterlockedExchange (&_connection_state, val); }
