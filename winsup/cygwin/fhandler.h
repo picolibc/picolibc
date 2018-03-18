@@ -579,8 +579,8 @@ class fhandler_socket: public fhandler_base
 
   void set_addr_family (int af) {addr_family = af;}
   int get_addr_family () {return addr_family;}
-  void set_socket_type (int st) { type = st;}
-  int get_socket_type () {return type;}
+  virtual void set_socket_type (int st) { type = st;}
+  virtual int get_socket_type () {return type;}
 
   /* select.cc */
   virtual select_record *select_read (select_stuff *) = 0;
@@ -851,6 +851,14 @@ public:
   }
 };
 
+/* Internal representation of shutdown states */
+enum shut_state {
+  _SHUT_NONE	= 0,
+  _SHUT_RECV	= 1,
+  _SHUT_SEND	= 2,
+  _SHUT_MASK	= 3
+};
+
 class sun_name_t
 {
  public:
@@ -861,19 +869,10 @@ class sun_name_t
       /* Allows 108 bytes sun_path plus trailing NUL */
       char _nul[sizeof (struct sockaddr_un) + 1];
     };
-  sun_name_t ();
-  sun_name_t (const struct sockaddr *name, __socklen_t namelen);
-
-  void *operator new (size_t) __attribute__ ((nothrow))
-    { return cmalloc_abort (HEAP_FHANDLER, sizeof (sun_name_t)); }
-  void operator delete (void *p) {cfree (p);}
-};
-
-/* Internal representation of shutdown states */
-enum shut_state {
-  _SHUT_READ	= 1,
-  _SHUT_WRITE	= 2,
-  _SHUT_RW	= 3
+  sun_name_t () { set (NULL, 0); }
+  sun_name_t (const struct sockaddr *name, __socklen_t namelen)
+    { set ((const struct sockaddr_un *) name, namelen); }
+  void set (const struct sockaddr_un *name, __socklen_t namelen);
 };
 
 /* For each AF_UNIX socket, we need to maintain socket-wide data,
@@ -893,7 +892,13 @@ class af_unix_shmem_t
   LONG _binding_state;		/* bind_state */
   LONG _shutdown;		/* shut_state */
   LONG _so_error;		/* SO_ERROR */
+  LONG _so_passcred;		/* SO_PASSCRED */
   LONG _reuseaddr;		/* dummy */
+  int  _type;			/* socket type */
+  sun_name_t _sun_path;
+  sun_name_t _peer_sun_path;
+  struct ucred _sock_cred;	/* filled at listen time */
+  struct ucred _peer_cred;	/* filled at connect time */
 
  public:
   void bind_lock () { _bind_lock.lock (); }
@@ -917,13 +922,31 @@ class af_unix_shmem_t
     { return (int) InterlockedExchange (&_shutdown, shut); }
   int shutdown () const { return (int) _shutdown; }
 
-  int so_error (int err)
-    { return (int) InterlockedExchange (&_so_error, err); }
+  int so_error (int err) { return (int) InterlockedExchange (&_so_error, err); }
   int so_error () const { return _so_error; }
+
+  bool so_passcred (bool pc)
+    { return (bool) InterlockedExchange (&_so_passcred, pc); }
+  bool so_passcred () const { return _so_passcred; }
 
   int reuseaddr (int val)
     { return (int) InterlockedExchange (&_reuseaddr, val); }
   int reuseaddr () const { return _reuseaddr; }
+
+  void set_socket_type (int val) { _type = val; }
+  int get_socket_type () const { return _type; }
+
+  void sun_path (struct sockaddr_un *un, __socklen_t unlen)
+    { _sun_path.set (un, unlen); }
+  void peer_sun_path (struct sockaddr_un *un, __socklen_t unlen)
+    { _peer_sun_path.set (un, unlen); }
+  sun_name_t *sun_path () {return &_sun_path;}
+  sun_name_t *peer_sun_path () {return &_peer_sun_path;}
+
+  void sock_cred (struct ucred *uc) { _sock_cred = *uc; }
+  struct ucred *sock_cred () { return &_sock_cred; }
+  void peer_cred (struct ucred *uc) { _peer_cred = *uc; }
+  struct ucred *peer_cred () { return &_peer_cred; }
 };
 
 class fhandler_socket_unix : public fhandler_socket
@@ -938,9 +961,6 @@ class fhandler_socket_unix : public fhandler_socket
   HANDLE connect_wait_thr;
   HANDLE cwt_termination_evt;
   PVOID cwt_param;
-  sun_name_t *sun_path;
-  sun_name_t *peer_sun_path;
-  struct ucred peer_cred;
 
   void bind_lock () { shmem->bind_lock (); }
   void bind_unlock () { shmem->bind_unlock (); }
@@ -960,8 +980,12 @@ class fhandler_socket_unix : public fhandler_socket
   int saw_shutdown () const { return shmem->shutdown (); }
   int so_error (int err) { return shmem->so_error (err); }
   int so_error () const { return shmem->so_error (); }
+  bool so_passcred (bool pc) { return shmem->so_passcred (pc); }
+  bool so_passcred () const { return shmem->so_passcred (); }
   int reuseaddr (int err) { return shmem->reuseaddr (err); }
   int reuseaddr () const { return shmem->reuseaddr (); }
+  void set_socket_type (int val) { shmem->set_socket_type (val); }
+  int get_socket_type () const { return shmem->get_socket_type (); }
 
   int create_shmem ();
   int reopen_shmem ();
@@ -977,26 +1001,37 @@ class fhandler_socket_unix : public fhandler_socket
   HANDLE autobind (sun_name_t *sun);
   wchar_t get_type_char ();
   void set_pipe_non_blocking (bool nonblocking);
-  int send_my_name ();
-  int recv_peer_name ();
+  int send_sock_info (bool from_bind);
+  int grab_admin_pkg ();
+  int recv_peer_info ();
   static NTSTATUS npfs_handle (HANDLE &nph);
   HANDLE create_pipe (bool single_instance);
   HANDLE create_pipe_instance ();
-  NTSTATUS open_pipe (PUNICODE_STRING pipe_name, bool send_name);
+  NTSTATUS open_pipe (PUNICODE_STRING pipe_name, bool xchg_sock_info);
   int wait_pipe (PUNICODE_STRING pipe_name);
   int connect_pipe (PUNICODE_STRING pipe_name);
   int listen_pipe ();
+  ULONG peek_pipe (PFILE_PIPE_PEEK_BUFFER pbuf, ULONG psize, HANDLE evt);
   int disconnect_pipe (HANDLE ph);
-  sun_name_t *get_sun_path () {return sun_path;}
-  sun_name_t *get_peer_sun_path () {return peer_sun_path;}
-  void set_sun_path (struct sockaddr_un *un, __socklen_t unlen);
-  void set_sun_path (sun_name_t *snt)
-    { snt ? set_sun_path (&snt->un, snt->un_len) : set_sun_path (NULL, 0); }
-  void set_peer_sun_path (struct sockaddr_un *un, __socklen_t unlen);
-  void set_peer_sun_path (sun_name_t *snt)
-    { snt ? set_peer_sun_path (&snt->un, snt->un_len)
-	  : set_peer_sun_path (NULL, 0); }
+  /* The NULL pointer check is required for FS methods like fstat.  When
+     called via stat or lstat, there's no shared memory, just a path in pc. */
+  sun_name_t *sun_path () {return shmem ? shmem->sun_path () : NULL;}
+  sun_name_t *peer_sun_path () {return shmem->peer_sun_path ();}
+  void sun_path (struct sockaddr_un *un, __socklen_t unlen)
+    { shmem->sun_path (un, unlen); }
+  void sun_path (sun_name_t *snt)
+    { snt ? sun_path (&snt->un, snt->un_len) : sun_path (NULL, 0); }
+  void peer_sun_path (struct sockaddr_un *un, __socklen_t unlen)
+    { shmem->peer_sun_path (un, unlen); }
+  void peer_sun_path (sun_name_t *snt)
+    { snt ? peer_sun_path (&snt->un, snt->un_len)
+	  : peer_sun_path (NULL, 0); }
+  void init_cred ();
   void set_cred ();
+  void sock_cred (struct ucred *uc) { shmem->sock_cred (uc); }
+  struct ucred *sock_cred () { return shmem->sock_cred (); }
+  void peer_cred (struct ucred *uc) { shmem->peer_cred (uc); }
+  struct ucred *peer_cred () { return shmem->peer_cred (); }
   void fixup_after_fork (HANDLE parent);
   void fixup_after_exec ();
   void set_close_on_exec (bool val);

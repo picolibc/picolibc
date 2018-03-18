@@ -58,8 +58,8 @@
     - <uniq_id> is an 8 byte hex unique number
 
    Note: We use MAX_PATH below for convenience where sufficient.  It's
-   big enough to hold sun_paths as well as pipe names so we don't have
-   to use tmp_pathbuf as often.
+   big enough to hold sun_paths as well as pipe names as well as packet
+   headers etc., so we don't have to use tmp_pathbuf as often.
 
    Every packet sent to a peer is a combination of the socket name of the
    local socket, the ancillary data, and the actual user data.  The data
@@ -78,18 +78,17 @@ class af_unix_pkt_hdr_t
 {
  public:
   uint16_t	pckt_len;	/* size of packet including header	*/
-  uint8_t	shut_info;	/* shutdown info.  SHUT_RD means
-				   SHUT_RD on the local side, so the
-				   peer must not send further packets,
-				   vice versa for SHUT_WR.   SHUT_RDWR
-				   is followed by closing the pipe
-				   handle. */
+  bool		admin_pkg : 1;	/* admin packets are marked as such	*/
+  shut_state	shut_info : 2;	/* _SHUT_RECV /_SHUT_SEND.		*/
   uint8_t	name_len;	/* size of name, a sockaddr_un		*/
   uint16_t	cmsg_len;	/* size of ancillary data block		*/
   uint16_t	data_len;	/* size of user data			*/
 
-  void init (uint8_t s, uint8_t n, uint16_t c, uint16_t d)
+  af_unix_pkt_hdr_t (bool a, shut_state s, uint8_t n, uint16_t c, uint16_t d)
+    { init (a, s, n, c, d); }
+  void init (bool a, shut_state s, uint8_t n, uint16_t c, uint16_t d)
     {
+      admin_pkg = a;
       shut_info = s;
       name_len = n;
       cmsg_len = c;
@@ -116,7 +115,7 @@ class af_unix_pkt_hdr_t
 #define AF_UNIX_PKT_CMSG(phdr) \
 	({ \
 	   af_unix_pkt_hdr_t *_p = phdr; \
-	   (void *)(((PBYTE)(_p)) + AF_UNIX_PKT_OFFSETOF_CMSG (_p)); \
+	   (struct cmsghdr *)(((PBYTE)(_p)) + AF_UNIX_PKT_OFFSETOF_CMSG (_p)); \
 	})
 #define AF_UNIX_PKT_DATA(phdr) \
 	({ \
@@ -157,21 +156,16 @@ GUID __cygwin_socket_guid = {
 /* Default timeout value of connect: 20 secs, as on Linux. */
 #define AF_UNIX_CONNECT_TIMEOUT (-20 * NS100PERSEC)
 
-sun_name_t::sun_name_t ()
-{
-  un_len = sizeof (sa_family_t);
-  un.sun_family = AF_UNIX;
-  _nul[sizeof (struct sockaddr_un)] = '\0';
-}
-
-sun_name_t::sun_name_t (const struct sockaddr *name, socklen_t namelen)
+void
+sun_name_t::set (const struct sockaddr_un *name, socklen_t namelen)
 {
   if (namelen < 0)
     namelen = 0;
   un_len = namelen < (__socklen_t) sizeof un ? namelen : sizeof un;
-  if (name)
+  un.sun_family = AF_UNIX;
+  if (name && un_len)
     memcpy (&un, name, un_len);
-  _nul[sizeof (struct sockaddr_un)] = '\0';
+  _nul[un_len] = '\0';
 }
 
 static HANDLE
@@ -618,24 +612,49 @@ fhandler_socket_unix::set_pipe_non_blocking (bool nonblocking)
     }
 }
 
+/* Apart from being called from bind(), from_bind indicates that the caller
+   already locked state_lock, so send_sock_info doesn't lock, only unlocks
+   state_lock. */
 int
-fhandler_socket_unix::send_my_name ()
+fhandler_socket_unix::send_sock_info (bool from_bind)
 {
   sun_name_t *sun;
-  size_t name_len = 0;
+  size_t plen;
+  size_t clen = 0;
   af_unix_pkt_hdr_t *packet;
   NTSTATUS status;
   IO_STATUS_BLOCK io;
 
-  bind_lock ();
-  sun = get_sun_path ();
-  name_len = sun ? sun->un_len : 0;
-  packet = (af_unix_pkt_hdr_t *) alloca (sizeof *packet + name_len);
+  if (!from_bind)
+    {
+      state_lock ();
+      /* When called from connect, initialize credentials.  accept4 already
+	 did it (copied from listening socket). */
+      if (sock_cred ()->pid == 0)
+	set_cred ();
+    }
+  sun = sun_path ();
+  plen = sizeof *packet + sun->un_len;
+  /* When called from connect/accept4, send SCM_CREDENTIALS, too. */
+  if (!from_bind)
+    {
+      clen = CMSG_SPACE (sizeof (struct ucred));
+      plen += clen;
+    }
+  packet = (af_unix_pkt_hdr_t *) alloca (plen);
+  packet->init (true, _SHUT_NONE, sun->un_len, clen, 0);
   if (sun)
-    memcpy (AF_UNIX_PKT_NAME (packet), &sun->un, name_len);
-  bind_unlock ();
+    memcpy (AF_UNIX_PKT_NAME (packet), &sun->un, sun->un_len);
+  if (!from_bind)
+    {
+      struct cmsghdr *cmsg = AF_UNIX_PKT_CMSG (packet);
+      cmsg->cmsg_level = SOL_SOCKET;
+      cmsg->cmsg_type = SCM_CREDENTIALS;
+      cmsg->cmsg_len = CMSG_LEN (sizeof (struct ucred));
+      memcpy (CMSG_DATA(cmsg), sock_cred (), sizeof (struct ucred));
+    }
 
-  packet->init (0, name_len, 0, 0);
+  state_unlock ();
 
   /* The theory: Fire and forget. */
   io_lock ();
@@ -652,10 +671,79 @@ fhandler_socket_unix::send_my_name ()
   return 0;
 }
 
-/* Returns an error code.  Locking is not required, user space doesn't know
-   about this socket yet. */
+/* Checks if the next packet in the pipe is an administrative packet.
+   If so, it reads it from the pipe, handles it.  Returns an error code. */
 int
-fhandler_socket_unix::recv_peer_name ()
+fhandler_socket_unix::grab_admin_pkg ()
+{
+  HANDLE evt;
+  NTSTATUS status;
+  IO_STATUS_BLOCK io;
+  /* MAX_PATH is more than sufficient for admin packets. */
+  PFILE_PIPE_PEEK_BUFFER pbuf = (PFILE_PIPE_PEEK_BUFFER) alloca (MAX_PATH);
+  if (!(evt = create_event ()))
+    return 0;
+  io_lock ();
+  ULONG ret_len = peek_pipe (pbuf, MAX_PATH, evt);
+  if (pbuf->NumberOfMessages == 0 || ret_len < sizeof (af_unix_pkt_hdr_t))
+    {
+      io_unlock ();
+      NtClose (evt);
+      return 0;
+    }
+  af_unix_pkt_hdr_t *packet = (af_unix_pkt_hdr_t *) pbuf->Data;
+  if (!packet->admin_pkg)
+    io_unlock ();
+  else
+    {
+      packet = (af_unix_pkt_hdr_t *) pbuf;
+      status = NtReadFile (get_handle (), evt, NULL, NULL, &io, packet,
+			   MAX_PATH, NULL, NULL);
+      if (status == STATUS_PENDING)
+	{
+	  /* Very short-lived */
+	  status = NtWaitForSingleObject (evt, FALSE, NULL);
+	  if (NT_SUCCESS (status))
+	    status = io.Status;
+	}
+      io_unlock ();
+      if (NT_SUCCESS (status))
+	{
+	  state_lock ();
+	  if (packet->shut_info)
+	    {
+	      /* Peer's shutdown sends the SHUT flags as used by the peer.
+		 They have to be reversed for our side. */
+	      int shut_info = saw_shutdown ();
+	      if (packet->shut_info & _SHUT_RECV)
+		shut_info |= _SHUT_SEND;
+	      if (packet->shut_info & _SHUT_SEND)
+		shut_info |= _SHUT_RECV;
+	      saw_shutdown (shut_info);
+	      /* FIXME: anything else here? */
+	    }
+	  if (packet->name_len > 0)
+	    peer_sun_path (AF_UNIX_PKT_NAME (packet), packet->name_len);
+	  if (packet->cmsg_len > 0)
+	    {
+	      struct cmsghdr *cmsg = (struct cmsghdr *)
+				     alloca (packet->cmsg_len);
+	      memcpy (cmsg, AF_UNIX_PKT_CMSG (packet), packet->cmsg_len);
+	      if (cmsg->cmsg_level == SOL_SOCKET
+		  && cmsg->cmsg_type == SCM_CREDENTIALS)
+		peer_cred ((struct ucred *) CMSG_DATA(cmsg));
+	    }
+	  state_unlock ();
+	}
+    }
+  NtClose (evt);
+  return 0;
+}
+
+/* Returns an error code.  Locking is not required when called from accept4,
+   user space doesn't know about this socket yet. */
+int
+fhandler_socket_unix::recv_peer_info ()
 {
   HANDLE evt;
   NTSTATUS status;
@@ -667,7 +755,7 @@ fhandler_socket_unix::recv_peer_name ()
 
   if (!(evt = create_event ()))
     return ENOBUFS;
-  len = sizeof *packet + sizeof *un;
+  len = sizeof *packet + sizeof *un + CMSG_SPACE (sizeof (struct ucred));
   packet = (af_unix_pkt_hdr_t *) alloca (len);
   set_pipe_non_blocking (false);
   status = NtReadFile (get_handle (), evt, NULL, NULL, &io, packet, len,
@@ -695,11 +783,23 @@ fhandler_socket_unix::recv_peer_name ()
 	  break;
 	}
     }
+  set_pipe_non_blocking (is_nonblocking ());
+  NtClose (evt);
   if (!NT_SUCCESS (status) && ret == 0)
     ret = geterrno_from_nt_status (status);
-  if (ret == 0 && packet->name_len > 0)
-    set_peer_sun_path (AF_UNIX_PKT_NAME (packet), packet->name_len);
-  set_pipe_non_blocking (is_nonblocking ());
+  if (ret == 0)
+    {
+      if (packet->name_len > 0)
+	peer_sun_path (AF_UNIX_PKT_NAME (packet), packet->name_len);
+      if (packet->cmsg_len > 0)
+	{
+	  struct cmsghdr *cmsg = (struct cmsghdr *) alloca (packet->cmsg_len);
+	  memcpy (cmsg, AF_UNIX_PKT_CMSG (packet), packet->cmsg_len);
+	  if (cmsg->cmsg_level == SOL_SOCKET
+	      && cmsg->cmsg_type == SCM_CREDENTIALS)
+	    peer_cred ((struct ucred *) CMSG_DATA(cmsg));
+	}
+    }
   return ret;
 }
 
@@ -818,7 +918,7 @@ fhandler_socket_unix::create_pipe_instance ()
 }
 
 NTSTATUS
-fhandler_socket_unix::open_pipe (PUNICODE_STRING pipe_name, bool send_name)
+fhandler_socket_unix::open_pipe (PUNICODE_STRING pipe_name, bool xchg_sock_info)
 {
   NTSTATUS status;
   HANDLE npfsh;
@@ -838,8 +938,8 @@ fhandler_socket_unix::open_pipe (PUNICODE_STRING pipe_name, bool send_name)
   if (NT_SUCCESS (status))
     {
       set_io_handle (ph);
-      if (send_name)
-	send_my_name ();
+      if (xchg_sock_info)
+	send_sock_info (false);
     }
   return status;
 }
@@ -902,13 +1002,13 @@ fhandler_socket_unix::wait_pipe (PUNICODE_STRING pipe_name)
   else
     {
       SetEvent (cwt_termination_evt);
-      WaitForSingleObject (connect_wait_thr, INFINITE);
+      NtWaitForSingleObject (connect_wait_thr, FALSE, NULL);
       GetExitCodeThread (connect_wait_thr, &err);
       waitret = WAIT_SIGNALED;
     }
   thr = InterlockedExchangePointer (&connect_wait_thr, NULL);
   if (thr)
-    CloseHandle (thr);
+    NtClose (thr);
   param = InterlockedExchangePointer (&cwt_param, NULL);
   if (param)
     cfree (param);
@@ -988,6 +1088,27 @@ fhandler_socket_unix::listen_pipe ()
   return (status == STATUS_PIPE_CONNECTED) ? 0 : -1;
 }
 
+ULONG
+fhandler_socket_unix::peek_pipe (PFILE_PIPE_PEEK_BUFFER pbuf, ULONG psize,
+				 HANDLE evt)
+{
+  NTSTATUS status;
+  IO_STATUS_BLOCK io;
+
+  status = NtFsControlFile (get_handle (), evt, NULL, NULL, &io,
+			    FSCTL_PIPE_PEEK, NULL, 0, pbuf, psize);
+  if (status == STATUS_PENDING)
+    {
+      /* Very short-lived */
+      status = NtWaitForSingleObject (evt ?: get_handle (), FALSE, NULL);
+      if (NT_SUCCESS (status))
+	status = io.Status;
+    }
+  return NT_SUCCESS (status) ? (io.Information
+				- offsetof (FILE_PIPE_PEEK_BUFFER, Data))
+			     : 0;
+}
+
 int
 fhandler_socket_unix::disconnect_pipe (HANDLE ph)
 {
@@ -998,7 +1119,7 @@ fhandler_socket_unix::disconnect_pipe (HANDLE ph)
 			    NULL, 0, NULL, 0);
   /* Short-lived.  Don't use cygwait.  We don't want to be interrupted. */
   if (status == STATUS_PENDING
-      && WaitForSingleObject (ph, INFINITE) == WAIT_OBJECT_0)
+      && NtWaitForSingleObject (ph, FALSE, NULL) == WAIT_OBJECT_0)
     status = io.Status;
   if (!NT_SUCCESS (status))
     {
@@ -1009,32 +1130,22 @@ fhandler_socket_unix::disconnect_pipe (HANDLE ph)
 }
 
 void
-fhandler_socket_unix::set_sun_path (struct sockaddr_un *un, socklen_t unlen)
+fhandler_socket_unix::init_cred ()
 {
-  if (peer_sun_path)
-    delete peer_sun_path;
-  if (!un)
-    sun_path = NULL;
-  sun_path = new sun_name_t ((const struct sockaddr *) un, unlen);
-}
-
-void
-fhandler_socket_unix::set_peer_sun_path (struct sockaddr_un *un,
-					 socklen_t unlen)
-{
-  if (peer_sun_path)
-    delete peer_sun_path;
-  if (!un)
-    peer_sun_path = NULL;
-  peer_sun_path = new sun_name_t ((const struct sockaddr *) un, unlen);
+  struct ucred *scred = shmem->sock_cred ();
+  struct ucred *pcred = shmem->peer_cred ();
+  scred->pid = pcred->pid = (pid_t) 0;
+  scred->uid = pcred->uid = (uid_t) -1;
+  scred->gid = pcred->gid = (gid_t) -1;
 }
 
 void
 fhandler_socket_unix::set_cred ()
 {
-  peer_cred.pid = (pid_t) 0;
-  peer_cred.uid = (uid_t) -1;
-  peer_cred.gid = (gid_t) -1;
+  struct ucred *scred = shmem->sock_cred ();
+  scred->pid = myself->pid;
+  scred->uid = myself->uid;
+  scred->gid = myself->gid;
 }
 
 /* ========================== public methods ========================= */
@@ -1074,15 +1185,10 @@ fhandler_socket_unix::set_close_on_exec (bool val)
 
 fhandler_socket_unix::fhandler_socket_unix ()
 {
-  set_cred ();
 }
 
 fhandler_socket_unix::~fhandler_socket_unix ()
 {
-  if (sun_path)
-    delete sun_path;
-  if (peer_sun_path)
-    delete peer_sun_path;
 }
 
 int
@@ -1094,6 +1200,12 @@ fhandler_socket_unix::dup (fhandler_base *child, int flags)
       return -1;
     }
   fhandler_socket_unix *fhs = (fhandler_socket_unix *) child;
+  if (reopen_shmem () < 0)
+    {
+      __seterrno ();
+      fhs->close ();
+      return -1;
+    }
   if (backing_file_handle && backing_file_handle != INVALID_HANDLE_VALUE
       && !DuplicateHandle (GetCurrentProcess (), backing_file_handle,
 			    GetCurrentProcess (), &fhs->backing_file_handle,
@@ -1111,14 +1223,8 @@ fhandler_socket_unix::dup (fhandler_base *child, int flags)
       fhs->close ();
       return -1;
     }
-  if (reopen_shmem () < 0)
-    {
-      __seterrno ();
-      fhs->close ();
-      return -1;
-    }
-  fhs->set_sun_path (get_sun_path ());
-  fhs->set_peer_sun_path (get_peer_sun_path ());
+  fhs->sun_path (sun_path ());
+  fhs->peer_sun_path (peer_sun_path ());
   fhs->connect_wait_thr = NULL;
   fhs->cwt_termination_evt = NULL;
   fhs->cwt_param = NULL;
@@ -1250,12 +1356,13 @@ fhandler_socket_unix::socket (int af, int type, int protocol, int flags)
     return -1;
   rmem (262144);
   wmem (262144);
-  set_addr_family (af);
+  set_addr_family (AF_UNIX);
   set_socket_type (type);
   if (flags & SOCK_NONBLOCK)
     set_nonblocking (true);
   if (flags & SOCK_CLOEXEC)
     set_close_on_exec (true);
+  init_cred ();
   set_io_handle (NULL);
   set_unique_id ();
   set_ino (get_unique_id ());
@@ -1281,46 +1388,36 @@ fhandler_socket_unix::socketpair (int af, int type, int protocol, int flags,
       return -1;
     }
 
+  if (create_shmem () < 0)
+    return -1;
+  if (fh->create_shmem () < 0)
+    goto fh_shmem_failed;
   /* socket() on both sockets */
   rmem (262144);
   fh->rmem (262144);
   wmem (262144);
   fh->wmem (262144);
-  set_addr_family (af);
-  fh->set_addr_family (af);
+  set_addr_family (AF_UNIX);
+  fh->set_addr_family (AF_UNIX);
   set_socket_type (type);
   fh->set_socket_type (type);
+  set_cred ();
+  fh->set_cred ();
   set_unique_id ();
   set_ino (get_unique_id ());
   /* bind/listen 1st socket */
   gen_pipe_name ();
   pipe = create_pipe (true);
   if (!pipe)
-    return -1;
+    goto create_pipe_failed;
   set_io_handle (pipe);
-  set_sun_path (&sun);
-  fh->set_peer_sun_path (&sun);
-  if (create_shmem () < 0)
-    {
-      NtClose (pipe);
-      return -1;
-    }
-  binding_state (bound);
+  sun_path (&sun);
+  fh->peer_sun_path (&sun);
   connect_state (listener);
-  /* connect 2nd socket */
-  if (type != SOCK_DGRAM
-      && fh->open_pipe (pc.get_nt_native_path (), false) < 0)
-    {
-      NtClose (shmem_handle);
-      NtClose (pipe);
-      return -1;
-    }
-  if (fh->create_shmem () < 0)
-    {
-      NtClose (fh->get_handle ());
-      NtClose (shmem_handle);
-      NtClose (pipe);
-    }
+  /* connect 2nd socket, even for DGRAM.  There's no difference as far
+     as socketpairs are concerned. */
+  if (fh->open_pipe (pc.get_nt_native_path (), false) < 0)
+    goto fh_open_pipe_failed;
   fh->connect_state (connected);
   if (flags & SOCK_NONBLOCK)
     {
@@ -1333,6 +1430,16 @@ fhandler_socket_unix::socketpair (int af, int type, int protocol, int flags,
       fh->set_close_on_exec (true);
     }
   return 0;
+
+fh_open_pipe_failed:
+  NtClose (pipe);
+create_pipe_failed:
+  NtUnmapViewOfSection (GetCurrentProcess (), fh->shmem);
+  NtClose (fh->shmem_handle);
+fh_shmem_failed:
+  NtUnmapViewOfSection (GetCurrentProcess (), shmem);
+  NtClose (shmem_handle);
+  return -1;
 }
 
 /* Bind creates the backing file, generates the pipe name and sets
@@ -1385,10 +1492,14 @@ fhandler_socket_unix::bind (const struct sockaddr *name, int namelen)
       binding_state (unbound);
       return -1;
     }
-  set_sun_path (&sun);
-  /* If we're already connected, send name to peer. */
+  state_lock ();
+  sun_path (&sun);
+  /* If we're already connected, send socket info to peer.  In this case
+     send_sock_info calls state_unlock */
   if (connect_state () == connected)
-    send_my_name ();
+    send_sock_info (true);
+  else
+    state_unlock ();
   binding_state (bound);
   return 0;
 }
@@ -1426,6 +1537,9 @@ fhandler_socket_unix::listen (int backlog)
       return -1;
     }
   set_io_handle (pipe);
+  state_lock ();
+  set_cred ();
+  state_unlock ();
   connect_state (listener);
   conn_unlock ();
   return 0;
@@ -1473,7 +1587,7 @@ fhandler_socket_unix::accept4 (struct sockaddr *peer, int *len, int flags)
 		  if (sock->create_shmem () < 0)
 		    goto create_shmem_failed;
 
-		  sock->set_addr_family (get_addr_family ());
+		  sock->set_addr_family (AF_UNIX);
 		  sock->set_socket_type (get_socket_type ());
 		  if (flags & SOCK_NONBLOCK)
 		    sock->set_nonblocking (true);
@@ -1486,15 +1600,20 @@ fhandler_socket_unix::accept4 (struct sockaddr *peer, int *len, int flags)
 		  sock->binding_state (binding_state ());
 		  sock->set_io_handle (accepted);
 
-		  sock->set_sun_path (get_sun_path ());
-		  error = sock->recv_peer_name ();
+		  sock->sun_path (sun_path ());
+		  sock->sock_cred (sock_cred ());
+		  /* Send this socket info to connecting socket. */
+		  sock->send_sock_info (false);
+		  /* Fetch the packet sent by send_sock_info called by
+		     connecting peer. */
+		  error = sock->recv_peer_info ();
 		  if (error == 0)
 		    {
 		      __try
 			{
 			  if (peer)
 			    {
-			      sun_name_t *sun = sock->get_peer_sun_path ();
+			      sun_name_t *sun = sock->peer_sun_path ();
 			      if (sun)
 				{
 				  memcpy (peer, &sun->un,
@@ -1591,14 +1710,14 @@ fhandler_socket_unix::connect (const struct sockaddr *name, int namelen)
       connect_state (unconnected);
       return -1;
     }
-  set_peer_sun_path (&sun);
+  peer_sun_path (&sun);
   if (get_socket_type () != SOCK_DGRAM)
     {
       if (connect_pipe (&pipe_name) < 0)
 	{
 	  if (get_errno () != EINPROGRESS)
 	    {
-	      set_peer_sun_path (NULL);
+	      peer_sun_path (NULL);
 	      connect_state (connect_failed);
 	    }
 	  return -1;
@@ -1611,36 +1730,60 @@ fhandler_socket_unix::connect (const struct sockaddr *name, int namelen)
 int
 fhandler_socket_unix::getsockname (struct sockaddr *name, int *namelen)
 {
-  sun_name_t sun;
+  sun_name_t *sun = sun_path ();
 
-  if (get_sun_path ())
-    memcpy (&sun, &get_sun_path ()->un, get_sun_path ()->un_len);
-  else
-    sun.un_len = 0;
-  memcpy (name, &sun, MIN (*namelen, sun.un_len));
-  *namelen = sun.un_len;
+  memcpy (name, sun, MIN (*namelen, sun->un_len));
+  *namelen = sun->un_len;
   return 0;
 }
 
 int
 fhandler_socket_unix::getpeername (struct sockaddr *name, int *namelen)
 {
-  sun_name_t sun;
-
-  if (get_peer_sun_path ())
-    memcpy (&sun, &get_peer_sun_path ()->un, get_peer_sun_path ()->un_len);
-  else
-    sun.un_len = 0;
-  memcpy (name, &sun, MIN (*namelen, sun.un_len));
-  *namelen = sun.un_len;
+  sun_name_t *sun = peer_sun_path ();
+  memcpy (name, sun, MIN (*namelen, sun->un_len));
+  *namelen = sun->un_len;
   return 0;
 }
 
 int
 fhandler_socket_unix::shutdown (int how)
 {
-  set_errno (EAFNOSUPPORT);
-  return -1;
+  NTSTATUS status = STATUS_SUCCESS;
+  IO_STATUS_BLOCK io;
+
+  if (how < SHUT_RD || how > SHUT_RDWR)
+    {
+      set_errno (EINVAL);
+      return -1;
+    }
+  /* Convert SHUT_RD/SHUT_WR/SHUT_RDWR to _SHUT_RECV/_SHUT_SEND bits. */
+  ++how;
+  state_lock ();
+  int old_shutdown_mask = saw_shutdown ();
+  int new_shutdown_mask = old_shutdown_mask | how;
+  if (new_shutdown_mask != old_shutdown_mask)
+    saw_shutdown (new_shutdown_mask);
+  state_unlock ();
+  if (new_shutdown_mask != old_shutdown_mask)
+    {
+      /* Send shutdown info to peer.  Note that it's not necessarily fatal
+	 if the info isn't sent here.  The info will be reproduced by any
+	 followup package sent to the peer. */
+      af_unix_pkt_hdr_t packet (true, (shut_state) new_shutdown_mask, 0, 0, 0);
+      io_lock ();
+      set_pipe_non_blocking (true);
+      status = NtWriteFile (get_handle (), NULL, NULL, NULL, &io, &packet,
+			    packet.pckt_len, NULL, NULL);
+      set_pipe_non_blocking (is_nonblocking ());
+      io_unlock ();
+    }
+  if (!NT_SUCCESS (status))
+    {
+      debug_printf ("Couldn't send shutdown info: NtWriteFile: %y", status);
+      return -1;
+    }
+  return 0;
 }
 
 int
@@ -1652,24 +1795,25 @@ fhandler_socket_unix::close ()
     {
       if (evt)
 	SetEvent (evt);
-      WaitForSingleObject (thr, INFINITE);
-      CloseHandle (thr);
+      NtWaitForSingleObject (thr, FALSE, NULL);
+      NtClose (thr);
     }
   if (evt)
     NtClose (evt);
   PVOID param = InterlockedExchangePointer (&cwt_param, NULL);
   if (param)
     cfree (param);
+  HANDLE hdl = InterlockedExchangePointer (&get_handle (), NULL);
+  if (hdl)
+    NtClose (hdl);
+  if (backing_file_handle && backing_file_handle != INVALID_HANDLE_VALUE)
+    NtClose (backing_file_handle);
   HANDLE shm = InterlockedExchangePointer (&shmem_handle, NULL);
   if (shm)
     NtClose (shm);
   param = InterlockedExchangePointer ((PVOID *) &shmem, NULL);
   if (param)
     NtUnmapViewOfSection (GetCurrentProcess (), param);
-  if (get_handle ())
-    NtClose (get_handle ());
-  if (backing_file_handle && backing_file_handle != INVALID_HANDLE_VALUE)
-    NtClose (backing_file_handle);
   return 0;
 }
 
@@ -1683,7 +1827,6 @@ fhandler_socket_unix::getpeereid (pid_t *pid, uid_t *euid, gid_t *egid)
       set_errno (EINVAL);
       return -1;
     }
-  conn_lock ();
   if (connect_state () != connected)
     set_errno (ENOTCONN);
   else
@@ -1691,19 +1834,19 @@ fhandler_socket_unix::getpeereid (pid_t *pid, uid_t *euid, gid_t *egid)
       __try
 	{
 	  state_lock ();
+	  struct ucred *pcred = peer_cred ();
 	  if (pid)
-	    *pid = peer_cred.pid;
+	    *pid = pcred->pid;
 	  if (euid)
-	    *euid = peer_cred.uid;
+	    *euid = pcred->uid;
 	  if (egid)
-	    *egid = peer_cred.gid;
+	    *egid = pcred->gid;
 	  state_unlock ();
 	  ret = 0;
 	}
       __except (EFAULT) {}
       __endtry
     }
-  conn_unlock ();
   return ret;
 }
 
@@ -1844,17 +1987,60 @@ fhandler_socket_unix::setsockopt (int level, int optname, const void *optval,
       switch (optname)
 	{
 	case SO_PASSCRED:
+	  if (optlen < (socklen_t) sizeof (int))
+	    {
+	      set_errno (EINVAL);
+	      return -1;
+	    }
+
+	  bool val;
+	  val = !!*(int *) optval;
+	  /* Using bind_lock here to make sure the autobind below is
+	     covered.  This is the only place to set so_passcred anyway. */
+	  bind_lock ();
+	  if (val && binding_state () == unbound)
+	    {
+	      sun_name_t sun;
+
+	      binding_state (bind_pending);
+	      backing_file_handle = autobind (&sun);
+	      if (!backing_file_handle)
+		{
+		  binding_state (unbound);
+		  bind_unlock ();
+		  return -1;
+		}
+	      sun_path (&sun);
+	      binding_state (bound);
+	    }
+	  so_passcred (val);
+	  bind_unlock ();
 	  break;
 
 	case SO_REUSEADDR:
-	  reuseaddr (*(int *) optval);
+	  if (optlen < (socklen_t) sizeof (int))
+	    {
+	      set_errno (EINVAL);
+	      return -1;
+	    }
+	  reuseaddr (!!*(int *) optval);
 	  break;
 
 	case SO_RCVBUF:
+	  if (optlen < (socklen_t) sizeof (int))
+	    {
+	      set_errno (EINVAL);
+	      return -1;
+	    }
 	  rmem (*(int *) optval);
 	  break;
 
 	case SO_SNDBUF:
+	  if (optlen < (socklen_t) sizeof (int))
+	    {
+	      set_errno (EINVAL);
+	      return -1;
+	    }
 	  wmem (*(int *) optval);
 	  break;
 
@@ -1900,6 +2086,12 @@ fhandler_socket_unix::getsockopt (int level, int optname, const void *optval,
 	{
 	case SO_ERROR:
 	  {
+	    if (*optlen < (socklen_t) sizeof (int))
+	      {
+		set_errno (EINVAL);
+		return -1;
+	      }
+
 	    int *e = (int *) optval;
 	    LONG err;
 
@@ -1909,7 +2101,17 @@ fhandler_socket_unix::getsockopt (int level, int optname, const void *optval,
 	  }
 
 	case SO_PASSCRED:
-	  break;
+	  {
+	    if (*optlen < (socklen_t) sizeof (int))
+	      {
+		set_errno (EINVAL);
+		return -1;
+	      }
+
+	    int *e = (int *) optval;
+	    *e = so_passcred ();
+	    break;
+	  }
 
 	case SO_PEERCRED:
 	  {
@@ -1977,6 +2179,11 @@ fhandler_socket_unix::getsockopt (int level, int optname, const void *optval,
 
 	case SO_TYPE:
 	  {
+	    if (*optlen < (socklen_t) sizeof (int))
+	      {
+		set_errno (EINVAL);
+		return -1;
+	      }
 	    unsigned int *type = (unsigned int *) optval;
 	    *type = get_socket_type ();
 	    *optlen = (socklen_t) sizeof *type;
@@ -1987,6 +2194,11 @@ fhandler_socket_unix::getsockopt (int level, int optname, const void *optval,
 
 	case SO_LINGER:
 	  {
+	    if (*optlen < (socklen_t) sizeof (struct linger))
+	      {
+		set_errno (EINVAL);
+		return -1;
+	      }
 	    struct linger *linger = (struct linger *) optval;
 	    memset (linger, 0, sizeof *linger);
 	    *optlen = (socklen_t) sizeof *linger;
@@ -1995,6 +2207,11 @@ fhandler_socket_unix::getsockopt (int level, int optname, const void *optval,
 
 	default:
 	  {
+	    if (*optlen < (socklen_t) sizeof (int))
+	      {
+		set_errno (EINVAL);
+		return -1;
+	      }
 	    unsigned int *val = (unsigned int *) optval;
 	    *val = 0;
 	    *optlen = (socklen_t) sizeof *val;
@@ -2083,9 +2300,9 @@ fhandler_socket_unix::fstat (struct stat *buf)
 {
   int ret = 0;
 
-  if (!get_sun_path ()
-      || get_sun_path ()->un_len <= (socklen_t) sizeof (sa_family_t)
-      || get_sun_path ()->un.sun_path[0] == '\0')
+  if (sun_path ()
+      && (sun_path ()->un_len <= (socklen_t) sizeof (sa_family_t)
+	  || sun_path ()->un.sun_path[0] == '\0'))
     return fhandler_socket::fstat (buf);
   ret = fhandler_base::fstat_fs (buf);
   if (!ret)
@@ -2099,9 +2316,9 @@ fhandler_socket_unix::fstat (struct stat *buf)
 int __reg2
 fhandler_socket_unix::fstatvfs (struct statvfs *sfs)
 {
-  if (!get_sun_path ()
-      || get_sun_path ()->un_len <= (socklen_t) sizeof (sa_family_t)
-      || get_sun_path ()->un.sun_path[0] == '\0')
+  if (sun_path ()
+      && (sun_path ()->un_len <= (socklen_t) sizeof (sa_family_t)
+	  || sun_path ()->un.sun_path[0] == '\0'))
     return fhandler_socket::fstatvfs (sfs);
   fhandler_disk_file fh (pc);
   fh.get_device () = FH_FS;
@@ -2111,9 +2328,9 @@ fhandler_socket_unix::fstatvfs (struct statvfs *sfs)
 int
 fhandler_socket_unix::fchmod (mode_t newmode)
 {
-  if (!get_sun_path ()
-      || get_sun_path ()->un_len <= (socklen_t) sizeof (sa_family_t)
-      || get_sun_path ()->un.sun_path[0] == '\0')
+  if (sun_path ()
+      && (sun_path ()->un_len <= (socklen_t) sizeof (sa_family_t)
+	  || sun_path ()->un.sun_path[0] == '\0'))
     return fhandler_socket::fchmod (newmode);
   fhandler_disk_file fh (pc);
   fh.get_device () = FH_FS;
@@ -2130,9 +2347,9 @@ fhandler_socket_unix::fchmod (mode_t newmode)
 int
 fhandler_socket_unix::fchown (uid_t uid, gid_t gid)
 {
-  if (!get_sun_path ()
-      || get_sun_path ()->un_len <= (socklen_t) sizeof (sa_family_t)
-      || get_sun_path ()->un.sun_path[0] == '\0')
+  if (sun_path ()
+      && (sun_path ()->un_len <= (socklen_t) sizeof (sa_family_t)
+	  || sun_path ()->un.sun_path[0] == '\0'))
     return fhandler_socket::fchown (uid, gid);
   fhandler_disk_file fh (pc);
   return fh.fchown (uid, gid);
@@ -2141,9 +2358,9 @@ fhandler_socket_unix::fchown (uid_t uid, gid_t gid)
 int
 fhandler_socket_unix::facl (int cmd, int nentries, aclent_t *aclbufp)
 {
-  if (!get_sun_path ()
-      || get_sun_path ()->un_len <= (socklen_t) sizeof (sa_family_t)
-      || get_sun_path ()->un.sun_path[0] == '\0')
+  if (sun_path ()
+      && (sun_path ()->un_len <= (socklen_t) sizeof (sa_family_t)
+	  || sun_path ()->un.sun_path[0] == '\0'))
     return fhandler_socket::facl (cmd, nentries, aclbufp);
   fhandler_disk_file fh (pc);
   return fh.facl (cmd, nentries, aclbufp);
@@ -2152,9 +2369,9 @@ fhandler_socket_unix::facl (int cmd, int nentries, aclent_t *aclbufp)
 int
 fhandler_socket_unix::link (const char *newpath)
 {
-  if (!get_sun_path ()
-      || get_sun_path ()->un_len <= (socklen_t) sizeof (sa_family_t)
-      || get_sun_path ()->un.sun_path[0] == '\0')
+  if (sun_path ()
+      && (sun_path ()->un_len <= (socklen_t) sizeof (sa_family_t)
+	  || sun_path ()->un.sun_path[0] == '\0'))
     return fhandler_socket::link (newpath);
   fhandler_disk_file fh (pc);
   return fh.link (newpath);
