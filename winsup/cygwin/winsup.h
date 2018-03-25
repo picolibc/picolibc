@@ -223,8 +223,6 @@ int __small_swprintf (PWCHAR dst, const WCHAR *fmt, ...);
 int __small_vswprintf (PWCHAR dst, const WCHAR *fmt, va_list ap);
 void multiple_cygwin_problem (const char *, uintptr_t, uintptr_t);
 
-extern "C" void vklog (int priority, const char *message, va_list ap);
-extern "C" void klog (int priority, const char *message, ...);
 bool child_copy (HANDLE, bool, ...);
 
 class path_conv;

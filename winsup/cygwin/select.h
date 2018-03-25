@@ -64,11 +64,6 @@ struct select_serial_info: public select_info
   select_serial_info (): select_info () {}
 };
 
-struct select_mailslot_info: public select_info
-{
-  select_mailslot_info (): select_info () {}
-};
-
 class select_stuff
 {
 public:
@@ -88,7 +83,6 @@ public:
   select_pipe_info *device_specific_pipe;
   select_socket_info *device_specific_socket;
   select_serial_info *device_specific_serial;
-  select_mailslot_info *device_specific_mailslot;
 
   bool test_and_set (int, fd_set *, fd_set *, fd_set *);
   int poll (fd_set *, fd_set *, fd_set *);
@@ -100,8 +94,7 @@ public:
   		   windows_used (false), start (0),
 		   device_specific_pipe (NULL),
 		   device_specific_socket (NULL),
-		   device_specific_serial (NULL),
-		   device_specific_mailslot (NULL) {}
+		   device_specific_serial (NULL) {}
 };
 
 extern "C" int cygwin_select (int , fd_set *, fd_set *, fd_set *,

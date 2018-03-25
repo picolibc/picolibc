@@ -13,7 +13,9 @@ details. */
 #include <stdarg.h>
 
 #define _PATH_LOG	"/dev/log"
+#if 0 /* Removed post 2.10 */
 #define _PATH_KLOG	"/dev/kmsg"
+#endif
 
 #define	LOG_EMERG	0
 #define	LOG_ALERT	1

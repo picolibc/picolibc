@@ -800,26 +800,6 @@ exception::handle (EXCEPTION_RECORD *e, exception_list *frame, CONTEXT *in,
       return ExceptionContinueExecution;
     }
 
-  /* FIXME: Probably should be handled in signal processing code */
-  if ((NTSTATUS) e->ExceptionCode == STATUS_ACCESS_VIOLATION)
-    {
-      int error_code = 0;
-      if (si.si_code == SEGV_ACCERR)	/* Address present */
-	error_code |= 1;
-      if (e->ExceptionInformation[0])	/* Write access */
-	error_code |= 2;
-      if (!me.inside_kernel (in))	/* User space */
-	error_code |= 4;
-      klog (LOG_INFO,
-#ifdef __x86_64__
-	    "%s[%d]: segfault at %011X rip %011X rsp %011X error %d",
-#else
-	    "%s[%d]: segfault at %08x rip %08x rsp %08x error %d",
-#endif
-	    __progname, myself->pid,
-	    e->ExceptionInformation[1], in->_GR(ip), in->_GR(sp),
-	    error_code);
-    }
   cygwin_exception exc (framep, in, e);
   si.si_cyg = (void *) &exc;
   /* POSIX requires that for SIGSEGV and SIGBUS, si_addr should be set to the

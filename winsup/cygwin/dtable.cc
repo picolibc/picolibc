@@ -591,9 +591,6 @@ fh_alloc (path_conv& pc)
 		fh->set_name ("/dev/tty");
 	    }
 	  break;
-	case FH_KMSG:
-	  fh = cnew (fhandler_mailslot);
-	  break;
       }
     }
 

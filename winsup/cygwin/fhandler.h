@@ -1261,35 +1261,6 @@ public:
   }
 };
 
-class fhandler_mailslot : public fhandler_base_overlapped
-{
-  POBJECT_ATTRIBUTES get_object_attr (OBJECT_ATTRIBUTES &, PUNICODE_STRING, int);
- public:
-  fhandler_mailslot ();
-  int __reg2 fstat (struct stat *buf);
-  int open (int flags, mode_t mode = 0);
-  ssize_t __reg3 raw_write (const void *, size_t);
-  int ioctl (unsigned int cmd, void *);
-  select_record *select_read (select_stuff *);
-
-  fhandler_mailslot (void *) {}
-
-  void copyto (fhandler_base *x)
-  {
-    x->pc.free_strings ();
-    *reinterpret_cast<fhandler_mailslot *> (x) = *this;
-    x->reset (this);
-  }
-
-  fhandler_mailslot *clone (cygheap_types malloc_type = HEAP_FHANDLER)
-  {
-    void *ptr = (void *) ccalloc (malloc_type, 1, sizeof (fhandler_mailslot));
-    fhandler_mailslot *fh = new (ptr) fhandler_mailslot (ptr);
-    copyto (fh);
-    return fh;
-  }
-};
-
 class fhandler_dev_raw: public fhandler_base
 {
  protected:
@@ -2645,7 +2616,6 @@ typedef union
   char __dev_zero[sizeof (fhandler_dev_zero)];
   char __disk_file[sizeof (fhandler_disk_file)];
   char __fifo[sizeof (fhandler_fifo)];
-  char __mailslot[sizeof (fhandler_mailslot)];
   char __netdrive[sizeof (fhandler_netdrive)];
   char __nodevice[sizeof (fhandler_nodevice)];
   char __pipe[sizeof (fhandler_pipe)];

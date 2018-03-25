@@ -283,7 +283,6 @@ DLL_OFILES:= \
 	fhandler_dsp.o \
 	fhandler_fifo.o \
 	fhandler_floppy.o \
-	fhandler_mailslot.o \
 	fhandler_netdrive.o \
 	fhandler_nodevice.o \
 	fhandler_proc.o \
