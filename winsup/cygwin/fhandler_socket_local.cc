@@ -974,7 +974,7 @@ fhandler_socket_local::accept4 (struct sockaddr *peer, int *len, int flags)
 					build_fh_dev (dev ());
 	  if (sock && sock->set_socket_handle (res, get_addr_family (),
 					       get_socket_type (),
-					       get_socket_flags ()))
+					       get_socket_flags ()) == 0)
 	    {
 	      sock->async_io (false); /* set_socket_handle disables async. */
 	      sock->set_sun_path (get_sun_path ());
