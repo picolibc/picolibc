@@ -57,16 +57,16 @@ toulower (wint_t c)
       case TO1:
 	switch (cce->delta)
 	  {
-	    case EVENCAP:
-	      if (!(c & 1))
-		return c + 1;
-	      break;
-	    case ODDCAP:
-	      if (c & 1)
-		return c + 1;
-	      break;
-	    default:
-	      break;
+	  case EVENCAP:
+	    if (!(c & 1))
+	      return c + 1;
+	    break;
+	  case ODDCAP:
+	    if (c & 1)
+	      return c + 1;
+	    break;
+	  default:
+	    break;
 	  }
 	default:
 	  break;
