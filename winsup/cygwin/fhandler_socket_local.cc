@@ -639,7 +639,7 @@ fhandler_socket_local::fstat (struct stat *buf)
 {
   int res;
 
-  if (!get_sun_path () || get_sun_path ()[0] == '\0')
+  if (get_sun_path () && get_sun_path ()[0] == '\0')
     return fhandler_socket_wsock::fstat (buf);
   res = fhandler_base::fstat_fs (buf);
   if (!res)
@@ -653,7 +653,7 @@ fhandler_socket_local::fstat (struct stat *buf)
 int __reg2
 fhandler_socket_local::fstatvfs (struct statvfs *sfs)
 {
-  if (!get_sun_path () || get_sun_path ()[0] == '\0')
+  if (get_sun_path () && get_sun_path ()[0] == '\0')
     return fhandler_socket_wsock::fstatvfs (sfs);
   fhandler_disk_file fh (pc);
   fh.get_device () = FH_FS;
@@ -663,7 +663,7 @@ fhandler_socket_local::fstatvfs (struct statvfs *sfs)
 int
 fhandler_socket_local::fchmod (mode_t newmode)
 {
-  if (!get_sun_path () || get_sun_path ()[0] == '\0')
+  if (get_sun_path () && get_sun_path ()[0] == '\0')
     return fhandler_socket_wsock::fchmod (newmode);
   fhandler_disk_file fh (pc);
   fh.get_device () = FH_FS;
@@ -673,7 +673,7 @@ fhandler_socket_local::fchmod (mode_t newmode)
 int
 fhandler_socket_local::fchown (uid_t uid, gid_t gid)
 {
-  if (!get_sun_path () || get_sun_path ()[0] == '\0')
+  if (get_sun_path () && get_sun_path ()[0] == '\0')
     return fhandler_socket_wsock::fchown (uid, gid);
   fhandler_disk_file fh (pc);
   return fh.fchown (uid, gid);
@@ -682,7 +682,7 @@ fhandler_socket_local::fchown (uid_t uid, gid_t gid)
 int
 fhandler_socket_local::facl (int cmd, int nentries, aclent_t *aclbufp)
 {
-  if (!get_sun_path () || get_sun_path ()[0] == '\0')
+  if (get_sun_path () && get_sun_path ()[0] == '\0')
     return fhandler_socket_wsock::facl (cmd, nentries, aclbufp);
   fhandler_disk_file fh (pc);
   return fh.facl (cmd, nentries, aclbufp);
@@ -691,7 +691,7 @@ fhandler_socket_local::facl (int cmd, int nentries, aclent_t *aclbufp)
 int
 fhandler_socket_local::link (const char *newpath)
 {
-  if (!get_sun_path () || get_sun_path ()[0] == '\0')
+  if (get_sun_path () && get_sun_path ()[0] == '\0')
     return fhandler_socket_wsock::link (newpath);
   fhandler_disk_file fh (pc);
   return fh.link (newpath);
