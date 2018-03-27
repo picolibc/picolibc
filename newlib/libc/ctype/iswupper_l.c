@@ -15,6 +15,6 @@ iswupper_l (wint_t c, struct __locale_t *locale)
   enum category cat = category (c);
   return cat == CAT_Lu || (cat == CAT_LC && towupper (c) == c);
 #else
-  return c < 0x100 ? islower (c) : 0;
+  return c < 0x100 ? isupper (c) : 0;
 #endif /* _MB_CAPABLE */
 }
