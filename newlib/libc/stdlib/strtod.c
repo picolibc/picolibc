@@ -1186,7 +1186,16 @@ _strtod_l (struct _reent *ptr, const char *__restrict s00, char **__restrict se,
 #endif
 		if (y == z) {
 			/* Can we stop now? */
+#ifndef _DOUBLE_IS_32BITS
+			/* If FE_INVALID floating point exceptions are
+			   enabled, a conversion to a 32 bit value is
+			   dangerous.  A positive double value can result
+			   in a negative 32 bit int, thus raising SIGFPE.
+			   To avoid this, always convert into 64 bit here. */
+			__int64_t L = (__int64_t)aadj;
+#else
 			L = (Long)aadj;
+#endif
 			aadj -= L;
 			/* The tolerances below are conservative. */
 			if (dsign || dword1(rv) || dword0(rv) & Bndry_mask) {
