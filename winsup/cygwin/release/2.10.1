@@ -13,3 +13,7 @@ Bug Fixes
 
 - Fix utils path handling in case cygdrive path is just '/'.
   Addresses: https://cygwin.com/ml/cygwin/2018-02/msg00174.html
+
+- Fix a potential SIGFPE in strtod, if FE_INVALID exceptions are
+  enabled.
+  Addresses: https://cygwin.com/ml/cygwin/2018-04/msg00055.html
