@@ -768,8 +768,9 @@ format_proc_cpuinfo (void *, char *&destbuf)
 	  extern long get_cpu_cache_intel (int sysc, uint32_t maxf);
 	  long cs;
 
-	  /* As on Linux, don't check for L3 cache. */
-	  cs = get_cpu_cache_intel (_SC_LEVEL2_CACHE_SIZE, maxf);
+	  cs = get_cpu_cache_intel (_SC_LEVEL3_CACHE_SIZE, maxf);
+	  if (cs == -1)
+	    cs = get_cpu_cache_intel (_SC_LEVEL2_CACHE_SIZE, maxf);
 	  if (cs == -1)
 	    {
 	      cs = get_cpu_cache_intel (_SC_LEVEL1_ICACHE_SIZE, maxf);
