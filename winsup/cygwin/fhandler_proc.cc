@@ -639,31 +639,47 @@ format_proc_cpuinfo (void *, char *&destbuf)
   char *buf = tp.c_get ();
   char *bufptr = buf;
 
-  DWORD lpi_size = NT_MAX_PATH;
   //WORD num_cpu_groups = 1;	/* Pre Windows 7, only one group... */
   WORD num_cpu_per_group = 64;	/* ...and a max of 64 CPUs. */
 
-  if (wincap.has_processor_groups ())
+  PSYSTEM_LOGICAL_PROCESSOR_INFORMATION_EX lpi =
+	    (PSYSTEM_LOGICAL_PROCESSOR_INFORMATION_EX) tp.c_get ();
+  DWORD lpi_size = NT_MAX_PATH;
+
+  /* Fake a SYSTEM_LOGICAL_PROCESSOR_INFORMATION_EX group info block on Vista
+     systems.  This may be over the top but if the below code just using
+     ActiveProcessorCount turns out to be insufficient, we can build on that. */
+  if (!wincap.has_processor_groups ()
+      || !GetLogicalProcessorInformationEx (RelationGroup, lpi, &lpi_size))
     {
-      PSYSTEM_LOGICAL_PROCESSOR_INFORMATION_EX lpi =
-		(PSYSTEM_LOGICAL_PROCESSOR_INFORMATION_EX) tp.c_get ();
-      lpi_size = NT_MAX_PATH;
-      if (!GetLogicalProcessorInformationEx (RelationGroup, lpi, &lpi_size))
-	lpi = NULL;
-      else
-	{
-	  PSYSTEM_LOGICAL_PROCESSOR_INFORMATION_EX plpi = lpi;
-	  for (DWORD size = lpi_size; size > 0;
-	       size -= plpi->Size, add_size (plpi, plpi->Size))
-	    if (plpi->Relationship == RelationGroup)
-	      {
-		//num_cpu_groups = plpi->Group.MaximumGroupCount;
-		num_cpu_per_group
-			= plpi->Group.GroupInfo[0].MaximumProcessorCount;
-		break;
-	      }
-	}
+      lpi_size = sizeof *lpi;
+      lpi->Relationship = RelationGroup;
+      lpi->Size = lpi_size;
+      lpi->Group.MaximumGroupCount = 1;
+      lpi->Group.ActiveGroupCount = 1;
+      lpi->Group.GroupInfo[0].MaximumProcessorCount = wincap.cpu_count ();
+      lpi->Group.GroupInfo[0].ActiveProcessorCount
+	= __builtin_popcountl (wincap.cpu_mask ());
+      lpi->Group.GroupInfo[0].ActiveProcessorMask = wincap.cpu_mask ();
     }
+
+  PSYSTEM_LOGICAL_PROCESSOR_INFORMATION_EX plpi = lpi;
+  for (DWORD size = lpi_size; size > 0;
+       size -= plpi->Size, add_size (plpi, plpi->Size))
+    if (plpi->Relationship == RelationGroup)
+      {
+	//num_cpu_groups = plpi->Group.MaximumGroupCount;
+	/* Turns out, there are systems with a MaximumProcessorCount not
+	   reflecting the actually available CPUs.  The ActiveProcessorCount
+	   is correct though.  So we just use ActiveProcessorCount for now,
+	   hoping the best.  If it turns out that we have to handle more
+	   complex CPU layouts with weird ActiveProcessorMasks, we can
+	   do that by restructuring the subsequent CPU loop. */
+	num_cpu_per_group
+		= plpi->Group.GroupInfo[0].ActiveProcessorCount;
+	break;
+      }
+
 
   cpu_num_p = wcpcpy (cpu_key, L"\\Registry\\Machine\\HARDWARE\\DESCRIPTION"
 				"\\System\\CentralProcessor\\");
