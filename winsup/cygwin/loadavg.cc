@@ -98,10 +98,7 @@ static bool get_load (double *load)
   if (ret != ERROR_SUCCESS)
     return false;
 
-  SYSTEM_INFO sysinfo;
-  GetSystemInfo (&sysinfo);
-
-  double running = fmtvalue1.doubleValue * sysinfo.dwNumberOfProcessors / 100;
+  double running = fmtvalue1.doubleValue * wincap.cpu_count () / 100;
 
   /* Estimate the number of runnable processes using ProcessorQueueLength */
   PDH_FMT_COUNTERVALUE fmtvalue2;

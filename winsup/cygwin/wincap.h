@@ -42,6 +42,11 @@ public:
   void init ();
 
   const DWORD cpu_count () const { return system_info.dwNumberOfProcessors; }
+  const DWORD_PTR cpu_mask () const { return system_info.dwActiveProcessorMask;}
+
+  const WORD cpu_arch () const { return system_info.wProcessorArchitecture; }
+  const WORD cpu_level () const { return system_info.wProcessorLevel; }
+
   /* The casts to size_t make sure that the returned value has the size of
      a pointer on any system.  This is important when using them for bit
      mask operations, like in roundup2. */

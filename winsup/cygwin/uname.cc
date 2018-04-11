@@ -19,8 +19,6 @@ extern "C" int cygwin_gethostname (char *__name, size_t __len);
 extern "C" int
 uname (struct utsname *name)
 {
-  SYSTEM_INFO sysinfo;
-
   __try
     {
       char *snp = strstr  (cygwin_version.dll_build_date, "SNP");
@@ -33,8 +31,6 @@ uname (struct utsname *name)
       if (wincap.is_wow64 ())
 	strncat (name->sysname, "-WOW",
 		 sizeof name->sysname - strlen (name->sysname) - 1);
-
-      GetSystemInfo (&sysinfo);
 
       /* Computer name */
       cygwin_gethostname (name->nodename, sizeof (name->nodename) - 1);
@@ -56,16 +52,16 @@ uname (struct utsname *name)
 	name->version[snp - cygwin_version.dll_build_date] = '\0';
 
       /* CPU type */
-      switch (sysinfo.wProcessorArchitecture)
+      switch (wincap.cpu_arch ())
 	{
 	  case PROCESSOR_ARCHITECTURE_INTEL:
 	    unsigned int ptype;
-	    if (sysinfo.wProcessorLevel < 3) /* Shouldn't happen. */
+	    if (wincap.cpu_level () < 3) /* Shouldn't happen. */
 	      ptype = 3;
-	    else if (sysinfo.wProcessorLevel > 9) /* P4 */
+	    else if (wincap.cpu_level () > 9) /* P4 */
 	      ptype = 6;
 	    else
-	      ptype = sysinfo.wProcessorLevel;
+	      ptype = wincap.cpu_level ();
 	    __small_sprintf (name->machine, "i%d86", ptype);
 	    break;
 	  case PROCESSOR_ARCHITECTURE_IA64:
