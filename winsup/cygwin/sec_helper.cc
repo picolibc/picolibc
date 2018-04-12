@@ -821,12 +821,16 @@ authz_ctx::get_user_attribute (mode_t *attribute, PSECURITY_DESCRIPTOR psd,
   if (RtlEqualSid (user_sid, cygheap->user.sid ())
       && !cygheap->user.issetuid ())
     {
+      /* Avoid lock in default case. */
       if (!user_ctx_hdl)
 	{
 	  authz_guard.acquire ();
-	  if (!AuthzInitializeContextFromToken (0, hProcToken, authz, NULL,
-						authz_dummy_luid, NULL,
-						&user_ctx_hdl))
+	  /* Check user_ctx_hdl again under lock to avoid overwriting
+	     user_ctx_hdl if it has already been initialized. */
+	  if (!user_ctx_hdl
+	      && !AuthzInitializeContextFromToken (0, hProcToken, authz, NULL,
+						   authz_dummy_luid, NULL,
+						   &user_ctx_hdl))
 	    debug_printf ("AuthzInitializeContextFromToken, %E");
 	  authz_guard.release ();
 	}
