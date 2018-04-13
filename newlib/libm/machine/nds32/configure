@@ -3419,6 +3419,12 @@ else
 fi
 
 
+# Emit any target-specific warnings.
+if test "x${newlib_msg_warn}" != "x"; then
+   { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: ${newlib_msg_warn}" >&5
+$as_echo "$as_me: WARNING: ${newlib_msg_warn}" >&2;}
+fi
+
 # Hard-code OBJEXT.  Normally it is set by AC_OBJEXT, but we
 # use oext, which is set in configure.host based on the target platform.
 OBJEXT=${oext}

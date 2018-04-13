@@ -143,25 +143,25 @@ libctype_la_LIBADD =
 am__objects_3 = ctype_.lo isalnum.lo isalpha.lo iscntrl.lo isdigit.lo \
 	islower.lo isupper.lo isprint.lo ispunct.lo isspace.lo \
 	isxdigit.lo tolower.lo toupper.lo
-@ELIX_LEVEL_1_FALSE@am__objects_4 = categories.lo isalnum_l.lo isalpha_l.lo \
-@ELIX_LEVEL_1_FALSE@	isascii.lo isascii_l.lo isblank.lo \
-@ELIX_LEVEL_1_FALSE@	isblank_l.lo iscntrl_l.lo isdigit_l.lo \
-@ELIX_LEVEL_1_FALSE@	islower_l.lo isupper_l.lo isprint_l.lo \
-@ELIX_LEVEL_1_FALSE@	ispunct_l.lo isspace_l.lo iswalnum.lo \
-@ELIX_LEVEL_1_FALSE@	iswalnum_l.lo iswalpha.lo iswalpha_l.lo \
-@ELIX_LEVEL_1_FALSE@	iswblank.lo iswblank_l.lo iswcntrl.lo \
-@ELIX_LEVEL_1_FALSE@	iswcntrl_l.lo iswctype.lo iswctype_l.lo \
-@ELIX_LEVEL_1_FALSE@	iswdigit.lo iswdigit_l.lo iswgraph.lo \
-@ELIX_LEVEL_1_FALSE@	iswgraph_l.lo iswlower.lo iswlower_l.lo \
-@ELIX_LEVEL_1_FALSE@	iswprint.lo iswprint_l.lo iswpunct.lo \
-@ELIX_LEVEL_1_FALSE@	iswpunct_l.lo iswspace.lo iswspace_l.lo \
-@ELIX_LEVEL_1_FALSE@	iswupper.lo iswupper_l.lo iswxdigit.lo \
-@ELIX_LEVEL_1_FALSE@	iswxdigit_l.lo isxdigit_l.lo jp2uc.lo \
-@ELIX_LEVEL_1_FALSE@	toascii.lo toascii_l.lo tolower_l.lo \
-@ELIX_LEVEL_1_FALSE@	toupper_l.lo towctrans.lo towctrans_l.lo \
-@ELIX_LEVEL_1_FALSE@	towlower.lo towlower_l.lo towupper.lo \
-@ELIX_LEVEL_1_FALSE@	towupper_l.lo wctrans.lo wctrans_l.lo \
-@ELIX_LEVEL_1_FALSE@	wctype.lo wctype_l.lo
+@ELIX_LEVEL_1_FALSE@am__objects_4 = categories.lo isalnum_l.lo \
+@ELIX_LEVEL_1_FALSE@	isalpha_l.lo isascii.lo isascii_l.lo \
+@ELIX_LEVEL_1_FALSE@	isblank.lo isblank_l.lo iscntrl_l.lo \
+@ELIX_LEVEL_1_FALSE@	isdigit_l.lo islower_l.lo isupper_l.lo \
+@ELIX_LEVEL_1_FALSE@	isprint_l.lo ispunct_l.lo isspace_l.lo \
+@ELIX_LEVEL_1_FALSE@	iswalnum.lo iswalnum_l.lo iswalpha.lo \
+@ELIX_LEVEL_1_FALSE@	iswalpha_l.lo iswblank.lo iswblank_l.lo \
+@ELIX_LEVEL_1_FALSE@	iswcntrl.lo iswcntrl_l.lo iswctype.lo \
+@ELIX_LEVEL_1_FALSE@	iswctype_l.lo iswdigit.lo iswdigit_l.lo \
+@ELIX_LEVEL_1_FALSE@	iswgraph.lo iswgraph_l.lo iswlower.lo \
+@ELIX_LEVEL_1_FALSE@	iswlower_l.lo iswprint.lo iswprint_l.lo \
+@ELIX_LEVEL_1_FALSE@	iswpunct.lo iswpunct_l.lo iswspace.lo \
+@ELIX_LEVEL_1_FALSE@	iswspace_l.lo iswupper.lo iswupper_l.lo \
+@ELIX_LEVEL_1_FALSE@	iswxdigit.lo iswxdigit_l.lo isxdigit_l.lo \
+@ELIX_LEVEL_1_FALSE@	jp2uc.lo toascii.lo toascii_l.lo \
+@ELIX_LEVEL_1_FALSE@	tolower_l.lo toupper_l.lo towctrans.lo \
+@ELIX_LEVEL_1_FALSE@	towctrans_l.lo towlower.lo towlower_l.lo \
+@ELIX_LEVEL_1_FALSE@	towupper.lo towupper_l.lo wctrans.lo \
+@ELIX_LEVEL_1_FALSE@	wctrans_l.lo wctype.lo wctype_l.lo
 @USE_LIBTOOL_TRUE@am_libctype_la_OBJECTS = $(am__objects_3) \
 @USE_LIBTOOL_TRUE@	$(am__objects_4)
 libctype_la_OBJECTS = $(am_libctype_la_OBJECTS)

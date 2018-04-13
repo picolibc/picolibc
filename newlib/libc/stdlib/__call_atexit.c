@@ -9,7 +9,9 @@
 #include "atexit.h"
 
 /* Make this a weak reference to avoid pulling in free.  */
+#ifndef MALLOC_PROVIDED
 void free(void *) _ATTRIBUTE((__weak__));
+#endif
 
 #ifndef __SINGLE_THREAD__
 __LOCK_INIT_RECURSIVE(, __atexit_recursive_mutex);

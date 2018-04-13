@@ -221,6 +221,11 @@ AM_CONDITIONAL(ELIX_LEVEL_4, test x[$]{newlib_elix_level} = x4)
 
 AM_CONDITIONAL(USE_LIBTOOL, test x[$]{use_libtool} = xyes)
 
+# Emit any target-specific warnings.
+if test "x${newlib_msg_warn}" != "x"; then
+   AC_MSG_WARN([${newlib_msg_warn}])
+fi
+
 # Hard-code OBJEXT.  Normally it is set by AC_OBJEXT, but we
 # use oext, which is set in configure.host based on the target platform.
 OBJEXT=${oext}

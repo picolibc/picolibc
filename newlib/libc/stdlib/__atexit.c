@@ -39,7 +39,9 @@
 #include "atexit.h"
 
 /* Make this a weak reference to avoid pulling in malloc.  */
+#ifndef MALLOC_PROVIDED
 void * malloc(size_t) _ATTRIBUTE((__weak__));
+#endif
 
 #ifdef _LITE_EXIT
 /* As __call_exitprocs is weak reference in lite exit, make a
