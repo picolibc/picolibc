@@ -30,7 +30,8 @@
 */
 
 	.text
-	.globl _interrupt_handler    # Interrupt Handler Label 
+	.weakext _interrupt_handler    # Interrupt Handler Label
+	.type _interrupt_handler, %function
 	.align 2
 
 	_interrupt_handler:

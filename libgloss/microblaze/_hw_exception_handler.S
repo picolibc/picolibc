@@ -30,7 +30,8 @@
 */
 
 	.text
-	.globl _hw_exception_handler    # HW Exception Handler Label 
+	.weakext _hw_exception_handler    # HW Exception Handler Label
+	.type _hw_exception_handler, %function
 	.align 2
 	
 	_hw_exception_handler:
