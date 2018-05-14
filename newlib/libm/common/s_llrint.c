@@ -93,9 +93,9 @@ long long int
       if (j0 >= 52)
 	/* 64bit return: j0 in [52,62] */
 	/* 64bit return: left shift amt in [32,42] */
-        result = ((long long int) ((i0 & 0x000fffff) | 0x0010000) << (j0 - 20)) | 
+        result = ((long long int) ((i0 & 0x000fffff) | 0x00100000) << (j0 - 20)) |
 		/* 64bit return: right shift amt in [0,10] */
-                   (i1 << (j0 - 52));
+                   ((long long int) i1 << (j0 - 52));
       else
         {
 	  /* 64bit return: j0 in [20,51] */
