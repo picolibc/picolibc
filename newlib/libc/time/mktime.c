@@ -188,7 +188,7 @@ mktime (struct tm *tim_p)
     }
 
   /* compute total seconds */
-  tim += (days * _SEC_IN_DAY);
+  tim += (time_t)days * _SEC_IN_DAY;
 
   TZ_LOCK;
 
