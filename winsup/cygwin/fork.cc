@@ -316,7 +316,7 @@ frok::parent (volatile char * volatile stack_here)
 	 on whether we're running on a pthread or not.  If pthread, we fetch
 	 the guardpage size from the pthread attribs, otherwise we use the
 	 system default. */
-      ch.stacklimit = (void *) ((uintptr_t) stack_here & ~wincap.page_size ());
+      ch.stacklimit = (void *) ((uintptr_t) stack_here & ~(wincap.page_size () - 1));
       ch.guardsize = (&_my_tls != _main_tls && _my_tls.tid)
 		     ? _my_tls.tid->attr.guardsize
 		     : wincap.def_guard_page_size ();
