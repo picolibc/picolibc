@@ -2198,13 +2198,18 @@ static void malloc_extend_top(RARG nb) RDECL INTERNAL_SIZE_T nb;
     /* Guarantee the next brk will be at a page boundary */
     correction += pagesz - ((POINTER_UINT)(brk + sbrk_size) & (pagesz - 1));
 
+    /* To guarantee page boundary, correction should be less than pagesz */
+    correction &= (pagesz - 1);
+
     /* Allocate correction */
     new_brk = (char*)(MORECORE (correction));
     if (new_brk == (char*)(MORECORE_FAILURE))
       {
 	correction = 0;
 	correction_failed = 1;
-	new_brk = brk;
+	new_brk = brk + sbrk_size;
+	if (front_misalign > 0)
+	  new_brk -= (MALLOC_ALIGNMENT) - front_misalign;
       }
 
     sbrked_mem += correction;
