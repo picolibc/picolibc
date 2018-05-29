@@ -25,3 +25,7 @@ Bug Fixes
 
 - Fix a buffer underrun problem in Win32 path normalization.
   Addresses: https://cygwin.com/ml/cygwin/2018-05//msg00017.html
+
+- Fix a stack alignment problem which may lead to spurious crashes after
+  fork.
+  Addresses: https://cygwin.com/ml/cygwin-patches/2018-q2/msg00016.html
