@@ -57,6 +57,7 @@
 #include <sys/param.h>
 #include <sys/cygwin.h>
 #include <wctype.h>
+#include <assert.h>
 #include "cygerrno.h"
 #include "path.h"
 #include "fhandler.h"
@@ -2800,7 +2801,7 @@ restart:
 	      if (*p != '.' && *p != ' ')
 		{
 		  while (*--p != '\\')
-		    ;
+		    assert(p >= path);
 		  if (*++p != ' ')
 		    p = NULL;
 		}
