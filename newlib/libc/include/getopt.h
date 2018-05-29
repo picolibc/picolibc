@@ -129,7 +129,7 @@ extern "C"
 
   /* The GETOPT_DATA_INITIALIZER macro is used to initialize a statically-
      allocated variable of type struct getopt_data.  */
-  #define GETOPT_DATA_INITIALIZER	{0,0,0,0,0}
+  #define GETOPT_DATA_INITIALIZER	{0,0,0,0,0,0,0}
 
   /* These #defines are to make accessing the reentrant functions easier.  */
   #define getopt_r		__getopt_r
@@ -142,6 +142,7 @@ extern "C"
   {
     char *optarg;
     int optind, opterr, optopt, optwhere;
+    int permute_from, num_nonopts;
   } getopt_data;
 
 #endif /* __need_getopt_newlib */

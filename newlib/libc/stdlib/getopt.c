@@ -118,6 +118,8 @@ int optopt = '?';
 
 /* static variables */
 static int optwhere = 0;
+static int permute_from = 0;
+static int num_nonopts = 0;
 
 /* functions */
 
@@ -163,6 +165,8 @@ read_globals (struct getopt_data *data)
   data->opterr = opterr;
   data->optopt = optopt;
   data->optwhere = optwhere;
+  data->permute_from = permute_from;
+  data->num_nonopts = num_nonopts;
 }
 
 /* write_globals: write the values into the globals from a getopt_data
@@ -175,6 +179,8 @@ write_globals (struct getopt_data *data)
   opterr = data->opterr;
   optopt = data->optopt;
   optwhere = data->optwhere;
+  permute_from = data->permute_from;
+  num_nonopts = data->num_nonopts;
 }
 
 /* getopt_internal:  the function that does all the dirty work
@@ -186,8 +192,6 @@ getopt_internal (int argc, char *const argv[], const char *shortopts,
 		 struct getopt_data *data)
 {
   GETOPT_ORDERING_T ordering = PERMUTE;
-  size_t permute_from = 0;
-  int num_nonopts = 0;
   int optindex = 0;
   size_t match_chars = 0;
   char *possible_arg = 0;
@@ -209,7 +213,12 @@ getopt_internal (int argc, char *const argv[], const char *shortopts,
 
   /* if this is our first time through */
   if (data->optind == 0)
-    data->optind = data->optwhere = 1;
+    {
+      data->optind = 1;
+      data->optwhere = 1;
+      data->permute_from = 0;
+      data->num_nonopts = 0;
+    }
 
   /* define ordering */
   if (shortopts != 0 && (*shortopts == '-' || *shortopts == '+'))
@@ -237,24 +246,24 @@ getopt_internal (int argc, char *const argv[], const char *shortopts,
 	{
 	default:		/* shouldn't happen */
 	case PERMUTE:
-	  permute_from = data->optind;
-	  num_nonopts = 0;
+	  data->permute_from = data->optind;
+	  data->num_nonopts = 0;
 	  while (!is_option (argv[data->optind], only))
 	    {
 	      data->optind++;
-	      num_nonopts++;
+	      data->num_nonopts++;
 	    }
 	  if (argv[data->optind] == 0)
 	    {
 	      /* no more options */
-	      data->optind = permute_from;
+	      data->optind = data->permute_from;
 	      return EOF;
 	    }
 	  else if (strcmp (argv[data->optind], "--") == 0)
 	    {
 	      /* no more options, but have to get `--' out of the way */
-	      permute (argv + permute_from, num_nonopts, 1);
-	      data->optind = permute_from + 1;
+	      permute (argv + data->permute_from, data->num_nonopts, 1);
+	      data->optind = data->permute_from + 1;
 	      return EOF;
 	    }
 	  break;
@@ -426,10 +435,10 @@ getopt_internal (int argc, char *const argv[], const char *shortopts,
     }
 
   /* do we have to permute or otherwise modify data->optind? */
-  if (ordering == PERMUTE && data->optwhere == 1 && num_nonopts != 0)
+  if (ordering == PERMUTE && data->optwhere == 1 && data->num_nonopts != 0)
     {
-      permute (argv + permute_from, num_nonopts, 1 + arg_next);
-      data->optind = permute_from + 1 + arg_next;
+      permute (argv + data->permute_from, data->num_nonopts, 1 + arg_next);
+      data->optind = data->permute_from + 1 + arg_next;
     }
   else if (data->optwhere == 1)
     data->optind = data->optind + 1 + arg_next;
