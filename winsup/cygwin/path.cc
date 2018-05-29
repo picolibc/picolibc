@@ -1336,6 +1336,7 @@ int
 normalize_win32_path (const char *src, char *dst, char *&tail)
 {
   const char *src_start = src;
+  const char *dst_start = dst;
   bool beg_src_slash = isdirsep (src[0]);
 
   tail = dst;
@@ -1370,27 +1371,43 @@ normalize_win32_path (const char *src, char *dst, char *&tail)
 	      src += 2;
 	    }
 	}
+      dst = tail;
+      /* If backslash is missing in src, add one. */
+      if (!isdirsep (src[0]))
+	*tail++ = '\\';
     }
-  if (tail == dst)
+  if (tail == dst_start)
     {
       if (isdrive (src))
-	/* Always convert drive letter to uppercase for case sensitivity. */
-	*tail++ = cyg_toupper (*src++);
+	{
+	  /* Always convert drive letter to uppercase for case sensitivity. */
+	  *tail++ = cyg_toupper (*src++);
+	  *tail++ = *src++;
+	  dst = tail;
+	  /* If backslash is missing in src, add one. */
+	  if (!isdirsep (src[0]))
+	    *tail++ = '\\';
+	}
       else if (*src != '/')
 	{
 	  if (beg_src_slash)
-	    tail += cygheap->cwd.get_drive (dst);
-	  else if (!cygheap->cwd.get (dst, 0))
-	    return get_errno ();
-	  else
+	    dst = (tail += cygheap->cwd.get_drive (dst));
+	  else if (cygheap->cwd.get (dst, 0))
 	    {
 	      tail = strchr (tail, '\0');
 	      if (tail[-1] != '\\')
 		*tail++ = '\\';
+	      dst = tail - 1;
 	    }
+	  else
+	    return get_errno ();
 	}
     }
 
+  /* At this point dst points to the first backslash, even if it only gets
+     written in the first iteration of the following loop.  Backing up to
+     handle ".." components can not underrun that border (thus avoiding
+     subsequent buffer underruns with fatal results). */
   while (*src)
     {
       /* Strip duplicate /'s.  */
@@ -1442,7 +1459,7 @@ normalize_win32_path (const char *src, char *dst, char *&tail)
   if (tail > dst + 1 && tail[-1] == '.' && tail[-2] == '\\')
     tail--;
   *tail = '\0';
-  debug_printf ("%s = normalize_win32_path (%s)", dst, src_start);
+  debug_printf ("%s = normalize_win32_path (%s)", dst_start, src_start);
   return 0;
 }
 
