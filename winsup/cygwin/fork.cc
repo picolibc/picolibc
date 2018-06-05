@@ -499,13 +499,16 @@ frok::parent (volatile char * volatile stack_here)
 
 /* Common cleanup code for failure cases */
 cleanup:
+  /* release procinfo before hProcess in destructor */
+  child.allow_remove ();
+
   if (fix_impersonation)
     cygheap->user.reimpersonate ();
   if (locked)
     __malloc_unlock ();
 
   /* Remember to de-allocate the fd table. */
-  if (hchild && !child.hProcess)
+  if (hchild && !child.hProcess) /* no child.procinfo */
     ForceCloseHandle1 (hchild, childhProc);
   if (forker_finished)
     ForceCloseHandle (forker_finished);
