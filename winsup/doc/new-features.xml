@@ -4,6 +4,26 @@
 
 <sect1 id="ov-new"><title>What's new and what changed in Cygwin</title>
 
+<sect2 id="ov-new2.11"><title>What's new and what changed in 2.11</title>
+
+<itemizedlist mark="bullet">
+
+<listitem><para>
+SO_RCVTIMEO and SO_SNDTIMEO socket options are now honored.
+</para></listitem>
+
+<listitem><para>
+/proc/cpuinfo now reports L3 cache size on Intel CPUs.
+</para></listitem>
+
+<listitem><para>
+New API: clearenv.
+</para></listitem>
+
+</itemizedlist>
+
+</sect2>
+
 <sect2 id="ov-new2.10"><title>What's new and what changed in 2.10</title>
 
 <itemizedlist mark="bullet">

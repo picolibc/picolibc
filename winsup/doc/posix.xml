@@ -1284,6 +1284,7 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     asprintf_r
     basename			(see chapter "Implementation Notes")
     canonicalize_file_name
+    clearenv
     clog10
     clog10f
     clog10l
