@@ -545,6 +545,7 @@ _getenv_r (struct _reent *, const char *name)
   return findenv_func (name, &offset);
 }
 
+/* Return size of environment block, including terminating NULL. */
 static int __stdcall
 envsize (const char * const *in_envp)
 {
@@ -582,11 +583,16 @@ _addenv (const char *name, const char *value, int overwrite)
   else
     {				/* Create new slot. */
       int sz = envsize (cur_environ ());
+
+      /* Allocate space for two new slots even though only one is needed.
+	 According to the commit message for commit ebd645e
+	 (2001-10-03), this is done to "work around problems with some
+	 buggy applications." */
       int allocsz = sz + (2 * sizeof (char *));
 
       offset = (sz - 1) / sizeof (char *);
 
-      /* Allocate space for additional element plus terminating NULL. */
+      /* Allocate space for additional element. */
       if (cur_environ () == lastenviron)
 	lastenviron = __cygwin_environ = (char **) realloc (cur_environ (),
 							    allocsz);
