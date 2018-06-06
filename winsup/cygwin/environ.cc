@@ -592,13 +592,11 @@ _addenv (const char *name, const char *value, int overwrite)
     {				/* Create new slot. */
       int sz = envsize (cur_environ ());
 
-      /* If sz == 0, we need two new slots, one for the terminating NULL.
-	 But we add two slots in all cases, as has been done since
-	 2001-10-03 (commit ebd645e) to "work around problems with
-	 some buggy applications." */
-      int allocsz = (sz + 2) * sizeof (char *);
+      /* If sz == 0, we need two new slots, one for the terminating NULL. */
+      int newsz = sz == 0 ? 2 : sz + 1;
+      int allocsz = newsz * sizeof (char *);
 
-      offset = sz == 0 ? 0 : sz - 1;
+      offset = newsz - 2;
 
       /* Allocate space for additional element. */
       if (cur_environ () == lastenviron)
