@@ -30,6 +30,7 @@ details. */
 #include "shared_info.h"
 #include "ntdll.h"
 
+/* If this is not NULL, it points to memory allocated by us. */
 static char **lastenviron;
 
 /* Parse CYGWIN options */
@@ -483,6 +484,9 @@ my_findenv (const char *name, int *offset)
   register char **p;
   const char *c;
 
+  if (cur_environ () == NULL)
+    return NULL;
+
   c = name;
   len = 0;
   while (*c && *c != '=')
@@ -545,14 +549,18 @@ _getenv_r (struct _reent *, const char *name)
   return findenv_func (name, &offset);
 }
 
-/* Return size of environment block, including terminating NULL. */
+/* Return number of environment entries, including terminating NULL. */
 static int __stdcall
 envsize (const char * const *in_envp)
 {
   const char * const *envp;
+
+  if (in_envp == NULL)
+    return 0;
+
   for (envp = in_envp; *envp; envp++)
     continue;
-  return (1 + envp - in_envp) * sizeof (const char *);
+  return 1 + envp - in_envp;
 }
 
 /* Takes similar arguments to setenv except that overwrite is
@@ -584,23 +592,22 @@ _addenv (const char *name, const char *value, int overwrite)
     {				/* Create new slot. */
       int sz = envsize (cur_environ ());
 
-      /* Allocate space for two new slots even though only one is needed.
-	 According to the commit message for commit ebd645e
-	 (2001-10-03), this is done to "work around problems with some
-	 buggy applications." */
-      int allocsz = sz + (2 * sizeof (char *));
+      /* If sz == 0, we need two new slots, one for the terminating NULL.
+	 But we add two slots in all cases, as has been done since
+	 2001-10-03 (commit ebd645e) to "work around problems with
+	 some buggy applications." */
+      int allocsz = (sz + 2) * sizeof (char *);
 
-      offset = (sz - 1) / sizeof (char *);
+      offset = sz == 0 ? 0 : sz - 1;
 
       /* Allocate space for additional element. */
       if (cur_environ () == lastenviron)
-	lastenviron = __cygwin_environ = (char **) realloc (cur_environ (),
+	lastenviron = __cygwin_environ = (char **) realloc (lastenviron,
 							    allocsz);
-      else if ((lastenviron = (char **) malloc (allocsz)) != NULL)
-	__cygwin_environ = (char **) memcpy ((char **) lastenviron,
-					     __cygwin_environ, sz);
-
-      if (!__cygwin_environ)
+      else if ((lastenviron = (char **) realloc (lastenviron, allocsz)) != NULL)
+	__cygwin_environ = (char **) memcpy (lastenviron, __cygwin_environ,
+					     sz * sizeof (char *));
+      if (!lastenviron)
 	{
 #ifdef DEBUGGING
 	  try_to_debug ();
@@ -1029,7 +1036,12 @@ build_env (const char * const *envp, PWCHAR &envblock, int &envc,
   char **dstp;
   bool saw_spenv[SPENVS_SIZE] = {0};
 
+  static char *const empty_env[] = { NULL };
+
   debug_printf ("envp %p", envp);
+
+  if (!envp)
+    envp = empty_env;
 
   /* How many elements? */
   for (n = 0; envp[n]; n++)

@@ -677,11 +677,12 @@ commune_process (void *arg)
 	sigproc_printf ("processing PICOM_ENVIRON");
 	unsigned n = 0;
 	char **env = cur_environ ();
-	for (char **e = env; *e; e++)
-	  n += strlen (*e) + 1;
+	if (env)
+	  for (char **e = env; *e; e++)
+	    n += strlen (*e) + 1;
 	if (!WritePipeOverlapped (tothem, &n, sizeof n, &nr, 1000L))
 	  sigproc_printf ("WritePipeOverlapped sizeof argv failed, %E");
-	else
+	else if (env)
 	  for (char **e = env; *e; e++)
 	    if (!WritePipeOverlapped (tothem, *e, strlen (*e) + 1, &nr, 1000L))
 	      {
