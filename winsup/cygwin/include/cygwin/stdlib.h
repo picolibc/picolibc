@@ -26,6 +26,9 @@ char *canonicalize_file_name (const char *);
 #if __BSD_VISIBLE || __POSIX_VISIBLE >= 200112
 int unsetenv (const char *);
 #endif
+#if __MISC_VISIBLE
+int clearenv (void);
+#endif
 #if __XSI_VISIBLE
 char *ptsname (int);
 int grantpt (int);

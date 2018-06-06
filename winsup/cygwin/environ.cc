@@ -720,6 +720,26 @@ unsetenv (const char *name)
   return -1;
 }
 
+/* Clear the environment.  */
+extern "C" int
+clearenv (void)
+{
+  __try
+    {
+      if (cur_environ () == lastenviron)
+	{
+	  free (lastenviron);
+	  lastenviron = NULL;
+	}
+      __cygwin_environ = NULL;
+      update_envptrs ();
+      return 0;
+    }
+  __except (EFAULT) {}
+  __endtry
+  return -1;
+}
+
 /* Minimal list of Windows vars which must be converted to uppercase.
    Either for POSIX compatibility of for backward compatibility with
    existing applications. */
