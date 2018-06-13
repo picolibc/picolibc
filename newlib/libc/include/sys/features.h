@@ -385,7 +385,7 @@ extern "C" {
 /* POSIX 1003.26-2003 defined device control method */
 #define _POSIX_26_VERSION			200312L
 
-#endif
+#endif /* __rtems__ */
 
 /* XMK loosely adheres to POSIX -- 1003.1 */
 #ifdef __XMK__
@@ -530,6 +530,18 @@ extern "C" {
 #define __STDC_ISO_10646__ 201806L
 
 #endif /* __CYGWIN__ */
+
+/* ESP-specific */
+#ifdef __XTENSA__
+
+#define _POSIX_THREADS                          1
+#define _POSIX_TIMEOUTS                         1
+#define _POSIX_TIMERS                           1
+#define _POSIX_MONOTONIC_CLOCK                  200112L
+#define _POSIX_CLOCK_SELECTION                  200112L
+#define _UNIX98_THREAD_MUTEX_ATTRIBUTES         1
+
+#endif /* __XTENSA__ */
 
 #ifdef __cplusplus
 }
