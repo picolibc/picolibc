@@ -29,4 +29,4 @@ extern struct _reent reent_data __attribute__ ((alias("impure_data")));
 #if !defined(__DYNAMIC_REENT__) || defined(__SINGLE_THREAD__)
 struct _reent *__ATTRIBUTE_IMPURE_PTR__ _impure_ptr = &impure_data;
 #endif
-struct _reent *const __ATTRIBUTE_IMPURE_PTR__ _global_impure_ptr = NULL;
+struct _reent * __ATTRIBUTE_IMPURE_PTR__ _global_impure_ptr = NULL;
