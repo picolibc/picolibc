@@ -1,5 +1,5 @@
 /* Configuration for math routines.
-   Copyright (c) 2017 ARM Ltd.  All rights reserved.
+   Copyright (c) 2017-2018 Arm Ltd.  All rights reserved.
 
    Redistribution and use in source and binary forms, with or without
    modification, are permitted provided that the following conditions
@@ -41,6 +41,44 @@
 #ifndef WANT_ERRNO_UFLOW
 /* Set errno to ERANGE if result underflows to 0 (in all rounding modes).  */
 # define WANT_ERRNO_UFLOW (WANT_ROUNDING && WANT_ERRNO)
+#endif
+
+/* Compiler can inline round as a single instruction.  */
+#ifndef HAVE_FAST_ROUND
+# if __aarch64__
+#   define HAVE_FAST_ROUND 1
+# else
+#   define HAVE_FAST_ROUND 0
+# endif
+#endif
+
+/* Compiler can inline lround, but not (long)round(x).  */
+#ifndef HAVE_FAST_LROUND
+# if __aarch64__ && (100*__GNUC__ + __GNUC_MINOR__) >= 408 && __NO_MATH_ERRNO__
+#   define HAVE_FAST_LROUND 1
+# else
+#   define HAVE_FAST_LROUND 0
+# endif
+#endif
+
+#if HAVE_FAST_ROUND
+# define TOINT_INTRINSICS 1
+
+static inline double_t
+roundtoint (double_t x)
+{
+  return round (x);
+}
+
+static inline uint64_t
+converttoint (double_t x)
+{
+# if HAVE_FAST_LROUND
+  return lround (x);
+# else
+  return (long) round (x);
+# endif
+}
 #endif
 
 #ifndef TOINT_INTRINSICS
@@ -109,12 +147,56 @@ issignalingf_inline (float x)
   return 2 * (ix ^ 0x00400000) > 2u * 0x7fc00000;
 }
 
+/* Force the evaluation of a floating-point expression for its side-effect.  */
+#if __aarch64__ && __GNUC__
+static inline void
+force_eval_float (float x)
+{
+  __asm__ __volatile__ ("" : "+w" (x));
+}
+static inline void
+force_eval_double (double x)
+{
+  __asm__ __volatile__ ("" : "+w" (x));
+}
+#else
+static inline void
+force_eval_float (float x)
+{
+  volatile float y = x;
+}
+static inline void
+force_eval_double (double x)
+{
+  volatile double y = x;
+}
+#endif
+
+/* Evaluate an expression as the specified type, normally a type
+   cast should be enough, but compilers implement non-standard
+   excess-precision handling, so when FLT_EVAL_METHOD != 0 then
+   these functions may need to be customized.  */
+static inline float
+eval_as_float (float x)
+{
+  return x;
+}
+static inline double
+eval_as_double (double x)
+{
+  return x;
+}
+
 #ifdef __GNUC__
 # define HIDDEN __attribute__ ((__visibility__ ("hidden")))
 # define NOINLINE __attribute__ ((noinline))
+# define likely(x) __builtin_expect (!!(x), 1)
+# define unlikely(x) __builtin_expect (x, 0)
 #else
 # define HIDDEN
 # define NOINLINE
+# define likely(x) (x)
+# define unlikely(x) (x)
 #endif
 
 HIDDEN float __math_oflowf (unsigned long);
