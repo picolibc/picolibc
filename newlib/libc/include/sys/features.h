@@ -531,6 +531,10 @@ extern "C" {
 #ifdef __XTENSA__
 #define _POSIX_THREADS                          1
 #define _UNIX98_THREAD_MUTEX_ATTRIBUTES         1
+#undef __MISC_VISIBLE
+#define __MISC_VISIBLE                          1
+#undef __GNU_VISIBLE
+#define __GNU_VISIBLE                           1
 #endif
 
 #ifdef __cplusplus
