@@ -33,7 +33,6 @@ POTFILES
 winsup/aclocal.m4
 winsup/configure
 winsup/**/Makefile.in
-test-driver
 
 tags
 TAGS
