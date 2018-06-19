@@ -1,3 +1,8 @@
+2018-06-19  Simon Marchi  <simon.marchi@ericsson.com>
+
+	* configure.in: Remove AC_PREREQ.
+	* configure: Re-generate.
+
 2018-01-03  Alan Modra  <amodra@gmail.com>
 
 	* add-log.el: Update copyright year range.
