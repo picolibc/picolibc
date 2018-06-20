@@ -14,6 +14,7 @@
  */
 
 #include "fdlibm.h"
+#if __OBSOLETE_MATH
 
 #ifdef __STDC__
 static const float one=1.0;
@@ -66,3 +67,4 @@ static float one=1.0;
 }
 
 #endif /* defined(_DOUBLE_IS_32BITS) */
+#endif /* __OBSOLETE_MATH */

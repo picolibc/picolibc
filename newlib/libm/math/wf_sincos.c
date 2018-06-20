@@ -1,6 +1,8 @@
 /* sincos -- currently no more efficient than two separate calls to
    sin and cos. */
 #include "fdlibm.h"
+#if __OBSOLETE_MATH
+
 #include <errno.h>
 
 #ifdef __STDC__
@@ -31,3 +33,4 @@
   *cosx = cosf((float) x);
 }
 #endif /* defined(_DOUBLE_IS_32BITS) */
+#endif /* __OBSOLETE_MATH */

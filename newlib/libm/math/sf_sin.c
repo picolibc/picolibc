@@ -14,6 +14,7 @@
  */
 
 #include "fdlibm.h"
+#if __OBSOLETE_MATH
 
 #ifdef __STDC__
 	float sinf(float x)
@@ -60,3 +61,4 @@
 }
 
 #endif /* defined(_DOUBLE_IS_32BITS) */
+#endif /* __OBSOLETE_MATH */

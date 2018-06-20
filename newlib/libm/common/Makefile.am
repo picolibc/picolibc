@@ -25,7 +25,7 @@ fsrc =	sf_finite.c sf_copysign.c sf_modf.c sf_scalbn.c \
 	sf_scalbln.c sf_trunc.c \
 	sf_exp.c sf_exp2.c sf_exp2_data.c sf_log.c sf_log_data.c \
 	sf_log2.c sf_log2_data.c sf_pow_log2_data.c sf_pow.c \
-	math_errf.c
+	sinf.c cosf.c sincosf.c sincosf_data.c math_errf.c
 
 lsrc =	atanl.c cosl.c sinl.c tanl.c tanhl.c frexpl.c modfl.c ceill.c fabsl.c \
 	floorl.c log1pl.c expm1l.c acosl.c asinl.c atan2l.c coshl.c sinhl.c \
@@ -38,6 +38,7 @@ lsrc =	atanl.c cosl.c sinl.c tanl.c tanhl.c frexpl.c modfl.c ceill.c fabsl.c \
 	sl_finite.c
 
 libcommon_la_LDFLAGS = -Xcompiler -nostdlib
+lib_a_CFLAGS = -fbuiltin -fno-math-errno
 
 if USE_LIBTOOL
 noinst_LTLIBRARIES = libcommon.la
@@ -52,7 +53,7 @@ lib_a_SOURCES = $(src) $(fsrc)
 if HAVE_LONG_DOUBLE
 lib_a_SOURCES += $(lsrc)
 endif # HAVE_LONG_DOUBLE
-lib_a_CFLAGS = $(AM_CFLAGS)
+lib_a_CFLAGS += $(AM_CFLAGS)
 noinst_DATA =
 endif # USE_LIBTOOL
 
