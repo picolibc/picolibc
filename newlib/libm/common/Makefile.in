@@ -55,7 +55,6 @@ build_triplet = @build@
 host_triplet = @host@
 @HAVE_LONG_DOUBLE_TRUE@@USE_LIBTOOL_TRUE@am__append_1 = $(lsrc)
 @HAVE_LONG_DOUBLE_TRUE@@USE_LIBTOOL_FALSE@am__append_2 = $(lsrc)
-@USE_LIBTOOL_FALSE@am__append_3 = $(AM_CFLAGS)
 DIST_COMMON = $(srcdir)/../../Makefile.shared $(srcdir)/Makefile.in \
 	$(srcdir)/Makefile.am
 subdir = common
@@ -115,8 +114,6 @@ am__objects_2 = lib_a-sf_finite.$(OBJEXT) lib_a-sf_copysign.$(OBJEXT) \
 	lib_a-sf_log.$(OBJEXT) lib_a-sf_log_data.$(OBJEXT) \
 	lib_a-sf_log2.$(OBJEXT) lib_a-sf_log2_data.$(OBJEXT) \
 	lib_a-sf_pow_log2_data.$(OBJEXT) lib_a-sf_pow.$(OBJEXT) \
-	lib_a-sinf.$(OBJEXT) lib_a-cosf.$(OBJEXT) \
-	lib_a-sincosf.$(OBJEXT) lib_a-sincosf_data.$(OBJEXT) \
 	lib_a-math_errf.$(OBJEXT)
 am__objects_3 = lib_a-atanl.$(OBJEXT) lib_a-cosl.$(OBJEXT) \
 	lib_a-sinl.$(OBJEXT) lib_a-tanl.$(OBJEXT) \
@@ -172,8 +169,7 @@ am__objects_6 = sf_finite.lo sf_copysign.lo sf_modf.lo sf_scalbn.lo \
 	sf_nearbyint.lo sf_remquo.lo sf_round.lo sf_scalbln.lo \
 	sf_trunc.lo sf_exp.lo sf_exp2.lo sf_exp2_data.lo sf_log.lo \
 	sf_log_data.lo sf_log2.lo sf_log2_data.lo sf_pow_log2_data.lo \
-	sf_pow.lo sinf.lo cosf.lo sincosf.lo sincosf_data.lo \
-	math_errf.lo
+	sf_pow.lo math_errf.lo
 am__objects_7 = atanl.lo cosl.lo sinl.lo tanl.lo tanhl.lo frexpl.lo \
 	modfl.lo ceill.lo fabsl.lo floorl.lo log1pl.lo expm1l.lo \
 	acosl.lo asinl.lo atan2l.lo coshl.lo sinhl.lo expl.lo \
@@ -365,7 +361,7 @@ fsrc = sf_finite.c sf_copysign.c sf_modf.c sf_scalbn.c \
 	sf_scalbln.c sf_trunc.c \
 	sf_exp.c sf_exp2.c sf_exp2_data.c sf_log.c sf_log_data.c \
 	sf_log2.c sf_log2_data.c sf_pow_log2_data.c sf_pow.c \
-	sinf.c cosf.c sincosf.c sincosf_data.c math_errf.c
+	math_errf.c
 
 lsrc = atanl.c cosl.c sinl.c tanl.c tanhl.c frexpl.c modfl.c ceill.c fabsl.c \
 	floorl.c log1pl.c expm1l.c acosl.c asinl.c atan2l.c coshl.c sinhl.c \
@@ -378,7 +374,6 @@ lsrc = atanl.c cosl.c sinl.c tanl.c tanhl.c frexpl.c modfl.c ceill.c fabsl.c \
 	sl_finite.c
 
 libcommon_la_LDFLAGS = -Xcompiler -nostdlib
-lib_a_CFLAGS = -fbuiltin -fno-math-errno $(am__append_3)
 @USE_LIBTOOL_TRUE@noinst_LTLIBRARIES = libcommon.la
 @USE_LIBTOOL_TRUE@libcommon_la_SOURCES = $(src) $(fsrc) \
 @USE_LIBTOOL_TRUE@	$(am__append_1)
@@ -386,6 +381,7 @@ lib_a_CFLAGS = -fbuiltin -fno-math-errno $(am__append_3)
 @USE_LIBTOOL_TRUE@noinst_DATA = objectlist.awk.in
 @USE_LIBTOOL_FALSE@noinst_LIBRARIES = lib.a
 @USE_LIBTOOL_FALSE@lib_a_SOURCES = $(src) $(fsrc) $(am__append_2)
+@USE_LIBTOOL_FALSE@lib_a_CFLAGS = $(AM_CFLAGS)
 
 #
 # documentation rules
@@ -947,30 +943,6 @@ lib_a-sf_pow.o: sf_pow.c
 
 lib_a-sf_pow.obj: sf_pow.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-sf_pow.obj `if test -f 'sf_pow.c'; then $(CYGPATH_W) 'sf_pow.c'; else $(CYGPATH_W) '$(srcdir)/sf_pow.c'; fi`
-
-lib_a-sinf.o: sinf.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-sinf.o `test -f 'sinf.c' || echo '$(srcdir)/'`sinf.c
-
-lib_a-sinf.obj: sinf.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-sinf.obj `if test -f 'sinf.c'; then $(CYGPATH_W) 'sinf.c'; else $(CYGPATH_W) '$(srcdir)/sinf.c'; fi`
-
-lib_a-cosf.o: cosf.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-cosf.o `test -f 'cosf.c' || echo '$(srcdir)/'`cosf.c
-
-lib_a-cosf.obj: cosf.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-cosf.obj `if test -f 'cosf.c'; then $(CYGPATH_W) 'cosf.c'; else $(CYGPATH_W) '$(srcdir)/cosf.c'; fi`
-
-lib_a-sincosf.o: sincosf.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-sincosf.o `test -f 'sincosf.c' || echo '$(srcdir)/'`sincosf.c
-
-lib_a-sincosf.obj: sincosf.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-sincosf.obj `if test -f 'sincosf.c'; then $(CYGPATH_W) 'sincosf.c'; else $(CYGPATH_W) '$(srcdir)/sincosf.c'; fi`
-
-lib_a-sincosf_data.o: sincosf_data.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-sincosf_data.o `test -f 'sincosf_data.c' || echo '$(srcdir)/'`sincosf_data.c
-
-lib_a-sincosf_data.obj: sincosf_data.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-sincosf_data.obj `if test -f 'sincosf_data.c'; then $(CYGPATH_W) 'sincosf_data.c'; else $(CYGPATH_W) '$(srcdir)/sincosf_data.c'; fi`
 
 lib_a-math_errf.o: math_errf.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-math_errf.o `test -f 'math_errf.c' || echo '$(srcdir)/'`math_errf.c
