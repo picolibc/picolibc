@@ -684,6 +684,8 @@ class fhandler_socket_wsock: public fhandler_socket
 
 class fhandler_socket_inet: public fhandler_socket_wsock
 {
+ private:
+  bool oobinline; /* True if option SO_OOBINLINE is set */
  protected:
   int af_local_connect () { return 0; }
 
