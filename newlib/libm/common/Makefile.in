@@ -93,7 +93,9 @@ am__objects_1 = lib_a-s_finite.$(OBJEXT) lib_a-s_copysign.$(OBJEXT) \
 	lib_a-s_llround.$(OBJEXT) lib_a-s_nearbyint.$(OBJEXT) \
 	lib_a-s_remquo.$(OBJEXT) lib_a-s_round.$(OBJEXT) \
 	lib_a-s_scalbln.$(OBJEXT) lib_a-s_signbit.$(OBJEXT) \
-	lib_a-s_trunc.$(OBJEXT)
+	lib_a-s_trunc.$(OBJEXT) lib_a-exp.$(OBJEXT) \
+	lib_a-exp2.$(OBJEXT) lib_a-exp_data.$(OBJEXT) \
+	lib_a-math_err.$(OBJEXT)
 am__objects_2 = lib_a-sf_finite.$(OBJEXT) lib_a-sf_copysign.$(OBJEXT) \
 	lib_a-sf_modf.$(OBJEXT) lib_a-sf_scalbn.$(OBJEXT) \
 	lib_a-sf_cbrt.$(OBJEXT) lib_a-sf_exp10.$(OBJEXT) \
@@ -162,7 +164,8 @@ am__objects_5 = s_finite.lo s_copysign.lo s_modf.lo s_scalbn.lo \
 	s_log2.lo s_matherr.lo s_lib_ver.lo s_fdim.lo s_fma.lo \
 	s_fmax.lo s_fmin.lo s_fpclassify.lo s_lrint.lo s_llrint.lo \
 	s_lround.lo s_llround.lo s_nearbyint.lo s_remquo.lo s_round.lo \
-	s_scalbln.lo s_signbit.lo s_trunc.lo
+	s_scalbln.lo s_signbit.lo s_trunc.lo exp.lo exp2.lo \
+	exp_data.lo math_err.lo
 am__objects_6 = sf_finite.lo sf_copysign.lo sf_modf.lo sf_scalbn.lo \
 	sf_cbrt.lo sf_exp10.lo sf_expm1.lo sf_ilogb.lo sf_infinity.lo \
 	sf_isinf.lo sf_isinff.lo sf_isnan.lo sf_isnanf.lo sf_log1p.lo \
@@ -352,7 +355,8 @@ src = s_finite.c s_copysign.c s_modf.c s_scalbn.c \
 	s_fdim.c s_fma.c s_fmax.c s_fmin.c s_fpclassify.c \
 	s_lrint.c s_llrint.c \
 	s_lround.c s_llround.c s_nearbyint.c s_remquo.c s_round.c s_scalbln.c \
-	s_signbit.c s_trunc.c
+	s_signbit.c s_trunc.c \
+	exp.c exp2.c exp_data.c math_err.c
 
 fsrc = sf_finite.c sf_copysign.c sf_modf.c sf_scalbn.c \
 	sf_cbrt.c sf_exp10.c sf_expm1.c sf_ilogb.c \
@@ -695,6 +699,30 @@ lib_a-s_trunc.o: s_trunc.c
 
 lib_a-s_trunc.obj: s_trunc.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-s_trunc.obj `if test -f 's_trunc.c'; then $(CYGPATH_W) 's_trunc.c'; else $(CYGPATH_W) '$(srcdir)/s_trunc.c'; fi`
+
+lib_a-exp.o: exp.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-exp.o `test -f 'exp.c' || echo '$(srcdir)/'`exp.c
+
+lib_a-exp.obj: exp.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-exp.obj `if test -f 'exp.c'; then $(CYGPATH_W) 'exp.c'; else $(CYGPATH_W) '$(srcdir)/exp.c'; fi`
+
+lib_a-exp2.o: exp2.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-exp2.o `test -f 'exp2.c' || echo '$(srcdir)/'`exp2.c
+
+lib_a-exp2.obj: exp2.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-exp2.obj `if test -f 'exp2.c'; then $(CYGPATH_W) 'exp2.c'; else $(CYGPATH_W) '$(srcdir)/exp2.c'; fi`
+
+lib_a-exp_data.o: exp_data.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-exp_data.o `test -f 'exp_data.c' || echo '$(srcdir)/'`exp_data.c
+
+lib_a-exp_data.obj: exp_data.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-exp_data.obj `if test -f 'exp_data.c'; then $(CYGPATH_W) 'exp_data.c'; else $(CYGPATH_W) '$(srcdir)/exp_data.c'; fi`
+
+lib_a-math_err.o: math_err.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-math_err.o `test -f 'math_err.c' || echo '$(srcdir)/'`math_err.c
+
+lib_a-math_err.obj: math_err.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-math_err.obj `if test -f 'math_err.c'; then $(CYGPATH_W) 'math_err.c'; else $(CYGPATH_W) '$(srcdir)/math_err.c'; fi`
 
 lib_a-sf_finite.o: sf_finite.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-sf_finite.o `test -f 'sf_finite.c' || echo '$(srcdir)/'`sf_finite.c

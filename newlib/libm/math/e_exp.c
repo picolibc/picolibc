@@ -75,6 +75,7 @@
  */
 
 #include "fdlibm.h"
+#if __OBSOLETE_MATH
 
 #ifndef _DOUBLE_IS_32BITS
 
@@ -164,3 +165,4 @@ P5   =  4.13813679705723846039e-08; /* 0x3E663769, 0x72BEA4D0 */
 }
 
 #endif /* defined(_DOUBLE_IS_32BITS) */
+#endif /* __OBSOLETE_MATH */

@@ -147,8 +147,21 @@ issignalingf_inline (float x)
   return 2 * (ix ^ 0x00400000) > 2u * 0x7fc00000;
 }
 
-/* Force the evaluation of a floating-point expression for its side-effect.  */
 #if __aarch64__ && __GNUC__
+/* Prevent the optimization of a floating-point expression.  */
+static inline float
+opt_barrier_float (float x)
+{
+  __asm__ __volatile__ ("" : "+w" (x));
+  return x;
+}
+static inline double
+opt_barrier_double (double x)
+{
+  __asm__ __volatile__ ("" : "+w" (x));
+  return x;
+}
+/* Force the evaluation of a floating-point expression for its side-effect.  */
 static inline void
 force_eval_float (float x)
 {
@@ -160,6 +173,18 @@ force_eval_double (double x)
   __asm__ __volatile__ ("" : "+w" (x));
 }
 #else
+static inline float
+opt_barrier_float (float x)
+{
+  volatile float y = x;
+  return y;
+}
+static inline double
+opt_barrier_double (double x)
+{
+  volatile double y = x;
+  return y;
+}
 static inline void
 force_eval_float (float x)
 {
@@ -199,11 +224,33 @@ eval_as_double (double x)
 # define unlikely(x) (x)
 #endif
 
+/* Error handling tail calls for special cases, with sign argument.  */
 HIDDEN float __math_oflowf (uint32_t);
 HIDDEN float __math_uflowf (uint32_t);
 HIDDEN float __math_may_uflowf (uint32_t);
 HIDDEN float __math_divzerof (uint32_t);
+HIDDEN double __math_oflow (uint32_t);
+HIDDEN double __math_uflow (uint32_t);
+HIDDEN double __math_may_uflow (uint32_t);
+HIDDEN double __math_divzero (uint32_t);
+/* Error handling using input checking.  */
 HIDDEN float __math_invalidf (float);
+HIDDEN double __math_invalid (double);
+/* Error handling using output checking, only for errno setting.  */
+HIDDEN double __math_check_oflow (double);
+HIDDEN double __math_check_uflow (double);
+
+static inline double
+check_oflow (double x)
+{
+  return WANT_ERRNO ? __math_check_oflow (x) : x;
+}
+
+static inline double
+check_uflow (double x)
+{
+  return WANT_ERRNO ? __math_check_uflow (x) : x;
+}
 
 /* Shared between expf, exp2f and powf.  */
 #define EXP2F_TABLE_BITS 5
@@ -257,5 +304,26 @@ extern const struct powf_log2_data
   } tab[1 << POWF_LOG2_TABLE_BITS];
   double poly[POWF_LOG2_POLY_ORDER];
 } __powf_log2_data HIDDEN;
+
+#define EXP_TABLE_BITS 7
+#define EXP_POLY_ORDER 5
+/* Use polynomial that is optimized for a wider input range.  This may be
+   needed for good precision in non-nearest rounding and !TOINT_INTRINSICS.  */
+#define EXP_POLY_WIDE 0
+/* Use close to nearest rounding toint when !TOINT_INTRINSICS.  This may be
+   needed for good precision in non-nearest rouning and !EXP_POLY_WIDE.  */
+#define EXP_USE_TOINT_NARROW 0
+#define EXP2_POLY_ORDER 5
+#define EXP2_POLY_WIDE 0
+extern const struct exp_data {
+  double invln2N;
+  double shift;
+  double negln2hiN;
+  double negln2loN;
+  double poly[4]; /* Last four coefficients.  */
+  double exp2_shift;
+  double exp2_poly[EXP2_POLY_ORDER];
+  uint64_t tab[2*(1 << EXP_TABLE_BITS)];
+} __exp_data HIDDEN;
 
 #endif

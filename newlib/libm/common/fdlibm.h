@@ -231,6 +231,7 @@ extern float __ieee754_scalbf __P((float,float));
    This is valid as long as there are no namespace issues (the
    extern symbol is reserved whenever the caller is reserved)
    and there are no observable error handling side effects.  */
+# define __ieee754_exp(x) exp(x)
 # define __ieee754_expf(x) expf(x)
 # define __ieee754_logf(x) logf(x)
 # define __ieee754_powf(x,y) powf(x,y)
