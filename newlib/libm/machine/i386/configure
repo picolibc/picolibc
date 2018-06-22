@@ -3661,7 +3661,7 @@ fi
 
 . ${newlib_basedir}/configure.host
 
-newlib_cflags="${newlib_cflags} -fno-builtin"
+newlib_cflags="${newlib_cflags}"
 
 NEWLIB_CFLAGS=${newlib_cflags}
 
