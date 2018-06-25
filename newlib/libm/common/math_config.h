@@ -199,10 +199,10 @@ eval_as_double (double x)
 # define unlikely(x) (x)
 #endif
 
-HIDDEN float __math_oflowf (unsigned long);
-HIDDEN float __math_uflowf (unsigned long);
-HIDDEN float __math_may_uflowf (unsigned long);
-HIDDEN float __math_divzerof (unsigned long);
+HIDDEN float __math_oflowf (uint32_t);
+HIDDEN float __math_uflowf (uint32_t);
+HIDDEN float __math_may_uflowf (uint32_t);
+HIDDEN float __math_divzerof (uint32_t);
 HIDDEN float __math_invalidf (float);
 
 /* Shared between expf, exp2f and powf.  */
