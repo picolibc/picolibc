@@ -24,14 +24,15 @@ cat <<\/EOS
 first=
 item () {
 	if [ -n "$first" ]
-	then	if [ $(( 0x$1 )) -ne $(( 0x${last-0} + 1 )) ]
+	then	if [ "$2" != "isRangeLast" \
+		     -a $(( 0x$1 )) -ne $(( 0x${last-0} + 1 )) ]
 		then	range
 		fi
 	fi
 
 	if [ -z "$first" ]
 	then	first=$1
-		val=$2
+		val=$3
 	fi
 
 	last=$1
@@ -60,8 +61,9 @@ then
      -e '/;Co;/ d'
 else cat
 fi |
-sed -e "s,^\([^;]*\);[^;]*;\([^;]*\);.*,\1	\2," |
-uniq -f1 --group=append | sed -e "s,^$,range," -e t -e "s,^,item ,"
+sed -e "s,^\([^;]*\);<[^;]*\, Last>;\([^;]*\);.*,\1 isRangeLast \2," \
+    -e "s,^\([^;]*\);[^;]*;\([^;]*\);.*,\1 isNormalOrRangeFirst \2," |
+uniq -f2 --group=append | sed -e "s,^$,range," -e t -e "s,^,item ,"
 ) | sh > categories.t
 
 sed -e "s/.*\(CAT_[A-Za-z]*\).*/  \1,/" categories.t |
