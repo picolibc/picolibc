@@ -8,6 +8,8 @@
    Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
    details. */
 
+#ifdef __WITH_AF_UNIX
+
 #include "winsup.h"
 #include <w32api/winioctl.h>
 #include <asm/byteorder.h>
@@ -2376,3 +2378,5 @@ fhandler_socket_unix::link (const char *newpath)
   fhandler_disk_file fh (pc);
   return fh.link (newpath);
 }
+
+#endif /* __WITH_AF_UNIX */

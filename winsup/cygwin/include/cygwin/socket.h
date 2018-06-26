@@ -136,7 +136,7 @@ struct OLD_msghdr
 #define AF_UNSPEC       0               /* unspecified */
 /* FIXME: This is for testing only, while developing the new
           fhandler_socket_unix class. */
-#ifdef __INSIDE_CYGWIN__
+#if defined (__INSIDE_CYGWIN__) && defined (__WITH_AF_UNIX)
 #define AF_UNIX         31
 #else
 #define AF_UNIX         1               /* local to host (pipes, portals) */

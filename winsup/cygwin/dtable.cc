@@ -520,9 +520,11 @@ fh_alloc (path_conv& pc)
 	case FH_LOCAL:
 	  fh = cnew (fhandler_socket_local);
 	  break;
+#ifdef __WITH_AF_UNIX
 	case FH_UNIX:
 	  fh = cnew (fhandler_socket_unix);
 	  break;
+#endif /* __WITH_AF_UNIX */
 	case FH_FS:
 	  fh = cnew (fhandler_disk_file);
 	  break;

@@ -951,7 +951,11 @@ path_conv::check (const char *src, unsigned opt,
 		      return;
 		    }
 		  fileattr = sym.fileattr;
+#ifdef __WITH_AF_UNIX
 		  dev.parse ((sym.pflags & PATH_REP) ? FH_UNIX : FH_LOCAL);
+#else
+		  dev.parse (FH_LOCAL);
+#endif /* __WITH_AF_UNIX */
 		  dev.setfs (1);
 		  path_flags = sym.pflags;
 		  goto out;
@@ -2370,6 +2374,7 @@ check_reparse_point_target (HANDLE h, bool remote, PREPARSE_DATA_BUFFER rp,
       if (check_reparse_point_string (psymbuf))
 	return PATH_SYMLINK | PATH_REP;
     }
+#ifdef __WITH_AF_UNIX
   else if (rp->ReparseTag == IO_REPARSE_TAG_CYGUNIX)
     {
       PREPARSE_GUID_DATA_BUFFER rgp = (PREPARSE_GUID_DATA_BUFFER) rp;
@@ -2377,6 +2382,7 @@ check_reparse_point_target (HANDLE h, bool remote, PREPARSE_DATA_BUFFER rp,
       if (memcmp (CYGWIN_SOCKET_GUID, &rgp->ReparseGuid, sizeof (GUID)) == 0)
 	return PATH_SOCKET | PATH_REP;
     }
+#endif /* __WITH_AF_UNIX */
   return 0;
 }
 

@@ -1602,6 +1602,8 @@ fhandler_socket_wsock::select_except (select_stuff *ss)
   return s;
 }
 
+#ifdef __WITH_AF_UNIX
+
 select_record *
 fhandler_socket_unix::select_read (select_stuff *ss)
 {
@@ -1646,6 +1648,8 @@ fhandler_socket_unix::select_except (select_stuff *ss)
   s->except_ready = false;
   return s;
 }
+
+#endif /* __WITH_AF_UNIX */
 
 static int
 peek_windows (select_record *me, bool)

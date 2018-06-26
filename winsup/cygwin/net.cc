@@ -500,8 +500,12 @@ cygwin_socket (int af, int type, int protocol)
   switch (af)
     {
     case AF_LOCAL:
+#ifndef __WITH_AF_UNIX
+      dev = af_local_dev;
+#else
     case AF_UNIX:
       dev = (af == AF_LOCAL) ? af_local_dev : af_unix_dev;
+#endif /* __WITH_AF_UNIX */
       break;
     case AF_INET:
     case AF_INET6:
@@ -2285,8 +2289,12 @@ socketpair (int af, int type, int protocol, int sv[2])
   switch (af)
     {
     case AF_LOCAL:
+#ifndef __WITH_AF_UNIX
+      dev = af_local_dev;
+#else
     case AF_UNIX:
       dev = (af == AF_LOCAL) ? af_local_dev : af_unix_dev;
+#endif /* __WITH_AF_UNIX */
       break;
     default:
       set_errno (EAFNOSUPPORT);

@@ -951,6 +951,8 @@ class af_unix_shmem_t
   struct ucred *peer_cred () { return &_peer_cred; }
 };
 
+#ifdef __WITH_AF_UNIX
+
 class fhandler_socket_unix : public fhandler_socket
 {
  protected:
@@ -1109,6 +1111,8 @@ class fhandler_socket_unix : public fhandler_socket
     return fh;
   }
 };
+
+#endif /* __WITH_AF_UNIX */
 
 class fhandler_base_overlapped: public fhandler_base
 {
@@ -2631,6 +2635,9 @@ typedef union
   char __serial[sizeof (fhandler_serial)];
   char __socket_inet[sizeof (fhandler_socket_inet)];
   char __socket_local[sizeof (fhandler_socket_local)];
+#ifdef __WITH_AF_UNIX
+  char __socket_unix[sizeof (fhandler_socket_unix)];
+#endif /* __WITH_AF_UNIX */
   char __termios[sizeof (fhandler_termios)];
   char __pty_common[sizeof (fhandler_pty_common)];
   char __pty_slave[sizeof (fhandler_pty_slave)];
