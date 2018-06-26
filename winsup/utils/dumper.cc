@@ -415,7 +415,10 @@ dumper::dump_thread (asection * to, process_thread * thread)
   bfd_putl32 (NOTE_NAME_SIZE, header.elf_note_header.namesz);
   bfd_putl32 (sizeof (thread_pstatus), header.elf_note_header.descsz);
   bfd_putl32 (NT_WIN32PSTATUS, header.elf_note_header.type);
-  strncpy ((char *) &header.elf_note_header.name, "win32thread", NOTE_NAME_SIZE);
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wstringop-overflow"
+  strncpy (header.elf_note_header.name, "win32thread", NOTE_NAME_SIZE);
+#pragma GCC diagnostic pop
 
   thread_pstatus.data_type = NOTE_INFO_THREAD;
   thread_pstatus.data.thread_info.tid = thread->tid;
@@ -478,7 +481,10 @@ dumper::dump_module (asection * to, process_module * module)
   bfd_putl32 (NOTE_NAME_SIZE, header.elf_note_header.namesz);
   bfd_putl32 (note_length, header.elf_note_header.descsz);
   bfd_putl32 (NT_WIN32PSTATUS, header.elf_note_header.type);
-  strncpy ((char *) &header.elf_note_header.name, "win32module", NOTE_NAME_SIZE);
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wstringop-overflow"
+  strncpy (header.elf_note_header.name, "win32module", NOTE_NAME_SIZE);
+#pragma GCC diagnostic pop
 
   module_pstatus_ptr->data_type = NOTE_INFO_MODULE;
   module_pstatus_ptr->data.module_info.base_address = module->base_address;

@@ -249,7 +249,7 @@ seminit(void)
 	for (i = 0; i < seminfo.semmni; i++)
 	{
 		char *buf = (char *) sys_malloc(16, M_SEM, M_WAITOK);
-		snprintf(buf, 16, "semid[%d]", i);
+		snprintf(buf, 16, "semid[%d]", (short) i);
 		mtx_init(&sema_mtx[i], buf, NULL, MTX_DEF);
 	}
 	for (i = 0; i < seminfo.semmnu; i++) {
