@@ -13,7 +13,7 @@ src = 	s_finite.c s_copysign.c s_modf.c s_scalbn.c \
 	s_lrint.c s_llrint.c \
 	s_lround.c s_llround.c s_nearbyint.c s_remquo.c s_round.c s_scalbln.c \
 	s_signbit.c s_trunc.c \
-	exp.c exp2.c exp_data.c math_err.c
+	exp.c exp2.c exp_data.c math_err.c log.c log_data.c
 
 fsrc =	sf_finite.c sf_copysign.c sf_modf.c sf_scalbn.c \
 	sf_cbrt.c sf_exp10.c sf_expm1.c sf_ilogb.c \

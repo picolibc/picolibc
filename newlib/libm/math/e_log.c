@@ -63,6 +63,7 @@
  */
 
 #include "fdlibm.h"
+#if __OBSOLETE_MATH
 
 #ifndef _DOUBLE_IS_32BITS
 
@@ -144,3 +145,4 @@ static double zero   =  0.0;
 }
 
 #endif /* defined(_DOUBLE_IS_32BITS) */
+#endif /*__OBSOLETE_MATH */
