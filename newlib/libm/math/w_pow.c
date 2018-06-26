@@ -52,6 +52,7 @@ PORTABILITY
  */
 
 #include "fdlibm.h"
+#if __OBSOLETE_MATH
 #include <errno.h>
 
 #ifndef _DOUBLE_IS_32BITS
@@ -207,7 +208,7 @@ PORTABILITY
 }
 
 #endif /* defined(_DOUBLE_IS_32BITS) */
-
+#endif /* __OBSOLETE_MATH */
 
 
 

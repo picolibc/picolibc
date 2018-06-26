@@ -147,6 +147,15 @@ issignalingf_inline (float x)
   return 2 * (ix ^ 0x00400000) > 2u * 0x7fc00000;
 }
 
+static inline int
+issignaling_inline (double x)
+{
+  uint64_t ix = asuint64 (x);
+  if (!IEEE_754_2008_SNAN)
+    return (ix & 0x7ff8000000000000) == 0x7ff8000000000000;
+  return 2 * (ix ^ 0x0008000000000000) > 2 * 0x7ff8000000000000ULL;
+}
+
 #if __aarch64__ && __GNUC__
 /* Prevent the optimization of a floating-point expression.  */
 static inline float
@@ -353,5 +362,15 @@ extern const struct log2_data {
   struct {double chi, clo;} tab2[1 << LOG2_TABLE_BITS];
 #endif
 } __log2_data HIDDEN;
+
+#define POW_LOG_TABLE_BITS 7
+#define POW_LOG_POLY_ORDER 8
+extern const struct pow_log_data {
+  double ln2hi;
+  double ln2lo;
+  double poly[POW_LOG_POLY_ORDER - 1]; /* First coefficient is 1.  */
+  /* Note: the pad field is unused, but allows slightly faster indexing.  */
+  struct {double invc, pad, logc, logctail;} tab[1 << POW_LOG_TABLE_BITS];
+} __pow_log_data HIDDEN;
 
 #endif

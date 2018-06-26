@@ -233,6 +233,7 @@ extern float __ieee754_scalbf __P((float,float));
    and there are no observable error handling side effects.  */
 # define __ieee754_exp(x) exp(x)
 # define __ieee754_log(x) log(x)
+# define __ieee754_pow(x,y) pow(x,y)
 # define __ieee754_expf(x) expf(x)
 # define __ieee754_logf(x) logf(x)
 # define __ieee754_powf(x,y) powf(x,y)

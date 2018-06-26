@@ -97,7 +97,8 @@ am__objects_1 = lib_a-s_finite.$(OBJEXT) lib_a-s_copysign.$(OBJEXT) \
 	lib_a-exp2.$(OBJEXT) lib_a-exp_data.$(OBJEXT) \
 	lib_a-math_err.$(OBJEXT) lib_a-log.$(OBJEXT) \
 	lib_a-log_data.$(OBJEXT) lib_a-log2.$(OBJEXT) \
-	lib_a-log2_data.$(OBJEXT)
+	lib_a-log2_data.$(OBJEXT) lib_a-pow.$(OBJEXT) \
+	lib_a-pow_log_data.$(OBJEXT)
 am__objects_2 = lib_a-sf_finite.$(OBJEXT) lib_a-sf_copysign.$(OBJEXT) \
 	lib_a-sf_modf.$(OBJEXT) lib_a-sf_scalbn.$(OBJEXT) \
 	lib_a-sf_cbrt.$(OBJEXT) lib_a-sf_exp10.$(OBJEXT) \
@@ -168,7 +169,7 @@ am__objects_5 = s_finite.lo s_copysign.lo s_modf.lo s_scalbn.lo \
 	s_lround.lo s_llround.lo s_nearbyint.lo s_remquo.lo s_round.lo \
 	s_scalbln.lo s_signbit.lo s_trunc.lo exp.lo exp2.lo \
 	exp_data.lo math_err.lo log.lo log_data.lo log2.lo \
-	log2_data.lo
+	log2_data.lo pow.lo pow_log_data.lo
 am__objects_6 = sf_finite.lo sf_copysign.lo sf_modf.lo sf_scalbn.lo \
 	sf_cbrt.lo sf_exp10.lo sf_expm1.lo sf_ilogb.lo sf_infinity.lo \
 	sf_isinf.lo sf_isinff.lo sf_isnan.lo sf_isnanf.lo sf_log1p.lo \
@@ -359,7 +360,8 @@ src = s_finite.c s_copysign.c s_modf.c s_scalbn.c \
 	s_lrint.c s_llrint.c \
 	s_lround.c s_llround.c s_nearbyint.c s_remquo.c s_round.c s_scalbln.c \
 	s_signbit.c s_trunc.c \
-	exp.c exp2.c exp_data.c math_err.c log.c log_data.c log2.c log2_data.c
+	exp.c exp2.c exp_data.c math_err.c log.c log_data.c log2.c log2_data.c \
+	pow.c pow_log_data.c
 
 fsrc = sf_finite.c sf_copysign.c sf_modf.c sf_scalbn.c \
 	sf_cbrt.c sf_exp10.c sf_expm1.c sf_ilogb.c \
@@ -750,6 +752,18 @@ lib_a-log2_data.o: log2_data.c
 
 lib_a-log2_data.obj: log2_data.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-log2_data.obj `if test -f 'log2_data.c'; then $(CYGPATH_W) 'log2_data.c'; else $(CYGPATH_W) '$(srcdir)/log2_data.c'; fi`
+
+lib_a-pow.o: pow.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-pow.o `test -f 'pow.c' || echo '$(srcdir)/'`pow.c
+
+lib_a-pow.obj: pow.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-pow.obj `if test -f 'pow.c'; then $(CYGPATH_W) 'pow.c'; else $(CYGPATH_W) '$(srcdir)/pow.c'; fi`
+
+lib_a-pow_log_data.o: pow_log_data.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-pow_log_data.o `test -f 'pow_log_data.c' || echo '$(srcdir)/'`pow_log_data.c
+
+lib_a-pow_log_data.obj: pow_log_data.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-pow_log_data.obj `if test -f 'pow_log_data.c'; then $(CYGPATH_W) 'pow_log_data.c'; else $(CYGPATH_W) '$(srcdir)/pow_log_data.c'; fi`
 
 lib_a-sf_finite.o: sf_finite.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-sf_finite.o `test -f 'sf_finite.c' || echo '$(srcdir)/'`sf_finite.c
