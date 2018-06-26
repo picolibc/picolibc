@@ -268,7 +268,7 @@ enum
   SI_QUEUE,				/* sent by sigqueue */
   SI_KERNEL,				/* sent by system */
 
-  ILL_ILLOPC,				/* illegal opcode */
+  ILL_ILLOPC = 7,			/* illegal opcode */
   ILL_ILLOPN,				/* illegal operand */
   ILL_ILLADR,				/* illegal addressing mode */
   ILL_ILLTRP,				/* illegal trap*/
@@ -277,7 +277,7 @@ enum
   ILL_COPROC,				/* coprocessor error */
   ILL_BADSTK,				/* internal stack error */
 
-  FPE_INTDIV,				/* integer divide by zero */
+  FPE_INTDIV = 15,			/* integer divide by zero */
   FPE_INTOVF,				/* integer overflow */
   FPE_FLTDIV,				/* floating point divide by zero */
   FPE_FLTOVF,				/* floating point overflow */
@@ -286,20 +286,54 @@ enum
   FPE_FLTINV,				/* floating point invalid operation */
   FPE_FLTSUB,				/* subscript out of range */
 
-  SEGV_MAPERR,				/* address not mapped to object */
+  SEGV_MAPERR = 23,			/* address not mapped to object */
   SEGV_ACCERR,				/* invalid permissions for mapped object */
 
-  BUS_ADRALN,				/* invalid address alignment.  */
+  BUS_ADRALN = 25,			/* invalid address alignment.  */
   BUS_ADRERR,				/* non-existant physical address.  */
   BUS_OBJERR,				/* object specific hardware error.  */
 
-  CLD_EXITED,				/* child has exited */
+  CLD_EXITED = 28,			/* child has exited */
   CLD_KILLED,				/* child was killed */
   CLD_DUMPED,				/* child terminated abnormally */
   CLD_TRAPPED,				/* traced child has trapped */
   CLD_STOPPED,				/* child has stopped */
   CLD_CONTINUED				/* stopped child has continued */
 };
+
+#define SI_USER SI_USER
+#define SI_ASYNCIO SI_ASYNCIO
+#define SI_MESGQ SI_MESGQ
+#define SI_TIMER SI_TIMER
+#define SI_QUEUE SI_QUEUE
+#define SI_KERNEL SI_KERNEL
+#define ILL_ILLOPC ILL_ILLOPC
+#define ILL_ILLOPN ILL_ILLOPN
+#define ILL_ILLADR ILL_ILLADR
+#define ILL_ILLTRP ILL_ILLTRP
+#define ILL_PRVOPC ILL_PRVOPC
+#define ILL_PRVREG ILL_PRVREG
+#define ILL_COPROC ILL_COPROC
+#define ILL_BADSTK ILL_BADSTK
+#define FPE_INTDIV FPE_INTDIV
+#define FPE_INTOVF FPE_INTOVF
+#define FPE_FLTDIV FPE_FLTDIV
+#define FPE_FLTOVF FPE_FLTOVF
+#define FPE_FLTUND FPE_FLTUND
+#define FPE_FLTRES FPE_FLTRES
+#define FPE_FLTINV FPE_FLTINV
+#define FPE_FLTSUB FPE_FLTSUB
+#define SEGV_MAPERR SEGV_MAPERR
+#define SEGV_ACCERR SEGV_ACCERR
+#define BUS_ADRALN BUS_ADRALN
+#define BUS_ADRERR BUS_ADRERR
+#define BUS_OBJERR BUS_OBJERR
+#define CLD_EXITED CLD_EXITED
+#define CLD_KILLED CLD_KILLED
+#define CLD_DUMPED CLD_DUMPED
+#define CLD_TRAPPED CLD_TRAPPED
+#define CLD_STOPPED CLD_STOPPED
+#define CLD_CONTINUED CLD_CONTINUED
 
 enum
 {
