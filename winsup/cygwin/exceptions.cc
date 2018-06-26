@@ -649,9 +649,15 @@ exception::handle (EXCEPTION_RECORD *e, exception_list *frame, CONTEXT *in,
   /* Coerce win32 value to posix value.  */
   switch (e->ExceptionCode)
     {
-    case STATUS_FLOAT_DENORMAL_OPERAND:
     case STATUS_FLOAT_DIVIDE_BY_ZERO:
+      si.si_signo = SIGFPE;
+      si.si_code = FPE_FLTDIV;
+      break;
+    case STATUS_FLOAT_DENORMAL_OPERAND:
     case STATUS_FLOAT_INVALID_OPERATION:
+      si.si_signo = SIGFPE;
+      si.si_code = FPE_FLTINV;
+      break;
     case STATUS_FLOAT_STACK_CHECK:
       si.si_signo = SIGFPE;
       si.si_code = FPE_FLTSUB;

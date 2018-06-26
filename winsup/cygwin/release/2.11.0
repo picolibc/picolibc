@@ -33,3 +33,6 @@ Bug Fixes
 
 - Fix a g++ compilation problem with -std=c++14 or -std=c++17.
   Addresses: https://cygwin.com/ml/cygwin/2018-05/msg00316.html
+
+- Fix FPE flag handling for division by zero conditions
+  Addresses: https://cygwin.com/ml/cygwin/2018-06/msg00281.html
