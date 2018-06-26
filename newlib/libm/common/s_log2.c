@@ -66,6 +66,7 @@ C99, POSIX, System V Interface Definition (Issue 6).
  */
 
 #include "fdlibm.h"
+#if __OBSOLETE_MATH
 #include <errno.h>
 #include <math.h>
 #undef log2
@@ -83,3 +84,4 @@ C99, POSIX, System V Interface Definition (Issue 6).
 }
 
 #endif /* defined(_DOUBLE_IS_32BITS) */
+#endif /* __OBSOLETE_MATH */
