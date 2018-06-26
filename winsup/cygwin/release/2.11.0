@@ -36,3 +36,6 @@ Bug Fixes
 
 - Fix FPE flag handling for division by zero conditions
   Addresses: https://cygwin.com/ml/cygwin/2018-06/msg00281.html
+
+- Fix Unicode table.
+  Addresses: https://cygwin.com/ml/cygwin/2018-06/msg00248.html
