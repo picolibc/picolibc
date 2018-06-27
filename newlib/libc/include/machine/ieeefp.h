@@ -467,6 +467,10 @@
 #define __IEEE_BIG_ENDIAN
 #endif
 
+#ifdef __CYGWIN__
+#define __OBSOLETE_MATH_DEFAULT 0
+#endif
+
 #ifndef __OBSOLETE_MATH_DEFAULT
 /* Use old math code by default.  */
 #define __OBSOLETE_MATH_DEFAULT 1
