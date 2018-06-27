@@ -1356,6 +1356,8 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     pthread_getname_np
     pthread_setname_np
     pthread_sigqueue
+    pthread_timedjoin_np
+    pthread_tryjoin_np
     ptsname_r
     putwc_unlocked
     putwchar_unlocked
