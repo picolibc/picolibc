@@ -2472,7 +2472,7 @@ pthread::join (pthread_t *thread, void **return_val, PLARGE_INTEGER timeout)
 	  // set joined thread back to joinable since we got canceled
 	  (*thread)->joiner = NULL;
 	  (*thread)->attr.joinable = PTHREAD_CREATE_JOINABLE;
-	  return EBUSY;
+	  return (timeout && timeout->QuadPart == 0LL) ? EBUSY : ETIMEDOUT;
 	default:
 	  // should never happen
 	  return EINVAL;
@@ -2588,7 +2588,7 @@ pthread_join (pthread_t thread, void **return_val)
 extern "C" int
 pthread_tryjoin_np (pthread_t thread, void **return_val)
 {
-  LARGE_INTEGER timeout = { 0, 0 };
+  LARGE_INTEGER timeout = { QuadPart:0LL };
 
   return pthread::join (&thread, (void **) return_val, &timeout);
 }
