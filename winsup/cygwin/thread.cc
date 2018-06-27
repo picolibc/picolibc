@@ -2421,7 +2421,7 @@ pthread_attr_destroy (pthread_attr_t *attr)
 }
 
 int
-pthread::join (pthread_t *thread, void **return_val)
+pthread::join (pthread_t *thread, void **return_val, PLARGE_INTEGER timeout)
 {
    pthread_t joiner = self ();
 
@@ -2453,7 +2453,7 @@ pthread::join (pthread_t *thread, void **return_val)
       (*thread)->attr.joinable = PTHREAD_CREATE_DETACHED;
       (*thread)->mutex.unlock ();
 
-      switch (cygwait ((*thread)->win32_obj_id, cw_infinite,
+      switch (cygwait ((*thread)->win32_obj_id, timeout,
 		       cw_sig | cw_sig_restart | cw_cancel))
 	{
 	case WAIT_OBJECT_0:
@@ -2468,6 +2468,11 @@ pthread::join (pthread_t *thread, void **return_val)
 	  joiner->cancel_self ();
 	  // never reached
 	  break;
+	case WAIT_TIMEOUT:
+	  // set joined thread back to joinable since we got canceled
+	  (*thread)->joiner = NULL;
+	  (*thread)->attr.joinable = PTHREAD_CREATE_JOINABLE;
+	  return EBUSY;
 	default:
 	  // should never happen
 	  return EINVAL;
@@ -2572,6 +2577,32 @@ pthread_convert_abstime (clockid_t clock_id, const struct timespec *abstime,
       break;
     }
   return 0;
+}
+
+extern "C" int
+pthread_join (pthread_t thread, void **return_val)
+{
+  return pthread::join (&thread, (void **) return_val, NULL);
+}
+
+extern "C" int
+pthread_tryjoin_np (pthread_t thread, void **return_val)
+{
+  LARGE_INTEGER timeout = { 0, 0 };
+
+  return pthread::join (&thread, (void **) return_val, &timeout);
+}
+
+extern "C" int
+pthread_timedjoin_np (pthread_t thread, void **return_val,
+		      const struct timespec *abstime)
+{
+  LARGE_INTEGER timeout;
+
+  int err = pthread_convert_abstime (CLOCK_REALTIME, abstime, &timeout);
+  if (err)
+    return err;
+  return pthread::join (&thread, (void **) return_val, &timeout);
 }
 
 extern "C" int

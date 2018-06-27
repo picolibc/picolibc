@@ -1135,6 +1135,8 @@ pthread_spin_trylock SIGFE
 pthread_spin_unlock SIGFE
 pthread_suspend SIGFE
 pthread_testcancel SIGFE
+pthread_timedjoin_np SIGFE
+pthread_tryjoin_np SIGFE
 pthread_yield = sched_yield SIGFE
 ptsname SIGFE
 ptsname_r SIGFE

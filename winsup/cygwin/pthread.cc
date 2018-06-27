@@ -42,12 +42,6 @@ pthread_exit (void *value_ptr)
 }
 
 int
-pthread_join (pthread_t thread, void **return_val)
-{
-  return pthread::join (&thread, (void **) return_val);
-}
-
-int
 pthread_detach (pthread_t thread)
 {
   return pthread::detach (&thread);

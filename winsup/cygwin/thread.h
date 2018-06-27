@@ -375,7 +375,7 @@ public:
 
   /* API calls */
   static int cancel (pthread_t);
-  static int join (pthread_t * thread, void **return_val);
+  static int join (pthread_t * thread, void **return_val, PLARGE_INTEGER);
   static int detach (pthread_t * thread);
   static int create (pthread_t * thread, const pthread_attr_t * attr,
 			      void *(*start_routine) (void *), void *arg);

@@ -495,12 +495,13 @@ details. */
   324: Export sigtimedwait.
   325: Export catclose, catgets, catopen.
   326: Export clearenv
+  327: Export pthread_tryjoin_np, pthread_timedjoin_np.
 
   Note that we forgot to bump the api for ualarm, strtoll, strtoull,
   sigaltstack, sethostname. */
 
 #define CYGWIN_VERSION_API_MAJOR 0
-#define CYGWIN_VERSION_API_MINOR 326
+#define CYGWIN_VERSION_API_MINOR 327
 
 /* There is also a compatibity version number associated with the shared memory
    regions.  It is incremented when incompatible changes are made to the shared
