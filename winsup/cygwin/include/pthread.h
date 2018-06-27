@@ -154,8 +154,6 @@ int pthread_getcpuclockid (pthread_t, clockid_t *);
 int pthread_getschedparam (pthread_t, int *, struct sched_param *);
 void *pthread_getspecific (pthread_key_t);
 int pthread_join (pthread_t, void **);
-int pthread_tryjoin_np (pthread_t, void **);
-int pthread_timedjoin_np (pthread_t, void **, const struct timespec *);
 int pthread_key_create (pthread_key_t *, void (*)(void *));
 int pthread_key_delete (pthread_key_t);
 
@@ -232,6 +230,8 @@ int pthread_getattr_np (pthread_t, pthread_attr_t *);
 int pthread_getname_np (pthread_t, char *, size_t) __attribute__((__nonnull__(2)));
 int pthread_setname_np (pthread_t, const char *) __attribute__((__nonnull__(2)));
 int pthread_sigqueue (pthread_t *, int, const union sigval);
+int pthread_timedjoin_np (pthread_t, void **, const struct timespec *);
+int pthread_tryjoin_np (pthread_t, void **);
 int pthread_yield (void);
 #endif
 #if __MISC_VISIBLE /* HP-UX, others? */
