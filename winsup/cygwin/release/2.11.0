@@ -40,3 +40,7 @@ Bug Fixes
 
 - Fix Unicode table.
   Addresses: https://cygwin.com/ml/cygwin/2018-06/msg00248.html
+
+- Handle a non-standard return value from some tape drives to
+  report a "no-media" error.
+  Addresses: https://cygwin.com/ml/cygwin/2018-06/msg00245.html

@@ -32,6 +32,16 @@ details. */
 			    part (partition)->initialize (0); \
 			  }
 
+/* Certain tape drives (known example: QUANTUM_ULTRIUM-HH6) return
+   ERROR_NOT_READY rather than ERROR_NO_MEDIA_IN_DRIVE if no media
+   is in the drive.  Convert this to the only sane error code. */
+#define GET_TAPE_STATUS(_h) ({ \
+				int _err = GetTapeStatus (_h); \
+				if (_err == ERROR_NOT_READY) \
+				  _err = ERROR_NO_MEDIA_IN_DRIVE; \
+				_err; \
+			   })
+
 #define IS_BOT(err) ((err) == ERROR_BEGINNING_OF_MEDIA)
 
 #define IS_EOF(err) ((err) == ERROR_FILEMARK_DETECTED \
@@ -98,6 +108,9 @@ mtinfo_drive::get_mp (HANDLE mt)
 {
   DWORD len = sizeof _mp;
   TAPE_FUNC (GetTapeParameters (mt, GET_TAPE_MEDIA_INFORMATION, &len, &_mp));
+  /* See GET_TAPE_STATUS comment. */
+  if (lasterr == ERROR_NOT_READY)
+    lasterr = ERROR_NO_MEDIA_IN_DRIVE;
   return error ("get_mp");
 }
 
@@ -130,7 +143,7 @@ int
 mtinfo_drive::close (HANDLE mt, bool rewind)
 {
   lasterr = 0;
-  if (GetTapeStatus (mt) == ERROR_NO_MEDIA_IN_DRIVE)
+  if (GET_TAPE_STATUS (mt) == ERROR_NO_MEDIA_IN_DRIVE)
     dirty = clean;
   if (dirty >= has_written)
     {
@@ -187,7 +200,7 @@ mtinfo_drive::read (HANDLE mt, LPOVERLAPPED pov, void *ptr, size_t &ulen)
   BOOL ret;
   DWORD bytes_read = 0;
 
-  if (GetTapeStatus (mt) == ERROR_NO_MEDIA_IN_DRIVE)
+  if (GET_TAPE_STATUS (mt) == ERROR_NO_MEDIA_IN_DRIVE)
     return lasterr = ERROR_NO_MEDIA_IN_DRIVE;
   if (lasterr == ERROR_BUS_RESET)
     {
@@ -300,7 +313,7 @@ mtinfo_drive::write (HANDLE mt, LPOVERLAPPED pov, const void *ptr, size_t &len)
   DWORD bytes_written = 0;
   int async_err = 0;
 
-  if (GetTapeStatus (mt) == ERROR_NO_MEDIA_IN_DRIVE)
+  if (GET_TAPE_STATUS (mt) == ERROR_NO_MEDIA_IN_DRIVE)
     return lasterr = ERROR_NO_MEDIA_IN_DRIVE;
   if (lasterr == ERROR_BUS_RESET)
     {
@@ -762,8 +775,12 @@ mtinfo_drive::get_status (HANDLE mt, struct mtget *get)
   if (!get)
     return ERROR_INVALID_PARAMETER;
 
-  if ((tstat = GetTapeStatus (mt)) == ERROR_NO_MEDIA_IN_DRIVE
-      || get_mp (mt) == ERROR_NO_MEDIA_IN_DRIVE)
+  tstat = GET_TAPE_STATUS (mt);
+  DWORD mpstat = (DWORD) get_mp (mt);
+
+  debug_printf ("GetTapeStatus: %u, get_mp: %d", tstat, mpstat);
+
+  if (tstat == ERROR_NO_MEDIA_IN_DRIVE || mpstat == ERROR_NO_MEDIA_IN_DRIVE)
     notape = 1;
 
   memset (get, 0, sizeof *get);
