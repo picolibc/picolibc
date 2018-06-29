@@ -1,4 +1,4 @@
-/* Copyright (c) 2012-2013, Linaro Limited
+/* Copyright (c) 2012-2018, Linaro Limited
    All rights reserved.
 
    Redistribution and use in source and binary forms, with or without
@@ -41,6 +41,8 @@
 \f:
 	.endm
 
+#define L(label) .L ## label
+
 #define REP8_01 0x0101010101010101
 #define REP8_7f 0x7f7f7f7f7f7f7f7f
 #define REP8_80 0x8080808080808080
@@ -69,24 +71,25 @@ def_fn strcmp p2align=6
 	eor	tmp1, src1, src2
 	mov	zeroones, #REP8_01
 	tst	tmp1, #7
-	b.ne	.Lmisaligned8
+	b.ne	L(misaligned8)
 	ands	tmp1, src1, #7
-	b.ne	.Lmutual_align
+	b.ne	L(mutual_align)
 	/* NUL detection works on the principle that (X - 1) & (~X) & 0x80
 	   (=> (X - 1) & ~(X | 0x7f)) is non-zero iff a byte is zero, and
 	   can be done in parallel across the entire word.  */
-.Lloop_aligned:
+L(loop_aligned):
 	ldr	data1, [src1], #8
 	ldr	data2, [src2], #8
-.Lstart_realigned:
+L(start_realigned):
 	sub	tmp1, data1, zeroones
 	orr	tmp2, data1, #REP8_7f
 	eor	diff, data1, data2	/* Non-zero if differences found.  */
 	bic	has_nul, tmp1, tmp2	/* Non-zero if NUL terminator.  */
 	orr	syndrome, diff, has_nul
-	cbz	syndrome, .Lloop_aligned
+	cbz	syndrome, L(loop_aligned)
 	/* End of performance-critical section  -- one 64B cache line.  */
 
+L(end):
 #ifndef	__AARCH64EB__
 	rev	syndrome, syndrome
 	rev	data1, data1
@@ -137,7 +140,7 @@ def_fn strcmp p2align=6
 	ret
 #endif
 
-.Lmutual_align:
+L(mutual_align):
 	/* Sources are mutually aligned, but are not currently at an
 	   alignment boundary.  Round down the addresses and then mask off
 	   the bytes that preceed the start point.  */
@@ -157,15 +160,41 @@ def_fn strcmp p2align=6
 #endif
 	orr	data1, data1, tmp2
 	orr	data2, data2, tmp2
-	b	.Lstart_realigned
+	b	L(start_realigned)
 
-.Lmisaligned8:
-	/* We can do better than this.  */
+L(misaligned8):
+	/* Align SRC1 to 8 bytes and then compare 8 bytes at a time, always
+	   checking to make sure that we don't access beyond page boundary in
+	   SRC2.  */
+	tst	src1, #7
+	b.eq	L(loop_misaligned)
+L(do_misaligned):
 	ldrb	data1w, [src1], #1
 	ldrb	data2w, [src2], #1
 	cmp	data1w, #1
 	ccmp	data1w, data2w, #0, cs	/* NZCV = 0b0000.  */
-	b.eq	.Lmisaligned8
+	b.ne	L(done)
+	tst	src1, #7
+	b.ne	L(do_misaligned)
+
+L(loop_misaligned):
+	/* Test if we are within the last dword of the end of a 4K page.  If
+	   yes then jump back to the misaligned loop to copy a byte at a time.  */
+	and	tmp1, src2, #0xff8
+	eor	tmp1, tmp1, #0xff8
+	cbz	tmp1, L(do_misaligned)
+	ldr	data1, [src1], #8
+	ldr	data2, [src2], #8
+
+	sub	tmp1, data1, zeroones
+	orr	tmp2, data1, #REP8_7f
+	eor	diff, data1, data2	/* Non-zero if differences found.  */
+	bic	has_nul, tmp1, tmp2	/* Non-zero if NUL terminator.  */
+	orr	syndrome, diff, has_nul
+	cbz	syndrome, L(loop_misaligned)
+	b	L(end)
+
+L(done):
 	sub	result, data1, data2
 	ret
 	.size	strcmp, .-strcmp
