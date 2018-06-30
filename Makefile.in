@@ -55307,7 +55307,6 @@ all-build-m4: maybe-all-build-texinfo
 all-build-fixincludes: maybe-all-build-libiberty
 all-build-libcpp: maybe-all-build-libiberty
 configure-gcc: maybe-configure-intl
-
 configure-stage1-gcc: maybe-configure-stage1-intl
 configure-stage2-gcc: maybe-configure-stage2-intl
 configure-stage3-gcc: maybe-configure-stage3-intl
@@ -55317,7 +55316,6 @@ configure-stagefeedback-gcc: maybe-configure-stagefeedback-intl
 configure-stageautoprofile-gcc: maybe-configure-stageautoprofile-intl
 configure-stageautofeedback-gcc: maybe-configure-stageautofeedback-intl
 configure-gcc: maybe-all-gmp
-
 configure-stage1-gcc: maybe-all-stage1-gmp
 configure-stage2-gcc: maybe-all-stage2-gmp
 configure-stage3-gcc: maybe-all-stage3-gmp
@@ -55327,7 +55325,6 @@ configure-stagefeedback-gcc: maybe-all-stagefeedback-gmp
 configure-stageautoprofile-gcc: maybe-all-stageautoprofile-gmp
 configure-stageautofeedback-gcc: maybe-all-stageautofeedback-gmp
 configure-gcc: maybe-all-mpfr
-
 configure-stage1-gcc: maybe-all-stage1-mpfr
 configure-stage2-gcc: maybe-all-stage2-mpfr
 configure-stage3-gcc: maybe-all-stage3-mpfr
@@ -55337,7 +55334,6 @@ configure-stagefeedback-gcc: maybe-all-stagefeedback-mpfr
 configure-stageautoprofile-gcc: maybe-all-stageautoprofile-mpfr
 configure-stageautofeedback-gcc: maybe-all-stageautofeedback-mpfr
 configure-gcc: maybe-all-mpc
-
 configure-stage1-gcc: maybe-all-stage1-mpc
 configure-stage2-gcc: maybe-all-stage2-mpc
 configure-stage3-gcc: maybe-all-stage3-mpc
@@ -55347,7 +55343,6 @@ configure-stagefeedback-gcc: maybe-all-stagefeedback-mpc
 configure-stageautoprofile-gcc: maybe-all-stageautoprofile-mpc
 configure-stageautofeedback-gcc: maybe-all-stageautofeedback-mpc
 configure-gcc: maybe-all-isl
-
 configure-stage1-gcc: maybe-all-stage1-isl
 configure-stage2-gcc: maybe-all-stage2-isl
 configure-stage3-gcc: maybe-all-stage3-isl
@@ -55357,7 +55352,6 @@ configure-stagefeedback-gcc: maybe-all-stagefeedback-isl
 configure-stageautoprofile-gcc: maybe-all-stageautoprofile-isl
 configure-stageautofeedback-gcc: maybe-all-stageautofeedback-isl
 configure-gcc: maybe-all-lto-plugin
-
 configure-stage1-gcc: maybe-all-stage1-lto-plugin
 configure-stage2-gcc: maybe-all-stage2-lto-plugin
 configure-stage3-gcc: maybe-all-stage3-lto-plugin
@@ -55367,7 +55361,6 @@ configure-stagefeedback-gcc: maybe-all-stagefeedback-lto-plugin
 configure-stageautoprofile-gcc: maybe-all-stageautoprofile-lto-plugin
 configure-stageautofeedback-gcc: maybe-all-stageautofeedback-lto-plugin
 configure-gcc: maybe-all-binutils
-
 configure-stage1-gcc: maybe-all-stage1-binutils
 configure-stage2-gcc: maybe-all-stage2-binutils
 configure-stage3-gcc: maybe-all-stage3-binutils
@@ -55377,7 +55370,6 @@ configure-stagefeedback-gcc: maybe-all-stagefeedback-binutils
 configure-stageautoprofile-gcc: maybe-all-stageautoprofile-binutils
 configure-stageautofeedback-gcc: maybe-all-stageautofeedback-binutils
 configure-gcc: maybe-all-gas
-
 configure-stage1-gcc: maybe-all-stage1-gas
 configure-stage2-gcc: maybe-all-stage2-gas
 configure-stage3-gcc: maybe-all-stage3-gas
@@ -55387,7 +55379,6 @@ configure-stagefeedback-gcc: maybe-all-stagefeedback-gas
 configure-stageautoprofile-gcc: maybe-all-stageautoprofile-gas
 configure-stageautofeedback-gcc: maybe-all-stageautofeedback-gas
 configure-gcc: maybe-all-ld
-
 configure-stage1-gcc: maybe-all-stage1-ld
 configure-stage2-gcc: maybe-all-stage2-ld
 configure-stage3-gcc: maybe-all-stage3-ld
@@ -55397,7 +55388,6 @@ configure-stagefeedback-gcc: maybe-all-stagefeedback-ld
 configure-stageautoprofile-gcc: maybe-all-stageautoprofile-ld
 configure-stageautofeedback-gcc: maybe-all-stageautofeedback-ld
 configure-gcc: maybe-all-gold
-
 configure-stage1-gcc: maybe-all-stage1-gold
 configure-stage2-gcc: maybe-all-stage2-gold
 configure-stage3-gcc: maybe-all-stage3-gold
@@ -55407,7 +55397,6 @@ configure-stagefeedback-gcc: maybe-all-stagefeedback-gold
 configure-stageautoprofile-gcc: maybe-all-stageautoprofile-gold
 configure-stageautofeedback-gcc: maybe-all-stageautofeedback-gold
 configure-gcc: maybe-all-libelf
-
 configure-stage1-gcc: maybe-all-stage1-libelf
 configure-stage2-gcc: maybe-all-stage2-libelf
 configure-stage3-gcc: maybe-all-stage3-libelf
@@ -55417,7 +55406,6 @@ configure-stagefeedback-gcc: maybe-all-stagefeedback-libelf
 configure-stageautoprofile-gcc: maybe-all-stageautoprofile-libelf
 configure-stageautofeedback-gcc: maybe-all-stageautofeedback-libelf
 configure-gcc: maybe-all-libiconv
-
 configure-stage1-gcc: maybe-all-stage1-libiconv
 configure-stage2-gcc: maybe-all-stage2-libiconv
 configure-stage3-gcc: maybe-all-stage3-libiconv
@@ -55427,7 +55415,6 @@ configure-stagefeedback-gcc: maybe-all-stagefeedback-libiconv
 configure-stageautoprofile-gcc: maybe-all-stageautoprofile-libiconv
 configure-stageautofeedback-gcc: maybe-all-stageautofeedback-libiconv
 all-gcc: all-libiberty
-
 all-stage1-gcc: all-stage1-libiberty
 all-stage2-gcc: all-stage2-libiberty
 all-stage3-gcc: all-stage3-libiberty
@@ -55437,7 +55424,6 @@ all-stagefeedback-gcc: all-stagefeedback-libiberty
 all-stageautoprofile-gcc: all-stageautoprofile-libiberty
 all-stageautofeedback-gcc: all-stageautofeedback-libiberty
 all-gcc: maybe-all-intl
-
 all-stage1-gcc: maybe-all-stage1-intl
 all-stage2-gcc: maybe-all-stage2-intl
 all-stage3-gcc: maybe-all-stage3-intl
@@ -55447,7 +55433,6 @@ all-stagefeedback-gcc: maybe-all-stagefeedback-intl
 all-stageautoprofile-gcc: maybe-all-stageautoprofile-intl
 all-stageautofeedback-gcc: maybe-all-stageautofeedback-intl
 all-gcc: maybe-all-mpfr
-
 all-stage1-gcc: maybe-all-stage1-mpfr
 all-stage2-gcc: maybe-all-stage2-mpfr
 all-stage3-gcc: maybe-all-stage3-mpfr
@@ -55457,7 +55442,6 @@ all-stagefeedback-gcc: maybe-all-stagefeedback-mpfr
 all-stageautoprofile-gcc: maybe-all-stageautoprofile-mpfr
 all-stageautofeedback-gcc: maybe-all-stageautofeedback-mpfr
 all-gcc: maybe-all-mpc
-
 all-stage1-gcc: maybe-all-stage1-mpc
 all-stage2-gcc: maybe-all-stage2-mpc
 all-stage3-gcc: maybe-all-stage3-mpc
@@ -55467,7 +55451,6 @@ all-stagefeedback-gcc: maybe-all-stagefeedback-mpc
 all-stageautoprofile-gcc: maybe-all-stageautoprofile-mpc
 all-stageautofeedback-gcc: maybe-all-stageautofeedback-mpc
 all-gcc: maybe-all-isl
-
 all-stage1-gcc: maybe-all-stage1-isl
 all-stage2-gcc: maybe-all-stage2-isl
 all-stage3-gcc: maybe-all-stage3-isl
@@ -55477,7 +55460,6 @@ all-stagefeedback-gcc: maybe-all-stagefeedback-isl
 all-stageautoprofile-gcc: maybe-all-stageautoprofile-isl
 all-stageautofeedback-gcc: maybe-all-stageautofeedback-isl
 all-gcc: maybe-all-build-texinfo
-
 all-stage1-gcc: maybe-all-build-texinfo
 all-stage2-gcc: maybe-all-build-texinfo
 all-stage3-gcc: maybe-all-build-texinfo
@@ -55487,7 +55469,6 @@ all-stagefeedback-gcc: maybe-all-build-texinfo
 all-stageautoprofile-gcc: maybe-all-build-texinfo
 all-stageautofeedback-gcc: maybe-all-build-texinfo
 all-gcc: maybe-all-build-bison
-
 all-stage1-gcc: maybe-all-build-bison
 all-stage2-gcc: maybe-all-build-bison
 all-stage3-gcc: maybe-all-build-bison
@@ -55497,7 +55478,6 @@ all-stagefeedback-gcc: maybe-all-build-bison
 all-stageautoprofile-gcc: maybe-all-build-bison
 all-stageautofeedback-gcc: maybe-all-build-bison
 all-gcc: maybe-all-build-flex
-
 all-stage1-gcc: maybe-all-build-flex
 all-stage2-gcc: maybe-all-build-flex
 all-stage3-gcc: maybe-all-build-flex
@@ -55507,7 +55487,6 @@ all-stagefeedback-gcc: maybe-all-build-flex
 all-stageautoprofile-gcc: maybe-all-build-flex
 all-stageautofeedback-gcc: maybe-all-build-flex
 all-gcc: maybe-all-build-libiberty
-
 all-stage1-gcc: maybe-all-build-libiberty
 all-stage2-gcc: maybe-all-build-libiberty
 all-stage3-gcc: maybe-all-build-libiberty
@@ -55517,7 +55496,6 @@ all-stagefeedback-gcc: maybe-all-build-libiberty
 all-stageautoprofile-gcc: maybe-all-build-libiberty
 all-stageautofeedback-gcc: maybe-all-build-libiberty
 all-gcc: maybe-all-build-fixincludes
-
 all-stage1-gcc: maybe-all-build-fixincludes
 all-stage2-gcc: maybe-all-build-fixincludes
 all-stage3-gcc: maybe-all-build-fixincludes
@@ -55527,7 +55505,6 @@ all-stagefeedback-gcc: maybe-all-build-fixincludes
 all-stageautoprofile-gcc: maybe-all-build-fixincludes
 all-stageautofeedback-gcc: maybe-all-build-fixincludes
 all-gcc: maybe-all-build-libcpp
-
 all-stage1-gcc: maybe-all-build-libcpp
 all-stage2-gcc: maybe-all-build-libcpp
 all-stage3-gcc: maybe-all-build-libcpp
@@ -55537,7 +55514,6 @@ all-stagefeedback-gcc: maybe-all-build-libcpp
 all-stageautoprofile-gcc: maybe-all-build-libcpp
 all-stageautofeedback-gcc: maybe-all-build-libcpp
 all-gcc: maybe-all-zlib
-
 all-stage1-gcc: maybe-all-stage1-zlib
 all-stage2-gcc: maybe-all-stage2-zlib
 all-stage3-gcc: maybe-all-stage3-zlib
@@ -55547,7 +55523,6 @@ all-stagefeedback-gcc: maybe-all-stagefeedback-zlib
 all-stageautoprofile-gcc: maybe-all-stageautoprofile-zlib
 all-stageautofeedback-gcc: maybe-all-stageautofeedback-zlib
 all-gcc: all-libbacktrace
-
 all-stage1-gcc: all-stage1-libbacktrace
 all-stage2-gcc: all-stage2-libbacktrace
 all-stage3-gcc: all-stage3-libbacktrace
@@ -55557,7 +55532,6 @@ all-stagefeedback-gcc: all-stagefeedback-libbacktrace
 all-stageautoprofile-gcc: all-stageautoprofile-libbacktrace
 all-stageautofeedback-gcc: all-stageautofeedback-libbacktrace
 all-gcc: all-libcpp
-
 all-stage1-gcc: all-stage1-libcpp
 all-stage2-gcc: all-stage2-libcpp
 all-stage3-gcc: all-stage3-libcpp
@@ -55567,7 +55541,6 @@ all-stagefeedback-gcc: all-stagefeedback-libcpp
 all-stageautoprofile-gcc: all-stageautoprofile-libcpp
 all-stageautofeedback-gcc: all-stageautofeedback-libcpp
 all-gcc: all-libdecnumber
-
 all-stage1-gcc: all-stage1-libdecnumber
 all-stage2-gcc: all-stage2-libdecnumber
 all-stage3-gcc: all-stage3-libdecnumber
@@ -55577,7 +55550,6 @@ all-stagefeedback-gcc: all-stagefeedback-libdecnumber
 all-stageautoprofile-gcc: all-stageautoprofile-libdecnumber
 all-stageautofeedback-gcc: all-stageautofeedback-libdecnumber
 all-gcc: maybe-all-libiberty
-
 all-stage1-gcc: maybe-all-stage1-libiberty
 all-stage2-gcc: maybe-all-stage2-libiberty
 all-stage3-gcc: maybe-all-stage3-libiberty
@@ -55587,7 +55559,6 @@ all-stagefeedback-gcc: maybe-all-stagefeedback-libiberty
 all-stageautoprofile-gcc: maybe-all-stageautoprofile-libiberty
 all-stageautofeedback-gcc: maybe-all-stageautofeedback-libiberty
 all-gcc: maybe-all-fixincludes
-
 all-stage1-gcc: maybe-all-stage1-fixincludes
 all-stage2-gcc: maybe-all-stage2-fixincludes
 all-stage3-gcc: maybe-all-stage3-fixincludes
@@ -55597,7 +55568,6 @@ all-stagefeedback-gcc: maybe-all-stagefeedback-fixincludes
 all-stageautoprofile-gcc: maybe-all-stageautoprofile-fixincludes
 all-stageautofeedback-gcc: maybe-all-stageautofeedback-fixincludes
 all-gcc: maybe-all-lto-plugin
-
 all-stage1-gcc: maybe-all-stage1-lto-plugin
 all-stage2-gcc: maybe-all-stage2-lto-plugin
 all-stage3-gcc: maybe-all-stage3-lto-plugin
@@ -55607,7 +55577,6 @@ all-stagefeedback-gcc: maybe-all-stagefeedback-lto-plugin
 all-stageautoprofile-gcc: maybe-all-stageautoprofile-lto-plugin
 all-stageautofeedback-gcc: maybe-all-stageautofeedback-lto-plugin
 all-gcc: maybe-all-libiconv
-
 all-stage1-gcc: maybe-all-stage1-libiconv
 all-stage2-gcc: maybe-all-stage2-libiconv
 all-stage3-gcc: maybe-all-stage3-libiconv
@@ -55617,7 +55586,6 @@ all-stagefeedback-gcc: maybe-all-stagefeedback-libiconv
 all-stageautoprofile-gcc: maybe-all-stageautoprofile-libiconv
 all-stageautofeedback-gcc: maybe-all-stageautofeedback-libiconv
 info-gcc: maybe-all-build-libiberty
-
 info-stage1-gcc: maybe-all-build-libiberty
 info-stage2-gcc: maybe-all-build-libiberty
 info-stage3-gcc: maybe-all-build-libiberty
@@ -55627,7 +55595,6 @@ info-stagefeedback-gcc: maybe-all-build-libiberty
 info-stageautoprofile-gcc: maybe-all-build-libiberty
 info-stageautofeedback-gcc: maybe-all-build-libiberty
 dvi-gcc: maybe-all-build-libiberty
-
 dvi-stage1-gcc: maybe-all-build-libiberty
 dvi-stage2-gcc: maybe-all-build-libiberty
 dvi-stage3-gcc: maybe-all-build-libiberty
@@ -55637,7 +55604,6 @@ dvi-stagefeedback-gcc: maybe-all-build-libiberty
 dvi-stageautoprofile-gcc: maybe-all-build-libiberty
 dvi-stageautofeedback-gcc: maybe-all-build-libiberty
 pdf-gcc: maybe-all-build-libiberty
-
 pdf-stage1-gcc: maybe-all-build-libiberty
 pdf-stage2-gcc: maybe-all-build-libiberty
 pdf-stage3-gcc: maybe-all-build-libiberty
@@ -55647,7 +55613,6 @@ pdf-stagefeedback-gcc: maybe-all-build-libiberty
 pdf-stageautoprofile-gcc: maybe-all-build-libiberty
 pdf-stageautofeedback-gcc: maybe-all-build-libiberty
 html-gcc: maybe-all-build-libiberty
-
 html-stage1-gcc: maybe-all-build-libiberty
 html-stage2-gcc: maybe-all-build-libiberty
 html-stage3-gcc: maybe-all-build-libiberty
@@ -55661,7 +55626,6 @@ install-gcc: maybe-install-lto-plugin
 install-strip-gcc: maybe-install-strip-fixincludes
 install-strip-gcc: maybe-install-strip-lto-plugin
 configure-libcpp: configure-libiberty
-
 configure-stage1-libcpp: configure-stage1-libiberty
 configure-stage2-libcpp: configure-stage2-libiberty
 configure-stage3-libcpp: configure-stage3-libiberty
@@ -55671,7 +55635,6 @@ configure-stagefeedback-libcpp: configure-stagefeedback-libiberty
 configure-stageautoprofile-libcpp: configure-stageautoprofile-libiberty
 configure-stageautofeedback-libcpp: configure-stageautofeedback-libiberty
 configure-libcpp: maybe-configure-intl
-
 configure-stage1-libcpp: maybe-configure-stage1-intl
 configure-stage2-libcpp: maybe-configure-stage2-intl
 configure-stage3-libcpp: maybe-configure-stage3-intl
@@ -55681,7 +55644,6 @@ configure-stagefeedback-libcpp: maybe-configure-stagefeedback-intl
 configure-stageautoprofile-libcpp: maybe-configure-stageautoprofile-intl
 configure-stageautofeedback-libcpp: maybe-configure-stageautofeedback-intl
 configure-libcpp: maybe-all-libiconv
-
 configure-stage1-libcpp: maybe-all-stage1-libiconv
 configure-stage2-libcpp: maybe-all-stage2-libiconv
 configure-stage3-libcpp: maybe-all-stage3-libiconv
@@ -55691,7 +55653,6 @@ configure-stagefeedback-libcpp: maybe-all-stagefeedback-libiconv
 configure-stageautoprofile-libcpp: maybe-all-stageautoprofile-libiconv
 configure-stageautofeedback-libcpp: maybe-all-stageautofeedback-libiconv
 all-libcpp: all-libiberty
-
 all-stage1-libcpp: all-stage1-libiberty
 all-stage2-libcpp: all-stage2-libiberty
 all-stage3-libcpp: all-stage3-libiberty
@@ -55701,7 +55662,6 @@ all-stagefeedback-libcpp: all-stagefeedback-libiberty
 all-stageautoprofile-libcpp: all-stageautoprofile-libiberty
 all-stageautofeedback-libcpp: all-stageautofeedback-libiberty
 all-libcpp: maybe-all-intl
-
 all-stage1-libcpp: maybe-all-stage1-intl
 all-stage2-libcpp: maybe-all-stage2-intl
 all-stage3-libcpp: maybe-all-stage3-intl
@@ -55711,7 +55671,6 @@ all-stagefeedback-libcpp: maybe-all-stagefeedback-intl
 all-stageautoprofile-libcpp: maybe-all-stageautoprofile-intl
 all-stageautofeedback-libcpp: maybe-all-stageautofeedback-intl
 all-libcpp: maybe-all-libiconv
-
 all-stage1-libcpp: maybe-all-stage1-libiconv
 all-stage2-libcpp: maybe-all-stage2-libiconv
 all-stage3-libcpp: maybe-all-stage3-libiconv
@@ -55721,7 +55680,6 @@ all-stagefeedback-libcpp: maybe-all-stagefeedback-libiconv
 all-stageautoprofile-libcpp: maybe-all-stageautoprofile-libiconv
 all-stageautofeedback-libcpp: maybe-all-stageautofeedback-libiconv
 all-fixincludes: maybe-all-libiberty
-
 all-stage1-fixincludes: maybe-all-stage1-libiberty
 all-stage2-fixincludes: maybe-all-stage2-libiberty
 all-stage3-fixincludes: maybe-all-stage3-libiberty
@@ -55731,9 +55689,7 @@ all-stagefeedback-fixincludes: maybe-all-stagefeedback-libiberty
 all-stageautoprofile-fixincludes: maybe-all-stageautoprofile-libiberty
 all-stageautofeedback-fixincludes: maybe-all-stageautofeedback-libiberty
 all-gnattools: maybe-all-target-libada
-all-gnattools: maybe-all-target-libstdc++-v3
 all-lto-plugin: maybe-all-libiberty
-
 all-stage1-lto-plugin: maybe-all-stage1-libiberty
 all-stage2-lto-plugin: maybe-all-stage2-libiberty
 all-stage3-lto-plugin: maybe-all-stage3-libiberty
@@ -55743,7 +55699,6 @@ all-stagefeedback-lto-plugin: maybe-all-stagefeedback-libiberty
 all-stageautoprofile-lto-plugin: maybe-all-stageautoprofile-libiberty
 all-stageautofeedback-lto-plugin: maybe-all-stageautofeedback-libiberty
 all-lto-plugin: maybe-all-libiberty-linker-plugin
-
 all-stage1-lto-plugin: maybe-all-stage1-libiberty-linker-plugin
 all-stage2-lto-plugin: maybe-all-stage2-libiberty-linker-plugin
 all-stage3-lto-plugin: maybe-all-stage3-libiberty-linker-plugin
@@ -55752,12 +55707,8 @@ all-stageprofile-lto-plugin: maybe-all-stageprofile-libiberty-linker-plugin
 all-stagefeedback-lto-plugin: maybe-all-stagefeedback-libiberty-linker-plugin
 all-stageautoprofile-lto-plugin: maybe-all-stageautoprofile-libiberty-linker-plugin
 all-stageautofeedback-lto-plugin: maybe-all-stageautofeedback-libiberty-linker-plugin
-configure-libcc1: maybe-configure-gcc
-all-libcc1: maybe-all-gcc
 all-gotools: maybe-all-target-libgo
-all-utils: maybe-all-libiberty
 configure-intl: maybe-all-libiconv
-
 configure-stage1-intl: maybe-all-stage1-libiconv
 configure-stage2-intl: maybe-all-stage2-libiconv
 configure-stage3-intl: maybe-all-stage3-libiconv
@@ -55767,7 +55718,6 @@ configure-stagefeedback-intl: maybe-all-stagefeedback-libiconv
 configure-stageautoprofile-intl: maybe-all-stageautoprofile-libiconv
 configure-stageautofeedback-intl: maybe-all-stageautofeedback-libiconv
 configure-mpfr: maybe-all-gmp
-
 configure-stage1-mpfr: maybe-all-stage1-gmp
 configure-stage2-mpfr: maybe-all-stage2-gmp
 configure-stage3-mpfr: maybe-all-stage3-gmp
@@ -55777,7 +55727,6 @@ configure-stagefeedback-mpfr: maybe-all-stagefeedback-gmp
 configure-stageautoprofile-mpfr: maybe-all-stageautoprofile-gmp
 configure-stageautofeedback-mpfr: maybe-all-stageautofeedback-gmp
 configure-mpc: maybe-all-mpfr
-
 configure-stage1-mpc: maybe-all-stage1-mpfr
 configure-stage2-mpc: maybe-all-stage2-mpfr
 configure-stage3-mpc: maybe-all-stage3-mpfr
@@ -55787,7 +55736,6 @@ configure-stagefeedback-mpc: maybe-all-stagefeedback-mpfr
 configure-stageautoprofile-mpc: maybe-all-stageautoprofile-mpfr
 configure-stageautofeedback-mpc: maybe-all-stageautofeedback-mpfr
 configure-isl: maybe-all-gmp
-
 configure-stage1-isl: maybe-all-stage1-gmp
 configure-stage2-isl: maybe-all-stage2-gmp
 configure-stage3-isl: maybe-all-stage3-gmp
@@ -55797,7 +55745,6 @@ configure-stagefeedback-isl: maybe-all-stagefeedback-gmp
 configure-stageautoprofile-isl: maybe-all-stageautoprofile-gmp
 configure-stageautofeedback-isl: maybe-all-stageautofeedback-gmp
 all-intl: maybe-all-libiconv
-
 all-stage1-intl: maybe-all-stage1-libiconv
 all-stage2-intl: maybe-all-stage2-libiconv
 all-stage3-intl: maybe-all-stage3-libiconv
@@ -55806,17 +55753,10 @@ all-stageprofile-intl: maybe-all-stageprofile-libiconv
 all-stagefeedback-intl: maybe-all-stagefeedback-libiconv
 all-stageautoprofile-intl: maybe-all-stageautoprofile-libiconv
 all-stageautofeedback-intl: maybe-all-stageautofeedback-libiconv
-configure-gdb: maybe-all-intl
 configure-gdb: maybe-configure-sim
-configure-gdb: maybe-all-bfd
-configure-gdb: maybe-all-libiconv
-all-gdb: maybe-all-libiberty
-all-gdb: maybe-all-libiconv
-all-gdb: maybe-all-opcodes
 all-gdb: maybe-all-readline
 all-gdb: maybe-all-build-bison
 all-gdb: maybe-all-sim
-all-gdb: maybe-all-libdecnumber
 all-gdb: maybe-all-libtermcap
 configure-libgui: maybe-configure-tcl
 configure-libgui: maybe-configure-tk
@@ -55824,7 +55764,6 @@ all-libgui: maybe-all-tcl
 all-libgui: maybe-all-tk
 all-libgui: maybe-all-itcl
 configure-bfd: configure-libiberty
-
 configure-stage1-bfd: configure-stage1-libiberty
 configure-stage2-bfd: configure-stage2-libiberty
 configure-stage3-bfd: configure-stage3-libiberty
@@ -55834,7 +55773,6 @@ configure-stagefeedback-bfd: configure-stagefeedback-libiberty
 configure-stageautoprofile-bfd: configure-stageautoprofile-libiberty
 configure-stageautofeedback-bfd: configure-stageautofeedback-libiberty
 configure-bfd: maybe-configure-intl
-
 configure-stage1-bfd: maybe-configure-stage1-intl
 configure-stage2-bfd: maybe-configure-stage2-intl
 configure-stage3-bfd: maybe-configure-stage3-intl
@@ -55844,7 +55782,6 @@ configure-stagefeedback-bfd: maybe-configure-stagefeedback-intl
 configure-stageautoprofile-bfd: maybe-configure-stageautoprofile-intl
 configure-stageautofeedback-bfd: maybe-configure-stageautofeedback-intl
 all-bfd: maybe-all-libiberty
-
 all-stage1-bfd: maybe-all-stage1-libiberty
 all-stage2-bfd: maybe-all-stage2-libiberty
 all-stage3-bfd: maybe-all-stage3-libiberty
@@ -55854,7 +55791,6 @@ all-stagefeedback-bfd: maybe-all-stagefeedback-libiberty
 all-stageautoprofile-bfd: maybe-all-stageautoprofile-libiberty
 all-stageautofeedback-bfd: maybe-all-stageautofeedback-libiberty
 all-bfd: maybe-all-intl
-
 all-stage1-bfd: maybe-all-stage1-intl
 all-stage2-bfd: maybe-all-stage2-intl
 all-stage3-bfd: maybe-all-stage3-intl
@@ -55864,7 +55800,6 @@ all-stagefeedback-bfd: maybe-all-stagefeedback-intl
 all-stageautoprofile-bfd: maybe-all-stageautoprofile-intl
 all-stageautofeedback-bfd: maybe-all-stageautofeedback-intl
 all-bfd: maybe-all-zlib
-
 all-stage1-bfd: maybe-all-stage1-zlib
 all-stage2-bfd: maybe-all-stage2-zlib
 all-stage3-bfd: maybe-all-stage3-zlib
@@ -55874,7 +55809,6 @@ all-stagefeedback-bfd: maybe-all-stagefeedback-zlib
 all-stageautoprofile-bfd: maybe-all-stageautoprofile-zlib
 all-stageautofeedback-bfd: maybe-all-stageautofeedback-zlib
 configure-opcodes: configure-libiberty
-
 configure-stage1-opcodes: configure-stage1-libiberty
 configure-stage2-opcodes: configure-stage2-libiberty
 configure-stage3-opcodes: configure-stage3-libiberty
@@ -55884,7 +55818,6 @@ configure-stagefeedback-opcodes: configure-stagefeedback-libiberty
 configure-stageautoprofile-opcodes: configure-stageautoprofile-libiberty
 configure-stageautofeedback-opcodes: configure-stageautofeedback-libiberty
 all-opcodes: maybe-all-libiberty
-
 all-stage1-opcodes: maybe-all-stage1-libiberty
 all-stage2-opcodes: maybe-all-stage2-libiberty
 all-stage3-opcodes: maybe-all-stage3-libiberty
@@ -55894,7 +55827,6 @@ all-stagefeedback-opcodes: maybe-all-stagefeedback-libiberty
 all-stageautoprofile-opcodes: maybe-all-stageautoprofile-libiberty
 all-stageautofeedback-opcodes: maybe-all-stageautofeedback-libiberty
 configure-binutils: maybe-configure-intl
-
 configure-stage1-binutils: maybe-configure-stage1-intl
 configure-stage2-binutils: maybe-configure-stage2-intl
 configure-stage3-binutils: maybe-configure-stage3-intl
@@ -55904,7 +55836,6 @@ configure-stagefeedback-binutils: maybe-configure-stagefeedback-intl
 configure-stageautoprofile-binutils: maybe-configure-stageautoprofile-intl
 configure-stageautofeedback-binutils: maybe-configure-stageautofeedback-intl
 all-binutils: maybe-all-libiberty
-
 all-stage1-binutils: maybe-all-stage1-libiberty
 all-stage2-binutils: maybe-all-stage2-libiberty
 all-stage3-binutils: maybe-all-stage3-libiberty
@@ -55914,7 +55845,6 @@ all-stagefeedback-binutils: maybe-all-stagefeedback-libiberty
 all-stageautoprofile-binutils: maybe-all-stageautoprofile-libiberty
 all-stageautofeedback-binutils: maybe-all-stageautofeedback-libiberty
 all-binutils: maybe-all-opcodes
-
 all-stage1-binutils: maybe-all-stage1-opcodes
 all-stage2-binutils: maybe-all-stage2-opcodes
 all-stage3-binutils: maybe-all-stage3-opcodes
@@ -55924,7 +55854,6 @@ all-stagefeedback-binutils: maybe-all-stagefeedback-opcodes
 all-stageautoprofile-binutils: maybe-all-stageautoprofile-opcodes
 all-stageautofeedback-binutils: maybe-all-stageautofeedback-opcodes
 all-binutils: maybe-all-bfd
-
 all-stage1-binutils: maybe-all-stage1-bfd
 all-stage2-binutils: maybe-all-stage2-bfd
 all-stage3-binutils: maybe-all-stage3-bfd
@@ -55934,7 +55863,6 @@ all-stagefeedback-binutils: maybe-all-stagefeedback-bfd
 all-stageautoprofile-binutils: maybe-all-stageautoprofile-bfd
 all-stageautofeedback-binutils: maybe-all-stageautofeedback-bfd
 all-binutils: maybe-all-build-flex
-
 all-stage1-binutils: maybe-all-build-flex
 all-stage2-binutils: maybe-all-build-flex
 all-stage3-binutils: maybe-all-build-flex
@@ -55944,7 +55872,6 @@ all-stagefeedback-binutils: maybe-all-build-flex
 all-stageautoprofile-binutils: maybe-all-build-flex
 all-stageautofeedback-binutils: maybe-all-build-flex
 all-binutils: maybe-all-build-bison
-
 all-stage1-binutils: maybe-all-build-bison
 all-stage2-binutils: maybe-all-build-bison
 all-stage3-binutils: maybe-all-build-bison
@@ -55954,7 +55881,6 @@ all-stagefeedback-binutils: maybe-all-build-bison
 all-stageautoprofile-binutils: maybe-all-build-bison
 all-stageautofeedback-binutils: maybe-all-build-bison
 all-binutils: maybe-all-intl
-
 all-stage1-binutils: maybe-all-stage1-intl
 all-stage2-binutils: maybe-all-stage2-intl
 all-stage3-binutils: maybe-all-stage3-intl
@@ -55964,7 +55890,6 @@ all-stagefeedback-binutils: maybe-all-stagefeedback-intl
 all-stageautoprofile-binutils: maybe-all-stageautoprofile-intl
 all-stageautofeedback-binutils: maybe-all-stageautofeedback-intl
 all-binutils: maybe-all-gas
-
 all-stage1-binutils: maybe-all-stage1-gas
 all-stage2-binutils: maybe-all-stage2-gas
 all-stage3-binutils: maybe-all-stage3-gas
@@ -55978,7 +55903,6 @@ install-strip-binutils: maybe-install-strip-opcodes
 install-opcodes: maybe-install-bfd
 install-strip-opcodes: maybe-install-strip-bfd
 configure-gas: maybe-configure-intl
-
 configure-stage1-gas: maybe-configure-stage1-intl
 configure-stage2-gas: maybe-configure-stage2-intl
 configure-stage3-gas: maybe-configure-stage3-intl
@@ -55988,7 +55912,6 @@ configure-stagefeedback-gas: maybe-configure-stagefeedback-intl
 configure-stageautoprofile-gas: maybe-configure-stageautoprofile-intl
 configure-stageautofeedback-gas: maybe-configure-stageautofeedback-intl
 all-gas: maybe-all-libiberty
-
 all-stage1-gas: maybe-all-stage1-libiberty
 all-stage2-gas: maybe-all-stage2-libiberty
 all-stage3-gas: maybe-all-stage3-libiberty
@@ -55998,7 +55921,6 @@ all-stagefeedback-gas: maybe-all-stagefeedback-libiberty
 all-stageautoprofile-gas: maybe-all-stageautoprofile-libiberty
 all-stageautofeedback-gas: maybe-all-stageautofeedback-libiberty
 all-gas: maybe-all-opcodes
-
 all-stage1-gas: maybe-all-stage1-opcodes
 all-stage2-gas: maybe-all-stage2-opcodes
 all-stage3-gas: maybe-all-stage3-opcodes
@@ -56008,7 +55930,6 @@ all-stagefeedback-gas: maybe-all-stagefeedback-opcodes
 all-stageautoprofile-gas: maybe-all-stageautoprofile-opcodes
 all-stageautofeedback-gas: maybe-all-stageautofeedback-opcodes
 all-gas: maybe-all-bfd
-
 all-stage1-gas: maybe-all-stage1-bfd
 all-stage2-gas: maybe-all-stage2-bfd
 all-stage3-gas: maybe-all-stage3-bfd
@@ -56018,7 +55939,6 @@ all-stagefeedback-gas: maybe-all-stagefeedback-bfd
 all-stageautoprofile-gas: maybe-all-stageautoprofile-bfd
 all-stageautofeedback-gas: maybe-all-stageautofeedback-bfd
 all-gas: maybe-all-intl
-
 all-stage1-gas: maybe-all-stage1-intl
 all-stage2-gas: maybe-all-stage2-intl
 all-stage3-gas: maybe-all-stage3-intl
@@ -56027,14 +55947,7 @@ all-stageprofile-gas: maybe-all-stageprofile-intl
 all-stagefeedback-gas: maybe-all-stagefeedback-intl
 all-stageautoprofile-gas: maybe-all-stageautoprofile-intl
 all-stageautofeedback-gas: maybe-all-stageautofeedback-intl
-configure-gprof: maybe-configure-intl
-all-gprof: maybe-all-libiberty
-all-gprof: maybe-all-bfd
-all-gprof: maybe-all-opcodes
-all-gprof: maybe-all-intl
-all-gprof: maybe-all-gas
 configure-ld: maybe-configure-intl
-
 configure-stage1-ld: maybe-configure-stage1-intl
 configure-stage2-ld: maybe-configure-stage2-intl
 configure-stage3-ld: maybe-configure-stage3-intl
@@ -56044,7 +55957,6 @@ configure-stagefeedback-ld: maybe-configure-stagefeedback-intl
 configure-stageautoprofile-ld: maybe-configure-stageautoprofile-intl
 configure-stageautofeedback-ld: maybe-configure-stageautofeedback-intl
 all-ld: maybe-all-libiberty
-
 all-stage1-ld: maybe-all-stage1-libiberty
 all-stage2-ld: maybe-all-stage2-libiberty
 all-stage3-ld: maybe-all-stage3-libiberty
@@ -56054,7 +55966,6 @@ all-stagefeedback-ld: maybe-all-stagefeedback-libiberty
 all-stageautoprofile-ld: maybe-all-stageautoprofile-libiberty
 all-stageautofeedback-ld: maybe-all-stageautofeedback-libiberty
 all-ld: maybe-all-bfd
-
 all-stage1-ld: maybe-all-stage1-bfd
 all-stage2-ld: maybe-all-stage2-bfd
 all-stage3-ld: maybe-all-stage3-bfd
@@ -56064,7 +55975,6 @@ all-stagefeedback-ld: maybe-all-stagefeedback-bfd
 all-stageautoprofile-ld: maybe-all-stageautoprofile-bfd
 all-stageautofeedback-ld: maybe-all-stageautofeedback-bfd
 all-ld: maybe-all-opcodes
-
 all-stage1-ld: maybe-all-stage1-opcodes
 all-stage2-ld: maybe-all-stage2-opcodes
 all-stage3-ld: maybe-all-stage3-opcodes
@@ -56074,7 +55984,6 @@ all-stagefeedback-ld: maybe-all-stagefeedback-opcodes
 all-stageautoprofile-ld: maybe-all-stageautoprofile-opcodes
 all-stageautofeedback-ld: maybe-all-stageautofeedback-opcodes
 all-ld: maybe-all-build-bison
-
 all-stage1-ld: maybe-all-build-bison
 all-stage2-ld: maybe-all-build-bison
 all-stage3-ld: maybe-all-build-bison
@@ -56084,7 +55993,6 @@ all-stagefeedback-ld: maybe-all-build-bison
 all-stageautoprofile-ld: maybe-all-build-bison
 all-stageautofeedback-ld: maybe-all-build-bison
 all-ld: maybe-all-build-flex
-
 all-stage1-ld: maybe-all-build-flex
 all-stage2-ld: maybe-all-build-flex
 all-stage3-ld: maybe-all-build-flex
@@ -56094,7 +56002,6 @@ all-stagefeedback-ld: maybe-all-build-flex
 all-stageautoprofile-ld: maybe-all-build-flex
 all-stageautofeedback-ld: maybe-all-build-flex
 all-ld: maybe-all-intl
-
 all-stage1-ld: maybe-all-stage1-intl
 all-stage2-ld: maybe-all-stage2-intl
 all-stage3-ld: maybe-all-stage3-intl
@@ -56104,7 +56011,6 @@ all-stagefeedback-ld: maybe-all-stagefeedback-intl
 all-stageautoprofile-ld: maybe-all-stageautoprofile-intl
 all-stageautofeedback-ld: maybe-all-stageautofeedback-intl
 all-ld: maybe-all-gas
-
 all-stage1-ld: maybe-all-stage1-gas
 all-stage2-ld: maybe-all-stage2-gas
 all-stage3-ld: maybe-all-stage3-gas
@@ -56114,7 +56020,6 @@ all-stagefeedback-ld: maybe-all-stagefeedback-gas
 all-stageautoprofile-ld: maybe-all-stageautoprofile-gas
 all-stageautofeedback-ld: maybe-all-stageautofeedback-gas
 all-ld: maybe-all-binutils
-
 all-stage1-ld: maybe-all-stage1-binutils
 all-stage2-ld: maybe-all-stage2-binutils
 all-stage3-ld: maybe-all-stage3-binutils
@@ -56126,7 +56031,6 @@ all-stageautofeedback-ld: maybe-all-stageautofeedback-binutils
 install-ld: maybe-install-gold
 install-strip-ld: maybe-install-strip-gold
 configure-gold: maybe-configure-intl
-
 configure-stage1-gold: maybe-configure-stage1-intl
 configure-stage2-gold: maybe-configure-stage2-intl
 configure-stage3-gold: maybe-configure-stage3-intl
@@ -56136,7 +56040,6 @@ configure-stagefeedback-gold: maybe-configure-stagefeedback-intl
 configure-stageautoprofile-gold: maybe-configure-stageautoprofile-intl
 configure-stageautofeedback-gold: maybe-configure-stageautofeedback-intl
 all-gold: maybe-all-libiberty
-
 all-stage1-gold: maybe-all-stage1-libiberty
 all-stage2-gold: maybe-all-stage2-libiberty
 all-stage3-gold: maybe-all-stage3-libiberty
@@ -56146,7 +56049,6 @@ all-stagefeedback-gold: maybe-all-stagefeedback-libiberty
 all-stageautoprofile-gold: maybe-all-stageautoprofile-libiberty
 all-stageautofeedback-gold: maybe-all-stageautofeedback-libiberty
 all-gold: maybe-all-intl
-
 all-stage1-gold: maybe-all-stage1-intl
 all-stage2-gold: maybe-all-stage2-intl
 all-stage3-gold: maybe-all-stage3-intl
@@ -56156,7 +56058,6 @@ all-stagefeedback-gold: maybe-all-stagefeedback-intl
 all-stageautoprofile-gold: maybe-all-stageautoprofile-intl
 all-stageautofeedback-gold: maybe-all-stageautofeedback-intl
 all-gold: maybe-all-bfd
-
 all-stage1-gold: maybe-all-stage1-bfd
 all-stage2-gold: maybe-all-stage2-bfd
 all-stage3-gold: maybe-all-stage3-bfd
@@ -56166,7 +56067,6 @@ all-stagefeedback-gold: maybe-all-stagefeedback-bfd
 all-stageautoprofile-gold: maybe-all-stageautoprofile-bfd
 all-stageautofeedback-gold: maybe-all-stageautofeedback-bfd
 all-gold: maybe-all-build-bison
-
 all-stage1-gold: maybe-all-build-bison
 all-stage2-gold: maybe-all-build-bison
 all-stage3-gold: maybe-all-build-bison
@@ -56176,7 +56076,6 @@ all-stagefeedback-gold: maybe-all-build-bison
 all-stageautoprofile-gold: maybe-all-build-bison
 all-stageautofeedback-gold: maybe-all-build-bison
 all-gold: maybe-all-gas
-
 all-stage1-gold: maybe-all-stage1-gas
 all-stage2-gold: maybe-all-stage2-gas
 all-stage3-gold: maybe-all-stage3-gas
@@ -56186,7 +56085,6 @@ all-stagefeedback-gold: maybe-all-stagefeedback-gas
 all-stageautoprofile-gold: maybe-all-stageautoprofile-gas
 all-stageautofeedback-gold: maybe-all-stageautofeedback-gas
 check-gold: maybe-all-binutils
-
 check-stage1-gold: maybe-all-stage1-binutils
 check-stage2-gold: maybe-all-stage2-binutils
 check-stage3-gold: maybe-all-stage3-binutils
@@ -56196,7 +56094,6 @@ check-stagefeedback-gold: maybe-all-stagefeedback-binutils
 check-stageautoprofile-gold: maybe-all-stageautoprofile-binutils
 check-stageautofeedback-gold: maybe-all-stageautofeedback-binutils
 check-gold: maybe-all-gas
-
 check-stage1-gold: maybe-all-stage1-gas
 check-stage2-gold: maybe-all-stage2-gas
 check-stage3-gold: maybe-all-stage3-gas
@@ -56206,7 +56103,6 @@ check-stagefeedback-gold: maybe-all-stagefeedback-gas
 check-stageautoprofile-gold: maybe-all-stageautoprofile-gas
 check-stageautofeedback-gold: maybe-all-stageautofeedback-gas
 configure-opcodes: maybe-configure-intl
-
 configure-stage1-opcodes: maybe-configure-stage1-intl
 configure-stage2-opcodes: maybe-configure-stage2-intl
 configure-stage3-opcodes: maybe-configure-stage3-intl
@@ -56216,7 +56112,6 @@ configure-stagefeedback-opcodes: maybe-configure-stagefeedback-intl
 configure-stageautoprofile-opcodes: maybe-configure-stageautoprofile-intl
 configure-stageautofeedback-opcodes: maybe-configure-stageautofeedback-intl
 all-opcodes: maybe-all-bfd
-
 all-stage1-opcodes: maybe-all-stage1-bfd
 all-stage2-opcodes: maybe-all-stage2-bfd
 all-stage3-opcodes: maybe-all-stage3-bfd
@@ -56226,7 +56121,6 @@ all-stagefeedback-opcodes: maybe-all-stagefeedback-bfd
 all-stageautoprofile-opcodes: maybe-all-stageautoprofile-bfd
 all-stageautofeedback-opcodes: maybe-all-stageautofeedback-bfd
 all-opcodes: maybe-all-libiberty
-
 all-stage1-opcodes: maybe-all-stage1-libiberty
 all-stage2-opcodes: maybe-all-stage2-libiberty
 all-stage3-opcodes: maybe-all-stage3-libiberty
@@ -56236,7 +56130,6 @@ all-stagefeedback-opcodes: maybe-all-stagefeedback-libiberty
 all-stageautoprofile-opcodes: maybe-all-stageautoprofile-libiberty
 all-stageautofeedback-opcodes: maybe-all-stageautofeedback-libiberty
 all-opcodes: maybe-all-intl
-
 all-stage1-opcodes: maybe-all-stage1-intl
 all-stage2-opcodes: maybe-all-stage2-intl
 all-stage3-opcodes: maybe-all-stage3-intl
@@ -56260,38 +56153,23 @@ install-itcl: maybe-install-tcl
 install-strip-itcl: maybe-install-strip-tcl
 configure-tk: maybe-configure-tcl
 all-tk: maybe-all-tcl
-all-sid: maybe-all-libiberty
-all-sid: maybe-all-bfd
-all-sid: maybe-all-opcodes
 all-sid: maybe-all-tcl
 all-sid: maybe-all-tk
 install-sid: maybe-install-tcl
 install-strip-sid: maybe-install-strip-tcl
 install-sid: maybe-install-tk
 install-strip-sid: maybe-install-strip-tk
-configure-sim: maybe-configure-intl
-all-sim: maybe-all-intl
-all-sim: maybe-all-libiberty
-all-sim: maybe-all-bfd
-all-sim: maybe-all-opcodes
 all-sim: maybe-all-readline
 all-sim: maybe-configure-gdb
-all-fastjar: maybe-all-zlib
 all-fastjar: maybe-all-build-texinfo
-all-fastjar: maybe-all-libiberty
-all-bison: maybe-all-intl
 all-bison: maybe-all-build-texinfo
 all-flex: maybe-all-build-bison
-all-flex: maybe-all-intl
 all-flex: maybe-all-m4
 all-flex: maybe-all-build-texinfo
-all-m4: maybe-all-intl
 all-m4: maybe-all-build-texinfo
-configure-target-boehm-gc: maybe-all-target-libstdc++-v3
 configure-target-fastjar: maybe-configure-target-zlib
 all-target-fastjar: maybe-all-target-zlib
 configure-target-libgo: maybe-configure-target-libffi
-configure-target-libgo: maybe-all-target-libstdc++-v3
 all-target-libgo: maybe-all-target-libbacktrace
 all-target-libgo: maybe-all-target-libffi
 all-target-libgo: maybe-all-target-libatomic
@@ -56305,7 +56183,6 @@ all-target-libjava: maybe-all-target-libffi
 configure-target-libobjc: maybe-configure-target-boehm-gc
 all-target-libobjc: maybe-all-target-boehm-gc
 configure-target-libstdc++-v3: maybe-configure-target-libgomp
-
 configure-stage1-target-libstdc++-v3: maybe-configure-stage1-target-libgomp
 configure-stage2-target-libstdc++-v3: maybe-configure-stage2-target-libgomp
 configure-stage3-target-libstdc++-v3: maybe-configure-stage3-target-libgomp
@@ -56314,9 +56191,7 @@ configure-stageprofile-target-libstdc++-v3: maybe-configure-stageprofile-target-
 configure-stagefeedback-target-libstdc++-v3: maybe-configure-stagefeedback-target-libgomp
 configure-stageautoprofile-target-libstdc++-v3: maybe-configure-stageautoprofile-target-libgomp
 configure-stageautofeedback-target-libstdc++-v3: maybe-configure-stageautofeedback-target-libgomp
-configure-target-liboffloadmic: maybe-configure-target-libgomp
 configure-target-libsanitizer: maybe-all-target-libstdc++-v3
-
 configure-stage1-target-libsanitizer: maybe-all-stage1-target-libstdc++-v3
 configure-stage2-target-libsanitizer: maybe-all-stage2-target-libstdc++-v3
 configure-stage3-target-libsanitizer: maybe-all-stage3-target-libstdc++-v3
@@ -56326,7 +56201,6 @@ configure-stagefeedback-target-libsanitizer: maybe-all-stagefeedback-target-libs
 configure-stageautoprofile-target-libsanitizer: maybe-all-stageautoprofile-target-libstdc++-v3
 configure-stageautofeedback-target-libsanitizer: maybe-all-stageautofeedback-target-libstdc++-v3
 configure-target-libvtv: maybe-all-target-libstdc++-v3
-
 configure-stage1-target-libvtv: maybe-all-stage1-target-libstdc++-v3
 configure-stage2-target-libvtv: maybe-all-stage2-target-libstdc++-v3
 configure-stage3-target-libvtv: maybe-all-stage3-target-libstdc++-v3
@@ -56336,7 +56210,6 @@ configure-stagefeedback-target-libvtv: maybe-all-stagefeedback-target-libstdc++-
 configure-stageautoprofile-target-libvtv: maybe-all-stageautoprofile-target-libstdc++-v3
 configure-stageautofeedback-target-libvtv: maybe-all-stageautofeedback-target-libstdc++-v3
 all-target-libstdc++-v3: maybe-configure-target-libgomp
-
 all-stage1-target-libstdc++-v3: maybe-configure-stage1-target-libgomp
 all-stage2-target-libstdc++-v3: maybe-configure-stage2-target-libgomp
 all-stage3-target-libstdc++-v3: maybe-configure-stage3-target-libgomp
@@ -56345,7 +56218,6 @@ all-stageprofile-target-libstdc++-v3: maybe-configure-stageprofile-target-libgom
 all-stagefeedback-target-libstdc++-v3: maybe-configure-stagefeedback-target-libgomp
 all-stageautoprofile-target-libstdc++-v3: maybe-configure-stageautoprofile-target-libgomp
 all-stageautofeedback-target-libstdc++-v3: maybe-configure-stageautofeedback-target-libgomp
-all-target-liboffloadmic: maybe-all-target-libgomp
 install-target-libgo: maybe-install-target-libatomic
 install-target-libgfortran: maybe-install-target-libquadmath
 install-target-libgfortran: maybe-install-target-libgcc
@@ -56363,11 +56235,62 @@ install-target-libobjc: maybe-install-target-libgcc
 install-target-libstdc++-v3: maybe-install-target-libgcc
 all-target-libgloss: maybe-all-target-newlib
 all-target-winsup: maybe-all-target-libtermcap
-configure-target-newlib: maybe-all-binutils
-configure-target-newlib: maybe-all-ld
 configure-target-libgfortran: maybe-all-target-libquadmath
 configure-target-libgfortran: maybe-all-target-libbacktrace
 
+
+@if gcc-bootstrap
+configure-gnattools: stage_last
+configure-libcc1: stage_last
+configure-utils: stage_last
+configure-gdb: stage_last
+configure-gprof: stage_last
+configure-sid: stage_last
+configure-sim: stage_last
+configure-fastjar: stage_last
+configure-bison: stage_last
+configure-flex: stage_last
+configure-m4: stage_last
+@endif gcc-bootstrap
+
+@unless gcc-bootstrap
+all-gnattools: maybe-all-target-libstdc++-v3
+configure-libcc1: maybe-configure-gcc
+all-libcc1: maybe-all-gcc
+all-utils: maybe-all-libiberty
+configure-gdb: maybe-all-intl
+configure-gdb: maybe-all-bfd
+configure-gdb: maybe-all-libiconv
+all-gdb: maybe-all-libiberty
+all-gdb: maybe-all-libiconv
+all-gdb: maybe-all-opcodes
+all-gdb: maybe-all-libdecnumber
+configure-gprof: maybe-configure-intl
+all-gprof: maybe-all-libiberty
+all-gprof: maybe-all-bfd
+all-gprof: maybe-all-opcodes
+all-gprof: maybe-all-intl
+all-gprof: maybe-all-gas
+all-sid: maybe-all-libiberty
+all-sid: maybe-all-bfd
+all-sid: maybe-all-opcodes
+configure-sim: maybe-configure-intl
+all-sim: maybe-all-intl
+all-sim: maybe-all-libiberty
+all-sim: maybe-all-bfd
+all-sim: maybe-all-opcodes
+all-fastjar: maybe-all-zlib
+all-fastjar: maybe-all-libiberty
+all-bison: maybe-all-intl
+all-flex: maybe-all-intl
+all-m4: maybe-all-intl
+configure-target-boehm-gc: maybe-all-target-libstdc++-v3
+configure-target-libgo: maybe-all-target-libstdc++-v3
+configure-target-liboffloadmic: maybe-configure-target-libgomp
+all-target-liboffloadmic: maybe-all-target-libgomp
+configure-target-newlib: maybe-all-binutils
+configure-target-newlib: maybe-all-ld
+@endunless gcc-bootstrap
 
 # Dependencies for target modules on other target modules are
 # described by lang_env_dependencies; the defaults apply to anything
