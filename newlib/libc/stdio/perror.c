@@ -56,7 +56,16 @@ Supporting OS subroutines required: <<close>>, <<fstat>>, <<isatty>>,
 #include <reent.h>
 #include <stdio.h>
 #include <string.h>
+#include <sys/uio.h>
 #include "local.h"
+
+#define ADD(str) \
+{ \
+  v->iov_base = (void *)(str); \
+  v->iov_len = strlen (v->iov_base); \
+  v ++; \
+  iov_cnt ++; \
+}
 
 void
 _perror_r (struct _reent *ptr,
@@ -64,18 +73,31 @@ _perror_r (struct _reent *ptr,
 {
   char *error;
   int dummy;
+  struct iovec iov[4];
+  struct iovec *v = iov;
+  int iov_cnt = 0;
+  FILE *fp = _stderr_r (ptr);
 
-  _REENT_SMALL_CHECK_INIT (ptr);
+  CHECK_INIT (ptr, fp);
   if (s != NULL && *s != '\0')
     {
-      fputs (s, _stderr_r (ptr));
-      fputs (": ", _stderr_r (ptr));
+      ADD (s);
+      ADD (": ");
     }
 
   if ((error = _strerror_r (ptr, ptr->_errno, 1, &dummy)) != NULL)
-    fputs (error, _stderr_r (ptr));
+    ADD (error);
 
-  fputc ('\n', _stderr_r (ptr));
+#ifdef __SCLE
+  ADD ((fp->_flags & __SCLE) ? "\r\n" : "\n");
+#else
+  ADD ("\n");
+#endif
+
+  _newlib_flockfile_start (fp);
+  fflush (fp);
+  writev (fileno (fp), iov, iov_cnt);
+  _newlib_flockfile_end (fp);
 }
 
 #ifndef _REENT_ONLY

@@ -32,13 +32,37 @@ Supporting OS subroutines required: <<close>>, <<fstat>>, <<isatty>>,
 #include <_ansi.h>
 #include <stdio.h>
 #include <string.h>
+#include <sys/uio.h>
+
+#define ADD(str) \
+{ \
+  v->iov_base = (void *)(str); \
+  v->iov_len = strlen (v->iov_base); \
+  v ++; \
+  iov_cnt ++; \
+}
 
 void
 psignal (int sig,
        const char *s)
 {
+  struct iovec iov[4];
+  struct iovec *v = iov;
+  int iov_cnt = 0;
+
   if (s != NULL && *s != '\0')
-    fprintf (stderr, "%s: %s\n", s, strsignal (sig));
-  else
-    fprintf (stderr, "%s\n", strsignal (sig));
+    {
+      ADD (s);
+      ADD (": ");
+    }
+  ADD (strsignal (sig));
+
+#ifdef __SCLE
+  ADD ((stderr->_flags & __SCLE) ? "\r\n" : "\n");
+#else
+  ADD ("\n");
+#endif
+
+  fflush (stderr);
+  writev (fileno (stderr), iov, iov_cnt);
 }
