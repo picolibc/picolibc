@@ -10,6 +10,7 @@ details. */
 #include <cygtls.h>
 #include <stdio.h>
 #include <string.h>
+#include <sys/uio.h>
 
 struct sigdesc
 {
@@ -149,13 +150,29 @@ strtosigno (const char *name)
   return 0;
 }
 
+#define ADD(str) \
+{ \
+  v->iov_base = (void *)(str); \
+  v->iov_len = strlen ((char *)v->iov_base); \
+  v ++; \
+  iov_cnt ++; \
+}
+
 extern "C" void
 psiginfo (const siginfo_t *info, const char *s)
 {
-  if (s != NULL && *s != '\0')
-    fprintf (stderr, "%s: ", s);
+  struct iovec iov[5];
+  struct iovec *v = iov;
+  int iov_cnt = 0;
+  char buf[64];
 
-  fprintf (stderr, "%s", strsignal (info->si_signo));
+  if (s != NULL && *s != '\0')
+    {
+      ADD (s);
+      ADD (": ");
+    }
+
+  ADD (strsignal (info->si_signo));
 
   if (info->si_signo > 0 && info->si_signo < NSIG)
     {
@@ -165,10 +182,12 @@ psiginfo (const siginfo_t *info, const char *s)
 	  case SIGBUS:
 	  case SIGFPE:
 	  case SIGSEGV:
-	    fprintf (stderr, " (%d [%p])", info->si_code, info->si_addr);
+	    snprintf (buf, sizeof(buf),
+		      " (%d [%p])", info->si_code, info->si_addr);
 	    break;
 	  case SIGCHLD:
-	    fprintf (stderr, " (%d %d %d %u)", info->si_code, info->si_pid,
+	    snprintf (buf, sizeof(buf),
+		      " (%d %d %d %u)", info->si_code, info->si_pid,
 		     info->si_status, info->si_uid);
 	    break;
 /* FIXME: implement si_band
@@ -177,9 +196,19 @@ psiginfo (const siginfo_t *info, const char *s)
 	    break;
 */
 	  default:
-	    fprintf (stderr, " (%d %d %u)", info->si_code, info->si_pid, info->si_uid);
+	    snprintf (buf, sizeof(buf),
+		      " (%d %d %u)", info->si_code, info->si_pid,
+		      info->si_uid);
 	}
+      ADD (buf);
     }
 
-  fprintf (stderr, "\n");
+#ifdef __SCLE
+  ADD ((stderr->_flags & __SCLE) ? "\r\n" : "\n");
+#else
+  ADD ("\n");
+#endif
+
+  fflush (stderr);
+  writev (fileno (stderr), iov, iov_cnt);
 }
