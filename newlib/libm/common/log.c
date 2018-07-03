@@ -42,6 +42,7 @@
 #define N (1 << LOG_TABLE_BITS)
 #define OFF 0x3fe6000000000000
 
+/* Top 16 bits of a double.  */
 static inline uint32_t
 top16 (double x)
 {
@@ -74,44 +75,44 @@ log (double x)
       if (WANT_ROUNDING && unlikely (ix == asuint64 (1.0)))
 	return 0;
       r = x - 1.0;
-      r2 = r*r;
-      r3 = r*r2;
+      r2 = r * r;
+      r3 = r * r2;
 #if LOG_POLY1_ORDER == 10
       /* Worst-case error is around 0.516 ULP.  */
-      y = r3*(B[1] + r*B[2] + r2*B[3]
-	      + r3*(B[4] + r*B[5] + r2*B[6] + r3*(B[7] + r*B[8])));
-      w = B[0]*r2; /* B[0] == -0.5.  */
+      y = r3 * (B[1] + r * B[2] + r2 * B[3]
+		+ r3 * (B[4] + r * B[5] + r2 * B[6] + r3 * (B[7] + r * B[8])));
+      w = B[0] * r2; /* B[0] == -0.5.  */
       hi = r + w;
       y += r - hi + w;
       y += hi;
 #elif LOG_POLY1_ORDER == 11
       /* Worst-case error is around 0.516 ULP.  */
-      y = r3*(B[1] + r*B[2]
-	      + r2*(B[3] + r*B[4] + r2*B[5]
-		    + r3*(B[6] + r*B[7] + r2*B[8] + r3*B[9])));
-      w = B[0]*r2; /* B[0] == -0.5.  */
+      y = r3 * (B[1] + r * B[2]
+		+ r2 * (B[3] + r * B[4] + r2 * B[5]
+			+ r3 * (B[6] + r * B[7] + r2 * B[8] + r3 * B[9])));
+      w = B[0] * r2; /* B[0] == -0.5.  */
       hi = r + w;
       y += r - hi + w;
       y += hi;
 #elif LOG_POLY1_ORDER == 12
-      y = r3*(B[1] + r*B[2] + r2*B[3]
-	      + r3*(B[4] + r*B[5] + r2*B[6]
-		    + r3*(B[7] + r*B[8] + r2*B[9] + r3*B[10])));
+      y = r3 * (B[1] + r * B[2] + r2 * B[3]
+		+ r3 * (B[4] + r * B[5] + r2 * B[6]
+			+ r3 * (B[7] + r * B[8] + r2 * B[9] + r3 * B[10])));
 # if N <= 64
       /* Worst-case error is around 0.532 ULP.  */
-      w = B[0]*r2; /* B[0] == -0.5.  */
+      w = B[0] * r2; /* B[0] == -0.5.  */
       hi = r + w;
       y += r - hi + w;
       y += hi;
 # else
       /* Worst-case error is around 0.507 ULP.  */
-      w = r*0x1p27;
+      w = r * 0x1p27;
       double_t rhi = r + w - w;
       double_t rlo = r - rhi;
-      w = rhi*rhi*B[0]; /* B[0] == -0.5.  */
+      w = rhi * rhi * B[0]; /* B[0] == -0.5.  */
       hi = r + w;
       lo = r - hi + w;
-      lo += B[0]*rlo*(rhi + r);
+      lo += B[0] * rlo * (rhi + r);
       y += lo;
       y += hi;
 # endif
@@ -150,14 +151,14 @@ log (double x)
   r = fma (z, invc, -1.0);
 #else
   /* rounding error: 0x1p-55/N + 0x1p-66.  */
-  r = (z - T2[i].chi - T2[i].clo)*invc;
+  r = (z - T2[i].chi - T2[i].clo) * invc;
 #endif
   kd = (double_t) k;
 
   /* hi + lo = r + log(c) + k*Ln2.  */
-  w = kd*Ln2hi + logc;
+  w = kd * Ln2hi + logc;
   hi = w + r;
-  lo = w - hi + r + kd*Ln2lo;
+  lo = w - hi + r + kd * Ln2lo;
 
   /* log(x) = lo + (log1p(r) - r) + hi.  */
   r2 = r * r; /* rounding error: 0x1p-54/N^2.  */
@@ -166,9 +167,12 @@ log (double x)
      Worst case error if |y| > 0x1p-4:
      0.5 + 2.06/N + abs-poly-error*2^56 ULP (+ 0.001 ULP without fma).  */
 #if LOG_POLY_ORDER == 6
-  y = lo + r2*A[0] + r*r2*(A[1] + r*A[2] + r2*(A[3] + r*A[4])) + hi;
+  y = lo + r2 * A[0] + r * r2 * (A[1] + r * A[2] + r2 * (A[3] + r * A[4])) + hi;
 #elif LOG_POLY_ORDER == 7
-  y = lo + r2*(A[0] + r*A[1] + r2*(A[2] + r*A[3]) + r2*r2*(A[4] + r*A[5])) + hi;
+  y = lo
+      + r2 * (A[0] + r * A[1] + r2 * (A[2] + r * A[3])
+	      + r2 * r2 * (A[4] + r * A[5]))
+      + hi;
 #endif
   return y;
 }

@@ -50,14 +50,14 @@ sincosf (float y, float *sinp, float *cosp)
       double x2 = x * x;
 
       if (unlikely (abstop12 (y) < abstop12 (0x1p-12f)))
-      {
-	if (unlikely (abstop12 (y) < abstop12 (0x1p-126f)))
-	  /* Force underflow for tiny y.  */
-	  force_eval_float (x2);
-	*sinp = y;
-	*cosp = 1.0f;
-	return;
-      }
+	{
+	  if (unlikely (abstop12 (y) < abstop12 (0x1p-126f)))
+	    /* Force underflow for tiny y.  */
+	    force_eval_float (x2);
+	  *sinp = y;
+	  *cosp = 1.0f;
+	  return;
+	}
 
       sincosf_poly (x, x2, p, 0, sinp, cosp);
     }

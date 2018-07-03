@@ -46,12 +46,16 @@ ulperr_exp: 0.509 ULP (ULP error of exp, 0.511 ULP without fma)
 #define N (1 << POW_LOG_TABLE_BITS)
 #define OFF 0x3fe6955500000000
 
+/* Top 12 bits of a double (sign and exponent bits).  */
 static inline uint32_t
 top12 (double x)
 {
   return asuint64 (x) >> 52;
 }
 
+/* Compute y+tail = log(x) where the rounded result is y and tail has about
+   additional 15 bits precision.  The bit representation of x if in ix, but
+   normalized in the subnormal range using sign bit too for the exponent.  */
 static inline double_t
 log_inline (uint64_t ix, double_t *tail)
 {
@@ -111,7 +115,8 @@ log_inline (uint64_t ix, double_t *tail)
 #endif
   /* p = log1p(r) - r - A[0]*r*r.  */
 #if POW_LOG_POLY_ORDER == 8
-  p = ar3*(A[1] + r*A[2] + ar2*(A[3] + r*A[4] + ar2*(A[5] + r*A[6])));
+  p = (ar3
+       * (A[1] + r * A[2] + ar2 * (A[3] + r * A[4] + ar2 * (A[5] + r * A[6]))));
 #endif
   lo = lo1 + lo2 + lo3 + lo4 + p;
   y = hi + lo;
@@ -133,6 +138,13 @@ log_inline (uint64_t ix, double_t *tail)
 #define C5 __exp_data.poly[8 - EXP_POLY_ORDER]
 #define C6 __exp_data.poly[9 - EXP_POLY_ORDER]
 
+/* Handle cases that may overflow or underflow when computing the result that
+   is scale*(1+TMP) without intermediate rounding.  The bit representation of
+   scale is in SBITS, however it has a computed exponent that may have
+   overflown into the sign bit so that needs to be adjusted before using it as
+   a double.  (int32_t)KI is the k used in the argument reduction and exponent
+   adjustment of scale, positive k here means the result may overflow and
+   negative k means the result may underflow.  */
 static inline double
 specialcase (double_t tmp, uint64_t sbits, uint64_t ki)
 {
@@ -176,6 +188,8 @@ specialcase (double_t tmp, uint64_t sbits, uint64_t ki)
 
 #define SIGN_BIAS (0x800 << EXP_TABLE_BITS)
 
+/* Computes sign*exp(x+xtail) where |xtail| < 2^-8/N and |xtail| <= |x|.
+   The sign_bias argument is SIGN_BIAS or 0 and sets the sign to -1 or 1.  */
 static inline double
 exp_inline (double x, double xtail, uint32_t sign_bias)
 {
@@ -223,26 +237,26 @@ exp_inline (double x, double xtail, uint32_t sign_bias)
   ki = asuint64 (kd);
   kd -= Shift;
 #endif
-  r = x + kd*NegLn2hiN + kd*NegLn2loN;
+  r = x + kd * NegLn2hiN + kd * NegLn2loN;
   /* The code assumes 2^-200 < |xtail| < 2^-8/N.  */
   r += xtail;
   /* 2^(k/N) ~= scale * (1 + tail).  */
-  idx = 2*(ki % N);
+  idx = 2 * (ki % N);
   top = (ki + sign_bias) << (52 - EXP_TABLE_BITS);
   tail = asdouble (T[idx]);
   /* This is only a valid scale when -1023*N < k < 1024*N.  */
   sbits = T[idx + 1] + top;
   /* exp(x) = 2^(k/N) * exp(r) ~= scale + scale * (tail + exp(r) - 1).  */
   /* Evaluation is optimized assuming superscalar pipelined execution.  */
-  r2 = r*r;
+  r2 = r * r;
   /* Without fma the worst case error is 0.25/N ulp larger.  */
   /* Worst case error is less than 0.5+1.11/N+(abs poly error * 2^53) ulp.  */
 #if EXP_POLY_ORDER == 4
-  tmp = tail + r + r2*C2 + r*r2*(C3 + r*C4);
+  tmp = tail + r + r2 * C2 + r * r2 * (C3 + r * C4);
 #elif EXP_POLY_ORDER == 5
-  tmp = tail + r + r2*(C2 + r*C3) + r2*r2*(C4 + r*C5);
+  tmp = tail + r + r2 * (C2 + r * C3) + r2 * r2 * (C4 + r * C5);
 #elif EXP_POLY_ORDER == 6
-  tmp = tail + r + r2*(0.5 + r*C3) + r2*r2*(C4 + r*C5 + r2*C6);
+  tmp = tail + r + r2 * (0.5 + r * C3) + r2 * r2 * (C4 + r * C5 + r2 * C6);
 #endif
   if (unlikely (abstop == 0))
     return specialcase (tmp, sbits, ki);
@@ -268,6 +282,7 @@ checkint (uint64_t iy)
   return 2;
 }
 
+/* Returns 1 if input is the bit representation of 0, infinity or nan.  */
 static inline int
 zeroinfnan (uint64_t i)
 {

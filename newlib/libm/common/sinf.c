@@ -49,12 +49,12 @@ sinf (float y)
       s = x * x;
 
       if (unlikely (abstop12 (y) < abstop12 (0x1p-12f)))
-      {
-	if (unlikely (abstop12 (y) < abstop12 (0x1p-126f)))
-	  /* Force underflow for tiny y.  */
-	  force_eval_float (s);
-	return y;
-      }
+	{
+	  if (unlikely (abstop12 (y) < abstop12 (0x1p-126f)))
+	    /* Force underflow for tiny y.  */
+	    force_eval_float (s);
+	  return y;
+	}
 
       return sinf_poly (x, s, p, 0);
     }
