@@ -31,9 +31,8 @@
  * SUCH DAMAGE.
  */
 
-#if defined(LIBC_SCCS) && !defined(lint)
-static char sccsid[] = "@(#)scandir.c	5.10 (Berkeley) 2/23/91";
-#endif /* LIBC_SCCS and not lint */
+#include <sys/cdefs.h>
+__SCCSID("@(#)scandir.c	8.3 (Berkeley) 1/2/94");
 
 /*
  * Scan the directory dirname calling select to make a list of selected
