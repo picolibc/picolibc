@@ -79,11 +79,13 @@ log_inline (uint64_t ix, double_t *tail)
   logc = T[i].logc;
   logctail = T[i].logctail;
 
-  /* r = z/c - 1, arranged to be exact.  */
+  /* Note: 1/c is j/N or j/N/2 where j is an integer in [N,2N) and
+     |z/c - 1| < 1/N, so r = z/c - 1 is exactly representible.  */
 #if HAVE_FAST_FMA
   r = fma (z, invc, -1.0);
 #else
-  double_t zhi = asdouble (iz & (-1ULL << 32));
+  /* Split z such that rhi, rlo and rhi*rhi are exact and |rlo| <= |r|.  */
+  double_t zhi = asdouble ((iz + (1ULL << 31)) & (-1ULL << 32));
   double_t zlo = z - zhi;
   double_t rhi = zhi * invc - 1.0;
   double_t rlo = zlo * invc;
