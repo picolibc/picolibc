@@ -42,7 +42,7 @@ sinf (float y)
   double x = y;
   double s;
   int n;
-  sincos_t *p = &sincosf_table[0];
+  const sincos_t *p = &__sincosf_table[0];
 
   if (abstop12 (y) < abstop12 (pio4))
     {
@@ -66,7 +66,7 @@ sinf (float y)
       s = p->sign[n & 3];
 
       if (n & 2)
-	p = &sincosf_table[1];
+	p = &__sincosf_table[1];
 
       return sinf_poly (x * s, x * x, p, n);
     }
@@ -81,7 +81,7 @@ sinf (float y)
       s = p->sign[(n + sign) & 3];
 
       if ((n + sign) & 2)
-	p = &sincosf_table[1];
+	p = &__sincosf_table[1];
 
       return sinf_poly (x * s, x * x, p, n);
     }

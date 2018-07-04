@@ -33,15 +33,15 @@ static const double pi64 = 0x1.921FB54442D18p-62;
 /* PI / 4.  */
 static const double pio4 = 0x1.921FB54442D18p-1;
 
-typedef const struct
+typedef struct
 {
   double sign[4];
   double hpi_inv, hpi, c0, c1, c2, c3, c4, s1, s2, s3;
 } sincos_t;
 
-extern sincos_t sincosf_table[2] HIDDEN;
+extern const sincos_t __sincosf_table[2] HIDDEN;
 
-extern const uint32_t inv_pio4[] HIDDEN;
+extern const uint32_t __inv_pio4[] HIDDEN;
 
 /* abstop12 assumes floating point reinterpret is fast by default.
    If floating point comparisons are faster, define PREFER_FLOAT_COMPARISON.  */
@@ -63,7 +63,8 @@ abstop12 (float x)
    polynomial P and store the results in SINP and COSP.  N is the quadrant,
    if odd the cosine and sine polynomials are swapped.  */
 static inline void
-sincosf_poly (double x, double x2, sincos_t *p, int n, float *sinp, float *cosp)
+sincosf_poly (double x, double x2, const sincos_t *p, int n, float *sinp,
+	      float *cosp)
 {
   double x3, x4, x5, x6, s, c, c1, c2, s1;
 
@@ -91,7 +92,7 @@ sincosf_poly (double x, double x2, sincos_t *p, int n, float *sinp, float *cosp)
 /* Return the sine of inputs X and X2 (X squared) using the polynomial P.
    N is the quadrant, and if odd the cosine polynomial is used.  */
 static inline float
-sinf_poly (double x, double x2, sincos_t *p, int n)
+sinf_poly (double x, double x2, const sincos_t *p, int n)
 {
   double x3, x4, x6, x7, s, c, c1, c2, s1;
 
@@ -126,7 +127,7 @@ sinf_poly (double x, double x2, sincos_t *p, int n)
    Use round/lround if inlined, otherwise convert to int.  To avoid inaccuracies
    introduced by truncating negative values, compute the quadrant * 2^24.  */
 static inline double
-reduce_fast (double x, sincos_t *p, int *np)
+reduce_fast (double x, const sincos_t *p, int *np)
 {
   double r;
 #if TOINT_INTRINSICS
@@ -151,7 +152,7 @@ reduce_fast (double x, sincos_t *p, int *np)
 static inline double
 reduce_large (uint32_t xi, int *np)
 {
-  const uint32_t *arr = &inv_pio4[(xi >> 26) & 15];
+  const uint32_t *arr = &__inv_pio4[(xi >> 26) & 15];
   int shift = (xi >> 23) & 7;
   uint64_t n, res0, res1, res2;
 

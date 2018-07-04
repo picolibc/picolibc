@@ -34,7 +34,7 @@
 
 /* The constants and polynomials for sine and cosine.  The 2nd entry
    computes -cos (x) rather than cos (x) to get negation for free.  */
-sincos_t sincosf_table[2] =
+const sincos_t __sincosf_table[2] =
 {
   {
     { 1.0, -1.0, -1.0, 1.0 },
@@ -74,7 +74,7 @@ sincos_t sincosf_table[2] =
 
 /* Table with 4/PI to 192 bit precision.  To avoid unaligned accesses
    only 8 new bits are added per entry, making the table 4 times larger.  */
-const uint32_t inv_pio4[24] =
+const uint32_t __inv_pio4[24] =
 {
   0xa2,       0xa2f9,	  0xa2f983,   0xa2f9836e,
   0xf9836e4e, 0x836e4e44, 0x6e4e4415, 0x4e441529,
