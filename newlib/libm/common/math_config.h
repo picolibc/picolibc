@@ -71,15 +71,23 @@
 #endif
 
 #if HAVE_FAST_ROUND
+/* When set, the roundtoint and converttoint functions are provided with
+   the semantics documented below.  */
 # define TOINT_INTRINSICS 1
 
+/* Round x to nearest int in all rounding modes, ties have to be rounded
+   consistently with converttoint so the results match.  If the result
+   would be outside of [-2^31, 2^31-1] then the semantics is unspecified.  */
 static inline double_t
 roundtoint (double_t x)
 {
   return round (x);
 }
 
-static inline uint64_t
+/* Convert x to nearest int in all rounding modes, ties have to be rounded
+   consistently with roundtoint.  If the result is not representible in an
+   int32_t then the semantics is unspecified.  */
+static inline int32_t
 converttoint (double_t x)
 {
 # if HAVE_FAST_LROUND
