@@ -93,12 +93,6 @@ converttoint (double_t x)
 #ifndef TOINT_INTRINSICS
 # define TOINT_INTRINSICS 0
 #endif
-#ifndef TOINT_RINT
-# define TOINT_RINT 0
-#endif
-#ifndef TOINT_SHIFT
-# define TOINT_SHIFT 1
-#endif
 
 static inline uint32_t
 asuint (float f)

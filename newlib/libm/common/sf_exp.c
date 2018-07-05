@@ -88,10 +88,7 @@ expf (float x)
 #if TOINT_INTRINSICS
   kd = roundtoint (z);
   ki = converttoint (z);
-#elif TOINT_RINT
-  kd = rint (z);
-  ki = (long) kd;
-#elif TOINT_SHIFT
+#else
 # define SHIFT __exp2f_data.shift
   kd = (double) (z + SHIFT); /* Rounding to double precision is required.  */
   ki = asuint64 (kd);
