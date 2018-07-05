@@ -65,17 +65,6 @@
 	double and single precision arithmetics has similar latency and it
 	has no legacy SVID matherr support, only POSIX errno and fenv
 	exception based error handling.
-
-   __HAVE_FAST_FMA_DEFAULT
-
-	Default value for __HAVE_FAST_FMA if that's not set by the user.
-	It should be set here based on predefined feature macros.
-
-   __HAVE_FAST_FMA
-
-	It should be set to 1 if the compiler can inline an fma call as a
-	single instruction.  Some math code has a separate faster code
-	path assuming the target has single instruction fma.
 */
 
 #if (defined(__arm__) || defined(__thumb__)) && !defined(__MAVERICK__)
@@ -91,9 +80,6 @@
 # endif
 # if __ARM_FP & 0x8
 #  define __OBSOLETE_MATH_DEFAULT 0
-#  if __ARM_FEATURE_FMA
-#   define __HAVE_FAST_FMA_DEFAULT 1
-#  endif
 # endif
 #else
 # define __IEEE_BIG_ENDIAN
@@ -110,7 +96,6 @@
 #define __IEEE_BIG_ENDIAN
 #endif
 #define __OBSOLETE_MATH_DEFAULT 0
-#define __HAVE_FAST_FMA_DEFAULT 1
 #endif
 
 #ifdef __epiphany__
@@ -477,14 +462,6 @@
 #endif
 #ifndef __OBSOLETE_MATH
 #define __OBSOLETE_MATH __OBSOLETE_MATH_DEFAULT
-#endif
-
-#ifndef __HAVE_FAST_FMA_DEFAULT
-/* Assume slow fma by default.  */
-#define __HAVE_FAST_FMA_DEFAULT 0
-#endif
-#ifndef __HAVE_FAST_FMA
-#define __HAVE_FAST_FMA __HAVE_FAST_FMA_DEFAULT
 #endif
 
 #ifndef __IEEE_BIG_ENDIAN

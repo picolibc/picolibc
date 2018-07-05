@@ -80,7 +80,7 @@ log_inline (uint64_t ix, double_t *tail)
   logctail = T[i].logctail;
 
   /* r = z/c - 1, arranged to be exact.  */
-#if __HAVE_FAST_FMA
+#if HAVE_FAST_FMA
   r = fma (z, invc, -1.0);
 #else
   double_t zhi = asdouble (iz & (-1ULL << 32));
@@ -102,7 +102,7 @@ log_inline (uint64_t ix, double_t *tail)
   ar2 = r * ar;
   ar3 = r * ar2;
   /* k*Ln2 + log(c) + r + A[0]*r*r.  */
-#if __HAVE_FAST_FMA
+#if HAVE_FAST_FMA
   hi = t2 + ar2;
   lo3 = fma (ar, r, -ar2);
   lo4 = t2 - hi + ar2;
@@ -376,7 +376,7 @@ pow (double x, double y)
   double_t lo;
   double_t hi = log_inline (ix, &lo);
   double_t ehi, elo;
-#if __HAVE_FAST_FMA
+#if HAVE_FAST_FMA
   ehi = y * hi;
   elo = y * lo + fma (y, hi, -ehi);
 #else

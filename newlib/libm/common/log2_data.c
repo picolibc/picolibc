@@ -134,7 +134,7 @@ const struct log2_data __log2_data = {
 {0x1.767dcf99eff8cp-1, 0x1.ce0a43dbf4000p-2},
 #endif
 },
-#if !__HAVE_FAST_FMA
+#if !HAVE_FAST_FMA
 .tab2 = {
 # if N == 64
 {0x1.6200012b90a8ep-1, 0x1.904ab0644b605p-55},
@@ -203,6 +203,6 @@ const struct log2_data __log2_data = {
 {0x1.5dfffebfc3481p+0, -0x1.180902e30e93ep-54},
 # endif
 },
-#endif /* !__HAVE_FAST_FMA */
+#endif /* !HAVE_FAST_FMA */
 };
 #endif /* __OBSOLETE_MATH */
