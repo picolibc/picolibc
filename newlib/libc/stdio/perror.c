@@ -56,15 +56,20 @@ Supporting OS subroutines required: <<close>>, <<fstat>>, <<isatty>>,
 #include <reent.h>
 #include <stdio.h>
 #include <string.h>
-#include <sys/uio.h>
 #include "local.h"
 
-#define ADD(str) \
+#define WRITE_STR(str) \
 { \
-  v->iov_base = (void *)(str); \
-  v->iov_len = strlen (v->iov_base); \
-  v ++; \
-  iov_cnt ++; \
+  const char *p = (str); \
+  size_t len = strlen (p); \
+  while (len) \
+    { \
+      ssize_t len1 = _write_r (ptr, fileno (fp), p, len); \
+      if (len1 < 0) \
+	break; \
+      len -= len1; \
+      p += len1; \
+    } \
 }
 
 void
@@ -73,31 +78,28 @@ _perror_r (struct _reent *ptr,
 {
   char *error;
   int dummy;
-  struct iovec iov[4];
-  struct iovec *v = iov;
-  int iov_cnt = 0;
   FILE *fp = _stderr_r (ptr);
 
   CHECK_INIT (ptr, fp);
+
+  _newlib_flockfile_start(fp);
+  _fflush_r (ptr, fp);
   if (s != NULL && *s != '\0')
     {
-      ADD (s);
-      ADD (": ");
+      WRITE_STR (s);
+      WRITE_STR (": ");
     }
 
   if ((error = _strerror_r (ptr, ptr->_errno, 1, &dummy)) != NULL)
-    ADD (error);
+    WRITE_STR (error);
 
 #ifdef __SCLE
-  ADD ((fp->_flags & __SCLE) ? "\r\n" : "\n");
+  WRITE_STR ((fp->_flags & __SCLE) ? "\r\n" : "\n");
 #else
-  ADD ("\n");
+  WRITE_STR ("\n");
 #endif
-
-  _newlib_flockfile_start (fp);
-  fflush (fp);
-  writev (fileno (fp), iov, iov_cnt);
-  _newlib_flockfile_end (fp);
+  fp->_flags &= ~__SOFF;
+  _newlib_flockfile_end(fp);
 }
 
 #ifndef _REENT_ONLY
