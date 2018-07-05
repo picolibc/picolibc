@@ -68,7 +68,7 @@ adjust_socket_file_mode (mode_t mode)
 }
 
 /* cygwin internal: map sockaddr into internet domain address */
-static int
+int
 get_inet_addr_local (const struct sockaddr *in, int inlen,
 	       struct sockaddr_storage *out, int *outlen,
 	       int *type = NULL, int *secret = NULL)
