@@ -40,13 +40,18 @@ __internal_syscall(long n, long _a0, long _a1, long _a2, long _a3, long _a4, lon
   asm volatile ("scall"
 		: "+r"(a0) : "r"(a1), "r"(a2), "r"(a3), "r"(a4), "r"(a5), "r"(syscall_id));
 
+  return a0;
+}
+
+static inline long
+syscall_errno(long n, long _a0, long _a1, long _a2, long _a3, long _a4, long _a5)
+{
+  long a0 = __internal_syscall (n, _a0, _a1, _a2, _a3, _a4, _a5);
+
   if (a0 < 0)
     return __syscall_error (a0);
   else
     return a0;
 }
-
-#define syscall_errno(n, a, b, c, d, e, f) \
-        __internal_syscall(n, (long)(a), (long)(b), (long)(c), (long)(d), (long)(e), (long)(f))
 
 #endif
