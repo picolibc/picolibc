@@ -43,21 +43,12 @@ extern const sincos_t __sincosf_table[2] HIDDEN;
 
 extern const uint32_t __inv_pio4[] HIDDEN;
 
-/* abstop12 assumes floating point reinterpret is fast by default.
-   If floating point comparisons are faster, define PREFER_FLOAT_COMPARISON.  */
-#if PREFER_FLOAT_COMPARISON
-static inline float
-abstop12 (float x)
-{
-  return fabsf (x);
-}
-#else
+/* Top 12 bits of the float representation with the sign bit cleared.  */
 static inline uint32_t
 abstop12 (float x)
 {
   return (asuint (x) >> 20) & 0x7ff;
 }
-#endif
 
 /* Compute the sine and cosine of inputs X and X2 (X squared), using the
    polynomial P and store the results in SINP and COSP.  N is the quadrant,
