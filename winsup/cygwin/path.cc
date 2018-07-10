@@ -4305,11 +4305,25 @@ find_fast_cwd ()
      used on the system. */
   fcwd_access_t **f_cwd_ptr = find_fast_cwd_pointer ();
   if (!f_cwd_ptr)
-    small_printf ("Cygwin WARNING:\n"
+    {
+#ifndef __x86_64__
+#ifndef PROCESSOR_ARCHITECTURE_ARM64
+#define PROCESSOR_ARCHITECTURE_ARM64 12
+#endif
+      SYSTEM_INFO si;
+
+      /* Check if we're running in WOW64 on ARM64.  Skip the warning as long as
+	 there's no solution for finding the FAST_CWD pointer on that system. */
+      if (wincap.is_wow64 ()
+	  && (GetNativeSystemInfo (&si),
+	      si.wProcessorArchitecture != PROCESSOR_ARCHITECTURE_ARM64))
+#endif
+      small_printf ("Cygwin WARNING:\n"
 "  Couldn't compute FAST_CWD pointer.  This typically occurs if you're using\n"
 "  an older Cygwin version on a newer Windows.  Please update to the latest\n"
 "  available Cygwin version from https://cygwin.com/.  If the problem persists,\n"
 "  please see https://cygwin.com/problems.html\n\n");
+    }
   if (f_cwd_ptr && *f_cwd_ptr)
     {
       /* Just evaluate structure version. */
