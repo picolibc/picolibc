@@ -53,9 +53,9 @@ top12 (double x)
   return asuint64 (x) >> 52;
 }
 
-/* Compute y+tail = log(x) where the rounded result is y and tail has about
-   additional 15 bits precision.  The bit representation of x if in ix, but
-   normalized in the subnormal range using sign bit too for the exponent.  */
+/* Compute y+TAIL = log(x) where the rounded result is y and TAIL has about
+   additional 15 bits precision.  IX is the bit representation of x, but
+   normalized in the subnormal range using the sign bit for the exponent.  */
 static inline double_t
 log_inline (uint64_t ix, double_t *tail)
 {
