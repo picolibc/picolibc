@@ -4390,43 +4390,38 @@ cwdstuff::override_win32_cwd (bool init, ULONG old_dismount_count)
     }
   else
     {
-      /* This is more a hack, and it's only used if we failed to find the
-	 fast_cwd_ptr value.  We call RtlSetCurrentDirectory_U and let it
-	 set up a new FAST_CWD structure.  Afterwards, compute the address
-	 of that structure utilizing the fact that the buffer address in
-	 the user process parameter block is actually pointing to the buffer
-	 in that FAST_CWD structure.  Then replace the directory handle in
-	 that structure with our own handle and close the original one.
+      /* Fallback if we failed to find the fast_cwd_ptr value:
 
-	 Note that the call to RtlSetCurrentDirectory_U also closes our
-	 old dir handle, so there won't be any handle left open.
+	 - Call RtlSetCurrentDirectory_U.
+	 - Compute new FAST_CWD struct address from buffer pointer in the
+	   user process parameter block.
+	 - Replace the directory handle in the struct with our own handle.
+	 - Close the original handle.  RtlSetCurrentDirectory_U already
+	   closed our former dir handle -> no handle leak.
 
-	 This method is prone to two race conditions:
+	 Guard the entire operation with FastPebLock to avoid races
+	 accessing the PEB and FAST_CWD struct.
 
-	 - Due to the way RtlSetCurrentDirectory_U opens the directory
-	   handle, the directory is locked against deletion or renaming
-	   between the RtlSetCurrentDirectory_U and the subsequent NtClose
-	   call.
+	 Unfortunately this method is still prone to a directory usage
+	 race condition:
 
-	 - When another thread calls SetCurrentDirectory at exactly the
-	   same time, a crash might occur, or worse, unrelated data could
-	   be overwritten or NtClose could be called on an unrelated handle.
-
-	 Therefore, use this *only* as a fallback. */
+	 - The directory is locked against deletion or renaming between the
+	   RtlSetCurrentDirectory_U and the subsequent NtClose call. */
+      if (unlikely (upp_cwd_hdl == NULL) && init)
+	return;
+      RtlEnterCriticalSection (peb.FastPebLock);
       if (!init)
 	{
 	  NTSTATUS status =
 	    RtlSetCurrentDirectory_U (error ? &ro_u_pipedir : &win32);
 	  if (!NT_SUCCESS (status))
 	    {
+	      RtlLeaveCriticalSection (peb.FastPebLock);
 	      debug_printf ("RtlSetCurrentDirectory_U(%S) failed, %y",
 			    error ? &ro_u_pipedir : &win32, status);
 	      return;
 	    }
 	}
-      else if (upp_cwd_hdl == NULL)
-	return;
-      RtlEnterCriticalSection (peb.FastPebLock);
       fcwd_access_t::SetDirHandleFromBufferPointer(upp_cwd_str.Buffer, dir);
       h = upp_cwd_hdl;
       upp_cwd_hdl = dir;
