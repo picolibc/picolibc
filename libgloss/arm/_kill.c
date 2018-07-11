@@ -39,7 +39,13 @@ _kill (int pid, int sig)
       }
     }
 
+#if SEMIHOST_V2
+if (_has_ext_exit_extended ())
   return do_AngelSWI (insn, block);
+else
+#endif
+  return do_AngelSWI (insn, (void*)block[0]);
+
 #else
   asm ("swi %a0" :: "i" (SWI_Exit));
 #endif
