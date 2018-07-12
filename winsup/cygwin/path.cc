@@ -4306,19 +4306,34 @@ find_fast_cwd ()
   fcwd_access_t **f_cwd_ptr = find_fast_cwd_pointer ();
   if (!f_cwd_ptr)
     {
+      bool warn = 1;
+
 #ifndef __x86_64__
-#ifndef PROCESSOR_ARCHITECTURE_ARM64
-#define PROCESSOR_ARCHITECTURE_ARM64 12
-#endif
+      #ifndef PROCESSOR_ARCHITECTURE_ARM64
+      #define PROCESSOR_ARCHITECTURE_ARM64 12
+      #endif
+
       SYSTEM_INFO si;
 
       /* Check if we're running in WOW64 on ARM64.  Skip the warning as long as
-	 there's no solution for finding the FAST_CWD pointer on that system. */
-      if (wincap.is_wow64 ()
-	  && (GetNativeSystemInfo (&si),
-	      si.wProcessorArchitecture != PROCESSOR_ARCHITECTURE_ARM64))
-#endif
-      small_printf ("Cygwin WARNING:\n"
+	 there's no solution for finding the FAST_CWD pointer on that system.
+
+	 2018-07-12: Apparently current ARM64 WOW64 has a bug:
+	 It's GetNativeSystemInfo returns PROCESSOR_ARCHITECTURE_INTEL in
+	 wProcessorArchitecture.  Since that's an invalid value (a 32 bit
+	 host system hosting a 32 bit emulator for itself?) we can use this
+	 value as an indicator to skip the message as well. */
+      if (wincap.is_wow64 ())
+	{
+	  GetNativeSystemInfo (&si);
+	  if (si.wProcessorArchitecture == PROCESSOR_ARCHITECTURE_ARM64
+	      || si.wProcessorArchitecture == PROCESSOR_ARCHITECTURE_INTEL)
+	    warn = 0;
+	}
+#endif /* !__x86_64__ */
+
+      if (warn)
+	small_printf ("Cygwin WARNING:\n"
 "  Couldn't compute FAST_CWD pointer.  This typically occurs if you're using\n"
 "  an older Cygwin version on a newer Windows.  Please update to the latest\n"
 "  available Cygwin version from https://cygwin.com/.  If the problem persists,\n"
