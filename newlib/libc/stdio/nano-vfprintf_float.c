@@ -213,6 +213,8 @@ _printf_float (struct _reent *data,
     }
   if (isnan (_fpvalue))
     {
+      if (_fpvalue < 0)
+	pdata->l_buf[0] = '-';
       if (code <= 'G')		/* 'A', 'E', 'F', or 'G'.  */
 	cp = "NAN";
       else
