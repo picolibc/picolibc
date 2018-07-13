@@ -65,6 +65,7 @@ getutid (struct utmp *id)
 	case DEAD_PROCESS:
 	  if (id->ut_id == utmp_data.ut_id)
 	    return &utmp_data;
+	  break;
 	default:
 	  abort ();
 	}
