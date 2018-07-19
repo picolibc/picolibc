@@ -12,11 +12,7 @@ typedef	__int32_t	__blksize_t;
 typedef	__uint64_t	__dev_t;
 #define	__machine_dev_t_defined
 
-#if defined(__arm__) || defined(__i386__) || defined(__m68k__) || defined(__mips__) || defined(__PPC__) || defined(__sparc__)
 typedef	__int64_t	_off_t;
-#else
-typedef	__int32_t	_off_t;
-#endif
 #define	__machine_off_t_defined
 
 typedef	_off_t		_fpos_t;
