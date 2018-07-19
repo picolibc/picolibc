@@ -640,6 +640,8 @@ sigtimedwait (const sigset_t *set, siginfo_t *info, const timespec *timeout)
       waittime.QuadPart = (LONGLONG) timeout->tv_sec * NS100PERSEC
                           + ((LONGLONG) timeout->tv_nsec + (NSPERSEC/NS100PERSEC) - 1)
 			    / (NSPERSEC/NS100PERSEC);
+      /* negate waittime to code as duration for NtSetTimer() below cygwait() */
+      waittime.QuadPart = -waittime.QuadPart;
     }
 
   return sigwait_common (set, info, timeout ? &waittime : cw_infinite);

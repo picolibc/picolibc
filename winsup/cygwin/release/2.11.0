@@ -44,3 +44,6 @@ Bug Fixes
 - Handle a non-standard return value from some tape drives to
   report a "no-media" error.
   Addresses: https://cygwin.com/ml/cygwin/2018-06/msg00245.html
+
+- Fix duration handling in sigtimedwait
+  Addresses: https://cygwin.com/ml/cygwin-patches/2018-q3/msg00018.html
