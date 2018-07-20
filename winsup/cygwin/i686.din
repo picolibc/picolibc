@@ -3,8 +3,6 @@ LIBRARY "cygwin1.dll" BASE=0x61000000
 EXPORTS
 #Exported variables
 __cygwin_environ DATA
-_fe_dfl_env DATA
-_fe_nomask_env DATA
 
 #Exported functions
 __argz_add = argz_add SIGFE

@@ -11,6 +11,8 @@ __stack_chk_guard DATA
 _check_for_executable DATA
 _ctype_ DATA
 _daylight DATA
+_fe_dfl_env DATA
+_fe_nomask_env DATA
 _impure_ptr DATA
 _sys_errlist DATA
 _sys_nerr DATA
