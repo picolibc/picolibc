@@ -1,10 +1,11 @@
 #include <wctype.h>
+#include <stdint.h>
 #include "categories.h"
 
 struct _category {
   enum category cat: 8;
-  unsigned int first: 24;
-  unsigned short delta;
+  uint_least32_t first: 24;
+  uint_least16_t delta;
 } __attribute__((packed));
 
 static const struct _category categories[] = {

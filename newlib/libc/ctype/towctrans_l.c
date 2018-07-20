@@ -1,6 +1,7 @@
 /* Modified (m) 2017 Thomas Wolff: revise Unicode and locale/wchar handling */
 #include <_ansi.h>
 #include <wctype.h>
+#include <stdint.h>
 //#include <errno.h>
 #include "local.h"
 
@@ -35,10 +36,10 @@
 enum {TO1, TOLO, TOUP, TOBOTH};
 enum {EVENCAP, ODDCAP};
 static struct caseconv_entry {
-  unsigned int first: 21;
-  unsigned short diff: 8;
-  unsigned char mode: 2;
-  int delta: 17;
+  uint_least32_t first: 21;
+  uint_least8_t diff: 8;
+  uint_least8_t mode: 2;
+  uint_least32_t delta: 17;
 } __attribute__ ((packed))
 caseconv_table [] = {
 #include "caseconv.t"
