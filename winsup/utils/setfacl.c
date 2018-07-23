@@ -119,7 +119,7 @@ getaclentry (action_t action, char *c, aclent_t *ace)
     }
   else if (!(ace->a_type & (USER_OBJ | GROUP_OBJ)))
     {
-      /* Mask and other entries may contain an extra colon. */
+      /* Mask and other entries may contain one or two colons. */
       if (*c == ':')
 	++c;
     }
@@ -558,8 +558,8 @@ usage (FILE *stream)
 "    u[ser]:uid:perm\n"
 "    g[roup]::perm\n"
 "    g[roup]:gid:perm\n"
-"    m[ask]:perm\n"
-"    o[ther]:perm\n"
+"    m[ask]:[:]perm\n"
+"    o[ther]:[:]perm\n"
 "\n"
 "  Default entries are like the above with the additional default identifier.\n"
 "  For example: \n"

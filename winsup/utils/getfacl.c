@@ -98,14 +98,14 @@ usage (FILE * stream)
 	"     user:name or uid:perm\n"
 	"     group::perm\n"
 	"     group:name or gid:perm\n"
-	"     mask:perm\n"
-	"     other:perm\n"
+	"     mask::perm\n"
+	"     other::perm\n"
 	"     default:user::perm\n"
 	"     default:user:name or uid:perm\n"
 	"     default:group::perm\n"
 	"     default:group:name or gid:perm\n"
-	"     default:mask:perm\n"
-	"     default:other:perm\n"
+	"     default:mask::perm\n"
+	"     default:other::perm\n"
 	"\n");
     }
 }
@@ -265,10 +265,10 @@ main (int argc, char **argv)
 		n += printf ("group:%s:", groupname (acls[i].a_id));
 	      break;
 	    case CLASS_OBJ:
-	      printf ("mask:");
+	      printf ("mask::");
 	      break;
 	    case OTHER_OBJ:
-	      printf ("other:");
+	      printf ("other::");
 	      break;
 	    }
 	  n += printf ("%s", permstr (acls[i].a_perm));
