@@ -13,25 +13,14 @@ details. */
 #include <stdio.h>
 #include <unistd.h>
 #include <getopt.h>
-#include <cygwin/acl.h>
+#include <sys/acl.h>
+#include <acl/libacl.h>
 #include <sys/stat.h>
 #include <cygwin/version.h>
 #include <string.h>
 #include <errno.h>
 
 static char *prog_name;
-
-char *
-permstr (mode_t perm)
-{
-  static char pbuf[4];
-
-  pbuf[0] = (perm & S_IROTH) ? 'r' : '-';
-  pbuf[1] = (perm & S_IWOTH) ? 'w' : '-';
-  pbuf[2] = (perm & S_IXOTH) ? 'x' : '-';
-  pbuf[3] = '\0';
-  return pbuf;
-}
 
 const char *
 username (uid_t uid)
@@ -150,9 +139,9 @@ main (int argc, char **argv)
   int eopt = 0;
   int dopt = 0;
   int nopt = 0;
+  int options = 0;
   int istty = isatty (fileno (stdout));
   struct stat st;
-  aclent_t acls[MAX_ACL_ENTRIES];
 
   prog_name = program_invocation_short_name;
 
@@ -192,19 +181,26 @@ main (int argc, char **argv)
       usage (stderr);
       return 1;
     }
+  if (nopt)
+    options |= TEXT_NUMERIC_IDS;
+  if (eopt > 0)
+    options |= TEXT_ALL_EFFECTIVE;
+  else if (!eopt)
+    options |= TEXT_SOME_EFFECTIVE;
+  if (istty)
+    options |= TEXT_SMART_INDENT;
   for (; optind < argc; ++optind)
     {
-      int i, num_acls;
-      mode_t mask = S_IRWXO, def_mask = S_IRWXO;
+      acl_t access_acl = NULL, default_acl = NULL;
+      char *access_txt, *default_txt;
 
       if (stat (argv[optind], &st)
-	  || (num_acls = acl (argv[optind], GETACL, MAX_ACL_ENTRIES, acls)) < 0)
-	{
-	  fprintf (stderr, "%s: %s: %s\n",
-		   prog_name, argv[optind], strerror (errno));
-	  ret = 2;
-	  continue;
-	}
+	  || (!dopt
+	      && !(access_acl = acl_get_file (argv[optind], ACL_TYPE_ACCESS)))
+	  || (!aopt && S_ISDIR (st.st_mode)
+	      && !(default_acl = acl_get_file (argv[optind],
+					       ACL_TYPE_DEFAULT))))
+	goto err;
       if (!copt)
 	{
 	  printf ("# file: %s\n", argv[optind]);
@@ -223,103 +219,35 @@ main (int argc, char **argv)
 					 (st.st_mode & S_ISGID) ? 's' : '-',
 					 (st.st_mode & S_ISVTX) ? 't' : '-');
 	}
-      for (i = 0; i < num_acls; ++i)
+      if (access_acl)
 	{
-	  if (acls[i].a_type == CLASS_OBJ)
-	    mask = acls[i].a_perm;
-	  else if (acls[i].a_type == DEF_CLASS_OBJ)
-	    def_mask = acls[i].a_perm;
+	  if (!(access_txt = acl_to_any_text (access_acl, NULL, '\n', options)))
+	    {
+	      acl_free (access_acl);
+	      goto err;
+	    }
+	  printf ("%s\n", access_txt);
+	  acl_free (access_txt);
+	  acl_free (access_acl);
 	}
-      for (i = 0; i < num_acls; ++i)
+      if (default_acl)
 	{
-	  int n = 0;
-	  int print_effective = 0;
-	  mode_t effective = acls[i].a_perm;
-
-	  if (acls[i].a_type & ACL_DEFAULT)
+	  if (!(default_txt = acl_to_any_text (default_acl, "default:",
+					       '\n', options)))
 	    {
-	      if (aopt)
-		continue;
-	      n += printf ("default:");
+	      acl_free (default_acl);
+	      goto err;
 	    }
-	  else if (dopt)
-	    continue;
-	  switch (acls[i].a_type & ~ACL_DEFAULT)
-	    {
-	    case USER_OBJ:
-	      printf ("user::");
-	      break;
-	    case USER:
-	      if (nopt)
-		n += printf ("user:%lu:", (unsigned long)acls[i].a_id);
-	      else
-		n += printf ("user:%s:", username (acls[i].a_id));
-	      break;
-	    case GROUP_OBJ:
-	      n += printf ("group::");
-	      break;
-	    case GROUP:
-	      if (nopt)
-		n += printf ("group:%lu:", (unsigned long)acls[i].a_id);
-	      else
-		n += printf ("group:%s:", groupname (acls[i].a_id));
-	      break;
-	    case CLASS_OBJ:
-	      printf ("mask::");
-	      break;
-	    case OTHER_OBJ:
-	      printf ("other::");
-	      break;
-	    }
-	  n += printf ("%s", permstr (acls[i].a_perm));
-	  switch (acls[i].a_type)
-	    {
-	    case USER:
-	    case GROUP_OBJ:
-	      effective = acls[i].a_perm & mask;
-	      print_effective = 1;
-	      break;
-	    case GROUP:
-	      /* Special case SYSTEM and Admins group:  The mask only
-	         applies to them as far as the execute bit is concerned. */
-	      if (acls[i].a_id == 18 || acls[i].a_id == 544)
-		effective = acls[i].a_perm & (mask | S_IROTH | S_IWOTH);
-	      else
-		effective = acls[i].a_perm & mask;
-	      print_effective = 1;
-	      break;
-	    case DEF_USER:
-	    case DEF_GROUP_OBJ:
-	      effective = acls[i].a_perm & def_mask;
-	      print_effective = 1;
-	      break;
-	    case DEF_GROUP:
-	      /* Special case SYSTEM and Admins group:  The mask only
-	         applies to them as far as the execute bit is concerned. */
-	      if (acls[i].a_id == 18 || acls[i].a_id == 544)
-		effective = acls[i].a_perm & (def_mask | S_IROTH | S_IWOTH);
-	      else
-		effective = acls[i].a_perm & def_mask;
-	      print_effective = 1;
-	      break;
-	    }
-	  if (print_effective && eopt >= 0
-	      && (eopt > 0 || effective != acls[i].a_perm))
-	    {
-	      if (istty)
-		{
-		  n = 40 - n;
-		  if (n <= 0)
-		    n = 1;
-		  printf ("%*s", n, " ");
-		}
-	      else
-	        putchar ('\t');
-	      printf ("#effective:%s", permstr (effective));
-	    }
-	  putchar ('\n');
+	  printf ("%s\n", default_txt);
+	  acl_free (default_txt);
+	  acl_free (default_acl);
 	}
       putchar ('\n');
+      continue;
+    err:
+      fprintf (stderr, "%s: %s: %s\n\n",
+	       prog_name, argv[optind], strerror (errno));
+      ret = 2;
     }
   return ret;
 }
