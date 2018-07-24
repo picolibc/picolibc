@@ -32,6 +32,13 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     acoshf
     acoshl
     acosl
+    aio_cancel
+    aio_error
+    aio_fsync
+    aio_read
+    aio_return
+    aio_suspend
+    aio_write
     alarm
     alphasort
     asctime
@@ -491,6 +498,7 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     lgammal
     link
     linkat
+    lio_listio
     listen
     llabs
     lldiv
@@ -1556,13 +1564,6 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
 <sect1 id="std-notimpl"><title>NOT implemented system interfaces from the Single Unix Specification, Volume 4:</title>
 
 <screen>
-    aio_cancel
-    aio_error
-    aio_fsync
-    aio_read
-    aio_return
-    aio_suspend
-    aio_write
     endnetent
     fattach
     fmtmsg
@@ -1575,7 +1576,6 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     getnetent
     getpmsg
     isastream
-    lio_listio
     mlockall
     munlockall
     posix_mem_offset

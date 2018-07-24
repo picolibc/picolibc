@@ -3,6 +3,10 @@ What's new:
 
 - New API: clearenv, pthread_tryjoin_np, pthread_timedjoin_np.
 
+- New APIs: aio_cancel, aio_error, aio_fsync, aio_read, aio_return,
+  aio_suspend, aio_write, lio_listio.
+  New header: <aio.h>.
+
 
 What changed:
 -------------

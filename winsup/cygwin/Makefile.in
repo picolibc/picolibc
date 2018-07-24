@@ -249,6 +249,7 @@ MATH_OFILES:= \
 
 DLL_OFILES:= \
 	advapi32.o \
+	aio.o \
 	arc4random_stir.o \
 	assert.o \
 	autoload.o \

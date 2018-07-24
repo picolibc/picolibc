@@ -20,6 +20,12 @@ SO_RCVTIMEO and SO_SNDTIMEO socket options are now honored.
 New API: clearenv, pthread_tryjoin_np, pthread_timedjoin_np.
 </para></listitem>
 
+<listitem><para>
+New APIs for POSIX Asynchronous I/O: aio_cancel, aio_error, aio_fsync,
+aio_read, aio_return, aio_suspend, aio_write, lio_listio.
+New Header: &lt;aio.h&gt;.
+</para></listitem>
+
 </itemizedlist>
 
 </sect2>

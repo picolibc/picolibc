@@ -195,6 +195,13 @@ acosh NOSIGFE
 acoshf NOSIGFE
 acoshl NOSIGFE
 acosl NOSIGFE
+aio_cancel SIGFE
+aio_error NOSIGFE
+aio_fsync SIGFE
+aio_read SIGFE
+aio_return NOSIGFE
+aio_suspend SIGFE
+aio_write SIGFE
 alarm SIGFE
 aligned_alloc SIGFE
 alphasort NOSIGFE
@@ -843,6 +850,7 @@ lgammal_r NOSIGFE
 lgetxattr SIGFE
 link SIGFE
 linkat SIGFE
+lio_listio SIGFE
 listen = cygwin_listen SIGFE
 listxattr SIGFE
 llabs NOSIGFE

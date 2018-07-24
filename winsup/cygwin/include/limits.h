@@ -147,7 +147,7 @@ details. */
 
 /* Runtime Invariant Values */
 
-/* Please note that symbolic names shall be ommited, on specific
+/* Please note that symbolic names shall be omitted, on specific
    implementations where the corresponding value is equal to or greater
    than the stated minimum, but is unspecified.  This indetermination
    might depend on the amount of available memory space on a specific
@@ -155,19 +155,16 @@ details. */
    a specific instance shall be provided by the sysconf() function. */
 
 /* Maximum number of I/O operations in a single list I/O call supported by
-   the implementation.  Not yet implemented. */
-#undef AIO_LISTIO_MAX
-/* #define AIO_LISTIO_MAX >= _POSIX_AIO_LISTIO_MAX */
+   the implementation. */
+#define AIO_LISTIO_MAX 32
 
 /* Maximum number of outstanding asynchronous I/O operations supported by
-   the implementation.  Not yet implemented. */
-#undef AIO_MAX
-/*  #define AIO_MAX >= _POSIX_AIO_MAX */
+   the implementation. */
+#define AIO_MAX 8
 
 /* The maximum amount by which a process can decrease its asynchronous I/O
-   priority level from its own scheduling priority. */
-#undef AIO_PRIO_DELTA_MAX
-/* #define AIO_PRIO_DELTA_MAX >= 0 */
+   priority level from its own scheduling priority. Not yet implemented. */
+#define AIO_PRIO_DELTA_MAX 0
 
 /* Maximum number of bytes in arguments and environment passed in an exec
    call.  32000 is the safe value used for Windows processes when called

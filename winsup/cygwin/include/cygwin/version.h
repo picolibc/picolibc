@@ -494,14 +494,16 @@ details. */
   323: scanf %l[ conversion.
   324: Export sigtimedwait.
   325: Export catclose, catgets, catopen.
-  326: Export clearenv
+  326: Export clearenv.
   327: Export pthread_tryjoin_np, pthread_timedjoin_np.
+  328: Export aio_cancel, aio_error, aio_fsync, aio_read, aio_return,
+       aio_suspend, aio_write, lio_listio.
 
   Note that we forgot to bump the api for ualarm, strtoll, strtoull,
   sigaltstack, sethostname. */
 
 #define CYGWIN_VERSION_API_MAJOR 0
-#define CYGWIN_VERSION_API_MINOR 327
+#define CYGWIN_VERSION_API_MINOR 328
 
 /* There is also a compatibity version number associated with the shared memory
    regions.  It is incremented when incompatible changes are made to the shared

@@ -541,9 +541,9 @@ static struct
   {cons, {c:_POSIX_SHARED_MEMORY_OBJECTS}},	/*  31, _SC_SHARED_MEMORY_OBJECTS */
   {cons, {c:_POSIX_SYNCHRONIZED_IO}},	/*  32, _SC_SYNCHRONIZED_IO */
   {cons, {c:_POSIX_TIMERS}},		/*  33, _SC_TIMERS */
-  {nsup, {c:0}},			/*  34, _SC_AIO_LISTIO_MAX */
-  {nsup, {c:0}},			/*  35, _SC_AIO_MAX */
-  {nsup, {c:0}},			/*  36, _SC_AIO_PRIO_DELTA_MAX */
+  {cons, {c:AIO_LISTIO_MAX}},		/*  34, _SC_AIO_LISTIO_MAX */
+  {cons, {c:AIO_MAX}},			/*  35, _SC_AIO_MAX */
+  {cons, {c:AIO_PRIO_DELTA_MAX}},	/*  36, _SC_AIO_PRIO_DELTA_MAX */
   {nsup, {c:0}},			/*  37, _SC_DELAYTIMER_MAX */
   {cons, {c:PTHREAD_KEYS_MAX}},		/*  38, _SC_THREAD_KEYS_MAX */
   {cons, {c:PTHREAD_STACK_MIN}},	/*  39, _SC_THREAD_STACK_MIN */
