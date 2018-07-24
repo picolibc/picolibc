@@ -859,7 +859,7 @@ fhandler_pty_slave::read (void *ptr, size_t& len)
 	break;
     }
 out:
-  termios_printf ("%d=read(%p, %lu)", totalread, ptr, len);
+  termios_printf ("%d = read(%p, %lu)", totalread, ptr, len);
   len = (size_t) totalread;
 }
 

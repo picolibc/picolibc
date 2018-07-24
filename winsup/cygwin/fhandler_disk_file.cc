@@ -24,6 +24,7 @@ details. */
 #include "tls_pbuf.h"
 #include "devices.h"
 #include "ldap.h"
+#include <aio.h>
 
 #define _COMPILING_NEWLIB
 #include <dirent.h>
@@ -1511,39 +1512,48 @@ fhandler_base::open_fs (int flags, mode_t mode)
    parameter to the latter. */
 
 int
-fhandler_disk_file::prw_open (bool write)
+fhandler_disk_file::prw_open (bool write, void *aio)
 {
   NTSTATUS status;
   IO_STATUS_BLOCK io;
   OBJECT_ATTRIBUTES attr;
+  ULONG options = get_options ();
+
+  /* If async i/o is intended, turn off the default synchronous operation */
+  if (aio)
+    options &= ~FILE_SYNCHRONOUS_IO_NONALERT;
 
   /* First try to open with the original access mask */
   ACCESS_MASK access = get_access ();
   status = NtOpenFile (&prw_handle, access,
 		       pc.init_reopen_attr (attr, get_handle ()), &io,
-		       FILE_SHARE_VALID_FLAGS, get_options ());
+		       FILE_SHARE_VALID_FLAGS, options);
   if (status == STATUS_ACCESS_DENIED)
     {
       /* If we get an access denied, chmod has been called.  Try again
 	 with just the required rights to perform the called function. */
       access &= write ? ~GENERIC_READ : ~GENERIC_WRITE;
       status = NtOpenFile (&prw_handle, access, &attr, &io,
-			   FILE_SHARE_VALID_FLAGS, get_options ());
+			   FILE_SHARE_VALID_FLAGS, options);
     }
   debug_printf ("%y = NtOpenFile (%p, %y, %S, io, %y, %y)",
 		status, prw_handle, access, pc.get_nt_native_path (),
-		FILE_SHARE_VALID_FLAGS, get_options ());
+		FILE_SHARE_VALID_FLAGS, options);
   if (!NT_SUCCESS (status))
     {
       __seterrno_from_nt_status (status);
       return -1;
     }
+
+  /* record prw_handle's asyncness for subsequent pread/pwrite operations */
+  prw_handle_isasync = !!aio;
   return 0;
 }
 
 ssize_t __reg3
-fhandler_disk_file::pread (void *buf, size_t count, off_t offset)
+fhandler_disk_file::pread (void *buf, size_t count, off_t offset, void *aio)
 {
+  struct aiocb *aiocb = (struct aiocb *) aio;
   ssize_t res;
 
   if ((get_flags () & O_ACCMODE) == O_WRONLY)
@@ -1560,10 +1570,16 @@ fhandler_disk_file::pread (void *buf, size_t count, off_t offset)
       NTSTATUS status;
       IO_STATUS_BLOCK io;
       LARGE_INTEGER off = { QuadPart:offset };
+      HANDLE evt = aio ? (HANDLE) aiocb->aio_wincb.event : NULL;
+      PIO_STATUS_BLOCK pio = aio ? (PIO_STATUS_BLOCK) &aiocb->aio_wincb : &io;
 
-      if (!prw_handle && prw_open (false))
+      /* If existing prw_handle asyncness doesn't match this call's, re-open */
+      if (prw_handle && (prw_handle_isasync != !!aio))
+	NtClose (prw_handle), prw_handle = NULL;
+
+      if (!prw_handle && prw_open (false, aio))
 	goto non_atomic;
-      status = NtReadFile (prw_handle, NULL, NULL, NULL, &io, buf, count,
+      status = NtReadFile (prw_handle, evt, NULL, NULL, pio, buf, count,
 			   &off, NULL);
       if (status == STATUS_END_OF_FILE)
 	res = 0;
@@ -1584,11 +1600,12 @@ fhandler_disk_file::pread (void *buf, size_t count, off_t offset)
 	      switch (mmap_is_attached_or_noreserve (buf, count))
 		{
 		case MMAP_NORESERVE_COMMITED:
-		  status = NtReadFile (prw_handle, NULL, NULL, NULL, &io,
+                  status = NtReadFile (prw_handle, evt, NULL, NULL, pio,
 				       buf, count, &off, NULL);
 		  if (NT_SUCCESS (status))
 		    {
-		      res = io.Information;
+		      res = aio ? (ssize_t) aiocb->aio_wincb.info
+                                : io.Information;
 		      goto out;
 		    }
 		  break;
@@ -1602,7 +1619,10 @@ fhandler_disk_file::pread (void *buf, size_t count, off_t offset)
 	  return -1;
 	}
       else
-	res = io.Information;
+	{
+	  res = aio ? (ssize_t) aiocb->aio_wincb.info : io.Information;
+	  goto out;
+	}
     }
   else
     {
@@ -1620,15 +1640,26 @@ non_atomic:
 	  else
 	    res = -1;
 	}
+
+      /* If this was a disallowed async request, simulate its conclusion */
+      if (aio)
+	{
+	  aiocb->aio_rbytes = res;
+	  aiocb->aio_errno = res == -1 ? get_errno () : 0;
+	  SetEvent ((HANDLE) aiocb->aio_wincb.event);
+	}
     }
 out:
-  debug_printf ("%d = pread(%p, %ld, %D)\n", res, buf, count, offset);
+  debug_printf ("%d = pread(%p, %ld, %D, %p)\n", res, buf, count, offset, aio);
   return res;
 }
 
 ssize_t __reg3
-fhandler_disk_file::pwrite (void *buf, size_t count, off_t offset)
+fhandler_disk_file::pwrite (void *buf, size_t count, off_t offset, void *aio)
 {
+  struct aiocb *aiocb = (struct aiocb *) aio;
+  ssize_t res;
+
   if ((get_flags () & O_ACCMODE) == O_RDONLY)
     {
       set_errno (EBADF);
@@ -1642,32 +1673,49 @@ fhandler_disk_file::pwrite (void *buf, size_t count, off_t offset)
       NTSTATUS status;
       IO_STATUS_BLOCK io;
       LARGE_INTEGER off = { QuadPart:offset };
+      HANDLE evt = aio ? (HANDLE) aiocb->aio_wincb.event : NULL;
+      PIO_STATUS_BLOCK pio = aio ? (PIO_STATUS_BLOCK) &aiocb->aio_wincb : &io;
 
-      if (!prw_handle && prw_open (true))
+      /* If existing prw_handle asyncness doesn't match this call's, re-open */
+      if (prw_handle && (prw_handle_isasync != !!aio))
+        NtClose (prw_handle), prw_handle = NULL;
+
+      if (!prw_handle && prw_open (true, aio))
 	goto non_atomic;
-      status = NtWriteFile (prw_handle, NULL, NULL, NULL, &io, buf, count,
+      status = NtWriteFile (prw_handle, evt, NULL, NULL, pio, buf, count,
 			    &off, NULL);
       if (!NT_SUCCESS (status))
 	{
 	  __seterrno_from_nt_status (status);
 	  return -1;
 	}
-      return io.Information;
+      res = aio ? (ssize_t) aiocb->aio_wincb.info : io.Information;
+      goto out;
     }
-
-non_atomic:
-  /* Text mode stays slow and non-atomic. */
-  int res;
-  off_t curpos = lseek (0, SEEK_CUR);
-  if (curpos < 0 || lseek (offset, SEEK_SET) < 0)
-    res = curpos;
   else
     {
-      res = (ssize_t) write (buf, count);
-      if (lseek (curpos, SEEK_SET) < 0)
-	res = -1;
+non_atomic:
+      /* Text mode stays slow and non-atomic. */
+      off_t curpos = lseek (0, SEEK_CUR);
+      if (curpos < 0 || lseek (offset, SEEK_SET) < 0)
+	res = curpos;
+      else
+	{
+	  res = (ssize_t) write (buf, count);
+	  if (lseek (curpos, SEEK_SET) < 0)
+	    res = -1;
+	}
+
+      /* If this was a disallowed async request, simulate its conclusion */
+      if (aio)
+	{
+	  aiocb->aio_rbytes = res;
+	  aiocb->aio_errno = res == -1 ? get_errno () : 0;
+	  SetEvent ((HANDLE) aiocb->aio_wincb.event);
+	}
     }
-  debug_printf ("%d = pwrite(%p, %ld, %D)\n", res, buf, count, offset);
+out:
+  debug_printf ("%d = pwrite(%p, %ld, %D, %p)\n", res, buf, count, offset, aio);
   return res;
 }
 
