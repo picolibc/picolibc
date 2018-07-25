@@ -1875,6 +1875,7 @@ fhandler_base::fpathconf (int v)
       set_errno (EINVAL);
       break;
     case _PC_ASYNC_IO:
+      return 1;
     case _PC_PRIO_IO:
       break;
     case _PC_SYNC_IO:
