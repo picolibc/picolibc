@@ -140,7 +140,7 @@ void	qsort (void *__base, size_t __nmemb, size_t __size, __compar_fn_t _compar);
 int	rand (void);
 void *	realloc (void *__r, size_t __size) _NOTHROW;
 #if __BSD_VISIBLE
-void	*reallocarray(void *, size_t, size_t) __result_use_check __alloc_size((2,3));
+void	*reallocarray(void *, size_t, size_t) __result_use_check __alloc_size2(2, 3);
 void *	reallocf (void *__r, size_t __size);
 #endif
 #if __BSD_VISIBLE || __XSI_VISIBLE >= 4
@@ -324,8 +324,8 @@ extern long double strtold (const char *__restrict, char **__restrict);
  * If we're in a mode greater than C99, expose C11 functions.
  */
 #if __ISO_C_VISIBLE >= 2011
-void *	aligned_alloc(size_t, size_t) __malloc_like __alloc_align((1))
-	    __alloc_size((2));
+void *	aligned_alloc(size_t, size_t) __malloc_like __alloc_align(1)
+	    __alloc_size(2);
 int	at_quick_exit(void (*)(void));
 _Noreturn void
 	quick_exit(int);
