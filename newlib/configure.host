@@ -47,6 +47,7 @@
 #   crt1_dir            directory where crt1 object is found
 #   have_crt0		"yes"/"no" if crt0 is/isn't provided.
 #			"" if crt0 is provided when sys_dir is set
+#   have_init_fini	have init/fini ("yes" or "no", set to "yes" by default)
 #   noinclude		list of include files to not install
 
 newlib_cflags=
@@ -65,6 +66,7 @@ mach_add_setjmp=
 crt1=
 crt1_dir=
 have_crt0=
+have_init_fini=yes
 use_libtool=no
 have_sys_mach_dir=no
 default_newlib_io_c99_formats=no
@@ -266,6 +268,7 @@ case "${host_cpu}" in
 	machine_dir=riscv
 	newlib_cflags="${newlib_cflags} -DHAVE_NANOSLEEP"
 	default_newlib_atexit_dynamic_alloc="no"
+	have_init_fini=no
 	;;
   rl78)
 	machine_dir=rl78
@@ -918,6 +921,11 @@ fi
 # Remove rpc headers if xdr_dir not specified
 if [ "x${xdr_dir}" = "x" ]; then
 	noinclude="${noinclude} rpc/types.h rpc/xdr.h"
+fi
+
+# Have init/finit if not explicitly specified otherwise
+if [ "x${have_init_fini}" != "xno" ]; then
+	newlib_cflags="${newlib_cflags} -DHAVE_INIT_FINI"
 fi
 
 if test -z "${have_crt0}" && test -n "${sys_dir}"; then
