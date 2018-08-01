@@ -157,12 +157,16 @@ ttb:
 	.align 2
 	.global	FUNCTION (_cpu_init_hook)
 	.type	FUNCTION (_cpu_init_hook), %function
+	.cfi_sections	.debug_frame
 FUNCTION (_cpu_init_hook):
-	sub	sp, sp, #16
-	str	x30, [sp, xzr]
+	.cfi_startproc
+	str	x30, [sp, -16]!
+	.cfi_def_cfa_offset 16
+	.cfi_offset 30, -16
 	bl	_init_vectors
 	bl	_flat_map
-	ldr	x30, [sp, xzr]
-	add	sp, sp, #16
+	ldr	x30, [sp], 16
+	.cfi_restore 30
 	ret
+	.cfi_endproc
 	.size	FUNCTION (_cpu_init_hook), .-FUNCTION (_cpu_init_hook)
