@@ -141,7 +141,11 @@ fegetexcept (void)
 int
 fegetenv (fenv_t *envp)
 {
-  __asm__ volatile ("fnstenv %0" : "=m" (envp->_fpu) : );
+  /* fnstenv disables all exceptions in the x87 FPU; as this is not what is
+     desired here, reload the cfg saved from the x87 FPU, back to the FPU */
+  __asm__ volatile ("fnstenv %0\n\
+                     fldenv %0"
+		    : "=m" (envp->_fpu) : );
   if (use_sse)
     __asm__ volatile ("stmxcsr %0" : "=m" (envp->_sse_mxcsr) : );
   return 0;
