@@ -54,3 +54,6 @@ Bug Fixes
 
 - Make FP environment symbols available on x86_64.
   Addresses: https://cygwin.com/ml/cygwin/2018-07/msg00183.html
+
+- Fix fegetenv behaviour.
+  Addresses: https://cygwin.com/ml/cygwin/2018-08/msg00000.html
