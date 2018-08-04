@@ -46,59 +46,34 @@
 #include "stdio_private.h"
 
 #if	!defined (SCANF_LEVEL)
-# ifndef SCANF_WWIDTH		/* use word for width variable	*/
-#  define SCANF_WWIDTH 0
-# endif
-# ifndef SCANF_BRACKET		/* use '%[' conversion	*/
-#  define SCANF_BRACKET	0
-# endif
-# ifndef SCANF_FLOAT		/* use float point conversion	*/
-#  define SCANF_FLOAT	0
-# endif
-#elif	SCANF_LEVEL == SCANF_MIN
-# define SCANF_WWIDTH	0
+#define SCANF_LEVEL SCANF_STD
+#endif
+
+#if	SCANF_LEVEL == SCANF_MIN
 # define SCANF_BRACKET	0
 # define SCANF_FLOAT	0
 #elif	SCANF_LEVEL == SCANF_STD
-# define SCANF_WWIDTH	0
 # define SCANF_BRACKET	1
 # define SCANF_FLOAT	0
+int vfscanf (FILE * stream, const char *fmt, va_list ap) __attribute__((weak));
 #elif	SCANF_LEVEL == SCANF_FLT
-# define SCANF_WWIDTH	1
 # define SCANF_BRACKET	1
 # define SCANF_FLOAT	1
 #else
 # error	 "Not a known scanf level."
 #endif
 
-#if	SCANF_WWIDTH
 typedef unsigned int width_t;
-#else
-typedef unsigned char width_t;
-#endif
 
-#ifndef	DISABLE_ASM
-# if	 defined(__AVR__) && __AVR__
-#  define DISABLE_ASM	0
-# else
-#  define DISABLE_ASM	1
-# endif
-#endif
-
-#if  SHRT_MAX != INT_MAX && 0
-# error  "SHRT_MAX != INT_MAX for target: not supported"
-#endif
-
-/* ATTENTION: check FL_CHAR first, not FL_LONG. The last is set
-   simultaneously.	*/
 #define FL_STAR	    0x01	/* '*': skip assignment		*/
 #define FL_WIDTH    0x02	/* width is present		*/
 #define FL_LONG	    0x04	/* 'long' type modifier		*/
 #define FL_CHAR	    0x08	/* 'char' type modifier		*/
-#define FL_OCT	    0x10	/* octal number			*/
-#define FL_DEC	    0x20	/* decimal number		*/
-#define FL_HEX	    0x40	/* hexidecimal number		*/
-#define FL_MINUS    0x80	/* minus flag (field or value)	*/
+#define FL_SHORT    0x10	/* 'short' type modifier	*/
+#define FL_OCT	    0x20	/* octal number			*/
+#define FL_DEC	    0x40	/* decimal number		*/
+#define FL_HEX	    0x80	/* hexidecimal number		*/
+#define FL_MINUS    0x100	/* minus flag (field or value)	*/
 
 #ifndef	__AVR_HAVE_LPMX__
 # if  defined(__AVR_ENHANCED__) && __AVR_ENHANCED__
@@ -116,13 +91,15 @@ typedef unsigned char width_t;
 
 __attribute__((noinline))
 ATTRIBUTE_CLIB_SECTION
-static void putval (void *addr, long val, unsigned char flags)
+static void putval (void *addr, long val, uint16_t flags)
 {
     if (!(flags & FL_STAR)) {
 	if (flags & FL_CHAR)
 	    *(char *)addr = val;
 	else if (flags & FL_LONG)
 	    *(long *)addr = val;
+	else if (flags & FL_SHORT)
+	    *(short *)addr = val;
 	else
 	    *(int *)addr = val;
     }
@@ -131,7 +108,7 @@ static void putval (void *addr, long val, unsigned char flags)
 __attribute__((noinline))
 ATTRIBUTE_CLIB_SECTION
 static unsigned long
-mulacc (unsigned long val, unsigned char flags, unsigned char c)
+mulacc (unsigned long val, uint16_t flags, unsigned char c)
 {
     unsigned char cnt;
 
@@ -140,34 +117,7 @@ mulacc (unsigned long val, unsigned char flags, unsigned char c)
     } else if (flags & FL_HEX) {
 	cnt = 4;
     } else {
-#if  DISABLE_ASM
 	val += (val << 2);
-#else
-	asm (
-# if  defined(__AVR_HAVE_MOVW__) && __AVR_HAVE_MOVW__
-	    "movw    r26, %A0		\n\t"
-	    "movw    r30, %C0		\n"
-# else
-	    "mov     r26, %A0		\n\t"
-	    "mov     r27, %B0		\n\t"
-	    "mov     r30, %C0		\n\t"
-	    "mov     r31, %D0		\n"
-# endif
-    "1:      lsl     r26		\n\t"
-	    "rol     r27		\n\t"
-	    "rol     r30		\n\t"
-	    "rol     r31		\n\t"
-	    "com     __zero_reg__	\n\t"
-	    "brne    1b			\n\t"
-	    "add     %A0, r26		\n\t"
-	    "adc     %B0, r27		\n\t"
-	    "adc     %C0, r30		\n\t"
-	    "adc     %D0, r31"
-	    : "=r"(val)
-	    : "0"(val)
-	    : "r26","r27","r30","r31"
-	);
-#endif
 	cnt = 1;
     }
 
@@ -178,7 +128,7 @@ mulacc (unsigned long val, unsigned char flags, unsigned char c)
 __attribute__((noinline))
 ATTRIBUTE_CLIB_SECTION
 static unsigned char
-conv_int (FILE *stream, width_t width, void *addr, unsigned char flags)
+conv_int (FILE *stream, width_t width, void *addr, uint16_t flags)
 {
     unsigned long val;
     int i;
@@ -338,34 +288,33 @@ conv_brk (FILE *stream, width_t width, char *addr, const char *fmt)
    Seems, GCC 4.3 does not use it also.	*/
 extern double __floatunsisf (unsigned long);
 
-PROGMEM static const float pwr_p10 [6] = {
+static const float pwr_p10 [6] = {
     1e+1, 1e+2, 1e+4, 1e+8, 1e+16, 1e+32
 };
-PROGMEM static const float pwr_m10 [6] = {
+static const float pwr_m10 [6] = {
     1e-1, 1e-2, 1e-4, 1e-8, 1e-16, 1e-32
 };
 
-PROGMEM static const char pstr_nfinity[] = "nfinity";
-PROGMEM static const char pstr_an[] = "an";
+static const char pstr_nfinity[] = "nfinity";
+static const char pstr_an[] = "an";
 
 __attribute__((noinline))
 ATTRIBUTE_CLIB_SECTION
 static unsigned char conv_flt (FILE *stream, width_t width, float *addr)
 {
-    union {
-	unsigned long u32;
-	float flt;
-    } x;
+    uint32_t u32;
+    float flt;
     int i;
     const char *p;
+    const float *f;
     int exp;
 
-    unsigned char flag;
-#define FL_MINUS    0x80	/* number is negative	*/
-#define FL_ANY	    0x02	/* any digit was readed	*/
-#define FL_OVFL	    0x04	/* overflow was		*/
-#define FL_DOT	    0x08	/* decimal '.' was	*/
-#define FL_MEXP	    0x10	/* exponent 'e' is neg.	*/
+    uint16_t flag;
+
+#define FL_ANY	    0x200	/* any digit was readed	*/
+#define FL_OVFL	    0x400	/* overflow was		*/
+#define FL_DOT	    0x800	/* decimal '.' was	*/
+#define FL_MEXP	    0x1000 	/* exponent 'e' is neg.	*/
 
     i = getc (stream);		/* after ungetc()	*/
 
@@ -403,12 +352,12 @@ static unsigned char conv_flt (FILE *stream, width_t width, float *addr)
 		}
 	    }
         }
-	x.flt = (p == pstr_an + 3) ? NAN : INFINITY;
+	flt = (p == pstr_an + 3) ? NAN : INFINITY;
 	break;
 
       default:
         exp = 0;
-	x.u32 = 0;
+	u32 = 0;
 	do {
 
 	    unsigned char c = i - '0';
@@ -421,8 +370,8 @@ static unsigned char conv_flt (FILE *stream, width_t width, float *addr)
 		} else {
 		    if (flag & FL_DOT)
 			exp -= 1;
-		    x.u32 = mulacc (x.u32, FL_DEC, c);
-		    if (x.u32 >= (ULONG_MAX - 9) / 10)
+		    u32 = mulacc (u32, FL_DEC, c);
+		    if (u32 >= (0xffffffffUL - 9) / 10)
 			flag |= FL_OVFL;
 	        }
 
@@ -463,30 +412,25 @@ static unsigned char conv_flt (FILE *stream, width_t width, float *addr)
 
 	if (width && i >= 0) ungetc (i, stream);
     
-	x.flt = __floatunsisf (x.u32);
+	flt = u32;
 
 	if (exp < 0) {
-	    p = (void *)(pwr_m10 + 5);
+	    f = pwr_m10 + 5;
 	    exp = -exp;
 	} else {
-	    p = (void *)(pwr_p10 + 5);
+	    f = pwr_p10 + 5;
 	}
 	for (width = 32; width; width >>= 1) {
 	    for (; (unsigned)exp >= width; exp -= width) {
-		union {
-		    long lo;
-		    float fl;
-		} y;
-		y.lo = *p;
-		x.flt *= y.fl;
+		flt *= *f;
 	    }
-	    p = (void *)p - sizeof(float);
+	    f--;
 	}
     } /* switch */
 
     if (flag & FL_MINUS)
-	x.flt = -x.flt;
-    if (addr) *addr = x.flt;
+	flt = -flt;
+    if (addr) *addr = flt;
     return 1;
 
   err:
@@ -648,7 +592,7 @@ int vfscanf (FILE * stream, const char *fmt, va_list ap)
     unsigned char c;
     width_t width;
     void *addr;
-    unsigned char flags;
+    uint16_t flags;
     int i;
 
     nconvs = 0;
@@ -696,16 +640,19 @@ int vfscanf (FILE * stream, const char *fmt, va_list ap)
 		width = ~0;
 	    }
 
-	    /* ATTENTION: with FL_CHAR the FL_LONG is set also.	*/
 	    switch (c) {
 	      case 'h':
-	        if ((c = *fmt++) != 'h')
+		if ((c = *fmt++) != 'h') {
+		    flags |= FL_SHORT;
 		    break;
+		}
 		flags |= FL_CHAR;
-		/* FALLTHROUGH */
+		c = *fmt++;
+		break;
 	      case 'l':
 		flags |= FL_LONG;
 		c = *fmt++;
+		break;
 	    }
 
 #define CNV_BASE	"cdinopsuxX"
@@ -720,7 +667,7 @@ int vfscanf (FILE * stream, const char *fmt, va_list ap)
 # define CNV_FLOAT	""
 #endif
 #define CNV_LIST	CNV_BASE CNV_BRACKET CNV_FLOAT
-	    if (!c || !strchr_P (PSTR (CNV_LIST), c))
+	    if (!c || !strchr (CNV_LIST, c))
 		break;
 
 	    addr = (flags & FL_STAR) ? 0 : va_arg (ap, void *);
