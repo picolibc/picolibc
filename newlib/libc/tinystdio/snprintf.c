@@ -39,10 +39,10 @@ int
 snprintf(char *s, size_t n, const char *fmt, ...)
 {
 	va_list ap;
-	FILE f;
+	struct __file_str f;
 	int i;
 
-	f.flags = __SWR | __SSTR;
+	f.file.flags = __SWR | __SSTR;
 	f.buf = s;
 	/* Restrict max output length to 32767, as snprintf() return
 	   signed int. The fputc() function uses a signed comparison
@@ -54,13 +54,13 @@ snprintf(char *s, size_t n, const char *fmt, ...)
 	f.size = n - 1;				/* -1,0,...32767 */
 
 	va_start(ap, fmt);
-	i = vfprintf(&f, fmt, ap);
+	i = vfprintf(&f.file, fmt, ap);
 	va_end(ap);
 
 	/* We use f.size (not 'n') as this is more effective: two 'ld'
 	   instructions vs. two 'push+pop' and 'movw'.	*/
 	if (f.size >= 0)
-		s[f.len < f.size ? f.len : f.size] = 0;
+		s[f.file.len < f.size ? f.file.len : f.size] = 0;
 
 	return i;
 }

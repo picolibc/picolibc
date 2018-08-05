@@ -40,16 +40,16 @@ int
 sprintf(char *s, const char *fmt, ...)
 {
 	va_list ap;
-	FILE f;
+	struct __file_str f;
 	int i;
 
-	f.flags = __SWR | __SSTR;
+	f.file.flags = __SWR | __SSTR;
 	f.buf = s;
 	f.size = INT_MAX;
 	va_start(ap, fmt);
-	i = vfprintf(&f, fmt, ap);
+	i = vfprintf(&f.file, fmt, ap);
 	va_end(ap);
-	s[f.len] = 0;
+	s[f.file.len] = 0;
 
 	return i;
 }

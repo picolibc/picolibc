@@ -42,8 +42,9 @@ fputc(int c, FILE *stream)
 		return EOF;
 
 	if (stream->flags & __SSTR) {
-		if (stream->len < stream->size)
-			*stream->buf++ = c;
+		struct __file_str *sstream = (struct __file_str *) stream;
+		if (stream->len < sstream->size)
+			*sstream->buf++ = c;
 		stream->len++;
 		return c;
 	} else {
