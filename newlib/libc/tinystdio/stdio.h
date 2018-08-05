@@ -394,7 +394,7 @@ extern "C" {
  * Doxygen documentation can be found in fdevopen.c.
  */
 
-extern struct __file *__iob[];
+extern struct __file *const __iob[];
 
 #if defined(__STDIO_FDEVOPEN_COMPAT_12)
 /*
