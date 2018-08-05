@@ -1,0 +1,13 @@
+Source: libnewlib-nano
+Priority: optional
+Maintainer: Keith Packard <keithp@keithp.com>
+Build-Depends: debhelper (>= 11), gcc-arm-none-eabi, meson, ninja-build
+Standards-Version: 4.1.3
+Section: devel
+
+Package: libnewlib-nano-arm-none-eabi
+Architecture: all
+Depends: ${misc:Depends}
+Description: Smaller embedded C library for arm development
+ Newlib with all of the shrinking options enabled and stdio
+ bits adapted from gcc-avr
