@@ -39,14 +39,14 @@ ATTRIBUTE_CLIB_SECTION
 int
 vsprintf(char *s, const char *fmt, va_list ap)
 {
-	FILE f;
+	struct __file_str f;
 	int i;
 
-	f.flags = __SWR | __SSTR;
+	f.file.flags = __SWR | __SSTR;
 	f.buf = s;
 	f.size = INT_MAX;
-	i = vfprintf(&f, fmt, ap);
-	s[f.len] = 0;
+	i = vfprintf(&f.file, fmt, ap);
+	s[f.file.len] = 0;
 
 	return i;
 }

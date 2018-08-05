@@ -40,10 +40,10 @@ int
 sscanf(const char *s, const char *fmt, ...)
 {
 	va_list ap;
-	FILE f;
+	struct __file_str f;
 	int i;
 
-	f.flags = __SRD | __SSTR;
+	f.file.flags = __SRD | __SSTR;
 	/*
 	 * It is OK to discard the "const" qualifier here.  f.buf is
 	 * non-const as in the generic case, this buffer is obtained
@@ -54,7 +54,7 @@ sscanf(const char *s, const char *fmt, ...)
 	 */
 	f.buf = (char *)s;
 	va_start(ap, fmt);
-	i = vfscanf(&f, fmt, ap);
+	i = vfscanf(&f.file, fmt, ap);
 	va_end(ap);
 
 	return i;

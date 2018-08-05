@@ -232,8 +232,8 @@
  * changed without warnings at any time.  Please do *never* reference
  * elements of it beyond by using the official interfaces provided.
  */
+
 struct __file {
-	char	*buf;		/* buffer pointer */
 	unsigned char unget;	/* ungetc() buffer */
 	uint8_t	flags;		/* flags, see below */
 #define __SRD	0x0001		/* OK to read */
@@ -250,11 +250,15 @@ struct __file {
 #define __SNBF	0x0400		/* unbuffered */
 #define __SMBF	0x0800		/* buf is from malloc */
 #endif
-	int	size;		/* size of buffer */
 	int	len;		/* characters read or written so far */
 	int	(*put)(char, struct __file *);	/* function to write one char to device */
 	int	(*get)(struct __file *);	/* function to read one char from device */
-	void	*udata;		/* User defined and accessible data. */
+};
+
+struct __file_str {
+	struct __file file;	/* main file struct */
+	char	*buf;		/* buffer pointer */
+	int	size;		/* size of buffer */
 };
 
 #endif /* not __DOXYGEN__ */

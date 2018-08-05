@@ -49,12 +49,13 @@ fgetc(FILE *stream)
 	}
 
 	if (stream->flags & __SSTR) {
-		rv = *stream->buf;
+		struct __file_str *sstream = (struct __file_str *) stream;
+		rv = *sstream->buf;
 		if (rv == '\0') {
 			stream->flags |= __SEOF;
 			return EOF;
 		} else {
-			stream->buf++;
+			sstream->buf++;
 		}
 	} else {
 		rv = stream->get(stream);
