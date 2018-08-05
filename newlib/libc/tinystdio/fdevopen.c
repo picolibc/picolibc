@@ -99,18 +99,11 @@ fdevopen(int (*put)(char, FILE *), int (*get)(FILE *))
 	if (get != 0) {
 		s->get = get;
 		s->flags |= __SRD;
-		if (stdin == 0)
-			stdin = s;
 	}
 
 	if (put != 0) {
 		s->put = put;
 		s->flags |= __SWR;
-		if (stdout == 0) {
-			stdout = s;
-			if (stderr == 0)
-				stderr = s;
-		}
 	}
 
 	return s;

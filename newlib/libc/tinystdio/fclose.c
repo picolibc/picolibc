@@ -48,15 +48,6 @@ fclose(FILE *stream)
 		 */
 		return 0;
 
-	/*
-	 * The standard streams are only aliases.  So if the stream to
-	 * be closed is also refered to by a standard stream name,
-	 * mark its slot as empty.
-	 */
-	for (i = 0; i < 3; i++)
-		if (__iob[i] == stream)
-			__iob[i] = 0;
-
 	free(stream);
 
 	return 0;
