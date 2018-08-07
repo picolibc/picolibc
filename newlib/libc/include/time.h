@@ -92,7 +92,7 @@ char      *strptime (const char *__restrict,
 				 const char *__restrict,
 				 struct tm *__restrict);
 #endif
-#if __GNU_VISIBLE
+#if __GNU_VISIBLE && __POSIX_VISIBLE >= 200809
 char *strptime_l (const char *__restrict, const char *__restrict,
 		  struct tm *__restrict, locale_t);
 #endif
