@@ -265,7 +265,7 @@ aiowaiter (void *unused)
     }
 }
 
-static int
+static ssize_t
 asyncread (struct aiocb *aio)
 { /* Try to initiate an asynchronous read, either from app or worker thread */
   ssize_t       res = 0;
@@ -296,7 +296,7 @@ asyncread (struct aiocb *aio)
   return res;
 }
 
-static int
+static ssize_t
 asyncwrite (struct aiocb *aio)
 { /* Try to initiate an asynchronous write, either from app or worker thread */
   ssize_t       res = 0;
@@ -712,7 +712,7 @@ aio_read (struct aiocb *aio)
       ; /* I think this is not possible */
     }
 
-  return res;
+  return res < 0 ? (int) res : 0; /* return 0 on success */
 }
 
 ssize_t
@@ -902,7 +902,7 @@ aio_write (struct aiocb *aio)
       ; /* I think this is not possible */
     }
 
-  return res;
+  return res < 0 ? (int) res : 0; /* return 0 on success */
 }
 
 int
