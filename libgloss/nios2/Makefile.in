@@ -1,0 +1,118 @@
+# Copyright (c) 1995, 1996, 2001 Cygnus Support  -*- mode:makefile -*-
+# Copyright (c) 2018, Mentor Graphics
+#
+# The authors hereby grant permission to use, copy, modify, distribute,
+# and license this software and its documentation for any purpose, provided
+# that existing copyright notices are retained in all copies and that this
+# notice is included verbatim in any distributions. No written agreement,
+# license, or royalty fee is required for any of the authorized uses.
+# Modifications to this software may be copyrighted by their authors
+# and need not follow the licensing terms described here, provided that
+# the new terms are clearly indicated on the first page of each file where
+# they apply.
+#
+
+DESTDIR =
+VPATH = @srcdir@
+srcdir = @srcdir@
+objdir = .
+srcroot = $(srcdir)/../..
+objroot = $(objdir)/../..
+
+prefix = @prefix@
+exec_prefix = @exec_prefix@
+
+host_alias = @host_alias@
+target_alias = @target_alias@
+program_transform_name = @program_transform_name@
+
+bindir = @bindir@
+libdir = @libdir@
+tooldir = $(exec_prefix)/$(target_alias)
+
+# Multilib support variables.
+# TOP is used instead of MULTI{BUILD,SRC}TOP.
+MULTIDIRS =
+MULTISUBDIR =
+MULTIDO = true
+MULTICLEAN = true
+
+INSTALL = @INSTALL@
+INSTALL_PROGRAM = @INSTALL_PROGRAM@
+INSTALL_DATA = @INSTALL_DATA@
+
+SHELL =	/bin/sh
+
+CC = @CC@
+
+AS = @AS@
+AR = @AR@
+LD = @LD@
+RANLIB = @RANLIB@
+AR_FLAGS = qv
+
+OBJDUMP = `if [ -f ${objroot}/../binutils/objdump ] ; \
+	then echo ${objroot}/../binutils/objdump ; \
+	else t='$(program_transform_name)'; echo objdump | sed -e $$t ; fi`
+OBJCOPY = `if [ -f ${objroot}/../binutils/objcopy ] ; \
+	then echo ${objroot}/../binutils/objcopy ; \
+	else t='$(program_transform_name)'; echo objcopy | sed -e $$t ; fi`
+
+# Linker scripts.
+
+BSP_SCRIPTS=	qemu-hosted.ld
+
+# Semihosting library.
+
+HOSTED_BSP=	libnios2.a
+HOSTED_OBJS=	io-gdb.o io-exit.o \
+		io-close.o io-fstat.o \
+		io-gettimeofday.o io-isatty.o io-lseek.o \
+		io-open.o io-read.o io-rename.o \
+		io-stat.o io-system.o io-time.o \
+		io-unlink.o io-write.o \
+		sbrk.o kill.o getpid.o
+
+# Host specific makefile fragment comes in here.
+@host_makefile_frag@
+
+all :: ${HOSTED_BSP}
+
+# Build semihosting library.
+crt0.o: crt0.S
+	$(CC) $(CFLAGS_FOR_TARGET) $(CFLAGS) -c $< -o $@
+io-nios2.o: io-nios2.S
+	$(CC) $(CFLAGS_FOR_TARGET) $(CFLAGS) -c $< -o $@
+$(HOSTED_OBJS): %.o: %.c io.h
+	$(CC) $(CFLAGS_FOR_TARGET) $(CFLAGS) -DHOSTED=1 $(INCLUDES) -c $< -o $@
+$(HOSTED_BSP): crt0.o io-nios2.o $(HOSTED_OBJS) $(OTHER_OBJS)
+	${AR} ${ARFLAGS} $@ $^
+	${RANLIB} $@
+
+
+.PHONY: install info dvi doc install-info clean-info
+install:: 
+	$(INSTALL_DATA) $(HOSTED_BSP) \
+		$(DESTDIR)$(tooldir)/lib${MULTISUBDIR}
+	for x in ${BSP_SCRIPTS}; do\
+	 ${INSTALL_DATA} ${srcdir}/$${x} $(DESTDIR)${tooldir}/lib${MULTISUBDIR}/$$x; \
+	done
+
+# target specific makefile fragment comes in here.
+@target_makefile_frag@
+
+clean mostlyclean:
+	rm -f a.out core *.i *~ *.a *.o *-test *.srec *.dis *.x *.map
+
+distclean maintainer-clean realclean: clean
+	rm -f Makefile config.cache config.log config.status
+
+info dvi doc:
+install-info:
+clean-info:
+
+Makefile: Makefile.in config.status @host_makefile_frag_path@ @target_makefile_frag_path@
+	$(SHELL) config.status
+
+config.status: configure
+	$(SHELL) config.status --recheck
