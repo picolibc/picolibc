@@ -411,4 +411,17 @@ sched_yield ()
   SwitchToThread ();
   return 0;
 }
+
+int
+sched_getcpu ()
+{
+  if (!wincap.has_processor_groups ())
+    return (int) GetCurrentProcessorNumber ();
+
+  PROCESSOR_NUMBER pnum;
+
+  GetCurrentProcessorNumberEx (&pnum);
+  return pnum.Group * __get_cpus_per_group () + pnum.Number;
 }
+
+} /* extern C */

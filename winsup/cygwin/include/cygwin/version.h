@@ -498,12 +498,13 @@ details. */
   327: Export pthread_tryjoin_np, pthread_timedjoin_np.
   328: Export aio_cancel, aio_error, aio_fsync, aio_read, aio_return,
        aio_suspend, aio_write, lio_listio.
+  329: Export sched_getcpu..
 
   Note that we forgot to bump the api for ualarm, strtoll, strtoull,
   sigaltstack, sethostname. */
 
 #define CYGWIN_VERSION_API_MAJOR 0
-#define CYGWIN_VERSION_API_MINOR 328
+#define CYGWIN_VERSION_API_MINOR 329
 
 /* There is also a compatibity version number associated with the shared memory
    regions.  It is incremented when incompatible changes are made to the shared

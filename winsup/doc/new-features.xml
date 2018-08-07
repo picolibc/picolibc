@@ -17,7 +17,7 @@ SO_RCVTIMEO and SO_SNDTIMEO socket options are now honored.
 </para></listitem>
 
 <listitem><para>
-New API: clearenv, pthread_tryjoin_np, pthread_timedjoin_np.
+New APIs: clearenv, pthread_tryjoin_np, pthread_timedjoin_np, sched_getcpu.
 </para></listitem>
 
 <listitem><para>
