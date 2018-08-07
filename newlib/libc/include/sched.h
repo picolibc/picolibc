@@ -90,6 +90,10 @@ int sched_yield( void );
 
 #endif /* _POSIX_THREADS or _POSIX_PRIORITY_SCHEDULING */
 
+#if __GNU_VISIBLE
+int sched_getcpu(void);
+#endif
+
 #ifdef __cplusplus
 }
 #endif
