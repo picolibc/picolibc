@@ -29,7 +29,7 @@
  * SUCH DAMAGE.
  *
  *	@(#)uio.h	8.5 (Berkeley) 2/22/94
- * $FreeBSD: head/sys/sys/_iovec.h 314436 2017-02-28 23:42:47Z imp $
+ * $FreeBSD: head/sys/sys/_iovec.h 326023 2017-11-20 19:43:44Z pfg $
  */
 
 #ifndef _SYS__IOVEC_H_

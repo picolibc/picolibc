@@ -29,7 +29,7 @@
  * SUCH DAMAGE.
  *
  *	@(#)socket.h	8.4 (Berkeley) 2/21/94
- * $FreeBSD: head/sys/sys/socket.h 314436 2017-02-28 23:42:47Z imp $
+ * $FreeBSD: head/sys/sys/socket.h 338136 2018-08-21 14:04:30Z tuexen $
  */
 
 #ifndef _SYS_SOCKET_H_

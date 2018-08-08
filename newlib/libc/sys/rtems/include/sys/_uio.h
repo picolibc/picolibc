@@ -29,7 +29,7 @@
  * SUCH DAMAGE.
  *
  *	@(#)uio.h	8.5 (Berkeley) 2/22/94
- * $FreeBSD$
+ * $FreeBSD: head/sys/sys/_uio.h 331621 2018-03-27 15:20:03Z brooks $
  */
 
 #ifndef _SYS__UIO_H_

@@ -29,7 +29,7 @@
  * SUCH DAMAGE.
  *
  *	@(#)termios.h	8.3 (Berkeley) 3/28/94
- * $FreeBSD: head/sys/sys/_termios.h 318780 2017-05-24 09:25:13Z kib $
+ * $FreeBSD: head/sys/sys/_termios.h 326023 2017-11-20 19:43:44Z pfg $
  */
 
 #ifndef _SYS__TERMIOS_H_

@@ -53,7 +53,7 @@
 /*
  *      @(#)netdb.h	8.1 (Berkeley) 6/2/93
  *      From: Id: netdb.h,v 8.9 1996/11/19 08:39:29 vixie Exp $
- * $FreeBSD: head/include/netdb.h 303428 2016-07-28 10:05:41Z ed $
+ * $FreeBSD: head/include/netdb.h 326695 2017-12-08 15:57:29Z pfg $
  */
 
 #ifndef _NETDB_H_

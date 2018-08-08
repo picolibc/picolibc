@@ -29,7 +29,7 @@
  * SUCH DAMAGE.
  *
  *	@(#)in.h	8.3 (Berkeley) 1/3/94
- * $FreeBSD: head/sys/netinet/in.h 316715 2017-04-11 19:20:20Z ae $
+ * $FreeBSD: head/sys/netinet/in.h 326023 2017-11-20 19:43:44Z pfg $
  */
 
 #ifndef _NETINET_IN_H_
