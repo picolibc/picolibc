@@ -17,7 +17,7 @@ char *cygpath (const char *s, ...);
 char *cygpath_rel (const char *cwd, const char *s, ...);
 bool is_exe (HANDLE);
 bool is_symlink (HANDLE);
-bool readlink (HANDLE, char *, int);
+bool readlink (HANDLE, char *, size_t);
 int get_word (HANDLE, int);
 int get_dword (HANDLE, int);
 bool from_fstab_line (mnt_t *m, char *line, bool user);

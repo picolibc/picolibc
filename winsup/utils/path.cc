@@ -181,7 +181,7 @@ out:
 
 /* Assumes is_symlink(fh) is true */
 bool
-readlink (HANDLE fh, char *path, int maxlen)
+readlink (HANDLE fh, char *path, size_t maxlen)
 {
   DWORD rv;
   char *buf, *cp;
@@ -225,7 +225,7 @@ readlink (HANDLE fh, char *path, int maxlen)
 	    return false;
 	  wcstombs (path, (wchar_t *) (cp + 2), wlen + 1);
 	}
-      else if (len + 1 > maxlen)
+      else if ((size_t) (len + 1) > maxlen)
 	return false;
       else
 	memcpy (path, cp, len);
@@ -243,7 +243,7 @@ readlink (HANDLE fh, char *path, int maxlen)
 	    return false;
 	  wcstombs (path, (wchar_t *) (cp + 2), wlen + 1);
 	}
-      else if (fi.nFileSizeLow - strlen (SYMLINK_COOKIE) > (unsigned) maxlen)
+      else if (fi.nFileSizeLow - strlen (SYMLINK_COOKIE) > maxlen)
 	return false;
       else
 	strcpy (path, cp);
@@ -778,7 +778,7 @@ rel_vconcat (const char *cwd, const char *s, va_list v)
       cwd = pathbuf;
     }
 
-  int max_len = 0;
+  size_t max_len = 0;
   mnt_t *m, *match = NULL;
 
   for (m = mount_table; m->posix; m++)
