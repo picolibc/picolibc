@@ -1795,17 +1795,13 @@ dump_sysinfo ()
 	printf ("%7dMb %3d%% ", (int) capacity_mb, (int) percent_full);
       else
 	printf ("    N/A    N/A ");
-      printf ("%s %s %s %s %s %s  %s\n",
+      printf ("%s %s %s %s %s %s %s  %s\n",
 	      flags & FS_CASE_IS_PRESERVED ? "CP" : "  ",
 	      flags & FS_CASE_SENSITIVE ? "CS" : "  ",
 	      flags & FS_UNICODE_STORED_ON_DISK ? "UN" : "  ",
 	      flags & FS_PERSISTENT_ACLS ? "PA" : "  ",
 	      flags & FS_FILE_COMPRESSION ? "FC" : "  ",
 	      flags & FS_VOL_IS_COMPRESSED ? "VC" : "  ",
-	      flags & FILE_SUPPORTS_ENCRYPTION ? "EN" : "  ",
-	      flags & FILE_SUPPORTS_OBJECT_IDS ? "OI" : "  ",
-	      flags & FILE_SUPPORTS_REPARSE_POINTS ? "RP" : "  ",
-	      flags & FILE_SUPPORTS_SPARSE_FILES ? "SP" : "  ",
 	      flags & FILE_VOLUME_QUOTAS ? "QU" : "  ",
 	      name);
     }
