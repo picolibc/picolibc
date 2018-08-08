@@ -48,10 +48,6 @@ fputc(int c, FILE *stream)
 		stream->len++;
 		return c;
 	} else {
-		if (stream->put(c, stream) == 0) {
-			stream->len++;
-			return c;
-		} else
-			return EOF;
+		return stream->put(c, stream);
 	}
 }
