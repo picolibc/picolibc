@@ -15,6 +15,7 @@
 #include <sys/uio.h>
 #include <reent.h>
 #include <signal.h>
+#include <stdlib.h>
 #include <time.h>
 #include <unistd.h>
 #include <machine/_arc4random.h>
@@ -32,6 +33,7 @@ RTEMS_STUB(void *,realloc(void* p, size_t s), { return 0; })
 RTEMS_STUB(void, free(void* ptr), { })
 RTEMS_STUB(void *, calloc(size_t s1, size_t s2), { return 0; })
 RTEMS_STUB(int, posix_memalign(void **p, size_t si, size_t s2), { return -1; })
+RTEMS_STUB(void *, aligned_alloc(size_t s1, size_t s2), { return 0; })
 
 /* Stubs for routines from RTEMS <sys/lock.h> */
 RTEMS_STUB(void, _Mutex_Acquire(struct _Mutex_Control *p), { })
@@ -189,7 +191,7 @@ RTEMS_STUB(int, issetugid (void), { return 0; })
 RTEMS_STUB(void *, _realloc_r(struct _reent *r, void *p, size_t s), { return 0; })
 RTEMS_STUB(void *, _calloc_r(struct _reent *r, size_t s1, size_t s2), { return 0; })
 RTEMS_STUB(void *, _malloc_r(struct _reent * r, size_t s), { return 0; })
-RTEMS_STUB(void, _free_r(struct _reent *r, void **p), { })
+RTEMS_STUB(void, _free_r(struct _reent *r, void *p), { })
 
 /* stubs for functions required by libc/stdlib */
 RTEMS_STUB(void, __assert_func(const char *file, int line, const char *failedexpr), { })
