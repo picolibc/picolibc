@@ -640,32 +640,6 @@ int	getsourcefilter(int, uint32_t, struct sockaddr *, socklen_t,
 
 #endif /* __BSD_VISIBLE */
 
-#ifdef _KERNEL
-
-struct ifnet; struct mbuf;	/* forward declarations for Standard C */
-struct in_ifaddr;
-
-int	 in_broadcast(struct in_addr, struct ifnet *);
-int	 in_ifaddr_broadcast(struct in_addr, struct in_ifaddr *);
-int	 in_canforward(struct in_addr);
-int	 in_localaddr(struct in_addr);
-int	 in_localip(struct in_addr);
-int	 in_ifhasaddr(struct ifnet *, struct in_addr);
-int	 inet_aton(const char *, struct in_addr *); /* in libkern */
-char	*inet_ntoa_r(struct in_addr ina, char *buf); /* in libkern */
-char	*inet_ntop(int, const void *, char *, socklen_t); /* in libkern */
-int	 inet_pton(int af, const char *, void *); /* in libkern */
-void	 in_ifdetach(struct ifnet *);
-
-#define	in_hosteq(s, t)	((s).s_addr == (t).s_addr)
-#define	in_nullhost(x)	((x).s_addr == INADDR_ANY)
-#define	in_allhosts(x)	((x).s_addr == htonl(INADDR_ALLHOSTS_GROUP))
-
-#define	satosin(sa)	((struct sockaddr_in *)(sa))
-#define	sintosa(sin)	((struct sockaddr *)(sin))
-#define	ifatoia(ifa)	((struct in_ifaddr *)(ifa))
-#endif /* _KERNEL */
-
 /* INET6 stuff */
 #if __POSIX_VISIBLE >= 200112
 #define	__KAME_NETINET_IN_H_INCLUDED_
@@ -673,4 +647,8 @@ void	 in_ifdetach(struct ifnet *);
 #undef __KAME_NETINET_IN_H_INCLUDED_
 #endif
 
+#ifdef _KERNEL
+/* Header file provided outside of Newlib */
+#include <machine/_kernel_in.h>
+#endif
 #endif /* !_NETINET_IN_H_*/
