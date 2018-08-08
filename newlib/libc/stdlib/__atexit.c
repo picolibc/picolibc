@@ -89,22 +89,12 @@ __register_exitproc (int type,
     }
   if (p->_ind >= _ATEXIT_SIZE)
     {
-#ifndef _ATEXIT_DYNAMIC_ALLOC
+#if !defined (_ATEXIT_DYNAMIC_ALLOC) || !defined (MALLOC_PROVIDED)
 #ifndef __SINGLE_THREAD__
       __lock_release_recursive(__atexit_recursive_mutex);
 #endif
       return -1;
 #else
-      /* Don't dynamically allocate the atexit array if malloc is not
-	 available.  */
-      if (!malloc)
-	{
-#ifndef __SINGLE_THREAD__
-	  __lock_release_recursive(__atexit_recursive_mutex);
-#endif
-	  return -1;
-	}
-
       p = (struct _atexit *) malloc (sizeof *p);
       if (p == NULL)
 	{
