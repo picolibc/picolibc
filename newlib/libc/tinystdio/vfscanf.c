@@ -588,7 +588,6 @@ ATTRIBUTE_CLIB_SECTION
 int vfscanf (FILE * stream, const char *fmt, va_list ap)
 {
     unsigned char nconvs;
-    unsigned char stream_flags;
     unsigned char c;
     width_t width;
     void *addr;
