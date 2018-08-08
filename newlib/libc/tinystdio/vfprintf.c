@@ -324,7 +324,7 @@ int vfprintf (FILE * stream, const char *fmt, va_list ap)
 	    int n;
 	    unsigned char vtype;	/* result of float value parse	*/
 	    unsigned char sign;		/* sign character (or 0)	*/
-# define ndigs	c		/* only for this block, undef is below	*/
+	    unsigned char ndigs;	/* number of digits to convert */
 
 	    flags &= ~FL_FLTUPP;
 
@@ -336,20 +336,16 @@ int vfprintf (FILE * stream, const char *fmt, va_list ap)
 		flags |= FL_FLTEXP;
 	    else if (c == 'f')
 		flags |= FL_FLTFIX;
-	    else if (prec > 0)
-		prec -= 1;
 
-	    if (flags & FL_FLTFIX) {
-		vtype = 7;		/* 'prec' arg for 'ftoa_engine'	*/
-		ndigs = prec < 60 ? prec + 1 : 60;
-	    } else {
-		if (prec > 7) prec = 7;
-		vtype = prec;
+	    /* number of digits past the decimal for 'f' format */
+	    if (flags & FL_FLTFIX)
+		ndigs = prec < FTOA_MAX_DIG ? prec : FTOA_MAX_DIG;
+	    else
 		ndigs = 0;
-	    }
-	    exp = __ftoa_engine (va_arg(ap,double), (char *)buf, vtype, ndigs);
+
+	    exp = __ftoa_engine (va_arg(ap,double), (char *)buf, prec, ndigs);
 	    vtype = buf[0];
-    
+
 	    sign = 0;
 	    if ((vtype & FTOA_MINUS) && !(vtype & FTOA_NAN))
 		sign = '-';
@@ -389,35 +385,28 @@ int vfprintf (FILE * stream, const char *fmt, va_list ap)
 	    }
 
 	    /* Output format adjustment, number of decimal digits in buf[] */
-	    if (flags & FL_FLTFIX) {
-		ndigs += exp;
-		if ((vtype & FTOA_CARRY) && buf[1] == '1')
-		    ndigs -= 1;
-		if ((signed char)ndigs < 1)
-		    ndigs = 1;
-		else if (ndigs > 8)
-		    ndigs = 8;
-	    } else if (!(flags & FL_FLTEXP)) {		/* 'g(G)' format */
-		if (exp <= prec && exp >= -4)
+
+	    if (!(flags & (FL_FLTEXP|FL_FLTFIX))) {		/* 'g(G)' format */
+		if (exp <= prec && exp >= -4) {
 		    flags |= FL_FLTFIX;
-		while (prec && buf[1+prec] == '0')
-		    prec--;
-		if (flags & FL_FLTFIX) {
-		    ndigs = prec + 1;		/* number of digits in buf */
-		    prec = prec > exp
-			   ? prec - exp : 0;	/* fractional part length  */
+		    /* XXX this may mis-round the output */
+		    ndigs = prec < FTOA_MAX_DIG ? prec : FTOA_MAX_DIG;
+		} else {
+		    /* remove trailing zeros */
+		    while (prec && buf[1+prec] == '0')
+			prec--;
 		}
 	    }
-    
+
 	    /* Conversion result length, width := free space length	*/
 	    if (flags & FL_FLTFIX)
 		n = (exp>0 ? exp+1 : 1);
 	    else
 		n = 5;		/* 1e+00 */
 	    if (sign) n += 1;
-	    if (prec) n += prec + 1;
+	    if (prec) n += prec;
 	    width = width > n ? width - n : 0;
-    
+
 	    /* Output before first digit	*/
 	    if (!(flags & (FL_LPAD | FL_ZFILL))) {
 		while (width) {
@@ -434,25 +423,42 @@ int vfprintf (FILE * stream, const char *fmt, va_list ap)
 	    }
     
 	    if (flags & FL_FLTFIX) {		/* 'f' format		*/
+		char out;
 
+		/* At this point, we should have
+		 *
+		 *	exp	exponent of leftmost digit in buf
+		 *	ndigs	number of buffer digits to print
+		 *	prec	number of digits after decimal
+		 *
+		 * In the loop, 'n' walks over the exponent value
+		 */
 		n = exp > 0 ? exp : 0;		/* exponent of left digit */
 		do {
+
+		    /* Insert decimal point at correct place */
 		    if (n == -1)
 			putc ('.', stream);
-		    flags = (n <= exp && n > exp - ndigs)
-			    ? buf[exp - n + 1] : '0';
+
+		    /* Pull digits from buffer when in-range,
+		     * otherwise use 0
+		     */
+		    if (0 <= exp - n && exp - n < ndigs)
+			out = buf[exp - n + 1];
+		    else
+			out = '0';
 		    if (--n < -prec)
 			break;
-		    putc (flags, stream);
+		    putc (out, stream);
 		} while (1);
 		if (n == exp
 		    && (buf[1] > '5'
 		        || (buf[1] == '5' && !(vtype & FTOA_CARRY))) )
 		{
-		    flags = '1';
+		    out = '1';
 		}
-		putc (flags, stream);
-	
+		putc (out, stream);
+
 	    } else {				/* 'e(E)' format	*/
 
 		/* mantissa	*/
@@ -463,7 +469,8 @@ int vfprintf (FILE * stream, const char *fmt, va_list ap)
 		    putc ('.', stream);
 		    sign = 2;
 		    do {
-			putc (buf[sign++], stream);
+			putc (sign < FTOA_MAX_DIG + 1 ? buf[sign] : '0', stream);
+			sign++;
 		    } while (--prec);
 		}
 

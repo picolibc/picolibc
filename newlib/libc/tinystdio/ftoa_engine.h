@@ -32,6 +32,9 @@
 #define	_FTOA_ENGINE_H
 
 #include <stdint.h>
+#include <float.h>
+
+#define FTOA_MAX_DIG	(__FLT_DIG__ + 1)
 
 int __ftoa_engine (float val, char *buf,
                    uint8_t prec, uint8_t maxdgs);
