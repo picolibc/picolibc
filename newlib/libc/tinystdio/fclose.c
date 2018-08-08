@@ -39,8 +39,6 @@ ATTRIBUTE_CLIB_SECTION
 int
 fclose(FILE *stream)
 {
-	uint8_t i;
-
 	if (!(stream->flags & __SMALLOC))
 		/*
 		 * If the stream had not been malloc()ed, this is
