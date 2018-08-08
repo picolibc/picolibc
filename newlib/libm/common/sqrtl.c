@@ -123,7 +123,7 @@ long double
 sqrtl (long double x)
 {
   union ieee_ext_u ux = { .extu_ld = x, };
-  int k, r;
+  int k;
   long double lo, xn;
 
   /* If x = NaN, then sqrt(x) = NaN.  */

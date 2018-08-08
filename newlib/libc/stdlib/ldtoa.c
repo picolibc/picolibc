@@ -412,8 +412,10 @@ static void eaddm (short unsigned int *x, short unsigned int *y);
 static void esubm (short unsigned int *x, short unsigned int *y);
 static void emdnorm (short unsigned int *s, int lost, int subflg,
 		     long int exp, int rcntrl, LDPARMS * ldp);
+#if 0 /* Broken, unusable implementation of strtold */
 static int asctoeg (char *ss, short unsigned int *y, int oprec,
 		    LDPARMS * ldp);
+#endif
 static void enan (short unsigned int *nan, int size);
 #if LDBL_MANT_DIG == 24
 static void toe24 (short unsigned int *x, short unsigned int *y);
@@ -1834,6 +1836,7 @@ e113toe (short unsigned int *pe, short unsigned int *y, LDPARMS * ldp)
 
 /* move out internal format to ieee long double */
 static void
+__attribute__ ((__unused__))
 toe113 (short unsigned int *a, short unsigned int *b)
 {
   register unsigned short *p, *q;
@@ -1970,6 +1973,7 @@ e64toe (short unsigned int *pe, short unsigned int *y, LDPARMS * ldp)
 
 /* move out internal format to ieee long double */
 static void
+__attribute__ ((__unused__))
 toe64 (short unsigned int *a, short unsigned int *b)
 {
   register unsigned short *p, *q;
@@ -2150,6 +2154,7 @@ etoe53 (x, e)
 }
 
 static void
+__attribute__ ((__unused__))
 toe53 (x, y)
      unsigned short *x, *y;
 {
@@ -2159,6 +2164,7 @@ toe53 (x, y)
 #else
 
 static void
+__attribute__ ((__unused__))
 toe53 (short unsigned int *x, short unsigned int *y)
 {
   unsigned short i;
@@ -2327,6 +2333,7 @@ e24toe (short unsigned int *pe, short unsigned int *y, LDPARMS * ldp)
 }
 
 static void
+__attribute__ ((__unused__))
 toe24 (short unsigned int *x, short unsigned int *y)
 {
   unsigned short i;

@@ -205,6 +205,7 @@ opt_barrier_double (double x)
   volatile double y = x;
   return y;
 }
+#pragma GCC diagnostic ignored "-Wunused-variable"
 static inline void
 force_eval_float (float x)
 {
@@ -215,6 +216,7 @@ force_eval_double (double x)
 {
   volatile double y = x;
 }
+#pragma GCC diagnostic pop
 #endif
 
 /* Evaluate an expression as the specified type, normally a type

@@ -421,7 +421,7 @@ __SVFSCANF_R (struct _reent *rptr,
   int nbytes = 1;               /* number of bytes read from fmt string */
   wchar_t wc;                   /* wchar to use to read format string */
   wchar_t *wcp;                 /* handy wide character pointer */
-  size_t mbslen;                /* length of converted multibyte sequence */
+  size_t mbslen = 0;            /* length of converted multibyte sequence */
 #ifdef _MB_CAPABLE
   mbstate_t state;              /* value to keep track of multibyte state */
 #endif
