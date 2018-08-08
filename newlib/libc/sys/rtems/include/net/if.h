@@ -579,13 +579,6 @@ struct ifrsshash {
 
 #endif /* __BSD_VISIBLE */
 
-#ifdef _KERNEL
-#ifdef MALLOC_DECLARE
-MALLOC_DECLARE(M_IFADDR);
-MALLOC_DECLARE(M_IFMADDR);
-#endif
-#endif
-
 #ifndef _KERNEL
 struct if_nameindex {
 	unsigned int	if_index;	/* 1, 2, ... */
@@ -598,5 +591,9 @@ char			*if_indextoname(unsigned int, char *);
 struct if_nameindex	*if_nameindex(void);
 unsigned int		 if_nametoindex(const char *);
 __END_DECLS
+#endif
+#ifdef _KERNEL
+/* Header file provided outside of Newlib */
+#include <machine/_kernel_if.h>
 #endif
 #endif /* !_NET_IF_H_ */
