@@ -327,7 +327,8 @@ locale, hard-coding the "C" locale settings.
 	*len_ret = 0;
       return buf;
     }
-#   define _ctloc(x)    (ctloc = __ctloc (ctlocbuf, _CurrentTimeLocale->x))
+#   define _ctloc(x)    (ctloc = __ctloc (ctlocbuf, _CurrentTimeLocale->x, \
+					  &ctloclen))
 #  endif
 #endif  /* MAKE_WCSFTIME */
 
