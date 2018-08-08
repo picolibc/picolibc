@@ -93,7 +93,7 @@
 #define	ICRNL		0x00000100	/* map CR to NL (ala CRMOD) */
 #define	IXON		0x00000200	/* enable output flow control */
 #define	IXOFF		0x00000400	/* enable input flow control */
-#if __XSI_VISIBLE || __POSIX_VISIBLE >= 200809
+#if __BSD_VISIBLE || __XSI_VISIBLE || __POSIX_VISIBLE >= 200809
 #define	IXANY		0x00000800	/* any char will restart after stop */
 #endif
 #if __BSD_VISIBLE
@@ -104,7 +104,7 @@
  * Output flags - software output processing
  */
 #define	OPOST		0x00000001	/* enable following output processing */
-#if __XSI_VISIBLE
+#if __BSD_VISIBLE || __XSI_VISIBLE
 #define	ONLCR		0x00000002	/* map NL to CR-NL (ala CRMOD) */
 #endif
 #if __BSD_VISIBLE
@@ -113,7 +113,7 @@
 #define	    TAB3	    0x00000004	    /* expand tabs to spaces */
 #define	ONOEOT		0x00000008	/* discard EOT's (^D) on output) */
 #endif
-#if __XSI_VISIBLE
+#if __BSD_VISIBLE || __XSI_VISIBLE
 #define	OCRNL		0x00000010	/* map CR to NL on output */
 #define	ONOCR		0x00000020	/* no CR output at column 0 */
 #define	ONLRET		0x00000040	/* NL performs CR function */
