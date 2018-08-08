@@ -83,7 +83,7 @@ int __ftoa_engine(float val, char *buf, uint8_t precision, uint8_t maxDecimals)
     } x;
     x.v = val;
     uint32_t frac = x.u & 0x007fffffUL;
-    if (precision>7) precision=7;
+    if (precision > FTOA_MAX_DIG) precision=FTOA_MAX_DIG;
     // Read the sign, shift the exponent in place and delete it from frac.
     if (x.u & (1 << 31)) flags = FTOA_MINUS; else flags = 0;
     uint8_t exp = (x.u >> 24) << 1;
@@ -122,13 +122,8 @@ int __ftoa_engine(float val, char *buf, uint8_t precision, uint8_t maxDecimals)
     do {
         char digit = '0';
         while(1) {// find the first nonzero digit or any of the next digits.
-            while ((prod -= decimal) >= 0)
-                digit++;
-            // Now we got too low. Fix it by adding again, once.
-            // it might appear more efficient to check before subtract, or
-            // to save and restore last nonnegative value - but in fact
-            // they take as long time and more space.
-            prod += decimal;
+	    digit += prod / decimal;
+	    prod = prod % decimal;
             decimal /= 10;
             // If already found a leading nonzero digit, accept zeros.
             if (hadNonzeroDigit) break;
@@ -153,8 +148,6 @@ int __ftoa_engine(float val, char *buf, uint8_t precision, uint8_t maxDecimals)
                 maxDecimals = maxDecimals+beforeDP-1;
                 if (precision > maxDecimals)
                     precision = maxDecimals;
-            } else {
-                precision++;                            // Output one more digit than the param value.
             }
             break;
         }
