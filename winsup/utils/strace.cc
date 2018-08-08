@@ -635,7 +635,7 @@ handle_output_debug_string (DWORD id, LPVOID p, unsigned mask, FILE *ofile)
     {
       s -= 8;
 #ifdef __x86_64__
-      sprintf (s, "%012I64x", n);
+      sprintf (s, "%012llx", n);
 #else
       sprintf (s, "%08lx", n);
 #endif
