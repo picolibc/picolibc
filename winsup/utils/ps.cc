@@ -223,11 +223,11 @@ main (int argc, char *argv[])
       }
 
   if (sflag)
-    printf (dtitle);
+    fputs (dtitle, stdout);
   else if (fflag)
-    printf (ftitle);
+    fputs (ftitle, stdout);
   else if (lflag)
-    printf (ltitle);
+    fputs (ltitle, stdout);
 
   (void) cygwin_internal (CW_LOCK_PINFO, 1000);
 
