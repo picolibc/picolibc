@@ -113,14 +113,6 @@ typedef	__uintptr_t	uintptr_t;
  */
 #define	SOCK_CLOEXEC	0x10000000
 #define	SOCK_NONBLOCK	0x20000000
-#ifdef _KERNEL
-/*
- * Flags for accept1(), kern_accept4() and solisten_dequeue, in addition
- * to SOCK_CLOEXEC and SOCK_NONBLOCK.
- */
-#define ACCEPT4_INHERIT 0x1
-#define ACCEPT4_COMPAT  0x2
-#endif	/* _KERNEL */
 #endif	/* __BSD_VISIBLE */
 
 /*
@@ -455,18 +447,12 @@ struct msghdr {
 #define	MSG_NBIO	 0x00004000	/* FIONBIO mode, used by fifofs */
 #define	MSG_COMPAT       0x00008000		/* used in sendit() */
 #endif
-#ifdef _KERNEL
-#define	MSG_SOCALLBCK    0x00010000	/* for use by socket callbacks - soreceive (TCP) */
-#endif
 #if __POSIX_VISIBLE >= 200809
 #define	MSG_NOSIGNAL	 0x00020000	/* do not generate SIGPIPE on EOF */
 #endif
 #if __BSD_VISIBLE
 #define	MSG_CMSG_CLOEXEC 0x00040000	/* make received fds close-on-exec */
 #define	MSG_WAITFORONE	 0x00080000	/* for recvmmsg() */
-#endif
-#ifdef _KERNEL
-#define	MSG_MORETOCOME	 0x00100000	/* additional data pending */
 #endif
 
 /*
@@ -555,10 +541,6 @@ struct sockcred {
 #define	CMSG_LEN(l)		(_ALIGN(sizeof(struct cmsghdr)) + (l))
 #endif
 
-#ifdef _KERNEL
-#define	CMSG_ALIGN(n)	_ALIGN(n)
-#endif
-
 /* "Socket"-level control message types: */
 #define	SCM_RIGHTS	0x01		/* access rights (array of int) */
 #if __BSD_VISIBLE
@@ -639,10 +621,6 @@ struct sf_hdtr {
 #define	SF_NOCACHE	0x00000010
 #define	SF_FLAGS(rh, flags)	(((rh) << 16) | (flags))
 
-#ifdef _KERNEL
-#define	SF_READAHEAD(flags)	((flags) >> 16)
-#endif /* _KERNEL */
-
 /*
  * Sendmmsg/recvmmsg specific structure(s)
  */
@@ -696,36 +674,7 @@ __END_DECLS
 #endif /* !_KERNEL */
 
 #ifdef _KERNEL
-struct socket;
-
-struct tcpcb *so_sototcpcb(struct socket *so);
-struct inpcb *so_sotoinpcb(struct socket *so);
-struct sockbuf *so_sockbuf_snd(struct socket *);
-struct sockbuf *so_sockbuf_rcv(struct socket *);
-
-int so_state_get(const struct socket *);
-void so_state_set(struct socket *, int);
-
-int so_options_get(const struct socket *);
-void so_options_set(struct socket *, int);
-
-int so_error_get(const struct socket *);
-void so_error_set(struct socket *, int);
-
-int so_linger_get(const struct socket *);
-void so_linger_set(struct socket *, int);
-
-struct protosw *so_protosw_get(const struct socket *);
-void so_protosw_set(struct socket *, struct protosw *);
-
-void so_sorwakeup_locked(struct socket *so);
-void so_sowwakeup_locked(struct socket *so);
-
-void so_sorwakeup(struct socket *so);
-void so_sowwakeup(struct socket *so);
-
-void so_lock(struct socket *so);
-void so_unlock(struct socket *so);
-
-#endif /* _KERNEL */
+/* Header file provided outside of Newlib */
+#include <machine/_kernel_socket.h>
+#endif
 #endif /* !_SYS_SOCKET_H_ */
