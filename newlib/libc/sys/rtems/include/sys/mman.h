@@ -197,54 +197,7 @@ typedef	__size_t	size_t;
 #define	_SIZE_T_DECLARED
 #endif
 
-#if defined(_KERNEL) || defined(_WANT_FILE)
-#include <sys/lock.h>
-#include <sys/mutex.h>
-#include <sys/queue.h>
-#include <sys/rangelock.h>
-#include <vm/vm.h>
-
-struct file;
-
-struct shmfd {
-	size_t		shm_size;
-	vm_object_t	shm_object;
-	int		shm_refs;
-	uid_t		shm_uid;
-	gid_t		shm_gid;
-	mode_t		shm_mode;
-	int		shm_kmappings;
-
-	/*
-	 * Values maintained solely to make this a better-behaved file
-	 * descriptor for fstat() to run on.
-	 */
-	struct timespec	shm_atime;
-	struct timespec	shm_mtime;
-	struct timespec	shm_ctime;
-	struct timespec	shm_birthtime;
-	ino_t		shm_ino;
-
-	struct label	*shm_label;		/* MAC label */
-	const char	*shm_path;
-
-	struct rangelock shm_rl;
-	struct mtx	shm_mtx;
-};
-#endif
-
-#ifdef _KERNEL
-int	shm_map(struct file *fp, size_t size, off_t offset, void **memp);
-int	shm_unmap(struct file *fp, void *mem, size_t size);
-
-int	shm_access(struct shmfd *shmfd, struct ucred *ucred, int flags);
-struct shmfd *shm_alloc(struct ucred *ucred, mode_t mode);
-struct shmfd *shm_hold(struct shmfd *shmfd);
-void	shm_drop(struct shmfd *shmfd);
-int	shm_dotruncate(struct shmfd *shmfd, off_t length);
-
-extern struct fileops shm_ops;
-#else /* !_KERNEL */
+#ifndef _KERNEL
 
 __BEGIN_DECLS
 /*
@@ -279,4 +232,8 @@ __END_DECLS
 
 #endif /* !_KERNEL */
 
+#ifdef _KERNEL
+/* Header file provided outside of Newlib */
+#include <machine/_kernel_mman.h>
+#endif
 #endif /* !_SYS_MMAN_H_ */
