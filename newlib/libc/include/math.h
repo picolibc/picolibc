@@ -4,7 +4,7 @@
 
 #include <sys/reent.h>
 #include <sys/cdefs.h>
-#include <machine/ieeefp.h>
+#include <ieeefp.h>
 #include "_ansi.h"
 
 _BEGIN_STD_C

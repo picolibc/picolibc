@@ -3,6 +3,7 @@
 
 #include <machine/ieeefp.h>  /* floating point macros */
 #include <sys/features.h>	/* POSIX defs */
+#include <float.h>
 
 #ifdef __aarch64__
 #define MALLOC_ALIGNMENT 16
@@ -295,6 +296,15 @@
 #ifdef _MB_EXTENDED_CHARSETS_ALL
 #define _MB_EXTENDED_CHARSETS_ISO 1
 #define _MB_EXTENDED_CHARSETS_WINDOWS 1
+#endif
+
+/* Figure out if long double is the same size as double. If the system
+ * doesn't provide long double, then those values will be undefined
+ * and cpp will substitute 0 for them in the test
+ */
+#if LDBL_MANT_DIG == DBL_MANT_DIG && LDBL_MIN_EXP == DBL_MIN_EXP && \
+    LDBL_MAX_EXP == DBL_MAX_EXP
+#define _LDBL_EQ_DBL
 #endif
 
 #endif /* __SYS_CONFIG_H__ */
