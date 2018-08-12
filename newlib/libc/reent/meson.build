@@ -1,0 +1,37 @@
+srcs_reent = [
+    'closer.c',
+    'execr.c',
+    'fcntlr.c',
+    'fstat64r.c',
+    'fstatr.c',
+    'getreent.c',
+    'gettimeofdayr.c',
+    'impure.c',
+    'isattyr.c',
+    'linkr.c',
+    'lseek64r.c',
+    'lseekr.c',
+    'mkdirr.c',
+    'open64r.c',
+    'openr.c',
+    'readr.c',
+    'reent.c',
+    'renamer.c',
+    'sbrkr.c',
+    'signalr.c',
+    'signgam.c',
+    'stat64r.c',
+    'statr.c',
+    'timesr.c',
+    'unlinkr.c',
+    'writer.c',
+]
+foreach target : targets
+	value = get_variable('target_' + target)
+	set_variable('lib_reent' + target,
+		static_library('reent' + target,
+			srcs_reent,
+			pic: false,
+			include_directories: inc,
+			c_args: value[1]))
+endforeach

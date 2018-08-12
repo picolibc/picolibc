@@ -1,0 +1,2 @@
+subdir('libc')
+subdir('libm')

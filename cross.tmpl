@@ -1,0 +1,24 @@
+[binaries]
+c = '@ARCH@-gcc'
+ar = '@ARCH@-ar'
+as = '@ARCH@-as'
+
+[properties]
+sizeof_int = 4
+sizeof_wchar_t = 2
+sizeof_vooid* = 4
+
+alignment_char = 1
+alignment_void* = 4
+alignment_double = 4
+
+c_args = [ @C_ARGS@ ]
+
+cpu_dir = '@CPU_DIR@'
+
+[host_machine]
+system = '@SYSTEM@'
+cpu_family = '@CPU_FAMILY@'
+cpu = '@CPU@'
+endian = '@ENDIAN@'
+

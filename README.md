@@ -11,39 +11,39 @@ I've tried to expose all of the same code selection options that are
 provided in the autotools. Use -D<option-name>={true,false} to change
 from the default value.
 
-| Option | Default | Description |
-| ------ | ------- | ----------- |
-| target-optspace | false | Compile with -Os |
-| hw-fp | false | Turn on hardware floating point math |
-| tests | false | Enable tests |
-| newlib-tinystdio | false | Use tiny stdio from avr libc |
-| newlib-io-pos-args | false | enable printf-family positional arg support |
-| newlib-io-c99-formats | false | enable C99 support in IO functions like printf/scanf |
-| newlib-register-fini | false | enable finalization function registration using atexit |
-| newlib-io-long-long | false | enable long long type support in IO functions like printf/scanf |
-| newlib-io-long-double | false | enable long double type support in IO functions printf/scanf |
-| newlib-mb | false | enable multibyte support |
-| newlib-iconv-encodings | false | enable specific comma-separated list of bidirectional iconv encodings to be built-in |
-| newlib-iconv-from-encodings | false | enable specific comma-separated list of "from" iconv encodings to be built-in |
-| newlib-iconv-to-encodings | false | enable specific comma-separated list of "to" iconv encodings to be built-in |
-| newlib-iconv-external-ccs | false | enable capabilities to load external CCS files for iconv |
-| newlib-atexit-dynamic-alloc | false | enable dynamic allocation of atexit entries |
-| newlib-global-atexit | false | enable atexit data structure as global |
-| newlib-reent-small | false | enable small reentrant struct support |
-| newlib-global-stdio-streams | false | enable global stdio streams |
-| newlib-fvwrite-in-streamio | false | disable iov in streamio |
-| newlib-fseek-optimization | false | disable fseek optimization |
-| newlib_wide_orient | false | Turn off wide orientation in streamio |
-| newlib-nano-malloc | false | use small-footprint nano-malloc implementation |
-| newlib-unbuf-stream-opt | false | enable unbuffered stream optimization in streamio |
-| lite-exit | false | enable light weight exit |
-| newlib_nano_formatted_io | false | Use nano version formatted IO |
-| newlib-retargetable-locking | false | Allow locking routines to be retargeted at link time |
-| newlib-long-time_t | false | define time_t to long |
-| newlib-multithread | false | enable support for multiple threads |
-| newlib-iconv | false | enable iconv library support |
-| newlib-io-float | false | enable printf/scanf family float support |
-| newlib-supplied-syscalls | false | enable newlib supplied syscalls |
+| Option                      | Default | Description                                                                          |
+| ------                      | ------- | -----------                                                                          |
+| target-optspace             | false   | Compile with -Os                                                                     |
+| hw-fp                       | false   | Turn on hardware floating point math                                                 |
+| tests                       | false   | Enable tests                                                                         |
+| newlib-tinystdio            | false   | Use tiny stdio from avr libc                                                         |
+| newlib-io-pos-args          | false   | Enable printf-family positional arg support                                          |
+| newlib-io-c99-formats       | false   | Enable C99 support in IO functions like printf/scanf                                 |
+| newlib-register-fini        | false   | Enable finalization function registration using atexit                               |
+| newlib-io-long-long         | false   | Enable long long type support in IO functions like printf/scanf                      |
+| newlib-io-long-double       | false   | Enable long double type support in IO functions printf/scanf                         |
+| newlib-mb                   | false   | Enable multibyte support                                                             |
+| newlib-iconv-encodings      | false   | Enable specific comma-separated list of bidirectional iconv encodings to be built-in |
+| newlib-iconv-from-encodings | false   | Enable specific comma-separated list of "from" iconv encodings to be built-in        |
+| newlib-iconv-to-encodings   | false   | Enable specific comma-separated list of "to" iconv encodings to be built-in          |
+| newlib-iconv-external-ccs   | false   | Enable capabilities to load external CCS files for iconv                             |
+| newlib-atexit-dynamic-alloc | false   | Enable dynamic allocation of atexit entries                                          |
+| newlib-global-atexit        | false   | Enable atexit data structure as global                                               |
+| newlib-reent-small          | false   | Enable small reentrant struct support                                                |
+| newlib-global-stdio-streams | false   | Enable global stdio streams                                                          |
+| newlib-fvwrite-in-streamio  | false   | Disable iov in streamio                                                              |
+| newlib-fseek-optimization   | false   | Disable fseek optimization                                                           |
+| newlib_wide_orient          | false   | Turn off wide orientation in streamio                                                |
+| newlib-nano-malloc          | false   | Use small-footprint nano-malloc implementation                                       |
+| newlib-unbuf-stream-opt     | false   | Enable unbuffered stream optimization in streamio                                    |
+| lite-exit                   | false   | Enable light weight exit                                                             |
+| newlib_nano_formatted_io    | false   | Use nano version formatted IO                                                        |
+| newlib-retargetable-locking | false   | Allow locking routines to be retargeted at link time                                 |
+| newlib-long-time_t          | false   | Define time_t to long                                                                |
+| newlib-multithread          | false   | Enable support for multiple threads                                                  |
+| newlib-iconv                | false   | Enable iconv library support                                                         |
+| newlib-io-float             | false   | Enable printf/scanf family float support                                             |
+| newlib-supplied-syscalls    | false   | Enable newlib supplied syscalls                                                      |
 
 ## Building for embedded arm systems
 
