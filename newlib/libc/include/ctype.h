@@ -66,7 +66,12 @@ extern int toascii_l (int __c, locale_t __l);
 #define _X	0100
 #define	_B	0200
 
+#if _MB_CAPABLE
 const char *__locale_ctype_ptr (void);
+#else
+#define __locale_ctype_ptr()	_ctype_
+#endif
+
 # define __CTYPE_PTR	(__locale_ctype_ptr ())
 
 #ifndef __cplusplus
