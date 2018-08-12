@@ -1,0 +1,20 @@
+install_headers(
+  'ansi.h',
+  '_arc4random.h',
+  '_default_types.h',
+  '_endian.h',
+  'endian.h',
+  'fastmath.h',
+  'ieeefp.h',
+  'malloc.h',
+  'param.h',
+  'setjmp-dj.h',
+  'setjmp.h',
+  'stdlib.h',
+  'termios.h',
+  '_time.h',
+  'time.h',
+  '_types.h',
+  'types.h',
+  subdir:'machine'
+)

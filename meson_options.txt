@@ -1,0 +1,67 @@
+option('target-optspace', type: 'boolean', value: false,
+       description: 'Compile with -Os')
+
+
+option('hw-fp', type: 'boolean', value: false,
+	description: 'Turn on hardware floating point math')
+
+option('tests', type: 'boolean', value: false,
+       description: 'Enable tests')
+
+option('newlib-tinystdio', type: 'boolean', value: false,
+       description: 'Use tiny stdio from avr libc')
+
+option('newlib-io-pos-args', type: 'boolean', value: false,
+       description: 'enable printf-family positional arg support')
+option('newlib-io-c99-formats', type: 'boolean', value: false,
+       description: 'enable C99 support in IO functions like printf/scanf')
+option('newlib-register-fini', type: 'boolean', value: false,
+       description: 'enable finalization function registration using atexit')
+option('newlib-io-long-long', type: 'boolean', value: false,
+       description: 'enable long long type support in IO functions like printf/scanf')
+option('newlib-io-long-double', type: 'boolean', value: false,
+       description: 'enable long double type support in IO functions printf/scanf')
+option('newlib-mb', type: 'boolean', value: false,
+       description: 'enable multibyte support')
+option('newlib-iconv-encodings', type: 'boolean', value: false,
+       description: 'enable specific comma-separated list of bidirectional iconv encodings to be built-in')
+option('newlib-iconv-from-encodings', type: 'boolean', value: false,
+       description: 'enable specific comma-separated list of "from" iconv encodings to be built-in')
+option('newlib-iconv-to-encodings', type: 'boolean', value: false,
+       description: 'enable specific comma-separated list of "to" iconv encodings to be built-in')
+option('newlib-iconv-external-ccs', type: 'boolean', value: false,
+       description: 'enable capabilities to load external CCS files for iconv')
+option('newlib-atexit-dynamic-alloc', type: 'boolean', value: false,
+       description: 'enable dynamic allocation of atexit entries')
+option('newlib-global-atexit', type: 'boolean', value: false,
+       description: 'enable atexit data structure as global')
+option('newlib-reent-small', type: 'boolean', value: false,
+       description: 'enable small reentrant struct support')
+option('newlib-global-stdio-streams', type: 'boolean', value: false,
+       description: 'enable global stdio streams')
+option('newlib-fvwrite-in-streamio', type: 'boolean', value: false,
+       description: 'disable iov in streamio')
+option('newlib-fseek-optimization', type: 'boolean', value: false,
+       description: 'disable fseek optimization')
+option('newlib_wide_orient', type: 'boolean', value: false,
+       description: 'Turn off wide orientation in streamio')
+option('newlib-nano-malloc', type: 'boolean', value: false,
+       description: 'use small-footprint nano-malloc implementation')
+option('newlib-unbuf-stream-opt', type: 'boolean', value: false,
+       description: 'enable unbuffered stream optimization in streamio')
+option('lite-exit', type: 'boolean', value: false,
+       description: 'enable light weight exit')
+option('newlib_nano_formatted_io', type: 'boolean', value: false,
+       description: 'Use nano version formatted IO')
+option('newlib-retargetable-locking', type: 'boolean', value: false,
+       description: 'Allow locking routines to be retargeted at link time')
+option('newlib-long-time_t', type: 'boolean', value: false,
+       description: 'define time_t to long')
+option('newlib-multithread', type: 'boolean', value: false,
+       description: 'enable support for multiple threads')
+option('newlib-iconv', type: 'boolean', value: false,
+       description: 'enable iconv library support')
+option('newlib-io-float', type: 'boolean', value: false,
+       description: 'enable printf/scanf family float support')
+option('newlib-supplied-syscalls', type: 'boolean', value: false,
+       description: 'enable newlib supplied syscalls')
