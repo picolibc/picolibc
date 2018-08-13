@@ -77,8 +77,6 @@ static const uint32_t factorTable[32] = {
 int __ftoa_engine(float val, char *buf, uint8_t precision, uint8_t maxDecimals) 
 {
     uint8_t flags;
-    // Bit reinterpretation hacks. This will ONLY work on little endian machines.
-    uint8_t *valbits = (uint8_t*)&val;
     union {
         float v;
         uint32_t u;
@@ -87,9 +85,9 @@ int __ftoa_engine(float val, char *buf, uint8_t precision, uint8_t maxDecimals)
     uint32_t frac = x.u & 0x007fffffUL;
     if (precision>7) precision=7;
     // Read the sign, shift the exponent in place and delete it from frac.
-    if (valbits[3] & (1<<7)) flags = FTOA_MINUS; else flags = 0;
-    uint8_t exp = valbits[3]<<1;
-    if(valbits[2] & (1<<7)) exp++;    // TODO possible but in case of subnormal
+    if (x.u & (1 << 31)) flags = FTOA_MINUS; else flags = 0;
+    uint8_t exp = (x.u >> 24) << 1;
+    if(x.u & (1 << 23)) exp++;    // TODO possible but in case of subnormal
     // Test for easy cases, zero and NaN
     if(exp==0 && frac==0) {
         buf[0] = flags | FTOA_ZERO;
