@@ -253,6 +253,7 @@ struct __file {
 	int	len;		/* characters read or written so far */
 	int	(*put)(char, struct __file *);	/* function to write one char to device */
 	int	(*get)(struct __file *);	/* function to read one char from device */
+	int	(*flush)(struct __file *);	/* function to flush output to device */
 };
 
 struct __file_str {
@@ -867,14 +868,14 @@ extern int	siscanf(const char *__buf, const char *__fmt, ...);
 /**
    Flush \c stream.
 
-   This is a null operation provided for source-code compatibility
-   only, as the standard IO implementation currently does not perform
-   any buffering.
+   If the stream provides a flush hook, use that. Otherwise return 0.
  */
 extern int	fflush(FILE *stream);
 #else
-static __inline__ int fflush(FILE *stream __attribute__((unused)))
+static __inline__ int fflush(FILE *stream)
 {
+	if (stream->flush)
+		return (stream->flush)(stream);
 	return 0;
 }
 #endif
