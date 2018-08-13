@@ -139,7 +139,7 @@ strtof (const char * nptr, char ** endptr)
 		    exp -= 1;
 		/* u32 = u32 * 10 + c	*/
 		u32 = (((u32 << 2) + u32) << 1) + c;
-		if (u32 >= (ULONG_MAX - 9) / 10)
+		if (u32 >= (0xffffffffUL - 9) / 10)
 		    flag |= FL_OVFL;
 	    }
 
