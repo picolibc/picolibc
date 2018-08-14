@@ -24,7 +24,7 @@ extern "C" {
      C99 Language spec (draft n1256):
    <url unknown>
 
-     Intel® 64 and IA-32 Architectures Software Developer’s Manuals:
+     Intel(R) 64 and IA-32 Architectures Software Developer's Manuals:
    http://www.intel.com/products/processor/manuals/
 
      GNU C library manual pages:
