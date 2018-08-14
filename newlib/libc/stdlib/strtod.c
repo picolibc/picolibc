@@ -1289,7 +1289,7 @@ strtof_l (const char *__restrict s00, char **__restrict se, locale_t loc)
 {
   double val = _strtod_l (_REENT, s00, se, loc);
   if (isnan (val))
-    return nanf (NULL);
+    return signbit (val) ? -nanf (NULL) : nanf (NULL);
   float retval = (float) val;
 #ifndef NO_ERRNO
   if (isinf (retval) && !isinf (val))
@@ -1304,7 +1304,7 @@ strtof (const char *__restrict s00,
 {
   double val = _strtod_l (_REENT, s00, se, __get_current_locale ());
   if (isnan (val))
-    return nanf (NULL);
+    return signbit (val) ? -nanf (NULL) : nanf (NULL);
   float retval = (float) val;
 #ifndef NO_ERRNO
   if (isinf (retval) && !isinf (val))
