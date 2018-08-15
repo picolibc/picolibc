@@ -87,16 +87,13 @@ typedef __uint32_t fexcept_t;
 #define FE_OVERFLOW	(1 << 3)
 #define FE_UNDERFLOW	(1 << 4)
 
-/*  This is not defined by Posix, but since x87 supports it we provide
-   a definition according to the same naming scheme used above.  */
-#define FE_DENORMAL	(1 << 1)
-
 /*  The <fenv.h> header shall define the following constant, which is
    simply the bitwise-inclusive OR of all floating-point exception
    constants defined above:  */
 
-#define FE_ALL_EXCEPT (FE_DIVBYZERO | FE_INEXACT | FE_INVALID \
-			| FE_OVERFLOW | FE_UNDERFLOW | FE_DENORMAL)
+/* in agreement w/ Linux the subnormal exception will always be masked */
+#define FE_ALL_EXCEPT \
+  (FE_INEXACT | FE_UNDERFLOW | FE_OVERFLOW | FE_DIVBYZERO | FE_INVALID)
 
 /*  The <fenv.h> header shall define the following constants if and only
    if the implementation supports getting and setting the represented
