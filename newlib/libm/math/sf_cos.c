@@ -17,12 +17,6 @@
 #if __OBSOLETE_MATH
 
 #ifdef __STDC__
-static const float one=1.0;
-#else
-static float one=1.0;
-#endif
-
-#ifdef __STDC__
 	float cosf(float x)
 #else
 	float cosf(x)
