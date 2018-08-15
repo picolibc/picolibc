@@ -31,7 +31,6 @@ __ultoa_invert(unsigned long val, char *str, int base, int upper)
 {
 	do {
 		int	v;
-		char	c;
 
 		v = val % base;
 		val = val / base;
