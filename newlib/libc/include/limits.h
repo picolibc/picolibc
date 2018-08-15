@@ -3,6 +3,7 @@
 
 #include <newlib.h>
 #include <sys/cdefs.h>
+#include <sys/syslimits.h>
 
 # ifdef _MB_LEN_MAX
 #  define MB_LEN_MAX	_MB_LEN_MAX
