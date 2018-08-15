@@ -43,6 +43,7 @@
 
 #include <inttypes.h>
 #include <stdarg.h>
+#include <sys/_types.h>
 
 #ifndef __DOXYGEN__
 #define __need_NULL
@@ -269,7 +270,11 @@ struct __file_str {
    \c FILE is the opaque structure that is passed around between the
    various standard IO functions.
 */
-typedef struct __file FILE;
+typedef struct __file __FILE;
+#if !defined(__FILE_defined)
+typedef __FILE FILE;
+# define __FILE_defined
+#endif
 
 /**
    Stream that will be used as an input stream by the simplified
