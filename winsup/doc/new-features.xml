@@ -26,6 +26,10 @@ aio_read, aio_return, aio_suspend, aio_write, lio_listio.
 New Header: &lt;aio.h&gt;.
 </para></listitem>
 
+<listitem><para>
+Drop denormal-operand exception from FE_ALL_EXCEPT, as on Linux.
+</para></listitem>
+
 </itemizedlist>
 
 </sect2>

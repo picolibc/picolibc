@@ -16,6 +16,8 @@ What changed:
 
 - /proc/cpuinfo now reports L3 cache size on Intel CPUs.
 
+- Drop denormal-operand exception from FE_ALL_EXCEPT, as on Linux.
+
 
 Bug Fixes
 ---------
