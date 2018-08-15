@@ -46,7 +46,7 @@
 #include "stdio_private.h"
 
 #if	!defined (SCANF_LEVEL)
-#define SCANF_LEVEL SCANF_STD
+#define SCANF_LEVEL SCANF_FLT
 #endif
 
 #if	SCANF_LEVEL == SCANF_MIN
