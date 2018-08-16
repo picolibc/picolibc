@@ -32,11 +32,10 @@
 #include "math_config.h"
 #include "sincosf.h"
 
-/* Fast sincosf implementation.  Worst-case ULP is 0.56072, maximum relative
-   error is 0.5303p-23.  A single-step signed range reduction is used for
+/* Fast sincosf implementation.  Worst-case ULP is 0.5607, maximum relative
+   error is 0.5303 * 2^-23.  A single-step range reduction is used for
    small values.  Large inputs have their range reduced using fast integer
-   arithmetic.
-*/
+   arithmetic.  */
 void
 sincosf (float y, float *sinp, float *cosp)
 {

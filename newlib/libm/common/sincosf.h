@@ -28,19 +28,25 @@
 #include <math.h>
 #include "math_config.h"
 
-/* PI * 2^-64.  */
-static const double pi64 = 0x1.921FB54442D18p-62;
+/* 2PI * 2^-64.  */
+static const double pi63 = 0x1.921FB54442D18p-62;
 /* PI / 4.  */
 static const double pio4 = 0x1.921FB54442D18p-1;
 
+/* The constants and polynomials for sine and cosine.  */
 typedef struct
 {
-  double sign[4];
-  double hpi_inv, hpi, c0, c1, c2, c3, c4, s1, s2, s3;
+  double sign[4];		/* Sign of sine in quadrants 0..3.  */
+  double hpi_inv;		/* 2 / PI ( * 2^24 if !TOINT_INTRINSICS).  */
+  double hpi;			/* PI / 2.  */
+  double c0, c1, c2, c3, c4;	/* Cosine polynomial.  */
+  double s1, s2, s3;		/* Sine polynomial.  */
 } sincos_t;
 
+/* Polynomial data (the cosine polynomial is negated in the 2nd entry).  */
 extern const sincos_t __sincosf_table[2] HIDDEN;
 
+/* Table with 4/PI to 192 bit precision.  */
 extern const uint32_t __inv_pio4[] HIDDEN;
 
 /* Top 12 bits of the float representation with the sign bit cleared.  */
@@ -114,18 +120,20 @@ sinf_poly (double x, double x2, const sincos_t *p, int n)
    X as a value between -PI/4 and PI/4 and store the quadrant in NP.
    The values for PI/2 and 2/PI are accessed via P.  Since PI/2 as a double
    is accurate to 55 bits and the worst-case cancellation happens at 6 * PI/4,
-   only 2 multiplies are required and the result is accurate for |X| <= 120.0.
-   Use round/lround if inlined, otherwise convert to int.  To avoid inaccuracies
-   introduced by truncating negative values, compute the quadrant * 2^24.  */
+   the result is accurate for |X| <= 120.0.  */
 static inline double
 reduce_fast (double x, const sincos_t *p, int *np)
 {
   double r;
 #if TOINT_INTRINSICS
+  /* Use fast round and lround instructions when available.  */
   r = x * p->hpi_inv;
   *np = converttoint (r);
   return x - roundtoint (r) * p->hpi;
 #else
+  /* Use scaled float to int conversion with explicit rounding.
+     hpi_inv is prescaled by 2^24 so the quadrant ends up in bits 24..31.
+     This avoids inaccuracies introduced by truncating negative values.  */
   r = x * p->hpi_inv;
   int n = ((int32_t)r + 0x800000) >> 24;
   *np = n;
@@ -133,7 +141,7 @@ reduce_fast (double x, const sincos_t *p, int *np)
 #endif
 }
 
-/* Reduce the range of XI to a multiple of PI/4 using fast integer arithmetic.
+/* Reduce the range of XI to a multiple of PI/2 using fast integer arithmetic.
    XI is a reinterpreted float and must be >= 2.0f (the sign bit is ignored).
    Return the modulo between -PI/4 and PI/4 and store the quadrant in NP.
    Reduction uses a table of 4/PI with 192 bits of precision.  A 32x96->128 bit
@@ -160,5 +168,5 @@ reduce_large (uint32_t xi, int *np)
   res0 -= n << 62;
   double x = (int64_t)res0;
   *np = n;
-  return x * pi64;
+  return x * pi63;
 }
