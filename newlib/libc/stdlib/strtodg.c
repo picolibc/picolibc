@@ -35,7 +35,6 @@ THIS SOFTWARE.
 #include <string.h>
 #include "mprec.h"
 #include "gdtoa.h"
-#include "gd_qnan.h"
 
 #include "locale.h"
 

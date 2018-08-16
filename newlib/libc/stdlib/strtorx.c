@@ -35,12 +35,8 @@ THIS SOFTWARE.
 #include <string.h>
 #include "mprec.h"
 #include "gdtoa.h"
-#include "gd_qnan.h"
 
 #if defined (_HAVE_LONG_DOUBLE) && !defined (_LDBL_EQ_DBL)
-
-#undef _0
-#undef _1
 
 /* one or the other of IEEE_MC68k or IEEE_8087 should be #defined */
 

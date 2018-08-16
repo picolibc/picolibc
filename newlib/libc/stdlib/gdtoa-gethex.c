@@ -35,7 +35,6 @@ THIS SOFTWARE.
 #include <locale.h>
 #include "mprec.h"
 #include "gdtoa.h"
-#include "gd_qnan.h"
 
 #if !defined(PREFER_SIZE_OVER_SPEED) && !defined(__OPTIMIZE_SIZE__) && !defined(_SMALL_HEXDIG)
 const unsigned char __hexdig[256]=

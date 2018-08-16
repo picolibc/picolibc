@@ -265,39 +265,6 @@ typedef union { double d; __ULong i[2]; } U;
 #define INFNAN_CHECK
 #endif
 
-/*
- * NAN_WORD0 and NAN_WORD1 are only referenced in strtod.c.  Prior to
- * 20050115, they used to be hard-wired here (to 0x7ff80000 and 0,
- * respectively), but now are determined by compiling and running
- * qnan.c to generate gd_qnan.h, which specifies d_QNAN0 and d_QNAN1.
- * Formerly gdtoaimp.h recommended supplying suitable -DNAN_WORD0=...
- * and -DNAN_WORD1=...  values if necessary.  This should still work.
- * (On HP Series 700/800 machines, -DNAN_WORD0=0x7ff40000 works.)
- */
-#ifdef IEEE_Arith
-#ifdef IEEE_MC68k
-#define _0 0
-#define _1 1
-#ifndef NAN_WORD0
-#define NAN_WORD0 d_QNAN0
-#endif
-#ifndef NAN_WORD1
-#define NAN_WORD1 d_QNAN1
-#endif
-#else
-#define _0 1
-#define _1 0
-#ifndef NAN_WORD0
-#define NAN_WORD0 d_QNAN1
-#endif
-#ifndef NAN_WORD1
-#define NAN_WORD1 d_QNAN0
-#endif
-#endif
-#else
-#undef INFNAN_CHECK
-#endif
-
 #ifdef RND_PRODQUOT
 #define rounded_product(a,b) a = rnd_prod(a, b)
 #define rounded_quotient(a,b) a = rnd_quot(a, b)

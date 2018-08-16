@@ -137,7 +137,6 @@ THIS SOFTWARE.
 #include <string.h>
 #include "mprec.h"
 #include "gdtoa.h"
-#include "gd_qnan.h"
 #include "../locale/setlocale.h"
 
 /* #ifndef NO_FENV_H */
@@ -170,6 +169,14 @@ static const double tinytens[] = { 1e-16, 1e-32,
 #define Check_FLT_ROUNDS
 #else
 #define Rounding Flt_Rounds
+#endif
+
+#ifdef IEEE_MC68k
+#define _0 0
+#define _1 1
+#else
+#define _0 1
+#define _1 0
 #endif
 
 #ifdef Avoid_Underflow /*{*/
