@@ -31,9 +31,7 @@
 
 #include <stdarg.h>
 #include <stdio.h>
-#include "sectionname.h"
 
-ATTRIBUTE_CLIB_SECTION
 int
 scanf(const char *fmt, ...)
 {

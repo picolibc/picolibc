@@ -30,11 +30,9 @@
 /* $Id: putchar.c 1944 2009-04-01 23:12:20Z arcanum $ */
 
 #include <stdio.h>
-#include "sectionname.h"
 
 #undef putchar
 
-ATTRIBUTE_CLIB_SECTION
 int
 putchar(int c)
 {

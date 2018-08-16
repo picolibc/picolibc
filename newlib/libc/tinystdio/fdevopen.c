@@ -32,7 +32,6 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include "sectionname.h"
 #include "stdio_private.h"
 
 /** \file */
@@ -67,9 +66,10 @@
    If both functions are provided, the stream is opened with read
    and write intent.
 
-   The first stream opened with read intent is assigned to \c stdin,
-   and the first one opened with write intent is assigned to both,
-   \c stdout and \c stderr.
+   If the \c flush function pointer is provided, then it will be
+   called whenever the application calls the fflush function on the
+   file. This allows the underlying I/O implementation to perform
+   buffering as needed.
 
    fdevopen() uses calloc() (und thus malloc()) in order to allocate
    the storage for the new stream.
@@ -82,9 +82,8 @@
    not use for new code.
 */
 
-ATTRIBUTE_CLIB_SECTION
 FILE *
-fdevopen(int (*put)(char, FILE *), int (*get)(FILE *))
+fdevopen(int (*put)(char, FILE *), int (*get)(FILE *), int (*flush)(FILE *))
 {
 	FILE *s;
 
@@ -95,6 +94,7 @@ fdevopen(int (*put)(char, FILE *), int (*get)(FILE *))
 		return 0;
 
 	s->flags = __SMALLOC;
+	s->flush = flush;
 
 	if (get != 0) {
 		s->get = get;
