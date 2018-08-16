@@ -444,10 +444,7 @@ _strtod_l (struct _reent *ptr, const char *__restrict s00, char **__restrict se,
 						}
 					else {
 #endif
-						dword0(rv) = NAN_WORD0;
-#ifndef _DOUBLE_IS_32BITS
-						dword1(rv) = NAN_WORD1;
-#endif /*!_DOUBLE_IS_32BITS*/
+						dval(rv) = nan ("");
 #ifndef No_Hex_NaN
 						}
 #endif

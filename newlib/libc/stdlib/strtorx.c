@@ -93,11 +93,7 @@ ULtox(__UShort *L, __ULong *bits, Long exp, int k)
 		break;
 
 	  case STRTOG_NaN:
-		L[0] = ldus_QNAN0;
-		L[1] = ldus_QNAN1;
-		L[2] = ldus_QNAN2;
-		L[3] = ldus_QNAN3;
-		L[4] = ldus_QNAN4;
+		*((long double*)L) = nanl ("");
 	  }
 	if (k & STRTOG_Neg)
 		L[_0] |= 0x8000;
