@@ -30,6 +30,10 @@ New Header: &lt;aio.h&gt;.
 Drop denormal-operand exception from FE_ALL_EXCEPT, as on Linux.
 </para></listitem>
 
+<listitem><para>
+Rename the --file option of setfacl(1) to --set-file, as on Linux.
+</para></listitem>
+
 </itemizedlist>
 
 </sect2>

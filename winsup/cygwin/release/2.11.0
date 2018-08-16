@@ -18,6 +18,8 @@ What changed:
 
 - Drop denormal-operand exception from FE_ALL_EXCEPT, as on Linux.
 
+- Rename the --file option of setfacl(1) to --set-file, as on Linux.
+
 
 Bug Fixes
 ---------
