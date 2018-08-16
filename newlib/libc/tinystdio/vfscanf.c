@@ -42,7 +42,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "sectionname.h"
 #include "stdio_private.h"
 
 #if	!defined (SCANF_LEVEL)
@@ -90,7 +89,6 @@ typedef unsigned int width_t;
 /* Add noinline attribute to avoid GCC 4.2 optimization.	*/
 
 __attribute__((noinline))
-ATTRIBUTE_CLIB_SECTION
 static void putval (void *addr, long val, uint16_t flags)
 {
     if (!(flags & FL_STAR)) {
@@ -106,7 +104,6 @@ static void putval (void *addr, long val, uint16_t flags)
 }
 
 __attribute__((noinline))
-ATTRIBUTE_CLIB_SECTION
 static unsigned long
 mulacc (unsigned long val, uint16_t flags, unsigned char c)
 {
@@ -126,7 +123,6 @@ mulacc (unsigned long val, uint16_t flags, unsigned char c)
 }
 
 __attribute__((noinline))
-ATTRIBUTE_CLIB_SECTION
 static unsigned char
 conv_int (FILE *stream, width_t width, void *addr, uint16_t flags)
 {
@@ -200,7 +196,6 @@ conv_int (FILE *stream, width_t width, void *addr, uint16_t flags)
 
 #if  SCANF_BRACKET
 __attribute__((noinline))
-ATTRIBUTE_CLIB_SECTION
 static const char *
 conv_brk (FILE *stream, width_t width, char *addr, const char *fmt)
 {
@@ -299,7 +294,6 @@ static const char pstr_nfinity[] = "nfinity";
 static const char pstr_an[] = "an";
 
 __attribute__((noinline))
-ATTRIBUTE_CLIB_SECTION
 static unsigned char conv_flt (FILE *stream, width_t width, float *addr)
 {
     uint32_t u32;
@@ -439,7 +433,6 @@ static unsigned char conv_flt (FILE *stream, width_t width, float *addr)
 #endif	/* SCANF_FLOAT	*/
 
 __attribute__((noinline))
-ATTRIBUTE_CLIB_SECTION
 static int skip_spaces (FILE *stream)
 {
     int i;
@@ -584,7 +577,6 @@ static int skip_spaces (FILE *stream)
      -Wl,-u,vfscanf -lscanf_min -lm
      \endcode
 */
-ATTRIBUTE_CLIB_SECTION
 int vfscanf (FILE * stream, const char *fmt, va_list ap)
 {
     unsigned char nconvs;

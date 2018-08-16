@@ -30,10 +30,8 @@
 /* $Id: fgetc.c 1944 2009-04-01 23:12:20Z arcanum $ */
 
 #include <stdio.h>
-#include "sectionname.h"
 #include "stdio_private.h"
 
-ATTRIBUTE_CLIB_SECTION
 int
 fgetc(FILE *stream)
 {

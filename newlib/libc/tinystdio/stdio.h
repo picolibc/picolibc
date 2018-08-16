@@ -114,22 +114,12 @@
     conversion should be performed, but instead any string that aims
     to issue a CR-LF sequence must use <tt>"\r\n"</tt> explicitly.
 
-    For convenience, the first call to \c fdevopen() that opens a
-    stream for reading will cause the resulting stream to be aliased
-    to \c stdin.  Likewise, the first call to \c fdevopen() that opens
-    a stream for writing will cause the resulting stream to be aliased
-    to both, \c stdout, and \c stderr.  Thus, if the open was done
-    with both, read and write intent, all three standard streams will
-    be identical.  Note that these aliases are indistinguishable from
-    each other, thus calling \c fclose() on such a stream will also
-    effectively close all of its aliases (\ref stdio_note3 "note 3").
-
-    It is possible to tie additional user data to a stream, using
-    fdev_set_udata().  The backend put and get functions can then
-    extract this user data using fdev_get_udata(), and act
-    appropriately.  For example, a single put function could be used
-    to talk to two different UARTs that way, or the put and get
-    functions could keep internal state between calls there.
+    stdin, stdout and stderr are macros which refer to an undefined
+    array of FILE pointers, __iob. If you want to use this, your
+    application must define this array and initialize it. It is
+    declared 'const' so that you can place it in ROM if you don't need
+    to modify it after startup. FILEs cannot be placed in ROM as they
+    have values which are modified during runtime.
 
     \anchor stdio_without_malloc
     <h3>Running stdio without malloc()</h3>
@@ -279,29 +269,18 @@ typedef __FILE FILE;
 /**
    Stream that will be used as an input stream by the simplified
    functions that don't take a \c stream argument.
-
-   The first stream opened with read intent using \c fdevopen()
-   will be assigned to \c stdin.
 */
 #define stdin (__iob[0])
 
 /**
    Stream that will be used as an output stream by the simplified
    functions that don't take a \c stream argument.
-
-   The first stream opened with write intent using \c fdevopen()
-   will be assigned to both, \c stdin, and \c stderr.
 */
 #define stdout (__iob[1])
 
 /**
    Stream destined for error output.  Unless specifically assigned,
    identical to \c stdout.
-
-   If \c stderr should point to another stream, the result of
-   another \c fdevopen() must be explicitly assigned to it without
-   closing the previous \c stderr (since this would also close
-   \c stdout).
 */
 #define stderr (__iob[2])
 
@@ -313,17 +292,6 @@ typedef __FILE FILE;
 */
 #define EOF	(-1)
 
-/** This macro inserts a pointer to user defined data into a FILE
-    stream object.
-
-    The user data can be useful for tracking state in the put and get
-    functions supplied to the fdevopen() function. */
-#define fdev_set_udata(stream, u) do { (stream)->udata = u; } while(0)
-
-/** This macro retrieves a pointer to user defined data from a FILE
-    stream object. */
-#define fdev_get_udata(stream) ((stream)->udata)
-
 #if defined(__DOXYGEN__)
 /**
    \brief Setup a user-supplied buffer as an stdio stream
@@ -333,8 +301,8 @@ typedef __FILE FILE;
    has been obtained dynamically from fdevopen(). The buffer to setup
    must be of type FILE.
 
-   The arguments \c put and \c get are identical to those that need to
-   be passed to fdevopen().
+   The arguments \c put , \c get and \c flush are identical to those
+   that need to be passed to fdevopen().
 
    The \c rwflag argument can take one of the values _FDEV_SETUP_READ,
    _FDEV_SETUP_WRITE, or _FDEV_SETUP_RW, for read, write, or read/write
@@ -345,14 +313,14 @@ typedef __FILE FILE;
    need to be assigned by the user.  See also under
    \ref stdio_without_malloc "Running stdio without malloc()".
  */
-#define fdev_setup_stream(stream, put, get, rwflag)
+#define fdev_setup_stream(stream, put, get, flush, rwflag)
 #else  /* !DOXYGEN */
-#define fdev_setup_stream(stream, p, g, f) \
+#define fdev_setup_stream(stream, p, g, fl, f)	\
 	do { \
 		(stream)->put = p; \
 		(stream)->get = g; \
+		(stream)->flush = fl; \
 		(stream)->flags = f; \
-		(stream)->udata = 0; \
 	} while(0)
 #endif /* DOXYGEN */
 
@@ -384,14 +352,14 @@ typedef __FILE FILE;
    The remaining arguments are to be used as explained in
    fdev_setup_stream().
  */
-#define FDEV_SETUP_STREAM(put, get, rwflag)
+#define FDEV_SETUP_STREAM(put, get, flush, rwflag)
 #else  /* !DOXYGEN */
-#define FDEV_SETUP_STREAM(p, g, f) \
+#define FDEV_SETUP_STREAM(p, g, fl, f)		\
 	{ \
 		.put = p, \
 		.get = g, \
+		.flush = fl, \
 		.flags = f, \
-		.udata = 0, \
 	}
 #endif /* DOXYGEN */
 
@@ -406,18 +374,7 @@ extern "C" {
 
 extern struct __file *const __iob[];
 
-#if defined(__STDIO_FDEVOPEN_COMPAT_12)
-/*
- * Declare prototype for the discontinued version of fdevopen() that
- * has been in use up to avr-libc 1.2.x.  The new implementation has
- * some backwards compatibility with the old version.
- */
-extern FILE *fdevopen(int (*__put)(char), int (*__get)(void),
-                      int __opts __attribute__((unused)));
-#else  /* !defined(__STDIO_FDEVOPEN_COMPAT_12) */
-/* New prototype for avr-libc 1.4 and above. */
-extern FILE *fdevopen(int (*__put)(char, FILE*), int (*__get)(FILE*));
-#endif /* defined(__STDIO_FDEVOPEN_COMPAT_12) */
+extern FILE *fdevopen(int (*__put)(char, FILE*), int (*__get)(FILE*), int(*__flush)(FILE *));
 
 #endif /* not __DOXYGEN__ */
 
@@ -441,13 +398,12 @@ extern int	fclose(FILE *__stream);
    needed, right before the application is going to destroy the
    \c stream object itself.
 
-   (Currently, this macro evaluates to nothing, but this might change
-   in future versions of the library.)
+   All that is needed is to flush any pending output.
 */
 #if defined(__DOXYGEN__)
-# define fdev_close()
+# define fdev_close(f)
 #else
-# define fdev_close() ((void)0)
+# define fdev_close(f) (fflush(f))
 #endif
 
 /**

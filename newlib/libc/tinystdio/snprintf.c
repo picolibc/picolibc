@@ -32,9 +32,7 @@
 #include <limits.h>
 #include <stdarg.h>
 #include <stdio.h>
-#include "sectionname.h"
 
-ATTRIBUTE_CLIB_SECTION
 int
 snprintf(char *s, size_t n, const char *fmt, ...)
 {

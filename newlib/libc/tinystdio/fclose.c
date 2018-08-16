@@ -32,10 +32,8 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include "sectionname.h"
 #include "stdio_private.h"
 
-ATTRIBUTE_CLIB_SECTION
 int
 fclose(FILE *stream)
 {
