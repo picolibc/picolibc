@@ -67,3 +67,6 @@ Bug Fixes
 
 - Fix NaN handling in strtof/strtod/strtold.
   Addresses: https://cygwin.com/ml/cygwin/2018-08/msg00150.html
+
+- Fix memory allocation values in /proc/<PID>/status and /proc/<PID>/statm.
+  Addresses: https://cygwin.com/ml/cygwin/2018-08/msg00223.html
