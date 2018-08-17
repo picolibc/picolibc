@@ -1214,12 +1214,10 @@ format_process_status (void *data, char *&destbuf)
   if (!get_mem_values (p->dwProcessId, vmsize, vmrss, vmtext, vmdata,
 		       vmlib, vmshare))
     return 0;
-  size_t page_size = wincap.page_size ();
-  vmsize *= page_size; vmrss *= page_size; vmdata *= page_size;
-  vmtext *= page_size; vmlib *= page_size;
   /* The real uid value for *this* process is stored at cygheap->user.real_uid
      but we can't get at the real uid value for any other process, so
      just fake it as p->uid.  Similar for p->gid. */
+  size_t kb_per_page = wincap.allocation_granularity() / 1024;
   destbuf = (char *) crealloc_abort (destbuf, strlen (cmd) + 320);
   return __small_sprintf (destbuf, "Name:\t%s\n"
 				   "State:\t%c (%s)\n"
@@ -1245,8 +1243,9 @@ format_process_status (void *data, char *&destbuf)
 			  p->ppid,
 			  p->uid, p->uid, p->uid, p->uid,
 			  p->gid, p->gid, p->gid, p->gid,
-			  vmsize >> 10, 0, vmrss >> 10, vmdata >> 10, 0,
-			  vmtext >> 10, vmlib >> 10,
+			  vmsize * kb_per_page, 0UL, vmrss * kb_per_page,
+			  vmdata * kb_per_page, 0UL, vmtext * kb_per_page,
+			  vmlib * kb_per_page,
 			  0, 0, _my_tls.sigmask
 			  );
 }
@@ -1256,16 +1255,13 @@ format_process_statm (void *data, char *&destbuf)
 {
   _pinfo *p = (_pinfo *) data;
   size_t vmsize = 0, vmrss = 0, vmtext = 0, vmdata = 0, vmlib = 0, vmshare = 0;
-  size_t page_scale;
   if (!get_mem_values (p->dwProcessId, vmsize, vmrss, vmtext, vmdata,
 		       vmlib, vmshare))
     return 0;
 
-  page_scale = wincap.allocation_granularity() / wincap.page_size();
   destbuf = (char *) crealloc_abort (destbuf, 96);
   return __small_sprintf (destbuf, "%lu %lu %lu %lu %lu %lu 0\n",
-              vmsize / page_scale, vmrss / page_scale, vmshare / page_scale,
-              vmtext / page_scale, vmlib / page_scale, vmdata / page_scale);
+			  vmsize, vmrss, vmshare, vmtext, vmlib, vmdata);
 }
 
 extern "C" {
@@ -1446,6 +1442,8 @@ get_mem_values (DWORD dwProcessId, size_t &vmsize, unsigned long &vmrss,
   VM_COUNTERS vmc;
   PMEMORY_WORKING_SET_LIST p;
   SIZE_T n = 0x4000, length;
+  const size_t page_scale = wincap.allocation_granularity()
+			    / wincap.page_size();
 
   /* This appears to work despite MSDN claiming that QueryWorkingSet requires
      PROCESS_QUERY_INFORMATION *and* PROCESS_VM_READ.  Since we're trying to do
@@ -1510,6 +1508,14 @@ get_mem_values (DWORD dwProcessId, size_t &vmsize, unsigned long &vmrss,
       goto out;
     }
   vmsize = vmc.PagefileUsage / wincap.page_size ();
+  /* Return number of Cygwin pages.  Page size in Cygwin is equivalent
+     to Windows allocation_granularity. */
+  vmsize = howmany (vmsize, page_scale);
+  vmrss = howmany (vmrss, page_scale);
+  vmshare = howmany (vmshare, page_scale);
+  vmtext = howmany (vmtext, page_scale);
+  vmlib = howmany (vmlib, page_scale);
+  vmdata = howmany (vmdata, page_scale);
   res = true;
 out:
   free (p);
