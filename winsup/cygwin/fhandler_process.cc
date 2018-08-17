@@ -1216,7 +1216,7 @@ format_process_status (void *data, char *&destbuf)
   if (!get_mem_values (p->dwProcessId, &vmsize, &vmrss, &vmtext, &vmdata,
 		       &vmlib, &vmshare))
     return 0;
-  unsigned page_size = wincap.allocation_granularity ();
+  unsigned page_size = wincap.page_size ();
   vmsize *= page_size; vmrss *= page_size; vmdata *= page_size;
   vmtext *= page_size; vmlib *= page_size;
   /* The real uid value for *this* process is stored at cygheap->user.real_uid
