@@ -1432,9 +1432,8 @@ out:
 }
 
 static bool
-get_mem_values (DWORD dwProcessId, size_t &vmsize, unsigned long &vmrss,
-		unsigned long &vmtext, unsigned long &vmdata,
-		unsigned long &vmlib, unsigned long &vmshare)
+get_mem_values (DWORD dwProcessId, size_t &vmsize, size_t &vmrss,
+		size_t &vmtext, size_t &vmdata, size_t &vmlib, size_t &vmshare)
 {
   bool res = false;
   NTSTATUS status;
