@@ -82,9 +82,9 @@ static const virt_tab_t process_tab[] =
 static const int PROCESS_LINK_COUNT =
   (sizeof (process_tab) / sizeof (virt_tab_t)) - 1;
 int get_process_state (DWORD dwProcessId);
-static bool get_mem_values (DWORD dwProcessId, size_t *vmsize, size_t *vmrss,
-			    size_t *vmtext, size_t *vmdata, size_t *vmlib,
-			    size_t *vmshare);
+static bool get_mem_values (DWORD dwProcessId, size_t &vmsize, size_t &vmrss,
+			    size_t &vmtext, size_t &vmdata, size_t &vmlib,
+			    size_t &vmshare);
 
 /* Returns 0 if path doesn't exist, >0 if path is a directory,
    -1 if path is a file, -2 if path is a symlink, -3 if path is a pipe,
@@ -1211,8 +1211,8 @@ format_process_status (void *data, char *&destbuf)
       state_str = "stopped";
       break;
     }
-  if (!get_mem_values (p->dwProcessId, &vmsize, &vmrss, &vmtext, &vmdata,
-		       &vmlib, &vmshare))
+  if (!get_mem_values (p->dwProcessId, vmsize, vmrss, vmtext, vmdata,
+		       vmlib, vmshare))
     return 0;
   size_t page_size = wincap.page_size ();
   vmsize *= page_size; vmrss *= page_size; vmdata *= page_size;
@@ -1257,8 +1257,8 @@ format_process_statm (void *data, char *&destbuf)
   _pinfo *p = (_pinfo *) data;
   size_t vmsize = 0, vmrss = 0, vmtext = 0, vmdata = 0, vmlib = 0, vmshare = 0;
   size_t page_scale;
-  if (!get_mem_values (p->dwProcessId, &vmsize, &vmrss, &vmtext, &vmdata,
-		       &vmlib, &vmshare))
+  if (!get_mem_values (p->dwProcessId, vmsize, vmrss, vmtext, vmdata,
+		       vmlib, vmshare))
     return 0;
 
   page_scale = wincap.allocation_granularity() / wincap.page_size();
@@ -1436,9 +1436,9 @@ out:
 }
 
 static bool
-get_mem_values (DWORD dwProcessId, size_t *vmsize, unsigned long *vmrss,
-		unsigned long *vmtext, unsigned long *vmdata,
-		unsigned long *vmlib, unsigned long *vmshare)
+get_mem_values (DWORD dwProcessId, size_t &vmsize, unsigned long &vmrss,
+		unsigned long &vmtext, unsigned long &vmdata,
+		unsigned long &vmlib, unsigned long &vmshare)
 {
   bool res = false;
   NTSTATUS status;
@@ -1480,7 +1480,7 @@ get_mem_values (DWORD dwProcessId, size_t *vmsize, unsigned long *vmrss,
       debug_printf ("NtQueryVirtualMemory: status %y", status);
       if (status == STATUS_PROCESS_IS_TERMINATING)
 	{
-	  *vmsize = *vmrss = *vmtext = *vmdata = *vmlib = *vmshare = 0;
+	  vmsize = vmrss = vmtext = vmdata = vmlib = vmshare = 0;
 	  res = true;
 	}
       else
@@ -1489,17 +1489,17 @@ get_mem_values (DWORD dwProcessId, size_t *vmsize, unsigned long *vmrss,
     }
   for (unsigned long i = 0; i < p->NumberOfPages; i++)
     {
-      ++*vmrss;
+      ++vmrss;
       unsigned flags = p->WorkingSetList[i] & 0x0FFF;
       if ((flags & (WSLE_PAGE_EXECUTE | WSLE_PAGE_SHAREABLE))
 	  == (WSLE_PAGE_EXECUTE | WSLE_PAGE_SHAREABLE))
-	++*vmlib;
+	++vmlib;
       else if (flags & WSLE_PAGE_SHAREABLE)
-	++*vmshare;
+	++vmshare;
       else if (flags & WSLE_PAGE_EXECUTE)
-	++*vmtext;
+	++vmtext;
       else
-	++*vmdata;
+	++vmdata;
     }
   status = NtQueryInformationProcess (hProcess, ProcessVmCounters, (PVOID) &vmc,
 				      sizeof vmc, NULL);
@@ -1509,7 +1509,7 @@ get_mem_values (DWORD dwProcessId, size_t *vmsize, unsigned long *vmrss,
       __seterrno_from_nt_status (status);
       goto out;
     }
-  *vmsize = vmc.PagefileUsage / wincap.page_size ();
+  vmsize = vmc.PagefileUsage / wincap.page_size ();
   res = true;
 out:
   free (p);
