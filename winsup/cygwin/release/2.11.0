@@ -20,6 +20,8 @@ What changed:
 
 - Rename the --file option of setfacl(1) to --set-file, as on Linux.
 
+- Support Unicode 10.
+
 
 Bug Fixes
 ---------
@@ -62,3 +64,6 @@ Bug Fixes
 
 - Fix fegetenv behaviour.
   Addresses: https://cygwin.com/ml/cygwin/2018-08/msg00000.html
+
+- Fix NaN handling in strtof/strtod/strtold.
+  Addresses: https://cygwin.com/ml/cygwin/2018-08/msg00150.html

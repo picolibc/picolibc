@@ -34,6 +34,10 @@ Drop denormal-operand exception from FE_ALL_EXCEPT, as on Linux.
 Rename the --file option of setfacl(1) to --set-file, as on Linux.
 </para></listitem>
 
+<listitem><para>
+Support Unicode 10.
+</para></listitem>
+
 </itemizedlist>
 
 </sect2>
