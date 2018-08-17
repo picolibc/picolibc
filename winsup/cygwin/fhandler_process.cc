@@ -82,10 +82,9 @@ static const virt_tab_t process_tab[] =
 static const int PROCESS_LINK_COUNT =
   (sizeof (process_tab) / sizeof (virt_tab_t)) - 1;
 int get_process_state (DWORD dwProcessId);
-static bool get_mem_values (DWORD dwProcessId, unsigned long *vmsize,
-			    unsigned long *vmrss, unsigned long *vmtext,
-			    unsigned long *vmdata, unsigned long *vmlib,
-			    unsigned long *vmshare);
+static bool get_mem_values (DWORD dwProcessId, size_t *vmsize, size_t *vmrss,
+			    size_t *vmtext, size_t *vmdata, size_t *vmlib,
+			    size_t *vmshare);
 
 /* Returns 0 if path doesn't exist, >0 if path is a directory,
    -1 if path is a file, -2 if path is a symlink, -3 if path is a pipe,
@@ -1174,8 +1173,7 @@ format_process_status (void *data, char *&destbuf)
   char cmd[NAME_MAX + 1];
   int state = 'R';
   const char *state_str = "unknown";
-  unsigned long vmsize = 0UL, vmrss = 0UL, vmdata = 0UL, vmlib = 0UL,
-		vmtext = 0UL, vmshare = 0UL;
+  size_t vmsize = 0, vmrss = 0, vmdata = 0, vmlib = 0, vmtext = 0, vmshare = 0;
 
   PWCHAR last_slash = wcsrchr (p->progname, L'\\');
   sys_wcstombs (cmd, NAME_MAX + 1, last_slash ? last_slash + 1 : p->progname);
@@ -1216,7 +1214,7 @@ format_process_status (void *data, char *&destbuf)
   if (!get_mem_values (p->dwProcessId, &vmsize, &vmrss, &vmtext, &vmdata,
 		       &vmlib, &vmshare))
     return 0;
-  unsigned page_size = wincap.page_size ();
+  size_t page_size = wincap.page_size ();
   vmsize *= page_size; vmrss *= page_size; vmdata *= page_size;
   vmtext *= page_size; vmlib *= page_size;
   /* The real uid value for *this* process is stored at cygheap->user.real_uid
@@ -1230,13 +1228,13 @@ format_process_status (void *data, char *&destbuf)
 				   "PPid:\t%d\n"
 				   "Uid:\t%d %d %d %d\n"
 				   "Gid:\t%d %d %d %d\n"
-				   "VmSize:\t%8d kB\n"
-				   "VmLck:\t%8d kB\n"
-				   "VmRSS:\t%8d kB\n"
-				   "VmData:\t%8d kB\n"
-				   "VmStk:\t%8d kB\n"
-				   "VmExe:\t%8d kB\n"
-				   "VmLib:\t%8d kB\n"
+				   "VmSize:\t%8lu kB\n"
+				   "VmLck:\t%8lu kB\n"
+				   "VmRSS:\t%8lu kB\n"
+				   "VmData:\t%8lu kB\n"
+				   "VmStk:\t%8lu kB\n"
+				   "VmExe:\t%8lu kB\n"
+				   "VmLib:\t%8lu kB\n"
 				   "SigPnd:\t%016x\n"
 				   "SigBlk:\t%016x\n"
 				   "SigIgn:\t%016x\n",
@@ -1257,8 +1255,7 @@ static off_t
 format_process_statm (void *data, char *&destbuf)
 {
   _pinfo *p = (_pinfo *) data;
-  unsigned long vmsize = 0UL, vmrss = 0UL, vmtext = 0UL, vmdata = 0UL,
-		vmlib = 0UL, vmshare = 0UL;
+  size_t vmsize = 0, vmrss = 0, vmtext = 0, vmdata = 0, vmlib = 0, vmshare = 0;
   size_t page_scale;
   if (!get_mem_values (p->dwProcessId, &vmsize, &vmrss, &vmtext, &vmdata,
 		       &vmlib, &vmshare))
@@ -1266,7 +1263,7 @@ format_process_statm (void *data, char *&destbuf)
 
   page_scale = wincap.allocation_granularity() / wincap.page_size();
   destbuf = (char *) crealloc_abort (destbuf, 96);
-  return __small_sprintf (destbuf, "%ld %ld %ld %ld %ld %ld 0\n",
+  return __small_sprintf (destbuf, "%lu %lu %lu %lu %lu %lu 0\n",
               vmsize / page_scale, vmrss / page_scale, vmshare / page_scale,
               vmtext / page_scale, vmlib / page_scale, vmdata / page_scale);
 }
@@ -1439,7 +1436,7 @@ out:
 }
 
 static bool
-get_mem_values (DWORD dwProcessId, unsigned long *vmsize, unsigned long *vmrss,
+get_mem_values (DWORD dwProcessId, size_t *vmsize, unsigned long *vmrss,
 		unsigned long *vmtext, unsigned long *vmdata,
 		unsigned long *vmlib, unsigned long *vmshare)
 {
