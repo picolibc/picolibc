@@ -198,8 +198,9 @@ RTEMS_STUB(void, __assert_func(const char *file, int line, const char *failedexp
 
 #if defined(__arm__)
 RTEMS_STUB(void, __aeabi_read_tp(void), { })
-RTEMS_STUB(void *, __tls_get_addr(const void *ti), { })
 #endif
+
+RTEMS_STUB(void *, __tls_get_addr(const void *ti), { })
 
 /* The PowerPC expects certain symbols to be defined in the linker script. */
 
