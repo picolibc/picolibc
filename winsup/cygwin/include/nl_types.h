@@ -87,7 +87,7 @@ typedef struct __nl_cat_d {
 
 
 #ifndef _NL_ITEM_DECLARED
-typedef int nl_item;
+typedef __nl_item nl_item;
 #define _NL_ITEM_DECLARED
 #endif
 
