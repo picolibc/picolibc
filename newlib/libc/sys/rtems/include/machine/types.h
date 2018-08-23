@@ -71,6 +71,9 @@ typedef	__uintptr_t	segsz_t;	/* segment size (in pages) */
 
 typedef	__uintptr_t	uintfptr_t;
 
+typedef	__uintptr_t	kvaddr_t;
+typedef	size_t		ksize_t;
+
 typedef	__intptr_t	vm_ooffset_t;
 typedef	__uintptr_t	vm_offset_t;
 typedef	__uintptr_t	vm_paddr_t;
