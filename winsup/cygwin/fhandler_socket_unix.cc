@@ -34,7 +34,7 @@
    Abstract socket:
 
      An abstract socket is represented by a symlink in the native
-     NT namespace, within the Cygin subdir in BasedNamedObjects.
+     NT namespace, within the Cygwin subdir in BasedNamedObjects.
      So it's globally available but only exists as long as at least on
      descriptor on the socket is open, as desired.
 
