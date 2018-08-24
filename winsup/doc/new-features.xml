@@ -38,6 +38,12 @@ Rename the --file option of setfacl(1) to --set-file, as on Linux.
 Support Unicode 10.
 </para></listitem>
 
+<listitem><para>
+Following glibc, `union wait' has now been removed.  Applications
+using union wait and these macros will have to migrate to the
+POSIX-specified int status type.
+</para></listitem>
+
 </itemizedlist>
 
 </sect2>

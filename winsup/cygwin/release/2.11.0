@@ -22,6 +22,10 @@ What changed:
 
 - Support Unicode 10.
 
+- Following glibc, `union wait' has now been removed.  Applications
+  using union wait and these macros will have to migrate to the
+  POSIX-specified int status type.
+
 
 Bug Fixes
 ---------
