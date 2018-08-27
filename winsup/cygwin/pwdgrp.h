@@ -101,6 +101,7 @@ class pwdgrp
   void *add_account_from_cygserver (cygpsid &sid);
   void *add_account_from_cygserver (const char *name);
   void *add_account_from_cygserver (uint32_t id);
+  bool construct_sid_from_name (cygsid &sid, wchar_t *name, wchar_t *sep);
   char *fetch_account_from_line (fetch_user_arg_t &arg, const char *line);
   char *fetch_account_from_file (fetch_user_arg_t &arg);
   char *fetch_account_from_windows (fetch_user_arg_t &arg,

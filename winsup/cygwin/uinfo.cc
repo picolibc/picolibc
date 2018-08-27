@@ -1793,6 +1793,116 @@ fetch_posix_offset (PDS_DOMAIN_TRUSTSW td, cyg_ldap *cldap)
   return td->PosixOffset;
 }
 
+/* If LookupAccountName fails, we check the name for a known constructed name
+   with this function.  Return true if we could create a valid SID from name
+   in sid.  sep is either a pointer to thr backslash in name, or NULL if name
+   is not a qualified DOMAIN\\name string. */
+bool
+pwdgrp::construct_sid_from_name (cygsid &sid, wchar_t *name, wchar_t *sep)
+{
+  unsigned long rid;
+  wchar_t *endptr;
+
+  if (sep && wcscmp (name, L"no\\body") == 0)
+    {
+      /* Special case "nobody" for reproducible construction of a
+	 nobody SID for WinFsp and similar services.  We use the
+	 value 65534 which is -2 with 16 bit uid/gids. */
+      sid.create (0, 1, 0xfffe);
+      return true;
+    }
+  if (sep && wcscmp (name, L"AzureAD\\Group") == 0)
+    {
+      get_azure_grp_sid ();
+      if (PSID (logon_sid) != NO_SID)
+	{
+	  sid = azure_grp_sid;
+	  return true;
+	}
+      return false;
+    }
+  if (!sep && wcscmp (name, L"Authentication authority asserted identity") == 0)
+    {
+      sid.create (18, 1, 1);
+      return true;
+    }
+  if (!sep && wcscmp (name, L"Service asserted identity") == 0)
+    {
+      sid.create (18, 1, 2);
+      return true;
+    }
+  if (sep && wcsncmp (name, L"Unix_", 5) == 0)
+    {
+      int type;
+
+      if (wcsncmp (name + 5, L"User\\", 5) == 0)
+	type = 1;
+      else if (wcsncmp (name + 5, L"Group\\", 6) == 0)
+	type = 2;
+      else
+	return false;
+
+      rid = wcstoul (sep + 1, &endptr, 10);
+      if (*endptr == L'\0')
+	{
+	  sid.create (22, 2, type, rid);
+	  return true;
+	}
+      return false;
+    }
+  /* At this point we have to check if the domain name is one of the
+     known domains, and if the account name is one of "User(DWORD)"
+     or "Group(DWORD)". */
+  if (sep)
+    {
+      wchar_t *numstr = NULL;
+      bool have_domain = false;
+
+      if (wcsncmp (sep + 1, L"User(", 5) == 0)
+	numstr = sep + 1 + 5;
+      else if (wcsncmp (sep + 1, L"Group(", 6) == 0)
+	numstr = sep + 1 + 6;
+      if (!numstr)
+	return false;
+      rid = wcstoul (numstr, &endptr, 10);
+      if (wcscmp (endptr, L")") != 0)
+	return false;
+
+      if (wcsncasecmp (name, cygheap->dom.account_flat_name (), sep - name)
+	  == 0)
+	{
+	  sid = cygheap->dom.account_sid ();
+	  have_domain = true;
+	}
+      else if (wcsncasecmp (name, cygheap->dom.primary_flat_name (), sep - name)
+	       == 0)
+	{
+	  sid = cygheap->dom.primary_sid ();
+	  have_domain = true;
+	}
+      else
+	{
+	  PDS_DOMAIN_TRUSTSW td = NULL;
+
+	  for (ULONG idx = 0; (td = cygheap->dom.trusted_domain (idx)); ++idx)
+	    {
+	      if (wcsncasecmp (name, td->NetbiosDomainName, sep - name) == 0)
+		{
+		  sid = td->DomainSid;
+		  have_domain = true;
+		  break;
+		}
+	    }
+	}
+      if (have_domain)
+	{
+	  sid.append (rid);
+	  return true;
+	}
+    }
+  return false;
+}
+
 /* CV 2014-05-08: USER_INFO_24 is not yet defined in Mingw64, but will be in
    the next release.  For the time being, define the structure here with
    another name which won't collide with the upcoming correct definition
@@ -1927,14 +2037,10 @@ pwdgrp::fetch_account_from_windows (fetch_user_arg_t &arg, cyg_ldap *pldap)
 	}
       if (!ret)
 	{
-	  if (!strcmp (arg.name, "no+body"))
-	    {
-	      /* Special case "nobody" for reproducible construction of a
-		 nobody SID for WinFsp and similar services.  We use the
-		 value 65534 which is -2 with 16 bit uid/gids. */
-	      csid.create (0, 1, 0xfffe);
-	      break;
-	    }
+	  /* For accounts which can't be resolved by Windows, try if
+	     it's one of the special names we use for special accounts. */
+	  if (construct_sid_from_name (csid, name, p))
+	    break;
 	  debug_printf ("LookupAccountNameW (%W), %E", name);
 	  return NULL;
 	}
@@ -2267,7 +2373,7 @@ pwdgrp::fetch_account_from_windows (fetch_user_arg_t &arg, cyg_ldap *pldap)
 		      /* This shouldn't happen, in theory, but it does.  There
 			 are cases where the user's logon domain does not show
 			 up in the list of trusted domains.  We're desperately
-			 trying to workaround that here bu adding an entry for
+			 trying to workaround that here by adding an entry for
 			 this domain to the trusted domains and ask the DC for
 			 a  posix_offset.  There's a good chance this doesn't
 			 work either, but at least we tried, and the user can
