@@ -74,3 +74,7 @@ Bug Fixes
 
 - Fix memory allocation values in /proc/<PID>/status and /proc/<PID>/statm.
   Addresses: https://cygwin.com/ml/cygwin/2018-08/msg00223.html
+
+- Fix handling of unknown accounts in file ACLs.  Add name->SID
+  conversion for (most) self-constructed account names.
+  Addresses: https://cygwin.com/ml/cygwin/2018-08/msg00295.html
