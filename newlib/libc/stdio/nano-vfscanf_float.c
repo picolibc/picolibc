@@ -330,7 +330,7 @@ fskip:
 	{
 	  flp = GET_ARG (N, *ap, float *);
 	  if (isnan (fp))
-	    *flp = nanf (NULL);
+	    *flp = nanf ("");
 	  else
 	    *flp = fp;
 	}

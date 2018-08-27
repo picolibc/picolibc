@@ -228,7 +228,7 @@ _wcstof_r (struct _reent *ptr,
 {
   double retval = _wcstod_l (ptr, nptr, endptr, __get_current_locale ());
   if (isnan (retval))
-    return nanf (NULL);
+    return nanf ("");
   return (float)retval;
 }
 
@@ -253,7 +253,7 @@ wcstof_l (const wchar_t *__restrict nptr, wchar_t **__restrict endptr,
 {
   double val = _wcstod_l (_REENT, nptr, endptr, loc);
   if (isnan (val))
-    return nanf (NULL);
+    return nanf ("");
   float retval = (float) val;
 #ifndef NO_ERRNO
   if (isinf (retval) && !isinf (val))
@@ -268,7 +268,7 @@ wcstof (const wchar_t *__restrict nptr,
 {
   double val = _wcstod_l (_REENT, nptr, endptr, __get_current_locale ());
   if (isnan (val))
-    return nanf (NULL);
+    return nanf ("");
   float retval = (float) val;
 #ifndef NO_ERRNO
   if (isinf (retval) && !isinf (val))
