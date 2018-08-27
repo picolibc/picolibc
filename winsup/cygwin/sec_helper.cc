@@ -169,10 +169,16 @@ cygpsid::get_id (BOOL search_grp, int *type, cyg_ldap *pldap)
 	}
       else if ((pw = internal_getpwsid (*this, pldap)))
 	id = pw->pw_uid;
-      if (id != ILLEGAL_UID && type)
-	*type = USER;
+      if (id != ILLEGAL_UID)
+	{
+	  if (type)
+	    *type = USER;
+	  return id;
+	}
     }
-  return id;
+  if (type)
+    *type = 0; /* undefined type */
+  return ILLEGAL_UID;
 }
 
 PWCHAR
