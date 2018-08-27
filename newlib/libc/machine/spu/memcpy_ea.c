@@ -34,10 +34,12 @@ POSSIBILITY OF SUCH DAMAGE.
 #include "ea_internal.h"
 #include <ea.h>
 #include <spu_cache.h>
+#include "../../string/local.h"
 
 COMPAT_EA_ALIAS (memcpy_ea);
 
 __ea void *
+__inhibit_loop_to_libcall
 memcpy_ea (__ea void *dest, __ea const void *src, size_ea_t n)
 {
   __ea void *curr_dest = dest;

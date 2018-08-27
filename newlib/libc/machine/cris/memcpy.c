@@ -31,6 +31,7 @@
    than what we describe.  An assembly file should be used instead.  */
 
 #include <stddef.h>
+#include "../../string/local.h"
 
 /* Break even between movem and move16 is really at 38.7 * 2, but
    modulo 44, so up to the next multiple of 44, we use ordinary code.  */
@@ -40,6 +41,7 @@
 __asm__ (".syntax no_register_prefix");
 
 void *
+__inhibit_loop_to_libcall
 memcpy(void *__restrict pdst, const void *__restrict psrc, size_t pn)
 {
   /* Now we want the parameters put in special registers.

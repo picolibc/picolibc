@@ -11,10 +11,12 @@
 
 #include <string.h>
 #include <stdint.h>
+#include "../../string/local.h"
 
 #define unlikely(X) __builtin_expect (!!(X), 0)
 
 void *
+__inhibit_loop_to_libcall
 memcpy(void *__restrict aa, const void *__restrict bb, size_t n)
 {
   #define BODY(a, b, t) { \

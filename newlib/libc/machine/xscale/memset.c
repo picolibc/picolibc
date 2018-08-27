@@ -6,8 +6,10 @@
 
 #include <string.h>
 #include "xscale.h"
+#include "../../string/local.h"
 
 void *
+__inhibit_loop_to_libcall
 memset (void *dst, int c, size_t len)
 {
   int dummy;

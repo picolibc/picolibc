@@ -31,6 +31,7 @@
 
 #include <stddef.h>
 #include "memset.h"
+#include "../../string/local.h"
 
 #define SET_32_OBJECTS(out)	\
 do {				\
@@ -228,8 +229,8 @@ do {				\
   out += 1;			\
 } while(0)
 
-
 static inline void
+__inhibit_loop_to_libcall
 __int_memset (void *__restrict s1, int val, size_t n)
 {
   int value = n;
@@ -369,6 +370,7 @@ __int_memset (void *__restrict s1, int val, size_t n)
 }
 
 static inline void
+__inhibit_loop_to_libcall
 __short_int_memset (void *__restrict s1, int val, size_t n)
 {
   int value = n;
@@ -508,6 +510,7 @@ __short_int_memset (void *__restrict s1, int val, size_t n)
 }
 
 static inline void
+__inhibit_loop_to_libcall
 __byte_memset (void *__restrict s1, int val, size_t n)
 {
   int value = n;
@@ -650,6 +653,7 @@ __byte_memset (void *__restrict s1, int val, size_t n)
 /* Exposed interface.  */
 
 void *
+__inhibit_loop_to_libcall
 memset (void *s, int c, size_t n)
 {
   void *result = s;

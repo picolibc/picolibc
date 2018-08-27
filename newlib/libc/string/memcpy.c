@@ -29,6 +29,7 @@ QUICKREF
 
 #include <_ansi.h>
 #include <string.h>
+#include "local.h"
 
 /* Nonzero if either X or Y is not aligned on a "long" boundary.  */
 #define UNALIGNED(X, Y) \
@@ -44,6 +45,7 @@ QUICKREF
 #define TOO_SMALL(LEN)  ((LEN) < BIGBLOCKSIZE)
 
 void *
+__inhibit_loop_to_libcall
 memcpy (void *__restrict dst0,
 	const void *__restrict src0,
 	size_t len0)

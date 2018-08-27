@@ -33,6 +33,7 @@
 #include <spu_intrinsics.h>
 #include <stddef.h>
 #include <vec_literal.h>
+#include "../../string/local.h"
 
 /* Copy n bytes from memory area src to memory area dest.
  * The memory areas may not overlap. The memcpy subroutine
@@ -42,7 +43,9 @@
  * either with prior knowledge of the alignment or special
  * casing specific optimal alignments.
  */
-void * memcpy(void * __restrict__ dest, const void * __restrict__ src, size_t n)
+void *
+__inhibit_loop_to_libcall
+memcpy(void * __restrict__ dest, const void * __restrict__ src, size_t n)
 {
   int adjust, delta;
   unsigned int soffset1, doffset1, doffset2;

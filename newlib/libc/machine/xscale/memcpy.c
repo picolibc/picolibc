@@ -6,8 +6,10 @@
 
 #include <string.h>
 #include "xscale.h"
+#include "../../string/local.h"
 
 void *
+__inhibit_loop_to_libcall
 memcpy (void *__restrict dst0, const void *__restrict src0, size_t len)
 {
   int dummy;
