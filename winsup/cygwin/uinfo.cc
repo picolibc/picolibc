@@ -1821,6 +1821,14 @@ pwdgrp::construct_sid_from_name (cygsid &sid, wchar_t *name, wchar_t *sep)
 	}
       return false;
     }
+  if (!sep && wcscmp (name, L"CurrentSession") == 0)
+    {
+      get_logon_sid ();
+      if (PSID (logon_sid) == NO_SID)
+	return false;
+      sid = logon_sid;
+      return true;
+    }
   if (!sep && wcscmp (name, L"Authentication authority asserted identity") == 0)
     {
       sid.create (18, 1, 1);
@@ -1903,6 +1911,8 @@ pwdgrp::construct_sid_from_name (cygsid &sid, wchar_t *name, wchar_t *sep)
   return false;
 }
 
+/* CV 2018-08-28: SidTypeLogonSession is not yet defined in Mingw64. */
+#define SidTypeLogonSession 11
 
 char *
 pwdgrp::fetch_account_from_windows (fetch_user_arg_t &arg, cyg_ldap *pldap)
@@ -2268,7 +2278,7 @@ pwdgrp::fetch_account_from_windows (fetch_user_arg_t &arg, cyg_ldap *pldap)
       if (acc_type == SidTypeUser
 	  && (sid_sub_auth_count (sid) <= 3 || sid_id_auth (sid) == 11))
 	acc_type = SidTypeWellKnownGroup;
-      switch (acc_type)
+      switch ((int) acc_type)
       	{
 	case SidTypeUser:
 	  if (is_group ())
@@ -2597,6 +2607,26 @@ pwdgrp::fetch_account_from_windows (fetch_user_arg_t &arg, cyg_ldap *pldap)
 	     Never return "NULL SID" or Everyone as user or group. */
 	  if (uid == 0x10000 || uid == 0x10100)
 	    return NULL;
+	  break;
+	case SidTypeLogonSession:
+	  /* Starting with Windows 10, LookupAccountSid/Name return valid
+	     info for the login session with new SID_NAME_USE value
+	     SidTypeLogonSession.  To return the same info as on
+	     pre-Windows 10, we have to handle this type explicitely here
+	     now and convert the name to "CurrentSession". */
+	  get_logon_sid ();
+	  if (PSID (logon_sid) == NO_SID)
+	    return NULL;
+	  if (RtlEqualSid (sid, logon_sid))
+	    {
+	      uid = 0xfff;
+	      wcpcpy (name = namebuf, L"CurrentSession");
+	    }
+	  else
+	    {
+	      uid = 0xffe;
+	      wcpcpy (name = namebuf, L"OtherSession");
+	    }
 	  break;
 	case SidTypeLabel:
 	  uid = 0x60000 + sid_sub_auth_rid (sid);

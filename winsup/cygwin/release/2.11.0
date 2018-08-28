@@ -78,3 +78,6 @@ Bug Fixes
 - Fix handling of unknown accounts in file ACLs.  Add name->SID
   conversion for (most) self-constructed account names.
   Addresses: https://cygwin.com/ml/cygwin/2018-08/msg00295.html
+
+- Correctly handle Logon Session accounts on Windows 10.
+  Addresses: Found during debugging
