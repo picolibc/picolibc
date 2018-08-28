@@ -1903,18 +1903,6 @@ pwdgrp::construct_sid_from_name (cygsid &sid, wchar_t *name, wchar_t *sep)
   return false;
 }
 
-/* CV 2014-05-08: USER_INFO_24 is not yet defined in Mingw64, but will be in
-   the next release.  For the time being, define the structure here with
-   another name which won't collide with the upcoming correct definition
-   in lmaccess.h. */
-struct cyg_USER_INFO_24
-{
-  BOOL   usri24_internet_identity;
-  DWORD  usri24_flags;
-  LPWSTR usri24_internet_provider_name;
-  LPWSTR usri24_internet_principal_name;
-  PSID   usri24_user_sid;
-};
 
 char *
 pwdgrp::fetch_account_from_windows (fetch_user_arg_t &arg, cyg_ldap *pldap)
@@ -2298,7 +2286,7 @@ pwdgrp::fetch_account_from_windows (fetch_user_arg_t &arg, cyg_ldap *pldap)
 		its_ok = true;
 	      else if (wincap.has_microsoft_accounts ())
 		{
-		  struct cyg_USER_INFO_24 *ui24;
+		  USER_INFO_24 *ui24;
 		  if (NetUserGetInfo (NULL, name, 24, (PBYTE *) &ui24)
 		      == NERR_Success)
 		    {
