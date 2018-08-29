@@ -1,0 +1,18 @@
+#!/bin/sh
+ARCH=arm-none-eabi
+DIR=`dirname $0`
+meson $DIR \
+	-Dtarget-optspace=true \
+	-Dnewlib-tinystdio=true \
+	-Dnewlib-supplied-syscalls=false \
+	-Dnewlib-reentrant-small=true\
+	-Dnewlib-wide-orient=false\
+	-Dnewlib-nano-malloc=true\
+	-Dnewlib-reent-small=true\
+	-Dlite-exit=true\
+	-Dnewlib-global-atexit=true\
+	-Dnewlib-global-errno=true\
+	-Dincludedir=lib/newlib-nano/$ARCH/include \
+	-Dlibdir=lib/newlib-nano/$ARCH/lib \
+	--cross-file $DIR/cross-$ARCH.txt \
+	--buildtype plain

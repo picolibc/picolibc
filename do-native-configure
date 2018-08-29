@@ -1,0 +1,14 @@
+#!/bin/sh
+DIR=`dirname $0`
+meson $DIR \
+	-Dnewlib-tinystdio=true \
+	-Dnewlib-supplied-syscalls=false \
+	-Dnewlib-reentrant-small=true\
+	-Dnewlib-wide-orient=false\
+	-Dnewlib-nano-malloc=true\
+	-Dlite-exit=true\
+	-Dnewlib-global-atexit=true\
+	-Dincludedir=lib/newlib-nano/include \
+	-Dlibdir=lib/newlib-nano/lib \
+	-Dtests=true \
+	--buildtype debug
