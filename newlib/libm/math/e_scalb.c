@@ -46,8 +46,13 @@
 	    else       return x/(-fn);
 	}
 	if (rint(fn)!=fn) return (fn-fn)/(fn-fn);
+#if INT_MAX == 32767
+	if ( fn > 65000.0) return scalbln(x, 65000);
+	if (-fn > 65000.0) return scalbln(x,-65000);
+#else
 	if ( fn > 65000.0) return scalbn(x, 65000);
 	if (-fn > 65000.0) return scalbn(x,-65000);
+#endif
 	return scalbn(x,(int)fn);
 #endif
 }
