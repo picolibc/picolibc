@@ -155,7 +155,7 @@ issignalingf_inline (float x)
   uint32_t ix = asuint (x);
   if (!IEEE_754_2008_SNAN)
     return (ix & 0x7fc00000) == 0x7fc00000;
-  return 2 * (ix ^ 0x00400000) > 2u * 0x7fc00000;
+  return 2 * (ix ^ 0x00400000) > 0xFF800000u;
 }
 
 static inline int
