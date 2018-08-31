@@ -76,7 +76,7 @@ static int monitor_stderr;
 typedef struct
 {
   int handle;
-  int pos;
+  off_t pos;
 }
 poslog;
 
@@ -234,9 +234,16 @@ _swilseek (int file, off_t ptr, int dir)
 
   if (dir == SEEK_CUR)
     {
+      off_t pos;
       if (slot == MAX_OPEN_FILES)
 	return -1;
-      ptr = openfiles[slot].pos + ptr;
+      pos = openfiles[slot].pos;
+
+      /* Avoid SWI SEEK command when just querying file position. */
+      if (ptr == 0)
+	return pos;
+
+      ptr += pos;
       dir = SEEK_SET;
     }
 
