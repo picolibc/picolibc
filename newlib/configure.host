@@ -28,6 +28,7 @@
 #   newlib_io_long_long --enable-newlib-io-long-long ("yes", "no", "")
 #   newlib_io_long_double --enable-newlib-io-long-double ("yes", "no", "")
 #   newlib_global_stdio_streams --enable-global-stdio-streams ("yes", "no, "")
+#   newlib_fno_builtin  --disable-newlib-fno-builtin ("yes", "no, "")
 
 # It sets the following shell variables:
 #   newlib_cflags	Special CFLAGS to use when building
@@ -88,6 +89,19 @@ case "${target_optspace}:${host}" in
     newlib_cflags="${newlib_cflags} -Os"
     ;;
   no:* | :*)
+    ;;
+esac
+
+case "${newlib_fno_builtin}:${host}" in
+  yes:*)
+    newlib_cflags="${newlib_cflags} -fno-builtin"
+    ;;
+  no:*)
+    newlib_cflags="${newlib_cflags}"
+    ;;
+  *:*)
+    # For now, all targets default to using -fno-builtin until tested without
+    newlib_cflags="${newlib_cflags} -fno-builtin"
     ;;
 esac
 

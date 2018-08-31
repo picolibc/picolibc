@@ -92,6 +92,16 @@ AC_ARG_ENABLE(newlib-supplied-syscalls,
 
 AM_CONDITIONAL(MAY_SUPPLY_SYSCALLS, test x[$]{newlib_may_supply_syscalls} = xyes)
 
+dnl Support --disable-newlib-fno-builtin
+AC_ARG_ENABLE(newlib-fno-builtin,
+[  --disable-newlib-fno-builtin disable -fno-builtin flag to allow compiler to use builtin library functions],
+[case "${enableval}" in
+  yes) newlib_fno_builtin=yes ;;
+  no)  newlib_fno_builtin=no ;;
+  *)   AC_MSG_ERROR(bad value ${enableval} for newlib-fno-builtin option) ;;
+ esac], [newlib_fno_builtin=])dnl
+
+
 dnl We may get other options which we don't document:
 dnl --with-target-subdir, --with-multisrctop, --with-multisubdir
 
@@ -201,8 +211,6 @@ if false; then
 fi
 
 . [$]{newlib_basedir}/configure.host
-
-newlib_cflags="[$]{newlib_cflags} -fno-builtin"
 
 NEWLIB_CFLAGS=${newlib_cflags}
 AC_SUBST(NEWLIB_CFLAGS)

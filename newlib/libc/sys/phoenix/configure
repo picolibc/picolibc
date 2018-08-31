@@ -692,6 +692,7 @@ enable_newlib_iconv
 enable_newlib_elix_level
 enable_newlib_io_float
 enable_newlib_supplied_syscalls
+enable_newlib_fno_builtin
 enable_dependency_tracking
 enable_maintainer_mode
 '
@@ -1328,6 +1329,7 @@ Optional Features:
   --enable-newlib-elix-level         supply desired elix library level (1-4)
   --disable-newlib-io-float disable printf/scanf family float support
   --disable-newlib-supplied-syscalls disable newlib from supplying syscalls
+  --disable-newlib-fno-builtin disable -fno-builtin flag to allow compiler to use builtin library functions
   --disable-dependency-tracking  speeds up one-time build
   --enable-dependency-tracking   do not reject slow dependency extractors
   --enable-maintainer-mode  enable make rules and dependencies not useful
@@ -2492,6 +2494,18 @@ else
 fi
 
 
+# Check whether --enable-newlib-fno-builtin was given.
+if test "${enable_newlib_fno_builtin+set}" = set; then :
+  enableval=$enable_newlib_fno_builtin; case "${enableval}" in
+  yes) newlib_fno_builtin=yes ;;
+  no)  newlib_fno_builtin=no ;;
+  *)   as_fn_error $? "bad value ${enableval} for newlib-fno-builtin option" "$LINENO" 5 ;;
+ esac
+else
+  newlib_fno_builtin=
+fi
+
+
 
 test -z "${with_target_subdir}" && with_target_subdir=.
 
@@ -3337,8 +3351,6 @@ if false; then
 fi
 
 . ${newlib_basedir}/configure.host
-
-newlib_cflags="${newlib_cflags} -fno-builtin"
 
 NEWLIB_CFLAGS=${newlib_cflags}
 
