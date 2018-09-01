@@ -1971,13 +1971,12 @@ bad_escape:
     }
 }
 
-/* This gets called when we found an invalid input character.  We just
-   print a half filled square (UTF 0x2592).  We have no chance to figure
-   out the "meaning" of the input char anyway. */
+/* This gets called when we found an invalid input character.
+   Print Unicode REPLACEMENT CHARACTER (UTF 0xfffd). */
 inline void
 fhandler_console::write_replacement_char ()
 {
-  static const wchar_t replacement_char = 0x2592; /* Half filled square */
+  static const wchar_t replacement_char = 0xfffd; /* REPLACEMENT CHARACTER */
   DWORD done;
   WriteConsoleW (get_output_handle (), &replacement_char, 1, &done, 0);
 }
