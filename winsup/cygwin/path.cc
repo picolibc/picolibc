@@ -1394,14 +1394,27 @@ normalize_win32_path (const char *src, char *dst, char *&tail)
 	}
       else if (*src != '/')
 	{
+	  /* Make sure dst points to the rightmost backslash which must not
+	     be backtracked over during ".." evaluation.  This is either
+	     the backslash after the network path prefix (i.e. "\\") or
+	     the backslash after a drive letter (i.e. C:\"). */
 	  if (beg_src_slash)
-	    dst = (tail += cygheap->cwd.get_drive (dst));
+	    {
+	      tail += cygheap->cwd.get_drive (dst);
+	      /* network path, drive == '\\\\'?  Decrement tail to avoid
+	         triple backslash in output. */
+	      if (dst[0] == '\\')
+		--tail;
+	      dst = tail;
+	    }
 	  else if (cygheap->cwd.get (dst, 0))
 	    {
 	      tail = strchr (tail, '\0');
 	      if (tail[-1] != '\\')
 		*tail++ = '\\';
-	      dst = tail - 1;
+	      ++dst;
+	      if (dst[1] == '\\')
+		++dst;
 	    }
 	  else
 	    return get_errno ();
@@ -1428,9 +1441,7 @@ normalize_win32_path (const char *src, char *dst, char *&tail)
 	}
 
       /* Backup if "..".  */
-      else if (src[0] == '.' && src[1] == '.'
-	       /* dst must be greater than dst_start */
-	       && tail[-1] == '\\')
+      else if (src[0] == '.' && src[1] == '.' && tail[-1] == '\\')
 	{
 	  if (!isdirsep (src[2]) && src[2] != '\0')
 	      *tail++ = *src++;
