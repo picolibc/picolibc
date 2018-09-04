@@ -30,20 +30,11 @@ QUICKREF
 
 #include <string.h>
 
-#if !defined(PREFER_SIZE_OVER_SPEED) && !defined(__OPTIMIZE_SIZE__)
-# define RETURN_TYPE char *
-# define AVAILABLE(h, h_l, j, n_l)			\
-  (!memchr ((h) + (h_l), '\0', (j) + (n_l) - (h_l))	\
-   && ((h_l) = (j) + (n_l)))
-# include "str-two-way.h"
-#endif
-
+#if defined(PREFER_SIZE_OVER_SPEED) || defined(__OPTIMIZE_SIZE__)
 char *
 strstr (const char *searchee,
 	const char *lookfor)
 {
-#if defined(PREFER_SIZE_OVER_SPEED) || defined(__OPTIMIZE_SIZE__)
-
   /* Less code size, but quadratic performance in the worst case.  */
   if (*searchee == 0)
     {
@@ -77,12 +68,76 @@ strstr (const char *searchee,
 
 #else /* compilation for speed */
 
+# define RETURN_TYPE char *
+# define AVAILABLE(h, h_l, j, n_l)			\
+  (!memchr ((h) + (h_l), '\0', (j) + (n_l) - (h_l))	\
+   && ((h_l) = (j) + (n_l)))
+# include "str-two-way.h"
+
+static inline char *
+strstr2 (const char *hs, const char *ne)
+{
+  uint32_t h1 = (ne[0] << 16) | ne[1];
+  uint32_t h2 = 0;
+  int c = hs[0];
+  while (h1 != h2 && c != 0)
+    {
+      h2 = (h2 << 16) | c;
+      c = *++hs;
+    }
+  return h1 == h2 ? (char *)hs - 2 : NULL;
+}
+
+static inline char *
+strstr3 (const char *hs, const char *ne)
+{
+  uint32_t h1 = (ne[0] << 24) | (ne[1] << 16) | (ne[2] << 8);
+  uint32_t h2 = 0;
+  int c = hs[0];
+  while (h1 != h2 && c != 0)
+    {
+      h2 = (h2 | c) << 8;
+      c = *++hs;
+    }
+  return h1 == h2 ? (char *)hs - 3 : NULL;
+}
+
+static inline char *
+strstr4 (const char *hs, const char *ne)
+{
+  uint32_t h1 = (ne[0] << 24) | (ne[1] << 16) | (ne[2] << 8) | ne[3];
+  uint32_t h2 = 0;
+  int c = hs[0];
+  while (h1 != h2 && c != 0)
+    {
+      h2 = (h2 << 8) | c;
+      c = *++hs;
+    }
+  return h1 == h2 ? (char *)hs - 4 : NULL;
+}
+
+char *
+strstr (const char *searchee,
+	const char *lookfor)
+{
   /* Larger code size, but guaranteed linear performance.  */
   const char *haystack = searchee;
   const char *needle = lookfor;
   size_t needle_len; /* Length of NEEDLE.  */
   size_t haystack_len; /* Known minimum length of HAYSTACK.  */
   int ok = 1; /* True if NEEDLE is prefix of HAYSTACK.  */
+
+  /* Handle short needle special cases first.  */
+  if (needle[0] == '\0')
+    return (char *) haystack;
+  if (needle[1] == '\0')
+    return strchr (haystack, needle[0]);
+  if (needle[2] == '\0')
+    return strstr2 (haystack, needle);
+  if (needle[3] == '\0')
+    return strstr3 (haystack, needle);
+  if (needle[4] == '\0')
+    return strstr4 (haystack, needle);
 
   /* Determine length of NEEDLE, and in the process, make sure
      HAYSTACK is at least as long (no point processing all of a long
