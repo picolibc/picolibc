@@ -759,7 +759,7 @@ dev_console::scroll_buffer (HANDLE h, int x1, int y1, int x2, int y2, int xn, in
   SMALL_RECT sr1, sr2;
   CHAR_INFO fill;
   COORD dest;
-  fill.Char.AsciiChar = ' ';
+  fill.Char.UnicodeChar = L' ';
   fill.Attributes = current_win32_attr;
 
   fillin (h);
@@ -775,7 +775,7 @@ dev_console::scroll_buffer (HANDLE h, int x1, int y1, int x2, int y2, int xn, in
     sr1.Bottom = sr2.Bottom;
   dest.X = xn >= 0 ? xn : dwWinSize.X - 1;
   dest.Y = yn >= 0 ? yn : b.srWindow.Bottom;
-  ScrollConsoleScreenBuffer (h, &sr1, &sr2, dest, &fill);
+  ScrollConsoleScreenBufferW (h, &sr1, &sr2, dest, &fill);
 }
 
 inline void
@@ -822,7 +822,7 @@ fhandler_console::open (int flags, mode_t)
   set_output_handle (NULL);
 
   /* Open the input handle as handle_ */
-  h = CreateFile ("CONIN$", GENERIC_READ | GENERIC_WRITE,
+  h = CreateFileW (L"CONIN$", GENERIC_READ | GENERIC_WRITE,
 		  FILE_SHARE_READ | FILE_SHARE_WRITE, &sec_none,
 		  OPEN_EXISTING, 0, 0);
 
@@ -833,7 +833,7 @@ fhandler_console::open (int flags, mode_t)
     }
   set_io_handle (h);
 
-  h = CreateFile ("CONOUT$", GENERIC_READ | GENERIC_WRITE,
+  h = CreateFileW (L"CONOUT$", GENERIC_READ | GENERIC_WRITE,
 		  FILE_SHARE_READ | FILE_SHARE_WRITE, &sec_none,
 		  OPEN_EXISTING, 0, 0);
 
@@ -1226,9 +1226,9 @@ dev_console::scroll_window (HANDLE h, int x1, int y1, int x2, int y2)
       br.Right = b.dwSize.X - 1;
       br.Bottom = b.dwSize.Y - 1;
       dest.X = dest.Y = 0;
-      fill.Char.AsciiChar = ' ';
+      fill.Char.UnicodeChar = L' ';
       fill.Attributes = current_win32_attr;
-      ScrollConsoleScreenBuffer (h, &br, NULL, dest, &fill);
+      ScrollConsoleScreenBufferW (h, &br, NULL, dest, &fill);
       /* Since we're moving the console buffer under the console window
 	 we only have to move the console window if the user scrolled the
 	 window upwards.  The number of lines is the distance to the
