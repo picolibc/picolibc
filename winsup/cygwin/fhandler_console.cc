@@ -1971,14 +1971,103 @@ bad_escape:
     }
 }
 
+#define NUM_REPLACEMENT_CHARS	3
+
+static const wchar_t replacement_char[NUM_REPLACEMENT_CHARS] =
+{
+  0xfffd, /* REPLACEMENT CHARACTER */
+  0x25a1, /* WHITE SQUARE */
+  0x2592  /* MEDIUM SHADE */
+};
+/* nFont member is always 0 so we have to use the facename. */
+static WCHAR cons_facename[LF_FACESIZE];
+static int rp_char_idx;
+static HDC cdc;
+
+static int CALLBACK
+enum_proc (const LOGFONTW *lf, const TEXTMETRICW *tm,
+	   DWORD FontType, LPARAM lParam)
+{
+  int *done = (int *) lParam;
+  *done = 1;
+  return 0;
+}
+
+static void
+check_font (HANDLE hdl)
+{
+  CONSOLE_FONT_INFOEX cfi;
+  LOGFONTW lf;
+
+  cfi.cbSize = sizeof cfi;
+  if (!GetCurrentConsoleFontEx (hdl, 0, &cfi))
+    return;
+  /* Switched font? */
+  if (wcscmp (cons_facename, cfi.FaceName) == 0)
+    return;
+  if (!cdc && !(cdc = GetDC (GetConsoleWindow ())))
+    return;
+  /* Some FaceNames like DejaVu Sans Mono are sometimes returned with stray
+     trailing chars.  Fix it. */
+  lf.lfCharSet = ANSI_CHARSET;
+  lf.lfPitchAndFamily = FIXED_PITCH | FF_DONTCARE;
+  wchar_t *cp = wcpcpy (lf.lfFaceName, cfi.FaceName) - 1;
+  int done = 0;
+  do
+    {
+      EnumFontFamiliesExW (cdc, &lf, enum_proc, (LPARAM) &done, 0);
+      if (!done && cp > lf.lfFaceName)
+	*cp-- = L'\0';
+    }
+  while (!done);
+  /* Yes.  Check for the best replacement char. */
+  HFONT f = CreateFontW (0, 0, 0, 0,
+			 cfi.FontWeight, FALSE, FALSE, FALSE,
+			 ANSI_CHARSET, OUT_DEFAULT_PRECIS,
+			 CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY,
+			 FIXED_PITCH | FF_DONTCARE, lf.lfFaceName);
+  if (!f)
+    return;
+
+  HFONT old_f = (HFONT) SelectObject(cdc, f);
+  if (old_f)
+    {
+      WORD glyph_idx[NUM_REPLACEMENT_CHARS];
+
+      if (GetGlyphIndicesW (cdc, replacement_char,
+			    NUM_REPLACEMENT_CHARS, glyph_idx,
+			    GGI_MARK_NONEXISTING_GLYPHS) != GDI_ERROR)
+	{
+	  int i;
+
+	  for (i = 0; i < NUM_REPLACEMENT_CHARS; ++i)
+	    if (glyph_idx[i] != 0xffff)
+	      break;
+	  if (i == NUM_REPLACEMENT_CHARS)
+	    i = 0;
+	  rp_char_idx = i;
+	  /* Note that we copy the original name returned by
+	     GetCurrentConsoleFontEx, even if it was broken.
+	     This allows an early return, rather than to store
+	     the fixed name and then having to enum font families
+	     all over again. */
+	  wcscpy (cons_facename, cfi.FaceName);
+	}
+      SelectObject (cdc, old_f);
+    }
+  DeleteObject (f);
+}
+
 /* This gets called when we found an invalid input character.
-   Print Unicode REPLACEMENT CHARACTER (UTF 0xfffd). */
+   Print one of the above Unicode chars as replacement char. */
 inline void
 fhandler_console::write_replacement_char ()
 {
-  static const wchar_t replacement_char = 0xfffd; /* REPLACEMENT CHARACTER */
+  check_font (get_output_handle ());
+
   DWORD done;
-  WriteConsoleW (get_output_handle (), &replacement_char, 1, &done, 0);
+  WriteConsoleW (get_output_handle (), &replacement_char[rp_char_idx], 1,
+		 &done, 0);
 }
 
 const unsigned char *
