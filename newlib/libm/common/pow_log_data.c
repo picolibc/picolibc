@@ -50,6 +50,28 @@ const struct pow_log_data __pow_log_data = {
 -0x1.0002b8b263fc3p-3 * -8,
 #endif
 },
+/* Algorithm:
+
+	x = 2^k z
+	log(x) = k ln2 + log(c) + log(z/c)
+	log(z/c) = poly(z/c - 1)
+
+where z is in [0x1.69555p-1; 0x1.69555p0] which is split into N subintervals
+and z falls into the ith one, then table entries are computed as
+
+	tab[i].invc = 1/c
+	tab[i].logc = round(0x1p43*log(c))/0x1p43
+	tab[i].logctail = (double)(log(c) - logc)
+
+where c is chosen near the center of the subinterval such that 1/c has only a
+few precision bits so z/c - 1 is exactly representible as double:
+
+	1/c = center < 1 ? round(N/center)/N : round(2*N/center)/N/2
+
+Note: |z/c - 1| < 1/N for the chosen c, |log(c) - logc - logctail| < 0x1p-97,
+the last few bits of logc are rounded away so k*ln2hi + logc has no rounding
+error and the interval for z is selected such that near x == 1, where log(x)
+is tiny, large cancellation error is avoided in logc + poly(z/c - 1).  */
 .tab = {
 #if N == 128
 #define A(a,b,c) {a,0,b,c},

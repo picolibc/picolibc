@@ -110,6 +110,32 @@ const struct log_data __log_data = {
 0x1.2493c29331a5cp-3,
 #endif
 },
+/* Algorithm:
+
+	x = 2^k z
+	log(x) = k ln2 + log(c) + log(z/c)
+	log(z/c) = poly(z/c - 1)
+
+where z is in [1.6p-1; 1.6p0] which is split into N subintervals and z falls
+into the ith one, then table entries are computed as
+
+	tab[i].invc = 1/c
+	tab[i].logc = (double)log(c)
+	tab2[i].chi = (double)c
+	tab2[i].clo = (double)(c - (double)c)
+
+where c is near the center of the subinterval and is chosen by trying +-2^29
+floating point invc candidates around 1/center and selecting one for which
+
+	1) the rounding error in 0x1.8p9 + logc is 0,
+	2) the rounding error in z - chi - clo is < 0x1p-66 and
+	3) the rounding error in (double)log(c) is minimized (< 0x1p-66).
+
+Note: 1) ensures that k*ln2hi + logc can be computed without rounding error,
+2) ensures that z/c - 1 can be computed as (z - chi - clo)*invc with close to
+a single rounding error when there is no fast fma for z*invc - 1, 3) ensures
+that logc + poly(z/c - 1) has small error, however near x == 1 when
+|log(x)| < 0x1p-4, this is not enough so that is special cased.  */
 .tab = {
 #if N == 64
 {0x1.7242886495cd8p+0, -0x1.79e267bdfe000p-2},
