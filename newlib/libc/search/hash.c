@@ -193,6 +193,9 @@ __hash_open (const char *file,
 			RETURN_ERROR(EFTYPE, error1);
 		if (hashp->hash(CHARKEY, sizeof(CHARKEY)) != hashp->H_CHARKEY)
 			RETURN_ERROR(EFTYPE, error1);
+                /* Check bucket size isn't too big for target int. */
+                if (hashp->BSIZE > INT_MAX)
+                        RETURN_ERROR(EFTYPE, error1);
 		/*
 		 * Figure out how many segments we need.  Max_Bucket is the
 		 * maximum bucket number, so the number of buckets is
@@ -343,7 +346,7 @@ init_hash(hashp, file, info)
 		if (stat(file, &statbuf))
 #endif
 			return (NULL);
-		hashp->BSIZE = statbuf.st_blksize;
+		hashp->BSIZE = MIN(statbuf.st_blksize, MAX_BSIZE);
 		hashp->BSHIFT = __log2(hashp->BSIZE);
 	}
 
