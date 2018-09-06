@@ -144,7 +144,7 @@ struct __sbuf {
  * _ub._base!=NULL) and _up and _ur save the current values of _p and _r.
  */
 
-#if defined(_REENT_SMALL) && !defined(_REENT_GLOBAL_STDIO_STREAMS)
+#if defined(_REENT_SMALL) && !defined(_REENT_GLOBAL_STDIO_STREAMS) && !defined(__CUSTOM_FILE_IO__)
 /*
  * struct __sFILE_fake is the start of a struct __sFILE, with only the
  * minimal fields allocated.  In __sinit() we really allocate the 3
@@ -377,16 +377,20 @@ struct _reent
   int _errno;			/* local copy of errno */
 #endif
 
+# ifndef TINY_STDIO
   /* FILE is a big struct and may change over time.  To try to achieve binary
      compatibility with future versions, put stdin,stdout,stderr here.
      These are pointers into member __sf defined below.  */
   __FILE *_stdin, *_stdout, *_stderr;	/* XXX */
+# endif
 
   int  _inc;			/* used by tmpnam */
 
   char *_emergency;
 
+# ifndef TINY_STDIO
   int __sdidinit;		/* 1 means stdio has been init'd */
+# endif
 
 # ifdef __HAVE_LOCALE_INFO__
   int _unspecified_locale_info;	/* unused, reserved for locale stuff */
@@ -505,8 +509,8 @@ extern const struct __sFILE_fake __sf_fake_stderr;
 #define __reent_assert(x) ((void)0)
 #endif
 
-#ifdef __CUSTOM_FILE_IO__
-#error Custom FILE I/O and _REENT_SMALL not currently supported.
+#if defined(__CUSTOM_FILE_IO__) && !defined(TINY_STDIO)
+#error Custom FILE I/O and _REENT_SMALL not currently supported without TINY_STDIO
 #endif
 
 /* Generic _REENT check macro.  */
