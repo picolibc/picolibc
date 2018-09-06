@@ -1982,7 +1982,7 @@ static const wchar_t replacement_char[NUM_REPLACEMENT_CHARS] =
 /* nFont member is always 0 so we have to use the facename. */
 static WCHAR cons_facename[LF_FACESIZE];
 static int rp_char_idx;
-static HDC cdc;
+static NO_COPY HDC cdc;
 
 static int CALLBACK
 enum_proc (const LOGFONTW *lf, const TEXTMETRICW *tm,
