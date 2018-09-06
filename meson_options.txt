@@ -77,3 +77,5 @@ option('newlib-locale-info', type: 'boolean', value: false,
        description: 'locale support')
 option('newlib-locale-info-extended', type: 'boolean', value: false,
        description: 'extended locale support')
+option('newlib-global-errno', type: 'boolean', value: false,
+       description: 'use global errnor variable')

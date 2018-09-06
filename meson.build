@@ -45,6 +45,7 @@ newlib_reentrant_syscalls_provided = get_option('newlib-reentrant-syscalls-provi
 newlib_missing_syscall_names = get_option('newlib-missing-syscall-names')
 newlib_locale_info = get_option('newlib-locale-info')
 newlib_locale_info_extended = get_option('newlib-locale-info-extended')
+newlib_global_errno = get_option('newlib-global-errno')
 hw_fp = get_option('hw-fp')
 
 host_cpu=host_machine.cpu()
@@ -122,6 +123,7 @@ conf_data.set('REENTRANT_SYSCALLS_PROVIDED', newlib_reentrant_syscalls_provided,
 conf_data.set('MISSING_SYSCALL_NAMES', newlib_missing_syscall_names, description: 'use regular syscalls')
 conf_data.set('__HAVE_LOCALE_INFO__', newlib_locale_info, description: 'locale support')
 conf_data.set('__HAVE_LOCALE_INFO_EXTENDED__', newlib_locale_info_extended, description: 'extended locale support')
+conf_data.set('NEWLIB_GLOBAL_ERRNO', newlib_global_errno, description: 'use global errno variable')
 
 version_data = configuration_data()
 
