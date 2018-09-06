@@ -47,7 +47,7 @@ _write_r (struct _reent *ptr,
 
   errno = 0;
   if ((ret = (_ssize_t)_write (fd, buf, cnt)) == -1 && errno != 0)
-    ptr->_errno = errno;
+    __errno_r(ptr) = errno;
   return ret;
 }
 

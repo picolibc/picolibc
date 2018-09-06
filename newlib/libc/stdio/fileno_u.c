@@ -39,7 +39,7 @@ fileno_unlocked (FILE * f)
   else
     {
       result = -1;
-      _REENT->_errno = EBADF;
+      __errno_r(_REENT) = EBADF;
     }
   return result;
 }

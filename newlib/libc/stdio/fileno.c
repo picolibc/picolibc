@@ -73,7 +73,7 @@ fileno (FILE * f)
   else
     {
       result = -1;
-      _REENT->_errno = EBADF;
+      __errno_r(_REENT) = EBADF;
     }
   _newlib_flockfile_end (f);
   return result;

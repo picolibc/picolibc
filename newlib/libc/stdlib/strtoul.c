@@ -182,7 +182,7 @@ _strtoul_l (struct _reent *rptr, const char *__restrict nptr,
 	}
 	if (any < 0) {
 		acc = ULONG_MAX;
-		rptr->_errno = ERANGE;
+		__errno_r(rptr) = ERANGE;
 	} else if (neg)
 		acc = -acc;
 	if (endptr != 0)

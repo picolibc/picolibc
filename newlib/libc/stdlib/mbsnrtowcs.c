@@ -126,7 +126,7 @@ _mbsnrtowcs_r (struct _reent *r,
       else
 	{
 	  ps->__count = 0;
-	  r->_errno = EILSEQ;
+	  __errno_r(r) = EILSEQ;
 	  return (size_t)-1;
 	}
     }

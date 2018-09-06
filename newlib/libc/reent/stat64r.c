@@ -53,7 +53,7 @@ _stat64_r (struct _reent *ptr,
 
   errno = 0;
   if ((ret = _stat64 (file, pstat)) == -1 && errno != 0)
-    ptr->_errno = errno;
+    __errno_r(ptr) = errno;
   return ret;
 }
 

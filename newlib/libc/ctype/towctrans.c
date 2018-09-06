@@ -86,7 +86,7 @@ _towctrans_r (struct _reent *r,
     {
       // skipping this because it was causing trouble (cygwin crash)
       // and there is no errno specified for towctrans
-      //r->_errno = EINVAL;
+      //__errno_r(r) = EINVAL;
       return c;
     }
 }

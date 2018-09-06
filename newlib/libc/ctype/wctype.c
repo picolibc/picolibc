@@ -128,7 +128,7 @@ _wctype_r (struct _reent *r,
     }
 
   /* otherwise invalid */
-  r->_errno = EINVAL;
+  __errno_r(r) = EINVAL;
   return 0;
 }
 

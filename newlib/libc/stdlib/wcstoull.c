@@ -154,7 +154,7 @@ _wcstoull_l (struct _reent *rptr, const wchar_t *nptr, wchar_t **endptr,
 	register int neg = 0, any, cutlim;
 
 	if(base < 0  ||  base == 1  ||  base > 36)  {
-		rptr->_errno = EINVAL;
+		__errno_r(rptr) = EINVAL;
 		return(0ULL);
 	}
 	/*
@@ -199,7 +199,7 @@ _wcstoull_l (struct _reent *rptr, const wchar_t *nptr, wchar_t **endptr,
 	}
 	if (any < 0) {
 		acc = ULLONG_MAX;
-		rptr->_errno = ERANGE;
+		__errno_r(rptr) = ERANGE;
 	} else if (neg)
 		acc = -acc;
 	if (endptr != 0)

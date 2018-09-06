@@ -58,7 +58,7 @@ __srefill_r (struct _reent * ptr,
     {
       if ((fp->_flags & __SRW) == 0)
 	{
-	  ptr->_errno = EBADF;
+	  __errno_r(ptr) = EBADF;
 	  fp->_flags |= __SERR;
 	  return EOF;
 	}

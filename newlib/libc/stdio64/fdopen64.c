@@ -55,7 +55,7 @@ _fdopen64_r (struct _reent *ptr,
   fdmode = fdflags & O_ACCMODE;
   if (fdmode != O_RDWR && (fdmode != (oflags & O_ACCMODE)))
     {
-      ptr->_errno = EBADF;
+      __errno_r(ptr) = EBADF;
       return 0;
     }
 #endif

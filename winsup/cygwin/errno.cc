@@ -334,7 +334,7 @@ void __reg3
 seterrno_from_win_error (const char *file, int line, DWORD code)
 {
   syscall_printf ("%s:%d windows error %u", file, line, code);
-  errno = _impure_ptr->_errno =  geterrno_from_win_error (code, EACCES);
+  errno = __errno_r(_impure_ptr) =  geterrno_from_win_error (code, EACCES);
 }
 
 int __reg2
@@ -352,7 +352,7 @@ seterrno_from_nt_status (const char *file, int line, NTSTATUS status)
   SetLastError (code);
   syscall_printf ("%s:%d status %y -> windows error %u",
 		  file, line, status, code);
-  errno = _impure_ptr->_errno =  geterrno_from_win_error (code, EACCES);
+  errno = __errno_r(_impure_ptr) =  geterrno_from_win_error (code, EACCES);
 }
 
 static char *

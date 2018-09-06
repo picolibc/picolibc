@@ -49,7 +49,7 @@ _fcntl_r (struct _reent *ptr,
 
   errno = 0;
   if ((ret = _fcntl (fd, cmd, arg)) == -1 && errno != 0)
-    ptr->_errno = errno;
+    __errno_r(ptr) = errno;
   return ret;
 }
 

@@ -310,7 +310,7 @@ _setlocale_r (struct _reent *p,
 
   if (category < LC_ALL || category >= _LC_LAST)
     {
-      p->_errno = EINVAL;
+      __errno_r(p) = EINVAL;
       return NULL;
     }
 
@@ -336,7 +336,7 @@ _setlocale_r (struct _reent *p,
 	      env = __get_locale_env (p, i);
 	      if (strlen (env) > ENCODING_LEN)
 		{
-		  p->_errno = EINVAL;
+		  __errno_r(p) = EINVAL;
 		  return NULL;
 		}
 	      strcpy (new_categories[i], env);
@@ -347,7 +347,7 @@ _setlocale_r (struct _reent *p,
 	  env = __get_locale_env (p, category);
 	  if (strlen (env) > ENCODING_LEN)
 	    {
-	      p->_errno = EINVAL;
+	      __errno_r(p) = EINVAL;
 	      return NULL;
 	    }
 	  strcpy (new_categories[category], env);
@@ -357,7 +357,7 @@ _setlocale_r (struct _reent *p,
     {
       if (strlen (locale) > ENCODING_LEN)
 	{
-	  p->_errno = EINVAL;
+	  __errno_r(p) = EINVAL;
 	  return NULL;
 	}
       strcpy (new_categories[category], locale);
@@ -368,7 +368,7 @@ _setlocale_r (struct _reent *p,
 	{
 	  if (strlen (locale) > ENCODING_LEN)
 	    {
-	      p->_errno = EINVAL;
+	      __errno_r(p) = EINVAL;
 	      return NULL;
 	    }
 	  for (i = 1; i < _LC_LAST; ++i)
@@ -380,7 +380,7 @@ _setlocale_r (struct _reent *p,
 	    ;
 	  if (!r[1])
 	    {
-	      p->_errno = EINVAL;
+	      __errno_r(p) = EINVAL;
 	      return NULL;  /* Hmm, just slashes... */
 	    }
 	  do
@@ -389,7 +389,7 @@ _setlocale_r (struct _reent *p,
 		break;  /* Too many slashes... */
 	      if ((len = r - locale) > ENCODING_LEN)
 		{
-		  p->_errno = EINVAL;
+		  __errno_r(p) = EINVAL;
 		  return NULL;
 		}
 	      strlcpy (new_categories[i], locale, len + 1);
@@ -418,7 +418,7 @@ _setlocale_r (struct _reent *p,
       strcpy (saved_categories[i], __get_global_locale ()->categories[i]);
       if (__loadlocale (__get_global_locale (), i, new_categories[i]) == NULL)
 	{
-	  saverr = p->_errno;
+	  saverr = __errno_r(p);
 	  for (j = 1; j < i; j++)
 	    {
 	      strcpy (new_categories[j], saved_categories[j]);
@@ -429,7 +429,7 @@ _setlocale_r (struct _reent *p,
 		  __loadlocale (__get_global_locale (), j, new_categories[j]);
 		}
 	    }
-	  p->_errno = saverr;
+	  __errno_r(p) = saverr;
 	  return NULL;
 	}
     }

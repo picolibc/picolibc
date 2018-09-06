@@ -52,7 +52,7 @@ _exit(int rc)
 int
 _close_r(struct _reent *reent, int fildes)
 {
-	reent->_errno = ENOSYS;
+	__errno_r(reent) = ENOSYS;
 	return -1;
 }
 
@@ -60,7 +60,7 @@ int
 _execve_r(struct _reent *reent, const char *name, char * const *argv,
 		char * const *env)
 {
-	reent->_errno = ENOSYS;
+	__errno_r(reent) = ENOSYS;
 	return -1;
 }
 
@@ -74,42 +74,42 @@ _fork_r(struct _reent *reent)
 int
 _fstat_r(struct _reent *reent, int fildes, struct stat *st)
 {
-	reent->_errno = ENOSYS;
+	__errno_r(reent) = ENOSYS;
 	return -1;
 }
 
 int
 _getpid_r(struct _reent *reent)
 {
-	reent->_errno = ENOSYS;
+	__errno_r(reent) = ENOSYS;
 	return -1;
 }
 
 int
 _gettimeofday(struct _reent *reent, struct timeval  *ptimeval, void *ptimezone)
 {
-	reent->_errno = ENOSYS;
+	__errno_r(reent) = ENOSYS;
 	return -1;
 }
 
 int
 _isatty_r(struct _reent *reent, int file)
 {
-	reent->_errno = ENOSYS;
+	__errno_r(reent) = ENOSYS;
 	return 0;
 }
 
 int
 _kill_r(struct _reent *reent, int pid, int sig)
 {
-	reent->_errno = ENOSYS;
+	__errno_r(reent) = ENOSYS;
 	return -1;
 }
 
 int
 _link_r(struct _reent *reent, const char *existing, const char *new)
 {
-	reent->_errno = ENOSYS;
+	__errno_r(reent) = ENOSYS;
 	return -1;
 }
 
@@ -123,35 +123,35 @@ _lseek_r(struct _reent *reent, int file, _off_t ptr, int dir)
 int
 _open_r(struct _reent *reent, const char *file, int flags, int mode)
 {
-	reent->_errno = ENOSYS;
+	__errno_r(reent) = ENOSYS;
 	return -1;
 }
 
 _ssize_t
 _read_r(struct _reent *reent, int file, void *ptr, size_t len)
 {
-	reent->_errno = ENOSYS;
+	__errno_r(reent) = ENOSYS;
 	return -1;
 }
 
 int
 _readlink_r(struct _reent *reent, const char *path, char *buf, size_t bufsize)
 {
-	reent->_errno = ENOSYS;
+	__errno_r(reent) = ENOSYS;
 	return -1;
 }
 
 int
 _stat_r(struct _reent *reent, const char *path, struct stat *buf)
 {
-	reent->_errno = EIO;
+	__errno_r(reent) = EIO;
 	return -1;
 }
 
 int
 _unlink_r(struct _reent *reent, const char * path)
 {
-	reent->_errno = EIO;
+	__errno_r(reent) = EIO;
 	return (-1);
 }
 

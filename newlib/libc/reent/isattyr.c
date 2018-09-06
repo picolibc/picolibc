@@ -50,7 +50,7 @@ _isatty_r (ptr, fd)
 
   errno = 0;
   if ((ret = _isatty (fd)) == -1 && errno != 0)
-    ptr->_errno = errno;
+    __errno_r(ptr) = errno;
   return ret;
 }
 

@@ -614,7 +614,7 @@ _VFWPRINTF_R (struct _reent *data,
 		fp->_bf._base = fp->_p = _malloc_r (data, 64);
 		if (!fp->_p)
 		{
-			data->_errno = ENOMEM;
+			__errno_r(data) = ENOMEM;
 			return EOF;
 		}
 		fp->_bf._size = 64;
@@ -1122,7 +1122,7 @@ reswitch:	switch (ch) {
 		case L'm':  /* GNU extension */
 			{
 				int dummy;
-				cp = (wchar_t *) _strerror_r (data, data->_errno, 1, &dummy);
+				cp = (wchar_t *) _strerror_r (data, __errno_r(data), 1, &dummy);
 			}
 			flags &= ~LONGINT;
 			goto string;

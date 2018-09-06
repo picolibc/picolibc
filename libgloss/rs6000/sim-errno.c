@@ -23,6 +23,6 @@ int
 _cerror (e)
      int e;
 {
-  _REENT->_errno = e;
+  __errno_r(_REENT) = e;
   return -1;
 }

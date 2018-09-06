@@ -103,7 +103,7 @@ _newlocale_r (struct _reent *p, int category_mask, const char *locale,
   /* Check for invalid mask values and valid locale ptr. */
   if ((category_mask & ~LC_VALID_MASK) || !locale)
     {
-      p->_errno = EINVAL;
+      __errno_r(p) = EINVAL;
       return NULL;
     }
   /* If the new locale is supposed to be all default locale, just return
@@ -125,7 +125,7 @@ _newlocale_r (struct _reent *p, int category_mask, const char *locale,
 						: locale;
 	  if (strlen (cat) > ENCODING_LEN)
 	    {
-	      p->_errno = EINVAL;
+	      __errno_r(p) = EINVAL;
 	      return NULL;
 	    }
 	  strcpy (new_categories[i], cat);
