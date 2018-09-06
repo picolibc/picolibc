@@ -27,6 +27,7 @@
 #include <stdarg.h>
 #include <stdint.h>
 #include <sys/param.h>
+#include <sys/types.h>
 
 /* avoid including stdio header here */
 #ifndef __VALIST
