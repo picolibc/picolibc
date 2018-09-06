@@ -71,6 +71,8 @@ const struct lc_monetary_T _C_monetary_locale = {
 #endif
 };
 
+#ifdef __HAVE_LOCALE_INFO__
+
 #ifndef __CYGWIN__
 static struct lc_monetary_T _monetary_locale;
 static int	_monetary_using_locale;
@@ -131,3 +133,5 @@ __monetary_load_locale (struct __locale_t *locale, const char *name ,
 #endif
   return ret;
 }
+
+#endif
