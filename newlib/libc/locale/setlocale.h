@@ -217,7 +217,11 @@ __get_global_locale ()
 _ELIDABLE_INLINE struct __locale_t *
 __get_locale_r (struct _reent *r)
 {
+#ifdef __HAVE_LOCALE_INFO__
   return r->_locale;
+#else
+  return __get_global_locale();
+#endif
 }
 
 /* In POSIX terms the current locale is the locale used by all functions
@@ -227,7 +231,11 @@ __get_locale_r (struct _reent *r)
 _ELIDABLE_INLINE struct __locale_t *
 __get_current_locale (void)
 {
+#ifdef __HAVE_LOCALE_INFO__
   return _REENT->_locale ?: __get_global_locale ();
+#else
+  return __get_global_locale();
+#endif
 }
 
 /* Only access fixed "C" locale using this function.  Fake for !_MB_CAPABLE

@@ -981,6 +981,7 @@ __locale_mb_cur_max (void)
 #endif
 }
 
+#ifdef __HAVE_LOCALE_INFO__
 const char *
 __locale_ctype_ptr_l (struct __locale_t *locale)
 {
@@ -992,6 +993,7 @@ __locale_ctype_ptr (void)
 {
   return __get_current_locale ()->ctype_ptr;
 }
+#endif /* __HAVE_LOCALE_INFO__ */
 
 #ifndef _REENT_ONLY
 
