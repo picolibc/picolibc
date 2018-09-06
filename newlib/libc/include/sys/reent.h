@@ -386,8 +386,10 @@ struct _reent
 
   int __sdidinit;		/* 1 means stdio has been init'd */
 
+# ifdef __HAVE_LOCALE_INFO__
   int _unspecified_locale_info;	/* unused, reserved for locale stuff */
   struct __locale_t *_locale;/* per-thread locale */
+# endif
 
   struct _mprec *_mp;
 
@@ -618,8 +620,10 @@ struct _reent
   char _emergency[_REENT_EMERGENCY_SIZE];
 
   /* TODO */
+# ifdef __HAVE_LOCALE_INFO__
   int _unspecified_locale_info;	/* unused, reserved for locale stuff */
   struct __locale_t *_locale;/* per-thread locale */
+#endif
 
   int __sdidinit;		/* 1 means stdio has been init'd */
 
