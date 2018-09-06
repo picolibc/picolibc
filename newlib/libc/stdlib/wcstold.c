@@ -83,6 +83,7 @@ wcstold_l (const wchar_t *__restrict nptr, wchar_t **__restrict endptr,
 
   if (endptr != NULL)
     {
+      const char *decimal_point = __get_numeric_locale(loc)->decimal_point;
       /* The only valid multibyte char in a float converted by
 	 strtold/wcstold is the radix char.  What we do here is,
 	 figure out if the radix char was in the valid leading
@@ -93,10 +94,10 @@ wcstold_l (const wchar_t *__restrict nptr, wchar_t **__restrict endptr,
 	 just one byte long.  The resulting difference (end - buf)
 	 is then equivalent to the number of valid wide characters
 	 in the input string.  */
-      len = strlen (__localeconv_l (loc)->decimal_point);
+      len = strlen (decimal_point);
       if (len > 1)
 	{
-	  char *d = strstr (buf, __localeconv_l (loc)->decimal_point);
+	  char *d = strstr (buf, decimal_point);
 
 	  if (d && d < end)
 	    end -= len - 1;

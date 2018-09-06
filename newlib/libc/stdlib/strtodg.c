@@ -419,8 +419,8 @@ _strtodg_l (struct _reent *p, const char *s00, char **se, FPI *fpi, Long *exp,
 	Long L;
 	__ULong y, z;
 	_Bigint *ab, *bb, *bb1, *bd, *bd0, *bs, *delta, *rvb, *rvb0;
-	struct lconv *lconv = __localeconv_l (loc);
-	int dec_len = strlen (lconv->decimal_point);
+	const char *decimal_point = __get_numeric_locale(loc)->decimal_point;
+	int dec_len = strlen (decimal_point);
 
 	irv = STRTOG_Zero;
 	denorm = sign = nz0 = nz = 0;
@@ -479,7 +479,7 @@ _strtodg_l (struct _reent *p, const char *s00, char **se, FPI *fpi, Long *exp,
 			z = 10*z + c - '0';
 	nd0 = nd;
 #ifdef USE_LOCALE
-	if (strncmp (s, lconv->decimal_point, dec_len) == 0)
+	if (strncmp (s, decimal_point, dec_len) == 0)
 #else
 	if (c == '.')
 #endif

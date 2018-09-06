@@ -149,8 +149,8 @@ gethex (struct _reent *ptr, const char **sp, const FPI *fpi,
 	int esign, havedig, irv, k, n, nbits, up, zret;
 	__ULong L, lostbits, *x;
 	Long e, e1;
-	unsigned char *decimalpoint = (unsigned char *)
-				      __localeconv_l (loc)->decimal_point;
+	const unsigned char *decimalpoint = (unsigned char *)
+				      __get_numeric_locale(loc)->decimal_point;
 	size_t decp_len = strlen ((const char *) decimalpoint);
 	unsigned char decp_end = decimalpoint[decp_len - 1];
 
