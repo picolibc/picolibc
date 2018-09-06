@@ -10,11 +10,6 @@ extern "C" {
 
 #include <sys/reent.h>
 
-#ifndef _REENT_ONLY
-#define errno (*__errno())
-extern int *__errno (void);
-#endif
-
 /* Please don't use these variables directly.
    Use strerror instead. */
 extern __IMPORT const char * const _sys_errlist[];
@@ -26,7 +21,16 @@ extern __IMPORT char *program_invocation_name;
 extern __IMPORT char *program_invocation_short_name;
 #endif
 
+#ifdef NEWLIB_GLOBAL_ERRNO
+extern int errno;
+#define __errno_r(ptr)	(errno)
+#else
 #define __errno_r(ptr) ((ptr)->_errno)
+#ifndef _REENT_ONLY
+#define errno (*__errno())
+extern int *__errno (void);
+#endif
+#endif
 
 #define	EPERM 1		/* Not owner */
 #define	ENOENT 2	/* No such file or directory */
