@@ -1981,7 +1981,7 @@ static const wchar_t replacement_char[NUM_REPLACEMENT_CHARS] =
 };
 /* nFont member is always 0 so we have to use the facename. */
 static WCHAR cons_facename[LF_FACESIZE];
-static int rp_char_idx;
+static WCHAR rp_char;
 static NO_COPY HDC cdc;
 
 static int CALLBACK
@@ -2045,7 +2045,7 @@ check_font (HANDLE hdl)
 	      break;
 	  if (i == NUM_REPLACEMENT_CHARS)
 	    i = 0;
-	  rp_char_idx = i;
+	  rp_char = replacement_char[i];
 	  /* Note that we copy the original name returned by
 	     GetCurrentConsoleFontEx, even if it was broken.
 	     This allows an early return, rather than to store
@@ -2066,8 +2066,7 @@ fhandler_console::write_replacement_char ()
   check_font (get_output_handle ());
 
   DWORD done;
-  WriteConsoleW (get_output_handle (), &replacement_char[rp_char_idx], 1,
-		 &done, 0);
+  WriteConsoleW (get_output_handle (), &rp_char, 1, &done, 0);
 }
 
 const unsigned char *
