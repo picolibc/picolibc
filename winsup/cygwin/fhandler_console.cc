@@ -2009,7 +2009,7 @@ check_font (HANDLE hdl)
     return;
   /* Some FaceNames like DejaVu Sans Mono are sometimes returned with stray
      trailing chars.  Fix it. */
-  lf.lfCharSet = ANSI_CHARSET;
+  lf.lfCharSet = DEFAULT_CHARSET;
   lf.lfPitchAndFamily = FIXED_PITCH | FF_DONTCARE;
   wchar_t *cp = wcpcpy (lf.lfFaceName, cfi.FaceName) - 1;
   int done = 0;
@@ -2023,7 +2023,7 @@ check_font (HANDLE hdl)
   /* Yes.  Check for the best replacement char. */
   HFONT f = CreateFontW (0, 0, 0, 0,
 			 cfi.FontWeight, FALSE, FALSE, FALSE,
-			 ANSI_CHARSET, OUT_DEFAULT_PRECIS,
+			 DEFAULT_CHARSET, OUT_DEFAULT_PRECIS,
 			 CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY,
 			 FIXED_PITCH | FF_DONTCARE, lf.lfFaceName);
   if (!f)
