@@ -2016,10 +2016,16 @@ check_font (HANDLE hdl)
   do
     {
       EnumFontFamiliesExW (cdc, &lf, enum_proc, (LPARAM) &done, 0);
-      if (!done && cp > lf.lfFaceName)
+      if (!done)
 	*cp-- = L'\0';
     }
-  while (!done);
+  while (!done && cp >= lf.lfFaceName);
+  /* What, really?  No recognizable font? */
+  if (!done)
+    {
+      rp_char = L'?';
+      return;
+    }
   /* Yes.  Check for the best replacement char. */
   HFONT f = CreateFontW (0, 0, 0, 0,
 			 cfi.FontWeight, FALSE, FALSE, FALSE,
