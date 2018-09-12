@@ -13,6 +13,7 @@ extern "C" {
 #include <_ansi.h>
 #include <stddef.h>
 #include <sys/_types.h>
+#include <errno.h>
 
 #define _NULL 0
 
@@ -382,13 +383,11 @@ struct _reent
      compatibility with future versions, put stdin,stdout,stderr here.
      These are pointers into member __sf defined below.  */
   __FILE *_stdin, *_stdout, *_stderr;	/* XXX */
-# endif
 
   int  _inc;			/* used by tmpnam */
 
   char *_emergency;
 
-# ifndef TINY_STDIO
   int __sdidinit;		/* 1 means stdio has been init'd */
 # endif
 
