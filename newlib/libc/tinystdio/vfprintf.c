@@ -384,10 +384,17 @@ int vfprintf (FILE * stream, const char *fmt, va_list ap)
 	    /* Output format adjustment, number of decimal digits in buf[] */
 
 	    if (!(flags & (FL_FLTEXP|FL_FLTFIX))) {		/* 'g(G)' format */
-		if (exp <= prec && exp >= -4) {
+		if (exp < prec && exp >= -4) {
 		    flags |= FL_FLTFIX;
 		    /* XXX this may mis-round the output */
 		    ndigs = prec < FTOA_MAX_DIG ? prec : FTOA_MAX_DIG;
+
+		    /* prec is number of significant digits; convert
+		     * to digits after decimal by subtracting the
+		     * exponent (making it larger if exp is negative,
+		     * and smaller if exp is positive)
+		     */
+		    prec -= exp + 1;
 		} else {
 		    /* remove trailing zeros */
 		    while (prec && buf[1+prec] == '0')
@@ -462,7 +469,7 @@ int vfprintf (FILE * stream, const char *fmt, va_list ap)
 		if (buf[1] != '1')
 		    vtype &= ~FTOA_CARRY;
 		putc (buf[1], stream);
-		if (prec) {
+		if (--prec > 0) {
 		    putc ('.', stream);
 		    sign = 2;
 		    do {
