@@ -317,30 +317,39 @@ int vfprintf (FILE * stream, const char *fmt, va_list ap)
 
 	} else if (c >= 'e' && c <= 'g') {
 
-	    int exp;		/* exponent of master decimal digit	*/
+	    int exp;			/* exponent of master decimal digit	*/
 	    int n;
-	    unsigned char vtype;	/* result of float value parse	*/
-	    unsigned char sign;		/* sign character (or 0)	*/
-	    unsigned char ndigs;	/* number of digits to convert */
+	    uint8_t vtype;		/* result of float value parse	*/
+	    uint8_t sign;		/* sign character (or 0)	*/
+	    uint8_t ndigs;		/* number of digits to convert */
 
 	    flags &= ~FL_FLTUPP;
 
 	  flt_oper:
+	    ndigs = 0;
 	    if (!(flags & FL_PREC))
 		prec = 6;
 	    flags &= ~(FL_FLTEXP | FL_FLTFIX);
-	    if (c == 'e')
+
+	    uint8_t ndecimal_ftoa;	/* digits after decimal (for 'f' format), 0 if no limit */
+
+	    if (c == 'e') {
+		ndigs = prec + 1;
+		ndecimal_ftoa = 0;
 		flags |= FL_FLTEXP;
-	    else if (c == 'f')
+	    } else if (c == 'f') {
+		ndigs = FTOA_MAX_DIG;
+		ndecimal_ftoa = prec;
 		flags |= FL_FLTFIX;
+	    } else {
+		ndigs = prec;
+		ndecimal_ftoa = 0;
+	    }
 
-	    /* number of digits past the decimal for 'f' format */
-	    if (flags & FL_FLTFIX)
-		ndigs = prec < FTOA_MAX_DIG ? prec : FTOA_MAX_DIG;
-	    else
-		ndigs = 0;
+	    if (ndigs > FTOA_MAX_DIG)
+		ndigs = FTOA_MAX_DIG;
 
-	    exp = __ftoa_engine (va_arg(ap,double), (char *)buf, prec, ndigs);
+	    exp = __ftoa_engine (va_arg(ap,double), (char *)buf, ndigs, ndecimal_ftoa);
 	    vtype = buf[0];
 
 	    sign = 0;
@@ -351,7 +360,8 @@ int vfprintf (FILE * stream, const char *fmt, va_list ap)
 	    else if (flags & FL_SPACE)
 		sign = ' ';
 
-	    if (vtype & (FTOA_NAN | FTOA_INF)) {
+	    if (vtype & (FTOA_NAN | FTOA_INF))
+	    {
 		const char *p;
 		ndigs = sign ? 4 : 3;
 		if (width > ndigs) {
@@ -383,22 +393,28 @@ int vfprintf (FILE * stream, const char *fmt, va_list ap)
 
 	    /* Output format adjustment, number of decimal digits in buf[] */
 
-	    if (!(flags & (FL_FLTEXP|FL_FLTFIX))) {		/* 'g(G)' format */
-		if (exp < prec && exp >= -4) {
-		    flags |= FL_FLTFIX;
-		    /* XXX this may mis-round the output */
-		    ndigs = prec < FTOA_MAX_DIG ? prec : FTOA_MAX_DIG;
+	    if (!(flags & (FL_FLTEXP|FL_FLTFIX))) {
 
-		    /* prec is number of significant digits; convert
-		     * to digits after decimal by subtracting the
-		     * exponent (making it larger if exp is negative,
-		     * and smaller if exp is positive)
-		     */
-		    prec -= exp + 1;
+		/* 'g(G)' format */
+
+		prec = ndigs;
+
+		/* Remove trailing zeros */
+		while (ndigs > 0 && buf[ndigs] == '0')
+		    ndigs--;
+
+		if (-4 <= exp && exp < prec)
+		{
+		    flags |= FL_FLTFIX;
+
+		    if (exp < 0 || ndigs > exp)
+			prec = ndigs - (exp + 1);
+		    else
+			prec = 0;
 		} else {
-		    /* remove trailing zeros */
-		    while (prec && buf[1+prec] == '0')
-			prec--;
+
+		    /* Limit displayed precision to available precision */
+		    prec = ndigs - 1;
 		}
 	    }
 
@@ -407,8 +423,11 @@ int vfprintf (FILE * stream, const char *fmt, va_list ap)
 		n = (exp>0 ? exp+1 : 1);
 	    else
 		n = 5;		/* 1e+00 */
-	    if (sign) n += 1;
-	    if (prec) n += prec;
+	    if (sign)
+		n += 1;
+	    if (prec)
+		n += prec + 1;
+
 	    width = width > n ? width - n : 0;
 
 	    /* Output before first digit	*/
@@ -418,14 +437,16 @@ int vfprintf (FILE * stream, const char *fmt, va_list ap)
 		    width--;
 		}
 	    }
-	    if (sign) putc (sign, stream);
+	    if (sign)
+		putc (sign, stream);
+
 	    if (!(flags & FL_LPAD)) {
 		while (width) {
 		    putc ('0', stream);
 		    width--;
 		}
 	    }
-    
+
 	    if (flags & FL_FLTFIX) {		/* 'f' format		*/
 		char out;
 
@@ -469,13 +490,11 @@ int vfprintf (FILE * stream, const char *fmt, va_list ap)
 		if (buf[1] != '1')
 		    vtype &= ~FTOA_CARRY;
 		putc (buf[1], stream);
-		if (--prec > 0) {
+		if (prec > 0) {
 		    putc ('.', stream);
-		    sign = 2;
-		    do {
-			putc (sign < FTOA_MAX_DIG + 1 ? buf[sign] : '0', stream);
-			sign++;
-		    } while (--prec);
+		    uint8_t pos = 1;
+		    for (pos = 1; pos < 1 + prec; pos++)
+			putc (pos < ndigs ? buf[pos + 1] : '0', stream);
 		}
 
 		/* exponent	*/
