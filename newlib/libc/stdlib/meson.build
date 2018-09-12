@@ -6,6 +6,10 @@ std_malloc_srcs_stdlib = [
   'mallocr.c',
 ]
 
+std_strtod_srcs_stdlib = [
+  'strtod.c',
+]
+
 srcs_stdlib = [
     'a64l.c',
     'abort.c',
@@ -95,7 +99,6 @@ srcs_stdlib = [
     'setenv.c',
     'setenv_r.c',
     'srand48.c',
-    'strtod.c',
     'strtodg.c',
     'strtoimax.c',
     'strtol.c',
@@ -143,6 +146,10 @@ if newlib_nano_malloc
   srcs_stdlib += nano_malloc_srcs_stdlib
 else
   srcs_stdlib += std_malloc_srcs_stdlib
+endif
+
+if not newlib_tinystdio
+  srcs_stdlib += std_strtod_srcs_stdlib
 endif
 
 hdrs_stdlib = [
