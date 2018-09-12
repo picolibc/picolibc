@@ -2,6 +2,7 @@ subdir('sys')
 
 srcs_tinystdio = [
     'clearerr.c',
+    'dtoa_engine.c',
     'fclose.c',
     'fdevopen.c',
     'feof.c',
@@ -57,6 +58,7 @@ srcs_tinystdio_flt = [
 ]
 
 hdrs_tinystdio = [
+    'dtoa_engine.h',
     'ftoa_engine.h',
     'stdio.h',
     'stdio_private.h',

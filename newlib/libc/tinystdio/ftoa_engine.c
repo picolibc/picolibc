@@ -84,7 +84,7 @@ static uint8_t min_uint8(uint8_t a, uint8_t b)
     return b;
 }
 
-int __ftoa_engine(float val, char *buf, uint8_t maxDigits, uint8_t maxDecimals) 
+int __ftoa_engine(float val, struct ftoa *ftoa, uint8_t maxDigits, uint8_t maxDecimals) 
 {
     uint8_t flags = 0;
 
@@ -115,10 +115,10 @@ int __ftoa_engine(float val, char *buf, uint8_t maxDigits, uint8_t maxDecimals)
      */
     if(exp==0 && frac==0)
     {
-        buf[0] = flags | FTOA_ZERO;
+        ftoa->flags = flags | FTOA_ZERO;
         uint8_t i;
         for(i=0; i<=maxDigits; i++) {
-            buf[i+1] = '0';
+            ftoa->digits[i] = '0';
         }
         return 0;
     }
@@ -197,20 +197,20 @@ int __ftoa_engine(float val, char *buf, uint8_t maxDigits, uint8_t maxDecimals)
 	}
 
 	/* Now we have a digit. */
-        outputIdx++;
         if(digit < '0' + 10) {
 	    /* normal case. */
-            buf[outputIdx] = digit;
+            ftoa->digits[outputIdx] = digit;
         } else {
             /*
 	     * Uh, oh. Something went wrong with our conversion. Write
 	     * 9s and use the round-up code to report back to the caller
 	     * that we've carried
 	     */
-            for(outputIdx = 1; outputIdx <= maxDigits; outputIdx++)
-                buf[outputIdx] = '9';
+            for(outputIdx = 0; outputIdx < maxDigits; outputIdx++)
+                ftoa->digits[outputIdx] = '9';
 	    goto round_up;
         }
+        outputIdx++;
     } while (outputIdx<maxDigits);
 
     /* Rounding: */
@@ -222,7 +222,7 @@ int __ftoa_engine(float val, char *buf, uint8_t maxDigits, uint8_t maxDecimals)
         while(outputIdx != 0) {
 
 	    /* Increment digit, check if we're done */
-            if(++buf[outputIdx] < '0' + 10)
+            if(++ftoa->digits[outputIdx-1] < '0' + 10)
 		break;
 
 	    /* Rounded past the first digit;
@@ -233,17 +233,18 @@ int __ftoa_engine(float val, char *buf, uint8_t maxDigits, uint8_t maxDecimals)
 	     */
 	    if(outputIdx == 1)
 	    {
-		buf[outputIdx] = '1';
+		ftoa->digits[0] = '1';
 		exp10++;
 		flags |= FTOA_CARRY;
 		break;
 	    }
 
-	    buf[outputIdx--] = '0';
+	    ftoa->digits[--outputIdx] = '0';
 	    /* and the loop continues, carrying to next digit. */
         }
     }
 
-    buf[0] = flags;
-    return exp10;
+    ftoa->flags = flags;
+    ftoa->exp = exp10;
+    return maxDigits;
 }

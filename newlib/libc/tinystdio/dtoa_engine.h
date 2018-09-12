@@ -1,4 +1,4 @@
-/* Copyright (c) 2005, Dmitry Xmelkov
+/* Copyright © 2018, Keith Packard
    All rights reserved.
 
    Redistribution and use in source and binary forms, with or without
@@ -26,29 +26,27 @@
   ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
   POSSIBILITY OF SUCH DAMAGE. */
 
-/* $Id: ftoa_engine.h 1218 2007-02-18 13:18:41Z dmix $ */
-
-#ifndef	_FTOA_ENGINE_H
-#define	_FTOA_ENGINE_H
+#ifndef	_DTOA_ENGINE_H_
+#define	_DTOA_ENGINE_H_
 
 #include <stdint.h>
 #include <float.h>
 
-#define FTOA_MAX_DIG	(__FLT_DIG__ + 1)
+#define DTOA_MAX_DIG	DBL_DIG
 
-struct ftoa {
-	int16_t	exp;
-	uint8_t flags;
-	char	digits[FTOA_MAX_DIG + 1];
+struct dtoa {
+	int32_t	exp;
+	uint8_t	flags;
+	char	digits[DTOA_MAX_DIG + 1];
 };
 
-int __ftoa_engine (float val, struct ftoa *ftoa, uint8_t maxDigits, uint8_t maxDecimal);
+int
+__dtoa_engine (double x, struct dtoa *dtoa, int max_digits, int max_decimals);
 
-/* '__ftoa_engine' flags return value */
-#define	FTOA_MINUS	1
-#define	FTOA_ZERO	2
-#define	FTOA_INF	4
-#define	FTOA_NAN	8
-#define	FTOA_CARRY	16	/* Carry was to master position.	*/
+#define	DTOA_MINUS	1
+#define	DTOA_ZERO	2
+#define	DTOA_INF	4
+#define	DTOA_NAN	8
+#define	DTOA_CARRY	16	/* Carry was to master position.	*/
 
-#endif	/* !_FTOA_ENGINE_H */
+#endif	/* !_DTOA_ENGINE_H_ */

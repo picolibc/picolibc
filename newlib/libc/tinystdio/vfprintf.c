@@ -33,14 +33,24 @@
 /* From: Id: printf_p_new.c,v 1.1.1.9 2002/10/15 20:10:28 joerg_wunsch Exp */
 /* $Id: vfprintf.c 2191 2010-11-05 13:45:57Z arcanum $ */
 
-#if !defined(__AVR_TINY__)
-
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include "stdio_private.h"
+#if 0
 #include "ftoa_engine.h"
+#define dtoa ftoa
+#define DTOA_MINUS FTOA_MINUS
+#define DTOA_ZERO  FTOA_ZERO
+#define DTOA_INF   FTOA_INF
+#define DTOA_NAN   FTOA_NAN
+#define DTOA_CARRY FTOA_CARRY
+#define DTOA_MAX_DIG FTOA_MAX_DIG
+#define __dtoa_engine(x,dtoa,dig,dec) __ftoa_engine(x,dtoa,dig,dec)
+#else
+#include "dtoa_engine.h"
+#endif
 #include "xtoa_fast.h"
 
 /*
@@ -231,7 +241,15 @@ int vfprintf (FILE * stream, const char *fmt, va_list ap)
     unsigned char flags;
     unsigned char width;
     unsigned char prec;
-    unsigned char buf[11];	/* size for -1 in octal, without '\0'	*/
+    union {
+	unsigned char __buf[11];	/* size for -1 in octal, without '\0'	*/
+#if PRINTF_LEVEL >= PRINTF_FLT
+	struct dtoa __dtoa;
+#endif
+    } u;
+
+#define buf	(u.__buf)
+#define _dtoa	(u.__dtoa)
 
     stream->len = 0;
 
@@ -316,10 +334,8 @@ int vfprintf (FILE * stream, const char *fmt, va_list ap)
 	    goto flt_oper;
 
 	} else if (c >= 'e' && c <= 'g') {
-
 	    int exp;			/* exponent of master decimal digit	*/
 	    int n;
-	    uint8_t vtype;		/* result of float value parse	*/
 	    uint8_t sign;		/* sign character (or 0)	*/
 	    uint8_t ndigs;		/* number of digits to convert */
 
@@ -331,36 +347,36 @@ int vfprintf (FILE * stream, const char *fmt, va_list ap)
 		prec = 6;
 	    flags &= ~(FL_FLTEXP | FL_FLTFIX);
 
-	    uint8_t ndecimal_ftoa;	/* digits after decimal (for 'f' format), 0 if no limit */
+	    uint8_t ndecimal;	/* digits after decimal (for 'f' format), 0 if no limit */
 
 	    if (c == 'e') {
 		ndigs = prec + 1;
-		ndecimal_ftoa = 0;
+		ndecimal = 0;
 		flags |= FL_FLTEXP;
 	    } else if (c == 'f') {
-		ndigs = FTOA_MAX_DIG;
-		ndecimal_ftoa = prec;
+		ndigs = DTOA_MAX_DIG;
+		ndecimal = prec;
 		flags |= FL_FLTFIX;
 	    } else {
 		ndigs = prec;
-		ndecimal_ftoa = 0;
+		ndecimal = 0;
 	    }
 
-	    if (ndigs > FTOA_MAX_DIG)
-		ndigs = FTOA_MAX_DIG;
+	    if (ndigs > DTOA_MAX_DIG)
+		ndigs = DTOA_MAX_DIG;
 
-	    exp = __ftoa_engine (va_arg(ap,double), (char *)buf, ndigs, ndecimal_ftoa);
-	    vtype = buf[0];
+	    ndigs = __dtoa_engine (va_arg(ap,double), &_dtoa, ndigs, ndecimal);
+	    exp = _dtoa.exp;
 
 	    sign = 0;
-	    if ((vtype & FTOA_MINUS) && !(vtype & FTOA_NAN))
+	    if ((_dtoa.flags & DTOA_MINUS) && !(_dtoa.flags & DTOA_NAN))
 		sign = '-';
 	    else if (flags & FL_PLUS)
 		sign = '+';
 	    else if (flags & FL_SPACE)
 		sign = ' ';
 
-	    if (vtype & (FTOA_NAN | FTOA_INF))
+	    if (_dtoa.flags & (DTOA_NAN | DTOA_INF))
 	    {
 		const char *p;
 		ndigs = sign ? 4 : 3;
@@ -377,7 +393,7 @@ int vfprintf (FILE * stream, const char *fmt, va_list ap)
 		if (sign)
 		    putc (sign, stream);
 		p = "inf";
-		if (vtype & FTOA_NAN)
+		if (_dtoa.flags & DTOA_NAN)
 		    p = "nan";
 # if ('I'-'i' != 'N'-'n') || ('I'-'i' != 'F'-'f') || ('I'-'i' != 'A'-'a')
 #  error
@@ -391,8 +407,6 @@ int vfprintf (FILE * stream, const char *fmt, va_list ap)
 		goto tail;
 	    }
 
-	    /* Output format adjustment, number of decimal digits in buf[] */
-
 	    if (!(flags & (FL_FLTEXP|FL_FLTFIX))) {
 
 		/* 'g(G)' format */
@@ -400,7 +414,7 @@ int vfprintf (FILE * stream, const char *fmt, va_list ap)
 		prec = ndigs;
 
 		/* Remove trailing zeros */
-		while (ndigs > 0 && buf[ndigs] == '0')
+		while (ndigs > 0 && _dtoa.digits[ndigs-1] == '0')
 		    ndigs--;
 
 		if (-4 <= exp && exp < prec)
@@ -452,7 +466,7 @@ int vfprintf (FILE * stream, const char *fmt, va_list ap)
 
 		/* At this point, we should have
 		 *
-		 *	exp	exponent of leftmost digit in buf
+		 *	exp	exponent of leftmost digit in _dtoa.digits
 		 *	ndigs	number of buffer digits to print
 		 *	prec	number of digits after decimal
 		 *
@@ -469,7 +483,7 @@ int vfprintf (FILE * stream, const char *fmt, va_list ap)
 		     * otherwise use 0
 		     */
 		    if (0 <= exp - n && exp - n < ndigs)
-			out = buf[exp - n + 1];
+			out = _dtoa.digits[exp - n];
 		    else
 			out = '0';
 		    if (--n < -prec)
@@ -477,8 +491,8 @@ int vfprintf (FILE * stream, const char *fmt, va_list ap)
 		    putc (out, stream);
 		} while (1);
 		if (n == exp
-		    && (buf[1] > '5'
-		        || (buf[1] == '5' && !(vtype & FTOA_CARRY))) )
+		    && (_dtoa.digits[0] > '5'
+		        || (_dtoa.digits[0] == '5' && !(_dtoa.flags & DTOA_CARRY))) )
 		{
 		    out = '1';
 		}
@@ -487,20 +501,20 @@ int vfprintf (FILE * stream, const char *fmt, va_list ap)
 	    } else {				/* 'e(E)' format	*/
 
 		/* mantissa	*/
-		if (buf[1] != '1')
-		    vtype &= ~FTOA_CARRY;
-		putc (buf[1], stream);
+		if (_dtoa.digits[0] != '1')
+		    _dtoa.flags &= ~DTOA_CARRY;
+		putc (_dtoa.digits[0], stream);
 		if (prec > 0) {
 		    putc ('.', stream);
 		    uint8_t pos = 1;
 		    for (pos = 1; pos < 1 + prec; pos++)
-			putc (pos < ndigs ? buf[pos + 1] : '0', stream);
+			putc (pos < ndigs ? _dtoa.digits[pos] : '0', stream);
 		}
 
 		/* exponent	*/
 		putc (flags & FL_FLTUPP ? 'E' : 'e', stream);
 		ndigs = '+';
-		if (exp < 0 || (exp == 0 && (vtype & FTOA_CARRY) != 0)) {
+		if (exp < 0 || (exp == 0 && (_dtoa.flags & DTOA_CARRY) != 0)) {
 		    exp = -exp;
 		    ndigs = '-';
 		}
@@ -512,7 +526,6 @@ int vfprintf (FILE * stream, const char *fmt, va_list ap)
 	    }
 
 	    goto tail;
-# undef ndigs
 	}
 
 #else		/* to: PRINTF_LEVEL >= PRINTF_FLT */
@@ -687,5 +700,3 @@ int vfprintf (FILE * stream, const char *fmt, va_list ap)
 }
 
 #endif	/* PRINTF_LEVEL > PRINTF_MIN */
-
-#endif /* !defined(__AVR_TINY__) */
