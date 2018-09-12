@@ -36,8 +36,7 @@
 
 #define FTOA_MAX_DIG	(__FLT_DIG__ + 1)
 
-int __ftoa_engine (float val, char *buf,
-                   uint8_t prec, uint8_t maxdgs);
+int __ftoa_engine (float val, char *buf, uint8_t maxDigits, uint8_t maxDecimal);
 
 /* '__ftoa_engine' return next flags (in buf[0]):	*/
 #define	FTOA_MINUS	1

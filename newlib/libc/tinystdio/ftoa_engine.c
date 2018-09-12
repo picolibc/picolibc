@@ -23,6 +23,7 @@
   CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
   ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
   POSSIBILITY OF SUCH DAMAGE. */
+
 #include "ftoa_engine.h"
 #include <stdint.h>
 
@@ -40,6 +41,7 @@ static const int8_t exponentTable[32] = {
     3, 5, 8, 10, 12, 15,  17, 20,
     22, 24, 27, 29,  32, 34, 36, 39
 };
+
 static const uint32_t factorTable[32] = {
     2295887404UL,
     587747175UL,
@@ -74,113 +76,174 @@ static const uint32_t factorTable[32] = {
     4056481921UL,
     1038459372UL
 };
-int __ftoa_engine(float val, char *buf, uint8_t precision, uint8_t maxDecimals) 
+
+static uint8_t min_uint8(uint8_t a, uint8_t b)
 {
-    uint8_t flags;
+    if (a < b)
+	return a;
+    return b;
+}
+
+int __ftoa_engine(float val, char *buf, uint8_t maxDigits, uint8_t maxDecimals) 
+{
+    uint8_t flags = 0;
+
     union {
         float v;
         uint32_t u;
     } x;
+
     x.v = val;
+
     uint32_t frac = x.u & 0x007fffffUL;
-    if (precision > FTOA_MAX_DIG) precision=FTOA_MAX_DIG;
-    // Read the sign, shift the exponent in place and delete it from frac.
-    if (x.u & (1 << 31)) flags = FTOA_MINUS; else flags = 0;
+
+    if (maxDigits > FTOA_MAX_DIG)
+	maxDigits = FTOA_MAX_DIG;
+
+    /* Read the sign, shift the exponent in place and delete it from frac.
+     */
+    if (x.u & (1 << 31))
+	flags = FTOA_MINUS;
+
     uint8_t exp = (x.u >> 24) << 1;
-    if(x.u & (1 << 23)) exp++;    // TODO possible but in case of subnormal
-    // Test for easy cases, zero and NaN
-    if(exp==0 && frac==0) {
+
+    if(x.u & (1 << 23))
+	exp++;    // TODO possible but in case of subnormal
+
+    /*
+     * Test for easy cases, zero and NaN
+     */
+    if(exp==0 && frac==0)
+    {
         buf[0] = flags | FTOA_ZERO;
         uint8_t i;
-        for(i=0; i<=precision; i++) {
+        for(i=0; i<=maxDigits; i++) {
             buf[i+1] = '0';
         }
         return 0;
     }
+
     if(exp == 0xff) {
-        if(frac == 0) flags |= FTOA_INF; else flags |= FTOA_NAN;
+        if(frac == 0)
+	    flags |= FTOA_INF;
+	else
+	    flags |= FTOA_NAN;
     }
-    // The implicit leading 1 is made explicit, except if value subnormal.
-    if (exp != 0) frac |= (1UL<<23);
+
+    /* The implicit leading 1 is made explicit, except if value
+     * subnormal.
+     */
+    if (exp != 0)
+	frac |= (1UL<<23);
+
     uint8_t idx = exp>>3;
     int8_t exp10 = exponentTable[idx];
-    // We COULD try making the multiplication in situ, where we make
-    // frac and a 64 bit int overlap in memory and select/weigh the
-    // upper 32 bits that way. For starters, this is less risky:
+
+    /*
+     * We COULD try making the multiplication in situ, where we make
+     * frac and a 64 bit int overlap in memory and select/weigh the
+     * upper 32 bits that way. For starters, this is less risky:
+     */
     int64_t prod = (int64_t)frac * (int64_t)factorTable[idx];
-    // The expConvFactorTable are factor are correct iff the lower 3 exponent
-    // bits are 1 (=7). Else we need to compensate by divding frac.
-    // If the lower 3 bits are 7 we are right.
-    // If the lower 3 bits are 6 we right-shift once
-    // ..
-    // If the lower 3 bits are 0 we right-shift 7x
+
+    /*
+     * The expConvFactorTable are factor are correct iff the lower 3 exponent
+     * bits are 1 (=7). Else we need to compensate by divding frac.
+     * If the lower 3 bits are 7 we are right.
+     * If the lower 3 bits are 6 we right-shift once
+     * ..
+     * If the lower 3 bits are 0 we right-shift 7x
+     */
     prod >>= (15-(exp & 7));
-    // Now convert to decimal.
-    uint8_t hadNonzeroDigit = 0; // a flag
+
+    /*
+     * Now convert to decimal.
+     */
+
+    uint8_t hadNonzeroDigit = 0; /* have seen a non-zero digit flag */
     uint8_t outputIdx = 0;
     int64_t decimal = 100000000000000ull;
+
     do {
-        char digit = '0';
-        while(1) {// find the first nonzero digit or any of the next digits.
-	    digit += prod / decimal;
-	    prod = prod % decimal;
-            decimal /= 10;
-            // If already found a leading nonzero digit, accept zeros.
-            if (hadNonzeroDigit) break;
-            // Else, don't return results with a leading zero! Instead
-            // skip those and decrement exp10 accordingly.
-            if(digit == '0') {
-                exp10--;
-                continue;
-            }
-            hadNonzeroDigit = 1;
-            // Compute how many digits N to output.
-            if(maxDecimals != 0) {                        // If limiting decimals...
-                int8_t beforeDP = exp10+1;                // Digits before point
-                if (beforeDP < 1) beforeDP = 1;            // Numbers < 1 should also output at least 1 digit.
-                /*
-                 * Below a simpler version of this:
-                int8_t afterDP = outputNum - beforeDP;
-                if (afterDP > maxDecimals-1)
-                    afterDP = maxDecimals-1;
-                outputNum = beforeDP + afterDP;
-                */
-                maxDecimals = maxDecimals+beforeDP-1;
-                if (precision > maxDecimals)
-                    precision = maxDecimals;
-            }
-            break;
-        }
-        // Now have a digit.
+	/* Compute next digit */
+	char digit = prod / decimal + '0';
+	prod = prod % decimal;
+	decimal /= 10;
+
+	if(!hadNonzeroDigit)
+	{
+	    /* Don't return results with a leading zero! Instead
+	     * skip those and decrement exp10 accordingly.
+	     */
+	    if (digit == '0') {
+		exp10--;
+		continue;
+	    }
+
+	    /* Found the first non-zero digit */
+	    hadNonzeroDigit = 1;
+
+	    /* If limiting decimals... */
+	    if(maxDecimals != 0)
+	    {
+		int8_t beforeDP = exp10+1;                // Digits before point
+
+		/* Numbers < 1 should also output at least 1 digit. */
+		if (beforeDP < 1)
+		    beforeDP = 1;
+
+		maxDigits = min_uint8 (maxDigits, maxDecimals + beforeDP);
+	    }
+	}
+
+	/* Now we have a digit. */
         outputIdx++;
-        if(digit < '0' + 10) // normal case.
+        if(digit < '0' + 10) {
+	    /* normal case. */
             buf[outputIdx] = digit;
-        else {
-            // Abnormal case, write 9s and bail.
-            // We might as well abuse hadNonzeroDigit as counter, it will not be used again.
-            for(hadNonzeroDigit=outputIdx; hadNonzeroDigit>0; hadNonzeroDigit--)
-                buf[hadNonzeroDigit] = '9';
-            goto roundup; // this is ugly but it _is_ code derived from assembler :)
+        } else {
+            /*
+	     * Uh, oh. Something went wrong with our conversion. Write
+	     * 9s and use the round-up code to report back to the caller
+	     * that we've carried
+	     */
+            for(outputIdx = 1; outputIdx <= maxDigits; outputIdx++)
+                buf[outputIdx] = '9';
+	    goto round_up;
         }
-    } while (outputIdx<precision);
-    // Rounding:
+    } while (outputIdx<maxDigits);
+
+    /* Rounding: */
     decimal *= 10;
-    if (prod - (decimal >> 1) >= 0) {
-    roundup:
-        // Increment digit, cascade
+    if (prod - (decimal >> 1) >= 0)
+    {
+    round_up:
+
         while(outputIdx != 0) {
-            if(++buf[outputIdx] == '0' + 10) {
-                if(outputIdx == 1) {
-                    buf[outputIdx] = '1';
-                    exp10++;
-                    flags |= FTOA_CARRY;
-                    break;
-                } else
-                    buf[outputIdx--] = '0'; // and the loop continues, carrying to next digit.
-            }
-            else break;
+
+	    /* Increment digit, check if we're done */
+            if(++buf[outputIdx] < '0' + 10)
+		break;
+
+	    /* Rounded past the first digit;
+	     * reset the leading digit to 1,
+	     * bump exp and tell the caller we've carried.
+	     * The remaining digits will already be '0',
+	     * so we don't need to mess with them
+	     */
+	    if(outputIdx == 1)
+	    {
+		buf[outputIdx] = '1';
+		exp10++;
+		flags |= FTOA_CARRY;
+		break;
+	    }
+
+	    buf[outputIdx--] = '0';
+	    /* and the loop continues, carrying to next digit. */
         }
     }
+
     buf[0] = flags;
     return exp10;
 }
