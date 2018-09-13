@@ -167,6 +167,7 @@ vfprintf (FILE * stream, const char *fmt, va_list ap)
 	      case 'u':
 		flags &= ~FL_ALT;
 	        base = 10;
+		sign = 0;
 		goto ultoa;
 	      case 'o':
 	        base = 8;
@@ -217,36 +218,45 @@ vfprintf (FILE * stream, const char *fmt, va_list ap)
 /* --------------------------------------------------------------------	*/
 #else	/* i.e. PRINTF_LEVEL > PRINTF_MIN */
 
-#define FL_ZFILL	0x01
-#define FL_PLUS		0x02
-#define FL_SPACE	0x04
-#define FL_LPAD		0x08
-#define FL_ALT		0x10
-#define FL_WIDTH	0x20
-#define FL_PREC		0x40
-#define FL_LONG		0x80
+/* Order is relevant here and matches order in format string */
 
-#define FL_NEGATIVE	FL_LONG
+#define FL_ZFILL	0x0001
+#define FL_PLUS		0x0002
+#define FL_SPACE	0x0004
+#define FL_LPAD		0x0008
+#define FL_ALT		0x0010
 
-#define FL_ALTUPP	FL_PLUS
-#define FL_ALTHEX	FL_SPACE
+#define FL_WIDTH	0x0020
+#define FL_PREC		0x0040
 
-#define	FL_FLTUPP	FL_ALT
-#define FL_FLTEXP	FL_PREC
-#define	FL_FLTFIX	FL_LONG
+#define FL_LONG		0x0080
+#define FL_LONGLONG	0x0100
+#define FL_SHORT	0x0200
+
+#define FL_NEGATIVE	0x0400
+
+#define FL_ALTUPP	0x0800
+#define FL_ALTHEX	0x1000
+
+#define	FL_FLTUPP	0x2000
+#define FL_FLTEXP	0x4000
+#define	FL_FLTFIX	0x8000
 
 int vfprintf (FILE * stream, const char *fmt, va_list ap)
 {
     unsigned char c;		/* holds a char from the format string */
-    unsigned char flags;
-    unsigned char width;
-    unsigned char prec;
+    uint16_t flags;
+    int width;
+    int prec;
     union {
 	unsigned char __buf[11];	/* size for -1 in octal, without '\0'	*/
 #if PRINTF_LEVEL >= PRINTF_FLT
 	struct dtoa __dtoa;
 #endif
     } u;
+    const char * pnt;
+    size_t size;
+    unsigned char len;
 
 #define buf	(u.__buf)
 #define _dtoa	(u.__dtoa)
@@ -305,11 +315,17 @@ int vfprintf (FILE * stream, const char *fmt, va_list ap)
 		    continue;
 		}
 		if (c == '*') {
-		    if (flags & FL_PREC)
+		    if (flags & FL_PREC) {
 			prec = va_arg(ap, int);
-		    else {
+			if (prec < 0)
+			    prec = 0;
+		    } else {
 			width = va_arg(ap, int);
 			flags |= FL_WIDTH;
+			if (width < 0) {
+			    width = -width;
+			    flags |= FL_LPAD;
+			}
 		    }
 		    continue;
 		}
@@ -319,14 +335,22 @@ int vfprintf (FILE * stream, const char *fmt, va_list ap)
 		    flags |= FL_PREC;
 		    continue;
 		}
-		if (c == 'l') {
-		    flags |= FL_LONG;
-		    continue;
-		}
-		if (c == 'h')
-		    continue;
 	    }
-	    
+
+	    if (c == 'l') {
+		if (flags & FL_LONG)
+		    flags |= FL_LONGLONG;
+		flags |= FL_LONG;
+		flags &= ~FL_SHORT;
+		continue;
+	    }
+
+	    if (c == 'h') {
+		flags |= FL_SHORT;
+		flags &= ~FL_LONG;
+		continue;
+	    }
+
 	    break;
 	} while ( (c = *fmt++) != 0);
 
@@ -450,6 +474,8 @@ int vfprintf (FILE * stream, const char *fmt, va_list ap)
 		n += 1;
 	    if (prec)
 		n += prec + 1;
+	    else if (flags & FL_ALT)
+		n += 1;
 
 	    width = width > n ? width - n : 0;
 
@@ -495,8 +521,11 @@ int vfprintf (FILE * stream, const char *fmt, va_list ap)
 			out = _dtoa.digits[exp - n];
 		    else
 			out = '0';
-		    if (--n < -prec)
+		    if (--n < -prec) {
+			if ((flags & FL_ALT) && n == -1)
+			    putc('.', stream);
 			break;
+		    }
 		    putc (out, stream);
 		} while (1);
 		if (n == exp
@@ -518,7 +547,8 @@ int vfprintf (FILE * stream, const char *fmt, va_list ap)
 		    uint8_t pos = 1;
 		    for (pos = 1; pos < 1 + prec; pos++)
 			putc (pos < ndigs ? _dtoa.digits[pos] : '0', stream);
-		}
+		} else if (flags & FL_ALT)
+		    putc ('.', stream);
 
 		/* exponent	*/
 		putc (flags & FL_FLTUPP ? 'E' : 'e', stream);
@@ -540,76 +570,83 @@ int vfprintf (FILE * stream, const char *fmt, va_list ap)
 #else		/* to: PRINTF_LEVEL >= PRINTF_FLT */
 	if ((c >= 'E' && c <= 'G') || (c >= 'e' && c <= 'g')) {
 	    (void) va_arg (ap, double);
-	    buf[0] = '?';
-	    goto buf_addr;
+	    pnt = "*float*";
+	    size = sizeof ("*float*") - 1;
+	    goto str_lpad;
 	}
-
 #endif
 
-	{
-	    const char * pnt;
-	    size_t size;
+	switch (c) {
 
-	    switch (c) {
+	case 'c':
+	    buf[0] = va_arg (ap, int);
+	    pnt = (char *)buf;
+	    size = 1;
+	    goto str_lpad;
 
-	      case 'c':
-		buf[0] = va_arg (ap, int);
-#if  PRINTF_LEVEL < PRINTF_FLT
-	      buf_addr:
-#endif
-		pnt = (char *)buf;
-		size = 1;
-		goto str_lpad;
+	case 's':
+	case 'S':
+	    pnt = va_arg (ap, char *);
+	    size = strnlen (pnt, (flags & FL_PREC) ? prec : ~0);
 
-	      case 's':
-	      case 'S':
-		pnt = va_arg (ap, char *);
-		size = strnlen (pnt, (flags & FL_PREC) ? prec : ~0);
-		goto str_lpad;
-
-	        pnt = va_arg (ap, char *);
-		size = strnlen (pnt, (flags & FL_PREC) ? prec : ~0);
-
-	      str_lpad:
-		if (!(flags & FL_LPAD)) {
-		    while (size < width) {
-			putc (' ', stream);
-			width--;
-		    }
+	str_lpad:
+	    if (!(flags & FL_LPAD)) {
+		while (size < width) {
+		    putc (' ', stream);
+		    width--;
 		}
-		while (size) {
-		    putc (*pnt++, stream);
-		    if (width) width -= 1;
-		    size -= 1;
-		}
-		goto tail;
 	    }
+	    while (size) {
+		putc (*pnt++, stream);
+		if (width) width -= 1;
+		size -= 1;
+	    }
+	    goto tail;
 	}
 
 	if (c == 'd' || c == 'i') {
-	    long x = (flags & FL_LONG) ? va_arg(ap,long) : va_arg(ap,int);
+	    long x;
+
+	    if (flags & FL_LONG)
+		x = va_arg(ap, long);
+	    else {
+		x = va_arg(ap, int);
+		if (flags & FL_SHORT)
+		    x = (short) x;
+	    }
+
 	    flags &= ~(FL_NEGATIVE | FL_ALT);
 	    if (x < 0) {
 		x = -x;
 		flags |= FL_NEGATIVE;
 	    }
-	    c = __ultoa_invert (x, (char *)buf, 10) - (char *)buf;
 
+	    if ((flags & FL_PREC) && prec == 0 && x == 0)
+		c = 0;
+	    else
+		c = __ultoa_invert (x, (char *)buf, 10) - (char *)buf;
 	} else {
 	    int base;
+	    unsigned long x;
 
-	    if (c == 'u') {
-		flags &= ~FL_ALT;
-		base = 10;
-		goto ultoa;
+	    if (flags & FL_LONG)
+		x = va_arg(ap, unsigned long);
+	    else {
+		x = va_arg(ap, unsigned int);
+		if (flags & FL_SHORT)
+		    x = (unsigned short) x;
 	    }
 
 	    flags &= ~(FL_PLUS | FL_SPACE);
 
 	    switch (c) {
+	      case 'u':
+		flags &= ~FL_ALT;
+		base = 10;
+		break;
 	      case 'o':
 	        base = 8;
-		goto ultoa;
+		break;
 	      case 'p':
 	        flags |= FL_ALT;
 		/* no break */
@@ -617,85 +654,81 @@ int vfprintf (FILE * stream, const char *fmt, va_list ap)
 		if (flags & FL_ALT)
 		    flags |= FL_ALTHEX;
 	        base = 16;
-		goto ultoa;
+		break;
 	      case 'X':
 		if (flags & FL_ALT)
 		    flags |= (FL_ALTHEX | FL_ALTUPP);
 	        base = 16 | XTOA_UPPER;
-	      ultoa:
-		c = __ultoa_invert ((flags & FL_LONG)
-				    ? va_arg(ap, unsigned long)
-				    : va_arg(ap, unsigned int),
-				    (char *)buf, base)  -  (char *)buf;
-		flags &= ~FL_NEGATIVE;
 		break;
-
 	      default:
-	        goto ret;
+		putc('%', stream);
+		putc(c, stream);
+		continue;
 	    }
+	    if ((flags & FL_PREC) && prec == 0 && x == 0)
+		c = 0;
+	    else
+		c = __ultoa_invert (x, (char *)buf, base) - (char *)buf;
+	    flags &= ~FL_NEGATIVE;
 	}
 
-	{
-	    unsigned char len;
+	len = c;
 
-	    len = c;
-	    if (flags & FL_PREC) {
-		flags &= ~FL_ZFILL;
-		if (len < prec) {
-		    len = prec;
-		    if ((flags & FL_ALT) && !(flags & FL_ALTHEX))
-			flags &= ~FL_ALT;
-		}
+	if (flags & FL_PREC) {
+	    flags &= ~FL_ZFILL;
+	    if (len < prec) {
+		len = prec;
+		if ((flags & FL_ALT) && !(flags & FL_ALTHEX))
+		    flags &= ~FL_ALT;
 	    }
-	    if (flags & FL_ALT) {
-		if (buf[c-1] == '0') {
-		    flags &= ~(FL_ALT | FL_ALTHEX | FL_ALTUPP);
-		} else {
-		    len += 1;
-		    if (flags & FL_ALTHEX)
-		    	len += 1;
-		}
-	    } else if (flags & (FL_NEGATIVE | FL_PLUS | FL_SPACE)) {
+	}
+	if (flags & FL_ALT) {
+	    if (buf[c-1] == '0') {
+		flags &= ~(FL_ALT | FL_ALTHEX | FL_ALTUPP);
+	    } else {
 		len += 1;
-	    }
-
-	    if (!(flags & FL_LPAD)) {
-		if (flags & FL_ZFILL) {
-		    prec = c;
-		    if (len < width) {
-			prec += width - len;
-			len = width;
-		    }
-		}
-		while (len < width) {
-		    putc (' ', stream);
-		    len++;
-		}
-	    }
-	
-	    width =  (len < width) ? width - len : 0;
-
-	    if (flags & FL_ALT) {
-		putc ('0', stream);
 		if (flags & FL_ALTHEX)
-		    putc (flags & FL_ALTUPP ? 'X' : 'x', stream);
-	    } else if (flags & (FL_NEGATIVE | FL_PLUS | FL_SPACE)) {
-		unsigned char z = ' ';
-		if (flags & FL_PLUS) z = '+';
-		if (flags & FL_NEGATIVE) z = '-';
-		putc (z, stream);
+		    len += 1;
 	    }
-		
-	    while (prec > c) {
-		putc ('0', stream);
-		prec--;
-	    }
-	
-	    do {
-		putc (buf[--c], stream);
-	    } while (c);
+	} else if (flags & (FL_NEGATIVE | FL_PLUS | FL_SPACE)) {
+	    len += 1;
 	}
-	
+
+	if (!(flags & FL_LPAD)) {
+	    if (flags & FL_ZFILL) {
+		prec = c;
+		if (len < width) {
+		    prec += width - len;
+		    len = width;
+		}
+	    }
+	    while (len < width) {
+		putc (' ', stream);
+		len++;
+	    }
+	}
+
+	width =  (len < width) ? width - len : 0;
+
+	if (flags & FL_ALT) {
+	    putc ('0', stream);
+	    if (flags & FL_ALTHEX)
+		putc (flags & FL_ALTUPP ? 'X' : 'x', stream);
+	} else if (flags & (FL_NEGATIVE | FL_PLUS | FL_SPACE)) {
+	    unsigned char z = ' ';
+	    if (flags & FL_PLUS) z = '+';
+	    if (flags & FL_NEGATIVE) z = '-';
+	    putc (z, stream);
+	}
+
+	while (prec > c) {
+	    putc ('0', stream);
+	    prec--;
+	}
+
+	while (c)
+	    putc (buf[--c], stream);
+
       tail:
 	/* Tail is possible.	*/
 	while (width) {

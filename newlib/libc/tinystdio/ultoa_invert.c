@@ -26,9 +26,17 @@
   ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
   POSSIBILITY OF SUCH DAMAGE. */
 
+#include "xtoa_fast.h"
+
 char *
-__ultoa_invert(unsigned long val, char *str, int base, int upper)
+__ultoa_invert(unsigned long val, char *str, int base)
 {
+	int upper = 0;
+
+	if (base & XTOA_UPPER) {
+		upper = 1;
+		base &= ~XTOA_UPPER;
+	}
 	do {
 		int	v;
 
