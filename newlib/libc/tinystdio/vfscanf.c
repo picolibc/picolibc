@@ -32,8 +32,6 @@
 
 /* $Id: vfscanf.c 2191 2010-11-05 13:45:57Z arcanum $ */
 
-#if !defined(__AVR_TINY__)
-
 #include <ctype.h>
 #include <limits.h>
 #include <math.h>
@@ -86,10 +84,8 @@ typedef unsigned int width_t;
 # endif
 #endif
 
-/* Add noinline attribute to avoid GCC 4.2 optimization.	*/
-
-__attribute__((noinline))
-static void putval (void *addr, long val, uint16_t flags)
+static void
+putval (void *addr, long val, uint16_t flags)
 {
     if (!(flags & FL_STAR)) {
 	if (flags & FL_CHAR)
@@ -103,7 +99,6 @@ static void putval (void *addr, long val, uint16_t flags)
     }
 }
 
-__attribute__((noinline))
 static unsigned long
 mulacc (unsigned long val, uint16_t flags, unsigned char c)
 {
@@ -122,7 +117,6 @@ mulacc (unsigned long val, uint16_t flags, unsigned char c)
     return val + c;
 }
 
-__attribute__((noinline))
 static unsigned char
 conv_int (FILE *stream, width_t width, void *addr, uint16_t flags)
 {
@@ -195,7 +189,6 @@ conv_int (FILE *stream, width_t width, void *addr, uint16_t flags)
 }
 
 #if  SCANF_BRACKET
-__attribute__((noinline))
 static const char *
 conv_brk (FILE *stream, width_t width, char *addr, const char *fmt)
 {
@@ -758,5 +751,3 @@ int vfscanf (FILE * stream, const char *fmt, va_list ap)
   eof:
     return nconvs ? nconvs : EOF;
 }
-
-#endif /* !defined(__AVR_TINY__) */
