@@ -277,30 +277,19 @@ conv_brk (FILE *stream, width_t width, char *addr, const char *fmt)
 
 #if  SCANF_FLOAT
 
-/* GCC before 4.2 does not use a library function to convert an unsigned
-   long to float.  Instead it uses a signed long to float conversion
-   function along with a large inline code to correct the result.
-   Seems, GCC 4.3 does not use it also.	*/
-extern double __floatunsisf (unsigned long);
-
-static const float pwr_p10 [6] = {
-    1e+1, 1e+2, 1e+4, 1e+8, 1e+16, 1e+32
-};
-static const float pwr_m10 [6] = {
-    1e-1, 1e-2, 1e-4, 1e-8, 1e-16, 1e-32
-};
+#include "dtoa_engine.h"
 
 static const char pstr_nfinity[] = "nfinity";
 static const char pstr_an[] = "an";
 
-__attribute__((noinline))
-static unsigned char conv_flt (FILE *stream, width_t width, float *addr)
+static unsigned char
+conv_flt (FILE *stream, width_t width, void *addr, uint16_t flags)
 {
-    uint32_t u32;
-    float flt;
+    uint64_t u64;
+    double flt;
     int i;
     const char *p;
-    const float *f;
+    const double *f;
     int exp;
 
     uint16_t flag;
@@ -351,7 +340,7 @@ static unsigned char conv_flt (FILE *stream, width_t width, float *addr)
 
       default:
         exp = 0;
-	u32 = 0;
+	u64 = 0;
 	do {
 
 	    unsigned char c = i - '0';
@@ -364,8 +353,8 @@ static unsigned char conv_flt (FILE *stream, width_t width, float *addr)
 		} else {
 		    if (flag & FL_DOT)
 			exp -= 1;
-		    u32 = mulacc (u32, FL_DEC, c);
-		    if (u32 >= (0xffffffffUL - 9) / 10)
+		    u64 = u64 * 10 + c;
+		    if (u64 >= (0xffffffffffffffffULL - 9) / 10)
 			flag |= FL_OVFL;
 	        }
 
@@ -397,7 +386,7 @@ static unsigned char conv_flt (FILE *stream, width_t width, float *addr)
 
 	    expacc = 0;
 	    do {
-		expacc = mulacc (expacc, FL_DEC, i - '0');
+		expacc = expacc * 10 + (i - '0');
 	    } while (--width && isdigit (i = getc(stream)));
 	    if (flag & FL_MEXP)
 		expacc = -expacc;
@@ -405,26 +394,36 @@ static unsigned char conv_flt (FILE *stream, width_t width, float *addr)
 	}
 
 	if (width && i >= 0) ungetc (i, stream);
-    
-	flt = u32;
+
+	flt = u64;
 
 	if (exp < 0) {
-	    f = pwr_m10 + 5;
+	    f = __dtoa_scale_down + DTOA_SCALE_DOWN_NUM - 1;
 	    exp = -exp;
+	    width = 1 << (DTOA_SCALE_DOWN_NUM - 1);
 	} else {
-	    f = pwr_p10 + 5;
+	    f = __dtoa_scale_up + DTOA_SCALE_UP_NUM - 1;
+	    width = 1 << (DTOA_SCALE_UP_NUM - 1);
 	}
-	for (width = 32; width; width >>= 1) {
-	    for (; (unsigned)exp >= width; exp -= width) {
+
+	while (exp) {
+	    if (exp >= width) {
 		flt *= *f;
+		exp -= width;
 	    }
 	    f--;
+	    width >>= 1;
 	}
     } /* switch */
 
     if (flag & FL_MINUS)
 	flt = -flt;
-    if (addr) *addr = flt;
+    if (addr) {
+	if (flags & FL_LONG)
+	    *((double *) addr) = flt;
+	else
+	    *((float *) addr) = flt;
+    }
     return 1;
 
   err:
@@ -432,7 +431,6 @@ static unsigned char conv_flt (FILE *stream, width_t width, float *addr)
 }
 #endif	/* SCANF_FLOAT	*/
 
-__attribute__((noinline))
 static int skip_spaces (FILE *stream)
 {
     int i;
@@ -619,7 +617,7 @@ int vfscanf (FILE * stream, const char *fmt, va_list ap)
 	    width = 0;
 	    while ((c -= '0') < 10) {
 		flags |= FL_WIDTH;
-		width = mulacc (width, FL_DEC, c);
+		width = width * 10 + c;
 		c = *fmt++;
 	    }
 	    c += '0';
@@ -726,7 +724,7 @@ int vfscanf (FILE * stream, const char *fmt, va_list ap)
 		    break;
 
 	          default:		/* e,E,f,F,g,G	*/
-		    c = conv_flt (stream, width, addr);
+		      c = conv_flt (stream, width, addr, flags);
 #else
 	          case 'd':
 		  case 'u':
