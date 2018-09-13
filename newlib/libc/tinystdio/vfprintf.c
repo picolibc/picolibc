@@ -304,6 +304,15 @@ int vfprintf (FILE * stream, const char *fmt, va_list ap)
 		    flags |= FL_WIDTH;
 		    continue;
 		}
+		if (c == '*') {
+		    if (flags & FL_PREC)
+			prec = va_arg(ap, int);
+		    else {
+			width = va_arg(ap, int);
+			flags |= FL_WIDTH;
+		    }
+		    continue;
+		}
 		if (c == '.') {
 		    if (flags & FL_PREC)
 			goto ret;
