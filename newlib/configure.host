@@ -135,6 +135,12 @@ case "${host_cpu}" in
 	machine_dir=cr16
        ;;
   cris | crisv32)
+	# The size of the (kernel_)time_t passed from or to a
+	# simulator or a Linux kernel is mandated by the
+	# gettimeofday and time system calls and fixed to 32 bits, the
+	# size of a long.  Instead of churning as 64 bits what is anyway
+	# 32 bits, it makes more sense to default to long.
+	test -z "${enable_newlib_long_time_t}" && newlib_long_time_t=yes
 	machine_dir=cris
 	;;
   crx*)
