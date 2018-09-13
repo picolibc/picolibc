@@ -29,75 +29,25 @@
 #include "dtoa_engine.h"
 #include <math.h>
 
-#define count_of(n)	(sizeof (n) / sizeof (n[0]))
+typedef double dtoa_type;
+#define DTOA_DIG DBL_DIG
+#define DTOA_MAX_10_EXP DBL_MAX_10_EXP
+#define DTOA_MIN_10_EXP DBL_MIN_10_EXP
 
-static const double scale_up[] = {
-	1e1,
-	1e2,
-	1e4,
-	1e8,
-	1e16,
-	1e32,
-	1e64,
-#if DBL_MAX_10_EXP >= 128
-	1e128,
-#if DBL_MAX_10_EXP >= 256
-	1e256,
-#if DBL_MAX_10_EXP >= 512
-	1e512,
-#if DBL_MAX_10_EXP >= 1024
-	1e1024,
-#if DBL_MAX_10_EXP >= 2048
-	1e2048,
-#if DBL_MAX_10_EXP >= 4096
-	1e4096,
-#if DBL_MAX_10_EXP >= 8192
-	1e8192
-#endif
-#endif
-#endif
-#endif
-#endif
-#endif
-#endif
-};
+#include "dtoa_data.c"
 
-static const double scale_down[] = {
-	1e-1,
-	1e-2,
-	1e-4,
-	1e-8,
-	1e-16,
-	1e-32,
-	1e-64,
-#if DBL_MAX_10_EXP >= 128
-	1e-128,
-#if DBL_MAX_10_EXP >= 256
-	1e-256,
-#if DBL_MAX_10_EXP >= 512
-	1e-512,
-#if DBL_MAX_10_EXP >= 1024
-	1e-1024,
-#if DBL_MAX_10_EXP >= 2048
-	1e-2048,
-#if DBL_MAX_10_EXP >= 4096
-	1e-4096,
-#if DBL_MAX_10_EXP >= 8192
-	1e-8192
-#endif
-#endif
-#endif
-#endif
-#endif
-#endif
-#endif
-};
+/* A bit of CPP trickery -- construct the floating-point value 10 ** DTOA_DIG
+ * by pasting the value of DTOA_DIG onto '1e' to
+ */
 
-#define paste(a,b) a##e##b
-#define expand(a,b) paste(a,b)
-#define MIN_MANT (10.0 * expand(1,DBL_DIG))
+#define paste(a) 1e##a
+#define substitute(a) paste(a)
+#define MIN_MANT (substitute(DTOA_DIG))
 #define MAX_MANT (10.0 * MIN_MANT)
 #define MIN_MANT_INT ((uint64_t) MIN_MANT)
+#define MIN_MANT_EXP	DTOA_DIG
+
+#define count_of(n)	(sizeof (n) / sizeof (n[0]))
 
 #define max(a, b) ({\
 		typeof(a) _a = a;\
@@ -110,18 +60,16 @@ static const double scale_down[] = {
 		_a < _b ? _a : _b; })
 
 int
-__dtoa_engine(double x, struct dtoa *dtoa, int max_digits, int max_decimals)
+__dtoa_engine(dtoa_type x, struct dtoa *dtoa, int max_digits, int max_decimals)
 {
 	int	i;
-	int32_t	exp = 0;
 	uint8_t	flags = 0;
-	double	y;
+	int32_t	exp = 0;
 
-	if (x < 0) {
+	if (signbit(x)) {
 		flags |= DTOA_MINUS;
 		x = -x;
 	}
-
 	if (x == 0) {
 		flags |= DTOA_ZERO;
 		for (i = 0; i < max_digits; i++)
@@ -131,35 +79,30 @@ __dtoa_engine(double x, struct dtoa *dtoa, int max_digits, int max_decimals)
 	} else if (isinf(x)) {
 		flags |= DTOA_INF;
 	} else {
-		exp = DBL_DIG + 1;
+		dtoa_type	y;
+
+		exp = MIN_MANT_EXP;
 
 		/* Bring x within range MIN_MANT <= x < MAX_MANT while
 		 * computing exponent value
 		 */
 		if (x < MIN_MANT) {
-			for (i = count_of(scale_up) - 1; i >= 0; i--) {
-				y = x * scale_up[i];
+			for (i = count_of(dtoa_scale_up) - 1; i >= 0; i--) {
+				y = x * dtoa_scale_up[i];
 				if (y < MAX_MANT) {
 					x = y;
 					exp -= (1 << i);
 				}
 			}
 		} else {
-			for (i = count_of(scale_down) - 1; i >= 0; i--) {
-				y = x * scale_down[i];
+			for (i = count_of(dtoa_scale_down) - 1; i >= 0; i--) {
+				y = x * dtoa_scale_down[i];
 				if (y >= MIN_MANT) {
 					x = y;
 					exp += (1 << i);
 				}
 			}
 		}
-
-		/* Now convert mantissa to decimal.
-		 */
-
-		uint8_t		outpos = 0;
-		uint64_t	mant = (uint64_t) (x + 0.5);
-		uint64_t	decimal = MIN_MANT_INT;
 
 		/* If limiting decimals, then limit the max digits
 		 * to no more than the number of digits left of the decimal
@@ -169,42 +112,29 @@ __dtoa_engine(double x, struct dtoa *dtoa, int max_digits, int max_decimals)
 		if(max_decimals != 0)
 			max_digits = min(max_digits, max_decimals + max(exp + 1, 1));
 
+		/* Round nearest by adding 1/2 of the last digit
+		 * before converting to int. Check for overflow
+		 * and adjust mantissa and exponent values
+		 */
+
+		x = x + dtoa_round[max_digits];
+
+		if (x >= MAX_MANT) {
+			x /= 10.0;
+			exp++;
+		}
+
+		/* Now convert mantissa to decimal. */
+
+		uint64_t	mant = (uint64_t) x;
+		uint64_t	decimal = MIN_MANT_INT;
+
 		/* Compute digits */
-		for (outpos = 0; outpos < max_digits; outpos++) {
-			dtoa->digits[outpos] = mant / decimal + '0';
+		for (i = 0; i < max_digits; i++) {
+			dtoa->digits[i] = mant / decimal + '0';
 			mant %= decimal;
 			decimal /= 10;
 		}
-
-		/* Round */
-		if (mant >= decimal * 5) {
-			while(outpos > 0) {
-
-				/* Increment digit, check if we're done */
-				if(++dtoa->digits[outpos-1] < '0' + 10)
-					break;
-
-				/* Rounded past the first digit;
-				 * reset the leading digit to 1,
-				 * bump exp and tell the caller we've carried.
-				 * The remaining digits will already be '0',
-				 * so we don't need to mess with them
-				 */
-				if(outpos == 0)
-				{
-					dtoa->digits[0] = '1';
-					exp++;
-					flags |= DTOA_CARRY;
-					break;
-				}
-
-				dtoa->digits[outpos-1] = '0';
-				outpos--;
-
-				/* and the loop continues, carrying to next digit. */
-			}
-		}
-
 	}
 	dtoa->digits[max_digits] = '\0';
 	dtoa->flags = flags;

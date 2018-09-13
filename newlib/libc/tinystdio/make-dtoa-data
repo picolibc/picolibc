@@ -1,3 +1,5 @@
+#!/usr/bin/nickle
+
 /* Copyright © 2018, Keith Packard
    All rights reserved.
 
@@ -26,27 +28,28 @@
   ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
   POSSIBILITY OF SUCH DAMAGE. */
 
-#ifndef	_DTOA_ENGINE_H_
-#define	_DTOA_ENGINE_H_
+printf ("static const dtoa_type dtoa_scale_up[] = {\n");
+for (int i = 1; i <= 65536; i *= 2) {
+	printf("#if DTOA_MAX_10_EXP >= %d\n", i);
+	printf("\t1e%d,\n", i);
+	printf("#endif\n");
+}
+printf("};\n");
 
-#include <stdint.h>
-#include <float.h>
+printf ("static const dtoa_type dtoa_scale_down[] = {\n");
+for (int i = 1; i <= 65536; i *= 2) {
+	printf("#if DTOA_MIN_10_EXP <= -%d\n", i);
+	printf("\t1e-%d,\n", i);
+	printf("#endif\n");
+}
+printf("};\n");
 
-#define DTOA_MAX_DIG	DBL_DIG
+printf ("static const dtoa_type dtoa_round[] = {\n");
 
-struct dtoa {
-	int32_t	exp;
-	uint8_t	flags;
-	char	digits[DTOA_MAX_DIG + 1];
-};
+for (int i = 30; i >= 0; i--) {
+	printf("#if DTOA_DIG >= %d\n", i);
+	printf("\t5e%d,\n", i);
+	printf("#endif\n");
+}
 
-int
-__dtoa_engine(double x, struct dtoa *dtoa, int max_digits, int max_decimals);
-
-#define	DTOA_MINUS	1
-#define	DTOA_ZERO	2
-#define	DTOA_INF	4
-#define	DTOA_NAN	8
-#define	DTOA_CARRY	16	/* Carry was to master position.	*/
-
-#endif	/* !_DTOA_ENGINE_H_ */
+printf("};\n");
