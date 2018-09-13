@@ -1,5 +1,5 @@
 #! /bin/sh
-#  Copyright (C) 2005 Axis Communications.
+#  Copyright (C) 2005, 2018 Axis Communications.
 #  All rights reserved.
 #
 #  Redistribution and use in source and binary forms, with or without
@@ -93,8 +93,16 @@ cat > gettod.c <<EOF
 $lu#include <sys/time.h>
 #include <sys/times.h>
 int
-_gettimeofday (struct timeval *tp, void *tzp
-${r}gettimeofday (tp, tzp))
+_gettimeofday (struct timeval *tp, void *tzp)
+{
+  struct kernel_timeval kt;
+  int retval = _Sys_gettimeofday(&kt, tzp);
+  if (retval == 0)
+  {
+    tp->tv_sec = kt.tv_sec;
+    tp->tv_usec = kt.tv_usec;
+  }
+  R (retval)
 EOF
 cat > isatty.c <<EOF
 $lu

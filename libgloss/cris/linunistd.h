@@ -1,5 +1,5 @@
 /* Support for syscalls for cris*-axis-linux-gnu and simulators
-   Copyright (C) 1998-2005 Axis Communications.
+   Copyright (C) 1998-2005, 2018 Axis Communications.
    All rights reserved.
 
    Redistribution and use in source and binary forms, with or without
@@ -402,6 +402,14 @@ struct new_stat {
 	unsigned long  __unused5;
 };
 
+typedef long int kernel_time_t;
+typedef long int kernel_suseconds_t;
+
+struct kernel_timeval {
+  kernel_time_t      tv_sec;
+  kernel_suseconds_t tv_usec;
+};
+
 static inline _syscall2(int,stat,const char *,path,struct new_stat *,statbuf)
 static inline _syscall2(int,fstat,int,fd,struct new_stat *,statbuf)
 static inline _syscall0(int,getpid)
@@ -412,7 +420,7 @@ static inline _syscall1(long,times,struct tms *,tbuf)
 static inline _syscall1(long,mmap,long *, buf)
 struct timeval;
 struct timezone;
-static inline _syscall2(int,gettimeofday,struct timeval *,tp,
+static inline _syscall2(int,gettimeofday,struct kernel_timeval *,tp,
                         void *, tzp)
 static inline _syscall2(int,link,const char *,old,const char *,new)
 static inline _syscall1(int,unlink,const char *, f)
