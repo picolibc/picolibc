@@ -3,6 +3,7 @@ subdir('sys')
 srcs_tinystdio = [
     'clearerr.c',
     'dtoa_engine.c',
+    'dtoa_data.c',
     'fclose.c',
     'fdevopen.c',
     'feof.c',

@@ -28,7 +28,7 @@
   ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
   POSSIBILITY OF SUCH DAMAGE. */
 
-printf ("static const dtoa_type dtoa_scale_up[] = {\n");
+printf ("const dtoa_type __dtoa_scale_up[] = {\n");
 for (int i = 1; i <= 65536; i *= 2) {
 	printf("#if DTOA_MAX_10_EXP >= %d\n", i);
 	printf("\t1e%d,\n", i);
@@ -36,7 +36,7 @@ for (int i = 1; i <= 65536; i *= 2) {
 }
 printf("};\n");
 
-printf ("static const dtoa_type dtoa_scale_down[] = {\n");
+printf ("const dtoa_type __dtoa_scale_down[] = {\n");
 for (int i = 1; i <= 65536; i *= 2) {
 	printf("#if DTOA_MIN_10_EXP <= -%d\n", i);
 	printf("\t1e-%d,\n", i);
@@ -44,7 +44,7 @@ for (int i = 1; i <= 65536; i *= 2) {
 }
 printf("};\n");
 
-printf ("static const dtoa_type dtoa_round[] = {\n");
+printf ("const dtoa_type __dtoa_round[] = {\n");
 
 for (int i = 30; i >= 0; i--) {
 	printf("#if DTOA_DIG >= %d\n", i);
@@ -53,3 +53,19 @@ for (int i = 30; i >= 0; i--) {
 }
 
 printf("};\n");
+
+int j = 0;
+for (int i = 1; i <= 65536; i *= 2) {
+	printf("#if DTOA_MAX_10_EXP >= %d && DTOA_MAX_10_EXP < %d\n", i, i*2);
+	printf("#define DTOA_SCALE_UP_NUM %d\n", j + 1);
+	printf("#endif\n");
+	j++;
+}
+
+int j = 0;
+for (int i = 1; i <= 65536; i *= 2) {
+	printf("#if DTOA_MIN_10_EXP <= -%d && DTOA_MIN_10_EXP > -%d\n", i, i*2);
+	printf ("#define DTOA_SCALE_DOWN_NUM %d\n", j + 1);
+	printf("#endif\n");
+	j++;
+}

@@ -26,210 +26,236 @@
   ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
   POSSIBILITY OF SUCH DAMAGE. */
 
-/* constant data needed for __dtoa_engine, removed
- * from that file to keep it looking neater
- */
+#include "dtoa_engine.h"
 
-static const dtoa_type dtoa_scale_up[] = {
-#if DTOA_MAX_10_EXP >= 1
+#ifndef DBL_MAX_10_EXP
+#error DBL_MAX_10_EXP
+#endif
+
+#ifndef DBL_MIN_10_EXP
+#error DBL_MIN_10_EXP
+#endif
+
+#ifndef DBL_DIG
+#error DBL_DIG
+#endif
+
+const double __dtoa_scale_up[] = {
+#if DBL_MAX_10_EXP >= 1
 	1e1,
 #endif
-#if DTOA_MAX_10_EXP >= 2
+#if DBL_MAX_10_EXP >= 2
 	1e2,
 #endif
-#if DTOA_MAX_10_EXP >= 4
+#if DBL_MAX_10_EXP >= 4
 	1e4,
 #endif
-#if DTOA_MAX_10_EXP >= 8
+#if DBL_MAX_10_EXP >= 8
 	1e8,
 #endif
-#if DTOA_MAX_10_EXP >= 16
+#if DBL_MAX_10_EXP >= 16
 	1e16,
 #endif
-#if DTOA_MAX_10_EXP >= 32
+#if DBL_MAX_10_EXP >= 32
 	1e32,
 #endif
-#if DTOA_MAX_10_EXP >= 64
+#if DBL_MAX_10_EXP >= 64
 	1e64,
 #endif
-#if DTOA_MAX_10_EXP >= 128
+#if DBL_MAX_10_EXP >= 128
 	1e128,
 #endif
-#if DTOA_MAX_10_EXP >= 256
+#if DBL_MAX_10_EXP >= 256
 	1e256,
 #endif
-#if DTOA_MAX_10_EXP >= 512
+#if DBL_MAX_10_EXP >= 512
 	1e512,
 #endif
-#if DTOA_MAX_10_EXP >= 1024
+#if DBL_MAX_10_EXP >= 1024
 	1e1024,
 #endif
-#if DTOA_MAX_10_EXP >= 2048
+#if DBL_MAX_10_EXP >= 2048
 	1e2048,
 #endif
-#if DTOA_MAX_10_EXP >= 4096
+#if DBL_MAX_10_EXP >= 4096
 	1e4096,
 #endif
-#if DTOA_MAX_10_EXP >= 8192
+#if DBL_MAX_10_EXP >= 8192
 	1e8192,
 #endif
-#if DTOA_MAX_10_EXP >= 16384
+#if DBL_MAX_10_EXP >= 16384
 	1e16384,
 #endif
-#if DTOA_MAX_10_EXP >= 32768
+#if DBL_MAX_10_EXP >= 32768
 	1e32768,
 #endif
-#if DTOA_MAX_10_EXP >= 65536
+#if DBL_MAX_10_EXP >= 65536
 	1e65536,
 #endif
 };
 
-static const dtoa_type dtoa_scale_down[] = {
-#if DTOA_MIN_10_EXP <= -1
+const double __dtoa_scale_down[] = {
+#if DBL_MIN_10_EXP <= -1
 	1e-1,
 #endif
-#if DTOA_MIN_10_EXP <= -2
+#if DBL_MIN_10_EXP <= -2
 	1e-2,
 #endif
-#if DTOA_MIN_10_EXP <= -4
+#if DBL_MIN_10_EXP <= -4
 	1e-4,
 #endif
-#if DTOA_MIN_10_EXP <= -8
+#if DBL_MIN_10_EXP <= -8
 	1e-8,
 #endif
-#if DTOA_MIN_10_EXP <= -16
+#if DBL_MIN_10_EXP <= -16
 	1e-16,
 #endif
-#if DTOA_MIN_10_EXP <= -32
+#if DBL_MIN_10_EXP <= -32
 	1e-32,
 #endif
-#if DTOA_MIN_10_EXP <= -64
+#if DBL_MIN_10_EXP <= -64
 	1e-64,
 #endif
-#if DTOA_MIN_10_EXP <= -128
+#if DBL_MIN_10_EXP <= -128
 	1e-128,
 #endif
-#if DTOA_MIN_10_EXP <= -256
+#if DBL_MIN_10_EXP <= -256
 	1e-256,
 #endif
-#if DTOA_MIN_10_EXP <= -512
+#if DBL_MIN_10_EXP <= -512
 	1e-512,
 #endif
-#if DTOA_MIN_10_EXP <= -1024
+#if DBL_MIN_10_EXP <= -1024
 	1e-1024,
 #endif
-#if DTOA_MIN_10_EXP <= -2048
+#if DBL_MIN_10_EXP <= -2048
 	1e-2048,
 #endif
-#if DTOA_MIN_10_EXP <= -4096
+#if DBL_MIN_10_EXP <= -4096
 	1e-4096,
 #endif
-#if DTOA_MIN_10_EXP <= -8192
+#if DBL_MIN_10_EXP <= -8192
 	1e-8192,
 #endif
-#if DTOA_MIN_10_EXP <= -16384
+#if DBL_MIN_10_EXP <= -16384
 	1e-16384,
 #endif
-#if DTOA_MIN_10_EXP <= -32768
+#if DBL_MIN_10_EXP <= -32768
 	1e-32768,
 #endif
-#if DTOA_MIN_10_EXP <= -65536
+#if DBL_MIN_10_EXP <= -65536
 	1e-65536,
 #endif
 };
 
-static const dtoa_type dtoa_round[] = {
-#if DTOA_DIG >= 30
+const double __dtoa_round[] = {
+#if DBL_DIG >= 30
 	5e30,
 #endif
-#if DTOA_DIG >= 29
+#if DBL_DIG >= 29
 	5e29,
 #endif
-#if DTOA_DIG >= 28
+#if DBL_DIG >= 28
 	5e28,
 #endif
-#if DTOA_DIG >= 27
+#if DBL_DIG >= 27
 	5e27,
 #endif
-#if DTOA_DIG >= 26
+#if DBL_DIG >= 26
 	5e26,
 #endif
-#if DTOA_DIG >= 25
+#if DBL_DIG >= 25
 	5e25,
 #endif
-#if DTOA_DIG >= 24
+#if DBL_DIG >= 24
 	5e24,
 #endif
-#if DTOA_DIG >= 23
+#if DBL_DIG >= 23
 	5e23,
 #endif
-#if DTOA_DIG >= 22
+#if DBL_DIG >= 22
 	5e22,
 #endif
-#if DTOA_DIG >= 21
+#if DBL_DIG >= 21
 	5e21,
 #endif
-#if DTOA_DIG >= 20
+#if DBL_DIG >= 20
 	5e20,
 #endif
-#if DTOA_DIG >= 19
+#if DBL_DIG >= 19
 	5e19,
 #endif
-#if DTOA_DIG >= 18
+#if DBL_DIG >= 18
 	5e18,
 #endif
-#if DTOA_DIG >= 17
+#if DBL_DIG >= 17
 	5e17,
 #endif
-#if DTOA_DIG >= 16
+#if DBL_DIG >= 16
 	5e16,
 #endif
-#if DTOA_DIG >= 15
+#if DBL_DIG >= 15
 	5e15,
 #endif
-#if DTOA_DIG >= 14
+#if DBL_DIG >= 14
 	5e14,
 #endif
-#if DTOA_DIG >= 13
+#if DBL_DIG >= 13
 	5e13,
 #endif
-#if DTOA_DIG >= 12
+#if DBL_DIG >= 12
 	5e12,
 #endif
-#if DTOA_DIG >= 11
+#if DBL_DIG >= 11
 	5e11,
 #endif
-#if DTOA_DIG >= 10
+#if DBL_DIG >= 10
 	5e10,
 #endif
-#if DTOA_DIG >= 9
+#if DBL_DIG >= 9
 	5e9,
 #endif
-#if DTOA_DIG >= 8
+#if DBL_DIG >= 8
 	5e8,
 #endif
-#if DTOA_DIG >= 7
+#if DBL_DIG >= 7
 	5e7,
 #endif
-#if DTOA_DIG >= 6
+#if DBL_DIG >= 6
 	5e6,
 #endif
-#if DTOA_DIG >= 5
+#if DBL_DIG >= 5
 	5e5,
 #endif
-#if DTOA_DIG >= 4
+#if DBL_DIG >= 4
 	5e4,
 #endif
-#if DTOA_DIG >= 3
+#if DBL_DIG >= 3
 	5e3,
 #endif
-#if DTOA_DIG >= 2
+#if DBL_DIG >= 2
 	5e2,
 #endif
-#if DTOA_DIG >= 1
+#if DBL_DIG >= 1
 	5e1,
 #endif
-#if DTOA_DIG >= 0
+#if DBL_DIG >= 0
 	5e0,
 #endif
 };
+
+/*
+ * Make sure the computed sizes of the arrays match the actual sizes
+ * by declaring an array which is legal if the sizes match and illegal
+ * if they do not
+ */
+
+#define count_of(n)	(sizeof (n) / sizeof (n[0]))
+#define match(array,size)	(count_of(array) == size)
+#define check_match(array,size)	(match(array, size) ? 1 : -1)
+
+typedef struct {
+	int	check_up[check_match(__dtoa_scale_up, DTOA_SCALE_UP_NUM)];
+	int	check_down[check_match(__dtoa_scale_down, DTOA_SCALE_DOWN_NUM)];
+	int	check_round[check_match(__dtoa_round, DTOA_ROUND_NUM)];
+} check_sizes;

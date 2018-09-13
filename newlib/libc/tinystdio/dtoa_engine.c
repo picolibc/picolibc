@@ -29,25 +29,16 @@
 #include "dtoa_engine.h"
 #include <math.h>
 
-typedef double dtoa_type;
-#define DTOA_DIG DBL_DIG
-#define DTOA_MAX_10_EXP DBL_MAX_10_EXP
-#define DTOA_MIN_10_EXP DBL_MIN_10_EXP
-
-#include "dtoa_data.c"
-
-/* A bit of CPP trickery -- construct the floating-point value 10 ** DTOA_DIG
- * by pasting the value of DTOA_DIG onto '1e' to
+/* A bit of CPP trickery -- construct the floating-point value 10 ** DBL_DIG
+ * by pasting the value of DBL_DIG onto '1e' to
  */
 
 #define paste(a) 1e##a
 #define substitute(a) paste(a)
-#define MIN_MANT (substitute(DTOA_DIG))
+#define MIN_MANT (substitute(DBL_DIG))
 #define MAX_MANT (10.0 * MIN_MANT)
 #define MIN_MANT_INT ((uint64_t) MIN_MANT)
-#define MIN_MANT_EXP	DTOA_DIG
-
-#define count_of(n)	(sizeof (n) / sizeof (n[0]))
+#define MIN_MANT_EXP	DBL_DIG
 
 #define max(a, b) ({\
 		typeof(a) _a = a;\
@@ -60,7 +51,7 @@ typedef double dtoa_type;
 		_a < _b ? _a : _b; })
 
 int
-__dtoa_engine(dtoa_type x, struct dtoa *dtoa, int max_digits, int max_decimals)
+__dtoa_engine(double x, struct dtoa *dtoa, int max_digits, int max_decimals)
 {
 	int	i;
 	uint8_t	flags = 0;
@@ -79,7 +70,7 @@ __dtoa_engine(dtoa_type x, struct dtoa *dtoa, int max_digits, int max_decimals)
 	} else if (isinf(x)) {
 		flags |= DTOA_INF;
 	} else {
-		dtoa_type	y;
+		double	y;
 
 		exp = MIN_MANT_EXP;
 
@@ -87,16 +78,16 @@ __dtoa_engine(dtoa_type x, struct dtoa *dtoa, int max_digits, int max_decimals)
 		 * computing exponent value
 		 */
 		if (x < MIN_MANT) {
-			for (i = count_of(dtoa_scale_up) - 1; i >= 0; i--) {
-				y = x * dtoa_scale_up[i];
+			for (i = DTOA_SCALE_UP_NUM - 1; i >= 0; i--) {
+				y = x * __dtoa_scale_up[i];
 				if (y < MAX_MANT) {
 					x = y;
 					exp -= (1 << i);
 				}
 			}
 		} else {
-			for (i = count_of(dtoa_scale_down) - 1; i >= 0; i--) {
-				y = x * dtoa_scale_down[i];
+			for (i = DTOA_SCALE_DOWN_NUM - 1; i >= 0; i--) {
+				y = x * __dtoa_scale_down[i];
 				if (y >= MIN_MANT) {
 					x = y;
 					exp += (1 << i);
@@ -117,7 +108,7 @@ __dtoa_engine(dtoa_type x, struct dtoa *dtoa, int max_digits, int max_decimals)
 		 * and adjust mantissa and exponent values
 		 */
 
-		x = x + dtoa_round[max_digits];
+		x = x + __dtoa_round[max_digits];
 
 		if (x >= MAX_MANT) {
 			x /= 10.0;
