@@ -268,7 +268,8 @@ exp_inline (double x, double xtail, uint32_t sign_bias)
   return scale + scale * tmp;
 }
 
-/* Returns 0 if not int, 1 if odd int, 2 if even int.  */
+/* Returns 0 if not int, 1 if odd int, 2 if even int.  The argument is
+   the bit representation of a non-zero finite floating-point value.  */
 static inline int
 checkint (uint64_t iy)
 {
