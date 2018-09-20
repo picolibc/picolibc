@@ -144,6 +144,10 @@ static float zero=  0.0000000000e+00;
 }
 
 
+#if defined(_IEEE_LIBM) && defined(HAVE_ALIAS_ATTRIBUTE)
+__strong_reference(__ieee754_lgammaf_r, lgammaf_r);
+#endif
+
 #ifdef __STDC__
 	float __ieee754_lgammaf_r(float x, int *signgamp)
 #else

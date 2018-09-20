@@ -47,6 +47,10 @@ static const float zero    = 0.0;
 static float zero    = 0.0;
 #endif
 
+#if defined(_IEEE_LIBM) && defined(HAVE_ALIAS_ATTRIBUTE)
+__strong_reference(__ieee754_j1f, j1f);
+#endif
+
 #ifdef __STDC__
 	float __ieee754_j1f(float x) 
 #else
@@ -115,6 +119,10 @@ static float V0[5] = {
   6.2274145840e-09, /* 0x31d5f8eb */
   1.6655924903e-11, /* 0x2d9281cf */
 };
+
+#if defined(_IEEE_LIBM) && defined(HAVE_ALIAS_ATTRIBUTE)
+__strong_reference(__ieee754_y1f, y1f);
+#endif
 
 #ifdef __STDC__
 	float __ieee754_y1f(float x) 

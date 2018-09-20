@@ -17,6 +17,7 @@
 #include <errno.h>
 
 
+#if !defined(_IEEE_LIBM) || !defined(HAVE_ALIAS_ATTRIBUTE)
 #ifdef __STDC__
 	float jnf(int n, float x)	/* wrapper jnf */
 #else
@@ -24,9 +25,6 @@
 	float x; int n;
 #endif
 {
-#ifdef _IEEE_LIBM
-	return __ieee754_jnf(n,x);
-#else
 	float z;
 	struct exception exc;
 	z = __ieee754_jnf(n,x);
@@ -49,9 +47,10 @@
             return exc.retval; 
 	} else
 	    return z;
-#endif
 }
+#endif
 
+#if !defined(_IEEE_LIBM) || !defined(HAVE_ALIAS_ATTRIBUTE)
 #ifdef __STDC__
 	float ynf(int n, float x)	/* wrapper ynf */
 #else
@@ -59,9 +58,6 @@
 	float x; int n;
 #endif
 {
-#ifdef _IEEE_LIBM
-	return __ieee754_ynf(n,x);
-#else
 	float z;
 	struct exception exc;
 	z = __ieee754_ynf(n,x);
@@ -110,8 +106,8 @@
             return (float)exc.retval; 
 	} else
 	    return z;
-#endif
 }
+#endif
 
 #ifdef _DOUBLE_IS_32BITS
 

@@ -15,6 +15,10 @@
 
 #include "fdlibm.h"
 
+#if defined(_IEEE_LIBM) && defined(HAVE_ALIAS_ATTRIBUTE)
+__strong_reference(__ieee754_hypotf, hypotf);
+#endif
+
 #ifdef __STDC__
 	float __ieee754_hypotf(float x, float y)
 #else

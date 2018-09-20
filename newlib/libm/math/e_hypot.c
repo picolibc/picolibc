@@ -47,6 +47,10 @@
 
 #ifndef _DOUBLE_IS_32BITS
 
+#if defined(_IEEE_LIBM) && defined(HAVE_ALIAS_ATTRIBUTE)
+__strong_reference(__ieee754_hypot, hypot);
+#endif
+
 #ifdef __STDC__
 	double __ieee754_hypot(double x, double y)
 #else

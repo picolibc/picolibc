@@ -18,6 +18,7 @@
 #include <reent.h>
 #include <errno.h>
 
+#if !defined(_IEEE_LIBM) || !defined(HAVE_ALIAS_ATTRIBUTE)
 #ifdef __STDC__
 	float gammaf(float x)
 #else
@@ -25,9 +26,6 @@
 	float x;
 #endif
 {
-#ifdef _IEEE_LIBM
-	return __ieee754_gammaf_r(x,&(_REENT_SIGNGAM(_REENT)));
-#else
         float y;
 	struct exception exc;
         y = __ieee754_gammaf_r(x,&(_REENT_SIGNGAM(_REENT)));
@@ -75,8 +73,8 @@
 	    return (float)exc.retval; 
         } else
             return y;
+}
 #endif
-}             
 
 #ifdef _DOUBLE_IS_32BITS
 

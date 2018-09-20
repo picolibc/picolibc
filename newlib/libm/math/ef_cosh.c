@@ -25,6 +25,10 @@ static const float one = 1.0, half=0.5, huge = 1.0e30;
 static float one = 1.0, half=0.5, huge = 1.0e30;
 #endif
 
+#if defined(_IEEE_LIBM) && defined(HAVE_ALIAS_ATTRIBUTE)
+__strong_reference(__ieee754_coshf, coshf);
+#endif
+
 #ifdef __STDC__
 	float __ieee754_coshf(float x)
 #else

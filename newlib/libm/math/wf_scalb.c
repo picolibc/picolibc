@@ -22,6 +22,7 @@
 #include "fdlibm.h"
 #include <errno.h>
 
+#if !defined(_IEEE_LIBM) || !defined(HAVE_ALIAS_ATTRIBUTE)
 #ifdef __STDC__
 #ifdef _SCALB_INT
 	float scalbf(float x, int fn)		/* wrapper scalbf */
@@ -37,9 +38,6 @@
 #endif
 #endif
 {
-#ifdef _IEEE_LIBM
-	return __ieee754_scalbf(x,fn);
-#else
 	float z;
 #ifndef HUGE_VAL 
 #define HUGE_VAL inf
@@ -88,8 +86,8 @@
 	if(!finitef(fn)) errno = ERANGE;
 #endif
 	return z;
-#endif 
 }
+#endif 
 
 #ifdef _DOUBLE_IS_32BITS
 

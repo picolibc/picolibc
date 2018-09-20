@@ -21,6 +21,7 @@
 #if __OBSOLETE_MATH
 #include <errno.h>
 
+#if !defined(_IEEE_LIBM) || !defined(HAVE_ALIAS_ATTRIBUTE)
 #ifdef __STDC__
 static const float
 #else
@@ -36,9 +37,6 @@ u_threshold= -1.0397208405e+02;  /* 0xc2cff1b5 */
 	float x;
 #endif
 {
-#ifdef _IEEE_LIBM
-	return __ieee754_expf(x);
-#else
 	float z;
 	struct exception exc;
 	z = __ieee754_expf(x);
@@ -86,8 +84,8 @@ u_threshold= -1.0397208405e+02;  /* 0xc2cff1b5 */
 	    } 
 	} 
 	return z;
-#endif
 }
+#endif
 
 #ifdef _DOUBLE_IS_32BITS
 

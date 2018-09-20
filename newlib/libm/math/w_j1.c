@@ -20,6 +20,7 @@
 
 #ifndef _DOUBLE_IS_32BITS
 
+#if !defined(_IEEE_LIBM) || !defined(HAVE_ALIAS_ATTRIBUTE)
 #ifdef __STDC__
 	double j1(double x)		/* wrapper j1 */
 #else
@@ -27,9 +28,6 @@
 	double x;
 #endif
 {
-#ifdef _IEEE_LIBM
-	return __ieee754_j1(x);
-#else
 	double z;
 	struct exception exc;
 	z = __ieee754_j1(x);
@@ -51,9 +49,10 @@
             return exc.retval; 
 	} else
 	    return z;
-#endif
 }
+#endif
 
+#if !defined(_IEEE_LIBM) || !defined(HAVE_ALIAS_ATTRIBUTE)
 #ifdef __STDC__
 	double y1(double x)		/* wrapper y1 */
 #else
@@ -61,9 +60,6 @@
 	double x;
 #endif
 {
-#ifdef _IEEE_LIBM
-	return __ieee754_y1(x);
-#else
 	double z;
 	struct exception exc;
 	z = __ieee754_y1(x);
@@ -110,8 +106,8 @@
             return exc.retval; 
 	} else
 	    return z;
-#endif
 }
+#endif
 
 #endif /* defined(_DOUBLE_IS_32BITS) */
 

@@ -56,6 +56,10 @@ static const double zero  =  0.00000000000000000000e+00;
 static double zero  =  0.00000000000000000000e+00;
 #endif
 
+#if defined(_IEEE_LIBM) && defined(HAVE_ALIAS_ATTRIBUTE)
+__strong_reference(__ieee754_jn, jn);
+#endif
+
 #ifdef __STDC__
 	double __ieee754_jn(int n, double x)
 #else
@@ -215,6 +219,10 @@ static double zero  =  0.00000000000000000000e+00;
 	}
 	if(sgn==1) return -b; else return b;
 }
+
+#if defined(_IEEE_LIBM) && defined(HAVE_ALIAS_ATTRIBUTE)
+__strong_reference(__ieee754_yn, yn);
+#endif
 
 #ifdef __STDC__
 	double __ieee754_yn(int n, double x) 

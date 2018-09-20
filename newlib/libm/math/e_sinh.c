@@ -39,6 +39,10 @@ static const double one = 1.0, shuge = 1.0e307;
 static double one = 1.0, shuge = 1.0e307;
 #endif
 
+#if defined(_IEEE_LIBM) && defined(HAVE_ALIAS_ATTRIBUTE)
+__strong_reference(__ieee754_sinh, sinh);
+#endif
+
 #ifdef __STDC__
 	double __ieee754_sinh(double x)
 #else

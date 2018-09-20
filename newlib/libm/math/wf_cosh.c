@@ -20,6 +20,7 @@
 #include "fdlibm.h"
 #include <errno.h>
 
+#if !defined(_IEEE_LIBM) || !defined(HAVE_ALIAS_ATTRIBUTE)
 #ifdef __STDC__
 	float coshf(float x)		/* wrapper coshf */
 #else
@@ -27,9 +28,6 @@
 	float x;
 #endif
 {
-#ifdef _IEEE_LIBM
-	return __ieee754_coshf(x);
-#else
 	float z;
 	struct exception exc;
 	z = __ieee754_coshf(x);
@@ -60,8 +58,8 @@
 	    return (float)exc.retval;
 	} else
 	    return z;
-#endif
 }
+#endif
 
 #ifdef _DOUBLE_IS_32BITS
 

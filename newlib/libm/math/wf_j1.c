@@ -21,6 +21,7 @@
 #include <errno.h>
 
 
+#if !defined(_IEEE_LIBM) || !defined(HAVE_ALIAS_ATTRIBUTE)
 #ifdef __STDC__
 	float j1f(float x)		/* wrapper j1f */
 #else
@@ -28,9 +29,6 @@
 	float x;
 #endif
 {
-#ifdef _IEEE_LIBM
-	return __ieee754_j1f(x);
-#else
 	float z;
 	struct exception exc;
 	z = __ieee754_j1f(x);
@@ -52,9 +50,10 @@
             return exc.retval; 
 	} else
 	    return z;
-#endif
 }
+#endif
 
+#if !defined(_IEEE_LIBM) || !defined(HAVE_ALIAS_ATTRIBUTE)
 #ifdef __STDC__
 	float y1f(float x)		/* wrapper y1f */
 #else
@@ -62,9 +61,6 @@
 	float x;
 #endif
 {
-#ifdef _IEEE_LIBM
-	return __ieee754_y1f(x);
-#else
 	float z;
 	struct exception exc;
 	z = __ieee754_y1f(x);
@@ -111,8 +107,8 @@
             return (float)exc.retval; 
 	} else
 	    return z;
-#endif
 }
+#endif
 
 #ifdef _DOUBLE_IS_32BITS
 

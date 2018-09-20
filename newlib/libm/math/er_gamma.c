@@ -21,6 +21,10 @@
 
 #include "fdlibm.h"
 
+#if defined(_IEEE_LIBM) && defined(HAVE_ALIAS_ATTRIBUTE)
+__strong_reference(__ieee754_gamma_r, gamma_r);
+#endif
+
 #ifdef __STDC__
 	double __ieee754_gamma_r(double x, int *signgamp)
 #else

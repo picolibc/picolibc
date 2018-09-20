@@ -74,6 +74,7 @@ QUICKREF
 #include "fdlibm.h"
 #include <errno.h>
 
+#if !defined(_IEEE_LIBM) || !defined(HAVE_ALIAS_ATTRIBUTE)
 #ifndef _DOUBLE_IS_32BITS
 
 #ifdef __STDC__
@@ -83,9 +84,6 @@ QUICKREF
 	double x;
 #endif
 {
-#ifdef _IEEE_LIBM
-	return __ieee754_atanh(x);
-#else
 	double z,y;
 	struct exception exc;
 	z = __ieee754_atanh(x);
@@ -122,11 +120,7 @@ QUICKREF
             return exc.retval; 
 	} else
 	    return z;
-#endif
 }
 
 #endif /* defined(_DOUBLE_IS_32BITS) */
-
-
-
-
+#endif

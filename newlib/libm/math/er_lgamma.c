@@ -209,6 +209,10 @@ static double zero=  0.00000000000000000000e+00;
 }
 
 
+#if defined(_IEEE_LIBM) && defined(HAVE_ALIAS_ATTRIBUTE)
+__strong_reference(__ieee754_lgamma_r, lgamma_r);
+#endif
+
 #ifdef __STDC__
 	double __ieee754_lgamma_r(double x, int *signgamp)
 #else

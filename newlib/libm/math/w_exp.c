@@ -58,6 +58,7 @@ PORTABILITY
 
 #ifndef _DOUBLE_IS_32BITS
 
+#if !defined(_IEEE_LIBM) || !defined(HAVE_ALIAS_ATTRIBUTE)
 #ifdef __STDC__
 static const double
 #else
@@ -73,9 +74,6 @@ u_threshold= -7.45133219101941108420e+02;  /* 0xc0874910, 0xD52D3051 */
 	double x;
 #endif
 {
-#ifdef _IEEE_LIBM
-	return __ieee754_exp(x);
-#else
 	double z;
 	struct exception exc;
 	z = __ieee754_exp(x);
@@ -123,8 +121,8 @@ u_threshold= -7.45133219101941108420e+02;  /* 0xc0874910, 0xD52D3051 */
 	    } 
 	} 
 	return z;
-#endif
 }
 
 #endif /* defined(_DOUBLE_IS_32BITS) */
+#endif
 #endif /* __OBSOLETE_MATH */

@@ -94,6 +94,7 @@ None of the Bessel functions are in ANSI C.
 
 #ifndef _DOUBLE_IS_32BITS
 
+#if !defined(_IEEE_LIBM) || !defined(HAVE_ALIAS_ATTRIBUTE)
 #ifdef __STDC__
 	double j0(double x)		/* wrapper j0 */
 #else
@@ -101,9 +102,6 @@ None of the Bessel functions are in ANSI C.
 	double x;
 #endif
 {
-#ifdef _IEEE_LIBM
-	return __ieee754_j0(x);
-#else
 	struct exception exc;
 	double z = __ieee754_j0(x);
 	if(_LIB_VERSION == _IEEE_ || isnan(x)) return z;
@@ -124,9 +122,10 @@ None of the Bessel functions are in ANSI C.
             return exc.retval; 
 	} else
 	    return z;
-#endif
 }
+#endif
 
+#if !defined(_IEEE_LIBM) || !defined(HAVE_ALIAS_ATTRIBUTE)
 #ifdef __STDC__
 	double y0(double x)		/* wrapper y0 */
 #else
@@ -134,9 +133,6 @@ None of the Bessel functions are in ANSI C.
 	double x;
 #endif
 {
-#ifdef _IEEE_LIBM
-	return __ieee754_y0(x);
-#else
 	double z;
 	struct exception exc;
 	z = __ieee754_y0(x);
@@ -183,8 +179,8 @@ None of the Bessel functions are in ANSI C.
 	    return exc.retval; 
 	} else
 	    return z;
-#endif
 }
+#endif
 
 #endif /* defined(_DOUBLE_IS_32BITS) */
 

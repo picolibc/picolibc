@@ -95,6 +95,10 @@ pio2_2t =  6.0770999344e-11, /* 0x2e85a308 */
 pio2_3  =  6.0770943833e-11, /* 0x2e85a300 */
 pio2_3t =  6.1232342629e-17; /* 0x248d3132 */
 
+#if defined(_IEEE_LIBM) && defined(HAVE_ALIAS_ATTRIBUTE)
+__strong_reference(__ieee754_rem_pio2f, rem_pio2f);
+#endif
+
 #ifdef __STDC__
 	__int32_t __ieee754_rem_pio2f(float x, float *y)
 #else

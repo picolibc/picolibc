@@ -57,6 +57,10 @@ ivln2    =  1.4426950216e+00, /* 0x3fb8aa3b =1/ln2 */
 ivln2_h  =  1.4426879883e+00, /* 0x3fb8aa00 =16b 1/ln2*/
 ivln2_l  =  7.0526075433e-06; /* 0x36eca570 =1/ln2 tail*/
 
+#if defined(_IEEE_LIBM) && defined(HAVE_ALIAS_ATTRIBUTE)
+__strong_reference(__ieee754_powf, powf);
+#endif
+
 #ifdef __STDC__
 	float __ieee754_powf(float x, float y)
 #else

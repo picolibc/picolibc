@@ -27,6 +27,10 @@ static const double one = 1.0, Zero[] = {0.0, -0.0,};
 static double one = 1.0, Zero[] = {0.0, -0.0,};
 #endif
 
+#if defined(_IEEE_LIBM) && defined(HAVE_ALIAS_ATTRIBUTE)
+__strong_reference(__ieee754_fmod, fmod);
+#endif
+
 #ifdef __STDC__
 	double __ieee754_fmod(double x, double y)
 #else

@@ -21,6 +21,10 @@ static	const float	one	= 1.0, tiny=1.0e-30;
 static	float	one	= 1.0, tiny=1.0e-30;
 #endif
 
+#if defined(_IEEE_LIBM) && defined(HAVE_ALIAS_ATTRIBUTE)
+__strong_reference(__ieee754_sqrtf, sqrtf);
+#endif
+
 #ifdef __STDC__
 	float __ieee754_sqrtf(float x)
 #else

@@ -21,6 +21,10 @@
 
 #ifndef _DOUBLE_IS_32BITS
 
+#if defined(_IEEE_LIBM) && defined(HAVE_ALIAS_ATTRIBUTE)
+__strong_reference(__ieee754_scalb, scalb);
+#endif
+
 #ifdef _SCALB_INT
 #ifdef __STDC__
 	double __ieee754_scalb(double x, int fn)

@@ -15,6 +15,10 @@
 
 #include "fdlibm.h"
 
+#if defined(_IEEE_LIBM) && defined(HAVE_ALIAS_ATTRIBUTE)
+__strong_reference(__ieee754_sinhf, sinhf);
+#endif
+
 #ifdef __STDC__
 static const float one = 1.0, shuge = 1.0e37;
 #else

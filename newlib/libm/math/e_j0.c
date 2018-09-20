@@ -91,6 +91,10 @@ static const double zero = 0.0;
 static double zero = 0.0;
 #endif
 
+#if defined(_IEEE_LIBM) && defined(HAVE_ALIAS_ATTRIBUTE)
+__strong_reference(__ieee754_j0, j0);
+#endif
+
 #ifdef __STDC__
 	double __ieee754_j0(double x) 
 #else
@@ -159,6 +163,10 @@ v01  =  1.27304834834123699328e-02, /* 0x3F8A1270, 0x91C9C71A */
 v02  =  7.60068627350353253702e-05, /* 0x3F13ECBB, 0xF578C6C1 */
 v03  =  2.59150851840457805467e-07, /* 0x3E91642D, 0x7FF202FD */
 v04  =  4.41110311332675467403e-10; /* 0x3DFE5018, 0x3BD6D9EF */
+
+#if defined(_IEEE_LIBM) && defined(HAVE_ALIAS_ATTRIBUTE)
+__strong_reference(__ieee754_y0, y0);
+#endif
 
 #ifdef __STDC__
 	double __ieee754_y0(double x) 

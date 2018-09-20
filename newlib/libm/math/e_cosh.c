@@ -42,6 +42,10 @@ static const double one = 1.0, half=0.5, huge = 1.0e300;
 static double one = 1.0, half=0.5, huge = 1.0e300;
 #endif
 
+#if defined(_IEEE_LIBM) && defined(HAVE_ALIAS_ATTRIBUTE)
+__strong_reference(__ieee754_cosh, cosh);
+#endif
+
 #ifdef __STDC__
 	double __ieee754_cosh(double x)
 #else

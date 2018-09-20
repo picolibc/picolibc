@@ -20,6 +20,7 @@
 #include "fdlibm.h"
 #include <errno.h>
 
+#if !defined(_IEEE_LIBM) || !defined(HAVE_ALIAS_ATTRIBUTE)
 #ifdef __STDC__
 	float j0f(float x)		/* wrapper j0f */
 #else
@@ -27,9 +28,6 @@
 	float x;
 #endif
 {
-#ifdef _IEEE_LIBM
-	return __ieee754_j0f(x);
-#else
 	struct exception exc;
 	float z = __ieee754_j0f(x);
 	if(_LIB_VERSION == _IEEE_ || isnan(x)) return z;
@@ -50,9 +48,10 @@
             return (float)exc.retval; 
 	} else
 	    return z;
-#endif
 }
+#endif
 
+#if !defined(_IEEE_LIBM) || !defined(HAVE_ALIAS_ATTRIBUTE)
 #ifdef __STDC__
 	float y0f(float x)		/* wrapper y0f */
 #else
@@ -60,9 +59,6 @@
 	float x;
 #endif
 {
-#ifdef _IEEE_LIBM
-	return __ieee754_y0f(x);
-#else
 	float z;
 	struct exception exc;
 	z = __ieee754_y0f(x);
@@ -109,8 +105,8 @@
             return (float)exc.retval; 
 	} else
 	    return z;
-#endif
 }
+#endif
 
 #ifdef _DOUBLE_IS_32BITS
 

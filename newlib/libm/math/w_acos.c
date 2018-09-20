@@ -70,6 +70,7 @@ MATHREF
 #include "fdlibm.h"
 #include <errno.h>
 
+#if !defined(_IEEE_LIBM) || !defined(HAVE_ALIAS_ATTRIBUTE)
 #ifndef _DOUBLE_IS_32BITS
 
 #ifdef __STDC__
@@ -79,9 +80,6 @@ MATHREF
 	double x;
 #endif
 {
-#ifdef _IEEE_LIBM
-	return __ieee754_acos(x);
-#else
 	double z;
        	struct exception exc;
        	z = __ieee754_acos(x);
@@ -103,7 +101,7 @@ MATHREF
 	    return exc.retval; 
 	} else
 	    return z;
-#endif
 }
 
 #endif /* defined(_DOUBLE_IS_32BITS) */
+#endif /* defined(_IEEE_LIBM) */

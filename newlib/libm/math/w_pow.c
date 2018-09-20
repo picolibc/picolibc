@@ -57,6 +57,7 @@ PORTABILITY
 
 #ifndef _DOUBLE_IS_32BITS
 
+#if !defined(_IEEE_LIBM) || !defined(HAVE_ALIAS_ATTRIBUTE)
 #ifdef __STDC__
 	double pow(double x, double y)	/* wrapper pow */
 #else
@@ -64,9 +65,6 @@ PORTABILITY
 	double x,y;
 #endif
 {
-#ifdef _IEEE_LIBM
-	return  __ieee754_pow(x,y);
-#else
 	double z;
 #ifndef HUGE_VAL 
 #define HUGE_VAL inf
@@ -204,8 +202,8 @@ PORTABILITY
             return exc.retval; 
         } 
 	return z;
-#endif
 }
+#endif
 
 #endif /* defined(_DOUBLE_IS_32BITS) */
 #endif /* __OBSOLETE_MATH */

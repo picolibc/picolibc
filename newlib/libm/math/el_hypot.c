@@ -6,6 +6,10 @@
 
 #include "fdlibm.h"
 
+#if defined(_IEEE_LIBM) && defined(HAVE_ALIAS_ATTRIBUTE)
+__strong_reference(__ieee754_hypotl, hypotl);
+#endif
+
 long double
 __ieee754_hypotl (long double x, long double y)
 {

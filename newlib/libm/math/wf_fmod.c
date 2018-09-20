@@ -20,6 +20,7 @@
 #include "fdlibm.h"
 #include <errno.h>
 
+#if !defined(_IEEE_LIBM) || !defined(HAVE_ALIAS_ATTRIBUTE)
 #ifdef __STDC__
 	float fmodf(float x, float y)	/* wrapper fmodf */
 #else
@@ -27,9 +28,6 @@
 	float x,y;
 #endif
 {
-#ifdef _IEEE_LIBM
-	return __ieee754_fmodf(x,y);
-#else
 	float z;
 	struct exception exc;
 	z = __ieee754_fmodf(x,y);
@@ -55,8 +53,8 @@
             return (float)exc.retval; 
 	} else
 	    return z;
-#endif
 }
+#endif
 
 #ifdef _DOUBLE_IS_32BITS
 

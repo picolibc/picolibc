@@ -50,6 +50,7 @@ PORTABILITY
 
 #ifndef _DOUBLE_IS_32BITS
 
+#if !defined(_IEEE_LIBM) || !defined(HAVE_ALIAS_ATTRIBUTE)
 #ifdef __STDC__
 	double log10(double x)		/* wrapper log10 */
 #else
@@ -57,9 +58,6 @@ PORTABILITY
 	double x;
 #endif
 {
-#ifdef _IEEE_LIBM
-	return __ieee754_log10(x);
-#else
 	double z;
 	struct exception exc;
 	z = __ieee754_log10(x);
@@ -102,7 +100,7 @@ PORTABILITY
             return exc.retval; 
 	} else
 	    return z;
-#endif
 }
+#endif
 
 #endif /* defined(_DOUBLE_IS_32BITS) */

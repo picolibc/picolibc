@@ -20,6 +20,7 @@
 
 #ifndef _DOUBLE_IS_32BITS
 
+#if !defined(_IEEE_LIBM) || !defined(HAVE_ALIAS_ATTRIBUTE)
 #ifdef __STDC__
 	double gamma_r(double x, int *signgamp) /* wrapper lgamma_r */
 #else
@@ -27,9 +28,6 @@
 	double x; int *signgamp;
 #endif
 {
-#ifdef _IEEE_LIBM
-	return __ieee754_gamma_r(x,signgamp);
-#else
         double y;
 	struct exception exc;
         y = __ieee754_gamma_r(x,signgamp);
@@ -70,7 +68,7 @@
 	    return exc.retval; 
         } else
             return y;
-#endif
 }
+#endif
 
 #endif /* defined(_DOUBLE_IS_32BITS) */

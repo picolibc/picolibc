@@ -21,6 +21,7 @@
 #if __OBSOLETE_MATH
 #include <errno.h>
 
+#if !defined(_IEEE_LIBM) || !defined(HAVE_ALIAS_ATTRIBUTE)
 #ifdef __STDC__
 	float logf(float x)		/* wrapper logf */
 #else
@@ -28,9 +29,6 @@
 	float x;
 #endif
 {
-#ifdef _IEEE_LIBM
-	return __ieee754_logf(x);
-#else
 	float z;
 	struct exception exc;
 	z = __ieee754_logf(x);
@@ -69,8 +67,8 @@
 	if (exc.err != 0)
            errno = exc.err;
         return (float)exc.retval; 
-#endif
 }
+#endif
 
 #ifdef _DOUBLE_IS_32BITS
 

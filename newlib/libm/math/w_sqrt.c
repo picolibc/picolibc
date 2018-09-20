@@ -47,6 +47,7 @@ PORTABILITY
 #include "fdlibm.h"
 #include <errno.h>
 
+#if !defined(_IEEE_LIBM) || !defined(HAVE_ALIAS_ATTRIBUTE)
 #ifndef _DOUBLE_IS_32BITS
 
 #ifdef __STDC__
@@ -56,9 +57,6 @@ PORTABILITY
 	double x;
 #endif
 {
-#ifdef _IEEE_LIBM
-	return __ieee754_sqrt(x);
-#else
 	struct exception exc;
 	double z;
 	z = __ieee754_sqrt(x);
@@ -82,7 +80,7 @@ PORTABILITY
 	  return exc.retval; 
 	} else
 	    return z;
-#endif
 }
 
 #endif /* defined(_DOUBLE_IS_32BITS) */
+#endif /* defined(_IEEE_LIBM) */

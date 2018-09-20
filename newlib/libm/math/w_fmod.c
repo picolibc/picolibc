@@ -58,6 +58,7 @@ PORTABILITY
 
 #ifndef _DOUBLE_IS_32BITS
 
+#if !defined(_IEEE_LIBM) || !defined(HAVE_ALIAS_ATTRIBUTE)
 #ifdef __STDC__
 	double fmod(double x, double y)	/* wrapper fmod */
 #else
@@ -65,9 +66,6 @@ PORTABILITY
 	double x,y;
 #endif
 {
-#ifdef _IEEE_LIBM
-	return __ieee754_fmod(x,y);
-#else
 	double z;
 	struct exception exc;
 	z = __ieee754_fmod(x,y);
@@ -93,7 +91,7 @@ PORTABILITY
             return exc.retval; 
 	} else
 	    return z;
-#endif
 }
+#endif
 
 #endif /* defined(_DOUBLE_IS_32BITS) */

@@ -40,6 +40,10 @@ P3   =  6.6137559770e-05, /* 0x388ab355 */
 P4   = -1.6533901999e-06, /* 0xb5ddea0e */
 P5   =  4.1381369442e-08; /* 0x3331bb4c */
 
+#if defined(_IEEE_LIBM) && defined(HAVE_ALIAS_ATTRIBUTE)
+__strong_reference(__ieee754_expf, expf);
+#endif
+
 #ifdef __STDC__
 	float __ieee754_expf(float x)	/* default IEEE double exp */
 #else

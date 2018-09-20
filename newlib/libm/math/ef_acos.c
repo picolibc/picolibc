@@ -35,6 +35,10 @@ qS2 =  2.0209457874e+00, /* 0x4001572d */
 qS3 = -6.8828397989e-01, /* 0xbf303361 */
 qS4 =  7.7038154006e-02; /* 0x3d9dc62e */
 
+#if defined(_IEEE_LIBM) && defined(HAVE_ALIAS_ATTRIBUTE)
+__strong_reference(__ieee754_acosf, acosf);
+#endif
+
 #ifdef __STDC__
 	float __ieee754_acosf(float x)
 #else

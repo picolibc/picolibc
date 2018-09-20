@@ -76,6 +76,7 @@ MATHREF
 
 #ifndef _DOUBLE_IS_32BITS
 
+#if !defined(_IEEE_LIBM) || !defined(HAVE_ALIAS_ATTRIBUTE)
 #ifdef __STDC__
 	double asin(double x)		/* wrapper asin */
 #else
@@ -83,9 +84,6 @@ MATHREF
 	double x;
 #endif
 {
-#ifdef _IEEE_LIBM
-	return __ieee754_asin(x);
-#else
 	double z;
 	struct exception exc;
 	z = __ieee754_asin(x);
@@ -107,7 +105,7 @@ MATHREF
 	    return exc.retval; 
 	} else
 	    return z;
-#endif
 }
 
 #endif /* defined(_DOUBLE_IS_32BITS) */
+#endif

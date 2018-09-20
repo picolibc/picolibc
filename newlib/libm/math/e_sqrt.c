@@ -91,6 +91,10 @@ static	const double	one	= 1.0, tiny=1.0e-300;
 static	double	one	= 1.0, tiny=1.0e-300;
 #endif
 
+#if defined(_IEEE_LIBM) && defined(HAVE_ALIAS_ATTRIBUTE)
+__strong_reference(__ieee754_sqrt, sqrt);
+#endif
+
 #ifdef __STDC__
 	double __ieee754_sqrt(double x)
 #else

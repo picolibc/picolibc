@@ -28,6 +28,10 @@ static const float zero = 0.0;
 static float zero = 0.0;
 #endif
 
+#if defined(_IEEE_LIBM) && defined(HAVE_ALIAS_ATTRIBUTE)
+__strong_reference(__ieee754_atanhf, atanhf);
+#endif
+
 #ifdef __STDC__
 	float __ieee754_atanhf(float x)
 #else

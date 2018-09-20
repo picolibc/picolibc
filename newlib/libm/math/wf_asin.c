@@ -22,6 +22,7 @@
 #include "fdlibm.h"
 #include <errno.h>
 
+#if !defined(_IEEE_LIBM) || !defined(HAVE_ALIAS_ATTRIBUTE)
 #ifdef __STDC__
 	float asinf(float x)		/* wrapper asinf */
 #else
@@ -29,9 +30,6 @@
 	float x;
 #endif
 {
-#ifdef _IEEE_LIBM
-	return __ieee754_asinf(x);
-#else
 	float z;
 	struct exception exc;
 	z = __ieee754_asinf(x);
@@ -53,8 +51,8 @@
 	    return (float)exc.retval; 
 	} else
 	    return z;
-#endif
 }
+#endif
 
 #ifdef _DOUBLE_IS_32BITS
 

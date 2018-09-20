@@ -22,6 +22,8 @@
 
 #ifndef _DOUBLE_IS_32BITS
 
+#if !defined(_IEEE_LIBM) || !defined(HAVE_ALIAS_ATTRIBUTE)
+
 #ifdef __STDC__
 #ifdef _SCALB_INT
 	double scalb(double x, int fn)		/* wrapper scalb */
@@ -37,9 +39,6 @@
 #endif
 #endif
 {
-#ifdef _IEEE_LIBM
-	return __ieee754_scalb(x,fn);
-#else
 	double z;
 #ifndef HUGE_VAL 
 #define HUGE_VAL inf
@@ -88,7 +87,7 @@
 	if(!finite(fn)) errno = ERANGE;
 #endif
 	return z;
-#endif 
 }
+#endif 
 
 #endif /* defined(_DOUBLE_IS_32BITS) */

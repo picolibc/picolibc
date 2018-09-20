@@ -54,6 +54,7 @@ PORTABILITY
 
 #ifndef _DOUBLE_IS_32BITS
 
+#if !defined(_IEEE_LIBM) || !defined(HAVE_ALIAS_ATTRIBUTE)
 #ifdef __STDC__
 	double log(double x)		/* wrapper log */
 #else
@@ -61,9 +62,6 @@ PORTABILITY
 	double x;
 #endif
 {
-#ifdef _IEEE_LIBM
-	return __ieee754_log(x);
-#else
 	double z;
 	struct exception exc;
 	z = __ieee754_log(x);
@@ -103,8 +101,8 @@ PORTABILITY
 	if (exc.err != 0)
            errno = exc.err;
         return exc.retval; 
-#endif
 }
+#endif
 
 #endif /* defined(_DOUBLE_IS_32BITS) */
 #endif /* __OBSOLETE_MATH */

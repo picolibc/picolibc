@@ -16,6 +16,10 @@
 #include "fdlibm.h"
 #include <limits.h>
 
+#if defined(_IEEE_LIBM) && defined(HAVE_ALIAS_ATTRIBUTE)
+__strong_reference(__ieee754_scalbf, scalbf);
+#endif
+
 #ifdef _SCALB_INT
 #ifdef __STDC__
 	float __ieee754_scalbf(float x, int fn)

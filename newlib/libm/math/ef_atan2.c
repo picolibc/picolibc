@@ -28,6 +28,10 @@ pi_o_2  = 1.5707963705e+00, /* 0x3fc90fdb */
 pi      = 3.1415927410e+00,  /* 0x40490fdb */
 pi_lo   = -8.7422776573e-08; /* 0xb3bbbd2e */
 
+#if defined(_IEEE_LIBM) && defined(HAVE_ALIAS_ATTRIBUTE)
+__strong_reference(__ieee754_atan2f, atan2f);
+#endif
+
 #ifdef __STDC__
 	float __ieee754_atan2f(float y, float x)
 #else

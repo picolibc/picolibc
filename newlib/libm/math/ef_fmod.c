@@ -27,6 +27,10 @@ static const float one = 1.0, Zero[] = {0.0, -0.0,};
 static float one = 1.0, Zero[] = {0.0, -0.0,};
 #endif
 
+#if defined(_IEEE_LIBM) && defined(HAVE_ALIAS_ATTRIBUTE)
+__strong_reference(__ieee754_fmodf, fmodf);
+#endif
+
 #ifdef __STDC__
 	float __ieee754_fmodf(float x, float y)
 #else

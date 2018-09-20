@@ -20,6 +20,7 @@
 #include "fdlibm.h"
 #include <errno.h>
 
+#if !defined(_IEEE_LIBM) || !defined(HAVE_ALIAS_ATTRIBUTE)
 #ifdef __STDC__
 	float lgammaf_r(float x, int *signgamp) /* wrapper lgammaf_r */
 #else
@@ -27,9 +28,6 @@
 	float x; int *signgamp;
 #endif
 {
-#ifdef _IEEE_LIBM
-	return __ieee754_lgammaf_r(x,signgamp);
-#else
         float y;
 	struct exception exc;
         y = __ieee754_lgammaf_r(x,signgamp);
@@ -71,5 +69,5 @@
             return (float)exc.retval; 
         } else
             return y;
-#endif
 }             
+#endif
