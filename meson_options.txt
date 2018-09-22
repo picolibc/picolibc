@@ -7,6 +7,9 @@ option('multilib', type: 'boolean', value: true,
 option('hw-fp', type: 'boolean', value: false,
 	description: 'Turn on hardware floating point math')
 
+option('have-alias-attribute', type: 'combo', choices: ['true', 'false', 'auto'], value: 'auto',
+       description: 'Compiler supports __alias__ attribute')
+
 option('tests', type: 'boolean', value: false,
        description: 'Enable tests')
 

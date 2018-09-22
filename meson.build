@@ -11,7 +11,7 @@ targets = []
 enable_multilib = get_option('multilib')
 enable_tests = get_option('tests')
 newlib_tinystdio = get_option('newlib-tinystdio')
-
+have_alias_attribute_option = get_option('have-alias-attribute')
 newlib_io_pos_args = get_option('newlib-io-pos-args')
 newlib_io_c99_formats = get_option('newlib-io-c99-formats')
 newlib_register_fini = get_option('newlib-register-fini')
@@ -55,6 +55,12 @@ if host_cpu == ''
   message('Computed host_cpu as ' + host_cpu)
 endif
 
+if have_alias_attribute_option == 'auto'
+  have_alias_attribute = meson.get_compiler('c').has_function_attribute('alias')
+else
+  have_alias_attribute = have_alias_attribute_option == 'true'
+endif
+
 if enable_multilib
   foreach target : run_command(meson.get_compiler('c'), '--print-multi-lib').stdout().strip().split('\n')
     tmp = target.split(';')
@@ -91,6 +97,7 @@ NEWLIB_PATCHLEVEL_VERSION=0
 have_cc_inhibit_loop_to_libcall=meson.get_compiler('c').has_argument('-fno-tree-loop-distribute-patterns')
 conf_data.set('_HAVE_CC_INHIBIT_LOOP_TO_LIBCALL', have_cc_inhibit_loop_to_libcall,
 	      description: 'GCC flag to prevent detecting memcpy/memset patterns')
+conf_data.set('HAVE_ALIAS_ATTRIBUTE', have_alias_attribute)
 conf_data.set('_WANT_IO_C99_FORMATS', newlib_io_c99_formats)
 conf_data.set('_WANT_REGISTER_FINI', newlib_register_fini)
 conf_data.set('_WANT_IO_LONG_LONG', newlib_io_long_long)
