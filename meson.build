@@ -61,6 +61,19 @@ else
   have_alias_attribute = have_alias_attribute_option == 'true'
 endif
 
+long_double_code = '''
+#include <float.h>
+#ifndef LDBL_MANT_DIG
+#error No long double support in float.h
+#endif
+long double test()
+{
+	long double ld = 0.0L;
+	 return ld;
+}
+'''
+have_long_double = meson.get_compiler('c').compiles(long_double_code, name : 'long double check')
+
 if enable_multilib
   foreach target : run_command(meson.get_compiler('c'), '--print-multi-lib').stdout().strip().split('\n')
     tmp = target.split(';')
@@ -97,6 +110,8 @@ NEWLIB_PATCHLEVEL_VERSION=0
 have_cc_inhibit_loop_to_libcall=meson.get_compiler('c').has_argument('-fno-tree-loop-distribute-patterns')
 conf_data.set('_HAVE_CC_INHIBIT_LOOP_TO_LIBCALL', have_cc_inhibit_loop_to_libcall,
 	      description: 'GCC flag to prevent detecting memcpy/memset patterns')
+conf_data.set('HAVE_LONG_DOUBLE', have_long_double,
+	      description: 'Compiler has long double type')
 conf_data.set('HAVE_ALIAS_ATTRIBUTE', have_alias_attribute)
 conf_data.set('_WANT_IO_C99_FORMATS', newlib_io_c99_formats)
 conf_data.set('_WANT_REGISTER_FINI', newlib_register_fini)
