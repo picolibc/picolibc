@@ -31,7 +31,6 @@ srcs_math = [
     'e_j0.c',
     'e_j1.c',
     'e_jn.c',
-    'el_hypot.c',
     'e_log10.c',
     'e_log.c',
     'e_pow.c',
@@ -135,6 +134,15 @@ srcs_math = [
     'w_sqrt.c',
     'w_tgamma.c',
 ]
+
+l_srcs_math = [
+    'el_hypot.c',
+  ]
+
+if have_long_double
+  srcs_math += l_srcs_math
+endif
+
 foreach target : targets
 	value = get_variable('target_' + target)
 	set_variable('lib_math' + target,

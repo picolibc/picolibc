@@ -163,6 +163,10 @@ lsrc_common = [
 
 srcs_common = dsrc_common + fsrc_common
 
+if have_long_double
+  srcs_common += lsrc_common
+endif
+
 hdrs_common = [
     'fdlibm.h',
     'local.h',
