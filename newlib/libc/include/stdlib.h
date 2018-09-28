@@ -282,7 +282,8 @@ int	_unsetenv_r (struct _reent *, const char *__string);
 #endif /* !__CYGWIN__ */
 
 #if __POSIX_VISIBLE >= 200112
-int __nonnull ((1)) posix_memalign (void **, size_t, size_t);
+int	posix_memalign (void **, size_t, size_t) __malloc_like __nonnull((1))
+	    __alloc_align(2) __alloc_size(3) __result_use_check;
 #endif
 
 char *	_dtoa_r (struct _reent *, double, int, int, int *, int*, char**);
@@ -326,7 +327,7 @@ extern long double strtold (const char *__restrict, char **__restrict);
  */
 #if __ISO_C_VISIBLE >= 2011
 void *	aligned_alloc(size_t, size_t) __malloc_like __alloc_align(1)
-	    __alloc_size(2);
+	    __alloc_size(2) __result_use_check;
 int	at_quick_exit(void (*)(void));
 _Noreturn void
 	quick_exit(int);

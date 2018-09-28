@@ -126,7 +126,7 @@ wchar_t	*wcscpy (wchar_t *__restrict, const wchar_t *__restrict);
 #if __POSIX_VISIBLE >= 200809
 wchar_t	*wcpcpy (wchar_t *__restrict,
 				 const wchar_t *__restrict);
-wchar_t	*wcsdup (const wchar_t *);
+wchar_t	*wcsdup (const wchar_t *) __malloc_like __result_use_check;
 #endif
 wchar_t	*_wcsdup_r (struct _reent *, const wchar_t * );
 size_t	wcscspn (const wchar_t *, const wchar_t *);
