@@ -642,7 +642,7 @@ _sbrk (int incr)
 
   if ((heap_end + incr > stack_ptr)
       /* Honour heap limit if it's valid.  */
-      || ((__heap_limit != 0xcafedead) && (heap_end + incr > __heap_limit)))
+      || ((__heap_limit != 0xcafedead) && (heap_end + incr > (char *)__heap_limit)))
     {
       /* Some of the libstdc++-v3 tests rely upon detecting
          out of memory errors, so do not abort here.  */
