@@ -438,6 +438,9 @@ case "${host}" in
 	sys_dir=a29khif
 	signal_dir=
 	;;
+  aarch64*-*-*)
+	newlib_cflags="${newlib_cflags} -D_COMPILING_NEWLIB"
+	;;
   arm*-*-*)
 	newlib_cflags="${newlib_cflags} -D_COMPILING_NEWLIB"
 	sys_dir=arm
