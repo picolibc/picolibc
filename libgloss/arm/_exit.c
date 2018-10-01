@@ -1,6 +1,6 @@
 #include <_ansi.h>
 
-int _kill (int, int);
+int _kill (int, int) __attribute__((__noreturn__));
 void _exit (int);
 
 void

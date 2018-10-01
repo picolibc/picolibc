@@ -30,7 +30,7 @@ int	_stat		(const char *, struct stat *);
 int	_fstat		(int, struct stat *);
 void *	_sbrk		(ptrdiff_t);
 pid_t	_getpid		(void);
-int	_kill		(int, int);
+int	_kill		(int, int) __attribute__((__noreturn__));
 void	_exit		(int);
 int	_close		(int);
 int	_swiclose	(int);
@@ -432,15 +432,18 @@ _kill (int pid, int sig)
   /* Note: The pid argument is thrown away.  */
   switch (sig) {
 	  case SIGABRT:
-		  return do_AngelSWI (AngelSWI_Reason_ReportException,
-				  (void *) ADP_Stopped_RunTimeError);
+		  do_AngelSWI (AngelSWI_Reason_ReportException,
+			       (void *) ADP_Stopped_RunTimeError);
+		  __builtin_unreachable();
 	  default:
-		  return do_AngelSWI (AngelSWI_Reason_ReportException,
-				  (void *) ADP_Stopped_ApplicationExit);
+		  do_AngelSWI (AngelSWI_Reason_ReportException,
+			       (void *) ADP_Stopped_ApplicationExit);
   }
 #else
   asm ("swi %a0" :: "i" (SWI_Exit));
 #endif
+
+  __builtin_unreachable();
 }
 
 void
