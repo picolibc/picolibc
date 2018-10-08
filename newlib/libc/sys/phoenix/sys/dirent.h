@@ -45,19 +45,6 @@ typedef struct {
 
 #define __dirfd(dir)	(dir)->dd_fd
 
-DIR *opendir(const char *name);
-struct dirent *readdir(DIR *dirp);
-void rewinddir(DIR *dirp);
-int closedir(DIR *dirp);
-
-long telldir(DIR *dirp);
-void seekdir(DIR *dirp, off_t loc);
-int scandir(const char *__dir,
-            struct dirent ***__namelist,
-            int (*select) (const struct dirent *),
-            int (*compar) (const struct dirent **, const struct dirent **));
-int alphasort(const struct dirent **__a, const struct dirent **__b);
-
 #define _seekdir		seekdir
 
 /* Declare which dirent fields are available in Phoenix-RTOS. */

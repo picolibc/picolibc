@@ -24,19 +24,6 @@ typedef struct _dirdesc {
 
 # define __dirfd(dp)	((dp)->dd_fd)
 
-DIR *opendir(const char *);
-struct dirent *readdir(DIR *);
-int readdir_r(DIR *__restrict, struct dirent *__restrict,
-              struct dirent **__restrict);
-void rewinddir(DIR *);
-int closedir(DIR *);
-void seekdir(DIR *dir, long loc);
-long telldir(DIR *dir);
-
-#ifdef _COMPILING_NEWLIB
-void _seekdir(DIR *dir, long offset);
-#endif
-
 #include <sys/types.h>
 
 #include <limits.h>
@@ -53,13 +40,6 @@ struct dirent {
 #if __BSD_VISIBLE
 #define	MAXNAMLEN NAME_MAX
 #endif
-
-int alphasort(const struct dirent **, const struct dirent **);
-int scandir ( const char *dirname,
-   struct dirent *** namelist,
-   int (*select)(const struct dirent *),
-   int (*dcomp)(const struct dirent **, const struct dirent **)
-);
 
 #ifdef __cplusplus
 }
