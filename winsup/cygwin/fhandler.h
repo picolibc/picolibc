@@ -1237,6 +1237,7 @@ class fhandler_fifo: public fhandler_base_overlapped
 public:
   fhandler_fifo ();
   int open (int, mode_t);
+  off_t lseek (off_t offset, int whence);
   int close ();
   int dup (fhandler_base *child, int);
   bool isfifo () const { return true; }
