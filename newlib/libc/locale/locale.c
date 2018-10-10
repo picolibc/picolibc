@@ -463,7 +463,7 @@ currentlocale ()
 extern void __set_ctype (struct __locale_t *, const char *charset);
 
 char *
-__loadlocale (struct __locale_t *loc, int category, const char *new_locale)
+__loadlocale (struct __locale_t *loc, int category, char *new_locale)
 {
   /* At this point a full-featured system would just load the locale
      specific data from the locale files.
@@ -506,7 +506,7 @@ __loadlocale (struct __locale_t *loc, int category, const char *new_locale)
 
 restart:
   if (!locale)
-    locale = (char *) new_locale;
+    locale = new_locale;
   else if (locale != tmp_locale)
     {
       locale = __set_locale_from_locale_alias (locale, tmp_locale);
