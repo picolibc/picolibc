@@ -38,5 +38,11 @@ nanl (const char *tagp)
 {
   return nan(tagp);
 }
+#elif __GNUC_PREREQ (3, 3)
+long double
+nanl (const char *tagp)
+{
+  return __builtin_nanl("");
+}
 #endif
 
