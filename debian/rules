@@ -1,0 +1,54 @@
+#!/usr/bin/make -f
+# See debhelper(7) (uncomment to enable)
+# output every command that modifies files on the build system.
+export DH_VERBOSE = 1
+
+
+# see FEATURE AREAS in dpkg-buildflags(1)
+#export DEB_BUILD_MAINT_OPTIONS = hardening=+all
+
+# see ENVIRONMENT in dpkg-buildflags(1)
+# package maintainers to append CFLAGS
+#export DEB_CFLAGS_MAINT_APPEND  = -Wall -pedantic
+# package maintainers to append LDFLAGS
+#export DEB_LDFLAGS_MAINT_APPEND = -Wl,--as-needed
+
+BUILDDIR=build-nano
+
+%:
+	dh $@ -B$(BUILDDIR)
+
+ARCH=arm-none-eabi
+
+MESON_FLAGS = \
+	--prefix=/usr \
+	--cross-file debian/cross-$(ARCH).txt \
+	--buildtype plain \
+	-Dtarget-optspace=true \
+	-Dnewlib-tinystdio=true \
+	-Dnewlib-supplied-syscalls=false \
+	-Dnewlib-reentrant-small=true\
+	-Dnewlib-wide-orient=false\
+	-Dnewlib-nano-malloc=true\
+	-Dlite-exit=true\
+	-Dnewlib-global-atexit=true\
+	-Dincludedir=lib/newlib-nano/$(ARCH)/include \
+	-Dlibdir=lib/newlib-nano/$(ARCH)/lib 
+
+override_dh_autoreconf:
+	echo 'no reconf needed'
+
+override_dh_auto_clean:
+	rm -fr debian/$(BUILDDIR)
+
+override_dh_auto_configure:
+	meson . debian/$(BUILDDIR) $(MESON_FLAGS)
+
+override_dh_auto_build:
+	cd debian/$(BUILDDIR) && ninja
+
+override_dh_auto_test:
+	cd debian/$(BUILDDIR) && ninja test
+
+override_dh_auto_install:
+	cd debian/$(BUILDDIR) && DESTDIR=${CURDIR}/debian/libnewlib-nano-arm-none-eabi ninja install

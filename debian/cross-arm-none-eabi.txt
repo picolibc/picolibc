@@ -1,0 +1,11 @@
+[binaries]
+c = 'arm-none-eabi-gcc'
+ar = 'arm-none-eabi-ar'
+as = 'arm-none-eabi-as'
+
+[host_machine]
+system = ''
+cpu_family = ''
+cpu = ''
+endian = ''
+

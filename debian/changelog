@@ -1,0 +1,5 @@
+libnewlib-nano (2.10.0-1) unstable; urgency=medium
+
+  * Initial release
+
+ -- Keith Packard <keithp@keithp.com>  Sat, 04 Aug 2018 18:37:23 +0800
