@@ -282,8 +282,8 @@ int	_unsetenv_r (struct _reent *, const char *__string);
 #endif /* !__CYGWIN__ */
 
 #if __POSIX_VISIBLE >= 200112
-int	posix_memalign (void **, size_t, size_t) __malloc_like __nonnull((1))
-	    __alloc_align(2) __alloc_size(3) __result_use_check;
+int	posix_memalign (void **, size_t, size_t) __nonnull((1))
+	    __result_use_check;
 #endif
 
 char *	_dtoa_r (struct _reent *, double, int, int, int *, int*, char**);
