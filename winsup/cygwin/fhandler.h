@@ -1216,6 +1216,7 @@ public:
   {
     x->pc.free_strings ();
     *reinterpret_cast<fhandler_pipe *> (x) = *this;
+    reinterpret_cast<fhandler_pipe *> (x)->atomic_write_buf = NULL;
     x->reset (this);
   }
 
@@ -1256,6 +1257,7 @@ public:
   {
     x->pc.free_strings ();
     *reinterpret_cast<fhandler_fifo *> (x) = *this;
+    reinterpret_cast<fhandler_fifo *> (x)->atomic_write_buf = NULL;
     x->reset (this);
   }
 
