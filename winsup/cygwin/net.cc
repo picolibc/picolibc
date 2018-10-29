@@ -536,10 +536,7 @@ cygwin_socket (int af, int type, int protocol)
 	  res = fd;
 	}
       else
-	{
-	  delete fh;
-	  fd.release ();
-	}
+	delete fh;
     }
 
 done:
@@ -2314,10 +2311,7 @@ socketpair (int af, int type, int protocol, int sv[2])
 
       cygheap_fdnew fd_out (fd_in, false);
       if (fd_out < 0)
-	{
-	  fd_in.release ();
-	  goto done;
-	}
+	goto done;
 
       fh_in = reinterpret_cast<fhandler_socket *> (build_fh_dev (*dev));
       fh_out = reinterpret_cast<fhandler_socket *> (build_fh_dev (*dev));
@@ -2343,8 +2337,6 @@ socketpair (int af, int type, int protocol, int sv[2])
 	{
 	  delete fh_in;
 	  delete fh_out;
-	  fd_in.release ();
-	  fd_out.release ();
 	}
     }
 

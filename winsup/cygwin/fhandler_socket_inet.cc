@@ -898,7 +898,7 @@ fhandler_socket_inet::accept4 (struct sockaddr *peer, int *len, int flags)
 		}
 	    }
 	  else
-	    fd.release ();
+	    delete sock;
 	}
       if (ret == -1)
 	::closesocket (res);
