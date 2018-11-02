@@ -279,6 +279,7 @@ case "${host_cpu}" in
 	;;
   or1k*|or1knd*)
 	machine_dir=or1k
+	have_init_fini=no
 	;;
   powerpc*)
 	machine_dir=powerpc
