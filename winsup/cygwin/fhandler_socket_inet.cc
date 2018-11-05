@@ -592,6 +592,7 @@ fhandler_socket_wsock::set_socket_handle (SOCKET sock, int af, int type,
 {
   DWORD hdl_flags;
   bool lsp_fixup = false;
+  int file_flags = O_RDWR | O_BINARY;
 
   /* Usually sockets are inheritable IFS objects.  Unfortunately some virus
      scanners or other network-oriented software replace normal sockets
@@ -644,18 +645,21 @@ fhandler_socket_wsock::set_socket_handle (SOCKET sock, int af, int type,
             }
         }
     }
+  set_io_handle ((HANDLE) sock);
   set_addr_family (af);
   set_socket_type (type);
-  if (flags & SOCK_NONBLOCK)
-    set_nonblocking (true);
-  if (flags & SOCK_CLOEXEC)
-    set_close_on_exec (true);
-  set_io_handle ((HANDLE) sock);
   if (!init_events ())
     return -1;
+  if (flags & SOCK_NONBLOCK)
+    file_flags |= O_NONBLOCK;
+  if (flags & SOCK_CLOEXEC)
+    {
+      set_close_on_exec (true);
+      file_flags |= O_CLOEXEC;
+    }
+  set_flags (file_flags);
   if (lsp_fixup)
     init_fixup_before ();
-  set_flags (O_RDWR | O_BINARY);
   set_unique_id ();
   if (get_socket_type () == SOCK_DGRAM)
     {
