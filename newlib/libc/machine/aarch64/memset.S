@@ -142,10 +142,10 @@ L(set_long):
 	b.eq	L(try_zva)
 L(no_zva):
 	sub	count, dstend, dst	/* Count is 16 too large.  */
-	add	dst, dst, 16
+	sub	dst, dst, 16		/* Dst is biased by -32.  */
 	sub	count, count, 64 + 16	/* Adjust count and bias for loop.  */
-1:	stp	q0, q0, [dst], 64
-	stp	q0, q0, [dst, -32]
+1:	stp	q0, q0, [dst, 32]
+	stp	q0, q0, [dst, 64]!
 L(tail64):
 	subs	count, count, 64
 	b.hi	1b
