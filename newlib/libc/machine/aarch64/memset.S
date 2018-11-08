@@ -233,6 +233,7 @@ L(zva_other):
 	subs	count, count, zva_len
 	b.hs	3b
 4:	add	count, count, zva_len
+	sub	dst, dst, 32		/* Bias dst for tail loop.  */
 	b	L(tail64)
 
 	.size	memset, . - memset
