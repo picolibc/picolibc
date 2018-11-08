@@ -35,12 +35,15 @@
 #define	_SYS__CPUSET_H_
 
 #include <sys/_bitset.h>
-#include <machine/param.h>
 
 #define	CPU_MAXSIZE	256
 
 #ifndef	CPU_SETSIZE
-#define	CPU_SETSIZE	MAXCPU
+#ifdef __LONG_WIDTH__
+#define	CPU_SETSIZE	__LONG_WIDTH__
+#else
+#define	CPU_SETSIZE	32
+#endif
 #endif
 
 BITSET_DEFINE(_cpuset, CPU_SETSIZE);
