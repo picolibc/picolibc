@@ -57,19 +57,19 @@ int _link (void);
 int _stat (const char *, struct stat *);
 int _fstat (int, struct stat *);
 int _swistat (int fd, struct stat * st);
-caddr_t _sbrk (int);
-int _getpid (int);
+void * _sbrk (ptrdiff_t);
+pid_t _getpid (void);
 int _close (int);
 clock_t _clock (void);
 int _swiclose (int);
 int _open (const char *, int, ...);
 int _swiopen (const char *, int);
-int _write (int, char *, int);
-int _swiwrite (int, char *, int);
-int _lseek (int, int, int);
-int _swilseek (int, int, int);
-int _read (int, char *, int);
-int _swiread (int, char *, int);
+int _write (int, const char *, size_t);
+int _swiwrite (int, const char *, size_t);
+off_t _lseek (int, off_t, int);
+off_t _swilseek (int, off_t, int);
+int _read (int, void *, size_t);
+int _swiread (int, void *, size_t);
 void initialise_monitor_handles (void);
 
 static int checkerror (int);
@@ -349,7 +349,7 @@ checkerror (int result)
    len, is the length in bytes to read.
    Returns the number of bytes *not* written. */
 int
-_swiread (int fh, char *ptr, int len)
+_swiread (int fh, void *ptr, size_t len)
 {
   param_block_t block[3];
 
@@ -364,7 +364,7 @@ _swiread (int fh, char *ptr, int len)
    Translates the return of _swiread into
    bytes read. */
 int
-_read (int fd, char *ptr, int len)
+_read (int fd, void *ptr, size_t len)
 {
   int res;
   struct fdent *pfd;
@@ -389,8 +389,8 @@ _read (int fd, char *ptr, int len)
 }
 
 /* fd, is a user file descriptor. */
-int
-_swilseek (int fd, int ptr, int dir)
+off_t
+_swilseek (int fd, off_t ptr, int dir)
 {
   int res;
   struct fdent *pfd;
@@ -449,7 +449,8 @@ _swilseek (int fd, int ptr, int dir)
     return -1;
 }
 
-_lseek (int fd, int ptr, int dir)
+off_t
+_lseek (int fd, off_t ptr, int dir)
 {
   return _swilseek (fd, ptr, dir);
 }
@@ -457,7 +458,7 @@ _lseek (int fd, int ptr, int dir)
 /* fh, is a valid internal file handle.
    Returns the number of bytes *not* written. */
 int
-_swiwrite (int fh, char *ptr, int len)
+_swiwrite (int fh, const char *ptr, size_t len)
 {
   param_block_t block[3];
 
@@ -470,7 +471,7 @@ _swiwrite (int fh, char *ptr, int len)
 
 /* fd, is a user file descriptor. */
 int
-_write (int fd, char *ptr, int len)
+_write (int fd, const char *ptr, size_t len)
 {
   int res;
   struct fdent *pfd;
@@ -620,7 +621,7 @@ _close (int fd)
 }
 
 int __attribute__((weak))
-_getpid (int n __attribute__ ((unused)))
+_getpid (void)
 {
   return 1;
 }
@@ -628,8 +629,8 @@ _getpid (int n __attribute__ ((unused)))
 /* Heap limit returned from SYS_HEAPINFO Angel semihost call.  */
 ulong __heap_limit __attribute__ ((aligned (8))) = 0xcafedead;
 
-caddr_t
-_sbrk (int incr)
+void *
+_sbrk (ptrdiff_t incr)
 {
   extern char end asm ("end");	/* Defined by the linker.  */
   static char *heap_end;
@@ -642,7 +643,7 @@ _sbrk (int incr)
 
   if ((heap_end + incr > stack_ptr)
       /* Honour heap limit if it's valid.  */
-      || ((__heap_limit != 0xcafedead) && (heap_end + incr > __heap_limit)))
+      || ((__heap_limit != 0xcafedead) && (heap_end + incr > (char *)__heap_limit)))
     {
       /* Some of the libstdc++-v3 tests rely upon detecting
          out of memory errors, so do not abort here.  */

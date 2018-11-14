@@ -23,13 +23,6 @@ typedef struct __dirdesc {
 
 # define __dirfd(dp)	((dp)->dd_fd)
 
-DIR *opendir (const char *);
-struct dirent *readdir (DIR *);
-int readdir_r (DIR *__restrict, struct dirent *__restrict,
-               struct dirent **__restrict);
-void rewinddir (DIR *);
-int closedir (DIR *);
-
 #include <sys/types.h>
 
 #define MAXNAMLEN	255

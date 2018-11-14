@@ -988,7 +988,6 @@ fhandler_socket_local::accept4 (struct sockaddr *peer, int *len, int flags)
 		  ret = sock->af_local_accept ();
 		  if (ret == -1)
 		    {
-		      fd.release ();
 		      delete sock;
 		      set_winsock_errno ();
 		      return -1;
@@ -1013,7 +1012,7 @@ fhandler_socket_local::accept4 (struct sockaddr *peer, int *len, int flags)
 		}
 	    }
 	  else
-	    fd.release ();
+	    delete sock;
 	}
       if (ret == -1)
 	::closesocket (res);

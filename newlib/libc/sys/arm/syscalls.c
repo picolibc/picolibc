@@ -30,7 +30,7 @@ int	_stat		(const char *, struct stat *);
 int	_fstat		(int, struct stat *);
 void *	_sbrk		(ptrdiff_t);
 pid_t	_getpid		(void);
-int	_kill		(int, int);
+int	_kill		(int, int) __attribute__((__noreturn__));
 void	_exit		(int);
 int	_close		(int);
 int	_swiclose	(int);
@@ -432,15 +432,18 @@ _kill (int pid, int sig)
   /* Note: The pid argument is thrown away.  */
   switch (sig) {
 	  case SIGABRT:
-		  return do_AngelSWI (AngelSWI_Reason_ReportException,
-				  (void *) ADP_Stopped_RunTimeError);
+		  do_AngelSWI (AngelSWI_Reason_ReportException,
+			       (void *) ADP_Stopped_RunTimeError);
+		  __builtin_unreachable();
 	  default:
-		  return do_AngelSWI (AngelSWI_Reason_ReportException,
-				  (void *) ADP_Stopped_ApplicationExit);
+		  do_AngelSWI (AngelSWI_Reason_ReportException,
+			       (void *) ADP_Stopped_ApplicationExit);
   }
 #else
   asm ("swi %a0" :: "i" (SWI_Exit));
 #endif
+
+  __builtin_unreachable();
 }
 
 void
@@ -534,7 +537,7 @@ _unlink (const char *path __attribute__ ((unused)))
 {
 #ifdef ARM_RDI_MONITOR
   int block[2];
-  block[0] = path;
+  block[0] = (int) path;
   block[1] = strlen(path);
   return wrap (do_AngelSWI (AngelSWI_Reason_Remove, block)) ? -1 : 0;
 #else
@@ -627,7 +630,7 @@ _system (const char *s)
      meaning to its return value.  Try to do something reasonable....  */
   if (!s)
     return 1;  /* maybe there is a shell available? we can hope. :-P */
-  block[0] = s;
+  block[0] = (int) s;
   block[1] = strlen (s);
   e = wrap (do_AngelSWI (AngelSWI_Reason_System, block));
   if ((e >= 0) && (e < 256))
@@ -654,9 +657,9 @@ _rename (const char * oldpath, const char * newpath)
 {
 #ifdef ARM_RDI_MONITOR
   int block[4];
-  block[0] = oldpath;
+  block[0] = (int) oldpath;
   block[1] = strlen(oldpath);
-  block[2] = newpath;
+  block[2] = (int) newpath;
   block[3] = strlen(newpath);
   return wrap (do_AngelSWI (AngelSWI_Reason_Rename, block)) ? -1 : 0;
 #else

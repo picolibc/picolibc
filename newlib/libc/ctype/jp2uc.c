@@ -166,7 +166,7 @@ __uc2jp (wint_t c, int type)
 wint_t
 _jp2uc_l (wint_t c, struct __locale_t * l)
 {
-  char * cs = l ? __locale_charset(l) : __current_locale_charset();
+  const char * cs = l ? __locale_charset(l) : __current_locale_charset();
   if (0 == strcmp (cs, "JIS"))
     c = __jp2uc (c, JP_JIS);
   else if (0 == strcmp (cs, "SJIS"))
@@ -186,7 +186,7 @@ _jp2uc (wint_t c)
 wint_t
 _uc2jp_l (wint_t c, struct __locale_t * l)
 {
-  char * cs = l ? __locale_charset(l) : __current_locale_charset();
+  const char * cs = l ? __locale_charset(l) : __current_locale_charset();
   if (0 == strcmp (cs, "JIS"))
     c = __uc2jp (c, JP_JIS);
   else if (0 == strcmp (cs, "SJIS"))

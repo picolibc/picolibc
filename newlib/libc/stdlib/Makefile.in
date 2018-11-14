@@ -154,7 +154,8 @@ am__objects_6 = lib_a-rpmatch.$(OBJEXT) lib_a-system.$(OBJEXT)
 @USE_LIBTOOL_FALSE@	$(am__objects_3) $(am__objects_7)
 lib_a_OBJECTS = $(am_lib_a_OBJECTS)
 LTLIBRARIES = $(noinst_LTLIBRARIES)
-@HAVE_LONG_DOUBLE_TRUE@am__objects_8 = strtold.lo wcstold.lo
+@HAVE_LONG_DOUBLE_TRUE@am__objects_8 = strtodg.lo strtold.lo strtorx.lo \
+	wcstold.lo
 am__objects_9 = __adjust.lo __atexit.lo __call_atexit.lo __exp10.lo \
 	__ten_mu.lo _Exit.lo abort.lo abs.lo aligned_alloc.lo \
 	assert.lo atexit.lo atof.lo atoff.lo atoi.lo atol.lo calloc.lo \
@@ -165,10 +166,10 @@ am__objects_9 = __adjust.lo __atexit.lo __call_atexit.lo __exp10.lo \
 	mbtowc.lo mbtowc_r.lo mlock.lo mprec.lo mstats.lo \
 	on_exit_args.lo quick_exit.lo rand.lo rand_r.lo random.lo \
 	realloc.lo reallocarray.lo reallocf.lo sb_charsets.lo \
-	strtod.lo strtodg.lo strtoimax.lo strtol.lo strtorx.lo \
-	strtoul.lo strtoumax.lo utoa.lo wcstod.lo wcstoimax.lo \
-	wcstol.lo wcstoul.lo wcstoumax.lo wcstombs.lo wcstombs_r.lo \
-	wctomb.lo wctomb_r.lo $(am__objects_8)
+	strtod.lo strtoimax.lo strtol.lo strtoul.lo strtoumax.lo \
+	utoa.lo wcstod.lo wcstoimax.lo wcstol.lo wcstoul.lo \
+	wcstoumax.lo wcstombs.lo wcstombs_r.lo wctomb.lo wctomb_r.lo \
+	$(am__objects_8)
 am__objects_10 = arc4random.lo arc4random_uniform.lo cxa_atexit.lo \
 	cxa_finalize.lo drand48.lo ecvtbuf.lo efgcvt.lo erand48.lo \
 	jrand48.lo lcong48.lo lrand48.lo mrand48.lo msize.lo mtrim.lo \

@@ -1216,6 +1216,7 @@ public:
   {
     x->pc.free_strings ();
     *reinterpret_cast<fhandler_pipe *> (x) = *this;
+    reinterpret_cast<fhandler_pipe *> (x)->atomic_write_buf = NULL;
     x->reset (this);
   }
 
@@ -1237,6 +1238,7 @@ class fhandler_fifo: public fhandler_base_overlapped
 public:
   fhandler_fifo ();
   int open (int, mode_t);
+  off_t lseek (off_t offset, int whence);
   int close ();
   int dup (fhandler_base *child, int);
   bool isfifo () const { return true; }
@@ -1255,6 +1257,7 @@ public:
   {
     x->pc.free_strings ();
     *reinterpret_cast<fhandler_fifo *> (x) = *this;
+    reinterpret_cast<fhandler_fifo *> (x)->atomic_write_buf = NULL;
     x->reset (this);
   }
 

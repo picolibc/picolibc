@@ -71,6 +71,7 @@
 
 #define	MAXPAGESIZES	1		/* maximum number of supported page sizes */
 
+#ifdef _KERNEL
 /*
  * Mach derived conversion macros
  */
@@ -81,5 +82,7 @@
 #define	ptoa(x)			((unsigned long)(x) << PAGE_SHIFT)
 
 #define	pgtok(x)		((unsigned long)(x) * (PAGE_SIZE / 1024))
+
+#endif
 
 #endif /* !_MACHINE_PARAM_H_ */

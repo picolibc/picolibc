@@ -2,7 +2,7 @@
 #include <signal.h>
 #include "swi.h"
 
-int _kill (int, int);
+int _kill (int, int) __attribute__((__noreturn__));
 
 int
 _kill (int pid, int sig)
@@ -41,12 +41,14 @@ _kill (int pid, int sig)
 
 #if SEMIHOST_V2
 if (_has_ext_exit_extended ())
-  return do_AngelSWI (insn, block);
+  do_AngelSWI (insn, block);
 else
 #endif
-  return do_AngelSWI (insn, (void*)block[0]);
+  do_AngelSWI (insn, (void*)block[0]);
 
 #else
   asm ("swi %a0" :: "i" (SWI_Exit));
 #endif
+
+  __builtin_unreachable();
 }
