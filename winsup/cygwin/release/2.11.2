@@ -1,0 +1,24 @@
+What's new:
+-----------
+
+
+What changed:
+-------------
+
+
+Bug Fixes
+---------
+
+- Return ESPIPE rather than EINVAL from lseek on a fifo.
+  Addresses: https://cygwin.com/ml/cygwin/2018-10/msg00019.html
+
+- Fix a memory corruption when using pipes or FIFOs
+  Addresses: https://cygwin.com/ml/cygwin-patches/2018-q4/msg00000.html
+
+- Fix potential memory corruption and SEGV if socket(2), socketpair(2),
+  accept(2), or accept4(2) fail.
+  Addresses: https://cygwin.com/ml/cygwin/2018-10/msg00229.html
+
+- Fix socket(2) and socketpair(2) calls mishandling SOCK_NONBLOCK and
+  SOCK_CLOEXEC flags.
+  Addresses: https://cygwin.com/ml/cygwin/2018-11/msg00017.html

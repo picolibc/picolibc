@@ -195,7 +195,7 @@ struct __locale_t
 };
 
 #ifdef _MB_CAPABLE
-extern char *__loadlocale (struct __locale_t *, int, const char *);
+extern char *__loadlocale (struct __locale_t *, int, char *);
 extern const char *__get_locale_env(struct _reent *, int);
 #endif /* _MB_CAPABLE */
 

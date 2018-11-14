@@ -145,6 +145,33 @@ _flat_map:
 	dsb	sy
 	msr	sctlr_el3, x0
 	isb
+
+	/* Determine if SVE is available.  */
+       mrs      x0, id_aa64pfr0_el1
+       tbz      x0, 32, .Lnosve
+
+       /* set up CPTR_EL3.TZ to 1.  */
+       mrs     x0, cptr_el3
+
+       /* TZ is bit 8 of CPTR_EL3.  */
+       orr     x0, x0, #0x100
+       msr     cptr_el3, x0
+       isb
+
+       /* set up vector lenght in ZCR_EL3 (4 LSB).  */
+       mov     x2, #0xF
+
+       /* Try to set the maximum value supported by the architecture (2048).
+	  SVE Arch.
+
+	    "If this field is set to a value that is not supported by the
+	    implementation then reading the register must return the highest
+	    supported vector length that is less than the value written."  */
+       mrs     x1, s3_6_c1_c2_0                /* mrs  x1, zcr_el3.  */
+       bfi     x1, x2, 0, 4
+       msr     s3_6_c1_c2_0, x1                /* msr  zcr_el3, x1.  */
+       isb
+.Lnosve:
 	ret
 
 	.data

@@ -221,6 +221,14 @@ out:
   return res == success;
 }
 
+off_t
+fhandler_fifo::lseek (off_t offset, int whence)
+{
+  debug_printf ("(%D, %d)", offset, whence);
+  set_errno (ESPIPE);
+  return -1;
+}
+
 bool
 fhandler_fifo::wait (HANDLE h)
 {

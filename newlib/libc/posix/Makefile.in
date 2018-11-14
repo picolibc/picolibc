@@ -74,14 +74,14 @@ lib_a_AR = $(AR) $(ARFLAGS)
 lib_a_LIBADD =
 am__objects_1 = lib_a-closedir.$(OBJEXT) lib_a-collate.$(OBJEXT) \
 	lib_a-collcmp.$(OBJEXT) lib_a-creat.$(OBJEXT) \
-	lib_a-fnmatch.$(OBJEXT) lib_a-glob.$(OBJEXT) \
-	lib_a-_isatty.$(OBJEXT) lib_a-isatty.$(OBJEXT) \
-	lib_a-opendir.$(OBJEXT) lib_a-readdir.$(OBJEXT) \
-	lib_a-readdir_r.$(OBJEXT) lib_a-regcomp.$(OBJEXT) \
-	lib_a-regerror.$(OBJEXT) lib_a-regexec.$(OBJEXT) \
-	lib_a-regfree.$(OBJEXT) lib_a-rewinddir.$(OBJEXT) \
-	lib_a-sleep.$(OBJEXT) lib_a-usleep.$(OBJEXT) \
-	lib_a-telldir.$(OBJEXT)
+	lib_a-dirfd.$(OBJEXT) lib_a-fnmatch.$(OBJEXT) \
+	lib_a-glob.$(OBJEXT) lib_a-_isatty.$(OBJEXT) \
+	lib_a-isatty.$(OBJEXT) lib_a-opendir.$(OBJEXT) \
+	lib_a-readdir.$(OBJEXT) lib_a-readdir_r.$(OBJEXT) \
+	lib_a-regcomp.$(OBJEXT) lib_a-regerror.$(OBJEXT) \
+	lib_a-regexec.$(OBJEXT) lib_a-regfree.$(OBJEXT) \
+	lib_a-rewinddir.$(OBJEXT) lib_a-sleep.$(OBJEXT) \
+	lib_a-usleep.$(OBJEXT) lib_a-telldir.$(OBJEXT)
 am__objects_2 = lib_a-scandir.$(OBJEXT) lib_a-seekdir.$(OBJEXT)
 am__objects_3 = lib_a-execl.$(OBJEXT) lib_a-execle.$(OBJEXT) \
 	lib_a-execlp.$(OBJEXT) lib_a-execv.$(OBJEXT) \
@@ -100,8 +100,8 @@ am__objects_4 = lib_a-popen.$(OBJEXT) lib_a-posix_spawn.$(OBJEXT)
 lib_a_OBJECTS = $(am_lib_a_OBJECTS)
 LTLIBRARIES = $(noinst_LTLIBRARIES)
 libposix_la_LIBADD =
-am__objects_6 = closedir.lo collate.lo collcmp.lo creat.lo fnmatch.lo \
-	glob.lo _isatty.lo isatty.lo opendir.lo readdir.lo \
+am__objects_6 = closedir.lo collate.lo collcmp.lo creat.lo dirfd.lo \
+	fnmatch.lo glob.lo _isatty.lo isatty.lo opendir.lo readdir.lo \
 	readdir_r.lo regcomp.lo regerror.lo regexec.lo regfree.lo \
 	rewinddir.lo sleep.lo usleep.lo telldir.lo
 am__objects_7 = scandir.lo seekdir.lo
@@ -290,7 +290,7 @@ top_srcdir = @top_srcdir@
 AUTOMAKE_OPTIONS = cygnus
 INCLUDES = $(NEWLIB_CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLAGS)
 GENERAL_SOURCES = \
-	closedir.c collate.c collcmp.c creat.c \
+	closedir.c collate.c collcmp.c creat.c dirfd.c \
 	fnmatch.c glob.c _isatty.c isatty.c \
 	opendir.c readdir.c readdir_r.c \
 	regcomp.c regerror.c regexec.c regfree.c \
@@ -427,6 +427,12 @@ lib_a-creat.o: creat.c
 
 lib_a-creat.obj: creat.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-creat.obj `if test -f 'creat.c'; then $(CYGPATH_W) 'creat.c'; else $(CYGPATH_W) '$(srcdir)/creat.c'; fi`
+
+lib_a-dirfd.o: dirfd.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-dirfd.o `test -f 'dirfd.c' || echo '$(srcdir)/'`dirfd.c
+
+lib_a-dirfd.obj: dirfd.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-dirfd.obj `if test -f 'dirfd.c'; then $(CYGPATH_W) 'dirfd.c'; else $(CYGPATH_W) '$(srcdir)/dirfd.c'; fi`
 
 lib_a-fnmatch.o: fnmatch.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-fnmatch.o `test -f 'fnmatch.c' || echo '$(srcdir)/'`fnmatch.c

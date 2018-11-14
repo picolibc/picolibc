@@ -1639,7 +1639,6 @@ fhandler_socket_unix::accept4 (struct sockaddr *peer, int *len, int flags)
 create_shmem_failed:
 		  delete sock;
 		}
-	      fd.release ();
 	    }
 	}
       /* Ouch!  We can't handle the client if we couldn't

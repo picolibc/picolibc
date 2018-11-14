@@ -23,6 +23,19 @@ extern "C" {
 #define	_FNONBLOCK	0x4000	/* non blocking I/O (POSIX style) */
 #define	_FNDELAY	_FNONBLOCK	/* non blocking I/O (4.2 style) */
 #define	_FNOCTTY	0x8000	/* don't assign a ctty on this open */
+#if defined (__CYGWIN__)
+#define	_FBINARY	0x10000
+#define	_FTEXT		0x20000
+#endif
+#define	_FNOINHERIT	0x40000
+#define	_FDIRECT	0x80000
+#define	_FNOFOLLOW	0x100000
+#define	_FDIRECTORY	0x200000
+#define	_FEXECSRCH	0x400000
+#if defined (__CYGWIN__)
+#define	_FTMPFILE	0x800000
+#define	_FNOATIME	0x1000000
+#endif
 
 #define	O_ACCMODE	(O_RDONLY|O_WRONLY|O_RDWR)
 
@@ -43,35 +56,28 @@ extern "C" {
 /*	O_NDELAY	_FNBIO 		set in include/fcntl.h */
 #define	O_NONBLOCK	_FNONBLOCK
 #define	O_NOCTTY	_FNOCTTY
-/* For machines which care - */
-#if defined (__CYGWIN__)
-#define _FBINARY        0x10000
-#define _FTEXT          0x20000
-#define _FNOINHERIT	0x40000
-#define _FDIRECT        0x80000
-#define _FNOFOLLOW      0x100000
-#define _FDIRECTORY     0x200000
-#define _FEXECSRCH      0x400000
-#define _FTMPFILE       0x800000
-#define _FNOATIME       0x1000000
 
+/* POSIX-1.2008 specific flags */
+#if __POSIX_VISIBLE >= 200809
+#define	O_CLOEXEC	_FNOINHERIT
+#define	O_NOFOLLOW	_FNOFOLLOW
+#define	O_DIRECTORY	_FDIRECTORY
+#define	O_EXEC		_FEXECSRCH
+#define	O_SEARCH	_FEXECSRCH
+#endif
+
+#if __BSD_VISIBLE
+#define	O_DIRECT	_FDIRECT
+#endif
+
+#if defined (__CYGWIN__)
 #define O_BINARY	_FBINARY
 #define O_TEXT		_FTEXT
 #define O_DSYNC         _FSYNC
 #define O_RSYNC         _FSYNC
-#define O_EXEC          _FEXECSRCH
-#define O_SEARCH        _FEXECSRCH
-
-/* POSIX-1.2008 specific flags */
-#if __POSIX_VISIBLE >= 200809
-#define O_CLOEXEC	_FNOINHERIT
-#define O_NOFOLLOW      _FNOFOLLOW
-#define O_DIRECTORY     _FDIRECTORY
-#endif
 
 /* Linux-specific flags */
 #if __GNU_VISIBLE
-#define O_DIRECT        _FDIRECT
 #define O_TMPFILE	_FTMPFILE
 #define O_NOATIME	_FNOATIME
 #endif

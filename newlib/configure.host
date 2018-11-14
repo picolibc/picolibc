@@ -279,6 +279,7 @@ case "${host_cpu}" in
 	;;
   or1k*|or1knd*)
 	machine_dir=or1k
+	have_init_fini=no
 	;;
   powerpc*)
 	machine_dir=powerpc
@@ -437,6 +438,9 @@ case "${host}" in
   a29k-*-*)
 	sys_dir=a29khif
 	signal_dir=
+	;;
+  aarch64*-*-*)
+	newlib_cflags="${newlib_cflags} -D_COMPILING_NEWLIB"
 	;;
   arm*-*-*)
 	newlib_cflags="${newlib_cflags} -D_COMPILING_NEWLIB"
@@ -634,6 +638,7 @@ case "${host}" in
   *-*-rtems*)
 	default_newlib_io_long_long="yes"
 	default_newlib_io_c99_formats="yes"
+	newlib_cflags="${newlib_cflags} -ffunction-sections -fdata-sections "
 	newlib_cflags="${newlib_cflags} -D_COMPILING_NEWLIB"
 newlib_cflags="${newlib_cflags} -DCLOCK_PROVIDED -DMALLOC_PROVIDED -DEXIT_PROVIDED -DSIGNAL_PROVIDED -DGETREENT_PROVIDED -DREENTRANT_SYSCALLS_PROVIDED -DHAVE_NANOSLEEP -DHAVE_BLKSIZE -DHAVE_FCNTL -DHAVE_ASSERT_FUNC"
         # turn off unsupported items in posix directory 
