@@ -240,7 +240,7 @@ const struct __locale_t __C_locale =
 };
 #endif /* _MB_CAPABLE */
 
-struct __locale_t __global_locale =
+const struct __locale_t __default_global_locale =
 {
   { "C", "C", DEFAULT_LOCALE, "C", "C", "C", "C", },
 #ifdef __CYGWIN__
@@ -279,6 +279,8 @@ struct __locale_t __global_locale =
   },
 #endif /* __HAVE_LOCALE_INFO__ */
 };
+
+struct __locale_t* __global_locale_ptr = &__default_global_locale;
 
 #ifdef _MB_CAPABLE
 /* Renamed from current_locale_string to make clear this is only the

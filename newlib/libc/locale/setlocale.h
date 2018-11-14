@@ -209,8 +209,8 @@ extern size_t _wcsnrtombs_l (struct _reent *, char *, const wchar_t **,
 _ELIDABLE_INLINE struct __locale_t *
 __get_global_locale ()
 {
-  extern struct __locale_t __global_locale;
-  return &__global_locale;
+  extern struct __locale_t* __global_locale_ptr;
+  return __global_locale_ptr;
 }
 
 /* Per REENT locale.  This is newlib-internal. */
