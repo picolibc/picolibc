@@ -1,6 +1,6 @@
-libnewlib-nano (2.11.0-1) unstable; urgency=medium
+libnewlib-nano (2.11.2-1) unstable; urgency=medium
 
-  * 2.11.0 upstream release
+  * 2.11.2 upstream release
   * Refactor meson and tinystdio changes
   * Make tinystdio pass printf/scanf tests
 
