@@ -1,15 +1,16 @@
 #include <_ansi.h>
+#include "swi.h"
 
-int _kill (int, int) __attribute__((__noreturn__));
+int _kill_shared (int, int, int) __attribute__((__noreturn__));
 void _exit (int);
 
 void
 _exit (int status)
 {
-  /* There is only one SWI for both _exit and _kill. For _exit, call
-     the SWI with the second argument set to -1, an invalid value for
-     signum, so that the SWI handler can distinguish the two calls.
-     Note: The RDI implementation of _kill throws away both its
-     arguments.  */
-  _kill (status, -1);
+  /* The same SWI is used for both _exit and _kill.
+     For _exit, call the SWI with "reason" set to ADP_Stopped_ApplicationExit
+     to mark a standard exit.
+     Note: The RDI implementation of _kill_shared throws away all its
+     arguments and all implementations ignore the first argument.  */
+  _kill_shared (-1, status, ADP_Stopped_ApplicationExit);
 }
