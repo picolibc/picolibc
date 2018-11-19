@@ -22,6 +22,8 @@ datarootdir = @datarootdir@
 mandir = @mandir@
 man1dir = $(mandir)/man1
 infodir = @infodir@
+htmldir = @htmldir@
+pdfdir = @pdfdir@
 
 MAKEINFO = makeinfo
 TEXI2DVI = TEXINPUTS=$(TEXIDIR):$(srcdir):$$TEXINPUTS texi2dvi
@@ -69,7 +71,7 @@ porting.html: $(srcdir)/porting.texi $(srcdir)/porting.texi
 
 porting.ps: porting.dvi
 	dvips -f porting.dvi > porting.ps
-		
+
 #   different targets for -ms, -mm, -me
 # Try to use a recent texi2roff.  v2 was put on prep in jan91.
 # If you want an index, see texi2roff doc for postprocessing 
@@ -144,6 +146,23 @@ install:
 install-info: info
 	for i in *.info* ; do \
 		$(INSTALL_DATA) $$i $(DESTDIR)$(infodir)/$$i ; \
+	done
+
+install-pdf: pdf
+	for i in *.pdf ; do \
+		$(INSTALL_DATA) $$i $(DESTDIR)$(pdfdir)/$$i ; \
+	done
+
+install-html: html
+	for i in *.html ; do \
+	    if [ -d $$i ]; then \
+		mkdir -p $(DESTDIR)$(htmldir)/$$i ; \
+		for j in $$i/*.html ; do \
+		    $(INSTALL_DATA) $$j $(DESTDIR)$(htmldir)/$$j ; \
+		done \
+	    else \
+		$(INSTALL_DATA) $$i $(DESTDIR)$(htmldir)/$$i ; \
+	    fi ; \
 	done
 
 clean-info:

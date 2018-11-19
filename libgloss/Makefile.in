@@ -181,6 +181,16 @@ install-info:
 	srcrootpre=`cd $(srcdir); pwd`/; export srcrootpre; \
 	$(MAKE) DO=$@ DODIRS=doc $(FLAGS_TO_PASS) subdir_do
 
+install-html:
+	rootpre=`pwd`/; export rootpre; \
+	srcrootpre=`cd $(srcdir); pwd`/; export srcrootpre; \
+	$(MAKE) DO=$@ DODIRS=doc $(FLAGS_TO_PASS) subdir_do
+
+install-pdf:
+	rootpre=`pwd`/; export rootpre; \
+	srcrootpre=`cd $(srcdir); pwd`/; export srcrootpre; \
+	$(MAKE) DO=$@ DODIRS=doc $(FLAGS_TO_PASS) subdir_do
+
 clean-info:
 
 force:
