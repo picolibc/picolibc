@@ -38,16 +38,9 @@ details. */
 /* # of millisecs per second. */
 #define MSPERSEC (1000L)
 
-class hires_base
+class hires_ns
 {
- protected:
   int inited;
- public:
-  void reset() {inited = false;}
-};
-
-class hires_ns : public hires_base
-{
   LARGE_INTEGER primed_pc;
   double freq;
   void prime ();
@@ -57,7 +50,7 @@ class hires_ns : public hires_base
   LONGLONG resolution();
 };
 
-class hires_ms : public hires_base
+class hires_ms
 {
  public:
   LONGLONG nsecs ();

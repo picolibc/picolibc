@@ -120,8 +120,6 @@ settimeofday (const struct timeval *tv, const struct timezone *tz)
       st.wMilliseconds = tv->tv_usec / (USPERSEC / MSPERSEC);
 
       res = -!SetSystemTime (&st);
-      gtod.reset ();
-
       if (res)
 	set_errno (EPERM);
     }
