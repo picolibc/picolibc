@@ -30,7 +30,7 @@ class spinlock
   {
     LARGE_INTEGER t;
     if (NtQuerySystemTime (&t) == STATUS_SUCCESS)
-      return get_ll (t);
+      return t.QuadPart;
     return 0LL;
   }
 public:
