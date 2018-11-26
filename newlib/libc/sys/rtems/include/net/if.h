@@ -29,7 +29,7 @@
  * SUCH DAMAGE.
  *
  *	@(#)if.h	8.1 (Berkeley) 6/10/93
- * $FreeBSD: head/sys/net/if.h 333502 2018-05-11 20:08:28Z mmacy $
+ * $FreeBSD: head/sys/net/if.h 340968 2018-11-26 13:42:18Z markj $
  */
 
 #ifndef _NET_IF_H_
@@ -271,6 +271,7 @@ struct if_msghdr {
 	int	ifm_addrs;	/* like rtm_addrs */
 	int	ifm_flags;	/* value of if_flags */
 	u_short	ifm_index;	/* index for associated ifp */
+	u_short	_ifm_spare1;
 	struct	if_data ifm_data;/* statistics and other data about if */
 };
 
@@ -296,6 +297,7 @@ struct if_msghdrl {
 	u_short _ifm_spare1;	/* spare space to grow if_index, see if_var.h */
 	u_short	ifm_len;	/* length of if_msghdrl incl. if_data */
 	u_short	ifm_data_off;	/* offset of if_data from beginning */
+	int	_ifm_spare2;
 	struct	if_data ifm_data;/* statistics and other data about if */
 };
 
@@ -311,6 +313,7 @@ struct ifa_msghdr {
 	int	ifam_addrs;	/* like rtm_addrs */
 	int	ifam_flags;	/* value of ifa_flags */
 	u_short	ifam_index;	/* index for associated ifp */
+	u_short	_ifam_spare1;
 	int	ifam_metric;	/* value of ifa_ifp->if_metric */
 };
 
@@ -352,6 +355,7 @@ struct ifma_msghdr {
 	int	ifmam_addrs;	/* like rtm_addrs */
 	int	ifmam_flags;	/* value of ifa_flags */
 	u_short	ifmam_index;	/* index for associated ifp */
+	u_short	_ifmam_spare1;
 };
 
 /*
