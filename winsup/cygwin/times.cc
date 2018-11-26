@@ -466,21 +466,14 @@ void
 hires_ns::prime ()
 {
   LARGE_INTEGER ifreq;
-  if (!QueryPerformanceFrequency (&ifreq))
-    {
-      inited = -1;
-      return;
-    }
+
+  /* On XP or later the perf counter functions will always succeed. */
+  QueryPerformanceFrequency (&ifreq);
 
   int priority = GetThreadPriority (GetCurrentThread ());
 
   SetThreadPriority (GetCurrentThread (), THREAD_PRIORITY_TIME_CRITICAL);
-  if (!QueryPerformanceCounter (&primed_pc))
-    {
-      SetThreadPriority (GetCurrentThread (), priority);
-      inited = -1;
-      return;
-    }
+  QueryPerformanceCounter (&primed_pc);
 
   freq = (double) ((double) NSPERSEC / (double) ifreq.QuadPart);
   inited = true;
@@ -490,21 +483,11 @@ hires_ns::prime ()
 LONGLONG
 hires_ns::nsecs (bool monotonic)
 {
+  LARGE_INTEGER now;
+
   if (!inited)
     prime ();
-  if (inited < 0)
-    {
-      set_errno (ENOSYS);
-      return (LONGLONG) -1;
-    }
-
-  LARGE_INTEGER now;
-  if (!QueryPerformanceCounter (&now))
-    {
-      set_errno (ENOSYS);
-      return -1;
-    }
-
+  QueryPerformanceCounter (&now);
   // FIXME: Use round() here?
   now.QuadPart = (LONGLONG) (freq * (double)
 		 (now.QuadPart - (monotonic ? 0LL : primed_pc.QuadPart)));
@@ -646,12 +629,6 @@ hires_ns::resolution ()
 {
   if (!inited)
     prime ();
-  if (inited < 0)
-    {
-      set_errno (ENOSYS);
-      return (LONGLONG) -1;
-    }
-
   return (freq <= 1.0) ? 1LL : (LONGLONG) freq;
 }
 
