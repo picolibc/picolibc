@@ -24,6 +24,7 @@ details. */
 #include "thread.h"
 #include "cygtls.h"
 #include "ntdll.h"
+#include "spinlock.h"
 
 hires_ms NO_COPY gtod;
 
@@ -465,19 +466,16 @@ ftime (struct timeb *tp)
 void
 hires_ns::prime ()
 {
-  LARGE_INTEGER ifreq;
+  spinlock hspin (inited, 1);
+  if (!hspin)
+    {
+      LARGE_INTEGER ifreq;
 
-  /* On XP or later the perf counter functions will always succeed. */
-  QueryPerformanceFrequency (&ifreq);
-
-  int priority = GetThreadPriority (GetCurrentThread ());
-
-  SetThreadPriority (GetCurrentThread (), THREAD_PRIORITY_TIME_CRITICAL);
-  QueryPerformanceCounter (&primed_pc);
-
-  freq = (double) ((double) NSPERSEC / (double) ifreq.QuadPart);
-  inited = true;
-  SetThreadPriority (GetCurrentThread (), priority);
+      /* On XP or later the perf counter functions will always succeed. */
+      QueryPerformanceFrequency (&ifreq);
+      freq = (double) ((double) NSPERSEC / (double) ifreq.QuadPart);
+      QueryPerformanceCounter (&primed_pc);
+    }
 }
 
 LONGLONG
@@ -485,7 +483,7 @@ hires_ns::nsecs (bool monotonic)
 {
   LARGE_INTEGER now;
 
-  if (!inited)
+  if (inited <= 0)
     prime ();
   QueryPerformanceCounter (&now);
   // FIXME: Use round() here?
@@ -627,7 +625,7 @@ static ULONG minperiod;	// FIXME: Maintain period after a fork.
 LONGLONG
 hires_ns::resolution ()
 {
-  if (!inited)
+  if (inited <= 0)
     prime ();
   return (freq <= 1.0) ? 1LL : (LONGLONG) freq;
 }

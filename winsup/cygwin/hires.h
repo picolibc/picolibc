@@ -40,7 +40,7 @@ details. */
 
 class hires_ns
 {
-  int inited;
+  LONG inited;
   LARGE_INTEGER primed_pc;
   double freq;
   void prime ();
