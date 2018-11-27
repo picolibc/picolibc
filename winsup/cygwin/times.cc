@@ -688,47 +688,13 @@ clock_getres (clockid_t clk_id, struct timespec *tp)
 extern "C" int
 clock_setres (clockid_t clk_id, struct timespec *tp)
 {
-  static NO_COPY bool period_set;
-  int status;
-
+  /* Don't use this function.  It only exists in QNX.  Just return
+     success on CLOCK_REALTIME for backward compat. */
   if (clk_id != CLOCK_REALTIME)
     {
       set_errno (EINVAL);
       return -1;
     }
-
-  /* Convert to 100ns to match OS resolution.  The OS uses ULONG values
-     to express resolution in 100ns units, so the coarsest timer resolution
-     is < 430 secs.  Actually the coarsest timer resolution is only slightly
-     beyond 15ms, but this might change in future OS versions, so we play nice
-     here. */
-  ULONGLONG period = tp->tv_sec * NS100PERSEC
-		     + (tp->tv_nsec + (NSPERSEC/NS100PERSEC) - 1)
-		       / (NSPERSEC/NS100PERSEC);
-
-  /* clock_setres is non-POSIX/non-Linux.  On QNX, the function always
-     rounds the incoming value to the nearest supported value. */
-  ULONG coarsest, finest, actual;
-  if (NT_SUCCESS (NtQueryTimerResolution (&coarsest, &finest, &actual)))
-    {
-      if (period > coarsest)
-	period = coarsest;
-      else if (finest > period)
-	period = finest;
-    }
-
-  if (period_set
-      && NT_SUCCESS (NtSetTimerResolution (minperiod, FALSE, &actual)))
-    period_set = false;
-
-  status = NtSetTimerResolution (period, TRUE, &actual);
-  if (!NT_SUCCESS (status))
-    {
-      __seterrno_from_nt_status (status);
-      return -1;
-    }
-  minperiod = period;
-  period_set = true;
   return 0;
 }
 
