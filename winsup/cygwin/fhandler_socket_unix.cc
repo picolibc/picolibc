@@ -24,7 +24,6 @@
 #include "fhandler.h"
 #include "dtable.h"
 #include "cygheap.h"
-#include "hires.h"
 #include "shared_info.h"
 #include "ntdll.h"
 #include "miscfuncs.h"
@@ -1269,7 +1268,7 @@ fhandler_socket_unix::wait_pipe_thread (PUNICODE_STRING pipe_name)
   pwbuf->NameLength = pipe_name->Length;
   pwbuf->TimeoutSpecified = TRUE;
   memcpy (pwbuf->Name, pipe_name->Buffer, pipe_name->Length);
-  stamp = ntod.nsecs ();
+  stamp = get_clock (CLOCK_MONOTONIC)->n100secs ();
   do
     {
       status = NtFsControlFile (npfsh, evt, NULL, NULL, &io, FSCTL_PIPE_WAIT,
@@ -1298,7 +1297,8 @@ fhandler_socket_unix::wait_pipe_thread (PUNICODE_STRING pipe_name)
 		  /* Another concurrent connect grabbed the pipe instance
 		     under our nose.  Fix the timeout value and go waiting
 		     again, unless the timeout has passed. */
-		  pwbuf->Timeout.QuadPart -= (stamp - ntod.nsecs ()) / 100LL;
+		  pwbuf->Timeout.QuadPart -=
+		    stamp - get_clock (CLOCK_MONOTONIC)->n100secs ();
 		  if (pwbuf->Timeout.QuadPart >= 0)
 		    {
 		      status = STATUS_IO_TIMEOUT;

@@ -19,7 +19,7 @@ details. */
 #include "ntdll.h"
 #include "tls_pbuf.h"
 #include "cpuid.h"
-#include "hires.h"
+#include "clock.h"
 
 static long
 get_open_max (int in)

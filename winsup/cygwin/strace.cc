@@ -82,8 +82,14 @@ strace::dll_info ()
 int
 strace::microseconds ()
 {
-  static hires_ns now NO_COPY;
-  return (int) now.usecs ();
+  /* Need a local clock instance because this function is called before
+     the global constructors of the inferior process have been called. */
+  static clk_monotonic_t clock_monotonic;
+  static LONGLONG process_start NO_COPY;
+
+  if (!process_start)
+    process_start = clock_monotonic.usecs ();
+  return (int) (clock_monotonic.usecs () - process_start);
 }
 
 static int __stdcall

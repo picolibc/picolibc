@@ -793,7 +793,8 @@ typedef struct _KUSER_SHARED_DATA
   KSYSTEM_TIME InterruptTime;
   BYTE Reserved2[0x2c8];
   ULONG DismountCount;
-  /* A lot more follows... */
+  BYTE Reserved3[0xd0];
+  UINT64 InterruptTimeBias;
 } KUSER_SHARED_DATA, *PKUSER_SHARED_DATA;
 
 /* Checked on 64 bit. */

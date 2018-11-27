@@ -76,16 +76,9 @@ clock_nanosleep (clockid_t clk_id, int flags, const struct timespec *rqtp,
   /* support for CPU-time clocks is optional */
   if (CLOCKID_IS_PROCESS (clk_id) || CLOCKID_IS_THREAD (clk_id))
     return ENOTSUP;
-
-  switch (clk_id)
-    {
-    case CLOCK_REALTIME:
-    case CLOCK_MONOTONIC:
-      break;
-    default:
-      /* unknown or illegal clock ID */
-      return EINVAL;
-    }
+  /* All other valid clocks are valid */
+  if (clk_id >= MAX_CLOCKS)
+    return EINVAL;
 
   LARGE_INTEGER timeout;
 
@@ -103,14 +96,18 @@ clock_nanosleep (clockid_t clk_id, int flags, const struct timespec *rqtp,
 	  || (tp.tv_sec == rqtp->tv_sec && tp.tv_nsec > rqtp->tv_nsec))
 	return 0;
 
-      if (clk_id == CLOCK_REALTIME)
-	timeout.QuadPart += FACTOR;
-      else
+      switch (clk_id)
 	{
+	case CLOCK_REALTIME_COARSE:
+	case CLOCK_REALTIME:
+	  timeout.QuadPart += FACTOR;
+	  break;
+	default:
 	  /* other clocks need to be handled with a relative timeout */
 	  timeout.QuadPart -= tp.tv_sec * NS100PERSEC
 			      + tp.tv_nsec / (NSPERSEC/NS100PERSEC);
 	  timeout.QuadPart *= -1LL;
+	  break;
 	}
     }
   else /* !abstime */

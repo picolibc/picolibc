@@ -586,6 +586,14 @@ LoadDLLfunc (GetSystemTimePreciseAsFileTime, 4, kernel32)
 LoadDLLfuncEx (PrefetchVirtualMemory, 16, kernel32, 1)
 LoadDLLfunc (SetThreadGroupAffinity, 12, kernel32)
 
+/* MSDN claims these are exported by kernel32.dll, but only
+   QueryUnbiasedInterruptTime actually is.  The others are only
+   available via KernelBase.dll. */
+LoadDLLfunc (QueryInterruptTime, 4, KernelBase)
+LoadDLLfunc (QueryInterruptTimePrecise, 4, KernelBase)
+LoadDLLfunc (QueryUnbiasedInterruptTime, 4, KernelBase)
+LoadDLLfunc (QueryUnbiasedInterruptTimePrecise, 4, KernelBase)
+
 /* ldap functions are cdecl! */
 #pragma push_macro ("mangle")
 #undef mangle

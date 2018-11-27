@@ -127,7 +127,7 @@ timer_thread (VOID *x)
       LONG sleep_ms;
       /* Account for delays in starting thread
 	and sending the signal */
-      now = gtod.usecs ();
+      now = get_clock (tt->clock_id)->usecs ();
       sleep_us = sleepto_us - now;
       if (sleep_us > 0)
 	{
@@ -232,7 +232,8 @@ timer_tracker::settime (int in_flags, const itimerspec *value, itimerspec *ovalu
       if (timespec_bad (value->it_value) || timespec_bad (value->it_interval))
 	__leave;
 
-      long long now = in_flags & TIMER_ABSTIME ? 0 : gtod.usecs ();
+      long long now = in_flags & TIMER_ABSTIME ?
+		      0 : get_clock (clock_id)->usecs ();
 
       lock_timer_tracker here;
       cancel ();
@@ -272,7 +273,7 @@ timer_tracker::gettime (itimerspec *ovalue)
   else
     {
       ovalue->it_interval = it_interval;
-      long long now = gtod.usecs ();
+      long long now = get_clock (clock_id)->usecs ();
       long long left_us = sleepto_us - now;
       if (left_us < 0)
        left_us = 0;
@@ -317,7 +318,7 @@ timer_create (clockid_t clock_id, struct sigevent *__restrict evp,
 	  return -1;
 	}
 
-      if (clock_id != CLOCK_REALTIME)
+      if (clock_id >= MAX_CLOCKS)
 	{
 	  set_errno (EINVAL);
 	  return -1;
@@ -466,8 +467,8 @@ alarm (unsigned int seconds)
  struct itimerspec newt = {}, oldt;
  /* alarm cannot fail, but only needs not be
     correct for arguments < 64k. Truncate */
- if (seconds > (HIRES_DELAY_MAX / 1000 - 1))
-   seconds = (HIRES_DELAY_MAX / 1000 - 1);
+ if (seconds > (CLOCK_DELAY_MAX / 1000 - 1))
+   seconds = (CLOCK_DELAY_MAX / 1000 - 1);
  newt.it_value.tv_sec = seconds;
  timer_settime ((timer_t) &ttstart, 0, &newt, &oldt);
  int ret = oldt.it_value.tv_sec + (oldt.it_value.tv_nsec > 0);

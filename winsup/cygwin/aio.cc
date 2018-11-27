@@ -7,7 +7,6 @@ Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
 #include "winsup.h"
-#include "hires.h"
 #include "path.h"
 #include "fhandler.h"
 #include "dtable.h"
@@ -803,12 +802,12 @@ retry:
       return -1;
     }
 
-  time0 = ntod.nsecs ();
+  time0 = get_clock (CLOCK_MONOTONIC)->nsecs ();
   /* Note wait below is abortable even w/ empty sigmask and infinite timeout */
   res = sigtimedwait (&sigmask, &si, timeout ? &to : NULL);
   if (res == -1)
     return -1; /* Return with errno set by failed sigtimedwait() */
-  time1 = ntod.nsecs ();
+  time1 = get_clock (CLOCK_MONOTONIC)->nsecs ();
 
   /* Adjust timeout to account for time just waited */
   time1 -= time0;

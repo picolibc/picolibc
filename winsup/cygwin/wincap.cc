@@ -32,6 +32,8 @@ wincaps wincap_vista __attribute__((section (".cygwin_dll_common"), shared)) = {
     has_new_pebteb_region:false,
     has_broken_whoami:true,
     has_unprivileged_createsymlink:false,
+    has_unbiased_interrupt_time:false,
+    has_precise_interrupt_time:false,
   },
 };
 
@@ -50,6 +52,8 @@ wincaps wincap_7 __attribute__((section (".cygwin_dll_common"), shared)) = {
     has_new_pebteb_region:false,
     has_broken_whoami:true,
     has_unprivileged_createsymlink:false,
+    has_unbiased_interrupt_time:true,
+    has_precise_interrupt_time:false,
   },
 };
 
@@ -68,6 +72,8 @@ wincaps wincap_8 __attribute__((section (".cygwin_dll_common"), shared)) = {
     has_new_pebteb_region:false,
     has_broken_whoami:false,
     has_unprivileged_createsymlink:false,
+    has_unbiased_interrupt_time:true,
+    has_precise_interrupt_time:false,
   },
 };
 
@@ -86,6 +92,8 @@ wincaps wincap_10 __attribute__((section (".cygwin_dll_common"), shared)) = {
     has_new_pebteb_region:false,
     has_broken_whoami:false,
     has_unprivileged_createsymlink:false,
+    has_unbiased_interrupt_time:true,
+    has_precise_interrupt_time:true,
   },
 };
 
@@ -104,6 +112,8 @@ wincaps wincap_10_1511 __attribute__((section (".cygwin_dll_common"), shared)) =
     has_new_pebteb_region:true,
     has_broken_whoami:false,
     has_unprivileged_createsymlink:false,
+    has_unbiased_interrupt_time:true,
+    has_precise_interrupt_time:true,
   },
 };
 
@@ -122,6 +132,8 @@ wincaps wincap_10_1703 __attribute__((section (".cygwin_dll_common"), shared)) =
     has_new_pebteb_region:true,
     has_broken_whoami:false,
     has_unprivileged_createsymlink:true,
+    has_unbiased_interrupt_time:true,
+    has_precise_interrupt_time:true,
   },
 };
 

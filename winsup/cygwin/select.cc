@@ -159,7 +159,7 @@ select (int maxfds, fd_set *readfds, fd_set *writefds, fd_set *exceptfds,
   int ret = 0;
 
   /* Record the current time for later use. */
-  LONGLONG start_time = gtod.usecs ();
+  LONGLONG start_time = get_clock (CLOCK_REALTIME)->usecs ();
 
   select_stuff sel;
   sel.return_on_signal = 0;
@@ -210,7 +210,7 @@ select (int maxfds, fd_set *readfds, fd_set *writefds, fd_set *exceptfds,
       if (us != -1LL && wait_state == select_stuff::select_set_zero)
 	{
 	  select_printf ("recalculating us");
-	  LONGLONG now = gtod.usecs ();
+	  LONGLONG now = get_clock (CLOCK_REALTIME)->usecs ();
 	  if (now >= (start_time + us))
 	    {
 	      select_printf ("timed out after verification");

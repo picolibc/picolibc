@@ -12,7 +12,7 @@
 #include "miscfuncs.h"
 #include "cygerrno.h"
 #include "pinfo.h"
-#include "hires.h"
+#include "clock.h"
 /* for getpid */
 #include <unistd.h>
 #include <sys/param.h>

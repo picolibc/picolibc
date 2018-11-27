@@ -27,6 +27,8 @@ struct wincaps
     unsigned has_new_pebteb_region		: 1;
     unsigned has_broken_whoami			: 1;
     unsigned has_unprivileged_createsymlink	: 1;
+    unsigned has_unbiased_interrupt_time	: 1;
+    unsigned has_precise_interrupt_time		: 1;
   };
 };
 
@@ -74,6 +76,8 @@ public:
   bool	IMPLEMENT (has_new_pebteb_region)
   bool	IMPLEMENT (has_broken_whoami)
   bool	IMPLEMENT (has_unprivileged_createsymlink)
+  bool	IMPLEMENT (has_unbiased_interrupt_time)
+  bool	IMPLEMENT (has_precise_interrupt_time)
 
 #undef IMPLEMENT
 };

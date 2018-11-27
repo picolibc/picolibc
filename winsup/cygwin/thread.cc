@@ -2566,6 +2566,7 @@ pthread_convert_abstime (clockid_t clock_id, const struct timespec *abstime,
 		       / (NSPERSEC/NS100PERSEC);
   switch (clock_id)
     {
+    case CLOCK_REALTIME_COARSE:
     case CLOCK_REALTIME:
       timeout->QuadPart += FACTOR;
       break;
@@ -3035,14 +3036,9 @@ pthread_condattr_setclock (pthread_condattr_t *attr, clockid_t clock_id)
 {
   if (!pthread_condattr::is_good_object (attr))
     return EINVAL;
-  switch (clock_id)
-    {
-    case CLOCK_REALTIME:
-    case CLOCK_MONOTONIC:
-      break;
-    default:
-      return EINVAL;
-    }
+  if (CLOCKID_IS_PROCESS (clock_id) || CLOCKID_IS_THREAD (clock_id)
+      || clock_id >= MAX_CLOCKS)
+    return EINVAL;
   (*attr)->clock_id = clock_id;
   return 0;
 }

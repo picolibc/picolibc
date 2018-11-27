@@ -254,6 +254,7 @@ DLL_OFILES:= \
 	autoload.o \
 	base64.o \
 	bsdlib.o \
+	clock.o \
 	ctype.o \
 	cxx.o \
 	cygheap.o \

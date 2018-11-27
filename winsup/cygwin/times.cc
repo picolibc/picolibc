@@ -26,10 +26,6 @@ details. */
 #include "ntdll.h"
 #include "spinlock.h"
 
-hires_ms NO_COPY gtod;
-
-hires_ns NO_COPY ntod;
-
 static inline void __attribute__ ((always_inline))
 get_system_time (PLARGE_INTEGER systime)
 {
@@ -171,10 +167,7 @@ gettimeofday (struct timeval *__restrict tv, void *__restrict tzvp)
 {
   struct timezone *tz = (struct timezone *) tzvp;
   static bool tzflag;
-  LONGLONG now = gtod.usecs ();
-
-  if (now == (LONGLONG) -1)
-    return -1;
+  LONGLONG now = get_clock (CLOCK_REALTIME)->usecs ();
 
   tv->tv_sec = now / USPERSEC;
   tv->tv_usec = now % USPERSEC;
@@ -462,135 +455,23 @@ ftime (struct timeb *tp)
   return 0;
 }
 
-#define stupid_printf if (cygwin_finished_initializing) debug_printf
-void
-hires_ns::prime ()
-{
-  spinlock hspin (inited, 1);
-  if (!hspin)
-    {
-      LARGE_INTEGER ifreq;
-
-      /* On XP or later the perf counter functions will always succeed. */
-      QueryPerformanceFrequency (&ifreq);
-      freq = (double) ((double) NSPERSEC / (double) ifreq.QuadPart);
-      QueryPerformanceCounter (&primed_pc);
-    }
-}
-
-LONGLONG
-hires_ns::nsecs (bool monotonic)
-{
-  LARGE_INTEGER now;
-
-  if (inited <= 0)
-    prime ();
-  QueryPerformanceCounter (&now);
-  // FIXME: Use round() here?
-  now.QuadPart = (LONGLONG) (freq * (double)
-		 (now.QuadPart - (monotonic ? 0LL : primed_pc.QuadPart)));
-  return now.QuadPart;
-}
-
-LONGLONG
-hires_ms::nsecs ()
-{
-  LARGE_INTEGER systime;
-  get_system_time (&systime);
-  /* Add conversion factor for UNIX vs. Windows base time */
-  return systime.QuadPart - FACTOR;
-}
-
 extern "C" int
 clock_gettime (clockid_t clk_id, struct timespec *tp)
 {
-  if (CLOCKID_IS_PROCESS (clk_id))
+  clk_t *clock = get_clock (clk_id);
+
+  if (!clock)
     {
-      pid_t pid = CLOCKID_TO_PID (clk_id);
-      HANDLE hProcess;
-      KERNEL_USER_TIMES kut;
-      int64_t x;
-
-      if (pid == 0)
-	pid = getpid ();
-
-      pinfo p (pid);
-      if (!p || !p->exists ())
-	{
-	  set_errno (EINVAL);
-	  return -1;
-	}
-
-      hProcess = OpenProcess (PROCESS_QUERY_LIMITED_INFORMATION, 0,
-			      p->dwProcessId);
-      NtQueryInformationProcess (hProcess, ProcessTimes,
-				 &kut, sizeof kut, NULL);
-
-      x = kut.KernelTime.QuadPart + kut.UserTime.QuadPart;
-      tp->tv_sec = x / NS100PERSEC;
-      tp->tv_nsec = (x % NS100PERSEC) * (NSPERSEC/NS100PERSEC);
-
-      CloseHandle (hProcess);
-      return 0;
+      set_errno (EINVAL);
+      return -1;
     }
-
-  if (CLOCKID_IS_THREAD (clk_id))
+  __try
     {
-      long thr_id = CLOCKID_TO_THREADID (clk_id);
-      HANDLE hThread;
-      KERNEL_USER_TIMES kut;
-      int64_t x;
-
-      if (thr_id == 0)
-	thr_id = pthread::self ()->getsequence_np ();
-
-      hThread = OpenThread (THREAD_QUERY_LIMITED_INFORMATION, 0, thr_id);
-      if (!hThread)
-	{
-	  set_errno (EINVAL);
-	  return -1;
-	}
-
-      NtQueryInformationThread (hThread, ThreadTimes,
-				&kut, sizeof kut, NULL);
-
-      x = kut.KernelTime.QuadPart + kut.UserTime.QuadPart;
-      tp->tv_sec = x / NS100PERSEC;
-      tp->tv_nsec = (x % NS100PERSEC) * (NSPERSEC/NS100PERSEC);
-
-      CloseHandle (hThread);
-      return 0;
+      return clock->nsecs (clk_id, tp);
     }
-
-  switch (clk_id)
-    {
-      case CLOCK_REALTIME:
-	{
-	  LONGLONG now = gtod.nsecs ();
-	  if (now == (LONGLONG) -1)
-	    return -1;
-	  tp->tv_sec = now / NS100PERSEC;
-	  tp->tv_nsec = (now % NS100PERSEC) * (NSPERSEC / NS100PERSEC);
-	  break;
-	}
-
-      case CLOCK_MONOTONIC:
-	{
-	  LONGLONG now = ntod.nsecs (true);
-	  if (now == (LONGLONG) -1)
-	    return -1;
-
-	  tp->tv_sec = now / NSPERSEC;
-	  tp->tv_nsec = (now % NSPERSEC);
-	  break;
-	}
-
-      default:
-	set_errno (EINVAL);
-	return -1;
-    }
-
-  return 0;
+  __except (EFAULT) {}
+  __endtry
+  return -1;
 }
 
 extern "C" int
@@ -608,80 +489,45 @@ clock_settime (clockid_t clk_id, const struct timespec *tp)
       return -1;
     }
 
-  if (clk_id != CLOCK_REALTIME)
+  if (clk_id != CLOCK_REALTIME_COARSE && clk_id != CLOCK_REALTIME)
     {
       set_errno (EINVAL);
       return -1;
     }
 
-  tv.tv_sec = tp->tv_sec;
-  tv.tv_usec = tp->tv_nsec / 1000;
+  __try
+    {
+      tv.tv_sec = tp->tv_sec;
+      tv.tv_usec = tp->tv_nsec / 1000;
+    }
+  __except (EFAULT)
+    {
+      return -1;
+    }
+  __endtry
 
   return settimeofday (&tv, NULL);
-}
-
-static ULONG minperiod;	// FIXME: Maintain period after a fork.
-
-LONGLONG
-hires_ns::resolution ()
-{
-  if (inited <= 0)
-    prime ();
-  return (freq <= 1.0) ? 1LL : (LONGLONG) freq;
-}
-
-UINT
-hires_ms::resolution ()
-{
-  if (!minperiod)
-    {
-      ULONG coarsest, finest, actual;
-
-      NtQueryTimerResolution (&coarsest, &finest, &actual);
-      /* The actual resolution of the OS timer is a system-wide setting which
-	 can be changed any time, by any process.  The only fixed value we
-	 can rely on is the coarsest value. */
-      minperiod = coarsest;
-    }
-  return minperiod;
 }
 
 extern "C" int
 clock_getres (clockid_t clk_id, struct timespec *tp)
 {
-  if (CLOCKID_IS_PROCESS (clk_id) || CLOCKID_IS_THREAD (clk_id))
+  clk_t *clock = get_clock (clk_id);
+
+  if (!clock)
     {
-      ULONG coarsest, finest, actual;
-
-      NtQueryTimerResolution (&coarsest, &finest, &actual);
-      tp->tv_sec = coarsest / NS100PERSEC;
-      tp->tv_nsec = (coarsest % NS100PERSEC) * (NSPERSEC/NS100PERSEC);
-      return 0;
+      set_errno (EINVAL);
+      return -1;
     }
-
-  switch (clk_id)
+  __try
     {
-      case CLOCK_REALTIME:
-	{
-	  DWORD period = gtod.resolution ();
-	  tp->tv_sec = period / NS100PERSEC;
-	  tp->tv_nsec = (period % NS100PERSEC) * (NSPERSEC/NS100PERSEC);
-	  break;
-	}
-
-      case CLOCK_MONOTONIC:
-	{
-	  LONGLONG period = ntod.resolution ();
-	  tp->tv_sec = period / NSPERSEC;
-	  tp->tv_nsec = period % NSPERSEC;
-	  break;
-	}
-
-      default:
-	set_errno (EINVAL);
-	return -1;
+      clock->resolution (tp);
     }
-
+  __except (EFAULT)
+    {
+      return -1;
+    }
+  __endtry
   return 0;
 }
 

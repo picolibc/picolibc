@@ -10,8 +10,8 @@ details. */
    the Cygwin shared library".  This version is used to track important
    changes to the DLL and is mainly informative in nature. */
 
-#define CYGWIN_VERSION_DLL_MAJOR 2011
-#define CYGWIN_VERSION_DLL_MINOR 3
+#define CYGWIN_VERSION_DLL_MAJOR 2012
+#define CYGWIN_VERSION_DLL_MINOR 0
 
 /* Major numbers before CYGWIN_VERSION_DLL_EPOCH are incompatible. */
 
@@ -498,13 +498,15 @@ details. */
   327: Export pthread_tryjoin_np, pthread_timedjoin_np.
   328: Export aio_cancel, aio_error, aio_fsync, aio_read, aio_return,
        aio_suspend, aio_write, lio_listio.
-  329: Export sched_getcpu..
+  329: Export sched_getcpu.
+  330: Add CLOCK_REALTIME_COARSE, CLOCK_MONOTONIC_RAW, CLOCK_MONOTONIC_COARSE,
+       CLOCK_BOOTTIME.
 
   Note that we forgot to bump the api for ualarm, strtoll, strtoull,
   sigaltstack, sethostname. */
 
 #define CYGWIN_VERSION_API_MAJOR 0
-#define CYGWIN_VERSION_API_MINOR 329
+#define CYGWIN_VERSION_API_MINOR 330
 
 /* There is also a compatibity version number associated with the shared memory
    regions.  It is incremented when incompatible changes are made to the shared
