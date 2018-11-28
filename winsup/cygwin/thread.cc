@@ -2945,25 +2945,33 @@ extern "C" int
 pthread_cond_timedwait (pthread_cond_t *cond, pthread_mutex_t *mutex,
 			const struct timespec *abstime)
 {
+  int err = 0;
   LARGE_INTEGER timeout;
 
   pthread_testcancel ();
 
   __try
     {
-      int err = __pthread_cond_wait_init (cond, mutex);
+      err = __pthread_cond_wait_init (cond, mutex);
       if (err)
-	return err;
+	__leave;
 
-      err = pthread_convert_abstime ((*cond)->clock_id, abstime, &timeout);
-      if (err)
-	return err;
+      do
+	{
+	  err = pthread_convert_abstime ((*cond)->clock_id, abstime, &timeout);
+	  if (err)
+	    __leave;
 
-      return (*cond)->wait (*mutex, &timeout);
+	  err = (*cond)->wait (*mutex, &timeout);
+	}
+      while (err == ETIMEDOUT);
     }
-  __except (NO_ERROR) {}
+  __except (NO_ERROR)
+    {
+      return EINVAL;
+    }
   __endtry
-  return EINVAL;
+  return err;
 }
 
 extern "C" int
