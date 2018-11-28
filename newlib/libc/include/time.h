@@ -251,7 +251,11 @@ extern "C" {
 
 /* Manifest Constants, P1003.1b-1993, p. 262 */
 
-#define CLOCK_REALTIME (clockid_t)1
+#if __GNU_VISIBLE
+#define CLOCK_REALTIME_COARSE	((clockid_t) 0)
+#endif
+
+#define CLOCK_REALTIME		((clockid_t) 1)
 
 /* Flag indicating time is "absolute" with respect to the clock
    associated with a time.  */
@@ -266,7 +270,7 @@ extern "C" {
    the identifier of the CPU_time clock associated with the PROCESS
    making the function call.  */
 
-#define CLOCK_PROCESS_CPUTIME_ID (clockid_t)2
+#define CLOCK_PROCESS_CPUTIME_ID ((clockid_t) 2)
 
 #endif
 
@@ -276,7 +280,7 @@ extern "C" {
     the identifier of the CPU_time clock associated with the THREAD
     making the function call.  */
 
-#define CLOCK_THREAD_CPUTIME_ID (clockid_t)3
+#define CLOCK_THREAD_CPUTIME_ID	((clockid_t) 3)
 
 #endif
 
@@ -286,7 +290,17 @@ extern "C" {
  *      as a clock whose value cannot be set via clock_settime() and which 
  *          cannot have backward clock jumps. */
 
-#define CLOCK_MONOTONIC (clockid_t)4
+#define CLOCK_MONOTONIC		((clockid_t) 4)
+
+#if __GNU_VISIBLE
+
+#define CLOCK_MONOTONIC_RAW	((clockid_t) 5)
+
+#define CLOCK_MONOTONIC_COARSE	((clockid_t) 6)
+
+#define CLOCK_BOOTTIME		((clockid_t) 7)
+
+#endif
 
 #endif
 
