@@ -6,16 +6,17 @@
 #include "spinlock.h"
 
 static LONGLONG
-system_qpc_resolution ()
+system_qpc_tickspersec ()
 {
   LARGE_INTEGER qpf;
 
+  /* ticks per sec */
   QueryPerformanceFrequency (&qpf);
   return qpf.QuadPart;
 }
 
 static LONGLONG
-system_tickcount_resolution ()
+system_tickcount_period ()
 {
   ULONG coarsest = 0, finest, actual;
 
@@ -26,7 +27,7 @@ system_tickcount_resolution ()
        can rely on is the coarsest value. */
       NtQueryTimerResolution (&coarsest, &finest, &actual);
     }
-  return NS100PERSEC / coarsest;
+  return coarsest;
 }
 
 void
@@ -34,7 +35,7 @@ clk_t::init ()
 {
   spinlock spin (inited, 1);
   if (!spin)
-    ticks_per_sec = system_tickcount_resolution ();
+    period = system_tickcount_period ();
 }
 
 void
@@ -42,9 +43,12 @@ clk_realtime_t::init ()
 {
   spinlock spin (inited, 1);
   if (!spin)
-    ticks_per_sec = wincap.has_precise_system_time ()
-		    ? system_qpc_resolution ()
-		    : system_tickcount_resolution ();
+    {
+      if (wincap.has_precise_system_time ())
+	ticks_per_sec = system_qpc_tickspersec ();
+      else
+	period = system_tickcount_period ();
+    }
 }
 
 void
@@ -52,7 +56,7 @@ clk_monotonic_t::init ()
 {
   spinlock spin (inited, 1);
   if (!spin)
-    ticks_per_sec = system_qpc_resolution ();
+    ticks_per_sec = system_qpc_tickspersec ();
 }
 
 int
@@ -202,16 +206,16 @@ clk_monotonic_coarse_t::now (clockid_t clockid, struct timespec *ts)
     }
   else
     {
-      /* Vista-only: GetTickCount64 is biased but it's coarse and
-         monotonic. */
-      LONGLONG now;
+      /* Vista-only: GetTickCount64 is biased but it's coarse and monotonic. */
+      ULONGLONG now;
 
       if (inited <= 0)
 	init ();
       now = GetTickCount64 ();
-      ts->tv_sec = now / ticks_per_sec;
-      now %= ticks_per_sec;
-      ts->tv_nsec = (now * NSPERSEC) / ticks_per_sec;
+      now *= period;	/* Normalize to 100ns period */
+      ts->tv_sec = now / NS100PERSEC;
+      now %= NS100PERSEC;
+      ts->tv_nsec = now * (NSPERSEC/NS100PERSEC);
     }
   return 0;
 }
@@ -249,7 +253,10 @@ clk_t::resolution (struct timespec *ts)
   if (inited <= 0)
     init ();
   ts->tv_sec = 0;
-  ts->tv_nsec = NSPERSEC / ticks_per_sec;
+  if (ticks_per_sec)
+    ts->tv_nsec = NSPERSEC / ticks_per_sec;
+  else
+    ts->tv_nsec = period * (NSPERSEC/NS100PERSEC);
 }
 
 static clk_realtime_coarse_t clk_realtime_coarse;

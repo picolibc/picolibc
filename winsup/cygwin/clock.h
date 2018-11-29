@@ -53,7 +53,11 @@ class clk_t
 {
  protected:
   LONG inited;
+  /* Some values are returned as ticks/s, some as 100ns period of a
+     single tick.  Store the original value and use a computation method
+     making the most sense for the value given, to avoid rounding issues. */
   LONGLONG ticks_per_sec;
+  LONGLONG period;
   virtual void init ();
   virtual int now (clockid_t, struct timespec *) = 0;
 
