@@ -4,6 +4,28 @@
 
 <sect1 id="ov-new"><title>What's new and what changed in Cygwin</title>
 
+<sect2 id="ov-new2.11"><title>What's new and what changed in 2.12</title>
+
+<itemizedlist mark="bullet">
+
+<listitem><para>
+Support for CLOCK_REALTIME_COARSE, CLOCK_MONOTONIC_COARSE,
+CLOCK_MONOTONIC_RAW, CLOCK_BOOTTIME clocks.
+</para></listitem>
+
+<listitem><para>
+clock_nanosleep, pthread_condattr_setclock and timer_create now support
+all clocks, except CLOCK_PROCESS_CPUTIME_ID and CLOCK_THREAD_CPUTIME_ID.
+</para></listitem>
+
+<listitem><para>
+clock_setres is a no-op now.
+</para></listitem>
+
+</itemizedlist>
+
+</sect2>
+
 <sect2 id="ov-new2.11"><title>What's new and what changed in 2.11</title>
 
 <itemizedlist mark="bullet">

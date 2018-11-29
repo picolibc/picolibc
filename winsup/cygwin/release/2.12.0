@@ -1,0 +1,24 @@
+What's new:
+-----------
+
+- Support for CLOCK_REALTIME_COARSE, CLOCK_MONOTONIC_COARSE,
+  CLOCK_MONOTONIC_RAW, CLOCK_BOOTTIME clocks.
+
+
+What changed:
+-------------
+
+- clock_nanosleep, pthread_condattr_setclock and timer_create now support
+  all clocks, except CLOCK_PROCESS_CPUTIME_ID and CLOCK_THREAD_CPUTIME_ID.
+
+- clock_setres is a no-op now.
+
+
+Bug Fixes
+---------
+
+- Fix a thread race when initializing CLOCK_MONOTONIC.
+  Addresses: https://cygwin.com/ml/cygwin/2018-11/msg00017.html
+
+- Fix early timeout from pthread_cond_timedwait.
+  Addresses: https://cygwin.com/ml/cygwin/2018-11/msg00171.html
