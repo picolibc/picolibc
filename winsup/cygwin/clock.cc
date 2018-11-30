@@ -5,7 +5,7 @@
 #include "miscfuncs.h"
 #include "spinlock.h"
 
-static LONGLONG
+static inline LONGLONG
 system_qpc_tickspersec ()
 {
   LARGE_INTEGER qpf;
@@ -15,7 +15,7 @@ system_qpc_tickspersec ()
   return qpf.QuadPart;
 }
 
-static LONGLONG
+static inline LONGLONG
 system_tickcount_period ()
 {
   ULONG coarsest = 0, finest, actual;
@@ -23,40 +23,37 @@ system_tickcount_period ()
   if (!coarsest)
     {
       /* The actual resolution of the OS timer is a system-wide setting which
-       can be changed any time, by any process.  The only fixed value we
-       can rely on is the coarsest value. */
+	 can be changed any time, by any process.  The only fixed value we
+	 can rely on is the coarsest value. */
       NtQueryTimerResolution (&coarsest, &finest, &actual);
     }
   return coarsest;
 }
 
-void
+void inline
 clk_t::init ()
 {
-  spinlock spin (inited, 1);
-  if (!spin)
-    period = system_tickcount_period ();
+  if (!period)
+    InterlockedExchange64 (&period, system_tickcount_period ());
 }
 
-void
+void inline
 clk_realtime_t::init ()
 {
-  spinlock spin (inited, 1);
-  if (!spin)
+  if (wincap.has_precise_system_time ())
     {
-      if (wincap.has_precise_system_time ())
-	ticks_per_sec = system_qpc_tickspersec ();
-      else
-	period = system_tickcount_period ();
+      if (!ticks_per_sec)
+	InterlockedExchange64 (&ticks_per_sec, system_qpc_tickspersec ());
     }
+  else if (!period)
+    InterlockedExchange64 (&period, system_tickcount_period ());
 }
 
-void
+void inline
 clk_monotonic_t::init ()
 {
-  spinlock spin (inited, 1);
-  if (!spin)
-    ticks_per_sec = system_qpc_tickspersec ();
+  if (!ticks_per_sec)
+    InterlockedExchange64 (&ticks_per_sec, system_qpc_tickspersec ());
 }
 
 int
@@ -169,8 +166,7 @@ clk_monotonic_t::now (clockid_t clockid, struct timespec *ts)
       LARGE_INTEGER now;
       struct timespec bts;
 
-      if (inited <= 0)
-	init ();
+      init ();
       do
 	{
 	  bias = SharedUserData.InterruptTimeBias;
@@ -209,13 +205,10 @@ clk_monotonic_coarse_t::now (clockid_t clockid, struct timespec *ts)
       /* Vista-only: GetTickCount64 is biased but it's coarse and monotonic. */
       ULONGLONG now;
 
-      if (inited <= 0)
-	init ();
-      now = GetTickCount64 ();
-      now *= period;	/* Normalize to 100ns period */
-      ts->tv_sec = now / NS100PERSEC;
-      now %= NS100PERSEC;
-      ts->tv_nsec = now * (NSPERSEC/NS100PERSEC);
+      now = GetTickCount64 ();	/* Returns ms since boot */
+      ts->tv_sec = now / MSPERSEC;
+      now %= MSPERSEC;
+      ts->tv_nsec = now * (NSPERSEC/MSPERSEC);
     }
   return 0;
 }
@@ -237,8 +230,7 @@ clk_boottime_t::now (clockid_t clockid, struct timespec *ts)
     {
       LARGE_INTEGER now;
 
-      if (inited <= 0)
-	init ();
+      init ();
       QueryPerformanceCounter (&now);
       ts->tv_sec = now.QuadPart / ticks_per_sec;
       now.QuadPart %= ticks_per_sec;
@@ -250,13 +242,28 @@ clk_boottime_t::now (clockid_t clockid, struct timespec *ts)
 void
 clk_t::resolution (struct timespec *ts)
 {
-  if (inited <= 0)
-    init ();
+  init ();
   ts->tv_sec = 0;
-  if (ticks_per_sec)
+  ts->tv_nsec = period * (NSPERSEC/NS100PERSEC);
+}
+
+void
+clk_realtime_t::resolution (struct timespec *ts)
+{
+  init ();
+  ts->tv_sec = 0;
+  if (wincap.has_precise_system_time ())
     ts->tv_nsec = NSPERSEC / ticks_per_sec;
   else
     ts->tv_nsec = period * (NSPERSEC/NS100PERSEC);
+}
+
+void
+clk_monotonic_t::resolution (struct timespec *ts)
+{
+  init ();
+  ts->tv_sec = 0;
+  ts->tv_nsec = NSPERSEC / ticks_per_sec;
 }
 
 static clk_realtime_coarse_t clk_realtime_coarse;

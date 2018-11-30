@@ -52,13 +52,15 @@ details. */
 class clk_t
 {
  protected:
-  LONG inited;
   /* Some values are returned as ticks/s, some as 100ns period of a
      single tick.  Store the original value and use a computation method
      making the most sense for the value given, to avoid rounding issues. */
-  LONGLONG ticks_per_sec;
-  LONGLONG period;
-  virtual void init ();
+  union
+    {
+      LONGLONG ticks_per_sec;
+      LONGLONG period;
+    };
+  void init ();
   virtual int now (clockid_t, struct timespec *) = 0;
 
  public:
@@ -66,32 +68,35 @@ class clk_t
   {
     return now (_id, ts);
   }
-  void resolution (struct timespec *);
+  virtual void resolution (struct timespec *);
 
   /* shortcuts for non-process/thread clocks */
-  void nsecs (struct timespec *ts) { nsecs (0, ts); }
+  void nsecs (struct timespec *ts)
+  {
+    now (0, ts);
+  }
   ULONGLONG nsecs ()
   {
     struct timespec ts;
-    nsecs (&ts);
+    now (0, &ts);
     return (ULONGLONG) ts.tv_sec * NSPERSEC + ts.tv_nsec;
   }
   LONGLONG n100secs ()
   {
     struct timespec ts;
-    nsecs (&ts);
+    now (0, &ts);
     return ts.tv_sec * NS100PERSEC + ts.tv_nsec / (NSPERSEC/NS100PERSEC);
   }
   LONGLONG usecs ()
   {
     struct timespec ts;
-    nsecs (&ts);
+    now (0, &ts);
     return ts.tv_sec * USPERSEC + ts.tv_nsec / (NSPERSEC/USPERSEC);
   }
   LONGLONG msecs ()
   {
     struct timespec ts;
-    nsecs (&ts);
+    now (0, &ts);
     return ts.tv_sec * MSPERSEC + ts.tv_nsec / (NSPERSEC/MSPERSEC);
   }
 };
@@ -103,8 +108,10 @@ class clk_realtime_coarse_t : public clk_t
 
 class clk_realtime_t : public clk_t
 {
-  virtual void init ();
+  void init ();
   virtual int now (clockid_t, struct timespec *);
+ public:
+  virtual void resolution (struct timespec *);
 };
 
 class clk_process_t : public clk_t
@@ -120,9 +127,18 @@ class clk_thread_t : public clk_t
 class clk_monotonic_t : public clk_t
 {
  protected:
-  virtual void init ();
+  void init ();
  private:
   virtual int now (clockid_t, struct timespec *);
+ public:
+  virtual void resolution (struct timespec *);
+  /* Under strace 1st call is so early that vtable is NULL. */
+  LONGLONG strace_usecs ()
+  {
+    struct timespec ts;
+    clk_monotonic_t::now (0, &ts);
+    return ts.tv_sec * USPERSEC + ts.tv_nsec / (NSPERSEC/USPERSEC);
+  }
 };
 
 class clk_monotonic_coarse_t : public clk_t
