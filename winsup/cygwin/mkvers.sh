@@ -140,7 +140,8 @@ done | tee /tmp/mkvers.$$ 1>&9
 trap "rm -f /tmp/mkvers.$$" 0 1 2 15
 
 if [ -n "$snapshotdate" ]; then
-  usedate="$(echo $snapshotdate | sed 's/-\\(..:..[^-]*\\).*$/ \1SNP/')"
+  usedate="$(echo $snapshotdate \
+	     | sed -e 's/\(....\)\(..\)\(..\)-\(..:..\).*$/\1-\2-\3 \4SNP/')"
 else
   usedate="$builddate"
 fi
