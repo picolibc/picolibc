@@ -187,9 +187,6 @@ sbttobt(sbintime_t _sbt)
  * evil of ull rather than a uint64_t cast to ensure we have well defined
  * right shift semantics. With these changes, we get all the ns, us and ms
  * conversions back and forth right.
- * Note: This file is used for both kernel and userland includes, so we can't
- * rely on KASSERT being defined, nor can we pollute the namespace by including
- * assert.h.
  */
 static __inline int64_t
 sbttons(sbintime_t _sbt)
@@ -203,9 +200,6 @@ nstosbt(int64_t _ns)
 {
 	sbintime_t sb = 0;
 
-#ifdef KASSERT
-	KASSERT(_ns >= 0, ("Negative values illegal for nstosbt: %jd", _ns));
-#endif
 	if (_ns >= SBT_1S) {
 		sb = (_ns / 1000000000) * SBT_1S;
 		_ns = _ns % 1000000000;
@@ -227,9 +221,6 @@ ustosbt(int64_t _us)
 {
 	sbintime_t sb = 0;
 
-#ifdef KASSERT
-	KASSERT(_us >= 0, ("Negative values illegal for ustosbt: %jd", _us));
-#endif
 	if (_us >= SBT_1S) {
 		sb = (_us / 1000000) * SBT_1S;
 		_us = _us % 1000000;
@@ -251,9 +242,6 @@ mstosbt(int64_t _ms)
 {
 	sbintime_t sb = 0;
 
-#ifdef KASSERT
-	KASSERT(_ms >= 0, ("Negative values illegal for mstosbt: %jd", _ms));
-#endif
 	if (_ms >= SBT_1S) {
 		sb = (_ms / 1000) * SBT_1S;
 		_ms = _ms % 1000;
