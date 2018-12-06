@@ -27,8 +27,6 @@ SYNOPSIS
 
 DESCRIPTION
 	<<sqrt>> computes the positive square root of the argument.
-	You can modify error handling for this function with
-	<<matherr>>.
 
 RETURNS
 	On success, the square root is returned. If <[x]> is real and
@@ -59,27 +57,12 @@ PORTABILITY
 #ifdef _IEEE_LIBM
 	return __ieee754_sqrt(x);
 #else
-	struct exception exc;
 	double z;
 	z = __ieee754_sqrt(x);
 	if(_LIB_VERSION == _IEEE_ || isnan(x)) return z;
 	if(x<0.0) {
-	  exc.type = DOMAIN;
-	  exc.name = "sqrt";
-	  exc.err = 0;
-	  exc.arg1 = exc.arg2 = x;
-	  if (_LIB_VERSION == _SVID_)
-	    exc.retval = 0.0;
-          else
-            exc.retval = 0.0/0.0;
-          if (_LIB_VERSION == _POSIX_)
-            errno = EDOM;
-          else if (!matherr(&exc)) {
-            errno = EDOM;
-          }
-          if (exc.err != 0)
-	    errno = exc.err;
-	  return exc.retval; 
+	    errno = EDOM;
+	    return 0.0/0.0;
 	} else
 	    return z;
 #endif

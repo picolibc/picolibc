@@ -8,7 +8,7 @@ src = 	s_finite.c s_copysign.c s_modf.c s_scalbn.c \
 	s_cbrt.c s_exp10.c s_expm1.c s_ilogb.c \
 	s_infinity.c s_isinf.c s_isinfd.c s_isnan.c s_isnand.c \
 	s_log1p.c s_nan.c s_nextafter.c s_pow10.c \
-	s_rint.c s_logb.c s_log2.c s_matherr.c s_lib_ver.c \
+	s_rint.c s_logb.c s_log2.c s_lib_ver.c \
 	s_fdim.c s_fma.c s_fmax.c s_fmin.c s_fpclassify.c \
 	s_lrint.c s_llrint.c \
 	s_lround.c s_llround.c s_nearbyint.c s_remquo.c s_round.c s_scalbln.c \
@@ -62,7 +62,7 @@ endif # USE_LIBTOOL
 include $(srcdir)/../../Makefile.shared
 
 CHEWOUT_FILES =	s_cbrt.def s_copysign.def s_exp10.def s_expm1.def s_ilogb.def \
-	s_infinity.def s_isnan.def s_log1p.def s_matherr.def s_modf.def \
+	s_infinity.def s_isnan.def s_log1p.def s_modf.def \
 	s_nan.def s_nextafter.def s_pow10.def s_scalbn.def \
 	s_fdim.def s_fma.def s_fmax.def s_fmin.def \
 	s_logb.def s_log2.def s_lrint.def s_lround.def s_nearbyint.def \

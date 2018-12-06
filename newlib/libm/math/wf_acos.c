@@ -26,24 +26,12 @@
 	return __ieee754_acosf(x);
 #else
 	float z;
-	struct exception exc;
 	z = __ieee754_acosf(x);
 	if(_LIB_VERSION == _IEEE_ || isnan(x)) return z;
-	if(fabsf(x)>(float)1.0) {
+	if(fabsf(x)>1.0f) {
 	    /* acosf(|x|>1) */
-	    exc.type = DOMAIN;
-	    exc.name = "acosf";
-	    exc.err = 0;
-	    exc.arg1 = exc.arg2 = (double)x;
-	    exc.retval = nan("");
-	    if (_LIB_VERSION == _POSIX_)
-	       errno = EDOM;
-	    else if (!matherr(&exc)) {
-	       errno = EDOM;
-            }
-            if (exc.err != 0)
-	       errno = exc.err;
-	    return (float)exc.retval; 
+	    errno = EDOM;
+	    return (float) nan("");
 	} else
 	    return z;
 #endif

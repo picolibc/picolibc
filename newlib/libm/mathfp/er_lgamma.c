@@ -97,8 +97,6 @@ When <[x]> is a nonpositive integer, <<gamma>> returns <<HUGE_VAL>>
 and <<errno>> is set to <<EDOM>>.  If the result overflows, <<gamma>>
 returns <<HUGE_VAL>> and <<errno>> is set to <<ERANGE>>.
 
-You can modify this error treatment using <<matherr>>.
-
 PORTABILITY
 Neither <<gamma>> nor <<gammaf>> is ANSI C.  */
 

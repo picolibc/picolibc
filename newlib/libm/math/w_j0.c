@@ -104,24 +104,12 @@ None of the Bessel functions are in ANSI C.
 #ifdef _IEEE_LIBM
 	return __ieee754_j0(x);
 #else
-	struct exception exc;
 	double z = __ieee754_j0(x);
 	if(_LIB_VERSION == _IEEE_ || isnan(x)) return z;
 	if(fabs(x)>X_TLOSS) {
 	    /* j0(|x|>X_TLOSS) */
-            exc.type = TLOSS;
-            exc.name = "j0";
-	    exc.err = 0;
-	    exc.arg1 = exc.arg2 = x;
-            exc.retval = 0.0;
-            if (_LIB_VERSION == _POSIX_)
-               errno = ERANGE;
-            else if (!matherr(&exc)) {
-               errno = ERANGE;
-            }        
-	    if (exc.err != 0)
-	       errno = exc.err;
-            return exc.retval; 
+	    errno = ERANGE;
+	    return 0.0;
 	} else
 	    return z;
 #endif
@@ -138,7 +126,6 @@ None of the Bessel functions are in ANSI C.
 	return __ieee754_y0(x);
 #else
 	double z;
-	struct exception exc;
 	z = __ieee754_y0(x);
 	if(_LIB_VERSION == _IEEE_ || isnan(x) ) return z;
         if(x <= 0.0){
@@ -149,38 +136,13 @@ None of the Bessel functions are in ANSI C.
 	    SET_HIGH_WORD(inf,0x7ff00000);	/* set inf to infinite */
 #endif
 	    /* y0(0) = -inf or y0(x<0) = NaN */
-	    exc.type = DOMAIN;	/* should be SING for IEEE y0(0) */
-	    exc.name = "y0";
-	    exc.err = 0;
-	    exc.arg1 = exc.arg2 = x;
-	    if (_LIB_VERSION == _SVID_)
-	       exc.retval = -HUGE;
-	    else
-	       exc.retval = -HUGE_VAL;
-	    if (_LIB_VERSION == _POSIX_)
-	       errno = EDOM;
-	    else if (!matherr(&exc)) {
-	       errno = EDOM;
-	    }
-	    if (exc.err != 0)
-	       errno = exc.err;
-            return exc.retval; 
+	    errno = EDOM;
+	    return -HUGE_VAL;
         }
 	if(x>X_TLOSS) {
 	    /* y0(x>X_TLOSS) */
-            exc.type = TLOSS;
-            exc.name = "y0";
-	    exc.err = 0;
-	    exc.arg1 = exc.arg2 = x;
-            exc.retval = 0.0;
-            if (_LIB_VERSION == _POSIX_)
-               errno = ERANGE;
-            else if (!matherr(&exc)) {
-               errno = ERANGE;
-            }        
-	    if (exc.err != 0)
-	       errno = exc.err;
-	    return exc.retval; 
+	    errno = ERANGE;
+	    return 0.0;
 	} else
 	    return z;
 #endif

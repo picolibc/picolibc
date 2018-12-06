@@ -30,39 +30,19 @@
 	return __ieee754_atanhf(x);
 #else
 	float z,y;
-	struct exception exc;
 	z = __ieee754_atanhf(x);
 	if(_LIB_VERSION == _IEEE_ || isnan(x)) return z;
 	y = fabsf(x);
-	if(y>=(float)1.0) {
-	    if(y>(float)1.0) {
-                /* atanhf(|x|>1) */
-                exc.type = DOMAIN;
-                exc.name = "atanhf";
-		exc.err = 0;
-		exc.arg1 = exc.arg2 = (double)x;
-                exc.retval = 0.0/0.0;
-                if (_LIB_VERSION == _POSIX_)
-                  errno = EDOM;
-                else if (!matherr(&exc)) {
-                  errno = EDOM;
-                }
+	if(y>=1.0f) {
+	    if(y>1.0f) {
+		/* atanhf(|x|>1) */
+		errno = EDOM;
+		return 0.0f/0.0f;
 	    } else { 
-                /* atanhf(|x|=1) */
-                exc.type = SING;
-                exc.name = "atanhf";
-		exc.err = 0;
-		exc.arg1 = exc.arg2 = (double)x;
-		exc.retval = x/0.0;	/* sign(x)*inf */
-                if (_LIB_VERSION == _POSIX_)
-                  errno = EDOM;
-                else if (!matherr(&exc)) {
-                  errno = EDOM;
-                }
-            }
-	    if (exc.err != 0)
-              errno = exc.err;
-            return (float)exc.retval; 
+		/* atanhf(|x|=1) */
+		errno = EDOM;
+		return x/0.0f;	/* sign(x)*inf */
+	    }
 	} else
 	    return z;
 #endif

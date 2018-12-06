@@ -31,7 +31,6 @@
 	return __ieee754_sinhf(x);
 #else
 	float z; 
-	struct exception exc;
 	z = __ieee754_sinhf(x);
 	if(_LIB_VERSION == _IEEE_) return z;
 	if(!finitef(z)&&finitef(x)) {
@@ -42,22 +41,8 @@
 	    
 	    SET_HIGH_WORD(inf,0x7ff00000);	/* set inf to infinite */
 #endif
-	    exc.type = OVERFLOW;
-	    exc.name = "sinhf";
-	    exc.err = 0;
-	    exc.arg1 = exc.arg2 = (double)x;
-	    if (_LIB_VERSION == _SVID_)
-	       exc.retval = ( (x>0.0) ? HUGE : -HUGE);
-	    else
-	       exc.retval = ( (x>0.0) ? HUGE_VAL : -HUGE_VAL);
-	    if (_LIB_VERSION == _POSIX_)
-	       errno = ERANGE;
-	    else if (!matherr(&exc)) {
-	       errno = ERANGE;
-	    }
-	    if (exc.err != 0)
-	       errno = exc.err;
-            return (float)exc.retval;
+	    errno = ERANGE;
+	    return ( (x>0.0f) ? HUGE_VAL : -HUGE_VAL);
 	} else
 	    return z;
 #endif

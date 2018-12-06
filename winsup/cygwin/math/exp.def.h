@@ -109,13 +109,13 @@ __FLT_ABI(exp) (__FLT_TYPE x)
   int x_class = fpclassify (x);
   if (x_class == FP_NAN)
     {
-      __FLT_RPT_DOMAIN ("exp", x, 0.0, x);
+      errno = EDOM;
       return x;
     }
   else if (x_class == FP_INFINITE)
     {
       __FLT_TYPE r = (signbit (x) ? __FLT_CST (0.0) : __FLT_HUGE_VAL);
-      __FLT_RPT_ERANGE ("exp", x, 0.0, r, signbit (x));
+      errno = ERANGE;
       return r;
     }
   else if (x_class == FP_ZERO)
@@ -124,7 +124,7 @@ __FLT_ABI(exp) (__FLT_TYPE x)
     }
   else if (x > __FLT_MAXLOG)
     {
-      __FLT_RPT_ERANGE ("exp", x, 0.0, __FLT_HUGE_VAL, 1);
+      errno = ERANGE;
       return __FLT_HUGE_VAL;
     }
   else if (x < __FLT_MINLOG)

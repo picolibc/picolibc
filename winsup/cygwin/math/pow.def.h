@@ -122,7 +122,7 @@ __FLT_ABI(pow) (__FLT_TYPE x, __FLT_TYPE y)
   else if (x_class == FP_NAN || y_class == FP_NAN)
     {
       rslt = (signbit(x) ? -__FLT_NAN : __FLT_NAN);
-      __FLT_RPT_DOMAIN ("pow", x, y, rslt);
+      errno = EDOM;
       return rslt;
     }
   else if (x_class == FP_ZERO)
@@ -133,7 +133,7 @@ __FLT_ABI(pow) (__FLT_TYPE x, __FLT_TYPE y)
       if (signbit(x) && internal_modf (y, &d) != 0.0)
 	{
 	  return signbit (y) ? (1.0 / -x) : __FLT_CST (0.0);
-	  /*__FLT_RPT_DOMAIN ("pow", x, y, -__FLT_NAN);
+	  /*errno = EDOM;
 	  return -__FLT_NAN; */
 	}
       odd_y = (internal_modf (__FLT_ABI (ldexp) (y, -1), &d) != 0.0) ? 1 : 0;
@@ -167,7 +167,7 @@ __FLT_ABI(pow) (__FLT_TYPE x, __FLT_TYPE y)
       if (signbit(x) && internal_modf (y, &d) != 0.0)
 	{
 	  return signbit(y) ? 1.0 / -x : -x;
-	  /*__FLT_RPT_DOMAIN ("pow", x, y, -__FLT_NAN);
+	  /*errno = EDOM;
 	  return -__FLT_NAN;*/
 	}
       odd_y = (internal_modf (__FLT_ABI (ldexp) (y, -1), &d) != 0.0) ? 1 : 0;
@@ -195,7 +195,7 @@ __FLT_ABI(pow) (__FLT_TYPE x, __FLT_TYPE y)
     {
       if (signbit (x))
 	{
-	  __FLT_RPT_DOMAIN ("pow", x, y, -__FLT_NAN);
+	  errno = EDOM;
 	  return -__FLT_NAN;
 	}
       if (y == __FLT_CST(0.5))

@@ -54,9 +54,6 @@ RETURNS
 	is 1, the global <<errno>> is set to <<EDOM>>; and the result is 
 	infinity with the same sign as <<x>>.  A <<SING error>> is reported.
 
-	You can modify the error handling for these routines using
-	<<matherr>>.
-
 PORTABILITY
 	Neither <<atanh>> nor <<atanhf>> are ANSI C.
 
@@ -87,39 +84,19 @@ QUICKREF
 	return __ieee754_atanh(x);
 #else
 	double z,y;
-	struct exception exc;
 	z = __ieee754_atanh(x);
 	if(_LIB_VERSION == _IEEE_ || isnan(x)) return z;
 	y = fabs(x);
 	if(y>=1.0) {
 	    if(y>1.0) {
-                /* atanh(|x|>1) */
-                exc.type = DOMAIN;
-                exc.name = "atanh";
-		exc.err = 0;
-		exc.arg1 = exc.arg2 = x;
-                exc.retval = 0.0/0.0;
-                if (_LIB_VERSION == _POSIX_)
-                  errno = EDOM;
-                else if (!matherr(&exc)) {
-                  errno = EDOM;
-                }
+		/* atanh(|x|>1) */
+		errno = EDOM;
+		return 0.0/0.0;
 	    } else { 
-                /* atanh(|x|=1) */
-                exc.type = SING;
-                exc.name = "atanh";
-		exc.err = 0;
-		exc.arg1 = exc.arg2 = x;
-		exc.retval = x/0.0;	/* sign(x)*inf */
-                if (_LIB_VERSION == _POSIX_)
-                  errno = EDOM;
-                else if (!matherr(&exc)) {
-                  errno = EDOM;
-                }
-            }
-	    if (exc.err != 0)
-              errno = exc.err;
-            return exc.retval; 
+		/* atanh(|x|=1) */
+		errno = EDOM;
+		return x/0.0;	/* sign(x)*inf */
+	    }
 	} else
 	    return z;
 #endif

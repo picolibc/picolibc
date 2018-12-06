@@ -16,9 +16,6 @@
 #include <sys/types.h>
 #include <machine/ieeefp.h>
 
-/* REDHAT LOCAL: Default to XOPEN_MODE.  */
-#define _XOPEN_MODE
-
 /* Most routines need to check whether a float is finite, infinite, or not a
    number, and many need to know whether the result of an operation will
    overflow.  These conditions depend on whether the largest exponent is

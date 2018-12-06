@@ -31,25 +31,12 @@
 	return __ieee754_remainderf(x,y);
 #else
 	float z;
-	struct exception exc;
 	z = __ieee754_remainderf(x,y);
 	if(_LIB_VERSION == _IEEE_ || isnan(y)) return z;
-	if(y==(float)0.0) { 
-            /* remainderf(x,0) */
-            exc.type = DOMAIN;
-            exc.name = "remainderf";
-	    exc.err = 0;
-	    exc.arg1 = (double)x;
-	    exc.arg2 = (double)y;
-            exc.retval = 0.0/0.0;
-            if (_LIB_VERSION == _POSIX_)
-               errno = EDOM;
-            else if (!matherr(&exc)) {
-               errno = EDOM;
-            }
-	    if (exc.err != 0)
-	       errno = exc.err;
-            return (float)exc.retval; 
+	if(y==0.0f) {
+	    /* remainderf(x,0) */
+	    errno = EDOM;
+	    return 0.0f/0.0f;
 	} else
 	    return z;
 #endif

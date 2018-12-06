@@ -42,16 +42,12 @@ RETURNS
 	@end tex
 
 	If <[x]> is not between @minus{}1 and 1, the returned value is NaN
-	(not a number) the global variable <<errno>> is set to <<EDOM>>, and a
-	<<DOMAIN error>> message is sent as standard error output.
-
-	You can modify error handling for these functions using <<matherr>>.
-
+	(not a number), and the global variable <<errno>> is set to <<EDOM>>.
 
 QUICKREF
- ansi svid posix rentrant
- acos	 y,y,y,m
- acosf   n,n,n,m
+ ansi posix rentrant
+ acos	 y,y,m
+ acosf   n,n,m
 
 MATHREF  
  acos, [-1,1], acos(arg),,,
@@ -83,24 +79,12 @@ MATHREF
 	return __ieee754_acos(x);
 #else
 	double z;
-       	struct exception exc;
        	z = __ieee754_acos(x);
 	if(_LIB_VERSION == _IEEE_ || isnan(x)) return z;
 	if(fabs(x)>1.0) { 
 	    /* acos(|x|>1) */
-	    exc.type = DOMAIN;
-	    exc.name = "acos";
-	    exc.err = 0;
-	    exc.arg1 = exc.arg2 = x;
-	    exc.retval = nan("");
-	    if (_LIB_VERSION == _POSIX_)
-	       errno = EDOM;
-	    else if (!matherr(&exc)) {
-	       errno = EDOM;
-            }
-            if (exc.err != 0)
-	       errno = exc.err;
-	    return exc.retval; 
+	    errno = EDOM;
+	    return nan("");
 	} else
 	    return z;
 #endif

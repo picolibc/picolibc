@@ -31,9 +31,6 @@ RETURNS
         an overflow,  <<cosh>> returns the value <<HUGE_VAL>> with the
         appropriate sign, and the global value <<errno>> is set to <<ERANGE>>.
 
-        You can modify error handling for these functions using the
-        function <<matherr>>.
-
 PORTABILITY
         <<cosh>> is ANSI.
         <<coshf>> is an extension.

@@ -57,25 +57,12 @@ PORTABILITY
 	return __ieee754_remainder(x,y);
 #else
 	double z;
-	struct exception exc;
 	z = __ieee754_remainder(x,y);
 	if(_LIB_VERSION == _IEEE_ || isnan(y)) return z;
 	if(y==0.0) { 
             /* remainder(x,0) */
-            exc.type = DOMAIN;
-            exc.name = "remainder";
-	    exc.err = 0;
-	    exc.arg1 = x;
-	    exc.arg2 = y;
-            exc.retval = 0.0/0.0;
-            if (_LIB_VERSION == _POSIX_)
-               errno = EDOM;
-            else if (!matherr(&exc)) {
-               errno = EDOM;
-            }
-	    if (exc.err != 0)
-	       errno = exc.err;
-            return exc.retval; 
+	    errno = EDOM;
+	    return 0.0/0.0;
 	} else
 	    return z;
 #endif

@@ -44,18 +44,15 @@ RETURNS
 <<acosh>> and <<acoshf>> return the calculated value.  If <[x]> 
 less than 1, the return value is NaN and <<errno>> is set to <<EDOM>>.
 
-You can change the error-handling behavior with the non-ANSI
-<<matherr>> function.
-
 PORTABILITY
 Neither <<acosh>> nor <<acoshf>> are ANSI C.  They are not recommended
 for portable programs.
 
 
 QUICKREF
- ansi svid posix rentrant
- acos	 n,n,n,m
- acosf   n,n,n,m
+ ansi posix rentrant
+ acos	 n,n,m
+ acosf   n,n,m
 
 MATHREF  
  acosh, NAN,   arg,DOMAIN,EDOM
@@ -89,24 +86,12 @@ MATHREF
 	return __ieee754_acosh(x);
 #else
 	double z;
-	struct exception exc;
 	z = __ieee754_acosh(x);
 	if(_LIB_VERSION == _IEEE_ || isnan(x)) return z;
 	if(x<1.0) {
             /* acosh(x<1) */
-            exc.type = DOMAIN;
-            exc.name = "acosh";
-	    exc.err = 0;
-	    exc.arg1 = exc.arg2 = x;
-            exc.retval = 0.0/0.0;
-            if (_LIB_VERSION == _POSIX_)
-               errno = EDOM;
-            else if (!matherr(&exc)) {
-               errno = EDOM;
-            }
-	    if (exc.err != 0)
-	       errno = exc.err;
-	    return exc.retval; 
+	    errno = EDOM;
+	    return 0.0/0.0;
 	} else
 	    return z;
 #endif

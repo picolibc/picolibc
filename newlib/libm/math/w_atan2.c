@@ -50,8 +50,6 @@ RETURNS
 $-\pi$ to $\pi$.
 @end tex
 
-You can modify error handling for these functions using <<matherr>>.
-
 PORTABILITY
 <<atan2>> is ANSI C.  <<atan2f>> is an extension.
 

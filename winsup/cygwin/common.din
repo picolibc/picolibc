@@ -907,7 +907,6 @@ malloc_stats SIGFE
 malloc_trim SIGFE
 malloc_usable_size SIGFE
 mallopt SIGFE
-matherr NOSIGFE
 mblen NOSIGFE
 mbrlen NOSIGFE
 mbrtowc NOSIGFE

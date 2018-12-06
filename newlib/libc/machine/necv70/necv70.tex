@@ -35,7 +35,7 @@ double x;
 
 The library has an entry @code{fast_sin} which uses the machine
 instruction @code{fsin.l} to perform the operation.  Note that the
-built-in instructions cannot call @code{matherr} or set @code{errno}
+built-in instructions cannot set @code{errno}
 in the same way that the C coded functions do.  Refer to a V70
 instruction manual to see how errors are generated and handled.
 

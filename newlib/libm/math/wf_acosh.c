@@ -32,24 +32,12 @@
 	return __ieee754_acoshf(x);
 #else
 	float z;
-	struct exception exc;
 	z = __ieee754_acoshf(x);
 	if(_LIB_VERSION == _IEEE_ || isnan(x)) return z;
-	if(x<(float)1.0) {
-            /* acoshf(x<1) */
-            exc.type = DOMAIN;
-            exc.name = "acoshf";
-	    exc.err = 0;
-	    exc.arg1 = exc.arg2 = (double)x;
-            exc.retval = 0.0/0.0;
-            if (_LIB_VERSION == _POSIX_)
-               errno = EDOM;
-            else if (!matherr(&exc)) {
-               errno = EDOM;
-            }
-	    if (exc.err != 0)
-	       errno = exc.err;
-	    return (float)exc.retval; 
+	if(x<1.0f) {
+	    /* acoshf(x<1) */
+	    errno = EDOM;
+	    return 0.0f/0.0f;
 	} else
 	    return z;
 #endif

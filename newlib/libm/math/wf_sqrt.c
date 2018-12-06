@@ -31,27 +31,12 @@
 	return __ieee754_sqrtf(x);
 #else
 	float z;
-	struct exception exc;
 	z = __ieee754_sqrtf(x);
 	if(_LIB_VERSION == _IEEE_ || isnan(x)) return z;
-	if(x<(float)0.0) {
-            /* sqrtf(negative) */
-            exc.type = DOMAIN;
-            exc.name = "sqrtf";
-	    exc.err = 0;
-	    exc.arg1 = exc.arg2 = (double)x;
-            if (_LIB_VERSION == _SVID_)
-              exc.retval = 0.0;
-            else
-              exc.retval = 0.0/0.0;
-            if (_LIB_VERSION == _POSIX_) 
-              errno = EDOM;
-            else if (!matherr(&exc)) {
-              errno = EDOM;
-            }
-            if (exc.err != 0)
-	      errno = exc.err;
-	    return (float)exc.retval; 
+	if(x<0.0f) {
+	    /* sqrtf(negative) */
+	    errno = EDOM;
+	    return 0.0f/0.0f;
 	} else
 	    return z;
 #endif

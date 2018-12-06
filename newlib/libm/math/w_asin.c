@@ -34,8 +34,6 @@ Arguments to <<asin>> must be in the range @minus{}1 to 1.
 <<asinf>> is identical to <<asin>>, other than taking and
 returning floats.
 
-You can modify error handling for these routines using <<matherr>>. 
-
 RETURNS
 @ifnottex
 <<asin>> returns values in radians, in the range of -pi/2 to pi/2.
@@ -45,15 +43,13 @@ RETURNS
 @end tex
 
 If <[x]> is not in the range @minus{}1 to 1, <<asin>> and <<asinf>>
-return NaN (not a number), set the global variable <<errno>> to
-<<EDOM>>, and issue a <<DOMAIN error>> message.
-
-You can change this error treatment using <<matherr>>.
+return NaN (not a number), and the global variable <<errno>> is set to
+<<EDOM>>.
 
 QUICKREF
- ansi svid posix rentrant
- asin	 y,y,y,m
- asinf   n,n,n,m
+ ansi posix rentrant
+ asin	 y,y,m
+ asinf   n,n,m
 
 MATHREF  
  asin,  -1<=arg<=1, asin(arg),,,
@@ -87,24 +83,12 @@ MATHREF
 	return __ieee754_asin(x);
 #else
 	double z;
-	struct exception exc;
 	z = __ieee754_asin(x);
 	if(_LIB_VERSION == _IEEE_ || isnan(x)) return z;
 	if(fabs(x)>1.0) {
 	    /* asin(|x|>1) */
-	    exc.type = DOMAIN;
-	    exc.name = "asin";
-	    exc.err = 0;
-	    exc.arg1 = exc.arg2 = x;
-	    exc.retval = nan("");
-	    if(_LIB_VERSION == _POSIX_)
-	      errno = EDOM;
-	    else if (!matherr(&exc)) {
-	      errno = EDOM;
-	    }
-	    if (exc.err != 0)
-	      errno = exc.err;
-	    return exc.retval; 
+	    errno = EDOM;
+	    return nan("");
 	} else
 	    return z;
 #endif

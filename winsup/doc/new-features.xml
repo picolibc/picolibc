@@ -86,6 +86,11 @@ to free the parent directory.
 Wctype functions updated to Unicode 11.0.
 </para></listitem>
 
+</para></listitem>
+Remove matherr, and SVID and X/Open math library configurations.
+Default math library configuration is now IEEE.
+<listitem><para>
+
 </itemizedlist>
 
 </sect2>

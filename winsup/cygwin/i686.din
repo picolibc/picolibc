@@ -366,7 +366,6 @@ _lseek64 = lseek64 SIGFE
 _lstat = lstat SIGFE
 _lstat64 = lstat64 SIGFE
 _malloc = malloc SIGFE
-_matherr = matherr NOSIGFE
 _mblen = mblen NOSIGFE
 _mbstowcs = mbstowcs NOSIGFE
 _mbtowc = mbtowc NOSIGFE

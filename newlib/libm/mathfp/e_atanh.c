@@ -55,9 +55,6 @@ RETURNS
         is 1, the global <<errno>> is set to <<EDOM>>; and the result is
         infinity with the same sign as <<x>>.  A <<SING error>> is reported.
 
-        You can modify the error handling for these routines using
-        <<matherr>>.
-
 PORTABILITY
         Neither <<atanh>> nor <<atanhf>> are ANSI C.
 
