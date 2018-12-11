@@ -39,6 +39,7 @@
 #include <string.h>
 #include <limits.h>
 #include <stdint.h>
+#include <math.h>
 #include <wchar.h>
 #include <sys/lock.h>
 #include <stdarg.h>
@@ -213,7 +214,7 @@ _printf_float (struct _reent *data,
     }
   if (isnan (_fpvalue))
     {
-      if (_fpvalue < 0)
+      if (signbit (_fpvalue))
 	pdata->l_buf[0] = '-';
       if (code <= 'G')		/* 'A', 'E', 'F', or 'G'.  */
 	cp = "NAN";
