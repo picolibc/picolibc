@@ -29,6 +29,7 @@ struct wincaps
     unsigned has_unprivileged_createsymlink	: 1;
     unsigned has_unbiased_interrupt_time	: 1;
     unsigned has_precise_interrupt_time		: 1;
+    unsigned has_posix_file_info		: 1;
   };
 };
 
@@ -78,6 +79,7 @@ public:
   bool	IMPLEMENT (has_unprivileged_createsymlink)
   bool	IMPLEMENT (has_unbiased_interrupt_time)
   bool	IMPLEMENT (has_precise_interrupt_time)
+  bool	IMPLEMENT (has_posix_file_info)
 
 #undef IMPLEMENT
 };
