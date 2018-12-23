@@ -53,7 +53,7 @@
 /*
  *      @(#)netdb.h	8.1 (Berkeley) 6/2/93
  *      From: Id: netdb.h,v 8.9 1996/11/19 08:39:29 vixie Exp $
- * $FreeBSD: head/include/netdb.h 326695 2017-12-08 15:57:29Z pfg $
+ * $FreeBSD: head/include/netdb.h 342383 2018-12-23 20:51:13Z pfg $
  */
 
 #ifndef _NETDB_H_
@@ -168,7 +168,7 @@ struct addrinfo {
 #define	EAI_AGAIN	 2	/* name could not be resolved at this time */
 #define	EAI_BADFLAGS	 3	/* flags parameter had an invalid value */
 #define	EAI_FAIL	 4	/* non-recoverable failure in name resolution */
-#define	EAI_FAMILY	 5	/* address family was recognized */
+#define	EAI_FAMILY	 5	/* address family not recognized */
 #define	EAI_MEMORY	 6	/* memory allocation failure */
 #if 0
 /* Obsoleted on RFC 2553bis-02 */
