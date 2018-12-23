@@ -31,6 +31,7 @@ enum fs_info_type
 {
   none = 0,
   fat,
+  exfat,
   ntfs,
   refs,
   samba,
@@ -100,6 +101,7 @@ class fs_info
   IMPLEMENT_STATUS_FLAG (bool, has_buggy_basic_info)
   IMPLEMENT_STATUS_FLAG (bool, has_dos_filenames_only)
   IMPLEMENT_FS_FLAG (fat)
+  IMPLEMENT_FS_FLAG (exfat)
   IMPLEMENT_FS_FLAG (ntfs)
   IMPLEMENT_FS_FLAG (refs)
   IMPLEMENT_FS_FLAG (samba)

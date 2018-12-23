@@ -369,6 +369,8 @@ class path_conv
   DWORD fs_name_len () const {return fs.name_len ();}
   bool fs_got_fs () const { return fs.got_fs (); }
   bool fs_is_fat () const {return fs.is_fat ();}
+  bool fs_is_exfat () const {return fs.is_exfat ();}
+  bool fs_is_any_fat () const {return fs.is_fat () || fs.is_exfat ();}
   bool fs_is_ntfs () const {return fs.is_ntfs ();}
   bool fs_is_refs () const {return fs.is_refs ();}
   bool fs_is_samba () const {return fs.is_samba ();}

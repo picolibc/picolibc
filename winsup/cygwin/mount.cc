@@ -343,9 +343,11 @@ fs_info::update (PUNICODE_STRING upath, HANDLE in_vol)
 #define FS_IS_WINDOWS_NTFS TEST_GVI(flags () & MINIMAL_WIN_NTFS_FLAGS, \
 				    MINIMAL_WIN_NTFS_FLAGS)
 /* These are the exact flags of a real Windows FAT/FAT32 filesystem.
+   Newer FAT32/exFAT support FILE_SUPPORTS_ENCRYPTION as well.
    Anything else is a filesystem faking to be FAT. */
 #define WIN_FAT_FLAGS (FILE_CASE_PRESERVED_NAMES | FILE_UNICODE_ON_DISK)
-#define FS_IS_WINDOWS_FAT  TEST_GVI(flags (), WIN_FAT_FLAGS)
+#define FAT_IGNORE (FILE_SUPPORTS_ENCRYPTION)
+#define FS_IS_WINDOWS_FAT  TEST_GVI(flags () & ~FAT_IGNORE, WIN_FAT_FLAGS)
 
       if ((flags () & FILE_SUPPORTS_OBJECT_IDS)
 	  && NT_SUCCESS (NtQueryVolumeInformationFile (vol, &io, &ffoi,
@@ -379,6 +381,8 @@ fs_info::update (PUNICODE_STRING upath, HANDLE in_vol)
 	is_cifs (!FS_IS_WINDOWS_FAT);
       /* Then check remote filesystems honest about their name. */
       if (!got_fs ()
+	  /* Microsoft exFAT */
+	  && !is_exfat (RtlEqualUnicodeString (&fsname, &ro_u_exfat, FALSE))
 	  /* Microsoft NFS needs distinct access methods for metadata. */
 	  && !is_nfs (RtlEqualUnicodeString (&fsname, &ro_u_nfs, FALSE))
 	  /* MVFS == Rational ClearCase remote filesystem.  Has a couple of
@@ -430,6 +434,7 @@ fs_info::update (PUNICODE_STRING upath, HANDLE in_vol)
   if (!got_fs ()
       && !is_ntfs (RtlEqualUnicodeString (&fsname, &ro_u_ntfs, FALSE))
       && !is_fat (RtlEqualUnicodePathPrefix (&fsname, &ro_u_fat, TRUE))
+      && !is_exfat (RtlEqualUnicodeString (&fsname, &ro_u_exfat, FALSE))
       && !is_refs (RtlEqualUnicodeString (&fsname, &ro_u_refs, FALSE))
       && !is_csc_cache (RtlEqualUnicodeString (&fsname, &ro_u_csc, FALSE))
       && is_cdrom (ffdi.DeviceType == FILE_DEVICE_CD_ROM))
@@ -1553,6 +1558,7 @@ mount_info::del_item (const char *path, unsigned flags)
 fs_names_t fs_names[] = {
     { "none", false },
     { "vfat", true },
+    { "exfat", true },
     { "ntfs", true },
     { "refs", true },
     { "smbfs", false },
