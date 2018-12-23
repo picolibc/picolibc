@@ -658,23 +658,64 @@ unlink_nt (path_conv &pc)
   HANDLE fh, fh_ro = NULL;
   OBJECT_ATTRIBUTES attr;
   IO_STATUS_BLOCK io;
+  ACCESS_MASK access = DELETE;
+  ULONG flags = FILE_OPEN_FOR_BACKUP_INTENT;
   HANDLE old_trans = NULL, trans = NULL;
   ULONG num_links = 1;
   FILE_DISPOSITION_INFORMATION disp = { TRUE };
   int reopened = 0;
-
   bin_status bin_stat = dont_move;
 
   syscall_printf ("Trying to delete %S, isdir = %d",
 		  pc.get_nt_native_path (), pc.isdir ());
-  ACCESS_MASK access = DELETE;
-  ULONG flags = FILE_OPEN_FOR_BACKUP_INTENT;
+
   /* Add the reparse point flag to known reparse points, otherwise we remove
      the target, not the reparse point. */
   if (pc.is_known_reparse_point ())
     flags |= FILE_OPEN_REPARSE_POINT;
 
   pc.get_object_attr (attr, sec_none_nih);
+
+  /* First check if we can use POSIX unlink semantics: W10 1709++, local NTFS.
+     With POSIX unlink semantics the entire job gets MUCH easier and faster.
+     Just try to do it and if it fails, it fails. */
+  if (wincap.has_posix_file_info () && !pc.isremote () && pc.fs_is_ntfs ())
+    {
+      FILE_DISPOSITION_INFORMATION_EX fdie;
+
+      if (pc.file_attributes () & FILE_ATTRIBUTE_READONLY)
+	access |= FILE_WRITE_ATTRIBUTES;
+      status = NtOpenFile (&fh, access, &attr, &io, FILE_SHARE_VALID_FLAGS,
+			   flags);
+      if (!NT_SUCCESS (status))
+	goto out;
+      /* Why didn't the devs add a FILE_DELETE_IGNORE_READONLY_ATTRIBUTE
+	 flag just like they did with FILE_LINK_IGNORE_READONLY_ATTRIBUTE
+	 and FILE_LINK_IGNORE_READONLY_ATTRIBUTE???
+
+         POSIX unlink semantics are nice, but they still fail if the file
+	 has the R/O attribute set.  Removing the file is very much a safe
+	 bet afterwards, so, no transaction. */
+      if (pc.file_attributes () & FILE_ATTRIBUTE_READONLY)
+	{
+	  status = NtSetAttributesFile (fh, pc.file_attributes ()
+					    & ~FILE_ATTRIBUTE_READONLY);
+	  if (!NT_SUCCESS (status))
+	    {
+	      NtClose (fh);
+	      goto out;
+	    }
+	}
+      fdie.Flags = FILE_DISPOSITION_DELETE | FILE_DISPOSITION_POSIX_SEMANTICS;
+      status = NtSetInformationFile (fh, &io, &fdie, sizeof fdie,
+				     FileDispositionInformationEx);
+      /* Restore R/O attribute in case we have multiple hardlinks. */
+      if (pc.file_attributes () & FILE_ATTRIBUTE_READONLY)
+	NtSetAttributesFile (fh, pc.file_attributes ());
+      NtClose (fh);
+      goto out;
+    }
+
   /* If the R/O attribute is set, we have to open the file with
      FILE_WRITE_ATTRIBUTES to be able to remove this flags before trying
      to delete it.  We do this separately because there are filesystems
@@ -1426,7 +1467,39 @@ open (const char *unix_path, int flags, ...)
       if ((fh->is_fs_special () && fh->device_access_denied (flags))
 	  || !fh->open_with_arch (flags, mode & 07777))
 	__leave;		/* errno already set */
+#if 0
+      /* W10 1709 POSIX unlink semantics:
 
+         TODO: Works nicely for O_TEMPFILE but using linkat requires that
+	 we first fix /proc/self/fd handling to allow opening by handle
+	 rather than by symlinked filename only. */
+      if ((flags & O_TMPFILE) && wincap.has_posix_file_info ()
+	  && fh->pc.fs_is_ntfs ())
+	{
+	  HANDLE del_h;
+	  OBJECT_ATTRIBUTES attr;
+	  NTSTATUS status;
+	  IO_STATUS_BLOCK io;
+	  FILE_DISPOSITION_INFORMATION_EX fdie;
+
+	  status = NtOpenFile (&del_h, DELETE,
+		       fh->pc.init_reopen_attr (attr, fh->get_handle ()), &io,
+		       FILE_SHARE_VALID_FLAGS, FILE_OPEN_FOR_BACKUP_INTENT);
+	  if (!NT_SUCCESS (status))
+	    debug_printf ("reopening tmpfile handle failed, status %y", status);
+	  else
+	    {
+	      fdie.Flags = FILE_DISPOSITION_DELETE
+			   | FILE_DISPOSITION_POSIX_SEMANTICS;
+	      status = NtSetInformationFile (del_h, &io, &fdie, sizeof fdie,
+					     FileDispositionInformationEx);
+	      if (!NT_SUCCESS (status))
+		debug_printf ("Setting POSIX delete disposition on tmpfile "
+			      "failed, status = %y", status);
+	      NtClose (del_h);
+	    }
+	}
+#endif
       fd = fh;
       if (fd <= 2)
 	set_std_handle (fd);
