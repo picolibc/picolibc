@@ -1437,6 +1437,8 @@ class fhandler_disk_file: public fhandler_base
   int __reg3 readdir_helper (DIR *, dirent *, DWORD, DWORD, PUNICODE_STRING fname);
 
   int prw_open (bool, void *);
+  uint64_t fs_ioc_getflags ();
+  int fs_ioc_setflags (uint64_t);
 
  public:
   fhandler_disk_file ();
@@ -1462,6 +1464,7 @@ class fhandler_disk_file: public fhandler_base
   int __reg2 link (const char *);
   int __reg2 utimens (const struct timespec *);
   int __reg2 fstatvfs (struct statvfs *buf);
+  int ioctl (unsigned int cmd, void *buf);
 
   HANDLE mmap (caddr_t *addr, size_t len, int prot, int flags, off_t off);
   int munmap (HANDLE h, caddr_t addr, size_t len);

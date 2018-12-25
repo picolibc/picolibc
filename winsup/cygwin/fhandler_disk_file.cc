@@ -25,6 +25,7 @@ details. */
 #include "devices.h"
 #include "ldap.h"
 #include <aio.h>
+#include <cygwin/fs.h>
 
 #define _COMPILING_NEWLIB
 #include <dirent.h>
@@ -2435,6 +2436,252 @@ fhandler_disk_file::closedir (DIR *dir)
   delete d_mounts (dir);
   syscall_printf ("%d = closedir(%p, %s)", res, dir, get_name ());
   return res;
+}
+
+uint64_t
+fhandler_disk_file::fs_ioc_getflags ()
+{
+  NTSTATUS status;
+  IO_STATUS_BLOCK io;
+  FILE_BASIC_INFORMATION fbi;
+  FILE_CASE_SENSITIVE_INFORMATION fcsi;
+  uint64_t flags = 0;
+
+  status = NtQueryInformationFile (get_handle (), &io, &fbi, sizeof fbi,
+				   FileBasicInformation);
+  if (NT_SUCCESS (status))
+    {
+      flags = (uint64_t) fbi.FileAttributes & FS_FL_USER_VISIBLE;
+      pc.file_attributes (fbi.FileAttributes);
+    }
+  else
+    flags = (uint64_t) pc.file_attributes () & FS_FL_USER_VISIBLE;
+  if (pc.isdir () && wincap.has_case_sensitive_dirs ()
+      && !pc.isremote () && pc.fs_is_ntfs ())
+    {
+      fcsi.Flags = 0;
+      status = NtQueryInformationFile (get_handle (), &io,
+				       &fcsi, sizeof fcsi,
+				       FileCaseSensitiveInformation);
+      if (NT_SUCCESS (status)
+	  && (fcsi.Flags & FILE_CS_FLAG_CASE_SENSITIVE_DIR))
+	flags |= FS_CASESENS_FL;
+    }
+  return flags;
+}
+
+/* Settable DOS attributes */
+#define FS_FL_SETATTRIBS	(FS_READONLY_FL \
+				 | FS_HIDDEN_FL \
+				 | FS_SYSTEM_FL \
+				 | FS_ARCHIVE_FL \
+				 | FS_TEMP_FL \
+				 | FS_NOTINDEXED_FL)
+
+int
+fhandler_disk_file::fs_ioc_setflags (uint64_t flags)
+{
+  int ret = -1;
+  uint64_t old_flags;
+  HANDLE fh;
+  NTSTATUS status;
+  OBJECT_ATTRIBUTES attr;
+  IO_STATUS_BLOCK io;
+  FILE_BASIC_INFORMATION fbi;
+  FILE_SET_SPARSE_BUFFER fssb;
+  USHORT comp;
+  FILE_CASE_SENSITIVE_INFORMATION fcsi;
+
+  if ((get_access () & (GENERIC_WRITE | FILE_WRITE_ATTRIBUTES)) != 0)
+    fh = get_handle ();
+  else
+    {
+      status = NtOpenFile (&fh, FILE_READ_ATTRIBUTES | FILE_WRITE_ATTRIBUTES,
+			   pc.init_reopen_attr (attr, get_handle ()), &io,
+			   FILE_SHARE_VALID_FLAGS,
+			   FILE_OPEN_FOR_BACKUP_INTENT);
+      if (!NT_SUCCESS (status))
+	{
+	  fh = get_handle ();
+	  __seterrno_from_nt_status (status);
+	  goto out;
+	}
+    }
+  old_flags = fs_ioc_getflags ();
+  if ((old_flags & FS_FL_SETATTRIBS) != (flags & FS_FL_SETATTRIBS))
+    {
+      fbi.CreationTime.QuadPart
+      = fbi.LastAccessTime.QuadPart
+      = fbi.LastWriteTime.QuadPart
+      = fbi.ChangeTime.QuadPart = 0LL;
+      fbi.FileAttributes = (ULONG) old_flags;
+      fbi.FileAttributes &= ~FS_FL_SETATTRIBS;
+      fbi.FileAttributes |= (flags & FS_FL_SETATTRIBS);
+      if (fbi.FileAttributes == 0)
+	fbi.FileAttributes = FILE_ATTRIBUTE_NORMAL;
+      status = NtSetInformationFile (fh, &io, &fbi, sizeof fbi,
+				     FileBasicInformation);
+      if (!NT_SUCCESS (status))
+	{
+	  __seterrno_from_nt_status (status);
+	  goto out;
+	}
+    }
+  if (!pc.isdir() && (flags & FS_SPARSE_FL) != (old_flags & FS_SPARSE_FL))
+    {
+      fssb.SetSparse = (flags & FS_SPARSE_FL) ? TRUE : FALSE;
+      status = NtFsControlFile (fh, NULL, NULL, NULL, &io,
+				FSCTL_SET_SPARSE, &fssb, sizeof fssb, NULL, 0);
+      if (!NT_SUCCESS (status))
+	{
+	  __seterrno_from_nt_status (status);
+	  goto out;
+	}
+    }
+  if (pc.isdir () && (flags & FS_CASESENS_FL) != (old_flags & FS_CASESENS_FL))
+    {
+      if (wincap.has_case_sensitive_dirs ()
+	  && !pc.isremote () && pc.fs_is_ntfs ())
+	{
+	  fcsi.Flags = (flags & FS_CASESENS_FL)
+		       ? FILE_CS_FLAG_CASE_SENSITIVE_DIR : 0;
+	  status = NtSetInformationFile (fh, &io, &fcsi, sizeof fcsi,
+					 FileCaseSensitiveInformation);
+	  if (!NT_SUCCESS (status))
+	    {
+	      /* Special case: The directory contains files which only
+		 differ in case.  NtSetInformationFile refuses to change
+		 back to case insensitivity and returns status 0xc00004b3.
+		 There's no STATUS_xyz macro assigned to that value yet,
+		 nor does it map to a useful Win32 error value. */
+	      if (status == (NTSTATUS) 0xc00004b3)
+		set_errno (EINVAL);	/* Does that make sense? */
+	      else
+		__seterrno_from_nt_status (status);
+	      goto out;
+	    }
+	}
+      else
+	{
+	  set_errno (ENOTSUP);
+	  goto out;
+	}
+    }
+  if ((flags & FS_COMPRESSED_FL) != (old_flags & FS_COMPRESSED_FL))
+    {
+      if (fh != get_handle ())
+	NtClose (fh);
+      fh = NULL;
+      if ((get_access () & (GENERIC_WRITE | GENERIC_READ))
+	  != (GENERIC_WRITE | GENERIC_READ))
+	{
+	  status = NtOpenFile (&fh, GENERIC_READ | GENERIC_WRITE | SYNCHRONIZE,
+			       pc.init_reopen_attr (attr, get_handle ()), &io,
+			       FILE_SHARE_VALID_FLAGS,
+			       FILE_SYNCHRONOUS_IO_NONALERT
+			       | FILE_OPEN_FOR_BACKUP_INTENT);
+	  if (!NT_SUCCESS (status))
+	    {
+	      fh = get_handle ();
+	      __seterrno_from_nt_status (status);
+	      goto out;
+	    }
+	}
+      comp = (flags & FS_COMPRESSED_FL)
+	     ? COMPRESSION_FORMAT_DEFAULT : COMPRESSION_FORMAT_NONE;
+      status = NtFsControlFile (fh, NULL, NULL, NULL, &io,
+				FSCTL_SET_COMPRESSION, &comp, sizeof comp,
+				NULL, 0);
+      if (!NT_SUCCESS (status))
+	{
+	  __seterrno_from_nt_status (status);
+	  goto out;
+	}
+    }
+  if (!pc.isdir() && (flags & FS_ENCRYPT_FL) != (old_flags & FS_ENCRYPT_FL))
+    {
+      tmp_pathbuf tp;
+      PWCHAR path = tp.w_get ();
+      BOOL cret;
+
+      /* EncryptFileW/DecryptFileW needs exclusive access. */
+      if (fh != get_handle ())
+	NtClose (fh);
+      NtClose (get_handle ());
+      set_io_handle (NULL);
+
+      pc.get_wide_win32_path (path);
+      cret = (flags & FS_ENCRYPT_FL)
+	     ? EncryptFileW (path) : DecryptFileW (path, 0);
+      status = NtOpenFile (&fh, get_access (),
+			   pc.get_object_attr (attr, sec_none_nih), &io,
+			   FILE_SHARE_VALID_FLAGS,
+			   FILE_SYNCHRONOUS_IO_NONALERT
+			   | FILE_OPEN_FOR_BACKUP_INTENT);
+      if (!NT_SUCCESS (status))
+	{
+	  __seterrno_from_nt_status (status);
+	  return -1;
+	}
+      set_io_handle (fh);
+      if (!cret)
+	{
+	  __seterrno ();
+	  goto out;
+	}
+    }
+  ret = 0;
+out:
+  status = NtQueryInformationFile (fh, &io, &fbi, sizeof fbi,
+				   FileBasicInformation);
+  if (NT_SUCCESS (status))
+    pc.file_attributes (fbi.FileAttributes);
+  if (fh != get_handle ())
+    NtClose (fh);
+  return ret;
+}
+
+int
+fhandler_disk_file::ioctl (unsigned int cmd, void *p)
+{
+  int ret = -1;
+  uint64_t flags = 0;
+
+  switch (cmd)
+    {
+    case FS_IOC_GETFLAGS:
+      __try
+	{
+	  uint64_t *fp = (uint64_t *) p;
+	  *fp = fs_ioc_getflags ();
+	  ret = 0;
+	}
+      __except (EFAULT) {}
+      __endtry
+      break;
+    case FS_IOC_SETFLAGS:
+      __try
+	{
+	  flags = *(__uint64_t *) p;
+	}
+      __except (EFAULT)
+	{
+	  break;
+	}
+      __endtry
+      if (flags & ~FS_FL_USER_MODIFIABLE)
+	{
+	  set_errno (EINVAL);
+	  break;
+	}
+      ret = fs_ioc_setflags (flags);
+      break;
+    default:
+      ret = fhandler_base::ioctl (cmd, p);
+      break;
+    }
+  syscall_printf ("%d = ioctl_file(%x, %p)", ret, cmd, p);
+  return ret;
 }
 
 fhandler_cygdrive::fhandler_cygdrive () :
