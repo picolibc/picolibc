@@ -1760,6 +1760,10 @@ fhandler_disk_file::mkdir (mode_t mode)
        I don't know what setting that is or how to recognize such a share,
        so for now we don't request WRITE_DAC on remote drives. */
     access |= READ_CONTROL | WRITE_DAC;
+  /* Setting case sensitivity requires FILE_WRITE_ATTRIBUTES. */
+  if (wincap.has_case_sensitive_dirs ()
+      && !pc.isremote () && pc.fs_is_ntfs ())
+    access |= FILE_WRITE_ATTRIBUTES;
   status = NtCreateFile (&dir, access, pc.get_object_attr (attr, sa), &io, NULL,
 			 FILE_ATTRIBUTE_DIRECTORY, FILE_SHARE_VALID_FLAGS,
 			 FILE_CREATE,
@@ -1773,6 +1777,36 @@ fhandler_disk_file::mkdir (mode_t mode)
       pc.file_attributes (FILE_ATTRIBUTE_DIRECTORY);
       if (has_acls ())
 	set_created_file_access (dir, pc, mode & 07777);
+      /* Starting with Windows 10 1803, try to create all dirs below the
+         installation root as case-sensitive.  If STATUS_NOT_SUPPORTED
+	 is returned, WSL isn't installed (unfortunately a requirement
+	 for this functionality. */
+      if (wincap.has_case_sensitive_dirs ()
+	  && !pc.isremote () && pc.fs_is_ntfs ())
+	{
+	  PUNICODE_STRING new_dir = pc.get_nt_native_path ();
+	  PUNICODE_STRING root_dir = &cygheap->installation_root;
+
+	  if (RtlEqualUnicodePathPrefix (new_dir, root_dir, TRUE)
+	      && new_dir->Buffer[root_dir->Length / sizeof (WCHAR)] == L'\\')
+	    {
+	      FILE_CASE_SENSITIVE_INFORMATION fcsi;
+
+	      fcsi.Flags = FILE_CS_FLAG_CASE_SENSITIVE_DIR;
+	      status = NtSetInformationFile (dir, &io, &fcsi, sizeof fcsi,
+					     FileCaseSensitiveInformation);
+	      if (!NT_SUCCESS (status))
+		{
+		  debug_printf ("Setting dir case sensitivity, status %y",
+				status);
+		  if (status == STATUS_NOT_SUPPORTED)
+		    {
+		      debug_printf ("Dir case sensitivity requires WSL");
+		      wincap.disable_case_sensitive_dirs ();
+		    }
+		}
+	    }
+	}
       NtClose (dir);
       res = 0;
     }
