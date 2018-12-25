@@ -492,7 +492,7 @@ mount_info::init (bool user_init)
   PWCHAR pathend;
   WCHAR path[PATH_MAX];
 
-  pathend = wcpcpy (path, cygheap->installation_root);
+  pathend = wcpcpy (path, cygheap->installation_root.Buffer);
   if (!user_init)
     create_root_entry (path);
 

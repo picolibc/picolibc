@@ -557,9 +557,10 @@ struct init_cygheap: public mini_cygheap
   _cmalloc_entry *chain;
   unsigned bucket_val[NBUCKETS];
   char *buckets[NBUCKETS];
-  WCHAR installation_root[PATH_MAX];
-  WCHAR installation_dir[PATH_MAX];
-  size_t installation_dir_len;
+  UNICODE_STRING installation_root;
+  WCHAR installation_root_buf[PATH_MAX];
+  UNICODE_STRING installation_dir;
+  WCHAR installation_dir_buf[PATH_MAX];
   UNICODE_STRING installation_key;
   WCHAR installation_key_buf[18];
   cygheap_root root;

@@ -1282,10 +1282,11 @@ build_env (const char * const *envp, PWCHAR &envblock, int &envc,
 	 during execve. */
       if (!saw_PATH)
 	{
-	  new_tl += cygheap->installation_dir_len + 5;
+	  new_tl += cygheap->installation_dir.Length / sizeof (WCHAR) + 5;
 	  if (new_tl > tl)
 	    tl = raise_envblock (new_tl, envblock, s);
-	  s = wcpcpy (wcpcpy (s, L"PATH="), cygheap->installation_dir) + 1;
+	  s = wcpcpy (wcpcpy (s, L"PATH="),
+		      cygheap->installation_dir.Buffer) + 1;
 	}
       *s = L'\0';			/* Two null bytes at the end */
       assert ((s - envblock) <= tl);	/* Detect if we somehow ran over end

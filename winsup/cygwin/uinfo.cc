@@ -1305,11 +1305,11 @@ cygheap_pwdgrp::_nss_init ()
   char *buf = tp.c_get ();
 
   PCWSTR rel_path = L"\\etc\\nsswitch.conf";
-  path.Length = (wcslen (cygheap->installation_root) + wcslen (rel_path))
-		* sizeof (WCHAR);
+  path.Length = cygheap->installation_root.Length
+		+ wcslen (rel_path) * sizeof (WCHAR);
   path.MaximumLength = path.Length + sizeof (WCHAR);
   path.Buffer = (PWCHAR) alloca (path.MaximumLength);
-  wcpcpy (wcpcpy (path.Buffer, cygheap->installation_root), rel_path);
+  wcpcpy (wcpcpy (path.Buffer, cygheap->installation_root.Buffer), rel_path);
   InitializeObjectAttributes (&attr, &path, OBJ_CASE_INSENSITIVE,
 			      NULL, NULL);
   if (rl.init (&attr, buf, NT_MAX_PATH))
@@ -1665,11 +1665,12 @@ pwdgrp::check_file ()
   if (!path.Buffer)
     {
       PCWSTR rel_path = is_group () ? L"\\etc\\group" : L"\\etc\\passwd";
-      path.Length = (wcslen (cygheap->installation_root) + wcslen (rel_path))
-		    * sizeof (WCHAR);
+      path.Length = cygheap->installation_root.Length
+		    + wcslen (rel_path) * sizeof (WCHAR);
       path.MaximumLength = path.Length + sizeof (WCHAR);
       path.Buffer = (PWCHAR) cmalloc_abort (HEAP_BUF, path.MaximumLength);
-      wcpcpy (wcpcpy (path.Buffer, cygheap->installation_root), rel_path);
+      wcpcpy (wcpcpy (path.Buffer, cygheap->installation_root.Buffer),
+	      rel_path);
       InitializeObjectAttributes (&attr, &path, OBJ_CASE_INSENSITIVE,
 				  NULL, NULL);
     }
