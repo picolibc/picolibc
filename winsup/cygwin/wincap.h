@@ -30,6 +30,7 @@ struct wincaps
     unsigned has_unbiased_interrupt_time	: 1;
     unsigned has_precise_interrupt_time		: 1;
     unsigned has_posix_file_info		: 1;
+    unsigned has_case_sensitive_dirs		: 1;
   };
 };
 
@@ -80,7 +81,12 @@ public:
   bool	IMPLEMENT (has_unbiased_interrupt_time)
   bool	IMPLEMENT (has_precise_interrupt_time)
   bool	IMPLEMENT (has_posix_file_info)
+  bool	IMPLEMENT (has_case_sensitive_dirs)
 
+  void disable_case_sensitive_dirs ()
+  {
+    ((wincaps *)caps)->has_case_sensitive_dirs = false;
+  }
 #undef IMPLEMENT
 };
 
