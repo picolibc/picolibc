@@ -137,11 +137,23 @@ fhandler_base::set_name (path_conv &in_pc)
 
 char *fhandler_base::get_proc_fd_name (char *buf)
 {
+  IO_STATUS_BLOCK io;
+  FILE_STANDARD_INFORMATION fsi;
+
   /* If the file had been opened with O_TMPFILE | O_EXCL, don't
      expose the filename.  linkat is supposed to return ENOENT in this
-     case.  See man 2 open on Linux. */
-  if ((get_flags () & (O_TMPFILE | O_EXCL)) == (O_TMPFILE | O_EXCL))
-    return strcpy (buf, "");
+     case.  FIXME: As soon as we open by handle from /proc/<PID>/fd,
+     the O_EXCL test has to be moved to open. */
+  if ((get_flags () & (O_TMPFILE | O_EXCL)) == (O_TMPFILE | O_EXCL)
+      || (get_device () == FH_FS
+	  && NT_SUCCESS (NtQueryInformationFile (get_handle (), &io,
+						 &fsi, sizeof fsi,
+						 FileStandardInformation))
+	  && fsi.DeletePending))
+    {
+      stpcpy (stpcpy (buf, get_name ()), " (deleted)");
+      return buf;
+    }
   if (get_name ())
     return strcpy (buf, get_name ());
   if (dev ().name ())
