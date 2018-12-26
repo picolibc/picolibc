@@ -4,6 +4,22 @@ What's new:
 - Support for CLOCK_REALTIME_COARSE, CLOCK_MONOTONIC_COARSE,
   CLOCK_MONOTONIC_RAW, CLOCK_BOOTTIME clocks.
 
+- Support for case sensitive directories.  mkdir(2) automatically
+  creates directories within the Cygwin installation dir as case
+  sensitive now.
+
+  This feature requires Windows 10 1803 or later and WSL installed!
+
+- New file ioctls's FS_IOC_GETFLAGS and FS_IOC_SETFLAGS.  The actual
+  inode flags are Cygwin-specific.  This allows to set or reset
+  DOS attributes, file sparseness, FS level encryption and compression,
+  as well as directory case sensitivity programatically.
+
+- New tools chattr(1) and lsattr(1) to utilize setting and viewing the
+  aforementioned new ioctl's on the command line.
+
+- Support for exFAT.
+
 
 What changed:
 -------------
@@ -12,6 +28,10 @@ What changed:
   all clocks, except CLOCK_PROCESS_CPUTIME_ID and CLOCK_THREAD_CPUTIME_ID.
 
 - clock_setres is a no-op now.
+
+- Use the new POSIX unlink semantics on NTFS starting with Windows 10 1709.
+  Deleting an in-use file now actually removes the file, rather than moving
+  it to the recycler bin.
 
 
 Bug Fixes
@@ -22,3 +42,5 @@ Bug Fixes
 
 - Fix early timeout from pthread_cond_timedwait.
   Addresses: https://cygwin.com/ml/cygwin/2018-11/msg00171.html
+
+- Fix a bug in recognizing remote FAT/FAT32/exFAT correctly.
