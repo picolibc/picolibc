@@ -1468,13 +1468,20 @@ open (const char *unix_path, int flags, ...)
 	  || !fh->open_with_arch (flags, mode & 07777))
 	__leave;		/* errno already set */
 #if 0
-      /* W10 1709 POSIX unlink semantics:
+      /* Don't use W10 1709 POSIX unlink semantics here.
 
-         TODO: Works nicely for O_TEMPFILE but using linkat requires that
-	 we first fix /proc/self/fd handling to allow opening by handle
-	 rather than by symlinked filename only. */
+	 Including W10 1809, NtSetInformationFile(FileLinkInformation) on a
+	 HANDLE to a file unlinked with POSIX semantics fails with
+	 STATUS_ACCESS_DENIED.  Trying to remove the delete disposition on
+	 the file prior to calling link fails with STATUS_FILE_DELETED.
+	 This breaks
+
+	   fd = open(O_TMPFILE);
+	   linkat("/proc/self/fd/<fd>);
+
+	  semantics. */
       if ((flags & O_TMPFILE) && wincap.has_posix_file_info ()
-	  && fh->pc.fs_is_ntfs ())
+	  && !fh->pc.isremote () && fh->pc.fs_is_ntfs ())
 	{
 	  HANDLE del_h;
 	  OBJECT_ATTRIBUTES attr;
