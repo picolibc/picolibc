@@ -1467,46 +1467,6 @@ open (const char *unix_path, int flags, ...)
       if ((fh->is_fs_special () && fh->device_access_denied (flags))
 	  || !fh->open_with_arch (flags, mode & 07777))
 	__leave;		/* errno already set */
-#if 0
-      /* Don't use W10 1709 POSIX unlink semantics here.
-
-	 Including W10 1809, NtSetInformationFile(FileLinkInformation) on a
-	 HANDLE to a file unlinked with POSIX semantics fails with
-	 STATUS_ACCESS_DENIED.  Trying to remove the delete disposition on
-	 the file prior to calling link fails with STATUS_FILE_DELETED.
-	 This breaks
-
-	   fd = open(O_TMPFILE);
-	   linkat("/proc/self/fd/<fd>);
-
-	  semantics. */
-      if ((flags & O_TMPFILE) && wincap.has_posix_file_info ()
-	  && !fh->pc.isremote () && fh->pc.fs_is_ntfs ())
-	{
-	  HANDLE del_h;
-	  OBJECT_ATTRIBUTES attr;
-	  NTSTATUS status;
-	  IO_STATUS_BLOCK io;
-	  FILE_DISPOSITION_INFORMATION_EX fdie;
-
-	  status = NtOpenFile (&del_h, DELETE,
-		       fh->pc.init_reopen_attr (attr, fh->get_handle ()), &io,
-		       FILE_SHARE_VALID_FLAGS, FILE_OPEN_FOR_BACKUP_INTENT);
-	  if (!NT_SUCCESS (status))
-	    debug_printf ("reopening tmpfile handle failed, status %y", status);
-	  else
-	    {
-	      fdie.Flags = FILE_DISPOSITION_DELETE
-			   | FILE_DISPOSITION_POSIX_SEMANTICS;
-	      status = NtSetInformationFile (del_h, &io, &fdie, sizeof fdie,
-					     FileDispositionInformationEx);
-	      if (!NT_SUCCESS (status))
-		debug_printf ("Setting POSIX delete disposition on tmpfile "
-			      "failed, status = %y", status);
-	      NtClose (del_h);
-	    }
-	}
-#endif
       fd = fh;
       if (fd <= 2)
 	set_std_handle (fd);
