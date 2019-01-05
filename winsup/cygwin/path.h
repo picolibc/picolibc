@@ -143,15 +143,19 @@ class path_conv
   DWORD fileattr;
   ULONG caseinsensitive;
   fs_info fs;
+
   PWCHAR wide_path;
   UNICODE_STRING uni_path;
-  void add_ext_from_sym (symlink_info&);
   DWORD symlink_length;
   const char *path;
   unsigned path_flags;
   const char *suffix;
   const char *posix_path;
   path_conv_handle conv_handle;
+
+  void add_ext_from_sym (symlink_info&);
+  char *modifiable_path () {return (char *) path;}
+
  public:
   int error;
   device dev;
@@ -407,8 +411,6 @@ class path_conv
   inline const char *get_posix () const { return posix_path; }
   void __reg2 set_posix (const char *);
   DWORD get_symlink_length () { return symlink_length; };
- private:
-  char *modifiable_path () {return (char *) path;}
 };
 
 /* Symlink marker */
