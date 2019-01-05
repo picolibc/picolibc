@@ -637,7 +637,7 @@ commune_process (void *arg)
       }
     case PICOM_PIPE_FHANDLER:
       {
-	sigproc_printf ("processing PICOM_FDS");
+	sigproc_printf ("processing PICOM_PIPE_FHANDLER");
 	int64_t unique_id = si._si_commune._si_pipe_unique_id;
 	unsigned int n = 0;
 	cygheap_fdenum cfd;
@@ -653,6 +653,26 @@ commune_process (void *arg)
 	      break;
 	    }
 	if (!n && !WritePipeOverlapped (tothem, &n, sizeof n, &nr, 1000L))
+	  sigproc_printf ("WritePipeOverlapped sizeof hdl failed, %E");
+	break;
+      }
+    case PICOM_FILE_PATHCONV:
+      {
+	sigproc_printf ("processing PICOM_FILE_PATHCONV");
+	int fd = si._si_commune._si_fd;
+	unsigned int n = 0;
+	cygheap_fdget cfd (fd);
+	if (cfd >= 0)
+	  {
+	    fhandler_base *fh = cfd;
+	    void *ser_buf = fh->pc.serialize (fh->get_handle (), n);
+	    if (!WritePipeOverlapped (tothem, &n, sizeof n, &nr, 1000L))
+	      sigproc_printf ("WritePipeOverlapped sizeof hdl failed, %E");
+	    else if (!WritePipeOverlapped (tothem, ser_buf, n, &nr, 1000L))
+	      sigproc_printf ("WritePipeOverlapped hdl failed, %E");
+	    cfree (ser_buf);
+	  }
+	else if (!WritePipeOverlapped (tothem, &n, sizeof n, &nr, 1000L))
 	  sigproc_printf ("WritePipeOverlapped sizeof hdl failed, %E");
 	break;
       }
@@ -741,6 +761,7 @@ _pinfo::commune_request (__uint32_t code, ...)
       break;
 
     case PICOM_FD:
+    case PICOM_FILE_PATHCONV:
       si._si_commune._si_fd = va_arg (args, int);
       break;
 
@@ -773,6 +794,7 @@ _pinfo::commune_request (__uint32_t code, ...)
     case PICOM_FDS:
     case PICOM_FD:
     case PICOM_PIPE_FHANDLER:
+    case PICOM_FILE_PATHCONV:
       if (!ReadPipeOverlapped (fromthem, &n, sizeof n, &nr, 1000L)
 	  || nr != sizeof n)
 	{
@@ -827,6 +849,18 @@ _pinfo::pipe_fhandler (int64_t unique_id, size_t &n)
   commune_result cr = commune_request (PICOM_PIPE_FHANDLER, unique_id);
   n = cr.n;
   return (fhandler_pipe *) cr.s;
+}
+
+void *
+_pinfo::file_pathconv (int fd, size_t &n)
+{
+  if (!pid)
+    return NULL;
+  if (pid == myself->pid)
+    return NULL;
+  commune_result cr = commune_request (PICOM_FILE_PATHCONV, fd);
+  n = cr.n;
+  return (void *) cr.s;
 }
 
 char *

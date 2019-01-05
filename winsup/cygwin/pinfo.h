@@ -27,7 +27,8 @@ enum picom
   PICOM_FDS = 4,
   PICOM_FD = 5,
   PICOM_PIPE_FHANDLER = 6,
-  PICOM_ENVIRON = 7
+  PICOM_FILE_PATHCONV = 7,
+  PICOM_ENVIRON = 8
 };
 
 #define EXITCODE_SET		0x8000000
@@ -102,6 +103,7 @@ public:
   commune_result commune_request (__uint32_t, ...);
   bool alive ();
   fhandler_pipe *pipe_fhandler (int64_t, size_t &);
+  void *file_pathconv (int, size_t &);
   char *fd (int fd, size_t &);
   char *fds (size_t &);
   char *root (size_t &);
