@@ -175,6 +175,7 @@ fhandler_process::fstat (struct stat *buf)
 	buf->st_nlink = 3;
       return 0;
     case virt_symlink:
+    case virt_fdsymlink:
       buf->st_uid = p->uid;
       buf->st_gid = p->gid;
       buf->st_mode = S_IFLNK | S_IRWXU | S_IRWXG | S_IRWXO;
@@ -397,7 +398,7 @@ format_process_fd (void *data, char *&destbuf)
 	  return 0;
 	}
       if (*e == '\0')
-	*((process_fd_t *) data)->fd_type = virt_symlink;
+	*((process_fd_t *) data)->fd_type = virt_fdsymlink;
       else /* trailing path */
 	{
 	  char *newbuf = (char *) cmalloc_abort (HEAP_STR, strlen (destbuf)

@@ -126,6 +126,7 @@ enum del_lock_called_from {
 };
 
 enum virtual_ftype_t {
+  virt_fdsymlink = -8,	/* Fd symlink (e.g. /proc/<PID>/fd/0) */
   virt_blk = -7,	/* Block special */
   virt_chr = -6,	/* Character special */
   virt_fsfile = -5,	/* FS-based file via /proc/sys */

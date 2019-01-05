@@ -801,7 +801,8 @@ path_conv::check (const char *src, unsigned opt,
 		  else
 		    {
 		      file_type = fh->exists ();
-		      if (file_type == virt_symlink)
+		      if (file_type == virt_symlink
+			  || file_type == virt_fdsymlink)
 			{
 			  fh->fill_filebuf ();
 			  symlen = sym.set (fh->get_filebuf ());
@@ -842,6 +843,7 @@ path_conv::check (const char *src, unsigned opt,
 			if (component == 0)
 			  fileattr = 0;
 			break;
+		      case virt_fdsymlink:
 		      case virt_symlink:
 			goto is_virtual_symlink;
 		      case virt_pipe:
