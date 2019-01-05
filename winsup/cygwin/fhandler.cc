@@ -140,11 +140,8 @@ char *fhandler_base::get_proc_fd_name (char *buf)
   IO_STATUS_BLOCK io;
   FILE_STANDARD_INFORMATION fsi;
 
-  /* If the file had been opened with O_TMPFILE | O_EXCL, don't
-     expose the filename.  linkat is supposed to return ENOENT in this
-     case.  FIXME: As soon as we open by handle from /proc/<PID>/fd,
-     the O_EXCL test has to be moved to open. */
-  if ((get_flags () & (O_TMPFILE | O_EXCL)) == (O_TMPFILE | O_EXCL)
+  /* If the file had been opened with O_TMPFILE, don't expose the filename. */
+  if ((get_flags () & O_TMPFILE)
       || (get_device () == FH_FS
 	  && NT_SUCCESS (NtQueryInformationFile (get_handle (), &io,
 						 &fsi, sizeof fsi,
