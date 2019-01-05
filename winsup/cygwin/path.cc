@@ -844,6 +844,10 @@ path_conv::check (const char *src, unsigned opt,
 			  fileattr = 0;
 			break;
 		      case virt_fdsymlink:
+			/* Allow open/linkat to do the right thing. */
+			if (opt & PC_SYM_NOFOLLOW_PROCFD)
+			  opt &= ~PC_SYM_FOLLOW;
+			/*FALLTHRU*/
 		      case virt_symlink:
 			goto is_virtual_symlink;
 		      case virt_pipe:

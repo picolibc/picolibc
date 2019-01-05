@@ -321,6 +321,84 @@ out:
   return res;
 }
 
+fhandler_base *
+fhandler_process::fd_reopen (int flags)
+{
+  const char *path;
+  char *e;
+  int fd;
+  HANDLE proc = NULL;
+  HANDLE hdl = NULL;
+  fhandler_base *fh = NULL;
+
+  path = get_name () + proc_len + 1;
+  pid = strtoul (path, &e, 10);
+  path = e + 4;
+  fd = strtoul (path, &e, 10);
+  if (e == path || *e != '\0')
+    {
+      set_errno (ENOENT);
+      return NULL;
+    }
+
+  if (pid == myself->pid)
+    {
+      cygheap_fdget cfd (fd);
+      if (cfd < 0)
+	return NULL;
+      fh = build_fh_pc (cfd->pc);
+      if (!fh)
+	goto err_out;
+      fh->set_io_handle (cfd->get_handle ());
+    }
+  else
+    {
+      size_t size;
+      path_conv pc;
+
+      pinfo p (pid);
+      if (!p)
+	{
+	  set_errno (ENOENT);
+	  return NULL;
+	}
+      if (!(proc = OpenProcess (PROCESS_DUP_HANDLE, false, p->dwProcessId)))
+	{
+	  __seterrno ();
+	  return NULL;
+	}
+      void *buf = p->file_pathconv (fd, size);
+      if (size == 0)
+	{
+	  set_errno (EPERM);
+	  goto err_out;
+	}
+      hdl = pc.deserialize (buf);
+      if (!DuplicateHandle (proc, hdl, GetCurrentProcess (), &hdl,
+			    0, FALSE, DUPLICATE_SAME_ACCESS))
+	{
+	  __seterrno ();
+	  hdl = NULL;
+	  goto err_out;
+	}
+      fh = build_fh_pc (pc);
+      if (!fh)
+	goto err_out;
+      fh->set_io_handle (hdl);
+    }
+  if (!fh->open_with_arch (flags, 0))
+    {
+      delete fh;
+      fh = NULL;
+    }
+err_out:
+  if (hdl)
+    CloseHandle (hdl);
+  if (proc)
+    CloseHandle (proc);
+  return fh;
+}
+
 struct process_fd_t {
   const char *path;
   _pinfo *p;

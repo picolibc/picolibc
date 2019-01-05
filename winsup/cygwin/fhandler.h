@@ -331,6 +331,7 @@ class fhandler_base
   int open_with_arch (int, mode_t = 0);
   int open_null (int flags);
   virtual int open (int, mode_t);
+  virtual fhandler_base *fd_reopen (int);
   virtual void open_setup (int flags);
   void set_unique_id (int64_t u) { unique_id = u; }
   void set_unique_id () { NtAllocateLocallyUniqueId ((PLUID) &unique_id); }
@@ -2553,6 +2554,7 @@ class fhandler_process: public fhandler_proc
   int closedir (DIR *);
   int __reg3 readdir (DIR *, dirent *);
   int open (int flags, mode_t mode = 0);
+  virtual fhandler_base *fd_reopen (int);
   int __reg2 fstat (struct stat *buf);
   bool fill_filebuf ();
 

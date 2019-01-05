@@ -47,10 +47,12 @@ enum pathconv_arg
   PC_SYM_CONTENTS	= 0x0008,
   PC_NOFULL		= 0x0010,
   PC_NULLEMPTY		= 0x0020,
+  PC_DO_NOT_USE		= 0x0040,
   PC_POSIX		= 0x0080,
   PC_NOWARN		= 0x0100,
   PC_OPEN		= 0x0200,	/* use open semantics */
   PC_CTTY		= 0x0400,	/* could later be used as ctty */
+  PC_SYM_NOFOLLOW_PROCFD = 0x0800,
   PC_KEEP_HANDLE	= 0x00400000,
   PC_NO_ACCESS_CHECK	= 0x00800000
 };

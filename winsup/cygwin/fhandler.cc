@@ -767,6 +767,13 @@ done:
   return res;
 }
 
+fhandler_base *
+fhandler_base::fd_reopen (int)
+{
+  /* This is implemented in fhandler_process only. */
+  return NULL;
+}
+
 void
 fhandler_base::open_setup (int)
 {

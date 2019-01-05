@@ -1368,6 +1368,7 @@ open (const char *unix_path, int flags, ...)
   va_list ap;
   mode_t mode = 0;
   fhandler_base *fh = NULL;
+  fhandler_base *fh_file = NULL;
 
   pthread_testcancel ();
 
@@ -1394,8 +1395,9 @@ open (const char *unix_path, int flags, ...)
 	 with a change in behavior that implements linux functionality:
 	 opening a tty should not automatically cause it to become the
 	 controlling tty for the process.  */
-      int opt = PC_OPEN | ((flags & (O_NOFOLLOW | O_EXCL))
-			   ?  PC_SYM_NOFOLLOW : PC_SYM_FOLLOW);
+      int opt = PC_OPEN | PC_SYM_NOFOLLOW_PROCFD;
+      opt |= (flags & (O_NOFOLLOW | O_EXCL)) ? PC_SYM_NOFOLLOW
+					     : PC_SYM_FOLLOW;
       if (!(flags & O_NOCTTY) && fd > 2 && myself->ctty != -2)
 	{
 	  flags |= O_NOCTTY;
@@ -1438,7 +1440,6 @@ open (const char *unix_path, int flags, ...)
 	     followed by an 8 byte unique hex number, followed by an 8 byte
 	     random hex number. */
 	  int64_t rnd;
-	  fhandler_base *fh_file;
 	  char *new_path;
 
 	  new_path = (char *) malloc (strlen (fh->get_name ())
@@ -1464,8 +1465,17 @@ open (const char *unix_path, int flags, ...)
 	  fh = fh_file;
 	}
 
-      if ((fh->is_fs_special () && fh->device_access_denied (flags))
-	  || !fh->open_with_arch (flags, mode & 07777))
+      if (fh->dev () == FH_PROCESSFD)
+	{
+	  /* Reopen file by descriptor */
+	  fh_file = fh->fd_reopen (flags);
+	  if (!fh_file)
+	    __leave;
+	  delete fh;
+	  fh = fh_file;
+	}
+      else if ((fh->is_fs_special () && fh->device_access_denied (flags))
+	       || !fh->open_with_arch (flags, mode & 07777))
 	__leave;		/* errno already set */
       fd = fh;
       if (fd <= 2)
