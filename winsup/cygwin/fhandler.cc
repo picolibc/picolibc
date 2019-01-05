@@ -552,7 +552,12 @@ fhandler_base::open (int flags, mode_t mode)
 
   syscall_printf ("(%S, %y)", pc.get_nt_native_path (), flags);
 
-  pc.get_object_attr (attr, *sec_none_cloexec (flags));
+  /* Allow to reopen from handle.  This is utilized by
+     open ("/proc/PID/fd/DESCRIPTOR", ...); */
+  if (get_handle ())
+    pc.init_reopen_attr (attr, get_handle ());
+  else
+    pc.get_object_attr (attr, *sec_none_cloexec (flags));
 
   options = FILE_OPEN_FOR_BACKUP_INTENT;
   switch (query_open ())
