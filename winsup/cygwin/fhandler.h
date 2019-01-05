@@ -2555,6 +2555,7 @@ class fhandler_process: public fhandler_proc
   int __reg3 readdir (DIR *, dirent *);
   int open (int flags, mode_t mode = 0);
   virtual fhandler_base *fd_reopen (int);
+  int __reg2 link (const char *);
   int __reg2 fstat (struct stat *buf);
   bool fill_filebuf ();
 

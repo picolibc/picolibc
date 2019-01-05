@@ -1484,6 +1484,10 @@ open (const char *unix_path, int flags, ...)
       else if ((fh->is_fs_special () && fh->device_access_denied (flags))
 	       || !fh->open_with_arch (flags, mode & 07777))
 	__leave;		/* errno already set */
+      /* Move O_TMPFILEs to the bin to avoid blocking the parent dir. */
+      if ((flags & O_TMPFILE) && !fh->pc.isremote ())
+	try_to_bin (fh->pc, fh->get_handle (), DELETE,
+		    FILE_OPEN_FOR_BACKUP_INTENT);
       fd = fh;
       if (fd <= 2)
 	set_std_handle (fd);
@@ -4791,7 +4795,9 @@ linkat (int olddirfd, const char *oldpathname,
 	__leave;
       if (flags & AT_SYMLINK_FOLLOW)
 	{
-	  path_conv old_name (oldpath, PC_SYM_FOLLOW | PC_POSIX, stat_suffixes);
+	  path_conv old_name (oldpath,
+			      PC_SYM_FOLLOW | PC_SYM_NOFOLLOW_PROCFD | PC_POSIX,
+			      stat_suffixes);
 	  if (old_name.error)
 	    {
 	      set_errno (old_name.error);

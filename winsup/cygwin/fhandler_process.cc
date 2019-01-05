@@ -399,6 +399,88 @@ err_out:
   return fh;
 }
 
+int
+fhandler_process::link (const char *newpath)
+{
+  const char *path;
+  int fd;
+  char *e;
+
+  path = get_name () + proc_len + 1;
+  pid = atoi (path);
+  while (*path != 0 && !isdirsep (*path))
+    path++;
+  if (*path == 0)
+    goto err_out;
+
+  virt_tab_t *entry;
+  entry = virt_tab_search (path + 1, true, process_tab, PROCESS_LINK_COUNT);
+  if (!entry || entry->fhandler != FH_PROCESSFD)
+    goto err_out;
+  if (path[3] != '/' || path[4] == '\0')
+    goto err_out;
+
+  fd = strtoul (path + 4, &e, 10);
+  if (fd < 0 || e == path + 4 || (*e != '/' && *e != '\0'))
+    goto err_out;
+  if (pid == myself->pid)
+    {
+      cygheap_fdget cfd (fd);
+      if (cfd < 0)
+	goto err_out;
+      return cfd->link (newpath);
+    }
+  else
+    {
+      HANDLE proc;
+      size_t size;
+      void *buf;
+      path_conv pc;
+      HANDLE hdl;
+      fhandler_base *fh = NULL;
+      int ret = -1;
+
+      pinfo p (pid);
+      if (!p)
+	{
+	  set_errno (ENOENT);
+	  return -1;
+	}
+      if (!(proc = OpenProcess (PROCESS_DUP_HANDLE, false, p->dwProcessId)))
+	goto err_out;
+      buf = p->file_pathconv (fd, size);
+      if (size == 0)
+	{
+	  set_errno (EPERM);
+	  goto err_out_close_proc;
+	}
+      hdl = pc.deserialize (buf);
+      if (!DuplicateHandle (proc, hdl, GetCurrentProcess (), &hdl,
+			    0, FALSE, DUPLICATE_SAME_ACCESS))
+	{
+	  __seterrno ();
+	  goto err_out_close_proc;
+	}
+      fh = build_fh_pc (pc);
+      if (!fh)
+	goto err_out_close_dup;
+
+      fh->set_io_handle (hdl);
+      ret = fh->link (newpath);
+      delete fh;
+
+err_out_close_dup:
+      CloseHandle (hdl);
+err_out_close_proc:
+      CloseHandle (proc);
+      return ret;
+    }
+
+err_out:
+  set_errno (EPERM);
+  return -1;
+}
+
 struct process_fd_t {
   const char *path;
   _pinfo *p;
