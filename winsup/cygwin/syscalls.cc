@@ -328,34 +328,38 @@ try_to_bin (path_conv &pc, HANDLE &fh, ACCESS_MASK access, ULONG flags)
 	}
       RtlAppendUnicodeToString (&recycler, L"\\");
     }
-  /* Create hopefully unique filename.
-     Since we have to stick to the current directory on remote shares, make
-     the new filename at least very unlikely to match by accident.  It starts
-     with ".cyg", with "cyg" transposed into the Unicode low surrogate area
-     starting at U+dc00.  Use plain ASCII chars on filesystems not supporting
-     Unicode.  The rest of the filename is the inode number in hex encoding
-     and a hash of the full NT path in hex.  The combination allows to remove
-     multiple hardlinks to the same file.  Samba doesn't like the transposed
-     names. */
-  RtlAppendUnicodeToString (&recycler,
-			    (pc.fs_flags () & FILE_UNICODE_ON_DISK
-			     && !pc.fs_is_samba ())
-			    ? L".\xdc63\xdc79\xdc67" : L".cyg");
-  pfii = (PFILE_INTERNAL_INFORMATION) infobuf;
-  /* Note: Modern Samba versions apparently don't like buffer sizes of more
-     than 65535 in some NtQueryInformationFile/NtSetInformationFile calls.
-     Therefore we better use exact buffer sizes from now on. */
-  status = NtQueryInformationFile (fh, &io, pfii, sizeof *pfii,
-				   FileInternalInformation);
-  if (!NT_SUCCESS (status))
+  if (pc.file_attributes () & FILE_ATTRIBUTE_TEMPORARY)
     {
-      debug_printf ("NtQueryInformationFile (%S, FileInternalInformation) "
-		    "failed, status = %y", pc.get_nt_native_path (), status);
-      goto out;
+      UNICODE_STRING basename;
+
+      RtlSplitUnicodePath (pc.get_nt_native_path (), NULL, &basename);
+      RtlAppendUnicodeToString (&recycler, basename.Buffer);
     }
-  RtlInt64ToHexUnicodeString (pfii->IndexNumber.QuadPart, &recycler, TRUE);
-  RtlInt64ToHexUnicodeString (hash_path_name (0, pc.get_nt_native_path ()),
-			      &recycler, TRUE);
+  else
+    {
+      /* Create unique filename.  Start with a dot, followed by "cyg"
+	 transposed into the Unicode low surrogate area (U+dc00) on file
+	 systems supporting Unicode (except Samba), followed by the inode
+	 number in hex, followed by a path hash in hex.  The combination
+	 allows to remove multiple hardlinks to the same file. */
+      RtlAppendUnicodeToString (&recycler,
+				(pc.fs_flags () & FILE_UNICODE_ON_DISK
+				 && !pc.fs_is_samba ())
+				? L".\xdc63\xdc79\xdc67" : L".cyg");
+      pfii = (PFILE_INTERNAL_INFORMATION) infobuf;
+      status = NtQueryInformationFile (fh, &io, pfii, sizeof *pfii,
+				       FileInternalInformation);
+      if (!NT_SUCCESS (status))
+	{
+	  debug_printf ("NtQueryInformationFile (%S, FileInternalInformation) "
+			"failed, status = %y",
+			pc.get_nt_native_path (), status);
+	  goto out;
+	}
+      RtlInt64ToHexUnicodeString (pfii->IndexNumber.QuadPart, &recycler, TRUE);
+      RtlInt64ToHexUnicodeString (hash_path_name (0, pc.get_nt_native_path ()),
+				  &recycler, TRUE);
+    }
   /* Shoot. */
   pfri = (PFILE_RENAME_INFORMATION) infobuf;
   pfri->ReplaceIfExists = TRUE;
@@ -461,6 +465,9 @@ try_to_bin (path_conv &pc, HANDLE &fh, ACCESS_MASK access, ULONG flags)
     }
   /* Moving to the bin worked. */
   bin_stat = has_been_moved;
+  /* If we're only moving a just created O_TMPFILE, we're done here. */
+  if (pc.file_attributes () & FILE_ATTRIBUTE_TEMPORARY)
+    goto out;
   /* Now we try to set the delete disposition.  If that worked, we're done.
      We try this here first, as long as we still have the open handle.
      Otherwise the below code closes the handle to allow replacing the file. */
