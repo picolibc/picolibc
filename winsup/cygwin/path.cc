@@ -1258,6 +1258,70 @@ path_conv::check (const char *src, unsigned opt,
   __endtry
 }
 
+struct pc_flat
+{
+  path_conv pc;
+  HANDLE hdl;
+  size_t name_len;
+  size_t posix_len;
+  char data[0];
+};
+
+void *
+path_conv::serialize (HANDLE h, unsigned int &n) const
+{
+  pc_flat *pcf;
+  size_t nlen = 0, plen = 0;
+  char *p;
+
+  if (path)
+    nlen = strlen (path) + 1;
+  if (posix_path)
+    plen = strlen (posix_path) + 1;
+  n = sizeof (pc_flat) + nlen + plen;
+  pcf = (pc_flat *) cmalloc (HEAP_COMMUNE, n);
+  if (!pcf)
+    {
+      n = 0;
+      return NULL;
+    }
+  memcpy (&pcf->pc, this, sizeof *this);
+  pcf->hdl = h;
+  pcf->name_len = nlen;
+  pcf->posix_len = plen;
+  p = pcf->data;
+  if (nlen)
+    p = stpcpy (p, path) + 1;
+  if (plen)
+    stpcpy (p, posix_path);
+  return pcf;
+}
+
+HANDLE
+path_conv::deserialize (void *bufp)
+{
+  pc_flat *pcf = (pc_flat *) bufp;
+  char *p;
+  HANDLE ret;
+
+  memcpy (this, &pcf->pc, sizeof *this);
+  wide_path = uni_path.Buffer = NULL;
+  uni_path.MaximumLength = uni_path.Length = 0;
+  path = posix_path = NULL;
+  p = pcf->data;
+  if (pcf->name_len)
+    {
+      set_path (p);
+      p += pcf->name_len;
+    }
+  if (pcf->posix_len)
+    set_posix (p);
+  dev.parse (pcf->pc.dev);
+  ret = pcf->hdl;
+  cfree (bufp);
+  return ret;
+}
+
 path_conv::~path_conv ()
 {
   if (posix_path)

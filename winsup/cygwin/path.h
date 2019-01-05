@@ -160,6 +160,9 @@ class path_conv
   int error;
   device dev;
 
+  void *serialize (HANDLE, unsigned int &) const;
+  HANDLE deserialize (void *);
+
   const char *known_suffix () { return suffix; }
   bool isremote () const {return fs.is_remote_drive ();}
   ULONG objcaseinsensitive () const {return caseinsensitive;}
