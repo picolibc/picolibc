@@ -271,7 +271,7 @@ try_to_bin (path_conv &pc, HANDLE &fh, ACCESS_MASK access, ULONG flags)
       if (RtlEqualUnicodeString (&fname, &recycler, TRUE))
 	goto out;
       /* Is fname really a subcomponent of the full path?  If not, there's
-	 a high probability we're acessing the file via a virtual drive
+	 a high probability we're accessing the file via a virtual drive
 	 created with "subst".  Check and accommodate it.  Note that we
 	 only get here if the virtual drive is really pointing to a local
 	 drive.  Otherwise pc.isremote () returns "true". */
@@ -313,7 +313,7 @@ try_to_bin (path_conv &pc, HANDLE &fh, ACCESS_MASK access, ULONG flags)
       /* Store length of recycler base dir, if it's necessary to create it. */
       recycler_base_len = recycler.Length;
       /* On NTFS or ReFS the recycler dir contains user specific subdirs, which
-	 are the actual recycle bins per user.  The name if this dir is the
+	 are the actual recycle bins per user.  The name of this dir is the
 	 string representation of the user SID. */
       if (fs_has_per_user_recycler)
 	{
