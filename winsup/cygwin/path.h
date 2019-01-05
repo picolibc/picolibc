@@ -83,7 +83,6 @@ enum path_types
   PATH_LNK		= 0x01000000,
   PATH_TEXT		= 0x02000000,
   PATH_REP		= 0x04000000,
-  PATH_HAS_SYMLINKS	= 0x10000000,
   PATH_SOCKET		= 0x40000000
 };
 
@@ -168,7 +167,6 @@ class path_conv
     return (path_flags & PATH_SPARSE)
 	   && (fs_flags () & FILE_SUPPORTS_SPARSE_FILES);
   }
-  int has_symlinks () const {return path_flags & PATH_HAS_SYMLINKS;}
   int has_dos_filenames_only () const {return path_flags & PATH_DOS;}
   int has_buggy_reopen () const {return fs.has_buggy_reopen ();}
   int has_buggy_fileid_dirinfo () const {return fs.has_buggy_fileid_dirinfo ();}
@@ -232,7 +230,6 @@ class path_conv
   }
 
   void set_symlink (DWORD n) {path_flags |= PATH_SYMLINK; symlink_length = n;}
-  void set_has_symlinks () {path_flags |= PATH_HAS_SYMLINKS;}
   void set_exec (int x = 1) {path_flags |= x ? PATH_EXEC : PATH_NOTEXEC;}
 
   void __reg3 check (const UNICODE_STRING *upath, unsigned opt = PC_SYM_FOLLOW,

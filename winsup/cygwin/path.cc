@@ -652,7 +652,6 @@ path_conv::check (const char *src, unsigned opt,
   char *THIS_path = tp.c_get ();
   symlink_info sym;
   bool need_directory = 0;
-  bool saw_symlinks = 0;
   bool add_ext = false;
   bool is_relpath;
   char *tail, *path_end;
@@ -1007,7 +1006,6 @@ path_conv::check (const char *src, unsigned opt,
 		 these operations again on the newly derived path. */
 	      else if (symlen > 0)
 		{
-		  saw_symlinks = 1;
 		  if (component == 0 && !need_directory
 		      && (!(opt & PC_SYM_FOLLOW)
 			  || (is_known_reparse_point ()
@@ -1227,9 +1225,6 @@ path_conv::check (const char *src, unsigned opt,
 		}
 	    }
 	}
-
-      if (saw_symlinks)
-	set_has_symlinks ();
 
       if (opt & PC_OPEN)
 	path_flags |= PATH_OPEN;
