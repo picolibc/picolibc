@@ -806,7 +806,7 @@ path_conv::check (const char *src, unsigned opt,
 			  fh->fill_filebuf ();
 			  symlen = sym.set (fh->get_filebuf ());
 			}
-		      else if (file_type == virt_fsdir && dev == FH_PROCESS)
+		      else if (file_type == virt_fsdir && dev == FH_PROCESSFD)
 			{
 			  /* FIXME: This is YA bad hack to workaround that
 			     we're checking for isvirtual_dev at this point.

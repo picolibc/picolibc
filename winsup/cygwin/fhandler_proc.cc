@@ -134,14 +134,22 @@ fhandler_proc::get_proc_fhandler (const char *path)
   if (entry)
     return entry->fhandler;
 
-  int pid = atoi (path);
+  char *e;
+  pid_t pid = strtoul (path, &e, 10);
+  if (*e != '/' && *e != '\0')
+    return FH_NADA;
   pinfo p (pid);
   /* If p->pid != pid, then pid is actually the Windows PID for an execed
      Cygwin process, and the pinfo entry is the additional entry created
      at exec time.  We don't want to enable the user to access a process
      entry by using the Win32 PID, though. */
   if (p && p->pid == pid)
-    return FH_PROCESS;
+    {
+      /* Check for entry in fd subdir */
+      if (!strncmp (++e, "fd/", 3) && e[3] != '\0')
+	return FH_PROCESSFD;
+      return FH_PROCESS;
+    }
 
   bool has_subdir = false;
   while (*path)
