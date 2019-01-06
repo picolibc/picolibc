@@ -33,6 +33,9 @@ What changed:
   Deleting an in-use file now actually removes the file, rather than moving
   it to the recycler bin.
 
+- open(..., O_TMPFILE) now moves the file to the trash bin immediately,
+  to free the parent directory.
+
 
 Bug Fixes
 ---------
@@ -44,3 +47,8 @@ Bug Fixes
   Addresses: https://cygwin.com/ml/cygwin/2018-11/msg00171.html
 
 - Fix a bug in recognizing remote FAT/FAT32/exFAT correctly.
+
+- Allow open(2)/stat(2)/linkat(2) of a file via /proc/PID/fd/DESCRIPTOR
+  even if file has been deleted.
+  Addresses: https://cygwin.com/ml/cygwin/2018-12/msg00125.html
+             https://cygwin.com/ml/cygwin/2018-12/msg00028.html
