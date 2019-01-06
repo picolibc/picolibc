@@ -69,6 +69,7 @@ enum path_types
   PATH_REP		= _BIT ( 3),
   PATH_SYMLINK		= _BIT ( 4),
   PATH_SOCKET		= _BIT ( 5),
+  PATH_RESOLVE_PROCFD	= _BIT ( 6),
   PATH_DONT_USE		= _BIT (31)	/* conversion to signed happens. */
 };
 
@@ -192,6 +193,7 @@ class path_conv
   int iscygexec () const {return mount_flags & MOUNT_CYGWIN_EXEC;}
   int isopen () const {return path_flags & PATH_OPEN;}
   int isctty_capable () const {return path_flags & PATH_CTTY;}
+  int follow_fd_symlink () const {return path_flags & PATH_RESOLVE_PROCFD;}
   void set_cygexec (bool isset)
   {
     if (isset)

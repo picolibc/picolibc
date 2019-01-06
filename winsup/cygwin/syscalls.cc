@@ -1398,13 +1398,13 @@ open (const char *unix_path, int flags, ...)
       if (fd < 0)
 	__leave;		/* errno already set */
 
+      int opt = PC_OPEN | PC_SYM_NOFOLLOW_PROCFD;
+      opt |= (flags & (O_NOFOLLOW | O_EXCL)) ? PC_SYM_NOFOLLOW
+					     : PC_SYM_FOLLOW;
       /* This is a temporary kludge until all utilities can catch up
 	 with a change in behavior that implements linux functionality:
 	 opening a tty should not automatically cause it to become the
 	 controlling tty for the process.  */
-      int opt = PC_OPEN | PC_SYM_NOFOLLOW_PROCFD;
-      opt |= (flags & (O_NOFOLLOW | O_EXCL)) ? PC_SYM_NOFOLLOW
-					     : PC_SYM_FOLLOW;
       if (!(flags & O_NOCTTY) && fd > 2 && myself->ctty != -2)
 	{
 	  flags |= O_NOCTTY;
@@ -1472,7 +1472,7 @@ open (const char *unix_path, int flags, ...)
 	  fh = fh_file;
 	}
 
-      if (fh->dev () == FH_PROCESSFD)
+      if (fh->dev () == FH_PROCESSFD && fh->pc.follow_fd_symlink ())
 	{
 	  /* Reopen file by descriptor */
 	  fh_file = fh->fd_reopen (flags);

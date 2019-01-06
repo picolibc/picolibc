@@ -850,7 +850,10 @@ path_conv::check (const char *src, unsigned opt,
 		      case virt_fdsymlink:
 			/* Allow open/linkat to do the right thing. */
 			if (opt & PC_SYM_NOFOLLOW_PROCFD)
-			  opt &= ~PC_SYM_FOLLOW;
+			  {
+			    opt &= ~PC_SYM_FOLLOW;
+			    sym.path_flags |= PATH_RESOLVE_PROCFD;
+			  }
 			/*FALLTHRU*/
 		      case virt_symlink:
 			goto is_virtual_symlink;
