@@ -29,7 +29,7 @@ details. */
 
 
 fhandler_base *
-fhandler_process_fd::fetch_fh (HANDLE &out_hdl)
+fhandler_process_fd::fetch_fh (HANDLE &out_hdl, uint32_t flags)
 {
   const char *path;
   char *e;
@@ -49,6 +49,12 @@ fhandler_process_fd::fetch_fh (HANDLE &out_hdl)
       cygheap_fdget cfd (fd, true);
       if (cfd < 0)
 	return NULL;
+      if ((flags & FFH_LINKAT)
+	 && (cfd->get_flags () & (O_TMPFILE | O_EXCL)) == (O_TMPFILE | O_EXCL))
+	{
+	  set_errno (ENOENT);
+	  return NULL;
+	}
       proc = GetCurrentProcess ();
       pc << cfd->pc;
       hdl = cfd->get_handle ();
@@ -68,10 +74,10 @@ fhandler_process_fd::fetch_fh (HANDLE &out_hdl)
 	  return NULL;
 	}
       size_t size;
-      void *buf = p->file_pathconv (fd, size);
+      void *buf = p->file_pathconv (fd, FFH_LINKAT, size);
       if (size == 0)
 	{
-	  set_errno (EPERM);
+	  set_errno (ENOENT);
 	  CloseHandle (proc);
 	  return NULL;
 	}
@@ -103,7 +109,7 @@ fhandler_process_fd::fd_reopen (int flags)
   fhandler_base *fh;
   HANDLE hdl;
 
-  fh = fetch_fh (hdl);
+  fh = fetch_fh (hdl, 0);
   if (!fh)
     return NULL;
   fh->set_io_handle (hdl);
@@ -126,7 +132,7 @@ fhandler_process_fd::fstat (struct stat *statbuf)
   fhandler_base *fh;
   HANDLE hdl;
 
-  fh = fetch_fh (hdl);
+  fh = fetch_fh (hdl, 0);
   if (!fh)
     return -1;
   fh->set_io_handle (hdl);
@@ -142,7 +148,7 @@ fhandler_process_fd::link (const char *newpath)
   fhandler_base *fh;
   HANDLE hdl;
 
-  fh = fetch_fh (hdl);
+  fh = fetch_fh (hdl, FFH_LINKAT);
   if (!fh)
     return -1;
   fh->set_io_handle (hdl);

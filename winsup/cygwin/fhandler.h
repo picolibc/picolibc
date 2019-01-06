@@ -2578,7 +2578,7 @@ class fhandler_process: public fhandler_proc
 
 class fhandler_process_fd : public fhandler_process
 {
-  fhandler_base *fetch_fh (HANDLE &);
+  fhandler_base *fetch_fh (HANDLE &, uint32_t);
 
  public:
   fhandler_process_fd () : fhandler_process () {}

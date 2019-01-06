@@ -73,6 +73,11 @@ enum path_types
   PATH_DONT_USE		= _BIT (31)	/* conversion to signed happens. */
 };
 
+enum fetch_fh_flags
+{
+  FFH_LINKAT	= (1 <<  0),
+};
+
 NTSTATUS file_get_fai (HANDLE, PFILE_ALL_INFORMATION);
 int check_reparse_point_target (HANDLE, bool, PREPARSE_DATA_BUFFER,
 				PUNICODE_STRING);

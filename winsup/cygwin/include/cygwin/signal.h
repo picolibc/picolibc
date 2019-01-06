@@ -187,7 +187,10 @@ struct _sigcommune
   void *_si_process_handle;
   __extension__ union
   {
-    int _si_fd;
+    struct {
+      int      _si_fd;
+      uint32_t _si_flags;
+    };
     int64_t _si_pipe_unique_id;
     char *_si_str;
   };

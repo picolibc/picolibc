@@ -660,9 +660,13 @@ commune_process (void *arg)
       {
 	sigproc_printf ("processing PICOM_FILE_PATHCONV");
 	int fd = si._si_commune._si_fd;
+	uint32_t flags = si._si_commune._si_flags;
 	unsigned int n = 0;
 	cygheap_fdget cfd (fd);
-	if (cfd >= 0)
+	if (cfd >= 0
+	    && (!(flags & FFH_LINKAT)
+		|| (cfd->get_flags () & (O_TMPFILE | O_EXCL))
+		    != (O_TMPFILE | O_EXCL)))
 	  {
 	    fhandler_base *fh = cfd;
 	    void *ser_buf = fh->pc.serialize (fh->get_handle (), n);
@@ -763,6 +767,7 @@ _pinfo::commune_request (__uint32_t code, ...)
     case PICOM_FD:
     case PICOM_FILE_PATHCONV:
       si._si_commune._si_fd = va_arg (args, int);
+      si._si_commune._si_flags = va_arg (args, uint32_t);
       break;
 
     break;
@@ -852,13 +857,13 @@ _pinfo::pipe_fhandler (int64_t unique_id, size_t &n)
 }
 
 void *
-_pinfo::file_pathconv (int fd, size_t &n)
+_pinfo::file_pathconv (int fd, uint32_t flags, size_t &n)
 {
   if (!pid)
     return NULL;
   if (pid == myself->pid)
     return NULL;
-  commune_result cr = commune_request (PICOM_FILE_PATHCONV, fd);
+  commune_result cr = commune_request (PICOM_FILE_PATHCONV, fd, flags);
   n = cr.n;
   return (void *) cr.s;
 }
