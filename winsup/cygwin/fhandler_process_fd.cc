@@ -7,26 +7,12 @@ Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
 #include "winsup.h"
-#include <stdlib.h>
-#include <stdio.h>
-#include <sys/cygwin.h>
-#include "cygerrno.h"
-#include "security.h"
 #include "path.h"
 #include "fhandler.h"
 #include "fhandler_virtual.h"
 #include "pinfo.h"
-#include "shared_info.h"
 #include "dtable.h"
 #include "cygheap.h"
-#include "ntdll.h"
-#include "cygtls.h"
-#include "mount.h"
-#include "tls_pbuf.h"
-#include <sys/sysmacros.h>
-#include <sys/param.h>
-#include <ctype.h>
-
 
 fhandler_base *
 fhandler_process_fd::fetch_fh (HANDLE &out_hdl, uint32_t flags)
