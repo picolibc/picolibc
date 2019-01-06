@@ -39,6 +39,8 @@ struct suffix_info
 
 extern suffix_info stat_suffixes[];
 
+/* DO NOT copy any of these files into the same set of flags as the
+   below path_types.  Ever. */
 enum pathconv_arg
 {
   PC_SYM_FOLLOW		= 0x0001,
@@ -76,7 +78,6 @@ enum path_types
   PATH_DOS		= MOUNT_DOS,
   PATH_IHASH		= MOUNT_IHASH,
   PATH_ALL_EXEC		= (PATH_CYGWIN_EXEC | PATH_EXEC),
-  PATH_NO_ACCESS_CHECK	= PC_NO_ACCESS_CHECK,
   PATH_CTTY		= 0x00400000,	/* could later be used as ctty */
   PATH_OPEN		= 0x00800000,	/* use open semantics */
   					/* FIXME?  PATH_OPEN collides with

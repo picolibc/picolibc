@@ -80,7 +80,8 @@ struct symlink_info
   char contents[SYMLINK_MAX + 1];
   char *ext_here;
   int extn;
-  unsigned pflags;
+  unsigned pflags;	/* path flags, i.e. mount flags, special files, ... */
+  unsigned pc_flags;	/* Relevant flags from caller of path_conv */
   DWORD fileattr;
   int issymlink;
   bool ext_tacked_on;
@@ -735,9 +736,10 @@ path_conv::check (const char *src, unsigned opt,
 
 	  int symlen = 0;
 
-	  for (unsigned pflags_or = opt & (PC_NO_ACCESS_CHECK | PC_KEEP_HANDLE);
+	  /* Make sure to check certain flags on last component only. */
+	  for (unsigned pc_flags = opt & (PC_NO_ACCESS_CHECK | PC_KEEP_HANDLE);
 	       ;
-	       pflags_or = 0)
+	       pc_flags = 0)
 	    {
 	      const suffix_info *suff;
 	      char *full_path;
@@ -764,7 +766,7 @@ path_conv::check (const char *src, unsigned opt,
 	      if (error)
 		return;
 
-	      sym.pflags |= pflags_or;
+	      sym.pc_flags = pc_flags;
 
 	      if (!dev.exists ())
 		{
@@ -1190,7 +1192,7 @@ path_conv::check (const char *src, unsigned opt,
 				  it will be figured out later by anything
 				  which cares about this. */
 	    }
-	  /* If the FS has been found to have unrelibale inodes, note
+	  /* If the FS has been found to have unreliable inodes, note
 	     that in path_flags. */
 	  if (!fs.hasgood_inode ())
 	    path_flags |= PATH_IHASH;
@@ -2721,7 +2723,8 @@ bool
 symlink_info::set_error (int in_errno)
 {
   bool res;
-  if (!(pflags & PATH_NO_ACCESS_CHECK) || in_errno == ENAMETOOLONG || in_errno == EIO)
+  if (!(pc_flags & PC_NO_ACCESS_CHECK)
+	|| in_errno == ENAMETOOLONG || in_errno == EIO)
     {
       error = in_errno;
       res = true;
@@ -3103,7 +3106,7 @@ restart:
 		 The handle has been opened with the FILE_OPEN_REPARSE_POINT
 		 flag, so it's a handle to the reparse point, not a handle
 		 to the volumes root dir. */
-	      pflags &= ~PC_KEEP_HANDLE;
+	      pc_flags &= ~PC_KEEP_HANDLE;
 	      /* Volume mount point:  The filesystem information for the top
 		 level directory should be for the volume top level directory,
 		 rather than for the reparse point itself.  So we fetch the
@@ -3202,7 +3205,7 @@ restart:
 
   if (h)
     {
-      if (pflags & PC_KEEP_HANDLE)
+      if (pc_flags & PC_KEEP_HANDLE)
 	conv_hdl.set (h);
       else
 	NtClose (h);
