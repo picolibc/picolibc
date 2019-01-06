@@ -524,16 +524,7 @@ static void
 set_flags (unsigned *flags, unsigned val)
 {
   *flags = val;
-  if (!(*flags & PATH_BINARY))
-    {
-      *flags |= PATH_TEXT;
-      debug_printf ("flags: text (%y)", *flags & (PATH_TEXT | PATH_BINARY));
-    }
-  else
-    {
-      *flags |= PATH_BINARY;
-      debug_printf ("flags: binary (%y)", *flags & (PATH_TEXT | PATH_BINARY));
-    }
+  debug_printf ("flags: binary (%y)", *flags & MOUNT_BINARY);
 }
 
 int
@@ -626,7 +617,7 @@ mount_info::conv_to_win32_path (const char *src_path, char *dst, device& dev,
       if (!strchr (src_path + 2, '/'))
 	{
 	  dev = *netdrive_dev;
-	  set_flags (flags, PATH_BINARY);
+	  set_flags (flags, MOUNT_BINARY);
 	}
       else
 	{
@@ -647,7 +638,7 @@ mount_info::conv_to_win32_path (const char *src_path, char *dst, device& dev,
       dev = fhandler_proc::get_proc_fhandler (src_path);
       if (dev == FH_NADA)
 	return ENOENT;
-      set_flags (flags, PATH_BINARY);
+      set_flags (flags, MOUNT_BINARY);
       if (isprocsys_dev (dev))
 	{
 	  if (src_path[procsys_len])
@@ -1008,7 +999,7 @@ mount_info::set_flags_from_win32_path (const char *p)
 			 mi.flags & MOUNT_NOPOSIX))
 	return mi.flags;
     }
-  return PATH_BINARY;
+  return MOUNT_BINARY;
 }
 
 inline char *
