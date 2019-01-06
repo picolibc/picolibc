@@ -2005,7 +2005,8 @@ extern "C" int
 stat64 (const char *__restrict name, struct stat *__restrict buf)
 {
   syscall_printf ("entering");
-  path_conv pc (name, PC_SYM_FOLLOW | PC_POSIX | PC_KEEP_HANDLE,
+  path_conv pc (name, PC_SYM_FOLLOW | PC_POSIX | PC_KEEP_HANDLE
+		      | PC_SYM_NOFOLLOW_PROCFD,
 		stat_suffixes);
   return stat_worker (pc, buf);
 }

@@ -2545,6 +2545,7 @@ class fhandler_registry: public fhandler_proc
 class pinfo;
 class fhandler_process: public fhandler_proc
 {
+ protected:
   pid_t pid;
   virtual_ftype_t fd_type;
  public:
@@ -2554,8 +2555,6 @@ class fhandler_process: public fhandler_proc
   int closedir (DIR *);
   int __reg3 readdir (DIR *, dirent *);
   int open (int flags, mode_t mode = 0);
-  virtual fhandler_base *fd_reopen (int);
-  int __reg2 link (const char *);
   int __reg2 fstat (struct stat *buf);
   bool fill_filebuf ();
 
@@ -2572,6 +2571,34 @@ class fhandler_process: public fhandler_proc
   {
     void *ptr = (void *) ccalloc (malloc_type, 1, sizeof (fhandler_process));
     fhandler_process *fh = new (ptr) fhandler_process (ptr);
+    copyto (fh);
+    return fh;
+  }
+};
+
+class fhandler_process_fd : public fhandler_process
+{
+  fhandler_base *fetch_fh (HANDLE &);
+
+ public:
+  fhandler_process_fd () : fhandler_process () {}
+  fhandler_process_fd (void *) {}
+
+  virtual fhandler_base *fd_reopen (int);
+  int __reg2 fstat (struct stat *buf);
+  virtual int __reg2 link (const char *);
+
+  void copyto (fhandler_base *x)
+  {
+    x->pc.free_strings ();
+    *reinterpret_cast<fhandler_process_fd *> (x) = *this;
+    x->reset (this);
+  }
+
+  fhandler_process_fd *clone (cygheap_types malloc_type = HEAP_FHANDLER)
+  {
+    void *ptr = (void *) ccalloc (malloc_type, 1, sizeof (fhandler_process_fd));
+    fhandler_process_fd *fh = new (ptr) fhandler_process_fd (ptr);
     copyto (fh);
     return fh;
   }
@@ -2638,6 +2665,7 @@ typedef union
   char __pipe[sizeof (fhandler_pipe)];
   char __proc[sizeof (fhandler_proc)];
   char __process[sizeof (fhandler_process)];
+  char __process_fd[sizeof (fhandler_process_fd)];
   char __procnet[sizeof (fhandler_procnet)];
   char __procsys[sizeof (fhandler_procsys)];
   char __procsysvipc[sizeof (fhandler_procsysvipc)];

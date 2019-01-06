@@ -288,6 +288,7 @@ DLL_OFILES:= \
 	fhandler_nodevice.o \
 	fhandler_proc.o \
 	fhandler_process.o \
+	fhandler_process_fd.o \
 	fhandler_procnet.o \
 	fhandler_procsys.o \
 	fhandler_procsysvipc.o \

@@ -552,8 +552,10 @@ fh_alloc (path_conv& pc)
 	  fh = cnew (fhandler_registry);
 	  break;
 	case FH_PROCESS:
-	case FH_PROCESSFD:
 	  fh = cnew (fhandler_process);
+	  break;
+	case FH_PROCESSFD:
+	  fh = cnew (fhandler_process_fd);
 	  break;
 	case FH_PROCNET:
 	  fh = cnew (fhandler_procnet);
