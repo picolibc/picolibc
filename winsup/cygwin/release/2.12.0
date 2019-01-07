@@ -20,6 +20,8 @@ What's new:
 
 - Support for exFAT.
 
+- Support Linux-specific open(2) flag O_PATH.
+
 
 What changed:
 -------------

@@ -426,6 +426,11 @@ fgetxattr (int fd, const char *name, void *value, size_t size)
   cygheap_fdget cfd (fd);
   if (cfd < 0)
     res = -1;
+  else if (cfd->get_flags () & O_PATH)
+    {
+      set_errno (EBADF);
+      res = -1;
+    }
   else
     res = cfd->fgetxattr (name, value, size);
   return res;
@@ -453,6 +458,11 @@ flistxattr (int fd, char *list, size_t size)
   cygheap_fdget cfd (fd);
   if (cfd < 0)
     res = -1;
+  else if (cfd->get_flags () & O_PATH)
+    {
+      set_errno (EBADF);
+      res = -1;
+    }
   else
     res = cfd->fgetxattr (NULL, list, size);
   return res;
@@ -523,6 +533,11 @@ fsetxattr (int fd, const char *name, const void *value, size_t size, int flags)
   cygheap_fdget cfd (fd);
   if (cfd < 0)
     res = -1;
+  else if (cfd->get_flags () & O_PATH)
+    {
+      set_errno (EBADF);
+      res = -1;
+    }
   else
     res = cfd->fsetxattr (name, value, size, flags);
   return res;
@@ -550,6 +565,11 @@ fremovexattr (int fd, const char *name)
   cygheap_fdget cfd (fd);
   if (cfd < 0)
     res = -1;
+  else if (cfd->get_flags () & O_PATH)
+    {
+      set_errno (EBADF);
+      res = -1;
+    }
   else
     res = cfd->fsetxattr (name, NULL, 0, 0);
   return res;

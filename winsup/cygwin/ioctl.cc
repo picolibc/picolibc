@@ -32,6 +32,11 @@ ioctl (int fd, int cmd, ...)
 
   debug_printf ("ioctl(fd %d, cmd %y)", fd, cmd);
   int res;
+  if (cfd->get_flags () & O_PATH)
+    {
+      set_errno (EBADF);
+      return -1;
+    }
   /* FIXME: This stinks.  There are collisions between cmd types
      depending on whether fd is associated with a pty master or not.
      Something to fix for Cygwin2.  CGF 2006-06-04 */

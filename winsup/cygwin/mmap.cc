@@ -930,6 +930,11 @@ mmap64 (void *addr, size_t len, int prot, int flags, int fd, off_t off)
       cygheap_fdget cfd (fd);
       if (cfd < 0)
 	goto out;
+      if (cfd->get_flags () & O_PATH)
+	{
+	  set_errno (EBADF);
+	  goto out;
+	}
 
       fh = cfd;
 

@@ -1193,7 +1193,8 @@ read (int fd, void *ptr, size_t len)
       if (cfd < 0)
 	__leave;
 
-      if ((cfd->get_flags () & O_ACCMODE) == O_WRONLY)
+      if ((cfd->get_flags () & O_PATH)
+	  || (cfd->get_flags () & O_ACCMODE) == O_WRONLY)
 	{
 	  set_errno (EBADF);
 	  __leave;
@@ -1235,7 +1236,8 @@ readv (int fd, const struct iovec *const iov, const int iovcnt)
 	  __leave;
 	}
 
-      if ((cfd->get_flags () & O_ACCMODE) == O_WRONLY)
+      if ((cfd->get_flags () & O_PATH)
+	  || (cfd->get_flags () & O_ACCMODE) == O_WRONLY)
 	{
 	  set_errno (EBADF);
 	  __leave;
@@ -1263,6 +1265,11 @@ pread (int fd, void *ptr, size_t len, off_t off)
   cygheap_fdget cfd (fd);
   if (cfd < 0)
     res = -1;
+  else if (cfd->get_flags () & O_PATH)
+    {
+      set_errno (EBADF);
+      res = -1;
+    }
   else
     res = cfd->pread (ptr, len, off);
 
@@ -1283,7 +1290,8 @@ write (int fd, const void *ptr, size_t len)
       if (cfd < 0)
 	__leave;
 
-      if ((cfd->get_flags () & O_ACCMODE) == O_RDONLY)
+      if ((cfd->get_flags () & O_PATH)
+	  || (cfd->get_flags () & O_ACCMODE) == O_RDONLY)
 	{
 	  set_errno (EBADF);
 	  __leave;
@@ -1326,7 +1334,8 @@ writev (const int fd, const struct iovec *const iov, const int iovcnt)
 	  __leave;
 	}
 
-      if ((cfd->get_flags () & O_ACCMODE) == O_RDONLY)
+      if ((cfd->get_flags () & O_PATH)
+	  || (cfd->get_flags () & O_ACCMODE) == O_RDONLY)
 	{
 	  set_errno (EBADF);
 	  __leave;
@@ -1358,6 +1367,11 @@ pwrite (int fd, void *ptr, size_t len, off_t off)
   cygheap_fdget cfd (fd);
   if (cfd < 0)
     res = -1;
+  else if (cfd->get_flags () & O_PATH)
+    {
+      set_errno (EBADF);
+      res = -1;
+    }
   else
     res = cfd->pwrite (ptr, len, off);
 
@@ -1397,6 +1411,11 @@ open (const char *unix_path, int flags, ...)
 
       if (fd < 0)
 	__leave;		/* errno already set */
+
+      /* When O_PATH is specified in flags, flag bits other than O_CLOEXEC,
+	 O_DIRECTORY, and O_NOFOLLOW are ignored. */
+      if (flags & O_PATH)
+	flags &= (O_PATH | O_CLOEXEC | O_DIRECTORY | O_NOFOLLOW);
 
       int opt = PC_OPEN | PC_SYM_NOFOLLOW_PROCFD;
       opt |= (flags & (O_NOFOLLOW | O_EXCL)) ? PC_SYM_NOFOLLOW
@@ -1685,6 +1704,11 @@ fchown32 (int fd, uid_t uid, gid_t gid)
       syscall_printf ("-1 = fchown (%d,...)", fd);
       return -1;
     }
+  else if (cfd->get_flags () & O_PATH)
+    {
+      set_errno (EBADF);
+      return -1;
+    }
 
   int res = cfd->fchown (uid, gid);
 
@@ -1754,6 +1778,11 @@ fchmod (int fd, mode_t mode)
   if (cfd < 0)
     {
       syscall_printf ("-1 = fchmod (%d, 0%o)", fd, mode);
+      return -1;
+    }
+  else if (cfd->get_flags () & O_PATH)
+    {
+      set_errno (EBADF);
       return -1;
     }
 

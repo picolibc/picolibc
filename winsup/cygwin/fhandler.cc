@@ -549,6 +549,9 @@ fhandler_base::open (int flags, mode_t mode)
 
   syscall_printf ("(%S, %y)", pc.get_nt_native_path (), flags);
 
+  if (flags & O_PATH)
+    query_open (query_read_attributes);
+
   /* Allow to reopen from handle.  This is utilized by
      open ("/proc/PID/fd/DESCRIPTOR", ...); */
   if (get_handle ())

@@ -35,6 +35,7 @@ extern "C" {
 #if defined (__CYGWIN__)
 #define	_FTMPFILE	0x800000
 #define	_FNOATIME	0x1000000
+#define	_FPATH		0x2000000
 #endif
 
 #define	O_ACCMODE	(O_RDONLY|O_WRONLY|O_RDWR)
@@ -80,6 +81,7 @@ extern "C" {
 #if __GNU_VISIBLE
 #define O_TMPFILE	_FTMPFILE
 #define O_NOATIME	_FNOATIME
+#define O_PATH		_FPATH
 #endif
 #endif
 
