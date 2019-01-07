@@ -287,6 +287,7 @@ DLL_OFILES:= \
 	fhandler_floppy.o \
 	fhandler_netdrive.o \
 	fhandler_nodevice.o \
+	fhandler_pipe.o \
 	fhandler_proc.o \
 	fhandler_process.o \
 	fhandler_process_fd.o \
@@ -349,7 +350,6 @@ DLL_OFILES:= \
 	passwd.o \
 	path.o \
 	pinfo.o \
-	pipe.o \
 	poll.o \
 	posix_ipc.o \
 	pseudo-reloc.o \
