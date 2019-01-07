@@ -4812,13 +4812,29 @@ linkat (int olddirfd, const char *oldpathname,
   tmp_pathbuf tp;
   __try
     {
-      if (flags & ~AT_SYMLINK_FOLLOW)
+      if (flags & ~(AT_SYMLINK_FOLLOW | AT_EMPTY_PATH))
 	{
 	  set_errno (EINVAL);
 	  __leave;
 	}
       char *oldpath = tp.c_get ();
-      if (gen_full_path_at (oldpath, olddirfd, oldpathname))
+      /* AT_EMPTY_PATH with an empty oldpathname is equivalent to
+
+	   linkat(AT_FDCWD, "/proc/self/fd/<olddirfd>", newdirfd,
+		  newname, AT_SYMLINK_FOLLOW);
+
+	 Convert the request accordingly. */
+      if ((flags & AT_EMPTY_PATH) && oldpathname && oldpathname[0] == '\0')
+	{
+	  if (olddirfd == AT_FDCWD)
+	    {
+	      set_errno (EPERM);
+	      __leave;
+	    }
+	  __small_sprintf (oldpath, "/proc/%d/fd/%d", myself->pid, olddirfd);
+	  flags = AT_SYMLINK_FOLLOW;
+	}
+      else if (gen_full_path_at (oldpath, olddirfd, oldpathname))
 	__leave;
       char *newpath = tp.c_get ();
       if (gen_full_path_at (newpath, newdirfd, newpathname))

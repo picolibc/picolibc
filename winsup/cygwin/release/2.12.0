@@ -22,6 +22,8 @@ What's new:
 
 - Support Linux-specific open(2) flag O_PATH.
 
+- Support Linux-specific linkat(2) flag AT_EMPTY_PATH.
+
 
 What changed:
 -------------

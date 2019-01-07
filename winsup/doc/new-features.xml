@@ -42,6 +42,10 @@ Support Linux-specific open(2) flag O_PATH.
 </para></listitem>
 
 <listitem><para>
+- Support Linux-specific linkat(2) flag AT_EMPTY_PATH.
+</para></listitem>
+
+<listitem><para>
 clock_nanosleep, pthread_condattr_setclock and timer_create now support
 all clocks, except CLOCK_PROCESS_CPUTIME_ID and CLOCK_THREAD_CPUTIME_ID.
 </para></listitem>
