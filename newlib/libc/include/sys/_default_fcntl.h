@@ -166,7 +166,9 @@ extern "C" {
 #define AT_SYMLINK_NOFOLLOW     2
 #define AT_SYMLINK_FOLLOW       4
 #define AT_REMOVEDIR            8
+#if __GNU_VISIBLE
 #define AT_EMPTY_PATH          16
+#endif
 #endif
 
 #if __BSD_VISIBLE
