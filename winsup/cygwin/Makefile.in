@@ -279,6 +279,7 @@ DLL_OFILES:= \
 	fhandler.o \
 	fhandler_clipboard.o \
 	fhandler_console.o \
+	fhandler_cygdrive.o \
 	fhandler_dev.o \
 	fhandler_disk_file.o \
 	fhandler_dsp.o \
