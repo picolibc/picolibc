@@ -693,6 +693,23 @@ fhandler_base::open (int flags, mode_t mode)
 
   status = NtCreateFile (&fh, access, &attr, &io, NULL, file_attributes, shared,
 			 create_disposition, options, p, plen);
+  /* Pre-W10, we can't open a file by handle with delete disposition
+     set, so we have to lie our ass off. */
+  if (get_handle () && status == STATUS_DELETE_PENDING)
+    {
+      BOOL ret = DuplicateHandle (GetCurrentProcess (), get_handle (),
+				  GetCurrentProcess (), &fh,
+				  access, !(flags & O_CLOEXEC), 0);
+      if (!ret)
+	ret = DuplicateHandle (GetCurrentProcess (), get_handle (),
+			       GetCurrentProcess (), &fh,
+			       0, !(flags & O_CLOEXEC),
+			       DUPLICATE_SAME_ACCESS);
+      if (!ret)
+	debug_printf ("DuplicateHandle after STATUS_DELETE_PENDING, %E");
+      else
+	status = STATUS_SUCCESS;
+    }
   if (!NT_SUCCESS (status))
     {
       /* Trying to create a directory should return EISDIR, not ENOENT. */
