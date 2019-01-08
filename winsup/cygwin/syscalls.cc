@@ -232,31 +232,6 @@ try_to_bin (path_conv &pc, HANDLE &fh, ACCESS_MASK access, ULONG flags)
      them into the recycler. */
   if (pfni->FileNameLength == 2) /* root dir. */
     goto out;
-  /* The recycler name is $Recycler.Bin by default.  If the recycler dir
-     disappeared for some reason, the shell32.dll recreates the directory in
-     all upper case.  So, we never know beforehand if the dir is written in
-     mixed case or in all upper case.  That's a problem when using
-     casesensitivity.  If the file handle given to FileRenameInformation
-     has been opened casesensitive, the call also handles the path to the
-     target dir casesensitive.  Rather than trying to find the right name
-     of the recycler, we just reopen the file to move with OBJ_CASE_INSENSITIVE,
-     so the subsequent FileRenameInformation works caseinsensitive in terms of
-     the recycler directory name, too. */
-  if (!pc.objcaseinsensitive ())
-    {
-      InitializeObjectAttributes (&attr, &ro_u_empty, OBJ_CASE_INSENSITIVE,
-				  fh, NULL);
-      status = NtOpenFile (&tmp_fh, access, &attr, &io, FILE_SHARE_VALID_FLAGS,
-			   flags);
-      if (!NT_SUCCESS (status))
-	debug_printf ("NtOpenFile (%S) for reopening caseinsensitive failed, "
-		      "status = %y", pc.get_nt_native_path (), status);
-      else
-	{
-	  NtClose (fh);
-	  fh = tmp_fh;
-	}
-    }
   /* Initialize recycler path. */
   RtlInitEmptyUnicodeString (&recycler, recyclerbuf, sizeof recyclerbuf);
   if (!pc.isremote ())
@@ -312,6 +287,36 @@ try_to_bin (path_conv &pc, HANDLE &fh, ACCESS_MASK access, ULONG flags)
       recycler.Length -= sizeof (WCHAR);
       /* Store length of recycler base dir, if it's necessary to create it. */
       recycler_base_len = recycler.Length;
+      /* The recycler name is $Recycler.Bin by default.  If the recycler dir
+	 disappears for some reason, shell32.dll recreates it in all upper
+	 case.  So we never know if the dir is written in camel back or in
+	 upper case.  That's a problem when using casesensitivity: If the
+	 file handle given to FileRenameInformation has been opened
+	 casesensitive, the call also handles the path to the target dir
+	 casesensitive.  Check for the right name here.
+
+	 Note that, originally, we reopened the file case insensitive instead.
+	 But that's a problem for O_TMPFILE on pre-W10.  As soon as the
+	 original HANDLE gets closed, delete-on-close is converted to full
+	 delete disposition and all useful operations on the file cease to
+	 work (STATUS_ACCESS_DENIED or STATUS_FILE_DELETED). */
+      if (!pc.objcaseinsensitive ())
+	{
+	  PFILE_BASIC_INFORMATION pfbi;
+
+	  InitializeObjectAttributes (&attr, &recycler, 0, rootdir, NULL);
+	  pfbi = (PFILE_BASIC_INFORMATION) infobuf;
+	  status = NtQueryAttributesFile (&attr, pfbi);
+	  if (status == STATUS_OBJECT_NAME_NOT_FOUND)
+	    {
+	      wcscpy (recycler.Buffer, L"$RECYCLE.BIN\\");
+	      status = NtQueryAttributesFile (&attr, pfbi);
+	      /* Keep the uppercase name if it exists, otherwise revert to
+		 camel back to create a nicer name than shell32.dll. */
+	      if (status == STATUS_OBJECT_NAME_NOT_FOUND)
+		wcscpy (recycler.Buffer, L"$Recycle.Bin\\");
+	    }
+	}
       /* On NTFS or ReFS the recycler dir contains user specific subdirs, which
 	 are the actual recycle bins per user.  The name of this dir is the
 	 string representation of the user SID. */
