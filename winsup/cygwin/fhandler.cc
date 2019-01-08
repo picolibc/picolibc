@@ -555,7 +555,11 @@ fhandler_base::open (int flags, mode_t mode)
   /* Allow to reopen from handle.  This is utilized by
      open ("/proc/PID/fd/DESCRIPTOR", ...); */
   if (get_handle ())
-    pc.init_reopen_attr (attr, get_handle ());
+    {
+      pc.init_reopen_attr (attr, get_handle ());
+      if (!(flags & O_CLOEXEC))
+	attr.Attributes |= OBJ_INHERIT;
+    }
   else
     pc.get_object_attr (attr, *sec_none_cloexec (flags));
 
