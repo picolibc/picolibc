@@ -195,6 +195,14 @@ enum bin_status
   dir_not_empty
 };
 
+/* Typically the recycler on drive C has been created at installation
+   time.  The name is then written in camel back.  On any other drive,
+   the recycler is created on first usage.  shell32.dll then creates
+   the recycler in all upper case.  That's only important if the entire
+   operation is running case sensitive. */
+static WCHAR recycler_basename_drive_c[] = L"\\$Recycle.Bin\\";
+static WCHAR recycler_basename_other[] = L"\\$RECYCLE.BIN\\";
+
 static bin_status
 try_to_bin (path_conv &pc, HANDLE &fh, ACCESS_MASK access, ULONG flags)
 {
@@ -205,6 +213,7 @@ try_to_bin (path_conv &pc, HANDLE &fh, ACCESS_MASK access, ULONG flags)
   HANDLE rootdir = NULL, recyclerdir = NULL, tmp_fh = NULL;
   USHORT recycler_base_len = 0, recycler_user_len = 0;
   UNICODE_STRING root, recycler, fname;
+  PWCHAR recycler_basename = NULL;
   WCHAR recyclerbuf[NAME_MAX + 1]; /* Enough for recycler + SID + filename */
   PFILE_NAME_INFORMATION pfni;
   PFILE_INTERNAL_INFORMATION pfii;
@@ -217,7 +226,8 @@ try_to_bin (path_conv &pc, HANDLE &fh, ACCESS_MASK access, ULONG flags)
   PBYTE infobuf = (PBYTE) tp.w_get ();
 
   pfni = (PFILE_NAME_INFORMATION) infobuf;
-  status = NtQueryInformationFile (fh, &io, pfni, 65536, FileNameInformation);
+  status = NtQueryInformationFile (fh, &io, pfni, NT_MAX_PATH * sizeof (WCHAR),
+				   FileNameInformation);
   if (!NT_SUCCESS (status))
     {
       debug_printf ("NtQueryInformationFile (%S, FileNameInformation) "
@@ -236,7 +246,11 @@ try_to_bin (path_conv &pc, HANDLE &fh, ACCESS_MASK access, ULONG flags)
   RtlInitEmptyUnicodeString (&recycler, recyclerbuf, sizeof recyclerbuf);
   if (!pc.isremote ())
     {
-      RtlAppendUnicodeToString (&recycler, L"\\$Recycle.Bin\\");
+      recycler_basename = wcsncmp (pc.get_nt_native_path ()->Buffer,
+				   L"\\??\\C:\\", 7)
+			  ? recycler_basename_other
+			  : recycler_basename_drive_c;
+      RtlAppendUnicodeToString (&recycler, recycler_basename);
       RtlInitCountedUnicodeString(&fname, pfni->FileName, pfni->FileNameLength);
       /* Is the file a subdir of the recycler? */
       if (RtlEqualUnicodePathPrefix (&fname, &recycler, TRUE))
@@ -287,36 +301,6 @@ try_to_bin (path_conv &pc, HANDLE &fh, ACCESS_MASK access, ULONG flags)
       recycler.Length -= sizeof (WCHAR);
       /* Store length of recycler base dir, if it's necessary to create it. */
       recycler_base_len = recycler.Length;
-      /* The recycler name is $Recycler.Bin by default.  If the recycler dir
-	 disappears for some reason, shell32.dll recreates it in all upper
-	 case.  So we never know if the dir is written in camel back or in
-	 upper case.  That's a problem when using casesensitivity: If the
-	 file handle given to FileRenameInformation has been opened
-	 casesensitive, the call also handles the path to the target dir
-	 casesensitive.  Check for the right name here.
-
-	 Note that, originally, we reopened the file case insensitive instead.
-	 But that's a problem for O_TMPFILE on pre-W10.  As soon as the
-	 original HANDLE gets closed, delete-on-close is converted to full
-	 delete disposition and all useful operations on the file cease to
-	 work (STATUS_ACCESS_DENIED or STATUS_FILE_DELETED). */
-      if (!pc.objcaseinsensitive ())
-	{
-	  PFILE_BASIC_INFORMATION pfbi;
-
-	  InitializeObjectAttributes (&attr, &recycler, 0, rootdir, NULL);
-	  pfbi = (PFILE_BASIC_INFORMATION) infobuf;
-	  status = NtQueryAttributesFile (&attr, pfbi);
-	  if (status == STATUS_OBJECT_NAME_NOT_FOUND)
-	    {
-	      wcscpy (recycler.Buffer, L"$RECYCLE.BIN\\");
-	      status = NtQueryAttributesFile (&attr, pfbi);
-	      /* Keep the uppercase name if it exists, otherwise revert to
-		 camel back to create a nicer name than shell32.dll. */
-	      if (status == STATUS_OBJECT_NAME_NOT_FOUND)
-		wcscpy (recycler.Buffer, L"$Recycle.Bin\\");
-	    }
-	}
       /* On NTFS or ReFS the recycler dir contains user specific subdirs, which
 	 are the actual recycle bins per user.  The name of this dir is the
 	 string representation of the user SID. */
@@ -376,7 +360,8 @@ try_to_bin (path_conv &pc, HANDLE &fh, ACCESS_MASK access, ULONG flags)
   status = NtSetInformationFile (fh, &io, pfri, frisiz, FileRenameInformation);
   if (status == STATUS_OBJECT_PATH_NOT_FOUND && !pc.isremote ())
     {
-      /* Ok, so the recycler and/or the recycler/SID directory don't exist.
+      /* The recycler and/or the recycler/SID directory don't exist, or the
+	 case of recycler dir has changed and the rename op is case sensitive.
 	 First reopen root dir with permission to create subdirs. */
       NtClose (rootdir);
       InitializeObjectAttributes (&attr, &root, OBJ_CASE_INSENSITIVE,
@@ -412,6 +397,26 @@ try_to_bin (path_conv &pc, HANDLE &fh, ACCESS_MASK access, ULONG flags)
 	  		&recycler, status);
 	  goto out;
 	}
+      /* If we opened the recycler (in contrast to creating it) and our
+	 rename op is case sensitive, fetch the actual case of the recycler
+	 and store the name in recycler_basename, as well as in pfri->FileName
+	 for the below 2nd try to rename the file. */
+      if (io.Information == FILE_OPENED && !pc.objcaseinsensitive ())
+	{
+	  pfni = (PFILE_NAME_INFORMATION) tp.w_get ();
+	  status = NtQueryInformationFile (recyclerdir, &io, pfni,
+					   NT_MAX_PATH * sizeof (WCHAR),
+					   FileNameInformation);
+	  if (NT_SUCCESS (status))
+	    {
+	      size_t len = pfni->FileNameLength / sizeof (WCHAR) - 1;
+	      PWCHAR p = pfni->FileName + 1;
+	      p[len] = L'\0';
+	      wcpncpy (pfri->FileName, p, len);
+	      wcpncpy (recycler_basename + 1, p, len);
+	    }
+	}
+
       /* Next, if necessary, check if the recycler/SID dir exists and
 	 create it if not. */
       if (fs_has_per_user_recycler)
