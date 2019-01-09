@@ -2216,6 +2216,7 @@ rename2 (const char *oldpath, const char *newpath, unsigned int at2flags)
   path_conv oldpc, newpc, new2pc, *dstpc, *removepc = NULL;
   bool old_dir_requested = false, new_dir_requested = false;
   bool old_explicit_suffix = false, new_explicit_suffix = false;
+  bool use_posix_semantics;
   bool noreplace = at2flags & RENAME_NOREPLACE;
   size_t olen, nlen;
   bool equal_path;
@@ -2511,10 +2512,18 @@ rename2 (const char *oldpath, const char *newpath, unsigned int at2flags)
 	  __leave;
 	}
 
+      /* POSIX semantics only on local NTFS drives. */
+      use_posix_semantics = wincap.has_posix_file_info ()
+			    && !oldpc.isremote ()
+			    && oldpc.fs_is_ntfs ();
+
       /* Opening the file must be part of the transaction.  It's not sufficient
 	 to call only NtSetInformationFile under the transaction.  Therefore we
-	 have to start the transaction here, if necessary. */
-      if ((dstpc->fs_flags () & FILE_SUPPORTS_TRANSACTIONS)
+	 have to start the transaction here, if necessary.  Don't start
+	 transaction on W10 1709 or later on local NTFS.  Use POSIX semantics
+	 instead. */
+      if (!use_posix_semantics
+	  && (dstpc->fs_flags () & FILE_SUPPORTS_TRANSACTIONS)
 	  && (dstpc->isdir ()
 	      || (!removepc && dstpc->has_attribute (FILE_ATTRIBUTE_READONLY))))
 	start_transaction (old_trans, trans);
@@ -2578,6 +2587,9 @@ rename2 (const char *oldpath, const char *newpath, unsigned int at2flags)
 	  __leave;
 	}
 
+      if (use_posix_semantics)
+	goto skip_pre_W10_checks;
+
       /* Renaming a dir to another, existing dir fails always, even if
 	 ReplaceIfExists is set to TRUE and the existing dir is empty.  So
 	 we have to remove the destination dir first.  This also covers the
@@ -2618,6 +2630,8 @@ rename2 (const char *oldpath, const char *newpath, unsigned int at2flags)
 	      __leave;
 	    }
 	}
+
+skip_pre_W10_checks:
 
       /* SUSv3: If the old argument and the new argument resolve to the same
 	 existing file, rename() shall return successfully and perform no
@@ -2666,7 +2680,13 @@ rename2 (const char *oldpath, const char *newpath, unsigned int at2flags)
 	  __leave;
 	}
       pfri = (PFILE_RENAME_INFORMATION) tp.w_get ();
-      pfri->ReplaceIfExists = !noreplace;
+      if (use_posix_semantics)
+	pfri->Flags = noreplace ? 0
+				: (FILE_RENAME_REPLACE_IF_EXISTS
+				   | FILE_RENAME_POSIX_SEMANTICS
+				   | FILE_RENAME_IGNORE_READONLY_ATTRIBUTE);
+      else
+	pfri->ReplaceIfExists = !noreplace;
       pfri->RootDirectory = NULL;
       pfri->FileNameLength = dstpc->get_nt_native_path ()->Length;
       memcpy (&pfri->FileName,  dstpc->get_nt_native_path ()->Buffer,
@@ -2677,7 +2697,9 @@ rename2 (const char *oldpath, const char *newpath, unsigned int at2flags)
 	 ERROR_ALREADY_EXISTS ==> Cygwin error EEXIST. */
       status = NtSetInformationFile (fh, &io, pfri,
 				     sizeof *pfri + pfri->FileNameLength,
-				     FileRenameInformation);
+				     use_posix_semantics
+				     ? FileRenameInformationEx
+				     : FileRenameInformation);
       /* This happens if the access rights don't allow deleting the destination.
 	 Even if the handle to the original file is opened with BACKUP
 	 and/or RECOVERY, these flags don't apply to the destination of the

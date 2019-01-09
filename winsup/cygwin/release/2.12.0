@@ -37,6 +37,10 @@ What changed:
   Deleting an in-use file now actually removes the file, rather than moving
   it to the recycler bin.
 
+- Use the new POSIX rename semantics on NTFS starting with Windows 10 1709.
+  Renaming a file to another in-use file now actually removes the other file,
+  rather than moving it to the recycler bin.
+
 - open(..., O_TMPFILE) now moves the file to the trash bin immediately,
   to free the parent directory.
 
