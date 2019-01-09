@@ -389,6 +389,8 @@ try_to_bin (path_conv &pc, HANDLE &fh, ACCESS_MASK access, ULONG flags)
 	  		&recycler, status);
 	  goto out;
 	}
+      /* Correct the rootdir HANDLE in pfri after reopening the dir. */
+      pfri->RootDirectory = rootdir;
       /* Then check if recycler exists by opening and potentially creating it.
 	 Yes, we can really do that.  Typically the recycle bin is created
 	 by the first user actually using the bin. */
