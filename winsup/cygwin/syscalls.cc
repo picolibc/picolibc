@@ -2209,14 +2209,14 @@ nt_path_has_executable_suffix (PUNICODE_STRING upath)
    of the rename is just to change the case of oldpath on a
    case-insensitive file system. */
 static int
-rename2 (const char *oldpath, const char *newpath, unsigned int flags)
+rename2 (const char *oldpath, const char *newpath, unsigned int at2flags)
 {
   tmp_pathbuf tp;
   int res = -1;
   path_conv oldpc, newpc, new2pc, *dstpc, *removepc = NULL;
   bool old_dir_requested = false, new_dir_requested = false;
   bool old_explicit_suffix = false, new_explicit_suffix = false;
-  bool noreplace = flags & RENAME_NOREPLACE;
+  bool noreplace = at2flags & RENAME_NOREPLACE;
   size_t olen, nlen;
   bool equal_path;
   NTSTATUS status = STATUS_SUCCESS;
@@ -2229,7 +2229,7 @@ rename2 (const char *oldpath, const char *newpath, unsigned int flags)
 
   __try
     {
-      if (flags & ~RENAME_NOREPLACE)
+      if (at2flags & ~RENAME_NOREPLACE)
 	/* RENAME_NOREPLACE is the only flag currently supported. */
 	{
 	  set_errno (EINVAL);
