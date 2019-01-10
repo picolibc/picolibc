@@ -832,9 +832,10 @@ class fhandler_socket_local: public fhandler_socket_wsock
 /* Sharable spinlock with low CPU profile.  These locks are NOT recursive! */
 class af_unix_spinlock_t
 {
-  LONG  locked;          /* 0 oder 1 */
+  LONG  locked;          /* 0 or 1 */
 
 public:
+  af_unix_spinlock_t () : locked (0) {}
   void lock ()
   {
     LONG ret = InterlockedExchange (&locked, 1);
