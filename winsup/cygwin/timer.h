@@ -35,7 +35,7 @@ class timer_tracker
   int clean_and_unhook ();
 
   DWORD thread_func ();
-  void fixup_after_fork ();
+  static void fixup_after_fork ();
 };
 
 #endif /* __TIMER_H__ */

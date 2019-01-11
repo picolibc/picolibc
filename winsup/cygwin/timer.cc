@@ -284,8 +284,8 @@ timer_tracker::clean_and_unhook ()
 void
 timer_tracker::fixup_after_fork ()
 {
-  hcancel = syncthread = NULL;
-  for (timer_tracker *tt = this; tt->next != NULL; /* nothing */)
+  ttstart.hcancel = ttstart.syncthread = NULL;
+  for (timer_tracker *tt = &ttstart; tt->next != NULL; /* nothing */)
     {
       timer_tracker *deleteme = tt->next;
       tt->next = deleteme->next;
@@ -297,7 +297,7 @@ timer_tracker::fixup_after_fork ()
 void
 fixup_timers_after_fork ()
 {
-  ttstart.fixup_after_fork ();
+  timer_tracker::fixup_after_fork ();
 }
 
 extern "C" int
