@@ -65,8 +65,16 @@ clock_nanosleep (clockid_t clk_id, int flags, const struct timespec *rqtp,
   sig_dispatch_pending ();
   pthread_testcancel ();
 
-  if (rqtp->tv_sec < 0 || rqtp->tv_nsec < 0 || rqtp->tv_nsec >= NSPERSEC)
-    return EINVAL;
+  __try
+    {
+      if (rqtp->tv_sec < 0 || rqtp->tv_nsec < 0 || rqtp->tv_nsec >= NSPERSEC)
+	return EINVAL;
+    }
+  __except (NO_ERROR)
+    {
+      return EFAULT;
+    }
+  __endtry
 
   /* Explicitly disallowed by POSIX. Needs to be checked first to avoid
      being caught by the following test. */
@@ -122,9 +130,17 @@ clock_nanosleep (clockid_t clk_id, int flags, const struct timespec *rqtp,
   /* according to POSIX, rmtp is used only if !abstime */
   if (rmtp && !abstime)
     {
-      rmtp->tv_sec = (time_t) (timeout.QuadPart / NS100PERSEC);
-      rmtp->tv_nsec = (long) ((timeout.QuadPart % NS100PERSEC)
-			      * (NSPERSEC/NS100PERSEC));
+      __try
+	{
+	  rmtp->tv_sec = (time_t) (timeout.QuadPart / NS100PERSEC);
+	  rmtp->tv_nsec = (long) ((timeout.QuadPart % NS100PERSEC)
+				  * (NSPERSEC/NS100PERSEC));
+	}
+      __except (NO_ERROR)
+	{
+	  res = EFAULT;
+	}
+      __endtry
     }
 
   syscall_printf ("%d = clock_nanosleep(%lu, %d, %ld.%09ld, %ld.%09.ld)",
