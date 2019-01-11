@@ -17,9 +17,11 @@ details. */
 #include <sys/param.h>
 
 #define TT_MAGIC 0x513e4a1c
-struct timer_tracker
+class timer_tracker
 {
   unsigned magic;
+  timer_tracker *next;
+
   clockid_t clock_id;
   sigevent evp;
   timespec it_interval;
@@ -27,13 +29,20 @@ struct timer_tracker
   HANDLE syncthread;
   long long interval_us;
   long long sleepto_us;
+
   bool cancel ();
-  struct timer_tracker *next;
-  int settime (int, const itimerspec *, itimerspec *);
-  void gettime (itimerspec *);
+
+ public:
   timer_tracker (clockid_t, const sigevent *);
   ~timer_tracker ();
-  friend void fixup_timers_after_fork ();
+  inline bool is_timer_tracker () { return magic == TT_MAGIC; }
+
+  void gettime (itimerspec *);
+  int settime (int, const itimerspec *, itimerspec *);
+  int clean_and_unhook ();
+
+  DWORD thread_func ();
+  void fixup_after_fork ();
 };
 
 timer_tracker NO_COPY ttstart (CLOCK_REALTIME, NULL);
@@ -115,66 +124,65 @@ timespec_to_us (const timespec& ts)
   return res;
 }
 
-static DWORD WINAPI
-timer_thread (VOID *x)
+DWORD
+timer_tracker::thread_func ()
 {
-  timer_tracker *tt = ((timer_tracker *) x);
   long long now;
-  long long sleepto_us =  tt->sleepto_us;
+  long long cur_sleepto_us = sleepto_us;
   while (1)
     {
       long long sleep_us;
       LONG sleep_ms;
       /* Account for delays in starting thread
 	and sending the signal */
-      now = get_clock (tt->clock_id)->usecs ();
-      sleep_us = sleepto_us - now;
+      now = get_clock (clock_id)->usecs ();
+      sleep_us = cur_sleepto_us - now;
       if (sleep_us > 0)
 	{
-	  tt->sleepto_us = sleepto_us;
+	  sleepto_us = cur_sleepto_us;
 	  sleep_ms = (sleep_us + (USPERSEC / MSPERSEC) - 1)
 		     / (USPERSEC / MSPERSEC);
 	}
       else
 	{
-	  tt->sleepto_us = now;
+	  sleepto_us = now;
 	  sleep_ms = 0;
 	}
 
-      debug_printf ("%p waiting for %u ms", x, sleep_ms);
-      switch (WaitForSingleObject (tt->hcancel, sleep_ms))
+      debug_printf ("%p waiting for %u ms", this, sleep_ms);
+      switch (WaitForSingleObject (hcancel, sleep_ms))
 	{
 	case WAIT_TIMEOUT:
 	  debug_printf ("timed out");
 	  break;
 	case WAIT_OBJECT_0:
-	  debug_printf ("%p cancelled", x);
+	  debug_printf ("%p cancelled", this);
 	  goto out;
 	default:
-	  debug_printf ("%p wait failed, %E", x);
+	  debug_printf ("%p wait failed, %E", this);
 	  goto out;
 	}
 
-      switch (tt->evp.sigev_notify)
+      switch (evp.sigev_notify)
 	{
 	case SIGEV_SIGNAL:
 	  {
 	    siginfo_t si = {0};
-	    si.si_signo = tt->evp.sigev_signo;
-	    si.si_sigval.sival_ptr = tt->evp.sigev_value.sival_ptr;
+	    si.si_signo = evp.sigev_signo;
+	    si.si_sigval.sival_ptr = evp.sigev_value.sival_ptr;
 	    si.si_code = SI_TIMER;
-	    debug_printf ("%p sending signal %d", x, tt->evp.sigev_signo);
+	    debug_printf ("%p sending signal %d", this, evp.sigev_signo);
 	    sig_send (myself_nowait, si);
 	    break;
 	  }
 	case SIGEV_THREAD:
 	  {
 	    pthread_t notify_thread;
-	    debug_printf ("%p starting thread", x);
+	    debug_printf ("%p starting thread", this);
 	    pthread_attr_t *attr;
 	    pthread_attr_t default_attr;
-	    if (tt->evp.sigev_notify_attributes)
-	      attr = tt->evp.sigev_notify_attributes;
+	    if (evp.sigev_notify_attributes)
+	      attr = evp.sigev_notify_attributes;
 	    else
 	      {
 		pthread_attr_init(attr = &default_attr);
@@ -182,8 +190,8 @@ timer_thread (VOID *x)
 	      }
 
 	    int rc = pthread_create (&notify_thread, attr,
-				     (void * (*) (void *)) tt->evp.sigev_notify_function,
-				     tt->evp.sigev_value.sival_ptr);
+			     (void * (*) (void *)) evp.sigev_notify_function,
+			     evp.sigev_value.sival_ptr);
 	    if (rc)
 	      {
 		debug_printf ("thread creation failed, %E");
@@ -193,16 +201,23 @@ timer_thread (VOID *x)
 	    break;
 	  }
 	}
-      if (!tt->interval_us)
+      if (!interval_us)
 	break;
 
-      sleepto_us = tt->sleepto_us + tt->interval_us;
+      cur_sleepto_us = sleepto_us + interval_us;
       debug_printf ("looping");
     }
 
 out:
   _my_tls._ctinfo->auto_release ();     /* automatically return the cygthread to the cygthread pool */
   return 0;
+}
+
+static DWORD WINAPI
+timer_thread (VOID *x)
+{
+  timer_tracker *tt = ((timer_tracker *) x);
+  return tt->thread_func ();
 }
 
 static inline bool
@@ -282,6 +297,37 @@ timer_tracker::gettime (itimerspec *ovalue)
     }
 }
 
+int
+timer_tracker::clean_and_unhook ()
+{
+  for (timer_tracker *tt = &ttstart; tt->next != NULL; tt = tt->next)
+    if (tt->next == this)
+      {
+	tt->next = this->next;
+	return 0;
+      }
+  return -1;
+}
+
+void
+timer_tracker::fixup_after_fork ()
+{
+  hcancel = syncthread = NULL;
+  for (timer_tracker *tt = this; tt->next != NULL; /* nothing */)
+    {
+      timer_tracker *deleteme = tt->next;
+      tt->next = deleteme->next;
+      deleteme->hcancel = deleteme->syncthread = NULL;
+      delete deleteme;
+    }
+}
+
+void
+fixup_timers_after_fork ()
+{
+  ttstart.fixup_after_fork ();
+}
+
 extern "C" int
 timer_gettime (timer_t timerid, struct itimerspec *ovalue)
 {
@@ -290,7 +336,7 @@ timer_gettime (timer_t timerid, struct itimerspec *ovalue)
   __try
     {
       timer_tracker *tt = (timer_tracker *) timerid;
-      if (tt->magic != TT_MAGIC)
+      if (!tt->is_timer_tracker ())
 	{
 	  set_errno (EINVAL);
 	  return -1;
@@ -342,7 +388,7 @@ timer_settime (timer_t timerid, int flags,
   __try
     {
       timer_tracker *tt = (timer_tracker *) timerid;
-      if (tt->magic != TT_MAGIC)
+      if (!tt->is_timer_tracker ())
 	{
 	  set_errno (EINVAL);
 	  __leave;
@@ -362,42 +408,25 @@ timer_delete (timer_t timerid)
   __try
     {
       timer_tracker *in_tt = (timer_tracker *) timerid;
-      if (in_tt->magic != TT_MAGIC)
+      if (!in_tt->is_timer_tracker ())
 	{
 	  set_errno (EINVAL);
 	  __leave;
 	}
 
       lock_timer_tracker here;
-      for (timer_tracker *tt = &ttstart; tt->next != NULL; tt = tt->next)
-	if (tt->next == in_tt)
-	  {
-	    tt->next = in_tt->next;
-	    delete in_tt;
-	    ret = 0;
-	    __leave;
-	  }
-      set_errno (EINVAL);
-      ret = 0;
+      if (in_tt->clean_and_unhook () == 0)
+	{
+	  delete in_tt;
+	  ret = 0;
+	}
+      else
+	set_errno (EINVAL);
     }
   __except (EFAULT) {}
   __endtry
   return ret;
 }
-
-void
-fixup_timers_after_fork ()
-{
-  ttstart.hcancel = ttstart.syncthread = NULL;
-  for (timer_tracker *tt = &ttstart; tt->next != NULL; /* nothing */)
-    {
-      timer_tracker *deleteme = tt->next;
-      tt->next = deleteme->next;
-      deleteme->hcancel = deleteme->syncthread = NULL;
-      delete deleteme;
-    }
-}
-
 
 extern "C" int
 setitimer (int which, const struct itimerval *__restrict value,
