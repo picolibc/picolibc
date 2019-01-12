@@ -1003,6 +1003,7 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     time
     timer_create		(see chapter "Implementation Notes")
     timer_delete
+    timer_getoverrun
     timer_gettime
     timer_settime
     times
@@ -1587,7 +1588,6 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     pthread_mutex_consistent
     putmsg
     setnetent
-    timer_getoverrun
     ulimit
     waitid
 </screen>

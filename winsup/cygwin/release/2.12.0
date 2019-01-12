@@ -24,6 +24,11 @@ What's new:
 
 - Support Linux-specific linkat(2) flag AT_EMPTY_PATH.
 
+- Support overrun counter for posix timers (via timer_getoverrun() or
+  siginfo_t::si_overrun).
+
+- New API: timer_getoverrun.
+
 
 What changed:
 -------------

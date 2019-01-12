@@ -22,6 +22,9 @@ class timer_tracker
   HANDLE syncthread;
   int64_t interval_us;
   int64_t sleepto_us;
+  LONG event_running;
+  LONG overrun_count_curr;
+  LONG64 overrun_count;
 
   bool cancel ();
 
@@ -29,10 +32,14 @@ class timer_tracker
   timer_tracker (clockid_t, const sigevent *);
   ~timer_tracker ();
   inline bool is_timer_tracker () const { return magic == TT_MAGIC; }
+  inline sigevent_t *sigevt () { return &evp; }
+  inline int getoverrun () const { return overrun_count_curr; }
 
   void gettime (itimerspec *);
   int settime (int, const itimerspec *, itimerspec *);
   int clean_and_unhook ();
+  LONG arm_event ();
+  LONG disarm_event ();
 
   DWORD thread_func ();
   static void fixup_after_fork ();

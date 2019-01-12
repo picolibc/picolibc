@@ -1484,6 +1484,7 @@ timegm NOSIGFE
 timelocal SIGFE
 timer_create SIGFE
 timer_delete SIGFE
+timer_getoverrun SIGFE
 timer_gettime SIGFE
 timer_settime SIGFE
 times SIGFE

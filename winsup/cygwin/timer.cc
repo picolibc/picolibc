@@ -17,6 +17,10 @@ details. */
 #include "timer.h"
 #include <sys/param.h>
 
+#define EVENT_DISARMED	 0
+#define EVENT_ARMED	-1
+#define EVENT_LOCK	 1
+
 timer_tracker NO_COPY ttstart (CLOCK_REALTIME, NULL);
 
 class lock_timer_tracker
@@ -79,6 +83,9 @@ timer_tracker::timer_tracker (clockid_t c, const sigevent *e)
   clock_id = c;
   magic = TT_MAGIC;
   hcancel = NULL;
+  event_running = EVENT_DISARMED;
+  overrun_count_curr = 0;
+  overrun_count = 0;
   if (this != &ttstart)
     {
       lock_timer_tracker here;
@@ -94,6 +101,57 @@ timespec_to_us (const timespec& ts)
   res *= USPERSEC;
   res += (ts.tv_nsec + (NSPERSEC/USPERSEC) - 1) / (NSPERSEC/USPERSEC);
   return res;
+}
+
+/* Returns 0 if arming successful, -1 if a signal is already queued.
+   If so, it also increments overrun_count. */
+LONG
+timer_tracker::arm_event ()
+{
+  LONG ret;
+
+  while ((ret = InterlockedCompareExchange (&event_running, EVENT_ARMED,
+					    EVENT_DISARMED)) == EVENT_LOCK)
+    yield ();
+  if (ret == EVENT_ARMED)
+    InterlockedIncrement64 (&overrun_count);
+  return ret;
+}
+
+LONG
+timer_tracker::disarm_event ()
+{
+  LONG ret;
+
+  while ((ret = InterlockedCompareExchange (&event_running, EVENT_LOCK,
+					    EVENT_ARMED)) == EVENT_LOCK)
+    yield ();
+  if (ret == EVENT_ARMED)
+    {
+      LONG64 ov_cnt;
+
+      InterlockedExchange64 (&ov_cnt, overrun_count);
+      if (ov_cnt > DELAYTIMER_MAX || ov_cnt < 0)
+	overrun_count_curr = DELAYTIMER_MAX;
+      else
+	overrun_count_curr = ov_cnt;
+      ret = overrun_count_curr;
+      InterlockedExchange64 (&overrun_count, 0);
+      InterlockedExchange (&event_running, EVENT_DISARMED);
+    }
+  return ret;
+}
+
+static void *
+notify_thread_wrapper (void *arg)
+{
+  timer_tracker *tt = (timer_tracker *) arg;
+  sigevent_t *evt = tt->sigevt ();
+  void * (*notify_func) (void *) = (void * (*) (void *))
+				   evt->sigev_notify_function;
+
+  tt->disarm_event ();
+  return notify_func (evt->sigev_value.sival_ptr);
 }
 
 DWORD
@@ -117,7 +175,10 @@ timer_tracker::thread_func ()
 	}
       else
 	{
-	  sleepto_us = now;
+	  int64_t num_intervals = (now - cur_sleepto_us) / interval_us;
+	  InterlockedAdd64 (&overrun_count, num_intervals);
+	  cur_sleepto_us += num_intervals * interval_us;
+	  sleepto_us = cur_sleepto_us;
 	  sleep_ms = 0;
 	}
 
@@ -139,16 +200,27 @@ timer_tracker::thread_func ()
 	{
 	case SIGEV_SIGNAL:
 	  {
+	    if (arm_event ())
+	      {
+		debug_printf ("%p timer signal already queued", this);
+		break;
+	      }
 	    siginfo_t si = {0};
 	    si.si_signo = evp.sigev_signo;
-	    si.si_sigval.sival_ptr = evp.sigev_value.sival_ptr;
 	    si.si_code = SI_TIMER;
+	    si.si_tid = (timer_t) this;
+	    si.si_sigval.sival_ptr = evp.sigev_value.sival_ptr;
 	    debug_printf ("%p sending signal %d", this, evp.sigev_signo);
 	    sig_send (myself_nowait, si);
 	    break;
 	  }
 	case SIGEV_THREAD:
 	  {
+	    if (arm_event ())
+	      {
+		debug_printf ("%p timer thread already queued", this);
+		break;
+	      }
 	    pthread_t notify_thread;
 	    debug_printf ("%p starting thread", this);
 	    pthread_attr_t *attr;
@@ -160,16 +232,13 @@ timer_tracker::thread_func ()
 		pthread_attr_init(attr = &default_attr);
 		pthread_attr_setdetachstate (attr, PTHREAD_CREATE_DETACHED);
 	      }
-
 	    int rc = pthread_create (&notify_thread, attr,
-			     (void * (*) (void *)) evp.sigev_notify_function,
-			     evp.sigev_value.sival_ptr);
+				     notify_thread_wrapper, this);
 	    if (rc)
 	      {
 		debug_printf ("thread creation failed, %E");
 		return 0;
 	      }
-	    // FIXME: pthread_join?
 	    break;
 	  }
 	}
@@ -219,9 +288,6 @@ timer_tracker::settime (int in_flags, const itimerspec *value, itimerspec *ovalu
       if (timespec_bad (value->it_value) || timespec_bad (value->it_interval))
 	__leave;
 
-      long long now = in_flags & TIMER_ABSTIME ?
-		      0 : get_clock (clock_id)->usecs ();
-
       lock_timer_tracker here;
       cancel ();
 
@@ -232,8 +298,23 @@ timer_tracker::settime (int in_flags, const itimerspec *value, itimerspec *ovalu
 	interval_us = sleepto_us = 0;
       else
 	{
-	  sleepto_us = now + timespec_to_us (value->it_value);
 	  interval_us = timespec_to_us (value->it_interval);
+	  if (in_flags & TIMER_ABSTIME)
+	    {
+	      int64_t now = get_clock (clock_id)->usecs ();
+
+	      sleepto_us = timespec_to_us (value->it_value);
+	      if (sleepto_us <= now)
+		{
+		  int64_t ov_cnt = (now - sleepto_us + (interval_us + 1))
+				   / interval_us;
+		  InterlockedAdd64 (&overrun_count, ov_cnt);
+		  sleepto_us += ov_cnt * interval_us;
+		}
+	    }
+	  else
+	    sleepto_us = get_clock (clock_id)->usecs ()
+			 + timespec_to_us (value->it_value);
 	  it_interval = value->it_interval;
 	  if (!hcancel)
 	    hcancel = CreateEvent (&sec_none_nih, TRUE, FALSE, NULL);
@@ -285,6 +366,9 @@ void
 timer_tracker::fixup_after_fork ()
 {
   ttstart.hcancel = ttstart.syncthread = NULL;
+  ttstart.event_running = EVENT_DISARMED;
+  ttstart.overrun_count_curr = 0;
+  ttstart.overrun_count = 0;
   for (timer_tracker *tt = &ttstart; tt->next != NULL; /* nothing */)
     {
       timer_tracker *deleteme = tt->next;
@@ -366,6 +450,26 @@ timer_settime (timer_t timerid, int flags,
 	  __leave;
 	}
       ret = tt->settime (flags, value, ovalue);
+    }
+  __except (EFAULT) {}
+  __endtry
+  return ret;
+}
+
+extern "C" int
+timer_getoverrun (timer_t timerid)
+{
+  int ret = -1;
+
+  __try
+    {
+      timer_tracker *tt = (timer_tracker *) timerid;
+      if (!tt->is_timer_tracker ())
+	{
+	  set_errno (EINVAL);
+	  __leave;
+	}
+      ret = tt->getoverrun ();
     }
   __except (EFAULT) {}
   __endtry

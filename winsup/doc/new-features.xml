@@ -46,6 +46,15 @@ Support Linux-specific open(2) flag O_PATH.
 </para></listitem>
 
 <listitem><para>
+Support overrun counter for posix timers (via timer_getoverrun() or
+siginfo_t::si_overrun).
+</para></listitem>
+
+<listitem><para>
+New API: timer_getoverrun.
+</para></listitem>
+
+<listitem><para>
 clock_nanosleep, pthread_condattr_setclock and timer_create now support
 all clocks, except CLOCK_PROCESS_CPUTIME_ID and CLOCK_THREAD_CPUTIME_ID.
 </para></listitem>
