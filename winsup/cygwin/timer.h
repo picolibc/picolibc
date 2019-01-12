@@ -1,4 +1,4 @@
-/* timer.h: Define class timer_tracker, base class for timer handling
+/* timer.h: Define class timer_tracker, base class for posix timers
 
 This file is part of Cygwin.
 
@@ -20,15 +20,15 @@ class timer_tracker
   timespec it_interval;
   HANDLE hcancel;
   HANDLE syncthread;
-  long long interval_us;
-  long long sleepto_us;
+  int64_t interval_us;
+  int64_t sleepto_us;
 
   bool cancel ();
 
  public:
   timer_tracker (clockid_t, const sigevent *);
   ~timer_tracker ();
-  inline bool is_timer_tracker () { return magic == TT_MAGIC; }
+  inline bool is_timer_tracker () const { return magic == TT_MAGIC; }
 
   void gettime (itimerspec *);
   int settime (int, const itimerspec *, itimerspec *);

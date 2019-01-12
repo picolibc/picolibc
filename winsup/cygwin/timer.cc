@@ -1,4 +1,4 @@
-/* timer.cc
+/* timer.cc: posix timers
 
 This file is part of Cygwin.
 
@@ -87,10 +87,10 @@ timer_tracker::timer_tracker (clockid_t c, const sigevent *e)
     }
 }
 
-static inline long long
+static inline int64_t
 timespec_to_us (const timespec& ts)
 {
-  long long res = ts.tv_sec;
+  int64_t res = ts.tv_sec;
   res *= USPERSEC;
   res += (ts.tv_nsec + (NSPERSEC/USPERSEC) - 1) / (NSPERSEC/USPERSEC);
   return res;
@@ -99,11 +99,11 @@ timespec_to_us (const timespec& ts)
 DWORD
 timer_tracker::thread_func ()
 {
-  long long now;
-  long long cur_sleepto_us = sleepto_us;
+  int64_t now;
+  int64_t cur_sleepto_us = sleepto_us;
   while (1)
     {
-      long long sleep_us;
+      int64_t sleep_us;
       LONG sleep_ms;
       /* Account for delays in starting thread
 	and sending the signal */
@@ -260,8 +260,8 @@ timer_tracker::gettime (itimerspec *ovalue)
   else
     {
       ovalue->it_interval = it_interval;
-      long long now = get_clock (clock_id)->usecs ();
-      long long left_us = sleepto_us - now;
+      int64_t now = get_clock (clock_id)->usecs ();
+      int64_t left_us = sleepto_us - now;
       if (left_us < 0)
        left_us = 0;
       ovalue->it_value.tv_sec = left_us / USPERSEC;
