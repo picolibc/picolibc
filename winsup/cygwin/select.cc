@@ -164,17 +164,20 @@ select (int maxfds, fd_set *readfds, fd_set *writefds, fd_set *exceptfds,
   select_stuff sel;
   sel.return_on_signal = 0;
 
-  /* Allocate some fd_set structures using the number of fds as a guide. */
-  fd_set *r = allocfd_set (maxfds);
-  fd_set *w = allocfd_set (maxfds);
-  fd_set *e = allocfd_set (maxfds);
+  /* Allocate fd_set structures to store incoming fd sets. */
+  fd_set *readfds_in = allocfd_set (maxfds);
+  fd_set *writefds_in = allocfd_set (maxfds);
+  fd_set *exceptfds_in = allocfd_set (maxfds);
+  memcpy (readfds_in, readfds, sizeof_fd_set (maxfds));
+  memcpy (writefds_in, writefds, sizeof_fd_set (maxfds));
+  memcpy (exceptfds_in, exceptfds, sizeof_fd_set (maxfds));
 
   do
     {
       /* Build the select record per fd linked list and set state as
 	 needed. */
       for (int i = 0; i < maxfds; i++)
-	if (!sel.test_and_set (i, readfds, writefds, exceptfds))
+	if (!sel.test_and_set (i, readfds_in, writefds_in, exceptfds_in))
 	  {
 	    select_printf ("aborting due to test_and_set error");
 	    return -1;	/* Invalid fd, maybe? */
@@ -186,7 +189,7 @@ select (int maxfds, fd_set *readfds, fd_set *writefds, fd_set *exceptfds,
 	wait_state = select_stuff::select_ok;
       else
 	/* wait for an fd to become active or time out */
-	wait_state = sel.wait (r, w, e, us);
+	wait_state = sel.wait (readfds, writefds, exceptfds, us);
 
       select_printf ("sel.wait returns %d", wait_state);
 

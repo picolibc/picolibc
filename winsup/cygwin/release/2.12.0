@@ -65,3 +65,5 @@ Bug Fixes
   even if file has been deleted.
   Addresses: https://cygwin.com/ml/cygwin/2018-12/msg00125.html
              https://cygwin.com/ml/cygwin/2018-12/msg00028.html
+
+- Fix a bug in select(2) when polling HANDLE-less descriptors.
