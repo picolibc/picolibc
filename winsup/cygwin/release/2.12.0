@@ -49,6 +49,8 @@ What changed:
 - open(..., O_TMPFILE) now moves the file to the trash bin immediately,
   to free the parent directory.
 
+- Wctype functions updated to Unicode 11.0.
+
 
 Bug Fixes
 ---------
@@ -67,3 +69,6 @@ Bug Fixes
              https://cygwin.com/ml/cygwin/2018-12/msg00028.html
 
 - Fix a bug in select(2) when polling HANDLE-less descriptors.
+
+- Fix WEOF handling in wctype functions.
+  Addresses: https://cygwin.com/ml/cygwin/2018-12/msg00173.html

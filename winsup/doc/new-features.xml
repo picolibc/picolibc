@@ -80,6 +80,10 @@ open(..., O_TMPFILE) now moves the file to the trash bin immediately,
 to free the parent directory.
 </para></listitem>
 
+<listitem><para>
+Wctype functions updated to Unicode 11.0.
+</para></listitem>
+
 </itemizedlist>
 
 </sect2>
