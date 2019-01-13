@@ -69,6 +69,13 @@ fhandler_process_fd::fetch_fh (HANDLE &out_hdl, uint32_t flags)
 	}
       hdl = pc.deserialize (buf);
     }
+  if (hdl == NULL)
+    {
+      if (proc != GetCurrentProcess ())
+	CloseHandle (proc);
+      set_errno (EACCES);
+      return NULL;
+    }
   BOOL ret = DuplicateHandle (proc, hdl, GetCurrentProcess (), &hdl,
 			      0, FALSE, DUPLICATE_SAME_ACCESS);
   if (proc != GetCurrentProcess ())
