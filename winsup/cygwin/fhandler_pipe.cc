@@ -73,10 +73,10 @@ fhandler_pipe::open (int flags, mode_t mode)
   bool inh;
   bool got_one = false;
 
-  if (sscanf (get_name (), "/proc/self/fd/pipe:[%lld]",
+  if (sscanf (get_name (), "/proc/self/fd/pipe:[%llu]",
 	      (long long *) &uniq_id) == 1)
     pid = myself->pid;
-  else if (sscanf (get_name (), "/proc/%d/fd/pipe:[%lld]",
+  else if (sscanf (get_name (), "/proc/%d/fd/pipe:[%llu]",
 		   &pid, (long long *) &uniq_id) < 2)
     {
       set_errno (ENOENT);
@@ -184,7 +184,7 @@ fhandler_pipe::ftruncate (off_t length, bool allow_truncate)
 char *
 fhandler_pipe::get_proc_fd_name (char *buf)
 {
-  __small_sprintf (buf, "pipe:[%D]", get_plain_ino ());
+  __small_sprintf (buf, "pipe:[%U]", get_plain_ino ());
   return buf;
 }
 
@@ -424,7 +424,7 @@ fhandler_pipe::fstat (struct stat *buf)
     {
       buf->st_dev = FH_PIPE;
       if (!(buf->st_ino = get_plain_ino ()))
-	sscanf (get_name (), "/proc/%*d/fd/pipe:[%lld]",
+	sscanf (get_name (), "/proc/%*d/fd/pipe:[%llu]",
 			     (long long *) &buf->st_ino);
     }
   return ret;
