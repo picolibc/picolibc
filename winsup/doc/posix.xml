@@ -1378,6 +1378,7 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     scandirat
     sched_getcpu
     setxattr
+    signalfd
     sincos
     sincosf
     sincosl

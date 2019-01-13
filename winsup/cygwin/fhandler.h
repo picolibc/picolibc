@@ -420,6 +420,7 @@ public:
   virtual class fhandler_socket *is_socket () { return NULL; }
   virtual class fhandler_socket_wsock *is_wsock_socket () { return NULL; }
   virtual class fhandler_console *is_console () { return 0; }
+  virtual class fhandler_signalfd *is_signalfd () { return NULL; }
   virtual int is_windows () {return 0; }
 
   virtual void __reg3 raw_read (void *ptr, size_t& ulen);
@@ -2633,6 +2634,44 @@ class fhandler_procnet: public fhandler_proc
   }
 };
 
+class fhandler_signalfd : public fhandler_base
+{
+  sigset_t sigset;
+
+ public:
+  fhandler_signalfd ();
+  fhandler_signalfd (void *) {}
+
+  fhandler_signalfd *is_signalfd () { return this; }
+
+  char *get_proc_fd_name (char *buf);
+
+  int signalfd (const sigset_t *mask, int flags);
+  int __reg2 fstat (struct stat *buf);
+  void __reg3 read (void *ptr, size_t& len);
+
+  int poll ();
+
+  select_record *select_read (select_stuff *);
+  select_record *select_write (select_stuff *);
+  select_record *select_except (select_stuff *);
+
+  void copyto (fhandler_base *x)
+  {
+    x->pc.free_strings ();
+    *reinterpret_cast<fhandler_signalfd *> (x) = *this;
+    x->reset (this);
+  }
+
+  fhandler_signalfd *clone (cygheap_types malloc_type = HEAP_FHANDLER)
+  {
+    void *ptr = (void *) ccalloc (malloc_type, 1, sizeof (fhandler_signalfd));
+    fhandler_signalfd *fh = new (ptr) fhandler_signalfd (ptr);
+    copyto (fh);
+    return fh;
+  }
+};
+
 struct fhandler_nodevice: public fhandler_base
 {
   fhandler_nodevice ();
@@ -2672,6 +2711,7 @@ typedef union
   char __pty_master[sizeof (fhandler_pty_master)];
   char __registry[sizeof (fhandler_registry)];
   char __serial[sizeof (fhandler_serial)];
+  char __signalfd[sizeof (fhandler_signalfd)];
   char __socket_inet[sizeof (fhandler_socket_inet)];
   char __socket_local[sizeof (fhandler_socket_local)];
 #ifdef __WITH_AF_UNIX

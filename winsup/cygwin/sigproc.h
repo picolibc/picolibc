@@ -79,6 +79,7 @@ void __stdcall sigalloc ();
 int kill_pgrp (pid_t, siginfo_t&);
 void __reg1 exit_thread (DWORD) __attribute__ ((noreturn));
 void __reg1 setup_signal_exit (int);
+int sigwait_common (const sigset_t *, siginfo_t *, PLARGE_INTEGER);
 
 class no_thread_exit_protect
 {

@@ -1731,3 +1731,68 @@ fhandler_windows::select_except (select_stuff *ss)
   s->windows_handle = true;
   return s;
 }
+
+static int
+peek_signalfd (select_record *me, bool)
+{
+  if (((fhandler_signalfd *) me->fh)->poll () == 0)
+    {
+      select_printf ("signalfd %d ready", me->fd);
+      return 1;
+    }
+
+  select_printf ("signalfd %d not ready", me->fd);
+  return 0;
+}
+
+static int
+verify_signalfd (select_record *me, fd_set *rfds, fd_set *wfds,
+		fd_set *efds)
+{
+  return peek_signalfd (me, true);
+}
+
+select_record *
+fhandler_signalfd::select_read (select_stuff *ss)
+{
+  select_record *s = ss->start.next;
+  if (!s->startup)
+    {
+      s->startup = no_startup;
+    }
+  s->verify = verify_signalfd;
+  s->peek = peek_signalfd;
+  s->read_selected = true;
+  s->read_ready = true;
+  return s;
+}
+
+select_record *
+fhandler_signalfd::select_write (select_stuff *ss)
+{
+  select_record *s = ss->start.next;
+  if (!s->startup)
+    {
+      s->startup = no_startup;
+      s->verify = no_verify;
+    }
+  s->peek = NULL;
+  s->write_selected = false;
+  s->write_ready = false;
+  return s;
+}
+
+select_record *
+fhandler_signalfd::select_except (select_stuff *ss)
+{
+  select_record *s = ss->start.next;
+  if (!s->startup)
+    {
+      s->startup = no_startup;
+      s->verify = no_verify;
+    }
+  s->peek = NULL;
+  s->except_selected = false;
+  s->except_ready = false;
+  return s;
+}

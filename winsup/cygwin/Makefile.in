@@ -298,6 +298,7 @@ DLL_OFILES:= \
 	fhandler_raw.o \
 	fhandler_registry.o \
 	fhandler_serial.o \
+	fhandler_signalfd.o \
 	fhandler_socket.o \
 	fhandler_socket_inet.o \
 	fhandler_socket_local.o \

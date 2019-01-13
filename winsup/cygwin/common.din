@@ -1333,6 +1333,7 @@ siginterrupt SIGFE
 sigismember SIGFE
 siglongjmp NOSIGFE
 signal SIGFE
+signalfd SIGFE
 significand NOSIGFE
 significandf NOSIGFE
 sigpause SIGFE

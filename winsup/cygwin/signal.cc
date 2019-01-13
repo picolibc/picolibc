@@ -12,6 +12,7 @@ details. */
 #include "winsup.h"
 #include <stdlib.h>
 #include <sys/cygwin.h>
+#include <sys/signalfd.h>
 #include "pinfo.h"
 #include "sigproc.h"
 #include "cygtls.h"
@@ -592,7 +593,7 @@ siginterrupt (int sig, int flag)
   return res;
 }
 
-static inline int
+int
 sigwait_common (const sigset_t *set, siginfo_t *info, PLARGE_INTEGER waittime)
 {
   int res = -1;
@@ -780,4 +781,63 @@ sigaltstack (const stack_t *ss, stack_t *oss)
     }
   __endtry
   return 0;
+}
+
+extern "C" int
+signalfd (int fd_in, const sigset_t *mask, int flags)
+{
+  int ret = -1;
+  fhandler_signalfd *fh;
+
+  debug_printf ("signalfd (%d, %p, %y)", fd_in, mask, flags);
+
+  if ((flags & ~(SFD_NONBLOCK | SFD_CLOEXEC)) != 0)
+    {
+      set_errno (EINVAL);
+      goto done;
+    }
+
+  if (fd_in != -1)
+    {
+      /* Change signal mask. */
+      cygheap_fdget fd (fd_in);
+
+      if (fd < 0)
+	goto done;
+      fh = fd->is_signalfd ();
+      if (!fh)
+	{
+	  set_errno (EINVAL);
+	  goto done;
+	}
+      __try
+        {
+	  if (fh->signalfd (mask, flags) == 0)
+	    ret = fd_in;
+	}
+      __except (EINVAL) {}
+      __endtry
+    }
+  else
+    {
+      /* Create new signalfd descriptor. */
+      cygheap_fdnew fd;
+
+      if (fd < 0)
+	goto done;
+      fh = (fhandler_signalfd *) build_fh_dev (*signalfd_dev);
+      if (fh && fh->signalfd (mask, flags) == 0)
+	{
+	  fd = fh;
+	  if (fd <= 2)
+	    set_std_handle (fd);
+	  ret = fd;
+	}
+      else
+	delete fh;
+    }
+
+done:
+  syscall_printf ("%R = signalfd (%d, %p, %y)", ret, fd_in, mask, flags);
+  return ret;
 }

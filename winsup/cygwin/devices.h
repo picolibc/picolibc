@@ -72,6 +72,8 @@ enum fh_devices
   FH_DEV     = FHDEV (DEV_VIRTFS_MAJOR, 193),
   FH_CYGDRIVE= FHDEV (DEV_VIRTFS_MAJOR, 192),
 
+  FH_SIGNALFD= FHDEV (DEV_VIRTFS_MAJOR, 13),
+
   DEV_FLOPPY_MAJOR = 2,
   FH_FLOPPY  = FHDEV (DEV_FLOPPY_MAJOR, 0),
 
@@ -400,6 +402,8 @@ extern const _device dev_af_local_storage;
 extern const _device dev_af_unix_storage;
 #define af_unix_dev ((device *) &dev_af_unix_storage)
 
+extern const _device dev_signalfd_storage;
+#define signalfd_dev ((device *) &dev_signalfd_storage)
 extern const _device dev_piper_storage;
 #define piper_dev ((device *) &dev_piper_storage)
 extern const _device dev_pipew_storage;

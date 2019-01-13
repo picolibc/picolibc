@@ -575,6 +575,9 @@ fh_alloc (path_conv& pc)
 	case FH_CYGDRIVE:
 	  fh = cnew (fhandler_cygdrive);
 	  break;
+	case FH_SIGNALFD:
+	  fh = cnew (fhandler_signalfd);
+	  break;
 	case FH_TTY:
 	  if (!pc.isopen ())
 	    {
