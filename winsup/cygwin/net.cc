@@ -61,7 +61,7 @@ get (const int fd)
   cygheap_fdget cfd (fd);
 
   if (cfd < 0)
-    return 0;
+    return NULL;
 
   fhandler_socket *const fh = cfd->is_socket ();
 

@@ -2610,13 +2610,12 @@ class fhandler_procnet: public fhandler_proc
   pid_t pid;
  public:
   fhandler_procnet ();
+  fhandler_procnet (void *) {}
   virtual_ftype_t exists();
   int __reg3 readdir (DIR *, dirent *);
   int open (int flags, mode_t mode = 0);
   int __reg2 fstat (struct stat *buf);
   bool fill_filebuf ();
-
-  fhandler_procnet (void *) {}
 
   void copyto (fhandler_base *x)
   {

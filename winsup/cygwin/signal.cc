@@ -635,9 +635,10 @@ sigwait_common (const sigset_t *set, siginfo_t *info, PLARGE_INTEGER waittime)
 	  break;
 	}
     }
-  __except (EFAULT) {
-    res = -1;
-  }
+  __except (EFAULT)
+    {
+      res = -1;
+    }
   __endtry
   sigproc_printf ("returning signal %d", res);
   return res;
