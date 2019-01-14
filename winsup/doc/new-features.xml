@@ -64,15 +64,15 @@ clock_setres is a no-op now.
 </para></listitem>
 
 <listitem><para>
-Use the new POSIX rename semantics on NTFS starting with Windows 10
-1709.  Renaming a file to another in-use file now actually removes the
-other file, rather than moving it to the recycler bin.
-</para></listitem>
-
-<listitem><para>
 Use the new POSIX unlink semantics on NTFS starting with Windows 10
 1709.  Deleting an in-use file now actually removes the file, rather
 than moving it to the recycler bin.
+</para></listitem>
+
+<listitem><para>
+Use the new POSIX rename semantics on NTFS starting with Windows 10
+1809.  Renaming a file to another in-use file now actually removes the
+other file, rather than moving it to the recycler bin.
 </para></listitem>
 
 <listitem><para>
