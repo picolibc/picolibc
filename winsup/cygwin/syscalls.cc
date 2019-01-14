@@ -698,7 +698,8 @@ unlink_nt (path_conv &pc)
   /* First check if we can use POSIX unlink semantics: W10 1709++, local NTFS.
      With POSIX unlink semantics the entire job gets MUCH easier and faster.
      Just try to do it and if it fails, it fails. */
-  if (wincap.has_posix_file_info () && !pc.isremote () && pc.fs_is_ntfs ())
+  if (wincap.has_posix_unlink_semantics ()
+      && !pc.isremote () && pc.fs_is_ntfs ())
     {
       FILE_DISPOSITION_INFORMATION_EX fdie;
 
@@ -2520,7 +2521,7 @@ rename2 (const char *oldpath, const char *newpath, unsigned int at2flags)
 	}
 
       /* POSIX semantics only on local NTFS drives. */
-      use_posix_semantics = wincap.has_posix_file_info ()
+      use_posix_semantics = wincap.has_posix_rename_semantics ()
 			    && !oldpc.isremote ()
 			    && oldpc.fs_is_ntfs ();
 

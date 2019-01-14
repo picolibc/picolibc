@@ -35,8 +35,9 @@ wincaps wincap_vista __attribute__((section (".cygwin_dll_common"), shared)) = {
     has_unprivileged_createsymlink:false,
     has_unbiased_interrupt_time:false,
     has_precise_interrupt_time:false,
-    has_posix_file_info:false,
+    has_posix_unlink_semantics:false,
     has_case_sensitive_dirs:false,
+    has_posix_rename_semantics:false,
   },
 };
 
@@ -57,8 +58,9 @@ wincaps wincap_7 __attribute__((section (".cygwin_dll_common"), shared)) = {
     has_unprivileged_createsymlink:false,
     has_unbiased_interrupt_time:true,
     has_precise_interrupt_time:false,
-    has_posix_file_info:false,
+    has_posix_unlink_semantics:false,
     has_case_sensitive_dirs:false,
+    has_posix_rename_semantics:false,
   },
 };
 
@@ -79,8 +81,9 @@ wincaps wincap_8 __attribute__((section (".cygwin_dll_common"), shared)) = {
     has_unprivileged_createsymlink:false,
     has_unbiased_interrupt_time:true,
     has_precise_interrupt_time:false,
-    has_posix_file_info:false,
+    has_posix_unlink_semantics:false,
     has_case_sensitive_dirs:false,
+    has_posix_rename_semantics:false,
   },
 };
 
@@ -101,8 +104,9 @@ wincaps  wincap_10_1507 __attribute__((section (".cygwin_dll_common"), shared)) 
     has_unprivileged_createsymlink:false,
     has_unbiased_interrupt_time:true,
     has_precise_interrupt_time:true,
-    has_posix_file_info:false,
+    has_posix_unlink_semantics:false,
     has_case_sensitive_dirs:false,
+    has_posix_rename_semantics:false,
   },
 };
 
@@ -123,8 +127,9 @@ wincaps wincap_10_1511 __attribute__((section (".cygwin_dll_common"), shared)) =
     has_unprivileged_createsymlink:false,
     has_unbiased_interrupt_time:true,
     has_precise_interrupt_time:true,
-    has_posix_file_info:false,
+    has_posix_unlink_semantics:false,
     has_case_sensitive_dirs:false,
+    has_posix_rename_semantics:false,
   },
 };
 
@@ -145,8 +150,9 @@ wincaps wincap_10_1703 __attribute__((section (".cygwin_dll_common"), shared)) =
     has_unprivileged_createsymlink:true,
     has_unbiased_interrupt_time:true,
     has_precise_interrupt_time:true,
-    has_posix_file_info:false,
+    has_posix_unlink_semantics:false,
     has_case_sensitive_dirs:false,
+    has_posix_rename_semantics:false,
   },
 };
 
@@ -167,8 +173,9 @@ wincaps wincap_10_1709 __attribute__((section (".cygwin_dll_common"), shared)) =
     has_unprivileged_createsymlink:true,
     has_unbiased_interrupt_time:true,
     has_precise_interrupt_time:true,
-    has_posix_file_info:true,
+    has_posix_unlink_semantics:true,
     has_case_sensitive_dirs:false,
+    has_posix_rename_semantics:false,
   },
 };
 
@@ -189,8 +196,32 @@ wincaps wincap_10_1803 __attribute__((section (".cygwin_dll_common"), shared)) =
     has_unprivileged_createsymlink:true,
     has_unbiased_interrupt_time:true,
     has_precise_interrupt_time:true,
-    has_posix_file_info:true,
+    has_posix_unlink_semantics:true,
     has_case_sensitive_dirs:true,
+    has_posix_rename_semantics:false,
+  },
+};
+
+wincaps wincap_10_1809 __attribute__((section (".cygwin_dll_common"), shared)) = {
+  def_guard_pages:2,
+  {
+    is_server:false,
+    needs_count_in_si_lpres2:false,
+    has_gaa_largeaddress_bug:false,
+    has_broken_alloc_console:true,
+    has_console_logon_sid:true,
+    has_precise_system_time:true,
+    has_microsoft_accounts:true,
+    has_processor_groups:true,
+    has_broken_prefetchvm:false,
+    has_new_pebteb_region:true,
+    has_broken_whoami:false,
+    has_unprivileged_createsymlink:true,
+    has_unbiased_interrupt_time:true,
+    has_precise_interrupt_time:true,
+    has_posix_unlink_semantics:true,
+    has_case_sensitive_dirs:true,
+    has_posix_rename_semantics:true,
   },
 };
 
@@ -234,7 +265,9 @@ wincapc::init ()
 	break;
       case 10:
       default:
-	if (likely (version.dwBuildNumber >= 17134))
+	if (likely (version.dwBuildNumber >= 17763))
+	  caps = &wincap_10_1809;
+	else if (version.dwBuildNumber >= 17134)
 	  caps = &wincap_10_1803;
 	else if (version.dwBuildNumber >= 16299)
 	  caps = &wincap_10_1709;
