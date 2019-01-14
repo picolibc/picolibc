@@ -603,9 +603,11 @@ sigwait_common (const sigset_t *set, siginfo_t *info, PLARGE_INTEGER waittime)
   __try
     {
       set_signal_mask (_my_tls.sigwait_mask, *set);
+      _my_tls.signalfd_select_wait = NULL;
       sig_dispatch_pending (true);
 
-      switch (cygwait (NULL, waittime, cw_sig_eintr | cw_cancel | cw_cancel_self))
+      switch (cygwait (NULL, waittime,
+		       cw_sig_eintr | cw_cancel | cw_cancel_self))
 	{
 	case WAIT_SIGNALED:
 	  if (!sigismember (set, _my_tls.infodata.si_signo))

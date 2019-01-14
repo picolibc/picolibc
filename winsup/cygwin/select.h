@@ -66,6 +66,12 @@ struct select_serial_info: public select_info
   select_serial_info (): select_info () {}
 };
 
+struct select_signalfd_info: public select_info
+{
+  HANDLE evt;
+  select_signalfd_info (): select_info () {}
+};
+
 class select_stuff
 {
 public:
@@ -85,6 +91,7 @@ public:
   select_pipe_info *device_specific_pipe;
   select_socket_info *device_specific_socket;
   select_serial_info *device_specific_serial;
+  select_signalfd_info *device_specific_signalfd;
 
   bool test_and_set (int, fd_set *, fd_set *, fd_set *);
   int poll (fd_set *, fd_set *, fd_set *);
@@ -93,10 +100,11 @@ public:
   void destroy ();
 
   select_stuff (): return_on_signal (false), always_ready (false),
-  		   windows_used (false), start (0),
+		   windows_used (false), start (),
 		   device_specific_pipe (NULL),
 		   device_specific_socket (NULL),
-		   device_specific_serial (NULL) {}
+		   device_specific_serial (NULL),
+		   device_specific_signalfd (NULL) {}
 };
 
 extern "C" int cygwin_select (int , fd_set *, fd_set *, fd_set *,

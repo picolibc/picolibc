@@ -140,10 +140,10 @@ fhandler_signalfd::read (void *ptr, size_t& len)
   return;
 }
 
+/* Called from select */
 int
 fhandler_signalfd::poll ()
 {
-  Sleep (1L);	/* BAD HACK, FIXME, need a non-polling technique. */
   sigset_t outset = (sigset_t) sig_send (myself, __SIGPENDING, &_my_tls);
   if (outset == SIG_BAD_MASK)
     return -1;

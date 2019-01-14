@@ -2651,6 +2651,7 @@ class fhandler_signalfd : public fhandler_base
   void __reg3 read (void *ptr, size_t& len);
 
   int poll ();
+  inline sigset_t get_sigset () const { return sigset; }
 
   select_record *select_read (select_stuff *);
   select_record *select_write (select_stuff *);
