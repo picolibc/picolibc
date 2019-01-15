@@ -787,6 +787,7 @@ CPPFLAGS
 CPP'
 ac_subdirs_all='a29k
 aarch64
+amdgcn
 arc
 arm
 bfin
@@ -11502,7 +11503,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<_LT_EOF
-#line 11505 "configure"
+#line 11506 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -11608,7 +11609,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<_LT_EOF
-#line 11611 "configure"
+#line 11612 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -11854,6 +11855,8 @@ if test -n "${machine_dir}"; then
 subdirs="$subdirs a29k"
  ;;
 	aarch64) subdirs="$subdirs aarch64"
+ ;;
+	amdgcn) subdirs="$subdirs amdgcn"
  ;;
 	arc) subdirs="$subdirs arc"
  ;;
