@@ -503,12 +503,13 @@ details. */
        CLOCK_BOOTTIME.
   331: Add timer_getoverrun, DELAYTIMER_MAX.
   332: Add signalfd.
+  333: Add timerfd_create, timerfd_gettime, timerfd_settime.
 
   Note that we forgot to bump the api for ualarm, strtoll, strtoull,
   sigaltstack, sethostname. */
 
 #define CYGWIN_VERSION_API_MAJOR 0
-#define CYGWIN_VERSION_API_MINOR 332
+#define CYGWIN_VERSION_API_MINOR 333
 
 /* There is also a compatibity version number associated with the shared memory
    regions.  It is incremented when incompatible changes are made to the shared

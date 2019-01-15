@@ -27,7 +27,8 @@ What's new:
 - Support overrun counter for posix timers (via timer_getoverrun() or
   siginfo_t::si_overrun).
 
-- New API: signalfd, timer_getoverrun.
+- New APIs: signalfd, timerfd_create, timerfd_gettime, timerfd_settime,
+  timer_getoverrun.
 
 
 What changed:

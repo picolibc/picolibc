@@ -51,7 +51,8 @@ siginfo_t::si_overrun).
 </para></listitem>
 
 <listitem><para>
-New API: signalfd, timer_getoverrun.
+New APIs: signalfd, timerfd_create, timerfd_gettime, timerfd_settime,
+timer_getoverrun.
 </para></listitem>
 
 <listitem><para>

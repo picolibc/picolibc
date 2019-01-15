@@ -421,6 +421,7 @@ public:
   virtual class fhandler_socket_wsock *is_wsock_socket () { return NULL; }
   virtual class fhandler_console *is_console () { return 0; }
   virtual class fhandler_signalfd *is_signalfd () { return NULL; }
+  virtual class fhandler_timerfd *is_timerfd () { return NULL; }
   virtual int is_windows () {return 0; }
 
   virtual void __reg3 raw_read (void *ptr, size_t& ulen);
@@ -2673,6 +2674,55 @@ class fhandler_signalfd : public fhandler_base
   }
 };
 
+class fhandler_timerfd : public fhandler_base
+{
+  timer_t timerid;
+
+ public:
+  fhandler_timerfd ();
+  fhandler_timerfd (void *) {}
+
+  fhandler_timerfd *is_timerfd () { return this; }
+
+  char *get_proc_fd_name (char *buf);
+
+  int timerfd (clockid_t clock_id, int flags);
+  int settime (int flags, const struct itimerspec *value,
+	       struct itimerspec *ovalue);
+  int gettime (struct itimerspec *ovalue);
+
+  int __reg2 fstat (struct stat *buf);
+  void __reg3 read (void *ptr, size_t& len);
+  int dup (fhandler_base *child, int);
+  int ioctl (unsigned int, void *);
+  int close ();
+
+  HANDLE get_timerfd_handle ();
+
+  void fixup_after_fork_exec (bool);
+  void fixup_after_exec () {fixup_after_fork_exec (true);}
+  void fixup_after_fork (HANDLE) {fixup_after_fork_exec (false);}
+
+  select_record *select_read (select_stuff *);
+  select_record *select_write (select_stuff *);
+  select_record *select_except (select_stuff *);
+
+  void copyto (fhandler_base *x)
+  {
+    x->pc.free_strings ();
+    *reinterpret_cast<fhandler_timerfd *> (x) = *this;
+    x->reset (this);
+  }
+
+  fhandler_timerfd *clone (cygheap_types malloc_type = HEAP_FHANDLER)
+  {
+    void *ptr = (void *) ccalloc (malloc_type, 1, sizeof (fhandler_timerfd));
+    fhandler_timerfd *fh = new (ptr) fhandler_timerfd (ptr);
+    copyto (fh);
+    return fh;
+  }
+};
+
 struct fhandler_nodevice: public fhandler_base
 {
   fhandler_nodevice ();
@@ -2713,6 +2763,7 @@ typedef union
   char __registry[sizeof (fhandler_registry)];
   char __serial[sizeof (fhandler_serial)];
   char __signalfd[sizeof (fhandler_signalfd)];
+  char __timerfd[sizeof (fhandler_timerfd)];
   char __socket_inet[sizeof (fhandler_socket_inet)];
   char __socket_local[sizeof (fhandler_socket_local)];
 #ifdef __WITH_AF_UNIX

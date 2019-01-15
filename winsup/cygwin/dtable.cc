@@ -578,6 +578,9 @@ fh_alloc (path_conv& pc)
 	case FH_SIGNALFD:
 	  fh = cnew (fhandler_signalfd);
 	  break;
+	case FH_TIMERFD:
+	  fh = cnew (fhandler_timerfd);
+	  break;
 	case FH_TTY:
 	  if (!pc.isopen ())
 	    {

@@ -1488,6 +1488,9 @@ timer_delete SIGFE
 timer_getoverrun SIGFE
 timer_gettime SIGFE
 timer_settime SIGFE
+timerfd_create SIGFE
+timerfd_gettime SIGFE
+timerfd_settime SIGFE
 times SIGFE
 timezone SIGFE
 timingsafe_bcmp NOSIGFE

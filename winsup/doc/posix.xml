@@ -1394,6 +1394,9 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     strverscmp
     sysinfo
     tdestroy
+    timerfd_create
+    timerfd_gettime
+    timerfd_settime
     timegm
     timelocal
     toascii_l

@@ -1870,3 +1870,48 @@ fhandler_signalfd::select_except (select_stuff *stuff)
   s->except_ready = false;
   return s;
 }
+
+select_record *
+fhandler_timerfd::select_read (select_stuff *stuff)
+{
+  select_record *s = stuff->start.next;
+  if (!s->startup)
+    {
+      s->startup = no_startup;
+      s->verify = verify_ok;
+    }
+  s->h = get_timerfd_handle ();
+  s->read_selected = true;
+  s->read_ready = true;
+  return s;
+}
+
+select_record *
+fhandler_timerfd::select_write (select_stuff *stuff)
+{
+  select_record *s = stuff->start.next;
+  if (!s->startup)
+    {
+      s->startup = no_startup;
+      s->verify = no_verify;
+    }
+  s->peek = NULL;
+  s->write_selected = false;
+  s->write_ready = false;
+  return s;
+}
+
+select_record *
+fhandler_timerfd::select_except (select_stuff *stuff)
+{
+  select_record *s = stuff->start.next;
+  if (!s->startup)
+    {
+      s->startup = no_startup;
+      s->verify = no_verify;
+    }
+  s->peek = NULL;
+  s->except_selected = false;
+  s->except_ready = false;
+  return s;
+}
