@@ -1,4 +1,4 @@
-/* fhandler_signalfd.cc: fhandler for /proc/<pid>/fd/<desc> operations
+/* fhandler_signalfd.cc: fhandler for signalfd
 
 This file is part of Cygwin.
 
