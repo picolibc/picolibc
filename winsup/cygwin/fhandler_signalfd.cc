@@ -112,13 +112,11 @@ fhandler_signalfd::read (void *ptr, size_t& len)
 					  ? (PLARGE_INTEGER) &poll : NULL);
       if (ret == -1)
 	{
-	  if (curlen == 0)
-	    {
-	      if (get_errno () == EINTR && curlen == 0)
-		continue;
-	      set_errno (old_errno);
-	    }
-	  len = curlen ?: (size_t) -1;
+	  /* If we already read a signal so the buffer isn't empty, just
+	     return success. */
+	  if (curlen > 0)
+	    break;
+	  len = -1;
 	  return;
 	}
       __try
