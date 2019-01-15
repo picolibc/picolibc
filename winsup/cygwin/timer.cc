@@ -369,22 +369,9 @@ timer_tracker::settime (int in_flags, const itimerspec *value, itimerspec *ovalu
       else
 	{
 	  interval_us = timespec_to_us (value->it_interval);
-	  if (in_flags & TIMER_ABSTIME)
-	    {
-	      int64_t now = get_clock (clock_id)->usecs ();
-
-	      sleepto_us = timespec_to_us (value->it_value);
-	      if (sleepto_us <= now)
-		{
-		  int64_t ov_cnt = (now - sleepto_us + (interval_us + 1))
-				   / interval_us;
-		  InterlockedAdd64 (&overrun_count, ov_cnt);
-		  sleepto_us += ov_cnt * interval_us;
-		}
-	    }
-	  else
-	    sleepto_us = get_clock (clock_id)->usecs ()
-			 + timespec_to_us (value->it_value);
+	  sleepto_us = timespec_to_us (value->it_value);
+	  if (!(in_flags & TIMER_ABSTIME))
+	    sleepto_us += get_clock (clock_id)->usecs ();
 	  it_interval = value->it_interval;
 	  if (!hcancel)
 	    hcancel = CreateEvent (&sec_none_nih, TRUE, FALSE, NULL);
@@ -564,7 +551,11 @@ timer_getoverrun (timer_t timerid)
 	  set_errno (EINVAL);
 	  __leave;
 	}
-      ret = tt->getoverrun ();
+      LONG64 ov_cnt = tt->getoverrun ();
+      if (ov_cnt > DELAYTIMER_MAX || ov_cnt < 0)
+	ret = DELAYTIMER_MAX;
+      else
+	ret = ov_cnt;
     }
   __except (EFAULT) {}
   __endtry
