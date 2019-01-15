@@ -59,6 +59,7 @@ fhandler_signalfd::fstat (struct stat *buf)
   int ret = fhandler_base::fstat (buf);
   if (!ret)
     {
+      buf->st_mode = S_IRUSR | S_IWUSR;
       buf->st_dev = FH_SIGNALFD;
       buf->st_ino = get_unique_id ();
     }

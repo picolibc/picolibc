@@ -1345,9 +1345,6 @@ fhandler_base::fstat (struct stat *buf)
     case FH_PIPER:
       buf->st_mode = S_IFIFO | S_IRUSR;
       break;
-    case FH_SIGNALFD:
-      buf->st_mode = S_IRUSR | S_IWUSR;
-      break;
     default:
       buf->st_mode = S_IFCHR | STD_RBITS | STD_WBITS | S_IWGRP | S_IWOTH;
       break;
