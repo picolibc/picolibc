@@ -108,16 +108,6 @@ timer_tracker::timer_tracker (clockid_t c, const sigevent *e, bool fd)
     }
 }
 
-void timer_tracker::increment_instances ()
-{
-  InterlockedIncrement (&instance_count);
-}
-
-LONG timer_tracker::decrement_instances ()
-{
-  return InterlockedDecrement (&instance_count);
-}
-
 static inline int64_t
 timespec_to_us (const timespec& ts)
 {
@@ -152,7 +142,6 @@ timer_tracker::_disarm_event ()
     yield ();
   if (ret == EVENT_ARMED)
     {
-
       InterlockedExchange64 (&overrun_count_curr, overrun_count);
       ret = overrun_count_curr;
       InterlockedExchange64 (&overrun_count, 0);
@@ -459,6 +448,23 @@ timer_tracker::restart ()
       syncthread = CreateEvent (&sec_none_nih, TRUE, FALSE, NULL);
       new cygthread (timer_thread, this, "itimer", syncthread);
     }
+}
+
+/* Only called from fhandler_timerfd::fixup_after_exec.  Note that
+   we don't touch the instance count.  This is handled by closing
+   the timer from fhandler_timerfd::close on O_CLOEXEC.  Ultimately
+   the instance count should be correct after execve. */
+void
+timer_tracker::fixup_after_exec ()
+{
+  lock_timer_tracker here;
+  /* Check if timer is already in the list. If so, skip it. */
+  for (timer_tracker *tt = &ttstart; tt->next != NULL; tt = tt->next)
+    if (tt->next == this)
+      return;
+  next = ttstart.next;
+  ttstart.next = this;
+  restart ();
 }
 
 void

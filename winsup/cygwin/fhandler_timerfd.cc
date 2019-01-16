@@ -161,10 +161,15 @@ fhandler_timerfd::dup (fhandler_base *child, int flags)
 void
 fhandler_timerfd::fixup_after_exec ()
 {
-  if (!close_on_exec ())
+  if (close_on_exec ())
+    return;
+  __try
     {
-      /* TODO after exec */
+      timer_tracker *tt = (timer_tracker *) timerid;
+      tt->fixup_after_exec ();
     }
+  __except (EFAULT) {}
+  __endtry
 }
 
 int

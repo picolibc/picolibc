@@ -30,7 +30,7 @@ class timer_tracker
   LONG64 overrun_count;
 
   bool cancel ();
-  LONG decrement_instances ();
+  LONG decrement_instances () { return InterlockedDecrement (&instance_count); }
   int clean_and_unhook ();
   LONG64 _disarm_event ();
   void restart ();
@@ -45,7 +45,8 @@ class timer_tracker
   ~timer_tracker ();
   inline bool is_timer_tracker () const { return magic == TT_MAGIC; }
 
-  void increment_instances ();
+
+  void increment_instances () { InterlockedIncrement (&instance_count); }
   LONG64 wait (bool nonblocking);
   HANDLE get_timerfd_handle () const { return timerfd_event; }
 
@@ -58,6 +59,7 @@ class timer_tracker
   unsigned int disarm_event ();
 
   DWORD thread_func ();
+  void fixup_after_exec ();
   static void fixup_after_fork ();
   static int close (timer_tracker *tt);
 };
