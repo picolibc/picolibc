@@ -692,7 +692,7 @@ ualarm (useconds_t value, useconds_t interval)
  return ret;
 }
 
-extern "C"
+extern "C" int
 timerfd_create (clockid_t clock_id, int flags)
 {
   int ret = -1;
