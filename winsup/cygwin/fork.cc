@@ -22,6 +22,7 @@ details. */
 #include "tls_pbuf.h"
 #include "dll_init.h"
 #include "cygmalloc.h"
+#include "timer.h"
 #include "ntdll.h"
 
 #define NPIDS_HELD 4
@@ -129,8 +130,6 @@ int __stdcall
 frok::child (volatile char * volatile here)
 {
   HANDLE& hParent = ch.parent;
-  extern void fixup_hooks_after_fork ();
-  extern void fixup_timers_after_fork ();
 
   /* NOTE: Logically this belongs in dll_list::load_after_fork, but by
      doing it here, before the first sync_with_parent, we can exploit

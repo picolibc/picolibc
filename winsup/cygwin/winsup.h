@@ -185,6 +185,7 @@ extern "C" void error_start_init (const char*);
 extern "C" int try_to_debug (bool waitloop = 1);
 
 void ld_preload ();
+void fixup_hooks_after_fork ();
 const char *find_first_notloaded_dll (class path_conv &);
 
 /**************************** Miscellaneous ******************************/

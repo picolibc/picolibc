@@ -56,4 +56,6 @@ class timer_tracker
   static int close (timer_tracker *tt);
 };
 
+extern void fixup_timers_after_fork ();
+
 #endif /* __TIMER_H__ */
