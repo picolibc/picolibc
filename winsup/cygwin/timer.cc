@@ -132,6 +132,22 @@ timer_tracker::arm_event ()
   return ret;
 }
 
+void
+timer_tracker::set_event (uint64_t ov_cnt)
+{
+  LONG ret;
+
+  while ((ret = InterlockedCompareExchange (&event_running, EVENT_LOCK,
+					    EVENT_DISARMED)) == EVENT_LOCK)
+    yield ();
+  InterlockedExchange64 (&overrun_count, ov_cnt);
+  if (ret == EVENT_DISARMED)
+    {
+      SetEvent (get_timerfd_handle ());
+      InterlockedExchange (&event_running, EVENT_ARMED);
+    }
+}
+
 LONG64
 timer_tracker::_disarm_event ()
 {

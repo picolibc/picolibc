@@ -176,15 +176,29 @@ int
 fhandler_timerfd::ioctl (unsigned int cmd, void *p)
 {
   int ret = -1;
+  uint64_t ov_cnt;
 
   switch (cmd)
     {
     case TFD_IOC_SET_TICKS:
-      /* TODO */
+      __try
+	{
+	  timer_tracker *tt = (timer_tracker *) timerid;
+
+	  ov_cnt = *(uint64_t *) p;
+	  if (!ov_cnt)
+	    {
+	      set_errno (EINVAL);
+	      break;
+	    }
+	  tt->set_event (ov_cnt);
+	}
+      __except (EFAULT) {}
+      __endtry
       ret = 0;
       break;
     default:
-      set_errno (EINVAL);
+      ret = fhandler_base::ioctl (cmd, p);
       break;
     }
   syscall_printf ("%d = ioctl_timerfd(%x, %p)", ret, cmd, p);

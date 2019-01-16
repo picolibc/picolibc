@@ -55,7 +55,9 @@ class timer_tracker
 
   void gettime (itimerspec *);
   int settime (int, const itimerspec *, itimerspec *);
+
   LONG arm_event ();
+  void set_event (uint64_t ov_cnt);
   unsigned int disarm_event ();
 
   DWORD thread_func ();
