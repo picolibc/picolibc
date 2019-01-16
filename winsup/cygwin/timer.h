@@ -33,8 +33,14 @@ class timer_tracker
   LONG decrement_instances ();
   int clean_and_unhook ();
   LONG64 _disarm_event ();
+  void restart ();
 
  public:
+  void *operator new (size_t size) __attribute__ ((nothrow))
+  { return malloc (size); }
+  void *operator new (size_t, void *p) __attribute__ ((nothrow)) {return p;}
+  void operator delete(void *p) { incygheap (p) ? cfree (p) : free (p); }
+
   timer_tracker (clockid_t, const sigevent *, bool);
   ~timer_tracker ();
   inline bool is_timer_tracker () const { return magic == TT_MAGIC; }

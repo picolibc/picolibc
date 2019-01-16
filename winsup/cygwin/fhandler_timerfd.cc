@@ -27,10 +27,19 @@ fhandler_timerfd::get_proc_fd_name (char *buf)
   return strcpy (buf, "anon_inode:[timerfd]");
 }
 
+/* The timers connected to a descriptor are stored on the cygheap
+   together with their fhandler. */
+
+#define cnew(name, ...) \
+  ({ \
+    void* ptr = (void*) ccalloc (HEAP_FHANDLER, 1, sizeof (name)); \
+    ptr ? new (ptr) name (__VA_ARGS__) : NULL; \
+  })
+
 int
 fhandler_timerfd::timerfd (clockid_t clock_id, int flags)
 {
-  timerid = (timer_t) new timer_tracker (clock_id, NULL, true);
+  timerid = (timer_t) cnew (timer_tracker, clock_id, NULL, true);
   if (flags & TFD_NONBLOCK)
     set_nonblocking (true);
   if (flags & TFD_CLOEXEC)
@@ -150,13 +159,9 @@ fhandler_timerfd::dup (fhandler_base *child, int flags)
 }
 
 void
-fhandler_timerfd::fixup_after_fork_exec (bool execing)
+fhandler_timerfd::fixup_after_exec ()
 {
-  if (!execing)
-    {
-      /* TODO after fork */
-    }
-  else if (!close_on_exec ())
+  if (!close_on_exec ())
     {
       /* TODO after exec */
     }

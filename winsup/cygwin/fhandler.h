@@ -2699,9 +2699,7 @@ class fhandler_timerfd : public fhandler_base
 
   HANDLE get_timerfd_handle ();
 
-  void fixup_after_fork_exec (bool);
-  void fixup_after_exec () {fixup_after_fork_exec (true);}
-  void fixup_after_fork (HANDLE) {fixup_after_fork_exec (false);}
+  void fixup_after_exec ();
 
   select_record *select_read (select_stuff *);
   select_record *select_write (select_stuff *);

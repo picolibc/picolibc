@@ -22,7 +22,8 @@ details. */
 #define EVENT_ARMED	-1
 #define EVENT_LOCK	 1
 
-timer_tracker NO_COPY ttstart (CLOCK_REALTIME, NULL, false);
+/* Must not be NO_COPY, otherwise timerfd breaks. */
+timer_tracker ttstart (CLOCK_REALTIME, NULL, false);
 
 class lock_timer_tracker
 {
@@ -79,7 +80,8 @@ timer_tracker::~timer_tracker ()
 /* fd is true for timerfd timers. */
 timer_tracker::timer_tracker (clockid_t c, const sigevent *e, bool fd)
 : magic (TT_MAGIC), instance_count (1), clock_id (c), deleting (false),
-  hcancel (NULL), syncthread (NULL), event_running (EVENT_DISARMED),
+  hcancel (NULL), syncthread (NULL), timerfd_event (NULL),
+  interval_us(0), sleepto_us(0), event_running (EVENT_DISARMED),
   overrun_count_curr (0), overrun_count (0)
 {
   if (e != NULL)
@@ -171,7 +173,7 @@ timer_tracker::disarm_event ()
 LONG64
 timer_tracker::wait (bool nonblocking)
 {
-  HANDLE w4[3] = { NULL, hcancel, timerfd_event };
+  HANDLE w4[3] = { NULL, hcancel, get_timerfd_handle () };
   LONG64 ret = -1;
 
   wait_signal_arrived here (w4[0]);
@@ -264,7 +266,11 @@ timer_tracker::thread_func ()
 	  {
 	    if (!timerfd_event)
 	      break;
-	    arm_event ();
+	    if (arm_event ())
+	      {
+		debug_printf ("%p timerfd already queued", this);
+		break;
+	      }
 	    SetEvent (timerfd_event);
 	    break;
 	  }
@@ -444,19 +450,40 @@ timer_tracker::close (timer_tracker *tt)
 }
 
 void
+timer_tracker::restart ()
+{
+  timerfd_event = CreateEvent (&sec_none_nih, TRUE, FALSE, NULL);
+  if (interval_us != 0 || sleepto_us != 0)
+    {
+      hcancel = CreateEvent (&sec_none_nih, TRUE, FALSE, NULL);
+      syncthread = CreateEvent (&sec_none_nih, TRUE, FALSE, NULL);
+      new cygthread (timer_thread, this, "itimer", syncthread);
+    }
+}
+
+void
 timer_tracker::fixup_after_fork ()
 {
-  /* TODO: Keep timerfd timers available and restart them */
   ttstart.hcancel = ttstart.syncthread = NULL;
+  ttstart.interval_us = ttstart.sleepto_us = 0;
   ttstart.event_running = EVENT_DISARMED;
-  ttstart.overrun_count_curr = 0;
-  ttstart.overrun_count = 0;
+  ttstart.overrun_count_curr = ttstart.overrun_count = 0;
   for (timer_tracker *tt = &ttstart; tt->next != NULL; /* nothing */)
     {
       timer_tracker *deleteme = tt->next;
-      tt->next = deleteme->next;
-      deleteme->hcancel = deleteme->syncthread = NULL;
-      delete deleteme;
+      if (deleteme->get_timerfd_handle ())
+	{
+	  tt = deleteme;
+	  tt->restart ();
+	}
+      else
+	{
+	  tt->next = deleteme->next;
+	  deleteme->timerfd_event = NULL;
+	  deleteme->hcancel = NULL;
+	  deleteme->syncthread = NULL;
+	  delete deleteme;
+	}
     }
 }
 
@@ -731,6 +758,8 @@ extern "C" int
 timerfd_settime (int fd_in, int flags, const struct itimerspec *value,
 		 struct itimerspec *ovalue)
 {
+  /* There's no easy way to implement TFD_TIMER_CANCEL_ON_SET, but
+     we should at least accept the flag. */
   if ((flags & ~(TFD_TIMER_ABSTIME | TFD_TIMER_CANCEL_ON_SET)) != 0)
     {
       set_errno (EINVAL);
