@@ -49,6 +49,7 @@ fhandler_signalfd::signalfd (const sigset_t *mask, int flags)
       nohandle (true);
       set_unique_id ();
       set_ino (get_unique_id ());
+      set_flags (O_RDWR | O_BINARY);
     }
   return 0;
 }
@@ -137,6 +138,13 @@ fhandler_signalfd::read (void *ptr, size_t& len)
   set_errno (old_errno);
   len = curlen;
   return;
+}
+
+ssize_t __stdcall
+fhandler_signalfd::write (const void *, size_t)
+{
+  set_errno (EINVAL);
+  return -1;
 }
 
 /* Called from select */

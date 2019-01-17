@@ -2650,6 +2650,7 @@ class fhandler_signalfd : public fhandler_base
   int signalfd (const sigset_t *mask, int flags);
   int __reg2 fstat (struct stat *buf);
   void __reg3 read (void *ptr, size_t& len);
+  ssize_t __stdcall write (const void *, size_t);
 
   int poll ();
   inline sigset_t get_sigset () const { return sigset; }
@@ -2693,6 +2694,7 @@ class fhandler_timerfd : public fhandler_base
 
   int __reg2 fstat (struct stat *buf);
   void __reg3 read (void *ptr, size_t& len);
+  ssize_t __stdcall write (const void *, size_t);
   int dup (fhandler_base *child, int);
   int ioctl (unsigned int, void *);
   int close ();

@@ -44,12 +44,10 @@ fhandler_timerfd::timerfd (clockid_t clock_id, int flags)
     set_nonblocking (true);
   if (flags & TFD_CLOEXEC)
     set_close_on_exec (true);
-  if (get_unique_id () == 0)
-    {
-      nohandle (true);
-      set_unique_id ();
-      set_ino (get_unique_id ());
-    }
+  nohandle (true);
+  set_unique_id ();
+  set_ino (get_unique_id ());
+  set_flags (O_RDWR | O_BINARY);
   return 0;
 }
 
@@ -123,6 +121,13 @@ fhandler_timerfd::read (void *ptr, size_t& len)
   __endtry
   len = (size_t) -1;
   return;
+}
+
+ssize_t __stdcall
+fhandler_timerfd::write (const void *, size_t)
+{
+  set_errno (EINVAL);
+  return -1;
 }
 
 HANDLE
