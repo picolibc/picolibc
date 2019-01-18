@@ -2549,9 +2549,7 @@ pthread_convert_abstime (clockid_t clock_id, const struct timespec *abstime,
   struct timespec tp;
 
   /* According to SUSv3, the abstime value must be checked for validity. */
-  if (abstime->tv_sec < 0
-      || abstime->tv_nsec < 0
-      || abstime->tv_nsec >= NSPERSEC)
+  if (!valid_timespec (*abstime))
     return EINVAL;
 
   /* Check for immediate timeout before converting */

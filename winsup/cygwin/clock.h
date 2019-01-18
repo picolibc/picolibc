@@ -166,4 +166,12 @@ ts_diff (const struct timespec &ts0, struct timespec &ts1)
   ts1.tv_sec -= ts0.tv_sec;
 }
 
+static inline bool
+valid_timespec (const timespec& ts)
+{
+  if (ts.tv_nsec < 0 || ts.tv_nsec >= NSPERSEC || ts.tv_sec < 0)
+    return false;
+  return true;
+}
+
 #endif /*__CLOCK_H__*/

@@ -766,7 +766,7 @@ aiosuspend (const struct aiocb *const aiolist[],
   if (timeout)
     {
       to = *timeout;
-      if (to.tv_sec < 0 || to.tv_nsec < 0 || to.tv_nsec > NSPERSEC)
+      if (!valid_timespec (to))
         {
           set_errno (EINVAL);
           return -1;

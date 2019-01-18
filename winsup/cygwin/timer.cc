@@ -342,17 +342,6 @@ timer_thread (VOID *x)
   return tt->thread_func ();
 }
 
-static inline bool
-timespec_bad (const timespec& t)
-{
-  if (t.tv_nsec < 0 || t.tv_nsec >= NSPERSEC || t.tv_sec < 0)
-    {
-      set_errno (EINVAL);
-      return true;
-    }
-  return false;
-}
-
 int
 timer_tracker::settime (int in_flags, const itimerspec *value, itimerspec *ovalue)
 {
@@ -366,8 +355,12 @@ timer_tracker::settime (int in_flags, const itimerspec *value, itimerspec *ovalu
 	  __leave;
 	}
 
-      if (timespec_bad (value->it_value) || timespec_bad (value->it_interval))
-	__leave;
+      if (!valid_timespec (value->it_value)
+	  || !valid_timespec (value->it_interval))
+	{
+	  set_errno (EINVAL);
+	  __leave;
+	}
 
       lock_timer_tracker here;
       cancel ();

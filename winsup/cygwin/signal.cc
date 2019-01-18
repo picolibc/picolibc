@@ -69,7 +69,7 @@ clock_nanosleep (clockid_t clk_id, int flags, const struct timespec *rqtp,
 
   __try
     {
-      if (rqtp->tv_sec < 0 || rqtp->tv_nsec < 0 || rqtp->tv_nsec >= NSPERSEC)
+      if (!valid_timespec (*rqtp))
 	return EINVAL;
     }
   __except (NO_ERROR)
@@ -654,8 +654,7 @@ sigtimedwait (const sigset_t *set, siginfo_t *info, const timespec *timeout)
 
   if (timeout)
     {
-      if (timeout->tv_sec < 0
-	    || timeout->tv_nsec < 0 || timeout->tv_nsec > NSPERSEC)
+      if (!valid_timespec (*timeout))
 	{
 	  set_errno (EINVAL);
 	  return -1;
