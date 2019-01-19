@@ -36,6 +36,7 @@ timerfd_tracker::thread_func ()
 	}
 
       /* Inner loop: Timer expired?  If not, wait for it. */
+      /* TODO: TFD_TIMER_CANCEL_ON_SET */
       HANDLE expired[3] = { tfd_shared->timer (),
 			    tfd_shared->disarm_evt (),
 			    cancel_evt };
@@ -359,16 +360,21 @@ repeat:
 	{
 	  ret = read_and_reset_overrun_count ();
 	  leave_critical_section ();
-	  if (ret)
-	    break;
-	  /* A 0 overrun count indicates another read was quicker.
-	     Continue as if we didn't catch the expiry. */
-	  if (!nonblocking)
+	  switch (ret)
 	    {
-	      Sleep (100L);
-	      goto repeat;
+	    case -1:	/* TFD_TIMER_CANCEL_ON_SET */
+	      ret = -ECANCELED;
+	      break;
+	    case 0:	/* Another read was quicker. */
+	      if (!nonblocking)
+		goto repeat;
+	      ret = -EAGAIN;
+	      break;
+	    default:	/* Return (positive) overrun count. */
+	      if (ret < 0)
+		ret = INT64_MAX;
+	      break;
 	    }
-	  ret = -EAGAIN;
 	}
       break;
     case WAIT_OBJECT_0 + 1:	/* signal */

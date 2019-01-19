@@ -322,8 +322,6 @@ extern "C" int
 timerfd_settime (int fd_in, int flags, const struct itimerspec *value,
 		 struct itimerspec *ovalue)
 {
-  /* TODO: There's no easy way to implement TFD_TIMER_CANCEL_ON_SET,
-     but we should at least accept the flag. */
   if ((flags & ~(TFD_TIMER_ABSTIME | TFD_TIMER_CANCEL_ON_SET)) != 0)
     {
       set_errno (EINVAL);
