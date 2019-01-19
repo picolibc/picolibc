@@ -2682,6 +2682,7 @@ class fhandler_timerfd : public fhandler_base
  public:
   fhandler_timerfd ();
   fhandler_timerfd (void *) {}
+  ~fhandler_timerfd ();
 
   fhandler_timerfd *is_timerfd () { return this; }
 
@@ -2701,6 +2702,7 @@ class fhandler_timerfd : public fhandler_base
 
   HANDLE get_timerfd_handle ();
 
+  void fixup_after_fork (HANDLE);
   void fixup_after_exec ();
 
   select_record *select_read (select_stuff *);

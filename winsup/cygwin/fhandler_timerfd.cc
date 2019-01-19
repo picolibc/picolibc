@@ -1,4 +1,4 @@
-/* fhandler_timerfd.cc: fhandler for timerfd
+/* fhandler_timerfd.cc: fhandler for timerfd, public timerfd API
 
 This file is part of Cygwin.
 
@@ -12,7 +12,7 @@ details. */
 #include "pinfo.h"
 #include "dtable.h"
 #include "cygheap.h"
-#include "timer.h"
+#include "timerfd.h"
 #include <sys/timerfd.h>
 #include <cygwin/signal.h>
 
@@ -39,7 +39,19 @@ fhandler_timerfd::get_proc_fd_name (char *buf)
 int
 fhandler_timerfd::timerfd (clockid_t clock_id, int flags)
 {
-  timerid = (timer_t) cnew (timer_tracker, clock_id, NULL, true);
+  timerfd_tracker *tfd = cnew (timerfd_tracker);
+  if (!tfd)
+    {
+      set_errno (ENOMEM);
+      return -1;
+    }
+  int ret = tfd->create (clock_id);
+  if (ret < 0)
+    {
+      cfree (tfd);
+      set_errno (-ret);
+      return -1;
+    }
   if (flags & TFD_NONBLOCK)
     set_nonblocking (true);
   if (flags & TFD_CLOEXEC)
@@ -48,19 +60,25 @@ fhandler_timerfd::timerfd (clockid_t clock_id, int flags)
   set_unique_id ();
   set_ino (get_unique_id ());
   set_flags (O_RDWR | O_BINARY);
+  timerid = (timer_t) tfd;
   return 0;
 }
 
 int
-fhandler_timerfd::settime (int flags, const itimerspec *value,
-			   itimerspec *ovalue)
+fhandler_timerfd::settime (int flags, const struct itimerspec *new_value,
+			   struct itimerspec *old_value)
 {
   int ret = -1;
 
   __try
     {
-      timer_tracker *tt = (timer_tracker *) timerid;
-      ret = tt->settime (flags, value, ovalue);
+      timerfd_tracker *tfd = (timerfd_tracker *) timerid;
+      ret = tfd->settime (flags, new_value, old_value);
+      if (ret < 0)
+	{
+	  set_errno (-ret);
+	  ret = -1;
+	}
     }
   __except (EFAULT) {}
   __endtry
@@ -68,15 +86,19 @@ fhandler_timerfd::settime (int flags, const itimerspec *value,
 }
 
 int
-fhandler_timerfd::gettime (itimerspec *ovalue)
+fhandler_timerfd::gettime (struct itimerspec *ovalue)
 {
   int ret = -1;
 
   __try
     {
-      timer_tracker *tt = (timer_tracker *) timerid;
-      tt->gettime (ovalue);
-      ret = 0;
+      timerfd_tracker *tfd = (timerfd_tracker *) timerid;
+      ret = tfd->gettime (ovalue);
+      if (ret < 0)
+	{
+	  set_errno (-ret);
+	  ret = -1;
+	}
     }
   __except (EFAULT) {}
   __endtry
@@ -108,12 +130,14 @@ fhandler_timerfd::read (void *ptr, size_t& len)
 
   __try
     {
-      timer_tracker *tt = (timer_tracker *) timerid;
-      LONG64 ret = tt->wait (is_nonblocking ());
-      if (ret == -1)
-	__leave;
-      PLONG64 pl64 = (PLONG64) ptr;
-      *pl64 = ret + 1;
+      timerfd_tracker *tfd = (timerfd_tracker *) timerid;
+      LONG64 ret = tfd->wait (is_nonblocking ());
+      if (ret < 0)
+	{
+	  set_errno (-ret);
+	  __leave;
+	}
+      *(PLONG64) ptr = ret;
       len = sizeof (LONG64);
       return;
     }
@@ -135,8 +159,8 @@ fhandler_timerfd::get_timerfd_handle ()
 {
   __try
     {
-      timer_tracker *tt = (timer_tracker *) timerid;
-      return tt->get_timerfd_handle ();
+      timerfd_tracker *tfd = (timerfd_tracker *) timerid;
+      return tfd->get_timerfd_handle ();
     }
   __except (EFAULT) {}
   __endtry
@@ -153,8 +177,8 @@ fhandler_timerfd::dup (fhandler_base *child, int flags)
       fhandler_timerfd *fhc = (fhandler_timerfd *) child;
       __try
 	{
-	  timer_tracker *tt = (timer_tracker *) fhc->timerid;
-	  tt->increment_instances ();
+	  timerfd_tracker *tfd = (timerfd_tracker *) fhc->timerid;
+	  tfd->increment_instances ();
 	  ret = 0;
 	}
       __except (EFAULT) {}
@@ -164,14 +188,27 @@ fhandler_timerfd::dup (fhandler_base *child, int flags)
 }
 
 void
-fhandler_timerfd::fixup_after_exec ()
+fhandler_timerfd::fixup_after_fork (HANDLE)
 {
-  if (close_on_exec ())
-    return;
   __try
     {
-      timer_tracker *tt = (timer_tracker *) timerid;
-      tt->fixup_after_exec ();
+      timerfd_tracker *tfd = (timerfd_tracker *) timerid;
+      tfd->fixup_after_fork ();
+    }
+  __except (EFAULT) {}
+  __endtry
+}
+
+void
+fhandler_timerfd::fixup_after_exec ()
+{
+  __try
+    {
+      timerfd_tracker *tfd = (timerfd_tracker *) timerid;
+      if (close_on_exec ())
+	tfd->decrement_instances ();
+      else
+	tfd->fixup_after_exec ();
     }
   __except (EFAULT) {}
   __endtry
@@ -188,7 +225,7 @@ fhandler_timerfd::ioctl (unsigned int cmd, void *p)
     case TFD_IOC_SET_TICKS:
       __try
 	{
-	  timer_tracker *tt = (timer_tracker *) timerid;
+	  timerfd_tracker *tfd = (timerfd_tracker *) timerid;
 
 	  ov_cnt = *(uint64_t *) p;
 	  if (!ov_cnt)
@@ -196,11 +233,11 @@ fhandler_timerfd::ioctl (unsigned int cmd, void *p)
 	      set_errno (EINVAL);
 	      break;
 	    }
-	  tt->set_event (ov_cnt);
+	  tfd->ioctl_set_ticks (ov_cnt);
+	  ret = 0;
 	}
       __except (EFAULT) {}
       __endtry
-      ret = 0;
       break;
     default:
       ret = fhandler_base::ioctl (cmd, p);
@@ -210,6 +247,17 @@ fhandler_timerfd::ioctl (unsigned int cmd, void *p)
   return ret;
 }
 
+fhandler_timerfd::~fhandler_timerfd ()
+{
+  __try
+    {
+      timerfd_tracker *tfd = (timerfd_tracker *) timerid;
+      timerfd_tracker::dtor (tfd);
+    }
+  __except (EFAULT) {}
+  __endtry
+}
+
 int
 fhandler_timerfd::close ()
 {
@@ -217,11 +265,94 @@ fhandler_timerfd::close ()
 
   __try
     {
-      timer_tracker *tt = (timer_tracker *) timerid;
-      timer_tracker::close (tt);
+      timerfd_tracker *tfd = (timerfd_tracker *) timerid;
+      tfd->close ();
       ret = 0;
     }
   __except (EFAULT) {}
   __endtry
   return ret;
+}
+
+extern "C" int
+timerfd_create (clockid_t clock_id, int flags)
+{
+  int ret = -1;
+  fhandler_timerfd *fh;
+
+  debug_printf ("timerfd_create (%lu, %y)", clock_id, flags);
+
+  if (clock_id != CLOCK_REALTIME
+      && clock_id != CLOCK_MONOTONIC
+      && clock_id != CLOCK_BOOTTIME)
+    {
+      set_errno (EINVAL);
+      goto done;
+    }
+  if ((flags & ~(TFD_NONBLOCK | TFD_CLOEXEC)) != 0)
+    {
+      set_errno (EINVAL);
+      goto done;
+    }
+
+    {
+      /* Create new timerfd descriptor. */
+      cygheap_fdnew fd;
+
+      if (fd < 0)
+        goto done;
+      fh = (fhandler_timerfd *) build_fh_dev (*timerfd_dev);
+      if (fh && fh->timerfd (clock_id, flags) == 0)
+        {
+          fd = fh;
+          if (fd <= 2)
+            set_std_handle (fd);
+          ret = fd;
+        }
+      else
+        delete fh;
+    }
+
+done:
+  syscall_printf ("%R = timerfd_create (%lu, %y)", ret, clock_id, flags);
+  return ret;
+}
+
+extern "C" int
+timerfd_settime (int fd_in, int flags, const struct itimerspec *value,
+		 struct itimerspec *ovalue)
+{
+  /* TODO: There's no easy way to implement TFD_TIMER_CANCEL_ON_SET,
+     but we should at least accept the flag. */
+  if ((flags & ~(TFD_TIMER_ABSTIME | TFD_TIMER_CANCEL_ON_SET)) != 0)
+    {
+      set_errno (EINVAL);
+      return -1;
+    }
+
+  cygheap_fdget fd (fd_in);
+  if (fd < 0)
+    return -1;
+  fhandler_timerfd *fh = fd->is_timerfd ();
+  if (!fh)
+    {
+      set_errno (EINVAL);
+      return -1;
+    }
+  return fh->settime (flags, value, ovalue);
+}
+
+extern "C" int
+timerfd_gettime (int fd_in, struct itimerspec *ovalue)
+{
+  cygheap_fdget fd (fd_in);
+  if (fd < 0)
+    return -1;
+  fhandler_timerfd *fh = fd->is_timerfd ();
+  if (!fh)
+    {
+      set_errno (EINVAL);
+      return -1;
+    }
+  return fh->gettime (ovalue);
 }

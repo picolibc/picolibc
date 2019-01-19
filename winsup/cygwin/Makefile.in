@@ -396,6 +396,7 @@ DLL_OFILES:= \
 	termios.o \
 	thread.o \
 	timer.o \
+	timerfd.o \
 	times.o \
 	tls_pbuf.o \
 	tty.o \

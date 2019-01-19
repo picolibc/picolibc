@@ -15,15 +15,14 @@ details. */
 #include "dtable.h"
 #include "cygheap.h"
 #include "timer.h"
-#include <sys/timerfd.h>
 #include <sys/param.h>
 
 #define EVENT_DISARMED	 0
 #define EVENT_ARMED	-1
 #define EVENT_LOCK	 1
 
-/* Must not be NO_COPY, otherwise timerfd breaks. */
-timer_tracker ttstart (CLOCK_REALTIME, NULL, false);
+/* Must not be NO_COPY to avoid memory leak after fork. */
+timer_tracker ttstart (CLOCK_REALTIME, NULL);
 
 class lock_timer_tracker
 {
@@ -60,46 +59,34 @@ timer_tracker::cancel ()
 
 timer_tracker::~timer_tracker ()
 {
-  HANDLE hdl;
-
-  deleting = true;
   if (cancel ())
     {
-      HANDLE hdl = InterlockedExchangePointer (&hcancel, NULL);
-      CloseHandle (hdl);
-      hdl = InterlockedExchangePointer (&timerfd_event, NULL);
-      if (hdl)
-	CloseHandle (hdl);
+      CloseHandle (hcancel);
+#ifdef DEBUGGING
+      hcancel = NULL;
+#endif
     }
-  hdl = InterlockedExchangePointer (&syncthread, NULL);
-  if (hdl)
-    CloseHandle (hdl);
+  if (syncthread)
+    CloseHandle (syncthread);
   magic = 0;
 }
 
-/* fd is true for timerfd timers. */
-timer_tracker::timer_tracker (clockid_t c, const sigevent *e, bool fd)
-: magic (TT_MAGIC), instance_count (1), clock_id (c), deleting (false),
-  hcancel (NULL), syncthread (NULL), timerfd_event (NULL),
-  interval_us(0), sleepto_us(0), event_running (EVENT_DISARMED),
-  overrun_count_curr (0), overrun_count (0)
+timer_tracker::timer_tracker (clockid_t c, const sigevent *e)
 {
   if (e != NULL)
     evp = *e;
-  else if (fd)
-    {
-      evp.sigev_notify = SIGEV_NONE;
-      evp.sigev_signo = 0;
-      evp.sigev_value.sival_ptr = this;
-    }
   else
     {
       evp.sigev_notify = SIGEV_SIGNAL;
       evp.sigev_signo = SIGALRM;
       evp.sigev_value.sival_ptr = this;
     }
-  if (fd)
-    timerfd_event = CreateEvent (&sec_none_nih, TRUE, FALSE, NULL);
+  clock_id = c;
+  magic = TT_MAGIC;
+  hcancel = NULL;
+  event_running = EVENT_DISARMED;
+  overrun_count_curr = 0;
+  overrun_count = 0;
   if (this != &ttstart)
     {
       lock_timer_tracker here;
@@ -132,24 +119,8 @@ timer_tracker::arm_event ()
   return ret;
 }
 
-void
-timer_tracker::set_event (uint64_t ov_cnt)
-{
-  LONG ret;
-
-  while ((ret = InterlockedCompareExchange (&event_running, EVENT_LOCK,
-					    EVENT_DISARMED)) == EVENT_LOCK)
-    yield ();
-  InterlockedExchange64 (&overrun_count, ov_cnt);
-  if (ret == EVENT_DISARMED)
-    {
-      SetEvent (get_timerfd_handle ());
-      InterlockedExchange (&event_running, EVENT_ARMED);
-    }
-}
-
-LONG64
-timer_tracker::_disarm_event ()
+LONG
+timer_tracker::disarm_event ()
 {
   LONG ret;
 
@@ -158,55 +129,16 @@ timer_tracker::_disarm_event ()
     yield ();
   if (ret == EVENT_ARMED)
     {
-      InterlockedExchange64 (&overrun_count_curr, overrun_count);
+      LONG64 ov_cnt;
+
+      InterlockedExchange64 (&ov_cnt, overrun_count);
+      if (ov_cnt > DELAYTIMER_MAX || ov_cnt < 0)
+	overrun_count_curr = DELAYTIMER_MAX;
+      else
+	overrun_count_curr = ov_cnt;
       ret = overrun_count_curr;
       InterlockedExchange64 (&overrun_count, 0);
       InterlockedExchange (&event_running, EVENT_DISARMED);
-    }
-  return ret;
-}
-
-unsigned int
-timer_tracker::disarm_event ()
-{
-  LONG64 ov = _disarm_event ();
-  if (ov > DELAYTIMER_MAX || ov < 0)
-    return DELAYTIMER_MAX;
-  return (unsigned int) ov;
-}
-
-LONG64
-timer_tracker::wait (bool nonblocking)
-{
-  HANDLE w4[3] = { NULL, hcancel, get_timerfd_handle () };
-  LONG64 ret = -1;
-
-  wait_signal_arrived here (w4[0]);
-repeat:
-  switch (WaitForMultipleObjects (3, w4, FALSE, nonblocking ? 0 : INFINITE))
-    {
-    case WAIT_OBJECT_0:		/* signal */
-      if (_my_tls.call_signal_handler ())
-	goto repeat;
-      set_errno (EINTR);
-      break;
-    case WAIT_OBJECT_0 + 1:	/* settime oder timer delete */
-      if (deleting)
-	{
-	  set_errno (EIO);
-	  break;
-	}
-      /*FALLTHRU*/
-    case WAIT_OBJECT_0 + 2:	/* timer event */
-      ret = _disarm_event ();
-      ResetEvent (timerfd_event);
-      break;
-    case WAIT_TIMEOUT:
-      set_errno (EAGAIN);
-      break;
-    default:
-      __seterrno ();
-      break;
     }
   return ret;
 }
@@ -267,18 +199,6 @@ timer_tracker::thread_func ()
 
       switch (evp.sigev_notify)
 	{
-	case SIGEV_NONE:
-	  {
-	    if (!timerfd_event)
-	      break;
-	    if (arm_event ())
-	      {
-		debug_printf ("%p timerfd already queued", this);
-		break;
-	      }
-	    SetEvent (timerfd_event);
-	    break;
-	  }
 	case SIGEV_SIGNAL:
 	  {
 	    if (arm_event ())
@@ -342,6 +262,17 @@ timer_thread (VOID *x)
   return tt->thread_func ();
 }
 
+static inline bool
+timespec_bad (const timespec& t)
+{
+  if (t.tv_nsec < 0 || t.tv_nsec >= NSPERSEC || t.tv_sec < 0)
+    {
+      set_errno (EINVAL);
+      return true;
+    }
+  return false;
+}
+
 int
 timer_tracker::settime (int in_flags, const itimerspec *value, itimerspec *ovalue)
 {
@@ -355,12 +286,8 @@ timer_tracker::settime (int in_flags, const itimerspec *value, itimerspec *ovalu
 	  __leave;
 	}
 
-      if (!valid_timespec (value->it_value)
-	  || !valid_timespec (value->it_interval))
-	{
-	  set_errno (EINVAL);
-	  __leave;
-	}
+      if (timespec_bad (value->it_value) || timespec_bad (value->it_interval))
+	__leave;
 
       lock_timer_tracker here;
       cancel ();
@@ -411,17 +338,9 @@ timer_tracker::gettime (itimerspec *ovalue)
     }
 }
 
-/* Returns
-
-    1 if we still have to keep the timer around
-    0 if we can delete the timer
-   -1 if we can't find the timer in the list
-*/
 int
 timer_tracker::clean_and_unhook ()
 {
-  if (decrement_instances () > 0)
-    return 1;
   for (timer_tracker *tt = &ttstart; tt->next != NULL; tt = tt->next)
     if (tt->next == this)
       {
@@ -431,74 +350,19 @@ timer_tracker::clean_and_unhook ()
   return -1;
 }
 
-int
-timer_tracker::close (timer_tracker *tt)
-{
-  lock_timer_tracker here;
-  int ret = tt->clean_and_unhook ();
-  if (ret >= 0)
-    {
-      if (ret == 0)
-	delete tt;
-      ret = 0;
-    }
-  else
-    set_errno (EINVAL);
-  return ret;
-}
-
-void
-timer_tracker::restart ()
-{
-  timerfd_event = CreateEvent (&sec_none_nih, TRUE, FALSE, NULL);
-  if (interval_us != 0 || sleepto_us != 0)
-    {
-      hcancel = CreateEvent (&sec_none_nih, TRUE, FALSE, NULL);
-      syncthread = CreateEvent (&sec_none_nih, TRUE, FALSE, NULL);
-      new cygthread (timer_thread, this, "itimer", syncthread);
-    }
-}
-
-/* Only called from fhandler_timerfd::fixup_after_exec.  Note that
-   we don't touch the instance count.  This is handled by closing
-   the timer from fhandler_timerfd::close on O_CLOEXEC.  Ultimately
-   the instance count should be correct after execve. */
-void
-timer_tracker::fixup_after_exec ()
-{
-  lock_timer_tracker here;
-  /* Check if timer is already in the list. If so, skip it. */
-  for (timer_tracker *tt = &ttstart; tt->next != NULL; tt = tt->next)
-    if (tt->next == this)
-      return;
-  next = ttstart.next;
-  ttstart.next = this;
-  restart ();
-}
-
 void
 timer_tracker::fixup_after_fork ()
 {
   ttstart.hcancel = ttstart.syncthread = NULL;
-  ttstart.interval_us = ttstart.sleepto_us = 0;
   ttstart.event_running = EVENT_DISARMED;
-  ttstart.overrun_count_curr = ttstart.overrun_count = 0;
+  ttstart.overrun_count_curr = 0;
+  ttstart.overrun_count = 0;
   for (timer_tracker *tt = &ttstart; tt->next != NULL; /* nothing */)
     {
       timer_tracker *deleteme = tt->next;
-      if (deleteme->get_timerfd_handle ())
-	{
-	  tt = deleteme;
-	  tt->restart ();
-	}
-      else
-	{
-	  tt->next = deleteme->next;
-	  deleteme->timerfd_event = NULL;
-	  deleteme->hcancel = NULL;
-	  deleteme->syncthread = NULL;
-	  delete deleteme;
-	}
+      tt->next = deleteme->next;
+      deleteme->hcancel = deleteme->syncthread = NULL;
+      delete deleteme;
     }
 }
 
@@ -536,21 +400,21 @@ timer_create (clockid_t clock_id, struct sigevent *__restrict evp,
 {
   int ret = -1;
 
-  if (CLOCKID_IS_PROCESS (clock_id) || CLOCKID_IS_THREAD (clock_id))
-    {
-      set_errno (ENOTSUP);
-      return -1;
-    }
-
-  if (clock_id >= MAX_CLOCKS)
-    {
-      set_errno (EINVAL);
-      return -1;
-    }
-
   __try
     {
-      *timerid = (timer_t) new timer_tracker (clock_id, evp, false);
+      if (CLOCKID_IS_PROCESS (clock_id) || CLOCKID_IS_THREAD (clock_id))
+	{
+	  set_errno (ENOTSUP);
+	  return -1;
+	}
+
+      if (clock_id >= MAX_CLOCKS)
+	{
+	  set_errno (EINVAL);
+	  return -1;
+	}
+
+      *timerid = (timer_t) new timer_tracker (clock_id, evp);
       ret = 0;
     }
   __except (EFAULT) {}
@@ -617,7 +481,15 @@ timer_delete (timer_t timerid)
 	  set_errno (EINVAL);
 	  __leave;
 	}
-      ret = timer_tracker::close (in_tt);
+
+      lock_timer_tracker here;
+      if (in_tt->clean_and_unhook () == 0)
+	{
+	  delete in_tt;
+	  ret = 0;
+	}
+      else
+	set_errno (EINVAL);
     }
   __except (EFAULT) {}
   __endtry
@@ -723,87 +595,4 @@ ualarm (useconds_t value, useconds_t interval)
 		    / (NSPERSEC/USPERSEC);
  syscall_printf ("%d = ualarm(%ld , %ld)", ret, value, interval);
  return ret;
-}
-
-extern "C" int
-timerfd_create (clockid_t clock_id, int flags)
-{
-  int ret = -1;
-  fhandler_timerfd *fh;
-
-  debug_printf ("timerfd (%lu, %y)", clock_id, flags);
-
-  if (clock_id != CLOCK_REALTIME
-      && clock_id != CLOCK_MONOTONIC
-      && clock_id != CLOCK_BOOTTIME)
-    {
-      set_errno (EINVAL);
-      return -1;
-    }
-  if ((flags & ~(TFD_NONBLOCK | TFD_CLOEXEC)) != 0)
-    {
-      set_errno (EINVAL);
-      goto done;
-    }
-
-    {
-      /* Create new timerfd descriptor. */
-      cygheap_fdnew fd;
-
-      if (fd < 0)
-        goto done;
-      fh = (fhandler_timerfd *) build_fh_dev (*timerfd_dev);
-      if (fh && fh->timerfd (clock_id, flags) == 0)
-        {
-          fd = fh;
-          if (fd <= 2)
-            set_std_handle (fd);
-          ret = fd;
-        }
-      else
-        delete fh;
-    }
-
-done:
-  syscall_printf ("%R = timerfd (%lu, %y)", ret, clock_id, flags);
-  return ret;
-}
-
-extern "C" int
-timerfd_settime (int fd_in, int flags, const struct itimerspec *value,
-		 struct itimerspec *ovalue)
-{
-  /* There's no easy way to implement TFD_TIMER_CANCEL_ON_SET, but
-     we should at least accept the flag. */
-  if ((flags & ~(TFD_TIMER_ABSTIME | TFD_TIMER_CANCEL_ON_SET)) != 0)
-    {
-      set_errno (EINVAL);
-      return -1;
-    }
-
-  cygheap_fdget fd (fd_in);
-  if (fd < 0)
-    return -1;
-  fhandler_timerfd *fh = fd->is_timerfd ();
-  if (!fh)
-    {
-      set_errno (EINVAL);
-      return -1;
-    }
-  return fh->settime (flags, value, ovalue);
-}
-
-extern "C" int
-timerfd_gettime (int fd_in, struct itimerspec *ovalue)
-{
-  cygheap_fdget fd (fd_in);
-  if (fd < 0)
-    return -1;
-  fhandler_timerfd *fh = fd->is_timerfd ();
-  if (!fh)
-    {
-      set_errno (EINVAL);
-      return -1;
-    }
-  return fh->gettime (ovalue);
 }
