@@ -1,4 +1,4 @@
-/* pipe.cc: pipe for Cygwin.
+/* fhandler_pipe.cc: pipes for Cygwin.
 
 This file is part of Cygwin.
 
