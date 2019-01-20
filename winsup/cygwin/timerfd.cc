@@ -495,6 +495,7 @@ timerfd_tracker::gettime (struct itimerspec *curr_value)
       next_relative_exp -= curr_value->it_value.tv_sec * NS100PERSEC;
       curr_value->it_value.tv_nsec = next_relative_exp
 				     * (NSPERSEC / NS100PERSEC);
+      curr_value->it_interval = time_spec ().it_interval;
       leave_critical_section ();
       ret = 0;
     }

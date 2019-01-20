@@ -128,6 +128,7 @@ class timerfd_tracker		/* cygheap! */
 
   clock_t get_clockid () const { return tfd_shared->_clockid; }
   LONG64 get_clock_now () const { return tfd_shared->get_clock_now (); }
+  struct itimerspec &time_spec () { return tfd_shared->time_spec (); }
   LONG64 get_exp_ts () const { return tfd_shared->_exp_ts; }
   LONG64 get_interval () const { return tfd_shared->_interval; }
   int flags () const { return tfd_shared->flags (); }
