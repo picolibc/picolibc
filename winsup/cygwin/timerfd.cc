@@ -590,8 +590,8 @@ timerfd_tracker::settime (int flags, const struct itimerspec *new_value,
 	  ret = -EBADF;
 	  __leave;
 	}
-      if (old_value)
-	gettime (old_value);
+      if (old_value && (ret = gettime (old_value)) < 0)
+	__leave;
       if (new_value->it_value.tv_sec == 0 && new_value->it_value.tv_nsec == 0)
 	ret = disarm_timer ();
       else
