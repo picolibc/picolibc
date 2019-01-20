@@ -69,6 +69,9 @@ timerfd_tracker::thread_func ()
 	      LONG64 now = get_clock_now ();
 	      LONG64 ts = get_exp_ts ();
 
+	      /* Make concessions for unexact realtime clock */
+	      if (ts > now)
+		ts = now - 1;
 	      increment_overrun_count ((now - ts + get_interval () - 1)
 				       / get_interval ());
 	      /* Set exp_ts to current timestamp.  Make sure exp_ts ends up
@@ -251,7 +254,6 @@ timerfd_shared::dtor ()
     {
       return false;
     }
-  timer_expired ();
   disarm_timer ();
   NtClose (_timer);
   NtClose (_arm_evt);
