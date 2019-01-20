@@ -26,7 +26,7 @@ class timerfd_shared
 
   clockid_t _clockid;		/* clockid */
   struct itimerspec _time_spec;	/* original incoming itimerspec */
-  LARGE_INTEGER _exp_ts;	/* start timestamp or next expire timestamp
+  LONG64 _exp_ts;		/* start timestamp or next expire timestamp
 				   in 100ns */
   LONG64 _interval;		/* timer interval in 100ns */
   LONG64 _overrun_count;	/* expiry counter */
@@ -71,7 +71,7 @@ class timerfd_shared
     {
       ResetEvent (_arm_evt);
       memset (&_time_spec, 0, sizeof _time_spec);
-      _exp_ts.QuadPart = 0;
+      _exp_ts = 0;
       _interval = 0;
       _flags = 0;
       NtCancelTimer (timer (), NULL);
@@ -79,7 +79,7 @@ class timerfd_shared
       return 0;
     }
   void timer_expired () { SetEvent (_expired_evt); }
-  void set_exp_ts (LONG64 ts) { _exp_ts.QuadPart = ts; }
+  void set_exp_ts (LONG64 ts) { _exp_ts = ts; }
 
   friend class timerfd_tracker;
 };
@@ -120,7 +120,7 @@ class timerfd_tracker		/* cygheap! */
     { return tfd_shared->time_spec ().it_interval; }
 
   LONG64 get_clock_now () const { return tfd_shared->get_clock_now (); }
-  LONG64 get_exp_ts () const { return tfd_shared->_exp_ts.QuadPart; }
+  LONG64 get_exp_ts () const { return tfd_shared->_exp_ts; }
   LONG64 get_interval () const { return tfd_shared->_interval; }
 
   void set_exp_ts (LONG64 ts) const { tfd_shared->set_exp_ts (ts); }
