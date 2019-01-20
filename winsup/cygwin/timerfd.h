@@ -59,7 +59,8 @@ class timerfd_shared
   /* write access methods */
   bool enter_cs ()
     {
-      return WaitForSingleObject (_access_mtx, INFINITE) == WAIT_OBJECT_0;
+      return (WaitForSingleObject (_access_mtx, INFINITE) & ~WAIT_ABANDONED_0)
+	      == WAIT_OBJECT_0;
     }
   void leave_cs ()
     {
