@@ -16,6 +16,70 @@ details. */
 #include <sys/timerfd.h>
 #include "timerfd.h"
 
+#define TFD_CANCEL_FLAGS (TFD_TIMER_ABSTIME | TFD_TIMER_CANCEL_ON_SET)
+
+/* Unfortunately MsgWaitForMultipleObjectsEx does not receive WM_TIMECHANGED
+   messages without a window defined in this process.  Create a hidden window
+   for that purpose. */
+
+void
+timerfd_tracker::create_timechange_window ()
+{
+  WNDCLASSW wclass = { 0 };
+  WCHAR cname[NAME_MAX];
+
+  __small_swprintf (cname, L"Cygwin.timerfd.%u", winpid);
+  wclass.lpfnWndProc = DefWindowProcW;
+  wclass.hInstance = GetModuleHandle (NULL);
+  wclass.hbrBackground = (HBRUSH) (COLOR_WINDOW + 1);
+  wclass.lpszClassName = cname;
+  atom = RegisterClassW (&wclass);
+  if (!atom)
+    debug_printf ("RegisterClass %E");
+  else
+    {
+      window = CreateWindowExW (0, cname, cname, WS_POPUP, 0, 0, 0, 0,
+				NULL, NULL, NULL, NULL);
+      if (!window)
+	debug_printf ("RegisterClass %E");
+    }
+}
+
+void
+timerfd_tracker::delete_timechange_window ()
+{
+  if (window)
+    DestroyWindow (window);
+  if (atom)
+    UnregisterClassW ((LPWSTR) (uintptr_t) atom, GetModuleHandle (NULL));
+}
+
+void
+timerfd_tracker::handle_timechange_window ()
+{
+  MSG msg;
+
+  if (PeekMessageW(&msg, NULL, 0, 0, PM_REMOVE) && msg.message != WM_QUIT)
+    {
+      DispatchMessageW(&msg);
+      if (msg.message == WM_TIMECHANGE
+	  && get_clockid () == CLOCK_REALTIME
+	  && (flags () & TFD_CANCEL_FLAGS) == TFD_CANCEL_FLAGS
+	  && enter_critical_section ())
+	{
+	  /* make sure to handle each WM_TIMECHANGE only once! */
+	  if (msg.time != tc_time ())
+	    {
+	      set_overrun_count (-1LL);
+	      disarm_timer ();
+	      timer_expired ();
+	      set_tc_time (msg.time);
+	    }
+	  leave_critical_section ();
+	}
+    }
+}
+
 DWORD
 timerfd_tracker::thread_func ()
 {
@@ -23,14 +87,19 @@ timerfd_tracker::thread_func ()
   HANDLE armed[2] = { tfd_shared->arm_evt (),
 		      cancel_evt };
 
+  create_timechange_window ();
   while (1)
     {
-      switch (WaitForMultipleObjects (2, armed, FALSE, INFINITE))
+      switch (MsgWaitForMultipleObjectsEx (2, armed, INFINITE, QS_POSTMESSAGE,
+					   MWMO_INPUTAVAILABLE))
 	{
 	case WAIT_OBJECT_0:
 	  break;
 	case WAIT_OBJECT_0 + 1:
 	  goto canceled;
+	case WAIT_OBJECT_0 + 2:
+	  handle_timechange_window ();
+	  continue;
 	default:
 	  continue;
 	}
@@ -40,9 +109,12 @@ timerfd_tracker::thread_func ()
       HANDLE expired[3] = { tfd_shared->timer (),
 			    tfd_shared->disarm_evt (),
 			    cancel_evt };
+
       while (1)
 	{
-	  switch (WaitForMultipleObjects (3, expired, FALSE, INFINITE))
+	  switch (MsgWaitForMultipleObjectsEx (3, expired, INFINITE,
+					       QS_POSTMESSAGE,
+					       MWMO_INPUTAVAILABLE))
 	    {
 	    case WAIT_OBJECT_0:
 	      break;
@@ -50,12 +122,23 @@ timerfd_tracker::thread_func ()
 	      goto disarmed;
 	    case WAIT_OBJECT_0 + 2:
 	      goto canceled;
+	    case WAIT_OBJECT_0 + 3:
+	      handle_timechange_window ();
+	      continue;
 	    default:
 	      continue;
 	    }
 
 	  if (!enter_critical_section ())
 	    continue;
+	  /* Make sure we haven't been abandoned and/or disarmed
+	     in the meantime */
+	  if (overrun_count () == -1LL
+	      || IsEventSignalled (tfd_shared->disarm_evt ()))
+	    {
+	      leave_critical_section ();
+	      goto disarmed;
+	    }
 	  /* One-shot timer? */
 	  if (!get_interval ())
 	    {
@@ -93,7 +176,7 @@ timerfd_tracker::thread_func ()
 		  NtSetTimer (tfd_shared->timer (), &DueTime, NULL, NULL,
 			      Resume, 0, NULL);
 		}
-	      }
+	    }
 	  /* Arm the expiry object */
 	  timer_expired ();
 	  leave_critical_section ();
@@ -103,6 +186,7 @@ disarmed:
     }
 
 canceled:
+  delete_timechange_window ();
   _my_tls._ctinfo->auto_release ();     /* automatically return the cygthread to the cygthread pool */
   return 0;
 }

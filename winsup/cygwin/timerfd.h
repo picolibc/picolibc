@@ -31,6 +31,7 @@ class timerfd_shared
   LONG64 _interval;		/* timer interval in 100ns */
   LONG64 _overrun_count;	/* expiry counter */
   int _flags;			/* settime flags */
+  DWORD _tc_time;		/* timestamp of the last WM_TIMECHANGE msg */
 
   int create (clockid_t);
   bool dtor ();
@@ -43,7 +44,8 @@ class timerfd_shared
   LONG64 get_clock_now () const { return get_clock (_clockid)->n100secs (); }
   struct itimerspec &time_spec () { return _time_spec; }
   int flags () const { return _flags; }
-  LONG64 overrun_count () const { return _overrun_count; }
+
+  /* write access methods */
   void increment_overrun_count (LONG64 add)
     { InterlockedAdd64 (&_overrun_count, add); }
   void set_overrun_count (LONG64 newval)
@@ -55,8 +57,6 @@ class timerfd_shared
 	ResetEvent (_expired_evt);
       return ret;
     }
-
-  /* write access methods */
   bool enter_cs ()
     {
       return (WaitForSingleObject (_access_mtx, INFINITE) & ~WAIT_ABANDONED_0)
@@ -73,7 +73,7 @@ class timerfd_shared
       memset (&_time_spec, 0, sizeof _time_spec);
       _exp_ts = 0;
       _interval = 0;
-      _flags = 0;
+      /* _flags = 0;  DON'T DO THAT.  Required for TFD_TIMER_CANCEL_ON_SET */
       NtCancelTimer (timer (), NULL);
       SetEvent (_disarm_evt);
       return 0;
@@ -86,8 +86,6 @@ class timerfd_shared
 
 class timerfd_tracker		/* cygheap! */
 {
-  DWORD winpid;			/* This is used @ fork/exec time to know if
-				   this tracker already has been fixed up. */
   HANDLE tfd_shared_hdl;	/* handle auf shared mem */
   timerfd_shared *tfd_shared;	/* pointer auf shared mem, needs
 				   NtMapViewOfSection in each new process. */
@@ -96,6 +94,14 @@ class timerfd_tracker		/* cygheap! */
   HANDLE sync_thr;		/* cygthread sync object. */
   LONG local_instance_count;	/* each open fd increments this.
 				   If 0 -> cancel thread.  */
+  DWORD winpid;			/* This is used @ fork/exec time to know if
+				   this tracker already has been fixed up. */
+  HWND window;			/* window handle */
+  ATOM atom;			/* window class */
+
+  void create_timechange_window ();
+  void delete_timechange_window ();
+  void handle_timechange_window ();
 
   bool dtor ();
 
@@ -107,9 +113,10 @@ class timerfd_tracker		/* cygheap! */
   int disarm_timer () const { return tfd_shared->disarm_timer (); }
   void timer_expired () const { tfd_shared->timer_expired (); }
 
+  LONG64 overrun_count () const { return tfd_shared->_overrun_count; }
   void increment_overrun_count (LONG64 add) const
     { tfd_shared->increment_overrun_count (add); }
-  void set_overrun_count (uint64_t ov_cnt) const
+  void set_overrun_count (LONG64 ov_cnt) const
     { tfd_shared->set_overrun_count ((LONG64) ov_cnt); }
   LONG64 read_and_reset_overrun_count () const
     { return tfd_shared->read_and_reset_overrun_count (); }
@@ -119,9 +126,13 @@ class timerfd_tracker		/* cygheap! */
   struct timespec it_interval () const
     { return tfd_shared->time_spec ().it_interval; }
 
+  clock_t get_clockid () const { return tfd_shared->_clockid; }
   LONG64 get_clock_now () const { return tfd_shared->get_clock_now (); }
   LONG64 get_exp_ts () const { return tfd_shared->_exp_ts; }
   LONG64 get_interval () const { return tfd_shared->_interval; }
+  int flags () const { return tfd_shared->flags (); }
+  DWORD tc_time () const { return tfd_shared->_tc_time; }
+  void set_tc_time (DWORD new_time) { tfd_shared->_tc_time = new_time; }
 
   void set_exp_ts (LONG64 ts) const { tfd_shared->set_exp_ts (ts); }
 
@@ -129,7 +140,8 @@ class timerfd_tracker		/* cygheap! */
   void *operator new (size_t, void *p) __attribute__ ((nothrow)) {return p;}
   timerfd_tracker ()
   : tfd_shared_hdl (NULL), tfd_shared (NULL), cancel_evt (NULL),
-    sync_thr (NULL), local_instance_count (1) {}
+    sync_thr (NULL), local_instance_count (1), winpid (0), window (NULL),
+    atom (0) {}
   int create (clockid_t);
   int gettime (struct itimerspec *);
   int settime (int, const struct itimerspec *, struct itimerspec *);
