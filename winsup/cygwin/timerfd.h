@@ -29,7 +29,7 @@ class timerfd_shared
   LONG64 _exp_ts;		/* start timestamp or next expire timestamp
 				   in 100ns */
   LONG64 _interval;		/* timer interval in 100ns */
-  LONG64 _overrun_count;	/* expiry counter */
+  LONG64 _expiration_count;	/* expiry counter */
   int _flags;			/* settime flags */
   DWORD _tc_time;		/* timestamp of the last WM_TIMECHANGE msg */
 
@@ -46,13 +46,13 @@ class timerfd_shared
   int flags () const { return _flags; }
 
   /* write access methods */
-  void increment_overrun_count (LONG64 add)
-    { InterlockedAdd64 (&_overrun_count, add); }
-  void set_overrun_count (LONG64 newval)
-    { InterlockedExchange64 (&_overrun_count, newval); }
-  LONG64 read_and_reset_overrun_count ()
+  void increment_expiration_count (LONG64 add)
+    { InterlockedAdd64 (&_expiration_count, add); }
+  void set_expiration_count (LONG64 newval)
+    { InterlockedExchange64 (&_expiration_count, newval); }
+  LONG64 read_and_reset_expiration_count ()
     {
-      LONG64 ret = InterlockedExchange64 (&_overrun_count, 0);
+      LONG64 ret = InterlockedExchange64 (&_expiration_count, 0);
       if (ret)
 	ResetEvent (_expired_evt);
       return ret;
@@ -113,13 +113,13 @@ class timerfd_tracker		/* cygheap! */
   int disarm_timer () const { return tfd_shared->disarm_timer (); }
   void timer_expired () const { tfd_shared->timer_expired (); }
 
-  LONG64 overrun_count () const { return tfd_shared->_overrun_count; }
-  void increment_overrun_count (LONG64 add) const
-    { tfd_shared->increment_overrun_count (add); }
-  void set_overrun_count (LONG64 ov_cnt) const
-    { tfd_shared->set_overrun_count ((LONG64) ov_cnt); }
-  LONG64 read_and_reset_overrun_count () const
-    { return tfd_shared->read_and_reset_overrun_count (); }
+  LONG64 expiration_count () const { return tfd_shared->_expiration_count; }
+  void increment_expiration_count (LONG64 add) const
+    { tfd_shared->increment_expiration_count (add); }
+  void set_expiration_count (LONG64 exp_cnt) const
+    { tfd_shared->set_expiration_count ((LONG64) exp_cnt); }
+  LONG64 read_and_reset_expiration_count () const
+    { return tfd_shared->read_and_reset_expiration_count (); }
 
   struct timespec it_value () const
     { return tfd_shared->time_spec ().it_value; }

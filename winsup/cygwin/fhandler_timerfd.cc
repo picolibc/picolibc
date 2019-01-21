@@ -218,7 +218,7 @@ int
 fhandler_timerfd::ioctl (unsigned int cmd, void *p)
 {
   int ret = -1;
-  uint64_t ov_cnt;
+  uint64_t exp_cnt;
 
   switch (cmd)
     {
@@ -227,13 +227,13 @@ fhandler_timerfd::ioctl (unsigned int cmd, void *p)
 	{
 	  timerfd_tracker *tfd = (timerfd_tracker *) timerid;
 
-	  ov_cnt = *(uint64_t *) p;
-	  if (!ov_cnt)
+	  exp_cnt = *(uint64_t *) p;
+	  if (!exp_cnt)
 	    {
 	      set_errno (EINVAL);
 	      break;
 	    }
-	  tfd->ioctl_set_ticks (ov_cnt);
+	  tfd->ioctl_set_ticks (exp_cnt);
 	  ret = 0;
 	}
       __except (EFAULT) {}

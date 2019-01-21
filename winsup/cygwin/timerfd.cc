@@ -70,7 +70,7 @@ timerfd_tracker::handle_timechange_window ()
 	  /* make sure to handle each WM_TIMECHANGE only once! */
 	  if (msg.time != tc_time ())
 	    {
-	      set_overrun_count (-1LL);
+	      set_expiration_count (-1LL);
 	      disarm_timer ();
 	      timer_expired ();
 	      set_tc_time (msg.time);
@@ -133,7 +133,7 @@ timerfd_tracker::thread_func ()
 	    continue;
 	  /* Make sure we haven't been abandoned and/or disarmed
 	     in the meantime */
-	  if (overrun_count () == -1LL
+	  if (expiration_count () == -1LL
 	      || IsEventSignalled (tfd_shared->disarm_evt ()))
 	    {
 	      leave_critical_section ();
@@ -142,29 +142,29 @@ timerfd_tracker::thread_func ()
 	  /* One-shot timer? */
 	  if (!get_interval ())
 	    {
-	      /* Set overrun count, disarm timer */
-	      increment_overrun_count (1);
+	      /* Set expiration count, disarm timer */
+	      increment_expiration_count (1);
 	      disarm_timer ();
 	    }
 	  else
 	    {
-	      /* Compute overrun count. */
+	      /* Compute expiration count. */
 	      LONG64 now = get_clock_now ();
 	      LONG64 ts = get_exp_ts ();
+	      LONG64 exp_cnt;
 
 	      /* Make concessions for unexact realtime clock */
 	      if (ts > now)
 		ts = now - 1;
-	      LONG64 ov_cnt = (now - ts + get_interval () - 1)
-			      / get_interval ();
-	      increment_overrun_count (ov_cnt);
-	      ts += get_interval () * ov_cnt;
+	      exp_cnt = (now - ts + get_interval () - 1) / get_interval ();
+	      increment_expiration_count (exp_cnt);
+	      ts += get_interval () * exp_cnt;
 	      /* Set exp_ts to current timestamp.  Make sure exp_ts ends up
-		 bigger than "now" and fix overrun count as required */
+		 bigger than "now" and fix expiration count as required */
 	      while (ts <= (now = get_clock_now ()))
 		{
-		  increment_overrun_count ((now - ts + get_interval () - 1)
-					   / get_interval ());
+		  increment_expiration_count ((now - ts + get_interval () - 1)
+					      / get_interval ());
 		  ts += get_interval ();
 		}
 	      set_exp_ts (ts);
@@ -395,9 +395,9 @@ timerfd_tracker::close ()
 }
 
 void
-timerfd_tracker::ioctl_set_ticks (uint64_t ov_cnt)
+timerfd_tracker::ioctl_set_ticks (uint64_t exp_cnt)
 {
-  set_overrun_count (ov_cnt);
+  set_expiration_count (exp_cnt);
   timer_expired ();
 }
 
@@ -449,7 +449,7 @@ repeat:
 	ret = -EIO;
       else
 	{
-	  ret = read_and_reset_overrun_count ();
+	  ret = read_and_reset_expiration_count ();
 	  leave_critical_section ();
 	  switch (ret)
 	    {
@@ -461,7 +461,7 @@ repeat:
 		goto repeat;
 	      ret = -EAGAIN;
 	      break;
-	    default:	/* Return (positive) overrun count. */
+	    default:	/* Return (positive) expiration count. */
 	      if (ret < 0)
 		ret = INT64_MAX;
 	      break;
@@ -539,7 +539,7 @@ timerfd_shared::arm_timer (int flags, const struct itimerspec *new_value)
 	{
 	  DueTime.QuadPart = get_clock_now () - ts;
 	  /* If the timestamp was earlier than now, compute number
-	     of overruns and offset DueTime to expire immediately. */
+	     of expirations and offset DueTime to expire immediately. */
 	  if (DueTime.QuadPart >= 0)
 	    DueTime.QuadPart = -1LL;
 	}
