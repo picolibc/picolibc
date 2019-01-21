@@ -155,13 +155,18 @@ timerfd_tracker::thread_func ()
 	      /* Make concessions for unexact realtime clock */
 	      if (ts > now)
 		ts = now - 1;
-	      increment_overrun_count ((now - ts + get_interval () - 1)
-				       / get_interval ());
+	      LONG64 ov_cnt = (now - ts + get_interval () - 1)
+			      / get_interval ();
+	      increment_overrun_count (ov_cnt);
+	      ts += get_interval () * ov_cnt;
 	      /* Set exp_ts to current timestamp.  Make sure exp_ts ends up
 		 bigger than "now" and fix overrun count as required */
-	      while ((ts += get_interval ()) <= (now = get_clock_now ()))
-		increment_overrun_count ((now - ts + get_interval () - 1)
-					 / get_interval ());
+	      while (ts <= (now = get_clock_now ()))
+		{
+		  increment_overrun_count ((now - ts + get_interval () - 1)
+					   / get_interval ());
+		  ts += get_interval ();
+		}
 	      set_exp_ts (ts);
 	      /* NtSetTimer allows periods of up to 24 days only.  If the time
 		 is longer, we set the timer up as one-shot timer for each
@@ -536,11 +541,7 @@ timerfd_shared::arm_timer (int flags, const struct itimerspec *new_value)
 	  /* If the timestamp was earlier than now, compute number
 	     of overruns and offset DueTime to expire immediately. */
 	  if (DueTime.QuadPart >= 0)
-	    {
-	      LONG64 num_intervals = DueTime.QuadPart / _interval;
-	      increment_overrun_count (num_intervals);
-	      DueTime.QuadPart = -1LL;
-	    }
+	    DueTime.QuadPart = -1LL;
 	}
     }
   else
