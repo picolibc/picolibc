@@ -187,6 +187,35 @@ fhandler_timerfd::dup (fhandler_base *child, int flags)
   return ret;
 }
 
+int
+fhandler_timerfd::ioctl (unsigned int cmd, void *p)
+{
+  int ret = -1;
+  uint64_t exp_cnt;
+
+  switch (cmd)
+    {
+    case TFD_IOC_SET_TICKS:
+      __try
+	{
+	  timerfd_tracker *tfd = (timerfd_tracker *) timerid;
+
+	  exp_cnt = *(uint64_t *) p;
+	  ret = tfd->ioctl_set_ticks (exp_cnt);
+	  if (ret < 0)
+	    set_errno (-ret);
+	}
+      __except (EFAULT) {}
+      __endtry
+      break;
+    default:
+      ret = fhandler_base::ioctl (cmd, p);
+      break;
+    }
+  syscall_printf ("%d = ioctl_timerfd(%x, %p)", ret, cmd, p);
+  return ret;
+}
+
 void
 fhandler_timerfd::fixup_after_fork (HANDLE)
 {
@@ -212,39 +241,6 @@ fhandler_timerfd::fixup_after_exec ()
     }
   __except (EFAULT) {}
   __endtry
-}
-
-int
-fhandler_timerfd::ioctl (unsigned int cmd, void *p)
-{
-  int ret = -1;
-  uint64_t exp_cnt;
-
-  switch (cmd)
-    {
-    case TFD_IOC_SET_TICKS:
-      __try
-	{
-	  timerfd_tracker *tfd = (timerfd_tracker *) timerid;
-
-	  exp_cnt = *(uint64_t *) p;
-	  if (!exp_cnt)
-	    {
-	      set_errno (EINVAL);
-	      break;
-	    }
-	  tfd->ioctl_set_ticks (exp_cnt);
-	  ret = 0;
-	}
-      __except (EFAULT) {}
-      __endtry
-      break;
-    default:
-      ret = fhandler_base::ioctl (cmd, p);
-      break;
-    }
-  syscall_printf ("%d = ioctl_timerfd(%x, %p)", ret, cmd, p);
-  return ret;
 }
 
 fhandler_timerfd::~fhandler_timerfd ()

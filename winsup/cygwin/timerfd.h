@@ -148,7 +148,7 @@ class timerfd_tracker		/* cygheap! */
   int settime (int, const struct itimerspec *, struct itimerspec *);
   static void dtor (timerfd_tracker *);
   void close ();
-  void ioctl_set_ticks (uint64_t);
+  int ioctl_set_ticks (uint64_t);
   void fixup_after_fork_exec (bool);
   void fixup_after_fork () { fixup_after_fork_exec (false); }
   void fixup_after_exec () { fixup_after_fork_exec (true); }

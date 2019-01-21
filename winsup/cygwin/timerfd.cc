@@ -394,11 +394,18 @@ timerfd_tracker::close ()
   InterlockedDecrement (&tfd_shared->instance_count);
 }
 
-void
-timerfd_tracker::ioctl_set_ticks (uint64_t exp_cnt)
+int
+timerfd_tracker::ioctl_set_ticks (uint64_t new_exp_cnt)
 {
+  LONG64 exp_cnt = (LONG64) new_exp_cnt;
+  if (exp_cnt == 0 || exp_cnt == -1LL)
+    return -EINVAL;
+  if (!enter_critical_section ())
+    return -EBADF;
   set_expiration_count (exp_cnt);
   timer_expired ();
+  leave_critical_section ();
+  return 0;
 }
 
 void
