@@ -574,6 +574,7 @@ timerfd_shared::arm_timer (int flags, const struct itimerspec *new_value)
     }
   set_exp_ts (ts);
   time_spec () = *new_value;
+  read_and_reset_expiration_count ();
   /* TODO: CLOCK_REALTIME_ALARM / CLOCK_BOOTTIME_ALARM
 	   Note: Advanced Power Settings -> Sleep -> Allow Wake Timers
 	   since W10 1709 */
