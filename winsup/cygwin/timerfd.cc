@@ -532,7 +532,7 @@ timerfd_shared::arm_timer (int flags, const struct itimerspec *new_value)
 	DueTime.QuadPart = ts + FACTOR;
       else /* non-REALTIME clocks require relative DueTime. */
 	{
-	  DueTime.QuadPart = ts - get_clock_now ();
+	  DueTime.QuadPart = get_clock_now () - ts;
 	  /* If the timestamp was earlier than now, compute number
 	     of overruns and offset DueTime to expire immediately. */
 	  if (DueTime.QuadPart >= 0)
