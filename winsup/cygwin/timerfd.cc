@@ -502,13 +502,26 @@ timerfd_tracker::gettime (struct itimerspec *curr_value)
 	  ret = -EBADF;
 	  __leave;
 	}
-      LONG64 next_relative_exp = get_exp_ts () - get_clock_now ();
-      curr_value->it_value.tv_sec = next_relative_exp / NS100PERSEC;
-      next_relative_exp -= curr_value->it_value.tv_sec * NS100PERSEC;
-      curr_value->it_value.tv_nsec = next_relative_exp
-				     * (NSPERSEC / NS100PERSEC);
-      curr_value->it_interval = time_spec ().it_interval;
-      leave_critical_section ();
+    }
+  __except (NO_ERROR)
+    {
+      return -EFAULT;
+    }
+  __endtry
+
+  __try
+    {
+      if (IsEventSignalled (tfd_shared->disarm_evt ()))
+	*curr_value = time_spec ();
+      else
+	{
+	  LONG64 next_relative_exp = get_exp_ts () - get_clock_now ();
+	  curr_value->it_value.tv_sec = next_relative_exp / NS100PERSEC;
+	  next_relative_exp -= curr_value->it_value.tv_sec * NS100PERSEC;
+	  curr_value->it_value.tv_nsec = next_relative_exp
+					 * (NSPERSEC / NS100PERSEC);
+	  curr_value->it_interval = time_spec ().it_interval;
+	}
       ret = 0;
     }
   __except (NO_ERROR)
@@ -516,6 +529,7 @@ timerfd_tracker::gettime (struct itimerspec *curr_value)
       ret = -EFAULT;
     }
   __endtry
+  leave_critical_section ();
   return ret;
 }
 
@@ -559,6 +573,7 @@ timerfd_shared::arm_timer (int flags, const struct itimerspec *new_value)
       ts += get_clock_now ();
     }
   set_exp_ts (ts);
+  time_spec () = *new_value;
   /* TODO: CLOCK_REALTIME_ALARM / CLOCK_BOOTTIME_ALARM
 	   Note: Advanced Power Settings -> Sleep -> Allow Wake Timers
 	   since W10 1709 */
