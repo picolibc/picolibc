@@ -46,7 +46,7 @@
 	if(!(finitef(z)||isnan(z))&&finitef(x)) {
 	    /* scalbf overflow; */
 	    errno = ERANGE;
-	    return (x > 0.0 ? HUGE_VAL : -HUGE_VAL);
+	    return (x > 0.0 ? HUGE_VALF : -HUGE_VALF);
 	}
 	if(z==0.0f&&z!=x) {
 	    /* scalbf underflow */

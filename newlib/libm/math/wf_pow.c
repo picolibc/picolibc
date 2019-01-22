@@ -51,7 +51,7 @@
 	    if(finitef(y)&&y<0.0f) {
 		/* 0**neg */
 		errno = EDOM;
-		return (float)-HUGE_VAL;
+		return -HUGE_VALF;
 	    }
 	    return z;
 	}
@@ -67,8 +67,8 @@
 		    /* powf(x,y) overflow */
 		    errno = ERANGE;
 		    if(x<0.0f&&rintf(y)!=y)
-		      return (float)-HUGE_VAL;
-		    return (float)HUGE_VAL;
+		      return -HUGE_VALF;
+		    return HUGE_VALF;
 		}
 	    }
 	} 

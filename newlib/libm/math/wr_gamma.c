@@ -40,7 +40,7 @@
 	    else
 	      /* gamma(finite) overflow */
 	      errno = ERANGE;
-	    return HUGE_VAL;
+	    return HUGE_VALF;
         } else
             return y;
 #endif

@@ -46,7 +46,7 @@ u_threshold= -1.0397208405e+02;  /* 0xc2cff1b5 */
 	    if(x>o_threshold) {
 		/* expf(finite) overflow */
 		errno = ERANGE;
-	        return HUGE_VAL;
+	        return HUGE_VALF;
 	    } else if(x<u_threshold) {
 		/* expf(finite) underflow */
 		errno = ERANGE;

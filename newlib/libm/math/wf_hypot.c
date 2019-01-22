@@ -36,7 +36,7 @@
 	if((!finitef(z))&&finitef(x)&&finitef(y)) {
 	    /* hypotf(finite,finite) overflow */
 	    errno = ERANGE;
-	    return (float)HUGE_VAL;
+	    return HUGE_VALF;
 	} else
 	    return z;
 #endif

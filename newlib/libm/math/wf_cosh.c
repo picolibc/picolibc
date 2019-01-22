@@ -36,7 +36,7 @@
 	if(fabsf(x)>8.9415985107e+01f) {
 	    /* coshf(finite) overflow */
 	    errno = ERANGE;
-	    return (float)HUGE_VAL;
+	    return HUGE_VALF;
 	} else
 	    return z;
 #endif

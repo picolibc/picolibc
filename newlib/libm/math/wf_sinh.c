@@ -36,7 +36,7 @@
 	if(!finitef(z)&&finitef(x)) {
 	    /* sinhf(finite) overflow */
 	    errno = ERANGE;
-	    return ( (x>0.0f) ? HUGE_VAL : -HUGE_VAL);
+	    return ( (x>0.0f) ? HUGE_VALF : -HUGE_VALF);
 	} else
 	    return z;
 #endif

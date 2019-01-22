@@ -41,7 +41,7 @@
 		/* gammaf(finite) overflow */
 		errno = ERANGE;
 	    }
-	    return (float)HUGE_VAL;
+	    return HUGE_VALF;
         } else
             return y;
 #endif

@@ -37,7 +37,7 @@
 	if(x==0.0f) {
 	    /* logf(0) */
 	    errno = ERANGE;
-	    return (float)-HUGE_VAL;
+	    return -HUGE_VALF;
 	} else { 
 	    /* logf(x<0) */
 	    errno = EDOM;

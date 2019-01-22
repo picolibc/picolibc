@@ -59,7 +59,7 @@
         if(x <= 0.0f){
 	    /* y1f(0) = -inf or y1f(x<0) = NaN */
 	    errno = EDOM;
-	    return (float)-HUGE_VAL;
+	    return -HUGE_VALF;
         }
 	if(x>(float)X_TLOSS) {
 	    /* y1f(x>X_TLOSS) */
