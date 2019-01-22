@@ -6,8 +6,8 @@ This software is a copyrighted work licensed under the terms of the
 Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
-#ifndef __TIMER_H__
-#define __TIMER_H__
+#ifndef __POSIX_TIMER_H__
+#define __POSIX_TIMER_H__
 
 #define TT_MAGIC 0x513e4a1c
 class timer_tracker
@@ -22,7 +22,6 @@ class timer_tracker
   HANDLE sync_thr;
   LONG64 interval;
   LONG64 exp_ts;
-  LONG overrun_event_running;
   LONG overrun_count_curr;
   LONG64 overrun_count;
 
@@ -42,7 +41,7 @@ class timer_tracker
   LONG64 get_interval () const { return interval; }
   void set_exp_ts (LONG64 ts) { exp_ts = ts; }
 
-  LONG arm_overrun_event ();
+  bool arm_overrun_event (LONG64);
   LONG disarm_overrun_event ();
 
   int gettime (itimerspec *, bool);
@@ -52,4 +51,4 @@ class timer_tracker
   static void fixup_after_fork ();
 };
 
-#endif /* __TIMER_H__ */
+#endif /* __POSIX_TIMER_H__ */

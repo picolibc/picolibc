@@ -17,8 +17,7 @@ details. */
 #include "posix_timer.h"
 #include <sys/param.h>
 
-#define OVR_EVENT_DISARMED	0
-#define OVR_EVENT_ARMED		1
+#define OVR_DISARMED		-1LL
 
 timer_tracker NO_COPY itimer_tracker (CLOCK_REALTIME, NULL);
 
@@ -34,15 +33,15 @@ timer_tracker::cancel ()
     {
       res = WaitForSingleObject (sync_thr, INFINITE);
       if (res != WAIT_OBJECT_0)
-	system_printf ("WFSO returned unexpected value %u, %E", res);
+	debug_printf ("WFSO returned unexpected value %u, %E", res);
     }
   return true;
 }
 
 timer_tracker::timer_tracker (clockid_t c, const sigevent *e)
 : magic (TT_MAGIC), clock_id (c), timer (NULL), cancel_evt (NULL),
-  sync_thr (NULL), interval (0), exp_ts (0), overrun_event_running (0),
-  overrun_count_curr (0), overrun_count (0)
+  sync_thr (NULL), interval (0), exp_ts (0), overrun_count_curr (0),
+  overrun_count (OVR_DISARMED)
 {
   srwlock = SRWLOCK_INIT;
   if (e != NULL)
@@ -66,25 +65,14 @@ timer_tracker::~timer_tracker ()
   ReleaseSRWLockExclusive (&srwlock);
 }
 
-static inline int64_t
-timespec_to_us (const timespec& ts)
-{
-  int64_t res = ts.tv_sec;
-  res *= USPERSEC;
-  res += (ts.tv_nsec + (NSPERSEC/USPERSEC) - 1) / (NSPERSEC/USPERSEC);
-  return res;
-}
-
 /* Returns 0 if arming successful, -1 if a signal is already queued.
    If so, it also increments overrun_count.  Only call under lock! */
-LONG
-timer_tracker::arm_overrun_event ()
+bool
+timer_tracker::arm_overrun_event (LONG64 exp_cnt)
 {
-  LONG ret;
+  bool ret = (overrun_count != OVR_DISARMED);
 
-  ret = InterlockedExchange (&overrun_event_running, OVR_EVENT_ARMED);
-  if (ret == OVR_EVENT_ARMED)
-    ret = InterlockedIncrement64 (&overrun_count);
+  overrun_count += exp_cnt;
   return ret;
 }
 
@@ -94,18 +82,17 @@ timer_tracker::disarm_overrun_event ()
   LONG ret;
 
   AcquireSRWLockExclusive (&srwlock);
-  ret = InterlockedExchange (&overrun_event_running, OVR_EVENT_DISARMED);
-  if (ret == OVR_EVENT_ARMED)
+  if (overrun_count != OVR_DISARMED)
     {
       LONG64 ov_cnt;
 
-      InterlockedExchange64 (&ov_cnt, overrun_count);
+      ov_cnt = overrun_count;
       if (ov_cnt > DELAYTIMER_MAX || ov_cnt < 0)
 	overrun_count_curr = DELAYTIMER_MAX;
       else
 	overrun_count_curr = ov_cnt;
       ret = overrun_count_curr;
-      InterlockedExchange64 (&overrun_count, 0);
+      overrun_count = OVR_DISARMED;
     }
   ReleaseSRWLockExclusive (&srwlock);
   return ret;
@@ -150,18 +137,17 @@ timer_tracker::thread_func ()
 	  ReleaseSRWLockExclusive (&srwlock);
 	  goto out;
 	}
+      LONG64 exp_cnt = 0;
       if (interval)
 	{
 	  /* Compute expiration count. */
 	  LONG64 now = get_clock_now ();
 	  LONG64 ts = get_exp_ts ();
-	  LONG64 exp_cnt;
 
 	  /* Make concessions for unexact realtime clock */
 	  if (ts > now)
 	    ts = now - 1;
-	  exp_cnt = (now - ts) / interval;
-	  InterlockedAdd64 (&overrun_count, exp_cnt);
+	  exp_cnt = (now - ts + interval - 1) / interval;
 	  ts += interval * exp_cnt;
 	  set_exp_ts (ts);
 	  /* NtSetTimer allows periods of up to 24 days only.  If the time
@@ -180,7 +166,7 @@ timer_tracker::thread_func ()
 	{
 	case SIGEV_SIGNAL:
 	  {
-	    if (arm_overrun_event ())
+	    if (arm_overrun_event (exp_cnt))
 	      {
 		debug_printf ("%p timer signal already queued", this);
 		break;
@@ -196,7 +182,7 @@ timer_tracker::thread_func ()
 	  }
 	case SIGEV_THREAD:
 	  {
-	    if (arm_overrun_event ())
+	    if (arm_overrun_event (exp_cnt))
 	      {
 		debug_printf ("%p timer thread already queued", this);
 		break;
@@ -227,7 +213,7 @@ timer_tracker::thread_func ()
 	{
 	  memset (&time_spec, 0, sizeof time_spec);
 	  exp_ts = 0;
-	  overrun_event_running = OVR_EVENT_DISARMED;
+	  overrun_count = OVR_DISARMED;
 	  ReleaseSRWLockExclusive (&srwlock);
 	  goto out;
 	}
@@ -383,8 +369,7 @@ timer_tracker::settime (int flags, const itimerspec *new_value,
 	  set_exp_ts (ts);
 	  time_spec = *new_value;
 	  overrun_count_curr = 0;
-	  overrun_count = 0;
-	  overrun_event_running = OVR_EVENT_DISARMED;
+	  overrun_count = OVR_DISARMED;
 	  /* Note: Advanced Power Settings -> Sleep -> Allow Wake Timers
 		   since W10 1709 */
 	  Resume = (clock_id == CLOCK_REALTIME_ALARM
