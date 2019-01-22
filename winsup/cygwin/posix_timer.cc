@@ -433,17 +433,20 @@ timer_create (clockid_t clock_id, struct sigevent *__restrict evp,
       if (CLOCKID_IS_PROCESS (clock_id) || CLOCKID_IS_THREAD (clock_id))
 	{
 	  set_errno (ENOTSUP);
-	  return -1;
+	  __leave;
 	}
 
       if (clock_id >= MAX_CLOCKS)
 	{
 	  set_errno (EINVAL);
-	  return -1;
+	  __leave;
 	}
 
       *timerid = (timer_t) cnew (timer_tracker, clock_id, evp);
-      ret = 0;
+      if (!*timerid)
+	__seterrno ();
+      else
+	ret = 0;
     }
   __except (EFAULT) {}
   __endtry
@@ -461,12 +464,15 @@ timer_gettime (timer_t timerid, struct itimerspec *ovalue)
       if (!tt->is_timer_tracker ())
 	{
 	  set_errno (EINVAL);
-	  return -1;
+	  __leave;
 	}
 
       ret = tt->gettime (ovalue, true);
       if (ret < 0)
-	set_errno (-ret);
+	{
+	  set_errno (-ret);
+	  ret = -1;
+	}
     }
   __except (EFAULT) {}
   __endtry
@@ -490,7 +496,10 @@ timer_settime (timer_t timerid, int flags,
 	}
       ret = tt->settime (flags, value, ovalue);
       if (ret < 0)
-	set_errno (-ret);
+	{
+	  set_errno (-ret);
+	  ret = -1;
+	}
     }
   __except (EFAULT) {}
   __endtry
