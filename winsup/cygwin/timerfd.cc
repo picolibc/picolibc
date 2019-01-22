@@ -173,9 +173,8 @@ timerfd_tracker::thread_func ()
 		 interval.  Restart timer here with new due time. */
 	      if (get_interval () > INT_MAX * (NS100PERSEC / MSPERSEC))
 		{
-		  /* TODO: CLOCK_REALTIME_ALARM / CLOCK_BOOTTIME_ALARM
-		     See comment in arm_timer */
-		  BOOL Resume = FALSE;
+		  BOOLEAN Resume = (get_clockid () == CLOCK_REALTIME_ALARM
+				    || get_clockid () == CLOCK_BOOTTIME_ALARM);
 		  LARGE_INTEGER DueTime = { QuadPart: -get_interval () };
 
 		  NtSetTimer (tfd_shared->timer (), &DueTime, NULL, NULL,
@@ -573,10 +572,10 @@ timerfd_shared::arm_timer (int flags, const struct itimerspec *new_value)
   set_exp_ts (ts);
   time_spec () = *new_value;
   read_and_reset_expiration_count ();
-  /* TODO: CLOCK_REALTIME_ALARM / CLOCK_BOOTTIME_ALARM
-	   Note: Advanced Power Settings -> Sleep -> Allow Wake Timers
+  /* Note: Advanced Power Settings -> Sleep -> Allow Wake Timers
 	   since W10 1709 */
-  Resume = FALSE;
+  Resume = (_clockid == CLOCK_REALTIME_ALARM
+	    || _clockid == CLOCK_BOOTTIME_ALARM);
   if (_interval > INT_MAX * (NS100PERSEC / MSPERSEC))
     Period = 0;
   else
