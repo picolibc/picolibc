@@ -30,7 +30,7 @@ class timer_tracker
 
  public:
   void *operator new (size_t, void *p) __attribute__ ((nothrow)) {return p;}
-  void operator delete (void *p) { cfree (p); }
+  void operator delete (void *p) { HeapFree (GetProcessHeap (), 0, p); }
   timer_tracker (clockid_t, const sigevent *);
   ~timer_tracker ();
   inline bool is_timer_tracker () const { return magic == TT_MAGIC; }

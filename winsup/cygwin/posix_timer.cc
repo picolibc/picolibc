@@ -414,10 +414,11 @@ timer_tracker::settime (int flags, const itimerspec *new_value,
   return ret;
 }
 
-/* The timers are stored on the cygheap. */
+/* The timers are stored on the system heap in order to avoid accidental
+   leaking of timer ids into the child process. */
 #define cnew(name, ...) \
   ({ \
-    void* ptr = (void*) ccalloc (HEAP_3_TIMER, 1, sizeof (name)); \
+    void* ptr = (void*) HeapAlloc (GetProcessHeap (), 0, sizeof (name)); \
     ptr ? new (ptr) name (__VA_ARGS__) : NULL; \
   })
 
