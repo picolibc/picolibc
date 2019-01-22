@@ -12,7 +12,7 @@ details. */
 #include <mmsystem.h>
 
 /* Must be a power of 2. */
-#define MAX_CLOCKS		 (8)
+#define MAX_CLOCKS		 (16)
 
 /* Conversions for per-process and per-thread clocks */
 #define CLOCKID(cid) \

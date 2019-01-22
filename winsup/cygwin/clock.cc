@@ -274,6 +274,8 @@ static clk_monotonic_t clk_monotonic;
 static clk_monotonic_t clk_monotonic_raw;	/* same as clk_monotonic */
 static clk_monotonic_coarse_t clk_monotonic_coarse;
 static clk_boottime_t clk_boottime;
+static clk_realtime_t clk_realtime_alarm;	/* same as clk_realtime */
+static clk_boottime_t clk_boottime_alarm;	/* same as clk_boottime_t */
 
 clk_t *cyg_clock[MAX_CLOCKS] =
 {
@@ -285,6 +287,8 @@ clk_t *cyg_clock[MAX_CLOCKS] =
   &clk_monotonic_raw,
   &clk_monotonic_coarse,
   &clk_boottime,
+  &clk_realtime_alarm,
+  &clk_boottime_alarm,
 };
 
 clk_t *
