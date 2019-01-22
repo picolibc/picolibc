@@ -249,6 +249,11 @@ extern "C" {
                            /*   thread shall not have a CPU-time clock */
                            /*   accessible. */
 
+/* Flag indicating time is "absolute" with respect to the clock
+   associated with a time.  Value 4 is historic. */
+
+#define TIMER_ABSTIME	4
+
 /* Manifest Constants, P1003.1b-1993, p. 262 */
 
 #if __GNU_VISIBLE
@@ -256,11 +261,6 @@ extern "C" {
 #endif
 
 #define CLOCK_REALTIME		((clockid_t) 1)
-
-/* Flag indicating time is "absolute" with respect to the clock
-   associated with a time.  */
-
-#define TIMER_ABSTIME	4
 
 /* Manifest Constants, P1003.4b/D8, p. 55 */
 
@@ -287,10 +287,12 @@ extern "C" {
 #if defined(_POSIX_MONOTONIC_CLOCK)
 
 /*  The identifier for the system-wide monotonic clock, which is defined
- *      as a clock whose value cannot be set via clock_settime() and which 
- *          cannot have backward clock jumps. */
+ *  as a clock whose value cannot be set via clock_settime() and which
+ *  cannot have backward clock jumps. */
 
 #define CLOCK_MONOTONIC		((clockid_t) 4)
+
+#endif
 
 #if __GNU_VISIBLE
 
@@ -300,7 +302,9 @@ extern "C" {
 
 #define CLOCK_BOOTTIME		((clockid_t) 7)
 
-#endif
+#define CLOCK_REALTIME_ALARM	((clockid_t) 8)
+
+#define CLOCK_BOOTTIME_ALARM	((clockid_t) 9)
 
 #endif
 
