@@ -54,12 +54,6 @@
 	if(_LIB_VERSION == _IEEE_ || isnan(x) ) return z;
         if(x <= 0.0f){
 	    /* ynf(n,0) = -inf or ynf(x<0) = NaN */
-#ifndef HUGE_VAL 
-#define HUGE_VAL inf
-	    double inf = 0.0;
-
-	    SET_HIGH_WORD(inf,0x7ff00000);	/* set inf to infinite */
-#endif
 	    errno = EDOM;
 	    return (float)-HUGE_VAL;
         }

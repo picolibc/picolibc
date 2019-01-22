@@ -52,12 +52,6 @@ hypotl (long double x, long double y)
   if ((! finitel (z)) && finitel (x) && finitel (y))
     {
       /* hypot (finite, finite) overflow.  */
-#ifndef HUGE_VAL 
-#define HUGE_VAL inf
-      double inf = 0.0;
-
-      SET_HIGH_WORD (inf, 0x7ff00000);	/* Set inf to infinite.  */
-#endif
       errno = ERANGE;
       return (long double) HUGE_VAL;
     }

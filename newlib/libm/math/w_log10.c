@@ -64,12 +64,6 @@ PORTABILITY
 	z = __ieee754_log10(x);
 	if(_LIB_VERSION == _IEEE_ || isnan(x)) return z;
 	if(x<=0.0) {
-#ifndef HUGE_VAL 
-#define HUGE_VAL inf
-	    double inf = 0.0;
-
-	    SET_HIGH_WORD(inf,0x7ff00000);	/* set inf to infinite */
-#endif
 	    if(x==0.0) {
 		/* log10(0) */
 		errno = ERANGE;

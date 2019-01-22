@@ -38,12 +38,6 @@
         y = __ieee754_lgamma_r(x,&(_REENT_SIGNGAM(_REENT)));
         if(_LIB_VERSION == _IEEE_) return y;
         if(!finite(y)&&finite(x)) {
-#ifndef HUGE_VAL 
-#define HUGE_VAL inf
-	    double inf = 0.0;
-
-	    SET_HIGH_WORD(inf,0x7ff00000);	/* set inf to infinite */
-#endif
 	    if(floor(x)==x&&x<=0.0)
 	      /* lgamma(-integer) */
 	      errno = EDOM;

@@ -32,12 +32,6 @@
         y = __ieee754_lgammaf_r(x,&(_REENT_SIGNGAM(_REENT)));
         if(_LIB_VERSION == _IEEE_) return y;
         if(!finitef(y)&&finitef(x)) {
-#ifndef HUGE_VAL 
-#define HUGE_VAL inf
-	    double inf = 0.0;
-
-	    SET_HIGH_WORD(inf,0x7ff00000);	/* set inf to infinite */
-#endif
 	    if(floorf(x)==x&&x<=0.0f) {
 		/* lgammaf(-integer) */
 		errno = EDOM;

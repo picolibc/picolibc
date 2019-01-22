@@ -41,12 +41,6 @@
 	return __ieee754_scalbf(x,fn);
 #else
 	float z;
-#ifndef HUGE_VAL 
-#define HUGE_VAL inf
-	double inf = 0.0;
-
-	SET_HIGH_WORD(inf,0x7ff00000);	/* set inf to infinite */
-#endif
 	z = __ieee754_scalbf(x,fn);
 	if(_LIB_VERSION == _IEEE_) return z;
 	if(!(finitef(z)||isnan(z))&&finitef(x)) {

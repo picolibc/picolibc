@@ -79,12 +79,6 @@ u_threshold= -7.45133219101941108420e+02;  /* 0xc0874910, 0xD52D3051 */
 	if(finite(x)) {
 	    if(x>o_threshold) {
 		/* exp(finite) overflow */
-#ifndef HUGE_VAL
-#define HUGE_VAL inf
-	        double inf = 0.0;
-
-	        SET_HIGH_WORD(inf,0x7ff00000);	/* set inf to infinite */
-#endif
 		errno = ERANGE;
 		return HUGE_VAL;
 	    } else if(x<u_threshold) {

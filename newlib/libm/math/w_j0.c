@@ -129,12 +129,6 @@ None of the Bessel functions are in ANSI C.
 	z = __ieee754_y0(x);
 	if(_LIB_VERSION == _IEEE_ || isnan(x) ) return z;
         if(x <= 0.0){
-#ifndef HUGE_VAL 
-#define HUGE_VAL inf
-	    double inf = 0.0;
-
-	    SET_HIGH_WORD(inf,0x7ff00000);	/* set inf to infinite */
-#endif
 	    /* y0(0) = -inf or y0(x<0) = NaN */
 	    errno = EDOM;
 	    return -HUGE_VAL;

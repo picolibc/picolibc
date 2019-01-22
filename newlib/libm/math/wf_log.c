@@ -34,12 +34,6 @@
 	float z;
 	z = __ieee754_logf(x);
 	if(_LIB_VERSION == _IEEE_ || isnan(x) || x > 0.0f) return z;
-#ifndef HUGE_VAL 
-#define HUGE_VAL inf
-	double inf = 0.0;
-
-	SET_HIGH_WORD(inf,0x7ff00000);	/* set inf to infinite */
-#endif
 	if(x==0.0f) {
 	    /* logf(0) */
 	    errno = ERANGE;

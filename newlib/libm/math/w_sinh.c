@@ -79,12 +79,6 @@ QUICKREF
 	if(_LIB_VERSION == _IEEE_) return z;
 	if(!finite(z)&&finite(x)) {
 	    /* sinh(finite) overflow */
-#ifndef HUGE_VAL 
-#define HUGE_VAL inf
-	    double inf = 0.0;
-	    
-	    SET_HIGH_WORD(inf,0x7ff00000);	/* set inf to infinite */
-#endif
 	    errno = ERANGE;
 	    return ((x>0.0) ? HUGE_VAL : -HUGE_VAL);
 	} else

@@ -34,12 +34,6 @@
         y = __ieee754_gamma_r(x,signgamp);
         if(_LIB_VERSION == _IEEE_) return y;
         if(!finite(y)&&finite(x)) {
-#ifndef HUGE_VAL 
-#define HUGE_VAL inf
-	    double inf = 0.0;
-
-	    SET_HIGH_WORD(inf,0x7ff00000);	/* set inf to infinite */
-#endif
 	    if(floor(x)==x&&x<=0.0)
 	      /* gamma(-integer) or gamma(0) */
 	      errno = EDOM;

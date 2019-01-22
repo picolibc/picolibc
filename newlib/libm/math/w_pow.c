@@ -66,12 +66,6 @@ PORTABILITY
 	return  __ieee754_pow(x,y);
 #else
 	double z;
-#ifndef HUGE_VAL 
-#define HUGE_VAL inf
-	double inf = 0.0;
-
-	SET_HIGH_WORD(inf,0x7ff00000);	/* set inf to infinite */
-#endif
 	z=__ieee754_pow(x,y);
 	if(_LIB_VERSION == _IEEE_|| isnan(y)) return z;
 	if(isnan(x)) {

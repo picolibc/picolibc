@@ -35,12 +35,6 @@
 	if(_LIB_VERSION == _IEEE_ || isnan(x)) return z;
 	if(fabsf(x)>8.9415985107e+01f) {
 	    /* coshf(finite) overflow */
-#ifndef HUGE_VAL
-#define HUGE_VAL inf
-	    double inf = 0.0;
-
-	    SET_HIGH_WORD(inf,0x7ff00000);	/* set inf to infinite */
-#endif
 	    errno = ERANGE;
 	    return (float)HUGE_VAL;
 	} else
