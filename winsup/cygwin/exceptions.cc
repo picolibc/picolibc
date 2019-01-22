@@ -27,7 +27,7 @@ details. */
 #include "child_info.h"
 #include "ntdll.h"
 #include "exception.h"
-#include "timer.h"
+#include "posix_timer.h"
 
 /* Definitions for code simplification */
 #ifdef __x86_64__
@@ -1483,7 +1483,7 @@ sigpacket::process ()
   if (handler == SIG_IGN)
     {
       if (si.si_code == SI_TIMER)
-	((timer_tracker *) si.si_tid)->disarm_event ();
+	((timer_tracker *) si.si_tid)->disarm_overrun_event ();
       sigproc_printf ("signal %d ignored", si.si_signo);
       goto done;
     }
@@ -1508,7 +1508,7 @@ sigpacket::process ()
 	  || si.si_signo == SIGURG)
 	{
 	  if (si.si_code == SI_TIMER)
-	    ((timer_tracker *) si.si_tid)->disarm_event ();
+	    ((timer_tracker *) si.si_tid)->disarm_overrun_event ();
 	  sigproc_printf ("signal %d default is currently ignore", si.si_signo);
 	  goto done;
 	}
@@ -1637,7 +1637,7 @@ _cygtls::call_signal_handler ()
 	{
 	  timer_tracker *tt = (timer_tracker *)
 			      infodata.si_tid;
-	  infodata.si_overrun = tt->disarm_event ();
+	  infodata.si_overrun = tt->disarm_overrun_event ();
 	}
 
       /* Save information locally on stack to pass to handler. */

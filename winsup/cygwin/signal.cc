@@ -21,7 +21,7 @@ details. */
 #include "dtable.h"
 #include "cygheap.h"
 #include "cygwait.h"
-#include "timer.h"
+#include "posix_timer.h"
 
 #define _SA_NORESTART	0x8000
 
@@ -619,7 +619,7 @@ sigwait_common (const sigset_t *set, siginfo_t *info, PLARGE_INTEGER waittime)
 		{
 		  timer_tracker *tt = (timer_tracker *)
 				      _my_tls.infodata.si_tid;
-		  _my_tls.infodata.si_overrun = tt->disarm_event ();
+		  _my_tls.infodata.si_overrun = tt->disarm_overrun_event ();
 		}
 	      if (info)
 		*info = _my_tls.infodata;

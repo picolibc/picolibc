@@ -22,7 +22,6 @@ details. */
 #include "tls_pbuf.h"
 #include "dll_init.h"
 #include "cygmalloc.h"
-#include "timer.h"
 #include "ntdll.h"
 
 #define NPIDS_HELD 4
@@ -196,7 +195,6 @@ frok::child (volatile char * volatile here)
   ForceCloseHandle1 (fork_info->forker_finished, forker_finished);
 
   pthread::atforkchild ();
-  fixup_timers_after_fork ();
   cygbench ("fork-child");
   ld_preload ();
   fixup_hooks_after_fork ();

@@ -354,6 +354,7 @@ DLL_OFILES:= \
 	pinfo.o \
 	poll.o \
 	posix_ipc.o \
+	posix_timer.o \
 	pseudo-reloc.o \
 	pthread.o \
 	quotactl.o \
@@ -395,7 +396,6 @@ DLL_OFILES:= \
 	syslog.o \
 	termios.o \
 	thread.o \
-	timer.o \
 	timerfd.o \
 	times.o \
 	tls_pbuf.o \

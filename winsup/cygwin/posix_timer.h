@@ -13,38 +13,43 @@ details. */
 class timer_tracker
 {
   unsigned magic;
-  timer_tracker *next;
-
+  SRWLOCK srwlock;
   clockid_t clock_id;
   sigevent evp;
-  timespec it_interval;
-  HANDLE hcancel;
-  HANDLE syncthread;
-  int64_t interval_us;
-  int64_t sleepto_us;
-  LONG event_running;
+  struct itimerspec time_spec;
+  HANDLE timer;
+  HANDLE cancel_evt;
+  HANDLE sync_thr;
+  LONG64 interval;
+  LONG64 exp_ts;
+  LONG overrun_event_running;
   LONG overrun_count_curr;
   LONG64 overrun_count;
 
   bool cancel ();
 
  public:
+  void *operator new (size_t, void *p) __attribute__ ((nothrow)) {return p;}
+  void operator delete (void *p) { cfree (p); }
   timer_tracker (clockid_t, const sigevent *);
   ~timer_tracker ();
   inline bool is_timer_tracker () const { return magic == TT_MAGIC; }
   inline sigevent_t *sigevt () { return &evp; }
   inline int getoverrun () const { return overrun_count_curr; }
 
-  void gettime (itimerspec *);
+  LONG64 get_clock_now () const { return get_clock (clock_id)->n100secs (); }
+  LONG64 get_exp_ts () const { return exp_ts; }
+  LONG64 get_interval () const { return interval; }
+  void set_exp_ts (LONG64 ts) { exp_ts = ts; }
+
+  LONG arm_overrun_event ();
+  LONG disarm_overrun_event ();
+
+  int gettime (itimerspec *, bool);
   int settime (int, const itimerspec *, itimerspec *);
-  int clean_and_unhook ();
-  LONG arm_event ();
-  LONG disarm_event ();
 
   DWORD thread_func ();
   static void fixup_after_fork ();
 };
-
-extern void fixup_timers_after_fork ();
 
 #endif /* __TIMER_H__ */

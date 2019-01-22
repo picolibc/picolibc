@@ -34,7 +34,8 @@ enum cygheap_types
   HEAP_2_DLL,
   HEAP_MMAP,
   HEAP_2_MAX = 200,
-  HEAP_3_FHANDLER
+  HEAP_3_FHANDLER,
+  HEAP_3_TIMER
 };
 
 extern "C" {
