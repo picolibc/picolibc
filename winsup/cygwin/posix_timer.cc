@@ -169,9 +169,8 @@ timer_tracker::thread_func ()
 	     interval.  Restart timer here with new due time. */
 	  if (interval > INT_MAX * (NS100PERSEC / MSPERSEC))
 	    {
-	      /* TODO: CLOCK_REALTIME_ALARM / CLOCK_BOOTTIME_ALARM
-		 See comment in arm_timer */
-	      BOOL Resume = FALSE;
+	      BOOLEAN Resume = (clock_id == CLOCK_REALTIME_ALARM
+				|| clock_id == CLOCK_BOOTTIME_ALARM);
 	      LARGE_INTEGER DueTime = { QuadPart: -interval };
 
 	      NtSetTimer (timer, &DueTime, NULL, NULL, Resume, 0, NULL);
@@ -386,10 +385,10 @@ timer_tracker::settime (int flags, const itimerspec *new_value,
 	  overrun_count_curr = 0;
 	  overrun_count = 0;
 	  overrun_event_running = OVR_EVENT_DISARMED;
-	  /* TODO: CLOCK_REALTIME_ALARM / CLOCK_BOOTTIME_ALARM
-	     Note: Advanced Power Settings -> Sleep -> Allow Wake Timers
-	     since W10 1709 */
-	  Resume = FALSE;
+	  /* Note: Advanced Power Settings -> Sleep -> Allow Wake Timers
+		   since W10 1709 */
+	  Resume = (clock_id == CLOCK_REALTIME_ALARM
+		    || clock_id == CLOCK_BOOTTIME_ALARM);
 	  if (interval > INT_MAX * (NS100PERSEC / MSPERSEC))
 	    Period = 0;
 	  else
