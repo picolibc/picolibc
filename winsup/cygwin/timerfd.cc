@@ -163,9 +163,9 @@ timerfd_tracker::thread_func ()
 		 bigger than "now" and fix expiration count as required */
 	      while (ts <= (now = get_clock_now ()))
 		{
-		  increment_expiration_count ((now - ts + get_interval () - 1)
-					      / get_interval ());
-		  ts += get_interval ();
+		  exp_cnt = (now - ts + get_interval () - 1) / get_interval ();
+		  increment_expiration_count (exp_cnt);
+		  ts += get_interval () * exp_cnt;
 		}
 	      set_exp_ts (ts);
 	      /* NtSetTimer allows periods of up to 24 days only.  If the time
@@ -271,7 +271,6 @@ int
 timerfd_tracker::create (clockid_t clock_id)
 {
   int ret;
-  clk_t *clock;
   NTSTATUS status;
   OBJECT_ATTRIBUTES attr;
 
@@ -281,8 +280,7 @@ timerfd_tracker::create (clockid_t clock_id)
   LARGE_INTEGER sectionsize = { QuadPart: PAGE_SIZE };
 
   /* Valid clock? */
-  clock = get_clock (clock_id);
-  if (!clock)
+  if (!get_clock (clock_id))
     {
       ret = -EINVAL;
       goto err;
