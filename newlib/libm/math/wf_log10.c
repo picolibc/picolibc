@@ -41,7 +41,7 @@
 	    } else { 
 		/* log10f(x<0) */
 		errno = EDOM;
-		return nan("");
+		return nanf("");
             }
 	} else
 	    return z;

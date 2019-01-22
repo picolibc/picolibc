@@ -41,7 +41,7 @@
 	} else { 
 	    /* logf(x<0) */
 	    errno = EDOM;
-	    return nan("");
+	    return nanf("");
         }
 #endif
 }

@@ -31,7 +31,7 @@
 	if(fabsf(x)>1.0f) {
 	    /* acosf(|x|>1) */
 	    errno = EDOM;
-	    return (float) nan("");
+	    return nanf("");
 	} else
 	    return z;
 #endif
