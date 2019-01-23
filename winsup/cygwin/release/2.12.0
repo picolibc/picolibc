@@ -77,3 +77,5 @@ Bug Fixes
 
 - Fix WEOF handling in wctype functions.
   Addresses: https://cygwin.com/ml/cygwin/2018-12/msg00173.html
+
+- Fix thread names in GDB when cygthreads get reused.
