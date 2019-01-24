@@ -718,7 +718,7 @@ cygwin_gethostname (char *name, size_t len)
 	{
 	  DWORD local_len = len;
 
-	  if (!GetComputerNameExA (ComputerNameDnsFullyQualified, name,
+	  if (!GetComputerNameExA (ComputerNameDnsHostname, name,
 				   &local_len))
 	    {
 	      if (GetLastError () == ERROR_MORE_DATA)

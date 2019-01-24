@@ -79,3 +79,5 @@ Bug Fixes
   Addresses: https://cygwin.com/ml/cygwin/2018-12/msg00173.html
 
 - Fix thread names in GDB when cygthreads get reused.
+
+- Fix return value of gethostname in a border case.
