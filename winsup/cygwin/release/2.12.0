@@ -81,3 +81,6 @@ Bug Fixes
 - Fix thread names in GDB when cygthreads get reused.
 
 - Fix return value of gethostname in a border case.
+
+- Disallow seteuid on disabled or locked out accounts.
+  Addresses: https://cygwin.com/ml/cygwin/2019-01/msg00197.html

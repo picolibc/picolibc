@@ -553,6 +553,21 @@ get_server_groups (cygsidlist &grp_list, PSID usersid)
       && sid_sub_auth (usersid, 0) == SECURITY_NT_NON_UNIQUE
       && get_logon_server (domain, server, DS_IS_FLAT_NAME))
     {
+      NET_API_STATUS napi_stat;
+      USER_INFO_1 *ui1;
+      bool allow_user = false;
+
+      napi_stat = NetUserGetInfo (server, user, 1, (LPBYTE *) &ui1);
+      if (napi_stat == NERR_Success)
+	allow_user = !(ui1->usri1_flags & (UF_ACCOUNTDISABLE | UF_LOCKOUT));
+      if (ui1)
+	NetApiBufferFree (ui1);
+      if (!allow_user)
+	{
+	  debug_printf ("User denied: %W\\%W", domain, user);
+	  set_errno (EACCES);
+	  return false;
+	}
       get_user_groups (server, grp_list, user, domain);
       get_user_local_groups (server, domain, grp_list, user);
     }
