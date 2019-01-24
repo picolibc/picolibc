@@ -440,6 +440,7 @@ GMON_OFILES:=gmon.o mcount.o profil.o mcountFunc.o
 NEW_FUNCTIONS:=$(addprefix --replace=,\
 	atexit= \
 	timezone= \
+	uname=uname_x \
 	__xdrrec_getrec= \
 	__xdrrec_setnonblock= \
 	xdr_array= \

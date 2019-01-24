@@ -56,6 +56,8 @@ What changed:
 - Remove matherr, and SVID and X/Open math library configurations.
   Default math library configuration is now IEEE.
 
+- Improve uname(2) for newly built applications.
+
 
 Bug Fixes
 ---------

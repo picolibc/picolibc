@@ -1522,6 +1522,7 @@ ualarm SIGFE
 umask NOSIGFE
 umount SIGFE
 uname SIGFE
+uname_x SIGFE
 ungetc SIGFE
 ungetwc SIGFE
 unlink SIGFE

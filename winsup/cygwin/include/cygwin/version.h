@@ -505,12 +505,13 @@ details. */
   332: Add signalfd.
   333: Add timerfd_create, timerfd_gettime, timerfd_settime.
   334: Remove matherr.
+  335: Change size of utsname, change uname output.
 
   Note that we forgot to bump the api for ualarm, strtoll, strtoull,
   sigaltstack, sethostname. */
 
 #define CYGWIN_VERSION_API_MAJOR 0
-#define CYGWIN_VERSION_API_MINOR 334
+#define CYGWIN_VERSION_API_MINOR 335
 
 /* There is also a compatibity version number associated with the shared memory
    regions.  It is incremented when incompatible changes are made to the shared

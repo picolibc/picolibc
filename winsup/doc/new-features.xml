@@ -91,6 +91,10 @@ Remove matherr, and SVID and X/Open math library configurations.
 Default math library configuration is now IEEE.
 <listitem><para>
 
+</para></listitem>
+Improve uname(2) for newly built applications.
+</para></listitem>
+
 </itemizedlist>
 
 </sect2>

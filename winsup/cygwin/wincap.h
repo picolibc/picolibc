@@ -59,6 +59,7 @@ public:
   const size_t allocation_granularity () const
 		     { return (size_t) system_info.dwAllocationGranularity; }
   const char *osname () const { return osnam; }
+  const DWORD build_number () const { return version.dwBuildNumber; }
   const bool is_wow64 () const { return !!wow64; }
 
 #define IMPLEMENT(cap) cap() const { return ((wincaps *) this->caps)->cap; }
