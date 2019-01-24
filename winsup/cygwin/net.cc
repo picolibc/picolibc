@@ -710,30 +710,24 @@ cygwin_getservbyport (int port, const char *proto)
 extern "C" int
 cygwin_gethostname (char *name, size_t len)
 {
-  int res = -1;
-
   __try
     {
-      if (gethostname (name, len))
-	{
-	  DWORD local_len = len;
+      PFIXED_INFO info = NULL;
+      ULONG size = 0;
 
-	  if (!GetComputerNameExA (ComputerNameDnsHostname, name,
-				   &local_len))
-	    {
-	      if (GetLastError () == ERROR_MORE_DATA)
-		set_errno (ENAMETOOLONG);
-	      else
-		set_winsock_errno ();
-	      __leave;
-	    }
+      if (GetNetworkParams(info, &size) == ERROR_BUFFER_OVERFLOW
+	  && (info = (PFIXED_INFO) alloca(size))
+	  && GetNetworkParams(info, &size) == ERROR_SUCCESS)
+	{
+	  strncpy(name, info->HostName, len);
+	  debug_printf ("gethostname %s", name);
+	  return 0;
 	}
-      debug_printf ("name %s", name);
-      res = 0;
+      __seterrno ();
     }
-  __except (EFAULT) {}
+  __except (EFAULT)
   __endtry
-  return res;
+  return -1;
 }
 
 extern "C" int
@@ -748,6 +742,30 @@ sethostname (const char *name, size_t len)
       return -1;
     }
   return 0;
+}
+
+/* getdomainname: 4.4BSD */
+extern "C" int
+getdomainname (char *domain, size_t len)
+{
+  __try
+    {
+      PFIXED_INFO info = NULL;
+      ULONG size = 0;
+
+      if (GetNetworkParams(info, &size) == ERROR_BUFFER_OVERFLOW
+	  && (info = (PFIXED_INFO) alloca(size))
+	  && GetNetworkParams(info, &size) == ERROR_SUCCESS)
+	{
+	  strncpy(domain, info->DomainName, len);
+	  debug_printf ("gethostname %s", domain);
+	  return 0;
+	}
+      __seterrno ();
+    }
+  __except (EFAULT)
+  __endtry
+  return -1;
 }
 
 /* exported as gethostbyname: POSIX.1-2001 */
@@ -1404,29 +1422,6 @@ cygwin_send (int fd, const void *buf, size_t len, int flags)
   __endtry
   syscall_printf ("%lR = send(%d, %p, %ld, %y)", res, fd, buf, len, flags);
   return res;
-}
-
-/* getdomainname: 4.4BSD */
-extern "C" int
-getdomainname (char *domain, size_t len)
-{
-  __try
-    {
-      PFIXED_INFO info = NULL;
-      ULONG size = 0;
-
-      if (GetNetworkParams(info, &size) == ERROR_BUFFER_OVERFLOW
-	  && (info = (PFIXED_INFO) alloca(size))
-	  && GetNetworkParams(info, &size) == ERROR_SUCCESS)
-	{
-	  strncpy(domain, info->DomainName, len);
-	  return 0;
-	}
-      __seterrno ();
-    }
-  __except (EFAULT)
-  __endtry
-  return -1;
 }
 
 /* Fill out an ifconf struct. */
