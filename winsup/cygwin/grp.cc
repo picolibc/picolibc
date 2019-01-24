@@ -738,7 +738,7 @@ get_groups (const char *user, gid_t gid, cygsidlist &gsids)
   struct group *grp = internal_getgrgid (gid, &cldap);
   cygsid usersid, grpsid;
   if (usersid.getfrompw (pw))
-    get_server_groups (gsids, usersid);
+    get_server_groups (gsids, usersid, NO_CHK_DISABLED);
   if (gid != ILLEGAL_GID && grpsid.getfromgr (grp))
     gsids += grpsid;
   cygheap->user.reimpersonate ();

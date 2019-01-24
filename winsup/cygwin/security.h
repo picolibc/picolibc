@@ -482,7 +482,13 @@ HANDLE lsaprivkeyauth (struct passwd *pw);
 /* Verify an existing token */
 bool verify_token (HANDLE token, cygsid &usersid, user_groups &groups, bool *pintern = NULL);
 /* Get groups of a user */
-bool get_server_groups (cygsidlist &grp_list, PSID usersid);
+enum acct_disabled_chk_t {
+  NO_CHK_DISABLED = 0,
+  CHK_DISABLED = 1
+};
+
+bool get_server_groups (cygsidlist &grp_list, PSID usersid,
+			acct_disabled_chk_t check_account_disabled);
 
 /* Extract U-domain\user field from passwd entry. */
 void extract_nt_dom_user (const struct passwd *pw, PWCHAR domain, PWCHAR user);

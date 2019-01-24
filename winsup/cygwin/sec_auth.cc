@@ -523,7 +523,8 @@ get_token_group_sidlist (cygsidlist &grp_list, PTOKEN_GROUPS my_grps)
 }
 
 bool
-get_server_groups (cygsidlist &grp_list, PSID usersid)
+get_server_groups (cygsidlist &grp_list, PSID usersid,
+		   acct_disabled_chk_t check_account_disabled)
 {
   WCHAR user[UNLEN + 1];
   WCHAR domain[MAX_DOMAIN_NAME_LEN + 1];
@@ -553,20 +554,23 @@ get_server_groups (cygsidlist &grp_list, PSID usersid)
       && sid_sub_auth (usersid, 0) == SECURITY_NT_NON_UNIQUE
       && get_logon_server (domain, server, DS_IS_FLAT_NAME))
     {
-      NET_API_STATUS napi_stat;
-      USER_INFO_1 *ui1;
-      bool allow_user = false;
-
-      napi_stat = NetUserGetInfo (server, user, 1, (LPBYTE *) &ui1);
-      if (napi_stat == NERR_Success)
-	allow_user = !(ui1->usri1_flags & (UF_ACCOUNTDISABLE | UF_LOCKOUT));
-      if (ui1)
-	NetApiBufferFree (ui1);
-      if (!allow_user)
+      if (check_account_disabled == CHK_DISABLED)
 	{
-	  debug_printf ("User denied: %W\\%W", domain, user);
-	  set_errno (EACCES);
-	  return false;
+	  NET_API_STATUS napi_stat;
+	  USER_INFO_1 *ui1;
+	  bool allow_user = false;
+
+	  napi_stat = NetUserGetInfo (server, user, 1, (LPBYTE *) &ui1);
+	  if (napi_stat == NERR_Success)
+	    allow_user = !(ui1->usri1_flags & (UF_ACCOUNTDISABLE | UF_LOCKOUT));
+	  if (ui1)
+	    NetApiBufferFree (ui1);
+	  if (!allow_user)
+	    {
+	      debug_printf ("User denied: %W\\%W", domain, user);
+	      set_errno (EACCES);
+	      return false;
+	    }
 	}
       get_user_groups (server, grp_list, user, domain);
       get_user_local_groups (server, domain, grp_list, user);
@@ -582,7 +586,7 @@ get_initgroups_sidlist (cygsidlist &grp_list, PSID usersid, PSID pgrpsid,
   grp_list *= well_known_authenticated_users_sid;
   if (well_known_system_sid != usersid)
     get_token_group_sidlist (grp_list, my_grps);
-  if (!get_server_groups (grp_list, usersid))
+  if (!get_server_groups (grp_list, usersid, CHK_DISABLED))
     return false;
 
   /* special_pgrp true if pgrpsid is not in normal groups */
@@ -590,17 +594,19 @@ get_initgroups_sidlist (cygsidlist &grp_list, PSID usersid, PSID pgrpsid,
   return true;
 }
 
-static void
+static bool
 get_setgroups_sidlist (cygsidlist &tmp_list, PSID usersid,
 		       PTOKEN_GROUPS my_grps, user_groups &groups)
 {
   tmp_list *= well_known_world_sid;
   tmp_list *= well_known_authenticated_users_sid;
   get_token_group_sidlist (tmp_list, my_grps);
-  get_server_groups (tmp_list, usersid);
+  if (!get_server_groups (tmp_list, usersid, CHK_DISABLED))
+    return false;
   for (int gidx = 0; gidx < groups.sgsids.count (); gidx++)
     tmp_list += groups.sgsids.sids[gidx];
   tmp_list += groups.pgsid;
+  return true;
 }
 
 /* Fixed size TOKEN_PRIVILEGES list to reflect privileges given to the
@@ -953,7 +959,10 @@ create_token (cygsid &usersid, user_groups &new_groups)
 
   /* Create list of groups, the user is member in. */
   if (new_groups.issetgroups ())
-    get_setgroups_sidlist (tmp_gsids, usersid, my_tok_gsids, new_groups);
+    {
+      if (!get_setgroups_sidlist (tmp_gsids, usersid, my_tok_gsids, new_groups))
+	goto out;
+    }
   else if (!get_initgroups_sidlist (tmp_gsids, usersid, new_groups.pgsid,
 				    my_tok_gsids))
     goto out;
@@ -1089,7 +1098,10 @@ lsaauth (cygsid &usersid, user_groups &new_groups)
 
   /* Create list of groups, the user is member in. */
   if (new_groups.issetgroups ())
-    get_setgroups_sidlist (tmp_gsids, usersid, NULL, new_groups);
+    {
+      if (!get_setgroups_sidlist (tmp_gsids, usersid, NULL, new_groups))
+	goto out;
+    }
   else if (!get_initgroups_sidlist (tmp_gsids, usersid, new_groups.pgsid,
 				    NULL))
     goto out;
