@@ -58,7 +58,7 @@ parse_preproc_flags $CC
 #
 # Load the current date so we can work on individual fields
 #
-set -$- $(date +"%m %d %Y %H:%M")
+set -$- $(date -u +"%m %d %Y %H:%M")
 m=$1 d=$2 y=$3 hhmm=$4
 #
 # Set date into YYYY-MM-DD HH:MM:SS format
