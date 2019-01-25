@@ -3546,10 +3546,9 @@ seteuid32 (uid_t uid)
 	  if (!(new_token = lsaauth (usersid, groups)))
 	    {
 	      debug_printf ("lsaauth failed, try create_token.");
-	      new_token = create_token (usersid, groups);
-	      if (new_token == INVALID_HANDLE_VALUE)
+	      if (!(new_token = create_token (usersid, groups)))
 		{
-		  debug_printf ("create_token failed, bail out of here");
+		  debug_printf ("create_token failed, bail out");
 		  cygheap->user.reimpersonate ();
 		  return -1;
 		}
