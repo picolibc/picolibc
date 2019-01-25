@@ -1061,17 +1061,11 @@ lsaauth (cygsid &usersid, user_groups &new_groups)
 
   /* Register as logon process. */
   RtlInitAnsiString (&name, "Cygwin");
-  SetLastError (0);
   status = LsaRegisterLogonProcess (&name, &lsa_hdl, &sec_mode);
   if (status != STATUS_SUCCESS)
     {
       debug_printf ("LsaRegisterLogonProcess: %y", status);
       __seterrno_from_nt_status (status);
-      goto out;
-    }
-  else if (GetLastError () == ERROR_PROC_NOT_FOUND)
-    {
-      debug_printf ("Couldn't load Secur32.dll");
       goto out;
     }
   /* Get handle to our own LSA package. */
