@@ -371,7 +371,7 @@ try_to_bin (path_conv &pc, HANDLE &fh, ACCESS_MASK access, ULONG flags)
       if (!NT_SUCCESS (status))
 	{
 	  debug_printf ("NtOpenFile (%S) failed, status = %y",
-	  		&recycler, status);
+			&recycler, status);
 	  goto out;
 	}
       /* Correct the rootdir HANDLE in pfri after reopening the dir. */
@@ -394,7 +394,7 @@ try_to_bin (path_conv &pc, HANDLE &fh, ACCESS_MASK access, ULONG flags)
       if (!NT_SUCCESS (status))
 	{
 	  debug_printf ("NtCreateFile (%S) failed, status = %y",
-	  		&recycler, status);
+			&recycler, status);
 	  goto out;
 	}
       /* If we opened the recycler (in contrast to creating it) and our
@@ -1842,7 +1842,6 @@ fhandler_base::stat_fixup (struct stat *buf)
 	buf->st_ino = FH_TTY;
       else
 	buf->st_ino = get_device ();
-      	
     }
   /* For /dev-based devices, st_dev must be set to the device number of /dev,
      not it's own device major/minor numbers.  What we do here to speed up
@@ -2436,7 +2435,7 @@ rename2 (const char *oldpath, const char *newpath, unsigned int at2flags)
 	  else if (oldpc.is_binary () && !old_explicit_suffix
 		   && oldpc.known_suffix ()
 		   && !nt_path_has_executable_suffix
-		   				(newpc.get_nt_native_path ()))
+						(newpc.get_nt_native_path ()))
 	    /* Never append .exe suffix if oldpath had .exe suffix given
 	       explicitely, or if oldpath wasn't already a .exe file, or
 	       if the destination filename has one of the blessed executable
@@ -2477,7 +2476,7 @@ rename2 (const char *oldpath, const char *newpath, unsigned int at2flags)
 	      if (!old_explicit_suffix && oldpc.known_suffix ()
 		  && !newpc.is_binary ()
 		  && !nt_path_has_executable_suffix
-		  				(newpc.get_nt_native_path ()))
+						(newpc.get_nt_native_path ()))
 		{
 		  rename_append_suffix (new2pc, newpath, nlen, ".exe");
 		  removepc = &newpc;
