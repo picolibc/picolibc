@@ -167,7 +167,7 @@ extern __declspec(dllimport) int h_errno;
 #define AI_ADDRCONFIG   0x400	/* Only return address types available on
 				   this host. */
 #define AI_V4MAPPED     0x800	/* IPv4 mapped addresses are acceptable. */
-#ifdef __GNU_VISIBLE
+#if __GNU_VISIBLE
 /* Glibc extensions. We use numerical values taken by winsock-specific
    extensions. */
 #define AI_IDN          0x4000	/* Encode IDN input from current local to
@@ -186,7 +186,7 @@ extern __declspec(dllimport) int h_errno;
 #define NI_NAMEREQD     0x4	/* Not being able to resolve is an error. */
 #define NI_NUMERICSERV  0x8	/* Return port number, rather than name. */
 #define NI_DGRAM        0x10	/* Lookup datagram (UDP) service. */
-#ifdef __GNU_VISIBLE
+#if __GNU_VISIBLE
 /* Glibc extensions. We use numerical values taken by winsock-specific
    extensions. */
 #define NI_IDN          0x4000	/* Decode name from punycode to IDN in
@@ -215,7 +215,7 @@ extern __declspec(dllimport) int h_errno;
 #define EAI_BADHINTS    12	/* Invalid value for hints */
 #define EAI_PROTOCOL    13	/* Resolved protocol is unknown */
 #define EAI_OVERFLOW    14	/* An argument buffer overflowed */
-#ifdef __GNU_VISIBLE
+#if __GNU_VISIBLE
 /* Glibc extensions. */
 #define EAI_IDN_ENCODE	15	/* Parameter string not correctly encoded */
 #endif
