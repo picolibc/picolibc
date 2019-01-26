@@ -3494,7 +3494,7 @@ seteuid32 (uid_t uid)
      order, the setgroups group list is still active when calling seteuid
      and verify_token treats the original token of the privileged user as
      insufficient.  This in turn results in creating a new user token for
-     the privileged user instead of using the orignal token.  This can have
+     the privileged user instead of using the original token.  This can have
      unfortunate side effects.  The created token has different group
      memberships, different user rights, and misses possible network
      credentials.
@@ -3542,17 +3542,31 @@ seteuid32 (uid_t uid)
 	}
       if (!new_token)
 	{
+#if 1
+	  debug_printf ("lsaprivkeyauth failed, try s4uauth.");
+	  if (!(new_token = s4uauth (pw_new)))
+	    {
+	      debug_printf ("s4uauth failed, bail out");
+	      cygheap->user.reimpersonate ();
+	      return -1;
+	    }
+#else
 	  debug_printf ("lsaprivkeyauth failed, try lsaauth.");
 	  if (!(new_token = lsaauth (usersid, groups)))
 	    {
-	      debug_printf ("lsaauth failed, try create_token.");
-	      if (!(new_token = create_token (usersid, groups)))
+	      debug_printf ("lsaauth failed, try s4uauth.");
+	      if (!(new_token = s4uauth (pw_new)))
 		{
-		  debug_printf ("create_token failed, bail out");
-		  cygheap->user.reimpersonate ();
-		  return -1;
+		  debug_printf ("s4uauth failed, try create_token.");
+		  if (!(new_token = create_token (usersid, groups)))
+		    {
+		      debug_printf ("create_token failed, bail out");
+		      cygheap->user.reimpersonate ();
+		      return -1;
+		    }
 		}
 	    }
+#endif
 	}
 
       /* Keep at most one internal token */

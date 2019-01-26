@@ -647,6 +647,7 @@ LoadDLLfunc (LsaFreeReturnBuffer, 4, secur32)
 LoadDLLfunc (LsaLogonUser, 56, secur32)
 LoadDLLfunc (LsaLookupAuthenticationPackage, 12, secur32)
 LoadDLLfunc (LsaRegisterLogonProcess, 12, secur32)
+LoadDLLfunc (TranslateNameW, 20, secur32)
 
 LoadDLLfunc (SHGetDesktopFolder, 4, shell32)
 

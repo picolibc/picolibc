@@ -58,6 +58,9 @@ What changed:
 
 - Improve uname(2) for newly built applications.
 
+- Kerberos/MSV1_0 S4U authentication replaces two old methods:
+  Creating a token from scratch and Cygwin LSA authentication package.
+
 
 Bug Fixes
 ---------

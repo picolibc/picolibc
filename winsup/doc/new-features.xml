@@ -4,7 +4,7 @@
 
 <sect1 id="ov-new"><title>What's new and what changed in Cygwin</title>
 
-<sect2 id="ov-new2.12"><title>What's new and what changed in 2.12</title>
+<sect2 id="ov-new3.0"><title>What's new and what changed in 3.0</title>
 
 <itemizedlist mark="bullet">
 
@@ -86,13 +86,18 @@ to free the parent directory.
 Wctype functions updated to Unicode 11.0.
 </para></listitem>
 
-</para></listitem>
+<listitem><para>
 Remove matherr, and SVID and X/Open math library configurations.
 Default math library configuration is now IEEE.
-<listitem><para>
-
 </para></listitem>
+
+<listitem><para>
 Improve uname(2) for newly built applications.
+</para></listitem>
+
+<listitem><para>
+Kerberos/MSV1_0 S4U authentication replaces two old methods:
+Creating a token from scratch and Cygwin LSA authentication package.
 </para></listitem>
 
 </itemizedlist>

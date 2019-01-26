@@ -24,6 +24,8 @@ details. */
 #include <iptypes.h>
 #include <wininet.h>
 #include <userenv.h>
+#define SECURITY_WIN32
+#include <secext.h>
 #include "cyglsa.h"
 #include "cygserver_setpwd.h"
 #include <cygwin/version.h>
@@ -872,6 +874,32 @@ verify_token (HANDLE token, cygsid &usersid, user_groups &groups, bool *pintern)
 	 || groups.pgsid == usersid;
 }
 
+const char *
+account_restriction (NTSTATUS status)
+{
+  const char *type;
+
+  switch (status)
+    {
+    case STATUS_INVALID_LOGON_HOURS:
+      type = "Logon outside allowed hours";
+      break;
+    case STATUS_INVALID_WORKSTATION:
+      type = "Logon at this machine not allowed";
+      break;
+    case STATUS_PASSWORD_EXPIRED:
+      type = "Password expired";
+      break;
+    case STATUS_ACCOUNT_DISABLED:
+      type = "Account disabled";
+      break;
+    default:
+      type = "Unknown";
+      break;
+    }
+  return type;
+}
+
 HANDLE
 create_token (cygsid &usersid, user_groups &new_groups)
 {
@@ -1229,7 +1257,11 @@ lsaauth (cygsid &usersid, user_groups &new_groups)
 			 &sub_status);
   if (status != STATUS_SUCCESS)
     {
-      debug_printf ("LsaLogonUser: %y (sub-status %y)", status, sub_status);
+      if (status == STATUS_ACCOUNT_RESTRICTION)
+	debug_printf ("Cygwin LSA Auth LsaLogonUser failed: %y (%s)",
+		      status, account_restriction (sub_status));
+      else
+	debug_printf ("Cygwin LSA Auth LsaLogonUser failed: %y", status);
       __seterrno_from_nt_status (status);
       goto out;
     }
@@ -1335,6 +1367,237 @@ lsaprivkeyauth (struct passwd *pw)
   lsa_close_policy (lsa);
 
 out:
+  pop_self_privilege ();
+  return token;
+}
+
+/* The following code is inspired by the generate_s4u_user_token
+   and lookup_principal_name functions from
+   https://github.com/PowerShell/openssh-portable
+
+   Thanks guys!  For courtesy here's the original copyright disclaimer: */
+
+/*
+* Author: Manoj Ampalam <manoj.ampalam@microsoft.com>
+*   Utilities to generate user tokens
+*
+* Author: Bryan Berns <berns@uwalumni.com>
+*   Updated s4u, logon, and profile loading routines to use
+*   normalized login names.
+*
+* Copyright (c) 2015 Microsoft Corp.
+* All rights reserved
+*
+* Microsoft openssh win32 port
+*
+* Redistribution and use in source and binary forms, with or without
+* modification, are permitted provided that the following conditions
+* are met:
+*
+* 1. Redistributions of source code must retain the above copyright
+* notice, this list of conditions and the following disclaimer.
+* 2. Redistributions in binary form must reproduce the above copyright
+* notice, this list of conditions and the following disclaimer in the
+* documentation and/or other materials provided with the distribution.
+*
+* THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
+* IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+* OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+* IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
+* INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
+* NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+* DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+* THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+* (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+* THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+*/
+
+/* In Mingw-w64, MsV1_0S4ULogon and MSV1_0_S4U_LOGON are only defined
+   in ddk/ntifs.h.  We can't inlcude this. */
+
+#define MsV1_0S4ULogon ((MSV1_0_LOGON_SUBMIT_TYPE) 12)
+
+typedef struct _MSV1_0_S4U_LOGON
+{
+  MSV1_0_LOGON_SUBMIT_TYPE MessageType;
+  ULONG Flags;
+  UNICODE_STRING UserPrincipalName;
+  UNICODE_STRING DomainName;
+} MSV1_0_S4U_LOGON, *PMSV1_0_S4U_LOGON;
+
+HANDLE
+s4uauth (struct passwd *pw)
+{
+  LSA_STRING name;
+  HANDLE lsa_hdl = NULL;
+  LSA_OPERATIONAL_MODE sec_mode;
+  NTSTATUS status, sub_status;
+  WCHAR domain[MAX_DOMAIN_NAME_LEN + 1];
+  WCHAR user[UNLEN + 1];
+  bool try_kerb_auth;
+  ULONG package_id, size;
+  struct {
+    LSA_STRING str;
+    CHAR buf[16];
+  } origin;
+
+  tmp_pathbuf tp;
+  PVOID authinf = NULL;
+  ULONG authinf_size;
+  TOKEN_SOURCE ts;
+  PKERB_INTERACTIVE_PROFILE profile = NULL;
+  LUID luid;
+  QUOTA_LIMITS quota;
+  HANDLE token = NULL;
+
+  push_self_privilege (SE_TCB_PRIVILEGE, true);
+
+  /* Register as logon process. */
+  RtlInitAnsiString (&name, "Cygwin");
+  status = LsaRegisterLogonProcess (&name, &lsa_hdl, &sec_mode);
+  if (status != STATUS_SUCCESS)
+    {
+      debug_printf ("LsaRegisterLogonProcess: %y", status);
+      __seterrno_from_nt_status (status);
+      goto out;
+    }
+
+  /* Fetch user and domain name and check if this is a domain user.
+     If so, try Kerberos first. */
+  extract_nt_dom_user (pw, domain, user);
+  try_kerb_auth = cygheap->dom.member_machine ()
+		  && wcscasecmp (domain, cygheap->dom.account_flat_name ());
+  RtlInitAnsiString (&name, try_kerb_auth ? MICROSOFT_KERBEROS_NAME_A
+					  : MSV1_0_PACKAGE_NAME);
+  status = LsaLookupAuthenticationPackage (lsa_hdl, &name, &package_id);
+  if (status != STATUS_SUCCESS)
+    {
+      debug_printf ("LsaLookupAuthenticationPackage: %y", status);
+      __seterrno_from_nt_status (status);
+      goto out;
+    }
+  /* Create origin. */
+  stpcpy (origin.buf, "Cygwin");
+  RtlInitAnsiString (&origin.str, origin.buf);
+
+  if (try_kerb_auth)
+    {
+      PWCHAR sam_name = tp.w_get ();
+      PWCHAR upn_name = tp.w_get ();
+      size = NT_MAX_PATH;
+      KERB_S4U_LOGON *s4u_logon;
+      USHORT name_len;
+
+      wcpcpy (wcpcpy (wcpcpy (sam_name, domain), L"\\"), user);
+      if (TranslateNameW (sam_name, NameSamCompatible, NameUserPrincipal,
+			  upn_name, &size) == 0)
+	{
+	  PWCHAR translated_name = tp.w_get ();
+	  PWCHAR p;
+
+	  debug_printf ("TranslateNameW(%W, NameUserPrincipal) %E", sam_name);
+	  size = NT_MAX_PATH;
+	  if (TranslateNameW (sam_name, NameSamCompatible, NameCanonical,
+			      translated_name, &size) == 0)
+	    {
+	      debug_printf ("TranslateNameW(%W, NameCanonical) %E", sam_name);
+	      debug_printf ("Fallback to MsV1_0 auth");
+	      goto msv1_0_auth; /* Fall through to MSV1_0 authentication */
+	    }
+	  p = wcschr (translated_name, L'/');
+	  if (p)
+	    *p = '\0';
+	  wcpcpy (wcpcpy (wcpcpy (upn_name, user), L"@"), translated_name);
+	}
+
+      name_len = wcslen (upn_name) * sizeof (WCHAR);
+      authinf_size = sizeof (KERB_S4U_LOGON) + name_len;
+      authinf = tp.c_get ();
+      RtlSecureZeroMemory (authinf, authinf_size);
+      s4u_logon = (KERB_S4U_LOGON *) authinf;
+      s4u_logon->MessageType = KerbS4ULogon;
+      s4u_logon->Flags = 0;
+      /* Append user to login info */
+      RtlInitEmptyUnicodeString (&s4u_logon->ClientUpn,
+				 (PWCHAR) (s4u_logon + 1),
+				 name_len);
+      RtlAppendUnicodeToString (&s4u_logon->ClientUpn, upn_name);
+      debug_printf ("ClientUpn: <%S>", &s4u_logon->ClientUpn);
+      /* Create token source. */
+      memcpy (ts.SourceName, "Cygwin.1", 8);
+      ts.SourceIdentifier.HighPart = 0;
+      ts.SourceIdentifier.LowPart = 0x0105;
+      status = LsaLogonUser (lsa_hdl, (PLSA_STRING) &origin, Network,
+			     package_id, authinf, authinf_size, NULL,
+			     &ts, (PVOID *) &profile, &size,
+			     &luid, &token, &quota, &sub_status);
+      switch (status)
+	{
+	case STATUS_SUCCESS:
+	  goto out;
+	/* These failures are fatal */
+	case STATUS_QUOTA_EXCEEDED:
+	case STATUS_LOGON_FAILURE:
+	  debug_printf ("Kerberos S4U LsaLogonUser failed: %y", status);
+	  goto out;
+	case STATUS_ACCOUNT_RESTRICTION:
+	  debug_printf ("Kerberos S4U LsaLogonUser failed: %y (%s)",
+			status, account_restriction (sub_status));
+	  goto out;
+	default:
+	  break;
+	}
+      debug_printf ("Kerberos S4U LsaLogonUser failed: %y, try MsV1_0", status);
+      /* Fall through to MSV1_0 authentication */
+    }
+
+msv1_0_auth:
+  MSV1_0_S4U_LOGON *s4u_logon;
+  USHORT user_len, domain_len;
+
+  user_len = wcslen (user) * sizeof (WCHAR);
+  domain_len = wcslen (domain) * sizeof (WCHAR);	/* Local machine */
+  authinf_size = sizeof (MSV1_0_S4U_LOGON) + user_len + domain_len;
+  if (!authinf)
+    authinf = tp.c_get ();
+  RtlSecureZeroMemory (authinf, authinf_size);
+  s4u_logon = (MSV1_0_S4U_LOGON *) authinf;
+  s4u_logon->MessageType = MsV1_0S4ULogon;
+  s4u_logon->Flags = 0;
+  /* Append user and domain to login info */
+  RtlInitEmptyUnicodeString (&s4u_logon->UserPrincipalName,
+			     (PWCHAR) (s4u_logon + 1),
+			     user_len);
+  RtlInitEmptyUnicodeString (&s4u_logon->DomainName,
+			     (PWCHAR) ((PBYTE) (s4u_logon + 1) + user_len),
+			     domain_len);
+  RtlAppendUnicodeToString (&s4u_logon->UserPrincipalName, user);
+  RtlAppendUnicodeToString (&s4u_logon->DomainName, domain);
+  debug_printf ("DomainName: <%S> UserPrincipalName: <%S>",
+		&s4u_logon->DomainName, &s4u_logon->UserPrincipalName);
+  /* Create token source. */
+  memcpy (ts.SourceName, "Cygwin.1", 8);
+  ts.SourceIdentifier.HighPart = 0;
+  ts.SourceIdentifier.LowPart = 0x0106;
+  if ((status = LsaLogonUser (lsa_hdl, (PLSA_STRING) &origin, Network,
+			      package_id, authinf, authinf_size, NULL,
+			      &ts, (PVOID *) &profile, &size,
+			      &luid, &token, &quota, &sub_status))
+      != STATUS_SUCCESS)
+    {
+      if (status == STATUS_ACCOUNT_RESTRICTION)
+	debug_printf ("MSV1_0 S4U LsaLogonUser failed: %y (%s)",
+		       status, account_restriction (sub_status));
+      else
+	debug_printf ("MSV1_0 S4U LsaLogonUser failed: %y", status);
+    }
+
+out:
+  if (lsa_hdl)
+    LsaDeregisterLogonProcess (lsa_hdl);
+  if (profile)
+    LsaFreeReturnBuffer (profile);
+
   pop_self_privilege ();
   return token;
 }
