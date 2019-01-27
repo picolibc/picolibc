@@ -814,8 +814,9 @@ child_info::child_info (unsigned in_cb, child_info_types chtype,
      allow the child to duplicate handles from the parent to itself. */
   parent = NULL;
   if (!DuplicateHandle (GetCurrentProcess (), GetCurrentProcess (),
-			GetCurrentProcess (), &parent, 0, true,
-			DUPLICATE_SAME_ACCESS))
+			GetCurrentProcess (), &parent,
+			PROCESS_DUP_HANDLE | PROCESS_VM_READ
+			| PROCESS_QUERY_LIMITED_INFORMATION, TRUE, 0))
     system_printf ("couldn't create handle to myself for child, %E");
 }
 

@@ -203,6 +203,8 @@ frok::child (volatile char * volatile here)
      rd_proc_pipe that would be an invalid handle.  In the case of
      wr_proc_pipe it would be == my_wr_proc_pipe.  Both would be bad. */
   ch.rd_proc_pipe = ch.wr_proc_pipe = NULL;
+  CloseHandle (hParent);
+  hParent = NULL;
   cygwin_finished_initializing = true;
   return 0;
 }
