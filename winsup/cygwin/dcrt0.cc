@@ -637,8 +637,7 @@ child_info_fork::handle_fork ()
 bool
 child_info_spawn::get_parent_handle ()
 {
-  parent = OpenProcess (PROCESS_QUERY_LIMITED_INFORMATION, FALSE,
-			parent_winpid);
+  parent = OpenProcess (PROCESS_VM_READ, FALSE, parent_winpid);
   moreinfo->myself_pinfo = NULL;
   return !!parent;
 }
