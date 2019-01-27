@@ -488,6 +488,7 @@ sid_in_token_groups (PTOKEN_GROUPS grps, cygpsid sid)
   return false;
 }
 
+#if 0 && S4U_RUNS_FINE
 static void
 get_token_group_sidlist (cygsidlist &grp_list, PTOKEN_GROUPS my_grps)
 {
@@ -523,6 +524,7 @@ get_token_group_sidlist (cygsidlist &grp_list, PTOKEN_GROUPS my_grps)
       grp_list *= well_known_users_sid;
     }
 }
+#endif
 
 bool
 get_server_groups (cygsidlist &grp_list, PSID usersid,
@@ -556,6 +558,7 @@ get_server_groups (cygsidlist &grp_list, PSID usersid,
       && sid_sub_auth (usersid, 0) == SECURITY_NT_NON_UNIQUE
       && get_logon_server (domain, server, DS_IS_FLAT_NAME))
     {
+#if 0 && S4U_RUNS_FINE
       if (check_account_disabled == CHK_DISABLED)
 	{
 	  NET_API_STATUS napi_stat;
@@ -574,12 +577,14 @@ get_server_groups (cygsidlist &grp_list, PSID usersid,
 	      return false;
 	    }
 	}
+#endif
       get_user_groups (server, grp_list, user, domain);
       get_user_local_groups (server, domain, grp_list, user);
     }
   return true;
 }
 
+#if 0 && S4U_RUNS_FINE
 static bool
 get_initgroups_sidlist (cygsidlist &grp_list, PSID usersid, PSID pgrpsid,
 			PTOKEN_GROUPS my_grps)
@@ -757,6 +762,7 @@ get_priv_list (LSA_HANDLE lsa, cygsid &usersid, cygsidlist &grp_list,
     }
   return privs;
 }
+#endif
 
 /* Accept a token if
    - the requested usersid matches the TokenUser and
@@ -900,6 +906,7 @@ account_restriction (NTSTATUS status)
   return type;
 }
 
+#if 0 && S4U_RUNS_FINE
 HANDLE
 create_token (cygsid &usersid, user_groups &new_groups)
 {
@@ -1293,6 +1300,7 @@ out:
   debug_printf ("%p = lsaauth ()", user_token);
   return user_token;
 }
+#endif
 
 #define SFU_LSA_KEY_SUFFIX	L"_microsoft_sfu_utility"
 

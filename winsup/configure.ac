@@ -36,7 +36,7 @@ AC_CYGWIN_INCLUDES
 
 AC_CONFIG_SUBDIRS(cygwin cygserver doc)
 if test "x$with_cross_bootstrap" != "xyes"; then
-    AC_CONFIG_SUBDIRS([utils lsaauth])
+    AC_CONFIG_SUBDIRS([utils])
 fi
 
 INSTALL_LICENSE="install-license"
