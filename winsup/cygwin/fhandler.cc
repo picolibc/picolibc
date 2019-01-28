@@ -547,7 +547,8 @@ fhandler_base::open (int flags, mode_t mode)
   PFILE_FULL_EA_INFORMATION p = NULL;
   ULONG plen = 0;
 
-  syscall_printf ("(%S, %y)", pc.get_nt_native_path (), flags);
+  syscall_printf ("(%S, %y)%s", pc.get_nt_native_path (), flags,
+				get_handle () ? " by handle" : "");
 
   if (flags & O_PATH)
     query_open (query_read_attributes);
@@ -559,6 +560,8 @@ fhandler_base::open (int flags, mode_t mode)
       pc.init_reopen_attr (attr, get_handle ());
       if (!(flags & O_CLOEXEC))
 	attr.Attributes |= OBJ_INHERIT;
+      if (pc.has_buggy_reopen ())
+	debug_printf ("Reopen by handle requested but FS doesn't support it");
     }
   else
     pc.get_object_attr (attr, *sec_none_cloexec (flags));
@@ -693,7 +696,7 @@ fhandler_base::open (int flags, mode_t mode)
 
   status = NtCreateFile (&fh, access, &attr, &io, NULL, file_attributes, shared,
 			 create_disposition, options, p, plen);
-  /* Pre-W10, we can't open a file by handle with delete disposition
+  /* Pre-W10, we can't reopen a file by handle with delete disposition
      set, so we have to lie our ass off. */
   if (get_handle () && status == STATUS_DELETE_PENDING)
     {
