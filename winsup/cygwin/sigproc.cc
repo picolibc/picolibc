@@ -814,7 +814,8 @@ child_info::child_info (unsigned in_cb, child_info_types chtype,
      allow the child to copy cygheap etc. from the parent to itself.  If
      we're forking, we also need handle duplicate access. */
   parent = NULL;
-  DWORD perms = PROCESS_QUERY_LIMITED_INFORMATION | PROCESS_VM_READ;
+  DWORD perms = PROCESS_QUERY_LIMITED_INFORMATION | PROCESS_VM_READ
+		| SYNCHRONIZE;
   if (type == _CH_FORK)
     {
       perms |= PROCESS_DUP_HANDLE;
