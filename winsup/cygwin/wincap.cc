@@ -23,6 +23,7 @@ wincaps wincap_vista __attribute__((section (".cygwin_dll_common"), shared)) = {
   {
     is_server:false,
     needs_count_in_si_lpres2:true,
+    needs_query_information:true,
     has_gaa_largeaddress_bug:true,
     has_broken_alloc_console:false,
     has_console_logon_sid:false,
@@ -46,6 +47,7 @@ wincaps wincap_7 __attribute__((section (".cygwin_dll_common"), shared)) = {
   {
     is_server:false,
     needs_count_in_si_lpres2:false,
+    needs_query_information:true,
     has_gaa_largeaddress_bug:true,
     has_broken_alloc_console:true,
     has_console_logon_sid:true,
@@ -69,6 +71,7 @@ wincaps wincap_8 __attribute__((section (".cygwin_dll_common"), shared)) = {
   {
     is_server:false,
     needs_count_in_si_lpres2:false,
+    needs_query_information:false,
     has_gaa_largeaddress_bug:false,
     has_broken_alloc_console:true,
     has_console_logon_sid:true,
@@ -92,6 +95,7 @@ wincaps  wincap_10_1507 __attribute__((section (".cygwin_dll_common"), shared)) 
   {
     is_server:false,
     needs_count_in_si_lpres2:false,
+    needs_query_information:false,
     has_gaa_largeaddress_bug:false,
     has_broken_alloc_console:true,
     has_console_logon_sid:true,
@@ -115,6 +119,7 @@ wincaps wincap_10_1511 __attribute__((section (".cygwin_dll_common"), shared)) =
   {
     is_server:false,
     needs_count_in_si_lpres2:false,
+    needs_query_information:false,
     has_gaa_largeaddress_bug:false,
     has_broken_alloc_console:true,
     has_console_logon_sid:true,
@@ -138,6 +143,7 @@ wincaps wincap_10_1703 __attribute__((section (".cygwin_dll_common"), shared)) =
   {
     is_server:false,
     needs_count_in_si_lpres2:false,
+    needs_query_information:false,
     has_gaa_largeaddress_bug:false,
     has_broken_alloc_console:true,
     has_console_logon_sid:true,
@@ -161,6 +167,7 @@ wincaps wincap_10_1709 __attribute__((section (".cygwin_dll_common"), shared)) =
   {
     is_server:false,
     needs_count_in_si_lpres2:false,
+    needs_query_information:false,
     has_gaa_largeaddress_bug:false,
     has_broken_alloc_console:true,
     has_console_logon_sid:true,
@@ -184,6 +191,7 @@ wincaps wincap_10_1803 __attribute__((section (".cygwin_dll_common"), shared)) =
   {
     is_server:false,
     needs_count_in_si_lpres2:false,
+    needs_query_information:false,
     has_gaa_largeaddress_bug:false,
     has_broken_alloc_console:true,
     has_console_logon_sid:true,
@@ -207,6 +215,7 @@ wincaps wincap_10_1809 __attribute__((section (".cygwin_dll_common"), shared)) =
   {
     is_server:false,
     needs_count_in_si_lpres2:false,
+    needs_query_information:false,
     has_gaa_largeaddress_bug:false,
     has_broken_alloc_console:true,
     has_console_logon_sid:true,

@@ -811,12 +811,24 @@ child_info::child_info (unsigned in_cb, child_info_types chtype,
     }
   sigproc_printf ("subproc_ready %p", subproc_ready);
   /* Create an inheritable handle to pass to the child process.  This will
-     allow the child to duplicate handles from the parent to itself. */
+     allow the child to copy cygheap etc. from the parent to itself.  If
+     we're forking, we also need handle duplicate access. */
   parent = NULL;
+  DWORD perms = PROCESS_QUERY_LIMITED_INFORMATION | PROCESS_VM_READ;
+  if (type == _CH_FORK)
+    {
+      perms |= PROCESS_DUP_HANDLE;
+      /* For some reason fork on Windows 7 requires PROCESS_QUERY_INFORMATION
+	 rather than just PROCESS_QUERY_LIMITED_INFORMATION when started as a
+	 service. */
+      if (wincap.needs_query_information ()
+	  && (cygheap->user.saved_sid () == well_known_system_sid
+	      || check_token_membership (hProcToken, well_known_service_sid)))
+	perms |= PROCESS_QUERY_INFORMATION;
+    }
+
   if (!DuplicateHandle (GetCurrentProcess (), GetCurrentProcess (),
-			GetCurrentProcess (), &parent,
-			PROCESS_DUP_HANDLE | PROCESS_VM_READ
-			| PROCESS_QUERY_LIMITED_INFORMATION, TRUE, 0))
+			GetCurrentProcess (), &parent, perms, TRUE, 0))
     system_printf ("couldn't create handle to myself for child, %E");
 }
 
