@@ -17,7 +17,6 @@ details. */
 
 /* UID/GID */
 void uinfo_init ();
-bool check_token_membership (HANDLE, PSID);
 bool check_token_membership (PSID);
 
 #define ILLEGAL_UID ((uid_t)-1)

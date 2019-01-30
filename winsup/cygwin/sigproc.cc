@@ -819,12 +819,10 @@ child_info::child_info (unsigned in_cb, child_info_types chtype,
   if (type == _CH_FORK)
     {
       perms |= PROCESS_DUP_HANDLE;
-      /* For some reason fork on Windows 7 requires PROCESS_QUERY_INFORMATION
-	 rather than just PROCESS_QUERY_LIMITED_INFORMATION when started as a
-	 service. */
-      if (wincap.needs_query_information ()
-	  && (cygheap->user.saved_sid () == well_known_system_sid
-	      || check_token_membership (hProcToken, well_known_service_sid)))
+      /* VirtualQueryEx is documented to require PROCESS_QUERY_INFORMATION.
+	 That's true for Windows 7, but PROCESS_QUERY_LIMITED_INFORMATION
+	 appears to be sufficient on Windows 8 and later. */
+      if (wincap.needs_query_information ())
 	perms |= PROCESS_QUERY_INFORMATION;
     }
 

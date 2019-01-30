@@ -118,13 +118,16 @@ cygheap_user::init ()
    This needs careful checking should we use check_token_membership in other
    circumstances. */
 bool
-check_token_membership (HANDLE tok, PSID sid)
+check_token_membership (PSID sid)
 {
   NTSTATUS status;
   ULONG size;
   tmp_pathbuf tp;
   PTOKEN_GROUPS groups = (PTOKEN_GROUPS) tp.w_get ();
 
+  /* If impersonated, use impersonation token. */
+  HANDLE tok = cygheap->user.issetuid () ? cygheap->user.primary_token ()
+					 : hProcToken;
   status = NtQueryInformationToken (tok, TokenGroups, groups, 2 * NT_MAX_PATH,
 				    &size);
   if (!NT_SUCCESS (status))
@@ -137,15 +140,6 @@ check_token_membership (HANDLE tok, PSID sid)
 	  return true;
     }
   return false;
-}
-
-bool
-check_token_membership (PSID sid)
-{
-  /* If impersonated, use impersonation token. */
-  HANDLE tok = cygheap->user.issetuid () ? cygheap->user.primary_token ()
-					 : hProcToken;
-  return check_token_membership (tok, sid);
 }
 
 static void
