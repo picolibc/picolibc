@@ -300,7 +300,10 @@ _pinfo::kill (siginfo_t& si)
 extern "C" int
 raise (int sig)
 {
-  return kill (myself->pid, sig);
+  pthread *thread = _my_tls.tid;
+  if (!thread)
+    return kill (myself->pid, sig);
+  return pthread_kill (thread, sig);
 }
 
 static int
