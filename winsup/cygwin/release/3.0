@@ -91,4 +91,7 @@ Bug Fixes
   Addresses: https://cygwin.com/ml/cygwin/2019-01/msg00197.html
 
 - Fix raise to work as required by POSIX.
-  (Partially) addresses: https://cygwin.com/ml/cygwin/2019-01/msg00149.html
+  Addresses: https://cygwin.com/ml/cygwin/2019-01/msg00149.html
+
+- Fix exception handling in pthreads.
+  Addresses: https://cygwin.com/ml/cygwin/2019-01/msg00149.html
