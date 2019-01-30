@@ -30,6 +30,7 @@ details. */
 #include "cygheap.h"
 #include "ntdll.h"
 #include "cygwait.h"
+#include "exception.h"
 
 extern "C" void __fp_lock_all ();
 extern "C" void __fp_unlock_all ();
@@ -1990,6 +1991,7 @@ pthread_spinlock::unlock ()
 DWORD WINAPI
 pthread::thread_init_wrapper (void *arg)
 {
+  exception protect;
   pthread *thread = (pthread *) arg;
   /* This *must* be set prior to calling set_tls_self_pointer or there is
      a race with the signal processing code which may miss the signal mask
