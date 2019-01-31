@@ -709,7 +709,7 @@ child_info_spawn::worker (const char *prog_arg, const char *const *argv,
 	::cygheap->fdtab.fixup_before_exec (pi.dwProcessId);
 
       if (mode != _P_OVERLAY)
-	cygpid = cygwin_pid (pi.dwProcessId);
+	cygpid = create_cygwin_pid ();
       else
 	cygpid = myself->pid;
 

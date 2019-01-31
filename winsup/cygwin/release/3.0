@@ -61,6 +61,9 @@ What changed:
 - Kerberos/MSV1_0 S4U authentication replaces two old methods:
   Creating a token from scratch and Cygwin LSA authentication package.
 
+- Cygwin PIDs have been decoupled from Windows PID.  Cygwin PIDs are
+  now incrementally dealt in the range from 2 up to 65535, POSIX-like.
+
 
 Bug Fixes
 ---------

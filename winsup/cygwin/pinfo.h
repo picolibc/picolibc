@@ -53,8 +53,6 @@ public:
 
   DWORD exitcode;	/* set when process exits */
 
-#define PINFO_REDIR_SIZE ((char *) &myself.procinfo->exitcode - (char *) myself.procinfo)
-
   /* > 0 if started by a cygwin process */
   DWORD cygstarted;
 
@@ -147,22 +145,25 @@ public:
 class pinfo: public pinfo_minimal
 {
   bool destroy;
+  HANDLE winpid_hdl;
   _pinfo *procinfo;
 public:
   bool waiter_ready;
   class cygthread *wait_thread;
 
   void __reg3 init (pid_t, DWORD, HANDLE);
-  pinfo (_pinfo *x = NULL): pinfo_minimal (), destroy (false), procinfo (x),
-		     waiter_ready (false), wait_thread (NULL) {}
-  pinfo (pid_t n, DWORD flag = 0): pinfo_minimal (), destroy (false),
-				   procinfo (NULL), waiter_ready (false),
-				   wait_thread (NULL)
+  pinfo (_pinfo *x = NULL)
+  : pinfo_minimal (), destroy (false), winpid_hdl (NULL), procinfo (x),
+    waiter_ready (false), wait_thread (NULL) {}
+  pinfo (pid_t n, DWORD flag = 0)
+  : pinfo_minimal (), destroy (false), winpid_hdl (NULL), procinfo (NULL),
+    waiter_ready (false), wait_thread (NULL)
   {
     init (n, flag, NULL);
   }
   pinfo (HANDLE, pinfo_minimal&, pid_t);
   void __reg2 thisproc (HANDLE);
+  void create_winpid_symlink (pid_t, DWORD);
   inline void _pinfo_release ();
   void release ();
   bool __reg1 wait ();
@@ -239,11 +240,8 @@ public:
   void release ();
 };
 
-extern __inline pid_t
-cygwin_pid (pid_t pid)
-{
-  return pid;
-}
+pid_t create_cygwin_pid ();
+pid_t cygwin_pid (DWORD);
 
 void __stdcall pinfo_init (char **, int);
 extern pinfo myself;

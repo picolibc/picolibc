@@ -209,35 +209,6 @@ frok::child (volatile char * volatile here)
   return 0;
 }
 
-#define NO_SLOW_PID_REUSE
-#ifndef NO_SLOW_PID_REUSE
-static void
-slow_pid_reuse (HANDLE h)
-{
-  static NO_COPY HANDLE last_fork_procs[NPIDS_HELD];
-  static NO_COPY unsigned nfork_procs;
-
-  if (nfork_procs >= (sizeof (last_fork_procs) / sizeof (last_fork_procs [0])))
-    nfork_procs = 0;
-  /* Keep a list of handles to child processes sitting around to prevent
-     Windows from reusing the same pid n times in a row.  Having the same pids
-     close in succesion confuses bash.  Keeping a handle open will stop
-     windows from reusing the same pid.  */
-  if (last_fork_procs[nfork_procs])
-    ForceCloseHandle1 (last_fork_procs[nfork_procs], fork_stupidity);
-  if (DuplicateHandle (GetCurrentProcess (), h,
-		       GetCurrentProcess (), &last_fork_procs[nfork_procs],
-		       0, FALSE, DUPLICATE_SAME_ACCESS))
-    ProtectHandle1 (last_fork_procs[nfork_procs], fork_stupidity);
-  else
-    {
-      last_fork_procs[nfork_procs] = NULL;
-      system_printf ("couldn't create last_fork_proc, %E");
-    }
-  nfork_procs++;
-}
-#endif
-
 int __stdcall
 frok::parent (volatile char * volatile stack_here)
 {
@@ -436,10 +407,6 @@ frok::parent (volatile char * volatile stack_here)
 #endif
       goto cleanup;
     }
-
-#ifndef NO_SLOW_PID_REUSE
-  slow_pid_reuse (hchild);
-#endif
 
   /* CHILD IS STOPPED */
   debug_printf ("child is alive (but stopped)");

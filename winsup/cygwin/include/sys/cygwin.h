@@ -269,8 +269,7 @@ enum
   PID_INITIALIZING     = 0x00800, /* Set until ready to receive signals. */
   PID_NEW	       = 0x01000, /* Available. */
   PID_ALLPIDS	       = 0x02000, /* used by pinfo scanner */
-  PID_EXECED	       = 0x04000, /* redirect to original pid info block */
-  PID_NOREDIR	       = 0x08000, /* don't redirect if execed */
+  PID_PROCINFO	       = 0x08000, /* caller just asks for process info */
   PID_EXITED	       = 0x40000000, /* Free entry. */
   PID_REAPED	       = 0x80000000  /* Reaped */
 };

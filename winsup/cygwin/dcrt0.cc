@@ -687,28 +687,11 @@ child_info_spawn::handle_spawn ()
 
   if (child_proc_info->parent)
     {
-      if (type == _CH_EXEC)
-	{
-	  /* Keep pointer to parent open if we've execed so that pid will not be
-	     reused.  Try to Urther reduce permissions. */
-	  HANDLE new_parent;
-
-	  if (DuplicateHandle (GetCurrentProcess (), child_proc_info->parent,
-			       GetCurrentProcess (), &new_parent,
-			       SYNCHRONIZE, FALSE, 0))
-	    {
-	      CloseHandle (child_proc_info->parent);
-	      child_proc_info->parent = new_parent;
-	    }
-	}
-      else
-	{
-	  /* Otherwise, we no longer need this handle so close it.  Need to do
-	     this after debug_fixup_after_fork_exec or DEBUGGING handling of
-	     handles might get confused. */
-	  CloseHandle (child_proc_info->parent);
-	  child_proc_info->parent = NULL;
-	}
+      /* We no longer need this handle so close it.  Need to do
+	 this after debug_fixup_after_fork_exec or DEBUGGING handling of
+	 handles might get confused. */
+      CloseHandle (child_proc_info->parent);
+      child_proc_info->parent = NULL;
     }
 
   signal_fixup_after_exec ();
