@@ -33,7 +33,7 @@
 
 #include <sys/cdefs.h>
 __SCCSID("@(#)scandir.c	8.3 (Berkeley) 1/2/94");
-__FBSDID("$FreeBSD$");
+__FBSDID("$FreeBSD: head/lib/libc/gen/scandir.c 335898 2018-07-03 17:31:45Z jhb $");
 
 /*
  * Scan the directory dirname calling select to make a list of selected
@@ -95,6 +95,9 @@ scandir(const char *dirname, struct dirent ***namelist,
 		if (p == NULL)
 			goto fail;
 		p->d_ino = d->d_ino;
+#ifdef DT_UNKNOWN
+		p->d_type = d->d_type;
+#endif
 		p->d_reclen = d->d_reclen;
 #ifdef _DIRENT_HAVE_D_NAMLEN
 		p->d_namlen = d->d_namlen;
