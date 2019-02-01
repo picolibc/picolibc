@@ -1212,9 +1212,8 @@ format_process_status (void *data, char *&destbuf)
       state_str = "stopped";
       break;
     }
-  if (!get_mem_values (p->dwProcessId, vmsize, vmrss, vmtext, vmdata,
-		       vmlib, vmshare))
-    return 0;
+  get_mem_values (p->dwProcessId, vmsize, vmrss, vmtext, vmdata,
+		  vmlib, vmshare);
   /* The real uid value for *this* process is stored at cygheap->user.real_uid
      but we can't get at the real uid value for any other process, so
      just fake it as p->uid.  Similar for p->gid. */
