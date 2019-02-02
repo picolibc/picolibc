@@ -693,7 +693,7 @@ kill -l [signal]
  -l, --list      print a list of signal names
  -s, --signal    send signal (use kill --list for a list)
  -W, --winpid    specified pids are windows PIDs, not Cygwin PIDs
-                 (use with extrem caution!)
+                 (use with extreme caution!)
  -h, --help      output usage information and exit
  -V, --version   output version information and exit
 </screen>

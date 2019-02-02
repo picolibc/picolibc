@@ -46,7 +46,7 @@ usage (FILE *where = stderr)
 	" -l, --list      print a list of signal names\n"
 	" -s, --signal    send signal (use %1$s --list for a list)\n"
 	" -W, --winpid    specified pids are windows PIDs, not Cygwin PIDs\n"
-	"                 (use with extrem caution!)\n"
+	"                 (use with extreme caution!)\n"
 	" -h, --help      output usage information and exit\n"
 	" -V, --version   output version information and exit\n"
 	"\n", prog_name);
