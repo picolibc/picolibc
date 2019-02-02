@@ -169,14 +169,15 @@ forcekill (pid_t pid, int sig, int wait)
   if (!h)
     {
       if (!wait || GetLastError () != ERROR_INVALID_PARAMETER)
-	fprintf (stderr, "%s: couldn't open pid %u\n", prog_name, dwpid);
+	fprintf (stderr, "%s: couldn't open pid %u\n",
+		 prog_name, (unsigned int) dwpid);
       return;
     }
   if (!wait || WaitForSingleObject (h, 200) != WAIT_OBJECT_0)
     if (sig && !TerminateProcess (h, sig << 8)
 	&& WaitForSingleObject (h, 200) != WAIT_OBJECT_0)
       fprintf (stderr, "%s: couldn't kill pid %u, %u\n",
-	       prog_name, dwpid, GetLastError ());
+	       prog_name, (unsigned int) dwpid, (unsigned int) GetLastError ());
   CloseHandle (h);
 }
 
