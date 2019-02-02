@@ -67,7 +67,7 @@ pinfo::thisproc (HANDLE h)
   procinfo->dwProcessId = myself_initial.pid;
   procinfo->sendsig = myself_initial.sendsig;
   wcscpy (procinfo->progname, myself_initial.progname);
-  create_winpid_symlink (procinfo->pid, procinfo->dwProcessId);
+  create_winpid_symlink ();
   procinfo->exec_sendsig = NULL;
   procinfo->exec_dwProcessId = 0;
   debug_printf ("myself dwProcessId %u", procinfo->dwProcessId);
@@ -303,8 +303,8 @@ cygwin_pid (DWORD dwProcessId)
 
 /* Create "winpid.WINPID" symlinks with the Cygwin PID of that process as
    target.  This is used to find the Cygwin PID for a given Windows WINPID. */
-inline void
-pinfo::create_winpid_symlink (pid_t cygpid, DWORD winpid)
+void
+pinfo::create_winpid_symlink ()
 {
   WCHAR sym_name[24];
   WCHAR pid_name[24];
@@ -312,8 +312,7 @@ pinfo::create_winpid_symlink (pid_t cygpid, DWORD winpid)
   UNICODE_STRING pid_str;
   OBJECT_ATTRIBUTES attr;
 
-  __small_swprintf (sym_name, L"winpid.%u",
-		    procinfo->dwProcessId ?: myself_initial.pid);
+  __small_swprintf (sym_name, L"winpid.%u", procinfo->dwProcessId);
   RtlInitUnicodeString (&sym_str, sym_name);
   __small_swprintf (pid_name, L"%u", procinfo->pid);
   RtlInitUnicodeString (&pid_str, pid_name);

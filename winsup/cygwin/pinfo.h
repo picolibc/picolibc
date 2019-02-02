@@ -163,7 +163,7 @@ public:
   }
   pinfo (HANDLE, pinfo_minimal&, pid_t);
   void __reg2 thisproc (HANDLE);
-  void create_winpid_symlink (pid_t, DWORD);
+  void create_winpid_symlink ();
   inline void _pinfo_release ();
   void release ();
   bool __reg1 wait ();
