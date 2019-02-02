@@ -770,7 +770,7 @@ winver.o: mkvers.sh include/cygwin/version.h winver.rc $(src_files)
 	@echo "Making version.cc and winver.o";\
 	/bin/sh ${word 1,$^} ${word 2,$^} ${word 3,$^} $(WINDRES) ${CFLAGS} $(addprefix -I,${CCWRAP_SYSTEM_HEADERS} ${CCWRAP_DIRAFTER_HEADERS})
 
-version.cc: winver.o
+version.o: winver.o
 
 Makefile: ${srcdir}/Makefile.in
 	/bin/sh ./config.status
