@@ -152,29 +152,31 @@ get_debug_priv (void)
 }
 
 static void __stdcall
-forcekill (int pid, int sig, int wait)
+forcekill (pid_t pid, int sig, int wait)
 {
-  // try to acquire SeDebugPrivilege
+  /* try to acquire SeDebugPrivilege */
   get_debug_priv();
 
   external_pinfo *p = NULL;
-  /* cygwin_internal misinterprets negative pids (Win9x pids) */
-  if (pid > 0)
-    p = (external_pinfo *) cygwin_internal (CW_GETPINFO_FULL, pid);
-  DWORD dwpid = p ? p->dwProcessId : (DWORD) pid;
-  HANDLE h = OpenProcess (PROCESS_TERMINATE, FALSE, (DWORD) dwpid);
+  p = (external_pinfo *) cygwin_internal (CW_GETPINFO_FULL, pid);
+  if (!p)
+    {
+      fprintf (stderr, "%s: %d: No such process\n", prog_name, pid);
+      return;
+    }
+  DWORD dwpid = p->dwProcessId;
+  HANDLE h = OpenProcess (PROCESS_TERMINATE, FALSE, dwpid);
   if (!h)
     {
       if (!wait || GetLastError () != ERROR_INVALID_PARAMETER)
-	fprintf (stderr, "%s: couldn't open pid %u\n",
-		 prog_name, (unsigned) dwpid);
+	fprintf (stderr, "%s: couldn't open pid %u\n", prog_name, dwpid);
       return;
     }
   if (!wait || WaitForSingleObject (h, 200) != WAIT_OBJECT_0)
     if (sig && !TerminateProcess (h, sig << 8)
 	&& WaitForSingleObject (h, 200) != WAIT_OBJECT_0)
       fprintf (stderr, "%s: couldn't kill pid %u, %u\n",
-	       prog_name, (unsigned) dwpid, (unsigned int) GetLastError ());
+	       prog_name, dwpid, GetLastError ());
   CloseHandle (h);
 }
 
@@ -232,11 +234,8 @@ main (int argc, char **argv)
 	  print_version ();
 	  break;
 	case '?':
-	  if (gotasig)
-	    {
-	      --optind;
-	      goto out;
-	    }
+	  if (gotasig) /* this is a negative pid, go ahead */
+	    goto out;
 	  optreset = 1;
 	  optind = 1 + av - argv;
 	  gotasig = *av + 1;
@@ -252,18 +251,22 @@ out:
   test_for_unknown_sig (sig, gotasig);
 
   argv += optind;
+  if (*argv == 0)
+    {
+      fprintf (stderr, "%s: not enough arguments\n", prog_name);
+      return 1;
+    }
   while (*argv != NULL)
     {
       if (!pid)
 	pid = strtoll (*argv, &p, 10);
-      if (*p != '\0'
-	  || (!force && (pid < INT_MIN || pid > INT_MAX))
-	  || (force && (pid <= 0 || pid > UINT_MAX)))
+      /* INT_MIN <= pid <= INT_MAX.  -f only takes positive pids. */
+      if (*p != '\0' || pid < (force ? 1 : INT_MIN) || pid > INT_MAX)
 	{
 	  fprintf (stderr, "%s: illegal pid: %s\n", prog_name, *argv);
 	  ret = 1;
 	}
-      else if (pid <= INT_MAX && kill ((pid_t) pid, sig) == 0)
+      else if (kill ((pid_t) pid, sig) == 0)
 	{
 	  if (force)
 	    forcekill ((pid_t) pid, sig, 1);
