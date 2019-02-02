@@ -204,6 +204,7 @@ public:
   }
 #endif
   HANDLE shared_handle () {return h;}
+  HANDLE shared_winpid_handle () {return winpid_hdl;}
   void set_acl ();
   friend class _pinfo;
   friend class winpids;

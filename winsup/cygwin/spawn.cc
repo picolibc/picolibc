@@ -725,6 +725,16 @@ child_info_spawn::worker (const char *prog_arg, const char *const *argv,
 	  myself->dwProcessId = pi.dwProcessId;
 	  strace.execing = 1;
 	  myself.hProcess = hExeced = pi.hProcess;
+	  if (!real_path.iscygexec ())
+	    {
+	      /* If the child process is not a Cygwin process, we have to
+		 create a new winpid symlink and drop the old one on
+		 behalf of the child process not being able to do this
+		 by itself. */
+	      HANDLE old_winpid_hdl = myself.shared_winpid_handle ();
+	      myself.create_winpid_symlink ();
+	      NtClose (old_winpid_hdl);
+	    }
 	  real_path.get_wide_win32_path (myself->progname); // FIXME: race?
 	  sigproc_printf ("new process name %W", myself->progname);
 	  if (!iscygwin ())
@@ -748,13 +758,23 @@ child_info_spawn::worker (const char *prog_arg, const char *const *argv,
 	  child.hProcess = pi.hProcess;
 
 	  real_path.get_wide_win32_path (child->progname);
-	  /* FIXME: This introduces an unreferenced, open handle into the child.
-	     The purpose is to keep the pid shared memory open so that all of
-	     the fields filled out by child.remember do not disappear and so
-	     there is not a brief period during which the pid is not available.
-	     However, we should try to find another way to do this eventually. */
+	  /* This introduces an unreferenced, open handle into the child.
+	     The purpose is to keep the pid shared memory open so that all
+	     of the fields filled out by child.remember do not disappear
+	     and so there is not a brief period during which the pid is
+	     not available. */
 	  DuplicateHandle (GetCurrentProcess (), child.shared_handle (),
 			   pi.hProcess, NULL, 0, 0, DUPLICATE_SAME_ACCESS);
+	  if (!real_path.iscygexec ())
+	    {
+	      /* If the child process is not a Cygwin process, we have to
+		 create a new winpid symlink and induce it into the child
+		 process as well to keep it over the lifetime of the child. */
+	      child.create_winpid_symlink ();
+	      DuplicateHandle (GetCurrentProcess (),
+			       child.shared_winpid_handle (),
+			       pi.hProcess, NULL, 0, 0, DUPLICATE_SAME_ACCESS);
+	    }
 	  child->start_time = time (NULL); /* Register child's starting time. */
 	  child->nice = myself->nice;
 	  postfork (child);
