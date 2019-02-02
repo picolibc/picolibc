@@ -766,11 +766,12 @@ ${EXTRALIBS}: lib%.a: %.o
 find_src_files = $(wildcard $(dir)/*.[chS]) $(wildcard $(dir)/*.cc)
 src_files := $(foreach dir,$(VPATH),$(find_src_files))
 
-winver.o: mkvers.sh include/cygwin/version.h winver.rc $(src_files)
+# mkvers.sh creates version.cc in the first place, winver.o always
+# second, so version.cc is always older than winver.o
+version.cc: mkvers.sh include/cygwin/version.h winver.rc $(src_files)
 	@echo "Making version.cc and winver.o";\
 	/bin/sh ${word 1,$^} ${word 2,$^} ${word 3,$^} $(WINDRES) ${CFLAGS} $(addprefix -I,${CCWRAP_SYSTEM_HEADERS} ${CCWRAP_DIRAFTER_HEADERS})
-
-version.o: winver.o
+$(VERSION_OFILES): version.cc
 
 Makefile: ${srcdir}/Makefile.in
 	/bin/sh ./config.status
