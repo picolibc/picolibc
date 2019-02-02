@@ -63,6 +63,8 @@ What changed:
 
 - Cygwin PIDs have been decoupled from Windows PID.  Cygwin PIDs are
   now incrementally dealt in the range from 2 up to 65535, POSIX-like.
+  Native Windows processes not started by Cygwin processes are mapped
+  into the range beyond 65535.
 
 
 Bug Fixes
