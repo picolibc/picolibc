@@ -241,7 +241,7 @@ create_cygwin_pid ()
       do
 	{
 	  pid = ((uint32_t) InterlockedIncrement (&cygwin_shared->pid_src))
-		% 65536;
+		% MAX_PID;
 	}
       while (pid < 2);
       __small_swprintf (sym_name, L"cygpid.%u", pid);
