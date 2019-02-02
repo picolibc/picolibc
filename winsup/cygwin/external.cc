@@ -322,6 +322,15 @@ cygwin_internal (cygwin_getinfo_types t, ...)
 	  res = p ? p->dwProcessId : 0;
 	}
 	break;
+
+      case CW_WINPID_TO_CYGWIN_PID:
+	{
+	  DWORD winpid = va_arg (arg, DWORD);
+	  pid_t pid = cygwin_pid (winpid);
+	  res = pid ?: winpid + MAX_PID;
+	}
+	break;
+
       case CW_EXTRACT_DOMAIN_AND_USER:
 	{
 	  WCHAR nt_domain[MAX_DOMAIN_NAME_LEN + 1];

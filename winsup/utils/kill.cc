@@ -26,17 +26,18 @@ static struct option longopts[] =
   {"list", optional_argument, NULL, 'l'},
   {"force", no_argument, NULL, 'f'},
   {"signal", required_argument, NULL, 's'},
+  {"winpid", no_argument, NULL, 'W'},
   {"version", no_argument, NULL, 'V'},
   {NULL, 0, NULL, 0}
 };
 
-static char opts[] = "hl::fs:V";
+static char opts[] = "hl::fs:WV";
 
 static void
 usage (FILE *where = stderr)
 {
   fprintf (where , ""
-	"Usage: %1$s [-f] [-signal] [-s signal] pid1 [pid2 ...]\n"
+	"Usage: %1$s [-fW] [-signal] [-s signal] pid1 [pid2 ...]\n"
 	"       %1$s -l [signal]\n"
 	"\n"
 	"Send signals to processes\n"
@@ -44,6 +45,8 @@ usage (FILE *where = stderr)
 	" -f, --force     force, using win32 interface if necessary\n"
 	" -l, --list      print a list of signal names\n"
 	" -s, --signal    send signal (use %1$s --list for a list)\n"
+	" -W, --winpid    specified pids are windows PIDs, not Cygwin PIDs\n"
+	"                 (use with extrem caution!)\n"
 	" -h, --help      output usage information and exit\n"
 	" -V, --version   output version information and exit\n"
 	"\n", prog_name);
@@ -152,19 +155,28 @@ get_debug_priv (void)
 }
 
 static void __stdcall
-forcekill (pid_t pid, int sig, int wait)
+forcekill (pid_t pid, DWORD winpid, int sig, int wait)
 {
+  DWORD dwpid;
+
   /* try to acquire SeDebugPrivilege */
   get_debug_priv();
 
-  external_pinfo *p = NULL;
-  p = (external_pinfo *) cygwin_internal (CW_GETPINFO_FULL, pid);
-  if (!p)
+  if (!winpid)
     {
-      fprintf (stderr, "%s: %d: No such process\n", prog_name, pid);
-      return;
+      external_pinfo *p = (external_pinfo *)
+			  cygwin_internal (CW_GETPINFO_FULL, pid);
+      if (!p)
+	{
+	  fprintf (stderr, "%s: %d: No such process\n", prog_name, pid);
+	  return;
+	}
+      dwpid = p->dwProcessId;
     }
-  DWORD dwpid = p->dwProcessId;
+  else
+    /* pid is used for printing only after this point */
+    pid = dwpid = winpid;
+
   HANDLE h = OpenProcess (PROCESS_TERMINATE, FALSE, dwpid);
   if (!h)
     {
@@ -186,6 +198,7 @@ main (int argc, char **argv)
 {
   int sig = SIGTERM;
   int force = 0;
+  int winpids = 0;
   int ret = 0;
   char *gotasig = NULL;
 
@@ -197,7 +210,6 @@ main (int argc, char **argv)
   opterr = 0;
 
   char *p;
-  long long int pid = 0;
 
   for (;;)
     {
@@ -228,6 +240,9 @@ main (int argc, char **argv)
 	case 'f':
 	  force = 1;
 	  break;
+	case 'W':
+	  winpids = 1;
+	  break;
 	case 'h':
 	  usage (stdout);
 	  break;
@@ -257,32 +272,37 @@ out:
       fprintf (stderr, "%s: not enough arguments\n", prog_name);
       return 1;
     }
-  while (*argv != NULL)
+  for (long long int pid = 0; *argv != NULL; argv++)
     {
-      if (!pid)
-	pid = strtoll (*argv, &p, 10);
+      DWORD dwpid = 0;
+
+      pid = strtoll (*argv, &p, 10);
       /* INT_MIN <= pid <= INT_MAX.  -f only takes positive pids. */
       if (*p != '\0' || pid < (force ? 1 : INT_MIN) || pid > INT_MAX)
 	{
 	  fprintf (stderr, "%s: illegal pid: %s\n", prog_name, *argv);
 	  ret = 1;
+	  continue;
 	}
-      else if (kill ((pid_t) pid, sig) == 0)
+      if (winpids)
+	{
+	  dwpid = pid;
+	  pid = (pid_t) cygwin_internal (CW_WINPID_TO_CYGWIN_PID, dwpid);
+	}
+      if (kill ((pid_t) pid, sig) == 0)
 	{
 	  if (force)
-	    forcekill ((pid_t) pid, sig, 1);
+	    forcekill ((pid_t) pid, dwpid, sig, 1);
 	}
       else if (force)
-	forcekill ((pid_t) pid, sig, 0);
+	forcekill ((pid_t) pid, dwpid, sig, 0);
       else
 	{
 	  char buf[1000];
-	  sprintf (buf, "%s: %lld", prog_name, pid);
+	  sprintf (buf, "%s: %lld", prog_name, dwpid ?: pid);
 	  perror (buf);
 	  ret = 1;
 	}
-      argv++;
-      pid = 0;
     }
   return ret;
 }

@@ -692,6 +692,8 @@ kill -l [signal]
  -f, --force     force, using win32 interface if necessary
  -l, --list      print a list of signal names
  -s, --signal    send signal (use kill --list for a list)
+ -W, --winpid    specified pids are windows PIDs, not Cygwin PIDs
+                 (use with extrem caution!)
  -h, --help      output usage information and exit
  -V, --version   output version information and exit
 </screen>
@@ -717,7 +719,13 @@ $ /bin/kill --version
 </screen> which should give the Cygwin
       <command>kill</command> version number and copyright information. </para>
 
-    <para>Unless you specific the <literal>-f</literal> option, the "pid"
+    <para>The <literal>-f</literal> option uses Windows functions to
+      terminate processes forcefully. Use <literal>-f</literal> to
+      terminate native Windows processes not started by Cygwin processes.
+      <literal>-f</literal> can also be useful to terminate Cygwin processes
+      not answering to SIGKILL.</para>
+
+    <para>Unless you specific the <literal>-W</literal> option, the "pid"
       values used by <command>kill</command> are the Cygwin pids, not the
       Windows pids. To get a list of running programs and their Cygwin pids,
       use the Cygwin <command>ps</command> program. <command>ps -W</command>
