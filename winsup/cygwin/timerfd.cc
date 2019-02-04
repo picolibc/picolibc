@@ -105,7 +105,6 @@ timerfd_tracker::thread_func ()
 	}
 
       /* Inner loop: Timer expired?  If not, wait for it. */
-      /* TODO: TFD_TIMER_CANCEL_ON_SET */
       HANDLE expired[3] = { tfd_shared->timer (),
 			    tfd_shared->disarm_evt (),
 			    cancel_evt };
