@@ -60,7 +60,7 @@ fhandler_process_fd::fetch_fh (HANDLE &out_hdl, uint32_t flags)
 	  return NULL;
 	}
       size_t size;
-      void *buf = p->file_pathconv (fd, FFH_LINKAT, size);
+      void *buf = p->file_pathconv (fd, flags, size);
       if (size == 0)
 	{
 	  set_errno (ENOENT);
