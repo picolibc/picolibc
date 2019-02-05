@@ -97,7 +97,7 @@ fhandler_process_fd::fetch_fh (HANDLE &out_hdl, uint32_t flags)
 }
 
 fhandler_base *
-fhandler_process_fd::fd_reopen (int flags)
+fhandler_process_fd::fd_reopen (int flags, mode_t mode)
 {
   fhandler_base *fh;
   HANDLE hdl;
@@ -106,7 +106,7 @@ fhandler_process_fd::fd_reopen (int flags)
   if (!fh)
     return NULL;
   fh->set_io_handle (hdl);
-  int ret = fh->open_with_arch (flags, 0);
+  int ret = fh->open_with_arch (flags, mode);
   CloseHandle (hdl);
   if (!ret)
     {

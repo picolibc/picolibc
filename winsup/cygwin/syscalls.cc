@@ -1507,7 +1507,7 @@ open (const char *unix_path, int flags, ...)
       if (fh->dev () == FH_PROCESSFD && fh->pc.follow_fd_symlink ())
 	{
 	  /* Reopen file by descriptor */
-	  fh_file = fh->fd_reopen (flags);
+	  fh_file = fh->fd_reopen (flags, mode & 07777);
 	  if (!fh_file)
 	    __leave;
 	  delete fh;

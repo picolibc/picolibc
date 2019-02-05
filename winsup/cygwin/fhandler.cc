@@ -792,7 +792,7 @@ done:
 }
 
 fhandler_base *
-fhandler_base::fd_reopen (int)
+fhandler_base::fd_reopen (int, mode_t)
 {
   /* This is implemented in fhandler_process only. */
   return NULL;

@@ -331,7 +331,7 @@ class fhandler_base
   int open_with_arch (int, mode_t = 0);
   int open_null (int flags);
   virtual int open (int, mode_t);
-  virtual fhandler_base *fd_reopen (int);
+  virtual fhandler_base *fd_reopen (int, mode_t);
   virtual void open_setup (int flags);
   void set_unique_id (int64_t u) { unique_id = u; }
   void set_unique_id () { NtAllocateLocallyUniqueId ((PLUID) &unique_id); }
@@ -2587,7 +2587,7 @@ class fhandler_process_fd : public fhandler_process
   fhandler_process_fd () : fhandler_process () {}
   fhandler_process_fd (void *) {}
 
-  virtual fhandler_base *fd_reopen (int);
+  virtual fhandler_base *fd_reopen (int, mode_t);
   int __reg2 fstat (struct stat *buf);
   virtual int __reg2 link (const char *);
 
