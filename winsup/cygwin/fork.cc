@@ -400,7 +400,6 @@ frok::parent (volatile char * volatile stack_here)
      we can't actually record the pid in the internal table. */
   if (!child.remember (false))
     {
-      TerminateProcess (hchild, 1);
       this_errno = EAGAIN;
 #ifdef DEBUGGING0
       error ("child remember failed");
@@ -508,8 +507,12 @@ cleanup:
     __malloc_unlock ();
 
   /* Remember to de-allocate the fd table. */
-  if (hchild && !child.hProcess) /* no child.procinfo */
-    ForceCloseHandle1 (hchild, childhProc);
+  if (hchild)
+    {
+      TerminateProcess (hchild, 1);
+      if (!child.hProcess) /* no child.procinfo */
+	ForceCloseHandle1 (hchild, childhProc);
+    }
   if (forker_finished)
     ForceCloseHandle (forker_finished);
   debug_printf ("returning -1");
