@@ -13,6 +13,7 @@ details. */
 #include "pinfo.h"
 #include "dtable.h"
 #include "cygheap.h"
+#include "tls_pbuf.h"
 
 fhandler_base *
 fhandler_process_fd::fetch_fh (HANDLE &out_hdl, uint32_t flags)
@@ -85,6 +86,16 @@ fhandler_process_fd::fetch_fh (HANDLE &out_hdl, uint32_t flags)
       __seterrno ();
       CloseHandle (hdl);
       return NULL;
+    }
+  /* relative path?  This happens for special types like pipes and sockets. */
+  if (*pc.get_posix () != '/')
+    {
+      tmp_pathbuf tp;
+      char *fullpath = tp.c_get ();
+
+      stpcpy (stpncpy (fullpath, get_name (), path - get_name ()),
+	      pc.get_posix ());
+      pc.set_posix (fullpath);
     }
   fhandler_base *fh = build_fh_pc (pc);
   if (!fh)

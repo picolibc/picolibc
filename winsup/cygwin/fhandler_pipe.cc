@@ -73,11 +73,8 @@ fhandler_pipe::open (int flags, mode_t mode)
   bool inh;
   bool got_one = false;
 
-  if (sscanf (get_name (), "/proc/self/fd/pipe:[%llu]",
-	      (long long *) &uniq_id) == 1)
-    pid = myself->pid;
-  else if (sscanf (get_name (), "/proc/%d/fd/pipe:[%llu]",
-		   &pid, (long long *) &uniq_id) < 2)
+  if (sscanf (get_name (), "/proc/%d/fd/pipe:[%llu]",
+	      &pid, (long long *) &uniq_id) < 2)
     {
       set_errno (ENOENT);
       return 0;

@@ -5061,8 +5061,8 @@ pipe_worker (int filedes[2], unsigned int psize, int mode)
     {
       cygheap_fdnew fdin;
       cygheap_fdnew fdout (fdin, false);
-      char buf[sizeof ("/proc/self/fd/pipe:[9223372036854775807]")];
-      __small_sprintf (buf, "/proc/self/fd/pipe:[%D]", fhs[0]->get_plain_ino ());
+      char buf[sizeof ("pipe:[9223372036854775807]")];
+      __small_sprintf (buf, "pipe:[%D]", fhs[0]->get_plain_ino ());
       fhs[0]->pc.set_posix (buf);
       __small_sprintf (buf, "pipe:[%D]", fhs[1]->get_plain_ino ());
       fhs[1]->pc.set_posix (buf);
