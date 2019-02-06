@@ -733,7 +733,11 @@ unlink_nt (path_conv &pc)
       if (pc.file_attributes () & FILE_ATTRIBUTE_READONLY)
 	NtSetAttributesFile (fh, pc.file_attributes ());
       NtClose (fh);
-      goto out;
+      /* Trying to delete in-use executables and DLLs using
+         FILE_DISPOSITION_POSIX_SEMANTICS returns STATUS_CANNOT_DELETE.
+	 Fall back to the default method. */
+      if (status != STATUS_CANNOT_DELETE)
+	goto out;
     }
 
   /* If the R/O attribute is set, we have to open the file with
