@@ -107,6 +107,13 @@ Native Windows processes not started by Cygwin processes are mapped
 into the range beyond 65535.
 </para></listitem>
 
+<listitem><para>
+fork(2) now is able to recover from when an in-use executable/dll is
+removed or replaced during process runtime.  This feature is disabled by
+default and limited to exes/dlls on the same NTFS partition as the Cygwin
+installation.  For more information and how to enable, please refer to
+<xref linkend="ov-hi-process"></xref>.
+</para></listitem>
 </itemizedlist>
 
 </sect2>

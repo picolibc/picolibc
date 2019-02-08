@@ -202,21 +202,27 @@ While Windows does not allow to remove binaries in use from the file
 system, they still can be renamed or moved into the recycle bin, as
 outlined for unlink(2) in <xref linkend="ov-new1.7-file"></xref>.
 To allow an existing process to fork, the original binary files need to be
-available via their original file names, but they may reside in
-different directories when using the <ulink
+available via their original file names, but they may reside in a
+different directory when using the <ulink
 url="https://social.msdn.microsoft.com/search/en-US?query=dotlocal%20dll%20redirection"
 >DotLocal (.local) Dll Redirection</ulink> feature.
 Since NTFS does support hardlinks, when the fork fails we try again, but
 create a private directory containing hardlinks to the original files as
-well as the .local file now.  The private directory for the hardlinks is
-/var/run/cygfork/, which you have to create manually for now if you need to
-protect fork against exe- and dll- updates on your Cygwin instance.  As
-hardlinks cannot be used across multiple NTFS file systems, please make sure
-your exe- and dll- replacing operations operate on the same single NTFS file
-system as your Cygwin instance and the /var/run/cygfork/ directory.</para>
+well as the <literal>.local</literal> file now.  The base directory for the
+private hardlink directory is <literal>/var/run/cygfork/</literal>, which
+you have to create manually for now if you need to protect fork against
+updates to executables and dlls on your Cygwin instance.  As hardlinks
+cannot be used across multiple NTFS file systems, please make sure your
+executable and dll replacing operations operate on the same single NTFS file
+system as your Cygwin instance and the <literal>/var/run/cygfork/</literal>
+directory.  Note that this private hardlink directory also does help for
+when a wrong dll is found in the parent process' current working directory.
+To enable creating the hardlinks, you need to stop all currently running
+Cygwin processes after creating this directory, once per Cygwin installation:
+<literallayout>$ mkdir --mode=a=rwxt /var/run/cygfork</literallayout></para>
 
-<para>We create one directory per user, application and application age,
-and remove it when no more processes use that directory.  To indicate
+<para>We create one hardlink directory per user, application and application
+age, and remove it when no more processes use that directory.  To indicate
 whether a directory still is in use, we define a mutex name similar to
 the directory name.  As mutexes are destroyed when no process holds a
 handle open any more, we can clean up even after power loss or similar:

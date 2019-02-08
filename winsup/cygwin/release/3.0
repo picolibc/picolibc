@@ -31,6 +31,12 @@ What's new:
 - New APIs: signalfd, timerfd_create, timerfd_gettime, timerfd_settime,
   timer_getoverrun.
 
+- fork(2) now is able to recover from when an in-use executable/dll is
+  removed or replaced during process runtime.  This feature is disabled by
+  default and limited to exes/dlls on the same NTFS partition as the Cygwin
+  installation.  For more information and how to enable, please refer to
+  https://www.cygwin.com/cygwin-ug-net/highlights.html#ov-hi-process
+
 
 What changed:
 -------------
