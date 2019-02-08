@@ -30,7 +30,9 @@
 
 
 /* Now the SWI numbers and reason codes for RDI (Angel) monitors.  */
-#if defined (SEMIHOST_V2) && defined (SEMIHOST_V2_MIXED_MODE)
+#if defined (SEMIHOST_V2) \
+    && defined (SEMIHOST_V2_MIXED_MODE) \
+    && !defined (THUMB_VXM)
   #define AngelSWI_ARM			0xE10F0070 /* HLT #0xF000 A32.  */
   #ifdef __thumb__
     #define AngelSWI			0xBABC /* HLT #0x3c T32.  */
