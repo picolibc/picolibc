@@ -35,7 +35,7 @@ public:
 
 pinfo_basic::pinfo_basic ()
 {
-  pid = dwProcessId = GetCurrentProcessId ();
+  dwProcessId = GetCurrentProcessId ();
   PWCHAR pend = wcpncpy (progname, global_progname,
 			 sizeof (progname) / sizeof (WCHAR) - 1);
   *pend = L'\0';
@@ -57,15 +57,20 @@ pinfo::thisproc (HANDLE h)
   procinfo = NULL;
 
   DWORD flags = PID_IN_USE | PID_ACTIVE;
+  /* Forked process or process started from non-Cygwin parent needs a pid. */
   if (!h)
     {
       cygheap->pid = create_cygwin_pid ();
       flags |= PID_NEW;
     }
+  /* spawnve'd process got pid in parent, cygheap->pid has been set in
+     child_info_spawn::handle_spawn. */
+  else if (h == INVALID_HANDLE_VALUE)
+    h = NULL;
 
   init (cygheap->pid, flags, h);
   procinfo->process_state |= PID_IN_USE;
-  procinfo->dwProcessId = myself_initial.pid;
+  procinfo->dwProcessId = myself_initial.dwProcessId;
   procinfo->sendsig = myself_initial.sendsig;
   wcscpy (procinfo->progname, myself_initial.progname);
   create_winpid_symlink ();

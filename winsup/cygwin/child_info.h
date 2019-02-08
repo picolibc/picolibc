@@ -144,6 +144,7 @@ class child_info_spawn: public child_info
 {
   HANDLE hExeced;
   HANDLE ev;
+  pid_t cygpid;
 public:
   cygheap_exec_info *moreinfo;
   int __stdin;

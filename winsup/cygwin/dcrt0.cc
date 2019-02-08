@@ -652,11 +652,16 @@ child_info_spawn::handle_spawn ()
 	cygheap_fixup_in_child (true);
 	memory_init ();
       }
+
+  cygheap->pid = cygpid;
+
+  /* Spawned process sets h to INVALID_HANDLE_VALUE to notify
+     pinfo::thisproc not to create another pid. */
   if (!moreinfo->myself_pinfo ||
       !DuplicateHandle (GetCurrentProcess (), moreinfo->myself_pinfo,
 			GetCurrentProcess (), &h, 0,
 			FALSE, DUPLICATE_SAME_ACCESS | DUPLICATE_CLOSE_SOURCE))
-    h = NULL;
+    h = (type == _CH_SPAWN) ? INVALID_HANDLE_VALUE : NULL;
 
   /* Setup our write end of the process pipe.  Clear the one in the structure.
      The destructor should never be called for this but, it can't hurt to be

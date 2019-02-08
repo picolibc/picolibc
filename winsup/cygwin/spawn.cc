@@ -258,7 +258,6 @@ child_info_spawn::worker (const char *prog_arg, const char *const *argv,
 			  int in__stdin, int in__stdout)
 {
   bool rc;
-  pid_t cygpid;
   int res = -1;
 
   /* Check if we have been called from exec{lv}p or spawn{lv}p and mask
@@ -578,6 +577,8 @@ child_info_spawn::worker (const char *prog_arg, const char *const *argv,
       if (!real_path.iscygexec () && mode == _P_OVERLAY)
 	myself->process_state |= PID_NOTCYGWIN;
 
+      cygpid = (mode != _P_OVERLAY) ? create_cygwin_pid () : myself->pid;
+
       wchar_t wcmd[(size_t) cmd];
       if (!::cygheap->user.issetuid ()
 	  || (::cygheap->user.saved_uid == ::cygheap->user.real_uid
@@ -707,11 +708,6 @@ child_info_spawn::worker (const char *prog_arg, const char *const *argv,
 	 main thread. */
       if (::cygheap->fdtab.need_fixup_before ())
 	::cygheap->fdtab.fixup_before_exec (pi.dwProcessId);
-
-      if (mode != _P_OVERLAY)
-	cygpid = create_cygwin_pid ();
-      else
-	cygpid = myself->pid;
 
       /* Print the original program name here so the user can see that too.  */
       syscall_printf ("pid %d, prog_arg %s, cmd line %.9500s)",
