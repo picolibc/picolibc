@@ -1879,6 +1879,13 @@ fhandler_socket_unix::getpeereid (pid_t *pid, uid_t *euid, gid_t *egid)
   return ret;
 }
 
+bool
+fhandler_socket_unix::evaluate_cmsg_data (af_unix_pkt_hdr_t *packet,
+					  bool clocexec)
+{
+  return true;
+}
+
 ssize_t
 fhandler_socket_unix::recvmsg (struct msghdr *msg, int flags)
 {
@@ -1943,6 +1950,13 @@ fhandler_socket_unix::readv (const struct iovec *const iov, int iovcnt,
   msg.msg_controllen = 0;
   msg.msg_flags = 0;
   return recvmsg (&msg, 0);
+}
+
+bool
+fhandler_socket_unix::create_cmsg_data (af_unix_pkt_hdr_t *packet,
+					const struct msghdr *msg)
+{
+  return true;
 }
 
 ssize_t

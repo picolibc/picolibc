@@ -958,6 +958,8 @@ class af_unix_shmem_t
   struct ucred *peer_cred () { return &_peer_cred; }
 };
 
+struct af_unix_pkt_hdr_t;
+
 class fhandler_socket_unix : public fhandler_socket
 {
  protected:
@@ -1067,6 +1069,7 @@ class fhandler_socket_unix : public fhandler_socket
   int shutdown (int how);
   int close ();
   int getpeereid (pid_t *pid, uid_t *euid, gid_t *egid);
+  bool evaluate_cmsg_data (af_unix_pkt_hdr_t *packet, bool);
   ssize_t recvmsg (struct msghdr *msg, int flags);
   ssize_t recvfrom (void *ptr, size_t len, int flags,
 		    struct sockaddr *from, int *fromlen);
@@ -1074,6 +1077,7 @@ class fhandler_socket_unix : public fhandler_socket
   ssize_t __stdcall readv (const struct iovec *const iov, int iovcnt,
 			   ssize_t tot = -1);
 
+  bool create_cmsg_data (af_unix_pkt_hdr_t *packet, const struct msghdr *msg);
   ssize_t sendmsg (const struct msghdr *msg, int flags);
   ssize_t sendto (const void *ptr, size_t len, int flags,
 		  const struct sockaddr *to, int tolen);
