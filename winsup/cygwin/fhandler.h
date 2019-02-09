@@ -1003,10 +1003,11 @@ class fhandler_socket_unix : public fhandler_socket
 				      PUNICODE_STRING pipe_name);
   static HANDLE create_reparse_point (const sun_name_t *sun,
 				      PUNICODE_STRING pipe_name);
-  HANDLE create_file (const sun_name_t *sun);
-  static int open_abstract_link (sun_name_t *sun, PUNICODE_STRING pipe_name);
-  static int open_reparse_point (sun_name_t *sun, PUNICODE_STRING pipe_name);
-  static int open_file (sun_name_t *sun, int &type, PUNICODE_STRING pipe_name);
+  HANDLE create_socket (const sun_name_t *sun);
+  static HANDLE open_abstract_link (sun_name_t *sun, PUNICODE_STRING pipe_name);
+  static HANDLE open_reparse_point (sun_name_t *sun, PUNICODE_STRING pipe_name);
+  static HANDLE open_socket (sun_name_t *sun, int &type,
+			     PUNICODE_STRING pipe_name);
   HANDLE autobind (sun_name_t *sun);
   wchar_t get_type_char ();
   void set_pipe_non_blocking (bool nonblocking);
@@ -1016,7 +1017,8 @@ class fhandler_socket_unix : public fhandler_socket
   static NTSTATUS npfs_handle (HANDLE &nph);
   HANDLE create_pipe (bool single_instance);
   HANDLE create_pipe_instance ();
-  NTSTATUS open_pipe (PUNICODE_STRING pipe_name, bool xchg_sock_info);
+  NTSTATUS open_pipe (HANDLE &ph, PUNICODE_STRING pipe_name,
+		      bool xchg_sock_info);
   int wait_pipe (PUNICODE_STRING pipe_name);
   int connect_pipe (PUNICODE_STRING pipe_name);
   int listen_pipe ();

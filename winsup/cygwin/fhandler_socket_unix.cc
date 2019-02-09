@@ -404,7 +404,7 @@ out:
 }
 
 HANDLE
-fhandler_socket_unix::create_file (const sun_name_t *sun)
+fhandler_socket_unix::create_socket (const sun_name_t *sun)
 {
   if (sun->un_len <= (socklen_t) sizeof (sa_family_t)
       || (sun->un_len == 3 && sun->un.sun_path[0] == '\0'))
@@ -417,7 +417,7 @@ fhandler_socket_unix::create_file (const sun_name_t *sun)
   return create_reparse_point (sun, pc.get_nt_native_path ());
 }
 
-int
+HANDLE
 fhandler_socket_unix::open_abstract_link (sun_name_t *sun,
 					  PUNICODE_STRING pipe_name)
 {
@@ -437,25 +437,25 @@ fhandler_socket_unix::open_abstract_link (sun_name_t *sun,
   if (!NT_SUCCESS (status))
     {
       __seterrno_from_nt_status (status);
-      return -1;
+      return NULL;
     }
   if (pipe_name)
     status = NtQuerySymbolicLinkObject (fh, pipe_name, NULL);
-  NtClose (fh);
   if (pipe_name)
     {
       if (!NT_SUCCESS (status))
 	{
+	  NtClose (fh);
 	  __seterrno_from_nt_status (status);
-	  return -1;
+	  return NULL;
 	}
       /* Enforce NUL-terminated pipe name. */
       pipe_name->Buffer[pipe_name->Length / sizeof (WCHAR)] = L'\0';
     }
-  return 0;
+  return fh;
 }
 
-int
+HANDLE
 fhandler_socket_unix::open_reparse_point (sun_name_t *sun,
 					  PUNICODE_STRING pipe_name)
 {
@@ -470,12 +470,12 @@ fhandler_socket_unix::open_reparse_point (sun_name_t *sun,
   if (pc.error)
     {
       set_errno (pc.error);
-      return -1;
+      return NULL;
     }
   if (!pc.exists ())
     {
       set_errno (ENOENT);
-      return -1;
+      return NULL;
     }
   pc.get_object_attr (attr, sec_none_nih);
   do
@@ -497,21 +497,20 @@ fhandler_socket_unix::open_reparse_point (sun_name_t *sun,
               && !_my_tls.call_signal_handler ())
             {
               set_errno (EINTR);
-              return -1;
+              return NULL;
             }
           yield ();
         }
       else if (!NT_SUCCESS (status))
         {
           __seterrno_from_nt_status (status);
-          return -1;
+          return NULL;
         }
     }
   while (status == STATUS_SHARING_VIOLATION);
   rp = (PREPARSE_GUID_DATA_BUFFER) tp.c_get ();
   status = NtFsControlFile (fh, NULL, NULL, NULL, &io, FSCTL_GET_REPARSE_POINT,
 			    NULL, 0, rp, MAXIMUM_REPARSE_DATA_BUFFER_SIZE);
-  NtClose (fh);
   if (rp->ReparseTag == IO_REPARSE_TAG_CYGUNIX
       && memcmp (CYGWIN_SOCKET_GUID, &rp->ReparseGuid, sizeof (GUID)) == 0)
     {
@@ -524,25 +523,28 @@ fhandler_socket_unix::open_reparse_point (sun_name_t *sun,
 	  memcpy (pipe_name->Buffer, rep_pipe_name->PipeName,
 		  rep_pipe_name->Length + sizeof (WCHAR));
 	}
-      return 0;
+      return fh;
     }
-  return -1;
+  NtClose (fh);
+  return NULL;
 }
 
-int
-fhandler_socket_unix::open_file (sun_name_t *sun, int &type,
-				 PUNICODE_STRING pipe_name)
+HANDLE
+fhandler_socket_unix::open_socket (sun_name_t *sun, int &type,
+				   PUNICODE_STRING pipe_name)
 {
-  int ret = -1;
+  HANDLE fh = NULL;
 
   if (sun->un_len <= (socklen_t) sizeof (sa_family_t)
       || (sun->un_len == 3 && sun->un.sun_path[0] == '\0'))
     set_errno (EINVAL);
+  else if (sun->un.sun_family != AF_UNIX)
+    set_errno (EAFNOSUPPORT);
   else if (sun->un.sun_path[0] == '\0')
-    ret = open_abstract_link (sun, pipe_name);
+    fh = open_abstract_link (sun, pipe_name);
   else
-    ret = open_reparse_point (sun, pipe_name);
-  if (!ret)
+    fh = open_reparse_point (sun, pipe_name);
+  if (fh)
     switch (pipe_name->Buffer[CYGWIN_PIPE_SOCKET_TYPE_POS])
       {
       case 'd':
@@ -553,10 +555,11 @@ fhandler_socket_unix::open_file (sun_name_t *sun, int &type,
 	break;
       default:
 	set_errno (EINVAL);
-	ret = -1;
+	NtClose (fh);
+	fh = NULL;
 	break;
       }
-  return ret;
+  return fh;
 }
 
 HANDLE
@@ -919,7 +922,8 @@ fhandler_socket_unix::create_pipe_instance ()
 }
 
 NTSTATUS
-fhandler_socket_unix::open_pipe (PUNICODE_STRING pipe_name, bool xchg_sock_info)
+fhandler_socket_unix::open_pipe (HANDLE &pipe, PUNICODE_STRING pipe_name,
+				 bool xchg_sock_info)
 {
   NTSTATUS status;
   HANDLE npfsh;
@@ -938,7 +942,7 @@ fhandler_socket_unix::open_pipe (PUNICODE_STRING pipe_name, bool xchg_sock_info)
   status = NtOpenFile (&ph, access, &attr, &io, sharing, 0);
   if (NT_SUCCESS (status))
     {
-      set_handle (ph);
+      pipe = ph;
       if (xchg_sock_info)
 	send_sock_info (false);
     }
@@ -1040,10 +1044,11 @@ int
 fhandler_socket_unix::connect_pipe (PUNICODE_STRING pipe_name)
 {
   NTSTATUS status;
+  HANDLE ph;
 
   /* Try connecting first.  If it doesn't work, wait for the pipe
      to become available. */
-  status = open_pipe (pipe_name, get_socket_type () != SOCK_DGRAM);
+  status = open_pipe (ph, pipe_name, get_socket_type () != SOCK_DGRAM);
   if (STATUS_PIPE_NO_INSTANCE_AVAILABLE (status))
     return wait_pipe (pipe_name);
   if (!NT_SUCCESS (status))
@@ -1052,6 +1057,7 @@ fhandler_socket_unix::connect_pipe (PUNICODE_STRING pipe_name)
       so_error (get_errno ());
       return -1;
     }
+  set_handle (ph);
   so_error (0);
   return 0;
 }
@@ -1291,7 +1297,10 @@ fhandler_socket_unix::wait_pipe_thread (PUNICODE_STRING pipe_name)
 	{
 	  case STATUS_SUCCESS:
 	    {
-	      status = open_pipe (pipe_name, get_socket_type () != SOCK_DGRAM);
+	      HANDLE ph;
+
+	      status = open_pipe (ph, pipe_name,
+				  get_socket_type () != SOCK_DGRAM);
 	      if (STATUS_PIPE_NO_INSTANCE_AVAILABLE (status))
 		{
 		  /* Another concurrent connect grabbed the pipe instance
@@ -1307,6 +1316,8 @@ fhandler_socket_unix::wait_pipe_thread (PUNICODE_STRING pipe_name)
 		}
 	      else if (!NT_SUCCESS (status))
 		error = geterrno_from_nt_status (status);
+	      else
+		set_handle (ph);
 	    }
 	    break;
 	  case STATUS_OBJECT_NAME_NOT_FOUND:
@@ -1375,7 +1386,7 @@ int
 fhandler_socket_unix::socketpair (int af, int type, int protocol, int flags,
 				  fhandler_socket *fh_out)
 {
-  HANDLE pipe;
+  HANDLE ph, ph2;
   sun_name_t sun;
   fhandler_socket_unix *fh = (fhandler_socket_unix *) fh_out;
 
@@ -1409,17 +1420,18 @@ fhandler_socket_unix::socketpair (int af, int type, int protocol, int flags,
   set_ino (get_unique_id ());
   /* bind/listen 1st socket */
   gen_pipe_name ();
-  pipe = create_pipe (true);
-  if (!pipe)
+  ph = create_pipe (true);
+  if (!ph)
     goto create_pipe_failed;
-  set_handle (pipe);
+  set_handle (ph);
   sun_path (&sun);
   fh->peer_sun_path (&sun);
   connect_state (listener);
   /* connect 2nd socket, even for DGRAM.  There's no difference as far
      as socketpairs are concerned. */
-  if (fh->open_pipe (pc.get_nt_native_path (), false) < 0)
+  if (fh->open_pipe (ph2, pc.get_nt_native_path (), false) < 0)
     goto fh_open_pipe_failed;
+  fh->set_handle (ph2);
   fh->connect_state (connected);
   if (flags & SOCK_NONBLOCK)
     {
@@ -1434,7 +1446,7 @@ fhandler_socket_unix::socketpair (int af, int type, int protocol, int flags,
   return 0;
 
 fh_open_pipe_failed:
-  NtClose (pipe);
+  NtClose (ph);
 create_pipe_failed:
   NtUnmapViewOfSection (GetCurrentProcess (), fh->shmem);
   NtClose (fh->shmem_handle);
@@ -1485,7 +1497,7 @@ fhandler_socket_unix::bind (const struct sockaddr *name, int namelen)
 	}
       set_handle (pipe);
     }
-  backing_file_handle = unnamed ? autobind (&sun) : create_file (&sun);
+  backing_file_handle = unnamed ? autobind (&sun) : create_socket (&sun);
   if (!backing_file_handle)
     {
       set_handle (NULL);
@@ -1656,6 +1668,7 @@ fhandler_socket_unix::connect (const struct sockaddr *name, int namelen)
   int peer_type;
   WCHAR pipe_name_buf[CYGWIN_PIPE_SOCKET_NAME_LEN + 1];
   UNICODE_STRING pipe_name;
+  HANDLE fh = NULL;
 
   /* Test and set connection state. */
   conn_lock ();
@@ -1679,28 +1692,10 @@ fhandler_socket_unix::connect (const struct sockaddr *name, int namelen)
     }
   connect_state (connect_pending);
   conn_unlock ();
-  /* Check validity of name */
-  if (sun.un_len <= (int) sizeof (sa_family_t))
-    {
-      set_errno (EINVAL);
-      connect_state (unconnected);
-      return -1;
-    }
-  if (sun.un.sun_family != AF_UNIX)
-    {
-      set_errno (EAFNOSUPPORT);
-      connect_state (unconnected);
-      return -1;
-    }
-  if (sun.un_len == 3 && sun.un.sun_path[0] == '\0')
-    {
-      set_errno (EINVAL);
-      connect_state (unconnected);
-      return -1;
-    }
   /* Check if peer address exists. */
   RtlInitEmptyUnicodeString (&pipe_name, pipe_name_buf, sizeof pipe_name_buf);
-  if (open_file (&sun, peer_type, &pipe_name) < 0)
+  fh = open_socket (&sun, peer_type, &pipe_name);
+  if (!fh)
     {
       connect_state (unconnected);
       return -1;
@@ -1708,22 +1703,22 @@ fhandler_socket_unix::connect (const struct sockaddr *name, int namelen)
   if (peer_type != get_socket_type ())
     {
       set_errno (EINVAL);
+      NtClose (fh);
       connect_state (unconnected);
       return -1;
     }
   peer_sun_path (&sun);
-  if (get_socket_type () != SOCK_DGRAM)
+  if (get_socket_type () != SOCK_DGRAM && connect_pipe (&pipe_name) < 0)
     {
-      if (connect_pipe (&pipe_name) < 0)
+      NtClose (fh);
+      if (get_errno () != EINPROGRESS)
 	{
-	  if (get_errno () != EINPROGRESS)
-	    {
-	      peer_sun_path (NULL);
-	      connect_state (connect_failed);
-	    }
-	  return -1;
+	  peer_sun_path (NULL);
+	  connect_state (connect_failed);
 	}
+      return -1;
     }
+  NtClose (fh);
   connect_state (connected);
   return 0;
 }
