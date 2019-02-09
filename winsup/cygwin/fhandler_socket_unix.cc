@@ -171,9 +171,10 @@ GUID __cygwin_socket_guid = {
 		   || _s == STATUS_PIPE_NOT_AVAILABLE \
 		   || _s == STATUS_PIPE_BUSY; })
 
-#define STATUS_PIPE_IS_CLOSING(status)	\
+#define STATUS_PIPE_IS_CLOSED(status)	\
 		({ NTSTATUS _s = (status); \
 		   _s == STATUS_PIPE_CLOSING \
+		   || _s == STATUS_PIPE_BROKEN \
 		   || _s == STATUS_PIPE_EMPTY; })
 
 #define STATUS_PIPE_INVALID(status) \
@@ -1962,8 +1963,148 @@ fhandler_socket_unix::create_cmsg_data (af_unix_pkt_hdr_t *packet,
 ssize_t
 fhandler_socket_unix::sendmsg (const struct msghdr *msg, int flags)
 {
-  set_errno (EAFNOSUPPORT);
-  return -1;
+  tmp_pathbuf tp;
+  ssize_t ret = -1;
+  WCHAR pipe_name_buf[CYGWIN_PIPE_SOCKET_NAME_LEN + 1];
+  UNICODE_STRING pipe_name;
+  NTSTATUS status = STATUS_SUCCESS;
+  IO_STATUS_BLOCK io;
+  HANDLE fh = NULL;
+  HANDLE ph = NULL;
+  HANDLE evt = NULL;
+  af_unix_pkt_hdr_t *packet;
+
+  __try
+    {
+      /* Valid flags: MSG_DONTWAIT, MSG_NOSIGNAL */
+      if (flags & ~(MSG_DONTWAIT | MSG_NOSIGNAL))
+	{
+	  set_errno (EOPNOTSUPP);
+	  __leave;
+	}
+      if (get_socket_type () == SOCK_STREAM)
+	{
+	  if (msg->msg_namelen)
+	    {
+	      set_errno (connect_state () == connected ? EISCONN : EOPNOTSUPP);
+	      __leave;
+	    }
+	  else if (connect_state () != connected)
+	    {
+	      set_errno (ENOTCONN);
+	      __leave;
+	    }
+	  if (saw_shutdown () & _SHUT_SEND)
+	    {
+	      set_errno (ESHUTDOWN);
+	      __leave;
+	    }
+	}
+      else
+	{
+	  sun_name_t sun;
+	  int peer_type;
+
+	  if (msg->msg_namelen)
+	    sun.set ((const struct sockaddr_un *) msg->msg_name,
+		     msg->msg_namelen);
+	  else
+	    sun = *peer_sun_path ();
+	  RtlInitEmptyUnicodeString (&pipe_name, pipe_name_buf,
+				     sizeof pipe_name_buf);
+	  fh = open_socket (&sun, peer_type, &pipe_name);
+	  if (!fh)
+	    __leave;
+	  if (peer_type != SOCK_DGRAM)
+	    {
+	      set_errno (EPROTOTYPE);
+	      __leave;
+	    }
+	  status = open_pipe (ph, &pipe_name, false);
+	  if (!NT_SUCCESS (status))
+	    {
+	      __seterrno_from_nt_status (status);
+	      __leave;
+	    }
+	}
+      /* Only create wait event in blocking mode if MSG_DONTWAIT isn't set. */
+      if (!is_nonblocking () && !(flags & MSG_DONTWAIT)
+	  && !(evt = create_event ()))
+	__leave;
+      packet = (af_unix_pkt_hdr_t *) tp.w_get ();
+      if (get_socket_type () == SOCK_DGRAM && binding_state () == bound)
+	{
+	  packet->init (false, _SHUT_NONE, sun_path ()->un_len, 0, 0);
+	  memcpy (AF_UNIX_PKT_NAME (packet), &sun_path ()->un,
+		  sun_path ()->un_len);
+	}
+      else
+	packet->init (false, _SHUT_NONE, 0, 0, 0);
+      if (msg->msg_controllen && !create_cmsg_data (packet, msg))
+	__leave;
+      for (int i = 0; i < msg->msg_iovlen; ++i)
+	if (!AF_UNIX_PKT_DATA_APPEND (packet, msg->msg_iov[i].iov_base,
+				      msg->msg_iov[i].iov_len))
+	  break;
+      io_lock ();
+      /* Handle MSG_DONTWAIT in blocking mode */
+      if (!is_nonblocking () && (flags & MSG_DONTWAIT))
+	set_pipe_non_blocking (true);
+      status = NtWriteFile (ph ?: get_handle (), evt, NULL, NULL, &io,
+			    packet, packet->pckt_len, NULL, NULL);
+      if (!is_nonblocking () && (flags & MSG_DONTWAIT))
+	set_pipe_non_blocking (false);
+      io_unlock ();
+      if (evt && status == STATUS_PENDING)
+	{
+	  DWORD ret = cygwait (evt, cw_infinite, cw_cancel | cw_sig_eintr);
+	  switch (ret)
+	    {
+	    case WAIT_OBJECT_0:
+	      status = io.Status;
+	      break;
+	    case WAIT_SIGNALED:
+	      status = STATUS_THREAD_SIGNALED;
+	      break;
+	    case WAIT_CANCELED:
+	      status = STATUS_THREAD_CANCELED;
+	      break;
+	    default:
+	      break;
+	    }
+	}
+      if (NT_SUCCESS (status))
+	{
+	  /* NtWriteFile returns success with # of bytes written == 0
+	     in case writing on a non-blocking pipe fails if the pipe
+	     buffer is full. */
+	  if (io.Information == 0)
+	    set_errno (EAGAIN);
+	  else
+	    ret = io.Information;
+	}
+      else if (STATUS_PIPE_IS_CLOSED (status))
+	{
+	  set_errno (EPIPE);
+	  if (get_socket_type () == SOCK_STREAM && !(flags & MSG_NOSIGNAL))
+	    raise (SIGPIPE);
+	}
+      else
+	__seterrno_from_nt_status (status);
+    }
+  __except (EFAULT)
+  __endtry
+  if (ph)
+    NtClose (ph);
+  if (fh)
+    NtClose (fh);
+  if (evt)
+    NtClose (evt);
+  if (status == STATUS_THREAD_SIGNALED && !_my_tls.call_signal_handler ())
+    set_errno (EINTR);
+  else if (status == STATUS_THREAD_CANCELED)
+    pthread::static_cancel_self ();
+  return ret;
 }
 
 ssize_t
