@@ -384,9 +384,12 @@ fhandler_dev_floppy::dup (fhandler_base *child, int flags)
 inline off_t
 fhandler_dev_floppy::get_current_position ()
 {
-  LARGE_INTEGER off = { QuadPart: 0LL };
-  off.LowPart = SetFilePointer (get_handle (), 0, &off.HighPart, FILE_CURRENT);
-  return off.QuadPart;
+  IO_STATUS_BLOCK io;
+  FILE_POSITION_INFORMATION fpi = { { QuadPart : 0LL } };
+
+  NtQueryInformationFile (get_handle (), &io, &fpi, sizeof fpi,
+			  FilePositionInformation);
+  return fpi.CurrentByteOffset.QuadPart;
 }
 
 void __reg3
