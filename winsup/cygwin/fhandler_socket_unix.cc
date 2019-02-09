@@ -2056,21 +2056,28 @@ fhandler_socket_unix::setsockopt (int level, int optname, const void *optval,
 	  break;
 
 	case SO_RCVBUF:
-	  if (optlen < (socklen_t) sizeof (int))
-	    {
-	      set_errno (EINVAL);
-	      return -1;
-	    }
-	  rmem (*(int *) optval);
-	  break;
-
 	case SO_SNDBUF:
-	  if (optlen < (socklen_t) sizeof (int))
-	    {
-	      set_errno (EINVAL);
-	      return -1;
-	    }
-	  wmem (*(int *) optval);
+	  {
+	    if (optlen < (socklen_t) sizeof (int))
+	      {
+		set_errno (EINVAL);
+		return -1;
+	      }
+	    /* As on Linux double value and make sure it's not too small */
+	    int val = *(int *) optval;
+
+	    if (val > 0 && val < INT_MAX / 2)
+	      val *= 2;
+	    if (val < 256)
+	      {
+		set_errno (EINVAL);
+		return -1;
+	      }
+	    if (optname == SO_RCVBUF)
+	      rmem (*(int *) optval);
+	    else
+	      wmem (*(int *) optval);
+	  }
 	  break;
 
 	case SO_RCVTIMEO:
@@ -2083,10 +2090,10 @@ fhandler_socket_unix::setsockopt (int level, int optname, const void *optval,
 	  if (!timeval_to_ms ((struct timeval *) optval,
 			      (optname == SO_RCVTIMEO) ? rcvtimeo ()
 						       : sndtimeo ()))
-	  {
-	    set_errno (EDOM);
-	    return -1;
-	  }
+	    {
+	      set_errno (EDOM);
+	      return -1;
+	    }
 	  break;
 
 	default:
