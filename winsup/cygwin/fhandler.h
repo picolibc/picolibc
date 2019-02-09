@@ -858,6 +858,8 @@ public:
   }
 };
 
+#ifdef __WITH_AF_UNIX
+
 /* Internal representation of shutdown states */
 enum shut_state {
   _SHUT_NONE	= 0,
@@ -955,8 +957,6 @@ class af_unix_shmem_t
   void peer_cred (struct ucred *uc) { _peer_cred = *uc; }
   struct ucred *peer_cred () { return &_peer_cred; }
 };
-
-#ifdef __WITH_AF_UNIX
 
 class fhandler_socket_unix : public fhandler_socket
 {
