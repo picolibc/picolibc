@@ -75,6 +75,9 @@
 
    A bound DGRAM socket sends its sun_path with each sendmsg/sendto.
 */
+
+#define MAX_AF_PKT_LEN	65536
+
 class af_unix_pkt_hdr_t
 {
  public:
@@ -98,31 +101,61 @@ class af_unix_pkt_hdr_t
     }
 };
 
-#define AF_UNIX_PKT_OFFSETOF_NAME(phdr)	\
-	(sizeof (af_unix_pkt_hdr_t))
-#define AF_UNIX_PKT_OFFSETOF_CMSG(phdr)	\
-	(sizeof (af_unix_pkt_hdr_t) + (phdr)->name_len)
-#define AF_UNIX_PKT_OFFSETOF_DATA(phdr)	\
-	({ \
-	   af_unix_pkt_hdr_t *_p = phdr; \
-	   sizeof (af_unix_pkt_hdr_t) + (_p)->name_len + (_p)->cmsg_len; \
-	})
-#define AF_UNIX_PKT_NAME(phdr) \
-	({ \
-	   af_unix_pkt_hdr_t *_p = phdr; \
-	   (struct sockaddr_un *)(((PBYTE)(_p)) \
-				  + AF_UNIX_PKT_OFFSETOF_NAME (_p)); \
-	})
-#define AF_UNIX_PKT_CMSG(phdr) \
-	({ \
-	   af_unix_pkt_hdr_t *_p = phdr; \
-	   (struct cmsghdr *)(((PBYTE)(_p)) + AF_UNIX_PKT_OFFSETOF_CMSG (_p)); \
-	})
-#define AF_UNIX_PKT_DATA(phdr) \
-	({ \
-	   af_unix_pkt_hdr_t _p = phdr; \
-	   (void *)(((PBYTE)(_p)) + AF_UNIX_PKT_OFFSETOF_DATA (_p)); \
-	})
+static inline ptrdiff_t
+AF_UNIX_PKT_OFFSETOF_NAME (af_unix_pkt_hdr_t *phdr)
+{
+  return sizeof (af_unix_pkt_hdr_t);
+}
+
+static inline ptrdiff_t
+AF_UNIX_PKT_OFFSETOF_CMSG (af_unix_pkt_hdr_t *phdr)
+{
+  return AF_UNIX_PKT_OFFSETOF_NAME (phdr) + phdr->name_len;
+}
+
+static inline ptrdiff_t
+AF_UNIX_PKT_OFFSETOF_DATA (af_unix_pkt_hdr_t *phdr)
+{
+  return AF_UNIX_PKT_OFFSETOF_CMSG (phdr) + phdr->cmsg_len;
+}
+
+static inline struct sockaddr_un *
+AF_UNIX_PKT_NAME (af_unix_pkt_hdr_t *phdr)
+{
+  return (struct sockaddr_un *)
+	 ((PBYTE)(phdr) + AF_UNIX_PKT_OFFSETOF_NAME (phdr));
+}
+
+static inline struct cmsghdr *
+AF_UNIX_PKT_CMSG (af_unix_pkt_hdr_t *phdr)
+{
+   return (struct cmsghdr *)
+	  ((PBYTE)(phdr) + AF_UNIX_PKT_OFFSETOF_CMSG (phdr));
+}
+
+static inline void *
+AF_UNIX_PKT_DATA (af_unix_pkt_hdr_t *phdr)
+{
+   return (void *) ((PBYTE)(phdr) + AF_UNIX_PKT_OFFSETOF_DATA (phdr));
+}
+
+static inline void *
+AF_UNIX_PKT_DATA_END (af_unix_pkt_hdr_t *phdr)
+{
+   return (void *) ((PBYTE)(phdr) + AF_UNIX_PKT_OFFSETOF_DATA (phdr)
+				  + (phdr)->data_len);
+}
+
+inline bool
+AF_UNIX_PKT_DATA_APPEND (af_unix_pkt_hdr_t *phdr, void *data, uint16_t dlen)
+{
+  if ((uint32_t) phdr->pckt_len + (uint32_t) dlen > MAX_AF_PKT_LEN)
+    return false;
+  memcpy (AF_UNIX_PKT_DATA_END (phdr), data, dlen);
+  phdr->pckt_len += dlen;
+  phdr->data_len += dlen;
+  return true;
+}
 
 GUID __cygwin_socket_guid = {
   .Data1 = 0xefc1714d,
