@@ -100,3 +100,6 @@ Bug Fixes
 
 - Fix exception handling in pthreads.
   Addresses: https://cygwin.com/ml/cygwin/2019-01/msg00149.html
+
+- Fix O_APPEND handling on files when calling non-Cygwin applications
+  Addresses: https://cygwin.com/ml/cygwin/2019-02/msg00081.html

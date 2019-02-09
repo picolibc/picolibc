@@ -857,12 +857,13 @@ dtable::set_file_pointers_for_exec ()
 {
 /* This is not POSIX-compliant so the function is only called for
    non-Cygwin processes. */
-  LONG off_high = 0;
+  LARGE_INTEGER eof = { QuadPart: 0 };
+
   lock ();
   fhandler_base *fh;
   for (size_t i = 0; i < size; i++)
     if ((fh = fds[i]) != NULL && fh->get_flags () & O_APPEND)
-      SetFilePointer (fh->get_handle (), 0, &off_high, FILE_END);
+      SetFilePointerEx (fh->get_handle (), eof, NULL, FILE_END);
   unlock ();
 }
 
