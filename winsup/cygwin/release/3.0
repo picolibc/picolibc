@@ -109,3 +109,7 @@ Bug Fixes
 
 - Fix O_APPEND handling on files when calling non-Cygwin applications
   Addresses: https://cygwin.com/ml/cygwin/2019-02/msg00081.html
+
+- Fix case correctness of passwd/group entries fetched via getpwnam
+  or getgrnam.
+  Addresses: https://cygwin.com/ml/cygwin/2019-02/msg00109.html

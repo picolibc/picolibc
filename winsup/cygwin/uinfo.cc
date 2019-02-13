@@ -2046,6 +2046,16 @@ pwdgrp::fetch_account_from_windows (fetch_user_arg_t &arg, cyg_ldap *pldap)
       /* We can skip the backslash in the rest of this function. */
       if (p)
 	name = p + 1;
+      /* Reverse lookup name from sid to make sure the username in
+	 our passwd/group data is written exactly as in the user DB. */
+      nlen = UNLEN + 1;
+      dlen = DNLEN + 1;
+      ret = LookupAccountSidW (NULL, sid, name, &nlen, dom, &dlen, &acc_type);
+      if (!ret)
+	{
+	  system_printf ("LookupAccountNameW (%W), %E", name);
+	  return NULL;
+	}
       /* Last but not least, some validity checks on the name style. */
       if (!fq_name)
 	{
