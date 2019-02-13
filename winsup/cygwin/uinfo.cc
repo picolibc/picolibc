@@ -1980,7 +1980,7 @@ pwdgrp::fetch_account_from_windows (fetch_user_arg_t &arg, cyg_ldap *pldap)
 	  PWCHAR val;
 
 	  if (cldap->fetch_ad_account (sid, true)
-	      && (val = cldap->get_group_name ()))
+	      && (val = cldap->get_account_name ()))
 	    {
 	      wcpcpy (name, val);
 	      wcpcpy (dom, L"BUILTIN");
