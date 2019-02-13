@@ -1919,7 +1919,7 @@ char *
 pwdgrp::fetch_account_from_windows (fetch_user_arg_t &arg, cyg_ldap *pldap)
 {
   /* Used in LookupAccount calls. */
-  WCHAR namebuf[UNLEN + 1], *name = namebuf;
+  WCHAR namebuf[DNLEN + 1 + UNLEN + 1], *name = namebuf;
   WCHAR dom[DNLEN + 1] = L"";
   cygsid csid;
   DWORD nlen = UNLEN + 1;
