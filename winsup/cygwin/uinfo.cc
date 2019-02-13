@@ -651,7 +651,7 @@ cygheap_pwdgrp::init ()
 		    && strchr (" \t", c[sizeof(s)-1]))
 
 /* The /etc/nsswitch.conf file is read exactly once by the root process of a
-   process tree.  We can't afford methodical changes during the lifetime of a 
+   process tree.  We can't afford methodical changes during the lifetime of a
    process tree. */
 void
 cygheap_pwdgrp::nss_init_line (const char *line)
@@ -778,7 +778,7 @@ cygheap_pwdgrp::nss_init_line (const char *line)
 		    *spc = L'\0';
 		}
 	      else
-	      	new_enums &= ~(ENUM_TDOMS | ENUM_TDOMS_ALL);
+		new_enums &= ~(ENUM_TDOMS | ENUM_TDOMS_ALL);
 	    }
 	  enums = new_enums;
 	}
@@ -896,7 +896,7 @@ fetch_windows_home (cyg_ldap *pldap, PUSER_INFO_3 ui, cygpsid &sid,
       WCHAR sidstr[128];
 
       if (get_user_profile_directory (sid.string (sidstr), profile, MAX_PATH))
-      	home = (char *) cygwin_create_path (CCP_WIN_W_TO_POSIX, profile);
+	home = (char *) cygwin_create_path (CCP_WIN_W_TO_POSIX, profile);
     }
   return home;
 }
@@ -950,9 +950,9 @@ fetch_from_path (cyg_ldap *pldap, PUSER_INFO_3 ui, cygpsid &sid, PCWSTR str,
   while (*str && w < we)
     {
       if (*str != L'%')
-      	*w++ = *str++;
+	*w++ = *str++;
       else
-      	{
+	{
 	  switch (*++str)
 	    {
 	    case L'u':
@@ -1135,7 +1135,7 @@ cygheap_pwdgrp::get_shell (cyg_ldap *pldap, cygpsid &sid, PCWSTR dom,
 	  break;
 	case NSS_SCHEME_PATH:
 	  shell = fetch_from_path (pldap, NULL, sid, shell_scheme[idx].attrib,
-	  			   dom, dnsdomain, name, full_qualified);
+				   dom, dnsdomain, name, full_qualified);
 	  break;
 	case NSS_SCHEME_FREEATTR:
 	  if (pldap->fetch_ad_account (sid, false, dnsdomain))
@@ -1547,7 +1547,7 @@ pwdgrp::add_account_post_fetch (char *line, bool lock)
   void *ret = NULL;
 
   if (line)
-    { 
+    {
       if (lock)
 	pglock.init ("pglock")->acquire ();
       if (add_line (line))
@@ -1645,16 +1645,16 @@ pwdgrp::add_group_from_windows (fetch_acc_t &full_acc, cyg_ldap *pldap)
 
 /* Check if file exists and if it has been written to since last checked.
    If file has been changed, invalidate the current cache.
-   
+
    If the file doesn't exist when this function is called the first time,
    by the first Cygwin process in a process tree, the file will never be
    visited again by any process in this process tree.  This is important,
    because we cannot allow a change of UID/GID values for the lifetime
    of a process tree.
-   
+
    If the file gets deleted or unreadable, the file cache will stay in
    place, but we won't try to read new accounts from the file.
-   
+
    The return code indicates to the calling function if the file exists. */
 bool
 pwdgrp::check_file ()
@@ -1961,7 +1961,7 @@ pwdgrp::fetch_account_from_windows (fetch_user_arg_t &arg, cyg_ldap *pldap)
 	*wcpncpy (dom, arg.full_acc->dom->Buffer,
 		  arg.full_acc->dom->Length / sizeof (WCHAR)) = L'\0';
 	acc_type = arg.full_acc->acc_type;
-      	ret = acc_type != SidTypeUnknown;
+	ret = acc_type != SidTypeUnknown;
       }
       break;
     case SID_arg:
@@ -2280,13 +2280,13 @@ pwdgrp::fetch_account_from_windows (fetch_user_arg_t &arg, cyg_ldap *pldap)
 	  && (sid_sub_auth_count (sid) <= 3 || sid_id_auth (sid) == 11))
 	acc_type = SidTypeWellKnownGroup;
       switch ((int) acc_type)
-      	{
+	{
 	case SidTypeUser:
 	  if (is_group ())
 	    {
 	      /* Don't allow users as group.  While this is technically
 		 possible, it doesn't make sense in a POSIX scenario.
-	 
+
 		 Microsoft Accounts as well as AzureAD accounts have the
 		 primary group SID in their user token set to their own
 		 user SID.
@@ -2467,7 +2467,7 @@ pwdgrp::fetch_account_from_windows (fetch_user_arg_t &arg, cyg_ldap *pldap)
 		  WCHAR server[INTERNET_MAX_HOST_NAME_LENGTH + 3];
 		  NET_API_STATUS nas;
 		  PUSER_INFO_3 ui;
-		  
+
 		  if (!get_logon_server (cygheap->dom.primary_flat_name (),
 					 server, DS_IS_FLAT_NAME))
 		    break;
@@ -2636,7 +2636,7 @@ pwdgrp::fetch_account_from_windows (fetch_user_arg_t &arg, cyg_ldap *pldap)
 	default:
 	  return NULL;
 	}
-    } 
+    }
   else if (sid_id_auth (sid) == 0 && sid_sub_auth (sid, 0) == 0xfffe)
     {
       /* Special case "nobody" for reproducible construction of a
@@ -2683,7 +2683,7 @@ pwdgrp::fetch_account_from_windows (fetch_user_arg_t &arg, cyg_ldap *pldap)
   else if (sid_id_auth (sid) == 18)
     {
       /* Authentication assertion SIDs.
-      
+
          Available when using a 2012R2 DC, but not supported by
 	 LookupAccountXXX on pre Windows 8/2012 machines */
       uid = 0x11200 + sid_sub_auth_rid (sid);
