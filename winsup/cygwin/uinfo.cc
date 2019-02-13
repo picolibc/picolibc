@@ -1941,6 +1941,7 @@ pwdgrp::fetch_account_from_windows (fetch_user_arg_t &arg, cyg_ldap *pldap)
   char *gecos = NULL;
   /* Temporary stuff. */
   PWCHAR p;
+  PWCHAR val;
   WCHAR sidstr[128];
   ULONG posix_offset = 0;
   uint32_t id_val;
@@ -1977,8 +1978,6 @@ pwdgrp::fetch_account_from_windows (fetch_user_arg_t &arg, cyg_ldap *pldap)
 	     can't be resolved, and if we're a domain member machine, ask a DC.
 	     Do *not* use LookupAccountSidW.  It can take ages when called on a
 	     DC for some weird reason.  Use LDAP instead. */
-	  PWCHAR val;
-
 	  if (cldap->fetch_ad_account (sid, true)
 	      && (val = cldap->get_account_name ()))
 	    {
@@ -2046,16 +2045,6 @@ pwdgrp::fetch_account_from_windows (fetch_user_arg_t &arg, cyg_ldap *pldap)
       /* We can skip the backslash in the rest of this function. */
       if (p)
 	name = p + 1;
-      /* Reverse lookup name from sid to make sure the username in
-	 our passwd/group data is written exactly as in the user DB. */
-      nlen = UNLEN + 1;
-      dlen = DNLEN + 1;
-      ret = LookupAccountSidW (NULL, sid, name, &nlen, dom, &dlen, &acc_type);
-      if (!ret)
-	{
-	  system_printf ("LookupAccountNameW (%W), %E", name);
-	  return NULL;
-	}
       /* Last but not least, some validity checks on the name style. */
       if (!fq_name)
 	{
@@ -2438,18 +2427,28 @@ pwdgrp::fetch_account_from_windows (fetch_user_arg_t &arg, cyg_ldap *pldap)
 
 	  if (is_domain_account)
 	    {
-	      /* Skip this when creating group entries and for non-users. */
+	      /* Overwrite group name to be sure case is same as in SAM */
+	      if (is_group()
+		  && cldap->fetch_ad_account (sid, true, domain)
+		  && (val = cldap->get_account_name ()))
+		wcscpy (name, val);
+	      /* Skip the rest if creating group entries and for non-users. */
 	      if (is_group() || acc_type != SidTypeUser)
 		break;
 	      /* On AD machines, use LDAP to fetch domain account infos. */
 	      if (cygheap->dom.primary_dns_name ())
 		{
-		  /* For the current user we got the primary group from the
-		     user token.  For any other user we fetch it from AD. */
+		  /* For the current user we got correctly cased username and
+		     the primary group via process token.  For any other user
+		     we fetch it from AD and overwrite it. */
 		  if (!is_current_user
-		      && cldap->fetch_ad_account (sid, false, domain)
-		      && (id_val = cldap->get_primary_gid ()) != ILLEGAL_GID)
-		    gid = posix_offset + id_val;
+		      && cldap->fetch_ad_account (sid, false, domain))
+		    {
+		      if ((val = cldap->get_account_name ()))
+			wcscpy (name, val);
+		      if ((id_val = cldap->get_primary_gid ()) != ILLEGAL_GID)
+			gid = posix_offset + id_val;
+		    }
 		  home = cygheap->pg.get_home (cldap, sid, dom, domain,
 					       name, fully_qualified_name);
 		  shell = cygheap->pg.get_shell (cldap, sid, dom, domain,
@@ -2487,6 +2486,8 @@ pwdgrp::fetch_account_from_windows (fetch_user_arg_t &arg, cyg_ldap *pldap)
 		      debug_printf ("NetUserGetInfo(%W) %u", name, nas);
 		      break;
 		    }
+		  /* Overwrite name to be sure case is same as in SAM */
+		  wcscpy (name, ui->usri3_name);
 		  gid = posix_offset + ui->usri3_primary_group_id;
 		  home = cygheap->pg.get_home (ui, sid, dom, name,
 					       fully_qualified_name);
@@ -2513,6 +2514,8 @@ pwdgrp::fetch_account_from_windows (fetch_user_arg_t &arg, cyg_ldap *pldap)
 		      debug_printf ("NetUserGetInfo(%W) %u", name, nas);
 		      break;
 		    }
+		  /* Overwrite name to be sure case is same as in SAM */
+		  wcscpy (name, ui->usri3_name);
 		  /* Fetch user attributes. */
 		  home = cygheap->pg.get_home (ui, sid, dom, name,
 					       fully_qualified_name);
@@ -2533,6 +2536,8 @@ pwdgrp::fetch_account_from_windows (fetch_user_arg_t &arg, cyg_ldap *pldap)
 		      debug_printf ("NetLocalGroupGetInfo(%W) %u", name, nas);
 		      break;
 		    }
+		  /* Overwrite name to be sure case is same as in SAM */
+		  wcscpy (name, gi->lgrpi1_name);
 		  /* Fetch unix gid from comment field. */
 		  uxid = fetch_from_description (gi->lgrpi1_comment,
 						 L"unix=\"", 6);
