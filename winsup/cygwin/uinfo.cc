@@ -2008,7 +2008,15 @@ pwdgrp::fetch_account_from_windows (fetch_user_arg_t &arg, cyg_ldap *pldap)
       if ((p = wcschr (name, cygheap->pg.nss_separator ()[0])))
 	{
 	  fq_name = true;
-	  *p = L'\\';
+	  /* Convenience: Translate domain name "." to local machine. */
+	  if (p == name + 1 && name[0] == L'.')
+	    {
+	      p = wcpcpy (name, cygheap->dom.account_flat_name ());
+	      *p = L'\\';
+	      sys_mbstowcs (p + 1, UNLEN + 1, arg.name + 2);
+	    }
+	  else
+	    *p = L'\\';
 	}
       sid = csid;
       ret = LookupAccountNameW (NULL, name, sid, &slen, dom, &dlen, &acc_type);
