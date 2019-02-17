@@ -815,7 +815,7 @@ child_info::child_info (unsigned in_cb, child_info_types chtype,
      we're forking, we also need handle duplicate access. */
   parent = NULL;
   DWORD perms = PROCESS_QUERY_LIMITED_INFORMATION | PROCESS_VM_READ
-		| SYNCHRONIZE;
+		| PROCESS_VM_OPERATION | SYNCHRONIZE;
   if (type == _CH_FORK)
     {
       perms |= PROCESS_DUP_HANDLE;
