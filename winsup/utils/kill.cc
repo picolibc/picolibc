@@ -251,7 +251,10 @@ main (int argc, char **argv)
 	  break;
 	case '?':
 	  if (gotasig) /* this is a negative pid, go ahead */
-	    goto out;
+	    {
+	      --optind;
+	      goto out;
+	    }
 	  optreset = 1;
 	  optind = 1 + av - argv;
 	  gotasig = *av + 1;
