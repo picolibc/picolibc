@@ -256,7 +256,7 @@ int
 main (int argc, char **argv)
 {
   int i;
-  int flags = MOUNT_BINARY;
+  int flags = 0;
   char *options = strdup ("");
   enum do_what
   {
