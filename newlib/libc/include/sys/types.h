@@ -85,7 +85,7 @@ typedef	unsigned long	u_long;
 #endif
 #define _BSDTYPES_DEFINED
 #endif
-#endif	/*__BSD_VISIBLE || __CYGWIN__ */
+#endif /* __MISC_VISIBLE */
 
 #if __MISC_VISIBLE
 typedef	unsigned short	ushort;		/* System V compatibility */
