@@ -987,21 +987,6 @@ out:
   return 0;
 }
 
-/* Return flags associated with a mount point given the win32 path. */
-
-unsigned
-mount_info::set_flags_from_win32_path (const char *p)
-{
-  for (int i = 0; i < nmounts; i++)
-    {
-      mount_item &mi = mount[native_sorted[i]];
-      if (path_prefix_p (mi.native_path, p, mi.native_pathlen,
-			 mi.flags & MOUNT_NOPOSIX))
-	return mi.flags;
-    }
-  return MOUNT_BINARY;
-}
-
 inline char *
 skip_ws (char *in)
 {

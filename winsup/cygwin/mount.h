@@ -189,7 +189,6 @@ class mount_info
   int add_item (const char *dev, const char *path, unsigned flags);
   int del_item (const char *path, unsigned flags);
 
-  unsigned set_flags_from_win32_path (const char *path);
   int conv_to_win32_path (const char *src_path, char *dst, device&,
 			  unsigned *flags = NULL);
   int conv_to_posix_path (PWCHAR src_path, char *posix_path, int ccp_flags);
