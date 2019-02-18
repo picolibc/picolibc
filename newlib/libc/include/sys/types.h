@@ -36,7 +36,7 @@ typedef __uint32_t	u_int32_t;
 #if ___int64_t_defined
 typedef __uint64_t	u_int64_t;
 #endif
-typedef int register_t;
+typedef __intptr_t register_t;
 #define __BIT_TYPES_DEFINED__ 1
 
 #ifndef __need_inttypes
