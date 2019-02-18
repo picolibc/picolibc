@@ -480,7 +480,7 @@ HANDLE lsaauth (cygsid &, user_groups &);
 /* LSA private key storage authentication, same as when using service logons. */
 HANDLE lsaprivkeyauth (struct passwd *pw);
 /* Kerberos or MsV1 S4U logon. */
-HANDLE s4uauth (struct passwd *pw);
+HANDLE s4uauth (struct passwd *pw, NTSTATUS &ret_status);
 /* Verify an existing token */
 bool verify_token (HANDLE token, cygsid &usersid, user_groups &groups, bool *pintern = NULL);
 /* Get groups of a user */

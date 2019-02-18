@@ -2575,6 +2575,16 @@ to create a token.</para>
 </listitem>
 
 <listitem>
+<para>Older systems, like WOW64 under Windows 7 64 bit, don't support
+<literal>S4U</literal> authentication for local machine accounts.  On
+these systems Cygwin falls back to an old and otherwise deprecated
+method to create a user token from scratch.  The underlying system call
+is undocumented and has an unfortunate requirement: We have to create a
+special account with dangerous permissions to perform this action.
+Therefore this is only enabled on affected systems.</para>
+</listitem>
+
+<listitem>
 <para>If all of the above fails, our process has insufficient privileges
 to switch the user context at all, so <command>set(e)uid</command>
 fails and returns -1, setting errno to EPERM.</para>

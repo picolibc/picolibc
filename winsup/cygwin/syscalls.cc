@@ -3564,31 +3564,29 @@ seteuid32 (uid_t uid)
 	}
       if (!new_token)
 	{
-#if 1
+	  NTSTATUS status;
+
 	  debug_printf ("lsaprivkeyauth failed, try s4uauth.");
-	  if (!(new_token = s4uauth (pw_new)))
+	  if (!(new_token = s4uauth (pw_new, status)))
 	    {
-	      debug_printf ("s4uauth failed, bail out");
-	      cygheap->user.reimpersonate ();
-	      return -1;
-	    }
-#else
-	  debug_printf ("lsaprivkeyauth failed, try lsaauth.");
-	  if (!(new_token = lsaauth (usersid, groups)))
-	    {
-	      debug_printf ("lsaauth failed, try s4uauth.");
-	      if (!(new_token = s4uauth (pw_new)))
+	      if (status != STATUS_INVALID_PARAMETER)
 		{
-		  debug_printf ("s4uauth failed, try create_token.");
-		  if (!(new_token = create_token (usersid, groups)))
-		    {
-		      debug_printf ("create_token failed, bail out");
-		      cygheap->user.reimpersonate ();
-		      return -1;
-		    }
+		  debug_printf ("s4uauth failed, bail out");
+		  cygheap->user.reimpersonate ();
+		  return -1;
+		}
+	      /* If s4uauth fails with status code STATUS_INVALID_PARAMETER,
+		 we're running on a system not implementing MsV1_0S4ULogon
+		 (Windows 7 WOW64, Vista?).  Fall back to create_token in
+		 this single case only. */
+	      debug_printf ("s4uauth failed, try create_token.");
+	      if (!(new_token = create_token (usersid, groups)))
+		{
+		  debug_printf ("create_token failed, bail out");
+		  cygheap->user.reimpersonate ();
+		  return -1;
 		}
 	    }
-#endif
 	}
 
       /* Keep at most one internal token */
