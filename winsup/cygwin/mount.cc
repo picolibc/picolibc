@@ -473,13 +473,13 @@ mount_info::create_root_entry (const PWCHAR root)
   sys_wcstombs (native_root, PATH_MAX, root);
   assert (*native_root != '\0');
   if (add_item (native_root, "/",
-		MOUNT_SYSTEM | MOUNT_BINARY | MOUNT_IMMUTABLE | MOUNT_AUTOMATIC)
+		MOUNT_SYSTEM | MOUNT_IMMUTABLE | MOUNT_AUTOMATIC)
       < 0)
     api_fatal ("add_item (\"%s\", \"/\", ...) failed, errno %d", native_root, errno);
   /* Create a default cygdrive entry.  Note that this is a user entry.
      This allows to override it with mount, unless the sysadmin created
      a cygdrive entry in /etc/fstab. */
-  cygdrive_flags = MOUNT_BINARY | MOUNT_NOPOSIX | MOUNT_CYGDRIVE;
+  cygdrive_flags = MOUNT_NOPOSIX | MOUNT_CYGDRIVE;
   strcpy (cygdrive, CYGWIN_INFO_CYGDRIVE_DEFAULT_PREFIX "/");
   cygdrive_len = strlen (cygdrive);
 }
@@ -508,23 +508,14 @@ mount_info::init (bool user_init)
       if (!got_usr_bin)
       {
 	stpcpy (p, "\\bin");
-	add_item (native, "/usr/bin",
-		  MOUNT_SYSTEM | MOUNT_BINARY | MOUNT_AUTOMATIC);
+	add_item (native, "/usr/bin", MOUNT_SYSTEM | MOUNT_AUTOMATIC);
       }
       if (!got_usr_lib)
       {
 	stpcpy (p, "\\lib");
-	add_item (native, "/usr/lib",
-		  MOUNT_SYSTEM | MOUNT_BINARY | MOUNT_AUTOMATIC);
+	add_item (native, "/usr/lib", MOUNT_SYSTEM | MOUNT_AUTOMATIC);
       }
     }
-}
-
-static void
-set_flags (unsigned *flags, unsigned val)
-{
-  *flags = val;
-  debug_printf ("flags: binary (%y)", *flags & MOUNT_BINARY);
 }
 
 int
@@ -533,7 +524,7 @@ mount_item::build_win32 (char *dst, const char *src, unsigned *outflags, unsigne
   int n, err = 0;
   const char *real_native_path;
   int real_posix_pathlen;
-  set_flags (outflags, (unsigned) flags);
+  *outflags = flags;
   if (!cygheap->root.exists () || posix_pathlen != 1 || posix_path[0] != '/')
     {
       n = native_pathlen;
@@ -604,7 +595,7 @@ mount_info::conv_to_win32_path (const char *src_path, char *dst, device& dev,
   /* See if this is a cygwin "device" */
   if (win32_device_name (src_path, dst, dev))
     {
-      *flags = MOUNT_BINARY;	/* FIXME: Is this a sensible default for devices? */
+      *flags = 0;
       rc = 0;
       goto out_no_chroot_check;
     }
@@ -617,7 +608,7 @@ mount_info::conv_to_win32_path (const char *src_path, char *dst, device& dev,
       if (!strchr (src_path + 2, '/'))
 	{
 	  dev = *netdrive_dev;
-	  set_flags (flags, MOUNT_BINARY);
+	  *flags = 0;
 	}
       else
 	{
@@ -626,7 +617,7 @@ mount_info::conv_to_win32_path (const char *src_path, char *dst, device& dev,
 	     are rather (warning, poetic description ahead) windows into the
 	     native Win32 world.  This also gives the user an elegant way to
 	     change the settings for those paths in a central place. */
-	  set_flags (flags, (unsigned) cygdrive_flags);
+	  *flags = cygdrive_flags;
 	}
       backslashify (src_path, dst, 0);
       /* Go through chroot check */
@@ -638,14 +629,14 @@ mount_info::conv_to_win32_path (const char *src_path, char *dst, device& dev,
       dev = fhandler_proc::get_proc_fhandler (src_path);
       if (dev == FH_NADA)
 	return ENOENT;
-      set_flags (flags, MOUNT_BINARY);
+      *flags = 0;
       if (isprocsys_dev (dev))
 	{
 	  if (src_path[procsys_len])
 	    backslashify (src_path + procsys_len, dst, 0);
 	  else	/* Avoid empty NT path. */
 	    stpcpy (dst, "\\");
-	  set_flags (flags, (unsigned) cygdrive_flags);
+	  *flags = cygdrive_flags;
 	}
       else
 	strcpy (dst, src_path);
@@ -666,7 +657,7 @@ mount_info::conv_to_win32_path (const char *src_path, char *dst, device& dev,
 	}
       else if (cygdrive_win32_path (src_path, dst, unit))
 	{
-	  set_flags (flags, (unsigned) cygdrive_flags);
+	  *flags = cygdrive_flags;
 	  goto out;
 	}
       else if (mount_table->cygdrive_len > 1)
@@ -1024,7 +1015,7 @@ struct opt
 {
   {"acl", MOUNT_NOACL, 1},
   {"auto", 0, 0},
-  {"binary", MOUNT_BINARY, 0},
+  {"binary", MOUNT_TEXT, 1},
   {"bind", MOUNT_BIND, 0},
   {"cygexec", MOUNT_CYGWIN_EXEC, 0},
   {"dos", MOUNT_DOS, 0},
@@ -1038,7 +1029,7 @@ struct opt
   {"posix=0", MOUNT_NOPOSIX, 0},
   {"posix=1", MOUNT_NOPOSIX, 1},
   {"sparse", MOUNT_SPARSE, 0},
-  {"text", MOUNT_BINARY, 1},
+  {"text", MOUNT_TEXT, 0},
   {"user", MOUNT_SYSTEM, 1}
 };
 
@@ -1140,7 +1131,7 @@ mount_info::from_fstab_line (char *line, bool user)
     return true;
   cend = find_ws (c);
   *cend = '\0';
-  unsigned mount_flags = MOUNT_SYSTEM | MOUNT_BINARY;
+  unsigned mount_flags = MOUNT_SYSTEM;
   if (!strcmp (fs_type, "cygdrive"))
     mount_flags |= MOUNT_NOPOSIX;
   if (!strcmp (fs_type, "usertemp"))
@@ -1157,7 +1148,7 @@ mount_info::from_fstab_line (char *line, bool user)
       int error = conv_to_win32_path (bound_path, native_path, dev, &flags);
       if (error || strlen (native_path) >= MAX_PATH)
 	return true;
-      if ((mount_flags & ~MOUNT_SYSTEM) == (MOUNT_BIND | MOUNT_BINARY))
+      if ((mount_flags & ~MOUNT_SYSTEM) == MOUNT_BIND)
 	mount_flags = (MOUNT_BIND | flags)
 		      & ~(MOUNT_IMMUTABLE | MOUNT_AUTOMATIC);
     }
@@ -1277,7 +1268,7 @@ mount_info::get_cygdrive_info (char *user, char *system, char *user_flags,
 	path[cygdrive_len - 1] = '\0';
     }
   if (flags)
-    strcpy (flags, (cygdrive_flags & MOUNT_BINARY) ? "binmode" : "textmode");
+    strcpy (flags, (cygdrive_flags & MOUNT_TEXT) ? "textmode" : "binmode");
   return 0;
 }
 
@@ -1603,7 +1594,7 @@ fillout_mntent (const char *native_path, const char *posix_path, unsigned flags)
      binary or textmode, or exec.  We don't print
      `silent' here; it's a magic internal thing. */
 
-  if (!(flags & MOUNT_BINARY))
+  if (flags & MOUNT_TEXT)
     strcpy (_my_tls.locals.mnt_opts, (char *) "text");
   else
     strcpy (_my_tls.locals.mnt_opts, (char *) "binary");
@@ -1759,7 +1750,7 @@ mount (const char *win32_path, const char *posix_path, unsigned flags)
 							   dev, &conv_flags);
 	      if (error || strlen (w32_path) >= MAX_PATH)
 		return true;
-	      if ((flags & ~MOUNT_SYSTEM) == (MOUNT_BIND | MOUNT_BINARY))
+	      if ((flags & ~MOUNT_SYSTEM) == MOUNT_BIND)
 		flags = (MOUNT_BIND | conv_flags)
 			& ~(MOUNT_IMMUTABLE | MOUNT_AUTOMATIC);
 	    }

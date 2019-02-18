@@ -174,9 +174,7 @@ class path_conv
   int has_buggy_basic_info () const {return fs.has_buggy_basic_info ();}
   int binmode () const
   {
-    if (mount_flags & MOUNT_BINARY)
-      return O_BINARY;
-    return O_TEXT;
+    return (mount_flags & MOUNT_TEXT) ? O_TEXT : O_BINARY;
   }
   int issymlink () const {return path_flags & PATH_SYMLINK;}
   int is_lnk_symlink () const {return path_flags & PATH_LNK;}

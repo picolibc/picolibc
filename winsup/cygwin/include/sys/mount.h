@@ -22,7 +22,7 @@ extern "C" {
 
 enum
 {
-  MOUNT_BINARY =	_BIT ( 1),	/* "binary" format read/writes */
+  MOUNT_TEXT =		_BIT ( 0),	/* "binary" format read/writes */
   MOUNT_SYSTEM =	_BIT ( 3),	/* mount point came from system table */
   MOUNT_EXEC   =	_BIT ( 4),	/* Any file in the mounted directory
 					   gets 'x' bit */
