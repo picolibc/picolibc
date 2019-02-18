@@ -1556,6 +1556,8 @@ msv1_0_auth:
   MSV1_0_S4U_LOGON *s4u_logon;
   USHORT user_len, domain_len;
 
+  /* Per MSDN MsV1_0S4ULogon is not implemented on Vista, but surprisingly
+     it works. */
   RtlInitAnsiString (&name, MSV1_0_PACKAGE_NAME);
   status = LsaLookupAuthenticationPackage (lsa_hdl, &name, &package_id);
   if (status != STATUS_SUCCESS)
@@ -1606,6 +1608,30 @@ out:
     LsaDeregisterLogonProcess (lsa_hdl);
   if (profile)
     LsaFreeReturnBuffer (profile);
+
+  if (token)
+    {
+      /* Convert to primary token.  Strictly speaking this is only
+	 required on Vista/2008.  CreateProcessAsUser also takes
+	 impersonation tokens since Windows 7. */
+      HANDLE tmp_token;
+
+      if (DuplicateTokenEx (token, MAXIMUM_ALLOWED, &sec_none,
+			    SecurityImpersonation, TokenPrimary, &tmp_token))
+	{
+	  CloseHandle (token);
+	  token = tmp_token;
+	}
+      else
+	{
+	  __seterrno ();
+	  debug_printf ("DuplicateTokenEx %E");
+	  /* Make sure not to allow create_token. */
+	  status = STATUS_INVALID_HANDLE;
+	  CloseHandle (token);
+	  token = NULL;
+	}
+    }
 
   pop_self_privilege ();
   ret_status = status;
