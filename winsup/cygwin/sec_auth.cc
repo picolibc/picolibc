@@ -1475,15 +1475,6 @@ s4uauth (struct passwd *pw)
   extract_nt_dom_user (pw, domain, user);
   try_kerb_auth = cygheap->dom.member_machine ()
 		  && wcscasecmp (domain, cygheap->dom.account_flat_name ());
-  RtlInitAnsiString (&name, try_kerb_auth ? MICROSOFT_KERBEROS_NAME_A
-					  : MSV1_0_PACKAGE_NAME);
-  status = LsaLookupAuthenticationPackage (lsa_hdl, &name, &package_id);
-  if (status != STATUS_SUCCESS)
-    {
-      debug_printf ("LsaLookupAuthenticationPackage: %y", status);
-      __seterrno_from_nt_status (status);
-      goto out;
-    }
   /* Create origin. */
   stpcpy (origin.buf, "Cygwin");
   RtlInitAnsiString (&origin.str, origin.buf);
@@ -1496,6 +1487,14 @@ s4uauth (struct passwd *pw)
       KERB_S4U_LOGON *s4u_logon;
       USHORT name_len;
 
+      RtlInitAnsiString (&name, MICROSOFT_KERBEROS_NAME_A);
+      status = LsaLookupAuthenticationPackage (lsa_hdl, &name, &package_id);
+      if (status != STATUS_SUCCESS)
+	{
+	  debug_printf ("LsaLookupAuthenticationPackage: %y", status);
+	  __seterrno_from_nt_status (status);
+	  goto out;
+	}
       wcpcpy (wcpcpy (wcpcpy (sam_name, domain), L"\\"), user);
       if (TranslateNameW (sam_name, NameSamCompatible, NameUserPrincipal,
 			  upn_name, &size) == 0)
@@ -1563,6 +1562,14 @@ msv1_0_auth:
   MSV1_0_S4U_LOGON *s4u_logon;
   USHORT user_len, domain_len;
 
+  RtlInitAnsiString (&name, MSV1_0_PACKAGE_NAME);
+  status = LsaLookupAuthenticationPackage (lsa_hdl, &name, &package_id);
+  if (status != STATUS_SUCCESS)
+    {
+      debug_printf ("LsaLookupAuthenticationPackage: %y", status);
+      __seterrno_from_nt_status (status);
+      goto out;
+    }
   user_len = wcslen (user) * sizeof (WCHAR);
   domain_len = wcslen (domain) * sizeof (WCHAR);	/* Local machine */
   authinf_size = sizeof (MSV1_0_S4U_LOGON) + user_len + domain_len;
