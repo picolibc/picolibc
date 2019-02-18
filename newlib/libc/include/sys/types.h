@@ -62,6 +62,8 @@ typedef	__uint32_t	in_addr_t;	/* base type for internet address */
 typedef	__uint16_t	in_port_t;
 #define	_IN_PORT_T_DECLARED
 #endif
+
+typedef	__uintptr_t	u_register_t;
 #endif /* __BSD_VISIBLE */
 
 #if __MISC_VISIBLE
