@@ -507,12 +507,13 @@ details. */
   334: Remove matherr.
   335: Change size of utsname, change uname output.
   336: New Cygwin PID algorithm (yeah, not really an API change)
+  337: MOUNT_BINARY -> MOUNT_TEXT
 
   Note that we forgot to bump the api for ualarm, strtoll, strtoull,
   sigaltstack, sethostname. */
 
 #define CYGWIN_VERSION_API_MAJOR 0
-#define CYGWIN_VERSION_API_MINOR 336
+#define CYGWIN_VERSION_API_MINOR 337
 
 /* There is also a compatibity version number associated with the shared memory
    regions.  It is incremented when incompatible changes are made to the shared
