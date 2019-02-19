@@ -43,7 +43,7 @@ Support Linux-specific open(2) flag O_PATH.
 </para></listitem>
 
 <listitem><para>
-- Support Linux-specific linkat(2) flag AT_EMPTY_PATH.
+Support Linux-specific linkat(2) flag AT_EMPTY_PATH.
 </para></listitem>
 
 <listitem><para>
@@ -52,8 +52,8 @@ siginfo_t::si_overrun).
 </para></listitem>
 
 <listitem><para>
-New APIs: signalfd, timerfd_create, timerfd_gettime, timerfd_settime,
-timer_getoverrun.
+New APIs: secure_getenv, signalfd, timerfd_create, timerfd_gettime,
+timerfd_settime, timer_getoverrun.
 </para></listitem>
 
 <listitem><para>
