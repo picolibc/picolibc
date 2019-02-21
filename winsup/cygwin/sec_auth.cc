@@ -400,11 +400,18 @@ get_user_local_groups (PWCHAR logonserver, PWCHAR domain,
   DWORD cnt, tot;
   NET_API_STATUS ret;
 
-  ret = NetUserGetLocalGroups (logonserver, user, 0, LG_INCLUDE_INDIRECT,
+  /* We want to know the membership in local groups on the current machine.
+     Thus, don't ask the logonserver, ask the local machine.  In contrast
+     to most other NetUser functions, NetUserGetLocalGroups accepts the
+     username in DOMAIN\user form. */
+  WCHAR username[MAX_DOMAIN_NAME_LEN + UNLEN + 2];
+  wcpcpy (wcpcpy (wcpcpy (username, domain), L"\\"), user);
+  ret = NetUserGetLocalGroups (NULL, username, 0, LG_INCLUDE_INDIRECT,
 			       (LPBYTE *) &buf, MAX_PREFERRED_LENGTH,
 			       &cnt, &tot);
   if (ret)
     {
+      debug_printf ("username: %W", username);
       __seterrno_from_win_error (ret);
       return false;
     }
