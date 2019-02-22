@@ -535,7 +535,6 @@ get_server_groups (cygsidlist &grp_list, PSID usersid,
 {
   WCHAR user[UNLEN + 1];
   WCHAR domain[MAX_DOMAIN_NAME_LEN + 1];
-  WCHAR server[INTERNET_MAX_HOST_NAME_LENGTH + 3];
   DWORD ulen = UNLEN + 1;
   DWORD dlen = MAX_DOMAIN_NAME_LEN + 1;
   SID_NAME_USE use;
@@ -546,41 +545,73 @@ get_server_groups (cygsidlist &grp_list, PSID usersid,
       return true;
     }
 
-  grp_list *= well_known_world_sid;
-  grp_list *= well_known_authenticated_users_sid;
-
   if (!LookupAccountSidW (NULL, usersid, user, &ulen, domain, &dlen, &use))
     {
       __seterrno ();
       return false;
     }
   /* If the SID does NOT start with S-1-5-21, the domain is some builtin
-     domain.  The search for a logon server and fetching group accounts
-     is moot. */
+     domain.  We don't fetch a group list then. */
   if (sid_id_auth (usersid) == 5 /* SECURITY_NT_AUTHORITY */
-      && sid_sub_auth (usersid, 0) == SECURITY_NT_NON_UNIQUE
-      && get_logon_server (domain, server, DS_IS_FLAT_NAME))
+      && sid_sub_auth (usersid, 0) == SECURITY_NT_NON_UNIQUE)
     {
-      if (check_account_disabled == CHK_DISABLED)
+      if (wincap.no_msv1_0_s4u_logon_in_wow64 ())
 	{
-	  NET_API_STATUS napi_stat;
-	  USER_INFO_1 *ui1;
-	  bool allow_user = false;
+	  WCHAR server[INTERNET_MAX_HOST_NAME_LENGTH + 3];
 
-	  napi_stat = NetUserGetInfo (server, user, 1, (LPBYTE *) &ui1);
-	  if (napi_stat == NERR_Success)
-	    allow_user = !(ui1->usri1_flags & (UF_ACCOUNTDISABLE | UF_LOCKOUT));
-	  if (ui1)
-	    NetApiBufferFree (ui1);
-	  if (!allow_user)
+	  if (!get_logon_server (domain, server, DS_IS_FLAT_NAME))
+	    return false;
+	  if (check_account_disabled == CHK_DISABLED)
 	    {
-	      debug_printf ("User denied: %W\\%W", domain, user);
-	      set_errno (EACCES);
-	      return false;
+	      NET_API_STATUS napi_stat;
+	      USER_INFO_1 *ui1;
+	      bool allow_user = false;
+
+	      napi_stat = NetUserGetInfo (server, user, 1, (LPBYTE *) &ui1);
+	      if (napi_stat == NERR_Success)
+		allow_user = !(ui1->usri1_flags & (UF_ACCOUNTDISABLE | UF_LOCKOUT));
+	      if (ui1)
+		NetApiBufferFree (ui1);
+	      if (!allow_user)
+		{
+		  debug_printf ("User denied: %W\\%W", domain, user);
+		  set_errno (EACCES);
+		  return false;
+		}
 	    }
+	  grp_list *= well_known_world_sid;
+	  grp_list *= well_known_authenticated_users_sid;
+	  get_user_groups (server, grp_list, user, domain);
+	  get_user_local_groups (domain, grp_list, user);
+	  return true;
 	}
-      get_user_groups (server, grp_list, user, domain);
-      get_user_local_groups (domain, grp_list, user);
+
+      tmp_pathbuf tp;
+      HANDLE token;
+      NTSTATUS status;
+      PTOKEN_GROUPS groups;
+      ULONG size;
+
+      token = s4uauth (false, domain, user, status);
+      if (!token)
+	return false;
+
+      groups = (PTOKEN_GROUPS) tp.w_get ();
+      status = NtQueryInformationToken (token, TokenGroups, groups,
+					2 * NT_MAX_PATH, &size);
+      if (NT_SUCCESS (status))
+	for (DWORD pg = 0; pg < groups->GroupCount; ++pg)
+	  {
+	    if (groups->Groups[pg].Attributes & SE_GROUP_USE_FOR_DENY_ONLY)
+	      continue;
+	    cygpsid grpsid = groups->Groups[pg].Sid;
+	    if (sid_id_auth (grpsid) == 5 /* SECURITY_NT_AUTHORITY */
+		&& sid_sub_auth (grpsid, 0) == SECURITY_NT_NON_UNIQUE)
+	      grp_list += grpsid;
+	    else
+	      grp_list *= grpsid;
+	  }
+      NtClose (token);
     }
   return true;
 }
@@ -589,8 +620,6 @@ static bool
 get_initgroups_sidlist (cygsidlist &grp_list, PSID usersid, PSID pgrpsid,
 			PTOKEN_GROUPS my_grps)
 {
-  grp_list *= well_known_world_sid;
-  grp_list *= well_known_authenticated_users_sid;
   if (well_known_system_sid != usersid)
     get_token_group_sidlist (grp_list, my_grps);
   if (!get_server_groups (grp_list, usersid, CHK_DISABLED))
@@ -605,8 +634,6 @@ static bool
 get_setgroups_sidlist (cygsidlist &tmp_list, PSID usersid,
 		       PTOKEN_GROUPS my_grps, user_groups &groups)
 {
-  tmp_list *= well_known_world_sid;
-  tmp_list *= well_known_authenticated_users_sid;
   get_token_group_sidlist (tmp_list, my_grps);
   if (!get_server_groups (tmp_list, usersid, CHK_DISABLED))
     return false;

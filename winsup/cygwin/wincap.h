@@ -33,6 +33,7 @@ struct wincaps
     unsigned has_posix_unlink_semantics		: 1;
     unsigned has_case_sensitive_dirs		: 1;
     unsigned has_posix_rename_semantics		: 1;
+    unsigned no_msv1_0_s4u_logon_in_wow64	: 1;
   };
 };
 
@@ -87,6 +88,7 @@ public:
   bool	IMPLEMENT (has_posix_unlink_semantics)
   bool	IMPLEMENT (has_case_sensitive_dirs)
   bool	IMPLEMENT (has_posix_rename_semantics)
+  bool	IMPLEMENT (no_msv1_0_s4u_logon_in_wow64)
 
   void disable_case_sensitive_dirs ()
   {
