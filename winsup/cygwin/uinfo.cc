@@ -2427,12 +2427,7 @@ pwdgrp::fetch_account_from_windows (fetch_user_arg_t &arg, cyg_ldap *pldap)
 
 	  if (is_domain_account)
 	    {
-	      /* Overwrite group name to be sure case is same as in SAM */
-	      if (is_group()
-		  && cldap->fetch_ad_account (sid, true, domain)
-		  && (val = cldap->get_account_name ()))
-		wcscpy (name, val);
-	      /* Skip the rest if creating group entries and for non-users. */
+	      /* Skip this when creating group entries and for non-users. */
 	      if (is_group() || acc_type != SidTypeUser)
 		break;
 	      /* On AD machines, use LDAP to fetch domain account infos. */
