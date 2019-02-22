@@ -393,8 +393,7 @@ get_user_groups (WCHAR *logonserver, cygsidlist &grp_list,
 }
 
 static bool
-get_user_local_groups (PWCHAR logonserver, PWCHAR domain,
-		       cygsidlist &grp_list, PWCHAR user)
+get_user_local_groups (PWCHAR domain, cygsidlist &grp_list, PWCHAR user)
 {
   LPLOCALGROUP_INFO_0 buf;
   DWORD cnt, tot;
@@ -582,7 +581,7 @@ get_server_groups (cygsidlist &grp_list, PSID usersid,
 	    }
 	}
       get_user_groups (server, grp_list, user, domain);
-      get_user_local_groups (server, domain, grp_list, user);
+      get_user_local_groups (domain, grp_list, user);
     }
   return true;
 }
