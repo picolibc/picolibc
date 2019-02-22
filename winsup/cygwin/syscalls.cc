@@ -37,6 +37,7 @@ details. */
 #include <sys/wait.h>
 #include <dirent.h>
 #include <ntsecapi.h>
+#include <iptypes.h>
 #include "ntdll.h"
 
 #undef fstat
@@ -3565,9 +3566,12 @@ seteuid32 (uid_t uid)
       if (!new_token)
 	{
 	  NTSTATUS status;
+	  WCHAR domain[MAX_DOMAIN_NAME_LEN + 1];
+	  WCHAR user[UNLEN + 1];
 
 	  debug_printf ("lsaprivkeyauth failed, try s4uauth.");
-	  if (!(new_token = s4uauth (pw_new, status)))
+	  extract_nt_dom_user (pw_new, domain, user);
+	  if (!(new_token = s4uauth (true, domain, user, status)))
 	    {
 	      if (status != STATUS_INVALID_PARAMETER)
 		{

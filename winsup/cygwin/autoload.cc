@@ -642,6 +642,7 @@ LoadDLLfunc (NetUserGetLocalGroups, 32, netapi32)
 
 LoadDLLfunc (CoTaskMemFree, 4, ole32)
 
+LoadDLLfunc (LsaConnectUntrusted, 4, secur32)
 LoadDLLfunc (LsaDeregisterLogonProcess, 4, secur32)
 LoadDLLfunc (LsaFreeReturnBuffer, 4, secur32)
 LoadDLLfunc (LsaLogonUser, 56, secur32)

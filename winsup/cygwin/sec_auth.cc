@@ -22,7 +22,6 @@ details. */
 #include "tls_pbuf.h"
 #include <lm.h>
 #include <iptypes.h>
-#include <wininet.h>
 #include <userenv.h>
 #define SECURITY_WIN32
 #include <secext.h>
@@ -1421,7 +1420,7 @@ out:
 */
 
 /* In Mingw-w64, MsV1_0S4ULogon and MSV1_0_S4U_LOGON are only defined
-   in ddk/ntifs.h.  We can't inlcude this. */
+   in ddk/ntifs.h.  We can't include this. */
 
 #define MsV1_0S4ULogon ((MSV1_0_LOGON_SUBMIT_TYPE) 12)
 
@@ -1433,15 +1432,18 @@ typedef struct _MSV1_0_S4U_LOGON
   UNICODE_STRING DomainName;
 } MSV1_0_S4U_LOGON, *PMSV1_0_S4U_LOGON;
 
+/* Missing in Mingw-w64 */
+#define KERB_S4U_LOGON_FLAG_IDENTITY 0x08
+
+/* If logon is true we need an impersonation token.  Otherwise we just
+   need an identification token, e. g. to fetch the group list. */
 HANDLE
-s4uauth (struct passwd *pw, NTSTATUS &ret_status)
+s4uauth (bool logon, PCWSTR domain, PCWSTR user, NTSTATUS &ret_status)
 {
   LSA_STRING name;
   HANDLE lsa_hdl = NULL;
   LSA_OPERATIONAL_MODE sec_mode;
   NTSTATUS status, sub_status;
-  WCHAR domain[MAX_DOMAIN_NAME_LEN + 1];
-  WCHAR user[UNLEN + 1];
   bool try_kerb_auth;
   ULONG package_id, size;
   struct {
@@ -1460,19 +1462,23 @@ s4uauth (struct passwd *pw, NTSTATUS &ret_status)
 
   push_self_privilege (SE_TCB_PRIVILEGE, true);
 
-  /* Register as logon process. */
-  RtlInitAnsiString (&name, "Cygwin");
-  status = LsaRegisterLogonProcess (&name, &lsa_hdl, &sec_mode);
+  if (logon)
+    {
+      /* Register as logon process. */
+      RtlInitAnsiString (&name, "Cygwin");
+      status = LsaRegisterLogonProcess (&name, &lsa_hdl, &sec_mode);
+    }
+  else
+    status = LsaConnectUntrusted (&lsa_hdl);
   if (status != STATUS_SUCCESS)
     {
-      debug_printf ("LsaRegisterLogonProcess: %y", status);
+      debug_printf ("%s: %y", logon ? "LsaRegisterLogonProcess"
+				    : "LsaConnectUntrusted", status);
       __seterrno_from_nt_status (status);
       goto out;
     }
 
-  /* Fetch user and domain name and check if this is a domain user.
-     If so, try Kerberos first. */
-  extract_nt_dom_user (pw, domain, user);
+  /* Check if this is a domain user.  If so, try Kerberos first. */
   try_kerb_auth = cygheap->dom.member_machine ()
 		  && wcscasecmp (domain, cygheap->dom.account_flat_name ());
   /* Create origin. */
@@ -1523,7 +1529,7 @@ s4uauth (struct passwd *pw, NTSTATUS &ret_status)
       RtlSecureZeroMemory (authinf, authinf_size);
       s4u_logon = (KERB_S4U_LOGON *) authinf;
       s4u_logon->MessageType = KerbS4ULogon;
-      s4u_logon->Flags = 0;
+      s4u_logon->Flags = logon ? 0 : KERB_S4U_LOGON_FLAG_IDENTITY;
       /* Append user to login info */
       RtlInitEmptyUnicodeString (&s4u_logon->ClientUpn,
 				 (PWCHAR) (s4u_logon + 1),
@@ -1615,7 +1621,7 @@ out:
   if (profile)
     LsaFreeReturnBuffer (profile);
 
-  if (token)
+  if (token && logon)
     {
       /* Convert to primary token.  Strictly speaking this is only
 	 required on Vista/2008.  CreateProcessAsUser also takes
