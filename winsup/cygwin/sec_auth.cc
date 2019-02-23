@@ -309,7 +309,10 @@ load_user_profile (HANDLE token, struct passwd *pw, cygpsid &usersid)
 bool
 unload_user_profile (HANDLE token, HANDLE profile)
 {
-  return UnloadUserProfile (token, profile);
+  bool ret = UnloadUserProfile (token, profile);
+  if (!ret)
+    debug_printf ("UnloadUserProfile, %E");
+  return ret;
 }
 
 HANDLE
