@@ -231,23 +231,12 @@ load_user_profile (HANDLE token, struct passwd *pw, cygpsid &usersid)
   WCHAR domain[DNLEN + 1];
   WCHAR username[UNLEN + 1];
   WCHAR sid[128];
-  HKEY hkey;
   WCHAR userpath[MAX_PATH];
   PROFILEINFOW pi;
-  WCHAR server[INTERNET_MAX_HOST_NAME_LENGTH + 3];
-  NET_API_STATUS nas = NERR_UserNotFound;
-  PUSER_INFO_3 ui;
 
   extract_nt_dom_user (pw, domain, username);
   usersid.string (sid);
-  debug_printf ("user: <%W> <%W>", username, sid);
-  /* Check if user hive is already loaded. */
-  if (!RegOpenKeyExW (HKEY_USERS, sid, 0, KEY_READ, &hkey))
-    {
-      debug_printf ("User registry hive for %W already exists", username);
-      RegCloseKey (hkey);
-      return NULL;
-    }
+  debug_printf ("user: <%W> <%W> <%W>", username, domain, sid);
   /* Check if the local profile dir has already been created. */
   if (!get_user_profile_directory (sid, userpath, MAX_PATH))
    {
@@ -264,21 +253,56 @@ load_user_profile (HANDLE token, struct passwd *pw, cygpsid &usersid)
   pi.dwSize = sizeof pi;
   pi.dwFlags = PI_NOUI;
   pi.lpUserName = username;
-  /* Check if user has a roaming profile and fill in lpProfilePath, if so. */
-  if (get_logon_server (domain, server, DS_IS_FLAT_NAME))
+  /* Check if user has a roaming profile and fill in lpProfilePath, if so.
+     Call NetUserGetInfo only for local machine accounts, use LDAP otherwise. */
+  if (!wcscasecmp (domain, cygheap->dom.account_flat_name ()))
     {
-      nas = NetUserGetInfo (server, username, 3, (PBYTE *) &ui);
-      if (NetUserGetInfo (server, username, 3, (PBYTE *) &ui) != NERR_Success)
+      NET_API_STATUS nas;
+      PUSER_INFO_3 ui;
+
+      nas = NetUserGetInfo (NULL, username, 3, (PBYTE *) &ui);
+      if (nas != NERR_Success)
 	debug_printf ("NetUserGetInfo, %u", nas);
-      else if (ui->usri3_profile && *ui->usri3_profile)
-	pi.lpProfilePath = ui->usri3_profile;
+      else
+	{
+	  if (ui->usri3_profile && *ui->usri3_profile)
+	    pi.lpProfilePath = ui->usri3_profile;
+	  NetApiBufferFree (ui);
+	}
+    }
+  else
+    {
+      cyg_ldap cldap;
+      PWCHAR dnsdomain = NULL;
+
+      if (!wcscasecmp (domain, cygheap->dom.primary_flat_name ()))
+	dnsdomain = wcsdup (cygheap->dom.primary_dns_name ());
+      else
+	{
+	  PDS_DOMAIN_TRUSTSW td = NULL;
+
+	  for (ULONG idx = 0; (td = cygheap->dom.trusted_domain (idx)); ++idx)
+	    if (!wcscasecmp (domain, td->NetbiosDomainName))
+	      {
+		dnsdomain = wcsdup (td->DnsDomainName);
+		break;
+	      }
+	}
+      if (cldap.fetch_ad_account (usersid, false, dnsdomain))
+	{
+	  PWCHAR val = cldap.get_profile_path ();
+	  if (val && *val)
+	    {
+	      wcsncpy (userpath, val, MAX_PATH - 1);
+	      userpath[MAX_PATH - 1] = L'\0';
+	      pi.lpProfilePath = userpath;
+	    }
+	}
+      free (dnsdomain);
     }
 
   if (!LoadUserProfileW (token, &pi))
     debug_printf ("LoadUserProfileW, %E");
-  /* Free buffer created by NetUserGetInfo */
-  if (nas == NERR_Success)
-    NetApiBufferFree (ui);
   return pi.hProfile;
 }
 

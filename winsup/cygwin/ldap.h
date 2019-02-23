@@ -63,4 +63,6 @@ public:
   PWCHAR get_account_name ()
 	    { return get_string_attribute (L"sAMAccountName"); }
   gid_t get_unix_gid () { return get_num_attribute (L"gidNumber"); }
+  PWCHAR get_profile_path ()
+	    { return get_string_attribute (L"profilePath"); }
 };

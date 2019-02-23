@@ -36,6 +36,7 @@ static const PCWSTR std_user_attr[] =
   L"objectSid",
   L"primaryGroupID",
   L"uidNumber",
+  L"profilePath",
   L"cygwinUnixUid",		/* TODO */
   /* windows scheme */
   L"displayName",
