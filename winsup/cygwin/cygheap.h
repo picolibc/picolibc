@@ -177,10 +177,6 @@ public:
   {
     if (curr_imp_token != NO_IMPERSONATION)
       CloseHandle (curr_imp_token);
-    if (curr_primary_token != NO_IMPERSONATION
-	&& curr_primary_token != external_token
-	&& curr_primary_token != internal_token)
-      CloseHandle (curr_primary_token);
     if (external_token != NO_IMPERSONATION)
       CloseHandle (external_token);
     if (internal_token != NO_IMPERSONATION)
