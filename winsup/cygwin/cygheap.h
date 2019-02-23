@@ -106,6 +106,9 @@ public:
   HANDLE curr_primary_token;	 /* Just a copy of external or internal token */
   HANDLE curr_imp_token;	 /* impersonation token derived from primary
 				    token */
+  HANDLE imp_profile_token;	 /* Handle to the token used to load the
+				    user profile in "imp_profile" */
+  HANDLE imp_profile;		 /* Handle to the user profile */
   bool ext_token_is_restricted;  /* external_token is restricted token */
   bool curr_token_is_restricted; /* curr_primary_token is restricted token */
   bool setuid_to_restricted;     /* switch to restricted token by setuid () */

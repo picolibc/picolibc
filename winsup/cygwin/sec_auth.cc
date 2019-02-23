@@ -306,6 +306,12 @@ load_user_profile (HANDLE token, struct passwd *pw, cygpsid &usersid)
   return pi.hProfile;
 }
 
+bool
+unload_user_profile (HANDLE token, HANDLE profile)
+{
+  return UnloadUserProfile (token, profile);
+}
+
 HANDLE
 lsa_open_policy (PWCHAR server, ACCESS_MASK access)
 {

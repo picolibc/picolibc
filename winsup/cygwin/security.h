@@ -502,6 +502,7 @@ PWCHAR get_user_profile_directory (PCWSTR sidstr, PWCHAR path, SIZE_T path_len);
 
 /* Load user profile if it's not already loaded. */
 HANDLE load_user_profile (HANDLE token, struct passwd *pw, cygpsid &sid);
+bool unload_user_profile (HANDLE token, HANDLE profile);
 
 HANDLE lsa_open_policy (PWCHAR server, ACCESS_MASK access);
 void lsa_close_policy (HANDLE lsa);
