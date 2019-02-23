@@ -224,6 +224,7 @@ pinfo::exit (DWORD n)
     exitcode = ((exitcode & 0xff) << 8) | ((exitcode >> 8) & 0xff);
   sigproc_printf ("Calling dlls.cleanup_forkables n %y, exitcode %y", n, exitcode);
   dlls.cleanup_forkables ();
+  cygheap->user.exit ();
   sigproc_printf ("Calling ExitProcess n %y, exitcode %y", n, exitcode);
   if (!TerminateProcess (GetCurrentProcess (), exitcode))
     system_printf ("TerminateProcess failed, %E");

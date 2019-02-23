@@ -193,6 +193,11 @@ public:
   {
     return effec_cygsid.string (buf);
   }
+  void exit ()
+  {
+    if (imp_profile_token && imp_profile)
+      unload_user_profile (imp_profile_token, imp_profile);
+  }
 
   const char __reg3 *test_uid (char *&, const char *, size_t);
 };
