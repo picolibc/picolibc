@@ -1871,6 +1871,26 @@ fhandler_signalfd::select_except (select_stuff *stuff)
   return s;
 }
 
+static int
+peek_timerfd (select_record *me, bool)
+{
+  if (WaitForSingleObject (me->h, 0) == WAIT_OBJECT_0)
+    {
+      select_printf ("timerfd %d ready", me->fd);
+      me->read_ready = true;
+      return 1;
+    }
+  select_printf ("timerfd %d not ready", me->fd);
+  return 0;
+}
+
+static int
+verify_timerfd (select_record *me, fd_set *rfds, fd_set *wfds,
+		fd_set *efds)
+{
+  return peek_timerfd (me, true);
+}
+
 select_record *
 fhandler_timerfd::select_read (select_stuff *stuff)
 {
@@ -1878,11 +1898,12 @@ fhandler_timerfd::select_read (select_stuff *stuff)
   if (!s->startup)
     {
       s->startup = no_startup;
-      s->verify = verify_ok;
+      s->verify = verify_timerfd;
     }
   s->h = get_timerfd_handle ();
+  s->peek = peek_timerfd;
   s->read_selected = true;
-  s->read_ready = true;
+  s->read_ready = false;
   return s;
 }
 
