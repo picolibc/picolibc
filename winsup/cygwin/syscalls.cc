@@ -3612,7 +3612,11 @@ seteuid32 (uid_t uid)
 	  cygheap->user.imp_profile = load_user_profile (new_token, pw_new,
 							 usersid);
 	  if (cygheap->user.imp_profile)
-	    cygheap->user.imp_profile_token = new_token;
+	    {
+	      cygheap->user.imp_profile_token = new_token;
+	      SetHandleInformation (cygheap->user.imp_profile,
+				    HANDLE_FLAG_INHERIT, HANDLE_FLAG_INHERIT);
+	    }
 	}
 
       /* Try setting owner to same value as user. */
