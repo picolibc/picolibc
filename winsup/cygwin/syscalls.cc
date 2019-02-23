@@ -3479,7 +3479,7 @@ seteuid32 (uid_t uid)
 
   cygsid usersid;
   user_groups &groups = cygheap->user.groups;
-  HANDLE new_token = INVALID_HANDLE_VALUE;
+  HANDLE new_token = NULL;
   struct passwd * pw_new;
   bool token_is_internal, issamesid = false;
 
@@ -3550,7 +3550,7 @@ seteuid32 (uid_t uid)
   /* If no impersonation token is available, try to authenticate using
      LSA private data stored password, LSA authentication using our own
      LSA module, or, as last chance, NtCreateToken. */
-  if (new_token == INVALID_HANDLE_VALUE)
+  if (new_token == NULL)
     {
       new_token = lsaprivkeyauth (pw_new);
       if (new_token)
