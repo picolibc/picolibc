@@ -12,6 +12,9 @@ Bug Fixes
 - Fix timerfd select always returning immediately.
   Addresses: https://cygwin.com/ml/cygwin/2019-02/msg00364.html
 
+- Fix fork/exec failing to restore timerfd share mem in child process.
+  Addresses: https://cygwin.com/ml/cygwin/2019-02/msg00400.html
+
 - Drop enforcing case-correct group names for AD accounts to avoid
   excessively long startup times.
   Addresses: https://cygwin.com/ml/cygwin/2019-02/msg00301.html

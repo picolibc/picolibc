@@ -408,6 +408,7 @@ void
 timerfd_tracker::fixup_after_fork_exec (bool execing)
 {
   NTSTATUS status;
+  PVOID base_address = NULL;
   OBJECT_ATTRIBUTES attr;
   SIZE_T vsize = PAGE_SIZE;
 
@@ -416,11 +417,12 @@ timerfd_tracker::fixup_after_fork_exec (bool execing)
     return;
   /* Recreate shared section mapping */
   status = NtMapViewOfSection (tfd_shared_hdl, NtCurrentProcess (),
-			       (void **) &tfd_shared, 0, PAGE_SIZE, NULL,
-			       &vsize, ViewShare, MEM_TOP_DOWN, PAGE_READWRITE);
+			       &base_address, 0, PAGE_SIZE, NULL,
+			       &vsize, ViewShare, 0, PAGE_READWRITE);
   if (!NT_SUCCESS (status))
-    api_fatal ("Can't recreate shared timerfd section during %s!",
-	       execing ? "execve" : "fork");
+    api_fatal ("Can't recreate shared timerfd section during %s, status %y!",
+	       execing ? "execve" : "fork", status);
+  tfd_shared = (timerfd_shared *) base_address;
   /* Increment global instance count by the number of instances in this
      process */
   InterlockedAdd (&tfd_shared->instance_count, local_instance_count);
@@ -430,8 +432,8 @@ timerfd_tracker::fixup_after_fork_exec (bool execing)
   status = NtCreateEvent (&cancel_evt, EVENT_ALL_ACCESS, &attr,
 			  NotificationEvent, FALSE);
   if (!NT_SUCCESS (status))
-    api_fatal ("Can't recreate timerfd cancel event during %s!",
-	       execing ? "execve" : "fork");
+    api_fatal ("Can't recreate timerfd cancel event during %s, status %y!",
+	       execing ? "execve" : "fork", status);
   /* Set winpid so we don't run this twice */
   winpid = GetCurrentProcessId ();
   new cygthread (timerfd_thread, this, "timerfd", sync_thr);
