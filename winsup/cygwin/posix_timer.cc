@@ -245,7 +245,7 @@ timer_tracker::gettime (itimerspec *curr_value, bool lock)
 	  return -EINVAL;
 	}
     }
-  if (!cancel_evt)
+  if (!time_spec.it_value.tv_sec && !time_spec.it_value.tv_nsec)
     memset (curr_value, 0, sizeof (*curr_value));
   else
     {
