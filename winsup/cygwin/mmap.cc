@@ -145,8 +145,7 @@ CreateMapping (HANDLE fhdl, size_t len, off_t off, DWORD openflags,
   ULONG attributes = attached (prot) ? SEC_RESERVE : SEC_COMMIT;
 
   OBJECT_ATTRIBUTES oa;
-  InitializeObjectAttributes (&oa, NULL, OBJ_INHERIT, NULL,
-			      sec_none.lpSecurityDescriptor);
+  InitializeObjectAttributes (&oa, NULL, OBJ_INHERIT, NULL, NULL);
 
   if (fhdl == INVALID_HANDLE_VALUE)
     {

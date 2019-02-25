@@ -306,8 +306,7 @@ timer_tracker::settime (int flags, const itimerspec *new_value,
 	    {
 	      OBJECT_ATTRIBUTES attr;
 
-	      InitializeObjectAttributes (&attr, NULL, 0, NULL,
-					  sec_none_nih.lpSecurityDescriptor);
+	      InitializeObjectAttributes (&attr, NULL, 0, NULL, NULL);
 	      status = NtCreateEvent (&cancel_evt, EVENT_ALL_ACCESS, &attr,
 				      NotificationEvent, FALSE);
 	      if (!NT_SUCCESS (status))

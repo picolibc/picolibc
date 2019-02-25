@@ -58,8 +58,7 @@ mkdirs (PWCHAR ntdirname, int lastsepcount)
 	  UNICODE_STRING dn;
 	  RtlInitUnicodeString (&dn, ntdirname);
 	  OBJECT_ATTRIBUTES oa;
-	  InitializeObjectAttributes (&oa, &dn, 0, NULL,
-				      sec_none_nih.lpSecurityDescriptor);
+	  InitializeObjectAttributes (&oa, &dn, 0, NULL, NULL);
 	  HANDLE dh = NULL;
 	  NTSTATUS status;
 	  IO_STATUS_BLOCK iosb;
@@ -765,8 +764,7 @@ dll_list::create_forkables ()
       RtlInitUnicodeString (&fn, ntname);
 
       OBJECT_ATTRIBUTES oa;
-      InitializeObjectAttributes (&oa, &fn, 0, NULL,
-				  sec_none_nih.lpSecurityDescriptor);
+      InitializeObjectAttributes (&oa, &fn, 0, NULL, NULL);
       HANDLE hlocal = NULL;
       NTSTATUS status;
       IO_STATUS_BLOCK iosb;
