@@ -28,10 +28,9 @@ timerfd_tracker::create_timechange_window ()
   WNDCLASSW wclass = { 0 };
   WCHAR cname[NAME_MAX];
 
-  __small_swprintf (cname, L"Cygwin.timerfd.%u", winpid);
+  __small_swprintf (cname, L"Cygwin.timerfd.%p", this);
   wclass.lpfnWndProc = DefWindowProcW;
-  wclass.hInstance = GetModuleHandle (NULL);
-  wclass.hbrBackground = (HBRUSH) (COLOR_WINDOW + 1);
+  wclass.hInstance = user_data->hmodule;
   wclass.lpszClassName = cname;
   atom = RegisterClassW (&wclass);
   if (!atom)
@@ -39,9 +38,9 @@ timerfd_tracker::create_timechange_window ()
   else
     {
       window = CreateWindowExW (0, cname, cname, WS_POPUP, 0, 0, 0, 0,
-				NULL, NULL, NULL, NULL);
+				NULL, NULL, user_data->hmodule, NULL);
       if (!window)
-	debug_printf ("RegisterClass %E");
+	debug_printf ("CreateWindowEx %E");
     }
 }
 
@@ -51,7 +50,7 @@ timerfd_tracker::delete_timechange_window ()
   if (window)
     DestroyWindow (window);
   if (atom)
-    UnregisterClassW ((LPWSTR) (uintptr_t) atom, GetModuleHandle (NULL));
+    UnregisterClassW ((LPWSTR) (uintptr_t) atom, user_data->hmodule);
 }
 
 void
@@ -59,12 +58,13 @@ timerfd_tracker::handle_timechange_window ()
 {
   MSG msg;
 
-  if (PeekMessageW(&msg, NULL, 0, 0, PM_REMOVE) && msg.message != WM_QUIT)
+  while (PeekMessageW (&msg, NULL, 0, 0, PM_REMOVE | PM_QS_POSTMESSAGE)
+	 && msg.message != WM_QUIT)
     {
-      DispatchMessageW(&msg);
+      DispatchMessageW (&msg);
       if (msg.message == WM_TIMECHANGE
 	  && get_clockid () == CLOCK_REALTIME
-	  && (flags () & TFD_CANCEL_FLAGS) == TFD_CANCEL_FLAGS
+	  && (get_flags () & TFD_CANCEL_FLAGS) == TFD_CANCEL_FLAGS
 	  && enter_critical_section ())
 	{
 	  /* make sure to handle each WM_TIMECHANGE only once! */
@@ -84,7 +84,7 @@ DWORD
 timerfd_tracker::thread_func ()
 {
   /* Outer loop: Is the timer armed?  If not, wait for it. */
-  HANDLE armed[2] = { tfd_shared->arm_evt (),
+  HANDLE armed[2] = { arm_evt (),
 		      cancel_evt };
 
   create_timechange_window ();
@@ -105,8 +105,8 @@ timerfd_tracker::thread_func ()
 	}
 
       /* Inner loop: Timer expired?  If not, wait for it. */
-      HANDLE expired[3] = { tfd_shared->timer (),
-			    tfd_shared->disarm_evt (),
+      HANDLE expired[3] = { timer (),
+			    disarm_evt (),
 			    cancel_evt };
 
       while (1)
@@ -133,7 +133,7 @@ timerfd_tracker::thread_func ()
 	  /* Make sure we haven't been abandoned and/or disarmed
 	     in the meantime */
 	  if (expiration_count () == -1LL
-	      || IsEventSignalled (tfd_shared->disarm_evt ()))
+	      || IsEventSignalled (disarm_evt ()))
 	    {
 	      leave_critical_section ();
 	      goto disarmed;
@@ -176,8 +176,7 @@ timerfd_tracker::thread_func ()
 				    || get_clockid () == CLOCK_BOOTTIME_ALARM);
 		  LARGE_INTEGER DueTime = { QuadPart: -get_interval () };
 
-		  NtSetTimer (tfd_shared->timer (), &DueTime, NULL, NULL,
-			      Resume, 0, NULL);
+		  NtSetTimer (timer (), &DueTime, NULL, NULL, Resume, 0, NULL);
 		}
 	    }
 	  /* Arm the expiry object */
@@ -190,7 +189,8 @@ disarmed:
 
 canceled:
   delete_timechange_window ();
-  _my_tls._ctinfo->auto_release ();     /* automatically return the cygthread to the cygthread pool */
+  /* automatically return the cygthread to the cygthread pool */
+  _my_tls._ctinfo->auto_release ();
   return 0;
 }
 
@@ -202,20 +202,40 @@ timerfd_thread (VOID *arg)
 }
 
 int
-timerfd_shared::create (clockid_t clock_id)
+timerfd_tracker::create (clockid_t clock_id)
 {
   int ret;
   NTSTATUS status;
   OBJECT_ATTRIBUTES attr;
 
-  /* Create access mutex */
-  InitializeObjectAttributes (&attr, NULL, OBJ_INHERIT, NULL,
-			      sec_none.lpSecurityDescriptor);
-  status = NtCreateMutant (&_access_mtx, MUTEX_ALL_ACCESS, &attr, FALSE);
+  const ACCESS_MASK access = STANDARD_RIGHTS_REQUIRED
+			     | SECTION_MAP_READ | SECTION_MAP_WRITE;
+  SIZE_T vsize = PAGE_SIZE;
+  LARGE_INTEGER sectionsize = { QuadPart: PAGE_SIZE };
+
+  /* Valid clock? */
+  if (!get_clock (clock_id))
+    {
+      ret = -EINVAL;
+      goto err;
+    }
+
+  /* Create shared objects */
+  InitializeObjectAttributes (&attr, NULL, OBJ_INHERIT, NULL, NULL);
+  /* Create shared section */
+  status = NtCreateSection (&tfd_shared_hdl, access, &attr, &sectionsize,
+			    PAGE_READWRITE, SEC_COMMIT, NULL);
   if (!NT_SUCCESS (status))
     {
       ret = -geterrno_from_nt_status (status);
       goto err;
+    }
+  /* Create access mutex */
+  status = NtCreateMutant (&_access_mtx, MUTEX_ALL_ACCESS, &attr, FALSE);
+  if (!NT_SUCCESS (status))
+    {
+      ret = -geterrno_from_nt_status (status);
+      goto err_close_tfd_shared_hdl;
     }
   /* Create "timer is armed" event, set to "Unsignaled" at creation time */
   status = NtCreateEvent (&_arm_evt, EVENT_ALL_ACCESS, &attr,
@@ -249,10 +269,48 @@ timerfd_shared::create (clockid_t clock_id)
       ret = -geterrno_from_nt_status (status);
       goto err_close_timer;
     }
-  instance_count = 1;
-  _clockid = clock_id;
+  /* Create process-local cancel event for this processes timer thread
+     (has to be recreated after fork/exec)*/
+  InitializeObjectAttributes (&attr, NULL, 0, NULL, NULL);
+  status = NtCreateEvent (&cancel_evt, EVENT_ALL_ACCESS, &attr,
+			  NotificationEvent, FALSE);
+  if (!NT_SUCCESS (status))
+    {
+      ret = -geterrno_from_nt_status (status);
+      goto err_close_expired_evt;
+    }
+  /* Create sync event for this processes timer thread */
+  status = NtCreateEvent (&sync_thr, EVENT_ALL_ACCESS, &attr,
+			  NotificationEvent, FALSE);
+  if (!NT_SUCCESS (status))
+    {
+      ret = -geterrno_from_nt_status (status);
+      goto err_close_cancel_evt;
+    }
+  /* Create section mapping (has to be recreated after fork/exec) */
+  tfd_shared = NULL;
+  status = NtMapViewOfSection (tfd_shared_hdl, NtCurrentProcess (),
+			       (void **) &tfd_shared, 0, PAGE_SIZE, NULL,
+			       &vsize, ViewShare, 0, PAGE_READWRITE);
+  if (!NT_SUCCESS (status))
+    {
+      ret = -geterrno_from_nt_status (status);
+      goto err_close_sync_thr;
+    }
+  /* Initialize clock id */
+  set_clockid (clock_id);
+  /* Set our winpid for fixup_after_fork_exec */
+  winpid = GetCurrentProcessId ();
+  /* Start timerfd thread */
+  new cygthread (timerfd_thread, this, "timerfd", sync_thr);
   return 0;
 
+err_close_sync_thr:
+  NtClose (sync_thr);
+err_close_cancel_evt:
+  NtClose (cancel_evt);
+err_close_expired_evt:
+  NtClose (_expired_evt);
 err_close_timer:
   NtClose (_timer);
 err_close_disarm_evt:
@@ -261,118 +319,43 @@ err_close_arm_evt:
   NtClose (_arm_evt);
 err_close_access_mtx:
   NtClose (_access_mtx);
-err:
-  return ret;
-}
-
-int
-timerfd_tracker::create (clockid_t clock_id)
-{
-  int ret;
-  NTSTATUS status;
-  OBJECT_ATTRIBUTES attr;
-
-  const ACCESS_MASK access = STANDARD_RIGHTS_REQUIRED
-			     | SECTION_MAP_READ | SECTION_MAP_WRITE;
-  SIZE_T vsize = PAGE_SIZE;
-  LARGE_INTEGER sectionsize = { QuadPart: PAGE_SIZE };
-
-  /* Valid clock? */
-  if (!get_clock (clock_id))
-    {
-      ret = -EINVAL;
-      goto err;
-    }
-  /* Create shared section. */
-  InitializeObjectAttributes (&attr, NULL, OBJ_INHERIT, NULL,
-			      sec_none.lpSecurityDescriptor);
-  status = NtCreateSection (&tfd_shared_hdl, access, &attr,
-			    &sectionsize, PAGE_READWRITE,
-			    SEC_COMMIT, NULL);
-  if (!NT_SUCCESS (status))
-    {
-      ret = -geterrno_from_nt_status (status);
-      goto err;
-    }
-  /* Create section mapping (has to be repeated after fork/exec */
-  status = NtMapViewOfSection (tfd_shared_hdl, NtCurrentProcess (),
-			       (void **) &tfd_shared, 0, PAGE_SIZE, NULL,
-			       &vsize, ViewShare, MEM_TOP_DOWN, PAGE_READWRITE);
-  if (!NT_SUCCESS (status))
-    {
-      ret = -geterrno_from_nt_status (status);
-      goto err_close_tfd_shared_hdl;
-    }
-  /* Create cancel even for this processes timer thread */
-  InitializeObjectAttributes (&attr, NULL, 0, NULL,
-			      sec_none_nih.lpSecurityDescriptor);
-  status = NtCreateEvent (&cancel_evt, EVENT_ALL_ACCESS, &attr,
-			  NotificationEvent, FALSE);
-  if (!NT_SUCCESS (status))
-    {
-      ret = -geterrno_from_nt_status (status);
-      goto err_unmap_tfd_shared;
-    }
-  ret = tfd_shared->create (clock_id);
-  if (ret < 0)
-    goto err_close_cancel_evt;
-  winpid = GetCurrentProcessId ();
-  new cygthread (timerfd_thread, this, "timerfd", sync_thr);
-  return 0;
-
-err_close_cancel_evt:
-  NtClose (cancel_evt);
-err_unmap_tfd_shared:
-  NtUnmapViewOfSection (NtCurrentProcess (), tfd_shared);
 err_close_tfd_shared_hdl:
   NtClose (tfd_shared_hdl);
 err:
   return ret;
 }
 
-/* Return true if this was the last instance of a timerfd, session-wide,
-   false otherwise */
-bool
-timerfd_shared::dtor ()
-{
-  if (instance_count > 0)
-    {
-      return false;
-    }
-  disarm_timer ();
-  NtClose (_timer);
-  NtClose (_arm_evt);
-  NtClose (_disarm_evt);
-  NtClose (_expired_evt);
-  NtClose (_access_mtx);
-  return true;
-}
-
-/* Return true if this was the last instance of a timerfd, session-wide,
+/* Return true if this was the last instance of a timerfd, process-wide,
    false otherwise.  Basically this is a destructor, but one which may
    notify the caller NOT to deleted the object. */
 bool
 timerfd_tracker::dtor ()
 {
-  if (enter_critical_section ())
+  if (!enter_critical_section ())
+    return false;
+  if (decrement_instances () > 0)
     {
-      if (local_instance_count > 0)
-	{
-	  leave_critical_section ();
-	  return false;
-	}
-      SetEvent (cancel_evt);
-      WaitForSingleObject (sync_thr, INFINITE);
-      if (tfd_shared->dtor ())
-	{
-	  NtUnmapViewOfSection (NtCurrentProcess (), tfd_shared);
-	  NtClose (tfd_shared_hdl);
-	}
-      else
-	leave_critical_section ();
+      leave_critical_section ();
+      return false;
     }
-  NtClose (cancel_evt);
-  NtClose (sync_thr);
+  if (cancel_evt)
+    SetEvent (cancel_evt);
+  if (sync_thr)
+    {
+      WaitForSingleObject (sync_thr, INFINITE);
+      NtClose (sync_thr);
+    }
+  leave_critical_section ();
+  if (tfd_shared)
+    NtUnmapViewOfSection (NtCurrentProcess (), tfd_shared);
+  if (cancel_evt)
+    NtClose (cancel_evt);
+  NtClose (tfd_shared_hdl);
+  NtClose (_expired_evt);
+  NtClose (_timer);
+  NtClose (_disarm_evt);
+  NtClose (_arm_evt);
+  NtClose (_access_mtx);
   return true;
 }
 
@@ -381,13 +364,6 @@ timerfd_tracker::dtor (timerfd_tracker *tfd)
 {
   if (tfd->dtor ())
     cfree (tfd);
-}
-
-void
-timerfd_tracker::close ()
-{
-  InterlockedDecrement (&local_instance_count);
-  InterlockedDecrement (&tfd_shared->instance_count);
 }
 
 int
@@ -405,10 +381,21 @@ timerfd_tracker::ioctl_set_ticks (uint64_t new_exp_cnt)
 }
 
 void
+timerfd_tracker::init_fixup_after_fork_exec ()
+{
+  /* Run this only if this is the first call, or all previous calls
+     came from close_on_exec descriptors */
+  if (winpid == GetCurrentProcessId ())
+    return;
+  tfd_shared = NULL;
+  cancel_evt = NULL;
+  sync_thr = NULL;
+}
+
+void
 timerfd_tracker::fixup_after_fork_exec (bool execing)
 {
   NTSTATUS status;
-  PVOID base_address = NULL;
   OBJECT_ATTRIBUTES attr;
   SIZE_T vsize = PAGE_SIZE;
 
@@ -416,23 +403,26 @@ timerfd_tracker::fixup_after_fork_exec (bool execing)
   if (winpid == GetCurrentProcessId ())
     return;
   /* Recreate shared section mapping */
+  tfd_shared = NULL;
   status = NtMapViewOfSection (tfd_shared_hdl, NtCurrentProcess (),
-			       &base_address, 0, PAGE_SIZE, NULL,
+			       (PVOID *) &tfd_shared, 0, PAGE_SIZE, NULL,
 			       &vsize, ViewShare, 0, PAGE_READWRITE);
   if (!NT_SUCCESS (status))
     api_fatal ("Can't recreate shared timerfd section during %s, status %y!",
 	       execing ? "execve" : "fork", status);
-  tfd_shared = (timerfd_shared *) base_address;
-  /* Increment global instance count by the number of instances in this
-     process */
-  InterlockedAdd (&tfd_shared->instance_count, local_instance_count);
-  /* Create cancel even for this processes timer thread */
-  InitializeObjectAttributes (&attr, NULL, 0, NULL,
-			      sec_none_nih.lpSecurityDescriptor);
+  /* Create cancel event for this processes timer thread */
+  InitializeObjectAttributes (&attr, NULL, 0, NULL, NULL);
   status = NtCreateEvent (&cancel_evt, EVENT_ALL_ACCESS, &attr,
 			  NotificationEvent, FALSE);
   if (!NT_SUCCESS (status))
     api_fatal ("Can't recreate timerfd cancel event during %s, status %y!",
+	       execing ? "execve" : "fork", status);
+  /* Create sync event for this processes timer thread */
+  InitializeObjectAttributes (&attr, NULL, 0, NULL, NULL);
+  status = NtCreateEvent (&sync_thr, EVENT_ALL_ACCESS, &attr,
+			  NotificationEvent, FALSE);
+  if (!NT_SUCCESS (status))
+    api_fatal ("Can't recreate timerfd sync event during %s, status %y!",
 	       execing ? "execve" : "fork", status);
   /* Set winpid so we don't run this twice */
   winpid = GetCurrentProcessId ();
@@ -509,7 +499,7 @@ timerfd_tracker::gettime (struct itimerspec *curr_value)
 
   __try
     {
-      if (IsEventSignalled (tfd_shared->disarm_evt ()))
+      if (IsEventSignalled (disarm_evt ()))
 	*curr_value = time_spec ();
       else
 	{
@@ -532,27 +522,28 @@ timerfd_tracker::gettime (struct itimerspec *curr_value)
 }
 
 int
-timerfd_shared::arm_timer (int flags, const struct itimerspec *new_value)
+timerfd_tracker::arm_timer (int flags, const struct itimerspec *new_value)
 {
+  LONG64 interval;
   LONG64 ts;
   NTSTATUS status;
   LARGE_INTEGER DueTime;
   BOOLEAN Resume;
   LONG Period;
 
-  ResetEvent (_disarm_evt);
+  ResetEvent (disarm_evt ());
 
   /* Convert incoming itimerspec into 100ns interval and timestamp */
-  _interval = new_value->it_interval.tv_sec * NS100PERSEC
-	      + (new_value->it_interval.tv_nsec + (NSPERSEC / NS100PERSEC) - 1)
-		/ (NSPERSEC / NS100PERSEC);
+  interval = new_value->it_interval.tv_sec * NS100PERSEC
+	     + (new_value->it_interval.tv_nsec + (NSPERSEC / NS100PERSEC) - 1)
+	       / (NSPERSEC / NS100PERSEC);
   ts = new_value->it_value.tv_sec * NS100PERSEC
 	    + (new_value->it_value.tv_nsec + (NSPERSEC / NS100PERSEC) - 1)
 	      / (NSPERSEC / NS100PERSEC);
-  _flags = flags;
+  set_flags (flags);
   if (flags & TFD_TIMER_ABSTIME)
     {
-      if (_clockid == CLOCK_REALTIME)
+      if (get_clockid () == CLOCK_REALTIME)
 	DueTime.QuadPart = ts + FACTOR;
       else /* non-REALTIME clocks require relative DueTime. */
 	{
@@ -570,17 +561,18 @@ timerfd_shared::arm_timer (int flags, const struct itimerspec *new_value)
       DueTime.QuadPart = -ts;
       ts += get_clock_now ();
     }
-  set_exp_ts (ts);
   time_spec () = *new_value;
+  set_exp_ts (ts);
+  set_interval (interval);
   read_and_reset_expiration_count ();
   /* Note: Advanced Power Settings -> Sleep -> Allow Wake Timers
 	   since W10 1709 */
-  Resume = (_clockid == CLOCK_REALTIME_ALARM
-	    || _clockid == CLOCK_BOOTTIME_ALARM);
-  if (_interval > INT_MAX * (NS100PERSEC / MSPERSEC))
+  Resume = (get_clockid () == CLOCK_REALTIME_ALARM
+	    || get_clockid () == CLOCK_BOOTTIME_ALARM);
+  if (interval > INT_MAX * (NS100PERSEC / MSPERSEC))
     Period = 0;
   else
-    Period = (_interval + (NS100PERSEC / MSPERSEC) - 1)
+    Period = (interval + (NS100PERSEC / MSPERSEC) - 1)
 	     / (NS100PERSEC / MSPERSEC);
   status = NtSetTimer (timer (), &DueTime, NULL, NULL, Resume, Period, NULL);
   if (!NT_SUCCESS (status))
@@ -589,7 +581,7 @@ timerfd_shared::arm_timer (int flags, const struct itimerspec *new_value)
       return -geterrno_from_nt_status (status);
     }
 
-  SetEvent (_arm_evt);
+  SetEvent (arm_evt ());
   return 0;
 }
 

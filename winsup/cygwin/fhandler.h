@@ -2682,7 +2682,7 @@ class fhandler_timerfd : public fhandler_base
  public:
   fhandler_timerfd ();
   fhandler_timerfd (void *) {}
-  ~fhandler_timerfd ();
+  ~fhandler_timerfd () {}
 
   fhandler_timerfd *is_timerfd () { return this; }
 

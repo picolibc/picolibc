@@ -30,21 +30,17 @@ fhandler_timerfd::get_proc_fd_name (char *buf)
 /* The timers connected to a descriptor are stored on the cygheap
    together with their fhandler. */
 
-#define cnew(name, ...) \
-  ({ \
-    void* ptr = (void*) ccalloc (HEAP_FHANDLER, 1, sizeof (name)); \
-    ptr ? new (ptr) name (__VA_ARGS__) : NULL; \
-  })
-
 int
 fhandler_timerfd::timerfd (clockid_t clock_id, int flags)
 {
-  timerfd_tracker *tfd = cnew (timerfd_tracker);
+  timerfd_tracker *tfd = (timerfd_tracker *)
+			 ccalloc (HEAP_FHANDLER, 1, sizeof (timerfd_tracker));
   if (!tfd)
     {
       set_errno (ENOMEM);
       return -1;
     }
+  new (tfd) timerfd_tracker ();
   int ret = tfd->create (clock_id);
   if (ret < 0)
     {
@@ -178,7 +174,7 @@ fhandler_timerfd::dup (fhandler_base *child, int flags)
       __try
 	{
 	  timerfd_tracker *tfd = (timerfd_tracker *) fhc->timerid;
-	  tfd->increment_instances ();
+	  tfd->dup ();
 	  ret = 0;
 	}
       __except (EFAULT) {}
@@ -234,21 +230,11 @@ fhandler_timerfd::fixup_after_exec ()
   __try
     {
       timerfd_tracker *tfd = (timerfd_tracker *) timerid;
+      tfd->init_fixup_after_fork_exec ();
       if (close_on_exec ())
-	tfd->decrement_instances ();
+	timerfd_tracker::dtor (tfd);
       else
 	tfd->fixup_after_exec ();
-    }
-  __except (EFAULT) {}
-  __endtry
-}
-
-fhandler_timerfd::~fhandler_timerfd ()
-{
-  __try
-    {
-      timerfd_tracker *tfd = (timerfd_tracker *) timerid;
-      timerfd_tracker::dtor (tfd);
     }
   __except (EFAULT) {}
   __endtry
@@ -262,7 +248,7 @@ fhandler_timerfd::close ()
   __try
     {
       timerfd_tracker *tfd = (timerfd_tracker *) timerid;
-      tfd->close ();
+      timerfd_tracker::dtor (tfd);
       ret = 0;
     }
   __except (EFAULT) {}
