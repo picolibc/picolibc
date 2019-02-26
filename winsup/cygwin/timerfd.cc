@@ -32,6 +32,15 @@ timerfd_tracker::create_timechange_window ()
   wclass.lpfnWndProc = DefWindowProcW;
   wclass.hInstance = user_data->hmodule;
   wclass.lpszClassName = cname;
+  /* This sleep is required on Windows 10 64 bit only, and only when running
+     under strace.  One of the child processes inheriting the timerfd
+     descriptor will get a STATUS_FLOAT_INEXACT_RESULT exception inside of
+     msvcrt.dll.  While this is completely crazy in itself, it's apparently
+     some timing problem.  It occurs in 4 out of 5 runs under strace only.
+     The sleep is required before calling RegisterClassW.  Moving it before
+     CreateWindowExW does not work.  What the heck? */
+  if (being_debugged ())
+    Sleep (1L);
   atom = RegisterClassW (&wclass);
   if (!atom)
     debug_printf ("RegisterClass %E");
