@@ -210,8 +210,8 @@ timerfd_tracker::create (clockid_t clock_id)
 
   const ACCESS_MASK access = STANDARD_RIGHTS_REQUIRED
 			     | SECTION_MAP_READ | SECTION_MAP_WRITE;
-  SIZE_T vsize = PAGE_SIZE;
-  LARGE_INTEGER sectionsize = { QuadPart: PAGE_SIZE };
+  SIZE_T vsize = wincap.page_size ();
+  LARGE_INTEGER sectionsize = { QuadPart: (LONGLONG) wincap.page_size () };
 
   /* Valid clock? */
   if (!get_clock (clock_id))
@@ -290,7 +290,7 @@ timerfd_tracker::create (clockid_t clock_id)
   /* Create section mapping (has to be recreated after fork/exec) */
   tfd_shared = NULL;
   status = NtMapViewOfSection (tfd_shared_hdl, NtCurrentProcess (),
-			       (void **) &tfd_shared, 0, PAGE_SIZE, NULL,
+			       (void **) &tfd_shared, 0, vsize, NULL,
 			       &vsize, ViewShare, 0, PAGE_READWRITE);
   if (!NT_SUCCESS (status))
     {
@@ -397,7 +397,7 @@ timerfd_tracker::fixup_after_fork_exec (bool execing)
 {
   NTSTATUS status;
   OBJECT_ATTRIBUTES attr;
-  SIZE_T vsize = PAGE_SIZE;
+  SIZE_T vsize = wincap.page_size ();
 
   /* Run this only once per process */
   if (winpid == GetCurrentProcessId ())
@@ -405,7 +405,7 @@ timerfd_tracker::fixup_after_fork_exec (bool execing)
   /* Recreate shared section mapping */
   tfd_shared = NULL;
   status = NtMapViewOfSection (tfd_shared_hdl, NtCurrentProcess (),
-			       (PVOID *) &tfd_shared, 0, PAGE_SIZE, NULL,
+			       (PVOID *) &tfd_shared, 0, vsize, NULL,
 			       &vsize, ViewShare, 0, PAGE_READWRITE);
   if (!NT_SUCCESS (status))
     api_fatal ("Can't recreate shared timerfd section during %s, status %y!",
