@@ -401,7 +401,7 @@ fesetprec (int prec)
   unsigned short cw;
 
   /* Will succeed for any valid value of the input parameter.  */
-  if (prec < FE_SINGLEPREC || prec > FE_EXTENDEDPREC)
+  if (prec < FE_FLTPREC || prec > FE_LDBLPREC)
     return EINVAL;
 
   /* Get control word.  */

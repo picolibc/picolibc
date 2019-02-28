@@ -1319,8 +1319,6 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     fedisableexcept
     feenableexcept
     fegetexcept
-    fegetprec
-    fesetprec
     ffsl
     ffsll
     fgets_unlocked
@@ -1443,6 +1441,8 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     acltotext
     endmntent
     facl
+    fegetprec
+    fesetprec
     futimesat
     getmntent
     memalign
