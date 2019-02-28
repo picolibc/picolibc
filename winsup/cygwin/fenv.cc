@@ -391,18 +391,30 @@ fegetprec (void)
   return (cw & FE_CW_PREC_MASK) >> FE_CW_PREC_SHIFT;
 }
 
-/*  Changes the currently selected precision to prec. If prec does not
-   correspond to one of the supported rounding modes nothing is changed.
-   fesetprec returns zero if it changed the precision, or a nonzero value
-   if the mode is not supported.  */
+/* http://www.open-std.org/jtc1/sc22//WG14/www/docs/n752.htm:
+
+   The fesetprec function establishes the precision represented by its
+   argument prec.  If the argument does not match a precision macro, the
+   precision is not changed.
+
+   The fesetprec function returns a nonzero value if and only if the
+   argument matches a precision macro (that is, if and only if the requested
+   precision can be established). */
 int
 fesetprec (int prec)
 {
   unsigned short cw;
 
   /* Will succeed for any valid value of the input parameter.  */
-  if (prec < FE_SINGLEPREC || prec > FE_EXTENDEDPREC)
-    return EINVAL;
+  switch (prec)
+    {
+    case FE_FLTPREC:
+    case FE_DBLPREC:
+    case FE_LDBLPREC:
+      break;
+    default:
+      return 0;
+    }
 
   /* Get control word.  */
   __asm__ volatile ("fnstcw %0" : "=m" (cw) : );
@@ -415,7 +427,7 @@ fesetprec (int prec)
   __asm__ volatile ("fldcw %0" :: "m" (cw));
 
   /* Indicate success.  */
-  return 0;
+  return 1;
 }
 
 /*  Set up the FPU and SSE environment at the start of execution.  */
