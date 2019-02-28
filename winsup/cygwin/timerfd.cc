@@ -15,6 +15,7 @@ details. */
 #include "cygerrno.h"
 #include <sys/timerfd.h>
 #include "timerfd.h"
+#include "fenv.h"
 
 #define TFD_CANCEL_FLAGS (TFD_TIMER_ABSTIME | TFD_TIMER_CANCEL_ON_SET)
 
@@ -32,15 +33,9 @@ timerfd_tracker::create_timechange_window ()
   wclass.lpfnWndProc = DefWindowProcW;
   wclass.hInstance = user_data->hmodule;
   wclass.lpszClassName = cname;
-  /* This sleep is required on Windows 10 64 bit only, and only when running
-     under strace.  One of the child processes inheriting the timerfd
-     descriptor will get a STATUS_FLOAT_INEXACT_RESULT exception inside of
-     msvcrt.dll.  While this is completely crazy in itself, it's apparently
-     some timing problem.  It occurs in 4 out of 5 runs under strace only.
-     The sleep is required before calling RegisterClassW.  Moving it before
-     CreateWindowExW does not work.  What the heck? */
-  if (being_debugged ())
-    Sleep (1L);
+  /* Avoid a potential STATUS_FLOAT_INEXACT_RESULT in msvcrt.dll.
+     Only observed on x86_64 W10 under strace. */
+  _feinitialise (false);
   atom = RegisterClassW (&wclass);
   if (!atom)
     debug_printf ("RegisterClass %E");

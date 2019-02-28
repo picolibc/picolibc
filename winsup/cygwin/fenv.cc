@@ -420,7 +420,7 @@ fesetprec (int prec)
 
 /*  Set up the FPU and SSE environment at the start of execution.  */
 void
-_feinitialise (void)
+_feinitialise (bool pre_main)
 {
   unsigned int edx, eax;
 
@@ -442,14 +442,18 @@ _feinitialise (void)
   if (use_sse)
     __asm__ volatile ("ldmxcsr %0" :: "m" (mxcsr));
 
-  /* Setup unmasked environment, but leave __FE_DENORM masked.  */
-  feenableexcept (FE_ALL_EXCEPT);
-  fegetenv (&fe_nomask_env);
+  if (pre_main)
+    {
+      /* Setup unmasked environment, but leave __FE_DENORM masked.  */
+      feenableexcept (FE_ALL_EXCEPT);
+      fegetenv (&fe_nomask_env);
 
-  /* Restore default exception masking (all masked).  */
-  fedisableexcept (FE_ALL_EXCEPT);
+      /* Restore default exception masking (all masked).  */
+      fedisableexcept (FE_ALL_EXCEPT);
 
-  /* Finally cache state as default environment. */
-  fegetenv (&fe_dfl_env);
+      /* Finally cache state as default environment. */
+      fegetenv (&fe_dfl_env);
+    }
+  else
+    fedisableexcept (FE_ALL_EXCEPT);
 }
-

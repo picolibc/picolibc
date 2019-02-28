@@ -168,7 +168,7 @@ extern int fesetprec (int __prec);
 
 #ifdef __INSIDE_CYGWIN__
 /* This is Cygwin-custom, not from the standard, for use in the Cygwin CRT.  */
-extern void _feinitialise ();
+extern void _feinitialise (bool);
 #endif
 
 #ifdef __cplusplus

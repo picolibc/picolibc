@@ -16,6 +16,7 @@ details. */
 #include "fhandler.h"
 #include "exception.h"
 #include "tls_pbuf.h"
+#include "fenv.h"
 
 int __reg2
 check_invalid_virtual_addr (const void *s, unsigned sz)
@@ -397,6 +398,8 @@ pthread_wrapper (PVOID arg)
       wrapper_arg.guardsize -= wincap.page_size ();
       SetThreadStackGuarantee (&wrapper_arg.guardsize);
     }
+  /* FP initialization. */
+  _feinitialise (false);
   /* Initialize new _cygtls. */
   _my_tls.init_thread (wrapper_arg.stackbase - CYGTLS_PADSIZE,
 		       (DWORD (*)(void*, void*)) wrapper_arg.func);
