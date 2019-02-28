@@ -239,7 +239,7 @@ wincaps wincap_10_1809 __attribute__((section (".cygwin_dll_common"), shared)) =
     has_posix_unlink_semantics:true,
     has_case_sensitive_dirs:true,
     has_posix_rename_semantics:true,
-    no_msv1_0_s4u_logon_in_wow64:true,
+    no_msv1_0_s4u_logon_in_wow64:false,
   },
 };
 
