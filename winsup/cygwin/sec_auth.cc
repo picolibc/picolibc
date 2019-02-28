@@ -288,17 +288,22 @@ load_user_profile (HANDLE token, struct passwd *pw, cygpsid &usersid)
 		break;
 	      }
 	}
-      if (cldap.fetch_ad_account (usersid, false, dnsdomain))
+      if (dnsdomain)
 	{
-	  PWCHAR val = cldap.get_profile_path ();
-	  if (val && *val)
+	  if (cldap.fetch_ad_account (usersid, false, dnsdomain))
 	    {
-	      wcsncpy (userpath, val, MAX_PATH - 1);
-	      userpath[MAX_PATH - 1] = L'\0';
-	      pi.lpProfilePath = userpath;
+	      PWCHAR val = cldap.get_profile_path ();
+	      if (val && *val)
+		{
+		  wcsncpy (userpath, val, MAX_PATH - 1);
+		  userpath[MAX_PATH - 1] = L'\0';
+		  pi.lpProfilePath = userpath;
+		}
 	    }
+	  free (dnsdomain);
 	}
-      free (dnsdomain);
+      else
+	debug_printf ("Unknown domain <%W>?", domain);
     }
 
   if (!LoadUserProfileW (token, &pi))
