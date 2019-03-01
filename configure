@@ -2763,10 +2763,8 @@ target_libraries="target-libgcc \
 		${libgcj} \
 		target-libobjc \
 		target-libada \
-		target-libgo"
-#TENSILICA-LOCAL - We have our own libgloss, so skip newlib's
-#		target-libgloss
-#TENSILICA-LOCAL
+		target-libgo \
+		target-libgloss"
 
 # these tools are built using the target libraries, and are intended to
 # run only in the target environment
