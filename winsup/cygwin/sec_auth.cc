@@ -1509,7 +1509,7 @@ s4uauth (bool logon, PCWSTR domain, PCWSTR user, NTSTATUS &ret_status)
   HANDLE lsa_hdl = NULL;
   LSA_OPERATIONAL_MODE sec_mode;
   NTSTATUS status, sub_status;
-  bool try_kerb_auth;
+  bool kerberos_auth;
   ULONG package_id, size;
   struct {
     LSA_STRING str;
@@ -1530,11 +1530,16 @@ s4uauth (bool logon, PCWSTR domain, PCWSTR user, NTSTATUS &ret_status)
   if (logon)
     {
       /* Register as logon process. */
+      debug_printf ("Impersonation requested");
       RtlInitAnsiString (&name, "Cygwin");
       status = LsaRegisterLogonProcess (&name, &lsa_hdl, &sec_mode);
     }
   else
-    status = LsaConnectUntrusted (&lsa_hdl);
+    {
+      /* Connect untrusted to just create a identification token */
+      debug_printf ("Identification requested");
+      status = LsaConnectUntrusted (&lsa_hdl);
+    }
   if (status != STATUS_SUCCESS)
     {
       debug_printf ("%s: %y", logon ? "LsaRegisterLogonProcess"
@@ -1543,14 +1548,34 @@ s4uauth (bool logon, PCWSTR domain, PCWSTR user, NTSTATUS &ret_status)
       goto out;
     }
 
-  /* Check if this is a domain user.  If so, try Kerberos first. */
-  try_kerb_auth = cygheap->dom.member_machine ()
-		  && wcscasecmp (domain, cygheap->dom.account_flat_name ());
+  /* Check if this is a domain user.  If so, use Kerberos. */
+  kerberos_auth = cygheap->dom.member_machine ()
+	      && wcscasecmp (domain, cygheap->dom.account_flat_name ());
+  debug_printf ("kerb %d, domain member %d, user domain <%W>, machine <%W>",
+		kerberos_auth, cygheap->dom.member_machine (), domain,
+		cygheap->dom.account_flat_name ());
+
+  /* Connect to authentication package. */
+  RtlInitAnsiString (&name, kerberos_auth ? MICROSOFT_KERBEROS_NAME_A
+					  : MSV1_0_PACKAGE_NAME);
+  status = LsaLookupAuthenticationPackage (lsa_hdl, &name, &package_id);
+  if (status != STATUS_SUCCESS)
+    {
+      debug_printf ("LsaLookupAuthenticationPackage: %y", status);
+      __seterrno_from_nt_status (status);
+      goto out;
+    }
+
   /* Create origin. */
   stpcpy (origin.buf, "Cygwin");
   RtlInitAnsiString (&origin.str, origin.buf);
 
-  if (try_kerb_auth)
+  /* Create token source. */
+  memcpy (ts.SourceName, "Cygwin.1", 8);
+  ts.SourceIdentifier.HighPart = 0;
+  ts.SourceIdentifier.LowPart = kerberos_auth ? 0x0105 : 0x0106;
+
+  if (kerberos_auth)
     {
       PWCHAR sam_name = tp.w_get ();
       PWCHAR upn_name = tp.w_get ();
@@ -1558,14 +1583,6 @@ s4uauth (bool logon, PCWSTR domain, PCWSTR user, NTSTATUS &ret_status)
       KERB_S4U_LOGON *s4u_logon;
       USHORT name_len;
 
-      RtlInitAnsiString (&name, MICROSOFT_KERBEROS_NAME_A);
-      status = LsaLookupAuthenticationPackage (lsa_hdl, &name, &package_id);
-      if (status != STATUS_SUCCESS)
-	{
-	  debug_printf ("LsaLookupAuthenticationPackage: %y", status);
-	  __seterrno_from_nt_status (status);
-	  goto out;
-	}
       wcpcpy (wcpcpy (wcpcpy (sam_name, domain), L"\\"), user);
       if (TranslateNameW (sam_name, NameSamCompatible, NameUserPrincipal,
 			  upn_name, &size) == 0)
@@ -1579,8 +1596,7 @@ s4uauth (bool logon, PCWSTR domain, PCWSTR user, NTSTATUS &ret_status)
 			      translated_name, &size) == 0)
 	    {
 	      debug_printf ("TranslateNameW(%W, NameCanonical) %E", sam_name);
-	      debug_printf ("Fallback to MsV1_0 auth");
-	      goto msv1_0_auth; /* Fall through to MSV1_0 authentication */
+	      goto out;
 	    }
 	  p = wcschr (translated_name, L'/');
 	  if (p)
@@ -1600,84 +1616,54 @@ s4uauth (bool logon, PCWSTR domain, PCWSTR user, NTSTATUS &ret_status)
 				 (PWCHAR) (s4u_logon + 1),
 				 name_len);
       RtlAppendUnicodeToString (&s4u_logon->ClientUpn, upn_name);
-      debug_printf ("ClientUpn: <%S>", &s4u_logon->ClientUpn);
-      /* Create token source. */
-      memcpy (ts.SourceName, "Cygwin.1", 8);
-      ts.SourceIdentifier.HighPart = 0;
-      ts.SourceIdentifier.LowPart = 0x0105;
-      status = LsaLogonUser (lsa_hdl, (PLSA_STRING) &origin, Network,
-			     package_id, authinf, authinf_size, NULL,
-			     &ts, (PVOID *) &profile, &size,
-			     &luid, &token, &quota, &sub_status);
-      switch (status)
-	{
-	case STATUS_SUCCESS:
-	  goto out;
-	/* These failures are fatal */
-	case STATUS_QUOTA_EXCEEDED:
-	case STATUS_LOGON_FAILURE:
-	  debug_printf ("Kerberos S4U LsaLogonUser failed: %y", status);
-	  goto out;
-	case STATUS_ACCOUNT_RESTRICTION:
-	  debug_printf ("Kerberos S4U LsaLogonUser failed: %y (%s)",
-			status, account_restriction (sub_status));
-	  goto out;
-	default:
-	  break;
-	}
-      debug_printf ("Kerberos S4U LsaLogonUser failed: %y, try MsV1_0", status);
-      /* Fall through to MSV1_0 authentication */
+      debug_printf ("KerbS4ULogon: ClientUpn: <%S>", &s4u_logon->ClientUpn);
+    }
+  else
+    {
+      /* Per MSDN MsV1_0S4ULogon is not implemented on Vista, but surprisingly
+	 it works. */
+      MSV1_0_S4U_LOGON *s4u_logon;
+      USHORT user_len, domain_len;
+
+      user_len = wcslen (user) * sizeof (WCHAR);
+      domain_len = wcslen (domain) * sizeof (WCHAR);	/* Local machine */
+      authinf_size = sizeof (MSV1_0_S4U_LOGON) + user_len + domain_len;
+      if (!authinf)
+	authinf = tp.c_get ();
+      RtlSecureZeroMemory (authinf, authinf_size);
+      s4u_logon = (MSV1_0_S4U_LOGON *) authinf;
+      s4u_logon->MessageType = MsV1_0S4ULogon;
+      s4u_logon->Flags = 0;
+      /* Append user and domain to login info */
+      RtlInitEmptyUnicodeString (&s4u_logon->UserPrincipalName,
+				 (PWCHAR) (s4u_logon + 1),
+				 user_len);
+      RtlInitEmptyUnicodeString (&s4u_logon->DomainName,
+				 (PWCHAR) ((PBYTE) (s4u_logon + 1) + user_len),
+				 domain_len);
+      RtlAppendUnicodeToString (&s4u_logon->UserPrincipalName, user);
+      RtlAppendUnicodeToString (&s4u_logon->DomainName, domain);
+      debug_printf ("MsV1_0S4ULogon: DomainName: <%S> UserPrincipalName: <%S>",
+		    &s4u_logon->DomainName, &s4u_logon->UserPrincipalName);
     }
 
-msv1_0_auth:
-  MSV1_0_S4U_LOGON *s4u_logon;
-  USHORT user_len, domain_len;
-
-  /* Per MSDN MsV1_0S4ULogon is not implemented on Vista, but surprisingly
-     it works. */
-  RtlInitAnsiString (&name, MSV1_0_PACKAGE_NAME);
-  status = LsaLookupAuthenticationPackage (lsa_hdl, &name, &package_id);
-  if (status != STATUS_SUCCESS)
+  /* Try to logon. */
+  status = LsaLogonUser (lsa_hdl, (PLSA_STRING) &origin, Network, package_id,
+			 authinf, authinf_size, NULL, &ts, (PVOID *) &profile,
+			 &size, &luid, &token, &quota, &sub_status);
+  switch (status)
     {
-      debug_printf ("LsaLookupAuthenticationPackage: %y", status);
-      __seterrno_from_nt_status (status);
-      goto out;
-    }
-  user_len = wcslen (user) * sizeof (WCHAR);
-  domain_len = wcslen (domain) * sizeof (WCHAR);	/* Local machine */
-  authinf_size = sizeof (MSV1_0_S4U_LOGON) + user_len + domain_len;
-  if (!authinf)
-    authinf = tp.c_get ();
-  RtlSecureZeroMemory (authinf, authinf_size);
-  s4u_logon = (MSV1_0_S4U_LOGON *) authinf;
-  s4u_logon->MessageType = MsV1_0S4ULogon;
-  s4u_logon->Flags = 0;
-  /* Append user and domain to login info */
-  RtlInitEmptyUnicodeString (&s4u_logon->UserPrincipalName,
-			     (PWCHAR) (s4u_logon + 1),
-			     user_len);
-  RtlInitEmptyUnicodeString (&s4u_logon->DomainName,
-			     (PWCHAR) ((PBYTE) (s4u_logon + 1) + user_len),
-			     domain_len);
-  RtlAppendUnicodeToString (&s4u_logon->UserPrincipalName, user);
-  RtlAppendUnicodeToString (&s4u_logon->DomainName, domain);
-  debug_printf ("DomainName: <%S> UserPrincipalName: <%S>",
-		&s4u_logon->DomainName, &s4u_logon->UserPrincipalName);
-  /* Create token source. */
-  memcpy (ts.SourceName, "Cygwin.1", 8);
-  ts.SourceIdentifier.HighPart = 0;
-  ts.SourceIdentifier.LowPart = 0x0106;
-  if ((status = LsaLogonUser (lsa_hdl, (PLSA_STRING) &origin, Network,
-			      package_id, authinf, authinf_size, NULL,
-			      &ts, (PVOID *) &profile, &size,
-			      &luid, &token, &quota, &sub_status))
-      != STATUS_SUCCESS)
-    {
-      if (status == STATUS_ACCOUNT_RESTRICTION)
-	debug_printf ("MSV1_0 S4U LsaLogonUser failed: %y (%s)",
-		       status, account_restriction (sub_status));
-      else
-	debug_printf ("MSV1_0 S4U LsaLogonUser failed: %y", status);
+    case STATUS_SUCCESS:
+      break;
+    case STATUS_ACCOUNT_RESTRICTION:
+      debug_printf ("%s S4U LsaLogonUser failed: %y (%s)",
+		    kerberos_auth ? "Kerberos" : "MsV1_0", status,
+		    account_restriction (sub_status));
+      break;
+    default:
+      debug_printf ("%s S4U LsaLogonUser failed: %y",
+		    kerberos_auth ? "Kerberos" : "MsV1_0", status);
+      break;
     }
 
 out:
