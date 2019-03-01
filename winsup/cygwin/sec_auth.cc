@@ -278,11 +278,11 @@ load_user_profile (HANDLE token, struct passwd *pw, cygpsid &usersid)
   else
     {
       cyg_ldap cldap;
-      PWCHAR dnsdomain = NULL;
+      PCWSTR dnsdomain = NULL;
 
       debug_printf ("primary domain <%W>", cygheap->dom.primary_flat_name ());
       if (!wcscasecmp (domain, cygheap->dom.primary_flat_name ()))
-	dnsdomain = wcsdup (cygheap->dom.primary_dns_name ());
+	dnsdomain = cygheap->dom.primary_dns_name ();
       else
 	{
 	  PDS_DOMAIN_TRUSTSW td = NULL;
@@ -292,7 +292,7 @@ load_user_profile (HANDLE token, struct passwd *pw, cygpsid &usersid)
 	      debug_printf ("foreign domain <%W>", td->NetbiosDomainName);
 	      if (!wcscasecmp (domain, td->NetbiosDomainName))
 		{
-		  dnsdomain = wcsdup (td->DnsDomainName);
+		  dnsdomain = td->DnsDomainName;
 		  break;
 		}
 	    }
@@ -309,7 +309,6 @@ load_user_profile (HANDLE token, struct passwd *pw, cygpsid &usersid)
 		  pi.lpProfilePath = userpath;
 		}
 	    }
-	  free (dnsdomain);
 	}
       else
 	debug_printf ("Unknown domain <%W>?", domain);
