@@ -182,6 +182,9 @@ case "${target}" in
   pru-*-*)
 	AC_CONFIG_SUBDIRS([pru])
 	;;
+  xtensa-*-*)
+	AC_CONFIG_SUBDIRS([xtensa])
+	;;
   nios2-*-*)
 	AC_CONFIG_SUBDIRS([nios2])
 	;;
