@@ -176,6 +176,10 @@ case "${target}" in
   or1k-*-* | or1knd-*-* )
 	AC_CONFIG_SUBDIRS([or1k])
 	;;
+  xtensa-*-*)
+	AC_CONFIG_SUBDIRS([xtensa])
+	;;
+
 esac
 
 dnl For now, don't bother configuring testsuite
