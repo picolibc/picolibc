@@ -234,6 +234,10 @@ load_user_profile (HANDLE token, struct passwd *pw, cygpsid &usersid)
   WCHAR userpath[MAX_PATH];
   PROFILEINFOW pi;
 
+  /* Initialize */
+  if (!cygheap->dom.init ())
+    return NULL;
+
   extract_nt_dom_user (pw, domain, username);
   usersid.string (sid);
   debug_printf ("user: <%W> <%W> <%W>", username, domain, sid);
@@ -1532,6 +1536,10 @@ s4uauth (bool logon, PCWSTR domain, PCWSTR user, NTSTATUS &ret_status)
   LUID luid;
   QUOTA_LIMITS quota;
   HANDLE token = NULL;
+
+  /* Initialize */
+  if (!cygheap->dom.init ())
+    return NULL;
 
   push_self_privilege (SE_TCB_PRIVILEGE, true);
 
