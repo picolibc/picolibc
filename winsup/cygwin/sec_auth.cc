@@ -267,7 +267,11 @@ load_user_profile (HANDLE token, struct passwd *pw, cygpsid &usersid)
       else
 	{
 	  if (ui->usri3_profile && *ui->usri3_profile)
-	    pi.lpProfilePath = ui->usri3_profile;
+	    {
+	      wcsncpy (userpath, ui->usri3_profile, MAX_PATH - 1);
+	      userpath[MAX_PATH - 1] = L'\0';
+	      pi.lpProfilePath = userpath;
+	    }
 	  NetApiBufferFree (ui);
 	}
     }
