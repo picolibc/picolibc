@@ -15,11 +15,8 @@ CLOCK_BOOTTIME_ALARM clocks.
 </para></listitem>
 
 <listitem><para>
-Support for case sensitive directories.  mkdir(2) automatically creates
-directories within the Cygwin installation dir as case sensitive
-now.</para>
-
-<para>This feature requires Windows 10 1803 or later and WSL installed!
+Support for case sensitive directories via chattr(1).  This feature requires
+Windows 10 1803 or later and WSL installed.
 </para></listitem>
 
 <listitem><para>

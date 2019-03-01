@@ -5,6 +5,14 @@ What's new:
 What changed:
 -------------
 
+- Windows 10 1803 or later and WSL installed:
+
+  Starting with 3.0.0, mkdir(2) automatically created directories within
+  the Cygwin installation dir as case sensitive.  This badly breaks
+  interoperability with remote machines trying to access these dirs.
+  Therefore, disable this as default.  You can still create case-sensitive
+  dirs via `chattr +C ...'
+
 
 Bug Fixes
 ---------

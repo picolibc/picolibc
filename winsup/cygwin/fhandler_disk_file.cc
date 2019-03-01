@@ -1778,6 +1778,12 @@ fhandler_disk_file::mkdir (mode_t mode)
       pc.file_attributes (FILE_ATTRIBUTE_DIRECTORY);
       if (has_acls ())
 	set_created_file_access (dir, pc, mode & 07777);
+#if 0
+      /* FIXME: This default behaviour badly breaks interoperability.
+		Inspecting the content of case-sensitive directories
+		on remote machines results in lots of errors like
+		disappearing diretories and files, file not found, etc. */
+
       /* Starting with Windows 10 1803, try to create all dirs below the
          installation root as case-sensitive.  If STATUS_NOT_SUPPORTED
 	 is returned, WSL isn't installed (unfortunately a requirement
@@ -1808,6 +1814,7 @@ fhandler_disk_file::mkdir (mode_t mode)
 		}
 	    }
 	}
+#endif
       NtClose (dir);
       res = 0;
     }
