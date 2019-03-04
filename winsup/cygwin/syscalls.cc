@@ -3552,18 +3552,7 @@ seteuid32 (uid_t uid)
      LSA module, or, as last chance, NtCreateToken. */
   if (new_token == NULL)
     {
-      new_token = lsaprivkeyauth (pw_new);
-      if (new_token)
-	{
-	  /* We have to verify this token since settings in /etc/group
-	     might render it unusable im terms of group membership. */
-	  if (!verify_token (new_token, usersid, groups))
-	    {
-	      CloseHandle (new_token);
-	      new_token = NULL;
-	    }
-	}
-      if (!new_token)
+      if (!(new_token = lsaprivkeyauth (pw_new)))
 	{
 	  NTSTATUS status;
 	  WCHAR domain[MAX_DOMAIN_NAME_LEN + 1];
