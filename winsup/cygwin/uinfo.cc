@@ -239,8 +239,6 @@ uinfo_init ()
   cygheap->user.internal_token = NO_IMPERSONATION;
   cygheap->user.curr_primary_token = NO_IMPERSONATION;
   cygheap->user.curr_imp_token = NO_IMPERSONATION;
-  cygheap->user.imp_profile_token = NO_IMPERSONATION;
-  cygheap->user.imp_profile = NULL;
   cygheap->user.ext_token_is_restricted = false;
   cygheap->user.curr_token_is_restricted = false;
   cygheap->user.setuid_to_restricted = false;

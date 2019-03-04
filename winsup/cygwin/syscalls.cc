@@ -3603,21 +3603,8 @@ seteuid32 (uid_t uid)
     {
       NTSTATUS status;
 
-      if (!request_restricted_uid_switch
-	  && new_token != cygheap->user.imp_profile_token)
-	{
-	  if (cygheap->user.imp_profile_token && cygheap->user.imp_profile)
-	    unload_user_profile (cygheap->user.imp_profile_token,
-				 cygheap->user.imp_profile);
-	  cygheap->user.imp_profile = load_user_profile (new_token, pw_new,
-							 usersid);
-	  if (cygheap->user.imp_profile)
-	    {
-	      cygheap->user.imp_profile_token = new_token;
-	      SetHandleInformation (cygheap->user.imp_profile,
-				    HANDLE_FLAG_INHERIT, HANDLE_FLAG_INHERIT);
-	    }
-	}
+      if (!request_restricted_uid_switch)
+	load_user_profile (new_token, pw_new, usersid);
 
       /* Try setting owner to same value as user. */
       status = NtSetInformationToken (new_token, TokenOwner,
@@ -3647,7 +3634,7 @@ seteuid32 (uid_t uid)
   issamesid = (usersid == cygheap->user.sid ());
   cygheap->user.set_sid (usersid);
   cygheap->user.curr_primary_token = new_token == hProcToken ? NO_IMPERSONATION
-							     : new_token;
+							: new_token;
   cygheap->user.curr_token_is_restricted = false;
   cygheap->user.setuid_to_restricted = false;
   if (cygheap->user.curr_imp_token != NO_IMPERSONATION)

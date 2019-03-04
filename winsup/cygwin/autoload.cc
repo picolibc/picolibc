@@ -699,7 +699,6 @@ LoadDLLfuncEx (CreateEnvironmentBlock, 12, userenv, 1)
 LoadDLLfuncEx2 (CreateProfile, 16, userenv, 1, 1)
 LoadDLLfunc (DestroyEnvironmentBlock, 4, userenv)
 LoadDLLfunc (LoadUserProfileW, 8, userenv)
-LoadDLLfunc (UnloadUserProfile, 8, userenv)
 
 LoadDLLfuncEx3 (waveInAddBuffer, 12, winmm, 1, 0, 1)
 LoadDLLfuncEx3 (waveInClose, 4, winmm, 1, 0, 1)
