@@ -259,7 +259,6 @@ load_user_profile (HANDLE token, struct passwd *pw, cygpsid &usersid)
   pi.lpUserName = username;
   /* Check if user has a roaming profile and fill in lpProfilePath, if so.
      Call NetUserGetInfo only for local machine accounts, use LDAP otherwise. */
-  debug_printf ("machine <%W>", cygheap->dom.account_flat_name ());
   if (!wcscasecmp (domain, cygheap->dom.account_flat_name ()))
     {
       NET_API_STATUS nas;
@@ -284,20 +283,16 @@ load_user_profile (HANDLE token, struct passwd *pw, cygpsid &usersid)
       cyg_ldap cldap;
       PCWSTR dnsdomain = NULL;
 
-      debug_printf ("primary domain <%W>", cygheap->dom.primary_flat_name ());
       if (wcscasecmp (domain, cygheap->dom.primary_flat_name ()))
 	{
 	  PDS_DOMAIN_TRUSTSW td = NULL;
 
 	  for (ULONG idx = 0; (td = cygheap->dom.trusted_domain (idx)); ++idx)
-	    {
-	      debug_printf ("foreign domain <%W>", td->NetbiosDomainName);
-	      if (!wcscasecmp (domain, td->NetbiosDomainName))
-		{
-		  dnsdomain = td->DnsDomainName;
-		  break;
-		}
-	    }
+	    if (!wcscasecmp (domain, td->NetbiosDomainName))
+	      {
+		dnsdomain = td->DnsDomainName;
+		break;
+	      }
 	}
       if (cldap.fetch_ad_account (usersid, false, dnsdomain))
 	{
