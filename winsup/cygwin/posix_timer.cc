@@ -287,9 +287,9 @@ timer_tracker::settime (int flags, const itimerspec *new_value,
       if (old_value)
 	gettime (old_value, false);
 
+      cancel ();
       if (!new_value->it_value.tv_sec && !new_value->it_value.tv_nsec)
 	{
-	  cancel ();
 	  memset (&time_spec, 0, sizeof time_spec);
 	  interval = 0;
 	  exp_ts = 0;
