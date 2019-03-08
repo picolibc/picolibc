@@ -31,7 +31,9 @@ timer_tracker::cancel ()
   SetEvent (cancel_evt);
   if (sync_thr)
     {
+      ReleaseSRWLockExclusive (&srwlock);
       res = WaitForSingleObject (sync_thr, INFINITE);
+      AcquireSRWLockExclusive (&srwlock);
       if (res != WAIT_OBJECT_0)
 	debug_printf ("WFSO returned unexpected value %u, %E", res);
     }
