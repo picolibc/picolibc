@@ -325,7 +325,8 @@ pinfo::create_winpid_symlink ()
   __small_swprintf (pid_name, L"%u", procinfo->pid);
   RtlInitUnicodeString (&pid_str, pid_name);
   InitializeObjectAttributes (&attr, &sym_str, OBJ_CASE_INSENSITIVE,
-			      get_shared_parent_dir (), NULL);
+			      get_shared_parent_dir (),
+			      everyone_sd (SYMBOLIC_LINK_QUERY));
   NtCreateSymbolicLinkObject (&winpid_hdl, SYMBOLIC_LINK_ALL_ACCESS,
 			      &attr, &pid_str);
 }
