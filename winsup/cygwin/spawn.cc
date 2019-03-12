@@ -566,6 +566,12 @@ child_info_spawn::worker (const char *prog_arg, const char *const *argv,
 	SetHandleInformation (my_wr_proc_pipe, HANDLE_FLAG_INHERIT, 0);
       parent_winpid = GetCurrentProcessId ();
 
+      PSECURITY_ATTRIBUTES sa = (PSECURITY_ATTRIBUTES) tp.w_get ();
+      if (!sec_user_nih (sa, cygheap->user.sid (),
+			 well_known_authenticated_users_sid,
+			 PROCESS_QUERY_LIMITED_INFORMATION))
+	sa = &sec_none_nih;
+
     loop:
       /* When ruid != euid we create the new process under the current original
 	 account and impersonate in child, this way maintaining the different
@@ -586,13 +592,13 @@ child_info_spawn::worker (const char *prog_arg, const char *const *argv,
 	      && !::cygheap->user.groups.issetgroups ()
 	      && !::cygheap->user.setuid_to_restricted))
 	{
-	  rc = CreateProcessW (runpath,	  /* image name - with full path */
-			       cmd.wcs (wcmd),/* what was passed to exec */
-			       &sec_none_nih, /* process security attrs */
-			       &sec_none_nih, /* thread security attrs */
-			       TRUE,	  /* inherit handles from parent */
+	  rc = CreateProcessW (runpath,		/* image name w/ full path */
+			       cmd.wcs (wcmd),	/* what was passed to exec */
+			       sa,		/* process security attrs */
+			       sa,		/* thread security attrs */
+			       TRUE,		/* inherit handles */
 			       c_flags,
-			       envblock,	  /* environment */
+			       envblock,	/* environment */
 			       NULL,
 			       &si,
 			       &pi);
@@ -640,13 +646,13 @@ child_info_spawn::worker (const char *prog_arg, const char *const *argv,
 	    }
 
 	  rc = CreateProcessAsUserW (::cygheap->user.primary_token (),
-			       runpath,	  /* image name - with full path */
-			       cmd.wcs (wcmd),/* what was passed to exec */
-			       &sec_none_nih, /* process security attrs */
-			       &sec_none_nih, /* thread security attrs */
-			       TRUE,	  /* inherit handles from parent */
+			       runpath,		/* image name w/ full path */
+			       cmd.wcs (wcmd),	/* what was passed to exec */
+			       sa,		/* process security attrs */
+			       sa,		/* thread security attrs */
+			       TRUE,		/* inherit handles */
 			       c_flags,
-			       envblock,	  /* environment */
+			       envblock,	/* environment */
 			       NULL,
 			       &si,
 			       &pi);

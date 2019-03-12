@@ -318,6 +318,13 @@ frok::parent (volatile char * volatile stack_here)
 
   ch.silentfail (!*with_forkables); /* fail silently without forkables */
 
+  tmp_pathbuf tp;
+  PSECURITY_ATTRIBUTES sa = (PSECURITY_ATTRIBUTES) tp.w_get ();
+  if (!sec_user_nih (sa, cygheap->user.saved_sid (),
+		     well_known_authenticated_users_sid,
+		     PROCESS_QUERY_LIMITED_INFORMATION))
+    sa = &sec_none_nih;
+
   while (1)
     {
       PCWCHAR forking_progname = NULL;
@@ -339,12 +346,12 @@ frok::parent (volatile char * volatile stack_here)
 						   sure child stack is allocated
 						   in the same memory location
 						   as in parent. */
-			   &sec_none_nih,
-			   &sec_none_nih,
-			   TRUE,		/* inherit handles from parent */
+			   sa,
+			   sa,
+			   TRUE,		/* inherit handles */
 			   c_flags,
-			   NULL,		/* environment filled in later */
-			   0,	  		/* use current drive/directory */
+			   NULL,		/* environ filled in later */
+			   0,			/* use cwd */
 			   &si,
 			   &pi);
 
