@@ -755,8 +755,8 @@ LoadDLLfunc (WSASocketW, 24, ws2_32)
 // LoadDLLfunc (WSAStartup, 8, ws2_32)
 LoadDLLfunc (WSAWaitForMultipleEvents, 20, ws2_32)
 
-LoadDLLfunc (PdhAddEnglishCounterA, 16, pdh)
+LoadDLLfunc (PdhAddEnglishCounterW, 16, pdh)
 LoadDLLfunc (PdhCollectQueryData, 4, pdh)
 LoadDLLfunc (PdhGetFormattedCounterValue, 16, pdh)
-LoadDLLfunc (PdhOpenQueryA, 12, pdh)
+LoadDLLfunc (PdhOpenQueryW, 12, pdh)
 }
