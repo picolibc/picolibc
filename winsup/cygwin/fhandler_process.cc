@@ -519,12 +519,9 @@ format_process_cmdline (void *data, char *&destbuf)
       destbuf = NULL;
     }
   destbuf = p ? p->cmdline (fs) : NULL;
-  if (!destbuf || !*destbuf)
-    {
-      destbuf = cstrdup ("<defunct>");
-      fs = strlen (destbuf) + 1;
-    }
-  return fs;
+  if (destbuf && *destbuf)
+    return fs;
+  return format_process_exename (data, destbuf);
 }
 
 static off_t
