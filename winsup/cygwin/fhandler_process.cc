@@ -1091,12 +1091,12 @@ format_process_stat (void *data, char *&destbuf)
 
   NTSTATUS status;
   HANDLE hProcess;
-  VM_COUNTERS vmc;
-  KERNEL_USER_TIMES put;
-  PROCESS_BASIC_INFORMATION pbi;
-  QUOTA_LIMITS ql;
-  SYSTEM_TIMEOFDAY_INFORMATION stodi;
-  SYSTEM_PROCESSOR_PERFORMANCE_INFORMATION spt;
+  VM_COUNTERS vmc = { 0 };
+  KERNEL_USER_TIMES put = { 0 };
+  PROCESS_BASIC_INFORMATION pbi = { 0 };
+  QUOTA_LIMITS ql = { 0 };
+  SYSTEM_TIMEOFDAY_INFORMATION stodi = { 0 };
+
   hProcess = OpenProcess (PROCESS_QUERY_LIMITED_INFORMATION,
 			  FALSE, p->dwProcessId);
   if (hProcess == NULL)
@@ -1104,38 +1104,44 @@ format_process_stat (void *data, char *&destbuf)
       DWORD error = GetLastError ();
       __seterrno_from_win_error (error);
       debug_printf ("OpenProcess: ret %u", error);
-      return 0;
     }
-
-  status = NtQueryInformationProcess (hProcess, ProcessVmCounters,
-				      (PVOID) &vmc, sizeof vmc, NULL);
-  if (NT_SUCCESS (status))
-    status = NtQueryInformationProcess (hProcess, ProcessTimes,
-					(PVOID) &put, sizeof put, NULL);
-  if (NT_SUCCESS (status))
-    status = NtQueryInformationProcess (hProcess, ProcessBasicInformation,
-					(PVOID) &pbi, sizeof pbi, NULL);
-  if (NT_SUCCESS (status))
-    status = NtQueryInformationProcess (hProcess, ProcessQuotaLimits,
-					(PVOID) &ql, sizeof ql, NULL);
-  CloseHandle (hProcess);
-  if (NT_SUCCESS (status))
-    status = NtQuerySystemInformation (SystemTimeOfDayInformation,
-				       (PVOID) &stodi, sizeof stodi, NULL);
-  if (NT_SUCCESS (status))
-    status = NtQuerySystemInformation (SystemProcessorPerformanceInformation,
-				       (PVOID) &spt, sizeof spt, NULL);
-  if (!NT_SUCCESS (status))
+  else
     {
-      __seterrno_from_nt_status (status);
-      debug_printf ("NtQueryInformationProcess: status %y, %E", status);
-      return 0;
+      status = NtQueryInformationProcess (hProcess, ProcessVmCounters,
+					  (PVOID) &vmc, sizeof vmc, NULL);
+      if (!NT_SUCCESS (status))
+	debug_printf ("NtQueryInformationProcess(ProcessVmCounters): status %y",
+		      status);
+      status = NtQueryInformationProcess (hProcess, ProcessTimes,
+					  (PVOID) &put, sizeof put, NULL);
+      if (!NT_SUCCESS (status))
+	debug_printf ("NtQueryInformationProcess(ProcessTimes): status %y",
+		      status);
+      status = NtQueryInformationProcess (hProcess, ProcessBasicInformation,
+					  (PVOID) &pbi, sizeof pbi, NULL);
+      if (!NT_SUCCESS (status))
+	debug_printf ("NtQueryInformationProcess(ProcessBasicInformation): "
+		      "status %y", status);
+      status = NtQueryInformationProcess (hProcess, ProcessQuotaLimits,
+					  (PVOID) &ql, sizeof ql, NULL);
+      if (!NT_SUCCESS (status))
+	debug_printf ("NtQueryInformationProcess(ProcessQuotaLimits): "
+		      "status %y", status);
+      CloseHandle (hProcess);
     }
+  status = NtQuerySystemInformation (SystemTimeOfDayInformation,
+				     (PVOID) &stodi, sizeof stodi, NULL);
+  if (!NT_SUCCESS (status))
+    debug_printf ("NtQuerySystemInformation(SystemTimeOfDayInformation): "
+		  "status %y", status);
   fault_count = vmc.PageFaultCount;
   utime = put.UserTime.QuadPart * CLOCKS_PER_SEC / NS100PERSEC;
   stime = put.KernelTime.QuadPart * CLOCKS_PER_SEC / NS100PERSEC;
-  start_time = (put.CreateTime.QuadPart - stodi.BootTime.QuadPart)
-	       * CLOCKS_PER_SEC / NS100PERSEC;
+  if (put.CreateTime.QuadPart)
+    start_time = (put.CreateTime.QuadPart - stodi.BootTime.QuadPart)
+		 * CLOCKS_PER_SEC / NS100PERSEC;
+  else
+    start_time = (p->start_time - to_time_t (&stodi.BootTime)) * CLOCKS_PER_SEC;
   /* The BasePriority returned to a 32 bit process under WOW64 is
      apparently broken, for 32 and 64 bit target processes.  64 bit
      processes get the correct base priority, even for 32 bit processes. */
