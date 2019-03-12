@@ -1097,7 +1097,7 @@ format_process_stat (void *data, char *&destbuf)
   QUOTA_LIMITS ql;
   SYSTEM_TIMEOFDAY_INFORMATION stodi;
   SYSTEM_PROCESSOR_PERFORMANCE_INFORMATION spt;
-  hProcess = OpenProcess (PROCESS_QUERY_LIMITED_INFORMATION | PROCESS_VM_READ,
+  hProcess = OpenProcess (PROCESS_QUERY_LIMITED_INFORMATION,
 			  FALSE, p->dwProcessId);
   if (hProcess == NULL)
     {
