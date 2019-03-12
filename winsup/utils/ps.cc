@@ -155,7 +155,6 @@ main (int argc, char *argv[])
   int aflag, lflag, fflag, sflag, proc_id;
   uid_t uid;
   bool found_proc_id = true;
-  DWORD proc_access = PROCESS_QUERY_LIMITED_INFORMATION;
   cygwin_getinfo_types query = CW_GETPINFO;
   const char *dtitle = "    PID  TTY        STIME COMMAND\n";
   const char *dfmt   = "%7d%4s%10s %s\n";
@@ -257,12 +256,6 @@ main (int argc, char *argv[])
 	}
 
       drive_map = (void *) cygwin_internal (CW_ALLOC_DRIVE_MAP);
-      /* Check old Cygwin version. */
-      if (drive_map == (void *) -1)
-	drive_map = NULL;
-      /* Allow fallback to GetModuleFileNameEx. */
-      if (!drive_map)
-	proc_access = PROCESS_QUERY_INFORMATION | PROCESS_VM_READ;
     }
 
   for (int pid = 0;
@@ -291,8 +284,6 @@ main (int argc, char *argv[])
       else if (p->process_state & PID_TTYOU)
 	status = 'O';
 
-      /* Maximum possible path length under NT.  There's no official define
-	 for that value. */
       if (p->ppid)
 	{
 	  char *s;
@@ -309,49 +300,27 @@ main (int argc, char *argv[])
 	  HANDLE h;
 	  NTSTATUS status;
 	  wchar_t *win32path = NULL;
+	  FILETIME ct, et, kt, ut;
 
-	  h = OpenProcess (proc_access, FALSE, p->dwProcessId);
-	  if (!h)
+	  ucbuf.spii.ProcessId = (PVOID) (ULONG_PTR) p->dwProcessId;
+	  ucbuf.spii.ImageName.Length = 0;
+	  ucbuf.spii.ImageName.MaximumLength = NT_MAX_PATH * sizeof (WCHAR);
+	  ucbuf.spii.ImageName.Buffer = ucbuf.buf;
+	  status = NtQuerySystemInformation (SystemProcessIdInformation,
+					     &ucbuf.spii, sizeof ucbuf.spii,
+					     NULL);
+	  if (NT_SUCCESS (status))
 	    {
-	      ucbuf.spii.ProcessId = (PVOID) (ULONG_PTR) p->dwProcessId;
-	      ucbuf.spii.ImageName.Length = 0;
-	      ucbuf.spii.ImageName.MaximumLength = NT_MAX_PATH * sizeof (WCHAR);
-	      ucbuf.spii.ImageName.Buffer = ucbuf.buf;
-	      status = NtQuerySystemInformation (SystemProcessIdInformation,
-						 &ucbuf.spii, sizeof ucbuf.spii, NULL);
-	      if (NT_SUCCESS (status))
-		{
-		  if (ucbuf.spii.ImageName.Length)
-		    ucbuf.spii.ImageName.Buffer[ucbuf.spii.ImageName.Length
-					  / sizeof (WCHAR)] = L'\0';
-		  win32path = ucbuf.spii.ImageName.Buffer;
-		}
+	      if (ucbuf.spii.ImageName.Length)
+		ucbuf.spii.ImageName.Buffer[ucbuf.spii.ImageName.Length
+				      / sizeof (WCHAR)] = L'\0';
+	      win32path = ucbuf.spii.ImageName.Buffer;
 	    }
-	  /* We use NtQueryInformationProcess in the first place, because
-	     GetModuleFileNameEx does not work under WOW64 when trying
-	     to fetch module names of 64 bit processes. */
-	  else if (!(proc_access & PROCESS_VM_READ))
-	    {
-	      status = NtQueryInformationProcess (h, ProcessImageFileName,
-						  &ucbuf.spii.ImageName,
-						  sizeof ucbuf - sizeof (PVOID),
-						  NULL);
-	      if (NT_SUCCESS (status))
-		{
-		  if (ucbuf.spii.ImageName.Length)
-		    ucbuf.spii.ImageName.Buffer[ucbuf.spii.ImageName.Length / sizeof (WCHAR)] = L'\0';
-		  win32path = ucbuf.spii.ImageName.Buffer;
-		}
-	    }
-	  else if (GetModuleFileNameExW (h, NULL, ucbuf.buf,
-					 NT_MAX_PATH + 1))
-	    win32path = ucbuf.buf;
 	  if (win32path)
 	    {
 	      /* Call CW_MAP_DRIVE_MAP to convert native NT device paths to
-	         an ordinary Win32 path.  The returned pointer is a pointer
-		 into the incoming buffer given as third argument.  It's
-		 expected to be big enough. */
+	         an ordinary Win32 path.  The returned pointer points into
+		 the incoming buffer given as third argument. */
 	      if (win32path[0] == L'\\')
 		win32path = (wchar_t *) cygwin_internal (CW_MAP_DRIVE_MAP,
 							 drive_map, win32path);
@@ -359,7 +328,9 @@ main (int argc, char *argv[])
 	    }
 	  else
 	    strcpy (pname, p->dwProcessId == 4 ? "System" : "*** unknown ***");
-	  FILETIME ct, et, kt, ut;
+
+	  h = OpenProcess (PROCESS_QUERY_LIMITED_INFORMATION, FALSE,
+			   p->dwProcessId);
 	  if (h)
 	    {
 	      if (GetProcessTimes (h, &ct, &et, &kt, &ut))
