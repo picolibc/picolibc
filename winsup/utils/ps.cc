@@ -26,7 +26,7 @@ details. */
 
 /* Maximum possible path length under NT.  There's no official define
    for that value.  Note that PATH_MAX is only 4K. */
-#define NT_MAX_PATH 32768
+#define NT_MAX_PATH 32767
 
 static char *prog_name;
 
@@ -140,7 +140,13 @@ print_version ()
 	  strrchr (__DATE__, ' ') + 1);
 }
 
-char unicode_buf[sizeof (UNICODE_STRING) + NT_MAX_PATH];
+struct
+{
+  SYSTEM_PROCESS_ID_INFORMATION spii;
+  WCHAR buf[NT_MAX_PATH + 1];
+} ucbuf;
+
+char pname[NT_MAX_PATH + sizeof (" <defunct>")  + 1];
 
 int
 main (int argc, char *argv[])
@@ -158,7 +164,6 @@ main (int argc, char *argv[])
   const char *ltitle = "      PID    PPID    PGID     WINPID   TTY         UID    STIME COMMAND\n";
   const char *lfmt   = "%c %7d %7d %7d %10u %4s %8u %8s %s\n";
   char ch;
-  PUNICODE_STRING uni = (PUNICODE_STRING) unicode_buf;
   void *drive_map = NULL;
 
   aflag = lflag = fflag = sflag = 0;
@@ -288,7 +293,6 @@ main (int argc, char *argv[])
 
       /* Maximum possible path length under NT.  There's no official define
 	 for that value. */
-      char pname[NT_MAX_PATH + sizeof (" <defunct>")];
       if (p->ppid)
 	{
 	  char *s;
@@ -308,45 +312,60 @@ main (int argc, char *argv[])
 
 	  h = OpenProcess (proc_access, FALSE, p->dwProcessId);
 	  if (!h)
-	    continue;
+	    {
+	      ucbuf.spii.ProcessId = (PVOID) (ULONG_PTR) p->dwProcessId;
+	      ucbuf.spii.ImageName.Length = 0;
+	      ucbuf.spii.ImageName.MaximumLength = NT_MAX_PATH * sizeof (WCHAR);
+	      ucbuf.spii.ImageName.Buffer = ucbuf.buf;
+	      status = NtQuerySystemInformation (SystemProcessIdInformation,
+						 &ucbuf.spii, sizeof ucbuf.spii, NULL);
+	      if (NT_SUCCESS (status))
+		{
+		  if (ucbuf.spii.ImageName.Length)
+		    ucbuf.spii.ImageName.Buffer[ucbuf.spii.ImageName.Length
+					  / sizeof (WCHAR)] = L'\0';
+		  win32path = ucbuf.spii.ImageName.Buffer;
+		}
+	    }
 	  /* We use NtQueryInformationProcess in the first place, because
 	     GetModuleFileNameEx does not work under WOW64 when trying
 	     to fetch module names of 64 bit processes. */
-	  if (!(proc_access & PROCESS_VM_READ))
+	  else if (!(proc_access & PROCESS_VM_READ))
 	    {
-	      status = NtQueryInformationProcess (h, ProcessImageFileName, uni,
-						  sizeof unicode_buf, NULL);
+	      status = NtQueryInformationProcess (h, ProcessImageFileName,
+						  &ucbuf.spii.ImageName,
+						  sizeof ucbuf - sizeof (PVOID),
+						  NULL);
 	      if (NT_SUCCESS (status))
 		{
-		  /* NtQueryInformationProcess returns a native NT device path.
-		     Call CW_MAP_DRIVE_MAP to convert the path to an ordinary
-		     Win32 path.  The returned pointer is a pointer into the
-		     incoming buffer given as third argument.  It's expected
-		     to be big enough, which we made sure by defining
-		     unicode_buf to have enough space for a maximum sized
-		     UNICODE_STRING. */
-		  if (uni->Length == 0)	/* System process */
-		    win32path = (wchar_t *) L"System";
-		  else
-		    {
-		      uni->Buffer[uni->Length / sizeof (WCHAR)] = L'\0';
-		      win32path = (wchar_t *) cygwin_internal (CW_MAP_DRIVE_MAP,
-							       drive_map,
-							       uni->Buffer);
-		    }
+		  if (ucbuf.spii.ImageName.Length)
+		    ucbuf.spii.ImageName.Buffer[ucbuf.spii.ImageName.Length / sizeof (WCHAR)] = L'\0';
+		  win32path = ucbuf.spii.ImageName.Buffer;
 		}
 	    }
-	  else if (GetModuleFileNameExW (h, NULL, (PWCHAR) unicode_buf,
-					 NT_MAX_PATH))
-	    win32path = (wchar_t *) unicode_buf;
+	  else if (GetModuleFileNameExW (h, NULL, ucbuf.buf,
+					 NT_MAX_PATH + 1))
+	    win32path = ucbuf.buf;
 	  if (win32path)
-	    wcstombs (pname, win32path, sizeof pname);
+	    {
+	      /* Call CW_MAP_DRIVE_MAP to convert native NT device paths to
+	         an ordinary Win32 path.  The returned pointer is a pointer
+		 into the incoming buffer given as third argument.  It's
+		 expected to be big enough. */
+	      if (win32path[0] == L'\\')
+		win32path = (wchar_t *) cygwin_internal (CW_MAP_DRIVE_MAP,
+							 drive_map, win32path);
+	      wcstombs (pname, win32path, sizeof pname);
+	    }
 	  else
-	    strcpy (pname, "*** unknown ***");
+	    strcpy (pname, p->dwProcessId == 4 ? "System" : "*** unknown ***");
 	  FILETIME ct, et, kt, ut;
-	  if (GetProcessTimes (h, &ct, &et, &kt, &ut))
-	    p->start_time = to_time_t (&ct);
-	  CloseHandle (h);
+	  if (h)
+	    {
+	      if (GetProcessTimes (h, &ct, &et, &kt, &ut))
+		p->start_time = to_time_t (&ct);
+	      CloseHandle (h);
+	    }
 	}
 
       char uname[128];
