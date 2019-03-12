@@ -582,6 +582,7 @@ typedef enum _SYSTEM_INFORMATION_CLASS
   SystemProcessorPerformanceInformation = 8,
   SystemHandleInformation = 16,
   SystemPagefileInformation = 18,
+  SystemProcessIdInformation = 0x58,
   /* There are a lot more of these... */
 } SYSTEM_INFORMATION_CLASS;
 
@@ -723,15 +724,6 @@ typedef struct _SYSTEM_PROCESS_INFORMATION
   SYSTEM_THREADS Threads[1];
 } SYSTEM_PROCESS_INFORMATION, *PSYSTEM_PROCESS_INFORMATION;
 
-typedef struct _IO_STATUS_BLOCK
-{
-  union {
-    NTSTATUS Status;
-    PVOID Pointer;
-  };
-  ULONG_PTR Information;
-} IO_STATUS_BLOCK, *PIO_STATUS_BLOCK;
-
 typedef struct _SYSTEM_PERFORMANCE_INFORMATION
 {
   LARGE_INTEGER IdleTime;
@@ -817,6 +809,12 @@ typedef struct _SYSTEM_TIMEOFDAY_INFORMATION
   ULONG CurrentTimeZoneId;
   BYTE Reserved1[20];		/* Per MSDN.  Always 0. */
 } SYSTEM_TIMEOFDAY_INFORMATION, *PSYSTEM_TIMEOFDAY_INFORMATION;
+
+typedef struct _SYSTEM_PROCESS_ID_INFORMATION
+{
+  PVOID ProcessId;
+  UNICODE_STRING ImageName;
+} SYSTEM_PROCESS_ID_INFORMATION, *PSYSTEM_PROCESS_ID_INFORMATION;
 
 typedef enum _PROCESSINFOCLASS
 {
@@ -1240,6 +1238,15 @@ typedef struct _FILE_MAILSLOT_SET_INFORMATION
 {
   LARGE_INTEGER ReadTimeout;
 } FILE_MAILSLOT_SET_INFORMATION, *PFILE_MAILSLOT_SET_INFORMATION;
+
+typedef struct _IO_STATUS_BLOCK
+{
+  union {
+    NTSTATUS Status;
+    PVOID Pointer;
+  };
+  ULONG_PTR Information;
+} IO_STATUS_BLOCK, *PIO_STATUS_BLOCK;
 
 typedef VOID NTAPI (*PIO_APC_ROUTINE)(PVOID, PIO_STATUS_BLOCK, ULONG);
 
