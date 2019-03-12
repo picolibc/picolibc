@@ -111,6 +111,12 @@ default and limited to exes/dlls on the same NTFS partition as the Cygwin
 installation.  For more information and how to enable, please refer to
 <xref linkend="ov-hi-process"></xref>.
 </para></listitem>
+
+<listitem><para>
+Improve /proc/&lt;PID&gt;/cmdline and /proc/&lt;PID&gt;/stat handling to allow
+all processes access to basic process information of foreign processes.
+</para></listitem>
+
 </itemizedlist>
 
 </sect2>
