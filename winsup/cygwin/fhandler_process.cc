@@ -1160,7 +1160,7 @@ format_process_stat (void *data, char *&destbuf)
 				   "%u %lu %lu %u %u %lu %lu "
 				   "%U %U %d %d %d %d "
 				   "%U %lu "
-				   "%ld %lu",
+				   "%ld %lu\n",
 			  p->pid, cmd, state,
 			  p->ppid, p->pgid, p->sid, p->ctty, -1,
 			  0, fault_count, fault_count, 0, 0, utime, stime,
