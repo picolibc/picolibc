@@ -1638,8 +1638,8 @@ char *
 __acltotext (aclent_t *aclbufp, int aclcnt, const char *prefix, char separator,
 	     int options)
 {
-  if (!aclbufp || aclcnt < 1 || aclcnt > MAX_ACL_ENTRIES
-      || aclsort32 (aclcnt, 0, aclbufp))
+  if (!aclbufp || aclcnt < 0 || aclcnt > MAX_ACL_ENTRIES
+      || (aclcnt > 0 && aclsort32 (aclcnt, 0, aclbufp)))
     {
       set_errno (EINVAL);
       return NULL;
