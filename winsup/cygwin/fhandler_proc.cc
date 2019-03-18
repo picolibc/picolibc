@@ -405,6 +405,8 @@ fhandler_proc::fill_filebuf ()
   return false;
 }
 
+extern "C" int uname_x (struct utsname *);
+
 static off_t
 format_proc_version (void *, char *&destbuf)
 {
@@ -413,7 +415,7 @@ format_proc_version (void *, char *&destbuf)
   char *bufptr = buf;
   struct utsname uts_name;
 
-  uname (&uts_name);
+  uname_x (&uts_name);
   bufptr += __small_sprintf (bufptr, "%s version %s (%s@%s) (%s) %s\n",
 			  uts_name.sysname, uts_name.release, USERNAME, HOSTNAME,
 			  GCC_VERSION, uts_name.version);
