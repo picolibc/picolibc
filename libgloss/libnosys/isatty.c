@@ -10,6 +10,8 @@
 extern int errno;
 #include "warning.h"
 
+#ifndef REENTRANT_SYSCALLS_STUBS
+
 int
 _isatty (int file)
 {
@@ -18,3 +20,18 @@ _isatty (int file)
 }
 
 stub_warning(_isatty)
+
+#else /* REENTRANT_SYSCALLS_STUBS */
+
+int
+_isatty_r (ptr, fd)
+     struct _reent *ptr;
+     int fd;
+{
+  errno = ENOSYS;
+  return 0;
+}
+
+stub_warning(_isatty_r)
+
+#endif /* REENTRANT_SYSCALLS_STUBS */

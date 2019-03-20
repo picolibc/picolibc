@@ -11,6 +11,8 @@
 extern int errno;
 #include "warning.h"
 
+#ifndef REENTRANT_SYSCALLS_STUBS
+
 clock_t
 _times (struct tms *buf)
 {
@@ -19,3 +21,17 @@ _times (struct tms *buf)
 }
 
 stub_warning(_times)
+
+#else /* REENTRANT_SYSCALLS_STUBS */
+
+clock_t
+_times_r (struct _reent *ptr,
+     struct tms *ptms)
+{
+  errno = ENOSYS;
+  return -1;
+}
+
+stub_warning (_times_r)
+
+#endif /* REENTRANT_SYSCALLS_STUBS */
