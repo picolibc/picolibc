@@ -85,6 +85,9 @@ case "${target}" in
 	;;
   z8k-*-*)
 	;;
+  xtensa-*-*)
+  AC_DEFINE(REENTRANT_SYSCALLS_STUBS)
+  ;;
   *)
 	AC_DEFINE(MISSING_SYSCALL_NAMES)
 	;;

@@ -12,6 +12,8 @@
 extern int errno;
 #include "warning.h"
 
+#ifndef REENTRANT_SYSCALLS_STUBS
+
 int
 _fstat (int          fildes,
         struct stat *st)
@@ -21,3 +23,19 @@ _fstat (int          fildes,
 }
 
 stub_warning(_fstat)
+
+#else /* REENTRANT_SYSCALLS_STUBS */
+
+int
+_fstat_r (ptr, fd, pstat)
+     struct _reent *ptr;
+     int fd;
+     struct stat *pstat;
+{
+  errno = ENOSYS;
+  return -1;
+}
+
+stub_warning(_fstat_r)
+
+#endif /* REENTRANT_SYSCALLS_STUBS */
