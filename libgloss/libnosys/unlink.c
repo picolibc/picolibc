@@ -10,6 +10,8 @@
 extern int errno;
 #include "warning.h"
 
+#ifndef REENTRANT_SYSCALLS_STUBS
+
 int
 _unlink (char *name)
 {
@@ -18,3 +20,17 @@ _unlink (char *name)
 }
 
 stub_warning(_unlink)
+
+#else /* REENTRANT_SYSCALLS_STUBS */
+
+int
+_unlink_r (struct _reent *ptr,
+     const char *file)
+{
+  errno = ENOSYS;
+  return -1;
+}
+
+stub_warning (_unlink_r)
+
+#endif /* REENTRANT_SYSCALLS_STUBS */

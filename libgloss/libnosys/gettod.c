@@ -14,6 +14,8 @@ extern int errno;
 
 struct timeval;
 
+#ifndef REENTRANT_SYSCALLS_STUBS
+
 int
 _gettimeofday (struct timeval  *ptimeval,
         void *ptimezone)
@@ -23,3 +25,18 @@ _gettimeofday (struct timeval  *ptimeval,
 }
 
 stub_warning(_gettimeofday)
+
+#else /* REENTRANT_SYSCALLS_STUBS */
+
+int
+_gettimeofday_r (struct _reent *ptr,
+     struct timeval *ptimeval,
+     void *ptimezone)
+{
+  errno = ENOSYS;
+  return -1;
+}
+
+stub_warning(_gettimeofday_r)
+
+#endif /* REENTRANT_SYSCALLS_STUBS */

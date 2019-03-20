@@ -68,7 +68,7 @@ OBJCOPY = `if [ -f ${objroot}/../binutils/objcopy ] ; \
 OBJS = chown.o close.o environ.o errno.o execve.o fork.o fstat.o \
 	getpid.o gettod.o isatty.o kill.o link.o lseek.o open.o \
 	read.o readlink.o sbrk.o stat.o symlink.o times.o unlink.o \
-	wait.o write.o _exit.o
+	wait.o write.o _exit.o pthread.o getreent.o
 
 # Object files specific to particular targets.
 EVALOBJS = ${OBJS}

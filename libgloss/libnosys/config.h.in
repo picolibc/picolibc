@@ -3,6 +3,9 @@
 /* Missing syscall names */
 #undef MISSING_SYSCALL_NAMES
 
+/* Reentrant syscalls stubs */
+#undef REENTRANT_SYSCALLS_STUBS
+
 /* Using ELF format */
 #undef HAVE_ELF
 
