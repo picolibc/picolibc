@@ -1309,9 +1309,11 @@ public:
   fhandler_fifo *clone (cygheap_types malloc_type = HEAP_FHANDLER)
   {
     void *ptr = (void *) ccalloc (malloc_type, 1, sizeof (fhandler_fifo));
-    fhandler_fifo *fh = new (ptr) fhandler_fifo (ptr);
-    copyto (fh);
-    return fh;
+    fhandler_fifo *fhf = new (ptr) fhandler_fifo (ptr);
+    copyto (fhf);
+    for (int i = 0; i < nclients; i++)
+      fhf->client[i].fh = client[i].fh->fhandler_base::clone ();
+    return fhf;
   }
 };
 

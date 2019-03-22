@@ -816,6 +816,31 @@ fhandler_fifo::dup (fhandler_base *child, int flags)
       __seterrno ();
       return -1;
     }
+  for (int i = 0; i < nclients; i++)
+    {
+      if (!DuplicateHandle (GetCurrentProcess (), client[i].fh->get_handle (),
+			    GetCurrentProcess (),
+			    &fhf->client[i].fh->get_handle (),
+			    0, true, DUPLICATE_SAME_ACCESS)
+	  || !DuplicateHandle (GetCurrentProcess (), client[i].connect_evt,
+			       GetCurrentProcess (),
+			       &fhf->client[i].connect_evt,
+			       0, true, DUPLICATE_SAME_ACCESS)
+	  || !DuplicateHandle (GetCurrentProcess (), client[i].dummy_evt,
+			       GetCurrentProcess (),
+			       &fhf->client[i].dummy_evt,
+			       0, true, DUPLICATE_SAME_ACCESS))
+	{
+	  CloseHandle (fhf->read_ready);
+	  CloseHandle (fhf->write_ready);
+	  fhf->close ();
+	  __seterrno ();
+	  return -1;
+	}
+    }
+  fhf->listen_client_thr = NULL;
+  fhf->lct_termination_evt = NULL;
+  fhf->fifo_client_unlock ();
   return 0;
 }
 
