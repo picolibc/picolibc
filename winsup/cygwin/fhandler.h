@@ -1278,6 +1278,10 @@ class fhandler_fifo: public fhandler_base
 public:
   fhandler_fifo ();
   bool hit_eof ();
+  int get_nclients () const { return nclients; }
+  HANDLE& get_handle () { return fhandler_base::get_handle (); }
+  HANDLE get_handle (int i) const { return client[i].fh->get_handle (); }
+  bool is_connected (int i) const { return client[i].state == fc_connected; }
   PUNICODE_STRING get_pipe_name ();
   DWORD listen_client_thread ();
   void fifo_client_lock () { _fifo_client_lock.lock (); }

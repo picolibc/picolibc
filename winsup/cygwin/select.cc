@@ -822,17 +822,148 @@ fhandler_pipe::select_except (select_stuff *ss)
   return s;
 }
 
+static int
+peek_fifo (select_record *s, bool from_select)
+{
+  if (cygheap->fdtab.not_open (s->fd))
+    {
+      s->thread_errno = EBADF;
+      return -1;
+    }
+
+  int gotone = 0;
+  fhandler_fifo *fh = (fhandler_fifo *) s->fh;
+
+  if (s->read_selected)
+    {
+      if (s->read_ready)
+	{
+	  select_printf ("%s, already ready for read", fh->get_name ());
+	  gotone = 1;
+	  goto out;
+	}
+
+      if (fh->get_readahead_valid ())
+	{
+	  select_printf ("readahead");
+	  gotone = s->read_ready = true;
+	  goto out;
+	}
+
+      if (fh->hit_eof ())
+	{
+	  select_printf ("read: %s, saw EOF", fh->get_name ());
+	  gotone = s->read_ready = true;
+	  if (s->except_selected)
+	    gotone += s->except_ready = true;
+	  goto out;
+	}
+
+      fh->fifo_client_lock ();
+      for (int i = 0; i < fh->get_nclients (); i++)
+	if (fh->is_connected (i))
+	  {
+	    int n = pipe_data_available (s->fd, fh, fh->get_handle (i),
+					 false);
+	    if (n > 0)
+	      {
+		select_printf ("read: %s, ready for read: avail %d, client %d",
+			       fh->get_name (), n, i);
+		fh->fifo_client_unlock ();
+		gotone += s->read_ready = true;
+		goto out;
+	      }
+	  }
+      fh->fifo_client_unlock ();
+    }
+out:
+  if (s->write_selected)
+    {
+      gotone += s->write_ready
+	= pipe_data_available (s->fd, fh, fh->get_handle (), true);
+      select_printf ("write: %s, gotone %d", fh->get_name (), gotone);
+    }
+  return gotone;
+}
+
+static int start_thread_fifo (select_record *me, select_stuff *stuff);
+
+static DWORD WINAPI
+thread_fifo (void *arg)
+{
+  select_fifo_info *pi = (select_fifo_info *) arg;
+  DWORD sleep_time = 0;
+  bool looping = true;
+
+  while (looping)
+    {
+      for (select_record *s = pi->start; (s = s->next); )
+	if (s->startup == start_thread_fifo)
+	  {
+	    if (peek_fifo (s, true))
+	      looping = false;
+	    if (pi->stop_thread)
+	      {
+		select_printf ("stopping");
+		looping = false;
+		break;
+	      }
+	  }
+      if (!looping)
+	break;
+      Sleep (sleep_time >> 3);
+      if (sleep_time < 80)
+	++sleep_time;
+      if (pi->stop_thread)
+	break;
+    }
+  return 0;
+}
+
+static int
+start_thread_fifo (select_record *me, select_stuff *stuff)
+{
+  select_fifo_info *pi = stuff->device_specific_fifo;
+  if (pi->start)
+    me->h = *((select_fifo_info *) stuff->device_specific_fifo)->thread;
+  else
+    {
+      pi->start = &stuff->start;
+      pi->stop_thread = false;
+      pi->thread = new cygthread (thread_fifo, pi, "fifosel");
+      me->h = *pi->thread;
+      if (!me->h)
+	return 0;
+    }
+  return 1;
+}
+
+static void
+fifo_cleanup (select_record *, select_stuff *stuff)
+{
+  select_fifo_info *pi = (select_fifo_info *) stuff->device_specific_fifo;
+  if (!pi)
+    return;
+  if (pi->thread)
+    {
+      pi->stop_thread = true;
+      pi->thread->detach ();
+    }
+  delete pi;
+  stuff->device_specific_fifo = NULL;
+}
+
 select_record *
 fhandler_fifo::select_read (select_stuff *ss)
 {
-  if (!ss->device_specific_pipe
-      && (ss->device_specific_pipe = new select_pipe_info) == NULL)
+  if (!ss->device_specific_fifo
+      && (ss->device_specific_fifo = new select_fifo_info) == NULL)
     return NULL;
   select_record *s = ss->start.next;
-  s->startup = start_thread_pipe;
-  s->peek = peek_pipe;
+  s->startup = start_thread_fifo;
+  s->peek = peek_fifo;
   s->verify = verify_ok;
-  s->cleanup = pipe_cleanup;
+  s->cleanup = fifo_cleanup;
   s->read_selected = true;
   s->read_ready = false;
   return s;
@@ -841,14 +972,14 @@ fhandler_fifo::select_read (select_stuff *ss)
 select_record *
 fhandler_fifo::select_write (select_stuff *ss)
 {
-  if (!ss->device_specific_pipe
-      && (ss->device_specific_pipe = new select_pipe_info) == NULL)
+  if (!ss->device_specific_fifo
+      && (ss->device_specific_fifo = new select_fifo_info) == NULL)
     return NULL;
   select_record *s = ss->start.next;
-  s->startup = start_thread_pipe;
-  s->peek = peek_pipe;
+  s->startup = start_thread_fifo;
+  s->peek = peek_fifo;
   s->verify = verify_ok;
-  s->cleanup = pipe_cleanup;
+  s->cleanup = fifo_cleanup;
   s->write_selected = true;
   s->write_ready = false;
   return s;
@@ -857,14 +988,14 @@ fhandler_fifo::select_write (select_stuff *ss)
 select_record *
 fhandler_fifo::select_except (select_stuff *ss)
 {
-  if (!ss->device_specific_pipe
-      && (ss->device_specific_pipe = new select_pipe_info) == NULL)
+  if (!ss->device_specific_fifo
+      && (ss->device_specific_fifo = new select_fifo_info) == NULL)
     return NULL;
   select_record *s = ss->start.next;
-  s->startup = start_thread_pipe;
-  s->peek = peek_pipe;
+  s->startup = start_thread_fifo;
+  s->peek = peek_fifo;
   s->verify = verify_ok;
-  s->cleanup = pipe_cleanup;
+  s->cleanup = fifo_cleanup;
   s->except_selected = true;
   s->except_ready = false;
   return s;

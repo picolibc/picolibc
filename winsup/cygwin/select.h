@@ -53,6 +53,11 @@ struct select_pipe_info: public select_info
   select_pipe_info (): select_info () {}
 };
 
+struct select_fifo_info: public select_info
+{
+  select_fifo_info (): select_info () {}
+};
+
 struct select_socket_info: public select_info
 {
   int num_w4;
@@ -89,6 +94,7 @@ public:
   select_record start;
 
   select_pipe_info *device_specific_pipe;
+  select_fifo_info *device_specific_fifo;
   select_socket_info *device_specific_socket;
   select_serial_info *device_specific_serial;
   select_signalfd_info *device_specific_signalfd;
@@ -102,6 +108,7 @@ public:
   select_stuff (): return_on_signal (false), always_ready (false),
 		   windows_used (false), start (),
 		   device_specific_pipe (NULL),
+		   device_specific_fifo (NULL),
 		   device_specific_socket (NULL),
 		   device_specific_serial (NULL),
 		   device_specific_signalfd (NULL) {}
