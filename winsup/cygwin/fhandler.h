@@ -1277,6 +1277,7 @@ class fhandler_fifo: public fhandler_base
   bool listen_client ();
 public:
   fhandler_fifo ();
+  bool hit_eof ();
   PUNICODE_STRING get_pipe_name ();
   DWORD listen_client_thread ();
   void fifo_client_lock () { _fifo_client_lock.lock (); }
