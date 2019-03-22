@@ -654,6 +654,25 @@ fhandler_fifo::raw_write (const void *ptr, size_t len)
   return ret;
 }
 
+/* A FIFO open for reading is at EOF if no process has it open for
+   writing.  We test this by checking nconnected.  But we must take
+   account of the possible delay from the time of connection to the
+   time the connection is recorded by the listen_client thread. */
+bool
+fhandler_fifo::hit_eof ()
+{
+  fifo_client_lock ();
+  bool eof = (nconnected == 0);
+  fifo_client_unlock ();
+  if (eof)
+    {
+      /* Give the listen_client thread time to catch up, then recheck. */
+      Sleep (1);
+      eof = (nconnected == 0);
+    }
+  return eof;
+}
+
 void __reg3
 fhandler_fifo::raw_read (void *in_ptr, size_t& len)
 {
@@ -665,7 +684,7 @@ fhandler_fifo::raw_read (void *in_ptr, size_t& len)
 
   while (1)
     {
-      if (nconnected == 0)	/* EOF */
+      if (hit_eof ())
 	{
 	  len = 0;
 	  return;
