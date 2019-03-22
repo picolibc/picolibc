@@ -867,4 +867,10 @@ fhandler_fifo::set_close_on_exec (bool val)
   fhandler_base::set_close_on_exec (val);
   set_no_inheritance (read_ready, val);
   set_no_inheritance (write_ready, val);
+  for (int i = 0; i < nclients; i++)
+    {
+      client[i].fh->fhandler_base::set_close_on_exec (val);
+      set_no_inheritance (client[i].connect_evt, val);
+      set_no_inheritance (client[i].dummy_evt, val);
+    }
 }
