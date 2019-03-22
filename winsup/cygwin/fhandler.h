@@ -1234,14 +1234,21 @@ public:
   }
 };
 
-class fhandler_fifo: public fhandler_base_overlapped
+#define CYGWIN_FIFO_PIPE_NAME_LEN     47
+
+class fhandler_fifo: public fhandler_base
 {
   HANDLE read_ready;
   HANDLE write_ready;
+  UNICODE_STRING pipe_name;
+  WCHAR pipe_name_buf[CYGWIN_FIFO_PIPE_NAME_LEN + 1];
   bool __reg2 wait (HANDLE);
-  char __reg2 *fifo_name (char *, const char *);
+  NTSTATUS npfs_handle (HANDLE &);
+  HANDLE create_pipe ();
+  NTSTATUS open_pipe ();
 public:
   fhandler_fifo ();
+  PUNICODE_STRING get_pipe_name ();
   int open (int, mode_t);
   off_t lseek (off_t offset, int whence);
   int close ();
@@ -1249,6 +1256,7 @@ public:
   bool isfifo () const { return true; }
   void set_close_on_exec (bool val);
   void __reg3 raw_read (void *ptr, size_t& ulen);
+  ssize_t __reg3 raw_write (const void *ptr, size_t ulen);
   bool arm (HANDLE h);
   void fixup_after_fork (HANDLE);
   int __reg2 fstatvfs (struct statvfs *buf);
@@ -1262,7 +1270,6 @@ public:
   {
     x->pc.free_strings ();
     *reinterpret_cast<fhandler_fifo *> (x) = *this;
-    reinterpret_cast<fhandler_fifo *> (x)->atomic_write_buf = NULL;
     x->reset (this);
   }
 
