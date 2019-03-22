@@ -1267,6 +1267,7 @@ class fhandler_fifo: public fhandler_base
   WCHAR pipe_name_buf[CYGWIN_FIFO_PIPE_NAME_LEN + 1];
   fifo_client_handler client[MAX_CLIENTS];
   int nclients, nconnected;
+  af_unix_spinlock_t _fifo_client_lock;
   bool __reg2 wait (HANDLE);
   NTSTATUS npfs_handle (HANDLE &);
   HANDLE create_pipe_instance (bool);
@@ -1278,6 +1279,8 @@ public:
   fhandler_fifo ();
   PUNICODE_STRING get_pipe_name ();
   DWORD listen_client_thread ();
+  void fifo_client_lock () { _fifo_client_lock.lock (); }
+  void fifo_client_unlock () { _fifo_client_lock.unlock (); }
   int open (int, mode_t);
   off_t lseek (off_t offset, int whence);
   int close ();

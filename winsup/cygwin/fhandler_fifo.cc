@@ -349,13 +349,17 @@ fhandler_fifo::listen_client_thread ()
       int i;
       DWORD wait_ret;
 
+      fifo_client_lock ();
       found = false;
       for (i = 0; i < nclients; i++)
 	switch (client[i].state)
 	  {
 	  case fc_invalid:
 	    if (disconnect_and_reconnect (i) < 0)
-	      goto errout;
+	      {
+		fifo_client_unlock ();
+		goto errout;
+	      }
 	    /* Fall through. */
 	  case fc_connected:
 	    w[i] = client[i].dummy_evt;
@@ -369,13 +373,15 @@ fhandler_fifo::listen_client_thread ()
 	    break;
 	  }
       w[nclients] = lct_termination_evt;
+      int res = 0;
       if (!found)
-	{
-	  if (add_client () < 0)
-	    goto errout;
-	  else
-	    continue;
-	}
+	res = add_client ();
+      fifo_client_unlock ();
+      if (res < 0)
+	goto errout;
+      else if (!found)
+	continue;
+
       if (!arm (read_ready))
 	{
 	  __seterrno ();
@@ -391,9 +397,11 @@ fhandler_fifo::listen_client_thread ()
 	return 0;
       else
 	{
+	  fifo_client_lock ();
 	  client[i].state = fc_connected;
 	  nconnected++;
 	  set_pipe_non_blocking (client[i].fh->get_handle (), true);
+	  fifo_client_unlock ();
 	  yield ();
 	}
     }
@@ -664,6 +672,7 @@ fhandler_fifo::raw_read (void *in_ptr, size_t& len)
 	}
 
       /* Poll the connected clients for input. */
+      fifo_client_lock ();
       for (int i = 0; i < nclients; i++)
 	if (client[i].state == fc_connected)
 	  {
@@ -671,15 +680,22 @@ fhandler_fifo::raw_read (void *in_ptr, size_t& len)
 	    client[i].fh->fhandler_base::raw_read (in_ptr, len);
 	    ssize_t nread = (ssize_t) len;
 	    if (nread > 0)
-	      return;
+	      {
+		fifo_client_unlock ();
+		return;
+	      }
 	    else if (nread < 0 && GetLastError () != ERROR_NO_DATA)
-	      goto errout;
+	      {
+		fifo_client_unlock ();
+		goto errout;
+	      }
 	    else if (nread == 0) /* Client has disconnected. */
 	      {
 		client[i].state = fc_invalid;
 		nconnected--;
 	      }
 	  }
+      fifo_client_unlock ();
       if (is_nonblocking ())
 	{
 	  set_errno (EAGAIN);
