@@ -850,6 +850,15 @@ fhandler_fifo::fixup_after_fork (HANDLE parent)
   fhandler_base::fixup_after_fork (parent);
   fork_fixup (parent, read_ready, "read_ready");
   fork_fixup (parent, write_ready, "write_ready");
+  for (int i = 0; i < nclients; i++)
+    {
+      client[i].fh->fhandler_base::fixup_after_fork (parent);
+      fork_fixup (parent, client[i].connect_evt, "connect_evt");
+      fork_fixup (parent, client[i].dummy_evt, "dummy_evt");
+    }
+  listen_client_thr = NULL;
+  lct_termination_evt = NULL;
+  fifo_client_unlock ();
 }
 
 void
