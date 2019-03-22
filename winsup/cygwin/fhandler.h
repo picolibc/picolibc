@@ -1235,20 +1235,49 @@ public:
 };
 
 #define CYGWIN_FIFO_PIPE_NAME_LEN     47
+#define MAX_CLIENTS 64
+
+enum fifo_client_connect_state
+  {
+   fc_unknown,
+   fc_connecting,
+   fc_connected,
+   fc_invalid
+  };
+
+struct fifo_client_handler
+{
+  fhandler_base *fh;
+  fifo_client_connect_state state;
+  HANDLE connect_evt;
+  HANDLE dummy_evt;		/* Never signaled. */
+  fifo_client_handler () : fh (NULL), state (fc_unknown), connect_evt (NULL),
+			   dummy_evt (NULL) {}
+  int connect ();
+  int close ();
+};
 
 class fhandler_fifo: public fhandler_base
 {
   HANDLE read_ready;
   HANDLE write_ready;
+  HANDLE listen_client_thr;
+  HANDLE lct_termination_evt;
   UNICODE_STRING pipe_name;
   WCHAR pipe_name_buf[CYGWIN_FIFO_PIPE_NAME_LEN + 1];
+  fifo_client_handler client[MAX_CLIENTS];
+  int nclients, nconnected;
   bool __reg2 wait (HANDLE);
   NTSTATUS npfs_handle (HANDLE &);
-  HANDLE create_pipe ();
+  HANDLE create_pipe_instance (bool);
   NTSTATUS open_pipe ();
+  int disconnect_and_reconnect (int);
+  int add_client ();
+  bool listen_client ();
 public:
   fhandler_fifo ();
   PUNICODE_STRING get_pipe_name ();
+  DWORD listen_client_thread ();
   int open (int, mode_t);
   off_t lseek (off_t offset, int whence);
   int close ();
