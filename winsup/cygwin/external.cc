@@ -331,6 +331,10 @@ cygwin_internal (cygwin_getinfo_types t, ...)
 	}
 	break;
 
+      case CW_MAX_CYGWIN_PID:
+	res = MAX_PID;
+	break;
+
       case CW_EXTRACT_DOMAIN_AND_USER:
 	{
 	  WCHAR nt_domain[MAX_DOMAIN_NAME_LEN + 1];
