@@ -1134,7 +1134,7 @@ ctrl_c_handler (DWORD type)
      handled *by* the process group leader. */
   if (t && (!have_execed || have_execed_cygwin)
       && t->getpgid () == myself->pid &&
-      (GetTickCount () - t->last_ctrl_c) >= MIN_CTRL_C_SLOP)
+      (GetTickCount64 () - t->last_ctrl_c) >= MIN_CTRL_C_SLOP)
     /* Otherwise we just send a SIGINT to the process group and return TRUE
        (to indicate that we have handled the signal).  At this point, type
        should be a CTRL_C_EVENT or CTRL_BREAK_EVENT. */
@@ -1144,9 +1144,9 @@ ctrl_c_handler (DWORD type)
       if (type == CTRL_BREAK_EVENT
 	  && t->ti.c_cc[VINTR] == 3 && t->ti.c_cc[VQUIT] == 3)
 	sig = SIGQUIT;
-      t->last_ctrl_c = GetTickCount ();
+      t->last_ctrl_c = GetTickCount64 ();
       t->kill_pgrp (sig);
-      t->last_ctrl_c = GetTickCount ();
+      t->last_ctrl_c = GetTickCount64 ();
       return TRUE;
     }
 

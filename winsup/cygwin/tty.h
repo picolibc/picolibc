@@ -42,7 +42,7 @@ public:
   pid_t pgid;
   bool output_stopped;		/* FIXME: Maybe do this with a mutex someday? */
   fh_devices ntty;
-  DWORD last_ctrl_c;		/* tick count of last ctrl-c */
+  ULONGLONG last_ctrl_c;	/* tick count of last ctrl-c */
   bool is_console;
 
   IMPLEMENT_STATUS_FLAG (bool, initialized)
