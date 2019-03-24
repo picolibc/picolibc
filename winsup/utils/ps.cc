@@ -164,6 +164,7 @@ main (int argc, char *argv[])
   const char *lfmt   = "%c %7d %7d %7d %10u %4s %8u %8s %s\n";
   char ch;
   void *drive_map = NULL;
+  time_t boot_time = -1;
 
   aflag = lflag = fflag = sflag = 0;
   uid = getuid ();
@@ -237,9 +238,12 @@ main (int argc, char *argv[])
 
   if (query == CW_GETPINFO_FULL)
     {
+      HANDLE tok;
+      NTSTATUS status;
+      SYSTEM_TIMEOFDAY_INFORMATION stodi;
+
       /* Enable debug privilege to allow to enumerate all processes,
 	 not only processes in current session. */
-      HANDLE tok;
       if (OpenProcessToken (GetCurrentProcess (),
 			    TOKEN_QUERY | TOKEN_ADJUST_PRIVILEGES,
 			    &tok))
@@ -256,6 +260,15 @@ main (int argc, char *argv[])
 	}
 
       drive_map = (void *) cygwin_internal (CW_ALLOC_DRIVE_MAP);
+
+      /* Get system boot time to default process start time */
+      status = NtQuerySystemInformation (SystemTimeOfDayInformation,
+				(PVOID) &stodi, sizeof stodi, NULL);
+      if (!NT_SUCCESS (status))
+	fprintf (stderr,
+		"NtQuerySystemInformation(SystemTimeOfDayInformation), "
+				"status %#010x\n", status);
+      boot_time = to_time_t ((FILETIME*)&stodi.BootTime);
     }
 
   for (int pid = 0;
@@ -337,16 +350,10 @@ main (int argc, char *argv[])
 		p->start_time = to_time_t (&ct);
 	      CloseHandle (h);
 	    }
+	  /* Default to boot time when process start time inaccessible, 0, -1 */
 	  if (!h || 0 == p->start_time || -1 == p->start_time)
 	    {
-	      SYSTEM_TIMEOFDAY_INFORMATION stodi;
-	      status = NtQuerySystemInformation (SystemTimeOfDayInformation,
-					(PVOID) &stodi, sizeof stodi, NULL);
-	      if (!NT_SUCCESS (status))
-		fprintf (stderr,
-			"NtQuerySystemInformation(SystemTimeOfDayInformation), "
-					"status %08x", status);
-	      p->start_time = to_time_t ((FILETIME*)&stodi.BootTime);
+	      p->start_time = boot_time;
 	    }
 	}
 
