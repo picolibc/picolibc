@@ -337,6 +337,17 @@ main (int argc, char *argv[])
 		p->start_time = to_time_t (&ct);
 	      CloseHandle (h);
 	    }
+	  if (!h || 0 == p->start_time || -1 == p->start_time)
+	    {
+	      SYSTEM_TIMEOFDAY_INFORMATION stodi;
+	      status = NtQuerySystemInformation (SystemTimeOfDayInformation,
+					(PVOID) &stodi, sizeof stodi, NULL);
+	      if (!NT_SUCCESS (status))
+		fprintf (stderr,
+			"NtQuerySystemInformation(SystemTimeOfDayInformation), "
+					"status %08x", status);
+	      p->start_time = to_time_t ((FILETIME*)&stodi.BootTime);
+	    }
 	}
 
       char uname[128];
