@@ -1253,6 +1253,10 @@ struct fifo_client_handler
   HANDLE dummy_evt;		/* Never signaled. */
   fifo_client_handler () : fh (NULL), state (fc_unknown), connect_evt (NULL),
 			   dummy_evt (NULL) {}
+  fifo_client_handler (fhandler_base *_fh, fifo_client_connect_state _state,
+		       HANDLE _connect_evt, HANDLE _dummy_evt)
+    : fh (_fh), state (_state), connect_evt (_connect_evt),
+      dummy_evt (_dummy_evt) {}
   int connect ();
   int close ();
 };
@@ -1268,6 +1272,7 @@ class fhandler_fifo: public fhandler_base
   fifo_client_handler client[MAX_CLIENTS];
   int nclients, nconnected;
   af_unix_spinlock_t _fifo_client_lock;
+  bool _duplexer;
   bool __reg2 wait (HANDLE);
   NTSTATUS npfs_handle (HANDLE &);
   HANDLE create_pipe_instance (bool);

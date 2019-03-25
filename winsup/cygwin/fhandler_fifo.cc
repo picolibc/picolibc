@@ -33,7 +33,7 @@ STATUS_PIPE_EMPTY simply means there's no data to be read. */
 fhandler_fifo::fhandler_fifo ():
   fhandler_base (), read_ready (NULL), write_ready (NULL),
   listen_client_thr (NULL), lct_termination_evt (NULL), nclients (0),
-  nconnected (0)
+  nconnected (0), _duplexer (false)
 {
   pipe_name_buf[0] = L'\0';
   need_fork_fixup (true);
@@ -224,6 +224,8 @@ fhandler_fifo::create_pipe_instance (bool first)
     }
   access = GENERIC_READ | FILE_READ_ATTRIBUTES | FILE_WRITE_ATTRIBUTES
     | SYNCHRONIZE;
+  if (first && _duplexer)
+    access |= GENERIC_WRITE;
   sharing = FILE_SHARE_READ | FILE_SHARE_WRITE;
   hattr = OBJ_INHERIT;
   if (first)
@@ -437,7 +439,7 @@ fhandler_fifo::open (int flags, mode_t)
     case O_RDWR:
       reader = true;
       writer = false;
-      duplexer = true;
+      duplexer = _duplexer = true;
       break;
     default:
       set_errno (EINVAL);
@@ -447,7 +449,7 @@ fhandler_fifo::open (int flags, mode_t)
 
   debug_only_printf ("reader %d, writer %d, duplexer %d", reader, writer, duplexer);
   set_flags (flags);
-  if (reader)
+  if (reader && !duplexer)
     nohandle (true);
 
   /* Create control events for this named pipe */
@@ -472,6 +474,48 @@ fhandler_fifo::open (int flags, mode_t)
       goto out;
     }
 
+  /* If we're a duplexer, create the pipe and the first client. */
+  if (duplexer)
+    {
+      HANDLE ph, connect_evt, dummy_evt;
+      fhandler_base *fh;
+
+      ph = create_pipe_instance (true);
+      if (!ph)
+	{
+	  res = error_errno_set;
+	  goto out;
+	}
+      set_io_handle (ph);
+      set_pipe_non_blocking (ph, true);
+      if (!(fh = build_fh_dev (dev ())))
+	{
+	  set_errno (EMFILE);
+	  res = error_errno_set;
+	  goto out;
+	}
+      fh->set_io_handle (ph);
+      fh->set_flags (flags);
+      if (!(connect_evt = create_event ()))
+	{
+	  res = error_errno_set;
+	  fh->close ();
+	  delete fh;
+	  goto out;
+	}
+      if (!(dummy_evt = create_event ()))
+	{
+	  res = error_errno_set;
+	  delete fh;
+	  fh->close ();
+	  CloseHandle (connect_evt);
+	  goto out;
+	}
+      client[0] = fifo_client_handler (fh, fc_connected, connect_evt,
+				       dummy_evt);
+      nconnected = nclients = 1;
+    }
+
   /* If we're reading, start the listen_client thread (which should
      signal read_ready), and wait for a writer. */
   if (reader)
@@ -482,8 +526,8 @@ fhandler_fifo::open (int flags, mode_t)
 	  res = error_errno_set;
 	  goto out;
 	}
-      /* Wait for the listen_client thread to create the pipe and
-	 signal read_ready.  This should be quick.  */
+      /* Wait for the listen_client thread to signal read_ready.  This
+	 should be quick.  */
       HANDLE w[2] = { listen_client_thr, read_ready };
       switch (WaitForMultipleObjects (2, w, FALSE, INFINITE))
 	{
@@ -703,12 +747,25 @@ fhandler_fifo::raw_read (void *in_ptr, size_t& len)
 		fifo_client_unlock ();
 		return;
 	      }
-	    else if (nread < 0 && GetLastError () != ERROR_NO_DATA)
-	      {
-		fifo_client_unlock ();
-		goto errout;
-	      }
-	    else if (nread == 0) /* Client has disconnected. */
+	    /* In the duplex case with no data, we seem to get nread
+	       == -1 with ERROR_PIPE_LISTENING on the first attempt to
+	       read from the duplex pipe (client[0]), and nread == 0
+	       on subsequent attempts. */
+	    else if (nread < 0)
+	      switch (GetLastError ())
+		{
+		case ERROR_NO_DATA:
+		  break;
+		case ERROR_PIPE_LISTENING:
+		  if (_duplexer && i == 0)
+		    break;
+		  /* Fall through. */
+		default:
+		  fifo_client_unlock ();
+		  goto errout;
+		}
+	    else if (nread == 0 && (!_duplexer || i > 0))
+	      /* Client has disconnected. */
 	      {
 		client[i].state = fc_invalid;
 		nconnected--;
