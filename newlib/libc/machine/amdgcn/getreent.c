@@ -3,6 +3,7 @@
 #include <reent.h>
 #include <stdint.h>
 #include <stdlib.h>
+#include <unistd.h>
 
 /* Copied from the HSA documentation.  */
 typedef struct hsa_signal_s {
