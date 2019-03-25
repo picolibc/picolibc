@@ -1316,7 +1316,7 @@ public:
     fhandler_fifo *fhf = new (ptr) fhandler_fifo (ptr);
     copyto (fhf);
     for (int i = 0; i < nclients; i++)
-      fhf->client[i].fh = client[i].fh->fhandler_base::clone ();
+      fhf->client[i].fh = client[i].fh->clone ();
     return fhf;
   }
 };
