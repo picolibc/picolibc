@@ -530,6 +530,10 @@ extern "C" {
 /* ESP-IDF-specific: enable pthreads support */
 #ifdef __XTENSA__
 #define _POSIX_THREADS                          1
+#define _POSIX_TIMEOUTS                         1
+#define _POSIX_TIMERS                           1
+#define _POSIX_MONOTONIC_CLOCK                  200112L
+#define _POSIX_CLOCK_SELECTION                  200112L
 #define _UNIX98_THREAD_MUTEX_ATTRIBUTES         1
 #undef __MISC_VISIBLE
 #define __MISC_VISIBLE                          1
