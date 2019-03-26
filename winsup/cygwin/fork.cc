@@ -136,12 +136,6 @@ frok::child (volatile char * volatile here)
 {
   HANDLE& hParent = ch.parent;
 
-  /* NOTE: Logically this belongs in dll_list::load_after_fork, but by
-     doing it here, before the first sync_with_parent, we can exploit
-     the existing retry mechanism in hopes of getting a more favorable
-     address space layout next time. */
-  dlls.reserve_space ();
-
   sync_with_parent ("after longjmp", true);
   debug_printf ("child is running.  pid %d, ppid %d, stack here %p",
 		myself->pid, myself->ppid, __builtin_frame_address (0));

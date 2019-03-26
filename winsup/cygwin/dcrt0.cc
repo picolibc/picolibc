@@ -632,6 +632,12 @@ child_info_fork::handle_fork ()
 
   if (fixup_mmaps_after_fork (parent))
     api_fatal ("recreate_mmaps_after_fork_failed");
+
+  /* We need to occupy the address space for dynamically loaded dlls
+     before we allocate any dynamic object, or we may end up with
+     error "address space needed by <dll> is already occupied"
+     for no good reason (seen with some relocated dll). */
+  dlls.reserve_space ();
 }
 
 bool
