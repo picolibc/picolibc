@@ -444,7 +444,7 @@ public:
     return dev ().native ();
   }
   virtual bg_check_types bg_check (int, bool = false) {return bg_ok;}
-  void clear_readahead ()
+  virtual void clear_readahead ()
   {
     raixput = raixget = ralen = rabuflen = 0;
     rabuf = NULL;
@@ -1302,6 +1302,12 @@ public:
   bool arm (HANDLE h);
   void fixup_after_fork (HANDLE);
   int __reg2 fstatvfs (struct statvfs *buf);
+  void clear_readahead ()
+  {
+    fhandler_base::clear_readahead ();
+    for (int i = 0; i < nclients; i++)
+      client[i].fh->clear_readahead ();
+  }
   select_record *select_read (select_stuff *);
   select_record *select_write (select_stuff *);
   select_record *select_except (select_stuff *);
