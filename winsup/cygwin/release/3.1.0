@@ -1,0 +1,14 @@
+What's new:
+-----------
+
+
+What changed:
+-------------
+
+- FIFOs can now be opened multiple times for writing.
+  Addresses: https://cygwin.com/ml/cygwin/2015-03/msg00047.html
+             https://cygwin.com/ml/cygwin/2015-12/msg00311.html
+
+
+Bug Fixes
+---------
