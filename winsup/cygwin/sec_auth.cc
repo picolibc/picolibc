@@ -1539,6 +1539,9 @@ s4uauth (bool logon, PCWSTR domain, PCWSTR user, NTSTATUS &ret_status)
     {
       debug_printf ("%s: %y", logon ? "LsaRegisterLogonProcess"
 				    : "LsaConnectUntrusted", status);
+      /* If the privilege is not held, set the proper error code. */
+      if (status == STATUS_PORT_CONNECTION_REFUSED)
+	status = STATUS_PRIVILEGE_NOT_HELD;
       __seterrno_from_nt_status (status);
       goto out;
     }
