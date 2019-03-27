@@ -1437,11 +1437,15 @@ winpids::add (DWORD& nelem, bool winpid, DWORD pid)
 	 shared memory region. */
       onreturn = OpenProcess (PROCESS_QUERY_LIMITED_INFORMATION, false, pid);
 
-      /* If we couldn't open the process then we don't have rights to it and should
-	 make a copy of the shared memory area when it exists (it may not).  */
+      /* If we couldn't open the process then we don't have rights to it
+	 and should make a copy of the shared memory area when it exists
+	 (it may not).  */
       perform_copy = onreturn ? make_copy : true;
 
       p.init (cygpid, PID_PROCINFO | pinfo_access, NULL);
+      /* Did we catch the process during exec?  Try to fix. */
+      if (p && p->dwProcessId != pid)
+	pid = p->dwProcessId;
     }
 
   /* If we're just looking for winpids then don't do any special cygwin "stuff* */
@@ -1462,40 +1466,33 @@ winpids::add (DWORD& nelem, bool winpid, DWORD pid)
 	return;
     }
 
+out:
   /* Scan list of previously recorded pids to make sure that this pid hasn't
      shown up before.  This can happen when a process execs. */
   for (unsigned i = 0; i < nelem; i++)
-    if (pinfolist[i]->pid == p->pid)
+    if (pidlist[i] == pid)
       {
-	if ((_pinfo *) p != (_pinfo *) myself)
+	if (p && (_pinfo *) p != (_pinfo *) myself)
 	  p.release ();
 	return;
       }
-
-out:
-  /* Exit here.
-
-     If p is "false" then, eventually any opened process handle will be closed and
-     the function will exit without adding anything to the pid list.
+  /* If p is "false" then, eventually any opened process handle will be closed
+     and the function will exit without adding anything to the pid list.
 
      If p is "true" then we've discovered a cygwin process.
 
      Handle "myself" differently.  Don't copy it and close/zero the handle we
-     just opened to it.
-     If not performing a copy, then keep the process handle open for the duration
-     of the life of the procinfo region to potential races when a new process uses
-     this pid.
-     Otherwise, malloc some memory for a copy of the shared memory.
+     just opened to it.  If not performing a copy, then keep the process handle
+     open for the duration of the life of the procinfo region to potential
+     races when a new process uses this pid.  Otherwise, malloc some memory
+     for a copy of the shared memory.
 
-     If the malloc failed, then "oh well".  Just keep the shared memory around
+     If malloc failed, then "oh well".  Just keep the shared memory around
      and eventually close the handle when the winpids goes out of scope.
 
      If malloc succeeds, copy the procinfo we just grabbed into the new region,
      release the shared memory and allow the handle to be closed when this
-     function returns.
-
-     Oh, and add the pid to the list and bump the number of elements.  */
-
+     function returns. */
   if (p)
     {
       if (p == (_pinfo *) myself)
@@ -1519,8 +1516,9 @@ out:
 	    }
 	}
     }
+  /* Add pid to the list and bump the number of elements.  */
   if (p || winpid)
-    pidlist[nelem++] = !p ? pid : p->dwProcessId;
+    pidlist[nelem++] = pid;
 }
 
 DWORD
@@ -1545,9 +1543,9 @@ winpids::enum_processes (bool winpid)
 	  f.dbi.ObjectName.Buffer[f.dbi.ObjectName.Length / sizeof (WCHAR)] = L'\0';
 	  if (wcsncmp (f.dbi.ObjectName.Buffer, L"winpid.", 7) == 0)
 	    {
-	    DWORD pid = wcstoul (f.dbi.ObjectName.Buffer + 7, NULL, 10);
-	    add (nelem, false, pid);
-	  }
+	      DWORD pid = wcstoul (f.dbi.ObjectName.Buffer + 7, NULL, 10);
+	      add (nelem, false, pid);
+	    }
 	}
     }
   else
