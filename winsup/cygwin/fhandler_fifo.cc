@@ -266,7 +266,7 @@ fhandler_fifo::open_pipe ()
   sharing = FILE_SHARE_READ | FILE_SHARE_WRITE;
   status = NtOpenFile (&ph, access, &attr, &io, sharing, 0);
   if (NT_SUCCESS (status))
-    set_io_handle (ph);
+    set_handle (ph);
   return status;
 }
 
@@ -293,7 +293,7 @@ fhandler_fifo::add_client ()
   HANDLE ph = create_pipe_instance (first);
   if (!ph)
     goto errout;
-  fh->set_io_handle (ph);
+  fh->set_handle (ph);
   fh->set_flags (get_flags ());
   if (fc.connect () < 0)
     {
@@ -486,7 +486,7 @@ fhandler_fifo::open (int flags, mode_t)
 	  res = error_errno_set;
 	  goto out;
 	}
-      set_io_handle (ph);
+      set_handle (ph);
       set_pipe_non_blocking (ph, true);
       if (!(fh = build_fh_dev (dev ())))
 	{
@@ -494,7 +494,7 @@ fhandler_fifo::open (int flags, mode_t)
 	  res = error_errno_set;
 	  goto out;
 	}
-      fh->set_io_handle (ph);
+      fh->set_handle (ph);
       fh->set_flags (flags);
       if (!(connect_evt = create_event ()))
 	{
@@ -604,8 +604,8 @@ out:
 	  CloseHandle (write_ready);
 	  write_ready = NULL;
 	}
-      if (get_io_handle ())
-	CloseHandle (get_io_handle ());
+      if (get_handle ())
+	CloseHandle (get_handle ());
       if (listen_client_thr)
 	CloseHandle (listen_client_thr);
     }

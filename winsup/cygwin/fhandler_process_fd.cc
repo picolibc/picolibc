@@ -116,7 +116,7 @@ fhandler_process_fd::fd_reopen (int flags, mode_t mode)
   fh = fetch_fh (hdl, 0);
   if (!fh)
     return NULL;
-  fh->set_io_handle (hdl);
+  fh->set_handle (hdl);
   int ret = fh->open_with_arch (flags, mode);
   CloseHandle (hdl);
   if (!ret)
@@ -139,7 +139,7 @@ fhandler_process_fd::fstat (struct stat *statbuf)
   fh = fetch_fh (hdl, 0);
   if (!fh)
     return -1;
-  fh->set_io_handle (hdl);
+  fh->set_handle (hdl);
   int ret = fh->fstat (statbuf);
   CloseHandle (hdl);
   delete fh;
@@ -155,7 +155,7 @@ fhandler_process_fd::link (const char *newpath)
   fh = fetch_fh (hdl, FFH_LINKAT);
   if (!fh)
     return -1;
-  fh->set_io_handle (hdl);
+  fh->set_handle (hdl);
   int ret = fh->link (newpath);
   CloseHandle (hdl);
   delete fh;

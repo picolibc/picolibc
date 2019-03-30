@@ -461,7 +461,7 @@ fhandler_base::open_with_arch (int flags, mode_t mode)
     }
   else if (archetype)
     {
-      if (!archetype->get_io_handle ())
+      if (!archetype->get_handle ())
 	{
 	  copyto (archetype);
 	  archetype_usecount (1);
@@ -522,7 +522,7 @@ fhandler_base::open_null (int flags)
       __seterrno_from_nt_status (status);
       goto done;
     }
-  set_io_handle (fh);
+  set_handle (fh);
   set_flags (flags, pc.binmode ());
   res = 1;
   set_open_status ();
@@ -775,7 +775,7 @@ fhandler_base::open (int flags, mode_t mode)
 	}
     }
 
-  set_io_handle (fh);
+  set_handle (fh);
   set_flags (flags, pc.binmode ());
 
   res = 1;
@@ -1298,7 +1298,7 @@ fhandler_base_overlapped::close ()
      /* Cancelling seems to be necessary for cases where a reader is
 	 still executing when a signal handler performs a close.  */
       if (!writer)
-	CancelIo (get_io_handle ());
+	CancelIo (get_handle ());
       destroy_overlapped ();
       res = fhandler_base::close ();
     }
@@ -1382,7 +1382,7 @@ fhandler_base::fstatvfs (struct statvfs *sfs)
 int
 fhandler_base::init (HANDLE f, DWORD a, mode_t bin)
 {
-  set_io_handle (f);
+  set_handle (f);
   access = a;
   a &= GENERIC_READ | GENERIC_WRITE;
   int flags = 0;
@@ -1417,7 +1417,7 @@ fhandler_base::dup (fhandler_base *child, int)
 	}
 
       VerifyHandle (nh);
-      child->set_io_handle (nh);
+      child->set_handle (nh);
     }
   return 0;
 }

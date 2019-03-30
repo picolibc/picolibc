@@ -212,7 +212,7 @@ fhandler_base::fstat_by_nfs_ea (struct stat *buf)
   cyg_ldap cldap;
   bool ldap_open = false;
 
-  if (get_io_handle ())
+  if (get_handle ())
     {
       /* NFS stumbles over its own caching.  If you write to the file,
 	 a subsequent fstat does not return the actual size of the file,
@@ -220,8 +220,8 @@ fhandler_base::fstat_by_nfs_ea (struct stat *buf)
 	 access through another handle invalidates the caching within the
 	 NFS client. */
       if (get_access () & GENERIC_WRITE)
-	FlushFileBuffers (get_io_handle ());
-      pc.get_finfo (get_io_handle ());
+	FlushFileBuffers (get_handle ());
+      pc.get_finfo (get_handle ());
     }
   buf->st_dev = nfs_attr->fsid;
   buf->st_ino = nfs_attr->fileid;
@@ -291,7 +291,7 @@ fhandler_base::fstat_by_handle (struct stat *buf)
 
   /* If the file has been opened for other purposes than stat, we can't rely
      on the information stored in pc.fai.  So we overwrite them here. */
-  if (get_io_handle ())
+  if (get_handle ())
     {
       status = pc.get_finfo (h);
       if (!NT_SUCCESS (status))
@@ -386,7 +386,7 @@ fhandler_base::fstat_fs (struct stat *buf)
       nohandle (false);
       close_fs ();
       nohandle (no_handle);
-      set_io_handle (NULL);
+      set_handle (NULL);
     }
   if (res)
     res = fstat_by_name (buf);
@@ -1465,7 +1465,7 @@ fhandler_base::open_fs (int flags, mode_t mode)
       /* The file info in pc is wrong at this point for newly created files.
 	 Refresh it before fetching any file info. */
       if (new_file)
-	pc.get_finfo (get_io_handle ());
+	pc.get_finfo (get_handle ());
 
       if (pc.isgood_inode (pc.get_ino ()))
 	ino = pc.get_ino ();
@@ -2615,7 +2615,7 @@ fhandler_disk_file::fs_ioc_setflags (uint64_t flags)
       if (fh != get_handle ())
 	NtClose (fh);
       NtClose (get_handle ());
-      set_io_handle (NULL);
+      set_handle (NULL);
 
       pc.get_wide_win32_path (path);
       cret = (flags & FS_ENCRYPT_FL)
@@ -2630,7 +2630,7 @@ fhandler_disk_file::fs_ioc_setflags (uint64_t flags)
 	  __seterrno_from_nt_status (status);
 	  return -1;
 	}
-      set_io_handle (fh);
+      set_handle (fh);
       if (!cret)
 	{
 	  __seterrno ();

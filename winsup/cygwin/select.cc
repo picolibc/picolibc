@@ -74,7 +74,7 @@ details. */
 })
 
 #define set_handle_or_return_if_not_open(h, s) \
-  h = (s)->fh->get_io_handle_cyg (); \
+  h = (s)->fh->get_handle_cyg (); \
   if (cygheap->fdtab.not_open ((s)->fd)) \
     { \
       (s)->thread_errno =  EBADF; \
@@ -1459,7 +1459,7 @@ fhandler_base::select_read (select_stuff *ss)
       s->startup = no_startup;
       s->verify = verify_ok;
     }
-  s->h = get_io_handle_cyg ();
+  s->h = get_handle_cyg ();
   s->read_selected = true;
   s->read_ready = true;
   return s;
@@ -1474,7 +1474,7 @@ fhandler_base::select_write (select_stuff *ss)
       s->startup = no_startup;
       s->verify = verify_ok;
     }
-  s->h = get_handle ();
+  s->h = get_output_handle_cyg ();
   s->write_selected = true;
   s->write_ready = true;
   return s;
@@ -1747,7 +1747,7 @@ fhandler_socket_unix::select_read (select_stuff *ss)
       s->startup = no_startup;
       s->verify = verify_ok;
     }
-  s->h = get_io_handle_cyg ();
+  s->h = get_handle_cyg ();
   s->read_selected = true;
   s->read_ready = true;
   return s;

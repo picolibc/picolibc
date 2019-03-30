@@ -155,7 +155,7 @@ fhandler_console::set_unit ()
     pc.file_attributes (FILE_ATTRIBUTE_NORMAL);
   else
     {
-      set_io_handle (NULL);
+      set_handle (NULL);
       set_output_handle (NULL);
       created = false;
     }
@@ -298,7 +298,7 @@ fhandler_console::read (void *pv, size_t& buflen)
 {
   push_process_state process_state (PID_TTYIN);
 
-  HANDLE h = get_io_handle ();
+  HANDLE h = get_handle ();
 
 #define buf ((char *) pv)
 
@@ -818,7 +818,7 @@ fhandler_console::open (int flags, mode_t)
 
   tcinit (false);
 
-  set_io_handle (NULL);
+  set_handle (NULL);
   set_output_handle (NULL);
 
   /* Open the input handle as handle_ */
@@ -831,7 +831,7 @@ fhandler_console::open (int flags, mode_t)
       __seterrno ();
       return 0;
     }
-  set_io_handle (h);
+  set_handle (h);
 
   h = CreateFileW (L"CONOUT$", GENERIC_READ | GENERIC_WRITE,
 		  FILE_SHARE_READ | FILE_SHARE_WRITE, &sec_none,
@@ -856,11 +856,11 @@ fhandler_console::open (int flags, mode_t)
   set_open_status ();
 
   DWORD cflags;
-  if (GetConsoleMode (get_io_handle (), &cflags))
-    SetConsoleMode (get_io_handle (),
+  if (GetConsoleMode (get_handle (), &cflags))
+    SetConsoleMode (get_handle (),
 		    ENABLE_WINDOW_INPUT | ENABLE_MOUSE_INPUT | cflags);
 
-  debug_printf ("opened conin$ %p, conout$ %p", get_io_handle (),
+  debug_printf ("opened conin$ %p, conout$ %p", get_handle (),
 		get_output_handle ());
 
   return 1;
@@ -878,7 +878,7 @@ fhandler_console::open_setup (int flags)
 int
 fhandler_console::close ()
 {
-  CloseHandle (get_io_handle ());
+  CloseHandle (get_handle ());
   CloseHandle (get_output_handle ());
   if (!have_execed)
     free_console ();
@@ -948,7 +948,7 @@ fhandler_console::ioctl (unsigned int cmd, void *arg)
 	  DWORD n;
 	  int ret = 0;
 	  INPUT_RECORD inp[INREC_SIZE];
-	  if (!PeekConsoleInputW (get_io_handle (), inp, INREC_SIZE, &n))
+	  if (!PeekConsoleInputW (get_handle (), inp, INREC_SIZE, &n))
 	    {
 	      set_errno (EINVAL);
 	      return -1;
@@ -972,7 +972,7 @@ fhandler_console::tcflush (int queue)
   if (queue == TCIFLUSH
       || queue == TCIOFLUSH)
     {
-      if (!FlushConsoleInputBuffer (get_io_handle ()))
+      if (!FlushConsoleInputBuffer (get_handle ()))
 	{
 	  __seterrno ();
 	  res = -1;
@@ -1004,7 +1004,7 @@ fhandler_console::input_tcsetattr (int, struct termios const *t)
 
   DWORD oflags;
 
-  if (!GetConsoleMode (get_io_handle (), &oflags))
+  if (!GetConsoleMode (get_handle (), &oflags))
     oflags = 0;
   DWORD flags = 0;
 
@@ -1050,7 +1050,7 @@ fhandler_console::input_tcsetattr (int, struct termios const *t)
     res = 0;
   else
     {
-      res = SetConsoleMode (get_io_handle (), flags) ? 0 : -1;
+      res = SetConsoleMode (get_handle (), flags) ? 0 : -1;
       if (res < 0)
 	__seterrno ();
       syscall_printf ("%d = tcsetattr(,%p) enable flags %y, c_lflag %y iflag %y",
@@ -1080,7 +1080,7 @@ fhandler_console::tcgetattr (struct termios *t)
 
   DWORD flags;
 
-  if (!GetConsoleMode (get_io_handle (), &flags))
+  if (!GetConsoleMode (get_handle (), &flags))
     {
       __seterrno ();
       res = -1;

@@ -826,7 +826,7 @@ fhandler_registry::open (int flags, mode_t mode)
 	      }
 	    else
 	      {
-		set_io_handle (fetch_hkey (i));
+		set_handle (fetch_hkey (i));
 		/* Marking as nohandle allows to call dup on pseudo registry
 		   handles. */
 		if (get_handle () >= HKEY_CLASSES_ROOT)
@@ -881,7 +881,7 @@ fhandler_registry::open (int flags, mode_t mode)
       else
 	flags |= O_DIROPEN;
 
-      set_io_handle (handle);
+      set_handle (handle);
       set_close_on_exec (!!(flags & O_CLOEXEC));
       value_name = cwcsdup (dec_file);
 
@@ -1118,7 +1118,7 @@ fhandler_registry::dup (fhandler_base *child, int flags)
      allows fhandler_base::dup to succeed as usual for nohandle fhandlers.
      Here we just have to fix up by copying the pseudo handle value. */
   if ((HKEY) get_handle () >= HKEY_CLASSES_ROOT)
-    fhs->set_io_handle (get_handle ());
+    fhs->set_handle (get_handle ());
   if (value_name)
     fhs->value_name = cwcsdup (value_name);
   return ret;

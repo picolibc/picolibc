@@ -516,7 +516,7 @@ mmap_record::alloc_fh ()
 {
   if (anonymous ())
     {
-      fh_anonymous.set_io_handle (INVALID_HANDLE_VALUE);
+      fh_anonymous.set_handle (INVALID_HANDLE_VALUE);
       fh_anonymous.set_access (GENERIC_READ | GENERIC_WRITE | GENERIC_EXECUTE);
       return &fh_anonymous;
     }
@@ -901,7 +901,7 @@ mmap64 (void *addr, size_t len, int prot, int flags, int fd, off_t off)
 
   size_t pagesize = wincap.allocation_granularity ();
 
-  fh_anonymous.set_io_handle (INVALID_HANDLE_VALUE);
+  fh_anonymous.set_handle (INVALID_HANDLE_VALUE);
   fh_anonymous.set_access (GENERIC_READ | GENERIC_WRITE | GENERIC_EXECUTE);
 
   /* EINVAL error conditions. */
@@ -1033,7 +1033,7 @@ mmap64 (void *addr, size_t len, int prot, int flags, int fd, off_t off)
 	  fh_disk_file = new (ccalloc (HEAP_FHANDLER, 1, sizeof *fh_disk_file))
 			     fhandler_disk_file;
 	  fh_disk_file->set_name (fh->pc);
-	  fh_disk_file->set_io_handle (h);
+	  fh_disk_file->set_handle (h);
 	  fh_disk_file->set_access (fh->get_access () | GENERIC_EXECUTE);
 	  fh = fh_disk_file;
 	}

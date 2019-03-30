@@ -227,7 +227,7 @@ class fhandler_base
   virtual ~fhandler_base ();
 
   /* Non-virtual simple accessor functions. */
-  void set_io_handle (HANDLE x) { io_handle = x; }
+  void set_handle (HANDLE x) { io_handle = x; }
 
   dev_t& get_device () { return dev (); }
   _major_t get_major () { return dev ().get_major (); }
@@ -430,9 +430,9 @@ public:
   /* Virtual accessor functions to hide the fact
      that some fd's have two handles. */
   virtual HANDLE& get_handle () { return io_handle; }
-  virtual HANDLE& get_io_handle () { return io_handle; }
-  virtual HANDLE& get_io_handle_cyg () { return io_handle; }
+  virtual HANDLE& get_handle_cyg () { return io_handle; }
   virtual HANDLE& get_output_handle () { return io_handle; }
+  virtual HANDLE& get_output_handle_cyg () { return io_handle; }
   virtual HANDLE get_stat_handle () { return pc.handle () ?: io_handle; }
   virtual HANDLE get_echo_handle () const { return NULL; }
   virtual bool hit_eof () {return false;}
@@ -1726,6 +1726,7 @@ class fhandler_termios: public fhandler_base
     need_fork_fixup (true);
   }
   HANDLE& get_output_handle () { return output_handle; }
+  HANDLE& get_output_handle_cyg () { return output_handle; }
   line_edit_status line_edit (const char *rptr, size_t nread, termios&,
 			      ssize_t *bytes_read = NULL);
   void set_output_handle (HANDLE h) { output_handle = h; }
@@ -2109,7 +2110,7 @@ class fhandler_pty_master: public fhandler_pty_common
 
 public:
   HANDLE get_echo_handle () const { return echo_r; }
-  HANDLE& get_io_handle_cyg () { return io_handle_cyg; }
+  HANDLE& get_handle_cyg () { return io_handle_cyg; }
   /* Constructor */
   fhandler_pty_master (int);
 
