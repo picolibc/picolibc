@@ -1884,6 +1884,15 @@ public:
     tty_min tty_min_state;
     dev_console con;
   };
+  bool input_ready;
+  enum input_states
+  {
+    input_error = -1,
+    input_processing = 0,
+    input_ok = 1,
+    input_signalled = 2,
+    input_winch = 3
+  };
 private:
   static const unsigned MAX_WRITE_CHARS;
   static console_state *shared_console_info;
@@ -1969,7 +1978,7 @@ private:
   void fixup_after_fork (HANDLE) {fixup_after_fork_exec (false);}
   void set_close_on_exec (bool val);
   void set_input_state ();
-  void send_winch_maybe ();
+  bool send_winch_maybe ();
   void setup ();
   bool set_unit ();
   static bool need_invisible ();
@@ -1992,6 +2001,7 @@ private:
     copyto (fh);
     return fh;
   }
+  input_states process_input_message ();
   friend tty_min * tty_list::get_cttyp ();
 };
 

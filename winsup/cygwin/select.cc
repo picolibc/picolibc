@@ -202,7 +202,9 @@ select (int maxfds, fd_set *readfds, fd_set *writefds, fd_set *exceptfds,
 	     right value >= 0, matching the number of bits set in the
 	     fds records.  if ret is 0, continue to loop. */
 	  ret = sel.poll (readfds, writefds, exceptfds);
-	  if (!ret)
+	  if (ret < 0)
+	    wait_state = select_stuff::select_signalled;
+	  else if (!ret)
 	    wait_state = select_stuff::select_set_zero;
 	}
       /* Always clean up everything here.  If we're looping then build it
@@ -479,6 +481,7 @@ was_timeout:
 	 events like mouse movements.  The verify function will detect these
 	 situations.  If it returns false, then this wakeup was a false alarm
 	 and we should go back to waiting. */
+      int ret = 0;
       while ((s = s->next))
 	if (s->saw_error ())
 	  {
@@ -488,8 +491,13 @@ was_timeout:
 	  }
 	else if ((((wait_ret >= m && s->windows_handle)
 	           || s->h == w4[wait_ret]))
-		 && s->verify (s, readfds, writefds, exceptfds))
+		 && (ret = s->verify (s, readfds, writefds, exceptfds)) > 0)
 	  res = select_ok;
+	else if (ret < 0)
+	  {
+	    res = select_signalled;
+	    goto out;
+	  }
 
       select_printf ("res after verify %d", res);
       break;
@@ -539,8 +547,12 @@ select_stuff::poll (fd_set *readfds, fd_set *writefds, fd_set *exceptfds)
   int n = 0;
   select_record *s = &start;
   while ((s = s->next))
-    n += (!s->peek || s->peek (s, true)) ?
-	 set_bits (s, readfds, writefds, exceptfds) : 0;
+    {
+      int ret = s->peek ? s->peek (s, true) : 1;
+      if (ret < 0)
+	return -1;
+      n += (ret > 0) ?  set_bits (s, readfds, writefds, exceptfds) : 0;
+    }
   return n;
 }
 
@@ -1010,16 +1022,10 @@ peek_console (select_record *me, bool)
     return me->write_ready;
 
   if (fh->get_cons_readahead_valid ())
-    {
-      select_printf ("cons_readahead");
-      return me->read_ready = true;
-    }
+    return me->read_ready = true;
 
-  if (fh->get_readahead_valid ())
-    {
-      select_printf ("readahead");
-      return me->read_ready = true;
-    }
+  if (fh->input_ready)
+    return me->read_ready = true;
 
   if (me->read_ready)
     {
@@ -1030,54 +1036,20 @@ peek_console (select_record *me, bool)
   INPUT_RECORD irec;
   DWORD events_read;
   HANDLE h;
-  char tmpbuf[17];
   set_handle_or_return_if_not_open (h, me);
 
-  for (;;)
+  while (!fh->input_ready && !fh->get_cons_readahead_valid ())
     if (fh->bg_check (SIGTTIN, true) <= bg_eof)
       return me->read_ready = true;
     else if (!PeekConsoleInputW (h, &irec, 1, &events_read) || !events_read)
       break;
-    else
+    else if (fhandler_console::input_winch == fh->process_input_message ())
       {
-	fh->send_winch_maybe ();
-	if (irec.EventType == KEY_EVENT)
-	  {
-	    if (irec.Event.KeyEvent.bKeyDown)
-	      {
-		/* Ignore Alt+Numpad keys. They are eventually handled in the
-		   key-up case below. */
-		if (is_alt_numpad_key (&irec))
-		   ;
-		/* Handle normal input. */
-		else if (irec.Event.KeyEvent.uChar.UnicodeChar
-			 || fhandler_console::get_nonascii_key (irec, tmpbuf))
-		  return me->read_ready = true;
-		/* Allow Ctrl-Space for ^@ */
-		else if ( (irec.Event.KeyEvent.wVirtualKeyCode == VK_SPACE
-			   || irec.Event.KeyEvent.wVirtualKeyCode == '2')
-			 && (irec.Event.KeyEvent.dwControlKeyState &
-			     (LEFT_CTRL_PRESSED | RIGHT_CTRL_PRESSED))
-			 && !(irec.Event.KeyEvent.dwControlKeyState
-			      & (LEFT_ALT_PRESSED | RIGHT_ALT_PRESSED)) )
-		  return me->read_ready = true;
-	      }
-	    /* Ignore key up events, except for Alt+Numpad events. */
-	    else if (is_alt_numpad_event (&irec))
-	      return me->read_ready = true;
-	  }
-	else
-	  {
-	    if (irec.EventType == MOUSE_EVENT
-		&& fh->mouse_aware (irec.Event.MouseEvent))
-		return me->read_ready = true;
-	    if (irec.EventType == FOCUS_EVENT && fh->focus_aware ())
-		return me->read_ready = true;
-	  }
-
-	/* Read and discard the event */
-	ReadConsoleInputW (h, &irec, 1, &events_read);
+	set_sig_errno (EINTR);
+	return -1;
       }
+  if (fh->input_ready || fh->get_cons_readahead_valid ())
+    return me->read_ready = true;
 
   return me->write_ready;
 }
@@ -1088,7 +1060,6 @@ verify_console (select_record *me, fd_set *rfds, fd_set *wfds,
 {
   return peek_console (me, true);
 }
-
 
 select_record *
 fhandler_console::select_read (select_stuff *ss)
@@ -1104,7 +1075,7 @@ fhandler_console::select_read (select_stuff *ss)
   s->peek = peek_console;
   s->h = get_handle ();
   s->read_selected = true;
-  s->read_ready = get_readahead_valid ();
+  s->read_ready = input_ready || get_cons_readahead_valid ();
   return s;
 }
 
