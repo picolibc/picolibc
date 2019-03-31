@@ -1698,6 +1698,12 @@ class fhandler_serial: public fhandler_base
   }
 };
 
+#define acquire_input_mutex(ms) \
+  __acquire_input_mutex (__PRETTY_FUNCTION__, __LINE__, ms)
+
+#define release_input_mutex() \
+  __release_input_mutex (__PRETTY_FUNCTION__, __LINE__)
+
 #define acquire_output_mutex(ms) \
   __acquire_output_mutex (__PRETTY_FUNCTION__, __LINE__, ms)
 
@@ -1897,6 +1903,7 @@ private:
   static const unsigned MAX_WRITE_CHARS;
   static console_state *shared_console_info;
   static bool invisible_console;
+  HANDLE input_mutex, output_mutex;
 
   /* Used when we encounter a truncated multi-byte sequence.  The
      lead bytes are stored here and revisited in the next write call. */
@@ -1966,8 +1973,11 @@ private:
   bool focus_aware () {return shared_console_info->con.use_focus;}
   bool get_cons_readahead_valid ()
   {
-    return shared_console_info->con.cons_rapoi != NULL &&
+    acquire_input_mutex (INFINITE);
+    bool ret = shared_console_info->con.cons_rapoi != NULL &&
       *shared_console_info->con.cons_rapoi;
+    release_input_mutex ();
+    return ret;
   }
 
   select_record *select_read (select_stuff *);
@@ -2002,6 +2012,12 @@ private:
     return fh;
   }
   input_states process_input_message ();
+  void setup_io_mutex (void);
+  DWORD __acquire_input_mutex (const char *fn, int ln, DWORD ms);
+  void __release_input_mutex (const char *fn, int ln);
+  DWORD __acquire_output_mutex (const char *fn, int ln, DWORD ms);
+  void __release_output_mutex (const char *fn, int ln);
+
   friend tty_min * tty_list::get_cttyp ();
 };
 

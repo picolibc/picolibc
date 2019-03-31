@@ -1039,15 +1039,20 @@ peek_console (select_record *me, bool)
   set_handle_or_return_if_not_open (h, me);
 
   while (!fh->input_ready && !fh->get_cons_readahead_valid ())
-    if (fh->bg_check (SIGTTIN, true) <= bg_eof)
-      return me->read_ready = true;
-    else if (!PeekConsoleInputW (h, &irec, 1, &events_read) || !events_read)
-      break;
-    else if (fhandler_console::input_winch == fh->process_input_message ())
-      {
-	set_sig_errno (EINTR);
-	return -1;
-      }
+    {
+      if (fh->bg_check (SIGTTIN, true) <= bg_eof)
+	return me->read_ready = true;
+      else if (!PeekConsoleInputW (h, &irec, 1, &events_read) || !events_read)
+	break;
+      fh->acquire_input_mutex (INFINITE);
+      if (fhandler_console::input_winch == fh->process_input_message ())
+	{
+	  set_sig_errno (EINTR);
+	  fh->release_input_mutex ();
+	  return -1;
+	}
+      fh->release_input_mutex ();
+    }
   if (fh->input_ready || fh->get_cons_readahead_valid ())
     return me->read_ready = true;
 
