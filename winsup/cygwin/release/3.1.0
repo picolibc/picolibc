@@ -1,6 +1,10 @@
 What's new:
 -----------
 
+- Add 24 bit color support using xterm compatibility mode in Windows 10
+  1703 or later.  Add fake 24 bit color support for legacy console,
+  which uses the nearest color from 16 system colors.
+
 
 What changed:
 -------------
@@ -12,3 +16,8 @@ What changed:
 
 Bug Fixes
 ---------
+
+- Fix select() on console in canonical mode.  Return after one line is
+  completed, instead of when only one key is typed.
+
+- Make console I/O functions thread-safe.

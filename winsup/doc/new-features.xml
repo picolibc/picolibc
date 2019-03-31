@@ -12,6 +12,12 @@
 FIFOs can now be opened multiple times for writing.
 </para></listitem>
 
+<listitem><para>
+Add 24 bit color support using xterm compatibility mode in Windows 10
+1703 or later.  Add fake 24 bit color support for legacy console, which
+uses the nearest color from 16 system colors.
+</para></listitem>
+
 </itemizedlist>
 
 </sect2>
