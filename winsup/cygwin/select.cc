@@ -1053,6 +1053,14 @@ peek_console (select_record *me, bool)
 		else if (irec.Event.KeyEvent.uChar.UnicodeChar
 			 || fhandler_console::get_nonascii_key (irec, tmpbuf))
 		  return me->read_ready = true;
+		/* Allow Ctrl-Space for ^@ */
+		else if ( (irec.Event.KeyEvent.wVirtualKeyCode == VK_SPACE
+			   || irec.Event.KeyEvent.wVirtualKeyCode == '2')
+			 && (irec.Event.KeyEvent.dwControlKeyState &
+			     (LEFT_CTRL_PRESSED | RIGHT_CTRL_PRESSED))
+			 && !(irec.Event.KeyEvent.dwControlKeyState
+			      & (LEFT_ALT_PRESSED | RIGHT_ALT_PRESSED)) )
+		  return me->read_ready = true;
 	      }
 	    /* Ignore key up events, except for Alt+Numpad events. */
 	    else if (is_alt_numpad_event (&irec))

@@ -40,6 +40,7 @@ wincaps wincap_vista __attribute__((section (".cygwin_dll_common"), shared)) = {
     has_case_sensitive_dirs:false,
     has_posix_rename_semantics:false,
     no_msv1_0_s4u_logon_in_wow64:true,
+    has_con_24bit_colors:false,
   },
 };
 
@@ -65,6 +66,7 @@ wincaps wincap_7 __attribute__((section (".cygwin_dll_common"), shared)) = {
     has_case_sensitive_dirs:false,
     has_posix_rename_semantics:false,
     no_msv1_0_s4u_logon_in_wow64:true,
+    has_con_24bit_colors:false,
   },
 };
 
@@ -90,6 +92,7 @@ wincaps wincap_8 __attribute__((section (".cygwin_dll_common"), shared)) = {
     has_case_sensitive_dirs:false,
     has_posix_rename_semantics:false,
     no_msv1_0_s4u_logon_in_wow64:false,
+    has_con_24bit_colors:false,
   },
 };
 
@@ -115,6 +118,7 @@ wincaps wincap_8_1 __attribute__((section (".cygwin_dll_common"), shared)) = {
     has_case_sensitive_dirs:false,
     has_posix_rename_semantics:false,
     no_msv1_0_s4u_logon_in_wow64:false,
+    has_con_24bit_colors:false,
   },
 };
 
@@ -140,6 +144,7 @@ wincaps  wincap_10_1507 __attribute__((section (".cygwin_dll_common"), shared)) 
     has_case_sensitive_dirs:false,
     has_posix_rename_semantics:false,
     no_msv1_0_s4u_logon_in_wow64:false,
+    has_con_24bit_colors:false,
   },
 };
 
@@ -165,6 +170,7 @@ wincaps wincap_10_1511 __attribute__((section (".cygwin_dll_common"), shared)) =
     has_case_sensitive_dirs:false,
     has_posix_rename_semantics:false,
     no_msv1_0_s4u_logon_in_wow64:false,
+    has_con_24bit_colors:false,
   },
 };
 
@@ -190,6 +196,7 @@ wincaps wincap_10_1703 __attribute__((section (".cygwin_dll_common"), shared)) =
     has_case_sensitive_dirs:false,
     has_posix_rename_semantics:false,
     no_msv1_0_s4u_logon_in_wow64:false,
+    has_con_24bit_colors:true,
   },
 };
 
@@ -215,6 +222,7 @@ wincaps wincap_10_1709 __attribute__((section (".cygwin_dll_common"), shared)) =
     has_case_sensitive_dirs:false,
     has_posix_rename_semantics:false,
     no_msv1_0_s4u_logon_in_wow64:false,
+    has_con_24bit_colors:true,
   },
 };
 
@@ -240,6 +248,7 @@ wincaps wincap_10_1803 __attribute__((section (".cygwin_dll_common"), shared)) =
     has_case_sensitive_dirs:true,
     has_posix_rename_semantics:false,
     no_msv1_0_s4u_logon_in_wow64:false,
+    has_con_24bit_colors:true,
   },
 };
 
@@ -265,6 +274,7 @@ wincaps wincap_10_1809 __attribute__((section (".cygwin_dll_common"), shared)) =
     has_case_sensitive_dirs:true,
     has_posix_rename_semantics:true,
     no_msv1_0_s4u_logon_in_wow64:false,
+    has_con_24bit_colors:true,
   },
 };
 

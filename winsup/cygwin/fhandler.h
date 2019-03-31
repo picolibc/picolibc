@@ -1778,6 +1778,8 @@ enum ansi_intensity
 #define eattitle 7
 #define gotparen 8
 #define gotrparen 9
+#define eatpalette 10
+#define endpalette 11
 #define MAXARGS 10
 
 enum cltype
@@ -1791,6 +1793,8 @@ enum cltype
 
 class dev_console
 {
+  pid_t owner;
+
   WORD default_color, underline_color, dim_color;
 
   /* Used to determine if an input keystroke should be modified with META. */
