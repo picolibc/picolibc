@@ -727,16 +727,15 @@ child_info_spawn::worker (const char *prog_arg, const char *const *argv,
 	  myself->dwProcessId = pi.dwProcessId;
 	  strace.execing = 1;
 	  myself.hProcess = hExeced = pi.hProcess;
+	  HANDLE old_winpid_hdl = myself.shared_winpid_handle ();
 	  if (!real_path.iscygexec ())
 	    {
 	      /* If the child process is not a Cygwin process, we have to
-		 create a new winpid symlink and drop the old one on
-		 behalf of the child process not being able to do this
-		 by itself. */
-	      HANDLE old_winpid_hdl = myself.shared_winpid_handle ();
+		 create a new winpid symlink on behalf of the child process
+		 not being able to do this by itself. */
 	      myself.create_winpid_symlink ();
-	      NtClose (old_winpid_hdl);
 	    }
+	  NtClose (old_winpid_hdl);
 	  real_path.get_wide_win32_path (myself->progname); // FIXME: race?
 	  sigproc_printf ("new process name %W", myself->progname);
 	  if (!iscygwin ())
