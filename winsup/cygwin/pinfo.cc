@@ -1443,10 +1443,10 @@ winpids::add (DWORD& nelem, bool winpid, DWORD pid)
       perform_copy = onreturn ? make_copy : true;
 
       p.init (cygpid, PID_PROCINFO | pinfo_access, NULL);
-      /* Did we catch the process during exec?  Try to fix. */
-      if (p && p->dwProcessId != pid)
-	pid = p->dwProcessId;
     }
+  /* Did we catch the process during exec?  Try to fix. */
+  if (p && p->dwProcessId != pid)
+    pid = p->dwProcessId;
 
   /* If we're just looking for winpids then don't do any special cygwin "stuff* */
   if (winpid)
