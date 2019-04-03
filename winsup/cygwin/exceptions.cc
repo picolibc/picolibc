@@ -1818,7 +1818,8 @@ _cygtls::call_signal_handler ()
 
       incyg = true;
 
-      set_signal_mask (_my_tls.sigmask, this_oldmask);
+      set_signal_mask (_my_tls.sigmask, (this_sa_flags & SA_SIGINFO)
+					? context.uc_sigmask : this_oldmask);
       if (this_errno >= 0)
 	set_errno (this_errno);
     }
