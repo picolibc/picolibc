@@ -455,6 +455,15 @@ sig_exit:
 fhandler_console::input_states
 fhandler_console::process_input_message (void)
 {
+  if (wincap.has_con_24bit_colors ())
+    {
+      DWORD dwMode;
+      /* Enable xterm compatible mode in input */
+      GetConsoleMode (get_handle (), &dwMode);
+      dwMode |= ENABLE_VIRTUAL_TERMINAL_INPUT;
+      SetConsoleMode (get_handle (), dwMode);
+    }
+
   char tmp[60];
 
   if (!shared_console_info)
@@ -2881,6 +2890,14 @@ fhandler_console::fixup_after_fork_exec (bool execing)
 {
   set_unit ();
   setup_io_mutex ();
+  if (wincap.has_con_24bit_colors ())
+    {
+      DWORD dwMode;
+      /* Disable xterm compatible mode in input */
+      GetConsoleMode (get_handle (), &dwMode);
+      dwMode &= ~ENABLE_VIRTUAL_TERMINAL_INPUT;
+      SetConsoleMode (get_handle (), dwMode);
+    }
 }
 
 // #define WINSTA_ACCESS (WINSTA_READATTRIBUTES | STANDARD_RIGHTS_READ | STANDARD_RIGHTS_WRITE | WINSTA_CREATEDESKTOP | WINSTA_EXITWINDOWS)
