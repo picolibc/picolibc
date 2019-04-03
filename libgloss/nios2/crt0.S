@@ -1,6 +1,6 @@
 /* crt0.S -- startup code for Nios II QEMU generic-nommu board emulation.
 
-   Copyright (c) 2018 Mentor Graphics
+   Copyright (c) 2018-2019 Mentor Graphics
 
    The authors hereby grant permission to use, copy, modify, distribute,
    and license this software and its documentation for any purpose, provided
@@ -81,6 +81,18 @@ __reset:
 
 	.size __reset, . - __reset
 
+/* Provide a stub interrupt handler that waits in a busy loop.
+   The alignment puts it at offset 0x20 from the base of RAM.  */
+
+	.align 5
+
+        .globl  __interrupt_handler
+        .type   __interrupt_handler, @function
+__interrupt_handler:
+0:
+	br 0b
+
+	.size __interrupt_handler, . - __interrupt_handler
 
 /* __start is the ELF entry point.  */
 
