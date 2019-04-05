@@ -1866,7 +1866,7 @@ extern "C" int
 setcontext (const ucontext_t *ucp)
 {
   PCONTEXT ctx = (PCONTEXT) &ucp->uc_mcontext;
-  _my_tls.sigmask = ucp->uc_sigmask;
+  set_signal_mask (_my_tls.sigmask, ucp->uc_sigmask);
   _my_tls.incyg = true;
 #ifdef __x86_64__
   /* Apparently a call to NtContinue works on 64 bit as well, but using
