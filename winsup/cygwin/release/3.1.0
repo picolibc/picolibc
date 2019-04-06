@@ -13,6 +13,9 @@ What changed:
   Addresses: https://cygwin.com/ml/cygwin/2015-03/msg00047.html
              https://cygwin.com/ml/cygwin/2015-12/msg00311.html
 
+- If a SA_SIGINFO signal handler changes the ucontext_t pointed to by
+  the third parameter, follow it after returning from the handler.
+
 
 Bug Fixes
 ---------

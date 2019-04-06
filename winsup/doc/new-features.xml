@@ -18,6 +18,11 @@ Add 24 bit color support using xterm compatibility mode in Windows 10
 uses the nearest color from 16 system colors.
 </para></listitem>
 
+<listitem><para>
+If a SA_SIGINFO signal handler changes the ucontext_t pointed to by the
+third parameter, follow it after returning from the handler.
+</para></listitem>
+
 </itemizedlist>
 
 </sect2>
