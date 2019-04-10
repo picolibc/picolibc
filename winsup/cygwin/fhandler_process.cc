@@ -355,7 +355,7 @@ fhandler_process::fill_filebuf ()
 	}
       else
 	filesize = process_tab[fileid].format_func (p, filebuf);
-      return !filesize ? false : true;
+      return filesize < 0 ? false : true;
     }
   return false;
 }
@@ -818,7 +818,22 @@ format_process_maps (void *data, char *&destbuf)
   HANDLE proc = OpenProcess (PROCESS_QUERY_INFORMATION
 			     | PROCESS_VM_READ, FALSE, p->dwProcessId);
   if (!proc)
-    return 0;
+    {
+      if (!(p->process_state & PID_EXITED))
+        {
+          DWORD error = GetLastError ();
+          __seterrno_from_win_error (error);
+          debug_printf ("OpenProcess: ret %u; pid: %d", error, p->dwProcessId);
+          return -1;
+        }
+      else
+        {
+          /* Else it's a zombie process; just return an empty string */
+          destbuf = (char *) crealloc_abort (destbuf, 1);
+          destbuf[0] = '\0';
+          return 0;
+        }
+    }
 
   NTSTATUS status;
   PROCESS_BASIC_INFORMATION pbi;
@@ -1101,9 +1116,14 @@ format_process_stat (void *data, char *&destbuf)
 			  FALSE, p->dwProcessId);
   if (hProcess == NULL)
     {
-      DWORD error = GetLastError ();
-      __seterrno_from_win_error (error);
-      debug_printf ("OpenProcess: ret %u", error);
+      if (!(p->process_state & PID_EXITED))
+        {
+          DWORD error = GetLastError ();
+          __seterrno_from_win_error (error);
+          debug_printf ("OpenProcess: ret %u; pid: %d", error, p->dwProcessId);
+          return -1;
+        }
+      /* Else it's a zombie process; just leave each structure zero'd */
     }
   else
     {
@@ -1258,9 +1278,10 @@ format_process_statm (void *data, char *&destbuf)
 {
   _pinfo *p = (_pinfo *) data;
   size_t vmsize = 0, vmrss = 0, vmtext = 0, vmdata = 0, vmlib = 0, vmshare = 0;
+
   if (!get_mem_values (p->dwProcessId, vmsize, vmrss, vmtext, vmdata,
-		       vmlib, vmshare))
-    return 0;
+		       vmlib, vmshare) && !(p->process_state & PID_EXITED))
+    return -1;  /* Error out unless it's a zombie process */
 
   destbuf = (char *) crealloc_abort (destbuf, 96);
   return __small_sprintf (destbuf, "%lu %lu %lu %lu %lu %lu 0\n",
