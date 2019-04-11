@@ -68,8 +68,10 @@
 #endif
 .endm
 
+/*******************************************************************************
+* Main library startup code.
+*******************************************************************************/
 	.align 	0
-
 	FUNC_START	_mainCRTStartup
 	FUNC_START	_start
 #if defined(__ELF__) && !defined(__USING_SJLJ_EXCEPTIONS__)
@@ -90,14 +92,14 @@
 #endif
 #endif
 
-/* Start by setting up a stack */
+/* Start by setting up a stack.  */
 #ifdef ARM_RDP_MONITOR
-	/*  Issue Demon SWI to read stack info */
-	swi	SWI_GetEnv	/*  Returns command line in r0 */
-	mov	sp,r1		/*  and the highest memory address in r1 */
+	/*  Issue Demon SWI to read stack info.  */
+	swi	SWI_GetEnv	/*  Returns command line in r0.  */
+	mov	sp,r1		/*  and the highest memory address in r1.  */
 
-	/*  stack limit is at end of data */
-	/*  allow slop for stack overflow handling and small frames */
+	/*  Stack limit is at end of data.  */
+	/*  Allow slop for stack overflow handling and small frames.  */
 #ifdef THUMB1_ONLY
 	ldr	r0, .LC2
 	adds	r0, #128
@@ -109,19 +111,19 @@
 #endif
 #else
 #ifdef ARM_RDI_MONITOR
-	/*  Issue Angel SWI to read stack info */
+	/*  Issue Angel SWI to read stack info.  */
 	movs	r0, #AngelSWI_Reason_HeapInfo
-	adr	r1, .LC0	/*  point at ptr to 4 words to receive data */
+	adr	r1, .LC0	/*  Point at ptr to 4 words to receive data.  */
 #ifdef THUMB_VXM
 	bkpt	AngelSWI
 #elif defined(__thumb2__)
-	/*  We are in thumb mode for startup on armv7 architectures. */
+	/*  We are in thumb mode for startup on armv7 architectures.  */
 	AngelSWIAsm (AngelSWI)
 #else
-	/*  We are always in ARM mode for startup on pre armv7 archs. */
+	/*  We are always in ARM mode for startup on pre armv7 archs.  */
 	AngelSWIAsm (AngelSWI_ARM)
 #endif
-	ldr	r0, .LC0	/*  point at values read */
+	ldr	r0, .LC0	/*  Point at values read.  */
 
 	/* Set __heap_limit.  */
 	ldr     r1, [r0, #4]
@@ -148,14 +150,15 @@
 	      to skip setting sp/sl to 0 here.
 	    - Considering M-profile processors, We might want to initialize
 	      sp by the first entry of vector table and return 0 to SYS_HEAPINFO
-	      semihosting call, which will be skipped here. */
+	      semihosting call, which will be skipped here.  */
 	cmp	r1, #0
 	beq	.LC26
 	mov	sp, r1
 .LC26:
 	cmp	r2, #0
 	beq	.LC27
-	/*  allow slop for stack overflow handling and small frames */
+
+	/*  Allow slop for stack overflow handling and small frames.  */
 #ifdef THUMB1_ONLY
 	adds	r2, #128
 	adds	r2, #128
@@ -163,9 +166,10 @@
 #else
 	add	sl, r2, #256
 #endif
+
 .LC27:
 #else
-	/*  Set up the stack pointer to a fixed value */
+	/*  Set up the stack pointer to a fixed value.  */
 	/*  Changes by toralf:
 	    - Allow linker script to provide stack via __stack symbol - see
 	      defintion of .Lstack
@@ -175,7 +179,7 @@
 	      Loosely based on init.s from ARM/Motorola example code.
               Note: Mode switch via CPSR is not allowed once in non-privileged
 		    mode, so we take care not to enter "User" to set up its sp,
-		    and also skip most operations if already in that mode. */
+		    and also skip most operations if already in that mode.  */
 
 	ldr	r3, .Lstack
 	cmp	r3, #0
@@ -192,42 +196,42 @@
 	/* Note: This 'mov' is essential when starting in User, and ensures we
 		 always get *some* sp value for the initial mode, even if we 
 		 have somehow missed it below (in which case it gets the same
-		 value as FIQ - not ideal, but better than nothing.) */
+		 value as FIQ - not ideal, but better than nothing).  */
 	mov	sp, r3
 #ifdef PREFER_THUMB
 	/* XXX Fill in stack assignments for interrupt modes.  */
 #else
 	mrs	r2, CPSR
-	tst	r2, #0x0F	/* Test mode bits - in User of all are 0 */
-	beq	.LC23		/* "eq" means r2 AND #0x0F is 0 */
-	msr     CPSR_c, #0xD1	/* FIRQ mode, interrupts disabled */
+	tst	r2, #0x0F	/* Test mode bits - in User of all are 0.  */
+	beq	.LC23		/* "eq" means r2 AND #0x0F is 0.  */
+	msr     CPSR_c, #0xD1	/* FIRQ mode, interrupts disabled.  */
 	mov 	sp, r3
-	sub	sl, sp, #0x1000	/* This mode also has its own sl (see below) */
+	sub	sl, sp, #0x1000	/* This mode also has its own sl (see below).  */
 	
 	mov	r3, sl	
-	msr     CPSR_c, #0xD7	/* Abort mode, interrupts disabled */
+	msr     CPSR_c, #0xD7	/* Abort mode, interrupts disabled.  */
 	mov	sp, r3
 	sub	r3, r3, #0x1000
 
-	msr     CPSR_c, #0xDB	/* Undefined mode, interrupts disabled */
+	msr     CPSR_c, #0xDB	/* Undefined mode, interrupts disabled.  */
 	mov	sp, r3
 	sub	r3, r3, #0x1000
 
-	msr     CPSR_c, #0xD2	/* IRQ mode, interrupts disabled */
+	msr     CPSR_c, #0xD2	/* IRQ mode, interrupts disabled.  */
 	mov	sp, r3
 	sub	r3, r3, #0x2000
 		
-	msr     CPSR_c, #0xD3	/* Supervisory mode, interrupts disabled */
+	msr     CPSR_c, #0xD3	/* Supervisory mode, interrupts disabled.  */
 
 	mov	sp, r3
-	sub	r3, r3, #0x8000	/* Min size 32k */
-	bic	r3, r3, #0x00FF	/* Align with current 64k block */
+	sub	r3, r3, #0x8000	/* Min size 32k.  */
+	bic	r3, r3, #0x00FF	/* Align with current 64k block.  */
 	bic	r3, r3, #0xFF00
 
 	str	r3, [r3, #-4]	/* Move value into user mode sp without */ 
-	ldmdb	r3, {sp}^       /* changing modes, via '^' form of ldm */ 
+	ldmdb	r3, {sp}^       /* changing modes, via '^' form of ldm.  */ 
 	orr	r2, r2, #0xC0	/* Back to original mode, presumably SVC, */
-	msr	CPSR_c, r2	/* with FIQ/IRQ disable bits forced to 1 */
+	msr	CPSR_c, r2	/* with FIQ/IRQ disable bits forced to 1.  */
 #endif	
 .LC23:
 	/* Setup a default stack-limit in-case the code has been
@@ -243,24 +247,24 @@
 	subs	r2, r3, r2
 	mov	sl, r2
 #else
-	sub	sl, r3, #64 << 10	/* Still assumes 256bytes below sl */
+	sub	sl, r3, #64 << 10	/* Still assumes 256bytes below sl.  */
 #endif
 #endif
 #endif
 	/* Zero the memory in the .bss section.  */
-	movs 	a2, #0			/* Second arg: fill value */
-	mov	fp, a2			/* Null frame pointer */
-	mov	r7, a2			/* Null frame pointer for Thumb */
+	movs 	a2, #0			/* Second arg: fill value.  */
+	mov	fp, a2			/* Null frame pointer.  */
+	mov	r7, a2			/* Null frame pointer for Thumb.  */
 	
-	ldr	a1, .LC1		/* First arg: start of memory block */
+	ldr	a1, .LC1		/* First arg: start of memory block.  */
 	ldr	a3, .LC2	
-	subs	a3, a3, a1		/* Third arg: length of block */
+	subs	a3, a3, a1		/* Third arg: length of block.  */
 	
 
 #if __thumb__ && !defined(PREFER_THUMB)
-	/* Enter Thumb mode.... */
-	add	a4, pc, #1	/* Get the address of the Thumb block */
-	bx	a4		/* Go there and start Thumb decoding  */
+	/* Enter Thumb mode...  */
+	add	a4, pc, #1	/* Get the address of the Thumb block.  */
+	bx	a4		/* Go there and start Thumb decoding.  */
 
 	.code 16
 	.global __change_mode
@@ -271,9 +275,8 @@ __change_mode:
 	bl	FUNCTION (memset)
 #if !defined (ARM_RDP_MONITOR) && !defined (ARM_RDI_MONITOR)
 /* Changes by toralf: Taken from libgloss/m68k/crt0.S
- * initialize target specific stuff. Only execute these
- * functions it they exist.
- */
+   initialize target specific stuff. Only execute these
+   functions it they exist.  */
 	ldr	r3, .Lhwinit
 	cmp	r3, #0
 	beq	.LC24
@@ -285,24 +288,24 @@ __change_mode:
 	indirect_call r3
 
 .LC25:	
-	movs	r0, #0		/*  no arguments  */
-	movs	r1, #0		/*  no argv either */
+	movs	r0, #0		/* No arguments.  */
+	movs	r1, #0		/* No argv either.  */
 #else
-	/* Need to set up standard file handles */
+	/* Need to set up standard file handles.  */
 	bl	FUNCTION (initialise_monitor_handles)
 	
 #ifdef ARM_RDP_MONITOR
-	swi	SWI_GetEnv	/*  sets r0 to point to the command line */
+	swi	SWI_GetEnv	/* Sets r0 to point to the command line.  */
 	movs	r1, r0
 #else
 	movs	r0, #AngelSWI_Reason_GetCmdLine
-	ldr	r1, .LC30	/*  Space for command line */
+	ldr	r1, .LC30	/* Space for command line.  */
 	AngelSWIAsm (AngelSWI)
 	ldr	r1, .LC30
 	ldr	r1, [r1]
 #endif
-	/*  Parse string at r1 */
-	movs	r0, #0		/*  count of arguments so far */
+	/*  Parse string at r1.  */
+	movs	r0, #0		/* Count of arguments so far.  */
 	/* Push a NULL argument onto the end of the list.  */
 #ifdef __thumb__
 	push	{r0}
@@ -310,7 +313,7 @@ __change_mode:
 	stmfd	sp!, {r0}
 #endif
 .LC10:
-/*  Skip leading blanks */
+/*  Skip leading blanks.  */
 #ifdef __thumb__
 	ldrb	r3, [r1]
 	adds	r1, #1
@@ -322,7 +325,7 @@ __change_mode:
 	cmp	r3, #' '
 	beq	.LC10
 
-/*  See whether we are scanning a string */
+/* See whether we are scanning a string.  */
 	cmp	r3, #'"'
 #ifdef __thumb__
 	beq	.LC20
@@ -333,17 +336,17 @@ __change_mode:
 	b	.LC22
 
 .LC21:
-	movs	r2, #' '	/*  terminator type */
-	subs	r1, r1, #1	/*  adjust back to point at start char */
+	movs	r2, #' '	/* Terminator type.  */
+	subs	r1, r1, #1	/* Adjust back to point at start char.  */
 .LC22:
 #else
 	cmpne	r3, #'\''
 	moveq	r2, r3
-	movne	r2, #' '	/*  terminator type */
-	subne	r1, r1, #1	/*  adjust back to point at start char */
+	movne	r2, #' '	/* Terminator type.  */
+	subne	r1, r1, #1	/* Adjust back to point at start char.  */
 #endif
 
-/*  Stack a pointer to the current argument */
+/*  Stack a pointer to the current argument.  */
 #ifdef __thumb__
 	push	{r1}
 #else
@@ -359,16 +362,16 @@ __change_mode:
 #endif
 	cmp	r3, #0
 	beq	.LC12
-	cmp	r2, r3		/*  reached terminator? */
+	cmp	r2, r3		/* Reached terminator ?  */
 	bne	.LC11
 	movs	r2, #0
 	subs	r3, r1, #1
-	strb	r2, [r3]	/*  terminate the arg string */
+	strb	r2, [r3]	/* Terminate the arg string.  */
 	b	.LC10
 
 .LC12:
-	mov	r1, sp		/*  point at stacked arg pointers */
-	/* We've now got the stacked args in order reverse the */
+	mov	r1, sp		/* Point at stacked arg pointers.  */
+	/* We've now got the stacked args in order, reverse them.  */
 #ifdef __thumb__
 	movs	r2, r0
 	lsls	r2, #2
@@ -390,10 +393,10 @@ __change_mode:
 	bics	r4, r5
 	mov	sp, r4
 #else
-	add	r2, sp, r0, LSL #2	/* End of args */
-	mov	r3, sp			/* Start of args */
+	add	r2, sp, r0, LSL #2	/* End of args.  */
+	mov	r3, sp			/* Start of args.  */
 .LC13:	cmp	r2, r3
-	ldrhi	r4,[r2, #-4]		/* Reverse ends of list */
+	ldrhi	r4,[r2, #-4]		/* Reverse ends of list.  */
 	ldrhi	r5, [r3]
 	strhi	r5, [r2, #-4]!
 	strhi	r4, [r3], #4
@@ -431,7 +434,6 @@ __change_mode:
 
 #if __thumb__ && !defined(PREFER_THUMB)
 	/* Come out of Thumb mode.  This code should be redundant.  */
-
 	mov	a4, pc
 	bx	a4
 
@@ -447,7 +449,6 @@ change_back:
 	
 	/* For Thumb, constants must be after the code since only 
 	   positive offsets are supported for PC relative addresses.  */
-	
 	.align 0
 .LC0:
 #ifdef ARM_RDI_MONITOR
@@ -457,13 +458,13 @@ change_back:
 	/* Changes by toralf: Provide alternative "stack" variable whose value
 	   may be defined externally; .Lstack will be used instead of .LC0 if
 	   it points to a non-0 value. Also set up references to "hooks" that
-           may be used by the application to provide additional init code. */
-	
+           may be used by the application to provide additional init code.  */
 #ifdef __pe__
 	.word	0x800000
 #else
 	.word	0x80000			/* Top of RAM on the PIE board.  */
 #endif
+
 .Lstack:	
 	.word	__stack
 .Lhwinit:	
@@ -476,7 +477,7 @@ change_back:
 	   runtime (meaning "ignore setting") for the variables, when the user
 	   does not provide the symbols. (The linker uses a weak symbol if,
 	   and only if, a normal version of the same symbol isn't provided
-	   e.g. by a linker script or another object file.) */	
+	   e.g. by a linker script or another object file.)  */	
 
 	.weak __stack
 	.weak FUNCTION (hardware_init_hook) 
