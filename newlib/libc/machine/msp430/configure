@@ -640,6 +640,8 @@ build
 newlib_basedir
 MAY_SUPPLY_SYSCALLS_FALSE
 MAY_SUPPLY_SYSCALLS_TRUE
+NEWLIB_NANO_FORMATTED_IO_FALSE
+NEWLIB_NANO_FORMATTED_IO_TRUE
 target_alias
 host_alias
 build_alias
@@ -681,6 +683,7 @@ SHELL'
 ac_subst_files=''
 ac_user_opts='
 enable_option_checking
+enable_newlib_nano_formatted_io
 enable_multilib
 enable_target_optspace
 enable_malloc_debugging
@@ -1318,6 +1321,7 @@ Optional Features:
   --disable-option-checking  ignore unrecognized --enable/--with options
   --disable-FEATURE       do not include FEATURE (same as --enable-FEATURE=no)
   --enable-FEATURE[=ARG]  include FEATURE [ARG=yes]
+  --enable-newlib-nano-formatted-io    Use small-footprint nano-formatted-IO implementation
   --enable-multilib         build many library versions (default)
   --enable-target-optspace  optimize for space
   --enable-malloc-debugging indicate malloc debugging requested
@@ -1835,6 +1839,26 @@ ac_config_guess="$SHELL $ac_aux_dir/config.guess"  # Please don't use this var.
 ac_config_sub="$SHELL $ac_aux_dir/config.sub"  # Please don't use this var.
 ac_configure="$SHELL $ac_aux_dir/configure"  # Please don't use this var.
 
+
+
+# Check whether --enable-newlib_nano_formatted_io was given.
+if test "${enable_newlib_nano_formatted_io+set}" = set; then :
+  enableval=$enable_newlib_nano_formatted_io; case "${enableval}" in
+   yes) newlib_nano_formatted_io=yes ;;
+   no)  newlib_nano_formatted_io=no ;;
+   *) as_fn_error $? "bad value ${enableval} for newlib-nano-formatted-io" "$LINENO" 5 ;;
+ esac
+else
+  newlib_nano_formatted_io=no
+fi
+
+ if test x$newlib_nano_formatted_io = xyes; then
+  NEWLIB_NANO_FORMATTED_IO_TRUE=
+  NEWLIB_NANO_FORMATTED_IO_FALSE='#'
+else
+  NEWLIB_NANO_FORMATTED_IO_TRUE='#'
+  NEWLIB_NANO_FORMATTED_IO_FALSE=
+fi
 
 
 
@@ -3575,6 +3599,10 @@ LIBOBJS=$ac_libobjs
 LTLIBOBJS=$ac_ltlibobjs
 
 
+if test -z "${NEWLIB_NANO_FORMATTED_IO_TRUE}" && test -z "${NEWLIB_NANO_FORMATTED_IO_FALSE}"; then
+  as_fn_error $? "conditional \"NEWLIB_NANO_FORMATTED_IO\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
 if test -z "${MAY_SUPPLY_SYSCALLS_TRUE}" && test -z "${MAY_SUPPLY_SYSCALLS_FALSE}"; then
   as_fn_error $? "conditional \"MAY_SUPPLY_SYSCALLS\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
