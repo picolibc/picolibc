@@ -340,30 +340,18 @@ exename (PWCHAR buf, ssize_t bufsize)
   return format_IndexNumber (buf, bufsize, &d->fii.IndexNumber);
 }
 
-/* Into buf if not NULL, write the newest dll's LastWriteTime.
+/* Into buf if not NULL, write the current Windows Thread Identifier.
    Return the number of characters (that would be) written. */
 static int
-lwtimename (PWCHAR buf, ssize_t bufsize)
+winthrname (PWCHAR buf, ssize_t bufsize)
 {
   if (!buf)
-    return sizeof (LARGE_INTEGER) * 2;
-  if (bufsize >= 0 && bufsize <= (int)sizeof (LARGE_INTEGER) * 2)
+    return sizeof (DWORD) * 4;
+  if (bufsize >= 0 && bufsize <= (int)sizeof (DWORD) * 4)
     return 0;
 
-  LARGE_INTEGER newest = { 0 };
-  /* Need by-handle-file-information for _all_ loaded dlls,
-     as most recent ctime forms the hardlinks directory. */
-  dll *d = &dlls.start;
-  while ((d = d->next))
-    {
-      /* LastWriteTime more properly tells the last file-content modification
-	 time, because a newly created hardlink may have a different
-	 CreationTime compared to the original file. */
-      if (d->fbi.LastWriteTime.QuadPart > newest.QuadPart)
-	newest = d->fbi.LastWriteTime;
-    }
-
-  return __small_swprintf (buf, L"%016X", newest);
+  return __small_swprintf (buf, L"%08X%08X",
+			   GetCurrentProcessId(), GetCurrentThreadId());
 }
 
 struct namepart {
@@ -382,7 +370,7 @@ forkable_nameparts[] = {
   { L"<sid>",         sidname,          true,  true,  },
   { L"<exe>",         exename,          false, false, },
   { MUTEXSEP,            NULL,          false, false, },
-  { L"<ctime>",    lwtimename,          true,  true,  },
+  { L"<winthr>",   winthrname,          true,  true,  },
 
   { NULL, NULL },
 };
