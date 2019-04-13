@@ -33,7 +33,7 @@
  * SUCH DAMAGE.
  *
  *	@(#)time.h	8.5 (Berkeley) 5/4/95
- * $FreeBSD: head/sys/sys/time.h 340664 2018-11-20 07:11:23Z imp $
+ * $FreeBSD: head/sys/sys/time.h 346176 2019-04-13 04:46:35Z imp $
  */
 
 #ifndef _SYS_TIME_H_
@@ -191,8 +191,15 @@ sbttobt(sbintime_t _sbt)
 static __inline int64_t
 sbttons(sbintime_t _sbt)
 {
+	uint64_t ns;
 
-	return ((1000000000 * _sbt) >> 32);
+	ns = _sbt;
+	if (ns >= SBT_1S)
+		ns = (ns >> 32) * 1000000000;
+	else
+		ns = 0;
+
+	return (ns + (1000000000 * (_sbt & 0xffffffffu) >> 32));
 }
 
 static __inline sbintime_t
