@@ -33,7 +33,7 @@ STATUS_PIPE_EMPTY simply means there's no data to be read. */
 fhandler_fifo::fhandler_fifo ():
   fhandler_base (), read_ready (NULL), write_ready (NULL),
   listen_client_thr (NULL), lct_termination_evt (NULL), nhandlers (0),
-  nconnected (0), _duplexer (false)
+  nconnected (0), reader (false), writer (false), duplexer (false)
 {
   pipe_name_buf[0] = L'\0';
   need_fork_fixup (true);
@@ -224,7 +224,7 @@ fhandler_fifo::create_pipe_instance (bool first)
     }
   access = GENERIC_READ | FILE_READ_ATTRIBUTES | FILE_WRITE_ATTRIBUTES
     | SYNCHRONIZE;
-  if (first && _duplexer)
+  if (first && duplexer)
     access |= GENERIC_WRITE;
   sharing = FILE_SHARE_READ | FILE_SHARE_WRITE;
   hattr = OBJ_INHERIT;
@@ -421,25 +421,19 @@ fhandler_fifo::open (int flags, mode_t)
    error_errno_set,
    error_set_errno
   } res;
-  bool reader, writer, duplexer;
 
   /* Determine what we're doing with this fhandler: reading, writing, both */
   switch (flags & O_ACCMODE)
     {
     case O_RDONLY:
       reader = true;
-      writer = false;
-      duplexer = false;
       break;
     case O_WRONLY:
       writer = true;
-      reader = false;
-      duplexer = false;
       break;
     case O_RDWR:
       reader = true;
-      writer = false;
-      duplexer = _duplexer = true;
+      duplexer = true;
       break;
     default:
       set_errno (EINVAL);
@@ -769,7 +763,7 @@ fhandler_fifo::raw_read (void *in_ptr, size_t& len)
 		  fifo_client_unlock ();
 		  goto errout;
 		}
-	    else if (nread == 0 && (!_duplexer || i > 0))
+	    else if (nread == 0 && (!duplexer || i > 0))
 	      /* Client has disconnected. */
 	      {
 		fc_handler[i].state = fc_invalid;
