@@ -344,6 +344,8 @@ fhandler_fifo::listen_client ()
 DWORD
 fhandler_fifo::listen_client_thread ()
 {
+  DWORD ret = -1;
+
   while (1)
     {
       bool found;
@@ -360,7 +362,7 @@ fhandler_fifo::listen_client_thread ()
 	    if (disconnect_and_reconnect (i) < 0)
 	      {
 		fifo_client_unlock ();
-		goto errout;
+		goto out;
 	      }
 	    else
 	      /* Recheck fc_handler[i].state. */
@@ -383,23 +385,27 @@ fhandler_fifo::listen_client_thread ()
 	res = add_client_handler ();
       fifo_client_unlock ();
       if (res < 0)
-	goto errout;
+	goto out;
       else if (!found)
 	continue;
 
+      /* Allow a writer to open. */
       if (!arm (read_ready))
 	{
 	  __seterrno ();
-	  goto errout;
+	  goto out;
 	}
 
       /* Wait for a client to connect. */
       wait_ret = WaitForMultipleObjects (nhandlers + 1, w, false, INFINITE);
       i = wait_ret - WAIT_OBJECT_0;
       if (i < 0 || i > nhandlers)
-	goto errout;
-      else if (i == nhandlers)	/* Reader is closing. */
-	return 0;
+	goto out;
+      else if (i == nhandlers)	/* Thread termination requested. */
+	{
+	  ret = 0;
+	  goto out;
+	}
       else
 	{
 	  fifo_client_lock ();
@@ -410,9 +416,9 @@ fhandler_fifo::listen_client_thread ()
 	  yield ();
 	}
     }
-errout:
+out:
   ResetEvent (read_ready);
-  return -1;
+  return ret;
 }
 
 int
@@ -457,7 +463,7 @@ fhandler_fifo::open (int flags, mode_t)
 
   char npbuf[MAX_PATH];
   __small_sprintf (npbuf, "r-event.%08x.%016X", get_dev (), get_ino ());
-  if (!(read_ready = CreateEvent (sa_buf, duplexer, false, npbuf)))
+  if (!(read_ready = CreateEvent (sa_buf, true, false, npbuf)))
     {
       debug_printf ("CreateEvent for %s failed, %E", npbuf);
       res = error_set_errno;
@@ -523,32 +529,7 @@ fhandler_fifo::open (int flags, mode_t)
 	  res = error_errno_set;
 	  goto out;
 	}
-      /* Wait for the listen_client thread to signal read_ready.  This
-	 should be quick.  */
-      HANDLE w[2] = { listen_client_thr, read_ready };
-      switch (WaitForMultipleObjects (2, w, FALSE, INFINITE))
-	{
-	case WAIT_OBJECT_0:
-	  debug_printf ("listen_client_thread exited unexpectedly");
-	  DWORD err;
-	  GetExitCodeThread (listen_client_thr, &err);
-	  __seterrno_from_win_error (err);
-	  res = error_errno_set;
-	  goto out;
-	  break;
-	case WAIT_OBJECT_0 + 1:
-	  if (!arm (read_ready))
-	    {
-	      res = error_set_errno;
-	      goto out;
-	    }
-	  break;
-	default:
-	  res = error_set_errno;
-	  goto out;
-	  break;
-	}
-      if (!duplexer && !wait (write_ready))
+      else if (!duplexer && !wait (write_ready))
 	{
 	  res = error_errno_set;
 	  goto out;
