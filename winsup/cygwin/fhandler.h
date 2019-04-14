@@ -1284,9 +1284,10 @@ public:
   fhandler_fifo ();
   bool hit_eof ();
   int get_nhandlers () const { return nhandlers; }
-  HANDLE& get_handle () { return fhandler_base::get_handle (); }
-  HANDLE get_handle (int i) const { return fc_handler[i].fh->get_handle (); }
-  bool is_connected (int i) const { return fc_handler[i].state == fc_connected; }
+  HANDLE get_fc_handle (int i) const
+  { return fc_handler[i].fh->get_handle (); }
+  bool is_connected (int i) const
+  { return fc_handler[i].state == fc_connected; }
   PUNICODE_STRING get_pipe_name ();
   DWORD listen_client_thread ();
   void fifo_client_lock () { _fifo_client_lock.lock (); }

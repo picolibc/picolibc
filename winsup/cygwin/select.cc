@@ -875,7 +875,7 @@ peek_fifo (select_record *s, bool from_select)
       for (int i = 0; i < fh->get_nhandlers (); i++)
 	if (fh->is_connected (i))
 	  {
-	    int n = pipe_data_available (s->fd, fh, fh->get_handle (i),
+	    int n = pipe_data_available (s->fd, fh, fh->get_fc_handle (i),
 					 false);
 	    if (n > 0)
 	      {
