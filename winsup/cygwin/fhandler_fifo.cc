@@ -809,7 +809,10 @@ fifo_client_handler::close ()
   int res = 0;
 
   if (fh)
-    res = fh->close ();
+    {
+      res = fh->fhandler_base::close ();
+      delete fh;
+    }
   if (connect_evt)
     CloseHandle (connect_evt);
   if (dummy_evt)
