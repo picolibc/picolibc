@@ -362,7 +362,10 @@ fhandler_fifo::listen_client_thread ()
 		fifo_client_unlock ();
 		goto errout;
 	      }
-	    /* Fall through. */
+	    else
+	      /* Recheck fc_handler[i].state. */
+	      i--;
+	    break;
 	  case fc_connected:
 	    w[i] = fc_handler[i].dummy_evt;
 	    break;
