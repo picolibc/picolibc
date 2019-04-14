@@ -705,15 +705,20 @@ fhandler_fifo::raw_write (const void *ptr, size_t len)
 bool
 fhandler_fifo::hit_eof ()
 {
-  fifo_client_lock ();
-  bool eof = (nconnected == 0);
-  fifo_client_unlock ();
-  if (eof)
-    {
-      /* Give the listen_client thread time to catch up, then recheck. */
-      Sleep (1);
+  bool eof;
+  bool retry = true;
+
+retry:
+      fifo_client_lock ();
       eof = (nconnected == 0);
-    }
+      fifo_client_unlock ();
+      if (eof && retry)
+	{
+	  retry = false;
+	  /* Give the listen_client thread time to catch up. */
+	  Sleep (1);
+	  goto retry;
+	}
   return eof;
 }
 
