@@ -853,19 +853,20 @@ fhandler_fifo::close ()
 int
 fhandler_fifo::dup (fhandler_base *child, int flags)
 {
+  int ret = -1;
+  fhandler_fifo *fhf = NULL;
+
   if (fhandler_base::dup (child, flags))
-    {
-      __seterrno ();
-      return -1;
-    }
-  fhandler_fifo *fhf = (fhandler_fifo *) child;
+    goto out;
+
+  fhf = (fhandler_fifo *) child;
   if (!DuplicateHandle (GetCurrentProcess (), read_ready,
 			GetCurrentProcess (), &fhf->read_ready,
 			0, true, DUPLICATE_SAME_ACCESS))
     {
       fhf->close ();
       __seterrno ();
-      return -1;
+      goto out;
     }
   if (!DuplicateHandle (GetCurrentProcess (), write_ready,
 			GetCurrentProcess (), &fhf->write_ready,
@@ -874,7 +875,7 @@ fhandler_fifo::dup (fhandler_base *child, int flags)
       CloseHandle (fhf->read_ready);
       fhf->close ();
       __seterrno ();
-      return -1;
+      goto out;
     }
   for (int i = 0; i < nhandlers; i++)
     {
@@ -895,13 +896,16 @@ fhandler_fifo::dup (fhandler_base *child, int flags)
 	  CloseHandle (fhf->write_ready);
 	  fhf->close ();
 	  __seterrno ();
-	  return -1;
+	  goto out;
 	}
     }
   fhf->listen_client_thr = NULL;
   fhf->lct_termination_evt = NULL;
   fhf->fifo_client_unlock ();
-  return 0;
+  if (!reader || fhf->listen_client ())
+    ret = 0;
+out:
+  return ret;
 }
 
 void
