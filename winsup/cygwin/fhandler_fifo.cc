@@ -30,6 +30,12 @@ STATUS_PIPE_EMPTY simply means there's no data to be read. */
 		   || _s == STATUS_PIPE_BROKEN \
 		   || _s == STATUS_PIPE_EMPTY; })
 
+#define STATUS_PIPE_NO_INSTANCE_AVAILABLE(status)	\
+		({ NTSTATUS _s = (status); \
+		   _s == STATUS_INSTANCE_NOT_AVAILABLE \
+		   || _s == STATUS_PIPE_NOT_AVAILABLE \
+		   || _s == STATUS_PIPE_BUSY; })
+
 fhandler_fifo::fhandler_fifo ():
   fhandler_base (), read_ready (NULL), write_ready (NULL),
   listen_client_thr (NULL), lct_termination_evt (NULL), nhandlers (0),
@@ -543,28 +549,32 @@ fhandler_fifo::open (int flags, mode_t)
      listen_client thread is running.  Then signal write_ready.  */
   if (writer)
     {
-      if (!wait (read_ready))
+      while (1)
 	{
-	  res = error_errno_set;
-	  goto out;
-	}
-      NTSTATUS status = open_pipe ();
-      if (!NT_SUCCESS (status))
-	{
-	  debug_printf ("create of writer failed");
-	  __seterrno_from_nt_status (status);
-	  res = error_errno_set;
-	  goto out;
-	}
-      else if (!arm (write_ready))
-	{
-	  res = error_set_errno;
-	  goto out;
-	}
-      else
-	{
-	  set_pipe_non_blocking (get_handle (), true);
-	  res = success;
+	  if (!wait (read_ready))
+	    {
+	      res = error_errno_set;
+	      goto out;
+	    }
+	  NTSTATUS status = open_pipe ();
+	  if (NT_SUCCESS (status))
+	    {
+	      set_pipe_non_blocking (get_handle (), true);
+	      if (!arm (write_ready))
+		res = error_set_errno;
+	      else
+		res = success;
+	      goto out;
+	    }
+	  else if (STATUS_PIPE_NO_INSTANCE_AVAILABLE (status))
+	    Sleep (1);
+	  else
+	    {
+	      debug_printf ("create of writer failed");
+	      __seterrno_from_nt_status (status);
+	      res = error_errno_set;
+	      goto out;
+	    }
 	}
     }
 out:
