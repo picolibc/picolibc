@@ -118,62 +118,6 @@ set_pipe_non_blocking (HANDLE ph, bool nonblocking)
     debug_printf ("NtSetInformationFile(FilePipeInformation): %y", status);
 }
 
-/* The pipe instance is always in blocking mode when this is called. */
-int
-fifo_client_handler::connect ()
-{
-  NTSTATUS status;
-  IO_STATUS_BLOCK io;
-
-  if (connect_evt)
-    ResetEvent (connect_evt);
-  else if (!(connect_evt = create_event ()))
-    return -1;
-  status = NtFsControlFile (fh->get_handle (), connect_evt, NULL, NULL, &io,
-			    FSCTL_PIPE_LISTEN, NULL, 0, NULL, 0);
-  switch (status)
-    {
-    case STATUS_PENDING:
-    case STATUS_PIPE_LISTENING:
-      state = fc_connecting;
-      break;
-    case STATUS_PIPE_CONNECTED:
-      state = fc_connected;
-      set_pipe_non_blocking (fh->get_handle (), true);
-      break;
-    default:
-      __seterrno_from_nt_status (status);
-      return -1;
-    }
-  return 0;
-}
-
-int
-fhandler_fifo::disconnect_and_reconnect (int i)
-{
-  NTSTATUS status;
-  IO_STATUS_BLOCK io;
-  HANDLE ph = fc_handler[i].fh->get_handle ();
-
-  status = NtFsControlFile (ph, NULL, NULL, NULL, &io, FSCTL_PIPE_DISCONNECT,
-			    NULL, 0, NULL, 0);
-  /* Short-lived.  Don't use cygwait.  We don't want to be interrupted. */
-  if (status == STATUS_PENDING
-      && NtWaitForSingleObject (ph, FALSE, NULL) == WAIT_OBJECT_0)
-    status = io.Status;
-  if (!NT_SUCCESS (status))
-    {
-      __seterrno_from_nt_status (status);
-      return -1;
-    }
-  set_pipe_non_blocking (fc_handler[i].fh->get_handle (), false);
-  if (fc_handler[i].connect () < 0)
-    return -1;
-  if (fc_handler[i].state == fc_connected)
-    nconnected++;
-  return 0;
-}
-
 NTSTATUS
 fhandler_fifo::npfs_handle (HANDLE &nph)
 {
@@ -280,41 +224,49 @@ fhandler_fifo::open_pipe ()
 int
 fhandler_fifo::add_client_handler ()
 {
+  int ret = -1;
   fifo_client_handler fc;
   fhandler_base *fh;
+  HANDLE ph = NULL;
   bool first = (nhandlers == 0);
 
   if (nhandlers == MAX_CLIENTS)
     {
       set_errno (EMFILE);
-      return -1;
+      goto out;
     }
-  if (!(fc.dummy_evt = create_event ()))
-    return -1;
+  if (!(fc.connect_evt = create_event ()))
+    goto out;
   if (!(fh = build_fh_dev (dev ())))
     {
       set_errno (EMFILE);
-      return -1;
+      goto out;
     }
-  fc.fh = fh;
-  HANDLE ph = create_pipe_instance (first);
+  ph = create_pipe_instance (first);
   if (!ph)
-    goto errout;
-  fh->set_handle (ph);
-  fh->set_flags (get_flags ());
-  if (fc.connect () < 0)
     {
-      fc.close ();
-      goto errout;
+      delete fh;
+      goto out;
     }
-  if (fc.state == fc_connected)
-    nconnected++;
-  fc_handler[nhandlers++] = fc;
-  return 0;
-errout:
-  delete fh;
-  return -1;
+  else
+    {
+      fh->set_handle (ph);
+      fh->set_flags (get_flags ());
+      ret = 0;
+      fc.fh = fh;
+      fc_handler[nhandlers++] = fc;
+    }
+out:
+  return ret;
+}
 
+void
+fhandler_fifo::delete_client_handler (int i)
+{
+  fc_handler[i].close ();
+  if (i < --nhandlers)
+    memmove (fc_handler + i, fc_handler + i + 1,
+	     (nhandlers - i) * sizeof (fc_handler[i]));
 }
 
 /* Just hop to the listen_client_thread method. */
@@ -355,46 +307,23 @@ fhandler_fifo::listen_client_thread ()
 
   while (1)
     {
-      bool found;
-      HANDLE w[MAX_CLIENTS + 1];
-      int i;
-      DWORD wait_ret;
+      /* At the beginning of the loop, all client handlers are
+	 in the fc_connected or fc_invalid state. */
 
+      /* Delete any invalid clients. */
       fifo_client_lock ();
-      found = false;
-      for (i = 0; i < nhandlers; i++)
-	switch (fc_handler[i].state)
-	  {
-	  case fc_invalid:
-	    if (disconnect_and_reconnect (i) < 0)
-	      {
-		fifo_client_unlock ();
-		goto out;
-	      }
-	    else
-	      /* Recheck fc_handler[i].state. */
-	      i--;
-	    break;
-	  case fc_connected:
-	    w[i] = fc_handler[i].dummy_evt;
-	    break;
-	  case fc_connecting:
-	    found = true;
-	    w[i] = fc_handler[i].connect_evt;
-	    break;
-	  case fc_unknown:	/* Shouldn't happen. */
-	  default:
-	    break;
-	  }
-      w[nhandlers] = lct_termination_evt;
-      int res = 0;
-      if (!found)
-	res = add_client_handler ();
-      fifo_client_unlock ();
-      if (res < 0)
+      int i = 0;
+      while (i < nhandlers)
+	{
+	  if (fc_handler[i].state == fc_invalid)
+	    delete_client_handler (i);
+	  else
+	    i++;
+	}
+
+      /* Create a new client handler. */
+      if (add_client_handler () < 0)
 	goto out;
-      else if (!found)
-	continue;
 
       /* Allow a writer to open. */
       if (!arm (read_ready))
@@ -402,25 +331,72 @@ fhandler_fifo::listen_client_thread ()
 	  __seterrno ();
 	  goto out;
 	}
+      fifo_client_unlock ();
 
-      /* Wait for a client to connect. */
-      wait_ret = WaitForMultipleObjects (nhandlers + 1, w, false, INFINITE);
-      i = wait_ret - WAIT_OBJECT_0;
-      if (i < 0 || i > nhandlers)
-	goto out;
-      else if (i == nhandlers)	/* Thread termination requested. */
+      /* Listen for a writer to connect to the new client handler. */
+      fifo_client_handler& fc = fc_handler[nhandlers - 1];
+      do
+	{
+	  NTSTATUS status;
+	  IO_STATUS_BLOCK io;
+
+	  status = NtFsControlFile (fc.fh->get_handle (), fc.connect_evt,
+				    NULL, NULL, &io, FSCTL_PIPE_LISTEN,
+				    NULL, 0, NULL, 0);
+	  if (status == STATUS_PENDING)
+	    {
+	      HANDLE w[2] = { fc.connect_evt, lct_termination_evt };
+	      DWORD waitret = WaitForMultipleObjects (2, w, false, INFINITE);
+	      switch (waitret)
+		{
+		case WAIT_OBJECT_0:
+		  status = io.Status;
+		  break;
+		case WAIT_OBJECT_0 + 1:
+		  ret = 0;
+		  status = STATUS_THREAD_IS_TERMINATING;
+		  break;
+		default:
+		  __seterrno ();
+		  debug_printf ("WaitForMultipleObjects failed, %E");
+		  status = STATUS_THREAD_IS_TERMINATING;
+		  break;
+		}
+	    }
+	  switch (status)
+	    {
+	    case STATUS_SUCCESS:
+	    case STATUS_PIPE_CONNECTED:
+	      fifo_client_lock ();
+	      fc.state = fc_connected;
+	      nconnected++;
+	      set_pipe_non_blocking (fc.fh->get_handle (), true);
+	      fifo_client_unlock ();
+	      break;
+	    case STATUS_PIPE_LISTENING:
+	      /* Retry. */
+	      fc.state = fc_connecting;
+	      ResetEvent (fc.connect_evt);
+	      break;
+	    case STATUS_THREAD_IS_TERMINATING:
+	      fifo_client_lock ();
+	      delete_client_handler (nhandlers - 1);
+	      fifo_client_unlock ();
+	      goto out;
+	    default:
+	      __seterrno_from_nt_status (status);
+	      fifo_client_lock ();
+	      delete_client_handler (nhandlers - 1);
+	      fifo_client_unlock ();
+	      goto out;
+	    }
+	} while (fc.state == fc_connecting);
+      /* Check for thread termination in case WaitForMultipleObjects
+	 didn't get called above. */
+      if (IsEventSignalled (lct_termination_evt))
 	{
 	  ret = 0;
 	  goto out;
-	}
-      else
-	{
-	  fifo_client_lock ();
-	  fc_handler[i].state = fc_connected;
-	  nconnected++;
-	  set_pipe_non_blocking (fc_handler[i].fh->get_handle (), true);
-	  fifo_client_unlock ();
-	  yield ();
 	}
     }
 out:
@@ -487,7 +463,7 @@ fhandler_fifo::open (int flags, mode_t)
   /* If we're a duplexer, create the pipe and the first client handler. */
   if (duplexer)
     {
-      HANDLE ph, connect_evt, dummy_evt;
+      HANDLE ph, connect_evt;
       fhandler_base *fh;
 
       ph = create_pipe_instance (true);
@@ -513,16 +489,7 @@ fhandler_fifo::open (int flags, mode_t)
 	  delete fh;
 	  goto out;
 	}
-      if (!(dummy_evt = create_event ()))
-	{
-	  res = error_errno_set;
-	  delete fh;
-	  fh->close ();
-	  CloseHandle (connect_evt);
-	  goto out;
-	}
-      fc_handler[0] = fifo_client_handler (fh, fc_connected, connect_evt,
-				       dummy_evt);
+      fc_handler[0] = fifo_client_handler (fh, fc_connected, connect_evt);
       nconnected = nhandlers = 1;
     }
 
@@ -863,8 +830,6 @@ fifo_client_handler::close ()
     }
   if (connect_evt)
     CloseHandle (connect_evt);
-  if (dummy_evt)
-    CloseHandle (dummy_evt);
   return res;
 }
 
@@ -943,10 +908,6 @@ fhandler_fifo::dup (fhandler_base *child, int flags)
 	  || !DuplicateHandle (GetCurrentProcess (), fc_handler[i].connect_evt,
 			       GetCurrentProcess (),
 			       &fhf->fc_handler[i].connect_evt,
-			       0, true, DUPLICATE_SAME_ACCESS)
-	  || !DuplicateHandle (GetCurrentProcess (), fc_handler[i].dummy_evt,
-			       GetCurrentProcess (),
-			       &fhf->fc_handler[i].dummy_evt,
 			       0, true, DUPLICATE_SAME_ACCESS))
 	{
 	  CloseHandle (fhf->read_ready);
@@ -975,7 +936,6 @@ fhandler_fifo::fixup_after_fork (HANDLE parent)
     {
       fc_handler[i].fh->fhandler_base::fixup_after_fork (parent);
       fork_fixup (parent, fc_handler[i].connect_evt, "connect_evt");
-      fork_fixup (parent, fc_handler[i].dummy_evt, "dummy_evt");
     }
   listen_client_thr = NULL;
   lct_termination_evt = NULL;
@@ -992,6 +952,5 @@ fhandler_fifo::set_close_on_exec (bool val)
     {
       fc_handler[i].fh->fhandler_base::set_close_on_exec (val);
       set_no_inheritance (fc_handler[i].connect_evt, val);
-      set_no_inheritance (fc_handler[i].dummy_evt, val);
     }
 }
