@@ -32,7 +32,7 @@ STATUS_PIPE_EMPTY simply means there's no data to be read. */
 
 fhandler_fifo::fhandler_fifo ():
   fhandler_base (), read_ready (NULL), write_ready (NULL),
-  listen_client_thr (NULL), lct_termination_evt (NULL), nclients (0),
+  listen_client_thr (NULL), lct_termination_evt (NULL), nhandlers (0),
   nconnected (0), _duplexer (false)
 {
   pipe_name_buf[0] = L'\0';
@@ -146,7 +146,7 @@ fhandler_fifo::disconnect_and_reconnect (int i)
 {
   NTSTATUS status;
   IO_STATUS_BLOCK io;
-  HANDLE ph = client[i].fh->get_handle ();
+  HANDLE ph = fc_handler[i].fh->get_handle ();
 
   status = NtFsControlFile (ph, NULL, NULL, NULL, &io, FSCTL_PIPE_DISCONNECT,
 			    NULL, 0, NULL, 0);
@@ -159,10 +159,10 @@ fhandler_fifo::disconnect_and_reconnect (int i)
       __seterrno_from_nt_status (status);
       return -1;
     }
-  set_pipe_non_blocking (client[i].fh->get_handle (), false);
-  if (client[i].connect () < 0)
+  set_pipe_non_blocking (fc_handler[i].fh->get_handle (), false);
+  if (fc_handler[i].connect () < 0)
     return -1;
-  if (client[i].state == fc_connected)
+  if (fc_handler[i].state == fc_connected)
     nconnected++;
   return 0;
 }
@@ -198,9 +198,9 @@ fhandler_fifo::npfs_handle (HANDLE &nph)
 }
 
 /* Called when a FIFO is first opened for reading and again each time
-   a new client is needed.  Each pipe instance is created in blocking
-   mode so that we can easily wait for a connection.  After it is
-   connected, it is put in nonblocking mode. */
+   a new client handler is needed.  Each pipe instance is created in
+   blocking mode so that we can easily wait for a connection.  After
+   it is connected, it is put in nonblocking mode. */
 HANDLE
 fhandler_fifo::create_pipe_instance (bool first)
 {
@@ -271,13 +271,13 @@ fhandler_fifo::open_pipe ()
 }
 
 int
-fhandler_fifo::add_client ()
+fhandler_fifo::add_client_handler ()
 {
   fifo_client_handler fc;
   fhandler_base *fh;
-  bool first = (nclients == 0);
+  bool first = (nhandlers == 0);
 
-  if (nclients == MAX_CLIENTS)
+  if (nhandlers == MAX_CLIENTS)
     {
       set_errno (EMFILE);
       return -1;
@@ -302,7 +302,7 @@ fhandler_fifo::add_client ()
     }
   if (fc.state == fc_connected)
     nconnected++;
-  client[nclients++] = fc;
+  fc_handler[nhandlers++] = fc;
   return 0;
 errout:
   delete fh;
@@ -353,8 +353,8 @@ fhandler_fifo::listen_client_thread ()
 
       fifo_client_lock ();
       found = false;
-      for (i = 0; i < nclients; i++)
-	switch (client[i].state)
+      for (i = 0; i < nhandlers; i++)
+	switch (fc_handler[i].state)
 	  {
 	  case fc_invalid:
 	    if (disconnect_and_reconnect (i) < 0)
@@ -364,20 +364,20 @@ fhandler_fifo::listen_client_thread ()
 	      }
 	    /* Fall through. */
 	  case fc_connected:
-	    w[i] = client[i].dummy_evt;
+	    w[i] = fc_handler[i].dummy_evt;
 	    break;
 	  case fc_connecting:
 	    found = true;
-	    w[i] = client[i].connect_evt;
+	    w[i] = fc_handler[i].connect_evt;
 	    break;
 	  case fc_unknown:	/* Shouldn't happen. */
 	  default:
 	    break;
 	  }
-      w[nclients] = lct_termination_evt;
+      w[nhandlers] = lct_termination_evt;
       int res = 0;
       if (!found)
-	res = add_client ();
+	res = add_client_handler ();
       fifo_client_unlock ();
       if (res < 0)
 	goto errout;
@@ -391,18 +391,18 @@ fhandler_fifo::listen_client_thread ()
 	}
 
       /* Wait for a client to connect. */
-      wait_ret = WaitForMultipleObjects (nclients + 1, w, false, INFINITE);
+      wait_ret = WaitForMultipleObjects (nhandlers + 1, w, false, INFINITE);
       i = wait_ret - WAIT_OBJECT_0;
-      if (i < 0 || i > nclients)
+      if (i < 0 || i > nhandlers)
 	goto errout;
-      else if (i == nclients)	/* Reader is closing. */
+      else if (i == nhandlers)	/* Reader is closing. */
 	return 0;
       else
 	{
 	  fifo_client_lock ();
-	  client[i].state = fc_connected;
+	  fc_handler[i].state = fc_connected;
 	  nconnected++;
-	  set_pipe_non_blocking (client[i].fh->get_handle (), true);
+	  set_pipe_non_blocking (fc_handler[i].fh->get_handle (), true);
 	  fifo_client_unlock ();
 	  yield ();
 	}
@@ -474,7 +474,7 @@ fhandler_fifo::open (int flags, mode_t)
       goto out;
     }
 
-  /* If we're a duplexer, create the pipe and the first client. */
+  /* If we're a duplexer, create the pipe and the first client handler. */
   if (duplexer)
     {
       HANDLE ph, connect_evt, dummy_evt;
@@ -511,9 +511,9 @@ fhandler_fifo::open (int flags, mode_t)
 	  CloseHandle (connect_evt);
 	  goto out;
 	}
-      client[0] = fifo_client_handler (fh, fc_connected, connect_evt,
+      fc_handler[0] = fifo_client_handler (fh, fc_connected, connect_evt,
 				       dummy_evt);
-      nconnected = nclients = 1;
+      nconnected = nhandlers = 1;
     }
 
   /* If we're reading, start the listen_client thread (which should
@@ -736,11 +736,11 @@ fhandler_fifo::raw_read (void *in_ptr, size_t& len)
 
       /* Poll the connected clients for input. */
       fifo_client_lock ();
-      for (int i = 0; i < nclients; i++)
-	if (client[i].state == fc_connected)
+      for (int i = 0; i < nhandlers; i++)
+	if (fc_handler[i].state == fc_connected)
 	  {
 	    len = orig_len;
-	    client[i].fh->fhandler_base::raw_read (in_ptr, len);
+	    fc_handler[i].fh->fhandler_base::raw_read (in_ptr, len);
 	    ssize_t nread = (ssize_t) len;
 	    if (nread > 0)
 	      {
@@ -749,7 +749,7 @@ fhandler_fifo::raw_read (void *in_ptr, size_t& len)
 	      }
 	    /* In the duplex case with no data, we seem to get nread
 	       == -1 with ERROR_PIPE_LISTENING on the first attempt to
-	       read from the duplex pipe (client[0]), and nread == 0
+	       read from the duplex pipe (fc_handler[0]), and nread == 0
 	       on subsequent attempts. */
 	    else if (nread < 0)
 	      switch (GetLastError ())
@@ -767,7 +767,7 @@ fhandler_fifo::raw_read (void *in_ptr, size_t& len)
 	    else if (nread == 0 && (!_duplexer || i > 0))
 	      /* Client has disconnected. */
 	      {
-		client[i].state = fc_invalid;
+		fc_handler[i].state = fc_invalid;
 		nconnected--;
 	      }
 	  }
@@ -841,8 +841,8 @@ fhandler_fifo::close ()
     CloseHandle (read_ready);
   if (write_ready)
     CloseHandle (write_ready);
-  for (int i = 0; i < nclients; i++)
-    if (client[i].close () < 0)
+  for (int i = 0; i < nhandlers; i++)
+    if (fc_handler[i].close () < 0)
       res = -1;
   return fhandler_base::close () || res;
 }
@@ -873,19 +873,19 @@ fhandler_fifo::dup (fhandler_base *child, int flags)
       __seterrno ();
       return -1;
     }
-  for (int i = 0; i < nclients; i++)
+  for (int i = 0; i < nhandlers; i++)
     {
-      if (!DuplicateHandle (GetCurrentProcess (), client[i].fh->get_handle (),
+      if (!DuplicateHandle (GetCurrentProcess (), fc_handler[i].fh->get_handle (),
 			    GetCurrentProcess (),
-			    &fhf->client[i].fh->get_handle (),
+			    &fhf->fc_handler[i].fh->get_handle (),
 			    0, true, DUPLICATE_SAME_ACCESS)
-	  || !DuplicateHandle (GetCurrentProcess (), client[i].connect_evt,
+	  || !DuplicateHandle (GetCurrentProcess (), fc_handler[i].connect_evt,
 			       GetCurrentProcess (),
-			       &fhf->client[i].connect_evt,
+			       &fhf->fc_handler[i].connect_evt,
 			       0, true, DUPLICATE_SAME_ACCESS)
-	  || !DuplicateHandle (GetCurrentProcess (), client[i].dummy_evt,
+	  || !DuplicateHandle (GetCurrentProcess (), fc_handler[i].dummy_evt,
 			       GetCurrentProcess (),
-			       &fhf->client[i].dummy_evt,
+			       &fhf->fc_handler[i].dummy_evt,
 			       0, true, DUPLICATE_SAME_ACCESS))
 	{
 	  CloseHandle (fhf->read_ready);
@@ -907,11 +907,11 @@ fhandler_fifo::fixup_after_fork (HANDLE parent)
   fhandler_base::fixup_after_fork (parent);
   fork_fixup (parent, read_ready, "read_ready");
   fork_fixup (parent, write_ready, "write_ready");
-  for (int i = 0; i < nclients; i++)
+  for (int i = 0; i < nhandlers; i++)
     {
-      client[i].fh->fhandler_base::fixup_after_fork (parent);
-      fork_fixup (parent, client[i].connect_evt, "connect_evt");
-      fork_fixup (parent, client[i].dummy_evt, "dummy_evt");
+      fc_handler[i].fh->fhandler_base::fixup_after_fork (parent);
+      fork_fixup (parent, fc_handler[i].connect_evt, "connect_evt");
+      fork_fixup (parent, fc_handler[i].dummy_evt, "dummy_evt");
     }
   listen_client_thr = NULL;
   lct_termination_evt = NULL;
@@ -924,10 +924,10 @@ fhandler_fifo::set_close_on_exec (bool val)
   fhandler_base::set_close_on_exec (val);
   set_no_inheritance (read_ready, val);
   set_no_inheritance (write_ready, val);
-  for (int i = 0; i < nclients; i++)
+  for (int i = 0; i < nhandlers; i++)
     {
-      client[i].fh->fhandler_base::set_close_on_exec (val);
-      set_no_inheritance (client[i].connect_evt, val);
-      set_no_inheritance (client[i].dummy_evt, val);
+      fc_handler[i].fh->fhandler_base::set_close_on_exec (val);
+      set_no_inheritance (fc_handler[i].connect_evt, val);
+      set_no_inheritance (fc_handler[i].dummy_evt, val);
     }
 }

@@ -872,7 +872,7 @@ peek_fifo (select_record *s, bool from_select)
 	}
 
       fh->fifo_client_lock ();
-      for (int i = 0; i < fh->get_nclients (); i++)
+      for (int i = 0; i < fh->get_nhandlers (); i++)
 	if (fh->is_connected (i))
 	  {
 	    int n = pipe_data_available (s->fd, fh, fh->get_handle (i),

@@ -1269,8 +1269,8 @@ class fhandler_fifo: public fhandler_base
   HANDLE lct_termination_evt;
   UNICODE_STRING pipe_name;
   WCHAR pipe_name_buf[CYGWIN_FIFO_PIPE_NAME_LEN + 1];
-  fifo_client_handler client[MAX_CLIENTS];
-  int nclients, nconnected;
+  fifo_client_handler fc_handler[MAX_CLIENTS];
+  int nhandlers, nconnected;
   af_unix_spinlock_t _fifo_client_lock;
   bool _duplexer;
   bool __reg2 wait (HANDLE);
@@ -1278,15 +1278,15 @@ class fhandler_fifo: public fhandler_base
   HANDLE create_pipe_instance (bool);
   NTSTATUS open_pipe ();
   int disconnect_and_reconnect (int);
-  int add_client ();
+  int add_client_handler ();
   bool listen_client ();
 public:
   fhandler_fifo ();
   bool hit_eof ();
-  int get_nclients () const { return nclients; }
+  int get_nhandlers () const { return nhandlers; }
   HANDLE& get_handle () { return fhandler_base::get_handle (); }
-  HANDLE get_handle (int i) const { return client[i].fh->get_handle (); }
-  bool is_connected (int i) const { return client[i].state == fc_connected; }
+  HANDLE get_handle (int i) const { return fc_handler[i].fh->get_handle (); }
+  bool is_connected (int i) const { return fc_handler[i].state == fc_connected; }
   PUNICODE_STRING get_pipe_name ();
   DWORD listen_client_thread ();
   void fifo_client_lock () { _fifo_client_lock.lock (); }
@@ -1305,8 +1305,8 @@ public:
   void clear_readahead ()
   {
     fhandler_base::clear_readahead ();
-    for (int i = 0; i < nclients; i++)
-      client[i].fh->clear_readahead ();
+    for (int i = 0; i < nhandlers; i++)
+      fc_handler[i].fh->clear_readahead ();
   }
   select_record *select_read (select_stuff *);
   select_record *select_write (select_stuff *);
@@ -1326,8 +1326,8 @@ public:
     void *ptr = (void *) ccalloc (malloc_type, 1, sizeof (fhandler_fifo));
     fhandler_fifo *fhf = new (ptr) fhandler_fifo (ptr);
     copyto (fhf);
-    for (int i = 0; i < nclients; i++)
-      fhf->client[i].fh = client[i].fh->clone ();
+    for (int i = 0; i < nhandlers; i++)
+      fhf->fc_handler[i].fh = fc_handler[i].fh->clone ();
     return fhf;
   }
 };
