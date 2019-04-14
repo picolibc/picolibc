@@ -812,9 +812,9 @@ fifo_client_handler::close ()
 }
 
 int
-fhandler_fifo::close ()
+fhandler_fifo::stop_listen_client ()
 {
-  int res = 0;
+  int ret = 0;
   HANDLE evt = InterlockedExchangePointer (&lct_termination_evt, NULL);
   HANDLE thr = InterlockedExchangePointer (&listen_client_thr, NULL);
   if (thr)
@@ -825,19 +825,29 @@ fhandler_fifo::close ()
       DWORD err;
       GetExitCodeThread (thr, &err);
       if (err)
-	debug_printf ("listen_client_thread exited with code %d", err);
+	{
+	  ret = -1;
+	  debug_printf ("listen_client_thread exited with error, %E");
+	}
       CloseHandle (thr);
     }
   if (evt)
     CloseHandle (evt);
+  return ret;
+}
+
+int
+fhandler_fifo::close ()
+{
+  int ret = stop_listen_client ();
   if (read_ready)
     CloseHandle (read_ready);
   if (write_ready)
     CloseHandle (write_ready);
   for (int i = 0; i < nhandlers; i++)
     if (fc_handler[i].close () < 0)
-      res = -1;
-  return fhandler_base::close () || res;
+      ret = -1;
+  return fhandler_base::close () || ret;
 }
 
 int

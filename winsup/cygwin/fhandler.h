@@ -1280,6 +1280,7 @@ class fhandler_fifo: public fhandler_base
   int disconnect_and_reconnect (int);
   int add_client_handler ();
   bool listen_client ();
+  int stop_listen_client ();
 public:
   fhandler_fifo ();
   bool hit_eof ();
@@ -1326,7 +1327,12 @@ public:
   {
     void *ptr = (void *) ccalloc (malloc_type, 1, sizeof (fhandler_fifo));
     fhandler_fifo *fhf = new (ptr) fhandler_fifo (ptr);
+    /* We don't want our client list to change any more. */
+    stop_listen_client ();
     copyto (fhf);
+    /* fhf->pipe_name_buf is a *copy* of this->pipe_name_buf, but
+       fhf->pipe_name.Buffer == this->pipe_name_buf. */
+    fhf->pipe_name.Buffer = fhf->pipe_name_buf;
     for (int i = 0; i < nhandlers; i++)
       fhf->fc_handler[i].fh = fc_handler[i].fh->clone ();
     return fhf;
