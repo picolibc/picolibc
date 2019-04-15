@@ -246,8 +246,8 @@ _msp430_run_array:
 	jeq	_msp430_run_done
 	mov_	@R4, R7
 	add_	R6, R4
-	call_	@R7
-	br_	_msp430_run_array
+	call_	R7
+	br_	#_msp430_run_array
 
 _msp430_run_done:
 	ret_
