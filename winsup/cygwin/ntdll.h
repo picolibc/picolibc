@@ -15,7 +15,9 @@
 extern GUID __cygwin_socket_guid;
 #define CYGWIN_SOCKET_GUID (&__cygwin_socket_guid)
 
-/* custom status code: */
+/* Custom Cygwin-only status codes. */
+#define STATUS_THREAD_SIGNALED	((NTSTATUS)0xe0000001)
+#define STATUS_THREAD_CANCELED	((NTSTATUS)0xe0000002)
 #define STATUS_ILLEGAL_DLL_PSEUDO_RELOCATION ((NTSTATUS) 0xe0000269)
 
 /* Simplify checking for a transactional error code. */

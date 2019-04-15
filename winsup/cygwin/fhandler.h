@@ -1273,6 +1273,7 @@ class fhandler_fifo: public fhandler_base
   int nhandlers, nconnected;
   af_unix_spinlock_t _fifo_client_lock;
   bool reader, writer, duplexer;
+  size_t max_atomic_write;
   bool __reg2 wait (HANDLE);
   NTSTATUS npfs_handle (HANDLE &);
   HANDLE create_pipe_instance (bool);
