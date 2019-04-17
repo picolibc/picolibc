@@ -62,6 +62,13 @@ START_CRT_FUNC 0000 start
 END_CRT_FUNC	start
 #endif
 
+;; Some of the CRT functions below will only be present in the final linked
+;; executable if the assembler decides they are needed.  It will only define
+;; the symbol necessary to prevent them being garbage collected by the linker
+;; if the file being assembled has a specific section.
+;; The CRT functions this applies to are:
+;; init_bss, movedata, move_highdata, init_highbss, run_init_array,
+;; run_preinit_array, run_fini_array and run_array.
 
 #if Lbss
 ;; Note - this section is only included in the startup code of the
@@ -215,44 +222,69 @@ END_CRT_FUNC	call_exit
 ;----------------------------------------
 
 #ifndef MINRT
-#if L0
-	.section ".crt_0900main_init", "ax", @progbits
-	.global	_msp430_run_init_array
-	.type	_msp430_run_init_array,@function
-_msp430_run_init_array:
-	mov_	#__init_array_start, R4
-	mov_	#__init_array_end, R5
-	mov_	#PTRsz, R6
-	br_	#_msp430_run_array
 
-	.global	_msp430_run_preinit_array
-	.type	_msp430_run_preinit_array,@function
-_msp430_run_preinit_array:
+#if Lrun_preinit_array
+;; Note - this section is only included in the startup code of the application
+;; if it is needed.  It is responsible for setting up the arguments
+;; required for __crt0_run_array, to run the functions in .preinit_array.
+START_CRT_FUNC 0910 run_preinit_array
+
 	mov_	#__preinit_array_start, R4
 	mov_	#__preinit_array_end, R5
 	mov_	#PTRsz, R6
-	br_	#_msp430_run_array
+	br_	#__crt0_run_array
 
-	.global	_msp430_run_fini_array
-	.type	_msp430_run_fini_array,@function
-_msp430_run_fini_array:
+END_CRT_FUNC	run_preinit_array
+#endif /* Lrun_preinit_array */
+
+#if Lrun_init_array
+;; Note - this section is only included in the startup code of the application
+;; if it is needed.  It is responsible for setting up the arguments
+;; required for __crt0_run_array, to run the functions in .init_array.
+START_CRT_FUNC 0920 run_init_array
+
+	mov_	#__init_array_start, R4
+	mov_	#__init_array_end, R5
+	mov_	#PTRsz, R6
+	br_	#__crt0_run_array
+
+END_CRT_FUNC	run_init_array
+#endif /* Lrun_init_array */
+
+#if Lrun_fini_array
+;; Note - this section is only included in the startup code of the application
+;; if it is needed.  It is responsible for setting up the arguments
+;; required for __crt0_run_array, to run the functions in .fini_array.
+START_CRT_FUNC 0930 run_fini_array
+
 	mov_	#__fini_array_start, R4
 	mov_	#__fini_array_end, R5
 	mov_	#-PTRsz, R6
-	br_	#_msp430_run_array
+	br_	#__crt0_run_array
 
-_msp430_run_array:
+END_CRT_FUNC	run_fini_array
+#endif /* Lrun_fini_array */
+
+#if Lrun_array
+;; Note - this section is only included in the startup code of the application
+;; if it is needed by one of the above run_*_array functions.
+START_CRT_FUNC 0980 run_array
+
 	cmp_	R4, R5
 	jeq	_msp430_run_done
 	mov_	@R4, R7
 	add_	R6, R4
 	call_	R7
-	br_	#_msp430_run_array
+	br_	#__crt0_run_array
+
+END_CRT_FUNC	run_array
 
 _msp430_run_done:
 	ret_
+#endif /* Lrun_array */
 
 ;----------------------------------------
+#if L0
 
 	.section	.init,"ax"
 
@@ -263,7 +295,14 @@ __msp430_init:
 
 	.global __msp430_fini
 __msp430_fini:
-	call_	#_msp430_run_fini_array
+	call_	#__crt0_run_fini_array
 	
+;; If this function is not defined externally, we don't need it to do
+;; anything.
+	.text
+	.weak __crt0_run_fini_array
+__crt0_run_fini_array:
+	ret_
+
 #endif
 #endif /* not MINRT */
