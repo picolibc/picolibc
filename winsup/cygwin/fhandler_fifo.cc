@@ -943,6 +943,15 @@ fhandler_fifo::fixup_after_fork (HANDLE parent)
 }
 
 void
+fhandler_fifo::fixup_after_exec ()
+{
+  fhandler_base::fixup_after_exec ();
+  listen_client_thr = NULL;
+  lct_termination_evt = NULL;
+  fifo_client_unlock ();
+}
+
+void
 fhandler_fifo::set_close_on_exec (bool val)
 {
   fhandler_base::set_close_on_exec (val);
