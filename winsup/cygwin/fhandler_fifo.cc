@@ -363,6 +363,7 @@ fhandler_fifo::listen_client_thread ()
 		  break;
 		}
 	    }
+	  HANDLE evt = NULL;
 	  switch (status)
 	    {
 	    case STATUS_SUCCESS:
@@ -371,6 +372,9 @@ fhandler_fifo::listen_client_thread ()
 	      fc.state = fc_connected;
 	      nconnected++;
 	      set_pipe_non_blocking (fc.fh->get_handle (), true);
+	      evt = InterlockedExchangePointer (&fc.connect_evt, NULL);
+	      if (evt)
+		CloseHandle (evt);
 	      fifo_client_unlock ();
 	      break;
 	    case STATUS_PIPE_LISTENING:
@@ -400,6 +404,8 @@ fhandler_fifo::listen_client_thread ()
 	}
     }
 out:
+  if (ret < 0)
+    debug_printf ("exiting lct with error, %E");
   ResetEvent (read_ready);
   return ret;
 }
@@ -829,14 +835,15 @@ int
 fifo_client_handler::close ()
 {
   int res = 0;
+  HANDLE evt = InterlockedExchangePointer (&connect_evt, NULL);
 
+  if (evt)
+    CloseHandle (evt);
   if (fh)
     {
       res = fh->fhandler_base::close ();
       delete fh;
     }
-  if (connect_evt)
-    CloseHandle (connect_evt);
   return res;
 }
 
@@ -913,11 +920,7 @@ fhandler_fifo::dup (fhandler_base *child, int flags)
       if (!DuplicateHandle (GetCurrentProcess (), fc_handler[i].fh->get_handle (),
 			    GetCurrentProcess (),
 			    &fhf->fc_handler[i].fh->get_handle (),
-			    0, true, DUPLICATE_SAME_ACCESS)
-	  || !DuplicateHandle (GetCurrentProcess (), fc_handler[i].connect_evt,
-			       GetCurrentProcess (),
-			       &fhf->fc_handler[i].connect_evt,
-			       0, true, DUPLICATE_SAME_ACCESS))
+			    0, true, DUPLICATE_SAME_ACCESS))
 	{
 	  CloseHandle (fhf->read_ready);
 	  CloseHandle (fhf->write_ready);
