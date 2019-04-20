@@ -522,7 +522,10 @@ fhandler_fifo::open (int flags, mode_t)
 	  goto out;
 	}
       else
-	res = success;
+	{
+	  init_fixup_before ();
+	  res = success;
+	}
     }
 
   /* If we're writing, wait for read_ready and then connect to the
@@ -752,7 +755,7 @@ fhandler_fifo::raw_read (void *in_ptr, size_t& len)
 {
   size_t orig_len = len;
 
-  /* Start the listen_client thread if necessary (e.g., after dup or fork). */
+  /* Start the listen_client thread if necessary (e.g., after fork or exec). */
   if (!listen_client_thr && !listen_client ())
     goto errout;
 
@@ -934,8 +937,16 @@ fhandler_fifo::dup (fhandler_base *child, int flags)
   fhf->fifo_client_unlock ();
   if (!reader || fhf->listen_client ())
     ret = 0;
+  if (reader)
+    fhf->init_fixup_before ();
 out:
   return ret;
+}
+
+void
+fhandler_fifo::init_fixup_before ()
+{
+  cygheap->fdtab.inc_need_fixup_before ();
 }
 
 void

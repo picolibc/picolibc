@@ -1300,6 +1300,9 @@ public:
   void __reg3 raw_read (void *ptr, size_t& ulen);
   ssize_t __reg3 raw_write (const void *ptr, size_t ulen);
   bool arm (HANDLE h);
+  bool need_fixup_before () const { return reader; }
+  int fixup_before_fork_exec (DWORD) { return stop_listen_client (); }
+  void init_fixup_before ();
   void fixup_after_fork (HANDLE);
   void fixup_after_exec ();
   int __reg2 fstatvfs (struct statvfs *buf);
