@@ -844,22 +844,24 @@ int
 fhandler_fifo::stop_listen_client ()
 {
   int ret = 0;
-  HANDLE evt = InterlockedExchangePointer (&lct_termination_evt, NULL);
-  HANDLE thr = InterlockedExchangePointer (&listen_client_thr, NULL);
+  HANDLE thr, evt;
+
+  thr = InterlockedExchangePointer (&listen_client_thr, NULL);
   if (thr)
     {
-      if (evt)
-	SetEvent (evt);
+      if (lct_termination_evt)
+	SetEvent (lct_termination_evt);
       WaitForSingleObject (thr, INFINITE);
       DWORD err;
       GetExitCodeThread (thr, &err);
       if (err)
 	{
 	  ret = -1;
-	  debug_printf ("listen_client_thread exited with error, %E");
+	  debug_printf ("listen_client_thread exited with error");
 	}
       CloseHandle (thr);
     }
+  evt = InterlockedExchangePointer (&lct_termination_evt, NULL);
   if (evt)
     CloseHandle (evt);
   return ret;
