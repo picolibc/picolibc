@@ -563,7 +563,7 @@ out:
       if (get_handle ())
 	CloseHandle (get_handle ());
       if (listen_client_thr)
-	CloseHandle (listen_client_thr);
+	stop_listen_client ();
     }
   debug_printf ("res %d", res);
   return res == success;
