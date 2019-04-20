@@ -755,7 +755,7 @@ fhandler_fifo::raw_read (void *in_ptr, size_t& len)
 {
   size_t orig_len = len;
 
-  /* Start the listen_client thread if necessary (e.g., after fork or exec). */
+  /* Start the listen_client thread if necessary (shouldn't be). */
   if (!listen_client_thr && !listen_client ())
     goto errout;
 
@@ -960,18 +960,16 @@ fhandler_fifo::fixup_after_fork (HANDLE parent)
       fc_handler[i].fh->fhandler_base::fixup_after_fork (parent);
       fork_fixup (parent, fc_handler[i].connect_evt, "connect_evt");
     }
-  listen_client_thr = NULL;
-  lct_termination_evt = NULL;
-  fifo_client_unlock ();
+  if (reader && !listen_client ())
+    debug_printf ("failed to start lct, %E");
 }
 
 void
 fhandler_fifo::fixup_after_exec ()
 {
   fhandler_base::fixup_after_exec ();
-  listen_client_thr = NULL;
-  lct_termination_evt = NULL;
-  fifo_client_unlock ();
+  if (reader && !listen_client ())
+    debug_printf ("failed to start lct, %E");
 }
 
 void
