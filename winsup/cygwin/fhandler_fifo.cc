@@ -480,7 +480,14 @@ fhandler_fifo::open (int flags, mode_t)
 	  res = error_errno_set;
 	  goto out;
 	}
-      fh->set_handle (ph);
+      if (!DuplicateHandle (GetCurrentProcess (), ph, GetCurrentProcess (),
+			    &fh->get_handle (), 0, true, DUPLICATE_SAME_ACCESS))
+	{
+	  res = error_set_errno;
+	  fh->close ();
+	  delete fh;
+	  goto out;
+	}
       fh->set_flags (flags);
       if (!(connect_evt = create_event ()))
 	{
