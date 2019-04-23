@@ -177,6 +177,9 @@ static const errmap_t wsock_errmap[] = {
   {WSAEREMOTE, "WSAEREMOTE", EREMOTE},
   {WSAEINVAL, "WSAEINVAL", EINVAL},
   {WSAEFAULT, "WSAEFAULT", EFAULT},
+  {WSAEBADF, "WSAEBADF", EBADF},
+  {WSAEACCES, "WSAEACCES", EACCES},
+  {WSAEMFILE, "WSAEMFILE", EMFILE},
   {0, "NOERROR", 0},
   {0, NULL, 0}
 };
@@ -188,7 +191,7 @@ find_winsock_errno (DWORD why)
     if (why == wsock_errmap[i].w)
       return wsock_errmap[i].e;
 
-  return EPERM;
+  return EACCES;
 }
 
 void
