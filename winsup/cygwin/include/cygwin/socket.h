@@ -207,6 +207,8 @@ struct OLD_msghdr
 /* AF_UNIX specific */
 #define MSG_CMSG_CLOEXEC 0x1000		/* Set O_CLOEXEC on fd's passed via
 					   SCM_RIGHTS */
+/* MSG_EOR is not supported.  We use the MSG_PARTIAL flag here */
+#define MSG_EOR		0x8000		/* Terminates a record */
 
 /* Setsockoptions(2) level. Thanks to BSD these must match IPPROTO_xxx */
 #define SOL_IP		0

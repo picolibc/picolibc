@@ -1351,6 +1351,13 @@ fhandler_socket_wsock::send_internal (struct _WSAMSG *wsamsg, int flags)
   DWORD wait_flags = flags & MSG_DONTWAIT;
   bool nosignal = !!(flags & MSG_NOSIGNAL);
 
+  /* MSG_EOR not supported by any protocol */
+  if (flags & MSG_EOR)
+    {
+      set_errno (EOPNOTSUPP);
+      return SOCKET_ERROR;
+    }
+
   flags &= (MSG_OOB | MSG_DONTROUTE);
   if (wsamsg->Control.len > 0)
     use_sendmsg = true;

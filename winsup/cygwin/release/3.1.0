@@ -24,3 +24,7 @@ Bug Fixes
   completed, instead of when only one key is typed.
 
 - Make console I/O functions thread-safe.
+
+- Define missing MSG_EOR.  It's unsupported by the underlying Winsock
+  layer so using it in send(2), sendto(2), or sendmsg(2) will return -1
+  with errno set to EOPNOTSUPP and recvmsg(2) will never return it.
