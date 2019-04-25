@@ -891,6 +891,22 @@ fhandler_fifo::close ()
   return fhandler_base::close () || ret;
 }
 
+/* If we're a writer, keep the nonblocking state of the windows pipe
+   in sync with our nonblocking state. */
+int
+fhandler_fifo::fcntl (int cmd, intptr_t arg)
+{
+  if (cmd != F_SETFL || !writer)
+    return fhandler_base::fcntl (cmd, arg);
+
+  const bool was_nonblocking = is_nonblocking ();
+  int res = fhandler_base::fcntl (cmd, arg);
+  const bool now_nonblocking = is_nonblocking ();
+  if (now_nonblocking != was_nonblocking)
+    set_pipe_non_blocking (get_handle (), now_nonblocking);
+  return res;
+}
+
 int
 fhandler_fifo::dup (fhandler_base *child, int flags)
 {

@@ -1294,6 +1294,7 @@ public:
   int open (int, mode_t);
   off_t lseek (off_t offset, int whence);
   int close ();
+  int fcntl (int cmd, intptr_t);
   int dup (fhandler_base *child, int);
   bool isfifo () const { return true; }
   void set_close_on_exec (bool val);
