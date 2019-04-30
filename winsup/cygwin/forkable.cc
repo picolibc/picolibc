@@ -155,10 +155,10 @@ rmdirs (WCHAR ntmaxpathbuf[NT_MAX_PATH])
    file name, as GetModuleFileNameW () yields the as-loaded name.
    While we have the file handle open, also read the attributes.
    NOTE: Uses dll_list::nt_max_path_buf (). */
-static bool
-stat_real_file_once (dll *d)
+bool
+dll::stat_real_file_once ()
 {
-  if (d->fii.IndexNumber.QuadPart != -1LL)
+  if (fii.IndexNumber.QuadPart != -1LL)
     return true;
 
   tmp_pathbuf tp;
@@ -171,35 +171,37 @@ stat_real_file_once (dll *d)
   RtlInitEmptyUnicodeString (&msi2.SectionFileName, tp.w_get (), 65535);
 
   /* Retry opening the real file name until that does not change any more. */
-  status = NtQueryVirtualMemory (NtCurrentProcess (), d->handle,
+  status = NtQueryVirtualMemory (NtCurrentProcess (), handle,
 				 MemorySectionName, pmsi1, 65536, NULL);
   while (NT_SUCCESS (status) &&
 	!RtlEqualUnicodeString (&msi2.SectionFileName,
 				&pmsi1->SectionFileName, FALSE))
     {
+      debug_printf ("for %s at %p got memory section name '%W'",
+	ntname, handle, pmsi1->SectionFileName.Buffer);
       RtlCopyUnicodeString (&msi2.SectionFileName, &pmsi1->SectionFileName);
       if (fhandle != INVALID_HANDLE_VALUE)
 	NtClose (fhandle);
       pmsi1->SectionFileName.Buffer[pmsi1->SectionFileName.Length] = L'\0';
       fhandle = dll_list::ntopenfile (pmsi1->SectionFileName.Buffer, &fstatus);
-      status = NtQueryVirtualMemory (NtCurrentProcess (), d->handle,
+      status = NtQueryVirtualMemory (NtCurrentProcess (), handle,
 				     MemorySectionName, pmsi1, 65536, NULL);
     }
   if (!NT_SUCCESS (status))
     system_printf ("WARNING: Unable (ntstatus %y) to query real file for %W",
-		   status, d->ntname);
+		   status, ntname);
   else if (fhandle == INVALID_HANDLE_VALUE)
     system_printf ("WARNING: Unable (ntstatus %y) to open real file for %W",
-		   fstatus, d->ntname);
+		   fstatus, ntname);
   if (fhandle == INVALID_HANDLE_VALUE)
     return false;
 
-  if (!dll_list::read_fii (fhandle, &d->fii))
+  if (!dll_list::read_fii (fhandle, &fii))
     system_printf ("WARNING: Unable to read real file attributes for %W",
 		   pmsi1->SectionFileName.Buffer);
 
   NtClose (fhandle);
-  return d->fii.IndexNumber.QuadPart != -1LL;
+  return fii.IndexNumber.QuadPart != -1LL;
 }
 
 /* easy use of NtOpenFile */
@@ -605,7 +607,7 @@ dll_list::prepare_forkables_nomination ()
 {
   dll *d = &dlls.start;
   while ((d = d->next))
-    stat_real_file_once (d); /* uses nt_max_path_buf () */
+    d->stat_real_file_once (); /* uses nt_max_path_buf () */
 
   PWCHAR pbuf = nt_max_path_buf ();
 

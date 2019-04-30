@@ -65,6 +65,7 @@ struct dll
 
   void detach ();
   int init ();
+  bool stat_real_file_once ();
   void nominate_forkable (PCWCHAR);
   bool create_forkable ();
   void run_dtors ()
