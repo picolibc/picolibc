@@ -372,7 +372,6 @@ dll_list::alloc (HINSTANCE h, per_process *p, dll_type type)
       d->image_size = ((pefile*)h)->optional_hdr ()->SizeOfImage;
       d->preferred_base = (void*) ((pefile*)h)->optional_hdr()->ImageBase;
       d->type = type;
-      d->fbi.FileAttributes = INVALID_FILE_ATTRIBUTES;
       d->fii.IndexNumber.QuadPart = -1LL;
       if (!forkntsize)
 	d->forkable_ntname = NULL;

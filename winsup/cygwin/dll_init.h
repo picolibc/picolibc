@@ -59,7 +59,6 @@ struct dll
   DWORD image_size;
   void* preferred_base;
   PWCHAR modname;
-  FILE_BASIC_INFORMATION fbi;
   FILE_INTERNAL_INFORMATION fii;
   PWCHAR forkable_ntname;
   WCHAR ntname[1]; /* must be the last data member */

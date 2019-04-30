@@ -158,7 +158,7 @@ rmdirs (WCHAR ntmaxpathbuf[NT_MAX_PATH])
 static bool
 stat_real_file_once (dll *d)
 {
-  if (d->fbi.FileAttributes != INVALID_FILE_ATTRIBUTES)
+  if (d->fii.IndexNumber.QuadPart != -1LL)
     return true;
 
   tmp_pathbuf tp;
@@ -194,13 +194,12 @@ stat_real_file_once (dll *d)
   if (fhandle == INVALID_HANDLE_VALUE)
     return false;
 
-  if (!dll_list::read_fii (fhandle, &d->fii) ||
-      !dll_list::read_fbi (fhandle, &d->fbi))
+  if (!dll_list::read_fii (fhandle, &d->fii))
     system_printf ("WARNING: Unable to read real file attributes for %W",
 		   pmsi1->SectionFileName.Buffer);
 
   NtClose (fhandle);
-  return d->fbi.FileAttributes != INVALID_FILE_ATTRIBUTES;
+  return d->fii.IndexNumber.QuadPart != -1LL;
 }
 
 /* easy use of NtOpenFile */
