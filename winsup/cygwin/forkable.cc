@@ -605,10 +605,6 @@ dll_list::forkable_ntnamesize (dll_type type, PCWCHAR fullntname, PCWCHAR modnam
 void
 dll_list::prepare_forkables_nomination ()
 {
-  dll *d = &dlls.start;
-  while ((d = d->next))
-    d->stat_real_file_once (); /* uses nt_max_path_buf () */
-
   PWCHAR pbuf = nt_max_path_buf ();
 
   bool needsep = false;
