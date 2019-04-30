@@ -32,6 +32,11 @@ third parameter, follow it after returning from the handler.
 <itemizedlist mark="bullet">
 
 <listitem><para>
+Updated era and message locale data, in particular add era data for
+the new Tennō.
+</para></listitem>
+
+<listitem><para>
 Support for CLOCK_REALTIME_COARSE, CLOCK_MONOTONIC_COARSE,
 CLOCK_MONOTONIC_RAW, CLOCK_BOOTTIME, CLOCK_REALTIME_ALARM,
 CLOCK_BOOTTIME_ALARM clocks.
