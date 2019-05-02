@@ -110,6 +110,7 @@ SECTIONS
     *(.gnu.linkonce.r.*)
   }
    _fdata = ALIGN(16);
+  . = _fdata;
   .data : {
     *(.data)
     *(.data.*)
