@@ -268,29 +268,6 @@ dll_list::read_fii (HANDLE fh, PFILE_INTERNAL_INFORMATION pfii)
   return true;
 }
 
-bool
-dll_list::read_fbi (HANDLE fh, PFILE_BASIC_INFORMATION pfbi)
-{
-  pfbi->FileAttributes = INVALID_FILE_ATTRIBUTES;
-  pfbi->LastWriteTime.QuadPart = -1LL;
-
-  NTSTATUS status;
-  IO_STATUS_BLOCK iosb;
-  status = NtQueryInformationFile (fh, &iosb,
-				   pfbi, sizeof (*pfbi),
-				   FileBasicInformation);
-  if (!NT_SUCCESS (status))
-    {
-      system_printf ("WARNING: %y = NtQueryInformationFile (%p,"
-		     " BasicInfo, io.Status %y)",
-		     status, fh, iosb.Status);
-      pfbi->FileAttributes = INVALID_FILE_ATTRIBUTES;
-      pfbi->LastWriteTime.QuadPart = -1LL;
-      return false;
-    }
-  return true;
-}
-
 /* Into buf if not NULL, write the IndexNumber in pli.
    Return the number of characters (that would be) written. */
 static int

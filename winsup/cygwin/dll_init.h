@@ -119,7 +119,6 @@ public:
 			    ULONG openopts = 0, ACCESS_MASK access = 0,
 			    HANDLE rootDir = NULL);
   static bool read_fii (HANDLE fh, PFILE_INTERNAL_INFORMATION pfii);
-  static bool read_fbi (HANDLE fh, PFILE_BASIC_INFORMATION pfbi);
   static PWCHAR form_ntname (PWCHAR ntbuf, size_t bufsize, PCWCHAR name);
   static PWCHAR form_shortname (PWCHAR shortbuf, size_t bufsize, PCWCHAR name);
   static PWCHAR nt_max_path_buf ()
