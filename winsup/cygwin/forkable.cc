@@ -161,44 +161,18 @@ dll::stat_real_file_once ()
   if (fii.IndexNumber.QuadPart != -1LL)
     return true;
 
-  tmp_pathbuf tp;
-
-  HANDLE fhandle = INVALID_HANDLE_VALUE;
-  NTSTATUS status, fstatus;
-  PMEMORY_SECTION_NAME pmsi1;
-  MEMORY_SECTION_NAME msi2;
-  pmsi1 = (PMEMORY_SECTION_NAME) dll_list::nt_max_path_buf ();
-  RtlInitEmptyUnicodeString (&msi2.SectionFileName, tp.w_get (), 65535);
-
-  /* Retry opening the real file name until that does not change any more. */
-  status = NtQueryVirtualMemory (NtCurrentProcess (), handle,
-				 MemorySectionName, pmsi1, 65536, NULL);
-  while (NT_SUCCESS (status) &&
-	!RtlEqualUnicodeString (&msi2.SectionFileName,
-				&pmsi1->SectionFileName, FALSE))
-    {
-      debug_printf ("for %s at %p got memory section name '%W'",
-	ntname, handle, pmsi1->SectionFileName.Buffer);
-      RtlCopyUnicodeString (&msi2.SectionFileName, &pmsi1->SectionFileName);
-      if (fhandle != INVALID_HANDLE_VALUE)
-	NtClose (fhandle);
-      pmsi1->SectionFileName.Buffer[pmsi1->SectionFileName.Length] = L'\0';
-      fhandle = dll_list::ntopenfile (pmsi1->SectionFileName.Buffer, &fstatus);
-      status = NtQueryVirtualMemory (NtCurrentProcess (), handle,
-				     MemorySectionName, pmsi1, 65536, NULL);
-    }
-  if (!NT_SUCCESS (status))
-    system_printf ("WARNING: Unable (ntstatus %y) to query real file for %W",
-		   status, ntname);
-  else if (fhandle == INVALID_HANDLE_VALUE)
-    system_printf ("WARNING: Unable (ntstatus %y) to open real file for %W",
-		   fstatus, ntname);
+  NTSTATUS fstatus;
+  HANDLE fhandle = dll_list::ntopenfile (ntname, &fstatus);
   if (fhandle == INVALID_HANDLE_VALUE)
-    return false;
+    {
+      system_printf ("WARNING: Unable (ntstatus %y) to open real file %W",
+		     fstatus, ntname);
+      return false;
+    }
 
   if (!dll_list::read_fii (fhandle, &fii))
     system_printf ("WARNING: Unable to read real file attributes for %W",
-		   pmsi1->SectionFileName.Buffer);
+		   ntname);
 
   NtClose (fhandle);
   return fii.IndexNumber.QuadPart != -1LL;
