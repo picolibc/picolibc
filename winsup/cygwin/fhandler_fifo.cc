@@ -461,7 +461,7 @@ fhandler_fifo::open (int flags, mode_t)
 
   char npbuf[MAX_PATH];
   __small_sprintf (npbuf, "r-event.%08x.%016X", get_dev (), get_ino ());
-  if (!(read_ready = CreateEvent (sa_buf, true, false, npbuf)))
+  if (!(read_ready = CreateEvent (sa_buf, false, false, npbuf)))
     {
       debug_printf ("CreateEvent for %s failed, %E", npbuf);
       res = error_set_errno;
