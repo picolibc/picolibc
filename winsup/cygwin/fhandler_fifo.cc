@@ -780,21 +780,14 @@ fhandler_fifo::raw_read (void *in_ptr, size_t& len)
 		fifo_client_unlock ();
 		return;
 	      }
-	    /* If the pipe is empty, we usually get nread == -1 with
-	       ERROR_NO_DATA or ERROR_PIPE_LISTENING.  An exception is
-	       that in the duplex case we may get nread == 0 when we
-	       attempt to read from the duplex pipe (fc_handler[0]). */
-	    else if (nread < 0)
-	      switch (GetLastError ())
-		{
-		case ERROR_NO_DATA:
-		case ERROR_PIPE_LISTENING:
-		  break;
-		default:
-		  fifo_client_unlock ();
-		  goto errout;
-		}
-	    else if (nread == 0 && (!duplexer || i > 0))
+	    /* If the pipe is empty, we  get nread == -1 with
+	       ERROR_NO_DATA. */
+	    else if (nread < 0 && GetLastError () != ERROR_NO_DATA)
+	      {
+		fifo_client_unlock ();
+		goto errout;
+	      }
+	    else if (nread == 0)
 	      /* Client has disconnected. */
 	      {
 		fc_handler[i].state = fc_invalid;
