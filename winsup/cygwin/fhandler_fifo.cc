@@ -175,8 +175,6 @@ fhandler_fifo::create_pipe_instance (bool first)
     }
   access = GENERIC_READ | FILE_READ_ATTRIBUTES | FILE_WRITE_ATTRIBUTES
     | SYNCHRONIZE;
-  if (first && duplexer)
-    access |= GENERIC_WRITE;
   sharing = FILE_SHARE_READ | FILE_SHARE_WRITE;
   hattr = OBJ_INHERIT;
   if (first)
@@ -474,41 +472,23 @@ fhandler_fifo::open (int flags, mode_t)
   /* If we're a duplexer, create the pipe and the first client handler. */
   if (duplexer)
     {
-      HANDLE ph, connect_evt;
-      fhandler_base *fh;
-
-      ph = create_pipe_instance (true);
-      if (!ph)
+      if (add_client_handler () < 0)
 	{
 	  res = error_errno_set;
 	  goto out;
 	}
-      set_handle (ph);
-      set_pipe_non_blocking (ph, true);
-      if (!(fh = build_fh_dev (dev ())))
+      NTSTATUS status = open_pipe ();
+      if (NT_SUCCESS (status))
 	{
-	  set_errno (EMFILE);
+	  record_connection (fc_handler[0]);
+	  set_pipe_non_blocking (get_handle (), flags & O_NONBLOCK);
+	}
+      else
+	{
+	  __seterrno_from_nt_status (status);
 	  res = error_errno_set;
 	  goto out;
 	}
-      if (!DuplicateHandle (GetCurrentProcess (), ph, GetCurrentProcess (),
-			    &fh->get_handle (), 0, true, DUPLICATE_SAME_ACCESS))
-	{
-	  res = error_set_errno;
-	  fh->close ();
-	  delete fh;
-	  goto out;
-	}
-      fh->set_flags (flags);
-      if (!(connect_evt = create_event ()))
-	{
-	  res = error_errno_set;
-	  fh->close ();
-	  delete fh;
-	  goto out;
-	}
-      fc_handler[0] = fifo_client_handler (fh, fc_connected, connect_evt);
-      nconnected = nhandlers = 1;
     }
 
   /* If we're reading, start the listen_client thread (which should
@@ -889,12 +869,13 @@ fhandler_fifo::close ()
   return fhandler_base::close () || ret;
 }
 
-/* If we're a writer, keep the nonblocking state of the windows pipe
-   in sync with our nonblocking state. */
+/* If we have a write handle (i.e., we're a duplexer or a writer),
+   keep the nonblocking state of the windows pipe in sync with our
+   nonblocking state. */
 int
 fhandler_fifo::fcntl (int cmd, intptr_t arg)
 {
-  if (cmd != F_SETFL || !writer)
+  if (cmd != F_SETFL || nohandle ())
     return fhandler_base::fcntl (cmd, arg);
 
   const bool was_nonblocking = is_nonblocking ();

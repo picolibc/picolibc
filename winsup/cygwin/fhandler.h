@@ -1251,10 +1251,6 @@ struct fifo_client_handler
   fifo_client_connect_state state;
   HANDLE connect_evt;
   fifo_client_handler () : fh (NULL), state (fc_unknown), connect_evt (NULL) {}
-  fifo_client_handler (fhandler_base *_fh, fifo_client_connect_state _state,
-		       HANDLE _connect_evt)
-    : fh (_fh), state (_state), connect_evt (_connect_evt) {}
-  int connect ();
   int close ();
 };
 
