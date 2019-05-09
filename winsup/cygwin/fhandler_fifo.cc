@@ -246,7 +246,8 @@ fhandler_fifo::add_client_handler ()
   else
     {
       fh->set_handle (ph);
-      fh->set_flags (get_flags ());
+      fh->set_flags ((openflags & ~O_ACCMODE) | O_RDONLY);
+      fh->set_nonblocking (false);
       ret = 0;
       fc.fh = fh;
       fc_handler[nhandlers++] = fc;
@@ -298,6 +299,7 @@ fhandler_fifo::record_connection (fifo_client_handler& fc)
   fifo_client_lock ();
   fc.state = fc_connected;
   nconnected++;
+  fc.fh->set_nonblocking (true);
   set_pipe_non_blocking (fc.fh->get_handle (), true);
   fifo_client_unlock ();
   HANDLE evt = InterlockedExchangePointer (&fc.connect_evt, NULL);
