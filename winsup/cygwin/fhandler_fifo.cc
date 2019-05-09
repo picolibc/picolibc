@@ -966,9 +966,6 @@ fhandler_fifo::dup (fhandler_base *child, int flags)
 	  goto out;
 	}
     }
-  fhf->listen_client_thr = NULL;
-  fhf->lct_termination_evt = NULL;
-  fhf->fifo_client_unlock ();
   if (!reader || fhf->listen_client ())
     ret = 0;
   if (reader)
@@ -990,10 +987,7 @@ fhandler_fifo::fixup_after_fork (HANDLE parent)
   fork_fixup (parent, read_ready, "read_ready");
   fork_fixup (parent, write_ready, "write_ready");
   for (int i = 0; i < nhandlers; i++)
-    {
-      fc_handler[i].fh->fhandler_base::fixup_after_fork (parent);
-      fork_fixup (parent, fc_handler[i].connect_evt, "connect_evt");
-    }
+    fc_handler[i].fh->fhandler_base::fixup_after_fork (parent);
   if (reader && !listen_client ())
     debug_printf ("failed to start lct, %E");
 }
@@ -1013,8 +1007,5 @@ fhandler_fifo::set_close_on_exec (bool val)
   set_no_inheritance (read_ready, val);
   set_no_inheritance (write_ready, val);
   for (int i = 0; i < nhandlers; i++)
-    {
-      fc_handler[i].fh->fhandler_base::set_close_on_exec (val);
-      set_no_inheritance (fc_handler[i].connect_evt, val);
-    }
+    fc_handler[i].fh->fhandler_base::set_close_on_exec (val);
 }
