@@ -215,23 +215,11 @@ fhandler_base::raw_read (void *ptr, size_t& len)
   NTSTATUS status;
   IO_STATUS_BLOCK io;
   int try_noreserve = 1;
-  DWORD waitret = WAIT_OBJECT_0;
 
 retry:
   status = NtReadFile (get_handle (), NULL, NULL, NULL, &io, ptr, len,
 		       NULL, NULL);
-  if (status == STATUS_PENDING)
-    {
-      waitret = cygwait (get_handle (), cw_infinite,
-			 cw_cancel | cw_sig_eintr);
-      if (waitret == WAIT_OBJECT_0)
-	status = io.Status;
-    }
-  if (waitret == WAIT_CANCELED)
-    pthread::static_cancel_self ();
-  else if (waitret == WAIT_SIGNALED)
-    set_errno (EINTR);
-  else if (NT_SUCCESS (status))
+  if (NT_SUCCESS (status))
     len = io.Information;
   else
     {
