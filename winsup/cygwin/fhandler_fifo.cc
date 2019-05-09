@@ -272,10 +272,7 @@ listen_client_func (LPVOID param)
   return fh->listen_client_thread ();
 }
 
-/* Start a thread that listens for client connections.  Whenever a new
-   client connects, it creates a new pipe_instance if necessary.
-   (There may already be an available instance if a client has
-   disconnected.)  */
+/* Start a thread that listens for client connections. */
 bool
 fhandler_fifo::listen_client ()
 {
@@ -331,70 +328,80 @@ fhandler_fifo::listen_client_thread ()
 
       /* Create a new client handler. */
       if (add_client_handler () < 0)
-	goto out;
+	{
+	  fifo_client_unlock ();
+	  goto out;
+	}
 
       /* Allow a writer to open. */
       if (!arm (read_ready))
 	{
+	  fifo_client_unlock ();
 	  __seterrno ();
 	  goto out;
 	}
-      fifo_client_unlock ();
 
       /* Listen for a writer to connect to the new client handler. */
       fifo_client_handler& fc = fc_handler[nhandlers - 1];
-      do
-	{
-	  NTSTATUS status;
-	  IO_STATUS_BLOCK io;
+      NTSTATUS status;
+      IO_STATUS_BLOCK io;
 
-	  status = NtFsControlFile (fc.fh->get_handle (), fc.connect_evt,
-				    NULL, NULL, &io, FSCTL_PIPE_LISTEN,
-				    NULL, 0, NULL, 0);
-	  if (status == STATUS_PENDING)
+      status = NtFsControlFile (fc.fh->get_handle (), fc.connect_evt,
+				NULL, NULL, &io, FSCTL_PIPE_LISTEN,
+				NULL, 0, NULL, 0);
+      fifo_client_unlock ();
+      if (status == STATUS_PENDING)
+	{
+	  HANDLE w[2] = { fc.connect_evt, lct_termination_evt };
+	  DWORD waitret = WaitForMultipleObjects (2, w, false, INFINITE);
+	  switch (waitret)
 	    {
-	      HANDLE w[2] = { fc.connect_evt, lct_termination_evt };
-	      DWORD waitret = WaitForMultipleObjects (2, w, false, INFINITE);
-	      switch (waitret)
-		{
-		case WAIT_OBJECT_0:
-		  status = io.Status;
-		  break;
-		case WAIT_OBJECT_0 + 1:
-		  ret = 0;
-		  status = STATUS_THREAD_IS_TERMINATING;
-		  break;
-		default:
-		  __seterrno ();
-		  debug_printf ("WaitForMultipleObjects failed, %E");
-		  status = STATUS_THREAD_IS_TERMINATING;
-		  break;
-		}
-	    }
-	  switch (status)
-	    {
-	    case STATUS_SUCCESS:
-	    case STATUS_PIPE_CONNECTED:
-	      record_connection (fc);
+	    case WAIT_OBJECT_0:
+	      status = io.Status;
 	      break;
-	    case STATUS_PIPE_LISTENING:
-	      /* Retry. */
-	      fc.state = fc_connecting;
-	      ResetEvent (fc.connect_evt);
+	    case WAIT_OBJECT_0 + 1:
+	      ret = 0;
+	      status = STATUS_THREAD_IS_TERMINATING;
 	      break;
-	    case STATUS_THREAD_IS_TERMINATING:
-	      fifo_client_lock ();
-	      delete_client_handler (nhandlers - 1);
-	      fifo_client_unlock ();
-	      goto out;
 	    default:
-	      __seterrno_from_nt_status (status);
-	      fifo_client_lock ();
-	      delete_client_handler (nhandlers - 1);
-	      fifo_client_unlock ();
-	      goto out;
+	      __seterrno ();
+	      debug_printf ("WaitForMultipleObjects failed, %E");
+	      status = STATUS_THREAD_IS_TERMINATING;
+	      break;
 	    }
-	} while (fc.state == fc_connecting);
+	}
+      HANDLE ph = NULL;
+      switch (status)
+	{
+	case STATUS_SUCCESS:
+	case STATUS_PIPE_CONNECTED:
+	  record_connection (fc);
+	  break;
+	case STATUS_THREAD_IS_TERMINATING:
+	  /* Try to cancel the pending listen.  Otherwise the first
+	     writer to connect after the thread is restarted will be
+	     invisible.
+
+	     FIXME: Is there a direct way to do this?  We do it by
+	     opening and closing a write handle to the client side. */
+	  open_pipe (ph);
+	  /* We don't care about the return value of open_pipe.  Even
+             if the latter failed, a writer might have connected. */
+	  if (WaitForSingleObject (fc.connect_evt, 0) == WAIT_OBJECT_0
+	      && (NT_SUCCESS (io.Status) || io.Status == STATUS_PIPE_CONNECTED))
+	    record_connection (fc);
+	  else
+	    fc.state = fc_invalid;
+	  /* By closing ph we ensure that if fc connected to ph, fc
+	     will be declared invalid on the next read attempt. */
+	  if (ph)
+	    CloseHandle (ph);
+	  goto out;
+	default:
+	  __seterrno_from_nt_status (status);
+	  fc.state = fc_invalid;
+	  goto out;
+	}
       /* Check for thread termination in case WaitForMultipleObjects
 	 didn't get called above. */
       if (IsEventSignalled (lct_termination_evt))
