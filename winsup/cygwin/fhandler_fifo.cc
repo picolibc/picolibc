@@ -300,6 +300,19 @@ fhandler_fifo::listen_client ()
   return true;
 }
 
+void
+fhandler_fifo::record_connection (fifo_client_handler& fc)
+{
+  fifo_client_lock ();
+  fc.state = fc_connected;
+  nconnected++;
+  set_pipe_non_blocking (fc.fh->get_handle (), true);
+  fifo_client_unlock ();
+  HANDLE evt = InterlockedExchangePointer (&fc.connect_evt, NULL);
+  if (evt)
+    CloseHandle (evt);
+}
+
 DWORD
 fhandler_fifo::listen_client_thread ()
 {
@@ -363,19 +376,11 @@ fhandler_fifo::listen_client_thread ()
 		  break;
 		}
 	    }
-	  HANDLE evt = NULL;
 	  switch (status)
 	    {
 	    case STATUS_SUCCESS:
 	    case STATUS_PIPE_CONNECTED:
-	      fifo_client_lock ();
-	      fc.state = fc_connected;
-	      nconnected++;
-	      set_pipe_non_blocking (fc.fh->get_handle (), true);
-	      evt = InterlockedExchangePointer (&fc.connect_evt, NULL);
-	      if (evt)
-		CloseHandle (evt);
-	      fifo_client_unlock ();
+	      record_connection (fc);
 	      break;
 	    case STATUS_PIPE_LISTENING:
 	      /* Retry. */
