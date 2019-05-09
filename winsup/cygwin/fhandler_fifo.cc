@@ -194,9 +194,9 @@ fhandler_fifo::create_pipe_instance (bool first)
   return ph;
 }
 
-/* Called when a FIFO is opened for writing. */
+/* Connect to a pipe instance. */
 NTSTATUS
-fhandler_fifo::open_pipe ()
+fhandler_fifo::open_pipe (HANDLE& ph)
 {
   NTSTATUS status;
   HANDLE npfsh;
@@ -204,7 +204,6 @@ fhandler_fifo::open_pipe ()
   OBJECT_ATTRIBUTES attr;
   IO_STATUS_BLOCK io;
   ULONG sharing;
-  HANDLE ph = NULL;
 
   status = npfs_handle (npfsh);
   if (!NT_SUCCESS (status))
@@ -214,8 +213,6 @@ fhandler_fifo::open_pipe ()
 			      npfsh, NULL);
   sharing = FILE_SHARE_READ | FILE_SHARE_WRITE;
   status = NtOpenFile (&ph, access, &attr, &io, sharing, 0);
-  if (NT_SUCCESS (status))
-    set_handle (ph);
   return status;
 }
 
@@ -472,16 +469,19 @@ fhandler_fifo::open (int flags, mode_t)
   /* If we're a duplexer, create the pipe and the first client handler. */
   if (duplexer)
     {
+      HANDLE ph = NULL;
+
       if (add_client_handler () < 0)
 	{
 	  res = error_errno_set;
 	  goto out;
 	}
-      NTSTATUS status = open_pipe ();
+      NTSTATUS status = open_pipe (ph);
       if (NT_SUCCESS (status))
 	{
 	  record_connection (fc_handler[0]);
-	  set_pipe_non_blocking (get_handle (), flags & O_NONBLOCK);
+	  set_handle (ph);
+	  set_pipe_non_blocking (ph, flags & O_NONBLOCK);
 	}
       else
 	{
@@ -525,7 +525,7 @@ fhandler_fifo::open (int flags, mode_t)
 	      res = error_errno_set;
 	      goto out;
 	    }
-	  NTSTATUS status = open_pipe ();
+	  NTSTATUS status = open_pipe (get_handle ());
 	  if (NT_SUCCESS (status))
 	    {
 	      set_pipe_non_blocking (get_handle (), flags & O_NONBLOCK);

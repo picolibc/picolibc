@@ -1270,7 +1270,7 @@ class fhandler_fifo: public fhandler_base
   bool __reg2 wait (HANDLE);
   NTSTATUS npfs_handle (HANDLE &);
   HANDLE create_pipe_instance (bool);
-  NTSTATUS open_pipe ();
+  NTSTATUS open_pipe (HANDLE&);
   int add_client_handler ();
   void delete_client_handler (int);
   bool listen_client ();
