@@ -744,13 +744,43 @@ retry:
   return eof;
 }
 
+/* Is the lct running? */
+int
+fhandler_fifo::check_listen_client_thread ()
+{
+  int ret = 0;
+
+  if (listen_client_thr)
+    {
+      DWORD waitret = WaitForSingleObject (listen_client_thr, 0);
+      switch (waitret)
+	{
+	case WAIT_OBJECT_0:
+	  CloseHandle (listen_client_thr);
+	  break;
+	case WAIT_TIMEOUT:
+	  ret = 1;
+	  break;
+	default:
+	  debug_printf ("WaitForSingleObject failed, %E");
+	  ret = -1;
+	  __seterrno ();
+	  CloseHandle (listen_client_thr);
+	  break;
+	}
+    }
+  return ret;
+}
+
 void __reg3
 fhandler_fifo::raw_read (void *in_ptr, size_t& len)
 {
   size_t orig_len = len;
 
-  /* Start the listen_client thread if necessary (shouldn't be). */
-  if (!listen_client_thr && !listen_client ())
+  /* Make sure the lct is running. */
+  int res = check_listen_client_thread ();
+  debug_printf ("lct status %d", res);
+  if (res < 0 || (res == 0 && !listen_client ()))
     goto errout;
 
   while (1)

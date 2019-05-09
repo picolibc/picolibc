@@ -1274,6 +1274,7 @@ class fhandler_fifo: public fhandler_base
   void delete_client_handler (int);
   bool listen_client ();
   int stop_listen_client ();
+  int check_listen_client_thread ();
   void record_connection (fifo_client_handler&);
 public:
   fhandler_fifo ();
