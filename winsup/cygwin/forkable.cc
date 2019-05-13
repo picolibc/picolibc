@@ -472,17 +472,21 @@ dll_list::forkable_ntnamesize (dll_type type, PCWCHAR fullntname, PCWCHAR modnam
   if (cygwin_shared->forkable_hardlink_support == 0) /* Unknown */
     {
       /* check existence of forkables dir */
-      PWCHAR pbuf = nt_max_path_buf ();
+      /* nt_max_path_buf () is already used in dll_list::alloc.
+         But as this is run in the very first cygwin process only,
+	 using some heap is not a performance issue here. */
+      PWCHAR pbuf = (PWCHAR) cmalloc_abort (HEAP_BUF,
+					    NT_MAX_PATH * sizeof (WCHAR));
+      PWCHAR pnext = pbuf;
       for (namepart const *part = forkable_nameparts; part->text; ++part)
 	{
 	  if (part->textfunc)
-	    pbuf += part->textfunc (pbuf, -1);
+	    pnext += part->textfunc (pnext, -1);
 	  else
-	    pbuf += __small_swprintf (pbuf, L"%W", part->text);
+	    pnext += __small_swprintf (pnext, L"%W", part->text);
 	  if (part->mutex_from_dir)
 	    break; /* up to first mutex-naming dir */
 	}
-      pbuf = nt_max_path_buf ();
 
       UNICODE_STRING fn;
       RtlInitUnicodeString (&fn, pbuf);
@@ -504,6 +508,7 @@ dll_list::forkable_ntnamesize (dll_type type, PCWCHAR fullntname, PCWCHAR modnam
 	  cygwin_shared->forkable_hardlink_support = -1; /* No */
 	  debug_printf ("disabled, missing or not on NTFS %W", fn.Buffer);
 	}
+      cfree (pbuf);
     }
 
   if (!forkables_supported ())
