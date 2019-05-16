@@ -30,6 +30,11 @@ typedef unsigned __Long __ULong;
 #include <sys/types.h>
 #endif
 
+#ifndef __machine_flock_t_defined
+#include <sys/lock.h>
+typedef _LOCK_RECURSIVE_T _flock_t;
+#endif
+
 #ifndef __Long
 #define __Long __int32_t
 typedef __uint32_t __ULong;
