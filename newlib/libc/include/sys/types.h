@@ -42,8 +42,6 @@ typedef __intptr_t register_t;
 #ifndef __need_inttypes
 
 #define _SYS_TYPES_H
-/* <stddef.h> must be before <sys/_types.h> for __size_t considerations */
-#include <stddef.h>
 #include <sys/_types.h>
 #include <sys/_stdint.h>
 
