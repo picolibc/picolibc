@@ -210,10 +210,15 @@ typedef	unsigned short	__nlink_t;
 typedef	long		__suseconds_t;	/* microseconds (signed) */
 typedef	unsigned long	__useconds_t;	/* microseconds (unsigned) */
 
-#ifdef __GNUCLIKE_BUILTIN_VARARGS
+/*
+ * Must be identical to the __GNUCLIKE_BUILTIN_VAALIST definition in
+ * <sys/cdefs.h>.  The <sys/cdefs.h> must not be included here to avoid cyclic
+ * header dependencies.
+ */
+#if __GNUC_MINOR__ > 95 || __GNUC__ >= 3
 typedef	__builtin_va_list	__va_list;
 #else
 typedef	char *			__va_list;
-#endif /* __GNUCLIKE_BUILTIN_VARARGS */
+#endif
 
 #endif	/* _SYS__TYPES_H */
