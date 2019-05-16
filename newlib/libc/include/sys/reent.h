@@ -17,6 +17,10 @@ extern "C" {
 
 #define _NULL 0
 
+#ifndef __machine_flock_t_defined
+#include <sys/lock.h>
+typedef _LOCK_RECURSIVE_T _flock_t;
+#endif
 struct _reent;
 
 /*
