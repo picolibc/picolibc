@@ -706,7 +706,8 @@ format_proc_cpuinfo (void *, char *&destbuf)
 
       /* Vendor identification. */
       bool is_amd = false, is_intel = false;
-      if (!strcmp ((char*)vendor_id, "AuthenticAMD"))
+      if (!strcmp ((char*)vendor_id, "AuthenticAMD")
+          || !strcmp((char*)vendor_id, "HygonGenuine"))
 	is_amd = true;
       else if (!strcmp ((char*)vendor_id, "GenuineIntel"))
 	is_intel = true;

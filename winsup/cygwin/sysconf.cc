@@ -486,7 +486,8 @@ get_cpu_cache (int in)
   vendor_id[3] = 0;
   if (!strcmp ((char*) vendor_id, "GenuineIntel"))
     return get_cpu_cache_intel (in, maxf & 0xffff);
-  else if (!strcmp ((char*)vendor_id, "AuthenticAMD"))
+  else if (!strcmp ((char*)vendor_id, "AuthenticAMD")
+           || !strcmp((char*)vendor_id, "HygonGenuine"))
     {
       uint32_t maxe = 0, unused;
       cpuid (&maxe, &unused, &unused, &unused, 0x80000000);
