@@ -1267,7 +1267,7 @@ class fhandler_fifo: public fhandler_base
   bool reader, writer, duplexer;
   size_t max_atomic_write;
   bool __reg2 wait (HANDLE);
-  NTSTATUS npfs_handle (HANDLE &);
+  static NTSTATUS npfs_handle (HANDLE &);
   HANDLE create_pipe_instance (bool);
   NTSTATUS open_pipe (HANDLE&);
   int add_client_handler ();
