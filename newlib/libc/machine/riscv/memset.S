@@ -13,6 +13,20 @@
 .global memset
 .type	memset, @function
 memset:
+#if defined(PREFER_SIZE_OVER_SPEED) || defined(__OPTIMIZE_SIZE__)
+  mv t1, a0
+  beqz a2, 2f
+
+1:
+  sb a1, 0(t1)
+  add   a2, a2, -1
+  add   t1, t1, 1
+  bnez a2, 1b
+
+2:
+  ret
+
+#else
   li t1, 15
   move a4, a0
   bleu a2, t1, .Ltiny
@@ -95,4 +109,5 @@ memset:
   add a2, a2, a5
   bleu a2, t1, .Ltiny
   j .Laligned
+#endif
   .size	memset, .-memset

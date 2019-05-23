@@ -19,6 +19,21 @@
 .globl strcmp
 .type  strcmp, @function
 strcmp:
+#if defined(PREFER_SIZE_OVER_SPEED) || defined(__OPTIMIZE_SIZE__)
+1:
+  lbu   a2, 0(a0)
+  lbu   a3, 0(a1)
+  add   a0, a0, 1
+  add   a1, a1, 1
+  bne   a2, a3, 2f
+  bnez  a2, 1b
+
+2:
+  sub   a0, a2, a3
+  ret
+
+.size	strcmp, .-strcmp
+#else
   or    a4, a0, a1
   li    t2, -1
   and   a4, a4, SZREG-1
@@ -145,4 +160,5 @@ strcmp:
 .align 3
 mask:
 .dword 0x7f7f7f7f7f7f7f7f
+#endif
 #endif
