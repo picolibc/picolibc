@@ -1257,6 +1257,8 @@ public:
   char *get_proc_fd_name (char *buf);
   int open (int flags, mode_t mode = 0);
   int dup (fhandler_base *child, int);
+  void __reg3 raw_read (void *ptr, size_t& len);
+  ssize_t __reg3 raw_write (const void *ptr, size_t len);
   int ioctl (unsigned int cmd, void *);
   int __reg2 fstat (struct stat *buf);
   int __reg2 fstatvfs (struct statvfs *buf);
