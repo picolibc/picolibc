@@ -1267,6 +1267,7 @@ public:
   int __reg3 fadvise (off_t, off_t, int);
   int __reg3 ftruncate (off_t, bool);
   int init (HANDLE, DWORD, mode_t, int64_t);
+  static NTSTATUS npfs_handle (HANDLE &);
   static int create (fhandler_pipe *[2], unsigned, int);
   static DWORD create (LPSECURITY_ATTRIBUTES, HANDLE *, HANDLE *, DWORD,
 		       const char *, DWORD, int64_t *unique_id = NULL);
