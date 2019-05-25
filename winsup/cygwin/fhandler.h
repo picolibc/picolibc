@@ -1243,6 +1243,7 @@ class fhandler_pipe: public fhandler_base
 private:
   pid_t popen_pid;
   size_t max_atomic_write;
+  void set_pipe_non_blocking (bool nonblocking);
 public:
   fhandler_pipe ();
 
@@ -1260,6 +1261,7 @@ public:
   void __reg3 raw_read (void *ptr, size_t& len);
   ssize_t __reg3 raw_write (const void *ptr, size_t len);
   int ioctl (unsigned int cmd, void *);
+  int fcntl (int cmd, intptr_t);
   int __reg2 fstat (struct stat *buf);
   int __reg2 fstatvfs (struct statvfs *buf);
   int __reg3 fadvise (off_t, off_t, int);

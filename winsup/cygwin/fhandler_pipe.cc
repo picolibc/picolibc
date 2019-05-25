@@ -35,6 +35,23 @@ fhandler_pipe::fhandler_pipe ()
   need_fork_fixup (true);
 }
 
+/* This also sets the pipe's read mode to byte_stream unconditionally. */
+void
+fhandler_pipe::set_pipe_non_blocking (bool nonblocking)
+{
+  NTSTATUS status;
+  IO_STATUS_BLOCK io;
+  FILE_PIPE_INFORMATION fpi;
+
+  fpi.ReadMode = FILE_PIPE_BYTE_STREAM_MODE;
+  fpi.CompletionMode = nonblocking ? FILE_PIPE_COMPLETE_OPERATION
+    : FILE_PIPE_QUEUE_OPERATION;
+  status = NtSetInformationFile (get_handle (), &io, &fpi, sizeof fpi,
+				 FilePipeInformation);
+  if (!NT_SUCCESS (status))
+    debug_printf ("NtSetInformationFile(FilePipeInformation): %y", status);
+}
+
 int
 fhandler_pipe::init (HANDLE f, DWORD a, mode_t mode, int64_t uniq_id)
 {
@@ -62,8 +79,7 @@ fhandler_pipe::init (HANDLE f, DWORD a, mode_t mode, int64_t uniq_id)
   set_ino (uniq_id);
   set_unique_id (uniq_id | !!(mode & GENERIC_WRITE));
   if (opened_properly)
-    /* ... */
-    ;
+    set_pipe_non_blocking (is_nonblocking ());
   return 1;
 }
 
@@ -610,6 +626,20 @@ fhandler_pipe::ioctl (unsigned int cmd, void *p)
     }
   *(int *) p = n;
   return 0;
+}
+
+int
+fhandler_pipe::fcntl (int cmd, intptr_t arg)
+{
+  if (cmd != F_SETFL)
+    return fhandler_base::fcntl (cmd, arg);
+
+  const bool was_nonblocking = is_nonblocking ();
+  int res = fhandler_base::fcntl (cmd, arg);
+  const bool now_nonblocking = is_nonblocking ();
+  if (now_nonblocking != was_nonblocking)
+    set_pipe_non_blocking (now_nonblocking);
+  return res;
 }
 
 int __reg2
