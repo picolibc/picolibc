@@ -176,7 +176,7 @@ fhandler_fifo::create_pipe_instance (bool first)
   access = GENERIC_READ | FILE_READ_ATTRIBUTES | FILE_WRITE_ATTRIBUTES
     | SYNCHRONIZE;
   sharing = FILE_SHARE_READ | FILE_SHARE_WRITE;
-  hattr = OBJ_INHERIT;
+  hattr = openflags & O_CLOEXEC ? 0 : OBJ_INHERIT;
   if (first)
     hattr |= OBJ_CASE_INSENSITIVE;
   InitializeObjectAttributes (&attr, get_pipe_name (),
@@ -209,7 +209,8 @@ fhandler_fifo::open_pipe (HANDLE& ph)
   if (!NT_SUCCESS (status))
     return status;
   access = GENERIC_WRITE | SYNCHRONIZE;
-  InitializeObjectAttributes (&attr, get_pipe_name (), OBJ_INHERIT,
+  InitializeObjectAttributes (&attr, get_pipe_name (),
+			      openflags & O_CLOEXEC ? 0 : OBJ_INHERIT,
 			      npfsh, NULL);
   sharing = FILE_SHARE_READ | FILE_SHARE_WRITE;
   status = NtOpenFile (&ph, access, &attr, &io, sharing, 0);
