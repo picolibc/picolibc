@@ -602,6 +602,7 @@ __SVFWSCANF_R (struct _reent *rptr,
 	case L'*':
 	  if ((flags & (CHAR | SHORT | LONG | LONGDBL | SUPPRESS | MALLOC))
 	      || width)
+	    goto match_failure;
 	  flags |= SUPPRESS;
 	  goto again;
 	case L'l':
