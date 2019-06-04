@@ -20,6 +20,7 @@ details. */
 
 wincaps wincap_vista __attribute__((section (".cygwin_dll_common"), shared)) = {
   def_guard_pages:1,
+  mmap_storage_high:0x070000000000LL,
   {
     is_server:false,
     needs_count_in_si_lpres2:true,
@@ -46,6 +47,7 @@ wincaps wincap_vista __attribute__((section (".cygwin_dll_common"), shared)) = {
 
 wincaps wincap_7 __attribute__((section (".cygwin_dll_common"), shared)) = {
   def_guard_pages:1,
+  mmap_storage_high:0x070000000000LL,
   {
     is_server:false,
     needs_count_in_si_lpres2:false,
@@ -72,6 +74,7 @@ wincaps wincap_7 __attribute__((section (".cygwin_dll_common"), shared)) = {
 
 wincaps wincap_8 __attribute__((section (".cygwin_dll_common"), shared)) = {
   def_guard_pages:2,
+  mmap_storage_high:0x070000000000LL,
   {
     is_server:false,
     needs_count_in_si_lpres2:false,
@@ -98,6 +101,7 @@ wincaps wincap_8 __attribute__((section (".cygwin_dll_common"), shared)) = {
 
 wincaps wincap_8_1 __attribute__((section (".cygwin_dll_common"), shared)) = {
   def_guard_pages:2,
+  mmap_storage_high:0x700000000000LL,
   {
     is_server:false,
     needs_count_in_si_lpres2:false,
@@ -124,6 +128,7 @@ wincaps wincap_8_1 __attribute__((section (".cygwin_dll_common"), shared)) = {
 
 wincaps  wincap_10_1507 __attribute__((section (".cygwin_dll_common"), shared)) = {
   def_guard_pages:2,
+  mmap_storage_high:0x700000000000LL,
   {
     is_server:false,
     needs_count_in_si_lpres2:false,
@@ -150,6 +155,7 @@ wincaps  wincap_10_1507 __attribute__((section (".cygwin_dll_common"), shared)) 
 
 wincaps wincap_10_1703 __attribute__((section (".cygwin_dll_common"), shared)) = {
   def_guard_pages:2,
+  mmap_storage_high:0x700000000000LL,
   {
     is_server:false,
     needs_count_in_si_lpres2:false,
@@ -176,6 +182,7 @@ wincaps wincap_10_1703 __attribute__((section (".cygwin_dll_common"), shared)) =
 
 wincaps wincap_10_1709 __attribute__((section (".cygwin_dll_common"), shared)) = {
   def_guard_pages:2,
+  mmap_storage_high:0x700000000000LL,
   {
     is_server:false,
     needs_count_in_si_lpres2:false,
@@ -202,6 +209,7 @@ wincaps wincap_10_1709 __attribute__((section (".cygwin_dll_common"), shared)) =
 
 wincaps wincap_10_1803 __attribute__((section (".cygwin_dll_common"), shared)) = {
   def_guard_pages:2,
+  mmap_storage_high:0x700000000000LL,
   {
     is_server:false,
     needs_count_in_si_lpres2:false,
@@ -228,6 +236,7 @@ wincaps wincap_10_1803 __attribute__((section (".cygwin_dll_common"), shared)) =
 
 wincaps wincap_10_1809 __attribute__((section (".cygwin_dll_common"), shared)) = {
   def_guard_pages:2,
+  mmap_storage_high:0x700000000000LL,
   {
     is_server:false,
     needs_count_in_si_lpres2:false,

@@ -801,8 +801,10 @@ mmap_worker (mmap_list *map_list, fhandler_base *fh, caddr_t base, size_t len,
 #ifdef __x86_64__
 
 /* The memory region used for memory maps */
-#define MMAP_STORAGE_LOW	0x00800000000L	/* Leave 8 Gigs for heap. */
-#define MMAP_STORAGE_HIGH	0x70000000000L	/* Leave enough room for OS. */
+#define MMAP_STORAGE_LOW	0x001000000000L	/* Leave 32 Gigs for heap. */
+/* Up to Win 8 only supporting 44 bit address space, starting with Win 8.1
+   48 bit address space. */
+#define MMAP_STORAGE_HIGH	wincap.mmap_storage_high ()
 
 /* FIXME?  Unfortunately the OS doesn't support a top down allocation with
 	   a ceiling value.  The ZeroBits mechanism only works for
