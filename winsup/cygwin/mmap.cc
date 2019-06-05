@@ -834,7 +834,7 @@ public:
       {
 	/* If it points to a free area, big enough to fulfill the request,
 	   return the address. */
-      	if (VirtualQuery (in_addr, &mbi, sizeof mbi)
+	if (VirtualQuery (in_addr, &mbi, sizeof mbi)
 	    && mbi.State == MEM_FREE
 	    && mbi.RegionSize >= size)
 	  return in_addr;
@@ -1075,14 +1075,17 @@ mmap64 (void *addr, size_t len, int prot, int flags, int fd, off_t off)
 	}
       fsiz -= off;
       /* We're creating the pages beyond EOF as reserved, anonymous pages.
-	 Note that this isn't done in 64 bit environments since apparently
-	 64 bit systems don't support the AT_ROUND_TO_PAGE flag, which is
-	 required to get this right.  Too bad. */
+	 Note that 64 bit environments don't support the AT_ROUND_TO_PAGE
+	 flag, which is required to get this right for the remainder of
+	 the first 64K block the file ends in.  We perform the workaround
+	 nevertheless to support expectations that the range mapped beyond
+	 EOF can be safely munmap'ed instead of being taken by another,
+	 totally unrelated mapping. */
+      if ((off_t) len > fsiz && !autogrow (flags))
+	orig_len = len;
 #ifdef __i386__
-      if (!wincap.is_wow64 ()
-	  && (((off_t) len > fsiz && !autogrow (flags))
-	      || roundup2 (len, wincap.page_size ())
-		 < roundup2 (len, pagesize)))
+      else if (!wincap.is_wow64 () && roundup2 (len, wincap.page_size ())
+				      < roundup2 (len, pagesize))
 	orig_len = len;
 #endif
       if ((off_t) len > fsiz)
@@ -1185,12 +1188,22 @@ go_ahead:
 	 raise a SIGBUS when trying to access them.  AT_ROUND_TO_PAGE
 	 and page protection on shared pages is only supported by the
 	 32 bit environment, so don't even try on 64 bit or even WOW64.
-	 This is accomplished by not setting orig_len on 64 bit above. */
-      len = roundup2 (len, wincap.page_size ());
+	 This results in an allocation gap in the first 64K block the file
+	 ends in, but there's nothing at all we can do about that. */
+#ifdef __x86_64__
+      len = roundup2 (len, wincap.allocation_granularity ());
+#else
+      len = roundup2 (len, wincap.is_wow64 () ? wincap.allocation_granularity ()
+					      : wincap.page_size ());
+#endif
       if (orig_len - len)
 	{
 	  orig_len -= len;
-	  size_t valid_page_len = orig_len % pagesize;
+	  size_t valid_page_len = 0;
+#ifndef __x86_64__
+	  if (!wincap.is_wow64 ())
+	    valid_page_len = orig_len % pagesize;
+#endif
 	  size_t sigbus_page_len = orig_len - valid_page_len;
 
 	  caddr_t at_base = base + len;
