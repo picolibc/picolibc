@@ -71,7 +71,11 @@ lib_a_AR = $(AR) $(ARFLAGS)
 lib_a_LIBADD =
 am_lib_a_OBJECTS = lib_a-close.$(OBJEXT) lib_a-fstat.$(OBJEXT) \
 	lib_a-isatty.$(OBJEXT) lib_a-lseek.$(OBJEXT) \
-	lib_a-read.$(OBJEXT) lib_a-write.$(OBJEXT)
+	lib_a-read.$(OBJEXT) lib_a-write.$(OBJEXT) \
+	lib_a-fcntl.$(OBJEXT) lib_a-getpid.$(OBJEXT) \
+	lib_a-kill.$(OBJEXT) lib_a-open.$(OBJEXT) \
+	lib_a-raise.$(OBJEXT) lib_a-stat.$(OBJEXT) \
+	lib_a-unlink.$(OBJEXT)
 lib_a_OBJECTS = $(am_lib_a_OBJECTS)
 DEFAULT_INCLUDES = -I.@am__isrc@
 depcomp =
@@ -195,7 +199,9 @@ AUTOMAKE_OPTIONS = cygnus
 INCLUDES = $(NEWLIB_CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLAGS)
 AM_CCASFLAGS = $(INCLUDES) $(CFLAGS)
 noinst_LIBRARIES = lib.a
-lib_a_SOURCES = close.c fstat.c isatty.c lseek.c read.c write.c
+lib_a_SOURCES = close.c fstat.c isatty.c lseek.c read.c write.c \
+                fcntl.c getpid.c kill.c open.c raise.c stat.c unlink.c
+
 lib_a_CCASFLAGS = $(AM_CCASFLAGS)
 lib_a_CFLAGS = $(AM_CFLAGS)
 ACLOCAL_AMFLAGS = -I ../../.. -I ../../../..
@@ -293,6 +299,48 @@ lib_a-write.o: write.c
 
 lib_a-write.obj: write.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-write.obj `if test -f 'write.c'; then $(CYGPATH_W) 'write.c'; else $(CYGPATH_W) '$(srcdir)/write.c'; fi`
+
+lib_a-fcntl.o: fcntl.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-fcntl.o `test -f 'fcntl.c' || echo '$(srcdir)/'`fcntl.c
+
+lib_a-fcntl.obj: fcntl.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-fcntl.obj `if test -f 'fcntl.c'; then $(CYGPATH_W) 'fcntl.c'; else $(CYGPATH_W) '$(srcdir)/fcntl.c'; fi`
+
+lib_a-getpid.o: getpid.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-getpid.o `test -f 'getpid.c' || echo '$(srcdir)/'`getpid.c
+
+lib_a-getpid.obj: getpid.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-getpid.obj `if test -f 'getpid.c'; then $(CYGPATH_W) 'getpid.c'; else $(CYGPATH_W) '$(srcdir)/getpid.c'; fi`
+
+lib_a-kill.o: kill.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-kill.o `test -f 'kill.c' || echo '$(srcdir)/'`kill.c
+
+lib_a-kill.obj: kill.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-kill.obj `if test -f 'kill.c'; then $(CYGPATH_W) 'kill.c'; else $(CYGPATH_W) '$(srcdir)/kill.c'; fi`
+
+lib_a-open.o: open.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-open.o `test -f 'open.c' || echo '$(srcdir)/'`open.c
+
+lib_a-open.obj: open.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-open.obj `if test -f 'open.c'; then $(CYGPATH_W) 'open.c'; else $(CYGPATH_W) '$(srcdir)/open.c'; fi`
+
+lib_a-raise.o: raise.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-raise.o `test -f 'raise.c' || echo '$(srcdir)/'`raise.c
+
+lib_a-raise.obj: raise.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-raise.obj `if test -f 'raise.c'; then $(CYGPATH_W) 'raise.c'; else $(CYGPATH_W) '$(srcdir)/raise.c'; fi`
+
+lib_a-stat.o: stat.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-stat.o `test -f 'stat.c' || echo '$(srcdir)/'`stat.c
+
+lib_a-stat.obj: stat.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-stat.obj `if test -f 'stat.c'; then $(CYGPATH_W) 'stat.c'; else $(CYGPATH_W) '$(srcdir)/stat.c'; fi`
+
+lib_a-unlink.o: unlink.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-unlink.o `test -f 'unlink.c' || echo '$(srcdir)/'`unlink.c
+
+lib_a-unlink.obj: unlink.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-unlink.obj `if test -f 'unlink.c'; then $(CYGPATH_W) 'unlink.c'; else $(CYGPATH_W) '$(srcdir)/unlink.c'; fi`
 
 ID: $(HEADERS) $(SOURCES) $(LISP) $(TAGS_FILES)
 	list='$(SOURCES) $(HEADERS) $(LISP) $(TAGS_FILES)'; \
