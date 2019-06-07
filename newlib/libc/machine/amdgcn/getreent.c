@@ -35,9 +35,9 @@ __getreent (void)
      s[4:5] contains the dispatch pointer.
      
      WARNING: this code will break if s[0:3] is ever used for anything!  */
-  const register long buffer_descriptor asm("s0");
-  long private_segment = buffer_descriptor & 0x0000ffffffffffff;
-  const register int stack_offset asm("s11");
+  const register unsigned long buffer_descriptor asm("s0");
+  unsigned long private_segment = buffer_descriptor & 0x0000ffffffffffff;
+  const register unsigned int stack_offset asm("s11");
   const register hsa_kernel_dispatch_packet_t *dispatch_ptr asm("s4");
 
   struct data {
@@ -45,9 +45,9 @@ __getreent (void)
     struct _reent reent;
   } *data;
 
-  long stack_base = private_segment + stack_offset;
-  long stack_end = stack_base + dispatch_ptr->private_segment_size * 64;
-  long addr = (stack_end - sizeof(struct data)) & ~7;
+  unsigned long stack_base = private_segment + stack_offset;
+  unsigned long stack_end = stack_base + dispatch_ptr->private_segment_size * 64;
+  unsigned long addr = (stack_end - sizeof(struct data)) & ~7;
   data = (struct data *)addr;
 
   register long sp asm("s16");
