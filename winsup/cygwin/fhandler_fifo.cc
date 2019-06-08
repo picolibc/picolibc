@@ -640,10 +640,14 @@ ssize_t __reg3
 fhandler_fifo::raw_write (const void *ptr, size_t len)
 {
   ssize_t ret = -1;
-  size_t nbytes = 0, chunk;
+  size_t nbytes = 0;
+  ULONG chunk;
   NTSTATUS status = STATUS_SUCCESS;
   IO_STATUS_BLOCK io;
   HANDLE evt = NULL;
+
+  if (!len)
+    return 0;
 
   if (len <= max_atomic_write)
     chunk = len;
@@ -654,7 +658,10 @@ fhandler_fifo::raw_write (const void *ptr, size_t len)
 
   /* Create a wait event if the FIFO is in blocking mode. */
   if (!is_nonblocking () && !(evt = CreateEvent (NULL, false, false, NULL)))
-    return -1;
+    {
+      __seterrno ();
+      return -1;
+    }
 
   /* Write in chunks, accumulating a total.  If there's an error, just
      return the accumulated total unless the first write fails, in
@@ -663,33 +670,35 @@ fhandler_fifo::raw_write (const void *ptr, size_t len)
     {
       ULONG_PTR nbytes_now = 0;
       size_t left = len - nbytes;
-      size_t len1;
+      ULONG len1;
+      DWORD waitret = WAIT_OBJECT_0;
+
       if (left > chunk)
 	len1 = chunk;
       else
-	len1 = left;
+	len1 = (ULONG) left;
       nbytes_now = 0;
       status = NtWriteFile (get_handle (), evt, NULL, NULL, &io,
 			    (PVOID) ptr, len1, NULL, NULL);
       if (evt && status == STATUS_PENDING)
 	{
-	  DWORD waitret = cygwait (evt, cw_infinite, cw_cancel | cw_sig_eintr);
-	  switch (waitret)
-	    {
-	    case WAIT_OBJECT_0:
-	      status = io.Status;
-	      break;
-	    case WAIT_SIGNALED:
-	      status = STATUS_THREAD_SIGNALED;
-	      break;
-	    case WAIT_CANCELED:
-	      status = STATUS_THREAD_CANCELED;
-	      break;
-	    default:
-	      break;
-	    }
+	  waitret = cygwait (evt);
+	  if (waitret == WAIT_OBJECT_0)
+	    status = io.Status;
 	}
-      if (NT_SUCCESS (status))
+      if (waitret == WAIT_CANCELED)
+	status = STATUS_THREAD_CANCELED;
+      else if (waitret == WAIT_SIGNALED)
+	status = STATUS_THREAD_SIGNALED;
+      else if (isclosed ())  /* A signal handler might have closed the fd. */
+	{
+	  if (waitret == WAIT_OBJECT_0)
+	    set_errno (EBADF);
+	  else
+	    __seterrno ();
+	  len = (size_t) -1;
+	}
+      else if (NT_SUCCESS (status))
 	{
 	  nbytes_now = io.Information;
 	  /* NtWriteFile returns success with # of bytes written == 0
@@ -714,7 +723,7 @@ fhandler_fifo::raw_write (const void *ptr, size_t len)
     }
   if (evt)
     CloseHandle (evt);
-  if (status == STATUS_THREAD_SIGNALED && !_my_tls.call_signal_handler ())
+  if (status == STATUS_THREAD_SIGNALED && ret < 0)
     set_errno (EINTR);
   else if (status == STATUS_THREAD_CANCELED)
     pthread::static_cancel_self ();
@@ -784,6 +793,9 @@ fhandler_fifo::raw_read (void *in_ptr, size_t& len)
   if (res < 0 || (res == 0 && !listen_client ()))
     goto errout;
 
+  if (!len)
+    return;
+
   while (1)
     {
       if (hit_eof ())
@@ -827,21 +839,32 @@ fhandler_fifo::raw_read (void *in_ptr, size_t& len)
 	}
       else
 	{
-	  /* Allow interruption.  Copied from
-	     fhandler_socket_unix::open_reparse_point. */
-	  pthread_testcancel ();
-	  if (cygwait (NULL, cw_nowait, cw_sig_eintr) == WAIT_SIGNALED
-	      && !_my_tls.call_signal_handler ())
+	  /* Allow interruption. */
+	  DWORD waitret = cygwait (NULL, cw_nowait, cw_cancel | cw_sig_eintr);
+	  if (waitret == WAIT_CANCELED)
+	    pthread::static_cancel_self ();
+	  else if (waitret == WAIT_SIGNALED)
 	    {
-	      set_errno (EINTR);
-	      goto errout;
+	      if (_my_tls.call_signal_handler ())
+		continue;
+	      else
+		{
+		  set_errno (EINTR);
+		  goto errout;
+		}
 	    }
-	  /* Don't hog the CPU. */
-	  Sleep (1);
 	}
+      /* We might have been closed by a signal handler or another thread. */
+      if (isclosed ())
+	{
+	  set_errno (EBADF);
+	  goto errout;
+	}
+      /* Don't hog the CPU. */
+      Sleep (1);
     }
 errout:
-  len = -1;
+  len = (size_t) -1;
 }
 
 int __reg2
