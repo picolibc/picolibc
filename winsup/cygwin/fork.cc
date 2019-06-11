@@ -181,8 +181,7 @@ frok::child (volatile char * volatile here)
   cygheap->fdtab.fixup_after_fork (hParent);
 
   /* Signal that we have successfully initialized, so the parent can
-     - transfer data/bss for dynamically loaded dlls (if any), and
-     - start up some tracker threads to remember the child, or
+     - transfer data/bss for dynamically loaded dlls (if any), or
      - terminate the current fork call even if the child is initialized. */
   sync_with_parent ("performed fork fixups and dynamic dll loading", true);
 
@@ -412,6 +411,20 @@ frok::parent (volatile char * volatile stack_here)
   child.hProcess = hchild;
   ch.postfork (child);
 
+  /* Hopefully, this will succeed.  The alternative to doing things this
+     way is to reserve space prior to calling CreateProcess and then fill
+     it in afterwards.  This requires more bookkeeping than I like, though,
+     so we'll just do it the easy way.  So, terminate any child process if
+     we can't actually record the pid in the internal table. */
+  if (!child.remember (false))
+    {
+      this_errno = EAGAIN;
+#ifdef DEBUGGING0
+      error ("child remember failed");
+#endif
+      goto cleanup;
+    }
+
   /* CHILD IS STOPPED */
   debug_printf ("child is alive (but stopped)");
 
@@ -493,20 +506,6 @@ frok::parent (volatile char * volatile stack_here)
 	      goto cleanup;
 	    }
 	}
-    }
-
-  /* Hopefully, this will succeed.  The alternative to doing things this
-     way is to reserve space prior to calling CreateProcess and then fill
-     it in afterwards.  This requires more bookkeeping than I like, though,
-     so we'll just do it the easy way.  So, terminate any child process if
-     we can't actually record the pid in the internal table. */
-  if (!child.remember (false))
-    {
-      this_errno = EAGAIN;
-#ifdef DEBUGGING0
-      error ("child remember failed");
-#endif
-      goto cleanup;
     }
 
   /* Finally start the child up. */
