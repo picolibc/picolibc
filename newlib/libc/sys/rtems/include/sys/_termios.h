@@ -29,7 +29,7 @@
  * SUCH DAMAGE.
  *
  *	@(#)termios.h	8.3 (Berkeley) 3/28/94
- * $FreeBSD: head/sys/sys/_termios.h 326023 2017-11-20 19:43:44Z pfg $
+ * $FreeBSD: head/sys/sys/_termios.h 348999 2019-06-12 18:07:04Z shurd $
  */
 
 #ifndef _SYS__TERMIOS_H_
@@ -143,6 +143,7 @@
 #define	CDTR_IFLOW	0x00040000	/* DTR flow control of input */
 #define	CDSR_OFLOW	0x00080000	/* DSR flow control of output */
 #define	CCAR_OFLOW	0x00100000	/* DCD flow control of output */
+#define	CNO_RTSDTR	0x00200000	/* Do not assert RTS or DTR automatically */
 #endif
 
 
