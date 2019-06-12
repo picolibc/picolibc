@@ -32,7 +32,7 @@
 #include <sys/cdefs.h>
 #include <sys/_types.h>
 #if __POSIX_VISIBLE >= 200809
-#include <xlocale.h>
+#include <sys/_locale.h>
 #endif
 
 #ifndef _NL_ITEM_DECLARED

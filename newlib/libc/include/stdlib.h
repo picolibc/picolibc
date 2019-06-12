@@ -27,7 +27,7 @@
 #endif
 
 #if __GNU_VISIBLE
-#include <xlocale.h>
+#include <sys/_locale.h>
 #endif
 
 _BEGIN_STD_C

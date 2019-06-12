@@ -16,6 +16,9 @@ What changed:
 - If a SA_SIGINFO signal handler changes the ucontext_t pointed to by
   the third parameter, follow it after returning from the handler.
 
+- Eliminate a header file name collision with <X11/XLocale.h> on case
+  insensitive filesystems by reverting <xlocale.h> back to <sys/_locale.h>.
+
 
 Bug Fixes
 ---------

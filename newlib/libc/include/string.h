@@ -17,7 +17,7 @@
 #include <stddef.h>
 
 #if __POSIX_VISIBLE >= 200809
-#include <xlocale.h>
+#include <sys/_locale.h>
 #endif
 
 #if __BSD_VISIBLE

@@ -9,6 +9,12 @@
 <itemizedlist mark="bullet">
 
 <listitem><para>
+Eliminate a header file name collision with &lt;X11/XLocale.h&gt; on
+case insensitive filesystems by reverting &lt;xlocale.h&gt; back to
+&lt;sys/_locale.h&gt;.
+</para></listitem>
+
+<listitem><para>
 FIFOs can now be opened multiple times for writing.
 </para></listitem>
 
