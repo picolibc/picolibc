@@ -298,6 +298,7 @@ fhandler_fifo::listen_client ()
 void
 fhandler_fifo::record_connection (fifo_client_handler& fc)
 {
+  SetEvent (write_ready);
   fc.state = fc_connected;
   nconnected++;
   fc.fh->set_nonblocking (true);
@@ -489,7 +490,7 @@ fhandler_fifo::open (int flags, mode_t)
       goto out;
     }
   npbuf[0] = 'w';
-  if (!(write_ready = CreateEvent (sa_buf, false, false, npbuf)))
+  if (!(write_ready = CreateEvent (sa_buf, true, false, npbuf)))
     {
       debug_printf ("CreateEvent for %s failed, %E", npbuf);
       res = error_set_errno;
