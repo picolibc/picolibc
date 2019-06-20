@@ -231,8 +231,6 @@ fhandler_fifo::add_client_handler ()
       set_errno (EMFILE);
       goto out;
     }
-  if (!(fc.connect_evt = create_event ()))
-    goto out;
   if (!(fh = build_fh_dev (dev ())))
     {
       set_errno (EMFILE);
@@ -304,15 +302,16 @@ fhandler_fifo::record_connection (fifo_client_handler& fc)
   nconnected++;
   fc.fh->set_nonblocking (true);
   set_pipe_non_blocking (fc.fh->get_handle (), true);
-  HANDLE evt = InterlockedExchangePointer (&fc.connect_evt, NULL);
-  if (evt)
-    CloseHandle (evt);
 }
 
 DWORD
 fhandler_fifo::listen_client_thread ()
 {
   DWORD ret = -1;
+  HANDLE evt;
+
+  if (!(evt = create_event ()))
+    goto out;
 
   while (1)
     {
@@ -353,12 +352,11 @@ fhandler_fifo::listen_client_thread ()
       NTSTATUS status;
       IO_STATUS_BLOCK io;
 
-      status = NtFsControlFile (fc.fh->get_handle (), fc.connect_evt,
-				NULL, NULL, &io, FSCTL_PIPE_LISTEN,
-				NULL, 0, NULL, 0);
+      status = NtFsControlFile (fc.fh->get_handle (), evt, NULL, NULL, &io,
+				FSCTL_PIPE_LISTEN, NULL, 0, NULL, 0);
       if (status == STATUS_PENDING)
 	{
-	  HANDLE w[2] = { fc.connect_evt, lct_termination_evt };
+	  HANDLE w[2] = { evt, lct_termination_evt };
 	  DWORD waitret = WaitForMultipleObjects (2, w, false, INFINITE);
 	  switch (waitret)
 	    {
@@ -384,6 +382,7 @@ fhandler_fifo::listen_client_thread ()
 	case STATUS_SUCCESS:
 	case STATUS_PIPE_CONNECTED:
 	  record_connection (fc);
+	  ResetEvent (evt);
 	  break;
 	case STATUS_THREAD_IS_TERMINATING:
 	  /* Force NtFsControlFile to complete.  Otherwise the next
@@ -431,9 +430,13 @@ fhandler_fifo::listen_client_thread ()
 	}
     }
 out:
-  if (ret < 0)
-    debug_printf ("exiting lct with error, %E");
+  if (evt)
+    CloseHandle (evt);
   ResetEvent (read_ready);
+  if (ret < 0)
+    debug_printf ("exiting with error, %E");
+  else
+    debug_printf ("exiting without error");
   return ret;
 }
 
@@ -908,10 +911,7 @@ int
 fifo_client_handler::close ()
 {
   int res = 0;
-  HANDLE evt = InterlockedExchangePointer (&connect_evt, NULL);
 
-  if (evt)
-    CloseHandle (evt);
   if (fh)
     {
       res = fh->fhandler_base::close ();

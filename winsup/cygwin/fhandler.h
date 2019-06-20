@@ -1253,8 +1253,7 @@ struct fifo_client_handler
 {
   fhandler_base *fh;
   fifo_client_connect_state state;
-  HANDLE connect_evt;
-  fifo_client_handler () : fh (NULL), state (fc_unknown), connect_evt (NULL) {}
+  fifo_client_handler () : fh (NULL), state (fc_unknown) {}
   int close ();
 /* Returns FILE_PIPE_DISCONNECTED_STATE, FILE_PIPE_LISTENING_STATE,
    FILE_PIPE_CONNECTED_STATE, FILE_PIPE_CLOSING_STATE,
