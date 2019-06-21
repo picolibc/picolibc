@@ -1244,6 +1244,11 @@ enum fifo_client_connect_state
    fc_invalid
   };
 
+enum
+{
+  FILE_PIPE_INPUT_AVAILABLE_STATE = 5
+};
+
 struct fifo_client_handler
 {
   fhandler_base *fh;
@@ -1251,6 +1256,10 @@ struct fifo_client_handler
   HANDLE connect_evt;
   fifo_client_handler () : fh (NULL), state (fc_unknown), connect_evt (NULL) {}
   int close ();
+/* Returns FILE_PIPE_DISCONNECTED_STATE, FILE_PIPE_LISTENING_STATE,
+   FILE_PIPE_CONNECTED_STATE, FILE_PIPE_CLOSING_STATE,
+   FILE_PIPE_INPUT_AVAILABLE_STATE, or -1 on error. */
+  int pipe_state ();
 };
 
 class fhandler_fifo: public fhandler_base

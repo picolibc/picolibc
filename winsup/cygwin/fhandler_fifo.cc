@@ -377,6 +377,7 @@ fhandler_fifo::listen_client_thread ()
 	    }
 	}
       HANDLE ph = NULL;
+      int ps = -1;
       fifo_client_lock ();
       switch (status)
 	{
@@ -385,29 +386,38 @@ fhandler_fifo::listen_client_thread ()
 	  record_connection (fc);
 	  break;
 	case STATUS_THREAD_IS_TERMINATING:
-	  /* Try to cancel the pending listen.  Otherwise the first
-	     writer to connect after the thread is restarted will be
-	     invisible.
-
-	     FIXME: Is there a direct way to do this?  We do it by
-	     opening and closing a write handle to the client side. */
-	  open_pipe (ph);
-	  /* We don't care about the return value of open_pipe.  Even
-             if the latter failed, a writer might have connected. */
-	  if (WaitForSingleObject (fc.connect_evt, 0) == WAIT_OBJECT_0
+	  /* Force NtFsControlFile to complete.  Otherwise the next
+	     writer to connect might not be recorded in the client
+	     handler list. */
+	  status = open_pipe (ph);
+	  if (NT_SUCCESS (status)
 	      && (NT_SUCCESS (io.Status) || io.Status == STATUS_PIPE_CONNECTED))
-	    record_connection (fc);
+	    {
+	      debug_printf ("successfully connected bogus client");
+	      if (delete_client_handler (nhandlers - 1) < 0)
+		ret = -1;
+	    }
+	  else if ((ps = fc.pipe_state ()) == FILE_PIPE_CONNECTED_STATE
+		   || ps == FILE_PIPE_INPUT_AVAILABLE_STATE)
+	    {
+	      /* A connection was made under our nose. */
+	      debug_printf ("recording connection before terminating");
+	      record_connection (fc);
+	    }
 	  else
-	    fc.state = fc_invalid;
-	  /* By closing ph we ensure that if fc connected to ph, fc
-	     will be declared invalid on the next read attempt. */
+	    {
+	      debug_printf ("failed to terminate NtFsControlFile cleanly");
+	      delete_client_handler (nhandlers - 1);
+	      ret = -1;
+	    }
 	  if (ph)
 	    CloseHandle (ph);
 	  fifo_client_unlock ();
 	  goto out;
 	default:
+	  debug_printf ("NtFsControlFile status %y", status);
 	  __seterrno_from_nt_status (status);
-	  fc.state = fc_invalid;
+	  delete_client_handler (nhandlers - 1);
 	  fifo_client_unlock ();
 	  goto out;
 	}
@@ -896,6 +906,27 @@ fifo_client_handler::close ()
       delete fh;
     }
   return res;
+}
+
+int
+fifo_client_handler::pipe_state ()
+{
+  IO_STATUS_BLOCK io;
+  FILE_PIPE_LOCAL_INFORMATION fpli;
+  NTSTATUS status;
+
+  status = NtQueryInformationFile (fh->get_handle (), &io, &fpli,
+				   sizeof (fpli), FilePipeLocalInformation);
+  if (!NT_SUCCESS (status))
+    {
+      debug_printf ("NtQueryInformationFile status %y", status);
+      __seterrno_from_nt_status (status);
+      return -1;
+    }
+  else if (fpli.ReadDataAvailable > 0)
+    return FILE_PIPE_INPUT_AVAILABLE_STATE;
+  else
+    return fpli.NamedPipeState;
 }
 
 int
