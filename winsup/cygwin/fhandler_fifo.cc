@@ -802,8 +802,6 @@ fhandler_fifo::check_listen_client_thread ()
 void __reg3
 fhandler_fifo::raw_read (void *in_ptr, size_t& len)
 {
-  size_t orig_len = len;
-
   /* Make sure the lct is running. */
   int res = check_listen_client_thread ();
   debug_printf ("lct status %d", res);
@@ -826,26 +824,40 @@ fhandler_fifo::raw_read (void *in_ptr, size_t& len)
       for (int i = 0; i < nhandlers; i++)
 	if (fc_handler[i].state == fc_connected)
 	  {
-	    len = orig_len;
-	    fc_handler[i].fh->fhandler_base::raw_read (in_ptr, len);
-	    ssize_t nread = (ssize_t) len;
-	    if (nread > 0)
+	    NTSTATUS status;
+	    IO_STATUS_BLOCK io;
+	    size_t nbytes = 0;
+
+	    status = NtReadFile (get_fc_handle (i), NULL, NULL, NULL,
+				 &io, in_ptr, len, NULL, NULL);
+	    switch (status)
 	      {
-		fifo_client_unlock ();
-		return;
-	      }
-	    /* If the pipe is empty, we  get nread == -1 with
-	       ERROR_NO_DATA. */
-	    else if (nread < 0 && GetLastError () != ERROR_NO_DATA)
-	      {
-		fifo_client_unlock ();
-		goto errout;
-	      }
-	    else if (nread == 0)
-	      /* Client has disconnected. */
-	      {
+	      case STATUS_SUCCESS:
+	      case STATUS_BUFFER_OVERFLOW:
+		/* io.Information is supposedly valid. */
+		nbytes = io.Information;
+		if (nbytes > 0)
+		  {
+		    len = nbytes;
+		    fifo_client_unlock ();
+		    return;
+		  }
+		break;
+	      case STATUS_PIPE_EMPTY:
+		break;
+	      case STATUS_PIPE_BROKEN:
+		/* Client has disconnected.  Mark the client handler
+		   to be deleted when it's safe to do that. */
 		fc_handler[i].state = fc_invalid;
 		nconnected--;
+		break;
+	      default:
+		debug_printf ("NtReadFile status %y", status);
+		__seterrno_from_nt_status (status);
+		fc_handler[i].state = fc_invalid;
+		nconnected--;
+		fifo_client_unlock ();
+		goto errout;
 	      }
 	  }
       fifo_client_unlock ();
