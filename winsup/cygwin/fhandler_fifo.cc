@@ -928,6 +928,9 @@ fhandler_fifo::stop_listen_client ()
 int
 fhandler_fifo::close ()
 {
+  /* Avoid deadlock with lct in case this is called from a signal
+     handler or another thread. */
+  fifo_client_unlock ();
   int ret = stop_listen_client ();
   if (read_ready)
     CloseHandle (read_ready);
