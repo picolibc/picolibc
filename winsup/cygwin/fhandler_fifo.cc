@@ -251,7 +251,9 @@ fhandler_fifo::add_client_handler ()
       fh->set_nonblocking (false);
       ret = 0;
       fc.fh = fh;
+      fifo_client_lock ();
       fc_handler[nhandlers++] = fc;
+      fifo_client_unlock ();
     }
 out:
   return ret;
@@ -298,12 +300,10 @@ fhandler_fifo::listen_client ()
 void
 fhandler_fifo::record_connection (fifo_client_handler& fc)
 {
-  fifo_client_lock ();
   fc.state = fc_connected;
   nconnected++;
   fc.fh->set_nonblocking (true);
   set_pipe_non_blocking (fc.fh->get_handle (), true);
-  fifo_client_unlock ();
   HANDLE evt = InterlockedExchangePointer (&fc.connect_evt, NULL);
   if (evt)
     CloseHandle (evt);
@@ -335,18 +335,15 @@ fhandler_fifo::listen_client_thread ()
 	  else
 	    i++;
 	}
+      fifo_client_unlock ();
 
       /* Create a new client handler. */
       if (add_client_handler () < 0)
-	{
-	  fifo_client_unlock ();
-	  goto out;
-	}
+	goto out;
 
       /* Allow a writer to open. */
       if (!arm (read_ready))
 	{
-	  fifo_client_unlock ();
 	  __seterrno ();
 	  goto out;
 	}
@@ -359,7 +356,6 @@ fhandler_fifo::listen_client_thread ()
       status = NtFsControlFile (fc.fh->get_handle (), fc.connect_evt,
 				NULL, NULL, &io, FSCTL_PIPE_LISTEN,
 				NULL, 0, NULL, 0);
-      fifo_client_unlock ();
       if (status == STATUS_PENDING)
 	{
 	  HANDLE w[2] = { fc.connect_evt, lct_termination_evt };
@@ -381,6 +377,7 @@ fhandler_fifo::listen_client_thread ()
 	    }
 	}
       HANDLE ph = NULL;
+      fifo_client_lock ();
       switch (status)
 	{
 	case STATUS_SUCCESS:
@@ -406,12 +403,15 @@ fhandler_fifo::listen_client_thread ()
 	     will be declared invalid on the next read attempt. */
 	  if (ph)
 	    CloseHandle (ph);
+	  fifo_client_unlock ();
 	  goto out;
 	default:
 	  __seterrno_from_nt_status (status);
 	  fc.state = fc_invalid;
+	  fifo_client_unlock ();
 	  goto out;
 	}
+      fifo_client_unlock ();
       /* Check for thread termination in case WaitForMultipleObjects
 	 didn't get called above. */
       if (IsEventSignalled (lct_termination_evt))
@@ -933,9 +933,11 @@ fhandler_fifo::close ()
     CloseHandle (read_ready);
   if (write_ready)
     CloseHandle (write_ready);
+  fifo_client_lock ();
   for (int i = 0; i < nhandlers; i++)
     if (fc_handler[i].close () < 0)
       ret = -1;
+  fifo_client_unlock ();
   return fhandler_base::close () || ret;
 }
 
@@ -983,6 +985,7 @@ fhandler_fifo::dup (fhandler_base *child, int flags)
       __seterrno ();
       goto out;
     }
+  fifo_client_lock ();
   for (int i = 0; i < nhandlers; i++)
     {
       if (!DuplicateHandle (GetCurrentProcess (), fc_handler[i].fh->get_handle (),
@@ -990,6 +993,7 @@ fhandler_fifo::dup (fhandler_base *child, int flags)
 			    &fhf->fc_handler[i].fh->get_handle (),
 			    0, true, DUPLICATE_SAME_ACCESS))
 	{
+	  fifo_client_unlock ();
 	  CloseHandle (fhf->read_ready);
 	  CloseHandle (fhf->write_ready);
 	  fhf->close ();
@@ -997,6 +1001,7 @@ fhandler_fifo::dup (fhandler_base *child, int flags)
 	  goto out;
 	}
     }
+  fifo_client_unlock ();
   if (!reader || fhf->listen_client ())
     ret = 0;
   if (reader)
@@ -1017,8 +1022,10 @@ fhandler_fifo::fixup_after_fork (HANDLE parent)
   fhandler_base::fixup_after_fork (parent);
   fork_fixup (parent, read_ready, "read_ready");
   fork_fixup (parent, write_ready, "write_ready");
+  fifo_client_lock ();
   for (int i = 0; i < nhandlers; i++)
     fc_handler[i].fh->fhandler_base::fixup_after_fork (parent);
+  fifo_client_unlock ();
   if (reader && !listen_client ())
     debug_printf ("failed to start lct, %E");
 }
@@ -1037,6 +1044,8 @@ fhandler_fifo::set_close_on_exec (bool val)
   fhandler_base::set_close_on_exec (val);
   set_no_inheritance (read_ready, val);
   set_no_inheritance (write_ready, val);
+  fifo_client_lock ();
   for (int i = 0; i < nhandlers; i++)
     fc_handler[i].fh->fhandler_base::set_close_on_exec (val);
+  fifo_client_unlock ();
 }
