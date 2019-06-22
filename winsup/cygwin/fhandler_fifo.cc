@@ -257,13 +257,14 @@ out:
   return ret;
 }
 
-void
+int
 fhandler_fifo::delete_client_handler (int i)
 {
-  fc_handler[i].close ();
+  int ret = fc_handler[i].close ();
   if (i < --nhandlers)
     memmove (fc_handler + i, fc_handler + i + 1,
 	     (nhandlers - i) * sizeof (fc_handler[i]));
+  return ret;
 }
 
 /* Just hop to the listen_client_thread method. */
@@ -324,7 +325,13 @@ fhandler_fifo::listen_client_thread ()
       while (i < nhandlers)
 	{
 	  if (fc_handler[i].state == fc_invalid)
-	    delete_client_handler (i);
+	    {
+	      if (delete_client_handler (i) < 0)
+		{
+		  fifo_client_unlock ();
+		  goto out;
+		}
+	    }
 	  else
 	    i++;
 	}
