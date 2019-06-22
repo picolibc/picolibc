@@ -1238,11 +1238,11 @@ public:
 #define MAX_CLIENTS 64
 
 enum fifo_client_connect_state
-  {
-   fc_unknown,
-   fc_connected,
-   fc_invalid
-  };
+{
+  fc_unknown,
+  fc_connected,
+  fc_invalid
+};
 
 enum
 {

@@ -761,7 +761,7 @@ fhandler_fifo::hit_eof ()
   bool eof;
   bool retry = true;
 
-retry:
+repeat:
       fifo_client_lock ();
       eof = (nconnected == 0);
       fifo_client_unlock ();
@@ -770,7 +770,7 @@ retry:
 	  retry = false;
 	  /* Give the listen_client thread time to catch up. */
 	  Sleep (1);
-	  goto retry;
+	  goto repeat;
 	}
   return eof;
 }
