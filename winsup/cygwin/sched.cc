@@ -424,4 +424,312 @@ sched_getcpu ()
   return pnum.Group * __get_cpus_per_group () + pnum.Number;
 }
 
+/* construct an affinity mask with just the 'count' lower-order bits set */
+static __cpu_mask
+groupmask (int count)
+{
+  if (count >= (int) (NBBY * sizeof (__cpu_mask)))
+    return ~(__cpu_mask) 0;
+  else
+    return ((__cpu_mask) 1 << count) - 1;
+}
+
+/* return the affinity mask of the indicated group from the given cpu set */
+static __cpu_mask
+getgroup (size_t sizeof_set, const cpu_set_t *set, int groupnum)
+{
+  int groupsize = __get_cpus_per_group ();
+  int bitindex = groupnum * groupsize;
+
+  int setsize = NBBY * sizeof_set; // bit size of whole cpu set
+  if (bitindex + groupsize > setsize)
+    return (__cpu_mask) 0;
+
+  int wordsize = NBBY * sizeof (cpu_set_t);
+  int wordindex = bitindex / wordsize;
+
+  __cpu_mask result = set->__bits[wordindex];
+  int offset = bitindex % wordsize;
+  if (offset)
+    {
+      result >>= offset;
+      offset = wordsize - offset;
+    }
+  else
+    offset = wordsize;
+
+  if (offset < groupsize)
+    result |= (set->__bits[wordindex + 1] << offset);
+  if (groupsize < wordsize)
+    result &= groupmask (groupsize);
+
+  return result;
+}
+
+/* set the given affinity mask for indicated group within the given cpu set */
+static __cpu_mask
+setgroup (size_t sizeof_set, cpu_set_t *set, int groupnum, __cpu_mask aff)
+{
+  int groupsize = __get_cpus_per_group ();
+  int bitindex = groupnum * groupsize;
+
+  int setsize = NBBY * sizeof_set; // bit size of whole cpu set
+  if (bitindex + groupsize > setsize)
+    return (__cpu_mask) 0;
+
+  int wordsize = NBBY * sizeof (cpu_set_t);
+  int wordindex = bitindex / wordsize;
+  int offset = bitindex % wordsize;
+  __cpu_mask mask = groupmask (groupsize);
+  aff &= mask;
+
+  set->__bits[wordindex] &= ~(mask << offset);
+  set->__bits[wordindex] |= aff << offset;
+
+  if ((bitindex + groupsize - 1) / wordsize != wordindex)
+    {
+      offset = wordsize - offset;
+      set->__bits[wordindex + 1] &= ~(mask >> offset);
+      set->__bits[wordindex + 1] |= aff >> offset;
+    }
+
+  return aff;
+}
+
+/* figure out which processor group the set bits indicate; can only be one */
+static int
+whichgroup (size_t sizeof_set, const cpu_set_t *set)
+{
+  int res = -1;
+  int maxgroup = min (__get_group_count (),
+                      (NBBY * sizeof_set) / __get_cpus_per_group ());
+
+  for (int i = 0; i < maxgroup; ++i)
+    if (getgroup (sizeof_set, set, i))
+      {
+	if (res >= 0)
+	  return -1; // error return if more than one group indicated
+	else
+	  res = i; // remember first group found
+      }
+
+  return res;
+}
+
+int
+sched_get_thread_affinity (HANDLE thread, size_t sizeof_set, cpu_set_t *set)
+{
+  int status = 0;
+
+  if (thread)
+    {
+      memset (set, 0, sizeof_set);
+      if (wincap.has_processor_groups () && __get_group_count () > 1)
+	{
+	  GROUP_AFFINITY ga;
+
+	  if (!GetThreadGroupAffinity (thread, &ga))
+	    {
+	      status = geterrno_from_win_error (GetLastError (), EPERM);
+	      goto done;
+	    }
+	  setgroup (sizeof_set, set, ga.Group, ga.Mask);
+	}
+      else
+	{
+	  THREAD_BASIC_INFORMATION tbi;
+
+	  status = NtQueryInformationThread (thread, ThreadBasicInformation,
+					     &tbi, sizeof (tbi), NULL);
+	  if (NT_SUCCESS (status))
+	    setgroup (sizeof_set, set, 0, tbi.AffinityMask);
+	  else
+	    status = geterrno_from_nt_status (status);
+	}
+    }
+  else
+    status = ESRCH;
+
+done:
+  return status;
+}
+
+int
+sched_getaffinity (pid_t pid, size_t sizeof_set, cpu_set_t *set)
+{
+  HANDLE process = 0;
+  int status = 0;
+
+  pinfo p (pid ? pid : getpid ());
+  if (p)
+    {
+      process = pid && pid != myself->pid ?
+                OpenProcess (PROCESS_QUERY_LIMITED_INFORMATION, FALSE,
+                             p->dwProcessId) : GetCurrentProcess ();
+      KAFFINITY procmask;
+      KAFFINITY sysmask;
+
+      if (!GetProcessAffinityMask (process, &procmask, &sysmask))
+        {
+          status = geterrno_from_win_error (GetLastError (), EPERM);
+          goto done;
+        }
+      memset (set, 0, sizeof_set);
+      if (wincap.has_processor_groups () && __get_group_count () > 1)
+        {
+          USHORT groupcount = __CPU_GROUPMAX;
+          USHORT grouparray[__CPU_GROUPMAX];
+
+          if (!GetProcessGroupAffinity (process, &groupcount, grouparray))
+            {
+	      status = geterrno_from_win_error (GetLastError (), EPERM);
+	      goto done;
+	    }
+
+	  KAFFINITY miscmask = groupmask (__get_cpus_per_group ());
+	  for (int i = 0; i < groupcount; i++)
+	    setgroup (sizeof_set, set, grouparray[i], miscmask);
+        }
+      else
+        setgroup (sizeof_set, set, 0, procmask);
+    }
+  else
+    status = ESRCH;
+
+done:
+  if (process && process != GetCurrentProcess ())
+    CloseHandle (process);
+
+  if (status)
+    {
+      set_errno (status);
+      status = -1;
+    }
+  else
+    {
+      /* Emulate documented Linux kernel behavior on successful return */
+      status = wincap.cpu_count ();
+    }
+  return status;
+}
+
+int
+sched_set_thread_affinity (HANDLE thread, size_t sizeof_set, const cpu_set_t *set)
+{
+  int group = whichgroup (sizeof_set, set);
+  int status = 0;
+
+  if (thread)
+    {
+      if (wincap.has_processor_groups () && __get_group_count () > 1)
+	{
+	  GROUP_AFFINITY ga;
+
+	  if (group < 0)
+	    {
+	      status = EINVAL;
+	      goto done;
+	    }
+	  memset (&ga, 0, sizeof (ga));
+	  ga.Mask = getgroup (sizeof_set, set, group);
+	  ga.Group = group;
+	  if (!SetThreadGroupAffinity (thread, &ga, NULL))
+	    {
+	      status = geterrno_from_win_error (GetLastError (), EPERM);
+	      goto done;
+	    }
+	}
+      else
+	{
+	  if (group != 0)
+	    {
+	      status = EINVAL;
+	      goto done;
+	    }
+	  if (!SetThreadAffinityMask (thread, getgroup (sizeof_set, set, 0)))
+	    {
+	      status = geterrno_from_win_error (GetLastError (), EPERM);
+	      goto done;
+	    }
+	}
+    }
+  else
+    status = ESRCH;
+
+done:
+  return status;
+}
+
+int
+sched_setaffinity (pid_t pid, size_t sizeof_set, const cpu_set_t *set)
+{
+  int group = whichgroup (sizeof_set, set);
+  HANDLE process = 0;
+  int status = 0;
+
+  pinfo p (pid ? pid : getpid ());
+  if (p)
+    {
+      process = pid && pid != myself->pid ?
+		OpenProcess (PROCESS_SET_INFORMATION, FALSE,
+			     p->dwProcessId) : GetCurrentProcess ();
+      if (wincap.has_processor_groups () && __get_group_count () > 1)
+	{
+	  USHORT groupcount = __CPU_GROUPMAX;
+	  USHORT grouparray[__CPU_GROUPMAX];
+
+	  if (!GetProcessGroupAffinity (process, &groupcount, grouparray))
+	    {
+	      status = geterrno_from_win_error (GetLastError (), EPERM);
+	      goto done;
+	    }
+	  if (group < 0)
+	    {
+	      status = EINVAL;
+	      goto done;
+	    }
+	  if (groupcount == 1 && grouparray[0] == group)
+	    {
+	      if (!SetProcessAffinityMask (process, getgroup (sizeof_set, set, group)))
+		status = geterrno_from_win_error (GetLastError (), EPERM);
+	      goto done;
+	    }
+
+	  /* If we get here, the user is trying to add the process to another
+             group or move it from current group to another group.  These ops
+             are not allowed by Windows.  One has to move one or more of the
+             process' threads to the new group(s) one by one.  Here, we bail.
+          */
+	  status = EINVAL;
+	  goto done;
+	}
+      else
+	{
+	  if (group != 0)
+	    {
+	      status = EINVAL;
+	      goto done;
+	    }
+	  if (!SetProcessAffinityMask (process, getgroup (sizeof_set, set, 0)))
+	    {
+	      status = geterrno_from_win_error (GetLastError (), EPERM);
+	      goto done;
+	    }
+	}
+    }
+  else
+    status = ESRCH;
+
+done:
+  if (process && process != GetCurrentProcess ())
+    CloseHandle (process);
+
+  if (status)
+    {
+      set_errno (status);
+      status = -1;
+    }
+  return status;
+}
+
 } /* extern C */

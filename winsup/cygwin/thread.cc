@@ -23,6 +23,7 @@ details. */
 #include "winsup.h"
 #include "miscfuncs.h"
 #include "path.h"
+#include <sched.h>
 #include <stdlib.h>
 #include "sigproc.h"
 #include "fhandler.h"
@@ -2604,6 +2605,24 @@ pthread_timedjoin_np (pthread_t thread, void **return_val,
   if (err)
     return err;
   return pthread::join (&thread, (void **) return_val, &timeout);
+}
+
+extern "C" int
+pthread_getaffinity_np (pthread_t thread, size_t sizeof_set, cpu_set_t *set)
+{
+  if (!pthread::is_good_object (&thread))
+    return ESRCH;
+
+  return sched_get_thread_affinity (thread->win32_obj_id, sizeof_set, set);
+}
+
+extern "C" int
+pthread_setaffinity_np (pthread_t thread, size_t sizeof_set, const cpu_set_t *set)
+{
+  if (!pthread::is_good_object (&thread))
+    return ESRCH;
+
+  return sched_set_thread_affinity (thread->win32_obj_id, sizeof_set, set);
 }
 
 extern "C" int

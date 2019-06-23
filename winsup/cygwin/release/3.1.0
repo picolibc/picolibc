@@ -5,6 +5,9 @@ What's new:
   1703 or later.  Add fake 24 bit color support for legacy console,
   which uses the nearest color from 16 system colors.
 
+- New APIs: sched_getaffinity, sched_setaffinity, pthread_getaffinity_np,
+  pthread_setaffinity_np.
+
 
 What changed:
 -------------

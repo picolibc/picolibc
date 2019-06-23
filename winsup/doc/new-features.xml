@@ -29,6 +29,12 @@ If a SA_SIGINFO signal handler changes the ucontext_t pointed to by the
 third parameter, follow it after returning from the handler.
 </para></listitem>
 
+<listitem><para>
+Support for getting and setting process and thread affinities.  New APIs:
+sched_getaffinity, sched_setaffinity, pthread_getaffinity_np,
+pthread_setaffinity_np.
+</para></listitem>
+
 </itemizedlist>
 
 </sect2>

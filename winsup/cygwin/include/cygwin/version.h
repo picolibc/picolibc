@@ -509,12 +509,14 @@ details. */
   336: New Cygwin PID algorithm (yeah, not really an API change)
   337: MOUNT_BINARY -> MOUNT_TEXT
   338: Export secure_getenv.
+  339: Export sched_getaffinity, sched_setaffinity, pthread_getaffinity_np,
+       pthread_setaffinity_np.
 
   Note that we forgot to bump the api for ualarm, strtoll, strtoull,
   sigaltstack, sethostname. */
 
 #define CYGWIN_VERSION_API_MAJOR 0
-#define CYGWIN_VERSION_API_MINOR 338
+#define CYGWIN_VERSION_API_MINOR 339
 
 /* There is also a compatibity version number associated with the shared memory
    regions.  It is incremented when incompatible changes are made to the shared
