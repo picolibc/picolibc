@@ -86,6 +86,8 @@ class timerfd_tracker		/* cygheap! */
       return (WaitForSingleObject (_access_mtx, INFINITE) & ~WAIT_ABANDONED_0)
 	      == WAIT_OBJECT_0;
     }
+  /* A version that honors a cancel event, for use in thread_func. */
+  int enter_critical_section_cancelable ();
   void leave_critical_section ()
     {
       ReleaseMutex (_access_mtx);

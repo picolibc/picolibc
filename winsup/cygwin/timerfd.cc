@@ -89,6 +89,25 @@ timerfd_tracker::handle_timechange_window ()
     }
 }
 
+/* Like enter_critical_section, but returns -1 on a cancel event. */
+int
+timerfd_tracker::enter_critical_section_cancelable ()
+{
+  HANDLE w[2] = { cancel_evt, _access_mtx };
+  DWORD waitret = WaitForMultipleObjects (2, w, FALSE, INFINITE);
+
+  switch (waitret)
+    {
+    case WAIT_OBJECT_0:
+      return -1;
+    case WAIT_OBJECT_0 + 1:
+    case WAIT_ABANDONED_0 + 1:
+      return 1;
+    default:
+      return 0;
+    }
+}
+
 DWORD
 timerfd_tracker::thread_func ()
 {
@@ -137,7 +156,10 @@ timerfd_tracker::thread_func ()
 	      continue;
 	    }
 
-	  if (!enter_critical_section ())
+	  int ec = enter_critical_section_cancelable ();
+	  if (ec < 0)
+	    goto canceled;
+	  else if (!ec)
 	    continue;
 	  /* Make sure we haven't been abandoned and/or disarmed
 	     in the meantime */
