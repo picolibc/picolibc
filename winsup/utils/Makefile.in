@@ -64,7 +64,7 @@ MINGW_BINS := ${addsuffix .exe,cygcheck cygwin-console-helper ldh strace}
 # List all objects to be compiled in MinGW mode.  Any object not on this
 # list will will be compiled in Cygwin mode implicitly, so there is no
 # need for a CYGWIN_OBJS.
-MINGW_OBJS := bloda.o cygcheck.o dump_setup.o ldh.o path.o strace.o
+MINGW_OBJS := bloda.o cygcheck.o cygwin-console-helper.o dump_setup.o ldh.o path.o strace.o
 MINGW_LDFLAGS:=-static
 
 CYGCHECK_OBJS:=cygcheck.o bloda.o path.o dump_setup.o
