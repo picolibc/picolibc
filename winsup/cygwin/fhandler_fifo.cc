@@ -717,7 +717,6 @@ fhandler_fifo::raw_write (const void *ptr, size_t len)
 	    set_errno (EBADF);
 	  else
 	    __seterrno ();
-	  len = (size_t) -1;
 	}
       else if (NT_SUCCESS (status))
 	{
