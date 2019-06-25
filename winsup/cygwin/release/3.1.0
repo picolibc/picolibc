@@ -35,5 +35,5 @@ Bug Fixes
   layer so using it in send(2), sendto(2), or sendmsg(2) will return -1
   with errno set to EOPNOTSUPP and recvmsg(2) will never return it.
 
-- Fix a race condition in the timerfd code.
+- Fix a timerfd deadlock.
   Addresses: https://cygwin.com/ml/cygwin/2019-06/msg00096.html
