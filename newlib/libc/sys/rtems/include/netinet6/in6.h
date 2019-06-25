@@ -60,7 +60,7 @@
  * SUCH DAMAGE.
  *
  *	@(#)in.h	8.3 (Berkeley) 1/3/94
- * $FreeBSD: head/sys/netinet6/in6.h 337783 2018-08-14 17:27:41Z jtl $
+ * $FreeBSD: head/sys/netinet6/in6.h 349369 2019-06-25 11:54:41Z hselasky $
  */
 
 #ifndef __KAME_NETINET_IN_H_INCLUDED_
@@ -395,11 +395,8 @@ struct route_in6 {
 #define IPV6_DEFAULT_MULTICAST_LOOP 1	/* normally hear sends if a member */
 
 /*
- * The im6o_membership vector for each socket is now dynamically allocated at
- * run-time, bounded by USHRT_MAX, and is reallocated when needed, sized
- * according to a power-of-two increment.
+ * Limit for IPv6 multicast memberships
  */
-#define	IPV6_MIN_MEMBERSHIPS	31
 #define	IPV6_MAX_MEMBERSHIPS	4095
 
 /*
