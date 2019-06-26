@@ -93,24 +93,6 @@ int sched_yield( void );
 #if __GNU_VISIBLE
 int sched_getcpu(void);
 
-/* Affinity-related definitions, here until numerous enough to separate out */
-#ifdef __x86_64__
-typedef uint64_t __cpu_mask;
-#else
-typedef uint32_t __cpu_mask;
-#endif
-#define __CPU_SETSIZE 1024  // maximum number of logical processors tracked
-#define __NCPUBITS (8 * sizeof (__cpu_mask))  // max size of processor group
-#define __CPU_GROUPMAX (__CPU_SETSIZE / __NCPUBITS)  // maximum group number
-
-#define __CPUELT(cpu)	((cpu) / __NCPUBITS)
-#define __CPUMASK(cpu)	((__cpu_mask) 1 << ((cpu) % __NCPUBITS))
-
-typedef struct
-{
-  __cpu_mask __bits[__CPU_GROUPMAX];
-} cpu_set_t;
-
 int sched_getaffinity (pid_t, size_t, cpu_set_t *);
 int sched_get_thread_affinity (void *, size_t, cpu_set_t *);
 int sched_setaffinity (pid_t, size_t, const cpu_set_t *);
