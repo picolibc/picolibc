@@ -70,7 +70,7 @@ longjmp:
   /* If the second argument to longjmp is zero, set return address to 1,
   otherwise set it to the value of the second argument */
 	l.addi	r11, r0, 1
-	l.sfne	r4, r0
+	l.sfeq	r4, r0
 	l.bf	1f
 	l.nop
 	l.addi	r11, r4, 0
