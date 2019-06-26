@@ -510,7 +510,7 @@ details. */
   337: MOUNT_BINARY -> MOUNT_TEXT
   338: Export secure_getenv.
   339: Export sched_getaffinity, sched_setaffinity, pthread_getaffinity_np,
-       pthread_setaffinity_np.
+       pthread_setaffinity_np, __sched_getaffinity_sys.
 
   Note that we forgot to bump the api for ualarm, strtoll, strtoull,
   sigaltstack, sethostname. */

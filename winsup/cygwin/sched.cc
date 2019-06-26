@@ -555,8 +555,9 @@ done:
 }
 
 int
-sched_getaffinity (pid_t pid, size_t sizeof_set, cpu_set_t *set)
+__sched_getaffinity_sys (pid_t pid, size_t sizeof_set, cpu_set_t *set)
 {
+  /* Emulate Linux raw sched_getaffinity syscall for benefit of taskset(1) */
   HANDLE process = 0;
   int status = 0;
 
@@ -603,14 +604,21 @@ done:
   if (status)
     {
       set_errno (status);
-      status = -1;
+      return -1;
     }
-  else
-    {
-      /* Emulate documented Linux kernel behavior on successful return */
-      status = wincap.cpu_count ();
-    }
-  return status;
+
+  /* On successful return, we would ordinarily return 0, but instead we
+     emulate the behavior of the raw sched_getaffinity syscall on Linux. */
+  return min (sizeof_set, sizeof (cpu_set_t));
+}
+
+int
+sched_getaffinity (pid_t pid, size_t sizeof_set, cpu_set_t *set)
+{
+  /* Emulate the Linux glibc interface of sched_getaffinity() by calling
+     the raw syscall emulation and mapping positive results to 0. */
+  int status = __sched_getaffinity_sys (pid, sizeof_set, set);
+  return status > 0 ? 0 : status;
 }
 
 int
@@ -727,9 +735,10 @@ done:
   if (status)
     {
       set_errno (status);
-      status = -1;
+      return -1;
     }
-  return status;
+
+  return 0;
 }
 
 } /* extern C */
