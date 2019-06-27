@@ -451,11 +451,18 @@ fhandler_fifo::open (int flags, mode_t)
    error_set_errno
   } res;
 
+  if (flags & O_PATH)
+    {
+      query_open (query_read_attributes);
+      nohandle (true);
+    }
+
   /* Determine what we're doing with this fhandler: reading, writing, both */
   switch (flags & O_ACCMODE)
     {
     case O_RDONLY:
-      reader = true;
+      if (!query_open ())
+	reader = true;
       break;
     case O_WRONLY:
       writer = true;
@@ -577,6 +584,8 @@ fhandler_fifo::open (int flags, mode_t)
 	    }
 	}
     }
+  if (query_open ())
+    res = success;
 out:
   if (res == error_set_errno)
     __seterrno ();
