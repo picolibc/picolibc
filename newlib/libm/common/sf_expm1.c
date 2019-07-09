@@ -14,6 +14,7 @@
  */
 
 #include "fdlibm.h"
+#include "math_config.h"
 
 #ifdef __v810__
 #define const
@@ -60,7 +61,7 @@ Q5  =  -2.0109921195e-07; /* 0xb457edbb */
 	    if(FLT_UWORD_IS_INFINITE(hx))
 		return (xsb==0)? x:-1.0;/* exp(+-inf)={inf,-1} */
 	    if(xsb == 0 && hx > FLT_UWORD_LOG_MAX) /* if x>=o_threshold */
-		return huge*huge; /* overflow */
+		return __math_oflowf (0); /* overflow */
 	    if(xsb!=0) { /* x < -27*ln2, return -1.0 with inexact */
 		if(x+tiny<(float)0.0)	/* raise inexact */
 		return tiny-one;	/* return -1 */

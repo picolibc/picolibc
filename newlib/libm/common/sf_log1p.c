@@ -14,6 +14,7 @@
  */
 
 #include "fdlibm.h"
+#include "math_config.h"
 
 #ifdef __STDC__
 static const float
@@ -54,8 +55,10 @@ static float zero = 0.0;
 	if (!FLT_UWORD_IS_FINITE(hx)) return x+x;
 	if (hx < 0x3ed413d7) {			/* x < 0.41422  */
 	    if(ax>=0x3f800000) {		/* x <= -1.0 */
-		if(x==(float)-1.0) return -two25/zero; /* log1p(-1)=+inf */
-		else return (x-x)/(x-x);	/* log1p(x<-1)=NaN */
+		if(x==(float)-1.0)
+		    return __math_divzero (1); /* log1p(-1)=-inf */
+		else
+		    return __math_invalid (x);	/* log1p(x<-1)=NaN */
 	    }
 	    if(ax<0x31000000) {			/* |x| < 2**-29 */
 		if(two25+x>zero			/* raise inexact */
