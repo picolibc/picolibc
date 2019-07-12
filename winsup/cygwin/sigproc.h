@@ -71,8 +71,8 @@ class _pinfo;
 void __stdcall proc_terminate ();
 void __stdcall sigproc_init ();
 bool __reg1 pid_exists (pid_t);
-int __reg3 sig_send (_pinfo *, siginfo_t&, class _cygtls * = NULL);
-int __reg3 sig_send (_pinfo *, int, class _cygtls * = NULL);
+sigset_t __reg3 sig_send (_pinfo *, siginfo_t&, class _cygtls * = NULL);
+sigset_t __reg3 sig_send (_pinfo *, int, class _cygtls * = NULL);
 void __stdcall signal_fixup_after_exec ();
 void __stdcall sigalloc ();
 
@@ -109,7 +109,7 @@ class lock_signals
 public:
   lock_signals ()
   {
-    worked = sig_send (NULL, __SIGHOLD) == 0;
+    worked = (bool) sig_send (NULL, __SIGHOLD) == 0;
   }
   operator int () const
   {

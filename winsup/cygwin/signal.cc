@@ -264,7 +264,7 @@ _pinfo::kill (siginfo_t& si)
 
       if (si.si_signo == 0)
 	res = 0;
-      else if ((res = sig_send (this, si)))
+      else if ((res = (int) sig_send (this, si)))
 	{
 	  sigproc_printf ("%d = sig_send, %E ", res);
 	  res = -1;
@@ -718,7 +718,7 @@ sigqueue (pid_t pid, int sig, const union sigval value)
   si.si_signo = sig;
   si.si_code = SI_QUEUE;
   si.si_value = value;
-  return sig_send (dest, si);
+  return (int) sig_send (dest, si);
 }
 
 extern "C" int

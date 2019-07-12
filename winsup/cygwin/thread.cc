@@ -3311,7 +3311,7 @@ pthread_kill (pthread_t thread, int sig)
     rval = ESRCH;
   else if (sig)
     {
-      rval = sig_send (NULL, si, thread->cygtls);
+      rval = (int) sig_send (NULL, si, thread->cygtls);
       if (rval == -1)
 	rval = get_errno ();
     }
@@ -3354,7 +3354,7 @@ pthread_sigqueue (pthread_t *thread, int sig, const union sigval value)
   si.si_value = value;
   si.si_pid = myself->pid;
   si.si_uid = myself->uid;
-  return sig_send (NULL, si, (*thread)->cygtls);
+  return (int) sig_send (NULL, si, (*thread)->cygtls);
 }
 
 /* ID */

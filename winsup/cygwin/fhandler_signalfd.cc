@@ -151,7 +151,7 @@ fhandler_signalfd::write (const void *, size_t)
 int
 fhandler_signalfd::poll ()
 {
-  sigset_t outset = (sigset_t) sig_send (myself, __SIGPENDING, &_my_tls);
+  sigset_t outset = sig_send (myself, __SIGPENDING, &_my_tls);
   if (outset == SIG_BAD_MASK)
     return -1;
   if ((outset & sigset) != 0)
