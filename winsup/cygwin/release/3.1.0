@@ -37,3 +37,6 @@ Bug Fixes
 
 - Fix a timerfd deadlock.
   Addresses: https://cygwin.com/ml/cygwin/2019-06/msg00096.html
+
+- Fix sigpending() incorrectly returning signals for unrelated threads.
+  Addresses: https://cygwin.com/ml/cygwin/2019-07/msg00051.html

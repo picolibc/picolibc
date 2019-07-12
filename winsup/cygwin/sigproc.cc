@@ -1335,8 +1335,13 @@ wait_sig (VOID *)
 	    *pack.mask = 0;
 	    tl_entry = cygheap->find_tls (pack.sigtls);
 	    while ((q = q->next))
-	      if (pack.sigtls->sigmask & (bit = SIGTOMASK (q->si.si_signo)))
-		*pack.mask |= bit;
+	      {
+		/* Skip thread-specific signals for other threads. */
+		if (q->sigtls && pack.sigtls != q->sigtls)
+		  continue;
+		if (pack.sigtls->sigmask & (bit = SIGTOMASK (q->si.si_signo)))
+		  *pack.mask |= bit;
+	      }
 	    cygheap->unlock_tls (tl_entry);
 	  }
 	  break;
