@@ -417,6 +417,7 @@ dumper::dump_thread (asection * to, process_thread * thread)
   bfd_putl32 (NT_WIN32PSTATUS, header.elf_note_header.type);
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wstringop-overflow"
+#pragma GCC diagnostic ignored "-Warray-bounds"
   strncpy (header.elf_note_header.name, "win32thread", NOTE_NAME_SIZE);
 #pragma GCC diagnostic pop
 
@@ -483,6 +484,7 @@ dumper::dump_module (asection * to, process_module * module)
   bfd_putl32 (NT_WIN32PSTATUS, header.elf_note_header.type);
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wstringop-overflow"
+#pragma GCC diagnostic ignored "-Warray-bounds"
   strncpy (header.elf_note_header.name, "win32module", NOTE_NAME_SIZE);
 #pragma GCC diagnostic pop
 
