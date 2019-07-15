@@ -275,13 +275,12 @@ public:
 };
 
 static msleep_sync_array *msleep_sync;
+extern struct msginfo msginfo;
+extern struct seminfo seminfo;
 
 void
 msleep_init (void)
 {
-  extern struct msginfo msginfo;
-  extern struct seminfo seminfo;
-
   msleep_glob_evt = CreateEvent (NULL, TRUE, FALSE, NULL);
   if (!msleep_glob_evt)
     panic ("CreateEvent in msleep_init failed: %u", GetLastError ());
