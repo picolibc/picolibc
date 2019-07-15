@@ -724,7 +724,7 @@ err:
    See FreeBSD src/lib/libc/amd64/string/memset.S
    and FreeBSD src/lib/libc/amd64/string/bcopy.S */
 
-asm volatile ("								\n\
+asm ("								\n\
 /*									\n\
  * Written by J.T. Conklin <jtc@NetBSD.org>.				\n\
  * Public domain.							\n\
@@ -791,7 +791,7 @@ L1:     rep								\n\
 	.seh_endproc							\n\
 ");
 
-asm volatile ("								\n\
+asm ("								\n\
 /*-									\n\
  * Copyright (c) 1990 The Regents of the University of California.	\n\
  * All rights reserved.							\n\
