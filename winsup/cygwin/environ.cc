@@ -644,7 +644,7 @@ _addenv (const char *name, const char *value, int overwrite)
 	return -1;		/* Oops.  No more memory. */
 
       /* Put name '=' value into current slot. */
-      strncpy (envhere, name, namelen);
+      memcpy (envhere, name, namelen);
       envhere[namelen] = '=';
       strcpy (envhere + namelen + 1, value);
     }

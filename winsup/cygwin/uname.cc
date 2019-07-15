@@ -25,7 +25,7 @@ uname_x (struct utsname *name)
 {
   __try
     {
-      char buf[NI_MAXHOST + 1];
+      char buf[NI_MAXHOST + 1] __attribute__ ((nonstring));
       char *snp = strstr (cygwin_version.dll_build_date, "SNP");
 
       memset (name, 0, sizeof (*name));

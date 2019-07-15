@@ -24,11 +24,11 @@ struct utmp
 {
  short	ut_type;
  pid_t	ut_pid;
- char	ut_line[UT_LINESIZE];
+ char	ut_line[UT_LINESIZE] __attribute__ ((nonstring));
  char  ut_id[UT_IDLEN];
  time_t ut_time;
- char	ut_user[UT_NAMESIZE];
- char	ut_host[UT_HOSTSIZE];
+ char	ut_user[UT_NAMESIZE] __attribute__ ((nonstring));
+ char	ut_host[UT_HOSTSIZE] __attribute__ ((nonstring));
  long	ut_addr;
 };
 
