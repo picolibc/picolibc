@@ -1736,7 +1736,7 @@ lf_split (lockf_t *lock1, lockf_t *lock2, lockf_t **split)
   splitlock = *split;
   assert (splitlock != NULL);
   *split = splitlock->lf_next;
-  memcpy (splitlock, lock1, sizeof *splitlock);
+  memcpy ((void *) splitlock, lock1, sizeof *splitlock);
   /* We have to unset the obj HANDLE here which has been copied by the
      above memcpy, so that the calling function recognizes the new object.
      See post-lf_split handling in lf_setlock and lf_clearlock. */

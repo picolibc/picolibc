@@ -313,7 +313,7 @@ class path_conv
   path_conv& eq_worker (const path_conv& pc, const char *in_path)
   {
     free_strings ();
-    memcpy (this, &pc, sizeof pc);
+    memcpy ((void *) this, &pc, sizeof pc);
     /* The device info might contain pointers to allocated strings, in
        contrast to statically allocated strings.  Calling device::dup()
        will duplicate the string if the source was allocated. */

@@ -1418,12 +1418,12 @@ winpids::add (DWORD& nelem, bool winpid, DWORD pid)
     {
       npidlist += slop_pidlist;
       pidlist = (DWORD *) realloc (pidlist, size_pidlist (npidlist + 1));
-      pinfolist = (pinfo *) realloc (pinfolist, size_pinfolist (npidlist + 1));
+      pinfolist = (pinfo *) realloc ((void *) pinfolist, size_pinfolist (npidlist + 1));
     }
 
   _onreturn onreturn;
   pinfo& p = pinfolist[nelem];
-  memset (&p, 0, sizeof (p));
+  memset ((void *) &p, 0, sizeof (p));
 
   bool perform_copy;
   if (cygpid == myself->pid)
