@@ -414,7 +414,6 @@ public:
   virtual bool is_tty () const { return false; }
   virtual bool ispipe () const { return false; }
   virtual pid_t get_popen_pid () const {return 0;}
-  virtual bool isdevice () const { return true; }
   virtual bool isfifo () const { return false; }
   virtual int ptsname_r (char *, size_t);
   virtual class fhandler_socket *is_socket () { return NULL; }
@@ -459,7 +458,6 @@ public:
   virtual void seekdir (DIR *, long);
   virtual void rewinddir (DIR *);
   virtual int closedir (DIR *);
-  bool is_auto_device () {return isdevice () && !dev ().isfs ();}
   bool is_fs_special () {return pc.is_fs_special ();}
   bool issymlink () {return pc.issymlink ();}
   bool __reg2 device_access_denied (int);
@@ -1527,7 +1525,6 @@ class fhandler_disk_file: public fhandler_base
   int dup (fhandler_base *child, int);
   void fixup_after_fork (HANDLE parent);
   int mand_lock (int, struct flock *);
-  bool isdevice () const { return false; }
   int __reg2 fstat (struct stat *buf);
   int __reg1 fchmod (mode_t mode);
   int __reg2 fchown (uid_t uid, gid_t gid);
