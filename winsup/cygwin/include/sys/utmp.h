@@ -19,16 +19,21 @@ extern "C" {
 #define ut_name		ut_user
 #endif
 
+#if __GNUC__ >= 8
+#define ATTRIBUTE_NONSTRING __attribute__ ((nonstring))
+#else
+#define ATTRIBUTE_NONSTRING
+#endif
 
 struct utmp
 {
  short	ut_type;
  pid_t	ut_pid;
- char	ut_line[UT_LINESIZE] __attribute__ ((nonstring));
+ char	ut_line[UT_LINESIZE] ATTRIBUTE_NONSTRING;
  char  ut_id[UT_IDLEN];
  time_t ut_time;
- char	ut_user[UT_NAMESIZE] __attribute__ ((nonstring));
- char	ut_host[UT_HOSTSIZE] __attribute__ ((nonstring));
+ char	ut_user[UT_NAMESIZE] ATTRIBUTE_NONSTRING;
+ char	ut_host[UT_HOSTSIZE] ATTRIBUTE_NONSTRING;
  long	ut_addr;
 };
 

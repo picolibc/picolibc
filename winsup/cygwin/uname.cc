@@ -17,6 +17,12 @@ details. */
 extern "C" int cygwin_gethostname (char *__name, size_t __len);
 extern "C" int getdomainname (char *__name, size_t __len);
 
+#if __GNUC__ >= 8
+#define ATTRIBUTE_NONSTRING __attribute__ ((nonstring))
+#else
+#define ATTRIBUTE_NONSTRING
+#endif
+
 /* uname: POSIX 4.4.1.1 */
 
 /* New entrypoint for applications since API 335 */
@@ -25,7 +31,7 @@ uname_x (struct utsname *name)
 {
   __try
     {
-      char buf[NI_MAXHOST + 1] __attribute__ ((nonstring));
+      char buf[NI_MAXHOST + 1] ATTRIBUTE_NONSTRING;
       char *snp = strstr (cygwin_version.dll_build_date, "SNP");
 
       memset (name, 0, sizeof (*name));
