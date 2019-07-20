@@ -184,7 +184,9 @@ class path_conv
   int isspecial () const {return dev.not_device (FH_FS);}
   int iscygdrive () const {return dev.is_device (FH_CYGDRIVE);}
   int is_fs_special () const {return dev.is_fs_special ();}
-  int is_lnk_special () const {return (isdevice () && is_fs_special ())
+
+  int is_lnk_special () const {return (isdevice () && is_fs_special ()
+				       && !issocket ())
       || isfifo () || is_lnk_symlink ();}
 #ifdef __WITH_AF_UNIX
   int issocket () const {return dev.is_device (FH_LOCAL)

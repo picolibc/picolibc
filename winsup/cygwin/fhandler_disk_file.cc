@@ -1190,10 +1190,10 @@ fhandler_disk_file::link (const char *newpath)
   char new_buf[nlen + 5];
   if (!newpc.error)
     {
-      /* If the original file is a lnk special file (except for sockets),
+      /* If the original file is a lnk special file,
 	 and if the original file has a .lnk suffix, add one to the hardlink
 	 as well. */
-      if (pc.is_lnk_special () && !pc.issocket ()
+      if (pc.is_lnk_special ()
 	  && RtlEqualUnicodePathSuffix (pc.get_nt_native_path (),
 					&ro_u_lnk, TRUE))
 	{
