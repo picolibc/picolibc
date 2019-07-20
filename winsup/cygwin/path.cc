@@ -1921,7 +1921,7 @@ symlink_worker (const char *oldpath, const char *newpath, bool isdevice)
 		      win32_newpath.get_nt_native_path (), wsym_type);
 
       if ((!isdevice && win32_newpath.exists ())
-	  || win32_newpath.is_auto_device ())
+	  || (win32_newpath.isdevice () && !win32_newpath.is_fs_special ()))
 	{
 	  set_errno (EEXIST);
 	  __leave;
