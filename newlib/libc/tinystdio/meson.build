@@ -37,7 +37,6 @@ srcs_tinystdio = [
     'sscanf.c',
     'strtof.c',
     'strtod.c',
-    'ultoa_invert.c',
     'ungetc.c',
     'vfiprintf.c',
     'vfiscanf.c',
