@@ -167,7 +167,6 @@ vfprintf (FILE * stream, const char *fmt, va_list ap)
 	      case 'u':
 		flags &= ~FL_ALT;
 	        base = 10;
-		sign = 0;
 		goto ultoa;
 	      case 'o':
 	        base = 8;
