@@ -86,9 +86,6 @@ static bool get_mem_values (DWORD dwProcessId, size_t &vmsize, size_t &vmrss,
 			    size_t &vmtext, size_t &vmdata, size_t &vmlib,
 			    size_t &vmshare);
 
-/* Returns 0 if path doesn't exist, >0 if path is a directory,
-   -1 if path is a file, -2 if path is a symlink, -3 if path is a pipe,
-   -4 if path is a socket. */
 virtual_ftype_t
 fhandler_process::exists ()
 {
