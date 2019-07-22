@@ -586,6 +586,8 @@ int vfprintf (FILE * stream, const char *fmt, va_list ap)
 	case 's':
 	case 'S':
 	    pnt = va_arg (ap, char *);
+	    if (!pnt)
+		pnt = "(null)";
 	    size = strnlen (pnt, (flags & FL_PREC) ? prec : ~0);
 
 	str_lpad:
