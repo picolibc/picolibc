@@ -59,6 +59,21 @@
 .endm
 #endif
 
+/* Annotation for EABI unwinding tables.  */
+.macro FN_EH_START
+#if defined(__ELF__) && !defined(__USING_SJLJ_EXCEPTIONS__)
+	.fnstart
+#endif
+.endm
+
+.macro FN_EH_END
+#if defined(__ELF__) && !defined(__USING_SJLJ_EXCEPTIONS__)
+	/* Protect against unhandled exceptions.  */
+	.cantunwind
+	.fnend
+#endif
+.endm
+
 .macro indirect_call reg
 #ifdef HAVE_CALL_INDIRECT
 	blx \reg
@@ -68,16 +83,171 @@
 #endif
 .endm
 
+/* For armv4t and newer, toolchains will transparently convert
+   'bx lr' to 'mov pc, lr' if needed. GCC has deprecated support
+   for anything older than armv4t, but this should handle that
+   corner case in case anyone needs it anyway.  */
+.macro  FN_RETURN
+#if __ARM_ARCH <= 4 && __ARM_ARCH_ISA_THUMB == 0
+	mov	pc, lr
+#else
+	bx	lr
+#endif
+.endm
+
+
+
+/******************************************************************************
+* User mode only:           This routine makes default target specific Stack
+*   +-----+ <- SL_sys,    Pointer initialization for different processor modes:
+*   |     |    SL_usr     FIQ, Abort, IRQ, Undefined, Supervisor, System (User)
+*   | SYS |               and setups a default Stack Limit in-case the code has
+*   | USR | -=0x10000     been compiled with "-mapcs-stack-check" for FIQ and
+*   |     |               System (User) modes.
+*   |     |
+*   +-----+ <- initial SP,
+*           becomes SP_sys   Hard-wiring SL value is not ideal, since there is
+*           and SL_usr     currently no support for checking that the heap and
+*                          stack have not collided, or that this default 64k is
+* All modes:               is enough for the program being executed. However,
+*   +-----+ <- SL_sys,     it ensures that this simple crt0 world will not
+*   |     |    SL_usr      immediately cause an overflow event.
+*   | SYS |
+*   | USR | -=0x10000        We go through all execution modes and set up SP
+*   |     |                for each of them.
+*   +-----+ <- SP_sys,
+*   |     |    SP_usr      Notes:
+*   | SVC | -= 0x8000       - This code will not work as intended if the system
+*   |     |                   starts in secure mode. In particular the methods
+*   +-----+ <- SP_svc         of getting in and out of secure state are not as
+*   |     |                   simple as writing to the CPSR mode bits.
+*   | IRQ | -= 0x2000       - Mode switch via CPSR is not allowed once in
+*   |     |                   non-privileged mode, so we take care not to enter
+* ^ +-----+ <- SP_und         "User" to set up its SP, and also skip most
+* s |     |                   operations if already in that mode.
+* t | UND | -= 0x1000
+* a |     |                Input parameters:
+* c +-----+ <- SP_und       - sp - Initialized SP
+* k |     |                 - r2 - May contain SL value from semihosting
+*   | ABT | -= 0x1000              SYS_HEAPINFO call
+* g |     |                Scratch registers:
+* r +-----+ <- SP_abt,      - r1 - new value of CPSR
+* o |     |    SL_fiq       - r2 - intermediate value (in standalone mode)
+* w | FIQ | -= 0x1000       - r3 - new SP value
+* t |     |                 - r4 - save/restore CPSR on entry/exit
+* h +-----+ <- initial SP,
+*           becomes SP_fiq   Declared as "weak" so that user can write and use
+*                          his own implementation if current doesn't fit.
+*
+******************************************************************************/
+	.align	0
+	FUNC_START	_stack_init
+	.weak FUNCTION (_stack_init)
+	FN_EH_START
+
+	/* M profile doesn't have CPSR register.  */
+#if (__ARM_ARCH_PROFILE != 'M')
+	/* Following code is compatible for both ARM and Thumb ISA.  */
+	mrs	r4, CPSR
+	/* Test mode bits - in User of all are 0.  */
+	tst	r4, #(CPSR_M_MASK)
+	/* "eq" means r4 AND #0x0F is 0.  */
+	beq	.Lskip_cpu_modes
+
+	mov	r3, sp /* Save input SP value.  */
+
+	/* FIQ mode, interrupts disabled.  */
+	mov	r1, #(CPSR_M_FIQ|CPSR_M_32BIT|CPSR_I_MASK|CPSR_F_MASK)
+	msr	CPSR_c, r1
+	mov	sp, r3
+	sub	sl, sp, #0x1000	/* FIQ mode has its own SL.  */
+
+	/* Abort mode, interrupts disabled.  */
+	mov	r3, sl
+	mov	r1, #(CPSR_M_ABT|CPSR_M_32BIT|CPSR_I_MASK|CPSR_F_MASK)
+	msr	CPSR_c, r1
+	mov	sp, r3
+	sub	r3, r3, #0x1000
+
+	/* Undefined mode, interrupts disabled.  */
+	mov	r1, #(CPSR_M_UND|CPSR_M_32BIT|CPSR_I_MASK|CPSR_F_MASK)
+	msr	CPSR_c, r1
+	mov	sp, r3
+	sub	r3, r3, #0x1000
+
+	/* IRQ mode, interrupts disabled.  */
+	mov	r1, #(CPSR_M_IRQ|CPSR_M_32BIT|CPSR_I_MASK|CPSR_F_MASK)
+	msr	CPSR_c, r1
+	mov	sp, r3
+	sub	r3, r3, #0x2000
+
+	/* Supervisory mode, interrupts disabled.  */
+	mov	r1, #(CPSR_M_SVR|CPSR_M_32BIT|CPSR_I_MASK|CPSR_F_MASK)
+	msr	CPSR_c, r1
+	mov	sp, r3
+
+	sub	r3, r3, #0x8000	/* Min size 32k.  */
+	bic	r3, r3, #0x00FF	/* Align with current 64k block.  */
+	bic	r3, r3, #0xFF00
+
+# if __ARM_ARCH >= 4
+	/* System (shares regs with User) mode, interrupts disabled.  */
+	mov	r1, #(CPSR_M_SYS|CPSR_M_32BIT|CPSR_I_MASK|CPSR_F_MASK)
+	msr	CPSR_c, r1
+	mov	sp, r3
+# else
+	/* Keep this for ARMv3, but GCC actually dropped it.  */
+	/* Move value into user mode SP without changing modes,  */
+	/* via '^' form of ldm.  */
+	str	r3, [r3, #-4]
+	ldmdb	r3, {sp}^
+# endif
+
+	/* Back to original mode, presumably SVC, with diabled FIQ/IRQ.  */
+	orr	r4, r4, #(CPSR_I_MASK|CPSR_F_MASK)
+	msr	CPSR_c, r4
+
+.Lskip_cpu_modes:
+#endif
+
+	/* Set SL register.  */
+#if defined (ARM_RDI_MONITOR) /* semihosting */
+	cmp	r2, #0
+	beq	.Lsl_forced_zero
+	/* Allow slop for stack overflow handling and small frames.  */
+# ifdef THUMB1_ONLY
+	adds	r2, #128
+	adds	r2, #128
+	mov	sl, r2
+# else
+	add	sl, r2, #256
+# endif
+.Lsl_forced_zero:
+
+#else /* standalone */
+	/* r3 contains SP for System/User mode. Set SL = SP - 0x10000.  */
+	#ifdef THUMB1_ONLY
+	movs	r2, #64
+	lsls	r2, r2, #10
+	subs	r2, r3, r2
+	mov	sl, r2
+	#else
+	/* Still assumes 256bytes below SL.  */
+	sub	sl, r3, #64 << 10
+	#endif
+#endif
+
+	FN_RETURN
+	FN_EH_END
+
+
 /*******************************************************************************
 * Main library startup code.
 *******************************************************************************/
 	.align 	0
 	FUNC_START	_mainCRTStartup
 	FUNC_START	_start
-#if defined(__ELF__) && !defined(__USING_SJLJ_EXCEPTIONS__)
-	/* Annotation for EABI unwinding tables.  */
-	.fnstart
-#endif
+	FN_EH_START
 
 	/* __ARM_ARCH_PROFILE is defined from GCC 4.8 onwards, however __ARM_ARCH_7A
 	has been defined since 4.2 onwards, which is when v7-a support was added
@@ -144,42 +314,33 @@
 .LC32:	
 	ldr	r1, [r0, #8]
 	ldr	r2, [r0, #12]
-	/*  We skip setting sp/sl if 0 returned from semihosting. 
+	/*  We skip setting SP/SL if 0 returned from semihosting.
 	    - According to semihosting docs, if 0 returned from semihosting,
 	      the system was unable to calculate the real value, so it's ok
-	      to skip setting sp/sl to 0 here.
+	      to skip setting SP/SL to 0 here.
 	    - Considering M-profile processors, We might want to initialize
-	      sp by the first entry of vector table and return 0 to SYS_HEAPINFO
-	      semihosting call, which will be skipped here.  */
+	      SP by the first entry of vector table and return 0 to SYS_HEAPINFO
+	      semihosting call, which will be skipped here.
+	    - Considering R-profile processors there is no automatic SP init by hardware
+	      so we need to initialize it by default value.  */
+	ldr	r3, .Lstack
 	cmp	r1, #0
 	beq	.LC26
-	mov	sp, r1
+	mov	r3, r1
 .LC26:
-	cmp	r2, #0
-	beq	.LC27
+	mov	sp, r3
 
-	/*  Allow slop for stack overflow handling and small frames.  */
-#ifdef THUMB1_ONLY
-	adds	r2, #128
-	adds	r2, #128
-	mov	sl, r2
-#else
-	add	sl, r2, #256
-#endif
+	/* r2 (SL value) will be used in _stack_init.  */
+	bl FUNCTION (_stack_init)
 
-.LC27:
-#else
-	/*  Set up the stack pointer to a fixed value.  */
+
+#else /* standalone */
+	/*  Set up the stack pointer to a fixed value. */
 	/*  Changes by toralf:
 	    - Allow linker script to provide stack via __stack symbol - see
 	      defintion of .Lstack
 	    - Provide "hooks" that may be used by the application to add
-	      custom init code - see .Lhwinit and .Lswinit	
-	    - Go through all execution modes and set up stack for each of them.
-	      Loosely based on init.s from ARM/Motorola example code.
-              Note: Mode switch via CPSR is not allowed once in non-privileged
-		    mode, so we take care not to enter "User" to set up its sp,
-		    and also skip most operations if already in that mode.  */
+	      custom init code - see .Lhwinit and .Lswinit.  */
 
 	ldr	r3, .Lstack
 	cmp	r3, #0
@@ -194,61 +355,14 @@
 	ldreq	r3, .LC0
 #endif
 	/* Note: This 'mov' is essential when starting in User, and ensures we
-		 always get *some* sp value for the initial mode, even if we 
+		 always get *some* SP value for the initial mode, even if we
 		 have somehow missed it below (in which case it gets the same
 		 value as FIQ - not ideal, but better than nothing).  */
 	mov	sp, r3
-#ifdef PREFER_THUMB
-	/* XXX Fill in stack assignments for interrupt modes.  */
-#else
-	mrs	r2, CPSR
-	tst	r2, #0x0F	/* Test mode bits - in User of all are 0.  */
-	beq	.LC23		/* "eq" means r2 AND #0x0F is 0.  */
-	msr     CPSR_c, #0xD1	/* FIRQ mode, interrupts disabled.  */
-	mov 	sp, r3
-	sub	sl, sp, #0x1000	/* This mode also has its own sl (see below).  */
-	
-	mov	r3, sl	
-	msr     CPSR_c, #0xD7	/* Abort mode, interrupts disabled.  */
-	mov	sp, r3
-	sub	r3, r3, #0x1000
 
-	msr     CPSR_c, #0xDB	/* Undefined mode, interrupts disabled.  */
-	mov	sp, r3
-	sub	r3, r3, #0x1000
+	/* We don't care of r2 value in standalone.  */
+	bl FUNCTION (_stack_init)
 
-	msr     CPSR_c, #0xD2	/* IRQ mode, interrupts disabled.  */
-	mov	sp, r3
-	sub	r3, r3, #0x2000
-		
-	msr     CPSR_c, #0xD3	/* Supervisory mode, interrupts disabled.  */
-
-	mov	sp, r3
-	sub	r3, r3, #0x8000	/* Min size 32k.  */
-	bic	r3, r3, #0x00FF	/* Align with current 64k block.  */
-	bic	r3, r3, #0xFF00
-
-	str	r3, [r3, #-4]	/* Move value into user mode sp without */ 
-	ldmdb	r3, {sp}^       /* changing modes, via '^' form of ldm.  */ 
-	orr	r2, r2, #0xC0	/* Back to original mode, presumably SVC, */
-	msr	CPSR_c, r2	/* with FIQ/IRQ disable bits forced to 1.  */
-#endif	
-.LC23:
-	/* Setup a default stack-limit in-case the code has been
-	   compiled with "-mapcs-stack-check".  Hard-wiring this value
-	   is not ideal, since there is currently no support for
-	   checking that the heap and stack have not collided, or that
-	   this default 64k is enough for the program being executed.
-	   However, it ensures that this simple crt0 world will not
-	   immediately cause an overflow event:  */
-#ifdef THUMB1_ONLY
-	movs	r2, #64
-	lsls	r2, r2, #10
-	subs	r2, r3, r2
-	mov	sl, r2
-#else
-	sub	sl, r3, #64 << 10	/* Still assumes 256bytes below sl.  */
-#endif
 #endif
 #endif
 	/* Zero the memory in the .bss section.  */
@@ -443,10 +557,12 @@ change_back:
 	/* Halt the execution.  This code should never be executed.  */
 	/* With no debug monitor, this probably aborts (eventually).
 	   With a Demon debug monitor, this halts cleanly.
-	   With an Angel debug monitor, this will report 'Unknown SWI'.	 */
+	   With an Angel debug monitor, this will report 'Unknown SWI'.  */
 	swi	SWI_Exit
 #endif
 	
+	FN_EH_END
+
 	/* For Thumb, constants must be after the code since only 
 	   positive offsets are supported for PC relative addresses.  */
 	.align 0
@@ -464,9 +580,6 @@ change_back:
 #else
 	.word	0x80000			/* Top of RAM on the PIE board.  */
 #endif
-
-.Lstack:	
-	.word	__stack
 .Lhwinit:	
 	.word	FUNCTION (hardware_init_hook)
 .Lswinit:
@@ -477,19 +590,18 @@ change_back:
 	   runtime (meaning "ignore setting") for the variables, when the user
 	   does not provide the symbols. (The linker uses a weak symbol if,
 	   and only if, a normal version of the same symbol isn't provided
-	   e.g. by a linker script or another object file.)  */	
+	   e.g. by a linker script or another object file.)  */
 
-	.weak __stack
 	.weak FUNCTION (hardware_init_hook) 
 	.weak FUNCTION (software_init_hook)
 #endif
 	
 #endif
-#if defined(__ELF__) && !defined(__USING_SJLJ_EXCEPTIONS__)
-	/* Protect against unhandled exceptions.  */
-	.cantunwind
-	.fnend
-#endif
+
+.Lstack:
+	.word	__stack
+	.weak	__stack
+
 .LC1:
 	.word	__bss_start__
 .LC2:

@@ -61,4 +61,30 @@
 # define HAVE_CALL_INDIRECT
 #endif
 
+/* A and R profiles (and legacy Arm).
+	Current Program Status Register (CPSR)
+	M[4:0]		Mode bits. M[4] is always 1 for 32-bit modes.
+	T[5]			1: Thumb, 0: ARM instruction set
+	F[6]			1: disables FIQ
+	I[7]			1: disables IRQ
+	A[8]			1: disables imprecise aborts
+	E[9]			0: Little-endian, 1: Big-endian
+	J[24]			1: Jazelle instruction set
+ */
+#define CPSR_M_USR			0x00	/* User mode.  */
+#define CPSR_M_FIQ			0x01	/* Fast Interrupt mode.  */
+#define CPSR_M_IRQ			0x02	/* Interrupt mode.  */
+#define CPSR_M_SVR			0x03	/* Supervisor mode.  */
+#define CPSR_M_MON			0x06	/* Monitor mode.  */
+#define CPSR_M_ABT			0x07	/* Abort mode.  */
+#define CPSR_M_HYP			0x0A	/* Hypervisor mode.  */
+#define CPSR_M_UND			0x0B	/* Undefined mode.  */
+#define CPSR_M_SYS			0x0F	/* System mode.  */
+#define CPSR_M_32BIT		0x10	/* 32-bit mode.  */
+#define CPSR_T_BIT			0x20	/* Thumb bit.  */
+#define CPSR_F_MASK			0x40	/* FIQ bit.  */
+#define CPSR_I_MASK			0x80	/* IRQ bit.  */
+
+#define CPSR_M_MASK			0x0F	/* Mode mask except M[4].  */
+
 #endif /* _LIBGLOSS_ARM_H */
