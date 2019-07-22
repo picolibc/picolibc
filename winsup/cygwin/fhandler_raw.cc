@@ -38,7 +38,7 @@ fhandler_dev_raw::fstat (struct stat *buf)
   debug_printf ("here");
 
   fhandler_base::fstat (buf);
-  if (is_auto_device ())
+  if (!dev ().isfs ())
     {
       if (get_major () == DEV_TAPE_MAJOR)
 	buf->st_mode = S_IFCHR | STD_RBITS | STD_WBITS | S_IWGRP | S_IWOTH;

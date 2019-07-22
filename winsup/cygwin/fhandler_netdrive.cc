@@ -145,8 +145,6 @@ create_thread_and_wait (int what, PVOID in, PVOID out, DWORD outsize,
   return ndi.ret;
 }
 
-/* Returns 0 if path doesn't exist, >0 if path is a directory,
-   -1 if path is a file, -2 if it's a symlink.  */
 virtual_ftype_t
 fhandler_netdrive::exists ()
 {

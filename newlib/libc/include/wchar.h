@@ -64,7 +64,7 @@ typedef __gnuc_va_list va_list;
 #endif
 
 #if __POSIX_VISIBLE >= 200809
-#include <xlocale.h>
+#include <sys/_locale.h>
 #endif
 
 _BEGIN_STD_C

@@ -1,6 +1,6 @@
 #include "arm.h"
         /* Run-time exception support */
-#ifndef PREFER_THUMB
+#ifndef __ARM_EABI__
 #include "swi.h"
 
 /* .text is used instead of .section .text so it works with arm-aout too.  */

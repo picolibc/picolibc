@@ -169,12 +169,13 @@ fhandler_process::fstat (struct stat *buf)
       buf->st_uid = p->uid;
       buf->st_gid = p->gid;
       buf->st_mode |= S_IFDIR | S_IXUSR | S_IXGRP | S_IXOTH;
-      if (file_type == 1)
+      if (file_type == virt_directory)
 	buf->st_nlink = 2;
       else
 	buf->st_nlink = 3;
       return 0;
     case virt_symlink:
+    case virt_fdsymlink:
       buf->st_uid = p->uid;
       buf->st_gid = p->gid;
       buf->st_mode = S_IFLNK | S_IRWXU | S_IRWXG | S_IRWXO;
@@ -354,7 +355,7 @@ fhandler_process::fill_filebuf ()
 	}
       else
 	filesize = process_tab[fileid].format_func (p, filebuf);
-      return !filesize ? false : true;
+      return filesize < 0 ? false : true;
     }
   return false;
 }
@@ -388,16 +389,16 @@ format_process_fd (void *data, char *&destbuf)
       if (fd < 0 || e == fdp || (*e != '/' && *e != '\0'))
 	{
 	  set_errno (ENOENT);
-	  return 0;
+	  return -1;
 	}
       destbuf = p ? p->fd (fd, fs) : NULL;
       if (!destbuf || !*destbuf)
 	{
 	  set_errno (ENOENT);
-	  return 0;
+	  return -1;
 	}
       if (*e == '\0')
-	*((process_fd_t *) data)->fd_type = virt_symlink;
+	*((process_fd_t *) data)->fd_type = virt_fdsymlink;
       else /* trailing path */
 	{
 	  char *newbuf = (char *) cmalloc_abort (HEAP_STR, strlen (destbuf)
@@ -518,12 +519,9 @@ format_process_cmdline (void *data, char *&destbuf)
       destbuf = NULL;
     }
   destbuf = p ? p->cmdline (fs) : NULL;
-  if (!destbuf || !*destbuf)
-    {
-      destbuf = cstrdup ("<defunct>");
-      fs = strlen (destbuf) + 1;
-    }
-  return fs;
+  if (destbuf && *destbuf)
+    return fs;
+  return format_process_exename (data, destbuf);
 }
 
 static off_t
@@ -820,7 +818,22 @@ format_process_maps (void *data, char *&destbuf)
   HANDLE proc = OpenProcess (PROCESS_QUERY_INFORMATION
 			     | PROCESS_VM_READ, FALSE, p->dwProcessId);
   if (!proc)
-    return 0;
+    {
+      if (!(p->process_state & PID_EXITED))
+        {
+          DWORD error = GetLastError ();
+          __seterrno_from_win_error (error);
+          debug_printf ("OpenProcess: ret %u; pid: %d", error, p->dwProcessId);
+          return -1;
+        }
+      else
+        {
+          /* Else it's a zombie process; just return an empty string */
+          destbuf = (char *) crealloc_abort (destbuf, 1);
+          destbuf[0] = '\0';
+          return 0;
+        }
+    }
 
   NTSTATUS status;
   PROCESS_BASIC_INFORMATION pbi;
@@ -1093,51 +1106,62 @@ format_process_stat (void *data, char *&destbuf)
 
   NTSTATUS status;
   HANDLE hProcess;
-  VM_COUNTERS vmc;
-  KERNEL_USER_TIMES put;
-  PROCESS_BASIC_INFORMATION pbi;
-  QUOTA_LIMITS ql;
-  SYSTEM_TIMEOFDAY_INFORMATION stodi;
-  SYSTEM_PROCESSOR_PERFORMANCE_INFORMATION spt;
-  hProcess = OpenProcess (PROCESS_QUERY_LIMITED_INFORMATION | PROCESS_VM_READ,
+  VM_COUNTERS vmc = { 0 };
+  KERNEL_USER_TIMES put = { 0 };
+  PROCESS_BASIC_INFORMATION pbi = { 0 };
+  QUOTA_LIMITS ql = { 0 };
+  SYSTEM_TIMEOFDAY_INFORMATION stodi = { 0 };
+
+  hProcess = OpenProcess (PROCESS_QUERY_LIMITED_INFORMATION,
 			  FALSE, p->dwProcessId);
   if (hProcess == NULL)
     {
-      DWORD error = GetLastError ();
-      __seterrno_from_win_error (error);
-      debug_printf ("OpenProcess: ret %u", error);
-      return 0;
+      if (!(p->process_state & PID_EXITED))
+        {
+          DWORD error = GetLastError ();
+          __seterrno_from_win_error (error);
+          debug_printf ("OpenProcess: ret %u; pid: %d", error, p->dwProcessId);
+          return -1;
+        }
+      /* Else it's a zombie process; just leave each structure zero'd */
     }
-
-  status = NtQueryInformationProcess (hProcess, ProcessVmCounters,
-				      (PVOID) &vmc, sizeof vmc, NULL);
-  if (NT_SUCCESS (status))
-    status = NtQueryInformationProcess (hProcess, ProcessTimes,
-					(PVOID) &put, sizeof put, NULL);
-  if (NT_SUCCESS (status))
-    status = NtQueryInformationProcess (hProcess, ProcessBasicInformation,
-					(PVOID) &pbi, sizeof pbi, NULL);
-  if (NT_SUCCESS (status))
-    status = NtQueryInformationProcess (hProcess, ProcessQuotaLimits,
-					(PVOID) &ql, sizeof ql, NULL);
-  CloseHandle (hProcess);
-  if (NT_SUCCESS (status))
-    status = NtQuerySystemInformation (SystemTimeOfDayInformation,
-				       (PVOID) &stodi, sizeof stodi, NULL);
-  if (NT_SUCCESS (status))
-    status = NtQuerySystemInformation (SystemProcessorPerformanceInformation,
-				       (PVOID) &spt, sizeof spt, NULL);
-  if (!NT_SUCCESS (status))
+  else
     {
-      __seterrno_from_nt_status (status);
-      debug_printf ("NtQueryInformationProcess: status %y, %E", status);
-      return 0;
+      status = NtQueryInformationProcess (hProcess, ProcessVmCounters,
+					  (PVOID) &vmc, sizeof vmc, NULL);
+      if (!NT_SUCCESS (status))
+	debug_printf ("NtQueryInformationProcess(ProcessVmCounters): status %y",
+		      status);
+      status = NtQueryInformationProcess (hProcess, ProcessTimes,
+					  (PVOID) &put, sizeof put, NULL);
+      if (!NT_SUCCESS (status))
+	debug_printf ("NtQueryInformationProcess(ProcessTimes): status %y",
+		      status);
+      status = NtQueryInformationProcess (hProcess, ProcessBasicInformation,
+					  (PVOID) &pbi, sizeof pbi, NULL);
+      if (!NT_SUCCESS (status))
+	debug_printf ("NtQueryInformationProcess(ProcessBasicInformation): "
+		      "status %y", status);
+      status = NtQueryInformationProcess (hProcess, ProcessQuotaLimits,
+					  (PVOID) &ql, sizeof ql, NULL);
+      if (!NT_SUCCESS (status))
+	debug_printf ("NtQueryInformationProcess(ProcessQuotaLimits): "
+		      "status %y", status);
+      CloseHandle (hProcess);
     }
+  status = NtQuerySystemInformation (SystemTimeOfDayInformation,
+				     (PVOID) &stodi, sizeof stodi, NULL);
+  if (!NT_SUCCESS (status))
+    debug_printf ("NtQuerySystemInformation(SystemTimeOfDayInformation): "
+		  "status %y", status);
   fault_count = vmc.PageFaultCount;
   utime = put.UserTime.QuadPart * CLOCKS_PER_SEC / NS100PERSEC;
   stime = put.KernelTime.QuadPart * CLOCKS_PER_SEC / NS100PERSEC;
-  start_time = (put.CreateTime.QuadPart - stodi.BootTime.QuadPart)
-	       * CLOCKS_PER_SEC / NS100PERSEC;
+  if (put.CreateTime.QuadPart)
+    start_time = (put.CreateTime.QuadPart - stodi.BootTime.QuadPart)
+		 * CLOCKS_PER_SEC / NS100PERSEC;
+  else
+    start_time = (p->start_time - to_time_t (&stodi.BootTime)) * CLOCKS_PER_SEC;
   /* The BasePriority returned to a 32 bit process under WOW64 is
      apparently broken, for 32 and 64 bit target processes.  64 bit
      processes get the correct base priority, even for 32 bit processes. */
@@ -1156,7 +1180,7 @@ format_process_stat (void *data, char *&destbuf)
 				   "%u %lu %lu %u %u %lu %lu "
 				   "%U %U %d %d %d %d "
 				   "%U %lu "
-				   "%ld %lu",
+				   "%ld %lu\n",
 			  p->pid, cmd, state,
 			  p->ppid, p->pgid, p->sid, p->ctty, -1,
 			  0, fault_count, fault_count, 0, 0, utime, stime,
@@ -1211,9 +1235,8 @@ format_process_status (void *data, char *&destbuf)
       state_str = "stopped";
       break;
     }
-  if (!get_mem_values (p->dwProcessId, vmsize, vmrss, vmtext, vmdata,
-		       vmlib, vmshare))
-    return 0;
+  get_mem_values (p->dwProcessId, vmsize, vmrss, vmtext, vmdata,
+		  vmlib, vmshare);
   /* The real uid value for *this* process is stored at cygheap->user.real_uid
      but we can't get at the real uid value for any other process, so
      just fake it as p->uid.  Similar for p->gid. */
@@ -1255,9 +1278,10 @@ format_process_statm (void *data, char *&destbuf)
 {
   _pinfo *p = (_pinfo *) data;
   size_t vmsize = 0, vmrss = 0, vmtext = 0, vmdata = 0, vmlib = 0, vmshare = 0;
+
   if (!get_mem_values (p->dwProcessId, vmsize, vmrss, vmtext, vmdata,
-		       vmlib, vmshare))
-    return 0;
+		       vmlib, vmshare) && !(p->process_state & PID_EXITED))
+    return -1;  /* Error out unless it's a zombie process */
 
   destbuf = (char *) crealloc_abort (destbuf, 96);
   return __small_sprintf (destbuf, "%lu %lu %lu %lu %lu %lu 0\n",

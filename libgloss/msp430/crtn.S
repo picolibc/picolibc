@@ -15,8 +15,8 @@
 
 #ifndef MINRT
 	.section	.init,"ax"
-	call_	#_msp430_run_preinit_array
-	call_	#_msp430_run_init_array
+	call_	#__crt0_run_preinit_array
+	call_	#__crt0_run_init_array
 	ret_
 	.global	__msp430_init_end
 __msp430_init_end:
@@ -28,5 +28,14 @@ __msp430_init_end:
 __msp430_fini_end:
 
 	.text
+;; If these functions are not defined externally, we don't need them to do
+;; anything.
+	.balign 2
+	.weak __crt0_run_preinit_array
+	.weak __crt0_run_init_array
+__crt0_run_preinit_array:
+__crt0_run_init_array:
+	ret_
+
 
 #endif

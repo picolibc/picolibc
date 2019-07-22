@@ -235,7 +235,7 @@ fhandler_pty_master::process_slave_output (char *buf, size_t len, int pktmode_on
 	  /* Check echo pipe first. */
 	  if (::bytes_available (echo_cnt, echo_r) && echo_cnt > 0)
 	    break;
-	  if (!::bytes_available (n, get_io_handle_cyg ()))
+	  if (!::bytes_available (n, get_handle_cyg ()))
 	    goto err;
 	  if (n)
 	    break;
@@ -296,7 +296,7 @@ fhandler_pty_master::process_slave_output (char *buf, size_t len, int pktmode_on
 	      goto err;
 	    }
 	}
-      else if (!ReadFile (get_io_handle_cyg (), outbuf, rlen, &n, NULL))
+      else if (!ReadFile (get_handle_cyg (), outbuf, rlen, &n, NULL))
 	{
 	  termios_printf ("ReadFile failed, %E");
 	  goto err;
@@ -494,7 +494,7 @@ fhandler_pty_slave::open (int flags, mode_t)
   termios_printf ("duplicated to_master_cyg %p->%p from pty_owner",
 		  get_ttyp ()->to_master_cyg (), to_master_cyg_local);
 
-  set_io_handle (from_master_local);
+  set_handle (from_master_local);
   set_output_handle (to_master_local);
   set_output_handle_cyg (to_master_cyg_local);
 
@@ -1347,11 +1347,11 @@ fhandler_pty_master::close ()
   if (!ForceCloseHandle (to_master))
     termios_printf ("error closing to_master %p, %E", to_master);
   from_master = to_master = NULL;
-  if (!ForceCloseHandle (get_io_handle_cyg ()))
-    termios_printf ("error closing io_handle_cyg %p, %E", get_io_handle_cyg ());
+  if (!ForceCloseHandle (get_handle_cyg ()))
+    termios_printf ("error closing io_handle_cyg %p, %E", get_handle_cyg ());
   if (!ForceCloseHandle (to_master_cyg))
     termios_printf ("error closing to_master_cyg %p, %E", to_master_cyg);
-  get_io_handle_cyg () = to_master_cyg = NULL;
+  get_handle_cyg () = to_master_cyg = NULL;
   ForceCloseHandle (echo_r);
   ForceCloseHandle (echo_w);
   echo_r = echo_w = NULL;
@@ -1458,7 +1458,7 @@ fhandler_pty_master::ioctl (unsigned int cmd, void *arg)
     case FIONREAD:
       {
 	DWORD n;
-	if (!::bytes_available (n, get_io_handle_cyg ()))
+	if (!::bytes_available (n, get_handle_cyg ()))
 	  {
 	    set_errno (EINVAL);
 	    return -1;
@@ -1662,7 +1662,7 @@ fhandler_pty_master::pty_master_fwd_thread ()
   termios_printf("Started.");
   for (;;)
     {
-      if (!ReadFile (get_io_handle (), outbuf, sizeof outbuf, &rlen, NULL))
+      if (!ReadFile (get_handle (), outbuf, sizeof outbuf, &rlen, NULL))
 	{
 	  termios_printf ("ReadFile for forwarding failed, %E");
 	  break;
@@ -1715,7 +1715,7 @@ fhandler_pty_master::setup ()
 
   char pipename[sizeof("ptyNNNN-to-master-cyg")];
   __small_sprintf (pipename, "pty%d-to-master", unit);
-  res = fhandler_pipe::create (&sec_none, &get_io_handle (), &to_master,
+  res = fhandler_pipe::create (&sec_none, &get_handle (), &to_master,
 			       fhandler_pty_common::pipesize, pipename, 0);
   if (res)
     {
@@ -1724,7 +1724,7 @@ fhandler_pty_master::setup ()
     }
 
   __small_sprintf (pipename, "pty%d-to-master-cyg", unit);
-  res = fhandler_pipe::create (&sec_none, &get_io_handle_cyg (), &to_master_cyg,
+  res = fhandler_pipe::create (&sec_none, &get_handle_cyg (), &to_master_cyg,
 			       fhandler_pty_common::pipesize, pipename, 0);
   if (res)
     {
@@ -1732,7 +1732,7 @@ fhandler_pty_master::setup ()
       goto err;
     }
 
-  ProtectHandle1 (get_io_handle (), from_pty);
+  ProtectHandle1 (get_handle (), from_pty);
 
   __small_sprintf (pipename, "pty%d-echoloop", unit);
   res = fhandler_pipe::create (&sec_none, &echo_r, &echo_w,
@@ -1807,14 +1807,14 @@ fhandler_pty_master::setup ()
   dev ().parse (DEV_PTYM_MAJOR, unit);
 
   termios_printf ("this %p, pty%d opened - from_pty <%p,%p>, to_pty %p",
-	this, unit, get_io_handle (), get_io_handle_cyg (),
+	this, unit, get_handle (), get_handle_cyg (),
 	get_output_handle ());
   return true;
 
 err:
   __seterrno ();
-  close_maybe (get_io_handle ());
-  close_maybe (get_io_handle_cyg ());
+  close_maybe (get_handle ());
+  close_maybe (get_handle_cyg ());
   close_maybe (get_output_handle ());
   close_maybe (input_available_event);
   close_maybe (output_mutex);

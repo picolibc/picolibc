@@ -16,7 +16,7 @@
 #include "cio.h"
 
 static int
-write_chunk (int fd, char *buf, int len)
+write_chunk (int fd, const char *buf, int len)
 {
   __CIOBUF__.length[0] = len;
   __CIOBUF__.length[1] = len >> 8;
@@ -35,10 +35,11 @@ write_chunk (int fd, char *buf, int len)
 #include <stdio.h>
 
 int
-write (int fd, char *buf, int len)
+write (int fd, const char *buf, int len)
 {
   int rv = 0;
   int c;
+  int i = 0;
 #if 0
   if (fd == 2)
     fprintf (stderr, "%.*s", buf, len);
@@ -48,12 +49,12 @@ write (int fd, char *buf, int len)
   while (len > 0)
     {
       int l = (len > CIO_BUF_SIZE) ? CIO_BUF_SIZE : len;
-      c = write_chunk (fd, buf, l);
+      c = write_chunk (fd, buf + i, l);
       if (c < 0)
 	return c;
       rv += l;
       len -= l;
-      buf += l;
+      i += l;
     }
   return rv;
 }

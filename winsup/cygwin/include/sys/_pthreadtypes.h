@@ -1,5 +1,4 @@
-/* machine/types.h
-   Written by Robert Collins <rbtcollins@hotmail.com>
+/* sys/_pthreadtypes.h
 
 This file is part of Cygwin.
 
@@ -9,6 +8,8 @@ details. */
 
 #ifndef _SYS__PTHREADTYPES_H_
 #define	_SYS__PTHREADTYPES_H_
+
+#include <sys/cpuset.h>
 
 #if !defined(__INSIDE_CYGWIN__) || !defined(__cplusplus)
 

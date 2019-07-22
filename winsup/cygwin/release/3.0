@@ -1,0 +1,115 @@
+What's new:
+-----------
+
+- Support for CLOCK_REALTIME_COARSE, CLOCK_MONOTONIC_COARSE,
+  CLOCK_MONOTONIC_RAW, CLOCK_BOOTTIME, CLOCK_REALTIME_ALARM,
+  CLOCK_BOOTTIME_ALARM clocks.
+
+- Support for case sensitive directories.  mkdir(2) automatically
+  creates directories within the Cygwin installation dir as case
+  sensitive now.
+
+  This feature requires Windows 10 1803 or later and WSL installed!
+
+- New file ioctls's FS_IOC_GETFLAGS and FS_IOC_SETFLAGS.  The actual
+  inode flags are Cygwin-specific.  This allows to set or reset
+  DOS attributes, file sparseness, FS level encryption and compression,
+  as well as directory case sensitivity programatically.
+
+- New tools chattr(1) and lsattr(1) to utilize setting and viewing the
+  aforementioned new ioctl's on the command line.
+
+- Support for exFAT.
+
+- Support Linux-specific open(2) flag O_PATH.
+
+- Support Linux-specific linkat(2) flag AT_EMPTY_PATH.
+
+- Support overrun counter for posix timers (via timer_getoverrun() or
+  siginfo_t::si_overrun).
+
+- New APIs: signalfd, timerfd_create, timerfd_gettime, timerfd_settime,
+  timer_getoverrun.
+
+- fork(2) now is able to recover from when an in-use executable/dll is
+  removed or replaced during process runtime.  This feature is disabled by
+  default and limited to exes/dlls on the same NTFS partition as the Cygwin
+  installation.  For more information and how to enable, please refer to
+  https://www.cygwin.com/cygwin-ug-net/highlights.html#ov-hi-process
+
+
+What changed:
+-------------
+
+- clock_nanosleep, pthread_condattr_setclock and timer_create now support
+  all clocks, except CLOCK_PROCESS_CPUTIME_ID and CLOCK_THREAD_CPUTIME_ID.
+
+- clock_setres is a no-op now.
+
+- Use the new POSIX unlink semantics on NTFS starting with Windows 10 1709.
+  Deleting an in-use file now actually removes the file, rather than moving
+  it to the recycler bin.
+
+- Use the new POSIX rename semantics on NTFS starting with Windows 10 1809.
+  Renaming a file to another in-use file now actually removes the other file,
+  rather than moving it to the recycler bin.
+
+- open(..., O_TMPFILE) now moves the file to the trash bin immediately,
+  to free the parent directory.
+
+- Wctype functions updated to Unicode 11.0.
+
+- Remove matherr, and SVID and X/Open math library configurations.
+  Default math library configuration is now IEEE.
+
+- Improve uname(2) for newly built applications.
+
+- Kerberos/MSV1_0 S4U authentication replaces two old methods:
+  Creating a token from scratch and Cygwin LSA authentication package.
+
+- Cygwin PIDs have been decoupled from Windows PID.  Cygwin PIDs are
+  now incrementally dealt in the range from 2 up to 65535, POSIX-like.
+  Native Windows processes not started by Cygwin processes are mapped
+  into the range beyond 65535.
+
+
+Bug Fixes
+---------
+
+- Fix a thread race when initializing CLOCK_MONOTONIC.
+  Addresses: https://cygwin.com/ml/cygwin/2018-11/msg00017.html
+
+- Fix early timeout from pthread_cond_timedwait.
+  Addresses: https://cygwin.com/ml/cygwin/2018-11/msg00171.html
+
+- Fix a bug in recognizing remote FAT/FAT32/exFAT correctly.
+
+- Allow open(2)/stat(2)/linkat(2) of a file via /proc/PID/fd/DESCRIPTOR
+  even if file has been deleted.
+  Addresses: https://cygwin.com/ml/cygwin/2018-12/msg00125.html
+             https://cygwin.com/ml/cygwin/2018-12/msg00028.html
+
+- Fix a bug in select(2) when polling HANDLE-less descriptors.
+
+- Fix WEOF handling in wctype functions.
+  Addresses: https://cygwin.com/ml/cygwin/2018-12/msg00173.html
+
+- Fix thread names in GDB when cygthreads get reused.
+
+- Fix return value of gethostname in a border case.
+
+- Disallow seteuid on disabled or locked out accounts.
+  Addresses: https://cygwin.com/ml/cygwin/2019-01/msg00197.html
+
+- Fix raise to work as required by POSIX.
+  Addresses: https://cygwin.com/ml/cygwin/2019-01/msg00149.html
+
+- Fix exception handling in pthreads.
+  Addresses: https://cygwin.com/ml/cygwin/2019-01/msg00149.html
+
+- Fix O_APPEND handling on files when calling non-Cygwin applications
+  Addresses: https://cygwin.com/ml/cygwin/2019-02/msg00081.html
+
+- Fix case correctness of passwd/group entries fetched via getpwnam
+  or getgrnam.
+  Addresses: https://cygwin.com/ml/cygwin/2019-02/msg00109.html

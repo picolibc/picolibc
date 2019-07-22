@@ -120,6 +120,12 @@ const _device dev_piper_storage =
 const _device dev_pipew_storage =
   {"", {FH_PIPEW}, "", exists_internal};
 
+const _device dev_signalfd_storage =
+  {"", {FH_SIGNALFD}, "", exists_internal};
+
+const _device dev_timerfd_storage =
+  {"", {FH_TIMERFD}, "", exists_internal};
+
 const _device dev_socket_storage =
   {"", {FH_SOCKET}, "", exists_internal};
 

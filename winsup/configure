@@ -682,7 +682,7 @@ CXXFLAGS
 CCC
 CPP'
 ac_subdirs_all='cygwin cygserver doc
-utils lsaauth'
+utils'
 
 # Initialize some variables set by options.
 ac_init_help=
@@ -3452,7 +3452,7 @@ export CXX
 subdirs="$subdirs cygwin cygserver doc"
 
 if test "x$with_cross_bootstrap" != "xyes"; then
-    subdirs="$subdirs utils lsaauth"
+    subdirs="$subdirs utils"
 
 fi
 

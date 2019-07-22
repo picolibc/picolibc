@@ -6,7 +6,7 @@ This software is a copyrighted work licensed under the terms of the
 Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
-#include "hires.h"
+#include "clock.h"
 #include "cygheap_malloc.h"
 #include "pwdgrp.h"
 
@@ -101,12 +101,11 @@ public:
   gid_t real_gid;       /* Ditto */
   user_groups groups;   /* Primary and supp SIDs */
 
-  /* token is needed if set(e)uid should be called. It can be set by a call
-     to `set_impersonation_token()'. */
-  HANDLE external_token;
-  HANDLE internal_token;
-  HANDLE curr_primary_token;
-  HANDLE curr_imp_token;
+  HANDLE external_token;	 /* token from set_impersonation_token call */
+  HANDLE internal_token;	 /* password-less token fetched in seteuid32 */
+  HANDLE curr_primary_token;	 /* Just a copy of external or internal token */
+  HANDLE curr_imp_token;	 /* impersonation token derived from primary
+				    token */
   bool ext_token_is_restricted;  /* external_token is restricted token */
   bool curr_token_is_restricted; /* curr_primary_token is restricted token */
   bool setuid_to_restricted;     /* switch to restricted token by setuid () */
@@ -178,10 +177,6 @@ public:
   {
     if (curr_imp_token != NO_IMPERSONATION)
       CloseHandle (curr_imp_token);
-    if (curr_primary_token != NO_IMPERSONATION
-	&& curr_primary_token != external_token
-	&& curr_primary_token != internal_token)
-      CloseHandle (curr_primary_token);
     if (external_token != NO_IMPERSONATION)
       CloseHandle (external_token);
     if (internal_token != NO_IMPERSONATION)
@@ -557,9 +552,10 @@ struct init_cygheap: public mini_cygheap
   _cmalloc_entry *chain;
   unsigned bucket_val[NBUCKETS];
   char *buckets[NBUCKETS];
-  WCHAR installation_root[PATH_MAX];
-  WCHAR installation_dir[PATH_MAX];
-  size_t installation_dir_len;
+  UNICODE_STRING installation_root;
+  WCHAR installation_root_buf[PATH_MAX];
+  UNICODE_STRING installation_dir;
+  WCHAR installation_dir_buf[PATH_MAX];
   UNICODE_STRING installation_key;
   WCHAR installation_key_buf[18];
   cygheap_root root;

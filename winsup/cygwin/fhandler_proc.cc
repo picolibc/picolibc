@@ -134,14 +134,22 @@ fhandler_proc::get_proc_fhandler (const char *path)
   if (entry)
     return entry->fhandler;
 
-  int pid = atoi (path);
+  char *e;
+  pid_t pid = strtoul (path, &e, 10);
+  if (*e != '/' && *e != '\0')
+    return FH_NADA;
   pinfo p (pid);
   /* If p->pid != pid, then pid is actually the Windows PID for an execed
      Cygwin process, and the pinfo entry is the additional entry created
      at exec time.  We don't want to enable the user to access a process
      entry by using the Win32 PID, though. */
   if (p && p->pid == pid)
-    return FH_PROCESS;
+    {
+      /* Check for entry in fd subdir */
+      if (!strncmp (++e, "fd/", 3) && e[3] != '\0')
+	return FH_PROCESSFD;
+      return FH_PROCESS;
+    }
 
   bool has_subdir = false;
   while (*path)
@@ -160,8 +168,6 @@ fhandler_proc::get_proc_fhandler (const char *path)
     return FH_PROC;
 }
 
-/* Returns 0 if path doesn't exist, >0 if path is a directory,
-   -1 if path is a file, -2 if it's a symlink.  */
 virtual_ftype_t
 fhandler_proc::exists ()
 {
@@ -397,6 +403,8 @@ fhandler_proc::fill_filebuf ()
   return false;
 }
 
+extern "C" int uname_x (struct utsname *);
+
 static off_t
 format_proc_version (void *, char *&destbuf)
 {
@@ -405,7 +413,7 @@ format_proc_version (void *, char *&destbuf)
   char *bufptr = buf;
   struct utsname uts_name;
 
-  uname (&uts_name);
+  uname_x (&uts_name);
   bufptr += __small_sprintf (bufptr, "%s version %s (%s@%s) (%s) %s\n",
 			  uts_name.sysname, uts_name.release, USERNAME, HOSTNAME,
 			  GCC_VERSION, uts_name.version);
@@ -696,7 +704,8 @@ format_proc_cpuinfo (void *, char *&destbuf)
 
       /* Vendor identification. */
       bool is_amd = false, is_intel = false;
-      if (!strcmp ((char*)vendor_id, "AuthenticAMD"))
+      if (!strcmp ((char*)vendor_id, "AuthenticAMD")
+          || !strcmp((char*)vendor_id, "HygonGenuine"))
 	is_amd = true;
       else if (!strcmp ((char*)vendor_id, "GenuineIntel"))
 	is_intel = true;

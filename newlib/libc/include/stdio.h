@@ -180,7 +180,7 @@ typedef _fpos64_t fpos64_t;
 #if __POSIX_VISIBLE
 char *	ctermid (char *);
 #endif
-#if __XSI_VISIBLE && __XSI_VISIBLE < 600
+#if __GNU_VISIBLE || (__XSI_VISIBLE && __XSI_VISIBLE < 600)
 char *	cuserid (char *);
 #endif
 FILE *	tmpfile (void);

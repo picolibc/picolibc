@@ -19,7 +19,7 @@ bisearch_cat(wint_t ucs, const struct _category *table, int max)
   int mid;
 
   if (ucs < table[0].first || ucs > table[max].first + table[max].delta)
-    return 0;
+    return -1;
   while (max >= min)
     {
       mid = (min + max) / 2;

@@ -63,19 +63,23 @@ fillout_pinfo (pid_t pid, int winpid)
       _pinfo *p = pids[i];
       i++;
 
+      /* Native Windows process not started from Cygwin have no procinfo
+	 attached.  They don't have a real Cygwin PID either.  We fake a
+	 Cygwin PID beyond MAX_PID. */
       if (!p)
 	{
-	  if (!nextpid && thispid != (DWORD) pid)
+	  if (!nextpid && thispid + MAX_PID != (DWORD) pid)
 	    continue;
-	  ep.pid = cygwin_pid (thispid);
+	  ep.pid = thispid + MAX_PID;
 	  ep.dwProcessId = thispid;
 	  ep.process_state = PID_IN_USE;
 	  ep.ctty = -1;
 	  break;
 	}
-      else if (nextpid || p->pid == pid || (winpid && thispid == (DWORD) pid))
+      else if (nextpid || p->pid == pid)
 	{
-	  ep.ctty = (p->ctty < 0 || iscons_dev (p->ctty)) ? p->ctty : device::minor (p->ctty);
+	  ep.ctty = (p->ctty < 0 || iscons_dev (p->ctty))
+		    ? p->ctty : device::minor (p->ctty);
 	  ep.pid = p->pid;
 	  ep.ppid = p->ppid;
 	  ep.dwProcessId = p->dwProcessId;
@@ -318,6 +322,19 @@ cygwin_internal (cygwin_getinfo_types t, ...)
 	  res = p ? p->dwProcessId : 0;
 	}
 	break;
+
+      case CW_WINPID_TO_CYGWIN_PID:
+	{
+	  DWORD winpid = va_arg (arg, DWORD);
+	  pid_t pid = cygwin_pid (winpid);
+	  res = pid ?: winpid + MAX_PID;
+	}
+	break;
+
+      case CW_MAX_CYGWIN_PID:
+	res = MAX_PID;
+	break;
+
       case CW_EXTRACT_DOMAIN_AND_USER:
 	{
 	  WCHAR nt_domain[MAX_DOMAIN_NAME_LEN + 1];

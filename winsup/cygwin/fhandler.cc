@@ -137,11 +137,20 @@ fhandler_base::set_name (path_conv &in_pc)
 
 char *fhandler_base::get_proc_fd_name (char *buf)
 {
-  /* If the file had been opened with O_TMPFILE | O_EXCL, don't
-     expose the filename.  linkat is supposed to return ENOENT in this
-     case.  See man 2 open on Linux. */
-  if ((get_flags () & (O_TMPFILE | O_EXCL)) == (O_TMPFILE | O_EXCL))
-    return strcpy (buf, "");
+  IO_STATUS_BLOCK io;
+  FILE_STANDARD_INFORMATION fsi;
+
+  /* If the file had been opened with O_TMPFILE, don't expose the filename. */
+  if ((get_flags () & O_TMPFILE)
+      || (get_device () == FH_FS
+	  && NT_SUCCESS (NtQueryInformationFile (get_handle (), &io,
+						 &fsi, sizeof fsi,
+						 FileStandardInformation))
+	  && fsi.DeletePending))
+    {
+      stpcpy (stpcpy (buf, get_name ()), " (deleted)");
+      return buf;
+    }
   if (get_name ())
     return strcpy (buf, get_name ());
   if (dev ().name ())
@@ -452,7 +461,7 @@ fhandler_base::open_with_arch (int flags, mode_t mode)
     }
   else if (archetype)
     {
-      if (!archetype->get_io_handle ())
+      if (!archetype->get_handle ())
 	{
 	  copyto (archetype);
 	  archetype_usecount (1);
@@ -513,7 +522,7 @@ fhandler_base::open_null (int flags)
       __seterrno_from_nt_status (status);
       goto done;
     }
-  set_io_handle (fh);
+  set_handle (fh);
   set_flags (flags, pc.binmode ());
   res = 1;
   set_open_status ();
@@ -538,9 +547,24 @@ fhandler_base::open (int flags, mode_t mode)
   PFILE_FULL_EA_INFORMATION p = NULL;
   ULONG plen = 0;
 
-  syscall_printf ("(%S, %y)", pc.get_nt_native_path (), flags);
+  syscall_printf ("(%S, %y)%s", pc.get_nt_native_path (), flags,
+				get_handle () ? " by handle" : "");
 
-  pc.get_object_attr (attr, *sec_none_cloexec (flags));
+  if (flags & O_PATH)
+    query_open (query_read_attributes);
+
+  /* Allow to reopen from handle.  This is utilized by
+     open ("/proc/PID/fd/DESCRIPTOR", ...); */
+  if (get_handle ())
+    {
+      pc.init_reopen_attr (attr, get_handle ());
+      if (!(flags & O_CLOEXEC))
+	attr.Attributes |= OBJ_INHERIT;
+      if (pc.has_buggy_reopen ())
+	debug_printf ("Reopen by handle requested but FS doesn't support it");
+    }
+  else
+    pc.get_object_attr (attr, *sec_none_cloexec (flags));
 
   options = FILE_OPEN_FOR_BACKUP_INTENT;
   switch (query_open ())
@@ -672,6 +696,23 @@ fhandler_base::open (int flags, mode_t mode)
 
   status = NtCreateFile (&fh, access, &attr, &io, NULL, file_attributes, shared,
 			 create_disposition, options, p, plen);
+  /* Pre-W10, we can't reopen a file by handle with delete disposition
+     set, so we have to lie our ass off. */
+  if (get_handle () && status == STATUS_DELETE_PENDING)
+    {
+      BOOL ret = DuplicateHandle (GetCurrentProcess (), get_handle (),
+				  GetCurrentProcess (), &fh,
+				  access, !(flags & O_CLOEXEC), 0);
+      if (!ret)
+	ret = DuplicateHandle (GetCurrentProcess (), get_handle (),
+			       GetCurrentProcess (), &fh,
+			       0, !(flags & O_CLOEXEC),
+			       DUPLICATE_SAME_ACCESS);
+      if (!ret)
+	debug_printf ("DuplicateHandle after STATUS_DELETE_PENDING, %E");
+      else
+	status = STATUS_SUCCESS;
+    }
   if (!NT_SUCCESS (status))
     {
       /* Trying to create a directory should return EISDIR, not ENOENT. */
@@ -734,7 +775,7 @@ fhandler_base::open (int flags, mode_t mode)
 	}
     }
 
-  set_io_handle (fh);
+  set_handle (fh);
   set_flags (flags, pc.binmode ());
 
   res = 1;
@@ -748,6 +789,13 @@ done:
   syscall_printf ("%d = fhandler_base::open(%S, %y)",
 		  res, pc.get_nt_native_path (), flags);
   return res;
+}
+
+fhandler_base *
+fhandler_base::fd_reopen (int, mode_t)
+{
+  /* This is implemented in fhandler_process only. */
+  return NULL;
 }
 
 void
@@ -1250,7 +1298,7 @@ fhandler_base_overlapped::close ()
      /* Cancelling seems to be necessary for cases where a reader is
 	 still executing when a signal handler performs a close.  */
       if (!writer)
-	CancelIo (get_io_handle ());
+	CancelIo (get_handle ());
       destroy_overlapped ();
       res = fhandler_base::close ();
     }
@@ -1334,7 +1382,7 @@ fhandler_base::fstatvfs (struct statvfs *sfs)
 int
 fhandler_base::init (HANDLE f, DWORD a, mode_t bin)
 {
-  set_io_handle (f);
+  set_handle (f);
   access = a;
   a &= GENERIC_READ | GENERIC_WRITE;
   int flags = 0;
@@ -1369,7 +1417,7 @@ fhandler_base::dup (fhandler_base *child, int)
 	}
 
       VerifyHandle (nh);
-      child->set_io_handle (nh);
+      child->set_handle (nh);
     }
   return 0;
 }

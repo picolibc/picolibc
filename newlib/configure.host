@@ -118,6 +118,11 @@ case "${host_cpu}" in
 	machine_dir=aarch64
 	libm_machine_dir=aarch64
 	;;
+  amdgcn*)
+	newlib_cflags="${newlib_cflags} -D__DYNAMIC_REENT__"
+	machine_dir=amdgcn
+	libc_cv_initfinit_array=yes
+	;;
   arc*)
 	machine_dir=arc
 	;;
@@ -441,6 +446,10 @@ case "${host}" in
 	;;
   aarch64*-*-*)
 	newlib_cflags="${newlib_cflags} -D_COMPILING_NEWLIB"
+	;;
+  amdgcn*)
+	sys_dir=amdgcn
+	have_crt0="no"
 	;;
   arm*-*-*)
 	newlib_cflags="${newlib_cflags} -D_COMPILING_NEWLIB"

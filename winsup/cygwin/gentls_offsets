@@ -26,21 +26,21 @@ substr($tls, 0, length($pre)) = '';
 $pre .= "\n//*/";
 $tls =~ s%/\*\s*gentls_offsets.*?/\*\s*gentls_offsets\s*\*/%%ogs;
 foreach ($tls =~ /^.*\n/mg) {
-    /^}|\s*(?:typedef|const)/o and do {
+    /^}|\s*(?:typedef|const)/ and do {
 	$def .= $_ ;
 	next;
     };
     $def .= $_ if $struct;
-    if (!s/;.*$//o) {
-	if (!$struct && /^\s*(?:struct|class)\s*([a-z_0-9]+)/o) {
+    if (!s/;.*$//) {
+	if (!$struct && /^\s*(?:struct|class)\s*([a-z_0-9]+)/) {
 	    $def .= $_;
 	    $struct = $1
 	}
 	next;
     }
-    s/(?:\[[^\]]*\]|struct|class)//o;
-    s/^\s+\S+\s+//o;
-    s/[\*\s()]+//go;
+    s/(?:\[[^\]]*\]|struct|class)//;
+    s/^\s+\S+\s+//;
+    s/[\*\s()]+//g;
     for my $f (split(/,/)) {
 	push(@fields, $f);
     }

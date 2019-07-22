@@ -518,14 +518,14 @@ fhandler_socket_wsock::fixup_after_fork (HANDLE parent)
   if (new_sock == INVALID_SOCKET)
     {
       set_winsock_errno ();
-      set_io_handle ((HANDLE) INVALID_SOCKET);
+      set_handle ((HANDLE) INVALID_SOCKET);
     }
   else
     {
       /* Even though the original socket was not inheritable, the duplicated
 	 socket is potentially inheritable again. */
       SetHandleInformation ((HANDLE) new_sock, HANDLE_FLAG_INHERIT, 0);
-      set_io_handle ((HANDLE) new_sock);
+      set_handle ((HANDLE) new_sock);
       debug_printf ("WSASocket succeeded (%p)", new_sock);
     }
 }
@@ -571,13 +571,13 @@ fhandler_socket_wsock::dup (fhandler_base *child, int flags)
 
   cygheap->user.deimpersonate ();
   fhs->init_fixup_before ();
-  fhs->set_io_handle (get_io_handle ());
+  fhs->set_handle (get_handle ());
   int ret = fhs->fixup_before_fork_exec (GetCurrentProcessId ());
   cygheap->user.reimpersonate ();
   if (!ret)
     {
       fhs->fixup_after_fork (GetCurrentProcess ());
-      if (fhs->get_io_handle() != (HANDLE) INVALID_SOCKET)
+      if (fhs->get_handle() != (HANDLE) INVALID_SOCKET)
 	return 0;
     }
   cygheap->fdtab.dec_need_fixup_before ();
@@ -645,7 +645,7 @@ fhandler_socket_wsock::set_socket_handle (SOCKET sock, int af, int type,
             }
         }
     }
-  set_io_handle ((HANDLE) sock);
+  set_handle ((HANDLE) sock);
   set_addr_family (af);
   set_socket_type (type);
   if (!init_events ())
@@ -1350,6 +1350,13 @@ fhandler_socket_wsock::send_internal (struct _WSAMSG *wsamsg, int flags)
   bool use_sendmsg = false;
   DWORD wait_flags = flags & MSG_DONTWAIT;
   bool nosignal = !!(flags & MSG_NOSIGNAL);
+
+  /* MSG_EOR not supported by any protocol */
+  if (flags & MSG_EOR)
+    {
+      set_errno (EOPNOTSUPP);
+      return SOCKET_ERROR;
+    }
 
   flags &= (MSG_OOB | MSG_DONTROUTE);
   if (wsamsg->Control.len > 0)

@@ -33,7 +33,7 @@ public:
 /* Data accessible to all tasks */
 
 
-#define CURR_SHARED_MAGIC 0x9b1c0f25U
+#define CURR_SHARED_MAGIC 0x9f33cc5dU
 
 #define USER_VERSION   1
 
@@ -50,6 +50,8 @@ class shared_info
   DWORD obcaseinsensitive;
   mtinfo mt;
   loadavginfo loadavg;
+  LONG pid_src;
+  LONG forkable_hardlink_support;
 
   void initialize ();
   void init_obcaseinsensitive ();

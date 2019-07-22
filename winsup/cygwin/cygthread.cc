@@ -87,6 +87,7 @@ cygthread::stub (VOID *arg)
 #endif
       else
 	{
+	  SetThreadName (info->id, info->__name);
 	  info->callfunc (false);
 
 	  HANDLE notify = info->notify_detached;
@@ -128,6 +129,7 @@ cygthread::simplestub (VOID *arg)
   _my_tls._ctinfo = info;
   info->stack_ptr = &arg;
   HANDLE notify = info->notify_detached;
+  SetThreadName (info->id, info->__name);
   info->callfunc (true);
   if (notify)
      SetEvent (notify);
@@ -213,8 +215,6 @@ cygthread::create ()
 			    this, 0, &id);
       if (!htobe)
 	api_fatal ("CreateThread failed for %s - %p<%y>, %E", __name, h, id);
-      else
-	SetThreadName (GetThreadId (htobe), __name);
       thread_printf ("created name '%s', thread %p, id %y", __name, h, id);
 #ifdef DEBUGGING
       terminated = false;

@@ -15,7 +15,9 @@
 extern GUID __cygwin_socket_guid;
 #define CYGWIN_SOCKET_GUID (&__cygwin_socket_guid)
 
-/* custom status code: */
+/* Custom Cygwin-only status codes. */
+#define STATUS_THREAD_SIGNALED	((NTSTATUS)0xe0000001)
+#define STATUS_THREAD_CANCELED	((NTSTATUS)0xe0000002)
 #define STATUS_ILLEGAL_DLL_PSEUDO_RELOCATION ((NTSTATUS) 0xe0000269)
 
 /* Simplify checking for a transactional error code. */
@@ -173,60 +175,85 @@ extern GUID __cygwin_socket_guid;
 
 typedef enum _FILE_INFORMATION_CLASS
 {
-  FileDirectoryInformation = 1,
-  FileFullDirectoryInformation, // 2
-  FileBothDirectoryInformation, // 3
-  FileBasicInformation, // 4 wdm
-  FileStandardInformation, // 5 wdm
-  FileInternalInformation, // 6
-  FileEaInformation, // 7
-  FileAccessInformation, // 8
-  FileNameInformation, // 9
-  FileRenameInformation, // 10
-  FileLinkInformation, // 11
-  FileNamesInformation, // 12
-  FileDispositionInformation, // 13
-  FilePositionInformation, // 14 wdm
-  FileFullEaInformation, // 15
-  FileModeInformation, // 16
-  FileAlignmentInformation, // 17
-  FileAllInformation, // 18
-  FileAllocationInformation, // 19
-  FileEndOfFileInformation, // 20 wdm
-  FileAlternateNameInformation, // 21
-  FileStreamInformation, // 22
-  FilePipeInformation, // 23
-  FilePipeLocalInformation, // 24
-  FilePipeRemoteInformation, // 25
-  FileMailslotQueryInformation, // 26
-  FileMailslotSetInformation, // 27
-  FileCompressionInformation, // 28
-  FileObjectIdInformation, // 29
-  FileCompletionInformation, // 30
-  FileMoveClusterInformation, // 31
-  FileQuotaInformation, // 32
-  FileReparsePointInformation, // 33
-  FileNetworkOpenInformation, // 34
-  FileAttributeTagInformation, // 35
-  FileTrackingInformation, // 36
-  FileIdBothDirectoryInformation, // 37
-  FileIdFullDirectoryInformation, // 38
-  FileValidDataLengthInformation, // 39
-  FileShortNameInformation, // 40
+  FileDirectoryInformation = 1,			//  1
+  FileFullDirectoryInformation,			//  2
+  FileBothDirectoryInformation,			//  3
+  FileBasicInformation,				//  4
+  FileStandardInformation,			//  5
+  FileInternalInformation,			//  6
+  FileEaInformation,				//  7
+  FileAccessInformation,			//  8
+  FileNameInformation,				//  9
+  FileRenameInformation,			// 10
+  FileLinkInformation,				// 11
+  FileNamesInformation,				// 12
+  FileDispositionInformation,			// 13
+  FilePositionInformation,			// 14
+  FileFullEaInformation,			// 15
+  FileModeInformation,				// 16
+  FileAlignmentInformation,			// 17
+  FileAllInformation,				// 18
+  FileAllocationInformation,			// 19
+  FileEndOfFileInformation,			// 20
+  FileAlternateNameInformation,			// 21
+  FileStreamInformation,			// 22
+  FilePipeInformation,				// 23
+  FilePipeLocalInformation,			// 24
+  FilePipeRemoteInformation,			// 25
+  FileMailslotQueryInformation,			// 26
+  FileMailslotSetInformation,			// 27
+  FileCompressionInformation,			// 28
+  FileObjectIdInformation,			// 29
+  FileCompletionInformation,			// 30
+  FileMoveClusterInformation,			// 31
+  FileQuotaInformation,				// 32
+  FileReparsePointInformation,			// 33
+  FileNetworkOpenInformation,			// 34
+  FileAttributeTagInformation,			// 35
+  FileTrackingInformation,			// 36
+  FileIdBothDirectoryInformation,		// 37
+  FileIdFullDirectoryInformation,		// 38
+  FileValidDataLengthInformation,		// 39
+  FileShortNameInformation,			// 40
+  FileIoCompletionNotificationInformation,	// 41
+  FileIoStatusBlockRangeInformation,		// 42
+  FileIoPriorityHintInformation,		// 43
+  FileSfioReserveInformation,			// 44
+  FileSfioVolumeInformation,			// 45
+  FileHardLinkInformation,			// 46
+  FileProcessIdsUsingFileInformation,		// 47
+  FileNormalizedNameInformation,		// 48
+  FileNetworkPhysicalNameInformation,		// 49
+  FileIdGlobalTxDirectoryInformation,		// 50
+  FileIsRemoteDeviceInformation,		// 51
+  FileUnusedInformation,			// 52
+  FileNumaNodeInformation,			// 53
+  FileStandardLinkInformation,			// 54
+  FileRemoteProtocolInformation,		// 55
+  FileRenameInformationBypassAccessCheck,	// 56
+  FileLinkInformationBypassAccessCheck,		// 57
+  FileVolumeNameInformation,			// 58
+  FileIdInformation,				// 59
+  FileIdExtdDirectoryInformation,		// 60
+  FileReplaceCompletionInformation,		// 61
+  FileHardLinkFullIdInformation,		// 62
+  FileIdExtdBothDirectoryInformation,		// 63
+  FileDispositionInformationEx,			// 64
+  FileRenameInformationEx,			// 65
+  FileRenameInformationExBypassAccessCheck,	// 66
+  FileDesiredStorageClassInformation,		// 67
+  FileStatInformation,				// 68
+  FileMemoryPartitionInformation,		// 69
+  FileStatLxInformation,			// 70
+  FileCaseSensitiveInformation,			// 71
+  FileLinkInformationEx,			// 72
+  FileLinkInformationExBypassAccessCheck,	// 73
+  FileStorageReserveIdInformation,		// 74
+  FileCaseSensitiveInformationForceAccessCheck,	// 75
   FileMaximumInformation
 } FILE_INFORMATION_CLASS, *PFILE_INFORMATION_CLASS;
 
-/* Checked on 64 bit. */
-typedef struct _FILE_NAMES_INFORMATION
-{
-  ULONG  NextEntryOffset;
-  ULONG  FileIndex;
-  ULONG  FileNameLength;
-  WCHAR  FileName[1];
-} FILE_NAMES_INFORMATION, *PFILE_NAMES_INFORMATION;
-
-/* Checked on 64 bit. */
-typedef struct _FILE_DIRECTORY_INFORMATION
+typedef struct _FILE_DIRECTORY_INFORMATION	//  1
 {
   ULONG  NextEntryOffset;
   ULONG  FileIndex;
@@ -241,8 +268,7 @@ typedef struct _FILE_DIRECTORY_INFORMATION
   WCHAR  FileName[1];
 } FILE_DIRECTORY_INFORMATION, *PFILE_DIRECTORY_INFORMATION;
 
-/* Checked on 64 bit. */
-typedef struct _FILE_BOTH_DIR_INFORMATION
+typedef struct _FILE_BOTH_DIR_INFORMATION	//  3
 {
   ULONG  NextEntryOffset;
   ULONG  FileIndex;
@@ -260,8 +286,156 @@ typedef struct _FILE_BOTH_DIR_INFORMATION
   WCHAR  FileName[1];
 } FILE_BOTH_DIR_INFORMATION, *PFILE_BOTH_DIR_INFORMATION;
 
-/* Checked on 64 bit. */
-typedef struct _FILE_ID_BOTH_DIR_INFORMATION
+typedef struct _FILE_BASIC_INFORMATION		//  4
+{
+  LARGE_INTEGER CreationTime;
+  LARGE_INTEGER LastAccessTime;
+  LARGE_INTEGER LastWriteTime;
+  LARGE_INTEGER ChangeTime;
+  ULONG FileAttributes;
+} FILE_BASIC_INFORMATION, *PFILE_BASIC_INFORMATION;
+
+typedef struct _FILE_STANDARD_INFORMATION	//  5
+{
+  LARGE_INTEGER AllocationSize;
+  LARGE_INTEGER EndOfFile;
+  ULONG NumberOfLinks;
+  BOOLEAN DeletePending;
+  BOOLEAN Directory;
+} FILE_STANDARD_INFORMATION, *PFILE_STANDARD_INFORMATION;
+
+typedef struct _FILE_INTERNAL_INFORMATION	//  6
+{
+  LARGE_INTEGER IndexNumber;
+} FILE_INTERNAL_INFORMATION, *PFILE_INTERNAL_INFORMATION;
+
+typedef struct _FILE_EA_INFORMATION		//  7
+{
+  ULONG EaSize;
+} FILE_EA_INFORMATION, *PFILE_EA_INFORMATION;
+
+typedef struct _FILE_ACCESS_INFORMATION		//  8
+{
+  ACCESS_MASK AccessFlags;
+} FILE_ACCESS_INFORMATION, *PFILE_ACCESS_INFORMATION;
+
+typedef struct _FILE_NAME_INFORMATION		//  9, 21, 40
+{
+  ULONG FileNameLength;
+  WCHAR FileName[1];
+} FILE_NAME_INFORMATION, *PFILE_NAME_INFORMATION;
+
+typedef struct _FILE_RENAME_INFORMATION		// 10, 56, 65, 66
+{
+  union
+  {
+    BOOLEAN ReplaceIfExists;	// FileRenameInformation
+    ULONG Flags;		// FileRenameInformationEx
+  };
+  HANDLE RootDirectory;
+  ULONG FileNameLength;
+  WCHAR FileName[1];
+} FILE_RENAME_INFORMATION, *PFILE_RENAME_INFORMATION;
+
+typedef struct _FILE_LINK_INFORMATION		// 11, 57, 72, 73
+{
+  union
+  {
+    BOOLEAN ReplaceIfExists;	// FileLinkInformation
+    ULONG Flags;		// FileLinkInformationEx
+  };
+  HANDLE RootDirectory;
+  ULONG FileNameLength;
+  WCHAR FileName[1];
+} FILE_LINK_INFORMATION, *PFILE_LINK_INFORMATION;
+
+typedef struct _FILE_NAMES_INFORMATION		// 12
+{
+  ULONG  NextEntryOffset;
+  ULONG  FileIndex;
+  ULONG  FileNameLength;
+  WCHAR  FileName[1];
+} FILE_NAMES_INFORMATION, *PFILE_NAMES_INFORMATION;
+
+typedef struct _FILE_DISPOSITION_INFORMATION	// 13
+{
+  BOOLEAN DeleteFile;
+} FILE_DISPOSITION_INFORMATION, *PFILE_DISPOSITION_INFORMATION;
+
+typedef struct _FILE_POSITION_INFORMATION	// 14
+{
+  LARGE_INTEGER CurrentByteOffset;
+} FILE_POSITION_INFORMATION, *PFILE_POSITION_INFORMATION;
+
+typedef struct _FILE_MODE_INFORMATION		// 16
+{
+  ULONG Mode;
+} FILE_MODE_INFORMATION, *PFILE_MODE_INFORMATION;
+
+typedef struct _FILE_ALIGNMENT_INFORMATION	// 17
+{
+  ULONG AlignmentRequirement;
+} FILE_ALIGNMENT_INFORMATION;
+
+typedef struct _FILE_ALL_INFORMATION {		// 18
+  FILE_BASIC_INFORMATION     BasicInformation;
+  FILE_STANDARD_INFORMATION  StandardInformation;
+  FILE_INTERNAL_INFORMATION  InternalInformation;
+  FILE_EA_INFORMATION        EaInformation;
+  FILE_ACCESS_INFORMATION    AccessInformation;
+  FILE_POSITION_INFORMATION  PositionInformation;
+  FILE_MODE_INFORMATION      ModeInformation;
+  FILE_ALIGNMENT_INFORMATION AlignmentInformation;
+  FILE_NAME_INFORMATION      NameInformation;
+} FILE_ALL_INFORMATION, *PFILE_ALL_INFORMATION;
+
+typedef struct _FILE_END_OF_FILE_INFORMATION	// 20
+{
+  LARGE_INTEGER EndOfFile;
+} FILE_END_OF_FILE_INFORMATION, *PFILE_END_OF_FILE_INFORMATION;
+
+typedef struct _FILE_PIPE_INFORMATION		// 23
+{
+  ULONG ReadMode;
+  ULONG CompletionMode;
+} FILE_PIPE_INFORMATION, *PFILE_PIPE_INFORMATION;
+
+typedef struct _FILE_PIPE_LOCAL_INFORMATION	// 24
+{
+  ULONG NamedPipeType;
+  ULONG NamedPipeConfiguration;
+  ULONG MaximumInstances;
+  ULONG CurrentInstances;
+  ULONG InboundQuota;
+  ULONG ReadDataAvailable;
+  ULONG OutboundQuota;
+  ULONG WriteQuotaAvailable;
+  ULONG NamedPipeState;
+  ULONG NamedPipeEnd;
+} FILE_PIPE_LOCAL_INFORMATION, *PFILE_PIPE_LOCAL_INFORMATION;
+
+typedef struct _FILE_COMPRESSION_INFORMATION	// 28
+{
+  LARGE_INTEGER CompressedFileSize;
+  USHORT CompressionFormat;
+  UCHAR	CompressionUnitShift;
+  UCHAR ChunkShift;
+  UCHAR ClusterShift;
+  UCHAR Reserved[3];
+} FILE_COMPRESSION_INFORMATION, *PFILE_COMPRESSION_INFORMATION;
+
+typedef struct _FILE_NETWORK_OPEN_INFORMATION	// 34
+{
+  LARGE_INTEGER CreationTime;
+  LARGE_INTEGER LastAccessTime;
+  LARGE_INTEGER LastWriteTime;
+  LARGE_INTEGER ChangeTime;
+  LARGE_INTEGER AllocationSize;
+  LARGE_INTEGER EndOfFile;
+  ULONG FileAttributes;
+} FILE_NETWORK_OPEN_INFORMATION, *PFILE_NETWORK_OPEN_INFORMATION;
+
+typedef struct _FILE_ID_BOTH_DIR_INFORMATION	// 37
 {
   ULONG  NextEntryOffset;
   ULONG  FileIndex;
@@ -280,6 +454,127 @@ typedef struct _FILE_ID_BOTH_DIR_INFORMATION
   WCHAR  FileName[1];
 } FILE_ID_BOTH_DIR_INFORMATION, *PFILE_ID_BOTH_DIR_INFORMATION;
 
+typedef struct _FILE_PROCESS_IDS_USING_FILE_INFORMATION	// 47
+{
+  ULONG NumberOfProcessIdsInList;
+  ULONG_PTR ProcessIdList[1];
+} FILE_PROCESS_IDS_USING_FILE_INFORMATION,
+  *PFILE_PROCESS_IDS_USING_FILE_INFORMATION;
+
+typedef struct _FILE_DISPOSITION_INFORMATION_EX	// 64
+{
+  ULONG Flags;
+} FILE_DISPOSITION_INFORMATION_EX, *PFILE_DISPOSITION_INFORMATION_EX;
+
+typedef struct _FILE_STAT_INFORMATION		// 68
+{
+  LARGE_INTEGER FileId;
+  LARGE_INTEGER CreationTime;
+  LARGE_INTEGER LastAccessTime;
+  LARGE_INTEGER LastWriteTime;
+  LARGE_INTEGER ChangeTime;
+  LARGE_INTEGER AllocationSize;
+  LARGE_INTEGER EndOfFile;
+  ULONG FileAttributes;
+  ULONG ReparseTag;
+  ULONG NumberOfLinks;
+  ACCESS_MASK EffectiveAccess;
+} FILE_STAT_INFORMATION, *PFILE_STAT_INFORMATION;
+
+typedef struct _FILE_CASE_SENSITIVE_INFORMATION	// 71
+{
+  ULONG Flags;
+} FILE_CASE_SENSITIVE_INFORMATION, *PFILE_CASE_SENSITIVE_INFORMATION;
+
+enum {
+  FILE_LINK_REPLACE_IF_EXISTS				= 0x01,
+  FILE_LINK_POSIX_SEMANTICS				= 0x02,
+  FILE_LINK_SUPPRESS_STORAGE_RESERVE_INHERITANCE	= 0x08,
+  FILE_LINK_NO_INCREASE_AVAILABLE_SPACE			= 0x10,
+  FILE_LINK_NO_DECREASE_AVAILABLE_SPACE			= 0x20,
+  FILE_LINK_PRESERVE_AVAILABLE_SPACE			= 0x30,
+  FILE_LINK_IGNORE_READONLY_ATTRIBUTE			= 0x40
+};
+
+enum {
+  FILE_DISPOSITION_DO_NOT_DELETE			= 0x00,
+  FILE_DISPOSITION_DELETE				= 0x01,
+  FILE_DISPOSITION_POSIX_SEMANTICS			= 0x02,
+  FILE_DISPOSITION_FORCE_IMAGE_SECTION_CHECK		= 0x04,
+  FILE_DISPOSITION_ON_CLOSE				= 0x08
+};
+
+enum
+{
+  FILE_RENAME_REPLACE_IF_EXISTS				= 0x01,
+  FILE_RENAME_POSIX_SEMANTICS				= 0x02,
+  FILE_RENAME_SUPPRESS_PIN_STATE_INHERITANCE		= 0x04,
+  FILE_RENAME_SUPPRESS_STORAGE_RESERVE_INHERITANCE	= 0x08,
+  FILE_RENAME_NO_INCREASE_AVAILABLE_SPACE		= 0x10,
+  FILE_RENAME_NO_DECREASE_AVAILABLE_SPACE		= 0x20,
+  FILE_RENAME_PRESERVE_AVAILABLE_SPACE			= 0x30,
+  FILE_RENAME_IGNORE_READONLY_ATTRIBUTE			= 0x40
+};
+
+enum
+{
+  FILE_CS_FLAG_CASE_SENSITIVE_DIR			= 0x01
+};
+
+enum
+{
+  FILE_PIPE_QUEUE_OPERATION = 0,
+  FILE_PIPE_COMPLETE_OPERATION = 1
+};
+
+enum
+{
+  FILE_PIPE_BYTE_STREAM_MODE = 0,
+  FILE_PIPE_MESSAGE_MODE = 1
+};
+
+enum
+{
+  FILE_PIPE_DISCONNECTED_STATE = 1,
+  FILE_PIPE_LISTENING_STATE = 2,
+  FILE_PIPE_CONNECTED_STATE = 3,
+  FILE_PIPE_CLOSING_STATE = 4
+};
+
+enum
+{
+  FILE_PIPE_INBOUND = 0,
+  FILE_PIPE_OUTBOUND = 1,
+  FILE_PIPE_FULL_DUPLEX = 2
+};
+
+enum
+{
+  FILE_PIPE_CLIENT_END = 0,
+  FILE_PIPE_SERVER_END = 1
+};
+
+enum
+{
+  FILE_PIPE_BYTE_STREAM_TYPE = 0,
+  FILE_PIPE_MESSAGE_TYPE = 1
+};
+
+typedef struct _FILE_PIPE_PEEK_BUFFER {
+  ULONG NamedPipeState;
+  ULONG ReadDataAvailable;
+  ULONG NumberOfMessages;
+  ULONG MessageLength;
+  CHAR Data[1];
+} FILE_PIPE_PEEK_BUFFER, *PFILE_PIPE_PEEK_BUFFER;
+
+typedef struct _FILE_PIPE_WAIT_FOR_BUFFER {
+  LARGE_INTEGER Timeout;
+  ULONG NameLength;
+  BOOLEAN TimeoutSpecified;
+  WCHAR Name[1];
+} FILE_PIPE_WAIT_FOR_BUFFER, *PFILE_PIPE_WAIT_FOR_BUFFER;
+
 typedef enum _SYSTEM_INFORMATION_CLASS
 {
   SystemBasicInformation = 0,
@@ -289,10 +584,10 @@ typedef enum _SYSTEM_INFORMATION_CLASS
   SystemProcessorPerformanceInformation = 8,
   SystemHandleInformation = 16,
   SystemPagefileInformation = 18,
+  SystemProcessIdInformation = 0x58,
   /* There are a lot more of these... */
 } SYSTEM_INFORMATION_CLASS;
 
-/* Checked on 64 bit. */
 typedef struct _SYSTEM_BASIC_INFORMATION
 {
   ULONG Unknown;
@@ -308,7 +603,6 @@ typedef struct _SYSTEM_BASIC_INFORMATION
   UCHAR NumberProcessors;
 } SYSTEM_BASIC_INFORMATION, *PSYSTEM_BASIC_INFORMATION;
 
-/* Checked on 64 bit. */
 typedef struct _SYSTEM_PAGEFILE_INFORMATION
 {
   ULONG NextEntryOffset;
@@ -318,7 +612,6 @@ typedef struct _SYSTEM_PAGEFILE_INFORMATION
   UNICODE_STRING FileName;
 } SYSTEM_PAGEFILE_INFORMATION, *PSYSTEM_PAGEFILE_INFORMATION;
 
-/* Checked on 64 bit. */
 typedef struct _SYSTEM_PROCESSOR_PERFORMANCE_INFORMATION
 {
   LARGE_INTEGER IdleTime;
@@ -331,7 +624,6 @@ typedef struct _SYSTEM_PROCESSOR_PERFORMANCE_INFORMATION
 
 typedef LONG KPRIORITY;
 
-/* Checked on 64 bit. */
 typedef struct _VM_COUNTERS
 {
   SIZE_T PeakVirtualSize;
@@ -347,7 +639,6 @@ typedef struct _VM_COUNTERS
   SIZE_T PeakPagefileUsage;
 } VM_COUNTERS, *PVM_COUNTERS;
 
-/* Checked on 64 bit. */
 typedef struct _CLIENT_ID
 {
   HANDLE UniqueProcess;
@@ -398,7 +689,6 @@ typedef enum
   MaximumWaitReason
 } KWAIT_REASON;
 
-/* Checked on 64 bit. */
 typedef struct _SYSTEM_THREADS
 {
   LARGE_INTEGER KernelTime;
@@ -415,7 +705,6 @@ typedef struct _SYSTEM_THREADS
   DWORD Reserved;
 } SYSTEM_THREADS, *PSYSTEM_THREADS;
 
-/* Checked on 64 bit. */
 typedef struct _SYSTEM_PROCESS_INFORMATION
 {
   ULONG NextEntryOffset;
@@ -437,17 +726,6 @@ typedef struct _SYSTEM_PROCESS_INFORMATION
   SYSTEM_THREADS Threads[1];
 } SYSTEM_PROCESS_INFORMATION, *PSYSTEM_PROCESS_INFORMATION;
 
-/* Checked on 64 bit. */
-typedef struct _IO_STATUS_BLOCK
-{
-  union {
-    NTSTATUS Status;
-    PVOID Pointer;
-  };
-  ULONG_PTR Information;
-} IO_STATUS_BLOCK, *PIO_STATUS_BLOCK;
-
-/* Checked on 64 bit. */
 typedef struct _SYSTEM_PERFORMANCE_INFORMATION
 {
   LARGE_INTEGER IdleTime;
@@ -525,7 +803,6 @@ typedef struct _SYSTEM_PERFORMANCE_INFORMATION
   ULONG SystemCalls;
 } SYSTEM_PERFORMANCE_INFORMATION, *PSYSTEM_PERFORMANCE_INFORMATION;
 
-/* Checked on 64 bit. */
 typedef struct _SYSTEM_TIMEOFDAY_INFORMATION
 {
   LARGE_INTEGER BootTime;
@@ -534,6 +811,12 @@ typedef struct _SYSTEM_TIMEOFDAY_INFORMATION
   ULONG CurrentTimeZoneId;
   BYTE Reserved1[20];		/* Per MSDN.  Always 0. */
 } SYSTEM_TIMEOFDAY_INFORMATION, *PSYSTEM_TIMEOFDAY_INFORMATION;
+
+typedef struct _SYSTEM_PROCESS_ID_INFORMATION
+{
+  PVOID ProcessId;
+  UNICODE_STRING ImageName;
+} SYSTEM_PROCESS_ID_INFORMATION, *PSYSTEM_PROCESS_ID_INFORMATION;
 
 typedef enum _PROCESSINFOCLASS
 {
@@ -547,7 +830,6 @@ typedef enum _PROCESSINFOCLASS
   ProcessDebugFlags = 31
 } PROCESSINFOCLASS;
 
-/* Checked on 64 bit. */
 typedef struct _DEBUG_BUFFER
 {
   HANDLE SectionHandle;
@@ -568,7 +850,6 @@ typedef struct _DEBUG_BUFFER
   PVOID Reserved[8];
 } DEBUG_BUFFER, *PDEBUG_BUFFER;
 
-/* Checked on 64 bit. */
 typedef struct _DEBUG_HEAP_INFORMATION
 {
   ULONG_PTR Base;
@@ -584,14 +865,12 @@ typedef struct _DEBUG_HEAP_INFORMATION
   PVOID Blocks;
 } DEBUG_HEAP_INFORMATION, *PDEBUG_HEAP_INFORMATION;
 
-/* Checked on 64 bit. */
 typedef struct _DEBUG_HEAP_ARRAY
 {
   ULONG Count;
   DEBUG_HEAP_INFORMATION Heaps[1];
 } DEBUG_HEAP_ARRAY, *PDEBUG_HEAP_ARRAY;
 
-/* Checked on 64 bit. */
 typedef struct _DEBUG_HEAP_BLOCK
 {
   ULONG_PTR Size;
@@ -600,7 +879,6 @@ typedef struct _DEBUG_HEAP_BLOCK
   ULONG_PTR Address;
 } DEBUG_HEAP_BLOCK, *PDEBUG_HEAP_BLOCK;
 
-/* Checked on 64 bit. */
 typedef struct _DEBUG_MODULE_INFORMATION
 {
   ULONG_PTR Reserved[2];
@@ -614,14 +892,12 @@ typedef struct _DEBUG_MODULE_INFORMATION
   CHAR ImageName[256];
 } DEBUG_MODULE_INFORMATION, *PDEBUG_MODULE_INFORMATION;
 
-/* Checked on 64 bit. */
 typedef struct _DEBUG_MODULE_ARRAY
 {
   ULONG Count;
   DEBUG_MODULE_INFORMATION Modules[1];
 } DEBUG_MODULE_ARRAY, *PDEBUG_MODULE_ARRAY;
 
-/* Checked on 64 bit. */
 typedef struct _KERNEL_USER_TIMES
 {
   LARGE_INTEGER CreateTime;
@@ -630,7 +906,6 @@ typedef struct _KERNEL_USER_TIMES
   LARGE_INTEGER UserTime;
 } KERNEL_USER_TIMES, *PKERNEL_USER_TIMES;
 
-/* Checked on 64 bit. */
 typedef struct _LDR_DATA_TABLE_ENTRY
 {
   /* Heads up!  The pointers within the LIST_ENTRYs don't point to the
@@ -651,7 +926,6 @@ typedef struct _LDR_DATA_TABLE_ENTRY
      including WOW64. */
 } LDR_DATA_TABLE_ENTRY, *PLDR_DATA_TABLE_ENTRY;
 
-/* Checked on 64 bit. */
 typedef struct _PEB_LDR_DATA
 {
   ULONG Length;
@@ -666,7 +940,6 @@ typedef struct _PEB_LDR_DATA
   PVOID EntryInProgress;
 } PEB_LDR_DATA, *PPEB_LDR_DATA;
 
-/* Checked on 64 bit. */
 typedef struct _RTL_USER_PROCESS_PARAMETERS
 {
   ULONG AllocationSize;
@@ -699,7 +972,6 @@ typedef struct _RTL_USER_PROCESS_PARAMETERS
   UNICODE_STRING RuntimeInfo;
 } RTL_USER_PROCESS_PARAMETERS, *PRTL_USER_PROCESS_PARAMETERS;
 
-/* Checked on 64 bit. */
 typedef struct _PEB
 {
   BYTE Reserved1[2];
@@ -719,7 +991,6 @@ typedef struct _PEB
   /* A lot more follows... */
 } PEB, *PPEB;
 
-/* Checked on 64 bit. */
 typedef struct _GDI_TEB_BATCH
 {
   ULONG Offset;
@@ -727,7 +998,6 @@ typedef struct _GDI_TEB_BATCH
   ULONG Buffer[0x136];
 } GDI_TEB_BATCH, *PGDI_TEB_BATCH;
 
-/* Checked on 64 bit. */
 typedef struct _TEB
 {
   NT_TIB Tib;
@@ -778,7 +1048,6 @@ typedef struct _TEB
   /* A lot more follows... */
 } TEB, *PTEB;
 
-/* Checked on 64 bit. */
 typedef struct _KSYSTEM_TIME
 {
   ULONG LowPart;
@@ -786,17 +1055,16 @@ typedef struct _KSYSTEM_TIME
   LONG High2Time;
 } KSYSTEM_TIME, *PKSYSTEM_TIME;
 
-/* Checked on 64 bit. */
 typedef struct _KUSER_SHARED_DATA
 {
   BYTE Reserved1[0x08];
   KSYSTEM_TIME InterruptTime;
   BYTE Reserved2[0x2c8];
   ULONG DismountCount;
-  /* A lot more follows... */
+  BYTE Reserved3[0xd0];
+  UINT64 InterruptTimeBias;
 } KUSER_SHARED_DATA, *PKUSER_SHARED_DATA;
 
-/* Checked on 64 bit. */
 typedef struct _PROCESS_BASIC_INFORMATION
 {
   NTSTATUS ExitStatus;
@@ -807,7 +1075,6 @@ typedef struct _PROCESS_BASIC_INFORMATION
   ULONG_PTR InheritedFromUniqueProcessId;
 } PROCESS_BASIC_INFORMATION, *PPROCESS_BASIC_INFORMATION;
 
-/* Checked on 64 bit. */
 typedef struct _PROCESS_SESSION_INFORMATION
 {
   ULONG  SessionId;
@@ -821,234 +1088,23 @@ typedef enum _MEMORY_INFORMATION_CLASS
   MemoryBasicVlmInformation
 } MEMORY_INFORMATION_CLASS;
 
-/* Checked on 64 bit. */
 typedef struct _MEMORY_WORKING_SET_LIST
 {
   ULONG NumberOfPages;
   ULONG_PTR WorkingSetList[1];
 } MEMORY_WORKING_SET_LIST, *PMEMORY_WORKING_SET_LIST;
 
-/* Checked on 64 bit. */
 typedef struct _MEMORY_SECTION_NAME
 {
   UNICODE_STRING SectionFileName;
 } MEMORY_SECTION_NAME, *PMEMORY_SECTION_NAME;
 
-/* Checked on 64 bit. */
-typedef struct _FILE_BASIC_INFORMATION
-{
-  LARGE_INTEGER CreationTime;
-  LARGE_INTEGER LastAccessTime;
-  LARGE_INTEGER LastWriteTime;
-  LARGE_INTEGER ChangeTime;
-  ULONG FileAttributes;
-} FILE_BASIC_INFORMATION, *PFILE_BASIC_INFORMATION;
-
-/* Checked on 64 bit. */
-typedef struct _FILE_STANDARD_INFORMATION
-{
-  LARGE_INTEGER AllocationSize;
-  LARGE_INTEGER EndOfFile;
-  ULONG NumberOfLinks;
-  BOOLEAN DeletePending;
-  BOOLEAN Directory;
-} FILE_STANDARD_INFORMATION, *PFILE_STANDARD_INFORMATION;
-
-/* Checked on 64 bit. */
-typedef struct _FILE_NETWORK_OPEN_INFORMATION
-{
-  LARGE_INTEGER CreationTime;
-  LARGE_INTEGER LastAccessTime;
-  LARGE_INTEGER LastWriteTime;
-  LARGE_INTEGER ChangeTime;
-  LARGE_INTEGER AllocationSize;
-  LARGE_INTEGER EndOfFile;
-  ULONG FileAttributes;
-} FILE_NETWORK_OPEN_INFORMATION, *PFILE_NETWORK_OPEN_INFORMATION;
-
-/* Checked on 64 bit. */
-typedef struct _FILE_INTERNAL_INFORMATION
-{
-  LARGE_INTEGER IndexNumber;
-} FILE_INTERNAL_INFORMATION, *PFILE_INTERNAL_INFORMATION;
-
-/* Checked on 64 bit. */
-typedef struct _FILE_EA_INFORMATION
-{
-  ULONG EaSize;
-} FILE_EA_INFORMATION, *PFILE_EA_INFORMATION;
-
-/* Checked on 64 bit. */
-typedef struct _FILE_ACCESS_INFORMATION
-{
-  ACCESS_MASK AccessFlags;
-} FILE_ACCESS_INFORMATION, *PFILE_ACCESS_INFORMATION;
-
-/* Checked on 64 bit. */
-typedef struct _FILE_DISPOSITION_INFORMATION
-{
-  BOOLEAN DeleteFile;
-} FILE_DISPOSITION_INFORMATION, *PFILE_DISPOSITION_INFORMATION;
-
-/* Checked on 64 bit. */
-typedef struct _FILE_POSITION_INFORMATION
-{
-  LARGE_INTEGER CurrentByteOffset;
-} FILE_POSITION_INFORMATION, *PFILE_POSITION_INFORMATION;
-
-/* Checked on 64 bit. */
-typedef struct _FILE_END_OF_FILE_INFORMATION
-{
-  LARGE_INTEGER EndOfFile;
-} FILE_END_OF_FILE_INFORMATION, *PFILE_END_OF_FILE_INFORMATION;
-
-/* Checked on 64 bit. */
-typedef struct _FILE_MODE_INFORMATION
-{
-  ULONG Mode;
-} FILE_MODE_INFORMATION, *PFILE_MODE_INFORMATION;
-
-/* Checked on 64 bit. */
-typedef struct _FILE_ALIGNMENT_INFORMATION
-{
-  ULONG AlignmentRequirement;
-} FILE_ALIGNMENT_INFORMATION;
-
-/* Checked on 64 bit. */
-typedef struct _FILE_NAME_INFORMATION
-{
-  ULONG FileNameLength;
-  WCHAR FileName[1];
-} FILE_NAME_INFORMATION, *PFILE_NAME_INFORMATION;
-
-/* Checked on 64 bit. */
-typedef struct _FILE_LINK_INFORMATION
-{
-  BOOLEAN ReplaceIfExists;
-  HANDLE RootDirectory;
-  ULONG FileNameLength;
-  WCHAR FileName[1];
-} FILE_LINK_INFORMATION, *PFILE_LINK_INFORMATION;
-
-/* Checked on 64 bit. */
-typedef struct _FILE_RENAME_INFORMATION
-{
-  BOOLEAN ReplaceIfExists;
-  HANDLE RootDirectory;
-  ULONG FileNameLength;
-  WCHAR FileName[1];
-} FILE_RENAME_INFORMATION, *PFILE_RENAME_INFORMATION;
-
-/* Checked on 64 bit. */
-typedef struct _FILE_ALL_INFORMATION {
-  FILE_BASIC_INFORMATION     BasicInformation;
-  FILE_STANDARD_INFORMATION  StandardInformation;
-  FILE_INTERNAL_INFORMATION  InternalInformation;
-  FILE_EA_INFORMATION        EaInformation;
-  FILE_ACCESS_INFORMATION    AccessInformation;
-  FILE_POSITION_INFORMATION  PositionInformation;
-  FILE_MODE_INFORMATION      ModeInformation;
-  FILE_ALIGNMENT_INFORMATION AlignmentInformation;
-  FILE_NAME_INFORMATION      NameInformation;
-} FILE_ALL_INFORMATION, *PFILE_ALL_INFORMATION;
-
-enum
-{
-  FILE_PIPE_QUEUE_OPERATION = 0,
-  FILE_PIPE_COMPLETE_OPERATION = 1
-};
-
-enum
-{
-  FILE_PIPE_BYTE_STREAM_MODE = 0,
-  FILE_PIPE_MESSAGE_MODE = 1
-};
-
-enum
-{
-  FILE_PIPE_DISCONNECTED_STATE = 1,
-  FILE_PIPE_LISTENING_STATE = 2,
-  FILE_PIPE_CONNECTED_STATE = 3,
-  FILE_PIPE_CLOSING_STATE = 4
-};
-
-enum
-{
-  FILE_PIPE_INBOUND = 0,
-  FILE_PIPE_OUTBOUND = 1,
-  FILE_PIPE_FULL_DUPLEX = 2
-};
-
-enum
-{
-  FILE_PIPE_CLIENT_END = 0,
-  FILE_PIPE_SERVER_END = 1
-};
-
-enum
-{
-  FILE_PIPE_BYTE_STREAM_TYPE = 0,
-  FILE_PIPE_MESSAGE_TYPE = 1
-};
-
-/* Checked on 64 bit. */
-typedef struct _FILE_PIPE_INFORMATION
-{
-  ULONG ReadMode;
-  ULONG CompletionMode;
-} FILE_PIPE_INFORMATION, *PFILE_PIPE_INFORMATION;
-
-/* Checked on 64 bit. */
-typedef struct _FILE_PIPE_LOCAL_INFORMATION
-{
-  ULONG NamedPipeType;
-  ULONG NamedPipeConfiguration;
-  ULONG MaximumInstances;
-  ULONG CurrentInstances;
-  ULONG InboundQuota;
-  ULONG ReadDataAvailable;
-  ULONG OutboundQuota;
-  ULONG WriteQuotaAvailable;
-  ULONG NamedPipeState;
-  ULONG NamedPipeEnd;
-} FILE_PIPE_LOCAL_INFORMATION, *PFILE_PIPE_LOCAL_INFORMATION;
-
-/* Checked on 64 bit. */
-typedef struct _FILE_PIPE_PEEK_BUFFER {
-  ULONG NamedPipeState;
-  ULONG ReadDataAvailable;
-  ULONG NumberOfMessages;
-  ULONG MessageLength;
-  CHAR Data[1];
-} FILE_PIPE_PEEK_BUFFER, *PFILE_PIPE_PEEK_BUFFER;
-
-/* Checked on 64 bit. */
-typedef struct _FILE_PIPE_WAIT_FOR_BUFFER {
-  LARGE_INTEGER Timeout;
-  ULONG NameLength;
-  BOOLEAN TimeoutSpecified;
-  WCHAR Name[1];
-} FILE_PIPE_WAIT_FOR_BUFFER, *PFILE_PIPE_WAIT_FOR_BUFFER;
-
-/* Checked on 64 bit. */
-typedef struct _FILE_COMPRESSION_INFORMATION
-{
-  LARGE_INTEGER CompressedFileSize;
-  USHORT CompressionFormat;
-  UCHAR	CompressionUnitShift;
-  UCHAR ChunkShift;
-  UCHAR ClusterShift;
-  UCHAR Reserved[3];
-} FILE_COMPRESSION_INFORMATION, *PFILE_COMPRESSION_INFORMATION;
-
-/* Checked on 64 bit. */
 typedef struct _FILE_FS_DEVICE_INFORMATION
 {
   ULONG DeviceType;
   ULONG Characteristics;
 } FILE_FS_DEVICE_INFORMATION, *PFILE_FS_DEVICE_INFORMATION;
 
-/* Checked on 64 bit. */
 typedef struct _FILE_FS_ATTRIBUTE_INFORMATION
 {
   ULONG FileSystemAttributes;
@@ -1057,7 +1113,6 @@ typedef struct _FILE_FS_ATTRIBUTE_INFORMATION
   WCHAR FileSystemName[1];
 } FILE_FS_ATTRIBUTE_INFORMATION, *PFILE_FS_ATTRIBUTE_INFORMATION;
 
-/* Checked on 64 bit. */
 #pragma pack(push,4)
 typedef struct _FILE_FS_VOLUME_INFORMATION
 {
@@ -1070,7 +1125,6 @@ typedef struct _FILE_FS_VOLUME_INFORMATION
 } FILE_FS_VOLUME_INFORMATION, *PFILE_FS_VOLUME_INFORMATION;
 #pragma pack(pop)
 
-/* Checked on 64 bit. */
 typedef struct _FILE_FS_SIZE_INFORMATION
 {
   LARGE_INTEGER TotalAllocationUnits;
@@ -1079,7 +1133,6 @@ typedef struct _FILE_FS_SIZE_INFORMATION
   ULONG BytesPerSector;
 } FILE_FS_SIZE_INFORMATION, *PFILE_FS_SIZE_INFORMATION;
 
-/* Checked on 64 bit. */
 typedef struct _FILE_FS_CONTROL_INFORMATION {
   LARGE_INTEGER FreeSpaceStartFiltering;
   LARGE_INTEGER FreeSpaceThreshold;
@@ -1089,7 +1142,6 @@ typedef struct _FILE_FS_CONTROL_INFORMATION {
   ULONG FileSystemControlFlags;
 } FILE_FS_CONTROL_INFORMATION, *PFILE_FS_CONTROL_INFORMATION;
 
-/* Checked on 64 bit. */
 typedef struct _FILE_FS_FULL_SIZE_INFORMATION
 {
   LARGE_INTEGER TotalAllocationUnits;
@@ -1099,7 +1151,6 @@ typedef struct _FILE_FS_FULL_SIZE_INFORMATION
   ULONG BytesPerSector;
 } FILE_FS_FULL_SIZE_INFORMATION, *PFILE_FS_FULL_SIZE_INFORMATION;
 
-/* Checked on 64 bit. */
 typedef struct _FILE_FS_OBJECTID_INFORMATION
 {
   UCHAR ObjectId[16];
@@ -1127,7 +1178,6 @@ typedef enum _OBJECT_INFORMATION_CLASS
    // and many more
 } OBJECT_INFORMATION_CLASS;
 
-/* Checked on 64 bit. */
 typedef struct _OBJECT_BASIC_INFORMATION
 {
   ULONG Attributes;
@@ -1143,27 +1193,23 @@ typedef struct _OBJECT_BASIC_INFORMATION
   LARGE_INTEGER CreateTime;
 } OBJECT_BASIC_INFORMATION, *POBJECT_BASIC_INFORMATION;
 
-/* Checked on 64 bit. */
 typedef struct _OBJECT_NAME_INFORMATION
 {
   UNICODE_STRING Name;
 } OBJECT_NAME_INFORMATION;
 
-/* Checked on 64 bit. */
 typedef struct _DIRECTORY_BASIC_INFORMATION
 {
   UNICODE_STRING ObjectName;
   UNICODE_STRING ObjectTypeName;
 } DIRECTORY_BASIC_INFORMATION, *PDIRECTORY_BASIC_INFORMATION;
 
-/* Checked on 64 bit. */
 typedef struct _FILE_GET_QUOTA_INFORMATION {
   ULONG NextEntryOffset;
   ULONG SidLength;
   SID Sid;
 } FILE_GET_QUOTA_INFORMATION, *PFILE_GET_QUOTA_INFORMATION;
 
-/* Checked on 64 bit. */
 typedef struct _FILE_QUOTA_INFORMATION {
   ULONG NextEntryOffset;
   ULONG SidLength;
@@ -1174,7 +1220,6 @@ typedef struct _FILE_QUOTA_INFORMATION {
   SID Sid;
 } FILE_QUOTA_INFORMATION, *PFILE_QUOTA_INFORMATION;
 
-/* Checked on 64 bit. */
 typedef struct _FILE_GET_EA_INFORMATION
 {
   ULONG NextEntryOffset;
@@ -1182,7 +1227,6 @@ typedef struct _FILE_GET_EA_INFORMATION
   CHAR EaName[1];
 } FILE_GET_EA_INFORMATION, *PFILE_GET_EA_INFORMATION;
 
-/* Checked on 64 bit. */
 typedef struct _FILE_FULL_EA_INFORMATION
 {
   ULONG NextEntryOffset;
@@ -1192,15 +1236,22 @@ typedef struct _FILE_FULL_EA_INFORMATION
   CHAR EaName[1];
 } FILE_FULL_EA_INFORMATION, *PFILE_FULL_EA_INFORMATION;
 
-/* Checked on 64 bit. */
 typedef struct _FILE_MAILSLOT_SET_INFORMATION
 {
   LARGE_INTEGER ReadTimeout;
 } FILE_MAILSLOT_SET_INFORMATION, *PFILE_MAILSLOT_SET_INFORMATION;
 
+typedef struct _IO_STATUS_BLOCK
+{
+  union {
+    NTSTATUS Status;
+    PVOID Pointer;
+  };
+  ULONG_PTR Information;
+} IO_STATUS_BLOCK, *PIO_STATUS_BLOCK;
+
 typedef VOID NTAPI (*PIO_APC_ROUTINE)(PVOID, PIO_STATUS_BLOCK, ULONG);
 
-/* Checked on 64 bit. */
 typedef struct _EVENT_BASIC_INFORMATION
 {
   EVENT_TYPE EventType;
@@ -1212,7 +1263,6 @@ typedef enum _EVENT_INFORMATION_CLASS
   EventBasicInformation = 0
 } EVENT_INFORMATION_CLASS, *PEVENT_INFORMATION_CLASS;
 
-/* Checked on 64 bit. */
 typedef struct _SEMAPHORE_BASIC_INFORMATION
 {
   LONG CurrentCount;
@@ -1232,7 +1282,6 @@ typedef enum _THREADINFOCLASS
   ThreadQuerySetWin32StartAddress = 9
 } THREADINFOCLASS, *PTHREADINFOCLASS;
 
-/* Checked on 64 bit. */
 typedef struct _THREAD_BASIC_INFORMATION
 {
   NTSTATUS ExitStatus;

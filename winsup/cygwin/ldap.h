@@ -60,8 +60,9 @@ public:
   /* User only */
   gid_t get_primary_gid () { return get_num_attribute (L"primaryGroupID"); }
   gid_t get_unix_uid () { return get_num_attribute (L"uidNumber"); }
-  /* group only */
-  PWCHAR get_group_name ()
+  PWCHAR get_account_name ()
 	    { return get_string_attribute (L"sAMAccountName"); }
   gid_t get_unix_gid () { return get_num_attribute (L"gidNumber"); }
+  PWCHAR get_profile_path ()
+	    { return get_string_attribute (L"profilePath"); }
 };

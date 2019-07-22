@@ -33,22 +33,6 @@ char *mname;
 
 int verbose;
 
-/* To test exceptions - we trap them all and return a known value */
-int
-matherr (struct exception *e)
-{
-  if (traperror) 
-  {
-    merror = e->type + 12;
-    mname = e->name;
-    e->retval = mretval;
-    errno = merror + 24;
-    return 1;
-  }
-  return 0;
-}
-
-
 void translate_to (FILE *file,
 	    double r)
 {
@@ -90,6 +74,7 @@ ffcheck (double is,
 #if 0
   if (p->qs[0].merror != merror) 
   {
+    /* Beware, matherr doesn't exist anymore.  */
     printf("testing %s_vec.c:%d, matherr wrong: %d %d\n",
 	   name, p->line, merror, p->qs[0].merror);
   }

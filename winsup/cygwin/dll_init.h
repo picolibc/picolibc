@@ -40,6 +40,7 @@ struct per_module
 typedef enum
 {
   DLL_NONE,
+  DLL_SELF, /* main-program.exe, cygwin1.dll */
   DLL_LINK,
   DLL_LOAD,
   DLL_ANY
@@ -58,9 +59,15 @@ struct dll
   DWORD image_size;
   void* preferred_base;
   PWCHAR modname;
-  WCHAR name[1];
+  FILE_INTERNAL_INFORMATION fii;
+  PWCHAR forkable_ntname;
+  WCHAR ntname[1]; /* must be the last data member */
+
   void detach ();
   int init ();
+  bool stat_real_file_once ();
+  void nominate_forkable (PCWCHAR);
+  bool create_forkable ();
   void run_dtors ()
   {
     if (has_dtors)
@@ -69,21 +76,66 @@ struct dll
 	p.run_dtors ();
       }
   }
+  PWCHAR forkedntname ()
+  {
+    return forkable_ntname && *forkable_ntname ? forkable_ntname : ntname;
+  }
 };
 
 #define MAX_DLL_BEFORE_INIT     100
 
 class dll_list
 {
+  bool forkables_supported ()
+  {
+    return cygwin_shared->forkable_hardlink_support >= 0;
+  }
+  DWORD forkables_dirx_size;
+  bool forkables_created;
+  PWCHAR forkables_dirx_ntname;
+  PWCHAR forkables_mutex_name;
+  HANDLE forkables_mutex;
+  void track_self ();
+  dll *find_by_forkedntname (PCWCHAR ntname);
+  size_t forkable_ntnamesize (dll_type, PCWCHAR fullntname, PCWCHAR modname);
+  void prepare_forkables_nomination ();
+  void update_forkables_needs ();
+  bool update_forkables ();
+  bool create_forkables ();
+  void denominate_forkables ();
+  bool close_mutex ();
+  void try_remove_forkables (PWCHAR dirbuf, size_t dirlen, size_t dirbufsize);
+  void set_forkables_inheritance (bool);
+  void request_forkables ();
+
   dll *end;
   dll *hold;
   dll_type hold_type;
   static muto protect;
+  /* Use this buffer under loader lock conditions only. */
+  static WCHAR NO_COPY nt_max_path_buffer[NT_MAX_PATH];
 public:
+  static HANDLE ntopenfile (PCWCHAR ntname, NTSTATUS *pstatus = NULL,
+			    ULONG openopts = 0, ACCESS_MASK access = 0,
+			    HANDLE rootDir = NULL);
+  static bool read_fii (HANDLE fh, PFILE_INTERNAL_INFORMATION pfii);
+  static PWCHAR form_ntname (PWCHAR ntbuf, size_t bufsize, PCWCHAR name);
+  static PWCHAR form_shortname (PWCHAR shortbuf, size_t bufsize, PCWCHAR name);
+  static PWCHAR nt_max_path_buf ()
+  {
+    return nt_max_path_buffer;
+  }
+  static PCWCHAR buffered_shortname (PCWCHAR name)
+  {
+    form_shortname (nt_max_path_buffer, NT_MAX_PATH, name);
+    return nt_max_path_buffer;
+  }
+
+  dll *main_executable;
   dll start;
   int loaded_dlls;
   int reload_on_fork;
-  dll *operator [] (const PWCHAR name);
+  dll *operator [] (PCWCHAR ntname);
   dll *alloc (HINSTANCE, per_process *, dll_type);
   dll *find (void *);
   void detach (void *);
@@ -91,11 +143,26 @@ public:
   void load_after_fork (HANDLE);
   void reserve_space ();
   void load_after_fork_impl (HANDLE, dll* which, int retries);
-  dll *find_by_modname (const PWCHAR name);
+  dll *find_by_modname (PCWCHAR modname);
   void populate_deps (dll* d);
   void topsort ();
   void topsort_visit (dll* d, bool goto_tail);
   void append (dll* d);
+
+  void release_forkables ();
+  void cleanup_forkables ();
+  bool setup_forkables (bool with_forkables)
+  {
+    if (!forkables_supported ())
+      return true; /* no need to retry fork */
+    if (forkables_created)
+      /* Once created, use forkables in current
+	 process chain on first fork try already. */
+      with_forkables = true;
+    if (with_forkables)
+      request_forkables ();
+    return with_forkables;
+  }
 
   dll *inext ()
   {

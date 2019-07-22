@@ -23,6 +23,7 @@ details. */
 #include "winsup.h"
 #include "miscfuncs.h"
 #include "path.h"
+#include <sched.h>
 #include <stdlib.h>
 #include "sigproc.h"
 #include "fhandler.h"
@@ -30,6 +31,7 @@ details. */
 #include "cygheap.h"
 #include "ntdll.h"
 #include "cygwait.h"
+#include "exception.h"
 
 extern "C" void __fp_lock_all ();
 extern "C" void __fp_unlock_all ();
@@ -1990,6 +1992,7 @@ pthread_spinlock::unlock ()
 DWORD WINAPI
 pthread::thread_init_wrapper (void *arg)
 {
+  exception protect;
   pthread *thread = (pthread *) arg;
   /* This *must* be set prior to calling set_tls_self_pointer or there is
      a race with the signal processing code which may miss the signal mask
@@ -2549,9 +2552,7 @@ pthread_convert_abstime (clockid_t clock_id, const struct timespec *abstime,
   struct timespec tp;
 
   /* According to SUSv3, the abstime value must be checked for validity. */
-  if (abstime->tv_sec < 0
-      || abstime->tv_nsec < 0
-      || abstime->tv_nsec >= NSPERSEC)
+  if (!valid_timespec (*abstime))
     return EINVAL;
 
   /* Check for immediate timeout before converting */
@@ -2566,6 +2567,7 @@ pthread_convert_abstime (clockid_t clock_id, const struct timespec *abstime,
 		       / (NSPERSEC/NS100PERSEC);
   switch (clock_id)
     {
+    case CLOCK_REALTIME_COARSE:
     case CLOCK_REALTIME:
       timeout->QuadPart += FACTOR;
       break;
@@ -2603,6 +2605,24 @@ pthread_timedjoin_np (pthread_t thread, void **return_val,
   if (err)
     return err;
   return pthread::join (&thread, (void **) return_val, &timeout);
+}
+
+extern "C" int
+pthread_getaffinity_np (pthread_t thread, size_t sizeof_set, cpu_set_t *set)
+{
+  if (!pthread::is_good_object (&thread))
+    return ESRCH;
+
+  return sched_get_thread_affinity (thread->win32_obj_id, sizeof_set, set);
+}
+
+extern "C" int
+pthread_setaffinity_np (pthread_t thread, size_t sizeof_set, const cpu_set_t *set)
+{
+  if (!pthread::is_good_object (&thread))
+    return ESRCH;
+
+  return sched_set_thread_affinity (thread->win32_obj_id, sizeof_set, set);
 }
 
 extern "C" int
@@ -2945,25 +2965,33 @@ extern "C" int
 pthread_cond_timedwait (pthread_cond_t *cond, pthread_mutex_t *mutex,
 			const struct timespec *abstime)
 {
+  int err = 0;
   LARGE_INTEGER timeout;
 
   pthread_testcancel ();
 
   __try
     {
-      int err = __pthread_cond_wait_init (cond, mutex);
+      err = __pthread_cond_wait_init (cond, mutex);
       if (err)
-	return err;
+	__leave;
 
-      err = pthread_convert_abstime ((*cond)->clock_id, abstime, &timeout);
-      if (err)
-	return err;
+      do
+	{
+	  err = pthread_convert_abstime ((*cond)->clock_id, abstime, &timeout);
+	  if (err)
+	    __leave;
 
-      return (*cond)->wait (*mutex, &timeout);
+	  err = (*cond)->wait (*mutex, &timeout);
+	}
+      while (err == ETIMEDOUT);
     }
-  __except (NO_ERROR) {}
+  __except (NO_ERROR)
+    {
+      return EINVAL;
+    }
   __endtry
-  return EINVAL;
+  return err;
 }
 
 extern "C" int
@@ -3027,14 +3055,9 @@ pthread_condattr_setclock (pthread_condattr_t *attr, clockid_t clock_id)
 {
   if (!pthread_condattr::is_good_object (attr))
     return EINVAL;
-  switch (clock_id)
-    {
-    case CLOCK_REALTIME:
-    case CLOCK_MONOTONIC:
-      break;
-    default:
-      return EINVAL;
-    }
+  if (CLOCKID_IS_PROCESS (clock_id) || CLOCKID_IS_THREAD (clock_id)
+      || clock_id >= MAX_CLOCKS)
+    return EINVAL;
   (*attr)->clock_id = clock_id;
   return 0;
 }
@@ -3288,7 +3311,7 @@ pthread_kill (pthread_t thread, int sig)
     rval = ESRCH;
   else if (sig)
     {
-      rval = sig_send (NULL, si, thread->cygtls);
+      rval = (int) sig_send (NULL, si, thread->cygtls);
       if (rval == -1)
 	rval = get_errno ();
     }
@@ -3331,7 +3354,7 @@ pthread_sigqueue (pthread_t *thread, int sig, const union sigval value)
   si.si_value = value;
   si.si_pid = myself->pid;
   si.si_uid = myself->uid;
-  return sig_send (NULL, si, (*thread)->cygtls);
+  return (int) sig_send (NULL, si, (*thread)->cygtls);
 }
 
 /* ID */

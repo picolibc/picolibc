@@ -60,6 +60,5 @@ install_headers(
   'utmp.h',
   'wchar.h',
   'wctype.h',
-  'wordexp.h',
-  'xlocale.h'
+  'wordexp.h'
 )

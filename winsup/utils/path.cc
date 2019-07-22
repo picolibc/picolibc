@@ -21,6 +21,7 @@ details. */
 #include <wchar.h>
 #include "path.h"
 #include "../cygwin/include/cygwin/version.h"
+#include "../cygwin/include/cygwin/bits.h"
 #include "../cygwin/include/sys/mount.h"
 #define _NOMNTENT_MACROS
 #include "../cygwin/include/mntent.h"
@@ -311,7 +312,7 @@ static struct opt
 {
   {"acl", MOUNT_NOACL, 1},
   {"auto", 0, 0},
-  {"binary", MOUNT_BINARY, 0},
+  {"binary", MOUNT_TEXT, 1},
   {"cygexec", MOUNT_CYGWIN_EXEC, 0},
   {"dos", MOUNT_DOS, 0},
   {"exec", MOUNT_EXEC, 0},
@@ -323,7 +324,7 @@ static struct opt
   {"override", MOUNT_OVERRIDE, 0},
   {"posix=0", MOUNT_NOPOSIX, 0},
   {"posix=1", MOUNT_NOPOSIX, 1},
-  {"text", MOUNT_BINARY, 1},
+  {"text", MOUNT_TEXT, 0},
   {"user", MOUNT_SYSTEM, 1}
 };
 
@@ -486,27 +487,26 @@ from_fstab (bool user, PWCHAR path, PWCHAR path_end)
 	*(native_path += 2) = '\\';
       m->posix = strdup ("/");
       m->native = strdup (native_path);
-      m->flags = MOUNT_SYSTEM | MOUNT_BINARY | MOUNT_IMMUTABLE
-		 | MOUNT_AUTOMATIC;
+      m->flags = MOUNT_SYSTEM | MOUNT_IMMUTABLE | MOUNT_AUTOMATIC;
       ++m;
       /* Create default /usr/bin and /usr/lib entries. */
       char *trail = strchr (native_path, '\0');
       strcpy (trail, "\\bin");
       m->posix = strdup ("/usr/bin");
       m->native = strdup (native_path);
-      m->flags = MOUNT_SYSTEM | MOUNT_BINARY | MOUNT_AUTOMATIC;
+      m->flags = MOUNT_SYSTEM | MOUNT_AUTOMATIC;
       ++m;
       strcpy (trail, "\\lib");
       m->posix = strdup ("/usr/lib");
       m->native = strdup (native_path);
-      m->flags = MOUNT_SYSTEM | MOUNT_BINARY | MOUNT_AUTOMATIC;
+      m->flags = MOUNT_SYSTEM | MOUNT_AUTOMATIC;
       ++m;
       /* Create a default cygdrive entry.  Note that this is a user entry.
 	 This allows to override it with mount, unless the sysadmin created
 	 a cygdrive entry in /etc/fstab. */
       m->posix = strdup (CYGWIN_INFO_CYGDRIVE_DEFAULT_PREFIX);
       m->native = strdup ("cygdrive prefix");
-      m->flags = MOUNT_BINARY | MOUNT_CYGDRIVE;
+      m->flags = MOUNT_CYGDRIVE;
       ++m;
       max_mount_entry = m - mount_table;
     }
@@ -934,7 +934,7 @@ getmntent (FILE *)
   strcpy (mnt.mnt_type,
 	  (char *) ((m->flags & MOUNT_SYSTEM) ? "system" : "user"));
 
-  if (!(m->flags & MOUNT_BINARY))
+  if (m->flags & MOUNT_TEXT)
     strcpy (mnt.mnt_opts, (char *) "text");
   else
     strcpy (mnt.mnt_opts, (char *) "binary");

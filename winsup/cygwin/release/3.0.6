@@ -1,0 +1,19 @@
+What's new:
+-----------
+
+
+What changed:
+-------------
+
+
+Bug Fixes
+---------
+
+- Fix the problem that `ps' or `pstree' may show up in their own output twice.
+  Addresses: Report on IRC
+
+- Honor setting uc_sigmask in a sigaction signal handler.
+  Addresses: https://cygwin.com/ml/cygwin/2019-04/msg00016.html
+
+- Fix signal handling if setcontext is called from a signal handler.
+  Addresses: Self-tested.

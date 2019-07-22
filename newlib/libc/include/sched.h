@@ -92,6 +92,11 @@ int sched_yield( void );
 
 #if __GNU_VISIBLE
 int sched_getcpu(void);
+
+int sched_getaffinity (pid_t, size_t, cpu_set_t *);
+int sched_get_thread_affinity (void *, size_t, cpu_set_t *);
+int sched_setaffinity (pid_t, size_t, const cpu_set_t *);
+int sched_set_thread_affinity (void *, size_t, const cpu_set_t *);
 #endif
 
 #ifdef __cplusplus

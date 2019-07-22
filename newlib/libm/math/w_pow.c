@@ -42,8 +42,6 @@ RETURNS
 	is set to <<EDOM>>.  If <[x]> and <[y]> are both 0, then
 	<<pow>> and <<powf>> return <<1>>.
 
-	You can modify error handling for these functions using <<matherr>>.
-
 PORTABILITY
 	<<pow>> is ANSI C. <<powf>> is an extension.  */
 
@@ -66,140 +64,48 @@ PORTABILITY
 #endif
 {
 	double z;
-#ifndef HUGE_VAL 
-#define HUGE_VAL inf
-	double inf = 0.0;
-
-	SET_HIGH_WORD(inf,0x7ff00000);	/* set inf to infinite */
-#endif
-	struct exception exc;
 	z=__ieee754_pow(x,y);
 	if(_LIB_VERSION == _IEEE_|| isnan(y)) return z;
 	if(isnan(x)) {
 	    if(y==0.0) { 
 		/* pow(NaN,0.0) */
-		/* error only if _LIB_VERSION == _SVID_ & _XOPEN_ */
-		exc.type = DOMAIN;
-		exc.name = "pow";
-		exc.err = 0;
-		exc.arg1 = x;
-		exc.arg2 = y;
-		exc.retval = 1.0;
-		if (_LIB_VERSION == _IEEE_ ||
-		    _LIB_VERSION == _POSIX_) exc.retval = 1.0;
-		else if (!matherr(&exc)) {
-			errno = EDOM;
-		}
-	        if (exc.err != 0)
-	           errno = exc.err;
-                return exc.retval; 
+		/* Not an error.  */
+                return 1.0;
 	    } else 
 		return z;
 	}
 	if(x==0.0){ 
 	    if(y==0.0) {
 		/* pow(0.0,0.0) */
-		/* error only if _LIB_VERSION == _SVID_ */
-		exc.type = DOMAIN;
-		exc.name = "pow";
-		exc.err = 0;
-		exc.arg1 = x;
-		exc.arg2 = y;
-		exc.retval = 0.0;
-		if (_LIB_VERSION != _SVID_) exc.retval = 1.0;
-		else if (!matherr(&exc)) {
-			errno = EDOM;
-		}
-	        if (exc.err != 0)
-	           errno = exc.err;
-                return exc.retval; 
+		/* Not an error.  */
+		return 1.0;
 	    }
-            if(finite(y)&&y<0.0) {
+	    if(finite(y)&&y<0.0) {
 		/* 0**neg */
-		exc.type = DOMAIN;
-		exc.name = "pow";
-		exc.err = 0;
-		exc.arg1 = x;
-		exc.arg2 = y;
-		if (_LIB_VERSION == _SVID_) 
-		  exc.retval = 0.0;
-		else
-		  exc.retval = -HUGE_VAL;
-		if (_LIB_VERSION == _POSIX_)
-		  errno = EDOM;
-		else if (!matherr(&exc)) {
-		  errno = EDOM;
-		}
-	        if (exc.err != 0)
-	           errno = exc.err;
-                return exc.retval; 
-            } 
+		errno = EDOM;
+		return -HUGE_VAL;
+	    }
 	    return z;
 	}
 	if(!finite(z)) {
 	    if(finite(x)&&finite(y)) {
 	        if(isnan(z)) {
 		    /* neg**non-integral */
-		    exc.type = DOMAIN;
-		    exc.name = "pow";
-		    exc.err = 0;
-		    exc.arg1 = x;
-		    exc.arg2 = y;
-		    if (_LIB_VERSION == _SVID_) 
-		        exc.retval = 0.0;
-		    else 
-		        exc.retval = 0.0/0.0;	/* X/Open allow NaN */
-		    if (_LIB_VERSION == _POSIX_) 
-		        errno = EDOM;
-		    else if (!matherr(&exc)) {
-		        errno = EDOM;
-		    }
-	            if (exc.err != 0)
-	                errno = exc.err;
-                    return exc.retval; 
+		    errno = EDOM;
+		    return 0.0/0.0;
 	        } else {
 		    /* pow(x,y) overflow */
-		    exc.type = OVERFLOW;
-		    exc.name = "pow";
-		    exc.err = 0;
-		    exc.arg1 = x;
-		    exc.arg2 = y;
-		    if (_LIB_VERSION == _SVID_) {
-		       exc.retval = HUGE;
-		       y *= 0.5;
-		       if(x<0.0&&rint(y)!=y) exc.retval = -HUGE;
-		    } else {
-		       exc.retval = HUGE_VAL;
-                       y *= 0.5;
-		       if(x<0.0&&rint(y)!=y) exc.retval = -HUGE_VAL;
-		    }
-		    if (_LIB_VERSION == _POSIX_)
-		        errno = ERANGE;
-		    else if (!matherr(&exc)) {
-			errno = ERANGE;
-		    }
-	            if (exc.err != 0)
-	                errno = exc.err;
-                    return exc.retval; 
+		    errno = ERANGE;
+		    if(x<0.0&&rint(y)!=y)
+		      return -HUGE_VAL;
+		    return HUGE_VAL;
                 }
 	    }
 	} 
 	if(z==0.0&&finite(x)&&finite(y)) {
 	    /* pow(x,y) underflow */
-	    exc.type = UNDERFLOW;
-	    exc.name = "pow";
-	    exc.err = 0;
-	    exc.arg1 = x;
-	    exc.arg2 = y;
-	    exc.retval =  0.0;
-	    if (_LIB_VERSION == _POSIX_)
-	        errno = ERANGE;
-	    else if (!matherr(&exc)) {
-	     	errno = ERANGE;
-	    }
-	    if (exc.err != 0)
-	        errno = exc.err;
-            return exc.retval; 
+	    errno = ERANGE;
+	    return 0.0;
         } 
 	return z;
 }

@@ -184,7 +184,7 @@ details. */
 
 /* Maximum number of timer expiration overruns.  Not yet implemented. */
 #undef DELAYTIMER_MAX
-/* #define DELAYTIMER_MAX >= _POSIX_DELAYTIMER_MAX */
+#define DELAYTIMER_MAX __INT_MAX__
 
 /* Maximum length of a host name. */
 #undef HOST_NAME_MAX

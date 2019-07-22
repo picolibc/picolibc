@@ -1003,6 +1003,7 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     time
     timer_create		(see chapter "Implementation Notes")
     timer_delete
+    timer_getoverrun
     timer_gettime
     timer_settime
     times
@@ -1318,8 +1319,6 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     fedisableexcept
     feenableexcept
     fegetexcept
-    fegetprec
-    fesetprec
     ffsl
     ffsll
     fgets_unlocked
@@ -1360,8 +1359,10 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     pow10f
     pow10l
     ppoll
+    pthread_getaffinity_np
     pthread_getattr_np
     pthread_getname_np
+    pthread_setaffinity_np
     pthread_setname_np
     pthread_sigqueue
     pthread_timedjoin_np
@@ -1375,8 +1376,12 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     rawmemchr
     removexattr
     scandirat
+    sched_getaffinity
     sched_getcpu
+    sched_setaffinity
+    secure_getenv
     setxattr
+    signalfd
     sincos
     sincosf
     sincosl
@@ -1392,6 +1397,9 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     strverscmp
     sysinfo
     tdestroy
+    timerfd_create
+    timerfd_gettime
+    timerfd_settime
     timegm
     timelocal
     toascii_l
@@ -1437,6 +1445,8 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     acltotext
     endmntent
     facl
+    fegetprec
+    fesetprec
     futimesat
     getmntent
     memalign
@@ -1587,7 +1597,6 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     pthread_mutex_consistent
     putmsg
     setnetent
-    timer_getoverrun
     ulimit
     waitid
 </screen>

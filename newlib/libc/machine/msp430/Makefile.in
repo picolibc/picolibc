@@ -82,7 +82,10 @@ LIBRARIES = $(noinst_LIBRARIES)
 ARFLAGS = cru
 lib_a_AR = $(AR) $(ARFLAGS)
 lib_a_LIBADD =
-am_lib_a_OBJECTS = lib_a-setjmp.$(OBJEXT)
+@NEWLIB_NANO_FORMATTED_IO_TRUE@am__objects_1 =  \
+@NEWLIB_NANO_FORMATTED_IO_TRUE@	lib_a-tiny-puts.$(OBJEXT) \
+@NEWLIB_NANO_FORMATTED_IO_TRUE@	lib_a-tiny-printf.$(OBJEXT)
+am_lib_a_OBJECTS = lib_a-setjmp.$(OBJEXT) $(am__objects_1)
 lib_a_OBJECTS = $(am_lib_a_OBJECTS)
 DEFAULT_INCLUDES = -I.@am__isrc@
 depcomp =
@@ -195,6 +198,7 @@ pdfdir = @pdfdir@
 prefix = @prefix@
 program_transform_name = @program_transform_name@
 psdir = @psdir@
+runstatedir = @runstatedir@
 sbindir = @sbindir@
 sharedstatedir = @sharedstatedir@
 srcdir = @srcdir@
@@ -208,15 +212,20 @@ AUTOMAKE_OPTIONS = cygnus
 INCLUDES = $(NEWLIB_CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLAGS)
 AM_CCASFLAGS = $(INCLUDES)
 noinst_LIBRARIES = lib.a
-lib_a_SOURCES = setjmp.S
+lib_a_SOURCES = setjmp.S $(TINY_SOURCES)
 lib_a_CCASFLAGS = $(AM_CCASFLAGS)
 lib_a_CFLAGS = $(AM_CFLAGS)
+
+# tiny-printf.c and tiny-puts.c are derived from the nano printf/puts
+# functions, so other supporting nano functions are required, and the tiny
+# printf/puts will not work without them.
+@NEWLIB_NANO_FORMATTED_IO_TRUE@TINY_SOURCES = tiny-puts.c tiny-printf.c
 ACLOCAL_AMFLAGS = -I ../../.. -I ../../../..
 CONFIG_STATUS_DEPENDENCIES = $(newlib_basedir)/configure.host
 all: all-am
 
 .SUFFIXES:
-.SUFFIXES: .S .o .obj
+.SUFFIXES: .S .c .o .obj
 am--refresh: Makefile
 	@:
 $(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am  $(am__configure_deps)
@@ -276,6 +285,24 @@ lib_a-setjmp.o: setjmp.S
 
 lib_a-setjmp.obj: setjmp.S
 	$(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CCASFLAGS) $(CCASFLAGS) -c -o lib_a-setjmp.obj `if test -f 'setjmp.S'; then $(CYGPATH_W) 'setjmp.S'; else $(CYGPATH_W) '$(srcdir)/setjmp.S'; fi`
+
+.c.o:
+	$(COMPILE) -c $<
+
+.c.obj:
+	$(COMPILE) -c `$(CYGPATH_W) '$<'`
+
+lib_a-tiny-puts.o: tiny-puts.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-tiny-puts.o `test -f 'tiny-puts.c' || echo '$(srcdir)/'`tiny-puts.c
+
+lib_a-tiny-puts.obj: tiny-puts.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-tiny-puts.obj `if test -f 'tiny-puts.c'; then $(CYGPATH_W) 'tiny-puts.c'; else $(CYGPATH_W) '$(srcdir)/tiny-puts.c'; fi`
+
+lib_a-tiny-printf.o: tiny-printf.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-tiny-printf.o `test -f 'tiny-printf.c' || echo '$(srcdir)/'`tiny-printf.c
+
+lib_a-tiny-printf.obj: tiny-printf.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-tiny-printf.obj `if test -f 'tiny-printf.c'; then $(CYGPATH_W) 'tiny-printf.c'; else $(CYGPATH_W) '$(srcdir)/tiny-printf.c'; fi`
 
 ID: $(HEADERS) $(SOURCES) $(LISP) $(TAGS_FILES)
 	list='$(SOURCES) $(HEADERS) $(LISP) $(TAGS_FILES)'; \

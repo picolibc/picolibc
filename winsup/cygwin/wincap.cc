@@ -8,6 +8,7 @@ Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
 #include "winsup.h"
+#include "miscfuncs.h"
 #include "security.h"
 #include "ntdll.h"
 
@@ -19,9 +20,11 @@ details. */
 
 wincaps wincap_vista __attribute__((section (".cygwin_dll_common"), shared)) = {
   def_guard_pages:1,
+  mmap_storage_high:0x070000000000LL,
   {
     is_server:false,
     needs_count_in_si_lpres2:true,
+    needs_query_information:true,
     has_gaa_largeaddress_bug:true,
     has_broken_alloc_console:false,
     has_console_logon_sid:false,
@@ -32,14 +35,23 @@ wincaps wincap_vista __attribute__((section (".cygwin_dll_common"), shared)) = {
     has_new_pebteb_region:false,
     has_broken_whoami:true,
     has_unprivileged_createsymlink:false,
+    has_unbiased_interrupt_time:false,
+    has_precise_interrupt_time:false,
+    has_posix_unlink_semantics:false,
+    has_case_sensitive_dirs:false,
+    has_posix_rename_semantics:false,
+    no_msv1_0_s4u_logon_in_wow64:true,
+    has_con_24bit_colors:false,
   },
 };
 
 wincaps wincap_7 __attribute__((section (".cygwin_dll_common"), shared)) = {
   def_guard_pages:1,
+  mmap_storage_high:0x070000000000LL,
   {
     is_server:false,
     needs_count_in_si_lpres2:false,
+    needs_query_information:true,
     has_gaa_largeaddress_bug:true,
     has_broken_alloc_console:true,
     has_console_logon_sid:true,
@@ -50,14 +62,23 @@ wincaps wincap_7 __attribute__((section (".cygwin_dll_common"), shared)) = {
     has_new_pebteb_region:false,
     has_broken_whoami:true,
     has_unprivileged_createsymlink:false,
+    has_unbiased_interrupt_time:true,
+    has_precise_interrupt_time:false,
+    has_posix_unlink_semantics:false,
+    has_case_sensitive_dirs:false,
+    has_posix_rename_semantics:false,
+    no_msv1_0_s4u_logon_in_wow64:true,
+    has_con_24bit_colors:false,
   },
 };
 
 wincaps wincap_8 __attribute__((section (".cygwin_dll_common"), shared)) = {
   def_guard_pages:2,
+  mmap_storage_high:0x070000000000LL,
   {
     is_server:false,
     needs_count_in_si_lpres2:false,
+    needs_query_information:true,
     has_gaa_largeaddress_bug:false,
     has_broken_alloc_console:true,
     has_console_logon_sid:true,
@@ -68,14 +89,50 @@ wincaps wincap_8 __attribute__((section (".cygwin_dll_common"), shared)) = {
     has_new_pebteb_region:false,
     has_broken_whoami:false,
     has_unprivileged_createsymlink:false,
+    has_unbiased_interrupt_time:true,
+    has_precise_interrupt_time:false,
+    has_posix_unlink_semantics:false,
+    has_case_sensitive_dirs:false,
+    has_posix_rename_semantics:false,
+    no_msv1_0_s4u_logon_in_wow64:false,
+    has_con_24bit_colors:false,
   },
 };
 
-wincaps wincap_10 __attribute__((section (".cygwin_dll_common"), shared)) = {
+wincaps wincap_8_1 __attribute__((section (".cygwin_dll_common"), shared)) = {
   def_guard_pages:2,
+  mmap_storage_high:0x700000000000LL,
   {
     is_server:false,
     needs_count_in_si_lpres2:false,
+    needs_query_information:false,
+    has_gaa_largeaddress_bug:false,
+    has_broken_alloc_console:true,
+    has_console_logon_sid:true,
+    has_precise_system_time:true,
+    has_microsoft_accounts:true,
+    has_processor_groups:true,
+    has_broken_prefetchvm:false,
+    has_new_pebteb_region:false,
+    has_broken_whoami:false,
+    has_unprivileged_createsymlink:false,
+    has_unbiased_interrupt_time:true,
+    has_precise_interrupt_time:false,
+    has_posix_unlink_semantics:false,
+    has_case_sensitive_dirs:false,
+    has_posix_rename_semantics:false,
+    no_msv1_0_s4u_logon_in_wow64:false,
+    has_con_24bit_colors:false,
+  },
+};
+
+wincaps  wincap_10_1507 __attribute__((section (".cygwin_dll_common"), shared)) = {
+  def_guard_pages:2,
+  mmap_storage_high:0x700000000000LL,
+  {
+    is_server:false,
+    needs_count_in_si_lpres2:false,
+    needs_query_information:false,
     has_gaa_largeaddress_bug:false,
     has_broken_alloc_console:true,
     has_console_logon_sid:true,
@@ -86,32 +143,23 @@ wincaps wincap_10 __attribute__((section (".cygwin_dll_common"), shared)) = {
     has_new_pebteb_region:false,
     has_broken_whoami:false,
     has_unprivileged_createsymlink:false,
-  },
-};
-
-wincaps wincap_10_1511 __attribute__((section (".cygwin_dll_common"), shared)) = {
-  def_guard_pages:2,
-  {
-    is_server:false,
-    needs_count_in_si_lpres2:false,
-    has_gaa_largeaddress_bug:false,
-    has_broken_alloc_console:true,
-    has_console_logon_sid:true,
-    has_precise_system_time:true,
-    has_microsoft_accounts:true,
-    has_processor_groups:true,
-    has_broken_prefetchvm:false,
-    has_new_pebteb_region:true,
-    has_broken_whoami:false,
-    has_unprivileged_createsymlink:false,
+    has_unbiased_interrupt_time:true,
+    has_precise_interrupt_time:true,
+    has_posix_unlink_semantics:false,
+    has_case_sensitive_dirs:false,
+    has_posix_rename_semantics:false,
+    no_msv1_0_s4u_logon_in_wow64:false,
+    has_con_24bit_colors:false,
   },
 };
 
 wincaps wincap_10_1703 __attribute__((section (".cygwin_dll_common"), shared)) = {
   def_guard_pages:2,
+  mmap_storage_high:0x700000000000LL,
   {
     is_server:false,
     needs_count_in_si_lpres2:false,
+    needs_query_information:false,
     has_gaa_largeaddress_bug:false,
     has_broken_alloc_console:true,
     has_console_logon_sid:true,
@@ -122,6 +170,94 @@ wincaps wincap_10_1703 __attribute__((section (".cygwin_dll_common"), shared)) =
     has_new_pebteb_region:true,
     has_broken_whoami:false,
     has_unprivileged_createsymlink:true,
+    has_unbiased_interrupt_time:true,
+    has_precise_interrupt_time:true,
+    has_posix_unlink_semantics:false,
+    has_case_sensitive_dirs:false,
+    has_posix_rename_semantics:false,
+    no_msv1_0_s4u_logon_in_wow64:false,
+    has_con_24bit_colors:true,
+  },
+};
+
+wincaps wincap_10_1709 __attribute__((section (".cygwin_dll_common"), shared)) = {
+  def_guard_pages:2,
+  mmap_storage_high:0x700000000000LL,
+  {
+    is_server:false,
+    needs_count_in_si_lpres2:false,
+    needs_query_information:false,
+    has_gaa_largeaddress_bug:false,
+    has_broken_alloc_console:true,
+    has_console_logon_sid:true,
+    has_precise_system_time:true,
+    has_microsoft_accounts:true,
+    has_processor_groups:true,
+    has_broken_prefetchvm:false,
+    has_new_pebteb_region:true,
+    has_broken_whoami:false,
+    has_unprivileged_createsymlink:true,
+    has_unbiased_interrupt_time:true,
+    has_precise_interrupt_time:true,
+    has_posix_unlink_semantics:true,
+    has_case_sensitive_dirs:false,
+    has_posix_rename_semantics:false,
+    no_msv1_0_s4u_logon_in_wow64:false,
+    has_con_24bit_colors:true,
+  },
+};
+
+wincaps wincap_10_1803 __attribute__((section (".cygwin_dll_common"), shared)) = {
+  def_guard_pages:2,
+  mmap_storage_high:0x700000000000LL,
+  {
+    is_server:false,
+    needs_count_in_si_lpres2:false,
+    needs_query_information:false,
+    has_gaa_largeaddress_bug:false,
+    has_broken_alloc_console:true,
+    has_console_logon_sid:true,
+    has_precise_system_time:true,
+    has_microsoft_accounts:true,
+    has_processor_groups:true,
+    has_broken_prefetchvm:false,
+    has_new_pebteb_region:true,
+    has_broken_whoami:false,
+    has_unprivileged_createsymlink:true,
+    has_unbiased_interrupt_time:true,
+    has_precise_interrupt_time:true,
+    has_posix_unlink_semantics:true,
+    has_case_sensitive_dirs:true,
+    has_posix_rename_semantics:false,
+    no_msv1_0_s4u_logon_in_wow64:false,
+    has_con_24bit_colors:true,
+  },
+};
+
+wincaps wincap_10_1809 __attribute__((section (".cygwin_dll_common"), shared)) = {
+  def_guard_pages:2,
+  mmap_storage_high:0x700000000000LL,
+  {
+    is_server:false,
+    needs_count_in_si_lpres2:false,
+    needs_query_information:false,
+    has_gaa_largeaddress_bug:false,
+    has_broken_alloc_console:true,
+    has_console_logon_sid:true,
+    has_precise_system_time:true,
+    has_microsoft_accounts:true,
+    has_processor_groups:true,
+    has_broken_prefetchvm:false,
+    has_new_pebteb_region:true,
+    has_broken_whoami:false,
+    has_unprivileged_createsymlink:true,
+    has_unbiased_interrupt_time:true,
+    has_precise_interrupt_time:true,
+    has_posix_unlink_semantics:true,
+    has_case_sensitive_dirs:true,
+    has_posix_rename_semantics:true,
+    no_msv1_0_s4u_logon_in_wow64:false,
+    has_con_24bit_colors:true,
   },
 };
 
@@ -155,22 +291,26 @@ wincapc::init ()
 	      caps = &wincap_7;
 	      break;
 	    case 2:
-	    case 3:
 	      caps = &wincap_8;
 	      break;
+	    case 3:
 	    default:
-	      caps = &wincap_10;
+	      caps = &wincap_8_1;
 	      break;
 	  }
 	break;
       case 10:
       default:
-	if (version.dwBuildNumber < 10586)
-	  caps = &wincap_10;
-	else if (version.dwBuildNumber < 15063)
-	  caps = &wincap_10_1511;
-	else
+	if (likely (version.dwBuildNumber >= 17763))
+	  caps = &wincap_10_1809;
+	else if (version.dwBuildNumber >= 17134)
+	  caps = &wincap_10_1803;
+	else if (version.dwBuildNumber >= 16299)
+	  caps = &wincap_10_1709;
+	else if (version.dwBuildNumber >= 15063)
 	  caps = &wincap_10_1703;
+	else
+	  caps = & wincap_10_1507;
     }
 
   ((wincaps *)caps)->is_server = (version.wProductType != VER_NT_WORKSTATION);
@@ -188,6 +328,7 @@ wincapc::init ()
       ((wincaps *)caps)->needs_count_in_si_lpres2 = false;
       ((wincaps *)caps)->has_gaa_largeaddress_bug = false;
       ((wincaps *)caps)->has_broken_prefetchvm = false;
+      ((wincaps *)caps)->no_msv1_0_s4u_logon_in_wow64 = false;
     }
 
   __small_sprintf (osnam, "NT-%d.%d", version.dwMajorVersion,

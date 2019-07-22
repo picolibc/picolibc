@@ -11,6 +11,7 @@ install_headers(
   'file.h',
   'iconvnls.h',
   '_intsup.h',
+  '_locale.h',
   'lock.h',
   'param.h',
   '_pthreadtypes.h',

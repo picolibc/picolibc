@@ -258,7 +258,6 @@ child_info_spawn::worker (const char *prog_arg, const char *const *argv,
 			  int in__stdin, int in__stdout)
 {
   bool rc;
-  pid_t cygpid;
   int res = -1;
 
   /* Check if we have been called from exec{lv}p or spawn{lv}p and mask
@@ -567,6 +566,12 @@ child_info_spawn::worker (const char *prog_arg, const char *const *argv,
 	SetHandleInformation (my_wr_proc_pipe, HANDLE_FLAG_INHERIT, 0);
       parent_winpid = GetCurrentProcessId ();
 
+      PSECURITY_ATTRIBUTES sa = (PSECURITY_ATTRIBUTES) tp.w_get ();
+      if (!sec_user_nih (sa, cygheap->user.sid (),
+			 well_known_authenticated_users_sid,
+			 PROCESS_QUERY_LIMITED_INFORMATION))
+	sa = &sec_none_nih;
+
     loop:
       /* When ruid != euid we create the new process under the current original
 	 account and impersonate in child, this way maintaining the different
@@ -578,6 +583,8 @@ child_info_spawn::worker (const char *prog_arg, const char *const *argv,
       if (!real_path.iscygexec () && mode == _P_OVERLAY)
 	myself->process_state |= PID_NOTCYGWIN;
 
+      cygpid = (mode != _P_OVERLAY) ? create_cygwin_pid () : myself->pid;
+
       wchar_t wcmd[(size_t) cmd];
       if (!::cygheap->user.issetuid ()
 	  || (::cygheap->user.saved_uid == ::cygheap->user.real_uid
@@ -585,13 +592,13 @@ child_info_spawn::worker (const char *prog_arg, const char *const *argv,
 	      && !::cygheap->user.groups.issetgroups ()
 	      && !::cygheap->user.setuid_to_restricted))
 	{
-	  rc = CreateProcessW (runpath,	  /* image name - with full path */
-			       cmd.wcs (wcmd),/* what was passed to exec */
-			       &sec_none_nih, /* process security attrs */
-			       &sec_none_nih, /* thread security attrs */
-			       TRUE,	  /* inherit handles from parent */
+	  rc = CreateProcessW (runpath,		/* image name w/ full path */
+			       cmd.wcs (wcmd),	/* what was passed to exec */
+			       sa,		/* process security attrs */
+			       sa,		/* thread security attrs */
+			       TRUE,		/* inherit handles */
 			       c_flags,
-			       envblock,	  /* environment */
+			       envblock,	/* environment */
 			       NULL,
 			       &si,
 			       &pi);
@@ -639,13 +646,13 @@ child_info_spawn::worker (const char *prog_arg, const char *const *argv,
 	    }
 
 	  rc = CreateProcessAsUserW (::cygheap->user.primary_token (),
-			       runpath,	  /* image name - with full path */
-			       cmd.wcs (wcmd),/* what was passed to exec */
-			       &sec_none_nih, /* process security attrs */
-			       &sec_none_nih, /* thread security attrs */
-			       TRUE,	  /* inherit handles from parent */
+			       runpath,		/* image name w/ full path */
+			       cmd.wcs (wcmd),	/* what was passed to exec */
+			       sa,		/* process security attrs */
+			       sa,		/* thread security attrs */
+			       TRUE,		/* inherit handles */
 			       c_flags,
-			       envblock,	  /* environment */
+			       envblock,	/* environment */
 			       NULL,
 			       &si,
 			       &pi);
@@ -708,11 +715,6 @@ child_info_spawn::worker (const char *prog_arg, const char *const *argv,
       if (::cygheap->fdtab.need_fixup_before ())
 	::cygheap->fdtab.fixup_before_exec (pi.dwProcessId);
 
-      if (mode != _P_OVERLAY)
-	cygpid = cygwin_pid (pi.dwProcessId);
-      else
-	cygpid = myself->pid;
-
       /* Print the original program name here so the user can see that too.  */
       syscall_printf ("pid %d, prog_arg %s, cmd line %.9500s)",
 		      rc ? cygpid : (unsigned int) -1, prog_arg, (const char *) cmd);
@@ -725,6 +727,15 @@ child_info_spawn::worker (const char *prog_arg, const char *const *argv,
 	  myself->dwProcessId = pi.dwProcessId;
 	  strace.execing = 1;
 	  myself.hProcess = hExeced = pi.hProcess;
+	  HANDLE old_winpid_hdl = myself.shared_winpid_handle ();
+	  if (!real_path.iscygexec ())
+	    {
+	      /* If the child process is not a Cygwin process, we have to
+		 create a new winpid symlink on behalf of the child process
+		 not being able to do this by itself. */
+	      myself.create_winpid_symlink ();
+	    }
+	  NtClose (old_winpid_hdl);
 	  real_path.get_wide_win32_path (myself->progname); // FIXME: race?
 	  sigproc_printf ("new process name %W", myself->progname);
 	  if (!iscygwin ())
@@ -748,13 +759,23 @@ child_info_spawn::worker (const char *prog_arg, const char *const *argv,
 	  child.hProcess = pi.hProcess;
 
 	  real_path.get_wide_win32_path (child->progname);
-	  /* FIXME: This introduces an unreferenced, open handle into the child.
-	     The purpose is to keep the pid shared memory open so that all of
-	     the fields filled out by child.remember do not disappear and so
-	     there is not a brief period during which the pid is not available.
-	     However, we should try to find another way to do this eventually. */
+	  /* This introduces an unreferenced, open handle into the child.
+	     The purpose is to keep the pid shared memory open so that all
+	     of the fields filled out by child.remember do not disappear
+	     and so there is not a brief period during which the pid is
+	     not available. */
 	  DuplicateHandle (GetCurrentProcess (), child.shared_handle (),
 			   pi.hProcess, NULL, 0, 0, DUPLICATE_SAME_ACCESS);
+	  if (!real_path.iscygexec ())
+	    {
+	      /* If the child process is not a Cygwin process, we have to
+		 create a new winpid symlink and induce it into the child
+		 process as well to keep it over the lifetime of the child. */
+	      child.create_winpid_symlink ();
+	      DuplicateHandle (GetCurrentProcess (),
+			       child.shared_winpid_handle (),
+			       pi.hProcess, NULL, 0, 0, DUPLICATE_SAME_ACCESS);
+	    }
 	  child->start_time = time (NULL); /* Register child's starting time. */
 	  child->nice = myself->nice;
 	  postfork (child);

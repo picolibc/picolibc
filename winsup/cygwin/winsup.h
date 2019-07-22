@@ -185,6 +185,7 @@ extern "C" void error_start_init (const char*);
 extern "C" int try_to_debug (bool waitloop = 1);
 
 void ld_preload ();
+void fixup_hooks_after_fork ();
 const char *find_first_notloaded_dll (class path_conv &);
 
 /**************************** Miscellaneous ******************************/
@@ -223,7 +224,7 @@ int __small_swprintf (PWCHAR dst, const WCHAR *fmt, ...);
 int __small_vswprintf (PWCHAR dst, const WCHAR *fmt, va_list ap);
 void multiple_cygwin_problem (const char *, uintptr_t, uintptr_t);
 
-bool child_copy (HANDLE, bool, ...);
+bool child_copy (HANDLE, bool, bool, ...);
 
 class path_conv;
 

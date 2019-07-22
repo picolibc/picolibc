@@ -13,6 +13,70 @@
     identically. All of the Cygwin command-line utilities support the
     <literal>--help</literal> and <literal>--version</literal> options. </para>
 
+  <refentry id="chattr">
+    <refmeta>
+      <refentrytitle>chattr</refentrytitle>
+      <manvolnum>1</manvolnum>
+      <refmiscinfo class="manual">Cygwin Utilities</refmiscinfo>
+    </refmeta>
+
+    <refnamediv>
+      <refname>chattr</refname>
+      <refpurpose>Change file attributes</refpurpose>
+    </refnamediv>
+
+    <refsynopsisdiv>
+      <screen>
+chattr [-RVfhv] [+-=mode]... [file]...
+      </screen>
+    </refsynopsisdiv>
+
+    <refsect1 id="chattr-options">
+      <title>Options</title>
+      <screen>
+  -R, --recursive     recursively list attributes of directories and their
+                      contents
+  -V, --verbose       Be verbose during operation
+  -f, --force         suppress error messages
+  -h, --help          this help text
+  -v, --version       display the program version
+</screen>
+    </refsect1>
+
+    <refsect1 id="chattr-desc">
+      <title>Description</title>
+    <para>The <command>chattr</command> program allows to change file
+      attributes, namely DOS attributes, as well as making files sparse,
+      encrypt or compress them on FS level, or setting directories'
+      case sensitivity.
+    </para>
+
+    <para>The format of 'mode' is {+-=}[acCehnrsSt]</para>
+
+    <para>The  operator '+' causes the selected attributes to be added to the
+      existing attributes of the files; '-' causes them to be removed; and
+      '=' causes them to be the only attributes that the files have.</para>
+
+    <para>Supported attributes:</para>
+
+    <screen>
+  'r', 'Readonly':     file is read-only
+  'h', 'Hidden':        file or directory is hidden
+  's', 'System':        file or directory that the operating system uses
+  'a', 'Archive':       file or directory has the archive marker set
+  't', 'Temporary':     file is being used for temporary storage
+  'S', 'Sparse':        file is sparse
+  'c', 'Compressed':    file or directory is compressed
+  'n', 'Notindexed':    file or directory is not to be indexed by the
+			content indexing service
+  'e', 'Encrypted':     file is encrypted
+  'C', 'Casesensitive': directory is handled case sensitive
+			(Windows 10 1803 or later, local NTFS only,
+			 WSL must be installed)
+    </screen>
+    </refsect1>
+  </refentry>
+
     <refentry id="cygcheck">
       <refmeta>
 	<refentrytitle>cygcheck</refentrytitle>
@@ -628,6 +692,8 @@ kill -l [signal]
  -f, --force     force, using win32 interface if necessary
  -l, --list      print a list of signal names
  -s, --signal    send signal (use kill --list for a list)
+ -W, --winpid    specified pids are windows PIDs, not Cygwin PIDs
+                 (use with extreme caution!)
  -h, --help      output usage information and exit
  -V, --version   output version information and exit
 </screen>
@@ -653,7 +719,13 @@ $ /bin/kill --version
 </screen> which should give the Cygwin
       <command>kill</command> version number and copyright information. </para>
 
-    <para>Unless you specific the <literal>-f</literal> option, the "pid"
+    <para>The <literal>-f</literal> option uses Windows functions to
+      terminate processes forcefully. Use <literal>-f</literal> to
+      terminate native Windows processes not started by Cygwin processes.
+      <literal>-f</literal> can also be useful to terminate Cygwin processes
+      not answering to SIGKILL.</para>
+
+    <para>Unless you specific the <literal>-W</literal> option, the "pid"
       values used by <command>kill</command> are the Cygwin pids, not the
       Windows pids. To get a list of running programs and their Cygwin pids,
       use the Cygwin <command>ps</command> program. <command>ps -W</command>
@@ -947,6 +1019,71 @@ nostr="no"
 messages-codeset="UTF-8"
 bash$ locale noexpr
 ^[nN]
+    </screen>
+    </refsect1>
+  </refentry>
+
+  <refentry id="lsattr">
+    <refmeta>
+      <refentrytitle>lsattr</refentrytitle>
+      <manvolnum>1</manvolnum>
+      <refmiscinfo class="manual">Cygwin Utilities</refmiscinfo>
+    </refmeta>
+
+    <refnamediv>
+      <refname>lsattr</refname>
+      <refpurpose>List file attributes</refpurpose>
+    </refnamediv>
+
+    <refsynopsisdiv>
+      <screen>
+lsattr [-RVadhln] [file]...
+      </screen>
+    </refsynopsisdiv>
+
+    <refsect1 id="lsattr-options">
+      <title>Options</title>
+      <screen>
+  -R, --recursive     recursively list attributes of directories and their
+                      contents
+  -V, --version       display the program version
+  -a, --all           list all files in directories, including files that
+                      start with '.'
+  -d, --directory     list directories like other files, rather than listing
+                      their contents.
+  -l, --long          print options using long names instead of single
+                      character abbreviations
+  -n, --no-headers    don't print directory headers when recursing
+  -h, --help          this help text
+</screen>
+    </refsect1>
+
+    <refsect1 id="lsattr-desc">
+      <title>Description</title>
+    <para>The <command>lsattr</command> program allows to list file
+      attributes, namely DOS attributes, file sparseness, FS level
+      encryption and compression state, as well as directories'
+      case sensitivity setting.
+    </para>
+
+    <para>Supported attributes:</para>
+
+    <screen>
+  'r', 'Readonly':      file is read-only, directory is system-marked
+  'h', 'Hidden':        file or directory is hidden
+  's', 'System':        file or directory that the operating system uses
+  'a', 'Archive':       file or directory has the archive marker set
+  't', 'Temporary':     file is being used for temporary storage
+  'S', 'Sparse':        file is sparse
+  'r', 'Reparse':       file or directory that has a reparse point
+  'c', 'Compressed':    file or directory is compressed
+  'o', 'Offline':       the data of a file is moved to offline storage
+  'n', 'Notindexed':    file or directory is not to be indexed by the
+                        content indexing service
+  'e', 'Encrypted':     file is encrypted
+  'C', 'Casesensitive': directory is handled case sensitive
+                        (Windows 10 1803 or later, local NTFS only,
+                         WSL must be installed)
     </screen>
     </refsect1>
   </refentry>

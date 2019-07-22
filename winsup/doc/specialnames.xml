@@ -215,6 +215,52 @@ Read on for more information.</para>
 
 </sect2>
 
+<sect2 id="pathnames-casesensitivedirs">
+<title>Case sensitive directories</title>
+
+<para>Windows 10 1803 introduced a new feature: NTFS directories can be marked
+as case-sensitive, independently of the <literal>obcaseinsensitive</literal>
+registry key discussed in the previous section.  This new per-directory
+case-sensitivity requires setting a flag in the NTFS filesystem header which
+is, unfortunately, undocumented.  The result is that you have to activate
+<literal>Windows Subsystem for Linux</literal> (<literal>WSL</literal>), a
+feature available via <literal>Programs and Features</literal> ->
+<literal>Turn Windows features on or off</literal>.  You only have to activate
+<literal>WSL</literal>, you don't have to install any actual Linux.  After
+turning <literal>WSL</literal> on and performing the compulsory reboot,
+case-sensitive directories are activated.</para>
+
+<para>Of course, there's a drawback.  While these case-sensitive directories
+work like charm on the local machine, there are massive interoperability
+problems when trying to access these directories from remote machines at
+the time of writing this.  We opened a bug report for that at
+<ulink url="https://github.com/Microsoft/WSL/issues/3885">Microsoft's WSL issue tracker</ulink>,
+if you're interested in the details.</para>
+
+<note><para>If you want case-sensitivity and need interoperability with remote
+machines, better stick to switching the kernel to case-sensitivity as
+outlined in <xref linkend="pathnames-casesensitive"></xref></para></note>
+
+<para>With <literal>WSL</literal> activated and starting with Cygwin 3.0.0,
+Cygwin's <command>mkdir</command> system call automatically created all
+directories below the Cygwin installation directory as case-sensitive.
+With Cygwin 3.0.2, this feature had been disabled again for hopefully
+obvious reasons.</para>
+
+<para>However, you can still use Cygwin's new
+<xref linkend="chattr"></xref> tool with the <literal>-C</literal> option
+to control case-sensitivity of directories on NTFS filesystems.</para>
+
+<para>Please keep in mind that switching <emphasis>off</emphasis>
+case-sensitivity on a directory has a condition attached to it:  If
+the directory contains two files which only differ in case (e. g.,
+<filename>foo</filename> and <filename>FOO</filename>), Windows
+refuses to convert the dir back to case-insensitive.  First you have
+to fix the filename collision, i. e., you have to rename one of these
+files.</para>
+
+</sect2>
+
 <sect2 id="pathnames-posixdevices"> <title>POSIX devices</title>
 <para>While there is no need to create a POSIX <filename>/dev</filename> 
 directory, the directory is automatically created as part of a Cygwin

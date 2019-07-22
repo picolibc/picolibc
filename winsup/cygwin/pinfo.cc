@@ -25,6 +25,7 @@ details. */
 #include "cygtls.h"
 #include "tls_pbuf.h"
 #include "child_info.h"
+#include "dll_init.h"
 
 class pinfo_basic: public _pinfo
 {
@@ -34,7 +35,7 @@ public:
 
 pinfo_basic::pinfo_basic ()
 {
-  pid = dwProcessId = GetCurrentProcessId ();
+  dwProcessId = GetCurrentProcessId ();
   PWCHAR pend = wcpncpy (progname, global_progname,
 			 sizeof (progname) / sizeof (WCHAR) - 1);
   *pend = L'\0';
@@ -56,28 +57,26 @@ pinfo::thisproc (HANDLE h)
   procinfo = NULL;
 
   DWORD flags = PID_IN_USE | PID_ACTIVE;
+  /* Forked process or process started from non-Cygwin parent needs a pid. */
   if (!h)
     {
-      h = INVALID_HANDLE_VALUE;
-      cygheap->pid = cygwin_pid (myself_initial.pid);
+      cygheap->pid = create_cygwin_pid ();
       flags |= PID_NEW;
     }
+  /* spawnve'd process got pid in parent, cygheap->pid has been set in
+     child_info_spawn::handle_spawn. */
+  else if (h == INVALID_HANDLE_VALUE)
+    h = NULL;
 
   init (cygheap->pid, flags, h);
   procinfo->process_state |= PID_IN_USE;
-  procinfo->dwProcessId = myself_initial.pid;
+  procinfo->dwProcessId = myself_initial.dwProcessId;
   procinfo->sendsig = myself_initial.sendsig;
   wcscpy (procinfo->progname, myself_initial.progname);
+  create_winpid_symlink ();
+  procinfo->exec_sendsig = NULL;
+  procinfo->exec_dwProcessId = 0;
   debug_printf ("myself dwProcessId %u", procinfo->dwProcessId);
-  if (h != INVALID_HANDLE_VALUE)
-    {
-      /* here if execed */
-      static pinfo NO_COPY myself_identity;
-      myself_identity.init (cygwin_pid (procinfo->dwProcessId), PID_EXECED, NULL);
-      procinfo->exec_sendsig = NULL;
-      procinfo->exec_dwProcessId = 0;
-      myself_identity->ppid = procinfo->pid;
-    }
 }
 
 /* Initialize the process table entry for the current task.
@@ -109,7 +108,8 @@ pinfo_init (char **envp, int envc)
   myself->process_state |= PID_ACTIVE;
   myself->process_state &= ~(PID_INITIALIZING | PID_EXITED | PID_REAPED);
   myself.preserve ();
-  debug_printf ("pid %d, pgid %d, process_state %y", myself->pid, myself->pgid, myself->process_state);
+  debug_printf ("pid %d, pgid %d, process_state %y",
+		myself->pid, myself->pgid, myself->process_state);
 }
 
 DWORD
@@ -152,7 +152,7 @@ pinfo::status_exit (DWORD x)
 	 reason (but note, the environment *in* CMD is broken and shortened).
 	 This occurs at a point where there's no return to the exec'ing parent
 	 process, so we have to find some way to inform the user what happened.
-	 
+
 	 FIXME: For now, just return with SIGBUS set.  Maybe it's better to add
 	 a lengthy small_printf instead. */
       x = SIGBUS;
@@ -222,12 +222,114 @@ pinfo::exit (DWORD n)
   int exitcode = self->exitcode & 0xffff;
   if (!self->cygstarted)
     exitcode = ((exitcode & 0xff) << 8) | ((exitcode >> 8) & 0xff);
+  sigproc_printf ("Calling dlls.cleanup_forkables n %y, exitcode %y", n, exitcode);
+  dlls.cleanup_forkables ();
   sigproc_printf ("Calling ExitProcess n %y, exitcode %y", n, exitcode);
   if (!TerminateProcess (GetCurrentProcess (), exitcode))
     system_printf ("TerminateProcess failed, %E");
   ExitProcess (exitcode);
 }
 # undef self
+
+/* Return next free Cygwin PID between 2 and 65535, round-robin.  Each new
+   PID is checked that it doesn't collide with an existing PID.  For that,
+   just check if the "cygpid.PID" section exists. */
+pid_t
+create_cygwin_pid ()
+{
+  pid_t pid = 0;
+  WCHAR sym_name[24];
+  UNICODE_STRING sym_str;
+  OBJECT_ATTRIBUTES attr;
+  HANDLE sym_hdl;
+  NTSTATUS status;
+
+  do
+    {
+      do
+	{
+	  pid = ((uint32_t) InterlockedIncrement (&cygwin_shared->pid_src))
+		% MAX_PID;
+	}
+      while (pid < 2);
+      __small_swprintf (sym_name, L"cygpid.%u", pid);
+      RtlInitUnicodeString (&sym_str, sym_name);
+      InitializeObjectAttributes (&attr, &sym_str, OBJ_CASE_INSENSITIVE,
+				  get_shared_parent_dir (), NULL);
+      /* We just want to know if the section (and thus the process) still
+         exists.  Instead of actually opening the section, try to open
+	 it as symlink.  NtOpenSymbolicLinkObject will always returns an
+	 error:
+	 - STATUS_OBJECT_NAME_NOT_FOUND if the section doesn't exist,
+	   so the slot is free and we can use this pid.
+	 - STATUS_OBJECT_TYPE_MISMATCH if the section exists, so we have
+	   to skip this pid and loop to try the next one.
+	  As side-effect we never have to close the section handle and thus
+	  we don't influence the lifetime of the section. */
+      status = NtOpenSymbolicLinkObject (&sym_hdl, SYMBOLIC_LINK_QUERY, &attr);
+    }
+  while (status == STATUS_OBJECT_TYPE_MISMATCH);
+  return pid;
+}
+
+/* Convert Windows WINPID into Cygwin PID.  Utilize the "winpid.WINPID"
+   symlinks created for each process.  The symlink contains the Cygwin
+   PID as target.  Return 0 if no "winpid.WINPID" symlink exists for
+   this WINPID. */
+pid_t
+cygwin_pid (DWORD dwProcessId)
+{
+  WCHAR sym_name[24];
+  WCHAR pid_name[12];
+  UNICODE_STRING sym_str;
+  UNICODE_STRING pid_str;
+  OBJECT_ATTRIBUTES attr;
+  HANDLE sym_hdl;
+  NTSTATUS status;
+
+  __small_swprintf (sym_name, L"winpid.%u", dwProcessId);
+  RtlInitUnicodeString (&sym_str, sym_name);
+  InitializeObjectAttributes (&attr, &sym_str, OBJ_CASE_INSENSITIVE,
+			      get_shared_parent_dir (), NULL);
+  status = NtOpenSymbolicLinkObject (&sym_hdl, SYMBOLIC_LINK_QUERY, &attr);
+  if (!NT_SUCCESS (status))
+    return 0;
+  RtlInitEmptyUnicodeString (&pid_str, pid_name,
+			     sizeof pid_name - sizeof (WCHAR));
+  status = NtQuerySymbolicLinkObject (sym_hdl, &pid_str, NULL);
+  NtClose (sym_hdl);
+  if (!NT_SUCCESS (status))
+    {
+      system_printf ("NtOpenSymbolicLinkObject: %y, PID %u, ret 0",
+		     status, dwProcessId);
+      return 0;
+    }
+  pid_str.Buffer[pid_str.Length / sizeof (WCHAR)] = L'\0';
+  pid_t ret = (pid_t) wcstoul (pid_str.Buffer, NULL, 10);
+  return ret;
+}
+
+/* Create "winpid.WINPID" symlinks with the Cygwin PID of that process as
+   target.  This is used to find the Cygwin PID for a given Windows WINPID. */
+void
+pinfo::create_winpid_symlink ()
+{
+  WCHAR sym_name[24];
+  WCHAR pid_name[24];
+  UNICODE_STRING sym_str;
+  UNICODE_STRING pid_str;
+  OBJECT_ATTRIBUTES attr;
+
+  __small_swprintf (sym_name, L"winpid.%u", procinfo->dwProcessId);
+  RtlInitUnicodeString (&sym_str, sym_name);
+  __small_swprintf (pid_name, L"%u", procinfo->pid);
+  RtlInitUnicodeString (&pid_str, pid_name);
+  InitializeObjectAttributes (&attr, &sym_str, OBJ_CASE_INSENSITIVE,
+			      get_shared_parent_dir (),
+			      everyone_sd (SYMBOLIC_LINK_QUERY));
+  NtCreateSymbolicLinkObject (&winpid_hdl, SYMBOLIC_LINK_ALL_ACCESS,
+			      &attr, &pid_str);
+}
 
 inline void
 pinfo::_pinfo_release ()
@@ -252,20 +354,18 @@ pinfo::init (pid_t n, DWORD flag, HANDLE h0)
 {
   shared_locations shloc;
   h = NULL;
-  if (myself && !(flag & PID_EXECED)
-      && (n == myself->pid || (DWORD) n == myself->dwProcessId))
+  if (myself && n == myself->pid)
     {
       procinfo = myself;
       destroy = 0;
       return;
     }
 
-  int createit = flag & (PID_IN_USE | PID_EXECED);
+  int createit = (flag & PID_IN_USE);
   DWORD access = FILE_MAP_READ
-		 | (flag & (PID_IN_USE | PID_EXECED | PID_MAP_RW)
-		    ? FILE_MAP_WRITE : 0);
+		 | (flag & (PID_IN_USE | PID_MAP_RW) ? FILE_MAP_WRITE : 0);
   if (!h0 || myself.h)
-    shloc = (flag & (PID_IN_USE | PID_EXECED)) ? SH_JUSTCREATE : SH_JUSTOPEN;
+    shloc = (flag & PID_IN_USE) ? SH_JUSTCREATE : SH_JUSTOPEN;
   else
     {
       shloc = SH_MYSELF;
@@ -281,14 +381,8 @@ pinfo::init (pid_t n, DWORD flag, HANDLE h0)
 
   for (int i = 0; i < 20; i++)
     {
-      DWORD mapsize;
-      if (flag & PID_EXECED)
-	mapsize = PINFO_REDIR_SIZE;
-      else
-	mapsize = sizeof (_pinfo);
-
-      procinfo = (_pinfo *) open_shared (L"cygpid", n, h0, mapsize, &shloc,
-					 sec_attribs, access);
+      procinfo = (_pinfo *) open_shared (L"cygpid", n, h0, sizeof (_pinfo),
+					 &shloc, sec_attribs, access);
       if (!h0)
 	{
 	  if (createit)
@@ -311,33 +405,10 @@ pinfo::init (pid_t n, DWORD flag, HANDLE h0)
 
       bool created = shloc != SH_JUSTOPEN;
 
-      /* Detect situation where a transitional memory block is being retrieved.
-	 If the block has been allocated with PINFO_REDIR_SIZE but not yet
-	 updated with a PID_EXECED state then we'll retry.  */
-      if (!created && !(flag & PID_NEW) && !procinfo->ppid)
-	{
-	  /* Fetching process info for /proc or ps?  just ignore this one. */
-	  if (flag & PID_NOREDIR)
-	    break;
-	  /* FIXME: Do we ever hit this case?  And if so, in what situation? */
-	  system_printf ("This shouldn't happen:\n"
-			 "    me: (%d, %d, %d, %W)\n"
-			 "    pid %d\n"
-			 "    process_state %y\n"
-			 "    cygstarted %d\n"
-			 "    dwProcessId %d\n"
-			 "    name %W",
-			 myself->pid, myself->dwProcessId, myself->cygstarted,
-			 myself->progname,
-			 procinfo->pid, procinfo->process_state,
-			 procinfo->cygstarted, procinfo->dwProcessId,
-			 procinfo->progname);
-	  /* If not populated, wait 2 seconds for procinfo to become populated.
-	     Would like to wait with finer granularity but that is not easily
-	     doable.  */
-	  for (int i = 0; i < 200 && !procinfo->ppid; i++)
-	    Sleep (10);
-	}
+      /* Just fetching info for ps or /proc, don't do anything rash. */
+      if (!created && !(flag & PID_NEW) && !procinfo->ppid
+	  && (flag & PID_PROCINFO))
+	break;
 
       if (!created && createit && (procinfo->process_state & PID_REAPED))
 	{
@@ -346,32 +417,18 @@ pinfo::init (pid_t n, DWORD flag, HANDLE h0)
 				   shared memory */
 	}
 
-      if ((procinfo->process_state & PID_REAPED)
-	  || ((procinfo->process_state & PID_INITIALIZING) && (flag & PID_NOREDIR)
-	      && cygwin_pid (procinfo->dwProcessId) != procinfo->pid))
+      if (procinfo->process_state & PID_REAPED)
 	{
 	  set_errno (ESRCH);
 	  break;
-	}
-
-      if (procinfo->process_state & PID_EXECED)
-	{
-	  pid_t realpid = procinfo->pid;
-	  debug_printf ("execed process windows pid %u, cygwin pid %d", n, realpid);
-	  if (realpid == n)
-	    api_fatal ("retrieval of execed process info for pid %d failed due to recursion.", n);
-
-	  n = realpid;
-	  CloseHandle (h0);
-	  h0 = NULL;
-	  goto loop;
 	}
 
       /* In certain pathological cases, it is possible for the shared memory
 	 region to exist for a while after a process has exited.  This should
 	 only be a brief occurrence, so rather than introduce some kind of
 	 locking mechanism, just loop.  */
-      if (!created && createit && (procinfo->process_state & (PID_EXITED | PID_REAPED)))
+      if (!created && createit
+	  && (procinfo->process_state & (PID_EXITED | PID_REAPED)))
 	{
 	  debug_printf ("looping because pid %d, procinfo->pid %d, "
 			"procinfo->dwProcessid %u has PID_EXITED|PID_REAPED set",
@@ -381,15 +438,8 @@ pinfo::init (pid_t n, DWORD flag, HANDLE h0)
 
       if (flag & PID_NEW)
 	procinfo->start_time = time (NULL);
-      if (!created)
-	/* nothing */;
-      else if (!(flag & PID_EXECED))
+      if (created)
 	procinfo->pid = n;
-      else
-	{
-	  procinfo->process_state |= PID_IN_USE | PID_EXECED;
-	  procinfo->pid = myself->pid;
-	}
 
       h = h0;	/* Success! */
       break;
@@ -529,7 +579,7 @@ _pinfo::set_ctty (fhandler_termios *fh, int flags)
 bool __reg1
 _pinfo::exists ()
 {
-  return process_state && !(process_state & (PID_EXITED | PID_REAPED | PID_EXECED));
+  return process_state && !(process_state & (PID_EXITED | PID_REAPED));
 }
 
 bool
@@ -637,7 +687,7 @@ commune_process (void *arg)
       }
     case PICOM_PIPE_FHANDLER:
       {
-	sigproc_printf ("processing PICOM_FDS");
+	sigproc_printf ("processing PICOM_PIPE_FHANDLER");
 	int64_t unique_id = si._si_commune._si_pipe_unique_id;
 	unsigned int n = 0;
 	cygheap_fdenum cfd;
@@ -653,6 +703,30 @@ commune_process (void *arg)
 	      break;
 	    }
 	if (!n && !WritePipeOverlapped (tothem, &n, sizeof n, &nr, 1000L))
+	  sigproc_printf ("WritePipeOverlapped sizeof hdl failed, %E");
+	break;
+      }
+    case PICOM_FILE_PATHCONV:
+      {
+	sigproc_printf ("processing PICOM_FILE_PATHCONV");
+	int fd = si._si_commune._si_fd;
+	uint32_t flags = si._si_commune._si_flags;
+	unsigned int n = 0;
+	cygheap_fdget cfd (fd);
+	if (cfd >= 0
+	    && (!(flags & FFH_LINKAT)
+		|| (cfd->get_flags () & (O_TMPFILE | O_EXCL))
+		    != (O_TMPFILE | O_EXCL)))
+	  {
+	    fhandler_base *fh = cfd;
+	    void *ser_buf = fh->pc.serialize (fh->get_handle (), n);
+	    if (!WritePipeOverlapped (tothem, &n, sizeof n, &nr, 1000L))
+	      sigproc_printf ("WritePipeOverlapped sizeof hdl failed, %E");
+	    else if (!WritePipeOverlapped (tothem, ser_buf, n, &nr, 1000L))
+	      sigproc_printf ("WritePipeOverlapped hdl failed, %E");
+	    cfree (ser_buf);
+	  }
+	else if (!WritePipeOverlapped (tothem, &n, sizeof n, &nr, 1000L))
 	  sigproc_printf ("WritePipeOverlapped sizeof hdl failed, %E");
 	break;
       }
@@ -741,7 +815,9 @@ _pinfo::commune_request (__uint32_t code, ...)
       break;
 
     case PICOM_FD:
+    case PICOM_FILE_PATHCONV:
       si._si_commune._si_fd = va_arg (args, int);
+      si._si_commune._si_flags = va_arg (args, uint32_t);
       break;
 
     break;
@@ -773,6 +849,7 @@ _pinfo::commune_request (__uint32_t code, ...)
     case PICOM_FDS:
     case PICOM_FD:
     case PICOM_PIPE_FHANDLER:
+    case PICOM_FILE_PATHCONV:
       if (!ReadPipeOverlapped (fromthem, &n, sizeof n, &nr, 1000L)
 	  || nr != sizeof n)
 	{
@@ -827,6 +904,18 @@ _pinfo::pipe_fhandler (int64_t unique_id, size_t &n)
   commune_result cr = commune_request (PICOM_PIPE_FHANDLER, unique_id);
   n = cr.n;
   return (fhandler_pipe *) cr.s;
+}
+
+void *
+_pinfo::file_pathconv (int fd, uint32_t flags, size_t &n)
+{
+  if (!pid)
+    return NULL;
+  if (pid == myself->pid)
+    return NULL;
+  commune_result cr = commune_request (PICOM_FILE_PATHCONV, fd, flags);
+  n = cr.n;
+  return (void *) cr.s;
 }
 
 char *
@@ -1240,6 +1329,8 @@ void
 pinfo::release ()
 {
   _pinfo_release ();
+  if (winpid_hdl)
+    NtClose (winpid_hdl);
   HANDLE close_h;
   if (rd_proc_pipe)
     {
@@ -1327,12 +1418,12 @@ winpids::add (DWORD& nelem, bool winpid, DWORD pid)
     {
       npidlist += slop_pidlist;
       pidlist = (DWORD *) realloc (pidlist, size_pidlist (npidlist + 1));
-      pinfolist = (pinfo *) realloc (pinfolist, size_pinfolist (npidlist + 1));
+      pinfolist = (pinfo *) realloc ((void *) pinfolist, size_pinfolist (npidlist + 1));
     }
 
   _onreturn onreturn;
   pinfo& p = pinfolist[nelem];
-  memset (&p, 0, sizeof (p));
+  memset ((void *) &p, 0, sizeof (p));
 
   bool perform_copy;
   if (cygpid == myself->pid)
@@ -1346,12 +1437,16 @@ winpids::add (DWORD& nelem, bool winpid, DWORD pid)
 	 shared memory region. */
       onreturn = OpenProcess (PROCESS_QUERY_LIMITED_INFORMATION, false, pid);
 
-      /* If we couldn't open the process then we don't have rights to it and should
-	 make a copy of the shared memory area when it exists (it may not).  */
+      /* If we couldn't open the process then we don't have rights to it
+	 and should make a copy of the shared memory area when it exists
+	 (it may not).  */
       perform_copy = onreturn ? make_copy : true;
 
-      p.init (cygpid, PID_NOREDIR | pinfo_access, NULL);
+      p.init (cygpid, PID_PROCINFO | pinfo_access, NULL);
     }
+  /* Did we catch the process during exec?  Try to fix. */
+  if (p && p->dwProcessId != pid)
+    pid = p->dwProcessId;
 
   /* If we're just looking for winpids then don't do any special cygwin "stuff* */
   if (winpid)
@@ -1364,47 +1459,40 @@ winpids::add (DWORD& nelem, bool winpid, DWORD pid)
      that it isn't a cygwin process. */
   if (!p)
     {
-      if (!pinfo_access)
+      if (!pinfo_access || !cygpid)
 	return;
-      p.init (cygpid, PID_NOREDIR, NULL);
+      p.init (cygpid, PID_PROCINFO, NULL);
       if (!p)
 	return;
     }
 
+out:
   /* Scan list of previously recorded pids to make sure that this pid hasn't
      shown up before.  This can happen when a process execs. */
   for (unsigned i = 0; i < nelem; i++)
-    if (pinfolist[i]->pid == p->pid)
+    if (pidlist[i] == pid)
       {
-	if ((_pinfo *) p != (_pinfo *) myself)
+	if (p && (_pinfo *) p != (_pinfo *) myself)
 	  p.release ();
 	return;
       }
-
-out:
-  /* Exit here.
-
-     If p is "false" then, eventually any opened process handle will be closed and
-     the function will exit without adding anything to the pid list.
+  /* If p is "false" then, eventually any opened process handle will be closed
+     and the function will exit without adding anything to the pid list.
 
      If p is "true" then we've discovered a cygwin process.
 
      Handle "myself" differently.  Don't copy it and close/zero the handle we
-     just opened to it.
-     If not performing a copy, then keep the process handle open for the duration
-     of the life of the procinfo region to potential races when a new process uses
-     this pid.
-     Otherwise, malloc some memory for a copy of the shared memory.
+     just opened to it.  If not performing a copy, then keep the process handle
+     open for the duration of the life of the procinfo region to potential
+     races when a new process uses this pid.  Otherwise, malloc some memory
+     for a copy of the shared memory.
 
-     If the malloc failed, then "oh well".  Just keep the shared memory around
+     If malloc failed, then "oh well".  Just keep the shared memory around
      and eventually close the handle when the winpids goes out of scope.
 
      If malloc succeeds, copy the procinfo we just grabbed into the new region,
      release the shared memory and allow the handle to be closed when this
-     function returns.
-
-     Oh, and add the pid to the list and bump the number of elements.  */
-
+     function returns. */
   if (p)
     {
       if (p == (_pinfo *) myself)
@@ -1428,8 +1516,9 @@ out:
 	    }
 	}
     }
+  /* Add pid to the list and bump the number of elements.  */
   if (p || winpid)
-    pidlist[nelem++] = !p ? pid : p->dwProcessId;
+    pidlist[nelem++] = pid;
 }
 
 DWORD
@@ -1452,11 +1541,11 @@ winpids::enum_processes (bool winpid)
 	{
 	  restart = FALSE;
 	  f.dbi.ObjectName.Buffer[f.dbi.ObjectName.Length / sizeof (WCHAR)] = L'\0';
-	  if (wcsncmp (f.dbi.ObjectName.Buffer, L"cygpid.", 7) == 0)
+	  if (wcsncmp (f.dbi.ObjectName.Buffer, L"winpid.", 7) == 0)
 	    {
-	    DWORD pid = wcstoul (f.dbi.ObjectName.Buffer + 7, NULL, 10);
-	    add (nelem, false, pid);
-	  }
+	      DWORD pid = wcstoul (f.dbi.ObjectName.Buffer + 7, NULL, 10);
+	      add (nelem, false, pid);
+	    }
 	}
     }
   else

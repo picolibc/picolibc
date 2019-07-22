@@ -52,36 +52,8 @@ hypotl (long double x, long double y)
   if ((! finitel (z)) && finitel (x) && finitel (y))
     {
       /* hypot (finite, finite) overflow.  */
-      struct exception exc;
-
-      exc.type = OVERFLOW;
-      exc.name = "hypotl";
-      exc.err = 0;
-      exc.arg1 = x;
-      exc.arg2 = y;
-
-      if (_LIB_VERSION == _SVID_)
-	exc.retval = HUGE;
-      else
-	{
-#ifndef HUGE_VAL 
-#define HUGE_VAL inf
-	  double inf = 0.0;
-
-	  SET_HIGH_WORD (inf, 0x7ff00000);	/* Set inf to infinite.  */
-#endif
-	  exc.retval = HUGE_VAL;
-	}
-
-      if (_LIB_VERSION == _POSIX_)
-	errno = ERANGE;
-      else if (! matherr (& exc))
-	errno = ERANGE;
-
-      if (exc.err != 0)
-	errno = exc.err;
-
-      return (long double) exc.retval; 
+      errno = ERANGE;
+      return (long double) HUGE_VAL;
     }
 
   return z;

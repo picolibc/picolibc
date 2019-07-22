@@ -73,7 +73,7 @@ __FLT_ABI (sqrt) (__FLT_TYPE x)
       if (x_class == FP_ZERO)
 	return __FLT_CST (-0.0);
 
-      __FLT_RPT_DOMAIN ("sqrt", x, 0.0, x);
+      errno = EDOM;
       return x;
     }
   else if (x_class == FP_ZERO)

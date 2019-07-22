@@ -10,8 +10,8 @@ details. */
    the Cygwin shared library".  This version is used to track important
    changes to the DLL and is mainly informative in nature. */
 
-#define CYGWIN_VERSION_DLL_MAJOR 2011
-#define CYGWIN_VERSION_DLL_MINOR 2
+#define CYGWIN_VERSION_DLL_MAJOR 3001
+#define CYGWIN_VERSION_DLL_MINOR 0
 
 /* Major numbers before CYGWIN_VERSION_DLL_EPOCH are incompatible. */
 
@@ -498,13 +498,25 @@ details. */
   327: Export pthread_tryjoin_np, pthread_timedjoin_np.
   328: Export aio_cancel, aio_error, aio_fsync, aio_read, aio_return,
        aio_suspend, aio_write, lio_listio.
-  329: Export sched_getcpu..
+  329: Export sched_getcpu.
+  330: Add CLOCK_REALTIME_COARSE, CLOCK_MONOTONIC_RAW, CLOCK_MONOTONIC_COARSE,
+       CLOCK_BOOTTIME.
+  331: Add timer_getoverrun, DELAYTIMER_MAX.
+  332: Add signalfd.
+  333: Add timerfd_create, timerfd_gettime, timerfd_settime.
+  334: Remove matherr.
+  335: Change size of utsname, change uname output.
+  336: New Cygwin PID algorithm (yeah, not really an API change)
+  337: MOUNT_BINARY -> MOUNT_TEXT
+  338: Export secure_getenv.
+  339: Export sched_getaffinity, sched_setaffinity, pthread_getaffinity_np,
+       pthread_setaffinity_np, __sched_getaffinity_sys.
 
   Note that we forgot to bump the api for ualarm, strtoll, strtoull,
   sigaltstack, sethostname. */
 
 #define CYGWIN_VERSION_API_MAJOR 0
-#define CYGWIN_VERSION_API_MINOR 329
+#define CYGWIN_VERSION_API_MINOR 339
 
 /* There is also a compatibity version number associated with the shared memory
    regions.  It is incremented when incompatible changes are made to the shared

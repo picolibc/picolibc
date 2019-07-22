@@ -2326,35 +2326,56 @@ example:</para>
 
 </sect3>
 
-<sect3 id="ntsec-nopasswd1"><title id="ntsec-nopasswd1.title">Switching the user context without password, Method 1: Create a token from scratch</title>
+<sect3 id="ntsec-nopasswd1"><title id="ntsec-nopasswd1.title">Switching the user context without password, Method 1: Kerberos/MsV1_0 S4U authentication</title>
 
 <para>An unfortunate aspect of the implementation of
 <command>set(e)uid</command> is the fact that the calling process
-requires the password of the user to which to switch.  Applications such as
+requires the password of the user to switch to.  Applications such as
 <command>sshd</command> wishing to switch the user context after a
 successful public key authentication, or the <command>cron</command>
 application which, again, wants to switch the user without any authentication
 are stuck here.  But there are other ways to get new user tokens.</para>
 
-<para>One way is just to create a user token from scratch.  This is
-accomplished by using an (officially undocumented) function on the NT
-function level.  The NT function level is used to implement the Win32
-level, and, as such is closer to the kernel than the Win32 level.  The
-function of interest, <command>NtCreateToken</command>, allows you to
-specify user, groups, permissions and almost everything you need to
-create a user token, without the need to specify the user password.  The
-only restriction for using this function is that the calling process
-needs the "Create a token object" user right, which only the SYSTEM user
-account has by default, and which is considered the most dangerous right
-a user can have on Windows systems.</para>
+<para>Starting with Cygwin 3.0, Cygwin tries to create a token by using
+<literal>Windows S4U authentication</literal> by default.  For a quick
+description, see
+<ulink url="https://blogs.msdn.microsoft.com/winsdk/2015/08/28/logon-as-a-user-without-a-password/">this blog posting</ulink>.  Cygwin versions prior
+to 3.0 tried to creat a user token from scratch using an officially
+undocumented function <command>NtCreateToken</command> which
+is now disabled.</para>
 
-<para>That sounds good.  We just start the servers which have to switch
-the user context (<command>sshd</command>, <command>inetd</command>,
-<command>cron</command>, ...) as Windows services under the SYSTEM
-(or LocalSystem in the GUI) account and everything just works.
-Unfortunately that's too simple.  Using <command>NtCreateToken</command>
-has a few drawbacks.</para>
+<para>So we just start the servers which have to switch the user context
+(<command>sshd</command>, <command>inetd</command>, <command>cron</command>,
+...) as Windows services under the SYSTEM (or LocalSystem in the GUI)
+account and everything just works.  Unfortunately that's too simple.
+Using <literal>S4U</literal> has a drawback.</para>
 
+<para>Annoyingly, you don't have the usual comfortable access
+to network shares.  The reason is that the token has been created
+without knowing the password.  The password are your credentials
+necessary for network access.  Thus, if you logon with a password, the
+password is stored hidden as "token credentials" within the access token
+and used as default logon to access network resources.  Since these
+credentials are missing from the token created with <literal>S4U</literal>
+or <command>NtCreateToken</command>, you only can access network shares
+from the new user's process tree by using explicit authentication, on
+the command line for instance:</para>
+
+<screen>
+bash$ net use '\\server\share' /user:DOMAIN\my_user my_users_password
+</screen>
+
+<para>Note that, on some systems, you can't even define a drive letter
+to access the share, and under some circumstances the drive letter you
+choose collides with a drive letter already used in another session.
+Therefore it's better to get used to accessing these shares using the UNC
+path as in</para>
+
+<screen>
+bash$ grep foo //server/share/foofile
+</screen>
+
+<!--
 <para>First of all, the permission "Create a token object" gets explicitly
 removed from the SYSTEM user's access token, when starting services under that
 account.  That requires us to create a new account with this specific
@@ -2388,31 +2409,6 @@ is more complicated.  Some native, non-Cygwin Windows applications will
 misbehave badly in this situation.  A well-known example are certain versions
 of Visual-C++.</para>
 
-<para>Last but not least, you don't have the usual comfortable access
-to network shares.  The reason is that the token has been created
-without knowing the password.  The password are your credentials
-necessary for network access.  Thus, if you logon with a password, the
-password is stored hidden as "token credentials" within the access token
-and used as default logon to access network resources.  Since these
-credentials are missing from the token created with
-<command>NtCreateToken</command>, you only can access network shares
-from the new user's process tree by using explicit authentication, on
-the command line for instance:</para>
-
-<screen>
-bash$ net use '\\server\share' /user:DOMAIN\my_user my_users_password
-</screen>
-
-<para>Note that, on some systems, you can't even define a drive letter
-to access the share, and under some circumstances the drive letter you
-choose collides with a drive letter already used in another session.
-Therefore it's better to get used to accessing these shares using the UNC
-path as in</para>
-
-<screen>
-bash$ grep foo //server/share/foofile
-</screen>
-
 </sect3>
 
 <sect3 id="ntsec-nopasswd2"><title id="ntsec-nopasswd2.title">Switching the user context without password, Method 2: LSA authentication package</title>
@@ -2439,9 +2435,6 @@ rebooting the system, the LSA authentication package is used by Cygwin
 when <command>set(e)uid</command> is called by an application.  The
 created access token using this method has its own logon session.</para>
 
-<para>This method has two advantages over the <command>NtCreateToken</command>
-method.</para>
-
 <para>The very special and very dangerous "Create a token object" user
 right is not required by a user using this method.  Other privileged
 user rights are still necessary, especially the "Act as part of the
@@ -2459,16 +2452,15 @@ inconvenience compared to that...</para>
 
 <para>Nevertheless, this is already a lot better than what we get by
 using <command>NtCreateToken</command>, isn't it?</para>
+-->
 
 </sect3>
 
-<sect3 id="ntsec-nopasswd3"><title id="ntsec-nopasswd3.title">Switching the user context without password, Method 3: With password</title>
+<sect3 id="ntsec-nopasswd3"><title id="ntsec-nopasswd3.title">Switching the user context without password, Method 2: With password</title>
 
-<para>Ok, so we have solved almost any problem, except for the network
-access problem.  Not being able to access network shares without
-having to specify a cleartext password on the command line or in a 
-script is a harsh problem for automated logons for testing purposes
-and similar stuff.</para>
+<para>Not being able to access network shares without having to specify
+a cleartext password on the command line or in a script is a harsh problem
+for automated logons for testing purposes and similar stuff.</para>
 
 <para>Fortunately there is a solution, but it has its own drawbacks.
 But, first things first, how does it work?  The title of this section
@@ -2512,13 +2504,7 @@ as normal, non-privileged user as well.</para>
 hidden, obfuscated registry area.  Only SYSTEM has access to this area
 for listing purposes, so, even as an administrator, you can't examine
 this area with regedit.  Right?  No.  Every administrator can start
-regedit as SYSTEM user:</para>
-
-<screen>
-bash$ date
-Tue Dec  2 16:28:03 CET 2008
-bash$ at 16:29 /interactive regedit.exe
-</screen>
+regedit as SYSTEM user, the Internet is your friend here.</para>
 
 <para>Additionally, if an administrator knows under which name
 the private key is stored (which is well-known since the algorithms
@@ -2539,12 +2525,12 @@ safely use this method.</para>
 
 <sect3 id="ntsec-setuid-impl"><title id="ntsec-setuid-impl.title">Switching the user context, how does it all fit together?</title>
 
-<para>Now we learned about four different ways to switch the user
+<para>Now we learned about three different ways to switch the user
 context using the <command>set(e)uid</command> system call, but
 how does <command>set(e)uid</command> really work?  Which method does it
 use now?</para>
 
-<para>The answer is, all four of them.  So here's a brief overview
+<para>The answer is, all three of them.  So here's a brief overview
 what <command>set(e)uid</command> does under the hood:</para>
 
 <itemizedlist>
@@ -2575,17 +2561,27 @@ private registry area, either under a Cygwin key, or under a SFU key.
 If so, use this to call <command>LogonUser</command>.  If this
 succeeds, we use the resulting token for the user context switch.</para>
 </listitem>
-
+<!--
 <listitem>
 <para>Otherwise, check if the Cygwin-specifc LSA authentication package
 has been installed and is functional.  If so, use the appropriate LSA
 calls to communicate with the Cygwin LSA authentication package and
 use the returned token.</para>
 </listitem>
+-->
+<listitem>
+<para>Otherwise, use the default <literal>S4U</literal> authentication
+to create a token.</para>
+</listitem>
 
 <listitem>
-<para>Last chance, try to use the <command>NtCreateToken</command> call
-to create a token.  If that works, use this token.</para>
+<para>Older systems, like WOW64 under Windows 7 64 bit, don't support
+<literal>S4U</literal> authentication for local machine accounts.  On
+these systems Cygwin falls back to an old and otherwise deprecated
+method to create a user token from scratch.  The underlying system call
+is undocumented and has an unfortunate requirement: We have to create a
+special account with dangerous permissions to perform this action.
+Therefore this is only enabled on affected systems.</para>
 </listitem>
 
 <listitem>

@@ -37,13 +37,10 @@ o $\pi$.
         (not a number) the global variable <<errno>> is set to <<EDOM>>, and a
         <<DOMAIN error>> message is sent as standard error output.
 
-        You can modify error handling for these functions using <<matherr>>.
-
-
 QUICKREF
- ansi svid posix rentrant
- acos    y,y,y,m
- acosf   n,n,n,m
+ ansi posix rentrant
+ acos    y,y,m
+ acosf   n,n,m
 
 MATHREF
  acos, [-1,1], acos(arg),,,

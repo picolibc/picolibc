@@ -1,0 +1,37 @@
+What's new:
+-----------
+
+
+What changed:
+-------------
+
+- Windows 10 1803 or later and WSL installed:
+
+  Starting with 3.0.0, mkdir(2) automatically created directories within
+  the Cygwin installation dir as case sensitive.  This badly breaks
+  interoperability with remote machines trying to access these dirs.
+  Therefore, disable this as default.  You can still create case-sensitive
+  dirs via `chattr +C ...'
+
+
+Bug Fixes
+---------
+
+- Fix timerfd select always returning immediately.
+  Addresses: https://cygwin.com/ml/cygwin/2019-02/msg00364.html
+
+- Fix fork/exec failing to restore timerfd share mem in child process.
+  Addresses: https://cygwin.com/ml/cygwin/2019-02/msg00400.html
+
+- Drop enforcing case-correct group names for AD accounts to avoid
+  excessively long startup times.
+  Addresses: https://cygwin.com/ml/cygwin/2019-02/msg00301.html
+
+- Fix and speed up evaluation of group membership in seteuid.
+  Addresses: Local testing.
+
+- Fix getitimer/timer_gettime values returned for unarmed timer.
+  Addresses: https://cygwin.com/ml/cygwin/2019-02/msg00395.html
+
+- Fix a fork issue with mmap on Windows 8 / Server 2012.
+  Addresses: https://cygwin.com/ml/cygwin/2019-03/msg00012.html

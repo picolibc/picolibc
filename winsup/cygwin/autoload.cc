@@ -534,6 +534,8 @@ LoadDLLprime (ws2_32, _wsock_init, 0)
 LoadDLLfunc (CheckTokenMembership, 12, advapi32)
 LoadDLLfunc (CreateProcessAsUserW, 44, advapi32)
 LoadDLLfunc (DeregisterEventSource, 4, advapi32)
+LoadDLLfunc (DecryptFileW, 8, advapi32)
+LoadDLLfunc (EncryptFileW, 4, advapi32)
 LoadDLLfunc (LogonUserW, 24, advapi32)
 LoadDLLfunc (LookupAccountNameW, 28, advapi32)
 LoadDLLfunc (LookupAccountSidW, 28, advapi32)
@@ -586,6 +588,14 @@ LoadDLLfunc (GetSystemTimePreciseAsFileTime, 4, kernel32)
 LoadDLLfuncEx (PrefetchVirtualMemory, 16, kernel32, 1)
 LoadDLLfunc (SetThreadGroupAffinity, 12, kernel32)
 
+/* MSDN claims these are exported by kernel32.dll, but only
+   QueryUnbiasedInterruptTime actually is.  The others are only
+   available via KernelBase.dll. */
+LoadDLLfunc (QueryInterruptTime, 4, KernelBase)
+LoadDLLfunc (QueryInterruptTimePrecise, 4, KernelBase)
+LoadDLLfunc (QueryUnbiasedInterruptTime, 4, KernelBase)
+LoadDLLfunc (QueryUnbiasedInterruptTimePrecise, 4, KernelBase)
+
 /* ldap functions are cdecl! */
 #pragma push_macro ("mangle")
 #undef mangle
@@ -632,11 +642,13 @@ LoadDLLfunc (NetUserGetLocalGroups, 32, netapi32)
 
 LoadDLLfunc (CoTaskMemFree, 4, ole32)
 
+LoadDLLfunc (LsaConnectUntrusted, 4, secur32)
 LoadDLLfunc (LsaDeregisterLogonProcess, 4, secur32)
 LoadDLLfunc (LsaFreeReturnBuffer, 4, secur32)
 LoadDLLfunc (LsaLogonUser, 56, secur32)
 LoadDLLfunc (LsaLookupAuthenticationPackage, 12, secur32)
 LoadDLLfunc (LsaRegisterLogonProcess, 12, secur32)
+LoadDLLfunc (TranslateNameW, 20, secur32)
 
 LoadDLLfunc (SHGetDesktopFolder, 4, shell32)
 
@@ -653,6 +665,7 @@ LoadDLLfunc (CreateDesktopW, 24, user32)
 LoadDLLfunc (CreateWindowExW, 48, user32)
 LoadDLLfunc (CreateWindowStationW, 16, user32)
 LoadDLLfunc (DefWindowProcW, 16, user32)
+LoadDLLfunc (DestroyWindow, 4, user32)
 LoadDLLfunc (DispatchMessageW, 4, user32)
 LoadDLLfunc (EmptyClipboard, 0, user32)
 LoadDLLfunc (EnumWindows, 8, user32)
@@ -680,6 +693,7 @@ LoadDLLfunc (SetClipboardData, 8, user32)
 LoadDLLfunc (SetParent, 8, user32)
 LoadDLLfunc (SetProcessWindowStation, 4, user32)
 LoadDLLfunc (SetThreadDesktop, 4, user32)
+LoadDLLfunc (UnregisterClassW, 8, user32)
 
 LoadDLLfuncEx (CreateEnvironmentBlock, 12, userenv, 1)
 LoadDLLfuncEx2 (CreateProfile, 16, userenv, 1, 1)
@@ -741,8 +755,8 @@ LoadDLLfunc (WSASocketW, 24, ws2_32)
 // LoadDLLfunc (WSAStartup, 8, ws2_32)
 LoadDLLfunc (WSAWaitForMultipleEvents, 20, ws2_32)
 
-LoadDLLfunc (PdhAddEnglishCounterA, 16, pdh)
+LoadDLLfunc (PdhAddEnglishCounterW, 16, pdh)
 LoadDLLfunc (PdhCollectQueryData, 4, pdh)
 LoadDLLfunc (PdhGetFormattedCounterValue, 16, pdh)
-LoadDLLfunc (PdhOpenQueryA, 12, pdh)
+LoadDLLfunc (PdhOpenQueryW, 12, pdh)
 }

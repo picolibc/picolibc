@@ -1,0 +1,19 @@
+What's new:
+-----------
+
+
+What changed:
+-------------
+
+- Improve /proc/<PID>/cmdline and /proc/<PID>/stat handling to allow
+  all processes access to basic process information of foreign processes.
+
+
+Bug Fixes
+---------
+
+- Fix access to process list
+  Addresses: https://cygwin.com/ml/cygwin/2019-03/msg00253.html
+
+- Fix acl_to_text/acl_to_any_text returning EINVAL on empty acl
+  Addresses: https://cygwin.com/ml/cygwin/2019-03/msg00157.html

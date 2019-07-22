@@ -254,6 +254,7 @@ DLL_OFILES:= \
 	autoload.o \
 	base64.o \
 	bsdlib.o \
+	clock.o \
 	ctype.o \
 	cxx.o \
 	cygheap.o \
@@ -278,6 +279,7 @@ DLL_OFILES:= \
 	fhandler.o \
 	fhandler_clipboard.o \
 	fhandler_console.o \
+	fhandler_cygdrive.o \
 	fhandler_dev.o \
 	fhandler_disk_file.o \
 	fhandler_dsp.o \
@@ -285,8 +287,10 @@ DLL_OFILES:= \
 	fhandler_floppy.o \
 	fhandler_netdrive.o \
 	fhandler_nodevice.o \
+	fhandler_pipe.o \
 	fhandler_proc.o \
 	fhandler_process.o \
+	fhandler_process_fd.o \
 	fhandler_procnet.o \
 	fhandler_procsys.o \
 	fhandler_procsysvipc.o \
@@ -294,12 +298,14 @@ DLL_OFILES:= \
 	fhandler_raw.o \
 	fhandler_registry.o \
 	fhandler_serial.o \
+	fhandler_signalfd.o \
 	fhandler_socket.o \
 	fhandler_socket_inet.o \
 	fhandler_socket_local.o \
 	fhandler_socket_unix.o \
 	fhandler_tape.o \
 	fhandler_termios.o \
+	fhandler_timerfd.o \
 	fhandler_tty.o \
 	fhandler_virtual.o \
 	fhandler_windows.o \
@@ -307,6 +313,7 @@ DLL_OFILES:= \
 	flock.o \
 	fnmatch.o \
 	fork.o \
+	forkable.o \
 	fts.o \
 	ftw.o \
 	getentropy.o \
@@ -346,9 +353,9 @@ DLL_OFILES:= \
 	passwd.o \
 	path.o \
 	pinfo.o \
-	pipe.o \
 	poll.o \
 	posix_ipc.o \
+	posix_timer.o \
 	pseudo-reloc.o \
 	pthread.o \
 	quotactl.o \
@@ -390,7 +397,7 @@ DLL_OFILES:= \
 	syslog.o \
 	termios.o \
 	thread.o \
-	timer.o \
+	timerfd.o \
 	times.o \
 	tls_pbuf.o \
 	tty.o \
@@ -434,6 +441,7 @@ GMON_OFILES:=gmon.o mcount.o profil.o mcountFunc.o
 NEW_FUNCTIONS:=$(addprefix --replace=,\
 	atexit= \
 	timezone= \
+	uname=uname_x \
 	__xdrrec_getrec= \
 	__xdrrec_setnonblock= \
 	xdr_array= \
@@ -754,11 +762,17 @@ libssp.a: ${LIB_NAME} $(newlib_build)/libc/ssp/lib.a
 ${EXTRALIBS}: lib%.a: %.o
 	$(AR) cru $@ $?
 
-winver.o: mkvers.sh include/cygwin/version.h winver.rc $(DLL_OFILES)
+# Every time we touch a source file, the version info has to be rebuilt
+# to maintain a correct build date, especially in uname release output
+find_src_files = $(wildcard $(dir)/*.[chS]) $(wildcard $(dir)/*.cc)
+src_files := $(foreach dir,$(VPATH),$(find_src_files))
+
+# mkvers.sh creates version.cc in the first place, winver.o always
+# second, so version.cc is always older than winver.o
+version.cc: mkvers.sh include/cygwin/version.h winver.rc $(src_files)
 	@echo "Making version.cc and winver.o";\
 	/bin/sh ${word 1,$^} ${word 2,$^} ${word 3,$^} $(WINDRES) ${CFLAGS} $(addprefix -I,${CCWRAP_SYSTEM_HEADERS} ${CCWRAP_DIRAFTER_HEADERS})
-
-version.cc: winver.o
+$(VERSION_OFILES): version.cc
 
 Makefile: ${srcdir}/Makefile.in
 	/bin/sh ./config.status

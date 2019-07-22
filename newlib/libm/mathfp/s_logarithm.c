@@ -38,8 +38,7 @@ RETURNS
 Normally, returns the calculated value.  When <[x]> is zero, the
 returned value is <<-HUGE_VAL>> and <<errno>> is set to <<ERANGE>>.
 When <[x]> is negative, the returned value is <<-HUGE_VAL>> and
-<<errno>> is set to <<EDOM>>.  You can control the error behavior via
-<<matherr>>.
+<<errno>> is set to <<EDOM>>.
 
 PORTABILITY
 <<log>> is ANSI. <<logf>> is an extension.

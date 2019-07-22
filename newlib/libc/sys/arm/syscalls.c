@@ -30,7 +30,7 @@ int	_stat		(const char *, struct stat *);
 int	_fstat		(int, struct stat *);
 void *	_sbrk		(ptrdiff_t);
 pid_t	_getpid		(void);
-int	_kill		(int, int) __attribute__((__noreturn__));
+int	_kill		(int, int);
 void	_exit		(int);
 int	_close		(int);
 int	_swiclose	(int);
@@ -49,6 +49,7 @@ static int	error		(int);
 static int	get_errno	(void);
 static int	remap_handle	(int);
 static int	findslot	(int);
+static int	_kill_shared	(int, int, int) __attribute__((__noreturn__));
 
 /* Register name faking - works in collusion with the linker.  */
 register char * stack_ptr asm ("sp");
@@ -424,21 +425,35 @@ _close (int file)
   return wrap (_swiclose (file));
 }
 
-int
-_kill (int pid, int sig)
+static int
+_kill_shared (int pid, int sig, int reason)
 {
-  (void)pid; (void)sig;
+  (void) pid; (void) sig;
 #ifdef ARM_RDI_MONITOR
   /* Note: The pid argument is thrown away.  */
-  switch (sig) {
-	  case SIGABRT:
-		  do_AngelSWI (AngelSWI_Reason_ReportException,
-			       (void *) ADP_Stopped_RunTimeError);
-		  __builtin_unreachable();
-	  default:
-		  do_AngelSWI (AngelSWI_Reason_ReportException,
-			       (void *) ADP_Stopped_ApplicationExit);
-  }
+  int block[2];
+  block[1] = sig;
+  block[0] = reason;
+  int insn;
+
+#if SEMIHOST_V2
+  if (_has_ext_exit_extended ())
+    {
+      insn = AngelSWI_Reason_ReportExceptionExtended;
+    }
+  else
+#endif
+    {
+      insn = AngelSWI_Reason_ReportException;
+    }
+
+#if SEMIHOST_V2
+if (_has_ext_exit_extended ())
+  do_AngelSWI (insn, block);
+else
+#endif
+  do_AngelSWI (insn, (void*)block[0]);
+
 #else
   asm ("swi %a0" :: "i" (SWI_Exit));
 #endif
@@ -446,15 +461,24 @@ _kill (int pid, int sig)
   __builtin_unreachable();
 }
 
+int
+_kill (int pid, int sig)
+{
+  if (sig == SIGABRT)
+    _kill_shared (pid, sig, ADP_Stopped_RunTimeError);
+  else
+    _kill_shared (pid, sig, ADP_Stopped_ApplicationExit);
+}
+
 void
 _exit (int status)
 {
-  /* There is only one SWI for both _exit and _kill. For _exit, call
-     the SWI with the second argument set to -1, an invalid value for
-     signum, so that the SWI handler can distinguish the two calls.
-     Note: The RDI implementation of _kill throws away both its
-     arguments.  */
-  _kill(status, -1);
+  /* The same SWI is used for both _exit and _kill.
+     For _exit, call the SWI with "reason" set to ADP_Stopped_ApplicationExit
+     to mark a standard exit.
+     Note: The RDI implementation of _kill_shared throws away all its
+     arguments and all implementations ignore the first argument.  */
+  _kill_shared (-1, status, ADP_Stopped_ApplicationExit);
 }
 
 pid_t

@@ -1,4 +1,4 @@
-/* pipe.cc: pipe for Cygwin.
+/* fhandler_pipe.cc: pipes for Cygwin.
 
 This file is part of Cygwin.
 
@@ -73,8 +73,12 @@ fhandler_pipe::open (int flags, mode_t mode)
   bool inh;
   bool got_one = false;
 
-  sscanf (get_name (), "/proc/%d/fd/pipe:[%lld]",
-		       &pid, (long long *) &uniq_id);
+  if (sscanf (get_name (), "/proc/%d/fd/pipe:[%llu]",
+	      &pid, (long long *) &uniq_id) < 2)
+    {
+      set_errno (ENOENT);
+      return 0;
+    }
   if (pid == myself->pid)
     {
       cygheap_fdenum cfd (true);
@@ -93,7 +97,7 @@ fhandler_pipe::open (int flags, mode_t mode)
 	      || (rwflags == O_WRONLY && !(cfd->get_access () & GENERIC_WRITE)))
 	    continue;
 	  cfd->copyto (this);
-	  set_io_handle (NULL);
+	  set_handle (NULL);
 	  pc.reset_conv_handle ();
 	  if (!cfd->dup (this, flags))
 	    return 1;
@@ -177,7 +181,7 @@ fhandler_pipe::ftruncate (off_t length, bool allow_truncate)
 char *
 fhandler_pipe::get_proc_fd_name (char *buf)
 {
-  __small_sprintf (buf, "pipe:[%D]", get_plain_ino ());
+  __small_sprintf (buf, "pipe:[%U]", get_plain_ino ());
   return buf;
 }
 
@@ -417,7 +421,7 @@ fhandler_pipe::fstat (struct stat *buf)
     {
       buf->st_dev = FH_PIPE;
       if (!(buf->st_ino = get_plain_ino ()))
-	sscanf (get_name (), "/proc/%*d/fd/pipe:[%lld]",
+	sscanf (get_name (), "/proc/%*d/fd/pipe:[%llu]",
 			     (long long *) &buf->st_ino);
     }
   return ret;
@@ -428,74 +432,4 @@ fhandler_pipe::fstatvfs (struct statvfs *sfs)
 {
   set_errno (EBADF);
   return -1;
-}
-
-static int __reg3
-pipe_worker (int filedes[2], unsigned int psize, int mode)
-{
-  fhandler_pipe *fhs[2];
-  int res = fhandler_pipe::create (fhs, psize, mode);
-  if (!res)
-    {
-      cygheap_fdnew fdin;
-      cygheap_fdnew fdout (fdin, false);
-      char buf[sizeof ("/dev/fd/pipe:[9223372036854775807]")];
-      __small_sprintf (buf, "/dev/fd/pipe:[%D]", fhs[0]->get_plain_ino ());
-      fhs[0]->pc.set_posix (buf);
-      __small_sprintf (buf, "pipe:[%D]", fhs[1]->get_plain_ino ());
-      fhs[1]->pc.set_posix (buf);
-      fdin = fhs[0];
-      fdout = fhs[1];
-      filedes[0] = fdin;
-      filedes[1] = fdout;
-    }
-  return res;
-}
-
-extern "C" int
-_pipe (int filedes[2], unsigned int psize, int mode)
-{
-  int res = pipe_worker (filedes, psize, mode);
-  int read, write;
-  if (res != 0)
-    read = write = -1;
-  else
-    {
-      read = filedes[0];
-      write = filedes[1];
-    }
-  syscall_printf ("%R = _pipe([%d, %d], %u, %y)", res, read, write, psize, mode);
-  return res;
-}
-
-extern "C" int
-pipe (int filedes[2])
-{
-  int res = pipe_worker (filedes, DEFAULT_PIPEBUFSIZE, O_BINARY);
-  int read, write;
-  if (res != 0)
-    read = write = -1;
-  else
-    {
-      read = filedes[0];
-      write = filedes[1];
-    }
-  syscall_printf ("%R = pipe([%d, %d])", res, read, write);
-  return res;
-}
-
-extern "C" int
-pipe2 (int filedes[2], int mode)
-{
-  int res = pipe_worker (filedes, DEFAULT_PIPEBUFSIZE, mode);
-  int read, write;
-  if (res != 0)
-    read = write = -1;
-  else
-    {
-      read = filedes[0];
-      write = filedes[1];
-    }
-  syscall_printf ("%R = pipe2([%d, %d], %y)", res, read, write, mode);
-  return res;
 }

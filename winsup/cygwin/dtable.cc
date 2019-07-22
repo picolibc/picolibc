@@ -552,8 +552,10 @@ fh_alloc (path_conv& pc)
 	  fh = cnew (fhandler_registry);
 	  break;
 	case FH_PROCESS:
-	case FH_PROCESSFD:
 	  fh = cnew (fhandler_process);
+	  break;
+	case FH_PROCESSFD:
+	  fh = cnew (fhandler_process_fd);
 	  break;
 	case FH_PROCNET:
 	  fh = cnew (fhandler_procnet);
@@ -572,6 +574,12 @@ fh_alloc (path_conv& pc)
 	  break;
 	case FH_CYGDRIVE:
 	  fh = cnew (fhandler_cygdrive);
+	  break;
+	case FH_SIGNALFD:
+	  fh = cnew (fhandler_signalfd);
+	  break;
+	case FH_TIMERFD:
+	  fh = cnew (fhandler_timerfd);
 	  break;
 	case FH_TTY:
 	  if (!pc.isopen ())
@@ -639,7 +647,7 @@ build_fh_pc (path_conv& pc)
   else if ((fh->archetype = cygheap->fdtab.find_archetype (fh->dev ())))
     {
       debug_printf ("found an archetype for %s(%d/%d) io_handle %p", fh->get_name (), fh->dev ().get_major (), fh->dev ().get_minor (),
-		    fh->archetype->get_io_handle ());
+		    fh->archetype->get_handle ());
       if (!fh->get_name ())
 	fh->set_name (fh->archetype->dev ().name ());
     }
@@ -680,7 +688,7 @@ dtable::dup_worker (fhandler_base *oldfh, int flags)
   else
     {
       if (!oldfh->archetype)
-	newfh->set_io_handle (NULL);
+	newfh->set_handle (NULL);
 
       newfh->pc.reset_conv_handle ();
       if (oldfh->dup (newfh, flags))
@@ -700,7 +708,7 @@ dtable::dup_worker (fhandler_base *oldfh, int flags)
 	  /* The O_CLOEXEC flag enforces close-on-exec behaviour. */
 	  newfh->set_close_on_exec (!!(flags & O_CLOEXEC));
 	  debug_printf ("duped '%s' old %p, new %p", oldfh->get_name (),
-			oldfh->get_io_handle (), newfh->get_io_handle ());
+			oldfh->get_handle (), newfh->get_handle ());
 	}
     }
   return newfh;
@@ -757,7 +765,7 @@ dtable::dup3 (int oldfd, int newfd, int flags)
     }
 
   debug_printf ("newfh->io_handle %p, oldfh->io_handle %p, new win32_name %p, old win32_name %p",
-		newfh->get_io_handle (), fds[oldfd]->get_io_handle (), newfh->get_win32_name (), fds[oldfd]->get_win32_name ());
+		newfh->get_handle (), fds[oldfd]->get_handle (), newfh->get_win32_name (), fds[oldfd]->get_win32_name ());
 
   if (!not_open (newfd))
     close (newfd);
@@ -849,12 +857,13 @@ dtable::set_file_pointers_for_exec ()
 {
 /* This is not POSIX-compliant so the function is only called for
    non-Cygwin processes. */
-  LONG off_high = 0;
+  LARGE_INTEGER eof = { QuadPart: 0 };
+
   lock ();
   fhandler_base *fh;
   for (size_t i = 0; i < size; i++)
     if ((fh = fds[i]) != NULL && fh->get_flags () & O_APPEND)
-      SetFilePointer (fh->get_handle (), 0, &off_high, FILE_END);
+      SetFilePointerEx (fh->get_handle (), eof, NULL, FILE_END);
   unlock ();
 }
 
@@ -882,12 +891,12 @@ dtable::fixup_after_exec ()
 	/* Close the handle if it's close-on-exec or if an error was detected
 	   (typically with opening a console in a gui app) by fixup_after_exec.
 	 */
-	if (fh->close_on_exec () || (!fh->nohandle () && !fh->get_io_handle ()))
+	if (fh->close_on_exec () || (!fh->nohandle () && !fh->get_handle ()))
 	  fixup_close (i, fh);
 	else if (fh->get_popen_pid ())
 	  close (i);
 	else if (i == 0)
-	  SetStdHandle (std_consts[i], fh->get_io_handle ());
+	  SetStdHandle (std_consts[i], fh->get_handle ());
 	else if (i <= 2)
 	  SetStdHandle (std_consts[i], fh->get_output_handle ());
       }
@@ -904,7 +913,7 @@ dtable::fixup_after_fork (HANDLE parent)
 	  {
 	    debug_printf ("fd %d (%s)", i, fh->get_name ());
 	    fh->fixup_after_fork (parent);
-	    if (!fh->nohandle () && !fh->get_io_handle ())
+	    if (!fh->nohandle () && !fh->get_handle ())
 	      {
 		/* This should actually never happen but it's here to make sure
 		   we don't crash due to access of an unopened file handle.  */
@@ -913,7 +922,7 @@ dtable::fixup_after_fork (HANDLE parent)
 	      }
 	  }
 	if (i == 0)
-	  SetStdHandle (std_consts[i], fh->get_io_handle ());
+	  SetStdHandle (std_consts[i], fh->get_handle ());
 	else if (i <= 2)
 	  SetStdHandle (std_consts[i], fh->get_output_handle ());
       }

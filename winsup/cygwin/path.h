@@ -11,6 +11,7 @@ details. */
 #include "cygheap_malloc.h"
 #include "nfs.h"
 
+#include <sys/mount.h>
 #include <sys/ioctl.h>
 #include <fcntl.h>
 #include <alloca.h>
@@ -39,52 +40,42 @@ struct suffix_info
 
 extern suffix_info stat_suffixes[];
 
+/* DO NOT copy any of these files into the same set of flags as the
+   below path_types.  Ever. */
 enum pathconv_arg
 {
-  PC_SYM_FOLLOW		= 0x0001,
-  PC_SYM_NOFOLLOW	= 0x0002,
-  PC_SYM_NOFOLLOW_REP	= 0x0004,
-  PC_SYM_CONTENTS	= 0x0008,
-  PC_NOFULL		= 0x0010,
-  PC_NULLEMPTY		= 0x0020,
-  PC_POSIX		= 0x0080,
-  PC_NOWARN		= 0x0100,
-  PC_OPEN		= 0x0200,	/* use open semantics */
-  PC_CTTY		= 0x0400,	/* could later be used as ctty */
-  PC_KEEP_HANDLE	= 0x00400000,
-  PC_NO_ACCESS_CHECK	= 0x00800000
+  PC_SYM_FOLLOW		 = _BIT ( 0),
+  PC_SYM_NOFOLLOW	 = _BIT ( 1),
+  PC_SYM_NOFOLLOW_REP	 = _BIT ( 2),
+  PC_SYM_CONTENTS	 = _BIT ( 3),
+  PC_NOFULL		 = _BIT ( 4),
+  PC_NULLEMPTY		 = _BIT ( 5),
+  PC_NONULLEMPTY	 = _BIT ( 6),
+  PC_POSIX		 = _BIT ( 7),
+  PC_NOWARN		 = _BIT ( 8),
+  PC_OPEN		 = _BIT ( 9),	/* use open semantics */
+  PC_CTTY		 = _BIT (10),	/* could later be used as ctty */
+  PC_SYM_NOFOLLOW_PROCFD = _BIT (11),
+  PC_KEEP_HANDLE	 = _BIT (12),
+  PC_NO_ACCESS_CHECK	 = _BIT (13),
+  PC_DONT_USE		 = _BIT (31)	/* conversion to signed happens. */
 };
-
-#define PC_NONULLEMPTY -1
-
-#include "sys/mount.h"
 
 enum path_types
 {
-  PATH_NOTHING		= 0,
-  PATH_SYMLINK		= MOUNT_SYMLINK,
-  PATH_BINARY		= MOUNT_BINARY,
-  PATH_EXEC		= MOUNT_EXEC,
-  PATH_NOTEXEC		= MOUNT_NOTEXEC,
-  PATH_CYGWIN_EXEC	= MOUNT_CYGWIN_EXEC,
-  PATH_SPARSE		= MOUNT_SPARSE,
-  PATH_RO		= MOUNT_RO,
-  PATH_NOACL		= MOUNT_NOACL,
-  PATH_NOPOSIX		= MOUNT_NOPOSIX,
-  PATH_DOS		= MOUNT_DOS,
-  PATH_IHASH		= MOUNT_IHASH,
-  PATH_ALL_EXEC		= (PATH_CYGWIN_EXEC | PATH_EXEC),
-  PATH_NO_ACCESS_CHECK	= PC_NO_ACCESS_CHECK,
-  PATH_CTTY		= 0x00400000,	/* could later be used as ctty */
-  PATH_OPEN		= 0x00800000,	/* use open semantics */
-  					/* FIXME?  PATH_OPEN collides with
-					   PATH_NO_ACCESS_CHECK, but it looks
-					   like they are never used together. */
-  PATH_LNK		= 0x01000000,
-  PATH_TEXT		= 0x02000000,
-  PATH_REP		= 0x04000000,
-  PATH_HAS_SYMLINKS	= 0x10000000,
-  PATH_SOCKET		= 0x40000000
+  PATH_CTTY		= _BIT ( 0),	/* could later be used as ctty */
+  PATH_OPEN		= _BIT ( 1),	/* use open semantics */
+  PATH_LNK		= _BIT ( 2),
+  PATH_REP		= _BIT ( 3),
+  PATH_SYMLINK		= _BIT ( 4),
+  PATH_SOCKET		= _BIT ( 5),
+  PATH_RESOLVE_PROCFD	= _BIT ( 6),
+  PATH_DONT_USE		= _BIT (31)	/* conversion to signed happens. */
+};
+
+enum fetch_fh_flags
+{
+  FFH_LINKAT	= (1 <<  0),
 };
 
 NTSTATUS file_get_fai (HANDLE, PFILE_ALL_INFORMATION);
@@ -144,42 +135,46 @@ class path_conv
   DWORD fileattr;
   ULONG caseinsensitive;
   fs_info fs;
+
   PWCHAR wide_path;
   UNICODE_STRING uni_path;
-  void add_ext_from_sym (symlink_info&);
   DWORD symlink_length;
   const char *path;
-  unsigned path_flags;
+  uint32_t mount_flags;
+  uint32_t path_flags;
   const char *suffix;
   const char *posix_path;
   path_conv_handle conv_handle;
+
+  void add_ext_from_sym (symlink_info&);
+  char *modifiable_path () {return (char *) path;}
+
  public:
   int error;
   device dev;
 
+  void *serialize (HANDLE, unsigned int &) const;
+  HANDLE deserialize (void *);
+
   const char *known_suffix () { return suffix; }
   bool isremote () const {return fs.is_remote_drive ();}
   ULONG objcaseinsensitive () const {return caseinsensitive;}
-  bool has_acls () const {return !(path_flags & PATH_NOACL) && fs.has_acls (); }
-  bool hasgood_inode () const {return !(path_flags & PATH_IHASH); }
+  bool has_acls () const {return !(mount_flags & MOUNT_NOACL)
+				 && fs.has_acls (); }
+  bool hasgood_inode () const {return !(mount_flags & MOUNT_IHASH); }
   bool isgood_inode (ino_t ino) const;
   bool support_sparse () const
   {
-    return (path_flags & PATH_SPARSE)
+    return (mount_flags & MOUNT_SPARSE)
 	   && (fs_flags () & FILE_SUPPORTS_SPARSE_FILES);
   }
-  int has_symlinks () const {return path_flags & PATH_HAS_SYMLINKS;}
-  int has_dos_filenames_only () const {return path_flags & PATH_DOS;}
+  int has_dos_filenames_only () const {return mount_flags & MOUNT_DOS;}
   int has_buggy_reopen () const {return fs.has_buggy_reopen ();}
   int has_buggy_fileid_dirinfo () const {return fs.has_buggy_fileid_dirinfo ();}
   int has_buggy_basic_info () const {return fs.has_buggy_basic_info ();}
   int binmode () const
   {
-    if (path_flags & PATH_BINARY)
-      return O_BINARY;
-    if (path_flags & PATH_TEXT)
-      return O_TEXT;
-    return 0;
+    return (mount_flags & MOUNT_TEXT) ? O_TEXT : O_BINARY;
   }
   int issymlink () const {return path_flags & PATH_SYMLINK;}
   int is_lnk_symlink () const {return path_flags & PATH_LNK;}
@@ -188,43 +183,45 @@ class path_conv
   int isfifo () const {return dev.is_device (FH_FIFO);}
   int isspecial () const {return dev.not_device (FH_FS);}
   int iscygdrive () const {return dev.is_device (FH_CYGDRIVE);}
-  int is_auto_device () const {return isdevice () && !is_fs_special ();}
-  int is_fs_device () const {return isdevice () && is_fs_special ();}
   int is_fs_special () const {return dev.is_fs_special ();}
-  int is_lnk_special () const {return is_fs_device () || isfifo () || is_lnk_symlink ();}
+
+  int is_lnk_special () const {return (isdevice () && is_fs_special ()
+				       && !issocket ())
+      || isfifo () || is_lnk_symlink ();}
 #ifdef __WITH_AF_UNIX
   int issocket () const {return dev.is_device (FH_LOCAL)
 				|| dev.is_device (FH_UNIX);}
 #else
   int issocket () const {return dev.is_device (FH_LOCAL);}
 #endif /* __WITH_AF_UNIX */
-  int iscygexec () const {return path_flags & PATH_CYGWIN_EXEC;}
+  int iscygexec () const {return mount_flags & MOUNT_CYGWIN_EXEC;}
   int isopen () const {return path_flags & PATH_OPEN;}
   int isctty_capable () const {return path_flags & PATH_CTTY;}
+  int follow_fd_symlink () const {return path_flags & PATH_RESOLVE_PROCFD;}
   void set_cygexec (bool isset)
   {
     if (isset)
-      path_flags |= PATH_CYGWIN_EXEC;
+      mount_flags |= MOUNT_CYGWIN_EXEC;
     else
-      path_flags &= ~PATH_CYGWIN_EXEC;
+      mount_flags &= ~MOUNT_CYGWIN_EXEC;
   }
   void set_cygexec (void *target)
   {
     if (target)
-      path_flags |= PATH_CYGWIN_EXEC;
+      mount_flags |= MOUNT_CYGWIN_EXEC;
     else
-      path_flags &= ~PATH_CYGWIN_EXEC;
+      mount_flags &= ~MOUNT_CYGWIN_EXEC;
   }
-  bool isro () const {return !!(path_flags & PATH_RO);}
+  bool isro () const {return !!(mount_flags & MOUNT_RO);}
   bool exists () const {return fileattr != INVALID_FILE_ATTRIBUTES;}
   bool has_attribute (DWORD x) const {return exists () && (fileattr & x);}
   int isdir () const {return has_attribute (FILE_ATTRIBUTE_DIRECTORY);}
   executable_states exec_state ()
   {
     extern int _check_for_executable;
-    if (path_flags & PATH_ALL_EXEC)
+    if (mount_flags & (MOUNT_CYGWIN_EXEC | MOUNT_EXEC))
       return is_executable;
-    if (path_flags & PATH_NOTEXEC)
+    if (mount_flags & MOUNT_NOTEXEC)
       return not_executable;
     if (!_check_for_executable)
       return dont_care_if_executable;
@@ -232,49 +229,40 @@ class path_conv
   }
 
   void set_symlink (DWORD n) {path_flags |= PATH_SYMLINK; symlink_length = n;}
-  void set_has_symlinks () {path_flags |= PATH_HAS_SYMLINKS;}
-  void set_exec (int x = 1) {path_flags |= x ? PATH_EXEC : PATH_NOTEXEC;}
+  void set_exec (int x = 1) {mount_flags |= x ? MOUNT_EXEC : MOUNT_NOTEXEC;}
 
-  void __reg3 check (const UNICODE_STRING *upath, unsigned opt = PC_SYM_FOLLOW,
+  void __reg3 check (const UNICODE_STRING *upath, uint32_t opt = PC_SYM_FOLLOW,
 	      const suffix_info *suffixes = NULL);
-  void __reg3 check (const char *src, unsigned opt = PC_SYM_FOLLOW,
+  void __reg3 check (const char *src, uint32_t opt = PC_SYM_FOLLOW,
 	      const suffix_info *suffixes = NULL);
 
   path_conv (const device& in_dev)
   : fileattr (INVALID_FILE_ATTRIBUTES), wide_path (NULL), path (NULL),
-    path_flags (0), suffix (NULL), posix_path (NULL), error (0),
-    dev (in_dev)
+    mount_flags (0), path_flags (0), suffix (NULL), posix_path (NULL),
+    error (0), dev (in_dev)
   {
     set_path (in_dev.native ());
   }
 
-  path_conv (int, const char *src, unsigned opt = PC_SYM_FOLLOW,
+  path_conv (const UNICODE_STRING *src, uint32_t opt = PC_SYM_FOLLOW,
 	     const suffix_info *suffixes = NULL)
   : fileattr (INVALID_FILE_ATTRIBUTES), wide_path (NULL), path (NULL),
-    path_flags (0), suffix (NULL), posix_path (NULL), error (0)
+    mount_flags (0), path_flags (0), suffix (NULL), posix_path (NULL), error (0)
   {
-    check (src, opt, suffixes);
+    check (src, opt | ((opt & PC_NONULLEMPTY) ? 0 : PC_NULLEMPTY), suffixes);
   }
 
-  path_conv (const UNICODE_STRING *src, unsigned opt = PC_SYM_FOLLOW,
+  path_conv (const char *src, uint32_t opt = PC_SYM_FOLLOW,
 	     const suffix_info *suffixes = NULL)
   : fileattr (INVALID_FILE_ATTRIBUTES), wide_path (NULL), path (NULL),
-    path_flags (0), suffix (NULL), posix_path (NULL), error (0)
+    mount_flags (0), path_flags (0), suffix (NULL), posix_path (NULL), error (0)
   {
-    check (src, opt | PC_NULLEMPTY, suffixes);
-  }
-
-  path_conv (const char *src, unsigned opt = PC_SYM_FOLLOW,
-	     const suffix_info *suffixes = NULL)
-  : fileattr (INVALID_FILE_ATTRIBUTES), wide_path (NULL), path (NULL),
-    path_flags (0), suffix (NULL), posix_path (NULL), error (0)
-  {
-    check (src, opt | PC_NULLEMPTY, suffixes);
+    check (src, opt | ((opt & PC_NONULLEMPTY) ? 0 : PC_NULLEMPTY), suffixes);
   }
 
   path_conv ()
   : fileattr (INVALID_FILE_ATTRIBUTES), wide_path (NULL), path (NULL),
-    path_flags (0), suffix (NULL), posix_path (NULL), error (0)
+    mount_flags (0), path_flags (0), suffix (NULL), posix_path (NULL), error (0)
   {}
 
   ~path_conv ();
@@ -326,7 +314,7 @@ class path_conv
   path_conv& eq_worker (const path_conv& pc, const char *in_path)
   {
     free_strings ();
-    memcpy (this, &pc, sizeof pc);
+    memcpy ((void *) this, &pc, sizeof pc);
     /* The device info might contain pointers to allocated strings, in
        contrast to statically allocated strings.  Calling device::dup()
        will duplicate the string if the source was allocated. */
@@ -369,6 +357,8 @@ class path_conv
   DWORD fs_name_len () const {return fs.name_len ();}
   bool fs_got_fs () const { return fs.got_fs (); }
   bool fs_is_fat () const {return fs.is_fat ();}
+  bool fs_is_exfat () const {return fs.is_exfat ();}
+  bool fs_is_any_fat () const {return fs.is_fat () || fs.is_exfat ();}
   bool fs_is_ntfs () const {return fs.is_ntfs ();}
   bool fs_is_refs () const {return fs.is_refs ();}
   bool fs_is_samba () const {return fs.is_samba ();}
@@ -408,8 +398,6 @@ class path_conv
   inline const char *get_posix () const { return posix_path; }
   void __reg2 set_posix (const char *);
   DWORD get_symlink_length () { return symlink_length; };
- private:
-  char *modifiable_path () {return (char *) path;}
 };
 
 /* Symlink marker */

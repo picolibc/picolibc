@@ -78,7 +78,8 @@ cygheap_fixup_in_child (bool execed)
 {
   cygheap_max = cygheap = (init_cygheap *) _cygheap_start;
   _csbrk ((char *) child_proc_info->cygheap_max - (char *) cygheap);
-  child_copy (child_proc_info->parent, false, "cygheap", cygheap, cygheap_max, NULL);
+  child_copy (child_proc_info->parent, false, child_proc_info->silentfail (),
+	      "cygheap", cygheap, cygheap_max, NULL);
   cygheap_init ();
   debug_fixup_after_fork_exec ();
   if (execed)
@@ -139,11 +140,11 @@ init_cygheap::init_installation_root ()
 {
   ptrdiff_t len = 0;
 
-  if (!GetModuleFileNameW (cygwin_hmodule, installation_root, PATH_MAX))
+  if (!GetModuleFileNameW (cygwin_hmodule, installation_root_buf, PATH_MAX))
     api_fatal ("Can't initialize Cygwin installation root dir.\n"
 	       "GetModuleFileNameW(%p, %p, %u), %E",
-	       cygwin_hmodule, installation_root, PATH_MAX);
-  PWCHAR p = installation_root;
+	       cygwin_hmodule, installation_root_buf, PATH_MAX);
+  PWCHAR p = installation_root_buf;
   if (wcsncasecmp (p, L"\\\\", 2))	/* Normal drive letter path */
     {
       len = 4;
@@ -170,18 +171,18 @@ init_cygheap::init_installation_root ()
 	    p = wcschr (p + 1, L'\\');  /* Skip share name */
 	}
     }
-  installation_root[1] = L'?';
+  installation_root_buf[1] = L'?';
   RtlInitEmptyUnicodeString (&installation_key, installation_key_buf,
 			     sizeof installation_key_buf);
-  RtlInt64ToHexUnicodeString (hash_path_name (0, installation_root),
+  RtlInt64ToHexUnicodeString (hash_path_name (0, installation_root_buf),
 			      &installation_key, FALSE);
 
   /* Strip off last path component ("\\cygwin1.dll") */
-  PWCHAR w = wcsrchr (installation_root, L'\\');
+  PWCHAR w = wcsrchr (installation_root_buf, L'\\');
   if (w)
     {
       *w = L'\0';
-      w = wcsrchr (installation_root, L'\\');
+      w = wcsrchr (installation_root_buf, L'\\');
     }
   if (!w)
     api_fatal ("Can't initialize Cygwin installation root dir.\n"
@@ -190,15 +191,14 @@ init_cygheap::init_installation_root ()
   /* Copy result into installation_dir before stripping off "bin" dir and
      revert to Win32 path.  This path is added to the Windows environment
      in build_env.  See there for a description. */
-  installation_dir_len = wcpncpy (installation_dir, installation_root + len,
-				  PATH_MAX)
-			 - installation_dir;
+  wcpncpy (installation_dir_buf, installation_root_buf + len, PATH_MAX);
+
   if (len == 4)		/* Local path */
     ;
   else if (len == 6)	/* UNC path */
-    installation_dir[0] = L'\\';
+    installation_dir_buf[0] = L'\\';
   else			/* Long, prefixed path */
-    installation_dir[1] = L'\\';
+    installation_dir_buf[1] = L'\\';
 
   /* If w < p, the Cygwin DLL resides in the root dir of a drive or network
      path.  In that case, if we strip off yet another backslash, the path
@@ -208,12 +208,15 @@ init_cygheap::init_installation_root ()
   if (w > p)
     *w = L'\0';
 
+  RtlInitUnicodeString (&installation_root, installation_root_buf);
+  RtlInitUnicodeString (&installation_dir, installation_dir_buf);
+
   for (int i = 1; i >= 0; --i)
     {
       reg_key r (i, KEY_WRITE, _WIDE (CYGWIN_INFO_INSTALLATIONS_NAME),
 		 NULL);
       if (NT_SUCCESS (r.set_string (installation_key_buf,
-				    installation_root)))
+				    installation_root_buf)))
 	break;
     }
 }

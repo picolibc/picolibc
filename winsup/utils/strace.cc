@@ -672,6 +672,25 @@ GetFileNameFromHandle(HANDLE hFile, WCHAR pszFilename[MAX_PATH+1])
   return result;
 }
 
+static char *
+cygwin_pid (DWORD winpid)
+{
+  static char buf[48];
+  static DWORD max_cygpid = 0;
+  DWORD cygpid;
+
+  if (!max_cygpid)
+    max_cygpid = (DWORD) cygwin_internal (CW_MAX_CYGWIN_PID);
+
+  cygpid = (DWORD) cygwin_internal (CW_WINPID_TO_CYGWIN_PID, winpid);
+
+  if (cygpid >= max_cygpid)
+    snprintf (buf, sizeof buf, "%lu", winpid);
+  else
+    snprintf (buf, sizeof buf, "%lu (pid: %lu)", winpid, cygpid);
+  return buf;
+}
+
 static DWORD
 proc_child (unsigned mask, FILE *ofile, pid_t pid)
 {
@@ -706,7 +725,8 @@ proc_child (unsigned mask, FILE *ofile, pid_t pid)
 	{
 	case CREATE_PROCESS_DEBUG_EVENT:
 	  if (events)
-	    fprintf (ofile, "--- Process %lu created\n", ev.dwProcessId);
+	    fprintf (ofile, "--- Process %s created\n",
+		     cygwin_pid (ev.dwProcessId));
 	  if (ev.u.CreateProcessInfo.hFile)
 	    CloseHandle (ev.u.CreateProcessInfo.hFile);
 	  add_child (ev.dwProcessId, ev.u.CreateProcessInfo.hProcess);
@@ -714,8 +734,8 @@ proc_child (unsigned mask, FILE *ofile, pid_t pid)
 
 	case CREATE_THREAD_DEBUG_EVENT:
 	  if (events)
-	    fprintf (ofile, "--- Process %lu thread %lu created\n",
-		     ev.dwProcessId, ev.dwThreadId);
+	    fprintf (ofile, "--- Process %s thread %lu created\n",
+		     cygwin_pid (ev.dwProcessId), ev.dwThreadId);
 	  break;
 
 	case LOAD_DLL_DEBUG_EVENT:
@@ -727,8 +747,9 @@ proc_child (unsigned mask, FILE *ofile, pid_t pid)
 	      if (!GetFileNameFromHandle(ev.u.LoadDll.hFile, dllname))
 		wcscpy(dllname, L"(unknown)");
 
-	      fprintf (ofile, "--- Process %lu loaded %ls at %p\n",
-		       ev.dwProcessId, dllname, ev.u.LoadDll.lpBaseOfDll);
+	      fprintf (ofile, "--- Process %s loaded %ls at %p\n",
+		       cygwin_pid (ev.dwProcessId), dllname,
+		       ev.u.LoadDll.lpBaseOfDll);
 	    }
 
 	  if (ev.u.LoadDll.hFile)
@@ -737,8 +758,8 @@ proc_child (unsigned mask, FILE *ofile, pid_t pid)
 
 	case UNLOAD_DLL_DEBUG_EVENT:
 	  if (events)
-	    fprintf (ofile, "--- Process %lu unloaded DLL at %p\n",
-		     ev.dwProcessId, ev.u.UnloadDll.lpBaseOfDll);
+	    fprintf (ofile, "--- Process %s unloaded DLL at %p\n",
+		     cygwin_pid (ev.dwProcessId), ev.u.UnloadDll.lpBaseOfDll);
 	  break;
 
 	case OUTPUT_DEBUG_STRING_EVENT:
@@ -749,16 +770,18 @@ proc_child (unsigned mask, FILE *ofile, pid_t pid)
 
 	case EXIT_PROCESS_DEBUG_EVENT:
 	  if (events)
-	    fprintf (ofile, "--- Process %lu exited with status 0x%lx\n",
-		     ev.dwProcessId, ev.u.ExitProcess.dwExitCode);
+	    fprintf (ofile, "--- Process %s exited with status 0x%lx\n",
+		     cygwin_pid (ev.dwProcessId), ev.u.ExitProcess.dwExitCode);
 	  res = ev.u.ExitProcess.dwExitCode;
 	  remove_child (ev.dwProcessId);
 	  break;
 
 	case EXIT_THREAD_DEBUG_EVENT:
 	  if (events)
-	    fprintf (ofile, "--- Process %lu thread %lu exited with status 0x%lx\n",
-		     ev.dwProcessId, ev.dwThreadId, ev.u.ExitThread.dwExitCode);
+	    fprintf (ofile, "--- Process %s thread %lu exited with "
+			    "status 0x%lx\n",
+		     cygwin_pid (ev.dwProcessId), ev.dwThreadId,
+		     ev.u.ExitThread.dwExitCode);
 	  break;
 
 	case EXCEPTION_DEBUG_EVENT:
@@ -770,8 +793,8 @@ proc_child (unsigned mask, FILE *ofile, pid_t pid)
 	    default:
 	      status = DBG_EXCEPTION_NOT_HANDLED;
 	      if (ev.u.Exception.dwFirstChance)
-		fprintf (ofile, "--- Process %lu, exception %08lx at %p\n",
-			 ev.dwProcessId,
+		fprintf (ofile, "--- Process %s, exception %08lx at %p\n",
+			 cygwin_pid (ev.dwProcessId),
 			 ev.u.Exception.ExceptionRecord.ExceptionCode,
 			 ev.u.Exception.ExceptionRecord.ExceptionAddress);
 	      break;

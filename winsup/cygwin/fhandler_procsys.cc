@@ -39,8 +39,6 @@ const size_t procsys_len = sizeof (procsys) - 1;
 	  RtlInitUnicodeString ((p), namebuf); \
 	}
 
-/* Returns 0 if path doesn't exist, >0 if path is a directory,
-   -1 if path is a file, -2 if it's a symlink.  */
 virtual_ftype_t
 fhandler_procsys::exists (struct stat *buf)
 {

@@ -142,6 +142,7 @@ PORTABILITY
  */
 
 #include "fdlibm.h"
+#include "math_config.h"
 
 #ifndef _DOUBLE_IS_32BITS
 
@@ -190,7 +191,7 @@ Q5  =  -2.01099218183624371326e-07; /* BE8AFDB7 6E09C32D */
 		         return x+x; 	 /* NaN */
 		    else return (xsb==0)? x:-1.0;/* exp(+-inf)={inf,-1} */
 	        }
-	        if(x > o_threshold) return huge*huge; /* overflow */
+	        if(x > o_threshold) return __math_oflow (0); /* overflow */
 	    }
 	    if(xsb!=0) { /* x < -56*ln2, return -1.0 with inexact */
 		if(x+tiny<0.0)		/* raise inexact */

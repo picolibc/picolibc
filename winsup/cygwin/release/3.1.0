@@ -1,0 +1,42 @@
+What's new:
+-----------
+
+- Add 24 bit color support using xterm compatibility mode in Windows 10
+  1703 or later.  Add fake 24 bit color support for legacy console,
+  which uses the nearest color from 16 system colors.
+
+- New APIs: sched_getaffinity, sched_setaffinity, pthread_getaffinity_np,
+  pthread_setaffinity_np.
+
+
+What changed:
+-------------
+
+- FIFOs can now be opened multiple times for writing.
+  Addresses: https://cygwin.com/ml/cygwin/2015-03/msg00047.html
+             https://cygwin.com/ml/cygwin/2015-12/msg00311.html
+
+- If a SA_SIGINFO signal handler changes the ucontext_t pointed to by
+  the third parameter, follow it after returning from the handler.
+
+- Eliminate a header file name collision with <X11/XLocale.h> on case
+  insensitive filesystems by reverting <xlocale.h> back to <sys/_locale.h>.
+
+
+Bug Fixes
+---------
+
+- Fix select() on console in canonical mode.  Return after one line is
+  completed, instead of when only one key is typed.
+
+- Make console I/O functions thread-safe.
+
+- Define missing MSG_EOR.  It's unsupported by the underlying Winsock
+  layer so using it in send(2), sendto(2), or sendmsg(2) will return -1
+  with errno set to EOPNOTSUPP and recvmsg(2) will never return it.
+
+- Fix a timerfd deadlock.
+  Addresses: https://cygwin.com/ml/cygwin/2019-06/msg00096.html
+
+- Fix sigpending() incorrectly returning signals for unrelated threads.
+  Addresses: https://cygwin.com/ml/cygwin/2019-07/msg00051.html

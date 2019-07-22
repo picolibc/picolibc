@@ -1,0 +1,197 @@
+Copyright (c) 2006 CodeSourcery Inc
+Copyright (c) 2018, 2019 Mentor Graphics
+
+The authors hereby grant permission to use, copy, modify, distribute,
+and license this software and its documentation for any purpose, provided
+that existing copyright notices are retained in all copies and that this
+notice is included verbatim in any distributions. No written agreement,
+license, or royalty fee is required for any of the authorized uses.
+Modifications to this software may be copyrighted by their authors
+and need not follow the licensing terms described here, provided that
+the new terms are clearly indicated on the first page of each file where
+they apply.
+
+
+Nios II Semihosting Protocol
+----------------------------
+
+The runtime (libgloss) indicates a semihosting request to the debug
+agent by issuing a "break 1" instruction.  r4 and r5 are used to pass
+parameters per the normal C ABI on nios2.
+
+r4 contains a request code.  r5 is typically a pointer to a 4-word
+parameter block, except for the exit operation where it is an
+immediate integer value.
+
+The result of the operation is returned in the first word of the
+parameter block.  The second word is used to return an errno value,
+encoded per the "Errno Values" section of the RSP documentation in the
+GDB User Manual.
+
+The supported r4 request codes are:
+
+#define HOSTED_EXIT  0
+
+  Terminate program execution; send a 'W' stop reply to GDB.
+
+  r5 contains the exit code, as an immediate integer rather than indirectly
+  in a parameter block.  This semihosting request isn't expected to return.
+
+#define HOSTED_INIT_SIM 1
+
+  Reserved/unimplemented.
+
+#define HOSTED_OPEN 2
+
+  Open file; 'Fopen' GDB fileio request.
+
+  r5 points to a parameter block containing:
+  [0] pointer to filename
+  [1] filename length
+  [2] open flags, encoded per the GDB RSP documentation
+  [3] mode, encoded per the GDB RSP documentation
+
+  Return values in parameter block:
+  [0] file descriptor or -1 on error
+  [1] errno, encoded per the GDB RSP documentation
+
+#define HOSTED_CLOSE 3
+
+  Close file; 'Fclose' GDB fileio request.
+
+  r5 points to a parameter block containing:
+  [0] file descriptor
+
+  Return values in parameter block:
+  [0] return status
+  [1] errno, encoded per the GDB RSP documentation
+
+#define HOSTED_READ 4
+
+  Read from file; 'Fread' GDB fileio request.
+
+  r5 points to a parameter block containing:
+  [0] file descriptor
+  [1] pointer to buffer
+  [2] buffer size
+  
+  Return values in parameter block:
+  [0] number of bytes read
+  [1] errno, encoded per the GDB RSP documentation
+
+#define HOSTED_WRITE 5
+
+  Write to file; 'Fwrite' GDB fileio request.
+
+  r5 points to a parameter block containing:
+  [0] file descriptor
+  [1] pointer to buffer
+  [2] byte count
+  
+  Return values in parameter block:
+  [0] number of bytes written
+  [1] errno, encoded per the GDB RSP documentation
+
+#define HOSTED_LSEEK 6
+
+  File seek; 'Flseek' GDB fileio request.
+
+  r5 points to a parameter block containing:
+  [0] file descriptor
+  [1] high word of 64-bit offset
+  [2] low word of 64-bit offset
+  [3] seek flag, encoded per the GDB RSP documentation
+
+  Return values in parameter block:
+  [0] high word of 64-bit result
+  [1] low word of 64-bit result
+  [2] errno, encoded per the GDB RSP documentation
+
+#define HOSTED_RENAME 7
+
+  File rename; 'Frename' GDB fileio request.
+
+  r5 points to a parameter block containing:
+  [0] oldname pointer
+  [1] oldname length
+  [2] newname pointer
+  [3] newname length
+
+  Return values in parameter block:
+  [0] return status
+  [1] errno, encoded per the GDB RSP documentation
+
+#define HOSTED_UNLINK 8
+
+  File unlink/delete; 'Funlink' GDB fileio request.
+
+  r5 points to a parameter block containing:
+  [0] filename pointer
+  [1] filename length
+
+  Return values in parameter block:
+  [0] return status
+  [1] errno, encoded per the GDB RSP documentation
+
+#define HOSTED_STAT 9
+
+  File information; 'Fstat' GDB fileio request.
+
+  r5 points to a parameter block containing:
+  [0] filename pointer
+  [1] filename length
+  [2] pointer to stat buf, using the structure definition in the GDB RSP
+      documentation 
+
+  Return values in parameter block:
+  [0] return status
+  [1] errno, encoded per the GDB RSP documentation
+
+#define HOSTED_FSTAT 10
+
+  File information; 'Ffstat' GDB fileio request.
+  
+  r5 points to a parameter block containing:
+  [0] file descriptor
+  [1] pointer to stat buf, using the structure definition in the GDB RSP
+      documentation 
+
+  Return values in parameter block:
+  [0] return status
+  [1] errno, encoded per the GDB RSP documentation
+
+#define HOSTED_GETTIMEOFDAY 11
+
+  Get current time; 'Fgettimeofday' GDB fileio request.
+
+  r5 points to a parameter block containing:
+  [0] timeval pointer, using the structure definition in the GDB RSP
+      documentation
+
+  Return values in parameter block:
+  [0] return status
+  [1] errno, encoded per the GDB RSP documentation
+
+#define HOSTED_ISATTY 12
+
+ Return true if the file descriptor is the GDB console; 'Fisatty' GDB fileio
+ request.
+
+  r5 points to a parameter block containing:
+  [0] file descriptor
+
+  Return values in parameter block:
+  [0] return status
+  [1] errno, encoded per the GDB RSP documentation
+
+#define HOSTED_SYSTEM 13
+
+  System call; 'Fsystem' GDB fileio request.
+
+  r5 points to a parameter block containing:
+  [0] command pointer
+  [1] command length
+
+  Return values in parameter block:
+  [0] return status
+  [1] errno, encoded per the GDB RSP documentation

@@ -126,18 +126,32 @@ enum del_lock_called_from {
 };
 
 enum virtual_ftype_t {
-  virt_blk = -7,	/* Block special */
-  virt_chr = -6,	/* Character special */
-  virt_fsfile = -5,	/* FS-based file via /proc/sys */
-  virt_socket = -4,	/* Socket */
-  virt_pipe = -3,	/* Pipe */
-  virt_symlink = -2,	/* Symlink */
-  virt_file = -1,	/* Regular file */
-  virt_none = 0,	/* Invalid, Error */
-  virt_directory = 1,	/* Directory */
-  virt_rootdir = 2,	/* Root directory of virtual FS */
-  virt_fsdir = 3,	/* FS-based directory via /proc/sys */
+  virt_none	 = 0x0000,	/* Invalid, Error */
+  virt_file	 = 0x0001,	/* Regular file */
+  virt_symlink	 = 0x0002,	/* Symlink */
+  virt_pipe	 = 0x0003,	/* Pipe */
+  virt_socket	 = 0x0004,	/* Socket */
+  virt_chr	 = 0x0005,	/* Character special */
+  virt_blk	 = 0x0006,	/* Block special */
+  virt_fdsymlink = 0x0007,	/* Fd symlink (e.g. /proc/<PID>/fd/0) */
+  virt_fsfile	 = 0x0008,	/* FS-based file via /proc/sys */
+  virt_dir_type	 = 0x1000,
+  virt_directory = 0x1001,	/* Directory */
+  virt_rootdir	 = 0x1002,	/* Root directory of virtual FS */
+  virt_fsdir	 = 0x1003,	/* FS-based directory via /proc/sys */
 };
+
+static inline bool
+virt_ftype_isfile (virtual_ftype_t _f)
+{
+  return _f != virt_none && !(_f & virt_dir_type);
+}
+
+static inline bool
+virt_ftype_isdir (virtual_ftype_t _f)
+{
+  return _f & virt_dir_type;
+}
 
 class fhandler_base
 {
@@ -226,7 +240,7 @@ class fhandler_base
   virtual ~fhandler_base ();
 
   /* Non-virtual simple accessor functions. */
-  void set_io_handle (HANDLE x) { io_handle = x; }
+  void set_handle (HANDLE x) { io_handle = x; }
 
   dev_t& get_device () { return dev (); }
   _major_t get_major () { return dev ().get_major (); }
@@ -330,6 +344,7 @@ class fhandler_base
   int open_with_arch (int, mode_t = 0);
   int open_null (int flags);
   virtual int open (int, mode_t);
+  virtual fhandler_base *fd_reopen (int, mode_t);
   virtual void open_setup (int flags);
   void set_unique_id (int64_t u) { unique_id = u; }
   void set_unique_id () { NtAllocateLocallyUniqueId ((PLUID) &unique_id); }
@@ -412,12 +427,13 @@ public:
   virtual bool is_tty () const { return false; }
   virtual bool ispipe () const { return false; }
   virtual pid_t get_popen_pid () const {return 0;}
-  virtual bool isdevice () const { return true; }
   virtual bool isfifo () const { return false; }
   virtual int ptsname_r (char *, size_t);
   virtual class fhandler_socket *is_socket () { return NULL; }
   virtual class fhandler_socket_wsock *is_wsock_socket () { return NULL; }
   virtual class fhandler_console *is_console () { return 0; }
+  virtual class fhandler_signalfd *is_signalfd () { return NULL; }
+  virtual class fhandler_timerfd *is_timerfd () { return NULL; }
   virtual int is_windows () {return 0; }
 
   virtual void __reg3 raw_read (void *ptr, size_t& ulen);
@@ -426,9 +442,9 @@ public:
   /* Virtual accessor functions to hide the fact
      that some fd's have two handles. */
   virtual HANDLE& get_handle () { return io_handle; }
-  virtual HANDLE& get_io_handle () { return io_handle; }
-  virtual HANDLE& get_io_handle_cyg () { return io_handle; }
+  virtual HANDLE& get_handle_cyg () { return io_handle; }
   virtual HANDLE& get_output_handle () { return io_handle; }
+  virtual HANDLE& get_output_handle_cyg () { return io_handle; }
   virtual HANDLE get_stat_handle () { return pc.handle () ?: io_handle; }
   virtual HANDLE get_echo_handle () const { return NULL; }
   virtual bool hit_eof () {return false;}
@@ -440,7 +456,7 @@ public:
     return dev ().native ();
   }
   virtual bg_check_types bg_check (int, bool = false) {return bg_ok;}
-  void clear_readahead ()
+  virtual void clear_readahead ()
   {
     raixput = raixget = ralen = rabuflen = 0;
     rabuf = NULL;
@@ -455,7 +471,6 @@ public:
   virtual void seekdir (DIR *, long);
   virtual void rewinddir (DIR *);
   virtual int closedir (DIR *);
-  bool is_auto_device () {return isdevice () && !dev ().isfs ();}
   bool is_fs_special () {return pc.is_fs_special ();}
   bool issymlink () {return pc.issymlink ();}
   bool __reg2 device_access_denied (int);
@@ -830,9 +845,10 @@ class fhandler_socket_local: public fhandler_socket_wsock
 /* Sharable spinlock with low CPU profile.  These locks are NOT recursive! */
 class af_unix_spinlock_t
 {
-  LONG  locked;          /* 0 oder 1 */
+  LONG  locked;          /* 0 or 1 */
 
 public:
+  af_unix_spinlock_t () : locked (0) {}
   void lock ()
   {
     LONG ret = InterlockedExchange (&locked, 1);
@@ -1229,24 +1245,90 @@ public:
   }
 };
 
-class fhandler_fifo: public fhandler_base_overlapped
+#define CYGWIN_FIFO_PIPE_NAME_LEN     47
+#define MAX_CLIENTS 64
+
+enum fifo_client_connect_state
+{
+  fc_unknown,
+  fc_connected,
+  fc_invalid
+};
+
+enum
+{
+  FILE_PIPE_INPUT_AVAILABLE_STATE = 5
+};
+
+struct fifo_client_handler
+{
+  fhandler_base *fh;
+  fifo_client_connect_state state;
+  fifo_client_handler () : fh (NULL), state (fc_unknown) {}
+  int close ();
+/* Returns FILE_PIPE_DISCONNECTED_STATE, FILE_PIPE_LISTENING_STATE,
+   FILE_PIPE_CONNECTED_STATE, FILE_PIPE_CLOSING_STATE,
+   FILE_PIPE_INPUT_AVAILABLE_STATE, or -1 on error. */
+  int pipe_state ();
+};
+
+class fhandler_fifo: public fhandler_base
 {
   HANDLE read_ready;
   HANDLE write_ready;
+  HANDLE listen_client_thr;
+  HANDLE lct_termination_evt;
+  UNICODE_STRING pipe_name;
+  WCHAR pipe_name_buf[CYGWIN_FIFO_PIPE_NAME_LEN + 1];
+  fifo_client_handler fc_handler[MAX_CLIENTS];
+  int nhandlers, nconnected;
+  af_unix_spinlock_t _fifo_client_lock;
+  bool reader, writer, duplexer;
+  size_t max_atomic_write;
   bool __reg2 wait (HANDLE);
-  char __reg2 *fifo_name (char *, const char *);
+  static NTSTATUS npfs_handle (HANDLE &);
+  HANDLE create_pipe_instance (bool);
+  NTSTATUS open_pipe (HANDLE&);
+  int add_client_handler ();
+  int delete_client_handler (int);
+  bool listen_client ();
+  int stop_listen_client ();
+  int check_listen_client_thread ();
+  void record_connection (fifo_client_handler&);
 public:
   fhandler_fifo ();
+  bool hit_eof ();
+  int get_nhandlers () const { return nhandlers; }
+  HANDLE get_fc_handle (int i) const
+  { return fc_handler[i].fh->get_handle (); }
+  bool is_connected (int i) const
+  { return fc_handler[i].state == fc_connected; }
+  PUNICODE_STRING get_pipe_name ();
+  DWORD listen_client_thread ();
+  void fifo_client_lock () { _fifo_client_lock.lock (); }
+  void fifo_client_unlock () { _fifo_client_lock.unlock (); }
   int open (int, mode_t);
   off_t lseek (off_t offset, int whence);
   int close ();
+  int fcntl (int cmd, intptr_t);
   int dup (fhandler_base *child, int);
   bool isfifo () const { return true; }
   void set_close_on_exec (bool val);
   void __reg3 raw_read (void *ptr, size_t& ulen);
+  ssize_t __reg3 raw_write (const void *ptr, size_t ulen);
   bool arm (HANDLE h);
+  bool need_fixup_before () const { return reader; }
+  int fixup_before_fork_exec (DWORD) { return stop_listen_client (); }
+  void init_fixup_before ();
   void fixup_after_fork (HANDLE);
+  void fixup_after_exec ();
   int __reg2 fstatvfs (struct statvfs *buf);
+  void clear_readahead ()
+  {
+    fhandler_base::clear_readahead ();
+    for (int i = 0; i < nhandlers; i++)
+      fc_handler[i].fh->clear_readahead ();
+  }
   select_record *select_read (select_stuff *);
   select_record *select_write (select_stuff *);
   select_record *select_except (select_stuff *);
@@ -1257,16 +1339,22 @@ public:
   {
     x->pc.free_strings ();
     *reinterpret_cast<fhandler_fifo *> (x) = *this;
-    reinterpret_cast<fhandler_fifo *> (x)->atomic_write_buf = NULL;
     x->reset (this);
   }
 
   fhandler_fifo *clone (cygheap_types malloc_type = HEAP_FHANDLER)
   {
     void *ptr = (void *) ccalloc (malloc_type, 1, sizeof (fhandler_fifo));
-    fhandler_fifo *fh = new (ptr) fhandler_fifo (ptr);
-    copyto (fh);
-    return fh;
+    fhandler_fifo *fhf = new (ptr) fhandler_fifo (ptr);
+    /* We don't want our client list to change any more. */
+    stop_listen_client ();
+    copyto (fhf);
+    /* fhf->pipe_name_buf is a *copy* of this->pipe_name_buf, but
+       fhf->pipe_name.Buffer == this->pipe_name_buf. */
+    fhf->pipe_name.Buffer = fhf->pipe_name_buf;
+    for (int i = 0; i < nhandlers; i++)
+      fhf->fc_handler[i].fh = fc_handler[i].fh->clone ();
+    return fhf;
   }
 };
 
@@ -1437,6 +1525,8 @@ class fhandler_disk_file: public fhandler_base
   int __reg3 readdir_helper (DIR *, dirent *, DWORD, DWORD, PUNICODE_STRING fname);
 
   int prw_open (bool, void *);
+  uint64_t fs_ioc_getflags ();
+  int fs_ioc_setflags (uint64_t);
 
  public:
   fhandler_disk_file ();
@@ -1448,7 +1538,6 @@ class fhandler_disk_file: public fhandler_base
   int dup (fhandler_base *child, int);
   void fixup_after_fork (HANDLE parent);
   int mand_lock (int, struct flock *);
-  bool isdevice () const { return false; }
   int __reg2 fstat (struct stat *buf);
   int __reg1 fchmod (mode_t mode);
   int __reg2 fchown (uid_t uid, gid_t gid);
@@ -1462,6 +1551,7 @@ class fhandler_disk_file: public fhandler_base
   int __reg2 link (const char *);
   int __reg2 utimens (const struct timespec *);
   int __reg2 fstatvfs (struct statvfs *buf);
+  int ioctl (unsigned int cmd, void *buf);
 
   HANDLE mmap (caddr_t *addr, size_t len, int prot, int flags, off_t off);
   int munmap (HANDLE h, caddr_t addr, size_t len);
@@ -1633,6 +1723,12 @@ class fhandler_serial: public fhandler_base
   }
 };
 
+#define acquire_input_mutex(ms) \
+  __acquire_input_mutex (__PRETTY_FUNCTION__, __LINE__, ms)
+
+#define release_input_mutex() \
+  __release_input_mutex (__PRETTY_FUNCTION__, __LINE__)
+
 #define acquire_output_mutex(ms) \
   __acquire_output_mutex (__PRETTY_FUNCTION__, __LINE__, ms)
 
@@ -1661,6 +1757,7 @@ class fhandler_termios: public fhandler_base
     need_fork_fixup (true);
   }
   HANDLE& get_output_handle () { return output_handle; }
+  HANDLE& get_output_handle_cyg () { return output_handle; }
   line_edit_status line_edit (const char *rptr, size_t nread, termios&,
 			      ssize_t *bytes_read = NULL);
   void set_output_handle (HANDLE h) { output_handle = h; }
@@ -1712,6 +1809,8 @@ enum ansi_intensity
 #define eattitle 7
 #define gotparen 8
 #define gotrparen 9
+#define eatpalette 10
+#define endpalette 11
 #define MAXARGS 10
 
 enum cltype
@@ -1725,6 +1824,8 @@ enum cltype
 
 class dev_console
 {
+  pid_t owner;
+
   WORD default_color, underline_color, dim_color;
 
   /* Used to determine if an input keystroke should be modified with META. */
@@ -1814,10 +1915,20 @@ public:
     tty_min tty_min_state;
     dev_console con;
   };
+  bool input_ready;
+  enum input_states
+  {
+    input_error = -1,
+    input_processing = 0,
+    input_ok = 1,
+    input_signalled = 2,
+    input_winch = 3
+  };
 private:
   static const unsigned MAX_WRITE_CHARS;
   static console_state *shared_console_info;
   static bool invisible_console;
+  HANDLE input_mutex, output_mutex;
 
   /* Used when we encounter a truncated multi-byte sequence.  The
      lead bytes are stored here and revisited in the next write call. */
@@ -1887,8 +1998,11 @@ private:
   bool focus_aware () {return shared_console_info->con.use_focus;}
   bool get_cons_readahead_valid ()
   {
-    return shared_console_info->con.cons_rapoi != NULL &&
+    acquire_input_mutex (INFINITE);
+    bool ret = shared_console_info->con.cons_rapoi != NULL &&
       *shared_console_info->con.cons_rapoi;
+    release_input_mutex ();
+    return ret;
   }
 
   select_record *select_read (select_stuff *);
@@ -1899,7 +2013,7 @@ private:
   void fixup_after_fork (HANDLE) {fixup_after_fork_exec (false);}
   void set_close_on_exec (bool val);
   void set_input_state ();
-  void send_winch_maybe ();
+  bool send_winch_maybe ();
   void setup ();
   bool set_unit ();
   static bool need_invisible ();
@@ -1922,6 +2036,13 @@ private:
     copyto (fh);
     return fh;
   }
+  input_states process_input_message ();
+  void setup_io_mutex (void);
+  DWORD __acquire_input_mutex (const char *fn, int ln, DWORD ms);
+  void __release_input_mutex (const char *fn, int ln);
+  DWORD __acquire_output_mutex (const char *fn, int ln, DWORD ms);
+  void __release_output_mutex (const char *fn, int ln);
+
   friend tty_min * tty_list::get_cttyp ();
 };
 
@@ -2044,7 +2165,7 @@ class fhandler_pty_master: public fhandler_pty_common
 
 public:
   HANDLE get_echo_handle () const { return echo_r; }
-  HANDLE& get_io_handle_cyg () { return io_handle_cyg; }
+  HANDLE& get_handle_cyg () { return io_handle_cyg; }
   /* Constructor */
   fhandler_pty_master (int);
 
@@ -2540,6 +2661,7 @@ class fhandler_registry: public fhandler_proc
 class pinfo;
 class fhandler_process: public fhandler_proc
 {
+ protected:
   pid_t pid;
   virtual_ftype_t fd_type;
  public:
@@ -2570,18 +2692,45 @@ class fhandler_process: public fhandler_proc
   }
 };
 
+class fhandler_process_fd : public fhandler_process
+{
+  fhandler_base *fetch_fh (HANDLE &, uint32_t);
+
+ public:
+  fhandler_process_fd () : fhandler_process () {}
+  fhandler_process_fd (void *) {}
+
+  virtual fhandler_base *fd_reopen (int, mode_t);
+  int __reg2 fstat (struct stat *buf);
+  virtual int __reg2 link (const char *);
+
+  void copyto (fhandler_base *x)
+  {
+    x->pc.free_strings ();
+    *reinterpret_cast<fhandler_process_fd *> (x) = *this;
+    x->reset (this);
+  }
+
+  fhandler_process_fd *clone (cygheap_types malloc_type = HEAP_FHANDLER)
+  {
+    void *ptr = (void *) ccalloc (malloc_type, 1, sizeof (fhandler_process_fd));
+    fhandler_process_fd *fh = new (ptr) fhandler_process_fd (ptr);
+    copyto (fh);
+    return fh;
+  }
+};
+
 class fhandler_procnet: public fhandler_proc
 {
   pid_t pid;
  public:
   fhandler_procnet ();
+  fhandler_procnet (void *) {}
   virtual_ftype_t exists();
   int __reg3 readdir (DIR *, dirent *);
   int open (int flags, mode_t mode = 0);
   int __reg2 fstat (struct stat *buf);
   bool fill_filebuf ();
-
-  fhandler_procnet (void *) {}
 
   void copyto (fhandler_base *x)
   {
@@ -2594,6 +2743,96 @@ class fhandler_procnet: public fhandler_proc
   {
     void *ptr = (void *) ccalloc (malloc_type, 1, sizeof (fhandler_procnet));
     fhandler_procnet *fh = new (ptr) fhandler_procnet (ptr);
+    copyto (fh);
+    return fh;
+  }
+};
+
+class fhandler_signalfd : public fhandler_base
+{
+  sigset_t sigset;
+
+ public:
+  fhandler_signalfd ();
+  fhandler_signalfd (void *) {}
+
+  fhandler_signalfd *is_signalfd () { return this; }
+
+  char *get_proc_fd_name (char *buf);
+
+  int signalfd (const sigset_t *mask, int flags);
+  int __reg2 fstat (struct stat *buf);
+  void __reg3 read (void *ptr, size_t& len);
+  ssize_t __stdcall write (const void *, size_t);
+
+  int poll ();
+  inline sigset_t get_sigset () const { return sigset; }
+
+  select_record *select_read (select_stuff *);
+  select_record *select_write (select_stuff *);
+  select_record *select_except (select_stuff *);
+
+  void copyto (fhandler_base *x)
+  {
+    x->pc.free_strings ();
+    *reinterpret_cast<fhandler_signalfd *> (x) = *this;
+    x->reset (this);
+  }
+
+  fhandler_signalfd *clone (cygheap_types malloc_type = HEAP_FHANDLER)
+  {
+    void *ptr = (void *) ccalloc (malloc_type, 1, sizeof (fhandler_signalfd));
+    fhandler_signalfd *fh = new (ptr) fhandler_signalfd (ptr);
+    copyto (fh);
+    return fh;
+  }
+};
+
+class fhandler_timerfd : public fhandler_base
+{
+  timer_t timerid;
+
+ public:
+  fhandler_timerfd ();
+  fhandler_timerfd (void *) {}
+  ~fhandler_timerfd () {}
+
+  fhandler_timerfd *is_timerfd () { return this; }
+
+  char *get_proc_fd_name (char *buf);
+
+  int timerfd (clockid_t clock_id, int flags);
+  int settime (int flags, const struct itimerspec *value,
+	       struct itimerspec *ovalue);
+  int gettime (struct itimerspec *ovalue);
+
+  int __reg2 fstat (struct stat *buf);
+  void __reg3 read (void *ptr, size_t& len);
+  ssize_t __stdcall write (const void *, size_t);
+  int dup (fhandler_base *child, int);
+  int ioctl (unsigned int, void *);
+  int close ();
+
+  HANDLE get_timerfd_handle ();
+
+  void fixup_after_fork (HANDLE);
+  void fixup_after_exec ();
+
+  select_record *select_read (select_stuff *);
+  select_record *select_write (select_stuff *);
+  select_record *select_except (select_stuff *);
+
+  void copyto (fhandler_base *x)
+  {
+    x->pc.free_strings ();
+    *reinterpret_cast<fhandler_timerfd *> (x) = *this;
+    x->reset (this);
+  }
+
+  fhandler_timerfd *clone (cygheap_types malloc_type = HEAP_FHANDLER)
+  {
+    void *ptr = (void *) ccalloc (malloc_type, 1, sizeof (fhandler_timerfd));
+    fhandler_timerfd *fh = new (ptr) fhandler_timerfd (ptr);
     copyto (fh);
     return fh;
   }
@@ -2631,12 +2870,15 @@ typedef union
   char __pipe[sizeof (fhandler_pipe)];
   char __proc[sizeof (fhandler_proc)];
   char __process[sizeof (fhandler_process)];
+  char __process_fd[sizeof (fhandler_process_fd)];
   char __procnet[sizeof (fhandler_procnet)];
   char __procsys[sizeof (fhandler_procsys)];
   char __procsysvipc[sizeof (fhandler_procsysvipc)];
   char __pty_master[sizeof (fhandler_pty_master)];
   char __registry[sizeof (fhandler_registry)];
   char __serial[sizeof (fhandler_serial)];
+  char __signalfd[sizeof (fhandler_signalfd)];
+  char __timerfd[sizeof (fhandler_timerfd)];
   char __socket_inet[sizeof (fhandler_socket_inet)];
   char __socket_local[sizeof (fhandler_socket_local)];
 #ifdef __WITH_AF_UNIX

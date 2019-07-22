@@ -18,7 +18,7 @@ typedef	__int64_t	_off_t;
 typedef	_off_t		_fpos_t;
 #define	__machine_fpos_t_defined
 
-typedef	unsigned long	__ino_t;
+typedef	__uint64_t	__ino_t;
 #define	__machine_ino_t_defined
 
 typedef	__uint32_t	__mode_t;

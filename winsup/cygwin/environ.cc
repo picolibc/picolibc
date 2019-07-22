@@ -549,6 +549,16 @@ _getenv_r (struct _reent *, const char *name)
   return findenv_func (name, &offset);
 }
 
+/* Like getenv, but returns NULL if effective and real UID/GIDs do not match */
+extern "C" char *
+secure_getenv (const char *name)
+{
+  int offset;
+  if (cygheap->user.issetuid ())
+    return NULL;
+  return findenv_func (name, &offset);
+}
+
 /* Return number of environment entries, including terminating NULL. */
 static int __stdcall
 envsize (const char * const *in_envp)
@@ -634,7 +644,7 @@ _addenv (const char *name, const char *value, int overwrite)
 	return -1;		/* Oops.  No more memory. */
 
       /* Put name '=' value into current slot. */
-      strncpy (envhere, name, namelen);
+      memcpy (envhere, name, namelen);
       envhere[namelen] = '=';
       strcpy (envhere + namelen + 1, value);
     }
@@ -859,7 +869,8 @@ win32env_to_cygenv (PWCHAR rawenv, bool posify)
   char *newp;
   int i;
   int sawTERM = 0;
-  static char NO_COPY cygterm[] = "TERM=cygwin";
+  const char cygterm[] = "TERM=cygwin";
+  const char xterm[] = "TERM=xterm-256color";
   char *tmpbuf = tp.t_get ();
   PWCHAR w;
 
@@ -889,8 +900,10 @@ win32env_to_cygenv (PWCHAR rawenv, bool posify)
       debug_printf ("%p: %s", envp[i], envp[i]);
     }
 
+  /* If console has 24 bit color capability, TERM=xterm-256color,
+     otherwise, TERM=cygwin */
   if (!sawTERM)
-    envp[i++] = strdup (cygterm);
+    envp[i++] = strdup (wincap.has_con_24bit_colors () ? xterm : cygterm);
 
   envp[i] = NULL;
   return envp;
@@ -1282,10 +1295,11 @@ build_env (const char * const *envp, PWCHAR &envblock, int &envc,
 	 during execve. */
       if (!saw_PATH)
 	{
-	  new_tl += cygheap->installation_dir_len + 5;
+	  new_tl += cygheap->installation_dir.Length / sizeof (WCHAR) + 5;
 	  if (new_tl > tl)
 	    tl = raise_envblock (new_tl, envblock, s);
-	  s = wcpcpy (wcpcpy (s, L"PATH="), cygheap->installation_dir) + 1;
+	  s = wcpcpy (wcpcpy (s, L"PATH="),
+		      cygheap->installation_dir.Buffer) + 1;
 	}
       *s = L'\0';			/* Two null bytes at the end */
       assert ((s - envblock) <= tl);	/* Detect if we somehow ran over end

@@ -41,10 +41,6 @@ static const virt_tab_t procnet_tab[] =
 static const int PROCNET_LINK_COUNT =
   (sizeof (procnet_tab) / sizeof (virt_tab_t)) - 1;
 
-/* Returns 0 if path doesn't exist, >0 if path is a directory,
- * -1 if path is a file, -2 if path is a symlink, -3 if path is a pipe,
- * -4 if path is a socket.
- */
 virtual_ftype_t
 fhandler_procnet::exists ()
 {

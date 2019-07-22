@@ -41,9 +41,6 @@ RETURNS
 	an overflow,  <<cosh>> returns the value <<HUGE_VAL>> with the
 	appropriate sign, and the global value <<errno>> is set to <<ERANGE>>.
 
-	You can modify error handling for these functions using the
-	function <<matherr>>.
-
 PORTABILITY
 	<<cosh>> is ANSI.  
 	<<coshf>> is an extension.
@@ -71,33 +68,12 @@ QUICKREF
 #endif
 {
 	double z;
-	struct exception exc;
 	z = __ieee754_cosh(x);
 	if(_LIB_VERSION == _IEEE_ || isnan(x)) return z;
 	if(fabs(x)>7.10475860073943863426e+02) {	
 	    /* cosh(finite) overflow */
-#ifndef HUGE_VAL
-#define HUGE_VAL inf
-	    double inf = 0.0;
-
-	    SET_HIGH_WORD(inf,0x7ff00000);	/* set inf to infinite */
-#endif
-	    exc.type = OVERFLOW;
-	    exc.name = "cosh";
-	    exc.err = 0;
-	    exc.arg1 = exc.arg2 = x;
-	    if (_LIB_VERSION == _SVID_)
-	       exc.retval = HUGE;
-	    else
-	       exc.retval = HUGE_VAL;
-	    if (_LIB_VERSION == _POSIX_)
-	       errno = ERANGE;
-	    else if (!matherr(&exc)) {
-	       errno = ERANGE;
-	    }
-	    if (exc.err != 0)
-	       errno = exc.err;
-	    return exc.retval; 
+	    errno = ERANGE;
+	    return HUGE_VAL;
 	} else
 	    return z;
 }

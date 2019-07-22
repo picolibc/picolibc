@@ -22,8 +22,9 @@ details. */
 #include "tls_pbuf.h"
 #include <lm.h>
 #include <iptypes.h>
-#include <wininet.h>
 #include <userenv.h>
+#define SECURITY_WIN32
+#include <secext.h>
 #include "cyglsa.h"
 #include "cygserver_setpwd.h"
 #include <cygwin/version.h>
@@ -230,23 +231,16 @@ load_user_profile (HANDLE token, struct passwd *pw, cygpsid &usersid)
   WCHAR domain[DNLEN + 1];
   WCHAR username[UNLEN + 1];
   WCHAR sid[128];
-  HKEY hkey;
   WCHAR userpath[MAX_PATH];
   PROFILEINFOW pi;
-  WCHAR server[INTERNET_MAX_HOST_NAME_LENGTH + 3];
-  NET_API_STATUS nas = NERR_UserNotFound;
-  PUSER_INFO_3 ui;
+
+  /* Initialize */
+  if (!cygheap->dom.init ())
+    return NULL;
 
   extract_nt_dom_user (pw, domain, username);
   usersid.string (sid);
-  debug_printf ("user: <%W> <%W>", username, sid);
-  /* Check if user hive is already loaded. */
-  if (!RegOpenKeyExW (HKEY_USERS, sid, 0, KEY_READ, &hkey))
-    {
-      debug_printf ("User registry hive for %W already exists", username);
-      RegCloseKey (hkey);
-      return NULL;
-    }
+  debug_printf ("user: <%W> <%W> <%W>", username, domain, sid);
   /* Check if the local profile dir has already been created. */
   if (!get_user_profile_directory (sid, userpath, MAX_PATH))
    {
@@ -263,21 +257,57 @@ load_user_profile (HANDLE token, struct passwd *pw, cygpsid &usersid)
   pi.dwSize = sizeof pi;
   pi.dwFlags = PI_NOUI;
   pi.lpUserName = username;
-  /* Check if user has a roaming profile and fill in lpProfilePath, if so. */
-  if (get_logon_server (domain, server, DS_IS_FLAT_NAME))
+  /* Check if user has a roaming profile and fill in lpProfilePath, if so.
+     Call NetUserGetInfo only for local machine accounts, use LDAP otherwise. */
+  if (!wcscasecmp (domain, cygheap->dom.account_flat_name ()))
     {
-      nas = NetUserGetInfo (server, username, 3, (PBYTE *) &ui);
-      if (NetUserGetInfo (server, username, 3, (PBYTE *) &ui) != NERR_Success)
+      NET_API_STATUS nas;
+      PUSER_INFO_3 ui;
+
+      nas = NetUserGetInfo (NULL, username, 3, (PBYTE *) &ui);
+      if (nas != NERR_Success)
 	debug_printf ("NetUserGetInfo, %u", nas);
-      else if (ui->usri3_profile && *ui->usri3_profile)
-	pi.lpProfilePath = ui->usri3_profile;
+      else
+	{
+	  if (ui->usri3_profile && *ui->usri3_profile)
+	    {
+	      wcsncpy (userpath, ui->usri3_profile, MAX_PATH - 1);
+	      userpath[MAX_PATH - 1] = L'\0';
+	      pi.lpProfilePath = userpath;
+	    }
+	  NetApiBufferFree (ui);
+	}
+    }
+  else
+    {
+      cyg_ldap cldap;
+      PCWSTR dnsdomain = NULL;
+
+      if (wcscasecmp (domain, cygheap->dom.primary_flat_name ()))
+	{
+	  PDS_DOMAIN_TRUSTSW td = NULL;
+
+	  for (ULONG idx = 0; (td = cygheap->dom.trusted_domain (idx)); ++idx)
+	    if (!wcscasecmp (domain, td->NetbiosDomainName))
+	      {
+		dnsdomain = td->DnsDomainName;
+		break;
+	      }
+	}
+      if (cldap.fetch_ad_account (usersid, false, dnsdomain))
+	{
+	  PWCHAR val = cldap.get_profile_path ();
+	  if (val && *val)
+	    {
+	      wcsncpy (userpath, val, MAX_PATH - 1);
+	      userpath[MAX_PATH - 1] = L'\0';
+	      pi.lpProfilePath = userpath;
+	    }
+	}
     }
 
   if (!LoadUserProfileW (token, &pi))
     debug_printf ("LoadUserProfileW, %E");
-  /* Free buffer created by NetUserGetInfo */
-  if (nas == NERR_Success)
-    NetApiBufferFree (ui);
   return pi.hProfile;
 }
 
@@ -391,18 +421,24 @@ get_user_groups (WCHAR *logonserver, cygsidlist &grp_list,
 }
 
 static bool
-get_user_local_groups (PWCHAR logonserver, PWCHAR domain,
-		       cygsidlist &grp_list, PWCHAR user)
+get_user_local_groups (PWCHAR domain, cygsidlist &grp_list, PWCHAR user)
 {
   LPLOCALGROUP_INFO_0 buf;
   DWORD cnt, tot;
   NET_API_STATUS ret;
 
-  ret = NetUserGetLocalGroups (logonserver, user, 0, LG_INCLUDE_INDIRECT,
+  /* We want to know the membership in local groups on the current machine.
+     Thus, don't ask the logonserver, ask the local machine.  In contrast
+     to most other NetUser functions, NetUserGetLocalGroups accepts the
+     username in DOMAIN\user form. */
+  WCHAR username[MAX_DOMAIN_NAME_LEN + UNLEN + 2];
+  wcpcpy (wcpcpy (wcpcpy (username, domain), L"\\"), user);
+  ret = NetUserGetLocalGroups (NULL, username, 0, LG_INCLUDE_INDIRECT,
 			       (LPBYTE *) &buf, MAX_PREFERRED_LENGTH,
 			       &cnt, &tot);
   if (ret)
     {
+      debug_printf ("username: %W", username);
       __seterrno_from_win_error (ret);
       return false;
     }
@@ -523,11 +559,11 @@ get_token_group_sidlist (cygsidlist &grp_list, PTOKEN_GROUPS my_grps)
 }
 
 bool
-get_server_groups (cygsidlist &grp_list, PSID usersid)
+get_server_groups (cygsidlist &grp_list, PSID usersid,
+		   acct_disabled_chk_t check_account_disabled)
 {
   WCHAR user[UNLEN + 1];
   WCHAR domain[MAX_DOMAIN_NAME_LEN + 1];
-  WCHAR server[INTERNET_MAX_HOST_NAME_LENGTH + 3];
   DWORD ulen = UNLEN + 1;
   DWORD dlen = MAX_DOMAIN_NAME_LEN + 1;
   SID_NAME_USE use;
@@ -538,23 +574,73 @@ get_server_groups (cygsidlist &grp_list, PSID usersid)
       return true;
     }
 
-  grp_list *= well_known_world_sid;
-  grp_list *= well_known_authenticated_users_sid;
-
   if (!LookupAccountSidW (NULL, usersid, user, &ulen, domain, &dlen, &use))
     {
       __seterrno ();
       return false;
     }
   /* If the SID does NOT start with S-1-5-21, the domain is some builtin
-     domain.  The search for a logon server and fetching group accounts
-     is moot. */
+     domain.  We don't fetch a group list then. */
   if (sid_id_auth (usersid) == 5 /* SECURITY_NT_AUTHORITY */
-      && sid_sub_auth (usersid, 0) == SECURITY_NT_NON_UNIQUE
-      && get_logon_server (domain, server, DS_IS_FLAT_NAME))
+      && sid_sub_auth (usersid, 0) == SECURITY_NT_NON_UNIQUE)
     {
-      get_user_groups (server, grp_list, user, domain);
-      get_user_local_groups (server, domain, grp_list, user);
+      if (wincap.no_msv1_0_s4u_logon_in_wow64 ())
+	{
+	  WCHAR server[INTERNET_MAX_HOST_NAME_LENGTH + 3];
+
+	  if (!get_logon_server (domain, server, DS_IS_FLAT_NAME))
+	    return false;
+	  if (check_account_disabled == CHK_DISABLED)
+	    {
+	      NET_API_STATUS napi_stat;
+	      USER_INFO_1 *ui1;
+	      bool allow_user = false;
+
+	      napi_stat = NetUserGetInfo (server, user, 1, (LPBYTE *) &ui1);
+	      if (napi_stat == NERR_Success)
+		allow_user = !(ui1->usri1_flags & (UF_ACCOUNTDISABLE | UF_LOCKOUT));
+	      if (ui1)
+		NetApiBufferFree (ui1);
+	      if (!allow_user)
+		{
+		  debug_printf ("User denied: %W\\%W", domain, user);
+		  set_errno (EACCES);
+		  return false;
+		}
+	    }
+	  grp_list *= well_known_world_sid;
+	  grp_list *= well_known_authenticated_users_sid;
+	  get_user_groups (server, grp_list, user, domain);
+	  get_user_local_groups (domain, grp_list, user);
+	  return true;
+	}
+
+      tmp_pathbuf tp;
+      HANDLE token;
+      NTSTATUS status;
+      PTOKEN_GROUPS groups;
+      ULONG size;
+
+      token = s4uauth (false, domain, user, status);
+      if (!token)
+	return false;
+
+      groups = (PTOKEN_GROUPS) tp.w_get ();
+      status = NtQueryInformationToken (token, TokenGroups, groups,
+					2 * NT_MAX_PATH, &size);
+      if (NT_SUCCESS (status))
+	for (DWORD pg = 0; pg < groups->GroupCount; ++pg)
+	  {
+	    if (groups->Groups[pg].Attributes & SE_GROUP_USE_FOR_DENY_ONLY)
+	      continue;
+	    cygpsid grpsid = groups->Groups[pg].Sid;
+	    if (sid_id_auth (grpsid) == 5 /* SECURITY_NT_AUTHORITY */
+		&& sid_sub_auth (grpsid, 0) == SECURITY_NT_NON_UNIQUE)
+	      grp_list += grpsid;
+	    else
+	      grp_list *= grpsid;
+	  }
+      NtClose (token);
     }
   return true;
 }
@@ -563,11 +649,9 @@ static bool
 get_initgroups_sidlist (cygsidlist &grp_list, PSID usersid, PSID pgrpsid,
 			PTOKEN_GROUPS my_grps)
 {
-  grp_list *= well_known_world_sid;
-  grp_list *= well_known_authenticated_users_sid;
   if (well_known_system_sid != usersid)
     get_token_group_sidlist (grp_list, my_grps);
-  if (!get_server_groups (grp_list, usersid))
+  if (!get_server_groups (grp_list, usersid, CHK_DISABLED))
     return false;
 
   /* special_pgrp true if pgrpsid is not in normal groups */
@@ -575,17 +659,17 @@ get_initgroups_sidlist (cygsidlist &grp_list, PSID usersid, PSID pgrpsid,
   return true;
 }
 
-static void
+static bool
 get_setgroups_sidlist (cygsidlist &tmp_list, PSID usersid,
 		       PTOKEN_GROUPS my_grps, user_groups &groups)
 {
-  tmp_list *= well_known_world_sid;
-  tmp_list *= well_known_authenticated_users_sid;
   get_token_group_sidlist (tmp_list, my_grps);
-  get_server_groups (tmp_list, usersid);
+  if (!get_server_groups (tmp_list, usersid, CHK_DISABLED))
+    return false;
   for (int gidx = 0; gidx < groups.sgsids.count (); gidx++)
     tmp_list += groups.sgsids.sids[gidx];
   tmp_list += groups.pgsid;
+  return true;
 }
 
 /* Fixed size TOKEN_PRIVILEGES list to reflect privileges given to the
@@ -851,6 +935,32 @@ verify_token (HANDLE token, cygsid &usersid, user_groups &groups, bool *pintern)
 	 || groups.pgsid == usersid;
 }
 
+const char *
+account_restriction (NTSTATUS status)
+{
+  const char *type;
+
+  switch (status)
+    {
+    case STATUS_INVALID_LOGON_HOURS:
+      type = "Logon outside allowed hours";
+      break;
+    case STATUS_INVALID_WORKSTATION:
+      type = "Logon at this machine not allowed";
+      break;
+    case STATUS_PASSWORD_EXPIRED:
+      type = "Password expired";
+      break;
+    case STATUS_ACCOUNT_DISABLED:
+      type = "Account disabled";
+      break;
+    default:
+      type = "Unknown";
+      break;
+    }
+  return type;
+}
+
 HANDLE
 create_token (cygsid &usersid, user_groups &new_groups)
 {
@@ -886,8 +996,8 @@ create_token (cygsid &usersid, user_groups &new_groups)
   source.SourceIdentifier.HighPart = 0;
   source.SourceIdentifier.LowPart = 0x0101;
 
-  HANDLE token = INVALID_HANDLE_VALUE;
-  HANDLE primary_token = INVALID_HANDLE_VALUE;
+  HANDLE token = NULL;
+  HANDLE primary_token = NULL;
 
   tmp_pathbuf tp;
   PTOKEN_GROUPS my_tok_gsids = NULL;
@@ -938,7 +1048,10 @@ create_token (cygsid &usersid, user_groups &new_groups)
 
   /* Create list of groups, the user is member in. */
   if (new_groups.issetgroups ())
-    get_setgroups_sidlist (tmp_gsids, usersid, my_tok_gsids, new_groups);
+    {
+      if (!get_setgroups_sidlist (tmp_gsids, usersid, my_tok_gsids, new_groups))
+	goto out;
+    }
   else if (!get_initgroups_sidlist (tmp_gsids, usersid, new_groups.pgsid,
 				    my_tok_gsids))
     goto out;
@@ -986,6 +1099,7 @@ create_token (cygsid &usersid, user_groups &new_groups)
 	{
 	  __seterrno ();
 	  debug_printf ("DuplicateTokenEx %E");
+	  primary_token = NULL;
 	}
     }
 
@@ -1001,6 +1115,7 @@ out:
   return primary_token;
 }
 
+#if 0 && S4U_RUNS_FINE
 HANDLE
 lsaauth (cygsid &usersid, user_groups &new_groups)
 {
@@ -1037,17 +1152,11 @@ lsaauth (cygsid &usersid, user_groups &new_groups)
 
   /* Register as logon process. */
   RtlInitAnsiString (&name, "Cygwin");
-  SetLastError (0);
   status = LsaRegisterLogonProcess (&name, &lsa_hdl, &sec_mode);
   if (status != STATUS_SUCCESS)
     {
       debug_printf ("LsaRegisterLogonProcess: %y", status);
       __seterrno_from_nt_status (status);
-      goto out;
-    }
-  else if (GetLastError () == ERROR_PROC_NOT_FOUND)
-    {
-      debug_printf ("Couldn't load Secur32.dll");
       goto out;
     }
   /* Get handle to our own LSA package. */
@@ -1074,7 +1183,10 @@ lsaauth (cygsid &usersid, user_groups &new_groups)
 
   /* Create list of groups, the user is member in. */
   if (new_groups.issetgroups ())
-    get_setgroups_sidlist (tmp_gsids, usersid, NULL, new_groups);
+    {
+      if (!get_setgroups_sidlist (tmp_gsids, usersid, NULL, new_groups))
+	goto out;
+    }
   else if (!get_initgroups_sidlist (tmp_gsids, usersid, new_groups.pgsid,
 				    NULL))
     goto out;
@@ -1207,7 +1319,11 @@ lsaauth (cygsid &usersid, user_groups &new_groups)
 			 &sub_status);
   if (status != STATUS_SUCCESS)
     {
-      debug_printf ("LsaLogonUser: %y (sub-status %y)", status, sub_status);
+      if (status == STATUS_ACCOUNT_RESTRICTION)
+	debug_printf ("Cygwin LSA Auth LsaLogonUser failed: %y (%s)",
+		      status, account_restriction (sub_status));
+      else
+	debug_printf ("Cygwin LSA Auth LsaLogonUser failed: %y", status);
       __seterrno_from_nt_status (status);
       goto out;
     }
@@ -1239,6 +1355,7 @@ out:
   debug_printf ("%p = lsaauth ()", user_token);
   return user_token;
 }
+#endif
 
 #define SFU_LSA_KEY_SUFFIX	L"_microsoft_sfu_utility"
 
@@ -1314,5 +1431,270 @@ lsaprivkeyauth (struct passwd *pw)
 
 out:
   pop_self_privilege ();
+  return token;
+}
+
+/* The following code is inspired by the generate_s4u_user_token
+   and lookup_principal_name functions from
+   https://github.com/PowerShell/openssh-portable
+
+   Thanks guys!  For courtesy here's the original copyright disclaimer: */
+
+/*
+* Author: Manoj Ampalam <manoj.ampalam@microsoft.com>
+*   Utilities to generate user tokens
+*
+* Author: Bryan Berns <berns@uwalumni.com>
+*   Updated s4u, logon, and profile loading routines to use
+*   normalized login names.
+*
+* Copyright (c) 2015 Microsoft Corp.
+* All rights reserved
+*
+* Microsoft openssh win32 port
+*
+* Redistribution and use in source and binary forms, with or without
+* modification, are permitted provided that the following conditions
+* are met:
+*
+* 1. Redistributions of source code must retain the above copyright
+* notice, this list of conditions and the following disclaimer.
+* 2. Redistributions in binary form must reproduce the above copyright
+* notice, this list of conditions and the following disclaimer in the
+* documentation and/or other materials provided with the distribution.
+*
+* THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
+* IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+* OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+* IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
+* INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
+* NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+* DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+* THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+* (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+* THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+*/
+
+/* In Mingw-w64, MsV1_0S4ULogon and MSV1_0_S4U_LOGON are only defined
+   in ddk/ntifs.h.  We can't include this. */
+
+#define MsV1_0S4ULogon ((MSV1_0_LOGON_SUBMIT_TYPE) 12)
+
+typedef struct _MSV1_0_S4U_LOGON
+{
+  MSV1_0_LOGON_SUBMIT_TYPE MessageType;
+  ULONG Flags;
+  UNICODE_STRING UserPrincipalName;
+  UNICODE_STRING DomainName;
+} MSV1_0_S4U_LOGON, *PMSV1_0_S4U_LOGON;
+
+/* Missing in Mingw-w64 */
+#define KERB_S4U_LOGON_FLAG_IDENTITY 0x08
+
+/* If logon is true we need an impersonation token.  Otherwise we just
+   need an identification token, e. g. to fetch the group list. */
+HANDLE
+s4uauth (bool logon, PCWSTR domain, PCWSTR user, NTSTATUS &ret_status)
+{
+  LSA_STRING name;
+  HANDLE lsa_hdl = NULL;
+  LSA_OPERATIONAL_MODE sec_mode;
+  NTSTATUS status, sub_status;
+  bool kerberos_auth;
+  ULONG package_id, size;
+  struct {
+    LSA_STRING str;
+    CHAR buf[16];
+  } origin;
+
+  tmp_pathbuf tp;
+  PVOID authinf = NULL;
+  ULONG authinf_size;
+  TOKEN_SOURCE ts;
+  PKERB_INTERACTIVE_PROFILE profile = NULL;
+  LUID luid;
+  QUOTA_LIMITS quota;
+  HANDLE token = NULL;
+
+  /* Initialize */
+  if (!cygheap->dom.init ())
+    return NULL;
+
+  push_self_privilege (SE_TCB_PRIVILEGE, true);
+
+  if (logon)
+    {
+      /* Register as logon process. */
+      debug_printf ("Impersonation requested");
+      RtlInitAnsiString (&name, "Cygwin");
+      status = LsaRegisterLogonProcess (&name, &lsa_hdl, &sec_mode);
+    }
+  else
+    {
+      /* Connect untrusted to just create a identification token */
+      debug_printf ("Identification requested");
+      status = LsaConnectUntrusted (&lsa_hdl);
+    }
+  if (status != STATUS_SUCCESS)
+    {
+      debug_printf ("%s: %y", logon ? "LsaRegisterLogonProcess"
+				    : "LsaConnectUntrusted", status);
+      /* If the privilege is not held, set the proper error code. */
+      if (status == STATUS_PORT_CONNECTION_REFUSED)
+	status = STATUS_PRIVILEGE_NOT_HELD;
+      __seterrno_from_nt_status (status);
+      goto out;
+    }
+
+  /* Check if this is a domain user.  If so, use Kerberos. */
+  kerberos_auth = cygheap->dom.member_machine ()
+	      && wcscasecmp (domain, cygheap->dom.account_flat_name ());
+  debug_printf ("kerb %d, domain member %d, user domain <%W>, machine <%W>",
+		kerberos_auth, cygheap->dom.member_machine (), domain,
+		cygheap->dom.account_flat_name ());
+
+  /* Connect to authentication package. */
+  RtlInitAnsiString (&name, kerberos_auth ? MICROSOFT_KERBEROS_NAME_A
+					  : MSV1_0_PACKAGE_NAME);
+  status = LsaLookupAuthenticationPackage (lsa_hdl, &name, &package_id);
+  if (status != STATUS_SUCCESS)
+    {
+      debug_printf ("LsaLookupAuthenticationPackage: %y", status);
+      __seterrno_from_nt_status (status);
+      goto out;
+    }
+
+  /* Create origin. */
+  stpcpy (origin.buf, "Cygwin");
+  RtlInitAnsiString (&origin.str, origin.buf);
+
+  /* Create token source. */
+  memcpy (ts.SourceName, "Cygwin.1", 8);
+  ts.SourceIdentifier.HighPart = 0;
+  ts.SourceIdentifier.LowPart = kerberos_auth ? 0x0105 : 0x0106;
+
+  if (kerberos_auth)
+    {
+      PWCHAR sam_name = tp.w_get ();
+      PWCHAR upn_name = tp.w_get ();
+      size = NT_MAX_PATH;
+      KERB_S4U_LOGON *s4u_logon;
+      USHORT name_len;
+
+      wcpcpy (wcpcpy (wcpcpy (sam_name, domain), L"\\"), user);
+      if (TranslateNameW (sam_name, NameSamCompatible, NameUserPrincipal,
+			  upn_name, &size) == 0)
+	{
+	  PWCHAR translated_name = tp.w_get ();
+	  PWCHAR p;
+
+	  debug_printf ("TranslateNameW(%W, NameUserPrincipal) %E", sam_name);
+	  size = NT_MAX_PATH;
+	  if (TranslateNameW (sam_name, NameSamCompatible, NameCanonical,
+			      translated_name, &size) == 0)
+	    {
+	      debug_printf ("TranslateNameW(%W, NameCanonical) %E", sam_name);
+	      goto out;
+	    }
+	  p = wcschr (translated_name, L'/');
+	  if (p)
+	    *p = '\0';
+	  wcpcpy (wcpcpy (wcpcpy (upn_name, user), L"@"), translated_name);
+	}
+
+      name_len = wcslen (upn_name) * sizeof (WCHAR);
+      authinf_size = sizeof (KERB_S4U_LOGON) + name_len;
+      authinf = tp.c_get ();
+      RtlSecureZeroMemory (authinf, authinf_size);
+      s4u_logon = (KERB_S4U_LOGON *) authinf;
+      s4u_logon->MessageType = KerbS4ULogon;
+      s4u_logon->Flags = logon ? 0 : KERB_S4U_LOGON_FLAG_IDENTITY;
+      /* Append user to login info */
+      RtlInitEmptyUnicodeString (&s4u_logon->ClientUpn,
+				 (PWCHAR) (s4u_logon + 1),
+				 name_len);
+      RtlAppendUnicodeToString (&s4u_logon->ClientUpn, upn_name);
+      debug_printf ("KerbS4ULogon: ClientUpn: <%S>", &s4u_logon->ClientUpn);
+    }
+  else
+    {
+      /* Per MSDN MsV1_0S4ULogon is not implemented on Vista, but surprisingly
+	 it works. */
+      MSV1_0_S4U_LOGON *s4u_logon;
+      USHORT user_len, domain_len;
+
+      user_len = wcslen (user) * sizeof (WCHAR);
+      domain_len = wcslen (domain) * sizeof (WCHAR);	/* Local machine */
+      authinf_size = sizeof (MSV1_0_S4U_LOGON) + user_len + domain_len;
+      if (!authinf)
+	authinf = tp.c_get ();
+      RtlSecureZeroMemory (authinf, authinf_size);
+      s4u_logon = (MSV1_0_S4U_LOGON *) authinf;
+      s4u_logon->MessageType = MsV1_0S4ULogon;
+      s4u_logon->Flags = 0;
+      /* Append user and domain to login info */
+      RtlInitEmptyUnicodeString (&s4u_logon->UserPrincipalName,
+				 (PWCHAR) (s4u_logon + 1),
+				 user_len);
+      RtlInitEmptyUnicodeString (&s4u_logon->DomainName,
+				 (PWCHAR) ((PBYTE) (s4u_logon + 1) + user_len),
+				 domain_len);
+      RtlAppendUnicodeToString (&s4u_logon->UserPrincipalName, user);
+      RtlAppendUnicodeToString (&s4u_logon->DomainName, domain);
+      debug_printf ("MsV1_0S4ULogon: DomainName: <%S> UserPrincipalName: <%S>",
+		    &s4u_logon->DomainName, &s4u_logon->UserPrincipalName);
+    }
+
+  /* Try to logon. */
+  status = LsaLogonUser (lsa_hdl, (PLSA_STRING) &origin, Network, package_id,
+			 authinf, authinf_size, NULL, &ts, (PVOID *) &profile,
+			 &size, &luid, &token, &quota, &sub_status);
+  switch (status)
+    {
+    case STATUS_SUCCESS:
+      break;
+    case STATUS_ACCOUNT_RESTRICTION:
+      debug_printf ("%s S4U LsaLogonUser failed: %y (%s)",
+		    kerberos_auth ? "Kerberos" : "MsV1_0", status,
+		    account_restriction (sub_status));
+      break;
+    default:
+      debug_printf ("%s S4U LsaLogonUser failed: %y",
+		    kerberos_auth ? "Kerberos" : "MsV1_0", status);
+      break;
+    }
+
+out:
+  if (lsa_hdl)
+    LsaDeregisterLogonProcess (lsa_hdl);
+  if (profile)
+    LsaFreeReturnBuffer (profile);
+
+  if (token && logon)
+    {
+      /* Convert to primary token.  Strictly speaking this is only
+	 required on Vista/2008.  CreateProcessAsUser also takes
+	 impersonation tokens since Windows 7. */
+      HANDLE tmp_token;
+
+      if (DuplicateTokenEx (token, MAXIMUM_ALLOWED, &sec_none,
+			    SecurityImpersonation, TokenPrimary, &tmp_token))
+	{
+	  CloseHandle (token);
+	  token = tmp_token;
+	}
+      else
+	{
+	  __seterrno ();
+	  debug_printf ("DuplicateTokenEx %E");
+	  /* Make sure not to allow create_token. */
+	  status = STATUS_INVALID_HANDLE;
+	  CloseHandle (token);
+	  token = NULL;
+	}
+    }
+
+  pop_self_privilege ();
+  ret_status = status;
   return token;
 }

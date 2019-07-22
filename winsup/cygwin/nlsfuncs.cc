@@ -1204,15 +1204,18 @@ wcsxfrm_l (wchar_t *__restrict ws1, const wchar_t *__restrict ws2, size_t wsn,
   if (ret)
     {
       ret /= sizeof (wchar_t);
-     /* Byte swap the array ourselves here. */
-      for (size_t idx = 0; idx < ret; ++idx)
-	ws1[idx] = __builtin_bswap16 (ws1[idx]);
-      /* LCMapStringW returns byte count including the terminating NUL char.
-	 wcsxfrm is supposed to return length in wchar_t excluding the NUL.
-	 Since the array is only single byte NUL-terminated yet, make sure
-	 the result is wchar_t-NUL terminated. */
-      if (ret < wsn)
-	ws1[ret] = L'\0';
+      if (wsn)
+	{
+	  /* Byte swap the array ourselves here. */
+	  for (size_t idx = 0; idx < ret; ++idx)
+	    ws1[idx] = __builtin_bswap16 (ws1[idx]);
+	  /* LCMapStringW returns byte count including the terminating NUL char.
+	     wcsxfrm is supposed to return length in wchar_t excluding the NUL.
+	     Since the array is only single byte NUL-terminated yet, make sure
+	     the result is wchar_t-NUL terminated. */
+	  if (ret < wsn)
+	    ws1[ret] = L'\0';
+	}
       return ret;
     }
   if (GetLastError () != ERROR_INSUFFICIENT_BUFFER)

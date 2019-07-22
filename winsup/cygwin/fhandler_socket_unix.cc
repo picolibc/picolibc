@@ -24,7 +24,6 @@
 #include "fhandler.h"
 #include "dtable.h"
 #include "cygheap.h"
-#include "hires.h"
 #include "shared_info.h"
 #include "ntdll.h"
 #include "miscfuncs.h"
@@ -939,7 +938,7 @@ fhandler_socket_unix::open_pipe (PUNICODE_STRING pipe_name, bool xchg_sock_info)
   status = NtOpenFile (&ph, access, &attr, &io, sharing, 0);
   if (NT_SUCCESS (status))
     {
-      set_io_handle (ph);
+      set_handle (ph);
       if (xchg_sock_info)
 	send_sock_info (false);
     }
@@ -1269,7 +1268,7 @@ fhandler_socket_unix::wait_pipe_thread (PUNICODE_STRING pipe_name)
   pwbuf->NameLength = pipe_name->Length;
   pwbuf->TimeoutSpecified = TRUE;
   memcpy (pwbuf->Name, pipe_name->Buffer, pipe_name->Length);
-  stamp = ntod.nsecs ();
+  stamp = get_clock (CLOCK_MONOTONIC)->n100secs ();
   do
     {
       status = NtFsControlFile (npfsh, evt, NULL, NULL, &io, FSCTL_PIPE_WAIT,
@@ -1298,7 +1297,8 @@ fhandler_socket_unix::wait_pipe_thread (PUNICODE_STRING pipe_name)
 		  /* Another concurrent connect grabbed the pipe instance
 		     under our nose.  Fix the timeout value and go waiting
 		     again, unless the timeout has passed. */
-		  pwbuf->Timeout.QuadPart -= (stamp - ntod.nsecs ()) / 100LL;
+		  pwbuf->Timeout.QuadPart -=
+		    stamp - get_clock (CLOCK_MONOTONIC)->n100secs ();
 		  if (pwbuf->Timeout.QuadPart >= 0)
 		    {
 		      status = STATUS_IO_TIMEOUT;
@@ -1365,7 +1365,7 @@ fhandler_socket_unix::socket (int af, int type, int protocol, int flags)
   if (flags & SOCK_CLOEXEC)
     set_close_on_exec (true);
   init_cred ();
-  set_io_handle (NULL);
+  set_handle (NULL);
   set_unique_id ();
   set_ino (get_unique_id ());
   return 0;
@@ -1412,7 +1412,7 @@ fhandler_socket_unix::socketpair (int af, int type, int protocol, int flags,
   pipe = create_pipe (true);
   if (!pipe)
     goto create_pipe_failed;
-  set_io_handle (pipe);
+  set_handle (pipe);
   sun_path (&sun);
   fh->peer_sun_path (&sun);
   connect_state (listener);
@@ -1483,12 +1483,12 @@ fhandler_socket_unix::bind (const struct sockaddr *name, int namelen)
 	  binding_state (unbound);
 	  return -1;
 	}
-      set_io_handle (pipe);
+      set_handle (pipe);
     }
   backing_file_handle = unnamed ? autobind (&sun) : create_file (&sun);
   if (!backing_file_handle)
     {
-      set_io_handle (NULL);
+      set_handle (NULL);
       if (pipe)
 	NtClose (pipe);
       binding_state (unbound);
@@ -1538,7 +1538,7 @@ fhandler_socket_unix::listen (int backlog)
       connect_state (unconnected);
       return -1;
     }
-  set_io_handle (pipe);
+  set_handle (pipe);
   state_lock ();
   set_cred ();
   state_unlock ();
@@ -1575,7 +1575,7 @@ fhandler_socket_unix::accept4 (struct sockaddr *peer, int *len, int flags)
       else
 	{
 	  /* Set new io handle. */
-	  set_io_handle (new_inst);
+	  set_handle (new_inst);
 	  io_unlock ();
 	  /* Prepare new file descriptor. */
 	  cygheap_fdnew fd;
@@ -1600,7 +1600,7 @@ fhandler_socket_unix::accept4 (struct sockaddr *peer, int *len, int flags)
 		  sock->pc.set_nt_native_path (pc.get_nt_native_path ());
 		  sock->connect_state (connected);
 		  sock->binding_state (binding_state ());
-		  sock->set_io_handle (accepted);
+		  sock->set_handle (accepted);
 
 		  sock->sun_path (sun_path ());
 		  sock->sock_cred (sock_cred ());

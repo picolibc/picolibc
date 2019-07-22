@@ -54,7 +54,9 @@ POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
 @HAVE_LONG_DOUBLE_TRUE@am__append_1 = \
-@HAVE_LONG_DOUBLE_TRUE@	strtold.c \
+@HAVE_LONG_DOUBLE_TRUE@	strtodg.c	\
+@HAVE_LONG_DOUBLE_TRUE@	strtold.c	\
+@HAVE_LONG_DOUBLE_TRUE@	strtorx.c	\
 @HAVE_LONG_DOUBLE_TRUE@	wcstold.c
 
 DIST_COMMON = $(srcdir)/../../Makefile.shared $(srcdir)/Makefile.in \
@@ -79,7 +81,9 @@ lib_a_AR = $(AR) $(ARFLAGS)
 @ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_TRUE@am__DEPENDENCIES_1 = $(ELIX_2_OBJS)
 @ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_TRUE@am__DEPENDENCIES_1 =  \
 @ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_TRUE@	$(ELIX_2_OBJS)
-@HAVE_LONG_DOUBLE_TRUE@am__objects_1 = lib_a-strtold.$(OBJEXT) \
+@HAVE_LONG_DOUBLE_TRUE@am__objects_1 = lib_a-strtodg.$(OBJEXT) \
+@HAVE_LONG_DOUBLE_TRUE@	lib_a-strtold.$(OBJEXT) \
+@HAVE_LONG_DOUBLE_TRUE@	lib_a-strtorx.$(OBJEXT) \
 @HAVE_LONG_DOUBLE_TRUE@	lib_a-wcstold.$(OBJEXT)
 am__objects_2 = lib_a-__adjust.$(OBJEXT) lib_a-__atexit.$(OBJEXT) \
 	lib_a-__call_atexit.$(OBJEXT) lib_a-__exp10.$(OBJEXT) \
@@ -107,9 +111,8 @@ am__objects_2 = lib_a-__adjust.$(OBJEXT) lib_a-__atexit.$(OBJEXT) \
 	lib_a-rand_r.$(OBJEXT) lib_a-random.$(OBJEXT) \
 	lib_a-realloc.$(OBJEXT) lib_a-reallocarray.$(OBJEXT) \
 	lib_a-reallocf.$(OBJEXT) lib_a-sb_charsets.$(OBJEXT) \
-	lib_a-strtod.$(OBJEXT) lib_a-strtodg.$(OBJEXT) \
-	lib_a-strtoimax.$(OBJEXT) lib_a-strtol.$(OBJEXT) \
-	lib_a-strtorx.$(OBJEXT) lib_a-strtoul.$(OBJEXT) \
+	lib_a-strtod.$(OBJEXT) lib_a-strtoimax.$(OBJEXT) \
+	lib_a-strtol.$(OBJEXT) lib_a-strtoul.$(OBJEXT) \
 	lib_a-strtoumax.$(OBJEXT) lib_a-utoa.$(OBJEXT) \
 	lib_a-wcstod.$(OBJEXT) lib_a-wcstoimax.$(OBJEXT) \
 	lib_a-wcstol.$(OBJEXT) lib_a-wcstoul.$(OBJEXT) \
@@ -154,8 +157,8 @@ am__objects_6 = lib_a-rpmatch.$(OBJEXT) lib_a-system.$(OBJEXT)
 @USE_LIBTOOL_FALSE@	$(am__objects_3) $(am__objects_7)
 lib_a_OBJECTS = $(am_lib_a_OBJECTS)
 LTLIBRARIES = $(noinst_LTLIBRARIES)
-@HAVE_LONG_DOUBLE_TRUE@am__objects_8 = strtodg.lo strtold.lo strtorx.lo \
-	wcstold.lo
+@HAVE_LONG_DOUBLE_TRUE@am__objects_8 = strtodg.lo strtold.lo \
+@HAVE_LONG_DOUBLE_TRUE@	strtorx.lo wcstold.lo
 am__objects_9 = __adjust.lo __atexit.lo __call_atexit.lo __exp10.lo \
 	__ten_mu.lo _Exit.lo abort.lo abs.lo aligned_alloc.lo \
 	assert.lo atexit.lo atof.lo atoff.lo atoi.lo atol.lo calloc.lo \
@@ -371,10 +374,10 @@ GENERAL_SOURCES = __adjust.c __atexit.c __call_atexit.c __exp10.c \
 	labs.c ldiv.c ldtoa.c malloc.c mblen.c mblen_r.c mbstowcs.c \
 	mbstowcs_r.c mbtowc.c mbtowc_r.c mlock.c mprec.c mstats.c \
 	on_exit_args.c quick_exit.c rand.c rand_r.c random.c realloc.c \
-	reallocarray.c reallocf.c sb_charsets.c strtod.c strtodg.c \
-	strtoimax.c strtol.c strtorx.c strtoul.c strtoumax.c utoa.c \
-	wcstod.c wcstoimax.c wcstol.c wcstoul.c wcstoumax.c wcstombs.c \
-	wcstombs_r.c wctomb.c wctomb_r.c $(am__append_1)
+	reallocarray.c reallocf.c sb_charsets.c strtod.c strtoimax.c \
+	strtol.c strtoul.c strtoumax.c utoa.c wcstod.c wcstoimax.c \
+	wcstol.c wcstoul.c wcstoumax.c wcstombs.c wcstombs_r.c \
+	wctomb.c wctomb_r.c $(am__append_1)
 @NEWLIB_NANO_MALLOC_FALSE@MALIGNR = malignr
 @NEWLIB_NANO_MALLOC_TRUE@MALIGNR = nano-malignr
 @NEWLIB_NANO_MALLOC_FALSE@MALLOPTR = malloptr
@@ -943,12 +946,6 @@ lib_a-strtod.o: strtod.c
 lib_a-strtod.obj: strtod.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-strtod.obj `if test -f 'strtod.c'; then $(CYGPATH_W) 'strtod.c'; else $(CYGPATH_W) '$(srcdir)/strtod.c'; fi`
 
-lib_a-strtodg.o: strtodg.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-strtodg.o `test -f 'strtodg.c' || echo '$(srcdir)/'`strtodg.c
-
-lib_a-strtodg.obj: strtodg.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-strtodg.obj `if test -f 'strtodg.c'; then $(CYGPATH_W) 'strtodg.c'; else $(CYGPATH_W) '$(srcdir)/strtodg.c'; fi`
-
 lib_a-strtoimax.o: strtoimax.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-strtoimax.o `test -f 'strtoimax.c' || echo '$(srcdir)/'`strtoimax.c
 
@@ -960,12 +957,6 @@ lib_a-strtol.o: strtol.c
 
 lib_a-strtol.obj: strtol.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-strtol.obj `if test -f 'strtol.c'; then $(CYGPATH_W) 'strtol.c'; else $(CYGPATH_W) '$(srcdir)/strtol.c'; fi`
-
-lib_a-strtorx.o: strtorx.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-strtorx.o `test -f 'strtorx.c' || echo '$(srcdir)/'`strtorx.c
-
-lib_a-strtorx.obj: strtorx.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-strtorx.obj `if test -f 'strtorx.c'; then $(CYGPATH_W) 'strtorx.c'; else $(CYGPATH_W) '$(srcdir)/strtorx.c'; fi`
 
 lib_a-strtoul.o: strtoul.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-strtoul.o `test -f 'strtoul.c' || echo '$(srcdir)/'`strtoul.c
@@ -1039,11 +1030,23 @@ lib_a-wctomb_r.o: wctomb_r.c
 lib_a-wctomb_r.obj: wctomb_r.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-wctomb_r.obj `if test -f 'wctomb_r.c'; then $(CYGPATH_W) 'wctomb_r.c'; else $(CYGPATH_W) '$(srcdir)/wctomb_r.c'; fi`
 
+lib_a-strtodg.o: strtodg.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-strtodg.o `test -f 'strtodg.c' || echo '$(srcdir)/'`strtodg.c
+
+lib_a-strtodg.obj: strtodg.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-strtodg.obj `if test -f 'strtodg.c'; then $(CYGPATH_W) 'strtodg.c'; else $(CYGPATH_W) '$(srcdir)/strtodg.c'; fi`
+
 lib_a-strtold.o: strtold.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-strtold.o `test -f 'strtold.c' || echo '$(srcdir)/'`strtold.c
 
 lib_a-strtold.obj: strtold.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-strtold.obj `if test -f 'strtold.c'; then $(CYGPATH_W) 'strtold.c'; else $(CYGPATH_W) '$(srcdir)/strtold.c'; fi`
+
+lib_a-strtorx.o: strtorx.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-strtorx.o `test -f 'strtorx.c' || echo '$(srcdir)/'`strtorx.c
+
+lib_a-strtorx.obj: strtorx.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-strtorx.obj `if test -f 'strtorx.c'; then $(CYGPATH_W) 'strtorx.c'; else $(CYGPATH_W) '$(srcdir)/strtorx.c'; fi`
 
 lib_a-wcstold.o: wcstold.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-wcstold.o `test -f 'wcstold.c' || echo '$(srcdir)/'`wcstold.c

@@ -82,8 +82,12 @@ strace::dll_info ()
 int
 strace::microseconds ()
 {
-  static hires_ns now NO_COPY;
-  return (int) now.usecs ();
+  static LONGLONG process_start NO_COPY;
+  clk_monotonic_t *clk = (clk_monotonic_t *) get_clock (CLOCK_MONOTONIC);
+
+  if (!process_start)
+    process_start = clk->strace_usecs ();
+  return (int) (clk->strace_usecs () - process_start);
 }
 
 static int __stdcall

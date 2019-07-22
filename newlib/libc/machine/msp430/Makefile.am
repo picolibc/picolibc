@@ -21,9 +21,16 @@ AM_CCASFLAGS = $(INCLUDES)
 
 noinst_LIBRARIES = lib.a
 
-lib_a_SOURCES = setjmp.S
+lib_a_SOURCES = setjmp.S $(TINY_SOURCES)
 lib_a_CCASFLAGS=$(AM_CCASFLAGS)
 lib_a_CFLAGS=$(AM_CFLAGS)
+
+# tiny-printf.c and tiny-puts.c are derived from the nano printf/puts
+# functions, so other supporting nano functions are required, and the tiny
+# printf/puts will not work without them.
+if NEWLIB_NANO_FORMATTED_IO
+TINY_SOURCES = tiny-puts.c tiny-printf.c
+endif
 
 ACLOCAL_AMFLAGS = -I ../../.. -I ../../../..
 CONFIG_STATUS_DEPENDENCIES = $(newlib_basedir)/configure.host

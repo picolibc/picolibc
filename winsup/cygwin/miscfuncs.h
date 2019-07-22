@@ -120,5 +120,6 @@ extern "C" HANDLE WINAPI CygwinCreateThread (LPTHREAD_START_ROUTINE thread_func,
 void SetThreadName (DWORD dwThreadID, const char* threadName);
 
 WORD __get_cpus_per_group (void);
+WORD __get_group_count (void);
 
 #endif /*_MISCFUNCS_H*/

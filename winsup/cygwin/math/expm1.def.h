@@ -51,7 +51,7 @@ __FLT_ABI(expm1) (__FLT_TYPE x)
   int x_class = fpclassify (x);
   if (x_class == FP_NAN)
   {
-    __FLT_RPT_DOMAIN ("expm1", x, 0.0, x);
+    errno = EDOM;
     return x;
   }
   else if (x_class == FP_INFINITE)

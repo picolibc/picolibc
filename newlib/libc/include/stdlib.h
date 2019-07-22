@@ -27,7 +27,7 @@
 #endif
 
 #if __GNU_VISIBLE
-#include <xlocale.h>
+#include <sys/_locale.h>
 #endif
 
 _BEGIN_STD_C
@@ -94,6 +94,9 @@ void	exit (int __status) _ATTRIBUTE ((__noreturn__));
 void	free (void *) _NOTHROW;
 char *  getenv (const char *__string);
 char *	_getenv_r (struct _reent *, const char *__string);
+#if __GNU_VISIBLE
+char *  secure_getenv (const char *__string);
+#endif
 char *	_findenv (const char *, int *);
 char *	_findenv_r (struct _reent *, const char *, int *);
 #if __POSIX_VISIBLE >= 200809

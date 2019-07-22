@@ -1,8 +1,10 @@
 /*	$NetBSD: tree.h,v 1.8 2004/03/28 19:38:30 provos Exp $	*/
 /*	$OpenBSD: tree.h,v 1.7 2002/10/17 21:51:54 art Exp $	*/
-/* $FreeBSD$ */
+/* $FreeBSD: head/sys/sys/tree.h 347360 2019-05-08 18:47:00Z trasz $ */
 
 /*-
+ * SPDX-License-Identifier: BSD-2-Clause-FreeBSD
+ *
  * Copyright 2002 Niels Provos <provos@citi.umich.edu>
  * All rights reserved.
  *
@@ -88,7 +90,7 @@ struct {								\
 	SPLAY_RIGHT(tmp, field) = (head)->sph_root;			\
 	(head)->sph_root = tmp;						\
 } while (/*CONSTCOND*/ 0)
-
+	
 #define SPLAY_ROTATE_LEFT(head, tmp, field) do {			\
 	SPLAY_RIGHT((head)->sph_root, field) = SPLAY_LEFT(tmp, field);	\
 	SPLAY_LEFT(tmp, field) = (head)->sph_root;			\
@@ -123,7 +125,7 @@ struct type *name##_SPLAY_INSERT(struct name *, struct type *);		\
 struct type *name##_SPLAY_REMOVE(struct name *, struct type *);		\
 									\
 /* Finds the node with the same key as elm */				\
-static __inline struct type *						\
+static __unused __inline struct type *					\
 name##_SPLAY_FIND(struct name *head, struct type *elm)			\
 {									\
 	if (SPLAY_EMPTY(head))						\
@@ -134,7 +136,7 @@ name##_SPLAY_FIND(struct name *head, struct type *elm)			\
 	return (NULL);							\
 }									\
 									\
-static __inline struct type *						\
+static __unused __inline struct type *					\
 name##_SPLAY_NEXT(struct name *head, struct type *elm)			\
 {									\
 	name##_SPLAY(head, elm);					\
@@ -148,7 +150,7 @@ name##_SPLAY_NEXT(struct name *head, struct type *elm)			\
 	return (elm);							\
 }									\
 									\
-static __inline struct type *						\
+static __unused __inline struct type *					\
 name##_SPLAY_MIN_MAX(struct name *head, int val)			\
 {									\
 	name##_SPLAY_MINMAX(head, val);					\

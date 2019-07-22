@@ -120,34 +120,3 @@
 #else
 # error "Unknown complex number type"
 #endif
-
-#define __FLT_RPT_DOMAIN(NAME, ARG1, ARG2, RSLT) \
-	errno = EDOM, \
-	__mingw_raise_matherr (_DOMAIN, __FLT_REPORT(NAME), (double) (ARG1), \
-			       (double) (ARG2), (double) (RSLT))
-#define __FLT_RPT_ERANGE(NAME, ARG1, ARG2, RSLT, OVL) \
-	errno = ERANGE, \
-        __mingw_raise_matherr (((OVL) ? _OVERFLOW : _UNDERFLOW), \
-			       __FLT_REPORT(NAME), (double) (ARG1), \
-                               (double) (ARG2), (double) (RSLT))
-
-#ifdef __CYGWIN__
-inline void __attribute__ ((always_inline))
-__mingw_raise_matherr (int typ, const char *name, double a1, double a2,
-		       double rslt)
-{
-  if (_LIB_VERSION != _POSIX_)
-    {
-      struct exception ex;
-      ex.type = typ;
-      ex.name = (char*)name;
-      ex.arg1 = a1;
-      ex.arg2 = a2;
-      ex.retval = rslt;
-      matherr(&ex);
-    }
-}
-#define _DOMAIN		DOMAIN
-#define _OVERFLOW	OVERFLOW
-#define _UNDERFLOW	UNDERFLOW
-#endif

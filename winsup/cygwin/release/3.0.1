@@ -1,0 +1,26 @@
+What's new:
+-----------
+
+- New API: secure_getenv.
+
+
+What changed:
+-------------
+
+
+Bug Fixes
+---------
+
+- Relax fork child permissions to avoid a potential fork failure.
+  Addresses: https://cygwin.com/ml/cygwin/2019-02/msg00234.html
+
+- Fix Command-line argument handling of kill(1) in terms of negative PID.
+  Addresses: report on IRC
+
+- Fix an accidentally introduced O_TEXT handling of pipes inherited
+  from native Windows processes.
+  Addresses: https://cygwin.com/ml/cygwin/2019-02/msg00246.html
+
+- Re-enable creating user token from scratch in seteuid to allow
+  user context switch on old systems not supporting MsV1_0S4ULogon.
+  Addresses: https://cygwin.com/ml/cygwin/2019-02/msg00277.html

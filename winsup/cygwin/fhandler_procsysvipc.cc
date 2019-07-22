@@ -52,9 +52,6 @@ static const virt_tab_t procsysvipc_tab[] =
 static const int PROCSYSVIPC_LINK_COUNT =
   (sizeof (procsysvipc_tab) / sizeof (virt_tab_t)) - 1;
 
-/* Returns 0 if path doesn't exist, >0 if path is a directory,
- * -1 if path is a file.
- */
 virtual_ftype_t
 fhandler_procsysvipc::exists ()
 {

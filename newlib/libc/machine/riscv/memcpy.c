@@ -9,6 +9,10 @@
    http://www.opensource.org/licenses.
 */
 
+#if defined(PREFER_SIZE_OVER_SPEED) || defined(__OPTIMIZE_SIZE__)
+//memcpy defined in memcpy-asm.S
+#else
+
 #include <string.h>
 #include <stdint.h>
 #include "../../string/local.h"
@@ -81,3 +85,4 @@ small:
     goto small;
   return aa;
 }
+#endif

@@ -29,7 +29,7 @@
 #include <sys/timespec.h>
 
 #if __POSIX_VISIBLE >= 200809
-#include <xlocale.h>
+#include <sys/_locale.h>
 #endif
 
 _BEGIN_STD_C
@@ -249,14 +249,18 @@ extern "C" {
                            /*   thread shall not have a CPU-time clock */
                            /*   accessible. */
 
-/* Manifest Constants, P1003.1b-1993, p. 262 */
-
-#define CLOCK_REALTIME (clockid_t)1
-
 /* Flag indicating time is "absolute" with respect to the clock
-   associated with a time.  */
+   associated with a time.  Value 4 is historic. */
 
 #define TIMER_ABSTIME	4
+
+/* Manifest Constants, P1003.1b-1993, p. 262 */
+
+#if __GNU_VISIBLE
+#define CLOCK_REALTIME_COARSE	((clockid_t) 0)
+#endif
+
+#define CLOCK_REALTIME		((clockid_t) 1)
 
 /* Manifest Constants, P1003.4b/D8, p. 55 */
 
@@ -266,7 +270,7 @@ extern "C" {
    the identifier of the CPU_time clock associated with the PROCESS
    making the function call.  */
 
-#define CLOCK_PROCESS_CPUTIME_ID (clockid_t)2
+#define CLOCK_PROCESS_CPUTIME_ID ((clockid_t) 2)
 
 #endif
 
@@ -276,17 +280,31 @@ extern "C" {
     the identifier of the CPU_time clock associated with the THREAD
     making the function call.  */
 
-#define CLOCK_THREAD_CPUTIME_ID (clockid_t)3
+#define CLOCK_THREAD_CPUTIME_ID	((clockid_t) 3)
 
 #endif
 
 #if defined(_POSIX_MONOTONIC_CLOCK)
 
 /*  The identifier for the system-wide monotonic clock, which is defined
- *      as a clock whose value cannot be set via clock_settime() and which 
- *          cannot have backward clock jumps. */
+ *  as a clock whose value cannot be set via clock_settime() and which
+ *  cannot have backward clock jumps. */
 
-#define CLOCK_MONOTONIC (clockid_t)4
+#define CLOCK_MONOTONIC		((clockid_t) 4)
+
+#endif
+
+#if __GNU_VISIBLE
+
+#define CLOCK_MONOTONIC_RAW	((clockid_t) 5)
+
+#define CLOCK_MONOTONIC_COARSE	((clockid_t) 6)
+
+#define CLOCK_BOOTTIME		((clockid_t) 7)
+
+#define CLOCK_REALTIME_ALARM	((clockid_t) 8)
+
+#define CLOCK_BOOTTIME_ALARM	((clockid_t) 9)
 
 #endif
 

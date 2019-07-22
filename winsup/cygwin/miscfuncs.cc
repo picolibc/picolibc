@@ -724,7 +724,7 @@ err:
    See FreeBSD src/lib/libc/amd64/string/memset.S
    and FreeBSD src/lib/libc/amd64/string/bcopy.S */
 
-asm volatile ("								\n\
+asm ("								\n\
 /*									\n\
  * Written by J.T. Conklin <jtc@NetBSD.org>.				\n\
  * Public domain.							\n\
@@ -791,7 +791,7 @@ L1:     rep								\n\
 	.seh_endproc							\n\
 ");
 
-asm volatile ("								\n\
+asm ("								\n\
 /*-									\n\
  * Copyright (c) 1990 The Regents of the University of California.	\n\
  * All rights reserved.							\n\
@@ -963,17 +963,19 @@ SetThreadName(DWORD dwThreadID, const char* threadName)
 
 #define add_size(p,s) ((p) = ((__typeof__(p))((PBYTE)(p)+(s))))
 
+static WORD num_cpu_per_group = 0;
+static WORD group_count = 0;
+
 WORD
 __get_cpus_per_group (void)
 {
-  static WORD num_cpu_per_group = 0;
-
   tmp_pathbuf tp;
 
   if (num_cpu_per_group)
     return num_cpu_per_group;
 
   num_cpu_per_group = 64;
+  group_count = 1;
 
   PSYSTEM_LOGICAL_PROCESSOR_INFORMATION_EX lpi =
             (PSYSTEM_LOGICAL_PROCESSOR_INFORMATION_EX) tp.c_get ();
@@ -1005,10 +1007,20 @@ __get_cpus_per_group (void)
 	   actually available CPUs.  The ActiveProcessorCount is correct
 	   though.  So we just use ActiveProcessorCount for now, hoping for
 	   the best. */
-        num_cpu_per_group
-                = plpi->Group.GroupInfo[0].ActiveProcessorCount;
+        num_cpu_per_group = plpi->Group.GroupInfo[0].ActiveProcessorCount;
+
+	/* Follow that lead to get the group count. */
+	group_count = plpi->Group.ActiveGroupCount;
         break;
       }
 
   return num_cpu_per_group;
+}
+
+WORD
+__get_group_count (void)
+{
+  if (group_count == 0)
+    (void) __get_cpus_per_group (); // caller should have called this first
+  return group_count;
 }

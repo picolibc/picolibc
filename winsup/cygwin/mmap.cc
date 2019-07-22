@@ -145,8 +145,7 @@ CreateMapping (HANDLE fhdl, size_t len, off_t off, DWORD openflags,
   ULONG attributes = attached (prot) ? SEC_RESERVE : SEC_COMMIT;
 
   OBJECT_ATTRIBUTES oa;
-  InitializeObjectAttributes (&oa, NULL, OBJ_INHERIT, NULL,
-			      sec_none.lpSecurityDescriptor);
+  InitializeObjectAttributes (&oa, NULL, OBJ_INHERIT, NULL, NULL);
 
   if (fhdl == INVALID_HANDLE_VALUE)
     {
@@ -517,7 +516,7 @@ mmap_record::alloc_fh ()
 {
   if (anonymous ())
     {
-      fh_anonymous.set_io_handle (INVALID_HANDLE_VALUE);
+      fh_anonymous.set_handle (INVALID_HANDLE_VALUE);
       fh_anonymous.set_access (GENERIC_READ | GENERIC_WRITE | GENERIC_EXECUTE);
       return &fh_anonymous;
     }
@@ -802,8 +801,10 @@ mmap_worker (mmap_list *map_list, fhandler_base *fh, caddr_t base, size_t len,
 #ifdef __x86_64__
 
 /* The memory region used for memory maps */
-#define MMAP_STORAGE_LOW	0x00800000000L	/* Leave 8 Gigs for heap. */
-#define MMAP_STORAGE_HIGH	0x70000000000L	/* Leave enough room for OS. */
+#define MMAP_STORAGE_LOW	0x001000000000L	/* Leave 32 Gigs for heap. */
+/* Up to Win 8 only supporting 44 bit address space, starting with Win 8.1
+   48 bit address space. */
+#define MMAP_STORAGE_HIGH	wincap.mmap_storage_high ()
 
 /* FIXME?  Unfortunately the OS doesn't support a top down allocation with
 	   a ceiling value.  The ZeroBits mechanism only works for
@@ -833,7 +834,7 @@ public:
       {
 	/* If it points to a free area, big enough to fulfill the request,
 	   return the address. */
-      	if (VirtualQuery (in_addr, &mbi, sizeof mbi)
+	if (VirtualQuery (in_addr, &mbi, sizeof mbi)
 	    && mbi.State == MEM_FREE
 	    && mbi.RegionSize >= size)
 	  return in_addr;
@@ -902,7 +903,7 @@ mmap64 (void *addr, size_t len, int prot, int flags, int fd, off_t off)
 
   size_t pagesize = wincap.allocation_granularity ();
 
-  fh_anonymous.set_io_handle (INVALID_HANDLE_VALUE);
+  fh_anonymous.set_handle (INVALID_HANDLE_VALUE);
   fh_anonymous.set_access (GENERIC_READ | GENERIC_WRITE | GENERIC_EXECUTE);
 
   /* EINVAL error conditions. */
@@ -930,6 +931,11 @@ mmap64 (void *addr, size_t len, int prot, int flags, int fd, off_t off)
       cygheap_fdget cfd (fd);
       if (cfd < 0)
 	goto out;
+      if (cfd->get_flags () & O_PATH)
+	{
+	  set_errno (EBADF);
+	  goto out;
+	}
 
       fh = cfd;
 
@@ -1029,7 +1035,7 @@ mmap64 (void *addr, size_t len, int prot, int flags, int fd, off_t off)
 	  fh_disk_file = new (ccalloc (HEAP_FHANDLER, 1, sizeof *fh_disk_file))
 			     fhandler_disk_file;
 	  fh_disk_file->set_name (fh->pc);
-	  fh_disk_file->set_io_handle (h);
+	  fh_disk_file->set_handle (h);
 	  fh_disk_file->set_access (fh->get_access () | GENERIC_EXECUTE);
 	  fh = fh_disk_file;
 	}
@@ -1069,14 +1075,17 @@ mmap64 (void *addr, size_t len, int prot, int flags, int fd, off_t off)
 	}
       fsiz -= off;
       /* We're creating the pages beyond EOF as reserved, anonymous pages.
-	 Note that this isn't done in 64 bit environments since apparently
-	 64 bit systems don't support the AT_ROUND_TO_PAGE flag, which is
-	 required to get this right.  Too bad. */
+	 Note that 64 bit environments don't support the AT_ROUND_TO_PAGE
+	 flag, which is required to get this right for the remainder of
+	 the first 64K block the file ends in.  We perform the workaround
+	 nevertheless to support expectations that the range mapped beyond
+	 EOF can be safely munmap'ed instead of being taken by another,
+	 totally unrelated mapping. */
+      if ((off_t) len > fsiz && !autogrow (flags))
+	orig_len = len;
 #ifdef __i386__
-      if (!wincap.is_wow64 ()
-	  && (((off_t) len > fsiz && !autogrow (flags))
-	      || roundup2 (len, wincap.page_size ())
-		 < roundup2 (len, pagesize)))
+      else if (!wincap.is_wow64 () && roundup2 (len, wincap.page_size ())
+				      < roundup2 (len, pagesize))
 	orig_len = len;
 #endif
       if ((off_t) len > fsiz)
@@ -1179,12 +1188,22 @@ go_ahead:
 	 raise a SIGBUS when trying to access them.  AT_ROUND_TO_PAGE
 	 and page protection on shared pages is only supported by the
 	 32 bit environment, so don't even try on 64 bit or even WOW64.
-	 This is accomplished by not setting orig_len on 64 bit above. */
-      len = roundup2 (len, wincap.page_size ());
+	 This results in an allocation gap in the first 64K block the file
+	 ends in, but there's nothing at all we can do about that. */
+#ifdef __x86_64__
+      len = roundup2 (len, wincap.allocation_granularity ());
+#else
+      len = roundup2 (len, wincap.is_wow64 () ? wincap.allocation_granularity ()
+					      : wincap.page_size ());
+#endif
       if (orig_len - len)
 	{
 	  orig_len -= len;
-	  size_t valid_page_len = orig_len % pagesize;
+	  size_t valid_page_len = 0;
+#ifndef __x86_64__
+	  if (!wincap.is_wow64 ())
+	    valid_page_len = orig_len % pagesize;
+#endif
 	  size_t sigbus_page_len = orig_len - valid_page_len;
 
 	  caddr_t at_base = base + len;

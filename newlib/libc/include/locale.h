@@ -23,7 +23,7 @@
 
 #if __POSIX_VISIBLE >= 200809 || defined (_COMPILING_NEWLIB)
 
-#include <xlocale.h>
+#include <sys/_locale.h>
 
 #define LC_ALL_MASK		(1 << LC_ALL)
 #define LC_COLLATE_MASK		(1 << LC_COLLATE)

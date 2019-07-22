@@ -27,50 +27,17 @@
 #endif
 {
         float y;
-	struct exception exc;
         y = __ieee754_gammaf_r(x,&(_REENT_SIGNGAM(_REENT)));
         if(_LIB_VERSION == _IEEE_) return y;
         if(!finitef(y)&&finitef(x)) {
-#ifndef HUGE_VAL 
-#define HUGE_VAL inf
-	    double inf = 0.0;
-
-	    SET_HIGH_WORD(inf,0x7ff00000);	/* set inf to infinite */
-#endif
-	    if(floorf(x)==x&&x<=(float)0.0) {
+	    if(floorf(x)==x&&x<=0.0f) {
 		/* gammaf(-integer) or gammaf(0) */
-		exc.type = SING;
-		exc.name = "gammaf";
-		exc.err = 0;
-		exc.arg1 = exc.arg2 = (double)x;
-                if (_LIB_VERSION == _SVID_)
-                  exc.retval = HUGE;
-                else
-                  exc.retval = HUGE_VAL;
-		if (_LIB_VERSION == _POSIX_)
-		  errno = EDOM;
-		else if (!matherr(&exc)) {
-		  errno = EDOM;
-		}
+		errno = EDOM;
             } else {
 		/* gammaf(finite) overflow */
-		exc.type = OVERFLOW;
-		exc.name = "gammaf";
-		exc.err = 0;
-		exc.arg1 = exc.arg2 = (double)x;
-                if (_LIB_VERSION == _SVID_)
-                  exc.retval = HUGE;
-                else
-                  exc.retval = HUGE_VAL;
-                if (_LIB_VERSION == _POSIX_)
-		  errno = ERANGE;
-                else if (!matherr(&exc)) {
-                  errno = ERANGE;
-                }
+		errno = ERANGE;
             }
-	    if (exc.err != 0)
-	       errno = exc.err;
-	    return (float)exc.retval; 
+	    return HUGE_VALF;
         } else
             return y;
 }

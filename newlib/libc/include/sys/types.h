@@ -36,30 +36,12 @@ typedef __uint32_t	u_int32_t;
 #if ___int64_t_defined
 typedef __uint64_t	u_int64_t;
 #endif
-typedef int register_t;
+typedef __intptr_t register_t;
 #define __BIT_TYPES_DEFINED__ 1
-
-#if defined(__rtems__) || defined(__XMK__)
-/*
- *  The following section is RTEMS specific and is needed to more
- *  closely match the types defined in the BSD sys/types.h.
- *  This is needed to let the RTEMS/BSD TCP/IP stack compile.
- */
-
-/* deprecated */
-#if ___int64_t_defined
-typedef	__uint64_t	u_quad_t;
-typedef	__int64_t	quad_t;
-typedef	quad_t *	qaddr_t;
-#endif
-
-#endif /* __rtems__ || __XMK__ */
 
 #ifndef __need_inttypes
 
 #define _SYS_TYPES_H
-/* <stddef.h> must be before <sys/_types.h> for __size_t considerations */
-#include <stddef.h>
 #include <sys/_types.h>
 #include <sys/_stdint.h>
 
@@ -78,6 +60,8 @@ typedef	__uint32_t	in_addr_t;	/* base type for internet address */
 typedef	__uint16_t	in_port_t;
 #define	_IN_PORT_T_DECLARED
 #endif
+
+typedef	__uintptr_t	u_register_t;
 #endif /* __BSD_VISIBLE */
 
 #if __MISC_VISIBLE
@@ -101,7 +85,7 @@ typedef	unsigned long	u_long;
 #endif
 #define _BSDTYPES_DEFINED
 #endif
-#endif	/*__BSD_VISIBLE || __CYGWIN__ */
+#endif /* __MISC_VISIBLE */
 
 #if __MISC_VISIBLE
 typedef	unsigned short	ushort;		/* System V compatibility */

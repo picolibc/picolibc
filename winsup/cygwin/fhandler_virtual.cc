@@ -45,7 +45,7 @@ fhandler_virtual::opendir (int fd)
   DIR *res = NULL;
   size_t len;
 
-  if (exists () <= 0)
+  if (!virt_ftype_isdir (exists ()))
     set_errno (ENOTDIR);
   else if ((len = strlen (get_name ())) > PATH_MAX - 3)
     set_errno (ENAMETOOLONG);

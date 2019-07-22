@@ -173,7 +173,6 @@ load math/log10.c
 load math/log1p.c
 load math/log2.c
 load math/log__L.c
-load math/matherr.c
 load math/modf.c
 load math/pow.c
 load math/scalb.c

@@ -89,10 +89,6 @@ __sflags (struct _reent *ptr,
 	  break;
 	}
     }
-#if defined (O_TEXT) && !defined (__CYGWIN__)
-  if (!(m | O_BINARY))
-    m |= O_TEXT;
-#endif
   *optr = m | o;
   return ret;
 }

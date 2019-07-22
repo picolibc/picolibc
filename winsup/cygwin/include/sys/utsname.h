@@ -13,13 +13,20 @@ details. */
 extern "C" {
 #endif
 
+#define _UTSNAME_LENGTH 65
+
 struct utsname
 {
-  char sysname[20];
-  char nodename[20];
-  char release[20];
-  char version[20];
-  char machine[20];
+  char sysname[_UTSNAME_LENGTH];
+  char nodename[_UTSNAME_LENGTH];
+  char release[_UTSNAME_LENGTH];
+  char version[_UTSNAME_LENGTH];
+  char machine[_UTSNAME_LENGTH];
+#if __GNU_VISIBLE
+  char domainname[_UTSNAME_LENGTH];
+#else
+  char __domainname[_UTSNAME_LENGTH];
+#endif
 };
 
 int uname (struct utsname *);

@@ -15,6 +15,7 @@ details. */
 #include <sys/param.h>
 #include <sys/cygwin.h>
 #include <cygwin/kd.h>
+#include <unistd.h>
 #include "cygerrno.h"
 #include "security.h"
 #include "path.h"
@@ -32,6 +33,17 @@ details. */
 #include "child_info.h"
 #include "cygwait.h"
 
+/* Not yet defined in Mingw-w64 */
+#ifndef ENABLE_VIRTUAL_TERMINAL_PROCESSING
+#define ENABLE_VIRTUAL_TERMINAL_PROCESSING 0x0004
+#endif /* ENABLE_VIRTUAL_TERMINAL_PROCESSING */
+#ifndef DISABLE_NEWLINE_AUTO_RETURN
+#define DISABLE_NEWLINE_AUTO_RETURN 0x0008
+#endif /* DISABLE_NEWLINE_AUTO_RETURN */
+#ifndef ENABLE_VIRTUAL_TERMINAL_INPUT
+#define ENABLE_VIRTUAL_TERMINAL_INPUT 0x0200
+#endif /* ENABLE_VIRTUAL_TERMINAL_INPUT */
+
 /* Don't make this bigger than NT_MAX_PATH as long as the temporary buffer
    is allocated using tmp_pathbuf!!! */
 #define CONVERT_LIMIT NT_MAX_PATH
@@ -41,7 +53,9 @@ details. */
 
 #define con (shared_console_info->con)
 #define srTop (con.b.srWindow.Top + con.scroll_region.Top)
-#define srBottom ((con.scroll_region.Bottom < 0) ? con.b.srWindow.Bottom : con.b.srWindow.Top + con.scroll_region.Bottom)
+#define srBottom ((con.scroll_region.Bottom < 0) ? \
+		  con.b.srWindow.Bottom : \
+		  con.b.srWindow.Top + con.scroll_region.Bottom)
 
 const unsigned fhandler_console::MAX_WRITE_CHARS = 16384;
 
@@ -137,25 +151,32 @@ fhandler_console::set_unit ()
 		shared_unit : FH_ERROR;
       created = false;
     }
-  else if ((!generic_console && (myself->ctty != -1 && !iscons_dev (myself->ctty)))
+  else if ((!generic_console &&
+	    (myself->ctty != -1 && !iscons_dev (myself->ctty)))
 	   || !(me = GetConsoleWindow ()))
     devset = FH_ERROR;
   else
     {
       created = true;
-      shared_console_info = open_shared_console (me, cygheap->console_h, created);
+      shared_console_info =
+	open_shared_console (me, cygheap->console_h, created);
       ProtectHandleINH (cygheap->console_h);
       if (created)
-	shared_console_info->tty_min_state.setntty (DEV_CONS_MAJOR, console_unit (me));
+	shared_console_info->
+	  tty_min_state.setntty (DEV_CONS_MAJOR, console_unit (me));
       devset = (fh_devices) shared_console_info->tty_min_state.getntty ();
+      if (created)
+	con.owner = getpid ();
     }
+  if (!created && shared_console_info && kill (con.owner, 0) == -1)
+    con.owner = getpid ();
 
   dev ().parse (devset);
   if (devset != FH_ERROR)
     pc.file_attributes (FILE_ATTRIBUTE_NORMAL);
   else
     {
-      set_io_handle (NULL);
+      set_handle (NULL);
       set_output_handle (NULL);
       created = false;
     }
@@ -167,33 +188,33 @@ void
 fhandler_console::setup ()
 {
   if (set_unit ())
-      {
-	con.scroll_region.Bottom = -1;
-	con.dwLastCursorPosition.X = -1;
-	con.dwLastCursorPosition.Y = -1;
-	con.dwLastMousePosition.X = -1;
-	con.dwLastMousePosition.Y = -1;
-	con.dwLastButtonState = 0;	/* none pressed */
-	con.last_button_code = 3;	/* released */
-	con.underline_color = FOREGROUND_GREEN | FOREGROUND_BLUE;
-	con.dim_color = FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE;
-	con.meta_mask = LEFT_ALT_PRESSED;
-	/* Set the mask that determines if an input keystroke is modified by
-	   META.  We set this based on the keyboard layout language loaded
-	   for the current thread.  The left <ALT> key always generates
-	   META, but the right <ALT> key only generates META if we are using
-	   an English keyboard because many "international" keyboards
-	   replace common shell symbols ('[', '{', etc.) with accented
-	   language-specific characters (umlaut, accent grave, etc.).  On
-	   these keyboards right <ALT> (called AltGr) is used to produce the
-	   shell symbols and should not be interpreted as META. */
-	if (PRIMARYLANGID (LOWORD (GetKeyboardLayout (0))) == LANG_ENGLISH)
-	  con.meta_mask |= RIGHT_ALT_PRESSED;
-	con.set_default_attr ();
-	con.backspace_keycode = CERASE;
-	con.cons_rapoi = NULL;
-	shared_console_info->tty_min_state.is_console = true;
-      }
+    {
+      con.scroll_region.Bottom = -1;
+      con.dwLastCursorPosition.X = -1;
+      con.dwLastCursorPosition.Y = -1;
+      con.dwLastMousePosition.X = -1;
+      con.dwLastMousePosition.Y = -1;
+      con.dwLastButtonState = 0;	/* none pressed */
+      con.last_button_code = 3;	/* released */
+      con.underline_color = FOREGROUND_GREEN | FOREGROUND_BLUE;
+      con.dim_color = FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE;
+      con.meta_mask = LEFT_ALT_PRESSED;
+      /* Set the mask that determines if an input keystroke is modified by
+	 META.  We set this based on the keyboard layout language loaded
+	 for the current thread.  The left <ALT> key always generates
+	 META, but the right <ALT> key only generates META if we are using
+	 an English keyboard because many "international" keyboards
+	 replace common shell symbols ('[', '{', etc.) with accented
+	 language-specific characters (umlaut, accent grave, etc.).  On
+	 these keyboards right <ALT> (called AltGr) is used to produce the
+	 shell symbols and should not be interpreted as META. */
+      if (PRIMARYLANGID (LOWORD (GetKeyboardLayout (0))) == LANG_ENGLISH)
+	con.meta_mask |= RIGHT_ALT_PRESSED;
+      con.set_default_attr ();
+      con.backspace_keycode = CERASE;
+      con.cons_rapoi = NULL;
+      shared_console_info->tty_min_state.is_console = true;
+    }
 }
 
 /* Return the tty structure associated with a given tty number.  If the
@@ -209,6 +230,45 @@ tty_list::get_cttyp ()
     return &ttys[device::minor (n)];
   else
     return NULL;
+}
+
+void
+fhandler_console::setup_io_mutex (void)
+{
+  char buf[MAX_PATH];
+  DWORD res;
+
+  res = WAIT_FAILED;
+  if (!input_mutex || WAIT_FAILED == (res = acquire_input_mutex (0)))
+    {
+      shared_name (buf, "cygcons.input.mutex", get_minor ());
+      input_mutex = OpenMutex (MAXIMUM_ALLOWED, TRUE, buf);
+      if (!input_mutex)
+	input_mutex = CreateMutex (&sec_none, FALSE, buf);
+      if (!input_mutex)
+	{
+	  __seterrno ();
+	  return;
+	}
+    }
+  if (res == WAIT_OBJECT_0)
+    release_input_mutex ();
+
+  res = WAIT_FAILED;
+  if (!output_mutex || WAIT_FAILED == (res = acquire_output_mutex (0)))
+    {
+      shared_name (buf, "cygcons.output.mutex", get_minor ());
+      output_mutex = OpenMutex (MAXIMUM_ALLOWED, TRUE, buf);
+      if (!output_mutex)
+	output_mutex = CreateMutex (&sec_none, FALSE, buf);
+      if (!output_mutex)
+	{
+	  __seterrno ();
+	  return;
+	}
+    }
+  if (res == WAIT_OBJECT_0)
+    release_output_mutex ();
 }
 
 inline DWORD
@@ -235,7 +295,8 @@ fhandler_console::set_raw_win32_keyboard_mode (bool new_mode)
 {
   bool old_mode = con.raw_win32_keyboard_mode;
   con.raw_win32_keyboard_mode = new_mode;
-  syscall_printf ("raw keyboard mode %sabled", con.raw_win32_keyboard_mode ? "en" : "dis");
+  syscall_printf ("raw keyboard mode %sabled",
+		  con.raw_win32_keyboard_mode ? "en" : "dis");
   return old_mode;
 };
 
@@ -251,7 +312,7 @@ fhandler_console::set_cursor_maybe ()
     }
 }
 
-void
+bool
 fhandler_console::send_winch_maybe ()
 {
   SHORT y = con.dwWinSize.Y;
@@ -263,7 +324,9 @@ fhandler_console::send_winch_maybe ()
       con.scroll_region.Top = 0;
       con.scroll_region.Bottom = -1;
       get_ttyp ()->kill_pgrp (SIGWINCH);
+      return true;
     }
+  return false;
 }
 
 /* Check whether a mouse event is to be reported as an escape sequence */
@@ -283,7 +346,8 @@ fhandler_console::mouse_aware (MOUSE_EVENT_RECORD& mouse_event)
   con.dwMousePosition.X = mouse_event.dwMousePosition.X - now.srWindow.Left;
   con.dwMousePosition.Y = mouse_event.dwMousePosition.Y - now.srWindow.Top;
 
-  return ((mouse_event.dwEventFlags == 0 || mouse_event.dwEventFlags == DOUBLE_CLICK)
+  return ((mouse_event.dwEventFlags == 0
+	   || mouse_event.dwEventFlags == DOUBLE_CLICK)
 	  && mouse_event.dwButtonState != con.dwLastButtonState)
 	 || mouse_event.dwEventFlags == MOUSE_WHEELED
 	 || (mouse_event.dwEventFlags == MOUSE_MOVED
@@ -296,36 +360,17 @@ fhandler_console::mouse_aware (MOUSE_EVENT_RECORD& mouse_event)
 void __reg3
 fhandler_console::read (void *pv, size_t& buflen)
 {
+  termios_printf ("read(%p,%d)", pv, buflen);
+
   push_process_state process_state (PID_TTYIN);
 
-  HANDLE h = get_io_handle ();
-
-#define buf ((char *) pv)
-
-  int ch;
-  set_input_state ();
-
-  /* Check console read-ahead buffer filled from terminal requests */
-  if (con.cons_rapoi && *con.cons_rapoi)
-    {
-      *buf = *con.cons_rapoi++;
-      buflen = 1;
-      return;
-    }
-
-  int copied_chars = get_readahead_into_buffer (buf, buflen);
-
-  if (copied_chars)
-    {
-      buflen = copied_chars;
-      return;
-    }
+  int copied_chars = 0;
 
   DWORD timeout = is_nonblocking () ? 0 : INFINITE;
-  char tmp[60];
 
-  termios ti = get_ttyp ()->ti;
-  for (;;)
+  set_input_state ();
+
+  while (!input_ready && !get_cons_readahead_valid ())
     {
       int bgres;
       if ((bgres = bg_check (SIGTTIN)) <= bg_eof)
@@ -334,8 +379,8 @@ fhandler_console::read (void *pv, size_t& buflen)
 	  return;
 	}
 
-      set_cursor_maybe ();	/* to make cursor appear on the screen immediately */
-      switch (cygwait (h, timeout))
+      set_cursor_maybe (); /* to make cursor appear on the screen immediately */
+      switch (cygwait (get_handle (), timeout))
 	{
 	case WAIT_OBJECT_0:
 	  break;
@@ -353,353 +398,45 @@ fhandler_console::read (void *pv, size_t& buflen)
 	  goto err;
 	}
 
-      DWORD nread;
-      INPUT_RECORD input_rec;
-      const char *toadd = NULL;
+#define buf ((char *) pv)
 
-      if (!ReadConsoleInputW (h, &input_rec, 1, &nread))
+      int ret;
+      acquire_input_mutex (INFINITE);
+      ret = process_input_message ();
+      release_input_mutex ();
+      switch (ret)
 	{
-	  syscall_printf ("ReadConsoleInput failed, %E");
-	  goto err;		/* seems to be failure */
-	}
-
-      const WCHAR &unicode_char = input_rec.Event.KeyEvent.uChar.UnicodeChar;
-      const DWORD &ctrl_key_state = input_rec.Event.KeyEvent.dwControlKeyState;
-
-      /* check the event that occurred */
-      switch (input_rec.EventType)
-	{
-	case KEY_EVENT:
-
-	  con.nModifiers = 0;
-
-#ifdef DEBUGGING
-	  /* allow manual switching to/from raw mode via ctrl-alt-scrolllock */
-	  if (input_rec.Event.KeyEvent.bKeyDown
-	      && input_rec.Event.KeyEvent.wVirtualKeyCode == VK_SCROLL
-	      && (ctrl_key_state & (LEFT_ALT_PRESSED | LEFT_CTRL_PRESSED))
-		  == (LEFT_ALT_PRESSED | LEFT_CTRL_PRESSED))
-	    {
-	      set_raw_win32_keyboard_mode (!con.raw_win32_keyboard_mode);
-	      continue;
-	    }
-#endif
-
-	  if (con.raw_win32_keyboard_mode)
-	    {
-	      __small_sprintf (tmp, "\033{%u;%u;%u;%u;%u;%luK",
-				    input_rec.Event.KeyEvent.bKeyDown,
-				    input_rec.Event.KeyEvent.wRepeatCount,
-				    input_rec.Event.KeyEvent.wVirtualKeyCode,
-				    input_rec.Event.KeyEvent.wVirtualScanCode,
-				    input_rec.Event.KeyEvent.uChar.UnicodeChar,
-				    input_rec.Event.KeyEvent.dwControlKeyState);
-	      toadd = tmp;
-	      nread = strlen (toadd);
-	      break;
-	    }
-
-	  /* Ignore key up events, except for Alt+Numpad events. */
-	  if (!input_rec.Event.KeyEvent.bKeyDown &&
-	      !is_alt_numpad_event (&input_rec))
-	    continue;
-	  /* Ignore Alt+Numpad keys.  They are eventually handled below after
-	     releasing the Alt key. */
-	  if (input_rec.Event.KeyEvent.bKeyDown
-	      && is_alt_numpad_key (&input_rec))
-	    continue;
-
-	  if (ctrl_key_state & SHIFT_PRESSED)
-	    con.nModifiers |= 1;
-	  if (ctrl_key_state & RIGHT_ALT_PRESSED)
-	    con.nModifiers |= 2;
-	  if (ctrl_key_state & CTRL_PRESSED)
-	    con.nModifiers |= 4;
-	  if (ctrl_key_state & LEFT_ALT_PRESSED)
-	    con.nModifiers |= 8;
-
-	  /* Allow Backspace to emit ^? and escape sequences. */
-	  if (input_rec.Event.KeyEvent.wVirtualKeyCode == VK_BACK)
-	    {
-	      char c = con.backspace_keycode;
-	      nread = 0;
-	      if (ctrl_key_state & ALT_PRESSED)
-		{
-		  if (con.metabit)
-		    c |= 0x80;
-		  else
-		    tmp[nread++] = '\e';
-		}
-	      tmp[nread++] = c;
-	      tmp[nread] = 0;
-	      toadd = tmp;
-	    }
-	  /* Allow Ctrl-Space to emit ^@ */
-	  else if (input_rec.Event.KeyEvent.wVirtualKeyCode == VK_SPACE
-		   && (ctrl_key_state & CTRL_PRESSED)
-		   && !(ctrl_key_state & ALT_PRESSED))
-	    toadd = "";
-	  else if (unicode_char == 0
-	      /* arrow/function keys */
-	      || (input_rec.Event.KeyEvent.dwControlKeyState & ENHANCED_KEY))
-	    {
-	      toadd = get_nonascii_key (input_rec, tmp);
-	      if (!toadd)
-		{
-		  con.nModifiers = 0;
-		  continue;
-		}
-	      nread = strlen (toadd);
-	    }
-	  else
-	    {
-	      nread = con.con_to_str (tmp + 1, 59, unicode_char);
-	      /* Determine if the keystroke is modified by META.  The tricky
-		 part is to distinguish whether the right Alt key should be
-		 recognized as Alt, or as AltGr. */
-	      bool meta =
-		     /* Alt but not AltGr (= left ctrl + right alt)? */
-		     (ctrl_key_state & ALT_PRESSED) != 0
-		     && ((ctrl_key_state & CTRL_PRESSED) == 0
-			    /* but also allow Alt-AltGr: */
-			 || (ctrl_key_state & ALT_PRESSED) == ALT_PRESSED
-			 || (unicode_char <= 0x1f || unicode_char == 0x7f));
-	      if (!meta)
-		{
-		  /* Determine if the character is in the current multibyte
-		     charset.  The test is easy.  If the multibyte sequence
-		     is > 1 and the first byte is ASCII CAN, the character
-		     has been translated into the ASCII CAN + UTF-8 replacement
-		     sequence.  If so, just ignore the keypress.
-		     FIXME: Is there a better solution? */
-		  if (nread > 1 && tmp[1] == 0x18)
-		    beep ();
-		  else
-		    toadd = tmp + 1;
-		}
-	      else if (con.metabit)
-		{
-		  tmp[1] |= 0x80;
-		  toadd = tmp + 1;
-		}
-	      else
-		{
-		  tmp[0] = '\033';
-		  tmp[1] = cyg_tolower (tmp[1]);
-		  toadd = tmp;
-		  nread++;
-		  con.nModifiers &= ~4;
-		}
-	    }
-	  break;
-
-	case MOUSE_EVENT:
-	  send_winch_maybe ();
-	  {
-	    MOUSE_EVENT_RECORD& mouse_event = input_rec.Event.MouseEvent;
-	    /* As a unique guard for mouse report generation,
-	       call mouse_aware() which is common with select(), so the result
-	       of select() and the actual read() will be consistent on the
-	       issue of whether input (i.e. a mouse escape sequence) will
-	       be available or not */
-	    if (mouse_aware (mouse_event))
-	      {
-		/* Note: Reported mouse position was already retrieved by
-		   mouse_aware() and adjusted by window scroll buffer offset */
-
-		/* Treat the double-click event like a regular button press */
-		if (mouse_event.dwEventFlags == DOUBLE_CLICK)
-		  {
-		    syscall_printf ("mouse: double-click -> click");
-		    mouse_event.dwEventFlags = 0;
-		  }
-
-		/* This code assumes Windows never reports multiple button
-		   events at the same time. */
-		int b = 0;
-		char sz[32];
-		char mode6_term = 'M';
-
-		if (mouse_event.dwEventFlags == MOUSE_WHEELED)
-		  {
-		    if (mouse_event.dwButtonState & 0xFF800000)
-		      {
-			b = 0x41;
-			strcpy (sz, "wheel down");
-		      }
-		    else
-		      {
-			b = 0x40;
-			strcpy (sz, "wheel up");
-		      }
-		  }
-		else
-		  {
-		    /* Ignore unimportant mouse buttons */
-		    mouse_event.dwButtonState &= 0x7;
-
-		    if (mouse_event.dwEventFlags == MOUSE_MOVED)
-		      {
-			b = con.last_button_code;
-		      }
-		    else if (mouse_event.dwButtonState < con.dwLastButtonState && !con.ext_mouse_mode6)
-		      {
-			b = 3;
-			strcpy (sz, "btn up");
-		      }
-		    else if ((mouse_event.dwButtonState & 1) != (con.dwLastButtonState & 1))
-		      {
-			b = 0;
-			strcpy (sz, "btn1 down");
-		      }
-		    else if ((mouse_event.dwButtonState & 2) != (con.dwLastButtonState & 2))
-		      {
-			b = 2;
-			strcpy (sz, "btn2 down");
-		      }
-		    else if ((mouse_event.dwButtonState & 4) != (con.dwLastButtonState & 4))
-		      {
-			b = 1;
-			strcpy (sz, "btn3 down");
-		      }
-
-		    if (con.ext_mouse_mode6 /* distinguish release */
-			&& mouse_event.dwButtonState < con.dwLastButtonState)
-			mode6_term = 'm';
-
-		    con.last_button_code = b;
-
-		    if (mouse_event.dwEventFlags == MOUSE_MOVED)
-		      {
-			b += 32;
-			strcpy (sz, "move");
-		      }
-		    else
-		      {
-			/* Remember the modified button state */
-			con.dwLastButtonState = mouse_event.dwButtonState;
-		      }
-		  }
-
-		/* Remember mouse position */
-		con.dwLastMousePosition.X = con.dwMousePosition.X;
-		con.dwLastMousePosition.Y = con.dwMousePosition.Y;
-
-		/* Remember the modifiers */
-		con.nModifiers = 0;
-		if (mouse_event.dwControlKeyState & SHIFT_PRESSED)
-		    con.nModifiers |= 0x4;
-		if (mouse_event.dwControlKeyState & ALT_PRESSED)
-		    con.nModifiers |= 0x8;
-		if (mouse_event.dwControlKeyState & CTRL_PRESSED)
-		    con.nModifiers |= 0x10;
-
-		/* Indicate the modifiers */
-		b |= con.nModifiers;
-
-		/* We can now create the code. */
-		if (con.ext_mouse_mode6)
-		  {
-		    __small_sprintf (tmp, "\033[<%d;%d;%d%c", b,
-				     con.dwMousePosition.X + 1,
-				     con.dwMousePosition.Y + 1,
-				     mode6_term);
-		    nread = strlen (tmp);
-		  }
-		else if (con.ext_mouse_mode15)
-		  {
-		    __small_sprintf (tmp, "\033[%d;%d;%dM", b + 32,
-				     con.dwMousePosition.X + 1,
-				     con.dwMousePosition.Y + 1);
-		    nread = strlen (tmp);
-		  }
-		else if (con.ext_mouse_mode5)
-		  {
-		    unsigned int xcode = con.dwMousePosition.X + ' ' + 1;
-		    unsigned int ycode = con.dwMousePosition.Y + ' ' + 1;
-
-		    __small_sprintf (tmp, "\033[M%c", b + ' ');
-		    nread = 4;
-		    /* the neat nested encoding function of mintty
-		       does not compile in g++, so let's unfold it: */
-		    if (xcode < 0x80)
-		      tmp [nread++] = xcode;
-		    else if (xcode < 0x800)
-		      {
-			tmp [nread++] = 0xC0 + (xcode >> 6);
-			tmp [nread++] = 0x80 + (xcode & 0x3F);
-		      }
-		    else
-		      tmp [nread++] = 0;
-		    if (ycode < 0x80)
-		      tmp [nread++] = ycode;
-		    else if (ycode < 0x800)
-		      {
-			tmp [nread++] = 0xC0 + (ycode >> 6);
-			tmp [nread++] = 0x80 + (ycode & 0x3F);
-		      }
-		    else
-		      tmp [nread++] = 0;
-		  }
-		else
-		  {
-		    unsigned int xcode = con.dwMousePosition.X + ' ' + 1;
-		    unsigned int ycode = con.dwMousePosition.Y + ' ' + 1;
-		    if (xcode >= 256)
-		      xcode = 0;
-		    if (ycode >= 256)
-		      ycode = 0;
-		    __small_sprintf (tmp, "\033[M%c%c%c", b + ' ',
-				     xcode, ycode);
-		    nread = 6;	/* tmp may contain NUL bytes */
-		  }
-		syscall_printf ("mouse: %s at (%d,%d)", sz,
-				con.dwMousePosition.X,
-				con.dwMousePosition.Y);
-
-		toadd = tmp;
-	      }
-	  }
-	  break;
-
-	case FOCUS_EVENT:
-	  if (con.use_focus)
-	    {
-	      if (input_rec.Event.FocusEvent.bSetFocus)
-		__small_sprintf (tmp, "\033[I");
-	      else
-		__small_sprintf (tmp, "\033[O");
-
-	      toadd = tmp;
-	      nread = 3;
-	    }
-	  break;
-
-	case WINDOW_BUFFER_SIZE_EVENT:
-	  send_winch_maybe ();
-	  /* fall through */
-	default:
+	case input_error:
+	  goto err;
+	case input_processing:
 	  continue;
-	}
-
-      if (toadd)
-	{
-	  line_edit_status res = line_edit (toadd, nread, ti);
-	  if (res == line_edit_signalled)
-	    goto sig_exit;
-	  else if (res == line_edit_input_done)
-	    break;
+	case input_ok: /* input ready */
+	  break;
+	case input_signalled: /* signalled */
+	  goto sig_exit;
+	case input_winch:
+	  continue;
+	default:
+	  /* Should not come here */
+	  goto err;
 	}
     }
 
-  while (buflen)
-    if ((ch = get_readahead ()) < 0)
-      break;
-    else
-      {
-	buf[copied_chars++] = (unsigned char)(ch & 0xff);
-	buflen--;
-      }
+  /* Check console read-ahead buffer filled from terminal requests */
+  acquire_input_mutex (INFINITE);
+  while (con.cons_rapoi && *con.cons_rapoi && buflen)
+    {
+      buf[copied_chars++] = *con.cons_rapoi++;
+      buflen --;
+    }
+
+  copied_chars +=
+    get_readahead_into_buffer (buf + copied_chars, buflen);
+
+  if (!ralen)
+    input_ready = false;
+  release_input_mutex ();
+
 #undef buf
 
   buflen = copied_chars;
@@ -713,6 +450,375 @@ err:
 sig_exit:
   set_sig_errno (EINTR);
   buflen = (size_t) -1;
+}
+
+fhandler_console::input_states
+fhandler_console::process_input_message (void)
+{
+  if (wincap.has_con_24bit_colors ())
+    {
+      DWORD dwMode;
+      /* Enable xterm compatible mode in input */
+      GetConsoleMode (get_handle (), &dwMode);
+      dwMode |= ENABLE_VIRTUAL_TERMINAL_INPUT;
+      SetConsoleMode (get_handle (), dwMode);
+    }
+
+  char tmp[60];
+
+  if (!shared_console_info)
+    return input_error;
+
+  termios *ti = &(get_ttyp ()->ti);
+
+  DWORD nread;
+  INPUT_RECORD input_rec;
+  const char *toadd = NULL;
+
+  if (!ReadConsoleInputW (get_handle (), &input_rec, 1, &nread))
+    {
+      termios_printf ("ReadConsoleInput failed, %E");
+      return input_error;
+    }
+
+  const WCHAR &unicode_char = input_rec.Event.KeyEvent.uChar.UnicodeChar;
+  const DWORD &ctrl_key_state = input_rec.Event.KeyEvent.dwControlKeyState;
+
+  /* check the event that occurred */
+  switch (input_rec.EventType)
+    {
+    case KEY_EVENT:
+
+      con.nModifiers = 0;
+
+#ifdef DEBUGGING
+      /* allow manual switching to/from raw mode via ctrl-alt-scrolllock */
+      if (input_rec.Event.KeyEvent.bKeyDown
+	  && input_rec.Event.KeyEvent.wVirtualKeyCode == VK_SCROLL
+	  && (ctrl_key_state & (LEFT_ALT_PRESSED | LEFT_CTRL_PRESSED))
+	  == (LEFT_ALT_PRESSED | LEFT_CTRL_PRESSED))
+	{
+	  set_raw_win32_keyboard_mode (!con.raw_win32_keyboard_mode);
+	  return input_processing;
+	}
+#endif
+
+      if (con.raw_win32_keyboard_mode)
+	{
+	  __small_sprintf (tmp, "\033{%u;%u;%u;%u;%u;%luK",
+			   input_rec.Event.KeyEvent.bKeyDown,
+			   input_rec.Event.KeyEvent.wRepeatCount,
+			   input_rec.Event.KeyEvent.wVirtualKeyCode,
+			   input_rec.Event.KeyEvent.wVirtualScanCode,
+			   input_rec.Event.KeyEvent.uChar.UnicodeChar,
+			   input_rec.Event.KeyEvent.dwControlKeyState);
+	  toadd = tmp;
+	  nread = strlen (toadd);
+	  break;
+	}
+
+      /* Ignore key up events, except for Alt+Numpad events. */
+      if (!input_rec.Event.KeyEvent.bKeyDown &&
+	  !is_alt_numpad_event (&input_rec))
+	return input_processing;
+      /* Ignore Alt+Numpad keys.  They are eventually handled below after
+	 releasing the Alt key. */
+      if (input_rec.Event.KeyEvent.bKeyDown
+	  && is_alt_numpad_key (&input_rec))
+	return input_processing;
+
+      if (ctrl_key_state & SHIFT_PRESSED)
+	con.nModifiers |= 1;
+      if (ctrl_key_state & RIGHT_ALT_PRESSED)
+	con.nModifiers |= 2;
+      if (ctrl_key_state & CTRL_PRESSED)
+	con.nModifiers |= 4;
+      if (ctrl_key_state & LEFT_ALT_PRESSED)
+	con.nModifiers |= 8;
+
+      /* Allow Backspace to emit ^? and escape sequences. */
+      if (input_rec.Event.KeyEvent.wVirtualKeyCode == VK_BACK)
+	{
+	  char c = con.backspace_keycode;
+	  nread = 0;
+	  if (ctrl_key_state & ALT_PRESSED)
+	    {
+	      if (con.metabit)
+		c |= 0x80;
+	      else
+		tmp[nread++] = '\e';
+	    }
+	  tmp[nread++] = c;
+	  tmp[nread] = 0;
+	  toadd = tmp;
+	}
+      /* Allow Ctrl-Space to emit ^@ */
+      else if (input_rec.Event.KeyEvent.wVirtualKeyCode
+	       == (wincap.has_con_24bit_colors () ? '2' : VK_SPACE)
+	       && (ctrl_key_state & CTRL_PRESSED)
+	       && !(ctrl_key_state & ALT_PRESSED))
+	toadd = "";
+      else if (unicode_char == 0
+	       /* arrow/function keys */
+	       || (input_rec.Event.KeyEvent.dwControlKeyState & ENHANCED_KEY))
+	{
+	  toadd = get_nonascii_key (input_rec, tmp);
+	  if (!toadd)
+	    {
+	      con.nModifiers = 0;
+	      return input_processing;
+	    }
+	  nread = strlen (toadd);
+	}
+      else
+	{
+	  nread = con.con_to_str (tmp + 1, 59, unicode_char);
+	  /* Determine if the keystroke is modified by META.  The tricky
+	     part is to distinguish whether the right Alt key should be
+	     recognized as Alt, or as AltGr. */
+	  bool meta =
+	    /* Alt but not AltGr (= left ctrl + right alt)? */
+	    (ctrl_key_state & ALT_PRESSED) != 0
+	    && ((ctrl_key_state & CTRL_PRESSED) == 0
+		/* but also allow Alt-AltGr: */
+		|| (ctrl_key_state & ALT_PRESSED) == ALT_PRESSED
+		|| (unicode_char <= 0x1f || unicode_char == 0x7f));
+	  if (!meta)
+	    {
+	      /* Determine if the character is in the current multibyte
+		 charset.  The test is easy.  If the multibyte sequence
+		 is > 1 and the first byte is ASCII CAN, the character
+		 has been translated into the ASCII CAN + UTF-8 replacement
+		 sequence.  If so, just ignore the keypress.
+		 FIXME: Is there a better solution? */
+	      if (nread > 1 && tmp[1] == 0x18)
+		beep ();
+	      else
+		toadd = tmp + 1;
+	    }
+	  else if (con.metabit)
+	    {
+	      tmp[1] |= 0x80;
+	      toadd = tmp + 1;
+	    }
+	  else
+	    {
+	      tmp[0] = '\033';
+	      tmp[1] = cyg_tolower (tmp[1]);
+	      toadd = tmp;
+	      nread++;
+	      con.nModifiers &= ~4;
+	    }
+	}
+      break;
+
+    case MOUSE_EVENT:
+      send_winch_maybe ();
+	{
+	  MOUSE_EVENT_RECORD& mouse_event = input_rec.Event.MouseEvent;
+	  /* As a unique guard for mouse report generation,
+	     call mouse_aware() which is common with select(), so the result
+	     of select() and the actual read() will be consistent on the
+	     issue of whether input (i.e. a mouse escape sequence) will
+	     be available or not */
+	  if (mouse_aware (mouse_event))
+	    {
+	      /* Note: Reported mouse position was already retrieved by
+		 mouse_aware() and adjusted by window scroll buffer offset */
+
+	      /* Treat the double-click event like a regular button press */
+	      if (mouse_event.dwEventFlags == DOUBLE_CLICK)
+		{
+		  syscall_printf ("mouse: double-click -> click");
+		  mouse_event.dwEventFlags = 0;
+		}
+
+	      /* This code assumes Windows never reports multiple button
+		 events at the same time. */
+	      int b = 0;
+	      char sz[32];
+	      char mode6_term = 'M';
+
+	      if (mouse_event.dwEventFlags == MOUSE_WHEELED)
+		{
+		  if (mouse_event.dwButtonState & 0xFF800000)
+		    {
+		      b = 0x41;
+		      strcpy (sz, "wheel down");
+		    }
+		  else
+		    {
+		      b = 0x40;
+		      strcpy (sz, "wheel up");
+		    }
+		}
+	      else
+		{
+		  /* Ignore unimportant mouse buttons */
+		  mouse_event.dwButtonState &= 0x7;
+
+		  if (mouse_event.dwEventFlags == MOUSE_MOVED)
+		    {
+		      b = con.last_button_code;
+		    }
+		  else if (mouse_event.dwButtonState < con.dwLastButtonState
+			   && !con.ext_mouse_mode6)
+		    {
+		      b = 3;
+		      strcpy (sz, "btn up");
+		    }
+		  else if ((mouse_event.dwButtonState & 1)
+			   != (con.dwLastButtonState & 1))
+		    {
+		      b = 0;
+		      strcpy (sz, "btn1 down");
+		    }
+		  else if ((mouse_event.dwButtonState & 2)
+			   != (con.dwLastButtonState & 2))
+		    {
+		      b = 2;
+		      strcpy (sz, "btn2 down");
+		    }
+		  else if ((mouse_event.dwButtonState & 4)
+			   != (con.dwLastButtonState & 4))
+		    {
+		      b = 1;
+		      strcpy (sz, "btn3 down");
+		    }
+
+		  if (con.ext_mouse_mode6 /* distinguish release */
+		      && mouse_event.dwButtonState < con.dwLastButtonState)
+		    mode6_term = 'm';
+
+		  con.last_button_code = b;
+
+		  if (mouse_event.dwEventFlags == MOUSE_MOVED)
+		    {
+		      b += 32;
+		      strcpy (sz, "move");
+		    }
+		  else
+		    {
+		      /* Remember the modified button state */
+		      con.dwLastButtonState = mouse_event.dwButtonState;
+		    }
+		}
+
+	      /* Remember mouse position */
+	      con.dwLastMousePosition.X = con.dwMousePosition.X;
+	      con.dwLastMousePosition.Y = con.dwMousePosition.Y;
+
+	      /* Remember the modifiers */
+	      con.nModifiers = 0;
+	      if (mouse_event.dwControlKeyState & SHIFT_PRESSED)
+		con.nModifiers |= 0x4;
+	      if (mouse_event.dwControlKeyState & ALT_PRESSED)
+		con.nModifiers |= 0x8;
+	      if (mouse_event.dwControlKeyState & CTRL_PRESSED)
+		con.nModifiers |= 0x10;
+
+	      /* Indicate the modifiers */
+	      b |= con.nModifiers;
+
+	      /* We can now create the code. */
+	      if (con.ext_mouse_mode6)
+		{
+		  __small_sprintf (tmp, "\033[<%d;%d;%d%c", b,
+				   con.dwMousePosition.X + 1,
+				   con.dwMousePosition.Y + 1,
+				   mode6_term);
+		  nread = strlen (tmp);
+		}
+	      else if (con.ext_mouse_mode15)
+		{
+		  __small_sprintf (tmp, "\033[%d;%d;%dM", b + 32,
+				   con.dwMousePosition.X + 1,
+				   con.dwMousePosition.Y + 1);
+		  nread = strlen (tmp);
+		}
+	      else if (con.ext_mouse_mode5)
+		{
+		  unsigned int xcode = con.dwMousePosition.X + ' ' + 1;
+		  unsigned int ycode = con.dwMousePosition.Y + ' ' + 1;
+
+		  __small_sprintf (tmp, "\033[M%c", b + ' ');
+		  nread = 4;
+		  /* the neat nested encoding function of mintty
+		     does not compile in g++, so let's unfold it: */
+		  if (xcode < 0x80)
+		    tmp [nread++] = xcode;
+		  else if (xcode < 0x800)
+		    {
+		      tmp [nread++] = 0xC0 + (xcode >> 6);
+		      tmp [nread++] = 0x80 + (xcode & 0x3F);
+		    }
+		  else
+		    tmp [nread++] = 0;
+		  if (ycode < 0x80)
+		    tmp [nread++] = ycode;
+		  else if (ycode < 0x800)
+		    {
+		      tmp [nread++] = 0xC0 + (ycode >> 6);
+		      tmp [nread++] = 0x80 + (ycode & 0x3F);
+		    }
+		  else
+		    tmp [nread++] = 0;
+		}
+	      else
+		{
+		  unsigned int xcode = con.dwMousePosition.X + ' ' + 1;
+		  unsigned int ycode = con.dwMousePosition.Y + ' ' + 1;
+		  if (xcode >= 256)
+		    xcode = 0;
+		  if (ycode >= 256)
+		    ycode = 0;
+		  __small_sprintf (tmp, "\033[M%c%c%c", b + ' ',
+				   xcode, ycode);
+		  nread = 6;	/* tmp may contain NUL bytes */
+		}
+	      syscall_printf ("mouse: %s at (%d,%d)", sz,
+			      con.dwMousePosition.X,
+			      con.dwMousePosition.Y);
+
+	      toadd = tmp;
+	    }
+	}
+      break;
+
+    case FOCUS_EVENT:
+      if (con.use_focus)
+	{
+	  if (input_rec.Event.FocusEvent.bSetFocus)
+	    __small_sprintf (tmp, "\033[I");
+	  else
+	    __small_sprintf (tmp, "\033[O");
+
+	  toadd = tmp;
+	  nread = 3;
+	}
+      break;
+
+    case WINDOW_BUFFER_SIZE_EVENT:
+      if (send_winch_maybe ())
+	return input_winch;
+      /* fall through */
+    default:
+      return input_processing;
+    }
+
+  if (toadd)
+    {
+      ssize_t ret;
+      line_edit_status res = line_edit (toadd, nread, *ti, &ret);
+      if (res == line_edit_signalled)
+	return input_signalled;
+      else if (res == line_edit_input_done)
+	{
+	  input_ready = true;
+	  return input_ok;
+	}
+    }
+  return input_processing;
 }
 
 void
@@ -732,7 +838,8 @@ dev_console::fillin (HANDLE h)
       dwWinSize.Y = 1 + b.srWindow.Bottom - b.srWindow.Top;
       dwWinSize.X = 1 + b.srWindow.Right - b.srWindow.Left;
       if (b.dwCursorPosition.Y > dwEnd.Y
-	  || (b.dwCursorPosition.Y >= dwEnd.Y && b.dwCursorPosition.X > dwEnd.X))
+	  || (b.dwCursorPosition.Y >= dwEnd.Y
+	      && b.dwCursorPosition.X > dwEnd.X))
 	dwEnd = b.dwCursorPosition;
     }
   else
@@ -748,7 +855,8 @@ dev_console::fillin (HANDLE h)
 }
 
 void __reg3
-dev_console::scroll_buffer (HANDLE h, int x1, int y1, int x2, int y2, int xn, int yn)
+dev_console::scroll_buffer (HANDLE h, int x1, int y1, int x2, int y2,
+			    int xn, int yn)
 {
 /* Scroll the screen context.
    x1, y1 - ul corner
@@ -769,7 +877,8 @@ dev_console::scroll_buffer (HANDLE h, int x1, int y1, int x2, int y2, int xn, in
   sr1.Bottom = y2 >= 0 ? y2 : b.srWindow.Bottom;
   sr2.Top = b.srWindow.Top + scroll_region.Top;
   sr2.Left = 0;
-  sr2.Bottom = (scroll_region.Bottom < 0) ? b.srWindow.Bottom : b.srWindow.Top + scroll_region.Bottom;
+  sr2.Bottom = (scroll_region.Bottom < 0) ?
+    b.srWindow.Bottom : b.srWindow.Top + scroll_region.Bottom;
   sr2.Right = dwWinSize.X - 1;
   if (sr1.Bottom > sr2.Bottom && sr1.Top <= sr2.Bottom)
     sr1.Bottom = sr2.Bottom;
@@ -779,13 +888,15 @@ dev_console::scroll_buffer (HANDLE h, int x1, int y1, int x2, int y2, int xn, in
 }
 
 inline void
-fhandler_console::scroll_buffer (int x1, int y1, int x2, int y2, int xn, int yn)
+fhandler_console::scroll_buffer (int x1, int y1, int x2, int y2,
+				 int xn, int yn)
 {
   con.scroll_buffer (get_output_handle (), x1, y1, x2, y2, xn, yn);
 }
 
 inline void
-fhandler_console::scroll_buffer_screen (int x1, int y1, int x2, int y2, int xn, int yn)
+fhandler_console::scroll_buffer_screen (int x1, int y1, int x2, int y2,
+					int xn, int yn)
 {
   if (y1 >= 0)
     y1 += con.b.srWindow.Top;
@@ -818,7 +929,7 @@ fhandler_console::open (int flags, mode_t)
 
   tcinit (false);
 
-  set_io_handle (NULL);
+  set_handle (NULL);
   set_output_handle (NULL);
 
   /* Open the input handle as handle_ */
@@ -831,7 +942,7 @@ fhandler_console::open (int flags, mode_t)
       __seterrno ();
       return 0;
     }
-  set_io_handle (h);
+  set_handle (h);
 
   h = CreateFileW (L"CONOUT$", GENERIC_READ | GENERIC_WRITE,
 		  FILE_SHARE_READ | FILE_SHARE_WRITE, &sec_none,
@@ -844,6 +955,8 @@ fhandler_console::open (int flags, mode_t)
     }
   set_output_handle (h);
 
+  setup_io_mutex ();
+
   if (con.fillin (get_output_handle ()))
     {
       con.current_win32_attr = con.b.wAttributes;
@@ -855,12 +968,26 @@ fhandler_console::open (int flags, mode_t)
   get_ttyp ()->rstcons (false);
   set_open_status ();
 
-  DWORD cflags;
-  if (GetConsoleMode (get_io_handle (), &cflags))
-    SetConsoleMode (get_io_handle (),
-		    ENABLE_WINDOW_INPUT | ENABLE_MOUSE_INPUT | cflags);
+  if (getpid () == con.owner && wincap.has_con_24bit_colors ())
+    {
+      DWORD dwMode;
+      /* Enable xterm compatible mode in output */
+      GetConsoleMode (get_output_handle (), &dwMode);
+      dwMode |= ENABLE_VIRTUAL_TERMINAL_PROCESSING;
+      SetConsoleMode (get_output_handle (), dwMode);
+      /* Enable xterm compatible mode in input */
+      GetConsoleMode (get_handle (), &dwMode);
+      dwMode |= ENABLE_VIRTUAL_TERMINAL_INPUT;
+      SetConsoleMode (get_handle (), dwMode);
+    }
 
-  debug_printf ("opened conin$ %p, conout$ %p", get_io_handle (),
+  DWORD cflags;
+  if (GetConsoleMode (get_handle (), &cflags))
+    SetConsoleMode (get_handle (), ENABLE_WINDOW_INPUT
+		    | (wincap.has_con_24bit_colors () ? 0 : ENABLE_MOUSE_INPUT)
+		    | cflags);
+
+  debug_printf ("opened conin$ %p, conout$ %p", get_handle (),
 		get_output_handle ());
 
   return 1;
@@ -878,7 +1005,28 @@ fhandler_console::open_setup (int flags)
 int
 fhandler_console::close ()
 {
-  CloseHandle (get_io_handle ());
+  debug_printf ("closing: %p, %p", get_handle (), get_output_handle ());
+
+  CloseHandle (input_mutex);
+  input_mutex = NULL;
+  CloseHandle (output_mutex);
+  output_mutex = NULL;
+
+  if (shared_console_info && getpid () == con.owner &&
+      wincap.has_con_24bit_colors ())
+    {
+      DWORD dwMode;
+      /* Disable xterm compatible mode in input */
+      GetConsoleMode (get_handle (), &dwMode);
+      dwMode &= ~ENABLE_VIRTUAL_TERMINAL_INPUT;
+      SetConsoleMode (get_handle (), dwMode);
+      /* Disable xterm compatible mode in output */
+      GetConsoleMode (get_output_handle (), &dwMode);
+      dwMode &= ~ENABLE_VIRTUAL_TERMINAL_PROCESSING;
+      SetConsoleMode (get_output_handle (), dwMode);
+    }
+
+  CloseHandle (get_handle ());
   CloseHandle (get_output_handle ());
   if (!have_execed)
     free_console ();
@@ -891,6 +1039,7 @@ fhandler_console::ioctl (unsigned int cmd, void *arg)
   int res = fhandler_termios::ioctl (cmd, arg);
   if (res <= 0)
     return res;
+  acquire_output_mutex (INFINITE);
   switch (cmd)
     {
       case TIOCGWINSZ:
@@ -906,20 +1055,25 @@ fhandler_console::ioctl (unsigned int cmd, void *arg)
 	    syscall_printf ("WINSZ: (row=%d,col=%d)",
 			   ((struct winsize *) arg)->ws_row,
 			   ((struct winsize *) arg)->ws_col);
+	    release_output_mutex ();
 	    return 0;
 	  }
 	else
 	  {
 	    syscall_printf ("WINSZ failed");
 	    __seterrno ();
+	    release_output_mutex ();
 	    return -1;
 	  }
+	release_output_mutex ();
 	return 0;
       case TIOCSWINSZ:
 	bg_check (SIGTTOU);
+	release_output_mutex ();
 	return 0;
       case KDGKBMETA:
 	*(int *) arg = (con.metabit) ? K_METABIT : K_ESCPREFIX;
+	release_output_mutex ();
 	return 0;
       case KDSKBMETA:
 	if ((intptr_t) arg == K_METABIT)
@@ -929,16 +1083,20 @@ fhandler_console::ioctl (unsigned int cmd, void *arg)
 	else
 	  {
 	    set_errno (EINVAL);
+	    release_output_mutex ();
 	    return -1;
 	  }
+	release_output_mutex ();
 	return 0;
       case TIOCLINUX:
 	if (*(unsigned char *) arg == 6)
 	  {
 	    *(unsigned char *) arg = (unsigned char) con.nModifiers;
+	    release_output_mutex ();
 	    return 0;
 	  }
 	set_errno (EINVAL);
+	release_output_mutex ();
 	return -1;
       case FIONREAD:
 	{
@@ -948,20 +1106,23 @@ fhandler_console::ioctl (unsigned int cmd, void *arg)
 	  DWORD n;
 	  int ret = 0;
 	  INPUT_RECORD inp[INREC_SIZE];
-	  if (!PeekConsoleInputW (get_io_handle (), inp, INREC_SIZE, &n))
+	  if (!PeekConsoleInputW (get_handle (), inp, INREC_SIZE, &n))
 	    {
 	      set_errno (EINVAL);
+	      release_output_mutex ();
 	      return -1;
 	    }
 	  while (n-- > 0)
 	    if (inp[n].EventType == KEY_EVENT && inp[n].Event.KeyEvent.bKeyDown)
 	      ++ret;
 	  *(int *) arg = ret;
+	  release_output_mutex ();
 	  return 0;
 	}
 	break;
     }
 
+  release_output_mutex ();
   return fhandler_base::ioctl (cmd, arg);
 }
 
@@ -972,7 +1133,7 @@ fhandler_console::tcflush (int queue)
   if (queue == TCIFLUSH
       || queue == TCIOFLUSH)
     {
-      if (!FlushConsoleInputBuffer (get_io_handle ()))
+      if (!FlushConsoleInputBuffer (get_handle ()))
 	{
 	  __seterrno ();
 	  res = -1;
@@ -986,11 +1147,20 @@ fhandler_console::output_tcsetattr (int, struct termios const *t)
 {
   /* All the output bits we can ignore */
 
+  acquire_output_mutex (INFINITE);
   DWORD flags = ENABLE_PROCESSED_OUTPUT | ENABLE_WRAP_AT_EOL_OUTPUT;
+  /* If system has 24 bit color capability, use xterm compatible mode. */
+  if (wincap.has_con_24bit_colors ())
+    {
+      flags |= ENABLE_VIRTUAL_TERMINAL_PROCESSING;
+      if (!(t->c_oflag & OPOST) || !(t->c_oflag & ONLCR))
+	flags |= DISABLE_NEWLINE_AUTO_RETURN;
+    }
 
   int res = SetConsoleMode (get_output_handle (), flags) ? 0 : -1;
   if (res)
     __seterrno_from_win_error (GetLastError ());
+  release_output_mutex ();
   syscall_printf ("%d = tcsetattr(,%p) (ENABLE FLAGS %y) (lflag %y oflag %y)",
 		  res, t, flags, t->c_lflag, t->c_oflag);
   return res;
@@ -1001,10 +1171,11 @@ fhandler_console::input_tcsetattr (int, struct termios const *t)
 {
   /* Ignore the optional_actions stuff, since all output is emitted
      instantly */
+  acquire_input_mutex (INFINITE);
 
   DWORD oflags;
 
-  if (!GetConsoleMode (get_io_handle (), &oflags))
+  if (!GetConsoleMode (get_handle (), &oflags))
     oflags = 0;
   DWORD flags = 0;
 
@@ -1043,14 +1214,18 @@ fhandler_console::input_tcsetattr (int, struct termios const *t)
       flags |= ENABLE_PROCESSED_INPUT;
     }
 
-  flags |= ENABLE_WINDOW_INPUT | ENABLE_MOUSE_INPUT;
+  flags |= ENABLE_WINDOW_INPUT |
+    (wincap.has_con_24bit_colors () ? 0 : ENABLE_MOUSE_INPUT);
+  /* if system has 24 bit color capability, use xterm compatible mode. */
+  if (wincap.has_con_24bit_colors ())
+    flags |= ENABLE_VIRTUAL_TERMINAL_INPUT;
 
   int res;
   if (flags == oflags)
     res = 0;
   else
     {
-      res = SetConsoleMode (get_io_handle (), flags) ? 0 : -1;
+      res = SetConsoleMode (get_handle (), flags) ? 0 : -1;
       if (res < 0)
 	__seterrno ();
       syscall_printf ("%d = tcsetattr(,%p) enable flags %y, c_lflag %y iflag %y",
@@ -1058,6 +1233,7 @@ fhandler_console::input_tcsetattr (int, struct termios const *t)
     }
 
   get_ttyp ()->rstcons (false);
+  release_input_mutex ();
   return res;
 }
 
@@ -1080,7 +1256,7 @@ fhandler_console::tcgetattr (struct termios *t)
 
   DWORD flags;
 
-  if (!GetConsoleMode (get_io_handle (), &flags))
+  if (!GetConsoleMode (get_handle (), &flags))
     {
       __seterrno ();
       res = -1;
@@ -1110,7 +1286,8 @@ fhandler_console::tcgetattr (struct termios *t)
 }
 
 fhandler_console::fhandler_console (fh_devices unit) :
-  fhandler_termios ()
+  fhandler_termios (), input_ready (false),
+  input_mutex (NULL), output_mutex (NULL)
 {
   if (unit > 0)
     dev ().parse (unit);
@@ -1602,11 +1779,32 @@ static const char base_chars[256] =
 /*F0 F1 F2 F3 F4 F5 F6 F7 */ NOR, NOR, NOR, NOR, NOR, NOR, NOR, NOR,
 /*F8 F9 FA FB FC FD FE FF */ NOR, NOR, NOR, NOR, NOR, NOR, NOR, NOR };
 
+static const char table256[256] =
+{
+   0, 4, 2, 6, 1, 5, 3, 7, 8,12,10,14, 9,13,11,15,
+   0, 1, 1, 1, 9, 9, 2, 3, 3, 3, 3, 9, 2, 3, 3, 3,
+   3,11, 2, 3, 3, 3,11,11,10, 3, 3,11,11,11,10,10,
+  11,11,11,11, 4, 5, 5, 5, 5, 9, 6, 8, 8, 8, 8, 9,
+   6, 8, 8, 8, 8, 7, 6, 8, 8, 8, 7, 7, 6, 8, 8, 7,
+   7,11,10,10, 7, 7,11,11, 4, 5, 5, 5, 5,13, 6, 8,
+   8, 8, 8, 7, 6, 8, 8, 8, 7, 7, 6, 8, 8, 7, 7, 7,
+   6, 8, 7, 7, 7, 7,14, 7, 7, 7, 7, 7, 4, 5, 5, 5,
+  13,13, 6, 8, 8, 8, 7, 7, 6, 8, 8, 7, 7, 7, 6, 8,
+   7, 7, 7, 7,14, 7, 7, 7, 7, 7,14, 7, 7, 7, 7,15,
+  12, 5, 5,13,13,13, 6, 8, 8, 7, 7,13, 6, 8, 7, 7,
+   7, 7,14, 7, 7, 7, 7, 7,14, 7, 7, 7, 7,15,14,14,
+   7, 7,15,15,12,12,13,13,13,13,12,12, 7, 7,13,13,
+  14, 7, 7, 7, 7, 7,14, 7, 7, 7, 7,15,14,14, 7, 7,
+  15,15,14,14, 7,15,15,15, 0, 0, 0, 0, 0, 0, 8, 8,
+   8, 8, 8, 8, 8, 8, 8, 8, 7, 7, 7, 7, 7, 7,15,15
+};
+
 void
 fhandler_console::char_command (char c)
 {
   int x, y, n;
   char buf[40];
+  int r, g, b;
 
   switch (c)
     {
@@ -1678,6 +1876,40 @@ fhandler_console::char_command (char c)
 	     case 37:		/* WHITE foreg */
 	       con.fg = FOREGROUND_BLUE | FOREGROUND_GREEN | FOREGROUND_RED;
 	       break;
+	     case 38:
+	       if (con.nargs < 1)
+		 /* Sequence error (abort) */
+		 break;
+	       switch (con.args[1])
+		 {
+		 case 2:
+		   if (con.nargs != 4)
+		     /* Sequence error (abort) */
+		     break;
+		   r = con.args[2];
+		   g = con.args[3];
+		   b = con.args[4];
+		   r = r < (95 + 1) / 2 ? 0 : r > 255 ? 5 : (r - 55 + 20) / 40;
+		   g = g < (95 + 1) / 2 ? 0 : g > 255 ? 5 : (g - 55 + 20) / 40;
+		   b = b < (95 + 1) / 2 ? 0 : b > 255 ? 5 : (b - 55 + 20) / 40;
+		   con.fg = table256[16 + r*36 + g*6 + b];
+		   break;
+		 case 5:
+		   if (con.nargs != 2)
+		     /* Sequence error (abort) */
+		     break;
+		   {
+		     int idx = con.args[2];
+		     if (idx < 0)
+		       idx = 0;
+		     if (idx > 255)
+		       idx = 255;
+		     con.fg = table256[idx];
+		   }
+		   break;
+		 }
+	       i += con.nargs;
+	       break;
 	     case 39:
 	       con.fg = con.default_color & FOREGROUND_ATTR_MASK;
 	       break;
@@ -1705,6 +1937,40 @@ fhandler_console::char_command (char c)
 	     case 47:    /* WHITE background */
 	       con.bg = BACKGROUND_BLUE | BACKGROUND_GREEN | BACKGROUND_RED;
 	       break;
+	     case 48:
+	       if (con.nargs < 1)
+		 /* Sequence error (abort) */
+		 break;
+	       switch (con.args[1])
+		 {
+		 case 2:
+		   if (con.nargs != 4)
+		     /* Sequence error (abort) */
+		     break;
+		   r = con.args[2];
+		   g = con.args[3];
+		   b = con.args[4];
+		   r = r < (95 + 1) / 2 ? 0 : r > 255 ? 5 : (r - 55 + 20) / 40;
+		   g = g < (95 + 1) / 2 ? 0 : g > 255 ? 5 : (g - 55 + 20) / 40;
+		   b = b < (95 + 1) / 2 ? 0 : b > 255 ? 5 : (b - 55 + 20) / 40;
+		   con.bg = table256[16 + r*36 + g*6 + b] << 4;
+		   break;
+		 case 5:
+		   if (con.nargs != 2)
+		     /* Sequence error (abort) */
+		     break;
+		   {
+		     int idx = con.args[2];
+		     if (idx < 0)
+		       idx = 0;
+		     if (idx > 255)
+		       idx = 255;
+		     con.bg = table256[idx] << 4;
+		   }
+		   break;
+		 }
+	       i += con.nargs;
+	       break;
 	     case 49:
 	       con.bg = con.default_color & BACKGROUND_ATTR_MASK;
 	       break;
@@ -1722,16 +1988,19 @@ fhandler_console::char_command (char c)
 		case 1: /* blinking block (default) */
 		case 2: /* steady block */
 		  console_cursor_info.dwSize = 100;
-		  SetConsoleCursorInfo (get_output_handle (), &console_cursor_info);
+		  SetConsoleCursorInfo (get_output_handle (),
+					&console_cursor_info);
 		  break;
 		case 3: /* blinking underline */
 		case 4: /* steady underline */
-		  console_cursor_info.dwSize = 10;	/* or Windows default 25? */
-		  SetConsoleCursorInfo (get_output_handle (), &console_cursor_info);
+		  console_cursor_info.dwSize = 10; /* or Windows default 25? */
+		  SetConsoleCursorInfo (get_output_handle (),
+					&console_cursor_info);
 		  break;
 		default: /* use value as percentage */
 		  console_cursor_info.dwSize = con.args[0];
-		  SetConsoleCursorInfo (get_output_handle (), &console_cursor_info);
+		  SetConsoleCursorInfo (get_output_handle (),
+					&console_cursor_info);
 		  break;
 	      }
 	}
@@ -1744,7 +2013,8 @@ fhandler_console::char_command (char c)
 	    {
 	    case 4:    /* Insert mode */
 	      con.insert_mode = (c == 'h') ? true : false;
-	      syscall_printf ("insert mode %sabled", con.insert_mode ? "en" : "dis");
+	      syscall_printf ("insert mode %sabled",
+			      con.insert_mode ? "en" : "dis");
 	      break;
 	    }
 	  break;
@@ -1931,16 +2201,22 @@ fhandler_console::char_command (char c)
 	/* Generate Secondary Device Attribute report, using 67 = ASCII 'C'
 	   to indicate Cygwin (convention used by Rxvt, Urxvt, Screen, Mintty),
 	   and cygwin version for terminal version. */
-	__small_sprintf (buf, "\033[>67;%d%02d;0c", CYGWIN_VERSION_DLL_MAJOR, CYGWIN_VERSION_DLL_MINOR);
+	__small_sprintf (buf, "\033[>67;%d%02d;0c",
+			 CYGWIN_VERSION_DLL_MAJOR, CYGWIN_VERSION_DLL_MINOR);
       else
 	strcpy (buf, "\033[?6c");
       /* The generated report needs to be injected for read-ahead into the
 	 fhandler_console object associated with standard input.
 	 So puts_readahead does not work.
 	 Use a common console read-ahead buffer instead. */
+      acquire_input_mutex (INFINITE);
       con.cons_rapoi = NULL;
       strcpy (con.cons_rabuf, buf);
       con.cons_rapoi = con.cons_rabuf;
+      release_input_mutex ();
+      /* Wake up read() or select() by sending a message
+	 which has no effect */
+      PostMessageW (GetConsoleWindow (), WM_SETFOCUS, 0, 0);
       break;
     case 'n':
       switch (con.args[0])
@@ -1950,9 +2226,14 @@ fhandler_console::char_command (char c)
 	  y -= con.b.srWindow.Top;
 	  /* x -= con.b.srWindow.Left;		// not available yet */
 	  __small_sprintf (buf, "\033[%d;%dR", y + 1, x + 1);
+	  acquire_input_mutex (INFINITE);
 	  con.cons_rapoi = NULL;
 	  strcpy (con.cons_rabuf, buf);
 	  con.cons_rapoi = con.cons_rabuf;
+	  release_input_mutex ();
+	  /* Wake up read() or select() by sending a message
+	     which has no effect */
+	  PostMessageW (GetConsoleWindow (), WM_SETFOCUS, 0, 0);
 	  break;
 	default:
 	  goto bad_escape;
@@ -2131,7 +2412,8 @@ fhandler_console::write_normal (const unsigned char *src,
 				    nfound - trunc_buf.buf);
 	  if (!write_console (write_buf, buf_len, done))
 	    {
-	      debug_printf ("multibyte sequence write failed, handle %p", get_output_handle ());
+	      debug_printf ("multibyte sequence write failed, handle %p",
+			    get_output_handle ());
 	      return 0;
 	    }
 	  found = src + (nfound - trunc_buf.buf - trunc_buf.len);
@@ -2143,10 +2425,12 @@ fhandler_console::write_normal (const unsigned char *src,
   /* Loop over src buffer as long as we have just simple characters.  Stop
      as soon as we reach the conversion limit, or if we encounter a control
      character or a truncated or invalid mutibyte sequence. */
+  /* If system has 24 bit color capability, just write all control
+     sequences to console since xterm compatible mode is enabled. */
   memset (&ps, 0, sizeof ps);
   while (found < end
 	 && found - src < CONVERT_LIMIT
-	 && base_chars[*found] == NOR)
+	 && (wincap.has_con_24bit_colors () || base_chars[*found] == NOR) )
     {
       switch (ret = f_mbtowc (_REENT, NULL, (const char *) found,
 			       end - found, &ps))
@@ -2229,7 +2513,8 @@ do_print:
 		  y--;
 		}
 	    }
-	  cursor_set (false, ((get_ttyp ()->ti.c_oflag & ONLCR) ? 0 : x), y + 1);
+	  cursor_set (false,
+		      ((get_ttyp ()->ti.c_oflag & ONLCR) ? 0 : x), y + 1);
 	  break;
 	case BAK:
 	  cursor_rel (-1, 0);
@@ -2283,6 +2568,7 @@ fhandler_console::write (const void *vsrc, size_t len)
     return (ssize_t) bg;
 
   push_process_state process_state (PID_TTYOU);
+  acquire_output_mutex (INFINITE);
 
   /* Run and check for ansi sequences */
   unsigned const char *src = (unsigned char *) vsrc;
@@ -2303,7 +2589,10 @@ fhandler_console::write (const void *vsrc, size_t len)
 	case normal:
 	  src = write_normal (src, end);
 	  if (!src) /* write_normal failed */
-	    return -1;
+	    {
+	      release_output_mutex ();
+	      return -1;
+	    }
 	  break;
 	case gotesc:
 	  if (*src == '[')		/* CSI Control Sequence Introducer */
@@ -2394,6 +2683,8 @@ fhandler_console::write (const void *vsrc, size_t len)
 	    con.rarg = con.rarg * 10 + (*src - '0');
 	  else if (*src == ';' && (con.rarg == 2 || con.rarg == 0))
 	    con.state = gettitle;
+	  else if (*src == ';' && (con.rarg == 4 || con.rarg == 104))
+	    con.state = eatpalette;
 	  else
 	    con.state = eattitle;
 	  src++;
@@ -2416,6 +2707,21 @@ fhandler_console::write (const void *vsrc, size_t len)
 	    src++;
 	    break;
 	  }
+	case eatpalette:
+	  if (*src == '\033')
+	    con.state = endpalette;
+	  else if (*src == '\a')
+	    con.state = normal;
+	  src++;
+	  break;
+	case endpalette:
+	  if (*src == '\\')
+	    con.state = normal;
+	  else
+	    /* Sequence error (abort) */
+	    con.state = normal;
+	  src++;
+	  break;
 	case gotsquare:
 	  if (*src == ';')
 	    {
@@ -2455,6 +2761,7 @@ fhandler_console::write (const void *vsrc, size_t len)
 	  break;
 	}
     }
+  release_output_mutex ();
 
   syscall_printf ("%ld = fhandler_console::write(...)", len);
 
@@ -2582,6 +2889,15 @@ void
 fhandler_console::fixup_after_fork_exec (bool execing)
 {
   set_unit ();
+  setup_io_mutex ();
+  if (wincap.has_con_24bit_colors ())
+    {
+      DWORD dwMode;
+      /* Disable xterm compatible mode in input */
+      GetConsoleMode (get_handle (), &dwMode);
+      dwMode &= ~ENABLE_VIRTUAL_TERMINAL_INPUT;
+      SetConsoleMode (get_handle (), dwMode);
+    }
 }
 
 // #define WINSTA_ACCESS (WINSTA_READATTRIBUTES | STANDARD_RIGHTS_READ | STANDARD_RIGHTS_WRITE | WINSTA_CREATEDESKTOP | WINSTA_EXITWINDOWS)
@@ -2671,7 +2987,8 @@ fhandler_console::create_invisible_console_workaround ()
 
 	  /* Create a new hidden process.  Use the two event handles as
 	     argv[1] and argv[2]. */
-	  BOOL x = CreateProcessW (NULL, cmd, &sec_none_nih, &sec_none_nih, true,
+	  BOOL x = CreateProcessW (NULL, cmd,
+				   &sec_none_nih, &sec_none_nih, true,
 				   CREATE_NEW_CONSOLE, NULL, NULL, &si, &pi);
 	  if (x)
 	    {
@@ -2763,4 +3080,58 @@ fhandler_console::need_invisible ()
 
   debug_printf ("invisible_console %d", invisible_console);
   return b;
+}
+
+DWORD
+fhandler_console::__acquire_input_mutex (const char *fn, int ln, DWORD ms)
+{
+#ifdef DEBUGGING
+  strace.prntf (_STRACE_TERMIOS, fn, "(%d): trying to get input_mutex", ln);
+#endif
+  DWORD res = WaitForSingleObject (input_mutex, ms);
+  if (res != WAIT_OBJECT_0)
+    strace.prntf (_STRACE_TERMIOS, fn,
+		  "(%d): Failed to acquire input_mutex %08x",
+		  ln, GetLastError ());
+#ifdef DEBUGGING
+  else
+    strace.prntf (_STRACE_TERMIOS, fn, "(%d): got input_mutex", ln);
+#endif
+  return res;
+}
+
+void
+fhandler_console::__release_input_mutex (const char *fn, int ln)
+{
+  ReleaseMutex (input_mutex);
+#ifdef DEBUGGING
+  strace.prntf (_STRACE_TERMIOS, fn, "(%d): release input_mutex", ln);
+#endif
+}
+
+DWORD
+fhandler_console::__acquire_output_mutex (const char *fn, int ln, DWORD ms)
+{
+#ifdef DEBUGGING
+  strace.prntf (_STRACE_TERMIOS, fn, "(%d): trying to get output_mutex", ln);
+#endif
+  DWORD res = WaitForSingleObject (output_mutex, ms);
+  if (res != WAIT_OBJECT_0)
+    strace.prntf (_STRACE_TERMIOS, fn,
+		  "(%d): Failed to acquire output_mutex %08x",
+		  ln, GetLastError ());
+#ifdef DEBUGGING
+  else
+    strace.prntf (_STRACE_TERMIOS, fn, "(%d): got output_mutex", ln);
+#endif
+  return res;
+}
+
+void
+fhandler_console::__release_output_mutex (const char *fn, int ln)
+{
+  ReleaseMutex (output_mutex);
+#ifdef DEBUGGING
+  strace.prntf (_STRACE_TERMIOS, fn, "(%d): release output_mutex", ln);
+#endif
 }

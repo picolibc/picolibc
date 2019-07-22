@@ -331,8 +331,10 @@ mkdir (const char *dir, mode_t mode)
 	  debug_printf ("got %d error from build_fh_name", fh->error ());
 	  set_errno (fh->error ());
 	}
+      else if (fh->exists ())
+	set_errno (EEXIST);
       else if (has_dot_last_component (dir, true))
-	set_errno (fh->exists () ? EEXIST : ENOENT);
+	set_errno (ENOENT);
       else if (!fh->mkdir (mode))
 	res = 0;
       delete fh;

@@ -27,6 +27,7 @@ details. */
 #include "child_info.h"
 #include "ntdll.h"
 #include "exception.h"
+#include "posix_timer.h"
 
 /* Definitions for code simplification */
 #ifdef __x86_64__
@@ -1133,7 +1134,7 @@ ctrl_c_handler (DWORD type)
      handled *by* the process group leader. */
   if (t && (!have_execed || have_execed_cygwin)
       && t->getpgid () == myself->pid &&
-      (GetTickCount () - t->last_ctrl_c) >= MIN_CTRL_C_SLOP)
+      (GetTickCount64 () - t->last_ctrl_c) >= MIN_CTRL_C_SLOP)
     /* Otherwise we just send a SIGINT to the process group and return TRUE
        (to indicate that we have handled the signal).  At this point, type
        should be a CTRL_C_EVENT or CTRL_BREAK_EVENT. */
@@ -1143,9 +1144,9 @@ ctrl_c_handler (DWORD type)
       if (type == CTRL_BREAK_EVENT
 	  && t->ti.c_cc[VINTR] == 3 && t->ti.c_cc[VQUIT] == 3)
 	sig = SIGQUIT;
-      t->last_ctrl_c = GetTickCount ();
+      t->last_ctrl_c = GetTickCount64 ();
       t->kill_pgrp (sig);
-      t->last_ctrl_c = GetTickCount ();
+      t->last_ctrl_c = GetTickCount64 ();
       return TRUE;
     }
 
@@ -1468,11 +1469,21 @@ sigpacket::process ()
   if (issig_wait)
     {
       tls->sigwait_mask = 0;
+      /* If the catching thread is running select on a signalfd, don't call
+	 the signal handler and don't remove the signal from the queue. */
+      if (tls->signalfd_select_wait)
+	{
+	  SetEvent (tls->signalfd_select_wait);
+	  rc = 0;
+	  goto done;
+	}
       goto dosig;
     }
 
   if (handler == SIG_IGN)
     {
+      if (si.si_code == SI_TIMER)
+	((timer_tracker *) si.si_tid)->disarm_overrun_event ();
       sigproc_printf ("signal %d ignored", si.si_signo);
       goto done;
     }
@@ -1496,6 +1507,8 @@ sigpacket::process ()
 	  || si.si_signo == SIGCONT || si.si_signo == SIGWINCH
 	  || si.si_signo == SIGURG)
 	{
+	  if (si.si_code == SI_TIMER)
+	    ((timer_tracker *) si.si_tid)->disarm_overrun_event ();
 	  sigproc_printf ("signal %d default is currently ignore", si.si_signo);
 	  goto done;
 	}
@@ -1620,12 +1633,19 @@ _cygtls::call_signal_handler ()
 
       sigset_t this_oldmask = set_process_mask_delta ();
 
+      if (infodata.si_code == SI_TIMER)
+	{
+	  timer_tracker *tt = (timer_tracker *)
+			      infodata.si_tid;
+	  infodata.si_overrun = tt->disarm_overrun_event ();
+	}
+
       /* Save information locally on stack to pass to handler. */
       int thissig = sig;
       siginfo_t thissi = infodata;
       void (*thisfunc) (int, siginfo_t *, void *) = func;
 
-      ucontext_t *thiscontext = NULL;
+      ucontext_t *thiscontext = NULL, context_copy;
 
       /* Only make a context for SA_SIGINFO handlers */
       if (this_sa_flags & SA_SIGINFO)
@@ -1681,6 +1701,7 @@ _cygtls::call_signal_handler ()
 				    ? (uintptr_t) thissi.si_addr : 0;
 
 	  thiscontext = &context;
+	  context_copy = context;
 	}
 
       int this_errno = saved_errno;
@@ -1798,9 +1819,18 @@ _cygtls::call_signal_handler ()
 
       incyg = true;
 
-      set_signal_mask (_my_tls.sigmask, this_oldmask);
+      set_signal_mask (_my_tls.sigmask, (this_sa_flags & SA_SIGINFO)
+					? context.uc_sigmask : this_oldmask);
       if (this_errno >= 0)
 	set_errno (this_errno);
+      if (this_sa_flags & SA_SIGINFO)
+	{
+	  /* If more than just the sigmask in the context has been changed by
+	     the signal handler, call setcontext. */
+	  context_copy.uc_sigmask = context.uc_sigmask;
+	  if (memcmp (&context, &context_copy, sizeof context) != 0)
+	    setcontext (&context);
+	}
     }
 
   /* FIXME: Since 2011 this return statement always returned 1 (meaning
@@ -1845,7 +1875,8 @@ extern "C" int
 setcontext (const ucontext_t *ucp)
 {
   PCONTEXT ctx = (PCONTEXT) &ucp->uc_mcontext;
-  _my_tls.sigmask = ucp->uc_sigmask;
+  set_signal_mask (_my_tls.sigmask, ucp->uc_sigmask);
+  _my_tls.incyg = true;
 #ifdef __x86_64__
   /* Apparently a call to NtContinue works on 64 bit as well, but using
      RtlRestoreContext is the blessed way. */
