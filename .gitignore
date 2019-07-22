@@ -42,3 +42,7 @@ core
 !core/
 
 lost+found
+
+# ignore meson build directories
+
+build-*/
