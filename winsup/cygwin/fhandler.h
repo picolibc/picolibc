@@ -126,19 +126,32 @@ enum del_lock_called_from {
 };
 
 enum virtual_ftype_t {
-  virt_fdsymlink = -8,	/* Fd symlink (e.g. /proc/<PID>/fd/0) */
-  virt_blk = -7,	/* Block special */
-  virt_chr = -6,	/* Character special */
-  virt_fsfile = -5,	/* FS-based file via /proc/sys */
-  virt_socket = -4,	/* Socket */
-  virt_pipe = -3,	/* Pipe */
-  virt_symlink = -2,	/* Symlink */
-  virt_file = -1,	/* Regular file */
-  virt_none = 0,	/* Invalid, Error */
-  virt_directory = 1,	/* Directory */
-  virt_rootdir = 2,	/* Root directory of virtual FS */
-  virt_fsdir = 3,	/* FS-based directory via /proc/sys */
+  virt_none	 = 0x0000,	/* Invalid, Error */
+  virt_file	 = 0x0001,	/* Regular file */
+  virt_symlink	 = 0x0002,	/* Symlink */
+  virt_pipe	 = 0x0003,	/* Pipe */
+  virt_socket	 = 0x0004,	/* Socket */
+  virt_chr	 = 0x0005,	/* Character special */
+  virt_blk	 = 0x0006,	/* Block special */
+  virt_fdsymlink = 0x0007,	/* Fd symlink (e.g. /proc/<PID>/fd/0) */
+  virt_fsfile	 = 0x0008,	/* FS-based file via /proc/sys */
+  virt_dir_type	 = 0x1000,
+  virt_directory = 0x1001,	/* Directory */
+  virt_rootdir	 = 0x1002,	/* Root directory of virtual FS */
+  virt_fsdir	 = 0x1003,	/* FS-based directory via /proc/sys */
 };
+
+static inline bool
+virt_ftype_isfile (virtual_ftype_t _f)
+{
+  return _f != virt_none && !(_f & virt_dir_type);
+}
+
+static inline bool
+virt_ftype_isdir (virtual_ftype_t _f)
+{
+  return _f & virt_dir_type;
+}
 
 class fhandler_base
 {

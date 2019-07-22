@@ -169,7 +169,7 @@ fhandler_process::fstat (struct stat *buf)
       buf->st_uid = p->uid;
       buf->st_gid = p->gid;
       buf->st_mode |= S_IFDIR | S_IXUSR | S_IXGRP | S_IXOTH;
-      if (file_type == 1)
+      if (file_type == virt_directory)
 	buf->st_nlink = 2;
       else
 	buf->st_nlink = 3;

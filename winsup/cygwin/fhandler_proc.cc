@@ -168,8 +168,6 @@ fhandler_proc::get_proc_fhandler (const char *path)
     return FH_PROC;
 }
 
-/* Returns 0 if path doesn't exist, >0 if path is a directory,
-   -1 if path is a file, -2 if it's a symlink.  */
 virtual_ftype_t
 fhandler_proc::exists ()
 {
