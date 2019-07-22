@@ -1,13 +1,12 @@
-libnewlib-nano (2.11.2-1) unstable; urgency=medium
+picolibc (1.0-1) unstable; urgency=medium
 
-  * 2.11.2 upstream release
-  * Refactor meson and tinystdio changes
-  * Make tinystdio pass printf/scanf tests
+  * Version 1.0
+  * Rename from newlib-nano
+  * Switch to TLS
+  * Add picolib to provide tls helper and sbrk implementation
+  * Provide linker script sample
+  * Adjust debhelper dependency to >= 12
+  * Add riscv target
+  * Incorporate printf fixes from NuttX
 
- -- Keith Packard <keithp@keithp.com>  Sun, 14 Oct 2018 22:26:58 -0700
-
-libnewlib-nano (2.10.0-1) unstable; urgency=medium
-
-  * Initial release
-
- -- Keith Packard <keithp@keithp.com>  Sat, 04 Aug 2018 18:37:23 +0800
+ -- Keith Packard <keithp@keithp.com>  Sun, 22 Sep 2019 19:21:20 -0700

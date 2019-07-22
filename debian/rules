@@ -28,13 +28,13 @@ MESON_RISCV_FLAGS = \
 	$(MESON_SHARED_FLAGS) \
 	--cross-file debian/cross-$(RISCV_ARCH).txt \
 	-Dincludedir=lib/picolibc/$(RISCV_ARCH)/include \
-	-Dlibdir=lib/picolibc/$(RISCV_ARCH)/lib 
+	-Dlibdir=lib/picolibc/$(RISCV_ARCH)/lib
 
 MESON_ARM_FLAGS = \
 	$(MESON_SHARED_FLAGS) \
 	--cross-file debian/cross-$(ARM_ARCH).txt \
 	-Dincludedir=lib/picolibc/$(ARM_ARCH)/include \
-	-Dlibdir=lib/picolibc/$(ARM_ARCH)/lib 
+	-Dlibdir=lib/picolibc/$(ARM_ARCH)/lib
 
 override_dh_autoreconf:
 	echo 'no reconf needed'
