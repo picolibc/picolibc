@@ -389,13 +389,13 @@ format_process_fd (void *data, char *&destbuf)
       if (fd < 0 || e == fdp || (*e != '/' && *e != '\0'))
 	{
 	  set_errno (ENOENT);
-	  return 0;
+	  return -1;
 	}
       destbuf = p ? p->fd (fd, fs) : NULL;
       if (!destbuf || !*destbuf)
 	{
 	  set_errno (ENOENT);
-	  return 0;
+	  return -1;
 	}
       if (*e == '\0')
 	*((process_fd_t *) data)->fd_type = virt_fdsymlink;
