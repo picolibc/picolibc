@@ -1,0 +1,11 @@
+[binaries]
+c = 'riscv32-unknown-elf-gcc'
+ar = 'riscv32-unknown-elf-ar'
+as = 'riscv32-unknown-elf-as'
+
+[host_machine]
+system = ''
+cpu_family = ''
+cpu = ''
+endian = ''
+
