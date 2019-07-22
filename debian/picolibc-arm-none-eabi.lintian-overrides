@@ -1,0 +1,1 @@
+picolibc-arm-none-eabi: arch-independent-package-contains-binary-or-object usr/lib/picolibc/*

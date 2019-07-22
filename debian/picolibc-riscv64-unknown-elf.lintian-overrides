@@ -1,0 +1,1 @@
+picolibc-riscv64-unknown-elf: arch-independent-package-contains-binary-or-object usr/lib/picolibc/*

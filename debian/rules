@@ -13,16 +13,16 @@ export DH_VERBOSE = 1
 # package maintainers to append LDFLAGS
 #export DEB_LDFLAGS_MAINT_APPEND = -Wl,--as-needed
 
-BUILDDIR=build-nano
+BUILDDIR=build
 
 %:
 	dh $@ -B$(BUILDDIR)
 
-ARCH=arm-none-eabi
+RISCV_ARCH=riscv64-unknown-elf
+ARM_ARCH=arm-none-eabi
 
-MESON_FLAGS = \
+MESON_SHARED_FLAGS = \
 	--prefix=/usr \
-	--cross-file debian/cross-$(ARCH).txt \
 	--buildtype plain \
 	-Dtarget-optspace=true \
 	-Dnewlib-tinystdio=true \
@@ -31,9 +31,19 @@ MESON_FLAGS = \
 	-Dnewlib-wide-orient=false\
 	-Dnewlib-nano-malloc=true\
 	-Dlite-exit=true\
-	-Dnewlib-global-atexit=true\
-	-Dincludedir=lib/newlib-nano/$(ARCH)/include \
-	-Dlibdir=lib/newlib-nano/$(ARCH)/lib 
+	-Dnewlib-global-atexit=true
+
+MESON_RISCV_FLAGS = \
+	$(MESON_SHARED_FLAGS) \
+	--cross-file debian/cross-$(RISCV_ARCH).txt \
+	-Dincludedir=lib/picolibc/$(RISCV_ARCH)/include \
+	-Dlibdir=lib/picolibc/$(RISCV_ARCH)/lib 
+
+MESON_ARM_FLAGS = \
+	$(MESON_SHARED_FLAGS) \
+	--cross-file debian/cross-$(ARM_ARCH).txt \
+	-Dincludedir=lib/picolibc/$(ARM_ARCH)/include \
+	-Dlibdir=lib/picolibc/$(ARM_ARCH)/lib 
 
 override_dh_autoreconf:
 	echo 'no reconf needed'
@@ -42,13 +52,17 @@ override_dh_auto_clean:
 	rm -fr debian/$(BUILDDIR)
 
 override_dh_auto_configure:
-	meson . debian/$(BUILDDIR) $(MESON_FLAGS)
+	meson . debian/$(BUILDDIR)/$(RISCV_ARCH) $(MESON_RISCV_FLAGS)
+	meson . debian/$(BUILDDIR)/$(ARM_ARCH) $(MESON_ARM_FLAGS)
 
 override_dh_auto_build:
-	cd debian/$(BUILDDIR) && ninja
+	cd debian/$(BUILDDIR)/$(RISCV_ARCH) && ninja
+	cd debian/$(BUILDDIR)/$(ARM_ARCH) && ninja
 
 override_dh_auto_test:
-	cd debian/$(BUILDDIR) && ninja test
+	cd debian/$(BUILDDIR)/$(RISCV_ARCH) && ninja test
+	cd debian/$(BUILDDIR)/$(ARM_ARCH) && ninja test
 
 override_dh_auto_install:
-	cd debian/$(BUILDDIR) && DESTDIR=${CURDIR}/debian/libnewlib-nano-arm-none-eabi ninja install
+	cd debian/$(BUILDDIR)/$(RISCV_ARCH) && DESTDIR=${CURDIR}/debian/tmp ninja install
+	cd debian/$(BUILDDIR)/$(ARM_ARCH) && DESTDIR=${CURDIR}/debian/tmp ninja install
