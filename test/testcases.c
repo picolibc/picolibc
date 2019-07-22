@@ -164,6 +164,7 @@
     result |= test(165, "12", "%o", 10);
     /* 166: excluded for C */
     /* 167: excluded for C */
+    result |= test(168, "(null)", "%s", NULL); 
     result |= test(169, "%%%%", "%s", "%%%%");
     result |= test(170, "4294967295", "%u", -1);
     result |= test(171, "%w", "%w", -1);
@@ -174,6 +175,7 @@
     result |= test(177, "%0", "%%0");
     result |= test(178, "2345", "%hx", 74565);
     result |= test(179, "61", "%hhx", 'a');
+    result |= test(180, "61", "%hhx", 'a' + 256);
     result |= test(181, "Hallo heimur", "Hallo heimur");
     result |= test(182, "Hallo heimur", "%s", "Hallo heimur");
     result |= test(183, "1024", "%d", 1024);
