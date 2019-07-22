@@ -1,15 +1,16 @@
-# Newlib-nano
-Copyright © 2018 Keith Packard 🄯
+# PicoLibc
+Copyright © 2018,2019 Keith Packard
 
-This is a fork of newlib which integrates the stdio code from gcc-avr
-to make it much smaller for tiny embedded systems. There's debian
-packaging which builds for arm-none-eabi targets.
+PicoLibc is library offering standard C library APIs that targets
+small embedded systems with limited RAM. PicoLibc was formed by blending
+code from [Newlib](http://sourceware.org/newlib/) and
+[AVR Libc](https://www.nongnu.org/avr-libc/).
 
-### Selecting newlib options
+### Selecting build options
 
-I've tried to expose all of the same code selection options that are
-provided in the autotools. Use -D<option-name>={true,false} to change
-from the default value.
+Most of these options set configuration values for the newlib code
+base and should match that configuration system. Use
+-D<option-name>={true,false} to change from the default value.
 
 | Option                      | Default | Description                                                                          |
 | ------                      | ------- | -----------                                                                          |
@@ -45,14 +46,26 @@ from the default value.
 | newlib-io-float             | false   | Enable printf/scanf family float support                                             |
 | newlib-supplied-syscalls    | false   | Enable newlib supplied syscalls                                                      |
 
-## Building for embedded arm systems
+## Building for embedded RISC-V and ARM systems
 
-Unlike autotools, which has you specify all of the cross-compilation
-bits on the command line, meson sticks them in a separate
-configuration file. There are a bunch of things you need to set, which
-the build system really shouldn't care about. In any case, you can
-find the cross-compilation details for the arm-none-eabi toolchain in
-the cross-arm-none-eabi.txt file:
+Meson sticks all of the cross-compilation build configuration bits in
+a separate configuration file. There are a bunch of things you need to
+set, which the build system really shouldn't care about. Example
+configuration settings for RISC-V processors are in
+cross-riscv32-unknown-elf.txt:
+
+    [binaries]
+    c = 'riscv32-unknown-elf-gcc'
+    ar = 'riscv32-unknown-elf-ar'
+    as = 'riscv32-unknown-elf-as'
+
+    [host_machine]
+    system = ''
+    cpu_family = ''
+    cpu = ''
+    endian = ''
+
+Settings for ARM processors are in cross-arm-none-eabi.txt:
 
     [binaries]
     c = 'arm-none-eabi-gcc'
@@ -70,9 +83,18 @@ wherever they may be.
 
 ### Auto-detecting the compiler configurations
 
-The key trick here is that the meson configuration, just like the
-autotools configuration it replaces, figures out all of the target CPU
-architectures supported by the compiler by doing:
+The PicoLibc configuration detects the processor configurations
+supported by the compiler using the `--print-multi-lib` command-line option:
+
+    $ riscv32-unknown-elf-gcc --print-multi-lib
+    .;
+    rv32i/ilp32;@march=rv32i@mabi=ilp32
+    rv32im/ilp32;@march=rv32im@mabi=ilp32
+    rv32iac/ilp32;@march=rv32iac@mabi=ilp32
+    rv32imac/ilp32;@march=rv32imac@mabi=ilp32
+    rv32imafc/ilp32f;@march=rv32imafc@mabi=ilp32f
+    rv64imac/lp64;@march=rv64imac@mabi=lp64
+    rv64imafdc/lp64d;@march=rv64imafdc@mabi=lp64d
 
     $ arm-none-eabi-gcc --print-multi-lib
     .;
@@ -96,9 +118,9 @@ architectures supported by the compiler by doing:
     thumb/v8-m.main/fpv5/softfp;@mthumb@march=armv8-m.main@mfpu=fpv5-d16@mfloat-abi=softfp
     thumb/v8-m.main/fpv5/hard;@mthumb@march=armv8-m.main@mfpu=fpv5-d16@mfloat-abi=hard
 
-Yes, we're going to compile all of the code 20 times with the
-specified compiler options (replace the '@'s with '-' to see what they
-will be).
+On RISC-V, PicoLibc is compiled 8 times, while on ARM, the library is
+compiled 20 times with the specified compiler options (replace the
+'@'s with '-' to see what they will be).
 
 ### Running meson
 
@@ -145,12 +167,12 @@ Once configured, you can compile the libraries with
 
 ### Using the library
 
-Eventually, we could go configure the compiler so that selecting a
-suitable target architecture combination would set up the library
-paths to match, but for now you'll have to figure out the right -L
-line by yourself by matching the path name on the left side of the
---print-multi-lib output with the compiler options on the right
-side. For instance, my STM32F042 cortex-M0 parts use
+We should configure the compiler so that selecting a suitable target
+architecture combination would set up the library paths to match, but
+at this point you'll have to figure out the right -L line by yourself
+by matching the path name on the left side of the --print-multi-lib
+output with the compiler options on the right side. For instance, my
+STM32F042 cortex-M0 parts use
 
     $ arm-none-eabi-gcc -mlittle-endian -mcpu=cortex-m0 -mthumb
 
