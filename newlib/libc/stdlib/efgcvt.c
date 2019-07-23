@@ -102,6 +102,9 @@ Supporting OS subroutines required: <<close>>, <<fstat>>, <<isatty>>,
 #include <stdlib.h>
 #include "local.h"
 
+char *	ecvtbuf (double, int, int*, int*, char *);
+char *	fcvtbuf (double, int, int*, int*, char *);
+
 char *
 fcvt (double d,
 	int ndigit,
@@ -118,6 +121,21 @@ fcvtf (float d,
 	int *sign)
 {
   return fcvt ((float) d, ndigit, decpt, sign);
+}
+
+
+char *
+gcvt (double d,
+	int ndigit,
+	char *buf)
+{
+  char *tbuf = buf;
+  if (d < 0) {
+    *buf = '-';
+    buf++;
+    ndigit--;
+  }
+  return (_gcvt (_REENT, d, ndigit, buf, 'g', 0) ? tbuf : 0);
 }
 
 
@@ -147,19 +165,4 @@ ecvtf (float d,
 	int *sign)
 {
   return ecvt ((double) d, ndigit, decpt, sign);
-}
-
-
-char *
-gcvt (double d,
-	int ndigit,
-	char *buf)
-{
-  char *tbuf = buf;
-  if (d < 0) {
-    *buf = '-';
-    buf++;
-    ndigit--;
-  }
-  return (_gcvt (_REENT, d, ndigit, buf, 'g', 0) ? tbuf : 0);
 }
