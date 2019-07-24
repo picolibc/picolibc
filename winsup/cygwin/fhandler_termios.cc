@@ -69,6 +69,11 @@ fhandler_termios::tcsetpgrp (const pid_t pgid)
       set_errno (EPERM);
       return -1;
     }
+  else if (pgid < 0)
+    {
+      set_errno (EINVAL);
+      return -1;
+    }
   int res;
   while (1)
     {
