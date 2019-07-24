@@ -394,6 +394,16 @@ cygwin_stackdump SIGFE
 cygwin_umount SIGFE
 cygwin_winpid_to_pid SIGFE
 daemon SIGFE
+dbm_clearerr SIGFE
+dbm_close SIGFE
+dbm_delete SIGFE
+dbm_dirfno SIGFE
+dbm_error SIGFE
+dbm_fetch SIGFE
+dbm_firstkey SIGFE
+dbm_nextkey SIGFE
+dbm_open SIGFE
+dbm_store SIGFE
 difftime NOSIGFE
 dirfd SIGFE
 dirname NOSIGFE

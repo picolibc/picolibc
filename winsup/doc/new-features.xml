@@ -35,6 +35,16 @@ sched_getaffinity, sched_setaffinity, pthread_getaffinity_np,
 pthread_setaffinity_np.
 </para></listitem>
 
+<listitem><para>
+New APIs: sched_getaffinity, sched_setaffinity, pthread_getaffinity_np,
+pthread_setaffinity_np.
+</para></listitem>
+
+<listitem><para>
+New APIs: dbm_clearerr, dbm_close, dbm_delete, dbm_dirfno, dbm_error,
+dbm_fetch, dbm_firstkey, dbm_nextkey, dbm_open, dbm_store.
+</para></listitem>
+
 </itemizedlist>
 
 </sect2>

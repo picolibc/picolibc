@@ -511,12 +511,14 @@ details. */
   338: Export secure_getenv.
   339: Export sched_getaffinity, sched_setaffinity, pthread_getaffinity_np,
        pthread_setaffinity_np, __sched_getaffinity_sys.
+  340: Export dbm_clearerr, dbm_close, dbm_delete, dbm_dirfno, dbm_error,
+       dbm_fetch, dbm_firstkey, dbm_nextkey, dbm_open, dbm_store.
 
   Note that we forgot to bump the api for ualarm, strtoll, strtoull,
   sigaltstack, sethostname. */
 
 #define CYGWIN_VERSION_API_MAJOR 0
-#define CYGWIN_VERSION_API_MINOR 339
+#define CYGWIN_VERSION_API_MINOR 340
 
 /* There is also a compatibity version number associated with the shared memory
    regions.  It is incremented when incompatible changes are made to the shared
