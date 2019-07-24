@@ -652,7 +652,7 @@ void
 child_info_spawn::handle_spawn ()
 {
   extern void fixup_lockf_after_exec (bool);
-  HANDLE h;
+  HANDLE h = INVALID_HANDLE_VALUE;
   if (!dynamically_loaded || get_parent_handle ())
       {
 	cygheap_fixup_in_child (true);

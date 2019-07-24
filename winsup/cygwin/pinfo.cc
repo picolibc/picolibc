@@ -62,11 +62,10 @@ pinfo::thisproc (HANDLE h)
     {
       cygheap->pid = create_cygwin_pid ();
       flags |= PID_NEW;
+      h = INVALID_HANDLE_VALUE;
     }
   /* spawnve'd process got pid in parent, cygheap->pid has been set in
      child_info_spawn::handle_spawn. */
-  else if (h == INVALID_HANDLE_VALUE)
-    h = NULL;
 
   init (cygheap->pid, flags, h);
   procinfo->process_state |= PID_IN_USE;
