@@ -121,9 +121,13 @@ __FLT_ABI(pow) (__FLT_TYPE x, __FLT_TYPE y)
     return __FLT_CST(1.0);
   else if (x_class == FP_NAN || y_class == FP_NAN)
     {
-      rslt = (signbit(x) ? -__FLT_NAN : __FLT_NAN);
-      errno = EDOM;
-      return rslt;
+      if (x_class == FP_NAN) {
+        errno = EDOM;
+        return x;
+      } else {
+        errno = EDOM;
+        return y;
+      }
     }
   else if (x_class == FP_ZERO)
     {

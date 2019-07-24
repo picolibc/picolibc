@@ -243,6 +243,9 @@ long double erfcl(long double a)
 	if (isinf (a))
 		return (signbit(a) ? 2.0 : 0.0);
 
+	if (isnan (a))
+		return (a);
+
 	x = fabsl (a);
 
 	if (x < 1.0L)

@@ -50,7 +50,12 @@ __FLT_TYPE
 __FLT_ABI(acosh) (__FLT_TYPE x)
 {
   int x_class = fpclassify (x);
-  if (x_class == FP_NAN || x < __FLT_CST(1.0))
+  if (x_class == FP_NAN)
+    {
+      errno = EDOM;
+      return x;
+    }
+  else if (x < __FLT_CST(1.0))
     {
       errno = EDOM;
       return __FLT_NAN;

@@ -216,7 +216,7 @@ long double __lgammal_r(long double x, int* sgngaml)
 	*sgngaml = 1;
 #ifdef NANS
 	if (isnanl(x))
-		return(NANL);
+		return x;
 #endif
 #ifdef INFINITIES
 	if (!isfinitel(x))
