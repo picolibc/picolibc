@@ -52,28 +52,25 @@ __msp430_resetvec_hook:
 
 START_CRT_FUNC 0000 start
 	.refsym	__msp430_resetvec_hook
-#ifdef MINRT
-	.refsym	__crt0_call_just_main
-#else
-	.refsym	__crt0_call_init_then_main
-#endif
+	.refsym	__crt0_call_main
 	mov_	#__stack, R1
 
 END_CRT_FUNC	start
 #endif
 
-;; Some of the CRT functions below will only be present in the final linked
-;; executable if the assembler decides they are needed.  It will only define
-;; the symbol necessary to prevent them being garbage collected by the linker
-;; if the file being assembled has a specific section.
-;; The CRT functions this applies to are:
-;; init_bss, movedata, move_highdata, init_highbss, run_init_array,
-;; run_preinit_array, run_fini_array and run_array.
+;; The CRT functions below will only be present in the final linked
+;; executable if the assembler decides they are needed.  The assembler will
+;; only define the symbol necessary to prevent them being garbage collected
+;; by the linker if the file being assembled has a specific section,
+;; or some other criteria is met.
+;; The exception to this is __crt0_call_exit. GCC will include this function
+;; if it detects that main() has an epilogue. For example, if main() has a
+;; while(1) loop at the end, GCC will not generate an epilogue (since it won't
+;; return) and __crt0_call_exit won't be included.
 
 #if Lbss
-;; Note - this section is only included in the startup code of the
-;; application if it is needed.  It is responsible for initializing
-;; the contents of the .bss section.
+;; This function is responsible for initializing the contents of the
+;; .bss section.
 
 START_CRT_FUNC 0100 init_bss
 
@@ -91,9 +88,8 @@ END_CRT_FUNC	init_bss
 
 #ifdef __MSP430X_LARGE__
 #if Lhigh_bss
-;; Note - this section is only included in the startup code of the
-;; application if it is needed.  It is responsible for initializing
-;; the contents of the .upper.bss section.
+;; This function is responsible for initializing the contents of the
+;; .upper.bss section.
 
 START_CRT_FUNC 0200 init_highbss
 	
@@ -112,8 +108,7 @@ END_CRT_FUNC	init_highbss
 
 
 #if Lmovedata
-;; Note - this section is only included in the startup code of the
-;; application if it is needed.  It is responsible for copying the
+;; This function is responsible for copying the
 ;; contents of the .data section from its load address (in ROM) to
 ;; its run-time address (in RAM).
 
@@ -136,8 +131,7 @@ END_CRT_FUNC	movedata
 
 #ifdef __MSP430X_LARGE__
 #if Lmove_highdata
-;; Note - this section is only included in the startup code of the application
-;; if it is needed.  It is responsible either for making sure that the
+;; This function is responsible for making sure that the
 ;; contents of the .upper.data section have their correct startup values.
 ;; If a copy of the .upper.data section is stored in ROM then this means
 ;; copying the contents into HIFRAM.  If a copy of .upper.data is stored in a
@@ -175,44 +169,62 @@ END_CRT_FUNC	move_highdata
 #endif /* Lmove_highdata */
 #endif /* __MSP430X_LARGE__ */
 
+#if Lrun_preinit_array
+;; This function is responsible for setting up the arguments
+;; required for __crt0_run_array, to run the functions in .preinit_array.
+START_CRT_FUNC 0500 run_preinit_array
 
-#if Lmain_minrt
-;; Note - this section is only included in the startup code of the
-;; application if it is needed.  It is responsible for just calling
-;; main.  No initialization code is called first, and main is not
-;; expected to return.
+	mov_	#__preinit_array_start, R4
+	mov_	#__preinit_array_end, R5
+	mov_	#PTRsz, R6
+	call_	#__crt0_run_array
 
-START_CRT_FUNC 0600 call_just_main
+END_CRT_FUNC	run_preinit_array
+#endif /* Lrun_preinit_array */
 
-	clr.w	R12		; Set argc == 0
-	call_	#main
-END_CRT_FUNC	call_just_main
-#endif /* Lmain_minrt */
+#if Lrun_init_array
+;; This function is responsible for setting up the arguments
+;; required for __crt0_run_array, to run the functions in .init_array.
+START_CRT_FUNC 0600 run_init_array
 
+	mov_	#__init_array_start, R4
+	mov_	#__init_array_end, R5
+	mov_	#PTRsz, R6
+	call_	#__crt0_run_array
+
+END_CRT_FUNC	run_init_array
+#endif /* Lrun_init_array */
+
+;; FIXME: There are currently no program termination routines executed for
+;; msp430.
+#if 0
+#if Lrun_fini_array
+;; Ensure global C++ destructors in .fini_array are called on exit
+;; by registering __crt0_run_fini_array with atexit.
+START_CRT_FUNC 0700 register_fini_array
+
+	mov_	#__crt0_run_fini_array, R12
+	call_	#atexit
+
+END_CRT_FUNC	register_fini_array
+#endif /* Lrun_fini_array */
+#endif /* 0 */
 
 #if Lmain
-;; Note - this section is only included in the startup code of the
-;; application if it is needed.  It is responsible for calling the
-;; initialization code - constructors, etc - and then main.  If main
-;; returns then the following section should be present to catch it.
+;; This function is always included and calls main().
 
-START_CRT_FUNC 0700 call_init_then_main
-
-	call_	#__msp430_init
+START_CRT_FUNC 0800 call_main
 
 	clr.w	R12		; Set argc == 0
 	call_	#main
 
-END_CRT_FUNC	call_init_then_main
+END_CRT_FUNC	call_main
 #endif /* Lmain */
 
-
 #if Lcallexit
-;; Note - this section is only included in the startup code of the
-;; application if it is needed.  It is responsible for calling exit
-;; once main has finished.
+;; This function is responsible for calling exit once main has finished.
 
-START_CRT_FUNC 0800 call_exit
+START_CRT_FUNC 0900 call_exit
 
 	call_	#_exit
 
@@ -221,46 +233,15 @@ END_CRT_FUNC	call_exit
 
 ;----------------------------------------
 
-#ifndef MINRT
-
-#if Lrun_preinit_array
-;; Note - this section is only included in the startup code of the application
-;; if it is needed.  It is responsible for setting up the arguments
-;; required for __crt0_run_array, to run the functions in .preinit_array.
-START_CRT_FUNC 0910 run_preinit_array
-
-	mov_	#__preinit_array_start, R4
-	mov_	#__preinit_array_end, R5
-	mov_	#PTRsz, R6
-	br_	#__crt0_run_array
-
-END_CRT_FUNC	run_preinit_array
-#endif /* Lrun_preinit_array */
-
-#if Lrun_init_array
-;; Note - this section is only included in the startup code of the application
-;; if it is needed.  It is responsible for setting up the arguments
-;; required for __crt0_run_array, to run the functions in .init_array.
-START_CRT_FUNC 0920 run_init_array
-
-	mov_	#__init_array_start, R4
-	mov_	#__init_array_end, R5
-	mov_	#PTRsz, R6
-	br_	#__crt0_run_array
-
-END_CRT_FUNC	run_init_array
-#endif /* Lrun_init_array */
-
 #if Lrun_fini_array
-;; Note - this section is only included in the startup code of the application
-;; if it is needed.  It is responsible for setting up the arguments
+;; This function is responsible for setting up the arguments
 ;; required for __crt0_run_array, to run the functions in .fini_array.
-START_CRT_FUNC 0930 run_fini_array
+START_CRT_FUNC 1000 run_fini_array
 
 	mov_	#__fini_array_start, R4
 	mov_	#__fini_array_end, R5
 	mov_	#-PTRsz, R6
-	br_	#__crt0_run_array
+	call_	#__crt0_run_array
 
 END_CRT_FUNC	run_fini_array
 #endif /* Lrun_fini_array */
@@ -268,7 +249,7 @@ END_CRT_FUNC	run_fini_array
 #if Lrun_array
 ;; Note - this section is only included in the startup code of the application
 ;; if it is needed by one of the above run_*_array functions.
-START_CRT_FUNC 0980 run_array
+START_CRT_FUNC 1100 run_array
 
 	cmp_	R4, R5
 	jeq	_msp430_run_done
@@ -282,27 +263,3 @@ END_CRT_FUNC	run_array
 _msp430_run_done:
 	ret_
 #endif /* Lrun_array */
-
-;----------------------------------------
-#if L0
-
-	.section	.init,"ax"
-
-	.global __msp430_init
-__msp430_init:
-
-	.section	.fini,"ax"
-
-	.global __msp430_fini
-__msp430_fini:
-	call_	#__crt0_run_fini_array
-	
-;; If this function is not defined externally, we don't need it to do
-;; anything.
-	.text
-	.weak __crt0_run_fini_array
-__crt0_run_fini_array:
-	ret_
-
-#endif
-#endif /* not MINRT */

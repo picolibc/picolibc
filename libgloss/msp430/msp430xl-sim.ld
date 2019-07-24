@@ -387,8 +387,6 @@ SECTIONS
     PROVIDE (_etext = .);
     PROVIDE (etext = .);
     . = ALIGN(2);
-    KEEP (*(.init))
-    KEEP (*(.fini))
     KEEP (*(.tm_clone_table))
   } > ROM
 

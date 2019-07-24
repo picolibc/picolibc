@@ -61,7 +61,7 @@ SCRIPTS  = $(srcdir)/msp430-sim.ld
 SCRIPTS += $(srcdir)/msp430xl-sim.ld
 SCRIPTS += $(srcdir)/intr_vectors.ld
 
-CRT = gcrt0.o crt0.o crt0-minrt.o crtn.o crtn-minrt.o
+CRT = gcrt0.o crt0.o
 SIM_BSP = libsim.a
 LIB_NOSYS = libnosys.a
 LIB_CRT = libcrt.a
@@ -85,7 +85,6 @@ CRT_OBJS = \
 	crt_movedata.o \
 	crt_move_highdata.o \
 	crt_main.o \
-	crt_main_minrt.o \
 	crt_callexit.o \
 	crt_run_init_array.o \
 	crt_run_preinit_array.o \
@@ -101,12 +100,6 @@ all: $(CRT) $(SIM_BSP) $(LIB_NOSYS) $(LIB_CRT) copy_scripts_to_objdir
 
 crt_%.o : crt0.S
 	$(CC) -DL$* -Wa,-gdwarf2 -Wa,-I$(srcdir) $(CFLAGS_FOR_TARGET) $(INCLUDES) $(CFLAGS) -c $< -o $@
-
-crt0-minrt.o : crt0.S
-	$(CC) -DL0 -DMINRT -Wa,-gdwarf2 -Wa,-I$(srcdir) $(CFLAGS_FOR_TARGET) $(INCLUDES) $(CFLAGS) -c $< -o $@
-
-crtn-minrt.o : crtn.S
-	$(CC) -DL0 -DMINRT -Wa,-gdwarf2 -Wa,-I$(srcdir) $(CFLAGS_FOR_TARGET) $(INCLUDES) $(CFLAGS) -c $< -o $@
 
 # Override .S.o rule to pass assembler debugging flags
 .S.o:
