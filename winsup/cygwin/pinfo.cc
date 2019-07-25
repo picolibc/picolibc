@@ -554,7 +554,11 @@ _pinfo::set_ctty (fhandler_termios *fh, int flags)
       syscall_printf ("attaching %s sid %d, pid %d, pgid %d, tty->pgid %d, tty->sid %d",
 		      __ctty (), sid, pid, pgid, tc.getpgid (), tc.getsid ());
       if (!cygwin_finished_initializing && !myself->cygstarted
-	  && pgid == pid && tc.getpgid () && tc.getsid ())
+	  && pgid == pid && tc.getpgid () && tc.getsid ()
+	  /* Even GDB starts app via CreateProcess which changes cygstarted.
+	     This results in setting the wrong pgid here, so just skip this
+	     under debugger. */
+	  && !being_debugged ())
 	pgid = tc.getpgid ();
 
       /* May actually need to do this:
