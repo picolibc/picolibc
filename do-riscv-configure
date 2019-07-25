@@ -1,5 +1,5 @@
 #!/bin/sh
-ARCH=riscv32-unknown-elf
+ARCH=riscv64-unknown-elf
 DIR=`dirname $0`
 meson $DIR \
 	-Dtarget-optspace=true \
