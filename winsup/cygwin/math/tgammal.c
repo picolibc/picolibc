@@ -285,6 +285,9 @@ long double __tgammal_r(long double x, int* sgngaml)
 		return (x);
 #endif
 #endif
+	if (x == 0.0L)
+		return copysignl(HUGE_VALL, x);
+
 	q = fabsl(x);
 
 	if (q > 13.0L)
@@ -299,8 +302,8 @@ long double __tgammal_r(long double x, int* sgngaml)
 gsing:
 				_SET_ERRNO(EDOM);
 				mtherr("tgammal", SING);
-#ifdef INFINITIES
-				return (INFINITYL);
+#ifdef NANS
+				return (NAN);
 #else
 				return (*sgngaml * MAXNUML);
 #endif
