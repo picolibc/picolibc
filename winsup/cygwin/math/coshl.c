@@ -21,7 +21,7 @@ long double coshl(long double x)
   else if (x_class == FP_INFINITE)
     {
        errno = ERANGE;
-       return x;
+       return INFINITY;
     }
   x = fabsl (x);
   if (x > (MAXLOGL + LOGE2L))
