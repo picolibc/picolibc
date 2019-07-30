@@ -137,6 +137,7 @@ SECTIONS
     . = __stack ;
   }
 
+  . = ALIGN(4);
    end = .;
    _end = .;
 
