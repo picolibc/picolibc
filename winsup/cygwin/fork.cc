@@ -424,6 +424,14 @@ frok::parent (volatile char * volatile stack_here)
 #endif
       goto cleanup;
     }
+  if (!child.reattach ())
+    {
+      this_errno = EAGAIN;
+#ifdef DEBUGGING0
+      error ("child reattach failed");
+#endif
+      goto cleanup;
+    }
 
   /* CHILD IS STOPPED */
   debug_printf ("child is alive (but stopped)");
