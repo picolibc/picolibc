@@ -393,13 +393,14 @@ __change_mode:
 	movs	r1, r0
 #else
 	movs	r0, #AngelSWI_Reason_GetCmdLine
-	adr	r1, .LC30	/* Space for command line.  */
+	ldr	r1, .LC30	/* Space for command line.  */
 #ifdef THUMB_VXM
 	bkpt	AngelSWI
 #else
  	AngelSWIAsm	AngelSWI
 #endif
 	ldr	r1, .LC30
+	ldr	r1, [r1]
 #endif
 	/*  Parse string at r1.  */
 	movs	r0, #0		/* Count of arguments so far.  */
@@ -586,8 +587,7 @@ change_back:
 #endif
 #ifdef ARM_RDI_MONITOR
 .LC30:
-	.word	CommandLine
-	.word	255
+	.word	AngelSWIArgs
 .LC31:
 	.word	__end__
 
@@ -600,6 +600,9 @@ HeapLimit:	.word	0
 __stack_base__:	.word	0
 StackLimit:	.word	0
 CommandLine:	.space	256,0	/*  Maximum length of 255 chars handled.  */
+AngelSWIArgs:
+	.word	CommandLine
+	.word	255
 #endif
 	
 #ifdef __pe__
