@@ -440,7 +440,7 @@ __change_mode:
 	beq	.LC10
 
 /* See whether we are scanning a string.  */
-	cmp	r3, #'"'
+	cmp	r3, #'\"'
 #ifdef __thumb__
 	beq	.LC20
 	cmp	r3, #'\''

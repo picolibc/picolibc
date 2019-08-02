@@ -85,6 +85,6 @@
 #define CPSR_F_MASK			0x40	/* FIQ bit.  */
 #define CPSR_I_MASK			0x80	/* IRQ bit.  */
 
-#define CPSR_M_MASK			0x0F	/* Mode mask except M[4] */
+#define CPSR_M_MASK			0x0F	/* Mode mask except M[4].  */
 
 #endif /* _LIBGLOSS_ARM_H */

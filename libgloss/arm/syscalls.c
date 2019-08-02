@@ -18,30 +18,30 @@
 #include "swi.h"
 
 /* Forward prototypes.  */
-int     _system     (const char *);
-int     _rename     (const char *, const char *);
-int     _isatty		(int);
+int	_system		(const char *);
+int	_rename		(const char *, const char *);
+int	_isatty		(int);
 clock_t _times		(struct tms *);
-int     _gettimeofday	(struct timeval *, void *);
-int     _unlink		(const char *);
-int     _link 		(const char *, const char *);
-int     _stat 		(const char *, struct stat *);
-int     _fstat 		(int, struct stat *);
+int	_gettimeofday	(struct timeval *, void *);
+int	_unlink		(const char *);
+int	_link		(const char *, const char *);
+int	_stat		(const char *, struct stat *);
+int	_fstat		(int, struct stat *);
 int	_swistat	(int fd, struct stat * st);
-void *  _sbrk		(ptrdiff_t);
-pid_t   _getpid	        (void);
-int     _close		(int);
-clock_t _clock		(void);
-int     _swiclose	(int);
-int     _open		(const char *, int, ...);
-int     _swiopen	(const char *, int);
-int     _write 		(int, const void *, size_t);
-int     _swiwrite	(int, const void *, size_t);
-_off_t  _lseek		(int, _off_t, int);
-_off_t  _swilseek	(int, _off_t, int);
-int     _read		(int, void *, size_t);
-int     _swiread	(int, void *, size_t);
-void    initialise_monitor_handles (void);
+void *	_sbrk		(ptrdiff_t);
+pid_t	_getpid		(void);
+int	_close		(int);
+clock_t	_clock		(void);
+int	_swiclose	(int);
+int	_open		(const char *, int, ...);
+int	_swiopen	(const char *, int);
+int	_write		(int, const void *, size_t);
+int	_swiwrite	(int, const void *, size_t);
+_off_t	_lseek		(int, _off_t, int);
+_off_t	_swilseek	(int, _off_t, int);
+int	_read		(int, void *, size_t);
+int	_swiread	(int, void *, size_t);
+void	initialise_monitor_handles (void);
 
 static int	checkerror	(int);
 static int	error		(int);
@@ -143,7 +143,7 @@ initialise_monitor_handles (void)
   int i;
   
   /* Open the standard file descriptors by opening the special
-   * teletype device, ":tt", read-only to obtain a descritpor for
+   * teletype device, ":tt", read-only to obtain a descriptor for
    * standard input and write-only to obtain a descriptor for standard
    * output. Finally, open ":tt" in append mode to obtain a descriptor
    * for standard error. Since this is a write mode, most kernels will
@@ -154,7 +154,7 @@ initialise_monitor_handles (void)
 
 #ifdef ARM_RDI_MONITOR
   int volatile block[3];
-  
+
   block[0] = (int) ":tt";
   block[2] = 3;     /* length of filename */
   block[1] = 0;     /* mode "r" */
@@ -351,17 +351,15 @@ checkerror (int result)
    len, is the length in bytes to read. 
    Returns the number of bytes *not* written. */
 int
-_swiread (int fh,
-	  void * ptr,
-	  size_t len)
+_swiread (int fh, void * ptr, size_t len)
 {
 #ifdef ARM_RDI_MONITOR
   int block[3];
-  
+
   block[0] = fh;
   block[1] = (int) ptr;
   block[2] = (int) len;
-  
+
   return checkerror (do_AngelSWI (AngelSWI_Reason_Read, block));
 #else
   register int r0 asm("r0");
@@ -381,9 +379,7 @@ _swiread (int fh,
    Translates the return of _swiread into
    bytes read. */
 int __attribute__((weak))
-_read (int fd,
-       void * ptr,
-       size_t len)
+_read (int fd, void * ptr, size_t len)
 {
   int res;
   struct fdent *pfd;
@@ -409,9 +405,7 @@ _read (int fd,
 
 /* fd, is a user file descriptor. */
 off_t
-_swilseek (int fd,
-	off_t ptr,
-	int dir)
+_swilseek (int fd, off_t ptr, int dir)
 {
   off_t res;
   struct fdent *pfd;
@@ -447,7 +441,7 @@ _swilseek (int fd,
         }
       dir = SEEK_SET;
     }
- 
+
 #ifdef ARM_RDI_MONITOR
   int block[2];
   if (dir == SEEK_END)
@@ -458,7 +452,7 @@ _swilseek (int fd,
         return -1;
       ptr += res;
     }
-  
+
   /* This code only does absolute seeks.  */
   block[0] = pfd->handle;
   block[1] = (int) ptr;
@@ -494,9 +488,7 @@ _swilseek (int fd,
 }
 
 off_t
-_lseek (int fd,
-	off_t ptr,
-	int dir)
+_lseek (int fd, off_t ptr, int dir)
 {
   return _swilseek (fd, ptr, dir);
 }
@@ -504,18 +496,15 @@ _lseek (int fd,
 /* fh, is a valid internal file handle.
    Returns the number of bytes *not* written. */
 int
-_swiwrite (
-	   int    fh,
-	   const void * ptr,
-	   size_t    len)
+_swiwrite (int fh, const void * ptr, size_t len)
 {
 #ifdef ARM_RDI_MONITOR
   int block[3];
-  
+
   block[0] = fh;
   block[1] = (int) ptr;
   block[2] = (int) len;
-  
+
   return checkerror (do_AngelSWI (AngelSWI_Reason_Write, block));
 #else
   register int r0 asm("r0");
@@ -533,9 +522,7 @@ _swiwrite (
 
 /* fd, is a user file descriptor. */
 int __attribute__((weak))
-_write (int    fd,
-	const void * ptr,
-	size_t    len)
+_write (int fd, const void * ptr, size_t len)
 {
   int res;
   struct fdent *pfd;
@@ -593,7 +580,7 @@ _swiopen (const char * path, int flags)
         }
     }
 
-  /* The flags are Unix-style, so we need to convert them. */ 
+  /* The flags are Unix-style, so we need to convert them.  */
 #ifdef O_BINARY
   if (flags & O_BINARY)
     aflags |= 1;
@@ -611,25 +598,24 @@ _swiopen (const char * path, int flags)
 
   if (flags & O_APPEND)
     {
-      /* Can't ask for w AND a; means just 'a'.  */
-      aflags &= ~4;
+      aflags &= ~4; /* Can't ask for w AND a; means just 'a'.  */
       aflags |= 8;
     }
-  
+
 #ifdef ARM_RDI_MONITOR
   block[0] = (int) path;
   block[2] = strlen (path);
   block[1] = aflags;
-  
+
   fh = do_AngelSWI (AngelSWI_Reason_Open, block);
-  
+
 #else
   asm ("mov r0,%2; mov r1, %3; swi %a1; mov %0, r0"
        : "=r"(fh)
        : "i" (SWI_Open),"r"(path),"r"(aflags)
        : "r0","r1");
 #endif
-  
+
   /* Return a user file descriptor or an error. */
   if (fh >= 0)
     {
@@ -784,13 +770,13 @@ _stat (const char *fname, struct stat *st)
 {
   int fd, res;
   memset (st, 0, sizeof (* st));
-  /* The best we can do is try to open the file readonly.  
-     If it exists, then we can guess a few things about it. */
+  /* The best we can do is try to open the file readonly.  If it exists,
+     then we can guess a few things about it.  */
   if ((fd = _open (fname, O_RDONLY)) == -1)
     return -1;
   st->st_mode |= S_IFREG | S_IREAD;
   res = _swistat (fd, st);
-  /* Not interested in the error. */
+  /* Not interested in the error.  */
   _close (fd); 
   return res;
 }
@@ -880,7 +866,7 @@ _times (struct tms * tp)
       tp->tms_cutime = 0;	/* user time, children */
       tp->tms_cstime = 0;	/* system time, children */
     }
-  
+
   return timeval;
 };
 
