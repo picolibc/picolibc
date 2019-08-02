@@ -707,15 +707,15 @@ uint __heap_limit = 0xcafedead;
 void * __attribute__((weak))
 _sbrk (ptrdiff_t incr)
 {
-  extern char end asm ("end"); /* Defined by the linker.  */
+  extern char   end asm ("end"); /* Defined by the linker.  */
   static char * heap_end;
-  char * prev_heap_end;
+  char *        prev_heap_end;
 
   if (heap_end == NULL)
     heap_end = & end;
-  
+
   prev_heap_end = heap_end;
-  
+
   if ((heap_end + incr > stack_ptr)
       /* Honour heap limit if it's valid.  */
       || (__heap_limit != 0xcafedead && heap_end + incr > (char *)__heap_limit))
@@ -726,14 +726,14 @@ _sbrk (ptrdiff_t incr)
       extern void abort (void);
 
       _write (1, "_sbrk: Heap and stack collision\n", 32);
-      
+
       abort ();
 #else
       errno = ENOMEM;
       return (void *) -1;
 #endif
     }
-  
+
   heap_end += incr;
 
   return (void *) prev_heap_end;

@@ -487,10 +487,13 @@ _getpid (void)
   return (pid_t)1;
 }
 
+/* Heap limit returned from SYS_HEAPINFO Angel semihost call.  */
+uint __heap_limit = 0xcafedead;
+
 void * __attribute__((weak))
 _sbrk (ptrdiff_t incr)
 {
-  extern char   end asm ("end");	/* Defined by the linker.  */
+  extern char   end asm ("end"); /* Defined by the linker.  */
   static char * heap_end;
   char *        prev_heap_end;
 
@@ -499,7 +502,9 @@ _sbrk (ptrdiff_t incr)
 
   prev_heap_end = heap_end;
 
-  if (heap_end + incr > stack_ptr)
+  if ((heap_end + incr > stack_ptr)
+      /* Honour heap limit if it's valid.  */
+      || (__heap_limit != 0xcafedead && heap_end + incr > (char *)__heap_limit))
     {
       /* Some of the libstdc++-v3 tests rely upon detecting
 	 out of memory errors, so do not abort here.  */

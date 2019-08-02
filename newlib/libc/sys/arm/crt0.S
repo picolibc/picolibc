@@ -282,6 +282,13 @@
 #endif
 	ldr	r0, .LC0	/*  Point at values read.  */
 
+	/* Set __heap_limit.  */
+	ldr     r1, [r0, #4]
+	cmp     r1, #0
+	beq     .LC33
+	ldr     r2, =__heap_limit
+	str     r1, [r2]
+.LC33:
 	ldr     r1, [r0, #0]
 	cmp     r1, #0
 	bne     .LC32
