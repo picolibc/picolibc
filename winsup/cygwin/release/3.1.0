@@ -6,7 +6,7 @@ What's new:
   which uses the nearest color from 16 system colors.
 
 - New APIs: sched_getaffinity, sched_setaffinity, pthread_getaffinity_np,
-  pthread_setaffinity_np.
+  pthread_setaffinity_np, plus CPU_SET macros.
 
 - New APIs: dbm_clearerr, dbm_close, dbm_delete, dbm_dirfno, dbm_error,
   dbm_fetch, dbm_firstkey, dbm_nextkey, dbm_open, dbm_store.
