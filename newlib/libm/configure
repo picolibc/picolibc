@@ -11868,7 +11868,7 @@ fi
 
 
 
-ac_config_files="$ac_config_files Makefile math/Makefile mathfp/Makefile common/Makefile complex/Makefile"
+ac_config_files="$ac_config_files Makefile math/Makefile mathfp/Makefile common/Makefile complex/Makefile fenv/Makefile"
 
 cat >confcache <<\_ACEOF
 # This file is a shell script that caches the results of configure
@@ -12930,6 +12930,7 @@ do
     "mathfp/Makefile") CONFIG_FILES="$CONFIG_FILES mathfp/Makefile" ;;
     "common/Makefile") CONFIG_FILES="$CONFIG_FILES common/Makefile" ;;
     "complex/Makefile") CONFIG_FILES="$CONFIG_FILES complex/Makefile" ;;
+    "fenv/Makefile") CONFIG_FILES="$CONFIG_FILES fenv/Makefile" ;;
 
   *) as_fn_error $? "invalid argument: \`$ac_config_target'" "$LINENO" 5;;
   esac
