@@ -1076,7 +1076,7 @@ format_process_stat (void *data, char *&destbuf)
   unsigned long fault_count = 0UL,
 		vmsize = 0UL, vmrss = 0UL, vmmaxrss = 0UL;
   uint64_t utime = 0ULL, stime = 0ULL, start_time = 0ULL;
-  int priority = 0;
+
   if (p->process_state & PID_EXITED)
     strcpy (cmd, "<defunct>");
   else
@@ -1105,7 +1105,6 @@ format_process_stat (void *data, char *&destbuf)
   HANDLE hProcess;
   VM_COUNTERS vmc = { 0 };
   KERNEL_USER_TIMES put = { 0 };
-  PROCESS_BASIC_INFORMATION pbi = { 0 };
   QUOTA_LIMITS ql = { 0 };
   SYSTEM_TIMEOFDAY_INFORMATION stodi = { 0 };
 
@@ -1134,11 +1133,6 @@ format_process_stat (void *data, char *&destbuf)
       if (!NT_SUCCESS (status))
 	debug_printf ("NtQueryInformationProcess(ProcessTimes): status %y",
 		      status);
-      status = NtQueryInformationProcess (hProcess, ProcessBasicInformation,
-					  (PVOID) &pbi, sizeof pbi, NULL);
-      if (!NT_SUCCESS (status))
-	debug_printf ("NtQueryInformationProcess(ProcessBasicInformation): "
-		      "status %y", status);
       status = NtQueryInformationProcess (hProcess, ProcessQuotaLimits,
 					  (PVOID) &ql, sizeof ql, NULL);
       if (!NT_SUCCESS (status))
@@ -1159,17 +1153,11 @@ format_process_stat (void *data, char *&destbuf)
 		 * CLOCKS_PER_SEC / NS100PERSEC;
   else
     start_time = (p->start_time - to_time_t (&stodi.BootTime)) * CLOCKS_PER_SEC;
-  /* The BasePriority returned to a 32 bit process under WOW64 is
-     apparently broken, for 32 and 64 bit target processes.  64 bit
-     processes get the correct base priority, even for 32 bit processes. */
-  if (wincap.is_wow64 ())
-    priority = 8; /* Default value. */
-  else
-    priority = pbi.BasePriority;
   unsigned page_size = wincap.page_size ();
   vmsize = vmc.PagefileUsage;
   vmrss = vmc.WorkingSetSize / page_size;
   vmmaxrss = ql.MaximumWorkingSetSize / page_size;
+  int nice = winprio_to_nice(GetPriorityClass(hProcess));
 
   destbuf = (char *) crealloc_abort (destbuf, strlen (cmd) + 320);
   return __small_sprintf (destbuf, "%d (%s) %c "
@@ -1181,7 +1169,7 @@ format_process_stat (void *data, char *&destbuf)
 			  p->pid, cmd, state,
 			  p->ppid, p->pgid, p->sid, p->ctty, -1,
 			  0, fault_count, fault_count, 0, 0, utime, stime,
-			  utime, stime, priority, 0, 0, 0,
+                         utime, stime, NZERO + nice, nice, 0, 0,
 			  start_time, vmsize,
 			  vmrss, vmmaxrss
 			  );
