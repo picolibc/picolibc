@@ -1,4 +1,4 @@
-project('newlib-nano', 'c',
+project('picolibc', 'c',
 	default_options: [
 		'buildtype=debugoptimized',
 		'c_std=gnu99',
