@@ -20,6 +20,7 @@ details. */
 #include "cygheap.h"
 #include "ntdll.h"
 #include <sys/queue.h>
+#include "mmap_alloc.h"
 
 /* __PROT_ATTACH indicates an anonymous mapping which is supposed to be
    attached to a file mapping for pages beyond the file's EOF.  The idea
@@ -797,94 +798,6 @@ mmap_worker (mmap_list *map_list, fhandler_base *fh, caddr_t base, size_t len,
     }
   return base;
 }
-
-#ifdef __x86_64__
-
-/* The memory region used for memory maps */
-#define MMAP_STORAGE_LOW	0x001000000000L	/* Leave 32 Gigs for heap. */
-/* Up to Win 8 only supporting 44 bit address space, starting with Win 8.1
-   48 bit address space. */
-#define MMAP_STORAGE_HIGH	wincap.mmap_storage_high ()
-
-/* FIXME?  Unfortunately the OS doesn't support a top down allocation with
-	   a ceiling value.  The ZeroBits mechanism only works for
-	   NtMapViewOfSection and it only evaluates the high bit of ZeroBits
-	   on 64 bit, so it's pretty much useless for our purposes.
-
-	   If the below simple mechanism to perform top-down allocations
-	   turns out to be too dumb, we need something else.  One idea is to
-	   dived the space in (3835) 4 Gig chunks and simply store the
-	   available free space per slot.  Then we can go top down from slot
-	   to slot and only try slots which are supposed to have enough space.
-	   Bookkeeping would be very simple and fast. */
-class mmap_allocator
-{
-  caddr_t mmap_current_low;
-
-public:
-  mmap_allocator () : mmap_current_low ((caddr_t) MMAP_STORAGE_HIGH) {}
-
-  PVOID alloc (PVOID in_addr, SIZE_T in_size, bool fixed)
-  {
-    MEMORY_BASIC_INFORMATION mbi;
-
-    SIZE_T size = roundup2 (in_size, wincap.allocation_granularity ());
-    /* First check for the given address. */
-    if (in_addr)
-      {
-	/* If it points to a free area, big enough to fulfill the request,
-	   return the address. */
-	if (VirtualQuery (in_addr, &mbi, sizeof mbi)
-	    && mbi.State == MEM_FREE
-	    && mbi.RegionSize >= size)
-	  return in_addr;
-	/* Otherwise, if MAP_FIXED was given, give up. */
-	if (fixed)
-	  return NULL;
-	/* Otherwise, fall through to the usual free space search mechanism. */
-      }
-    /* Start with the last allocation start address - requested size. */
-    caddr_t addr = mmap_current_low - size;
-    bool merry_go_round = false;
-    do
-      {
-	/* Did we hit the lower ceiling?  If so, restart from the upper
-	   ceiling, but note that we did it. */
-	if (addr < (caddr_t) MMAP_STORAGE_LOW)
-	  {
-	    addr = (caddr_t) MMAP_STORAGE_HIGH - size;
-	    merry_go_round = true;
-	  }
-	/* Shouldn't fail, but better test. */
-	if (!VirtualQuery ((PVOID) addr, &mbi, sizeof mbi))
-	  return NULL;
-	/* If the region is free... */
-	if (mbi.State == MEM_FREE)
-	  {
-	    /* ...and the region is big enough to fulfill the request... */
-	    if (mbi.RegionSize >= size)
-	      {
-		/* ...note the address as next start address for our simple
-		   merry-go-round and return the address. */
-		mmap_current_low = addr;
-		return (PVOID) addr;
-	      }
-	    /* Otherwise, subtract what's missing in size and try again. */
-	    addr -= size - mbi.RegionSize;
-	  }
-	/* If the region isn't free, skip to address below AllocationBase
-	   and try again. */
-	else
-	  addr = (caddr_t) mbi.AllocationBase - size;
-      }
-    /* Repeat until we had a full ride on the merry_go_round. */
-    while (!merry_go_round || addr >= mmap_current_low);
-    return NULL;
-  }
-};
-
-static mmap_allocator mmap_alloc;	/* Inherited by forked child. */
-#endif
 
 extern "C" void *
 mmap64 (void *addr, size_t len, int prot, int flags, int fd, off_t off)

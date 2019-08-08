@@ -17,6 +17,7 @@ details. */
 #include "cygtls.h"
 #include "sync.h"
 #include "ntdll.h"
+#include "mmap_alloc.h"
 
 /* __getpagesize is only available from libcygwin.a */
 #undef SHMLBA
@@ -220,8 +221,13 @@ shmat (int shmid, const void *shmaddr, int shmflg)
       return (void *) -1;
     }
   NTSTATUS status;
-  vm_object_t ptr = NULL;
   SIZE_T viewsize = ssh_entry->size;
+#ifdef __x86_64__
+  vm_object_t ptr = mmap_alloc.alloc (NULL, viewsize, false);
+#else
+  vm_object_t ptr = NULL;
+#endif
+
   ULONG access = (shmflg & SHM_RDONLY) ? PAGE_READONLY : PAGE_READWRITE;
   status = NtMapViewOfSection (ssh_entry->hdl, NtCurrentProcess (), &ptr, 0,
 			       ssh_entry->size, NULL, &viewsize, ViewShare,

@@ -341,6 +341,7 @@ DLL_OFILES:= \
 	miscfuncs.o \
 	mktemp.o \
 	mmap.o \
+	mmap_alloc.o \
 	msg.o \
 	msgcat.o \
 	mount.o \
