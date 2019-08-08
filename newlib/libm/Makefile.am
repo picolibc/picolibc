@@ -8,17 +8,17 @@ else
 MATHDIR = math
 endif
 
-SUBDIRS = $(MATHDIR) common complex machine 
+SUBDIRS = $(MATHDIR) common complex fenv machine
 
 libm_la_LDFLAGS = -Xcompiler -nostdlib
 
 if USE_LIBTOOL
-SUBLIBS = $(MATHDIR)/lib$(MATHDIR).$(aext) common/libcommon.$(aext) complex/libcomplex.$(aext)  $(LIBM_MACHINE_LIB)
+SUBLIBS = $(MATHDIR)/lib$(MATHDIR).$(aext) common/libcommon.$(aext) complex/libcomplex.$(aext) fenv/libfenv.$(aext) $(LIBM_MACHINE_LIB)
 noinst_LTLIBRARIES = libm.la
 libm_la_SOURCES =
 libm_la_LIBADD = $(SUBLIBS)
 else
-SUBLIBS = $(MATHDIR)/lib.$(aext) common/lib.$(aext) complex/lib.$(aext) $(LIBM_MACHINE_LIB)
+SUBLIBS = $(MATHDIR)/lib.$(aext) common/lib.$(aext) complex/lib.$(aext) fenv/lib.$(aext) $(LIBM_MACHINE_LIB)
 noinst_LIBRARIES = libm.a
 libm.a: $(SUBLIBS)
 	rm -f $@
@@ -39,7 +39,7 @@ info_TEXINFOS = libm.texinfo
 
 libm_TEXINFOS = targetdep.tex
 
-libm.dvi: targetdep.tex math/stmp-def complex/stmp-def
+libm.dvi: targetdep.tex math/stmp-def complex/stmp-def fenv/stmp-def
 
 stmp-targetdep: force
 	rm -f tmp.texi
@@ -57,6 +57,8 @@ targetdep.tex: stmp-targetdep ; @true
 math/stmp-def: stmp-targetdep ; @true
 
 complex/stmp-def: stmp-targetdep ; @true
+
+fenv/stmp-def: stmp-targetdep ; @true
 
 docbook-recursive: force
 	for d in $(SUBDIRS); do \
