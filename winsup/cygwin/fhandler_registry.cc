@@ -306,8 +306,6 @@ multi_wcstombs (char *dst, size_t len, const wchar_t *src, size_t nwc)
   return sum;
 }
 
-/* Returns 0 if path doesn't exist, otherwise a virtual_ftype_t value
-   specifying the exact file type. */
 virtual_ftype_t
 fhandler_registry::exists ()
 {
@@ -562,7 +560,7 @@ fhandler_registry::fstat (struct stat *buf)
 		  buf->st_uid = uid;
 		  buf->st_gid = gid;
 		  buf->st_mode &= ~(S_IWUSR | S_IWGRP | S_IWOTH);
-		  if (file_type > virt_none)
+		  if (virt_ftype_isdir (file_type))
 		    buf->st_mode |= S_IFDIR;
 		  else
 		    buf->st_mode &= NO_X;

@@ -216,9 +216,7 @@ proc_subproc (DWORD what, uintptr_t val)
 	  vchild->process_state |= PID_INITIALIZING;
 	  vchild->ppid = what == PROC_DETACHED_CHILD ? 1 : myself->pid;	/* always set last */
 	}
-      if (what == PROC_DETACHED_CHILD)
-	break;
-      /* fall through intentionally */
+      break;
 
     case PROC_REATTACH_CHILD:
       procs[nprocs] = vchild;
@@ -873,7 +871,8 @@ void
 child_info_spawn::wait_for_myself ()
 {
   postfork (myself);
-  myself.remember (false);
+  if (myself.remember (false))
+    myself.reattach ();
   WaitForSingleObject (ev, INFINITE);
 }
 

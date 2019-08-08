@@ -62,11 +62,10 @@ pinfo::thisproc (HANDLE h)
     {
       cygheap->pid = create_cygwin_pid ();
       flags |= PID_NEW;
+      h = INVALID_HANDLE_VALUE;
     }
   /* spawnve'd process got pid in parent, cygheap->pid has been set in
      child_info_spawn::handle_spawn. */
-  else if (h == INVALID_HANDLE_VALUE)
-    h = NULL;
 
   init (cygheap->pid, flags, h);
   procinfo->process_state |= PID_IN_USE;
@@ -554,7 +553,11 @@ _pinfo::set_ctty (fhandler_termios *fh, int flags)
       syscall_printf ("attaching %s sid %d, pid %d, pgid %d, tty->pgid %d, tty->sid %d",
 		      __ctty (), sid, pid, pgid, tc.getpgid (), tc.getsid ());
       if (!cygwin_finished_initializing && !myself->cygstarted
-	  && pgid == pid && tc.getpgid () && tc.getsid ())
+	  && pgid == pid && tc.getpgid () && tc.getsid ()
+	  /* Even GDB starts app via CreateProcess which changes cygstarted.
+	     This results in setting the wrong pgid here, so just skip this
+	     under debugger. */
+	  && !being_debugged ())
 	pgid = tc.getpgid ();
 
       /* May actually need to do this:

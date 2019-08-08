@@ -508,6 +508,17 @@ frok::parent (volatile char * volatile stack_here)
 	}
     }
 
+  /* Do not attach to the child before it has successfully initialized.
+     Otherwise we may wait forever, or deliver an orphan SIGCHILD. */
+  if (!child.reattach ())
+    {
+      this_errno = EAGAIN;
+#ifdef DEBUGGING0
+      error ("child reattach failed");
+#endif
+      goto cleanup;
+    }
+
   /* Finally start the child up. */
   resume_child (forker_finished);
 

@@ -9,6 +9,7 @@ GENERAL_SOURCES = \
 	db_local.h \
 	extern.h \
 	hash.h \
+	ndbm.c \
 	page.h \
 	qsort.c
 

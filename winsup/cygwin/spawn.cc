@@ -779,7 +779,9 @@ child_info_spawn::worker (const char *prog_arg, const char *const *argv,
 	  child->start_time = time (NULL); /* Register child's starting time. */
 	  child->nice = myself->nice;
 	  postfork (child);
-	  if (!child.remember (mode == _P_DETACH))
+	  if (mode == _P_DETACH
+	      ? !child.remember (true)
+	      : !(child.remember (false) && child.reattach ()))
 	    {
 	      /* FIXME: Child in strange state now */
 	      CloseHandle (pi.hProcess);
@@ -1170,6 +1172,12 @@ av::setup (const char *prog_arg, path_conv& real_path, const char *ext,
 	  }
 	UnmapViewOfFile (buf);
   just_shell:
+	/* Check if script is executable.  Otherwise we start non-executable
+	   scripts successfully, which is incorrect behaviour. */
+	if (real_path.has_acls ()
+	    && check_file_access (real_path, X_OK, true) < 0)
+	  return -1;	/* errno is already set. */
+
 	if (!pgm)
 	  {
 	    if (!p_type_exec)
@@ -1185,12 +1193,6 @@ av::setup (const char *prog_arg, path_conv& real_path, const char *ext,
 	    pgm = (char *) "/bin/sh";
 	    arg1 = NULL;
 	  }
-
-	/* Check if script is executable.  Otherwise we start non-executable
-	   scripts successfully, which is incorrect behaviour. */
-	if (real_path.has_acls ()
-	    && check_file_access (real_path, X_OK, true) < 0)
-	  return -1;	/* errno is already set. */
 
 	/* Replace argv[0] with the full path to the script if this is the
 	   first time through the loop. */
