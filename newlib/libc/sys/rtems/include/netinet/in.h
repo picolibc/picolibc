@@ -29,7 +29,7 @@
  * SUCH DAMAGE.
  *
  *	@(#)in.h	8.3 (Berkeley) 1/3/94
- * $FreeBSD: head/sys/netinet/in.h 326023 2017-11-20 19:43:44Z pfg $
+ * $FreeBSD: head/sys/netinet/in.h 350749 2019-08-08 11:43:09Z thj $
  */
 
 #ifndef _NETINET_IN_H_
@@ -169,7 +169,7 @@ __END_DECLS
 #define	IPPROTO_BLT		30		/* Bulk Data Transfer */
 #define	IPPROTO_NSP		31		/* Network Services */
 #define	IPPROTO_INP		32		/* Merit Internodal */
-#define	IPPROTO_SEP		33		/* Sequential Exchange */
+#define	IPPROTO_DCCP		33		/* Datagram Congestion Control Protocol */
 #define	IPPROTO_3PC		34		/* Third Party Connect */
 #define	IPPROTO_IDPR		35		/* InterDomain Policy Routing */
 #define	IPPROTO_XTP		36		/* XTP */
