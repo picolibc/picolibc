@@ -11,6 +11,7 @@ What's new:
 - New APIs: dbm_clearerr, dbm_close, dbm_delete, dbm_dirfno, dbm_error,
   dbm_fetch, dbm_firstkey, dbm_nextkey, dbm_open, dbm_store.
 
+
 What changed:
 -------------
 
@@ -42,3 +43,31 @@ Bug Fixes
 
 - Fix sigpending() incorrectly returning signals for unrelated threads.
   Addresses: https://cygwin.com/ml/cygwin/2019-07/msg00051.html
+
+- Fix a hang when opening a FIFO with O_PATH.
+  Addresses: https://cygwin.com/ml/cygwin-developers/2019-06/msg00001.html
+
+- Don't append ".lnk" when renaming a socket file.
+  Addresses: https://cygwin.com/ml/cygwin/2019-07/msg00139.html
+
+- Make tcsetpgrp() return -1 if its argument is negative.
+  Addresses: https://cygwin.com/ml/cygwin/2019-07/msg00166.html
+
+- Avoid mistakenly moving a process under debugger control into the
+  process group of the debugger.
+  Addresses a problem visible in GDB 8.1.1, related to
+  https://cygwin.com/ml/cygwin/2019-07/msg00166.html
+
+- Return ENOEXEC from execve for arbitrary files only if the files are
+  executable.
+  Addresses: https://cygwin.com/ml/cygwin/2019-08/msg00054.html
+
+- Fix off-by-one in environment evaluation leading to an abort.
+  Addresses: https://cygwin.com/ml/cygwin-patches/2019-q3/msg00069.html
+
+- Make output of /proc/[PID]/stat consistent with getpriority().
+  Addresses: https://cygwin.com/ml/cygwin/2019-08/msg00082.html
+
+- 64 bit only: Avoid collisions between memory maps created with shmat
+  and Windows datastructures during fork.
+  Addresses: https://cygwin.com/ml/cygwin/2019-08/msg00107.html
