@@ -55,12 +55,36 @@ if host_cpu == ''
   message('Computed host_cpu as ' + host_cpu)
 endif
 
+specs_dir = get_option('specsdir')
+if specs_dir == ''
+  specs_dir=run_command(meson.get_compiler('c'), '-print-search-dirs').stdout().split('\n')[0].split(':')[1].strip()
+endif
+
+message('specs dir is ' + specs_dir)
+
 if have_alias_attribute_option == 'auto'
   have_alias_attribute = meson.get_compiler('c').has_function_attribute('alias')
 else
   have_alias_attribute = have_alias_attribute_option == 'true'
 endif
 
+specs_data = configuration_data()
+specs_data.set(
+  'INCLUDEDIR',
+  join_paths(get_option('prefix'), get_option('includedir'))
+)
+
+specs_data.set(
+  'LIBDIR',
+  join_paths(get_option('prefix'), get_option('libdir'))
+)
+
+configure_file(input: 'picolibc.specs.in',
+	       output: '@BASENAME@',
+	       configuration: specs_data,
+	       install_dir: specs_dir,
+	       install: true)
+				     
 long_double_code = '''
 #include <float.h>
 #ifndef LDBL_MANT_DIG

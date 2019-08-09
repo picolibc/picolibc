@@ -1,0 +1,11 @@
+%rename link	picolibc_link
+%rename cpp	picolibc_cpp
+
+*cpp:
+-isystem @INCLUDEDIR@ %(picolibc_cpp)
+
+*link:
+-L@LIBDIR@/%M %(picolibc_link)
+
+*lib:
+--start-group -lc --end-group 

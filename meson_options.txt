@@ -16,6 +16,9 @@ option('tests', type: 'boolean', value: false,
 option('newlib-tinystdio', type: 'boolean', value: false,
        description: 'Use tiny stdio from avr libc')
 
+option('specsdir', type: 'string',
+       description: 'Installation directory for .specs file')
+
 option('newlib-io-pos-args', type: 'boolean', value: false,
        description: 'enable printf-family positional arg support')
 option('newlib-io-c99-formats', type: 'boolean', value: false,
