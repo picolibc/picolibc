@@ -168,8 +168,12 @@ fhandler_console::set_unit ()
       if (created)
 	con.owner = getpid ();
     }
-  if (!created && shared_console_info && kill (con.owner, 0) == -1)
-    con.owner = getpid ();
+  if (!created && shared_console_info)
+    {
+      pinfo p (con.owner);
+      if (!p)
+	con.owner = getpid ();
+    }
 
   dev ().parse (devset);
   if (devset != FH_ERROR)
