@@ -44,8 +44,8 @@ SYNOPSIS
 
 DESCRIPTION
 This method attempts to set the floating-point status flags specified
-by <[excepts]> to the states indicated by <[flagp>].  The argument
-[<flagp>] must point to an fexcept_t instance obtained via calling
+by <[excepts]> to the states indicated by <[flagp]>.  The argument
+<[flagp]> must point to an fexcept_t instance obtained via calling
 <<fegetexceptflag>> with at least the floating-point exceptions specified
 by the argument <[excepts]>.
 

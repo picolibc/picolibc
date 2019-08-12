@@ -38,17 +38,17 @@ INDEX
 
 SYNOPSIS
 	#include <fenv.h>
-	int feupdateenv(const fenv_t *[<envp>]);
+	int feupdateenv(const fenv_t *<[envp]>);
 
 	Link with -lm.
 
 DESCRIPTION
 This method attempts to save the currently raised floating point
 exceptions in its automatic storage, install the floating point
-environment specified by [<envp]>, and raise the saved floating
+environment specified by <[envp]>, and raise the saved floating
 point exceptions.
 
-The argument [<envp>] must point to a floating-point environment
+The argument <[envp]> must point to a floating-point environment
 obtained via <<fegetenv>> or <<feholdexcept>>.
 
 RETURNS

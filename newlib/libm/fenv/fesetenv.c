@@ -38,13 +38,13 @@ INDEX
 
 SYNOPSIS
 	#include <fenv.h>
-	int fesetenv(const fenv_t *[<envp>]);
+	int fesetenv(const fenv_t *<[envp]>);
 
 	Link with -lm.
 
 DESCRIPTION
 This method attempts to establish the floating-point environment
-pointed to by <[envp]>. The argument [<envp>] must point to a
+pointed to by <[envp]>. The argument <[envp]> must point to a
 floating-point environment obtained via <<fegetenv>> or <<feholdexcept>>
 or a floating-point environment macro such as <<FE_DFL_ENV>>.
 

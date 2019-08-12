@@ -45,7 +45,7 @@ SYNOPSIS
 DESCRIPTION
 This method attempts to store an implementation-defined representation
 of the states of the floating-point status flags specified by <[excepts]>
-in the memory pointed to by <[flagp>].
+in the memory pointed to by <[flagp]>.
 
 RETURNS
 If the information was successfully returned, this method returns
