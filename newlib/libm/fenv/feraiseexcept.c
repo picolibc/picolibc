@@ -43,7 +43,7 @@ SYNOPSIS
 
 DESCRIPTION
 This method attempts to raise the floating-point exceptions specified
-in <[except]>.
+in <[excepts]>.
 
 RETURNS
 If the <[excepts]> argument is zero or all requested exceptions were
