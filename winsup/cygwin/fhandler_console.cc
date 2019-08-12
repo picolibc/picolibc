@@ -327,6 +327,25 @@ fhandler_console::send_winch_maybe ()
     {
       con.scroll_region.Top = 0;
       con.scroll_region.Bottom = -1;
+      if (wincap.has_con_24bit_colors ())
+	{
+	  /* Workaround for a bug of windows xterm compatible mode. */
+	  /* The horizontal tab positions are broken after resize. */
+	  DWORD dwLen;
+	  CONSOLE_SCREEN_BUFFER_INFO sbi;
+	  GetConsoleScreenBufferInfo (get_output_handle (), &sbi);
+	  /* Clear all horizontal tabs */
+	  WriteConsole (get_output_handle (), "\033[3g", 4, &dwLen, 0);
+	  /* Set horizontal tabs */
+	  for (int col=8; col<con.dwWinSize.X; col+=8)
+	    {
+	      char buf[32];
+	      __small_sprintf (buf, "\033[%d;%dH\033H", 1, col+1);
+	      WriteConsole (get_output_handle (), buf, strlen (buf), &dwLen, 0);
+	    }
+	  /* Restore cursor position */
+	  SetConsoleCursorPosition (get_output_handle (), sbi.dwCursorPosition);
+	}
       get_ttyp ()->kill_pgrp (SIGWINCH);
       return true;
     }
