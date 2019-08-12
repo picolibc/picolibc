@@ -1628,7 +1628,7 @@ _cygtls::call_signal_handler ()
       if (retaddr () == (__tlsstack_t) sigdelayed)
 	pop ();
 
-      debug_only_printf ("dealing with signal %d", sig);
+      debug_only_printf ("dealing with signal %d, handler %p", sig, func);
       this_sa_flags = sa_flags;
 
       sigset_t this_oldmask = set_process_mask_delta ();
@@ -1647,8 +1647,12 @@ _cygtls::call_signal_handler ()
 
       ucontext_t *thiscontext = NULL, context_copy;
 
-      /* Only make a context for SA_SIGINFO handlers */
-      if (this_sa_flags & SA_SIGINFO)
+      /* Only make a context for SA_SIGINFO handlers, only if a handler
+         exists.  If handler is NULL, drop SA_SIGINFO flag to avoid
+	 accidental context access later in the function. */
+      if (!thisfunc)
+	this_sa_flags &= ~SA_SIGINFO;
+      else if (this_sa_flags & SA_SIGINFO)
 	{
 	  context.uc_link = 0;
 	  context.uc_flags = 0;
@@ -1709,6 +1713,11 @@ _cygtls::call_signal_handler ()
       incyg = false;
       sig = 0;		/* Flag that we can accept another signal */
       unlock ();	/* unlock signal stack */
+
+      /* Handler may be NUll in sigwaitinfo/signalfd scenario.  Avoid
+	 crashing by calling a NULL function. */
+      if (!thisfunc)
+	goto skip_calling_handler;
 
       /* Alternate signal stack requested for this signal and alternate signal
 	 stack set up for this thread? */
@@ -1816,6 +1825,8 @@ _cygtls::call_signal_handler ()
 	/* No alternate signal stack requested or available, just call
 	   signal handler. */
 	thisfunc (thissig, &thissi, thiscontext);
+
+skip_calling_handler:
 
       incyg = true;
 
