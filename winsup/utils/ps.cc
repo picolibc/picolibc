@@ -266,8 +266,8 @@ main (int argc, char *argv[])
 				(PVOID) &stodi, sizeof stodi, NULL);
       if (!NT_SUCCESS (status))
 	fprintf (stderr,
-		"NtQuerySystemInformation(SystemTimeOfDayInformation), "
-				"status %#010x\n", status);
+		 "NtQuerySystemInformation(SystemTimeOfDayInformation), "
+		 "status %#010x\n", (unsigned int) status);
       boot_time = to_time_t ((FILETIME*)&stodi.BootTime);
     }
 
