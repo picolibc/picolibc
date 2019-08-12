@@ -308,6 +308,9 @@ void
 fhandler_console::set_cursor_maybe ()
 {
   con.fillin (get_output_handle ());
+  /* Nothing to do for xterm compatible mode. */
+  if (wincap.has_con_24bit_colors ())
+    return;
   if (con.dwLastCursorPosition.X != con.b.dwCursorPosition.X ||
       con.dwLastCursorPosition.Y != con.b.dwCursorPosition.Y)
     {
