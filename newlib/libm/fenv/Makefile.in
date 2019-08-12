@@ -266,7 +266,7 @@ DOCBOOK_CHEW = ${top_srcdir}/../doc/makedocbook.py
 DOCBOOK_OUT_FILES = $(CHEWOUT_FILES:.def=.xml)
 DOCBOOK_CHAPTERS = $(CHAPTERS:.tex=.xml)
 CLEANFILES = $(CHEWOUT_FILES) $(DOCBOOK_OUT_FILES)
-CHEWOUT_FILES = feclearexcept.def fe_dfl_env.def fegetenv.def \
+CHEWOUT_FILES = feclearexcept.def fegetenv.def \
 	fegetexceptflag.def fegetround.def feholdexcept.def \
 	feraiseexcept.def fesetenv.def fesetexceptflag.def fesetround.def \
 	fetestexcept.def feupdateenv.def

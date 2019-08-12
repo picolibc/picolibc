@@ -24,7 +24,7 @@ endif # USE_LIBTOOL
 
 include $(srcdir)/../../Makefile.shared
 
-CHEWOUT_FILES =	feclearexcept.def fe_dfl_env.def fegetenv.def \
+CHEWOUT_FILES =	feclearexcept.def fegetenv.def \
 	fegetexceptflag.def fegetround.def feholdexcept.def \
 	feraiseexcept.def fesetenv.def fesetexceptflag.def fesetround.def \
 	fetestexcept.def feupdateenv.def
