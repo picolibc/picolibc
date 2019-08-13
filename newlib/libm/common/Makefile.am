@@ -13,7 +13,11 @@ src = 	s_finite.c s_copysign.c s_modf.c s_scalbn.c \
 	s_lrint.c s_llrint.c \
 	s_lround.c s_llround.c s_nearbyint.c s_remquo.c s_round.c s_scalbln.c \
 	s_signbit.c s_trunc.c \
-	exp.c exp2.c exp_data.c math_err.c log.c log_data.c log2.c log2_data.c \
+	exp.c exp2.c exp_data.c \
+	math_err_with_errno.c math_err_xflow.c math_err_uflow.c	\
+	math_err_oflow.c math_err_divzero.c math_err_invalid.c \
+	math_err_may_uflow.c math_err_check_uflow.c math_err_check_oflow.c \
+	log.c log_data.c log2.c log2_data.c \
 	pow.c pow_log_data.c
 
 fsrc =	sf_finite.c sf_copysign.c sf_modf.c sf_scalbn.c \
@@ -27,7 +31,10 @@ fsrc =	sf_finite.c sf_copysign.c sf_modf.c sf_scalbn.c \
 	sf_scalbln.c sf_trunc.c \
 	sf_exp.c sf_exp2.c sf_exp2_data.c sf_log.c sf_log_data.c \
 	sf_log2.c sf_log2_data.c sf_pow_log2_data.c sf_pow.c \
-	sinf.c cosf.c sincosf.c sincosf_data.c math_errf.c
+	sinf.c cosf.c sincosf.c sincosf_data.c \
+	math_errf_with_errnof.c math_errf_xflowf.c math_errf_uflowf.c \
+	math_errf_may_uflowf.c math_errf_oflowf.c math_errf_divzerof.c \
+	math_errf_invalidf.c
 
 lsrc =	atanl.c cosl.c sinl.c tanl.c tanhl.c frexpl.c modfl.c ceill.c fabsl.c \
 	floorl.c log1pl.c expm1l.c acosl.c asinl.c atan2l.c coshl.c sinhl.c \

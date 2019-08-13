@@ -417,4 +417,21 @@ extern const struct pow_log_data
   struct {double invc, pad, logc, logctail;} tab[1 << POW_LOG_TABLE_BITS];
 } __pow_log_data HIDDEN;
 
+#if WANT_ERRNO
+HIDDEN double
+__math_with_errno (double y, int e);
+
+HIDDEN float
+__math_with_errnof (float y, int e);
+#else
+#define __math_with_errno(x, e) (x)
+#define __math_with_errnof(x, e) (x)
+#endif
+
+HIDDEN double
+__math_xflow (uint32_t sign, double y);
+
+HIDDEN float
+__math_xflowf (uint32_t sign, float y);
+
 #endif
