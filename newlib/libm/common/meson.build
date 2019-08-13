@@ -38,7 +38,15 @@ dsrc_common = [
   'exp.c',
   'exp2.c',
   'exp_data.c',
-  'math_err.c',
+  'math_err_with_errno.c',
+  'math_err_xflow.c',
+  'math_err_uflow.c',
+  'math_err_oflow.c',
+  'math_err_divzero.c',
+  'math_err_invalid.c',
+  'math_err_may_uflow.c',
+  'math_err_check_uflow.c',
+  'math_err_check_oflow.c',
   'log.c',
   'log_data.c',
   'log2.c',
@@ -94,7 +102,13 @@ fsrc_common = [
   'cosf.c',
   'sincosf.c',
   'sincosf_data.c',
-  'math_errf.c'
+  'math_errf_with_errnof.c',
+  'math_errf_xflowf.c',
+  'math_errf_uflowf.c',
+  'math_errf_may_uflowf.c',
+  'math_errf_oflowf.c',
+  'math_errf_divzerof.c',
+  'math_errf_invalidf.c'
 ]
 
 lsrc_common = [
