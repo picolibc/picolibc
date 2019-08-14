@@ -271,7 +271,7 @@ CHEWOUT_FILES = feclearexcept.def fegetenv.def \
 	feraiseexcept.def fesetenv.def fesetexceptflag.def fesetround.def \
 	fetestexcept.def feupdateenv.def
 
-CHAPTERS =
+CHAPTERS = fenv.tex
 all: all-am
 
 .SUFFIXES:
