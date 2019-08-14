@@ -1,1 +1,3 @@
 picolibc-arm-none-eabi: arch-independent-package-contains-binary-or-object usr/lib/picolibc/*
+picolibc-arm-none-eabi: unstripped-static-library usr/lib/picolibc/*
+picolibc-arm-none-eabi: static-library-has-unneeded-section usr/lib/picolibc/*
