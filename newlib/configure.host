@@ -576,6 +576,7 @@ case "${host}" in
 	sys_dir=w65
 	;;
   xtensa*-*-* | xtensa*-*)
+	posix_dir=posix
 	sys_dir=xtensa
 	;;
   z8k-*-coff)
