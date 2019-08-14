@@ -72,51 +72,26 @@ LIBRARIES = $(noinst_LIBRARIES)
 ARFLAGS = cru
 lib_a_AR = $(AR) $(ARFLAGS)
 lib_a_LIBADD =
-am__objects_1 = lib_a-closedir.$(OBJEXT) lib_a-collate.$(OBJEXT) \
-	lib_a-collcmp.$(OBJEXT) lib_a-creat.$(OBJEXT) \
-	lib_a-dirfd.$(OBJEXT) lib_a-fnmatch.$(OBJEXT) \
-	lib_a-glob.$(OBJEXT) lib_a-_isatty.$(OBJEXT) \
-	lib_a-isatty.$(OBJEXT) lib_a-opendir.$(OBJEXT) \
-	lib_a-readdir.$(OBJEXT) lib_a-readdir_r.$(OBJEXT) \
+am__objects_1 = lib_a-collate.$(OBJEXT) lib_a-collcmp.$(OBJEXT) \
 	lib_a-regcomp.$(OBJEXT) lib_a-regerror.$(OBJEXT) \
-	lib_a-regexec.$(OBJEXT) lib_a-regfree.$(OBJEXT) \
-	lib_a-rewinddir.$(OBJEXT) lib_a-sleep.$(OBJEXT) \
-	lib_a-usleep.$(OBJEXT) lib_a-telldir.$(OBJEXT)
-am__objects_2 = lib_a-scandir.$(OBJEXT) lib_a-seekdir.$(OBJEXT)
-am__objects_3 = lib_a-execl.$(OBJEXT) lib_a-execle.$(OBJEXT) \
-	lib_a-execlp.$(OBJEXT) lib_a-execv.$(OBJEXT) \
-	lib_a-execve.$(OBJEXT) lib_a-execvp.$(OBJEXT) \
-	lib_a-wordexp.$(OBJEXT) lib_a-wordfree.$(OBJEXT)
-am__objects_4 = lib_a-popen.$(OBJEXT) lib_a-posix_spawn.$(OBJEXT)
-@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@am__objects_5 = $(am__objects_2) \
-@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	$(am__objects_3) \
-@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	$(am__objects_4)
-@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_TRUE@am__objects_5 = $(am__objects_2) \
-@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_TRUE@	$(am__objects_3)
-@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_TRUE@am__objects_5 =  \
+	lib_a-regexec.$(OBJEXT) lib_a-regfree.$(OBJEXT)
+am__objects_2 =
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@am__objects_3 = $(am__objects_2) \
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	$(am__objects_2) \
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	$(am__objects_2)
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_TRUE@am__objects_3 = $(am__objects_2) \
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_TRUE@	$(am__objects_2)
+@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_TRUE@am__objects_3 =  \
 @ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_TRUE@	$(am__objects_2)
 @USE_LIBTOOL_FALSE@am_lib_a_OBJECTS = $(am__objects_1) \
-@USE_LIBTOOL_FALSE@	$(am__objects_5)
+@USE_LIBTOOL_FALSE@	$(am__objects_3)
 lib_a_OBJECTS = $(am_lib_a_OBJECTS)
 LTLIBRARIES = $(noinst_LTLIBRARIES)
 libposix_la_LIBADD =
-am__objects_6 = closedir.lo collate.lo collcmp.lo creat.lo dirfd.lo \
-	fnmatch.lo glob.lo _isatty.lo isatty.lo opendir.lo readdir.lo \
-	readdir_r.lo regcomp.lo regerror.lo regexec.lo regfree.lo \
-	rewinddir.lo sleep.lo usleep.lo telldir.lo
-am__objects_7 = scandir.lo seekdir.lo
-am__objects_8 = execl.lo execle.lo execlp.lo execv.lo execve.lo \
-	execvp.lo wordexp.lo wordfree.lo
-am__objects_9 = popen.lo posix_spawn.lo
-@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@am__objects_10 = $(am__objects_7) \
-@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	$(am__objects_8) \
-@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@	$(am__objects_9)
-@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_TRUE@am__objects_10 = $(am__objects_7) \
-@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_TRUE@	$(am__objects_8)
-@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_TRUE@am__objects_10 =  \
-@ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_TRUE@	$(am__objects_7)
-@USE_LIBTOOL_TRUE@am_libposix_la_OBJECTS = $(am__objects_6) \
-@USE_LIBTOOL_TRUE@	$(am__objects_10)
+am__objects_4 = collate.lo collcmp.lo regcomp.lo regerror.lo \
+	regexec.lo regfree.lo
+@USE_LIBTOOL_TRUE@am_libposix_la_OBJECTS = $(am__objects_4) \
+@USE_LIBTOOL_TRUE@	$(am__objects_3)
 libposix_la_OBJECTS = $(am_libposix_la_OBJECTS)
 libposix_la_LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
@@ -277,6 +252,7 @@ pdfdir = @pdfdir@
 prefix = @prefix@
 program_transform_name = @program_transform_name@
 psdir = @psdir@
+runstatedir = @runstatedir@
 sbindir = @sbindir@
 sharedstatedir = @sharedstatedir@
 srcdir = @srcdir@
@@ -290,23 +266,12 @@ top_srcdir = @top_srcdir@
 AUTOMAKE_OPTIONS = cygnus
 INCLUDES = $(NEWLIB_CFLAGS) $(CROSS_CFLAGS) $(TARGET_CFLAGS)
 GENERAL_SOURCES = \
-	closedir.c collate.c collcmp.c creat.c dirfd.c \
-	fnmatch.c glob.c _isatty.c isatty.c \
-	opendir.c readdir.c readdir_r.c \
-	regcomp.c regerror.c regexec.c regfree.c \
-	rewinddir.c sleep.c usleep.c \
-	telldir.c
+	collate.c collcmp.c \
+	regcomp.c regerror.c regexec.c regfree.c
 
-ELIX_2_SOURCES = \
-        scandir.c seekdir.c
-
-ELIX_3_SOURCES = \
-	execl.c execle.c execlp.c execv.c \
-	execve.c execvp.c wordexp.c wordfree.c
-
-ELIX_4_SOURCES = \
-	popen.c posix_spawn.c
-
+ELIX_2_SOURCES = 
+ELIX_3_SOURCES = 
+ELIX_4_SOURCES = 
 @ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_FALSE@ELIX_SOURCES = $(ELIX_2_SOURCES) $(ELIX_3_SOURCES) $(ELIX_4_SOURCES)
 @ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_FALSE@@ELIX_LEVEL_3_TRUE@ELIX_SOURCES = $(ELIX_2_SOURCES) $(ELIX_3_SOURCES)
 @ELIX_LEVEL_1_FALSE@@ELIX_LEVEL_2_TRUE@ELIX_SOURCES = $(ELIX_2_SOURCES)
@@ -404,12 +369,6 @@ distclean-compile:
 .c.lo:
 	$(LTCOMPILE) -c -o $@ $<
 
-lib_a-closedir.o: closedir.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-closedir.o `test -f 'closedir.c' || echo '$(srcdir)/'`closedir.c
-
-lib_a-closedir.obj: closedir.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-closedir.obj `if test -f 'closedir.c'; then $(CYGPATH_W) 'closedir.c'; else $(CYGPATH_W) '$(srcdir)/closedir.c'; fi`
-
 lib_a-collate.o: collate.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-collate.o `test -f 'collate.c' || echo '$(srcdir)/'`collate.c
 
@@ -422,60 +381,8 @@ lib_a-collcmp.o: collcmp.c
 lib_a-collcmp.obj: collcmp.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-collcmp.obj `if test -f 'collcmp.c'; then $(CYGPATH_W) 'collcmp.c'; else $(CYGPATH_W) '$(srcdir)/collcmp.c'; fi`
 
-lib_a-creat.o: creat.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-creat.o `test -f 'creat.c' || echo '$(srcdir)/'`creat.c
-
-lib_a-creat.obj: creat.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-creat.obj `if test -f 'creat.c'; then $(CYGPATH_W) 'creat.c'; else $(CYGPATH_W) '$(srcdir)/creat.c'; fi`
-
-lib_a-dirfd.o: dirfd.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-dirfd.o `test -f 'dirfd.c' || echo '$(srcdir)/'`dirfd.c
-
 lib_a-dirfd.obj: dirfd.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-dirfd.obj `if test -f 'dirfd.c'; then $(CYGPATH_W) 'dirfd.c'; else $(CYGPATH_W) '$(srcdir)/dirfd.c'; fi`
-
-lib_a-fnmatch.o: fnmatch.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-fnmatch.o `test -f 'fnmatch.c' || echo '$(srcdir)/'`fnmatch.c
-
-lib_a-fnmatch.obj: fnmatch.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-fnmatch.obj `if test -f 'fnmatch.c'; then $(CYGPATH_W) 'fnmatch.c'; else $(CYGPATH_W) '$(srcdir)/fnmatch.c'; fi`
-
-lib_a-glob.o: glob.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-glob.o `test -f 'glob.c' || echo '$(srcdir)/'`glob.c
-
-lib_a-glob.obj: glob.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-glob.obj `if test -f 'glob.c'; then $(CYGPATH_W) 'glob.c'; else $(CYGPATH_W) '$(srcdir)/glob.c'; fi`
-
-lib_a-_isatty.o: _isatty.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-_isatty.o `test -f '_isatty.c' || echo '$(srcdir)/'`_isatty.c
-
-lib_a-_isatty.obj: _isatty.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-_isatty.obj `if test -f '_isatty.c'; then $(CYGPATH_W) '_isatty.c'; else $(CYGPATH_W) '$(srcdir)/_isatty.c'; fi`
-
-lib_a-isatty.o: isatty.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-isatty.o `test -f 'isatty.c' || echo '$(srcdir)/'`isatty.c
-
-lib_a-isatty.obj: isatty.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-isatty.obj `if test -f 'isatty.c'; then $(CYGPATH_W) 'isatty.c'; else $(CYGPATH_W) '$(srcdir)/isatty.c'; fi`
-
-lib_a-opendir.o: opendir.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-opendir.o `test -f 'opendir.c' || echo '$(srcdir)/'`opendir.c
-
-lib_a-opendir.obj: opendir.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-opendir.obj `if test -f 'opendir.c'; then $(CYGPATH_W) 'opendir.c'; else $(CYGPATH_W) '$(srcdir)/opendir.c'; fi`
-
-lib_a-readdir.o: readdir.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-readdir.o `test -f 'readdir.c' || echo '$(srcdir)/'`readdir.c
-
-lib_a-readdir.obj: readdir.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-readdir.obj `if test -f 'readdir.c'; then $(CYGPATH_W) 'readdir.c'; else $(CYGPATH_W) '$(srcdir)/readdir.c'; fi`
-
-lib_a-readdir_r.o: readdir_r.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-readdir_r.o `test -f 'readdir_r.c' || echo '$(srcdir)/'`readdir_r.c
-
-lib_a-readdir_r.obj: readdir_r.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-readdir_r.obj `if test -f 'readdir_r.c'; then $(CYGPATH_W) 'readdir_r.c'; else $(CYGPATH_W) '$(srcdir)/readdir_r.c'; fi`
-
 lib_a-regcomp.o: regcomp.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-regcomp.o `test -f 'regcomp.c' || echo '$(srcdir)/'`regcomp.c
 
@@ -499,102 +406,6 @@ lib_a-regfree.o: regfree.c
 
 lib_a-regfree.obj: regfree.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-regfree.obj `if test -f 'regfree.c'; then $(CYGPATH_W) 'regfree.c'; else $(CYGPATH_W) '$(srcdir)/regfree.c'; fi`
-
-lib_a-rewinddir.o: rewinddir.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-rewinddir.o `test -f 'rewinddir.c' || echo '$(srcdir)/'`rewinddir.c
-
-lib_a-rewinddir.obj: rewinddir.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-rewinddir.obj `if test -f 'rewinddir.c'; then $(CYGPATH_W) 'rewinddir.c'; else $(CYGPATH_W) '$(srcdir)/rewinddir.c'; fi`
-
-lib_a-sleep.o: sleep.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-sleep.o `test -f 'sleep.c' || echo '$(srcdir)/'`sleep.c
-
-lib_a-sleep.obj: sleep.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-sleep.obj `if test -f 'sleep.c'; then $(CYGPATH_W) 'sleep.c'; else $(CYGPATH_W) '$(srcdir)/sleep.c'; fi`
-
-lib_a-usleep.o: usleep.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-usleep.o `test -f 'usleep.c' || echo '$(srcdir)/'`usleep.c
-
-lib_a-usleep.obj: usleep.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-usleep.obj `if test -f 'usleep.c'; then $(CYGPATH_W) 'usleep.c'; else $(CYGPATH_W) '$(srcdir)/usleep.c'; fi`
-
-lib_a-telldir.o: telldir.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-telldir.o `test -f 'telldir.c' || echo '$(srcdir)/'`telldir.c
-
-lib_a-telldir.obj: telldir.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-telldir.obj `if test -f 'telldir.c'; then $(CYGPATH_W) 'telldir.c'; else $(CYGPATH_W) '$(srcdir)/telldir.c'; fi`
-
-lib_a-scandir.o: scandir.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-scandir.o `test -f 'scandir.c' || echo '$(srcdir)/'`scandir.c
-
-lib_a-scandir.obj: scandir.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-scandir.obj `if test -f 'scandir.c'; then $(CYGPATH_W) 'scandir.c'; else $(CYGPATH_W) '$(srcdir)/scandir.c'; fi`
-
-lib_a-seekdir.o: seekdir.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-seekdir.o `test -f 'seekdir.c' || echo '$(srcdir)/'`seekdir.c
-
-lib_a-seekdir.obj: seekdir.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-seekdir.obj `if test -f 'seekdir.c'; then $(CYGPATH_W) 'seekdir.c'; else $(CYGPATH_W) '$(srcdir)/seekdir.c'; fi`
-
-lib_a-execl.o: execl.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-execl.o `test -f 'execl.c' || echo '$(srcdir)/'`execl.c
-
-lib_a-execl.obj: execl.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-execl.obj `if test -f 'execl.c'; then $(CYGPATH_W) 'execl.c'; else $(CYGPATH_W) '$(srcdir)/execl.c'; fi`
-
-lib_a-execle.o: execle.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-execle.o `test -f 'execle.c' || echo '$(srcdir)/'`execle.c
-
-lib_a-execle.obj: execle.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-execle.obj `if test -f 'execle.c'; then $(CYGPATH_W) 'execle.c'; else $(CYGPATH_W) '$(srcdir)/execle.c'; fi`
-
-lib_a-execlp.o: execlp.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-execlp.o `test -f 'execlp.c' || echo '$(srcdir)/'`execlp.c
-
-lib_a-execlp.obj: execlp.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-execlp.obj `if test -f 'execlp.c'; then $(CYGPATH_W) 'execlp.c'; else $(CYGPATH_W) '$(srcdir)/execlp.c'; fi`
-
-lib_a-execv.o: execv.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-execv.o `test -f 'execv.c' || echo '$(srcdir)/'`execv.c
-
-lib_a-execv.obj: execv.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-execv.obj `if test -f 'execv.c'; then $(CYGPATH_W) 'execv.c'; else $(CYGPATH_W) '$(srcdir)/execv.c'; fi`
-
-lib_a-execve.o: execve.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-execve.o `test -f 'execve.c' || echo '$(srcdir)/'`execve.c
-
-lib_a-execve.obj: execve.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-execve.obj `if test -f 'execve.c'; then $(CYGPATH_W) 'execve.c'; else $(CYGPATH_W) '$(srcdir)/execve.c'; fi`
-
-lib_a-execvp.o: execvp.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-execvp.o `test -f 'execvp.c' || echo '$(srcdir)/'`execvp.c
-
-lib_a-execvp.obj: execvp.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-execvp.obj `if test -f 'execvp.c'; then $(CYGPATH_W) 'execvp.c'; else $(CYGPATH_W) '$(srcdir)/execvp.c'; fi`
-
-lib_a-wordexp.o: wordexp.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-wordexp.o `test -f 'wordexp.c' || echo '$(srcdir)/'`wordexp.c
-
-lib_a-wordexp.obj: wordexp.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-wordexp.obj `if test -f 'wordexp.c'; then $(CYGPATH_W) 'wordexp.c'; else $(CYGPATH_W) '$(srcdir)/wordexp.c'; fi`
-
-lib_a-wordfree.o: wordfree.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-wordfree.o `test -f 'wordfree.c' || echo '$(srcdir)/'`wordfree.c
-
-lib_a-wordfree.obj: wordfree.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-wordfree.obj `if test -f 'wordfree.c'; then $(CYGPATH_W) 'wordfree.c'; else $(CYGPATH_W) '$(srcdir)/wordfree.c'; fi`
-
-lib_a-popen.o: popen.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-popen.o `test -f 'popen.c' || echo '$(srcdir)/'`popen.c
-
-lib_a-popen.obj: popen.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-popen.obj `if test -f 'popen.c'; then $(CYGPATH_W) 'popen.c'; else $(CYGPATH_W) '$(srcdir)/popen.c'; fi`
-
-lib_a-posix_spawn.o: posix_spawn.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-posix_spawn.o `test -f 'posix_spawn.c' || echo '$(srcdir)/'`posix_spawn.c
-
-lib_a-posix_spawn.obj: posix_spawn.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-posix_spawn.obj `if test -f 'posix_spawn.c'; then $(CYGPATH_W) 'posix_spawn.c'; else $(CYGPATH_W) '$(srcdir)/posix_spawn.c'; fi`
 
 mostlyclean-libtool:
 	-rm -f *.lo
