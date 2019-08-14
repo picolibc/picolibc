@@ -3,7 +3,7 @@ project('picolibc', 'c',
 		'buildtype=debugoptimized',
 		'c_std=gnu99',
 	],
-	version: '2.10.0',
+	version: '3.1.0.2019.08.14'
 )
 
 targets = []
@@ -50,14 +50,17 @@ hw_fp = get_option('hw-fp')
 
 host_cpu=host_machine.cpu()
 if host_cpu == ''
-  host_cc_machine=run_command(meson.get_compiler('c'), '-dumpmachine').stdout().strip().split('-')
+  host_cmds = meson.get_compiler('c').cmd_array() + ['-dumpmachine']
+  host_cc_machine=run_command(host_cmds).stdout().strip().split('-')
   host_cpu=host_cc_machine[0]
   message('Computed host_cpu as ' + host_cpu)
 endif
 
 specs_dir = get_option('specsdir')
 if specs_dir == ''
-  specs_dir=run_command(meson.get_compiler('c'), '-print-search-dirs').stdout().split('\n')[0].split(':')[1].strip()
+  search_cmds = meson.get_compiler('c').cmd_array() + ['-print-search-dirs']
+  install_dir=run_command(search_cmds).stdout().split('\n')[0]
+  specs_dir=install_dir.split(':')[1].strip()
 endif
 
 message('specs dir is ' + specs_dir)
