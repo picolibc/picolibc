@@ -1045,7 +1045,9 @@ peek_console (select_record *me, bool)
       else if (!PeekConsoleInputW (h, &irec, 1, &events_read) || !events_read)
 	break;
       fh->acquire_input_mutex (INFINITE);
-      if (fhandler_console::input_winch == fh->process_input_message ())
+      if (fhandler_console::input_winch == fh->process_input_message ()
+	  && global_sigs[SIGWINCH].sa_handler != SIG_IGN
+	  && global_sigs[SIGWINCH].sa_handler != SIG_DFL)
 	{
 	  set_sig_errno (EINTR);
 	  fh->release_input_mutex ();
