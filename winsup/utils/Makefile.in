@@ -101,7 +101,7 @@ cygpath.exe: CYGWIN_LDFLAGS += -lcygwin -luserenv -lntdll
 ps.exe: CYGWIN_LDFLAGS += -lcygwin -lpsapi -lntdll
 strace.exe: MINGW_LDFLAGS += -lntdll
 
-ldd.exe:CYGWIN_LDFLAGS += -lpsapi
+ldd.exe:CYGWIN_LDFLAGS += -lpsapi -lntdll
 pldd.exe: CYGWIN_LDFLAGS += -lpsapi
 minidumper.exe: CYGWIN_LDFLAGS += -ldbghelp
 
