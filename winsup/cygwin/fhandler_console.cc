@@ -319,6 +319,25 @@ fhandler_console::set_cursor_maybe ()
     }
 }
 
+/* Workaround for a bug of windows xterm compatible mode. */
+/* The horizontal tab positions are broken after resize. */
+static void
+fix_tab_position (HANDLE h, SHORT width)
+{
+  char buf[2048] = {0,};
+  /* Save cursor position */
+  __small_sprintf (buf+strlen (buf), "\0337");
+  /* Clear all horizontal tabs */
+  __small_sprintf (buf+strlen (buf), "\033[3g");
+  /* Set horizontal tabs */
+  for (int col=8; col<width; col+=8)
+    __small_sprintf (buf+strlen (buf), "\033[%d;%dH\033H", 1, col+1);
+  /* Restore cursor position */
+  __small_sprintf (buf+strlen (buf), "\0338");
+  DWORD dwLen;
+  WriteConsole (h, buf, strlen (buf), &dwLen, 0);
+}
+
 bool
 fhandler_console::send_winch_maybe ()
 {
@@ -331,24 +350,7 @@ fhandler_console::send_winch_maybe ()
       con.scroll_region.Top = 0;
       con.scroll_region.Bottom = -1;
       if (wincap.has_con_24bit_colors ())
-	{
-	  /* Workaround for a bug of windows xterm compatible mode. */
-	  /* The horizontal tab positions are broken after resize. */
-	  DWORD dwLen;
-	  CONSOLE_SCREEN_BUFFER_INFO sbi;
-	  GetConsoleScreenBufferInfo (get_output_handle (), &sbi);
-	  /* Clear all horizontal tabs */
-	  WriteConsole (get_output_handle (), "\033[3g", 4, &dwLen, 0);
-	  /* Set horizontal tabs */
-	  for (int col=8; col<con.dwWinSize.X; col+=8)
-	    {
-	      char buf[32];
-	      __small_sprintf (buf, "\033[%d;%dH\033H", 1, col+1);
-	      WriteConsole (get_output_handle (), buf, strlen (buf), &dwLen, 0);
-	    }
-	  /* Restore cursor position */
-	  SetConsoleCursorPosition (get_output_handle (), sbi.dwCursorPosition);
-	}
+	fix_tab_position (get_output_handle (), con.dwWinSize.X);
       get_ttyp ()->kill_pgrp (SIGWINCH);
       return true;
     }
@@ -1615,6 +1617,12 @@ static const wchar_t __vt100_conv[31] = {
 inline
 bool fhandler_console::write_console (PWCHAR buf, DWORD len, DWORD& done)
 {
+  bool need_fix_tab_position = false;
+  /* Check if screen will be alternated. */
+  if (wincap.has_con_24bit_colors ()
+      && memmem (buf, len*sizeof (WCHAR), L"\033[?1049", 7*sizeof (WCHAR)))
+    need_fix_tab_position = true;
+
   if (con.iso_2022_G1
 	? con.vt100_graphics_mode_G1
 	: con.vt100_graphics_mode_G0)
@@ -1633,6 +1641,9 @@ bool fhandler_console::write_console (PWCHAR buf, DWORD len, DWORD& done)
       len -= done;
       buf += done;
     }
+  /* Call fix_tab_position() if screen has been alternated. */
+  if (need_fix_tab_position)
+    fix_tab_position (get_output_handle (), con.dwWinSize.X);
   return true;
 }
 
