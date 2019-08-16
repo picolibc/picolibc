@@ -214,6 +214,7 @@ endif
 add_project_arguments(arguments, language: 'c')
 
 subdir('newlib')
+subdir('picocrt')
 
 if enable_tests
   subdir('test')

@@ -9,3 +9,6 @@
 
 *lib:
 --start-group -lc --end-group 
+
+*startfile:
+@LIBDIR@/%M/crt0%O%s
