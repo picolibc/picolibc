@@ -7,6 +7,7 @@ libm_machine_dirs = {
 		      'i686' : 'i386',
 		      'nds32' : 'nds32',
 		      'riscv' : 'riscv',
+		      'riscv64' : 'riscv',
 		      'spu' : 'spu',
 		    }
 
