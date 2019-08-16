@@ -110,7 +110,8 @@ struct _atexit {
 # define _REENT_INIT_ATEXIT
 #else
 # define _REENT_INIT_ATEXIT \
-  _NULL, _ATEXIT_INIT,
+	._atexit = _NULL,   \
+	._atexit0 = _ATEXIT_INIT,
 #endif
 
 /*
@@ -301,6 +302,8 @@ struct _glue
   __FILE *_iobs;
 };
 
+#define _GLUE_INIT	{ _NULL, 0, _NULL }
+
 /*
  * rand48 family support
  *
@@ -344,6 +347,56 @@ struct _rand48 {
  * It's raison d'etre is to facilitate threads by making all library routines
  * reentrant.  IE: All state information is contained here.
  */
+
+#ifdef NEWLIB_GLOBAL_ERRNO
+#define _REENT_INIT_ERRNO
+#else
+#define _REENT_INIT_ERRNO \
+	._errno = 0,
+#endif
+
+#ifdef _REENT_GLOBAL_STDIO_STREAMS
+extern __FILE __sf[3];
+#define _REENT_STDIO_STREAM(var, index) &__sf[index]
+#else
+#define _REENT_STDIO_STREAM(var, index) &(var)->__sf[index]
+#endif
+
+#ifdef _REENT_SMALL
+#define _REENT_INIT_STDIO_EMERGENCY \
+	._emergency = _NULL,
+#else
+#define _REENT_INIT_STDIO_EMERGENCY \
+	._emergency = "",
+#endif
+
+#ifdef TINY_STDIO
+#define _REENT_INIT_STDIO(var)
+#else
+#define _REENT_INIT_STDIO(var)			\
+	._stdin = _REENT_STDIO_STREAM(&(var), 0), \
+	._stdout = _REENT_STDIO_STREAM(&(var), 1), \
+	._stderr = _REENT_STDIO_STREAM(&(var), 2), \
+	._inc = 0, \
+	_REENT_INIT_STDIO_EMERGENCY \
+	.__sdidinit = 0,
+#endif
+
+#ifdef __HAVE_LOCALE_INFO__
+#define _REENT_INIT_LOCALE \
+	._unspecified_locale_info = 0, \
+	._locale = _NULL,
+#else
+#define _REENT_INIT_LOCALE
+#endif
+
+#ifdef _REENT_GLOBAL_ATEXIT
+#define _REENT_INIT_ATEXIT
+#else
+#define _REENT_INIT_ATEXIT \
+	._atexit = _NULL, \
+	._atexit0 = _ATEXIT_INIT,
+#endif
 
 #ifdef _REENT_SMALL
 
@@ -430,34 +483,28 @@ struct _reent
   char *_signal_buf;                    /* strsignal */
 };
 
+# define _REENT_INIT(var) \
+  { _REENT_INIT_ERRNO \
+    _REENT_INIT_STDIO(var) \
+    _REENT_INIT_LOCALE \
+    ._mp = NULL, \
+    .__cleanup = NULL, \
+    ._gamma_signgam = 0, \
+    ._cvtlen = 0, \
+    ._cvtbuf = _NULL, \
+    ._r48 = _NULL, \
+    ._localtime_buf = _NULL, \
+    ._asctime_buf = _NULL, \
+    ._sig_func = _NULL, \
+    _REENT_INIT_ATEXIT \
+    .__sglue = _GLUE_INIT, \
+    .__sf = _NULL, \
+    ._misc = _NULL, \
+    ._signal_buf = NULL \
+  }
+
 #ifdef _REENT_GLOBAL_STDIO_STREAMS
 extern __FILE __sf[3];
-
-# define _REENT_INIT(var) \
-  { 0, \
-    &__sf[0], \
-    &__sf[1], \
-    &__sf[2], \
-    0,   \
-    _NULL, \
-    0, \
-    0, \
-    _NULL, \
-    _NULL, \
-    _NULL, \
-    0, \
-    0, \
-    _NULL, \
-    _NULL, \
-    _NULL, \
-    _NULL, \
-    _NULL, \
-    _REENT_INIT_ATEXIT \
-    {_NULL, 0, _NULL}, \
-    _NULL, \
-    _NULL, \
-    _NULL \
-  }
 
 #define _REENT_INIT_PTR_ZEROED(var) \
   { (var)->_stdin = &__sf[0]; \
@@ -470,32 +517,6 @@ extern __FILE __sf[3];
 extern const struct __sFILE_fake __sf_fake_stdin;
 extern const struct __sFILE_fake __sf_fake_stdout;
 extern const struct __sFILE_fake __sf_fake_stderr;
-
-# define _REENT_INIT(var) \
-  { 0, \
-    (__FILE *)&__sf_fake_stdin, \
-    (__FILE *)&__sf_fake_stdout, \
-    (__FILE *)&__sf_fake_stderr, \
-    0, \
-    _NULL, \
-    0, \
-    0, \
-    _NULL, \
-    _NULL, \
-    _NULL, \
-    0, \
-    0, \
-    _NULL, \
-    _NULL, \
-    _NULL, \
-    _NULL, \
-    _NULL, \
-    _REENT_INIT_ATEXIT \
-    {_NULL, 0, _NULL}, \
-    _NULL, \
-    _NULL, \
-    _NULL \
-  }
 
 #define _REENT_INIT_PTR_ZEROED(var) \
   { (var)->_stdin = (__FILE *)&__sf_fake_stdin; \
@@ -712,24 +733,17 @@ extern __FILE __sf[3];
 #endif
 
 #define _REENT_INIT(var) \
-  { 0, \
-    _REENT_STDIO_STREAM(&(var), 0), \
-    _REENT_STDIO_STREAM(&(var), 1), \
-    _REENT_STDIO_STREAM(&(var), 2), \
-    0, \
-    "", \
-    0, \
-    _NULL, \
-    0, \
-    _NULL, \
-    _NULL, \
-    0, \
-    _NULL, \
-    _NULL, \
-    0, \
-    _NULL, \
-    { \
-      { \
+  { _REENT_INIT_ERRNO \
+    _REENT_INIT_STDIO(var)	    \
+    _REENT_INIT_LOCALE \
+    .__cleanup = _NULL, \
+    ._result_k = 0, \
+    ._p5s = _NULL, \
+    ._freelist = _NULL, \
+    ._cvtlen = 0, \
+    ._cvtbuf = _NULL, \
+    ._new = { \
+      ._reent = { \
         0, \
         _NULL, \
         "", \
@@ -755,8 +769,8 @@ extern __FILE __sf[3];
       } \
     }, \
     _REENT_INIT_ATEXIT \
-    _NULL, \
-    {_NULL, 0, _NULL} \
+    ._sig_func = _NULL, \
+    .__sglue = _GLUE_INIT \
   }
 
 #define _REENT_INIT_PTR_ZEROED(var) \
