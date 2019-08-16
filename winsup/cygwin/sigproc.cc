@@ -57,6 +57,9 @@ _cygtls NO_COPY *_sig_tls;
 Static HANDLE my_sendsig;
 Static HANDLE my_readsig;
 
+/* Used in select if a signalfd is part of the read descriptor set */
+HANDLE NO_COPY my_pendingsigs_evt;
+
 /* Function declarations */
 static int __reg1 checkstate (waitq *);
 static __inline__ bool get_proc_lock (DWORD, DWORD);
@@ -455,6 +458,10 @@ sigproc_init ()
     }
   ProtectHandle (my_readsig);
   myself->sendsig = my_sendsig;
+  my_pendingsigs_evt = CreateEvent (NULL, TRUE, FALSE, NULL);
+  if (!my_pendingsigs_evt)
+    api_fatal ("couldn't create pending signal event, %E");
+
   /* sync_proc_subproc is used by proc_subproc.  It serializes
      access to the children and proc arrays.  */
   sync_proc_subproc.init ("sync_proc_subproc");
@@ -1398,6 +1405,16 @@ wait_sig (VOID *)
 		      qnext->si.si_signo = 0;
 		    }
 		}
+	      /* At least one signal still queued?  The event is used in select
+		 only, and only to decide if WFMO should wake up in case a
+		 signalfd is waiting via select/poll for being ready to read a
+		 pending signal.  This method wakes up all threads hanging in
+		 select and having a signalfd, as soon as a pending signal is
+		 available, but it's certainly better than constant polling. */
+	      if (sigq.start.next)
+		SetEvent (my_pendingsigs_evt);
+	      else
+		ResetEvent (my_pendingsigs_evt);
 	      if (pack.si.si_signo == SIGCHLD)
 		clearwait = true;
 	    }

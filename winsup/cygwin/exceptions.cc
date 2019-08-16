@@ -1469,14 +1469,6 @@ sigpacket::process ()
   if (issig_wait)
     {
       tls->sigwait_mask = 0;
-      /* If the catching thread is running select on a signalfd, don't call
-	 the signal handler and don't remove the signal from the queue. */
-      if (tls->signalfd_select_wait)
-	{
-	  SetEvent (tls->signalfd_select_wait);
-	  rc = 0;
-	  goto done;
-	}
       goto dosig;
     }
 

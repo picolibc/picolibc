@@ -189,8 +189,8 @@ public:
   stack_t altstack;
   siginfo_t *sigwait_info;
   HANDLE signal_arrived;
-  HANDLE signalfd_select_wait;
   bool will_wait_for_signal;
+  long __align;			/* Needed to align context to 16 byte. */
   /* context MUST be aligned to 16 byte, otherwise RtlCaptureContext fails.
      If you prepend cygtls members here, make sure context stays 16 byte
      aligned. */

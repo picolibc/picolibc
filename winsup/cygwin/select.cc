@@ -1849,80 +1849,6 @@ fhandler_windows::select_except (select_stuff *ss)
   return s;
 }
 
-static int start_thread_signalfd (select_record *, select_stuff *);
-
-static DWORD WINAPI
-thread_signalfd (void *arg)
-{
-  select_signalfd_info *si = (select_signalfd_info *) arg;
-  bool event = false;
-
-  while (!event)
-    {
-      sigset_t set = 0;
-      _cygtls *tls = si->start->tls;
-
-      for (select_record *s = si->start; (s = s->next); )
-	if (s->startup == start_thread_signalfd)
-	  set |= ((fhandler_signalfd *) s->fh)->get_sigset ();
-      set_signal_mask (tls->sigwait_mask, set);
-      tls->signalfd_select_wait = si->evt;
-      sig_dispatch_pending (true);
-      switch (WaitForSingleObject (si->evt, INFINITE))
-	{
-	case WAIT_OBJECT_0:
-	  tls->signalfd_select_wait = NULL;
-	  event = true;
-	  break;
-	default:
-	  break;
-	}
-      if (si->stop_thread)
-	break;
-      if (!event)
-	Sleep (1L);
-    }
-  CloseHandle (si->evt);
-  return 0;
-}
-
-static int
-start_thread_signalfd (select_record *me, select_stuff *stuff)
-{
-  select_signalfd_info *si;
-
-  if ((si = stuff->device_specific_signalfd))
-    {
-      me->h = *si->thread;
-      return 1;
-    }
-  si = new select_signalfd_info;
-  si->start = &stuff->start;
-  si->stop_thread = false;
-  si->evt = CreateEventW (&sec_none_nih, TRUE, FALSE, NULL);
-  si->thread = new cygthread (thread_signalfd, si, "signalfdsel");
-  me->h = *si->thread;
-  stuff->device_specific_signalfd = si;
-  return 1;
-}
-
-static void
-signalfd_cleanup (select_record *, select_stuff *stuff)
-{
-  select_signalfd_info *si;
-
-  if (!(si = stuff->device_specific_signalfd))
-    return;
-  if (si->thread)
-    {
-      si->stop_thread = true;
-      SetEvent (si->evt);
-      si->thread->detach ();
-    }
-  delete si;
-  stuff->device_specific_signalfd = NULL;
-}
-
 static int
 peek_signalfd (select_record *me, bool)
 {
@@ -1942,17 +1868,19 @@ verify_signalfd (select_record *me, fd_set *rfds, fd_set *wfds, fd_set *efds)
   return peek_signalfd (me, true);
 }
 
+extern HANDLE my_pendingsigs_evt;
+
 select_record *
 fhandler_signalfd::select_read (select_stuff *stuff)
 {
   select_record *s = stuff->start.next;
   if (!s->startup)
     {
-      s->startup = start_thread_signalfd;
+      s->startup = no_startup;
       s->verify = verify_signalfd;
-      s->cleanup = signalfd_cleanup;
     }
   s->peek = peek_signalfd;
+  s->h = my_pendingsigs_evt;	/* wait_sig sets this if signal are pending */
   s->read_selected = true;
   s->read_ready = false;
   return s;

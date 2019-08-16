@@ -29,10 +29,10 @@
 //; $tls::psigwait_info = 4144;
 //; $tls::signal_arrived = -8648;
 //; $tls::psignal_arrived = 4152;
-//; $tls::signalfd_select_wait = -8640;
-//; $tls::psignalfd_select_wait = 4160;
-//; $tls::will_wait_for_signal = -8632;
-//; $tls::pwill_wait_for_signal = 4168;
+//; $tls::will_wait_for_signal = -8640;
+//; $tls::pwill_wait_for_signal = 4160;
+//; $tls::__align = -8632;
+//; $tls::p__align = 4168;
 //; $tls::context = -8624;
 //; $tls::pcontext = 4176;
 //; $tls::thread_id = -7328;
@@ -91,10 +91,10 @@
 #define tls_psigwait_info (4144)
 #define tls_signal_arrived (-8648)
 #define tls_psignal_arrived (4152)
-#define tls_signalfd_select_wait (-8640)
-#define tls_psignalfd_select_wait (4160)
-#define tls_will_wait_for_signal (-8632)
-#define tls_pwill_wait_for_signal (4168)
+#define tls_will_wait_for_signal (-8640)
+#define tls_pwill_wait_for_signal (4160)
+#define tls___align (-8632)
+#define tls_p__align (4168)
 #define tls_context (-8624)
 #define tls_pcontext (4176)
 #define tls_thread_id (-7328)
