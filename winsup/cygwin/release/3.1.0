@@ -71,6 +71,3 @@ Bug Fixes
 - 64 bit only: Avoid collisions between memory maps created with shmat
   and Windows datastructures during fork.
   Addresses: https://cygwin.com/ml/cygwin/2019-08/msg00107.html
-
-- Avoid a SEGV after using signalfd.
-  Addresses: https://cygwin.com/ml/cygwin/2019-08/msg00148.html
