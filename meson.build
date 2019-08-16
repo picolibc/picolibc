@@ -3,7 +3,7 @@ project('picolibc', 'c',
 		'buildtype=debugoptimized',
 		'c_std=gnu99',
 	],
-	version: '3.1.0.2019.08.14'
+	version: '3.1.0.2019.08.15'
 )
 
 targets = []
