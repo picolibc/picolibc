@@ -38,15 +38,6 @@ struct	stat
   time_t	st_atime;
   time_t	st_mtime;
   time_t	st_ctime;
-#elif defined(__cris__)
-  time_t	st_atime;
-  long		st_spare1;
-  time_t	st_mtime;
-  long		st_spare2;
-  time_t	st_ctime;
-  long		st_spare3;
-  blksize_t	st_blksize;
-  blkcnt_t	st_blocks;
 #else
   struct timespec st_atim;
   struct timespec st_mtim;

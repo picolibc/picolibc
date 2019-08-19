@@ -60,6 +60,9 @@ EOF
 cat > fstat.c <<EOF
 $lu#include <string.h>
 #include <sys/stat.h>
+#undef st_atime
+#undef st_mtime
+#undef st_ctime
 int
 _fstat (int fd, struct stat *buf)
 {
@@ -81,9 +84,9 @@ _fstat (int fd, struct stat *buf)
   buf->st_size = ks.st_size;
   buf->st_blksize = ks.st_blksize;
   buf->st_blocks = ks.st_blocks;
-  buf->st_atime = ks.st_atime;
-  buf->st_mtime = ks.st_mtime;
-  buf->st_ctime = ks.st_ctime;
+  buf->st_atim.tv_sec = ks.st_atime;
+  buf->st_mtim.tv_sec = ks.st_mtime;
+  buf->st_ctim.tv_sec = ks.st_ctime;
   R (retval)
 EOF
 cat > getpid.c <<EOF
@@ -216,6 +219,9 @@ EOF
 cat > stat.c <<EOF
 $lu#include <string.h>
 #include <sys/stat.h>
+#undef st_atime
+#undef st_mtime
+#undef st_ctime
 int
 _stat (const char *path, struct stat *buf)
 {
@@ -237,9 +243,9 @@ _stat (const char *path, struct stat *buf)
   buf->st_size = ks.st_size;
   buf->st_blksize = ks.st_blksize;
   buf->st_blocks = ks.st_blocks;
-  buf->st_atime = ks.st_atime;
-  buf->st_mtime = ks.st_mtime;
-  buf->st_ctime = ks.st_ctime;
+  buf->st_atim.tv_sec = ks.st_atime;
+  buf->st_mtim.tv_sec = ks.st_mtime;
+  buf->st_ctim.tv_sec = ks.st_ctime;
   R (retval)
 EOF
 cat > times.c <<EOF
