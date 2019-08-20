@@ -94,9 +94,9 @@ __hosted_from_gdb_stat (const struct gdb_stat *gs,
   s->st_size = gs->st_size;
   s->st_blksize = gs->st_blksize;
   s->st_blocks = gs->st_blocks;
-  s->st_atime = gs->st_atime;
-  s->st_mtime = gs->st_mtime;
-  s->st_ctime = gs->st_ctime;
+  s->st_atime = gs->st_atim;
+  s->st_mtime = gs->st_mtim;
+  s->st_ctime = gs->st_ctim;
 }
 
 void

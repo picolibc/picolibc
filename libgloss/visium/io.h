@@ -57,9 +57,9 @@ struct gdb_stat {
   uint64_t    st_size;    /* total size, in bytes */
   uint64_t    st_blksize; /* blocksize for filesystem I/O */
   uint64_t    st_blocks;  /* number of blocks allocated */
-  gdb_time_t  st_atime;   /* time of last access */
-  gdb_time_t  st_mtime;   /* time of last modification */
-  gdb_time_t  st_ctime;   /* time of last change */
+  gdb_time_t  st_atim;   /* time of last access */
+  gdb_time_t  st_mtim;   /* time of last modification */
+  gdb_time_t  st_ctim;   /* time of last change */
 };
 
 struct gdb_timeval {
