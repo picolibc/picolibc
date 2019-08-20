@@ -16,7 +16,6 @@ meson "$arg" \
 	-Dnewlib-reent-small=true\
 	-Dnewlib-wide-orient=false\
 	-Dnewlib-nano-malloc=true\
-	-Dnewlib-reent-small=true\
 	-Dlite-exit=true\
 	-Dnewlib-global-atexit=true\
 	-Dnewlib-global-errno=true\
