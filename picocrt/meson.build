@@ -18,7 +18,7 @@ foreach target : targets
   if target == ''
     crt_name = 'crt0.o'
   else
-    crt_name = target.underscorify() + '_crt0.o'
+    crt_name = join_paths(target, 'crt0.o')
   endif
 
   executable(crt_name,
