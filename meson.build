@@ -88,6 +88,9 @@ configure_file(input: 'picolibc.specs.in',
 	       install_dir: specs_dir,
 	       install: true)
 				     
+install_data('picolibc.ld',
+	     install_dir: specs_dir)
+
 long_double_code = '''
 #include <float.h>
 #ifndef LDBL_MANT_DIG

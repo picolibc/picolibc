@@ -5,10 +5,13 @@
 -isystem @INCLUDEDIR@ %(picolibc_cpp)
 
 *link:
--L@LIBDIR@/%M %(picolibc_link)
+%{!T:-T@LIBDIR@/picolibc.ld} -L@LIBDIR@/%M %(picolibc_link)
 
 *lib:
 --start-group -lc --end-group 
+
+*endfile:
+
 
 *startfile:
 @LIBDIR@/%M/crt0%O%s
