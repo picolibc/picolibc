@@ -1,12 +1,10 @@
-srcs_reent = [
+srcs_reent_full = [
     'closer.c',
     'execr.c',
     'fcntlr.c',
     'fstat64r.c',
     'fstatr.c',
-    'getreent.c',
     'gettimeofdayr.c',
-    'impure.c',
     'isattyr.c',
     'linkr.c',
     'lseek64r.c',
@@ -26,6 +24,20 @@ srcs_reent = [
     'unlinkr.c',
     'writer.c',
 ]
+srcs_reent_common = [
+    'getreent.c',
+    'impure.c',
+]
+
+srcs_reent_tiny = [
+]
+srcs_reent = srcs_reent_common
+if newlib_tinystdio
+  srcs_reent += srcs_reent_tiny
+else
+  srcs_reent += srcs_reent_full
+endif
+
 foreach target : targets
 	value = get_variable('target_' + target)
 	set_variable('lib_reent' + target,
