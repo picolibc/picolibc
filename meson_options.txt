@@ -85,3 +85,5 @@ option('newlib-locale-info-extended', type: 'boolean', value: false,
        description: 'extended locale support')
 option('newlib-global-errno', type: 'boolean', value: false,
        description: 'use global errnor variable')
+option('newlib-initfini-array', type: 'boolean', value: true,
+       description: 'compiler supports INIT_ARRAY section types')
