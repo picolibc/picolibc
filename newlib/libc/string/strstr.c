@@ -90,7 +90,7 @@ strstr (const char *hs, const char *ne)
 
 # define RETURN_TYPE char *
 # define AVAILABLE(h, h_l, j, n_l) (((j) <= (h_l) - (n_l)) \
-   || ((h_l) += strnlen ((h) + (h_l), (n_l) | 2048), ((j) <= (h_l) - (n_l))))
+   || ((h_l) += strnlen ((char *)(h) + (h_l), (n_l) | 2048), ((j) <= (h_l) - (n_l))))
 
 # include "str-two-way.h"
 
@@ -147,7 +147,7 @@ strstr (const char *haystack, const char *needle)
   if (ne[0] == '\0')
     return (char *) hs;
   if (ne[1] == '\0')
-    return (char*)strchr (hs, ne[0]);
+    return (char*)strchr ((char *) hs, (char) ne[0]);
   if (ne[2] == '\0')
     return strstr2 (hs, ne);
   if (ne[3] == '\0')
@@ -155,8 +155,8 @@ strstr (const char *haystack, const char *needle)
   if (ne[4] == '\0')
     return strstr4 (hs, ne);
 
-  size_t ne_len = strlen (ne);
-  size_t hs_len = strnlen (hs, ne_len | 512);
+  size_t ne_len = strlen ((char *) ne);
+  size_t hs_len = strnlen ((char *) hs, ne_len | 512);
 
   /* Ensure haystack length is >= needle length.  */
   if (hs_len < ne_len)
@@ -187,7 +187,7 @@ strstr (const char *haystack, const char *needle)
 	    }
 	  if (end[ne_len] == 0)
 	    return NULL;
-	  end += strnlen (end + ne_len, 2048);
+	  end += strnlen ((char *) end + ne_len, 2048);
 	}
       while (hs <= end);
 
