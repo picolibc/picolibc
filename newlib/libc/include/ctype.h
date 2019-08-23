@@ -66,6 +66,9 @@ extern int toascii_l (int __c, locale_t __l);
 #define _X	0100
 #define	_B	0200
 
+/* For C++ backward-compatibility only.  */
+extern	__IMPORT const char	_ctype_[];
+
 #ifdef __HAVE_LOCALE_INFO__
 const char *__locale_ctype_ptr (void);
 #else
@@ -84,7 +87,12 @@ const char *__locale_ctype_ptr (void);
    Meanwhile, the real index to __CTYPE_PTR+1 must be cast to int,
    since isalpha(0x100000001LL) must equal isalpha(1), rather than being
    an out-of-bounds reference on a 64-bit machine.  */
-#define __ctype_lookup(__c) ((__CTYPE_PTR+sizeof(""[__c]))[(int)(__c)])
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wchar-subscripts"
+static inline char __ctype_lookup(char c) {
+  return ((__CTYPE_PTR+sizeof(""[c]))[(int)(c)]);
+}
+#pragma GCC diagnostic pop
 
 #define	isalpha(__c)	(__ctype_lookup(__c)&(_U|_L))
 #define	isupper(__c)	((__ctype_lookup(__c)&(_U|_L))==_U)
@@ -110,7 +118,13 @@ const char *__locale_ctype_ptr_l (locale_t);
 #else
 #define __locale_ctype_ptr_l(l)	_ctype_
 #endif
-#define __ctype_lookup_l(__c,__l) ((__locale_ctype_ptr_l(__l)+sizeof(""[__c]))[(int)(__c)])
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wchar-subscripts"
+static inline char __ctype_lookup_l(char c, locale_t l) {
+  return ((__locale_ctype_ptr_l(l)+sizeof(""[c]))[(int)(c)]);
+}
+#pragma GCC diagnostic pop
 
 #define	isalpha_l(__c,__l)	(__ctype_lookup_l(__c,__l)&(_U|_L))
 #define	isupper_l(__c,__l)	((__ctype_lookup_l(__c,__l)&(_U|_L))==_U)
@@ -169,9 +183,6 @@ const char *__locale_ctype_ptr_l (locale_t);
 #endif /* __POSIX_VISIBLE >= 200809 */
 
 #endif /* !__cplusplus */
-
-/* For C++ backward-compatibility only.  */
-extern	__IMPORT const char	_ctype_[];
 
 _END_STD_C
 

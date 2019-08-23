@@ -143,7 +143,7 @@ __set_ctype (struct __locale_t *loc, const char *charset)
 #if defined(_MB_EXTENDED_CHARSETS_ISO) || defined(_MB_EXTENDED_CHARSETS_WINDOWS)
   int idx;
 #endif
-  char *ctype_ptr = NULL;
+  const char *ctype_ptr = NULL;
 
   switch (*charset)
     {
