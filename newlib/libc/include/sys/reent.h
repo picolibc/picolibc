@@ -348,13 +348,6 @@ struct _rand48 {
  * reentrant.  IE: All state information is contained here.
  */
 
-#ifdef NEWLIB_GLOBAL_ERRNO
-#define _REENT_INIT_ERRNO
-#else
-#define _REENT_INIT_ERRNO \
-	._errno = 0,
-#endif
-
 #ifdef _REENT_GLOBAL_STDIO_STREAMS
 extern __FILE __sf[3];
 #define _REENT_STDIO_STREAM(var, index) &__sf[index]
@@ -430,12 +423,6 @@ struct _misc_reent
  * ports with 16-bit int's but 32-bit pointers, align nicely.  */
 struct _reent
 {
-# ifndef NEWLIB_GLOBAL_ERRNO
-  /* As an exception to the above put _errno first for binary
-     compatibility with non _REENT_SMALL targets.  */
-  int _errno;			/* local copy of errno */
-#endif
-
 # ifndef TINY_STDIO
   /* FILE is a big struct and may change over time.  To try to achieve binary
      compatibility with future versions, put stdin,stdout,stderr here.
@@ -484,15 +471,13 @@ struct _reent
 };
 
 # define _REENT_INIT(var) \
-  { _REENT_INIT_ERRNO \
-    _REENT_INIT_STDIO(var) \
+  { _REENT_INIT_STDIO(var) \
     _REENT_INIT_LOCALE \
     ._mp = NULL, \
     .__cleanup = NULL, \
     ._gamma_signgam = 0, \
     ._cvtlen = 0, \
     ._cvtbuf = _NULL, \
-    ._r48 = _NULL, \
     ._localtime_buf = _NULL, \
     ._asctime_buf = _NULL, \
     ._sig_func = _NULL, \
@@ -640,10 +625,6 @@ extern const struct __sFILE_fake __sf_fake_stderr;
 
 struct _reent
 {
-# ifndef NEWLIB_GLOBAL_ERRNO
-  int _errno;			/* local copy of errno */
-#endif
-
   /* FILE is a big struct and may change over time.  To try to achieve binary
      compatibility with future versions, put stdin,stdout,stderr here.
      These are pointers into member __sf defined below.  */
@@ -733,8 +714,7 @@ extern __FILE __sf[3];
 #endif
 
 #define _REENT_INIT(var) \
-  { _REENT_INIT_ERRNO \
-    _REENT_INIT_STDIO(var)	    \
+  { _REENT_INIT_STDIO(var)	    \
     _REENT_INIT_LOCALE \
     .__cleanup = _NULL, \
     ._result_k = 0, \

@@ -19,14 +19,6 @@ DESCRIPTION
 #endif
 #endif
 
-#ifndef REENTRANT_SYSCALLS_PROVIDED
-
-/* We use the errno variable used by the system dependent layer.  */
-#undef errno
-int errno;
-
-#endif
-
 /* Interim cleanup code */
 
 void
