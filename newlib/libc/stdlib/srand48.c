@@ -14,23 +14,22 @@
 #include "rand48.h"
 
 void
-_srand48_r (struct _reent *r,
+_srand48_r (struct _rand48 *r,
        long seed)
 {
-  _REENT_CHECK_RAND48(r);
-  __rand48_seed[0] = _RAND48_SEED_0;
-  __rand48_seed[1] = (unsigned short) seed;
-  __rand48_seed[2] = (unsigned short) ((unsigned long)seed >> 16);
-  __rand48_mult[0] = _RAND48_MULT_0;
-  __rand48_mult[1] = _RAND48_MULT_1;
-  __rand48_mult[2] = _RAND48_MULT_2;
-  __rand48_add = _RAND48_ADD;
+  r->_seed[0] = _RAND48_SEED_0;
+  r->_seed[1] = (unsigned short) seed;
+  r->_seed[2] = (unsigned short) ((unsigned long)seed >> 16);
+  r->_mult[0] = _RAND48_MULT_0;
+  r->_mult[1] = _RAND48_MULT_1;
+  r->_mult[2] = _RAND48_MULT_2;
+  r->_add = _RAND48_ADD;
 }
 
 #ifndef _REENT_ONLY
 void
 srand48 (long seed)
 {
-  _srand48_r (_REENT, seed);
+  _srand48_r (&_rand48, seed);
 }
 #endif /* !_REENT_ONLY */

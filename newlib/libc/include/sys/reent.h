@@ -304,37 +304,6 @@ struct _glue
 
 #define _GLUE_INIT	{ _NULL, 0, _NULL }
 
-/*
- * rand48 family support
- *
- * Copyright (c) 1993 Martin Birgmeier
- * All rights reserved.
- *
- * You may redistribute unmodified or modified versions of this source
- * code provided that the above copyright notice and this and the
- * following conditions are retained.
- *
- * This software is provided ``as is'', and comes with no warranties
- * of any kind. I shall in no event be liable for anything that happens
- * to anyone/anything when using this software.
- */
-#define        _RAND48_SEED_0  (0x330e)
-#define        _RAND48_SEED_1  (0xabcd)
-#define        _RAND48_SEED_2  (0x1234)
-#define        _RAND48_MULT_0  (0xe66d)
-#define        _RAND48_MULT_1  (0xdeec)
-#define        _RAND48_MULT_2  (0x0005)
-#define        _RAND48_ADD     (0x000b)
-struct _rand48 {
-  unsigned short _seed[3];
-  unsigned short _mult[3];
-  unsigned short _add;
-#ifdef _REENT_SMALL
-  /* Put this in here as well, for good luck.  */
-  __extension__ unsigned long long _rand_next;
-#endif
-};
-
 /* How big the some arrays are.  */
 #define _REENT_EMERGENCY_SIZE 25
 #define _REENT_ASCTIME_SIZE 26
@@ -451,7 +420,6 @@ struct _reent
   int _cvtlen;			/* should be size_t */
   char *_cvtbuf;
 
-  struct _rand48 *_r48;
   struct __tm *_localtime_buf;
   char *_asctime_buf;
 
@@ -541,21 +509,6 @@ extern const struct __sFILE_fake __sf_fake_stderr;
   _REENT_CHECK(var, _asctime_buf, char *, _REENT_ASCTIME_SIZE, \
     memset((var)->_asctime_buf, 0, _REENT_ASCTIME_SIZE))
 
-/* Handle the dynamically allocated rand48 structure. */
-#define _REENT_INIT_RAND48(var) do { \
-  struct _reent *_r = (var); \
-  _r->_r48->_seed[0] = _RAND48_SEED_0; \
-  _r->_r48->_seed[1] = _RAND48_SEED_1; \
-  _r->_r48->_seed[2] = _RAND48_SEED_2; \
-  _r->_r48->_mult[0] = _RAND48_MULT_0; \
-  _r->_r48->_mult[1] = _RAND48_MULT_1; \
-  _r->_r48->_mult[2] = _RAND48_MULT_2; \
-  _r->_r48->_add = _RAND48_ADD; \
-  _r->_r48->_rand_next = 1; \
-} while (0)
-#define _REENT_CHECK_RAND48(var) \
-  _REENT_CHECK(var, _r48, struct _rand48 *, sizeof *((var)->_r48), _REENT_INIT_RAND48((var)))
-
 #define _REENT_INIT_MP(var) do { \
   struct _reent *_r = (var); \
   _r->_mp->_result_k = 0; \
@@ -597,10 +550,6 @@ extern const struct __sFILE_fake __sf_fake_stderr;
   _REENT_CHECK(var, _signal_buf, char *, _REENT_SIGNAL_SIZE, /* nothing */)
 
 #define _REENT_SIGNGAM(ptr)	((ptr)->_gamma_signgam)
-#define _REENT_RAND_NEXT(ptr)	((ptr)->_r48->_rand_next)
-#define _REENT_RAND48_SEED(ptr)	((ptr)->_r48->_seed)
-#define _REENT_RAND48_MULT(ptr)	((ptr)->_r48->_mult)
-#define _REENT_RAND48_ADD(ptr)	((ptr)->_r48->_add)
 #define _REENT_MP_RESULT(ptr)	((ptr)->_mp->_result)
 #define _REENT_MP_RESULT_K(ptr)	((ptr)->_mp->_result_k)
 #define _REENT_MP_P5S(ptr)	((ptr)->_mp->_p5s)
@@ -662,8 +611,6 @@ struct _reent
           char _asctime_buf[_REENT_ASCTIME_SIZE];
           struct __tm _localtime_buf;
           int _gamma_signgam;
-          __extension__ unsigned long long _rand_next;
-          struct _rand48 _r48;
           _mbstate_t _mblen_state;
           _mbstate_t _mbtowc_state;
           _mbstate_t _wctomb_state;
@@ -729,12 +676,6 @@ extern __FILE __sf[3];
         "", \
         {0, 0, 0, 0, 0, 0, 0, 0, 0}, \
         0, \
-        1, \
-        { \
-          {_RAND48_SEED_0, _RAND48_SEED_1, _RAND48_SEED_2}, \
-          {_RAND48_MULT_0, _RAND48_MULT_1, _RAND48_MULT_2}, \
-          _RAND48_ADD \
-        }, \
         {0, {0}}, \
         {0, {0}}, \
         {0, {0}}, \
@@ -757,17 +698,8 @@ extern __FILE __sf[3];
   { (var)->_stdin = _REENT_STDIO_STREAM(var, 0); \
     (var)->_stdout = _REENT_STDIO_STREAM(var, 1); \
     (var)->_stderr = _REENT_STDIO_STREAM(var, 2); \
-    (var)->_new._reent._rand_next = 1; \
-    (var)->_new._reent._r48._seed[0] = _RAND48_SEED_0; \
-    (var)->_new._reent._r48._seed[1] = _RAND48_SEED_1; \
-    (var)->_new._reent._r48._seed[2] = _RAND48_SEED_2; \
-    (var)->_new._reent._r48._mult[0] = _RAND48_MULT_0; \
-    (var)->_new._reent._r48._mult[1] = _RAND48_MULT_1; \
-    (var)->_new._reent._r48._mult[2] = _RAND48_MULT_2; \
-    (var)->_new._reent._r48._add = _RAND48_ADD; \
   }
 
-#define _REENT_CHECK_RAND48(ptr)	/* nothing */
 #define _REENT_CHECK_MP(ptr)		/* nothing */
 #define _REENT_CHECK_TM(ptr)		/* nothing */
 #define _REENT_CHECK_ASCTIME_BUF(ptr)	/* nothing */
@@ -776,10 +708,6 @@ extern __FILE __sf[3];
 #define _REENT_CHECK_SIGNAL_BUF(ptr)	/* nothing */
 
 #define _REENT_SIGNGAM(ptr)	((ptr)->_new._reent._gamma_signgam)
-#define _REENT_RAND_NEXT(ptr)	((ptr)->_new._reent._rand_next)
-#define _REENT_RAND48_SEED(ptr)	((ptr)->_new._reent._r48._seed)
-#define _REENT_RAND48_MULT(ptr)	((ptr)->_new._reent._r48._mult)
-#define _REENT_RAND48_ADD(ptr)	((ptr)->_new._reent._r48._add)
 #define _REENT_MP_RESULT(ptr)	((ptr)->_result)
 #define _REENT_MP_RESULT_K(ptr)	((ptr)->_result_k)
 #define _REENT_MP_P5S(ptr)	((ptr)->_p5s)

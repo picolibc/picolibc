@@ -232,26 +232,27 @@ int	rand_r (unsigned *__seed);
 #endif
 
 #if __SVID_VISIBLE || __XSI_VISIBLE
+struct _rand48;
 double drand48 (void);
-double _drand48_r (struct _reent *);
+double _drand48_r (struct _rand48 *);
 double erand48 (unsigned short [3]);
-double _erand48_r (struct _reent *, unsigned short [3]);
+double _erand48_r (struct _rand48 *, unsigned short [3]);
 long   jrand48 (unsigned short [3]);
-long   _jrand48_r (struct _reent *, unsigned short [3]);
+long   _jrand48_r (struct _rand48 *, unsigned short [3]);
 void  lcong48 (unsigned short [7]);
-void  _lcong48_r (struct _reent *, unsigned short [7]);
+void  _lcong48_r (struct _rand48 *, unsigned short [7]);
 long   lrand48 (void);
-long   _lrand48_r (struct _reent *);
+long   _lrand48_r (struct _rand48 *);
 long   mrand48 (void);
-long   _mrand48_r (struct _reent *);
+long   _mrand48_r (struct _rand48 *);
 long   nrand48 (unsigned short [3]);
-long   _nrand48_r (struct _reent *, unsigned short [3]);
+long   _nrand48_r (struct _rand48 *, unsigned short [3]);
 unsigned short *
        seed48 (unsigned short [3]);
 unsigned short *
-       _seed48_r (struct _reent *, unsigned short [3]);
+       _seed48_r (struct _rand48 *, unsigned short [3]);
 void  srand48 (long);
-void  _srand48_r (struct _reent *, long);
+void  _srand48_r (struct _rand48 *, long);
 #endif /* __SVID_VISIBLE || __XSI_VISIBLE */
 #if __SVID_VISIBLE || __XSI_VISIBLE >= 4 || __BSD_VISIBLE
 char *	initstate (unsigned, char *, size_t);
