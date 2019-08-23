@@ -7,6 +7,7 @@ meson $DIR \
 	-Dnewlib-wide-orient=false\
 	-Dnewlib-nano-malloc=true\
 	-Dlite-exit=true\
+	-Dnewlib-mb=true\
 	-Dnewlib-global-atexit=true\
 	-Dincludedir=lib/newlib-nano/include \
 	-Dlibdir=lib/newlib-nano/lib \
