@@ -118,6 +118,7 @@ _reclaim_reent (struct _reent *ptr)
 	  if (ptr->_sig_func)
 	_free_r (ptr, ptr->_sig_func);*/
 
+#ifndef TINY_STDIO
       if (ptr->__sdidinit)
 	{
 	  /* cleanup won't reclaim memory 'coz usually it's run
@@ -127,6 +128,7 @@ _reclaim_reent (struct _reent *ptr)
 	  if (ptr->__sglue._next)
 	    cleanup_glue (ptr, ptr->__sglue._next);
 	}
+#endif
 
       /* Malloc memory not reclaimed; no good way to return memory anyway. */
 
