@@ -7,3 +7,8 @@ test('Bart Massey printf test',
      executable('printf-tests', 'printf-tests.c',
 		link_with: [lib_m, lib_c],
 		include_directories: inc))
+
+test('Random number generator',
+     executable('rand', ['rand.c', 'test_io.c'],
+		link_with: [lib_m, lib_c],
+		include_directories: inc))
