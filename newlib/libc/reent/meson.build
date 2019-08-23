@@ -13,7 +13,6 @@ srcs_reent_full = [
     'open64r.c',
     'openr.c',
     'readr.c',
-    'reent.c',
     'renamer.c',
     'sbrkr.c',
     'signalr.c',
@@ -27,6 +26,7 @@ srcs_reent_full = [
 srcs_reent_common = [
     'getreent.c',
     'impure.c',
+    'reent.c',
 ]
 
 srcs_reent_tiny = [
