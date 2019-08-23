@@ -67,8 +67,6 @@ _reclaim_reent (struct _reent *ptr)
 #endif
 
 #ifdef _REENT_SMALL
-      if (ptr->_emergency)
-	_free_r (ptr, ptr->_emergency);
       if (ptr->_mp)
 	_free_r (ptr, ptr->_mp);
 	  if (ptr->_signal_buf)

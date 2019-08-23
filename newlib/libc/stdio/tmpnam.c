@@ -116,6 +116,10 @@ worker (struct _reent *ptr,
   return 1;
 }
 
+#define _TMPNAM_SIZE 25
+
+static NEWLIB_THREAD_LOCAL char _tmpnam_buf[_TMPNAM_SIZE];
+
 char *
 _tmpnam_r (struct _reent *p,
        char *s)
@@ -126,8 +130,7 @@ _tmpnam_r (struct _reent *p,
   if (s == NULL)
     {
       /* ANSI states we must use an internal static buffer if s is NULL */
-      _REENT_CHECK_EMERGENCY(p);
-      result = _REENT_EMERGENCY(p);
+      result = _tmpnam_buf;
     }
   else
     {
