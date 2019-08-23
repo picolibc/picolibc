@@ -15,7 +15,6 @@
  */
 
 #include "fdlibm.h"
-#include <reent.h>
 #include <errno.h>
 
 #if !defined(_IEEE_LIBM) || !defined(HAVE_ALIAS_ATTRIBUTE)
@@ -27,7 +26,7 @@
 #endif
 {
         float y;
-        y = __ieee754_gammaf_r(x,&(_REENT_SIGNGAM(_REENT)));
+        y = __ieee754_gammaf_r(x,&signgam);
         if(_LIB_VERSION == _IEEE_) return y;
         if(!finitef(y)&&finitef(x)) {
 	    if(floorf(x)==x&&x<=0.0f) {

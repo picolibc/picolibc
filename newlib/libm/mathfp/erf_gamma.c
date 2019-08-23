@@ -35,5 +35,5 @@
 
 float gammaf(float x)
 {
-  return gammaf_r(x, &(_REENT_SIGNGAM(_REENT)));
+  return gammaf_r(x, &signgam);
 }

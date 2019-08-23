@@ -19,7 +19,6 @@
  */
 
 #include "fdlibm.h"
-#include <reent.h>
 #include <errno.h>
 
 #ifndef _DOUBLE_IS_32BITS
@@ -32,10 +31,10 @@
 #endif
 {
 #ifdef _IEEE_LIBM
-	return __ieee754_lgamma_r(x,&(_REENT_SIGNGAM(_REENT)));
+	return __ieee754_lgamma_r(x,&signgam);
 #else
         double y;
-        y = __ieee754_lgamma_r(x,&(_REENT_SIGNGAM(_REENT)));
+        y = __ieee754_lgamma_r(x,&signgam);
         if(_LIB_VERSION == _IEEE_) return y;
         if(!finite(y)&&finite(x)) {
 	    if(floor(x)==x&&x<=0.0)

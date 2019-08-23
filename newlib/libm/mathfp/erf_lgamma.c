@@ -247,5 +247,5 @@ static float zero=  0.0000000000e+00;
 
 float lgammaf(float x)
 {
-  return lgammaf_r(x, &(_REENT_SIGNGAM(_REENT)));
+  return lgammaf_r(x, &signgam);
 }

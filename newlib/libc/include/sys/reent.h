@@ -400,8 +400,6 @@ struct _reent
 
   void (*__cleanup) (struct _reent *);
 
-  int _gamma_signgam;
-
   /* used by some fp conversion routines */
   int _cvtlen;			/* should be size_t */
   char *_cvtbuf;
@@ -428,7 +426,6 @@ struct _reent
     _REENT_INIT_LOCALE \
     ._mp = NULL, \
     .__cleanup = NULL, \
-    ._gamma_signgam = 0, \
     ._cvtlen = 0, \
     ._cvtbuf = _NULL, \
     ._asctime_buf = _NULL, \
@@ -529,7 +526,6 @@ extern const struct __sFILE_fake __sf_fake_stderr;
 #define _REENT_CHECK_SIGNAL_BUF(var) \
   _REENT_CHECK(var, _signal_buf, char *, _REENT_SIGNAL_SIZE, /* nothing */)
 
-#define _REENT_SIGNGAM(ptr)	((ptr)->_gamma_signgam)
 #define _REENT_MP_RESULT(ptr)	((ptr)->_mp->_result)
 #define _REENT_MP_RESULT_K(ptr)	((ptr)->_mp->_result_k)
 #define _REENT_MP_P5S(ptr)	((ptr)->_mp->_p5s)
@@ -588,7 +584,6 @@ struct _reent
           unsigned int _unused_rand;
           char * _strtok_last;
           char _asctime_buf[_REENT_ASCTIME_SIZE];
-          int _gamma_signgam;
           _mbstate_t _mblen_state;
           _mbstate_t _mbtowc_state;
           _mbstate_t _wctomb_state;
@@ -652,7 +647,6 @@ extern __FILE __sf[3];
         0, \
         _NULL, \
         "", \
-        0, \
         {0, {0}}, \
         {0, {0}}, \
         {0, {0}}, \
@@ -683,7 +677,6 @@ extern __FILE __sf[3];
 #define _REENT_CHECK_MISC(ptr)	        /* nothing */
 #define _REENT_CHECK_SIGNAL_BUF(ptr)	/* nothing */
 
-#define _REENT_SIGNGAM(ptr)	((ptr)->_new._reent._gamma_signgam)
 #define _REENT_MP_RESULT(ptr)	((ptr)->_result)
 #define _REENT_MP_RESULT_K(ptr)	((ptr)->_result_k)
 #define _REENT_MP_P5S(ptr)	((ptr)->_p5s)

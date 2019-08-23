@@ -559,13 +559,7 @@ extern float pow10l (float);
 #endif /* __GNU_VISIBLE */
 
 #if __MISC_VISIBLE || __XSI_VISIBLE
-/* The gamma functions use a global variable, signgam.  */
-#ifndef _REENT_ONLY
-#define signgam (*__signgam())
-extern int *__signgam (void);
-#endif /* ! defined (_REENT_ONLY) */
-
-#define __signgam_r(ptr) _REENT_SIGNGAM(ptr)
+extern NEWLIB_THREAD_LOCAL int signgam;
 #endif /* __MISC_VISIBLE || __XSI_VISIBLE */
 
 /* Useful constants.  */
