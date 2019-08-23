@@ -292,7 +292,6 @@ struct _glue
 
 /* How big the some arrays are.  */
 #define _REENT_EMERGENCY_SIZE 25
-#define _REENT_ASCTIME_SIZE 26
 #define _REENT_SIGNAL_SIZE 24
 
 /*
@@ -404,8 +403,6 @@ struct _reent
   int _cvtlen;			/* should be size_t */
   char *_cvtbuf;
 
-  char *_asctime_buf;
-
   /* signal info */
   void (**(_sig_func))(int);
 
@@ -428,7 +425,6 @@ struct _reent
     .__cleanup = NULL, \
     ._cvtlen = 0, \
     ._cvtbuf = _NULL, \
-    ._asctime_buf = _NULL, \
     ._sig_func = _NULL, \
     _REENT_INIT_ATEXIT \
     .__sglue = _GLUE_INIT, \
@@ -482,10 +478,6 @@ extern const struct __sFILE_fake __sf_fake_stderr;
   } \
 } while (0)
 
-#define _REENT_CHECK_ASCTIME_BUF(var) \
-  _REENT_CHECK(var, _asctime_buf, char *, _REENT_ASCTIME_SIZE, \
-    memset((var)->_asctime_buf, 0, _REENT_ASCTIME_SIZE))
-
 #define _REENT_INIT_MP(var) do { \
   struct _reent *_r = (var); \
   _r->_mp->_result_k = 0; \
@@ -530,7 +522,6 @@ extern const struct __sFILE_fake __sf_fake_stderr;
 #define _REENT_MP_RESULT_K(ptr)	((ptr)->_mp->_result_k)
 #define _REENT_MP_P5S(ptr)	((ptr)->_mp->_p5s)
 #define _REENT_MP_FREELIST(ptr)	((ptr)->_mp->_freelist)
-#define _REENT_ASCTIME_BUF(ptr)	((ptr)->_asctime_buf)
 #define _REENT_EMERGENCY(ptr)	((ptr)->_emergency)
 #define _REENT_STRTOK_LAST(ptr)	((ptr)->_misc->_strtok_last)
 #define _REENT_MBLEN_STATE(ptr)	((ptr)->_misc->_mblen_state)
@@ -583,7 +574,6 @@ struct _reent
         {
           unsigned int _unused_rand;
           char * _strtok_last;
-          char _asctime_buf[_REENT_ASCTIME_SIZE];
           _mbstate_t _mblen_state;
           _mbstate_t _mbtowc_state;
           _mbstate_t _wctomb_state;
@@ -646,7 +636,6 @@ extern __FILE __sf[3];
       ._reent = { \
         0, \
         _NULL, \
-        "", \
         {0, {0}}, \
         {0, {0}}, \
         {0, {0}}, \
@@ -672,7 +661,6 @@ extern __FILE __sf[3];
   }
 
 #define _REENT_CHECK_MP(ptr)		/* nothing */
-#define _REENT_CHECK_ASCTIME_BUF(ptr)	/* nothing */
 #define _REENT_CHECK_EMERGENCY(ptr)	/* nothing */
 #define _REENT_CHECK_MISC(ptr)	        /* nothing */
 #define _REENT_CHECK_SIGNAL_BUF(ptr)	/* nothing */
@@ -681,7 +669,6 @@ extern __FILE __sf[3];
 #define _REENT_MP_RESULT_K(ptr)	((ptr)->_result_k)
 #define _REENT_MP_P5S(ptr)	((ptr)->_p5s)
 #define _REENT_MP_FREELIST(ptr)	((ptr)->_freelist)
-#define _REENT_ASCTIME_BUF(ptr)	((ptr)->_new._reent._asctime_buf)
 #define _REENT_EMERGENCY(ptr)	((ptr)->_emergency)
 #define _REENT_STRTOK_LAST(ptr)	((ptr)->_new._reent._strtok_last)
 #define _REENT_MBLEN_STATE(ptr)	((ptr)->_new._reent._mblen_state)

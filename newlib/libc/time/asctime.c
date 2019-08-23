@@ -43,17 +43,17 @@ ANSI C requires <<asctime>>.
 #include <string.h>
 #include <time.h>
 #include <_ansi.h>
-#include <reent.h>
 
 #ifndef _REENT_ONLY
+
+#define _ASCTIME_SIZE 26
+
+static NEWLIB_THREAD_LOCAL char _asctime_buf[_ASCTIME_SIZE];
 
 char *
 asctime (const struct tm *tim_p)
 {
-  struct _reent *reent = _REENT;
-
-  _REENT_CHECK_ASCTIME_BUF(reent);
-  return asctime_r (tim_p, _REENT_ASCTIME_BUF(reent));
+  return asctime_r (tim_p, (char * __restrict) &_asctime_buf);
 }
 
 #endif

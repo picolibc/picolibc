@@ -71,8 +71,6 @@ _reclaim_reent (struct _reent *ptr)
 	_free_r (ptr, ptr->_emergency);
       if (ptr->_mp)
 	_free_r (ptr, ptr->_mp);
-      if (ptr->_asctime_buf)
-	_free_r (ptr, ptr->_asctime_buf);
 	  if (ptr->_signal_buf)
 	_free_r (ptr, ptr->_signal_buf);
 	  if (ptr->_misc)
