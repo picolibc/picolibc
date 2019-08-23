@@ -707,7 +707,7 @@ restart:
     case 'c':
       if (charset[1] != 'P' && charset[1] != 'p')
 	FAIL;
-      strncpy (charset, "CP", 2);
+      memcpy (charset, "CP", 2);
       val = strtol (charset + 2, &end, 10);
       if (*end)
 	FAIL;
