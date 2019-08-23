@@ -457,7 +457,6 @@ void * nano_calloc(RARG malloc_size_t n, malloc_size_t elem)
 void * nano_realloc(RARG void * ptr, malloc_size_t size)
 {
     void * mem;
-    chunk * p_to_realloc;
 
     if (ptr == NULL) return nano_malloc(RCALL size);
 
