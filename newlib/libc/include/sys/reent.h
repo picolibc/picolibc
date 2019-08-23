@@ -350,7 +350,6 @@ struct _mprec
 struct _misc_reent
 {
   /* miscellaneous reentrant data */
-  char *_strtok_last;
   _mbstate_t _mblen_state;
   _mbstate_t _wctomb_state;
   _mbstate_t _mbtowc_state;
@@ -477,7 +476,6 @@ extern const struct __sFILE_fake __sf_fake_stderr;
 
 #define _REENT_INIT_MISC(var) do { \
   struct _reent *_r = (var); \
-  _r->_misc->_strtok_last = _NULL; \
   _r->_misc->_mblen_state.__count = 0; \
   _r->_misc->_mblen_state.__value.__wch = 0; \
   _r->_misc->_wctomb_state.__count = 0; \
@@ -507,7 +505,6 @@ extern const struct __sFILE_fake __sf_fake_stderr;
 #define _REENT_MP_RESULT_K(ptr)	((ptr)->_mp->_result_k)
 #define _REENT_MP_P5S(ptr)	((ptr)->_mp->_p5s)
 #define _REENT_MP_FREELIST(ptr)	((ptr)->_mp->_freelist)
-#define _REENT_STRTOK_LAST(ptr)	((ptr)->_misc->_strtok_last)
 #define _REENT_MBLEN_STATE(ptr)	((ptr)->_misc->_mblen_state)
 #define _REENT_MBTOWC_STATE(ptr)((ptr)->_misc->_mbtowc_state)
 #define _REENT_WCTOMB_STATE(ptr)((ptr)->_misc->_wctomb_state)
@@ -556,7 +553,6 @@ struct _reent
       struct
         {
           unsigned int _unused_rand;
-          char * _strtok_last;
           _mbstate_t _mblen_state;
           _mbstate_t _mbtowc_state;
           _mbstate_t _wctomb_state;
@@ -618,7 +614,6 @@ extern __FILE __sf[3];
     ._new = { \
       ._reent = { \
         0, \
-        _NULL, \
         {0, {0}}, \
         {0, {0}}, \
         {0, {0}}, \
@@ -651,7 +646,6 @@ extern __FILE __sf[3];
 #define _REENT_MP_RESULT_K(ptr)	((ptr)->_result_k)
 #define _REENT_MP_P5S(ptr)	((ptr)->_p5s)
 #define _REENT_MP_FREELIST(ptr)	((ptr)->_freelist)
-#define _REENT_STRTOK_LAST(ptr)	((ptr)->_new._reent._strtok_last)
 #define _REENT_MBLEN_STATE(ptr)	((ptr)->_new._reent._mblen_state)
 #define _REENT_MBTOWC_STATE(ptr)((ptr)->_new._reent._mbtowc_state)
 #define _REENT_WCTOMB_STATE(ptr)((ptr)->_new._reent._wctomb_state)
