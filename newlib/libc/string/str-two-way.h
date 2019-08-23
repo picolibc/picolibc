@@ -195,7 +195,7 @@ critical_factorization (const unsigned char *needle, size_t needle_len,
    most 2 * HAYSTACK_LEN - NEEDLE_LEN comparisons occur in searching.
    If AVAILABLE modifies HAYSTACK_LEN (as in strstr), then at most 3 *
    HAYSTACK_LEN - NEEDLE_LEN comparisons occur in searching.  */
-static RETURN_TYPE
+static inline RETURN_TYPE
 two_way_short_needle (const unsigned char *haystack, size_t haystack_len,
 		      const unsigned char *needle, size_t needle_len)
 {
