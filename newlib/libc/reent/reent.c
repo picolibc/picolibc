@@ -32,48 +32,26 @@ cleanup_glue (struct _reent *ptr,
   _free_r (ptr, glue);
 }
 
+void mprec_free(void);
+
+#ifdef __weak_alias
+__weak_alias(mprec_free_noop, mprec_free)
+
+void
+mprec_free_noop(void)
+{
+}
+#else
+#define mprec_free_noop mprec_free
+#endif
+
 void
 _reclaim_reent (struct _reent *ptr)
 {
   if (ptr != _impure_ptr)
     {
       /* used by mprec routines. */
-#ifdef _REENT_SMALL
-      if (ptr->_mp)	/* don't bother allocating it! */
-      {
-#endif
-      if (_REENT_MP_FREELIST(ptr))
-	{
-	  int i;
-	  for (i = 0; i < _Kmax; i++) 
-	    {
-	      struct _Bigint *thisone, *nextone;
-	
-	      nextone = _REENT_MP_FREELIST(ptr)[i];
-	      while (nextone)
-		{
-		  thisone = nextone;
-		  nextone = nextone->_next;
-		  _free_r (ptr, thisone);
-		}
-	    }    
-
-	  _free_r (ptr, _REENT_MP_FREELIST(ptr));
-	}
-      if (_REENT_MP_RESULT(ptr))
-	_free_r (ptr, _REENT_MP_RESULT(ptr));
-#ifdef _REENT_SMALL
-      }
-#endif
-
-#ifdef _REENT_SMALL
-      if (ptr->_mp)
-	_free_r (ptr, ptr->_mp);
-	  if (ptr->_signal_buf)
-	_free_r (ptr, ptr->_signal_buf);
-	  if (ptr->_misc)
-	_free_r (ptr, ptr->_misc);
-#endif
+      mprec_free();
 
 #ifndef _REENT_GLOBAL_ATEXIT
       /* atexit stuff */

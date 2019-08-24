@@ -175,7 +175,7 @@ quorem (_Bigint * b, _Bigint * S)
 
 
 char *
-_dtoa_r (struct _reent *ptr,
+_dtoa_r (
 	double _d,
 	int mode,
 	int ndigits,
@@ -231,13 +231,12 @@ _dtoa_r (struct _reent *ptr,
 
   d.d = _d;
 
-  _REENT_CHECK_MP(ptr);
-  if (_REENT_MP_RESULT(ptr))
+  if (_mprec_result)
     {
-      _REENT_MP_RESULT(ptr)->_k = _REENT_MP_RESULT_K(ptr);
-      _REENT_MP_RESULT(ptr)->_maxwds = 1 << _REENT_MP_RESULT_K(ptr);
-      Bfree (ptr, _REENT_MP_RESULT(ptr));
-      _REENT_MP_RESULT(ptr) = 0;
+      _mprec_result->_k = _mprec_result_k;
+      _mprec_result->_maxwds = 1 << _mprec_result_k;
+      Bfree (_mprec_result);
+      _mprec_result = 0;
     }
 
   if (word0 (d) & Sign_bit)
@@ -284,7 +283,7 @@ _dtoa_r (struct _reent *ptr,
       return s;
     }
 
-  b = d2b (ptr, d.d, &be, &bbits);
+  b = d2b (d.d, &be, &bbits);
 #ifdef Sudden_Underflow
   i = (int) (word0 (d) >> Exp_shift1 & (Exp_mask >> Exp_shift1));
 #else
@@ -420,11 +419,15 @@ _dtoa_r (struct _reent *ptr,
 	i = 1;
     }
   j = sizeof (__ULong);
-  for (_REENT_MP_RESULT_K(ptr) = 0; sizeof (_Bigint) - sizeof (__ULong) + j <= i;
+  for (_mprec_result_k = 0; sizeof (_Bigint) - sizeof (__ULong) + j <= i;
        j <<= 1)
-    _REENT_MP_RESULT_K(ptr)++;
-  _REENT_MP_RESULT(ptr) = Balloc (ptr, _REENT_MP_RESULT_K(ptr));
-  s = s0 = (char *) _REENT_MP_RESULT(ptr);
+    _mprec_result_k++;
+  if (__mprec_register_exit() != 0)
+    return NULL;
+  _mprec_result = Balloc (_mprec_result_k);
+  if (!_mprec_result)
+    return NULL;
+  s = s0 = (char *) _mprec_result;
 
   if (ilim >= 0 && ilim <= Quick_max && try_quick)
     {
@@ -625,7 +628,7 @@ _dtoa_r (struct _reent *ptr,
 	}
       b2 += i;
       s2 += i;
-      mhi = i2b (ptr, 1);
+      mhi = i2b (1);
     }
   if (m2 > 0 && s2 > 0)
     {
@@ -640,20 +643,20 @@ _dtoa_r (struct _reent *ptr,
 	{
 	  if (m5 > 0)
 	    {
-	      mhi = pow5mult (ptr, mhi, m5);
-	      b1 = mult (ptr, mhi, b);
-	      Bfree (ptr, b);
+	      mhi = pow5mult (mhi, m5);
+	      b1 = mult (mhi, b);
+	      Bfree (b);
 	      b = b1;
 	    }
          if ((j = b5 - m5) != 0)
-	    b = pow5mult (ptr, b, j);
+	    b = pow5mult (b, j);
 	}
       else
-	b = pow5mult (ptr, b, b5);
+	b = pow5mult (b, b5);
     }
-  S = i2b (ptr, 1);
+  S = i2b (1);
   if (s5 > 0)
-    S = pow5mult (ptr, S, s5);
+    S = pow5mult (S, s5);
 
   /* Check for special case that d is a normalized power of 2. */
 
@@ -703,23 +706,23 @@ _dtoa_r (struct _reent *ptr,
       s2 += i;
     }
   if (b2 > 0)
-    b = lshift (ptr, b, b2);
+    b = lshift (b, b2);
   if (s2 > 0)
-    S = lshift (ptr, S, s2);
+    S = lshift (S, s2);
   if (k_check)
     {
       if (cmp (b, S) < 0)
 	{
 	  k--;
-	  b = multadd (ptr, b, 10, 0);	/* we botched the k estimate */
+	  b = multadd (b, 10, 0);	/* we botched the k estimate */
 	  if (leftright)
-	    mhi = multadd (ptr, mhi, 10, 0);
+	    mhi = multadd (mhi, 10, 0);
 	  ilim = ilim1;
 	}
     }
   if (ilim <= 0 && mode > 2)
     {
-      if (ilim < 0 || cmp (b, S = multadd (ptr, S, 5, 0)) <= 0)
+      if (ilim < 0 || cmp (b, S = multadd (S, 5, 0)) <= 0)
 	{
 	  /* no digits, fcvt style */
 	no_digits:
@@ -734,7 +737,7 @@ _dtoa_r (struct _reent *ptr,
   if (leftright)
     {
       if (m2 > 0)
-	mhi = lshift (ptr, mhi, m2);
+	mhi = lshift (mhi, m2);
 
       /* Compute mlo -- check for special case
        * that d is a normalized power of 2.
@@ -743,9 +746,9 @@ _dtoa_r (struct _reent *ptr,
       mlo = mhi;
       if (spec_case)
 	{
-	  mhi = Balloc (ptr, mhi->_k);
+	  mhi = Balloc (mhi->_k);
 	  Bcopy (mhi, mlo);
-	  mhi = lshift (ptr, mhi, Log2P);
+	  mhi = lshift (mhi, Log2P);
 	}
 
       for (i = 1;; i++)
@@ -755,9 +758,9 @@ _dtoa_r (struct _reent *ptr,
 	   * that will round to d?
 	   */
 	  j = cmp (b, mlo);
-	  delta = diff (ptr, S, mhi);
+	  delta = diff (S, mhi);
 	  j1 = delta->_sign ? 1 : cmp (b, delta);
-	  Bfree (ptr, delta);
+	  Bfree (delta);
 #ifndef ROUND_BIASED
 	  if (j1 == 0 && !mode && !(word1 (d) & 1))
 	    {
@@ -777,7 +780,7 @@ _dtoa_r (struct _reent *ptr,
 	    {
 	      if (j1 > 0)
 		{
-		  b = lshift (ptr, b, 1);
+		  b = lshift (b, 1);
 		  j1 = cmp (b, S);
                  if (((j1 > 0) || ((j1 == 0) && (dig & 1)))
 		      && dig++ == '9')
@@ -800,13 +803,13 @@ _dtoa_r (struct _reent *ptr,
 	  *s++ = dig;
 	  if (i == ilim)
 	    break;
-	  b = multadd (ptr, b, 10, 0);
+	  b = multadd (b, 10, 0);
 	  if (mlo == mhi)
-	    mlo = mhi = multadd (ptr, mhi, 10, 0);
+	    mlo = mhi = multadd (mhi, 10, 0);
 	  else
 	    {
-	      mlo = multadd (ptr, mlo, 10, 0);
-	      mhi = multadd (ptr, mhi, 10, 0);
+	      mlo = multadd (mlo, 10, 0);
+	      mhi = multadd (mhi, 10, 0);
 	    }
 	}
     }
@@ -816,12 +819,12 @@ _dtoa_r (struct _reent *ptr,
 	*s++ = dig = quorem (b, S) + '0';
 	if (i >= ilim)
 	  break;
-	b = multadd (ptr, b, 10, 0);
+	b = multadd (b, 10, 0);
       }
 
   /* Round off last digit */
 
-  b = lshift (ptr, b, 1);
+  b = lshift (b, 1);
   j = cmp (b, S);
   if ((j > 0) || ((j == 0) && (dig & 1)))
     {
@@ -841,15 +844,15 @@ _dtoa_r (struct _reent *ptr,
       s++;
     }
 ret:
-  Bfree (ptr, S);
+  Bfree (S);
   if (mhi)
     {
       if (mlo && mlo != mhi)
-	Bfree (ptr, mlo);
-      Bfree (ptr, mhi);
+	Bfree (mlo);
+      Bfree (mhi);
     }
 ret1:
-  Bfree (ptr, b);
+  Bfree (b);
   *s = 0;
   *decpt = k + 1;
   if (rve)

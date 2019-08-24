@@ -350,34 +350,37 @@ typedef struct _Bigint _Bigint;
 #define bigtens __mprec_bigtens
 #define tinytens __mprec_tinytens
 
-struct _reent ;
+extern NEWLIB_THREAD_LOCAL _Bigint *_mprec_result;
+extern NEWLIB_THREAD_LOCAL int _mprec_result_k;
+int __mprec_register_exit(void);
+
 struct FPI;
 double 		ulp (double x);
 double		b2d (_Bigint *a , int *e);
-_Bigint *	Balloc (struct _reent *p, int k);
-void 		Bfree (struct _reent *p, _Bigint *v);
-_Bigint *	multadd (struct _reent *p, _Bigint *, int, int);
-_Bigint *	s2b (struct _reent *, const char*, int, int, __ULong);
-_Bigint	*	i2b (struct _reent *,int);
-_Bigint *	mult (struct _reent *, _Bigint *, _Bigint *);
-_Bigint *	pow5mult (struct _reent *, _Bigint *, int k);
+_Bigint *	Balloc (int k);
+void 		Bfree (_Bigint *v);
+_Bigint *	multadd (_Bigint *, int, int);
+_Bigint *	s2b (const char*, int, int, __ULong);
+_Bigint	*	i2b (int);
+_Bigint *	mult (_Bigint *, _Bigint *);
+_Bigint *	pow5mult (_Bigint *, int k);
 int 		hi0bits (__ULong);
 int 		lo0bits (__ULong *);
-_Bigint *	d2b (struct _reent *p, double d, int *e, int *bits);
-_Bigint *	lshift (struct _reent *p, _Bigint *b, int k);
+_Bigint *	d2b (double d, int *e, int *bits);
+_Bigint *	lshift (_Bigint *b, int k);
 int		match (const char**, char*);
-_Bigint *	diff (struct _reent *p, _Bigint *a, _Bigint *b);
+_Bigint *	diff (_Bigint *a, _Bigint *b);
 int		cmp (_Bigint *a, _Bigint *b);
-int		gethex (struct _reent *p, const char **sp, const struct FPI *fpi, Long *exp, _Bigint **bp, int sign, locale_t loc);
+int		gethex (const char **sp, const struct FPI *fpi, Long *exp, _Bigint **bp, int sign, locale_t loc);
 double		ratio (_Bigint *a, _Bigint *b);
 __ULong		any_on (_Bigint *b, int k);
 void		copybits (__ULong *c, int n, _Bigint *b);
-double		_strtod_l (struct _reent *ptr, const char *__restrict s00,
+double		_strtod_l (const char *__restrict s00,
 			   char **__restrict se, locale_t loc);
-#if defined (_HAVE_LONG_DOUBLE) && !defined (_LDBL_EQ_DBL)
-int		_strtorx_l (struct _reent *, const char *, char **, int,
+#if defined (_HAVE_LONG_DOUBLE) && !defined (_LDBL_EQ_DBL) || 1
+int		_strtorx_l (const char *, char **, int,
 			    void *, locale_t);
-int		_strtodg_l (struct _reent *p, const char *s00, char **se,
+int		_strtodg_l (const char *s00, char **se,
 			    struct FPI *fpi, Long *exp, __ULong *bits,
 			    locale_t);
 #endif /* _HAVE_LONG_DOUBLE && !_LDBL_EQ_DBL */

@@ -36,7 +36,7 @@ THIS SOFTWARE.
 #include "mprec.h"
 #include "gdtoa.h"
 
-#if defined (_HAVE_LONG_DOUBLE) && !defined (_LDBL_EQ_DBL)
+#if defined (_HAVE_LONG_DOUBLE) && !defined (_LDBL_EQ_DBL) || 1
 
 /* one or the other of IEEE_MC68k or IEEE_8087 should be #defined */
 
@@ -97,9 +97,9 @@ ULtox(__UShort *L, __ULong *bits, Long exp, int k)
 
  int
 #ifdef KR_headers
-_strtorx_l(p, s, sp, rounding, L, loc) struct _reent *p; const char *s; char **sp; int rounding; void *L; locale_t loc;
+_strtorx_l(s, sp, rounding, L, loc) const char *s; char **sp; int rounding; void *L; locale_t loc;
 #else
-_strtorx_l(struct _reent *p, const char *s, char **sp, int rounding, void *L,
+_strtorx_l(const char *s, char **sp, int rounding, void *L,
 	   locale_t loc)
 #endif
 {
@@ -115,7 +115,7 @@ _strtorx_l(struct _reent *p, const char *s, char **sp, int rounding, void *L,
 		fpi1.rounding = rounding;
 		fpi = &fpi1;
 		}
-	k = _strtodg_l(p, s, sp, fpi, &exp, bits, loc);
+	k = _strtodg_l(s, sp, fpi, &exp, bits, loc);
 	ULtox((__UShort*)L, bits, exp, k);
 	return k;
 	}

@@ -179,7 +179,7 @@ _wcstod_l (struct _reent *ptr, const wchar_t *nptr, wchar_t **endptr,
         _wcsnrtombs_l(ptr, buf, &wcp, (size_t) -1, len + 1, &mbs, loc);
 
         /* Let strtod() do most of the work for us. */
-        val = _strtod_l(ptr, buf, &end, loc);
+        val = _strtod_l(buf, &end, loc);
 
         /*
          * We only know where the number ended in the _multibyte_

@@ -38,7 +38,7 @@ THIS SOFTWARE.
 
 #include "locale.h"
 
-#if defined (_HAVE_LONG_DOUBLE) && !defined (_LDBL_EQ_DBL)
+#if defined (_HAVE_LONG_DOUBLE) && !defined (_LDBL_EQ_DBL) || 1
 
 #define USE_LOCALE
 
@@ -52,7 +52,7 @@ fivesbits[] = {	 0,  3,  5,  7, 10, 12, 14, 17, 19, 21,
 		};
 
 static _Bigint *
-sum (struct _reent *p, _Bigint *a, _Bigint *b)
+sum (_Bigint *a, _Bigint *b)
 {
 	_Bigint *c;
 	__ULong carry, *xc, *xa, *xb, *xe, y;
@@ -63,7 +63,7 @@ sum (struct _reent *p, _Bigint *a, _Bigint *b)
 	if (a->_wds < b->_wds) {
 		c = b; b = a; a = c;
 		}
-	c = Balloc(p, a->_k);
+	c = Balloc(a->_k);
 	c->_wds = a->_wds;
 	carry = 0;
 	xa = a->_x;
@@ -103,9 +103,9 @@ sum (struct _reent *p, _Bigint *a, _Bigint *b)
 #endif
 	if (carry) {
 		if (c->_wds == c->_maxwds) {
-			b = Balloc(p, c->_k + 1);
+			b = Balloc(c->_k + 1);
 			Bcopy(b, c);
-			Bfree(p, c);
+			Bfree(c);
 			c = b;
 			}
 		c->_x[c->_wds++] = 1;
@@ -160,7 +160,7 @@ trailz (_Bigint *b)
 	}
 
 _Bigint *
-increment (struct _reent *p, _Bigint *b)
+increment (_Bigint *b)
 {
 	__ULong *x, *xe;
 	_Bigint *b1;
@@ -190,9 +190,9 @@ increment (struct _reent *p, _Bigint *b)
 #endif
 	{
 		if (b->_wds >= b->_maxwds) {
-			b1 = Balloc(p,b->_k+1);
+			b1 = Balloc(b->_k+1);
 			Bcopy(b1,b);
-			Bfree(p,b);
+			Bfree(b);
 			b = b1;
 			}
 		b->_x[b->_wds++] = 1;
@@ -245,15 +245,15 @@ all_on (_Bigint *b, int n)
 	}
 
 _Bigint *
-set_ones (struct _reent *p, _Bigint *b, int n)
+set_ones (_Bigint *b, int n)
 {
 	int k;
 	__ULong *x, *xe;
 
 	k = (n + ((1 << kshift) - 1)) >> kshift;
 	if (b->_k < k) {
-		Bfree(p,b);
-		b = Balloc(p,k);
+		Bfree(b);
+		b = Balloc(k);
 		}
 	k = n >> kshift;
 	if (n &= kmask)
@@ -269,7 +269,7 @@ set_ones (struct _reent *p, _Bigint *b, int n)
 	}
 
 static int
-rvOK (struct _reent *p, double d, FPI *fpi, Long *exp, __ULong *bits, int exact,
+rvOK (double d, FPI *fpi, Long *exp, __ULong *bits, int exact,
       int rd, int *irv)
 {
 	_Bigint *b;
@@ -277,7 +277,7 @@ rvOK (struct _reent *p, double d, FPI *fpi, Long *exp, __ULong *bits, int exact,
 	int bdif, e, j, k, k1, nb, rv;
 
 	carry = rv = 0;
-	b = d2b(p, d, &e, &bdif);
+	b = d2b(d, &e, &bdif);
 	bdif -= nb = fpi->nbits;
 	e += bdif;
 	if (bdif <= 0) {
@@ -329,7 +329,7 @@ rvOK (struct _reent *p, double d, FPI *fpi, Long *exp, __ULong *bits, int exact,
 		rshift(b, bdif);
 		if (carry) {
 			inex = STRTOG_Inexhi;
-			b = increment(p, b);
+			b = increment(b);
 			if ( (j = nb & kmask) !=0)
 				j = ULbits - j;
 			if (hi0bits(b->_x[b->_wds - 1]) != j) {
@@ -341,7 +341,7 @@ rvOK (struct _reent *p, double d, FPI *fpi, Long *exp, __ULong *bits, int exact,
 			}
 		}
 	else if (bdif < 0)
-		b = lshift(p, b, -bdif);
+		b = lshift(b, -bdif);
 	if (e < fpi->emin) {
 		k = fpi->emin - e;
 		e = fpi->emin;
@@ -360,7 +360,7 @@ rvOK (struct _reent *p, double d, FPI *fpi, Long *exp, __ULong *bits, int exact,
 			rshift(b, k);
 			*irv = STRTOG_Denormal;
 			if (carry) {
-				b = increment(p, b);
+				b = increment(b);
 				inex = STRTOG_Inexhi | STRTOG_Underflow;
 				}
 			else if (lostbits)
@@ -380,7 +380,7 @@ rvOK (struct _reent *p, double d, FPI *fpi, Long *exp, __ULong *bits, int exact,
 	*irv |= inex;
 	rv = 1;
  ret:
-	Bfree(p,b);
+	Bfree(b);
 	return rv;
 	}
 
@@ -404,7 +404,7 @@ mantbits (U d)
 	}
 
 int
-_strtodg_l (struct _reent *p, const char *s00, char **se, FPI *fpi, Long *exp,
+_strtodg_l (const char *s00, char **se, FPI *fpi, Long *exp,
 	    __ULong *bits, locale_t loc)
 {
 	int abe, abits, asub;
@@ -456,7 +456,7 @@ _strtodg_l (struct _reent *p, const char *s00, char **se, FPI *fpi, Long *exp,
 		switch(s[1]) {
 		  case 'x':
 		  case 'X':
-			irv = gethex(p, &s, fpi, exp, &rvb, sign, loc);
+			irv = gethex(&s, fpi, exp, &rvb, sign, loc);
 			if (irv == STRTOG_NoNumber) {
 				s = s00;
 				sign = 0;
@@ -622,7 +622,7 @@ _strtodg_l (struct _reent *p, const char *s00, char **se, FPI *fpi, Long *exp,
 	bd0 = 0;
 	if (nbits <= P && nd <= DBL_DIG) {
 		if (!e) {
-			if (rvOK(p, dval(rv), fpi, exp, bits, 1, rd, &irv))
+			if (rvOK(dval(rv), fpi, exp, bits, 1, rd, &irv))
 				goto ret;
 			}
 		else if (e > 0) {
@@ -632,7 +632,7 @@ _strtodg_l (struct _reent *p, const char *s00, char **se, FPI *fpi, Long *exp,
 #else
 				i = fivesbits[e] + mantbits(rv) <= P;
 				/* rv = */ rounded_product(dval(rv), tens[e]);
-				if (rvOK(p, dval(rv), fpi, exp, bits, i, rd, &irv))
+				if (rvOK(dval(rv), fpi, exp, bits, i, rd, &irv))
 					goto ret;
 				e1 -= e;
 				goto rv_notOK;
@@ -662,7 +662,7 @@ _strtodg_l (struct _reent *p, const char *s00, char **se, FPI *fpi, Long *exp,
 #else
 				/* rv = */ rounded_product(dval(rv), tens[e2]);
 #endif
-				if (rvOK(p, dval(rv), fpi, exp, bits, 0, rd, &irv))
+				if (rvOK(dval(rv), fpi, exp, bits, 0, rd, &irv))
 					goto ret;
 				e1 -= e2;
 				}
@@ -670,7 +670,7 @@ _strtodg_l (struct _reent *p, const char *s00, char **se, FPI *fpi, Long *exp,
 #ifndef Inaccurate_Divide
 		else if (e >= -Ten_pmax) {
 			/* rv = */ rounded_quotient(dval(rv), tens[-e]);
-			if (rvOK(p, dval(rv), fpi, exp, bits, 0, rd, &irv))
+			if (rvOK(dval(rv), fpi, exp, bits, 0, rd, &irv))
 				goto ret;
 			e1 -= e;
 			}
@@ -733,7 +733,7 @@ _strtodg_l (struct _reent *p, const char *s00, char **se, FPI *fpi, Long *exp,
 	 */
 	e2 <<= 2;
 #endif
-	rvb = d2b(p, dval(rv), &rve, &rvbits);	/* rv = rvb * 2^rve */
+	rvb = d2b(dval(rv), &rve, &rvbits);	/* rv = rvb * 2^rve */
 	rve += e2;
 	if ((j = rvbits - nbits) > 0) {
 		rshift(rvb, j);
@@ -749,7 +749,7 @@ _strtodg_l (struct _reent *p, const char *s00, char **se, FPI *fpi, Long *exp,
 		denorm = 1;
 		j = rve - emin;
 		if (j > 0) {
-			rvb = lshift(p, rvb, j);
+			rvb = lshift(rvb, j);
 			rvbits += j;
 			}
 		else if (j < 0) {
@@ -777,16 +777,16 @@ _strtodg_l (struct _reent *p, const char *s00, char **se, FPI *fpi, Long *exp,
 
 	/* Put digits into bd: true value = bd * 10^e */
 
-	bd0 = s2b(p, s0, nd0, nd, y);
+	bd0 = s2b(s0, nd0, nd, y);
 
 	for(;;) {
-		bd = Balloc(p,bd0->_k);
+		bd = Balloc(bd0->_k);
 		Bcopy(bd, bd0);
-		bb = Balloc(p,rvb->_k);
+		bb = Balloc(rvb->_k);
 		Bcopy(bb, rvb);
 		bbbits = rvbits - bb0;
 		bbe = rve + bb0;
-		bs = i2b(p, 1);
+		bs = i2b(1);
 
 		if (e >= 0) {
 			bb2 = bb5 = 0;
@@ -816,25 +816,25 @@ _strtodg_l (struct _reent *p, const char *s00, char **se, FPI *fpi, Long *exp,
 			bs2 -= i;
 			}
 		if (bb5 > 0) {
-			bs = pow5mult(p, bs, bb5);
-			bb1 = mult(p, bs, bb);
-			Bfree(p,bb);
+			bs = pow5mult(bs, bb5);
+			bb1 = mult(bs, bb);
+			Bfree(bb);
 			bb = bb1;
 			}
 		bb2 -= bb0;
 		if (bb2 > 0)
-			bb = lshift(p, bb, bb2);
+			bb = lshift(bb, bb2);
 		else if (bb2 < 0)
 			rshift(bb, -bb2);
 		if (bd5 > 0)
-			bd = pow5mult(p, bd, bd5);
+			bd = pow5mult(bd, bd5);
 		if (bd2 > 0)
-			bd = lshift(p, bd, bd2);
+			bd = lshift(bd, bd2);
 		if (bs2 > 0)
-			bs = lshift(p, bs, bs2);
+			bs = lshift(bs, bs2);
 		asub = 1;
 		inex = STRTOG_Inexhi;
-		delta = diff(p, bb, bd);
+		delta = diff(bb, bd);
 		if (delta->_wds <= 1 && !delta->_x[0])
 			break;
 		dsign = delta->_sign;
@@ -859,7 +859,7 @@ _strtodg_l (struct _reent *p, const char *s00, char **se, FPI *fpi, Long *exp,
 				if (j > 1 && lo0bits(rvb->_x + i) < j - 1)
 					goto adj1;
 				rve = rve1 - 1;
-				rvb = set_ones(p, rvb, rvbits = nbits);
+				rvb = set_ones(rvb, rvbits = nbits);
 				break;
 				}
 			irv |= dsign ? STRTOG_Inexlo : STRTOG_Inexhi;
@@ -874,7 +874,7 @@ _strtodg_l (struct _reent *p, const char *s00, char **se, FPI *fpi, Long *exp,
 				: STRTOG_Normal | STRTOG_Inexhi;
 			if (dsign || bbbits > 1 || denorm || rve1 == emin)
 				break;
-			delta = lshift(p, delta,1);
+			delta = lshift(delta,1);
 			if (cmp(delta, bs) > 0) {
 				irv = STRTOG_Normal | STRTOG_Inexlo;
 				goto drop_down;
@@ -906,7 +906,7 @@ _strtodg_l (struct _reent *p, const char *s00, char **se, FPI *fpi, Long *exp,
 					break;
 					}
 				rve -= nbits;
-				rvb = set_ones(p, rvb, rvbits = nbits);
+				rvb = set_ones(rvb, rvbits = nbits);
 				break;
 				}
 			else
@@ -914,7 +914,7 @@ _strtodg_l (struct _reent *p, const char *s00, char **se, FPI *fpi, Long *exp,
 			if ((bbbits < nbits && !denorm) || !(rvb->_x[0] & 1))
 				break;
 			if (dsign) {
-				rvb = increment(p, rvb);
+				rvb = increment(rvb);
 				j = kmask & (ULbits - (rvbits & kmask));
 				if (hi0bits(rvb->_x[rvb->_wds - 1]) != j)
 					rvbits++;
@@ -978,20 +978,20 @@ _strtodg_l (struct _reent *p, const char *s00, char **se, FPI *fpi, Long *exp,
 		/* if (asub) rv -= adj; else rv += adj; */
 
 		if (!denorm && rvbits < nbits) {
-			rvb = lshift(p, rvb, j = nbits - rvbits);
+			rvb = lshift(rvb, j = nbits - rvbits);
 			rve -= j;
 			rvbits = nbits;
 			}
-		ab = d2b(p, dval(adj), &abe, &abits);
+		ab = d2b(dval(adj), &abe, &abits);
 		if (abe < 0)
 			rshift(ab, -abe);
 		else if (abe > 0)
-			ab = lshift(p, ab, abe);
+			ab = lshift(ab, abe);
 		rvb0 = rvb;
 		if (asub) {
 			/* rv -= adj; */
 			j = hi0bits(rvb->_x[rvb->_wds-1]);
-			rvb = diff(p, rvb, ab);
+			rvb = diff(rvb, ab);
 			k = rvb0->_wds - 1;
 			if (denorm)
 				/* do nothing */;
@@ -1004,7 +1004,7 @@ _strtodg_l (struct _reent *p, const char *s00, char **se, FPI *fpi, Long *exp,
 					denorm = 1;
 					}
 				else {
-					rvb = lshift(p, rvb, 1);
+					rvb = lshift(rvb, 1);
 					--rve;
 					--rve1;
 					L = finished = 0;
@@ -1012,7 +1012,7 @@ _strtodg_l (struct _reent *p, const char *s00, char **se, FPI *fpi, Long *exp,
 				}
 			}
 		else {
-			rvb = sum(p, rvb, ab);
+			rvb = sum(rvb, ab);
 			k = rvb->_wds - 1;
 			if (k >= rvb0->_wds
 			 || hi0bits(rvb->_x[k]) < hi0bits(rvb0->_x[k])) {
@@ -1028,8 +1028,8 @@ _strtodg_l (struct _reent *p, const char *s00, char **se, FPI *fpi, Long *exp,
 					}
 				}
 			}
-		Bfree(p,ab);
-		Bfree(p,rvb0);
+		Bfree(ab);
+		Bfree(rvb0);
 		if (finished)
 			break;
 
@@ -1050,24 +1050,24 @@ _strtodg_l (struct _reent *p, const char *s00, char **se, FPI *fpi, Long *exp,
 				}
 			}
 		bb0 = denorm ? 0 : trailz(rvb);
-		Bfree(p,bb);
-		Bfree(p,bd);
-		Bfree(p,bs);
-		Bfree(p,delta);
+		Bfree(bb);
+		Bfree(bd);
+		Bfree(bs);
+		Bfree(delta);
 		}
 	if (!denorm && (j = nbits - rvbits)) {
 		if (j > 0)
-			rvb = lshift(p, rvb, j);
+			rvb = lshift(rvb, j);
 		else
 			rshift(rvb, -j);
 		rve -= j;
 		}
 	*exp = rve;
-	Bfree(p,bb);
-	Bfree(p,bd);
-	Bfree(p,bs);
-	Bfree(p,bd0);
-	Bfree(p,delta);
+	Bfree(bb);
+	Bfree(bd);
+	Bfree(bs);
+	Bfree(bd0);
+	Bfree(delta);
 	if (rve > fpi->emax) {
  huge:
 		rvb->_wds = 0;
@@ -1097,7 +1097,7 @@ _strtodg_l (struct _reent *p, const char *s00, char **se, FPI *fpi, Long *exp,
 		irv |= STRTOG_Neg;
 	if (rvb) {
 		copybits(bits, nbits, rvb);
-		Bfree(p,rvb);
+		Bfree(rvb);
 		}
 	return irv;
 	}

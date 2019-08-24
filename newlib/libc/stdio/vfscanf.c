@@ -1867,10 +1867,10 @@ __SVFSCANF_R (struct _reent *rptr,
 	         result.  */
 #ifndef _NO_LONGDBL /* !_NO_LONGDBL */
 	      if (flags & LONGDBL)
-		qres = _strtold_r (rptr, buf, NULL);
+		qres = _strtold_r (buf, NULL);
 	      else
 #endif
-	        res = _strtod_r (rptr, buf, NULL);
+	        res = _strtod_r (buf, NULL);
 
 	      if (flags & LONG)
 		{

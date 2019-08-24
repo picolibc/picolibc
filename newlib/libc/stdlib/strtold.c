@@ -68,7 +68,7 @@ _strtold_r (struct _reent *ptr, const char *__restrict s00,
 #else
   long double result;
 
-  _strtorx_l (ptr, s00, se, FLT_ROUNDS, &result, __get_current_locale ());
+  _strtorx_l (s00, se, FLT_ROUNDS, &result, __get_current_locale ());
   return result;
 #endif
 }
@@ -82,7 +82,7 @@ strtold_l (const char *__restrict s00, char **__restrict se, locale_t loc)
 #else
   long double result;
 
-  _strtorx_l (_REENT, s00, se, FLT_ROUNDS, &result, loc);
+  _strtorx_l (s00, se, FLT_ROUNDS, &result, loc);
   return result;
 #endif
 }
@@ -96,7 +96,7 @@ strtold (const char *__restrict s00, char **__restrict se)
 #else
   long double result;
 
-  _strtorx_l (_REENT, s00, se, FLT_ROUNDS, &result, __get_current_locale ());
+  _strtorx_l (s00, se, FLT_ROUNDS, &result, __get_current_locale ());
   return result;
 #endif
 }

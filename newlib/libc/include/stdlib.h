@@ -158,7 +158,7 @@ void	setkey (const char *__key);
 #endif
 void	srand (unsigned __seed);
 double	strtod (const char *__restrict __n, char **__restrict __end_PTR);
-double	_strtod_r (struct _reent *,const char *__restrict __n, char **__restrict __end_PTR);
+double	_strtod_r (const char *__restrict __n, char **__restrict __end_PTR);
 #if __ISO_C_VISIBLE >= 1999
 float	strtof (const char *__restrict __n, char **__restrict __end_PTR);
 #endif
@@ -290,7 +290,7 @@ int	posix_memalign (void **, size_t, size_t) __nonnull((1))
 	    __result_use_check;
 #endif
 
-char *	_dtoa_r (struct _reent *, double, int, int, int *, int*, char**);
+char *	_dtoa_r (double, int, int, int *, int*, char**);
 #ifndef __CYGWIN__
 void *	_malloc_r (struct _reent *, size_t) _NOTHROW;
 void *	_calloc_r (struct _reent *, size_t, size_t) _NOTHROW;

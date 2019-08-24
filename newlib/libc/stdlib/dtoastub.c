@@ -15,7 +15,7 @@ __dtoa (double d,
 	int *sign,
 	char **rve)
 {
-  return _dtoa_r (_REENT, d, mode, ndigits, decpt, sign, rve);
+  return _dtoa_r (d, mode, ndigits, decpt, sign, rve);
 }
 
 #endif

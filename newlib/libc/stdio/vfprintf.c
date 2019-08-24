@@ -505,7 +505,7 @@ __sbprintf (struct _reent *rptr,
 
 # ifdef _NO_LONGDBL
 
-extern char *_dtoa_r (struct _reent *, double, int,
+extern char *_dtoa_r (double, int,
 			      int, int *, int *, char **);
 
 #  define _PRINTF_FLOAT_TYPE double
@@ -514,7 +514,7 @@ extern char *_dtoa_r (struct _reent *, double, int,
 
 # else /* !_NO_LONGDBL */
 
-extern char *_ldtoa_r (struct _reent *, _LONG_DOUBLE, int,
+extern char *_ldtoa_r (_LONG_DOUBLE, int,
 			      int, int *, int *, char **);
 
 extern int _ldcheck (_LONG_DOUBLE *);
@@ -1874,7 +1874,7 @@ cvt(struct _reent *data, _PRINTF_FLOAT_TYPE value, int ndigits, int flags,
 		mode = 2;		/* ndigits significant digits */
 	}
 
-	digits = _DTOA_R (data, value, mode, ndigits, decpt, &dsgn, &rve);
+	digits = _DTOA_R (value, mode, ndigits, decpt, &dsgn, &rve);
 
 	if ((ch != 'g' && ch != 'G') || flags & ALT) {	/* Print trailing zeros */
 		bp = digits + ndigits;

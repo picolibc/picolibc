@@ -337,16 +337,6 @@ extern __FILE __sf[3];
 
 #ifdef _REENT_SMALL
 
-struct _mprec
-{
-  /* used by mprec routines */
-  struct _Bigint *_result;
-  int _result_k;
-  struct _Bigint *_p5s;
-  struct _Bigint **_freelist;
-};
-
-
 struct _misc_reent
 {
   /* miscellaneous reentrant data */
@@ -382,8 +372,6 @@ struct _reent
   struct __locale_t *_locale;/* per-thread locale */
 # endif
 
-  struct _mprec *_mp;
-
   void (*__cleanup) (struct _reent *);
 
   /* used by some fp conversion routines */
@@ -408,7 +396,6 @@ struct _reent
 # define _REENT_INIT(var) \
   { _REENT_INIT_STDIO(var) \
     _REENT_INIT_LOCALE \
-    ._mp = NULL, \
     .__cleanup = NULL, \
     ._cvtlen = 0, \
     ._cvtbuf = _NULL, \
@@ -465,15 +452,6 @@ extern const struct __sFILE_fake __sf_fake_stderr;
   } \
 } while (0)
 
-#define _REENT_INIT_MP(var) do { \
-  struct _reent *_r = (var); \
-  _r->_mp->_result_k = 0; \
-  _r->_mp->_result = _r->_mp->_p5s = _NULL; \
-  _r->_mp->_freelist = _NULL; \
-} while (0)
-#define _REENT_CHECK_MP(var) \
-  _REENT_CHECK(var, _mp, struct _mprec *, sizeof *((var)->_mp), _REENT_INIT_MP(var))
-
 #define _REENT_INIT_MISC(var) do { \
   struct _reent *_r = (var); \
   _r->_misc->_mblen_state.__count = 0; \
@@ -501,10 +479,6 @@ extern const struct __sFILE_fake __sf_fake_stderr;
 #define _REENT_CHECK_SIGNAL_BUF(var) \
   _REENT_CHECK(var, _signal_buf, char *, _REENT_SIGNAL_SIZE, /* nothing */)
 
-#define _REENT_MP_RESULT(ptr)	((ptr)->_mp->_result)
-#define _REENT_MP_RESULT_K(ptr)	((ptr)->_mp->_result_k)
-#define _REENT_MP_P5S(ptr)	((ptr)->_mp->_p5s)
-#define _REENT_MP_FREELIST(ptr)	((ptr)->_mp->_freelist)
 #define _REENT_MBLEN_STATE(ptr)	((ptr)->_misc->_mblen_state)
 #define _REENT_MBTOWC_STATE(ptr)((ptr)->_misc->_mbtowc_state)
 #define _REENT_WCTOMB_STATE(ptr)((ptr)->_misc->_wctomb_state)
@@ -537,12 +511,6 @@ struct _reent
   int __sdidinit;		/* 1 means stdio has been init'd */
 
   void (*__cleanup) (struct _reent *);
-
-  /* used by mprec routines */
-  struct _Bigint *_result;
-  int _result_k;
-  struct _Bigint *_p5s;
-  struct _Bigint **_freelist;
 
   /* used by some fp conversion routines */
   int _cvtlen;			/* should be size_t */
@@ -606,9 +574,6 @@ extern __FILE __sf[3];
   { _REENT_INIT_STDIO(var)	    \
     _REENT_INIT_LOCALE \
     .__cleanup = _NULL, \
-    ._result_k = 0, \
-    ._p5s = _NULL, \
-    ._freelist = _NULL, \
     ._cvtlen = 0, \
     ._cvtbuf = _NULL, \
     ._new = { \
@@ -638,14 +603,9 @@ extern __FILE __sf[3];
     (var)->_stderr = _REENT_STDIO_STREAM(var, 2); \
   }
 
-#define _REENT_CHECK_MP(ptr)		/* nothing */
 #define _REENT_CHECK_MISC(ptr)	        /* nothing */
 #define _REENT_CHECK_SIGNAL_BUF(ptr)	/* nothing */
 
-#define _REENT_MP_RESULT(ptr)	((ptr)->_result)
-#define _REENT_MP_RESULT_K(ptr)	((ptr)->_result_k)
-#define _REENT_MP_P5S(ptr)	((ptr)->_p5s)
-#define _REENT_MP_FREELIST(ptr)	((ptr)->_freelist)
 #define _REENT_MBLEN_STATE(ptr)	((ptr)->_new._reent._mblen_state)
 #define _REENT_MBTOWC_STATE(ptr)((ptr)->_new._reent._mbtowc_state)
 #define _REENT_WCTOMB_STATE(ptr)((ptr)->_new._reent._wctomb_state)
