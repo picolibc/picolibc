@@ -41,7 +41,7 @@ const struct lc_numeric_T _C_numeric_locale = {
 #endif
 };
 
-#if __HAVE_LOCALE_INFO__
+#ifdef __HAVE_LOCALE_INFO__
 int
 __numeric_load_locale (struct __locale_t *locale, const char *name ,
 		       void *f_wctomb, const char *charset)
