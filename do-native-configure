@@ -1,7 +1,7 @@
 #!/bin/sh
 DIR=`dirname $0`
 meson $DIR \
-	-Dnewlib-tinystdio=true \
+	-Dnewlib-tinystdio=false \
 	-Dnewlib-supplied-syscalls=false \
 	-Dnewlib-reentrant-small=true\
 	-Dnewlib-wide-orient=false\
