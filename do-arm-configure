@@ -2,6 +2,7 @@
 ARCH=arm-none-eabi
 DIR=`dirname $0`
 meson $DIR \
+      -Dmultilib=false\
 	-Dtarget-optspace=true \
 	-Dnewlib-tinystdio=true \
 	-Dnewlib-supplied-syscalls=false \
@@ -10,6 +11,7 @@ meson $DIR \
 	-Dnewlib-nano-malloc=true\
 	-Dnewlib-reent-small=true\
 	-Dlite-exit=true\
+	-Dnewlib-mb=false\
 	-Dnewlib-global-atexit=true\
 	-Dnewlib-global-errno=true\
 	-Dincludedir=lib/newlib-nano/$ARCH/include \
