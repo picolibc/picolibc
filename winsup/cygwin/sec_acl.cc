@@ -807,9 +807,9 @@ get_posix_access (PSECURITY_DESCRIPTOR psd,
 			  lacl[pos].a_id = ACL_UNDEFINED_ID;
 			  lacl[pos].a_perm = CYG_ACE_MASK_TO_POSIX (ace->Mask);
 			  aclsid[pos] = well_known_null_sid;
+			  has_class_perm = true;
+			  class_perm = lacl[pos].a_perm;
 			}
-		      has_class_perm = true;
-		      class_perm = lacl[pos].a_perm;
 		    }
 		  if (ace->Header.AceFlags & SUB_CONTAINERS_AND_OBJECTS_INHERIT)
 		    {
@@ -820,9 +820,9 @@ get_posix_access (PSECURITY_DESCRIPTOR psd,
 			  lacl[pos].a_id = ACL_UNDEFINED_ID;
 			  lacl[pos].a_perm = CYG_ACE_MASK_TO_POSIX (ace->Mask);
 			  aclsid[pos] = well_known_null_sid;
+			  has_def_class_perm = true;
+			  def_class_perm = lacl[pos].a_perm;
 			}
-		      has_def_class_perm = true;
-		      def_class_perm = lacl[pos].a_perm;
 		    }
 		}
 	    }
