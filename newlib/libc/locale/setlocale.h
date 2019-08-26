@@ -39,6 +39,11 @@
 
 __BEGIN_DECLS
 
+extern struct __locale_t __global_locale;
+
+#define __get_current_locale() _locale
+#define __get_global_locale() (&__global_locale)
+
 #define ENCODING_LEN 31
 #define CATEGORY_LEN 11
 #define _LC_LAST      7
@@ -47,7 +52,7 @@ __BEGIN_DECLS
 struct lc_collate_T
 {
   __uint32_t	 lcid;
-  int	       (*mbtowc) (struct _reent *, wchar_t *, const char *, size_t,
+  int	       (*mbtowc) (wchar_t *, const char *, size_t,
 			  mbstate_t *);
   char		 codeset[ENCODING_LEN + 1];
 };
@@ -178,9 +183,9 @@ struct __lc_cats
 struct __locale_t
 {
   char			 categories[_LC_LAST][ENCODING_LEN + 1];
-  int			(*wctomb) (struct _reent *, char *, wchar_t,
+  int			(*wctomb) (char *, wchar_t,
 				   mbstate_t *);
-  int			(*mbtowc) (struct _reent *, wchar_t *,
+  int			(*mbtowc) (wchar_t *,
 				   const char *, size_t, mbstate_t *);
   int			 cjk_lang;
   const char		 *ctype_ptr;
@@ -196,47 +201,21 @@ struct __locale_t
 
 #ifdef _MB_CAPABLE
 extern char *__loadlocale (struct __locale_t *, int, char *);
-extern const char *__get_locale_env(struct _reent *, int);
+extern const char *__get_locale_env(int);
 #endif /* _MB_CAPABLE */
 
 extern struct lconv *__localeconv_l (struct __locale_t *locale);
 
-extern size_t _wcsnrtombs_l (struct _reent *, char *, const wchar_t **,
+extern size_t _wcsnrtombs_l (char *, const wchar_t **,
 			     size_t, size_t, mbstate_t *, struct __locale_t *);
 
-/* In POSIX terms the global locale is the process-wide locale.  Use this
-   function to always refer to the global locale. */
-_ELIDABLE_INLINE struct __locale_t *
-__get_global_locale ()
-{
-  extern struct __locale_t __global_locale;
-  return &__global_locale;
-}
-
-/* Per REENT locale.  This is newlib-internal. */
-_ELIDABLE_INLINE struct __locale_t *
-__get_locale_r (struct _reent *r)
-{
 #ifdef __HAVE_LOCALE_INFO__
-  return r->_locale;
+#define NEWLIB_THREAD_LOCAL_LOCALE NEWLIB_THREAD_LOCAL
 #else
-  return __get_global_locale();
+#define NEWLIB_THREAD_LOCAL_LOCALE
 #endif
-}
 
-/* In POSIX terms the current locale is the locale used by all functions
-   using locale info without providing a locale as parameter (*_l functions).
-   The current locale is either the locale of the current thread, if the
-   thread called uselocale, or the global locale if not. */
-_ELIDABLE_INLINE struct __locale_t *
-__get_current_locale (void)
-{
-#ifdef __HAVE_LOCALE_INFO__
-  return _REENT->_locale ?: __get_global_locale ();
-#else
-  return __get_global_locale();
-#endif
-}
+extern NEWLIB_THREAD_LOCAL_LOCALE struct __locale_t *_locale;
 
 /* Only access fixed "C" locale using this function.  Fake for !_MB_CAPABLE
    targets by returning ptr to globale locale. */
@@ -262,7 +241,7 @@ _ELIDABLE_INLINE const struct lc_collate_T *
 __get_current_collate_locale (void)
 {
   return (const struct lc_collate_T *)
-	 __get_current_locale ()->lc_cat[LC_COLLATE].ptr;
+	 _locale->lc_cat[LC_COLLATE].ptr;
 }
 #endif
 
@@ -277,7 +256,7 @@ _ELIDABLE_INLINE const struct lc_ctype_T *
 __get_current_ctype_locale (void)
 {
   return (const struct lc_ctype_T *)
-	 __get_current_locale ()->lc_cat[LC_CTYPE].ptr;
+	 _locale->lc_cat[LC_CTYPE].ptr;
 }
 #endif
 
@@ -302,7 +281,7 @@ _ELIDABLE_INLINE const struct lc_monetary_T *
 __get_current_monetary_locale (void)
 {
   return (const struct lc_monetary_T *)
-	 __get_current_locale ()->lc_cat[LC_MONETARY].ptr;
+	 _locale->lc_cat[LC_MONETARY].ptr;
 }
 
 _ELIDABLE_INLINE const struct lc_numeric_T *
@@ -315,7 +294,7 @@ _ELIDABLE_INLINE const struct lc_numeric_T *
 __get_current_numeric_locale (void)
 {
   return (const struct lc_numeric_T *)
-	 __get_current_locale ()->lc_cat[LC_NUMERIC].ptr;
+	 _locale->lc_cat[LC_NUMERIC].ptr;
 }
 
 _ELIDABLE_INLINE const struct lc_time_T *
@@ -328,7 +307,7 @@ _ELIDABLE_INLINE const struct lc_time_T *
 __get_current_time_locale (void)
 {
   return (const struct lc_time_T *)
-	 __get_current_locale ()->lc_cat[LC_TIME].ptr;
+	 _locale->lc_cat[LC_TIME].ptr;
 }
 
 _ELIDABLE_INLINE const struct lc_messages_T *
@@ -341,7 +320,7 @@ _ELIDABLE_INLINE const struct lc_messages_T *
 __get_current_messages_locale (void)
 {
   return (const struct lc_messages_T *)
-	 __get_current_locale ()->lc_cat[LC_MESSAGES].ptr;
+	 _locale->lc_cat[LC_MESSAGES].ptr;
 }
 #else /* ! __HAVE_LOCALE_INFO__ */
 _ELIDABLE_INLINE const struct lc_monetary_T *
@@ -409,7 +388,7 @@ __current_locale_charset (void)
 #ifdef __HAVE_LOCALE_INFO__
   return __get_current_ctype_locale ()->codeset;
 #else
-  return __get_current_locale ()->ctype_codeset;
+  return _locale->ctype_codeset;
 #endif
 }
 
@@ -419,14 +398,14 @@ __locale_msgcharset (void)
 #ifdef __HAVE_LOCALE_INFO__
   return (char *) __get_current_messages_locale ()->codeset;
 #else
-  return (char *) __get_current_locale ()->message_codeset;
+  return (char *) _locale->message_codeset;
 #endif
 }
 
 _ELIDABLE_INLINE int
 __locale_cjk_lang (void)
 {
-  return __get_current_locale ()->cjk_lang;
+  return _locale->cjk_lang;
 }
 
 int __ctype_load_locale (struct __locale_t *, const char *, void *,

@@ -6,19 +6,11 @@ INDEX
 	setlocale
 INDEX
 	localeconv
-INDEX
-	_setlocale_r
-INDEX
-	_localeconv_r
 
 SYNOPSIS
 	#include <locale.h>
 	char *setlocale(int <[category]>, const char *<[locale]>);
 	lconv *localeconv(void);
-
-	char *_setlocale_r(void *<[reent]>,
-                        int <[category]>, const char *<[locale]>);
-	lconv *_localeconv_r(void *<[reent]>);
 
 DESCRIPTION
 <<setlocale>> is the facility defined by ANSI C to condition the
@@ -94,10 +86,6 @@ beginning with <<"LC_">>.
 `<<locale.h>>') describing the locale-specific conventions currently
 in effect.  
 
-<<_localeconv_r>> and <<_setlocale_r>> are reentrant versions of
-<<localeconv>> and <<setlocale>> respectively.  The extra argument
-<[reent]> is a pointer to a reentrancy structure.
-
 RETURNS
 A successful call to <<setlocale>> returns a pointer to a string
 associated with the specified category for the new locale.  The string
@@ -159,7 +147,6 @@ No supporting OS subroutines are required.
 #include <errno.h>
 #include <string.h>
 #include <limits.h>
-#include <reent.h>
 #include <stdlib.h>
 #include <wchar.h>
 #include "setlocale.h"
@@ -172,6 +159,8 @@ No supporting OS subroutines are required.
 		     2010 don't use it anymore. */
 int __EXPORT __mb_cur_max = 6;
 #endif
+
+NEWLIB_THREAD_LOCAL_LOCALE struct __locale_t *_locale = &__global_locale;
 
 char *_PathLocale = NULL;
 
@@ -290,7 +279,7 @@ static char *currentlocale (void);
 #endif /* _MB_CAPABLE */
 
 char *
-_setlocale_r (struct _reent *p,
+setlocale (
        int category,
        const char *locale)
 {
@@ -333,7 +322,7 @@ _setlocale_r (struct _reent *p,
 	{
 	  for (i = 1; i < _LC_LAST; ++i)
 	    {
-	      env = __get_locale_env (p, i);
+	      env = __get_locale_env (i);
 	      if (strlen (env) > ENCODING_LEN)
 		{
 		  __errno_r(p) = EINVAL;
@@ -344,7 +333,7 @@ _setlocale_r (struct _reent *p,
 	}
       else
 	{
-	  env = __get_locale_env (p, category);
+	  env = __get_locale_env (category);
 	  if (strlen (env) > ENCODING_LEN)
 	    {
 	      __errno_r(p) = EINVAL;
@@ -491,6 +480,8 @@ __loadlocale (struct __locale_t *loc, int category, char *new_locale)
   if (!strcmp (new_locale, loc->categories[category]))
     return loc->categories[category];
 
+  int ret = 0;
+
 #ifdef __CYGWIN__
   /* This additional code handles the case that the incoming locale string
      is not valid.  If so, it calls the function __set_locale_from_locale_alias,
@@ -502,7 +493,6 @@ __loadlocale (struct __locale_t *loc, int category, char *new_locale)
      to the second argument, which is a buffer in which the replacement locale
      gets stored.  Otherwise the function returns NULL. */
   char tmp_locale[ENCODING_LEN + 1];
-  int ret = 0;
 
 restart:
   if (!locale)
@@ -948,20 +938,20 @@ restart:
 }
 
 const char *
-__get_locale_env (struct _reent *p, int category)
+__get_locale_env (int category)
 {
   const char *env;
 
   /* 1. check LC_ALL. */
-  env = _getenv_r (p, categories[0]);
+  env = getenv (categories[0]);
 
   /* 2. check LC_* */
   if (env == NULL || !*env)
-    env = _getenv_r (p, categories[category]);
+    env = getenv (categories[category]);
 
   /* 3. check LANG */
   if (env == NULL || !*env)
-    env = _getenv_r (p, "LANG");
+    env = getenv ("LANG");
 
   /* 4. if none is set, fall to default locale */
   if (env == NULL || !*env)
@@ -994,14 +984,3 @@ __locale_ctype_ptr (void)
   return __get_current_locale ()->ctype_ptr;
 }
 #endif /* __HAVE_LOCALE_INFO__ */
-
-#ifndef _REENT_ONLY
-
-char *
-setlocale (int category,
-	const char *locale)
-{
-  return _setlocale_r (_REENT, category, locale);
-}
-
-#endif

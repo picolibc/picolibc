@@ -167,7 +167,7 @@ _wcstod_l (struct _reent *ptr, const wchar_t *nptr, wchar_t **endptr,
          */
         wcp = nptr;
         mbs = initial;
-        if ((len = _wcsnrtombs_l(ptr, NULL, &wcp, (size_t) -1, 0, &mbs, loc))
+        if ((len = _wcsnrtombs_l(NULL, &wcp, (size_t) -1, 0, &mbs, loc))
 	    == (size_t) -1) {
                 if (endptr != NULL)
                         *endptr = (wchar_t *)nptr;
@@ -176,7 +176,7 @@ _wcstod_l (struct _reent *ptr, const wchar_t *nptr, wchar_t **endptr,
         if ((buf = _malloc_r(ptr, len + 1)) == NULL)
                 return (0.0);
         mbs = initial;
-        _wcsnrtombs_l(ptr, buf, &wcp, (size_t) -1, len + 1, &mbs, loc);
+        _wcsnrtombs_l(buf, &wcp, (size_t) -1, len + 1, &mbs, loc);
 
         /* Let strtod() do most of the work for us. */
         val = _strtod_l(buf, &end, loc);

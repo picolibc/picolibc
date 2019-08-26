@@ -392,7 +392,7 @@ __wctob (struct _reent *rptr, wint_t wc)
   if (wc == WEOF)
     return EOF;
   memset (&mbs, '\0', sizeof (mbs));
-  return __WCTOMB (rptr, (char *) pmb, wc, &mbs) == 1 ? (int) pmb[0] : 0;
+  return __WCTOMB ((char *) pmb, wc, &mbs) == 1 ? (int) pmb[0] : 0;
 }
 
 int
@@ -601,7 +601,7 @@ __SVFSCANF_R (struct _reent *rptr,
 #ifndef _MB_CAPABLE
       wc = *fmt;
 #else
-      nbytes = __MBTOWC (rptr, &wc, (char *) fmt, MB_CUR_MAX, &state);
+      nbytes = __MBTOWC (&wc, (char *) fmt, MB_CUR_MAX, &state);
       if (nbytes < 0) {
 	wc = 0xFFFD; /* Unicode replacement character */
 	nbytes = 1;
@@ -978,7 +978,7 @@ __SVFSCANF_R (struct _reent *rptr,
 		     through */
 		  if (mbslen != 3 || state.__count != 4)
 		    memset (&state, 0, sizeof (mbstate_t));
-                  if ((mbslen = _mbrtowc_r (rptr, wcp, buf, n, &state))
+                  if ((mbslen = mbrtowc (wcp, buf, n, &state))
                                                          == (size_t)-1)
                     goto input_failure; /* Invalid sequence */
                   if (mbslen == 0 && !(flags & SUPPRESS))
@@ -1095,7 +1095,7 @@ __SVFSCANF_R (struct _reent *rptr,
 		     through */
 		  if (mbslen != 3 || state.__count != 4)
 		    memset (&state, 0, sizeof (mbstate_t));
-                  if ((mbslen = _mbrtowc_r (rptr, wcp, buf, n, &state))
+                  if ((mbslen = mbrtowc (wcp, buf, n, &state))
                                                         == (size_t)-1)
                     goto input_failure;
                   if (mbslen == 0)
@@ -1232,7 +1232,7 @@ __SVFSCANF_R (struct _reent *rptr,
 		     through */
 		  if (mbslen != 3 || state.__count != 4)
 		    memset (&state, 0, sizeof (mbstate_t));
-                  if ((mbslen = _mbrtowc_r (rptr, wcp, buf, n, &state))
+                  if ((mbslen = mbrtowc (wcp, buf, n, &state))
                                                         == (size_t)-1)
                     goto input_failure;
                   if (mbslen == 0)
@@ -1550,7 +1550,7 @@ __SVFSCANF_R (struct _reent *rptr,
 	  unsigned width_left = 0;
 	  char nancount = 0;
 	  char infcount = 0;
-	  const char *decpt = _localeconv_r (rptr)->decimal_point;
+	  const char *decpt = localeconv ()->decimal_point;
 #ifdef _MB_CAPABLE
 	  int decptpos = 0;
 #endif

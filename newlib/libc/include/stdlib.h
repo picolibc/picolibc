@@ -107,15 +107,13 @@ long	labs (long);
 ldiv_t	ldiv (long __numer, long __denom);
 void	*malloc(size_t) __malloc_like __result_use_check __alloc_size(1) _NOTHROW;
 int	mblen (const char *, size_t);
-int	_mblen_r (struct _reent *, const char *, size_t, _mbstate_t *);
 int	mbtowc (wchar_t *__restrict, const char *__restrict, size_t);
-int	_mbtowc_r (struct _reent *, wchar_t *__restrict, const char *__restrict, size_t, _mbstate_t *);
+int	_mbtowc (wchar_t *__restrict, const char *__restrict, size_t, _mbstate_t *);
 int	wctomb (char *, wchar_t);
-int	_wctomb_r (struct _reent *, char *, wchar_t, _mbstate_t *);
 size_t	mbstowcs (wchar_t *__restrict, const char *__restrict, size_t);
-size_t	_mbstowcs_r (struct _reent *, wchar_t *__restrict, const char *__restrict, size_t, _mbstate_t *);
+size_t	_mbstowcs (wchar_t *__restrict, const char *__restrict, size_t, _mbstate_t *);
 size_t	wcstombs (char *__restrict, const wchar_t *__restrict, size_t);
-size_t	_wcstombs_r (struct _reent *, char *__restrict, const wchar_t *__restrict, size_t, _mbstate_t *);
+size_t	_wcstombs (char *__restrict, const wchar_t *__restrict, size_t, _mbstate_t *);
 #ifndef _REENT_ONLY
 #if __BSD_VISIBLE || __POSIX_VISIBLE >= 200809
 char *	mkdtemp (char *);

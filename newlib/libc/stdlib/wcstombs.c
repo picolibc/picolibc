@@ -15,10 +15,9 @@ implementation of <<wcstombs>>.  In this case,
 all wide-characters are expected to represent single bytes and so
 are converted simply by casting to char.
 
-When _MB_CAPABLE is defined, this routine calls <<_wcstombs_r>> to perform
-the conversion, passing a state variable to allow state dependent
-decoding.  The result is based on the locale setting which may
-be restricted to a defined set of locales.
+When _MB_CAPABLE is defined, this routine uses a state variable to
+allow state dependent decoding.  The result is based on the locale
+setting which may be restricted to a defined set of locales.
 
 RETURNS
 This implementation of <<wcstombs>> returns <<0>> if
@@ -46,6 +45,7 @@ effects vary with the locale.
 #include <newlib.h>
 #include <stdlib.h>
 #include <wchar.h>
+#include "local.h"
 
 size_t
 wcstombs (char          *__restrict s,
@@ -55,8 +55,42 @@ wcstombs (char          *__restrict s,
 #ifdef _MB_CAPABLE
   mbstate_t state;
   state.__count = 0;
-  
-  return _wcstombs_r (_REENT, s, pwcs, n, &state);
+
+  char *ptr = s;
+  size_t max = n;
+  char buff[8];
+  int i, bytes, num_to_copy;
+
+  if (s == NULL)
+    {
+      size_t num_bytes = 0;
+      while (*pwcs != 0)
+	{
+	  bytes = __WCTOMB (buff, *pwcs++, &state);
+	  if (bytes == -1)
+	    return -1;
+	  num_bytes += bytes;
+	}
+      return num_bytes;
+    }
+  else
+    {
+      while (n > 0)
+        {
+          bytes = __WCTOMB (buff, *pwcs, &state);
+          if (bytes == -1)
+            return -1;
+          num_to_copy = (n > bytes ? bytes : (int)n);
+          for (i = 0; i < num_to_copy; ++i)
+            *ptr++ = buff[i];
+
+          if (*pwcs == 0x00)
+            return ptr - s - (n >= bytes);
+          ++pwcs;
+          n -= num_to_copy;
+        }
+      return max;
+    }
 #else /* not _MB_CAPABLE */
   int count = 0;
   

@@ -18,10 +18,9 @@ Each call to <<mbtowc>> copies one character from <<*<[s]>>> to
 <<*<[pwc]>>>, unless <[s]> is a null pointer.  The argument n
 is ignored.
 
-When _MB_CAPABLE is defined, this routine calls <<_mbtowc_r>> to perform
-the conversion, passing a state variable to allow state dependent
-decoding.  The result is based on the locale setting which may
-be restricted to a defined set of locales.
+When _MB_CAPABLE is defined, this routine uses a state variable to
+allow state dependent decoding.  The result is based on the locale
+setting which may be restricted to a defined set of locales.
 
 RETURNS
 This implementation of <<mbtowc>> returns <<0>> if
@@ -56,17 +55,13 @@ mbtowc (wchar_t *__restrict pwc,
 {
 #ifdef _MB_CAPABLE
   int retval = 0;
-  struct _reent *reent = _REENT;
-  mbstate_t *ps;
+  static NEWLIB_THREAD_LOCAL mbstate_t _mbtowc_state;
 
-  _REENT_CHECK_MISC(reent);
-  ps = &(_REENT_MBTOWC_STATE(reent));
-  
-  retval = __MBTOWC (reent, pwc, s, n, ps);
-  
+  retval = __MBTOWC (pwc, s, n, &_mbtowc_state);
+
   if (retval < 0)
     {
-      ps->__count = 0;
+      _mbtowc_state.__count = 0;
       return -1;
     }
   return retval;

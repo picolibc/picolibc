@@ -63,7 +63,6 @@ PORTABILITY
 <<wcsnrtombs>> is defined by the POSIX.1-2008 standard.
 */
 
-#include <reent.h>
 #include <newlib.h>
 #include <wchar.h>
 #include <stdlib.h>
@@ -73,7 +72,7 @@ PORTABILITY
 #include "../locale/setlocale.h"
 
 size_t
-_wcsnrtombs_l (struct _reent *r, char *dst, const wchar_t **src, size_t nwc,
+_wcsnrtombs_l (char *dst, const wchar_t **src, size_t nwc,
 	       size_t len, mbstate_t *ps, struct __locale_t *loc)
 {
   char *ptr = dst;
@@ -85,8 +84,8 @@ _wcsnrtombs_l (struct _reent *r, char *dst, const wchar_t **src, size_t nwc,
 #ifdef _MB_CAPABLE
   if (ps == NULL)
     {
-      _REENT_CHECK_MISC(r);
-      ps = &(_REENT_WCSRTOMBS_STATE(r));
+      static NEWLIB_THREAD_LOCAL mbstate_t _wcsrtombs_state;
+      ps = &_wcsrtombs_state;
     }
 #endif
 
@@ -101,7 +100,7 @@ _wcsnrtombs_l (struct _reent *r, char *dst, const wchar_t **src, size_t nwc,
     {
       int count = ps->__count;
       wint_t wch = ps->__value.__wch;
-      int bytes = loc->wctomb (r, buff, *pwcs, ps);
+      int bytes = loc->wctomb (buff, *pwcs, ps);
       if (bytes == -1)
 	{
 	  __errno_r(r) = EILSEQ;
@@ -137,18 +136,6 @@ _wcsnrtombs_l (struct _reent *r, char *dst, const wchar_t **src, size_t nwc,
   return n;
 } 
 
-size_t
-_wcsnrtombs_r (struct _reent *r,
-	char *dst,
-	const wchar_t **src,
-	size_t nwc,
-	size_t len,
-	mbstate_t *ps)
-{
-  return _wcsnrtombs_l (_REENT, dst, src, nwc, len, ps,
-			__get_current_locale ());
-}
-
 #ifndef _REENT_ONLY
 size_t
 wcsnrtombs (char *__restrict dst,
@@ -157,7 +144,7 @@ wcsnrtombs (char *__restrict dst,
 	size_t len,
 	mbstate_t *__restrict ps)
 {
-  return _wcsnrtombs_l (_REENT, dst, src, nwc, len, ps,
+  return _wcsnrtombs_l (dst, src, nwc, len, ps,
 			__get_current_locale ());
 }
 #endif /* !_REENT_ONLY */

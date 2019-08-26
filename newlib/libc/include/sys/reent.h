@@ -43,8 +43,6 @@ typedef __uint32_t __ULong;
 
 struct _reent;
 
-struct __locale_t;
-
 /*
  * If _REENT_SMALL is defined, we make struct _reent as small as possible,
  * by having nearly everything possible allocated at first use.
@@ -319,14 +317,6 @@ extern __FILE __sf[3];
 	.__sdidinit = 0,
 #endif
 
-#ifdef __HAVE_LOCALE_INFO__
-#define _REENT_INIT_LOCALE \
-	._unspecified_locale_info = 0, \
-	._locale = _NULL,
-#else
-#define _REENT_INIT_LOCALE
-#endif
-
 #ifdef _REENT_GLOBAL_ATEXIT
 #define _REENT_INIT_ATEXIT
 #else
@@ -340,16 +330,8 @@ extern __FILE __sf[3];
 struct _misc_reent
 {
   /* miscellaneous reentrant data */
-  _mbstate_t _mblen_state;
-  _mbstate_t _wctomb_state;
-  _mbstate_t _mbtowc_state;
   char _l64a_buf[8];
   int _getdate_err;
-  _mbstate_t _mbrlen_state;
-  _mbstate_t _mbrtowc_state;
-  _mbstate_t _mbsrtowcs_state;
-  _mbstate_t _wcrtomb_state;
-  _mbstate_t _wcsrtombs_state;
 };
 
 /* This version of _reent is laid out with "int"s in pairs, to help
@@ -365,11 +347,6 @@ struct _reent
   int  _inc;			/* used by tmpnam */
 
   int __sdidinit;		/* 1 means stdio has been init'd */
-# endif
-
-# ifdef __HAVE_LOCALE_INFO__
-  int _unspecified_locale_info;	/* unused, reserved for locale stuff */
-  struct __locale_t *_locale;/* per-thread locale */
 # endif
 
   void (*__cleanup) (struct _reent *);
@@ -395,7 +372,6 @@ struct _reent
 
 # define _REENT_INIT(var) \
   { _REENT_INIT_STDIO(var) \
-    _REENT_INIT_LOCALE \
     .__cleanup = NULL, \
     ._cvtlen = 0, \
     ._cvtbuf = _NULL, \
@@ -454,22 +430,6 @@ extern const struct __sFILE_fake __sf_fake_stderr;
 
 #define _REENT_INIT_MISC(var) do { \
   struct _reent *_r = (var); \
-  _r->_misc->_mblen_state.__count = 0; \
-  _r->_misc->_mblen_state.__value.__wch = 0; \
-  _r->_misc->_wctomb_state.__count = 0; \
-  _r->_misc->_wctomb_state.__value.__wch = 0; \
-  _r->_misc->_mbtowc_state.__count = 0; \
-  _r->_misc->_mbtowc_state.__value.__wch = 0; \
-  _r->_misc->_mbrlen_state.__count = 0; \
-  _r->_misc->_mbrlen_state.__value.__wch = 0; \
-  _r->_misc->_mbrtowc_state.__count = 0; \
-  _r->_misc->_mbrtowc_state.__value.__wch = 0; \
-  _r->_misc->_mbsrtowcs_state.__count = 0; \
-  _r->_misc->_mbsrtowcs_state.__value.__wch = 0; \
-  _r->_misc->_wcrtomb_state.__count = 0; \
-  _r->_misc->_wcrtomb_state.__value.__wch = 0; \
-  _r->_misc->_wcsrtombs_state.__count = 0; \
-  _r->_misc->_wcsrtombs_state.__value.__wch = 0; \
   _r->_misc->_l64a_buf[0] = '\0'; \
   _r->_misc->_getdate_err = 0; \
 } while (0)
@@ -479,14 +439,6 @@ extern const struct __sFILE_fake __sf_fake_stderr;
 #define _REENT_CHECK_SIGNAL_BUF(var) \
   _REENT_CHECK(var, _signal_buf, char *, _REENT_SIGNAL_SIZE, /* nothing */)
 
-#define _REENT_MBLEN_STATE(ptr)	((ptr)->_misc->_mblen_state)
-#define _REENT_MBTOWC_STATE(ptr)((ptr)->_misc->_mbtowc_state)
-#define _REENT_WCTOMB_STATE(ptr)((ptr)->_misc->_wctomb_state)
-#define _REENT_MBRLEN_STATE(ptr) ((ptr)->_misc->_mbrlen_state)
-#define _REENT_MBRTOWC_STATE(ptr) ((ptr)->_misc->_mbrtowc_state)
-#define _REENT_MBSRTOWCS_STATE(ptr) ((ptr)->_misc->_mbsrtowcs_state)
-#define _REENT_WCRTOMB_STATE(ptr) ((ptr)->_misc->_wcrtomb_state)
-#define _REENT_WCSRTOMBS_STATE(ptr) ((ptr)->_misc->_wcsrtombs_state)
 #define _REENT_L64A_BUF(ptr)    ((ptr)->_misc->_l64a_buf)
 #define _REENT_GETDATE_ERR_P(ptr) (&((ptr)->_misc->_getdate_err))
 #define _REENT_SIGNAL_BUF(ptr)  ((ptr)->_signal_buf)
@@ -502,12 +454,6 @@ struct _reent
 
   int  _inc;			/* used by tmpnam */
 
-  /* TODO */
-# ifdef __HAVE_LOCALE_INFO__
-  int _unspecified_locale_info;	/* unused, reserved for locale stuff */
-  struct __locale_t *_locale;/* per-thread locale */
-#endif
-
   int __sdidinit;		/* 1 means stdio has been init'd */
 
   void (*__cleanup) (struct _reent *);
@@ -521,17 +467,9 @@ struct _reent
       struct
         {
           unsigned int _unused_rand;
-          _mbstate_t _mblen_state;
-          _mbstate_t _mbtowc_state;
-          _mbstate_t _wctomb_state;
           char _l64a_buf[8];
           char _signal_buf[_REENT_SIGNAL_SIZE];
           int _getdate_err;
-          _mbstate_t _mbrlen_state;
-          _mbstate_t _mbrtowc_state;
-          _mbstate_t _mbsrtowcs_state;
-          _mbstate_t _wcrtomb_state;
-          _mbstate_t _wcsrtombs_state;
 	  int _h_errno;
         } _reent;
   /* Two next two fields were once used by malloc.  They are no longer
@@ -572,24 +510,15 @@ extern __FILE __sf[3];
 
 #define _REENT_INIT(var) \
   { _REENT_INIT_STDIO(var)	    \
-    _REENT_INIT_LOCALE \
     .__cleanup = _NULL, \
     ._cvtlen = 0, \
     ._cvtbuf = _NULL, \
     ._new = { \
       ._reent = { \
         0, \
-        {0, {0}}, \
-        {0, {0}}, \
-        {0, {0}}, \
         "", \
         "", \
         0, \
-        {0, {0}}, \
-        {0, {0}}, \
-        {0, {0}}, \
-        {0, {0}}, \
-        {0, {0}} \
       } \
     }, \
     _REENT_INIT_ATEXIT \
@@ -606,14 +535,6 @@ extern __FILE __sf[3];
 #define _REENT_CHECK_MISC(ptr)	        /* nothing */
 #define _REENT_CHECK_SIGNAL_BUF(ptr)	/* nothing */
 
-#define _REENT_MBLEN_STATE(ptr)	((ptr)->_new._reent._mblen_state)
-#define _REENT_MBTOWC_STATE(ptr)((ptr)->_new._reent._mbtowc_state)
-#define _REENT_WCTOMB_STATE(ptr)((ptr)->_new._reent._wctomb_state)
-#define _REENT_MBRLEN_STATE(ptr)((ptr)->_new._reent._mbrlen_state)
-#define _REENT_MBRTOWC_STATE(ptr)((ptr)->_new._reent._mbrtowc_state)
-#define _REENT_MBSRTOWCS_STATE(ptr)((ptr)->_new._reent._mbsrtowcs_state)
-#define _REENT_WCRTOMB_STATE(ptr)((ptr)->_new._reent._wcrtomb_state)
-#define _REENT_WCSRTOMBS_STATE(ptr)((ptr)->_new._reent._wcsrtombs_state)
 #define _REENT_L64A_BUF(ptr)    ((ptr)->_new._reent._l64a_buf)
 #define _REENT_SIGNAL_BUF(ptr)  ((ptr)->_new._reent._signal_buf)
 #define _REENT_GETDATE_ERR_P(ptr) (&((ptr)->_new._reent._getdate_err))

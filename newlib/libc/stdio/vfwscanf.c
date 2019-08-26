@@ -361,7 +361,7 @@ __SVFWSCANF_R (struct _reent *rptr,
 
   mbstate_t mbs;                /* value to keep track of multibyte state */
 
-  #define CCFN_PARAMS	(struct _reent *, const wchar_t *, wchar_t **, int)
+  #define CCFN_PARAMS	(const wchar_t *, wchar_t **, int)
   unsigned long (*ccfn)CCFN_PARAMS=0;	/* conversion function (wcstol/wcstoul) */
   wchar_t buf[BUF];		/* buffer for numeric conversions */
   const wchar_t *ccls;          /* character class start */
@@ -536,15 +536,15 @@ __SVFWSCANF_R (struct _reent *rptr,
 	    size_t nconv;
 
 	    memset (&mbs, '\0', sizeof (mbs));
-	    nconv = _mbrtowc_r (rptr, &decpt,
-				_localeconv_r (rptr)->decimal_point,
+	    nconv = mbrtowc (&decpt,
+				localeconv ()->decimal_point,
 				MB_CUR_MAX, &mbs);
 	    if (nconv == (size_t) -1 || nconv == (size_t) -2)
 	      decpt = L'.';
 	  }
 #endif /* !__HAVE_LOCALE_INFO_EXTENDED__ */
 #else
-	  decpt = (wchar_t) *_localeconv_r (rptr)->decimal_point;
+	  decpt = (wchar_t) *localeconv ()->decimal_point;
 #endif /* !_MB_CAPABLE */
 #endif /* FLOATING_POINT */
 
@@ -722,25 +722,25 @@ __SVFWSCANF_R (struct _reent *rptr,
 
 	case L'd':
 	  c = CT_INT;
-	  ccfn = (unsigned long (*)CCFN_PARAMS)_wcstol_r;
+	  ccfn = (unsigned long (*)CCFN_PARAMS)wcstol;
 	  base = 10;
 	  break;
 
 	case L'i':
 	  c = CT_INT;
-	  ccfn = (unsigned long (*)CCFN_PARAMS)_wcstol_r;
+	  ccfn = (unsigned long (*)CCFN_PARAMS)wcstol;
 	  base = 0;
 	  break;
 
 	case L'o':
 	  c = CT_INT;
-	  ccfn = _wcstoul_r;
+	  ccfn = wcstoul;
 	  base = 8;
 	  break;
 
 	case L'u':
 	  c = CT_INT;
-	  ccfn = _wcstoul_r;
+	  ccfn = wcstoul;
 	  base = 10;
 	  break;
 
@@ -748,7 +748,7 @@ __SVFWSCANF_R (struct _reent *rptr,
 	case L'x':
 	  flags |= PFXOK;	/* enable 0x prefixing */
 	  c = CT_INT;
-	  ccfn = _wcstoul_r;
+	  ccfn = wcstoul;
 	  base = 16;
 	  break;
 
@@ -810,7 +810,7 @@ __SVFWSCANF_R (struct _reent *rptr,
 	case 'p':		/* pointer format is like hex */
 	  flags |= POINTER | PFXOK;
 	  c = CT_INT;
-	  ccfn = _wcstoul_r;
+	  ccfn = wcstoul;
 	  base = 16;
 	  break;
 
@@ -934,7 +934,7 @@ __SVFWSCANF_R (struct _reent *rptr,
 	      memset ((void *)&mbs, '\0', sizeof (mbstate_t));
 	      while (width != 0 && (wi = _fgetwc_r (rptr, fp)) != WEOF)
 		{
-		  nconv = _wcrtomb_r (rptr, mbp, wi, &mbs);
+		  nconv = wcrtomb (mbp, wi, &mbs);
 		  if (nconv == (size_t) -1)
 		    goto input_failure;
 		  /* Ignore high surrogate in width counting */
@@ -1027,7 +1027,7 @@ __SVFWSCANF_R (struct _reent *rptr,
 	      while ((wi = _fgetwc_r (rptr, fp)) != WEOF
 		     && width != 0 && INCCL (wi))
 		{
-		  nconv = _wcrtomb_r (rptr, mbp, wi, &mbs);
+		  nconv = wcrtomb (mbp, wi, &mbs);
 		  if (nconv == (size_t) -1)
 		    goto input_failure;
 		  /* Ignore high surrogate in width counting */
@@ -1281,7 +1281,7 @@ __SVFWSCANF_R (struct _reent *rptr,
 	      unsigned long res;
 
 	      *p = 0;
-	      res = (*ccfn) (rptr, buf, (wchar_t **) NULL, base);
+	      res = (*ccfn) (buf, (wchar_t **) NULL, base);
 	      if (flags & POINTER)
 		{
 		  void **vp = GET_ARG (N, ap, void **);
@@ -1289,7 +1289,7 @@ __SVFWSCANF_R (struct _reent *rptr,
 		  if (sizeof (uintptr_t) > sizeof (unsigned long))
 		    {
 		      unsigned long long resll;
-		      resll = _wcstoull_r (rptr, buf, (wchar_t **) NULL, base);
+		      resll = wcstoull (buf, (wchar_t **) NULL, base);
 		      *vp = (void *) (uintptr_t) resll;
 		    }
 		  else
@@ -1317,10 +1317,10 @@ __SVFWSCANF_R (struct _reent *rptr,
 	      else if (flags & LONGDBL)
 		{
 		  unsigned long long resll;
-		  if (ccfn == _wcstoul_r)
-		    resll = _wcstoull_r (rptr, buf, (wchar_t **) NULL, base);
+		  if (ccfn == wcstoul)
+		    resll = wcstoull (buf, (wchar_t **) NULL, base);
 		  else
-		    resll = _wcstoll_r (rptr, buf, (wchar_t **) NULL, base);
+		    resll = wcstoll (buf, (wchar_t **) NULL, base);
 		  llp = GET_ARG (N, ap, long long*);
 		  *llp = resll;
 		}
@@ -1602,7 +1602,7 @@ __SVFWSCANF_R (struct _reent *rptr,
 		  exp_start = p;
 		}
 	      else if (exp_adjust)
-                new_exp = _wcstol_r (rptr, (exp_start + 1), NULL, 10) - exp_adjust;
+                new_exp = wcstol ((exp_start + 1), NULL, 10) - exp_adjust;
 	      if (exp_adjust)
 		{
 
@@ -1618,10 +1618,10 @@ __SVFWSCANF_R (struct _reent *rptr,
 	      /* FIXME: We don't have wcstold yet. */
 #if 0//ndef _NO_LONGDBL /* !_NO_LONGDBL */
 	      if (flags & LONGDBL)
-		qres = _wcstold_r (rptr, buf, NULL);
+		qres = wcstold (buf, NULL);
 	      else
 #endif
-	        res = _wcstod_r (rptr, buf, NULL);
+	        res = wcstod (buf, NULL);
 
 	      if (flags & LONG)
 		{

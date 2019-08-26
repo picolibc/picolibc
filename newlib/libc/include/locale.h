@@ -67,16 +67,6 @@ struct lconv
   char int_p_sign_posn;
 };
 
-struct _reent;
-char *_setlocale_r (struct _reent *, int, const char *);
-struct lconv *_localeconv_r (struct _reent *);
-
-struct __locale_t *_newlocale_r (struct _reent *, int, const char *,
-				 struct __locale_t *);
-void _freelocale_r (struct _reent *, struct __locale_t *);
-struct __locale_t *_duplocale_r (struct _reent *, struct __locale_t *);
-struct __locale_t *_uselocale_r (struct _reent *, struct __locale_t *);
-
 #ifndef _REENT_ONLY
 
 char *setlocale (int, const char *);

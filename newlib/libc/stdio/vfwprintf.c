@@ -465,8 +465,8 @@ _VFWPRINTF_R (struct _reent *data,
 	  size_t nconv;
 
 	  memset (&state, '\0', sizeof (state));
-	  nconv = _mbrtowc_r (data, &decimal_point,
-			      _localeconv_r (data)->decimal_point,
+	  nconv = mbrtowc (&decimal_point,
+			      localeconv ()->decimal_point,
 			      MB_CUR_MAX, &state);
 	  if (nconv == (size_t) -1 || nconv == (size_t) -2)
 	    decimal_point = L'.';
@@ -680,7 +680,7 @@ reswitch:	switch (ch) {
 		    size_t nconv;
 
 		    memset (&state, '\0', sizeof (state));
-		    nconv = _mbrtowc_r (data, &thousands_sep,
+		    nconv = mbrtowc (&thousands_sep,
 					_localeconv_r (data)->thousands_sep,
 					MB_CUR_MAX, &state);
 		    if (nconv == (size_t) -1 || nconv == (size_t) -2)
@@ -1224,7 +1224,7 @@ string:
 				memset ((void *)&ps, '\0', sizeof (mbstate_t));
 				p = cp;
 				while (insize != 0) {
-					nconv = _mbrtowc_r (data, p, arg, insize, &ps);
+					nconv = mbrtowc (p, arg, insize, &ps);
 					if (nconv == 0 || nconv == (size_t)-1 || nconv == (size_t)-2)
 						break;
 					++p;

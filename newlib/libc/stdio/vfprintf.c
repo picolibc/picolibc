@@ -686,7 +686,7 @@ _VFPRINTF_R (struct _reent *data,
 	const char *grouping = NULL;
 #endif
 #ifdef FLOATING_POINT
-	char *decimal_point = _localeconv_r (data)->decimal_point;
+	char *decimal_point = localeconv ()->decimal_point;
 	size_t decp_len = strlen (decimal_point);
 	char softsign;		/* temporary negative sign for floats */
 	union { int i; _PRINTF_FLOAT_TYPE fp; } _double_ = {0};
@@ -903,7 +903,7 @@ _VFPRINTF_R (struct _reent *data,
 	for (;;) {
 	        cp = fmt;
 #ifdef _MB_CAPABLE
-	        while ((n = __MBTOWC (data, &wc, fmt, MB_CUR_MAX,
+	        while ((n = __MBTOWC (&wc, fmt, MB_CUR_MAX,
 				      &state)) != 0) {
 		    if (n < 0) {
 			/* Wave invalid chars through. */
@@ -1169,7 +1169,7 @@ reswitch:	switch (ch) {
 				mbstate_t ps;
 
 				memset ((void *)&ps, '\0', sizeof (mbstate_t));
-				if ((size = (int)_wcrtomb_r (data, cp,
+				if ((size = (int)wcrtomb (cp,
 					       (wchar_t)GET_ARG (N, ap, wint_t),
 						&ps)) == -1) {
 					fp->_flags |= __SERR;
@@ -1465,7 +1465,7 @@ string:
 					while (1) {
 						if (wcp[m] == L'\0')
 							break;
-						if ((n = (int)_wcrtomb_r (data,
+						if ((n = (int)wcrtomb (
 						     buf, wcp[m], &ps)) == -1) {
 							fp->_flags |= __SERR;
 							goto error;
@@ -1479,7 +1479,7 @@ string:
 					}
 				}
 				else {
-					if ((size = (int)_wcsrtombs_r (data,
+					if ((size = (int)wcsrtombs (
 						   NULL, &wcp, 0, &ps)) == -1) {
 						fp->_flags |= __SERR;
 						goto error;
@@ -1503,7 +1503,7 @@ string:
 
 				/* Convert widechar string to multibyte string. */
 				memset ((void *)&ps, '\0', sizeof (mbstate_t));
-				if (_wcsrtombs_r (data, cp, &wcp, size, &ps)
+				if (wcsrtombs (cp, &wcp, size, &ps)
 				    != size) {
 					fp->_flags |= __SERR;
 					goto error;

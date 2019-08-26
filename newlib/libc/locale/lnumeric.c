@@ -46,7 +46,7 @@ int
 __numeric_load_locale (struct __locale_t *locale, const char *name ,
 		       void *f_wctomb, const char *charset)
 {
-  int ret;
+  int ret= -1;
   struct lc_numeric_T nm;
   char *bufp = NULL;
 
