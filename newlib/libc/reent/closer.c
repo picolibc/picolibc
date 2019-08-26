@@ -17,7 +17,7 @@
 
 /* We use the errno variable used by the system dependent layer.  */
 #undef errno
-extern int errno;
+extern __thread int errno;
 
 /*
 FUNCTION
@@ -44,7 +44,7 @@ _close_r (ptr, fd)
   int ret;
 
   errno = 0;
-  if ((ret = _close (fd)) == -1 && errno != 0)
+  if ((ret = close (fd)) == -1 && errno != 0)
     __errno_r(ptr) = errno;
   return ret;
 }

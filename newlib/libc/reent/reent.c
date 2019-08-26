@@ -32,17 +32,11 @@ cleanup_glue (struct _reent *ptr,
   _free_r (ptr, glue);
 }
 
-void mprec_free(void);
 
 #ifdef __weak_alias
-__weak_alias(mprec_free_noop, mprec_free)
-
-void
-mprec_free_noop(void)
-{
-}
+__attribute__((weak)) void mprec_free(void);
 #else
-#define mprec_free_noop mprec_free
+void mprec_free(void);
 #endif
 
 void

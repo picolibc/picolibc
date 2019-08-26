@@ -21,7 +21,7 @@ int _dummy_sbrk_syscalls = 1;
 
 /* We use the errno variable used by the system dependent layer.  */
 #undef errno
-extern int errno;
+extern __thread int errno;
 
 /*
 FUNCTION
@@ -48,7 +48,7 @@ _sbrk_r (struct _reent *ptr,
   void *_sbrk(ptrdiff_t);
 
   errno = 0;
-  if ((ret = (char *)(_sbrk (incr))) == (void *) -1 && errno != 0)
+  if ((ret = (char *)(sbrk (incr))) == (void *) -1 && errno != 0)
     __errno_r(ptr) = errno;
   return ret;
 }

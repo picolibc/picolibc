@@ -466,10 +466,12 @@ void * nano_realloc(RARG void * ptr, malloc_size_t size)
         return NULL;
     }
 
+#ifdef DEFINE_MALLOC_USABLE_SIZE
     /* TODO: There is chance to shrink the chunk if newly requested
      * size is much small */
     if (nano_malloc_usable_size(RCALL ptr) >= size)
       return ptr;
+#endif
 
     mem = nano_malloc(RCALL size);
     if (mem != NULL)

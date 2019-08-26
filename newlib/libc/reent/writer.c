@@ -17,7 +17,7 @@
 
 /* We use the errno variable used by the system dependent layer.  */
 #undef errno
-extern int errno;
+extern __thread int errno;
 
 /*
 FUNCTION
@@ -46,7 +46,7 @@ _write_r (struct _reent *ptr,
   _ssize_t ret;
 
   errno = 0;
-  if ((ret = (_ssize_t)_write (fd, buf, cnt)) == -1 && errno != 0)
+  if ((ret = (_ssize_t)write (fd, buf, cnt)) == -1 && errno != 0)
     __errno_r(ptr) = errno;
   return ret;
 }
