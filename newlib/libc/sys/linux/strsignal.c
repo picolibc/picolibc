@@ -1,7 +1,6 @@
 #include <string.h>
 #include <signal.h>
 #include <stdio.h>
-#include <reent.h>
 
 static const char *sigstring[] =
   {
@@ -45,13 +44,9 @@ strsignal (int sig)
   if (sig < 0 || sig >= __SIGRTMIN)
     {
       char *buffer;
-      struct _reent *ptr;
+      static NEWLIB_THREAD_LOCAL char  _signal_buf[24];
 
-      ptr = _REENT;
-
-      _REENT_CHECK_SIGNAL_BUF(ptr);
-      buffer = _REENT_SIGNAL_BUF(ptr);
-
+      buffer = _signal_buf;
       if (sig < 0 || sig > __SIGRTMAX)
         siprintf (buffer, "Unknown signal %d", sig);
       else

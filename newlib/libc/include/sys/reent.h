@@ -360,7 +360,6 @@ struct _reent
   struct _glue __sglue;			/* root of glue chain */
   __FILE *__sf;			        /* file descriptors */
   struct _misc_reent *_misc;            /* strtok, multibyte states */
-  char *_signal_buf;                    /* strsignal */
 };
 
 # define _REENT_INIT(var) \
@@ -370,7 +369,6 @@ struct _reent
     .__sglue = _GLUE_INIT, \
     .__sf = _NULL, \
     ._misc = _NULL, \
-    ._signal_buf = NULL \
   }
 
 #ifdef _REENT_GLOBAL_STDIO_STREAMS
@@ -426,12 +424,8 @@ extern const struct __sFILE_fake __sf_fake_stderr;
 #define _REENT_CHECK_MISC(var) \
   _REENT_CHECK(var, _misc, struct _misc_reent *, sizeof *((var)->_misc), _REENT_INIT_MISC(var))
 
-#define _REENT_CHECK_SIGNAL_BUF(var) \
-  _REENT_CHECK(var, _signal_buf, char *, _REENT_SIGNAL_SIZE, /* nothing */)
-
 #define _REENT_L64A_BUF(ptr)    ((ptr)->_misc->_l64a_buf)
 #define _REENT_GETDATE_ERR_P(ptr) (&((ptr)->_misc->_getdate_err))
-#define _REENT_SIGNAL_BUF(ptr)  ((ptr)->_signal_buf)
 
 #else /* !_REENT_SMALL */
 
@@ -454,7 +448,6 @@ struct _reent
         {
           unsigned int _unused_rand;
           char _l64a_buf[8];
-          char _signal_buf[_REENT_SIGNAL_SIZE];
           int _getdate_err;
 	  int _h_errno;
         } _reent;
@@ -498,7 +491,6 @@ extern __FILE __sf[3];
       ._reent = { \
         0, \
         "", \
-        "", \
         0, \
       } \
     }, \
@@ -513,10 +505,8 @@ extern __FILE __sf[3];
   }
 
 #define _REENT_CHECK_MISC(ptr)	        /* nothing */
-#define _REENT_CHECK_SIGNAL_BUF(ptr)	/* nothing */
 
 #define _REENT_L64A_BUF(ptr)    ((ptr)->_new._reent._l64a_buf)
-#define _REENT_SIGNAL_BUF(ptr)  ((ptr)->_new._reent._signal_buf)
 #define _REENT_GETDATE_ERR_P(ptr) (&((ptr)->_new._reent._getdate_err))
 
 #endif /* !_REENT_SMALL */
