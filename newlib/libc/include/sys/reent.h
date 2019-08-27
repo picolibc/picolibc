@@ -327,11 +327,6 @@ extern __FILE __sf[3];
 
 #ifdef _REENT_SMALL
 
-struct _misc_reent
-{
-  /* miscellaneous reentrant data */
-};
-
 /* This version of _reent is laid out with "int"s in pairs, to help
  * ports with 16-bit int's but 32-bit pointers, align nicely.  */
 struct _reent
@@ -357,7 +352,6 @@ struct _reent
 
   struct _glue __sglue;			/* root of glue chain */
   __FILE *__sf;			        /* file descriptors */
-  struct _misc_reent *_misc;            /* strtok, multibyte states */
 };
 
 # define _REENT_INIT(var) \
@@ -366,7 +360,6 @@ struct _reent
     _REENT_INIT_ATEXIT \
     .__sglue = _GLUE_INIT, \
     .__sf = _NULL, \
-    ._misc = _NULL, \
   }
 
 #ifdef _REENT_GLOBAL_STDIO_STREAMS
@@ -413,12 +406,6 @@ extern const struct __sFILE_fake __sf_fake_stderr;
     init; \
   } \
 } while (0)
-
-#define _REENT_INIT_MISC(var) do { \
-  struct _reent *_r = (var); \
-} while (0)
-#define _REENT_CHECK_MISC(var) \
-  _REENT_CHECK(var, _misc, struct _misc_reent *, sizeof *((var)->_misc), _REENT_INIT_MISC(var))
 
 #else /* !_REENT_SMALL */
 
@@ -493,8 +480,6 @@ extern __FILE __sf[3];
     (var)->_stdout = _REENT_STDIO_STREAM(var, 1); \
     (var)->_stderr = _REENT_STDIO_STREAM(var, 2); \
   }
-
-#define _REENT_CHECK_MISC(ptr)	        /* nothing */
 
 #endif /* !_REENT_SMALL */
 

@@ -21,8 +21,6 @@ btowc (int c)
   /* Put mbs in initial state. */
   memset (&mbs, '\0', sizeof (mbs));
 
-  _REENT_CHECK_MISC(_REENT);
-
   retval = __MBTOWC (&pwc, (const char *) &b, 1, &mbs);
 
   if (retval != 0 && retval != 1)
