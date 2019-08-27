@@ -28,6 +28,8 @@ details. */
 #define MIN_CTRL_C_SLOP 50
 #endif
 
+typedef void *HPCON;
+
 #include <devices.h>
 class tty_min
 {
@@ -88,14 +90,28 @@ public:
 
 private:
   HANDLE _from_master;
+  HANDLE _from_master_cyg;
   HANDLE _to_master;
   HANDLE _to_master_cyg;
+  HPCON hPseudoConsole;
+  HANDLE hHelperProcess;
+  DWORD HelperProcessId;
+  HANDLE hHelperGoodbye;
+  bool attach_pcon_in_fork;
+  bool switch_to_pcon;
+  bool screen_alternated;
+  bool mask_switch_to_pcon;
+  pid_t pcon_pid;
+  int num_pcon_attached_slaves;
+  UINT TermCodePage;
 
 public:
-  HANDLE from_master() const { return _from_master; }
-  HANDLE to_master() const { return _to_master; }
-  HANDLE to_master_cyg() const { return _to_master_cyg; }
+  HANDLE from_master () const { return _from_master; }
+  HANDLE from_master_cyg () const { return _from_master_cyg; }
+  HANDLE to_master () const { return _to_master; }
+  HANDLE to_master_cyg () const { return _to_master_cyg; }
   void set_from_master (HANDLE h) { _from_master = h; }
+  void set_from_master_cyg (HANDLE h) { _from_master_cyg = h; }
   void set_to_master (HANDLE h) { _to_master = h; }
   void set_to_master_cyg (HANDLE h) { _to_master_cyg = h; }
 
@@ -117,7 +133,9 @@ public:
   void set_master_ctl_closed () {master_pid = -1;}
   static void __stdcall create_master (int);
   static void __stdcall init_session ();
+  friend class fhandler_pty_common;
   friend class fhandler_pty_master;
+  friend class fhandler_pty_slave;
 };
 
 class tty_list

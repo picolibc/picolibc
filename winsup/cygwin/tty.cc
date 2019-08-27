@@ -234,7 +234,15 @@ tty::init ()
   was_opened = false;
   master_pid = 0;
   is_console = false;
+  attach_pcon_in_fork = false;
+  hPseudoConsole = NULL;
   column = 0;
+  switch_to_pcon = false;
+  screen_alternated = false;
+  mask_switch_to_pcon = false;
+  pcon_pid = 0;
+  num_pcon_attached_slaves = 0;
+  TermCodePage = 20127; /* ASCII */
 }
 
 HANDLE

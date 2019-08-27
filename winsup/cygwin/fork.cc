@@ -134,6 +134,30 @@ child_info::prefork (bool detached)
 int __stdcall
 frok::child (volatile char * volatile here)
 {
+  cygheap_fdenum cfd (false);
+  while (cfd.next () >= 0)
+    if (cfd->get_major () == DEV_PTYM_MAJOR)
+      {
+	fhandler_base *fh = cfd;
+	fhandler_pty_master *ptym = (fhandler_pty_master *) fh;
+	if (ptym->getPseudoConsole () &&
+	    !fhandler_console::get_console_process_id (
+				ptym->getHelperProcessId (), true))
+
+	  {
+	    debug_printf ("found a PTY master %d: helper_PID=%d",
+			  ptym->get_minor (), ptym->getHelperProcessId ());
+	    if (ptym->attach_pcon_in_fork ())
+	      {
+		FreeConsole ();
+		if (!AttachConsole (ptym->getHelperProcessId ()))
+		  /* Error */;
+		else
+		  break;
+	      }
+	  }
+      }
+
   HANDLE& hParent = ch.parent;
 
   sync_with_parent ("after longjmp", true);

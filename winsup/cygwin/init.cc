@@ -100,6 +100,7 @@ dll_entry (HANDLE h, DWORD reason, void *static_load)
 	 will always fall back to __global_locale, rather then crash due to
 	 _REENT->_locale having an arbitrary value. */
       alloca_dummy = alloca (CYGTLS_PADSIZE);
+      ZeroMemory (alloca_dummy, CYGTLS_PADSIZE);
       memcpy (_REENT, _GLOBAL_REENT, sizeof (struct _reent));
 
       dll_crt0_0 ();

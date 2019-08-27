@@ -259,6 +259,8 @@ child_info_spawn::worker (const char *prog_arg, const char *const *argv,
 {
   bool rc;
   int res = -1;
+  DWORD pidRestore = 0;
+  bool attach_to_pcon = false;
 
   /* Check if we have been called from exec{lv}p or spawn{lv}p and mask
      mode to keep only the spawn mode. */
@@ -572,6 +574,58 @@ child_info_spawn::worker (const char *prog_arg, const char *const *argv,
 			 PROCESS_QUERY_LIMITED_INFORMATION))
 	sa = &sec_none_nih;
 
+      /* Attach to pseudo console if pty salve is used */
+      pidRestore = fhandler_console::get_console_process_id
+	(GetCurrentProcessId (), false);
+      fhandler_pty_slave *ptys = NULL;
+      for (int fd = 0; fd < 3; fd ++)
+	{
+	  fhandler_base *fh = ::cygheap->fdtab[fd];
+	  if (fh && fh->get_major () == DEV_PTYS_MAJOR)
+	    {
+	      ptys = (fhandler_pty_slave *) fh;
+	      if (ptys->getPseudoConsole () &&
+		  !fhandler_console::get_console_process_id (
+				     ptys->getHelperProcessId (), true))
+		{
+		  DWORD dwHelperProcessId = ptys->getHelperProcessId ();
+		  debug_printf ("found a PTY slave %d: helper_PID=%d",
+				fh->get_minor (), dwHelperProcessId);
+		  FreeConsole ();
+		  if (!AttachConsole (dwHelperProcessId))
+		    {
+		      /* Fallback */
+		      DWORD target[3] = {
+			STD_INPUT_HANDLE,
+			STD_OUTPUT_HANDLE,
+			STD_ERROR_HANDLE
+		      };
+		      if (fd == 0)
+			{
+			  ptys->set_handle (ptys->get_handle_cyg ());
+			  SetStdHandle (target[fd],
+					ptys->get_handle ());
+			}
+		      else
+			{
+			  ptys->set_output_handle (
+				       ptys->get_output_handle_cyg ());
+			  SetStdHandle (target[fd],
+					ptys->get_output_handle ());
+			}
+		    }
+		  else
+		    {
+		      init_console_handler (true);
+		      attach_to_pcon = true;
+		      break;
+		    }
+		}
+	    }
+	}
+      if (ptys)
+	ptys->fixup_after_attach (true);
+
     loop:
       /* When ruid != euid we create the new process under the current original
 	 account and impersonate in child, this way maintaining the different
@@ -869,6 +923,13 @@ child_info_spawn::worker (const char *prog_arg, const char *const *argv,
   this->cleanup ();
   if (envblock)
     free (envblock);
+
+  if (attach_to_pcon && pidRestore)
+    {
+      FreeConsole ();
+      AttachConsole (pidRestore);
+    }
+
   return (int) res;
 }
 

@@ -1056,6 +1056,19 @@ fhandler_console::close ()
 
   CloseHandle (get_handle ());
   CloseHandle (get_output_handle ());
+
+  /* If already attached to pseudo console, don't call free_console () */
+  cygheap_fdenum cfd (false);
+  while (cfd.next () >= 0)
+    if (cfd->get_major () == DEV_PTYM_MAJOR ||
+	cfd->get_major () == DEV_PTYS_MAJOR)
+      {
+	fhandler_pty_common *t =
+	  (fhandler_pty_common *) (fhandler_base *) cfd;
+	if (get_console_process_id (t->getHelperProcessId (), true))
+	  return 0;
+      }
+
   if (!have_execed)
     free_console ();
   return 0;
@@ -3117,6 +3130,25 @@ fhandler_console::need_invisible ()
 
   debug_printf ("invisible_console %d", invisible_console);
   return b;
+}
+
+DWORD
+fhandler_console::get_console_process_id (DWORD pid, bool match)
+{
+  DWORD tmp;
+  int num = GetConsoleProcessList (&tmp, 1);
+  DWORD *list = (DWORD *)
+	      HeapAlloc (GetProcessHeap (), 0, num * sizeof (DWORD));
+  num = GetConsoleProcessList (list, num);
+  tmp = 0;
+  for (int i=0; i<num; i++)
+    if ((match && list[i] == pid) || (!match && list[i] != pid))
+      {
+	tmp = list[i];
+	//break;
+      }
+  HeapFree (GetProcessHeap (), 0, list);
+  return tmp;
 }
 
 DWORD

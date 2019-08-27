@@ -667,6 +667,9 @@ peek_pipe (select_record *s, bool from_select)
 	    fhm->flush_to_slave ();
 	  }
 	  break;
+	case DEV_PTYS_MAJOR:
+	  ((fhandler_pty_slave *) fh)->reset_switch_to_pcon ();
+	  break;
 	default:
 	  if (fh->get_readahead_valid ())
 	    {
@@ -1178,17 +1181,32 @@ verify_tty_slave (select_record *me, fd_set *readfds, fd_set *writefds,
   return set_bits (me, readfds, writefds, exceptfds);
 }
 
+static int
+pty_slave_startup (select_record *s, select_stuff *)
+{
+  fhandler_base *fh = (fhandler_base *) s->fh;
+  ((fhandler_pty_slave *) fh)->mask_switch_to_pcon (true);
+  return 1;
+}
+
+static void
+pty_slave_cleanup (select_record *s, select_stuff *)
+{
+  fhandler_base *fh = (fhandler_base *) s->fh;
+  ((fhandler_pty_slave *) fh)->mask_switch_to_pcon (false);
+}
+
 select_record *
 fhandler_pty_slave::select_read (select_stuff *ss)
 {
   select_record *s = ss->start.next;
   s->h = input_available_event;
-  s->startup = no_startup;
+  s->startup = pty_slave_startup;
   s->peek = peek_pipe;
   s->verify = verify_tty_slave;
   s->read_selected = true;
   s->read_ready = false;
-  s->cleanup = NULL;
+  s->cleanup = pty_slave_cleanup;
   return s;
 }
 
