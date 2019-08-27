@@ -1649,7 +1649,7 @@ wcvt(struct _reent *data, _PRINTF_FLOAT_TYPE value, int ndigits, int flags,
 
 	  *length = rve - digits; /* full length of the string */
 #ifdef _MB_CAPABLE
-	  _mbsnrtowcs_r (data, buf, (const char **) &digits, *length,
+	  mbsnrtowcs (buf, (const char **) &digits, *length,
 			 len, NULL);
 #else
 	  for (i = 0; i < *length && i < len; ++i)
