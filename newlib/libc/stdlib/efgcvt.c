@@ -135,7 +135,7 @@ gcvt (double d,
     buf++;
     ndigit--;
   }
-  return (_gcvt (_REENT, d, ndigit, buf, 'g', 0) ? tbuf : 0);
+  return (_gcvt (d, ndigit, buf, 'g', 0) ? tbuf : 0);
 }
 
 

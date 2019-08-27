@@ -351,10 +351,6 @@ struct _reent
 
   void (*__cleanup) (struct _reent *);
 
-  /* used by some fp conversion routines */
-  int _cvtlen;			/* should be size_t */
-  char *_cvtbuf;
-
 # ifndef _REENT_GLOBAL_ATEXIT
   /* atexit stuff */
   struct _atexit *_atexit;
@@ -370,8 +366,6 @@ struct _reent
 # define _REENT_INIT(var) \
   { _REENT_INIT_STDIO(var) \
     .__cleanup = NULL, \
-    ._cvtlen = 0, \
-    ._cvtbuf = _NULL, \
     _REENT_INIT_ATEXIT \
     .__sglue = _GLUE_INIT, \
     .__sf = _NULL, \
@@ -454,10 +448,6 @@ struct _reent
 
   void (*__cleanup) (struct _reent *);
 
-  /* used by some fp conversion routines */
-  int _cvtlen;			/* should be size_t */
-  char *_cvtbuf;
-
   union
     {
       struct
@@ -504,8 +494,6 @@ extern __FILE __sf[3];
 #define _REENT_INIT(var) \
   { _REENT_INIT_STDIO(var)	    \
     .__cleanup = _NULL, \
-    ._cvtlen = 0, \
-    ._cvtbuf = _NULL, \
     ._new = { \
       ._reent = { \
         0, \
