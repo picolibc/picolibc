@@ -127,8 +127,7 @@ __tzinfo_type *__gettzinfo (void);
 #ifdef HAVE_GETDATE
 #if __XSI_VISIBLE >= 4
 #ifndef _REENT_ONLY
-#define getdate_err (*__getdate_err())
-int *__getdate_err (void);
+extern NEWLIB_THREAD_LOCAL int getdate_err;
 
 struct tm *	getdate (const char *);
 /* getdate_err is set to one of the following values to indicate the error.

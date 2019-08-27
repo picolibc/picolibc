@@ -330,7 +330,6 @@ extern __FILE __sf[3];
 struct _misc_reent
 {
   /* miscellaneous reentrant data */
-  int _getdate_err;
 };
 
 /* This version of _reent is laid out with "int"s in pairs, to help
@@ -417,12 +416,9 @@ extern const struct __sFILE_fake __sf_fake_stderr;
 
 #define _REENT_INIT_MISC(var) do { \
   struct _reent *_r = (var); \
-  _r->_misc->_getdate_err = 0; \
 } while (0)
 #define _REENT_CHECK_MISC(var) \
   _REENT_CHECK(var, _misc, struct _misc_reent *, sizeof *((var)->_misc), _REENT_INIT_MISC(var))
-
-#define _REENT_GETDATE_ERR_P(ptr) (&((ptr)->_misc->_getdate_err))
 
 #else /* !_REENT_SMALL */
 
@@ -444,7 +440,6 @@ struct _reent
       struct
         {
           unsigned int _unused_rand;
-          int _getdate_err;
 	  int _h_errno;
         } _reent;
   /* Two next two fields were once used by malloc.  They are no longer
@@ -500,8 +495,6 @@ extern __FILE __sf[3];
   }
 
 #define _REENT_CHECK_MISC(ptr)	        /* nothing */
-
-#define _REENT_GETDATE_ERR_P(ptr) (&((ptr)->_new._reent._getdate_err))
 
 #endif /* !_REENT_SMALL */
 

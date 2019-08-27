@@ -7,12 +7,6 @@
 
 #ifndef _REENT_ONLY
 
-int *
-__getdate_err ()
-{
-  struct _reent *ptr = _REENT;
-  _REENT_CHECK_MISC(ptr);
-  return _REENT_GETDATE_ERR_P(ptr);
-}
+NEWLIB_THREAD_LOCAL int getdate_err;
 
 #endif
