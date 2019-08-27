@@ -19,11 +19,6 @@ typedef _sig_func_ptr sighandler_t;	/* glibc naming */
 #define SIG_IGN ((_sig_func_ptr)1)	/* Ignore action */
 #define SIG_ERR ((_sig_func_ptr)-1)	/* Error return */
 
-struct _reent;
-
-_sig_func_ptr _signal_r (struct _reent *, int, _sig_func_ptr);
-int	_raise_r (struct _reent *, int);
-
 #ifndef _REENT_ONLY
 _sig_func_ptr signal (int, _sig_func_ptr);
 int	raise (int);

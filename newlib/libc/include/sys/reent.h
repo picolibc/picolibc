@@ -355,9 +355,6 @@ struct _reent
   int _cvtlen;			/* should be size_t */
   char *_cvtbuf;
 
-  /* signal info */
-  void (**(_sig_func))(int);
-
 # ifndef _REENT_GLOBAL_ATEXIT
   /* atexit stuff */
   struct _atexit *_atexit;
@@ -375,7 +372,6 @@ struct _reent
     .__cleanup = NULL, \
     ._cvtlen = 0, \
     ._cvtbuf = _NULL, \
-    ._sig_func = _NULL, \
     _REENT_INIT_ATEXIT \
     .__sglue = _GLUE_INIT, \
     .__sf = _NULL, \
@@ -489,9 +485,6 @@ struct _reent
   struct _atexit _atexit0;	/* one guaranteed table, required by ANSI */
 # endif
 
-  /* signal info */
-  void (**(_sig_func))(int);
-
   /* These are here last so that __FILE can grow without changing the offsets
      of the above members (on the off chance that future binary compatibility
      would be broken otherwise).  */
@@ -522,7 +515,6 @@ extern __FILE __sf[3];
       } \
     }, \
     _REENT_INIT_ATEXIT \
-    ._sig_func = _NULL, \
     .__sglue = _GLUE_INIT \
   }
 

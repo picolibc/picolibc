@@ -15,7 +15,6 @@ srcs_reent_full = [
     'readr.c',
     'renamer.c',
     'sbrkr.c',
-    'signalr.c',
     'signgam.c',
     'stat64r.c',
     'statr.c',
