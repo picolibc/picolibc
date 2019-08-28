@@ -13,7 +13,7 @@ __xpg_strerror_r (int errnum,
 
   if (!n)
     return ERANGE;
-  error = _strerror_r (_REENT, errnum, 1, &result);
+  error = _strerror_r (errnum, 1, &result);
   if (strlen (error) >= n)
     {
       memcpy (buffer, error, n - 1);

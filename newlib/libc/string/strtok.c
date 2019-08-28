@@ -72,7 +72,6 @@ QUICKREF
 #include <string.h>
 #include <stdlib.h>
 #include <_ansi.h>
-#include <reent.h>
 
 #ifndef _REENT_ONLY
 

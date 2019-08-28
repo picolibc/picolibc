@@ -7,7 +7,13 @@
 char *
 strdup (const char *str)
 {
-  return _strdup_r (_REENT, str);
+  size_t len = strlen (str) + 1;
+  char *copy = malloc (len);
+  if (copy)
+    {
+      memcpy (copy, str, len);
+    }
+  return copy;
 }
 
 #endif /* !_REENT_ONLY */
