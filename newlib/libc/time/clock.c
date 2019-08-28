@@ -50,12 +50,12 @@ Supporting OS subroutine required: <<times>>.
 #include <reent.h>
 
 clock_t 
-clock ()
+clock (void)
 {
   struct tms tim_s;
   clock_t res;
 
-  if ((res = (clock_t) _times_r (_REENT, &tim_s)) != (clock_t) -1)
+  if ((res = (clock_t) times (&tim_s)) != (clock_t) -1)
     res = (clock_t) (tim_s.tms_utime + tim_s.tms_stime +
 		     tim_s.tms_cutime + tim_s.tms_cstime);
 
