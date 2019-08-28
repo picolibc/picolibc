@@ -56,49 +56,6 @@ struct _Bigint
 };
 
 /*
- * atexit() support.
- */
-
-#define	_ATEXIT_SIZE 32	/* must be at least 32 to guarantee ANSI conformance */
-
-struct _on_exit_args {
-	void *  _fnargs[_ATEXIT_SIZE];	        /* user fn args */
-	void *	_dso_handle[_ATEXIT_SIZE];
-	/* Bitmask is set if user function takes arguments.  */
-	__ULong _fntypes;           	        /* type of exit routine -
-				   Must have at least _ATEXIT_SIZE bits */
-	/* Bitmask is set if function was registered via __cxa_atexit.  */
-	__ULong _is_cxa;
-};
-
-#ifdef _REENT_SMALL
-struct _atexit {
-	struct	_atexit *_next;			/* next in list */
-	int	_ind;				/* next index in this table */
-	void	(*_fns[_ATEXIT_SIZE])(void);	/* the table itself */
-        struct _on_exit_args * _on_exit_args_ptr;
-};
-# define _ATEXIT_INIT {_NULL, 0, {_NULL}, _NULL}
-#else
-struct _atexit {
-	struct	_atexit *_next;			/* next in list */
-	int	_ind;				/* next index in this table */
-	/* Some entries may already have been called, and will be NULL.  */
-	void	(*_fns[_ATEXIT_SIZE])(void);	/* the table itself */
-        struct _on_exit_args _on_exit_args;
-};
-# define _ATEXIT_INIT {_NULL, 0, {_NULL}, {{_NULL}, {_NULL}, 0, 0}}
-#endif
-
-#ifdef _REENT_GLOBAL_ATEXIT
-# define _REENT_INIT_ATEXIT
-#else
-# define _REENT_INIT_ATEXIT \
-	._atexit = _NULL,   \
-	._atexit0 = _ATEXIT_INIT,
-#endif
-
-/*
  * Stdio buffers.
  *
  * This and __FILE are defined here because we need them for struct _reent,
@@ -317,14 +274,6 @@ extern __FILE __sf[3];
 	.__sdidinit = 0,
 #endif
 
-#ifdef _REENT_GLOBAL_ATEXIT
-#define _REENT_INIT_ATEXIT
-#else
-#define _REENT_INIT_ATEXIT \
-	._atexit = _NULL, \
-	._atexit0 = _ATEXIT_INIT,
-#endif
-
 #ifdef _REENT_SMALL
 
 /* This version of _reent is laid out with "int"s in pairs, to help
@@ -344,12 +293,6 @@ struct _reent
 
   void (*__cleanup) (struct _reent *);
 
-# ifndef _REENT_GLOBAL_ATEXIT
-  /* atexit stuff */
-  struct _atexit *_atexit;
-  struct _atexit _atexit0;
-# endif
-
   struct _glue __sglue;			/* root of glue chain */
   __FILE *__sf;			        /* file descriptors */
 };
@@ -357,7 +300,6 @@ struct _reent
 # define _REENT_INIT(var) \
   { _REENT_INIT_STDIO(var) \
     .__cleanup = NULL, \
-    _REENT_INIT_ATEXIT \
     .__sglue = _GLUE_INIT, \
     .__sf = _NULL, \
   }
@@ -440,12 +382,6 @@ struct _reent
         } _unused;
     } _new;
 
-# ifndef _REENT_GLOBAL_ATEXIT
-  /* atexit stuff */
-  struct _atexit *_atexit;	/* points to head of LIFO stack */
-  struct _atexit _atexit0;	/* one guaranteed table, required by ANSI */
-# endif
-
   /* These are here last so that __FILE can grow without changing the offsets
      of the above members (on the off chance that future binary compatibility
      would be broken otherwise).  */
@@ -471,7 +407,6 @@ extern __FILE __sf[3];
         0, \
       } \
     }, \
-    _REENT_INIT_ATEXIT \
     .__sglue = _GLUE_INIT \
   }
 
@@ -519,13 +454,6 @@ void _reclaim_reent (struct _reent *);
 #endif /* __SINGLE_THREAD__ || !__DYNAMIC_REENT__ */
 
 #define _GLOBAL_REENT _global_impure_ptr
-
-#ifdef _REENT_GLOBAL_ATEXIT
-extern struct _atexit *_global_atexit; /* points to head of LIFO stack */
-# define _GLOBAL_ATEXIT _global_atexit
-#else
-# define _GLOBAL_ATEXIT (_GLOBAL_REENT->_atexit)
-#endif
 
 #ifdef __cplusplus
 }

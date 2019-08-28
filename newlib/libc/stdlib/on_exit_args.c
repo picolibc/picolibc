@@ -19,7 +19,10 @@
  * __cxa_atexit() will force it to be linked.
  */
 
-#include <reent.h>
+#include <stddef.h>
+#include <stdlib.h>
+#include <sys/lock.h>
+#include "atexit.h"
 
 #ifdef _REENT_SMALL
 

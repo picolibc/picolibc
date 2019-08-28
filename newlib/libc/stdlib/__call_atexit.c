@@ -17,10 +17,6 @@ void free(void *) _ATTRIBUTE((__weak__));
 __LOCK_INIT_RECURSIVE(, __atexit_recursive_mutex);
 #endif
 
-#ifdef _REENT_GLOBAL_ATEXIT
-struct _atexit *_global_atexit = _NULL;
-#endif
-
 #ifdef _WANT_REGISTER_FINI
 
 /* If "__libc_fini" is defined, finalizers (either
@@ -83,15 +79,11 @@ __call_exitprocs (int code, void *d)
 
  restart:
 
-  p = _GLOBAL_ATEXIT;
-  lastp = &_GLOBAL_ATEXIT;
+  p = _atexit;
+  lastp = &_atexit;
   while (p)
     {
-#ifdef _REENT_SMALL
-      args = p->_on_exit_args_ptr;
-#else
       args = &p->_on_exit_args;
-#endif
       for (n = p->_ind - 1; n >= 0; n--)
 	{
 	  int ind;
@@ -140,10 +132,6 @@ __call_exitprocs (int code, void *d)
 	{
 	  /* Remove empty block from the list.  */
 	  *lastp = p->_next;
-#ifdef _REENT_SMALL
-	  if (args)
-	    free (args);
-#endif
 	  free (p);
 	  p = *lastp;
 	}
