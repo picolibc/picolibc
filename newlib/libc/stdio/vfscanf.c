@@ -547,7 +547,7 @@ __SVFSCANF_R (struct _reent *rptr,
     while (0)
 #endif
 
-  #define CCFN_PARAMS	(struct _reent *, const char *, char **, int)
+  #define CCFN_PARAMS	(const char *, char **, int)
   u_long (*ccfn)CCFN_PARAMS=0;	/* conversion function (strtol/strtoul) */
   char ccltab[256];		/* character class table for %[...] */
   char buf[BUF];		/* buffer for numeric conversions */
@@ -790,13 +790,13 @@ __SVFSCANF_R (struct _reent *rptr,
 	  /* FALLTHROUGH */
 	case 'd':
 	  c = CT_INT;
-	  ccfn = (u_long (*)CCFN_PARAMS)_strtol_r;
+	  ccfn = (u_long (*)CCFN_PARAMS)strtol;
 	  base = 10;
 	  break;
 
 	case 'i':
 	  c = CT_INT;
-	  ccfn = (u_long (*)CCFN_PARAMS)_strtol_r;
+	  ccfn = (u_long (*)CCFN_PARAMS)strtol;
 	  base = 0;
 	  break;
 
@@ -805,13 +805,13 @@ __SVFSCANF_R (struct _reent *rptr,
 	  /* FALLTHROUGH */
 	case 'o':
 	  c = CT_INT;
-	  ccfn = _strtoul_r;
+	  ccfn = strtoul;
 	  base = 8;
 	  break;
 
 	case 'u':
 	  c = CT_INT;
-	  ccfn = _strtoul_r;
+	  ccfn = strtoul;
 	  base = 10;
 	  break;
 
@@ -819,7 +819,7 @@ __SVFSCANF_R (struct _reent *rptr,
 	case 'x':
 	  flags |= PFXOK;	/* enable 0x prefixing */
 	  c = CT_INT;
-	  ccfn = _strtoul_r;
+	  ccfn = strtoul;
 	  base = 16;
 	  break;
 
@@ -868,7 +868,7 @@ __SVFSCANF_R (struct _reent *rptr,
 	case 'p':		/* pointer format is like hex */
 	  flags |= POINTER | PFXOK;
 	  c = CT_INT;
-	  ccfn = _strtoul_r;
+	  ccfn = strtoul;
 	  base = 16;
 	  break;
 
@@ -1482,7 +1482,7 @@ __SVFSCANF_R (struct _reent *rptr,
 	      u_long res;
 
 	      *p = 0;
-	      res = (*ccfn) (rptr, buf, (char **) NULL, base);
+	      res = (*ccfn) (buf, (char **) NULL, base);
 	      if (flags & POINTER)
 		{
 		  void **vp = GET_ARG (N, ap, void **);
@@ -1850,7 +1850,7 @@ __SVFSCANF_R (struct _reent *rptr,
 		  exp_start = p;
 		}
 	      else if (exp_adjust)
-                new_exp = _strtol_r (rptr, (exp_start + 1), NULL, 10) - exp_adjust;
+                new_exp = strtol ((exp_start + 1), NULL, 10) - exp_adjust;
 	      if (exp_adjust)
 		{
 

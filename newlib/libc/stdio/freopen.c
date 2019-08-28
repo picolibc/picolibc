@@ -136,7 +136,7 @@ _freopen_r (struct _reent *ptr,
 
   if (file != NULL)
     {
-      f = _open_r (ptr, (char *) file, oflags, 0666);
+      f = open ((char *) file, oflags, 0666);
       e = __errno_r(ptr);
     }
   else
@@ -184,7 +184,7 @@ _freopen_r (struct _reent *ptr,
    */
 
   if (fp->_flags & __SMBF)
-    _free_r (ptr, (char *) fp->_bf._base);
+    free ((char *) fp->_bf._base);
   fp->_w = 0;
   fp->_r = 0;
   fp->_p = NULL;

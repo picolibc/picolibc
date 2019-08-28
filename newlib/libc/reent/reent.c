@@ -29,7 +29,7 @@ cleanup_glue (struct _reent *ptr,
   if (glue->_next)
     cleanup_glue (ptr, glue->_next);
 
-  _free_r (ptr, glue);
+  free (glue);
 }
 
 

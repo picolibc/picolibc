@@ -223,7 +223,7 @@ __ssputs_r (struct _reent *ptr,
 		if (fp->_flags & __SOPT)
 		{
 			/* asnprintf leaves original buffer alone.  */
-			str = (unsigned char *)_malloc_r (ptr, newsize);
+			str = (unsigned char *)malloc (newsize);
 			if (!str)
 			{
 				__errno_r(ptr) = ENOMEM;
@@ -234,11 +234,11 @@ __ssputs_r (struct _reent *ptr,
 		}
 		else
 		{
-			str = (unsigned char *)_realloc_r (ptr, fp->_bf._base,
+			str = (unsigned char *)realloc (fp->_bf._base,
 					newsize);
 			if (!str) {
 				/* Free unneeded buffer.  */
-				_free_r (ptr, fp->_bf._base);
+				free (fp->_bf._base);
 				/* Ensure correct errno, even if free
 				 * changed it.  */
 				__errno_r(ptr) = ENOMEM;
@@ -307,7 +307,7 @@ __ssprint_r (struct _reent *ptr,
 			if (fp->_flags & __SOPT)
 			{
 				/* asnprintf leaves original buffer alone.  */
-				str = (unsigned char *)_malloc_r (ptr, newsize);
+				str = (unsigned char *)malloc (newsize);
 				if (!str)
 				{
 					__errno_r(ptr) = ENOMEM;
@@ -318,11 +318,11 @@ __ssprint_r (struct _reent *ptr,
 			}
 			else
 			{
-				str = (unsigned char *)_realloc_r (ptr, fp->_bf._base,
+				str = (unsigned char *)realloc (fp->_bf._base,
 						newsize);
 				if (!str) {
 					/* Free unneeded buffer.  */
-					_free_r (ptr, fp->_bf._base);
+					free (fp->_bf._base);
 					/* Ensure correct errno, even if free
 					 * changed it.  */
 					__errno_r(ptr) = ENOMEM;
@@ -872,7 +872,7 @@ _VFPRINTF_R (struct _reent *data,
         /* Create initial buffer if we are called by asprintf family.  */
         if (fp->_flags & __SMBF && !fp->_bf._base)
         {
-		fp->_bf._base = fp->_p = _malloc_r (data, 64);
+		fp->_bf._base = fp->_p = malloc (64);
 		if (!fp->_p)
 		{
 			__errno_r(data) = ENOMEM;
@@ -1492,7 +1492,7 @@ string:
 
 				if (size >= BUF) {
 					if ((malloc_buf =
-					     (char *)_malloc_r (data, size + 1))
+					     (char *)malloc (size + 1))
 					    == NULL) {
 						fp->_flags |= __SERR;
 						goto error;
@@ -1773,7 +1773,7 @@ number:			if ((dprec = prec) >= 0)
 		FLUSH ();	/* copy out the I/O vectors */
 
                 if (malloc_buf != NULL) {
-			_free_r (data, malloc_buf);
+			free (malloc_buf);
 			malloc_buf = NULL;
 		}
 	}
@@ -1781,7 +1781,7 @@ done:
 	FLUSH ();
 error:
 	if (malloc_buf != NULL)
-		_free_r (data, malloc_buf);
+		free (malloc_buf);
 #ifndef STRING_ONLY
 	_newlib_flockfile_end (fp);
 #endif

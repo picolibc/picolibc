@@ -43,6 +43,7 @@ Supporting OS subroutines required: <<close>>, <<fstat>>, <<getpid>>,
 #include <stdio.h>
 #include <errno.h>
 #include <fcntl.h>
+#include <unistd.h>
 #include <sys/stat.h>
 
 #ifndef O_BINARY
@@ -62,7 +63,7 @@ _tmpfile_r (struct _reent *ptr)
     {
       if ((f = _tmpnam_r (ptr, buf)) == NULL)
 	return NULL;
-      fd = _open_r (ptr, f, O_RDWR | O_CREAT | O_EXCL | O_BINARY,
+      fd = open (f, O_RDWR | O_CREAT | O_EXCL | O_BINARY,
 		    S_IRUSR | S_IWUSR);
     }
   while (fd < 0 && __errno_r(ptr) == EEXIST);
@@ -71,8 +72,8 @@ _tmpfile_r (struct _reent *ptr)
   fp = _fdopen_r (ptr, fd, "wb+");
   e = __errno_r(ptr);
   if (!fp)
-    _close_r (ptr, fd);
-  (void) _remove_r (ptr, f);
+    close (fd);
+  (void) remove (f);
   __errno_r(ptr) = e;
   return fp;
 }

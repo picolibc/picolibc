@@ -26,9 +26,9 @@ _vdprintf_r (struct _reent *ptr,
   p = _vasnprintf_r (ptr, buf, &n, format, ap);
   if (!p)
     return -1;
-  n = _write_r (ptr, fd, p, n);
+  n = write (fd, p, n);
   if (p != buf)
-    _free_r (ptr, p);
+    free (p);
   return n;
 }
 

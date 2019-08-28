@@ -88,7 +88,7 @@ __submore (struct _reent *rptr,
       /*
        * Get a new buffer (rather than expanding the old one).
        */
-      if ((p = (unsigned char *) _malloc_r (rptr, (size_t) BUFSIZ)) == NULL)
+      if ((p = (unsigned char *) malloc ((size_t) BUFSIZ)) == NULL)
 	return EOF;
       fp->_ub._base = p;
       fp->_ub._size = BUFSIZ;
@@ -99,7 +99,7 @@ __submore (struct _reent *rptr,
       return 0;
     }
   i = fp->_ub._size;
-  p = (unsigned char *) _realloc_r (rptr, (void *) (fp->_ub._base), i << 1);
+  p = (unsigned char *) realloc ((void *) (fp->_ub._base), i << 1);
   if (p == NULL)
     return EOF;
   (void) memcpy ((void *) (p + i), (void *) p, (size_t) i);

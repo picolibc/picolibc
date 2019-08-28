@@ -245,14 +245,14 @@ extern _READ_WRITE_RETURN_TYPE __swrite64 (struct _reent *, void *,
 #define	HASUB(fp) ((fp)->_ub._base != NULL)
 #define	FREEUB(ptr, fp) {                    \
 	if ((fp)->_ub._base != (fp)->_ubuf) \
-		_free_r(ptr, (char *)(fp)->_ub._base); \
+		free((char *)(fp)->_ub._base); \
 	(fp)->_ub._base = NULL; \
 }
 
 /* Test for an fgetline() buffer.  */
 
 #define	HASLB(fp) ((fp)->_lb._base != NULL)
-#define	FREELB(ptr, fp) { _free_r(ptr,(char *)(fp)->_lb._base); \
+#define	FREELB(ptr, fp) { free((char *)(fp)->_lb._base);	\
       (fp)->_lb._base = NULL; }
 
 #ifdef _WIDE_ORIENT

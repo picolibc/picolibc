@@ -50,7 +50,7 @@ __smakebuf_r (struct _reent *ptr,
       return;
     }
   flags = __swhatbuf_r (ptr, fp, &size, &couldbetty);
-  if ((p = _malloc_r (ptr, size)) == NULL)
+  if ((p = malloc (size)) == NULL)
     {
       if (!(fp->_flags & __SSTR))
 	{
@@ -65,7 +65,7 @@ __smakebuf_r (struct _reent *ptr,
       fp->_flags |= __SMBF;
       fp->_bf._base = fp->_p = (unsigned char *) p;
       fp->_bf._size = size;
-      if (couldbetty && _isatty_r (ptr, fp->_file))
+      if (couldbetty && isatty (fp->_file))
 	fp->_flags = (fp->_flags & ~__SNBF) | __SLBF;
       fp->_flags |= flags;
     }
@@ -89,11 +89,11 @@ __swhatbuf_r (struct _reent *ptr,
 #ifdef __USE_INTERNAL_STAT64
   struct stat64 st;
 
-  if (fp->_file < 0 || _fstat64_r (ptr, fp->_file, &st) < 0)
+  if (fp->_file < 0 || fstat64 (fp->_file, &st) < 0)
 #else
   struct stat st;
 
-  if (fp->_file < 0 || _fstat_r (ptr, fp->_file, &st) < 0)
+  if (fp->_file < 0 || fstat (fp->_file, &st) < 0)
 #endif
     {
       *couldbetty = 0;
