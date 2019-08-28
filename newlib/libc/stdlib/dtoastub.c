@@ -1,6 +1,5 @@
 #include <_ansi.h>
 #include <stdlib.h>
-#include <reent.h>
 #include <string.h>
 
 /* Nothing in newlib actually *calls* dtoa, they all call _dtoa_r, so this 

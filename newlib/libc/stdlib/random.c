@@ -54,7 +54,6 @@ algorithm as <<rand>>.
 #ifndef _REENT_ONLY
 
 #include <stdlib.h>
-#include <reent.h>
 
 static NEWLIB_THREAD_LOCAL long long _rand_next = 1;
 

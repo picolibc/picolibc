@@ -56,7 +56,6 @@ on two different systems.
 #ifndef _REENT_ONLY
 
 #include <stdlib.h>
-#include <reent.h>
 
 void
 srand (unsigned int seed)

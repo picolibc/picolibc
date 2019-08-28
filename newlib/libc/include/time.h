@@ -9,7 +9,6 @@
 
 #include "_ansi.h"
 #include <sys/cdefs.h>
-#include <sys/reent.h>
 
 #define __need_size_t
 #define __need_NULL
@@ -100,7 +99,6 @@ char *strptime_l (const char *__restrict, const char *__restrict,
 #if __POSIX_VISIBLE
 void      tzset 	(void);
 #endif
-void      _tzset_r 	(struct _reent *);
 
 typedef struct __tzrule_struct
 {

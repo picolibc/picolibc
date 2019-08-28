@@ -3,7 +3,6 @@
   */
 
 #include <_ansi.h>
-#include <reent.h>
 #include <string.h>
 #include <stdlib.h>
 #include "mprec.h"

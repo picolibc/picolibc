@@ -1,7 +1,6 @@
 #include <wchar.h>
 #include <stdlib.h>
 #include <stdio.h>
-#include <reent.h>
 #include <string.h>
 #include "local.h"
 

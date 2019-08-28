@@ -38,7 +38,6 @@ THIS SOFTWARE.
 /* Modified 06-21-2006 by Jeff Johnston to work with newlib.  */
 
 #include <_ansi.h>
-#include <reent.h>
 #include <string.h>
 #include "mprec.h"
 #include "gdtoa.h"

@@ -28,7 +28,6 @@
 
 #include <_ansi.h>
 #include <stdlib.h>
-#include <reent.h>
 #include <string.h>
 #include "mprec.h"
 

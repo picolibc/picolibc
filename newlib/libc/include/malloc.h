@@ -4,7 +4,6 @@
 #define _INCLUDE_MALLOC_H_
 
 #include <_ansi.h>
-#include <sys/reent.h>
 
 #define __need_size_t
 #include <stddef.h>

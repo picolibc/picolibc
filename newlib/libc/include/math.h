@@ -2,7 +2,6 @@
 
 #define  _MATH_H_
 
-#include <sys/reent.h>
 #include <sys/cdefs.h>
 #include <ieeefp.h>
 #include "_ansi.h"

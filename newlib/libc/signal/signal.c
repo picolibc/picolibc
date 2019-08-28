@@ -83,6 +83,7 @@ int _dummy_simulated_signal;
 #include <stddef.h>
 #include <stdlib.h>
 #include <_syslist.h>
+#include <unistd.h>
 
 /* signal info */
 static NEWLIB_THREAD_LOCAL void (*(_sig_func[NSIG]))(int);

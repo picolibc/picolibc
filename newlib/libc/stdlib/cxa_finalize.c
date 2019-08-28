@@ -4,7 +4,6 @@
 
 
 #include <stdlib.h>
-#include <reent.h>
 #include "atexit.h"
 
 /*

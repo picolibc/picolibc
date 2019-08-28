@@ -4,7 +4,6 @@
 
 #include <stddef.h>
 #include <stdlib.h>
-#include <reent.h>
 #include <sys/lock.h>
 #include "atexit.h"
 

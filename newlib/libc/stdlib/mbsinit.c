@@ -1,4 +1,3 @@
-#include <reent.h>
 #include <wchar.h>
 #include <stdlib.h>
 #include <stdio.h>

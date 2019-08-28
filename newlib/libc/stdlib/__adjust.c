@@ -3,7 +3,6 @@
  */
 
 #include <_ansi.h>
-#include <reent.h>
 #include "std.h"
 
 #define abs(x) (((x) < 0) ? -(x) : (x))

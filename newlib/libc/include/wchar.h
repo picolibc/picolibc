@@ -3,7 +3,7 @@
 
 #include <_ansi.h>
 
-#include <sys/reent.h>
+#include <stdio.h>
 
 #define __need_size_t
 #define __need_wchar_t
@@ -70,7 +70,6 @@ typedef __gnuc_va_list va_list;
 _BEGIN_STD_C
 
 #if __POSIX_VISIBLE >= 200809 || _XSI_VISIBLE
-/* As in stdio.h, <sys/reent.h> defines __FILE. */
 #if !defined(__FILE_defined)
 typedef __FILE FILE;
 # define __FILE_defined
