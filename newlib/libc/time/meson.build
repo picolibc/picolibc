@@ -18,7 +18,6 @@ srcs_time = [
     'tzcalc_limits.c',
     'tzlock.c',
     'tzset.c',
-    'tzset_r.c',
     'tzvars.c',
     'wcsftime.c',
 ]
