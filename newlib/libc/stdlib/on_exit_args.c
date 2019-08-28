@@ -26,7 +26,7 @@
 
 #ifdef _REENT_SMALL
 
-static struct _on_exit_args _on_exit_args_instance = {{_NULL}, {_NULL}, 0, 0};
+static struct _on_exit_args _on_exit_args_instance;
 
 struct _on_exit_args * const __on_exit_args = &_on_exit_args_instance;
 
