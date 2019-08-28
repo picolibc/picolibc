@@ -31,6 +31,7 @@
 
 #include <math.h>
 #include <stdint.h>
+#include <errno.h>
 
 #ifndef WANT_ROUNDING
 /* Correct special case results in non-nearest rounding modes.  */
