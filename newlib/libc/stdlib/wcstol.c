@@ -125,14 +125,15 @@ No supporting OS subroutines are required.
 #include <wctype.h>
 #include <errno.h>
 #include <wchar.h>
-#include <reent.h>
 #include "../locale/setlocale.h"
 
 /*
  * Convert a wide string to a long integer.
  */
-static long
-_wcstol_l (struct _reent *rptr, const wchar_t *nptr, wchar_t **endptr,
+#ifndef _REENT_ONLY
+
+long
+wcstol_l (const wchar_t *nptr, wchar_t **endptr,
 	   int base, locale_t loc)
 {
 	register const wchar_t *s = nptr;
@@ -212,30 +213,13 @@ _wcstol_l (struct _reent *rptr, const wchar_t *nptr, wchar_t **endptr,
 	return (acc);
 }
 
-long
-_wcstol_r (struct _reent *rptr,
-	const wchar_t *nptr,
-	wchar_t **endptr,
-	int base)
-{
-	return _wcstol_l (rptr, nptr, endptr, base, __get_current_locale ());
-}
-
-#ifndef _REENT_ONLY
-
-long
-wcstol_l (const wchar_t *__restrict s, wchar_t **__restrict ptr, int base,
-	  locale_t loc)
-{
-	return _wcstol_l (_REENT, s, ptr, base, loc);
-}
 
 long
 wcstol (const wchar_t *__restrict s,
 	wchar_t **__restrict ptr,
 	int base)
 {
-	return _wcstol_l (_REENT, s, ptr, base, __get_current_locale ());
+	return wcstol_l (s, ptr, base, __get_current_locale ());
 }
 
 #endif

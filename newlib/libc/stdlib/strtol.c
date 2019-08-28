@@ -20,9 +20,6 @@ SYNOPSIS
         long strtol_l(const char *restrict <[s]>, char **restrict <[ptr]>,
 		      int <[base]>, locale_t <[locale]>);
 
-        long _strtol_r(void *<[reent]>, const char *restrict <[s]>,
-		       char **restrict <[ptr]>,int <[base]>);
-
 DESCRIPTION
 The function <<strtol>> converts the string <<*<[s]>>> to
 a <<long>>. First, it breaks down the string into three parts:
@@ -66,9 +63,6 @@ not <<NULL>>).
 <<strtol_l>> is like <<strtol>> but performs the conversion based on the
 locale specified by the locale object locale.  If <[locale]> is
 LC_GLOBAL_LOCALE or not a valid locale object, the behaviour is undefined.
-
-The alternate function <<_strtol_r>> is a reentrant version.  The
-extra argument <[reent]> is a pointer to a reentrancy structure.
 
 RETURNS
 <<strtol>>, <<strtol_l>> return the converted value, if any. If no
@@ -124,14 +118,13 @@ No supporting OS subroutines are required.
 #include <ctype.h>
 #include <errno.h>
 #include <stdlib.h>
-#include <reent.h>
 #include "../locale/setlocale.h"
 
 /*
  * Convert a string to a long integer.
  */
 static long
-_strtol_l (struct _reent *rptr, const char *__restrict nptr,
+_strtol_l (const char *__restrict nptr,
 	   char **__restrict endptr, int base, locale_t loc)
 {
 	register const unsigned char *s = (const unsigned char *)nptr;
@@ -211,22 +204,13 @@ _strtol_l (struct _reent *rptr, const char *__restrict nptr,
 	return (acc);
 }
 
-long
-_strtol_r (struct _reent *rptr,
-	const char *__restrict nptr,
-	char **__restrict endptr,
-	int base)
-{
-	return _strtol_l (rptr, nptr, endptr, base, __get_current_locale ());
-}
-
 #ifndef _REENT_ONLY
 
 long
 strtol_l (const char *__restrict s, char **__restrict ptr, int base,
 	  locale_t loc)
 {
-	return _strtol_l (_REENT, s, ptr, base, loc);
+	return _strtol_l (s, ptr, base, loc);
 }
 
 long
@@ -234,7 +218,7 @@ strtol (const char *__restrict s,
 	char **__restrict ptr,
 	int base)
 {
-	return _strtol_l (_REENT, s, ptr, base, __get_current_locale ());
+	return _strtol_l (s, ptr, base, __get_current_locale ());
 }
 
 #endif

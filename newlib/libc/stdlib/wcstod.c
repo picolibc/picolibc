@@ -141,8 +141,10 @@ Supporting OS subroutines required: <<close>>, <<fstat>>, <<isatty>>,
 #include <math.h>
 #include "mprec.h"
 
+#ifndef _REENT_ONLY
+
 double
-_wcstod_l (struct _reent *ptr, const wchar_t *nptr, wchar_t **endptr,
+wcstod_l (const wchar_t *nptr, wchar_t **endptr,
 	   locale_t loc)
 {
         static const mbstate_t initial;
@@ -173,7 +175,7 @@ _wcstod_l (struct _reent *ptr, const wchar_t *nptr, wchar_t **endptr,
                         *endptr = (wchar_t *)nptr;
                 return (0.0);
         }
-        if ((buf = _malloc_r(ptr, len + 1)) == NULL)
+        if ((buf = malloc(len + 1)) == NULL)
                 return (0.0);
         mbs = initial;
         _wcsnrtombs_l(buf, &wcp, (size_t) -1, len + 1, &mbs, loc);
@@ -208,50 +210,22 @@ _wcstod_l (struct _reent *ptr, const wchar_t *nptr, wchar_t **endptr,
                 *endptr = (wchar_t *)nptr + (end - buf);
 	}
 
-        _free_r(ptr, buf);
+        free(buf);
 
         return (val);
 }
 
 double
-_wcstod_r (struct _reent *ptr,
-	const wchar_t *nptr,
-	wchar_t **endptr)
-{
-  return _wcstod_l (ptr, nptr, endptr, __get_current_locale ());
-}
-
-float
-_wcstof_r (struct _reent *ptr,
-	const wchar_t *nptr,
-	wchar_t **endptr)
-{
-  double retval = _wcstod_l (ptr, nptr, endptr, __get_current_locale ());
-  if (isnan (retval))
-    return nanf ("");
-  return (float)retval;
-}
-
-#ifndef _REENT_ONLY
-
-double
-wcstod_l (const wchar_t *__restrict nptr, wchar_t **__restrict endptr,
-	  locale_t loc)
-{
-  return _wcstod_l (_REENT, nptr, endptr, loc);
-}
-
-double
 wcstod (const wchar_t *__restrict nptr, wchar_t **__restrict endptr)
 {
-  return _wcstod_l (_REENT, nptr, endptr, __get_current_locale ());
+  return wcstod_l (nptr, endptr, __get_current_locale ());
 }
 
 float
 wcstof_l (const wchar_t *__restrict nptr, wchar_t **__restrict endptr,
 	  locale_t loc)
 {
-  double val = _wcstod_l (_REENT, nptr, endptr, loc);
+  double val = wcstod_l (nptr, endptr, loc);
   if (isnan (val))
     return nanf ("");
   float retval = (float) val;
@@ -266,7 +240,7 @@ float
 wcstof (const wchar_t *__restrict nptr,
 	wchar_t **__restrict endptr)
 {
-  double val = _wcstod_l (_REENT, nptr, endptr, __get_current_locale ());
+  double val = wcstod_l (nptr, endptr, __get_current_locale ());
   if (isnan (val))
     return nanf ("");
   float retval = (float) val;

@@ -52,11 +52,3 @@ atoi (const char *s)
   return (int) strtol (s, NULL, 10);
 }
 #endif /* !_REENT_ONLY */
-
-int
-_atoi_r (struct _reent *ptr,
-	const char *s)
-{
-  return (int) _strtol_r (ptr, s, NULL, 10);
-}
-

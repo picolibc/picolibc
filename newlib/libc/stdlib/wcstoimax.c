@@ -46,7 +46,6 @@ __FBSDID("$FreeBSD: head/lib/libc/locale/wcstoimax.c 314436 2017-02-28 23:42:47Z
 #include <stdlib.h>
 #include <wchar.h>
 #include <wctype.h>
-#include <reent.h>
 #include <stdint.h>
 #include "../locale/setlocale.h"
 
@@ -54,11 +53,10 @@ __FBSDID("$FreeBSD: head/lib/libc/locale/wcstoimax.c 314436 2017-02-28 23:42:47Z
  * Convert a wide character string to an intmax_t integer.
  */
 
-/*
- *Reentrant version of wcstoimax.
- */
-static intmax_t
-_wcstoimax_l(struct _reent *rptr, const wchar_t * __restrict nptr,
+#ifndef _REENT_ONLY
+
+intmax_t
+wcstoimax_l(const wchar_t * __restrict nptr,
 	     wchar_t ** __restrict endptr, int base, locale_t loc)
 {
 	const wchar_t *s = nptr;
@@ -134,25 +132,9 @@ noconv:
 }
 
 intmax_t
-_wcstoimax_r(struct _reent *rptr, const wchar_t *__restrict nptr,
-	     wchar_t **__restrict endptr, int base)
-{
-	return _wcstoimax_l(rptr, nptr, endptr, base, __get_current_locale());
-}
-
-#ifndef _REENT_ONLY
-
-intmax_t
-wcstoimax_l(const wchar_t * __restrict nptr, wchar_t ** __restrict endptr,
-	    int base, locale_t loc)
-{
-	return _wcstoimax_l(_REENT, nptr, endptr, base, loc);
-}
-
-intmax_t
 wcstoimax(const wchar_t* __restrict nptr, wchar_t** __restrict endptr, int base)
 {
-	return _wcstoimax_l(_REENT, nptr, endptr, base, __get_current_locale());
+	return wcstoimax_l(nptr, endptr, base, __get_current_locale());
 }
 
 #endif

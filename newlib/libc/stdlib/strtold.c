@@ -59,21 +59,6 @@ __flt_rounds(void)
 #endif
 
 long double
-_strtold_r (struct _reent *ptr, const char *__restrict s00,
-	    char **__restrict se)
-{
-#ifdef _LDBL_EQ_DBL
-  /* On platforms where long double is as wide as double.  */
-  return _strtod_l (ptr, s00, se, __get_current_locale ());
-#else
-  long double result;
-
-  _strtorx_l (s00, se, FLT_ROUNDS, &result, __get_current_locale ());
-  return result;
-#endif
-}
-
-long double
 strtold_l (const char *__restrict s00, char **__restrict se, locale_t loc)
 {
 #ifdef _LDBL_EQ_DBL
