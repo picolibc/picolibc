@@ -32,46 +32,11 @@ cleanup_glue (struct _reent *ptr,
   free (glue);
 }
 
-
-#ifdef __weak_alias
-__attribute__((weak)) void mprec_free(void);
-#else
-void mprec_free(void);
-#endif
-
 void
 _reclaim_reent (struct _reent *ptr)
 {
   if (ptr != _impure_ptr)
     {
-      /* used by mprec routines. */
-      mprec_free();
-
-#ifndef _REENT_GLOBAL_ATEXIT
-      /* atexit stuff */
-# ifdef _REENT_SMALL
-      if (ptr->_atexit && ptr->_atexit->_on_exit_args_ptr)
-	_free_r (ptr, ptr->_atexit->_on_exit_args_ptr);
-# else
-      if ((ptr->_atexit) && (ptr->_atexit != &ptr->_atexit0))
-	{
-	  struct _atexit *p, *q;
-	  for (p = ptr->_atexit; p != &ptr->_atexit0;)
-	    {
-	      q = p;
-	      p = p->_next;
-	      _free_r (ptr, q);
-	    }
-	}
-# endif
-#endif
-
-    /* We should free _sig_func to avoid a memory leak, but how to
-	   do it safely considering that a signal may be delivered immediately
-	   after the free?
-	  if (ptr->_sig_func)
-	_free_r (ptr, ptr->_sig_func);*/
-
 #ifndef TINY_STDIO
       if (ptr->__sdidinit)
 	{
@@ -83,7 +48,6 @@ _reclaim_reent (struct _reent *ptr)
 	    cleanup_glue (ptr, ptr->__sglue._next);
 	}
 #endif
-
       /* Malloc memory not reclaimed; no good way to return memory anyway. */
 
     }
