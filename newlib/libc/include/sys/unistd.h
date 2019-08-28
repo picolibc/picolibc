@@ -262,20 +262,20 @@ pid_t   vfork (void);
 #ifdef _COMPILING_NEWLIB
 /* Provide prototypes for most of the _<systemcall> names that are
    provided in newlib for some compilers.  */
-int     _close (int __fildes);
-pid_t   _fork (void);
-pid_t   _getpid (void);
-int	_isatty (int __fildes);
-int     _link (const char *__path1, const char *__path2);
-_off_t   _lseek (int __fildes, _off_t __offset, int __whence);
+int     close (int __fildes);
+pid_t   fork (void);
+pid_t   getpid (void);
+int	isatty (int __fildes);
+int     link (const char *__path1, const char *__path2);
+_off_t  lseek (int __fildes, _off_t __offset, int __whence);
 #ifdef __LARGE64_FILES
-_off64_t _lseek64 (int __filedes, _off64_t __offset, int __whence);
+_off64_t lseek64 (int __filedes, _off64_t __offset, int __whence);
 #endif
 _READ_WRITE_RETURN_TYPE _read (int __fd, void *__buf, size_t __nbyte);
-void *  _sbrk (ptrdiff_t __incr);
-int     _unlink (const char *__path);
+void *  sbrk (ptrdiff_t __incr);
+int     unlink (const char *__path);
 _READ_WRITE_RETURN_TYPE _write (int __fd, const void *__buf, size_t __nbyte);
-int     _execve (const char *__path, char * const __argv[], char * const __envp[]);
+int     execve (const char *__path, char * const __argv[], char * const __envp[]);
 #endif
 
 #if !defined(__INSIDE_CYGWIN__)
