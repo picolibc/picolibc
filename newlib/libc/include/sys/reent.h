@@ -333,24 +333,6 @@ struct _reent
 
   void (*__cleanup) (struct _reent *);
 
-  union
-    {
-      struct
-        {
-          unsigned int _unused_rand;
-	  int _h_errno;
-        } _reent;
-  /* Two next two fields were once used by malloc.  They are no longer
-     used. They are used to preserve the space used before so as to
-     allow addition of new reent fields and keep binary compatibility.   */
-      struct
-        {
-#define _N_LISTS 30
-          unsigned char * _nextf[_N_LISTS];
-          unsigned int _nmalloc[_N_LISTS];
-        } _unused;
-    } _new;
-
   /* These are here last so that __FILE can grow without changing the offsets
      of the above members (on the off chance that future binary compatibility
      would be broken otherwise).  */
@@ -370,12 +352,6 @@ extern __FILE __sf[3];
 #define _REENT_INIT(var) \
   { _REENT_INIT_STDIO(var)	    \
     .__cleanup = _NULL, \
-    ._new = { \
-      ._reent = { \
-        0, \
-        0, \
-      } \
-    }, \
     .__sglue = _GLUE_INIT \
   }
 
