@@ -227,4 +227,8 @@ typedef	__int64_t	sbintime_t;
 
 #undef __need_inttypes
 
+#include <stdint.h>
+#define __Long int32_t
+#define __ULong uint32_t
+
 #endif	/* _SYS_TYPES_H */

@@ -17,43 +17,12 @@ extern "C" {
 
 #define _NULL 0
 
-#ifndef __Long
-#if __LONG_MAX__ == 2147483647L
-#define __Long long
-typedef unsigned __Long __ULong;
-#elif __INT_MAX__ == 2147483647
-#define __Long int
-typedef unsigned __Long __ULong;
-#endif
-#endif
-
-#if !defined( __Long)
-#include <sys/types.h>
-#endif
-
-#ifndef __machine_flock_t_defined
-#include <sys/lock.h>
-typedef _LOCK_RECURSIVE_T _flock_t;
-#endif
-
-#ifndef __Long
-#define __Long __int32_t
-typedef __uint32_t __ULong;
-#endif
-
 struct _reent;
 
 /*
  * If _REENT_SMALL is defined, we make struct _reent as small as possible,
  * by having nearly everything possible allocated at first use.
  */
-
-struct _Bigint
-{
-  struct _Bigint *_next;
-  int _k, _maxwds, _sign, _wds;
-  __ULong _x[1];
-};
 
 /*
  * Stdio buffers.

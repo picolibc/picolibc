@@ -354,6 +354,13 @@ extern NEWLIB_THREAD_LOCAL _Bigint *_mprec_result;
 extern NEWLIB_THREAD_LOCAL int _mprec_result_k;
 int __mprec_register_exit(void);
 
+struct _Bigint
+{
+  struct _Bigint *_next;
+  int _k, _maxwds, _sign, _wds;
+  uint32_t _x[1];
+};
+
 struct FPI;
 double 		ulp (double x);
 double		b2d (_Bigint *a , int *e);

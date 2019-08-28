@@ -2,6 +2,8 @@
  *	Common definitions for atexit-like routines
  */
 
+#include <stdint.h>
+
 enum __atexit_types
 {
   __et_atexit,
@@ -21,10 +23,10 @@ struct _on_exit_args {
 	void *  _fnargs[_ATEXIT_SIZE];	        /* user fn args */
 	void *	_dso_handle[_ATEXIT_SIZE];
 	/* Bitmask is set if user function takes arguments.  */
-	__ULong _fntypes;           	        /* type of exit routine -
+	uint32_t _fntypes;           	        /* type of exit routine -
 				   Must have at least _ATEXIT_SIZE bits */
 	/* Bitmask is set if function was registered via __cxa_atexit.  */
-	__ULong _is_cxa;
+	uint32_t _is_cxa;
 };
 
 struct _atexit {
