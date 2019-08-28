@@ -32,7 +32,7 @@
  * This is a non-functional implementation that should be overridden
  * by an architecture specific implementation in newlib/libm/machine/ARCH.
  *
- * The implementation must defined FE_DFL_ENV to point to a default
+ * The implementation must define FE_DFL_ENV to point to a default
  * environment of type fenv_t.
  */
 
