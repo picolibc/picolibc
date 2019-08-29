@@ -295,21 +295,13 @@ extern "C" {
 
 #include <sys/config.h>
 
-/*
-  In newlib, all the publically visible routines take a reentrancy
-  pointer.  We don't currently do anything much with it, but we do
-  pass it to the lock routine.
- */
-
-#include <reent.h>
-
 #define POINTER_UINT unsigned _POINTER_INT
 #define SEPARATE_OBJECTS
 #define HAVE_MMAP 0
-#define MORECORE(size) _sbrk_r(reent_ptr, (size))
+#define MORECORE(size) sbrk((size))
 #define MORECORE_CLEARS 0
-#define MALLOC_LOCK __malloc_lock(reent_ptr)
-#define MALLOC_UNLOCK __malloc_unlock(reent_ptr)
+#define MALLOC_LOCK __malloc_lock()
+#define MALLOC_UNLOCK __malloc_unlock()
 
 #ifdef __CYGWIN__
 # undef _WIN32
@@ -325,35 +317,16 @@ extern "C" {
 #endif
 
 #if __STD_C
-extern void __malloc_lock(struct _reent *);
-extern void __malloc_unlock(struct _reent *);
+extern void __malloc_lock(void);
+extern void __malloc_unlock(void);
 #else
 extern void __malloc_lock();
 extern void __malloc_unlock();
 #endif
 
-#if __STD_C
-#define RARG struct _reent *reent_ptr,
-#define RONEARG struct _reent *reent_ptr
-#else
-#define RARG reent_ptr
-#define RONEARG reent_ptr
-#define RDECL struct _reent *reent_ptr;
-#endif
-
-#define RERRNO __errno_r(reent_ptr)
-#define RCALL reent_ptr,
-#define RONECALL reent_ptr
-
 #else /* ! INTERNAL_NEWLIB */
 
 #define POINTER_UINT unsigned long
-#define RARG
-#define RONEARG
-#define RDECL
-#define RERRNO errno
-#define RCALL
-#define RONECALL
 
 #endif /* ! INTERNAL_NEWLIB */
 
@@ -1000,21 +973,21 @@ extern Void_t*     sbrk();
 
 #else
 
+#define cALLOc		calloc
+#define fREe		free
+#define mALLOc		malloc
+#define mEMALIGn	memalign
+#define rEALLOc		ealloc
+#define vALLOc		valloc
+#define pvALLOc		pvalloc
+#define mALLINFo	mallinfo
+#define mALLOPt		mallopt
+
 #ifdef INTERNAL_NEWLIB
 
-#define cALLOc		_calloc_r
-#define fREe		_free_r
-#define mALLOc		_malloc_r
-#define mEMALIGn	_memalign_r
-#define rEALLOc		_realloc_r
-#define vALLOc		_valloc_r
-#define pvALLOc		_pvalloc_r
-#define mALLINFo	_mallinfo_r
-#define mALLOPt		_mallopt_r
-
-#define malloc_stats			_malloc_stats_r
-#define malloc_trim			_malloc_trim_r
-#define malloc_usable_size		_malloc_usable_size_r
+#define malloc_stats			malloc_stats
+#define malloc_trim			malloc_trim
+#define malloc_usable_size		malloc_usable_size
 
 #define malloc_update_mallinfo		__malloc_update_mallinfo
 
@@ -1026,18 +999,6 @@ extern Void_t*     sbrk();
 #define malloc_top_pad			__malloc_top_pad
 #define malloc_trim_threshold		__malloc_trim_threshold
 
-#else /* ! INTERNAL_NEWLIB */
-
-#define cALLOc		calloc
-#define fREe		free
-#define mALLOc		malloc
-#define mEMALIGn	memalign
-#define rEALLOc		realloc
-#define vALLOc		valloc
-#define pvALLOc		pvalloc
-#define mALLINFo	mallinfo
-#define mALLOPt		mallopt
-
 #endif /* ! INTERNAL_NEWLIB */
 #endif
 
@@ -1045,19 +1006,19 @@ extern Void_t*     sbrk();
 
 #if __STD_C
 
-Void_t* mALLOc(RARG size_t);
-void    fREe(RARG Void_t*);
-Void_t* rEALLOc(RARG Void_t*, size_t);
-Void_t* mEMALIGn(RARG size_t, size_t);
-Void_t* vALLOc(RARG size_t);
-Void_t* pvALLOc(RARG size_t);
-Void_t* cALLOc(RARG size_t, size_t);
+Void_t* mALLOc(size_t);
+void    fREe(Void_t*);
+Void_t* rEALLOc(Void_t*, size_t);
+Void_t* mEMALIGn(size_t, size_t);
+Void_t* vALLOc(size_t);
+Void_t* pvALLOc(size_t);
+Void_t* cALLOc(size_t, size_t);
 void    cfree(Void_t*);
-int     malloc_trim(RARG size_t);
-size_t  malloc_usable_size(RARG Void_t*);
-void    malloc_stats(RONEARG);
-int     mALLOPt(RARG int, int);
-struct mallinfo mALLINFo(RONEARG);
+int     malloc_trim(size_t);
+size_t  malloc_usable_size(Void_t*);
+void    malloc_stats(void);
+int     mALLOPt(int, int);
+struct mallinfo mALLINFo(void);
 #else
 Void_t* mALLOc();
 void    fREe();
@@ -2134,9 +2095,9 @@ static mchunkptr mremap_chunk(p, new_size) mchunkptr p; size_t new_size;
 */
 
 #if __STD_C
-static void malloc_extend_top(RARG INTERNAL_SIZE_T nb)
+static void malloc_extend_top(INTERNAL_SIZE_T nb)
 #else
-static void malloc_extend_top(RARG nb) RDECL INTERNAL_SIZE_T nb;
+static void malloc_extend_top(nb) RDECL INTERNAL_SIZE_T nb;
 #endif
 {
   char*     brk;                  /* return value from sbrk */
@@ -2240,7 +2201,7 @@ static void malloc_extend_top(RARG nb) RDECL INTERNAL_SIZE_T nb;
         SIZE_SZ|PREV_INUSE;
       /* If possible, release the rest. */
       if (old_top_size >= MINSIZE) 
-        fREe(RCALL chunk2mem(old_top));
+        fREe(chunk2mem(old_top));
     }
   }
 
@@ -2257,6 +2218,7 @@ static void malloc_extend_top(RARG nb) RDECL INTERNAL_SIZE_T nb;
   /* We always land on a page boundary */
   assert(((unsigned long)((char*)top + top_size) & (pagesz - 1)) == 0
 	 || correction_failed);
+  (void) correction_failed;
 }
 
 #endif /* DEFINE_MALLOC */
@@ -2326,9 +2288,9 @@ static void malloc_extend_top(RARG nb) RDECL INTERNAL_SIZE_T nb;
 */
 
 #if __STD_C
-Void_t* mALLOc(RARG size_t bytes)
+Void_t* mALLOc(size_t bytes)
 #else
-Void_t* mALLOc(RARG bytes) RDECL size_t bytes;
+Void_t* mALLOc(bytes) RDECL size_t bytes;
 #endif
 {
 #ifdef MALLOC_PROVIDED
@@ -2355,7 +2317,7 @@ Void_t* mALLOc(RARG bytes) RDECL size_t bytes;
   /* Check for overflow and just fail, if so. */
   if (nb > INT_MAX || nb < bytes)
   {
-    RERRNO = ENOMEM;
+    errno = ENOMEM;
     return 0;
   }
 
@@ -2577,7 +2539,7 @@ Void_t* mALLOc(RARG bytes) RDECL size_t bytes;
 #endif
 
     /* Try to extend */
-    malloc_extend_top(RCALL nb);
+    malloc_extend_top(nb);
     remainder_size = long_sub_size_t(chunksize(top), nb);
     if (chunksize(top) < nb || remainder_size < (long)MINSIZE)
     {
@@ -2624,9 +2586,9 @@ Void_t* mALLOc(RARG bytes) RDECL size_t bytes;
 
 
 #if __STD_C
-void fREe(RARG Void_t* mem)
+void fREe(Void_t* mem)
 #else
-void fREe(RARG mem) RDECL Void_t* mem;
+void fREe(mem) RDECL Void_t* mem;
 #endif
 {
 #ifdef MALLOC_PROVIDED
@@ -2684,7 +2646,7 @@ void fREe(RARG mem) RDECL Void_t* mem;
     set_head(p, sz | PREV_INUSE);
     top = p;
     if ((unsigned long)(sz) >= (unsigned long)trim_threshold) 
-      malloc_trim(RCALL top_pad); 
+      malloc_trim(top_pad); 
     MALLOC_UNLOCK;
     return;
   }
@@ -2770,9 +2732,9 @@ void fREe(RARG mem) RDECL Void_t* mem;
 
 
 #if __STD_C
-Void_t* rEALLOc(RARG Void_t* oldmem, size_t bytes)
+Void_t* rEALLOc(Void_t* oldmem, size_t bytes)
 #else
-Void_t* rEALLOc(RARG oldmem, bytes) RDECL Void_t* oldmem; size_t bytes;
+Void_t* rEALLOc(oldmem, bytes) RDECL Void_t* oldmem; size_t bytes;
 #endif
 {
 #ifdef MALLOC_PROVIDED
@@ -2803,12 +2765,12 @@ Void_t* rEALLOc(RARG oldmem, bytes) RDECL Void_t* oldmem; size_t bytes;
   mchunkptr fwd;              /* misc temp for linking */
 
 #ifdef REALLOC_ZERO_BYTES_FREES
-  if (bytes == 0) { fREe(RCALL oldmem); return 0; }
+  if (bytes == 0) { fREe(oldmem); return 0; }
 #endif
 
 
   /* realloc of null is supposed to be same as malloc */
-  if (oldmem == 0) return mALLOc(RCALL bytes);
+  if (oldmem == 0) return mALLOc(bytes);
 
   MALLOC_LOCK;
 
@@ -2821,7 +2783,7 @@ Void_t* rEALLOc(RARG oldmem, bytes) RDECL Void_t* oldmem; size_t bytes;
   /* Check for overflow and just fail, if so. */
   if (nb > INT_MAX || nb < bytes)
   {
-    RERRNO = ENOMEM;
+    errno = ENOMEM;
     return 0;
   }
 
@@ -2843,7 +2805,7 @@ Void_t* rEALLOc(RARG oldmem, bytes) RDECL Void_t* oldmem; size_t bytes;
       return oldmem; /* do nothing */
     }
     /* Must alloc, copy, free. */
-    newmem = mALLOc(RCALL bytes);
+    newmem = mALLOc(bytes);
     if (newmem == 0)
     {
       MALLOC_UNLOCK;
@@ -2952,7 +2914,7 @@ Void_t* rEALLOc(RARG oldmem, bytes) RDECL Void_t* oldmem; size_t bytes;
 
     /* Must allocate */
 
-    newmem = mALLOc (RCALL bytes);
+    newmem = mALLOc (bytes);
 
     if (newmem == 0)  /* propagate failure */
     {
@@ -2972,7 +2934,7 @@ Void_t* rEALLOc(RARG oldmem, bytes) RDECL Void_t* oldmem; size_t bytes;
 
     /* Otherwise copy, free, and exit */
     MALLOC_COPY(newmem, oldmem, oldsize - SIZE_SZ);
-    fREe(RCALL oldmem);
+    fREe(oldmem);
     MALLOC_UNLOCK;
     return newmem;
   }
@@ -2988,7 +2950,7 @@ Void_t* rEALLOc(RARG oldmem, bytes) RDECL Void_t* oldmem; size_t bytes;
     set_head_size(newp, nb);
     set_head(remainder, remainder_size | PREV_INUSE);
     set_inuse_bit_at_offset(remainder, remainder_size);
-    fREe(RCALL chunk2mem(remainder)); /* let free() deal with it */
+    fREe(chunk2mem(remainder)); /* let free() deal with it */
   }
   else
   {
@@ -3027,9 +2989,9 @@ Void_t* rEALLOc(RARG oldmem, bytes) RDECL Void_t* oldmem; size_t bytes;
 
 
 #if __STD_C
-Void_t* mEMALIGn(RARG size_t alignment, size_t bytes)
+Void_t* mEMALIGn(size_t alignment, size_t bytes)
 #else
-Void_t* mEMALIGn(RARG alignment, bytes) RDECL size_t alignment; size_t bytes;
+Void_t* mEMALIGn(alignment, bytes) RDECL size_t alignment; size_t bytes;
 #endif
 {
   INTERNAL_SIZE_T    nb;      /* padded  request size */
@@ -3044,7 +3006,7 @@ Void_t* mEMALIGn(RARG alignment, bytes) RDECL size_t alignment; size_t bytes;
 
   /* If need less alignment than we give anyway, just relay to malloc */
 
-  if (alignment <= MALLOC_ALIGNMENT) return mALLOc(RCALL bytes);
+  if (alignment <= MALLOC_ALIGNMENT) return mALLOc(bytes);
 
   /* Otherwise, ensure that it is at least a minimum chunk size */
   
@@ -3057,11 +3019,11 @@ Void_t* mEMALIGn(RARG alignment, bytes) RDECL size_t alignment; size_t bytes;
   /* Check for overflow. */
   if (nb > INT_MAX || nb < bytes)
   {
-    RERRNO = ENOMEM;
+    errno = ENOMEM;
     return 0;
   }
 
-  m  = (char*)(mALLOc(RCALL nb + alignment + MINSIZE));
+  m  = (char*)(mALLOc(nb + alignment + MINSIZE));
 
   if (m == 0) return 0; /* propagate failure */
 
@@ -3112,7 +3074,7 @@ Void_t* mEMALIGn(RARG alignment, bytes) RDECL size_t alignment; size_t bytes;
     set_head(newp, newsize | PREV_INUSE);
     set_inuse_bit_at_offset(newp, newsize);
     set_head_size(p, leadsize);
-    fREe(RCALL chunk2mem(p));
+    fREe(chunk2mem(p));
     p = newp;
 
     assert (newsize >= nb && (((unsigned long)(chunk2mem(p))) % alignment) == 0);
@@ -3127,7 +3089,7 @@ Void_t* mEMALIGn(RARG alignment, bytes) RDECL size_t alignment; size_t bytes;
     remainder = chunk_at_offset(p, nb);
     set_head(remainder, remainder_size | PREV_INUSE);
     set_head_size(p, nb);
-    fREe(RCALL chunk2mem(remainder));
+    fREe(chunk2mem(remainder));
   }
 
   check_inuse_chunk(p);
@@ -3147,12 +3109,12 @@ Void_t* mEMALIGn(RARG alignment, bytes) RDECL size_t alignment; size_t bytes;
 */
 
 #if __STD_C
-Void_t* vALLOc(RARG size_t bytes)
+Void_t* vALLOc(size_t bytes)
 #else
-Void_t* vALLOc(RARG bytes) RDECL size_t bytes;
+Void_t* vALLOc(bytes) RDECL size_t bytes;
 #endif
 {
-  return mEMALIGn (RCALL malloc_getpagesize, bytes);
+  return mEMALIGn (malloc_getpagesize, bytes);
 }
 
 #endif /* DEFINE_VALLOC */
@@ -3166,13 +3128,13 @@ Void_t* vALLOc(RARG bytes) RDECL size_t bytes;
 
 
 #if __STD_C
-Void_t* pvALLOc(RARG size_t bytes)
+Void_t* pvALLOc(size_t bytes)
 #else
-Void_t* pvALLOc(RARG bytes) RDECL size_t bytes;
+Void_t* pvALLOc(bytes) RDECL size_t bytes;
 #endif
 {
   size_t pagesize = malloc_getpagesize;
-  return mEMALIGn (RCALL pagesize, (bytes + pagesize - 1) & ~(pagesize - 1));
+  return mEMALIGn (pagesize, (bytes + pagesize - 1) & ~(pagesize - 1));
 }
 
 #endif /* DEFINE_PVALLOC */
@@ -3186,9 +3148,9 @@ Void_t* pvALLOc(RARG bytes) RDECL size_t bytes;
 */
 
 #if __STD_C
-Void_t* cALLOc(RARG size_t n, size_t elem_size)
+Void_t* cALLOc(size_t n, size_t elem_size)
 #else
-Void_t* cALLOc(RARG n, elem_size) RDECL size_t n; size_t elem_size;
+Void_t* cALLOc(n, elem_size) RDECL size_t n; size_t elem_size;
 #endif
 {
   mchunkptr p;
@@ -3209,7 +3171,7 @@ Void_t* cALLOc(RARG n, elem_size) RDECL size_t n; size_t elem_size;
   oldtopsize = chunksize(top);
 #endif
 
-  mem = mALLOc (RCALL sz);
+  mem = mALLOc (sz);
 
   if (mem == 0) 
   {
@@ -3270,11 +3232,7 @@ void cfree(Void_t *mem)
 void cfree(mem) Void_t *mem;
 #endif
 {
-#ifdef INTERNAL_NEWLIB
-  fREe(_REENT, mem);
-#else
   fREe(mem);
-#endif
 }
 #endif
 #endif
@@ -3307,9 +3265,9 @@ void cfree(mem) Void_t *mem;
 */
 
 #if __STD_C
-int malloc_trim(RARG size_t pad)
+int malloc_trim(size_t pad)
 #else
-int malloc_trim(RARG pad) RDECL size_t pad;
+int malloc_trim(pad) RDECL size_t pad;
 #endif
 {
   long  top_size;        /* Amount of top-most memory */
@@ -3388,9 +3346,9 @@ int malloc_trim(RARG pad) RDECL size_t pad;
 */
 
 #if __STD_C
-size_t malloc_usable_size(RARG Void_t* mem)
+size_t malloc_usable_size(Void_t* mem)
 #else
-size_t malloc_usable_size(RARG mem) RDECL Void_t* mem;
+size_t malloc_usable_size(mem) RDECL Void_t* mem;
 #endif
 {
   mchunkptr p;
@@ -3487,9 +3445,9 @@ extern void malloc_update_mallinfo();
 */
 
 #if __STD_C
-void malloc_stats(RONEARG)
+void malloc_stats(void)
 #else
-void malloc_stats(RONEARG) RDECL
+void malloc_stats() RDECL
 #endif
 {
   unsigned long local_max_total_mem;
@@ -3511,13 +3469,7 @@ void malloc_stats(RONEARG) RDECL
 #endif
   MALLOC_UNLOCK;
 
-#ifdef INTERNAL_NEWLIB
-  _REENT_SMALL_CHECK_INIT(reent_ptr);
-  fp = _stderr_r(reent_ptr);
-#define fprintf fiprintf
-#else
   fp = stderr;
-#endif
 
   fprintf(fp, "max system bytes = %10u\n", 
 	  (unsigned int)(local_max_total_mem));
@@ -3547,9 +3499,9 @@ void malloc_stats(RONEARG) RDECL
 */
 
 #if __STD_C
-struct mallinfo mALLINFo(RONEARG)
+struct mallinfo mALLINFo(void)
 #else
-struct mallinfo mALLINFo(RONEARG) RDECL
+struct mallinfo mALLINFo() RDECL
 #endif
 {
   struct mallinfo ret;
@@ -3579,9 +3531,9 @@ struct mallinfo mALLINFo(RONEARG) RDECL
 */
 
 #if __STD_C
-int mALLOPt(RARG int param_number, int value)
+int mALLOPt(int param_number, int value)
 #else
-int mALLOPt(RARG param_number, value) RDECL int param_number; int value;
+int mALLOPt(param_number, value) RDECL int param_number; int value;
 #endif
 {
   MALLOC_LOCK;
