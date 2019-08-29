@@ -9,12 +9,6 @@
 <itemizedlist mark="bullet">
 
 <listitem><para>
-Eliminate a header file name collision with &lt;X11/XLocale.h&gt; on
-case insensitive filesystems by reverting &lt;xlocale.h&gt; back to
-&lt;sys/_locale.h&gt;.
-</para></listitem>
-
-<listitem><para>
 FIFOs can now be opened multiple times for writing.
 </para></listitem>
 
@@ -22,6 +16,19 @@ FIFOs can now be opened multiple times for writing.
 Add 24 bit color support using xterm compatibility mode in Windows 10
 1703 or later.  Add fake 24 bit color support for legacy console, which
 uses the nearest color from 16 system colors.
+</para></listitem>
+
+<listitem><para>
+Support pseudo console in PTY. Pseudo console is a new feature
+in Windows 10 1809, which provides console APIs on virtual
+terminal. With this patch, native console applications can work
+in PTYs such as mintty, ssh, gnu screen or tmux.
+</para></listitem>
+
+<listitem><para>
+Eliminate a header file name collision with &lt;X11/XLocale.h&gt; on
+case insensitive filesystems by reverting &lt;xlocale.h&gt; back to
+&lt;sys/_locale.h&gt;.
 </para></listitem>
 
 <listitem><para>
