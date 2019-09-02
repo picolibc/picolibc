@@ -24,7 +24,6 @@ install_headers(
   '_sigset.h',
   'stat.h',
   '_stdint.h',
-  'stdio.h',
   'string.h',
   'syslimits.h',
   'timeb.h',

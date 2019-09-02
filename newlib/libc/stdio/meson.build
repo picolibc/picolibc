@@ -1,3 +1,8 @@
+subdir('sys')
+install_headers(
+  'stdio.h'
+)
+
 general_srcs_stdio = [
   'clearerr.c',
   'fclose.c',

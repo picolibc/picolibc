@@ -199,7 +199,8 @@ if newlib_tinystdio
 else
   inc = include_directories(
     '.',
-    'newlib/libc/include'
+    'newlib/libc/stdio',
+    'newlib/libc/include',
   )
 endif
 
