@@ -27,7 +27,6 @@
 #define __ICONV_CONVERSION_H__
 
 #include <_ansi.h>
-#include <reent.h>
 #include <sys/types.h>
 #include <wchar.h>
 

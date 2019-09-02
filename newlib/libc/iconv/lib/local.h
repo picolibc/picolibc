@@ -26,7 +26,6 @@
 #define __ICONV_LIB_LOCAL_H__
 
 #include <_ansi.h>
-#include <reent.h>
 #include <sys/types.h>
 #include <limits.h>
 
