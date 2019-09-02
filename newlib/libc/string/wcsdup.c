@@ -31,7 +31,6 @@ QUICKREF
 	wcsdup 
 */
 
-#include <reent.h>
 #include <stdlib.h>
 #include <wchar.h>
 

@@ -1,6 +1,5 @@
 #ifndef _REENT_ONLY
 
-#include <reent.h>
 #include <stdlib.h>
 #include <string.h>
 
