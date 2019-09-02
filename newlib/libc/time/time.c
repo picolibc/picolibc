@@ -28,7 +28,6 @@ Supporting OS subroutine required: Some implementations require
 /* Most times we have a system call in newlib/libc/sys/.. to do this job */
 
 #include <_ansi.h>
-#include <reent.h>
 #include <sys/types.h>
 #include <sys/time.h>
 
