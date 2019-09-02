@@ -1,4 +1,3 @@
-#include <reent.h>
 #include <stdlib.h>
 #include <string.h>
 
