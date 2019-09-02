@@ -47,7 +47,6 @@ Supporting OS subroutine required: <<times>>.
 
 #include <time.h>
 #include <sys/times.h>
-#include <reent.h>
 
 clock_t 
 clock (void)
