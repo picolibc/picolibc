@@ -38,7 +38,6 @@ ANSI C requires <<localtime>>.
 
 #include <stdlib.h>
 #include <time.h>
-#include <reent.h>
 
 #ifndef _REENT_ONLY
 
