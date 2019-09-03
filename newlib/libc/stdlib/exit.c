@@ -42,7 +42,9 @@ Supporting OS subroutines required: <<_exit>>.
 
 #include <stdlib.h>
 #include <unistd.h>	/* for _exit() declaration */
+#ifndef TINY_STDIO
 #include <reent.h>
+#endif
 #include "atexit.h"
 
 /*
@@ -59,7 +61,9 @@ exit (int code)
 #endif
     __call_exitprocs (code, NULL);
 
+#ifndef TINY_STDIO
   if (_GLOBAL_REENT->__cleanup)
     (*_GLOBAL_REENT->__cleanup) (_GLOBAL_REENT);
+#endif
   _exit (code);
 }
