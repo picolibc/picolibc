@@ -73,12 +73,12 @@ machine_dirs = {
 
 libdirs = ['argz', 'ctype', 'errno', 'iconv', 'misc', 'search',
 	   'signal', 'ssp', 'stdlib', 'string', 'time',
-	   'xdr', 'locale', 'reent']
+	   'xdr', 'locale']
 
 if newlib_tinystdio
   libdirs += 'tinystdio'
 else
-  libdirs += 'stdio'
+  libdirs += ['stdio', 'reent']
 endif
 
 if newlib_supplied_syscalls
