@@ -1,7 +1,7 @@
 subdir('sys')
 subdir('machine')
 
-install_headers(
+inc_headers = [
   'alloca.h',
   '_ansi.h',
   'argz.h',
@@ -35,7 +35,6 @@ install_headers(
   'paths.h',
   'pthread.h',
   'pwd.h',
-  'reent.h',
   'regdef.h',
   'regex.h',
   'sched.h',
@@ -61,4 +60,10 @@ install_headers(
   'wchar.h',
   'wctype.h',
   'wordexp.h'
-)
+]
+
+if not newlib_tinystdio
+  inc_headers += ['reent.h']
+endif
+
+install_headers(inc_headers)

@@ -1,4 +1,4 @@
-install_headers(
+inc_sys_headers = [
   'cdefs.h',
   'config.h',
   'custom_file.h',
@@ -16,7 +16,6 @@ install_headers(
   'param.h',
   '_pthreadtypes.h',
   'queue.h',
-  'reent.h',
   'resource.h',
   'sched.h',
   'select.h',
@@ -37,6 +36,12 @@ install_headers(
   'types.h',
   'unistd.h',
   'utime.h',
-  'wait.h',
-  subdir:'sys'
-)
+  'wait.h'
+]
+if not newlib_tinystdio
+  inc_sys_headers += ['reent.h']
+endif
+
+install_headers(inc_sys_headers,
+		subdir:'sys'
+	       )
