@@ -22,6 +22,10 @@ pid_t waitpid (pid_t __pid, int *__status, int __options);
 pid_t wait3 (int *__status, int __options, struct rusage *__rusage);
 pid_t wait4 (pid_t __pid, int *__status, int __options, struct rusage *__rusage);
 
+#ifdef _COMPILING_NEWLIB
+pid_t _wait (int *);
+#endif
+
 #ifdef __cplusplus
 }
 #endif
