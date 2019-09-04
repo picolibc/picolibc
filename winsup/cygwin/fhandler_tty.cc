@@ -855,26 +855,6 @@ fhandler_pty_slave::cleanup ()
 int
 fhandler_pty_slave::close ()
 {
-#if 0
-  if (getPseudoConsole ())
-    {
-      INPUT_RECORD inp[128];
-      DWORD n;
-      PeekFunc =
-	PeekConsoleInputA_Orig ? PeekConsoleInputA_Orig : PeekConsoleInput;
-      PeekFunc (get_handle (), inp, 128, &n);
-      bool pipe_empty = true;
-      while (n-- > 0)
-	if (inp[n].EventType == KEY_EVENT && inp[n].Event.KeyEvent.bKeyDown)
-	  pipe_empty = false;
-      if (pipe_empty)
-	{
-	  /* Flush input buffer */
-	  size_t len = UINT_MAX;
-	  read (NULL, len);
-	}
-    }
-#endif
   termios_printf ("closing last open %s handle", ttyname ());
   if (inuse && !CloseHandle (inuse))
     termios_printf ("CloseHandle (inuse), %E");
@@ -1524,7 +1504,6 @@ fhandler_pty_slave::read (void *ptr, size_t& len)
 out:
   termios_printf ("%d = read(%p, %lu)", totalread, ptr, len);
   len = (size_t) totalread;
-#if 1 /* Experimenta code */
   /* Push slave read as echo to pseudo console screen buffer. */
   if (getPseudoConsole () && ptr0 && (get_ttyp ()->ti.c_lflag & ECHO))
     {
@@ -1532,7 +1511,6 @@ out:
       push_to_pcon_screenbuffer (ptr0, len);
       release_output_mutex ();
     }
-#endif
   mask_switch_to_pcon (false);
 }
 
@@ -2748,10 +2726,6 @@ restart:
   if (p)
     *p = L'-';
   LCID lcid = LocaleNameToLCID (lc, 0);
-#if 0
-  if (lcid == (LCID) -1)
-    return lcid;
-#endif
   if (!lcid && !strcmp (charset, "ASCII"))
     return 0;
 
@@ -2842,7 +2816,6 @@ fhandler_pty_slave::fixup_after_attach (bool native_maybe)
 			}
 		}
 
-#if 1 /* Experimental code */
 	      /* Clear screen to synchronize pseudo console screen buffer
 		 with real terminal. This is necessary because pseudo
 		 console screen buffer is empty at start. */
@@ -2854,7 +2827,6 @@ fhandler_pty_slave::fixup_after_attach (bool native_maybe)
 		/* Assume this is the first process using this pty slave. */
 		WriteFile (get_output_handle_cyg (),
 			   "\033[H\033[J", 6, &n, NULL);
-#endif
 
 	      pcon_attached[get_minor ()] = true;
 	      get_ttyp ()->num_pcon_attached_slaves ++;
