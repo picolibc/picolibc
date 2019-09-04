@@ -47,6 +47,7 @@ newlib_locale_info = get_option('newlib-locale-info')
 newlib_locale_info_extended = get_option('newlib-locale-info-extended')
 newlib_global_errno = get_option('newlib-global-errno')
 newlib_initfini_array = get_option('newlib-initfini-array')
+newlib_initfini = get_option('newlib-initfini')
 thread_local_storage = get_option('thread-local-storage')
 hw_fp = get_option('hw-fp')
 
@@ -179,6 +180,7 @@ conf_data.set('__HAVE_LOCALE_INFO__', newlib_locale_info, description: 'locale s
 conf_data.set('__HAVE_LOCALE_INFO_EXTENDED__', newlib_locale_info_extended, description: 'extended locale support')
 conf_data.set('NEWLIB_GLOBAL_ERRNO', newlib_global_errno, description: 'use global errno variable')
 conf_data.set('HAVE_INITFINI_ARRAY', newlib_initfini_array, description: 'compiler supports INIT_ARRAY sections')
+conf_data.set('HAVE_INIT_FINI', newlib_initfini, description: 'Support _init() and _fini() functions')
 conf_data.set('NEWLIB_TLS', thread_local_storage, description: 'use thread local storage')
 
 version_data = configuration_data()

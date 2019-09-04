@@ -87,5 +87,7 @@ option('newlib-global-errno', type: 'boolean', value: false,
        description: 'use global errnor variable')
 option('newlib-initfini-array', type: 'boolean', value: true,
        description: 'compiler supports INIT_ARRAY section types')
+option('newlib-initfini', type: 'boolean', value: true,
+       description: 'Supports _init() and _fini()')
 option('thread-local-storage', type: 'boolean', value: true,
        description: 'use thread local storage for static data')
