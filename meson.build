@@ -71,6 +71,8 @@ else
   have_alias_attribute = have_alias_attribute_option == 'true'
 endif
 
+lib_dir = join_paths(get_option('prefix'), get_option('libdir'))
+
 specs_data = configuration_data()
 specs_data.set(
   'INCLUDEDIR',
@@ -79,7 +81,7 @@ specs_data.set(
 
 specs_data.set(
   'LIBDIR',
-  join_paths(get_option('prefix'), get_option('libdir'))
+  lib_dir
 )
 
 configure_file(input: 'picolibc.specs.in',
@@ -89,7 +91,7 @@ configure_file(input: 'picolibc.specs.in',
 	       install: true)
 				     
 install_data('picolibc.ld',
-	     install_dir: specs_dir)
+	     install_dir: lib_dir)
 
 long_double_code = '''
 #include <float.h>
