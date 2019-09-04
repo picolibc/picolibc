@@ -140,20 +140,24 @@ frok::child (volatile char * volatile here)
       {
 	fhandler_base *fh = cfd;
 	fhandler_pty_master *ptym = (fhandler_pty_master *) fh;
-	if (ptym->getPseudoConsole () &&
-	    !fhandler_console::get_console_process_id (
-				ptym->getHelperProcessId (), true))
-
+	if (ptym->getPseudoConsole ())
 	  {
 	    debug_printf ("found a PTY master %d: helper_PID=%d",
 			  ptym->get_minor (), ptym->getHelperProcessId ());
-	    if (ptym->attach_pcon_in_fork ())
+	    if (fhandler_console::get_console_process_id (
+				ptym->getHelperProcessId (), true))
+	      /* Already attached */
+	      break;
+	    else
 	      {
-		FreeConsole ();
-		if (!AttachConsole (ptym->getHelperProcessId ()))
-		  /* Error */;
-		else
-		  break;
+		if (ptym->attach_pcon_in_fork ())
+		  {
+		    FreeConsole ();
+		    if (!AttachConsole (ptym->getHelperProcessId ()))
+		      /* Error */;
+		    else
+		      break;
+		  }
 	      }
 	  }
       }

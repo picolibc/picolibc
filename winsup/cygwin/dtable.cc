@@ -147,18 +147,16 @@ dtable::get_debugger_info ()
 void
 dtable::stdio_init ()
 {
-  bool need_fixup_handle = false;
-  fhandler_pty_slave *ptys = NULL;
-  bool is_pty[3] = {false, false, false};
-  for (int fd = 0; fd < 3; fd ++)
+  int chk_order[] = {1, 0, 2};
+  for (int i = 0; i < 3; i ++)
     {
+      int fd = chk_order[i];
       fhandler_base *fh = cygheap->fdtab[fd];
       if (fh && fh->get_major () == DEV_PTYS_MAJOR)
 	{
-	  ptys = (fhandler_pty_slave *) fh;
+	  fhandler_pty_slave *ptys = (fhandler_pty_slave *) fh;
 	  if (ptys->getPseudoConsole ())
 	    {
-	      is_pty[fd] = true;
 	      bool attached = !!fhandler_console::get_console_process_id
 		(ptys->getHelperProcessId (), true);
 	      if (!attached)
@@ -167,15 +165,12 @@ dtable::stdio_init ()
 		     by some reason. This happens if the executable is
 		     a windows GUI binary, such as mintty. */
 		  FreeConsole ();
-		  AttachConsole (ptys->getHelperProcessId ());
-		  need_fixup_handle = true;
+		  if (AttachConsole (ptys->getHelperProcessId ()))
+		    break;
 		}
-	      ptys->reset_switch_to_pcon ();
 	    }
 	}
     }
-  if (need_fixup_handle)
-    goto fixup_handle;
 
   if (myself->cygstarted || ISSTATE (myself, PID_CYGPARENT))
     {
@@ -183,27 +178,6 @@ dtable::stdio_init ()
       if (t && t->is_console)
 	init_console_handler (true);
       return;
-    }
-
-fixup_handle:
-  if (need_fixup_handle)
-    {
-      HANDLE h;
-      h = CreateFile ("CONIN$", GENERIC_READ, FILE_SHARE_READ,
-		       NULL, OPEN_EXISTING, 0, 0);
-      if (is_pty[0])
-	{
-	  SetStdHandle (STD_INPUT_HANDLE, h);
-	  ptys->set_handle (h);
-	}
-      h = CreateFile ("CONOUT$", GENERIC_WRITE, FILE_SHARE_WRITE,
-		       NULL, OPEN_EXISTING, 0, 0);
-      if (is_pty[1])
-	SetStdHandle (STD_OUTPUT_HANDLE, h);
-      if (is_pty[2])
-	SetStdHandle (STD_ERROR_HANDLE, h);
-      if (is_pty[1] || is_pty[2])
-	ptys->set_output_handle (h);
     }
 
   HANDLE in = GetStdHandle (STD_INPUT_HANDLE);

@@ -3136,16 +3136,29 @@ DWORD
 fhandler_console::get_console_process_id (DWORD pid, bool match)
 {
   DWORD tmp;
-  int num = GetConsoleProcessList (&tmp, 1);
-  DWORD *list = (DWORD *)
-	      HeapAlloc (GetProcessHeap (), 0, num * sizeof (DWORD));
-  num = GetConsoleProcessList (list, num);
+  DWORD num, num_req;
+  num = 1;
+  num_req = GetConsoleProcessList (&tmp, num);
+  DWORD *list;
+  while (true)
+    {
+      list = (DWORD *)
+	HeapAlloc (GetProcessHeap (), 0, num_req * sizeof (DWORD));
+      num = num_req;
+      num_req = GetConsoleProcessList (list, num);
+      if (num_req > num)
+	HeapFree (GetProcessHeap (), 0, list);
+      else
+	break;
+    }
+  num = num_req;
+
   tmp = 0;
-  for (int i=0; i<num; i++)
+  for (DWORD i=0; i<num; i++)
     if ((match && list[i] == pid) || (!match && list[i] != pid))
       {
 	tmp = list[i];
-	//break;
+	break;
       }
   HeapFree (GetProcessHeap (), 0, list);
   return tmp;

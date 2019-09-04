@@ -71,7 +71,7 @@ struct pipe_reply {
   DWORD error;
 };
 
-static bool pcon_attached[NTTYS];
+static int pcon_attached_to = -1;
 static bool isHybrid;
 
 #if USE_API_HOOK
@@ -85,7 +85,6 @@ set_switch_to_pcon (void)
 	fhandler_base *fh = cfd;
 	fhandler_pty_slave *ptys = (fhandler_pty_slave *) fh;
 	ptys->set_switch_to_pcon ();
-	return;
       }
 }
 
@@ -339,25 +338,6 @@ fhandler_pty_common::__release_output_mutex (const char *fn, int ln)
 #endif
 }
 
-static bool switch_to_pcon_prev;
-
-bool
-fhandler_pty_common::check_switch_to_pcon (void)
-{
-  bool switch_to_pcon_now = get_ttyp ()->switch_to_pcon;
-  if (!isHybrid && !switch_to_pcon_prev && switch_to_pcon_now)
-    {
-      Sleep (40);
-      /* Check again */
-      switch_to_pcon_now = get_ttyp ()->switch_to_pcon;
-      if (switch_to_pcon_now)
-	switch_to_pcon_prev = true;
-    }
-  else
-    switch_to_pcon_prev = switch_to_pcon_now;
-  return switch_to_pcon_prev;
-}
-
 /* Process pty input. */
 
 void
@@ -553,7 +533,7 @@ out:
 
 fhandler_pty_slave::fhandler_pty_slave (int unit)
   : fhandler_pty_common (), inuse (NULL), output_handle_cyg (NULL),
-  io_handle_cyg (NULL)
+  io_handle_cyg (NULL), pid_restore (0)
 {
   if (unit >= 0)
     dev ().parse (DEV_PTYS_MAJOR, unit);
@@ -562,32 +542,33 @@ fhandler_pty_slave::fhandler_pty_slave (int unit)
 fhandler_pty_slave::~fhandler_pty_slave ()
 {
   if (!get_ttyp ())
-    {
-      /* Why it comes here? */
-      init_console_handler (false);
-      FreeConsole ();
-      pcon_attached[get_minor ()] = false;
-    }
-  else if (getPseudoConsole ())
+    /* Why comes here? Who clears _tc? */
+    return;
+  if (getPseudoConsole ())
     {
       int used = 0;
+      int attached = 0;
       cygheap_fdenum cfd (false);
       while (cfd.next () >= 0)
-	if (cfd->get_major () == DEV_PTYS_MAJOR &&
-	    cfd->get_minor () == get_minor ())
-	  used ++;
+	{
+	  if (cfd->get_major () == DEV_PTYS_MAJOR ||
+	      cfd->get_major () == DEV_CONS_MAJOR)
+	    used ++;
+	  if (cfd->get_major () == DEV_PTYS_MAJOR &&
+	      cfd->get_minor () == pcon_attached_to)
+	    attached ++;
+	}
 
-      /* Call FreeConsole() if no pty slave on this pty is
-	 opened and the process is attached to the pseudo
-	 console corresponding to this pty. This is needed
-	 to make GNU screen and tmux work in Windows 10 1903. */
-      if (used == 0 &&
-	  fhandler_console::get_console_process_id (getHelperProcessId (),
-						    true))
+      /* Call FreeConsole() if no tty is opened and the process
+	 is attached to console corresponding to tty. This is
+	 needed to make GNU screen and tmux work in Windows 10
+	 1903. */
+      if (attached == 0)
+	pcon_attached_to = -1;
+      if (used == 0)
 	{
 	  init_console_handler (false);
 	  FreeConsole ();
-	  pcon_attached[get_minor ()] = false;
 	}
     }
 }
@@ -771,7 +752,27 @@ fhandler_pty_slave::open (int flags, mode_t)
   set_output_handle (to_master_local);
   set_output_handle_cyg (to_master_cyg_local);
 
-  fhandler_console::need_invisible ();
+  if (!getPseudoConsole ())
+    {
+      fhandler_console::need_invisible ();
+      pcon_attached_to = -1;
+    }
+  else if (!fhandler_console::get_console_process_id
+			       (GetCurrentProcessId (), true))
+    {
+      fhandler_console::need_invisible ();
+      pcon_attached_to = -1;
+    }
+  else if (fhandler_console::get_console_process_id
+			       (getHelperProcessId (), true))
+    /* Attached to pcon of this pty */
+    {
+      pcon_attached_to = get_minor ();
+      init_console_handler (true);
+    }
+  else if (pcon_attached_to < 0)
+    fhandler_console::need_invisible ();
+
   set_open_status ();
   return 1;
 
@@ -824,12 +825,13 @@ fhandler_pty_slave::close ()
   if (!ForceCloseHandle (get_handle_cyg ()))
     termios_printf ("CloseHandle (get_handle_cyg ()<%p>), %E",
 	get_handle_cyg ());
-  if ((unsigned) myself->ctty == FHDEV (DEV_PTYS_MAJOR, get_minor ()))
+  if (!getPseudoConsole () &&
+      (unsigned) myself->ctty == FHDEV (DEV_PTYS_MAJOR, get_minor ()))
     fhandler_console::free_console ();	/* assumes that we are the last pty closer */
   fhandler_pty_common::close ();
   if (!ForceCloseHandle (output_mutex))
     termios_printf ("CloseHandle (output_mutex<%p>), %E", output_mutex);
-  if (pcon_attached[get_minor ()])
+  if (pcon_attached_to == get_minor ())
     get_ttyp ()->num_pcon_attached_slaves --;
   return 0;
 }
@@ -874,14 +876,53 @@ fhandler_pty_slave::init (HANDLE h, DWORD a, mode_t)
   return ret;
 }
 
+bool
+fhandler_pty_slave::try_reattach_pcon (void)
+{
+  pid_restore = 0;
+
+  /* Do not detach from the console because re-attaching will
+     fail if helper process is running as service account. */
+  if (pcon_attached_to >= 0 &&
+      cygwin_shared->tty[pcon_attached_to]->attach_pcon_in_fork)
+    return false;
+
+  pid_restore =
+    fhandler_console::get_console_process_id (GetCurrentProcessId (),
+					      false);
+  /* If pid_restore is not set, give up. */
+  if (!pid_restore)
+    return false;
+
+  FreeConsole ();
+  if (!AttachConsole (getHelperProcessId ()))
+    {
+      system_printf ("pty%d: AttachConsole(helper=%d) failed. 0x%08lx",
+		     get_minor (), getHelperProcessId (), GetLastError ());
+      return false;
+    }
+  return true;
+}
+
+void
+fhandler_pty_slave::restore_reattach_pcon (void)
+{
+  if (pid_restore)
+    {
+      FreeConsole ();
+      if (!AttachConsole (pid_restore))
+	{
+	  system_printf ("pty%d: AttachConsole(restore=%d) failed. 0x%08lx",
+			 get_minor (), pid_restore, GetLastError ());
+	  pcon_attached_to = -1;
+	}
+    }
+  pid_restore = 0;
+}
+
 void
 fhandler_pty_slave::set_switch_to_pcon (void)
 {
-  if (!pcon_attached[get_minor ()])
-    {
-      isHybrid = false;
-      return;
-    }
   if (!isHybrid)
     {
       reset_switch_to_pcon ();
@@ -889,6 +930,16 @@ fhandler_pty_slave::set_switch_to_pcon (void)
     }
   if (!get_ttyp ()->switch_to_pcon)
     {
+      pid_restore = 0;
+      if (pcon_attached_to != get_minor ())
+	if (!try_reattach_pcon ())
+	  goto skip_console_setting;
+      FlushConsoleInputBuffer (get_handle ());
+      DWORD mode;
+      GetConsoleMode (get_handle (), &mode);
+      SetConsoleMode (get_handle (), mode | ENABLE_ECHO_INPUT);
+skip_console_setting:
+      restore_reattach_pcon ();
       Sleep (20);
       if (get_ttyp ()->pcon_pid == 0 ||
 	  kill (get_ttyp ()->pcon_pid, 0) != 0)
@@ -904,7 +955,7 @@ fhandler_pty_slave::reset_switch_to_pcon (void)
     return;
   if (isHybrid)
     {
-      set_switch_to_pcon ();
+      this->set_switch_to_pcon ();
       return;
     }
   if (get_ttyp ()->pcon_pid &&
@@ -918,7 +969,7 @@ fhandler_pty_slave::reset_switch_to_pcon (void)
       DWORD mode;
       GetConsoleMode (get_handle (), &mode);
       SetConsoleMode (get_handle (), mode & ~ENABLE_ECHO_INPUT);
-      Sleep (60); /* Wait for pty_master_fwd_thread() */
+      Sleep (20); /* Wait for pty_master_fwd_thread() */
     }
   get_ttyp ()->pcon_pid = 0;
   get_ttyp ()->switch_to_pcon = false;
@@ -927,43 +978,31 @@ fhandler_pty_slave::reset_switch_to_pcon (void)
 void
 fhandler_pty_slave::push_to_pcon_screenbuffer (const char *ptr, size_t len)
 {
-  DWORD pidRestore = 0;
-  if (!fhandler_console::get_console_process_id (getHelperProcessId (), true))
-    if (pcon_attached[get_minor ()])
-      {
-	Sleep (20);
-	/* Check again */
-	if (!fhandler_console::get_console_process_id
-				    (getHelperProcessId (), true))
-	  {
-	    system_printf ("pty%d: pcon_attach mismatch?????? (%p)",
-			   get_minor (), this);
-	    //pcon_attached[get_minor ()] = false;
-	    return;
-	  }
-      }
-  /* If not attached pseudo console yet, try to attach temporally. */
-  if (!pcon_attached[get_minor ()])
+  bool attached =
+    !!fhandler_console::get_console_process_id (getHelperProcessId (), true);
+  if (!attached && pcon_attached_to == get_minor ())
     {
-      if (has_master_opened ())
-	return;
-
-      pidRestore =
-	fhandler_console::get_console_process_id (GetCurrentProcessId (),
-						  false);
-      /* If pidRestore is not set, give up to push. */
-      if (!pidRestore)
-	return;
-
-      FreeConsole ();
-      if (!AttachConsole (getHelperProcessId ()))
+      for (DWORD t0 = GetTickCount (); GetTickCount () - t0 < 100; )
 	{
-	  system_printf ("pty%d: AttachConsole(%d) failed. (%p) %08lx",
-			 get_minor (), getHelperProcessId (),
-			 this, GetLastError ());
-	  goto detach;
+	  Sleep (1);
+	  attached = fhandler_console::get_console_process_id
+				      (getHelperProcessId (), true);
+	  if (attached)
+	    break;
+	}
+      if (!attached)
+	{
+	  system_printf ("pty%d: pcon_attach_to mismatch??????", get_minor ());
+	  return;
 	}
     }
+
+  /* If not attached to this pseudo console, try to attach temporarily. */
+  pid_restore = 0;
+  if (pcon_attached_to != get_minor ())
+    if (!try_reattach_pcon ())
+      goto detach;
+
   char *buf;
   size_t nlen;
   DWORD origCP;
@@ -1005,7 +1044,7 @@ fhandler_pty_slave::push_to_pcon_screenbuffer (const char *ptr, size_t len)
     }
   if (!nlen) /* Nothing to be synchronized */
     goto cleanup;
-  if (check_switch_to_pcon ())
+  if (get_ttyp ()->switch_to_pcon)
     goto cleanup;
   /* Remove ESC sequence which returns results to console
      input buffer. Without this, cursor position report
@@ -1060,27 +1099,7 @@ cleanup:
   SetConsoleOutputCP (origCP);
   HeapFree (GetProcessHeap (), 0, buf);
 detach:
-  if (!pcon_attached[get_minor ()])
-    {
-      FreeConsole ();
-      if (!AttachConsole (pidRestore))
-	{
-	  system_printf ("pty%d: AttachConsole(%d) failed. (%p) %08lx",
-			 get_minor (), pidRestore, this, GetLastError ());
-	  pcon_attached[get_minor ()] = false;
-	}
-    }
-}
-
-bool
-fhandler_pty_slave::has_master_opened (void)
-{
-  cygheap_fdenum cfd (false);
-  while (cfd.next () >= 0)
-    if (cfd->get_major () == DEV_PTYM_MAJOR &&
-	cfd->get_minor () == get_minor ())
-      return true;
-  return false;
+  restore_reattach_pcon ();
 }
 
 ssize_t __stdcall
@@ -1100,7 +1119,7 @@ fhandler_pty_slave::write (const void *ptr, size_t len)
 
   char *buf;
   ssize_t nlen;
-  UINT targetCodePage = (check_switch_to_pcon ()) ?
+  UINT targetCodePage = get_ttyp ()->switch_to_pcon ?
     GetConsoleOutputCP () : get_ttyp ()->TermCodePage;
   if (targetCodePage != get_ttyp ()->TermCodePage)
     {
@@ -1127,18 +1146,25 @@ fhandler_pty_slave::write (const void *ptr, size_t len)
       nlen = len;
     }
 
+  /* If not attached to this pseudo console, try to attach temporarily. */
+  pid_restore = 0;
+  bool fallback = false;
+  if (get_ttyp ()->switch_to_pcon && pcon_attached_to != get_minor ())
+    if (!try_reattach_pcon ())
+      fallback = true;
+
   DWORD dwMode, flags;
   flags = ENABLE_VIRTUAL_TERMINAL_PROCESSING;
   if (!(get_ttyp ()->ti.c_oflag & OPOST) ||
       !(get_ttyp ()->ti.c_oflag & ONLCR))
     flags |= DISABLE_NEWLINE_AUTO_RETURN;
-  if (check_switch_to_pcon ())
+  if (get_ttyp ()->switch_to_pcon && !fallback)
     {
       GetConsoleMode (get_output_handle (), &dwMode);
       SetConsoleMode (get_output_handle (), dwMode | flags);
     }
-  HANDLE to =
-    check_switch_to_pcon () ? get_output_handle () : get_output_handle_cyg ();
+  HANDLE to = (get_ttyp ()->switch_to_pcon && !fallback) ?
+    get_output_handle () : get_output_handle_cyg ();
   acquire_output_mutex (INFINITE);
   if (!process_opost_output (to, buf, nlen, false))
     {
@@ -1157,8 +1183,10 @@ fhandler_pty_slave::write (const void *ptr, size_t len)
   release_output_mutex ();
   HeapFree (GetProcessHeap (), 0, buf);
   flags = ENABLE_VIRTUAL_TERMINAL_PROCESSING;
-  if (check_switch_to_pcon ())
-    SetConsoleMode (get_output_handle (), dwMode | flags);
+  if (get_ttyp ()->switch_to_pcon && !fallback)
+    SetConsoleMode (get_output_handle (), dwMode);
+
+  restore_reattach_pcon ();
 
   /* Push slave output to pseudo console screen buffer */
   if (getPseudoConsole ())
@@ -1299,9 +1327,15 @@ fhandler_pty_slave::read (void *ptr, size_t& len)
 	    }
 	  goto out;
 	}
-      if (check_switch_to_pcon () &&
-	  !get_ttyp ()->mask_switch_to_pcon)
+      if (get_ttyp ()->switch_to_pcon &&
+	  (!get_ttyp ()->mask_switch_to_pcon || ALWAYS_USE_PCON))
 	{
+	  if (!try_reattach_pcon ())
+	    {
+	      restore_reattach_pcon ();
+	      goto do_read_cyg;
+	    }
+
 	  DWORD dwMode;
 	  GetConsoleMode (get_handle (), &dwMode);
 	  DWORD flags = ENABLE_VIRTUAL_TERMINAL_INPUT;
@@ -1344,8 +1378,13 @@ fhandler_pty_slave::read (void *ptr, size_t& len)
 	    ResetEvent (input_available_event);
 	  ReleaseMutex (input_mutex);
 	  len = rlen;
+
+	  restore_reattach_pcon ();
+	  mask_switch_to_pcon (false);
 	  return;
 	}
+
+do_read_cyg:
       if (!bytes_available (bytes_in_pipe))
 	{
 	  ReleaseMutex (input_mutex);
@@ -1611,31 +1650,13 @@ fhandler_pty_slave::ioctl (unsigned int cmd, void *arg)
     case TIOCSWINSZ:
       if (getPseudoConsole ())
 	{
-	  /* If not attached pseudo console yet, try to attach
-	     temporally. */
-	  DWORD pidRestore = 0;
-	  if (!pcon_attached[get_minor ()])
-	    {
-	      if (has_master_opened () && get_ttyp ()->attach_pcon_in_fork)
-		goto resize_cyg;
+	  /* If not attached to this pseudo console,
+	     try to attach temporarily. */
+	  pid_restore = 0;
+	  if (pcon_attached_to != get_minor ())
+	    if (!try_reattach_pcon ())
+	      goto cleanup;
 
-	      pidRestore = fhandler_console::get_console_process_id
-		(GetCurrentProcessId (), false);
-
-	      /* This happens at mintty startup if fhandler_console::
-		 need_invisible() is called in stdio_init() in dtable.cc */
-	      if (!pidRestore) /* Give up to resize pseudo console */
-		goto resize_cyg;
-
-	      FreeConsole ();
-	      if (!AttachConsole (getHelperProcessId ()))
-		{
-		  system_printf ("pty%d: AttachConsole(%d) failed. (%p) %08lx",
-				 get_minor(), getHelperProcessId (),
-				 this, GetLastError ());
-		  goto cleanup;
-		}
-	    }
 	  COORD size;
 	  size.X = ((struct winsize *) arg)->ws_col;
 	  size.Y = ((struct winsize *) arg)->ws_row;
@@ -1653,20 +1674,9 @@ fhandler_pty_slave::ioctl (unsigned int cmd, void *arg)
 	  rect.Bottom = size.Y-1;
 	  SetConsoleWindowInfo (get_output_handle (), TRUE, &rect);
 cleanup:
-	  /* Detach from pseudo console and resume. */
-	  if (pidRestore)
-	    {
-	      FreeConsole ();
-	      if (!AttachConsole (pidRestore))
-		{
-		  system_printf ("pty%d: AttachConsole(%d) failed. (%p) %08lx",
-				 get_minor (), pidRestore,
-				 this, GetLastError ());
-		  pcon_attached[get_minor ()] = false;
-		}
-	    }
+	  restore_reattach_pcon ();
 	}
-resize_cyg:
+
       if (get_ttyp ()->winsize.ws_row != ((struct winsize *) arg)->ws_row
 	  || get_ttyp ()->winsize.ws_col != ((struct winsize *) arg)->ws_col)
 	{
@@ -2042,7 +2052,6 @@ fhandler_pty_master::close ()
 	      ClosePseudoConsole = (VOID (WINAPI *) (HPCON)) func;
 	      ClosePseudoConsole (getPseudoConsole ());
 	    }
-	  get_ttyp ()->hPseudoConsole = NULL;
 	  get_ttyp ()->switch_to_pcon = false;
 	}
       if (get_ttyp ()->getsid () > 0)
@@ -2096,8 +2105,8 @@ fhandler_pty_master::write (const void *ptr, size_t len)
 
   /* Write terminal input to to_slave pipe instead of output_handle
      if current application is native console application. */
-  if (check_switch_to_pcon () &&
-      !get_ttyp ()->mask_switch_to_pcon)
+  if (get_ttyp ()->switch_to_pcon &&
+      (!get_ttyp ()->mask_switch_to_pcon || ALWAYS_USE_PCON))
     {
       char *buf;
       size_t nlen;
@@ -2702,8 +2711,9 @@ fhandler_pty_slave::fixup_after_attach (bool native_maybe)
       if (fhandler_console::get_console_process_id (getHelperProcessId (),
 						    true))
 	{
-	  if (!pcon_attached[get_minor ()])
+	  if (pcon_attached_to != get_minor ())
 	    {
+	      pcon_attached_to = get_minor ();
 	      init_console_handler (true);
 #if USE_OWN_NLS_FUNC
 	      char locale[ENCODING_LEN + 1] = "C";
@@ -2786,19 +2796,20 @@ fhandler_pty_slave::fixup_after_attach (bool native_maybe)
 		WriteFile (get_output_handle_cyg (),
 			   "\033[H\033[J", 6, &n, NULL);
 
-	      pcon_attached[get_minor ()] = true;
 	      get_ttyp ()->num_pcon_attached_slaves ++;
 	    }
 	}
-      else
-	pcon_attached[get_minor ()] = false;
     }
-  if (pcon_attached[get_minor ()] && native_maybe)
+  if (pcon_attached_to == get_minor () && (native_maybe || ALWAYS_USE_PCON))
     {
       FlushConsoleInputBuffer (get_handle ());
       DWORD mode;
       GetConsoleMode (get_handle (), &mode);
-      SetConsoleMode (get_handle (), mode | ENABLE_ECHO_INPUT);
+      SetConsoleMode (get_handle (),
+		      (mode & ~ENABLE_VIRTUAL_TERMINAL_INPUT) |
+		      ENABLE_ECHO_INPUT |
+		      ENABLE_LINE_INPUT |
+		      ENABLE_PROCESSED_INPUT);
       Sleep (20);
       if (get_ttyp ()->pcon_pid == 0 ||
 	  kill (get_ttyp ()->pcon_pid, 0) != 0)
@@ -2826,23 +2837,28 @@ fhandler_pty_slave::fixup_after_exec ()
   else if (getPseudoConsole ())
     {
       int used = 0;
+      int attached = 0;
       cygheap_fdenum cfd (false);
       while (cfd.next () >= 0)
-	if (cfd->get_major () == DEV_PTYS_MAJOR &&
-	    cfd->get_minor () == get_minor ())
-	  used ++;
+	{
+	  if (cfd->get_major () == DEV_PTYS_MAJOR ||
+	      cfd->get_major () == DEV_CONS_MAJOR)
+	    used ++;
+	  if (cfd->get_major () == DEV_PTYS_MAJOR &&
+	      cfd->get_minor () == pcon_attached_to)
+	    attached ++;
+	}
 
-      /* Call FreeConsole() if no pty slave on this pty is
-	 opened and the process is attached to the pseudo
-	 console corresponding to this pty. This is needed
-	 to make GNU screen and tmux work in Windows 10 1903. */
-      if (used == 1 /* About to close this one */ &&
-	  fhandler_console::get_console_process_id (getHelperProcessId (),
-						    true))
+      /* Call FreeConsole() if no tty is opened and the process
+	 is attached to console corresponding to tty. This is
+	 needed to make GNU screen and tmux work in Windows 10
+	 1903. */
+      if (attached == 1 && get_minor () == pcon_attached_to)
+	pcon_attached_to = -1;
+      if (used == 1 /* About to close this tty */)
 	{
 	  init_console_handler (false);
 	  FreeConsole ();
-	  pcon_attached[get_minor ()] = false;
 	}
     }
 
@@ -3049,7 +3065,7 @@ fhandler_pty_master::pty_master_fwd_thread ()
 	{
 	  /* Avoid duplicating slave output which is already sent to
 	     to_master_cyg */
-	  if (!check_switch_to_pcon ())
+	  if (!get_ttyp ()->switch_to_pcon)
 	    continue;
 
 	  /* Avoid setting window title to "cygwin-console-helper.exe" */
@@ -3064,24 +3080,41 @@ fhandler_pty_master::pty_master_fwd_thread ()
 	      }
 	    else if ((state == 1 && outbuf[i] == ']') ||
 		     (state == 2 && outbuf[i] == '0') ||
-		     (state == 3 && outbuf[i] == ';') ||
-		     (state == 4 && outbuf[i] == '\0'))
+		     (state == 3 && outbuf[i] == ';'))
 	      {
 		state ++;
 		continue;
 	      }
-	    else if (state == 5 && outbuf[i] == '\a')
+	    else if (state == 4 && outbuf[i] == '\a')
 	      {
 		memmove (&outbuf[start_at], &outbuf[i+1], rlen-i-1);
 		state = 0;
 		rlen = wlen = start_at + rlen - i - 1;
 		continue;
 	      }
-	    else if (state != 4 || outbuf[i] == '\a')
+	    else if (outbuf[i] == '\a')
 	      {
 		state = 0;
 		continue;
 	      }
+
+	  /* Remove ESC sequence which returns results to console
+	     input buffer. Without this, cursor position report
+	     is put into the input buffer as a garbage. */
+	  /* Remove ESC sequence to report cursor position. */
+	  char *p0;
+	  while ((p0 = (char *) memmem (outbuf, rlen, "\033[6n", 4)))
+	    {
+	      memmove (p0, p0+4, rlen - (p0+4 - outbuf));
+	      rlen -= 4;
+	    }
+	  /* Remove ESC sequence to report terminal identity. */
+	  while ((p0 = (char *) memmem (outbuf, rlen, "\033[0c", 4)))
+	    {
+	      memmove (p0, p0+4, rlen - (p0+4 - outbuf));
+	      rlen -= 4;
+	    }
+	  wlen = rlen;
 
 	  char *buf;
 	  size_t nlen;

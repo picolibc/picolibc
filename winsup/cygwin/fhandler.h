@@ -2106,18 +2106,21 @@ class fhandler_pty_common: public fhandler_termios
  protected:
   BOOL process_opost_output (HANDLE h,
 			     const void *ptr, ssize_t& len, bool is_echo);
-  bool check_switch_to_pcon (void);
 };
 
 class fhandler_pty_slave: public fhandler_pty_common
 {
   HANDLE inuse;			// used to indicate that a tty is in use
   HANDLE output_handle_cyg, io_handle_cyg;
+  DWORD pid_restore;
 
   /* Helper functions for fchmod and fchown. */
   bool fch_open_handles (bool chown);
   int fch_set_sd (security_descriptor &sd, bool chown);
   void fch_close_handles ();
+
+  bool try_reattach_pcon ();
+  void restore_reattach_pcon ();
 
  public:
   /* Constructor */
@@ -2172,7 +2175,6 @@ class fhandler_pty_slave: public fhandler_pty_common
   void set_switch_to_pcon (void);
   void reset_switch_to_pcon (void);
   void push_to_pcon_screenbuffer (const char *ptr, size_t len);
-  bool has_master_opened (void);
   void mask_switch_to_pcon (bool mask)
   {
     get_ttyp ()->mask_switch_to_pcon = mask;
