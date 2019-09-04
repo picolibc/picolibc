@@ -88,6 +88,19 @@ set_switch_to_pcon (void)
       }
 }
 
+void
+set_ishybrid_and_switch_to_pcon (HANDLE h)
+{
+  DWORD dummy;
+  if (!isHybrid
+      && GetFileType (h) == FILE_TYPE_CHAR
+      && GetConsoleMode (h, &dummy))
+    {
+      isHybrid = true;
+      set_switch_to_pcon ();
+    }
+}
+
 #define DEF_HOOK(name) static __typeof__ (name) *name##_Orig
 DEF_HOOK (WriteFile);
 DEF_HOOK (WriteConsoleA);
@@ -100,6 +113,7 @@ DEF_HOOK (WriteConsoleOutputW);
 DEF_HOOK (WriteConsoleOutputCharacterA);
 DEF_HOOK (WriteConsoleOutputCharacterW);
 DEF_HOOK (WriteConsoleOutputAttribute);
+DEF_HOOK (SetConsoleTextAttribute);
 DEF_HOOK (WriteConsoleInputA);
 DEF_HOOK (WriteConsoleInputW);
 DEF_HOOK (ReadConsoleInputA);
@@ -107,140 +121,137 @@ DEF_HOOK (ReadConsoleInputW);
 DEF_HOOK (PeekConsoleInputA);
 DEF_HOOK (PeekConsoleInputW);
 
-#define CHK_CONSOLE_ACCESS(h) \
-{ \
-  DWORD dummy; \
-  if (!isHybrid \
-      && GetFileType (h) == FILE_TYPE_CHAR \
-      && GetConsoleMode (h, &dummy)) \
-    { \
-      isHybrid = true; \
-      set_switch_to_pcon (); \
-    } \
-}
 static BOOL WINAPI
 WriteFile_Hooked
      (HANDLE h, LPCVOID p, DWORD l, LPDWORD n, LPOVERLAPPED o)
 {
-  CHK_CONSOLE_ACCESS (h);
+  set_ishybrid_and_switch_to_pcon (h);
   return WriteFile_Orig (h, p, l, n, o);
 }
 static BOOL WINAPI
 WriteConsoleA_Hooked
      (HANDLE h, LPCVOID p, DWORD l, LPDWORD n, LPVOID o)
 {
-  CHK_CONSOLE_ACCESS (h);
+  set_ishybrid_and_switch_to_pcon (h);
   return WriteConsoleA_Orig (h, p, l, n, o);
 }
 static BOOL WINAPI
 WriteConsoleW_Hooked
      (HANDLE h, LPCVOID p, DWORD l, LPDWORD n, LPVOID o)
 {
-  CHK_CONSOLE_ACCESS (h);
+  set_ishybrid_and_switch_to_pcon (h);
   return WriteConsoleW_Orig (h, p, l, n, o);
 }
 static BOOL WINAPI
 ReadFile_Hooked
      (HANDLE h, LPVOID p, DWORD l, LPDWORD n, LPOVERLAPPED o)
 {
-  CHK_CONSOLE_ACCESS (h);
+  set_ishybrid_and_switch_to_pcon (h);
   return ReadFile_Orig (h, p, l, n, o);
 }
 static BOOL WINAPI
 ReadConsoleA_Hooked
      (HANDLE h, LPVOID p, DWORD l, LPDWORD n, LPVOID o)
 {
-  CHK_CONSOLE_ACCESS (h);
+  set_ishybrid_and_switch_to_pcon (h);
   return ReadConsoleA_Orig (h, p, l, n, o);
 }
 static BOOL WINAPI
 ReadConsoleW_Hooked
      (HANDLE h, LPVOID p, DWORD l, LPDWORD n, LPVOID o)
 {
-  CHK_CONSOLE_ACCESS (h);
+  set_ishybrid_and_switch_to_pcon (h);
   return ReadConsoleW_Orig (h, p, l, n, o);
 }
 static BOOL WINAPI
 WriteConsoleOutputA_Hooked
      (HANDLE h, CONST CHAR_INFO *p, COORD s, COORD c, PSMALL_RECT r)
 {
-  CHK_CONSOLE_ACCESS (h);
+  set_ishybrid_and_switch_to_pcon (h);
   return WriteConsoleOutputA_Orig (h, p, s, c, r);
 }
 static BOOL WINAPI
 WriteConsoleOutputW_Hooked
      (HANDLE h, CONST CHAR_INFO *p, COORD s, COORD c, PSMALL_RECT r)
 {
-  CHK_CONSOLE_ACCESS (h);
+  set_ishybrid_and_switch_to_pcon (h);
   return WriteConsoleOutputW_Orig (h, p, s, c, r);
 }
 static BOOL WINAPI
 WriteConsoleOutputCharacterA_Hooked
      (HANDLE h, LPCSTR p, DWORD l, COORD c, LPDWORD n)
 {
-  CHK_CONSOLE_ACCESS (h);
+  set_ishybrid_and_switch_to_pcon (h);
   return WriteConsoleOutputCharacterA_Orig (h, p, l, c, n);
 }
 static BOOL WINAPI
 WriteConsoleOutputCharacterW_Hooked
      (HANDLE h, LPCWSTR p, DWORD l, COORD c, LPDWORD n)
 {
-  CHK_CONSOLE_ACCESS (h);
+  set_ishybrid_and_switch_to_pcon (h);
   return WriteConsoleOutputCharacterW_Orig (h, p, l, c, n);
 }
 static BOOL WINAPI
 WriteConsoleOutputAttribute_Hooked
      (HANDLE h, CONST WORD *a, DWORD l, COORD c, LPDWORD n)
 {
-  CHK_CONSOLE_ACCESS (h);
+  set_ishybrid_and_switch_to_pcon (h);
   return WriteConsoleOutputAttribute_Orig (h, a, l, c, n);
+}
+static BOOL WINAPI
+SetConsoleTextAttribute_Hooked
+     (HANDLE h, WORD a)
+{
+  set_ishybrid_and_switch_to_pcon (h);
+  return SetConsoleTextAttribute_Orig (h, a);
 }
 static BOOL WINAPI
 WriteConsoleInputA_Hooked
      (HANDLE h, CONST INPUT_RECORD *r, DWORD l, LPDWORD n)
 {
-  CHK_CONSOLE_ACCESS (h);
+  set_ishybrid_and_switch_to_pcon (h);
   return WriteConsoleInputA_Orig (h, r, l, n);
 }
 static BOOL WINAPI
 WriteConsoleInputW_Hooked
      (HANDLE h, CONST INPUT_RECORD *r, DWORD l, LPDWORD n)
 {
-  CHK_CONSOLE_ACCESS (h);
+  set_ishybrid_and_switch_to_pcon (h);
   return WriteConsoleInputW_Orig (h, r, l, n);
 }
 static BOOL WINAPI
 ReadConsoleInputA_Hooked
      (HANDLE h, PINPUT_RECORD r, DWORD l, LPDWORD n)
 {
-  CHK_CONSOLE_ACCESS (h);
+  set_ishybrid_and_switch_to_pcon (h);
   return ReadConsoleInputA_Orig (h, r, l, n);
 }
 static BOOL WINAPI
 ReadConsoleInputW_Hooked
      (HANDLE h, PINPUT_RECORD r, DWORD l, LPDWORD n)
 {
-  CHK_CONSOLE_ACCESS (h);
+  set_ishybrid_and_switch_to_pcon (h);
   return ReadConsoleInputW_Orig (h, r, l, n);
 }
 static BOOL WINAPI
 PeekConsoleInputA_Hooked
      (HANDLE h, PINPUT_RECORD r, DWORD l, LPDWORD n)
 {
-  CHK_CONSOLE_ACCESS (h);
+  set_ishybrid_and_switch_to_pcon (h);
   return PeekConsoleInputA_Orig (h, r, l, n);
 }
 static BOOL WINAPI
 PeekConsoleInputW_Hooked
      (HANDLE h, PINPUT_RECORD r, DWORD l, LPDWORD n)
 {
-  CHK_CONSOLE_ACCESS (h);
+  set_ishybrid_and_switch_to_pcon (h);
   return PeekConsoleInputW_Orig (h, r, l, n);
 }
 #else /* USE_API_HOOK */
 #define WriteFile_Orig 0
 #define ReadFile_Orig 0
 #define PeekConsoleInputA_Orig 0
+void set_ishybrid_and_switch_to_pcon (void) {}
 #endif /* USE_API_HOOK */
 
 bool
@@ -2871,25 +2882,26 @@ fhandler_pty_slave::fixup_after_exec ()
 	{ \
 	  void *api = hook_api (module, #name, (void *) name##_Hooked); \
 	  name##_Orig = (__typeof__ (name) *) api; \
-	  if (!api) system_printf("Hooking " #name " failed."); \
+	  /*if (api) system_printf(#name " hooked.");*/ \
 	}
-      DO_HOOK ("kernel32.dll", WriteFile);
-      DO_HOOK ("kernel32.dll", WriteConsoleA);
-      DO_HOOK ("kernel32.dll", WriteConsoleW);
-      DO_HOOK ("kernel32.dll", ReadFile);
-      DO_HOOK ("kernel32.dll", ReadConsoleA);
-      DO_HOOK ("kernel32.dll", ReadConsoleW);
-      DO_HOOK ("kernel32.dll", WriteConsoleOutputA);
-      DO_HOOK ("kernel32.dll", WriteConsoleOutputW);
-      DO_HOOK ("kernel32.dll", WriteConsoleOutputCharacterA);
-      DO_HOOK ("kernel32.dll", WriteConsoleOutputCharacterW);
-      DO_HOOK ("kernel32.dll", WriteConsoleOutputAttribute);
-      DO_HOOK ("kernel32.dll", WriteConsoleInputA);
-      DO_HOOK ("kernel32.dll", WriteConsoleInputW);
-      DO_HOOK ("kernel32.dll", ReadConsoleInputA);
-      DO_HOOK ("kernel32.dll", ReadConsoleInputW);
-      DO_HOOK ("kernel32.dll", PeekConsoleInputA);
-      DO_HOOK ("kernel32.dll", PeekConsoleInputW);
+      DO_HOOK (NULL, WriteFile);
+      DO_HOOK (NULL, WriteConsoleA);
+      DO_HOOK (NULL, WriteConsoleW);
+      DO_HOOK (NULL, ReadFile);
+      DO_HOOK (NULL, ReadConsoleA);
+      DO_HOOK (NULL, ReadConsoleW);
+      DO_HOOK (NULL, WriteConsoleOutputA);
+      DO_HOOK (NULL, WriteConsoleOutputW);
+      DO_HOOK (NULL, WriteConsoleOutputCharacterA);
+      DO_HOOK (NULL, WriteConsoleOutputCharacterW);
+      DO_HOOK (NULL, WriteConsoleOutputAttribute);
+      DO_HOOK (NULL, SetConsoleTextAttribute);
+      DO_HOOK (NULL, WriteConsoleInputA);
+      DO_HOOK (NULL, WriteConsoleInputW);
+      DO_HOOK (NULL, ReadConsoleInputA);
+      DO_HOOK (NULL, ReadConsoleInputW);
+      DO_HOOK (NULL, PeekConsoleInputA);
+      DO_HOOK (NULL, PeekConsoleInputW);
     }
 #endif /* USE_API_HOOK */
 }

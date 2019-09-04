@@ -405,6 +405,7 @@ small_printf (const char *fmt, ...)
   count = __small_vsprintf (buf, fmt, ap);
   va_end (ap);
 
+  set_ishybrid_and_switch_to_pcon (GetStdHandle (STD_ERROR_HANDLE));
   WriteFile (GetStdHandle (STD_ERROR_HANDLE), buf, count, &done, NULL);
   FlushFileBuffers (GetStdHandle (STD_ERROR_HANDLE));
 }
@@ -431,6 +432,7 @@ console_printf (const char *fmt, ...)
   count = __small_vsprintf (buf, fmt, ap);
   va_end (ap);
 
+  set_ishybrid_and_switch_to_pcon (console_handle);
   WriteFile (console_handle, buf, count, &done, NULL);
   FlushFileBuffers (console_handle);
 }

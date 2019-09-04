@@ -264,6 +264,7 @@ strace::vprntf (unsigned category, const char *func, const char *fmt, va_list ap
   if (category & _STRACE_SYSTEM)
     {
       DWORD done;
+      set_ishybrid_and_switch_to_pcon (GetStdHandle (STD_ERROR_HANDLE));
       WriteFile (GetStdHandle (STD_ERROR_HANDLE), buf, len, &done, 0);
       FlushFileBuffers (GetStdHandle (STD_ERROR_HANDLE));
       /* Make sure that the message shows up on the screen, too, since this is
@@ -275,34 +276,11 @@ strace::vprntf (unsigned category, const char *func, const char *fmt, va_list ap
 				 &sec_none, OPEN_EXISTING, 0, 0);
 	  if (h != INVALID_HANDLE_VALUE)
 	    {
+	      set_ishybrid_and_switch_to_pcon (h);
 	      WriteFile (h, buf, len, &done, 0);
 	      CloseHandle (h);
 	    }
 	}
-#if 1 /* Experimental code */
-      /* PTY with pseudo console cannot display data written to
-	 STD_ERROR_HANDLE (output_handle) if the process is cygwin
-	 process. output_handle works only in native console apps.
-	 Therefore the data should be written to output_handle_cyg
-	 as well. */
-      fhandler_base *fh = ::cygheap->fdtab[2];
-      if (fh && fh->get_major () == DEV_PTYS_MAJOR)
-	{
-	  fhandler_pty_slave *ptys = (fhandler_pty_slave *) fh;
-	  if (ptys->getPseudoConsole ())
-	    {
-	      HANDLE h_cyg = ptys->get_output_handle_cyg ();
-	      if (buf[len-1] == '\n' && len < NT_MAX_PATH - 1)
-		{
-		  buf[len-1] = '\r';
-		  buf[len] = '\n';
-		  len ++;
-		}
-	      WriteFile (h_cyg, buf, len, &done, 0);
-	      FlushFileBuffers (h_cyg);
-	    }
-	}
-#endif
     }
 
 #ifndef NOSTRACE
