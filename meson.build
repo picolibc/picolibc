@@ -65,8 +65,6 @@ if specs_dir == ''
   specs_dir=install_dir.split(':')[1].strip()
 endif
 
-message('specs dir is ' + specs_dir)
-
 if have_alias_attribute_option == 'auto'
   have_alias_attribute = meson.get_compiler('c').has_function_attribute('alias')
 else
