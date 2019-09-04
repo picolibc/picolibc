@@ -635,6 +635,12 @@ child_info_spawn::worker (const char *prog_arg, const char *const *argv,
       if (ptys)
 	ptys->fixup_after_attach (!iscygwin ());
 
+      if (!iscygwin ())
+	{
+	  init_console_handler (myself->ctty > 0);
+	  myself->ctty = 0;
+	}
+
     loop:
       /* When ruid != euid we create the new process under the current original
 	 account and impersonate in child, this way maintaining the different
