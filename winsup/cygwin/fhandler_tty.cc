@@ -75,50 +75,6 @@ static bool pcon_attached[NTTYS];
 static bool isHybrid;
 
 #if USE_API_HOOK
-/* Hook WIN32 API */
-static
-void *hook_api (const char *mname, const char *name, const void *fn)
-{
-  HMODULE hm = GetModuleHandle (mname);
-  PIMAGE_NT_HEADERS pExeNTHdr = PIMAGE_NT_HEADERS (PBYTE (hm)
-				   + PIMAGE_DOS_HEADER (hm)->e_lfanew);
-  DWORD importRVA = pExeNTHdr->OptionalHeader.DataDirectory
-    [IMAGE_DIRECTORY_ENTRY_IMPORT].VirtualAddress;
-  PIMAGE_IMPORT_DESCRIPTOR pdfirst =
-    (PIMAGE_IMPORT_DESCRIPTOR) ((char *) hm + importRVA);
-  for (PIMAGE_IMPORT_DESCRIPTOR pd = pdfirst; pd->FirstThunk; pd++)
-    {
-      if (pd->OriginalFirstThunk == 0)
-	continue;
-      PIMAGE_THUNK_DATA pt =
-	(PIMAGE_THUNK_DATA) ((char *) hm + pd->FirstThunk);
-      PIMAGE_THUNK_DATA pn =
-	(PIMAGE_THUNK_DATA) ((char *) hm + pd->OriginalFirstThunk);
-      for (PIMAGE_THUNK_DATA pi = pt; pn->u1.Ordinal; pi++, pn++)
-	{
-	  if (IMAGE_SNAP_BY_ORDINAL (pn->u1.Ordinal))
-	    continue;
-	  PIMAGE_IMPORT_BY_NAME pimp =
-	    (PIMAGE_IMPORT_BY_NAME) ((char *) hm + pn->u1.AddressOfData);
-	  if (strcmp (name, (char *) pimp->Name) != 0)
-	    continue;
-#ifdef __x86_64__
-#define THUNK_FUNC_TYPE ULONGLONG
-#else
-#define THUNK_FUNC_TYPE DWORD
-#endif
-	  DWORD ofl = PAGE_READWRITE;
-	  if (!VirtualProtect (pi, sizeof (THUNK_FUNC_TYPE), ofl, &ofl))
-	    return NULL;
-	  void *origfn = (void *) pi->u1.Function;
-	  pi->u1.Function = (THUNK_FUNC_TYPE) fn;
-	  VirtualProtect (pi, sizeof (THUNK_FUNC_TYPE), ofl, &ofl);
-	  return origfn;
-	}
-    }
-  return NULL;
-}
-
 static void
 set_switch_to_pcon (void)
 {

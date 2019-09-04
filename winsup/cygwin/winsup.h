@@ -199,6 +199,7 @@ ino_t __reg2 hash_path_name (ino_t hash, const char *name);
 void __reg2 nofinalslash (const char *src, char *dst);
 
 void __reg3 *hook_or_detect_cygwin (const char *, const void *, WORD&, HANDLE h = NULL);
+void __reg3 *hook_api (const char *mname, const char *name, const void *fn);
 
 /* Time related */
 void __stdcall totimeval (struct timeval *, PLARGE_INTEGER, int, int);
