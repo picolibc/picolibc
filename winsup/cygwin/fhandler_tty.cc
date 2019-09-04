@@ -155,7 +155,9 @@ DEF_HOOK (PeekConsoleInputW);
 #define CHK_CONSOLE_ACCESS(h) \
 { \
   DWORD dummy; \
-  if (!isHybrid && GetConsoleMode (h, &dummy)) \
+  if (!isHybrid \
+      && GetFileType (h) == FILE_TYPE_CHAR \
+      && GetConsoleMode (h, &dummy)) \
     { \
       isHybrid = true; \
       set_switch_to_pcon (); \
