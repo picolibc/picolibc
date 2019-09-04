@@ -9,16 +9,14 @@ case "$#" in
 	;;
 esac
 meson "$arg" \
-        -Dprefix=/opt/ \
+      -Dmultilib=true\
 	-Dtarget-optspace=true \
 	-Dnewlib-tinystdio=true \
 	-Dnewlib-supplied-syscalls=false \
-	-Dnewlib-reent-small=true\
-	-Dnewlib-wide-orient=false\
 	-Dnewlib-nano-malloc=true\
 	-Dlite-exit=true\
-	-Dnewlib-global-atexit=true\
-	-Dnewlib-global-errno=true\
+	-Dnewlib-global-atexit=false\
+	-Dnewlib-global-errno=false\
 	-Dincludedir=picolibc/$ARCH/include \
 	-Dlibdir=picolibc/$ARCH/lib \
 	--buildtype plain \
