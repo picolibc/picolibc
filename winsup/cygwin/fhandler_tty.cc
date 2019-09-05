@@ -1223,6 +1223,13 @@ fhandler_pty_slave::write (const void *ptr, size_t len)
   return towrite;
 }
 
+bool
+fhandler_pty_common::to_be_read_from_pcon (void)
+{
+  return get_ttyp ()->switch_to_pcon &&
+    (!get_ttyp ()->mask_switch_to_pcon || ALWAYS_USE_PCON);
+}
+
 void __reg3
 fhandler_pty_slave::read (void *ptr, size_t& len)
 {
@@ -1351,8 +1358,7 @@ fhandler_pty_slave::read (void *ptr, size_t& len)
 	    }
 	  goto out;
 	}
-      if (get_ttyp ()->switch_to_pcon &&
-	  (!get_ttyp ()->mask_switch_to_pcon || ALWAYS_USE_PCON))
+      if (to_be_read_from_pcon ())
 	{
 	  if (!try_reattach_pcon ())
 	    {
@@ -2129,8 +2135,7 @@ fhandler_pty_master::write (const void *ptr, size_t len)
 
   /* Write terminal input to to_slave pipe instead of output_handle
      if current application is native console application. */
-  if (get_ttyp ()->switch_to_pcon &&
-      (!get_ttyp ()->mask_switch_to_pcon || ALWAYS_USE_PCON))
+  if (to_be_read_from_pcon ())
     {
       char *buf;
       size_t nlen;

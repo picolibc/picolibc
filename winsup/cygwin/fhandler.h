@@ -2102,6 +2102,7 @@ class fhandler_pty_common: public fhandler_termios
   {
     return get_ttyp ()->hPseudoConsole;
   }
+  bool to_be_read_from_pcon (void);
 
  protected:
   BOOL process_opost_output (HANDLE h,
@@ -2150,6 +2151,8 @@ class fhandler_pty_slave: public fhandler_pty_common
   void fixup_after_exec ();
 
   select_record *select_read (select_stuff *);
+  select_record *select_write (select_stuff *);
+  select_record *select_except (select_stuff *);
   virtual char const *ttyname () { return pc.dev.name (); }
   int __reg2 fstat (struct stat *buf);
   int __reg3 facl (int, int, struct acl *);
@@ -2177,9 +2180,21 @@ class fhandler_pty_slave: public fhandler_pty_common
   void push_to_pcon_screenbuffer (const char *ptr, size_t len);
   void mask_switch_to_pcon (bool mask)
   {
+    if (!mask && get_ttyp ()->pcon_pid &&
+	get_ttyp ()->pcon_pid != myself->pid &&
+	kill (get_ttyp ()->pcon_pid, 0) == 0)
+      return;
     get_ttyp ()->mask_switch_to_pcon = mask;
   }
   void fixup_after_attach (bool native_maybe);
+  pid_t get_pcon_pid (void)
+  {
+    return get_ttyp ()->pcon_pid;
+  }
+  bool is_line_input (void)
+  {
+    return get_ttyp ()->ti.c_lflag & ICANON;
+  }
 };
 
 #define __ptsname(buf, unit) __small_sprintf ((buf), "/dev/pty%d", (unit))

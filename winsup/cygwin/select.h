@@ -88,6 +88,7 @@ public:
   select_record start;
 
   select_pipe_info *device_specific_pipe;
+  select_pipe_info *device_specific_ptys;
   select_fifo_info *device_specific_fifo;
   select_socket_info *device_specific_socket;
   select_serial_info *device_specific_serial;
@@ -101,6 +102,7 @@ public:
   select_stuff (): return_on_signal (false), always_ready (false),
 		   windows_used (false), start (),
 		   device_specific_pipe (NULL),
+		   device_specific_ptys (NULL),
 		   device_specific_fifo (NULL),
 		   device_specific_socket (NULL),
 		   device_specific_serial (NULL)
