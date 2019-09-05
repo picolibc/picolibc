@@ -88,16 +88,59 @@ set_switch_to_pcon (void)
       }
 }
 
+static void
+force_attach_to_pcon (HANDLE h)
+{
+  bool attach_done = false;
+  for (int n = 0; n < 2; n ++)
+    {
+      /* First time, attach to the pty whose handle value is match.
+	 Second time, try to attach to any pty. */
+      cygheap_fdenum cfd (false);
+      while (cfd.next () >= 0)
+	if (cfd->get_major () == DEV_PTYS_MAJOR)
+	  {
+	    fhandler_base *fh = cfd;
+	    fhandler_pty_slave *ptys = (fhandler_pty_slave *) fh;
+	    if (n != 0
+		|| h == ptys->get_handle ()
+		|| h == ptys->get_output_handle ())
+	      {
+		if (fhandler_console::get_console_process_id
+				  (ptys->getHelperProcessId (), true))
+		  attach_done = true;
+		else
+		  {
+		    FreeConsole ();
+		    if (AttachConsole (ptys->getHelperProcessId ()))
+		      {
+			pcon_attached_to = ptys->get_minor ();
+			attach_done = true;
+		      }
+		    else
+		      pcon_attached_to = -1;
+		  }
+		break;
+	      }
+	  }
+      if (attach_done)
+	break;
+    }
+}
+
 void
 set_ishybrid_and_switch_to_pcon (HANDLE h)
 {
-  DWORD dummy;
-  if (!isHybrid
-      && GetFileType (h) == FILE_TYPE_CHAR
-      && GetConsoleMode (h, &dummy))
+  if (GetFileType (h) == FILE_TYPE_CHAR)
     {
-      isHybrid = true;
-      set_switch_to_pcon ();
+      force_attach_to_pcon (h);
+      DWORD dummy;
+      if (!isHybrid && (GetConsoleMode (h, &dummy)
+			|| GetLastError () != ERROR_INVALID_HANDLE))
+	{
+	  isHybrid = true;
+	  set_switch_to_pcon ();
+	}
     }
 }
 
