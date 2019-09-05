@@ -159,14 +159,19 @@ dtable::stdio_init ()
 	    {
 	      bool attached = !!fhandler_console::get_console_process_id
 		(ptys->getHelperProcessId (), true);
-	      if (!attached)
+	      if (attached)
+		break;
+	      else
 		{
 		  /* Not attached to pseudo console in fork() or spawn()
 		     by some reason. This happens if the executable is
 		     a windows GUI binary, such as mintty. */
 		  FreeConsole ();
 		  if (AttachConsole (ptys->getHelperProcessId ()))
-		    break;
+		    {
+		      ptys->fixup_after_attach (false);
+		      break;
+		    }
 		}
 	    }
 	}
