@@ -962,6 +962,19 @@ skip_console_setting:
 void
 fhandler_pty_slave::reset_switch_to_pcon (void)
 {
+  if (get_ttyp ()->need_clear_screen)
+    {
+      const char *term = getenv ("TERM");
+      if (term && strcmp (term, "dumb") && !strstr (term, "emacs"))
+	{
+	  /* FIXME: Clearing sequence may not be "^[[H^[[J"
+	     depending on the terminal type. */
+	  DWORD n;
+	  WriteFile (get_output_handle_cyg (), "\033[H\033[J", 6, &n, NULL);
+	}
+      get_ttyp ()->need_clear_screen = false;
+    }
+
   if (ALWAYS_USE_PCON)
     return;
   if (isHybrid)
@@ -2798,14 +2811,10 @@ fhandler_pty_slave::fixup_after_attach (bool native_maybe)
 	      /* Clear screen to synchronize pseudo console screen buffer
 		 with real terminal. This is necessary because pseudo
 		 console screen buffer is empty at start. */
-	      /* FIXME: Clearing sequence may not be "^[[H^[[J"
-		 depending on the terminal type. */
-	      DWORD n;
 	      if (get_ttyp ()->num_pcon_attached_slaves == 0
 		  && !ALWAYS_USE_PCON)
 		/* Assume this is the first process using this pty slave. */
-		WriteFile (get_output_handle_cyg (),
-			   "\033[H\033[J", 6, &n, NULL);
+		get_ttyp ()->need_clear_screen = true;
 
 	      get_ttyp ()->num_pcon_attached_slaves ++;
 	    }

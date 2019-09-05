@@ -104,6 +104,7 @@ private:
   pid_t pcon_pid;
   int num_pcon_attached_slaves;
   UINT TermCodePage;
+  bool need_clear_screen;
 
 public:
   HANDLE from_master () const { return _from_master; }

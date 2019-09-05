@@ -243,6 +243,7 @@ tty::init ()
   pcon_pid = 0;
   num_pcon_attached_slaves = 0;
   TermCodePage = 20127; /* ASCII */
+  need_clear_screen = false;
 }
 
 HANDLE
