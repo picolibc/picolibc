@@ -2,6 +2,7 @@
 DIR=`dirname $0`
 meson $DIR \
         -Dtarget-optspace=true \
+        -Dpicolib=false \
 	-Dnewlib-tinystdio=true \
 	-Dnewlib-supplied-syscalls=false \
 	-Dnewlib-reentrant-small=true\

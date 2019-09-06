@@ -4,6 +4,9 @@ option('target-optspace', type: 'boolean', value: false,
 option('multilib', type: 'boolean', value: true,
        description: 'Enable multilib compile')
 
+option('picolib', type: 'boolean', value: true,
+       description: 'Include pico lib bits')
+
 option('hw-fp', type: 'boolean', value: false,
 	description: 'Turn on hardware floating point math')
 

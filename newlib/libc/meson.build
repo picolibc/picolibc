@@ -75,6 +75,10 @@ libdirs = ['argz', 'ctype', 'errno', 'iconv', 'misc', 'search',
 	   'signal', 'ssp', 'stdlib', 'string', 'time',
 	   'xdr', 'locale']
 
+if enable_picolib
+  libdirs += 'picolib'
+endif
+
 if newlib_tinystdio
   libdirs += 'tinystdio'
 else

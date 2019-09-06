@@ -9,6 +9,7 @@ project('picolibc', 'c',
 targets = []
 
 enable_multilib = get_option('multilib')
+enable_picolib = get_option('picolib')
 enable_tests = get_option('tests')
 newlib_tinystdio = get_option('newlib-tinystdio')
 have_alias_attribute_option = get_option('have-alias-attribute')
