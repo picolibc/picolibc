@@ -29,7 +29,6 @@ srcs_string = [
     'strcat.c',
     'strchr.c',
     'strchrnul.c',
-    'strcmp.c',
     'strcoll.c',
     'strcoll_l.c',
     'strcpy.c',
@@ -103,16 +102,36 @@ srcs_string = [
     'wmemset.c',
     'xpg_strerror_r.c',
 ]
+
 hdrs_string = [
     'local.h',
     'str-two-way.h',
 ]
+
+srcs_strcmp = [
+  'strcmp.c'
+]
+
+if fast_strcmp
+  cargs_strcmp = ['-O3']
+else
+  cargs_strcmp = []
+endif
+
 foreach target : targets
 	value = get_variable('target_' + target)
+	set_variable('lib_strcmp' + target,
+		     static_library('strcmp' + target,
+				    srcs_strcmp,
+				    pic: false,
+				    c_args: value[1] + cargs_strcmp,
+				    include_directories: inc))
+	strcmp_objs = get_variable('lib_strcmp' + target).extract_all_objects(recursive:true)
 	set_variable('lib_string' + target,
 		static_library('string' + target,
-			srcs_string,
-			pic: false,
-			include_directories: inc,
-			c_args: value[1]))
+			       srcs_string,
+			       objects: strcmp_objs,
+			       pic: false,
+			       include_directories: inc,
+			       c_args: value[1]))
 endforeach

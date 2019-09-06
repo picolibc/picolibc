@@ -1,6 +1,9 @@
 option('target-optspace', type: 'boolean', value: false,
        description: 'Compile with -Os')
 
+option('fast-strcmp', type: 'boolean', value: true,
+       description: 'Always optimize strcmp for performance')
+
 option('multilib', type: 'boolean', value: true,
        description: 'Enable multilib compile')
 
