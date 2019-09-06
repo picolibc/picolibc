@@ -47,41 +47,14 @@
 #define MAX(a,b) ((a) >= (b) ? (a) : (b))
 #endif
 
-#ifdef INTERNAL_NEWLIB
-
 #include <sys/config.h>
 
 #define MALLOC_LOCK __malloc_lock()
 #define MALLOC_UNLOCK __malloc_unlock()
 
-#define RERRNO __errno_r(reent_ptr)
-
-#define nanomalloc		malloc
-#define nano_free		free
-#define nanoealloc		ealloc
-#define nano_memalign		memalign
-#define nano_valloc		valloc
-#define nano_pvalloc		pvalloc
-#define nano_calloc		calloc
-#define nano_cfree		cfree
-#define nano_malloc_usable_size malloc_usable_size
-#define nano_malloc_stats	malloc_stats
-#define nano_mallinfo		mallinfo
-#define nano_mallopt		mallopt
-
-#else /* ! INTERNAL_NEWLIB */
-
-#define RARG
-#define RONEARG
-#define RCALL
-#define RONECALL
-#define MALLOC_LOCK
-#define MALLOC_UNLOCK
-#define RERRNO errno
-
 #define nano_malloc		malloc
 #define nano_free		free
-#define nano_realloc		realloc
+#define nano_ealloc		ealloc
 #define nano_memalign		memalign
 #define nano_valloc		valloc
 #define nano_pvalloc		pvalloc
@@ -91,7 +64,6 @@
 #define nano_malloc_stats	malloc_stats
 #define nano_mallinfo		mallinfo
 #define nano_mallopt		mallopt
-#endif /* ! INTERNAL_NEWLIB */
 
 /* Redefine names to avoid conflict with user names */
 #define free_list __malloc_free_list
@@ -240,7 +212,7 @@ void * nano_malloc(malloc_size_t s)
 
     if (alloc_size >= MAX_ALLOC_SIZE || alloc_size < s)
     {
-        RERRNO = ENOMEM;
+        errno = ENOMEM;
         return NULL;
     }
 
@@ -289,7 +261,7 @@ void * nano_malloc(malloc_size_t s)
         /* sbrk returns -1 if fail to allocate */
         if (r == (void *)-1)
         {
-            RERRNO = ENOMEM;
+            errno = ENOMEM;
             MALLOC_UNLOCK;
             return NULL;
         }
@@ -403,7 +375,7 @@ void nano_free (void * free_p)
     else if ((char *)p + p->size > (char *)p_to_free)
     {
         /* Report double free fault */
-        RERRNO = ENOMEM;
+        errno = ENOMEM;
         MALLOC_UNLOCK;
         return;
     }

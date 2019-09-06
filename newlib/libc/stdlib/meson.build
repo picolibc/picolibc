@@ -1,9 +1,31 @@
 nano_malloc_srcs_stdlib = [
-  'nano-mallocr.c',
+  'nano-malloc-calloc.c',
+  'nano-malloc-cfree.c',
+  'nano-malloc-free.c',
+  'nano-malloc-mallinco.c',
+  'nano-malloc-malloc.c',
+  'nano-malloc-malloc_stats.c',
+  'nano-malloc-malloc_usable_size.c',
+  'nano-malloc-mallopt.c',
+  'nano-malloc-memalign.c',
+  'nano-malloc-pvalloc.c',
+  'nano-malloc-realloc.c',
+  'nano-malloc-valloc.c',
 ]
 
 std_malloc_srcs_stdlib = [
-  'mallocr.c',
+  'malloc-calloc.c',
+  'malloc-cfree.c',
+  'malloc-free.c',
+  'malloc-mallinco.c',
+  'malloc-malloc.c',
+  'malloc-malloc_stats.c',
+  'malloc-malloc_usable_size.c',
+  'malloc-mallopt.c',
+  'malloc-memalign.c',
+  'malloc-pvalloc.c',
+  'malloc-realloc.c',
+  'malloc-valloc.c',
 ]
 
 std_strtod_srcs_stdlib = [
@@ -150,19 +172,6 @@ hdrs_stdlib = [
     'std.h',
 ]
 
-malloc_defs = [
-  '-DDEFINE_MALLOC',
-  '-DDEFINE_FREE',
-  '-DDEFINE_REALLOC',
-  '-DDEFINE_CALLOC',
-  '-DDEFINE_CFREE',
-  '-DDEFINE_MEMALIGN',
-  '-DDEFINE_VALLOC',
-  '-DDEFINE_PVALLOC',
-  '-DDEFINE_MALLINFO',
-  '-DDEFINE_MALLOC_STATS',
-]
-
 foreach target : targets
 	value = get_variable('target_' + target)
 	set_variable('lib_stdlib' + target,
@@ -170,5 +179,5 @@ foreach target : targets
 			srcs_stdlib,
 			pic: false,
 			include_directories: inc,
-			c_args: value[1] + ['-DINTERNAL_NEWLIB'] + malloc_defs))
+			c_args: value[1] + ['-DINTERNAL_NEWLIB']))
 endforeach
