@@ -156,6 +156,7 @@ DEF_HOOK (WriteConsoleOutputW);
 DEF_HOOK (WriteConsoleOutputCharacterA);
 DEF_HOOK (WriteConsoleOutputCharacterW);
 DEF_HOOK (WriteConsoleOutputAttribute);
+DEF_HOOK (SetConsoleCursorPosition);
 DEF_HOOK (SetConsoleTextAttribute);
 DEF_HOOK (WriteConsoleInputA);
 DEF_HOOK (WriteConsoleInputW);
@@ -240,6 +241,13 @@ WriteConsoleOutputAttribute_Hooked
 {
   set_ishybrid_and_switch_to_pcon (h);
   return WriteConsoleOutputAttribute_Orig (h, a, l, c, n);
+}
+static BOOL WINAPI
+SetConsoleCursorPosition_Hooked
+     (HANDLE h, COORD c)
+{
+  set_ishybrid_and_switch_to_pcon (h);
+  return SetConsoleCursorPosition_Orig (h, c);
 }
 static BOOL WINAPI
 SetConsoleTextAttribute_Hooked
@@ -2952,6 +2960,7 @@ fhandler_pty_slave::fixup_after_exec ()
       DO_HOOK (NULL, WriteConsoleOutputCharacterA);
       DO_HOOK (NULL, WriteConsoleOutputCharacterW);
       DO_HOOK (NULL, WriteConsoleOutputAttribute);
+      DO_HOOK (NULL, SetConsoleCursorPosition);
       DO_HOOK (NULL, SetConsoleTextAttribute);
       DO_HOOK (NULL, WriteConsoleInputA);
       DO_HOOK (NULL, WriteConsoleInputW);
