@@ -75,7 +75,6 @@ PORTABILITY
 
 #include <newlib.h>
 #include <errno.h>
-#include <reent.h>
 #include <stdlib.h>
 #include "setlocale.h"
 

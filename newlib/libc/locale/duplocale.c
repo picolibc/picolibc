@@ -35,7 +35,6 @@ PORTABILITY
 */
 
 #include <newlib.h>
-#include <reent.h>
 #include <stdlib.h>
 #include "setlocale.h"
 
