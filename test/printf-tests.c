@@ -7,8 +7,6 @@
 #include <stdarg.h>
 #include <string.h>
 
-#include "stdio-bits.c"
-
 static char buf[1024];
 
 static void failmsg(int serial, char *fmt, ...) {
