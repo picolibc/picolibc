@@ -33,34 +33,56 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "../../crt0.h"
+#include <string.h>
+#include <picotls.h>
 
-static void *__tls;
+extern char __data_source__[];
+extern char __data_start__[];
+extern char __data_end__[];
+extern char __bss_start__[];
+extern char __bss_end__[];
 
-void *
-__aeabi_read_tp(void)
-{
-	return __tls;
-}
+/* These two functions must be defined in the architecture-specific
+ * code
+ */
 
 void
-_set_tls(void *tls)
-{
-	__tls = tls;
-}
+_set_tls(void  *tls);
 
 int
-_start(void)
-{
-#ifndef __SOFTFP__
-#define FPSCR_FZ		(1 << 24)
+_start(void);
 
-	unsigned int fpscr_save;
+/* This is the application entry point */
+int
+main(void);
 
-	/* Set the FZ (flush-to-zero) bit in FPSCR.  */
-	__asm__("vmrs %0, fpscr" : "=r" (fpscr_save));
-	fpscr_save |= FPSCR_FZ;
-	__asm__("vmsr fpscr, %0" : : "r" (fpscr_save));
+#ifdef HAVE_INITFINI_ARRAY
+extern void __libc_init_array(void);
+extern void __libc_fini_array(void);
 #endif
-	__start();
+
+/* After the architecture-specific chip initialization is done, this
+ * function initializes the data and bss segments. Note that a static
+ * block of TLS data is carefully interleaved with the regular data
+ * and bss segments in picolibc.ld so that this one operation
+ * initializes both. Then it runs the application code, starting with
+ * any initialization functions, followed by the main application
+ * entry point and finally any cleanup functions
+ */
+
+static inline void
+__start(void)
+{
+	memcpy(__data_start__, __data_source__,
+	       __data_end__ - __data_start__);
+	memset(__bss_start__, '\0',
+	       __bss_end__ - __bss_start__);
+	_set_tls(__tls_base__);
+#ifdef HAVE_INITFINI_ARRAY
+	__libc_init_array();
+#endif
+	main();
+#ifdef HAVE_INITFINI_ARRAY
+	__libc_fini_array();
+#endif
 }

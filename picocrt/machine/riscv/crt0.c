@@ -1,12 +1,39 @@
-#include <string.h>
+/*
+ * SPDX-License-Identifier: BSD-3-Clause
+ *
+ * Copyright © 2019 Keith Packard
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ *
+ * 1. Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions and the following disclaimer.
+ *
+ * 2. Redistributions in binary form must reproduce the above
+ *    copyright notice, this list of conditions and the following
+ *    disclaimer in the documentation and/or other materials provided
+ *    with the distribution.
+ *
+ * 3. Neither the name of the copyright holder nor the names of its
+ *    contributors may be used to endorse or promote products derived
+ *    from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+ * FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+ * COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+ * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+ * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
+ * STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
+ * OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
 
-extern int main(void);
-
-extern char __data_source__[];
-extern char __data_start__[];
-extern char __data_end__[];
-extern char __bss_start__[];
-extern char __bss_end__[];
+#include "../../crt0.h"
 
 void
 _set_tls(void *tls)
@@ -14,41 +41,9 @@ _set_tls(void *tls)
 	asm("la tp, %0" : "=r" (tls));
 }
 
-extern char __tls_base__[];
-extern char __tbss_size__[];
-extern char __tdata_size__[];
-extern char __tdata_source__[];
-extern char __tdata_size__[];
-
-void
-_init_tls(void *__tls)
-{
-	char *tls = __tls;
-	/* Copy tls initialized data */
-	memcpy(tls - (int) &__tdata_size__, __tdata_source__, (int) &__tdata_size__);
-	/* Clear tls zero data */
-	memset(tls, '\0', (int) &__tbss_size__);
-}
-
-#ifdef HAVE_INITFINI_ARRAY
-extern void __libc_init_array(void);
-extern void __libc_fini_array(void);
-#endif
-
 int
 _start(void)
 {
 	asm("la gp, __global_pointer$");
-	memcpy(__data_start__, __data_source__,
-	       __data_end__ - __data_start__);
-	memset(__bss_start__, '\0',
-	       __bss_end__ - __bss_start__);
-	_set_tls(__tls_base__);
-#ifdef HAVE_INITFINI_ARRAY
-	__libc_init_array();
-#endif
-	main();
-#ifdef HAVE_INITFINI_ARRAY
-	__libc_fini_array();
-#endif
+	__start();
 }

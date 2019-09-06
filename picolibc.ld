@@ -1,9 +1,44 @@
+/*
+ * SPDX-License-Identifier: BSD-3-Clause
+ *
+ * Copyright © 2019 Keith Packard
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ *
+ * 1. Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions and the following disclaimer.
+ *
+ * 2. Redistributions in binary form must reproduce the above
+ *    copyright notice, this list of conditions and the following
+ *    disclaimer in the documentation and/or other materials provided
+ *    with the distribution.
+ *
+ * 3. Neither the name of the copyright holder nor the names of its
+ *    contributors may be used to endorse or promote products derived
+ *    from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+ * FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+ * COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+ * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+ * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
+ * STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
+ * OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+
 ENTRY(_start)
 
 MEMORY
 {
-	flash (rxai!w) : ORIGIN = DEFINED(__flash) ? __flash : 0x20400000, LENGTH = DEFINED(__flash_size) ? __flash_size : 0x1fc00000
-	ram (wxa!ri) : ORIGIN = DEFINED(__ram) ? __ram : 0x80000000, LENGTH = DEFINED(__ram_size) ? __ram_size : 0x4000
+	flash (rxai!w) : ORIGIN = __flash, LENGTH = __flash_size
+	ram (wxa!ri) : ORIGIN = __ram, LENGTH = __ram_size
 }
 
 PHDRS
@@ -16,10 +51,13 @@ PHDRS
 
 SECTIONS
 {
-	__ram_size = DEFINED(__ram_size) ? __ram_size : 0x4000;
-	__flash_size = DEFINED(__flash_size) ? __flash_size : 0x8000;
+	__flash = DEFINED(__flash) ? __flash : 0x10000000;
+	__flash_size = DEFINED(__flash_size) ? __flash_size : 0x10000;
+
+	__ram = DEFINED(__ram) ? __ram : 0x20000000;
+	__ram_size = DEFINED(__ram_size) ? __ram_size : 0x8000;
+
 	__stack_size = DEFINED(__stack_size) ? __stack_size : 0x400;
-	__heap_size = DEFINED(__heap_size) ? __heap_size : 0x400;
 
 	PROVIDE(__stack_size = __stack_size);
 	PROVIDE(__stack__ = ORIGIN(ram) + __ram_size);
@@ -130,6 +168,7 @@ SECTIONS
 		PROVIDE(__tls_base__ = .);
 	} >ram
 
+	PROVIDE( __edata = . );
 	PROVIDE( _edata = . );
 	PROVIDE( edata = . );
 	PROVIDE(__data_end__ = .);
@@ -151,8 +190,12 @@ SECTIONS
 		*(.gnu.linkonce.b.*)
 		*(COMMON)
 	} >ram AT>ram :ram
+	PROVIDE( __end = . );
 	PROVIDE( _end = . );
 	PROVIDE( end = . );
 	PROVIDE( __bss_end__ = . );
+
+	PROVIDE( __heap_end = __ram + __ram_size );
+	PROVIDE( __heap_size = __heap_end - __end );
 }
 
