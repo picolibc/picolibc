@@ -219,6 +219,8 @@ configure_file(output : '_newlib_version.h',
 arguments = ['-g', '-ffunction-sections', '-fdata-sections']
 if target_optspace
   arguments += '-Os'
+else
+  arguments += '-O3'
 endif
 
 add_project_arguments(arguments, language: 'c')
