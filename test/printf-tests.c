@@ -44,6 +44,5 @@ static int test(int serial, char *expect, char *fmt, ...) {
 int main() {
     int result = 0;
 #include "testcases.c"
-    fflush(stdout);
     return result;
 }

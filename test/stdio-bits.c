@@ -57,6 +57,12 @@ ao_getc(FILE *ignore)
 	return (unsigned char) read_buf[read_off++];
 }
 
+__attribute__((destructor))
+static void ao_exit(void)
+{
+	ao_flush(stdout);
+}
+
 static FILE __stdio = {
 	.flags = __SRD|__SWR,
 	.put = ao_putc,
