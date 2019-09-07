@@ -4,14 +4,10 @@ FUNCTION
 
 INDEX
 	signal
-INDEX
-	_signal_r
 
 SYNOPSIS
 	#include <signal.h>
 	void (*signal(int <[sig]>, void(*<[func]>)(int))) (int);
-
-	void (*_signal_r(void *<[reent]>, int <[sig]>, void(*<[func]>)(int))) (int);
 
 DESCRIPTION
 <<signal>> provides a simple signal-handling implementation for embedded
@@ -38,9 +34,6 @@ return), your program's execution continues at the point
 where it was when the signal was raised (whether by your program
 itself, or by an external event).  Signal handlers can also
 use functions such as <<exit>> and <<abort>> to avoid returning.
-
-The alternate function <<_signal_r>> is the reentrant version.
-The extra argument <[reent]> is a pointer to a reentrancy structure.
 
 @c FIXME: do we have setjmp.h and assoc fns?
 
