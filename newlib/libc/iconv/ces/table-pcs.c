@@ -33,7 +33,6 @@
  || defined (ICONV_FROM_UCS_CES_TABLE_PCS)
 
 #include <_ansi.h>
-#include <reent.h>
 #include <sys/types.h>
 #include "../lib/local.h"
 #include "../lib/ucsconv.h"
@@ -64,17 +63,17 @@ table_pcs_convert_from_ucs (void *data,
 }
 
 static void *
-table_pcs_from_ucs_init (struct _reent *rptr,
+table_pcs_from_ucs_init (
                                 const char *encoding)
 {
-  return _iconv_from_ucs_ces_handlers_table.init (rptr, encoding);
+  return _iconv_from_ucs_ces_handlers_table.init (encoding);
 }
 
 static size_t
-table_pcs_from_ucs_close (struct _reent *rptr,
+table_pcs_from_ucs_close (
                                  void *data)
 {
-  return _iconv_from_ucs_ces_handlers_table.close (rptr, data);
+  return _iconv_from_ucs_ces_handlers_table.close (data);
 }
 
 static int
@@ -108,17 +107,17 @@ table_pcs_convert_to_ucs (void *data,
 }
 
 static void *
-table_pcs_to_ucs_init (struct _reent *rptr,
+table_pcs_to_ucs_init (
                               const char *encoding)
 {
-  return _iconv_to_ucs_ces_handlers_table.init (rptr, encoding);
+  return _iconv_to_ucs_ces_handlers_table.init (encoding);
 }
 
 static size_t
-table_pcs_to_ucs_close (struct _reent *rptr,
+table_pcs_to_ucs_close (
                                void *data)
 {
-  return _iconv_to_ucs_ces_handlers_table.close (rptr, data);
+  return _iconv_to_ucs_ces_handlers_table.close (data);
 }
 
 static int

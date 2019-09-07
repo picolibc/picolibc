@@ -32,14 +32,22 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
-srcs_iconv = [
-]
+libdirs = ['ces', 'ccs', 'lib']
+
+foreach libdir : libdirs
+  subdir(libdir)
+endforeach
+
 foreach target : targets
-	value = get_variable('target_' + target)
+  value = get_variable('target_' + target)
+  libobjs = []
+  foreach libname : libdirs
+    libobjs += get_variable('lib_' + libname + target).extract_all_objects(recursive:true)
+  endforeach
+  
 	set_variable('lib_iconv' + target,
 		static_library('iconv' + target,
-			srcs_iconv,
-			pic: false,
-			include_directories: inc,
-			c_args: value[1]))
+			       objects : libobjs,
+			       pic: false))
 endforeach
+

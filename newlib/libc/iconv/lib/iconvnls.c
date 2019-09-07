@@ -23,7 +23,6 @@
  * SUCH DAMAGE.
  */
 #include <_ansi.h>
-#include <reent.h>
 #include <newlib.h>
 #include <sys/types.h>
 #include <string.h>
@@ -45,7 +44,6 @@
  * _iconv_nls_construct_filename -- constructs full file name. 
  *
  * PARAMETERS:
- *   struct _reent *rptr - reent structure of current thread/process.  
  *   const char *file   - the name of file.
  *   const char *dir    - the name of subdirectory;
  *   const char *ext    - file extension.
@@ -59,7 +57,7 @@
  *   and sets current thread's/process's errno.
  */
 const char *
-_iconv_nls_construct_filename (struct _reent *rptr,
+_iconv_nls_construct_filename (
                                       const char *file,
                                       const char *dir,
                                       const char *ext)
@@ -69,14 +67,14 @@ _iconv_nls_construct_filename (struct _reent *rptr,
   char *p;
   int dirlen = strlen (dir);
     
-  if ((path = _getenv_r (rptr, NLS_ENVVAR_NAME)) == NULL || *path == '\0')
+  if ((path = getenv (NLS_ENVVAR_NAME)) == NULL || *path == '\0')
     path = ICONV_DEFAULT_NLSPATH;
 
   len1 = strlen (path);
   len2 = strlen (file);
   len3 = strlen (ext);
 
-  if ((p = _malloc_r (rptr, len1 + dirlen + len2 + len3 + 3)) == NULL)
+  if ((p = malloc (len1 + dirlen + len2 + len3 + 3)) == NULL)
     return (const char *)NULL;
 
   memcpy (p, path, len1);
@@ -163,7 +161,7 @@ _iconv_nls_is_stateful (iconv_t cd,
  *    Same as _iconv_r.
  */
 size_t
-_iconv_nls_conv (struct _reent *rptr,
+_iconv_nls_conv (
                         iconv_t cd,
                         const char **inbuf,
                         size_t *inbytesleft,
@@ -177,7 +175,7 @@ _iconv_nls_conv (struct _reent *rptr,
        || (ic->handlers != &_iconv_null_conversion_handlers
            && ic->handlers != &_iconv_ucs_conversion_handlers))
     {
-      __errno_r (rptr) = EBADF;
+      errno = EBADF;
       return (size_t)-1;
     }
   
@@ -189,11 +187,11 @@ _iconv_nls_conv (struct _reent *rptr,
   
   if (outbytesleft == NULL || *outbytesleft == 0)
     {
-      __errno_r (rptr) = E2BIG;
+      errno = E2BIG;
       return (size_t)-1;
     }
 
-  return ic->handlers->convert (rptr,
+  return ic->handlers->convert (
                                 ic->data,
                                 (const unsigned char**)inbuf,
                                 inbytesleft,
@@ -253,7 +251,7 @@ _iconv_nls_set_state (iconv_t cd,
 
 /* Same as iconv_open() but don't perform name resolving */
 static iconv_t
-iconv_open1 (struct _reent *rptr,
+iconv_open1 (
                      const char *to,
                      const char *from)
 {
@@ -262,7 +260,7 @@ iconv_open1 (struct _reent *rptr,
   if (to == NULL || from == NULL || *to == '\0' || *from == '\0')
     return (iconv_t)-1;
 
-  ic = (iconv_conversion_t *)_malloc_r (rptr, sizeof (iconv_conversion_t));
+  ic = (iconv_conversion_t *)malloc (sizeof (iconv_conversion_t));
   if (ic == NULL)
     return (iconv_t)-1;
 
@@ -271,18 +269,18 @@ iconv_open1 (struct _reent *rptr,
     {
       /* Use null conversion */
       ic->handlers = &_iconv_null_conversion_handlers;
-      ic->data = ic->handlers->open (rptr, to, from);
+      ic->data = ic->handlers->open (to, from);
     }
   else  
     {
       /* Use UCS-based conversion */
       ic->handlers = &_iconv_ucs_conversion_handlers;
-      ic->data = ic->handlers->open (rptr, to, from);
+      ic->data = ic->handlers->open (to, from);
     }
 
   if (ic->data == NULL)
     {
-      _free_r (rptr, (void *)ic);
+      free ((void *)ic);
       return (iconv_t)-1;
     }
 
@@ -293,7 +291,6 @@ iconv_open1 (struct _reent *rptr,
  * _iconv_nls_open - open iconv descriptors for NLS.
  *
  * PARAMETERS:
- *     struct _reent *rptr - process's reent structure;
  *     const char *encoding - encoding name;
  *     iconv_t *tomb - wchar -> encoding iconv descriptor pointer;
  *     iconv_t *towc - encoding -> wchar iconv descriptor pointer;
@@ -309,7 +306,7 @@ iconv_open1 (struct _reent *rptr,
  *     If successful - return 0, else set errno and return -1.
  */
 int
-_iconv_nls_open (struct _reent *rptr,
+_iconv_nls_open (
                         const char *encoding,
                         iconv_t *tomb,
                         iconv_t *towc,
@@ -326,23 +323,23 @@ _iconv_nls_open (struct _reent *rptr,
 
   if (flag)
     {
-      if ((*towc = _iconv_open_r (rptr, wchar_encoding, encoding)) == (iconv_t)-1)
+      if ((*towc = iconv_open (wchar_encoding, encoding)) == (iconv_t)-1)
         return -1;
     
-      if ((*tomb = _iconv_open_r (rptr, encoding, wchar_encoding)) == (iconv_t)-1)
+      if ((*tomb = iconv_open (encoding, wchar_encoding)) == (iconv_t)-1)
       {
-        _iconv_close_r (rptr, *towc);
+        iconv_close (*towc);
         return -1;
       }
     }
   else
     {
-      if ((*towc = iconv_open1 (rptr, wchar_encoding, encoding)) == (iconv_t)-1)
+      if ((*towc = iconv_open1 (wchar_encoding, encoding)) == (iconv_t)-1)
         return -1;
     
-      if ((*tomb = iconv_open1 (rptr, encoding, wchar_encoding)) == (iconv_t)-1)
+      if ((*tomb = iconv_open1 (encoding, wchar_encoding)) == (iconv_t)-1)
       {
-        _iconv_close_r (rptr, *towc);
+        iconv_close (*towc);
         return -1;
       }
     }

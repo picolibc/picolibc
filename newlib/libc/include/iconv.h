@@ -47,16 +47,6 @@ int
 iconv_close (iconv_t);
 #endif
 
-iconv_t
-_iconv_open_r (struct _reent *, const char *, const char *);
-
-size_t
-_iconv_r (struct _reent *, iconv_t, const char **,
-                  size_t *, char **, size_t *);
-
-int
-_iconv_close_r (struct _reent *, iconv_t);
-
 _END_STD_C
 
 #endif /* #ifndef _ICONV_H_ */

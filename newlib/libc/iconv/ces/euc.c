@@ -29,7 +29,6 @@
  || defined (ICONV_FROM_UCS_CES_EUC)
 
 #include <_ansi.h>
-#include <reent.h>
 #include <newlib.h>
 #include <string.h>
 #include <stdlib.h>
@@ -101,13 +100,13 @@ static euc_cs_desc_t euc_kr_cs_desc [] =
 
 #if defined (ICONV_FROM_UCS_CES_EUC)
 static void *
-euc_from_ucs_init (struct _reent *rptr,
+euc_from_ucs_init (
                           const char *encoding)
 {
   int i;
   euc_data_t *data;
 
-  if ((data = (euc_data_t *)_calloc_r (rptr, 1, sizeof (euc_data_t))) == NULL)
+  if ((data = (euc_data_t *)calloc (1, sizeof (euc_data_t))) == NULL)
     return 0;
   
 #if defined (_ICONV_TO_ENCODING_EUC_JP) \
@@ -147,7 +146,6 @@ ok:
   for (i = 0; data->desc[i].csname != NULL; i++)
     {
       data->data[i] = _iconv_from_ucs_ces_handlers_table.init (
-                                                        rptr,
                                                         data->desc[i].csname);
       if (data->data == NULL)
         goto error;
@@ -156,15 +154,15 @@ ok:
   return data;
     
 error:
-  _iconv_from_ucs_ces_handlers_table.close (rptr, data);
+  _iconv_from_ucs_ces_handlers_table.close (data);
   return NULL;
 error1:
-  _free_r (rptr, (void *)data);
+  free ((void *)data);
   return NULL;
 }
 
 static size_t
-euc_from_ucs_close (struct _reent *rptr,
+euc_from_ucs_close (
                            void *data)
 {
   int i;
@@ -174,10 +172,9 @@ euc_from_ucs_close (struct _reent *rptr,
     {
       if (((euc_data_t *)data)->data[i] != NULL)
         res |= _iconv_from_ucs_ces_handlers_table.close (
-                                                rptr,
                                                 ((euc_data_t *)data)->data[i]);
     }
-  _free_r(rptr, data);
+  free(data);
 
   return res;
 }
@@ -258,13 +255,13 @@ euc_convert_from_ucs (void *data,
 
 #if defined (ICONV_TO_UCS_CES_EUC)
 static void *
-euc_to_ucs_init (struct _reent *rptr,
+euc_to_ucs_init (
                         const char *encoding)
 {
   int i;
   euc_data_t *data;
 
-  if ((data = (euc_data_t *)_calloc_r (rptr, 1, sizeof (euc_data_t))) == NULL)
+  if ((data = (euc_data_t *)calloc (1, sizeof (euc_data_t))) == NULL)
     return 0;
   
 #if defined (_ICONV_TO_ENCODING_EUC_JP) \
@@ -304,7 +301,6 @@ ok:
   for (i = 0; data->desc[i].csname != NULL; i++)
     {
       data->data[i] = _iconv_to_ucs_ces_handlers_table.init (
-                                                        rptr,
                                                         data->desc[i].csname);
       if (data->data == NULL)
         goto error;
@@ -313,15 +309,15 @@ ok:
   return data;
     
 error:
-  _iconv_to_ucs_ces_handlers_table.close (rptr, data);
+  _iconv_to_ucs_ces_handlers_table.close (data);
   return NULL;
 error1:
-  _free_r (rptr, (void *)data);
+  free ((void *)data);
   return NULL;
 }
 
 static size_t
-euc_to_ucs_close (struct _reent *rptr,
+euc_to_ucs_close (
                          void *data)
 {
   int i;
@@ -331,10 +327,9 @@ euc_to_ucs_close (struct _reent *rptr,
     {
       if (((euc_data_t *)data)->data[i] != NULL)
         res |= _iconv_to_ucs_ces_handlers_table.close (
-                                                rptr,
                                                 ((euc_data_t *)data)->data[i]);
     }
-  _free_r(rptr, data);
+  free(data);
 
   return res;
 }

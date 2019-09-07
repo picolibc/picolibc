@@ -29,7 +29,6 @@
  || defined (ICONV_FROM_UCS_CES_TABLE)
  
 #include <_ansi.h>
-#include <reent.h>
 #include <newlib.h>
 #include <sys/types.h>
 #include <string.h>
@@ -67,28 +66,28 @@ find_code_speed_8bit (ucs2_t code, const unsigned char *tblp);
 
 #ifdef _ICONV_ENABLE_EXTERNAL_CCS
 static const iconv_ccs_desc_t *
-load_file (struct _reent *rptr, const char *name, int direction);
+load_file (const char *name, int direction);
 #endif
 
 /*
  * Interface data and functions implementation.
  */
 static size_t
-table_close (struct _reent *rptr,
+table_close (
                     void *data)
 {
   const iconv_ccs_desc_t *ccsp = (iconv_ccs_desc_t *)data;
 
   if (ccsp->type == TABLE_EXTERNAL)
-    _free_r (rptr, (void *)ccsp->tbl);
+    free ((void *)ccsp->tbl);
 
-  _free_r( rptr, (void *)ccsp);
+  free((void *)ccsp);
   return 0;
 }
 
 #if defined (ICONV_FROM_UCS_CES_TABLE)
 static void *
-table_init_from_ucs (struct _reent *rptr,
+table_init_from_ucs (
                             const char *encoding)
 {
   int i;
@@ -106,7 +105,7 @@ table_init_from_ucs (struct _reent *rptr,
     {
       if (biccsp->from_ucs == NULL
           || (ccsp = (iconv_ccs_desc_t *)
-                     _malloc_r (rptr, sizeof (iconv_ccs_desc_t))) == NULL)
+                     malloc (sizeof (iconv_ccs_desc_t))) == NULL)
         return NULL;
 
       ccsp->type = TABLE_BUILTIN;
@@ -118,7 +117,7 @@ table_init_from_ucs (struct _reent *rptr,
     }
     
 #ifdef _ICONV_ENABLE_EXTERNAL_CCS
-  return (void *)load_file (rptr, encoding, 1);
+  return (void *)load_file (encoding, 1);
 #else
   return NULL;
 #endif
@@ -169,7 +168,7 @@ table_convert_from_ucs (void *data,
 
 #if defined (ICONV_TO_UCS_CES_TABLE)
 static void *
-table_init_to_ucs (struct _reent *rptr,
+table_init_to_ucs (
                           const char *encoding)
 {
   int i;
@@ -187,7 +186,7 @@ table_init_to_ucs (struct _reent *rptr,
     {
       if (biccsp->to_ucs == NULL
           || (ccsp = (iconv_ccs_desc_t *)
-                     _malloc_r (rptr, sizeof (iconv_ccs_desc_t))) == NULL)
+                     malloc (sizeof (iconv_ccs_desc_t))) == NULL)
         return NULL;
 
       ccsp->type = TABLE_BUILTIN;
@@ -199,7 +198,7 @@ table_init_to_ucs (struct _reent *rptr,
     }
   
 #ifdef _ICONV_ENABLE_EXTERNAL_CCS
-  return (void *)load_file (rptr, encoding, 0);
+  return (void *)load_file (encoding, 0);
 #else
   return NULL;
 #endif
@@ -437,7 +436,6 @@ find_code_size (ucs2_t code,
  *             iconv_ccs_desc_t object.
  *
  * PARAMETERS:
- *    struct _reent *rptr - reent structure of current thread/process.
  *    const char *name - encoding name.
  *    int direction - conversion direction.
  *
@@ -451,7 +449,7 @@ find_code_size (ucs2_t code,
  *    iconv_ccs_desc_t * pointer is success, NULL if failure.
  */
 static const iconv_ccs_desc_t *
-load_file (struct _reent *rptr,
+load_file (
                   const char *name,
                   int direction)
 {
@@ -470,17 +468,17 @@ load_file (struct _reent *rptr,
   
   hdrlen = nmlen + EXTTABLE_HEADER_LEN + alignment;
 
-  if ((fname = _iconv_nls_construct_filename (rptr, name, ICONV_SUBDIR,
+  if ((fname = _iconv_nls_construct_filename (name, ICONV_SUBDIR,
                                               ICONV_DATA_EXT)) == NULL)
     return NULL;
   
-  if ((fd = _open_r (rptr, fname, O_RDONLY, S_IRUSR)) == -1)
+  if ((fd = open (fname, O_RDONLY, S_IRUSR)) == -1)
     goto error1;
   
-  if ((buf = (const unsigned char *)_malloc_r (rptr, hdrlen)) == NULL)
+  if ((buf = (const unsigned char *)malloc (hdrlen)) == NULL)
     goto error2;
 
-  if (_read_r (rptr, fd, (void *)buf, hdrlen) != hdrlen)
+  if (read (fd, (void *)buf, hdrlen) != hdrlen)
     goto error3;
 
   if (_16BIT_ELT (EXTTABLE_VERSION_OFF) != TABLE_VERSION_1
@@ -489,7 +487,7 @@ load_file (struct _reent *rptr,
     goto error3; /* Bad file */
 
   if ((ccsp = (iconv_ccs_desc_t *)
-           _calloc_r (rptr, 1, sizeof (iconv_ccs_desc_t))) == NULL)
+           calloc (1, sizeof (iconv_ccs_desc_t))) == NULL)
     goto error3;
   
   ccsp->bits = _16BIT_ELT (EXTTABLE_BITS_OFF);
@@ -545,37 +543,37 @@ load_file (struct _reent *rptr,
   if (off == EXTTABLE_NO_TABLE)
     goto error4; /* No correspondent table in file */
 
-  if ((ccsp->tbl = (ucs2_t *)_malloc_r (rptr, tbllen)) == NULL)
+  if ((ccsp->tbl = (ucs2_t *)malloc (tbllen)) == NULL)
     goto error4;
 
-  if (_lseek_r (rptr, fd, off, SEEK_SET) == (off_t)-1
-      || _read_r (rptr, fd, (void *)ccsp->tbl, tbllen) != tbllen)
+  if (lseek (fd, off, SEEK_SET) == (off_t)-1
+      || read (fd, (void *)ccsp->tbl, tbllen) != tbllen)
     goto error5;
 
   goto normal_exit;
 
 error5:
-  _free_r (rptr, (void *)ccsp->tbl);
+  free ((void *)ccsp->tbl);
   ccsp->tbl = NULL;
 error4:
-  _free_r (rptr, (void *)ccsp);
+  free ((void *)ccsp);
   ccsp = NULL;
 error3:
 normal_exit:
-  _free_r (rptr, (void *)buf);
+  free ((void *)buf);
 error2:
-  if (_close_r (rptr, fd) == -1)
+  if (close (fd) == -1)
     {
       if (ccsp != NULL)
         {
           if (ccsp->tbl != NULL)
-            _free_r (rptr, (void *)ccsp->tbl);
-          _free_r (rptr, (void *)ccsp);
+            free ((void *)ccsp->tbl);
+          free ((void *)ccsp);
         }
       ccsp = NULL;
     }
 error1:
-  _free_r (rptr, (void *)fname);
+  free ((void *)fname);
   return ccsp;
 }
 #endif

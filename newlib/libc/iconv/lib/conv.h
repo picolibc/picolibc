@@ -50,7 +50,6 @@ typedef struct
    * open - open and initialize conversion.
    *
    * PARAMETERS:
-   *   struct _reent *rptr - reent structure of current thread/process;
    *   const char *to     - output encoding's normalized name;
    *   const char *from   - input encoding's normalized name.
    * 
@@ -62,7 +61,7 @@ typedef struct
    *   Pointer to conversion-specific data if success. In case of error
    *   returns NULL and sets current thread's/process's errno.
    */
-  void *(*open) (struct _reent *rptr,
+  void *(*open) (
                           const char *to,
                           const char *from);
   
@@ -70,7 +69,6 @@ typedef struct
    * close - close conversion.
    *
    * PARAMETRS:
-   *   struct _reent *rptr - reent structure of current thread/process;
    *   void *data      - conversion-specific data.
    *
    * DESCRIPTION:
@@ -80,13 +78,12 @@ typedef struct
    *   When successful, returns (size_t)0. In case of error, sets current
    *   thread's/process's errno and returns (size_t)-1 (same as iconv_open()).
    */
-  size_t (*close) (struct _reent *rptr,
+  size_t (*close) (
                         void *data);
   
   /* convert - perform encoding conversion.
    *
    * PARAMETERS:
-   *   struct _reent *rptr - reent structure of current thread/process.
    *   void *data      - conversion-specific data;
    *   const unsigned char **inbuf - input data buffer;
    *   size_t *inbytesleft          - input buffer's length;
@@ -113,7 +110,7 @@ typedef struct
    *   Reversible conversions are not counted. In case of error, sets current
    *   thread's/process's errno and returns (size_t)-1 (same as iconv()).
    */
-  size_t (*convert) (struct _reent *rptr,
+  size_t (*convert) (
                            void *data,
                            const unsigned char **inbuf,
                            size_t *inbytesleft,
