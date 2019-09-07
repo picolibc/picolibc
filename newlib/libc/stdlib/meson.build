@@ -130,7 +130,6 @@ srcs_stdlib = [
     'mrand48.c',
     'mstats.c',
     'nrand48.c',
-    'on_exit_args.c',
     'on_exit.c',
     'putenv.c',
     'quick_exit.c',

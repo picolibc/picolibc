@@ -43,7 +43,7 @@ Supporting OS subroutines required: <<_exit>>.
 #include <stdlib.h>
 #include <unistd.h>	/* for _exit() declaration */
 #ifndef TINY_STDIO
-#include <reent.h>
+#include <stdio.h>
 #endif
 #include "atexit.h"
 
