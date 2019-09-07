@@ -34,7 +34,6 @@
 #
 srcs_signal = [
     'psignal.c',
-    'raise.c',
     'signal.c',
 ]
 foreach target : targets
