@@ -540,7 +540,6 @@ Supporting OS subroutines required: <<close>>, <<fstat>>, <<isatty>>,
 
 
 #include <_ansi.h>
-#include <reent.h>
 #include <stdio.h>
 #include <wchar.h>
 #include <stdarg.h>

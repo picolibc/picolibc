@@ -46,7 +46,6 @@ Supporting OS subroutines required: <<sbrk>>, <<write>>.
 */
 
 #include <_ansi.h>
-#include <reent.h>
 #include <stdio.h>
 #include <unistd.h>
 #include <stdarg.h>

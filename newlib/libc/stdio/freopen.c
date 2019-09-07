@@ -60,7 +60,6 @@ Supporting OS subroutines required: <<close>>, <<fstat>>, <<isatty>>,
 */
 
 #include <_ansi.h>
-#include <reent.h>
 #include <time.h>
 #include <stdio.h>
 #include <string.h>

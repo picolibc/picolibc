@@ -44,7 +44,6 @@ PORTABILITY
 */
 
 #include <_ansi.h>
-#include <reent.h>
 #include <sys/types.h>
 #include <sys/fcntl.h>
 #include <stdio.h>

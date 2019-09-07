@@ -17,7 +17,6 @@
 /* No user fns here.  Pesch 15apr92. */
 
 #include <_ansi.h>
-#include <reent.h>
 #include <stdio.h>
 #include <sys/types.h>
 #include <fcntl.h>

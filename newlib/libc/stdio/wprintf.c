@@ -17,7 +17,6 @@
 /* doc in swprintf.c */
 
 #include <_ansi.h>
-#include <reent.h>
 #include <stdio.h>
 #include <wchar.h>
 #include <stdarg.h>

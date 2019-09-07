@@ -74,12 +74,10 @@ The global pointer <<environ>> is also required.
 */
 
 #include <_ansi.h>
-#include <reent.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <fcntl.h>
-#include <reent.h>
 #include <errno.h>
 #include <unistd.h>
 

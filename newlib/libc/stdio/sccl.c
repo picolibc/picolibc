@@ -18,7 +18,6 @@
 /* Split from vfscanf.c  */
 
 #include <_ansi.h>
-#include <reent.h>
 #include <newlib.h>
 #include <stdio.h>
 #include "local.h"

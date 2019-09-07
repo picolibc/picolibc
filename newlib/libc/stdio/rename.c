@@ -47,7 +47,6 @@ Supporting OS subroutines required: <<link>>, <<unlink>>, or <<rename>>.
 */
 
 #include <_ansi.h>
-#include <reent.h>
 #include <stdio.h>
 #include <sys/unistd.h>
 

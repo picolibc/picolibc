@@ -79,7 +79,6 @@ PORTABILITY
 */
 
 #include <_ansi.h>
-#include <reent.h>
 #include <stdio.h>
 #include <wchar.h>
 #include "local.h"

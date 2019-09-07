@@ -18,7 +18,6 @@
 /* This code created by modifying sprintf.c so copyright inherited. */
 
 #include <_ansi.h>
-#include <reent.h>
 #include <stdio.h>
 #include <stdarg.h>
 #include <limits.h>

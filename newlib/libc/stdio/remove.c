@@ -55,7 +55,6 @@ Supporting OS subroutine required: <<unlink>>.
 */
 
 #include <_ansi.h>
-#include <reent.h>
 #include <stdio.h>
 #include <unistd.h>
 

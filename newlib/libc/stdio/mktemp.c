@@ -130,7 +130,6 @@ Supporting OS subroutines required: <<getpid>>, <<mkdir>>, <<open>>, <<stat>>.
 
 #include <_ansi.h>
 #include <stdlib.h>
-#include <reent.h>
 #include <sys/types.h>
 #include <fcntl.h>
 #include <sys/stat.h>

@@ -117,7 +117,6 @@ PORTABILITY
 */
 
 #include <_ansi.h>
-#include <reent.h>
 #include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
