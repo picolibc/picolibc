@@ -32,9 +32,6 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
-option('target-optspace', type: 'boolean', value: false,
-       description: 'Compile with -Os')
-
 option('fast-strcmp', type: 'boolean', value: true,
        description: 'Always optimize strcmp for performance')
 
@@ -53,7 +50,7 @@ option('have-alias-attribute', type: 'combo', choices: ['true', 'false', 'auto']
 option('tests', type: 'boolean', value: false,
        description: 'Enable tests')
 
-option('newlib-tinystdio', type: 'boolean', value: false,
+option('newlib-tinystdio', type: 'boolean', value: true,
        description: 'Use tiny stdio from avr libc')
 
 option('specsdir', type: 'string',
@@ -93,11 +90,11 @@ option('newlib-fseek-optimization', type: 'boolean', value: false,
        description: 'disable fseek optimization')
 option('newlib-wide-orient', type: 'boolean', value: false,
        description: 'Turn off wide orientation in streamio')
-option('newlib-nano-malloc', type: 'boolean', value: false,
+option('newlib-nano-malloc', type: 'boolean', value: true,
        description: 'use small-footprint nano-malloc implementation')
 option('newlib-unbuf-stream-opt', type: 'boolean', value: false,
        description: 'enable unbuffered stream optimization in streamio')
-option('lite-exit', type: 'boolean', value: false,
+option('lite-exit', type: 'boolean', value: true,
        description: 'enable light weight exit')
 option('newlib-nano-formatted-io', type: 'boolean', value: false,
        description: 'Use nano version formatted IO')

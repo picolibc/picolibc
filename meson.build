@@ -34,8 +34,9 @@
 #
 project('picolibc', 'c',
 	default_options: [
-		'buildtype=debugoptimized',
-		'c_std=gnu99',
+	  'buildtype=minsize',
+	  'c_std=gnu99',
+	  'b_staticpic=false',
 	],
 	version: '3.1.0.2019.08.15'
 )
@@ -75,7 +76,7 @@ newlib_iconv = get_option('newlib-iconv')
 newlib_io_float = get_option('newlib-io-float')
 newlib_supplied_syscalls = get_option('newlib-supplied-syscalls')
 newlib_elix_level = get_option('newlib-elix-level')
-target_optspace = get_option('target-optspace')
+target_optspace = get_option('optimization') == 's'
 fast_strcmp = get_option('fast-strcmp')
 newlib_reentrant_syscalls_provided = get_option('newlib-reentrant-syscalls-provided')
 newlib_missing_syscall_names = get_option('newlib-missing-syscall-names')
@@ -254,11 +255,6 @@ configure_file(output : '_newlib_version.h',
 	       install_dir: includedir)
 
 arguments = ['-g', '-ffunction-sections', '-fdata-sections']
-if target_optspace
-  arguments += '-Os'
-else
-  arguments += '-O3'
-endif
 
 add_project_arguments(arguments, language: 'c')
 

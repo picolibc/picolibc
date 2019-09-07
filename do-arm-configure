@@ -1,17 +1,8 @@
 #!/bin/sh
 ARCH=arm-none-eabi
 DIR=`dirname $0`
-meson $DIR \
-      -Dmultilib=true\
-	-Dtarget-optspace=true \
-	-Dnewlib-tinystdio=true \
-	-Dnewlib-supplied-syscalls=false \
-	-Dnewlib-nano-malloc=true\
-	-Dlite-exit=true \
-	-Dnewlib-mb=true \
-	-Dnewlib-global-atexit=false\
-	-Dnewlib-global-errno=false\
+meson "$DIR" \
 	-Dincludedir=picolibc/$ARCH/include \
 	-Dlibdir=picolibc/$ARCH/lib \
-	--buildtype plain\
-	--cross-file $DIR/cross-$ARCH.txt
+	--cross-file $DIR/cross-$ARCH.txt \
+	"$@"

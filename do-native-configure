@@ -1,19 +1,10 @@
 #!/bin/sh
 DIR=`dirname $0`
 meson $DIR \
-        -Dtarget-optspace=true \
+        -Dmultilib=false \
         -Dpicolib=false \
-	-Dnewlib-tinystdio=true \
-	-Dnewlib-supplied-syscalls=false \
-	-Dnewlib-reentrant-small=true\
-	-Dnewlib-wide-orient=false\
-	-Dnewlib-nano-malloc=true\
-	-Dnewlib-reent-small=true\
-	-Dlite-exit=true\
-	-Dnewlib-mb=false\
 	-Dnewlib-global-atexit=true\
-	-Dnewlib-global-errno=true\
-	-Dincludedir=lib/newlib-nano/include \
-	-Dlibdir=lib/newlib-nano/lib \
+	-Dincludedir=lib/picolibc/include \
+	-Dlibdir=lib/picolibc/lib \
 	-Dtests=true \
-	--buildtype debug
+	"$@"
