@@ -120,7 +120,7 @@ else
 endif
 
 if newlib_supplied_syscalls
-  lib_dirs += 'syscalls'
+  libdirs += 'syscalls'
 endif
 
 libnames = libdirs
