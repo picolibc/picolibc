@@ -73,6 +73,7 @@ struct pipe_reply {
 
 static int pcon_attached_to = -1;
 static bool isHybrid;
+static bool do_not_reset_switch_to_pcon;
 
 #if USE_API_HOOK
 static void
@@ -1046,6 +1047,8 @@ fhandler_pty_slave::reset_switch_to_pcon (void)
       init_console_handler (true);
       return;
     }
+  if (do_not_reset_switch_to_pcon)
+    return;
   if (get_ttyp ()->switch_to_pcon)
     {
       DWORD mode;
@@ -1108,6 +1111,8 @@ fhandler_pty_slave::push_to_pcon_screenbuffer (const char *ptr, size_t len)
 	    {
 	      //p0 += 8;
 	      get_ttyp ()->screen_alternated = true;
+	      if (get_ttyp ()->switch_to_pcon)
+		do_not_reset_switch_to_pcon = true;
 	    }
 	}
       if (get_ttyp ()->screen_alternated)
@@ -1118,6 +1123,7 @@ fhandler_pty_slave::push_to_pcon_screenbuffer (const char *ptr, size_t len)
 	    {
 	      p1 += 8;
 	      get_ttyp ()->screen_alternated = false;
+	      do_not_reset_switch_to_pcon = false;
 	      memmove (p0, p1, buf+nlen - p1);
 	      nlen -= p1 - p0;
 	    }
@@ -1177,7 +1183,8 @@ fhandler_pty_slave::push_to_pcon_screenbuffer (const char *ptr, size_t len)
       p += wLen;
     }
   /* Detach from pseudo console and resume. */
-  SetConsoleMode (get_output_handle (), dwMode);
+  flags = ENABLE_VIRTUAL_TERMINAL_PROCESSING;
+  SetConsoleMode (get_output_handle (), dwMode | flags);
 cleanup:
   SetConsoleOutputCP (origCP);
   HeapFree (GetProcessHeap (), 0, buf);
@@ -1267,7 +1274,7 @@ fhandler_pty_slave::write (const void *ptr, size_t len)
   HeapFree (GetProcessHeap (), 0, buf);
   flags = ENABLE_VIRTUAL_TERMINAL_PROCESSING;
   if (get_ttyp ()->switch_to_pcon && !fallback)
-    SetConsoleMode (get_output_handle (), dwMode);
+    SetConsoleMode (get_output_handle (), dwMode | flags);
 
   restore_reattach_pcon ();
 
@@ -2899,12 +2906,11 @@ fhandler_pty_slave::fixup_after_attach (bool native_maybe)
     {
       FlushConsoleInputBuffer (get_handle ());
       DWORD mode;
-      GetConsoleMode (get_handle (), &mode);
-      SetConsoleMode (get_handle (),
-		      (mode & ~ENABLE_VIRTUAL_TERMINAL_INPUT) |
-		      ENABLE_ECHO_INPUT |
-		      ENABLE_LINE_INPUT |
-		      ENABLE_PROCESSED_INPUT);
+      mode = ENABLE_PROCESSED_OUTPUT | ENABLE_WRAP_AT_EOL_OUTPUT;
+      SetConsoleMode (get_output_handle (), mode);
+      FlushConsoleInputBuffer (get_handle ());
+      mode = ENABLE_PROCESSED_INPUT | ENABLE_LINE_INPUT | ENABLE_ECHO_INPUT;
+      SetConsoleMode (get_handle (), mode);
       Sleep (20);
       if (get_ttyp ()->pcon_pid == 0 ||
 	  kill (get_ttyp ()->pcon_pid, 0) != 0)
