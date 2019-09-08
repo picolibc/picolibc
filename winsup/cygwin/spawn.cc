@@ -261,6 +261,21 @@ child_info_spawn::worker (const char *prog_arg, const char *const *argv,
   int res = -1;
   DWORD pidRestore = 0;
   bool attach_to_pcon = false;
+  pid_t ctty_pgid = 0;
+
+  /* Search for CTTY and retrieve its PGID */
+  cygheap_fdenum cfd (false);
+  while (cfd.next () >= 0)
+    if (cfd->get_major () == DEV_PTYS_MAJOR ||
+	cfd->get_major () == DEV_CONS_MAJOR)
+      {
+	fhandler_termios *fh = (fhandler_termios *) (fhandler_base *) cfd;
+	if (fh->tc ()->ntty == myself->ctty)
+	  {
+	    ctty_pgid = fh->tc ()->getpgid ();
+	    break;
+	  }
+      }
 
   /* Check if we have been called from exec{lv}p or spawn{lv}p and mask
      mode to keep only the spawn mode. */
@@ -539,8 +554,7 @@ child_info_spawn::worker (const char *prog_arg, const char *const *argv,
 	 in a console will break native processes running in the background,
 	 because the Ctrl-C event is sent to all processes in the console, unless
 	 they ignore it explicitely.  CREATE_NEW_PROCESS_GROUP does that for us. */
-      if (!iscygwin () && fhandler_console::exists ()
-	  && fhandler_console::tc_getpgid () != myself->pgid)
+      if (!iscygwin () && ctty_pgid && ctty_pgid != myself->pgid)
 	c_flags |= CREATE_NEW_PROCESS_GROUP;
       refresh_cygheap ();
 
@@ -606,33 +620,11 @@ child_info_spawn::worker (const char *prog_arg, const char *const *argv,
 			  attach_to_pcon = true;
 			  break;
 			}
-		      else
-			{
-			  /* Fallback */
-			  DWORD target[3] = {
-			    STD_INPUT_HANDLE,
-			    STD_OUTPUT_HANDLE,
-			    STD_ERROR_HANDLE
-			  };
-			  if (fd == 0)
-			    {
-			      ptys->set_handle (ptys->get_handle_cyg ());
-			      SetStdHandle (target[fd],
-					    ptys->get_handle ());
-			    }
-			  else if (fd < 3)
-			    {
-			      ptys->set_output_handle (
-					   ptys->get_output_handle_cyg ());
-			      SetStdHandle (target[fd],
-					    ptys->get_output_handle ());
-			    }
-			}
 		    }
 		}
 	    }
 	}
-      if (ptys)
+      if (ptys && attach_to_pcon)
 	ptys->fixup_after_attach (!iscygwin ());
 
       if (!iscygwin ())

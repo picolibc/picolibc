@@ -1294,7 +1294,7 @@ pty_slave_startup (select_record *me, select_stuff *stuff)
 {
   fhandler_base *fh = (fhandler_base *) me->fh;
   fhandler_pty_slave *ptys = (fhandler_pty_slave *) fh;
-  if (me->read_selected && ptys->get_pcon_pid () != myself->pid)
+  if (me->read_selected)
     ptys->mask_switch_to_pcon (true);
 
   select_pipe_info *pi = stuff->device_specific_ptys;

@@ -895,6 +895,7 @@ fhandler_pty_slave::close ()
     termios_printf ("CloseHandle (output_mutex<%p>), %E", output_mutex);
   if (pcon_attached_to == get_minor ())
     get_ttyp ()->num_pcon_attached_slaves --;
+  get_ttyp ()->mask_switch_to_pcon = false;
   return 0;
 }
 
@@ -1026,20 +1027,26 @@ fhandler_pty_slave::reset_switch_to_pcon (void)
       get_ttyp ()->need_clear_screen = false;
     }
 
-  if (ALWAYS_USE_PCON)
-    return;
   if (isHybrid)
-    {
-      this->set_switch_to_pcon ();
-      return;
-    }
+    this->set_switch_to_pcon ();
   if (get_ttyp ()->pcon_pid &&
       get_ttyp ()->pcon_pid != myself->pid &&
       kill (get_ttyp ()->pcon_pid, 0) == 0)
     /* There is a process which is grabbing pseudo console. */
     return;
-  if (get_ttyp ()->switch_to_pcon &&
-      get_ttyp ()->pcon_pid != myself->pid)
+  if (isHybrid)
+    {
+      if (ALWAYS_USE_PCON)
+	{
+	  DWORD mode;
+	  GetConsoleMode (get_handle (), &mode);
+	  SetConsoleMode (get_handle (), mode & ~ENABLE_PROCESSED_INPUT);
+	}
+      get_ttyp ()->pcon_pid = 0;
+      init_console_handler (true);
+      return;
+    }
+  if (get_ttyp ()->switch_to_pcon)
     {
       DWORD mode;
       GetConsoleMode (get_handle (), &mode);
@@ -1048,6 +1055,7 @@ fhandler_pty_slave::reset_switch_to_pcon (void)
     }
   get_ttyp ()->pcon_pid = 0;
   get_ttyp ()->switch_to_pcon = false;
+  init_console_handler (true);
 }
 
 void
@@ -1307,8 +1315,7 @@ fhandler_pty_slave::read (void *ptr, size_t& len)
   if (ptr) /* Indicating not tcflush(). */
     {
       reset_switch_to_pcon ();
-      if (get_ttyp ()->pcon_pid != myself->pid)
-	mask_switch_to_pcon (true);
+      mask_switch_to_pcon (true);
     }
 
   if (is_nonblocking () || !ptr) /* Indicating tcflush(). */
@@ -1428,7 +1435,7 @@ fhandler_pty_slave::read (void *ptr, size_t& len)
 	    flags &= ~ENABLE_ECHO_INPUT;
 	  if ((get_ttyp ()->ti.c_lflag & ISIG) &&
 	      !(get_ttyp ()->ti.c_iflag & IGNBRK))
-	    flags |= ENABLE_PROCESSED_INPUT;
+	    flags |= ALWAYS_USE_PCON ? 0 : ENABLE_PROCESSED_INPUT;
 	  if (dwMode != flags)
 	    SetConsoleMode (get_handle (), flags);
 	  /* Read get_handle() instad of get_handle_cyg() */
@@ -2222,6 +2229,16 @@ fhandler_pty_master::write (const void *ptr, size_t len)
       return len;
     }
 
+  if (get_ttyp ()->switch_to_pcon &&
+      (ti.c_lflag & ISIG) &&
+      memchr (p, ti.c_cc[VINTR], len) &&
+      get_ttyp ()->getpgid () == get_ttyp ()->pcon_pid)
+    {
+      DWORD n;
+      /* Send ^C to pseudo console as well */
+      WriteFile (to_slave, "\003", 1, &n, 0);
+    }
+
   line_edit_status status = line_edit (p++, len, ti, &ret);
   if (status > line_edit_signalled && status != line_edit_pipe_full)
     ret = -1;
@@ -2875,8 +2892,10 @@ fhandler_pty_slave::fixup_after_attach (bool native_maybe)
 	      get_ttyp ()->num_pcon_attached_slaves ++;
 	    }
 	}
+      if (ALWAYS_USE_PCON && pcon_attached_to == get_minor ())
+	set_ishybrid_and_switch_to_pcon (get_output_handle ());
     }
-  if (pcon_attached_to == get_minor () && (native_maybe || ALWAYS_USE_PCON))
+  if (pcon_attached_to == get_minor () && native_maybe)
     {
       FlushConsoleInputBuffer (get_handle ());
       DWORD mode;
@@ -2891,6 +2910,7 @@ fhandler_pty_slave::fixup_after_attach (bool native_maybe)
 	  kill (get_ttyp ()->pcon_pid, 0) != 0)
 	get_ttyp ()->pcon_pid = myself->pid;
       get_ttyp ()->switch_to_pcon = true;
+      init_console_handler(false);
     }
 }
 

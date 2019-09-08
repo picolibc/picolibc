@@ -2187,10 +2187,6 @@ class fhandler_pty_slave: public fhandler_pty_common
     get_ttyp ()->mask_switch_to_pcon = mask;
   }
   void fixup_after_attach (bool native_maybe);
-  pid_t get_pcon_pid (void)
-  {
-    return get_ttyp ()->pcon_pid;
-  }
   bool is_line_input (void)
   {
     return get_ttyp ()->ti.c_lflag & ICANON;
