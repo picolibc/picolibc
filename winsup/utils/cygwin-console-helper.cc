@@ -10,6 +10,7 @@ main (int argc, char **argv)
   SetEvent (h);
   if (argc == 4) /* Pseudo console helper mode for PTY */
     {
+      SetConsoleCtrlHandler (NULL, TRUE);
       HANDLE hPipe = (HANDLE) strtoull (argv[3], &end, 0);
       char buf[64];
       sprintf (buf, "StdHandles=%p,%p\n",
