@@ -22,16 +22,7 @@ RISCV_ARCH=riscv64-unknown-elf
 ARM_ARCH=arm-none-eabi
 
 MESON_SHARED_FLAGS = \
-	--prefix=/usr \
-	--buildtype plain \
-	-Dtarget-optspace=true \
-	-Dnewlib-tinystdio=true \
-	-Dnewlib-supplied-syscalls=false \
-	-Dnewlib-reentrant-small=true\
-	-Dnewlib-wide-orient=false\
-	-Dnewlib-nano-malloc=true\
-	-Dlite-exit=true\
-	-Dnewlib-global-atexit=true
+	--prefix=/usr
 
 MESON_RISCV_FLAGS = \
 	$(MESON_SHARED_FLAGS) \
