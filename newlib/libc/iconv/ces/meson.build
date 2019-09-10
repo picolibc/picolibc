@@ -49,8 +49,12 @@ hdrs_ces = [
     'cesbi.h',
     'cesdeps.h',
 ]
-lib_ces = static_library('ces',
-    srcs_ces,
-    pic: false,
-    include_directories: inc,
-)
+foreach target : targets
+	value = get_variable('target_' + target)
+	set_variable('lib_ces' + target,
+		static_library('ces' + target,
+			       srcs_ces,
+			       pic: false,
+			       include_directories: inc,
+			       c_args: value[1]))
+endforeach

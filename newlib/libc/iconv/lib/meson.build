@@ -48,8 +48,12 @@ hdrs_lib = [
     'local.h',
     'ucsconv.h',
 ]
-lib_lib = static_library('lib',
-    srcs_lib,
-    pic: false,
-    include_directories: inc,
-)
+foreach target : targets
+	value = get_variable('target_' + target)
+	set_variable('lib_lib' + target,
+		static_library('lib' + target,
+			       srcs_lib,
+			       pic: false,
+			       include_directories: inc,
+			       c_args: value[1]))
+endforeach
