@@ -49,7 +49,7 @@ extern char __bss_end__[];
 void
 _set_tls(void  *tls);
 
-int
+void
 _start(void);
 
 /* This is the application entry point */

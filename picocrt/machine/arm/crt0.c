@@ -49,7 +49,7 @@ _set_tls(void *tls)
 	__tls = tls;
 }
 
-int
+void
 _start(void)
 {
 #ifndef __SOFTFP__

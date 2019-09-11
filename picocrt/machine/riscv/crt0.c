@@ -41,7 +41,7 @@ _set_tls(void *tls)
 	asm("la tp, %0" : "=r" (tls));
 }
 
-int
+void
 _start(void)
 {
 	asm("la gp, __global_pointer$");
