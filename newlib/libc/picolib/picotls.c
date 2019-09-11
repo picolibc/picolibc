@@ -35,13 +35,14 @@
 
 #include <picotls.h>
 #include <string.h>
+#include <stdint.h>
 
 void
 _init_tls(void *__tls)
 {
 	char *tls = __tls;
 	/* Copy tls initialized data */
-	memcpy(tls - (int) &__tdata_size__, __tdata_source__, (int) &__tdata_size__);
+	memcpy(tls - (uintptr_t) &__tdata_size__, __tdata_source__, (uintptr_t) &__tdata_size__);
 	/* Clear tls zero data */
-	memset(tls, '\0', (int) &__tbss_size__);
+	memset(tls, '\0', (uintptr_t) &__tbss_size__);
 }
