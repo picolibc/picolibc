@@ -260,7 +260,7 @@ child_info_spawn::worker (const char *prog_arg, const char *const *argv,
   bool rc;
   int res = -1;
   DWORD pidRestore = 0;
-  bool attach_to_pcon = false;
+  bool attach_to_console = false;
   pid_t ctty_pgid = 0;
 
   /* Search for CTTY and retrieve its PGID */
@@ -407,14 +407,6 @@ child_info_spawn::worker (const char *prog_arg, const char *const *argv,
       PROCESS_INFORMATION pi;
       pi.hProcess = pi.hThread = NULL;
       pi.dwProcessId = pi.dwThreadId = 0;
-
-      /* Set up needed handles for stdio */
-      si.dwFlags = STARTF_USESTDHANDLES;
-      si.hStdInput = handle ((in__stdin < 0 ? 0 : in__stdin), false);
-      si.hStdOutput = handle ((in__stdout < 0 ? 1 : in__stdout), true);
-      si.hStdError = handle (2, true);
-
-      si.cb = sizeof (si);
 
       c_flags = GetPriorityClass (GetCurrentProcess ());
       sigproc_printf ("priority class %d", c_flags);
@@ -591,15 +583,14 @@ child_info_spawn::worker (const char *prog_arg, const char *const *argv,
       /* Attach to pseudo console if pty salve is used */
       pidRestore = fhandler_console::get_console_process_id
 	(GetCurrentProcessId (), false);
-      fhandler_pty_slave *ptys = NULL;
-      int chk_order[] = {1, 0, 2};
       for (int i = 0; i < 3; i ++)
 	{
+	  const int chk_order[] = {1, 0, 2};
 	  int fd = chk_order[i];
 	  fhandler_base *fh = ::cygheap->fdtab[fd];
 	  if (fh && fh->get_major () == DEV_PTYS_MAJOR)
 	    {
-	      ptys = (fhandler_pty_slave *) fh;
+	      fhandler_pty_slave *ptys = (fhandler_pty_slave *) fh;
 	      if (ptys->getPseudoConsole ())
 		{
 		  DWORD dwHelperProcessId = ptys->getHelperProcessId ();
@@ -607,25 +598,28 @@ child_info_spawn::worker (const char *prog_arg, const char *const *argv,
 				    fh->get_minor (), dwHelperProcessId);
 		  if (fhandler_console::get_console_process_id
 					      (dwHelperProcessId, true))
-		    {
-		      /* Already attached */
-		      attach_to_pcon = true;
-		      break;
-		    }
-		  else
+		    /* Already attached */
+		    attach_to_console = true;
+		  else if (!attach_to_console)
 		    {
 		      FreeConsole ();
 		      if (AttachConsole (dwHelperProcessId))
-			{
-			  attach_to_pcon = true;
-			  break;
-			}
+			attach_to_console = true;
 		    }
+		  ptys->fixup_after_attach (!iscygwin (), fd);
 		}
 	    }
+	  else if (fh && fh->get_major () == DEV_CONS_MAJOR)
+	    attach_to_console = true;
 	}
-      if (ptys && attach_to_pcon)
-	ptys->fixup_after_attach (!iscygwin ());
+
+      /* Set up needed handles for stdio */
+      si.dwFlags = STARTF_USESTDHANDLES;
+      si.hStdInput = handle ((in__stdin < 0 ? 0 : in__stdin), false);
+      si.hStdOutput = handle ((in__stdout < 0 ? 1 : in__stdout), true);
+      si.hStdError = handle (2, true);
+
+      si.cb = sizeof (si);
 
       if (!iscygwin ())
 	{
@@ -931,7 +925,7 @@ child_info_spawn::worker (const char *prog_arg, const char *const *argv,
   if (envblock)
     free (envblock);
 
-  if (attach_to_pcon && pidRestore)
+  if (attach_to_console && pidRestore)
     {
       FreeConsole ();
       AttachConsole (pidRestore);

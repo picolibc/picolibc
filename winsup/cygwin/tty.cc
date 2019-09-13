@@ -237,9 +237,10 @@ tty::init ()
   attach_pcon_in_fork = false;
   hPseudoConsole = NULL;
   column = 0;
-  switch_to_pcon = false;
+  switch_to_pcon_in = false;
+  switch_to_pcon_out = false;
   screen_alternated = false;
-  mask_switch_to_pcon = false;
+  mask_switch_to_pcon_in = false;
   pcon_pid = 0;
   num_pcon_attached_slaves = 0;
   TermCodePage = 20127; /* ASCII */

@@ -98,9 +98,10 @@ private:
   DWORD HelperProcessId;
   HANDLE hHelperGoodbye;
   bool attach_pcon_in_fork;
-  bool switch_to_pcon;
+  bool switch_to_pcon_in;
+  bool switch_to_pcon_out;
   bool screen_alternated;
-  bool mask_switch_to_pcon;
+  bool mask_switch_to_pcon_in;
   pid_t pcon_pid;
   int num_pcon_attached_slaves;
   UINT TermCodePage;

@@ -2114,6 +2114,7 @@ class fhandler_pty_slave: public fhandler_pty_common
   HANDLE inuse;			// used to indicate that a tty is in use
   HANDLE output_handle_cyg, io_handle_cyg;
   DWORD pid_restore;
+  int fd;
 
   /* Helper functions for fchmod and fchown. */
   bool fch_open_handles (bool chown);
@@ -2175,18 +2176,18 @@ class fhandler_pty_slave: public fhandler_pty_common
     copyto (fh);
     return fh;
   }
-  void set_switch_to_pcon (void);
+  void set_switch_to_pcon (int fd);
   void reset_switch_to_pcon (void);
   void push_to_pcon_screenbuffer (const char *ptr, size_t len);
-  void mask_switch_to_pcon (bool mask)
+  void mask_switch_to_pcon_in (bool mask)
   {
     if (!mask && get_ttyp ()->pcon_pid &&
 	get_ttyp ()->pcon_pid != myself->pid &&
 	kill (get_ttyp ()->pcon_pid, 0) == 0)
       return;
-    get_ttyp ()->mask_switch_to_pcon = mask;
+    get_ttyp ()->mask_switch_to_pcon_in = mask;
   }
-  void fixup_after_attach (bool native_maybe);
+  void fixup_after_attach (bool native_maybe, int fd);
   bool is_line_input (void)
   {
     return get_ttyp ()->ti.c_lflag & ICANON;

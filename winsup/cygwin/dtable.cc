@@ -147,9 +147,9 @@ dtable::get_debugger_info ()
 void
 dtable::stdio_init ()
 {
-  int chk_order[] = {1, 0, 2};
   for (int i = 0; i < 3; i ++)
     {
+      const int chk_order[] = {1, 0, 2};
       int fd = chk_order[i];
       fhandler_base *fh = cygheap->fdtab[fd];
       if (fh && fh->get_major () == DEV_PTYS_MAJOR)
@@ -169,12 +169,14 @@ dtable::stdio_init ()
 		  FreeConsole ();
 		  if (AttachConsole (ptys->getHelperProcessId ()))
 		    {
-		      ptys->fixup_after_attach (false);
+		      ptys->fixup_after_attach (false, fd);
 		      break;
 		    }
 		}
 	    }
 	}
+      else if (fh && fh->get_major () == DEV_CONS_MAJOR)
+	break;
     }
 
   if (myself->cygstarted || ISSTATE (myself, PID_CYGPARENT))

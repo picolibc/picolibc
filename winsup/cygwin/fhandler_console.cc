@@ -3156,10 +3156,9 @@ fhandler_console::get_console_process_id (DWORD pid, bool match)
   tmp = 0;
   for (DWORD i=0; i<num; i++)
     if ((match && list[i] == pid) || (!match && list[i] != pid))
-      {
-	tmp = list[i];
-	break;
-      }
+      /* Last one is the oldest. */
+      /* https://github.com/microsoft/terminal/issues/95 */
+      tmp = list[i];
   HeapFree (GetProcessHeap (), 0, list);
   return tmp;
 }
