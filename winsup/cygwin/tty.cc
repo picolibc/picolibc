@@ -243,7 +243,7 @@ tty::init ()
   mask_switch_to_pcon_in = false;
   pcon_pid = 0;
   num_pcon_attached_slaves = 0;
-  TermCodePage = 20127; /* ASCII */
+  term_code_page = 0;
   need_clear_screen = false;
 }
 
