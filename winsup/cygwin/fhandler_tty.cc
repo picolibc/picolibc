@@ -45,7 +45,7 @@ details. */
 #endif /* ENABLE_VIRTUAL_TERMINAL_INPUT */
 
 extern "C" int sscanf (const char *, const char *, ...);
-extern "C" int ttyname_r(int, char*, size_t);
+extern "C" int ttyname_r (int, char*, size_t);
 
 #define close_maybe(h) \
   do { \
@@ -2147,7 +2147,7 @@ fhandler_pty_master::close ()
   else if (obi.HandleCount == (getPseudoConsole () ? 2 : 1))
 			      /* Helper process has inherited one. */
     {
-      termios_printf("Closing last master of pty%d", get_minor ());
+      termios_printf ("Closing last master of pty%d", get_minor ());
       /* Close Pseudo Console */
       if (getPseudoConsole ())
 	{
@@ -2446,9 +2446,9 @@ get_locale_from_env (char *locale)
   char lang[ENCODING_LEN + 1] = {0, }, country[ENCODING_LEN + 1] = {0, };
   env = getenv ("LC_ALL");
   if (env == NULL || !*env)
-    env = getenv("LC_CTYPE");
+    env = getenv ("LC_CTYPE");
   if (env == NULL || !*env)
-    env = getenv("LANG");
+    env = getenv ("LANG");
   if (env == NULL || !*env)
     {
       if (GetLocaleInfo (LOCALE_CUSTOM_UI_DEFAULT,
@@ -2476,7 +2476,7 @@ get_locale_from_env (char *locale)
 			 LOCALE_SISO3166CTRYNAME,
 			 country, sizeof (country));
       if (strlen (lang) && strlen (country))
-	__small_sprintf (lang + strlen(lang), "_%s.UTF-8", country);
+	__small_sprintf (lang + strlen (lang), "_%s.UTF-8", country);
       else
 	strcpy (lang , "C.UTF-8");
       env = lang;
@@ -2492,7 +2492,7 @@ get_langinfo (char *locale_out, char *charset_out)
   get_locale_from_env (new_locale);
 
   __locale_t loc;
-  memset(&loc, 0, sizeof (loc));
+  memset (&loc, 0, sizeof (loc));
   const char *locale = __loadlocale (&loc, LC_CTYPE, new_locale);
   if (!locale)
     locale = "C";
@@ -2565,8 +2565,8 @@ get_langinfo (char *locale_out, char *charset_out)
     return 0;
 
   /* Set results */
-  strcpy(locale_out, new_locale);
-  strcpy(charset_out, charset);
+  strcpy (locale_out, new_locale);
+  strcpy (charset_out, charset);
   return lcid;
 }
 
@@ -2670,7 +2670,7 @@ fhandler_pty_slave::fixup_after_attach (bool native_maybe, int fd_set)
 		get_ttyp ()->pcon_pid = myself->pid;
 	      get_ttyp ()->switch_to_pcon_out = true;
 	    }
-	  init_console_handler(false);
+	  init_console_handler (false);
 	}
       else if (fd == 0 && native_maybe)
 	/* Read from unattached pseudo console cause freeze,
@@ -2754,7 +2754,7 @@ fhandler_pty_slave::fixup_after_exec ()
 	{ \
 	  void *api = hook_api (module, #name, (void *) name##_Hooked); \
 	  name##_Orig = (__typeof__ (name) *) api; \
-	  /*if (api) system_printf(#name " hooked.");*/ \
+	  /*if (api) system_printf (#name " hooked.");*/ \
 	}
       DO_HOOK (NULL, WriteFile);
       DO_HOOK (NULL, WriteConsoleA);
@@ -3118,7 +3118,7 @@ fhandler_pty_master::setup_pseudoconsole ()
   if (res != S_OK)
     {
       system_printf ("CreatePseudoConsole() failed. %08x\n",
-		     GetLastError());
+		     GetLastError ());
       CloseHandle (from_master);
       CloseHandle (to_slave);
       from_master = from_master_cyg;
@@ -3230,7 +3230,7 @@ fhandler_pty_master::setup ()
     termios_printf ("can't set output_handle(%p) to non-blocking mode",
 		    get_output_handle ());
 
-  char pipename[sizeof("ptyNNNN-to-master-cyg")];
+  char pipename[sizeof ("ptyNNNN-to-master-cyg")];
   __small_sprintf (pipename, "pty%d-to-master", unit);
   res = fhandler_pipe::create (&sec_none, &from_slave, &to_master,
 			       fhandler_pty_common::pipesize, pipename, 0);
@@ -3406,7 +3406,7 @@ fhandler_pty_common::process_opost_output (HANDLE h, const void *ptr, ssize_t& l
 		break;
 	      else
 		{
-		  set_errno(EAGAIN);
+		  set_errno (EAGAIN);
 		  len = -1;
 		  return TRUE;
 		}
