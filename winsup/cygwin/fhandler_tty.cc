@@ -857,8 +857,6 @@ fhandler_pty_slave::open (int flags, mode_t)
       pcon_attached_to = get_minor ();
       init_console_handler (true);
     }
-  else if (pcon_attached_to < 0)
-    fhandler_console::need_invisible ();
 
   set_open_status ();
   return 1;
