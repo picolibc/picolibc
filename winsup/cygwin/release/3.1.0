@@ -30,6 +30,9 @@ What changed:
 - Eliminate a header file name collision with <X11/XLocale.h> on case
   insensitive filesystems by reverting <xlocale.h> back to <sys/_locale.h>.
 
+- Allow times(2) to have a NULL argument, as on Linux.
+  Addresses: https://cygwin.com/ml/cygwin/2019-09/msg00141.html
+
 
 Bug Fixes
 ---------
