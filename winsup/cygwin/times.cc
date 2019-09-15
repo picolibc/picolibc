@@ -72,12 +72,17 @@ times (struct tms *buf)
       /* ticks is in in 100ns, convert to clock ticks. */
       tc = (clock_t) (ticks.QuadPart * CLOCKS_PER_SEC / NS100PERSEC);
 
-      buf->tms_stime = __to_clock_t (&kut.KernelTime, 0);
-      buf->tms_utime = __to_clock_t (&kut.UserTime, 0);
-      timeval_to_filetime (&myself->rusage_children.ru_stime, &kut.KernelTime);
-      buf->tms_cstime = __to_clock_t (&kut.KernelTime, 1);
-      timeval_to_filetime (&myself->rusage_children.ru_utime, &kut.UserTime);
-      buf->tms_cutime = __to_clock_t (&kut.UserTime, 1);
+      /* Linux allows a NULL buf and just returns tc in that case, so
+	 mimic that */
+      if (buf)
+	{
+	  buf->tms_stime = __to_clock_t (&kut.KernelTime, 0);
+	  buf->tms_utime = __to_clock_t (&kut.UserTime, 0);
+	  timeval_to_filetime (&myself->rusage_children.ru_stime, &kut.KernelTime);
+	  buf->tms_cstime = __to_clock_t (&kut.KernelTime, 1);
+	  timeval_to_filetime (&myself->rusage_children.ru_utime, &kut.UserTime);
+	  buf->tms_cutime = __to_clock_t (&kut.UserTime, 1);
+	}
     }
   __except (EFAULT)
     {
