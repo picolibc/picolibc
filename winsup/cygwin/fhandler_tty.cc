@@ -47,6 +47,12 @@ details. */
 extern "C" int sscanf (const char *, const char *, ...);
 extern "C" int ttyname_r (int, char*, size_t);
 
+extern "C" {
+  HRESULT WINAPI CreatePseudoConsole (COORD, HANDLE, HANDLE, DWORD, HPCON *);
+  HRESULT WINAPI ResizePseudoConsole (HPCON, COORD);
+  VOID WINAPI ClosePseudoConsole (HPCON);
+}
+
 #define close_maybe(h) \
   do { \
     if (h && h != INVALID_HANDLE_VALUE) \
@@ -2157,14 +2163,8 @@ fhandler_pty_master::close ()
 	  /* FIXME: Pseudo console can be accessed via its handle
 	     only in the process which created it. What else can we do? */
 	  if (master_pid_tmp == myself->pid)
-	    {
-	      /* Release pseudo console */
-	      HMODULE hModule = GetModuleHandle ("kernel32.dll");
-	      FARPROC func = GetProcAddress (hModule, "ClosePseudoConsole");
-	      VOID (WINAPI *ClosePseudoConsole) (HPCON) = NULL;
-	      ClosePseudoConsole = (VOID (WINAPI *) (HPCON)) func;
-	      ClosePseudoConsole (getPseudoConsole ());
-	    }
+	    /* Release pseudo console */
+	    ClosePseudoConsole (getPseudoConsole ());
 	  get_ttyp ()->switch_to_pcon_in = false;
 	  get_ttyp ()->switch_to_pcon_out = false;
 	}
@@ -2348,10 +2348,6 @@ fhandler_pty_master::ioctl (unsigned int cmd, void *arg)
 	 only in the process which created it. What else can we do? */
       if (getPseudoConsole () && get_ttyp ()->master_pid == myself->pid)
 	{
-	  HMODULE hModule = GetModuleHandle ("kernel32.dll");
-	  FARPROC func = GetProcAddress (hModule, "ResizePseudoConsole");
-	  HRESULT (WINAPI *ResizePseudoConsole) (HPCON, COORD) = NULL;
-	  ResizePseudoConsole = (HRESULT (WINAPI *) (HPCON, COORD)) func;
 	  COORD size;
 	  size.X = ((struct winsize *) arg)->ws_col;
 	  size.Y = ((struct winsize *) arg)->ws_row;
@@ -3103,22 +3099,16 @@ fhandler_pty_master::setup_pseudoconsole ()
      process in a pseudo console and get them from the helper.
      Slave process will attach to the pseudo console in the
      helper process using AttachConsole(). */
-  HMODULE hModule = GetModuleHandle ("kernel32.dll");
-  FARPROC func = GetProcAddress (hModule, "CreatePseudoConsole");
-  HRESULT (WINAPI *CreatePseudoConsole)
-    (COORD, HANDLE, HANDLE, DWORD, HPCON *) = NULL;
-  if (!func)
-    return false;
-  CreatePseudoConsole =
-    (HRESULT (WINAPI *) (COORD, HANDLE, HANDLE, DWORD, HPCON *)) func;
   COORD size = {80, 25};
   CreatePipe (&from_master, &to_slave, &sec_none, 0);
+  SetLastError (ERROR_SUCCESS);
   HRESULT res = CreatePseudoConsole (size, from_master, to_master,
 				     0, &get_ttyp ()->hPseudoConsole);
-  if (res != S_OK)
+  if (res != S_OK || GetLastError () == ERROR_PROC_NOT_FOUND)
     {
-      system_printf ("CreatePseudoConsole() failed. %08x\n",
-		     GetLastError ());
+      if (res != S_OK)
+	system_printf ("CreatePseudoConsole() failed. %08x\n",
+		       GetLastError ());
       CloseHandle (from_master);
       CloseHandle (to_slave);
       from_master = from_master_cyg;

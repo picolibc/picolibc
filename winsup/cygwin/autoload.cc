@@ -759,4 +759,7 @@ LoadDLLfunc (PdhAddEnglishCounterW, 16, pdh)
 LoadDLLfunc (PdhCollectQueryData, 4, pdh)
 LoadDLLfunc (PdhGetFormattedCounterValue, 16, pdh)
 LoadDLLfunc (PdhOpenQueryW, 12, pdh)
+LoadDLLfuncEx (CreatePseudoConsole, 20, kernel32, 1)
+LoadDLLfuncEx (ResizePseudoConsole, 8, kernel32, 1)
+LoadDLLfuncEx (ClosePseudoConsole, 4, kernel32, 1)
 }
