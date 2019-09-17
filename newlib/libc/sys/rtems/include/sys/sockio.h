@@ -29,7 +29,7 @@
  * SUCH DAMAGE.
  *
  *	@(#)sockio.h	8.1 (Berkeley) 3/28/94
- * $FreeBSD: head/sys/sys/sockio.h 331622 2018-03-27 15:29:32Z kib $
+ * $FreeBSD: head/sys/sys/sockio.h 352458 2019-09-17 18:49:13Z kib $
  */
 
 #ifndef _SYS_SOCKIO_H_
@@ -142,5 +142,7 @@
 
 #define	SIOCGLANPCP	_IOWR('i', 152, struct ifreq)	/* Get (V)LAN PCP */
 #define	SIOCSLANPCP	 _IOW('i', 153, struct ifreq)	/* Set (V)LAN PCP */
+
+#define	SIOCGIFDOWNREASON	_IOWR('i', 154, struct ifdownreason)
 
 #endif /* !_SYS_SOCKIO_H_ */
