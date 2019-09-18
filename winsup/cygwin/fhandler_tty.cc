@@ -87,7 +87,8 @@ set_switch_to_pcon (void)
       {
 	fhandler_base *fh = cfd;
 	fhandler_pty_slave *ptys = (fhandler_pty_slave *) fh;
-	ptys->set_switch_to_pcon (fd);
+	if (ptys->getPseudoConsole ())
+	  ptys->set_switch_to_pcon (fd);
       }
 }
 
@@ -105,6 +106,8 @@ force_attach_to_pcon (HANDLE h)
 	  {
 	    fhandler_base *fh = cfd;
 	    fhandler_pty_slave *ptys = (fhandler_pty_slave *) fh;
+	    if (!ptys->getPseudoConsole ())
+	      continue;
 	    if (n != 0
 		|| h == ptys->get_handle ()
 		|| h == ptys->get_output_handle ())
