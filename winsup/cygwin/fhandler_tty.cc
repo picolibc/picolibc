@@ -3054,6 +3054,12 @@ fhandler_pty_master::pty_master_fwd_thread ()
 	  mb_str_free (buf);
 	  continue;
 	}
+      size_t nlen;
+      char *buf = convert_mb_str
+	(get_ttyp ()->term_code_page, &nlen, GetConsoleOutputCP (), ptr, wlen);
+
+      ptr = buf;
+      wlen = rlen = nlen;
       acquire_output_mutex (INFINITE);
       while (rlen>0)
 	{
@@ -3066,6 +3072,7 @@ fhandler_pty_master::pty_master_fwd_thread ()
 	  wlen = (rlen -= wlen);
 	}
       release_output_mutex ();
+      mb_str_free (buf);
     }
   return 0;
 }
