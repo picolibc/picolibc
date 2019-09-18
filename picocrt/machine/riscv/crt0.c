@@ -36,12 +36,6 @@
 #include "../../crt0.h"
 
 void
-_set_tls(void *tls)
-{
-	asm("la tp, %0" : "=r" (tls));
-}
-
-void
 _start(void)
 {
 	asm("la gp, __global_pointer$");

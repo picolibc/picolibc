@@ -32,14 +32,20 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
+src_tls_machine = {
+			'riscv' : 'riscv/tls.c',
+			'riscv64' : 'riscv/tls.c',
+			'arm' : 'arm/tls.c'
+		      }
+
 srcs_picolib = [
-  'picotls.c',
+  'inittls.c',
   'picosbrk.c'
 ]
 
-install_headers(
-  'picotls.h'
-)
+if src_tls_machine.has_key(host_cpu)
+  srcs_picolib = join_paths('machine', src_tls_machine[host_cpu])
+endif
 
 foreach target : targets
 	value = get_variable('target_' + target)

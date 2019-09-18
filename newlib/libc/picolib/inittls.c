@@ -33,18 +33,29 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef _PICOTLS_H_
-#define _PICOTLS_H_
+#include <picotls.h>
+#include <string.h>
+#include <stdint.h>
 
 /*
- * Initialize a TLS block, copying the data segment from flash and
- * zeroing the BSS segment.
+ * The TLS block consists of initialized data immediately followed by
+ * zero filled data
+ *
+ * These addresses must be defined by the loader configuration file
  */
-void
-_init_tls(void *tls);
 
-/* Set the TLS pointer to the specific block */
-void
-_set_tls(void *tls);
+extern char __tdata_source[];	/* Source of TLS initialization data (in ROM) */
+extern char __tdata_size[];	/* Size of TLS initized data */
+extern char __tbss_size[];	/* Size of TLS zero-filled data */
 
-#endif /* _PICOTLS_H_ */
+void
+_init_tls(void *__tls)
+{
+	char *tls = __tls;
+
+	/* Copy tls initialized data */
+	memcpy(tls, __tdata_source, (uintptr_t) __tdata_size);
+
+	/* Clear tls zero data */
+	memset(tls + __tdata_size, '\0', (uintptr_t) __tbss_size);
+}

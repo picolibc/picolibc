@@ -59,8 +59,7 @@ SECTIONS
 
 	__stack_size = DEFINED(__stack_size) ? __stack_size : 0x400;
 
-	PROVIDE(__stack_size = __stack_size);
-	PROVIDE(__stack__ = ORIGIN(ram) + __ram_size);
+	PROVIDE(__stack = ORIGIN(ram) + __ram_size);
 
 	.init : {
 		KEEP (*(.text.init.enter))
@@ -76,11 +75,12 @@ SECTIONS
 
 	.fini : {
 		KEEP (*(SORT_NONE(.fini)))
+		__text_end = .;
 	} >flash AT>flash :text
 
-	PROVIDE (__etext = .);
-	PROVIDE (_etext = .);
-	PROVIDE (etext = .);
+	PROVIDE (__etext = __text_end);
+	PROVIDE (_etext = __text_end);
+	PROVIDE (etext = __text_end);
 
 	.rodata : {
 		*(.rdata)
@@ -97,23 +97,23 @@ SECTIONS
 	. = ALIGN(8);
 
 	.preinit_array : {
-		PROVIDE_HIDDEN (__preinit_array_start = .);
+		PROVIDE_HIDDEN ( __preinit_array_start = . );
 		KEEP (*(.preinit_array))
-		PROVIDE_HIDDEN (__preinit_array_end = .);
+		PROVIDE_HIDDEN ( __preinit_array_end = . );
 	} >flash AT>flash :text
 
 	.init_array : {
-		PROVIDE_HIDDEN (__init_array_start = .);
+		PROVIDE_HIDDEN ( __init_array_start = . );
 		KEEP (*(SORT_BY_INIT_PRIORITY(.init_array.*) SORT_BY_INIT_PRIORITY(.ctors.*)))
 		KEEP (*(.init_array EXCLUDE_FILE (*crtbegin.o *crtbegin?.o *crtend.o *crtend?.o ) .ctors))
-		PROVIDE_HIDDEN (__init_array_end = .);
+		PROVIDE_HIDDEN ( __init_array_end = . );
 	} >flash AT>flash :text
 
 	.fini_array : {
-		PROVIDE_HIDDEN (__fini_array_start = .);
+		PROVIDE_HIDDEN ( __fini_array_start = . );
 		KEEP (*(SORT_BY_INIT_PRIORITY(.fini_array.*) SORT_BY_INIT_PRIORITY(.dtors.*)))
 		KEEP (*(.fini_array EXCLUDE_FILE (*crtbegin.o *crtbegin?.o *crtend.o *crtend?.o ) .dtors))
-		PROVIDE_HIDDEN (__fini_array_end = .);
+		PROVIDE_HIDDEN ( __fini_array_end = . );
 	} >flash AT>flash :text
 
 	.ctors : {
@@ -134,15 +134,15 @@ SECTIONS
 
 	.lalign : {
 		. = ALIGN(8);
-		PROVIDE(__data_source__ = .);
+		PROVIDE( __data_source = . );
 	} >flash AT>flash :text
 
 	.dalign : {
 		. = ALIGN(8);
-		PROVIDE(__data_start__ = .);
+		PROVIDE( __data_start = . );
 	} >ram AT>flash :ram_init
 
-	.data : {
+	.data : ALIGN_WITH_INPUT {
 		*(.data .data.*)
 		*(.gnu.linkonce.d.*)
 		. = ALIGN(8);
@@ -157,31 +157,47 @@ SECTIONS
 		*(.srodata .srodata.*)
 	} >ram AT>flash :ram_init
 
-	.tdata : {
-		PROVIDE( __tdata_source__ = .);
+	/* Thread local initialized data. This gets
+	 * space allocated as it is expected to be placed
+	 * in ram to be used as a template for TLS data blocks
+	 * allocated at runtime. We're slightly abusing that
+	 * by placing the data in flash where it will be copied
+	 * into the allocate ram addresses by the existing
+	 * data initialization code in crt0
+	 */
+	.tdata ALIGN_WITH_INPUT : {
+		PROVIDE( __tdata_start = .);
+		PROVIDE( __tls_base = .);
 		*(.tdata .tdata.* .gnu.linkonce.td.*)
-	} >flash : tls : text
-	PROVIDE(__tdata_size__ = SIZEOF(.tdata));
+		PROVIDE(__data_end = .);
+	} >ram AT>flash :tls : text
+	PROVIDE( __tdata_source = LOADADDR(.tdata) );
+	PROVIDE( __tdata_size = SIZEOF(.tdata) );
 
-	.tdata_space : {
-		. = . + SIZEOF(.tdata);
-		PROVIDE(__tls_base__ = .);
-	} >ram
+	PROVIDE( __edata = __data_end );
+	PROVIDE( _edata = __data_end );
+	PROVIDE( edata = __data_end );
+	PROVIDE( __data_size = __data_end - __data_start );
 
-	PROVIDE( __edata = . );
-	PROVIDE( _edata = . );
-	PROVIDE( edata = . );
-	PROVIDE(__data_end__ = .);
-
-	PROVIDE( _fbss = . );
-	PROVIDE( __bss_start = . );
-	PROVIDE(__bss_start__ = .);
-
-	.tbss (NOLOAD) : {
+	.tbss : {
+		PROVIDE( __bss_start = . );
 		*(.tbss .tbss.* .gnu.linkonce.tb.*)
 		*(.tcommon)
 	} >ram : tls : text
-	PROVIDE(__tbss_size__ = SIZEOF(.tbss));
+	PROVIDE( __tbss_size = SIZEOF(.tbss) );
+
+	/*
+	 * The linker special cases .tbss segments which are
+	 * identified as segments which are not loaded and are
+	 * thread_local.
+	 *
+	 * For these segments, the linker does not advance 'dot'
+	 * across them.  We actually need memory allocated for tbss,
+	 * so we create a special segment here just to make room
+	 */
+	.tbss_space : {
+		. = . + __tbss_size;
+	} >ram
 
 	.bss : {
 		*(.sbss*)
@@ -189,13 +205,14 @@ SECTIONS
 		*(.bss .bss.*)
 		*(.gnu.linkonce.b.*)
 		*(COMMON)
+		__bss_end = .;
 	} >ram AT>ram :ram
-	PROVIDE( __end = . );
-	PROVIDE( _end = . );
-	PROVIDE( end = . );
-	PROVIDE( __bss_end__ = . );
+	PROVIDE( __end = __bss_end );
+	PROVIDE( _end = __bss_end );
+	PROVIDE( end = __bss_end );
+	PROVIDE(__bss_size = __bss_end - __bss_start);
 
 	PROVIDE( __heap_end = __ram + __ram_size );
-	PROVIDE( __heap_size = __heap_end - __end );
+	PROVIDE( __heap_size = __heap_end - __bss_end );
 }
 

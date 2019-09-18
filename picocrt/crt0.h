@@ -35,19 +35,18 @@
 
 #include <string.h>
 #include <picotls.h>
+#include <stdint.h>
 
-extern char __data_source__[];
-extern char __data_start__[];
-extern char __data_end__[];
-extern char __bss_start__[];
-extern char __bss_end__[];
+extern char __data_source[];
+extern char __data_start[];
+extern char __data_size[];
+extern char __bss_start[];
+extern char __bss_size[];
+extern char __tls_base[];
 
 /* These two functions must be defined in the architecture-specific
  * code
  */
-
-void
-_set_tls(void  *tls);
 
 void
 _start(void);
@@ -73,11 +72,9 @@ extern void __libc_fini_array(void);
 static inline void
 __start(void)
 {
-	memcpy(__data_start__, __data_source__,
-	       __data_end__ - __data_start__);
-	memset(__bss_start__, '\0',
-	       __bss_end__ - __bss_start__);
-	_set_tls(__tls_base__);
+	memcpy(__data_start, __data_source, (uintptr_t) __data_size);
+	memset(__bss_start, '\0', (uintptr_t) __bss_size);
+	_set_tls(__tls_base);
 #ifdef HAVE_INITFINI_ARRAY
 	__libc_init_array();
 #endif

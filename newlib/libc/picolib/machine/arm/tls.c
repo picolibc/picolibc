@@ -37,12 +37,23 @@
 #include <string.h>
 #include <stdint.h>
 
-void
-_init_tls(void *__tls)
+static void *__tls;
+
+void *
+__aeabi_read_tp(void)
 {
-	char *tls = __tls;
-	/* Copy tls initialized data */
-	memcpy(tls - (uintptr_t) &__tdata_size__, __tdata_source__, (uintptr_t) &__tdata_size__);
-	/* Clear tls zero data */
-	memset(tls, '\0', (uintptr_t) &__tbss_size__);
+	return __tls;
+}
+
+/* The size of the thread control block.
+ * TLS relocations are generated relative to
+ * a location this far *before* the first thread
+ * variable (!)
+ */
+#define TCB_SIZE	8
+
+void
+_set_tls(void *tls)
+{
+	__tls = (uint8_t *) tls - TCB_SIZE;
 }

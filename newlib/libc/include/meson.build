@@ -96,6 +96,8 @@ inc_headers = [
   'wordexp.h'
 ]
 
+inc_headers += ['picotls.h']
+
 if not newlib_tinystdio
   inc_headers += ['reent.h']
 endif

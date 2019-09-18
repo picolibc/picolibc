@@ -33,22 +33,15 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef _PICOTLS_H_
-#define _PICOTLS_H_
+#include <picotls.h>
+#include <string.h>
+#include <stdint.h>
 
-/* These addresses must be defined by the loader configuration file */
-
-extern char __tls_base__[];
-extern char __tbss_size__[];
-extern char __tdata_size__[];
-extern char __tdata_source__[];
-extern char __tdata_size__[];
-
-/* Initialize a TLS block, copying the data segment from flash and
- * zeroing the BSS segment
- */
+extern char __tdata_size[];
 
 void
-_init_tls(void *__tls);
-
-#endif /* _PICOTLS_H_ */
+_set_tls(void *tls)
+{
+	uint8_t *__tls = tls;
+	asm("la tp, %0" : : "r" (__tls + (uintptr_t) __tdata_size));
+}

@@ -35,20 +35,6 @@
 
 #include "../../crt0.h"
 
-static void *__tls;
-
-void *
-__aeabi_read_tp(void)
-{
-	return __tls;
-}
-
-void
-_set_tls(void *tls)
-{
-	__tls = tls;
-}
-
 void
 _start(void)
 {
