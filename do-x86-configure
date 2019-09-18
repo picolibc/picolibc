@@ -1,11 +1,11 @@
 #!/bin/sh
 DIR=`dirname $0`
 ARCH=i386-linux-gnu
-meson $DIR \
+meson "$DIR" \
+        -Dtls-model=global-dynamic \
         -Dmultilib=false \
 	-Dincludedir=picolibc/$ARCH/include \
 	-Dlibdir=picolibc/$ARCH/lib \
+	--cross-file "$DIR"/cross-$ARCH.txt \
 	-Dtests=true \
-	--cross-file $DIR/cross-$ARCH.txt \
-	--buildtype debug \
 	"$@"

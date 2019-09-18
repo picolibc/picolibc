@@ -1,6 +1,7 @@
 #!/bin/sh
 DIR=`dirname $0`
 meson $DIR \
+        -Dtls-model=global-dynamic \
         -Dmultilib=false \
         -Dpicolib=false \
 	-Dnewlib-global-atexit=true\

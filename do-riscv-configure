@@ -4,5 +4,5 @@ DIR=`dirname $0`
 meson "$DIR" \
 	-Dincludedir=picolibc/$ARCH/include \
 	-Dlibdir=picolibc/$ARCH/lib \
-	--cross-file "$arg"/cross-$ARCH.txt \
+	--cross-file "$DIR"/cross-$ARCH.txt \
 	"$@"
