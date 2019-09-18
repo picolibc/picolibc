@@ -1,8 +1,16 @@
 %rename link	picolibc_link
 %rename cpp	picolibc_cpp
+%rename cc1	picolibc_cc1
+%rename cc1plus	picolibc_cc1plus
 
 *cpp:
 -isystem @INCLUDEDIR@ %(picolibc_cpp)
+
+*cc1:
+%{!ftls-model:-ftls-model=@TLSMODEL@} %(picolibc_cc1)
+
+*cc1plus:
+%{!ftls-model:-ftls-model=@TLSMODEL@} %(picolibc_cc1plus)
 
 *link:
 %{!T:-T@LIBDIR@/picolibc.ld} -L@LIBDIR@/%M %(picolibc_link)

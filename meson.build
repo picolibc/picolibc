@@ -86,6 +86,7 @@ newlib_global_errno = get_option('newlib-global-errno')
 newlib_initfini_array = get_option('newlib-initfini-array')
 newlib_initfini = get_option('newlib-initfini')
 thread_local_storage = get_option('thread-local-storage')
+tls_model = get_option('tls-model')
 hw_fp = get_option('hw-fp')
 
 host_cpu=host_machine.cpu()
@@ -120,6 +121,11 @@ specs_data.set(
 specs_data.set(
   'LIBDIR',
   lib_dir
+)
+
+specs_data.set(
+  'TLSMODEL',
+  tls_model
 )
 
 configure_file(input: 'picolibc.specs.in',
@@ -255,6 +261,10 @@ configure_file(output : '_newlib_version.h',
 	       install_dir: includedir)
 
 arguments = ['-g', '-ffunction-sections', '-fdata-sections']
+
+if tls_model != ''
+  arguments += ['-ftls-model=' + tls_model]
+endif
 
 add_project_arguments(arguments, language: 'c')
 
