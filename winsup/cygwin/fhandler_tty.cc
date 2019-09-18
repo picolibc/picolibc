@@ -197,6 +197,9 @@ DEF_HOOK (ReadConsoleInputA);
 DEF_HOOK (ReadConsoleInputW);
 DEF_HOOK (PeekConsoleInputA);
 DEF_HOOK (PeekConsoleInputW);
+/* CreateProcess() is hooked for GDB etc. */
+DEF_HOOK (CreateProcessA);
+DEF_HOOK (CreateProcessW);
 
 static BOOL WINAPI
 WriteFile_Hooked
@@ -330,6 +333,35 @@ PeekConsoleInputW_Hooked
 {
   set_ishybrid_and_switch_to_pcon (h);
   return PeekConsoleInputW_Orig (h, r, l, n);
+}
+/* CreateProcess() is hooked for GDB etc. */
+static BOOL WINAPI
+CreateProcessA_Hooked
+     (LPCSTR n, LPSTR c, LPSECURITY_ATTRIBUTES pa, LPSECURITY_ATTRIBUTES ta,
+      BOOL inh, DWORD f, LPVOID e, LPCSTR d,
+      LPSTARTUPINFOA si, LPPROCESS_INFORMATION pi)
+{
+  HANDLE h;
+  if (si->dwFlags & STARTF_USESTDHANDLES)
+    h = si->hStdOutput;
+  else
+    h = GetStdHandle (STD_OUTPUT_HANDLE);
+  set_ishybrid_and_switch_to_pcon (h);
+  return CreateProcessA_Orig (n, c, pa, ta, inh, f, e, d, si, pi);
+}
+static BOOL WINAPI
+CreateProcessW_Hooked
+     (LPCWSTR n, LPWSTR c, LPSECURITY_ATTRIBUTES pa, LPSECURITY_ATTRIBUTES ta,
+      BOOL inh, DWORD f, LPVOID e, LPCWSTR d,
+      LPSTARTUPINFOW si, LPPROCESS_INFORMATION pi)
+{
+  HANDLE h;
+  if (si->dwFlags & STARTF_USESTDHANDLES)
+    h = si->hStdOutput;
+  else
+    h = GetStdHandle (STD_OUTPUT_HANDLE);
+  set_ishybrid_and_switch_to_pcon (h);
+  return CreateProcessW_Orig (n, c, pa, ta, inh, f, e, d, si, pi);
 }
 #else /* USE_API_HOOK */
 #define WriteFile_Orig 0
@@ -2778,6 +2810,9 @@ fhandler_pty_slave::fixup_after_exec ()
       DO_HOOK (NULL, ReadConsoleInputW);
       DO_HOOK (NULL, PeekConsoleInputA);
       DO_HOOK (NULL, PeekConsoleInputW);
+      /* CreateProcess() is hooked for GDB etc. */
+      DO_HOOK (NULL, CreateProcessA);
+      DO_HOOK (NULL, CreateProcessW);
     }
 #endif /* USE_API_HOOK */
 }
