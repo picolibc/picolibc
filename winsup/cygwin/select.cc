@@ -1209,7 +1209,6 @@ peek_pty_slave (select_record *s, bool from_select)
 	{
 	  if (ptys->is_line_input ())
 	    {
-#define INREC_SIZE (65536 / sizeof (INPUT_RECORD))
 	      INPUT_RECORD inp[INREC_SIZE];
 	      DWORD n;
 	      PeekConsoleInput (ptys->get_handle (), inp, INREC_SIZE, &n);

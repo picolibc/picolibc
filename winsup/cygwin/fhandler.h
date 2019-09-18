@@ -43,6 +43,12 @@ details. */
 
 #define O_TMPFILE_FILE_ATTRS (FILE_ATTRIBUTE_TEMPORARY | FILE_ATTRIBUTE_HIDDEN)
 
+/* Buffer size for ReadConsoleInput() and PeekConsoleInput(). */
+/* Per MSDN, max size of buffer required is below 64K. */
+/* (65536 / sizeof (INPUT_RECORD)) is 3276, however,
+   ERROR_NOT_ENOUGH_MEMORY occurs in win7 if this value is used. */
+#define INREC_SIZE 2048
+
 extern const char *windows_device_names[];
 extern struct __cygwin_perfile *perfile_table;
 #define __fmode (*(user_data->fmode_ptr))

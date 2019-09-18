@@ -499,9 +499,6 @@ fhandler_console::process_input_message (void)
 
   termios *ti = &(get_ttyp ()->ti);
 
-	  /* Per MSDN, max size of buffer required is below 64K. */
-#define	  INREC_SIZE	(65536 / sizeof (INPUT_RECORD))
-
   fhandler_console::input_states stat = input_processing;
   DWORD total_read, i;
   INPUT_RECORD input_rec[INREC_SIZE];
@@ -1165,9 +1162,6 @@ fhandler_console::ioctl (unsigned int cmd, void *arg)
 	return -1;
       case FIONREAD:
 	{
-	  /* Per MSDN, max size of buffer required is below 64K. */
-#define	  INREC_SIZE	(65536 / sizeof (INPUT_RECORD))
-
 	  DWORD n;
 	  int ret = 0;
 	  INPUT_RECORD inp[INREC_SIZE];
