@@ -137,9 +137,16 @@ force_attach_to_pcon (HANDLE h)
 		/* If the process is running on a console,
 		   the parent process should be attached
 		   to the same console. */
-		pinfo p (myself->ppid);
+		DWORD attach_wpid;
+		if (myself->ppid == 1)
+		  attach_wpid = ATTACH_PARENT_PROCESS;
+		else
+		  {
+		    pinfo p (myself->ppid);
+		    attach_wpid = p->dwProcessId;
+		  }
 		FreeConsole ();
-		if (AttachConsole (p->dwProcessId))
+		if (AttachConsole (attach_wpid))
 		  {
 		    pcon_attached_to = -1;
 		    attach_done = true;
