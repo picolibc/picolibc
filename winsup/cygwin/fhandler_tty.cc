@@ -370,7 +370,43 @@ CreateProcessW_Hooked
 void set_ishybrid_and_switch_to_pcon (HANDLE) {}
 #endif /* USE_API_HOOK */
 
-bool
+static char *
+convert_mb_str (UINT cp_to, size_t *len_to,
+		UINT cp_from, const char *ptr_from, size_t len_from)
+{
+  char *buf;
+  size_t nlen;
+  if (cp_to != cp_from)
+    {
+      size_t wlen =
+	MultiByteToWideChar (cp_from, 0, ptr_from, len_from, NULL, 0);
+      wchar_t *wbuf = (wchar_t *)
+	HeapAlloc (GetProcessHeap (), 0, wlen * sizeof (wchar_t));
+      wlen =
+	MultiByteToWideChar (cp_from, 0, ptr_from, len_from, wbuf, wlen);
+      nlen = WideCharToMultiByte (cp_to, 0, wbuf, wlen, NULL, 0, NULL, NULL);
+      buf = (char *) HeapAlloc (GetProcessHeap (), 0, nlen);
+      nlen = WideCharToMultiByte (cp_to, 0, wbuf, wlen, buf, nlen, NULL, NULL);
+      HeapFree (GetProcessHeap (), 0, wbuf);
+    }
+  else
+    {
+      /* Just copy */
+      buf = (char *) HeapAlloc (GetProcessHeap (), 0, len_from);
+      memcpy (buf, ptr_from, len_from);
+      nlen = len_from;
+    }
+  *len_to = nlen;
+  return buf;
+}
+
+static void
+mb_str_free (char *ptr)
+{
+  HeapFree (GetProcessHeap (), 0, ptr);
+}
+
+static bool
 bytes_available (DWORD& n, HANDLE h)
 {
   DWORD navail, nleft;
@@ -1270,34 +1306,11 @@ fhandler_pty_slave::write (const void *ptr, size_t len)
 
   reset_switch_to_pcon ();
 
-  char *buf;
-  ssize_t nlen;
-  UINT targetCodePage = get_ttyp ()->switch_to_pcon_out ?
+  UINT target_code_page = get_ttyp ()->switch_to_pcon_out ?
     GetConsoleOutputCP () : get_ttyp ()->term_code_page;
-  if (targetCodePage != get_ttyp ()->term_code_page)
-    {
-      size_t wlen =
-	MultiByteToWideChar (get_ttyp ()->term_code_page, 0,
-			     (char *)ptr, len, NULL, 0);
-      wchar_t *wbuf = (wchar_t *)
-	HeapAlloc (GetProcessHeap (), 0, wlen * sizeof (wchar_t));
-      wlen =
-	MultiByteToWideChar (get_ttyp ()->term_code_page, 0,
-			     (char *)ptr, len, wbuf, wlen);
-      nlen = WideCharToMultiByte (targetCodePage, 0,
-				  wbuf, wlen, NULL, 0, NULL, NULL);
-      buf = (char *) HeapAlloc (GetProcessHeap (), 0, nlen);
-      nlen = WideCharToMultiByte (targetCodePage, 0,
-				  wbuf, wlen, buf, nlen, NULL, NULL);
-      HeapFree (GetProcessHeap (), 0, wbuf);
-    }
-  else
-    {
-      /* Just copy */
-      buf = (char *) HeapAlloc (GetProcessHeap (), 0, len);
-      memcpy (buf, (char *)ptr, len);
-      nlen = len;
-    }
+  ssize_t nlen;
+  char *buf = convert_mb_str (target_code_page, (size_t *) &nlen,
+		 get_ttyp ()->term_code_page, (const char *) ptr, len);
 
   /* If not attached to this pseudo console, try to attach temporarily. */
   pid_restore = 0;
@@ -1334,7 +1347,7 @@ fhandler_pty_slave::write (const void *ptr, size_t len)
       towrite = -1;
     }
   release_output_mutex ();
-  HeapFree (GetProcessHeap (), 0, buf);
+  mb_str_free (buf);
   flags = ENABLE_VIRTUAL_TERMINAL_PROCESSING;
   if (get_ttyp ()->switch_to_pcon_out && !fallback)
     SetConsoleMode (get_output_handle (), dwMode | flags);
@@ -2260,33 +2273,10 @@ fhandler_pty_master::write (const void *ptr, size_t len)
      if current application is native console application. */
   if (to_be_read_from_pcon ())
     {
-      char *buf;
       size_t nlen;
+      char *buf = convert_mb_str
+	(CP_UTF8, &nlen, get_ttyp ()->term_code_page, (const char *) ptr, len);
 
-      if (get_ttyp ()->term_code_page != CP_UTF8)
-	{
-	  size_t wlen =
-	    MultiByteToWideChar (get_ttyp ()->term_code_page, 0,
-				 (char *)ptr, len, NULL, 0);
-	  wchar_t *wbuf = (wchar_t *)
-	    HeapAlloc (GetProcessHeap (), 0, wlen * sizeof (wchar_t));
-	  wlen =
-	    MultiByteToWideChar (get_ttyp ()->term_code_page, 0,
-				 (char *)ptr, len, wbuf, wlen);
-	  nlen = WideCharToMultiByte (CP_UTF8, 0,
-				      wbuf, wlen, NULL, 0, NULL, NULL);
-	  buf = (char *) HeapAlloc (GetProcessHeap (), 0, nlen);
-	  nlen = WideCharToMultiByte (CP_UTF8, 0,
-				      wbuf, wlen, buf, nlen, NULL, NULL);
-	  HeapFree (GetProcessHeap (), 0, wbuf);
-	}
-      else
-	{
-	  /* Just copy */
-	  buf = (char *) HeapAlloc (GetProcessHeap (), 0, len);
-	  memcpy (buf, (char *)ptr, len);
-	  nlen = len;
-	}
       DWORD wLen;
       WriteFile (to_slave, buf, nlen, &wLen, NULL);
 
@@ -2302,7 +2292,7 @@ fhandler_pty_master::write (const void *ptr, size_t len)
       else
 	SetEvent (input_available_event);
 
-      HeapFree (GetProcessHeap (), 0, buf);
+      mb_str_free (buf);
       return len;
     }
 
@@ -3039,32 +3029,10 @@ fhandler_pty_master::pty_master_fwd_thread ()
 	    }
 	  wlen = rlen;
 
-	  char *buf;
 	  size_t nlen;
-	  if (get_ttyp ()->term_code_page != CP_UTF8)
-	    {
-	      size_t wlen2 =
-		MultiByteToWideChar (CP_UTF8, 0,
-				     (char *)ptr, wlen, NULL, 0);
-	      wchar_t *wbuf = (wchar_t *)
-		HeapAlloc (GetProcessHeap (), 0, wlen2 * sizeof (wchar_t));
-	      wlen2 =
-		MultiByteToWideChar (CP_UTF8, 0,
-				     (char *)ptr, wlen, wbuf, wlen2);
-	      nlen = WideCharToMultiByte (get_ttyp ()->term_code_page, 0,
-					  wbuf, wlen2, NULL, 0, NULL, NULL);
-	      buf = (char *) HeapAlloc (GetProcessHeap (), 0, nlen);
-	      nlen = WideCharToMultiByte (get_ttyp ()->term_code_page, 0,
-					  wbuf, wlen2, buf, nlen, NULL, NULL);
-	      HeapFree (GetProcessHeap (), 0, wbuf);
-	    }
-	  else
-	    {
-	      /* Just copy */
-	      buf = (char *) HeapAlloc (GetProcessHeap (), 0, wlen);
-	      memcpy (buf, (char *)ptr, wlen);
-	      nlen = wlen;
-	    }
+	  char *buf = convert_mb_str
+	    (get_ttyp ()->term_code_page, &nlen, CP_UTF8, ptr, wlen);
+
 	  ptr = buf;
 	  wlen = rlen = nlen;
 
@@ -3083,7 +3051,7 @@ fhandler_pty_master::pty_master_fwd_thread ()
 	      wlen = (rlen -= written);
 	    }
 	  release_output_mutex ();
-	  HeapFree (GetProcessHeap (), 0, buf);
+	  mb_str_free (buf);
 	  continue;
 	}
       acquire_output_mutex (INFINITE);
