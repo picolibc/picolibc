@@ -90,7 +90,7 @@ fpsetround(fp_rnd rnd_dir)
     case FP_RP: new_rm = 3;
     default:    return -1;
     }
-  fssr (new_rm << 5 | fsr & 0x1f);
+  fssr (new_rm << 5 | (fsr & 0x1f));
   return frm_fp_rnd (rm);
 #else
   return -1;
@@ -102,7 +102,7 @@ fpsetsticky(fp_except sticky)
 {
 #ifdef __riscv_flen
   unsigned fsr = frsr ();
-  fssr (sticky & 0x1f | fsr & ~0x1f);
+  fssr ((sticky & 0x1f) | (fsr & ~0x1f));
   return fsr & 0x1f;
 #else
   return -1;
