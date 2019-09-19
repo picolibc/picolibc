@@ -57,5 +57,5 @@ _init_tls(void *__tls)
 	memcpy(tls, __tdata_source, (uintptr_t) __tdata_size);
 
 	/* Clear tls zero data */
-	memset(tls + __tdata_size, '\0', (uintptr_t) __tbss_size);
+	memset(tls + (uintptr_t) __tdata_size, '\0', (uintptr_t) __tbss_size);
 }
