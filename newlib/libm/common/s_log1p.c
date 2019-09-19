@@ -146,7 +146,7 @@ static double zero = 0.0;
 	double x;
 #endif
 {
-	double hfsq,f,c,s,z,R,u;
+	double hfsq,f,c=0,s,z,R,u;
 	__int32_t k,hx,hu,ax;
 
 	GET_HIGH_WORD(hx,x);
