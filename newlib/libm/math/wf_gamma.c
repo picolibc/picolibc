@@ -26,7 +26,7 @@
 #endif
 {
         float y;
-        y = __ieee754_gammaf_r(x,&signgam);
+        y = __ieee754_gammaf(x);
         if(_LIB_VERSION == _IEEE_) return y;
         if(!finitef(y)&&finitef(x)) {
 	    if(floorf(x)==x&&x<=0.0f) {

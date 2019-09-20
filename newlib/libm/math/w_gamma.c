@@ -148,10 +148,10 @@ in terms of the base return values, although the <[signgam]> global for
 #endif
 {
 #ifdef _IEEE_LIBM
-	return __ieee754_gamma_r(x,&signgam);
+	return __ieee754_gamma(x);
 #else
         double y;
-        y = __ieee754_gamma_r(x,&signgam);
+        y = __ieee754_gamma_r(x);
         if(_LIB_VERSION == _IEEE_) return y;
         if(!finite(y)&&finite(x)) {
 	    if(floor(x)==x&&x<=0.0) {

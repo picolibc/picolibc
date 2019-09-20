@@ -31,10 +31,10 @@
 #endif
 {
 #ifdef _IEEE_LIBM
-	return __ieee754_lgamma_r(x,&signgam);
+	return __ieee754_lgamma(x);
 #else
         double y;
-        y = __ieee754_lgamma_r(x,&signgam);
+        y = __ieee754_lgamma(x);
         if(_LIB_VERSION == _IEEE_) return y;
         if(!finite(y)&&finite(x)) {
 	    if(floor(x)==x&&x<=0.0)

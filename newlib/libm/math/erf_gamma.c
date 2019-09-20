@@ -18,21 +18,21 @@
  * Reentrant version of the logarithm of the Gamma function 
  * with user provide pointer for the sign of Gamma(x). 
  *
- * Method: See __ieee754_lgammaf_r
+ * Method: See __ieee754_lgammaf
  */
 
 #include "fdlibm.h"
 
 #if defined(_IEEE_LIBM) && defined(HAVE_ALIAS_ATTRIBUTE)
-__strong_reference(__ieee754_gammaf_r, gammaf_r);
+__strong_reference(__ieee754_gammaf, gammaf);
 #endif
 
 #ifdef __STDC__
-	float __ieee754_gammaf_r(float x, int *signgamp)
+	float __ieee754_gammaf(float x)
 #else
-	float __ieee754_gammaf_r(x,signgamp)
-	float x; int *signgamp;
+	float __ieee754_gammaf(x)
+	float x;
 #endif
 {
-	return __ieee754_expf (__ieee754_lgammaf_r(x,signgamp));
+	return __ieee754_expf (__ieee754_lgammaf(x));
 }

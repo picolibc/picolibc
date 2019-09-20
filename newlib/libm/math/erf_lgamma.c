@@ -145,14 +145,14 @@ static float zero=  0.0000000000e+00;
 
 
 #if defined(_IEEE_LIBM) && defined(HAVE_ALIAS_ATTRIBUTE)
-__strong_reference(__ieee754_lgammaf_r, lgammaf_r);
+__strong_reference(__ieee754_lgammaf, lgammaf);
 #endif
 
 #ifdef __STDC__
-	float __ieee754_lgammaf_r(float x, int *signgamp)
+	float __ieee754_lgammaf(float x)
 #else
-	float __ieee754_lgammaf_r(x,signgamp)
-	float x; int *signgamp;
+	float __ieee754_lgammaf(x)
+	float x;
 #endif
 {
 	float t,y,z,nadj = 0.0,p,p1,p2,p3,q,r,w;
@@ -161,13 +161,13 @@ __strong_reference(__ieee754_lgammaf_r, lgammaf_r);
 	GET_FLOAT_WORD(hx,x);
 
     /* purge off +-inf, NaN, +-0, and negative arguments */
-	*signgamp = 1;
+	signgam = 1;
 	ix = hx&0x7fffffff;
 	if(ix>=0x7f800000) return x*x;
 	if(ix==0) return one/zero;
 	if(ix<0x1c800000) {	/* |x|<2**-70, return -log(|x|) */
 	    if(hx<0) {
-	        *signgamp = -1;
+	        signgam = -1;
 	        return -__ieee754_logf(-x);
 	    } else return -__ieee754_logf(x);
 	}
@@ -177,7 +177,7 @@ __strong_reference(__ieee754_lgammaf_r, lgammaf_r);
 	    t = sin_pif(x);
 	    if(t==zero) return one/zero; /* -integer */
 	    nadj = __ieee754_logf(pi/fabsf(t*x));
-	    if(t<zero) *signgamp = -1;
+	    if(t<zero) signgam = -1;
 	    x = -x;
 	}
 
