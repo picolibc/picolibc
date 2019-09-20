@@ -949,7 +949,7 @@ _cygtls::interrupt_setup (siginfo_t& si, void *handler, struct sigaction& siga)
   if (incyg)
     set_signal_arrived ();
 
-  if (!have_execed)
+  if (!have_execed && ch_spawn.iscygwin ())
     proc_subproc (PROC_CLEARWAIT, 1);
   sigproc_printf ("armed signal_arrived %p, signal %d",
 		  signal_arrived, si.si_signo);
