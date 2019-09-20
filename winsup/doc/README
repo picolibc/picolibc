@@ -1,9 +1,0 @@
-ADDITIONAL BUILD REQUIREMENTS FOR DOCUMENTATION
-
-dblatex
-docbook-xml45
-docbook-xsl
-docbook2x-texi
-gzip
-texinfo
-xmlto

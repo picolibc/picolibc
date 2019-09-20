@@ -10,9 +10,7 @@ code from [Newlib](http://sourceware.org/newlib/) and
 
 Picolibc source comes from a variety of places and has a huge variety
 of copyright holders and license texts. The bulk of the code is
-covered by BSD-like licenses, either two or three clause, all of which
-are GPLv2+ compatible. Some of the code is covered by a GPL varient,
-but that code is only used on Linux platforms
+covered by BSD-like licenses, either two or three clause. There are source files included in 
 
 ## Documentation
 
