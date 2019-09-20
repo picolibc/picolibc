@@ -166,7 +166,6 @@ SECTIONS
 	 * data initialization code in crt0
 	 */
 	.tdata ALIGN_WITH_INPUT : {
-		PROVIDE( __tdata_start = .);
 		PROVIDE( __tls_base = .);
 		*(.tdata .tdata.* .gnu.linkonce.td.*)
 		PROVIDE(__data_end = .);
@@ -183,8 +182,10 @@ SECTIONS
 		PROVIDE( __bss_start = . );
 		*(.tbss .tbss.* .gnu.linkonce.tb.*)
 		*(.tcommon)
+		PROVIDE( __tls_end = . );
 	} >ram : tls : text
 	PROVIDE( __tbss_size = SIZEOF(.tbss) );
+	PROVIDE( __tls_size = __tls_end - __tls_base );
 
 	/*
 	 * The linker special cases .tbss segments which are
