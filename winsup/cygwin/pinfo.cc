@@ -570,7 +570,7 @@ _pinfo::set_ctty (fhandler_termios *fh, int flags)
 	tc.setsid (sid);
       sid = tc.getsid ();
       /* See above */
-      if (!tc.getpgid () && pgid == pid)
+      if ((!tc.getpgid () || being_debugged ()) && pgid == pid)
 	tc.setpgid (pgid);
     }
   debug_printf ("cygheap->ctty now %p, archetype %p", cygheap->ctty, fh ? fh->archetype : NULL);
