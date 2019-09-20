@@ -60,12 +60,12 @@ option('newlib-io-pos-args', type: 'boolean', value: false,
        description: 'enable printf-family positional arg support')
 option('newlib-io-c99-formats', type: 'boolean', value: false,
        description: 'enable C99 support in IO functions like printf/scanf')
-option('newlib-register-fini', type: 'boolean', value: false,
-       description: 'enable finalization function registration using atexit')
 option('newlib-io-long-long', type: 'boolean', value: false,
        description: 'enable long long type support in IO functions like printf/scanf')
 option('newlib-io-long-double', type: 'boolean', value: false,
        description: 'enable long double type support in IO functions printf/scanf')
+option('newlib-register-fini', type: 'boolean', value: false,
+       description: 'enable finalization function registration using atexit')
 option('newlib-mb', type: 'boolean', value: false,
        description: 'enable multibyte support')
 option('newlib-iconv-encodings', type: 'boolean', value: false,
@@ -121,7 +121,7 @@ option('newlib-locale-info', type: 'boolean', value: false,
 option('newlib-locale-info-extended', type: 'boolean', value: false,
        description: 'extended locale support')
 option('newlib-global-errno', type: 'boolean', value: false,
-       description: 'use global errnor variable')
+       description: 'use global errno variable')
 option('newlib-initfini-array', type: 'boolean', value: true,
        description: 'compiler supports INIT_ARRAY section types')
 option('newlib-initfini', type: 'boolean', value: true,
