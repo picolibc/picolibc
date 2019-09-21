@@ -5,6 +5,7 @@
 
 #include <machine/ieeefp.h>
 #include <float.h>
+#include <stdint.h>
 
 _BEGIN_STD_C
 
@@ -41,10 +42,10 @@ typedef union
   } nan;
   struct 
   {
-    unsigned long msw;
-    unsigned long lsw;
+    uint32_t msw;
+    uint32_t lsw;
   } parts;
-    long aslong[2];
+    int32_t aslong[2];
 } __ieee_double_shape_type;
 
 #elif defined __IEEE_LITTLE_ENDIAN
@@ -83,11 +84,11 @@ typedef union
   } nan;
   struct 
   {
-    unsigned long lsw;
-    unsigned long msw;
+    uint32_t lsw;
+    uint32_t msw;
   } parts;
 
-  long aslong[2];
+  int32_t aslong[2];
 
 } __ieee_double_shape_type;
 
@@ -113,7 +114,7 @@ typedef union
     unsigned int function0:6;
     unsigned int function1:16;
   } nan;
-  long p1;
+  int32_t p1;
   
 } __ieee_float_shape_type;
 
@@ -137,7 +138,7 @@ typedef union
     unsigned int exponent:8;
     unsigned int sign:1;
   } nan;
-  long p1;
+  int32_t p1;
   
 } __ieee_float_shape_type;
 
