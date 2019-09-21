@@ -437,6 +437,7 @@ int vfprintf (FILE * stream, const char *fmt, va_list ap)
 		flags |= FL_FLTFIX;
 	    } else {
 		ndigs = prec;
+		if (ndigs < 1) ndigs = 1;
 		ndecimal = 0;
 	    }
 
