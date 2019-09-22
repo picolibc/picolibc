@@ -71,8 +71,8 @@ Assign these symbols in the linker script as follows:
  * __bss_size is an absolute symbol noting the size of the cleared
    data segment
 
- 4) Call [initializers/constructors](init) using `__libc_init_array()`
+ 4) Call [initializers/constructors](init.md) using `__libc_init_array()`
 
  5) Call `main()`
 
- 6) Call [finalizers/destructors](fini) using `__libc_fini_array()`
+ 6) Call [finalizers/destructors](init.md) using `__libc_fini_array()`
