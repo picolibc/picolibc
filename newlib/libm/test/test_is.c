@@ -1,5 +1,6 @@
 #include "test.h"
 #include <ctype.h>
+#include <stdlib.h>
 
 int setascii;
 int setlower;
@@ -2015,8 +2016,8 @@ test_is (void)
   test_is_set(isspace, "isspace function", &myspace);
   test_is_set(isupper, "isupper function", &myupper);
   test_is_set(isxdigit, "isxdigit function", &myxdigit);
-  test_to_set(_tolower, "_tolower function", &setlower, 'A','Z');
-  test_to_set(_toupper, "_toupper function", &setupper, 'a','z');
+  test_to_set(tolower, "tolower function", &setlower, 'A','Z');
+  test_to_set(toupper, "toupper function", &setupper, 'a','z');
   test_to_set(def__tolower, "_tolower define", &setlower, 'A','Z');
   test_to_set(def__toupper, "_toupper define", &setupper, 'a','z');
   test_to_set(def_toascii, "toascii define", &setascii, 0,255);
