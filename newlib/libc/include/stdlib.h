@@ -189,7 +189,7 @@ int	putenv (char *__string);
 int	setenv (const char *__string, const char *__value, int __overwrite);
 #endif
 
-#if __XSI_VISIBLE >= 4 && __POSIX_VISIBLE < 200112
+#if __XSI_VISIBLE >= 4
 char *	gcvt (double,int,char *);
 char *	gcvtf (float,int,char *);
 char *	fcvt (double,int,int *,int *);
