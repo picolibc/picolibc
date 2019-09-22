@@ -160,34 +160,24 @@ compiled 20 times with the specified compiler options (replace the
 Because Picolibc targets smaller systems like the SiFive FE310 or ARM
 Cortex-M0 parts with only a few kB of RAM and flash, the default
 values for all of the configuration options are designed to minimize
-the library code size.
+the library code size. Here's the
+[do-riscv-configure](../do-riscv-configure) script from the repository
+that configures the library for small RISC-V systems:
 
     #!/bin/sh
-    ARCH=arm-none-eabi
+    ARCH=riscv64-unknown-elf
     DIR=`dirname $0`
-    meson $DIR \
-	    -Dtarget-optspace=true \
-	    -Dnewlib-tinystdio=true \
-	    -Dnewlib-supplied-syscalls=false \
-	    -Dnewlib-reentrant-small=true\
-	    -Dnewlib-wide-orient=false\
-	    -Dnewlib-nano-malloc=true\
-	    -Dlite-exit=true\
-	    -Dnewlib-global-atexit=true\
-	    -Dincludedir=lib/newlib-nano/$ARCH/include \
-	    -Dlibdir=lib/newlib-nano/$ARCH/lib \
-	    --cross-file $DIR/cross-$ARCH.txt \
-	    --buildtype plain
-
-Note the use of '--buildtype plain'. This stops meson from adding
-compilation options so that the '-Dtarget-optspace=true' option can
-select '-Os'.
+    meson "$DIR" \
+	    -Dincludedir=picolibc/$ARCH/include \
+	    -Dlibdir=picolibc/$ARCH/lib \
+	    --cross-file "$DIR"/cross-$ARCH.txt \
+	    "$@"
 
 This script is designed to be run from a build directory, so you'd do:
 
-    $ mkdir build-arm-none-eabi
-    $ cd build-arm-none-eabi
-    $ ../do-arm-configure
+    $ mkdir build-riscv64-unknown-elf
+    $ cd build-riscv64-unknown-elf
+    $ ../do-riscv-configure
 
 ### Compiling
 
