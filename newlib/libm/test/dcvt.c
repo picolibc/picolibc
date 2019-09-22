@@ -191,7 +191,7 @@ normalize (double value,
   
 }
 int
-round (cvt_info_type *in,
+dcvt_round (cvt_info_type *in,
        char *start,
        char *now,
        char ch)
@@ -306,7 +306,7 @@ _cvte (register  cvt_info_type *in)
     
   }
 
-  if (round(in,
+  if (dcvt_round(in,
 	    in->buffer,
 	    in->buffer+buffer_idx,
 	    nextdigit(&(in->value)))) 
@@ -413,7 +413,7 @@ _cvtf (cvt_info_type *in)
 
   in->null_idx = buffer_idx;  
   in->buffer[buffer_idx] = 0;
-  if (round(in, in->buffer, in->buffer+buffer_idx,
+  if (dcvt_round(in, in->buffer, in->buffer+buffer_idx,
 	    nextdigit(&(in->value)))) 
   {
       _cvtf(in);
