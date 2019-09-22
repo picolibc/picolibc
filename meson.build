@@ -237,18 +237,16 @@ version_data.set('_NEWLIB_MINOR__', version_array[1], description: 'The newlib m
 version_data.set('__NEWLIB_PATCHLEVEL__', version_array[2], description: 'The newlib patch level.')
 
 if newlib_tinystdio
-  inc = include_directories(
-    '.',
-    'newlib/libc/tinystdio',
-    'newlib/libc/include'
-  )
+  stdio_inc_dir = 'newlib/libc/tinystdio'
 else
-  inc = include_directories(
-    '.',
-    'newlib/libc/stdio',
-    'newlib/libc/include',
-  )
+  stdio_inc_dir = 'newlib/libc/stdio'
 endif
+
+inc_dirs = [stdio_inc_dir, '.', 'newlib/libc/include']
+
+inc = include_directories(inc_dirs)
+test_inc_dirs = ['newlib/testsuite/include'] + inc_dirs
+test_inc = include_directories(test_inc_dirs)
 
 includedir = join_paths(get_option('prefix'), get_option('includedir'))
 

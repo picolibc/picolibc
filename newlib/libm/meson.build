@@ -88,3 +88,8 @@ foreach target : targets
 			      pic: false,
 			      objects : libobjs))
 endforeach
+
+if enable_tests
+  subdir('test')
+endif
+
