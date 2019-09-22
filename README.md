@@ -9,12 +9,15 @@ code from [Newlib](http://sourceware.org/newlib/) and
 ## License
 
 Picolibc source comes from a variety of places and has a huge variety
-of copyright holders and license texts. The bulk of the code is
-covered by BSD-like licenses, either two or three clause. There are source files included in 
+of copyright holders and license texts. While much of the code comes
+from newlib, none of the GPL-related bits are left in the repository,
+so all of the source code uses BSD-like licenses, a mixture of 2- and
+3- clause BSD itself and a variety of other (mostly older) licenses
+with similar terms.
 
 ## Documentation
 
- * [Building Picolibc](doc/build)
- * [Using Picolibc](doc/using)
- * [Picolibc initialization](doc/init)
- * [Thread Local Storage](doc/tls)
+ * [Building Picolibc](doc/build.md)
+ * [Using Picolibc](doc/using.md)
+ * [Picolibc initialization](doc/init.md)
+ * [Thread Local Storage](doc/tls.md)
