@@ -2,8 +2,16 @@
 DIR=`dirname $0`
 ARCH=i386-linux-gnu
 meson "$DIR" \
+        --buildtype debug \
         -Dtls-model=global-dynamic \
         -Dmultilib=false \
+        -Dpicolib=false \
+        -Dnewlib-locale-info=true\
+        -Dnewlib-locale-info-extended=true\
+        -Dnewlib-elix-level=2\
+	-Dnewlib-mb=true\
+	-Dnewlib-global-errno=true\
+	-Dnewlib-global-atexit=true\
 	-Dincludedir=picolibc/$ARCH/include \
 	-Dlibdir=picolibc/$ARCH/lib \
 	--cross-file "$DIR"/cross-$ARCH.txt \

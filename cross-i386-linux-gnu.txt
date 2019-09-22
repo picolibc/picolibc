@@ -2,11 +2,13 @@
 c_args = ['-m32']
 as_args = ['-32']
 c_link_args = ['-m32']
+needs_exe_wrapper = true
 
 [binaries]
 c = 'gcc'
 ar = 'ar'
 as = 'as'
+exe_wrapper = 'env'
 
 [host_machine]
 system='linux'
