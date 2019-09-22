@@ -142,7 +142,11 @@ touupper (wint_t c)
 wint_t
 towctrans_l (wint_t c, wctrans_t w, struct __locale_t *locale)
 {
+#ifdef _MB_CAPABLE
   wint_t u = _jp2uc_l (c, locale);
+#else
+  wint_t u = c;
+#endif
   wint_t res;
   if (w == WCT_TOLOWER)
     res = toulower (u);
@@ -156,7 +160,11 @@ towctrans_l (wint_t c, wctrans_t w, struct __locale_t *locale)
       return c;
     }
   if (res != u)
+#ifdef _MB_CAPABLE
     return _uc2jp_l (res, locale);
+#else
+    return res;
+#endif
   else
     return c;
 }
