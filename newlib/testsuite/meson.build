@@ -32,6 +32,15 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
-subdir('libc')
-subdir('libm')
-subdir('testsuite')
+
+dirs = ['newlib.iconv',
+	'newlib.locale',
+	'newlib.search',
+	'newlib.stdio',
+	'newlib.stdlib',
+	'newlib.string',
+	'newlib.wctype']
+
+foreach dir : dirs
+  subdir(dir)
+endforeach
