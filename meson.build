@@ -38,7 +38,7 @@ project('picolibc', 'c',
 	  'c_std=gnu99',
 	  'b_staticpic=false',
 	],
-	version: '3.1.0.2019.09.11'
+	version: '1.0.0'
 )
 
 targets = []
