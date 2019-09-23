@@ -179,6 +179,7 @@ endif
 
 conf_data = configuration_data()
 
+NEWLIB_VERSION='2.10.0'
 NEWLIB_MAJOR_VERSION=2
 NEWLIB_MINOR_VERSION=10
 NEWLIB_PATCHLEVEL_VERSION=0
@@ -231,10 +232,15 @@ version_data = configuration_data()
 
 version_array = meson.project_version().split('.')
 
-version_data.set('_NEWLIB_VERSION', '"@0@"'.format(meson.project_version()), description: 'The newlib version in string format.')
-version_data.set('_NEWLIB__', version_array[0], description: 'The newlib major version number.')
-version_data.set('_NEWLIB_MINOR__', version_array[1], description: 'The newlib minor version number.')
-version_data.set('__NEWLIB_PATCHLEVEL__', version_array[2], description: 'The newlib patch level.')
+version_data.set('_PICOLIBC_VERSION', '"@0@"'.format(meson.project_version()), description: 'The Picolibc version in string format.')
+version_data.set('_PICOLIBC__', version_array[0], description: 'The Picolibc major version number.')
+version_data.set('_PICOLIBC_MINOR__', version_array[1], description: 'The Picolibc minor version number.')
+version_data.set('__PICOLIBC_PATCHLEVEL__', version_array[2], description: 'The Picolibc patch level.')
+
+version_data.set('_NEWLIB_VERSION', '"@0@"'.format(NEWLIB_VERSION), description: 'The newlib version in string format.')
+version_data.set('_NEWLIB__', NEWLIB_MAJOR_VERSION, description: 'The newlib major version number.')
+version_data.set('_NEWLIB_MINOR__', NEWLIB_MINOR_VERSION, description: 'The newlib minor version number.')
+version_data.set('__NEWLIB_PATCHLEVEL__', NEWLIB_PATCHLEVEL_VERSION, description: 'The newlib patch level.')
 
 if newlib_tinystdio
   stdio_inc_dir = 'newlib/libc/tinystdio'
