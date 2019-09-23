@@ -35,6 +35,19 @@
 
 ENTRY(_start)
 
+/*
+ * These values should be provided by the application. We'll include
+ * some phony values here to make things link for testing
+ */
+
+__flash = DEFINED(__flash) ? __flash : 0x10000000;
+__flash_size = DEFINED(__flash_size) ? __flash_size : 0x10000;
+
+__ram = DEFINED(__ram) ? __ram : 0x20000000;
+__ram_size = DEFINED(__ram_size) ? __ram_size : 0x8000;
+
+__stack_size = DEFINED(__stack_size) ? __stack_size : 0x400;
+
 MEMORY
 {
 	flash (rxai!w) : ORIGIN = __flash, LENGTH = __flash_size
@@ -51,14 +64,6 @@ PHDRS
 
 SECTIONS
 {
-	__flash = DEFINED(__flash) ? __flash : 0x10000000;
-	__flash_size = DEFINED(__flash_size) ? __flash_size : 0x10000;
-
-	__ram = DEFINED(__ram) ? __ram : 0x20000000;
-	__ram_size = DEFINED(__ram_size) ? __ram_size : 0x8000;
-
-	__stack_size = DEFINED(__stack_size) ? __stack_size : 0x400;
-
 	PROVIDE(__stack = ORIGIN(ram) + __ram_size);
 
 	.init : {
@@ -132,17 +137,8 @@ SECTIONS
 		KEEP (*(.dtors))
 	} >flash AT>flash :text
 
-	.lalign : {
-		. = ALIGN(8);
-		PROVIDE( __data_source = . );
-	} >flash AT>flash :text
-
-	.dalign : {
-		. = ALIGN(8);
-		PROVIDE( __data_start = . );
-	} >ram AT>flash :ram_init
-
-	.data : ALIGN_WITH_INPUT {
+	.data : {
+		PROVIDE(__data_start = .);
 		*(.data .data.*)
 		*(.gnu.linkonce.d.*)
 		. = ALIGN(8);
@@ -156,6 +152,7 @@ SECTIONS
 		*(.srodata.cst2)
 		*(.srodata .srodata.*)
 	} >ram AT>flash :ram_init
+	PROVIDE(__data_source = LOADADDR(.data));
 
 	/* Thread local initialized data. This gets
 	 * space allocated as it is expected to be placed
