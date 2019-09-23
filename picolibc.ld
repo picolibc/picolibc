@@ -165,7 +165,7 @@ SECTIONS
 	 * into the allocate ram addresses by the existing
 	 * data initialization code in crt0
 	 */
-	.tdata ALIGN_WITH_INPUT : {
+	.tdata : ALIGN_WITH_INPUT {
 		PROVIDE( __tls_base = .);
 		*(.tdata .tdata.* .gnu.linkonce.td.*)
 		PROVIDE(__data_end = .);
