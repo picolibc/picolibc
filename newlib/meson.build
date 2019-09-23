@@ -34,4 +34,6 @@
 #
 subdir('libc')
 subdir('libm')
-subdir('testsuite')
+if enable_tests
+  subdir('testsuite')
+endif
