@@ -13,7 +13,7 @@
 %{!ftls-model:-ftls-model=@TLSMODEL@} %(picolibc_cc1plus)
 
 *link:
-%{!T:-T@LIBDIR@/picolibc.ld} -L@LIBDIR@/%M %(picolibc_link)
+-L@LIBDIR@/%M -L@LIBDIR@ %{!T:-Tpicolibc.ld} %(picolibc_link)
 
 *lib:
 --start-group -lc --end-group 
