@@ -885,6 +885,10 @@ extern char *tmpnam (char *s);
 #endif /* __ASSEMBLER */
 
 #ifdef NEWLIB_INTEGER_PRINTF_SCANF
+#define PICOLIBC_INTEGER_PRINTF_SCANF
+#endif
+
+#ifdef PICOLIBC_INTEGER_PRINTF_SCANF
 
 #define PRINTF_LEVEL	PRINTF_STD
 #define SCANF_LEVEL	SCANF_STD

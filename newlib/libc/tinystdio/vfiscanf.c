@@ -30,6 +30,6 @@
 
 */
 
-#define NEWLIB_INTEGER_PRINTF_SCANF
+#define PICOLIBC_INTEGER_PRINTF_SCANF
 
 #include <vfscanf.c>
