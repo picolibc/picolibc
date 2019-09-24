@@ -79,3 +79,6 @@ Bug Fixes
 - 64 bit only: Avoid collisions between memory maps created with shmat
   and Windows datastructures during fork.
   Addresses: https://cygwin.com/ml/cygwin/2019-08/msg00107.html
+
+- Make rmdir fail if its argument is a symlink.
+  Addresses: https://cygwin.com/ml/cygwin/2019-09/msg00221.html
