@@ -24,10 +24,10 @@
 _LIB_VERSION_TYPE _LIB_VERSION = _POSIX_;
 #else
 #ifdef _XOPEN_MODE
-_LIB_VERSION_TYPE _LIB_VERSION = _XOPEN_;
+#error _XOPEN_MODE is unsupported
 #else
 #ifdef _SVID3_MODE
-_LIB_VERSION_TYPE _LIB_VERSION = _SVID_;
+#error _SVID3_MODE is unsupported
 #else					/* default _IEEE_MODE */
 _LIB_VERSION_TYPE _LIB_VERSION = _IEEE_;
 #endif

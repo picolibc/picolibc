@@ -140,7 +140,7 @@ __hash_open (const char *file,
 	new_table = 0;
 	if (!file || (flags & O_TRUNC) ||
 #ifdef __USE_INTERNAL_STAT64
-	    (_stat64(file, &statbuf) && (errno == ENOENT))) {
+	    (stat64(file, &statbuf) && (errno == ENOENT))) {
 #else
 	    (stat(file, &statbuf) && (errno == ENOENT))) {
 #endif
@@ -156,7 +156,7 @@ __hash_open (const char *file,
 		   a new .db file, then reinitialize the database */
 		if ((flags & O_CREAT) &&
 #ifdef __USE_INTERNAL_STAT64
-		     _fstat64(hashp->fp, &statbuf) == 0 && statbuf.st_size == 0)
+		     fstat64(hashp->fp, &statbuf) == 0 && statbuf.st_size == 0)
 #else
 		     fstat(hashp->fp, &statbuf) == 0 && statbuf.st_size == 0)
 #endif
@@ -341,7 +341,7 @@ init_hash(hashp, file, info)
 	/* Fix bucket size to be optimal for file system */
 	if (file != NULL) {
 #ifdef __USE_INTERNAL_STAT64
-		if (_stat64(file, &statbuf))
+		if (stat64(file, &statbuf))
 #else
 		if (stat(file, &statbuf))
 #endif

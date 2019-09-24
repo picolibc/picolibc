@@ -1,3 +1,17 @@
+*** Major changes in newlib version 3.1.0:
+
+- global stdio streams support added for reent small
+- _CLOCKID_T made system configurable
+- generated Unicode 10.0 width data, case conversion data,
+  character category data
+- Unicode table generation scripts fixed/enhanced
+- performance enhancements for qsort, strstr
+- nvptx port added
+- sinf/cosf/sincosf/exp/exp2/log/log2/pow rewritten for performance and accuracy
+- various gcc warnings fixed
+- various standard improvements
+
+
 *** Major changes in newlib version 3.0.0:
 
 - K&R support removed in code and docs

@@ -2,7 +2,6 @@
 
 #define  _MATH_H_
 
-#include <sys/reent.h>
 #include <sys/cdefs.h>
 #include <ieeefp.h>
 #include "_ansi.h"
@@ -559,49 +558,8 @@ extern float pow10l (float);
 #endif /* __GNU_VISIBLE */
 
 #if __MISC_VISIBLE || __XSI_VISIBLE
-/* The gamma functions use a global variable, signgam.  */
-#ifndef _REENT_ONLY
-#define signgam (*__signgam())
-extern int *__signgam (void);
-#endif /* ! defined (_REENT_ONLY) */
-
-#define __signgam_r(ptr) _REENT_SIGNGAM(ptr)
+extern NEWLIB_THREAD_LOCAL int signgam;
 #endif /* __MISC_VISIBLE || __XSI_VISIBLE */
-
-#if __SVID_VISIBLE
-/* The exception structure passed to the matherr routine.  */
-/* We have a problem when using C++ since `exception' is a reserved
-   name in C++.  */
-#ifdef __cplusplus
-struct __exception
-#else
-struct exception
-#endif
-{
-  int type;
-  char *name;
-  double arg1;
-  double arg2;
-  double retval;
-  int err;
-};
-
-#ifdef __cplusplus
-extern int matherr (struct __exception *e);
-#else
-extern int matherr (struct exception *e);
-#endif
-
-/* Values for the type field of struct exception.  */
-
-#define DOMAIN 1
-#define SING 2
-#define OVERFLOW 3
-#define UNDERFLOW 4
-#define TLOSS 5
-#define PLOSS 6
-
-#endif /* __SVID_VISIBLE */
 
 /* Useful constants.  */
 
@@ -642,8 +600,6 @@ extern int matherr (struct exception *e);
 enum __fdlibm_version
 {
   __fdlibm_ieee = -1,
-  __fdlibm_svid,
-  __fdlibm_xopen,
   __fdlibm_posix
 };
 
@@ -653,8 +609,6 @@ enum __fdlibm_version
 extern __IMPORT _LIB_VERSION_TYPE _LIB_VERSION;
 
 #define _IEEE_  __fdlibm_ieee
-#define _SVID_  __fdlibm_svid
-#define _XOPEN_ __fdlibm_xopen
 #define _POSIX_ __fdlibm_posix
 
 #endif /* __BSD_VISIBLE */

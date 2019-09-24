@@ -4,14 +4,10 @@ FUNCTION
 
 INDEX
 	signal
-INDEX
-	_signal_r
 
 SYNOPSIS
 	#include <signal.h>
 	void (*signal(int <[sig]>, void(*<[func]>)(int))) (int);
-
-	void (*_signal_r(void *<[reent]>, int <[sig]>, void(*<[func]>)(int))) (int);
 
 DESCRIPTION
 <<signal>> provides a simple signal-handling implementation for embedded
@@ -38,9 +34,6 @@ return), your program's execution continues at the point
 where it was when the signal was raised (whether by your program
 itself, or by an external event).  Signal handlers can also
 use functions such as <<exit>> and <<abort>> to avoid returning.
-
-The alternate function <<_signal_r>> is the reentrant version.
-The extra argument <[reent]> is a pointer to a reentrancy structure.
 
 @c FIXME: do we have setjmp.h and assoc fns?
 
@@ -72,9 +65,6 @@ without an operating system that can actually raise exceptions.
  * for the signal sig, or SIG_ERR if the request fails.
  */
 
-/* _init_signal initialises the signal handlers for each signal. This function
-   is called by crt0 at program startup.  */
-
 #ifdef SIGNAL_PROVIDED
 
 int _dummy_simulated_signal;
@@ -85,86 +75,64 @@ int _dummy_simulated_signal;
 #include <signal.h>
 #include <stddef.h>
 #include <stdlib.h>
-#include <reent.h>
 #include <_syslist.h>
+#include <unistd.h>
 
-int
-_init_signal_r (struct _reent *ptr)
-{
-  int i;
-
-  if (ptr->_sig_func == NULL)
-    {
-      ptr->_sig_func = (_sig_func_ptr *)_malloc_r (ptr, sizeof (_sig_func_ptr) * NSIG);
-      if (ptr->_sig_func == NULL)
-	return -1;
-
-      for (i = 0; i < NSIG; i++)
-	ptr->_sig_func[i] = SIG_DFL;
-    }
-
-  return 0;
-}
+/* signal info */
+static NEWLIB_THREAD_LOCAL void (*(_sig_func[NSIG]))(int);
 
 _sig_func_ptr
-_signal_r (struct _reent *ptr,
-	int sig,
-	_sig_func_ptr func)
+signal (int sig, _sig_func_ptr func)
 {
   _sig_func_ptr old_func;
 
   if (sig < 0 || sig >= NSIG)
     {
-      __errno_r(ptr) = EINVAL;
+      errno = EINVAL;
       return SIG_ERR;
     }
 
-  if (ptr->_sig_func == NULL && _init_signal_r (ptr) != 0)
-    return SIG_ERR;
-  
-  old_func = ptr->_sig_func[sig];
-  ptr->_sig_func[sig] = func;
+  old_func = _sig_func[sig];
+  _sig_func[sig] = func;
 
   return old_func;
 }
 
-int 
-_raise_r (struct _reent *ptr,
-     int sig)
+int
+raise (int sig)
 {
   _sig_func_ptr func;
 
   if (sig < 0 || sig >= NSIG)
     {
-      __errno_r(ptr) = EINVAL;
+      errno = EINVAL;
       return -1;
     }
 
-  if (ptr->_sig_func == NULL)
+  if (_sig_func == NULL)
     func = SIG_DFL;
   else
-    func = ptr->_sig_func[sig];
+    func = _sig_func[sig];
 
   if (func == SIG_DFL)
-    return _kill_r (ptr, _getpid_r (ptr), sig);
+    return kill (getpid (), sig);
   else if (func == SIG_IGN)
     return 0;
   else if (func == SIG_ERR)
     {
-      __errno_r(ptr) = EINVAL;
+      errno = EINVAL;
       return 1;
     }
   else
     {
-      ptr->_sig_func[sig] = SIG_DFL;
+      _sig_func[sig] = SIG_DFL;
       func (sig);
       return 0;
     }
 }
 
 int
-__sigtramp_r (struct _reent *ptr,
-     int sig)
+__sigtramp (int sig)
 {
   _sig_func_ptr func;
 
@@ -173,10 +141,7 @@ __sigtramp_r (struct _reent *ptr,
       return -1;
     }
 
-  if (ptr->_sig_func == NULL && _init_signal_r (ptr) != 0)
-    return -1;
-
-  func = ptr->_sig_func[sig];
+  func = _sig_func[sig];
   if (func == SIG_DFL)
     return 1;
   else if (func == SIG_ERR)
@@ -185,39 +150,10 @@ __sigtramp_r (struct _reent *ptr,
     return 3;
   else
     {
-      ptr->_sig_func[sig] = SIG_DFL;
+      _sig_func[sig] = SIG_DFL;
       func (sig);
       return 0;
     }
 }
-
-#ifndef _REENT_ONLY
-
-int 
-raise (int sig)
-{
-  return _raise_r (_REENT, sig);
-}
-
-_sig_func_ptr
-signal (int sig,
-	_sig_func_ptr func)
-{
-  return _signal_r (_REENT, sig, func);
-}
-
-int 
-_init_signal (void)
-{
-  return _init_signal_r (_REENT);
-}
-
-int
-__sigtramp (int sig)
-{
-  return __sigtramp_r (_REENT, sig);
-}
-
-#endif
 
 #endif /* !SIGNAL_PROVIDED */

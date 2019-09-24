@@ -30,7 +30,6 @@ THIS SOFTWARE.
  * with " at " changed at "@" and " dot " changed to ".").	*/
 
 #include <_ansi.h>
-#include <reent.h>
 #include <string.h>
 #include <locale.h>
 #include "mprec.h"
@@ -98,7 +97,7 @@ rshift (_Bigint *b,
 }
 
 static _Bigint *
-increment (struct _reent *ptr,
+increment (
 	_Bigint *b)
 {
 	__ULong *x, *xe;
@@ -129,9 +128,9 @@ increment (struct _reent *ptr,
 #endif
 	{
 		if (b->_wds >= b->_maxwds) {
-			b1 = Balloc(ptr, b->_k+1);
+			b1 = Balloc(b->_k+1);
 			Bcopy(b1, b);
-			Bfree(ptr, b);
+			Bfree(b);
 			b = b1;
 			}
 		b->_x[b->_wds++] = 1;
@@ -141,7 +140,7 @@ increment (struct _reent *ptr,
 
 
 int
-gethex (struct _reent *ptr, const char **sp, const FPI *fpi,
+gethex (const char **sp, const FPI *fpi,
 	Long *exp, _Bigint **bp, int sign, locale_t loc)
 {
 	_Bigint *b;
@@ -219,7 +218,7 @@ gethex (struct _reent *ptr, const char **sp, const FPI *fpi,
 	n = s1 - s0 - 1;
 	for(k = 0; n > 7; n >>= 1)
 		k++;
-	b = Balloc(ptr, k);
+	b = Balloc(k);
 	x = b->_x;
 	n = 0;
 	L = 0;
@@ -260,13 +259,13 @@ gethex (struct _reent *ptr, const char **sp, const FPI *fpi,
 		}
 	else if (n < nbits) {
 		n = nbits - n;
-		b = lshift(ptr, b, n);
+		b = lshift(b, n);
 		e -= n;
 		x = b->_x;
 		}
 	if (e > fpi->emax) {
  ovfl:
-		Bfree(ptr, b);
+		Bfree(b);
 		*bp = 0;
 		return STRTOG_Infinite | STRTOG_Overflow | STRTOG_Inexhi;
 		}
@@ -294,7 +293,7 @@ gethex (struct _reent *ptr, const char **sp, const FPI *fpi,
 						| STRTOG_Underflow;
 					}
 			  }
-			Bfree(ptr, b);
+			Bfree(b);
 			*bp = 0;
 			return STRTOG_Zero | STRTOG_Inexlo | STRTOG_Underflow;
 			}
@@ -327,7 +326,7 @@ gethex (struct _reent *ptr, const char **sp, const FPI *fpi,
 		  }
 		if (up) {
 			k = b->_wds;
-			b = increment(ptr, b);
+			b = increment(b);
 			x = b->_x;
 			if (irv == STRTOG_Denormal) {
 				if (nbits == fpi->nbits - 1

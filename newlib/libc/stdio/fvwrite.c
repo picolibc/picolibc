@@ -142,7 +142,7 @@ __sfvwrite_r (struct _reent *ptr,
 		  if (fp->_flags & __SOPT)
 		    {
 		      /* asnprintf leaves original buffer alone.  */
-		      str = (unsigned char *)_malloc_r (ptr, newsize);
+		      str = (unsigned char *)malloc (newsize);
 		      if (!str)
 			{
 			  __errno_r(ptr) = ENOMEM;
@@ -153,13 +153,13 @@ __sfvwrite_r (struct _reent *ptr,
 		    }
 		  else
 		    {
-		      str = (unsigned char *)_realloc_r (ptr, fp->_bf._base,
+		      str = (unsigned char *)realloc (fp->_bf._base,
 							 newsize);
 		      if (!str)
 			{
 			  /* Free buffer which is no longer used and clear
 			     __SMBF flag to avoid double free in fclose.  */
-			  _free_r (ptr, fp->_bf._base);
+			  free (fp->_bf._base);
 			  fp->_flags &=  ~__SMBF;
 			  /* Ensure correct errno, even if free changed it.  */
 			  __errno_r(ptr) = ENOMEM;

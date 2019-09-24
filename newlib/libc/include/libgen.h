@@ -7,7 +7,6 @@
 
 #include "_ansi.h"
 #include <sys/cdefs.h>
-#include <sys/reent.h>
 
 #ifdef __cplusplus
 extern "C" {

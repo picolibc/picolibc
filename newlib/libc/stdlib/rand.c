@@ -56,29 +56,17 @@ on two different systems.
 #ifndef _REENT_ONLY
 
 #include <stdlib.h>
-#include <reent.h>
 
 void
 srand (unsigned int seed)
 {
-  struct _reent *reent = _REENT;
-
-  _REENT_CHECK_RAND48(reent);
-  _REENT_RAND_NEXT(reent) = seed;
+  srandom(seed);
 }
 
 int
 rand (void)
 {
-  struct _reent *reent = _REENT;
-
-  /* This multiplier was obtained from Knuth, D.E., "The Art of
-     Computer Programming," Vol 2, Seminumerical Algorithms, Third
-     Edition, Addison-Wesley, 1998, p. 106 (line 26) & p. 108 */
-  _REENT_CHECK_RAND48(reent);
-  _REENT_RAND_NEXT(reent) =
-     _REENT_RAND_NEXT(reent) * __extension__ 6364136223846793005LL + 1;
-  return (int)((_REENT_RAND_NEXT(reent) >> 32) & RAND_MAX);
+  return (int) random();
 }
 
 #endif /* _REENT_ONLY */

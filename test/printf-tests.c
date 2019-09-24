@@ -7,8 +7,6 @@
 #include <stdarg.h>
 #include <string.h>
 
-#include "stdio-bits.c"
-
 static char buf[1024];
 
 static void failmsg(int serial, char *fmt, ...) {
@@ -44,6 +42,5 @@ static int test(int serial, char *expect, char *fmt, ...) {
 int main() {
     int result = 0;
 #include "testcases.c"
-    fflush(stdout);
     return result;
 }

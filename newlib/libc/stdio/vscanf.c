@@ -18,7 +18,6 @@
  */
 
 #include <_ansi.h>
-#include <reent.h>
 #include <stdio.h>
 #include <stdarg.h>
 #include "local.h"

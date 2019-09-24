@@ -37,6 +37,7 @@
 #include <math.h>		/* INFINITY, NAN		*/
 #include <string.h>
 #include <stdlib.h>
+#include <inttypes.h>
 
 static const double pwr_p10 [6] = {
     1e+1, 1e+2, 1e+4, 1e+8, 1e+16, 1e+32

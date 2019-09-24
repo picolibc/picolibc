@@ -34,9 +34,6 @@ DESCRIPTION
 	$10^x$
 	@end tex
 
-	You can use the (non-ANSI) function <<matherr>> to specify
-	error handling for these functions.
-
 RETURNS
 	On success, <<exp10>> and <<exp10f>> return the calculated value.
 	If the result underflows, the returned value is <<0>>.  If the

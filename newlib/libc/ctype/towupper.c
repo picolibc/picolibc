@@ -68,7 +68,6 @@ No supporting OS subroutines are required.
 #include <_ansi.h>
 #include <newlib.h>
 #include <string.h>
-#include <reent.h>
 #include <ctype.h>
 #include <wctype.h>
 #include "local.h"

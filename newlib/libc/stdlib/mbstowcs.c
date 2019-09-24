@@ -16,10 +16,9 @@ only ``multi-byte character sequences'' recognized are single bytes,
 and they are ``converted'' to wide-char versions simply by byte
 extension.
 
-When _MB_CAPABLE is defined, this routine calls <<_mbstowcs_r>> to perform
-the conversion, passing a state variable to allow state dependent
-decoding.  The result is based on the locale setting which may
-be restricted to a defined set of locales.
+When _MB_CAPABLE is defined, this uses a state variable to allow state
+dependent decoding.  The result is based on the locale setting which
+may be restricted to a defined set of locales.
 
 RETURNS
 This implementation of <<mbstowcs>> returns <<0>> if
@@ -45,6 +44,7 @@ effects vary with the locale.
 #include <newlib.h>
 #include <stdlib.h>
 #include <wchar.h>
+#include "local.h"
 
 size_t
 mbstowcs (wchar_t *__restrict pwcs,
@@ -55,7 +55,31 @@ mbstowcs (wchar_t *__restrict pwcs,
   mbstate_t state;
   state.__count = 0;
   
-  return _mbstowcs_r (_REENT, pwcs, s, n, &state);
+  size_t ret = 0;
+  char *t = (char *)s;
+  int bytes;
+
+  if (!pwcs)
+    n = (size_t) 1; /* Value doesn't matter as long as it's not 0. */
+  while (n > 0)
+    {
+      bytes = __MBTOWC (pwcs, t, MB_CUR_MAX, &state);
+      if (bytes < 0)
+	{
+	  state.__count = 0;
+	  return -1;
+	}
+      else if (bytes == 0)
+	break;
+      t += bytes;
+      ++ret;
+      if (pwcs)
+	{
+	  ++pwcs;
+	  --n;
+	}
+    }
+  return ret;
 #else /* not _MB_CAPABLE */
   
   int count = 0;

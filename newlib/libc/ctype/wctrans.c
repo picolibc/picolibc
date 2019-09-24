@@ -69,14 +69,13 @@ No supporting OS subroutines are required.
 
 #include <_ansi.h>
 #include <string.h>
-#include <reent.h>
 #include <wctype.h>
 #include <errno.h>
 #include "local.h"
 
+#ifndef _REENT_ONLY
 wctrans_t
-_wctrans_r (struct _reent *r,
-	const char *c)
+wctrans (const char *c)
 {
   if (!strcmp (c, "tolower"))
     return WCT_TOLOWER;
@@ -87,12 +86,5 @@ _wctrans_r (struct _reent *r,
       __errno_r(r) = EINVAL;
       return 0;
     }
-}
-
-#ifndef _REENT_ONLY
-wctrans_t
-wctrans (const char *c)
-{
-  return _wctrans_r (_REENT, c);
 }
 #endif /* !_REENT_ONLY */

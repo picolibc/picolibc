@@ -34,9 +34,6 @@ DESCRIPTION
 	@end tex
 	is the base of the natural system of logarithms, approximately 2.71828).
 
-	You can use the (non-ANSI) function <<matherr>> to specify
-	error handling for these functions.
-
 RETURNS
 	On success, <<exp>> and <<expf>> return the calculated value.
 	If the result underflows, the returned value is <<0>>.  If the
@@ -75,49 +72,17 @@ u_threshold= -7.45133219101941108420e+02;  /* 0xc0874910, 0xD52D3051 */
 #endif
 {
 	double z;
-	struct exception exc;
 	z = __ieee754_exp(x);
 	if(_LIB_VERSION == _IEEE_) return z;
 	if(finite(x)) {
 	    if(x>o_threshold) {
 		/* exp(finite) overflow */
-#ifndef HUGE_VAL
-#define HUGE_VAL inf
-	        double inf = 0.0;
-
-	        SET_HIGH_WORD(inf,0x7ff00000);	/* set inf to infinite */
-#endif
-		exc.type = OVERFLOW;
-		exc.name = "exp";
-		exc.err = 0;
-		exc.arg1 = exc.arg2 = x;
-		if (_LIB_VERSION == _SVID_)
-		  exc.retval = HUGE;
-		else
-		  exc.retval = HUGE_VAL;
-		if (_LIB_VERSION == _POSIX_)
-		  errno = ERANGE;
-		else if (!matherr(&exc)) {
-			errno = ERANGE;
-		}
-	        if (exc.err != 0)
-	           errno = exc.err;
-	        return exc.retval; 
+		errno = ERANGE;
+		return HUGE_VAL;
 	    } else if(x<u_threshold) {
 		/* exp(finite) underflow */
-		exc.type = UNDERFLOW;
-		exc.name = "exp";
-		exc.err = 0;
-		exc.arg1 = exc.arg2 = x;
-		exc.retval = 0.0;
-		if (_LIB_VERSION == _POSIX_)
-		  errno = ERANGE;
-		else if (!matherr(&exc)) {
-			errno = ERANGE;
-		}
-	        if (exc.err != 0)
-	           errno = exc.err;
-	        return exc.retval; 
+		errno = ERANGE;
+		return 0.0;
 	    } 
 	} 
 	return z;

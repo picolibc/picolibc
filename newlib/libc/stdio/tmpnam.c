@@ -74,13 +74,12 @@ The global pointer <<environ>> is also required.
 */
 
 #include <_ansi.h>
-#include <reent.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <fcntl.h>
-#include <reent.h>
 #include <errno.h>
+#include <unistd.h>
 
 /* Try to open the file specified, if it can't be opened then try
    another one.  Return nonzero if successful, otherwise zero.  */
@@ -101,7 +100,7 @@ worker (struct _reent *ptr,
       int t;
       _sprintf_r (ptr, result, "%s/%s%x.%x", part1, part2, part3, *part4);
       (*part4)++;
-      t = _open_r (ptr, result, O_RDONLY, 0);
+      t = open (result, O_RDONLY, 0);
       if (t == -1)
 	{
 	  if (__errno_r(ptr) == ENOSYS)
@@ -111,10 +110,14 @@ worker (struct _reent *ptr,
 	    }
 	  break;
 	}
-      _close_r (ptr, t);
+      close (t);
     }
   return 1;
 }
+
+#define _TMPNAM_SIZE 25
+
+static NEWLIB_THREAD_LOCAL char _tmpnam_buf[_TMPNAM_SIZE];
 
 char *
 _tmpnam_r (struct _reent *p,
@@ -126,14 +129,13 @@ _tmpnam_r (struct _reent *p,
   if (s == NULL)
     {
       /* ANSI states we must use an internal static buffer if s is NULL */
-      _REENT_CHECK_EMERGENCY(p);
-      result = _REENT_EMERGENCY(p);
+      result = _tmpnam_buf;
     }
   else
     {
       result = s;
     }
-  pid = _getpid_r (p);
+  pid = getpid ();
 
   if (worker (p, result, P_tmpdir, "t", pid, &p->_inc))
     {
@@ -158,11 +160,11 @@ _tempnam_r (struct _reent *p,
   /* two 8 digit numbers + . / */
   length = strlen (dir) + strlen (prefix) + (4 * sizeof (int)) + 2 + 1;
 
-  filename = _malloc_r (p, length);
+  filename = malloc (length);
   if (filename)
     {
       if (! worker (p, filename, dir, prefix,
-		    _getpid_r (p) ^ (int) (_POINTER_INT) p, &p->_inc))
+		    getpid () ^ (int) (_POINTER_INT) p, &p->_inc))
 	return NULL;
     }
   return filename;

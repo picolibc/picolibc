@@ -1,12 +1,13 @@
 #include <signal.h>
 #include  "test.h"
 #include <math.h>
-#include <ieeefp.h>
 #include <string.h>
 int verbose;
 static int count;
 int inacc;
 
+int redo = 0;
+extern int calc;
 
 int
 main (int ac,
@@ -19,6 +20,7 @@ main (int ac,
   int math= 1;
   int cvt = 1;
   int ieee= 1;
+  int vector=0;
 bt();
   for (i = 1; i < ac; i++) 
   {
@@ -36,6 +38,10 @@ bt();
      cvt = 0;
     if (strcmp(av[i],"-noiee") == 0)
      ieee= 0;
+    if (strcmp(av[i],"-generate") == 0) {
+     vector = 1;
+     calc = 1;
+    }
   }
   if (cvt)
    test_cvt();
@@ -45,10 +51,10 @@ bt();
   if (string)
    test_string();
   if (math)
-   test_math();
+   test_math(vector);
   if (is)
    test_is();
-  if (ieee)  test_ieee();
+//  if (ieee)  test_ieee();
   printf("Tested %d functions, %d errors detected\n", count, inacc);
   return 0;
 }
@@ -84,7 +90,6 @@ int li;
 
 
 
-int redo = 0;
 int reduce = 0;
 
 int strtod_vector = 0;

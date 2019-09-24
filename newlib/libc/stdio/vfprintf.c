@@ -149,7 +149,6 @@ static char *rcsid = "$Id$";
 #endif
 
 #include <_ansi.h>
-#include <reent.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -223,7 +222,7 @@ __ssputs_r (struct _reent *ptr,
 		if (fp->_flags & __SOPT)
 		{
 			/* asnprintf leaves original buffer alone.  */
-			str = (unsigned char *)_malloc_r (ptr, newsize);
+			str = (unsigned char *)malloc (newsize);
 			if (!str)
 			{
 				__errno_r(ptr) = ENOMEM;
@@ -234,11 +233,11 @@ __ssputs_r (struct _reent *ptr,
 		}
 		else
 		{
-			str = (unsigned char *)_realloc_r (ptr, fp->_bf._base,
+			str = (unsigned char *)realloc (fp->_bf._base,
 					newsize);
 			if (!str) {
 				/* Free unneeded buffer.  */
-				_free_r (ptr, fp->_bf._base);
+				free (fp->_bf._base);
 				/* Ensure correct errno, even if free
 				 * changed it.  */
 				__errno_r(ptr) = ENOMEM;
@@ -307,7 +306,7 @@ __ssprint_r (struct _reent *ptr,
 			if (fp->_flags & __SOPT)
 			{
 				/* asnprintf leaves original buffer alone.  */
-				str = (unsigned char *)_malloc_r (ptr, newsize);
+				str = (unsigned char *)malloc (newsize);
 				if (!str)
 				{
 					__errno_r(ptr) = ENOMEM;
@@ -318,11 +317,11 @@ __ssprint_r (struct _reent *ptr,
 			}
 			else
 			{
-				str = (unsigned char *)_realloc_r (ptr, fp->_bf._base,
+				str = (unsigned char *)realloc (fp->_bf._base,
 						newsize);
 				if (!str) {
 					/* Free unneeded buffer.  */
-					_free_r (ptr, fp->_bf._base);
+					free (fp->_bf._base);
 					/* Ensure correct errno, even if free
 					 * changed it.  */
 					__errno_r(ptr) = ENOMEM;
@@ -505,7 +504,7 @@ __sbprintf (struct _reent *rptr,
 
 # ifdef _NO_LONGDBL
 
-extern char *_dtoa_r (struct _reent *, double, int,
+extern char *_dtoa_r (double, int,
 			      int, int *, int *, char **);
 
 #  define _PRINTF_FLOAT_TYPE double
@@ -514,7 +513,7 @@ extern char *_dtoa_r (struct _reent *, double, int,
 
 # else /* !_NO_LONGDBL */
 
-extern char *_ldtoa_r (struct _reent *, _LONG_DOUBLE, int,
+extern char *_ldtoa_r (_LONG_DOUBLE, int,
 			      int, int *, int *, char **);
 
 extern int _ldcheck (_LONG_DOUBLE *);
@@ -686,7 +685,7 @@ _VFPRINTF_R (struct _reent *data,
 	const char *grouping = NULL;
 #endif
 #ifdef FLOATING_POINT
-	char *decimal_point = _localeconv_r (data)->decimal_point;
+	char *decimal_point = localeconv ()->decimal_point;
 	size_t decp_len = strlen (decimal_point);
 	char softsign;		/* temporary negative sign for floats */
 	union { int i; _PRINTF_FLOAT_TYPE fp; } _double_ = {0};
@@ -872,7 +871,7 @@ _VFPRINTF_R (struct _reent *data,
         /* Create initial buffer if we are called by asprintf family.  */
         if (fp->_flags & __SMBF && !fp->_bf._base)
         {
-		fp->_bf._base = fp->_p = _malloc_r (data, 64);
+		fp->_bf._base = fp->_p = malloc (64);
 		if (!fp->_p)
 		{
 			__errno_r(data) = ENOMEM;
@@ -903,7 +902,7 @@ _VFPRINTF_R (struct _reent *data,
 	for (;;) {
 	        cp = fmt;
 #ifdef _MB_CAPABLE
-	        while ((n = __MBTOWC (data, &wc, fmt, MB_CUR_MAX,
+	        while ((n = __MBTOWC (&wc, fmt, MB_CUR_MAX,
 				      &state)) != 0) {
 		    if (n < 0) {
 			/* Wave invalid chars through. */
@@ -1169,7 +1168,7 @@ reswitch:	switch (ch) {
 				mbstate_t ps;
 
 				memset ((void *)&ps, '\0', sizeof (mbstate_t));
-				if ((size = (int)_wcrtomb_r (data, cp,
+				if ((size = (int)wcrtomb (cp,
 					       (wchar_t)GET_ARG (N, ap, wint_t),
 						&ps)) == -1) {
 					fp->_flags |= __SERR;
@@ -1465,7 +1464,7 @@ string:
 					while (1) {
 						if (wcp[m] == L'\0')
 							break;
-						if ((n = (int)_wcrtomb_r (data,
+						if ((n = (int)wcrtomb (
 						     buf, wcp[m], &ps)) == -1) {
 							fp->_flags |= __SERR;
 							goto error;
@@ -1479,7 +1478,7 @@ string:
 					}
 				}
 				else {
-					if ((size = (int)_wcsrtombs_r (data,
+					if ((size = (int)wcsrtombs (
 						   NULL, &wcp, 0, &ps)) == -1) {
 						fp->_flags |= __SERR;
 						goto error;
@@ -1492,7 +1491,7 @@ string:
 
 				if (size >= BUF) {
 					if ((malloc_buf =
-					     (char *)_malloc_r (data, size + 1))
+					     (char *)malloc (size + 1))
 					    == NULL) {
 						fp->_flags |= __SERR;
 						goto error;
@@ -1503,7 +1502,7 @@ string:
 
 				/* Convert widechar string to multibyte string. */
 				memset ((void *)&ps, '\0', sizeof (mbstate_t));
-				if (_wcsrtombs_r (data, cp, &wcp, size, &ps)
+				if (wcsrtombs (cp, &wcp, size, &ps)
 				    != size) {
 					fp->_flags |= __SERR;
 					goto error;
@@ -1773,7 +1772,7 @@ number:			if ((dprec = prec) >= 0)
 		FLUSH ();	/* copy out the I/O vectors */
 
                 if (malloc_buf != NULL) {
-			_free_r (data, malloc_buf);
+			free (malloc_buf);
 			malloc_buf = NULL;
 		}
 	}
@@ -1781,7 +1780,7 @@ done:
 	FLUSH ();
 error:
 	if (malloc_buf != NULL)
-		_free_r (data, malloc_buf);
+		free (malloc_buf);
 #ifndef STRING_ONLY
 	_newlib_flockfile_end (fp);
 #endif
@@ -1874,7 +1873,7 @@ cvt(struct _reent *data, _PRINTF_FLOAT_TYPE value, int ndigits, int flags,
 		mode = 2;		/* ndigits significant digits */
 	}
 
-	digits = _DTOA_R (data, value, mode, ndigits, decpt, &dsgn, &rve);
+	digits = _DTOA_R (value, mode, ndigits, decpt, &dsgn, &rve);
 
 	if ((ch != 'g' && ch != 'G') || flags & ALT) {	/* Print trailing zeros */
 		bp = digits + ndigits;

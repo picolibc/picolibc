@@ -39,48 +39,17 @@
 #endif
 {
 	float z;
-#ifndef HUGE_VAL 
-#define HUGE_VAL inf
-	double inf = 0.0;
-
-	SET_HIGH_WORD(inf,0x7ff00000);	/* set inf to infinite */
-#endif
-	struct exception exc;
 	z = __ieee754_scalbf(x,fn);
 	if(_LIB_VERSION == _IEEE_) return z;
 	if(!(finitef(z)||isnan(z))&&finitef(x)) {
-	    /* scalbf overflow; SVID also returns +-HUGE_VAL */
-	    exc.type = OVERFLOW;
-	    exc.name = "scalbf";
-	    exc.err = 0;
-	    exc.arg1 = (double)x;
-	    exc.arg2 = (double)fn;
-	    exc.retval = x > 0.0 ? HUGE_VAL : -HUGE_VAL;
-	    if (_LIB_VERSION == _POSIX_)
-	       errno = ERANGE;
-	    else if (!matherr(&exc)) {
-	       errno = ERANGE;
-	    }
-	    if (exc.err != 0)
-	       errno = exc.err;
-            return exc.retval;
+	    /* scalbf overflow; */
+	    errno = ERANGE;
+	    return (x > 0.0 ? HUGE_VALF : -HUGE_VALF);
 	}
-	if(z==(float)0.0&&z!=x) {
+	if(z==0.0f&&z!=x) {
 	    /* scalbf underflow */
-	    exc.type = UNDERFLOW;
-	    exc.name = "scalbf";
-	    exc.err = 0;
-	    exc.arg1 = (double)x;
-	    exc.arg2 = (double)fn;
-	    exc.retval = copysign(0.0,x);
-	    if (_LIB_VERSION == _POSIX_)
-	       errno = ERANGE;
-	    else if (!matherr(&exc)) {
-	       errno = ERANGE;
-	    }
-	    if (exc.err != 0)
-	       errno = exc.err;
-            return exc.retval; 
+	    errno = ERANGE;
+	    return copysign(0.0,x);
 	} 
 #ifndef _SCALB_INT
 	if(!finitef(fn)) errno = ERANGE;

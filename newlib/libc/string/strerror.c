@@ -385,7 +385,7 @@ QUICKREF
 #include <string.h>
 
 char *
-_strerror_r (struct _reent *ptr,
+_strerror_r (
 	int errnum,
 	int internal,
 	int *errptr)
@@ -894,12 +894,12 @@ _strerror_r (struct _reent *ptr,
 char *
 strerror (int errnum)
 {
-  return _strerror_r (_REENT, errnum, 0, NULL);
+  return _strerror_r (errnum, 0, NULL);
 }
 
 char *
 strerror_l (int errnum, locale_t locale)
 {
   /* We don't support per-locale error messages. */
-  return _strerror_r (_REENT, errnum, 0, NULL);
+  return _strerror_r (errnum, 0, NULL);
 }

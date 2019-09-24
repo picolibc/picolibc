@@ -72,9 +72,10 @@ QUICKREF
 #include <string.h>
 #include <stdlib.h>
 #include <_ansi.h>
-#include <reent.h>
 
 #ifndef _REENT_ONLY
+
+static NEWLIB_THREAD_LOCAL char *_strtok_last;
 
 extern char *__strtok_r (char *, const char *, char **, int);
 
@@ -82,9 +83,6 @@ char *
 strtok (register char *__restrict s,
 	register const char *__restrict delim)
 {
-	struct _reent *reent = _REENT;
-
-	_REENT_CHECK_MISC(reent);
-	return __strtok_r (s, delim, &(_REENT_STRTOK_LAST(reent)), 1);
+	return __strtok_r (s, delim, &_strtok_last, 1);
 }
 #endif

@@ -1,8 +1,45 @@
-option('target-optspace', type: 'boolean', value: false,
-       description: 'Compile with -Os')
+#
+# SPDX-License-Identifier: BSD-3-Clause
+#
+# Copyright © 2019 Keith Packard
+#
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions
+# are met:
+#
+# 1. Redistributions of source code must retain the above copyright
+#    notice, this list of conditions and the following disclaimer.
+#
+# 2. Redistributions in binary form must reproduce the above
+#    copyright notice, this list of conditions and the following
+#    disclaimer in the documentation and/or other materials provided
+#    with the distribution.
+#
+# 3. Neither the name of the copyright holder nor the names of its
+#    contributors may be used to endorse or promote products derived
+#    from this software without specific prior written permission.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+# "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+# LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+# FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+# COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+# INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+# (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+# SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+# HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
+# STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+# ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
+# OF THE POSSIBILITY OF SUCH DAMAGE.
+#
+option('fast-strcmp', type: 'boolean', value: true,
+       description: 'Always optimize strcmp for performance')
 
 option('multilib', type: 'boolean', value: true,
        description: 'Enable multilib compile')
+
+option('picolib', type: 'boolean', value: true,
+       description: 'Include pico lib bits')
 
 option('hw-fp', type: 'boolean', value: false,
 	description: 'Turn on hardware floating point math')
@@ -13,19 +50,22 @@ option('have-alias-attribute', type: 'combo', choices: ['true', 'false', 'auto']
 option('tests', type: 'boolean', value: false,
        description: 'Enable tests')
 
-option('newlib-tinystdio', type: 'boolean', value: false,
+option('newlib-tinystdio', type: 'boolean', value: true,
        description: 'Use tiny stdio from avr libc')
+
+option('specsdir', type: 'string',
+       description: 'Installation directory for .specs file')
 
 option('newlib-io-pos-args', type: 'boolean', value: false,
        description: 'enable printf-family positional arg support')
 option('newlib-io-c99-formats', type: 'boolean', value: false,
        description: 'enable C99 support in IO functions like printf/scanf')
-option('newlib-register-fini', type: 'boolean', value: false,
-       description: 'enable finalization function registration using atexit')
 option('newlib-io-long-long', type: 'boolean', value: false,
        description: 'enable long long type support in IO functions like printf/scanf')
 option('newlib-io-long-double', type: 'boolean', value: false,
        description: 'enable long double type support in IO functions printf/scanf')
+option('newlib-register-fini', type: 'boolean', value: false,
+       description: 'enable finalization function registration using atexit')
 option('newlib-mb', type: 'boolean', value: false,
        description: 'enable multibyte support')
 option('newlib-iconv-encodings', type: 'boolean', value: false,
@@ -50,11 +90,11 @@ option('newlib-fseek-optimization', type: 'boolean', value: false,
        description: 'disable fseek optimization')
 option('newlib-wide-orient', type: 'boolean', value: false,
        description: 'Turn off wide orientation in streamio')
-option('newlib-nano-malloc', type: 'boolean', value: false,
+option('newlib-nano-malloc', type: 'boolean', value: true,
        description: 'use small-footprint nano-malloc implementation')
 option('newlib-unbuf-stream-opt', type: 'boolean', value: false,
        description: 'enable unbuffered stream optimization in streamio')
-option('lite-exit', type: 'boolean', value: false,
+option('lite-exit', type: 'boolean', value: true,
        description: 'enable light weight exit')
 option('newlib-nano-formatted-io', type: 'boolean', value: false,
        description: 'Use nano version formatted IO')
@@ -81,4 +121,12 @@ option('newlib-locale-info', type: 'boolean', value: false,
 option('newlib-locale-info-extended', type: 'boolean', value: false,
        description: 'extended locale support')
 option('newlib-global-errno', type: 'boolean', value: false,
-       description: 'use global errnor variable')
+       description: 'use global errno variable')
+option('newlib-initfini-array', type: 'boolean', value: true,
+       description: 'compiler supports INIT_ARRAY section types')
+option('newlib-initfini', type: 'boolean', value: true,
+       description: 'Supports _init() and _fini()')
+option('thread-local-storage', type: 'boolean', value: true,
+       description: 'use thread local storage for static data')
+option('tls-model', type: 'string', value: 'local-exec',
+       description: 'tls model (global-dynamic, local-dynamic, initial-exec or local-exec)')

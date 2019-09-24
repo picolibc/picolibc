@@ -119,7 +119,6 @@ SEEALSO
 #endif
 
 #include <_ansi.h>
-#include <reent.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -227,7 +226,7 @@ __sbwprintf (struct _reent *rptr,
 
 # ifdef _NO_LONGDBL
 
-extern char *_dtoa_r (struct _reent *, double, int,
+extern char *_dtoa_r (double, int,
 			      int, int *, int *, char **);
 
 #  define _PRINTF_FLOAT_TYPE double
@@ -236,7 +235,7 @@ extern char *_dtoa_r (struct _reent *, double, int,
 
 # else /* !_NO_LONGDBL */
 
-extern char *_ldtoa_r (struct _reent *, _LONG_DOUBLE, int,
+extern char *_ldtoa_r (_LONG_DOUBLE, int,
 			      int, int *, int *, char **);
 
 extern int _ldcheck (_LONG_DOUBLE *);
@@ -465,8 +464,8 @@ _VFWPRINTF_R (struct _reent *data,
 	  size_t nconv;
 
 	  memset (&state, '\0', sizeof (state));
-	  nconv = _mbrtowc_r (data, &decimal_point,
-			      _localeconv_r (data)->decimal_point,
+	  nconv = mbrtowc (&decimal_point,
+			      localeconv ()->decimal_point,
 			      MB_CUR_MAX, &state);
 	  if (nconv == (size_t) -1 || nconv == (size_t) -2)
 	    decimal_point = L'.';
@@ -611,7 +610,7 @@ _VFWPRINTF_R (struct _reent *data,
         /* Create initial buffer if we are called by asprintf family.  */
         if (fp->_flags & __SMBF && !fp->_bf._base)
         {
-		fp->_bf._base = fp->_p = _malloc_r (data, 64);
+		fp->_bf._base = fp->_p = malloc (64);
 		if (!fp->_p)
 		{
 			__errno_r(data) = ENOMEM;
@@ -680,7 +679,7 @@ reswitch:	switch (ch) {
 		    size_t nconv;
 
 		    memset (&state, '\0', sizeof (state));
-		    nconv = _mbrtowc_r (data, &thousands_sep,
+		    nconv = mbrtowc (&thousands_sep,
 					_localeconv_r (data)->thousands_sep,
 					MB_CUR_MAX, &state);
 		    if (nconv == (size_t) -1 || nconv == (size_t) -2)
@@ -1048,7 +1047,7 @@ reswitch:	switch (ch) {
 			 */
 			if (cp == buf && ndig > BUF && malloc_buf == NULL) {
 				if ((malloc_buf =
-				    (wchar_t *)_malloc_r (data, ndig * sizeof (wchar_t)))
+				    (wchar_t *)malloc (ndig * sizeof (wchar_t)))
 				    == NULL)
 				  {
 				    fp->_flags |= __SERR;
@@ -1213,7 +1212,7 @@ string:
 				} else
 					insize = strlen(arg);
 				if (insize >= BUF) {
-				    if ((malloc_buf = (wchar_t *) _malloc_r (data, (insize + 1) * sizeof (wchar_t)))
+				    if ((malloc_buf = (wchar_t *) malloc ((insize + 1) * sizeof (wchar_t)))
 					== NULL) {
 						fp->_flags |= __SERR;
 						goto error;
@@ -1224,7 +1223,7 @@ string:
 				memset ((void *)&ps, '\0', sizeof (mbstate_t));
 				p = cp;
 				while (insize != 0) {
-					nconv = _mbrtowc_r (data, p, arg, insize, &ps);
+					nconv = mbrtowc (p, arg, insize, &ps);
 					if (nconv == 0 || nconv == (size_t)-1 || nconv == (size_t)-2)
 						break;
 					++p;
@@ -1521,7 +1520,7 @@ number:			if ((dprec = prec) >= 0)
 		FLUSH ();	/* copy out the I/O vectors */
 
                 if (malloc_buf != NULL) {
-			_free_r (data, malloc_buf);
+			free (malloc_buf);
 			malloc_buf = NULL;
 		}
 	}
@@ -1529,7 +1528,7 @@ done:
 	FLUSH ();
 error:
 	if (malloc_buf != NULL)
-		_free_r (data, malloc_buf);
+		free (malloc_buf);
 #ifndef STRING_ONLY
 	_newlib_flockfile_end (fp);
 #endif
@@ -1632,7 +1631,7 @@ wcvt(struct _reent *data, _PRINTF_FLOAT_TYPE value, int ndigits, int flags,
 	  int i;
 #endif
 
-	  digits = _DTOA_R (data, value, mode, ndigits, decpt, &dsgn, &rve);
+	  digits = _DTOA_R (value, mode, ndigits, decpt, &dsgn, &rve);
 
 	  if ((ch != L'g' && ch != L'G') || flags & ALT) {	/* Print trailing zeros */
 		bp = digits + ndigits;
@@ -1649,7 +1648,7 @@ wcvt(struct _reent *data, _PRINTF_FLOAT_TYPE value, int ndigits, int flags,
 
 	  *length = rve - digits; /* full length of the string */
 #ifdef _MB_CAPABLE
-	  _mbsnrtowcs_r (data, buf, (const char **) &digits, *length,
+	  mbsnrtowcs (buf, (const char **) &digits, *length,
 			 len, NULL);
 #else
 	  for (i = 0; i < *length && i < len; ++i)

@@ -18,7 +18,6 @@
 /* doc in siprintf.c */
 
 #include <_ansi.h>
-#include <reent.h>
 #include <stdio.h>
 #include <stdarg.h>
 #include <limits.h>

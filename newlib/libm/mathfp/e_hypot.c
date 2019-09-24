@@ -41,8 +41,6 @@ RETURNS
         <<hypot>> returns <<HUGE_VAL>> and sets <<errno>> to
         <<ERANGE>>.
 
-        You can change the error treatment with <<matherr>>.
-
 PORTABILITY
         <<hypot>> and <<hypotf>> are not ANSI C.  */
 

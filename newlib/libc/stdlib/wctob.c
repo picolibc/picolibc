@@ -1,4 +1,3 @@
-#include <reent.h>
 #include <wchar.h>
 #include <stdio.h>
 #include <string.h>
@@ -8,7 +7,6 @@
 int
 wctob (wint_t wc)
 {
-  struct _reent *reent;
   mbstate_t mbs;
   unsigned char pmb[MB_LEN_MAX];
 
@@ -18,8 +16,5 @@ wctob (wint_t wc)
   /* Put mbs in initial state. */
   memset (&mbs, '\0', sizeof (mbs));
 
-  reent = _REENT;
-  _REENT_CHECK_MISC(reent);
-
-  return __WCTOMB (reent, (char *) pmb, wc, &mbs) == 1 ? (int) pmb[0] : EOF;
+  return __WCTOMB ((char *) pmb, wc, &mbs) == 1 ? (int) pmb[0] : EOF;
 }

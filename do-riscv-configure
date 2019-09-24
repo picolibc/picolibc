@@ -1,0 +1,8 @@
+#!/bin/sh
+ARCH=riscv64-unknown-elf
+DIR=`dirname $0`
+meson "$DIR" \
+	-Dincludedir=picolibc/$ARCH/include \
+	-Dlibdir=picolibc/$ARCH/lib \
+	--cross-file "$DIR"/cross-$ARCH.txt \
+	"$@"

@@ -28,8 +28,8 @@
 
 #include "xtoa_fast.h"
 
-char *
-__ultoa_invert(unsigned long val, char *str, int base)
+static char *
+__ultoa_invert(ultoa_unsigned_t val, char *str, int base)
 {
 	int upper = 0;
 

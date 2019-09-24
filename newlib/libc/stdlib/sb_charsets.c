@@ -653,6 +653,7 @@ wchar_t __cp_conv[26][0x80] = {
 };
 #endif /* _MB_EXTENDED_CHARSETS_WINDOWS */
 
+#if defined(_MB_EXTENDED_CHARSETS_ISO) || defined(_MB_EXTENDED_CHARSETS_WINDOWS)
 /* Handle one to five decimal digits.  Return -1 in any other case. */
 static int
 __micro_atoi (const char *s)
@@ -669,6 +670,7 @@ __micro_atoi (const char *s)
     }
   return ret;
 }
+#endif
 
 #ifdef _MB_EXTENDED_CHARSETS_ISO
 int

@@ -16,9 +16,6 @@
 #include <sys/types.h>
 #include <machine/ieeefp.h>
 
-/* REDHAT LOCAL: Default to XOPEN_MODE.  */
-#define _XOPEN_MODE
-
 /* Most routines need to check whether a float is finite, infinite, or not a
    number, and many need to know whether the result of an operation will
    overflow.  These conditions depend on whether the largest exponent is
@@ -160,8 +157,8 @@ extern double __ieee754_exp __P((double));
 extern double __ieee754_cosh __P((double));
 extern double __ieee754_fmod __P((double,double));
 extern double __ieee754_pow __P((double,double));
-extern double __ieee754_lgamma_r __P((double,int *));
-extern double __ieee754_gamma_r __P((double,int *));
+extern double __ieee754_lgamma __P((double));
+extern double __ieee754_gamma __P((double));
 extern double __ieee754_log10 __P((double));
 extern double __ieee754_sinh __P((double));
 extern double __ieee754_hypot __P((double,double));
@@ -206,8 +203,8 @@ extern float __ieee754_expf __P((float));
 extern float __ieee754_coshf __P((float));
 extern float __ieee754_fmodf __P((float,float));
 extern float __ieee754_powf __P((float,float));
-extern float __ieee754_lgammaf_r __P((float,int *));
-extern float __ieee754_gammaf_r __P((float,int *));
+extern float __ieee754_lgammaf __P((float));
+extern float __ieee754_gammaf __P((float));
 extern float __ieee754_log10f __P((float));
 extern float __ieee754_sinhf __P((float));
 extern float __ieee754_hypotf __P((float,float));

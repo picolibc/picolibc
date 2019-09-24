@@ -49,7 +49,6 @@ Required OS subroutines: <<close>>, <<fstat>>, <<isatty>>, <<lseek>>,
 */
 
 #include <_ansi.h>
-#include <reent.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/lock.h>
@@ -96,7 +95,7 @@ _fclose_r (struct _reent *rptr,
   if (fp->_close != NULL && fp->_close (rptr, fp->_cookie) < 0)
     r = EOF;
   if (fp->_flags & __SMBF)
-    _free_r (rptr, (char *) fp->_bf._base);
+    free ((char *) fp->_bf._base);
   if (HASUB (fp))
     FREEUB (rptr, fp);
   if (HASLB (fp))

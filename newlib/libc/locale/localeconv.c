@@ -1,5 +1,4 @@
 #include "newlib.h"
-#include <reent.h>
 #include "setlocale.h"
 
 struct lconv *
@@ -51,18 +50,10 @@ __localeconv_l (struct __locale_t *locale)
 }
 
 struct lconv *
-_localeconv_r (struct _reent *data)
+localeconv (void)
 {
   /* Note that we always fall back to the global locale, even in case
      of specifying a reent.  Otherwise a call to _localeconv_r would just
      crash if the reent locale pointer is NULL. */
   return __localeconv_l (__get_current_locale ());
 }
-
-#ifndef _REENT_ONLY
-struct lconv *
-localeconv (void)
-{
-  return __localeconv_l (__get_current_locale ());
-}
-#endif

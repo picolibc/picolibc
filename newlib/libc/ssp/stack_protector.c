@@ -5,6 +5,11 @@
 #include <string.h>
 #include <unistd.h>
 
+#if defined(__AMDGCN__)
+/* GCN does not support constructors, yet.  */
+uintptr_t __stack_chk_guard = 0x00000aff; /* 0, 0, '\n', 255  */
+
+#else
 uintptr_t __stack_chk_guard = 0;
 
 void
@@ -24,6 +29,7 @@ __stack_chk_init (void)
   ((unsigned char *)&__stack_chk_guard)[3] = 255;
 #endif
 }
+#endif
 
 void
 __attribute__((__noreturn__))

@@ -75,7 +75,6 @@ PORTABILITY
 
 #include <newlib.h>
 #include <errno.h>
-#include <reent.h>
 #include <stdlib.h>
 #include "setlocale.h"
 
@@ -83,7 +82,7 @@ PORTABILITY
 			 | LC_NUMERIC_MASK | LC_TIME_MASK | LC_MESSAGES_MASK)
 
 struct __locale_t *
-_newlocale_r (struct _reent *p, int category_mask, const char *locale,
+newlocale (int category_mask, const char *locale,
 	      struct __locale_t *base)
 {
 #ifndef _MB_CAPABLE
@@ -121,7 +120,7 @@ _newlocale_r (struct _reent *p, int category_mask, const char *locale,
 	{
 	  /* If locale is "", fetch from environment.  Otherwise use locale
 	     name verbatim. */
-	  const char *cat = (locale[0] == '\0') ? __get_locale_env (p, i)
+	  const char *cat = (locale[0] == '\0') ? __get_locale_env (i)
 						: locale;
 	  if (strlen (cat) > ENCODING_LEN)
 	    {
@@ -175,7 +174,7 @@ _newlocale_r (struct _reent *p, int category_mask, const char *locale,
 	}
     }
   /* Allocate new locale_t. */
-  new_locale = (struct __locale_t *) _calloc_r (p, 1, sizeof *new_locale);
+  new_locale = (struct __locale_t *) calloc (1, sizeof *new_locale);
   if (!new_locale)
     goto error;
   if (base)
@@ -191,7 +190,7 @@ _newlocale_r (struct _reent *p, int category_mask, const char *locale,
 	    base->lc_cat[i].ptr = base->lc_cat[i].buf = NULL;
 	  }
 #endif /* __HAVE_LOCALE_INFO__ */
-      _freelocale_r (p, base);
+      freelocale (base);
     }
 
   *new_locale = tmp_locale;
@@ -206,17 +205,11 @@ error:
 	&& tmp_locale.lc_cat[i].buf
 	&& tmp_locale.lc_cat[i].buf != (const void *) -1)
       {
-	_free_r (p, (void *) tmp_locale.lc_cat[i].ptr);
-	_free_r (p, tmp_locale.lc_cat[i].buf);
+	free ((void *) tmp_locale.lc_cat[i].ptr);
+	free (tmp_locale.lc_cat[i].buf);
       }
 #endif /* __HAVE_LOCALE_INFO__ */
 
   return NULL;
 #endif /* _MB_CAPABLE */
-}
-
-struct __locale_t *
-newlocale (int category_mask, const char *locale, struct __locale_t *base)
-{
-  return _newlocale_r (_REENT, category_mask, locale, base);
 }

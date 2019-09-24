@@ -23,7 +23,7 @@
 
 #if __POSIX_VISIBLE >= 200809 || defined (_COMPILING_NEWLIB)
 
-#include <xlocale.h>
+#include <sys/_locale.h>
 
 #define LC_ALL_MASK		(1 << LC_ALL)
 #define LC_COLLATE_MASK		(1 << LC_COLLATE)
@@ -66,16 +66,6 @@ struct lconv
   char int_p_sep_by_space;
   char int_p_sign_posn;
 };
-
-struct _reent;
-char *_setlocale_r (struct _reent *, int, const char *);
-struct lconv *_localeconv_r (struct _reent *);
-
-struct __locale_t *_newlocale_r (struct _reent *, int, const char *,
-				 struct __locale_t *);
-void _freelocale_r (struct _reent *, struct __locale_t *);
-struct __locale_t *_duplocale_r (struct _reent *, struct __locale_t *);
-struct __locale_t *_uselocale_r (struct _reent *, struct __locale_t *);
 
 #ifndef _REENT_ONLY
 

@@ -22,7 +22,7 @@ extern void (*__init_array_start []) (void) __attribute__((weak));
 extern void (*__init_array_end []) (void) __attribute__((weak));
 
 #ifdef HAVE_INIT_FINI
-extern void _init (void);
+extern void _init (void) __attribute__((weak));
 #endif
 
 /* Iterate over all the init routines.  */
@@ -37,7 +37,8 @@ __libc_init_array (void)
     __preinit_array_start[i] ();
 
 #ifdef HAVE_INIT_FINI
-  _init ();
+  if (_init)
+    _init ();
 #endif
 
   count = __init_array_end - __init_array_start;

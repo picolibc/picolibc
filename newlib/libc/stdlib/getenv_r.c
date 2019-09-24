@@ -74,7 +74,7 @@ static char ***p_environ = &environ;
  */
 
 char *
-_findenv_r (struct _reent *reent_ptr,
+_findenv (
 	register const char *name,
 	int *offset)
 {
@@ -110,18 +110,4 @@ _findenv_r (struct _reent *reent_ptr,
     }
   ENV_UNLOCK;
   return NULL;
-}
-
-/*
- * _getenv_r --
- *	Returns ptr to value associated with name, if any, else NULL.
- */
-
-char *
-_getenv_r (struct _reent *reent_ptr,
-	const char *name)
-{
-  int offset;
-
-  return _findenv_r (reent_ptr, name, &offset);
 }

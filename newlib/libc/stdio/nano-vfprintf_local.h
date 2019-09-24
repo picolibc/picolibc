@@ -88,7 +88,7 @@
 # define MAXEXPLEN		7
 # define DEFPREC		6
 
-extern char *_dtoa_r (struct _reent *, double, int,
+extern char *_dtoa_r (double, int,
 			      int, int *, int *, char **);
 
 # define _DTOA_R _dtoa_r

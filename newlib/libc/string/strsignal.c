@@ -50,19 +50,14 @@ QUICKREF
 #include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <reent.h>
 
 char *
 strsignal (int signal)
 {
   char *buffer;
-  struct _reent *ptr;
+  static NEWLIB_THREAD_LOCAL char _signal_buf[24];
 
-  ptr = _REENT;
-
-  _REENT_CHECK_SIGNAL_BUF(ptr);
-  buffer = _REENT_SIGNAL_BUF(ptr);
-
+  buffer = _signal_buf;
 #if defined(SIGRTMIN) && defined(SIGRTMAX)
   if ((signal >= SIGRTMIN) && (signal <= SIGRTMAX)) {
     siprintf (buffer, "Real-time signal %d", signal - SIGRTMIN);

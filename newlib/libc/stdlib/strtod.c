@@ -240,7 +240,7 @@ ULtod (__ULong *L,
 #endif /* !NO_HEX_FP */
 
 double
-_strtod_l (struct _reent *ptr, const char *__restrict s00, char **__restrict se,
+_strtod_l (const char *__restrict s00, char **__restrict se,
 	   locale_t loc)
 {
 #ifdef Avoid_Underflow
@@ -313,7 +313,7 @@ _strtod_l (struct _reent *ptr, const char *__restrict s00, char **__restrict se,
 #else
 #define fpi1 fpi
 #endif
-			switch((i = gethex(ptr, &s, &fpi1, &exp, &bb, sign, loc)) & STRTOG_Retmask) {
+			switch((i = gethex(&s, &fpi1, &exp, &bb, sign, loc)) & STRTOG_Retmask) {
 			  case STRTOG_NoNumber:
 				s = s00;
 				sign = 0;
@@ -323,7 +323,7 @@ _strtod_l (struct _reent *ptr, const char *__restrict s00, char **__restrict se,
 			  default:
 				if (bb) {
 					copybits(bits, fpi.nbits, bb);
-					Bfree(ptr,bb);
+					Bfree(bb);
 					}
 				ULtod(rv.i, bits, exp, i);
 			  }}
@@ -585,7 +585,7 @@ _strtod_l (struct _reent *ptr, const char *__restrict s00, char **__restrict se,
 			if (e1 > DBL_MAX_10_EXP) {
  ovfl:
 #ifndef NO_ERRNO
-				__errno_r(ptr) = ERANGE;
+				errno = ERANGE;
 #endif
 				/* Can't trust HUGE_VAL */
 #ifdef IEEE_Arith
@@ -692,7 +692,7 @@ _strtod_l (struct _reent *ptr, const char *__restrict s00, char **__restrict se,
  undfl:
 					dval(rv) = 0.;
 #ifndef NO_ERRNO
-					__errno_r(ptr) = ERANGE;
+					errno = ERANGE;
 #endif
 					if (bd0)
 						goto retfree;
@@ -717,19 +717,19 @@ _strtod_l (struct _reent *ptr, const char *__restrict s00, char **__restrict se,
 
 	/* Put digits into bd: true value = bd * 10^e */
 
-	bd0 = s2b(ptr, s0, nd0, nd, y);
+	bd0 = s2b(s0, nd0, nd, y);
 	if (bd0 == NULL)
 		goto ovfl;
 
 	for(;;) {
-		bd = Balloc(ptr,bd0->_k);
+		bd = Balloc(bd0->_k);
 		if (bd == NULL)
 			goto ovfl;
 		Bcopy(bd, bd0);
-		bb = d2b(ptr,dval(rv), &bbe, &bbbits);	/* rv = bb * 2^bbe */
+		bb = d2b(dval(rv), &bbe, &bbbits);	/* rv = bb * 2^bbe */
 		if (bb == NULL)
 			goto ovfl;
-		bs = i2b(ptr,1);
+		bs = i2b(1);
 		if (bs == NULL)
 			goto ovfl;
 
@@ -794,36 +794,36 @@ _strtod_l (struct _reent *ptr, const char *__restrict s00, char **__restrict se,
 			bs2 -= i;
 			}
 		if (bb5 > 0) {
-			bs = pow5mult(ptr, bs, bb5);
+			bs = pow5mult(bs, bb5);
 			if (bs == NULL)
 				goto ovfl;
-			bb1 = mult(ptr, bs, bb);
+			bb1 = mult(bs, bb);
 			if (bb1 == NULL)
 				goto ovfl;
-			Bfree(ptr, bb);
+			Bfree( bb);
 			bb = bb1;
 			}
 		if (bb2 > 0) {
-			bb = lshift(ptr, bb, bb2);
+			bb = lshift(bb, bb2);
 			if (bb == NULL)
 				goto ovfl;
 			}
 		if (bd5 > 0) {
-			bd = pow5mult(ptr, bd, bd5);
+			bd = pow5mult( bd, bd5);
 			if (bd == NULL)
 				goto ovfl;
 			}
 		if (bd2 > 0) {
-			bd = lshift(ptr, bd, bd2);
+			bd = lshift(bd, bd2);
 			if (bd == NULL)
 				goto ovfl;
 			}
 		if (bs2 > 0) {
-			bs = lshift(ptr, bs, bs2);
+			bs = lshift(bs, bs2);
 			if (bs == NULL)
 				goto ovfl;
 			}
-		delta = diff(ptr, bb, bd);
+		delta = diff(bb, bd);
 		if (delta == NULL)
 			goto ovfl;
 		dsign = delta->_sign;
@@ -857,7 +857,7 @@ _strtod_l (struct _reent *ptr, const char *__restrict s00, char **__restrict se,
 						if (y)
 #endif
 						  {
-						  delta = lshift(ptr, delta,Log2P);
+						  delta = lshift(delta,Log2P);
 						  if (cmp(delta, bs) <= 0)
 							adj = -0.5;
 						  }
@@ -948,7 +948,7 @@ _strtod_l (struct _reent *ptr, const char *__restrict s00, char **__restrict se,
 #endif
 				break;
 				}
-			delta = lshift(ptr,delta,Log2P);
+			delta = lshift(delta,Log2P);
 			if (cmp(delta, bs) > 0)
 				goto drop_down;
 			break;
@@ -1211,10 +1211,10 @@ _strtod_l (struct _reent *ptr, const char *__restrict s00, char **__restrict se,
 			}
 #endif
  cont:
-		Bfree(ptr,bb);
-		Bfree(ptr,bd);
-		Bfree(ptr,bs);
-		Bfree(ptr,delta);
+		Bfree(bb);
+		Bfree(bd);
+		Bfree(bs);
+		Bfree(delta);
 		}
 #ifdef SET_INEXACT
 	if (inexact) {
@@ -1239,7 +1239,7 @@ _strtod_l (struct _reent *ptr, const char *__restrict s00, char **__restrict se,
 #ifndef NO_ERRNO
 		/* try to avoid the bug of testing an 8087 register value */
 		if (dword0(rv) == 0 && dword1(rv) == 0)
-			__errno_r(ptr) = ERANGE;
+			errno = ERANGE;
 #endif
 		}
 #endif /* Avoid_Underflow */
@@ -1251,11 +1251,11 @@ _strtod_l (struct _reent *ptr, const char *__restrict s00, char **__restrict se,
 		}
 #endif
  retfree:
-	Bfree(ptr,bb);
-	Bfree(ptr,bd);
-	Bfree(ptr,bs);
-	Bfree(ptr,bd0);
-	Bfree(ptr,delta);
+	Bfree(bb);
+	Bfree(bd);
+	Bfree(bs);
+	Bfree(bd0);
+	Bfree(delta);
  ret:
 	if (se)
 		*se = (char *)s;
@@ -1263,11 +1263,11 @@ _strtod_l (struct _reent *ptr, const char *__restrict s00, char **__restrict se,
 }
 
 double
-_strtod_r (struct _reent *ptr,
+_strtod_r (
 	const char *__restrict s00,
 	char **__restrict se)
 {
-  return _strtod_l (ptr, s00, se, __get_current_locale ());
+  return _strtod_l (s00, se, __get_current_locale ());
 }
 
 #ifndef _REENT_ONLY
@@ -1275,19 +1275,19 @@ _strtod_r (struct _reent *ptr,
 double
 strtod_l (const char *__restrict s00, char **__restrict se, locale_t loc)
 {
-  return _strtod_l (_REENT, s00, se, loc);
+  return _strtod_l (s00, se, loc);
 }
 
 double
 strtod (const char *__restrict s00, char **__restrict se)
 {
-  return _strtod_l (_REENT, s00, se, __get_current_locale ());
+  return _strtod_l (s00, se, __get_current_locale ());
 }
 
 float
 strtof_l (const char *__restrict s00, char **__restrict se, locale_t loc)
 {
-  double val = _strtod_l (_REENT, s00, se, loc);
+  double val = _strtod_l (s00, se, loc);
   if (isnan (val))
     return signbit (val) ? -nanf ("") : nanf ("");
   float retval = (float) val;
@@ -1302,7 +1302,7 @@ float
 strtof (const char *__restrict s00,
 	char **__restrict se)
 {
-  double val = _strtod_l (_REENT, s00, se, __get_current_locale ());
+  double val = _strtod_l (s00, se, __get_current_locale ());
   if (isnan (val))
     return signbit (val) ? -nanf ("") : nanf ("");
   float retval = (float) val;

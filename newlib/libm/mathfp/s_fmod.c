@@ -43,8 +43,6 @@ magnitude of <[y]>.
 
 <<fmod(<[x]>,0)>> returns NaN, and sets <<errno>> to <<EDOM>>.
 
-You can modify error treatment for these functions using <<matherr>>.
-
 PORTABILITY
 <<fmod>> is ANSI C. <<fmodf>> is an extension.
 */

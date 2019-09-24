@@ -38,10 +38,6 @@ macros defined in math.h:
 . #define log2f(x) (logf (x) / (float) _M_LN2)
 To use the functions instead, just undefine the macros first.
 
-You can use the (non-ANSI) function <<matherr>> to specify error
-handling for these functions, indirectly through the respective <<log>>
-function. 
-
 RETURNS
 The <<log2>> functions return
 @ifnottex
@@ -54,8 +50,7 @@ on success.
 When <[x]> is zero, the
 returned value is <<-HUGE_VAL>> and <<errno>> is set to <<ERANGE>>.
 When <[x]> is negative, the returned value is NaN (not a number) and
-<<errno>> is set to <<EDOM>>.  You can control the error behavior via
-<<matherr>>.
+<<errno>> is set to <<EDOM>>.
 
 PORTABILITY
 C99, POSIX, System V Interface Definition (Issue 6).

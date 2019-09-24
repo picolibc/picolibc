@@ -8,17 +8,7 @@
 #include "local.h"
 
 int
-_mbtowc_r (struct _reent *r,
-        wchar_t       *__restrict pwc,
-        const char    *__restrict s,
-        size_t         n,
-        mbstate_t      *state)
-{
-  return __MBTOWC (r, pwc, s, n, state);
-}
-
-int
-__ascii_mbtowc (struct _reent *r,
+__ascii_mbtowc (
         wchar_t       *pwc,
         const char    *s,
         size_t         n,
@@ -526,7 +516,7 @@ __cp_mbtowc (int val)
 #endif /* _MB_EXTENDED_CHARSETS_WINDOWS */
 
 int
-__utf8_mbtowc (struct _reent *r,
+__utf8_mbtowc (
         wchar_t       *pwc,
         const char    *s,
         size_t         n,
@@ -727,7 +717,7 @@ __utf8_mbtowc (struct _reent *r,
    because the underlying OS requires wchar_t == UTF-16. */
 #ifndef  __CYGWIN__
 int
-__sjis_mbtowc (struct _reent *r,
+__sjis_mbtowc (
         wchar_t       *pwc,
         const char    *s,
         size_t         n,
@@ -783,7 +773,7 @@ __sjis_mbtowc (struct _reent *r,
 }
 
 int
-__eucjp_mbtowc (struct _reent *r,
+__eucjp_mbtowc (
         wchar_t       *pwc,
         const char    *s,
         size_t         n,
@@ -865,7 +855,7 @@ __eucjp_mbtowc (struct _reent *r,
 }
 
 int
-__jis_mbtowc (struct _reent *r,
+__jis_mbtowc (
         wchar_t       *pwc,
         const char    *s,
         size_t         n,

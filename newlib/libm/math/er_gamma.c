@@ -22,15 +22,15 @@
 #include "fdlibm.h"
 
 #if defined(_IEEE_LIBM) && defined(HAVE_ALIAS_ATTRIBUTE)
-__strong_reference(__ieee754_gamma_r, gamma_r);
+__strong_reference(__ieee754_gamma, gamma);
 #endif
 
 #ifdef __STDC__
-	double __ieee754_gamma_r(double x, int *signgamp)
+	double __ieee754_gamma(double x)
 #else
-	double __ieee754_gamma_r(x,signgamp)
-	double x; int *signgamp;
+	double __ieee754_gamma(x)
+	double x;
 #endif
 {
-	return __ieee754_exp (__ieee754_lgamma_r(x,signgamp));
+	return __ieee754_exp (__ieee754_lgamma(x));
 }

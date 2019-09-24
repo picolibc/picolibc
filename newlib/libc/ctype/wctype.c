@@ -70,14 +70,13 @@ No supporting OS subroutines are required.
 
 #include <_ansi.h>
 #include <string.h>
-#include <reent.h>
 #include <wctype.h>
 #include <errno.h>
 #include "local.h"
 
+#ifndef _REENT_ONLY
 wctype_t
-_wctype_r (struct _reent *r,
-	const char *c)
+wctype (const char *c)
 {
   switch (*c)
     {
@@ -130,12 +129,5 @@ _wctype_r (struct _reent *r,
   /* otherwise invalid */
   __errno_r(r) = EINVAL;
   return 0;
-}
-
-#ifndef _REENT_ONLY
-wctype_t
-wctype (const char *c)
-{
-  return _wctype_r (_REENT, c);
 }
 #endif /* !_REENT_ONLY */

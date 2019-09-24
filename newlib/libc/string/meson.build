@@ -1,3 +1,37 @@
+#
+# SPDX-License-Identifier: BSD-3-Clause
+#
+# Copyright © 2019 Keith Packard
+#
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions
+# are met:
+#
+# 1. Redistributions of source code must retain the above copyright
+#    notice, this list of conditions and the following disclaimer.
+#
+# 2. Redistributions in binary form must reproduce the above
+#    copyright notice, this list of conditions and the following
+#    disclaimer in the documentation and/or other materials provided
+#    with the distribution.
+#
+# 3. Neither the name of the copyright holder nor the names of its
+#    contributors may be used to endorse or promote products derived
+#    from this software without specific prior written permission.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+# "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+# LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+# FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+# COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+# INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+# (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+# SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+# HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
+# STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+# ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
+# OF THE POSSIBILITY OF SUCH DAMAGE.
+#
 srcs_string = [
     'bcmp.c',
     'bcopy.c',
@@ -29,13 +63,11 @@ srcs_string = [
     'strcat.c',
     'strchr.c',
     'strchrnul.c',
-    'strcmp.c',
     'strcoll.c',
     'strcoll_l.c',
     'strcpy.c',
     'strcspn.c',
     'strdup.c',
-    'strdup_r.c',
     'strerror.c',
     'strerror_r.c',
     'strlcat.c',
@@ -48,7 +80,6 @@ srcs_string = [
     'strncmp.c',
     'strncpy.c',
     'strndup.c',
-    'strndup_r.c',
     'strnlen.c',
     'strnstr.c',
     'strpbrk.c',
@@ -105,16 +136,36 @@ srcs_string = [
     'wmemset.c',
     'xpg_strerror_r.c',
 ]
+
 hdrs_string = [
     'local.h',
     'str-two-way.h',
 ]
+
+srcs_strcmp = [
+  'strcmp.c'
+]
+
+if fast_strcmp
+  cargs_strcmp = ['-O3']
+else
+  cargs_strcmp = []
+endif
+
 foreach target : targets
 	value = get_variable('target_' + target)
+	set_variable('lib_strcmp' + target,
+		     static_library('strcmp' + target,
+				    srcs_strcmp,
+				    pic: false,
+				    c_args: value[1] + cargs_strcmp,
+				    include_directories: inc))
+	strcmp_objs = get_variable('lib_strcmp' + target).extract_all_objects(recursive:true)
 	set_variable('lib_string' + target,
 		static_library('string' + target,
-			srcs_string,
-			pic: false,
-			include_directories: inc,
-			c_args: value[1]))
+			       srcs_string,
+			       objects: strcmp_objs,
+			       pic: false,
+			       include_directories: inc,
+			       c_args: value[1]))
 endforeach

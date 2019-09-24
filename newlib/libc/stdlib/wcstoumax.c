@@ -47,18 +47,15 @@ __FBSDID("$FreeBSD: head/lib/libc/locale/wcstoumax.c 314436 2017-02-28 23:42:47Z
 #include <wchar.h>
 #include <wctype.h>
 #include <stdint.h>
-#include <reent.h>
 #include "../locale/setlocale.h"
 
 /*
  * Convert a wide character string to a uintmax_t integer.
  */
 
-/*
- *Reentrant version of wcstoumax.
- */
-static uintmax_t
-_wcstoumax_l(struct _reent *rptr,const wchar_t * __restrict nptr,
+#ifndef _REENT_ONLY
+uintmax_t
+wcstoumax_l(const wchar_t * __restrict nptr,
 	     wchar_t ** __restrict endptr, int base, locale_t loc)
 {
 	const wchar_t *s = nptr;
@@ -133,25 +130,9 @@ noconv:
 }
 
 uintmax_t
-_wcstoumax_r(struct _reent *rptr, const wchar_t *__restrict nptr,
-	     wchar_t **__restrict endptr, int base)
-{
-	return _wcstoumax_l(rptr, nptr, endptr, base, __get_current_locale());
-}
-
-#ifndef _REENT_ONLY
-
-uintmax_t
-wcstoumax_l(const wchar_t * __restrict nptr, wchar_t ** __restrict endptr,
-	    int base, locale_t loc)
-{
-	return _wcstoumax_l(_REENT, nptr, endptr, base, loc);
-}
-
-uintmax_t
 wcstoumax(const wchar_t* __restrict nptr, wchar_t** __restrict endptr, int base)
 {
-	return _wcstoumax_l(_REENT, nptr, endptr, base, __get_current_locale());
+	return wcstoumax_l(nptr, endptr, base, __get_current_locale());
 }
 
 #endif

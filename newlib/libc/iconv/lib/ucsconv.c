@@ -24,7 +24,6 @@
  * SUCH DAMAGE.
  */
 #include <_ansi.h>
-#include <reent.h>
 #include <sys/types.h>
 #include <errno.h>
 #include <stdlib.h>
@@ -45,7 +44,7 @@ find_encoding_name (const char *searchee,
  */
 
 static void *
-ucs_based_conversion_open (struct _reent *rptr,
+ucs_based_conversion_open (
                                   const char *to,
                                   const char *from)
 {
@@ -54,7 +53,7 @@ ucs_based_conversion_open (struct _reent *rptr,
   const iconv_from_ucs_ces_t *from_ucs_bices;
   
   uc = (iconv_ucs_conversion_t *)
-             _calloc_r (rptr, 1, sizeof (iconv_ucs_conversion_t));
+             calloc (1, sizeof (iconv_ucs_conversion_t));
   if (uc == NULL)
     return NULL;
 
@@ -91,7 +90,7 @@ ucs_based_conversion_open (struct _reent *rptr,
   /* Initialize "to UCS" CES converter */
   if (to_ucs_bices->handlers->init != NULL)
     {
-      uc->to_ucs.data = to_ucs_bices->handlers->init (rptr, from);
+      uc->to_ucs.data = to_ucs_bices->handlers->init (from);
       if (uc->to_ucs.data == NULL)
         goto error;
     }
@@ -102,7 +101,7 @@ ucs_based_conversion_open (struct _reent *rptr,
   /* Initialize "from UCS" CES converter */
   if (from_ucs_bices->handlers->init != NULL)
     {
-      uc->from_ucs.data = from_ucs_bices->handlers->init (rptr, to);
+      uc->from_ucs.data = from_ucs_bices->handlers->init (to);
       if (uc->from_ucs.data == NULL)
         goto error;
     }
@@ -113,16 +112,16 @@ ucs_based_conversion_open (struct _reent *rptr,
 
 error:
   if (uc->to_ucs.data != NULL && uc->to_ucs.handlers->close != NULL)
-    uc->to_ucs.handlers->close (rptr, uc->to_ucs.data);
+    uc->to_ucs.handlers->close (uc->to_ucs.data);
 
-  _free_r (rptr, (void *)uc);
+  free ((void *)uc);
 
   return NULL;
 }
 
 
 static size_t
-ucs_based_conversion_close (struct _reent *rptr,
+ucs_based_conversion_close (
                                    void *data)
 {
   iconv_ucs_conversion_t *uc;
@@ -131,18 +130,18 @@ ucs_based_conversion_close (struct _reent *rptr,
   uc = (iconv_ucs_conversion_t *)data;
 
   if (uc->from_ucs.handlers->close != NULL)  
-    res = uc->from_ucs.handlers->close (rptr, uc->from_ucs.data);
+    res = uc->from_ucs.handlers->close (uc->from_ucs.data);
   if (uc->to_ucs.handlers->close != NULL)
-    res |= uc->to_ucs.handlers->close (rptr, uc->to_ucs.data);
+    res |= uc->to_ucs.handlers->close (uc->to_ucs.data);
 
-  _free_r (rptr, (void *)data);
+  free ((void *)data);
 
   return res;
 }
 
 
 static size_t
-ucs_based_conversion_convert (struct _reent *rptr,
+ucs_based_conversion_convert (
                  void *data,
                  const unsigned char **inbuf,
                  size_t *inbytesleft,
@@ -164,7 +163,7 @@ ucs_based_conversion_convert (struct _reent *rptr,
 
       if (*outbytesleft == 0)
         {
-          __errno_r (rptr) = E2BIG;
+          errno = E2BIG;
           return (size_t)-1;
         }
 
@@ -173,13 +172,13 @@ ucs_based_conversion_convert (struct _reent *rptr,
 
       if (ch == (ucs4_t)ICONV_CES_BAD_SEQUENCE)
         {
-          __errno_r (rptr) = EINVAL;
+          errno = EINVAL;
           return (size_t)-1;
         }
 
       if (ch == (ucs4_t)ICONV_CES_INVALID_CHARACTER)
         {
-          __errno_r (rptr) = EILSEQ;
+          errno = EILSEQ;
           return (size_t)-1;
         }
 
@@ -196,7 +195,7 @@ ucs_based_conversion_convert (struct _reent *rptr,
         {
           *inbuf = inbuf_save;
           *inbytesleft = inbyteslef_save;
-          __errno_r (rptr) = E2BIG;
+          errno = E2BIG;
           return (size_t)-1;
         }
       else if (bytes == (size_t)ICONV_CES_INVALID_CHARACTER)
@@ -204,7 +203,7 @@ ucs_based_conversion_convert (struct _reent *rptr,
           if (flags & ICONV_FAIL_BIT)
             {
               /* Generate error */
-              __errno_r (rptr) = EILSEQ;
+              errno = EILSEQ;
               return (size_t)-1;
             }
           /*
@@ -221,7 +220,7 @@ ucs_based_conversion_convert (struct _reent *rptr,
                                          outbytesleft);
           if ((__int32_t)bytes < 0)
             {
-              __errno_r (rptr) = E2BIG;
+              errno = E2BIG;
               return (size_t)-1;
             }
       

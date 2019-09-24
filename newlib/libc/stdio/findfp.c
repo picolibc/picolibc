@@ -17,7 +17,6 @@
 /* No user fns here.  Pesch 15apr92. */
 
 #include <_ansi.h>
-#include <reent.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <errno.h>
@@ -129,7 +128,7 @@ __sfmoreglue (struct _reent *d,
   struct glue_with_file *g;
 
   g = (struct glue_with_file *)
-    _malloc_r (d, sizeof (*g) + (n - 1) * sizeof (FILE));
+    malloc (sizeof (*g) + (n - 1) * sizeof (FILE));
   if (g == NULL)
     return NULL;
   g->glue._next = NULL;

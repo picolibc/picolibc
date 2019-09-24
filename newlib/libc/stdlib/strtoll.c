@@ -126,14 +126,13 @@ No supporting OS subroutines are required.
 #include <ctype.h>
 #include <errno.h>
 #include <stdlib.h>
-#include <reent.h>
 #include "../locale/setlocale.h"
 
 /*
  * Convert a string to a long long integer.
  */
 static long long
-_strtoll_l (struct _reent *rptr, const char *__restrict nptr,
+_strtoll_l (const char *__restrict nptr,
 	    char **__restrict endptr, int base, locale_t loc)
 {
 	register const unsigned char *s = (const unsigned char *)nptr;
@@ -213,22 +212,13 @@ _strtoll_l (struct _reent *rptr, const char *__restrict nptr,
 	return (acc);
 }
 
-long long
-_strtoll_r (struct _reent *rptr,
-	const char *__restrict nptr,
-	char **__restrict endptr,
-	int base)
-{
-	return _strtoll_l (rptr, nptr, endptr, base, __get_current_locale ());
-}
-
 #ifndef _REENT_ONLY
 
 long long
 strtoll_l (const char *__restrict s, char **__restrict ptr, int base,
 	   locale_t loc)
 {
-	return _strtoll_l (_REENT, s, ptr, base, loc);
+	return _strtoll_l (s, ptr, base, loc);
 }
 
 long long
@@ -236,7 +226,7 @@ strtoll (const char *__restrict s,
 	char **__restrict ptr,
 	int base)
 {
-	return _strtoll_l (_REENT, s, ptr, base, __get_current_locale ());
+	return _strtoll_l (s, ptr, base, __get_current_locale ());
 }
 
 #endif

@@ -45,9 +45,6 @@ char * utoa_width (unsigned val, char *s, int base, size_t width);
 char * ltoa_width (long val, char *s, int base, size_t width);
 char * ultoa_width (unsigned long val, char *s, int base, size_t width);
 
-/* Internal function for use from `printf'.	*/
-char * __ultoa_invert (unsigned long val, char *s, int base);
-
 #endif	/* ifndef __ASSEMBLER__ */
 
 /* Next flags are to use with `base'. Unused fields are reserved.	*/

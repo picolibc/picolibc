@@ -43,7 +43,6 @@ __FBSDID("$FreeBSD: head/lib/libc/stdlib/strtoumax.c 251672 2013-06-13 00:19:30Z
 #include <stdlib.h>
 #include <inttypes.h>
 #include <stdint.h>
-#include <reent.h>
 #include "../locale/setlocale.h"
 
 /*
@@ -53,11 +52,10 @@ __FBSDID("$FreeBSD: head/lib/libc/stdlib/strtoumax.c 251672 2013-06-13 00:19:30Z
  * alphabets and digits are each contiguous.
  */
 
-/*
- *Reentrant version of strtoumax.
- */
-static uintmax_t
-_strtoumax_l(struct _reent *rptr, const char * __restrict nptr,
+#ifndef _REENT_ONLY
+
+uintmax_t
+_strtoumax_l(const char * __restrict nptr,
 	     char ** __restrict endptr, int base, locale_t loc)
 {
 	const char *s = nptr;
@@ -126,26 +124,11 @@ noconv:
 	return (acc);
 }
 
-uintmax_t
-_strtoumax_r(struct _reent *rptr, const char *__restrict nptr,
-	     char **__restrict endptr, int base)
-{
-	return _strtoumax_l(rptr, nptr, endptr, base, __get_current_locale());
-}
-
-#ifndef _REENT_ONLY
-
-uintmax_t
-strtoumax_l(const char * __restrict nptr, char ** __restrict endptr, int base,
-	    locale_t loc)
-{
-	return _strtoumax_l(_REENT, nptr, endptr, base, loc);
-}
 
 uintmax_t
 strtoumax(const char* __restrict nptr, char** __restrict endptr, int base)
 {
-	return _strtoumax_l(_REENT, nptr, endptr, base, __get_current_locale());
+	return strtoumax_l(nptr, endptr, base, __get_current_locale());
 }
 
 #endif

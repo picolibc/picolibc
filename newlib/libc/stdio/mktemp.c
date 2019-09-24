@@ -130,13 +130,13 @@ Supporting OS subroutines required: <<getpid>>, <<mkdir>>, <<open>>, <<stat>>.
 
 #include <_ansi.h>
 #include <stdlib.h>
-#include <reent.h>
 #include <sys/types.h>
 #include <fcntl.h>
 #include <sys/stat.h>
 #include <errno.h>
 #include <stdio.h>
 #include <ctype.h>
+#include <unistd.h>
 
 static int
 _gettemp (struct _reent *ptr,
@@ -155,7 +155,7 @@ _gettemp (struct _reent *ptr,
 #endif
   unsigned int pid;
 
-  pid = _getpid_r (ptr);
+  pid = getpid ();
   for (trv = path; *trv; ++trv)		/* extra X's get set to 0's */
     continue;
   if (trv - path < suffixlen)
@@ -189,9 +189,9 @@ _gettemp (struct _reent *ptr,
 	{
 	  *trv = '\0';
 #ifdef __USE_INTERNAL_STAT64
-	  if (_stat64_r (ptr, path, &sbuf))
+	  if (stat64 (path, &sbuf))
 #else
-	  if (_stat_r (ptr, path, &sbuf))
+	  if (stat (path, &sbuf))
 #endif
 	    return (0);
 	  if (!(sbuf.st_mode & S_IFDIR))
@@ -223,16 +223,16 @@ _gettemp (struct _reent *ptr,
 #endif /* _ELIX_LEVEL */
       if (doopen)
 	{
-	  if ((*doopen = _open_r (ptr, path, O_CREAT | O_EXCL | O_RDWR | flags,
+	  if ((*doopen = open (path, O_CREAT | O_EXCL | O_RDWR | flags,
 				  0600)) >= 0)
 	    return 1;
 	  if (__errno_r(ptr) != EEXIST)
 	    return 0;
 	}
 #ifdef __USE_INTERNAL_STAT64
-      else if (_stat64_r (ptr, path, &sbuf))
+      else if (stat64 (path, &sbuf))
 #else
-      else if (_stat_r (ptr, path, &sbuf))
+      else if (stat (path, &sbuf))
 #endif
 	return (__errno_r(ptr) == ENOENT ? 1 : 0);
 

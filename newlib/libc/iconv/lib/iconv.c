@@ -34,12 +34,6 @@ INDEX
 	iconv_open
 INDEX
 	iconv_close
-INDEX
-	_iconv_r
-INDEX
-	_iconv_open_r
-INDEX
-	_iconv_close_r
 
 SYNOPSIS
 	#include <iconv.h>
@@ -49,14 +43,6 @@ SYNOPSIS
 	              size_t *restrict <[inbytesleft]>, 
 		      char **restrict <[outbuf]>, 
                       size_t *restrict <[outbytesleft]>);
-
-	iconv_t _iconv_open_r (struct _reent *<[rptr]>, 
-			       const char *<[to]>, const char *<[from]>);
-	int _iconv_close_r (struct _reent *<[rptr]>, iconv_t <[cd]>);
-        size_t _iconv_r (struct _reent *<[rptr]>,
-			 iconv_t <[cd]>, const char **<[inbuf]>, 
-	                 size_t *<[inbytesleft]>, 
-		         char **<[outbuf]>, size_t *<[outbytesleft]>);
 
 DESCRIPTION
 The function <<iconv>> converts characters from <[in]> which are in one
@@ -76,11 +62,6 @@ to create a conversion specifier that can be used with <<iconv>>.
 
 The function <<iconv_close>> is used to close a conversion specifier after
 it is no longer needed.
-
-The <<_iconv_r>>, <<_iconv_open_r>>, and <<_iconv_close_r>> functions are
-reentrant versions of <<iconv>>, <<iconv_open>>, and <<iconv_close>>,
-respectively.  An additional reentrancy struct pointer: <[rptr]> is passed
-to properly set <<errno>>.
 
 RETURNS
 The <<iconv>> function returns the number of non-identical conversions
@@ -103,7 +84,6 @@ by the Single Unix specification.
 No supporting OS subroutine calls are required.
 */
 #include <_ansi.h>
-#include <reent.h>
 #include <sys/types.h>
 #include <errno.h>
 #include <string.h>
@@ -119,11 +99,54 @@ No supporting OS subroutine calls are required.
  * iconv interface functions as specified by Single Unix specification.
  */
 
+#ifndef _REENT_ONLY
 iconv_t
-iconv_open (const char *to,
-                   const char *from)
+iconv_open (
+                      const char *to,
+                      const char *from)
 {
-  return _iconv_open_r (_REENT, to, from);
+  iconv_conversion_t *ic;
+    
+  if (to == NULL || from == NULL || *to == '\0' || *from == '\0')
+    return (iconv_t)-1;
+
+  if ((to = (const char *)_iconv_resolve_encoding_name (to)) == NULL)
+    return (iconv_t)-1;
+
+  if ((from = (const char *)_iconv_resolve_encoding_name (from)) == NULL)
+    {
+      free ((void *)to);
+      return (iconv_t)-1;
+    }
+
+  ic = (iconv_conversion_t *)malloc (sizeof (iconv_conversion_t));
+  if (ic == NULL)
+    return (iconv_t)-1;
+
+  /* Select which conversion type to use */
+  if (strcmp (from, to) == 0)
+    {
+      /* Use null conversion */
+      ic->handlers = &_iconv_null_conversion_handlers;
+      ic->data = ic->handlers->open (to, from);
+    }
+  else  
+    {
+      /* Use UCS-based conversion */
+      ic->handlers = &_iconv_ucs_conversion_handlers;
+      ic->data = ic->handlers->open (to, from);
+    }
+
+  free ((void *)to);
+  free ((void *)from);
+
+  if (ic->data == NULL)
+    {
+      free ((void *)ic);
+      return (iconv_t)-1;
+    }
+
+  return (void *)ic;
 }
 
 
@@ -134,84 +157,13 @@ iconv (iconv_t cd,
               char **__restrict outbuf,
               size_t *__restrict outbytesleft)
 {
-    return _iconv_r (_REENT, cd, (const char **) inbuf, inbytesleft,
-		     outbuf, outbytesleft);
-}
-
-
-int
-iconv_close (iconv_t cd)
-{
-    return _iconv_close_r (_REENT, cd);
-}
-
-
-#ifndef _REENT_ONLY
-iconv_t
-_iconv_open_r (struct _reent *rptr,
-                      const char *to,
-                      const char *from)
-{
-  iconv_conversion_t *ic;
-    
-  if (to == NULL || from == NULL || *to == '\0' || *from == '\0')
-    return (iconv_t)-1;
-
-  if ((to = (const char *)_iconv_resolve_encoding_name (rptr, to)) == NULL)
-    return (iconv_t)-1;
-
-  if ((from = (const char *)_iconv_resolve_encoding_name (rptr, from)) == NULL)
-    {
-      _free_r (rptr, (void *)to);
-      return (iconv_t)-1;
-    }
-
-  ic = (iconv_conversion_t *)_malloc_r (rptr, sizeof (iconv_conversion_t));
-  if (ic == NULL)
-    return (iconv_t)-1;
-
-  /* Select which conversion type to use */
-  if (strcmp (from, to) == 0)
-    {
-      /* Use null conversion */
-      ic->handlers = &_iconv_null_conversion_handlers;
-      ic->data = ic->handlers->open (rptr, to, from);
-    }
-  else  
-    {
-      /* Use UCS-based conversion */
-      ic->handlers = &_iconv_ucs_conversion_handlers;
-      ic->data = ic->handlers->open (rptr, to, from);
-    }
-
-  _free_r (rptr, (void *)to);
-  _free_r (rptr, (void *)from);
-
-  if (ic->data == NULL)
-    {
-      _free_r (rptr, (void *)ic);
-      return (iconv_t)-1;
-    }
-
-  return (void *)ic;
-}
-
-
-size_t
-_iconv_r (struct _reent *rptr,
-                 iconv_t cd,
-                 const char **inbuf,
-                 size_t *inbytesleft,
-                 char **outbuf,
-                 size_t *outbytesleft)
-{
   iconv_conversion_t *ic = (iconv_conversion_t *)cd;
 
   if ((void *)cd == NULL || cd == (iconv_t)-1 || ic->data == NULL
        || (ic->handlers != &_iconv_null_conversion_handlers
            && ic->handlers != &_iconv_ucs_conversion_handlers))
     {
-      __errno_r (rptr) = EBADF;
+      errno = EBADF;
       return (size_t)-1;
     }
 
@@ -257,23 +209,23 @@ _iconv_r (struct _reent *rptr,
            ic->handlers->set_state (ic->data, &state_save, 1);
         }
        
-      __errno_r (rptr) = E2BIG;
+      errno = E2BIG;
       return (size_t)-1;
     }
   
   if (*inbytesleft == 0)
     {
-      __errno_r (rptr) = EINVAL;
+      errno = EINVAL;
       return (size_t)-1;
     }
    
   if (*outbytesleft == 0 || *outbuf == NULL)
     {
-      __errno_r (rptr) = E2BIG;
+      errno = E2BIG;
       return (size_t)-1;
     }
 
-  return ic->handlers->convert (rptr,
+  return ic->handlers->convert (
                                 ic->data,
                                 (const unsigned char**)inbuf,
                                 inbytesleft,
@@ -284,8 +236,7 @@ _iconv_r (struct _reent *rptr,
 
 
 int
-_iconv_close_r (struct _reent *rptr,
-                       iconv_t cd)
+iconv_close (iconv_t cd)
 {
   int res;
   iconv_conversion_t *ic = (iconv_conversion_t *)cd;
@@ -294,13 +245,13 @@ _iconv_close_r (struct _reent *rptr,
        || (ic->handlers != &_iconv_null_conversion_handlers
            && ic->handlers != &_iconv_ucs_conversion_handlers))
     {
-      __errno_r (rptr) = EBADF;
+      errno = EBADF;
       return -1;
     }
 
-  res = (int)ic->handlers->close (rptr, ic->data);
+  res = (int)ic->handlers->close (ic->data);
   
-  _free_r (rptr, (void *)cd);
+  free ((void *)cd);
 
   return res;
 }

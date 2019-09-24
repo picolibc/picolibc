@@ -25,7 +25,25 @@
 int
 putenv (char *str)
 {
-  return _putenv_r (_REENT, str);
+  register char *p, *equal;
+  int rval;
+
+  p = strdup (str);
+
+  if (!p)
+    return 1;
+
+  if (!(equal = strchr (p, '=')))
+    {
+      (void) free (p);
+      return 1;
+    }
+
+  *equal = '\0';
+  rval = setenv (p, equal + 1, 1);
+  (void) free (p);
+
+  return rval;
 }
 
 #endif /* !_REENT_ONLY */

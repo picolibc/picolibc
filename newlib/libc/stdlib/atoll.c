@@ -74,10 +74,3 @@ atoll (const char *str)
 	return strtoll(str, (char **)NULL, 10);
 }
 #endif /* !_REENT_ONLY */
-
-long long
-_atoll_r (struct _reent *ptr,
-       const char *str)
-{
-	return _strtoll_r(ptr, str, (char **)NULL, 10);
-}

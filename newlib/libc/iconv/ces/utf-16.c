@@ -29,7 +29,6 @@
  || defined (ICONV_FROM_UCS_CES_UTF_16)
 
 #include <_ansi.h>
-#include <reent.h>
 #include <sys/types.h>
 #include <stdlib.h>
 #include <string.h>
@@ -58,21 +57,21 @@
 #define UTF_16LE "utf_16le"
 
 static size_t
-utf_16_close (struct _reent *rptr,
+utf_16_close (
                      void *data)
 {
-  _free_r(rptr, data);
+  free(data);
   return 0;
 }
 
 #if defined (ICONV_FROM_UCS_CES_UTF_16)
 static void *
-utf_16_init_from_ucs (struct _reent *rptr,
+utf_16_init_from_ucs (
                              const char *encoding)
 {
   int *data;
   
-  if ((data = (int *)_malloc_r (rptr, sizeof (int))) == NULL)
+  if ((data = (int *)malloc (sizeof (int))) == NULL)
     return (void *)NULL;
   
   if (strcmp (encoding, UTF_16LE) == 0)
@@ -167,12 +166,12 @@ utf_16_convert_from_ucs (void *data,
 
 #if defined (ICONV_TO_UCS_CES_UTF_16)
 static void *
-utf_16_init_to_ucs (struct _reent *rptr,
+utf_16_init_to_ucs (
                            const char *encoding)
 {
   int *data;
   
-  if ((data = (int *)_malloc_r (rptr, sizeof (int))) == NULL)
+  if ((data = (int *)malloc (sizeof (int))) == NULL)
     return (void *)NULL;
   
   if (strcmp (encoding, UTF_16BE) == 0)

@@ -29,7 +29,6 @@
  || defined (ICONV_FROM_UCS_CES_UTF_8)
 
 #include <_ansi.h>
-#include <reent.h>
 #include <sys/types.h>
 #include "../lib/local.h"
 #include "../lib/ucsconv.h"

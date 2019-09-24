@@ -1,9 +1,65 @@
+#
+# SPDX-License-Identifier: BSD-3-Clause
+#
+# Copyright © 2019 Keith Packard
+#
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions
+# are met:
+#
+# 1. Redistributions of source code must retain the above copyright
+#    notice, this list of conditions and the following disclaimer.
+#
+# 2. Redistributions in binary form must reproduce the above
+#    copyright notice, this list of conditions and the following
+#    disclaimer in the documentation and/or other materials provided
+#    with the distribution.
+#
+# 3. Neither the name of the copyright holder nor the names of its
+#    contributors may be used to endorse or promote products derived
+#    from this software without specific prior written permission.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+# "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+# LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+# FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+# COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+# INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+# (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+# SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+# HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
+# STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+# ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
+# OF THE POSSIBILITY OF SUCH DAMAGE.
+#
 nano_malloc_srcs_stdlib = [
-  'nano-mallocr.c',
+  'nano-malloc-calloc.c',
+  'nano-malloc-cfree.c',
+  'nano-malloc-free.c',
+  'nano-malloc-mallinco.c',
+  'nano-malloc-malloc.c',
+  'nano-malloc-malloc_stats.c',
+  'nano-malloc-malloc_usable_size.c',
+  'nano-malloc-mallopt.c',
+  'nano-malloc-memalign.c',
+  'nano-malloc-pvalloc.c',
+  'nano-malloc-realloc.c',
+  'nano-malloc-valloc.c',
 ]
 
 std_malloc_srcs_stdlib = [
-  'mallocr.c',
+  'malloc-calloc.c',
+  'malloc-cfree.c',
+  'malloc-free.c',
+  'malloc-mallinco.c',
+  'malloc-malloc.c',
+  'malloc-malloc_stats.c',
+  'malloc-malloc_usable_size.c',
+  'malloc-mallopt.c',
+  'malloc-memalign.c',
+  'malloc-pvalloc.c',
+  'malloc-realloc.c',
+  'malloc-valloc.c',
 ]
 
 std_strtod_srcs_stdlib = [
@@ -28,7 +84,6 @@ srcs_stdlib = [
     'atoll.c',
     'btowc.c',
     '__call_atexit.c',
-    'calloc.c',
     'cxa_atexit.c',
     'cxa_finalize.c',
     'div.c',
@@ -61,58 +116,45 @@ srcs_stdlib = [
     'llabs.c',
     'lldiv.c',
     'lrand48.c',
-    'malign.c',
-    'malloc.c',
     'mblen.c',
-    'mblen_r.c',
     'mbrlen.c',
     'mbrtowc.c',
     'mbsinit.c',
     'mbsnrtowcs.c',
     'mbsrtowcs.c',
     'mbstowcs.c',
-    'mbstowcs_r.c',
     'mbtowc.c',
     'mbtowc_r.c',
     'mlock.c',
     'mprec.c',
     'mrand48.c',
-    'msize.c',
     'mstats.c',
-    'mtrim.c',
     'nrand48.c',
-    'on_exit_args.c',
     'on_exit.c',
     'putenv.c',
-    'putenv_r.c',
     'quick_exit.c',
     'rand48.c',
     'rand.c',
     'random.c',
     'rand_r.c',
     'reallocarray.c',
-    'realloc.c',
     'reallocf.c',
     'rpmatch.c',
     'sb_charsets.c',
     'seed48.c',
     'setenv.c',
-    'setenv_r.c',
     'srand48.c',
     'strtodg.c',
     'strtoimax.c',
     'strtol.c',
     'strtoll.c',
-    'strtoll_r.c',
     'strtorx.c',
     'strtoul.c',
     'strtoull.c',
-    'strtoull_r.c',
     'strtoumax.c',
     'system.c',
     '__ten_mu.c',
     'utoa.c',
-    'valloc.c',
     'wcrtomb.c',
     'wcsnrtombs.c',
     'wcsrtombs.c',
@@ -120,12 +162,9 @@ srcs_stdlib = [
     'wcstoimax.c',
     'wcstol.c',
     'wcstoll.c',
-    'wcstoll_r.c',
     'wcstombs.c',
-    'wcstombs_r.c',
     'wcstoul.c',
     'wcstoull.c',
-    'wcstoull_r.c',
     'wcstoumax.c',
     'wctob.c',
     'wctomb.c',
@@ -166,19 +205,6 @@ hdrs_stdlib = [
     'std.h',
 ]
 
-malloc_defs = [
-  '-DDEFINE_MALLOC',
-  '-DDEFINE_FREE',
-  '-DDEFINE_REALLOC',
-  '-DDEFINE_CALLOC',
-  '-DDEFINE_CFREE',
-  '-DDEFINE_MEMALIGN',
-  '-DDEFINE_VALLOC',
-  '-DDEFINE_PVALLOC',
-  '-DDEFINE_MALLINFO',
-  '-DDEFINE_MALLOC_STATS',
-]
-
 foreach target : targets
 	value = get_variable('target_' + target)
 	set_variable('lib_stdlib' + target,
@@ -186,5 +212,5 @@ foreach target : targets
 			srcs_stdlib,
 			pic: false,
 			include_directories: inc,
-			c_args: value[1] + ['-DINTERNAL_NEWLIB'] + malloc_defs))
+			c_args: value[1] + ['-DINTERNAL_NEWLIB']))
 endforeach

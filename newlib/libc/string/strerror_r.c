@@ -69,7 +69,7 @@ strerror_r (int errnum,
 	char *buffer,
 	size_t n)
 {
-  char *error = _strerror_r (_REENT, errnum, 1, NULL);
+  char *error = _strerror_r (errnum, 1, NULL);
 
   if (strlen (error) >= n)
     return error;

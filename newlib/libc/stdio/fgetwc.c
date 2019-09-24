@@ -117,7 +117,6 @@ PORTABILITY
 */
 
 #include <_ansi.h>
-#include <reent.h>
 #include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -142,7 +141,7 @@ __fgetwc (struct _reent *ptr,
     }
   do
     {
-      nconv = _mbrtowc_r (ptr, &wc, (char *) fp->_p, fp->_r, &fp->_mbstate);
+      nconv = mbrtowc (&wc, (char *) fp->_p, fp->_r, &fp->_mbstate);
       if (nconv == (size_t)-1)
 	break;
       else if (nconv == (size_t)-2)

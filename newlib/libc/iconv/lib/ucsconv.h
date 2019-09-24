@@ -27,7 +27,6 @@
 #define __ICONV_UCS_CONVERSION_H__
 
 #include <_ansi.h>
-#include <reent.h>
 #include <sys/types.h>
 #include <wchar.h>
 #include "local.h"
@@ -56,7 +55,6 @@ typedef struct
    * init - initialize CES converter.
    *
    * PARAMETERS:
-   *   struct _reent *rptr   - reent structure of current thread/process;
    *   const char *encoding - encoding name.
    *
    * DESCRIPTION:
@@ -68,14 +66,13 @@ typedef struct
    *   Returns CES-specific data pointer if success. In case of error returns
    *   NULL and sets current thread's/process's errno.
    */
-  void *(*init) (struct _reent *rptr,
+  void *(*init) (
                           const char *encoding);
 
   /*
    * close - close CES converter.
    *
    * PARAMETERS:
-   *   struct _reent *rptr - reent structure of current thread/process;
    *   void *data      - CES converter-specific data.
    *
    * DESCRIPTION:
@@ -84,7 +81,7 @@ typedef struct
    *   Returns (size_t)0 if success. In case of error returns (size_t)-1 and
    *   sets current thread's/process's errno.
    */
-  size_t (*close) (struct _reent *rptr,
+  size_t (*close) (
                         void *data);
 
   /*
@@ -172,11 +169,11 @@ typedef struct
 typedef struct
 {
   /* Same as in iconv_to_ucs_ces_handlers_t */
-  void *(*init) (struct _reent *rptr,
+  void *(*init) (
                           const char *encoding);
 
   /* Same as in iconv_to_ucs_ces_handlers_t */
-  size_t (*close) (struct _reent *rptr,
+  size_t (*close) (
                         void *data);
 
   /* Same as in iconv_to_ucs_ces_handlers_t */

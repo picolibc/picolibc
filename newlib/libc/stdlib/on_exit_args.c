@@ -19,11 +19,14 @@
  * __cxa_atexit() will force it to be linked.
  */
 
-#include <reent.h>
+#include <stddef.h>
+#include <stdlib.h>
+#include <sys/lock.h>
+#include "atexit.h"
 
 #ifdef _REENT_SMALL
 
-static struct _on_exit_args _on_exit_args_instance = {{_NULL}, {_NULL}, 0, 0};
+static struct _on_exit_args _on_exit_args_instance;
 
 struct _on_exit_args * const __on_exit_args = &_on_exit_args_instance;
 

@@ -28,24 +28,12 @@
 	float x;
 #endif
 {
-	struct exception exc;
 	float z = __ieee754_j0f(x);
 	if(_LIB_VERSION == _IEEE_ || isnan(x)) return z;
 	if(fabsf(x)>(float)X_TLOSS) {
 	    /* j0f(|x|>X_TLOSS) */
-            exc.type = TLOSS;
-            exc.name = "j0f";
-	    exc.err = 0;
-	    exc.arg1 = exc.arg2 = (double)x;
-            exc.retval = 0.0;
-            if (_LIB_VERSION == _POSIX_)
-               errno = ERANGE;
-            else if (!matherr(&exc)) {
-               errno = ERANGE;
-            }        
-	    if (exc.err != 0)
-	       errno = exc.err;
-            return (float)exc.retval; 
+	    errno = ERANGE;
+	    return 0.0f;
 	} else
 	    return z;
 }
@@ -60,49 +48,17 @@
 #endif
 {
 	float z;
-	struct exception exc;
 	z = __ieee754_y0f(x);
 	if(_LIB_VERSION == _IEEE_ || isnan(x) ) return z;
         if(x <= (float)0.0){
-#ifndef HUGE_VAL 
-#define HUGE_VAL inf
-	    double inf = 0.0;
-
-	    SET_HIGH_WORD(inf,0x7ff00000);	/* set inf to infinite */
-#endif
 	    /* y0f(0) = -inf  or y0f(x<0) = NaN */
-	    exc.type = DOMAIN;	/* should be SING for IEEE y0f(0) */
-	    exc.name = "y0f";
-	    exc.err = 0;
-	    exc.arg1 = exc.arg2 = (double)x;
-	    if (_LIB_VERSION == _SVID_)
-	       exc.retval = -HUGE;
-	    else
-	       exc.retval = -HUGE_VAL;
-	    if (_LIB_VERSION == _POSIX_)
-	       errno = EDOM;
-	    else if (!matherr(&exc)) {
-	       errno = EDOM;
-	    }
-	    if (exc.err != 0)
-	       errno = exc.err;
-            return (float)exc.retval; 
+	    errno = EDOM;
+	    return -HUGE_VALF;
         }
 	if(x>(float)X_TLOSS) {
 	    /* y0f(x>X_TLOSS) */
-            exc.type = TLOSS;
-            exc.name = "y0f";
-	    exc.err = 0;
-	    exc.arg1 = exc.arg2 = (double)x;
-            exc.retval = 0.0;
-            if (_LIB_VERSION == _POSIX_)
-                errno = ERANGE;
-            else if (!matherr(&exc)) {
-                errno = ERANGE;
-            }        
-	    if (exc.err != 0)
-	       errno = exc.err;
-            return (float)exc.retval; 
+	    errno = ERANGE;
+	    return 0.0f;
 	} else
 	    return z;
 }

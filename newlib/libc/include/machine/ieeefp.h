@@ -452,6 +452,10 @@
 #define __IEEE_BIG_ENDIAN
 #endif
 
+#ifdef __AMDGCN__
+#define __IEEE_LITTLE_ENDIAN
+#endif
+
 #ifdef __CYGWIN__
 #define __OBSOLETE_MATH_DEFAULT 0
 #endif

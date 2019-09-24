@@ -31,8 +31,6 @@ RETURNS
         is set to <<EDOM>>.  If <[x]> and <[y]> are both 0, then
         <<pow>> and <<powf>> return <<1>>.
 
-        You can modify error handling for these functions using <<matherr>>.
-
 PORTABILITY
         <<pow>> is ANSI C. <<powf>> is an extension.  */
 

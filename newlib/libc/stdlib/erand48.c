@@ -14,7 +14,7 @@
 #include "rand48.h"
 
 double
-_erand48_r (struct _reent *r,
+_erand48_r (struct _rand48 *r,
        unsigned short xseed[3])
 {
   __dorand48(r, xseed);
@@ -27,6 +27,6 @@ _erand48_r (struct _reent *r,
 double
 erand48 (unsigned short xseed[3])
 {
-  return _erand48_r (_REENT, xseed);
+  return _erand48_r (&_rand48, xseed);
 }
 #endif /* !_REENT_ONLY */

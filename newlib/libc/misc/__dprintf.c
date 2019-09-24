@@ -5,8 +5,8 @@
 */
 
 #include <_ansi.h>
+#include <unistd.h>
 #include "ctype.h"
-#include "reent.h"
 #include "string.h"
 #include "unctrl.h"
 
@@ -254,7 +254,7 @@ print_number (int base,
 static void
 write_char (char c)
 {
-  _write_r (_REENT, CONSOLE_FD, &c, 1);
+  write (CONSOLE_FD, &c, 1);
 }
 
 /* Write S to the console.
@@ -264,5 +264,5 @@ write_char (char c)
 static void
 write_string (const char *s)
 {
-  _write_r (_REENT, CONSOLE_FD, s, strlen (s));
+  write (CONSOLE_FD, s, strlen (s));
 }

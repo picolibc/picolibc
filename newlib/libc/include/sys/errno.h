@@ -8,7 +8,7 @@ extern "C" {
 #endif
 #define _SYS_ERRNO_H_
 
-#include <sys/reent.h>
+#include <sys/config.h>
 
 /* Please don't use these variables directly.
    Use strerror instead. */
@@ -22,15 +22,16 @@ extern __IMPORT char *program_invocation_short_name;
 #endif
 
 #ifdef NEWLIB_GLOBAL_ERRNO
-extern int errno;
-#define __errno_r(ptr)	(errno)
+#define NEWLIB_THREAD_LOCAL_ERRNO
 #else
-#define __errno_r(ptr) ((ptr)->_errno)
-#ifndef _REENT_ONLY
-#define errno (*__errno())
-extern int *__errno (void);
+#define NEWLIB_THREAD_LOCAL_ERRNO NEWLIB_THREAD_LOCAL
 #endif
-#endif
+
+extern NEWLIB_THREAD_LOCAL_ERRNO int _errno;
+
+#define errno _errno
+#define __errno_r(ptr)	(_errno)
+#define __errno() 	(&_errno)
 
 #define	EPERM 1		/* Not owner */
 #define	ENOENT 2	/* No such file or directory */

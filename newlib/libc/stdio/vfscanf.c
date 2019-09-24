@@ -75,7 +75,6 @@ Supporting OS subroutines required:
 */
 
 #include <_ansi.h>
-#include <reent.h>
 #include <newlib.h>
 #include <ctype.h>
 #include <wctype.h>
@@ -392,7 +391,7 @@ __wctob (struct _reent *rptr, wint_t wc)
   if (wc == WEOF)
     return EOF;
   memset (&mbs, '\0', sizeof (mbs));
-  return __WCTOMB (rptr, (char *) pmb, wc, &mbs) == 1 ? (int) pmb[0] : 0;
+  return __WCTOMB ((char *) pmb, wc, &mbs) == 1 ? (int) pmb[0] : 0;
 }
 
 int
@@ -547,7 +546,7 @@ __SVFSCANF_R (struct _reent *rptr,
     while (0)
 #endif
 
-  #define CCFN_PARAMS	(struct _reent *, const char *, char **, int)
+  #define CCFN_PARAMS	(const char *, char **, int)
   u_long (*ccfn)CCFN_PARAMS=0;	/* conversion function (strtol/strtoul) */
   char ccltab[256];		/* character class table for %[...] */
   char buf[BUF];		/* buffer for numeric conversions */
@@ -601,7 +600,7 @@ __SVFSCANF_R (struct _reent *rptr,
 #ifndef _MB_CAPABLE
       wc = *fmt;
 #else
-      nbytes = __MBTOWC (rptr, &wc, (char *) fmt, MB_CUR_MAX, &state);
+      nbytes = __MBTOWC (&wc, (char *) fmt, MB_CUR_MAX, &state);
       if (nbytes < 0) {
 	wc = 0xFFFD; /* Unicode replacement character */
 	nbytes = 1;
@@ -790,13 +789,13 @@ __SVFSCANF_R (struct _reent *rptr,
 	  /* FALLTHROUGH */
 	case 'd':
 	  c = CT_INT;
-	  ccfn = (u_long (*)CCFN_PARAMS)_strtol_r;
+	  ccfn = (u_long (*)CCFN_PARAMS)strtol;
 	  base = 10;
 	  break;
 
 	case 'i':
 	  c = CT_INT;
-	  ccfn = (u_long (*)CCFN_PARAMS)_strtol_r;
+	  ccfn = (u_long (*)CCFN_PARAMS)strtol;
 	  base = 0;
 	  break;
 
@@ -805,13 +804,13 @@ __SVFSCANF_R (struct _reent *rptr,
 	  /* FALLTHROUGH */
 	case 'o':
 	  c = CT_INT;
-	  ccfn = _strtoul_r;
+	  ccfn = strtoul;
 	  base = 8;
 	  break;
 
 	case 'u':
 	  c = CT_INT;
-	  ccfn = _strtoul_r;
+	  ccfn = strtoul;
 	  base = 10;
 	  break;
 
@@ -819,7 +818,7 @@ __SVFSCANF_R (struct _reent *rptr,
 	case 'x':
 	  flags |= PFXOK;	/* enable 0x prefixing */
 	  c = CT_INT;
-	  ccfn = _strtoul_r;
+	  ccfn = strtoul;
 	  base = 16;
 	  break;
 
@@ -868,7 +867,7 @@ __SVFSCANF_R (struct _reent *rptr,
 	case 'p':		/* pointer format is like hex */
 	  flags |= POINTER | PFXOK;
 	  c = CT_INT;
-	  ccfn = _strtoul_r;
+	  ccfn = strtoul;
 	  base = 16;
 	  break;
 
@@ -978,7 +977,7 @@ __SVFSCANF_R (struct _reent *rptr,
 		     through */
 		  if (mbslen != 3 || state.__count != 4)
 		    memset (&state, 0, sizeof (mbstate_t));
-                  if ((mbslen = _mbrtowc_r (rptr, wcp, buf, n, &state))
+                  if ((mbslen = mbrtowc (wcp, buf, n, &state))
                                                          == (size_t)-1)
                     goto input_failure; /* Invalid sequence */
                   if (mbslen == 0 && !(flags & SUPPRESS))
@@ -1095,7 +1094,7 @@ __SVFSCANF_R (struct _reent *rptr,
 		     through */
 		  if (mbslen != 3 || state.__count != 4)
 		    memset (&state, 0, sizeof (mbstate_t));
-                  if ((mbslen = _mbrtowc_r (rptr, wcp, buf, n, &state))
+                  if ((mbslen = mbrtowc (wcp, buf, n, &state))
                                                         == (size_t)-1)
                     goto input_failure;
                   if (mbslen == 0)
@@ -1232,7 +1231,7 @@ __SVFSCANF_R (struct _reent *rptr,
 		     through */
 		  if (mbslen != 3 || state.__count != 4)
 		    memset (&state, 0, sizeof (mbstate_t));
-                  if ((mbslen = _mbrtowc_r (rptr, wcp, buf, n, &state))
+                  if ((mbslen = mbrtowc (wcp, buf, n, &state))
                                                         == (size_t)-1)
                     goto input_failure;
                   if (mbslen == 0)
@@ -1482,7 +1481,7 @@ __SVFSCANF_R (struct _reent *rptr,
 	      u_long res;
 
 	      *p = 0;
-	      res = (*ccfn) (rptr, buf, (char **) NULL, base);
+	      res = (*ccfn) (buf, (char **) NULL, base);
 	      if (flags & POINTER)
 		{
 		  void **vp = GET_ARG (N, ap, void **);
@@ -1550,7 +1549,7 @@ __SVFSCANF_R (struct _reent *rptr,
 	  unsigned width_left = 0;
 	  char nancount = 0;
 	  char infcount = 0;
-	  const char *decpt = _localeconv_r (rptr)->decimal_point;
+	  const char *decpt = localeconv ()->decimal_point;
 #ifdef _MB_CAPABLE
 	  int decptpos = 0;
 #endif
@@ -1850,7 +1849,7 @@ __SVFSCANF_R (struct _reent *rptr,
 		  exp_start = p;
 		}
 	      else if (exp_adjust)
-                new_exp = _strtol_r (rptr, (exp_start + 1), NULL, 10) - exp_adjust;
+                new_exp = strtol ((exp_start + 1), NULL, 10) - exp_adjust;
 	      if (exp_adjust)
 		{
 
@@ -1867,10 +1866,10 @@ __SVFSCANF_R (struct _reent *rptr,
 	         result.  */
 #ifndef _NO_LONGDBL /* !_NO_LONGDBL */
 	      if (flags & LONGDBL)
-		qres = _strtold_r (rptr, buf, NULL);
+		qres = _strtold_r (buf, NULL);
 	      else
 #endif
-	        res = _strtod_r (rptr, buf, NULL);
+	        res = _strtod_r (buf, NULL);
 
 	      if (flags & LONG)
 		{

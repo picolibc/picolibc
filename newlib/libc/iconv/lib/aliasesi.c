@@ -23,7 +23,6 @@
  * SUCH DAMAGE.
  */
 #include <_ansi.h>
-#include <reent.h>
 #include <newlib.h>
 #include <sys/types.h>
 #include <string.h>
@@ -37,7 +36,6 @@
  * canonical_form - canonize 'str'.
  *
  * PARAMETERS:
- *   struct _reent *rptr - reent structure of current thread/process.
  *   const char *str    - string to canonize. 
  *
  * DESCRIPTION:
@@ -48,12 +46,12 @@
  *   Returns canonical form of 'str' if success, NULL if failure.
  */
 static const char *
-canonical_form (struct _reent *rptr,
+canonical_form (
                        const char *str)
 {
   char *p, *p1;
 
-  if (str == NULL || (p = p1 = _strdup_r (rptr, str)) == NULL)
+  if (str == NULL || (p = p1 = strdup (str)) == NULL)
     return (const char *)NULL;
 
   for (; *str; str++, p++)
@@ -71,7 +69,6 @@ canonical_form (struct _reent *rptr,
  * find_alias - find encoding name name by it's alias. 
  *
  * PARAMETERS:
- *   struct _reent *rptr - reent structure of current thread/process.
  *   const char *alias  - alias by which "official" name should be found.
  *   const char *table  - aliases table.
  *   int len             - aliases table length.
@@ -92,7 +89,7 @@ canonical_form (struct _reent *rptr,
  *   and sets current thread's/process's errno.
  */
 static char *
-find_alias (struct _reent *rptr,
+find_alias (
                    const char *alias,
                    const char *table,
                    int len)
@@ -126,14 +123,13 @@ search_again:
 
   for (end = p + 1; !isspace (*end) && *end != '\n' && *end != '\0'; end++);
 
-  return _strndup_r (rptr, p, (size_t)(end - p));
+  return strndup (p, (size_t)(end - p));
 }
 
 /*
  * _iconv_resolve_encoding_name - resolves encoding's name by given alias. 
  *
  * PARAMETERS:
- *   struct _reent *rptr - reent structure of current thread/process.
  *   const char *ca     - encoding alias to resolve.
  *
  * DESCRIPTION: 
@@ -145,7 +141,7 @@ search_again:
  *   and sets current thread's/process's errno.
  */
 char *
-_iconv_resolve_encoding_name (struct _reent *rptr,
+_iconv_resolve_encoding_name (
                                      const char *ca)
 {
   char *p = (char *)ca;
@@ -155,12 +151,12 @@ _iconv_resolve_encoding_name (struct _reent *rptr,
     if (*p == ' ' || *p == '\r' || *p++ == '\n')
       return NULL;
     
-  if ((ca = canonical_form (rptr, ca)) == NULL)
+  if ((ca = canonical_form (ca)) == NULL)
     return NULL;
 
-  p = find_alias (rptr, ca, _iconv_aliases, strlen (_iconv_aliases));
+  p = find_alias (ca, _iconv_aliases, strlen (_iconv_aliases));
   
-  _free_r (rptr, (void *)ca);
+  free ((void *)ca);
   return p;
 }
 

@@ -122,7 +122,7 @@ setvbuf (register FILE * fp,
     FREEUB(reent, fp);
   fp->_r = fp->_lbfsize = 0;
   if (fp->_flags & __SMBF)
-    _free_r (reent, (void *) fp->_bf._base);
+    free ((void *) fp->_bf._base);
   fp->_flags &= ~(__SLBF | __SNBF | __SMBF | __SOPT | __SNPT | __SEOF);
 
   if (mode == _IONBF)

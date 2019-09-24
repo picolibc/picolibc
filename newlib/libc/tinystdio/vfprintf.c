@@ -51,7 +51,6 @@
 #else
 #include "dtoa_engine.h"
 #endif
-#include "xtoa_fast.h"
 
 /*
  * This file can be compiled into more than one flavour.  The default
@@ -72,6 +71,53 @@
 # error "Not a known printf level."
 #endif
 
+#ifndef PRINTF_LONGLONG
+# define PRINTF_LONGLONG	(PRINTF_LEVEL >= PRINTF_FLT)
+#endif
+
+#if PRINTF_LONGLONG
+typedef unsigned long long ultoa_unsigned_t;
+typedef long long ultoa_signed_t;
+#define PRINTF_BUF_SIZE 22
+#define arg_to_t(flags, _s_)	({				\
+	    _s_ long long __v__;				\
+	    if ((flags) & FL_LONG) {				\
+		if ((flags) & FL_REPD_TYPE)			\
+		    __v__ = va_arg(ap, _s_ long long);		\
+		else						\
+		    __v__ = va_arg(ap, _s_ long);		\
+	    } else if ((flags) & FL_SHORT) {			\
+		if ((flags) & FL_REPD_TYPE)			\
+		    __v__ = (_s_ char) va_arg(ap, _s_ int);	\
+		else						\
+		    __v__ = (_s_ short) va_arg(ap, _s_ int);	\
+	    } else {						\
+		__v__ = va_arg(ap, _s_ int);			\
+	    }							\
+	    __v__;						\
+	})
+#else
+typedef unsigned long ultoa_unsigned_t;
+typedef long ultoa_signed_t;
+#define PRINTF_BUF_SIZE 11
+#define arg_to_t(flags, _s_)	({				\
+	    _s_ long __v__;					\
+	    if ((flags) & FL_LONG) {				\
+		__v__ = va_arg(ap, _s_ long);			\
+	    } else if ((flags) & FL_SHORT) {			\
+		__v__ = (_s_ short) va_arg(ap, _s_ int);	\
+	    } else {						\
+		__v__ = va_arg(ap, _s_ int);			\
+	    }							\
+	    __v__;						\
+	})
+#endif
+
+#define arg_to_unsigned(flags) arg_to_t(flags, unsigned)
+#define arg_to_signed(flags) arg_to_t(flags, signed)
+
+#include "ultoa_invert.c"
+
 /* --------------------------------------------------------------------	*/
 #if  PRINTF_LEVEL <= PRINTF_MIN
 
@@ -86,7 +132,7 @@ vfprintf (FILE * stream, const char *fmt, va_list ap)
 {
     unsigned char c;		/* holds a char from the format string */
     unsigned char flags;
-    unsigned char buf[11];	/* size for -1 in octal, without '\0'	*/
+    unsigned char buf[PRINTF_BUF_SIZE];	/* size for -1 in octal, without '\0'	*/
 
     stream->len = 0;
 
@@ -150,7 +196,8 @@ vfprintf (FILE * stream, const char *fmt, va_list ap)
 	}
 
 	if (c == 'd' || c == 'i') {
-	    long x = (flags & FL_LONG) ? va_arg(ap,long) : va_arg(ap,int);
+	    ultoa_signed_t x = arg_to_signed(flags);
+
 	    flags &= ~FL_ALT;
 	    if (x < 0) {
 		x = -x;
@@ -167,7 +214,6 @@ vfprintf (FILE * stream, const char *fmt, va_list ap)
 	      case 'u':
 		flags &= ~FL_ALT;
 	        base = 10;
-		sign = 0;
 		goto ultoa;
 	      case 'o':
 	        base = 8;
@@ -183,10 +229,7 @@ vfprintf (FILE * stream, const char *fmt, va_list ap)
 		flags |= FL_ALTHEX;
 	        base = 16 | XTOA_UPPER;
 	      ultoa:
-		c = __ultoa_invert ((flags & FL_LONG)
-				    ? va_arg(ap, unsigned long)
-				    : va_arg(ap, unsigned int),
-				    (char *)buf, base)  -  (char *)buf;
+		c = __ultoa_invert (arg_to_unsigned(flags), (char *)buf, base) - (char *)buf;
 		break;
 
 	      default:
@@ -230,8 +273,8 @@ vfprintf (FILE * stream, const char *fmt, va_list ap)
 #define FL_PREC		0x0040
 
 #define FL_LONG		0x0080
-#define FL_LONGLONG	0x0100
-#define FL_SHORT	0x0200
+#define FL_SHORT	0x0100
+#define FL_REPD_TYPE	0x0200
 
 #define FL_NEGATIVE	0x0400
 
@@ -249,7 +292,7 @@ int vfprintf (FILE * stream, const char *fmt, va_list ap)
     int width;
     int prec;
     union {
-	unsigned char __buf[11];	/* size for -1 in octal, without '\0'	*/
+	unsigned char __buf[PRINTF_BUF_SIZE];	/* size for -1 in octal, without '\0'	*/
 #if PRINTF_LEVEL >= PRINTF_FLT
 	struct dtoa __dtoa;
 #endif
@@ -339,13 +382,15 @@ int vfprintf (FILE * stream, const char *fmt, va_list ap)
 
 	    if (c == 'l') {
 		if (flags & FL_LONG)
-		    flags |= FL_LONGLONG;
+		    flags |= FL_REPD_TYPE;
 		flags |= FL_LONG;
 		flags &= ~FL_SHORT;
 		continue;
 	    }
 
 	    if (c == 'h') {
+		if (flags & FL_SHORT)
+		    flags |= FL_REPD_TYPE;
 		flags |= FL_SHORT;
 		flags &= ~FL_LONG;
 		continue;
@@ -392,6 +437,7 @@ int vfprintf (FILE * stream, const char *fmt, va_list ap)
 		flags |= FL_FLTFIX;
 	    } else {
 		ndigs = prec;
+		if (ndigs < 1) ndigs = 1;
 		ndecimal = 0;
 	    }
 
@@ -587,6 +633,8 @@ int vfprintf (FILE * stream, const char *fmt, va_list ap)
 	case 's':
 	case 'S':
 	    pnt = va_arg (ap, char *);
+	    if (!pnt)
+		pnt = "(null)";
 	    size = strnlen (pnt, (flags & FL_PREC) ? prec : ~0);
 
 	str_lpad:
@@ -605,15 +653,7 @@ int vfprintf (FILE * stream, const char *fmt, va_list ap)
 	}
 
 	if (c == 'd' || c == 'i') {
-	    long x;
-
-	    if (flags & FL_LONG)
-		x = va_arg(ap, long);
-	    else {
-		x = va_arg(ap, int);
-		if (flags & FL_SHORT)
-		    x = (short) x;
-	    }
+	    ultoa_signed_t x = arg_to_signed(flags);
 
 	    flags &= ~(FL_NEGATIVE | FL_ALT);
 	    if (x < 0) {
@@ -627,15 +667,7 @@ int vfprintf (FILE * stream, const char *fmt, va_list ap)
 		c = __ultoa_invert (x, (char *)buf, 10) - (char *)buf;
 	} else {
 	    int base;
-	    unsigned long x;
-
-	    if (flags & FL_LONG)
-		x = va_arg(ap, unsigned long);
-	    else {
-		x = va_arg(ap, unsigned int);
-		if (flags & FL_SHORT)
-		    x = (unsigned short) x;
-	    }
+	    ultoa_unsigned_t x = arg_to_unsigned(flags);
 
 	    flags &= ~(FL_PLUS | FL_SPACE);
 

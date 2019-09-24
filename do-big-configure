@@ -1,0 +1,21 @@
+#!/bin/sh
+DIR=`dirname $0`
+meson $DIR \
+        -Dtls-model=global-dynamic \
+        -Dmultilib=false \
+        -Dpicolib=false \
+        -Dnewlib-tinystdio=true \
+        -Dnewlib-locale-info=true\
+        -Dnewlib-locale-info-extended=true\
+        -Dnewlib-elix-level=2\
+	-Dnewlib-supplied-syscalls=false \
+	-Dnewlib-reentrant-small=false\
+	-Dnewlib-wide-orient=false\
+	-Dnewlib-nano-malloc=false\
+	-Dlite-exit=false\
+	-Dnewlib-mb=true\
+	-Dnewlib-global-atexit=false\
+	-Dincludedir=lib/picolibc/include \
+	-Dlibdir=lib/picolibc/lib \
+	-Dtests=true \
+	--buildtype debug

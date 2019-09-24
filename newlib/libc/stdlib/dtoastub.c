@@ -1,6 +1,5 @@
 #include <_ansi.h>
 #include <stdlib.h>
-#include <reent.h>
 #include <string.h>
 
 /* Nothing in newlib actually *calls* dtoa, they all call _dtoa_r, so this 
@@ -15,7 +14,7 @@ __dtoa (double d,
 	int *sign,
 	char **rve)
 {
-  return _dtoa_r (_REENT, d, mode, ndigits, decpt, sign, rve);
+  return _dtoa_r (d, mode, ndigits, decpt, sign, rve);
 }
 
 #endif

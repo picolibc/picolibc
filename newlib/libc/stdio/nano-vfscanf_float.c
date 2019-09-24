@@ -16,7 +16,6 @@
  */
 
 #include <_ansi.h>
-#include <reent.h>
 #include <newlib.h>
 #include <ctype.h>
 #include <wctype.h>

@@ -7,16 +7,7 @@
 #include "local.h"
 
 int
-_wctomb_r (struct _reent *r,
-        char          *s,
-        wchar_t        _wchar,
-        mbstate_t     *state)
-{
-  return __WCTOMB (r, s, _wchar, state);
-}
-
-int
-__ascii_wctomb (struct _reent *r,
+__ascii_wctomb (
         char          *s,
         wchar_t        _wchar,
         mbstate_t     *state)
@@ -48,7 +39,7 @@ __ascii_wctomb (struct _reent *r,
 #define __state __count
 
 int
-__utf8_wctomb (struct _reent *r,
+__utf8_wctomb (
         char          *s,
         wchar_t        _wchar,
         mbstate_t     *state)
@@ -141,7 +132,7 @@ __utf8_wctomb (struct _reent *r,
    because the underlying OS requires wchar_t == UTF-16. */
 #ifndef __CYGWIN__
 int
-__sjis_wctomb (struct _reent *r,
+__sjis_wctomb (
         char          *s,
         wchar_t        _wchar,
         mbstate_t     *state)
@@ -174,7 +165,7 @@ __sjis_wctomb (struct _reent *r,
 }
 
 int
-__eucjp_wctomb (struct _reent *r,
+__eucjp_wctomb (
         char          *s,
         wchar_t        _wchar,
         mbstate_t     *state)
@@ -213,7 +204,7 @@ __eucjp_wctomb (struct _reent *r,
 }
 
 int
-__jis_wctomb (struct _reent *r,
+__jis_wctomb (
         char          *s,
         wchar_t        _wchar,
         mbstate_t     *state)
@@ -263,7 +254,7 @@ __jis_wctomb (struct _reent *r,
 
 #ifdef _MB_EXTENDED_CHARSETS_ISO
 static int
-___iso_wctomb (struct _reent *r, char *s, wchar_t _wchar, int iso_idx,
+___iso_wctomb (char *s, wchar_t _wchar, int iso_idx,
 	       mbstate_t *state)
 {
   wint_t wchar = _wchar;
@@ -299,94 +290,94 @@ ___iso_wctomb (struct _reent *r, char *s, wchar_t _wchar, int iso_idx,
   return 1;
 }
 
-int __iso_8859_1_wctomb (struct _reent *r, char *s, wchar_t _wchar,
+int __iso_8859_1_wctomb (char *s, wchar_t _wchar,
 			 mbstate_t *state)
 {
-  return ___iso_wctomb (r, s, _wchar, -1, state);
+  return ___iso_wctomb (s, _wchar, -1, state);
 }
 
-int __iso_8859_2_wctomb (struct _reent *r, char *s, wchar_t _wchar,
+int __iso_8859_2_wctomb (char *s, wchar_t _wchar,
 			 mbstate_t *state)
 {
-  return ___iso_wctomb (r, s, _wchar, 0, state);
+  return ___iso_wctomb (s, _wchar, 0, state);
 }
 
-int __iso_8859_3_wctomb (struct _reent *r, char *s, wchar_t _wchar,
+int __iso_8859_3_wctomb (char *s, wchar_t _wchar,
 			 mbstate_t *state)
 {
-  return ___iso_wctomb (r, s, _wchar, 1, state);
+  return ___iso_wctomb (s, _wchar, 1, state);
 }
 
-int __iso_8859_4_wctomb (struct _reent *r, char *s, wchar_t _wchar,
+int __iso_8859_4_wctomb (char *s, wchar_t _wchar,
 			 mbstate_t *state)
 {
-  return ___iso_wctomb (r, s, _wchar, 2, state);
+  return ___iso_wctomb (s, _wchar, 2, state);
 }
 
-int __iso_8859_5_wctomb (struct _reent *r, char *s, wchar_t _wchar,
+int __iso_8859_5_wctomb (char *s, wchar_t _wchar,
 			 mbstate_t *state)
 {
-  return ___iso_wctomb (r, s, _wchar, 3, state);
+  return ___iso_wctomb (s, _wchar, 3, state);
 }
 
-int __iso_8859_6_wctomb (struct _reent *r, char *s, wchar_t _wchar,
+int __iso_8859_6_wctomb (char *s, wchar_t _wchar,
 			 mbstate_t *state)
 {
-  return ___iso_wctomb (r, s, _wchar, 4, state);
+  return ___iso_wctomb (s, _wchar, 4, state);
 }
 
-int __iso_8859_7_wctomb (struct _reent *r, char *s, wchar_t _wchar,
+int __iso_8859_7_wctomb (char *s, wchar_t _wchar,
 			 mbstate_t *state)
 {
-  return ___iso_wctomb (r, s, _wchar, 5, state);
+  return ___iso_wctomb (s, _wchar, 5, state);
 }
 
-int __iso_8859_8_wctomb (struct _reent *r, char *s, wchar_t _wchar,
+int __iso_8859_8_wctomb (char *s, wchar_t _wchar,
 			 mbstate_t *state)
 {
-  return ___iso_wctomb (r, s, _wchar, 6, state);
+  return ___iso_wctomb (s, _wchar, 6, state);
 }
 
-int __iso_8859_9_wctomb (struct _reent *r, char *s, wchar_t _wchar,
+int __iso_8859_9_wctomb (char *s, wchar_t _wchar,
 			 mbstate_t *state)
 {
-  return ___iso_wctomb (r, s, _wchar, 7, state);
+  return ___iso_wctomb (s, _wchar, 7, state);
 }
 
-int __iso_8859_10_wctomb (struct _reent *r, char *s, wchar_t _wchar,
+int __iso_8859_10_wctomb (char *s, wchar_t _wchar,
 			  mbstate_t *state)
 {
-  return ___iso_wctomb (r, s, _wchar, 8, state);
+  return ___iso_wctomb (s, _wchar, 8, state);
 }
 
-int __iso_8859_11_wctomb (struct _reent *r, char *s, wchar_t _wchar,
+int __iso_8859_11_wctomb (char *s, wchar_t _wchar,
 			  mbstate_t *state)
 {
-  return ___iso_wctomb (r, s, _wchar, 9, state);
+  return ___iso_wctomb (s, _wchar, 9, state);
 }
 
-int __iso_8859_13_wctomb (struct _reent *r, char *s, wchar_t _wchar,
+int __iso_8859_13_wctomb (char *s, wchar_t _wchar,
 			  mbstate_t *state)
 {
-  return ___iso_wctomb (r, s, _wchar, 10, state);
+  return ___iso_wctomb (s, _wchar, 10, state);
 }
 
-int __iso_8859_14_wctomb (struct _reent *r, char *s, wchar_t _wchar,
+int __iso_8859_14_wctomb (char *s, wchar_t _wchar,
 			  mbstate_t *state)
 {
-  return ___iso_wctomb (r, s, _wchar, 11, state);
+  return ___iso_wctomb (s, _wchar, 11, state);
 }
 
-int __iso_8859_15_wctomb (struct _reent *r, char *s, wchar_t _wchar,
+int __iso_8859_15_wctomb (char *s, wchar_t _wchar,
 			  mbstate_t *state)
 {
-  return ___iso_wctomb (r, s, _wchar, 12, state);
+  return ___iso_wctomb (s, _wchar, 12, state);
 }
 
-int __iso_8859_16_wctomb (struct _reent *r, char *s, wchar_t _wchar,
+int __iso_8859_16_wctomb (char *s, wchar_t _wchar,
 			  mbstate_t *state)
 {
-  return ___iso_wctomb (r, s, _wchar, 13, state);
+  return ___iso_wctomb (s, _wchar, 13, state);
 }
 
 static wctomb_p __iso_8859_wctomb[17] = {
@@ -420,7 +411,7 @@ __iso_wctomb (int val)
 
 #ifdef _MB_EXTENDED_CHARSETS_WINDOWS
 static int
-___cp_wctomb (struct _reent *r, char *s, wchar_t _wchar, int cp_idx,
+___cp_wctomb (char *s, wchar_t _wchar, int cp_idx,
 	      mbstate_t *state)
 {
   wint_t wchar = _wchar;
@@ -456,159 +447,159 @@ ___cp_wctomb (struct _reent *r, char *s, wchar_t _wchar, int cp_idx,
 }
 
 static int
-__cp_437_wctomb (struct _reent *r, char *s, wchar_t _wchar, mbstate_t *state)
+__cp_437_wctomb (char *s, wchar_t _wchar, mbstate_t *state)
 {
-  return ___cp_wctomb (r, s, _wchar, 0, state);
+  return ___cp_wctomb (s, _wchar, 0, state);
 }
 
 static int
-__cp_720_wctomb (struct _reent *r, char *s, wchar_t _wchar, mbstate_t *state)
+__cp_720_wctomb (char *s, wchar_t _wchar, mbstate_t *state)
 {
-  return ___cp_wctomb (r, s, _wchar, 1, state);
+  return ___cp_wctomb (s, _wchar, 1, state);
 }
 
 static int
-__cp_737_wctomb (struct _reent *r, char *s, wchar_t _wchar, mbstate_t *state)
+__cp_737_wctomb (char *s, wchar_t _wchar, mbstate_t *state)
 {
-  return ___cp_wctomb (r, s, _wchar, 2, state);
+  return ___cp_wctomb (s, _wchar, 2, state);
 }
 
 static int
-__cp_775_wctomb (struct _reent *r, char *s, wchar_t _wchar, mbstate_t *state)
+__cp_775_wctomb (char *s, wchar_t _wchar, mbstate_t *state)
 {
-  return ___cp_wctomb (r, s, _wchar, 3, state);
+  return ___cp_wctomb (s, _wchar, 3, state);
 }
 
 static int
-__cp_850_wctomb (struct _reent *r, char *s, wchar_t _wchar, mbstate_t *state)
+__cp_850_wctomb (char *s, wchar_t _wchar, mbstate_t *state)
 {
-  return ___cp_wctomb (r, s, _wchar, 4, state);
+  return ___cp_wctomb (s, _wchar, 4, state);
 }
 
 static int
-__cp_852_wctomb (struct _reent *r, char *s, wchar_t _wchar, mbstate_t *state)
+__cp_852_wctomb (char *s, wchar_t _wchar, mbstate_t *state)
 {
-  return ___cp_wctomb (r, s, _wchar, 5, state);
+  return ___cp_wctomb (s, _wchar, 5, state);
 }
 
 static int
-__cp_855_wctomb (struct _reent *r, char *s, wchar_t _wchar, mbstate_t *state)
+__cp_855_wctomb (char *s, wchar_t _wchar, mbstate_t *state)
 {
-  return ___cp_wctomb (r, s, _wchar, 6, state);
+  return ___cp_wctomb (s, _wchar, 6, state);
 }
 
 static int
-__cp_857_wctomb (struct _reent *r, char *s, wchar_t _wchar, mbstate_t *state)
+__cp_857_wctomb (char *s, wchar_t _wchar, mbstate_t *state)
 {
-  return ___cp_wctomb (r, s, _wchar, 7, state);
+  return ___cp_wctomb (s, _wchar, 7, state);
 }
 
 static int
-__cp_858_wctomb (struct _reent *r, char *s, wchar_t _wchar, mbstate_t *state)
+__cp_858_wctomb (char *s, wchar_t _wchar, mbstate_t *state)
 {
-  return ___cp_wctomb (r, s, _wchar, 8, state);
+  return ___cp_wctomb (s, _wchar, 8, state);
 }
 
 static int
-__cp_862_wctomb (struct _reent *r, char *s, wchar_t _wchar, mbstate_t *state)
+__cp_862_wctomb (char *s, wchar_t _wchar, mbstate_t *state)
 {
-  return ___cp_wctomb (r, s, _wchar, 9, state);
+  return ___cp_wctomb (s, _wchar, 9, state);
 }
 
 static int
-__cp_866_wctomb (struct _reent *r, char *s, wchar_t _wchar, mbstate_t *state)
+__cp_866_wctomb (char *s, wchar_t _wchar, mbstate_t *state)
 {
-  return ___cp_wctomb (r, s, _wchar, 10, state);
+  return ___cp_wctomb (s, _wchar, 10, state);
 }
 
 static int
-__cp_874_wctomb (struct _reent *r, char *s, wchar_t _wchar, mbstate_t *state)
+__cp_874_wctomb (char *s, wchar_t _wchar, mbstate_t *state)
 {
-  return ___cp_wctomb (r, s, _wchar, 11, state);
+  return ___cp_wctomb (s, _wchar, 11, state);
 }
 
 static int
-__cp_1125_wctomb (struct _reent *r, char *s, wchar_t _wchar, mbstate_t *state)
+__cp_1125_wctomb (char *s, wchar_t _wchar, mbstate_t *state)
 {
-  return ___cp_wctomb (r, s, _wchar, 12, state);
+  return ___cp_wctomb (s, _wchar, 12, state);
 }
 
 static int
-__cp_1250_wctomb (struct _reent *r, char *s, wchar_t _wchar, mbstate_t *state)
+__cp_1250_wctomb (char *s, wchar_t _wchar, mbstate_t *state)
 {
-  return ___cp_wctomb (r, s, _wchar, 13, state);
+  return ___cp_wctomb (s, _wchar, 13, state);
 }
 
 static int
-__cp_1251_wctomb (struct _reent *r, char *s, wchar_t _wchar, mbstate_t *state)
+__cp_1251_wctomb (char *s, wchar_t _wchar, mbstate_t *state)
 {
-  return ___cp_wctomb (r, s, _wchar, 14, state);
+  return ___cp_wctomb (s, _wchar, 14, state);
 }
 
 static int
-__cp_1252_wctomb (struct _reent *r, char *s, wchar_t _wchar, mbstate_t *state)
+__cp_1252_wctomb (char *s, wchar_t _wchar, mbstate_t *state)
 {
-  return ___cp_wctomb (r, s, _wchar, 15, state);
+  return ___cp_wctomb (s, _wchar, 15, state);
 }
 
 static int
-__cp_1253_wctomb (struct _reent *r, char *s, wchar_t _wchar, mbstate_t *state)
+__cp_1253_wctomb (char *s, wchar_t _wchar, mbstate_t *state)
 {
-  return ___cp_wctomb (r, s, _wchar, 16, state);
+  return ___cp_wctomb (s, _wchar, 16, state);
 }
 
 static int
-__cp_1254_wctomb (struct _reent *r, char *s, wchar_t _wchar, mbstate_t *state)
+__cp_1254_wctomb (char *s, wchar_t _wchar, mbstate_t *state)
 {
-  return ___cp_wctomb (r, s, _wchar, 17, state);
+  return ___cp_wctomb (s, _wchar, 17, state);
 }
 
 static int
-__cp_1255_wctomb (struct _reent *r, char *s, wchar_t _wchar, mbstate_t *state)
+__cp_1255_wctomb (char *s, wchar_t _wchar, mbstate_t *state)
 {
-  return ___cp_wctomb (r, s, _wchar, 18, state);
+  return ___cp_wctomb (s, _wchar, 18, state);
 }
 
 static int
-__cp_1256_wctomb (struct _reent *r, char *s, wchar_t _wchar, mbstate_t *state)
+__cp_1256_wctomb (char *s, wchar_t _wchar, mbstate_t *state)
 {
-  return ___cp_wctomb (r, s, _wchar, 19, state);
+  return ___cp_wctomb (s, _wchar, 19, state);
 }
 
 static int
-__cp_1257_wctomb (struct _reent *r, char *s, wchar_t _wchar, mbstate_t *state)
+__cp_1257_wctomb (char *s, wchar_t _wchar, mbstate_t *state)
 {
-  return ___cp_wctomb (r, s, _wchar, 20, state);
+  return ___cp_wctomb (s, _wchar, 20, state);
 }
 
 static int
-__cp_1258_wctomb (struct _reent *r, char *s, wchar_t _wchar, mbstate_t *state)
+__cp_1258_wctomb (char *s, wchar_t _wchar, mbstate_t *state)
 {
-  return ___cp_wctomb (r, s, _wchar, 21, state);
+  return ___cp_wctomb (s, _wchar, 21, state);
 }
 
 static int
-__cp_20866_wctomb (struct _reent *r, char *s, wchar_t _wchar, mbstate_t *state)
+__cp_20866_wctomb (char *s, wchar_t _wchar, mbstate_t *state)
 {
-  return ___cp_wctomb (r, s, _wchar, 22, state);
+  return ___cp_wctomb (s, _wchar, 22, state);
 }
 
 static int
-__cp_21866_wctomb (struct _reent *r, char *s, wchar_t _wchar, mbstate_t *state)
+__cp_21866_wctomb (char *s, wchar_t _wchar, mbstate_t *state)
 {
-  return ___cp_wctomb (r, s, _wchar, 23, state);
+  return ___cp_wctomb (s, _wchar, 23, state);
 }
 
 static int
-__cp_101_wctomb (struct _reent *r, char *s, wchar_t _wchar, mbstate_t *state)
+__cp_101_wctomb (char *s, wchar_t _wchar, mbstate_t *state)
 {
-  return ___cp_wctomb (r, s, _wchar, 24, state);
+  return ___cp_wctomb (s, _wchar, 24, state);
 }
 
 static int
-__cp_102_wctomb (struct _reent *r, char *s, wchar_t _wchar, mbstate_t *state)
+__cp_102_wctomb (char *s, wchar_t _wchar, mbstate_t *state)
 {
-  return ___cp_wctomb (r, s, _wchar, 25, state);
+  return ___cp_wctomb (s, _wchar, 25, state);
 }
 
 static wctomb_p __cp_xxx_wctomb[26] = {

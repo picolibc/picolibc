@@ -23,7 +23,7 @@ int _dummy_fstat_syscalls = 1;
 
 /* We use the errno variable used by the system dependent layer.  */
 #undef errno
-extern int errno;
+extern __thread int errno;
 
 /*
 FUNCTION
@@ -52,7 +52,7 @@ _fstat_r (ptr, fd, pstat)
   int ret;
 
   errno = 0;
-  if ((ret = _fstat (fd, pstat)) == -1 && errno != 0)
+  if ((ret = fstat (fd, pstat)) == -1 && errno != 0)
     __errno_r(ptr) = errno;
   return ret;
 }

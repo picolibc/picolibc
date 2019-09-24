@@ -29,7 +29,6 @@
  || defined (ICONV_FROM_UCS_CES_UCS_2)
 
 #include <_ansi.h>
-#include <reent.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/types.h>
@@ -50,12 +49,12 @@
 #define UCS_2LE "ucs_2le"
 
 static void *
-ucs_2_init (struct _reent *rptr,
+ucs_2_init (
                    const char *encoding)
 {
   int *data;
   
-  if ((data = (int *) _malloc_r(rptr, sizeof (int))) == NULL)
+  if ((data = (int *) malloc(sizeof (int))) == NULL)
     return (void *)NULL;
   
   if (strcmp (encoding, UCS_2LE) == 0)
@@ -67,10 +66,10 @@ ucs_2_init (struct _reent *rptr,
 }
 
 static size_t
-ucs_2_close (struct _reent *rptr,
+ucs_2_close (
                     void *data)
 {
-  _free_r (rptr, data);
+  free (data);
   return 0;
 }
 

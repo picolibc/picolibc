@@ -50,19 +50,19 @@ Supporting OS subroutines required: <<_exit>>, <<_execve>>, <<_fork_r>>,
 #include <stdlib.h>
 #include <unistd.h>
 #include <_syslist.h>
-#include <reent.h>
+#include <sys/wait.h>
 
 #if defined (unix) || defined (__CYGWIN__)
-static int do_system (struct _reent *ptr, const char *s);
+static int do_system (const char *s);
 #endif
 
+#ifndef _REENT_ONLY
+
 int
-_system_r (struct _reent *ptr,
-     const char *s)
+system (const char *s)
 {
 #if defined(HAVE_SYSTEM)
   return _system (s);
-  ptr = ptr;
 #elif defined(NO_EXEC)
   if (s == NULL)
     return 0;
@@ -78,7 +78,7 @@ _system_r (struct _reent *ptr,
 #if defined (unix) || defined (__CYGWIN__)
   if (s == NULL)
     return 1;
-  return do_system (ptr, s);
+  return do_system (s);
 #else
   if (s == NULL)
     return 0;
@@ -87,14 +87,6 @@ _system_r (struct _reent *ptr,
 #endif
 
 #endif
-}
-
-#ifndef _REENT_ONLY
-
-int
-system (const char *s)
-{
-  return _system_r (_REENT, s);
 }
 
 #endif
@@ -108,8 +100,7 @@ extern char **environ;
 static char ***p_environ = &environ;
 
 static int
-do_system (struct _reent *ptr,
-     const char *s)
+do_system (const char *s)
 {
   char *argv[4];
   int pid, status;
@@ -119,16 +110,16 @@ do_system (struct _reent *ptr,
   argv[2] = (char *) s;
   argv[3] = NULL;
 
-  if ((pid = _fork_r (ptr)) == 0)
+  if ((pid = fork ()) == 0)
     {
-      _execve ("/bin/sh", argv, *p_environ);
+      execve ("/bin/sh", argv, *p_environ);
       exit (100);
     }
   else if (pid == -1)
     return -1;
   else
     {
-      int rc = _wait_r (ptr, &status);
+      int rc = wait (&status);
       if (rc == -1)
 	return -1;
       status = (status >> 8) & 0xff;
@@ -139,8 +130,7 @@ do_system (struct _reent *ptr,
 
 #if defined (__CYGWIN__)
 static int
-do_system (struct _reent *ptr,
-     const char *s)
+do_system (const char *s)
 {
   char *argv[4];
   int pid, status;

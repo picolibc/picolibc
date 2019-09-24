@@ -28,7 +28,6 @@ Supporting OS subroutine required: Some implementations require
 /* Most times we have a system call in newlib/libc/sys/.. to do this job */
 
 #include <_ansi.h>
-#include <reent.h>
 #include <sys/types.h>
 #include <sys/time.h>
 
@@ -37,7 +36,7 @@ time (time_t * t)
 {
   struct timeval now;
 
-  if (_gettimeofday_r (_REENT, &now, NULL) < 0)
+  if (gettimeofday (&now, NULL) < 0)
     now.tv_sec = (time_t) -1;
 
   if (t)

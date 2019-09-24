@@ -30,136 +30,50 @@
 #endif
 {
 	float z;
-	struct exception exc;
 	z=__ieee754_powf(x,y);
 	if(_LIB_VERSION == _IEEE_|| isnan(y)) return z;
 	if(isnan(x)) {
-	    if(y==(float)0.0) { 
+	    if(y==0.0f) {
 		/* powf(NaN,0.0) */
-		/* error only if _LIB_VERSION == _SVID_ & _XOPEN_ */
-		exc.type = DOMAIN;
-		exc.name = "powf";
-		exc.err = 0;
-		exc.arg1 = (double)x;
-		exc.arg2 = (double)y;
-		exc.retval = 1.0;
-		if (_LIB_VERSION == _IEEE_ ||
-		    _LIB_VERSION == _POSIX_) exc.retval = 1.0;
-		else if (!matherr(&exc)) {
-			errno = EDOM;
-		}
-	        if (exc.err != 0)
-	           errno = exc.err;
-                return (float)exc.retval; 
+		/* Not an error.  */
+		return 1.0f;
 	    } else 
 		return z;
 	}
-	if(x==(float)0.0){ 
-	    if(y==(float)0.0) {
+	if(x==0.0f){
+	    if(y==0.0f) {
 		/* powf(0.0,0.0) */
-		/* error only if _LIB_VERSION == _SVID_ */
-		exc.type = DOMAIN;
-		exc.name = "powf";
-		exc.err = 0;
-		exc.arg1 = (double)x;
-		exc.arg2 = (double)y;
-		exc.retval = 0.0;
-		if (_LIB_VERSION != _SVID_) exc.retval = 1.0;
-		else if (!matherr(&exc)) {
-			errno = EDOM;
-		}
-	        if (exc.err != 0)
-	           errno = exc.err;
-                return (float)exc.retval; 
+		/* Not an error.  */
+		return 1.0f;
 	    }
-	    if(finitef(y)&&y<(float)0.0) {
+	    if(finitef(y)&&y<0.0f) {
 		/* 0**neg */
-		exc.type = DOMAIN;
-		exc.name = "powf";
-		exc.err = 0;
-		exc.arg1 = (double)x;
-		exc.arg2 = (double)y;
-		if (_LIB_VERSION == _SVID_) 
-		  exc.retval = 0.0;
-		else
-		  exc.retval = -HUGE_VAL;
-		if (_LIB_VERSION == _POSIX_)
-		  errno = EDOM;
-		else if (!matherr(&exc)) {
-		  errno = EDOM;
-		}
-	        if (exc.err != 0)
-	           errno = exc.err;
-                return (float)exc.retval; 
-            }
+		errno = EDOM;
+		return -HUGE_VALF;
+	    }
 	    return z;
 	}
 	if(!finitef(z)) {
 	    if(finitef(x)&&finitef(y)) {
-	        if(isnan(z)) {
+		if(isnan(z)) {
 		    /* neg**non-integral */
-		    exc.type = DOMAIN;
-		    exc.name = "powf";
-		    exc.err = 0;
-		    exc.arg1 = (double)x;
-		    exc.arg2 = (double)y;
-		    if (_LIB_VERSION == _SVID_) 
-		        exc.retval = 0.0;
-		    else 
-		        /* Use a float divide, to avoid a soft-float double
-			   divide call on single-float only targets.  */
-		        exc.retval = (0.0f/0.0f);	/* X/Open allow NaN */
-		    if (_LIB_VERSION == _POSIX_) 
-		        errno = EDOM;
-		    else if (!matherr(&exc)) {
-		        errno = EDOM;
-		    }
-	            if (exc.err != 0)
-	                errno = exc.err;
-                    return (float)exc.retval; 
-	        } else {
+		    errno = EDOM;
+		    /* Use a float divide, to avoid a soft-float double
+		       divide call on single-float only targets.  */
+		    return 0.0f/0.0f;
+		} else {
 		    /* powf(x,y) overflow */
-		    exc.type = OVERFLOW;
-		    exc.name = "powf";
-		    exc.err = 0;
-		    exc.arg1 = (double)x;
-		    exc.arg2 = (double)y;
-		    if (_LIB_VERSION == _SVID_) {
-		       exc.retval = HUGE;
-		       y *= 0.5;
-		       if(x<0.0f&&rintf(y)!=y) exc.retval = -HUGE;
-		    } else {
-		       exc.retval = HUGE_VAL;
-                       y *= 0.5;
-		       if(x<0.0f&&rintf(y)!=y) exc.retval = -HUGE_VAL;
-		    }
-		    if (_LIB_VERSION == _POSIX_)
-		        errno = ERANGE;
-		    else if (!matherr(&exc)) {
-			errno = ERANGE;
-		    }
-	            if (exc.err != 0)
-	                errno = exc.err;
-                    return (float)exc.retval; 
-                }
+		    errno = ERANGE;
+		    if(x<0.0f&&rintf(y)!=y)
+		      return -HUGE_VALF;
+		    return HUGE_VALF;
+		}
 	    }
 	} 
-	if(z==(float)0.0&&finitef(x)&&finitef(y)) {
+	if(z==0.0f&&finitef(x)&&finitef(y)) {
 	    /* powf(x,y) underflow */
-	    exc.type = UNDERFLOW;
-	    exc.name = "powf";
-	    exc.err = 0;
-	    exc.arg1 = (double)x;
-	    exc.arg2 = (double)y;
-	    exc.retval =  0.0;
-	    if (_LIB_VERSION == _POSIX_)
-	        errno = ERANGE;
-	    else if (!matherr(&exc)) {
-	     	errno = ERANGE;
-	    }
-	    if (exc.err != 0)
-	        errno = exc.err;
-            return (float)exc.retval; 
+	    errno = ERANGE;
+	    return 0.0f;
         }
 	return z;
 }

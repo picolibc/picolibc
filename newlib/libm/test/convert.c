@@ -1,8 +1,11 @@
 /* Test conversions */
 
+#define IN_CONVERT
 #include "test.h"
+//#include <_ansi.h>
 #include <stdlib.h>
 #include <errno.h>
+#include <string.h>
 
 static char buffer[500];
 
@@ -40,11 +43,13 @@ test_atof (void)
   test_mok(atof(pd->string), pd->value, 64);
 }
 
+#ifndef NO_NEWLIB
 void
 test_atoff (void)
 {
   test_mok(atoff(pd->string), pd->value, 32);
 }
+#endif
 
 
 static
@@ -121,9 +126,11 @@ test_atol (void)
   test_eok(errno, p->decimal.errno_val);
 }
 
-/* test ECVT and friends */
 extern ddouble_type ddoubles[];
 ddouble_type *pdd;
+
+#ifndef NO_NEWLIB
+/* test ECVT and friends */
 void
 test_ecvtbuf (void)
 {
@@ -135,6 +142,7 @@ test_ecvtbuf (void)
   test_iok(pdd->e2,a2);
   test_iok(pdd->e3,a3);
 }
+#endif
 
 void
 test_ecvt (void)
@@ -147,13 +155,16 @@ test_ecvt (void)
   test_iok(pdd->e2,a2);
   test_iok(pdd->e3,a3);
 
+#ifndef NO_NEWLIB
   s =  ecvtf(pdd->value, pdd->e1, &a2, &a3);
 
   test_sok(s,pdd->estring);
   test_iok(pdd->e2,a2);
   test_iok(pdd->e3,a3);
+#endif
 }
 
+#ifndef NO_NEWLIB
 void
 test_fcvtbuf (void)
 {
@@ -165,6 +176,7 @@ test_fcvtbuf (void)
   test_iok(pdd->f2,a2);
   test_iok(pdd->f3,a3);
 }
+#endif
 
 void
 test_gcvt (void)
@@ -172,9 +184,10 @@ test_gcvt (void)
   char *s = gcvt(pdd->value, pdd->g1, buffer);  
   test_scok(s, pdd->gstring, 9);
   
+#ifndef NO_NEWLIB
   s = gcvtf(pdd->value, pdd->g1, buffer);  
   test_scok(s, pdd->gstring, 9);
-
+#endif
 }
 
 void
@@ -191,6 +204,7 @@ test_fcvt (void)
   test_iok(pdd->f2,a2);
   test_iok(pdd->f3,a3);
 
+#ifndef NO_NEWLIB
   /* Test the float version by converting and inspecting the numbers 3
    after reconverting */
   sf =  fcvtf(pdd->value, pdd->f1, &a2, &a3);
@@ -199,6 +213,7 @@ test_fcvt (void)
   test_mok(v1, v2,32);
   test_iok(pdd->f2,a2);
   test_iok(pdd->f3,a3);
+#endif
 }
 
 static void
@@ -274,7 +289,10 @@ test_sprint (void)
   while (si->line) 
   {
     line( si->line);
-    sprintf(buffer, si->format_string, si->value);
+    if (strchr(si->format_string, 'l'))
+      sprintf(buffer, si->format_string, (long) si->value);
+    else
+      sprintf(buffer, si->format_string, si->value);
     test_sok(buffer, si->result);
     si++;
   }  
@@ -314,9 +332,9 @@ test_scan (void)
     long d0,d1;
     
     line(si->line);
-    sscanf(si->result, "%d", &d0);
-    sprintf(buffer, "%d", d0);
-    sscanf(buffer, "%d", &d1);
+    sscanf(si->result, "%ld", &d0);
+    sprintf(buffer, "%ld", d0);
+    sscanf(buffer, "%ld", &d1);
     test_iok(d0,d1);
     si++;
   }
@@ -340,23 +358,31 @@ test_cvt (void)
 {
   deltest();
 
+#ifndef NO_NEWLIB
   diterate(test_fcvtbuf,"fcvtbuf");
   diterate(test_fcvt,"fcvt/fcvtf");
+#endif
 
   diterate(test_gcvt,"gcvt/gcvtf");
+#ifndef NO_NEWLIB
   diterate(test_ecvtbuf,"ecvtbuf");
   diterate(test_ecvt,"ecvt/ecvtf");
-  
+#endif
+
   iterate(test_strtod, "strtod");
 
   test_scan();
   test_sprint();  
   iterate(test_atof, "atof");
+#ifndef NO_NEWLIB
   iterate(test_atoff, "atoff");
+#endif
 
   iterate(test_strtof, "strtof");
 
   int_iterate(test_atoi,"atoi");
-  int_iterate(test_atol,"atol");
-  int_iterate(test_strtol, "strtol");
+  if (sizeof(int) == sizeof(long)) {
+    int_iterate(test_atol,"atol");
+    int_iterate(test_strtol, "strtol");
+  }
 }

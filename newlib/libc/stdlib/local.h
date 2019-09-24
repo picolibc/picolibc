@@ -3,7 +3,7 @@
 #ifndef _LOCAL_H_
 #define _LOCAL_H_
 
-char *	_gcvt (struct _reent *, double , int , char *, char, int);
+char *	_gcvt (double , int , char *, char, int);
 
 #include "../locale/setlocale.h"
 
@@ -11,7 +11,7 @@ char *	_gcvt (struct _reent *, double , int , char *, char, int);
 #include <wchar.h>
 #endif
 
-typedef int wctomb_f (struct _reent *, char *, wchar_t, mbstate_t *);
+typedef int wctomb_f (char *, wchar_t, mbstate_t *);
 typedef wctomb_f *wctomb_p;
 
 wctomb_f __ascii_wctomb;
@@ -29,9 +29,9 @@ wctomb_f __big5_wctomb;
 #endif
 #endif
 
-#define __WCTOMB (__get_current_locale ()->wctomb)
+#define __WCTOMB (_locale->wctomb)
 
-typedef int mbtowc_f (struct _reent *, wchar_t *, const char *, size_t,
+typedef int mbtowc_f (wchar_t *, const char *, size_t,
 		      mbstate_t *);
 typedef mbtowc_f *mbtowc_p;
 
@@ -50,7 +50,7 @@ mbtowc_f __big5_mbtowc;
 #endif
 #endif
 
-#define __MBTOWC (__get_current_locale ()->mbtowc)
+#define __MBTOWC (_locale->mbtowc)
 
 extern wchar_t __iso_8859_conv[14][0x60];
 int __iso_8859_val_index (int);

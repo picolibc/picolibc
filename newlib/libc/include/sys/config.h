@@ -4,9 +4,14 @@
 #include <machine/ieeefp.h>  /* floating point macros */
 #include <sys/features.h>	/* POSIX defs */
 #include <float.h>
+#include <newlib.h>
 
 #ifdef __aarch64__
 #define MALLOC_ALIGNMENT 16
+#endif
+
+#ifdef __AMDGCN__
+#define __DYNAMIC_REENT__
 #endif
 
 /* exceptions first */
@@ -268,6 +273,12 @@
 #if __INT_MAX__ == 32767 || defined (_WIN32)
 #define __WCHAR_MAX__ 0xffffu
 #endif
+#endif
+
+#ifdef NEWLIB_TLS
+#define NEWLIB_THREAD_LOCAL __thread
+#else
+#define NEWLIB_THREAD_LOCAL
 #endif
 
 /* See if small reent asked for at configuration time and

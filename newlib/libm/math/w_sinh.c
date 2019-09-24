@@ -46,8 +46,6 @@ RETURNS
 	appropriate sign, and sets the global value <<errno>> to
 	<<ERANGE>>. 
 
-	You can modify error handling for these functions with <<matherr>>.
-
 PORTABILITY
 	<<sinh>> is ANSI C.  
 	<<sinhf>> is an extension.
@@ -75,33 +73,12 @@ QUICKREF
 #endif
 {
 	double z; 
-	struct exception exc;
 	z = __ieee754_sinh(x);
 	if(_LIB_VERSION == _IEEE_) return z;
 	if(!finite(z)&&finite(x)) {
 	    /* sinh(finite) overflow */
-#ifndef HUGE_VAL 
-#define HUGE_VAL inf
-	    double inf = 0.0;
-	    
-	    SET_HIGH_WORD(inf,0x7ff00000);	/* set inf to infinite */
-#endif
-	    exc.type = OVERFLOW;
-	    exc.name = "sinh";
-	    exc.err = 0;
-	    exc.arg1 = exc.arg2 = x;
-	    if (_LIB_VERSION == _SVID_)
-	       exc.retval = ( (x>0.0) ? HUGE : -HUGE);
-	    else
-	       exc.retval = ( (x>0.0) ? HUGE_VAL : -HUGE_VAL);
-	    if (_LIB_VERSION == _POSIX_)
-	       errno = ERANGE;
-	    else if (!matherr(&exc)) {
-	       errno = ERANGE;
-	    }
-	    if (exc.err != 0)
-	       errno = exc.err;
-            return exc.retval;
+	    errno = ERANGE;
+	    return ((x>0.0) ? HUGE_VAL : -HUGE_VAL);
 	} else
 	    return z;
 }

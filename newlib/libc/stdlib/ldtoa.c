@@ -3,7 +3,6 @@
   */
 
 #include <_ansi.h>
-#include <reent.h>
 #include <string.h>
 #include <stdlib.h>
 #include "mprec.h"
@@ -2802,15 +2801,13 @@ _ldtoa_r (struct _reent *ptr, long double d, int mode, int ndigits,
   rnd.rlast = -1;
   rnd.rndprc = NBITS;
 
-  _REENT_CHECK_MP (ptr);
-
 /* reentrancy addition to use mprec storage pool */
-  if (_REENT_MP_RESULT (ptr))
+  if (_mprec_result)
     {
-      _REENT_MP_RESULT (ptr)->_k = _REENT_MP_RESULT_K (ptr);
-      _REENT_MP_RESULT (ptr)->_maxwds = 1 << _REENT_MP_RESULT_K (ptr);
-      Bfree (ptr, _REENT_MP_RESULT (ptr));
-      _REENT_MP_RESULT (ptr) = 0;
+      _mprec_result->_k = _mprec_result_k;
+      _mprec_result->_maxwds = 1 << _mprec_result_k;
+      Bfree (_mprec_result);
+      _mprec_result = 0;
     }
 
 #if LDBL_MANT_DIG == 24
@@ -2920,13 +2917,17 @@ stripspaces:
     i = orig_ndigits + MAX_EXP_DIGITS + 4;
 
   j = sizeof (__ULong);
-  for (_REENT_MP_RESULT_K (ptr) = 0;
+  for (_mprec_result_k = 0;
        sizeof (_Bigint) - sizeof (__ULong) + j <= i; j <<= 1)
-    _REENT_MP_RESULT_K (ptr)++;
-  _REENT_MP_RESULT (ptr) = Balloc (ptr, _REENT_MP_RESULT_K (ptr));
+    _mprec_result_k++;
+  if (__mprec_register_exit() != 0)
+    return NULL;
+  _mprec_result = Balloc (_mprec_result_k);
+  if (!_mprec_result)
+    return NULL;
 
 /* Copy from internal temporary buffer to permanent buffer.  */
-  outstr = (char *) _REENT_MP_RESULT (ptr);
+  outstr = (char *) _mprec_result;
   strcpy (outstr, outbuf);
 
   if (rve)

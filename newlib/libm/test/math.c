@@ -18,11 +18,11 @@
 
 #include "test.h"
 #include <math.h>
-#include <ieeefp.h>
 #include <float.h>
 #include <math.h>
 #include <errno.h>
 #include <stdio.h>
+#include <string.h>
 
 int inacc;
 
@@ -32,22 +32,6 @@ int traperror = 1;
 char *mname;
 
 int verbose;
-
-/* To test exceptions - we trap them all and return a known value */
-int
-matherr (struct exception *e)
-{
-  if (traperror) 
-  {
-    merror = e->type + 12;
-    mname = e->name;
-    e->retval = mretval;
-    errno = merror + 24;
-    return 1;
-  }
-  return 0;
-}
-
 
 void translate_to (FILE *file,
 	    double r)
@@ -90,6 +74,7 @@ ffcheck (double is,
 #if 0
   if (p->qs[0].merror != merror) 
   {
+    /* Beware, matherr doesn't exist anymore.  */
     printf("testing %s_vec.c:%d, matherr wrong: %d %d\n",
 	   name, p->line, merror, p->qs[0].merror);
   }
@@ -105,8 +90,8 @@ ffcheck (double is,
 }
 
 double
-thedouble (long msw,
-       long lsw)
+thedouble (uint32_t msw,
+	   uint32_t lsw)
 {
   __ieee_double_shape_type x;
   
@@ -124,7 +109,7 @@ frontline (FILE *f,
        one_line_type *p,
        double result,
        int merror,
-       int errno,
+       int my_errno,
        char *args,
        char *name)
 {
@@ -138,7 +123,7 @@ frontline (FILE *f,
   }
 
 
-  fprintf(f,"%2d,%3d,", merror,errno);
+  fprintf(f,"%2d,%3d,", merror,my_errno);
   fprintf(f, "__LINE__, ");
 
   if (calc) 
@@ -188,6 +173,7 @@ finish (FILE *f,
 } 
 int redo;  
 
+void
 run_vector_1 (int vector,
        one_line_type *p,
        char *func,
@@ -206,35 +192,43 @@ run_vector_1 (int vector,
     if (redo)
     {
       double k;
+      union {
+	struct { uint32_t a, b; };
+	double d;
+      } d, d4;
 
       for (k = -.2; k < .2; k+= 0.00132) 
       {
-
+	d.d = k;
+	d4.d = k + 4;
 	fprintf(f,"{1,1, 1,1, 0,0,0x%08x,0x%08x, 0x%08x, 0x%08x},\n",
-		k,k+4);
+		d.a, d.b, d4.a, d4.b);
 
       }
 
       for (k = -1.2; k < 1.2; k+= 0.01) 
       {
-
+	d.d = k;
+	d4.d = k + 4;
 	fprintf(f,"{1,1, 1,1, 0,0,0x%08x,0x%08x, 0x%08x, 0x%08x},\n",
-		k,k+4);
+		d.a, d.b, d4.a, d4.b);
 
       }
       for (k = -M_PI *2; k < M_PI *2; k+= M_PI/2) 
       {
-
+	d.d = k;
+	d4.d = k + 4;
 	fprintf(f,"{1,1, 1,1, 0,0,0x%08x,0x%08x, 0x%08x, 0x%08x},\n",
-		k,k+4);
+		d.a, d.b, d4.a, d4.b);
 
       }
 
       for (k = -30; k < 30; k+= 1.7) 
       {
-
+	d.d = k;
+	d4.d = k + 4;
 	fprintf(f,"{2,2, 1,1, 0,0, 0x%08x,0x%08x, 0x%08x, 0x%08x},\n",
-		k,k+4);
+		d.a, d.b, d4.a, d4.b);
 
       }
       VECCLOSE(f, name, args);
@@ -347,74 +341,74 @@ run_vector_1 (int vector,
 }
 
 void
-test_math (void)
+test_math (int vector)
 {
-  test_acos(0);
-  test_acosf(0);
-  test_acosh(0);
-  test_acoshf(0);
-  test_asin(0);
-  test_asinf(0);
-  test_asinh(0);
-  test_asinhf(0);
-  test_atan(0);
-  test_atan2(0);
-  test_atan2f(0);
-  test_atanf(0);
-  test_atanh(0);
-  test_atanhf(0);
-  test_ceil(0);
-  test_ceilf(0);
-  test_cos(0);
-  test_cosf(0);
-  test_cosh(0);
-  test_coshf(0);
-  test_erf(0);
-  test_erfc(0);
-  test_erfcf(0);
-  test_erff(0);
-  test_exp(0);
-  test_expf(0);
-  test_fabs(0);
-  test_fabsf(0);
-  test_floor(0);
-  test_floorf(0);
-  test_fmod(0);
-  test_fmodf(0);
-  test_gamma(0);
-  test_gammaf(0);
-  test_hypot(0);
-  test_hypotf(0);
-  test_j0(0);
-  test_j0f(0);
-  test_j1(0);
-  test_j1f(0);
-  test_jn(0);
-  test_jnf(0);
-  test_log(0);
-  test_log10(0);
-  test_log10f(0);
-  test_log1p(0);
-  test_log1pf(0);
-  test_log2(0);
-  test_log2f(0);
-  test_logf(0);
-  test_sin(0);
-  test_sinf(0);
-  test_sinh(0);
-  test_sinhf(0);
-  test_sqrt(0);
-  test_sqrtf(0);
-  test_tan(0);
-  test_tanf(0);
-  test_tanh(0);
-  test_tanhf(0);
-  test_y0(0);
-  test_y0f(0);
-  test_y1(0);
-  test_y1f(0);
-  test_y1f(0);
-  test_ynf(0);
+  test_acos(vector);
+  test_acosf(vector);
+  test_acosh(vector);
+  test_acoshf(vector);
+  test_asin(vector);
+  test_asinf(vector);
+  test_asinh(vector);
+  test_asinhf(vector);
+  test_atan(vector);
+  test_atan2(vector);
+  test_atan2f(vector);
+  test_atanf(vector);
+  test_atanh(vector);
+  test_atanhf(vector);
+  test_ceil(vector);
+  test_ceilf(vector);
+  test_cos(vector);
+  test_cosf(vector);
+  test_cosh(vector);
+  test_coshf(vector);
+  test_erf(vector);
+  test_erfc(vector);
+  test_erfcf(vector);
+  test_erff(vector);
+  test_exp(vector);
+  test_expf(vector);
+  test_fabs(vector);
+  test_fabsf(vector);
+  test_floor(vector);
+  test_floorf(vector);
+  test_fmod(vector);
+  test_fmodf(vector);
+  test_gamma(vector);
+  test_gammaf(vector);
+  test_hypot(vector);
+  test_hypotf(vector);
+  test_j0(vector);
+  test_j0f(vector);
+  test_j1(vector);
+  test_j1f(vector);
+  test_jn(vector);
+  test_jnf(vector);
+  test_log(vector);
+  test_log10(vector);
+  test_log10f(vector);
+  test_log1p(vector);
+  test_log1pf(vector);
+  test_log2(vector);
+  test_log2f(vector);
+  test_logf(vector);
+  test_sin(vector);
+  test_sinf(vector);
+  test_sinh(vector);
+  test_sinhf(vector);
+  test_sqrt(vector);
+  test_sqrtf(vector);
+  test_tan(vector);
+  test_tanf(vector);
+  test_tanh(vector);
+  test_tanhf(vector);
+  test_y0(vector);
+  test_y0f(vector);
+  test_y1(vector);
+  test_y1f(vector);
+  test_y1f(vector);
+  test_ynf(vector);
 }
 
 /* These have to be played with to get to compile on machines which

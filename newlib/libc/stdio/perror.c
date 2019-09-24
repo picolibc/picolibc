@@ -53,7 +53,6 @@ Supporting OS subroutines required: <<close>>, <<fstat>>, <<isatty>>,
 */
 
 #include <_ansi.h>
-#include <reent.h>
 #include <stdio.h>
 #include <string.h>
 #include "local.h"
@@ -64,7 +63,7 @@ Supporting OS subroutines required: <<close>>, <<fstat>>, <<isatty>>,
   size_t len = strlen (p); \
   while (len) \
     { \
-      ssize_t len1 = _write_r (ptr, fileno (fp), p, len); \
+      ssize_t len1 = write (fileno (fp), p, len); \
       if (len1 < 0) \
 	break; \
       len -= len1; \
@@ -90,7 +89,7 @@ _perror_r (struct _reent *ptr,
       WRITE_STR (": ");
     }
 
-  if ((error = _strerror_r (ptr, __errno_r(ptr), 1, &dummy)) != NULL)
+  if ((error = _strerror_r (__errno_r(ptr), 1, &dummy)) != NULL)
     WRITE_STR (error);
 
 #ifdef __SCLE

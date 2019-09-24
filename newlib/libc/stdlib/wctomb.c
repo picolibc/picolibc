@@ -50,11 +50,9 @@ wctomb (char *s,
         wchar_t wchar)
 {
 #ifdef _MB_CAPABLE
-	struct _reent *reent = _REENT;
+	static NEWLIB_THREAD_LOCAL mbstate_t _wctomb_state;
 
-        _REENT_CHECK_MISC(reent);
-
-        return __WCTOMB (reent, s, wchar, &(_REENT_WCTOMB_STATE(reent)));
+        return __WCTOMB (s, wchar, &_wctomb_state);
 #else /* not _MB_CAPABLE */
         if (s == NULL)
                 return 0;

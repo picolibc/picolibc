@@ -16,7 +16,7 @@ only ``multi-byte character sequences'' recognized are single bytes,
 and thus <<1>> is returned unless <[s]> is the null pointer or
 has a length of 0 or is the empty string.
 
-When _MB_CAPABLE is defined, this routine calls <<_mbtowc_r>> to perform
+When _MB_CAPABLE is defined, this routine calls <<__MBTOWC>> to perform
 the conversion, passing a state variable to allow state dependent
 decoding.  The result is based on the locale setting which may
 be restricted to a defined set of locales.
@@ -48,20 +48,17 @@ mblen (const char *s,
 {
 #ifdef _MB_CAPABLE
   int retval = 0;
-  struct _reent *reent = _REENT;
-  mbstate_t *state;
-  
-  _REENT_CHECK_MISC(reent);
-  state = &(_REENT_MBLEN_STATE(reent));
-  retval = __MBTOWC (reent, NULL, s, n, state);
+  static NEWLIB_THREAD_LOCAL _mbstate_t _mblen_state;
+
+  retval = __MBTOWC (NULL, s, n, &_mblen_state);
   if (retval < 0)
     {
-      state->__count = 0;
+      _mblen_state.__count = 0;
       return -1;
     }
   else
     return retval;
-  
+
 #else /* not _MB_CAPABLE */
   if (s == NULL || *s == '\0')
     return 0;

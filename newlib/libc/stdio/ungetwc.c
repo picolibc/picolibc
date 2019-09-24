@@ -65,7 +65,6 @@ C99
 */
 
 #include <_ansi.h>
-#include <reent.h>
 #include <errno.h>
 #include <limits.h>
 #include <stdio.h>

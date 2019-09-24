@@ -24,7 +24,6 @@
  * SUCH DAMAGE.
  */
 #include <_ansi.h>
-#include <reent.h>
 #include <sys/types.h>
 #include <errno.h>
 #include <stdlib.h>
@@ -36,7 +35,7 @@ static int null_conversion_dummy_data;
 
 
 static void *
-null_conversion_open (struct _reent *rptr,
+null_conversion_open (
                              const char *to,
                              const char *from)
 {
@@ -45,7 +44,7 @@ null_conversion_open (struct _reent *rptr,
 
 
 static size_t
-null_conversion_close (struct _reent *rptr,
+null_conversion_close (
                               void *data)
 {
   return 0;
@@ -53,7 +52,7 @@ null_conversion_close (struct _reent *rptr,
 
 
 static size_t
-null_conversion_convert (struct _reent *rptr,
+null_conversion_convert (
                      void *data,
                      const unsigned char **inbuf,
                      size_t *inbytesleft,
@@ -73,7 +72,7 @@ null_conversion_convert (struct _reent *rptr,
     {
       result = (size_t)-1;
       len = *outbytesleft;
-      __errno_r (rptr) = E2BIG;
+      errno = E2BIG;
     }
   
   if ((flags & 1) == 0)

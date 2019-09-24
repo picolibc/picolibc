@@ -155,7 +155,7 @@ __sflush_r (struct _reent *ptr,
 	      if (curoff == -1L && __errno_r(ptr) != 0)
 		{
 		  int result = EOF;
-		  if (__errno_r(ptr) == ESPIPE || ptr->_errno == EINVAL)
+		  if (__errno_r(ptr) == ESPIPE || __errno_r(ptr) == EINVAL)
 		    {
 		      result = 0;
 		      __errno_r(ptr) = tmp_errno;
@@ -181,7 +181,7 @@ __sflush_r (struct _reent *ptr,
 #endif
 	    curoff = fp->_seek (ptr, fp->_cookie, curoff, SEEK_SET);
 	  if (curoff != -1 || __errno_r(ptr) == 0
-	      || __errno_r(ptr) == ESPIPE || ptr->_errno == EINVAL)
+	      || __errno_r(ptr) == ESPIPE || __errno_r(ptr) == EINVAL)
 	    {
 	      /* Seek successful or ignorable error condition.
 		 We can clear read buffer now.  */

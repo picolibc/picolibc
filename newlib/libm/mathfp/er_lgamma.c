@@ -97,8 +97,6 @@ When <[x]> is a nonpositive integer, <<gamma>> returns <<HUGE_VAL>>
 and <<errno>> is set to <<EDOM>>.  If the result overflows, <<gamma>>
 returns <<HUGE_VAL>> and <<errno>> is set to <<ERANGE>>.
 
-You can modify this error treatment using <<matherr>>.
-
 PORTABILITY
 Neither <<gamma>> nor <<gammaf>> is ANSI C.  */
 
@@ -403,5 +401,5 @@ static double zero=  0.00000000000000000000e+00;
 double
 lgamma(double x)
 {
-  return lgamma_r(x, &(_REENT_SIGNGAM(_REENT)));
+  return lgamma_r(x, &signgam);
 }

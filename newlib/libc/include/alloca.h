@@ -8,7 +8,6 @@
 #define _NEWLIB_ALLOCA_H
 
 #include "_ansi.h"
-#include <sys/reent.h>
 
 #undef alloca
 

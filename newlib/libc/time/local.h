@@ -23,7 +23,6 @@ int         __tzcalc_limits (int __year);
 
 extern const int __month_lengths[2][MONSPERYEAR];
 
-void _tzset_unlocked_r (struct _reent *);
 void _tzset_unlocked (void);
 
 /* locks for multi-threading */

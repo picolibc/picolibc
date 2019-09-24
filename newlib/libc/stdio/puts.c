@@ -54,7 +54,6 @@ static char sccsid[] = "%W% (Berkeley) %G%";
 #endif /* LIBC_SCCS and not lint */
 
 #include <_ansi.h>
-#include <reent.h>
 #include <stdio.h>
 #include <string.h>
 #include "fvwrite.h"

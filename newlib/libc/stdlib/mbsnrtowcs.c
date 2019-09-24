@@ -19,19 +19,10 @@ SYNOPSIS
 			 mbstate_t *__restrict <[ps]>);
 
 	#include <wchar.h>
-	size_t _mbsrtowcs_r(struct _reent *<[ptr]>, wchar_t *<[dst]>,
-			    const char **<[src]>, size_t <[len]>,
-			    mbstate_t *<[ps]>);
-
-	#include <wchar.h>
 	size_t mbsnrtowcs(wchar_t *__ restrict <[dst]>, 
 			  const char **__restrict <[src]>, size_t <[nms]>,
 			  size_t <[len]>, mbstate_t *__restrict <[ps]>);
 
-	#include <wchar.h>
-	size_t _mbsnrtowcs_r(struct _reent *<[ptr]>, wchar_t *<[dst]>,
-			     const char **<[src]>, size_t <[nms]>,
-			     size_t <[len]>, mbstate_t *<[ps]>);
 
 DESCRIPTION
 The <<mbsrtowcs>> function converts a sequence of multibyte characters
@@ -63,15 +54,16 @@ PORTABILITY
 <<mbsnrtowcs>> is defined by the POSIX.1-2008 standard.
 */
 
-#include <reent.h>
 #include <newlib.h>
 #include <wchar.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <errno.h>
 
+#ifndef _REENT_ONLY
+
 size_t
-_mbsnrtowcs_r (struct _reent *r,
+mbsnrtowcs (
 	wchar_t *dst,
 	const char **src,
 	size_t nms,
@@ -87,8 +79,8 @@ _mbsnrtowcs_r (struct _reent *r,
 #ifdef _MB_CAPABLE
   if (ps == NULL)
     {
-      _REENT_CHECK_MISC(r);
-      ps = &(_REENT_MBSRTOWCS_STATE(r));
+      static NEWLIB_THREAD_LOCAL mbstate_t _mbsrtowcs_state;
+      ps = &_mbsrtowcs_state;
     }
 #endif
 
@@ -104,7 +96,7 @@ _mbsnrtowcs_r (struct _reent *r,
   max = len;
   while (len > 0)
     {
-      bytes = _mbrtowc_r (r, ptr, *src, nms, ps);
+      bytes = mbrtowc (ptr, *src, nms, ps);
       if (bytes > 0)
 	{
 	  *src += bytes;
@@ -134,14 +126,4 @@ _mbsnrtowcs_r (struct _reent *r,
   return (size_t)max;
 }
 
-#ifndef _REENT_ONLY
-size_t
-mbsnrtowcs (wchar_t *__restrict dst,
-	const char **__restrict src,
-	size_t nms,
-	size_t len,
-	mbstate_t *__restrict ps)
-{
-  return _mbsnrtowcs_r (_REENT, dst, src, nms, len, ps);
-}
 #endif /* !_REENT_ONLY */

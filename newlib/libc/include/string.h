@@ -8,7 +8,6 @@
 #define	_STRING_H_
 
 #include "_ansi.h"
-#include <sys/reent.h>
 #include <sys/cdefs.h>
 #include <sys/features.h>
 
@@ -17,7 +16,7 @@
 #include <stddef.h>
 
 #if __POSIX_VISIBLE >= 200809
-#include <xlocale.h>
+#include <sys/_locale.h>
 #endif
 
 #if __BSD_VISIBLE
@@ -83,11 +82,9 @@ char 	*strchrnul (const char *, int);
 #if __MISC_VISIBLE || __POSIX_VISIBLE >= 200809 || __XSI_VISIBLE >= 4
 char 	*strdup (const char *) __malloc_like __result_use_check;
 #endif
-char 	*_strdup_r (struct _reent *, const char *);
 #if __POSIX_VISIBLE >= 200809
 char 	*strndup (const char *, size_t) __malloc_like __result_use_check;
 #endif
-char 	*_strndup_r (struct _reent *, const char *, size_t);
 
 /* There are two common strerror_r variants.  If you request
    _GNU_SOURCE, you get the GNU version; otherwise you get the POSIX
@@ -109,7 +106,7 @@ int	__xpg_strerror_r (int, char *, size_t);
 #endif
 
 /* Reentrant version of strerror.  */
-char *	_strerror_r (struct _reent *, int, int, int *);
+char *	_strerror_r (int, int, int *);
 
 #if __BSD_VISIBLE
 size_t	strlcat (char *, const char *, size_t);

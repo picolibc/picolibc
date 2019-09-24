@@ -70,14 +70,13 @@ No supporting OS subroutines are required.
 */
 
 #include <_ansi.h>
-#include <reent.h>
 #include <wctype.h>
 //#include <errno.h>
 #include "local.h"
 
+#ifndef _REENT_ONLY
 wint_t
-_towctrans_r (struct _reent *r,
-	wint_t c,
+towctrans (wint_t c,
 	wctrans_t w)
 {
   if (w == WCT_TOLOWER || w == WCT_TOUPPER)
@@ -89,13 +88,5 @@ _towctrans_r (struct _reent *r,
       //__errno_r(r) = EINVAL;
       return c;
     }
-}
-
-#ifndef _REENT_ONLY
-wint_t
-towctrans (wint_t c,
-	wctrans_t w)
-{
-  return _towctrans_r (_REENT, c, w);
 }
 #endif /* !_REENT_ONLY */

@@ -103,10 +103,13 @@ static char sccsid[] = "%W% (Berkeley) %G%";
 #endif /* LIBC_SCCS and not lint */
 
 #include <_ansi.h>
-#include <reent.h>
 #include <stdio.h>
 #include <errno.h>
+#include <unistd.h>
 #include <sys/lock.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
 #ifdef __CYGWIN__
 #include <fcntl.h>
 #endif
@@ -126,7 +129,7 @@ _fopen_r (struct _reent *ptr,
   if ((fp = __sfp (ptr)) == NULL)
     return NULL;
 
-  if ((f = _open_r (ptr, file, oflags, 0666)) < 0)
+  if ((f = open (file, oflags, 0666)) < 0)
     {
       _newlib_sfp_lock_start (); 
       fp->_flags = 0;		/* release */

@@ -97,10 +97,12 @@ Supporting OS subroutines required: <<close>>, <<fstat>>, <<isatty>>,
 #define _XOPEN_SOURCE
 #define _XOPEN_SOURCE_EXTENDED
 #include <_ansi.h>
-#include <reent.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include "local.h"
+
+char *	ecvtbuf (double, int, int*, int*, char *);
+char *	fcvtbuf (double, int, int*, int*, char *);
 
 char *
 fcvt (double d,
@@ -118,6 +120,21 @@ fcvtf (float d,
 	int *sign)
 {
   return fcvt ((float) d, ndigit, decpt, sign);
+}
+
+
+char *
+gcvt (double d,
+	int ndigit,
+	char *buf)
+{
+  char *tbuf = buf;
+  if (d < 0) {
+    *buf = '-';
+    buf++;
+    ndigit--;
+  }
+  return (_gcvt (d, ndigit, buf, 'g', 0) ? tbuf : 0);
 }
 
 
@@ -147,19 +164,4 @@ ecvtf (float d,
 	int *sign)
 {
   return ecvt ((double) d, ndigit, decpt, sign);
-}
-
-
-char *
-gcvt (double d,
-	int ndigit,
-	char *buf)
-{
-  char *tbuf = buf;
-  if (d < 0) {
-    *buf = '-';
-    buf++;
-    ndigit--;
-  }
-  return (_gcvt (_REENT, d, ndigit, buf, 'g', 0) ? tbuf : 0);
 }

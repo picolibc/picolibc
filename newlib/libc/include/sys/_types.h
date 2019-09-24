@@ -19,10 +19,12 @@
 #ifndef	_SYS__TYPES_H
 #define _SYS__TYPES_H
 
+#define __need_size_t
+#define __need_wint_t
+#include <stddef.h>
 #include <newlib.h>
 #include <sys/config.h>
 #include <machine/_types.h>
-#include <sys/lock.h>
 
 #ifndef __machine_blkcnt_t_defined
 typedef long __blkcnt_t;
@@ -155,9 +157,6 @@ typedef long _ssize_t;
 
 typedef _ssize_t __ssize_t;
 
-#define __need_wint_t
-#include <stddef.h>
-
 #ifndef __machine_mbstate_t_defined
 /* Conversion state information.  */
 typedef struct
@@ -169,10 +168,6 @@ typedef struct
     unsigned char __wchb[4];
   } __value;		/* Value so far.  */
 } _mbstate_t;
-#endif
-
-#ifndef __machine_flock_t_defined
-typedef _LOCK_RECURSIVE_T _flock_t;
 #endif
 
 #ifndef __machine_iconv_t_defined
@@ -215,10 +210,15 @@ typedef	unsigned short	__nlink_t;
 typedef	long		__suseconds_t;	/* microseconds (signed) */
 typedef	unsigned long	__useconds_t;	/* microseconds (unsigned) */
 
-#ifdef __GNUCLIKE_BUILTIN_VARARGS
+/*
+ * Must be identical to the __GNUCLIKE_BUILTIN_VAALIST definition in
+ * <sys/cdefs.h>.  The <sys/cdefs.h> must not be included here to avoid cyclic
+ * header dependencies.
+ */
+#if __GNUC_MINOR__ > 95 || __GNUC__ >= 3
 typedef	__builtin_va_list	__va_list;
 #else
 typedef	char *			__va_list;
-#endif /* __GNUCLIKE_BUILTIN_VARARGS */
+#endif
 
 #endif	/* _SYS__TYPES_H */
