@@ -1406,15 +1406,18 @@ normalize_win32_path (const char *src, char *dst, char *&tail)
   bool beg_src_slash = isdirsep (src[0]);
 
   tail = dst;
-  /* Skip long path name prefixes in Win32 or NT syntax. */
+  /* Skip Win32 long path name prefix and NT object directory prefix. */
   if (beg_src_slash && (src[1] == '?' || isdirsep (src[1]))
       && src[2] == '?' && isdirsep (src[3]))
     {
       src += 4;
-      if (src[1] != ':') /* native UNC path */
+      if (isdrive (src) && isdirsep (src[2]))
+	beg_src_slash = false;
+      else if (!strncmp (src, "UNC", 3) && isdirsep (src[3]))
+	/* native UNC path */
 	src += 2; /* Fortunately the first char is not copied... */
       else
-	beg_src_slash = false;
+	return EINVAL;
     }
   if (beg_src_slash && isdirsep (src[1]))
     {
