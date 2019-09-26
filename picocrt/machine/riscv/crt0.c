@@ -38,6 +38,6 @@
 void
 _start(void)
 {
-	asm("la gp, __global_pointer$");
+	asm(".option push\n.option norelax\nla gp, __global_pointer$\n.option pop");
 	__start();
 }
