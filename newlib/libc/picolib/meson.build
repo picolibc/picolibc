@@ -40,11 +40,12 @@ src_tls_machine = {
 
 srcs_picolib = [
   'inittls.c',
-  'picosbrk.c'
+  'picosbrk.c',
+  'dummyiob.c'
 ]
 
 if src_tls_machine.has_key(host_cpu)
-  srcs_picolib = join_paths('machine', src_tls_machine[host_cpu])
+  srcs_picolib += join_paths('machine', src_tls_machine[host_cpu])
 endif
 
 foreach target : targets
