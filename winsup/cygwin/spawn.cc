@@ -790,8 +790,6 @@ child_info_spawn::worker (const char *prog_arg, const char *const *argv,
 	  NtClose (old_winpid_hdl);
 	  real_path.get_wide_win32_path (myself->progname); // FIXME: race?
 	  sigproc_printf ("new process name %W", myself->progname);
-	  if (!iscygwin ())
-	    close_all_files ();
 	}
       else
 	{
@@ -890,6 +888,8 @@ child_info_spawn::worker (const char *prog_arg, const char *const *argv,
 		wait_for_myself ();
 	    }
 	  myself.exit (EXITCODE_NOSET);
+	  if (!iscygwin ())
+	    close_all_files ();
 	  break;
 	case _P_WAIT:
 	case _P_SYSTEM:
