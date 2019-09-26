@@ -8,6 +8,8 @@ needs_exe_wrapper = true
 c = 'gcc'
 ar = 'ar'
 as = 'as'
+ld = 'ld'
+strip = 'strip'
 exe_wrapper = 'env'
 
 [host_machine]
