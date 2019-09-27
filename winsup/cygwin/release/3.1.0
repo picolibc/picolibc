@@ -87,3 +87,7 @@ Bug Fixes
 
 - Fix an assertion failure on an invalid path.
   Addresses: https://cygwin.com/ml/cygwin/2019-09/msg00228.html
+
+- If the argument to mkdir(2) or rmdir(2) is 'x:\', don't strip the
+  trailing backslash.
+  Addresses: https://cygwin.com/ml/cygwin/2019-08/msg00334.html
