@@ -12,7 +12,7 @@
  *  _start -> exit -> __call_exitprocs
  *
  *  Here an -> means arrow tail invokes arrow head. All invocations here
- *  are non-weak reference in current newlib/libgloss.
+ *  are non-weak reference in current newlib.
  *
  *  Lite exit makes some of above calls as weak reference, so that size expansive
  *  functions __register_exitproc and __call_exitprocs may not be linked. These
