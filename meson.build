@@ -38,6 +38,8 @@ project('picolibc', 'c',
 	  'c_std=gnu99',
 	  'b_staticpic=false',
 	],
+	license : 'BSD',
+	meson_version : '>= 0.48',
 	version: '1.0.0'
 )
 
