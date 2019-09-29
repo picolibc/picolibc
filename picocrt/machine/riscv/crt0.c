@@ -35,9 +35,10 @@
 
 #include "../../crt0.h"
 
-void
+void __attribute((naked))
 _start(void)
 {
 	asm(".option push\n.option norelax\nla gp, __global_pointer$\n.option pop");
+	asm("la sp, __stack");
 	__start();
 }
