@@ -39,7 +39,7 @@ project('picolibc', 'c',
 	  'b_staticpic=false',
 	],
 	license : 'BSD',
-	meson_version : '>= 0.48',
+	meson_version : '>= 0.50',
 	version: '1.0.0'
 )
 
