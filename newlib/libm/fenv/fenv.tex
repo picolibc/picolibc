@@ -1,0 +1,45 @@
+@node Fenv
+@chapter Floating-Point Environment (@file{fenv.h})
+
+This chapter groups the methods used to manipulate the floating-point
+status flags. Floating-point operations modify the floating-point
+status flags to indicate abnormal result information.
+
+The implementation of these methods is architecture specific.
+
+@menu
+* feclearexcept::		Clear floating-point exception
+* fegetenv::		Get current floating-point environment
+* fegetexceptflag::	Get floating-point status flags
+* fegetround::		Get current rounding direction
+* feholdexcept::		Save current floating-point environment
+* feraiseexcept::		Raise floating-point exception
+* fesetenv::		Set current floating-point environment
+* fesetexceptflag::	Set floating-point status flags
+* fesetround::		Set current rounding direction
+* fetestexcept::		Test floating-point exception flags
+* feupdateenv::		Update current floating-point environment
+@end menu
+
+@page
+@include fenv/feclearexcept.def
+@page
+@include fenv/fegetenv.def
+@page
+@include fenv/fegetexceptflag.def
+@page
+@include fenv/fegetround.def
+@page
+@include fenv/feholdexcept.def
+@page
+@include fenv/feraiseexcept.def
+@page
+@include fenv/fesetenv.def
+@page
+@include fenv/fesetexceptflag.def
+@page
+@include fenv/fesetround.def
+@page
+@include fenv/fetestexcept.def
+@page
+@include fenv/feupdateenv.def
