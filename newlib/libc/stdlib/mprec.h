@@ -30,6 +30,7 @@
 #include <math.h>
 #include <float.h>
 #include <errno.h>
+#include <assert.h>
 #include <sys/config.h>
 #include <sys/types.h>
 #include "../locale/setlocale.h"
@@ -340,6 +341,13 @@ typedef struct _Bigint _Bigint;
 #define copybits 	__copybits
 #define hexnan	__hexnan
 
+#define eBalloc(__reent_ptr, __len) ({ \
+   void *__ptr = Balloc(__reent_ptr, __len); \
+   if (__ptr == NULL) \
+     __assert_func(__FILE__, __LINE__, (char *)0, "Balloc succeeded"); \
+   __ptr; \
+   })
+   
 #if !defined(PREFER_SIZE_OVER_SPEED) && !defined(__OPTIMIZE_SIZE__) && !defined(_SMALL_HEXDIG)
 #define __get_hexdig(x) __hexdig[x] /* NOTE: must evaluate arg only once */
 #else /* !defined(PREFER_SIZE_OVER_SPEED) && !defined(__OPTIMIZE_SIZE__) && !defined(_SMALL_HEXDIG) */
