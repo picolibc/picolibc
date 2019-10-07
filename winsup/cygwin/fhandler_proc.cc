@@ -744,6 +744,8 @@ format_proc_cpuinfo (void *, char *&destbuf)
       int cache_size = -1,
 	  clflush = 64,
 	  cache_alignment = 64;
+      long (*get_cpu_cache) (int, uint32_t) = NULL;
+      uint32_t max;
       if (features1 & (1 << 19)) /* CLFSH */
 	clflush = ((extra_info >> 8) & 0xff) << 3;
       if (is_intel && family == 15)
@@ -751,45 +753,34 @@ format_proc_cpuinfo (void *, char *&destbuf)
       if (is_intel)
 	{
 	  extern long get_cpu_cache_intel (int sysc, uint32_t maxf);
-	  long cs;
-
-	  cs = get_cpu_cache_intel (_SC_LEVEL3_CACHE_SIZE, maxf);
-	  if (cs == -1)
-	    cs = get_cpu_cache_intel (_SC_LEVEL2_CACHE_SIZE, maxf);
-	  if (cs == -1)
-	    {
-	      cs = get_cpu_cache_intel (_SC_LEVEL1_ICACHE_SIZE, maxf);
-	      if (cs != -1)
-		cache_size = cs;
-	      cs = get_cpu_cache_intel (_SC_LEVEL1_DCACHE_SIZE, maxf);
-	      if (cs != -1)
-		cache_size += cs;
-	    }
-	  else
-	    cache_size = cs;
-	  if (cache_size != -1)
-	    cache_size >>= 10;
+	  get_cpu_cache = get_cpu_cache_intel;
+	  max = maxf;	/* Intel uses normal cpuid levels */
 	}
       else if (is_amd)
 	{
 	  extern long get_cpu_cache_amd (int sysc, uint32_t maxe);
+	  get_cpu_cache = get_cpu_cache_amd;
+	  max = maxe;	/* AMD uses extended cpuid levels */
+	}
+      if (get_cpu_cache)
+	{
 	  long cs;
 
-	  cs = get_cpu_cache_amd (_SC_LEVEL3_CACHE_SIZE, maxe);
-	  if (cs == -1)
-	    cs = get_cpu_cache_amd (_SC_LEVEL2_CACHE_SIZE, maxe);
-	  if (cs == -1)
+	  cs = get_cpu_cache (_SC_LEVEL3_CACHE_SIZE, max);
+	  if (cs <= 0)
+	    cs = get_cpu_cache (_SC_LEVEL2_CACHE_SIZE, max);
+	  if (cs <= 0)
 	    {
-	      cs = get_cpu_cache_amd (_SC_LEVEL1_ICACHE_SIZE, maxe);
-	      if (cs != -1)
+	      cs = get_cpu_cache (_SC_LEVEL1_ICACHE_SIZE, max);
+	      if (cs > 0)
 		cache_size = cs;
-	      cs = get_cpu_cache_amd (_SC_LEVEL1_DCACHE_SIZE, maxe);
-	      if (cs != -1)
+	      cs = get_cpu_cache (_SC_LEVEL1_DCACHE_SIZE, max);
+	      if (cs > 0)
 		cache_size += cs;
 	    }
 	  else
 	    cache_size = cs;
-	  if (cache_size != -1)
+	  if (cache_size > 0)
 	    cache_size >>= 10;
 	}
       bufptr += __small_sprintf (bufptr, "cpu family\t: %d\n"
