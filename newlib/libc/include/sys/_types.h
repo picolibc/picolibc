@@ -24,6 +24,7 @@
 #include <stddef.h>
 #include <newlib.h>
 #include <sys/config.h>
+#include <sys/lock.h>
 #include <machine/_types.h>
 
 #ifndef __machine_blkcnt_t_defined
@@ -168,6 +169,10 @@ typedef struct
     unsigned char __wchb[4];
   } __value;		/* Value so far.  */
 } _mbstate_t;
+#endif
+
+#ifndef __machine_flock_t_defined
+typedef _LOCK_RECURSIVE_T _flock_t;
 #endif
 
 #ifndef __machine_iconv_t_defined
