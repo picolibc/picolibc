@@ -927,13 +927,30 @@ format_proc_cpuinfo (void *, char *&destbuf)
 
 	}
 
+      /* level is number of non-zero leafs exc. sub-leafs */
+      int level = maxf + 1 + (maxe & 0x7fffffff) + 1;
+
+      for (uint32_t l = maxe; 0x80000001 < l; --l)
+        {
+	  uint32_t a, b, c, d;
+	  cpuid (&a, &b, &c, &d, l);
+	  if (!(a | b | c | d))	--level;
+        }
+
+      for (uint32_t l = maxf; 1 < l; --l)
+        {
+	  uint32_t a, b, c, d;
+	  cpuid (&a, &b, &c, &d, l);
+	  if (!(a | b | c | d))	--level;
+        }
+
       bufptr += __small_sprintf (bufptr, "fpu\t\t: %s\n"
 					 "fpu_exception\t: %s\n"
 					 "cpuid level\t: %d\n"
 					 "wp\t\t: yes\n",
 				 (features1 & (1 << 0)) ? "yes" : "no",
 				 (features1 & (1 << 0)) ? "yes" : "no",
-				 maxf);
+				 level);
       print ("flags\t\t:");
       if (features1 & (1 << 0))
 	print (" fpu");
