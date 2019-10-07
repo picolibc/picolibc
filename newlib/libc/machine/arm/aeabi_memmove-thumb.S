@@ -26,6 +26,8 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include "acle-compat.h"
+
 	.thumb
 	.syntax unified
 	.global __aeabi_memmove
@@ -49,9 +51,13 @@ __aeabi_memmove:
 	subs	r3, r3, #1
 	bcs	1b
 2:
+#if __ARM_ARCH >= 5
+	pop	{r4, pc}
+#else
 	pop	{r4}
 	pop	{r1}
 	bx	r1
+#endif
 3:
 	movs	r3, #0
 	cmp	r2, #0
