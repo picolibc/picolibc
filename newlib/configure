@@ -788,6 +788,7 @@ enable_newlib_register_fini
 enable_newlib_io_long_long
 enable_newlib_io_long_double
 enable_newlib_mb
+enable_newlib_reent_check_verify
 enable_newlib_iconv_encodings
 enable_newlib_iconv_from_encodings
 enable_newlib_iconv_to_encodings
@@ -1463,6 +1464,7 @@ Optional Features:
   --enable-newlib-io-long-long   enable long long type support in IO functions like printf/scanf
   --enable-newlib-io-long-double   enable long double type support in IO functions printf/scanf
   --enable-newlib-mb        enable multibyte support
+  --enable-newlib-reent-check-verify        enable checking of _REENT_CHECK memory allocation
   --enable-newlib-iconv-encodings   enable specific comma-separated list of bidirectional iconv encodings to be built-in
   --enable-newlib-iconv-from-encodings   enable specific comma-separated list of \"from\" iconv encodings to be built-in
   --enable-newlib-iconv-to-encodings   enable specific comma-separated list of \"to\" iconv encodings to be built-in
@@ -2308,6 +2310,17 @@ if test "${enable_newlib_mb+set}" = set; then :
  esac
 else
   newlib_mb=
+fi
+
+# Check whether --enable-newlib-reent-check-verify was given.
+if test "${enable_newlib_reent_check_verify+set}" = set; then :
+  enableval=$enable_newlib_reent_check_verify; case "${enableval}" in
+  yes) newlib_reent_check_verify=yes;;
+  no)  newlib_reent_check_verify=no ;;
+  *)   as_fn_error $? "bad value ${enableval} for newlib-reent-check-verify option" "$LINENO" 5 ;;
+ esac
+else
+  newlib_reent_check_verify=
 fi
 
 # Check whether --enable-newlib-iconv-encodings was given.
@@ -11840,7 +11853,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<_LT_EOF
-#line 11843 "configure"
+#line 11856 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -11946,7 +11959,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<_LT_EOF
-#line 11949 "configure"
+#line 11962 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -12347,6 +12360,13 @@ fi
 if test "${newlib_elix_level}" -gt "0"; then
 cat >>confdefs.h <<_ACEOF
 #define _ELIX_LEVEL ${newlib_elix_level}
+_ACEOF
+
+fi
+
+if test "${newlib_reent_check_verify}" = "yes"; then
+cat >>confdefs.h <<_ACEOF
+#define _REENT_CHECK_VERIFY 1
 _ACEOF
 
 fi

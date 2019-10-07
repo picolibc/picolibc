@@ -29,6 +29,7 @@
 #   newlib_io_long_double --enable-newlib-io-long-double ("yes", "no", "")
 #   newlib_global_stdio_streams --enable-global-stdio-streams ("yes", "no, "")
 #   newlib_fno_builtin  --disable-newlib-fno-builtin ("yes", "no, "")
+#   newlib_reent_check_verify  --enable-newlib-reent-check-verify ("yes", "no, "")
 
 # It sets the following shell variables:
 #   newlib_cflags	Special CFLAGS to use when building
@@ -76,6 +77,7 @@ default_newlib_io_long_double=no
 default_newlib_io_pos_args=no
 default_newlib_atexit_dynamic_alloc=yes
 default_newlib_nano_malloc=no
+default_newlib_reent_check_verify=no
 aext=a
 oext=o
 lpfx="lib_a-"
@@ -949,6 +951,13 @@ fi
 if [ "x${newlib_nano_malloc}" = "x" ]; then
 	if [ ${default_newlib_nano_malloc} = "yes" ]; then
 		newlib_nano_malloc="yes";
+	fi
+fi
+
+# Enable _REENT_CHECK macro memory allocation verification.
+if [ "x${newlib_reent_check_verify}" = "x" ]; then
+	if [ ${default_newlib_reent_check_verify} = "yes" ]; then
+		newlib_reent_check_verify="yes";
 	fi
 fi
 
