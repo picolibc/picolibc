@@ -137,6 +137,6 @@ foreach target : targets
 		static_library('mathfp' + target,
 			srcs_mathfp,
 			pic: false,
-			include_directories: inc,
+			include_directories: [ inc, include_directories('../common') ],
 			c_args: value[1]))
 endforeach
