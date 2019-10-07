@@ -885,11 +885,10 @@ format_proc_cpuinfo (void *, char *&destbuf)
 
 		  cpuid (&unused, &unused, &core_info, &unused, 0x80000008);
 		  cpuid (&unused, &cus, &unused, &unused, 0x8000001e);
-		  siblings = (core_info & 0xff) + 1;
+		  siblings = cpu_cores = (core_info & 0xff) + 1;
 		  logical_bits = (core_info >> 12) & 0xf;
 		  cus = ((cus >> 8) & 0x3) + 1;
 		  ht_bits = mask_bits (cus);
-		  cpu_cores = siblings >> ht_bits;
 		}
 	      else if (maxe >= 0x80000008)
 		{
