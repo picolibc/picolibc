@@ -687,16 +687,30 @@ format_proc_cpuinfo (void *, char *&destbuf)
       yield ();
 
       DWORD cpu_mhz = 0;
-      RTL_QUERY_REGISTRY_TABLE tab[2] = {
-	{ NULL, RTL_QUERY_REGISTRY_DIRECT | RTL_QUERY_REGISTRY_NOSTRING,
-	  L"~Mhz", &cpu_mhz, REG_NONE, NULL, 0 },
-	{ NULL, 0, NULL, NULL, 0, NULL, 0 }
-      };
+      union
+        {
+	  LONG uc_len;		/* -max size of buffer before call */
+	  char uc_microcode[16];
+        } uc;
 
+      RTL_QUERY_REGISTRY_TABLE tab[3] =
+        {
+	  { NULL, RTL_QUERY_REGISTRY_DIRECT | RTL_QUERY_REGISTRY_NOSTRING,
+	    L"~Mhz", &cpu_mhz, REG_NONE, NULL, 0 },
+	  { NULL, RTL_QUERY_REGISTRY_DIRECT | RTL_QUERY_REGISTRY_NOSTRING,
+	    L"Update Revision", &uc, REG_NONE, NULL, 0 },
+	  { NULL, 0, NULL, NULL, 0, NULL, 0 }
+        };
+
+      memset (&uc, 0, sizeof (uc.uc_microcode));
+      uc.uc_len = -16;	/* -max size of microcode buffer */
       RtlQueryRegistryValues (RTL_REGISTRY_ABSOLUTE, cpu_key, tab,
 			      NULL, NULL);
       cpu_mhz = ((cpu_mhz - 1) / 10 + 1) * 10;	/* round up to multiple of 10 */
       DWORD bogomips = cpu_mhz * 2; /* bogomips is double cpu MHz since MMX */
+      long long microcode = 0;	/* at least 8 bytes for AMD */
+      memcpy (&microcode, &uc, sizeof (microcode));
+
       bufptr += __small_sprintf (bufptr, "processor\t: %d\n", cpu_number);
       uint32_t maxf, vendor_id[4], unused;
 
@@ -789,11 +803,13 @@ format_proc_cpuinfo (void *, char *&destbuf)
 					 "model\t\t: %d\n"
 					 "model name\t: %s\n"
 					 "stepping\t: %d\n"
+					 "microcode\t: 0x%x\n"
 					 "cpu MHz\t\t: %d.000\n",
 				 family,
 				 model,
 				 in_buf.s + strspn (in_buf.s, " 	"),
 				 stepping,
+				 microcode,
 				 cpu_mhz);
 
       if (cache_size >= 0)
