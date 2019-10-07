@@ -740,7 +740,7 @@ format_proc_cpuinfo (void *, char *&destbuf)
       if (family == 15)
 	family += (cpuid_sig >> 20) & 0xff;
       if (family >= 6)
-	model += ((cpuid_sig >> 16) & 0x0f) << 4;
+	model |= ((cpuid_sig >> 16) & 0x0f) << 4; /* ext model << 4 | model */
 
       uint32_t maxe = 0;
       cpuid (&maxe, &unused, &unused, &unused, 0x80000000);
