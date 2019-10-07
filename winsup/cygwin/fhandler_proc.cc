@@ -696,6 +696,7 @@ format_proc_cpuinfo (void *, char *&destbuf)
       RtlQueryRegistryValues (RTL_REGISTRY_ABSOLUTE, cpu_key, tab,
 			      NULL, NULL);
       cpu_mhz = ((cpu_mhz - 1) / 10 + 1) * 10;	/* round up to multiple of 10 */
+      DWORD bogomips = cpu_mhz * 2; /* bogomips is double cpu MHz since MMX */
       bufptr += __small_sprintf (bufptr, "processor\t: %d\n", cpu_number);
       uint32_t maxf, vendor_id[4], unused;
 
@@ -1228,7 +1229,8 @@ format_proc_cpuinfo (void *, char *&destbuf)
 
       print ("\n");
 
-      /* TODO: bogomips */
+      bufptr += __small_sprintf (bufptr, "bogomips\t: %d.00\n",
+						bogomips);
 
       bufptr += __small_sprintf (bufptr, "clflush size\t: %d\n"
 					 "cache_alignment\t: %d\n",
