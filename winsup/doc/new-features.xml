@@ -50,6 +50,10 @@ dbm_fetch, dbm_firstkey, dbm_nextkey, dbm_open, dbm_store.
 Allow times(2) to have a NULL argument, as on Linux.
 </para></listitem>
 
+<listitem><para>
+Improve /proc/cpuinfo output and align more closely with Linux.
+</para></listitem>
+
 </itemizedlist>
 
 </sect2>

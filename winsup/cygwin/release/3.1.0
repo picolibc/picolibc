@@ -33,6 +33,8 @@ What changed:
 - Allow times(2) to have a NULL argument, as on Linux.
   Addresses: https://cygwin.com/ml/cygwin/2019-09/msg00141.html
 
+- Improve /proc/cpuinfo output and align more closely with Linux.
+
 
 Bug Fixes
 ---------
