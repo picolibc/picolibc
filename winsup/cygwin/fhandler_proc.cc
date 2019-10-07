@@ -1062,7 +1062,7 @@ format_proc_cpuinfo (void *, char *&destbuf)
       ftcprint (features2, 24, "tsc_deadline_timer"); /* TSC deadline timer */
       ftcprint (features2, 25, "aes");	    /* AES instructions */
       ftcprint (features2, 26, "xsave");    /* xsave/xrstor/xsetbv/xgetbv */
-      ftcprint (features2, 27, "osxsave");  /* not output on Linux */
+/*    ftcprint (features2, 27, "osxsave"); */ /* not output on Linux */
       ftcprint (features2, 28, "avx");	    /* advanced vector extensions */
       ftcprint (features2, 29, "f16c");     /* 16 bit FP conversions */
       ftcprint (features2, 30, "rdrand");   /* RNG rdrand instruction */
@@ -1187,14 +1187,14 @@ format_proc_cpuinfo (void *, char *&destbuf)
 	  ftcprint (features1,  3, "bmi1");         /* bit manip ext group 1 */
 	  ftcprint (features1,  4, "hle");          /* hardware lock elision */
 	  ftcprint (features1,  5, "avx2");         /* AVX ext instructions */
-	  ftcprint (features1,  6, "fpdx");	    /* FP data ptr upd on exc */
+/*	  ftcprint (features1,  6, "fpdx"); */	    /* FP data ptr upd on exc */
 	  ftcprint (features1,  7, "smep");         /* super mode exec prot */
 	  ftcprint (features1,  8, "bmi2");         /* bit manip ext group 2 */
 	  ftcprint (features1,  9, "erms");         /* enh rep movsb/stosb */
 	  ftcprint (features1, 10, "invpcid");      /* inv proc context id */
 	  ftcprint (features1, 11, "rtm");          /* restricted txnal mem */
 	  ftcprint (features1, 12, "cqm");          /* cache QoS monitoring */
-	  ftcprint (features1, 13, "fpcsdsz");	    /* zero FP cs/ds */
+/*	  ftcprint (features1, 13, "fpcsdsz"); */   /* zero FP cs/ds */
 	  ftcprint (features1, 14, "mpx");          /* mem prot ext */
 	  ftcprint (features1, 15, "rdt_a");        /* rsrc dir tech alloc */
 	  ftcprint (features1, 16, "avx512f");      /* vec foundation */
@@ -1255,15 +1255,15 @@ format_proc_cpuinfo (void *, char *&destbuf)
 	  ftcprint (features1,  0, "clzero");	    /* clzero instruction */
 	  ftcprint (features1,  1, "irperf");       /* instr retired count */
 	  ftcprint (features1,  2, "xsaveerptr");   /* save/rest FP err ptrs */
-	  ftcprint (features1,  6, "mba"); 	    /* memory BW alloc */
+/*	  ftcprint (features1,  6, "mba"); */	    /* memory BW alloc */
 	  ftcprint (features1,  9, "wbnoinvd");     /* wbnoinvd instruction */
-	  ftcprint (features1, 12, "ibpb" );	    /* ind br pred barrier */
-	  ftcprint (features1, 14, "ibrs" );	    /* ind br restricted spec */
-	  ftcprint (features1, 15, "stibp");	    /* 1 thread ind br pred */
-	  ftcprint (features1, 17, "stibp_always_on"); /* stibp always on */
-	  ftcprint (features1, 24, "ssbd");	    /* spec store byp dis */
+/*	  ftcprint (features1, 12, "ibpb" ); */	    /* ind br pred barrier */
+/*	  ftcprint (features1, 14, "ibrs" ); */	    /* ind br restricted spec */
+/*	  ftcprint (features1, 15, "stibp"); */	    /* 1 thread ind br pred */
+/*	  ftcprint (features1, 17, "stibp_always_on"); */ /* stibp always on */
+/*	  ftcprint (features1, 24, "ssbd"); */	    /* spec store byp dis */
 	  ftcprint (features1, 25, "virt_ssbd");    /* vir spec store byp dis */
-	  ftcprint (features1, 26, "ssb_no");	    /* ssb fixed in hardware */
+/*	  ftcprint (features1, 26, "ssb_no"); */    /* ssb fixed in hardware */
         }
 
       /* thermal & power cpuid 0x00000006 eax */
@@ -1392,13 +1392,13 @@ format_proc_cpuinfo (void *, char *&destbuf)
 	  ftcprint (features1,  5, "stc");          /* sw thermal control */
 	  ftcprint (features1,  6, "100mhzsteps");  /* 100 MHz mult control */
 	  ftcprint (features1,  7, "hwpstate");     /* hw P state control */
-	  ftcprint (features1,  8, "invariant_tsc"); /* TSC invariant */
+/*	  ftcprint (features1,  8, "invariant_tsc"); */ /* TSC invariant */
 	  ftcprint (features1,  9, "cpb");          /* core performance boost */
 	  ftcprint (features1, 10, "eff_freq_ro");  /* ro eff freq interface */
-	  ftcprint (features1, 11, "proc_feedback"); /* proc feedback if */
-	  ftcprint (features1, 12, "acc_power");    /* core power reporting */
-	  ftcprint (features1, 13, "connstby");	    /* connected standby */
-	  ftcprint (features1, 14, "rapl");	    /* running average power limit */
+/*	  ftcprint (features1, 11, "proc_feedback"); */ /* proc feedback if */
+/*	  ftcprint (features1, 12, "acc_power"); */ /* core power reporting */
+/*	  ftcprint (features1, 13, "connstby"); */  /* connected standby */
+/*	  ftcprint (features1, 14, "rapl"); */	    /* running average power limit */
 	}
 
       if (orig_affinity_mask != 0)
