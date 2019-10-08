@@ -3,9 +3,10 @@
 
 #include <errno.h>
 
-#define NUM 3
-#define NAN 2
-#define INF 1
+#define NUMTEST_NUM 3
+#define NUMTEST_NAN 2
+#define NUMTEST_INF 1
+#define NUMTEST_0   0
 
 #define __PI 3.14159265358979323846
 #define __SQRT_HALF 0.70710678118654752440

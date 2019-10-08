@@ -74,15 +74,15 @@ ldexp (double d,
   /* Check for special values and then scale d by e. */
   switch (numtest (d))
     {
-      case NAN:
+      case NUMTEST_NAN:
         errno = EDOM;
         break;
 
-      case INF:
+      case NUMTEST_INF:
         errno = ERANGE;
         break;
 
-      case 0:
+      case NUMTEST_0:
         break;
 
       default:

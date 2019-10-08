@@ -71,10 +71,10 @@ tan (double x)
   /* Check for special values. */
   switch (numtest (x))
     {
-      case NAN:
+      case NUMTEST_NAN:
         errno = EDOM;
         return (x);
-      case INF:
+      case NUMTEST_INF:
         errno = EDOM;
         return (z_notanum.d);
     }

@@ -35,21 +35,21 @@ numtestf (float x)
   /* Check for a zero input. */
   if (x == 0.0)
     {
-      return (0);
+      return (NUMTEST_0);
     }
 
   /* Check for not a number or infinity. */
   if (exp == 0xff)
     {
       if(wx & 0x7fffff)
-        return (NAN);
+        return (NUMTEST_NAN);
       else
-        return (INF);
+        return (NUMTEST_INF);
     }
      
   /* Otherwise it's a finite value. */ 
   else
-    return (NUM);
+    return (NUMTEST_NUM);
 }
 
 #ifdef _DOUBLE_IS_32BITS

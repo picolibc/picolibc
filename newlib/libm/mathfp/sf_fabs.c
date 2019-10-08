@@ -22,13 +22,13 @@ fabsf (float x)
 {
   switch (numtestf (x))
     {
-      case NAN:
+      case NUMTEST_NAN:
         errno = EDOM;
         return (x);
-      case INF:
+      case NUMTEST_INF:
         errno = ERANGE;
         return (x);
-      case 0:
+      case NUMTEST_0:
         return (0.0);
       default:
         return (x < 0.0 ? -x : x);

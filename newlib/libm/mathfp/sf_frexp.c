@@ -27,10 +27,10 @@ float frexpf (float d, int *exp)
   /* Check for special values. */
   switch (numtestf (d))
     {
-      case NAN:
-      case INF:
+      case NUMTEST_NAN:
+      case NUMTEST_INF:
         errno = EDOM;
-      case 0:
+      case NUMTEST_0:
         *exp = 0;
         return (d);
     }

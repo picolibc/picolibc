@@ -37,21 +37,21 @@ numtest (double x)
   /* Check for a zero input. */
   if (x == 0.0)
     {
-      return (0);
+      return (NUMTEST_0);
     }
 
   /* Check for not a number or infinity. */
   if (exp == 0x7ff)
     {
       if(hx & 0xf0000 || lx)
-        return (NAN);
+        return (NUMTEST_NAN);
       else
-        return (INF);
+        return (NUMTEST_INF);
     }
      
   /* Otherwise it's a finite value. */ 
   else
-    return (NUM);
+    return (NUMTEST_NUM);
 }
 
 #endif /* _DOUBLE_IS_32BITS */

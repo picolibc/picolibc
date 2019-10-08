@@ -58,13 +58,13 @@ atan (double x)
 {
   switch (numtest (x))
     {
-      case NAN:
+      case NUMTEST_NAN:
         errno = EDOM;
         return (x);
-      case INF:
+      case NUMTEST_INF:
         /* this should check to see if neg NaN or pos NaN... */
         return (__PI_OVER_TWO);
-      case 0:
+      case NUMTEST_0:
         return (0.0);
       default:
         return (atangent (x, 0, 0, 0));

@@ -40,10 +40,10 @@ sqrtf (float x)
   /* Check for special values. */
   switch (numtestf (x))
     {
-      case NAN:
+      case NUMTEST_NAN:
         errno = EDOM;
         return (x);
-      case INF:
+      case NUMTEST_INF:
         if (isposf (x))
           {
             errno = EDOM;

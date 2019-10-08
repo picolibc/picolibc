@@ -37,16 +37,16 @@ expf (float x)
 
   switch (numtestf (x))
     {
-      case NAN:
+      case NUMTEST_NAN:
         errno = EDOM;
         return (x);
-      case INF:
+      case NUMTEST_INF:
         errno = ERANGE;
         if (isposf (x))
           return (z_infinity_f.f);
         else
           return (0.0);
-      case 0:
+      case NUMTEST_0:
         return (1.0);
     }
 

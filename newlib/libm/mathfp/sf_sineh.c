@@ -42,10 +42,10 @@ sinehf (float x,
   /* Check for special values. */
   switch (numtestf (x))
     {
-      case NAN:
+      case NUMTEST_NAN:
         errno = EDOM;
         return (x);
-      case INF:
+      case NUMTEST_INF:
         errno = ERANGE;
         return (ispos (x) ? z_infinity_f.f : -z_infinity_f.f);
     }

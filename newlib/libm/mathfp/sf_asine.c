@@ -39,10 +39,10 @@ asinef (float x,
 
   /* Check for special values. */
   i = numtestf (x);
-  if (i == NAN || i == INF)
+  if (i == NUMTEST_NAN || i == NUMTEST_INF)
     {
       errno = EDOM;
-      if (i == NAN)
+      if (i == NUMTEST_NAN)
         return (x);
       else
         return (z_infinity_f.f);
