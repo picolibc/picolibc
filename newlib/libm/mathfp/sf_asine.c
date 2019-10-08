@@ -35,7 +35,7 @@ asinef (float x,
 {
   int flag, i;
   int branch = 0;
-  float g, res, R, P, Q, y;
+  float g = 0.0f, res = 0.0f, R, P, Q, y;
 
   /* Check for special values. */
   i = numtestf (x);

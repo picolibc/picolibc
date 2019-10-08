@@ -73,4 +73,4 @@ double tanh (double x)
   return (double) tanhf ((float) x);
 }
 
-#endif _DOUBLE_IS_32BITS
+#endif /*_DOUBLE_IS_32BITS */

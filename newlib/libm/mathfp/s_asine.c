@@ -94,7 +94,7 @@ asine (double x,
 {
   int flag, i;
   int branch = 0;
-  double g, res, R, P, Q, y;
+  double g = 0.0, res = 0.0, R, P, Q, y;
 
   /* Check for special values. */
   i = numtest (x);

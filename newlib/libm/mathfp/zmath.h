@@ -52,5 +52,7 @@ double atangent (double, double, double, int);
 float  atangentf (float, float, float, int);
 double sineh (double, int);
 float  sinehf (float, int);
+int ispos (double x);
+int isposf (float x);
 
 #endif /* no __ZMATH_H */

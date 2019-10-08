@@ -90,14 +90,13 @@ static const double p[] = { -0.35181283430177117881e+6,
                             -0.16375798202630751372e+3,
                             -0.78966127417357099479 };
 static const double LNV = 0.6931610107421875000;
-static const double INV_V2 = 0.24999308500451499336;
 static const double V_OVER2_MINUS1 = 0.13830277879601902638e-4;
 
 double
 sineh (double x,
         int cosineh)
 {
-  double y, f, P, Q, R, res, z, w;
+  double y, f, P, Q, R, res = 0.0, z, w;
   int sgn = 1;
   double WBAR = 18.55;
 

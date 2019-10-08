@@ -65,7 +65,7 @@ static const double q[] = { -0.46671683339755294240,
 double
 tan (double x)
 {
-  double y, f, g, XN, xnum, xden, res;
+  double y, f, g, xnum, xden, res;
   int N;
 
   /* Check for special values. */
@@ -92,8 +92,6 @@ tan (double x)
     N = (int) (x * TWO_OVER_PI - 0.5);
   else
     N = (int) (x * TWO_OVER_PI + 0.5);
-
-  XN = (double) N;
 
   f = x - N * __PI_OVER_TWO;
 

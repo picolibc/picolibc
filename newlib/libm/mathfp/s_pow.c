@@ -151,4 +151,4 @@ double pow (double x, double y)
   return x;
 }
 
-#endif _DOUBLE_IS_32BITS
+#endif /*_DOUBLE_IS_32BITS */

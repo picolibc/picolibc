@@ -31,7 +31,7 @@ static const float q[] = { -0.429135777,
 float
 tanf (float x)
 {
-  float y, f, g, XN, xnum, xden, res;
+  float y, f, g, xnum, xden, res;
   int N;
 
   /* Check for special values. */
@@ -58,8 +58,6 @@ tanf (float x)
     N = (int) (x * TWO_OVER_PI - 0.5);
   else
     N = (int) (x * TWO_OVER_PI + 0.5);
-
-  XN = (float) N;
 
   f = x - N * __PI_OVER_TWO;
 

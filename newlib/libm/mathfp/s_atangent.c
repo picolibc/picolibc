@@ -99,16 +99,18 @@ atangent (double x,
   if (arctan2)
     {
       if (u == 0.0)
-        if (v == 0.0)
-          {
-            errno = ERANGE;
-            return (z_notanum.d);
-          }
-        else
-          {
-            branch = 1;
-            res = __PI_OVER_TWO;
-          }
+        {
+	  if (v == 0.0)
+	    {
+	      errno = ERANGE;
+	      return (z_notanum.d);
+	    }
+	    else
+	    {
+	      branch = 1;
+	      res = __PI_OVER_TWO;
+	    }
+	}
 
       if (!branch)
         {

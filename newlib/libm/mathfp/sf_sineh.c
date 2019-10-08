@@ -28,14 +28,14 @@ static const float q[] = { -0.428277109e+2 };
 static const float p[] = { -0.713793159e+1,
                            -0.190333399 };
 static const float LNV = 0.6931610107;
-static const float INV_V2 = 0.2499930850;
+//static const float INV_V2 = 0.2499930850;
 static const float V_OVER2_MINUS1 = 0.1383027787e-4;
 
 float
 sinehf (float x,
         int cosineh)
 {
-  float y, f, P, Q, R, res, z, w;
+  float y, f, P, Q, R, res = 0.0f, z, w;
   int sgn = 1;
   float WBAR = 18.55;
 
