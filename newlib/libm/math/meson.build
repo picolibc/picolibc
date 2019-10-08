@@ -167,7 +167,6 @@ srcs_math = [
     'w_sinh.c',
     'w_sqrt.c',
     'w_tgamma.c',
-    'signgam.c'
 ]
 
 l_srcs_math = [
