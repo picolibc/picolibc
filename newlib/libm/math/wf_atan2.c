@@ -21,6 +21,7 @@
 #include "fdlibm.h"
 #include <errno.h>
 
+#if !defined(_IEEE_LIBM) || !defined(HAVE_ALIAS_ATTRIBUTE)
 #ifdef __STDC__
 	float atan2f(float y, float x)		/* wrapper atan2f */
 #else
@@ -30,6 +31,7 @@
 {
 	return __ieee754_atan2f(y,x);
 }
+#endif
 
 #ifdef _DOUBLE_IS_32BITS
 

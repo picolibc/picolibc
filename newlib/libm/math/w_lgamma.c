@@ -23,6 +23,7 @@
 
 #ifndef _DOUBLE_IS_32BITS
 
+#if !defined(_IEEE_LIBM) || !defined(HAVE_ALIAS_ATTRIBUTE)
 #ifdef __STDC__
 	double lgamma(double x)
 #else
@@ -48,6 +49,7 @@
             return y;
 #endif
 }             
+#endif
 
 #endif /* defined(_DOUBLE_IS_32BITS) */
 
