@@ -89,7 +89,6 @@ newlib_initfini_array = get_option('newlib-initfini-array')
 newlib_initfini = get_option('newlib-initfini')
 thread_local_storage = get_option('thread-local-storage')
 tls_model = get_option('tls-model')
-hw_fp = get_option('hw-fp')
 
 host_cpu=host_machine.cpu()
 if host_cpu == ''

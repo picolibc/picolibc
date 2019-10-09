@@ -45,12 +45,7 @@ libm_machine_dirs = {
 		      'spu' : 'spu',
 		    }
 
-libdirs = ['common', 'complex']
-if hw_fp
-  libdirs += 'mathfp'
-else
-  libdirs += 'math'
-endif
+libdirs = ['math', 'common', 'complex']
 
 libnames = libdirs
 
