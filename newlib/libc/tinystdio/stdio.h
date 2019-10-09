@@ -247,6 +247,15 @@ struct __file {
 	int	(*flush)(struct __file *);	/* function to flush output to device */
 };
 
+/*
+ * This variant includes a 'close' function which is
+ * invoked from fclose when the __SCLOSE bit is set
+ */
+struct __file_close {
+	struct __file file;			/* main file struct */
+	int	(*close)(struct __file *);	/* function to close file */
+};
+
 #endif /* not __DOXYGEN__ */
 
 /*@{*/

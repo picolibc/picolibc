@@ -41,11 +41,6 @@
 #define SCANF_STD 2
 #define SCANF_FLT 3
 
-struct __file_close {
-	struct __file file;			/* main file struct */
-	int	(*close)(struct __file *);	/* function to close file */
-};
-
 struct __file_str {
 	struct __file file;	/* main file struct */
 	char	*buf;		/* buffer pointer */
