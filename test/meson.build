@@ -46,3 +46,10 @@ test('Random number generator',
      executable('rand', ['rand.c'],
 		link_with: [lib_m, lib_c],
 		include_directories: inc))
+
+if posix_io
+  test('posix i/o tests',
+       executable('posix-io', ['posix-io.c'],
+		  link_with: [lib_c],
+		  include_directories: inc))
+endif
