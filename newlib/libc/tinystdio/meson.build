@@ -91,6 +91,7 @@ srcs_tinystdio_posix = [
   'fdopen.c',
   'fclose.c',
   'posixio.c',
+  'posixiob.c',
   'sflags.c'
 ]
 

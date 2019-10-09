@@ -33,37 +33,37 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <stdio.h>
+#include "stdio_private.h"
+#include <stdlib.h>
+#include <unistd.h>
 
-/*
- * Dummy stdio hooks. This allows programs to link without requiring
- * any system-dependent functions. This is only used if the program
- * doesn't provide its own version of __iob
- */
+static char write_buf[BUFSIZ];
+static char read_buf[BUFSIZ];
 
-static int
-dummy_putc(char c, FILE *file)
-{
-	(void) c;
-	(void) file;
-	return c;
-}
+static struct __file_posix __stdin = {
+	.cfile = {
+		.file = {
+			.flags = __SRD | __SCLOSE,
+			.get = __posix_getc,
+		},
+		.close = __posix_close
+	},
+	.fd = 0,
+	.read_buf = read_buf
+};
 
-static int
-dummy_getc(FILE *file)
-{
-	(void) file;
-	return EOF;
-}
+static struct __file_posix __stdout = {
+	.cfile = {
+		.file = {
+			.flags = __SWR | __SCLOSE,
+			.put = __posix_putc,
+			.flush = __posix_flush,
+		},
+		.close = __posix_close
+	},
+	.fd = 1,
+	.write_buf = write_buf
+};
 
-static int
-dummy_flush(FILE *file)
-{
-	(void) file;
-	return 0;
-}
-
-static FILE __stdio = FDEV_SETUP_STREAM(dummy_putc, dummy_getc, dummy_flush, _FDEV_SETUP_RW);
-
-FILE *const __weak_iob[3] = { &__stdio, &__stdio, &__stdio };
-__weak_reference(__weak_iob,__iob);
+FILE *const __posix_iob[3] = { &__stdin.cfile.file, &__stdout.cfile.file, &__stdout.cfile.file };
+__weak_reference(__posix_iob,__iob);

@@ -128,33 +128,3 @@ static void posix_exit(void)
 {
 	__posix_flush(stdout);
 }
-
-static char write_buf[BUFSIZ];
-static char read_buf[BUFSIZ];
-
-static struct __file_posix __stdin = {
-	.cfile = {
-		.file = {
-			.flags = __SRD | __SCLOSE,
-			.get = __posix_getc,
-		},
-		.close = __posix_close
-	},
-	.fd = 0,
-	.read_buf = read_buf
-};
-
-static struct __file_posix __stdout = {
-	.cfile = {
-		.file = {
-			.flags = __SWR | __SCLOSE,
-			.put = __posix_putc,
-			.flush = __posix_flush,
-		},
-		.close = __posix_close
-	},
-	.fd = 1,
-	.write_buf = write_buf
-};
-
-FILE *const __iob[3] = { &__stdin.cfile.file, &__stdout.cfile.file, &__stdout.cfile.file };
