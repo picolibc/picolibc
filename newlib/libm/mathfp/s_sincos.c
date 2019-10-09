@@ -17,6 +17,7 @@
 #include "fdlibm.h"
 #include "zmath.h"
 
+#if __OBSOLETE_MATH
 #ifndef _DOUBLE_IS_32BITS
 
 void
@@ -29,3 +30,4 @@ sincos (double x,
 }
 
 #endif /* _DOUBLE_IS_32BITS */
+#endif

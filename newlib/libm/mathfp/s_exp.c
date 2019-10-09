@@ -59,6 +59,7 @@ PORTABILITY
 #include "fdlibm.h"
 #include "zmath.h"
 
+#if __OBSOLETE_MATH
 #ifndef _DOUBLE_IS_32BITS
 
 static const double INV_LN2 = 1.4426950408889634074;
@@ -122,3 +123,4 @@ exp (double x)
 }
 
 #endif /* _DOUBLE_IS_32BITS */
+#endif

@@ -6,6 +6,7 @@
 
 #include "fdlibm.h"
 
+#if __OBSOLETE_MATH
 float
 exp2f (float x)
 {
@@ -20,3 +21,4 @@ double exp2 (double x)
 }
 
 #endif /* _DOUBLE_IS_32BITS */
+#endif

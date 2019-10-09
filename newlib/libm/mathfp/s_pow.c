@@ -38,6 +38,7 @@ PORTABILITY
 #include "fdlibm.h"
 #include "zmath.h"
 
+#if __OBSOLETE_MATH
 #ifndef _DOUBLE_IS_32BITS
 
 double pow (double x, double y)
@@ -152,3 +153,4 @@ double pow (double x, double y)
 }
 
 #endif /*_DOUBLE_IS_32BITS */
+#endif

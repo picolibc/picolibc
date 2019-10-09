@@ -4,6 +4,7 @@
 #include "fdlibm.h"
 #include "zmath.h"
 
+#if __OBSOLETE_MATH
 float powf (float x, float y)
 {
   float d, k, t, r = 1.0;
@@ -123,3 +124,4 @@ double pow (double x, double y)
 }
 
 #endif /* defined(_DOUBLE_IS_32BITS) */ 
+#endif

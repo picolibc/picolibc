@@ -17,6 +17,7 @@
 #include "fdlibm.h"
 #include "zmath.h"
 
+#if __OBSOLETE_MATH
 void
 sincosf (float x,
         float *sinx,
@@ -36,3 +37,4 @@ sincos (double x, double *sinx, double *cosx)
 }
 
 #endif /* defined(_DOUBLE_IS_32BITS) */
+#endif

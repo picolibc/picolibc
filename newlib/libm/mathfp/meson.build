@@ -115,7 +115,6 @@ srcs_mathfp = [
     's_sincos.c',
     's_sine.c',
     's_sineh.c',
-    's_sinf.c',
     's_sinh.c',
     's_sqrt.c',
     's_tan.c',

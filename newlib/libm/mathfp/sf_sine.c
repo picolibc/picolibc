@@ -24,6 +24,7 @@
 #include "fdlibm.h"
 #include "zmath.h"
 
+#if __OBSOLETE_MATH
 static const float HALF_PI = 1.570796326;
 static const float ONE_OVER_PI = 0.318309886;
 static const float r[] = { -0.1666665668,
@@ -109,3 +110,4 @@ sinef (float x,
 
   return (res);
 }
+#endif

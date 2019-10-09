@@ -17,6 +17,7 @@
 #include "fdlibm.h"
 #include "zmath.h"
 
+#if __OBSOLETE_MATH
 float
 logf (float x)
 {
@@ -31,3 +32,4 @@ double log (double x)
 }
 
 #endif /* defined(_DOUBLE_IS_32BITS) */
+#endif
