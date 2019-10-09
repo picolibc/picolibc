@@ -64,24 +64,6 @@ __posix_sflags (const char *mode, int *optr)
 	  ret |= (__SRD | __SWR);
 	  m = (m & ~O_ACCMODE) | O_RDWR;
 	  break;
-	case 'b':
-#ifdef O_BINARY
-	  m |= O_BINARY;
-#endif
-	  break;
-#ifdef __CYGWIN__
-	case 't':
-	  m |= O_TEXT;
-	  break;
-#endif
-#if defined (O_CLOEXEC)
-	case 'e':
-	  m |= O_CLOEXEC;
-	  break;
-#endif
-	case 'x':
-	  m |= O_EXCL;
-	  break;
 	default:
 	  break;
 	}
