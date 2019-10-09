@@ -35,16 +35,14 @@
 #include "stdio_private.h"
 
 int
-fclose(FILE *stream)
+fclose(FILE *f)
 {
-	if (!(stream->flags & __SMALLOC))
+	if (f->flags & __SCLOSE) {
+		struct __file_close *cf = (struct __file_close *) f;
 		/*
-		 * If the stream had not been malloc()ed, this is
-		 * not our business.
+		 * FIle has 'close' function, call it
 		 */
-		return 0;
-
-	free(stream);
-
+		return (*cf->close)(f);
+	}
 	return 0;
 }

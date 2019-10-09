@@ -31,7 +31,7 @@
 
 #include <limits.h>
 #include <stdarg.h>
-#include <stdio.h>
+#include "stdio_private.h"
 
 int
 vsnprintf(char *s, size_t n, const char *fmt, va_list ap)

@@ -110,7 +110,6 @@ math_test_src = [
   'y1_vec.c',
   'ynf_vec.c',
   'yn_vec.c',
-  'stdio-bits.c'
 ]
 
 #  'dcvt.c',

@@ -89,6 +89,7 @@ newlib_initfini_array = get_option('newlib-initfini-array')
 newlib_initfini = get_option('newlib-initfini')
 thread_local_storage = get_option('thread-local-storage')
 tls_model = get_option('tls-model')
+posix_io = get_option('posix-io')
 
 host_cpu=host_machine.cpu()
 if host_cpu == ''
@@ -216,7 +217,6 @@ conf_data.set('_NANO_FORMATTED_IO', newlib_nano_formatted_io)
 conf_data.set('_RETARGETABLE_LOCKING', newlib_retargetable_locking)
 conf_data.set('_WANT_USE_LONG_TIME_T', newlib_long_time_t)
 conf_data.set('TINY_STDIO', newlib_tinystdio, description: 'Use tiny stdio from gcc avr')
-conf_data.set('__CUSTOM_FILE_IO__', newlib_tinystdio, description: 'Use tiny stdio FILE')
 conf_data.set('_IEEE_LIBM', true, description: 'math library only offers ieee semantics')
 conf_data.set('PREFER_SIZE_OVER_SPEED', target_optspace, description: 'Optimize for space over speed')
 conf_data.set('FAST_STRCMP', fast_strcmp, description: 'Always optimize strcmp for performance')
@@ -228,6 +228,7 @@ conf_data.set('NEWLIB_GLOBAL_ERRNO', newlib_global_errno, description: 'use glob
 conf_data.set('HAVE_INITFINI_ARRAY', newlib_initfini_array, description: 'compiler supports INIT_ARRAY sections')
 conf_data.set('HAVE_INIT_FINI', newlib_initfini, description: 'Support _init() and _fini() functions')
 conf_data.set('NEWLIB_TLS', thread_local_storage, description: 'use thread local storage')
+conf_data.set('POSIX_IO', posix_io, description: 'Use open/close/read/write in tinystdio')
 
 version_data = configuration_data()
 

@@ -86,6 +86,24 @@ srcs_tinystdio = [
     'vsprintf.c',
 ]
 
+srcs_tinystdio_posix = [
+  'fopen.c',
+  'fdopen.c',
+  'fclose.c',
+  'posixio.c',
+  'sflags.c'
+]
+
+srcs_tinystdio_dummy = [
+  'dummyiob.c'
+]
+
+if posix_io
+  srcs_tinystdio += srcs_tinystdio_posix
+else
+  srcs_tinystdio += srcs_tinystdio_dummy
+endif
+
 srcs_tinystdio_flt = [
     'vfprintf.c',
     'vfscanf.c',

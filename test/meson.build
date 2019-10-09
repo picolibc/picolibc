@@ -38,11 +38,11 @@ test('Round-trip printf/scanf test',
 		include_directories: inc))
 
 test('Bart Massey printf test',
-     executable('printf-tests', ['printf-tests.c', 'stdio-bits.c'],
+     executable('printf-tests', ['printf-tests.c'],
 		link_with: [lib_m, lib_c],
 		include_directories: inc))
 
 test('Random number generator',
-     executable('rand', ['rand.c', 'stdio-bits.c'],
+     executable('rand', ['rand.c'],
 		link_with: [lib_m, lib_c],
 		include_directories: inc))

@@ -82,29 +82,40 @@
    not use for new code.
 */
 
+static int
+fdevclose(FILE *f)
+{
+	int ret = 0;
+	if  (f->flush)
+		ret = (*f->flush)(f);
+	free(f);
+	return ret;
+}
+
 FILE *
 fdevopen(int (*put)(char, FILE *), int (*get)(FILE *), int (*flush)(FILE *))
 {
-	FILE *s;
+	struct __file_close *cf;
 
 	if (put == 0 && get == 0)
 		return 0;
 
-	if ((s = calloc(1, sizeof(FILE))) == 0)
+	if ((cf = calloc(1, sizeof(*cf))) == 0)
 		return 0;
 
-	s->flags = __SMALLOC;
-	s->flush = flush;
+	cf->file.flags = __SCLOSE;
+	cf->close = fdevclose;
 
 	if (get != 0) {
-		s->get = get;
-		s->flags |= __SRD;
+		cf->file.get = get;
+		cf->file.flags |= __SRD;
 	}
 
 	if (put != 0) {
-		s->put = put;
-		s->flags |= __SWR;
+		cf->file.put = put;
+		cf->file.flush = flush;
+		cf->file.flags |= __SWR;
 	}
 
-	return s;
+	return &(cf->file);
 }

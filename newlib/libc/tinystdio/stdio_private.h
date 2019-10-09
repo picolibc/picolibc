@@ -29,7 +29,6 @@
 
 /* $Id: stdio_private.h 847 2005-09-06 18:49:15Z joerg_wunsch $ */
 
-#include <stdint.h>
 #include <stdio.h>
 
 /* values for PRINTF_LEVEL */
@@ -41,3 +40,43 @@
 #define SCANF_MIN 1
 #define SCANF_STD 2
 #define SCANF_FLT 3
+
+struct __file_close {
+	struct __file file;			/* main file struct */
+	int	(*close)(struct __file *);	/* function to close file */
+};
+
+struct __file_str {
+	struct __file file;	/* main file struct */
+	char	*buf;		/* buffer pointer */
+	int	size;		/* size of buffer */
+};
+
+#ifdef POSIX_IO
+
+struct __file_posix {
+	struct __file_close cfile;
+	int	fd;
+	char	*write_buf;
+	int	write_len;
+	char	*read_buf;
+	int	read_len;
+	int	read_off;
+};
+
+int
+__posix_sflags (const char *mode, int *optr);
+
+int
+__posix_flush(FILE *f);
+
+int
+__posix_putc(char c, FILE *f);
+
+int
+__posix_getc(FILE *f);
+
+int
+__posix_close(FILE *f);
+
+#endif

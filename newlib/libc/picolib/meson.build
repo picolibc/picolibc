@@ -41,7 +41,6 @@ src_tls_machine = {
 srcs_picolib = [
   'inittls.c',
   'picosbrk.c',
-  'dummyiob.c'
 ]
 
 if src_tls_machine.has_key(host_cpu)
