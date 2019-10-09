@@ -1081,8 +1081,9 @@ extern "C" int
 spawnvp (int mode, const char *file, const char * const *argv)
 {
   path_conv buf;
-  return spawnve (mode | _P_PATH_TYPE_EXEC, find_exec (file, buf), argv,
-		  cur_environ ());
+  return spawnve (mode | _P_PATH_TYPE_EXEC,
+		  find_exec (file, buf, "PATH", FE_NNF) ?: "",
+		  argv, cur_environ ());
 }
 
 extern "C" int
@@ -1090,7 +1091,9 @@ spawnvpe (int mode, const char *file, const char * const *argv,
 	  const char * const *envp)
 {
   path_conv buf;
-  return spawnve (mode | _P_PATH_TYPE_EXEC, find_exec (file, buf), argv, envp);
+  return spawnve (mode | _P_PATH_TYPE_EXEC,
+		  find_exec (file, buf, "PATH", FE_NNF) ?: "",
+		  argv, envp);
 }
 
 int

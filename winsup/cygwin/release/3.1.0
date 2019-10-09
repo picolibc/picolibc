@@ -91,3 +91,6 @@ Bug Fixes
 - If the argument to mkdir(2) or rmdir(2) is 'x:\', don't strip the
   trailing backslash.
   Addresses: https://cygwin.com/ml/cygwin/2019-08/msg00334.html
+
+- Make spawnvp, spawnvpe fail if the executable is not in $PATH.
+  Addresses: https://cygwin.com/ml/cygwin/2019-10/msg00032.html
