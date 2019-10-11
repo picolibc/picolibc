@@ -90,6 +90,7 @@ newlib_initfini = get_option('newlib-initfini')
 thread_local_storage = get_option('thread-local-storage')
 tls_model = get_option('tls-model')
 posix_io = get_option('posix-io')
+sysroot_install = get_option('sysroot-install')
 
 host_cpu=host_machine.cpu()
 if host_cpu == ''
@@ -117,12 +118,12 @@ lib_dir = join_paths(get_option('prefix'), get_option('libdir'))
 specs_data = configuration_data()
 specs_data.set(
   'INCLUDEDIR',
-  join_paths(get_option('prefix'), get_option('includedir'))
+  join_paths(sysroot_install? '%R' : get_option('prefix'), get_option('includedir'))
 )
 
 specs_data.set(
   'LIBDIR',
-  lib_dir
+  sysroot_install? join_paths('%R', get_option('libdir')) : lib_dir
 )
 
 specs_data.set(
