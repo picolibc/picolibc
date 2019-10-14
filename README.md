@@ -44,3 +44,4 @@ Supporting architectures that already have newlib code requires:
  * [Using Picolibc](doc/using.md)
  * [Picolibc initialization](doc/init.md)
  * [Thread Local Storage](doc/tls.md)
+ * [Picolibc as embedded source](doc/embedsource.md)
