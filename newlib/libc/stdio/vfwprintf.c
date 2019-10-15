@@ -472,7 +472,7 @@ _VFWPRINTF_R (struct _reent *data,
 	}
 #endif
 #else
-	decimal_point = (wchar_t) *_localeconv_r (data)->decimal_point;
+	decimal_point = (wchar_t) *localeconv ()->decimal_point;
 #endif
 #endif
 	/*
@@ -680,16 +680,16 @@ reswitch:	switch (ch) {
 
 		    memset (&state, '\0', sizeof (state));
 		    nconv = mbrtowc (&thousands_sep,
-					_localeconv_r (data)->thousands_sep,
+					localeconv ()->thousands_sep,
 					MB_CUR_MAX, &state);
 		    if (nconv == (size_t) -1 || nconv == (size_t) -2)
 		      thousands_sep = L'\0';
 		  }
 #endif
 #else
-		  thousands_sep = (wchar_t) *_localeconv_r(data)->thousands_sep;
+		  thousands_sep = (wchar_t) *localeconv ()->thousands_sep;
 #endif
-		  grouping = _localeconv_r (data)->grouping;
+		  grouping = localeconv ()->grouping;
 		  if (thousands_sep && grouping && *grouping)
 		    flags |= GROUPING;
 		  goto rflag;
