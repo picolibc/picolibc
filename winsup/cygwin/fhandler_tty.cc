@@ -1048,6 +1048,8 @@ fhandler_pty_slave::try_reattach_pcon (void)
 
   /* Do not detach from the console because re-attaching will
      fail if helper process is running as service account. */
+  if (get_ttyp()->attach_pcon_in_fork)
+    return false;
   if (pcon_attached_to >= 0 &&
       cygwin_shared->tty[pcon_attached_to]->attach_pcon_in_fork)
     return false;
