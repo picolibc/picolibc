@@ -2716,6 +2716,19 @@ fhandler_pty_slave::fixup_after_fork (HANDLE parent)
   // fork_fixup (parent, inuse, "inuse");
   // fhandler_pty_common::fixup_after_fork (parent);
   report_tty_counts (this, "inherited", "");
+
+  if (get_ttyp ()->need_clear_screen)
+    {
+      const char *term = getenv ("TERM");
+      if (term && strcmp (term, "dumb") && !strstr (term, "emacs"))
+	{
+	  /* FIXME: Clearing sequence may not be "^[[H^[[J"
+	     depending on the terminal type. */
+	  DWORD n;
+	  WriteFile (get_output_handle_cyg (), "\033[H\033[J", 6, &n, NULL);
+	}
+      get_ttyp ()->need_clear_screen = false;
+    }
 }
 
 void
@@ -2757,19 +2770,6 @@ fhandler_pty_slave::fixup_after_exec ()
 	  init_console_handler (false);
 	  FreeConsole ();
 	}
-    }
-
-  if (get_ttyp ()->need_clear_screen)
-    {
-      const char *term = getenv ("TERM");
-      if (term && strcmp (term, "dumb") && !strstr (term, "emacs"))
-	{
-	  /* FIXME: Clearing sequence may not be "^[[H^[[J"
-	     depending on the terminal type. */
-	  DWORD n;
-	  WriteFile (get_output_handle_cyg (), "\033[H\033[J", 6, &n, NULL);
-	}
-      get_ttyp ()->need_clear_screen = false;
     }
 
   /* Set locale */
