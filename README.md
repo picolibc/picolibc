@@ -15,6 +15,9 @@ so all of the source code uses BSD-like licenses, a mixture of 2- and
 3- clause BSD itself and a variety of other (mostly older) licenses
 with similar terms.
 
+Please see the file COPYING.NEWLIB in this distribution for newlib
+license terms.
+
 ## Supported Architectures
 
 Picolibc inherited code for a *lot* of architectures from newlib, but

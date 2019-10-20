@@ -58,6 +58,7 @@ general_srcs_stdio = [
   'freopen.c',
   'fscanf.c',
   'fseek.c',
+  'fseeko.c',
   'fsetpos.c',
   'ftell.c',
   'fvwrite.c',
