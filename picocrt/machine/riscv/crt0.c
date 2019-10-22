@@ -34,8 +34,9 @@
  */
 
 #include "../../crt0.h"
+#include <sys/cdefs.h>
 
-void __attribute((naked))
+void __attribute((naked)) __section(".text.init.enter")
 _start(void)
 {
 	asm(".option push\n.option norelax\nla gp, __global_pointer$\n.option pop");
