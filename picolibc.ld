@@ -68,6 +68,7 @@ SECTIONS
 
 	.init : {
 		KEEP (*(.text.init.enter))
+		KEEP (*(.data.init.enter))
 		KEEP (*(SORT_BY_NAME(.init) SORT_BY_NAME(.init.*)))
 	} >flash AT>flash :text
 
