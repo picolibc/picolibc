@@ -798,6 +798,70 @@ const _RDATA _device dev_storage[] =
   {"/dev/ttyS61", BRACK(FHDEV(DEV_SERIAL_MAJOR, 61)), "\\??\\COM62", exists_ntdev, S_IFCHR, true},
   {"/dev/ttyS62", BRACK(FHDEV(DEV_SERIAL_MAJOR, 62)), "\\??\\COM63", exists_ntdev, S_IFCHR, true},
   {"/dev/ttyS63", BRACK(FHDEV(DEV_SERIAL_MAJOR, 63)), "\\??\\COM64", exists_ntdev, S_IFCHR, true},
+  {"/dev/ttyS64", BRACK(FHDEV(DEV_SERIAL_MAJOR, 64)), "\\??\\COM65", exists_ntdev, S_IFCHR, true},
+  {"/dev/ttyS65", BRACK(FHDEV(DEV_SERIAL_MAJOR, 65)), "\\??\\COM66", exists_ntdev, S_IFCHR, true},
+  {"/dev/ttyS66", BRACK(FHDEV(DEV_SERIAL_MAJOR, 66)), "\\??\\COM67", exists_ntdev, S_IFCHR, true},
+  {"/dev/ttyS67", BRACK(FHDEV(DEV_SERIAL_MAJOR, 67)), "\\??\\COM68", exists_ntdev, S_IFCHR, true},
+  {"/dev/ttyS68", BRACK(FHDEV(DEV_SERIAL_MAJOR, 68)), "\\??\\COM69", exists_ntdev, S_IFCHR, true},
+  {"/dev/ttyS69", BRACK(FHDEV(DEV_SERIAL_MAJOR, 69)), "\\??\\COM70", exists_ntdev, S_IFCHR, true},
+  {"/dev/ttyS70", BRACK(FHDEV(DEV_SERIAL_MAJOR, 70)), "\\??\\COM71", exists_ntdev, S_IFCHR, true},
+  {"/dev/ttyS71", BRACK(FHDEV(DEV_SERIAL_MAJOR, 71)), "\\??\\COM72", exists_ntdev, S_IFCHR, true},
+  {"/dev/ttyS72", BRACK(FHDEV(DEV_SERIAL_MAJOR, 72)), "\\??\\COM73", exists_ntdev, S_IFCHR, true},
+  {"/dev/ttyS73", BRACK(FHDEV(DEV_SERIAL_MAJOR, 73)), "\\??\\COM74", exists_ntdev, S_IFCHR, true},
+  {"/dev/ttyS74", BRACK(FHDEV(DEV_SERIAL_MAJOR, 74)), "\\??\\COM75", exists_ntdev, S_IFCHR, true},
+  {"/dev/ttyS75", BRACK(FHDEV(DEV_SERIAL_MAJOR, 75)), "\\??\\COM76", exists_ntdev, S_IFCHR, true},
+  {"/dev/ttyS76", BRACK(FHDEV(DEV_SERIAL_MAJOR, 76)), "\\??\\COM77", exists_ntdev, S_IFCHR, true},
+  {"/dev/ttyS77", BRACK(FHDEV(DEV_SERIAL_MAJOR, 77)), "\\??\\COM78", exists_ntdev, S_IFCHR, true},
+  {"/dev/ttyS78", BRACK(FHDEV(DEV_SERIAL_MAJOR, 78)), "\\??\\COM79", exists_ntdev, S_IFCHR, true},
+  {"/dev/ttyS79", BRACK(FHDEV(DEV_SERIAL_MAJOR, 79)), "\\??\\COM80", exists_ntdev, S_IFCHR, true},
+  {"/dev/ttyS80", BRACK(FHDEV(DEV_SERIAL_MAJOR, 80)), "\\??\\COM81", exists_ntdev, S_IFCHR, true},
+  {"/dev/ttyS81", BRACK(FHDEV(DEV_SERIAL_MAJOR, 81)), "\\??\\COM82", exists_ntdev, S_IFCHR, true},
+  {"/dev/ttyS82", BRACK(FHDEV(DEV_SERIAL_MAJOR, 82)), "\\??\\COM83", exists_ntdev, S_IFCHR, true},
+  {"/dev/ttyS83", BRACK(FHDEV(DEV_SERIAL_MAJOR, 83)), "\\??\\COM84", exists_ntdev, S_IFCHR, true},
+  {"/dev/ttyS84", BRACK(FHDEV(DEV_SERIAL_MAJOR, 84)), "\\??\\COM85", exists_ntdev, S_IFCHR, true},
+  {"/dev/ttyS85", BRACK(FHDEV(DEV_SERIAL_MAJOR, 85)), "\\??\\COM86", exists_ntdev, S_IFCHR, true},
+  {"/dev/ttyS86", BRACK(FHDEV(DEV_SERIAL_MAJOR, 86)), "\\??\\COM87", exists_ntdev, S_IFCHR, true},
+  {"/dev/ttyS87", BRACK(FHDEV(DEV_SERIAL_MAJOR, 87)), "\\??\\COM88", exists_ntdev, S_IFCHR, true},
+  {"/dev/ttyS88", BRACK(FHDEV(DEV_SERIAL_MAJOR, 88)), "\\??\\COM89", exists_ntdev, S_IFCHR, true},
+  {"/dev/ttyS89", BRACK(FHDEV(DEV_SERIAL_MAJOR, 89)), "\\??\\COM90", exists_ntdev, S_IFCHR, true},
+  {"/dev/ttyS90", BRACK(FHDEV(DEV_SERIAL_MAJOR, 90)), "\\??\\COM91", exists_ntdev, S_IFCHR, true},
+  {"/dev/ttyS91", BRACK(FHDEV(DEV_SERIAL_MAJOR, 91)), "\\??\\COM92", exists_ntdev, S_IFCHR, true},
+  {"/dev/ttyS92", BRACK(FHDEV(DEV_SERIAL_MAJOR, 92)), "\\??\\COM93", exists_ntdev, S_IFCHR, true},
+  {"/dev/ttyS93", BRACK(FHDEV(DEV_SERIAL_MAJOR, 93)), "\\??\\COM94", exists_ntdev, S_IFCHR, true},
+  {"/dev/ttyS94", BRACK(FHDEV(DEV_SERIAL_MAJOR, 94)), "\\??\\COM95", exists_ntdev, S_IFCHR, true},
+  {"/dev/ttyS95", BRACK(FHDEV(DEV_SERIAL_MAJOR, 95)), "\\??\\COM96", exists_ntdev, S_IFCHR, true},
+  {"/dev/ttyS96", BRACK(FHDEV(DEV_SERIAL_MAJOR, 96)), "\\??\\COM97", exists_ntdev, S_IFCHR, true},
+  {"/dev/ttyS97", BRACK(FHDEV(DEV_SERIAL_MAJOR, 97)), "\\??\\COM98", exists_ntdev, S_IFCHR, true},
+  {"/dev/ttyS98", BRACK(FHDEV(DEV_SERIAL_MAJOR, 98)), "\\??\\COM99", exists_ntdev, S_IFCHR, true},
+  {"/dev/ttyS99", BRACK(FHDEV(DEV_SERIAL_MAJOR, 99)), "\\??\\COM100", exists_ntdev, S_IFCHR, true},
+  {"/dev/ttyS100", BRACK(FHDEV(DEV_SERIAL_MAJOR, 100)), "\\??\\COM101", exists_ntdev, S_IFCHR, true},
+  {"/dev/ttyS101", BRACK(FHDEV(DEV_SERIAL_MAJOR, 101)), "\\??\\COM102", exists_ntdev, S_IFCHR, true},
+  {"/dev/ttyS102", BRACK(FHDEV(DEV_SERIAL_MAJOR, 102)), "\\??\\COM103", exists_ntdev, S_IFCHR, true},
+  {"/dev/ttyS103", BRACK(FHDEV(DEV_SERIAL_MAJOR, 103)), "\\??\\COM104", exists_ntdev, S_IFCHR, true},
+  {"/dev/ttyS104", BRACK(FHDEV(DEV_SERIAL_MAJOR, 104)), "\\??\\COM105", exists_ntdev, S_IFCHR, true},
+  {"/dev/ttyS105", BRACK(FHDEV(DEV_SERIAL_MAJOR, 105)), "\\??\\COM106", exists_ntdev, S_IFCHR, true},
+  {"/dev/ttyS106", BRACK(FHDEV(DEV_SERIAL_MAJOR, 106)), "\\??\\COM107", exists_ntdev, S_IFCHR, true},
+  {"/dev/ttyS107", BRACK(FHDEV(DEV_SERIAL_MAJOR, 107)), "\\??\\COM108", exists_ntdev, S_IFCHR, true},
+  {"/dev/ttyS108", BRACK(FHDEV(DEV_SERIAL_MAJOR, 108)), "\\??\\COM109", exists_ntdev, S_IFCHR, true},
+  {"/dev/ttyS109", BRACK(FHDEV(DEV_SERIAL_MAJOR, 109)), "\\??\\COM110", exists_ntdev, S_IFCHR, true},
+  {"/dev/ttyS110", BRACK(FHDEV(DEV_SERIAL_MAJOR, 110)), "\\??\\COM111", exists_ntdev, S_IFCHR, true},
+  {"/dev/ttyS111", BRACK(FHDEV(DEV_SERIAL_MAJOR, 111)), "\\??\\COM112", exists_ntdev, S_IFCHR, true},
+  {"/dev/ttyS112", BRACK(FHDEV(DEV_SERIAL_MAJOR, 112)), "\\??\\COM113", exists_ntdev, S_IFCHR, true},
+  {"/dev/ttyS113", BRACK(FHDEV(DEV_SERIAL_MAJOR, 113)), "\\??\\COM114", exists_ntdev, S_IFCHR, true},
+  {"/dev/ttyS114", BRACK(FHDEV(DEV_SERIAL_MAJOR, 114)), "\\??\\COM115", exists_ntdev, S_IFCHR, true},
+  {"/dev/ttyS115", BRACK(FHDEV(DEV_SERIAL_MAJOR, 115)), "\\??\\COM116", exists_ntdev, S_IFCHR, true},
+  {"/dev/ttyS116", BRACK(FHDEV(DEV_SERIAL_MAJOR, 116)), "\\??\\COM117", exists_ntdev, S_IFCHR, true},
+  {"/dev/ttyS117", BRACK(FHDEV(DEV_SERIAL_MAJOR, 117)), "\\??\\COM118", exists_ntdev, S_IFCHR, true},
+  {"/dev/ttyS118", BRACK(FHDEV(DEV_SERIAL_MAJOR, 118)), "\\??\\COM119", exists_ntdev, S_IFCHR, true},
+  {"/dev/ttyS119", BRACK(FHDEV(DEV_SERIAL_MAJOR, 119)), "\\??\\COM120", exists_ntdev, S_IFCHR, true},
+  {"/dev/ttyS120", BRACK(FHDEV(DEV_SERIAL_MAJOR, 120)), "\\??\\COM121", exists_ntdev, S_IFCHR, true},
+  {"/dev/ttyS121", BRACK(FHDEV(DEV_SERIAL_MAJOR, 121)), "\\??\\COM122", exists_ntdev, S_IFCHR, true},
+  {"/dev/ttyS122", BRACK(FHDEV(DEV_SERIAL_MAJOR, 122)), "\\??\\COM123", exists_ntdev, S_IFCHR, true},
+  {"/dev/ttyS123", BRACK(FHDEV(DEV_SERIAL_MAJOR, 123)), "\\??\\COM124", exists_ntdev, S_IFCHR, true},
+  {"/dev/ttyS124", BRACK(FHDEV(DEV_SERIAL_MAJOR, 124)), "\\??\\COM125", exists_ntdev, S_IFCHR, true},
+  {"/dev/ttyS125", BRACK(FHDEV(DEV_SERIAL_MAJOR, 125)), "\\??\\COM126", exists_ntdev, S_IFCHR, true},
+  {"/dev/ttyS126", BRACK(FHDEV(DEV_SERIAL_MAJOR, 126)), "\\??\\COM127", exists_ntdev, S_IFCHR, true},
+  {"/dev/ttyS127", BRACK(FHDEV(DEV_SERIAL_MAJOR, 127)), "\\??\\COM128", exists_ntdev, S_IFCHR, true},
   {"/dev/urandom", BRACK(FH_URANDOM), "\\Device\\Null", exists_ntdev, S_IFCHR, true},
   {"/dev/windows", BRACK(FH_WINDOWS), "\\Device\\Null", exists_ntdev, S_IFCHR, true},
   {"/dev/zero", BRACK(FH_ZERO), "\\Device\\Null", exists_ntdev, S_IFCHR, true},
@@ -935,9 +999,9 @@ const _RDATA _device dev_storage[] =
 
 const _device *cons_dev = dev_storage + 20;
 const _device *console_dev = dev_storage + 148;
-const _device *ptym_dev = dev_storage + 656;
+const _device *ptym_dev = dev_storage + 720;
 const _device *ptys_dev = dev_storage + 297;
-const _device *urandom_dev = dev_storage + 651;
+const _device *urandom_dev = dev_storage + 715;
 
 
 static KR_device_t KR_find_keyword (const char *KR_keyword, int KR_length)
@@ -967,7 +1031,7 @@ return	NULL;
           if (strncmp (KR_keyword, ":pipe", 5) == 0)
             {
 {
-return dev_storage + 655;
+return dev_storage + 719;
 
 }
             }
@@ -982,7 +1046,7 @@ return	NULL;
           if (strncmp (KR_keyword, ":fifo", 5) == 0)
             {
 {
-return dev_storage + 654;
+return dev_storage + 718;
 
 }
             }
@@ -1006,7 +1070,7 @@ return	NULL;
           if (strncmp (KR_keyword, ":ptym9", 6) == 0)
             {
 {
-return dev_storage + 665;
+return dev_storage + 729;
 
 }
             }
@@ -1021,7 +1085,7 @@ return	NULL;
           if (strncmp (KR_keyword, ":ptym8", 6) == 0)
             {
 {
-return dev_storage + 664;
+return dev_storage + 728;
 
 }
             }
@@ -1036,7 +1100,7 @@ return	NULL;
           if (strncmp (KR_keyword, ":ptym7", 6) == 0)
             {
 {
-return dev_storage + 663;
+return dev_storage + 727;
 
 }
             }
@@ -1051,7 +1115,7 @@ return	NULL;
           if (strncmp (KR_keyword, ":ptym6", 6) == 0)
             {
 {
-return dev_storage + 662;
+return dev_storage + 726;
 
 }
             }
@@ -1066,7 +1130,7 @@ return	NULL;
           if (strncmp (KR_keyword, ":ptym5", 6) == 0)
             {
 {
-return dev_storage + 661;
+return dev_storage + 725;
 
 }
             }
@@ -1081,7 +1145,7 @@ return	NULL;
           if (strncmp (KR_keyword, ":ptym4", 6) == 0)
             {
 {
-return dev_storage + 660;
+return dev_storage + 724;
 
 }
             }
@@ -1096,7 +1160,7 @@ return	NULL;
           if (strncmp (KR_keyword, ":ptym3", 6) == 0)
             {
 {
-return dev_storage + 659;
+return dev_storage + 723;
 
 }
             }
@@ -1111,7 +1175,7 @@ return	NULL;
           if (strncmp (KR_keyword, ":ptym2", 6) == 0)
             {
 {
-return dev_storage + 658;
+return dev_storage + 722;
 
 }
             }
@@ -1126,7 +1190,7 @@ return	NULL;
           if (strncmp (KR_keyword, ":ptym1", 6) == 0)
             {
 {
-return dev_storage + 657;
+return dev_storage + 721;
 
 }
             }
@@ -1141,7 +1205,7 @@ return	NULL;
           if (strncmp (KR_keyword, ":ptym0", 6) == 0)
             {
 {
-return dev_storage + 656;
+return dev_storage + 720;
 
 }
             }
@@ -1168,7 +1232,7 @@ return	NULL;
               if (strncmp (KR_keyword, ":ptym99", 7) == 0)
                 {
 {
-return dev_storage + 755;
+return dev_storage + 819;
 
 }
                 }
@@ -1183,7 +1247,7 @@ return	NULL;
               if (strncmp (KR_keyword, ":ptym98", 7) == 0)
                 {
 {
-return dev_storage + 754;
+return dev_storage + 818;
 
 }
                 }
@@ -1198,7 +1262,7 @@ return	NULL;
               if (strncmp (KR_keyword, ":ptym97", 7) == 0)
                 {
 {
-return dev_storage + 753;
+return dev_storage + 817;
 
 }
                 }
@@ -1213,7 +1277,7 @@ return	NULL;
               if (strncmp (KR_keyword, ":ptym96", 7) == 0)
                 {
 {
-return dev_storage + 752;
+return dev_storage + 816;
 
 }
                 }
@@ -1228,7 +1292,7 @@ return	NULL;
               if (strncmp (KR_keyword, ":ptym95", 7) == 0)
                 {
 {
-return dev_storage + 751;
+return dev_storage + 815;
 
 }
                 }
@@ -1243,7 +1307,7 @@ return	NULL;
               if (strncmp (KR_keyword, ":ptym94", 7) == 0)
                 {
 {
-return dev_storage + 750;
+return dev_storage + 814;
 
 }
                 }
@@ -1258,7 +1322,7 @@ return	NULL;
               if (strncmp (KR_keyword, ":ptym93", 7) == 0)
                 {
 {
-return dev_storage + 749;
+return dev_storage + 813;
 
 }
                 }
@@ -1273,7 +1337,7 @@ return	NULL;
               if (strncmp (KR_keyword, ":ptym92", 7) == 0)
                 {
 {
-return dev_storage + 748;
+return dev_storage + 812;
 
 }
                 }
@@ -1288,7 +1352,7 @@ return	NULL;
               if (strncmp (KR_keyword, ":ptym91", 7) == 0)
                 {
 {
-return dev_storage + 747;
+return dev_storage + 811;
 
 }
                 }
@@ -1303,7 +1367,7 @@ return	NULL;
               if (strncmp (KR_keyword, ":ptym90", 7) == 0)
                 {
 {
-return dev_storage + 746;
+return dev_storage + 810;
 
 }
                 }
@@ -1327,7 +1391,7 @@ return	NULL;
               if (strncmp (KR_keyword, ":ptym89", 7) == 0)
                 {
 {
-return dev_storage + 745;
+return dev_storage + 809;
 
 }
                 }
@@ -1342,7 +1406,7 @@ return	NULL;
               if (strncmp (KR_keyword, ":ptym88", 7) == 0)
                 {
 {
-return dev_storage + 744;
+return dev_storage + 808;
 
 }
                 }
@@ -1357,7 +1421,7 @@ return	NULL;
               if (strncmp (KR_keyword, ":ptym87", 7) == 0)
                 {
 {
-return dev_storage + 743;
+return dev_storage + 807;
 
 }
                 }
@@ -1372,7 +1436,7 @@ return	NULL;
               if (strncmp (KR_keyword, ":ptym86", 7) == 0)
                 {
 {
-return dev_storage + 742;
+return dev_storage + 806;
 
 }
                 }
@@ -1387,7 +1451,7 @@ return	NULL;
               if (strncmp (KR_keyword, ":ptym85", 7) == 0)
                 {
 {
-return dev_storage + 741;
+return dev_storage + 805;
 
 }
                 }
@@ -1402,7 +1466,7 @@ return	NULL;
               if (strncmp (KR_keyword, ":ptym84", 7) == 0)
                 {
 {
-return dev_storage + 740;
+return dev_storage + 804;
 
 }
                 }
@@ -1417,7 +1481,7 @@ return	NULL;
               if (strncmp (KR_keyword, ":ptym83", 7) == 0)
                 {
 {
-return dev_storage + 739;
+return dev_storage + 803;
 
 }
                 }
@@ -1432,7 +1496,7 @@ return	NULL;
               if (strncmp (KR_keyword, ":ptym82", 7) == 0)
                 {
 {
-return dev_storage + 738;
+return dev_storage + 802;
 
 }
                 }
@@ -1447,7 +1511,7 @@ return	NULL;
               if (strncmp (KR_keyword, ":ptym81", 7) == 0)
                 {
 {
-return dev_storage + 737;
+return dev_storage + 801;
 
 }
                 }
@@ -1462,7 +1526,7 @@ return	NULL;
               if (strncmp (KR_keyword, ":ptym80", 7) == 0)
                 {
 {
-return dev_storage + 736;
+return dev_storage + 800;
 
 }
                 }
@@ -1486,7 +1550,7 @@ return	NULL;
               if (strncmp (KR_keyword, ":ptym79", 7) == 0)
                 {
 {
-return dev_storage + 735;
+return dev_storage + 799;
 
 }
                 }
@@ -1501,7 +1565,7 @@ return	NULL;
               if (strncmp (KR_keyword, ":ptym78", 7) == 0)
                 {
 {
-return dev_storage + 734;
+return dev_storage + 798;
 
 }
                 }
@@ -1516,7 +1580,7 @@ return	NULL;
               if (strncmp (KR_keyword, ":ptym77", 7) == 0)
                 {
 {
-return dev_storage + 733;
+return dev_storage + 797;
 
 }
                 }
@@ -1531,7 +1595,7 @@ return	NULL;
               if (strncmp (KR_keyword, ":ptym76", 7) == 0)
                 {
 {
-return dev_storage + 732;
+return dev_storage + 796;
 
 }
                 }
@@ -1546,7 +1610,7 @@ return	NULL;
               if (strncmp (KR_keyword, ":ptym75", 7) == 0)
                 {
 {
-return dev_storage + 731;
+return dev_storage + 795;
 
 }
                 }
@@ -1561,7 +1625,7 @@ return	NULL;
               if (strncmp (KR_keyword, ":ptym74", 7) == 0)
                 {
 {
-return dev_storage + 730;
+return dev_storage + 794;
 
 }
                 }
@@ -1576,7 +1640,7 @@ return	NULL;
               if (strncmp (KR_keyword, ":ptym73", 7) == 0)
                 {
 {
-return dev_storage + 729;
+return dev_storage + 793;
 
 }
                 }
@@ -1591,7 +1655,7 @@ return	NULL;
               if (strncmp (KR_keyword, ":ptym72", 7) == 0)
                 {
 {
-return dev_storage + 728;
+return dev_storage + 792;
 
 }
                 }
@@ -1606,7 +1670,7 @@ return	NULL;
               if (strncmp (KR_keyword, ":ptym71", 7) == 0)
                 {
 {
-return dev_storage + 727;
+return dev_storage + 791;
 
 }
                 }
@@ -1621,7 +1685,7 @@ return	NULL;
               if (strncmp (KR_keyword, ":ptym70", 7) == 0)
                 {
 {
-return dev_storage + 726;
+return dev_storage + 790;
 
 }
                 }
@@ -1645,7 +1709,7 @@ return	NULL;
               if (strncmp (KR_keyword, ":ptym69", 7) == 0)
                 {
 {
-return dev_storage + 725;
+return dev_storage + 789;
 
 }
                 }
@@ -1660,7 +1724,7 @@ return	NULL;
               if (strncmp (KR_keyword, ":ptym68", 7) == 0)
                 {
 {
-return dev_storage + 724;
+return dev_storage + 788;
 
 }
                 }
@@ -1675,7 +1739,7 @@ return	NULL;
               if (strncmp (KR_keyword, ":ptym67", 7) == 0)
                 {
 {
-return dev_storage + 723;
+return dev_storage + 787;
 
 }
                 }
@@ -1690,7 +1754,7 @@ return	NULL;
               if (strncmp (KR_keyword, ":ptym66", 7) == 0)
                 {
 {
-return dev_storage + 722;
+return dev_storage + 786;
 
 }
                 }
@@ -1705,7 +1769,7 @@ return	NULL;
               if (strncmp (KR_keyword, ":ptym65", 7) == 0)
                 {
 {
-return dev_storage + 721;
+return dev_storage + 785;
 
 }
                 }
@@ -1720,7 +1784,7 @@ return	NULL;
               if (strncmp (KR_keyword, ":ptym64", 7) == 0)
                 {
 {
-return dev_storage + 720;
+return dev_storage + 784;
 
 }
                 }
@@ -1735,7 +1799,7 @@ return	NULL;
               if (strncmp (KR_keyword, ":ptym63", 7) == 0)
                 {
 {
-return dev_storage + 719;
+return dev_storage + 783;
 
 }
                 }
@@ -1750,7 +1814,7 @@ return	NULL;
               if (strncmp (KR_keyword, ":ptym62", 7) == 0)
                 {
 {
-return dev_storage + 718;
+return dev_storage + 782;
 
 }
                 }
@@ -1765,7 +1829,7 @@ return	NULL;
               if (strncmp (KR_keyword, ":ptym61", 7) == 0)
                 {
 {
-return dev_storage + 717;
+return dev_storage + 781;
 
 }
                 }
@@ -1780,7 +1844,7 @@ return	NULL;
               if (strncmp (KR_keyword, ":ptym60", 7) == 0)
                 {
 {
-return dev_storage + 716;
+return dev_storage + 780;
 
 }
                 }
@@ -1804,7 +1868,7 @@ return	NULL;
               if (strncmp (KR_keyword, ":ptym59", 7) == 0)
                 {
 {
-return dev_storage + 715;
+return dev_storage + 779;
 
 }
                 }
@@ -1819,7 +1883,7 @@ return	NULL;
               if (strncmp (KR_keyword, ":ptym58", 7) == 0)
                 {
 {
-return dev_storage + 714;
+return dev_storage + 778;
 
 }
                 }
@@ -1834,7 +1898,7 @@ return	NULL;
               if (strncmp (KR_keyword, ":ptym57", 7) == 0)
                 {
 {
-return dev_storage + 713;
+return dev_storage + 777;
 
 }
                 }
@@ -1849,7 +1913,7 @@ return	NULL;
               if (strncmp (KR_keyword, ":ptym56", 7) == 0)
                 {
 {
-return dev_storage + 712;
+return dev_storage + 776;
 
 }
                 }
@@ -1864,7 +1928,7 @@ return	NULL;
               if (strncmp (KR_keyword, ":ptym55", 7) == 0)
                 {
 {
-return dev_storage + 711;
+return dev_storage + 775;
 
 }
                 }
@@ -1879,7 +1943,7 @@ return	NULL;
               if (strncmp (KR_keyword, ":ptym54", 7) == 0)
                 {
 {
-return dev_storage + 710;
+return dev_storage + 774;
 
 }
                 }
@@ -1894,7 +1958,7 @@ return	NULL;
               if (strncmp (KR_keyword, ":ptym53", 7) == 0)
                 {
 {
-return dev_storage + 709;
+return dev_storage + 773;
 
 }
                 }
@@ -1909,7 +1973,7 @@ return	NULL;
               if (strncmp (KR_keyword, ":ptym52", 7) == 0)
                 {
 {
-return dev_storage + 708;
+return dev_storage + 772;
 
 }
                 }
@@ -1924,7 +1988,7 @@ return	NULL;
               if (strncmp (KR_keyword, ":ptym51", 7) == 0)
                 {
 {
-return dev_storage + 707;
+return dev_storage + 771;
 
 }
                 }
@@ -1939,7 +2003,7 @@ return	NULL;
               if (strncmp (KR_keyword, ":ptym50", 7) == 0)
                 {
 {
-return dev_storage + 706;
+return dev_storage + 770;
 
 }
                 }
@@ -1963,7 +2027,7 @@ return	NULL;
               if (strncmp (KR_keyword, ":ptym49", 7) == 0)
                 {
 {
-return dev_storage + 705;
+return dev_storage + 769;
 
 }
                 }
@@ -1978,7 +2042,7 @@ return	NULL;
               if (strncmp (KR_keyword, ":ptym48", 7) == 0)
                 {
 {
-return dev_storage + 704;
+return dev_storage + 768;
 
 }
                 }
@@ -1993,7 +2057,7 @@ return	NULL;
               if (strncmp (KR_keyword, ":ptym47", 7) == 0)
                 {
 {
-return dev_storage + 703;
+return dev_storage + 767;
 
 }
                 }
@@ -2008,7 +2072,7 @@ return	NULL;
               if (strncmp (KR_keyword, ":ptym46", 7) == 0)
                 {
 {
-return dev_storage + 702;
+return dev_storage + 766;
 
 }
                 }
@@ -2023,7 +2087,7 @@ return	NULL;
               if (strncmp (KR_keyword, ":ptym45", 7) == 0)
                 {
 {
-return dev_storage + 701;
+return dev_storage + 765;
 
 }
                 }
@@ -2038,7 +2102,7 @@ return	NULL;
               if (strncmp (KR_keyword, ":ptym44", 7) == 0)
                 {
 {
-return dev_storage + 700;
+return dev_storage + 764;
 
 }
                 }
@@ -2053,7 +2117,7 @@ return	NULL;
               if (strncmp (KR_keyword, ":ptym43", 7) == 0)
                 {
 {
-return dev_storage + 699;
+return dev_storage + 763;
 
 }
                 }
@@ -2068,7 +2132,7 @@ return	NULL;
               if (strncmp (KR_keyword, ":ptym42", 7) == 0)
                 {
 {
-return dev_storage + 698;
+return dev_storage + 762;
 
 }
                 }
@@ -2083,7 +2147,7 @@ return	NULL;
               if (strncmp (KR_keyword, ":ptym41", 7) == 0)
                 {
 {
-return dev_storage + 697;
+return dev_storage + 761;
 
 }
                 }
@@ -2098,7 +2162,7 @@ return	NULL;
               if (strncmp (KR_keyword, ":ptym40", 7) == 0)
                 {
 {
-return dev_storage + 696;
+return dev_storage + 760;
 
 }
                 }
@@ -2122,7 +2186,7 @@ return	NULL;
               if (strncmp (KR_keyword, ":ptym39", 7) == 0)
                 {
 {
-return dev_storage + 695;
+return dev_storage + 759;
 
 }
                 }
@@ -2137,7 +2201,7 @@ return	NULL;
               if (strncmp (KR_keyword, ":ptym38", 7) == 0)
                 {
 {
-return dev_storage + 694;
+return dev_storage + 758;
 
 }
                 }
@@ -2152,7 +2216,7 @@ return	NULL;
               if (strncmp (KR_keyword, ":ptym37", 7) == 0)
                 {
 {
-return dev_storage + 693;
+return dev_storage + 757;
 
 }
                 }
@@ -2167,7 +2231,7 @@ return	NULL;
               if (strncmp (KR_keyword, ":ptym36", 7) == 0)
                 {
 {
-return dev_storage + 692;
+return dev_storage + 756;
 
 }
                 }
@@ -2182,7 +2246,7 @@ return	NULL;
               if (strncmp (KR_keyword, ":ptym35", 7) == 0)
                 {
 {
-return dev_storage + 691;
+return dev_storage + 755;
 
 }
                 }
@@ -2197,7 +2261,7 @@ return	NULL;
               if (strncmp (KR_keyword, ":ptym34", 7) == 0)
                 {
 {
-return dev_storage + 690;
+return dev_storage + 754;
 
 }
                 }
@@ -2212,7 +2276,7 @@ return	NULL;
               if (strncmp (KR_keyword, ":ptym33", 7) == 0)
                 {
 {
-return dev_storage + 689;
+return dev_storage + 753;
 
 }
                 }
@@ -2227,7 +2291,7 @@ return	NULL;
               if (strncmp (KR_keyword, ":ptym32", 7) == 0)
                 {
 {
-return dev_storage + 688;
+return dev_storage + 752;
 
 }
                 }
@@ -2242,7 +2306,7 @@ return	NULL;
               if (strncmp (KR_keyword, ":ptym31", 7) == 0)
                 {
 {
-return dev_storage + 687;
+return dev_storage + 751;
 
 }
                 }
@@ -2257,7 +2321,7 @@ return	NULL;
               if (strncmp (KR_keyword, ":ptym30", 7) == 0)
                 {
 {
-return dev_storage + 686;
+return dev_storage + 750;
 
 }
                 }
@@ -2281,7 +2345,7 @@ return	NULL;
               if (strncmp (KR_keyword, ":ptym29", 7) == 0)
                 {
 {
-return dev_storage + 685;
+return dev_storage + 749;
 
 }
                 }
@@ -2296,7 +2360,7 @@ return	NULL;
               if (strncmp (KR_keyword, ":ptym28", 7) == 0)
                 {
 {
-return dev_storage + 684;
+return dev_storage + 748;
 
 }
                 }
@@ -2311,7 +2375,7 @@ return	NULL;
               if (strncmp (KR_keyword, ":ptym27", 7) == 0)
                 {
 {
-return dev_storage + 683;
+return dev_storage + 747;
 
 }
                 }
@@ -2326,7 +2390,7 @@ return	NULL;
               if (strncmp (KR_keyword, ":ptym26", 7) == 0)
                 {
 {
-return dev_storage + 682;
+return dev_storage + 746;
 
 }
                 }
@@ -2341,7 +2405,7 @@ return	NULL;
               if (strncmp (KR_keyword, ":ptym25", 7) == 0)
                 {
 {
-return dev_storage + 681;
+return dev_storage + 745;
 
 }
                 }
@@ -2356,7 +2420,7 @@ return	NULL;
               if (strncmp (KR_keyword, ":ptym24", 7) == 0)
                 {
 {
-return dev_storage + 680;
+return dev_storage + 744;
 
 }
                 }
@@ -2371,7 +2435,7 @@ return	NULL;
               if (strncmp (KR_keyword, ":ptym23", 7) == 0)
                 {
 {
-return dev_storage + 679;
+return dev_storage + 743;
 
 }
                 }
@@ -2386,7 +2450,7 @@ return	NULL;
               if (strncmp (KR_keyword, ":ptym22", 7) == 0)
                 {
 {
-return dev_storage + 678;
+return dev_storage + 742;
 
 }
                 }
@@ -2401,7 +2465,7 @@ return	NULL;
               if (strncmp (KR_keyword, ":ptym21", 7) == 0)
                 {
 {
-return dev_storage + 677;
+return dev_storage + 741;
 
 }
                 }
@@ -2416,7 +2480,7 @@ return	NULL;
               if (strncmp (KR_keyword, ":ptym20", 7) == 0)
                 {
 {
-return dev_storage + 676;
+return dev_storage + 740;
 
 }
                 }
@@ -2440,7 +2504,7 @@ return	NULL;
               if (strncmp (KR_keyword, ":ptym19", 7) == 0)
                 {
 {
-return dev_storage + 675;
+return dev_storage + 739;
 
 }
                 }
@@ -2455,7 +2519,7 @@ return	NULL;
               if (strncmp (KR_keyword, ":ptym18", 7) == 0)
                 {
 {
-return dev_storage + 674;
+return dev_storage + 738;
 
 }
                 }
@@ -2470,7 +2534,7 @@ return	NULL;
               if (strncmp (KR_keyword, ":ptym17", 7) == 0)
                 {
 {
-return dev_storage + 673;
+return dev_storage + 737;
 
 }
                 }
@@ -2485,7 +2549,7 @@ return	NULL;
               if (strncmp (KR_keyword, ":ptym16", 7) == 0)
                 {
 {
-return dev_storage + 672;
+return dev_storage + 736;
 
 }
                 }
@@ -2500,7 +2564,7 @@ return	NULL;
               if (strncmp (KR_keyword, ":ptym15", 7) == 0)
                 {
 {
-return dev_storage + 671;
+return dev_storage + 735;
 
 }
                 }
@@ -2515,7 +2579,7 @@ return	NULL;
               if (strncmp (KR_keyword, ":ptym14", 7) == 0)
                 {
 {
-return dev_storage + 670;
+return dev_storage + 734;
 
 }
                 }
@@ -2530,7 +2594,7 @@ return	NULL;
               if (strncmp (KR_keyword, ":ptym13", 7) == 0)
                 {
 {
-return dev_storage + 669;
+return dev_storage + 733;
 
 }
                 }
@@ -2545,7 +2609,7 @@ return	NULL;
               if (strncmp (KR_keyword, ":ptym12", 7) == 0)
                 {
 {
-return dev_storage + 668;
+return dev_storage + 732;
 
 }
                 }
@@ -2560,7 +2624,7 @@ return	NULL;
               if (strncmp (KR_keyword, ":ptym11", 7) == 0)
                 {
 {
-return dev_storage + 667;
+return dev_storage + 731;
 
 }
                 }
@@ -2575,7 +2639,7 @@ return	NULL;
               if (strncmp (KR_keyword, ":ptym10", 7) == 0)
                 {
 {
-return dev_storage + 666;
+return dev_storage + 730;
 
 }
                 }
@@ -2683,7 +2747,7 @@ return	NULL;
               if (strncmp (KR_keyword, ":ptym119", 8) == 0)
                 {
 {
-return dev_storage + 775;
+return dev_storage + 839;
 
 }
                 }
@@ -2698,7 +2762,7 @@ return	NULL;
               if (strncmp (KR_keyword, ":ptym109", 8) == 0)
                 {
 {
-return dev_storage + 765;
+return dev_storage + 829;
 
 }
                 }
@@ -2767,7 +2831,7 @@ return	NULL;
               if (strncmp (KR_keyword, ":ptym118", 8) == 0)
                 {
 {
-return dev_storage + 774;
+return dev_storage + 838;
 
 }
                 }
@@ -2782,7 +2846,7 @@ return	NULL;
               if (strncmp (KR_keyword, ":ptym108", 8) == 0)
                 {
 {
-return dev_storage + 764;
+return dev_storage + 828;
 
 }
                 }
@@ -2851,7 +2915,7 @@ return	NULL;
               if (strncmp (KR_keyword, ":ptym127", 8) == 0)
                 {
 {
-return dev_storage + 783;
+return dev_storage + 847;
 
 }
                 }
@@ -2866,7 +2930,7 @@ return	NULL;
               if (strncmp (KR_keyword, ":ptym117", 8) == 0)
                 {
 {
-return dev_storage + 773;
+return dev_storage + 837;
 
 }
                 }
@@ -2881,7 +2945,7 @@ return	NULL;
               if (strncmp (KR_keyword, ":ptym107", 8) == 0)
                 {
 {
-return dev_storage + 763;
+return dev_storage + 827;
 
 }
                 }
@@ -2950,7 +3014,7 @@ return	NULL;
               if (strncmp (KR_keyword, ":ptym126", 8) == 0)
                 {
 {
-return dev_storage + 782;
+return dev_storage + 846;
 
 }
                 }
@@ -2965,7 +3029,7 @@ return	NULL;
               if (strncmp (KR_keyword, ":ptym116", 8) == 0)
                 {
 {
-return dev_storage + 772;
+return dev_storage + 836;
 
 }
                 }
@@ -2980,7 +3044,7 @@ return	NULL;
               if (strncmp (KR_keyword, ":ptym106", 8) == 0)
                 {
 {
-return dev_storage + 762;
+return dev_storage + 826;
 
 }
                 }
@@ -3049,7 +3113,7 @@ return	NULL;
               if (strncmp (KR_keyword, ":ptym125", 8) == 0)
                 {
 {
-return dev_storage + 781;
+return dev_storage + 845;
 
 }
                 }
@@ -3064,7 +3128,7 @@ return	NULL;
               if (strncmp (KR_keyword, ":ptym115", 8) == 0)
                 {
 {
-return dev_storage + 771;
+return dev_storage + 835;
 
 }
                 }
@@ -3079,7 +3143,7 @@ return	NULL;
               if (strncmp (KR_keyword, ":ptym105", 8) == 0)
                 {
 {
-return dev_storage + 761;
+return dev_storage + 825;
 
 }
                 }
@@ -3148,7 +3212,7 @@ return	NULL;
               if (strncmp (KR_keyword, ":ptym124", 8) == 0)
                 {
 {
-return dev_storage + 780;
+return dev_storage + 844;
 
 }
                 }
@@ -3163,7 +3227,7 @@ return	NULL;
               if (strncmp (KR_keyword, ":ptym114", 8) == 0)
                 {
 {
-return dev_storage + 770;
+return dev_storage + 834;
 
 }
                 }
@@ -3178,7 +3242,7 @@ return	NULL;
               if (strncmp (KR_keyword, ":ptym104", 8) == 0)
                 {
 {
-return dev_storage + 760;
+return dev_storage + 824;
 
 }
                 }
@@ -3247,7 +3311,7 @@ return	NULL;
               if (strncmp (KR_keyword, ":ptym123", 8) == 0)
                 {
 {
-return dev_storage + 779;
+return dev_storage + 843;
 
 }
                 }
@@ -3262,7 +3326,7 @@ return	NULL;
               if (strncmp (KR_keyword, ":ptym113", 8) == 0)
                 {
 {
-return dev_storage + 769;
+return dev_storage + 833;
 
 }
                 }
@@ -3277,7 +3341,7 @@ return	NULL;
               if (strncmp (KR_keyword, ":ptym103", 8) == 0)
                 {
 {
-return dev_storage + 759;
+return dev_storage + 823;
 
 }
                 }
@@ -3346,7 +3410,7 @@ return	NULL;
               if (strncmp (KR_keyword, ":ptym122", 8) == 0)
                 {
 {
-return dev_storage + 778;
+return dev_storage + 842;
 
 }
                 }
@@ -3361,7 +3425,7 @@ return	NULL;
               if (strncmp (KR_keyword, ":ptym112", 8) == 0)
                 {
 {
-return dev_storage + 768;
+return dev_storage + 832;
 
 }
                 }
@@ -3376,7 +3440,7 @@ return	NULL;
               if (strncmp (KR_keyword, ":ptym102", 8) == 0)
                 {
 {
-return dev_storage + 758;
+return dev_storage + 822;
 
 }
                 }
@@ -3445,7 +3509,7 @@ return	NULL;
               if (strncmp (KR_keyword, ":ptym121", 8) == 0)
                 {
 {
-return dev_storage + 777;
+return dev_storage + 841;
 
 }
                 }
@@ -3460,7 +3524,7 @@ return	NULL;
               if (strncmp (KR_keyword, ":ptym111", 8) == 0)
                 {
 {
-return dev_storage + 767;
+return dev_storage + 831;
 
 }
                 }
@@ -3475,7 +3539,7 @@ return	NULL;
               if (strncmp (KR_keyword, ":ptym101", 8) == 0)
                 {
 {
-return dev_storage + 757;
+return dev_storage + 821;
 
 }
                 }
@@ -3544,7 +3608,7 @@ return	NULL;
               if (strncmp (KR_keyword, ":ptym120", 8) == 0)
                 {
 {
-return dev_storage + 776;
+return dev_storage + 840;
 
 }
                 }
@@ -3559,7 +3623,7 @@ return	NULL;
               if (strncmp (KR_keyword, ":ptym110", 8) == 0)
                 {
 {
-return dev_storage + 766;
+return dev_storage + 830;
 
 }
                 }
@@ -3574,7 +3638,7 @@ return	NULL;
               if (strncmp (KR_keyword, ":ptym100", 8) == 0)
                 {
 {
-return dev_storage + 756;
+return dev_storage + 820;
 
 }
                 }
@@ -3619,7 +3683,7 @@ return	NULL;
           if (strncmp (KR_keyword, "/dev/zero", 9) == 0)
             {
 {
-return dev_storage + 653;
+return dev_storage + 717;
 
 }
             }
@@ -9913,153 +9977,321 @@ return	NULL;
 }
             }
         case '9':
-          switch (KR_keyword [10])
+          switch (KR_keyword [5])
             {
-            case '9':
-              if (strncmp (KR_keyword, "/dev/cons99", 11) == 0)
+            case 't':
+              switch (KR_keyword [10])
                 {
+                case '9':
+                  if (strncmp (KR_keyword, "/dev/ttyS99", 11) == 0)
+                    {
+{
+return dev_storage + 686;
+
+}
+                    }
+                  else
+                    {
+{
+return	NULL;
+
+}
+                    }
+                case '8':
+                  if (strncmp (KR_keyword, "/dev/ttyS98", 11) == 0)
+                    {
+{
+return dev_storage + 685;
+
+}
+                    }
+                  else
+                    {
+{
+return	NULL;
+
+}
+                    }
+                case '7':
+                  if (strncmp (KR_keyword, "/dev/ttyS97", 11) == 0)
+                    {
+{
+return dev_storage + 684;
+
+}
+                    }
+                  else
+                    {
+{
+return	NULL;
+
+}
+                    }
+                case '6':
+                  if (strncmp (KR_keyword, "/dev/ttyS96", 11) == 0)
+                    {
+{
+return dev_storage + 683;
+
+}
+                    }
+                  else
+                    {
+{
+return	NULL;
+
+}
+                    }
+                case '5':
+                  if (strncmp (KR_keyword, "/dev/ttyS95", 11) == 0)
+                    {
+{
+return dev_storage + 682;
+
+}
+                    }
+                  else
+                    {
+{
+return	NULL;
+
+}
+                    }
+                case '4':
+                  if (strncmp (KR_keyword, "/dev/ttyS94", 11) == 0)
+                    {
+{
+return dev_storage + 681;
+
+}
+                    }
+                  else
+                    {
+{
+return	NULL;
+
+}
+                    }
+                case '3':
+                  if (strncmp (KR_keyword, "/dev/ttyS93", 11) == 0)
+                    {
+{
+return dev_storage + 680;
+
+}
+                    }
+                  else
+                    {
+{
+return	NULL;
+
+}
+                    }
+                case '2':
+                  if (strncmp (KR_keyword, "/dev/ttyS92", 11) == 0)
+                    {
+{
+return dev_storage + 679;
+
+}
+                    }
+                  else
+                    {
+{
+return	NULL;
+
+}
+                    }
+                case '1':
+                  if (strncmp (KR_keyword, "/dev/ttyS91", 11) == 0)
+                    {
+{
+return dev_storage + 678;
+
+}
+                    }
+                  else
+                    {
+{
+return	NULL;
+
+}
+                    }
+                case '0':
+                  if (strncmp (KR_keyword, "/dev/ttyS90", 11) == 0)
+                    {
+{
+return dev_storage + 677;
+
+}
+                    }
+                  else
+                    {
+{
+return	NULL;
+
+}
+                    }
+                default:
+{
+return	NULL;
+
+}
+                }
+            case 'c':
+              switch (KR_keyword [10])
+                {
+                case '9':
+                  if (strncmp (KR_keyword, "/dev/cons99", 11) == 0)
+                    {
 {
 return dev_storage + 119;
 
 }
-                }
-              else
-                {
+                    }
+                  else
+                    {
 {
 return	NULL;
 
 }
-                }
-            case '8':
-              if (strncmp (KR_keyword, "/dev/cons98", 11) == 0)
-                {
+                    }
+                case '8':
+                  if (strncmp (KR_keyword, "/dev/cons98", 11) == 0)
+                    {
 {
 return dev_storage + 118;
 
 }
-                }
-              else
-                {
+                    }
+                  else
+                    {
 {
 return	NULL;
 
 }
-                }
-            case '7':
-              if (strncmp (KR_keyword, "/dev/cons97", 11) == 0)
-                {
+                    }
+                case '7':
+                  if (strncmp (KR_keyword, "/dev/cons97", 11) == 0)
+                    {
 {
 return dev_storage + 117;
 
 }
-                }
-              else
-                {
+                    }
+                  else
+                    {
 {
 return	NULL;
 
 }
-                }
-            case '6':
-              if (strncmp (KR_keyword, "/dev/cons96", 11) == 0)
-                {
+                    }
+                case '6':
+                  if (strncmp (KR_keyword, "/dev/cons96", 11) == 0)
+                    {
 {
 return dev_storage + 116;
 
 }
-                }
-              else
-                {
+                    }
+                  else
+                    {
 {
 return	NULL;
 
 }
-                }
-            case '5':
-              if (strncmp (KR_keyword, "/dev/cons95", 11) == 0)
-                {
+                    }
+                case '5':
+                  if (strncmp (KR_keyword, "/dev/cons95", 11) == 0)
+                    {
 {
 return dev_storage + 115;
 
 }
-                }
-              else
-                {
+                    }
+                  else
+                    {
 {
 return	NULL;
 
 }
-                }
-            case '4':
-              if (strncmp (KR_keyword, "/dev/cons94", 11) == 0)
-                {
+                    }
+                case '4':
+                  if (strncmp (KR_keyword, "/dev/cons94", 11) == 0)
+                    {
 {
 return dev_storage + 114;
 
 }
-                }
-              else
-                {
+                    }
+                  else
+                    {
 {
 return	NULL;
 
 }
-                }
-            case '3':
-              if (strncmp (KR_keyword, "/dev/cons93", 11) == 0)
-                {
+                    }
+                case '3':
+                  if (strncmp (KR_keyword, "/dev/cons93", 11) == 0)
+                    {
 {
 return dev_storage + 113;
 
 }
-                }
-              else
-                {
+                    }
+                  else
+                    {
 {
 return	NULL;
 
 }
-                }
-            case '2':
-              if (strncmp (KR_keyword, "/dev/cons92", 11) == 0)
-                {
+                    }
+                case '2':
+                  if (strncmp (KR_keyword, "/dev/cons92", 11) == 0)
+                    {
 {
 return dev_storage + 112;
 
 }
-                }
-              else
-                {
+                    }
+                  else
+                    {
 {
 return	NULL;
 
 }
-                }
-            case '1':
-              if (strncmp (KR_keyword, "/dev/cons91", 11) == 0)
-                {
+                    }
+                case '1':
+                  if (strncmp (KR_keyword, "/dev/cons91", 11) == 0)
+                    {
 {
 return dev_storage + 111;
 
 }
-                }
-              else
-                {
+                    }
+                  else
+                    {
 {
 return	NULL;
 
 }
-                }
-            case '0':
-              if (strncmp (KR_keyword, "/dev/cons90", 11) == 0)
-                {
+                    }
+                case '0':
+                  if (strncmp (KR_keyword, "/dev/cons90", 11) == 0)
+                    {
 {
 return dev_storage + 110;
 
 }
-                }
-              else
-                {
+                    }
+                  else
+                    {
+{
+return	NULL;
+
+}
+                    }
+                default:
 {
 return	NULL;
 
@@ -10072,153 +10304,321 @@ return	NULL;
 }
             }
         case '8':
-          switch (KR_keyword [10])
+          switch (KR_keyword [5])
             {
-            case '9':
-              if (strncmp (KR_keyword, "/dev/cons89", 11) == 0)
+            case 't':
+              switch (KR_keyword [10])
                 {
+                case '9':
+                  if (strncmp (KR_keyword, "/dev/ttyS89", 11) == 0)
+                    {
+{
+return dev_storage + 676;
+
+}
+                    }
+                  else
+                    {
+{
+return	NULL;
+
+}
+                    }
+                case '8':
+                  if (strncmp (KR_keyword, "/dev/ttyS88", 11) == 0)
+                    {
+{
+return dev_storage + 675;
+
+}
+                    }
+                  else
+                    {
+{
+return	NULL;
+
+}
+                    }
+                case '7':
+                  if (strncmp (KR_keyword, "/dev/ttyS87", 11) == 0)
+                    {
+{
+return dev_storage + 674;
+
+}
+                    }
+                  else
+                    {
+{
+return	NULL;
+
+}
+                    }
+                case '6':
+                  if (strncmp (KR_keyword, "/dev/ttyS86", 11) == 0)
+                    {
+{
+return dev_storage + 673;
+
+}
+                    }
+                  else
+                    {
+{
+return	NULL;
+
+}
+                    }
+                case '5':
+                  if (strncmp (KR_keyword, "/dev/ttyS85", 11) == 0)
+                    {
+{
+return dev_storage + 672;
+
+}
+                    }
+                  else
+                    {
+{
+return	NULL;
+
+}
+                    }
+                case '4':
+                  if (strncmp (KR_keyword, "/dev/ttyS84", 11) == 0)
+                    {
+{
+return dev_storage + 671;
+
+}
+                    }
+                  else
+                    {
+{
+return	NULL;
+
+}
+                    }
+                case '3':
+                  if (strncmp (KR_keyword, "/dev/ttyS83", 11) == 0)
+                    {
+{
+return dev_storage + 670;
+
+}
+                    }
+                  else
+                    {
+{
+return	NULL;
+
+}
+                    }
+                case '2':
+                  if (strncmp (KR_keyword, "/dev/ttyS82", 11) == 0)
+                    {
+{
+return dev_storage + 669;
+
+}
+                    }
+                  else
+                    {
+{
+return	NULL;
+
+}
+                    }
+                case '1':
+                  if (strncmp (KR_keyword, "/dev/ttyS81", 11) == 0)
+                    {
+{
+return dev_storage + 668;
+
+}
+                    }
+                  else
+                    {
+{
+return	NULL;
+
+}
+                    }
+                case '0':
+                  if (strncmp (KR_keyword, "/dev/ttyS80", 11) == 0)
+                    {
+{
+return dev_storage + 667;
+
+}
+                    }
+                  else
+                    {
+{
+return	NULL;
+
+}
+                    }
+                default:
+{
+return	NULL;
+
+}
+                }
+            case 'c':
+              switch (KR_keyword [10])
+                {
+                case '9':
+                  if (strncmp (KR_keyword, "/dev/cons89", 11) == 0)
+                    {
 {
 return dev_storage + 109;
 
 }
-                }
-              else
-                {
+                    }
+                  else
+                    {
 {
 return	NULL;
 
 }
-                }
-            case '8':
-              if (strncmp (KR_keyword, "/dev/cons88", 11) == 0)
-                {
+                    }
+                case '8':
+                  if (strncmp (KR_keyword, "/dev/cons88", 11) == 0)
+                    {
 {
 return dev_storage + 108;
 
 }
-                }
-              else
-                {
+                    }
+                  else
+                    {
 {
 return	NULL;
 
 }
-                }
-            case '7':
-              if (strncmp (KR_keyword, "/dev/cons87", 11) == 0)
-                {
+                    }
+                case '7':
+                  if (strncmp (KR_keyword, "/dev/cons87", 11) == 0)
+                    {
 {
 return dev_storage + 107;
 
 }
-                }
-              else
-                {
+                    }
+                  else
+                    {
 {
 return	NULL;
 
 }
-                }
-            case '6':
-              if (strncmp (KR_keyword, "/dev/cons86", 11) == 0)
-                {
+                    }
+                case '6':
+                  if (strncmp (KR_keyword, "/dev/cons86", 11) == 0)
+                    {
 {
 return dev_storage + 106;
 
 }
-                }
-              else
-                {
+                    }
+                  else
+                    {
 {
 return	NULL;
 
 }
-                }
-            case '5':
-              if (strncmp (KR_keyword, "/dev/cons85", 11) == 0)
-                {
+                    }
+                case '5':
+                  if (strncmp (KR_keyword, "/dev/cons85", 11) == 0)
+                    {
 {
 return dev_storage + 105;
 
 }
-                }
-              else
-                {
+                    }
+                  else
+                    {
 {
 return	NULL;
 
 }
-                }
-            case '4':
-              if (strncmp (KR_keyword, "/dev/cons84", 11) == 0)
-                {
+                    }
+                case '4':
+                  if (strncmp (KR_keyword, "/dev/cons84", 11) == 0)
+                    {
 {
 return dev_storage + 104;
 
 }
-                }
-              else
-                {
+                    }
+                  else
+                    {
 {
 return	NULL;
 
 }
-                }
-            case '3':
-              if (strncmp (KR_keyword, "/dev/cons83", 11) == 0)
-                {
+                    }
+                case '3':
+                  if (strncmp (KR_keyword, "/dev/cons83", 11) == 0)
+                    {
 {
 return dev_storage + 103;
 
 }
-                }
-              else
-                {
+                    }
+                  else
+                    {
 {
 return	NULL;
 
 }
-                }
-            case '2':
-              if (strncmp (KR_keyword, "/dev/cons82", 11) == 0)
-                {
+                    }
+                case '2':
+                  if (strncmp (KR_keyword, "/dev/cons82", 11) == 0)
+                    {
 {
 return dev_storage + 102;
 
 }
-                }
-              else
-                {
+                    }
+                  else
+                    {
 {
 return	NULL;
 
 }
-                }
-            case '1':
-              if (strncmp (KR_keyword, "/dev/cons81", 11) == 0)
-                {
+                    }
+                case '1':
+                  if (strncmp (KR_keyword, "/dev/cons81", 11) == 0)
+                    {
 {
 return dev_storage + 101;
 
 }
-                }
-              else
-                {
+                    }
+                  else
+                    {
 {
 return	NULL;
 
 }
-                }
-            case '0':
-              if (strncmp (KR_keyword, "/dev/cons80", 11) == 0)
-                {
+                    }
+                case '0':
+                  if (strncmp (KR_keyword, "/dev/cons80", 11) == 0)
+                    {
 {
 return dev_storage + 100;
 
 }
-                }
-              else
-                {
+                    }
+                  else
+                    {
+{
+return	NULL;
+
+}
+                    }
+                default:
 {
 return	NULL;
 
@@ -10231,153 +10631,321 @@ return	NULL;
 }
             }
         case '7':
-          switch (KR_keyword [10])
+          switch (KR_keyword [5])
             {
-            case '9':
-              if (strncmp (KR_keyword, "/dev/cons79", 11) == 0)
+            case 't':
+              switch (KR_keyword [10])
                 {
+                case '9':
+                  if (strncmp (KR_keyword, "/dev/ttyS79", 11) == 0)
+                    {
+{
+return dev_storage + 666;
+
+}
+                    }
+                  else
+                    {
+{
+return	NULL;
+
+}
+                    }
+                case '8':
+                  if (strncmp (KR_keyword, "/dev/ttyS78", 11) == 0)
+                    {
+{
+return dev_storage + 665;
+
+}
+                    }
+                  else
+                    {
+{
+return	NULL;
+
+}
+                    }
+                case '7':
+                  if (strncmp (KR_keyword, "/dev/ttyS77", 11) == 0)
+                    {
+{
+return dev_storage + 664;
+
+}
+                    }
+                  else
+                    {
+{
+return	NULL;
+
+}
+                    }
+                case '6':
+                  if (strncmp (KR_keyword, "/dev/ttyS76", 11) == 0)
+                    {
+{
+return dev_storage + 663;
+
+}
+                    }
+                  else
+                    {
+{
+return	NULL;
+
+}
+                    }
+                case '5':
+                  if (strncmp (KR_keyword, "/dev/ttyS75", 11) == 0)
+                    {
+{
+return dev_storage + 662;
+
+}
+                    }
+                  else
+                    {
+{
+return	NULL;
+
+}
+                    }
+                case '4':
+                  if (strncmp (KR_keyword, "/dev/ttyS74", 11) == 0)
+                    {
+{
+return dev_storage + 661;
+
+}
+                    }
+                  else
+                    {
+{
+return	NULL;
+
+}
+                    }
+                case '3':
+                  if (strncmp (KR_keyword, "/dev/ttyS73", 11) == 0)
+                    {
+{
+return dev_storage + 660;
+
+}
+                    }
+                  else
+                    {
+{
+return	NULL;
+
+}
+                    }
+                case '2':
+                  if (strncmp (KR_keyword, "/dev/ttyS72", 11) == 0)
+                    {
+{
+return dev_storage + 659;
+
+}
+                    }
+                  else
+                    {
+{
+return	NULL;
+
+}
+                    }
+                case '1':
+                  if (strncmp (KR_keyword, "/dev/ttyS71", 11) == 0)
+                    {
+{
+return dev_storage + 658;
+
+}
+                    }
+                  else
+                    {
+{
+return	NULL;
+
+}
+                    }
+                case '0':
+                  if (strncmp (KR_keyword, "/dev/ttyS70", 11) == 0)
+                    {
+{
+return dev_storage + 657;
+
+}
+                    }
+                  else
+                    {
+{
+return	NULL;
+
+}
+                    }
+                default:
+{
+return	NULL;
+
+}
+                }
+            case 'c':
+              switch (KR_keyword [10])
+                {
+                case '9':
+                  if (strncmp (KR_keyword, "/dev/cons79", 11) == 0)
+                    {
 {
 return dev_storage + 99;
 
 }
-                }
-              else
-                {
+                    }
+                  else
+                    {
 {
 return	NULL;
 
 }
-                }
-            case '8':
-              if (strncmp (KR_keyword, "/dev/cons78", 11) == 0)
-                {
+                    }
+                case '8':
+                  if (strncmp (KR_keyword, "/dev/cons78", 11) == 0)
+                    {
 {
 return dev_storage + 98;
 
 }
-                }
-              else
-                {
+                    }
+                  else
+                    {
 {
 return	NULL;
 
 }
-                }
-            case '7':
-              if (strncmp (KR_keyword, "/dev/cons77", 11) == 0)
-                {
+                    }
+                case '7':
+                  if (strncmp (KR_keyword, "/dev/cons77", 11) == 0)
+                    {
 {
 return dev_storage + 97;
 
 }
-                }
-              else
-                {
+                    }
+                  else
+                    {
 {
 return	NULL;
 
 }
-                }
-            case '6':
-              if (strncmp (KR_keyword, "/dev/cons76", 11) == 0)
-                {
+                    }
+                case '6':
+                  if (strncmp (KR_keyword, "/dev/cons76", 11) == 0)
+                    {
 {
 return dev_storage + 96;
 
 }
-                }
-              else
-                {
+                    }
+                  else
+                    {
 {
 return	NULL;
 
 }
-                }
-            case '5':
-              if (strncmp (KR_keyword, "/dev/cons75", 11) == 0)
-                {
+                    }
+                case '5':
+                  if (strncmp (KR_keyword, "/dev/cons75", 11) == 0)
+                    {
 {
 return dev_storage + 95;
 
 }
-                }
-              else
-                {
+                    }
+                  else
+                    {
 {
 return	NULL;
 
 }
-                }
-            case '4':
-              if (strncmp (KR_keyword, "/dev/cons74", 11) == 0)
-                {
+                    }
+                case '4':
+                  if (strncmp (KR_keyword, "/dev/cons74", 11) == 0)
+                    {
 {
 return dev_storage + 94;
 
 }
-                }
-              else
-                {
+                    }
+                  else
+                    {
 {
 return	NULL;
 
 }
-                }
-            case '3':
-              if (strncmp (KR_keyword, "/dev/cons73", 11) == 0)
-                {
+                    }
+                case '3':
+                  if (strncmp (KR_keyword, "/dev/cons73", 11) == 0)
+                    {
 {
 return dev_storage + 93;
 
 }
-                }
-              else
-                {
+                    }
+                  else
+                    {
 {
 return	NULL;
 
 }
-                }
-            case '2':
-              if (strncmp (KR_keyword, "/dev/cons72", 11) == 0)
-                {
+                    }
+                case '2':
+                  if (strncmp (KR_keyword, "/dev/cons72", 11) == 0)
+                    {
 {
 return dev_storage + 92;
 
 }
-                }
-              else
-                {
+                    }
+                  else
+                    {
 {
 return	NULL;
 
 }
-                }
-            case '1':
-              if (strncmp (KR_keyword, "/dev/cons71", 11) == 0)
-                {
+                    }
+                case '1':
+                  if (strncmp (KR_keyword, "/dev/cons71", 11) == 0)
+                    {
 {
 return dev_storage + 91;
 
 }
-                }
-              else
-                {
+                    }
+                  else
+                    {
 {
 return	NULL;
 
 }
-                }
-            case '0':
-              if (strncmp (KR_keyword, "/dev/cons70", 11) == 0)
-                {
+                    }
+                case '0':
+                  if (strncmp (KR_keyword, "/dev/cons70", 11) == 0)
+                    {
 {
 return dev_storage + 90;
 
 }
-                }
-              else
-                {
+                    }
+                  else
+                    {
+{
+return	NULL;
+
+}
+                    }
+                default:
 {
 return	NULL;
 
@@ -10390,102 +10958,102 @@ return	NULL;
 }
             }
         case '6':
-          switch (KR_keyword [10])
+          switch (KR_keyword [5])
             {
-            case '9':
-              if (strncmp (KR_keyword, "/dev/cons69", 11) == 0)
+            case 't':
+              switch (KR_keyword [10])
                 {
+                case '9':
+                  if (strncmp (KR_keyword, "/dev/ttyS69", 11) == 0)
+                    {
 {
-return dev_storage + 89;
+return dev_storage + 656;
 
 }
-                }
-              else
-                {
-{
-return	NULL;
-
-}
-                }
-            case '8':
-              if (strncmp (KR_keyword, "/dev/cons68", 11) == 0)
-                {
-{
-return dev_storage + 88;
-
-}
-                }
-              else
-                {
+                    }
+                  else
+                    {
 {
 return	NULL;
 
 }
-                }
-            case '7':
-              if (strncmp (KR_keyword, "/dev/cons67", 11) == 0)
-                {
+                    }
+                case '8':
+                  if (strncmp (KR_keyword, "/dev/ttyS68", 11) == 0)
+                    {
 {
-return dev_storage + 87;
+return dev_storage + 655;
 
 }
-                }
-              else
-                {
-{
-return	NULL;
-
-}
-                }
-            case '6':
-              if (strncmp (KR_keyword, "/dev/cons66", 11) == 0)
-                {
-{
-return dev_storage + 86;
-
-}
-                }
-              else
-                {
+                    }
+                  else
+                    {
 {
 return	NULL;
 
 }
-                }
-            case '5':
-              if (strncmp (KR_keyword, "/dev/cons65", 11) == 0)
-                {
+                    }
+                case '7':
+                  if (strncmp (KR_keyword, "/dev/ttyS67", 11) == 0)
+                    {
 {
-return dev_storage + 85;
+return dev_storage + 654;
 
 }
-                }
-              else
-                {
-{
-return	NULL;
-
-}
-                }
-            case '4':
-              if (strncmp (KR_keyword, "/dev/cons64", 11) == 0)
-                {
-{
-return dev_storage + 84;
-
-}
-                }
-              else
-                {
+                    }
+                  else
+                    {
 {
 return	NULL;
 
 }
-                }
-            case '3':
-              switch (KR_keyword [5])
-                {
-                case 't':
+                    }
+                case '6':
+                  if (strncmp (KR_keyword, "/dev/ttyS66", 11) == 0)
+                    {
+{
+return dev_storage + 653;
+
+}
+                    }
+                  else
+                    {
+{
+return	NULL;
+
+}
+                    }
+                case '5':
+                  if (strncmp (KR_keyword, "/dev/ttyS65", 11) == 0)
+                    {
+{
+return dev_storage + 652;
+
+}
+                    }
+                  else
+                    {
+{
+return	NULL;
+
+}
+                    }
+                case '4':
+                  if (strncmp (KR_keyword, "/dev/ttyS64", 11) == 0)
+                    {
+{
+return dev_storage + 651;
+
+}
+                    }
+                  else
+                    {
+{
+return	NULL;
+
+}
+                    }
+                case '3':
                   if (strncmp (KR_keyword, "/dev/ttyS63", 11) == 0)
                     {
 {
@@ -10500,31 +11068,7 @@ return	NULL;
 
 }
                     }
-                case 'c':
-                  if (strncmp (KR_keyword, "/dev/cons63", 11) == 0)
-                    {
-{
-return dev_storage + 83;
-
-}
-                    }
-                  else
-                    {
-{
-return	NULL;
-
-}
-                    }
-                default:
-{
-return	NULL;
-
-}
-                }
-            case '2':
-              switch (KR_keyword [5])
-                {
-                case 't':
+                case '2':
                   if (strncmp (KR_keyword, "/dev/ttyS62", 11) == 0)
                     {
 {
@@ -10539,31 +11083,7 @@ return	NULL;
 
 }
                     }
-                case 'c':
-                  if (strncmp (KR_keyword, "/dev/cons62", 11) == 0)
-                    {
-{
-return dev_storage + 82;
-
-}
-                    }
-                  else
-                    {
-{
-return	NULL;
-
-}
-                    }
-                default:
-{
-return	NULL;
-
-}
-                }
-            case '1':
-              switch (KR_keyword [5])
-                {
-                case 't':
+                case '1':
                   if (strncmp (KR_keyword, "/dev/ttyS61", 11) == 0)
                     {
 {
@@ -10578,11 +11098,11 @@ return	NULL;
 
 }
                     }
-                case 'c':
-                  if (strncmp (KR_keyword, "/dev/cons61", 11) == 0)
+                case '0':
+                  if (strncmp (KR_keyword, "/dev/ttyS60", 11) == 0)
                     {
 {
-return dev_storage + 81;
+return dev_storage + 647;
 
 }
                     }
@@ -10599,14 +11119,14 @@ return	NULL;
 
 }
                 }
-            case '0':
-              switch (KR_keyword [5])
+            case 'c':
+              switch (KR_keyword [10])
                 {
-                case 't':
-                  if (strncmp (KR_keyword, "/dev/ttyS60", 11) == 0)
+                case '9':
+                  if (strncmp (KR_keyword, "/dev/cons69", 11) == 0)
                     {
 {
-return dev_storage + 647;
+return dev_storage + 89;
 
 }
                     }
@@ -10617,7 +11137,127 @@ return	NULL;
 
 }
                     }
-                case 'c':
+                case '8':
+                  if (strncmp (KR_keyword, "/dev/cons68", 11) == 0)
+                    {
+{
+return dev_storage + 88;
+
+}
+                    }
+                  else
+                    {
+{
+return	NULL;
+
+}
+                    }
+                case '7':
+                  if (strncmp (KR_keyword, "/dev/cons67", 11) == 0)
+                    {
+{
+return dev_storage + 87;
+
+}
+                    }
+                  else
+                    {
+{
+return	NULL;
+
+}
+                    }
+                case '6':
+                  if (strncmp (KR_keyword, "/dev/cons66", 11) == 0)
+                    {
+{
+return dev_storage + 86;
+
+}
+                    }
+                  else
+                    {
+{
+return	NULL;
+
+}
+                    }
+                case '5':
+                  if (strncmp (KR_keyword, "/dev/cons65", 11) == 0)
+                    {
+{
+return dev_storage + 85;
+
+}
+                    }
+                  else
+                    {
+{
+return	NULL;
+
+}
+                    }
+                case '4':
+                  if (strncmp (KR_keyword, "/dev/cons64", 11) == 0)
+                    {
+{
+return dev_storage + 84;
+
+}
+                    }
+                  else
+                    {
+{
+return	NULL;
+
+}
+                    }
+                case '3':
+                  if (strncmp (KR_keyword, "/dev/cons63", 11) == 0)
+                    {
+{
+return dev_storage + 83;
+
+}
+                    }
+                  else
+                    {
+{
+return	NULL;
+
+}
+                    }
+                case '2':
+                  if (strncmp (KR_keyword, "/dev/cons62", 11) == 0)
+                    {
+{
+return dev_storage + 82;
+
+}
+                    }
+                  else
+                    {
+{
+return	NULL;
+
+}
+                    }
+                case '1':
+                  if (strncmp (KR_keyword, "/dev/cons61", 11) == 0)
+                    {
+{
+return dev_storage + 81;
+
+}
+                    }
+                  else
+                    {
+{
+return	NULL;
+
+}
+                    }
+                case '0':
                   if (strncmp (KR_keyword, "/dev/cons60", 11) == 0)
                     {
 {
@@ -13195,7 +13835,7 @@ return	NULL;
           if (strncmp (KR_keyword, "/dev/windows", 12) == 0)
             {
 {
-return dev_storage + 652;
+return dev_storage + 716;
 
 }
             }
@@ -13210,7 +13850,7 @@ return	NULL;
           if (strncmp (KR_keyword, "/dev/urandom", 12) == 0)
             {
 {
-return dev_storage + 651;
+return dev_storage + 715;
 
 }
             }
@@ -13237,123 +13877,261 @@ return	NULL;
 }
             }
         case '2':
-          switch (KR_keyword [11])
+          switch (KR_keyword [5])
             {
-            case '7':
-              if (strncmp (KR_keyword, "/dev/cons127", 12) == 0)
+            case 't':
+              switch (KR_keyword [11])
                 {
+                case '7':
+                  if (strncmp (KR_keyword, "/dev/ttyS127", 12) == 0)
+                    {
+{
+return dev_storage + 714;
+
+}
+                    }
+                  else
+                    {
+{
+return	NULL;
+
+}
+                    }
+                case '6':
+                  if (strncmp (KR_keyword, "/dev/ttyS126", 12) == 0)
+                    {
+{
+return dev_storage + 713;
+
+}
+                    }
+                  else
+                    {
+{
+return	NULL;
+
+}
+                    }
+                case '5':
+                  if (strncmp (KR_keyword, "/dev/ttyS125", 12) == 0)
+                    {
+{
+return dev_storage + 712;
+
+}
+                    }
+                  else
+                    {
+{
+return	NULL;
+
+}
+                    }
+                case '4':
+                  if (strncmp (KR_keyword, "/dev/ttyS124", 12) == 0)
+                    {
+{
+return dev_storage + 711;
+
+}
+                    }
+                  else
+                    {
+{
+return	NULL;
+
+}
+                    }
+                case '3':
+                  if (strncmp (KR_keyword, "/dev/ttyS123", 12) == 0)
+                    {
+{
+return dev_storage + 710;
+
+}
+                    }
+                  else
+                    {
+{
+return	NULL;
+
+}
+                    }
+                case '2':
+                  if (strncmp (KR_keyword, "/dev/ttyS122", 12) == 0)
+                    {
+{
+return dev_storage + 709;
+
+}
+                    }
+                  else
+                    {
+{
+return	NULL;
+
+}
+                    }
+                case '1':
+                  if (strncmp (KR_keyword, "/dev/ttyS121", 12) == 0)
+                    {
+{
+return dev_storage + 708;
+
+}
+                    }
+                  else
+                    {
+{
+return	NULL;
+
+}
+                    }
+                case '0':
+                  if (strncmp (KR_keyword, "/dev/ttyS120", 12) == 0)
+                    {
+{
+return dev_storage + 707;
+
+}
+                    }
+                  else
+                    {
+{
+return	NULL;
+
+}
+                    }
+                default:
+{
+return	NULL;
+
+}
+                }
+            case 'c':
+              switch (KR_keyword [11])
+                {
+                case '7':
+                  if (strncmp (KR_keyword, "/dev/cons127", 12) == 0)
+                    {
 {
 return dev_storage + 147;
 
 }
-                }
-              else
-                {
+                    }
+                  else
+                    {
 {
 return	NULL;
 
 }
-                }
-            case '6':
-              if (strncmp (KR_keyword, "/dev/cons126", 12) == 0)
-                {
+                    }
+                case '6':
+                  if (strncmp (KR_keyword, "/dev/cons126", 12) == 0)
+                    {
 {
 return dev_storage + 146;
 
 }
-                }
-              else
-                {
+                    }
+                  else
+                    {
 {
 return	NULL;
 
 }
-                }
-            case '5':
-              if (strncmp (KR_keyword, "/dev/cons125", 12) == 0)
-                {
+                    }
+                case '5':
+                  if (strncmp (KR_keyword, "/dev/cons125", 12) == 0)
+                    {
 {
 return dev_storage + 145;
 
 }
-                }
-              else
-                {
+                    }
+                  else
+                    {
 {
 return	NULL;
 
 }
-                }
-            case '4':
-              if (strncmp (KR_keyword, "/dev/cons124", 12) == 0)
-                {
+                    }
+                case '4':
+                  if (strncmp (KR_keyword, "/dev/cons124", 12) == 0)
+                    {
 {
 return dev_storage + 144;
 
 }
-                }
-              else
-                {
+                    }
+                  else
+                    {
 {
 return	NULL;
 
 }
-                }
-            case '3':
-              if (strncmp (KR_keyword, "/dev/cons123", 12) == 0)
-                {
+                    }
+                case '3':
+                  if (strncmp (KR_keyword, "/dev/cons123", 12) == 0)
+                    {
 {
 return dev_storage + 143;
 
 }
-                }
-              else
-                {
+                    }
+                  else
+                    {
 {
 return	NULL;
 
 }
-                }
-            case '2':
-              if (strncmp (KR_keyword, "/dev/cons122", 12) == 0)
-                {
+                    }
+                case '2':
+                  if (strncmp (KR_keyword, "/dev/cons122", 12) == 0)
+                    {
 {
 return dev_storage + 142;
 
 }
-                }
-              else
-                {
+                    }
+                  else
+                    {
 {
 return	NULL;
 
 }
-                }
-            case '1':
-              if (strncmp (KR_keyword, "/dev/cons121", 12) == 0)
-                {
+                    }
+                case '1':
+                  if (strncmp (KR_keyword, "/dev/cons121", 12) == 0)
+                    {
 {
 return dev_storage + 141;
 
 }
-                }
-              else
-                {
+                    }
+                  else
+                    {
 {
 return	NULL;
 
 }
-                }
-            case '0':
-              if (strncmp (KR_keyword, "/dev/cons120", 12) == 0)
-                {
+                    }
+                case '0':
+                  if (strncmp (KR_keyword, "/dev/cons120", 12) == 0)
+                    {
 {
 return dev_storage + 140;
 
 }
-                }
-              else
-                {
+                    }
+                  else
+                    {
+{
+return	NULL;
+
+}
+                    }
+                default:
 {
 return	NULL;
 
@@ -13366,153 +14144,321 @@ return	NULL;
 }
             }
         case '1':
-          switch (KR_keyword [11])
+          switch (KR_keyword [5])
             {
-            case '9':
-              if (strncmp (KR_keyword, "/dev/cons119", 12) == 0)
+            case 't':
+              switch (KR_keyword [11])
                 {
+                case '9':
+                  if (strncmp (KR_keyword, "/dev/ttyS119", 12) == 0)
+                    {
+{
+return dev_storage + 706;
+
+}
+                    }
+                  else
+                    {
+{
+return	NULL;
+
+}
+                    }
+                case '8':
+                  if (strncmp (KR_keyword, "/dev/ttyS118", 12) == 0)
+                    {
+{
+return dev_storage + 705;
+
+}
+                    }
+                  else
+                    {
+{
+return	NULL;
+
+}
+                    }
+                case '7':
+                  if (strncmp (KR_keyword, "/dev/ttyS117", 12) == 0)
+                    {
+{
+return dev_storage + 704;
+
+}
+                    }
+                  else
+                    {
+{
+return	NULL;
+
+}
+                    }
+                case '6':
+                  if (strncmp (KR_keyword, "/dev/ttyS116", 12) == 0)
+                    {
+{
+return dev_storage + 703;
+
+}
+                    }
+                  else
+                    {
+{
+return	NULL;
+
+}
+                    }
+                case '5':
+                  if (strncmp (KR_keyword, "/dev/ttyS115", 12) == 0)
+                    {
+{
+return dev_storage + 702;
+
+}
+                    }
+                  else
+                    {
+{
+return	NULL;
+
+}
+                    }
+                case '4':
+                  if (strncmp (KR_keyword, "/dev/ttyS114", 12) == 0)
+                    {
+{
+return dev_storage + 701;
+
+}
+                    }
+                  else
+                    {
+{
+return	NULL;
+
+}
+                    }
+                case '3':
+                  if (strncmp (KR_keyword, "/dev/ttyS113", 12) == 0)
+                    {
+{
+return dev_storage + 700;
+
+}
+                    }
+                  else
+                    {
+{
+return	NULL;
+
+}
+                    }
+                case '2':
+                  if (strncmp (KR_keyword, "/dev/ttyS112", 12) == 0)
+                    {
+{
+return dev_storage + 699;
+
+}
+                    }
+                  else
+                    {
+{
+return	NULL;
+
+}
+                    }
+                case '1':
+                  if (strncmp (KR_keyword, "/dev/ttyS111", 12) == 0)
+                    {
+{
+return dev_storage + 698;
+
+}
+                    }
+                  else
+                    {
+{
+return	NULL;
+
+}
+                    }
+                case '0':
+                  if (strncmp (KR_keyword, "/dev/ttyS110", 12) == 0)
+                    {
+{
+return dev_storage + 697;
+
+}
+                    }
+                  else
+                    {
+{
+return	NULL;
+
+}
+                    }
+                default:
+{
+return	NULL;
+
+}
+                }
+            case 'c':
+              switch (KR_keyword [11])
+                {
+                case '9':
+                  if (strncmp (KR_keyword, "/dev/cons119", 12) == 0)
+                    {
 {
 return dev_storage + 139;
 
 }
-                }
-              else
-                {
+                    }
+                  else
+                    {
 {
 return	NULL;
 
 }
-                }
-            case '8':
-              if (strncmp (KR_keyword, "/dev/cons118", 12) == 0)
-                {
+                    }
+                case '8':
+                  if (strncmp (KR_keyword, "/dev/cons118", 12) == 0)
+                    {
 {
 return dev_storage + 138;
 
 }
-                }
-              else
-                {
+                    }
+                  else
+                    {
 {
 return	NULL;
 
 }
-                }
-            case '7':
-              if (strncmp (KR_keyword, "/dev/cons117", 12) == 0)
-                {
+                    }
+                case '7':
+                  if (strncmp (KR_keyword, "/dev/cons117", 12) == 0)
+                    {
 {
 return dev_storage + 137;
 
 }
-                }
-              else
-                {
+                    }
+                  else
+                    {
 {
 return	NULL;
 
 }
-                }
-            case '6':
-              if (strncmp (KR_keyword, "/dev/cons116", 12) == 0)
-                {
+                    }
+                case '6':
+                  if (strncmp (KR_keyword, "/dev/cons116", 12) == 0)
+                    {
 {
 return dev_storage + 136;
 
 }
-                }
-              else
-                {
+                    }
+                  else
+                    {
 {
 return	NULL;
 
 }
-                }
-            case '5':
-              if (strncmp (KR_keyword, "/dev/cons115", 12) == 0)
-                {
+                    }
+                case '5':
+                  if (strncmp (KR_keyword, "/dev/cons115", 12) == 0)
+                    {
 {
 return dev_storage + 135;
 
 }
-                }
-              else
-                {
+                    }
+                  else
+                    {
 {
 return	NULL;
 
 }
-                }
-            case '4':
-              if (strncmp (KR_keyword, "/dev/cons114", 12) == 0)
-                {
+                    }
+                case '4':
+                  if (strncmp (KR_keyword, "/dev/cons114", 12) == 0)
+                    {
 {
 return dev_storage + 134;
 
 }
-                }
-              else
-                {
+                    }
+                  else
+                    {
 {
 return	NULL;
 
 }
-                }
-            case '3':
-              if (strncmp (KR_keyword, "/dev/cons113", 12) == 0)
-                {
+                    }
+                case '3':
+                  if (strncmp (KR_keyword, "/dev/cons113", 12) == 0)
+                    {
 {
 return dev_storage + 133;
 
 }
-                }
-              else
-                {
+                    }
+                  else
+                    {
 {
 return	NULL;
 
 }
-                }
-            case '2':
-              if (strncmp (KR_keyword, "/dev/cons112", 12) == 0)
-                {
+                    }
+                case '2':
+                  if (strncmp (KR_keyword, "/dev/cons112", 12) == 0)
+                    {
 {
 return dev_storage + 132;
 
 }
-                }
-              else
-                {
+                    }
+                  else
+                    {
 {
 return	NULL;
 
 }
-                }
-            case '1':
-              if (strncmp (KR_keyword, "/dev/cons111", 12) == 0)
-                {
+                    }
+                case '1':
+                  if (strncmp (KR_keyword, "/dev/cons111", 12) == 0)
+                    {
 {
 return dev_storage + 131;
 
 }
-                }
-              else
-                {
+                    }
+                  else
+                    {
 {
 return	NULL;
 
 }
-                }
-            case '0':
-              if (strncmp (KR_keyword, "/dev/cons110", 12) == 0)
-                {
+                    }
+                case '0':
+                  if (strncmp (KR_keyword, "/dev/cons110", 12) == 0)
+                    {
 {
 return dev_storage + 130;
 
 }
-                }
-              else
-                {
+                    }
+                  else
+                    {
+{
+return	NULL;
+
+}
+                    }
+                default:
 {
 return	NULL;
 
@@ -13525,153 +14471,321 @@ return	NULL;
 }
             }
         case '0':
-          switch (KR_keyword [11])
+          switch (KR_keyword [5])
             {
-            case '9':
-              if (strncmp (KR_keyword, "/dev/cons109", 12) == 0)
+            case 't':
+              switch (KR_keyword [11])
                 {
+                case '9':
+                  if (strncmp (KR_keyword, "/dev/ttyS109", 12) == 0)
+                    {
+{
+return dev_storage + 696;
+
+}
+                    }
+                  else
+                    {
+{
+return	NULL;
+
+}
+                    }
+                case '8':
+                  if (strncmp (KR_keyword, "/dev/ttyS108", 12) == 0)
+                    {
+{
+return dev_storage + 695;
+
+}
+                    }
+                  else
+                    {
+{
+return	NULL;
+
+}
+                    }
+                case '7':
+                  if (strncmp (KR_keyword, "/dev/ttyS107", 12) == 0)
+                    {
+{
+return dev_storage + 694;
+
+}
+                    }
+                  else
+                    {
+{
+return	NULL;
+
+}
+                    }
+                case '6':
+                  if (strncmp (KR_keyword, "/dev/ttyS106", 12) == 0)
+                    {
+{
+return dev_storage + 693;
+
+}
+                    }
+                  else
+                    {
+{
+return	NULL;
+
+}
+                    }
+                case '5':
+                  if (strncmp (KR_keyword, "/dev/ttyS105", 12) == 0)
+                    {
+{
+return dev_storage + 692;
+
+}
+                    }
+                  else
+                    {
+{
+return	NULL;
+
+}
+                    }
+                case '4':
+                  if (strncmp (KR_keyword, "/dev/ttyS104", 12) == 0)
+                    {
+{
+return dev_storage + 691;
+
+}
+                    }
+                  else
+                    {
+{
+return	NULL;
+
+}
+                    }
+                case '3':
+                  if (strncmp (KR_keyword, "/dev/ttyS103", 12) == 0)
+                    {
+{
+return dev_storage + 690;
+
+}
+                    }
+                  else
+                    {
+{
+return	NULL;
+
+}
+                    }
+                case '2':
+                  if (strncmp (KR_keyword, "/dev/ttyS102", 12) == 0)
+                    {
+{
+return dev_storage + 689;
+
+}
+                    }
+                  else
+                    {
+{
+return	NULL;
+
+}
+                    }
+                case '1':
+                  if (strncmp (KR_keyword, "/dev/ttyS101", 12) == 0)
+                    {
+{
+return dev_storage + 688;
+
+}
+                    }
+                  else
+                    {
+{
+return	NULL;
+
+}
+                    }
+                case '0':
+                  if (strncmp (KR_keyword, "/dev/ttyS100", 12) == 0)
+                    {
+{
+return dev_storage + 687;
+
+}
+                    }
+                  else
+                    {
+{
+return	NULL;
+
+}
+                    }
+                default:
+{
+return	NULL;
+
+}
+                }
+            case 'c':
+              switch (KR_keyword [11])
+                {
+                case '9':
+                  if (strncmp (KR_keyword, "/dev/cons109", 12) == 0)
+                    {
 {
 return dev_storage + 129;
 
 }
-                }
-              else
-                {
+                    }
+                  else
+                    {
 {
 return	NULL;
 
 }
-                }
-            case '8':
-              if (strncmp (KR_keyword, "/dev/cons108", 12) == 0)
-                {
+                    }
+                case '8':
+                  if (strncmp (KR_keyword, "/dev/cons108", 12) == 0)
+                    {
 {
 return dev_storage + 128;
 
 }
-                }
-              else
-                {
+                    }
+                  else
+                    {
 {
 return	NULL;
 
 }
-                }
-            case '7':
-              if (strncmp (KR_keyword, "/dev/cons107", 12) == 0)
-                {
+                    }
+                case '7':
+                  if (strncmp (KR_keyword, "/dev/cons107", 12) == 0)
+                    {
 {
 return dev_storage + 127;
 
 }
-                }
-              else
-                {
+                    }
+                  else
+                    {
 {
 return	NULL;
 
 }
-                }
-            case '6':
-              if (strncmp (KR_keyword, "/dev/cons106", 12) == 0)
-                {
+                    }
+                case '6':
+                  if (strncmp (KR_keyword, "/dev/cons106", 12) == 0)
+                    {
 {
 return dev_storage + 126;
 
 }
-                }
-              else
-                {
+                    }
+                  else
+                    {
 {
 return	NULL;
 
 }
-                }
-            case '5':
-              if (strncmp (KR_keyword, "/dev/cons105", 12) == 0)
-                {
+                    }
+                case '5':
+                  if (strncmp (KR_keyword, "/dev/cons105", 12) == 0)
+                    {
 {
 return dev_storage + 125;
 
 }
-                }
-              else
-                {
+                    }
+                  else
+                    {
 {
 return	NULL;
 
 }
-                }
-            case '4':
-              if (strncmp (KR_keyword, "/dev/cons104", 12) == 0)
-                {
+                    }
+                case '4':
+                  if (strncmp (KR_keyword, "/dev/cons104", 12) == 0)
+                    {
 {
 return dev_storage + 124;
 
 }
-                }
-              else
-                {
+                    }
+                  else
+                    {
 {
 return	NULL;
 
 }
-                }
-            case '3':
-              if (strncmp (KR_keyword, "/dev/cons103", 12) == 0)
-                {
+                    }
+                case '3':
+                  if (strncmp (KR_keyword, "/dev/cons103", 12) == 0)
+                    {
 {
 return dev_storage + 123;
 
 }
-                }
-              else
-                {
+                    }
+                  else
+                    {
 {
 return	NULL;
 
 }
-                }
-            case '2':
-              if (strncmp (KR_keyword, "/dev/cons102", 12) == 0)
-                {
+                    }
+                case '2':
+                  if (strncmp (KR_keyword, "/dev/cons102", 12) == 0)
+                    {
 {
 return dev_storage + 122;
 
 }
-                }
-              else
-                {
+                    }
+                  else
+                    {
 {
 return	NULL;
 
 }
-                }
-            case '1':
-              if (strncmp (KR_keyword, "/dev/cons101", 12) == 0)
-                {
+                    }
+                case '1':
+                  if (strncmp (KR_keyword, "/dev/cons101", 12) == 0)
+                    {
 {
 return dev_storage + 121;
 
 }
-                }
-              else
-                {
+                    }
+                  else
+                    {
 {
 return	NULL;
 
 }
-                }
-            case '0':
-              if (strncmp (KR_keyword, "/dev/cons100", 12) == 0)
-                {
+                    }
+                case '0':
+                  if (strncmp (KR_keyword, "/dev/cons100", 12) == 0)
+                    {
 {
 return dev_storage + 120;
 
 }
-                }
-              else
-                {
+                    }
+                  else
+                    {
+{
+return	NULL;
+
+}
+                    }
+                default:
 {
 return	NULL;
 
