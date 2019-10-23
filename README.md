@@ -58,7 +58,7 @@ picolibc, some care needs to be taken while editing the code:
    newlib project
  * Changes, where possible, should be made in a way compatible with
    newlib design. For example, instead of using 'errno' (which is
-   valid in picolibc, use __errno_r(r), even when 'r' is not defined
+   valid in picolibc), use __errno_r(r), even when 'r' is not defined
    in the local context.
 
 The bulk of newlib changes over the last several years have been in
