@@ -27,6 +27,7 @@ at this point only has code to build for the following targets:
  * i386 (Linux hosted, for testing)
  * RISC-V (both 32- and 64- bit)
  * x86_64 (Linux hosted, for testing)
+ * PowerPC
 
 Supporting architectures that already have newlib code requires:
 
@@ -40,6 +41,29 @@ Supporting architectures that already have newlib code requires:
     mechanism to use the right tools
  5. do-_architecture_-configure to make testing the cross-compilation
     setup easier.
+
+## Relation to newlib
+
+Picolibc is mostly built from pieces of newlib, and retains the
+directory structure of that project. While there have been a lot of
+changes in the build system and per-thread data storage, the bulk of
+the source code remains unchanged.
+
+To keep picolibc and newlib code in sync, newlib changes will be
+regularly incorporated. To ease integration of these changes into
+picolibc, some care needs to be taken while editing the code:
+
+ * Files should not be renamed.
+ * Fixes that also benefit users of newlib should also be sent to the
+   newlib project
+ * Changes, where possible, should be made in a way compatible with
+   newlib design. For example, instead of using 'errno' (which is
+   valid in picolibc, use __errno_r(r), even when 'r' is not defined
+   in the local context.
+
+The bulk of newlib changes over the last several years have been in
+areas unrelated to the code used by picolibc, so keeping things in
+sync has not been difficult so far.
 
 ## Documentation
 
