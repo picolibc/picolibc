@@ -69,6 +69,7 @@ LIB_CRT = libcrt.a
 SIM_OBJS = syscalls.o \
 	cio.o \
 	write.o \
+	unlink.o \
 	sbrk.o
 
 NOSYS_OBJS = ciosyscalls.o \
