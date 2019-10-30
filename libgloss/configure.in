@@ -229,6 +229,7 @@ AC_CONFIG_FILES([Makefile],
 fi],
 srcdir=${srcdir}
 target=${target}
+host=${host}
 with_multisubdir=${with_multisubdir}
 ac_configure_args="--enable-multilib ${ac_configure_args}"
 CONFIG_SHELL=${CONFIG_SHELL-/bin/sh}
