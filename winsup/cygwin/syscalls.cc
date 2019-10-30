@@ -3977,7 +3977,12 @@ getpriority (int which, id_t who)
       if (!who)
 	who = myself->pid;
       if ((pid_t) who == myself->pid)
-	return myself->nice;
+        {
+          DWORD winprio = GetPriorityClass(GetCurrentProcess());
+          if (winprio != nice_to_winprio(myself->nice))
+            myself->nice = winprio_to_nice(winprio);
+          return myself->nice;
+        }
       break;
     case PRIO_PGRP:
       if (!who)
