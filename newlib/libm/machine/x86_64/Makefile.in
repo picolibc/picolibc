@@ -58,12 +58,11 @@ DIST_COMMON = $(srcdir)/../../../Makefile.shared $(srcdir)/Makefile.in \
 	$(am__configure_deps) $(srcdir)/../../../../mkinstalldirs
 subdir = .
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
-am__aclocal_m4_deps =  \
-	$(top_srcdir)/../../../../newlib-3.1.0libtool.m4 \
-	$(top_srcdir)/../../../../newlib-3.1.0ltoptions.m4 \
-	$(top_srcdir)/../../../../newlib-3.1.0ltsugar.m4 \
-	$(top_srcdir)/../../../../newlib-3.1.0ltversion.m4 \
-	$(top_srcdir)/../../../../newlib-3.1.0lt~obsolete.m4 \
+am__aclocal_m4_deps = $(top_srcdir)/../../../../libtool.m4 \
+	$(top_srcdir)/../../../../ltoptions.m4 \
+	$(top_srcdir)/../../../../ltsugar.m4 \
+	$(top_srcdir)/../../../../ltversion.m4 \
+	$(top_srcdir)/../../../../lt~obsolete.m4 \
 	$(top_srcdir)/../../../acinclude.m4 $(top_srcdir)/configure.in
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)

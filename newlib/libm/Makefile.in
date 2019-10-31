@@ -907,7 +907,7 @@ uninstall-am: uninstall-dvi-am uninstall-html-am uninstall-info-am \
 
 $(SUBLIBS):
 
-libm.dvi: targetdep.tex math/stmp-def complex/stmp-def
+libm.dvi: targetdep.tex math/stmp-def complex/stmp-def fenv/stmp-def
 
 stmp-targetdep: force
 	rm -f tmp.texi
@@ -925,6 +925,8 @@ targetdep.tex: stmp-targetdep ; @true
 math/stmp-def: stmp-targetdep ; @true
 
 complex/stmp-def: stmp-targetdep ; @true
+
+fenv/stmp-def: stmp-targetdep ; @true
 
 docbook-recursive: force
 	for d in $(SUBDIRS); do \
