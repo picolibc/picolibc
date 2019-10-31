@@ -66,5 +66,4 @@ dummy_flush(FILE *file)
 
 static FILE __stdio = FDEV_SETUP_STREAM(dummy_putc, dummy_getc, dummy_flush, _FDEV_SETUP_RW);
 
-FILE *const __weak_iob[3] = { &__stdio, &__stdio, &__stdio };
-__weak_reference(__weak_iob,__iob);
+FILE *const __iob[3] = { &__stdio, &__stdio, &__stdio };

@@ -278,7 +278,10 @@ add_project_arguments(arguments, language: 'c')
 
 subdir('newlib')
 subdir('picocrt')
-subdir('semihost')
+if newlib_tinystdio
+  subdir('semihost')
+  subdir('dummyhost')
+endif
 
 if enable_tests
   subdir('test')

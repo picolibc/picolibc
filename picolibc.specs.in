@@ -16,7 +16,7 @@
 -L@LIBDIR@/%M -L@LIBDIR@ %{!T:-Tpicolibc.ld} %(picolibc_link)
 
 *lib:
---start-group %{semihost:--undefined=__iob -lsemihost} -lc %{semihost:-lsemihost} --end-group 
+--start-group -lc %{-semihost:-lsemihost} %{-dummyhost:-ldummyhost} --end-group 
 
 *endfile:
 
