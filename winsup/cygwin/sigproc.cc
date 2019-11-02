@@ -949,6 +949,9 @@ cygheap_exec_info::record_children ()
     {
       children[nchildren].pid = procs[nchildren]->pid;
       children[nchildren].p = procs[nchildren];
+      /* Set inheritance of required child handles for reattach_children
+	 in the about-to-be-execed process. */
+      children[nchildren].p.set_inheritance (true);
     }
 }
 

@@ -94,3 +94,6 @@ Bug Fixes
 
 - Make spawnvp, spawnvpe fail if the executable is not in $PATH.
   Addresses: https://cygwin.com/ml/cygwin/2019-10/msg00032.html
+
+- Fix parent/child relationship after parent dies.
+  Addresses: https://cygwin.com/ml/cygwin/2019-09/msg00263.html

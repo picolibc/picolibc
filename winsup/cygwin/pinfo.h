@@ -139,6 +139,7 @@ public:
   HANDLE rd_proc_pipe;
   pinfo_minimal (): h (NULL), hProcess (NULL), rd_proc_pipe (NULL) {}
   void set_rd_proc_pipe (HANDLE& h) {rd_proc_pipe = h;}
+  void set_inheritance (bool);
   friend class pinfo;
 };
 

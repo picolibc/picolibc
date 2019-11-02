@@ -478,33 +478,28 @@ pinfo::set_acl()
     debug_printf ("NtSetSecurityObject %y", status);
 }
 
+void
+pinfo_minimal::set_inheritance (bool inherit)
+{
+  DWORD i_flag = inherit ? HANDLE_FLAG_INHERIT : 0;
+
+  SetHandleInformation (rd_proc_pipe, HANDLE_FLAG_INHERIT, i_flag);
+  SetHandleInformation (hProcess, HANDLE_FLAG_INHERIT, i_flag);
+  SetHandleInformation (h, HANDLE_FLAG_INHERIT, i_flag);
+}
+
 pinfo::pinfo (HANDLE parent, pinfo_minimal& from, pid_t pid):
   pinfo_minimal (), destroy (false), procinfo (NULL), waiter_ready (false),
   wait_thread (NULL)
 {
-  HANDLE herr;
-  const char *duperr = NULL;
-  if (!DuplicateHandle (parent, herr = from.rd_proc_pipe, GetCurrentProcess (),
-			&rd_proc_pipe, 0, false, DUPLICATE_SAME_ACCESS))
-    duperr = "couldn't duplicate parent rd_proc_pipe handle %p for forked child %d after exec, %E";
-  else if (!DuplicateHandle (parent, herr = from.hProcess, GetCurrentProcess (),
-			     &hProcess, 0, false, DUPLICATE_SAME_ACCESS))
-    duperr = "couldn't duplicate parent process handle %p for forked child %d after exec, %E";
-  else
-    {
-      h = NULL;
-      DuplicateHandle (parent, from.h, GetCurrentProcess (), &h, 0, false,
-		       DUPLICATE_SAME_ACCESS);
-      init (pid, PID_MAP_RW, h);
-      if (*this)
-	return;
-    }
-
-  if (duperr)
-    debug_printf (duperr, herr, pid);
-
-  /* Returning with procinfo == NULL.  Any open handles will be closed by the
-     destructor. */
+  /* cygheap_exec_info::record_children set the inheritance of the required
+     child handles so just copy them over... */
+  rd_proc_pipe = from.rd_proc_pipe;
+  hProcess = from.hProcess;
+  h = from.h;
+  /* ...and reset their inheritance. */
+  set_inheritance (false);
+  init (pid, PID_MAP_RW, h);
 }
 
 const char *
