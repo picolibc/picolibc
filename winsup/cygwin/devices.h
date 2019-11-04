@@ -19,7 +19,6 @@ typedef unsigned short _minor_t;
 #include <dirent.h>
 #include "cygheap_malloc.h"
 
-#define MAX_CONSOLES 63
 enum fh_devices
 {
   DEV_TTY_MAJOR = 5,
@@ -31,7 +30,7 @@ enum fh_devices
 
   DEV_CONS_MAJOR = 3,
   FH_CONS     = FHDEV (DEV_CONS_MAJOR, 0),
-  FH_CONS_MAX = FHDEV (DEV_CONS_MAJOR, MAX_CONSOLES),
+  FH_CONS_MAX = FHDEV (DEV_CONS_MAJOR, 127),
 
   DEV_PTYM_MAJOR = 128,
   FH_PTYM    = FHDEV (DEV_PTYM_MAJOR, 0),
