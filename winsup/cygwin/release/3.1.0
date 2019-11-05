@@ -97,3 +97,7 @@ Bug Fixes
 
 - Fix parent/child relationship after parent dies.
   Addresses: https://cygwin.com/ml/cygwin/2019-09/msg00263.html
+
+- Fix a security problem if Cygwin is installed into a path
+  with spaces in it.
+  Addresses: https://cygwin.com/ml/cygwin/2019-11/msg00018.html
