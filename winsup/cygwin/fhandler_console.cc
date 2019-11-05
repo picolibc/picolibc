@@ -3042,20 +3042,22 @@ fhandler_console::create_invisible_console_workaround ()
 	  STARTUPINFOW si = {};
 	  PROCESS_INFORMATION pi;
 	  size_t len = helper.get_wide_win32_path_len ();
-	  WCHAR cmd[len + (2 * strlen (" 0xffffffff")) + 1];
+	  WCHAR cmd[len + 1];
+	  WCHAR args[len + 1 + (2 * sizeof (" 0xffffffffffffffff")) + 1];
 	  WCHAR title[] = L"invisible cygwin console";
 
+	  /* Create a new hidden process.  Use the two event handles as
+	     argv[1] and argv[2]. */
+
 	  helper.get_wide_win32_path (cmd);
-	  __small_swprintf (cmd + len, L" %p %p", hello, goodbye);
+	  __small_swprintf (args, L"\"%W\" %p %p", cmd, hello, goodbye);
 
 	  si.cb = sizeof (si);
 	  si.dwFlags = STARTF_USESHOWWINDOW;
 	  si.wShowWindow = SW_HIDE;
 	  si.lpTitle = title;
 
-	  /* Create a new hidden process.  Use the two event handles as
-	     argv[1] and argv[2]. */
-	  BOOL x = CreateProcessW (NULL, cmd,
+	  BOOL x = CreateProcessW (cmd, args,
 				   &sec_none_nih, &sec_none_nih, true,
 				   CREATE_NEW_CONSOLE, NULL, NULL, &si, &pi);
 	  if (x)
