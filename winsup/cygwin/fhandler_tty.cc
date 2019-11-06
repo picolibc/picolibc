@@ -26,6 +26,7 @@ details. */
 #include <asm/socket.h>
 #include "cygwait.h"
 #include "tls_pbuf.h"
+#include "registry.h"
 
 #define ALWAYS_USE_PCON false
 #define USE_API_HOOK true
@@ -3104,6 +3105,19 @@ is_running_as_service (void)
 bool
 fhandler_pty_master::setup_pseudoconsole ()
 {
+  /* If the legacy console mode is enabled, pseudo console seems
+     not to work as expected. To determine console mode, registry
+     key ForceV2 in HKEY_CURRENT_USER\Console is checked. */
+  reg_key reg (HKEY_CURRENT_USER, KEY_READ, L"Console", NULL);
+  if (reg.error ())
+    return false;
+  if (reg.get_dword (L"ForceV2", 1) == 0)
+    {
+      termios_printf ("Pseudo console is disabled "
+		      "because the legacy console mode is enabled.");
+      return false;
+    }
+
   /* Pseudo console supprot is realized using a tricky technic.
      PTY need the pseudo console handles, however, they cannot
      be retrieved by normal procedure. Therefore, run a helper

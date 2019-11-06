@@ -859,6 +859,7 @@ environ_init (char **envp, int envc)
   __endtry
 }
 
+int sawTERM = 0;
 
 char ** __reg2
 win32env_to_cygenv (PWCHAR rawenv, bool posify)
@@ -868,7 +869,6 @@ win32env_to_cygenv (PWCHAR rawenv, bool posify)
   int envc;
   char *newp;
   int i;
-  int sawTERM = 0;
   const char cygterm[] = "TERM=cygwin";
   const char xterm[] = "TERM=xterm-256color";
   char *tmpbuf = tp.t_get ();

@@ -309,7 +309,7 @@ fhandler_console::set_cursor_maybe ()
 {
   con.fillin (get_output_handle ());
   /* Nothing to do for xterm compatible mode. */
-  if (wincap.has_con_24bit_colors ())
+  if (wincap.has_con_24bit_colors () && !con.is_legacy)
     return;
   if (con.dwLastCursorPosition.X != con.b.dwCursorPosition.X ||
       con.dwLastCursorPosition.Y != con.b.dwCursorPosition.Y)
@@ -349,7 +349,7 @@ fhandler_console::send_winch_maybe ()
     {
       con.scroll_region.Top = 0;
       con.scroll_region.Bottom = -1;
-      if (wincap.has_con_24bit_colors ())
+      if (wincap.has_con_24bit_colors () && !con.is_legacy)
 	fix_tab_position (get_output_handle (), con.dwWinSize.X);
       get_ttyp ()->kill_pgrp (SIGWINCH);
       return true;
@@ -483,7 +483,7 @@ sig_exit:
 fhandler_console::input_states
 fhandler_console::process_input_message (void)
 {
-  if (wincap.has_con_24bit_colors ())
+  if (wincap.has_con_24bit_colors () && !con.is_legacy)
     {
       DWORD dwMode;
       /* Enable xterm compatible mode in input */
@@ -589,7 +589,8 @@ fhandler_console::process_input_message (void)
 	    }
 	  /* Allow Ctrl-Space to emit ^@ */
 	  else if (input_rec[i].Event.KeyEvent.wVirtualKeyCode
-		   == (wincap.has_con_24bit_colors () ? '2' : VK_SPACE)
+		   == ((wincap.has_con_24bit_colors () && !con.is_legacy) ?
+		       '2' : VK_SPACE)
 		   && (ctrl_key_state & CTRL_PRESSED)
 		   && !(ctrl_key_state & ALT_PRESSED))
 	    toadd = "";
@@ -1023,17 +1024,28 @@ fhandler_console::open (int flags, mode_t)
       /* Enable xterm compatible mode in output */
       GetConsoleMode (get_output_handle (), &dwMode);
       dwMode |= ENABLE_VIRTUAL_TERMINAL_PROCESSING;
-      SetConsoleMode (get_output_handle (), dwMode);
+      if (!SetConsoleMode (get_output_handle (), dwMode))
+	con.is_legacy = true;
+      else
+	con.is_legacy = false;
       /* Enable xterm compatible mode in input */
-      GetConsoleMode (get_handle (), &dwMode);
-      dwMode |= ENABLE_VIRTUAL_TERMINAL_INPUT;
-      SetConsoleMode (get_handle (), dwMode);
+      if (!con.is_legacy)
+	{
+	  GetConsoleMode (get_handle (), &dwMode);
+	  dwMode |= ENABLE_VIRTUAL_TERMINAL_INPUT;
+	  if (!SetConsoleMode (get_handle (), dwMode))
+	    con.is_legacy = true;
+	}
+      extern int sawTERM;
+      if (con.is_legacy && !sawTERM)
+	setenv ("TERM", "cygwin", 1);
     }
 
   DWORD cflags;
   if (GetConsoleMode (get_handle (), &cflags))
     SetConsoleMode (get_handle (), ENABLE_WINDOW_INPUT
-		    | (wincap.has_con_24bit_colors () ? 0 : ENABLE_MOUSE_INPUT)
+		    | ((wincap.has_con_24bit_colors () && !con.is_legacy) ?
+		       0 : ENABLE_MOUSE_INPUT)
 		    | cflags);
 
   debug_printf ("opened conin$ %p, conout$ %p", get_handle (),
@@ -1062,7 +1074,7 @@ fhandler_console::close ()
   output_mutex = NULL;
 
   if (shared_console_info && getpid () == con.owner &&
-      wincap.has_con_24bit_colors ())
+      wincap.has_con_24bit_colors () && !con.is_legacy)
     {
       DWORD dwMode;
       /* Disable xterm compatible mode in input */
@@ -1209,7 +1221,7 @@ fhandler_console::output_tcsetattr (int, struct termios const *t)
   acquire_output_mutex (INFINITE);
   DWORD flags = ENABLE_PROCESSED_OUTPUT | ENABLE_WRAP_AT_EOL_OUTPUT;
   /* If system has 24 bit color capability, use xterm compatible mode. */
-  if (wincap.has_con_24bit_colors ())
+  if (wincap.has_con_24bit_colors () && !con.is_legacy)
     {
       flags |= ENABLE_VIRTUAL_TERMINAL_PROCESSING;
       if (!(t->c_oflag & OPOST) || !(t->c_oflag & ONLCR))
@@ -1274,9 +1286,10 @@ fhandler_console::input_tcsetattr (int, struct termios const *t)
     }
 
   flags |= ENABLE_WINDOW_INPUT |
-    (wincap.has_con_24bit_colors () ? 0 : ENABLE_MOUSE_INPUT);
+    ((wincap.has_con_24bit_colors () && !con.is_legacy) ?
+     0 : ENABLE_MOUSE_INPUT);
   /* if system has 24 bit color capability, use xterm compatible mode. */
-  if (wincap.has_con_24bit_colors ())
+  if (wincap.has_con_24bit_colors () && !con.is_legacy)
     flags |= ENABLE_VIRTUAL_TERMINAL_INPUT;
 
   int res;
@@ -1650,7 +1663,7 @@ bool fhandler_console::write_console (PWCHAR buf, DWORD len, DWORD& done)
 {
   bool need_fix_tab_position = false;
   /* Check if screen will be alternated. */
-  if (wincap.has_con_24bit_colors ()
+  if (wincap.has_con_24bit_colors () && !con.is_legacy
       && memmem (buf, len*sizeof (WCHAR), L"\033[?1049", 7*sizeof (WCHAR)))
     need_fix_tab_position = true;
 
@@ -2498,7 +2511,8 @@ fhandler_console::write_normal (const unsigned char *src,
   memset (&ps, 0, sizeof ps);
   while (found < end
 	 && found - src < CONVERT_LIMIT
-	 && (wincap.has_con_24bit_colors () || base_chars[*found] == NOR) )
+	 && ((wincap.has_con_24bit_colors () && !con.is_legacy)
+	     || base_chars[*found] == NOR) )
     {
       switch (ret = f_mbtowc (_REENT, NULL, (const char *) found,
 			       end - found, &ps))
@@ -2958,7 +2972,7 @@ fhandler_console::fixup_after_fork_exec (bool execing)
 {
   set_unit ();
   setup_io_mutex ();
-  if (wincap.has_con_24bit_colors ())
+  if (wincap.has_con_24bit_colors () && !con.is_legacy)
     {
       DWORD dwMode;
       /* Disable xterm compatible mode in input */
