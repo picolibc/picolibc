@@ -3094,22 +3094,11 @@ pty_master_fwd_thread (VOID *arg)
    the helper process is running as privileged user while
    slave process is not. This function is used to determine
    if the process is running as a srvice or not. */
-static bool
+inline static bool
 is_running_as_service (void)
 {
-  DWORD dwSize = 0;
-  PTOKEN_GROUPS pGroupInfo;
-  tmp_pathbuf tp;
-  pGroupInfo = (PTOKEN_GROUPS) tp.w_get ();
-  NtQueryInformationToken (hProcToken, TokenGroups, pGroupInfo,
-					2 * NT_MAX_PATH, &dwSize);
-  for (DWORD i=0; i<pGroupInfo->GroupCount; i++)
-    if (RtlEqualSid (well_known_service_sid, pGroupInfo->Groups[i].Sid))
-      return true;
-  for (DWORD i=0; i<pGroupInfo->GroupCount; i++)
-    if (RtlEqualSid (well_known_interactive_sid, pGroupInfo->Groups[i].Sid))
-      return false;
-  return true;
+  return check_token_membership (well_known_service_sid)
+    || cygheap->user.saved_sid () == well_known_system_sid;
 }
 
 bool
