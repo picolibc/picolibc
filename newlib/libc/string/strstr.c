@@ -102,7 +102,8 @@ strstr2 (const unsigned char *hs, const unsigned char *ne)
 {
   uint32_t h1 = (ne[0] << 16) | ne[1];
   uint32_t h2 = 0;
-  for (int c = hs[0]; h1 != h2 && c != 0; c = *++hs)
+  int c;
+  for (c = hs[0]; h1 != h2 && c != 0; c = *++hs)
       h2 = (h2 << 16) | c;
   return h1 == h2 ? (char *)hs - 2 : NULL;
 }
@@ -112,7 +113,8 @@ strstr3 (const unsigned char *hs, const unsigned char *ne)
 {
   uint32_t h1 = (ne[0] << 24) | (ne[1] << 16) | (ne[2] << 8);
   uint32_t h2 = 0;
-  for (int c = hs[0]; h1 != h2 && c != 0; c = *++hs)
+  int c;
+  for (c = hs[0]; h1 != h2 && c != 0; c = *++hs)
       h2 = (h2 | c) << 8;
   return h1 == h2 ? (char *)hs - 3 : NULL;
 }
@@ -122,7 +124,8 @@ strstr4 (const unsigned char *hs, const unsigned char *ne)
 {
   uint32_t h1 = (ne[0] << 24) | (ne[1] << 16) | (ne[2] << 8) | ne[3];
   uint32_t h2 = 0;
-  for (int c = hs[0]; c != 0 && h1 != h2; c = *++hs)
+  int c;
+  for (c = hs[0]; c != 0 && h1 != h2; c = *++hs)
     h2 = (h2 << 8) | c;
   return h1 == h2 ? (char *)hs - 4 : NULL;
 }
@@ -142,6 +145,7 @@ strstr (const char *haystack, const char *needle)
 {
   const unsigned char *hs = (const unsigned char *) haystack;
   const unsigned char *ne = (const unsigned char *) needle;
+  int i;
 
   /* Handle short needle special cases first.  */
   if (ne[0] == '\0')
@@ -170,7 +174,7 @@ strstr (const char *haystack, const char *needle)
 
       /* Initialize bad character shift hash table.  */
       memset (shift, ne_len + 1, sizeof (shift));
-      for (int i = 0; i < ne_len; i++)
+      for (i = 0; i < ne_len; i++)
 	shift[ne[i] % sizeof (shift)] = ne_len - i;
 
       do

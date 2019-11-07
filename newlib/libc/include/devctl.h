@@ -1,5 +1,6 @@
 /*
- * Copyright (c) 2016 Joel Sherrill <joel@rtems.org>.  All rights reserved.
+ * Copyright (c) 2016,2019 Joel Sherrill <joel@rtems.org>.
+ * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -27,6 +28,28 @@
 #define _POSIX_DEVCTL_h_
 
 /*
+ * Nothing in this file should be visible unless _POSIX_26_C_SOURCE is
+ * defined.
+ */
+#ifdef _POSIX_26_C_SOURCE
+
+#include <sys/cdefs.h>
+
+#if defined(__rtems__)
+/*
+ * The FACE Technical Standard, Edition 3.0 and later require the
+ * definition of the subcommand SOCKCLOSE in <devctl.h>.
+ *
+ * Reference: https://www.opengroup.org/face
+ *
+ * Using 'D' should avoid the letters used by other users of <sys/ioccom.h>
+ */
+#include <sys/ioccom.h>
+
+#define SOCKCLOSE    _IO('D', 1)    /* socket close */
+#endif
+
+/*
  * The posix_devctl() method is defined by POSIX 1003.26-2003. Aside
  * from the single method, it adds the following requirements:
  *
@@ -35,10 +58,6 @@
  *   + application must define _POSIX_26_C_SOURCE to use posix_devctl().
  *   + posix_devctl() is prototyped in <devctl.h>
  */
-
-#ifdef _POSIX_26_C_SOURCE
-#include <sys/cdefs.h>
-
 int posix_devctl(
   int              fd,
   int              dcmd,
