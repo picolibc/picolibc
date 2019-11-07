@@ -41,6 +41,9 @@ option('multilib', type: 'boolean', value: true,
 option('picolib', type: 'boolean', value: true,
        description: 'Include pico lib bits')
 
+option('sysroot-install', type: 'boolean', value: false,
+       description: 'Install in gcc sysroot')
+
 option('have-alias-attribute', type: 'combo', choices: ['true', 'false', 'auto'], value: 'auto',
        description: 'Compiler supports __alias__ attribute')
 
