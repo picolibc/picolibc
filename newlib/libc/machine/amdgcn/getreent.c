@@ -34,7 +34,7 @@ __getreent (void)
      s11 contains the offset to the base of the stack.
      s[4:5] contains the dispatch pointer.
      
-     WARNING: this code will break if s[0:3] is ever used for anything!  */
+     WARNING: this code will break if s[0:1] is ever used for anything!  */
   const register unsigned long buffer_descriptor asm("s0");
   unsigned long private_segment = buffer_descriptor & 0x0000ffffffffffff;
   const register unsigned int stack_offset asm("s11");
@@ -54,20 +54,20 @@ __getreent (void)
   if (sp >= addr)
     goto stackoverflow;
 
-  /* Place a marker in s3 to indicate that the reent data is initialized.
-     The register is known to hold part of an unused buffer descriptor
-     when the kernel is launched.  This may not be unused forever, but
-     we already used s0 and s1 above, so this doesn't do extra harm.  */
-  register int s3 asm("s3");
-  if (s3 != 123456)
+  /* Stash a marker in the unused upper 16 bits of s[0:1] to indicate that
+     the reent data is initialized.  */
+  const register unsigned int s1 asm("s1");
+  unsigned int marker = s1 >> 16;
+  if (marker != 12345)
     {
-      asm("s_mov_b32 s3, 123456");
-      data->marker = 123456;
+      asm("s_and_b32\ts1, s1, 0xffff");
+      asm("s_or_b32\ts1, s1, (12345 << 16)");
+      data->marker = 12345;
 
       __builtin_memset (&data->reent, 0, sizeof(struct _reent));
       _REENT_INIT_PTR_ZEROED (&data->reent);
     }
-  else if (data->marker != 123456)
+  else if (data->marker != 12345)
     goto stackoverflow;
 
 
