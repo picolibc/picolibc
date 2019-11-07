@@ -46,7 +46,6 @@ srcs_machine = [
   'strlen.c',
 ]
 
-subdir('include')
 subdir('sys')
 
 foreach target : targets

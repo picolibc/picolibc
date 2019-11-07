@@ -32,8 +32,34 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
-inc_headers = [
-  'fenv.h'
+srcs_fenv = [
+  'feclearexcept.c',
+  'fe_dfl_env.c',
+  'fegetenv.c',
+  'fegetexceptflag.c',
+  'fegetround.c',
+  'feholdexcept.c',
+  'fenv_stub.c',
+  'feraiseexcept.c',
+  'fesetenv.c',
+  'fesetexceptflag.c',
+  'fesetround.c',
+  'fetestexcept.c',
+  'feupdateenv.c',
 ]
 
-install_headers(inc_headers)
+include_sys = '../../libc/include/sys'
+
+install_headers([join_paths(include_sys, 'fenv.h')],
+		subdir:'sys'
+	       )
+  
+foreach target : targets
+  value = get_variable('target_' + target)
+  set_variable('lib_fenv' + target,
+	       static_library('fenv' + target,
+			      srcs_fenv,
+			      pic: false,
+			      include_directories: inc,
+			      c_args: value[1]))
+endforeach

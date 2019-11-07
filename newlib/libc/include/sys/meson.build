@@ -72,6 +72,11 @@ inc_sys_headers = [
   'utime.h',
   'wait.h'
 ]
+
+if need_generic_fenv_h
+  inc_sys_headers += ['fenv.h']
+endif
+
 if not newlib_tinystdio
   inc_sys_headers += ['reent.h']
 endif
