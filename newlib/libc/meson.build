@@ -134,6 +134,14 @@ if machine_dirs.has_key(host_cpu)
     need_generic_fenv_h = true
   endif
 
+  machine_inc_dir = join_paths(machine_dir, 'include')
+
+  if run_command('test', '-d', machine_inc_dir).returncode() == 0
+    inc = [include_directories(machine_inc_dir), inc]
+  endif
+
+  inc = [include_directories(machine_dir), inc]
+
   libdirs = [machine_dir] + libdirs
   libnames = ['machine'] + libnames
 else

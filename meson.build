@@ -254,10 +254,6 @@ endif
 inc_dirs = [stdio_inc_dir, '.', 'newlib/libc/include']
 
 inc = include_directories(inc_dirs)
-test_inc_dirs = ['newlib/testsuite/include'] + inc_dirs
-test_inc = include_directories(test_inc_dirs)
-semihost_inc_dirs = ['semihost'] + inc_dirs
-semihost_inc = include_directories(semihost_inc_dirs)
 
 includedir = join_paths(get_option('prefix'), get_option('includedir'))
 

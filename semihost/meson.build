@@ -51,6 +51,8 @@ if src_semihost_machine.has_key(host_cpu)
     'semihost.h'
   )
 
+  semihost_inc = [include_directories('.'), inc]
+
   foreach target : targets
     value = get_variable('target_' + target)
 
