@@ -35,6 +35,9 @@ What changed:
 
 - Improve /proc/cpuinfo output and align more closely with Linux.
 
+- Raise stackdump frame limit from 16 to 32.
+  Addresses: https://cygwin.com/ml/cygwin/2019-11/msg00038.html
+
 
 Bug Fixes
 ---------
