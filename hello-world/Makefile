@@ -33,13 +33,13 @@
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
-CFLAGS=--specs=picolibc.specs --semihost -O0 -g
+CFLAGS=--specs=picolibc.specs --semihost
 
 CC_RISCV=riscv64-unknown-elf-gcc
-CFLAGS_RISCV=$(CFLAGS) -march=rv32imac -mabi=ilp32 -Wl,-Map=hello-world-riscv.map  -Wl,-Thello-world-riscv.ld
+CFLAGS_RISCV=$(CFLAGS) -march=rv32imac -mabi=ilp32 -Thello-world-riscv.ld
 
 CC_ARM=arm-none-eabi-gcc
-CFLAGS_ARM=$(CFLAGS) -mlittle-endian -mcpu=cortex-m3 -mthumb  -Wl,-Map=hello-world-arm.map  -Wl,-Thello-world-arm.ld
+CFLAGS_ARM=$(CFLAGS) -mcpu=cortex-m3 -Thello-world-arm.ld
 
 all: hello-world-riscv.elf hello-world-arm.elf
 
