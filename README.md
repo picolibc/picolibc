@@ -71,4 +71,4 @@ sync has not been difficult so far.
  * [Using Picolibc](doc/using.md)
  * [Picolibc initialization](doc/init.md)
  * [Thread Local Storage](doc/tls.md)
- * [Hello World](hello-world/hello-world.md)
+ * [Hello World](hello-world/README.md)
