@@ -61,9 +61,10 @@ hello-world-riscv.ld):
 
 	INCLUDE picolibc.ld
 
-The mps2-an385 has at least 16kB of flash starting at 0 and at least
-64kB of RAM starting at 0x20000000, so hello-world-arm.ld looks like
-this:
+The mps2-an385 has at least 16kB of flash starting at 0. Picolibc
+places a small interrupt vector there which points at the first
+instruction of _start.  The mps2-an385 also has 64kB of RAM starting
+at 0x20000000, so hello-world-arm.ld looks like this:
 
 	__flash =      0x00000000;
 	__flash_size = 0x00004000;
