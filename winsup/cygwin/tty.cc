@@ -244,7 +244,7 @@ tty::init ()
   pcon_pid = 0;
   num_pcon_attached_slaves = 0;
   term_code_page = 0;
-  need_clear_screen = false;
+  need_redraw_screen = false;
 }
 
 HANDLE

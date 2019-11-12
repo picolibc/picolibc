@@ -2669,7 +2669,7 @@ fhandler_pty_slave::fixup_after_attach (bool native_maybe, int fd_set)
 	  if (get_ttyp ()->num_pcon_attached_slaves == 0
 	      && !ALWAYS_USE_PCON)
 	    /* Assume this is the first process using this pty slave. */
-	    get_ttyp ()->need_clear_screen = true;
+	    get_ttyp ()->need_redraw_screen = true;
 
 	  get_ttyp ()->num_pcon_attached_slaves ++;
 	}
@@ -2700,6 +2700,21 @@ fhandler_pty_slave::fixup_after_attach (bool native_maybe, int fd_set)
 		  kill (get_ttyp ()->pcon_pid, 0) != 0)
 		get_ttyp ()->pcon_pid = myself->pid;
 	      get_ttyp ()->switch_to_pcon_out = true;
+
+	      if (get_ttyp ()->need_redraw_screen)
+		{
+		  /* Forcibly redraw screen based on console screen buffer. */
+		  /* The following code triggers redrawing the screen. */
+		  CONSOLE_SCREEN_BUFFER_INFO sbi;
+		  GetConsoleScreenBufferInfo (get_output_handle (), &sbi);
+		  SMALL_RECT rect = {0, 0,
+		    (SHORT) (sbi.dwSize.X -1), (SHORT) (sbi.dwSize.Y - 1)};
+		  COORD dest = {0, 0};
+		  CHAR_INFO fill = {' ', 0};
+		  ScrollConsoleScreenBuffer (get_output_handle (),
+					     &rect, NULL, dest, &fill);
+		  get_ttyp ()->need_redraw_screen = false;
+		}
 	    }
 	  init_console_handler (false);
 	}
@@ -2717,19 +2732,6 @@ fhandler_pty_slave::fixup_after_fork (HANDLE parent)
   // fork_fixup (parent, inuse, "inuse");
   // fhandler_pty_common::fixup_after_fork (parent);
   report_tty_counts (this, "inherited", "");
-
-  if (get_ttyp ()->need_clear_screen)
-    {
-      const char *term = getenv ("TERM");
-      if (term && strcmp (term, "dumb") && !strstr (term, "emacs"))
-	{
-	  /* FIXME: Clearing sequence may not be "^[[H^[[J"
-	     depending on the terminal type. */
-	  DWORD n;
-	  WriteFile (get_output_handle_cyg (), "\033[H\033[J", 6, &n, NULL);
-	}
-      get_ttyp ()->need_clear_screen = false;
-    }
 }
 
 void
