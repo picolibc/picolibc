@@ -1255,6 +1255,28 @@ fhandler_pty_slave::push_to_pcon_screenbuffer (const char *ptr, size_t len)
       memmove (p0, p0+4, nlen - (p0+4 - buf));
       nlen -= 4;
     }
+
+  /* If the ESC sequence ESC[?3h or ESC[?3l which clears console screen
+     buffer is pushed, set need_redraw_screen to trigger redraw screen. */
+  p0 = buf;
+  while ((p0 = (char *) memmem (p0, nlen - (p0 - buf), "\033[?", 3)))
+    {
+      p0 += 3;
+      while (p0 < buf + nlen && *p0 != 'h' && *p0 != 'l')
+	{
+	  int arg = 0;
+	  while (p0 < buf + nlen && isdigit (*p0))
+	    arg = arg * 10 + (*p0 ++) - '0';
+	  if (arg == 3)
+	    get_ttyp ()->need_redraw_screen = true;
+	  if (p0 < buf + nlen && *p0 == ';')
+	    p0 ++;
+	}
+      p0 ++;
+      if (p0 >= buf + nlen)
+	break;
+    }
+
   DWORD dwMode, flags;
   flags = ENABLE_VIRTUAL_TERMINAL_PROCESSING;
   GetConsoleMode (get_output_handle (), &dwMode);
