@@ -43,10 +43,10 @@ relerr_log2: 1.83 * 2^-33 (Relative error of logx.)
 relerr_exp2: 1.69 * 2^-34 (Relative error of exp2(ylogx).)
 */
 
-#define N (1 << POWF_LOG2_TABLE_BITS)
+#define N (1ul << POWF_LOG2_TABLE_BITS)
 #define T __powf_log2_data.tab
 #define A __powf_log2_data.poly
-#define OFF 0x3f330000
+#define OFF 0x3f330000ul
 
 /* Subnormal input is normalized so ix has negative biased exponent.
    Output is multiplied by N (POWF_SCALE) if TOINT_INTRINICS is set.  */
@@ -63,7 +63,7 @@ log2_inline (uint32_t ix)
      The ith subinterval contains z and c is near its center.  */
   tmp = ix - OFF;
   i = (tmp >> (23 - POWF_LOG2_TABLE_BITS)) % N;
-  top = tmp & 0xff800000;
+  top = tmp & 0xff800000ul;
   iz = ix - top;
   k = (int32_t) top >> (23 - POWF_SCALE_BITS); /* arithmetic shift */
   invc = T[i].invc;
@@ -87,9 +87,9 @@ log2_inline (uint32_t ix)
 
 #undef N
 #undef T
-#define N (1 << EXP2F_TABLE_BITS)
+#define N (1ul << EXP2F_TABLE_BITS)
 #define T __exp2f_data.tab
-#define SIGN_BIAS (1 << (EXP2F_TABLE_BITS + 11))
+#define SIGN_BIAS (1ul << (EXP2F_TABLE_BITS + 11))
 
 /* The output of log2 and thus the input of exp2 is either scaled by N
    (in case of fast toint intrinsics) or not.  The unscaled xd must be
@@ -139,9 +139,9 @@ checkint (uint32_t iy)
     return 0;
   if (e > 0x7f + 23)
     return 2;
-  if (iy & ((1 << (0x7f + 23 - e)) - 1))
+  if (iy & ((1ul << (0x7f + 23 - e)) - 1))
     return 0;
-  if (iy & (1 << (0x7f + 23 - e)))
+  if (iy & (1ul << (0x7f + 23 - e)))
     return 1;
   return 2;
 }
@@ -149,7 +149,7 @@ checkint (uint32_t iy)
 static inline int
 zeroinfnan (uint32_t ix)
 {
-  return 2 * ix - 1 >= 2u * 0x7f800000 - 1;
+  return 2 * ix - 1 >= 2ul * 0x7f800000ul - 1;
 }
 
 float
@@ -160,7 +160,7 @@ powf (float x, float y)
 
   ix = asuint (x);
   iy = asuint (y);
-  if (__builtin_expect (ix - 0x00800000 >= 0x7f800000 - 0x00800000
+  if (__builtin_expect (ix - 0x00800000ul >= 0x7f800000ul - 0x00800000ul
 			  || zeroinfnan (iy),
 			0))
     {
@@ -169,32 +169,32 @@ powf (float x, float y)
 	{
 	  if (2 * iy == 0)
 	    return issignalingf_inline (x) ? x + y : 1.0f;
-	  if (ix == 0x3f800000)
+	  if (ix == 0x3f800000ul)
 	    return issignalingf_inline (y) ? x + y : 1.0f;
-	  if (2 * ix > 2u * 0x7f800000 || 2 * iy > 2u * 0x7f800000)
+	  if (2 * ix > 2u * 0x7f800000ul || 2 * iy > 2u * 0x7f800000ul)
 	    return x + y;
-	  if (2 * ix == 2 * 0x3f800000)
+	  if (2 * ix == 2 * 0x3f800000ul)
 	    return 1.0f;
-	  if ((2 * ix < 2 * 0x3f800000) == !(iy & 0x80000000))
+	  if ((2 * ix < 2 * 0x3f800000ul) == !(iy & 0x80000000ul))
 	    return 0.0f; /* |x|<1 && y==inf or |x|>1 && y==-inf.  */
 	  return y * y;
 	}
       if (__builtin_expect (zeroinfnan (ix), 0))
 	{
 	  float_t x2 = x * x;
-	  if (ix & 0x80000000 && checkint (iy) == 1)
+	  if (ix & 0x80000000ul && checkint (iy) == 1)
 	    {
 	      x2 = -x2;
 	      sign_bias = 1;
 	    }
 #if WANT_ERRNO
-	  if (2 * ix == 0 && iy & 0x80000000)
+	  if (2 * ix == 0 && iy & 0x80000000ul)
 	    return __math_divzerof (sign_bias);
 #endif
-	  return iy & 0x80000000 ? 1 / x2 : x2;
+	  return iy & 0x80000000ul ? 1 / x2 : x2;
 	}
       /* x and y are non-zero finite.  */
-      if (ix & 0x80000000)
+      if (ix & 0x80000000ul)
 	{
 	  /* Finite x < 0.  */
 	  int yint = checkint (iy);
@@ -202,14 +202,14 @@ powf (float x, float y)
 	    return __math_invalidf (x);
 	  if (yint == 1)
 	    sign_bias = SIGN_BIAS;
-	  ix &= 0x7fffffff;
+	  ix &= 0x7ffffffful;
 	}
-      if (ix < 0x00800000)
+      if (ix < 0x00800000ul)
 	{
 	  /* Normalize subnormal x so exponent becomes negative.  */
 	  ix = asuint (x * 0x1p23f);
-	  ix &= 0x7fffffff;
-	  ix -= 23 << 23;
+	  ix &= 0x7ffffffful;
+	  ix -= 23ul << 23;
 	}
     }
   double_t logx = log2_inline (ix);
