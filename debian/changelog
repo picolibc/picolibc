@@ -1,3 +1,13 @@
+picolibc (1.1-1) unstable; urgency=medium
+
+  * Upstream release 1.1
+  * semihost support
+  * Posix I/O support on Posix systems
+  * Merged newlib code
+  * Hello world example
+
+ -- Keith Packard <keithp@keithp.com>  Thu, 14 Nov 2019 17:01:13 -0800
+
 picolibc (1.0-1) unstable; urgency=medium
 
   * Version 1.0
