@@ -55,6 +55,6 @@ foreach target : targets
 		static_library('machine' + target,
 			srcs_libm_machine,
 			pic: false,
-			include_directories: [ inc, include_directories('../../common') ],
+			include_directories: math_inc,
 			c_args: value[1] + ['-fno-builtin']))
 endforeach

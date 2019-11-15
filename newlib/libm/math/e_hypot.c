@@ -47,9 +47,18 @@
 
 #ifndef _DOUBLE_IS_32BITS
 
-#if defined(_IEEE_LIBM) && defined(HAVE_ALIAS_ATTRIBUTE)
+#if defined(HAVE_ALIAS_ATTRIBUTE)
+#if defined(_IEEE_LIBM)
 __strong_reference(__ieee754_hypot, hypot);
+#ifdef _LDBL_EQ_DBL
+extern long double hypotl(long double x, long double y) __attribute__ ((__alias__ ("__ieee754_hypot")));
 #endif
+#endif
+#ifdef _LDBL_EQ_DBL
+extern long double __ieee754_hypotl(long double x, long double y) __attribute__ ((__alias__ ("__ieee754_hypot")));
+#endif
+#endif
+
 
 #ifdef __STDC__
 	double __ieee754_hypot(double x, double y)

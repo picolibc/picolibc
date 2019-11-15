@@ -4,8 +4,8 @@
 # is freely granted, provided that this notice is preserved.
 #
 
-# flags.exp overrides the dejagnu versions of libgloss_link_flags,
-# newlib_link_flags, and newlib_include_flags.
+# flags.exp overrides the dejagnu versions of newlib_link_flags and
+# newlib_include_flags.
 load_lib flags.exp
 
 proc newlib_version { } {

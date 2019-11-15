@@ -169,7 +169,7 @@ _printf_float (struct _reent *data,
 {
 #define _fpvalue (pdata->_double_)
 
-  char *decimal_point = _localeconv_r (data)->decimal_point;
+  char *decimal_point = localeconv ()->decimal_point;
   size_t decp_len = strlen (decimal_point);
   /* Temporary negative sign for floats.  */
   char softsign;

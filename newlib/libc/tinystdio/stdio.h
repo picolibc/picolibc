@@ -232,8 +232,8 @@ struct __file {
 #define __SSTR	0x0004		/* this is an sprintf/snprintf string */
 #define __SERR	0x0010		/* found error */
 #define __SEOF	0x0020		/* found EOF */
-#define __SUNGET 0x040		/* ungetc() happened */
-#define __SMALLOC 0x80		/* handle is malloc()ed */
+#define __SUNGET 0x0040		/* ungetc() happened */
+#define __SCLOSE 0x0080		/* struct is __file_close with close function */
 #if 0
 /* possible future extensions, will require uint16_t flags */
 #define __SRW	0x0100		/* open for reading & writing */
@@ -247,10 +247,13 @@ struct __file {
 	int	(*flush)(struct __file *);	/* function to flush output to device */
 };
 
-struct __file_str {
-	struct __file file;	/* main file struct */
-	char	*buf;		/* buffer pointer */
-	int	size;		/* size of buffer */
+/*
+ * This variant includes a 'close' function which is
+ * invoked from fclose when the __SCLOSE bit is set
+ */
+struct __file_close {
+	struct __file file;			/* main file struct */
+	int	(*close)(struct __file *);	/* function to close file */
 };
 
 #endif /* not __DOXYGEN__ */
@@ -843,7 +846,9 @@ static __inline__ int fflush(FILE *stream)
 
 #ifndef __DOXYGEN__
 /* only mentioned for libstdc++ support, not implemented in library */
-#define BUFSIZ 1024
+#ifndef BUFSIZ
+#define BUFSIZ 512
+#endif
 #define _IONBF 0
 __extension__ typedef long long fpos_t;
 extern int fgetpos(FILE *stream, fpos_t *pos);

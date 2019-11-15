@@ -6,6 +6,8 @@
 
 #include "fdlibm.h"
 
+#if !defined(_LDBL_EQ_DBL) || !defined(HAVE_ALIAS_ATTRIBUTE)
+
 #if defined(_IEEE_LIBM) && defined(HAVE_ALIAS_ATTRIBUTE)
 __strong_reference(__ieee754_hypotl, hypotl);
 #endif
@@ -20,3 +22,4 @@ __ieee754_hypotl (long double x, long double y)
   return sqrtl ((x * x) + (y * y));
 #endif
 }
+#endif

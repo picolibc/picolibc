@@ -32,6 +32,10 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
+src_common = [
+    'signgam.c'
+]  
+
 dsrc_common = [
   's_finite.c',
   's_copysign.c',
@@ -208,7 +212,7 @@ lsrc_common = [
   'sl_finite.c'
 ]
 
-srcs_common = dsrc_common + fsrc_common
+srcs_common = src_common + dsrc_common + fsrc_common
 
 if have_long_double
   srcs_common += lsrc_common

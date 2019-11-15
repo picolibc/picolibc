@@ -951,9 +951,9 @@ rflag:		ch = *fmt++;
 reswitch:	switch (ch) {
 #ifdef _WANT_IO_C99_FORMATS
 		case '\'':
-			thousands_sep = _localeconv_r (data)->thousands_sep;
+			thousands_sep = localeconv ()->thousands_sep;
 			thsnd_len = strlen (thousands_sep);
-			grouping = _localeconv_r (data)->grouping;
+			grouping = localeconv ()->grouping;
 			if (thsnd_len > 0 && grouping && *grouping)
 			  flags |= GROUPING;
 			goto rflag;

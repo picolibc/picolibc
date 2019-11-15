@@ -38,7 +38,9 @@ project('picolibc', 'c',
 	  'c_std=gnu99',
 	  'b_staticpic=false',
 	],
-	version: '1.0.0'
+	license : 'BSD',
+	meson_version : '>= 0.50',
+	version: '1.1.0'
 )
 
 targets = []
@@ -87,7 +89,8 @@ newlib_initfini_array = get_option('newlib-initfini-array')
 newlib_initfini = get_option('newlib-initfini')
 thread_local_storage = get_option('thread-local-storage')
 tls_model = get_option('tls-model')
-hw_fp = get_option('hw-fp')
+posix_io = get_option('posix-io')
+sysroot_install = get_option('sysroot-install')
 
 host_cpu=host_machine.cpu()
 if host_cpu == ''
@@ -115,12 +118,12 @@ lib_dir = join_paths(get_option('prefix'), get_option('libdir'))
 specs_data = configuration_data()
 specs_data.set(
   'INCLUDEDIR',
-  join_paths(get_option('prefix'), get_option('includedir'))
+  join_paths(sysroot_install? '%R' : get_option('prefix'), get_option('includedir'))
 )
 
 specs_data.set(
   'LIBDIR',
-  lib_dir
+  sysroot_install? join_paths('%R', get_option('libdir')) : lib_dir
 )
 
 specs_data.set(
@@ -215,7 +218,6 @@ conf_data.set('_NANO_FORMATTED_IO', newlib_nano_formatted_io)
 conf_data.set('_RETARGETABLE_LOCKING', newlib_retargetable_locking)
 conf_data.set('_WANT_USE_LONG_TIME_T', newlib_long_time_t)
 conf_data.set('TINY_STDIO', newlib_tinystdio, description: 'Use tiny stdio from gcc avr')
-conf_data.set('__CUSTOM_FILE_IO__', newlib_tinystdio, description: 'Use tiny stdio FILE')
 conf_data.set('_IEEE_LIBM', true, description: 'math library only offers ieee semantics')
 conf_data.set('PREFER_SIZE_OVER_SPEED', target_optspace, description: 'Optimize for space over speed')
 conf_data.set('FAST_STRCMP', fast_strcmp, description: 'Always optimize strcmp for performance')
@@ -227,6 +229,7 @@ conf_data.set('NEWLIB_GLOBAL_ERRNO', newlib_global_errno, description: 'use glob
 conf_data.set('HAVE_INITFINI_ARRAY', newlib_initfini_array, description: 'compiler supports INIT_ARRAY sections')
 conf_data.set('HAVE_INIT_FINI', newlib_initfini, description: 'Support _init() and _fini() functions')
 conf_data.set('NEWLIB_TLS', thread_local_storage, description: 'use thread local storage')
+conf_data.set('POSIX_IO', posix_io, description: 'Use open/close/read/write in tinystdio')
 
 version_data = configuration_data()
 
@@ -251,8 +254,6 @@ endif
 inc_dirs = [stdio_inc_dir, '.', 'newlib/libc/include']
 
 inc = include_directories(inc_dirs)
-test_inc_dirs = ['newlib/testsuite/include'] + inc_dirs
-test_inc = include_directories(test_inc_dirs)
 
 includedir = join_paths(get_option('prefix'), get_option('includedir'))
 
@@ -274,6 +275,10 @@ add_project_arguments(arguments, language: 'c')
 
 subdir('newlib')
 subdir('picocrt')
+if newlib_tinystdio
+  subdir('semihost')
+  subdir('dummyhost')
+endif
 
 if enable_tests
   subdir('test')

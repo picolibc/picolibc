@@ -12,12 +12,14 @@ file delivered with Picolibc. This will set the system header file
 path and the linker library path to point at Picolibc. For example, to
 compile a single file and generate a .o file:
 
-	$ gcc -specs=picolibc.specs -c foo.c
+	$ gcc --specs=picolibc.specs -c foo.c
 
 When installed directly into the system, picolibc.specs is placed in
 the gcc directory so that it will be found using just the base name of
-the file. If installed in a separate location, you will need to provide an
-absolute pathname to the picolibc.specs file.
+the file. If installed in a separate location, you will need to
+provide an absolute pathname to the picolibc.specs file:
+
+	$ gcc --specs=/usr/local/picolibc/picolibc.specs -c foo.c
 
 When building for an embedded system, you'll probably need to use a
 longer name for the compiler, something like `riscv-unknown-elf-gcc`
@@ -76,3 +78,26 @@ Assign these symbols in the linker script as follows:
  5) Call `main()`
 
  6) Call [finalizers/destructors](init.md) using `__libc_fini_array()`
+
+## Semihosting
+
+“Semihosting” is a mechanism used when the application is run under a
+debugger or emulation environment that provides access to some
+functionality of the OS running the debugger or emulator. Picolibc
+has semihosting support for console I/O and the exit() call.
+
+One common use for semihosting is to generate debug messages before
+any of the target hardware has been set up.
+
+Picolibc distributes the semihosting implementation as a separate
+library, `libsemihost.a`. Because it provides interfaces that are used
+by libc itself, it must be included in the linker command line *after*
+libc. You can do this by using the GCC --semihost
+command line flag defined by picolibc.specs:
+
+	$ gcc --specs=picolibc.specs --semihost -o program.elf program.o
+
+You can also list libc and libsemihost in the correct order
+explicitly:
+
+	$ gcc --specs=picolibc.specs -o program.elf -lc -lsemihost

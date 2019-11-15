@@ -35,6 +35,8 @@
 
 #include "../../crt0.h"
 
+extern const void *__interrupt_vector[];
+
 void
 _start(void)
 {
@@ -49,4 +51,6 @@ _start(void)
 	__asm__("vmsr fpscr, %0" : : "r" (fpscr_save));
 #endif
 	__start();
+	/* Generate a reference to __interrupt_vector so we get one loaded */
+	__asm__(".equ __my_interrupt_vector, __interrupt_vector");
 }

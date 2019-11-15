@@ -41,6 +41,8 @@ dirs = ['newlib.iconv',
 	'newlib.string',
 	'newlib.wctype']
 
+test_inc = [include_directories('include'), inc]
+
 foreach dir : dirs
   subdir(dir)
 endforeach

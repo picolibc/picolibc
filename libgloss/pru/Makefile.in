@@ -1,0 +1,155 @@
+# SPDX-License-Identifier: BSD-2-Clause-FreeBSD
+#
+# Copyright 2018-2019 Dimitar Dimitrov <dimitar@dinux.eu>
+# All rights reserved.
+#
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions
+# are met:
+# 1. Redistributions of source code must retain the above copyright
+#    notice, this list of conditions and the following disclaimer.
+# 2. Redistributions in binary form must reproduce the above copyright
+#    notice, this list of conditions and the following disclaimer in the
+#    documentation and/or other materials provided with the distribution.
+#
+# THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
+# IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+# OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+# IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
+# INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
+# NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+# DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+# THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+# (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+# THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+VPATH = @srcdir@ @srcdir@/..
+
+srcdir = @srcdir@
+objdir = .
+srcroot = $(srcdir)/../..
+objroot = $(objdir)/../..
+top_srcdir = @top_srcdir@
+
+prefix = @prefix@
+exec_prefix = @exec_prefix@
+
+host_alias = @host_alias@
+target_alias = @target_alias@
+
+bindir = @bindir@
+libdir = @libdir@
+includedir = @includedir@
+tooldir = $(exec_prefix)/$(target_alias)
+
+# Multilib support variables.
+# TOP is used instead of MULTI{BUILD,SRC}TOP.
+MULTIDIRS =
+MULTISUBDIR =
+
+SHELL =	/bin/sh
+
+mkinstalldirs = $(SHELL) $(top_srcdir)/../../mkinstalldirs
+
+CC = @CC@
+
+AS = @AS@
+
+AR = @AR@
+
+LD = @LD@
+
+RANLIB = @RANLIB@
+
+OBJDUMP = `t='$(program_transform_name)'; echo objdump | sed -e $$t`
+OBJCOPY = `t='$(program_transform_name)'; echo objcopy | sed -e $$t`
+
+# linker scripts
+SCRIPTS = `ls ${srcdir}/ldscripts/*.x`
+
+# object files needed
+OBJS = \
+	do_global_dtors.o gettimeofday.o \
+	isatty.o putnum.o raise.o \
+	inbyte.o outbyte.o sbrk.o stat.o syscalls.o \
+	do_global_dtors.o
+
+# Object files specific to particular targets.
+EVALOBJS = ${OBJS}
+
+CRTOBJS = crt0.o crt0-minrt.o
+OUTPUTS = libgloss.a $(CRTOBJS)
+
+INCLUDES = -I$(srcdir)/..
+
+# Note that when building the library, ${MULTILIB} is not the way multilib
+# options are passed; they're passed in $(CFLAGS).
+CFLAGS_FOR_TARGET = ${MULTILIB} ${INCLUDES}
+LDFLAGS_FOR_TARGET = ${MULTILIB}
+
+.c.o:
+	$(CC) $(CFLAGS_FOR_TARGET) -Os $(INCLUDES) -c $(CFLAGS) $<
+
+.C.o:
+	$(CC) $(CFLAGS_FOR_TARGET) -Os $(INCLUDES) -c $(CFLAGS) $<
+.s.o:
+	$(AS) $(ASFLAGS_FOR_TARGET) $(INCLUDES) $(ASFLAGS) -o $*.o $<
+
+#
+# GCC knows to run the preprocessor on .S files before it assembles them.
+#
+.S.o:
+	$(CC) $(CFLAGS_FOR_TARGET) $(INCLUDES) $(CFLAGS) -c $<
+
+all: ${OUTPUTS} copy_scripts_to_objdir
+
+copy_scripts_to_objdir: $(srcdir)/ldscripts/gen-ld-scripts.sh
+	cp $(SCRIPTS) $(objdir)
+
+#
+# here's where we build the library for each target
+#
+
+libgloss.a: $(EVALOBJS)
+	${AR} ${ARFLAGS} $@ $(EVALOBJS)
+	${RANLIB} $@
+
+# C Runtime Library startup code.
+crt0.o: $(srcdir)/crt0.S
+	$(CC) $(CFLAGS_FOR_TARGET) $(INCLUDES) $(CFLAGS) $< -c -o $@
+
+crt0-minrt.o: $(srcdir)/crt0.S
+	$(CC) $(CFLAGS_FOR_TARGET) $(INCLUDES) $(CFLAGS) -DMINRT $< -c -o $@
+
+doc:
+
+clean mostlyclean:
+	rm -f $(OUTPUTS) *.i *~ *.o *-test *.srec *.dis *.map *.x
+
+distclean maintainer-clean realclean: clean
+	rm -f Makefile config.status $(OUTPUTS)
+
+.PHONY: install info install-info clean-info
+install: $(OUTPUTS) $(srcdir)/ldscripts/gen-ld-scripts.sh
+	for outputs in ${OUTPUTS}; do\
+	 ${INSTALL_DATA} $${outputs} ${DESTDIR}${tooldir}/lib${MULTISUBDIR}/$${outputs}; \
+	done
+	for s in $(SCRIPTS); do \
+	  b=`basename $$s`; \
+	  ${INSTALL_DATA} $$s ${DESTDIR}${tooldir}/lib${MULTISUBDIR}/$$b ;\
+	done
+	${mkinstalldirs} ${DESTDIR}${tooldir}/lib${MULTISUBDIR}/device-specs; \
+	for s in ${srcdir}/device-specs/*; do \
+	  b=`basename $$s`; \
+	  $(INSTALL_DATA) $$s $(DESTDIR)$(tooldir)/lib${MULTISUBDIR}/device-specs/$$b ;\
+	done
+
+info:
+install-info:
+clean-info:
+
+Makefile: $(srcdir)/Makefile.in config.status @host_makefile_frag_path@
+	$(SHELL) config.status
+
+config.status: $(srcdir)/configure
+	$(SHELL) config.status --recheck

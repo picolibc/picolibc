@@ -409,6 +409,10 @@
 #define __SMALL_BITFIELDS	/* 16 Bit INT */
 #endif
 
+#ifdef __PRU__
+#define __IEEE_LITTLE_ENDIAN
+#endif
+
 #ifdef __RL78__
 #define __IEEE_LITTLE_ENDIAN
 #define __SMALL_BITFIELDS	/* 16 Bit INT */
@@ -461,8 +465,8 @@
 #endif
 
 #ifndef __OBSOLETE_MATH_DEFAULT
-/* Use old math code by default.  */
-#define __OBSOLETE_MATH_DEFAULT 1
+/* Use new math code by default.  */
+#define __OBSOLETE_MATH_DEFAULT 0
 #endif
 #ifndef __OBSOLETE_MATH
 #define __OBSOLETE_MATH __OBSOLETE_MATH_DEFAULT

@@ -5,6 +5,7 @@ meson $DIR \
         -Dtls-model=global-dynamic \
         -Dmultilib=false \
         -Dpicolib=false \
+	-Dposix-io=true \
 	-Dnewlib-global-atexit=true\
 	-Dincludedir=lib/picolibc/include \
 	-Dlibdir=lib/picolibc/lib \

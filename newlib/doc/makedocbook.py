@@ -297,6 +297,8 @@ def synopsis(c, t):
 	    # preprocessor # directives, structs, comments in square brackets
 	    funcsynopsisinfo = lxml.etree.SubElement(funcsynopsis, 'funcsynopsisinfo')
 	    funcsynopsisinfo.text = l.strip() + '\n'
+	elif re.match('[Ll]ink with', l):
+	    pass
 	else:
 	    s = s + l
 
@@ -312,7 +314,7 @@ def synopsis(c, t):
 
     if s.strip():
 	print("surplus synopsis '%s'" % s, file=sys.stderr)
-	raise
+	exit(1)
 
 def synopsis_for_prototype(funcsynopsis, s):
     s = s.strip()

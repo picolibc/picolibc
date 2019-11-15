@@ -26,6 +26,8 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include "acle-compat.h"
+
 	.thumb
 	.syntax unified
 	.global __aeabi_memset
@@ -110,9 +112,13 @@ __aeabi_memset:
 	cmp	r4, r3
 	bne	8b
 9:
+#if __ARM_ARCH >= 5
+	pop	{r4, r5, r6, pc}
+#else
 	pop	{r4, r5, r6}
 	pop	{r1}
 	bx	r1
+#endif
 10:
 	movs	r3, r0
 	movs	r4, r1

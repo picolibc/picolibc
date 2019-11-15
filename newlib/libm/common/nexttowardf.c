@@ -66,11 +66,13 @@ nexttowardf (float x, long double y)
   if (e == 0x7f800000) {
     volatile float force_eval;
     force_eval = x + x;
+    (void) force_eval;
   }
   /* raise underflow if ux.value is subnormal or zero */
   if (e == 0) {
     volatile float force_eval;
     force_eval = x*x + ux.value*ux.value;
+    (void) force_eval;
   }
   return ux.value;
 }

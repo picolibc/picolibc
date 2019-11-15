@@ -2,10 +2,12 @@
 c = 'arm-none-eabi-gcc'
 ar = 'arm-none-eabi-ar'
 as = 'arm-none-eabi-as'
+ld = 'arm-none-eabi-ld'
+strip = 'arm-none-eabi-strip'
 
 [host_machine]
-system = ''
-cpu_family = ''
-cpu = ''
-endian = ''
+system = 'none'
+cpu_family = 'arm'
+cpu = 'arm'
+endian = 'little'
 

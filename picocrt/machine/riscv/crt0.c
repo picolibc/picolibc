@@ -34,10 +34,12 @@
  */
 
 #include "../../crt0.h"
+#include <sys/cdefs.h>
 
-void
+void __attribute((naked)) __section(".text.init.enter")
 _start(void)
 {
-	asm("la gp, __global_pointer$");
+	asm(".option push\n.option norelax\nla gp, __global_pointer$\n.option pop");
+	asm("la sp, __stack");
 	__start();
 }

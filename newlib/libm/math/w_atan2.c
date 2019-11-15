@@ -65,6 +65,7 @@ PORTABILITY
 
 #ifndef _DOUBLE_IS_32BITS
 
+#if !defined(_IEEE_LIBM) || !defined(HAVE_ALIAS_ATTRIBUTE)
 #ifdef __STDC__
 	double atan2(double y, double x)	/* wrapper atan2 */
 #else
@@ -74,5 +75,6 @@ PORTABILITY
 {
 	return __ieee754_atan2(y,x);
 }
+#endif
 
 #endif /* defined(_DOUBLE_IS_32BITS) */

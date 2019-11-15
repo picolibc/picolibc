@@ -41,5 +41,5 @@ foreach test : tests
        executable(test, [src, '../stdio-bits.c'],
 		  c_args: ['-Wno-missing-braces', '-Wno-implicit-int', '-Wno-return-type', '-D_XOPEN_SOURCE=700', '-D_GNU_SOURCE'],
 		  link_with: [lib_m, lib_c],
-		  include_directories: inc))
+		  include_directories: test_inc))
 endforeach

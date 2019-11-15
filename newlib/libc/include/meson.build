@@ -52,6 +52,7 @@ inc_headers = [
   'errno.h',
   'fastmath.h',
   'fcntl.h',
+  'fenv.h',
   'fnmatch.h',
   'getopt.h',
   'glob.h',

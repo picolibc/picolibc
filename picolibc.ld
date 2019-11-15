@@ -68,6 +68,7 @@ SECTIONS
 
 	.init : {
 		KEEP (*(.text.init.enter))
+		KEEP (*(.data.init.enter))
 		KEEP (*(SORT_BY_NAME(.init) SORT_BY_NAME(.init.*)))
 	} >flash AT>flash :text
 
@@ -180,7 +181,7 @@ SECTIONS
 		*(.tbss .tbss.* .gnu.linkonce.tb.*)
 		*(.tcommon)
 		PROVIDE( __tls_end = . );
-	} >ram : tls : text
+	} >ram AT>ram : tls : ram
 	PROVIDE( __tbss_size = SIZEOF(.tbss) );
 	PROVIDE( __tls_size = __tls_end - __tls_base );
 
@@ -195,7 +196,7 @@ SECTIONS
 	 */
 	.tbss_space : {
 		. = . + __tbss_size;
-	} >ram
+	} >ram AT>ram : ram
 
 	.bss : {
 		*(.sbss*)

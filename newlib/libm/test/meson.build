@@ -110,7 +110,6 @@ math_test_src = [
   'y1_vec.c',
   'ynf_vec.c',
   'yn_vec.c',
-  'stdio-bits.c'
 ]
 
 #  'dcvt.c',
@@ -122,9 +121,11 @@ test('math',
 		link_with: [lib_m, lib_c],
 		include_directories: inc))
 
-native_lib_m = meson.get_compiler('c').find_library('m', required: true)
+native_lib_m = meson.get_compiler('c').find_library('m', required: false)
 
-test('math-native',
-     executable('math_test_native', math_test_src,
-		c_args: ['-Wno-missing-braces', '-Wno-implicit-int', '-Wno-return-type', '-D_XOPEN_SOURCE=700', '-D_GNU_SOURCE', '-DNO_NEWLIB'],
-		dependencies: native_lib_m))
+if native_lib_m.found()
+  test('math-native',
+       executable('math_test_native', math_test_src,
+		  c_args: ['-Wno-missing-braces', '-Wno-implicit-int', '-Wno-return-type', '-D_XOPEN_SOURCE=700', '-D_GNU_SOURCE', '-DNO_NEWLIB'],
+		  dependencies: native_lib_m))
+endif

@@ -35,17 +35,18 @@
 int
 fputc(int c, FILE *stream)
 {
-
 	if ((stream->flags & __SWR) == 0)
 		return EOF;
 
 	if (stream->flags & __SSTR) {
 		struct __file_str *sstream = (struct __file_str *) stream;
-		if (stream->len < sstream->size)
-			*sstream->buf++ = c;
-		stream->len++;
-		return c;
+		if (stream->len >= sstream->size)
+			return EOF;
+		*sstream->buf++ = c;
 	} else {
-		return stream->put(c, stream);
+		if (stream->put(c, stream) == EOF)
+			return EOF;
 	}
+	++stream->len;
+	return c;
 }

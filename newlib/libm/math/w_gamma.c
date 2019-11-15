@@ -140,6 +140,7 @@ in terms of the base return values, although the <[signgam]> global for
 
 #ifndef _DOUBLE_IS_32BITS
 
+#if !defined(_IEEE_LIBM) || !defined(HAVE_ALIAS_ATTRIBUTE)
 #ifdef __STDC__
 	double gamma(double x)
 #else
@@ -166,5 +167,6 @@ in terms of the base return values, although the <[signgam]> global for
             return y;
 #endif
 }             
+#endif
 
 #endif /* defined(_DOUBLE_IS_32BITS) */

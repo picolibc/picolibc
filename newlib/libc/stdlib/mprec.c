@@ -247,10 +247,14 @@ s2b (
   for (k = 0, y = 1; x > y; y <<= 1, k++);
 #ifdef Pack_32
   b = Balloc (k);
+  if (!b)
+    return NULL;
   b->_x[0] = y9;
   b->_wds = 1;
 #else
   b = Balloc (k + 1);
+  if (!b)
+    return NULL;
   b->_x[0] = y9 & 0xffff;
   b->_wds = (b->_x[1] = y9 >> 16) ? 2 : 1;
 #endif
@@ -361,6 +365,8 @@ i2b (int i)
   _Bigint *b;
 
   b = Balloc (1);
+  if (!b)
+    return NULL;
   b->_x[0] = i;
   b->_wds = 1;
   return b;
@@ -390,6 +396,8 @@ mult (_Bigint * a, _Bigint * b)
   if (wc > a->_maxwds)
     k++;
   c = Balloc (k);
+  if (!c)
+    return NULL;
   for (x = c->_x, xa = x + wc; x < xa; x++)
     *x = 0;
   xa = a->_x;
@@ -515,6 +523,8 @@ lshift (_Bigint * b, int k)
   for (i = b->_maxwds; n1 > i; i <<= 1)
     k1++;
   b1 = Balloc (k1);
+  if (!b1)
+    return NULL;
   x1 = b1->_x;
   for (i = 0; i < n; i++)
     *x1++ = 0;
@@ -604,6 +614,8 @@ diff (
   if (!i)
     {
       c = Balloc (0);
+      if (!c)
+	return NULL;
       c->_wds = 1;
       c->_x[0] = 0;
       return c;
@@ -618,6 +630,8 @@ diff (
   else
     i = 0;
   c = Balloc (a->_k);
+  if (!c)
+    return NULL;
   c->_sign = i;
   wa = a->_wds;
   xa = a->_x;
@@ -823,6 +837,8 @@ d2b (
 #else
   b = Balloc (2);
 #endif
+  if (!b)
+    return NULL;
   x = b->_x;
 
   z = d0 & Frac_mask;

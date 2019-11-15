@@ -32,8 +32,27 @@ struct	stat
   nlink_t	st_nlink;
   uid_t		st_uid;
   gid_t		st_gid;
+#if defined(linux) && defined(__x86_64__)
+    int __pad0;
+#endif
   dev_t		st_rdev;
+#if defined(linux) && !defined(__x86_64__)
+    unsigned short int __pad2;
+#endif
   off_t		st_size;
+#if defined(linux)
+  blksize_t	st_blksize;
+  blkcnt_t	st_blocks;
+  struct timespec st_atim;
+  struct timespec st_mtim;
+  struct timespec st_ctim;
+#define st_atime st_atim.tv_sec      /* Backward compatibility */
+#define st_mtime st_mtim.tv_sec
+#define st_ctime st_ctim.tv_sec
+#if defined(linux) && defined(__x86_64__)
+    __uint64_t __glibc_reserved[3];
+#endif
+#else
 #if defined(__rtems__)
   struct timespec st_atim;
   struct timespec st_mtim;
@@ -47,20 +66,20 @@ struct	stat
   time_t	st_mtime;
   time_t	st_ctime;
 #else
-  time_t	st_atime;
-  long		st_spare1;
-  time_t	st_mtime;
-  long		st_spare2;
-  time_t	st_ctime;
-  long		st_spare3;
-  blksize_t	st_blksize;
+  struct timespec st_atim;
+  struct timespec st_mtim;
+  struct timespec st_ctim;
+  blksize_t     st_blksize;
   blkcnt_t	st_blocks;
-  long	st_spare4[2];
+#if !defined(__rtems__)
+  long		st_spare4[2];
+#endif
+#endif
 #endif
 #endif
 };
 
-#if defined(__rtems__)
+#if !(defined(__svr4__) && !defined(__PPC__) && !defined(__sun__)) && !defined(__cris__)
 #define st_atime st_atim.tv_sec
 #define st_ctime st_ctim.tv_sec
 #define st_mtime st_mtim.tv_sec
