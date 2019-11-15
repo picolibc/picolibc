@@ -65,6 +65,52 @@ The bulk of newlib changes over the last several years have been in
 areas unrelated to the code used by picolibc, so keeping things in
 sync has not been difficult so far.
 
+## Releases
+
+### Picolibc version 1.0
+
+This is the first release of picolibc. Major changes from newlib
+include:
+
+ 1. Remove all non-BSD licensed code. None of it was used in building
+    the embedded library, and removing it greatly simplifies the
+    license situation.
+
+ 2. Move thread-local values to native TLS mechanism
+
+ 3. Add smaller stdio from avr-libc, which is enabled by default
+
+ 4. Switch build system to meson. This has two notable benefits; the first
+    is that building the library is much faster, the second is that
+    it isolates build system changes from newlib making merging of
+    newlib changes much easier.
+
+ 5. Add simple startup code. This can be used in environments that
+    don't have complicated requirements, allowing small applications
+    to avoid needing to figure this out.
+
+### Picolibc version 1.1
+
+A minor update from 1.0, this release includes:
+
+ 1. semihost support. This adds console I/O and exit(3) support on ARM
+    and RISC-V hosts using the standard semihosting interfaces.
+
+ 2. Posix I/O support in tinystdio. When meson is run with
+    -Dposix-io=true, tinystdio adds support for fopen and fdopen,
+    along with directing stdin/stdout/stderr to the posix standard
+    file descriptors
+
+ 3. Merge recent upstream newlib code. This brings picolibc up to date
+    with current newlib sources.
+
+ 4. Hello world example. This uses a simple Makefile to demonstrate
+    how to us picolibc when installed for ARM and RISC-V embedded
+    processors. The resulting executables can be run under qemu.
+
+ 5. Remove newlib/libm/mathfp directory. This experimental code never
+    worked correctly anyways.
+
 ## Documentation
 
  * [Building Picolibc](doc/build.md)
