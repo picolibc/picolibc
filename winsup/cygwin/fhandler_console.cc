@@ -1099,7 +1099,7 @@ fhandler_console::close ()
       {
 	fhandler_pty_common *t =
 	  (fhandler_pty_common *) (fhandler_base *) cfd;
-	if (get_console_process_id (t->getHelperProcessId (), true))
+	if (get_console_process_id (t->get_helper_process_id (), true))
 	  return 0;
       }
 

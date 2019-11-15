@@ -259,7 +259,7 @@ child_info_spawn::worker (const char *prog_arg, const char *const *argv,
 {
   bool rc;
   int res = -1;
-  DWORD pidRestore = 0;
+  DWORD pid_restore = 0;
   bool attach_to_console = false;
   pid_t ctty_pgid = 0;
 
@@ -581,7 +581,7 @@ child_info_spawn::worker (const char *prog_arg, const char *const *argv,
 	sa = &sec_none_nih;
 
       /* Attach to pseudo console if pty salve is used */
-      pidRestore = fhandler_console::get_console_process_id
+      pid_restore = fhandler_console::get_console_process_id
 	(GetCurrentProcessId (), false);
       for (int i = 0; i < 3; i ++)
 	{
@@ -591,19 +591,19 @@ child_info_spawn::worker (const char *prog_arg, const char *const *argv,
 	  if (fh && fh->get_major () == DEV_PTYS_MAJOR)
 	    {
 	      fhandler_pty_slave *ptys = (fhandler_pty_slave *) fh;
-	      if (ptys->getPseudoConsole ())
+	      if (ptys->get_pseudo_console ())
 		{
-		  DWORD dwHelperProcessId = ptys->getHelperProcessId ();
+		  DWORD helper_process_id = ptys->get_helper_process_id ();
 		  debug_printf ("found a PTY slave %d: helper_PID=%d",
-				    fh->get_minor (), dwHelperProcessId);
+				    fh->get_minor (), helper_process_id);
 		  if (fhandler_console::get_console_process_id
-					      (dwHelperProcessId, true))
+					      (helper_process_id, true))
 		    /* Already attached */
 		    attach_to_console = true;
 		  else if (!attach_to_console)
 		    {
 		      FreeConsole ();
-		      if (AttachConsole (dwHelperProcessId))
+		      if (AttachConsole (helper_process_id))
 			attach_to_console = true;
 		    }
 		  ptys->fixup_after_attach (!iscygwin (), fd);
@@ -922,10 +922,10 @@ child_info_spawn::worker (const char *prog_arg, const char *const *argv,
   if (envblock)
     free (envblock);
 
-  if (attach_to_console && pidRestore)
+  if (attach_to_console && pid_restore)
     {
       FreeConsole ();
-      AttachConsole (pidRestore);
+      AttachConsole (pid_restore);
     }
 
   return (int) res;

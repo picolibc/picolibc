@@ -88,7 +88,7 @@ set_switch_to_pcon (void)
       {
 	fhandler_base *fh = cfd;
 	fhandler_pty_slave *ptys = (fhandler_pty_slave *) fh;
-	if (ptys->getPseudoConsole ())
+	if (ptys->get_pseudo_console ())
 	  ptys->set_switch_to_pcon (fd);
       }
 }
@@ -107,19 +107,19 @@ force_attach_to_pcon (HANDLE h)
 	  {
 	    fhandler_base *fh = cfd;
 	    fhandler_pty_slave *ptys = (fhandler_pty_slave *) fh;
-	    if (!ptys->getPseudoConsole ())
+	    if (!ptys->get_pseudo_console ())
 	      continue;
 	    if (n != 0
 		|| h == ptys->get_handle ()
 		|| h == ptys->get_output_handle ())
 	      {
 		if (fhandler_console::get_console_process_id
-				  (ptys->getHelperProcessId (), true))
+				  (ptys->get_helper_process_id (), true))
 		  attach_done = true;
 		else
 		  {
 		    FreeConsole ();
-		    if (AttachConsole (ptys->getHelperProcessId ()))
+		    if (AttachConsole (ptys->get_helper_process_id ()))
 		      {
 			pcon_attached_to = ptys->get_minor ();
 			attach_done = true;
@@ -711,7 +711,7 @@ fhandler_pty_slave::~fhandler_pty_slave ()
   if (!get_ttyp ())
     /* Why comes here? Who clears _tc? */
     return;
-  if (getPseudoConsole ())
+  if (get_pseudo_console ())
     {
       int used = 0;
       int attached = 0;
@@ -919,7 +919,7 @@ fhandler_pty_slave::open (int flags, mode_t)
   set_output_handle (to_master_local);
   set_output_handle_cyg (to_master_cyg_local);
 
-  if (!getPseudoConsole ())
+  if (!get_pseudo_console ())
     {
       fhandler_console::need_invisible ();
       pcon_attached_to = -1;
@@ -931,7 +931,7 @@ fhandler_pty_slave::open (int flags, mode_t)
       pcon_attached_to = -1;
     }
   else if (fhandler_console::get_console_process_id
-			       (getHelperProcessId (), true))
+			       (get_helper_process_id (), true))
     /* Attached to pcon of this pty */
     {
       pcon_attached_to = get_minor ();
@@ -990,7 +990,7 @@ fhandler_pty_slave::close ()
   if (!ForceCloseHandle (get_handle_cyg ()))
     termios_printf ("CloseHandle (get_handle_cyg ()<%p>), %E",
 	get_handle_cyg ());
-  if (!getPseudoConsole () &&
+  if (!get_pseudo_console () &&
       (unsigned) myself->ctty == FHDEV (DEV_PTYS_MAJOR, get_minor ()))
     fhandler_console::free_console ();	/* assumes that we are the last pty closer */
   fhandler_pty_common::close ();
@@ -1063,10 +1063,10 @@ fhandler_pty_slave::try_reattach_pcon (void)
     return false;
 
   FreeConsole ();
-  if (!AttachConsole (getHelperProcessId ()))
+  if (!AttachConsole (get_helper_process_id ()))
     {
       system_printf ("pty%d: AttachConsole(helper=%d) failed. 0x%08lx",
-		     get_minor (), getHelperProcessId (), GetLastError ());
+		     get_minor (), get_helper_process_id (), GetLastError ());
       return false;
     }
   return true;
@@ -1170,14 +1170,14 @@ void
 fhandler_pty_slave::push_to_pcon_screenbuffer (const char *ptr, size_t len)
 {
   bool attached =
-    !!fhandler_console::get_console_process_id (getHelperProcessId (), true);
+    !!fhandler_console::get_console_process_id (get_helper_process_id (), true);
   if (!attached && pcon_attached_to == get_minor ())
     {
       for (DWORD t0 = GetTickCount (); GetTickCount () - t0 < 100; )
 	{
 	  Sleep (1);
 	  attached = fhandler_console::get_console_process_id
-				      (getHelperProcessId (), true);
+				      (get_helper_process_id (), true);
 	  if (attached)
 	    break;
 	}
@@ -1383,7 +1383,7 @@ fhandler_pty_slave::write (const void *ptr, size_t len)
   restore_reattach_pcon ();
 
   /* Push slave output to pseudo console screen buffer */
-  if (getPseudoConsole ())
+  if (get_pseudo_console ())
     {
       acquire_output_mutex (INFINITE);
       push_to_pcon_screenbuffer ((char *)ptr, len);
@@ -1701,7 +1701,7 @@ out:
   termios_printf ("%d = read(%p, %lu)", totalread, ptr, len);
   len = (size_t) totalread;
   /* Push slave read as echo to pseudo console screen buffer. */
-  if (getPseudoConsole () && ptr0 && (get_ttyp ()->ti.c_lflag & ECHO))
+  if (get_pseudo_console () && ptr0 && (get_ttyp ()->ti.c_lflag & ECHO))
     {
       acquire_output_mutex (INFINITE);
       push_to_pcon_screenbuffer (ptr0, len);
@@ -1847,7 +1847,7 @@ fhandler_pty_slave::ioctl (unsigned int cmd, void *arg)
       get_ttyp ()->winsize = get_ttyp ()->arg.winsize;
       break;
     case TIOCSWINSZ:
-      if (getPseudoConsole ())
+      if (get_pseudo_console ())
 	{
 	  /* If not attached to this pseudo console,
 	     try to attach temporarily. */
@@ -2230,21 +2230,21 @@ fhandler_pty_master::close ()
     termios_printf ("CloseHandle (output_mutex<%p>), %E", output_mutex);
   if (!NT_SUCCESS (status))
     debug_printf ("NtQueryObject: %y", status);
-  else if (obi.HandleCount == (getPseudoConsole () ? 2 : 1))
+  else if (obi.HandleCount == (get_pseudo_console () ? 2 : 1))
 			      /* Helper process has inherited one. */
     {
       termios_printf ("Closing last master of pty%d", get_minor ());
       /* Close Pseudo Console */
-      if (getPseudoConsole ())
+      if (get_pseudo_console ())
 	{
 	  /* Terminate helper process */
-	  SetEvent (get_ttyp ()->hHelperGoodbye);
-	  WaitForSingleObject (get_ttyp ()->hHelperProcess, INFINITE);
+	  SetEvent (get_ttyp ()->h_helper_goodbye);
+	  WaitForSingleObject (get_ttyp ()->h_helper_process, INFINITE);
 	  /* FIXME: Pseudo console can be accessed via its handle
 	     only in the process which created it. What else can we do? */
 	  if (master_pid_tmp == myself->pid)
 	    /* Release pseudo console */
-	    ClosePseudoConsole (getPseudoConsole ());
+	    ClosePseudoConsole (get_pseudo_console ());
 	  get_ttyp ()->switch_to_pcon_in = false;
 	  get_ttyp ()->switch_to_pcon_out = false;
 	}
@@ -2403,12 +2403,12 @@ fhandler_pty_master::ioctl (unsigned int cmd, void *arg)
     case TIOCSWINSZ:
       /* FIXME: Pseudo console can be accessed via its handle
 	 only in the process which created it. What else can we do? */
-      if (getPseudoConsole () && get_ttyp ()->master_pid == myself->pid)
+      if (get_pseudo_console () && get_ttyp ()->master_pid == myself->pid)
 	{
 	  COORD size;
 	  size.X = ((struct winsize *) arg)->ws_col;
 	  size.Y = ((struct winsize *) arg)->ws_row;
-	  ResizePseudoConsole (getPseudoConsole (), size);
+	  ResizePseudoConsole (get_pseudo_console (), size);
 	}
       if (get_ttyp ()->winsize.ws_row != ((struct winsize *) arg)->ws_row
 	  || get_ttyp ()->winsize.ws_col != ((struct winsize *) arg)->ws_col)
@@ -2675,9 +2675,9 @@ fhandler_pty_slave::fixup_after_attach (bool native_maybe, int fd_set)
 {
   if (fd < 0)
     fd = fd_set;
-  if (getPseudoConsole ())
+  if (get_pseudo_console ())
     {
-      if (fhandler_console::get_console_process_id (getHelperProcessId (),
+      if (fhandler_console::get_console_process_id (get_helper_process_id (),
 						    true))
 	{
 	  if (pcon_attached_to != get_minor ())
@@ -2769,7 +2769,7 @@ fhandler_pty_slave::fixup_after_exec ()
 
   if (!close_on_exec ())
     fixup_after_fork (NULL);
-  else if (getPseudoConsole ())
+  else if (get_pseudo_console ())
     {
       int used = 0;
       int attached = 0;
@@ -2802,7 +2802,7 @@ fhandler_pty_slave::fixup_after_exec ()
 
 #if USE_API_HOOK
   /* Hook Console API */
-  if (getPseudoConsole ())
+  if (get_pseudo_console ())
     {
 #define DO_HOOK(module, name) \
       if (!name##_Orig) \
@@ -3004,7 +3004,7 @@ fhandler_pty_master::pty_master_fwd_thread ()
 	}
       ssize_t wlen = rlen;
       char *ptr = outbuf;
-      if (getPseudoConsole ())
+      if (get_pseudo_console ())
 	{
 	  /* Avoid duplicating slave output which is already sent to
 	     to_master_cyg */
@@ -3152,7 +3152,7 @@ fhandler_pty_master::setup_pseudoconsole ()
   CreatePipe (&from_master, &to_slave, &sec_none, 0);
   SetLastError (ERROR_SUCCESS);
   HRESULT res = CreatePseudoConsole (size, from_master, to_master,
-				     0, &get_ttyp ()->hPseudoConsole);
+				     0, &get_ttyp ()->h_pseudo_console);
   if (res != S_OK || GetLastError () == ERROR_PROC_NOT_FOUND)
     {
       if (res != S_OK)
@@ -3162,7 +3162,7 @@ fhandler_pty_master::setup_pseudoconsole ()
       CloseHandle (to_slave);
       from_master = from_master_cyg;
       to_slave = NULL;
-      get_ttyp ()->hPseudoConsole = NULL;
+      get_ttyp ()->h_pseudo_console = NULL;
       return false;
     }
 
@@ -3186,8 +3186,8 @@ fhandler_pty_master::setup_pseudoconsole ()
   UpdateProcThreadAttribute (si_helper.lpAttributeList,
 			     0,
 			     PROC_THREAD_ATTRIBUTE_PSEUDOCONSOLE,
-			     get_ttyp ()->hPseudoConsole,
-			     sizeof (get_ttyp ()->hPseudoConsole),
+			     get_ttyp ()->h_pseudo_console,
+			     sizeof (get_ttyp ()->h_pseudo_console),
 			     NULL, NULL);
   HANDLE hello = CreateEvent (&sec_none, true, false, NULL);
   HANDLE goodbye = CreateEvent (&sec_none, true, false, NULL);
@@ -3228,9 +3228,9 @@ fhandler_pty_master::setup_pseudoconsole ()
   DeleteProcThreadAttributeList (si_helper.lpAttributeList);
   HeapFree (GetProcessHeap (), 0, si_helper.lpAttributeList);
   /* Setting information of stuffs regarding pseudo console */
-  get_ttyp ()->hHelperGoodbye = goodbye;
-  get_ttyp ()->hHelperProcess = pi_helper.hProcess;
-  get_ttyp ()->HelperProcessId = pi_helper.dwProcessId;
+  get_ttyp ()->h_helper_goodbye = goodbye;
+  get_ttyp ()->h_helper_process = pi_helper.hProcess;
+  get_ttyp ()->helper_process_id = pi_helper.dwProcessId;
   CloseHandle (from_master);
   CloseHandle (to_master);
   from_master = hpConIn;

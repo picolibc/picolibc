@@ -155,10 +155,10 @@ dtable::stdio_init ()
       if (fh && fh->get_major () == DEV_PTYS_MAJOR)
 	{
 	  fhandler_pty_slave *ptys = (fhandler_pty_slave *) fh;
-	  if (ptys->getPseudoConsole ())
+	  if (ptys->get_pseudo_console ())
 	    {
 	      bool attached = !!fhandler_console::get_console_process_id
-		(ptys->getHelperProcessId (), true);
+		(ptys->get_helper_process_id (), true);
 	      if (attached)
 		break;
 	      else
@@ -167,7 +167,7 @@ dtable::stdio_init ()
 		     by some reason. This happens if the executable is
 		     a windows GUI binary, such as mintty. */
 		  FreeConsole ();
-		  if (AttachConsole (ptys->getHelperProcessId ()))
+		  if (AttachConsole (ptys->get_helper_process_id ()))
 		    {
 		      ptys->fixup_after_attach (false, fd);
 		      break;

@@ -2101,13 +2101,13 @@ class fhandler_pty_common: public fhandler_termios
   {
     return get_ttyp ()->attach_pcon_in_fork;
   }
-  DWORD getHelperProcessId (void)
+  DWORD get_helper_process_id (void)
   {
-    return get_ttyp ()->HelperProcessId;
+    return get_ttyp ()->helper_process_id;
   }
-  HPCON getPseudoConsole (void)
+  HPCON get_pseudo_console (void)
   {
-    return get_ttyp ()->hPseudoConsole;
+    return get_ttyp ()->h_pseudo_console;
   }
   bool to_be_read_from_pcon (void);
 

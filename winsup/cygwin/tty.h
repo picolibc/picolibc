@@ -93,10 +93,10 @@ private:
   HANDLE _from_master_cyg;
   HANDLE _to_master;
   HANDLE _to_master_cyg;
-  HPCON hPseudoConsole;
-  HANDLE hHelperProcess;
-  DWORD HelperProcessId;
-  HANDLE hHelperGoodbye;
+  HPCON h_pseudo_console;
+  HANDLE h_helper_process;
+  DWORD helper_process_id;
+  HANDLE h_helper_goodbye;
   bool attach_pcon_in_fork;
   bool switch_to_pcon_in;
   bool switch_to_pcon_out;

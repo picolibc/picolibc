@@ -235,7 +235,7 @@ tty::init ()
   master_pid = 0;
   is_console = false;
   attach_pcon_in_fork = false;
-  hPseudoConsole = NULL;
+  h_pseudo_console = NULL;
   column = 0;
   switch_to_pcon_in = false;
   switch_to_pcon_out = false;
