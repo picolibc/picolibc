@@ -1,0 +1,13 @@
+[binaries]
+c = 'msp430-elf-gcc'
+ar = 'msp430-elf-ar'
+as = 'msp430-elf-as'
+ld = 'msp430-elf-ld'
+strip = 'msp430-elf-strip'
+
+[host_machine]
+system = 'none'
+cpu_family = 'msp430'
+cpu = 'msp430'
+endian = 'little'
+
