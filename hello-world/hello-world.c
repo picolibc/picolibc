@@ -35,10 +35,23 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <semihost.h>
 
 int
 main(void)
 {
+	char	cmdline[128];
 	printf("hello, world\n");
+
+	if (sys_semihost_get_cmdline(cmdline, sizeof(cmdline)) == 0) {
+		printf("Command line %s\n", cmdline);
+		FILE *f = fopen(cmdline, "r");
+		if (f) {
+			int c;
+			while ((c = getc(f)) != EOF)
+				putchar(c);
+		}
+	}
+
 	exit(0);
 }
