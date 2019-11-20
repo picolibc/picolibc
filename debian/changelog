@@ -1,3 +1,12 @@
+picolibc (1.1.1-1) unstable; urgency=medium
+
+  * New upstream release (1.1.1)
+  * Compute TLS support in GCC automatically which disables this on ARM
+  * Change how picolibc.specs gets installed
+  * Update cross-compile meson files to match upstream
+
+ -- Keith Packard <keithp@keithp.com>  Wed, 20 Nov 2019 00:15:51 -0800
+
 picolibc (1.1-2) unstable; urgency=medium
 
   * Make install depend on compilers so .specs files work afterwards
