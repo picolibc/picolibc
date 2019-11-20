@@ -4,9 +4,9 @@ Maintainer: Keith Packard <keithp@keithp.com>
 Build-Depends: debhelper (>= 12), gcc-arm-none-eabi, gcc-riscv64-unknown-elf, meson, ninja-build
 Standards-Version: 4.4.0
 Section: devel
-HomePage: https://keithp.com/git/riscv-binutils-gdb
-Vcs-Git: https://salsa.debian.org/debian/binutils-riscv64-unknown-elf.git
-Vcs-Browser: https://salsa.debian.org/debian/binutils-riscv64-unknown-elf
+HomePage: https://keithp.com/git/picolibc
+Vcs-Git: https://keithp.com/git/picolibc.git
+Vcs-Browser: https://keithp.com/picolibc
 
 Package: picolibc-riscv64-unknown-elf
 Architecture: all

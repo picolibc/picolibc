@@ -27,12 +27,14 @@ MESON_SHARED_FLAGS = \
 MESON_RISCV_FLAGS = \
 	$(MESON_SHARED_FLAGS) \
 	--cross-file debian/cross-$(RISCV_ARCH).txt \
+	-Dspecsdir=/usr/lib/picolibc/$(RISCV_ARCH) \
 	-Dincludedir=lib/picolibc/$(RISCV_ARCH)/include \
 	-Dlibdir=lib/picolibc/$(RISCV_ARCH)/lib
 
 MESON_ARM_FLAGS = \
 	$(MESON_SHARED_FLAGS) \
 	--cross-file debian/cross-$(ARM_ARCH).txt \
+	-Dspecsdir=/usr/lib/picolibc/$(ARM_ARCH) \
 	-Dincludedir=lib/picolibc/$(ARM_ARCH)/include \
 	-Dlibdir=lib/picolibc/$(ARM_ARCH)/lib
 
