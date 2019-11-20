@@ -8,7 +8,8 @@ operations as clear as possible.
 
 ## Selecting picolibc headers and C library
 
-Picolibc provides a GCC '.specs' file which sets the search path for
+Picolibc provides a GCC '.specs' file _(generated from
+picolibc.specs.in)_ which sets the search path for
 header files and picolibc libraries.
 
 	gcc --specs=picolibc.specs

@@ -126,8 +126,8 @@ option('newlib-initfini-array', type: 'boolean', value: true,
        description: 'compiler supports INIT_ARRAY section types')
 option('newlib-initfini', type: 'boolean', value: true,
        description: 'Supports _init() and _fini()')
-option('thread-local-storage', type: 'boolean', value: true,
-       description: 'use thread local storage for static data')
+option('thread-local-storage', type: 'combo', choices: ['true', 'false', 'auto'], value: 'auto',
+       description: 'use thread local storage for static data (default: automatically detect support)')
 option('tls-model', type: 'string', value: 'local-exec',
        description: 'tls model (global-dynamic, local-dynamic, initial-exec or local-exec)')
 option('posix-io', type: 'boolean', value: false,

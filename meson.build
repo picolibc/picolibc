@@ -40,7 +40,7 @@ project('picolibc', 'c',
 	],
 	license : 'BSD',
 	meson_version : '>= 0.50',
-	version: '1.1.0'
+	version: '1.1.1'
 )
 
 targets = []
@@ -87,7 +87,7 @@ newlib_locale_info_extended = get_option('newlib-locale-info-extended')
 newlib_global_errno = get_option('newlib-global-errno')
 newlib_initfini_array = get_option('newlib-initfini-array')
 newlib_initfini = get_option('newlib-initfini')
-thread_local_storage = get_option('thread-local-storage')
+thread_local_storage_option = get_option('thread-local-storage')
 tls_model = get_option('tls-model')
 posix_io = get_option('posix-io')
 sysroot_install = get_option('sysroot-install')
@@ -111,6 +111,12 @@ if have_alias_attribute_option == 'auto'
   have_alias_attribute = meson.get_compiler('c').has_function_attribute('alias')
 else
   have_alias_attribute = have_alias_attribute_option == 'true'
+endif
+
+if thread_local_storage_option == 'auto'
+  thread_local_storage = not meson.get_compiler('c').has_function('__emutls_get_address', args: ['-nostdlib', '-lgcc'])
+else
+  thread_local_storage = thread_local_storage_option == 'true'
 endif
 
 lib_dir = join_paths(get_option('prefix'), get_option('libdir'))
