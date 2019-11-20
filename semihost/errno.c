@@ -33,21 +33,10 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#pragma once
-
-#include <stdio.h>
+#include "semihost-private.h"
 
 int
-sys_semihost_putc(char c, FILE *file);
-
-int
-sys_semihost_getc(FILE *file);
-
-void
-sys_semihost_exit(int code);
-
-int
-sys_semihost_get_cmdline(char *buf, int size);
-
-int
-sys_semihost_errno(void);
+sys_semihost_errno(void)
+{
+	return sys_semihost(SYS_ERRNO, 0);
+}

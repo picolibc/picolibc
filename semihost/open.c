@@ -33,21 +33,50 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#pragma once
-
-#include <stdio.h>
-
-int
-sys_semihost_putc(char c, FILE *file);
-
-int
-sys_semihost_getc(FILE *file);
-
-void
-sys_semihost_exit(int code);
+#include "semihost-private.h"
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <unistd.h>
+#include <string.h>
+#include <errno.h>
 
 int
-sys_semihost_get_cmdline(char *buf, int size);
+open(const char *pathname, int flags, ...)
+{
+	int semiflags = 0;
 
-int
-sys_semihost_errno(void);
+	switch (flags & (O_RDONLY|O_WRONLY|O_RDWR)) {
+	case O_RDONLY:
+		semiflags = 0;			/* 'r' */
+		break;
+	case O_WRONLY:
+		if (flags & O_TRUNC)
+			semiflags = 4;	/* 'w' */
+		else
+			semiflags = 8;	/* 'a' */
+		break;
+	default:
+		if (flags & O_TRUNC)
+			semiflags = 6;	/* 'w+' */
+		else
+			semiflags = 10;	/* 'a+' */
+		break;
+	}
+
+	struct {
+		uintptr_t	field1;
+		uintptr_t	field2;
+		uintptr_t	field3;
+	} arg = {
+		.field1 = (uintptr_t) pathname,
+		.field2 = semiflags,
+		.field3 = strlen(pathname)
+	};
+
+	uintptr_t ret = sys_semihost(SYS_OPEN, (uintptr_t) &arg);
+	if ((int) ret == -1)
+		errno = sys_semihost_errno();
+	return (int) ret;
+}
+

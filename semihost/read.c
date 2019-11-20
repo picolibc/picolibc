@@ -33,21 +33,29 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#pragma once
+#include "semihost-private.h"
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <unistd.h>
+#include <string.h>
+#include <errno.h>
 
-#include <stdio.h>
+ssize_t
+read(int fd, void *buf, size_t count)
+{
+	struct {
+		uintptr_t	field1;
+		uintptr_t	field2;
+		uintptr_t	field3;
+	} arg = {
+		.field1 = fd,
+		.field2 = (uintptr_t) buf,
+		.field3 = (uintptr_t) count
+	};
 
-int
-sys_semihost_putc(char c, FILE *file);
+	uintptr_t ret = sys_semihost(SYS_READ, (uintptr_t) &arg);
 
-int
-sys_semihost_getc(FILE *file);
-
-void
-sys_semihost_exit(int code);
-
-int
-sys_semihost_get_cmdline(char *buf, int size);
-
-int
-sys_semihost_errno(void);
+	ssize_t got = count - (ssize_t) ret;
+	return got;
+}
