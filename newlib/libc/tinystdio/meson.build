@@ -87,16 +87,23 @@ srcs_tinystdio = [
 ]
 
 srcs_tinystdio_posix = [
-  'fopen.c',
-  'fdopen.c',
-  'fclose.c',
-  'posixio.c',
+    'fopen.c',
+    'fdopen.c',
+    'fclose.c',
+    'posixio.c',
+    'sflags.c'
+]
+
+srcs_tinystdio_posix_console = [
   'posixiob.c',
-  'sflags.c'
 ]
 
 if posix_io
   srcs_tinystdio += srcs_tinystdio_posix
+endif
+
+if posix_console
+  srcs_tinystdio += srcs_tinystdio_posix_console
 endif
 
 srcs_tinystdio_flt = [

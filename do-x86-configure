@@ -6,7 +6,7 @@ meson "$DIR" \
         -Dtls-model=global-dynamic \
         -Dmultilib=false \
         -Dpicolib=false \
-	-Dposix-io=true \
+	-Dposix-console=true \
         -Dnewlib-locale-info=true\
         -Dnewlib-locale-info-extended=true\
         -Dnewlib-elix-level=2\

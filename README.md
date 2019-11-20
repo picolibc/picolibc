@@ -96,10 +96,12 @@ A minor update from 1.0, this release includes:
  1. semihost support. This adds console I/O and exit(3) support on ARM
     and RISC-V hosts using the standard semihosting interfaces.
 
- 2. Posix I/O support in tinystdio. When meson is run with
-    -Dposix-io=true, tinystdio adds support for fopen and fdopen,
-    along with directing stdin/stdout/stderr to the posix standard
-    file descriptors
+ 2. Posix I/O support in tinystdio. When -Dposix-io=true is included
+    in the meson command line (which is the default), tinystdio adds
+    support for fopen and fdopen by using malloc, open, close, read,
+    write and lseek. If -Dposix-console=true is also passed to meson,
+    then picolibc will direct stdin/stdout/stderr to the posix
+    standard file descriptors (0, 1, 2).
 
  3. Merge recent upstream newlib code. This brings picolibc up to date
     with current newlib sources.

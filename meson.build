@@ -90,6 +90,7 @@ newlib_initfini = get_option('newlib-initfini')
 thread_local_storage_option = get_option('thread-local-storage')
 tls_model = get_option('tls-model')
 posix_io = get_option('posix-io')
+posix_console = posix_io and get_option('posix-console')
 sysroot_install = get_option('sysroot-install')
 
 host_cpu=host_machine.cpu()
@@ -236,6 +237,7 @@ conf_data.set('HAVE_INITFINI_ARRAY', newlib_initfini_array, description: 'compil
 conf_data.set('HAVE_INIT_FINI', newlib_initfini, description: 'Support _init() and _fini() functions')
 conf_data.set('NEWLIB_TLS', thread_local_storage, description: 'use thread local storage')
 conf_data.set('POSIX_IO', posix_io, description: 'Use open/close/read/write in tinystdio')
+conf_data.set('POSIX_CONSOLE', posix_console, description: 'Use POSIX I/O for stdin, stdout and stderr')
 
 version_data = configuration_data()
 
