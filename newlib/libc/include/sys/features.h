@@ -25,7 +25,7 @@
 extern "C" {
 #endif
 
-#include <_newlib_version.h>
+#include <picolibc.h>
 
 /* Macro to test version of GCC.  Returns 0 for non-GCC or too old GCC. */
 #ifndef __GNUC_PREREQ
