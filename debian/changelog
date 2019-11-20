@@ -1,3 +1,9 @@
+picolibc (1.1-2) unstable; urgency=medium
+
+  * Make install depend on compilers so .specs files work afterwards
+
+ -- Keith Packard <keithp@keithp.com>  Fri, 15 Nov 2019 17:00:46 -0800
+
 picolibc (1.1-1) unstable; urgency=medium
 
   * Upstream release 1.1

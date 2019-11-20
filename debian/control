@@ -10,7 +10,7 @@ Vcs-Browser: https://salsa.debian.org/debian/binutils-riscv64-unknown-elf
 
 Package: picolibc-riscv64-unknown-elf
 Architecture: all
-Depends: ${misc:Depends}
+Depends: ${misc:Depends}, gcc-riscv64-unknown-elf
 Description: Smaller embedded C library for RISC-V development
  PicoLibc is a combination of Newlib and AVR libc bits designed
  for small-RAM embedded systems. This package has binaries for
@@ -18,7 +18,7 @@ Description: Smaller embedded C library for RISC-V development
 
 Package: picolibc-arm-none-eabi
 Architecture: all
-Depends: ${misc:Depends}
+Depends: ${misc:Depends}, gcc-arm-none-eabi
 Description: Smaller embedded C library for ARM development
  PicoLibc is a combination of Newlib and AVR libc bits designed
  for small-RAM embedded systems. This package has binaries for
