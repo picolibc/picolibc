@@ -40,18 +40,10 @@ ENTRY(_start)
  * some phony values here to make things link for testing
  */
 
-__flash = DEFINED(__flash) ? __flash : 0x10000000;
-__flash_size = DEFINED(__flash_size) ? __flash_size : 0x10000;
-
-__ram = DEFINED(__ram) ? __ram : 0x20000000;
-__ram_size = DEFINED(__ram_size) ? __ram_size : 0x8000;
-
-__stack_size = DEFINED(__stack_size) ? __stack_size : 0x400;
-
 MEMORY
 {
-	flash (rxai!w) : ORIGIN = __flash, LENGTH = __flash_size
-	ram (wxa!ri) : ORIGIN = __ram, LENGTH = __ram_size
+	flash (rxai!w) : ORIGIN = DEFINED(__flash) ? __flash : 0x10000000, LENGTH = DEFINED(__flash_size) ? __flash_size : 0x10000
+	ram (wxa!ri)   : ORIGIN = DEFINED(__ram  ) ? __ram   : 0x20000000, LENGTH = DEFINED(__ram_size  ) ? __ram_size   : 0x08000
 }
 
 PHDRS
@@ -64,7 +56,7 @@ PHDRS
 
 SECTIONS
 {
-	PROVIDE(__stack = ORIGIN(ram) + __ram_size);
+	PROVIDE(__stack = ORIGIN(ram) + LENGTH(ram));
 
 	.init : {
 		KEEP (*(.text.init.enter))
@@ -211,7 +203,7 @@ SECTIONS
 	PROVIDE( end = __bss_end );
 	PROVIDE(__bss_size = __bss_end - __bss_start);
 
-	PROVIDE( __heap_end = __ram + __ram_size );
+	PROVIDE( __heap_end = ORIGIN(ram) + LENGTH(ram) - (DEFINED(__stack_size) ? __stack_size : 0x800));
 	PROVIDE( __heap_size = __heap_end - __bss_end );
 }
 
