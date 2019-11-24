@@ -51,6 +51,7 @@ if src_semihost_machine.has_key(host_cpu)
     'lseek.c',
     'write.c',
     'read.c',
+    'clock.c',
     join_paths('machine', src_semihost_machine[host_cpu])
   ]
 
