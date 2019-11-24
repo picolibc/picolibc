@@ -263,10 +263,6 @@ inc = include_directories(inc_dirs)
 
 includedir = join_paths(get_option('prefix'), get_option('includedir'))
 
-configure_file(output : 'picolibc.h',
-	       configuration: conf_data,
-	       install_dir: includedir)
-
 arguments = ['-g', '-ffunction-sections', '-fdata-sections']
 
 if tls_model != ''
@@ -275,6 +271,9 @@ endif
 
 add_project_arguments(arguments, language: 'c')
 
+# semihost will adjust this if supported
+has_semihost = false
+
 subdir('newlib')
 subdir('picocrt')
 if newlib_tinystdio
@@ -282,6 +281,13 @@ if newlib_tinystdio
   subdir('dummyhost')
 endif
 
+conf_data.set('HAVE_SEMIHOST', has_semihost, description: 'Semihost APIs supported')
+
 if enable_tests
   subdir('test')
 endif
+
+configure_file(output : 'picolibc.h',
+	       configuration: conf_data,
+	       install_dir: includedir)
+
