@@ -148,7 +148,7 @@ case "${target}" in
   m32c-*-*)
 	AC_CONFIG_SUBDIRS([m32c])
 	;;
-  msp430*-*-elf)
+  msp430-*-elf*)
 	AC_CONFIG_SUBDIRS([msp430])
 	config_libnosys=false
 	;;

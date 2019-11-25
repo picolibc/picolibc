@@ -2552,7 +2552,7 @@ case "${target}" in
 	subdirs="$subdirs m32c"
 
 	;;
-  msp430*-*-elf)
+  msp430-*-elf*)
 	subdirs="$subdirs msp430"
 
 	config_libnosys=false
