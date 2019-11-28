@@ -67,27 +67,26 @@ sync has not been difficult so far.
 
 ## Releases
 
-### Picolibc version 1.0
+### Picolibc version 1.2
 
-This is the first release of picolibc. Major changes from newlib
-include:
+This release includes important fixes in picolibc.ld and more
+semihosting support.
 
- 1. Remove all non-BSD licensed code. None of it was used in building
-    the embedded library, and removing it greatly simplifies the
-    license situation.
+ 1. File I/O and clock support for semihosting. This enables fopen/fdopen
+    support in tinystdio along with an API to fetch a real time clock
+    value.
 
- 2. Move thread-local values to native TLS mechanism
+ 2. Fix picolibc.ld to not attempt to use redefined symbols for memory
+    space definitions. These redefinitions would fail and the default
+    values be used for system memory definitions. Instead, just use
+    the ? : operators each place the values are needed. Linker scripts
+    continue to mystify.
 
- 3. Add smaller stdio from avr-libc, which is enabled by default
+ 3. Expose library definitions in 'picolibc.h', instead of 'newlib.h'
+    and '_newlib_version.h'
 
- 4. Switch build system to meson. This has two notable benefits; the first
-    is that building the library is much faster, the second is that
-    it isolates build system changes from newlib making merging of
-    newlib changes much easier.
-
- 5. Add simple startup code. This can be used in environments that
-    don't have complicated requirements, allowing small applications
-    to avoid needing to figure this out.
+ 4. Define HAVE_SEMIHOST when semihosting support is available. This
+    lets the 'hello-world' example do some semihost specific things.
 
 ### Picolibc version 1.1
 
@@ -112,6 +111,28 @@ A minor update from 1.0, this release includes:
 
  5. Remove newlib/libm/mathfp directory. This experimental code never
     worked correctly anyways.
+
+### Picolibc version 1.0
+
+This is the first release of picolibc. Major changes from newlib
+include:
+
+ 1. Remove all non-BSD licensed code. None of it was used in building
+    the embedded library, and removing it greatly simplifies the
+    license situation.
+
+ 2. Move thread-local values to native TLS mechanism
+
+ 3. Add smaller stdio from avr-libc, which is enabled by default
+
+ 4. Switch build system to meson. This has two notable benefits; the first
+    is that building the library is much faster, the second is that
+    it isolates build system changes from newlib making merging of
+    newlib changes much easier.
+
+ 5. Add simple startup code. This can be used in environments that
+    don't have complicated requirements, allowing small applications
+    to avoid needing to figure this out.
 
 ## Documentation
 
