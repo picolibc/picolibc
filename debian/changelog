@@ -1,3 +1,11 @@
+picolibc (1.2-1) unstable; urgency=medium
+
+  * New upstream release  (1.2)
+  * Add fopen/fdopen and clock semihost support
+  * Fix picolibc.ld to actually use user-defined memory areas
+
+ -- Keith Packard <keithp@keithp.com>  Thu, 28 Nov 2019 10:46:30 -0800
+
 picolibc (1.1.1-1) unstable; urgency=medium
 
   * New upstream release (1.1.1)
