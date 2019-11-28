@@ -33,29 +33,10 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <stdio.h>
-#include <stdlib.h>
-#ifdef HAVE_SEMIHOST
-#include <semihost.h>
-#endif
+#include "semihost-private.h"
 
 int
-main(void)
+sys_semihost_errno(void)
 {
-	printf("hello, world\n");
-
-#ifdef HAVE_SEMIHOST
-	char	cmdline[128];
-	if (sys_semihost_get_cmdline(cmdline, sizeof(cmdline)) == 0) {
-		printf("Command line %s\n", cmdline);
-		FILE *f = fopen(cmdline, "r");
-		if (f) {
-			int c;
-			while ((c = getc(f)) != EOF)
-				putchar(c);
-		}
-	}
-#endif
-
-	exit(0);
+	return sys_semihost(SYS_ERRNO, 0);
 }

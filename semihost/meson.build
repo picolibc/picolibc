@@ -40,10 +40,18 @@ src_semihost_machine = {
 
 if src_semihost_machine.has_key(host_cpu)
   srcs_semihost = [
+    'errno.c',
     'putc.c',
     'getc.c',
     'exit.c',
     'iob.c',
+    'get_cmdline.c',
+    'open.c',
+    'close.c',
+    'lseek.c',
+    'write.c',
+    'read.c',
+    'clock.c',
     join_paths('machine', src_semihost_machine[host_cpu])
   ]
 
@@ -52,6 +60,8 @@ if src_semihost_machine.has_key(host_cpu)
   )
 
   semihost_inc = [include_directories('.'), inc]
+
+  has_semihost = true
 
   foreach target : targets
     value = get_variable('target_' + target)

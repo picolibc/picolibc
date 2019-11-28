@@ -67,6 +67,7 @@ inc_headers = [
   'malloc.h',
   'math.h',
   'memory.h',
+  'newlib.h',
   'paths.h',
   'pthread.h',
   'pwd.h',

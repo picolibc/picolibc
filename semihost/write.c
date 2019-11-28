@@ -33,29 +33,29 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <stdio.h>
-#include <stdlib.h>
-#ifdef HAVE_SEMIHOST
-#include <semihost.h>
-#endif
+#include "semihost-private.h"
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <unistd.h>
+#include <string.h>
+#include <errno.h>
 
-int
-main(void)
+ssize_t
+write(int fd, const void *buf, size_t count)
 {
-	printf("hello, world\n");
+	struct {
+		uintptr_t	field1;
+		uintptr_t	field2;
+		uintptr_t	field3;
+	} arg = {
+		.field1 = fd,
+		.field2 = (uintptr_t) buf,
+		.field3 = (uintptr_t) count
+	};
 
-#ifdef HAVE_SEMIHOST
-	char	cmdline[128];
-	if (sys_semihost_get_cmdline(cmdline, sizeof(cmdline)) == 0) {
-		printf("Command line %s\n", cmdline);
-		FILE *f = fopen(cmdline, "r");
-		if (f) {
-			int c;
-			while ((c = getc(f)) != EOF)
-				putchar(c);
-		}
-	}
-#endif
+	uintptr_t ret = sys_semihost(SYS_WRITE, (uintptr_t) &arg);
 
-	exit(0);
+	ssize_t put = count - (ssize_t) ret;
+	return put;
 }

@@ -67,6 +67,51 @@ sync has not been difficult so far.
 
 ## Releases
 
+### Picolibc version 1.2
+
+This release includes important fixes in picolibc.ld and more
+semihosting support.
+
+ 1. File I/O and clock support for semihosting. This enables fopen/fdopen
+    support in tinystdio along with an API to fetch a real time clock
+    value.
+
+ 2. Fix picolibc.ld to not attempt to use redefined symbols for memory
+    space definitions. These redefinitions would fail and the default
+    values be used for system memory definitions. Instead, just use
+    the ? : operators each place the values are needed. Linker scripts
+    continue to mystify.
+
+ 3. Expose library definitions in 'picolibc.h', instead of 'newlib.h'
+    and '_newlib_version.h'
+
+ 4. Define HAVE_SEMIHOST when semihosting support is available. This
+    lets the 'hello-world' example do some semihost specific things.
+
+### Picolibc version 1.1
+
+A minor update from 1.0, this release includes:
+
+ 1. semihost support. This adds console I/O and exit(3) support on ARM
+    and RISC-V hosts using the standard semihosting interfaces.
+
+ 2. Posix I/O support in tinystdio. When -Dposix-io=true is included
+    in the meson command line (which is the default), tinystdio adds
+    support for fopen and fdopen by using malloc, open, close, read,
+    write and lseek. If -Dposix-console=true is also passed to meson,
+    then picolibc will direct stdin/stdout/stderr to the posix
+    standard file descriptors (0, 1, 2).
+
+ 3. Merge recent upstream newlib code. This brings picolibc up to date
+    with current newlib sources.
+
+ 4. Hello world example. This uses a simple Makefile to demonstrate
+    how to us picolibc when installed for ARM and RISC-V embedded
+    processors. The resulting executables can be run under qemu.
+
+ 5. Remove newlib/libm/mathfp directory. This experimental code never
+    worked correctly anyways.
+
 ### Picolibc version 1.0
 
 This is the first release of picolibc. Major changes from newlib
@@ -88,28 +133,6 @@ include:
  5. Add simple startup code. This can be used in environments that
     don't have complicated requirements, allowing small applications
     to avoid needing to figure this out.
-
-### Picolibc version 1.1
-
-A minor update from 1.0, this release includes:
-
- 1. semihost support. This adds console I/O and exit(3) support on ARM
-    and RISC-V hosts using the standard semihosting interfaces.
-
- 2. Posix I/O support in tinystdio. When meson is run with
-    -Dposix-io=true, tinystdio adds support for fopen and fdopen,
-    along with directing stdin/stdout/stderr to the posix standard
-    file descriptors
-
- 3. Merge recent upstream newlib code. This brings picolibc up to date
-    with current newlib sources.
-
- 4. Hello world example. This uses a simple Makefile to demonstrate
-    how to us picolibc when installed for ARM and RISC-V embedded
-    processors. The resulting executables can be run under qemu.
-
- 5. Remove newlib/libm/mathfp directory. This experimental code never
-    worked correctly anyways.
 
 ## Documentation
 

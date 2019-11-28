@@ -33,29 +33,50 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <stdio.h>
-#include <stdlib.h>
-#ifdef HAVE_SEMIHOST
-#include <semihost.h>
-#endif
+#include "semihost-private.h"
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <unistd.h>
+#include <string.h>
+#include <errno.h>
 
 int
-main(void)
+open(const char *pathname, int flags, ...)
 {
-	printf("hello, world\n");
+	int semiflags = 0;
 
-#ifdef HAVE_SEMIHOST
-	char	cmdline[128];
-	if (sys_semihost_get_cmdline(cmdline, sizeof(cmdline)) == 0) {
-		printf("Command line %s\n", cmdline);
-		FILE *f = fopen(cmdline, "r");
-		if (f) {
-			int c;
-			while ((c = getc(f)) != EOF)
-				putchar(c);
-		}
+	switch (flags & (O_RDONLY|O_WRONLY|O_RDWR)) {
+	case O_RDONLY:
+		semiflags = 0;			/* 'r' */
+		break;
+	case O_WRONLY:
+		if (flags & O_TRUNC)
+			semiflags = 4;	/* 'w' */
+		else
+			semiflags = 8;	/* 'a' */
+		break;
+	default:
+		if (flags & O_TRUNC)
+			semiflags = 6;	/* 'w+' */
+		else
+			semiflags = 10;	/* 'a+' */
+		break;
 	}
-#endif
 
-	exit(0);
+	struct {
+		uintptr_t	field1;
+		uintptr_t	field2;
+		uintptr_t	field3;
+	} arg = {
+		.field1 = (uintptr_t) pathname,
+		.field2 = semiflags,
+		.field3 = strlen(pathname)
+	};
+
+	uintptr_t ret = sys_semihost(SYS_OPEN, (uintptr_t) &arg);
+	if ((int) ret == -1)
+		errno = sys_semihost_errno();
+	return (int) ret;
 }
+

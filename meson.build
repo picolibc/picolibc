@@ -90,6 +90,7 @@ newlib_initfini = get_option('newlib-initfini')
 thread_local_storage_option = get_option('thread-local-storage')
 tls_model = get_option('tls-model')
 posix_io = get_option('posix-io')
+posix_console = posix_io and get_option('posix-console')
 sysroot_install = get_option('sysroot-install')
 
 host_cpu=host_machine.cpu()
@@ -236,20 +237,19 @@ conf_data.set('HAVE_INITFINI_ARRAY', newlib_initfini_array, description: 'compil
 conf_data.set('HAVE_INIT_FINI', newlib_initfini, description: 'Support _init() and _fini() functions')
 conf_data.set('NEWLIB_TLS', thread_local_storage, description: 'use thread local storage')
 conf_data.set('POSIX_IO', posix_io, description: 'Use open/close/read/write in tinystdio')
-
-version_data = configuration_data()
+conf_data.set('POSIX_CONSOLE', posix_console, description: 'Use POSIX I/O for stdin, stdout and stderr')
 
 version_array = meson.project_version().split('.')
 
-version_data.set('_PICOLIBC_VERSION', '"@0@"'.format(meson.project_version()), description: 'The Picolibc version in string format.')
-version_data.set('_PICOLIBC__', version_array[0], description: 'The Picolibc major version number.')
-version_data.set('_PICOLIBC_MINOR__', version_array[1], description: 'The Picolibc minor version number.')
-version_data.set('__PICOLIBC_PATCHLEVEL__', version_array[2], description: 'The Picolibc patch level.')
+conf_data.set('_PICOLIBC_VERSION', '"@0@"'.format(meson.project_version()), description: 'The Picolibc version in string format.')
+conf_data.set('_PICOLIBC__', version_array[0], description: 'The Picolibc major version number.')
+conf_data.set('_PICOLIBC_MINOR__', version_array[1], description: 'The Picolibc minor version number.')
+conf_data.set('__PICOLIBC_PATCHLEVEL__', version_array[2], description: 'The Picolibc patch level.')
 
-version_data.set('_NEWLIB_VERSION', '"@0@"'.format(NEWLIB_VERSION), description: 'The newlib version in string format.')
-version_data.set('_NEWLIB__', NEWLIB_MAJOR_VERSION, description: 'The newlib major version number.')
-version_data.set('_NEWLIB_MINOR__', NEWLIB_MINOR_VERSION, description: 'The newlib minor version number.')
-version_data.set('__NEWLIB_PATCHLEVEL__', NEWLIB_PATCHLEVEL_VERSION, description: 'The newlib patch level.')
+conf_data.set('_NEWLIB_VERSION', '"@0@"'.format(NEWLIB_VERSION), description: 'The newlib version in string format.')
+conf_data.set('_NEWLIB__', NEWLIB_MAJOR_VERSION, description: 'The newlib major version number.')
+conf_data.set('_NEWLIB_MINOR__', NEWLIB_MINOR_VERSION, description: 'The newlib minor version number.')
+conf_data.set('__NEWLIB_PATCHLEVEL__', NEWLIB_PATCHLEVEL_VERSION, description: 'The newlib patch level.')
 
 if newlib_tinystdio
   stdio_inc_dir = 'newlib/libc/tinystdio'
@@ -263,14 +263,6 @@ inc = include_directories(inc_dirs)
 
 includedir = join_paths(get_option('prefix'), get_option('includedir'))
 
-configure_file(output : 'newlib.h',
-	       configuration: conf_data,
-	       install_dir: includedir)
-
-configure_file(output : '_newlib_version.h',
-	       configuration: version_data,
-	       install_dir: includedir)
-
 arguments = ['-g', '-ffunction-sections', '-fdata-sections']
 
 if tls_model != ''
@@ -279,6 +271,9 @@ endif
 
 add_project_arguments(arguments, language: 'c')
 
+# semihost will adjust this if supported
+has_semihost = false
+
 subdir('newlib')
 subdir('picocrt')
 if newlib_tinystdio
@@ -286,6 +281,13 @@ if newlib_tinystdio
   subdir('dummyhost')
 endif
 
+conf_data.set('HAVE_SEMIHOST', has_semihost, description: 'Semihost APIs supported')
+
 if enable_tests
   subdir('test')
 endif
+
+configure_file(output : 'picolibc.h',
+	       configuration: conf_data,
+	       install_dir: includedir)
+

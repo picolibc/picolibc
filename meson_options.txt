@@ -130,5 +130,7 @@ option('thread-local-storage', type: 'combo', choices: ['true', 'false', 'auto']
        description: 'use thread local storage for static data (default: automatically detect support)')
 option('tls-model', type: 'string', value: 'local-exec',
        description: 'tls model (global-dynamic, local-dynamic, initial-exec or local-exec)')
-option('posix-io', type: 'boolean', value: false,
-       description: 'Target supports POSIX I/O functions (open, close, read, write)')
+option('posix-io', type: 'boolean', value: true,
+       description: 'Provide fopen/fdopen using POSIX I/O (open, close, read, write, lseek)')
+option('posix-console', type: 'boolean', value: false,
+       description: 'Use POSIX I/O for stdin/stdout/stderr')

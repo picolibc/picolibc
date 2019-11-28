@@ -45,3 +45,12 @@ sys_semihost_getc(FILE *file);
 
 void
 sys_semihost_exit(int code);
+
+int
+sys_semihost_get_cmdline(char *buf, int size);
+
+int
+sys_semihost_errno(void);
+
+uintptr_t
+sys_semihost_clock(void);

@@ -73,18 +73,20 @@ Meson sticks all of the cross-compilation build configuration bits in
 a separate configuration file. There are a bunch of things you need to
 set, which the build system really shouldn't care about. Example
 configuration settings for RISC-V processors are in
-cross-riscv32-unknown-elf.txt:
+cross-riscv64-unknown-elf.txt:
 
     [binaries]
-    c = 'riscv32-unknown-elf-gcc'
-    ar = 'riscv32-unknown-elf-ar'
-    as = 'riscv32-unknown-elf-as'
+    c = 'riscv64-unknown-elf-gcc'
+    ar = 'riscv64-unknown-elf-ar'
+    as = 'riscv64-unknown-elf-as'
+    ld = 'riscv64-unknown-elf-ld'
+    strip = 'riscv64-unknown-elf-strip'
 
     [host_machine]
-    system = ''
-    cpu_family = ''
-    cpu = ''
-    endian = ''
+    system = 'unknown'
+    cpu_family = 'riscv'
+    cpu = 'riscv'
+    endian = 'little'
 
 Settings for ARM processors are in cross-arm-none-eabi.txt:
 
@@ -92,12 +94,14 @@ Settings for ARM processors are in cross-arm-none-eabi.txt:
     c = 'arm-none-eabi-gcc'
     ar = 'arm-none-eabi-ar'
     as = 'arm-none-eabi-as'
+    ld = 'arm-none-eabi-ld'
+    strip = 'arm-none-eabi-strip'
 
     [host_machine]
-    system = ''
-    cpu_family = ''
-    cpu = ''
-    endian = ''
+    system = 'none'
+    cpu_family = 'arm'
+    cpu = 'arm'
+    endian = 'little'
 
 If those programs aren't in your path, you can edit the file to point
 wherever they may be.
