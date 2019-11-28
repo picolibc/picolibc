@@ -1,8 +1,8 @@
 Source: picolibc
 Priority: optional
 Maintainer: Keith Packard <keithp@keithp.com>
-Build-Depends: debhelper (>= 12), gcc-arm-none-eabi, gcc-riscv64-unknown-elf, meson, ninja-build
-Standards-Version: 4.4.0
+Build-Depends: debhelper-compat (= 12), gcc-arm-none-eabi, gcc-riscv64-unknown-elf, meson, ninja-build
+Standards-Version: 4.4.1
 Section: devel
 HomePage: https://keithp.com/git/picolibc
 Vcs-Git: https://keithp.com/git/picolibc.git
