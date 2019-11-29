@@ -36,7 +36,7 @@ nano_malloc_srcs_stdlib = [
   'nano-malloc-calloc.c',
   'nano-malloc-cfree.c',
   'nano-malloc-free.c',
-  'nano-malloc-mallinco.c',
+  'nano-malloc-mallinfo.c',
   'nano-malloc-malloc.c',
   'nano-malloc-malloc_stats.c',
   'nano-malloc-malloc_usable_size.c',

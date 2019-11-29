@@ -54,16 +54,16 @@
 
 #define nano_malloc		malloc
 #define nano_free		free
-#define nano_ealloc		ealloc
-#define nano_memalign		memalign
+#define nano_realloc	realloc
+#define nano_memalign	memalign
 #define nano_valloc		valloc
-#define nano_pvalloc		pvalloc
+#define nano_pvalloc	pvalloc
 #define nano_calloc		calloc
 #define nano_cfree		cfree
 #define nano_malloc_usable_size malloc_usable_size
-#define nano_malloc_stats	malloc_stats
-#define nano_mallinfo		mallinfo
-#define nano_mallopt		mallopt
+#define nano_malloc_stats   malloc_stats
+#define nano_mallinfo	mallinfo
+#define nano_mallopt	mallopt
 
 /* Redefine names to avoid conflict with user names */
 #define free_list __malloc_free_list
