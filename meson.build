@@ -92,6 +92,7 @@ tls_model = get_option('tls-model')
 posix_io = get_option('posix-io')
 posix_console = posix_io and get_option('posix-console')
 sysroot_install = get_option('sysroot-install')
+newlib_obsolete_math = get_option('newlib-obsolete-math')
 
 host_cpu=host_machine.cpu()
 if host_cpu == ''
@@ -238,6 +239,16 @@ conf_data.set('HAVE_INIT_FINI', newlib_initfini, description: 'Support _init() a
 conf_data.set('NEWLIB_TLS', thread_local_storage, description: 'use thread local storage')
 conf_data.set('POSIX_IO', posix_io, description: 'Use open/close/read/write in tinystdio')
 conf_data.set('POSIX_CONSOLE', posix_console, description: 'Use POSIX I/O for stdin, stdout and stderr')
+
+if newlib_obsolete_math == 'auto'
+  obsolete_math_value = false
+elif newlib_obsolete_math == 'true'
+  obsolete_math_value = 1
+elif newlib_obsolete_math == 'false'
+  obsolete_math_value = 0
+endif
+  
+conf_data.set('__OBSOLETE_MATH', obsolete_math_value, description: 'Use old math code (undef auto, 0 no, 1 yes)')
 
 version_array = meson.project_version().split('.')
 
