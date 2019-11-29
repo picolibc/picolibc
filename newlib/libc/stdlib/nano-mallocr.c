@@ -153,14 +153,14 @@ static inline chunk * get_chunk_from_ptr(void * ptr)
     return c;
 }
 
+extern void  *sbrk(intptr_t);
+
 #ifdef DEFINE_MALLOC
 /* List list header of free blocks */
 chunk * free_list = NULL;
 
 /* Starting point of memory allocated from system */
 char * sbrk_start = NULL;
-
-extern void  *sbrk(intptr_t);
 
 /** Function sbrk_aligned
   * Algorithm:
