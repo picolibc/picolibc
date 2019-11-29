@@ -29,11 +29,9 @@
 #include "fdlibm.h"
 #include "math_config.h"
 
-#if !__OBSOLETE_MATH
 HIDDEN float
 __math_invalidf (float x)
 {
   float y = (x - x) / (x - x);
   return isnan (x) ? y : __math_with_errnof (y, EDOM);
 }
-#endif /* !__OBSOLETE_MATH */
