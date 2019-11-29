@@ -75,7 +75,6 @@ __math_oflowf (uint32_t sign)
   return xflowf (sign, 0x1p97f);
 }
 
-#if !__OBSOLETE_MATH
 HIDDEN float
 __math_divzerof (uint32_t sign)
 {
@@ -89,4 +88,3 @@ __math_invalidf (float x)
   float y = (x - x) / (x - x);
   return isnan (x) ? y : with_errnof (y, EDOM);
 }
-#endif /* !__OBSOLETE_MATH */
