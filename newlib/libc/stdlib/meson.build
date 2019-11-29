@@ -51,7 +51,7 @@ std_malloc_srcs_stdlib = [
   'malloc-calloc.c',
   'malloc-cfree.c',
   'malloc-free.c',
-  'malloc-mallinco.c',
+  'malloc-mallinfo.c',
   'malloc-malloc.c',
   'malloc-malloc_stats.c',
   'malloc-malloc_usable_size.c',

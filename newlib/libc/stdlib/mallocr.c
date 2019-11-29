@@ -977,7 +977,7 @@ extern Void_t*     sbrk();
 #define fREe		free
 #define mALLOc		malloc
 #define mEMALIGn	memalign
-#define rEALLOc		ealloc
+#define rEALLOc		realloc
 #define vALLOc		valloc
 #define pvALLOc		pvalloc
 #define mALLINFo	mallinfo
