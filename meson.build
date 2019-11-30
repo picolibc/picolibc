@@ -302,3 +302,10 @@ configure_file(output : 'picolibc.h',
 	       configuration: conf_data,
 	       install_dir: includedir)
 
+# Usage as an embedded subproject:
+# If picolibc is embedded into the source as a subproject, 
+# provide a dependency to be used by the main project:
+#   dependency('libc', fallback: ['picolibc', 'libc_dep'])
+if not enable_multilib and meson.is_subproject()
+  picolibc_dep = declare_dependency(include_directories: inc, link_with: [lib_c, lib_m])
+endif
