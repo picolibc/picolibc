@@ -38,8 +38,21 @@
 #include <stdlib.h>
 #include <string.h>
 #include "stdio_private.h"
-#if 0
-#include "ftoa_engine.h"
+
+#ifdef PICOLIBC_FLOAT_PRINTF_SCANF
+static inline float
+printf_float_get(uint32_t u)
+{
+	union {
+		float		f;
+		uint32_t	u;
+	} un = { .u = u };
+	return un.f;
+}
+
+#define PRINTF_FLOAT_ARG(ap) (printf_float_get(va_arg(ap, uint32_t)))
+typedef float printf_float_t;
+
 #define dtoa ftoa
 #define DTOA_MINUS FTOA_MINUS
 #define DTOA_ZERO  FTOA_ZERO
@@ -48,8 +61,14 @@
 #define DTOA_CARRY FTOA_CARRY
 #define DTOA_MAX_DIG FTOA_MAX_DIG
 #define __dtoa_engine(x,dtoa,dig,dec) __ftoa_engine(x,dtoa,dig,dec)
+#include "ftoa_engine.h"
+
 #else
+
+#define PRINTF_FLOAT_ARG(ap) va_arg(ap, double)
+typedef double printf_float_t;
 #include "dtoa_engine.h"
+
 #endif
 
 /*
@@ -127,6 +146,7 @@ typedef long ultoa_signed_t;
 #define FL_NEGATIVE	0x40
 #define FL_LONG 	0x80
 
+
 int
 vfprintf (FILE * stream, const char *fmt, va_list ap)
 {
@@ -171,7 +191,7 @@ vfprintf (FILE * stream, const char *fmt, va_list ap)
 	/* Only a format character is valid.	*/
 
 	if (c && strchr("EFGefg", c)) {
-	    (void) va_arg (ap, double);
+		(void) PRINTF_FLOAT_ARG(ap);
 	    putc ('?', stream);
 	    continue;
 	}
@@ -444,7 +464,7 @@ int vfprintf (FILE * stream, const char *fmt, va_list ap)
 	    if (ndigs > DTOA_MAX_DIG)
 		ndigs = DTOA_MAX_DIG;
 
-	    ndigs = __dtoa_engine (va_arg(ap,double), &_dtoa, ndigs, ndecimal);
+	    ndigs = __dtoa_engine (PRINTF_FLOAT_ARG(ap), &_dtoa, ndigs, ndecimal);
 	    exp = _dtoa.exp;
 
 	    sign = 0;
@@ -615,7 +635,7 @@ int vfprintf (FILE * stream, const char *fmt, va_list ap)
 
 #else		/* to: PRINTF_LEVEL >= PRINTF_FLT */
 	if ((c >= 'E' && c <= 'G') || (c >= 'e' && c <= 'g')) {
-	    (void) va_arg (ap, double);
+	    (void) PRINTF_FLOAT_ARG(ap);
 	    pnt = "*float*";
 	    size = sizeof ("*float*") - 1;
 	    goto str_lpad;

@@ -412,9 +412,11 @@ conv_flt (FILE *stream, width_t width, void *addr, uint16_t flags)
     if (flag & FL_MINUS)
 	flt = -flt;
     if (addr) {
+#ifndef PICOLIBC_FLOAT_PRINTF_SCANF
 	if (flags & FL_LONG)
 	    *((double *) addr) = flt;
 	else
+#endif
 	    *((float *) addr) = flt;
     }
     return 1;
