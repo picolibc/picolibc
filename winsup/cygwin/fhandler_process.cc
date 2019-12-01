@@ -1076,6 +1076,7 @@ format_process_stat (void *data, char *&destbuf)
   unsigned long fault_count = 0UL,
 		vmsize = 0UL, vmrss = 0UL, vmmaxrss = 0UL;
   uint64_t utime = 0ULL, stime = 0ULL, start_time = 0ULL;
+  int nice = 0;
 
   if (p->process_state & PID_EXITED)
     strcpy (cmd, "<defunct>");
@@ -1138,6 +1139,7 @@ format_process_stat (void *data, char *&destbuf)
       if (!NT_SUCCESS (status))
 	debug_printf ("NtQueryInformationProcess(ProcessQuotaLimits): "
 		      "status %y", status);
+      nice = winprio_to_nice (GetPriorityClass (hProcess));
       CloseHandle (hProcess);
     }
   status = NtQuerySystemInformation (SystemTimeOfDayInformation,
@@ -1157,7 +1159,6 @@ format_process_stat (void *data, char *&destbuf)
   vmsize = vmc.PagefileUsage;
   vmrss = vmc.WorkingSetSize / page_size;
   vmmaxrss = ql.MaximumWorkingSetSize / page_size;
-  int nice = winprio_to_nice(GetPriorityClass(hProcess));
 
   destbuf = (char *) crealloc_abort (destbuf, strlen (cmd) + 320);
   return __small_sprintf (destbuf, "%d (%s) %c "
@@ -1169,7 +1170,7 @@ format_process_stat (void *data, char *&destbuf)
 			  p->pid, cmd, state,
 			  p->ppid, p->pgid, p->sid, p->ctty, -1,
 			  0, fault_count, fault_count, 0, 0, utime, stime,
-                         utime, stime, NZERO + nice, nice, 0, 0,
+			  utime, stime, NZERO + nice, nice, 0, 0,
 			  start_time, vmsize,
 			  vmrss, vmmaxrss
 			  );
