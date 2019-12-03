@@ -1,3 +1,12 @@
+picolibc (1.2.1-1) unstable; urgency=medium
+
+  * New upstream release (1.2.1)
+  * Switch back to __OBSOLETE_MATH for machines without hw double
+  * Include realloc and mallinfo in the library
+  * Use SYS_EXIT on semihost implementations without SYS_EXIT_EXTENDED
+
+ -- Keith Packard <keithp@keithp.com>  Mon, 02 Dec 2019 20:55:24 -0800
+
 picolibc (1.2-1) unstable; urgency=medium
 
   * New upstream release  (1.2)
