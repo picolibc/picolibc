@@ -568,6 +568,7 @@ extern int	fclose(FILE *__stream);
 
 extern int	vfprintf(FILE *__stream, const char *__fmt, va_list __ap);
 extern int	vfiprintf(FILE *__stream, const char *__fmt, va_list __ap);
+extern int	vfprintff(FILE *__stream, const char *__fmt, va_list __ap);
 
 /**
    The function \c fputc sends the character \c c (though given as type
@@ -604,6 +605,7 @@ extern int	putchar(int __c);
 */
 extern int	printf(const char *__fmt, ...);
 extern int	iprintf(const char *__fmt, ...);
+extern int	printff(const char *__fmt, ...);
 
 /**
    The function \c vprintf performs formatted output to stream
@@ -613,6 +615,7 @@ extern int	iprintf(const char *__fmt, ...);
 */
 extern int	vprintf(const char *__fmt, va_list __ap);
 extern int	viprintf(const char *__fmt, va_list __ap);
+extern int	vprintff(const char *__fmt, va_list __ap);
 
 /**
    Variant of \c printf() that sends the formatted characters
@@ -620,6 +623,7 @@ extern int	viprintf(const char *__fmt, va_list __ap);
 */
 extern int	sprintf(char *__s, const char *__fmt, ...);
 extern int	siprintf(char *__s, const char *__fmt, ...);
+extern int	sprintff(char *__s, const char *__fmt, ...);
 
 /**
    Like \c sprintf(), but instead of assuming \c s to be of infinite
@@ -631,6 +635,7 @@ extern int	siprintf(char *__s, const char *__fmt, ...);
 */
 extern int	snprintf(char *__s, size_t __n, const char *__fmt, ...);
 extern int	sniprintf(char *__s, size_t __n, const char *__fmt, ...);
+extern int	snprintff(char *__s, size_t __n, const char *__fmt, ...);
 
 /**
    Like \c sprintf() but takes a variable argument list for the
@@ -638,6 +643,7 @@ extern int	sniprintf(char *__s, size_t __n, const char *__fmt, ...);
 */
 extern int	vsprintf(char *__s, const char *__fmt, va_list ap);
 extern int	vsiprintf(char *__s, const char *__fmt, va_list ap);
+extern int	vsprintff(char *__s, const char *__fmt, va_list ap);
 
 /**
    Like \c vsprintf(), but instead of assuming \c s to be of infinite
@@ -649,6 +655,7 @@ extern int	vsiprintf(char *__s, const char *__fmt, va_list ap);
 */
 extern int	vsnprintf(char *__s, size_t __n, const char *__fmt, va_list ap);
 extern int	vsniprintf(char *__s, size_t __n, const char *__fmt, va_list ap);
+extern int	vsnprintff(char *__s, size_t __n, const char *__fmt, va_list ap);
 
 /**
    The function \c fprintf performs formatted output to \c stream.
@@ -656,6 +663,7 @@ extern int	vsniprintf(char *__s, size_t __n, const char *__fmt, va_list ap);
 */
 extern int	fprintf(FILE *__stream, const char *__fmt, ...);
 extern int	fiprintf(FILE *__stream, const char *__fmt, ...);
+extern int	fprintff(FILE *__stream, const char *__fmt, ...);
 
 /**
    Write the string pointed to by \c str to stream \c stream.
@@ -792,6 +800,7 @@ extern int	ferror(FILE *__stream);
 
 extern int	vfscanf(FILE *__stream, const char *__fmt, va_list __ap);
 extern int	vfiscanf(FILE *__stream, const char *__fmt, va_list __ap);
+extern int	vfscanff(FILE *__stream, const char *__fmt, va_list __ap);
 
 /**
    The function \c fscanf performs formatted input, reading the
@@ -801,6 +810,7 @@ extern int	vfiscanf(FILE *__stream, const char *__fmt, va_list __ap);
  */
 extern int	fscanf(FILE *__stream, const char *__fmt, ...);
 extern int	fiscanf(FILE *__stream, const char *__fmt, ...);
+extern int	fscanff(FILE *__stream, const char *__fmt, ...);
 
 /**
    The function \c scanf performs formatted input from stream \c stdin.
@@ -809,6 +819,7 @@ extern int	fiscanf(FILE *__stream, const char *__fmt, ...);
  */
 extern int	scanf(const char *__fmt, ...);
 extern int	iscanf(const char *__fmt, ...);
+extern int	scanff(const char *__fmt, ...);
 
 /**
    The function \c vscanf performs formatted input from stream
@@ -818,6 +829,7 @@ extern int	iscanf(const char *__fmt, ...);
 */
 extern int	vscanf(const char *__fmt, va_list __ap);
 extern int	viscanf(const char *__fmt, va_list __ap);
+extern int	vscanff(const char *__fmt, va_list __ap);
 
 /**
    The function \c sscanf performs formatted input, reading the
@@ -827,6 +839,7 @@ extern int	viscanf(const char *__fmt, va_list __ap);
  */
 extern int	sscanf(const char *__buf, const char *__fmt, ...);
 extern int	siscanf(const char *__buf, const char *__fmt, ...);
+extern int	sscanff(const char *__buf, const char *__fmt, ...);
 
 #if defined(__DOXYGEN__)
 /**
@@ -913,6 +926,43 @@ extern char *tmpnam (char *s);
 #define fscanf fiscanf
 #define sscanf siscanf
 
+#else
+
+#ifdef PICOLIBC_FLOAT_PRINTF_SCANF
+
+#define vsnprintf vsnprintff
+#define vfprintf vfprintff
+#define vprintf vprintff
+#define fprintf fprintff
+#define printf printff
+#define sprintf sprintff
+#define snprintf snprintff
+#define asprintf asprintff
+#define asnprintf asnprintff
+
+#define vfscanf vfscanff
+#define scanf scanff
+#define fscanf fscanff
+#define sscanf sscanff
+
+static inline uint32_t
+__printf_float(float f)
+{
+	union {
+		float		f;
+		uint32_t	u;
+	} u = { .f = f };
+	return u.u;
+}
+
+#define printf_float(x) __printf_float(x)
+
+#endif
+
+#endif
+
+#ifndef printf_float
+#define printf_float(x) ((double) (x))
 #endif
 
 #endif /* _STDLIB_H_ */

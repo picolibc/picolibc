@@ -29,11 +29,9 @@
 #include "fdlibm.h"
 #include "math_config.h"
 
-#if !__OBSOLETE_MATH
 HIDDEN float
 __math_divzerof (uint32_t sign)
 {
   float y = 0;
   return __math_with_errnof ((sign ? -1 : 1) / y, ERANGE);
 }
-#endif

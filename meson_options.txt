@@ -134,3 +134,6 @@ option('posix-io', type: 'boolean', value: true,
        description: 'Provide fopen/fdopen using POSIX I/O (open, close, read, write, lseek)')
 option('posix-console', type: 'boolean', value: false,
        description: 'Use POSIX I/O for stdin/stdout/stderr')
+option('newlib-obsolete-math', type: 'combo', choices: ['true', 'false', 'auto'],
+       value: 'auto',
+       description: 'Use obsolete math routines (default: automatic based on platform)')

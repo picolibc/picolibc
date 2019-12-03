@@ -28,218 +28,206 @@
 
 #include "dtoa_engine.h"
 
-#ifndef DBL_MAX_10_EXP
-#error DBL_MAX_10_EXP
-#endif
-
-#ifndef DBL_MIN_10_EXP
-#error DBL_MIN_10_EXP
-#endif
-
-#ifndef DBL_DIG
-#error DBL_DIG
-#endif
-
 const double __dtoa_scale_up[] = {
-#if DBL_MAX_10_EXP >= 1
+#if DTOA_MAX_10_EXP >= 1
 	1e1,
 #endif
-#if DBL_MAX_10_EXP >= 2
+#if DTOA_MAX_10_EXP >= 2
 	1e2,
 #endif
-#if DBL_MAX_10_EXP >= 4
+#if DTOA_MAX_10_EXP >= 4
 	1e4,
 #endif
-#if DBL_MAX_10_EXP >= 8
+#if DTOA_MAX_10_EXP >= 8
 	1e8,
 #endif
-#if DBL_MAX_10_EXP >= 16
+#if DTOA_MAX_10_EXP >= 16
 	1e16,
 #endif
-#if DBL_MAX_10_EXP >= 32
+#if DTOA_MAX_10_EXP >= 32
 	1e32,
 #endif
-#if DBL_MAX_10_EXP >= 64
+#if DTOA_MAX_10_EXP >= 64
 	1e64,
 #endif
-#if DBL_MAX_10_EXP >= 128
+#if DTOA_MAX_10_EXP >= 128
 	1e128,
 #endif
-#if DBL_MAX_10_EXP >= 256
+#if DTOA_MAX_10_EXP >= 256
 	1e256,
 #endif
-#if DBL_MAX_10_EXP >= 512
+#if DTOA_MAX_10_EXP >= 512
 	1e512,
 #endif
-#if DBL_MAX_10_EXP >= 1024
+#if DTOA_MAX_10_EXP >= 1024
 	1e1024,
 #endif
-#if DBL_MAX_10_EXP >= 2048
+#if DTOA_MAX_10_EXP >= 2048
 	1e2048,
 #endif
-#if DBL_MAX_10_EXP >= 4096
+#if DTOA_MAX_10_EXP >= 4096
 	1e4096,
 #endif
-#if DBL_MAX_10_EXP >= 8192
+#if DTOA_MAX_10_EXP >= 8192
 	1e8192,
 #endif
-#if DBL_MAX_10_EXP >= 16384
+#if DTOA_MAX_10_EXP >= 16384
 	1e16384,
 #endif
-#if DBL_MAX_10_EXP >= 32768
+#if DTOA_MAX_10_EXP >= 32768
 	1e32768,
 #endif
-#if DBL_MAX_10_EXP >= 65536
+#if DTOA_MAX_10_EXP >= 65536
 	1e65536,
 #endif
 };
 
 const double __dtoa_scale_down[] = {
-#if DBL_MIN_10_EXP <= -1
+#if DTOA_MIN_10_EXP <= -1
 	1e-1,
 #endif
-#if DBL_MIN_10_EXP <= -2
+#if DTOA_MIN_10_EXP <= -2
 	1e-2,
 #endif
-#if DBL_MIN_10_EXP <= -4
+#if DTOA_MIN_10_EXP <= -4
 	1e-4,
 #endif
-#if DBL_MIN_10_EXP <= -8
+#if DTOA_MIN_10_EXP <= -8
 	1e-8,
 #endif
-#if DBL_MIN_10_EXP <= -16
+#if DTOA_MIN_10_EXP <= -16
 	1e-16,
 #endif
-#if DBL_MIN_10_EXP <= -32
+#if DTOA_MIN_10_EXP <= -32
 	1e-32,
 #endif
-#if DBL_MIN_10_EXP <= -64
+#if DTOA_MIN_10_EXP <= -64
 	1e-64,
 #endif
-#if DBL_MIN_10_EXP <= -128
+#if DTOA_MIN_10_EXP <= -128
 	1e-128,
 #endif
-#if DBL_MIN_10_EXP <= -256
+#if DTOA_MIN_10_EXP <= -256
 	1e-256,
 #endif
-#if DBL_MIN_10_EXP <= -512
+#if DTOA_MIN_10_EXP <= -512
 	1e-512,
 #endif
-#if DBL_MIN_10_EXP <= -1024
+#if DTOA_MIN_10_EXP <= -1024
 	1e-1024,
 #endif
-#if DBL_MIN_10_EXP <= -2048
+#if DTOA_MIN_10_EXP <= -2048
 	1e-2048,
 #endif
-#if DBL_MIN_10_EXP <= -4096
+#if DTOA_MIN_10_EXP <= -4096
 	1e-4096,
 #endif
-#if DBL_MIN_10_EXP <= -8192
+#if DTOA_MIN_10_EXP <= -8192
 	1e-8192,
 #endif
-#if DBL_MIN_10_EXP <= -16384
+#if DTOA_MIN_10_EXP <= -16384
 	1e-16384,
 #endif
-#if DBL_MIN_10_EXP <= -32768
+#if DTOA_MIN_10_EXP <= -32768
 	1e-32768,
 #endif
-#if DBL_MIN_10_EXP <= -65536
+#if DTOA_MIN_10_EXP <= -65536
 	1e-65536,
 #endif
 };
 
 const double __dtoa_round[] = {
-#if DBL_DIG >= 30
+#if DTOA_DIG >= 30
 	5e30,
 #endif
-#if DBL_DIG >= 29
+#if DTOA_DIG >= 29
 	5e29,
 #endif
-#if DBL_DIG >= 28
+#if DTOA_DIG >= 28
 	5e28,
 #endif
-#if DBL_DIG >= 27
+#if DTOA_DIG >= 27
 	5e27,
 #endif
-#if DBL_DIG >= 26
+#if DTOA_DIG >= 26
 	5e26,
 #endif
-#if DBL_DIG >= 25
+#if DTOA_DIG >= 25
 	5e25,
 #endif
-#if DBL_DIG >= 24
+#if DTOA_DIG >= 24
 	5e24,
 #endif
-#if DBL_DIG >= 23
+#if DTOA_DIG >= 23
 	5e23,
 #endif
-#if DBL_DIG >= 22
+#if DTOA_DIG >= 22
 	5e22,
 #endif
-#if DBL_DIG >= 21
+#if DTOA_DIG >= 21
 	5e21,
 #endif
-#if DBL_DIG >= 20
+#if DTOA_DIG >= 20
 	5e20,
 #endif
-#if DBL_DIG >= 19
+#if DTOA_DIG >= 19
 	5e19,
 #endif
-#if DBL_DIG >= 18
+#if DTOA_DIG >= 18
 	5e18,
 #endif
-#if DBL_DIG >= 17
+#if DTOA_DIG >= 17
 	5e17,
 #endif
-#if DBL_DIG >= 16
+#if DTOA_DIG >= 16
 	5e16,
 #endif
-#if DBL_DIG >= 15
+#if DTOA_DIG >= 15
 	5e15,
 #endif
-#if DBL_DIG >= 14
+#if DTOA_DIG >= 14
 	5e14,
 #endif
-#if DBL_DIG >= 13
+#if DTOA_DIG >= 13
 	5e13,
 #endif
-#if DBL_DIG >= 12
+#if DTOA_DIG >= 12
 	5e12,
 #endif
-#if DBL_DIG >= 11
+#if DTOA_DIG >= 11
 	5e11,
 #endif
-#if DBL_DIG >= 10
+#if DTOA_DIG >= 10
 	5e10,
 #endif
-#if DBL_DIG >= 9
+#if DTOA_DIG >= 9
 	5e9,
 #endif
-#if DBL_DIG >= 8
+#if DTOA_DIG >= 8
 	5e8,
 #endif
-#if DBL_DIG >= 7
+#if DTOA_DIG >= 7
 	5e7,
 #endif
-#if DBL_DIG >= 6
+#if DTOA_DIG >= 6
 	5e6,
 #endif
-#if DBL_DIG >= 5
+#if DTOA_DIG >= 5
 	5e5,
 #endif
-#if DBL_DIG >= 4
+#if DTOA_DIG >= 4
 	5e4,
 #endif
-#if DBL_DIG >= 3
+#if DTOA_DIG >= 3
 	5e3,
 #endif
-#if DBL_DIG >= 2
+#if DTOA_DIG >= 2
 	5e2,
 #endif
-#if DBL_DIG >= 1
+#if DTOA_DIG >= 1
 	5e1,
 #endif
-#if DBL_DIG >= 0
+#if DTOA_DIG >= 0
 	5e0,
 #endif
 };

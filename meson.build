@@ -40,7 +40,7 @@ project('picolibc', 'c',
 	],
 	license : 'BSD',
 	meson_version : '>= 0.50',
-	version: '1.1.1'
+	version: '1.2.1'
 )
 
 targets = []
@@ -92,6 +92,7 @@ tls_model = get_option('tls-model')
 posix_io = get_option('posix-io')
 posix_console = posix_io and get_option('posix-console')
 sysroot_install = get_option('sysroot-install')
+newlib_obsolete_math = get_option('newlib-obsolete-math')
 
 host_cpu=host_machine.cpu()
 if host_cpu == ''
@@ -239,6 +240,16 @@ conf_data.set('NEWLIB_TLS', thread_local_storage, description: 'use thread local
 conf_data.set('POSIX_IO', posix_io, description: 'Use open/close/read/write in tinystdio')
 conf_data.set('POSIX_CONSOLE', posix_console, description: 'Use POSIX I/O for stdin, stdout and stderr')
 
+if newlib_obsolete_math == 'auto'
+  obsolete_math_value = false
+elif newlib_obsolete_math == 'true'
+  obsolete_math_value = 1
+elif newlib_obsolete_math == 'false'
+  obsolete_math_value = 0
+endif
+  
+conf_data.set('__OBSOLETE_MATH', obsolete_math_value, description: 'Use old math code (undef auto, 0 no, 1 yes)')
+
 version_array = meson.project_version().split('.')
 
 conf_data.set('_PICOLIBC_VERSION', '"@0@"'.format(meson.project_version()), description: 'The Picolibc version in string format.')
@@ -291,3 +302,10 @@ configure_file(output : 'picolibc.h',
 	       configuration: conf_data,
 	       install_dir: includedir)
 
+# Usage as an embedded subproject:
+# If picolibc is embedded into the source as a subproject, 
+# provide a dependency to be used by the main project:
+#   dependency('libc', fallback: ['picolibc', 'libc_dep'])
+if not enable_multilib and meson.is_subproject()
+  picolibc_dep = declare_dependency(include_directories: inc, link_with: [lib_c, lib_m])
+endif

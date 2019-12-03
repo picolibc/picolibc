@@ -1,2 +1,2 @@
-#define DEFINE_MALLINCO
+#define DEFINE_MALLINFO
 #include "nano-mallocr.c"

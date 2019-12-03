@@ -34,41 +34,56 @@
  */
 
 #include "semihost-private.h"
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <fcntl.h>
-#include <unistd.h>
-#include <errno.h>
+#include <stdbool.h>
+#include <string.h>
 
-off_t lseek(int fd, off_t offset, int whence)
+#define SH_EXT_NUM_BYTES	((SH_EXT_NUM + 7) >> 3)
+
+static bool got_feature_bytes;
+static uint8_t feature_bytes[SH_EXT_NUM_BYTES];
+
+static const uint8_t fb_magic[4] = {
+	SHFB_MAGIC_0,
+	SHFB_MAGIC_1,
+	SHFB_MAGIC_2,
+	SHFB_MAGIC_3,
+};
+
+static void
+get_features(void)
 {
-	if (whence == SEEK_CUR && offset == 0)
-		return 0;
+	if (got_feature_bytes)
+		return;
+	got_feature_bytes = true;
 
-	if (whence == SEEK_END) {
-		int flen = sys_semihost_flen(fd);
-		if (flen != -1) {
-			whence = SEEK_SET;
-			offset += flen;
-		}
-	}
+	int fd = sys_semihost_open(":semihosting_features", 0);
+	if (fd == -1)
+		return;
 
-	if (whence != SEEK_SET) {
-		errno = EINVAL;
-		return (off_t) -1;
-	}
+	int len = sys_semihost_flen(fd);
+	if (len < sizeof(fb_magic))
+		goto do_close;
 
-	struct {
-		uintptr_t	field1;
-		uintptr_t	field2;
-	} arg = {
-		.field1 = fd,
-		.field2 = offset
-	};
+	uint8_t magic[sizeof (fb_magic)];
+	if (sys_semihost_read(fd, magic, sizeof (fb_magic)) != 0)
+		goto do_close;
+	if (memcmp(magic, fb_magic, sizeof (fb_magic)) != 0)
+		goto do_close;
 
-	uintptr_t ret = sys_semihost(SYS_SEEK, (uintptr_t) &arg);
-	if (ret == 0)
-		return offset;
-	errno = sys_semihost_errno();
-	return -1;
+	int to_read = len - sizeof(fb_magic);
+	if (to_read > sizeof(feature_bytes))
+		to_read = sizeof(feature_bytes);
+
+	(void) sys_semihost_read(fd, feature_bytes, to_read);
+do_close:
+	sys_semihost_close(fd);
+}
+
+bool
+sys_semihost_feature(uint8_t feature)
+{
+	get_features();
+	uint8_t byte = (feature >> 3);
+	uint8_t bit = (feature & 7);
+	return (feature_bytes[byte] & (1 << bit)) != 0;
 }

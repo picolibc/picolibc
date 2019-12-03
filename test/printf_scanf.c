@@ -102,12 +102,20 @@ main(int argc, char **argv)
 	{
 		int t;
 		for (t = 0; t < sizeof(test_vals)/sizeof(test_vals[0]); t++) {
-			double v = test_vals[t] * pow(10.0, (double) x);
-			double r;
-			double e;
+#ifdef PICOLIBC_FLOAT_PRINTF_SCANF
+#define float_type float
+#define scanf_format "%f"
+#else
+#define float_type double
+#define scanf_format "%lf"
+#endif
+			float_type v = test_vals[t] * pow(10.0, (float_type) x);
+			float_type r;
+			float_type e;
 
-			sprintf(buf, "%.45f", v);
-			sscanf(buf, "%lf", &r);
+			sprintf(buf, "%.45f", printf_float(v));
+			printf("t %d buf %s\n", t, buf);
+			sscanf(buf, scanf_format, &r);
 			e = fabs(v-r) / v;
 			if (e > 1e-6) {
 				printf("\t%3d: wanted %.7e got %.7e (error %.7e\n", x, v, r, e);
@@ -116,8 +124,8 @@ main(int argc, char **argv)
 			}
 
 
-			sprintf(buf, "%.14e", v);
-			sscanf(buf, "%lf", &r);
+			sprintf(buf, "%.14e", printf_float(v));
+			sscanf(buf, scanf_format, &r);
 			e = fabs(v-r) / v;
 			if (e > 1e-6) {
 				printf("\t%3d: wanted %.7e got %.7e (error %.7e, buf %s)\n", x, v, r, e, buf);
@@ -126,8 +134,8 @@ main(int argc, char **argv)
 			}
 
 
-			sprintf(buf, "%.7g", v);
-			sscanf(buf, "%lf", &r);
+			sprintf(buf, "%.7g", printf_float(v));
+			sscanf(buf, scanf_format, &r);
 			e = fabs(v-r) / v;
 			if (e > 1e-6) {
 				printf("\t%3d: wanted %.7e got %.7e (error %.7e, buf %s)\n", x, v, r, e, buf);

@@ -34,41 +34,20 @@
  */
 
 #include "semihost-private.h"
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <fcntl.h>
-#include <unistd.h>
-#include <errno.h>
+#include <string.h>
 
-off_t lseek(int fd, off_t offset, int whence)
+int
+sys_semihost_open(const char *pathname, int semiflags)
 {
-	if (whence == SEEK_CUR && offset == 0)
-		return 0;
-
-	if (whence == SEEK_END) {
-		int flen = sys_semihost_flen(fd);
-		if (flen != -1) {
-			whence = SEEK_SET;
-			offset += flen;
-		}
-	}
-
-	if (whence != SEEK_SET) {
-		errno = EINVAL;
-		return (off_t) -1;
-	}
-
 	struct {
 		uintptr_t	field1;
 		uintptr_t	field2;
+		uintptr_t	field3;
 	} arg = {
-		.field1 = fd,
-		.field2 = offset
+		.field1 = (uintptr_t) pathname,
+		.field2 = semiflags,
+		.field3 = strlen(pathname)
 	};
 
-	uintptr_t ret = sys_semihost(SYS_SEEK, (uintptr_t) &arg);
-	if (ret == 0)
-		return offset;
-	errno = sys_semihost_errno();
-	return -1;
+	return (int) sys_semihost(SYS_OPEN, (uintptr_t) &arg);
 }

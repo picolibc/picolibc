@@ -32,8 +32,14 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
-test('Round-trip printf/scanf test',
+test('Round-trip printf/scanf',
      executable('printf_scanf', 'printf_scanf.c',
+		link_with: [lib_m, lib_c],
+		include_directories: inc))
+
+test('Round-trip printf/scanf float mode',
+     executable('printff_scanff', 'printf_scanf.c',
+		c_args: '-DPICOLIBC_FLOAT_PRINTF_SCANF',
 		link_with: [lib_m, lib_c],
 		include_directories: inc))
 

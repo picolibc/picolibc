@@ -142,3 +142,4 @@ include:
  * [Thread Local Storage](doc/tls.md)
  * [Linking with Picolibc.ld](doc/linking.md)
  * [Hello World](hello-world/README.md)
+ * [Picolibc as embedded source](doc/embedsource.md)

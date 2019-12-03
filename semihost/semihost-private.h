@@ -82,6 +82,15 @@
 #define ADP_Stopped_DivisionByZero	0x20028
 #define ADP_Stopped_OSSpecific		0x20029
 
+#define SH_EXT_EXIT_EXTENDED		0
+#define SH_EXT_STDOUT_STDERR		1
+#define SH_EXT_NUM			2
+
+#define SHFB_MAGIC_0	0x53
+#define SHFB_MAGIC_1	0x48
+#define SHFB_MAGIC_2	0x46
+#define SHFB_MAGIC_3	0x42
+
 uintptr_t
 sys_semihost(uintptr_t op, uintptr_t param);
 

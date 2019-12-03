@@ -40,18 +40,23 @@ src_semihost_machine = {
 
 if src_semihost_machine.has_key(host_cpu)
   srcs_semihost = [
-    'errno.c',
-    'putc.c',
-    'getc.c',
+    'close.c',
     'exit.c',
     'iob.c',
-    'get_cmdline.c',
-    'open.c',
-    'close.c',
     'lseek.c',
-    'write.c',
+    'open.c',
     'read.c',
-    'clock.c',
+    'write.c',
+    'sys_clock.c',
+    'sys_errno.c',
+    'sys_feature.c',
+    'sys_flen.c',
+    'sys_get_cmdline.c',
+    'sys_getc.c',
+    'sys_open.c',
+    'sys_putc.c',
+    'sys_read.c',
+    'sys_close.c',
     join_paths('machine', src_semihost_machine[host_cpu])
   ]
 
