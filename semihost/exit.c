@@ -39,13 +39,23 @@
 void  _ATTRIBUTE((__noreturn__))
 _exit(int code)
 {
-	struct {
-		uintptr_t	field1;
-		uintptr_t	field2;
-	} arg = {
-		.field1 = ADP_Stopped_ApplicationExit,
-		.field2 = code
-	};
-	(void) sys_semihost(SYS_EXIT_EXTENDED, (uintptr_t) &arg);
+	if (sys_semihost_feature(SH_EXT_EXIT_EXTENDED)) {
+		struct {
+			uintptr_t	field1;
+			uintptr_t	field2;
+		} arg = {
+			.field1 = ADP_Stopped_ApplicationExit,
+			.field2 = code
+		};
+		(void) sys_semihost(SYS_EXIT_EXTENDED, (uintptr_t) &arg);
+	} else {
+		uintptr_t	value;
+
+		if (code == 0)
+			value = ADP_Stopped_ApplicationExit;
+		else
+			value = ADP_Stopped_RunTimeErrorUnknown;
+		(void) sys_semihost(SYS_EXIT, value);
+	}
 	__unreachable();
 }

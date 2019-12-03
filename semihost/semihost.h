@@ -36,21 +36,37 @@
 #pragma once
 
 #include <stdio.h>
+#include <stdbool.h>
+
+uintptr_t
+sys_semihost_clock(void);
+
+uintptr_t
+sys_semihost_close(int fd);
 
 int
-sys_semihost_putc(char c, FILE *file);
-
-int
-sys_semihost_getc(FILE *file);
+sys_semihost_errno(void);
 
 void
 sys_semihost_exit(int code);
+
+bool
+sys_semihost_feature(uint8_t feature);
+
+int
+sys_semihost_flen(int fd);
 
 int
 sys_semihost_get_cmdline(char *buf, int size);
 
 int
-sys_semihost_errno(void);
+sys_semihost_getc(FILE *file);
+
+int
+sys_semihost_open(const char *pathname, int semiflags);
+
+int
+sys_semihost_putc(char c, FILE *file);
 
 uintptr_t
-sys_semihost_clock(void);
+sys_semihost_read(int fd, void *buf, size_t count);

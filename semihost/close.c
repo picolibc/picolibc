@@ -42,10 +42,5 @@
 int
 close(int fd)
 {
-	struct {
-		uintptr_t	field1;
-	} arg = {
-		.field1 = fd
-	};
-	return (int) sys_semihost(SYS_CLOSE, (uintptr_t) &arg);
+	return (int) sys_semihost_close(fd);
 }

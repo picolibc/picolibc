@@ -64,19 +64,9 @@ open(const char *pathname, int flags, ...)
 		break;
 	}
 
-	struct {
-		uintptr_t	field1;
-		uintptr_t	field2;
-		uintptr_t	field3;
-	} arg = {
-		.field1 = (uintptr_t) pathname,
-		.field2 = semiflags,
-		.field3 = strlen(pathname)
-	};
-
-	uintptr_t ret = sys_semihost(SYS_OPEN, (uintptr_t) &arg);
-	if ((int) ret == -1)
+	int ret = sys_semihost_open(pathname, semiflags);
+	if (ret == -1)
 		errno = sys_semihost_errno();
-	return (int) ret;
+	return ret;
 }
 
