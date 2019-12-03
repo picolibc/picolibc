@@ -83,8 +83,8 @@ __posix_getc(FILE *f)
 	if (pf->read_off >= pf->read_len) {
 
 		/* Flush stdout if reading from stdin */
-		if (pf->fd <= 2)
-			__posix_flush(stdout);
+		if (f == stdin)
+			fflush(stdout);
 
 		/* Reset read pointer, read some data */
 		pf->read_off = 0;
