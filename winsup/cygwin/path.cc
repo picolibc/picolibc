@@ -2895,7 +2895,8 @@ restart:
 	     slow down normal operation.  This extra check only kicks in if
 	     we encountered a STATUS_OBJECT_NAME_NOT_FOUND *and* we didn't
 	     already attach a suffix. */
-	  if (!restarted && !*ext_here && !(mount_flags & MOUNT_DOS))
+	  if (!restarted && !*ext_here && ext_here[-1] != '\\'
+	      && !(mount_flags & MOUNT_DOS))
 	    {
 	      /* Check for trailing dot or space or leading space in
 		 last component. */
