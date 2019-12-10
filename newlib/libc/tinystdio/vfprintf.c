@@ -436,6 +436,7 @@ int vfprintf (FILE * stream, const char *fmt, va_list ap)
 	    int n;
 	    uint8_t sign;		/* sign character (or 0)	*/
 	    uint8_t ndigs;		/* number of digits to convert */
+	    uint8_t ndigs_exp;		/* number of digis in exponent */
 
 	    flags &= ~FL_FLTUPP;
 
@@ -466,6 +467,11 @@ int vfprintf (FILE * stream, const char *fmt, va_list ap)
 
 	    ndigs = __dtoa_engine (PRINTF_FLOAT_ARG(ap), &_dtoa, ndigs, ndecimal);
 	    exp = _dtoa.exp;
+	    ndigs_exp = 2;
+#ifndef PICOLIBC_FLOAT_PRINTF_SCANF
+	    if (exp < -99 || 99 < exp)
+		    ndigs_exp = 3;
+#endif
 
 	    sign = 0;
 	    if ((_dtoa.flags & DTOA_MINUS) && !(_dtoa.flags & DTOA_NAN))
@@ -535,7 +541,7 @@ int vfprintf (FILE * stream, const char *fmt, va_list ap)
 	    if (flags & FL_FLTFIX)
 		n = (exp>0 ? exp+1 : 1);
 	    else
-		n = 5;		/* 1e+00 */
+		n = 3 + ndigs_exp;		/* 1e+00 */
 	    if (sign)
 		n += 1;
 	    if (prec)
@@ -624,9 +630,14 @@ int vfprintf (FILE * stream, const char *fmt, va_list ap)
 		    ndigs = '-';
 		}
 		putc (ndigs, stream);
-		for (ndigs = '0'; exp >= 10; exp -= 10)
-		    ndigs += 1;
-		putc (ndigs, stream);
+#ifndef PICOLIBC_FLOAT_PRINTF_SCANF
+		if (ndigs_exp > 2) {
+			putc(exp / 100 + '0', stream);
+			exp %= 100;
+		}
+#endif
+		putc(exp / 10 + '0', stream);
+		exp %= 10;
 		putc ('0' + exp, stream);
 	    }
 
