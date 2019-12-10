@@ -35,10 +35,10 @@
 
 #define paste(a) 1e##a
 #define substitute(a) paste(a)
-#define MIN_MANT (substitute(DBL_DIG))
+#define MIN_MANT (substitute(DTOA_DIG))
 #define MAX_MANT (10.0 * MIN_MANT)
 #define MIN_MANT_INT ((uint64_t) MIN_MANT)
-#define MIN_MANT_EXP	DBL_DIG
+#define MIN_MANT_EXP	DTOA_DIG
 
 #define max(a, b) ({\
 		typeof(a) _a = a;\
