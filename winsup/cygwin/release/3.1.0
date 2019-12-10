@@ -104,3 +104,7 @@ Bug Fixes
 - Fix a security problem if Cygwin is installed into a path
   with spaces in it.
   Addresses: https://cygwin.com/ml/cygwin/2019-11/msg00018.html
+
+- Fix an assertion failure when /cygdrive contains an offline network
+  drive.
+  Addresses: https://cygwin.com/ml/cygwin/2019-12/msg00016.html
