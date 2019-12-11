@@ -48,6 +48,7 @@ targets = []
 enable_multilib = get_option('multilib')
 enable_picolib = get_option('picolib')
 enable_tests = get_option('tests')
+enable_native_tests = get_option('native-tests')
 newlib_tinystdio = get_option('newlib-tinystdio')
 have_alias_attribute_option = get_option('have-alias-attribute')
 newlib_io_pos_args = get_option('newlib-io-pos-args')
@@ -285,14 +286,32 @@ add_project_arguments(arguments, language: 'c')
 # semihost will adjust this if supported
 has_semihost = false
 
-subdir('newlib')
-subdir('picocrt')
 if newlib_tinystdio
   subdir('semihost')
   subdir('dummyhost')
 endif
 
 conf_data.set('HAVE_SEMIHOST', has_semihost, description: 'Semihost APIs supported')
+
+test_link_args = []
+test_c_args = []
+semihost_inc = []
+
+if has_semihost
+  test_link_script = 'test-' + host_machine.cpu() + '.ld'
+  custom_target(test_link_script,
+		command: ['cp', files(test_link_script), test_link_script],
+		build_by_default: true,
+		install: false,
+		input: test_link_script,
+		output: test_link_script)
+  test_c_args += ['--specs', 'picolibc.specs', '-nostartfiles']
+  test_link_args += test_c_args
+  test_link_args += ['-L.', '-T', test_link_script, '-Wl,--undefined=_exit']
+endif
+
+subdir('picocrt')
+subdir('newlib')
 
 if enable_tests
   subdir('test')

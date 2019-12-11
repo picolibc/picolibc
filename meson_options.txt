@@ -50,6 +50,9 @@ option('have-alias-attribute', type: 'combo', choices: ['true', 'false', 'auto']
 option('tests', type: 'boolean', value: false,
        description: 'Enable tests')
 
+option('native-tests', type: 'boolean', value: false,
+       description: 'Run math tests against native libc too')
+
 option('newlib-tinystdio', type: 'boolean', value: true,
        description: 'Use tiny stdio from avr libc')
 
