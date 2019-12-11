@@ -21,7 +21,6 @@ main (int ac,
   int cvt = 1;
   int ieee= 1;
   int vector=0;
-bt();
   for (i = 1; i < ac; i++) 
   {
     if (strcmp(av[i],"-v")==0) 
