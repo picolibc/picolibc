@@ -33,43 +33,19 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#pragma once
-
-#include <stdio.h>
-#include <stdbool.h>
-
-uintptr_t
-sys_semihost_clock(void);
-
-uintptr_t
-sys_semihost_close(int fd);
+#include "semihost-private.h"
+#include <string.h>
 
 int
-sys_semihost_errno(void);
+sys_semihost_remove(const char *pathname)
+{
+	struct {
+		uintptr_t	field1;
+		uintptr_t	field2;
+	} arg = {
+		.field1 = (uintptr_t) pathname,
+		.field2 = strlen(pathname)
+	};
 
-void
-sys_semihost_exit(int code);
-
-bool
-sys_semihost_feature(uint8_t feature);
-
-int
-sys_semihost_flen(int fd);
-
-int
-sys_semihost_get_cmdline(char *buf, int size);
-
-int
-sys_semihost_getc(FILE *file);
-
-int
-sys_semihost_open(const char *pathname, int semiflags);
-
-int
-sys_semihost_putc(char c, FILE *file);
-
-uintptr_t
-sys_semihost_read(int fd, void *buf, size_t count);
-
-int
-sys_semihost_remove(const char *pathname);
+	return (int) sys_semihost(SYS_REMOVE, (uintptr_t) &arg);
+}

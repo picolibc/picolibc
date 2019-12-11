@@ -33,43 +33,12 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#pragma once
+#include "semihost-private.h"
+#include <sys/types.h>
+#include <signal.h>
+#include <unistd.h>
+#include <errno.h>
 
-#include <stdio.h>
-#include <stdbool.h>
+pid_t getpid(void) { return 1; }
 
-uintptr_t
-sys_semihost_clock(void);
-
-uintptr_t
-sys_semihost_close(int fd);
-
-int
-sys_semihost_errno(void);
-
-void
-sys_semihost_exit(int code);
-
-bool
-sys_semihost_feature(uint8_t feature);
-
-int
-sys_semihost_flen(int fd);
-
-int
-sys_semihost_get_cmdline(char *buf, int size);
-
-int
-sys_semihost_getc(FILE *file);
-
-int
-sys_semihost_open(const char *pathname, int semiflags);
-
-int
-sys_semihost_putc(char c, FILE *file);
-
-uintptr_t
-sys_semihost_read(int fd, void *buf, size_t count);
-
-int
-sys_semihost_remove(const char *pathname);
+int kill(pid_t pid, int sig) { if (pid == 1) _exit(sig << 8); errno = ESRCH; return -1; }

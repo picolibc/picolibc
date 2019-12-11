@@ -43,11 +43,14 @@ if src_semihost_machine.has_key(host_cpu)
     'close.c',
     'exit.c',
     'iob.c',
+    'kill.c',
     'lseek.c',
     'open.c',
     'read.c',
+    'unlink.c',
     'write.c',
     'sys_clock.c',
+    'sys_close.c',
     'sys_errno.c',
     'sys_feature.c',
     'sys_flen.c',
@@ -56,7 +59,7 @@ if src_semihost_machine.has_key(host_cpu)
     'sys_open.c',
     'sys_putc.c',
     'sys_read.c',
-    'sys_close.c',
+    'sys_remove.c',
     join_paths('machine', src_semihost_machine[host_cpu])
   ]
 
