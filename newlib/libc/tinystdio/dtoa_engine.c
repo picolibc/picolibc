@@ -112,9 +112,8 @@ __dtoa_engine(double x, struct dtoa *dtoa, int max_digits, int max_decimals)
 		 *               the limits of the buffer
 		 */
 
+		int save_max_digits = max_digits;
 		if(max_decimals != 0) {
-			/* max_decimals comes in biased by 1 to flag the 'f' case */
-			max_decimals -= 1;
 			/*
 			 * This covers two cases:
 			 *
@@ -132,7 +131,8 @@ __dtoa_engine(double x, struct dtoa *dtoa, int max_digits, int max_decimals)
 			 * A single expression gives the right answer in both
 			 * cases, which is kinda cool
 			 */
-			max_digits = min(max_digits, max(0, max_decimals + exp + 1));
+			/* max_decimals comes in biased by 1 to flag the 'f' case */
+			max_digits = min(max_digits, max(0, max_decimals - 1 + exp + 1));
 		}
 
 		/* Round nearest by adding 1/2 of the last digit
@@ -145,6 +145,10 @@ __dtoa_engine(double x, struct dtoa *dtoa, int max_digits, int max_decimals)
 		if (x >= MAX_MANT) {
 			x /= 10.0;
 			exp++;
+
+			/* Redo this computation wit the new exp value */
+			if  (max_decimals != 0)
+				max_digits = min(save_max_digits, max(0, max_decimals - 1 + exp + 1));
 		}
 
 		/* Now convert mantissa to decimal. */
