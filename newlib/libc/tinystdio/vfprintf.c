@@ -454,7 +454,7 @@ int vfprintf (FILE * stream, const char *fmt, va_list ap)
 		flags |= FL_FLTEXP;
 	    } else if (c == 'f') {
 		ndigs = DTOA_MAX_DIG;
-		ndecimal = prec;
+		ndecimal = prec + 1;
 		flags |= FL_FLTFIX;
 	    } else {
 		ndigs = prec;
@@ -594,8 +594,6 @@ int vfprintf (FILE * stream, const char *fmt, va_list ap)
 		    else
 			out = '0';
 		    if (--n < -prec) {
-			if ((flags & FL_ALT) && n == -1)
-			    putc('.', stream);
 			break;
 		    }
 		    putc (out, stream);
@@ -607,7 +605,8 @@ int vfprintf (FILE * stream, const char *fmt, va_list ap)
 		    out = '1';
 		}
 		putc (out, stream);
-
+		if ((flags & FL_ALT) && n == -1)
+			putc('.', stream);
 	    } else {				/* 'e(E)' format	*/
 
 		/* mantissa	*/

@@ -98,10 +98,42 @@ __dtoa_engine(double x, struct dtoa *dtoa, int max_digits, int max_decimals)
 		/* If limiting decimals, then limit the max digits
 		 * to no more than the number of digits left of the decimal
 		 * plus the number of digits right of the decimal
+		 *
+		 * exp:          exponent value. If negative, there are
+		 *		 -exp - 1 zeros left of the first non-zero
+		 *               digit in 'f' format. If non-negative,
+		 *               there are exp digits to the left of
+		 *               the decimal point
+		 *
+		 * max_decimals: Only used in 'f' format. Display no more than this
+		 *               many digits (-1) to the right of the decimal point
+		 *
+		 * max_digits:	 We can't convert more than this number of digits given
+		 *               the limits of the buffer
 		 */
 
-		if(max_decimals != 0)
-			max_digits = min(max_digits, max_decimals + max(exp + 1, 1));
+		if(max_decimals != 0) {
+			/* max_decimals comes in biased by 1 to flag the 'f' case */
+			max_decimals -= 1;
+			/*
+			 * This covers two cases:
+			 *
+			 * When exp is < 0, there are -exp-1 zeros taking up
+			 * space before we can display any of the real digits,
+			 * so we have to subtract those off max_decimals before
+			 * we round that (max_decimals - (-exp - 1)). This
+			 * may end up less than zero, in which case we have
+			 * no digits to display.
+			 *
+			 * When exp >= 0, there are exp + 1 digits left of the
+			 * decimal point *plus* max_decimals right of the
+			 * decimal point that need to be generated
+			 *
+			 * A single expression gives the right answer in both
+			 * cases, which is kinda cool
+			 */
+			max_digits = min(max_digits, max(0, max_decimals + exp + 1));
+		}
 
 		/* Round nearest by adding 1/2 of the last digit
 		 * before converting to int. Check for overflow

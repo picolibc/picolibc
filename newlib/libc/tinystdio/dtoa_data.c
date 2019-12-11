@@ -137,6 +137,9 @@ const double __dtoa_scale_down[] = {
 };
 
 const double __dtoa_round[] = {
+#if DTOA_DIG > 30
+#error DTOA_DIG too large
+#endif
 #if DTOA_DIG >= 30
 	5e30,
 #endif
