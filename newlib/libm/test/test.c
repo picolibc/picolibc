@@ -55,7 +55,7 @@ main (int ac,
    test_is();
 //  if (ieee)  test_ieee();
   printf("Tested %d functions, %d errors detected\n", count, inacc);
-  return 0;
+  return inacc != 0;
 }
 
 
