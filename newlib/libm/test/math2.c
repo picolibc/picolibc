@@ -200,10 +200,10 @@ test_pow (void)
   
   for (i = 0; i < 1000; i++) 
   {
-    double n1;
-    double n2;
-    double res;
-    double shouldbe;
+    float n1;
+    float n2;
+    float res;
+    float shouldbe;
 
     errno = 0;
     
