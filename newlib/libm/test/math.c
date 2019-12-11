@@ -46,7 +46,8 @@ ffcheck (double is,
        one_line_type *p,
        char *name,
        int serrno,
-       int merror)
+	 int merror,
+	 int is_float)
 {
   /* Make sure the answer isn't to far wrong from the correct value */
   __ieee_double_shape_type correct, isbits;
@@ -56,9 +57,22 @@ ffcheck (double is,
   correct.parts.msw = p->qs[0].msw;
   correct.parts.lsw = p->qs[0].lsw;
   
+  int error_bit = p->error_bit;
+
+  if (is_float) {
+    if (error_bit > 31)
+      error_bit = 31;
+  } else  {
+    if (error_bit > 63)
+      error_bit = 63;
+  }
+
   mag = mag_of_error(correct.value, is);
   
-  if (mag < p->error_bit)
+  if (isnan(correct.value) && isnan(is))
+    mag = 64;
+
+  if (mag < error_bit)
   {
     inacc ++;
     
@@ -113,6 +127,10 @@ frontline (FILE *f,
        char *args,
        char *name)
 {
+  /* float returns can never have more than 32 bits of accuracy */
+  if (*args == 'f' && mag > 32)
+    mag = 32;
+
   if (reduce && p->error_bit < mag) 
   {
     fprintf(f, "{%2d,", p->error_bit);
@@ -165,7 +183,7 @@ finish (FILE *f,
 {
   int mag;
 
-  mag = ffcheck(result, p,name,  merror, errno);    
+  mag = ffcheck(result, p,name,  merror, errno, args[0] == 'f');    
   if (vector) 
   {    
     frontline(f, mag, p, result, merror, errno, args , name);
