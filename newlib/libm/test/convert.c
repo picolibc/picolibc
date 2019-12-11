@@ -319,9 +319,12 @@ test_scan (void)
     double d0,d1;
     line( s->line);
     sscanf(s->result, "%lg", &d0);
-    sprintf(buffer, "%20.19e", d0);
+    sprintf(buffer, "%.16e", d0);
     sscanf(buffer, "%lg", &d1);
-    test_mok(d0,d1, 62);
+    if  (s->mag)
+      test_mok(d0, d1, s->mag);
+    else
+      test_mok(d0,d1, 62);
     s++;
   }
 
