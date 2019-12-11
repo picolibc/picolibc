@@ -22,7 +22,7 @@ test_strtod (void)
   double v;
   /* On average we'll loose 1/2 a bit, so the test is for within 1 bit  */
   v = strtod(pd->string, &tail);
-  test_mok(v, pd->value, 64);
+  test_mok(v, pd->value, 62);
   test_iok(tail - pd->string, pd->endscan);
 }
 
@@ -33,21 +33,21 @@ test_strtof (void)
   double v;
   /* On average we'll loose 1/2 a bit, so the test is for within 1 bit  */
   v = strtof(pd->string, &tail);
-  test_mok(v, pd->value, 32);
+  test_mok(v, pd->value, 30);
   test_iok(tail - pd->string, pd->endscan);
 }
 
 void
 test_atof (void)
 {
-  test_mok(atof(pd->string), pd->value, 64);
+  test_mok(atof(pd->string), pd->value, 62);
 }
 
 #ifndef NO_NEWLIB
 void
 test_atoff (void)
 {
-  test_mok(atoff(pd->string), pd->value, 32);
+  test_mok(atoff(pd->string), pd->value, 30);
 }
 #endif
 
@@ -115,8 +115,8 @@ test_strtol (void)
 void
 test_atoi (void)
 {
-  test_iok(atoi(p->string), p->decimal.value);
-  test_eok(errno, p->decimal.errno_val);
+  if (p->decimal.errno_val == 0)
+    test_iok(atoi(p->string), p->decimal.value);
 }
 
 void
@@ -158,7 +158,7 @@ test_ecvt (void)
 #ifndef NO_NEWLIB
   s =  ecvtf(pdd->value, pdd->e1, &a2, &a3);
 
-  test_sok(s,pdd->estring);
+  test_scok(s,pdd->estring, 6);
   test_iok(pdd->e2,a2);
   test_iok(pdd->e3,a3);
 #endif
@@ -186,7 +186,7 @@ test_gcvt (void)
   
 #ifndef NO_NEWLIB
   s = gcvtf(pdd->value, pdd->g1, buffer);  
-  test_scok(s, pdd->gstring, 9);
+  test_scok(s, pdd->gstring, 6);
 #endif
 }
 
@@ -210,7 +210,7 @@ test_fcvt (void)
   sf =  fcvtf(pdd->value, pdd->f1, &a2, &a3);
   sscanf(sd, "%lg", &v1);
   sscanf(sf, "%lg", &v2);
-  test_mok(v1, v2,32);
+  test_mok(v1, v2,30);
   test_iok(pdd->f2,a2);
   test_iok(pdd->f3,a3);
 #endif
@@ -319,9 +319,9 @@ test_scan (void)
     double d0,d1;
     line( s->line);
     sscanf(s->result, "%lg", &d0);
-    sprintf(buffer, "%20.17e", d0);
+    sprintf(buffer, "%20.19e", d0);
     sscanf(buffer, "%lg", &d1);
-    test_mok(d0,d1, 64);
+    test_mok(d0,d1, 62);
     s++;
   }
 
