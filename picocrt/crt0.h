@@ -53,7 +53,7 @@ _start(void);
 
 /* This is the application entry point */
 int
-main(void);
+main(int, char **);
 
 #ifdef HAVE_INITFINI_ARRAY
 extern void __libc_init_array(void);
@@ -69,6 +69,11 @@ extern void __libc_fini_array(void);
  * entry point and finally any cleanup functions
  */
 
+#include <stdio.h>
+
+extern void
+_exit(int) __weak_symbol;
+
 static inline void
 __start(void)
 {
@@ -78,8 +83,10 @@ __start(void)
 #ifdef HAVE_INITFINI_ARRAY
 	__libc_init_array();
 #endif
-	main();
+	int ret = main(0, NULL);
 #ifdef HAVE_INITFINI_ARRAY
 	__libc_fini_array();
 #endif
+	if (_exit)
+		_exit(ret);
 }
