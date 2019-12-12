@@ -293,6 +293,7 @@ int	diprintf (int, const char *, ...)
 #endif
 int	fiprintf (FILE *, const char *, ...)
                _ATTRIBUTE ((__format__ (__printf__, 2, 3)));
+#define __i_fprintf fiprintf
 int	fiscanf (FILE *, const char *, ...)
                _ATTRIBUTE ((__format__ (__scanf__, 2, 3)));
 int	iprintf (const char *, ...)
@@ -301,10 +302,12 @@ int	iscanf (const char *, ...)
                _ATTRIBUTE ((__format__ (__scanf__, 1, 2)));
 int	siprintf (char *, const char *, ...)
                _ATTRIBUTE ((__format__ (__printf__, 2, 3)));
+#define __i_sprintf siprintf
 int	siscanf (const char *, const char *, ...)
                _ATTRIBUTE ((__format__ (__scanf__, 2, 3)));
 int	sniprintf (char *, size_t, const char *, ...)
                _ATTRIBUTE ((__format__ (__printf__, 3, 4)));
+#define  __i_snprintf sniprintf
 int	vasiprintf (char **, const char *, __VALIST)
                _ATTRIBUTE ((__format__ (__printf__, 2, 0)));
 char *	vasniprintf (char *, size_t *, const char *, __VALIST)

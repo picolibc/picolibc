@@ -91,7 +91,7 @@ not portable.
 void
 mstats (char *s)
 {
-  fiprintf (stderr, "Memory allocation statistics %s\n", s);
+  __i_fprintf (stderr, "Memory allocation statistics %s\n", s);
   malloc_stats ();
 }
 

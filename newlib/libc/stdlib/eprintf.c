@@ -20,7 +20,7 @@ __eprintf (format, file, line, expression)
      unsigned int line;
      const char *expression;
 {
-  (void) fiprintf (stderr, format, file, line, expression);
+  (void) __i_fprintf (stderr, format, file, line, expression);
   abort ();
   /*NOTREACHED*/
 }
