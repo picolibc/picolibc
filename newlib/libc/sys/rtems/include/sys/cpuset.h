@@ -177,16 +177,16 @@ static __inline void CPU_XOR(cpu_set_t *destset, const cpu_set_t *srcset1,
   CPU_XOR_S(sizeof(*destset), destset, srcset1, srcset2);
 }
 
-static __inline void CPU_NAND_S(size_t setsize, cpu_set_t *destset,
+static __inline void CPU_ANDNOT_S(size_t setsize, cpu_set_t *destset,
   const cpu_set_t *srcset1, const cpu_set_t *srcset2)
 {
-  BIT_NAND2(_cpu_set_bits(setsize), destset, srcset1, srcset2);
+  BIT_ANDNOT2(_cpu_set_bits(setsize), destset, srcset1, srcset2);
 }
 
-static __inline void CPU_NAND(cpu_set_t *destset, const cpu_set_t *srcset1,
+static __inline void CPU_ANDNOT(cpu_set_t *destset, const cpu_set_t *srcset1,
   const cpu_set_t *srcset2)
 {
-  CPU_NAND_S(sizeof(*destset), destset, srcset1, srcset2);
+  CPU_ANDNOT_S(sizeof(*destset), destset, srcset1, srcset2);
 }
 
 static __inline int CPU_COUNT_S(size_t setsize, const cpu_set_t *set)
