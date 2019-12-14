@@ -1,5 +1,5 @@
 [binaries]
-c = 'riscv64-unknown-elf-gcc'
+c = ['riscv64-unknown-elf-gcc', '-mcmodel=medany']
 ar = 'riscv64-unknown-elf-ar'
 as = 'riscv64-unknown-elf-as'
 ld = 'riscv64-unknown-elf-ld'
