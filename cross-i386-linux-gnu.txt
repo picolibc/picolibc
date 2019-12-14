@@ -1,5 +1,5 @@
 [properties]
-c_args = ['-m32', '-mcpu=core2', '-mfpmath=sse']
+c_args = ['-m32', '-march=core2', '-mfpmath=sse', '-msse2']
 as_args = ['-32']
 c_link_args = ['-m32']
 needs_exe_wrapper = true
