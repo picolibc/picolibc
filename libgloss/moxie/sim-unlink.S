@@ -1,7 +1,7 @@
 /*
  * sim-unlink.S -- write interface for moxie simulator
  * 
- * Copyright (c) 2008 Anthony Green
+ * Copyright (c) 2008, 2019 Anthony Green
  *
  * The authors hereby grant permission to use, copy, modify, distribute,
  * and license this software and its documentation for any purpose, provided
@@ -22,7 +22,7 @@
 	.text
 _unlink:
 unlink:
-	jmpa unlink
+	swi	SYS_unlink
 	ret
 .Lend:
 	.size	_unlink,.Lend-_unlink
