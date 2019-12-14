@@ -1,0 +1,38 @@
+#!/bin/bash
+
+qemu=qemu-system-arm
+
+# select the program
+elf="$1"
+shift
+
+case "$elf" in
+    */thumb_v7_m/*) ;;
+    *)
+	echo "Skipping $elf"
+	exit 77
+	;;
+esac
+
+# Set the target machine
+machine=mps2-an385
+cpu=cortex-m3
+
+# Map stdio to a multiplexed character device so we can use it
+# for the monitor and semihosting output
+
+chardev=stdio,mux=on,id=stdio0
+
+# Point the semihosting driver at our new chardev
+
+semi=enable=on,chardev=stdio0
+
+# Point the monitor at the new chardev too
+
+mon=none
+
+# Point serial port at new chardev
+
+serial=none
+
+$qemu -chardev $chardev -semihosting-config $semi -monitor $mon -serial $serial -machine $machine -cpu $cpu -kernel $elf -nographic "$@" < /dev/null

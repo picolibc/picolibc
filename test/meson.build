@@ -58,7 +58,9 @@ foreach target : targets
 		  c_args: _c_args,
 		  link_args: _link_args,
 		  link_with: _libs,
-		  include_directories: inc))
+		  link_depends:  test_link_depends,
+		  include_directories: inc),
+       env: ['MESON_SOURCE_ROOT=' + meson.source_root()])
 
   t1 = 'printff/scanff'
   if target == ''
@@ -72,7 +74,9 @@ foreach target : targets
 		  c_args: ['-DPICOLIBC_FLOAT_PRINTF_SCANF'] + _c_args,
 		  link_args: _link_args,
 		  link_with: _libs,
-		  include_directories: inc))
+		  link_depends:  test_link_depends,
+		  include_directories: inc),
+       env: ['MESON_SOURCE_ROOT=' + meson.source_root()])
 
   t1 = 'printf-tests'
   if target == ''
@@ -86,7 +90,8 @@ foreach target : targets
 		  c_args: _c_args,
 		  link_args: _link_args,
 		  link_with: _libs,
-		  include_directories: inc))
+		  include_directories: inc),
+       env: ['MESON_SOURCE_ROOT=' + meson.source_root()])
 
   t1 = 'rand'
   if target == ''
@@ -100,7 +105,9 @@ foreach target : targets
 		  c_args: _c_args,
 		  link_args: _link_args,
 		  link_with: _libs,
-		  include_directories: inc))
+		  link_depends:  test_link_depends,
+		  include_directories: inc),
+	 env: ['MESON_SOURCE_ROOT=' + meson.source_root()])
 
   if posix_io
     t1 = 'posix-io'
@@ -115,7 +122,9 @@ foreach target : targets
 		    c_args: _c_args,
 		    link_args: _link_args,
 		    link_with: _libs,
-		    include_directories: inc))
+		    link_depends:  test_link_depends,
+		    include_directories: inc),
+	 env: ['MESON_SOURCE_ROOT=' + meson.source_root()])
   endif
 
 endforeach

@@ -1,0 +1,58 @@
+#!/bin/sh
+
+qemu=qemu-system-riscv32
+
+# select the program
+elf="$1"
+shift
+
+case "$elf" in
+    */rv32*_ilp32*/*)
+	qemu=qemu-system-riscv32
+	cpu=rv32
+	;;
+    */rv64*_lp64*/*)
+	qemu=qemu-system-riscv64
+	cpu=rv64
+	;;
+    *)
+	qemu=qemu-system-riscv64
+	options="i m a f d c"
+	cpu=rv64
+	;;
+esac
+
+if [ -z "$options" ]; then
+    options=`echo $elf | sed 's/.*rv[36][24]\([a-z]*\)_.*$/\1/' | sed 's/\(.\)/\1 /g'`
+fi
+
+for o in $options; do
+    cpu=$cpu",$o=true"
+    case "$o" in
+	e)
+	    cpu=$cpu",i=false"
+	    ;;
+    esac
+done
+
+# Set the target machine
+machine=spike
+
+# Map stdio to a multiplexed character device so we can use it
+# for the monitor and semihosting output
+
+chardev=stdio,mux=on,id=stdio0
+
+# Point the semihosting driver at our new chardev
+
+semi=enable=on,chardev=stdio0,arg="test-file"
+
+# Point the monitor at the new chardev too
+
+mon=none
+
+# Disable the serial port
+
+serial=none
+
+$qemu -chardev $chardev -semihosting-config $semi -monitor $mon -serial $serial -machine $machine -cpu $cpu -kernel $elf -nographic "$@" < /dev/null

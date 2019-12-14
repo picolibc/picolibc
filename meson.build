@@ -41,7 +41,7 @@ project('picolibc', 'c',
 	license : 'BSD',
 	meson_version : '>= 0.50',
 	version: '1.2.1'
-)
+       )
 
 targets = []
 
@@ -293,21 +293,34 @@ endif
 
 conf_data.set('HAVE_SEMIHOST', has_semihost, description: 'Semihost APIs supported')
 
-test_link_args = []
+# By default, tests don't require any special arguments
+
 test_c_args = []
-semihost_inc = []
+test_link_args = []
+test_link_depends = []
 
 if has_semihost
-  test_link_script = 'test-' + host_machine.cpu() + '.ld'
-  custom_target(test_link_script,
-		command: ['cp', files(test_link_script), test_link_script],
-		build_by_default: true,
-		install: false,
-		input: test_link_script,
-		output: test_link_script)
+
+  # If we're using semihosting, we assume that there's a
+  # custom linker script that includes picolibc.specs
+
+  test_link_name = 'test-' + host_machine.cpu() + '.ld'
+  test_link_dep = files(test_link_name)
+
+  # Linker args must be strings (seems like a bug), so compute the
+  # full path by hand
+
+  test_link_path = '@0@/@1@'.format(meson.current_source_dir(), test_link_name)
+
   test_c_args += ['--specs', 'picolibc.specs', '-nostartfiles']
-  test_link_args += test_c_args
-  test_link_args += ['-L.', '-T', test_link_script, '-Wl,--undefined=_exit']
+
+  # Undefine _exit as that's in libsemihost and needs to replace the weak _exit
+
+  test_link_args += test_c_args + ['-L.', '-T', test_link_path, '-Wl,--undefined=_exit']
+
+  # Make sure all of the tests get re-linked if the linker scripts change
+
+  test_link_depends += test_link_dep + files('picolibc.ld')
 endif
 
 subdir('picocrt')

@@ -44,5 +44,6 @@ foreach test : tests
 		  c_args: ['-Wno-missing-braces', '-Wno-implicit-int', '-Wno-return-type', '-D_XOPEN_SOURCE=700', '-D_GNU_SOURCE'] + test_c_args,
 		  link_args: test_link_args,
 		  link_with: [lib_m, lib_c, lib_semihost, lib_crt],
-		  include_directories: inc))
+		  include_directories: inc),
+       env: ['MESON_SOURCE_ROOT=' + meson.source_root()])
 endforeach
