@@ -140,6 +140,11 @@ _strtol_l (struct _reent *rptr, const char *__restrict nptr,
 	register unsigned long cutoff;
 	register int neg = 0, any, cutlim;
 
+	if (base < 0 || base == 1 || base > 36) {
+		errno = EINVAL;
+		return 0;
+	}
+
 	/*
 	 * Skip white space and pick up leading +/- sign if any.
 	 * If base is 0, allow 0x for hex and 0 for octal, else
@@ -193,9 +198,9 @@ _strtol_l (struct _reent *rptr, const char *__restrict nptr,
 			break;
 		if (c >= base)
 			break;
-               if (any < 0 || acc > cutoff || (acc == cutoff && c > cutlim))
+		if (any < 0 || acc > cutoff || (acc == cutoff && c > cutlim)) {
 			any = -1;
-		else {
+		} else {
 			any = 1;
 			acc *= base;
 			acc += c;
