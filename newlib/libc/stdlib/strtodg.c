@@ -348,6 +348,9 @@ rvOK (struct _reent *p, double d, FPI *fpi, Long *exp, __ULong *bits, int exact,
 		if (k > nb || fpi->sudden_underflow) {
 			b->_wds = inex = 0;
 			*irv = STRTOG_Underflow | STRTOG_Inexlo;
+#ifndef NO_ERRNO
+			errno = ERANGE;
+#endif
 			}
 		else {
 			k1 = k - 1;
@@ -362,9 +365,15 @@ rvOK (struct _reent *p, double d, FPI *fpi, Long *exp, __ULong *bits, int exact,
 			if (carry) {
 				b = increment(p, b);
 				inex = STRTOG_Inexhi | STRTOG_Underflow;
+#ifndef NO_ERRNO
+				errno = ERANGE;
+#endif
 				}
 			else if (lostbits)
 				inex = STRTOG_Inexlo | STRTOG_Underflow;
+#ifndef NO_ERRNO
+				errno = ERANGE;
+#endif
 			}
 		}
 	else if (e > fpi->emax) {
@@ -761,6 +770,9 @@ _strtodg_l (struct _reent *p, const char *s00, char **se, FPI *fpi, Long *exp,
 					rvb->_x[0] = 0;
 					*exp = emin;
 					irv = STRTOG_Underflow | STRTOG_Inexlo;
+#ifndef NO_ERRNO
+					errno = ERANGE;
+#endif
 					goto ret;
 					}
 				rvb->_x[0] = rvb->_wds = rvbits = 1;
@@ -940,6 +952,9 @@ _strtodg_l (struct _reent *p, const char *s00, char **se, FPI *fpi, Long *exp,
 				rvb->_wds = 0;
 				rve = emin;
 				irv = STRTOG_Underflow | STRTOG_Inexlo;
+#ifndef NO_ERRNO
+				errno = ERANGE;
+#endif
 				break;
 				}
 			adj0 = dval(adj) = 1.;
@@ -1083,12 +1098,18 @@ _strtodg_l (struct _reent *p, const char *s00, char **se, FPI *fpi, Long *exp,
 		if (sudden_underflow) {
 			rvb->_wds = 0;
 			irv = STRTOG_Underflow | STRTOG_Inexlo;
+#ifndef NO_ERRNO
+			errno = ERANGE;
+#endif
 			}
 		else  {
 			irv = (irv & ~STRTOG_Retmask) |
 				(rvb->_wds > 0 ? STRTOG_Denormal : STRTOG_Zero);
 			if (irv & STRTOG_Inexact)
 				irv |= STRTOG_Underflow;
+#ifndef NO_ERRNO
+				errno = ERANGE;
+#endif
 			}
 		}
 	if (se)
