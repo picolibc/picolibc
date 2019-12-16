@@ -23,6 +23,8 @@ __MINGW_USYMBOL(ilogbl):
 	andb    %ah, %dh
 	cmpb    $0x05, %dh
 	je      1f		/* Is +-Inf, jump.  */
+	cmpb	$0x40, %dh
+	je	2f		/* Is +-Inf, jump.  */
 
 	fxtract
 	pushq	%rax
@@ -37,6 +39,9 @@ __MINGW_USYMBOL(ilogbl):
 1:	fstp	%st
 	movl	$0x7fffffff, %eax
 	ret
+2:	fstp    %st
+	movl	$0x80000001, %eax	/* FP_ILOGB0  */
+	ret
 #else
 	fldt	4(%esp)
 /* I added the following ugly construct because ilogb(+-Inf) is
@@ -48,6 +53,8 @@ __MINGW_USYMBOL(ilogbl):
 	andb    %ah, %dh
 	cmpb    $0x05, %dh
 	je      1f		/* Is +-Inf, jump.  */
+	cmpb	$0x40, %dh
+	je	2f		/* Is +-Inf, jump.  */
 
 	fxtract
 	pushl	%eax
@@ -61,5 +68,8 @@ __MINGW_USYMBOL(ilogbl):
 
 1:	fstp	%st
 	movl	$0x7fffffff, %eax
+	ret
+2:	fstp    %st
+	movl	$0x80000001, %eax	/* FP_ILOGB0  */
 	ret
 #endif

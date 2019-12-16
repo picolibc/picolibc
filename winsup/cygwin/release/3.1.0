@@ -108,3 +108,6 @@ Bug Fixes
 - Fix an assertion failure when /cygdrive contains an offline network
   drive.
   Addresses: https://cygwin.com/ml/cygwin/2019-12/msg00016.html
+
+- Fix return value of ilogbl for 0 input.
+  Addresses: https://cygwin.com/ml/cygwin/2019-12/msg00074.html
