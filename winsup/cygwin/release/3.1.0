@@ -111,3 +111,6 @@ Bug Fixes
 
 - Fix return value of ilogbl for 0 input.
   Addresses: https://cygwin.com/ml/cygwin/2019-12/msg00074.html
+
+- Let strtold set errno to ERANGE on underflow per POSIX.
+  Addresses: https://cygwin.com/ml/cygwin/2019-12/msg00072.html
