@@ -1262,16 +1262,19 @@ fhandler_pty_slave::push_to_pcon_screenbuffer (const char *ptr, size_t len)
   while ((p0 = (char *) memmem (p0, nlen - (p0 - buf), "\033[?", 3)))
     {
       p0 += 3;
-      while (p0 < buf + nlen && *p0 != 'h' && *p0 != 'l')
+      bool exist_arg_3 = false;
+      while (p0 < buf + nlen && !isalpha (*p0))
 	{
 	  int arg = 0;
 	  while (p0 < buf + nlen && isdigit (*p0))
 	    arg = arg * 10 + (*p0 ++) - '0';
 	  if (arg == 3)
-	    get_ttyp ()->need_redraw_screen = true;
+	    exist_arg_3 = true;
 	  if (p0 < buf + nlen && *p0 == ';')
 	    p0 ++;
 	}
+      if (p0 < buf + nlen && exist_arg_3 && (*p0 == 'h' || *p0 == 'l'))
+	get_ttyp ()->need_redraw_screen = true;
       p0 ++;
       if (p0 >= buf + nlen)
 	break;
