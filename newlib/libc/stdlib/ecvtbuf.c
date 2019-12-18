@@ -93,7 +93,8 @@ print_f (struct _reent *ptr,
     {
       if (p == start)
 	*buf++ = '0';
-      *buf++ = '.';
+      if (decpt < 0 && ndigit > 0)
+	*buf++ = '.';
       while (decpt < 0 && ndigit > 0)
 	{
 	  *buf++ = '0';
@@ -148,11 +149,15 @@ print_e (struct _reent *ptr,
     }
 
   *buf++ = *p++;
-  if (dot || ndigit != 0)
-    *buf++ = '.';
+  if (ndigit > 0)
+    dot = 1;
 
   while (*p && ndigit > 0)
     {
+      if (dot) {
+	*buf++ = '.';
+	dot = 0;
+      }
       *buf++ = *p++;
       ndigit--;
     }
@@ -168,6 +173,10 @@ print_e (struct _reent *ptr,
     {
       while (ndigit > 0)
 	{
+	  if  (dot) {
+	    *buf++ = '.';
+	    dot = 0;
+	  }
 	  *buf++ = '0';
 	  ndigit--;
 	}
