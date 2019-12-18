@@ -56,7 +56,7 @@ get_features(void)
 		return;
 	got_feature_bytes = true;
 
-	int fd = sys_semihost_open(":semihosting_features", 0);
+	int fd = sys_semihost_open(":semihosting-features", 0);
 	if (fd == -1)
 		return;
 
