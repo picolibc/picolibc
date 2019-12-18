@@ -11,6 +11,8 @@ static char buffer[500];
 
 extern double_type doubles[];
 
+//#define GENERATE_VECTORS
+
 /* TEST ATOF  ATOFF */
 
 double_type *pd = doubles;
@@ -281,8 +283,17 @@ test_sprint (void)
   {
     line( s->line);
     sprintf(buffer, s->format_string, s->value);
+#ifdef GENERATE_VECTORS
+    if (s->mag)
+      printf("{__LINE__, %.15e,\t\"%s\", \"%s\", %d },\n",
+	     s->value, buffer, s->format_string, s->mag);
+    else
+      printf("{__LINE__, %.15e,\t\"%s\", \"%s\" },\n",
+	     s->value, buffer, s->format_string);
+#else
     test_scok(buffer, s->result, 12); /* Only check the first 12 digs,
 					 other stuff is random */
+#endif
     s++;
   }
 
@@ -293,7 +304,16 @@ test_sprint (void)
       sprintf(buffer, si->format_string, (long) si->value);
     else
       sprintf(buffer, si->format_string, si->value);
+#ifdef GENERATE_VECTORS
+    if (si->value < 0)
+      printf("__LINE__, -%#09x,\t\"%s\", \"%s\",\n",
+	     -si->value, buffer, si->format_string);
+    else
+      printf("__LINE__, %#010x,\t\"%s\", \"%s\",\n",
+	     si->value, buffer, si->format_string);
+#else
     test_sok(buffer, si->result);
+#endif
     si++;
   }  
 }
@@ -356,19 +376,44 @@ test_scan (void)
   test_sok("magic", buffer);
 }
 
+#ifdef GENERATE_VECTORS
+static void
+gen_dvec(void)
+{
+  char	ebuf[128];
+  char	fbuf[128];
+  char	gbuf[128];
+  int	e_decpt, e_sign;
+  int	f_decpt, f_sign;
+
+  strcpy(ebuf, ecvt(pdd->value, pdd->e1, &e_decpt, &e_sign));
+  strcpy(fbuf, fcvt(pdd->value, pdd->f1, &f_decpt, &f_sign));
+  gcvt(pdd->value, pdd->g1, gbuf);
+  printf("__LINE__, %.15e,\"%s\",%d,%d,%d,\"%s\",%d,%d,%d,\"%s\",%d,\n\n",
+	 pdd->value,
+	 ebuf, pdd->e1, e_decpt, e_sign,
+	 fbuf, pdd->f1, f_decpt, f_sign,
+	 gbuf, pdd->g1);
+}
+#endif
+
 void
 test_cvt (void)
 {
   deltest();
 
+#ifdef GENERATE_VECTORS
+  diterate(gen_dvec, "gen");
+#else
 #ifndef NO_NEWLIB
   diterate(test_fcvtbuf,"fcvtbuf");
-  diterate(test_fcvt,"fcvt/fcvtf");
 #endif
+  diterate(test_fcvt,"fcvt/fcvtf");
 
   diterate(test_gcvt,"gcvt/gcvtf");
 #ifndef NO_NEWLIB
   diterate(test_ecvtbuf,"ecvtbuf");
+#endif
   diterate(test_ecvt,"ecvt/ecvtf");
 #endif
 
