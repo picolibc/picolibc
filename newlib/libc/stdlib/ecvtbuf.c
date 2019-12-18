@@ -235,14 +235,7 @@ fcvtbuf (double invalue,
 
   save = fcvt_buf;
 
-  if (invalue < 1.0 && invalue > -1.0)
-    {
-      p = _dtoa_r (reent, invalue, 2, ndigit, decpt, sign, &end);
-    }
-  else
-    {
-      p = _dtoa_r (reent, invalue, 3, ndigit, decpt, sign, &end);
-    }
+  p = _dtoa_r (reent, invalue, 3, ndigit, decpt, sign, &end);
 
   /* Now copy */
 
