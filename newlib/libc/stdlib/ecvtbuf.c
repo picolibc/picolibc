@@ -372,15 +372,10 @@ _gcvt (
       char *end;
       char *p;
 
-      if (invalue < 1.0)
-	{
-	  /* what we want is ndigits after the point */
-	  p = _dtoa_r (invalue, 3, ndigit, &decpt, &sign, &end);
-	}
-      else
-	{
-	  p = _dtoa_r (invalue, 2, ndigit, &decpt, &sign, &end);
-	}
+      /* We always want ndigits of precision, even if that means printing
+       * a bunch of leading zeros for numbers < 1.0
+       */
+      p = _dtoa_r (invalue, 2, ndigit, &decpt, &sign, &end);
 
       if (decpt == 9999)
 	{
@@ -406,11 +401,12 @@ _gcvt (
 	  if (buf == save)
 	    *buf++ = '0';
 	  *buf++ = '.';
-	  while (decpt < 0 && ndigit > 0)
+
+	  /* Leading zeros don't count towards 'ndigit' */
+	  while (decpt < 0)
 	    {
 	      *buf++ = '0';
 	      decpt++;
-	      ndigit--;
 	    }
 
 	  /* Print rest of stuff */
