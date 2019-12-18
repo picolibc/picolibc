@@ -130,6 +130,14 @@ memset:
 	/* Get number of loop iterations with 16B per iteration.  */
 	srli	a7, a4, 4
 
+#ifdef PSRAM_FIX
+	//do not do this if we have less than one iteration to do
+	beqz	a7, 2f
+	//this seems to work to prefetch the cache line
+	s32i	a3, a5, 0
+	nop
+#endif
+
 	/* Destination is word-aligned.  */
 #if XCHAL_HAVE_LOOPS
 	loopnez	a7, 2f

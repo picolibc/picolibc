@@ -100,15 +100,11 @@ __memcpy_aux:
 	l8ui	a6, a3, 0
 	addi	a3, a3, 1
 	addi	a4, a4, -1
-#ifdef PSRAM_FIX
-	nop
-	nop
-#endif
 	s8i	a6, a5, 0
-	addi	a5, a5, 1
 #ifdef PSRAM_FIX
 	memw
 #endif
+	addi	a5, a5, 1
 
 	/* Return to main algorithm if dst is now aligned.  */
 	bbci.l	a5, 1, .Ldstaligned
@@ -123,16 +119,12 @@ __memcpy_aux:
 	l8ui	a7, a3, 1
 	addi	a3, a3, 2
 	addi	a4, a4, -2
-#ifdef PSRAM_FIX
-	nop
-	nop
-#endif
 	s8i	a6, a5, 0
 	s8i	a7, a5, 1
-	addi	a5, a5, 2
 #ifdef PSRAM_FIX
 	memw
 #endif
+	addi	a5, a5, 2
 
 	/* dst is now aligned; return to main algorithm.  */
 	j	.Ldstaligned
@@ -165,34 +157,38 @@ memcpy:
 	slli	a8, a7, 4
 	add	a8, a8, a3	// a8 = end of last 16B source chunk
 #endif
-1:	l32i	a6, a3, 0
+
+#ifndef PSRAM_FIX
+
+1:	l32i	a6, a3, 0 //HYP: memw after this is fix-ish?
 	l32i	a7, a3, 4
-#ifdef PSRAM_FIX
-	nop
-	nop
-	nop
-	nop
-#endif
 	s32i	a6, a5, 0
 	l32i	a6, a3, 8
-#ifdef PSRAM_FIX
-	nop
-	nop
-	nop
-	nop
-#endif
 	s32i	a7, a5, 4
 	l32i	a7, a3, 12
-#ifdef PSRAM_FIX
-	nop
-	nop
-	nop
-	nop
-#endif
 	s32i	a6, a5, 8
 	addi	a3, a3, 16
 	s32i	a7, a5, 12
 	addi	a5, a5, 16
+
+#else
+1:	l32i	a6, a3, 0
+	l32i	a7, a3, 4
+	s32i	a6, a5, 0
+	s32i	a7, a5, 4
+	memw
+	l32i	a6, a3, 8
+	l32i	a7, a3, 12
+	s32i	a6, a5, 8
+	s32i	a7, a5, 12
+	memw
+
+	addi	a3, a3, 16
+	addi	a5, a5, 16
+
+#endif
+
+
 #if !XCHAL_HAVE_LOOPS
 	bltu	a3, a8, 1b
 #endif
@@ -204,11 +200,6 @@ memcpy:
 	l32i	a6, a3, 0
 	l32i	a7, a3, 4
 	addi	a3, a3, 8
-#ifdef PSRAM_FIX
-	nop
-	nop
-	nop
-#endif
 	s32i	a6, a5, 0
 	s32i	a7, a5, 4
 	addi	a5, a5, 8
@@ -216,53 +207,43 @@ memcpy:
 3:	bbsi.l	a4, 2, 4f
 	bbsi.l	a4, 1, 5f
 	bbsi.l	a4, 0, 6f
+#ifdef PSRAM_FIX
+	memw
+#endif
 	leaf_return
 
 	.align 4
 	/* Copy 4 bytes.  */
 4:	l32i	a6, a3, 0
 	addi	a3, a3, 4
-#ifdef PSRAM_FIX
-	nop
-	nop
-	nop
-#endif
 	s32i	a6, a5, 0
 	addi	a5, a5, 4
 	bbsi.l	a4, 1, 5f
 	bbsi.l	a4, 0, 6f
+#ifdef PSRAM_FIX
+	memw
+#endif
 	leaf_return
 
 	/* Copy 2 bytes.  */
 5:	l16ui	a6, a3, 0
 	addi	a3, a3, 2
-#ifdef PSRAM_FIX
-	nop
-	nop
-	nop
-#endif
 	s16i	a6, a5, 0
 	addi	a5, a5, 2
+	bbsi.l	a4, 0, 6f
 #ifdef PSRAM_FIX
 	memw
 #endif
-	bbsi.l	a4, 0, 6f
 	leaf_return
 
 	/* Copy 1 byte.  */
 6:	l8ui	a6, a3, 0
-#ifdef PSRAM_FIX
-	nop
-	nop
-	nop
-	nop
-#endif
 	s8i	a6, a5, 0
+
+.Ldone:
 #ifdef PSRAM_FIX
 	memw
 #endif
-
-.Ldone:
 	leaf_return
 
 
@@ -291,27 +272,12 @@ memcpy:
 1:	l32i	a7, a3, 4
 	l32i	a8, a3, 8
 	src_b	a6, a6, a7
-#ifdef PSRAM_FIX
-	nop
-	nop
-	nop
-#endif
 	s32i	a6, a5, 0
 	l32i	a9, a3, 12
 	src_b	a7, a7, a8
-#ifdef PSRAM_FIX
-	nop
-	nop
-	nop
-#endif
 	s32i	a7, a5, 4
 	l32i	a6, a3, 16
 	src_b	a8, a8, a9
-#ifdef PSRAM_FIX
-	nop
-	nop
-	nop
-#endif
 	s32i	a8, a5, 8
 	addi	a3, a3, 16
 	src_b	a9, a9, a6
@@ -327,11 +293,6 @@ memcpy:
 	l32i	a7, a3, 4
 	l32i	a8, a3, 8
 	src_b	a6, a6, a7
-#ifdef PSRAM_FIX
-	nop
-	nop
-	nop
-#endif
 	s32i	a6, a5, 0
 	addi	a3, a3, 8
 	src_b	a7, a7, a8
@@ -345,10 +306,6 @@ memcpy:
 	l32i	a7, a3, 4
 	addi	a3, a3, 4
 	src_b	a6, a6, a7
-#ifdef PSRAM_FIX
-	nop
-	nop
-#endif
 	s32i	a6, a5, 0
 	addi	a5, a5, 4
 	mov	a6, a7
@@ -364,28 +321,17 @@ memcpy:
 5:	l8ui	a6, a3, 0
 	l8ui	a7, a3, 1
 	addi	a3, a3, 2
-#ifdef PSRAM_FIX
-	nop
-	nop
-	nop
-#endif
 	s8i	a6, a5, 0
 	s8i	a7, a5, 1
 	addi	a5, a5, 2
+	bbsi.l	a4, 0, 6f
 #ifdef PSRAM_FIX
 	memw
 #endif
-	bbsi.l	a4, 0, 6f
 	leaf_return
 
 	/* Copy 1 byte.  */
 6:	l8ui	a6, a3, 0
-#ifdef PSRAM_FIX
-	nop
-	nop
-	nop
-	nop
-#endif
 	s8i	a6, a5, 0
 #ifdef PSRAM_FIX
 	memw

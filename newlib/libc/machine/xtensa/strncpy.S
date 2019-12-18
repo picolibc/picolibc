@@ -32,11 +32,6 @@ __strncpy_aux:
 .Lsrc1mod2: // src address is odd
 	l8ui	a8, a3, 0	// get byte 0
 	addi	a3, a3, 1	// advance src pointer
-#ifdef PSRAM_FIX
-	nop
-	nop
-	nop
-#endif
 	s8i	a8, a10, 0	// store byte 0
 	addi	a4, a4, -1	// decrement n
 	beqz    a4, .Lret       // if n is zero
@@ -47,22 +42,12 @@ __strncpy_aux:
 .Lsrc2mod4: // src address is 2 mod 4
 	l8ui	a8, a3, 0	// get byte 0
 	addi	a4, a4, -1	// decrement n
-#ifdef PSRAM_FIX
-	nop
-	nop
-	nop
-#endif
 	s8i	a8, a10, 0	// store byte 0
 	beqz    a4, .Lret       // if n is zero
 	addi	a10, a10, 1	// advance dst pointer
 	beqz	a8, .Lfill	// if byte 0 is zero
 	l8ui	a8, a3, 1	// get byte 0
 	addi	a3, a3, 2	// advance src pointer
-#ifdef PSRAM_FIX
-	nop
-	nop
-	nop
-#endif
 	s8i	a8, a10, 0	// store byte 0
 	addi	a4, a4, -1	// decrement n
 	beqz    a4, .Lret       // if n is zero
@@ -71,6 +56,9 @@ __strncpy_aux:
 	j	.Lfill
 
 .Lret:
+#ifdef PSRAM_FIX
+	memw
+#endif
 	leaf_return
 
 
@@ -137,7 +125,11 @@ strncpy:
 	addi	a10, a10, 1
 	bnez    a4, .Lfillcleanup 
 
-2:	leaf_return
+2:	
+#ifdef PSRAM_FIX
+	memw
+#endif
+	leaf_return
 	
 .Lfill1mod2: // dst address is odd
 	s8i	a9, a10, 0	// store byte 0
@@ -272,7 +264,11 @@ strncpy:
 #endif
 2:	j	.Lfill
 
-3:	leaf_return
+3:	
+#ifdef PSRAM_FIX
+	memw
+#endif
+	leaf_return
 .end schedule
 
 	.size	strncpy, . - strncpy

@@ -51,11 +51,6 @@ strcpy:
 .Lsrc1mod2: // src address is odd
 	l8ui	a8, a3, 0	// get byte 0
 	addi	a3, a3, 1	// advance src pointer
-#ifdef PSRAM_FIX
-	nop
-	nop
-	nop
-#endif
 	s8i	a8, a10, 0	// store byte 0
 #ifdef PSRAM_FIX
 	memw
@@ -67,12 +62,6 @@ strcpy:
 .Lsrc2mod4: // src address is 2 mod 4
 	l8ui	a8, a3, 0	// get byte 0
 	/* 1-cycle interlock */
-#ifdef PSRAM_FIX
-	nop
-	nop
-	nop
-	nop
-#endif
 	s8i	a8, a10, 0	// store byte 0
 #ifdef PSRAM_FIX
 	memw
@@ -80,11 +69,6 @@ strcpy:
 	beqz	a8, 1f		// if byte 0 is zero
 	l8ui	a8, a3, 1	// get byte 0
 	addi	a3, a3, 2	// advance src pointer
-#ifdef PSRAM_FIX
-	nop
-	nop
-	nop
-#endif
 	s8i	a8, a10, 1	// store byte 0
 	addi	a10, a10, 2	// advance dst pointer
 #ifdef PSRAM_FIX
@@ -118,6 +102,10 @@ strcpy:
 	bnone	a8, a5, .Lz1	// if byte 1 is zero
 	bnone	a8, a6, .Lz2	// if byte 2 is zero
 	s32i	a8, a10, 0	// store word to dst
+#ifdef PSRAM_FIX
+	l32i	a8, a10, 0
+	s32i	a8, a10, 0
+#endif
 	bnone	a8, a7, .Lz3	// if byte 3 is zero
 	addi	a10, a10, 4	// advance dst pointer
 
@@ -131,6 +119,11 @@ strcpy:
 	bnone	a8, a5, .Lz1	// if byte 1 is zero
 	bnone	a8, a6, .Lz2	// if byte 2 is zero
 	s32i	a8, a10, 0	// store word to dst
+#ifdef PSRAM_FIX
+	l32i	a8, a10, 0
+	s32i	a8, a10, 0
+#endif
+
 	bany	a8, a7, 1b	// if byte 3 is zero
 #endif /* !XCHAL_HAVE_LOOPS */
 
@@ -194,11 +187,6 @@ strcpy:
 #endif
 1:	l8ui	a8, a3, 0
 	addi	a3, a3, 1
-#ifdef PSRAM_FIX
-	nop
-	nop
-	nop
-#endif
 	s8i	a8, a10, 0
 	addi	a10, a10, 1
 #ifdef PSRAM_FIX
