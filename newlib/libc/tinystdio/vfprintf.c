@@ -518,9 +518,10 @@ int vfprintf (FILE * stream, const char *fmt, va_list ap)
 
 		prec = ndigs;
 
-		/* Remove trailing zeros */
-		while (ndigs > 0 && _dtoa.digits[ndigs-1] == '0')
-		    ndigs--;
+		/* Remove trailing zeros unless '#' */
+		if (!(flags & FL_ALT))
+		    while (ndigs > 0 && _dtoa.digits[ndigs-1] == '0')
+			ndigs--;
 
 		if (-4 <= exp && exp < prec)
 		{
