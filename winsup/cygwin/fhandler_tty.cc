@@ -1263,7 +1263,7 @@ fhandler_pty_slave::push_to_pcon_screenbuffer (const char *ptr, size_t len)
     {
       p0 += 3;
       bool exist_arg_3 = false;
-      while (p0 < buf + nlen && !isalpha (*p0))
+      while (p0 < buf + nlen && (isdigit (*p0) || *p0 == ';'))
 	{
 	  int arg = 0;
 	  while (p0 < buf + nlen && isdigit (*p0))
