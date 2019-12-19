@@ -40,7 +40,7 @@ void __attribute((naked)) __section(".text.init.enter")
 _start(void)
 {
 	asm(".option push\n.option norelax\nla gp, __global_pointer$\n.option pop");
-#ifndef __SOFTFP__
+#ifdef __riscv_flen
 	long mstatus;
 	asm("csrr %0, mstatus" : "=r" (mstatus));
 	mstatus |= 1 << 13;
