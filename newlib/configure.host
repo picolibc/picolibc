@@ -868,7 +868,7 @@ newlib_cflags="${newlib_cflags} -DCLOCK_PROVIDED -DMALLOC_PROVIDED -DEXIT_PROVID
 	;;
   xtensa*-*-* | xtensa*-*)
 	syscall_dir=syscalls
-	newlib_cflags="${newlib_cflags} -DHAVE_RENAME_R -DHAVE_GETTIMEOFDAY -I."
+	newlib_cflags="${newlib_cflags} -DHAVE_RENAME_R -DHAVE_GETTIMEOFDAY -DHAVE_FCNTL -DSIGNAL_PROVIDED -DABORT_PROVIDED -I."
 	;;
   z8k-*-*)
 	syscall_dir=syscalls
