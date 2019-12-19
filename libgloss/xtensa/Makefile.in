@@ -7,7 +7,8 @@ gloss_hdrs =
 gloss_srcs =
 
 gloss_specs = \
-	default.specs
+	default.specs \
+	nano.specs
 
 # Extra files
 
