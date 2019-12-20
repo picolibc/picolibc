@@ -105,10 +105,7 @@ int __ftoa_engine(float val, struct ftoa *ftoa, uint8_t maxDigits, uint8_t maxDe
     if (x.u & (1 << 31))
         flags = FTOA_MINUS;
 
-    uint8_t exp = (x.u >> 24) << 1;
-
-    if(x.u & (1 << 23))
-        exp++;    // TODO possible but in case of subnormal
+    uint8_t exp = x.u >> 23;
 
     ftoa->exp = 0;
 
@@ -129,9 +126,11 @@ int __ftoa_engine(float val, struct ftoa *ftoa, uint8_t maxDigits, uint8_t maxDe
     } else {
 
         /* The implicit leading 1 is made explicit, except if value
-         * subnormal.
+         * subnormal, in which case exp needs to be adjusted by one
          */
-        if (exp != 0)
+        if (exp == 0)
+	    exp = 1;
+	else
             frac |= (1UL<<23);
 
         uint8_t idx = exp>>3;
