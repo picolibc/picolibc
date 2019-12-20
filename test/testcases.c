@@ -418,3 +418,7 @@
     result |= test(414, "1234ABCD            ", "% -+0*.*X", 20, 5, 305441741);
     result |= test(415, "00EDCB5433          ", "% -+0*.*X", 20, 10, 3989525555U);
     result |= test(416, "hi x", "%*sx", -3, "hi");
+    result |= test(417, "1.000e-38", "%.3e", 1e-38);
+#ifndef PICOLIBC_FLOAT_PRINTF_SCANF
+    result |= test(418, "1.000e-308", "%.3e", 1e-308);
+#endif
