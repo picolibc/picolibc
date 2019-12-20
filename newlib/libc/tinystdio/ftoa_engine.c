@@ -98,153 +98,152 @@ int __ftoa_engine(float val, struct ftoa *ftoa, uint8_t maxDigits, uint8_t maxDe
     uint32_t frac = x.u & 0x007fffffUL;
 
     if (maxDigits > FTOA_MAX_DIG)
-	maxDigits = FTOA_MAX_DIG;
+        maxDigits = FTOA_MAX_DIG;
 
     /* Read the sign, shift the exponent in place and delete it from frac.
      */
     if (x.u & (1 << 31))
-	flags = FTOA_MINUS;
+        flags = FTOA_MINUS;
 
     uint8_t exp = (x.u >> 24) << 1;
 
     if(x.u & (1 << 23))
-	exp++;    // TODO possible but in case of subnormal
+        exp++;    // TODO possible but in case of subnormal
+
+    ftoa->exp = 0;
 
     /*
      * Test for easy cases, zero and NaN
      */
     if(exp==0 && frac==0)
     {
-        ftoa->flags = flags | FTOA_ZERO;
+        flags |= FTOA_ZERO;
         uint8_t i;
-        for(i=0; i<=maxDigits; i++) {
+        for(i=0; i<=maxDigits; i++)
             ftoa->digits[i] = '0';
-        }
-        return 0;
-    }
-
-    if(exp == 0xff) {
+    } else if(exp == 0xff) {
         if(frac == 0)
-	    flags |= FTOA_INF;
-	else
-	    flags |= FTOA_NAN;
-    }
+            flags |= FTOA_INF;
+        else
+            flags |= FTOA_NAN;
+    } else {
 
-    /* The implicit leading 1 is made explicit, except if value
-     * subnormal.
-     */
-    if (exp != 0)
-	frac |= (1UL<<23);
+        /* The implicit leading 1 is made explicit, except if value
+         * subnormal.
+         */
+        if (exp != 0)
+            frac |= (1UL<<23);
 
-    uint8_t idx = exp>>3;
-    int8_t exp10 = exponentTable[idx];
+        uint8_t idx = exp>>3;
+        int8_t exp10 = exponentTable[idx];
 
-    /*
-     * We COULD try making the multiplication in situ, where we make
-     * frac and a 64 bit int overlap in memory and select/weigh the
-     * upper 32 bits that way. For starters, this is less risky:
-     */
-    int64_t prod = (int64_t)frac * (int64_t)factorTable[idx];
+        /*
+         * We COULD try making the multiplication in situ, where we make
+         * frac and a 64 bit int overlap in memory and select/weigh the
+         * upper 32 bits that way. For starters, this is less risky:
+         */
+        int64_t prod = (int64_t)frac * (int64_t)factorTable[idx];
 
-    /*
-     * The expConvFactorTable are factor are correct iff the lower 3 exponent
-     * bits are 1 (=7). Else we need to compensate by divding frac.
-     * If the lower 3 bits are 7 we are right.
-     * If the lower 3 bits are 6 we right-shift once
-     * ..
-     * If the lower 3 bits are 0 we right-shift 7x
-     */
-    prod >>= (15-(exp & 7));
+        /*
+         * The expConvFactorTable are factor are correct iff the lower 3 exponent
+         * bits are 1 (=7). Else we need to compensate by divding frac.
+         * If the lower 3 bits are 7 we are right.
+         * If the lower 3 bits are 6 we right-shift once
+         * ..
+         * If the lower 3 bits are 0 we right-shift 7x
+         */
+        prod >>= (15-(exp & 7));
 
-    /*
-     * Now convert to decimal.
-     */
+        /*
+         * Now convert to decimal.
+         */
 
-    uint8_t hadNonzeroDigit = 0; /* have seen a non-zero digit flag */
-    uint8_t outputIdx = 0;
-    int64_t decimal = 100000000000000ull;
+        uint8_t hadNonzeroDigit = 0; /* have seen a non-zero digit flag */
+        uint8_t outputIdx = 0;
+        int64_t decimal = 100000000000000ull;
 
-    do {
-	/* Compute next digit */
-	char digit = prod / decimal + '0';
-	prod = prod % decimal;
-	decimal /= 10;
+        do {
+            /* Compute next digit */
+            char digit = prod / decimal + '0';
+            prod = prod % decimal;
+            decimal /= 10;
 
-	if(!hadNonzeroDigit)
-	{
-	    /* Don't return results with a leading zero! Instead
-	     * skip those and decrement exp10 accordingly.
-	     */
-	    if (digit == '0') {
-		exp10--;
-		continue;
-	    }
+            if(!hadNonzeroDigit)
+            {
+                /* Don't return results with a leading zero! Instead
+                 * skip those and decrement exp10 accordingly.
+                 */
+                if (digit == '0') {
+                    exp10--;
+                    continue;
+                }
 
-	    /* Found the first non-zero digit */
-	    hadNonzeroDigit = 1;
+                /* Found the first non-zero digit */
+                hadNonzeroDigit = 1;
 
-	    /* If limiting decimals... */
-	    if(maxDecimals != 0)
-	    {
-		int8_t beforeDP = exp10+1;                // Digits before point
+                /* If limiting decimals... */
+                if(maxDecimals != 0)
+                {
+                    int8_t beforeDP = exp10+1;                // Digits before point
 
-		/* Numbers < 1 should also output at least 1 digit. */
-		if (beforeDP < 1)
-		    beforeDP = 1;
+                    /* Numbers < 1 should also output at least 1 digit. */
+                    if (beforeDP < 1)
+                        beforeDP = 1;
 
-		maxDigits = min_uint8 (maxDigits, maxDecimals + beforeDP);
-	    }
-	}
+                    maxDigits = min_uint8 (maxDigits, maxDecimals - 1 + beforeDP);
+                }
+            }
 
-	/* Now we have a digit. */
-        if(digit < '0' + 10) {
-	    /* normal case. */
-            ftoa->digits[outputIdx] = digit;
-        } else {
-            /*
-	     * Uh, oh. Something went wrong with our conversion. Write
-	     * 9s and use the round-up code to report back to the caller
-	     * that we've carried
-	     */
-            for(outputIdx = 0; outputIdx < maxDigits; outputIdx++)
-                ftoa->digits[outputIdx] = '9';
-	    goto round_up;
+            /* Now we have a digit. */
+            if(digit < '0' + 10) {
+                /* normal case. */
+                ftoa->digits[outputIdx] = digit;
+            } else {
+                /*
+                 * Uh, oh. Something went wrong with our conversion. Write
+                 * 9s and use the round-up code to report back to the caller
+                 * that we've carried
+                 */
+                for(outputIdx = 0; outputIdx < maxDigits; outputIdx++)
+                    ftoa->digits[outputIdx] = '9';
+                goto round_up;
+            }
+            outputIdx++;
+        } while (outputIdx<maxDigits);
+
+        /* Rounding: */
+        decimal *= 10;
+        if (prod - (decimal >> 1) >= 0)
+        {
+        round_up:
+
+            while(outputIdx != 0) {
+
+                /* Increment digit, check if we're done */
+                if(++ftoa->digits[outputIdx-1] < '0' + 10)
+                    break;
+
+                /* Rounded past the first digit;
+                 * reset the leading digit to 1,
+                 * bump exp and tell the caller we've carried.
+                 * The remaining digits will already be '0',
+                 * so we don't need to mess with them
+                 */
+                if(outputIdx == 1)
+                {
+                    ftoa->digits[0] = '1';
+                    exp10++;
+                    flags |= FTOA_CARRY;
+                    break;
+                }
+
+                ftoa->digits[--outputIdx] = '0';
+                /* and the loop continues, carrying to next digit. */
+            }
         }
-        outputIdx++;
-    } while (outputIdx<maxDigits);
-
-    /* Rounding: */
-    decimal *= 10;
-    if (prod - (decimal >> 1) >= 0)
-    {
-    round_up:
-
-        while(outputIdx != 0) {
-
-	    /* Increment digit, check if we're done */
-            if(++ftoa->digits[outputIdx-1] < '0' + 10)
-		break;
-
-	    /* Rounded past the first digit;
-	     * reset the leading digit to 1,
-	     * bump exp and tell the caller we've carried.
-	     * The remaining digits will already be '0',
-	     * so we don't need to mess with them
-	     */
-	    if(outputIdx == 1)
-	    {
-		ftoa->digits[0] = '1';
-		exp10++;
-		flags |= FTOA_CARRY;
-		break;
-	    }
-
-	    ftoa->digits[--outputIdx] = '0';
-	    /* and the loop continues, carrying to next digit. */
-        }
+        ftoa->exp = exp10;
     }
-
     ftoa->flags = flags;
-    ftoa->exp = exp10;
+    ftoa->digits[maxDigits] = '\0';
     return maxDigits;
 }
