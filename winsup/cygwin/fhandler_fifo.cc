@@ -184,7 +184,8 @@ fhandler_fifo::create_pipe_instance (bool first)
   timeout.QuadPart = -500000;
   status = NtCreateNamedPipeFile (&ph, access, &attr, &io, sharing,
 				  first ? FILE_CREATE : FILE_OPEN, 0,
-				  FILE_PIPE_MESSAGE_TYPE,
+				  FILE_PIPE_MESSAGE_TYPE
+				    | FILE_PIPE_REJECT_REMOTE_CLIENTS,
 				  FILE_PIPE_MESSAGE_MODE,
 				  nonblocking, max_instances,
 				  DEFAULT_PIPEBUFSIZE, DEFAULT_PIPEBUFSIZE,
