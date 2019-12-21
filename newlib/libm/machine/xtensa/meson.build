@@ -1,7 +1,7 @@
 #
 # SPDX-License-Identifier: BSD-3-Clause
 #
-# Copyright © 2019 Keith Packard
+# Copyright © 2019 Jonathan McDowell
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions
@@ -32,73 +32,27 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
-libm_machine_dirs = {
-		      'aarch64' : 'aarch64',
-		      'arm' : 'arm',
-		      'i386' : 'i386',
-		      'i486' : 'i386',
-		      'i586' : 'i386',
-		      'i686' : 'i386',
-		      'nds32' : 'nds32',
-		      'riscv' : 'riscv',
-		      'riscv64' : 'riscv',
-		      'spu' : 'spu',
-		      'xtensa': 'xtensa',
-		    }
 
-libdirs = ['math', 'common', 'complex']
-
-libnames = libdirs
-
-need_generic_fenv = true
-
-if libm_machine_dirs.has_key(host_cpu)
-  libm_machine_dir = join_paths('machine', libm_machine_dirs[host_cpu])
-  libdirs = [libm_machine_dir] + libdirs
-  libnames = ['machine'] + libnames
-  if run_command('test', '-f', join_paths(libm_machine_dir, 'fegetenv.c')).returncode() == 0
-    need_generic_fenv = false
-  endif
-else
-  warning('No libm machine directory for cpu ' + host_cpu)
-endif
-
-if need_generic_fenv
-  libdirs = ['fenv'] + libdirs
-  libnames = ['fenv'] + libnames
-endif
-
-math_inc = [include_directories('common'), inc]
-
-foreach libdir : libdirs
-  subdir(libdir)
-endforeach
+srcs_libm_machine = [
+  'feclearexcept.c',
+  'fegetenv.c',
+  'fegetexcept.c',
+  'fegetexceptflag.c',
+  'fegetround.c',
+  'feholdexcept.c',
+  'feraiseexcept.c',
+  'fetestexcept.c',
+  'feupdateenv.c',
+]
 
 foreach target : targets
-  value = get_variable('target_' + target)
-  libobjs = []
-
-  foreach libname : libnames
-    libobjs += get_variable('lib_' + libname + target).extract_all_objects(recursive:true)
-  endforeach
-
-  instdir = join_paths(get_option('libdir'), value[0])
-
-  if target == ''
-    libm_name = 'm'
-  else
-    libm_name = join_paths(target, 'libm')
-  endif
-
-  set_variable('lib_m' + target,
-	       static_library(libm_name,
-			      install : true,
-			      install_dir : instdir,
-			      pic: false,
-			      objects : libobjs))
+	value = get_variable('target_' + target)
+	set_variable('lib_machine' + target,
+		static_library('machine' + target,
+			srcs_libm_machine,
+			pic: false,
+			include_directories: [ inc,
+					       include_directories('../../common'),
+					       include_directories('../../../libc/machine/xtensa') ],
+			c_args: value[1] + ['-fno-builtin']))
 endforeach
-
-if enable_tests
-  subdir('test')
-endif
-

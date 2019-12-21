@@ -99,6 +99,7 @@ machine_dirs = {
 		 'x86_64': 'x86_64',
 		 'xc16x': 'xc16x',
 		 'xstormy16': 'xstormy16',
+		 'xtensa': 'xtensa',
 		 'z8k': 'z8k',
 		 'spu': 'spu',
 	       }
