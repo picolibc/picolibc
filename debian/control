@@ -1,7 +1,7 @@
 Source: picolibc
 Priority: optional
 Maintainer: Keith Packard <keithp@keithp.com>
-Build-Depends: debhelper-compat (= 12), gcc-arm-none-eabi, gcc-riscv64-unknown-elf, meson, ninja-build
+Build-Depends: debhelper-compat (= 12), gcc-arm-none-eabi, gcc-riscv64-unknown-elf, gcc-xtensa-lx106, meson, ninja-build
 Standards-Version: 4.4.1
 Section: devel
 HomePage: https://keithp.com/git/picolibc
@@ -23,3 +23,11 @@ Description: Smaller embedded C library for ARM development
  PicoLibc is a combination of Newlib and AVR libc bits designed
  for small-RAM embedded systems. This package has binaries for
  ARM processors. This library is intended to replace libnewlib-nano
+
+Package: picolibc-xtensa-lx106-elf
+Architecture: all
+Depends: ${misc:Depends}, gcc-xtensa-lx106
+Description: Smaller embedded C library for ESP8266 development
+ PicoLibc is a combination of Newlib and AVR libc bits designed
+ for small-RAM embedded systems. This package has binaries for
+ ESP8266 processors.

@@ -20,6 +20,7 @@ BUILDDIR=build
 
 RISCV_ARCH=riscv64-unknown-elf
 ARM_ARCH=arm-none-eabi
+LX106_ARCH=xtensa-lx106-elf
 
 MESON_SHARED_FLAGS = \
 	--prefix=/usr
@@ -38,6 +39,14 @@ MESON_ARM_FLAGS = \
 	-Dincludedir=lib/picolibc/$(ARM_ARCH)/include \
 	-Dlibdir=lib/picolibc/$(ARM_ARCH)/lib
 
+MESON_LX106_FLAGS = \
+	$(MESON_SHARED_FLAGS) \
+	--cross-file cross-$(LX106_ARCH).txt \
+	-Dnewlib-long-time_t=true \
+	-Dspecsdir=/usr/lib/gcc/$(LX106_ARCH) \
+	-Dincludedir=lib/$(LX106_ARCH)/include \
+	-Dlibdir=lib/$(LX106_ARCH)/lib
+
 override_dh_autoreconf:
 	echo 'no reconf needed'
 
@@ -47,10 +56,12 @@ override_dh_auto_clean:
 override_dh_auto_configure:
 	meson . debian/$(BUILDDIR)/$(RISCV_ARCH) $(MESON_RISCV_FLAGS)
 	meson . debian/$(BUILDDIR)/$(ARM_ARCH) $(MESON_ARM_FLAGS)
+	meson . debian/$(BUILDDIR)/$(LX106_ARCH) $(MESON_LX106_FLAGS)
 
 override_dh_auto_build:
 	cd debian/$(BUILDDIR)/$(RISCV_ARCH) && ninja
 	cd debian/$(BUILDDIR)/$(ARM_ARCH) && ninja
+	cd debian/$(BUILDDIR)/$(LX106_ARCH) && ninja
 
 override_dh_auto_test:
 ifeq (,$(filter nocheck,$(DEB_BUILD_OPTIONS)))
@@ -61,3 +72,4 @@ endif
 override_dh_auto_install:
 	cd debian/$(BUILDDIR)/$(RISCV_ARCH) && DESTDIR=${CURDIR}/debian/tmp ninja install
 	cd debian/$(BUILDDIR)/$(ARM_ARCH) && DESTDIR=${CURDIR}/debian/tmp ninja install
+	cd debian/$(BUILDDIR)/$(LX106_ARCH) && DESTDIR=${CURDIR}/debian/tmp ninja install
