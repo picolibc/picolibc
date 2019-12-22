@@ -1,0 +1,16 @@
+[binaries]
+c = 'xtensa-lx106-elf-gcc'
+ar = 'xtensa-lx106-elf-ar'
+as = 'xtensa-lx106-elf-as'
+ld = 'xtensa-lx106-elf-ld'
+strip = 'xtensa-lx106-elf-strip'
+
+[properties]
+c_args = [ '-mlongcalls', '-Os' ]
+
+[host_machine]
+system = 'esp8266'
+cpu_family = 'xtensa'
+cpu = 'xtensa'
+endian = 'little'
+

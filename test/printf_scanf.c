@@ -38,6 +38,7 @@
 #include <stdint.h>
 #include <errno.h>
 #include <sys/stat.h>
+#include <string.h>
 
 extern double strtod(char *, char **);
 
@@ -49,6 +50,7 @@ main(int argc, char **argv)
 	int x = -35;
 	char	buf[256];
 	int	errors = 0;
+
 #if 0
 	double	a;
 
@@ -71,6 +73,12 @@ main(int argc, char **argv)
 	}
 	printf ("%g\n", exp(11));
 #endif
+	sprintf(buf, "%g", printf_float(0.0f));
+	if (strcmp(buf, "0") != 0) {
+		printf("0: wanted \"0\" got \"%s\"\n", buf);
+		errors++;
+		fflush(stdout);
+	}
 	for (x = 0; x < 32; x++) {
 		uint32_t v = 0x12345678ul >> x;
 		uint32_t r;
@@ -114,11 +122,11 @@ main(int argc, char **argv)
 			float_type e;
 
 			sprintf(buf, "%.45f", printf_float(v));
-			printf("t %d buf %s\n", t, buf);
 			sscanf(buf, scanf_format, &r);
 			e = fabs(v-r) / v;
 			if (e > 1e-6) {
-				printf("\t%3d: wanted %.7e got %.7e (error %.7e\n", x, v, r, e);
+				printf("\t%3d: wanted %.7e got %.7e (error %.7e\n", x,
+				       printf_float(v), printf_float(r), printf_float(e));
 				errors++;
 				fflush(stdout);
 			}
@@ -128,7 +136,8 @@ main(int argc, char **argv)
 			sscanf(buf, scanf_format, &r);
 			e = fabs(v-r) / v;
 			if (e > 1e-6) {
-				printf("\t%3d: wanted %.7e got %.7e (error %.7e, buf %s)\n", x, v, r, e, buf);
+				printf("\t%3d: wanted %.7e got %.7e (error %.7e, buf %s)\n", x,
+				       printf_float(v), printf_float(r), printf_float(e), buf);
 				errors++;
 				fflush(stdout);
 			}
@@ -138,14 +147,13 @@ main(int argc, char **argv)
 			sscanf(buf, scanf_format, &r);
 			e = fabs(v-r) / v;
 			if (e > 1e-6) {
-				printf("\t%3d: wanted %.7e got %.7e (error %.7e, buf %s)\n", x, v, r, e, buf);
+				printf("\t%3d: wanted %.7e got %.7e (error %.7e, buf %s)\n", x,
+				       printf_float(v), printf_float(r), printf_float(e), buf);
 				errors++;
 				fflush(stdout);
 			}
 		}
 	}
-	if (!errors)
-		printf("success\n");
 	fflush(stdout);
 	return errors;
 }

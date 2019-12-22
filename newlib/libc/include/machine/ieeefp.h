@@ -457,7 +457,19 @@
 #define __IEEE_BIG_ENDIAN
 #endif
 
+#if (defined(__XTENSA__))
+#ifdef __XTENSA_EB__
+#define __IEEE_BIG_ENDIAN
+#else
+#define __IEEE_LITTLE_ENDIAN
+#endif
+#endif
+
 #ifdef __AMDGCN__
+#define __IEEE_LITTLE_ENDIAN
+#endif
+
+#ifdef __XTENSA_EL__
 #define __IEEE_LITTLE_ENDIAN
 #endif
 

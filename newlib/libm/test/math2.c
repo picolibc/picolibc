@@ -193,17 +193,17 @@ test_pow (void)
     n2 = fabs(randy()/100.0);
     res = pow(n1, n2);
     shouldbe = exp(log(n1) * n2);
-    test_mok(shouldbe, res,56);
+    test_mok(shouldbe, res,55);
   }
 
   newfunc("powf");
   
   for (i = 0; i < 1000; i++) 
   {
-    double n1;
-    double n2;
-    double res;
-    double shouldbe;
+    float n1;
+    float n2;
+    float res;
+    float shouldbe;
 
     errno = 0;
     

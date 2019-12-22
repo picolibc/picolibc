@@ -41,13 +41,14 @@ project('picolibc', 'c',
 	license : 'BSD',
 	meson_version : '>= 0.50',
 	version: '1.2.1'
-)
+       )
 
 targets = []
 
 enable_multilib = get_option('multilib')
 enable_picolib = get_option('picolib')
 enable_tests = get_option('tests')
+enable_native_tests = get_option('native-tests')
 newlib_tinystdio = get_option('newlib-tinystdio')
 have_alias_attribute_option = get_option('have-alias-attribute')
 newlib_io_pos_args = get_option('newlib-io-pos-args')
@@ -285,14 +286,45 @@ add_project_arguments(arguments, language: 'c')
 # semihost will adjust this if supported
 has_semihost = false
 
-subdir('newlib')
-subdir('picocrt')
 if newlib_tinystdio
   subdir('semihost')
   subdir('dummyhost')
 endif
 
 conf_data.set('HAVE_SEMIHOST', has_semihost, description: 'Semihost APIs supported')
+
+# By default, tests don't require any special arguments
+
+test_c_args = []
+test_link_args = []
+test_link_depends = []
+
+if has_semihost
+
+  # If we're using semihosting, we assume that there's a
+  # custom linker script that includes picolibc.specs
+
+  test_link_name = 'test-' + host_machine.cpu() + '.ld'
+  test_link_dep = files(test_link_name)
+
+  # Linker args must be strings (seems like a bug), so compute the
+  # full path by hand
+
+  test_link_path = '@0@/@1@'.format(meson.current_source_dir(), test_link_name)
+
+  test_c_args += ['--specs', 'picolibc.specs', '-nostartfiles']
+
+  # Undefine _exit as that's in libsemihost and needs to replace the weak _exit
+
+  test_link_args += test_c_args + ['-L.', '-T', test_link_path, '-Wl,--undefined=_exit']
+
+  # Make sure all of the tests get re-linked if the linker scripts change
+
+  test_link_depends += test_link_dep + files('picolibc.ld')
+endif
+
+subdir('picocrt')
+subdir('newlib')
 
 if enable_tests
   subdir('test')

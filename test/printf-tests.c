@@ -21,7 +21,37 @@ static void failmsg(int serial, char *fmt, ...) {
 static int test(int serial, char *expect, char *fmt, ...) {
     va_list ap;
     va_start(ap, fmt);
-    int n = vsnprintf(buf, 1024, fmt, ap);
+    double dv;
+    int n;
+    char *star;
+    switch (fmt[strlen(fmt)-1]) {
+    case 'e':
+    case 'E':
+    case 'f':
+    case 'F':
+    case 'g':
+    case 'G':
+	    star = strchr(fmt, '*');
+	    if (star) {
+		    if (strchr(star+1, '*')) {
+			    int iv1 = va_arg(ap, int);
+			    int iv2 = va_arg(ap, int);
+			    dv = va_arg(ap, double);
+			    n = snprintf(buf, 1024, fmt, iv1, iv2, printf_float(dv));
+		    } else  {
+			    int iv = va_arg(ap, int);
+			    dv = va_arg(ap, double);
+			    n = snprintf(buf, 1024, fmt, iv, printf_float(dv));
+		    }
+	    } else {
+		    dv = va_arg(ap, double);
+		    n = snprintf(buf, 1024, fmt, printf_float(dv));
+	    }
+	    break;
+    default:
+	    n = vsnprintf(buf, 1024, fmt, ap);
+	    break;
+    }
     va_end(ap);
     if (n >= 1024) {
         failmsg(serial, "buffer overflow");

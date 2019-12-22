@@ -115,17 +115,40 @@ math_test_src = [
 #  'dcvt.c',
 #  'test_ieee.c',
 
-test('math',
-     executable('math_test', math_test_src,
-		c_args: ['-Wno-missing-braces', '-Wno-implicit-int', '-Wno-return-type', '-D_XOPEN_SOURCE=700', '-D_GNU_SOURCE'],
-		link_with: [lib_m, lib_c],
-		include_directories: inc))
+foreach target : targets
+  value = get_variable('target_' + target)
 
-native_lib_m = meson.get_compiler('c').find_library('m', required: false)
+  libs = [get_variable('lib_m' + target), get_variable('lib_c' + target)]
+  if is_variable('lib_semihost' + target)
+    libs += [get_variable('lib_semihost' + target)]
+  endif
+  if is_variable('lib_crt' + target)
+    libs += [get_variable('lib_crt'+ target)]
+  endif
 
-if native_lib_m.found()
-  test('math-native',
-       executable('math_test_native', math_test_src,
-		  c_args: ['-Wno-missing-braces', '-Wno-implicit-int', '-Wno-return-type', '-D_XOPEN_SOURCE=700', '-D_GNU_SOURCE', '-DNO_NEWLIB'],
-		  dependencies: native_lib_m))
+  if target == ''
+    test_name = 'math_test'
+  else
+    test_name = join_paths(target, 'math_test')
+  endif
+
+  test('math' + target,
+       executable(test_name, math_test_src,
+		  c_args:  value[1] + ['-Wno-missing-braces', '-Wno-implicit-int', '-Wno-return-type', '-D_XOPEN_SOURCE=700', '-D_GNU_SOURCE'] + test_c_args,
+		  link_with: libs,
+		  link_args: value[1] + test_link_args + ['-Wl,--gc-sections'],
+		  include_directories: inc),
+       env: ['MESON_SOURCE_ROOT=' + meson.source_root()])
+endforeach
+
+if enable_native_tests
+
+  native_lib_m = meson.get_compiler('c').find_library('m', required: false)
+
+  if native_lib_m.found()
+    test('math-native',
+	 executable('math_test_native', math_test_src,
+		    c_args: ['-Wno-missing-braces', '-Wno-implicit-int', '-Wno-return-type', '-D_XOPEN_SOURCE=700', '-D_GNU_SOURCE', '-DNO_NEWLIB'],
+		    dependencies: native_lib_m))
+  endif
 endif

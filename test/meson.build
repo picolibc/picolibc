@@ -32,30 +32,114 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
-test('Round-trip printf/scanf',
-     executable('printf_scanf', 'printf_scanf.c',
-		link_with: [lib_m, lib_c],
-		include_directories: inc))
+foreach target : targets
+  value = get_variable('target_' + target)
 
-test('Round-trip printf/scanf float mode',
-     executable('printff_scanff', 'printf_scanf.c',
-		c_args: '-DPICOLIBC_FLOAT_PRINTF_SCANF',
-		link_with: [lib_m, lib_c],
-		include_directories: inc))
+  _libs = [get_variable('lib_m' + target), get_variable('lib_c' + target)]
+  if is_variable('lib_semihost' + target)
+    _libs += [get_variable('lib_semihost' + target)]
+  endif
+  if is_variable('lib_crt' + target)
+    _libs += [get_variable('lib_crt'+ target)]
+  endif
+  
+  _c_args = value[1] + test_c_args
+  _link_args = value[1] + test_link_args
 
-test('Bart Massey printf test',
-     executable('printf-tests', ['printf-tests.c'],
-		link_with: [lib_m, lib_c],
-		include_directories: inc))
+  t1 = 'printf/scanf'
+  if target == ''
+    t1_name = t1
+  else
+    t1_name = join_paths(target, t1)
+  endif
 
-test('Random number generator',
-     executable('rand', ['rand.c'],
-		link_with: [lib_m, lib_c],
-		include_directories: inc))
+  test(t1 + target,
+       executable(t1_name, 'printf_scanf.c',
+		  c_args: _c_args,
+		  link_args: _link_args,
+		  link_with: _libs,
+		  link_depends:  test_link_depends,
+		  include_directories: inc),
+       env: ['MESON_SOURCE_ROOT=' + meson.source_root()])
 
-if posix_io
-  test('posix i/o tests',
-       executable('posix-io', ['posix-io.c'],
-		  link_with: [lib_c],
-		  include_directories: inc))
-endif
+  t1 = 'printff/scanff'
+  if target == ''
+    t1_name = t1
+  else
+    t1_name = join_paths(target, t1)
+  endif
+
+  test(t1 + target,
+       executable(t1_name, 'printf_scanf.c',
+		  c_args: ['-DPICOLIBC_FLOAT_PRINTF_SCANF'] + _c_args,
+		  link_args: _link_args,
+		  link_with: _libs,
+		  link_depends:  test_link_depends,
+		  include_directories: inc),
+       env: ['MESON_SOURCE_ROOT=' + meson.source_root()])
+
+  t1 = 'printf-tests'
+  if target == ''
+    t1_name = t1
+  else
+    t1_name = join_paths(target, t1)
+  endif
+
+  test(t1 + target,
+       executable(t1_name, ['printf-tests.c'],
+		  c_args: _c_args,
+		  link_args: _link_args,
+		  link_with: _libs,
+		  include_directories: inc),
+       env: ['MESON_SOURCE_ROOT=' + meson.source_root()])
+
+  t1 = 'printff-tests'
+  if target == ''
+    t1_name = t1
+  else
+    t1_name = join_paths(target, t1)
+  endif
+
+  test(t1 + target,
+       executable(t1_name, ['printf-tests.c'],
+		  c_args: ['-DPICOLIBC_FLOAT_PRINTF_SCANF'] + _c_args,
+		  link_args: _link_args,
+		  link_with: _libs,
+		  include_directories: inc),
+       env: ['MESON_SOURCE_ROOT=' + meson.source_root()])
+
+  t1 = 'rand'
+  if target == ''
+    t1_name = t1
+  else
+    t1_name = join_paths(target, t1)
+  endif
+
+  test(t1 + target,
+       executable(t1_name, ['rand.c'],
+		  c_args: _c_args,
+		  link_args: _link_args,
+		  link_with: _libs,
+		  link_depends:  test_link_depends,
+		  include_directories: inc),
+	 env: ['MESON_SOURCE_ROOT=' + meson.source_root()])
+
+  if posix_io
+    t1 = 'posix-io'
+    if target == ''
+      t1_name = t1
+    else
+      t1_name = join_paths(target, t1)
+    endif
+
+    test(t1 + target,
+	 executable(t1_name, ['posix-io.c'],
+		    c_args: _c_args,
+		    link_args: _link_args,
+		    link_with: _libs,
+		    link_depends:  test_link_depends,
+		    include_directories: inc),
+	 env: ['MESON_SOURCE_ROOT=' + meson.source_root()])
+  endif
+
+endforeach

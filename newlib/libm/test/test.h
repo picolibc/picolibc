@@ -251,6 +251,7 @@ typedef struct
   double value;
   char *result;
   char *format_string;
+  int mag;
 } sprint_double_type;
 
 

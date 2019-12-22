@@ -1,5 +1,5 @@
 /* A setjmp.c for Moxie
-   Copyright (C) 2009  Anthony Green
+   Copyright (C) 2009, 2019  Anthony Green
 
    The authors hereby grant permission to use, copy, modify, distribute,
    and license this software and its documentation for any purpose, provided
@@ -12,28 +12,31 @@
    they apply.  */
 
 # setjmp/longjmp for moxie.  The jmpbuf looks like this:
-#	
-# Register	jmpbuf offset
-#   $r0		  0x00
-#   $r1		  0x04
-#   $r2		  0x08
-#   $r3		  0x0c
-#   $r4		  0x10
-#   $r5		  0x14
-#   $r6		  0x18
-#   $r7		  0x1c
-#   $r8		  0x20
-#   $r9		  0x24
-#   $r10	  0x28
-#   $r11	  0x2c
-#   $r12	  0x30
-#   $r13	  0x34
-#   $fp		  0x38
-#   $sp		  0x3c
-
-	.text
-	.global	setjmp
-	.type	setjmp,@function
+#
+# Register        jmpbuf offset
+#   $r0             0x00
+#   $r1             0x04
+#   $r2             0x08
+#   $r3             0x0c
+#   $r4             0x10
+#   $r5             0x14
+#   $r6             0x18
+#   $r7             0x1c
+#   $r8             0x20
+#   $r9             0x24
+#   $r10            0x28
+#   $r11            0x2c
+#   $r12            0x30
+#   $r13            0x34
+#   $fp             0x38
+#   $sp             0x3c
+#   stack frame fp  0x40
+#   stack frame ra  0x44
+#   stack frame sc  0x48
+       
+        .text
+        .global setjmp
+        .type   setjmp,@function
 setjmp:
 	st.l	($r0),     $r0
 	sto.l	0x04($r0), $r1
@@ -51,6 +54,13 @@ setjmp:
 	sto.l	0x34($r0), $r13
 	sto.l	0x38($r0), $sp
 	sto.l	0x3c($r0), $fp
+	ldo.l   $r1,       0x0($fp)
+	sto.l   0x40($r0), $r1
+	ldo.l   $r1,       0x04($fp)
+	sto.l   0x44($r0), $r1
+	ldo.l   $r1,       0x08($fp)
+	sto.l   0x48($r0), $r1
+	ldo.l	$r1,       0x04($r0)
 	xor	$r0, $r0
 	ret
 .Lend1:
@@ -62,7 +72,6 @@ longjmp:
 	ldi.l	$r2, 0x00
 	cmp	$r1, $r2
 	beq	.Lreturn1
-	ldo.l	$r1, 0x04($r0)
 	ldo.l	$r2, 0x08($r0)
 	ldo.l	$r3, 0x0c($r0)
 	ldo.l	$r4, 0x10($r0)
@@ -77,6 +86,13 @@ longjmp:
 	ldo.l	$r13, 0x34($r0)
 	ldo.l	$sp, 0x38($r0)
 	ldo.l	$fp, 0x3c($r0)
+	ldo.l   $r1, 0x40($r0)
+	sto.l   0x0($fp), $r1
+	ldo.l   $r1, 0x44($r0)
+	sto.l   0x4($fp), $r1
+	ldo.l   $r1, 0x48($r0)
+	sto.l   0x8($fp), $r1
+	ldo.l	$r1, 0x04($r0)
 	mov	$r0, $r1
 	ret
 .Lreturn1:
@@ -95,6 +111,13 @@ longjmp:
 	ldo.l	$r13, 0x34($r0)
 	ldo.l	$sp, 0x38($r0)
 	ldo.l	$fp, 0x3c($r0)
+	ldo.l   $r1, 0x40($r0)
+	sto.l   0x0($fp), $r1
+	ldo.l   $r1, 0x44($r0)
+	sto.l   0x4($fp), $r1
+	ldo.l   $r1, 0x48($r0)
+	sto.l   0x8($fp), $r1
+	ldo.l	$r1, 0x04($r0)
 	ldi.l	$r0, 0x01
 	ret
 .Lend2:

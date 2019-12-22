@@ -487,11 +487,11 @@ struct mallinfo nano_mallinfo(void)
 void nano_malloc_stats(void)
 {
     nano_mallinfo();
-    fiprintf(stderr, "max system bytes = %10u\n",
+    __i_fprintf(stderr, "max system bytes = %10u\n",
              current_mallinfo.arena);
-    fiprintf(stderr, "system bytes     = %10u\n",
+    __i_fprintf(stderr, "system bytes     = %10u\n",
              current_mallinfo.arena);
-    fiprintf(stderr, "in use bytes     = %10u\n",
+    __i_fprintf(stderr, "in use bytes     = %10u\n",
              current_mallinfo.uordblks);
 }
 #endif /* DEFINE_MALLOC_STATS */

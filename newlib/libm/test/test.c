@@ -21,7 +21,6 @@ main (int ac,
   int cvt = 1;
   int ieee= 1;
   int vector=0;
-bt();
   for (i = 1; i < ac; i++) 
   {
     if (strcmp(av[i],"-v")==0) 
@@ -56,7 +55,7 @@ bt();
    test_is();
 //  if (ieee)  test_ieee();
   printf("Tested %d functions, %d errors detected\n", count, inacc);
-  return 0;
+  return inacc != 0;
 }
 
 

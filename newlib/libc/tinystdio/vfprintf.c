@@ -436,6 +436,7 @@ int vfprintf (FILE * stream, const char *fmt, va_list ap)
 	    int n;
 	    uint8_t sign;		/* sign character (or 0)	*/
 	    uint8_t ndigs;		/* number of digits to convert */
+	    uint8_t ndigs_exp;		/* number of digis in exponent */
 
 	    flags &= ~FL_FLTUPP;
 
@@ -453,7 +454,7 @@ int vfprintf (FILE * stream, const char *fmt, va_list ap)
 		flags |= FL_FLTEXP;
 	    } else if (c == 'f') {
 		ndigs = DTOA_MAX_DIG;
-		ndecimal = prec;
+		ndecimal = prec + 1;
 		flags |= FL_FLTFIX;
 	    } else {
 		ndigs = prec;
@@ -466,6 +467,11 @@ int vfprintf (FILE * stream, const char *fmt, va_list ap)
 
 	    ndigs = __dtoa_engine (PRINTF_FLOAT_ARG(ap), &_dtoa, ndigs, ndecimal);
 	    exp = _dtoa.exp;
+	    ndigs_exp = 2;
+#ifndef PICOLIBC_FLOAT_PRINTF_SCANF
+	    if (exp < -99 || 99 < exp)
+		    ndigs_exp = 3;
+#endif
 
 	    sign = 0;
 	    if ((_dtoa.flags & DTOA_MINUS) && !(_dtoa.flags & DTOA_NAN))
@@ -512,9 +518,10 @@ int vfprintf (FILE * stream, const char *fmt, va_list ap)
 
 		prec = ndigs;
 
-		/* Remove trailing zeros */
-		while (ndigs > 0 && _dtoa.digits[ndigs-1] == '0')
-		    ndigs--;
+		/* Remove trailing zeros unless '#' */
+		if (!(flags & FL_ALT))
+		    while (ndigs > 0 && _dtoa.digits[ndigs-1] == '0')
+			ndigs--;
 
 		if (-4 <= exp && exp < prec)
 		{
@@ -535,7 +542,7 @@ int vfprintf (FILE * stream, const char *fmt, va_list ap)
 	    if (flags & FL_FLTFIX)
 		n = (exp>0 ? exp+1 : 1);
 	    else
-		n = 5;		/* 1e+00 */
+		n = 3 + ndigs_exp;		/* 1e+00 */
 	    if (sign)
 		n += 1;
 	    if (prec)
@@ -588,8 +595,6 @@ int vfprintf (FILE * stream, const char *fmt, va_list ap)
 		    else
 			out = '0';
 		    if (--n < -prec) {
-			if ((flags & FL_ALT) && n == -1)
-			    putc('.', stream);
 			break;
 		    }
 		    putc (out, stream);
@@ -601,7 +606,8 @@ int vfprintf (FILE * stream, const char *fmt, va_list ap)
 		    out = '1';
 		}
 		putc (out, stream);
-
+		if ((flags & FL_ALT) && n == -1)
+			putc('.', stream);
 	    } else {				/* 'e(E)' format	*/
 
 		/* mantissa	*/
@@ -624,9 +630,14 @@ int vfprintf (FILE * stream, const char *fmt, va_list ap)
 		    ndigs = '-';
 		}
 		putc (ndigs, stream);
-		for (ndigs = '0'; exp >= 10; exp -= 10)
-		    ndigs += 1;
-		putc (ndigs, stream);
+#ifndef PICOLIBC_FLOAT_PRINTF_SCANF
+		if (ndigs_exp > 2) {
+			putc(exp / 100 + '0', stream);
+			exp %= 100;
+		}
+#endif
+		putc(exp / 10 + '0', stream);
+		exp %= 10;
 		putc ('0' + exp, stream);
 	    }
 

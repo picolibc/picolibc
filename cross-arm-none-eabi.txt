@@ -4,6 +4,7 @@ ar = 'arm-none-eabi-ar'
 as = 'arm-none-eabi-as'
 ld = 'arm-none-eabi-ld'
 strip = 'arm-none-eabi-strip'
+exe_wrapper = ['sh', '-c', '$MESON_SOURCE_ROOT/run-arm "$@"', 'run-arm']
 
 [host_machine]
 system = 'none'
@@ -11,3 +12,5 @@ cpu_family = 'arm'
 cpu = 'arm'
 endian = 'little'
 
+[properties]
+needs_exe_wrapper = true

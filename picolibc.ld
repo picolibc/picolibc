@@ -130,20 +130,14 @@ SECTIONS
 		KEEP (*(.dtors))
 	} >flash AT>flash :text
 
-	.data : {
+	.data : ALIGN_WITH_INPUT {
 		PROVIDE(__data_start = .);
 		*(.data .data.*)
 		*(.gnu.linkonce.d.*)
-		. = ALIGN(8);
+ 		. = ALIGN(8);
 		PROVIDE( __global_pointer$ = . + 0x800 );
 		*(.sdata .sdata.* .sdata2.*)
 		*(.gnu.linkonce.s.*)
-		. = ALIGN(8);
-		*(.srodata.cst16)
-		*(.srodata.cst8)
-		*(.srodata.cst4)
-		*(.srodata.cst2)
-		*(.srodata .srodata.*)
 	} >ram AT>flash :ram_init
 	PROVIDE(__data_source = LOADADDR(.data));
 
@@ -159,7 +153,7 @@ SECTIONS
 		PROVIDE( __tls_base = .);
 		*(.tdata .tdata.* .gnu.linkonce.td.*)
 		PROVIDE(__data_end = .);
-	} >ram AT>flash :tls : text
+	} >ram AT>flash :tls :ram_init
 	PROVIDE( __tdata_source = LOADADDR(.tdata) );
 	PROVIDE( __tdata_size = SIZEOF(.tdata) );
 
@@ -173,7 +167,7 @@ SECTIONS
 		*(.tbss .tbss.* .gnu.linkonce.tb.*)
 		*(.tcommon)
 		PROVIDE( __tls_end = . );
-	} >ram AT>ram : tls : ram
+	} >ram AT>ram :tls :ram
 	PROVIDE( __tbss_size = SIZEOF(.tbss) );
 	PROVIDE( __tls_size = __tls_end - __tls_base );
 
@@ -188,7 +182,7 @@ SECTIONS
 	 */
 	.tbss_space : {
 		. = . + __tbss_size;
-	} >ram AT>ram : ram
+	} >ram AT>ram :ram
 
 	.bss : {
 		*(.sbss*)

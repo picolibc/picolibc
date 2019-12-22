@@ -43,6 +43,7 @@ libm_machine_dirs = {
 		      'riscv' : 'riscv',
 		      'riscv64' : 'riscv',
 		      'spu' : 'spu',
+		      'xtensa': 'xtensa',
 		    }
 
 libdirs = ['math', 'common', 'complex']

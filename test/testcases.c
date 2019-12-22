@@ -20,6 +20,7 @@
 /* XXX This code generated automatically by gen-testcases.hs
    from ../../printf-tests.txt . You probably do not want to
    manually edit this file. */
+    result |= test(0, "0", "%.7g", 0.0f);
     result |= test(1, "0.33", "%.*f", 2, 0.33333333);
     result |= test(2, "foo", "%.3s", "foobar");
     result |= test(3, "     00004", "%10.5d", 4);
@@ -88,9 +89,15 @@
     /* 73: anti-test */
     /* 74: excluded for C */
     /* 75: excluded for C */
+#ifdef PICOLIBC_FLOAT_PRINTF_SCANF
+    result |= test(76, "         +7.894561e+08", "%+#22.6e", 7.89456123e8);
+    result |= test(77, "7.894561e+08          ", "%-#22.6e", 7.89456123e8);
+    result |= test(78, "          7.894561e+08", "%#22.6e", 7.89456123e8);
+#else
     result |= test(76, "+7.894561230000000e+08", "%+#22.15e", 7.89456123e8);
     result |= test(77, "7.894561230000000e+08 ", "%-#22.15e", 7.89456123e8);
     result |= test(78, " 7.894561230000000e+08", "%#22.15e", 7.89456123e8);
+#endif
     result |= test(79, "8.e+08", "%#1.1g", 7.89456123e8);
     result |= test(81, "    +100", "%+8lld", 100LL);
     result |= test(82, "+00000100", "%+.8lld", 100LL);
@@ -411,3 +418,7 @@
     result |= test(414, "1234ABCD            ", "% -+0*.*X", 20, 5, 305441741);
     result |= test(415, "00EDCB5433          ", "% -+0*.*X", 20, 10, 3989525555U);
     result |= test(416, "hi x", "%*sx", -3, "hi");
+    result |= test(417, "1.000e-38", "%.3e", 1e-38);
+#ifndef PICOLIBC_FLOAT_PRINTF_SCANF
+    result |= test(418, "1.000e-308", "%.3e", 1e-308);
+#endif
