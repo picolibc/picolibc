@@ -89,6 +89,7 @@ int __sched_getaffinity_sys (pid_t, size_t, cpu_set_t *);
 #define CPU_XOR(dst, src1, src2)  CPU_XOR_S(sizeof (cpu_set_t), dst, src1, src2)
 #define CPU_EQUAL(src1, src2)     CPU_EQUAL_S(sizeof (cpu_set_t), src1, src2)
 
+#define CPU_SETSIZE               __CPU_SETSIZE
 #endif /* __GNU_VISIBLE */
 
 #ifdef __cplusplus
