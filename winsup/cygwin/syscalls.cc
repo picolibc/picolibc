@@ -4785,14 +4785,36 @@ fchownat (int dirfd, const char *pathname, uid_t uid, gid_t gid, int flags)
   tmp_pathbuf tp;
   __try
     {
-      if (flags & ~AT_SYMLINK_NOFOLLOW)
+      if (flags & ~(AT_SYMLINK_NOFOLLOW | AT_EMPTY_PATH))
 	{
 	  set_errno (EINVAL);
 	  __leave;
 	}
       char *path = tp.c_get ();
-      if (gen_full_path_at (path, dirfd, pathname))
-	__leave;
+      int res = gen_full_path_at (path, dirfd, pathname);
+      if (res)
+	{
+	  if (!(errno == ENOENT && (flags & AT_EMPTY_PATH)))
+	    __leave;
+	  /* pathname is an empty string.  Operate on dirfd. */
+	  if (dirfd == AT_FDCWD)
+	    {
+	      cwdstuff::cwd_lock.acquire ();
+	      strcpy (path, cygheap->cwd.get_posix ());
+	      cwdstuff::cwd_lock.release ();
+	    }
+	  else
+	    {
+	      cygheap_fdget cfd (dirfd);
+	      if (cfd < 0)
+		__leave;
+	      strcpy (path, cfd->get_name ());
+	      /* If dirfd refers to a symlink (which was necessarily
+		 opened with O_PATH | O_NOFOLLOW), we must operate
+		 directly on that symlink.. */
+	      flags = AT_SYMLINK_NOFOLLOW;
+	    }
+	}
       return chown_worker (path, (flags & AT_SYMLINK_NOFOLLOW)
 				 ? PC_SYM_NOFOLLOW : PC_SYM_FOLLOW, uid, gid);
     }
@@ -4808,14 +4830,27 @@ fstatat (int dirfd, const char *__restrict pathname, struct stat *__restrict st,
   tmp_pathbuf tp;
   __try
     {
-      if (flags & ~AT_SYMLINK_NOFOLLOW)
+      if (flags & ~(AT_SYMLINK_NOFOLLOW | AT_EMPTY_PATH))
 	{
 	  set_errno (EINVAL);
 	  __leave;
 	}
       char *path = tp.c_get ();
-      if (gen_full_path_at (path, dirfd, pathname))
-	__leave;
+      int res = gen_full_path_at (path, dirfd, pathname);
+      if (res)
+	{
+	  if (!(errno == ENOENT && (flags & AT_EMPTY_PATH)))
+	    __leave;
+	  /* pathname is an empty string.  Operate on dirfd. */
+	  if (dirfd == AT_FDCWD)
+	    {
+	      cwdstuff::cwd_lock.acquire ();
+	      strcpy (path, cygheap->cwd.get_posix ());
+	      cwdstuff::cwd_lock.release ();
+	    }
+	  else
+	    return fstat (dirfd, st);
+	}
       path_conv pc (path, ((flags & AT_SYMLINK_NOFOLLOW)
 			   ? PC_SYM_NOFOLLOW : PC_SYM_FOLLOW)
 			  | PC_POSIX | PC_KEEP_HANDLE, stat_suffixes);
