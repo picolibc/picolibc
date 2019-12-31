@@ -34,6 +34,7 @@ MESON_RISCV_FLAGS = \
 
 MESON_ARM_FLAGS = \
 	$(MESON_SHARED_FLAGS) \
+	-Dtests=true \
 	--cross-file cross-$(ARM_ARCH).txt \
 	-Dspecsdir=/usr/lib/picolibc/$(ARM_ARCH) \
 	-Dincludedir=lib/picolibc/$(ARM_ARCH)/include \
