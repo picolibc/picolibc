@@ -20,7 +20,7 @@ Our example program wants to display a string to stdout; because there
 aren't drivers for the serial ports emulated by qemu provided, the
 example uses Picolibc's semihosting support
 
-	gcc --specs=picolibc.specs --semihost
+	gcc --specs=picolibc.specs --oslib=semihost
 
 ## Target processor
 
@@ -30,12 +30,12 @@ processor with the 'imac' options (integer, multiply, atomics,
 compressed) and uses the 'ilp32' ABI (32-bit integer, long and
 pointer):
 
-	riscv64-unknown-elf-gcc --specs=picolibc.specs --semihost -march=rv32imac -mabi=ilp32
+	riscv64-unknown-elf-gcc --specs=picolibc.specs --oslib-semihost -march=rv32imac -mabi=ilp32
 
 For ARM, QEMU emulates a "mps2-an385" board which has a Cortex-M3
 processor:
 
-	arm-none-eabi-gcc --specs=picolibc.specs --semihost -mcpu=cortex-m3
+	arm-none-eabi-gcc --specs=picolibc.specs --oslib=semihost -mcpu=cortex-m3
 
 ## Target Memory Layout
 
@@ -78,9 +78,9 @@ at 0x20000000, so hello-world-arm.ld looks like this:
 The `-T` flag is used to specify the linker script in the compile
 line:
 
-	riscv64-unknown-elf-gcc --specs=picolibc.specs --semihost -march=rv32imac -mabi=ilp32 -Thello-world-riscv.ld
+	riscv64-unknown-elf-gcc --specs=picolibc.specs --oslib=semihost -march=rv32imac -mabi=ilp32 -Thello-world-riscv.ld
 
-	arm-none-eabi-gcc --specs=picolibc.specs --semihost -mcpu=cortex-m3 -Thello-world-arm.ld
+	arm-none-eabi-gcc --specs=picolibc.specs --oslib=semihost -mcpu=cortex-m3 -Thello-world-arm.ld
 
 ## Final Commands
 
@@ -88,10 +88,10 @@ The rest of the command line tells GCC what file to compile
 (hello-world.c) and where to put the output (hello-world-riscv.elf and
 hello-world-arm.elf):
 
-	riscv64-unknown-elf-gcc --specs=picolibc.specs --semihost
+	riscv64-unknown-elf-gcc --specs=picolibc.specs --oslib=semihost
 	-march=rv32imac -mabi=ilp32 -Thello-world-riscv.ld -o
 	hello-world-riscv.elf hello-world.c
 
-	arm-none-eabi-gcc --specs=picolibc.specs --semihost
+	arm-none-eabi-gcc --specs=picolibc.specs --oslib=semihost
 	-mcpu=cortex-m3 -Thello-world-arm.ld -o hello-world-arm.elf
 	hello-world.c
