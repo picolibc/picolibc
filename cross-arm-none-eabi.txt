@@ -1,10 +1,10 @@
 [binaries]
-c = 'arm-none-eabi-gcc'
+c = ['arm-none-eabi-gcc', '-nostdlib']
 ar = 'arm-none-eabi-ar'
 as = 'arm-none-eabi-as'
 ld = 'arm-none-eabi-ld'
 strip = 'arm-none-eabi-strip'
-exe_wrapper = ['sh', '-c', '$MESON_SOURCE_ROOT/run-arm "$@"', 'run-arm']
+exe_wrapper = ['sh', '-c', 'test -z "$MESON_SOURCE_ROOT" || "$MESON_SOURCE_ROOT"/run-arm "$@"', 'run-arm']
 
 [host_machine]
 system = 'none'

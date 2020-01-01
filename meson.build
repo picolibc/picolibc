@@ -40,7 +40,7 @@ project('picolibc', 'c',
 	],
 	license : 'BSD',
 	meson_version : '>= 0.50',
-	version: '1.2.1'
+	version: '1.3'
        )
 
 targets = []
@@ -253,10 +253,16 @@ conf_data.set('__OBSOLETE_MATH', obsolete_math_value, description: 'Use old math
 
 version_array = meson.project_version().split('.')
 
+if version_array.length() > 2
+  picolibc_patch_level = version_array[2]
+else
+  picolibc_patch_level = 0
+endif
+
 conf_data.set('_PICOLIBC_VERSION', '"@0@"'.format(meson.project_version()), description: 'The Picolibc version in string format.')
 conf_data.set('_PICOLIBC__', version_array[0], description: 'The Picolibc major version number.')
 conf_data.set('_PICOLIBC_MINOR__', version_array[1], description: 'The Picolibc minor version number.')
-conf_data.set('__PICOLIBC_PATCHLEVEL__', version_array[2], description: 'The Picolibc patch level.')
+conf_data.set('__PICOLIBC_PATCHLEVEL__', picolibc_patch_level, description: 'The Picolibc patch level.')
 
 conf_data.set('_NEWLIB_VERSION', '"@0@"'.format(NEWLIB_VERSION), description: 'The newlib version in string format.')
 conf_data.set('_NEWLIB__', NEWLIB_MAJOR_VERSION, description: 'The newlib major version number.')
@@ -316,7 +322,7 @@ if has_semihost
 
   # Undefine _exit as that's in libsemihost and needs to replace the weak _exit
 
-  test_link_args += test_c_args + ['-L.', '-T', test_link_path, '-Wl,--undefined=_exit']
+  test_link_args += test_c_args + ['-L.', '-L' + meson.source_root(), '-T', test_link_path, '-Wl,--undefined=_exit', '-lgcc']
 
   # Make sure all of the tests get re-linked if the linker scripts change
 

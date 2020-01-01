@@ -28,6 +28,7 @@ at this point only has code to build for the following targets:
  * RISC-V (both 32- and 64- bit)
  * x86_64 (Linux hosted, for testing)
  * PowerPC
+ * ESP8266 (xtensa-lx106-elf)
 
 Supporting architectures that already have newlib code requires:
 
@@ -66,6 +67,26 @@ areas unrelated to the code used by picolibc, so keeping things in
 sync has not been difficult so far.
 
 ## Releases
+
+### Picolibc version 1.3
+
+This release now includes tests, and fixes bugs found by them.
+
+ 1. ESP8266 support added, thanks to Jonathan McDowell.
+
+ 2. Numerous test cases from newlib have been fixed, and
+    precision requirements adjusted so that the library now
+    passes its own test suite on x86, RISC-V and ARM.
+
+ 3. String/number conversion bug fixes. This includes fcvt/ecvt/gcvt
+    shared with newlib and tinystdio printf/scanf
+
+ 4. A few RISC-V ABI fixes, including setting the TLS base correctly,
+    compiling with -mcmodel=medany, and enabling the FPU for libraries
+    built to use it.
+
+ 5. Semihosting updates, including adding unlink, kill and getpid
+    (which are used by some tests).
 
 ### Picolibc version 1.2
 
@@ -137,6 +158,7 @@ include:
 ## Documentation
 
  * [Building Picolibc](doc/build.md)
+ * [Operating System Support](doc/os.md)
  * [Using Picolibc](doc/using.md)
  * [Picolibc initialization](doc/init.md)
  * [Thread Local Storage](doc/tls.md)

@@ -16,7 +16,7 @@
 -L@LIBDIR@/%M -L@LIBDIR@ %{!T:-Tpicolibc.ld} %(picolibc_link)
 
 *lib:
---start-group -lc %{-semihost:--undefined=_exit} %{-semihost:-lsemihost} %{-dummyhost:-ldummyhost} --end-group 
+--start-group -lc %{-oslib=*:--undefined=_exit} %{-oslib=*:-l%*} --end-group 
 
 *endfile:
 
