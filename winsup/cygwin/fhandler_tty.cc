@@ -2126,15 +2126,6 @@ fhandler_pty_master::fhandler_pty_master (int unit)
   set_name ("/dev/ptmx");
 }
 
-fhandler_pty_master::~fhandler_pty_master ()
-{
-  /* Without this wait, helper process for pseudo console
-     sometimes remains running after the pty session is
-     closed. The reason is not clear. */
-  if (to_master && from_master)
-    Sleep (20);
-}
-
 int
 fhandler_pty_master::open (int flags, mode_t)
 {

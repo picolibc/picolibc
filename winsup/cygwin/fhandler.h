@@ -2218,7 +2218,6 @@ public:
   HANDLE get_echo_handle () const { return echo_r; }
   /* Constructor */
   fhandler_pty_master (int);
-  ~fhandler_pty_master ();
 
   DWORD pty_master_thread ();
   DWORD pty_master_fwd_thread ();
