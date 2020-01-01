@@ -2629,39 +2629,36 @@ fhandler_pty_slave::setup_locale (void)
   if (lcid == 0 || lcid == (LCID) -1)
     code_page = 20127; /* ASCII */
   else if (!GetLocaleInfo (lcid,
-			   LOCALE_IDEFAULTANSICODEPAGE | LOCALE_RETURN_NUMBER,
+			   LOCALE_IDEFAULTCODEPAGE | LOCALE_RETURN_NUMBER,
 			   (char *) &code_page, sizeof (code_page)))
     code_page = 20127; /* ASCII */
   SetConsoleCP (code_page);
   SetConsoleOutputCP (code_page);
 
-  if (get_ttyp ()->term_code_page == 0)
+  /* Set terminal code page from locale */
+  /* This code is borrowed from mintty: charset.c */
+  get_ttyp ()->term_code_page = 20127; /* Default ASCII */
+  char charset_u[ENCODING_LEN + 1] = {0, };
+  for (int i=0; charset[i] && i<ENCODING_LEN; i++)
+    charset_u[i] = toupper (charset[i]);
+  unsigned int iso;
+  UINT cp = 20127; /* Default for fallback */
+  if (sscanf (charset_u, "ISO-8859-%u", &iso) == 1 ||
+      sscanf (charset_u, "ISO8859-%u", &iso) == 1 ||
+      sscanf (charset_u, "ISO8859%u", &iso) == 1)
     {
-      /* Set terminal code page from locale */
-      /* This code is borrowed from mintty: charset.c */
-      get_ttyp ()->term_code_page = 20127; /* Default ASCII */
-      char charset_u[ENCODING_LEN + 1] = {0, };
-      for (int i=0; charset[i] && i<ENCODING_LEN; i++)
-	charset_u[i] = toupper (charset[i]);
-      unsigned int iso;
-      UINT cp = 20127; /* Default for fallback */
-      if (sscanf (charset_u, "ISO-8859-%u", &iso) == 1 ||
-	  sscanf (charset_u, "ISO8859-%u", &iso) == 1 ||
-	  sscanf (charset_u, "ISO8859%u", &iso) == 1)
-	{
-	  if (iso && iso <= 16 && iso !=12)
-	    get_ttyp ()->term_code_page = 28590 + iso;
-	}
-      else if (sscanf (charset_u, "CP%u", &cp) == 1)
-	get_ttyp ()->term_code_page = cp;
-      else
-	for (int i=0; cs_names[i].cp; i++)
-	  if (strcasecmp (charset_u, cs_names[i].name) == 0)
-	    {
-	      get_ttyp ()->term_code_page = cs_names[i].cp;
-	      break;
-	    }
+      if (iso && iso <= 16 && iso !=12)
+	get_ttyp ()->term_code_page = 28590 + iso;
     }
+  else if (sscanf (charset_u, "CP%u", &cp) == 1)
+    get_ttyp ()->term_code_page = cp;
+  else
+    for (int i=0; cs_names[i].cp; i++)
+      if (strcasecmp (charset_u, cs_names[i].name) == 0)
+	{
+	  get_ttyp ()->term_code_page = cs_names[i].cp;
+	  break;
+	}
 }
 
 void
@@ -2792,7 +2789,8 @@ fhandler_pty_slave::fixup_after_exec ()
     }
 
   /* Set locale */
-  setup_locale ();
+  if (get_ttyp ()->term_code_page == 0)
+    setup_locale ();
 
 #if USE_API_HOOK
   /* Hook Console API */
