@@ -137,6 +137,7 @@ include:
 ## Documentation
 
  * [Building Picolibc](doc/build.md)
+ * [Operating System Support](doc/os.md)
  * [Using Picolibc](doc/using.md)
  * [Picolibc initialization](doc/init.md)
  * [Thread Local Storage](doc/tls.md)
