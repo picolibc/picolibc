@@ -1,5 +1,5 @@
 [binaries]
-c = 'arm-none-eabi-gcc'
+c = ['arm-none-eabi-gcc', '-nostdlib']
 ar = 'arm-none-eabi-ar'
 as = 'arm-none-eabi-as'
 ld = 'arm-none-eabi-ld'
