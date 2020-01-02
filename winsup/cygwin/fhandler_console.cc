@@ -53,6 +53,9 @@ fhandler_console::console_state NO_COPY *fhandler_console::shared_console_info;
 
 bool NO_COPY fhandler_console::invisible_console;
 
+static DWORD orig_conin_mode = (DWORD) -1;
+static DWORD orig_conout_mode = (DWORD) -1;
+
 static void
 beep ()
 {
@@ -1010,6 +1013,11 @@ fhandler_console::open (int flags, mode_t)
   get_ttyp ()->rstcons (false);
   set_open_status ();
 
+  if (orig_conin_mode == (DWORD) -1)
+    GetConsoleMode (get_handle (), &orig_conin_mode);
+  if (orig_conout_mode == (DWORD) -1)
+    GetConsoleMode (get_output_handle (), &orig_conout_mode);
+
   if (getpid () == con.owner && wincap.has_con_24bit_colors ())
     {
       DWORD dwMode;
@@ -1077,6 +1085,19 @@ fhandler_console::close ()
       GetConsoleMode (get_output_handle (), &dwMode);
       dwMode &= ~ENABLE_VIRTUAL_TERMINAL_PROCESSING;
       SetConsoleMode (get_output_handle (), dwMode);
+    }
+
+  /* Restore console mode if this is the last closure. */
+  OBJECT_BASIC_INFORMATION obi;
+  NTSTATUS status;
+  status = NtQueryObject (get_handle (), ObjectBasicInformation,
+			  &obi, sizeof obi, NULL);
+  if (NT_SUCCESS (status) && obi.HandleCount == 1)
+    {
+      if (orig_conin_mode != (DWORD) -1)
+	SetConsoleMode (get_handle (), orig_conin_mode);
+      if (orig_conout_mode != (DWORD) -1)
+	SetConsoleMode (get_handle (), orig_conout_mode);
     }
 
   CloseHandle (get_handle ());
