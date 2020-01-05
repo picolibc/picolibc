@@ -850,7 +850,9 @@ fhandler_console::process_input_message (void)
       if (toadd)
 	{
 	  ssize_t ret;
+	  release_input_mutex ();
 	  line_edit_status res = line_edit (toadd, nread, *ti, &ret);
+	  acquire_input_mutex (INFINITE);
 	  if (res == line_edit_signalled)
 	    {
 	      stat = input_signalled;
