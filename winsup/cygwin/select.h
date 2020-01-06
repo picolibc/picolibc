@@ -44,6 +44,7 @@ struct select_info
 {
   cygthread *thread;
   bool stop_thread;
+  HANDLE bye;
   select_record *start;
   select_info (): thread (NULL), stop_thread (0), start (NULL) {}
 };

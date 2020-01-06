@@ -744,7 +744,7 @@ thread_pipe (void *arg)
 	  }
       if (!looping)
 	break;
-      Sleep (sleep_time >> 3);
+      cygwait (pi->bye, sleep_time >> 3);
       if (sleep_time < 80)
 	++sleep_time;
       if (pi->stop_thread)
@@ -763,6 +763,7 @@ start_thread_pipe (select_record *me, select_stuff *stuff)
     {
       pi->start = &stuff->start;
       pi->stop_thread = false;
+      pi->bye = CreateEvent (&sec_none_nih, TRUE, FALSE, NULL);
       pi->thread = new cygthread (thread_pipe, pi, "pipesel");
       me->h = *pi->thread;
       if (!me->h)
@@ -780,8 +781,10 @@ pipe_cleanup (select_record *, select_stuff *stuff)
   if (pi->thread)
     {
       pi->stop_thread = true;
+      SetEvent (pi->bye);
       pi->thread->detach ();
     }
+  CloseHandle (pi->bye);
   delete pi;
   stuff->device_specific_pipe = NULL;
 }
@@ -924,7 +927,7 @@ thread_fifo (void *arg)
 	  }
       if (!looping)
 	break;
-      Sleep (sleep_time >> 3);
+      cygwait (pi->bye, sleep_time >> 3);
       if (sleep_time < 80)
 	++sleep_time;
       if (pi->stop_thread)
@@ -943,6 +946,7 @@ start_thread_fifo (select_record *me, select_stuff *stuff)
     {
       pi->start = &stuff->start;
       pi->stop_thread = false;
+      pi->bye = CreateEvent (&sec_none_nih, TRUE, FALSE, NULL);
       pi->thread = new cygthread (thread_fifo, pi, "fifosel");
       me->h = *pi->thread;
       if (!me->h)
@@ -960,8 +964,10 @@ fifo_cleanup (select_record *, select_stuff *stuff)
   if (pi->thread)
     {
       pi->stop_thread = true;
+      SetEvent (pi->bye);
       pi->thread->detach ();
     }
+  CloseHandle (pi->bye);
   delete pi;
   stuff->device_specific_fifo = NULL;
 }
@@ -1279,7 +1285,7 @@ thread_pty_slave (void *arg)
 	  }
       if (!looping)
 	break;
-      Sleep (sleep_time >> 3);
+      cygwait (pi->bye, sleep_time >> 3);
       if (sleep_time < 80)
 	++sleep_time;
       if (pi->stop_thread)
@@ -1303,6 +1309,7 @@ pty_slave_startup (select_record *me, select_stuff *stuff)
     {
       pi->start = &stuff->start;
       pi->stop_thread = false;
+      pi->bye = CreateEvent (&sec_none_nih, TRUE, FALSE, NULL);
       pi->thread = new cygthread (thread_pty_slave, pi, "ptyssel");
       me->h = *pi->thread;
       if (!me->h)
@@ -1325,8 +1332,10 @@ pty_slave_cleanup (select_record *me, select_stuff *stuff)
   if (pi->thread)
     {
       pi->stop_thread = true;
+      SetEvent (pi->bye);
       pi->thread->detach ();
     }
+  CloseHandle (pi->bye);
   delete pi;
   stuff->device_specific_ptys = NULL;
 }
