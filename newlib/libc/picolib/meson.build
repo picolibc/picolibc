@@ -32,19 +32,33 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
-src_machine = {
+srcs_machine_tls = {
 			'riscv' : ['machine/riscv/tls.c'],
 			'riscv64' : ['machine/riscv/tls.c'],
-			'arm' : ['machine/arm/tls.c', 'machine/arm/interrupt.c']
+			'arm' : ['machine/arm/tls.c']
 		      }
 
+srcs_machine = {
+			'arm' : ['machine/arm/interrupt.c']
+		      }
+
+srcs_tls = [
+  'inittls.c'
+]
+
 srcs_picolib = [
-  'inittls.c',
   'picosbrk.c',
 ]
 
-if src_machine.has_key(host_cpu)
-  srcs_picolib += src_machine[host_cpu]
+if srcs_machine.has_key(host_cpu)
+  srcs_picolib += srcs_machine[host_cpu]
+endif
+
+if thread_local_storage
+  srcs_picolib += srcs_tls
+  if srcs_machine_tls.has_key(host_cpu)
+    srcs_picolib += srcs_machine_tls[host_cpu]
+  endif
 endif
 
 foreach target : targets
