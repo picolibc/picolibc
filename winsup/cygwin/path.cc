@@ -4307,6 +4307,8 @@ find_fast_cwd_pointer ()
   const uint8_t *use_cwd = rcall + 5 + offset;
   /* Find first `push %edi' instruction. */
   const uint8_t *pushedi = (const uint8_t *) memchr (use_cwd, 0x57, 32);
+  if (!pushedi)
+    return NULL;
   /* ...which should be followed by `mov crit-sect-addr,%edi' then
      `push %edi', or by just a single `push crit-sect-addr'. */
   const uint8_t *movedi = pushedi + 1;
