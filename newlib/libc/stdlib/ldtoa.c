@@ -2923,7 +2923,7 @@ stripspaces:
   for (_REENT_MP_RESULT_K (ptr) = 0;
        sizeof (_Bigint) - sizeof (__ULong) + j <= i; j <<= 1)
     _REENT_MP_RESULT_K (ptr)++;
-  _REENT_MP_RESULT (ptr) = Balloc (ptr, _REENT_MP_RESULT_K (ptr));
+  _REENT_MP_RESULT (ptr) = eBalloc (ptr, _REENT_MP_RESULT_K (ptr));
 
 /* Copy from internal temporary buffer to permanent buffer.  */
   outstr = (char *) _REENT_MP_RESULT (ptr);

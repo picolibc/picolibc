@@ -63,7 +63,7 @@ sum (struct _reent *p, _Bigint *a, _Bigint *b)
 	if (a->_wds < b->_wds) {
 		c = b; b = a; a = c;
 		}
-	c = Balloc(p, a->_k);
+	c = eBalloc(p, a->_k);
 	c->_wds = a->_wds;
 	carry = 0;
 	xa = a->_x;
@@ -103,7 +103,7 @@ sum (struct _reent *p, _Bigint *a, _Bigint *b)
 #endif
 	if (carry) {
 		if (c->_wds == c->_maxwds) {
-			b = Balloc(p, c->_k + 1);
+			b = eBalloc(p, c->_k + 1);
 			Bcopy(b, c);
 			Bfree(p, c);
 			c = b;
@@ -190,7 +190,7 @@ increment (struct _reent *p, _Bigint *b)
 #endif
 	{
 		if (b->_wds >= b->_maxwds) {
-			b1 = Balloc(p,b->_k+1);
+			b1 = eBalloc(p,b->_k+1);
 			Bcopy(b1,b);
 			Bfree(p,b);
 			b = b1;
@@ -253,7 +253,7 @@ set_ones (struct _reent *p, _Bigint *b, int n)
 	k = (n + ((1 << kshift) - 1)) >> kshift;
 	if (b->_k < k) {
 		Bfree(p,b);
-		b = Balloc(p,k);
+		b = eBalloc(p,k);
 		}
 	k = n >> kshift;
 	if (n &= kmask)
@@ -792,9 +792,9 @@ _strtodg_l (struct _reent *p, const char *s00, char **se, FPI *fpi, Long *exp,
 	bd0 = s2b(p, s0, nd0, nd, y);
 
 	for(;;) {
-		bd = Balloc(p,bd0->_k);
+		bd = eBalloc(p,bd0->_k);
 		Bcopy(bd, bd0);
-		bb = Balloc(p,rvb->_k);
+		bb = eBalloc(p,rvb->_k);
 		Bcopy(bb, rvb);
 		bbbits = rvbits - bb0;
 		bbe = rve + bb0;
