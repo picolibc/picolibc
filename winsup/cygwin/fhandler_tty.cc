@@ -2626,15 +2626,18 @@ fhandler_pty_slave::setup_locale (void)
   LCID lcid = get_langinfo (locale, charset);
 
   /* Set console code page form locale */
-  UINT code_page;
-  if (lcid == 0 || lcid == (LCID) -1)
-    code_page = 20127; /* ASCII */
-  else if (!GetLocaleInfo (lcid,
-			   LOCALE_IDEFAULTCODEPAGE | LOCALE_RETURN_NUMBER,
-			   (char *) &code_page, sizeof (code_page)))
-    code_page = 20127; /* ASCII */
-  SetConsoleCP (code_page);
-  SetConsoleOutputCP (code_page);
+  if (get_pseudo_console ())
+    {
+      UINT code_page;
+      if (lcid == 0 || lcid == (LCID) -1)
+	code_page = 20127; /* ASCII */
+      else if (!GetLocaleInfo (lcid,
+			       LOCALE_IDEFAULTCODEPAGE | LOCALE_RETURN_NUMBER,
+			       (char *) &code_page, sizeof (code_page)))
+	code_page = 20127; /* ASCII */
+      SetConsoleCP (code_page);
+      SetConsoleOutputCP (code_page);
+    }
 
   /* Set terminal code page from locale */
   /* This code is borrowed from mintty: charset.c */
