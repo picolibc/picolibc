@@ -66,6 +66,7 @@ struct pipe_reply {
 static int pcon_attached_to = -1;
 static bool isHybrid;
 static bool do_not_reset_switch_to_pcon;
+static bool freeconsole_on_close = true;
 
 #if USE_API_HOOK
 static void
@@ -725,7 +726,8 @@ fhandler_pty_slave::~fhandler_pty_slave ()
       if (used == 0)
 	{
 	  init_console_handler (false);
-	  FreeConsole ();
+	  if (freeconsole_on_close)
+	    FreeConsole ();
 	}
     }
 }
@@ -2661,6 +2663,12 @@ fhandler_pty_slave::setup_locale (void)
 }
 
 void
+fhandler_pty_slave::set_freeconsole_on_close (bool val)
+{
+  freeconsole_on_close = val;
+}
+
+void
 fhandler_pty_slave::fixup_after_attach (bool native_maybe, int fd_set)
 {
   if (fd < 0)
@@ -2783,7 +2791,8 @@ fhandler_pty_slave::fixup_after_exec ()
       if (used == 1 /* About to close this tty */)
 	{
 	  init_console_handler (false);
-	  FreeConsole ();
+	  if (freeconsole_on_close)
+	    FreeConsole ();
 	}
     }
 

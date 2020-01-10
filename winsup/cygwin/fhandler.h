@@ -2200,6 +2200,7 @@ class fhandler_pty_slave: public fhandler_pty_common
     return get_ttyp ()->ti.c_lflag & ICANON;
   }
   void setup_locale (void);
+  void set_freeconsole_on_close (bool val);
 };
 
 #define __ptsname(buf, unit) __small_sprintf ((buf), "/dev/pty%d", (unit))
