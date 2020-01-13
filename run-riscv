@@ -36,7 +36,7 @@ for o in $options; do
 done
 
 # Set the target machine
-machine=spike
+machine=virt,accel=tcg
 
 # Map stdio to a multiplexed character device so we can use it
 # for the monitor and semihosting output
@@ -55,4 +55,4 @@ mon=none
 
 serial=none
 
-$qemu -chardev $chardev -semihosting-config $semi -monitor $mon -serial $serial -machine $machine -cpu $cpu -kernel $elf -nographic "$@" < /dev/null
+$qemu -chardev $chardev -semihosting-config $semi -monitor $mon -serial $serial -machine $machine -cpu $cpu -kernel $elf -nographic "$@" -bios none < /dev/null

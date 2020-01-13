@@ -6,7 +6,7 @@ qemu=qemu-system-riscv32
 elf=hello-world-riscv.elf
 
 # Set the target machine
-machine=spike
+machine=virt,accel=tcg
 cpu=sifive-e31
 
 # Map stdio to a multiplexed character device so we can use it
@@ -26,4 +26,4 @@ mon=chardev=stdio0,mode=readline
 
 serial=chardev:stdio0
 
-$qemu -chardev $chardev -semihosting-config $semi -mon $mon -serial $serial -machine $machine -cpu $cpu -kernel $elf -nographic "$@"
+$qemu -chardev $chardev -semihosting-config $semi -mon $mon -serial $serial -machine $machine -cpu $cpu -kernel $elf -bios none -nographic "$@"
