@@ -1763,4 +1763,17 @@ extern "C"
     return status;
   }
 }
+
+/* This is for pseudo console workaround. ClosePseudoConsole()
+   seems to have a bug that one internal handle remains opend.
+   This causes handle leak. To close this handle, it is needed
+   to access internal of HPCON. HPCON_INTERNAL is defined for
+   this purpose. The structure of internal of HPCON is not
+   documented. Refer to: https://github.com/Biswa96/XConPty */
+typedef struct _HPCON_INTERNAL
+{
+  HANDLE hWritePipe;
+  HANDLE hConDrvReference;
+  HANDLE hConHostProcess;
+} HPCON_INTERNAL;
 #endif

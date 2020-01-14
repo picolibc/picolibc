@@ -2233,11 +2233,21 @@ fhandler_pty_master::close ()
 	  /* Terminate helper process */
 	  SetEvent (get_ttyp ()->h_helper_goodbye);
 	  WaitForSingleObject (get_ttyp ()->h_helper_process, INFINITE);
+	  CloseHandle (get_ttyp ()->h_helper_goodbye);
+	  CloseHandle (get_ttyp ()->h_helper_process);
 	  /* FIXME: Pseudo console can be accessed via its handle
 	     only in the process which created it. What else can we do? */
 	  if (master_pid_tmp == myself->pid)
-	    /* Release pseudo console */
-	    ClosePseudoConsole (get_pseudo_console ());
+	    {
+	      /* ClosePseudoConsole() seems to have a bug that one
+		 internal handle remains opened. This causes handle leak.
+		 This is a workaround for this problem. */
+	      HPCON_INTERNAL *hp = (HPCON_INTERNAL *) get_pseudo_console ();
+	      HANDLE tmp = hp->hConHostProcess;
+	      /* Release pseudo console */
+	      ClosePseudoConsole (get_pseudo_console ());
+	      CloseHandle (tmp);
+	    }
 	  get_ttyp ()->switch_to_pcon_in = false;
 	  get_ttyp ()->switch_to_pcon_out = false;
 	}
@@ -3208,6 +3218,8 @@ fhandler_pty_master::setup_pseudoconsole ()
 		  TRUE, EXTENDED_STARTUPINFO_PRESENT,
 		  NULL, NULL, &si_helper.StartupInfo, &pi_helper);
   WaitForSingleObject (hello, INFINITE);
+  CloseHandle (hello);
+  CloseHandle (pi_helper.hThread);
   /* Retrieve pseudo console handles */
   DWORD rLen;
   char buf[64];
