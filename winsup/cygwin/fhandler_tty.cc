@@ -2224,8 +2224,7 @@ fhandler_pty_master::close ()
     termios_printf ("CloseHandle (output_mutex<%p>), %E", output_mutex);
   if (!NT_SUCCESS (status))
     debug_printf ("NtQueryObject: %y", status);
-  else if (obi.HandleCount == (get_pseudo_console () ? 2 : 1))
-			      /* Helper process has inherited one. */
+  else if (obi.HandleCount == 1)
     {
       termios_printf ("Closing last master of pty%d", get_minor ());
       /* Close Pseudo Console */
@@ -3167,14 +3166,14 @@ fhandler_pty_master::setup_pseudoconsole ()
     get_ttyp ()->attach_pcon_in_fork = true;
 
   SIZE_T bytesRequired;
-  InitializeProcThreadAttributeList (NULL, 1, 0, &bytesRequired);
+  InitializeProcThreadAttributeList (NULL, 2, 0, &bytesRequired);
   STARTUPINFOEXW si_helper;
   ZeroMemory (&si_helper, sizeof (si_helper));
   si_helper.StartupInfo.cb = sizeof (STARTUPINFOEXW);
   si_helper.lpAttributeList = (PPROC_THREAD_ATTRIBUTE_LIST)
     HeapAlloc (GetProcessHeap (), 0, bytesRequired);
   InitializeProcThreadAttributeList (si_helper.lpAttributeList,
-				     1, 0, &bytesRequired);
+				     2, 0, &bytesRequired);
   UpdateProcThreadAttribute (si_helper.lpAttributeList,
 			     0,
 			     PROC_THREAD_ATTRIBUTE_PSEUDOCONSOLE,
@@ -3186,6 +3185,14 @@ fhandler_pty_master::setup_pseudoconsole ()
   /* Create a pipe for receiving pseudo console handles */
   HANDLE hr, hw;
   CreatePipe (&hr, &hw, &sec_none, 0);
+  /* Inherit only handles which are needed by helper. */
+  HANDLE handles_to_inherit[] = {hello, goodbye, hw};
+  UpdateProcThreadAttribute (si_helper.lpAttributeList,
+			     0,
+			     PROC_THREAD_ATTRIBUTE_HANDLE_LIST,
+			     handles_to_inherit,
+			     sizeof (handles_to_inherit),
+			     NULL, NULL);
   /* Create helper process */
   WCHAR cmd[MAX_PATH];
   path_conv helper ("/bin/cygwin-console-helper.exe");
