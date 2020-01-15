@@ -381,6 +381,7 @@ sub postprocess
     s/\@file\{([^\}]*)\}/F<$1>/g;
     s/\@w\{([^\}]*)\}/S<$1>/g;
     s/\@(?:dmn|math)\{([^\}]*)\}/$1/g;
+    s/\@t\{([^\}]*)\}/$1/g;
 
     # keep references of the form @ref{...}, print them bold
     s/\@(?:ref)\{([^\}]*)\}/B<$1>/g;

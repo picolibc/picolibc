@@ -1,3 +1,7 @@
+2020-01-15  Simon Marchi  <simon.marchi@polymtl.ca>
+
+	* texi2pod.pl: Handle @t{...} tags.
+
 2018-06-19  Simon Marchi  <simon.marchi@ericsson.com>
 
 	* configure.in: Remove AC_PREREQ.
