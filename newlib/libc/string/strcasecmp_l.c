@@ -36,6 +36,8 @@ QUICKREF
 	strcasecmp_l
 */
 
+#define _POSIX_C_SOURCE 200809L
+
 #include <strings.h>
 #include <ctype.h>
 

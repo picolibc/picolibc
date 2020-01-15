@@ -36,6 +36,8 @@ PORTABILITY
 <<wcsxfrm_l>> is POSIX-1.2008.
 */
 
+#define _POSIX_C_SOURCE 200809L
+
 #include <_ansi.h>
 #include <wchar.h>
 

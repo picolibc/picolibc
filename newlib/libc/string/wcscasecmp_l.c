@@ -36,6 +36,8 @@ QUICKREF
 	wcscasecmp_l 
 */
 
+#define _POSIX_C_SOURCE 200809L
+
 #include <wchar.h>
 #include <wctype.h>
 

@@ -46,6 +46,8 @@ QUICKREF
 	strxfrm_l ansi pure
 */
 
+#define _POSIX_C_SOURCE 200809L
+
 #include <string.h>
 
 size_t
