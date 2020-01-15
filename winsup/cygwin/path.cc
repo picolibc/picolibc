@@ -1411,7 +1411,7 @@ normalize_win32_path (const char *src, char *dst, char *&tail)
       && src[2] == '?' && isdirsep (src[3]))
     {
       src += 4;
-      if (isdrive (src) && isdirsep (src[2]))
+      if (isdrive (src) && (isdirsep (src[2]) || !src[2]))
 	beg_src_slash = false;
       else if (!strncmp (src, "UNC", 3) && isdirsep (src[3]))
 	/* native UNC path */
