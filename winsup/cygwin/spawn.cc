@@ -947,6 +947,15 @@ child_info_spawn::worker (const char *prog_arg, const char *const *argv,
     {
       FreeConsole ();
       AttachConsole (pid_restore);
+      cygheap_fdenum cfd (false);
+      int fd;
+      while ((fd = cfd.next ()) >= 0)
+	if (cfd->get_major () == DEV_PTYS_MAJOR)
+	  {
+	    fhandler_pty_slave *ptys =
+	      (fhandler_pty_slave *) (fhandler_base *) cfd;
+	    ptys->fixup_after_attach (false, fd);
+	  }
     }
 
   return (int) res;
