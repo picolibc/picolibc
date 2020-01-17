@@ -54,6 +54,21 @@ Allow times(2) to have a NULL argument, as on Linux.
 Improve /proc/cpuinfo output and align more closely with Linux.
 </para></listitem>
 
+<listitem><para>
+Allow symlinks to be opened with O_PATH | O_NOFOLLOW.
+</para></listitem>
+
+<listitem><para>
+Allow the pathname argument to readlinkat(2) to be an empty string,
+provided the dirfd argument refers to a symlink opened with O_PATH |
+O_NOFOLLOW.  The readlinkat call then operates on that symlink.
+</para></listitem>
+
+<listitem><para>
+Support the Linux-specific AT_EMPTY_PATH flag for fchownat(2) and
+fstatat(2).
+</para></listitem>
+
 </itemizedlist>
 
 </sect2>
