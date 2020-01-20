@@ -2,7 +2,6 @@
 c = 'xtensa-esp32-elf-gcc'
 ar = 'xtensa-esp32-elf-ar'
 as = 'xtensa-esp32-elf-as'
-ld = 'xtensa-esp32-elf-ld'
 strip = 'xtensa-esp32-elf-strip'
 
 [host_machine]

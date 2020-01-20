@@ -2,7 +2,6 @@
 c = ['xtensa-lx106-elf-gcc', '-nostdlib', '-mlongcalls']
 ar = 'xtensa-lx106-elf-ar'
 as = 'xtensa-lx106-elf-as'
-ld = 'xtensa-lx106-elf-ld'
 strip = 'xtensa-lx106-elf-strip'
 
 [host_machine]
