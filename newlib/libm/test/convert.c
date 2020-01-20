@@ -200,6 +200,7 @@ test_fcvt (void)
   char *sf;
   double v1;
   double v2;
+  int s1, s2;
   sd =  fcvt(pdd->value, pdd->f1, &a2, &a3);
 
   test_scok(sd,pdd->fstring,10);
@@ -210,8 +211,16 @@ test_fcvt (void)
   /* Test the float version by converting and inspecting the numbers 3
    after reconverting */
   sf =  fcvtf(pdd->value, pdd->f1, &a2, &a3);
-  sscanf(sd, "%lg", &v1);
-  sscanf(sf, "%lg", &v2);
+  s1 = sscanf(sd, "%lg", &v1);
+  s2 = sscanf(sf, "%lg", &v2);
+  if (strlen(sd) == 0) {
+    test_iok(EOF, s1);
+    v1 = 0.0;
+  }
+  if (strlen(sf) == 0) {
+    test_iok(EOF, s2);
+    v2 = 0.0;
+  }
   test_mok(v1, v2,30);
   test_iok(pdd->f2,a2);
   test_iok(pdd->f3,a3);
