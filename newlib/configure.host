@@ -77,7 +77,7 @@ default_newlib_io_long_double=no
 default_newlib_io_pos_args=no
 default_newlib_atexit_dynamic_alloc=yes
 default_newlib_nano_malloc=no
-default_newlib_reent_check_verify=no
+default_newlib_reent_check_verify=yes
 aext=a
 oext=o
 lpfx="lib_a-"
@@ -970,8 +970,8 @@ fi
 
 # Enable _REENT_CHECK macro memory allocation verification.
 if [ "x${newlib_reent_check_verify}" = "x" ]; then
-	if [ ${default_newlib_reent_check_verify} = "yes" ]; then
-		newlib_reent_check_verify="yes";
+	if [ ${default_newlib_reent_check_verify} = "no" ]; then
+		newlib_reent_check_verify="no";
 	fi
 fi
 
