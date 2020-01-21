@@ -40,6 +40,40 @@ frm_fp_rnd (unsigned frm)
     }
 }
 
+static fp_except
+frm_fp_except (unsigned except)
+{
+  fp_except fp = 0;
+  if (except & (1 << 0))
+    fp |= FP_X_IMP;
+  if (except & (1 << 1))
+    fp |= FP_X_UFL;
+  if (except & (1 << 2))
+    fp |= FP_X_OFL;
+  if (except & (1 << 3))
+    fp |= FP_X_DX;
+  if (except & (1 << 4))
+    fp |= FP_X_INV;
+  return fp;
+}
+
+static unsigned
+frm_except(fp_except fp)
+{
+  unsigned except = 0;
+  if (fp & FP_X_IMP)
+    except |= (1 << 0);
+  if (fp & FP_X_UFL)
+    except |= (1 << 1);
+  if (fp & FP_X_OFL)
+    except |= (1 << 2);
+  if (fp & FP_X_DX)
+    except |= (1 << 3);
+  if (fp & FP_X_INV)
+    except |= (1 << 4);
+  return except;
+}
+
 #endif /* __riscv_flen */
 
 fp_except
@@ -63,7 +97,7 @@ fp_except
 fpgetsticky(void)
 {
 #ifdef __riscv_flen
-  return frsr () & 0x1f;
+  return frm_fp_except(frsr ());
 #else
   return 0;
 #endif /* __riscv_flen */
@@ -102,8 +136,8 @@ fpsetsticky(fp_except sticky)
 {
 #ifdef __riscv_flen
   unsigned fsr = frsr ();
-  fssr (sticky & 0x1f | fsr & ~0x1f);
-  return fsr & 0x1f;
+  fssr (frm_except(sticky) | (fsr & ~0x1f));
+  return frm_fp_except(fsr);
 #else
   return -1;
 #endif /* __riscv_flen */
