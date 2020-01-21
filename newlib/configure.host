@@ -970,8 +970,8 @@ fi
 
 # Enable _REENT_CHECK macro memory allocation verification.
 if [ "x${newlib_reent_check_verify}" = "x" ]; then
-	if [ ${default_newlib_reent_check_verify} = "no" ]; then
-		newlib_reent_check_verify="no";
+	if [ ${default_newlib_reent_check_verify} = "yes" ]; then
+		newlib_reent_check_verify="yes";
 	fi
 fi
 

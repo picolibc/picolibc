@@ -67,9 +67,9 @@ AC_ARG_ENABLE(newlib-mb,
  esac], [newlib_mb=])dnl
 
 dnl Enable verification of successful memory allocation for _REENT_CHECK family of macros
-dnl Support --enable-newlib-reent-check-verify
+dnl Support --disable-newlib-reent-check-verify
 AC_ARG_ENABLE(newlib-reent-check-verify,
-[  --enable-newlib-reent-check-verify        enable checking of _REENT_CHECK memory allocation],
+[  --disable-newlib-reent-check-verify        disable checking of _REENT_CHECK memory allocation],
 [case "${enableval}" in
   yes) newlib_reent_check_verify=yes;;
   no)  newlib_reent_check_verify=no ;;

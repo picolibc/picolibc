@@ -1464,7 +1464,7 @@ Optional Features:
   --enable-newlib-io-long-long   enable long long type support in IO functions like printf/scanf
   --enable-newlib-io-long-double   enable long double type support in IO functions printf/scanf
   --enable-newlib-mb        enable multibyte support
-  --enable-newlib-reent-check-verify        enable checking of _REENT_CHECK memory allocation
+  --disable-newlib-reent-check-verify        disable checking of _REENT_CHECK memory allocation
   --enable-newlib-iconv-encodings   enable specific comma-separated list of bidirectional iconv encodings to be built-in
   --enable-newlib-iconv-from-encodings   enable specific comma-separated list of \"from\" iconv encodings to be built-in
   --enable-newlib-iconv-to-encodings   enable specific comma-separated list of \"to\" iconv encodings to be built-in
