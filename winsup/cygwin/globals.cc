@@ -71,6 +71,7 @@ bool pipe_byte;
 bool reset_com;
 bool wincmdln;
 winsym_t allow_winsymlinks = WSYM_sysfile;
+bool disable_pcon;
 
 bool NO_COPY in_forkee;
 

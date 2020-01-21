@@ -3145,6 +3145,8 @@ is_running_as_service (void)
 bool
 fhandler_pty_master::setup_pseudoconsole ()
 {
+  if (disable_pcon)
+    return false;
   /* If the legacy console mode is enabled, pseudo console seems
      not to work as expected. To determine console mode, registry
      key ForceV2 in HKEY_CURRENT_USER\Console is checked. */
