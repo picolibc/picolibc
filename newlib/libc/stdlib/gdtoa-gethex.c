@@ -128,7 +128,7 @@ increment (
 #endif
 	{
 		if (b->_wds >= b->_maxwds) {
-			b1 = Balloc(b->_k+1);
+			b1 = eBalloc(b->_k+1);
 			Bcopy(b1, b);
 			Bfree(b);
 			b = b1;
@@ -218,7 +218,7 @@ gethex (const char **sp, const FPI *fpi,
 	n = s1 - s0 - 1;
 	for(k = 0; n > 7; n >>= 1)
 		k++;
-	b = Balloc(k);
+	b = eBalloc(k);
 	x = b->_x;
 	n = 0;
 	L = 0;

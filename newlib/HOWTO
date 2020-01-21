@@ -49,7 +49,8 @@ For an example of this kind of usage, see libm/common/s_logb.c.
 
      If writing a new function that requires documentation, the required
 sections are FUNCTION, INDEX, SYNOPSIS, DESCRIPTION, RETURNS,
-and PORTABILITY.  BUGS and SEEALSO should be added as appropriate.
+and PORTABILITY.  BUGS, NOTES, SEEALSO and WARNINGS should be added as
+appropriate.
 
      Source files which contain documentation are processed into ".def"
 files with the extracted information.  These .def files are noted in the
@@ -64,7 +65,8 @@ In summary, to add new documentation:
 1.  Add properly-formatted comments to source file (e.g. src.c);
 2.  add "chewout" file to CHEWOUT_FILES list in Makefile.am (e.g. src.def),
     re-generate Makefile.in;
-3.  add file to something.tex;
+3.  @include that .def file in the appropriate .tex file, add texinfo menu
+    entries that reference the @node(s) in that .def file;
 4.  make ChangeLog entry and generate patch.
  
 EL/IX (ELIX_LEVEL_n, ELIX_n_SOURCES)
