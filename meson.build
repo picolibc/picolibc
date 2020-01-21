@@ -290,6 +290,9 @@ endif
 
 add_project_arguments(arguments, language: 'c')
 
+# libc will adjust this if supported
+has_ieeefp_funcs = false
+
 # semihost will adjust this if supported
 has_semihost = false
 
@@ -336,6 +339,8 @@ subdir('newlib')
 if enable_tests
   subdir('test')
 endif
+
+conf_data.set('HAVE_IEEEFP_FUNCS', has_ieeefp_funcs, description: 'IEEE fp funcs available')
 
 configure_file(output : 'picolibc.h',
 	       configuration: conf_data,

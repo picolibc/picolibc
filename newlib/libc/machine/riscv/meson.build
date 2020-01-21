@@ -46,6 +46,8 @@ srcs_machine = [
   'strlen.c',
 ]
 
+has_ieeefp_funcs = true
+
 subdir('sys')
 
 foreach target : targets
