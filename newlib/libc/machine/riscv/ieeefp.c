@@ -142,3 +142,13 @@ fpsetsticky(fp_except sticky)
   return -1;
 #endif /* __riscv_flen */
 }
+
+fp_rdi fpgetroundtoi (void)
+{
+  return 0;
+}
+
+fp_rdi fpsetroundtoi (fp_rdi rdi)
+{
+  return -1;
+}
