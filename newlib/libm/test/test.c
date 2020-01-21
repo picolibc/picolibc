@@ -19,7 +19,9 @@ main (int ac,
   int is = 1;
   int math= 1;
   int cvt = 1;
+#ifdef HAVE_IEEEFP_FUNCS
   int ieee= 1;
+#endif
   int vector=0;
   for (i = 1; i < ac; i++) 
   {
@@ -35,8 +37,10 @@ main (int ac,
      math= 0;
     if (strcmp(av[i],"-nocvt") == 0)
      cvt = 0;
+#ifdef HAVE_IEEEFP_FUNCS
     if (strcmp(av[i],"-noiee") == 0)
      ieee= 0;
+#endif
     if (strcmp(av[i],"-generate") == 0) {
      vector = 1;
      calc = 1;
@@ -53,7 +57,10 @@ main (int ac,
    test_math(vector);
   if (is)
    test_is();
-//  if (ieee)  test_ieee();
+#ifdef HAVE_IEEEFP_FUNCS
+  if (ieee)
+   test_ieee();
+#endif
   printf("Tested %d functions, %d errors detected\n", count, inacc);
   return inacc != 0;
 }
