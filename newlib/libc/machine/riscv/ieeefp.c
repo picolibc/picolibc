@@ -15,14 +15,14 @@
 static void
 fssr(unsigned value)
 {
-  asm volatile ("fssr %0" :: "r"(value));
+  asm volatile ("fscsr %0" :: "r"(value));
 }
 
 static unsigned
 frsr()
 {
   unsigned value;
-  asm volatile ("frsr %0" : "=r" (value));
+  asm volatile ("frcsr %0" : "=r" (value));
   return value;
 }
 
