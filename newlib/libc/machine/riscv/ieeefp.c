@@ -84,10 +84,10 @@ fpsetround(fp_rnd rnd_dir)
   unsigned new_rm;
   switch (rnd_dir)
     {
-    case FP_RN: new_rm = 0;
-    case FP_RZ: new_rm = 1;
-    case FP_RM: new_rm = 2;
-    case FP_RP: new_rm = 3;
+    case FP_RN: new_rm = 0; break;
+    case FP_RZ: new_rm = 1; break;
+    case FP_RM: new_rm = 2; break;
+    case FP_RP: new_rm = 3; break;
     default:    return -1;
     }
   fssr (new_rm << 5 | fsr & 0x1f);
