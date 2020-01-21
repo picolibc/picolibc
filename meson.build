@@ -191,9 +191,9 @@ endif
 
 conf_data = configuration_data()
 
-NEWLIB_VERSION='2.10.0'
-NEWLIB_MAJOR_VERSION=2
-NEWLIB_MINOR_VERSION=10
+NEWLIB_VERSION='3.2.0'
+NEWLIB_MAJOR_VERSION=3
+NEWLIB_MINOR_VERSION=2
 NEWLIB_PATCHLEVEL_VERSION=0
 
 have_cc_inhibit_loop_to_libcall=meson.get_compiler('c').has_argument('-fno-tree-loop-distribute-patterns')
