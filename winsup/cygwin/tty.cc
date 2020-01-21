@@ -245,6 +245,7 @@ tty::init ()
   num_pcon_attached_slaves = 0;
   term_code_page = 0;
   need_redraw_screen = false;
+  fwd_done = NULL;
 }
 
 HANDLE

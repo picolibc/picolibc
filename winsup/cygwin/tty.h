@@ -106,6 +106,7 @@ private:
   int num_pcon_attached_slaves;
   UINT term_code_page;
   bool need_redraw_screen;
+  HANDLE fwd_done;
 
 public:
   HANDLE from_master () const { return _from_master; }

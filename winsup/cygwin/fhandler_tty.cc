@@ -648,7 +648,7 @@ fhandler_pty_master::process_slave_output (char *buf, size_t len, int pktmode_on
       /* If echo pipe has data (something has been typed or pasted), prefer
          it over slave output. */
       if (echo_cnt > 0)
-      	{
+	{
 	  if (!ReadFile (echo_r, outbuf, rlen, &n, NULL))
 	    {
 	      termios_printf ("ReadFile on echo pipe failed, %E");
@@ -1109,7 +1109,7 @@ skip_console_setting:
     }
   else if ((fd == 1 || fd == 2) && !get_ttyp ()->switch_to_pcon_out)
     {
-      Sleep (20);
+      cygwait (get_ttyp ()->fwd_done, INFINITE);
       if (get_ttyp ()->pcon_pid == 0 ||
 	  kill (get_ttyp ()->pcon_pid, 0) != 0)
 	get_ttyp ()->pcon_pid = myself->pid;
@@ -1151,7 +1151,8 @@ fhandler_pty_slave::reset_switch_to_pcon (void)
       SetConsoleMode (get_handle (), mode & ~ENABLE_ECHO_INPUT);
     }
   if (get_ttyp ()->switch_to_pcon_out)
-    Sleep (20); /* Wait for pty_master_fwd_thread() */
+    /* Wait for pty_master_fwd_thread() */
+    cygwait (get_ttyp ()->fwd_done, INFINITE);
   get_ttyp ()->pcon_pid = 0;
   get_ttyp ()->switch_to_pcon_in = false;
   get_ttyp ()->switch_to_pcon_out = false;
@@ -2202,6 +2203,8 @@ fhandler_pty_master::close ()
 	    }
 	  release_output_mutex ();
 	  master_fwd_thread->terminate_thread ();
+	  CloseHandle (get_ttyp ()->fwd_done);
+	  get_ttyp ()->fwd_done = NULL;
 	}
     }
 
@@ -2718,7 +2721,7 @@ fhandler_pty_slave::fixup_after_attach (bool native_maybe, int fd_set)
 	      DWORD mode = ENABLE_PROCESSED_OUTPUT | ENABLE_WRAP_AT_EOL_OUTPUT;
 	      SetConsoleMode (get_output_handle (), mode);
 	      if (!get_ttyp ()->switch_to_pcon_out)
-		Sleep (20);
+		cygwait (get_ttyp ()->fwd_done, INFINITE);
 	      if (get_ttyp ()->pcon_pid == 0 ||
 		  kill (get_ttyp ()->pcon_pid, 0) != 0)
 		get_ttyp ()->pcon_pid = myself->pid;
@@ -3000,11 +3003,14 @@ fhandler_pty_master::pty_master_fwd_thread ()
   termios_printf ("Started.");
   for (;;)
     {
+      if (::bytes_available (rlen, from_slave) && rlen == 0)
+	SetEvent (get_ttyp ()->fwd_done);
       if (!ReadFile (from_slave, outbuf, sizeof outbuf, &rlen, NULL))
 	{
 	  termios_printf ("ReadFile for forwarding failed, %E");
 	  break;
 	}
+      ResetEvent (get_ttyp ()->fwd_done);
       ssize_t wlen = rlen;
       char *ptr = outbuf;
       if (get_pseudo_console ())
@@ -3365,6 +3371,7 @@ fhandler_pty_master::setup ()
       errstr = "pty master forwarding thread";
       goto err;
     }
+  get_ttyp ()->fwd_done = CreateEvent (&sec_none, true, false, NULL);
 
   setup_pseudoconsole ();
 
