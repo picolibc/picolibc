@@ -1273,9 +1273,21 @@ fhandler_pty_slave::push_to_pcon_screenbuffer (const char *ptr, size_t len)
 	break;
     }
 
+  int retry_count;
+  retry_count = 0;
   DWORD dwMode, flags;
   flags = ENABLE_VIRTUAL_TERMINAL_PROCESSING;
-  GetConsoleMode (get_output_handle (), &dwMode);
+  while (!GetConsoleMode (get_output_handle (), &dwMode))
+    {
+      termios_printf ("GetConsoleMode failed, %E");
+      /* Re-open handles */
+      this->close ();
+      this->open (0, 0);
+      /* Fix pseudo console window size */
+      this->ioctl (TIOCSWINSZ, &get_ttyp ()->winsize);
+      if (++retry_count > 3)
+	goto cleanup;
+    }
   if (!(get_ttyp ()->ti.c_oflag & OPOST) ||
       !(get_ttyp ()->ti.c_oflag & ONLCR))
     flags |= DISABLE_NEWLINE_AUTO_RETURN;
@@ -1284,8 +1296,6 @@ fhandler_pty_slave::push_to_pcon_screenbuffer (const char *ptr, size_t len)
   p = buf;
   DWORD wLen, written;
   written = 0;
-  int retry_count;
-  retry_count = 0;
   BOOL (WINAPI *WriteFunc)
     (HANDLE, LPCVOID, DWORD, LPDWORD, LPOVERLAPPED);
   WriteFunc = WriteFile_Orig ? WriteFile_Orig : WriteFile;
@@ -1294,16 +1304,13 @@ fhandler_pty_slave::push_to_pcon_screenbuffer (const char *ptr, size_t len)
       if (!WriteFunc (get_output_handle (), p, nlen - written, &wLen, NULL))
 	{
 	  termios_printf ("WriteFile failed, %E");
-	  this->open (0, 0); /* Re-open handles */
-	  /* Fix pseudo console window size */
-	  struct winsize win;
-	  this->ioctl (TIOCGWINSZ, &win);
-	  this->ioctl (TIOCSWINSZ, &win);
-	  if (++retry_count > 3)
-	    break;
+	  break;
 	}
-      written += wLen;
-      p += wLen;
+      else
+	{
+	  written += wLen;
+	  p += wLen;
+	}
     }
   /* Detach from pseudo console and resume. */
   flags = ENABLE_VIRTUAL_TERMINAL_PROCESSING;
