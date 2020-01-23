@@ -997,7 +997,7 @@ fhandler_fifo::close ()
 int
 fhandler_fifo::fcntl (int cmd, intptr_t arg)
 {
-  if (cmd != F_SETFL || nohandle ())
+  if (cmd != F_SETFL || nohandle () || (get_flags () & O_PATH))
     return fhandler_base::fcntl (cmd, arg);
 
   const bool was_nonblocking = is_nonblocking ();
@@ -1013,6 +1013,9 @@ fhandler_fifo::dup (fhandler_base *child, int flags)
 {
   int ret = -1;
   fhandler_fifo *fhf = NULL;
+
+  if (get_flags () & O_PATH)
+    return fhandler_base::dup (child, flags);
 
   if (fhandler_base::dup (child, flags))
     goto out;
