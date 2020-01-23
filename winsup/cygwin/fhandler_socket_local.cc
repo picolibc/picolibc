@@ -634,6 +634,26 @@ fhandler_socket_local::dup (fhandler_base *child, int flags)
   return fhandler_socket_wsock::dup (child, flags);
 }
 
+int
+fhandler_socket_local::open (int flags, mode_t mode)
+{
+  /* We don't support opening sockets unless O_PATH is specified. */
+  if (flags & O_PATH)
+    return open_fs (flags, mode);
+
+  set_errno (EOPNOTSUPP);
+  return 0;
+}
+
+int
+fhandler_socket_local::close ()
+{
+  if (get_flags () & O_PATH)
+    return fhandler_base::close ();
+  else
+    return fhandler_socket_wsock::close ();
+}
+
 int __reg2
 fhandler_socket_local::fstat (struct stat *buf)
 {

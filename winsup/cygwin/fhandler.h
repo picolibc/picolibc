@@ -834,6 +834,8 @@ class fhandler_socket_local: public fhandler_socket_wsock
   int getsockopt (int level, int optname, const void *optval,
 		  __socklen_t *optlen);
 
+  int open (int flags, mode_t mode = 0);
+  int close ();
   int __reg2 fstat (struct stat *buf);
   int __reg2 fstatvfs (struct statvfs *buf);
   int __reg1 fchmod (mode_t newmode);
