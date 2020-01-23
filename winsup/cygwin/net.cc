@@ -65,8 +65,11 @@ get (const int fd)
 
   fhandler_socket *const fh = cfd->is_socket ();
 
-  if (!fh)
-    set_errno (ENOTSOCK);
+  if (!fh || (fh->get_flags () & O_PATH))
+    {
+      set_errno (ENOTSOCK);
+      return NULL;
+    }
 
   return fh;
 }
@@ -641,9 +644,17 @@ extern "C" int
 sockatmark (int fd)
 {
   int ret;
+  cygheap_fdget cfd (fd);
 
-  fhandler_socket *fh = get (fd);
-  if (fh && fh->ioctl (SIOCATMARK, &ret) != -1)
+  if (cfd < 0)
+    return -1;
+
+  fhandler_socket *const fh = cfd->is_socket ();
+  if (!fh)
+    set_errno (ENOTSOCK);
+  else if (fh->get_flags () & O_PATH)
+    set_errno (EBADF);
+  else if (fh->ioctl (SIOCATMARK, &ret) != -1)
     return ret;
   return -1;
 }
