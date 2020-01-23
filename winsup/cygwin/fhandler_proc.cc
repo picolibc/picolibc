@@ -1255,6 +1255,7 @@ format_proc_cpuinfo (void *, char *&destbuf)
 	  ftcprint (features1,  0, "clzero");	    /* clzero instruction */
 	  ftcprint (features1,  1, "irperf");       /* instr retired count */
 	  ftcprint (features1,  2, "xsaveerptr");   /* save/rest FP err ptrs */
+	  ftcprint (features1,  4, "rdpru");	    /* user level rd proc reg */
 /*	  ftcprint (features1,  6, "mba"); */	    /* memory BW alloc */
 	  ftcprint (features1,  9, "wbnoinvd");     /* wbnoinvd instruction */
 /*	  ftcprint (features1, 12, "ibpb" ); */	    /* ind br pred barrier */
