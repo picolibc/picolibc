@@ -1281,7 +1281,6 @@ fhandler_pty_slave::push_to_pcon_screenbuffer (const char *ptr, size_t len)
     {
       termios_printf ("GetConsoleMode failed, %E");
       /* Re-open handles */
-      this->close ();
       this->open (0, 0);
       /* Fix pseudo console window size */
       this->ioctl (TIOCSWINSZ, &get_ttyp ()->winsize);
