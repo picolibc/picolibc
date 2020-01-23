@@ -335,6 +335,9 @@ fhandler_base::device_access_denied (int flags)
 {
   int mode = 0;
 
+  if (flags & O_PATH)
+    return false;
+
   if (flags & O_RDWR)
     mode |= R_OK | W_OK;
   if (flags & (O_WRONLY | O_APPEND))
