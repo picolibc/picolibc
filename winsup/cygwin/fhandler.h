@@ -392,6 +392,7 @@ private:
   int __reg2 fstat_by_name (struct stat *buf);
 public:
   virtual int __reg2 fstatvfs (struct statvfs *buf);
+  int __reg2 fstatvfs_by_handle (HANDLE h, struct statvfs *buf);
   int __reg2 utimens_fs (const struct timespec *);
   virtual int __reg1 fchmod (mode_t mode);
   virtual int __reg2 fchown (uid_t uid, gid_t gid);

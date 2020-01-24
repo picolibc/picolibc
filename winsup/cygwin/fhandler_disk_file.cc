@@ -600,9 +600,7 @@ int __reg2
 fhandler_disk_file::fstatvfs (struct statvfs *sfs)
 {
   int ret = -1, opened = 0;
-  NTSTATUS status;
   IO_STATUS_BLOCK io;
-  FILE_FS_FULL_SIZE_INFORMATION full_fsi;
   /* We must not use the stat handle here, even if it exists.  The handle
      has been opened with FILE_OPEN_REPARSE_POINT, thus, in case of a volume
      mount point, it points to the FS of the mount point, rather than to the
@@ -629,6 +627,22 @@ fhandler_disk_file::fstatvfs (struct statvfs *sfs)
 	    goto out;
 	}
     }
+
+  ret = fstatvfs_by_handle (fh, sfs);
+out:
+  if (opened)
+    NtClose (fh);
+  syscall_printf ("%d = fstatvfs(%s, %p)", ret, get_name (), sfs);
+  return ret;
+}
+
+int __reg2
+fhandler_base::fstatvfs_by_handle (HANDLE fh, struct statvfs *sfs)
+{
+  int ret = -1;
+  NTSTATUS status;
+  IO_STATUS_BLOCK io;
+  FILE_FS_FULL_SIZE_INFORMATION full_fsi;
 
   sfs->f_files = ULONG_MAX;
   sfs->f_ffree = ULONG_MAX;
@@ -688,10 +702,6 @@ fhandler_disk_file::fstatvfs (struct statvfs *sfs)
     debug_printf ("%y = NtQueryVolumeInformationFile"
 		  "(%S, FileFsFullSizeInformation)", 
 		  status, pc.get_nt_native_path ());
-out:
-  if (opened)
-    NtClose (fh);
-  syscall_printf ("%d = fstatvfs(%s, %p)", ret, get_name (), sfs);
   return ret;
 }
 
