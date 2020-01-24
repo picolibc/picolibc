@@ -359,7 +359,7 @@ fhandler_base::fstat_fs (struct stat *buf)
 
   if (get_stat_handle ())
     {
-      if (!nohandle () && !is_fs_special ())
+      if (!nohandle () && (!is_fs_special () || get_flags () & O_PATH))
 	res = pc.fs_is_nfs () ? fstat_by_nfs_ea (buf) : fstat_by_handle (buf);
       if (res)
 	res = fstat_by_name (buf);
