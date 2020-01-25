@@ -628,6 +628,11 @@ fhandler_socket_local::af_local_set_secret (char *buf)
 int
 fhandler_socket_local::dup (fhandler_base *child, int flags)
 {
+  if (get_flags () & O_PATH)
+    /* We're viewing the socket as a disk file, but fhandler_base::dup
+       suffices here. */
+    return fhandler_base::dup (child, flags);
+
   fhandler_socket_local *fhs = (fhandler_socket_local *) child;
   fhs->set_sun_path (get_sun_path ());
   fhs->set_peer_sun_path (get_peer_sun_path ());
@@ -652,6 +657,17 @@ fhandler_socket_local::close ()
     return fhandler_base::close ();
   else
     return fhandler_socket_wsock::close ();
+}
+
+int
+fhandler_socket_local::fcntl (int cmd, intptr_t arg)
+{
+  if (get_flags () & O_PATH)
+    /* We're viewing the socket as a disk file, but
+       fhandler_base::fcntl suffices here. */
+    return fhandler_base::fcntl (cmd, arg);
+  else
+    return fhandler_socket_wsock::fcntl (cmd, arg);
 }
 
 int __reg2
