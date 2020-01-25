@@ -675,6 +675,13 @@ fhandler_socket_local::fstatvfs (struct statvfs *sfs)
 {
   if (get_sun_path () && get_sun_path ()[0] == '\0')
     return fhandler_socket_wsock::fstatvfs (sfs);
+  if (get_flags () & O_PATH)
+    /* We already have a handle. */
+    {
+      HANDLE h = get_handle ();
+      if (h)
+	return fstatvfs_by_handle (h, sfs);
+    }
   fhandler_disk_file fh (pc);
   fh.get_device () = FH_FS;
   return fh.fstatvfs (sfs);
