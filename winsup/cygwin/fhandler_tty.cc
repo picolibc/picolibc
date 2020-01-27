@@ -525,7 +525,7 @@ fhandler_pty_master::accept_input ()
     }
   else
     {
-      char *p = rabuf;
+      char *p = rabuf ();
       DWORD rc;
       DWORD written = 0;
 

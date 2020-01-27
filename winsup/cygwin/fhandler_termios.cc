@@ -265,25 +265,26 @@ fhandler_termios::bg_check (int sig, bool dontsignal)
 int
 fhandler_termios::eat_readahead (int n)
 {
-  int oralen = ralen;
+  int oralen = ralen ();
   if (n < 0)
-    n = ralen;
-  if (n > 0 && ralen > 0)
+    n = ralen ();
+  if (n > 0 && ralen () > 0)
     {
-      if ((int) (ralen -= n) < 0)
-	ralen = 0;
+      if ((int) (ralen () -= n) < 0)
+	ralen () = 0;
       /* If IUTF8 is set, the terminal is in UTF-8 mode.  If so, we erase
 	 a complete UTF-8 multibyte sequence on VERASE/VWERASE.  Otherwise,
 	 if we only erase a single byte, invalid unicode chars are left in
 	 the input. */
       if (tc ()->ti.c_iflag & IUTF8)
-	while (ralen > 0 && ((unsigned char) rabuf[ralen] & 0xc0) == 0x80)
-	  --ralen;
+	while (ralen () > 0 &&
+	       ((unsigned char) rabuf ()[ralen ()] & 0xc0) == 0x80)
+	  --ralen ();
 
-      if (raixget >= ralen)
-	raixget = raixput = ralen = 0;
-      else if (raixput > ralen)
-	raixput = ralen;
+      if (raixget () >= ralen ())
+	raixget () = raixput () = ralen () = 0;
+      else if (raixput () > ralen ())
+	raixput () = ralen ();
     }
 
   return oralen;
@@ -411,7 +412,7 @@ fhandler_termios::line_edit (const char *rptr, size_t nread, termios& ti,
 	  if (ti.c_lflag & ECHO)
 	    {
 	      doecho ("\n\r", 2);
-	      doecho (rabuf, ralen);
+	      doecho (rabuf (), ralen ());
 	    }
 	  continue;
 	}
@@ -438,13 +439,13 @@ fhandler_termios::line_edit (const char *rptr, size_t nread, termios& ti,
 	doecho (&c, 1);
       /* Write in chunks of 32 bytes to reduce the number of WriteFile calls
       	in non-canonical mode. */
-      if ((!iscanon && ralen >= 32) || input_done)
+      if ((!iscanon && ralen () >= 32) || input_done)
 	{
 	  int status = accept_input ();
 	  if (status != 1)
 	    {
 	      ret = status ? line_edit_error : line_edit_pipe_full;
-	      nread += ralen;
+	      nread += ralen ();
 	      break;
 	    }
 	  ret = line_edit_input_done;
@@ -453,14 +454,14 @@ fhandler_termios::line_edit (const char *rptr, size_t nread, termios& ti,
     }
 
   /* If we didn't write all bytes in non-canonical mode, write them now. */
-  if (!iscanon && ralen > 0
+  if (!iscanon && ralen () > 0
       && (ret == line_edit_ok || ret == line_edit_input_done))
     {
       int status = accept_input ();
       if (status != 1)
 	{
 	  ret = status ? line_edit_error : line_edit_pipe_full;
-	  nread += ralen;
+	  nread += ralen ();
 	}
       else
 	ret = line_edit_input_done;

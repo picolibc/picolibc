@@ -202,16 +202,21 @@ class fhandler_base
 
   ino_t ino;	/* file ID or hashed filename, depends on FS. */
   LONG _refcnt;
+ public:
+  struct rabuf_t
+  {
+    char *rabuf;		/* used for crlf conversion in text files */
+    size_t ralen;
+    size_t raixget;
+    size_t raixput;
+    size_t rabuflen;
+  };
 
  protected:
   /* File open flags from open () and fcntl () calls */
   int openflags;
 
-  char *rabuf;		/* used for crlf conversion in text files */
-  size_t ralen;
-  size_t raixget;
-  size_t raixput;
-  size_t rabuflen;
+  struct rabuf_t ra;
 
   /* Used for advisory file locking.  See flock.cc.  */
   int64_t unique_id;
@@ -315,7 +320,13 @@ class fhandler_base
     ReleaseSemaphore (read_state, n, NULL);
   }
 
-  bool get_readahead_valid () { return raixget < ralen; }
+  virtual char *&rabuf () { return ra.rabuf; };
+  virtual size_t &ralen () { return ra.ralen; };
+  virtual size_t &raixget () { return ra.raixget; };
+  virtual size_t &raixput () { return ra.raixput; };
+  virtual size_t &rabuflen () { return ra.rabuflen; };
+
+  bool get_readahead_valid () { return raixget () < ralen (); }
   int puts_readahead (const char *s, size_t len = (size_t) -1);
   int put_readahead (char value);
 
@@ -464,8 +475,8 @@ public:
   virtual bg_check_types bg_check (int, bool = false) {return bg_ok;}
   virtual void clear_readahead ()
   {
-    raixput = raixget = ralen = rabuflen = 0;
-    rabuf = NULL;
+    raixput () = raixget () = ralen () = rabuflen () = 0;
+    rabuf () = NULL;
   }
   void operator delete (void *p) {cfree (p);}
   virtual void set_eof () {}
@@ -2050,6 +2061,12 @@ private:
   void __release_input_mutex (const char *fn, int ln);
   DWORD __acquire_output_mutex (const char *fn, int ln, DWORD ms);
   void __release_output_mutex (const char *fn, int ln);
+
+  char *&rabuf ();
+  size_t &ralen ();
+  size_t &raixget ();
+  size_t &raixput ();
+  size_t &rabuflen ();
 
   friend tty_min * tty_list::get_cttyp ();
 };

@@ -44,11 +44,11 @@ void
 fhandler_base::reset (const fhandler_base *from)
 {
   pc << from->pc;
-  rabuf = NULL;
-  ralen = 0;
-  raixget = 0;
-  raixput = 0;
-  rabuflen = 0;
+  ra.rabuf = NULL;
+  ra.ralen = 0;
+  ra.raixget = 0;
+  ra.raixput = 0;
+  ra.rabuflen = 0;
   _refcnt = 0;
 }
 
@@ -66,15 +66,15 @@ int
 fhandler_base::put_readahead (char value)
 {
   char *newrabuf;
-  if (raixput < rabuflen)
+  if (raixput () < rabuflen ())
     /* Nothing to do */;
-  else if ((newrabuf = (char *) realloc (rabuf, rabuflen += 32)))
-    rabuf = newrabuf;
+  else if ((newrabuf = (char *) realloc (rabuf (), rabuflen () += 32)))
+    rabuf () = newrabuf;
   else
     return 0;
 
-  rabuf[raixput++] = value;
-  ralen++;
+  rabuf ()[raixput ()++] = value;
+  ralen ()++;
   return 1;
 }
 
@@ -82,11 +82,11 @@ int
 fhandler_base::get_readahead ()
 {
   int chret = -1;
-  if (raixget < ralen)
-    chret = ((unsigned char) rabuf[raixget++]) & 0xff;
+  if (raixget () < ralen ())
+    chret = ((unsigned char) rabuf ()[raixget ()++]) & 0xff;
   /* FIXME - not thread safe */
-  if (raixget >= ralen)
-    raixget = raixput = ralen = 0;
+  if (raixget () >= ralen ())
+    raixget () = raixput () = ralen () = 0;
   return chret;
 }
 
@@ -94,10 +94,10 @@ int
 fhandler_base::peek_readahead (int queryput)
 {
   int chret = -1;
-  if (!queryput && raixget < ralen)
-    chret = ((unsigned char) rabuf[raixget]) & 0xff;
-  else if (queryput && raixput > 0)
-    chret = ((unsigned char) rabuf[raixput - 1]) & 0xff;
+  if (!queryput && raixget () < ralen ())
+    chret = ((unsigned char) rabuf ()[raixget ()]) & 0xff;
+  else if (queryput && raixput () > 0)
+    chret = ((unsigned char) rabuf ()[raixput () - 1]) & 0xff;
   return chret;
 }
 
@@ -105,7 +105,7 @@ void
 fhandler_base::set_readahead_valid (int val, int ch)
 {
   if (!val)
-    ralen = raixget = raixput = 0;
+    ralen () = raixget () = raixput () = 0;
   if (ch != -1)
     put_readahead (ch);
 }
@@ -1092,7 +1092,7 @@ fhandler_base::lseek (off_t offset, int whence)
   if (whence != SEEK_CUR || offset != 0)
     {
       if (whence == SEEK_CUR)
-	offset -= ralen - raixget;
+	offset -= ralen () - raixget ();
       set_readahead_valid (0);
     }
 
@@ -1142,7 +1142,7 @@ fhandler_base::lseek (off_t offset, int whence)
      readahead that we have to take into account when calculating
      the actual position for the application.  */
   if (whence == SEEK_CUR)
-    res -= ralen - raixget;
+    res -= ralen () - raixget ();
 
   return res;
 }
@@ -1565,23 +1565,23 @@ fhandler_base::fhandler_base () :
   ino (0),
   _refcnt (0),
   openflags (0),
-  rabuf (NULL),
-  ralen (0),
-  raixget (0),
-  raixput (0),
-  rabuflen (0),
   unique_id (0),
   archetype (NULL),
   usecount (0)
 {
+  ra.rabuf = NULL;
+  ra.ralen = 0;
+  ra.raixget = 0;
+  ra.raixput = 0;
+  ra.rabuflen = 0;
   isclosed (false);
 }
 
 /* Normal I/O destructor */
 fhandler_base::~fhandler_base ()
 {
-  if (rabuf)
-    free (rabuf);
+  if (ra.rabuf)
+    free (ra.rabuf);
 }
 
 /**********************************************************************/

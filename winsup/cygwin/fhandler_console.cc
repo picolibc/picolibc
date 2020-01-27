@@ -56,6 +56,10 @@ bool NO_COPY fhandler_console::invisible_console;
 static DWORD orig_conin_mode = (DWORD) -1;
 static DWORD orig_conout_mode = (DWORD) -1;
 
+/* con_ra is shared in the same process.
+   Only one console can exist in a process, therefore, static is suitable. */
+static struct fhandler_base::rabuf_t con_ra;
+
 static void
 beep ()
 {
@@ -212,6 +216,36 @@ fhandler_console::setup ()
       con.cons_rapoi = NULL;
       shared_console_info->tty_min_state.is_console = true;
     }
+}
+
+char *&
+fhandler_console::rabuf ()
+{
+  return con_ra.rabuf;
+}
+
+size_t &
+fhandler_console::ralen ()
+{
+  return con_ra.ralen;
+}
+
+size_t &
+fhandler_console::raixget ()
+{
+  return con_ra.raixget;
+}
+
+size_t &
+fhandler_console::raixput ()
+{
+  return con_ra.raixput;
+}
+
+size_t &
+fhandler_console::rabuflen ()
+{
+  return con_ra.rabuflen;
 }
 
 /* Return the tty structure associated with a given tty number.  If the
@@ -454,7 +488,7 @@ fhandler_console::read (void *pv, size_t& buflen)
   copied_chars +=
     get_readahead_into_buffer (buf + copied_chars, buflen);
 
-  if (!ralen)
+  if (!con_ra.ralen)
     input_ready = false;
   release_input_mutex ();
 
@@ -1102,6 +1136,9 @@ fhandler_console::close ()
 
   CloseHandle (get_handle ());
   CloseHandle (get_output_handle ());
+
+  if (con_ra.rabuf)
+    free (con_ra.rabuf);
 
   /* If already attached to pseudo console, don't call free_console () */
   cygheap_fdenum cfd (false);
