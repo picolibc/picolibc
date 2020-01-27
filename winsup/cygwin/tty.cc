@@ -246,6 +246,7 @@ tty::init ()
   term_code_page = 0;
   need_redraw_screen = false;
   fwd_done = NULL;
+  pcon_last_time = 0;
 }
 
 HANDLE

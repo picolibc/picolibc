@@ -1109,7 +1109,7 @@ skip_console_setting:
     }
   else if ((fd == 1 || fd == 2) && !get_ttyp ()->switch_to_pcon_out)
     {
-      cygwait (get_ttyp ()->fwd_done, INFINITE);
+      wait_pcon_fwd ();
       if (get_ttyp ()->pcon_pid == 0 ||
 	  kill (get_ttyp ()->pcon_pid, 0) != 0)
 	get_ttyp ()->pcon_pid = myself->pid;
@@ -1152,7 +1152,7 @@ fhandler_pty_slave::reset_switch_to_pcon (void)
     }
   if (get_ttyp ()->switch_to_pcon_out)
     /* Wait for pty_master_fwd_thread() */
-    cygwait (get_ttyp ()->fwd_done, INFINITE);
+    wait_pcon_fwd ();
   get_ttyp ()->pcon_pid = 0;
   get_ttyp ()->switch_to_pcon_in = false;
   get_ttyp ()->switch_to_pcon_out = false;
@@ -2681,6 +2681,16 @@ fhandler_pty_slave::set_freeconsole_on_close (bool val)
 }
 
 void
+fhandler_pty_slave::wait_pcon_fwd (void)
+{
+  acquire_output_mutex (INFINITE);
+  get_ttyp ()->pcon_last_time = GetTickCount ();
+  ResetEvent (get_ttyp ()->fwd_done);
+  release_output_mutex ();
+  cygwait (get_ttyp ()->fwd_done, INFINITE);
+}
+
+void
 fhandler_pty_slave::fixup_after_attach (bool native_maybe, int fd_set)
 {
   if (fd < 0)
@@ -2727,7 +2737,7 @@ fhandler_pty_slave::fixup_after_attach (bool native_maybe, int fd_set)
 	      DWORD mode = ENABLE_PROCESSED_OUTPUT | ENABLE_WRAP_AT_EOL_OUTPUT;
 	      SetConsoleMode (get_output_handle (), mode);
 	      if (!get_ttyp ()->switch_to_pcon_out)
-		cygwait (get_ttyp ()->fwd_done, INFINITE);
+		wait_pcon_fwd ();
 	      if (get_ttyp ()->pcon_pid == 0 ||
 		  kill (get_ttyp ()->pcon_pid, 0) != 0)
 		get_ttyp ()->pcon_pid = myself->pid;
@@ -3009,14 +3019,29 @@ fhandler_pty_master::pty_master_fwd_thread ()
   termios_printf ("Started.");
   for (;;)
     {
-      if (::bytes_available (rlen, from_slave) && rlen == 0)
-	SetEvent (get_ttyp ()->fwd_done);
+      if (get_pseudo_console ())
+	{
+	  /* The forwarding in pseudo console sometimes stops for
+	     16-32 msec even if it already has data to transfer.
+	     If the time without transfer exceeds 32 msec, the
+	     forwarding is supposed to be finished. */
+	  const int sleep_in_pcon = 16;
+	  const int time_to_wait = sleep_in_pcon * 2 + 1/* margine */;
+	  get_ttyp ()->pcon_last_time = GetTickCount ();
+	  while (::bytes_available (rlen, from_slave) && rlen == 0)
+	    {
+	      acquire_output_mutex (INFINITE);
+	      if (GetTickCount () - get_ttyp ()->pcon_last_time > time_to_wait)
+		SetEvent (get_ttyp ()->fwd_done);
+	      release_output_mutex ();
+	      Sleep (1);
+	    }
+	}
       if (!ReadFile (from_slave, outbuf, sizeof outbuf, &rlen, NULL))
 	{
 	  termios_printf ("ReadFile for forwarding failed, %E");
 	  break;
 	}
-      ResetEvent (get_ttyp ()->fwd_done);
       ssize_t wlen = rlen;
       char *ptr = outbuf;
       if (get_pseudo_console ())
