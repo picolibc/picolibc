@@ -16,12 +16,6 @@ by prefixing with <literal>no</literal>.</para>
 <itemizedlist mark="bullet">
 
 <listitem>
-<para><envar>(no)dosfilewarning</envar> - If set, Cygwin will warn the
-first time a user uses an "MS-DOS" style path name rather than a POSIX-style
-path name.  Defaults to off.</para>
-</listitem>
-
-<listitem>
 <para><envar>(no)export</envar> - If set, the final values of these
 settings are re-exported to the environment as <envar>CYGWIN</envar> again.
 Defaults to off.</para>
@@ -129,6 +123,11 @@ explicitly in the open(2) call.
 <listitem>
 <para><envar>(no)detect_bloda</envar> - No case of a BLODA found by this
 option has been reported in years.</para>
+</listitem>
+
+<listitem>
+<para><envar>(no)dosfilewarning</envar> - This option had been disabled for
+quite some time and nobody missed it.</para>
 </listitem>
 
 <listitem>

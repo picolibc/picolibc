@@ -452,10 +452,7 @@ cygwin_internal (cygwin_getinfo_types t, ...)
 	res = CYGTLS_PADSIZE;
 	break;
       case CW_SET_DOS_FILE_WARNING:
-	{
-	  dos_file_warning = va_arg (arg, int);
-	  res = 0;
-	}
+	res = 0;
 	break;
       case CW_SET_PRIV_KEY:
 	{

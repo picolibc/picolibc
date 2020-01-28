@@ -53,7 +53,6 @@ enum pathconv_arg
   PC_NULLEMPTY		 = _BIT ( 5),	/* empty path is no error */
   PC_NONULLEMPTY	 = _BIT ( 6),	/* override PC_NULLEMPTY default */
   PC_POSIX		 = _BIT ( 7),	/* return normalized posix path */
-  PC_NOWARN		 = _BIT ( 8),	/* don't emit ms-dos path warning */
   PC_OPEN		 = _BIT ( 9),	/* use open semantics */
   PC_CTTY		 = _BIT (10),	/* could later be used as ctty */
   PC_SYM_NOFOLLOW_PROCFD = _BIT (11),	/* allow /proc/PID/fd redirection */

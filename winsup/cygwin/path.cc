@@ -532,31 +532,6 @@ path_conv::get_wide_win32_path (PWCHAR wc)
   return wc;
 }
 
-static void
-warn_msdos (const char *src)
-{
-  if (user_shared->warned_msdos || !cygwin_finished_initializing)
-    return;
-  tmp_pathbuf tp;
-  char *posix_path = tp.c_get ();
-  small_printf ("Cygwin WARNING:\n");
-  if (cygwin_conv_path (CCP_WIN_A_TO_POSIX | CCP_RELATIVE, src,
-			posix_path, NT_MAX_PATH))
-    small_printf (
-"  MS-DOS style path detected: %ls\n  POSIX equivalent preferred.\n",
-		  src);
-  else
-    small_printf (
-"  MS-DOS style path detected: %ls\n"
-"  Preferred POSIX equivalent is: %ls\n",
-		  src, posix_path);
-  small_printf (
-"  CYGWIN environment variable option \"nodosfilewarning\" turns off this\n"
-"  warning.  Consult the user's guide for more details about POSIX paths:\n"
-"  http://cygwin.com/cygwin-ug-net/using.html#using-pathnames\n");
-  user_shared->warned_msdos = true;
-}
-
 static DWORD
 getfileattr (const char *path, bool caseinsensitive) /* path has to be always absolute. */
 {
@@ -1253,8 +1228,6 @@ path_conv::check (const char *src, unsigned opt,
 	  if (tail < path_end && tail > path_copy + 1)
 	    *tail = '/';
 	  set_posix (path_copy);
-	  if (is_msdos && dos_file_warning && !(opt & PC_NOWARN))
-	    warn_msdos (src);
 	}
 
 #if 0
@@ -1916,8 +1889,7 @@ symlink_worker (const char *oldpath, path_conv &win32_newpath, bool isdevice)
 	{
 	  char *newplnk = tp.c_get ();
 	  stpcpy (stpcpy (newplnk, win32_newpath.get_posix ()), ".lnk");
-	  win32_newpath.check (newplnk, PC_SYM_NOFOLLOW | PC_POSIX
-					| (isdevice ? PC_NOWARN : 0));
+	  win32_newpath.check (newplnk, PC_SYM_NOFOLLOW | PC_POSIX);
 	}
 
       if (win32_newpath.error)
@@ -3492,7 +3464,7 @@ cygwin_conv_path (cygwin_conv_path_t what, const void *from, void *to,
 	  {
 	    p.check ((const char *) from,
 		     PC_POSIX | PC_SYM_FOLLOW | PC_SYM_NOFOLLOW_REP
-		     | PC_NO_ACCESS_CHECK | PC_NOWARN
+		     | PC_NO_ACCESS_CHECK
 		     | ((how & CCP_RELATIVE) ? PC_NOFULL : 0), stat_suffixes);
 	    if (p.error)
 	      {
@@ -3537,7 +3509,7 @@ cygwin_conv_path (cygwin_conv_path_t what, const void *from, void *to,
 	case CCP_POSIX_TO_WIN_W:
 	  p.check ((const char *) from,
 		   PC_POSIX | PC_SYM_FOLLOW | PC_SYM_NOFOLLOW_REP
-		   | PC_NO_ACCESS_CHECK | PC_NOWARN
+		   | PC_NO_ACCESS_CHECK
 		   | ((how & CCP_RELATIVE) ? PC_NOFULL : 0), stat_suffixes);
 	  if (p.error)
 	    {
@@ -3550,7 +3522,7 @@ cygwin_conv_path (cygwin_conv_path_t what, const void *from, void *to,
 	    {
 	      /* Recreate as absolute path. */
 	      p.check ((const char *) from, PC_POSIX | PC_SYM_FOLLOW
-					    | PC_NO_ACCESS_CHECK | PC_NOWARN);
+					    | PC_NO_ACCESS_CHECK);
 	      if (p.error)
 		{
 		  set_errno (p.error);

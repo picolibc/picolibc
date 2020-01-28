@@ -111,7 +111,6 @@ static struct parse_thing
       } values[2];
   } known[] NO_COPY =
 {
-  {"dosfilewarning", {&dos_file_warning}, setbool, NULL, {{false}, {true}}},
   {"error_start", {func: error_start_init}, isfunc, NULL, {{0}, {0}}},
   {"export", {&export_settings}, setbool, NULL, {{false}, {true}}},
   {"glob", {func: glob_init}, isfunc, NULL, {{0}, {s: "normal"}}},

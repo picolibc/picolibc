@@ -120,12 +120,12 @@ pinfo::status_exit (DWORD x)
       {
 	path_conv pc;
 	if (!procinfo)
-	   pc.check ("/dev/null", PC_NOWARN | PC_POSIX);
+	   pc.check ("/dev/null", PC_POSIX);
 	else
 	  {
 	    UNICODE_STRING uc;
 	    RtlInitUnicodeString(&uc, procinfo->progname);
-	    pc.check (&uc, PC_NOWARN | PC_POSIX);
+	    pc.check (&uc, PC_POSIX);
 	  }
 	small_printf ("%s: error while loading shared libraries: %s: cannot "
 		      "open shared object file: No such file or directory\n",

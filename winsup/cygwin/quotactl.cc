@@ -89,7 +89,7 @@ quotactl (int cmd, const char *special, int id, caddr_t addr)
       return -1;
     }
   /* Check path */
-  pc.check (special, PC_SYM_FOLLOW | PC_NOWARN, stat_suffixes);
+  pc.check (special, PC_SYM_FOLLOW, stat_suffixes);
   if (pc.error)
     {
       set_errno (pc.error);
