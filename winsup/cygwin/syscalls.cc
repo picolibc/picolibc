@@ -81,7 +81,7 @@ static int __stdcall mknod_worker (const char *, mode_t, mode_t, _major_t,
    but never call close.  This function is called by _exit to
    ensure we don't leave any such files lying around.  */
 
-void __stdcall
+void
 close_all_files (bool norelease)
 {
   cygheap->fdtab.lock ();
