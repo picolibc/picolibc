@@ -73,8 +73,7 @@ details. */
 #undef _lseek64
 #undef _fstat64
 
-static int __stdcall mknod_worker (const char *, mode_t, mode_t, _major_t,
-				   _minor_t);
+static int mknod_worker (path_conv &, mode_t, _major_t, _minor_t);
 
 /* Close all files and process any queued deletions.
    Lots of unix style applications will open a tmp file, unlink it,
@@ -1773,14 +1772,15 @@ umask (mode_t mask)
   return oldmask;
 }
 
+#define FILTERED_MODE(m)	((m) & (S_ISUID | S_ISGID | S_ISVTX \
+					| S_IRWXU | S_IRWXG | S_IRWXO))
+
 int
 chmod_device (path_conv& pc, mode_t mode)
 {
-  return mknod_worker (pc.get_win32 (), pc.dev.mode () & S_IFMT, mode, pc.dev.get_major (), pc.dev.get_minor ());
+  return mknod_worker (pc, (pc.dev.mode () & S_IFMT) | FILTERED_MODE (mode),
+		       pc.dev.get_major (), pc.dev.get_minor ());
 }
-
-#define FILTERED_MODE(m)	((m) & (S_ISUID | S_ISGID | S_ISVTX \
-					| S_IRWXU | S_IRWXG | S_IRWXO))
 
 /* chmod: POSIX 5.6.4.1 */
 extern "C" int
@@ -3364,14 +3364,12 @@ ptsname_r (int fd, char *buf, size_t buflen)
   return cfd->ptsname_r (buf, buflen);
 }
 
-static int __stdcall
-mknod_worker (const char *path, mode_t type, mode_t mode, _major_t major,
-	      _minor_t minor)
+static int
+mknod_worker (path_conv &pc, mode_t mode, _major_t major, _minor_t minor)
 {
   char buf[sizeof (":\\00000000:00000000:00000000") + PATH_MAX];
-  sprintf (buf, ":\\%x:%x:%x", major, minor,
-	   type | (mode & (S_IRWXU | S_IRWXG | S_IRWXO)));
-  return symlink_worker (buf, path, true);
+  sprintf (buf, ":\\%x:%x:%x", major, minor, mode);
+  return symlink_worker (buf, pc, true);
 }
 
 extern "C" int
@@ -3388,12 +3386,17 @@ mknod32 (const char *path, mode_t mode, dev_t dev)
       if (strlen (path) >= PATH_MAX)
 	__leave;
 
-      path_conv w32path (path, PC_SYM_NOFOLLOW);
-      if (w32path.exists ())
-	{
-	  set_errno (EEXIST);
-	  __leave;
-	}
+      /* Trailing dirsep is a no-no, only errno differs. */
+      bool has_trailing_dirsep = isdirsep (path[strlen (path) - 1]);
+
+      path_conv w32path (path, PC_SYM_NOFOLLOW | PC_SYM_NOFOLLOW_DIR
+			       | PC_POSIX, stat_suffixes);
+
+      if (w32path.exists () || has_trailing_dirsep)
+        {
+          set_errno (w32path.exists () ? EEXIST : ENOENT);
+          __leave;
+        }
 
       mode_t type = mode & S_IFMT;
       _major_t major = _major (dev);
@@ -3424,7 +3427,7 @@ mknod32 (const char *path, mode_t mode, dev_t dev)
 	  __leave;
 	}
 
-      return mknod_worker (w32path.get_win32 (), type, mode, major, minor);
+      return mknod_worker (w32path, mode, major, minor);
     }
   __except (EFAULT)
   __endtry

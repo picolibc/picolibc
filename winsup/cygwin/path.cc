@@ -1674,7 +1674,34 @@ conv_path_list (const char *src, char *dst, size_t size,
 extern "C" int
 symlink (const char *oldpath, const char *newpath)
 {
-  return symlink_worker (oldpath, newpath, false);
+  path_conv win32_newpath;
+
+  __try
+    {
+      if (!*oldpath || !*newpath)
+	{
+	  set_errno (ENOENT);
+	  __leave;
+	}
+
+      /* Trailing dirsep is a no-no, only errno differs. */
+      bool has_trailing_dirsep = isdirsep (newpath[strlen (newpath) - 1]);
+      win32_newpath.check (newpath,
+			   PC_SYM_NOFOLLOW | PC_SYM_NOFOLLOW_DIR | PC_POSIX,
+			   stat_suffixes);
+
+      if (win32_newpath.error || has_trailing_dirsep)
+	{
+	  set_errno (win32_newpath.error ?:
+		     win32_newpath.exists () ? EEXIST : ENOENT);
+	  __leave;
+	}
+
+      return symlink_worker (oldpath, win32_newpath, false);
+    }
+  __except (EFAULT) {}
+  __endtry
+  return -1;
 }
 
 static int
@@ -1846,15 +1873,12 @@ symlink_native (const char *oldpath, path_conv &win32_newpath)
 }
 
 int
-symlink_worker (const char *oldpath, const char *newpath, bool isdevice)
+symlink_worker (const char *oldpath, path_conv &win32_newpath, bool isdevice)
 {
   int res = -1;
   size_t len;
-  path_conv win32_newpath;
   char *buf, *cp;
   tmp_pathbuf tp;
-  unsigned check_opt;
-  bool has_trailing_dirsep = false;
   winsym_t wsym_type;
 
   /* POSIX says that empty 'newpath' is invalid input while empty
@@ -1862,30 +1886,11 @@ symlink_worker (const char *oldpath, const char *newpath, bool isdevice)
      symlink contents point to existing filesystem object */
   __try
     {
-      if (!*oldpath || !*newpath)
-	{
-	  set_errno (ENOENT);
-	  __leave;
-	}
-
       if (strlen (oldpath) > SYMLINK_MAX)
 	{
 	  set_errno (ENAMETOOLONG);
 	  __leave;
 	}
-
-      /* Trailing dirsep is a no-no. */
-      len = strlen (newpath);
-      has_trailing_dirsep = isdirsep (newpath[len - 1]);
-      if (has_trailing_dirsep)
-	{
-	  newpath = strdup (newpath);
-	  ((char *) newpath)[len - 1] = '\0';
-	}
-
-      check_opt = PC_SYM_NOFOLLOW | PC_POSIX | (isdevice ? PC_NOWARN : 0);
-      /* We need the normalized full path below. */
-      win32_newpath.check (newpath, check_opt, stat_suffixes);
 
       /* Default symlink type is determined by global allow_winsymlinks
 	 variable.  Device files are always shortcuts. */
@@ -1910,8 +1915,9 @@ symlink_worker (const char *oldpath, const char *newpath, bool isdevice)
 	  && (isdevice || !win32_newpath.fs_is_nfs ()))
 	{
 	  char *newplnk = tp.c_get ();
-	  stpcpy (stpcpy (newplnk, newpath), ".lnk");
-	  win32_newpath.check (newplnk, check_opt);
+	  stpcpy (stpcpy (newplnk, win32_newpath.get_posix ()), ".lnk");
+	  win32_newpath.check (newplnk, PC_SYM_NOFOLLOW | PC_POSIX
+					| (isdevice ? PC_NOWARN : 0));
 	}
 
       if (win32_newpath.error)
@@ -1927,11 +1933,6 @@ symlink_worker (const char *oldpath, const char *newpath, bool isdevice)
 	  || (win32_newpath.isdevice () && !win32_newpath.is_fs_special ()))
 	{
 	  set_errno (EEXIST);
-	  __leave;
-	}
-      if (has_trailing_dirsep && !win32_newpath.exists ())
-	{
-	  set_errno (ENOENT);
 	  __leave;
 	}
 
@@ -2189,9 +2190,7 @@ symlink_worker (const char *oldpath, const char *newpath, bool isdevice)
   __except (EFAULT) {}
   __endtry
   syscall_printf ("%d = symlink_worker(%s, %s, %d)",
-		  res, oldpath, newpath, isdevice);
-  if (has_trailing_dirsep)
-    free ((void *) newpath);
+		  res, oldpath, win32_newpath.get_posix (), isdevice);
   return res;
 }
 
@@ -3389,7 +3388,7 @@ chdir (const char *in_dir)
       syscall_printf ("dir '%s'", in_dir);
 
       /* Convert path.  PC_NONULLEMPTY ensures that we don't check for
-      	 NULL/empty/invalid again. */
+	 NULL/empty/invalid again. */
       path_conv path (in_dir, PC_SYM_FOLLOW | PC_POSIX | PC_NONULLEMPTY);
       if (path.error)
 	{

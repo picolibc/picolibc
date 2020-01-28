@@ -447,4 +447,4 @@ int normalize_win32_path (const char *, char *, char *&);
 int normalize_posix_path (const char *, char *, char *&);
 PUNICODE_STRING __reg3 get_nt_native_path (const char *, UNICODE_STRING&, bool);
 
-int __reg3 symlink_worker (const char *, const char *, bool);
+int __reg3 symlink_worker (const char *, path_conv &, bool);
