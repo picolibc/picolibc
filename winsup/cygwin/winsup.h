@@ -178,6 +178,7 @@ extern struct per_process_cxx_malloc default_cygwin_cxx_malloc;
 /* various events */
 void events_init ();
 
+int chmod_device (class path_conv& pc, mode_t mode);
 void __stdcall close_all_files (bool = false);
 
 /* debug_on_trap support. see exceptions.cc:try_to_debug() */

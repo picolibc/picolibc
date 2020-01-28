@@ -698,7 +698,6 @@ out:
 int __reg1
 fhandler_disk_file::fchmod (mode_t mode)
 {
-  extern int chmod_device (path_conv& pc, mode_t mode);
   int ret = -1;
   int oret = 0;
   NTSTATUS status;

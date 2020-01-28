@@ -1754,7 +1754,6 @@ fhandler_base::closedir (DIR *)
 int
 fhandler_base::fchmod (mode_t mode)
 {
-  extern int chmod_device (path_conv& pc, mode_t mode);
   if (pc.is_fs_special ())
     return chmod_device (pc, mode);
   /* By default, just succeeds. */
