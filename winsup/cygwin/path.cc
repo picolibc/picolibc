@@ -1022,20 +1022,33 @@ path_conv::check (const char *src, unsigned opt,
 		 these operations again on the newly derived path. */
 	      else if (symlen > 0)
 		{
-		  if (component == 0 && !need_directory
+		  if (component == 0
 		      && (!(opt & PC_SYM_FOLLOW)
 			  || (is_known_reparse_point ()
 			      && (opt & PC_SYM_NOFOLLOW_REP))))
 		    {
-		      /* last component of path is a symlink. */
-		      set_symlink (symlen);
-		      if (opt & PC_SYM_CONTENTS)
+		      /* Usually a trailing slash requires to follow a symlink,
+			 even with PC_SYM_NOFOLLOW.  The reason is that "foo/"
+			 is equivalent to "foo/." so the symlink is in fact not
+			 the last path component.
+
+			 PC_SYM_NOFOLLOW_DIR is used to indicate that the
+			 last path component is the target symlink and the
+			 trailing slash is supposed to be ignored. */
+		      if (!need_directory || (opt & PC_SYM_NOFOLLOW_DIR))
 			{
-			  strcpy (THIS_path, sym.contents);
+			  /* last component of path is a symlink. */
+			  set_symlink (symlen);
+			  /* make sure not to set errno to ENOTDIR. */
+			  need_directory = 0;
+			  if (opt & PC_SYM_CONTENTS)
+			    {
+			      strcpy (THIS_path, sym.contents);
+			      goto out;
+			    }
+			  add_ext = true;
 			  goto out;
 			}
-		      add_ext = true;
-		      goto out;
 		    }
 		  /* Following a symlink we can't trust the collected
 		     filesystem information any longer. */
