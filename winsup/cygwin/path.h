@@ -44,20 +44,21 @@ extern suffix_info stat_suffixes[];
    below path_types.  Ever. */
 enum pathconv_arg
 {
-  PC_SYM_FOLLOW		 = _BIT ( 0),
-  PC_SYM_NOFOLLOW	 = _BIT ( 1),
-  PC_SYM_NOFOLLOW_REP	 = _BIT ( 2),
-  PC_SYM_CONTENTS	 = _BIT ( 3),
-  PC_NOFULL		 = _BIT ( 4),
-  PC_NULLEMPTY		 = _BIT ( 5),
-  PC_NONULLEMPTY	 = _BIT ( 6),
-  PC_POSIX		 = _BIT ( 7),
-  PC_NOWARN		 = _BIT ( 8),
+  PC_SYM_FOLLOW		 = _BIT ( 0),	/* follow symlinks */
+  PC_SYM_NOFOLLOW	 = _BIT ( 1),	/* don't follow symlinks (but honor
+					   trailing slashes) */
+  PC_SYM_NOFOLLOW_REP	 = _BIT ( 2),	/* don't follow dir reparse point */
+  PC_SYM_CONTENTS	 = _BIT ( 3),	/* don't follow, return content only */
+  PC_NOFULL		 = _BIT ( 4),	/* keep relative path */
+  PC_NULLEMPTY		 = _BIT ( 5),	/* empty path is no error */
+  PC_NONULLEMPTY	 = _BIT ( 6),	/* override PC_NULLEMPTY default */
+  PC_POSIX		 = _BIT ( 7),	/* return normalized posix path */
+  PC_NOWARN		 = _BIT ( 8),	/* don't emit ms-dos path warning */
   PC_OPEN		 = _BIT ( 9),	/* use open semantics */
   PC_CTTY		 = _BIT (10),	/* could later be used as ctty */
-  PC_SYM_NOFOLLOW_PROCFD = _BIT (11),
-  PC_KEEP_HANDLE	 = _BIT (12),
-  PC_NO_ACCESS_CHECK	 = _BIT (13),
+  PC_SYM_NOFOLLOW_PROCFD = _BIT (11),	/* allow /proc/PID/fd redirection */
+  PC_KEEP_HANDLE	 = _BIT (12),	/* keep handle for later stat calls */
+  PC_NO_ACCESS_CHECK	 = _BIT (13),	/* helper flag for error check */
   PC_DONT_USE		 = _BIT (31)	/* conversion to signed happens. */
 };
 
