@@ -69,6 +69,12 @@ Support the Linux-specific AT_EMPTY_PATH flag for fchownat(2) and
 fstatat(2).
 </para></listitem>
 
+<listitem><para>
+Allow AF_LOCAL sockets to be opened with O_PATH.  If that flag is not
+set, or if an attempt is made to open a different type of socket, the
+errno is now EOPNOTSUPP instead of ENXIO.
+</para></listitem>
+
 </itemizedlist>
 
 </sect2>
