@@ -141,12 +141,31 @@ _fseeko_r (struct _reent *ptr,
   switch (whence)
     {
     case SEEK_CUR:
-      curoff = _ftello_r(ptr, fp);
-      if (curoff == -1L)
-        {
-          _newlib_flockfile_exit (fp);
-          return EOF;
-        }
+      /*
+       * In order to seek relative to the current stream offset,
+       * we have to first find the current stream offset a la
+       * ftell (see ftell for details).
+       */
+      _fflush_r (ptr, fp);   /* may adjust seek offset on append stream */
+      if (fp->_flags & __SOFF)
+	curoff = fp->_offset;
+      else
+	{
+	  curoff = seekfn (ptr, fp->_cookie, (_fpos_t) 0, SEEK_CUR);
+	  if (curoff == -1L)
+	    {
+	      _newlib_flockfile_exit (fp);
+	      return EOF;
+	    }
+	}
+      if (fp->_flags & __SRD)
+	{
+	  curoff -= fp->_r;
+	  if (HASUB (fp))
+	    curoff -= fp->_ur;
+	}
+      else if (fp->_flags & __SWR && fp->_p != NULL)
+	curoff += fp->_p - fp->_bf._base;
 
       offset += curoff;
       whence = SEEK_SET;
