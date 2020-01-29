@@ -22,18 +22,24 @@ case "$elf" in
 	;;
 esac
 
+cpu="$cpu,mmu=false,pmp=false"
+
 if [ -z "$options" ]; then
     options=`echo $elf | sed 's/.*rv[36][24]\([a-z]*\)_.*$/\1/' | sed 's/\(.\)/\1 /g'`
 fi
 
-for o in $options; do
-    cpu=$cpu",$o=true"
-    case "$o" in
-	e)
-	    cpu=$cpu",i=false"
-	    ;;
-    esac
+all_options="i e g m a f d c s u"
+
+for o in $all_options; do
+    if `echo $options | grep -q $o`; then
+	value=true
+    else
+	value=false
+    fi
+    cpu=$cpu",$o=$value"
 done
+
+echo cpu is "$cpu"
 
 # Set the target machine
 machine=virt,accel=tcg
