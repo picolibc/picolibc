@@ -480,7 +480,7 @@ fhandler_base::fstat_helper (struct stat *buf)
     {
       /* If read-only attribute is set, modify ntsec return value */
       if (::has_attribute (attributes, FILE_ATTRIBUTE_READONLY)
-	  && !pc.isdir () && !pc.issymlink ())
+	  && !pc.isdir () && !pc.issymlink () && !pc.is_fs_special ())
 	buf->st_mode &= ~(S_IWUSR | S_IWGRP | S_IWOTH);
 
       if (buf->st_mode & S_IFMT)
@@ -490,7 +490,7 @@ fhandler_base::fstat_helper (struct stat *buf)
       else
 	{
 	  buf->st_dev = buf->st_rdev = dev ();
-	  buf->st_mode = dev ().mode ();
+	  buf->st_mode |= dev ().mode () & S_IFMT;
 	  buf->st_size = 0;
 	}
     }
