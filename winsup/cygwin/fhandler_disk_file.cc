@@ -394,12 +394,13 @@ fhandler_base::fstat_fs (struct stat *buf)
   return res;
 }
 
+/* Called by fstat_by_handle and fstat_by_name. */
 int __reg2
 fhandler_base::fstat_helper (struct stat *buf)
 {
   IO_STATUS_BLOCK st;
   FILE_COMPRESSION_INFORMATION fci;
-  HANDLE h = get_stat_handle ();
+  HANDLE h = get_stat_handle ();      /* Should always be pc.handle(). */
   PFILE_ALL_INFORMATION pfai = pc.fai ();
   ULONG attributes = pc.file_attributes ();
 
@@ -475,8 +476,8 @@ fhandler_base::fstat_helper (struct stat *buf)
   else if (pc.issocket ())
     buf->st_mode = S_IFSOCK;
 
-  if (!get_file_attribute (is_fs_special () && !pc.issocket () ? NULL : h, pc,
-			   &buf->st_mode, &buf->st_uid, &buf->st_gid))
+  if (!get_file_attribute (h, pc, &buf->st_mode, &buf->st_uid,
+			   &buf->st_gid))
     {
       /* If read-only attribute is set, modify ntsec return value */
       if (::has_attribute (attributes, FILE_ATTRIBUTE_READONLY)
