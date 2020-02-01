@@ -22,6 +22,35 @@
 #include "ntdll.h"
 #include "cygwait.h"
 
+/*
+   Overview:
+
+     Currently a FIFO can be opened once for reading and multiple
+     times for writing.  Any attempt to open the FIFO a second time
+     for reading fails with EACCES (from STATUS_ACCESS_DENIED).
+
+     When a FIFO is opened for reading,
+     fhandler_fifo::create_pipe_instance is called to create the first
+     instance of a Windows named pipe server (Windows terminology).  A
+     "listen_client" thread is also started; it waits for pipe clients
+     (Windows terminology again) to connect.  This happens every time
+     a process opens the FIFO for writing.
+
+     The listen_client thread creates new instances of the pipe server
+     as needed, so that there is always an instance available for a
+     writer to connect to.
+
+     The reader maintains a list of "fifo_client_handlers", one for
+     each pipe instance.  A fifo_client_handler manages the connection
+     between the pipe instance and a writer connected to that pipe
+     instance.
+
+     TODO: Allow a FIFO to be opened multiple times for reading.
+     Maybe this could be done by using shared memory, so that all
+     readers could have access to the same list of writers.
+*/
+
+
 /* This is only to be used for writers.  When reading,
 STATUS_PIPE_EMPTY simply means there's no data to be read. */
 #define STATUS_PIPE_IS_CLOSED(status)	\
