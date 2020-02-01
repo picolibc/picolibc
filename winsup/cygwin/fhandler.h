@@ -1832,7 +1832,7 @@ enum ansi_intensity
 #define gotrparen 9
 #define eatpalette 10
 #define endpalette 11
-#define MAXARGS 10
+#define MAXARGS 16
 
 enum cltype
 {

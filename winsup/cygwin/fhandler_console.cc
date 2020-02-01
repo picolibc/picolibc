@@ -1952,7 +1952,7 @@ fhandler_console::char_command (char c)
   switch (c)
     {
     case 'm':   /* Set Graphics Rendition */
-       for (int i = 0; i <= con.nargs; i++)
+       for (int i = 0; i < con.nargs; i++)
 	 switch (con.args[i])
 	   {
 	     case 0:    /* normal color */
@@ -2020,38 +2020,39 @@ fhandler_console::char_command (char c)
 	       con.fg = FOREGROUND_BLUE | FOREGROUND_GREEN | FOREGROUND_RED;
 	       break;
 	     case 38:
-	       if (con.nargs < 1)
+	       if (con.nargs < i + 2)
 		 /* Sequence error (abort) */
 		 break;
-	       switch (con.args[1])
+	       switch (con.args[i + 1])
 		 {
 		 case 2:
-		   if (con.nargs != 4)
+		   if (con.nargs < i + 5)
 		     /* Sequence error (abort) */
 		     break;
-		   r = con.args[2];
-		   g = con.args[3];
-		   b = con.args[4];
+		   r = con.args[i + 2];
+		   g = con.args[i + 3];
+		   b = con.args[i + 4];
 		   r = r < (95 + 1) / 2 ? 0 : r > 255 ? 5 : (r - 55 + 20) / 40;
 		   g = g < (95 + 1) / 2 ? 0 : g > 255 ? 5 : (g - 55 + 20) / 40;
 		   b = b < (95 + 1) / 2 ? 0 : b > 255 ? 5 : (b - 55 + 20) / 40;
 		   con.fg = table256[16 + r*36 + g*6 + b];
+		   i += 4;
 		   break;
 		 case 5:
-		   if (con.nargs != 2)
+		   if (con.nargs < i + 3)
 		     /* Sequence error (abort) */
 		     break;
 		   {
-		     int idx = con.args[2];
+		     int idx = con.args[i + 2];
 		     if (idx < 0)
 		       idx = 0;
 		     if (idx > 255)
 		       idx = 255;
 		     con.fg = table256[idx];
+		     i += 2;
 		   }
 		   break;
 		 }
-	       i += con.nargs;
 	       break;
 	     case 39:
 	       con.fg = con.default_color & FOREGROUND_ATTR_MASK;
@@ -2081,38 +2082,39 @@ fhandler_console::char_command (char c)
 	       con.bg = BACKGROUND_BLUE | BACKGROUND_GREEN | BACKGROUND_RED;
 	       break;
 	     case 48:
-	       if (con.nargs < 1)
+	       if (con.nargs < i + 2)
 		 /* Sequence error (abort) */
 		 break;
-	       switch (con.args[1])
+	       switch (con.args[i + 1])
 		 {
 		 case 2:
-		   if (con.nargs != 4)
+		   if (con.nargs < i + 5)
 		     /* Sequence error (abort) */
 		     break;
-		   r = con.args[2];
-		   g = con.args[3];
-		   b = con.args[4];
+		   r = con.args[i + 2];
+		   g = con.args[i + 3];
+		   b = con.args[i + 4];
 		   r = r < (95 + 1) / 2 ? 0 : r > 255 ? 5 : (r - 55 + 20) / 40;
 		   g = g < (95 + 1) / 2 ? 0 : g > 255 ? 5 : (g - 55 + 20) / 40;
 		   b = b < (95 + 1) / 2 ? 0 : b > 255 ? 5 : (b - 55 + 20) / 40;
 		   con.bg = table256[16 + r*36 + g*6 + b] << 4;
+		   i += 4;
 		   break;
 		 case 5:
-		   if (con.nargs != 2)
+		   if (con.nargs < i + 3)
 		     /* Sequence error (abort) */
 		     break;
 		   {
-		     int idx = con.args[2];
+		     int idx = con.args[i + 2];
 		     if (idx < 0)
 		       idx = 0;
 		     if (idx > 255)
 		       idx = 255;
 		     con.bg = table256[idx] << 4;
+		     i += 2;
 		   }
 		   break;
 		 }
-	       i += con.nargs;
 	       break;
 	     case 49:
 	       con.bg = con.default_color & BACKGROUND_ATTR_MASK;
@@ -2806,7 +2808,7 @@ fhandler_console::write (const void *vsrc, size_t len)
 	    {
 	      src++;
 	      con.nargs++;
-	      if (con.nargs >= MAXARGS)
+	      if (con.nargs > MAXARGS)
 		con.nargs--;
 	    }
 	  else if (*src == ' ')
@@ -2819,6 +2821,9 @@ fhandler_console::write (const void *vsrc, size_t len)
 	    con.state = gotcommand;
 	  break;
 	case gotcommand:
+	  con.nargs ++;
+	  if (con.nargs > MAXARGS)
+	    con.nargs--;
 	  char_command (*src++);
 	  con.state = normal;
 	  break;
@@ -2871,6 +2876,8 @@ fhandler_console::write (const void *vsrc, size_t len)
 	    {
 	      con.state = gotarg1;
 	      con.nargs++;
+	      if (con.nargs > MAXARGS)
+		con.nargs--;
 	      src++;
 	    }
 	  else if (isalpha (*src))
