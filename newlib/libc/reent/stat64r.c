@@ -1,3 +1,4 @@
+/* Copyright (c) 2008 Jeff Johnston <jjohnstn@redhat.com> */
 /* Reentrant versions of stat64 system call.  This implementation just
    calls the stat64 system call.  */
 

@@ -1,3 +1,4 @@
+/* Copyright (c) 2002 Jeff Johnston <jjohnstn@redhat.com> */
 /* Reentrant versions of open system call. */
 
 #include <reent.h>

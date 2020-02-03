@@ -1,3 +1,4 @@
+/* Copyright (c) 2007 Patrick Mansfield <patmans@us.ibm.com> */
 /* Reentrant versions of times system calls */
 
 #include <reent.h>

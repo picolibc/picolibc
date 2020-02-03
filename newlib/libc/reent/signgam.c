@@ -1,3 +1,4 @@
+/* Copyright (c) 2001 Jeff Johnston <jjohnstn@redhat.com> */
 /* The signgam variable is stored in the reentrancy structure.  This
    function returns its address for use by the macro signgam defined in
    math.h.  */

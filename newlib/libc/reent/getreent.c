@@ -1,3 +1,4 @@
+/* Copyright (c) 2002 Jeff Johnston <jjohnstn@redhat.com> */
 /* default reentrant pointer when multithread enabled */
 
 #ifdef GETREENT_PROVIDED

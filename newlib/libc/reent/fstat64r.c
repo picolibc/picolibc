@@ -1,3 +1,4 @@
+/* Copyright (c) 2002 Jeff Johnston <jjohnstn@redhat.com> */
 /* Reentrant versions of fstat system call.  This implementation just
    calls the fstat system call.  */
 
