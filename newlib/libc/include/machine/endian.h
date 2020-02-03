@@ -1,3 +1,4 @@
+/* Copyright (c) 2004 Jeff Johnston  <jjohnstn@redhat.com> */
 #ifndef __MACHINE_ENDIAN_H__
 #define	__MACHINE_ENDIAN_H__
 

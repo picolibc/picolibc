@@ -1,3 +1,4 @@
+/* Copyright (c) 2005 Jeff Johnston  <jjohnstn@redhat.com> */
 /*
  * libgen.h - defined by XPG4
  */

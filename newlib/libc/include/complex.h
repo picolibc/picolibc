@@ -1,7 +1,7 @@
 /* $NetBSD: complex.h,v 1.3 2010/09/15 16:11:30 christos Exp $ */
 
 /*
- * Written by Matthias Drochner.
+ * Copyright (c) 2010 Matthias Drochner.
  * Public domain.
  */
 

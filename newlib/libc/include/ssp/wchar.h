@@ -1,3 +1,4 @@
+/* Copyright (c) 2017 Yaakov Selkowitz <yselkowi@redhat.com> */
 #ifndef _SSP_WCHAR_H_
 #define _SSP_WCHAR_H_
 
