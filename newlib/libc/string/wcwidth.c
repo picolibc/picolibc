@@ -1,3 +1,4 @@
+/* Copyright (c) 2003 Corinna Vinschen <corinna@vinschen.de> */
 /*
 FUNCTION
 	<<wcwidth>>---number of column positions of a wide-character code

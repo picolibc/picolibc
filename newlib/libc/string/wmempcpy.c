@@ -1,3 +1,4 @@
+/* Copyright (c) 2017 Yaakov Selkowitz <yselkowi@redhat.com> */
 /*
 FUNCTION
 	<<wmempcpy>>---copy wide characters in memory and return end pointer

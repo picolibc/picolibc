@@ -1,4 +1,7 @@
 /*
+Copyright (c) 2003 Corinna Vinschen <corinna@vinschen.de>
+ */
+/*
 FUNCTION
 	<<wcswidth>>---number of column positions of a wide-character string
 	

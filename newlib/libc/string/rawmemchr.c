@@ -1,3 +1,4 @@
+/* Copyright (c) 2013 Yaakov Selkowitz <yselkowi@redhat.com> */
 /*
 FUNCTION
 	<<rawmemchr>>---find character in memory

@@ -1,3 +1,4 @@
+/* Copyright (c) 2016 Corinna Vinschen <corinna@vinschen.de> */
 /*
 FUNCTION
 	<<strcasecmp_l>>---case-insensitive character string compare

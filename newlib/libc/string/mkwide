@@ -1,4 +1,5 @@
 #! /bin/sh
+# Copyright(c) 2018 Thomas Wolff <towo@towo.net>
 
 # generate list of wide characters, with convex closure
 

@@ -1,3 +1,4 @@
+/* Copyright (c) 2009 Corinna Vinschen <corinna@vinschen.de> */
 #include <_ansi.h>
 #include <../ctype/local.h>
 

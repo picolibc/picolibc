@@ -1,4 +1,5 @@
 #! /bin/sh
+# Copyright(c) 2018 Thomas Wolff <towo@towo.net>
 
 echo Generating Unicode width data for newlib/libc/string/wcwidth.c
 

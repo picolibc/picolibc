@@ -1,3 +1,4 @@
+/* Copyright (c) 2002 Jeff Johnston <jjohnstn@redhat.com> */
 /*
 FUNCTION
         <<memccpy>>---copy memory regions with end-token check

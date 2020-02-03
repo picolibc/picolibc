@@ -1,3 +1,4 @@
+/* Copyright (c) 2011 Corinna Vinschen <corinna@vinschen.de> */
 /*
 FUNCTION
 	<<strchrnul>>---search for character in string
