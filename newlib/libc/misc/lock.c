@@ -1,3 +1,4 @@
+/* Copyright (c) 2016 Thomas Preud'homme <thomas.preudhomme@arm.com> */
 /*
 FUNCTION
 <<__retarget_lock_init>>, <<__retarget_lock_init_recursive>>, <<__retarget_lock_close>>, <<__retarget_lock_close_recursive>>, <<__retarget_lock_acquire>>, <<__retarget_lock_acquire_recursive>>, <<__retarget_lock_try_acquire>>, <<__retarget_lock_try_acquire_recursive>>, <<__retarget_lock_release>>, <<__retarget_lock_release_recursive>>---locking routines
