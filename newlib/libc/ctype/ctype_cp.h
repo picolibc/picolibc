@@ -1,3 +1,6 @@
+/*
+ * Copyright (c) 2009 Corinna Vinschen <corinna@vinschen.de>
+ */
 /* ctype table definitions for Windows codepage charsets. 
    Included by ctype_.c. */
 
