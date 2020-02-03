@@ -1,4 +1,8 @@
 /*
+Copyright (c) 1990 Regents of the University of California.
+All rights reserved.
+ */
+/*
 FUNCTION
 <<mbstowcs>>---minimal multibyte string to wide char converter
 

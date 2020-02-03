@@ -1,3 +1,7 @@
+/*
+Copyright (c) 1990 Regents of the University of California.
+All rights reserved.
+ */
 #include <errno.h>
 #include <stdlib.h>
 #include <string.h>

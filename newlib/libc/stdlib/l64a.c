@@ -1,3 +1,4 @@
+/* Copyright (c) 2002 Jeff Johnston <jjohnstn@redhat.com> */
 /* l64a - convert long to radix-64 ascii string
  *          
  * Conversion is performed on at most 32-bits of input value starting 

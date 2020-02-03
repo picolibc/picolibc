@@ -1,3 +1,7 @@
+/*
+Copyright (c) 1990 Regents of the University of California.
+All rights reserved.
+ */
 /* Misc. local definitions for libc/stdlib */
 
 #ifndef _LOCAL_H_

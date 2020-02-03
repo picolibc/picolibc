@@ -1,4 +1,8 @@
 /*
+Copyright (c) 1990 Regents of the University of California.
+All rights reserved.
+ */
+/*
  * [atw] multiply 64 bit accumulator by 10 and add digit.
  * The KA/CA way to do this should be to use
  * a 64-bit integer internally and use "adjust" to

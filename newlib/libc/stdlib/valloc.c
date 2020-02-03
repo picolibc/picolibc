@@ -1,3 +1,7 @@
+/*
+Copyright (c) 1990 Regents of the University of California.
+All rights reserved.
+ */
 #ifndef MALLOC_PROVIDED
 /* valloc.c -- a wrapper for valloc_r and pvalloc_r.  */
 

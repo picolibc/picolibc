@@ -1,4 +1,8 @@
 /*
+Copyright (c) 1990 Regents of the University of California.
+All rights reserved.
+ */
+/*
 FUNCTION
 <<assert>>---macro for debugging diagnostics
 

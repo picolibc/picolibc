@@ -1,3 +1,4 @@
+/* Copyright (c) 2016 Joel Sherrill <joel@rtems.org> */
 /*
 FUNCTION
 <<random>>, <<srandom>>---pseudo-random numbers

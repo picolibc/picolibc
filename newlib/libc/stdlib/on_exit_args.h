@@ -1,3 +1,4 @@
+/* Copyright (c) 2015 Freddie Chopin <freddie.chopin@gmail.com> */
 #ifndef NEWLIB_CYGWIN_NEWLIB_LIBC_STDLIB_ON_EXIT_ARGS_H_
 #define NEWLIB_CYGWIN_NEWLIB_LIBC_STDLIB_ON_EXIT_ARGS_H_
 

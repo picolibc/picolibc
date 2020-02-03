@@ -1,3 +1,4 @@
+/* Copyright (c) 2004 Paul Brook <paul@codesourcery.com> */
 /*
  *  Common routine to implement atexit-like functionality.
  *
