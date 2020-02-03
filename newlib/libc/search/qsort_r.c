@@ -1,3 +1,4 @@
+/* Copyright (c) 2014 Yaakov Selkowitz <yselkowi@redhat.com> */
 /*
 FUNCTION
 <<qsort_r>>---sort an array
