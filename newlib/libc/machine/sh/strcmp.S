@@ -1,4 +1,4 @@
-! SH5 code Copyright 2002 SuperH Ltd.
+/* SH5 code Copyright 2002 SuperH Ltd. */
 
 #include "asm.h"
 

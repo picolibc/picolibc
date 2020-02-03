@@ -1,3 +1,4 @@
+/* Copyright (c) 2003 Kazu Hirata  <kazu@cs.umass.edu> */
 #ifdef __H8300H__
 #ifdef __NORMAL_MODE__
 	.h8300hn

@@ -1,3 +1,4 @@
+/* Copyright (c) 2007 Patrick Mansfield <patmans@us.ibm.com> */
 #ifndef _SYS_UIO_H
 #define _SYS_UIO_H
 

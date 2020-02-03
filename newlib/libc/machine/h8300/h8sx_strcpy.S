@@ -1,3 +1,4 @@
+/* Copyright (c) 2003 Richard Sandiford  <rsandifo@redhat.com> */
 ; This file exists to provide a movsd implementation of strcpy().
 ; Continue to use the generic version for targets other than h8sx.
 #ifdef __H8300SX__

@@ -1,3 +1,4 @@
+/* Copyright (c) 2007 Jeff Johnston  <jjohnstn@redhat.com> */
 #ifndef _MACHFASTMATH_H
 #define _MACHFASTMATH_H
 

@@ -1,7 +1,7 @@
  ##############################################################################
  # setjmp.S -- CR16 setjmp routine                                            #
  #                                                                            #
- # Copyright (c) 2004 National Semiconductor Corporation                      #
+/* Copyright (c) 2004 National Semiconductor Corporation                      */
  #                                                                            #
  # The authors hereby grant permission to use, copy, modify, distribute,      #
  # and license this software and its documentation for any purpose, provided  #

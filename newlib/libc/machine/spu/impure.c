@@ -1,3 +1,4 @@
+/* Copyright (c) 2008 Patrick Mansfield <patmans@us.ibm.com> */
 #include <reent.h>
 
 /* Note that there is a copy of this in sys/reent.h.  */

@@ -1,3 +1,4 @@
+/* Copyright (c) 2008 Patrick Mansfield <patmans@us.ibm.com> */
 /* Copied from libc/posix/sleep.c, removed the check for HAVE_NANOSLEEP */
 
 /* Written 2000 by Werner Almesberger */

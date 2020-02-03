@@ -1,3 +1,4 @@
+/* Copyright (c) 2002 Dave Brolley  <brolley@redhat.com> */
 # setjmp/longjmp for Frv.  The jmpbuf looks like this:
 #	
 # Register	jmpbuf offset
