@@ -1,4 +1,13 @@
 /*
+Copyright (c) 2007 Dave Korn 
+
+
+x87 FP implementation contributed to Newlib by
+Dave Korn, November 2007.  This file is placed in the
+public domain.  Permission to use, copy, modify, and 
+distribute this software is freely granted.
+ */
+/*
  * ====================================================
  * x87 FP implementation contributed to Newlib by
  * Dave Korn, November 2007.  This file is placed in the
