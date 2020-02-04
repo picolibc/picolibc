@@ -2338,7 +2338,7 @@ fhandler_pty_master::write (const void *ptr, size_t len)
       WriteFile (to_slave, "\003", 1, &n, 0);
     }
 
-  line_edit_status status = line_edit (p++, len, ti, &ret);
+  line_edit_status status = line_edit (p, len, ti, &ret);
   if (status > line_edit_signalled && status != line_edit_pipe_full)
     ret = -1;
   return ret;
