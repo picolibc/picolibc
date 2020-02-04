@@ -1,3 +1,10 @@
+/*
+Copyright (C) 1998, 2002 by Red Hat Inc. All rights reserved.
+
+Permission to use, copy, modify, and distribute this
+software is freely granted, provided that this notice
+is preserved.
+ */
 /*  This file was based on the modified setjmp.S performed by
  *  Joel Sherill (joel@OARcorp.com) which specified the use
  *  of the __USER_LABEL_PREFIX__ and __REGISTER_PREFIX__ macros.
