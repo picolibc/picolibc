@@ -1,3 +1,4 @@
+/* Copyright (c) 2005 Jeff Johnston <jjohnstn@redhat.com> */
 #include <sys/types.h>
 #include <local.h>
 
