@@ -1,3 +1,4 @@
+/* Copyright (c) 2002 Thomas Fitzsimmons <fitzsim@redhat.com> */
 /* sincos -- currently no more efficient than two separate calls to
    sin and cos. */
 #include "fdlibm.h"
