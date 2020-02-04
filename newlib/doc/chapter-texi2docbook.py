@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# Copyright (c) 2016 Jon Turney <jon.turney@dronecode.org.uk>
 #
 # python script to convert the handwritten chapter .texi files, which include
 # the generated files for each function, to DocBook XML

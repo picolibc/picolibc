@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# Copyright (c) 2016 Jon Turney <jon.turney@dronecode.org.uk>
 #
 # python script to process makedoc instructions in a source file and produce
 # DocBook XML output
