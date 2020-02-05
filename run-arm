@@ -49,7 +49,7 @@ case "$elf" in
 esac
 
 # Set the target machine
-machine=mps2-an385
+machine=mps2-an385,accel=tcg
 cpu=cortex-m3
 
 # Map stdio to a multiplexed character device so we can use it
@@ -61,7 +61,7 @@ chardev=stdio,mux=on,id=stdio0
 
 semi=enable=on,chardev=stdio0
 
-# Point the monitor at the new chardev too
+# Disable monitor
 
 mon=none
 
