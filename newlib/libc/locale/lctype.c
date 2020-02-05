@@ -1,4 +1,6 @@
 /*
+ * Copyright (c) 2010 Corinna Vinschen <corinna@vinschen.de>
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
  * are met:
