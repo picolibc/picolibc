@@ -3,7 +3,8 @@ Priority: optional
 Maintainer: Keith Packard <keithp@keithp.com>
 Build-Depends: debhelper-compat (= 12), gcc-arm-none-eabi, gcc-riscv64-unknown-elf, gcc-xtensa-lx106,
  meson, ninja-build, qemu-system-arm
-Standards-Version: 4.4.1
+Standards-Version: 4.5.0
+Rules-Requires-Root: no
 Section: devel
 HomePage: https://keithp.com/git/picolibc
 Vcs-Git: https://keithp.com/git/picolibc.git
