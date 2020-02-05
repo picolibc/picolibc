@@ -1,3 +1,4 @@
+/* Copyright (c) 2011 Eric Blake <eblake@redhat.com> */
 /* POSIX variant of strerror_r. */
 #undef __STRICT_ANSI__
 #include <errno.h>

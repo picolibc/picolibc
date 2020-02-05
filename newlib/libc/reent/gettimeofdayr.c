@@ -1,3 +1,4 @@
+/* Copyright (c) 2007 Patrick Mansfield <patmans@us.ibm.com> */
 /* Reentrant version of gettimeofday system call
    This implementation just calls the times/gettimeofday system calls.
    Gettimeofday may not be available on all targets.  It's presence

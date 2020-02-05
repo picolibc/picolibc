@@ -1,4 +1,12 @@
 /*
+Copyright (C) 1993 by Sun Microsystems, Inc. All rights reserved.
+
+Developed at SunPro, a Sun Microsystems, Inc. business.
+Permission to use, copy, modify, and distribute this
+software is freely granted, provided that this notice 
+is preserved.
+ */
+/*
  * __isinfd(x) returns 1 if x is infinity, else 0;
  * no branching!
  * Added by Cygnus Support.

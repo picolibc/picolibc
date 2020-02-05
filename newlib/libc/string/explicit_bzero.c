@@ -1,7 +1,7 @@
 /*	$OpenBSD: explicit_bzero.c,v 1.2 2014/06/10 04:17:37 deraadt Exp $ */
 /*
+ * Copyright (c) 2014 Ted Unangst
  * Public domain.
- * Written by Ted Unangst
  */
 
 #include <string.h>

@@ -1,3 +1,4 @@
+/* Copyright (c) 2000 Nick Clifton <nickc@redhat.com> */
 #if defined __thumb__
 
 #include "../../string/memcmp.c"

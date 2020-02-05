@@ -1,3 +1,4 @@
+/* Copyright (c) 2002 Geoffrey Keating <geoffk@geoffk.org> */
 #include <malloc.h>
 
 #ifdef DEFINE_MALLOC

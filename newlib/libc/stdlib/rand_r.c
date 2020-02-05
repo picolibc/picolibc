@@ -1,3 +1,7 @@
+/*
+Copyright (c) 1990 Regents of the University of California.
+All rights reserved.
+ */
 #include <stdlib.h>
 
 /* Pseudo-random generator based on Minimal Standard by

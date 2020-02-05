@@ -1,6 +1,7 @@
 /* This is a simple version of setjmp and longjmp.
 
-   Nick Clifton, Cygnus Solutions, 13 June 1997.  */
+   Copyright (c) 1997 Nick Clifton, Cygnus Solutions
+ */
 
 #include "acle-compat.h"
 

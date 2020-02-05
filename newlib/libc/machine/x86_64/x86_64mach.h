@@ -1,4 +1,11 @@
 /*
+Copyright (C) 2007 by Ellips BV. All rights reserved.
+
+Permission to use, copy, modify, and distribute this
+software is freely granted, provided that this notice
+is preserved.
+ */
+/*
  ** This file is distributed WITHOUT ANY WARRANTY; without even the implied
  ** warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  */

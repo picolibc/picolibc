@@ -1,3 +1,6 @@
+/*
+Copyright (c) 2002 Jeff Johnston <jjohnstn@redhat.com>
+ */
 #include <stdlib.h>
 #include <string.h>
 

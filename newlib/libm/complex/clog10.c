@@ -1,3 +1,4 @@
+/* Copyright (c) 2016 Yaakov Selkowitz <yselkowi@redhat.com> */
 /*
 FUNCTION
         <<clog10>>, <<clog10f>>---complex base-10 logarithm

@@ -1,3 +1,4 @@
+/* Copyright (c) 2017 Sichen Zhao <1473996754@qq.com> */
 /*
 FUNCTION
 	<<strnstr>>---find string segment

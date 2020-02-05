@@ -1,3 +1,4 @@
+/* Copyright (c) 2010 Yaakov Selkowitz <yselkowi@redhat.com> */
 /* BSD predecessor of POSIX.1 <dirent.h> and struct dirent */
 
 #ifndef _SYS_DIR_H_

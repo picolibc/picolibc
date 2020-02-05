@@ -1,3 +1,4 @@
+/* Copyright (c) 2002 Arthur David Olson */
 /*
  * month_lengths.c
  *

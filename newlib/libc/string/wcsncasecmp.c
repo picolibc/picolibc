@@ -1,3 +1,4 @@
+/* Copyright (c) 2009 Corinna Vinschen <corinna@vinschen.de> */
 /*
 FUNCTION
 	<<wcsncasecmp>>---case-insensitive wide character string compare

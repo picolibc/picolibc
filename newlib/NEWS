@@ -1,3 +1,20 @@
+*** Major changes in newlib version 3.2.0:
+
+- memmem performance improvement
+- nanf() and HUGE_VALF now used in libm float routines to reduce size
+- new reduced "tiny" code size printf and puts support
+- errno setting enhanced in libm routines
+- new --enable-newlib-reent-check-verify configure option to verify reent memory
+- <fenv.h> support added
+- <sys/time.h> and <sys/_timespec.h> synced with FreeBSD
+- timeval macros moved to <sys/time.h>
+- newlib wide char conversion functions updated to Unicode 11.0
+- new msp430-elfbare target support
+- AMD GCN port
+- PRU port
+- nbdm port
+- various standard improvements
+
 *** Major changes in newlib version 3.1.0:
 
 - global stdio streams support added for reent small

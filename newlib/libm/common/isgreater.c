@@ -1,3 +1,11 @@
+/*
+Copyright (C) 1993 by Sun Microsystems, Inc. All rights reserved.
+
+Developed at SunPro, a Sun Microsystems, Inc. business.
+Permission to use, copy, modify, and distribute this
+software is freely granted, provided that this notice 
+is preserved.
+ */
 /* isgreater.c:  This file contains no source code, but rather only the
  * man-page comments.  All of the documented "functions" are actually macros
  * defined in math.h (q.v.).  */

@@ -1,4 +1,7 @@
 /*
+Copyright (c) 2007 Corinna Vinschen <corinna@vinschen.de>
+ */
+/*
 FUNCTION
 	<<stpncpy>>---counted copy string returning a pointer to its end
 

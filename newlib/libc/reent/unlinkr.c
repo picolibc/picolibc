@@ -1,3 +1,4 @@
+/* Copyright (c) 2000 Alexandre Oliva <aoliva@redhat.com> */
 /* Reentrant versions of file system calls.  These implementations
    just call the usual system calls.  */
 

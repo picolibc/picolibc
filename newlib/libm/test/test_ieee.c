@@ -1,3 +1,19 @@
+/*
+ * Copyright (c) 1994 Cygnus Support.
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms are permitted
+ * provided that the above copyright notice and this paragraph are
+ * duplicated in all such forms and that any documentation,
+ * and/or other materials related to such
+ * distribution and use acknowledge that the software was developed
+ * at Cygnus Support, Inc.  Cygnus Support, Inc. may not be used to
+ * endorse or promote products derived from this software without
+ * specific prior written permission.
+ * THIS SOFTWARE IS PROVIDED ``AS IS'' AND WITHOUT ANY EXPRESS OR
+ * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+ */
 
 #include "test.h"
 #include <ieeefp.h>
@@ -11,17 +27,17 @@ test_getround (void)
 
   newfunc("fpgetround/fpsetround");
   line(1);
-  fpsetround(FP_RN);
-  test_iok(fpgetround(), FP_RN);
+  if (fpsetround(FP_RN) != -1)
+    test_iok(fpgetround(), FP_RN);
   line(2);
-  fpsetround(FP_RM);
-  test_iok(fpgetround(), FP_RM);
+  if (fpsetround(FP_RM) != -1)
+    test_iok(fpgetround(), FP_RM);
   line(3);  
-  fpsetround(FP_RP);
-  test_iok(fpgetround(), FP_RP);
+  if (fpsetround(FP_RP) != -1)
+    test_iok(fpgetround(), FP_RP);
   line(4);  
-  fpsetround(FP_RZ);
-  test_iok(fpgetround(), FP_RZ);
+  if (fpsetround(FP_RZ) != -1)
+    test_iok(fpgetround(), FP_RZ);
 }
 
 /* And fpset/fpgetmask */
@@ -30,20 +46,20 @@ test_getmask (void)
 {
   newfunc("fpsetmask/fpgetmask");
   line(1);
-  fpsetmask(FP_X_INV);
-  test_iok(fpgetmask(),FP_X_INV);
+  if (fpsetmask(FP_X_INV) != -1)
+    test_iok(fpgetmask(),FP_X_INV);
   line(2);
-  fpsetmask(FP_X_DX);
-  test_iok(fpgetmask(),FP_X_DX);
+  if (fpsetmask(FP_X_DX) != -1)
+    test_iok(fpgetmask(),FP_X_DX);
   line(3);
-  fpsetmask(FP_X_OFL );
-  test_iok(fpgetmask(),FP_X_OFL);
+  if (fpsetmask(FP_X_OFL ) != -1)
+    test_iok(fpgetmask(),FP_X_OFL);
   line(4);  
-  fpsetmask(FP_X_UFL);
-  test_iok(fpgetmask(),FP_X_UFL);
+  if (fpsetmask(FP_X_UFL) != -1)
+    test_iok(fpgetmask(),FP_X_UFL);
   line(5);  
-  fpsetmask(FP_X_IMP);
-  test_iok(fpgetmask(),FP_X_IMP);
+  if (fpsetmask(FP_X_IMP) != -1)
+    test_iok(fpgetmask(),FP_X_IMP);
 }
 
 void
@@ -51,20 +67,20 @@ test_getsticky (void)
 {
   newfunc("fpsetsticky/fpgetsticky");
   line(1);
-  fpsetsticky(FP_X_INV);
-  test_iok(fpgetsticky(),FP_X_INV);
+  if (fpsetsticky(FP_X_INV) != -1)
+    test_iok(fpgetsticky(),FP_X_INV);
   line(2);
-  fpsetsticky(FP_X_DX);
-  test_iok(fpgetsticky(),FP_X_DX);
+  if (fpsetsticky(FP_X_DX) != -1)
+    test_iok(fpgetsticky(),FP_X_DX);
   line(3);
-  fpsetsticky(FP_X_OFL );
-  test_iok(fpgetsticky(),FP_X_OFL);
+  if (fpsetsticky(FP_X_OFL ) != -1)
+    test_iok(fpgetsticky(),FP_X_OFL);
   line(4);  
-  fpsetsticky(FP_X_UFL);
-  test_iok(fpgetsticky(),FP_X_UFL);
+  if (fpsetsticky(FP_X_UFL) != -1)
+    test_iok(fpgetsticky(),FP_X_UFL);
   line(5);  
-  fpsetsticky(FP_X_IMP);
-  test_iok(fpgetsticky(),FP_X_IMP);
+  if (fpsetsticky(FP_X_IMP) != -1)
+    test_iok(fpgetsticky(),FP_X_IMP);
 }
 
 void
@@ -72,12 +88,12 @@ test_getroundtoi (void)
 {
   newfunc("fpsetroundtoi/fpgetroundtoi");
   line(1);
-  fpsetroundtoi(FP_RDI_TOZ);
-  test_iok(fpgetroundtoi(),FP_RDI_TOZ);
+  if (fpsetroundtoi(FP_RDI_TOZ) != -1)
+    test_iok(fpgetroundtoi(),FP_RDI_TOZ);
 
   line(2);
-  fpsetroundtoi(FP_RDI_RD);
-  test_iok(fpgetroundtoi(),FP_RDI_RD);
+  if (fpsetroundtoi(FP_RDI_RD) != -1)
+    test_iok(fpgetroundtoi(),FP_RDI_RD);
 
 }
 
@@ -118,46 +134,54 @@ test_round (void)
   
   line(1);
   
-  fpsetround(FP_RN);
-  r1 = n + m;
-  test_mok(r1, add_rounded_up, 64);
+  if (fpsetround(FP_RN) != -1) {
+    r1 = n + m;
+    test_mok(r1, add_rounded_up, 64);
+  }
   
   line(2);
-  fpsetround(FP_RM);
-  r2 = n + m;
-  test_mok(r2, add_rounded_down, 64);
+  if (fpsetround(FP_RM) != -1) {
+    r2 = n + m;
+    test_mok(r2, add_rounded_down, 64);
+  }
   
-  fpsetround(FP_RP);
   line(3);
-  r3 = n + m;
-  test_mok(r3,add_rounded_up, 64);
+  if (fpsetround(FP_RP) != -1) {
+    r3 = n + m;
+    test_mok(r3,add_rounded_up, 64);
+  }
   
-  fpsetround(FP_RZ);
   line(4);
-  r4 = n + m;
-  test_mok(r4,add_rounded_down,64);
+  if (fpsetround(FP_RZ) != -1) {
+    r4 = n + m;
+    test_mok(r4,add_rounded_down,64);
+  }
 
 
-  fpsetround(FP_RN);
-  r1 = - n - m;
   line(5);
-  test_mok(r1,sub_rounded_down,64);
+  if (fpsetround(FP_RN) != -1) {
+    r1 = - n - m;
+    test_mok(r1,sub_rounded_down,64);
+  }
   
-  fpsetround(FP_RM);
-  r2 = - n - m;
   line(6);
-  test_mok(r2,sub_rounded_down,64);
+  if (fpsetround(FP_RM) != -1) {
+    r2 = - n - m;
+    test_mok(r2,sub_rounded_down,64);
+  }
 
 
-  fpsetround(FP_RP);
-  r3 = - n - m;
   line(7);
-  test_mok(r3,sub_rounded_up,64);
+  if (fpsetround(FP_RP) != -1) {
+    r3 = - n - m;
+    test_mok(r3,sub_rounded_up,64);
+  }
 
-  fpsetround(FP_RZ);
-  r4 = - n - m;
   line(8);
-  test_mok(r4,sub_rounded_up,64);
+  if (fpsetround(FP_RZ) != -1) {
+    r4 = - n - m;
+    test_mok(r4,sub_rounded_up,64);
+  }
 }
 
 

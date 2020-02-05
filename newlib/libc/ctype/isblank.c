@@ -1,3 +1,4 @@
+/* Copyright (c) 2002 Thomas Fitzsimmons <fitzsim@redhat.com> */
 /*
 FUNCTION
 	<<isblank>>, <<isblank_l>>---blank character predicate

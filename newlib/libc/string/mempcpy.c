@@ -1,4 +1,7 @@
 /*
+Copyright (c) 2002 Jeff Johnston <jjohnstn@redhat.com>
+ */
+/*
 FUNCTION
         <<mempcpy>>---copy memory regions and return end pointer
 

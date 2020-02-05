@@ -10,10 +10,14 @@ code from [Newlib](http://sourceware.org/newlib/) and
 
 Picolibc source comes from a variety of places and has a huge variety
 of copyright holders and license texts. While much of the code comes
-from newlib, none of the GPL-related bits are left in the repository,
-so all of the source code uses BSD-like licenses, a mixture of 2- and
-3- clause BSD itself and a variety of other (mostly older) licenses
-with similar terms.
+from newlib, none of the GPL-related bits used to build the library
+are left in the repository, so all of the source code uses BSD-like
+licenses, a mixture of 2- and 3- clause BSD itself and a variety of
+other (mostly older) licenses with similar terms.
+
+There are two files used for testing printf, test/printf-tests.c and
+test/testcases.c which are licensed under the GPL version 2 or
+later.
 
 Please see the file COPYING.NEWLIB in this distribution for newlib
 license terms.

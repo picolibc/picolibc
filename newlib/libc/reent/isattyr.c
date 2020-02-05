@@ -1,3 +1,4 @@
+/* Copyright (c) 2008 Jeff Johnston <jjohnstn@redhat.com> */
 /* Reentrant versions of isatty system call.  */
 
 #include <reent.h>

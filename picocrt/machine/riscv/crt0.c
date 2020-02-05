@@ -33,6 +33,12 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+static inline void
+_set_tls(void *tls)
+{
+	asm("mv tp, %0" : : "r" (tls));
+}
+
 #include "../../crt0.h"
 #include <sys/cdefs.h>
 

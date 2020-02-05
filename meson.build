@@ -40,7 +40,7 @@ project('picolibc', 'c',
 	],
 	license : 'BSD',
 	meson_version : '>= 0.50',
-	version: '1.3'
+	version: '1.4'
        )
 
 targets = []
@@ -191,9 +191,9 @@ endif
 
 conf_data = configuration_data()
 
-NEWLIB_VERSION='2.10.0'
-NEWLIB_MAJOR_VERSION=2
-NEWLIB_MINOR_VERSION=10
+NEWLIB_VERSION='3.2.0'
+NEWLIB_MAJOR_VERSION=3
+NEWLIB_MINOR_VERSION=2
 NEWLIB_PATCHLEVEL_VERSION=0
 
 have_cc_inhibit_loop_to_libcall=meson.get_compiler('c').has_argument('-fno-tree-loop-distribute-patterns')
@@ -238,6 +238,7 @@ conf_data.set('NEWLIB_GLOBAL_ERRNO', newlib_global_errno, description: 'use glob
 conf_data.set('HAVE_INITFINI_ARRAY', newlib_initfini_array, description: 'compiler supports INIT_ARRAY sections')
 conf_data.set('HAVE_INIT_FINI', newlib_initfini, description: 'Support _init() and _fini() functions')
 conf_data.set('NEWLIB_TLS', thread_local_storage, description: 'use thread local storage')
+conf_data.set('PICOLIBC_TLS', thread_local_storage, description: 'use thread local storage')
 conf_data.set('POSIX_IO', posix_io, description: 'Use open/close/read/write in tinystdio')
 conf_data.set('POSIX_CONSOLE', posix_console, description: 'Use POSIX I/O for stdin, stdout and stderr')
 
@@ -289,6 +290,9 @@ endif
 
 add_project_arguments(arguments, language: 'c')
 
+# libc will adjust this if supported
+has_ieeefp_funcs = false
+
 # semihost will adjust this if supported
 has_semihost = false
 
@@ -335,6 +339,8 @@ subdir('newlib')
 if enable_tests
   subdir('test')
 endif
+
+conf_data.set('HAVE_IEEEFP_FUNCS', has_ieeefp_funcs, description: 'IEEE fp funcs available')
 
 configure_file(output : 'picolibc.h',
 	       configuration: conf_data,

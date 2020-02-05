@@ -341,8 +341,8 @@ typedef struct _Bigint _Bigint;
 #define copybits 	__copybits
 #define hexnan	__hexnan
 
-#define eBalloc(__reent_ptr, __len) ({ \
-   void *__ptr = Balloc(__reent_ptr, __len); \
+#define eBalloc(__len) ({ \
+   void *__ptr = Balloc(__len); \
    if (__ptr == NULL) \
      __assert_func(__FILE__, __LINE__, (char *)0, "Balloc succeeded"); \
    __ptr; \

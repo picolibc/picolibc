@@ -221,7 +221,7 @@ multadd (
     {
       if (wds >= b->_maxwds)
 	{
-	  b1 = Balloc (b->_k + 1);
+	  b1 = eBalloc (b->_k + 1);
 	  Bcopy (b1, b);
 	  Bfree (b);
 	  b = b1;
@@ -246,15 +246,11 @@ s2b (
   x = (nd + 8) / 9;
   for (k = 0, y = 1; x > y; y <<= 1, k++);
 #ifdef Pack_32
-  b = Balloc (k);
-  if (!b)
-    return NULL;
+  b = eBalloc (k);
   b->_x[0] = y9;
   b->_wds = 1;
 #else
-  b = Balloc (k + 1);
-  if (!b)
-    return NULL;
+  b = eBalloc (k + 1);
   b->_x[0] = y9 & 0xffff;
   b->_wds = (b->_x[1] = y9 >> 16) ? 2 : 1;
 #endif
@@ -364,9 +360,7 @@ i2b (int i)
 {
   _Bigint *b;
 
-  b = Balloc (1);
-  if (!b)
-    return NULL;
+  b = eBalloc (1);
   b->_x[0] = i;
   b->_wds = 1;
   return b;
@@ -395,9 +389,7 @@ mult (_Bigint * a, _Bigint * b)
   wc = wa + wb;
   if (wc > a->_maxwds)
     k++;
-  c = Balloc (k);
-  if (!c)
-    return NULL;
+  c = eBalloc (k);
   for (x = c->_x, xa = x + wc; x < xa; x++)
     *x = 0;
   xa = a->_x;
@@ -522,9 +514,7 @@ lshift (_Bigint * b, int k)
   n1 = n + b->_wds + 1;
   for (i = b->_maxwds; n1 > i; i <<= 1)
     k1++;
-  b1 = Balloc (k1);
-  if (!b1)
-    return NULL;
+  b1 = eBalloc (k1);
   x1 = b1->_x;
   for (i = 0; i < n; i++)
     *x1++ = 0;
@@ -613,9 +603,7 @@ diff (
   i = cmp (a, b);
   if (!i)
     {
-      c = Balloc (0);
-      if (!c)
-	return NULL;
+      c = eBalloc (0);
       c->_wds = 1;
       c->_x[0] = 0;
       return c;
@@ -629,9 +617,7 @@ diff (
     }
   else
     i = 0;
-  c = Balloc (a->_k);
-  if (!c)
-    return NULL;
+  c = eBalloc (a->_k);
   c->_sign = i;
   wa = a->_wds;
   xa = a->_x;

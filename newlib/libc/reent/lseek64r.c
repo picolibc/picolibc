@@ -1,3 +1,4 @@
+/* Copyright (c) 2002 Jeff Johnston <jjohnstn@redhat.com> */
 /* Reentrant versions of lseek system call. */
 
 #include <reent.h>

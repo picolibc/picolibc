@@ -1,3 +1,4 @@
+/* Copyright (c) 2009 Corinna Vinschen <corinna@vinschen.de> */
 /*
 FUNCTION
 <<wcsrtombs>>, <<wcsnrtombs>>---convert a wide-character string to a character string

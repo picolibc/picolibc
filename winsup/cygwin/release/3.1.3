@@ -1,0 +1,31 @@
+What changed:
+-------------
+
+- Allow symlinks to be opened with O_PATH | O_NOFOLLOW.
+
+- Allow the pathname argument to readlinkat(2) to be an empty string,
+  provided the dirfd argument refers to a symlink opened with
+  O_PATH | O_NOFOLLOW.  The readlinkat call then operates on that
+  symlink.
+
+- Support the Linux-specific AT_EMPTY_PATH flag for fchownat(2) and
+  fstatat(2).
+
+Bug Fixes:
+----------
+
+- Define CPU_SETSIZE, as on Linux.
+  Addresses: https://cygwin.com/ml/cygwin/2019-12/msg00248.html
+
+- Fix a regression that prevented the root of a drive from being the
+  Cygwin installation root.
+  Addresses: https://cygwin.com/ml/cygwin/2020-01/msg00111.html
+
+- Many fixes in new pseudo console support.
+  Addresses (among others):
+	     https://cygwin.com/ml/cygwin/2019-12/msg00173.html
+	     https://cygwin.com/ml/cygwin/2019-12/msg00292.html
+	     https://cygwin.com/ml/cygwin/2019-12/msg00295.html
+	     https://cygwin.com/ml/cygwin/2020-01/msg00093.html
+	     https://cygwin.com/ml/cygwin/2020-01/msg00147.html
+	     https://cygwin.com/ml/cygwin/2020-01/msg00161.html

@@ -1,3 +1,4 @@
+/* Copyright (c) 2007 Corinna Vinschen <corinna@vinschen.de> */
 /*
 FUNCTION
 	<<stpcpy>>---copy string returning a pointer to its end

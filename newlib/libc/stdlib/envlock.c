@@ -1,4 +1,8 @@
 /*
+Copyright (c) 1990 Regents of the University of California.
+All rights reserved.
+ */
+/*
 FUNCTION
 <<__env_lock>>, <<__env_unlock>>---lock environ variable
 

@@ -1,5 +1,7 @@
 #! /bin/sh
 
+# Copyright (c) 2018 Thomas Wolff <towo@towo.net>
+
 echo Generating Unicode character properties data for newlib/libc/ctype
 
 cd `dirname $0`

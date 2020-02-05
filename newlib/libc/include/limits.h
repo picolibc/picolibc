@@ -1,3 +1,4 @@
+/* Copyright (c) 2002 Jeff Johnston  <jjohnstn@redhat.com> */
 #ifndef _LIBC_LIMITS_H_
 # define _LIBC_LIMITS_H_	1
 

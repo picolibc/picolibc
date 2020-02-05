@@ -1,3 +1,4 @@
+/* Copyright (c) 2013 Corinna Vinschen <corinna@vinschen.de> */
 #ifndef _MB_ENDIAN_H
 #define _MB_ENDIAN_H
 

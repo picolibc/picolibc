@@ -1,3 +1,4 @@
+/* Copyright (c) 2002 Jeff Johnston <jjohnstn@redhat.com> */
 /* GNU variant of strerror_r. */
 /*
 FUNCTION

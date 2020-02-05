@@ -1,3 +1,8 @@
+/*
+Copyright (c) 2017 Thomas Wolff towo@towo.net
+
+
+ */
 #include <wctype.h>
 #include <stdint.h>
 #include "categories.h"

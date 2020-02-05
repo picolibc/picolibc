@@ -1,3 +1,7 @@
+/*
+Copyright (c) 1990 Regents of the University of California.
+All rights reserved.
+ */
 #ifndef _MBCTYPE_H_
 
 #define _MBCTYPE_H_

@@ -1,3 +1,7 @@
+/*
+Copyright (c) 1990 Regents of the University of California.
+All rights reserved.
+ */
 /* NetWare can not use this implementation of abort.  It provides its
    own version of abort in clib.nlm.  If we can not use clib.nlm, then
    we must write abort in sys/netware.  */

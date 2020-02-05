@@ -1,3 +1,4 @@
+/* Copyright (c) 2003 Anthony Green <green@moxielogic.com> */
 /* This is a simple version of setjmp and longjmp for iq2000. */
 
 

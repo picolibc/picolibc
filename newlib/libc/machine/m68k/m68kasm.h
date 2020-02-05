@@ -1,3 +1,4 @@
+/* Copyright (c) 2008 Jeff Johnston  <jjohnstn@redhat.com> */
 /* These are predefined by new versions of GNU cpp.  */
 
 #ifndef __USER_LABEL_PREFIX__

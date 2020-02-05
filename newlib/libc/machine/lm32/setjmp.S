@@ -1,6 +1,5 @@
 /* 
- * setjmp/longjmp for LatticeMico32.
- * Contributed by Jon Beniston <jon@beniston.com>
+ * Copyright (c) 2008 Jon Beniston <jon@beniston.com>
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -23,6 +22,7 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
+/* setjmp/longjmp for LatticeMico32. */
  
 	.section	.text
 	.align	4

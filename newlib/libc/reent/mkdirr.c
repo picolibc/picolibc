@@ -1,3 +1,4 @@
+/* Copyright (c) 2009 Jeff Johnston <jjohnstn@redhat.com> */
 /* Reentrant versions of mkdir system call. */
 
 #include <reent.h>

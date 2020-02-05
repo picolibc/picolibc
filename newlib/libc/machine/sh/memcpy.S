@@ -3,7 +3,7 @@
 !
 ! by Toshiyasu Morita (tm@netcom.com)
 ! hacked by J"orn Rernnecke (joern.rennecke@superh.com) ("o for o-umlaut)
-! SH5 code Copyright 2002 SuperH Ltd.
+/* SH5 code Copyright 2002 SuperH Ltd. */
 !
 ! Entry: ARG0: destination pointer
 !        ARG1: source pointer

@@ -1,3 +1,6 @@
+/*
+Copyright (c) 2009 Nick Clifton <nickc@redhat.com>
+ */
 	.file	"strcmp.S"
 
 	.section .text

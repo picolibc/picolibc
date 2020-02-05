@@ -1,3 +1,4 @@
+/* Copyright (c) 2007 Dave Korn */
 /*
  * ====================================================
  * x87 FP implementation contributed to Newlib by

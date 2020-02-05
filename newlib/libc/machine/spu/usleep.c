@@ -1,6 +1,6 @@
 /* Copied from libc/posix/usleep.c, removed the check for HAVE_NANOSLEEP */
 
-/* Written 2002 by Jeff Johnston */
+/* Copyright (c) 2002 by Jeff Johnston */
 
 #include <errno.h>
 #include <time.h>

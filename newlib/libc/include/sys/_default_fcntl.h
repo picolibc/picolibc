@@ -1,3 +1,4 @@
+/* Copyright (c) 2007 Jeff Johnston  <jjohnstn@redhat.com> */
 
 #ifndef	_SYS__DEFAULT_FCNTL_H_
 #ifdef __cplusplus

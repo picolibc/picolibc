@@ -1,3 +1,6 @@
+/*
+Copyright (c) 2000 Nick Clifton <nickc@redhat.com>
+ */
 #if defined __thumb__ || defined(PREFER_SIZE_OVER_SPEED) || defined(__OPTIMIZE_SIZE__)
 
 #include "../../string/strlen.c"

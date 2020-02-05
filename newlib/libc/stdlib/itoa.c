@@ -1,3 +1,4 @@
+/* Copyright (c) 2014 Corinna Vinschen <corinna@vinschen.de> */
 /*
 FUNCTION
 <<itoa>>---integer to string

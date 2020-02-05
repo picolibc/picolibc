@@ -2922,9 +2922,7 @@ stripspaces:
     _mprec_result_k++;
   if (__mprec_register_exit() != 0)
     return NULL;
-  _mprec_result = Balloc (_mprec_result_k);
-  if (!_mprec_result)
-    return NULL;
+  _mprec_result = eBalloc (_mprec_result_k);
 
 /* Copy from internal temporary buffer to permanent buffer.  */
   outstr = (char *) _mprec_result;

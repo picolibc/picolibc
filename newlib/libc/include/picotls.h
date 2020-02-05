@@ -36,6 +36,7 @@
 #ifndef _PICOTLS_H_
 #define _PICOTLS_H_
 
+#ifdef PICOLIBC_TLS
 /*
  * Initialize a TLS block, copying the data segment from flash and
  * zeroing the BSS segment.
@@ -46,5 +47,6 @@ _init_tls(void *tls);
 /* Set the TLS pointer to the specific block */
 void
 _set_tls(void *tls);
+#endif
 
 #endif /* _PICOTLS_H_ */

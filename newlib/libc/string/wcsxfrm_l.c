@@ -1,4 +1,7 @@
 /*
+Copyright (c) 2016 Corinna Vinschen <corinna@vinschen.de>
+ */
+/*
 FUNCTION
 	<<wcsxfrm_l>>---locale-specific wide-character string transformation
 	

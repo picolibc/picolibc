@@ -112,8 +112,13 @@ math_test_src = [
   'yn_vec.c',
 ]
 
+if has_ieeefp_funcs
+  math_test_src += [
+    'test_ieee.c',
+  ]
+endif
+
 #  'dcvt.c',
-#  'test_ieee.c',
 
 foreach target : targets
   value = get_variable('target_' + target)

@@ -37,8 +37,7 @@
 #include <string.h>
 #include <stdint.h>
 
-extern char __tdata_size[];
-
+/* This code is duplicated in picocrt/machine/riscv/crt0.c */
 void
 _set_tls(void *tls)
 {

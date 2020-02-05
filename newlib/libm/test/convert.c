@@ -1,3 +1,19 @@
+/*
+ * Copyright (c) 1994 Cygnus Support.
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms are permitted
+ * provided that the above copyright notice and this paragraph are
+ * duplicated in all such forms and that any documentation,
+ * and/or other materials related to such
+ * distribution and use acknowledge that the software was developed
+ * at Cygnus Support, Inc.  Cygnus Support, Inc. may not be used to
+ * endorse or promote products derived from this software without
+ * specific prior written permission.
+ * THIS SOFTWARE IS PROVIDED ``AS IS'' AND WITHOUT ANY EXPRESS OR
+ * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+ */
 /* Test conversions */
 
 #define IN_CONVERT
@@ -200,6 +216,7 @@ test_fcvt (void)
   char *sf;
   double v1;
   double v2;
+  int s1, s2;
   sd =  fcvt(pdd->value, pdd->f1, &a2, &a3);
 
   test_scok(sd,pdd->fstring,10);
@@ -210,8 +227,16 @@ test_fcvt (void)
   /* Test the float version by converting and inspecting the numbers 3
    after reconverting */
   sf =  fcvtf(pdd->value, pdd->f1, &a2, &a3);
-  sscanf(sd, "%lg", &v1);
-  sscanf(sf, "%lg", &v2);
+  s1 = sscanf(sd, "%lg", &v1);
+  s2 = sscanf(sf, "%lg", &v2);
+  if (strlen(sd) == 0) {
+    test_iok(EOF, s1);
+    v1 = 0.0;
+  }
+  if (strlen(sf) == 0) {
+    test_iok(EOF, s2);
+    v2 = 0.0;
+  }
   test_mok(v1, v2,30);
   test_iok(pdd->f2,a2);
   test_iok(pdd->f3,a3);

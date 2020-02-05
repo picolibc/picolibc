@@ -1,3 +1,4 @@
+/* Copyright (c) 2002 Jeff Johnston  <jjohnstn@redhat.com> */
 #ifndef __SYS_LOCK_H__
 #define __SYS_LOCK_H__
 

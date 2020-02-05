@@ -80,8 +80,8 @@ main(int argc, char **argv)
 		fflush(stdout);
 	}
 	for (x = 0; x < 32; x++) {
-		uint32_t v = 0x12345678ul >> x;
-		uint32_t r;
+		unsigned int v = 0x12345678 >> x;
+		unsigned int r;
 
 		sprintf(buf, "%u", v);
 		sscanf(buf, "%u", &r);

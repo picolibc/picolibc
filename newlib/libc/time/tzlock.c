@@ -1,3 +1,4 @@
+/* Copyright (c) 2002 Jeff Johnston <jjohnstn@redhat.com> */
 /*
 FUNCTION
 <<__tz_lock>>, <<__tz_unlock>>---lock time zone global variables

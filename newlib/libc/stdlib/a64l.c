@@ -1,3 +1,4 @@
+/* Copyright (c) 2002 Jeff Johnston <jjohnstn@redhat.com> */
 /*
 FUNCTION
 <<a64l>>, <<l64a>>---convert between radix-64 ASCII string and long

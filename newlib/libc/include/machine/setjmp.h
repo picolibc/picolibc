@@ -1,3 +1,14 @@
+/*
+Copyright (C) 1991 DJ Delorie
+All rights reserved.
+
+Redistribution, modification, and use in source and binary forms is permitted
+provided that the above copyright notice and following paragraph are
+duplicated in all such forms.
+
+This file is distributed WITHOUT ANY WARRANTY; without even the implied
+warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ */
 
 _BEGIN_STD_C
 
@@ -238,7 +249,7 @@ _BEGIN_STD_C
 #endif
 
 #ifdef __moxie__
-#define _JBLEN 19
+#define _JBLEN 10
 #endif
 
 #ifdef __CRX__

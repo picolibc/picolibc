@@ -1,3 +1,4 @@
+/* Copyright (c) 2015 Freddie Chopin <freddie.chopin@gmail.com> */
 /*
  * Static instance of _on_exit_args struct.
  *

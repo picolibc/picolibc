@@ -1,3 +1,4 @@
+/* Copyright (c) 2007 Patrick Mansfield <patmans@us.ibm.com> */
 /*
  * The SPU must have these values match those on the PPU linux side, so
  * the assisted calls (system or library ones) that set errno will use the
