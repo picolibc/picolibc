@@ -1,0 +1,3 @@
+#!/bin/sh
+dir=`dirname $0`
+git ls-files | $dir/find-copyright -

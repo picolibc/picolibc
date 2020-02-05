@@ -1,0 +1,486 @@
+#!/usr/bin/python3
+
+import sys
+import fileinput
+import magic
+import re
+from comment_parser import comment_parser
+
+end_pats = (r'This implementation just',
+            r'Synopsis of public',
+            r'The SPU must have',
+            r'This is a simple version',
+            r'This is a dummy',
+            r'stdio_ext\.h',
+            r'python script to',
+            r'libgen\.h',
+            r'Id:.*Exp',
+            r'sccs\.',
+            r'Tests gleaned',
+            r'tar\.h',
+            r'tzcalc_limits\.c',
+            r'dummy file',
+            r'Rearranged for general',
+            r'sincos',
+            r'POSIX',
+            r'Reentrant',
+            r'Copied',
+            r'These are',
+            r'creat',
+            r'ARM configuration',
+            r'Place holder',
+            r'local header',
+            r'GNU variant',
+            r'default reentrant',
+            r'A replacement',
+            r'The signgam',
+            r'dummy header',
+            r'Uniset',
+            r'wcsftime\.c',
+            r'month_lengths\.c',
+            r'Static instance',
+            r'Conversion is performed',
+            r'Common routine',
+            r'l64a')
+
+end_pats_s = (r'FUNCTION',)
+
+end_res = []
+for pat in end_pats:
+        regex = re.compile(pat, re.I)
+        end_res += [regex]
+
+for pat in end_pats_s:
+        regex = re.compile(pat)
+        end_res += [regex]
+
+left_res = re.compile(r'^[^A-Za-z0-9]*(.*)')
+right_res = re.compile(r'(.*)[ /*\t]$')
+
+def clean_copyright(string):
+        copyright = []
+        have_cpr = False
+        cpr_line = re.compile(r'copyright.*(20[0-2][0-9]|19[7-9][0-9])', re.I)
+        upper = re.compile(r'[A-Z]')
+        lower = re.compile(r'[a-z]')
+        modified = re.compile(r'Modified')
+        derived = re.compile(r'code is derived from software', re.I)
+        skipping = False
+        only_upper = False
+        for line in string.splitlines():
+                m = cpr_line.search(line)
+                if m:
+                        line = line[m.start():]
+                        m = re.match(r'(.*<[^>]+>).*', line)
+                        if m:
+                                line = line[:m.end()]
+                        have_cpr = True
+
+                if not have_cpr:
+                        continue
+
+                end = False
+                for regex in end_res:
+                        if regex.search(line):
+                                end = True
+                                break
+                if end:
+                        break
+
+                if modified.search(line):
+                        skipping = True
+                        continue
+                if derived.search(line):
+                        skipping = True
+                        continue
+                if only_upper:
+                        if lower.search(line):
+                                break
+                elif upper.search(line) and not lower.search(line):
+                        only_upper = True
+                
+                line = left_res.match(line).group(1)
+                while True:
+                        m = right_res.match(line)
+                        if not m:
+                                break
+                        line = m.group(1)
+                if skipping:
+                        if len(line) == 0:
+                                skipping = False
+                        continue
+                copyright += [line]
+        t = '\n'.join(copyright).strip()
+        return t
+
+def get_license_type(copyright):
+        if re.match(r'^no support for.*', copyright):
+                return "Unknown"
+        if copyright == 'none':
+                return "None"
+        if re.search(r'NetBSD', copyright):
+                return "NetBSD"
+        if (re.search(r'Redistributions *(of)? *source +code', copyright) and
+            re.search(r'Redistributions +in +binary +form', copyright)):
+           if re.search(r'[tT]he +names? of', copyright):
+                   return "BSD3"
+           else:
+                   return "BSD2"
+        if (re.search(r'University', copyright) and
+            re.search(r'California', copyright) and
+            re.search(r'Berkeley', copyright)):
+                return "UCB"
+        if re.search(r'FreeBSD', copyright):
+                return "FreeBSD"
+        if re.search(r'the GPL', copyright):
+                if re.search(r'version 2', copyright):
+                        return "GPL2"
+                if re.search(r'version 3', copyright):
+                        return "GPL3"
+                return "GPL"
+        return "Other"
+
+def find_copyright_source(name, mime):
+        with open(name, 'rb') as f:
+                text = f.read().decode('utf-8', errors='ignore')
+                try:
+                        comments = comment_parser.extract_comments_from_str(text, mime)
+                except:
+                        return None
+        tog = re.compile(r'.*Open Group Base Specification', re.I | re.S)
+        m = re.compile(r'.*copyright.*', re.I | re.S)
+        for i in range(len(comments)):
+                comment = comments[i]
+                if tog.match(comment.text()):
+                        continue
+                if m.match(comment.text()):
+                        bits = comment.text()
+                        line = comments[i].line_number() + 1
+                        i += 1
+                        while i < len(comments):
+                                if comments[i].line_number() != line:
+                                        break
+                                bits += '\n' + comments[i].text()
+                                i += 1
+                                line += 1
+                        return clean_copyright(bits)
+        return None
+
+# Copyright holder is generally the first paragraph of the text
+
+def pick_split(split,match,use_end):
+        if not match:
+                return split
+        start = match.start()
+        end = match.start()
+        if use_end:
+                end = match.end()
+        if not split:
+                return (start, end)
+        if start < split[0]:
+                return (start, end)
+        return split
+
+def get_split(copyright):
+        lastcopy = None
+        for lastcopy in re.finditer(r'copyright (\(c\))? *(19[7-9][0-9]|20[0-2][0-9])[^A-Z]*[A-Z][^\n]*', copyright, re.I|re.S):
+                pass
+        if lastcopy:
+                para = None
+                for para in re.finditer(r'\n\n', copyright, re.S):
+                        if para.start() >= lastcopy.end():
+                                break
+                all = None
+                for all in re.finditer(r'all rights reserved\.?', copyright, re.I | re.S):
+                        if all.start() >= lastcopy.end():
+                                break
+        else:
+                para = re.search(r'\n\n', copyright, re.S)
+                all = re.search(r'all rights reserved\.?', copyright, re.I | re.S)
+        licensed = re.search(r'This ', copyright, re.I | re.S)
+        portions = re.search(r'Portions', copyright, re.I | re.S)
+        mod = re.search(r'modification', copyright, re.I | re.S)
+        perm = re.search(r'permission to', copyright, re.I | re.S)
+        public = re.search(r'public domain', copyright, re.I | re.S)
+
+        split = None
+        split = pick_split(split, all, True)
+        if not split:
+                split = pick_split(split, para, True)
+        split = pick_split(split, licensed, False)
+        split = pick_split(split, portions, False)
+        split = pick_split(split, mod, False)
+        split = pick_split(split, perm, False)
+        split = pick_split(split, public, False)
+        return split
+
+def get_holder(copyright):
+        split = get_split(copyright)
+        if split:
+                return copyright[:split[0]]
+        return copyright
+
+def get_license(copyright):
+        split = get_split(copyright)
+        if split:
+                copyright = copyright[split[1]:]
+                m = re.match(r'^[ \t]*\n[ \t]*\n*', copyright, re.I|re.S)
+                if m:
+                        copyright = copyright[m.end():]
+                return copyright
+        if copyright == "unknown file type":
+                return copyright
+        return "none"
+
+def pound_comments(name):
+        l = re.compile(r'^#[ \t]*(.*)$')
+        comments = []
+        comment = []
+        for line in open(name).readlines():
+                m = l.match(line)
+                if m:
+                        after = m.group(1)
+                        comment += [after]
+                elif comment:
+                        comments += ['\n'.join(comment)]
+                        comment = []
+        if comment:
+                comments += ['\n'.join(comment)]
+        return comments
+
+def find_copyright_pound(name):
+        comments = pound_comments(name)
+        m = re.compile(r'.*copyright.*', re.I | re.S)
+        for comment in comments:
+                if m.match(comment):
+                        return clean_copyright(comment)
+        return None
+
+def semi_comments(name):
+        l = re.compile(r'^;;*[ \t]*(.*)$')
+        comments = []
+        comment = []
+        for line in open(name).readlines():
+                m = l.match(line)
+                if m:
+                        after = m.group(1)
+                        comment += [after]
+                elif comment:
+                        comments += ['\n'.join(comment)]
+                        comment = []
+        if comment:
+                comments += ['\n'.join(comment)]
+        return comments
+
+def find_copyright_semi(name):
+        comments = semi_comments(name)
+        m = re.compile(r'.*copyright.*', re.I | re.S)
+        for comment in comments:
+                if m.match(comment):
+                        return clean_copyright(comment)
+        return None
+
+def troff_comments(name):
+        l = re.compile(r'^\.\\"[ \t]*(.*)$')
+        comments = []
+        comment = []
+        for line in open(name).readlines():
+                m = l.match(line)
+                if m:
+                        after = m.group(1)
+                        comment += [after]
+                elif comment:
+                        comments += ['\n'.join(comment)]
+                        comment = []
+        if comment:
+                comments += ['\n'.join(comment)]
+        return comments
+
+def find_copyright_troff(name):
+        comments = troff_comments(name)
+        m = re.compile(r'.*copyright.*', re.I | re.S)
+        for comment in comments:
+                if m.match(comment):
+                        return clean_copyright(comment)
+        return None
+
+def clean(str,chars):
+        out = ""
+        for c in str:
+                if c not in chars:
+                        out += c.lower()
+        return out
+
+def pack_copyright(copyright):
+        return clean(copyright, " .,!*\n\t")
+
+def num_lines(name):
+        with open(name, 'rb') as f:
+                text = f.read().decode('utf-8', errors='ignore').splitlines()
+                return len(text)
+
+def starts_with(pattern, name):
+        with open(name, 'rb') as f:
+                text = f.read().decode('utf-8', errors='ignore')
+                m = re.search(pattern, text)
+                return m and m.start() == 0
+
+def file_contains(pattern, name):
+        with open(name, 'rb') as f:
+                text = f.read().decode('utf-8', errors='ignore')
+                return re.search(pattern, text)
+
+def main():
+        names = []
+        for name in sys.argv[1:]:
+                if name == '-':
+                        for line in sys.stdin:
+                                names += [line.strip()]
+                else:
+                        names += [name]
+        copyright_users = {}
+        copyrights = {}
+        copyright_files = {}
+        for name in names:
+                copyright = None
+
+                # Data files don't need a license
+
+                if re.match(r'.*\.t$', name):
+                        continue
+                if re.match(r'.*\.cct$', name):
+                        continue
+                if re.match(r'.*ChangeLog.*', name):
+                        continue
+                if re.match(r'.*COPYING.*', name):
+                        continue
+                if re.match(r'.*NEWS.*', name):
+                        continue
+                if re.match(r'.*MAINTAINERS', name):
+                        continue
+                if re.match(r'CODE_OF_CONDUCT.*', name):
+                        continue
+                if re.match(r'CONTRIBUTING.*', name):
+                        continue
+
+                if re.match(r'.*\.[ch]$', name) or re.match(r'.*\.ld$', name) or re.match(r'.*\.[ch]\.in$', name):
+                        copyright = find_copyright_source(name, 'text/x-c')
+                elif re.match(r'.*\.[sS]$', name):
+                        copyright = find_copyright_semi(name)
+                        if not copyright:
+                                copyright = find_copyright_source(name, 'text/x-c')
+                elif re.match(r'.*meson.*', name) or re.match(r'.*Makefile.*', name):
+                        copyright = find_copyright_pound(name)
+                elif re.match(r'.*\.[123]$', name):
+                        copyright = find_copyright_troff(name)
+                if not copyright:
+                        m = magic.from_file(name)
+                        if m is None:
+                                copyright = 'unknown file type'
+                        else:
+                                if re.search(r'troff', m):
+                                        copyright = find_copyright_troff(name)
+                                elif re.search(r'C source', m):
+                                        copyright = find_copyright_source(name, 'text/x-c')
+                                elif (re.search(r'POSIX shell script', m) or
+                                      re.search(r'Bourne-Again shell script', m) or
+                                      re.search(r'Python script', m) or
+                                      re.search(r'Perl script', m) or
+                                      starts_with(r'#', name)):
+                                        copyright = find_copyright_pound(name)
+                if not copyright:
+
+                        # Skip very short files without a copyright
+
+                        if num_lines(name) < 15:
+                                continue
+
+                        # Skip generated files
+
+                        if (file_contains(r'generated automatically', name) or
+                            file_contains(r'automatically generated', name)):
+                                continue
+
+                        copyright = 'none'
+
+                i = pack_copyright(copyright)
+                if i not in copyrights:
+                        copyrights[i] = copyright
+                        copyright_users[i] = [name]
+                else:
+                        copyright_users[i] += [name]
+        
+        license_map = {}
+        licenses = {}
+        license_ids = {}
+        license_name = {}
+        holders = {}
+        copyright_map = {}
+        
+        for i in copyrights:
+                holder = get_holder(copyrights[i])
+                license = get_license(copyrights[i])
+                license_key = pack_copyright(license)
+                type = get_license_type(license)
+                if license_key in license_name:
+                        name = license_name[license_key]
+                else:
+                        if type in license_ids:
+                                id = license_ids[type]
+                        else:
+                                id = 1
+                        license_ids[type] = id + 1
+                        name = "%s-%d" % (type, id)
+                        licenses[name] = license
+                        holders[name] = holder
+                        license_name[license_key] = name
+                if name in copyright_map:
+                        copyright_map[name] += [i]
+                else:
+                        copyright_map[name] = [i]
+
+        for type in sorted(license_ids.keys()):
+                for id in range(1,license_ids[type]):
+
+                        name = "%s-%d" % (type, id)
+
+                        for i in copyright_map[name]:
+                                holder = get_holder(copyrights[i])
+                                license = get_license(copyrights[i])
+
+                                print("Files:", end='')
+                                for file in copyright_users[i]:
+                                        print(" %s" % file)
+                                print("Copyright:", end='')
+                                done = False
+                                for line in holder.splitlines():
+                                        for pat in (r'(.*)copyright(.*)',
+                                                    r'(.*)©(.*)', r'(.*)\(c\)(.*)',
+                                                    r'(.*) by (.*)',
+                                                    r'(.*)all rights reserved\.?(.*)'):
+                                                m = re.match(pat, line, re.I)
+                                                if m:
+                                                        line = m.group(1).strip() + ' ' + m.group(2).strip()
+                                        line = line.strip()
+                                        if re.match(r'(19[89][0-9]|2[0-2][0-9][0-9]).*', line):
+                                                if done:
+                                                        print()
+                                        print(' %s' % line, end='')
+                                        done = True
+                                print()
+                                print("License: %s" % name)
+                                print()
+
+        started = False
+        for type in sorted(license_ids.keys()):
+                for id in range(1,license_ids[type]):
+                        if started:
+                                print()
+                        started = True
+                        name = "%s-%d" % (type, id)
+                        print("License: %s" % name)
+                        for line in licenses[name].splitlines():
+                                if len(line) == 0:
+                                        line = '.'
+                                print(" %s" % line)
+main()
