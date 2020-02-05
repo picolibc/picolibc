@@ -39,7 +39,7 @@ off_t lseek (int fd, off_t offset, int whence)
 #if HOSTED
   gdb_parambuf_t parameters;
   parameters[0] = (uint32_t) fd;
-  parameters[1] = (uint32_t) ((offset >> 32) & 0xffffffff);
+  parameters[1] = (uint32_t) ((int64_t)offset >> 32);
   parameters[2] = (uint32_t) (offset & 0xffffffff);
   parameters[3] = __hosted_to_gdb_lseek_flags (whence);
   __io_hosted (HOSTED_LSEEK, parameters);
