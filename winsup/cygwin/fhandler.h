@@ -2211,7 +2211,7 @@ class fhandler_pty_slave: public fhandler_pty_common
   {
     if (!mask && get_ttyp ()->pcon_pid &&
 	get_ttyp ()->pcon_pid != myself->pid &&
-	kill (get_ttyp ()->pcon_pid, 0) == 0)
+	!!pinfo (get_ttyp ()->pcon_pid))
       return;
     get_ttyp ()->mask_switch_to_pcon_in = mask;
   }

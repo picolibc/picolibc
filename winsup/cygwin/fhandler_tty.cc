@@ -1103,7 +1103,7 @@ fhandler_pty_slave::set_switch_to_pcon (int fd_set)
 skip_console_setting:
       restore_reattach_pcon ();
       if (get_ttyp ()->pcon_pid == 0 ||
-	  kill (get_ttyp ()->pcon_pid, 0) != 0)
+	  !pinfo (get_ttyp ()->pcon_pid))
 	get_ttyp ()->pcon_pid = myself->pid;
       get_ttyp ()->switch_to_pcon_in = true;
     }
@@ -1111,7 +1111,7 @@ skip_console_setting:
     {
       wait_pcon_fwd ();
       if (get_ttyp ()->pcon_pid == 0 ||
-	  kill (get_ttyp ()->pcon_pid, 0) != 0)
+	  !pinfo (get_ttyp ()->pcon_pid))
 	get_ttyp ()->pcon_pid = myself->pid;
       get_ttyp ()->switch_to_pcon_out = true;
     }
@@ -1124,7 +1124,7 @@ fhandler_pty_slave::reset_switch_to_pcon (void)
     this->set_switch_to_pcon (fd);
   if (get_ttyp ()->pcon_pid &&
       get_ttyp ()->pcon_pid != myself->pid &&
-      kill (get_ttyp ()->pcon_pid, 0) == 0)
+      !!pinfo (get_ttyp ()->pcon_pid))
     /* There is a process which is grabbing pseudo console. */
     return;
   if (isHybrid)
@@ -2728,7 +2728,7 @@ fhandler_pty_slave::fixup_after_attach (bool native_maybe, int fd_set)
 		ENABLE_PROCESSED_INPUT | ENABLE_LINE_INPUT | ENABLE_ECHO_INPUT;
 	      SetConsoleMode (get_handle (), mode);
 	      if (get_ttyp ()->pcon_pid == 0 ||
-		  kill (get_ttyp ()->pcon_pid, 0) != 0)
+		  !pinfo (get_ttyp ()->pcon_pid))
 		get_ttyp ()->pcon_pid = myself->pid;
 	      get_ttyp ()->switch_to_pcon_in = true;
 	    }
@@ -2739,7 +2739,7 @@ fhandler_pty_slave::fixup_after_attach (bool native_maybe, int fd_set)
 	      if (!get_ttyp ()->switch_to_pcon_out)
 		wait_pcon_fwd ();
 	      if (get_ttyp ()->pcon_pid == 0 ||
-		  kill (get_ttyp ()->pcon_pid, 0) != 0)
+		  !pinfo (get_ttyp ()->pcon_pid))
 		get_ttyp ()->pcon_pid = myself->pid;
 	      get_ttyp ()->switch_to_pcon_out = true;
 
