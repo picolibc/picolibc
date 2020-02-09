@@ -2878,7 +2878,7 @@ fhandler_pty_master::pty_master_thread ()
   while (!exit && (ConnectNamedPipe (master_ctl, NULL)
 		   || GetLastError () == ERROR_PIPE_CONNECTED))
     {
-      pipe_reply repl = { NULL, NULL, NULL, 0 };
+      pipe_reply repl = { NULL, NULL, NULL, NULL, 0 };
       bool deimp = false;
       NTSTATUS allow = STATUS_ACCESS_DENIED;
       ACCESS_MASK access = EVENT_MODIFY_STATE;
