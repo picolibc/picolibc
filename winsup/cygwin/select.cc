@@ -1195,6 +1195,8 @@ peek_pty_slave (select_record *s, bool from_select)
   fhandler_pty_slave *ptys = (fhandler_pty_slave *) fh;
 
   ptys->reset_switch_to_pcon ();
+  if (ptys->to_be_read_from_pcon ())
+    ptys->update_pcon_input_state (true);
 
   if (s->read_selected)
     {

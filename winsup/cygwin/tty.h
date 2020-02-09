@@ -108,6 +108,9 @@ private:
   bool need_redraw_screen;
   HANDLE fwd_done;
   DWORD pcon_last_time;
+  bool pcon_in_empty;
+  bool req_transfer_input_to_pcon;
+  bool req_flush_pcon_input;
 
 public:
   HANDLE from_master () const { return _from_master; }

@@ -326,7 +326,7 @@ class fhandler_base
   virtual size_t &raixput () { return ra.raixput; };
   virtual size_t &rabuflen () { return ra.rabuflen; };
 
-  bool get_readahead_valid () { return raixget () < ralen (); }
+  virtual bool get_readahead_valid () { return raixget () < ralen (); }
   int puts_readahead (const char *s, size_t len = (size_t) -1);
   int put_readahead (char value);
 
@@ -335,7 +335,7 @@ class fhandler_base
 
   void set_readahead_valid (int val, int ch = -1);
 
-  int get_readahead_into_buffer (char *buf, size_t buflen);
+  virtual int get_readahead_into_buffer (char *buf, size_t buflen);
 
   bool has_acls () const { return pc.has_acls (); }
 
@@ -1768,7 +1768,7 @@ class fhandler_termios: public fhandler_base
   int ioctl (int, void *);
   tty_min *_tc;
   tty *get_ttyp () {return (tty *) tc ();}
-  int eat_readahead (int n);
+  virtual int eat_readahead (int n);
 
  public:
   tty_min*& tc () {return _tc;}
@@ -2168,6 +2168,9 @@ class fhandler_pty_slave: public fhandler_pty_common
   ssize_t __stdcall write (const void *ptr, size_t len);
   void __reg3 read (void *ptr, size_t& len);
   int init (HANDLE, DWORD, mode_t);
+  int eat_readahead (int n);
+  int get_readahead_into_buffer (char *buf, size_t buflen);
+  bool get_readahead_valid (void);
 
   int tcsetattr (int a, const struct termios *t);
   int tcgetattr (struct termios *t);
@@ -2217,6 +2220,8 @@ class fhandler_pty_slave: public fhandler_pty_common
   void set_freeconsole_on_close (bool val);
   void trigger_redraw_screen (void);
   void wait_pcon_fwd (void);
+  void pull_pcon_input (void);
+  void update_pcon_input_state (bool need_lock);
 };
 
 #define __ptsname(buf, unit) __small_sprintf ((buf), "/dev/pty%d", (unit))
@@ -2281,6 +2286,7 @@ public:
   }
 
   bool setup_pseudoconsole (void);
+  void transfer_input_to_pcon (void);
 };
 
 class fhandler_dev_null: public fhandler_base
