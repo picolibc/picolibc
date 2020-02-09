@@ -65,6 +65,12 @@ static bool isHybrid;
 static bool do_not_reset_switch_to_pcon;
 static bool freeconsole_on_close = true;
 
+void
+clear_pcon_attached_to (void)
+{
+  pcon_attached_to = -1;
+}
+
 static void
 set_switch_to_pcon (void)
 {
@@ -727,7 +733,10 @@ fhandler_pty_slave::~fhandler_pty_slave ()
 	{
 	  init_console_handler (false);
 	  if (freeconsole_on_close)
-	    FreeConsole ();
+	    {
+	      FreeConsole ();
+	      pcon_attached_to = -1;
+	    }
 	}
     }
 }
@@ -2988,7 +2997,10 @@ fhandler_pty_slave::fixup_after_exec ()
 	{
 	  init_console_handler (false);
 	  if (freeconsole_on_close)
-	    FreeConsole ();
+	    {
+	      FreeConsole ();
+	      pcon_attached_to = -1;
+	    }
 	}
     }
 

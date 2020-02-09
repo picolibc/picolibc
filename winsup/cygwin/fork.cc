@@ -161,6 +161,8 @@ frok::child (volatile char * volatile here)
 	      }
 	  }
       }
+  extern void clear_pcon_attached_to (void); /* fhandler_tty.cc */
+  clear_pcon_attached_to ();
 
   HANDLE& hParent = ch.parent;
 
