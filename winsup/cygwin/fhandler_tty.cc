@@ -28,9 +28,6 @@ details. */
 #include "tls_pbuf.h"
 #include "registry.h"
 
-#define ALWAYS_USE_PCON false
-#define USE_API_HOOK true
-
 #ifndef PROC_THREAD_ATTRIBUTE_PSEUDOCONSOLE
 #define PROC_THREAD_ATTRIBUTE_PSEUDOCONSOLE 0x00020016
 #endif /* PROC_THREAD_ATTRIBUTE_PSEUDOCONSOLE */
@@ -68,7 +65,6 @@ static bool isHybrid;
 static bool do_not_reset_switch_to_pcon;
 static bool freeconsole_on_close = true;
 
-#if USE_API_HOOK
 static void
 set_switch_to_pcon (void)
 {
@@ -364,12 +360,6 @@ CreateProcessW_Hooked
   set_ishybrid_and_switch_to_pcon (h);
   return CreateProcessW_Orig (n, c, pa, ta, inh, f, e, d, si, pi);
 }
-#else /* USE_API_HOOK */
-#define WriteFile_Orig 0
-#define ReadFile_Orig 0
-#define PeekConsoleInputA_Orig 0
-void set_ishybrid_and_switch_to_pcon (HANDLE) {}
-#endif /* USE_API_HOOK */
 
 static char *
 convert_mb_str (UINT cp_to, size_t *len_to,
@@ -1091,11 +1081,6 @@ fhandler_pty_slave::set_switch_to_pcon (int fd_set)
 {
   if (fd < 0)
     fd = fd_set;
-  if (!isHybrid)
-    {
-      reset_switch_to_pcon ();
-      return;
-    }
   if (fd == 0 && !get_ttyp ()->switch_to_pcon_in)
     {
       pid_restore = 0;
@@ -1109,6 +1094,11 @@ skip_console_setting:
 	  !pinfo (get_ttyp ()->pcon_pid))
 	get_ttyp ()->pcon_pid = myself->pid;
       get_ttyp ()->switch_to_pcon_in = true;
+      if (isHybrid && !get_ttyp ()->switch_to_pcon_out)
+	{
+	  wait_pcon_fwd ();
+	  get_ttyp ()->switch_to_pcon_out = true;
+	}
     }
   else if ((fd == 1 || fd == 2) && !get_ttyp ()->switch_to_pcon_out)
     {
@@ -1117,14 +1107,14 @@ skip_console_setting:
 	  !pinfo (get_ttyp ()->pcon_pid))
 	get_ttyp ()->pcon_pid = myself->pid;
       get_ttyp ()->switch_to_pcon_out = true;
+      if (isHybrid)
+	get_ttyp ()->switch_to_pcon_in = true;
     }
 }
 
 void
 fhandler_pty_slave::reset_switch_to_pcon (void)
 {
-  if (isHybrid)
-    this->set_switch_to_pcon (fd);
   if (get_ttyp ()->pcon_pid &&
       get_ttyp ()->pcon_pid != myself->pid &&
       !!pinfo (get_ttyp ()->pcon_pid))
@@ -1132,27 +1122,17 @@ fhandler_pty_slave::reset_switch_to_pcon (void)
     return;
   if (isHybrid)
     {
-      if (ALWAYS_USE_PCON)
-	{
-	  DWORD mode;
-	  GetConsoleMode (get_handle (), &mode);
-	  mode |= ENABLE_ECHO_INPUT;
-	  mode |= ENABLE_LINE_INPUT;
-	  mode &= ~ENABLE_PROCESSED_INPUT;
-	  SetConsoleMode (get_handle (), mode);
-	}
-      get_ttyp ()->pcon_pid = 0;
+      DWORD bytes_in_pipe;
+      WaitForSingleObject (input_mutex, INFINITE);
+      if (bytes_available (bytes_in_pipe) && !bytes_in_pipe)
+	ResetEvent (input_available_event);
+      FlushConsoleInputBuffer (get_handle ());
+      ReleaseMutex (input_mutex);
       init_console_handler (true);
       return;
     }
   if (do_not_reset_switch_to_pcon)
     return;
-  if (get_ttyp ()->switch_to_pcon_in)
-    {
-      DWORD mode;
-      GetConsoleMode (get_handle (), &mode);
-      SetConsoleMode (get_handle (), mode & ~ENABLE_ECHO_INPUT);
-    }
   if (get_ttyp ()->switch_to_pcon_out)
     /* Wait for pty_master_fwd_thread() */
     wait_pcon_fwd ();
@@ -1413,7 +1393,7 @@ bool
 fhandler_pty_common::to_be_read_from_pcon (void)
 {
   return get_ttyp ()->switch_to_pcon_in &&
-    (!get_ttyp ()->mask_switch_to_pcon_in || ALWAYS_USE_PCON);
+    !get_ttyp ()->mask_switch_to_pcon_in;
 }
 
 void __reg3
@@ -1441,8 +1421,8 @@ fhandler_pty_slave::read (void *ptr, size_t& len)
 
   if (ptr) /* Indicating not tcflush(). */
     {
-      reset_switch_to_pcon ();
       mask_switch_to_pcon_in (true);
+      reset_switch_to_pcon ();
     }
 
   if (is_nonblocking () || !ptr) /* Indicating tcflush(). */
@@ -1562,7 +1542,7 @@ fhandler_pty_slave::read (void *ptr, size_t& len)
 	    flags &= ~ENABLE_ECHO_INPUT;
 	  if ((get_ttyp ()->ti.c_lflag & ISIG) &&
 	      !(get_ttyp ()->ti.c_iflag & IGNBRK))
-	    flags |= ALWAYS_USE_PCON ? 0 : ENABLE_PROCESSED_INPUT;
+	    flags |= ENABLE_PROCESSED_INPUT;
 	  if (dwMode != flags)
 	    SetConsoleMode (get_handle (), flags);
 	  /* Read get_handle() instad of get_handle_cyg() */
@@ -2325,12 +2305,10 @@ fhandler_pty_master::write (const void *ptr, size_t len)
       char *buf = convert_mb_str
 	(CP_UTF8, &nlen, get_ttyp ()->term_code_page, (const char *) ptr, len);
 
+      WaitForSingleObject (input_mutex, INFINITE);
+
       DWORD wLen;
       WriteFile (to_slave, buf, nlen, &wLen, NULL);
-
-      if (ALWAYS_USE_PCON &&
-	  (ti.c_lflag & ISIG) && memchr (p, ti.c_cc[VINTR], len))
-	get_ttyp ()->kill_pgrp (SIGINT);
 
       if (ti.c_lflag & ICANON)
 	{
@@ -2340,18 +2318,10 @@ fhandler_pty_master::write (const void *ptr, size_t len)
       else
 	SetEvent (input_available_event);
 
+      ReleaseMutex (input_mutex);
+
       mb_str_free (buf);
       return len;
-    }
-
-  if (get_ttyp ()->switch_to_pcon_in &&
-      (ti.c_lflag & ISIG) &&
-      memchr (p, ti.c_cc[VINTR], len) &&
-      get_ttyp ()->getpgid () == get_ttyp ()->pcon_pid)
-    {
-      DWORD n;
-      /* Send ^C to pseudo console as well */
-      WriteFile (to_slave, "\003", 1, &n, 0);
     }
 
   line_edit_status status = line_edit (p, len, ti, &ret);
@@ -2739,16 +2709,12 @@ fhandler_pty_slave::fixup_after_attach (bool native_maybe, int fd_set)
 	  /* Clear screen to synchronize pseudo console screen buffer
 	     with real terminal. This is necessary because pseudo
 	     console screen buffer is empty at start. */
-	  if (get_ttyp ()->num_pcon_attached_slaves == 0
-	      && !ALWAYS_USE_PCON)
+	  if (get_ttyp ()->num_pcon_attached_slaves == 0)
 	    /* Assume this is the first process using this pty slave. */
 	    get_ttyp ()->need_redraw_screen = true;
 
 	  get_ttyp ()->num_pcon_attached_slaves ++;
 	}
-
-      if (ALWAYS_USE_PCON && !isHybrid && pcon_attached_to == get_minor ())
-	set_ishybrid_and_switch_to_pcon (get_output_handle ());
 
       if (pcon_attached_to == get_minor () && native_maybe)
 	{
@@ -2801,7 +2767,8 @@ fhandler_pty_slave::fixup_after_exec ()
   /* Native windows program does not reset event on read.
      Therefore, reset here if no input is available. */
   DWORD bytes_in_pipe;
-  if (bytes_available (bytes_in_pipe) && !bytes_in_pipe)
+  if (!to_be_read_from_pcon () &&
+      bytes_available (bytes_in_pipe) && !bytes_in_pipe)
     ResetEvent (input_available_event);
 
   reset_switch_to_pcon ();
@@ -2841,7 +2808,6 @@ fhandler_pty_slave::fixup_after_exec ()
   if (get_ttyp ()->term_code_page == 0)
     setup_locale ();
 
-#if USE_API_HOOK
   /* Hook Console API */
   if (get_pseudo_console ())
     {
@@ -2875,7 +2841,6 @@ fhandler_pty_slave::fixup_after_exec ()
       DO_HOOK (NULL, CreateProcessA);
       DO_HOOK (NULL, CreateProcessW);
     }
-#endif /* USE_API_HOOK */
 }
 
 /* This thread function handles the master control pipe.  It waits for a

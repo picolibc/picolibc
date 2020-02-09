@@ -1211,29 +1211,6 @@ peek_pty_slave (select_record *s, bool from_select)
 	  goto out;
 	}
 
-      if (ptys->to_be_read_from_pcon ())
-	{
-	  if (ptys->is_line_input ())
-	    {
-	      INPUT_RECORD inp[INREC_SIZE];
-	      DWORD n;
-	      PeekConsoleInput (ptys->get_handle (), inp, INREC_SIZE, &n);
-	      bool end_of_line = false;
-	      while (n-- > 0)
-		if (inp[n].EventType == KEY_EVENT &&
-		    inp[n].Event.KeyEvent.bKeyDown &&
-		    inp[n].Event.KeyEvent.uChar.AsciiChar == '\r')
-		  end_of_line = true;
-	      if (end_of_line)
-		{
-		  gotone = s->read_ready = true;
-		  goto out;
-		}
-	      else
-		goto out;
-	    }
-	}
-
       if (IsEventSignalled (ptys->input_available_event))
 	{
 	  gotone = s->read_ready = true;
