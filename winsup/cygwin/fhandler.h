@@ -2207,14 +2207,7 @@ class fhandler_pty_slave: public fhandler_pty_common
   void set_switch_to_pcon (int fd);
   void reset_switch_to_pcon (void);
   void push_to_pcon_screenbuffer (const char *ptr, size_t len);
-  void mask_switch_to_pcon_in (bool mask)
-  {
-    if (!mask && get_ttyp ()->pcon_pid &&
-	get_ttyp ()->pcon_pid != myself->pid &&
-	!!pinfo (get_ttyp ()->pcon_pid))
-      return;
-    get_ttyp ()->mask_switch_to_pcon_in = mask;
-  }
+  void mask_switch_to_pcon_in (bool mask);
   void fixup_after_attach (bool native_maybe, int fd);
   bool is_line_input (void)
   {

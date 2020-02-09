@@ -1395,6 +1395,16 @@ fhandler_pty_slave::write (const void *ptr, size_t len)
   return towrite;
 }
 
+void
+fhandler_pty_slave::mask_switch_to_pcon_in (bool mask)
+{
+  if (!mask && get_ttyp ()->pcon_pid &&
+      get_ttyp ()->pcon_pid != myself->pid &&
+      !!pinfo (get_ttyp ()->pcon_pid))
+    return;
+  get_ttyp ()->mask_switch_to_pcon_in = mask;
+}
+
 bool
 fhandler_pty_common::to_be_read_from_pcon (void)
 {
