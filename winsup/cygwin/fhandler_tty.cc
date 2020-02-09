@@ -80,7 +80,13 @@ set_switch_to_pcon (void)
 	fhandler_base *fh = cfd;
 	fhandler_pty_slave *ptys = (fhandler_pty_slave *) fh;
 	if (ptys->get_pseudo_console ())
-	  ptys->set_switch_to_pcon (fd);
+	  {
+	    ptys->set_switch_to_pcon (fd);
+	    ptys->trigger_redraw_screen ();
+	    DWORD mode =
+	      ENABLE_PROCESSED_INPUT | ENABLE_LINE_INPUT | ENABLE_ECHO_INPUT;
+	    SetConsoleMode (ptys->get_handle (), mode);
+	  }
       }
 }
 
@@ -1097,9 +1103,6 @@ fhandler_pty_slave::set_switch_to_pcon (int fd_set)
 	if (!try_reattach_pcon ())
 	  goto skip_console_setting;
       FlushConsoleInputBuffer (get_handle ());
-      DWORD mode;
-      mode = ENABLE_PROCESSED_INPUT | ENABLE_LINE_INPUT | ENABLE_ECHO_INPUT;
-      SetConsoleMode (get_handle (), mode);
 skip_console_setting:
       restore_reattach_pcon ();
       if (get_ttyp ()->pcon_pid == 0 ||
@@ -1160,7 +1163,8 @@ fhandler_pty_slave::reset_switch_to_pcon (void)
 }
 
 void
-fhandler_pty_slave::push_to_pcon_screenbuffer (const char *ptr, size_t len)
+fhandler_pty_slave::push_to_pcon_screenbuffer (const char *ptr, size_t len,
+					       bool is_echo)
 {
   bool attached =
     !!fhandler_console::get_console_process_id (get_helper_process_id (), true);
@@ -1231,7 +1235,7 @@ fhandler_pty_slave::push_to_pcon_screenbuffer (const char *ptr, size_t len)
     }
   if (!nlen) /* Nothing to be synchronized */
     goto cleanup;
-  if (get_ttyp ()->switch_to_pcon_out)
+  if (get_ttyp ()->switch_to_pcon_out && !is_echo)
     goto cleanup;
   /* Remove ESC sequence which returns results to console
      input buffer. Without this, cursor position report
@@ -1388,7 +1392,7 @@ fhandler_pty_slave::write (const void *ptr, size_t len)
   if (get_pseudo_console ())
     {
       acquire_output_mutex (INFINITE);
-      push_to_pcon_screenbuffer ((char *)ptr, len);
+      push_to_pcon_screenbuffer ((char *)ptr, len, false);
       release_output_mutex ();
     }
 
@@ -1716,7 +1720,9 @@ out:
   if (get_pseudo_console () && ptr0 && (get_ttyp ()->ti.c_lflag & ECHO))
     {
       acquire_output_mutex (INFINITE);
-      push_to_pcon_screenbuffer (ptr0, len);
+      push_to_pcon_screenbuffer (ptr0, len, true);
+      if (get_ttyp ()->switch_to_pcon_out)
+	trigger_redraw_screen ();
       release_output_mutex ();
     }
   mask_switch_to_pcon_in (false);
@@ -2701,6 +2707,21 @@ fhandler_pty_slave::wait_pcon_fwd (void)
 }
 
 void
+fhandler_pty_slave::trigger_redraw_screen (void)
+{
+  /* Forcibly redraw screen based on console screen buffer. */
+  /* The following code triggers redrawing the screen. */
+  CONSOLE_SCREEN_BUFFER_INFO sbi;
+  GetConsoleScreenBufferInfo (get_output_handle (), &sbi);
+  SMALL_RECT rect = {0, 0,
+    (SHORT) (sbi.dwSize.X -1), (SHORT) (sbi.dwSize.Y - 1)};
+  COORD dest = {0, 0};
+  CHAR_INFO fill = {' ', 0};
+  ScrollConsoleScreenBuffer (get_output_handle (), &rect, NULL, dest, &fill);
+  get_ttyp ()->need_redraw_screen = false;
+}
+
+void
 fhandler_pty_slave::fixup_after_attach (bool native_maybe, int fd_set)
 {
   if (fd < 0)
@@ -2754,19 +2775,7 @@ fhandler_pty_slave::fixup_after_attach (bool native_maybe, int fd_set)
 	      get_ttyp ()->switch_to_pcon_out = true;
 
 	      if (get_ttyp ()->need_redraw_screen)
-		{
-		  /* Forcibly redraw screen based on console screen buffer. */
-		  /* The following code triggers redrawing the screen. */
-		  CONSOLE_SCREEN_BUFFER_INFO sbi;
-		  GetConsoleScreenBufferInfo (get_output_handle (), &sbi);
-		  SMALL_RECT rect = {0, 0,
-		    (SHORT) (sbi.dwSize.X -1), (SHORT) (sbi.dwSize.Y - 1)};
-		  COORD dest = {0, 0};
-		  CHAR_INFO fill = {' ', 0};
-		  ScrollConsoleScreenBuffer (get_output_handle (),
-					     &rect, NULL, dest, &fill);
-		  get_ttyp ()->need_redraw_screen = false;
-		}
+		trigger_redraw_screen ();
 	    }
 	  init_console_handler (false);
 	}

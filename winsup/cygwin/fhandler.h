@@ -2206,7 +2206,7 @@ class fhandler_pty_slave: public fhandler_pty_common
   }
   void set_switch_to_pcon (int fd);
   void reset_switch_to_pcon (void);
-  void push_to_pcon_screenbuffer (const char *ptr, size_t len);
+  void push_to_pcon_screenbuffer (const char *ptr, size_t len, bool is_echo);
   void mask_switch_to_pcon_in (bool mask);
   void fixup_after_attach (bool native_maybe, int fd);
   bool is_line_input (void)
@@ -2215,6 +2215,7 @@ class fhandler_pty_slave: public fhandler_pty_common
   }
   void setup_locale (void);
   void set_freeconsole_on_close (bool val);
+  void trigger_redraw_screen (void);
   void wait_pcon_fwd (void);
 };
 
