@@ -3413,7 +3413,10 @@ fhandler_pty_master::setup_pseudoconsole ()
      process in a pseudo console and get them from the helper.
      Slave process will attach to the pseudo console in the
      helper process using AttachConsole(). */
-  COORD size = {80, 25};
+  COORD size = {
+    (SHORT) get_ttyp ()->winsize.ws_col,
+    (SHORT) get_ttyp ()->winsize.ws_row
+  };
   CreatePipe (&from_master, &to_slave, &sec_none, 0);
   SetLastError (ERROR_SUCCESS);
   HRESULT res = CreatePseudoConsole (size, from_master, to_master,
@@ -3423,12 +3426,7 @@ fhandler_pty_master::setup_pseudoconsole ()
       if (res != S_OK)
 	system_printf ("CreatePseudoConsole() failed. %08x\n",
 		       GetLastError ());
-      CloseHandle (from_master);
-      CloseHandle (to_slave);
-      from_master = from_master_cyg;
-      to_slave = NULL;
-      get_ttyp ()->h_pseudo_console = NULL;
-      return false;
+      goto fallback;
     }
 
   /* If master process is running as service, attaching to
@@ -3439,69 +3437,82 @@ fhandler_pty_master::setup_pseudoconsole ()
   if (is_running_as_service ())
     get_ttyp ()->attach_pcon_in_fork = true;
 
-  SIZE_T bytesRequired;
-  InitializeProcThreadAttributeList (NULL, 2, 0, &bytesRequired);
   STARTUPINFOEXW si_helper;
-  ZeroMemory (&si_helper, sizeof (si_helper));
-  si_helper.StartupInfo.cb = sizeof (STARTUPINFOEXW);
-  si_helper.lpAttributeList = (PPROC_THREAD_ATTRIBUTE_LIST)
-    HeapAlloc (GetProcessHeap (), 0, bytesRequired);
-  InitializeProcThreadAttributeList (si_helper.lpAttributeList,
-				     2, 0, &bytesRequired);
-  UpdateProcThreadAttribute (si_helper.lpAttributeList,
-			     0,
-			     PROC_THREAD_ATTRIBUTE_PSEUDOCONSOLE,
-			     get_ttyp ()->h_pseudo_console,
-			     sizeof (get_ttyp ()->h_pseudo_console),
-			     NULL, NULL);
-  HANDLE hello = CreateEvent (&sec_none, true, false, NULL);
-  HANDLE goodbye = CreateEvent (&sec_none, true, false, NULL);
-  /* Create a pipe for receiving pseudo console handles */
+  HANDLE hello, goodbye;
   HANDLE hr, hw;
-  CreatePipe (&hr, &hw, &sec_none, 0);
-  /* Inherit only handles which are needed by helper. */
-  HANDLE handles_to_inherit[] = {hello, goodbye, hw};
-  UpdateProcThreadAttribute (si_helper.lpAttributeList,
-			     0,
-			     PROC_THREAD_ATTRIBUTE_HANDLE_LIST,
-			     handles_to_inherit,
-			     sizeof (handles_to_inherit),
-			     NULL, NULL);
-  /* Create helper process */
-  WCHAR cmd[MAX_PATH];
-  path_conv helper ("/bin/cygwin-console-helper.exe");
-  size_t len = helper.get_wide_win32_path_len ();
-  helper.get_wide_win32_path (cmd);
-  __small_swprintf (cmd + len, L" %p %p %p", hello, goodbye, hw);
-  si_helper.StartupInfo.dwFlags = STARTF_USESTDHANDLES;
-  si_helper.StartupInfo.hStdInput = NULL;
-  si_helper.StartupInfo.hStdOutput = NULL;
-  si_helper.StartupInfo.hStdError = NULL;
   PROCESS_INFORMATION pi_helper;
-  CreateProcessW (NULL, cmd, &sec_none, &sec_none,
-		  TRUE, EXTENDED_STARTUPINFO_PRESENT,
-		  NULL, NULL, &si_helper.StartupInfo, &pi_helper);
-  WaitForSingleObject (hello, INFINITE);
-  CloseHandle (hello);
-  CloseHandle (pi_helper.hThread);
-  /* Retrieve pseudo console handles */
-  DWORD rLen;
-  char buf[64];
-  ReadFile (hr, buf, sizeof (buf), &rLen, NULL);
-  buf[rLen] = '\0';
   HANDLE hpConIn, hpConOut;
-  sscanf (buf, "StdHandles=%p,%p", &hpConIn, &hpConOut);
-  DuplicateHandle (pi_helper.hProcess, hpConIn,
-		   GetCurrentProcess (), &hpConIn, 0,
-		   TRUE, DUPLICATE_SAME_ACCESS);
-  DuplicateHandle (pi_helper.hProcess, hpConOut,
-		   GetCurrentProcess (), &hpConOut, 0,
-		   TRUE, DUPLICATE_SAME_ACCESS);
-  CloseHandle (hr);
-  CloseHandle (hw);
-  /* Clean up */
-  DeleteProcThreadAttributeList (si_helper.lpAttributeList);
-  HeapFree (GetProcessHeap (), 0, si_helper.lpAttributeList);
+  {
+    SIZE_T bytesRequired;
+    InitializeProcThreadAttributeList (NULL, 2, 0, &bytesRequired);
+    ZeroMemory (&si_helper, sizeof (si_helper));
+    si_helper.StartupInfo.cb = sizeof (STARTUPINFOEXW);
+    si_helper.lpAttributeList = (PPROC_THREAD_ATTRIBUTE_LIST)
+      HeapAlloc (GetProcessHeap (), 0, bytesRequired);
+    if (si_helper.lpAttributeList == NULL)
+      goto cleanup_pseudo_console;
+    if (!InitializeProcThreadAttributeList (si_helper.lpAttributeList,
+					    2, 0, &bytesRequired))
+      goto cleanup_heap;
+    if (!UpdateProcThreadAttribute (si_helper.lpAttributeList,
+				    0,
+				    PROC_THREAD_ATTRIBUTE_PSEUDOCONSOLE,
+				    get_ttyp ()->h_pseudo_console,
+				    sizeof (get_ttyp ()->h_pseudo_console),
+				    NULL, NULL))
+      goto cleanup_heap;
+    /* Create events for start/stop helper process. */
+    hello = CreateEvent (&sec_none, true, false, NULL);
+    goodbye = CreateEvent (&sec_none, true, false, NULL);
+    /* Create a pipe for receiving pseudo console handles */
+    CreatePipe (&hr, &hw, &sec_none, 0);
+    /* Inherit only handles which are needed by helper. */
+    HANDLE handles_to_inherit[] = {hello, goodbye, hw};
+    if (!UpdateProcThreadAttribute (si_helper.lpAttributeList,
+				    0,
+				    PROC_THREAD_ATTRIBUTE_HANDLE_LIST,
+				    handles_to_inherit,
+				    sizeof (handles_to_inherit),
+				    NULL, NULL))
+      goto cleanup_event_and_pipes;
+    /* Create helper process */
+    WCHAR cmd[MAX_PATH];
+    path_conv helper ("/bin/cygwin-console-helper.exe");
+    size_t len = helper.get_wide_win32_path_len ();
+    helper.get_wide_win32_path (cmd);
+    __small_swprintf (cmd + len, L" %p %p %p", hello, goodbye, hw);
+    si_helper.StartupInfo.dwFlags = STARTF_USESTDHANDLES;
+    si_helper.StartupInfo.hStdInput = NULL;
+    si_helper.StartupInfo.hStdOutput = NULL;
+    si_helper.StartupInfo.hStdError = NULL;
+    if (!CreateProcessW (NULL, cmd, &sec_none, &sec_none,
+			 TRUE, EXTENDED_STARTUPINFO_PRESENT,
+			 NULL, NULL, &si_helper.StartupInfo, &pi_helper))
+      goto cleanup_event_and_pipes;
+    WaitForSingleObject (hello, INFINITE);
+    CloseHandle (hello);
+    CloseHandle (pi_helper.hThread);
+    /* Retrieve pseudo console handles */
+    DWORD rLen;
+    char buf[64];
+    if (!ReadFile (hr, buf, sizeof (buf), &rLen, NULL))
+      goto cleanup_helper_process;
+    buf[rLen] = '\0';
+    sscanf (buf, "StdHandles=%p,%p", &hpConIn, &hpConOut);
+    if (!DuplicateHandle (pi_helper.hProcess, hpConIn,
+			  GetCurrentProcess (), &hpConIn, 0,
+			  TRUE, DUPLICATE_SAME_ACCESS))
+      goto cleanup_helper_process;
+    if (!DuplicateHandle (pi_helper.hProcess, hpConOut,
+			  GetCurrentProcess (), &hpConOut, 0,
+			  TRUE, DUPLICATE_SAME_ACCESS))
+      goto cleanup_pcon_in;
+    CloseHandle (hr);
+    CloseHandle (hw);
+    /* Clean up */
+    DeleteProcThreadAttributeList (si_helper.lpAttributeList);
+    HeapFree (GetProcessHeap (), 0, si_helper.lpAttributeList);
+  }
   /* Setting information of stuffs regarding pseudo console */
   get_ttyp ()->h_helper_goodbye = goodbye;
   get_ttyp ()->h_helper_process = pi_helper.hProcess;
@@ -3510,7 +3521,38 @@ fhandler_pty_master::setup_pseudoconsole ()
   CloseHandle (to_master);
   from_master = hpConIn;
   to_master = hpConOut;
+  ResizePseudoConsole (get_ttyp ()->h_pseudo_console, size);
   return true;
+
+cleanup_pcon_in:
+  CloseHandle (hpConIn);
+cleanup_helper_process:
+  SetEvent (goodbye);
+  WaitForSingleObject (pi_helper.hProcess, INFINITE);
+  CloseHandle (pi_helper.hProcess);
+  goto skip_close_hello;
+cleanup_event_and_pipes:
+  CloseHandle (hello);
+skip_close_hello:
+  CloseHandle (goodbye);
+  CloseHandle (hr);
+  CloseHandle (hw);
+cleanup_heap:
+  HeapFree (GetProcessHeap (), 0, si_helper.lpAttributeList);
+cleanup_pseudo_console:
+  {
+    HPCON_INTERNAL *hp = (HPCON_INTERNAL *) get_ttyp ()->h_pseudo_console;
+    HANDLE tmp = hp->hConHostProcess;
+    ClosePseudoConsole (get_pseudo_console ());
+    CloseHandle (tmp);
+  }
+fallback:
+  CloseHandle (from_master);
+  CloseHandle (to_slave);
+  from_master = from_master_cyg;
+  to_slave = NULL;
+  get_ttyp ()->h_pseudo_console = NULL;
+  return false;
 }
 
 bool
@@ -3629,14 +3671,15 @@ fhandler_pty_master::setup ()
     }
   get_ttyp ()->fwd_done = CreateEvent (&sec_none, true, false, NULL);
 
+  t.winsize.ws_col = 80;
+  t.winsize.ws_row = 25;
+
   setup_pseudoconsole ();
 
   t.set_from_master (from_master);
   t.set_from_master_cyg (from_master_cyg);
   t.set_to_master (to_master);
   t.set_to_master_cyg (to_master_cyg);
-  t.winsize.ws_col = 80;
-  t.winsize.ws_row = 25;
   t.master_pid = myself->pid;
 
   dev ().parse (DEV_PTYM_MAJOR, unit);
