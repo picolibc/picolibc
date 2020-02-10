@@ -5,5 +5,5 @@
 int
 _access(const char *file, int mode)
 {
-  return syscall_errno (SYS_access, file, mode, 0, 0, 0, 0);
+  return syscall_errno (SYS_access, 2, file, mode, 0, 0, 0, 0);
 }

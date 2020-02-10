@@ -6,5 +6,5 @@
 off_t
 _lseek(int file, off_t ptr, int dir)
 {
-  return syscall_errno (SYS_lseek, file, ptr, dir, 0, 0, 0);
+  return syscall_errno (SYS_lseek, 3, file, ptr, dir, 0, 0, 0);
 }

@@ -5,5 +5,5 @@
 int
 _unlink(const char *name)
 {
-  return syscall_errno (SYS_unlink, name, 0, 0, 0, 0, 0);
+  return syscall_errno (SYS_unlink, 1, name, 0, 0, 0, 0, 0);
 }

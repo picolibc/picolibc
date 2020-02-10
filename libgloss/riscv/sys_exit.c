@@ -5,6 +5,6 @@
 void
 _exit(int exit_status)
 {
-  syscall_errno (SYS_exit, exit_status, 0, 0, 0, 0, 0);
+  syscall_errno (SYS_exit, 1, exit_status, 0, 0, 0, 0, 0);
   while (1);
 }

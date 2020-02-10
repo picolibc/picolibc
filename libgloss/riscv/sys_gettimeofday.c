@@ -6,5 +6,5 @@
 int
 _gettimeofday(struct timeval *tp, void *tzp)
 {
-  return syscall_errno (SYS_gettimeofday, tp, 0, 0, 0, 0, 0);
+  return syscall_errno (SYS_gettimeofday, 1, tp, 0, 0, 0, 0, 0);
 }
