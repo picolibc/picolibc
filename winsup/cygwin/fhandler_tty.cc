@@ -1412,10 +1412,13 @@ fhandler_pty_slave::push_to_pcon_screenbuffer (const char *ptr, size_t len,
   while (!GetConsoleMode (get_output_handle (), &dwMode))
     {
       termios_printf ("GetConsoleMode failed, %E");
+      int errno_save = errno;
       /* Re-open handles */
       this->open (0, 0);
       /* Fix pseudo console window size */
       this->ioctl (TIOCSWINSZ, &get_ttyp ()->winsize);
+      if (errno != errno_save)
+	set_errno (errno_save);
       if (++retry_count > 3)
 	goto cleanup;
     }
