@@ -1,0 +1,23 @@
+name: CI
+
+on: [push]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+    container:
+      image: vlamdock/riskv
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Build Picolibc
+      run: |
+        mkdir build
+        cd build
+        ../do-riscv-configure
+        ninja
+    - name: Initiate Tests
+      run: |
+        cd build
+        ninja test
