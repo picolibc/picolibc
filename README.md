@@ -6,6 +6,8 @@ small embedded systems with limited RAM. PicoLibc was formed by blending
 code from [Newlib](http://sourceware.org/newlib/) and
 [AVR Libc](https://www.nongnu.org/avr-libc/).
 
+garbage
+
 ## License
 
 Picolibc source comes from a variety of places and has a huge variety
