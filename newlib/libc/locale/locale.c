@@ -85,6 +85,9 @@ it is 2 for <<"zh">> (Chinese), <<"ja">> (Japanese), and <<"ko">> (Korean),
 and 1 for everything else. Specifying <<"cjknarrow">> or <<"cjkwide">>
 forces a width of 1 or 2, respectively, independent of charset and language.
 
+This implementation also supports the modifier <<"cjksingle">>
+to enforce single-width character properties.
+
 If you use <<NULL>> as the <[locale]> argument, <<setlocale>> returns a
 pointer to the string representing the current locale.  The acceptable
 values for <[category]> are defined in `<<locale.h>>' as macros
@@ -480,6 +483,7 @@ __loadlocale (struct __locale_t *loc, int category, char *new_locale)
   int mbc_max;
   wctomb_p l_wctomb;
   mbtowc_p l_mbtowc;
+  int cjksingle = 0;
   int cjknarrow = 0;
   int cjkwide = 0;
 
@@ -594,11 +598,13 @@ restart:
     }
   if (c && c[0] == '@')
     {
-      /* Modifier */
+      /* Modifier "cjksingle" is recognized to enforce single-width mode. */
       /* Modifiers "cjknarrow" or "cjkwide" are recognized to modify the
          behaviour of wcwidth() and wcswidth() for East Asian languages.
          For details see the comment at the end of this function. */
-      if (!strcmp (c + 1, "cjknarrow"))
+      if (!strcmp (c + 1, "cjksingle"))
+	cjksingle = 1;
+      else if (!strcmp (c + 1, "cjknarrow"))
 	cjknarrow = 1;
       else if (!strcmp (c + 1, "cjkwide"))
 	cjkwide = 1;
@@ -893,6 +899,7 @@ restart:
       loc->wctomb = l_wctomb;
       loc->mbtowc = l_mbtowc;
       __set_ctype (loc, charset);
+      /* Set CJK width mode (1: ambiguous-wide, 0: normal, -1: disabled). */
       /* Determine the width for the "CJK Ambiguous Width" category of
          characters. This is used in wcwidth(). Assume single width for
          single-byte charsets, and double width for multi-byte charsets
@@ -907,6 +914,8 @@ restart:
 			   || strncmp (locale, "ja", 2) == 0
 			   || strncmp (locale, "ko", 2) == 0
 			   || strncmp (locale, "zh", 2) == 0));
+      if (cjksingle)
+	loc->cjk_lang = -1;	/* Disable CJK dual-width */
 #ifdef __HAVE_LOCALE_INFO__
       ret = __ctype_load_locale (loc, locale, (void *) l_wctomb, charset,
 				 mbc_max);
