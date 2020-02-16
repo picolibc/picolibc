@@ -179,6 +179,17 @@ response with this option; it forces wcwidth/wcswidth to return 2 for the
 ambiguous width characters.
 </para></listitem>
 
+<listitem><para>
+As an alternative preference, CJK single-width may be enforced.
+This feature is a
+<ulink url="https://gitlab.freedesktop.org/terminal-wg/specifications/issues/9#note_406682">proposal</ulink>
+in the Terminals Working Group Specifications.
+The mintty terminal implements it as an option with proper glyph scaling.
+The locale modifier "@cjksingle" supports consistent locale response
+with this option; it forces wcwidth/wcswidth to account at most 1 for
+all characters.
+</para></listitem>
+
 </itemizedlist>
 
 </sect2>
