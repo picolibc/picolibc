@@ -1122,7 +1122,7 @@ fhandler_console::close ()
 			  &obi, sizeof obi, NULL);
   if (NT_SUCCESS (status) && obi.HandleCount == 1)
     if (orig_conout_mode != (DWORD) -1)
-      SetConsoleMode (get_handle (), orig_conout_mode);
+      SetConsoleMode (get_output_handle (), orig_conout_mode);
 
   release_output_mutex ();
 
