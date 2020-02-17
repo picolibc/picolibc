@@ -1075,19 +1075,49 @@ verify_console (select_record *me, fd_set *rfds, fd_set *wfds,
   return peek_console (me, true);
 }
 
+static int
+console_startup (select_record *me, select_stuff *stuff)
+{
+  select_record *s = stuff->start.next;
+  if (wincap.has_con_24bit_colors ())
+    {
+      DWORD dwMode;
+      GetConsoleMode (s->h, &dwMode);
+      /* Enable xterm compatible mode in input */
+      dwMode |= ENABLE_VIRTUAL_TERMINAL_INPUT;
+      SetConsoleMode (s->h, dwMode);
+    }
+  return 1;
+}
+
+static void
+console_cleanup (select_record *me, select_stuff *stuff)
+{
+  select_record *s = stuff->start.next;
+  if (wincap.has_con_24bit_colors ())
+    {
+      DWORD dwMode;
+      GetConsoleMode (s->h, &dwMode);
+      /* Disable xterm compatible mode in input */
+      dwMode &= ~ENABLE_VIRTUAL_TERMINAL_INPUT;
+      SetConsoleMode (s->h, dwMode);
+    }
+}
+
 select_record *
 fhandler_console::select_read (select_stuff *ss)
 {
   select_record *s = ss->start.next;
   if (!s->startup)
     {
-      s->startup = no_startup;
+      s->startup = console_startup;
       s->verify = verify_console;
       set_cursor_maybe ();
     }
 
   s->peek = peek_console;
   s->h = get_handle ();
+  s->cleanup = console_cleanup;
   s->read_selected = true;
   s->read_ready = input_ready || get_cons_readahead_valid ();
   return s;

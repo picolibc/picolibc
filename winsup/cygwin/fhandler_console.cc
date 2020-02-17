@@ -53,7 +53,6 @@ fhandler_console::console_state NO_COPY *fhandler_console::shared_console_info;
 
 bool NO_COPY fhandler_console::invisible_console;
 
-static DWORD orig_conin_mode = (DWORD) -1;
 static DWORD orig_conout_mode = (DWORD) -1;
 
 /* con_ra is shared in the same process.
@@ -361,6 +360,9 @@ fix_tab_position (HANDLE h, SHORT width)
     __small_sprintf (buf+strlen (buf), "\033[%d;%dH\033H", 1, col+1);
   /* Restore cursor position */
   __small_sprintf (buf+strlen (buf), "\0338");
+  DWORD dwMode;
+  GetConsoleMode (h, &dwMode);
+  SetConsoleMode (h, dwMode | ENABLE_VIRTUAL_TERMINAL_PROCESSING);
   DWORD dwLen;
   WriteConsole (h, buf, strlen (buf), &dwLen, 0);
 }
@@ -425,12 +427,19 @@ fhandler_console::read (void *pv, size_t& buflen)
 
   set_input_state ();
 
+  DWORD dwMode;
+  GetConsoleMode (get_handle (), &dwMode);
+  /* if system has 24 bit color capability, use xterm compatible mode. */
+  if (wincap.has_con_24bit_colors () && !con_is_legacy)
+    SetConsoleMode (get_handle (), dwMode | ENABLE_VIRTUAL_TERMINAL_INPUT);
+
   while (!input_ready && !get_cons_readahead_valid ())
     {
       int bgres;
       if ((bgres = bg_check (SIGTTIN)) <= bg_eof)
 	{
 	  buflen = bgres;
+	  SetConsoleMode (get_handle (), dwMode); /* Restore */
 	  return;
 	}
 
@@ -448,6 +457,7 @@ fhandler_console::read (void *pv, size_t& buflen)
 	case WAIT_TIMEOUT:
 	  set_sig_errno (EAGAIN);
 	  buflen = (size_t) -1;
+	  SetConsoleMode (get_handle (), dwMode); /* Restore */
 	  return;
 	default:
 	  goto err;
@@ -495,30 +505,24 @@ fhandler_console::read (void *pv, size_t& buflen)
 #undef buf
 
   buflen = copied_chars;
+  SetConsoleMode (get_handle (), dwMode); /* Restore */
   return;
 
 err:
   __seterrno ();
   buflen = (size_t) -1;
+  SetConsoleMode (get_handle (), dwMode); /* Restore */
   return;
 
 sig_exit:
   set_sig_errno (EINTR);
   buflen = (size_t) -1;
+  SetConsoleMode (get_handle (), dwMode); /* Restore */
 }
 
 fhandler_console::input_states
 fhandler_console::process_input_message (void)
 {
-  if (wincap.has_con_24bit_colors () && !con_is_legacy)
-    {
-      DWORD dwMode;
-      /* Enable xterm compatible mode in input */
-      GetConsoleMode (get_handle (), &dwMode);
-      dwMode |= ENABLE_VIRTUAL_TERMINAL_INPUT;
-      SetConsoleMode (get_handle (), dwMode);
-    }
-
   char tmp[60];
 
   if (!shared_console_info)
@@ -1047,29 +1051,26 @@ fhandler_console::open (int flags, mode_t)
   get_ttyp ()->rstcons (false);
   set_open_status ();
 
-  if (orig_conin_mode == (DWORD) -1)
-    GetConsoleMode (get_handle (), &orig_conin_mode);
   if (orig_conout_mode == (DWORD) -1)
     GetConsoleMode (get_output_handle (), &orig_conout_mode);
 
   if (getpid () == con.owner && wincap.has_con_24bit_colors ())
     {
+      bool is_legacy = false;
       DWORD dwMode;
-      /* Enable xterm compatible mode in output */
+      /* Check xterm compatible mode in output */
       GetConsoleMode (get_output_handle (), &dwMode);
-      dwMode |= ENABLE_VIRTUAL_TERMINAL_PROCESSING;
-      if (!SetConsoleMode (get_output_handle (), dwMode))
-	con.is_legacy = true;
-      else
-	con.is_legacy = false;
-      /* Enable xterm compatible mode in input */
-      if (!con_is_legacy)
-	{
-	  GetConsoleMode (get_handle (), &dwMode);
-	  dwMode |= ENABLE_VIRTUAL_TERMINAL_INPUT;
-	  if (!SetConsoleMode (get_handle (), dwMode))
-	    con.is_legacy = true;
-	}
+      if (!SetConsoleMode (get_output_handle (),
+			   dwMode | ENABLE_VIRTUAL_TERMINAL_PROCESSING))
+	is_legacy = true;
+      SetConsoleMode (get_output_handle (), dwMode);
+      /* Check xterm compatible mode in input */
+      GetConsoleMode (get_handle (), &dwMode);
+      if (!SetConsoleMode (get_handle (),
+			   dwMode | ENABLE_VIRTUAL_TERMINAL_INPUT))
+	is_legacy = true;
+      SetConsoleMode (get_handle (), dwMode);
+      con.is_legacy = is_legacy;
       extern int sawTERM;
       if (con_is_legacy && !sawTERM)
 	setenv ("TERM", "cygwin", 1);
@@ -1102,19 +1103,12 @@ fhandler_console::close ()
 {
   debug_printf ("closing: %p, %p", get_handle (), get_output_handle ());
 
-  CloseHandle (input_mutex);
-  input_mutex = NULL;
-  CloseHandle (output_mutex);
-  output_mutex = NULL;
+  acquire_output_mutex (INFINITE);
 
   if (shared_console_info && getpid () == con.owner &&
       wincap.has_con_24bit_colors () && !con_is_legacy)
     {
       DWORD dwMode;
-      /* Disable xterm compatible mode in input */
-      GetConsoleMode (get_handle (), &dwMode);
-      dwMode &= ~ENABLE_VIRTUAL_TERMINAL_INPUT;
-      SetConsoleMode (get_handle (), dwMode);
       /* Disable xterm compatible mode in output */
       GetConsoleMode (get_output_handle (), &dwMode);
       dwMode &= ~ENABLE_VIRTUAL_TERMINAL_PROCESSING;
@@ -1127,12 +1121,15 @@ fhandler_console::close ()
   status = NtQueryObject (get_handle (), ObjectBasicInformation,
 			  &obi, sizeof obi, NULL);
   if (NT_SUCCESS (status) && obi.HandleCount == 1)
-    {
-      if (orig_conin_mode != (DWORD) -1)
-	SetConsoleMode (get_handle (), orig_conin_mode);
-      if (orig_conout_mode != (DWORD) -1)
-	SetConsoleMode (get_handle (), orig_conout_mode);
-    }
+    if (orig_conout_mode != (DWORD) -1)
+      SetConsoleMode (get_handle (), orig_conout_mode);
+
+  release_output_mutex ();
+
+  CloseHandle (input_mutex);
+  input_mutex = NULL;
+  CloseHandle (output_mutex);
+  output_mutex = NULL;
 
   CloseHandle (get_handle ());
   CloseHandle (get_output_handle ());
@@ -1270,13 +1267,6 @@ fhandler_console::output_tcsetattr (int, struct termios const *t)
 
   acquire_output_mutex (INFINITE);
   DWORD flags = ENABLE_PROCESSED_OUTPUT | ENABLE_WRAP_AT_EOL_OUTPUT;
-  /* If system has 24 bit color capability, use xterm compatible mode. */
-  if (wincap.has_con_24bit_colors () && !con_is_legacy)
-    {
-      flags |= ENABLE_VIRTUAL_TERMINAL_PROCESSING;
-      if (!(t->c_oflag & OPOST) || !(t->c_oflag & ONLCR))
-	flags |= DISABLE_NEWLINE_AUTO_RETURN;
-    }
 
   int res = SetConsoleMode (get_output_handle (), flags) ? 0 : -1;
   if (res)
@@ -1338,9 +1328,6 @@ fhandler_console::input_tcsetattr (int, struct termios const *t)
   flags |= ENABLE_WINDOW_INPUT |
     ((wincap.has_con_24bit_colors () && !con_is_legacy) ?
      0 : ENABLE_MOUSE_INPUT);
-  /* if system has 24 bit color capability, use xterm compatible mode. */
-  if (wincap.has_con_24bit_colors () && !con_is_legacy)
-    flags |= ENABLE_VIRTUAL_TERMINAL_INPUT;
 
   int res;
   if (flags == oflags)
@@ -2715,6 +2702,20 @@ fhandler_console::write (const void *vsrc, size_t len)
 
   push_process_state process_state (PID_TTYOU);
   acquire_output_mutex (INFINITE);
+
+  /* If system has 24 bit color capability, use xterm compatible mode. */
+  if (wincap.has_con_24bit_colors () && !con_is_legacy)
+    {
+      DWORD dwMode;
+      GetConsoleMode (get_output_handle (), &dwMode);
+      dwMode |= ENABLE_VIRTUAL_TERMINAL_PROCESSING;
+      if (!(get_ttyp ()->ti.c_oflag & OPOST) ||
+	  !(get_ttyp ()->ti.c_oflag & ONLCR))
+	dwMode |= DISABLE_NEWLINE_AUTO_RETURN;
+      else
+	dwMode &= ~DISABLE_NEWLINE_AUTO_RETURN;
+      SetConsoleMode (get_output_handle (), dwMode);
+    }
 
   /* Run and check for ansi sequences */
   unsigned const char *src = (unsigned char *) vsrc;

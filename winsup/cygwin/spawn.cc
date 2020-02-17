@@ -615,22 +615,13 @@ child_info_spawn::worker (const char *prog_arg, const char *const *argv,
 	    {
 	      attach_to_console = true;
 	      if (wincap.has_con_24bit_colors () && !iscygwin ())
-		{
-		  DWORD dwMode;
-		  if (fd == 0)
-		    {
-		      /* Disable xterm compatible mode in input */
-		      GetConsoleMode (fh->get_handle (), &dwMode);
-		      dwMode &= ~ENABLE_VIRTUAL_TERMINAL_INPUT;
-		      SetConsoleMode (fh->get_handle (), dwMode);
-		    }
-		  else
-		    {
-		      GetConsoleMode (fh->get_output_handle (), &dwMode);
-		      dwMode &= ~ENABLE_VIRTUAL_TERMINAL_PROCESSING;
-		      SetConsoleMode (fh->get_output_handle (), dwMode);
-		    }
-		}
+		if (fd == 1 || fd == 2)
+		  {
+		    DWORD dwMode;
+		    GetConsoleMode (fh->get_output_handle (), &dwMode);
+		    dwMode &= ~ENABLE_VIRTUAL_TERMINAL_PROCESSING;
+		    SetConsoleMode (fh->get_output_handle (), dwMode);
+		  }
 	    }
 	}
 
