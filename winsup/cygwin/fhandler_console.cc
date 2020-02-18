@@ -1230,10 +1230,39 @@ fhandler_console::ioctl (unsigned int cmd, void *arg)
 	      release_output_mutex ();
 	      return -1;
 	    }
-	  while (n-- > 0)
-	    if (inp[n].EventType == KEY_EVENT && inp[n].Event.KeyEvent.bKeyDown)
-	      ++ret;
-	  *(int *) arg = ret;
+	  bool saw_eol = false;
+	  for (DWORD i=0; i<n; i++)
+	    if (inp[i].EventType == KEY_EVENT &&
+		inp[i].Event.KeyEvent.bKeyDown &&
+		inp[i].Event.KeyEvent.uChar.UnicodeChar)
+	      {
+		WCHAR wc = inp[i].Event.KeyEvent.uChar.UnicodeChar;
+		char mbs[8];
+		int len = con.con_to_str (mbs, sizeof (mbs), wc);
+		if ((get_ttyp ()->ti.c_lflag & ICANON) &&
+		    len == 1 && CCEQ (get_ttyp ()->ti.c_cc[VEOF], mbs[0]))
+		  {
+		    saw_eol = true;
+		    break;
+		  }
+		ret += len;
+		const char eols[] = {
+		  '\n',
+		  '\r',
+		  (char) get_ttyp ()->ti.c_cc[VEOL],
+		  (char) get_ttyp ()->ti.c_cc[VEOL2]
+		};
+		if ((get_ttyp ()->ti.c_lflag & ICANON) &&
+		    len == 1 && memchr (eols, mbs[0], sizeof (eols)))
+		  {
+		    saw_eol = true;
+		    break;
+		  }
+	      }
+	  if ((get_ttyp ()->ti.c_lflag & ICANON) && !saw_eol)
+	    *(int *) arg = 0;
+	  else
+	    *(int *) arg = ret;
 	  release_output_mutex ();
 	  return 0;
 	}
