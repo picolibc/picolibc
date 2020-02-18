@@ -16,6 +16,11 @@ What changed:
 - <signal.h>: New macro _NSIG replacing NSIG.  NSIG is now only
   visible to MISC builds, as on Linux.
 
+- The new locale modifier @cjksingle allows enforcing of single-width
+  character property for usually double-widthed characters.  This will
+  be supported by upcoming mintty releases.  For the reasoning, see
+  https://gitlab.freedesktop.org/terminal-wg/specifications/issues/9.
+
 
 Bug Fixes:
 ----------

@@ -75,6 +75,13 @@ set, or if an attempt is made to open a different type of socket, the
 errno is now EOPNOTSUPP instead of ENXIO.
 </para></listitem>
 
+<listitem><para>
+The new locale modifier @cjksingle allows enforcing of single-width
+character property for usually double-widthed characters.  This will
+be supported by upcoming mintty releases.  For the reasoning, see
+https://gitlab.freedesktop.org/terminal-wg/specifications/issues/9.
+</para></listitem>
+
 </itemizedlist>
 
 </sect2>
