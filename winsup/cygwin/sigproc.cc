@@ -71,7 +71,7 @@ static void WINAPI wait_sig (VOID *arg);
 
 class pending_signals
 {
-  sigpacket sigs[NSIG + 1];
+  sigpacket sigs[_NSIG + 1];
   sigpacket start;
   bool retry;
 
@@ -91,7 +91,7 @@ void __stdcall
 sigalloc ()
 {
   cygheap->sigs = global_sigs =
-    (struct sigaction *) ccalloc_abort (HEAP_SIGS, NSIG, sizeof (struct sigaction));
+    (struct sigaction *) ccalloc_abort (HEAP_SIGS, _NSIG, sizeof (struct sigaction));
   global_sigs[SIGSTOP].sa_flags = SA_RESTART | SA_NODEFER;
 }
 
@@ -100,7 +100,7 @@ signal_fixup_after_exec ()
 {
   global_sigs = cygheap->sigs;
   /* Set up child's signal handlers */
-  for (int i = 0; i < NSIG; i++)
+  for (int i = 0; i < _NSIG; i++)
     {
       global_sigs[i].sa_mask = 0;
       if (global_sigs[i].sa_handler != SIG_IGN)
@@ -449,7 +449,7 @@ sigproc_init ()
   char char_sa_buf[1024];
   PSECURITY_ATTRIBUTES sa = sec_user_nih ((PSECURITY_ATTRIBUTES) char_sa_buf, cygheap->user.sid());
   DWORD err = fhandler_pipe::create (sa, &my_readsig, &my_sendsig,
-				     NSIG * sizeof (sigpacket), "sigwait",
+				     _NSIG * sizeof (sigpacket), "sigwait",
 				     PIPE_ADD_PID);
   if (err)
     {

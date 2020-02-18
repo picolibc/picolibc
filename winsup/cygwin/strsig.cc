@@ -174,7 +174,7 @@ psiginfo (const siginfo_t *info, const char *s)
 
   ADD (strsignal (info->si_signo));
 
-  if (info->si_signo > 0 && info->si_signo < NSIG)
+  if (info->si_signo > 0 && info->si_signo < _NSIG)
     {
       switch (info->si_signo)
 	{

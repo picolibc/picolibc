@@ -10,19 +10,19 @@ details. */
 #include <signal.h>
 #include "sync.h"
 
-#ifdef NSIG
+#ifdef _NSIG
 enum
 {
-  __SIGFLUSH	    = -(NSIG + 1),
-  __SIGSTRACE	    = -(NSIG + 2),
-  __SIGCOMMUNE	    = -(NSIG + 3),
-  __SIGPENDING	    = -(NSIG + 4),
-  __SIGDELETE	    = -(NSIG + 5),	/* Not currently used */
-  __SIGFLUSHFAST    = -(NSIG + 6),
-  __SIGHOLD	    = -(NSIG + 7),
-  __SIGNOHOLD	    = -(NSIG + 8),
-  __SIGSETPGRP	    = -(NSIG + 9),
-  __SIGTHREADEXIT   = -(NSIG + 10)
+  __SIGFLUSH	    = -(_NSIG + 1),
+  __SIGSTRACE	    = -(_NSIG + 2),
+  __SIGCOMMUNE	    = -(_NSIG + 3),
+  __SIGPENDING	    = -(_NSIG + 4),
+  __SIGDELETE	    = -(_NSIG + 5),	/* Not currently used */
+  __SIGFLUSHFAST    = -(_NSIG + 6),
+  __SIGHOLD	    = -(_NSIG + 7),
+  __SIGNOHOLD	    = -(_NSIG + 8),
+  __SIGSETPGRP	    = -(_NSIG + 9),
+  __SIGTHREADEXIT   = -(_NSIG + 10)
 };
 #endif
 

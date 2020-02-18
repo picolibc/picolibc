@@ -13,6 +13,10 @@ What changed:
 
 - Allow AF_LOCAL sockets to be opened with O_PATH.
 
+- <signal.h>: New macro _NSIG replacing NSIG.  NSIG is now only
+  visible to MISC builds, as on Linux.
+
+
 Bug Fixes:
 ----------
 

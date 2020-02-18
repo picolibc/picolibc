@@ -438,14 +438,18 @@ struct sigaction
 #define	SIGUSR2 31	/* user defined signal 2 */
 
 #if __WORDSIZE == 64
-#define NSIG	65      /* signal 0 implied */
+#define _NSIG	65      /* signal 0 implied */
 #else
-#define NSIG	33      /* signal 0 implied */
+#define _NSIG	33      /* signal 0 implied */
+#endif
+
+#if __MISC_VISIBLE
+#define NSIG	_NSIG
 #endif
 
 /* Real-Time signals per SUSv3.  RT_SIGMAX is defined as 8 in limits.h */
 #define SIGRTMIN 32
-#define SIGRTMAX (NSIG - 1)
+#define SIGRTMAX (_NSIG - 1)
 
 #define SIG_HOLD ((_sig_func_ptr)2)	/* Signal in signal mask */
 

@@ -1166,7 +1166,7 @@ extern "C" int
 sighold (int sig)
 {
   /* check that sig is in right range */
-  if (sig < 0 || sig >= NSIG)
+  if (sig < 0 || sig >= _NSIG)
     {
       set_errno (EINVAL);
       syscall_printf ("signal %d out of range", sig);
@@ -1182,7 +1182,7 @@ extern "C" int
 sigrelse (int sig)
 {
   /* check that sig is in right range */
-  if (sig < 0 || sig >= NSIG)
+  if (sig < 0 || sig >= _NSIG)
     {
       set_errno (EINVAL);
       syscall_printf ("signal %d out of range", sig);
@@ -1201,7 +1201,7 @@ sigset (int sig, _sig_func_ptr func)
   _sig_func_ptr prev;
 
   /* check that sig is in right range */
-  if (sig < 0 || sig >= NSIG || sig == SIGKILL || sig == SIGSTOP)
+  if (sig < 0 || sig >= _NSIG || sig == SIGKILL || sig == SIGSTOP)
     {
       set_errno (EINVAL);
       syscall_printf ("SIG_ERR = sigset (%d, %p)", sig, func);

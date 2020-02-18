@@ -36,7 +36,7 @@ signal (int sig, _sig_func_ptr func)
   _sig_func_ptr prev;
 
   /* check that sig is in right range */
-  if (sig <= 0 || sig >= NSIG || sig == SIGKILL || sig == SIGSTOP)
+  if (sig <= 0 || sig >= _NSIG || sig == SIGKILL || sig == SIGSTOP)
     {
       set_errno (EINVAL);
       syscall_printf ("SIG_ERR = signal (%d, %p)", sig, func);
@@ -311,7 +311,7 @@ kill0 (pid_t pid, siginfo_t& si)
 {
   syscall_printf ("kill (%d, %d)", pid, si.si_signo);
   /* check that sig is in right range */
-  if (si.si_signo < 0 || si.si_signo >= NSIG)
+  if (si.si_signo < 0 || si.si_signo >= _NSIG)
     {
       set_errno (EINVAL);
       syscall_printf ("signal %d out of range", si.si_signo);
@@ -417,7 +417,7 @@ sigaction_worker (int sig, const struct sigaction *newact,
     {
       sig_dispatch_pending ();
       /* check that sig is in right range */
-      if (sig <= 0 || sig >= NSIG)
+      if (sig <= 0 || sig >= _NSIG)
 	set_errno (EINVAL);
       else
 	{
@@ -480,7 +480,7 @@ extern "C" int
 sigaddset (sigset_t *set, const int sig)
 {
   /* check that sig is in right range */
-  if (sig <= 0 || sig >= NSIG)
+  if (sig <= 0 || sig >= _NSIG)
     {
       set_errno (EINVAL);
       syscall_printf ("SIG_ERR = sigaddset signal %d out of range", sig);
@@ -495,7 +495,7 @@ extern "C" int
 sigdelset (sigset_t *set, const int sig)
 {
   /* check that sig is in right range */
-  if (sig <= 0 || sig >= NSIG)
+  if (sig <= 0 || sig >= _NSIG)
     {
       set_errno (EINVAL);
       syscall_printf ("SIG_ERR = sigdelset signal %d out of range", sig);
@@ -510,7 +510,7 @@ extern "C" int
 sigismember (const sigset_t *set, int sig)
 {
   /* check that sig is in right range */
-  if (sig <= 0 || sig >= NSIG)
+  if (sig <= 0 || sig >= _NSIG)
     {
       set_errno (EINVAL);
       syscall_printf ("SIG_ERR = sigdelset signal %d out of range", sig);
@@ -709,7 +709,7 @@ sigqueue (pid_t pid, int sig, const union sigval value)
     }
   if (sig == 0)
     return 0;
-  if (sig < 0 || sig >= NSIG)
+  if (sig < 0 || sig >= _NSIG)
     {
       set_errno (EINVAL);
       return -1;
