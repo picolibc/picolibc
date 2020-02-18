@@ -53,8 +53,6 @@ fhandler_console::console_state NO_COPY *fhandler_console::shared_console_info;
 
 bool NO_COPY fhandler_console::invisible_console;
 
-static DWORD orig_conout_mode = (DWORD) -1;
-
 /* con_ra is shared in the same process.
    Only one console can exist in a process, therefore, static is suitable. */
 static struct fhandler_base::rabuf_t con_ra;
@@ -162,13 +160,17 @@ fhandler_console::set_unit ()
 	  tty_min_state.setntty (DEV_CONS_MAJOR, console_unit (me));
       devset = (fh_devices) shared_console_info->tty_min_state.getntty ();
       if (created)
-	con.owner = getpid ();
+	{
+	  con.owner = myself->pid;
+	  con.xterm_mode_input = 0;
+	  con.xterm_mode_output = 0;
+	}
     }
   if (!created && shared_console_info)
     {
       pinfo p (con.owner);
       if (!p)
-	con.owner = getpid ();
+	con.owner = myself->pid;
     }
 
   dev ().parse (devset);
@@ -245,6 +247,60 @@ size_t &
 fhandler_console::rabuflen ()
 {
   return con_ra.rabuflen;
+}
+
+void
+fhandler_console::request_xterm_mode_input (bool req)
+{
+  if (con_is_legacy)
+    return;
+  if (req)
+    {
+      if (InterlockedIncrement (&con.xterm_mode_input) == 1)
+	{
+	  DWORD dwMode;
+	  GetConsoleMode (get_handle (), &dwMode);
+	  dwMode |= ENABLE_VIRTUAL_TERMINAL_INPUT;
+	  SetConsoleMode (get_handle (), dwMode);
+	}
+    }
+  else
+    {
+      if (InterlockedDecrement (&con.xterm_mode_input) == 0)
+	{
+	  DWORD dwMode;
+	  GetConsoleMode (get_handle (), &dwMode);
+	  dwMode &= ~ENABLE_VIRTUAL_TERMINAL_INPUT;
+	  SetConsoleMode (get_handle (), dwMode);
+	}
+    }
+}
+
+void
+fhandler_console::request_xterm_mode_output (bool req)
+{
+  if (con_is_legacy)
+    return;
+  if (req)
+    {
+      if (InterlockedExchange (&con.xterm_mode_output, 1) == 0)
+	{
+	  DWORD dwMode;
+	  GetConsoleMode (get_output_handle (), &dwMode);
+	  dwMode |= ENABLE_VIRTUAL_TERMINAL_PROCESSING;
+	  SetConsoleMode (get_output_handle (), dwMode);
+	}
+    }
+  else
+    {
+      if (InterlockedExchange (&con.xterm_mode_output, 0) == 1)
+	{
+	  DWORD dwMode;
+	  GetConsoleMode (get_output_handle (), &dwMode);
+	  dwMode &= ~ENABLE_VIRTUAL_TERMINAL_PROCESSING;
+	  SetConsoleMode (get_output_handle (), dwMode);
+	}
+    }
 }
 
 /* Return the tty structure associated with a given tty number.  If the
@@ -347,8 +403,8 @@ fhandler_console::set_cursor_maybe ()
 
 /* Workaround for a bug of windows xterm compatible mode. */
 /* The horizontal tab positions are broken after resize. */
-static void
-fix_tab_position (HANDLE h, SHORT width)
+void
+fhandler_console::fix_tab_position (void)
 {
   char buf[2048] = {0,};
   /* Save cursor position */
@@ -356,15 +412,13 @@ fix_tab_position (HANDLE h, SHORT width)
   /* Clear all horizontal tabs */
   __small_sprintf (buf+strlen (buf), "\033[3g");
   /* Set horizontal tabs */
-  for (int col=8; col<width; col+=8)
+  for (int col=8; col<con.dwWinSize.X; col+=8)
     __small_sprintf (buf+strlen (buf), "\033[%d;%dH\033H", 1, col+1);
   /* Restore cursor position */
   __small_sprintf (buf+strlen (buf), "\0338");
-  DWORD dwMode;
-  GetConsoleMode (h, &dwMode);
-  SetConsoleMode (h, dwMode | ENABLE_VIRTUAL_TERMINAL_PROCESSING);
+  request_xterm_mode_output (true);
   DWORD dwLen;
-  WriteConsole (h, buf, strlen (buf), &dwLen, 0);
+  WriteConsole (get_output_handle (), buf, strlen (buf), &dwLen, 0);
 }
 
 bool
@@ -379,7 +433,7 @@ fhandler_console::send_winch_maybe ()
       con.scroll_region.Top = 0;
       con.scroll_region.Bottom = -1;
       if (wincap.has_con_24bit_colors () && !con_is_legacy)
-	fix_tab_position (get_output_handle (), con.dwWinSize.X);
+	fix_tab_position ();
       get_ttyp ()->kill_pgrp (SIGWINCH);
       return true;
     }
@@ -427,11 +481,9 @@ fhandler_console::read (void *pv, size_t& buflen)
 
   set_input_state ();
 
-  DWORD dwMode;
-  GetConsoleMode (get_handle (), &dwMode);
   /* if system has 24 bit color capability, use xterm compatible mode. */
-  if (wincap.has_con_24bit_colors () && !con_is_legacy)
-    SetConsoleMode (get_handle (), dwMode | ENABLE_VIRTUAL_TERMINAL_INPUT);
+  if (wincap.has_con_24bit_colors ())
+    request_xterm_mode_input (true);
 
   while (!input_ready && !get_cons_readahead_valid ())
     {
@@ -439,7 +491,8 @@ fhandler_console::read (void *pv, size_t& buflen)
       if ((bgres = bg_check (SIGTTIN)) <= bg_eof)
 	{
 	  buflen = bgres;
-	  SetConsoleMode (get_handle (), dwMode); /* Restore */
+	  if (wincap.has_con_24bit_colors ())
+	    request_xterm_mode_input (false);
 	  return;
 	}
 
@@ -457,7 +510,8 @@ fhandler_console::read (void *pv, size_t& buflen)
 	case WAIT_TIMEOUT:
 	  set_sig_errno (EAGAIN);
 	  buflen = (size_t) -1;
-	  SetConsoleMode (get_handle (), dwMode); /* Restore */
+	  if (wincap.has_con_24bit_colors ())
+	    request_xterm_mode_input (false);
 	  return;
 	default:
 	  goto err;
@@ -505,19 +559,22 @@ fhandler_console::read (void *pv, size_t& buflen)
 #undef buf
 
   buflen = copied_chars;
-  SetConsoleMode (get_handle (), dwMode); /* Restore */
+  if (wincap.has_con_24bit_colors ())
+    request_xterm_mode_input (false);
   return;
 
 err:
   __seterrno ();
   buflen = (size_t) -1;
-  SetConsoleMode (get_handle (), dwMode); /* Restore */
+  if (wincap.has_con_24bit_colors ())
+    request_xterm_mode_input (false);
   return;
 
 sig_exit:
   set_sig_errno (EINTR);
   buflen = (size_t) -1;
-  SetConsoleMode (get_handle (), dwMode); /* Restore */
+  if (wincap.has_con_24bit_colors ())
+    request_xterm_mode_input (false);
 }
 
 fhandler_console::input_states
@@ -1051,10 +1108,7 @@ fhandler_console::open (int flags, mode_t)
   get_ttyp ()->rstcons (false);
   set_open_status ();
 
-  if (orig_conout_mode == (DWORD) -1)
-    GetConsoleMode (get_output_handle (), &orig_conout_mode);
-
-  if (getpid () == con.owner && wincap.has_con_24bit_colors ())
+  if (myself->pid == con.owner && wincap.has_con_24bit_colors ())
     {
       bool is_legacy = false;
       DWORD dwMode;
@@ -1105,15 +1159,9 @@ fhandler_console::close ()
 
   acquire_output_mutex (INFINITE);
 
-  if (shared_console_info && getpid () == con.owner &&
+  if (shared_console_info && myself->pid == con.owner &&
       wincap.has_con_24bit_colors () && !con_is_legacy)
-    {
-      DWORD dwMode;
-      /* Disable xterm compatible mode in output */
-      GetConsoleMode (get_output_handle (), &dwMode);
-      dwMode &= ~ENABLE_VIRTUAL_TERMINAL_PROCESSING;
-      SetConsoleMode (get_output_handle (), dwMode);
-    }
+    request_xterm_mode_output (false);
 
   /* Restore console mode if this is the last closure. */
   OBJECT_BASIC_INFORMATION obi;
@@ -1121,8 +1169,8 @@ fhandler_console::close ()
   status = NtQueryObject (get_handle (), ObjectBasicInformation,
 			  &obi, sizeof obi, NULL);
   if (NT_SUCCESS (status) && obi.HandleCount == 1)
-    if (orig_conout_mode != (DWORD) -1)
-      SetConsoleMode (get_output_handle (), orig_conout_mode);
+    if (wincap.has_con_24bit_colors ())
+      request_xterm_mode_output (false);
 
   release_output_mutex ();
 
@@ -1295,6 +1343,8 @@ fhandler_console::output_tcsetattr (int, struct termios const *t)
   /* All the output bits we can ignore */
 
   acquire_output_mutex (INFINITE);
+  if (wincap.has_con_24bit_colors ())
+    request_xterm_mode_output (false);
   DWORD flags = ENABLE_PROCESSED_OUTPUT | ENABLE_WRAP_AT_EOL_OUTPUT;
 
   int res = SetConsoleMode (get_output_handle (), flags) ? 0 : -1;
@@ -1765,7 +1815,7 @@ bool fhandler_console::write_console (PWCHAR buf, DWORD len, DWORD& done)
     }
   /* Call fix_tab_position() if screen has been alternated. */
   if (need_fix_tab_position)
-    fix_tab_position (get_output_handle (), con.dwWinSize.X);
+    fix_tab_position ();
   return true;
 }
 
@@ -2733,11 +2783,12 @@ fhandler_console::write (const void *vsrc, size_t len)
   acquire_output_mutex (INFINITE);
 
   /* If system has 24 bit color capability, use xterm compatible mode. */
+  if (wincap.has_con_24bit_colors ())
+    request_xterm_mode_output (true);
   if (wincap.has_con_24bit_colors () && !con_is_legacy)
     {
       DWORD dwMode;
       GetConsoleMode (get_output_handle (), &dwMode);
-      dwMode |= ENABLE_VIRTUAL_TERMINAL_PROCESSING;
       if (!(get_ttyp ()->ti.c_oflag & OPOST) ||
 	  !(get_ttyp ()->ti.c_oflag & ONLCR))
 	dwMode |= DISABLE_NEWLINE_AUTO_RETURN;
