@@ -19,8 +19,12 @@ There are two files used for testing printf, test/printf-tests.c and
 test/testcases.c which are licensed under the GPL version 2 or
 later.
 
-Please see the file COPYING.NEWLIB in this distribution for newlib
-license terms.
+The file COPYING.picolibc contains all of the current copyright and
+license information in the Debian standard machine-readable format. It
+was generated using the make-copyrights and find-copyright
+scripts. There are currently 75 distinct licenses: 9 versions of the
+2-clause BSD license, 35 versions of the 3-clause BSD license, and 31
+other licenses.
 
 ## Supported Architectures
 
@@ -71,6 +75,24 @@ areas unrelated to the code used by picolibc, so keeping things in
 sync has not been difficult so far.
 
 ## Releases
+
+### Picolibc version 1.4
+
+This release was focused on cleaning up the copyright and license
+information.
+
+ 1. Copyright information should now be present in every source file.
+
+ 2. License information, where it could be inferred from the
+    repository, was added to many files.
+
+ 3. 4-clause BSD licenses were changed (with permission) to 3-clause
+
+ 4. Fix RISC-V ieeefp.h exception bits
+
+ 5. Merge past newlib 3.2.0
+
+ 6. Add PICOLIBC_TLS preprocessor define when the library has TLS support
 
 ### Picolibc version 1.3
 
@@ -169,3 +191,4 @@ include:
  * [Linking with Picolibc.ld](doc/linking.md)
  * [Hello World](hello-world/README.md)
  * [Picolibc as embedded source](doc/embedsource.md)
+ * [Copyright and license information](COPYING.picolibc)
