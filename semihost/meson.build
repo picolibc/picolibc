@@ -38,7 +38,7 @@ src_semihost_machine = {
 			'arm' : 'arm/semihost-arm.c'
 		      }
 
-if src_semihost_machine.has_key(host_cpu)
+if src_semihost_machine.has_key(host_cpu_family)
   srcs_semihost = [
     'close.c',
     'exit.c',
@@ -60,7 +60,7 @@ if src_semihost_machine.has_key(host_cpu)
     'sys_putc.c',
     'sys_read.c',
     'sys_remove.c',
-    join_paths('machine', src_semihost_machine[host_cpu])
+    join_paths('machine', src_semihost_machine[host_cpu_family])
   ]
 
   install_headers(

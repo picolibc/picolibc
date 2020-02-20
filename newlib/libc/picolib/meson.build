@@ -50,14 +50,14 @@ srcs_picolib = [
   'picosbrk.c',
 ]
 
-if srcs_machine.has_key(host_cpu)
-  srcs_picolib += srcs_machine[host_cpu]
+if srcs_machine.has_key(host_cpu_family)
+  srcs_picolib += srcs_machine[host_cpu_family]
 endif
 
 if thread_local_storage
   srcs_picolib += srcs_tls
-  if srcs_machine_tls.has_key(host_cpu)
-    srcs_picolib += srcs_machine_tls[host_cpu]
+  if srcs_machine_tls.has_key(host_cpu_family)
+    srcs_picolib += srcs_machine_tls[host_cpu_family]
   endif
 endif
 
