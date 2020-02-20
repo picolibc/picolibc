@@ -95,7 +95,7 @@ posix_console = posix_io and get_option('posix-console')
 sysroot_install = get_option('sysroot-install')
 newlib_obsolete_math = get_option('newlib-obsolete-math')
 
-host_cpu=host_machine.cpu()
+host_cpu=host_machine.cpu_family()
 if host_cpu == ''
   host_cmds = meson.get_compiler('c').cmd_array() + ['-dumpmachine']
   host_cc_machine=run_command(host_cmds).stdout().strip().split('-')
@@ -314,7 +314,7 @@ if has_semihost
   # If we're using semihosting, we assume that there's a
   # custom linker script that includes picolibc.specs
 
-  test_link_name = 'test-' + host_machine.cpu() + '.ld'
+  test_link_name = 'test-' + host_machine.cpu_family() + '.ld'
   test_link_dep = files(test_link_name)
 
   # Linker args must be strings (seems like a bug), so compute the
