@@ -38,8 +38,8 @@ src_picocrt_machine = {
 			'arm' : 'arm/crt0.c'
 		      }
 
-if src_picocrt_machine.has_key(host_cpu)
-  srcs_picocrt = join_paths('machine', src_picocrt_machine[host_cpu])
+if src_picocrt_machine.has_key(host_cpu_family)
+  srcs_picocrt = join_paths('machine', src_picocrt_machine[host_cpu_family])
 else
   srcs_picocrt = 'shared/crt0.c'
 endif
