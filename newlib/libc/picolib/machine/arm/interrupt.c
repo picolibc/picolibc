@@ -74,7 +74,7 @@ void _start(void);
 extern uint8_t __stack[];
 
 #define i(addr,name)	[(addr)/4] = arm_ ## name ## _isr
-
+/*
 __section(".data.init.enter")
 const void *__weak_interrupt_vector[] __attribute((aligned(128))) = {
 	[0] = __stack,
@@ -87,3 +87,4 @@ const void *__weak_interrupt_vector[] __attribute((aligned(128))) = {
 	i(0x3c, systick),
 };
 __weak_reference(__weak_interrupt_vector, __interrupt_vector);
+*/
