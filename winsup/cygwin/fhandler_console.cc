@@ -1774,8 +1774,8 @@ static const wchar_t __vt100_conv[31] = {
 	0x00B7, /* Middle Dot */
 };
 
-inline
-bool fhandler_console::write_console (PWCHAR buf, DWORD len, DWORD& done)
+inline bool
+fhandler_console::write_console (PWCHAR buf, DWORD len, DWORD& done)
 {
   bool need_fix_tab_position = false;
   /* Check if screen will be alternated. */
@@ -2643,7 +2643,7 @@ fhandler_console::write_normal (const unsigned char *src,
 	 && found - src < CONVERT_LIMIT
 	 && base_chars[*found] != IGN
 	 && ((wincap.has_con_24bit_colors () && !con_is_legacy)
-	     || base_chars[*found] == NOR) )
+	     || base_chars[*found] == NOR))
     {
       switch (ret = f_mbtowc (_REENT, NULL, (const char *) found,
 			       end - found, &ps))
