@@ -2641,6 +2641,7 @@ fhandler_console::write_normal (const unsigned char *src,
   memset (&ps, 0, sizeof ps);
   while (found < end
 	 && found - src < CONVERT_LIMIT
+	 && base_chars[*found] != IGN
 	 && ((wincap.has_con_24bit_colors () && !con_is_legacy)
 	     || base_chars[*found] == NOR) )
     {
@@ -2732,7 +2733,8 @@ do_print:
 	  cursor_rel (-1, 0);
 	  break;
 	case IGN:
-	  cursor_rel (1, 0);
+	 if (!wincap.has_con_24bit_colors () || con_is_legacy)
+	    cursor_rel (1, 0);
 	  break;
 	case CR:
 	  cursor_get (&x, &y);
