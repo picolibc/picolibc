@@ -53,12 +53,10 @@ void arm_ignore_isr(void)
 }
 
 #define isr(name) \
-	void __attribute__ ((weak)) arm_ ## name ## _isr(void); \
-	_Pragma(STRINGIFY(weak arm_ ## name ## _isr = arm_ignore_isr))
+	void  arm_ ## name ## _isr(void) __attribute__ ((weak, alias("arm_ignore_isr")));
 
 #define isr_halt(name) \
-	void __attribute__ ((weak)) arm_ ## name ## _isr(void); \
-	_Pragma(STRINGIFY(weak arm_ ## name ## _isr = arm_halt_isr))
+	void  arm_ ## name ## _isr(void) __attribute__ ((weak, alias("arm_halt_isr")));
 
 isr(nmi);
 isr_halt(hardfault);
@@ -73,11 +71,11 @@ isr(systick);
 void _start(void);
 extern uint8_t __stack[];
 
-#define i(addr,name)	[(addr)/4] = arm_ ## name ## _isr
-/*
+#define i(addr,name)	[(addr)/4] = (void(*)(void)) arm_ ## name ## _isr
+
 __section(".data.init.enter")
-const void *__weak_interrupt_vector[] __attribute((aligned(128))) = {
-	[0] = __stack,
+void (* const __weak_interrupt_vector[])(void) __attribute((aligned(128))) = {
+	[0] = (void(*)(void))__stack,
 	[1] = _start,
 	i(0x08, nmi),
 	i(0x0c, hardfault),
@@ -87,4 +85,3 @@ const void *__weak_interrupt_vector[] __attribute((aligned(128))) = {
 	i(0x3c, systick),
 };
 __weak_reference(__weak_interrupt_vector, __interrupt_vector);
-*/
