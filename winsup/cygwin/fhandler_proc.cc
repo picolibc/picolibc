@@ -1346,6 +1346,7 @@ format_proc_cpuinfo (void *, char *&destbuf)
 
           ftcprint (features1,  2, "avx512_4vnniw");	   /* vec dot prod dw */
           ftcprint (features1,  3, "avx512_4fmaps");       /* vec 4 FMA single */
+          ftcprint (features1,  4, "fsrm");		   /* fast short REP MOVSB */
           ftcprint (features1,  8, "avx512_vp2intersect"); /* vec intcpt d/q */
           ftcprint (features1, 10, "md_clear");            /* verw clear buf */
           ftcprint (features1, 18, "pconfig");		   /* platform config */
