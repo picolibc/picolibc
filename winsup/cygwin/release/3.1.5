@@ -1,0 +1,7 @@
+Bug Fixes:
+----------
+
+- Fix accidental evaluation of NUL (\0) characters in xterm console output.
+  Don't move cursor to the right in case of a NUL character in the console
+  output stream, this is not backed by terminfo.
+  Addresses: https://cygwin.com/ml/cygwin/2020-02/msg00162.html
