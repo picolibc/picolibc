@@ -2733,8 +2733,9 @@ do_print:
 	  cursor_rel (-1, 0);
 	  break;
 	case IGN:
-	 if (!wincap.has_con_24bit_colors () || con_is_legacy)
-	    cursor_rel (1, 0);
+	 /* Up to release 3.1.3 we called cursor_rel (1, 0); to move the cursor
+	    one step to the right.  However, that neither matches the terminfo
+	    for the cygwin terminal, nor the one for the xterm terminal. */
 	  break;
 	case CR:
 	  cursor_get (&x, &y);
