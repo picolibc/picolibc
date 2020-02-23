@@ -230,7 +230,7 @@ typedef __uint_least64_t uint_least64_t;
 #define INT64_MIN (-__INT64_MAX__ - 1)
 #define INT64_MAX (__INT64_MAX__)
 #define UINT64_MAX (__UINT64_MAX__)
-#elif defined(__int64_t_defined)
+#elif defined(___int64_t_defined)
 #if __have_long64
 #define INT64_MIN 	(-9223372036854775807L-1L)
 #define INT64_MAX 	 (9223372036854775807L)
@@ -433,7 +433,7 @@ typedef __uint_least64_t uint_least64_t;
 #define INT64_C(x) __INT64_C(x)
 #define UINT64_C(x) __UINT64_C(x)
 #else
-#if __int64_t_defined
+#if ___int64_t_defined
 #if __have_long64
 #define INT64_C(x)	x##L
 #define UINT64_C(x)	x##UL

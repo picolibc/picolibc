@@ -213,7 +213,7 @@
 #define __PRI64FAST(x) __FAST64 __STRINGIFY(x)
 #define __SCN64FAST(x) __FAST64 __STRINGIFY(x)
 
-#if __int64_t_defined
+#if ___int64_t_defined
 #define PRId64		__PRI64(d)
 #define PRIi64		__PRI64(i)
 #define PRIo64		__PRI64(o)

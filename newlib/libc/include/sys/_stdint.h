@@ -60,7 +60,7 @@ typedef __int64_t int64_t ;
 typedef __uint64_t uint64_t ;
 #define _UINT64_T_DECLARED
 #endif
-#define __int64_t_defined 1
+#define ___int64_t_defined 1
 #endif /* ___int64_t_defined */
 
 #ifndef _INTMAX_T_DECLARED
