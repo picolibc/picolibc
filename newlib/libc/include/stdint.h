@@ -196,7 +196,7 @@ typedef __uint_least64_t uint_least64_t;
 #define INT32_MIN (-__INT32_MAX__ - 1)
 #define INT32_MAX (__INT32_MAX__)
 #define UINT32_MAX (__UINT32_MAX__)
-#elif defined(__int32_t_defined)
+#elif defined(___int32_t_defined)
 #if defined (_INT32_EQ_LONG)
 #define INT32_MIN 	 (-2147483647L-1)
 #define INT32_MAX 	 (2147483647L)
