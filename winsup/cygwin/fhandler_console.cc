@@ -1159,18 +1159,17 @@ fhandler_console::close ()
 
   acquire_output_mutex (INFINITE);
 
-  if (shared_console_info && myself->pid == con.owner &&
-      wincap.has_con_24bit_colors () && !con_is_legacy)
-    request_xterm_mode_output (false);
-
-  /* Restore console mode if this is the last closure. */
-  OBJECT_BASIC_INFORMATION obi;
-  NTSTATUS status;
-  status = NtQueryObject (get_handle (), ObjectBasicInformation,
-			  &obi, sizeof obi, NULL);
-  if (NT_SUCCESS (status) && obi.HandleCount == 1)
-    if (wincap.has_con_24bit_colors ())
-      request_xterm_mode_output (false);
+  if (shared_console_info && wincap.has_con_24bit_colors ())
+    {
+      /* Restore console mode if this is the last closure. */
+      OBJECT_BASIC_INFORMATION obi;
+      NTSTATUS status;
+      status = NtQueryObject (get_handle (), ObjectBasicInformation,
+			      &obi, sizeof obi, NULL);
+      if ((NT_SUCCESS (status) && obi.HandleCount == 1)
+	  || myself->pid == con.owner)
+	request_xterm_mode_output (false);
+    }
 
   release_output_mutex ();
 

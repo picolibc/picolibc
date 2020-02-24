@@ -5,3 +5,7 @@ Bug Fixes:
   Don't move cursor to the right in case of a NUL character in the console
   output stream, this is not backed by terminfo.
   Addresses: https://cygwin.com/ml/cygwin/2020-02/msg00162.html
+
+- Fix a segfault when starting, e.g., mintty from a bash in a console
+  running xterm emulation.
+  Addresses: https://cygwin.com/ml/cygwin/2020-02/msg00197.html
