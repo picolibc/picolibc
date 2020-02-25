@@ -1397,8 +1397,8 @@ format_proc_cpuinfo (void *, char *&destbuf)
 /*	  ftcprint (features1,  8, "invariant_tsc"); */ /* TSC invariant */
 	  ftcprint (features1,  9, "cpb");          /* core performance boost */
 	  ftcprint (features1, 10, "eff_freq_ro");  /* ro eff freq interface */
-/*	  ftcprint (features1, 11, "proc_feedback"); */ /* proc feedback if */
-/*	  ftcprint (features1, 12, "acc_power"); */ /* core power reporting */
+	  ftcprint (features1, 11, "proc_feedback");/* proc feedback if */
+	  ftcprint (features1, 12, "acc_power");    /* core power reporting */
 /*	  ftcprint (features1, 13, "connstby"); */  /* connected standby */
 /*	  ftcprint (features1, 14, "rapl"); */	    /* running average power limit */
 	}
