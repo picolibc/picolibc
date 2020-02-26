@@ -37,6 +37,7 @@ struct wincaps
     unsigned no_msv1_0_s4u_logon_in_wow64	: 1;
     unsigned has_con_24bit_colors		: 1;
     unsigned has_con_broken_csi3j		: 1;
+    unsigned has_con_broken_il_dl		: 1;
   };
 };
 
@@ -97,6 +98,7 @@ public:
   bool	IMPLEMENT (no_msv1_0_s4u_logon_in_wow64)
   bool	IMPLEMENT (has_con_24bit_colors)
   bool	IMPLEMENT (has_con_broken_csi3j)
+  bool	IMPLEMENT (has_con_broken_il_dl)
 
   void disable_case_sensitive_dirs ()
   {

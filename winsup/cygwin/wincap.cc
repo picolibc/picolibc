@@ -43,6 +43,7 @@ wincaps wincap_vista __attribute__((section (".cygwin_dll_common"), shared)) = {
     no_msv1_0_s4u_logon_in_wow64:true,
     has_con_24bit_colors:false,
     has_con_broken_csi3j:false,
+    has_con_broken_il_dl:false,
   },
 };
 
@@ -71,6 +72,7 @@ wincaps wincap_7 __attribute__((section (".cygwin_dll_common"), shared)) = {
     no_msv1_0_s4u_logon_in_wow64:true,
     has_con_24bit_colors:false,
     has_con_broken_csi3j:false,
+    has_con_broken_il_dl:false,
   },
 };
 
@@ -99,6 +101,7 @@ wincaps wincap_8 __attribute__((section (".cygwin_dll_common"), shared)) = {
     no_msv1_0_s4u_logon_in_wow64:false,
     has_con_24bit_colors:false,
     has_con_broken_csi3j:false,
+    has_con_broken_il_dl:false,
   },
 };
 
@@ -127,6 +130,7 @@ wincaps wincap_8_1 __attribute__((section (".cygwin_dll_common"), shared)) = {
     no_msv1_0_s4u_logon_in_wow64:false,
     has_con_24bit_colors:false,
     has_con_broken_csi3j:false,
+    has_con_broken_il_dl:false,
   },
 };
 
@@ -155,6 +159,7 @@ wincaps  wincap_10_1507 __attribute__((section (".cygwin_dll_common"), shared)) 
     no_msv1_0_s4u_logon_in_wow64:false,
     has_con_24bit_colors:false,
     has_con_broken_csi3j:false,
+    has_con_broken_il_dl:false,
   },
 };
 
@@ -183,6 +188,7 @@ wincaps wincap_10_1703 __attribute__((section (".cygwin_dll_common"), shared)) =
     no_msv1_0_s4u_logon_in_wow64:false,
     has_con_24bit_colors:true,
     has_con_broken_csi3j:false,
+    has_con_broken_il_dl:false,
   },
 };
 
@@ -211,6 +217,7 @@ wincaps wincap_10_1709 __attribute__((section (".cygwin_dll_common"), shared)) =
     no_msv1_0_s4u_logon_in_wow64:false,
     has_con_24bit_colors:true,
     has_con_broken_csi3j:false,
+    has_con_broken_il_dl:false,
   },
 };
 
@@ -239,6 +246,7 @@ wincaps wincap_10_1803 __attribute__((section (".cygwin_dll_common"), shared)) =
     no_msv1_0_s4u_logon_in_wow64:false,
     has_con_24bit_colors:true,
     has_con_broken_csi3j:false,
+    has_con_broken_il_dl:false,
   },
 };
 
@@ -267,6 +275,7 @@ wincaps wincap_10_1809 __attribute__((section (".cygwin_dll_common"), shared)) =
     no_msv1_0_s4u_logon_in_wow64:false,
     has_con_24bit_colors:true,
     has_con_broken_csi3j:true,
+    has_con_broken_il_dl:false,
   },
 };
 
@@ -295,6 +304,7 @@ wincaps wincap_10_1903 __attribute__((section (".cygwin_dll_common"), shared)) =
     no_msv1_0_s4u_logon_in_wow64:false,
     has_con_24bit_colors:true,
     has_con_broken_csi3j:false,
+    has_con_broken_il_dl:true,
   },
 };
 
