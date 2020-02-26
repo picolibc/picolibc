@@ -33,6 +33,18 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+
+/* Suppresses compiler warnings
+ * regarding destructor priority 
+ * 
+ * -Wno-prio-ctor-dtor is not yet supported 
+ * for suppression via pragma statement
+*/
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wno-prio-ctor-dtor"
+
+
 #include "stdio_private.h"
 #include <stdlib.h>
 #include <unistd.h>
@@ -119,17 +131,6 @@ __posix_close(FILE *f)
 	return ret;
 }
 
-/* Suppresses compiler warnings
- * regarding destructor priority 
- * 
- * -Wno-prio-ctor-dtor is not yet supported 
- * for suppression via pragma statement
-
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wno-prio-ctor-dtor"
-
-*/
-
 /*
  * Add a destructor function to get stdout flushed on
  * exit
@@ -140,4 +141,4 @@ static void posix_exit(void)
 	__posix_flush(stdout);
 }
 
-/* #pragma GCC diagnostic pop */
+#pragma GCC diagnostic pop
