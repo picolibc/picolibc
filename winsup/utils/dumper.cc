@@ -39,6 +39,20 @@
 
 #define NOTE_NAME_SIZE 16
 
+#ifdef bfd_get_section_size
+/* for bfd < 2.34 */
+#define get_section_name(abfd, sect) bfd_get_section_name (abfd, sect)
+#define get_section_size(sect) bfd_get_section_size(sect)
+#define set_section_size(abfd, sect, size) bfd_set_section_size(abfd, sect, size)
+#define set_section_flags(abfd, sect, flags) bfd_set_section_flags(abfd, sect, flags)
+#else
+/* otherwise bfd >= 2.34 */
+#define get_section_name(afbd, sect) bfd_section_name (sect)
+#define get_section_size(sect) bfd_section_size(sect)
+#define set_section_size(abfd, sect, size) bfd_set_section_size(sect, size)
+#define set_section_flags(abfd, sect, flags) bfd_set_section_flags(sect, flags)
+#endif
+
 typedef struct _note_header
   {
     Elf_External_Note elf_note_header;
@@ -131,7 +145,7 @@ dumper::sane ()
 void
 print_section_name (bfd* abfd, asection* sect, PTR obj)
 {
-  deb_printf (" %s", bfd_get_section_name (abfd, sect));
+  deb_printf (" %s", get_section_name (abfd, sect));
 }
 
 void
@@ -712,10 +726,10 @@ dumper::prepare_core_dump ()
 
       if (p->type == pr_ent_module && status_section != NULL)
 	{
-	  if (!bfd_set_section_size (core_bfd,
-				     status_section,
-				     (bfd_get_section_size (status_section)
-				      + sect_size)))
+	  if (!set_section_size (core_bfd,
+				 status_section,
+				 (get_section_size (status_section)
+				  + sect_size)))
 	    {
 	      bfd_perror ("resizing status section");
 	      goto failed;
@@ -738,8 +752,8 @@ dumper::prepare_core_dump ()
 	  goto failed;
 	}
 
-      if (!bfd_set_section_flags (core_bfd, new_section, sect_flags) ||
-	  !bfd_set_section_size (core_bfd, new_section, sect_size))
+      if (!set_section_flags (core_bfd, new_section, sect_flags) ||
+	  !set_section_size (core_bfd, new_section, sect_size))
 	{
 	  bfd_perror ("setting section attributes");
 	  goto failed;
@@ -823,7 +837,7 @@ dumper::write_core_dump ()
       deb_printf ("writing section type=%u base=%p size=%p flags=%08x\n",
 		  p->type,
 		  p->section->vma,
-		  bfd_get_section_size (p->section),
+		  get_section_size (p->section),
 		  p->section->flags);
 
       switch (p->type)

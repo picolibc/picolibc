@@ -25,6 +25,10 @@
 
 #include "dumper.h"
 
+#ifndef bfd_get_section_size
+#define bfd_get_section_size(sect) bfd_section_size(sect)
+#endif
+
 int
 exclusion::add (LPBYTE mem_base, SIZE_T mem_size)
 {
