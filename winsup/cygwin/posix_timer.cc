@@ -81,7 +81,7 @@ timer_tracker::arm_overrun_event (LONG64 exp_cnt)
 LONG
 timer_tracker::disarm_overrun_event ()
 {
-  LONG ret;
+  LONG ret = 0;
 
   AcquireSRWLockExclusive (&srwlock);
   if (overrun_count != OVR_DISARMED)
