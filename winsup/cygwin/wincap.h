@@ -38,6 +38,7 @@ struct wincaps
     unsigned has_con_24bit_colors		: 1;
     unsigned has_con_broken_csi3j		: 1;
     unsigned has_con_broken_il_dl		: 1;
+    unsigned has_con_esc_rep			: 1;
   };
 };
 
@@ -99,6 +100,7 @@ public:
   bool	IMPLEMENT (has_con_24bit_colors)
   bool	IMPLEMENT (has_con_broken_csi3j)
   bool	IMPLEMENT (has_con_broken_il_dl)
+  bool	IMPLEMENT (has_con_esc_rep)
 
   void disable_case_sensitive_dirs ()
   {

@@ -62,6 +62,7 @@ static struct fhandler_base::rabuf_t con_ra;
 #define WPBUF_LEN 256
 static unsigned char wpbuf[WPBUF_LEN];
 static int wpixput;
+static unsigned char last_char;
 #define wpbuf_put(x) \
   wpbuf[wpixput++] = x; \
   if (wpixput > WPBUF_LEN) \
@@ -2009,6 +2010,37 @@ fhandler_console::char_command (char c)
       DWORD wn;
       switch (c)
 	{
+#if 0 /* These sequences, which are supported by real xterm, are
+	 not supported by xterm compatible mode. Therefore they
+	 were implemented once. However, these are not declared
+	 in terminfo of xterm-256color, therefore, do not appear
+	 to be necessary. */
+	case '`': /* HPA */
+	  if (con.args[0] == 0)
+	    con.args[0] = 1;
+	  cursor_get (&x, &y);
+	  cursor_set (false, con.args[0]-1, y);
+	  break;
+	case 'a': /* HPR */
+	  if (con.args[0] == 0)
+	    con.args[0] = 1;
+	  cursor_rel (con.args[0], 0);
+	  break;
+	case 'e': /* VPR */
+	  if (con.args[0] == 0)
+	    con.args[0] = 1;
+	  cursor_rel (0, con.args[0]);
+	  break;
+#endif
+	case 'b': /* REP */
+	  wpbuf_put (c);
+	  if (wincap.has_con_esc_rep ())
+	    /* Just send the sequence */
+	    WriteConsoleA (get_output_handle (), wpbuf, wpixput, &wn, 0);
+	  else if (last_char && last_char != '\n')
+	    for (int i = 0; i < con.args[0]; i++)
+	      WriteConsoleA (get_output_handle (), &last_char, 1, &wn, 0);
+	  break;
 	case 'r': /* DECSTBM */
 	  con.scroll_region.Top = con.args[0] ? con.args[0] - 1 : 0;
 	  con.scroll_region.Bottom = con.args[1] ? con.args[1] - 1 : -1;
@@ -2746,6 +2778,7 @@ fhandler_console::write_normal (const unsigned char *src,
 	  break;
 	default:
 	  found += ret;
+	  last_char = *(found - 1);
 	  break;
 	}
     }
