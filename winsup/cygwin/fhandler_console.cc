@@ -2102,8 +2102,23 @@ fhandler_console::char_command (char c)
 	  break;
 	case 'J': /* ED */
 	  wpbuf_put (c);
-	  /* Ignore CSI3J in Win10 1809 because it is broken. */
-	  if (con.args[0] != 3 || !wincap.has_con_broken_csi3j ())
+	  if (con.args[0] == 3 && wincap.has_con_broken_csi3j ())
+	    { /* Workaround for broken CSI3J in Win10 1809 */
+	      CONSOLE_SCREEN_BUFFER_INFO sbi;
+	      GetConsoleScreenBufferInfo (get_output_handle (), &sbi);
+	      SMALL_RECT r = {0, sbi.srWindow.Top,
+		(SHORT) (sbi.dwSize.X - 1), (SHORT) (sbi.dwSize.Y - 1)};
+	      CHAR_INFO f = {' ', sbi.wAttributes};
+	      COORD d = {0, 0};
+	      ScrollConsoleScreenBufferA (get_output_handle (),
+					  &r, NULL, d, &f);
+	      SetConsoleCursorPosition (get_output_handle (), d);
+	      d = sbi.dwCursorPosition;
+	      d.Y -= sbi.srWindow.Top;
+	      SetConsoleCursorPosition (get_output_handle (), d);
+	    }
+	  else
+	    /* Just send the sequence */
 	    WriteConsoleA (get_output_handle (), wpbuf, wpixput, &wn, 0);
 	  break;
 	case 'h': /* DECSET */
