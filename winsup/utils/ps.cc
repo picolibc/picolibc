@@ -88,17 +88,17 @@ to_time_t (FILETIME *ptr)
 }
 
 static const char *
-ttynam (int ntty)
+ttynam (int ntty, char buf[9])
 {
-  static char buf[9];
   char buf0[9];
+
   if (ntty < 0)
     strcpy (buf0, "?");
   else if (ntty & 0xffff0000)
-    sprintf (buf0, "cons%d", ntty & 0xff);
+    snprintf (buf0, 9, "cons%d", ntty & 0xff);
   else
-    sprintf (buf0, "pty%d", ntty);
-  sprintf (buf, " %-7s", buf0);
+    snprintf (buf0, 9, "pty%d", ntty);
+  snprintf (buf, 9, " %-7.7s", buf0);
   return buf;
 }
 
@@ -358,6 +358,7 @@ main (int argc, char *argv[])
 	}
 
       char uname[128];
+      char ttyname[9];
 
       if (fflag)
 	{
@@ -373,13 +374,13 @@ main (int argc, char *argv[])
 	}
 
       if (sflag)
-	printf (dfmt, p->pid, ttynam (p->ctty), start_time (p), pname);
+	printf (dfmt, p->pid, ttynam (p->ctty, ttyname), start_time (p), pname);
       else if (fflag)
-	printf (ffmt, uname, p->pid, p->ppid, ttynam (p->ctty), start_time (p),
-		pname);
+	printf (ffmt, uname, p->pid, p->ppid, ttynam (p->ctty, ttyname),
+		start_time (p), pname);
       else if (lflag)
 	printf (lfmt, status, p->pid, p->ppid, p->pgid,
-		p->dwProcessId, ttynam (p->ctty),
+		p->dwProcessId, ttynam (p->ctty, ttyname),
 		p->version >= EXTERNAL_PINFO_VERSION_32_BIT ? p->uid32 : p->uid,
 		start_time (p), pname);
 
