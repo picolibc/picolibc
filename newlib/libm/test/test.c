@@ -15,8 +15,12 @@
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  */
 
+
+/* Suppresses compiler warnings
+ *    As described by items in quotes
+ */
 #pragma GCC diagnostic push
-#pragma GCC diagnostic ignore "-Wformat="
+#pragma GCC diagnostic ignored "-Wformat="
 
 #include <signal.h>
 #include  "test.h"
