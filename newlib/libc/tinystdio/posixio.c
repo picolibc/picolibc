@@ -34,16 +34,16 @@
  */
 
 
-/* Suppresses compiler warnings
- * regarding destructor priority 
+/* This would suppresses compiler warnings
+ * 		regarding destructor priority 
  * 
- * -Wno-prio-ctor-dtor is not yet supported 
- * for suppression via pragma statement
-*/
+ * But -Wno-prio-ctor-dtor is not yet supported 
+ * 		for suppression via pragma statement
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wno-prio-ctor-dtor"
 
+*/
 
 #include "stdio_private.h"
 #include <stdlib.h>
@@ -141,4 +141,4 @@ static void posix_exit(void)
 	__posix_flush(stdout);
 }
 
-#pragma GCC diagnostic pop
+/* #pragma GCC diagnostic pop */
