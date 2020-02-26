@@ -119,6 +119,11 @@ __posix_close(FILE *f)
 	return ret;
 }
 
+/* Suppresses compiler warnings
+ * regarding destructor priority 
+ */
+#pragma warning(push, 1)
+
 /*
  * Add a destructor function to get stdout flushed on
  * exit
@@ -128,3 +133,5 @@ static void posix_exit(void)
 {
 	__posix_flush(stdout);
 }
+
+#pragma warning(pop)
