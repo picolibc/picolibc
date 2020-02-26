@@ -1786,24 +1786,6 @@ static const wchar_t __vt100_conv[31] = {
 inline bool
 fhandler_console::write_console (PWCHAR buf, DWORD len, DWORD& done)
 {
-  bool need_fix_tab_position = false;
-  /* Check if screen will be alternated. */
-  if (wincap.has_con_24bit_colors () && !con_is_legacy
-      && memmem (buf, len*sizeof (WCHAR), L"\033[?1049", 7*sizeof (WCHAR)))
-    need_fix_tab_position = true;
-  /* Workaround for broken CSI3J (ESC[3J) support in xterm compatible mode. */
-  if (wincap.has_con_24bit_colors () && !con_is_legacy &&
-      wincap.has_con_broken_csi3j ())
-    {
-      WCHAR *p = buf;
-      while ((p = (WCHAR *) memmem (p, (len - (p - buf))*sizeof (WCHAR),
-				    L"\033[3J", 4*sizeof (WCHAR))))
-	{
-	  memmove (p, p+4, (len - (p+4 - buf))*sizeof (WCHAR));
-	  len -= 4;
-	}
-    }
-
   if (con.iso_2022_G1
 	? con.vt100_graphics_mode_G1
 	: con.vt100_graphics_mode_G0)
@@ -1822,9 +1804,6 @@ fhandler_console::write_console (PWCHAR buf, DWORD len, DWORD& done)
       len -= done;
       buf += done;
     }
-  /* Call fix_tab_position() if screen has been alternated. */
-  if (need_fix_tab_position)
-    fix_tab_position ();
   return true;
 }
 
@@ -2087,6 +2066,28 @@ fhandler_console::char_command (char c)
 	      wpbuf_put (c);
 	      /* Just send the sequence */
 	      WriteConsoleA (get_output_handle (), wpbuf, wpixput, &wn, 0);
+	    }
+	  break;
+	case 'J': /* ED */
+	  wpbuf_put (c);
+	  /* Ignore CSI3J in Win10 1809 because it is broken. */
+	  if (con.args[0] != 3 || !wincap.has_con_broken_csi3j ())
+	    WriteConsoleA (get_output_handle (), wpbuf, wpixput, &wn, 0);
+	  break;
+	case 'h': /* DECSET */
+	case 'l': /* DECRST */
+	  wpbuf_put (c);
+	  /* Just send the sequence */
+	  WriteConsoleA (get_output_handle (), wpbuf, wpixput, &wn, 0);
+	  if (con.saw_question_mark)
+	    {
+	      bool need_fix_tab_position = false;
+	      for (int i = 0; i < con.nargs; i++)
+		if (con.args[i] == 1049)
+		  need_fix_tab_position = true;
+	      /* Call fix_tab_position() if screen has been alternated. */
+	      if (need_fix_tab_position)
+		fix_tab_position ();
 	    }
 	  break;
 	default:
