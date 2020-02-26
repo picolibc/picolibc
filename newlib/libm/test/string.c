@@ -578,4 +578,4 @@ void test_string()
 #endif
 }
 
-#pragma diagnostic pop
+#pragma GCC diagnostic pop

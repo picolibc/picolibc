@@ -14,6 +14,10 @@
  * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  */
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignore "-Wformat="
+
 #include <signal.h>
 #include  "test.h"
 #include <math.h>
@@ -307,3 +311,5 @@ bt(){
   printf("(%g)\n", f2);
 
 }
+
+#pragma GCC diagnostic pop

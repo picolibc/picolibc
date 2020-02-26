@@ -122,7 +122,8 @@ __posix_close(FILE *f)
 /* Suppresses compiler warnings
  * regarding destructor priority 
  */
-#pragma warning(push, 1)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wno-prio-ctor-dtor"
 
 /*
  * Add a destructor function to get stdout flushed on
@@ -134,4 +135,4 @@ static void posix_exit(void)
 	__posix_flush(stdout);
 }
 
-#pragma warning(pop)
+#pragma GCC diagnostic pop
