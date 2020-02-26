@@ -33,13 +33,13 @@
 */
 
 /* Suppresses compiler warnings
- * Regarding unused variables
- * And implicit function declarations
+ *    As described by items in quotes 
  */
-
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-variable"
 #pragma GCC diagnostic ignored "-Wimplicit-function-declaration"
+#pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
+#pragma GCC diagnostic ignored "-Wformat="
 
 #include "test.h"
 #include <math.h>

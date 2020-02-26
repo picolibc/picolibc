@@ -5,6 +5,16 @@
  * is freely granted, provided that this notice is preserved.
  */
 
+/* Suppresses compiler warnings
+ *    As described by items in quotes
+ */
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wstringop-truncation"
+#pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
+#pragma GCC diagnostic ignored "-Wmemset-transposed-args"
+#pragma GCC diagnostic ignored "-Wunused-value"
+
+
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -351,3 +361,5 @@ int main()
   else
     exit(0);
 }
+
+#pragma GCC diagnostic pop
