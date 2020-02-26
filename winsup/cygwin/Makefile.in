@@ -567,6 +567,8 @@ ifeq ($(target_cpu),i686)
 exceptions_CFLAGS:=-fno-omit-frame-pointer
 endif
 endif
+# required since gcc 9.x
+exec_CFLAGS:=-fno-builtin-execve
 
 fhandler_proc_CFLAGS+=-DUSERNAME="\"$(USER)\"" -DHOSTNAME="\"$(HOSTNAME)\""
 fhandler_proc_CFLAGS+=-DGCC_VERSION="\"`$(CC) -v 2>&1 | tail -n 1`\""
