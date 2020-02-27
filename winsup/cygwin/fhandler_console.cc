@@ -2053,6 +2053,19 @@ fhandler_console::char_command (char c)
 	    {
 	      /* Use "CSI Ps T" instead */
 	      cursor_get (&x, &y);
+	      if (y < srTop || y > srBottom)
+		break;
+	      if (y == con.b.srWindow.Top
+		  && srBottom == con.b.srWindow.Bottom)
+		{
+		  /* Erase scroll down area */
+		  n = con.args[0] ? : 1;
+		  __small_sprintf (buf, "\033[%d;1H\033[J\033[%d;%dH",
+				   srBottom - (n-1) - con.b.srWindow.Top + 1,
+				   y + 1 - con.b.srWindow.Top, x + 1);
+		  WriteConsoleA (get_output_handle (),
+				 buf, strlen (buf), &wn, 0);
+		}
 	      __small_sprintf (buf, "\033[%d;%dr",
 			       y + 1 - con.b.srWindow.Top,
 			       srBottom + 1 - con.b.srWindow.Top);
@@ -2079,6 +2092,8 @@ fhandler_console::char_command (char c)
 	    {
 	      /* Use "CSI Ps S" instead */
 	      cursor_get (&x, &y);
+	      if (y < srTop || y > srBottom)
+		break;
 	      __small_sprintf (buf, "\033[%d;%dr",
 			       y + 1 - con.b.srWindow.Top,
 			       srBottom + 1 - con.b.srWindow.Top);
@@ -2136,6 +2151,16 @@ fhandler_console::char_command (char c)
 	      if (need_fix_tab_position)
 		fix_tab_position ();
 	    }
+	  break;
+	case 'p':
+	  if (con.saw_exclamation_mark) /* DECSTR Soft reset */
+	    {
+	      con.scroll_region.Top = 0;
+	      con.scroll_region.Bottom = -1;
+	    }
+	  wpbuf_put (c);
+	  /* Just send the sequence */
+	  WriteConsoleA (get_output_handle (), wpbuf, wpixput, &wn, 0);
 	  break;
 	default:
 	  /* Other escape sequences */
@@ -2970,6 +2995,7 @@ fhandler_console::write (const void *vsrc, size_t len)
 	      con.saw_question_mark = false;
 	      con.saw_greater_than_sign = false;
 	      con.saw_space = false;
+	      con.saw_exclamation_mark = false;
 	    }
 	  else if (wincap.has_con_24bit_colors () && !con_is_legacy
 		   && wincap.has_con_broken_il_dl () && *src == 'M')
@@ -2979,13 +3005,17 @@ fhandler_console::write (const void *vsrc, size_t len)
 	      cursor_get (&x, &y);
 	      if (y == srTop)
 		{
-		  /* Erase scroll down area */
-		  char buf[] = "\033[32768;1H\033[J\033[32768;32768";
-		  __small_sprintf (buf, "\033[%d;1H\033[J\033[%d;%dH",
-			     srBottom - con.b.srWindow.Top + 1,
-			     y + 1 - con.b.srWindow.Top, x + 1);
-		  WriteConsoleA (get_output_handle (),
-				 buf, strlen (buf), &n, 0);
+		  if (y == con.b.srWindow.Top
+		      && srBottom == con.b.srWindow.Bottom)
+		    {
+		      /* Erase scroll down area */
+		      char buf[] = "\033[32768;1H\033[J\033[32768;32768";
+		      __small_sprintf (buf, "\033[%d;1H\033[J\033[%d;%dH",
+				       srBottom - con.b.srWindow.Top + 1,
+				       y + 1 - con.b.srWindow.Top, x + 1);
+		      WriteConsoleA (get_output_handle (),
+				     buf, strlen (buf), &n, 0);
+		    }
 		  /* Substitute "CSI Ps T" */
 		  wpbuf_put ('[');
 		  wpbuf_put ('T');
@@ -2998,6 +3028,11 @@ fhandler_console::write (const void *vsrc, size_t len)
 	    }
 	  else if (wincap.has_con_24bit_colors () && !con_is_legacy)
 	    { /* Only CSI is handled in xterm compatible mode. */
+	      if (*src == 'c') /* RIS Full reset */
+		{
+		  con.scroll_region.Top = 0;
+		  con.scroll_region.Bottom = -1;
+		}
 	      wpbuf_put (*src);
 	      /* Just send the sequence */
 	      DWORD n;
@@ -3169,6 +3204,8 @@ fhandler_console::write (const void *vsrc, size_t len)
 		con.saw_question_mark = true;
 	      else if (*src == '>')
 		con.saw_greater_than_sign = true;
+	      else if (*src == '!')
+		con.saw_exclamation_mark = true;
 	      wpbuf_put (*src);
 	      /* ignore any extra chars between [ and first arg or command */
 	      src++;

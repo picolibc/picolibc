@@ -1862,6 +1862,7 @@ class dev_console
   bool saw_question_mark;
   bool saw_greater_than_sign;
   bool saw_space;
+  bool saw_exclamation_mark;
   bool vt100_graphics_mode_G0;
   bool vt100_graphics_mode_G1;
   bool iso_2022_G1;
