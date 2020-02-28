@@ -2974,7 +2974,7 @@ fhandler_pty_slave::fixup_after_exec ()
   reset_switch_to_pcon ();
 
   if (!close_on_exec ())
-    fixup_after_fork (NULL);
+    fixup_after_fork (NULL);	/* No parent handle required. */
   else if (get_pseudo_console ())
     {
       int used = 0;

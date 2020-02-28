@@ -534,7 +534,7 @@ void
 fhandler_socket_wsock::fixup_after_exec ()
 {
   if (need_fixup_before () && !close_on_exec ())
-    fixup_after_fork (NULL);
+    fixup_after_fork (NULL);	/* No parent handle required. */
 }
 
 int

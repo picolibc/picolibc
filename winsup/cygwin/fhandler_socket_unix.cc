@@ -1149,6 +1149,16 @@ fhandler_socket_unix::set_cred ()
   scred->gid = myself->gid;
 }
 
+void
+fhandler_socket_unix::fixup_helper ()
+{
+  if (shmem_handle)
+    reopen_shmem ();
+  connect_wait_thr = NULL;
+  cwt_termination_evt = NULL;
+  cwt_param = NULL;
+}
+
 /* ========================== public methods ========================= */
 
 void
@@ -1158,20 +1168,15 @@ fhandler_socket_unix::fixup_after_fork (HANDLE parent)
   if (backing_file_handle && backing_file_handle != INVALID_HANDLE_VALUE)
     fork_fixup (parent, backing_file_handle, "backing_file_handle");
   if (shmem_handle)
-    {
-      fork_fixup (parent, shmem_handle, "shmem_handle");
-      reopen_shmem ();
-    }
-  connect_wait_thr = NULL;
-  cwt_termination_evt = NULL;
-  cwt_param = NULL;
+    fork_fixup (parent, shmem_handle, "shmem_handle");
+  fixup_helper ();
 }
 
 void
 fhandler_socket_unix::fixup_after_exec ()
 {
   if (!close_on_exec ())
-    fixup_after_fork (NULL);
+    fixup_helper ();
 }
 
 void
