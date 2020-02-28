@@ -16,20 +16,12 @@ extern int main (int argc, char **argv);
 
 void cygwin_crt0 (int (*main) (int, char **));
 
+#ifdef __i386__
+__attribute__ ((force_align_arg_pointer))
+#endif
 void
 mainCRTStartup ()
 {
-#ifdef __i386__
-#if __GNUC_PREREQ(6,0)
-#pragma GCC diagnostic ignored "-Wframe-address"
-#endif
-  (void)__builtin_return_address(1);
-#if __GNUC_PREREQ(6,0)
-#pragma GCC diagnostic pop
-#endif
-  asm volatile ("andl $-16,%%esp" ::: "%esp");
-#endif
-
   cygwin_crt0 (main);
 
   /* These are never actually called.  They are just here to force the inclusion
