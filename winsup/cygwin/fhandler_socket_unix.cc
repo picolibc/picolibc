@@ -1201,12 +1201,6 @@ fhandler_socket_unix::dup (fhandler_base *child, int flags)
       return -1;
     }
   fhandler_socket_unix *fhs = (fhandler_socket_unix *) child;
-  if (reopen_shmem () < 0)
-    {
-      __seterrno ();
-      fhs->close ();
-      return -1;
-    }
   if (backing_file_handle && backing_file_handle != INVALID_HANDLE_VALUE
       && !DuplicateHandle (GetCurrentProcess (), backing_file_handle,
 			    GetCurrentProcess (), &fhs->backing_file_handle,
@@ -1219,6 +1213,12 @@ fhandler_socket_unix::dup (fhandler_base *child, int flags)
   if (!DuplicateHandle (GetCurrentProcess (), shmem_handle,
 			GetCurrentProcess (), &fhs->shmem_handle,
 			0, TRUE, DUPLICATE_SAME_ACCESS))
+    {
+      __seterrno ();
+      fhs->close ();
+      return -1;
+    }
+  if (fhs->reopen_shmem () < 0)
     {
       __seterrno ();
       fhs->close ();
