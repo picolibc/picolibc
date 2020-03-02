@@ -57,6 +57,8 @@
    
    For Thumb-2 do everything in Thumb mode.  */
 
+	.syntax unified
+
 #if __ARM_ARCH_ISA_THUMB == 1 && !__ARM_ARCH_ISA_ARM
 /* ARMv6-M-like has to be implemented in Thumb mode.  */
 
@@ -74,11 +76,11 @@ SYM (setjmp):
 	mov	r5, sp
 	mov	r6, lr
 	stmia	r0!, {r1, r2, r3, r4, r5, r6}
-	sub	r0, r0, #40
+	subs	r0, r0, #40
 	/* Restore callee-saved low regs.  */
 	ldmia	r0!, {r4, r5, r6, r7}
 	/* Return zero.  */
-	mov	r0, #0
+	movs	r0, #0
 	bx lr
 
 .thumb_func
@@ -86,7 +88,7 @@ SYM (setjmp):
 	TYPE (longjmp)
 SYM (longjmp):
 	/* Restore High regs.  */
-	add	r0, r0, #16
+	adds	r0, r0, #16
 	ldmia	r0!, {r2, r3, r4, r5, r6}
 	mov	r8, r2
 	mov	r9, r3
@@ -95,12 +97,12 @@ SYM (longjmp):
 	mov	sp, r6
 	ldmia	r0!, {r3} /* lr */
 	/* Restore low regs.  */
-	sub	r0, r0, #40
+	subs	r0, r0, #40
 	ldmia	r0!, {r4, r5, r6, r7}
 	/* Return the result argument, or 1 if it is zero.  */
-	mov	r0, r1
+	movs	r0, r1
 	bne	1f
-	mov	r0, #1
+	movs	r0, #1
 1:
 	bx	r3
 
@@ -126,7 +128,6 @@ SYM (longjmp):
 #endif
 
 #if defined(__thumb2__)
-.syntax unified
 .macro MODE
 	.thumb
 	.thumb_func
