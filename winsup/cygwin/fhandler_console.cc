@@ -417,19 +417,10 @@ fhandler_console::set_cursor_maybe ()
 void
 fhandler_console::fix_tab_position (void)
 {
-  char buf[2048] = {0,};
-  /* Save cursor position */
-  __small_sprintf (buf+strlen (buf), "\0337");
-  /* Clear all horizontal tabs */
-  __small_sprintf (buf+strlen (buf), "\033[3g");
-  /* Set horizontal tabs */
-  for (int col=8; col<con.dwWinSize.X; col+=8)
-    __small_sprintf (buf+strlen (buf), "\033[%d;%dH\033H", 1, col+1);
-  /* Restore cursor position */
-  __small_sprintf (buf+strlen (buf), "\0338");
+  /* Re-setting ENABLE_VIRTUAL_TERMINAL_PROCESSING
+     fixes the tab position. */
+  request_xterm_mode_output (false);
   request_xterm_mode_output (true);
-  DWORD dwLen;
-  WriteConsole (get_output_handle (), buf, strlen (buf), &dwLen, 0);
 }
 
 bool
