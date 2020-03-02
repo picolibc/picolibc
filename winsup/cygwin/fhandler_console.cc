@@ -267,7 +267,7 @@ fhandler_console::request_xterm_mode_input (bool req)
     return;
   if (req)
     {
-      if (InterlockedIncrement (&con.xterm_mode_input) == 1)
+      if (InterlockedExchange (&con.xterm_mode_input, 1) == 0)
 	{
 	  DWORD dwMode;
 	  GetConsoleMode (get_handle (), &dwMode);
@@ -277,7 +277,7 @@ fhandler_console::request_xterm_mode_input (bool req)
     }
   else
     {
-      if (InterlockedDecrement (&con.xterm_mode_input) == 0)
+      if (InterlockedExchange (&con.xterm_mode_input, 0) == 1)
 	{
 	  DWORD dwMode;
 	  GetConsoleMode (get_handle (), &dwMode);
@@ -1171,6 +1171,7 @@ fhandler_console::close ()
       if ((NT_SUCCESS (status) && obi.HandleCount == 1)
 	  || myself->pid == con.owner)
 	request_xterm_mode_output (false);
+      request_xterm_mode_input (false);
     }
 
   release_output_mutex ();
