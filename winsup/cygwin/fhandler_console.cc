@@ -63,10 +63,13 @@ static struct fhandler_base::rabuf_t con_ra;
 static unsigned char wpbuf[WPBUF_LEN];
 static int wpixput;
 static unsigned char last_char;
-#define wpbuf_put(x) \
-  wpbuf[wpixput++] = x; \
-  if (wpixput > WPBUF_LEN) \
-    wpixput--;
+
+static inline void
+wpbuf_put (unsigned char x)
+{
+  if (wpixput < WPBUF_LEN)
+    wpbuf[wpixput++] = x;
+}
 
 static void
 beep ()
