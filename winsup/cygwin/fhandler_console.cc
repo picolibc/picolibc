@@ -3094,7 +3094,8 @@ fhandler_console::write (const void *vsrc, size_t len)
 	case gotarg1:
 	  if (isdigit (*src))
 	    {
-	      con.args[con.nargs] = con.args[con.nargs] * 10 + *src - '0';
+	      if (con.nargs < MAXARGS)
+		con.args[con.nargs] = con.args[con.nargs] * 10 + *src - '0';
 	      wpbuf_put (*src);
 	      src++;
 	    }
@@ -3102,9 +3103,8 @@ fhandler_console::write (const void *vsrc, size_t len)
 	    {
 	      wpbuf_put (*src);
 	      src++;
-	      con.nargs++;
-	      if (con.nargs > MAXARGS)
-		con.nargs--;
+	      if (con.nargs < MAXARGS)
+		con.nargs++;
 	    }
 	  else if (*src == ' ')
 	    {
@@ -3117,9 +3117,8 @@ fhandler_console::write (const void *vsrc, size_t len)
 	    con.state = gotcommand;
 	  break;
 	case gotcommand:
-	  con.nargs ++;
-	  if (con.nargs > MAXARGS)
-	    con.nargs--;
+	  if (con.nargs < MAXARGS)
+	    con.nargs++;
 	  char_command (*src++);
 	  con.state = normal;
 	  wpixput = 0;
@@ -3183,9 +3182,8 @@ fhandler_console::write (const void *vsrc, size_t len)
 	    {
 	      con.state = gotarg1;
 	      wpbuf_put (*src);
-	      con.nargs++;
-	      if (con.nargs > MAXARGS)
-		con.nargs--;
+	      if (con.nargs < MAXARGS)
+		con.nargs++;
 	      src++;
 	    }
 	  else if (isalpha (*src))
