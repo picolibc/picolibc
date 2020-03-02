@@ -519,14 +519,7 @@ fhandler_serial::ioctl (unsigned int cmd, void *buf)
 	  }
 	break;
      case TIOCINQ:
-       if (ev & CE_FRAME || ev & CE_IOE || ev & CE_OVERRUN || ev & CE_RXOVER
-	   || ev & CE_RXPARITY)
-	 {
-	   set_errno (EINVAL);	/* FIXME: Use correct errno */
-	   res = -1;
-	 }
-       else
-	 ipbuf = st.cbInQue;
+       ipbuf = st.cbInQue;
        break;
      case TIOCGWINSZ:
        ((struct winsize *) buf)->ws_row = 0;
