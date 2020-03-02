@@ -207,6 +207,8 @@ fhandler_console::setup ()
       con.dwLastCursorPosition.Y = -1;
       con.dwLastMousePosition.X = -1;
       con.dwLastMousePosition.Y = -1;
+      con.savex = con.savey = -1;
+      con.screen_alternated = false;
       con.dwLastButtonState = 0;	/* none pressed */
       con.last_button_code = 3;	/* released */
       con.underline_color = FOREGROUND_GREEN | FOREGROUND_BLUE;
@@ -2130,6 +2132,10 @@ fhandler_console::char_command (char c)
 	  break;
 	case 'h': /* DECSET */
 	case 'l': /* DECRST */
+	  if (c == 'h')
+	    con.screen_alternated = true;
+	  else
+	    con.screen_alternated = false;
 	  wpbuf_put (c);
 	  /* Just send the sequence */
 	  WriteConsoleA (get_output_handle (), wpbuf, wpixput, &wn, 0);
@@ -2989,6 +2995,36 @@ fhandler_console::write (const void *vsrc, size_t len)
 	      con.saw_space = false;
 	      con.saw_exclamation_mark = false;
 	    }
+	  else if (*src == '8')		/* DECRC Restore cursor position */
+	    {
+	      if (con.screen_alternated)
+		{
+		  /* For xterm mode only */
+		  DWORD n;
+		  /* Just send the sequence */
+		  wpbuf_put (*src);
+		  WriteConsoleA (get_output_handle (), wpbuf, wpixput, &n, 0);
+		}
+	      else if (con.savex >= 0 && con.savey >= 0)
+		cursor_set (false, con.savex, con.savey);
+	      con.state = normal;
+	      wpixput = 0;
+	    }
+	  else if (*src == '7')		/* DECSC Save cursor position */
+	    {
+	      if (con.screen_alternated)
+		{
+		  /* For xterm mode only */
+		  DWORD n;
+		  /* Just send the sequence */
+		  wpbuf_put (*src);
+		  WriteConsoleA (get_output_handle (), wpbuf, wpixput, &n, 0);
+		}
+	      else
+		cursor_get (&con.savex, &con.savey);
+	      con.state = normal;
+	      wpixput = 0;
+	    }
 	  else if (wincap.has_con_24bit_colors () && !con_is_legacy
 		   && wincap.has_con_broken_il_dl () && *src == 'M')
 	    { /* Reverse Index (scroll down) */
@@ -3019,12 +3055,15 @@ fhandler_console::write (const void *vsrc, size_t len)
 	      wpixput = 0;
 	    }
 	  else if (wincap.has_con_24bit_colors () && !con_is_legacy)
-	    { /* Only CSI is handled in xterm compatible mode. */
+	    {
 	      if (*src == 'c') /* RIS Full reset */
 		{
 		  con.scroll_region.Top = 0;
 		  con.scroll_region.Bottom = -1;
 		}
+	      /* ESC sequences below (e.g. OSC, etc) are left to xterm
+		 emulation in xterm compatible mode, therefore, are not
+		 handled and just sent them. */
 	      wpbuf_put (*src);
 	      /* Just send the sequence */
 	      DWORD n;
@@ -3064,18 +3103,6 @@ fhandler_console::write (const void *vsrc, size_t len)
 	      con.iso_2022_G1 = false;
 	      cursor_set (false, 0, 0);
 	      clear_screen (cl_buf_beg, cl_buf_beg, cl_buf_end, cl_buf_end);
-	      con.state = normal;
-	      wpixput = 0;
-	    }
-	  else if (*src == '8')		/* DECRC Restore cursor position */
-	    {
-	      cursor_set (false, con.savex, con.savey);
-	      con.state = normal;
-	      wpixput = 0;
-	    }
-	  else if (*src == '7')		/* DECSC Save cursor position */
-	    {
-	      cursor_get (&con.savex, &con.savey);
 	      con.state = normal;
 	      wpixput = 0;
 	    }

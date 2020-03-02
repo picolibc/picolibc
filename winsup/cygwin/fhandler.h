@@ -1869,6 +1869,7 @@ class dev_console
   bool alternate_charset_active;
   bool metabit;
   char backspace_keycode;
+  bool screen_alternated; /* For xterm compatible mode only */
 
   char my_title_buf [TITLESIZE + 1];
 
