@@ -26,12 +26,13 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include <string.h>
+#include <stdlib.h>
+#include <stdio.h>
 #include <stdarg.h>
-#include "test-string.h"
 
 /* The macro LONG_TEST controls whether a short or a more comprehensive test
    of strcmp should be performed.  */
-
 #ifdef LONG_TEST
 #ifndef BUFF_SIZE
 #define BUFF_SIZE 1024
@@ -95,243 +96,190 @@ int errors = 0;
 
 const char *testname = "strcmp";
 
-typedef int (*proto_t) (const char *, const char *);
-int simple_strcmp (const char *, const char *);
-int stupid_strcmp (const char *, const char *);
-
-IMPL (stupid_strcmp, 0)
-IMPL (simple_strcmp, 0)
-IMPL (strcmp, 1)
-
-int
-simple_strcmp (const char *s1, const char *s2)
+void
+print_error (char const* msg, ...)
 {
-  int ret;
-
-  while ((ret = *(unsigned char *) s1 - *(unsigned char *) s2++) == 0
-	 && *s1++);
-  return ret;
-}
-
-int
-stupid_strcmp (const char *s1, const char *s2)
-{
-  size_t ns1 = strlen (s1) + 1, ns2 = strlen (s2) + 1;
-  size_t n = ns1 < ns2 ? ns1 : ns2;
-  int ret = 0;
-
-  while (n--)
-    if ((ret = *(unsigned char *) s1++ - *(unsigned char *) s2++) != 0)
-      break;
-  return ret;
-}
-
-
-static void
-do_one_test (impl_t *impl, const char *s1, const char *s2, int exp_result)
-{
-  int result = CALL (impl, s1, s2);
-  if ((exp_result == 0 && result != 0)
-      || (exp_result < 0 && result >= 0)
-      || (exp_result > 0 && result <= 0))
+  errors++;
+  if (errors == TOO_MANY_ERRORS)
     {
-      error (0, 0, "Wrong result in function %s %d %d", impl->name,
-	     result, exp_result);
-      ret = 1;
-      return;
+      fprintf (stderr, "Too many errors.\n");
     }
-
-  if (HP_TIMING_AVAIL)
+  else if (errors < TOO_MANY_ERRORS)
     {
-      hp_timing_t start __attribute ((unused));
-      hp_timing_t stop __attribute ((unused));
-      hp_timing_t best_time = ~ (hp_timing_t) 0;
-      size_t i;
-
-      for (i = 0; i < 32; ++i)
-	{
-	  HP_TIMING_NOW (start);
-	  CALL (impl, s1, s2);
-	  HP_TIMING_NOW (stop);
-	  HP_TIMING_BEST (best_time, start, stop);
-	}
-
-      printf ("\t%zd", (size_t) best_time);
+      va_list ap;
+      va_start (ap, msg);
+      vfprintf (stderr, msg, ap);
+      va_end (ap);
+    }
+  else
+    {
+      /* Further errors omitted.  */
     }
 }
 
-static void
-do_test (size_t align1, size_t align2, size_t len, int max_char,
-	 int exp_result)
+void
+printbuf (char *buf, char *name)
 {
-  size_t i;
-  char *s1, *s2;
-
-  if (len == 0)
-    return;
-
-  align1 &= 7;
-  if (align1 + len + 1 >= page_size)
-    return;
-
-  align2 &= 7;
-  if (align2 + len + 1 >= page_size)
-    return;
-
-  s1 = (char *) (buf1 + align1);
-  s2 = (char *) (buf2 + align2);
-
-  for (i = 0; i < len; i++)
-    s1[i] = s2[i] = 1 + 23 * i % max_char;
-
-  s1[len] = s2[len] = 0;
-  s1[len + 1] = 23;
-  s2[len + 1] = 24 + exp_result;
-  s2[len - 1] -= exp_result;
-
-  if (HP_TIMING_AVAIL)
-    printf ("Length %4zd, alignment %2zd/%2zd:", len, align1, align2);
-
-  FOR_EACH_IMPL (impl, 0)
-    do_one_test (impl, s1, s2, exp_result);
-
-  if (HP_TIMING_AVAIL)
-    putchar ('\n');
-}
-
-static void
-do_random_tests (void)
-{
-  size_t i, j, n, align1, align2, pos, len1, len2;
-  int result;
-  long r;
-  unsigned char *p1 = buf1 + page_size - 512;
-  unsigned char *p2 = buf2 + page_size - 512;
-
-  for (n = 0; n < ITERATIONS; n++)
-    {
-      align1 = random () & 31;
-      if (random () & 1)
-	align2 = random () & 31;
-      else
-	align2 = align1 + (random () & 24);
-      pos = random () & 511;
-      j = align1 > align2 ? align1 : align2;
-      if (pos + j >= 511)
-	pos = 510 - j - (random () & 7);
-      len1 = random () & 511;
-      if (pos >= len1 && (random () & 1))
-        len1 = pos + (random () & 7);
-      if (len1 + j >= 512)
-        len1 = 511 - j - (random () & 7);
-      if (pos >= len1)
-	len2 = len1;
-      else
-	len2 = len1 + (len1 != 511 - j ? random () % (511 - j - len1) : 0);
-      j = (pos > len2 ? pos : len2) + align1 + 64;
-      if (j > 512)
-	j = 512;
-      for (i = 0; i < j; ++i)
-	{
-	  p1[i] = random () & 255;
-	  if (i < len1 + align1 && !p1[i])
-	    {
-	      p1[i] = random () & 255;
-	      if (!p1[i])
-		p1[i] = 1 + (random () & 127);
-	    }
-	}
-      for (i = 0; i < j; ++i)
-	{
-	  p2[i] = random () & 255;
-	  if (i < len2 + align2 && !p2[i])
-	    {
-	      p2[i] = random () & 255;
-	      if (!p2[i])
-		p2[i] = 1 + (random () & 127);
-	    }
-	}
-
-      result = 0;
-      memcpy (p2 + align2, p1 + align1, pos);
-      if (pos < len1)
-	{
-	  if (p2[align2 + pos] == p1[align1 + pos])
-	    {
-	      p2[align2 + pos] = random () & 255;
-	      if (p2[align2 + pos] == p1[align1 + pos])
-		p2[align2 + pos] = p1[align1 + pos] + 3 + (random () & 127);
-	    }
-
-	  if (p1[align1 + pos] < p2[align2 + pos])
-	    result = -1;
-	  else
-	    result = 1;
-	}
-      p1[len1 + align1] = 0;
-      p2[len2 + align2] = 0;
-
-      FOR_EACH_IMPL (impl, 1)
-	{
-	  r = CALL (impl, (char *) (p1 + align1), (char *) (p2 + align2));
-	  /* Test whether on 64-bit architectures where ABI requires
-	     callee to promote has the promotion been done.  */
-	  asm ("" : "=g" (r) : "0" (r));
-	  if ((r == 0 && result)
-	      || (r < 0 && result >= 0)
-	      || (r > 0 && result <= 0))
-	    {
-	      error (0, 0, "Iteration %zd - wrong result in function %s (%zd, %zd, %zd, %zd, %zd) %ld != %d, p1 %p p2 %p",
-		     n, impl->name, align1, align2, len1, len2, pos, r, result, p1, p2);
-	      ret = 1;
-	    }
-	}
-    }
+  int i;
+  printf ("\n %s=", name);
+  for (i = 0; i < BUFF_SIZE; i++)
+    if (buf[i] != 0)
+      printf ("(%d,%c)", i, buf[i]);
+    else
+      printf ("(%d,%s)", i, "\\0");
+  printf ("\n");
 }
 
 int
 main (void)
 {
-  size_t i;
+  /* Allocate buffers to read and write from.  */
+  char src[BUFF_SIZE], dest[BUFF_SIZE];
 
-  test_init ();
+  /* Fill the source buffer with non-null values, reproducable random data.  */
+  srand (1539);
+  int i, j, zeros;
+  unsigned sa;
+  unsigned da;
+  unsigned n, m, len;
+  char *p;
+  int ret;
 
-  printf ("%23s", "");
-  FOR_EACH_IMPL (impl, 0)
-    printf ("\t%s", impl->name);
-  putchar ('\n');
+  /* Make calls to strcmp with block sizes ranging between 1 and
+     MAX_BLOCK_SIZE bytes, aligned and misaligned source and destination.  */
+  for (sa = 0; sa <= MAX_OFFSET; sa++)
+    for (da = 0; da <= MAX_OFFSET; da++)
+      for (n = 1; n <= MAX_BLOCK_SIZE; n++)
+	{
+	for (m = 1;  m < n + MAX_DIFF; m++)
+	  for (len = 0; len < MAX_LEN; len++)
+	    for  (zeros = 1; zeros < MAX_ZEROS; zeros++)
+	    {
+	      if (n - m > MAX_DIFF)
+		continue;
+	      /* Make a copy of the source.  */
+	      for (i = 0; i < BUFF_SIZE; i++)
+		{
+		  src[i] = 'A' + (i % 26);
+		  dest[i] = src[i];
+		}
+	      memcpy (dest + da, src + sa, n);
 
-  for (i = 1; i < 16; ++i)
+	      /* Make src 0-terminated.  */
+	      p = src + sa + n - 1;
+	      for (i = 0; i < zeros; i++)
+		{
+		  *p++ = '\0';
+		}
+
+	      /* Modify dest.  */
+	      p = dest + da + m - 1;
+	      for (j = 0; j < len; j++)
+		*p++ = 'x';
+	      /* Make dest 0-terminated.  */
+	      *p = '\0';
+
+	      ret = strcmp (src + sa, dest + da);
+
+	      /* Check return value.  */
+	      if (n == m)
+		{
+		  if (len == 0)
+		    {
+		      if (ret != 0)
+			{
+			print_error ("\nFailed: after %s of %u bytes "
+				     "with src_align %u and dst_align %u, "
+				     "dest after %d bytes is modified for %d bytes, "
+				     "return value is %d, expected 0.\n",
+				     testname, n, sa, da, m, len, ret);
+			}
+		    }
+		  else
+		    {
+		      if (ret >= 0)
+			print_error ("\nFailed: after %s of %u bytes "
+				     "with src_align %u and dst_align %u, "
+				     "dest after %d bytes is modified for %d bytes, "
+				     "return value is %d, expected negative.\n",
+				     testname, n, sa, da, m, len, ret);
+		    }
+		}
+	      else if (m > n)
+		{
+		  if (ret >= 0)
+		    {
+		      print_error ("\nFailed: after %s of %u bytes "
+				   "with src_align %u and dst_align %u, "
+				   "dest after %d bytes is modified for %d bytes, "
+				   "return value is %d, expected negative.\n",
+				   testname, n, sa, da, m, len, ret);
+		    }
+		}
+	      else  /* m < n */
+		{
+		  if (len == 0)
+		    {
+		      if (ret <= 0)
+			print_error ("\nFailed: after %s of %u bytes "
+				     "with src_align %u and dst_align %u, "
+				     "dest after %d bytes is modified for %d bytes, "
+				     "return value is %d, expected positive.\n",
+				     testname, n, sa, da, m, len, ret);
+		    }
+		  else
+		    {
+		      if (ret >= 0)
+			print_error ("\nFailed: after %s of %u bytes "
+				     "with src_align %u and dst_align %u, "
+				     "dest after %d bytes is modified for %d bytes, "
+				     "return value is %d, expected negative.\n",
+				     testname, n, sa, da, m, len, ret);
+		    }
+		}
+	    }
+	}
+
+  /* Check some corner cases.  */
+  src[1] = 'A';
+  dest[1] = 'A';
+  src[2] = 'B';
+  dest[2] = 'B';
+  src[3] = 'C';
+  dest[3] = 'C';
+  src[4] = '\0';
+  dest[4] = '\0';
+
+  src[0] = 0xc1;
+  dest[0] = 0x41;
+  ret = strcmp (src, dest);
+  if (ret <= 0)
+    print_error ("\nFailed: expected positive, return %d\n", ret);
+
+  src[0] = 0x01;
+  dest[0] = 0x82;
+  ret = strcmp (src, dest);
+  if (ret >= 0)
+    print_error ("\nFailed: expected negative, return %d\n", ret);
+
+  dest[0] = src[0] = 'D';
+  src[3] = 0xc1;
+  dest[3] = 0x41;
+  ret = strcmp (src, dest);
+  if (ret <= 0)
+    print_error ("\nFailed: expected positive, return %d\n", ret);
+
+  src[3] = 0x01;
+  dest[3] = 0x82;
+  ret = strcmp (src, dest);
+  if (ret >= 0)
+    print_error ("\nFailed: expected negative, return %d\n", ret);
+
+  printf ("\n");
+  if (errors != 0)
     {
-      do_test (i, i, i, 127, 0);
-      do_test (i, i, i, 127, 1);
-      do_test (i, i, i, 127, -1);
+      printf ("ERROR. FAILED.\n");
+      abort ();
     }
-
-  for (i = 1; i < 10; ++i)
-    {
-      do_test (0, 0, 2 << i, 127, 0);
-      do_test (0, 0, 2 << i, 254, 0);
-      do_test (0, 0, 2 << i, 127, 1);
-      do_test (0, 0, 2 << i, 254, 1);
-      do_test (0, 0, 2 << i, 127, -1);
-      do_test (0, 0, 2 << i, 254, -1);
-    }
-
-  for (i = 1; i < 8; ++i)
-    {
-      do_test (i, 2 * i, 8 << i, 127, 0);
-      do_test (2 * i, i, 8 << i, 254, 0);
-      do_test (i, 2 * i, 8 << i, 127, 1);
-      do_test (2 * i, i, 8 << i, 254, 1);
-      do_test (i, 2 * i, 8 << i, 127, -1);
-      do_test (2 * i, i, 8 << i, 254, -1);
-    }
-
-  do_random_tests ();
-  exit (ret);
+  exit (0);
 }
-
-
-
-
