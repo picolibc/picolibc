@@ -26,16 +26,10 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <string.h>
-#include <stdlib.h>
-#include <stdio.h>
 #include <stdarg.h>
 
 /* The macro LONG_TEST controls whether a short or a more comprehensive test
    of strcmp should be performed.  */
-
-//PICO
-
 
 #ifdef LONG_TEST
 #ifndef BUFF_SIZE
@@ -101,6 +95,36 @@ int errors = 0;
 const char *testname = "strcmp";
 
 typedef int (*proto_t) (const char *, const char *);
+int simple_strcmp (const char *, const char *);
+int stupid_strcmp (const char *, const char *);
+
+IMPL (stupid_strcmp, 0)
+IMPL (simple_strcmp, 0)
+IMPL (strcmp, 1)
+
+int
+simple_strcmp (const char *s1, const char *s2)
+{
+  int ret;
+
+  while ((ret = *(unsigned char *) s1 - *(unsigned char *) s2++) == 0
+	 && *s1++);
+  return ret;
+}
+
+int
+stupid_strcmp (const char *s1, const char *s2)
+{
+  size_t ns1 = strlen (s1) + 1, ns2 = strlen (s2) + 1;
+  size_t n = ns1 < ns2 ? ns1 : ns2;
+  int ret = 0;
+
+  while (n--)
+    if ((ret = *(unsigned char *) s1++ - *(unsigned char *) s2++) != 0)
+      break;
+  return ret;
+}
+
 
 static void
 do_one_test (impl_t *impl, const char *s1, const char *s2, int exp_result)

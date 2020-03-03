@@ -18,13 +18,12 @@
    Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
    02111-1307 USA.  */
 
-
-
-
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <stdarg.h>
+
+//GLIBC
 
 typedef int (*proto_t) (const char *, const char *);
 int simple_strcmp (const char *, const char *);
