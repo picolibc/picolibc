@@ -27,6 +27,7 @@
  */
 
 #include <stdarg.h>
+#include "test-string.h"
 
 /* The macro LONG_TEST controls whether a short or a more comprehensive test
    of strcmp should be performed.  */
