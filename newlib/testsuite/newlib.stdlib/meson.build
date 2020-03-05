@@ -33,7 +33,7 @@
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
-tests = ['atexit', 'size_max', 'tst-environ', 'tst-limits', 'tst-rand48', 'tst-rand48-2', 'tst-random', 'tst-random2', 'tst-strtod', 'tst-strtod4', 'tst-strtod6', 'tst-strtol', 'tst-strtoll']
+tests = ['atexit', 'size_max', 'tst-environ', 'tst-rand48', 'tst-rand48-2', 'tst-random', 'tst-random2', 'tst-strtod', 'tst-strtod4', 'tst-strtod6', 'tst-strtol', 'tst-strtoll']
 
 foreach target : targets
   value = get_variable('target_' + target)
