@@ -33,7 +33,7 @@
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
-tests = ['memcpy-1', 'memmove1', 'strcmp-1', 'tstring', 'tst-strlen', 'tst-inlcall', 'tst-strtok', 'tst-strxfrm', 'tst-strxfrm2', 'tst-svc']
+tests = ['memcpy-1', 'memmove1', 'strcmp-1', 'tstring', 'tst-strlen', 'tst-inlcall', 'tst-strtok', 'tst-strxfrm', 'tst-svc']
 
 foreach target : targets
   value = get_variable('target_' + target)
