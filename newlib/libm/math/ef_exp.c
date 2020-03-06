@@ -77,7 +77,7 @@ P5   =  4.1381369442e-08; /* 0x3331bb4c */
 	    }
 	    x  = hi - lo;
 	} 
-	else if(hx < 0x31800000)  {	/* when |x|<2**-28 */
+	else if(hx < 0x34000000)  {	/* when |x|<2**-23 */
 	    if(huge+x>one) return one+x;/* trigger inexact */
 	}
 
