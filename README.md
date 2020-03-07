@@ -76,6 +76,28 @@ sync has not been difficult so far.
 
 ## Releases
 
+### Picolibc version 1.4.1
+
+This release contains an important TLS fix for ARM along with a few
+minor compatibility fixes
+
+ 1. Make __aeabi_read_tp respect ARM ABI register requirements to
+    avoid clobbering register contents during TLS variable use.
+
+ 2. Use cpu_family instead of cpu in meson config, which is 'more
+    correct' when building for a single cpu instead of multilib.
+
+ 3. Make arm sample interrupt vector work with clang
+
+ 4. Use __inline instead of inline in published headers to allow
+    compiling with -ansi
+
+ 5. Make 'naked' RISC-V _start function contain only asm
+    statements as required by clang (and recommended by gcc).
+
+ 6. Use -msave-restore in sample RISC-V cross-compile
+    configuration. This saves text space.
+
 ### Picolibc version 1.4
 
 This release was focused on cleaning up the copyright and license
