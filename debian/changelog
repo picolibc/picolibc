@@ -1,3 +1,11 @@
+picolibc (1.4.1-1) unstable; urgency=medium
+
+  * ARM TLS corruption fix
+  * Compilation compatibility fixes
+  * Add -msave-restore to RISC-V version
+
+ -- Keith Packard <keithp@keithp.com>  Mon, 09 Mar 2020 12:02:54 -0700
+
 picolibc (1.4-1) unstable; urgency=medium
 
   * Merge upstream license changes from BSD 4-clause to BSD 3-clause
