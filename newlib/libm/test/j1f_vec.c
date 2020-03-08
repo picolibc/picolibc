@@ -301,4 +301,4 @@
 {33, 0,123,__LINE__, 0x3fc25cf8, 0xd1c20f55, 0x403bcccc, 0xccccccc9},	/* 0.143462=f(27.8)*/
 {31, 0,123,__LINE__, 0xbfb07640, 0x84343430, 0x403d7fff, 0xfffffffc},	/* -0.0643044=f(29.5)*/
 0,};
-test_j1f(m)   {run_vector_1(m,j1f_vec,(char *)(j1f),"j1f","ff");   }	
+void test_j1f(m)   {run_vector_1(m,j1f_vec,(char *)(j1f),"j1f","ff");   }	

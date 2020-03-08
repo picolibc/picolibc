@@ -217,4 +217,4 @@
 {62, 0,123,__LINE__, 0x3fbefed6, 0x4831e4e2, 0x40080000, 0x00000000, 0x3fff3333, 0x33333338},	/* 0.121076=f(3, 1.95)*/
 {61, 0,123,__LINE__, 0x3f9fc826, 0xafa66438, 0x40100000, 0x00000000, 0x3fff3333, 0x33333338},	/* 0.031037=f(4, 1.95)*/
 0,};
-test_jn(m)   {run_vector_1(m,jn_vec,(char *)(jn),"jn","did");   }	
+void test_jn(m)   {run_vector_1(m,jn_vec,(char *)(jn),"jn","did");   }	

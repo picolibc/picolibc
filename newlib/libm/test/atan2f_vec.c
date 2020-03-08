@@ -1617,4 +1617,4 @@
 {38, 0,123,__LINE__, 0x3fe9ff55, 0x55338c10, 0x3fee6666, 0x6666666d, 0x3feccccc, 0xccccccd3},	/* 0.812419=f(0.95, 0.9)*/
 {64, 0,123,__LINE__, 0x3fe921fb, 0x54442d18, 0x3fee6666, 0x6666666d, 0x3fee6666, 0x6666666d},	/* 0.785398=f(0.95, 0.95)*/
 0,};
-test_atan2f(m)   {run_vector_1(m,atan2f_vec,(char *)(atan2f),"atan2f","fff");   }	
+void test_atan2f(m)   {run_vector_1(m,atan2f_vec,(char *)(atan2f),"atan2f","fff");   }	

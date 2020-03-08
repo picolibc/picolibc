@@ -301,4 +301,4 @@
 {37, 0,123,__LINE__, 0x40451e82, 0xe0000000, 0x403bcccc, 0xccccccc9, 0x403fcccc, 0xccccccc9},	/* 42.2384=f(27.8, 31.8)*/
 {37, 0,123,__LINE__, 0x40465197, 0x40000000, 0x403d7fff, 0xfffffffc, 0x4040bfff, 0xfffffffe},	/* 44.6374=f(29.5, 33.5)*/
 0,};
-test_hypotf(m)   {run_vector_1(m,hypotf_vec,(char *)(hypotf),"hypotf","fff");   }	
+void test_hypotf(m)   {run_vector_1(m,hypotf_vec,(char *)(hypotf),"hypotf","fff");   }	

@@ -301,4 +301,4 @@
 {64, 0,123,__LINE__, 0x3fc2771c, 0x9fef6e9f, 0x403bcccc, 0xccccccc9},	/* 0.14426=f(27.8)*/
 {61, 0,123,__LINE__, 0xbfafc3a0, 0x56b6c329, 0x403d7fff, 0xfffffffc},	/* -0.0620394=f(29.5)*/
 0,};
-test_y0(m)   {run_vector_1(m,y0_vec,(char *)(y0),"y0","dd");   }	
+void test_y0(m)   {run_vector_1(m,y0_vec,(char *)(y0),"y0","dd");   }	

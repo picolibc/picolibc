@@ -286,9 +286,9 @@ test_mok (double value,
 	   iname, 
 	   theline,
 	   mag);
-     printf("%08x%08x %08x%08x) ",
-	    a.parts.msw,	     a.parts.lsw,
-	    b.parts.msw,	     b.parts.lsw);
+     printf("%08lx%08lx %08lx%08lx) ",
+	    (unsigned long) a.parts.msw,	     (unsigned long) a.parts.lsw,
+	    (unsigned long) b.parts.msw,	     (unsigned long) b.parts.lsw);
     printf("(%g %g)\n",   a.value, b.value);
     inacc++;
   }

@@ -301,4 +301,4 @@
 {62, 0,123,__LINE__, 0xbfec7794, 0x7992f401, 0x403bcccc, 0xccccccc9},	/* -0.889597=f(27.8)*/
 {58, 0,123,__LINE__, 0xbfd5a705, 0x9eaeac43, 0x403d7fff, 0xfffffffc},	/* -0.338319=f(29.5)*/
 0,};
-test_cos(m)   {run_vector_1(m,cos_vec,(char *)(cos),"cos","dd");   }	
+void test_cos(m)   {run_vector_1(m,cos_vec,(char *)(cos),"cos","dd");   }	

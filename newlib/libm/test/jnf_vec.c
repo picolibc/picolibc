@@ -217,4 +217,4 @@
 {35, 0,123,__LINE__, 0x3fbefed6, 0x60000000, 0x40080000, 0x00000000, 0x3fff3333, 0x33333338},	/* 0.121076=f(3, 1.95)*/
 {34, 0,123,__LINE__, 0x3f9fc826, 0xe0000000, 0x40100000, 0x00000000, 0x3fff3333, 0x33333338},	/* 0.031037=f(4, 1.95)*/
 0,};
-test_jnf(m)   {run_vector_1(m,jnf_vec,(char *)(jnf),"jnf","fif");   }	
+void test_jnf(m)   {run_vector_1(m,jnf_vec,(char *)(jnf),"jnf","fif");   }	

@@ -301,4 +301,4 @@
 {64, 0,123,__LINE__, 0x403c0000, 0x00000000, 0x403bcccc, 0xccccccc9},	/* 28=f(27.8)*/
 {64, 0,123,__LINE__, 0x403e0000, 0x00000000, 0x403d7fff, 0xfffffffc},	/* 30=f(29.5)*/
 0,};
-test_ceil(m)   {run_vector_1(m,ceil_vec,(char *)(ceil),"ceil","dd");   }	
+void test_ceil(m)   {run_vector_1(m,ceil_vec,(char *)(ceil),"ceil","dd");   }	

@@ -301,4 +301,4 @@
 {64, 0,123,__LINE__, 0xbfe06e04, 0xfc5ca3b7, 0x403bcccc, 0xccccccc9},	/* -0.51343=f(27.8)*/
 {64, 0,123,__LINE__, 0x4006407d, 0xaf0ccd5f, 0x403d7fff, 0xfffffffc},	/* 2.78149=f(29.5)*/
 0,};
-test_tan(m)   {run_vector_1(m,tan_vec,(char *)(tan),"tan","dd");   }	
+void test_tan(m)   {run_vector_1(m,tan_vec,(char *)(tan),"tan","dd");   }	

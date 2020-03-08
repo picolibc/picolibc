@@ -301,4 +301,4 @@
 {64, 0,123,__LINE__, 0x403b0000, 0x00000000, 0x403bcccc, 0xccccccc9},	/* 27=f(27.8)*/
 {64, 0,123,__LINE__, 0x403d0000, 0x00000000, 0x403d7fff, 0xfffffffc},	/* 29=f(29.5)*/
 0,};
-test_floorf(m)   {run_vector_1(m,floorf_vec,(char *)(floorf),"floorf","ff");   }	
+void test_floorf(m)   {run_vector_1(m,floorf_vec,(char *)(floorf),"floorf","ff");   }	

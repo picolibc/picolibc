@@ -301,4 +301,4 @@
 {64, 0,123,__LINE__, 0x3ff71ace, 0xb746d587, 0x403bcccc, 0xccccccc9},	/* 1.44404=f(27.8)*/
 {64, 0,123,__LINE__, 0x3ff78464, 0x1719126d, 0x403d7fff, 0xfffffffc},	/* 1.46982=f(29.5)*/
 0,};
-test_log10(m)   {run_vector_1(m,log10_vec,(char *)(log10),"log10","dd");   }	
+void test_log10(m)   {run_vector_1(m,log10_vec,(char *)(log10),"log10","dd");   }	

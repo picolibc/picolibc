@@ -301,4 +301,4 @@
 {64, 0,123,__LINE__, 0x403bcccc, 0xc0000000, 0x403bcccc, 0xccccccc9},	/* 27.8=f(27.8)*/
 {64, 0,123,__LINE__, 0x403d8000, 0x00000000, 0x403d7fff, 0xfffffffc},	/* 29.5=f(29.5)*/
 0,};
-test_fabsf(m)   {run_vector_1(m,fabsf_vec,(char *)(fabsf),"fabsf","ff");   }	
+void test_fabsf(m)   {run_vector_1(m,fabsf_vec,(char *)(fabsf),"fabsf","ff");   }	

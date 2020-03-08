@@ -301,4 +301,4 @@
 {64, 0,123,__LINE__, 0x401012f3, 0x5ffa8bd3, 0x403bcccc, 0xccccccc9},	/* 4.01851=f(27.8)*/
 {63, 0,123,__LINE__, 0x40104fb1, 0x4017a7ca, 0x403d7fff, 0xfffffffc},	/* 4.07782=f(29.5)*/
 0,};
-test_asinh(m)   {run_vector_1(m,asinh_vec,(char *)(asinh),"asinh","dd");   }	
+void test_asinh(m)   {run_vector_1(m,asinh_vec,(char *)(asinh),"asinh","dd");   }	

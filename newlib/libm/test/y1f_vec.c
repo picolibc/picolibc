@@ -301,4 +301,4 @@
 {31, 0,123,__LINE__, 0x3fa8b667, 0x712a954e, 0x403bcccc, 0xccccccc9},	/* 0.0482666=f(27.8)*/
 {34, 0,123,__LINE__, 0x3fc0e92b, 0x2cf35621, 0x403d7fff, 0xfffffffc},	/* 0.132116=f(29.5)*/
 0,};
-test_y1f(m)   {run_vector_1(m,y1f_vec,(char *)(y1f),"y1f","ff");   }	
+void test_y1f(m)   {run_vector_1(m,y1f_vec,(char *)(y1f),"y1f","ff");   }	

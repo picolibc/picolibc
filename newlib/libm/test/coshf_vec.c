@@ -301,4 +301,4 @@
 {31, 0,123,__LINE__, 0x42613b18, 0x40000000, 0x403bcccc, 0xccccccc9},	/* 5.92047e+11=f(27.8)*/
 {31, 0,123,__LINE__, 0x42879487, 0xa0000000, 0x403d7fff, 0xfffffffc},	/* 3.24084e+12=f(29.5)*/
 0,};
-test_coshf(m)   {run_vector_1(m,coshf_vec,(char *)(coshf),"coshf","ff");   }	
+void test_coshf(m)   {run_vector_1(m,coshf_vec,(char *)(coshf),"coshf","ff");   }	

@@ -299,4 +299,4 @@
 {64, 0, 34,__LINE__, 0x00000000, 0x00000000, 0x403bcccc, 0xccccccc9},	/* 0=f(27.8)*/
 {64, 0, 34,__LINE__, 0x00000000, 0x00000000, 0x403d7fff, 0xfffffffc},	/* 0=f(29.5)*/
 0,};
-test_erfc(m)   {run_vector_1(m,erfc_vec,(char *)(erfc),"erfc","dd");   }	
+void test_erfc(m)   {run_vector_1(m,erfc_vec,(char *)(erfc),"erfc","dd");   }	
