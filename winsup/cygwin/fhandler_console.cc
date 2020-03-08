@@ -59,17 +59,28 @@ static struct fhandler_base::rabuf_t con_ra;
 
 /* Write pending buffer for ESC sequence handling
    in xterm compatible mode */
-#define WPBUF_LEN 256
-static unsigned char wpbuf[WPBUF_LEN];
-static int wpixput;
 static unsigned char last_char;
 
-static inline void
-wpbuf_put (unsigned char x)
+/* simple helper class to accumulate output in a buffer
+   and send that to the console on request: */
+static class write_pending_buffer
 {
-  if (wpixput < WPBUF_LEN)
-    wpbuf[wpixput++] = x;
-}
+private:
+  static const size_t WPBUF_LEN = 256u;
+  unsigned char buf[WPBUF_LEN];
+  size_t ixput;
+public:
+  inline void put (unsigned char x)
+  {
+    if (ixput < WPBUF_LEN)
+      buf[ixput++] = x;
+  }
+  inline void empty () { ixput = 0u; }
+  inline void send (HANDLE &handle, DWORD *wn = NULL)
+  {
+    WriteConsoleA (handle, buf, ixput, wn, 0);
+  }
+} wpbuf;
 
 static void
 beep ()
@@ -2030,10 +2041,10 @@ fhandler_console::char_command (char c)
 	  break;
 #endif
 	case 'b': /* REP */
-	  wpbuf_put (c);
+	  wpbuf.put (c);
 	  if (wincap.has_con_esc_rep ())
 	    /* Just send the sequence */
-	    WriteConsoleA (get_output_handle (), wpbuf, wpixput, &wn, 0);
+	    wpbuf.send (get_output_handle (), &wn);
 	  else if (last_char && last_char != '\n')
 	    for (int i = 0; i < con.args[0]; i++)
 	      WriteConsoleA (get_output_handle (), &last_char, 1, &wn, 0);
@@ -2041,9 +2052,9 @@ fhandler_console::char_command (char c)
 	case 'r': /* DECSTBM */
 	  con.scroll_region.Top = con.args[0] ? con.args[0] - 1 : 0;
 	  con.scroll_region.Bottom = con.args[1] ? con.args[1] - 1 : -1;
-	  wpbuf_put (c);
+	  wpbuf.put (c);
 	  /* Just send the sequence */
-	  WriteConsoleA (get_output_handle (), wpbuf, wpixput, &wn, 0);
+	  wpbuf.send (get_output_handle (), &wn);
 	  break;
 	case 'L': /* IL */
 	  if (wincap.has_con_broken_il_dl ())
@@ -2067,8 +2078,8 @@ fhandler_console::char_command (char c)
 			       y + 1 - con.b.srWindow.Top,
 			       srBottom + 1 - con.b.srWindow.Top);
 	      WriteConsoleA (get_output_handle (), buf, strlen (buf), &wn, 0);
-	      wpbuf_put ('T');
-	      WriteConsoleA (get_output_handle (), wpbuf, wpixput, &wn, 0);
+	      wpbuf.put ('T');
+	      wpbuf.send (get_output_handle (), &wn);
 	      __small_sprintf (buf, "\033[%d;%dr",
 			       srTop + 1 - con.b.srWindow.Top,
 			       srBottom + 1 - con.b.srWindow.Top);
@@ -2079,9 +2090,9 @@ fhandler_console::char_command (char c)
 	    }
 	  else
 	    {
-	      wpbuf_put (c);
+	      wpbuf.put (c);
 	      /* Just send the sequence */
-	      WriteConsoleA (get_output_handle (), wpbuf, wpixput, &wn, 0);
+	      wpbuf.send (get_output_handle (), &wn);
 	    }
 	  break;
 	case 'M': /* DL */
@@ -2095,8 +2106,8 @@ fhandler_console::char_command (char c)
 			       y + 1 - con.b.srWindow.Top,
 			       srBottom + 1 - con.b.srWindow.Top);
 	      WriteConsoleA (get_output_handle (), buf, strlen (buf), &wn, 0);
-	      wpbuf_put ('S');
-	      WriteConsoleA (get_output_handle (), wpbuf, wpixput, &wn, 0);
+	      wpbuf.put ('S');
+	      wpbuf.send (get_output_handle (), &wn);
 	      __small_sprintf (buf, "\033[%d;%dr",
 			       srTop + 1 - con.b.srWindow.Top,
 			       srBottom + 1 - con.b.srWindow.Top);
@@ -2107,13 +2118,13 @@ fhandler_console::char_command (char c)
 	    }
 	  else
 	    {
-	      wpbuf_put (c);
+	      wpbuf.put (c);
 	      /* Just send the sequence */
-	      WriteConsoleA (get_output_handle (), wpbuf, wpixput, &wn, 0);
+	      wpbuf.send (get_output_handle (), &wn);
 	    }
 	  break;
 	case 'J': /* ED */
-	  wpbuf_put (c);
+	  wpbuf.put (c);
 	  if (con.args[0] == 3 && wincap.has_con_broken_csi3j ())
 	    { /* Workaround for broken CSI3J in Win10 1809 */
 	      CONSOLE_SCREEN_BUFFER_INFO sbi;
@@ -2131,7 +2142,7 @@ fhandler_console::char_command (char c)
 	    }
 	  else
 	    /* Just send the sequence */
-	    WriteConsoleA (get_output_handle (), wpbuf, wpixput, &wn, 0);
+	    wpbuf.send (get_output_handle (), &wn);
 	  break;
 	case 'h': /* DECSET */
 	case 'l': /* DECRST */
@@ -2139,9 +2150,9 @@ fhandler_console::char_command (char c)
 	    con.screen_alternated = true;
 	  else
 	    con.screen_alternated = false;
-	  wpbuf_put (c);
+	  wpbuf.put (c);
 	  /* Just send the sequence */
-	  WriteConsoleA (get_output_handle (), wpbuf, wpixput, &wn, 0);
+	  wpbuf.send (get_output_handle (), &wn);
 	  if (con.saw_question_mark)
 	    {
 	      bool need_fix_tab_position = false;
@@ -2159,15 +2170,15 @@ fhandler_console::char_command (char c)
 	      con.scroll_region.Top = 0;
 	      con.scroll_region.Bottom = -1;
 	    }
-	  wpbuf_put (c);
+	  wpbuf.put (c);
 	  /* Just send the sequence */
-	  WriteConsoleA (get_output_handle (), wpbuf, wpixput, &wn, 0);
+	  wpbuf.send (get_output_handle (), &wn);
 	  break;
 	default:
 	  /* Other escape sequences */
-	  wpbuf_put (c);
+	  wpbuf.put (c);
 	  /* Just send the sequence */
-	  WriteConsoleA (get_output_handle (), wpbuf, wpixput, &wn, 0);
+	  wpbuf.send (get_output_handle (), &wn);
 	  break;
 	}
       return;
@@ -2874,7 +2885,7 @@ do_print:
 	  break;
 	case ESC:
 	  con.state = gotesc;
-	  wpbuf_put (*found);
+	  wpbuf.put (*found);
 	  break;
 	case DWN:
 	  cursor_get (&x, &y);
@@ -2989,7 +3000,7 @@ fhandler_console::write (const void *vsrc, size_t len)
 	case gotesc:
 	  if (*src == '[')		/* CSI Control Sequence Introducer */
 	    {
-	      wpbuf_put (*src);
+	      wpbuf.put (*src);
 	      con.state = gotsquare;
 	      memset (con.args, 0, sizeof con.args);
 	      con.nargs = 0;
@@ -3005,13 +3016,13 @@ fhandler_console::write (const void *vsrc, size_t len)
 		  /* For xterm mode only */
 		  DWORD n;
 		  /* Just send the sequence */
-		  wpbuf_put (*src);
-		  WriteConsoleA (get_output_handle (), wpbuf, wpixput, &n, 0);
+		  wpbuf.put (*src);
+		  wpbuf.send (get_output_handle (), &n);
 		}
 	      else if (con.savex >= 0 && con.savey >= 0)
 		cursor_set (false, con.savex, con.savey);
 	      con.state = normal;
-	      wpixput = 0;
+	      wpbuf.empty();
 	    }
 	  else if (*src == '7')		/* DECSC Save cursor position */
 	    {
@@ -3020,13 +3031,13 @@ fhandler_console::write (const void *vsrc, size_t len)
 		  /* For xterm mode only */
 		  DWORD n;
 		  /* Just send the sequence */
-		  wpbuf_put (*src);
-		  WriteConsoleA (get_output_handle (), wpbuf, wpixput, &n, 0);
+		  wpbuf.put (*src);
+		  wpbuf.send (get_output_handle (), &n);
 		}
 	      else
 		cursor_get (&con.savex, &con.savey);
 	      con.state = normal;
-	      wpixput = 0;
+	      wpbuf.empty();
 	    }
 	  else if (wincap.has_con_24bit_colors () && !con_is_legacy
 		   && wincap.has_con_broken_il_dl () && *src == 'M')
@@ -3048,14 +3059,14 @@ fhandler_console::write (const void *vsrc, size_t len)
 				     buf, strlen (buf), &n, 0);
 		    }
 		  /* Substitute "CSI Ps T" */
-		  wpbuf_put ('[');
-		  wpbuf_put ('T');
+		  wpbuf.put ('[');
+		  wpbuf.put ('T');
 		}
 	      else
-		wpbuf_put (*src);
-	      WriteConsoleA (get_output_handle (), wpbuf, wpixput, &n, 0);
+		wpbuf.put (*src);
+	      wpbuf.send (get_output_handle (), &n);
 	      con.state = normal;
-	      wpixput = 0;
+	      wpbuf.empty();
 	    }
 	  else if (wincap.has_con_24bit_colors () && !con_is_legacy)
 	    {
@@ -3067,28 +3078,28 @@ fhandler_console::write (const void *vsrc, size_t len)
 	      /* ESC sequences below (e.g. OSC, etc) are left to xterm
 		 emulation in xterm compatible mode, therefore, are not
 		 handled and just sent them. */
-	      wpbuf_put (*src);
+	      wpbuf.put (*src);
 	      /* Just send the sequence */
 	      DWORD n;
-	      WriteConsoleA (get_output_handle (), wpbuf, wpixput, &n, 0);
+	      wpbuf.send (get_output_handle (), &n);
 	      con.state = normal;
-	      wpixput = 0;
+	      wpbuf.empty();
 	    }
 	  else if (*src == ']')		/* OSC Operating System Command */
 	    {
-	      wpbuf_put (*src);
+	      wpbuf.put (*src);
 	      con.rarg = 0;
 	      con.my_title_buf[0] = '\0';
 	      con.state = gotrsquare;
 	    }
 	  else if (*src == '(')		/* Designate G0 character set */
 	    {
-	      wpbuf_put (*src);
+	      wpbuf.put (*src);
 	      con.state = gotparen;
 	    }
 	  else if (*src == ')')		/* Designate G1 character set */
 	    {
-	      wpbuf_put (*src);
+	      wpbuf.put (*src);
 	      con.state = gotrparen;
 	    }
 	  else if (*src == 'M')		/* Reverse Index (scroll down) */
@@ -3096,7 +3107,7 @@ fhandler_console::write (const void *vsrc, size_t len)
 	      con.fillin (get_output_handle ());
 	      scroll_buffer_screen (0, 0, -1, -1, 0, 1);
 	      con.state = normal;
-	      wpixput = 0;
+	      wpbuf.empty();
 	    }
 	  else if (*src == 'c')		/* RIS Full Reset */
 	    {
@@ -3107,17 +3118,17 @@ fhandler_console::write (const void *vsrc, size_t len)
 	      cursor_set (false, 0, 0);
 	      clear_screen (cl_buf_beg, cl_buf_beg, cl_buf_end, cl_buf_end);
 	      con.state = normal;
-	      wpixput = 0;
+	      wpbuf.empty();
 	    }
 	  else if (*src == 'R')		/* ? */
 	    {
 	      con.state = normal;
-	      wpixput = 0;
+	      wpbuf.empty();
 	    }
 	  else
 	    {
 	      con.state = normal;
-	      wpixput = 0;
+	      wpbuf.empty();
 	    }
 	  src++;
 	  break;
@@ -3126,19 +3137,19 @@ fhandler_console::write (const void *vsrc, size_t len)
 	    {
 	      if (con.nargs < MAXARGS)
 		con.args[con.nargs] = con.args[con.nargs] * 10 + *src - '0';
-	      wpbuf_put (*src);
+	      wpbuf.put (*src);
 	      src++;
 	    }
 	  else if (*src == ';')
 	    {
-	      wpbuf_put (*src);
+	      wpbuf.put (*src);
 	      src++;
 	      if (con.nargs < MAXARGS)
 		con.nargs++;
 	    }
 	  else if (*src == ' ')
 	    {
-	      wpbuf_put (*src);
+	      wpbuf.put (*src);
 	      src++;
 	      con.saw_space = true;
 	      con.state = gotcommand;
@@ -3151,7 +3162,7 @@ fhandler_console::write (const void *vsrc, size_t len)
 	    con.nargs++;
 	  char_command (*src++);
 	  con.state = normal;
-	  wpixput = 0;
+	  wpbuf.empty();
 	  break;
 	case gotrsquare:
 	  if (isdigit (*src))
@@ -3162,7 +3173,7 @@ fhandler_console::write (const void *vsrc, size_t len)
 	    con.state = eatpalette;
 	  else
 	    con.state = eattitle;
-	  wpbuf_put (*src);
+	  wpbuf.put (*src);
 	  src++;
 	  break;
 	case eattitle:
@@ -3174,13 +3185,13 @@ fhandler_console::write (const void *vsrc, size_t len)
 		if (*src == '\007' && con.state == gettitle)
 		  set_console_title (con.my_title_buf);
 		con.state = normal;
-		wpixput = 0;
+		wpbuf.empty();
 	      }
 	    else if (n < TITLESIZE)
 	      {
 		con.my_title_buf[n++] = *src;
 		con.my_title_buf[n] = '\0';
-		wpbuf_put (*src);
+		wpbuf.put (*src);
 	      }
 	    src++;
 	    break;
@@ -3188,13 +3199,13 @@ fhandler_console::write (const void *vsrc, size_t len)
 	case eatpalette:
 	  if (*src == '\033')
 	    {
-	      wpbuf_put (*src);
+	      wpbuf.put (*src);
 	      con.state = endpalette;
 	    }
 	  else if (*src == '\a')
 	    {
 	      con.state = normal;
-	      wpixput = 0;
+	      wpbuf.empty();
 	    }
 	  src++;
 	  break;
@@ -3204,14 +3215,14 @@ fhandler_console::write (const void *vsrc, size_t len)
 	  else
 	    /* Sequence error (abort) */
 	    con.state = normal;
-	  wpixput = 0;
+	  wpbuf.empty();
 	  src++;
 	  break;
 	case gotsquare:
 	  if (*src == ';')
 	    {
 	      con.state = gotarg1;
-	      wpbuf_put (*src);
+	      wpbuf.put (*src);
 	      if (con.nargs < MAXARGS)
 		con.nargs++;
 	      src++;
@@ -3226,7 +3237,7 @@ fhandler_console::write (const void *vsrc, size_t len)
 		con.saw_greater_than_sign = true;
 	      else if (*src == '!')
 		con.saw_exclamation_mark = true;
-	      wpbuf_put (*src);
+	      wpbuf.put (*src);
 	      /* ignore any extra chars between [ and first arg or command */
 	      src++;
 	    }
@@ -3239,7 +3250,7 @@ fhandler_console::write (const void *vsrc, size_t len)
 	  else
 	    con.vt100_graphics_mode_G0 = false;
 	  con.state = normal;
-	  wpixput = 0;
+	  wpbuf.empty();
 	  src++;
 	  break;
 	case gotrparen:	/* Designate G1 Character Set (ISO 2022) */
@@ -3248,7 +3259,7 @@ fhandler_console::write (const void *vsrc, size_t len)
 	  else
 	    con.vt100_graphics_mode_G1 = false;
 	  con.state = normal;
-	  wpixput = 0;
+	  wpbuf.empty();
 	  src++;
 	  break;
 	}
