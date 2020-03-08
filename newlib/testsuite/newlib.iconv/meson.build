@@ -33,7 +33,7 @@
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
-tests = ['iconvjp', 'iconvnm', 'iconvru', 'tst-iconv1]
+tests = ['iconvjp', 'iconvnm', 'iconvru', 'tst-iconv1']
 
 foreach target : targets
   value = get_variable('target_' + target)
