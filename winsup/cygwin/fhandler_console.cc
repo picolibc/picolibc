@@ -2015,7 +2015,6 @@ fhandler_console::char_command (char c)
   if (wincap.has_con_24bit_colors () && !con_is_legacy)
     {
       /* For xterm compatible mode */
-      DWORD wn;
       switch (c)
 	{
 #if 0 /* These sequences, which are supported by real xterm, are
@@ -2044,17 +2043,17 @@ fhandler_console::char_command (char c)
 	  wpbuf.put (c);
 	  if (wincap.has_con_esc_rep ())
 	    /* Just send the sequence */
-	    wpbuf.send (get_output_handle (), &wn);
+	    wpbuf.send (get_output_handle ());
 	  else if (last_char && last_char != '\n')
 	    for (int i = 0; i < con.args[0]; i++)
-	      WriteConsoleA (get_output_handle (), &last_char, 1, &wn, 0);
+	      WriteConsoleA (get_output_handle (), &last_char, 1, 0, 0);
 	  break;
 	case 'r': /* DECSTBM */
 	  con.scroll_region.Top = con.args[0] ? con.args[0] - 1 : 0;
 	  con.scroll_region.Bottom = con.args[1] ? con.args[1] - 1 : -1;
 	  wpbuf.put (c);
 	  /* Just send the sequence */
-	  wpbuf.send (get_output_handle (), &wn);
+	  wpbuf.send (get_output_handle ());
 	  break;
 	case 'L': /* IL */
 	  if (wincap.has_con_broken_il_dl ())
@@ -2072,27 +2071,27 @@ fhandler_console::char_command (char c)
 				   srBottom - (n-1) - con.b.srWindow.Top + 1,
 				   y + 1 - con.b.srWindow.Top, x + 1);
 		  WriteConsoleA (get_output_handle (),
-				 buf, strlen (buf), &wn, 0);
+				 buf, strlen (buf), 0, 0);
 		}
 	      __small_sprintf (buf, "\033[%d;%dr",
 			       y + 1 - con.b.srWindow.Top,
 			       srBottom + 1 - con.b.srWindow.Top);
-	      WriteConsoleA (get_output_handle (), buf, strlen (buf), &wn, 0);
+	      WriteConsoleA (get_output_handle (), buf, strlen (buf), 0, 0);
 	      wpbuf.put ('T');
-	      wpbuf.send (get_output_handle (), &wn);
+	      wpbuf.send (get_output_handle ());
 	      __small_sprintf (buf, "\033[%d;%dr",
 			       srTop + 1 - con.b.srWindow.Top,
 			       srBottom + 1 - con.b.srWindow.Top);
-	      WriteConsoleA (get_output_handle (), buf, strlen (buf), &wn, 0);
+	      WriteConsoleA (get_output_handle (), buf, strlen (buf), 0, 0);
 	      __small_sprintf (buf, "\033[%d;%dH",
 			       y + 1 - con.b.srWindow.Top, x + 1);
-	      WriteConsoleA (get_output_handle (), buf, strlen (buf), &wn, 0);
+	      WriteConsoleA (get_output_handle (), buf, strlen (buf), 0, 0);
 	    }
 	  else
 	    {
 	      wpbuf.put (c);
 	      /* Just send the sequence */
-	      wpbuf.send (get_output_handle (), &wn);
+	      wpbuf.send (get_output_handle ());
 	    }
 	  break;
 	case 'M': /* DL */
@@ -2105,22 +2104,22 @@ fhandler_console::char_command (char c)
 	      __small_sprintf (buf, "\033[%d;%dr",
 			       y + 1 - con.b.srWindow.Top,
 			       srBottom + 1 - con.b.srWindow.Top);
-	      WriteConsoleA (get_output_handle (), buf, strlen (buf), &wn, 0);
+	      WriteConsoleA (get_output_handle (), buf, strlen (buf), 0, 0);
 	      wpbuf.put ('S');
-	      wpbuf.send (get_output_handle (), &wn);
+	      wpbuf.send (get_output_handle ());
 	      __small_sprintf (buf, "\033[%d;%dr",
 			       srTop + 1 - con.b.srWindow.Top,
 			       srBottom + 1 - con.b.srWindow.Top);
-	      WriteConsoleA (get_output_handle (), buf, strlen (buf), &wn, 0);
+	      WriteConsoleA (get_output_handle (), buf, strlen (buf), 0, 0);
 	      __small_sprintf (buf, "\033[%d;%dH",
 			       y + 1 - con.b.srWindow.Top, x + 1);
-	      WriteConsoleA (get_output_handle (), buf, strlen (buf), &wn, 0);
+	      WriteConsoleA (get_output_handle (), buf, strlen (buf), 0, 0);
 	    }
 	  else
 	    {
 	      wpbuf.put (c);
 	      /* Just send the sequence */
-	      wpbuf.send (get_output_handle (), &wn);
+	      wpbuf.send (get_output_handle ());
 	    }
 	  break;
 	case 'J': /* ED */
@@ -2142,7 +2141,7 @@ fhandler_console::char_command (char c)
 	    }
 	  else
 	    /* Just send the sequence */
-	    wpbuf.send (get_output_handle (), &wn);
+	    wpbuf.send (get_output_handle ());
 	  break;
 	case 'h': /* DECSET */
 	case 'l': /* DECRST */
@@ -2152,7 +2151,7 @@ fhandler_console::char_command (char c)
 	    con.screen_alternated = false;
 	  wpbuf.put (c);
 	  /* Just send the sequence */
-	  wpbuf.send (get_output_handle (), &wn);
+	  wpbuf.send (get_output_handle ());
 	  if (con.saw_question_mark)
 	    {
 	      bool need_fix_tab_position = false;
@@ -2172,13 +2171,13 @@ fhandler_console::char_command (char c)
 	    }
 	  wpbuf.put (c);
 	  /* Just send the sequence */
-	  wpbuf.send (get_output_handle (), &wn);
+	  wpbuf.send (get_output_handle ());
 	  break;
 	default:
 	  /* Other escape sequences */
 	  wpbuf.put (c);
 	  /* Just send the sequence */
-	  wpbuf.send (get_output_handle (), &wn);
+	  wpbuf.send (get_output_handle ());
 	  break;
 	}
       return;
@@ -3014,10 +3013,9 @@ fhandler_console::write (const void *vsrc, size_t len)
 	      if (con.screen_alternated)
 		{
 		  /* For xterm mode only */
-		  DWORD n;
 		  /* Just send the sequence */
 		  wpbuf.put (*src);
-		  wpbuf.send (get_output_handle (), &n);
+		  wpbuf.send (get_output_handle ());
 		}
 	      else if (con.savex >= 0 && con.savey >= 0)
 		cursor_set (false, con.savex, con.savey);
@@ -3029,10 +3027,9 @@ fhandler_console::write (const void *vsrc, size_t len)
 	      if (con.screen_alternated)
 		{
 		  /* For xterm mode only */
-		  DWORD n;
 		  /* Just send the sequence */
 		  wpbuf.put (*src);
-		  wpbuf.send (get_output_handle (), &n);
+		  wpbuf.send (get_output_handle ());
 		}
 	      else
 		cursor_get (&con.savex, &con.savey);
@@ -3043,7 +3040,6 @@ fhandler_console::write (const void *vsrc, size_t len)
 		   && wincap.has_con_broken_il_dl () && *src == 'M')
 	    { /* Reverse Index (scroll down) */
 	      int x, y;
-	      DWORD n;
 	      cursor_get (&x, &y);
 	      if (y == srTop)
 		{
@@ -3056,7 +3052,7 @@ fhandler_console::write (const void *vsrc, size_t len)
 				       srBottom - con.b.srWindow.Top + 1,
 				       y + 1 - con.b.srWindow.Top, x + 1);
 		      WriteConsoleA (get_output_handle (),
-				     buf, strlen (buf), &n, 0);
+				     buf, strlen (buf), 0, 0);
 		    }
 		  /* Substitute "CSI Ps T" */
 		  wpbuf.put ('[');
@@ -3064,7 +3060,7 @@ fhandler_console::write (const void *vsrc, size_t len)
 		}
 	      else
 		wpbuf.put (*src);
-	      wpbuf.send (get_output_handle (), &n);
+	      wpbuf.send (get_output_handle ());
 	      con.state = normal;
 	      wpbuf.empty();
 	    }
@@ -3080,8 +3076,7 @@ fhandler_console::write (const void *vsrc, size_t len)
 		 handled and just sent them. */
 	      wpbuf.put (*src);
 	      /* Just send the sequence */
-	      DWORD n;
-	      wpbuf.send (get_output_handle (), &n);
+	      wpbuf.send (get_output_handle ());
 	      con.state = normal;
 	      wpbuf.empty();
 	    }
