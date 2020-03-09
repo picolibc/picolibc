@@ -2124,6 +2124,11 @@ fhandler_console::char_command (char c)
 	  break;
 	case 'J': /* ED */
 	  wpbuf.put (c);
+	  if (con.args[0] == 3 && con.savey >= 0)
+	    {
+	      con.fillin (get_output_handle ());
+	      con.savey -= con.b.srWindow.Top;
+	    }
 	  if (con.args[0] == 3 && wincap.has_con_broken_csi3j ())
 	    { /* Workaround for broken CSI3J in Win10 1809 */
 	      CONSOLE_SCREEN_BUFFER_INFO sbi;
@@ -2168,6 +2173,7 @@ fhandler_console::char_command (char c)
 	    {
 	      con.scroll_region.Top = 0;
 	      con.scroll_region.Bottom = -1;
+	      con.savex = con.savey = -1;
 	    }
 	  wpbuf.put (c);
 	  /* Just send the sequence */
@@ -3070,6 +3076,7 @@ fhandler_console::write (const void *vsrc, size_t len)
 		{
 		  con.scroll_region.Top = 0;
 		  con.scroll_region.Bottom = -1;
+		  con.savex = con.savey = -1;
 		}
 	      /* ESC sequences below (e.g. OSC, etc) are left to xterm
 		 emulation in xterm compatible mode, therefore, are not
