@@ -42,8 +42,8 @@ _set_tls(void *tls)
 #include "../../crt0.h"
 #include <sys/cdefs.h>
 
-void __attribute((naked)) __section(".text.init.enter")
-_start(void)
+static void __attribute((used))
+_cstart(void)
 {
 	asm(".option push\n.option norelax\nla gp, __global_pointer$\n.option pop");
 #ifdef __riscv_flen
@@ -53,6 +53,12 @@ _start(void)
 	asm("csrw mstatus, %0" : : "r" (mstatus));
 	asm("csrwi fcsr, 0");
 #endif
-	asm("la sp, __stack");
 	__start();
+}
+
+void __attribute((naked)) __section(".text.init.enter")
+_start(void)
+{
+	asm(".option push\n.option norelax\nla sp, __stack\n.option pop");
+	asm("j _cstart");
 }

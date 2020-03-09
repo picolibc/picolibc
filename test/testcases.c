@@ -422,3 +422,4 @@
 #ifndef PICOLIBC_FLOAT_PRINTF_SCANF
     result |= test(418, "1.000e-308", "%.3e", 1e-308);
 #endif
+    result |= test(419, "1, 1", "%-*.llu, %-*.llu",1,(int64_t)1,1,(int64_t)1);

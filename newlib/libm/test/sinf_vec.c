@@ -299,4 +299,4 @@
 {30, 0,123,__LINE__, 0x3fdd3b56, 0x4dfe1bfd, 0x403bcccc, 0xccccccc9},	/* 0.456747=f(27.8)*/
 {33, 0,123,__LINE__, 0xbfee1ced, 0xe66aee4e, 0x403d7fff, 0xfffffffc},	/* -0.941031=f(29.5)*/
 0,};
-test_sinf(m)   {run_vector_1(m,sinf_vec,(char *)(sinf),"sinf","ff");   }	
+void test_sinf(m)   {run_vector_1(m,sinf_vec,(char *)(sinf),"sinf","ff");   }	

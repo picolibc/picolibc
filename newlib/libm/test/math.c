@@ -54,7 +54,7 @@ void translate_to (FILE *file,
 {
   __ieee_double_shape_type bits;
   bits.value = r;
-  fprintf(file, "0x%08x, 0x%08x", bits.parts.msw, bits.parts.lsw);
+  fprintf(file, "0x%08lx, 0x%08lx", (unsigned long) bits.parts.msw, (unsigned long) bits.parts.lsw);
 }
 
 int 
@@ -92,12 +92,12 @@ ffcheck (double is,
   {
     inacc ++;
     
-    printf("%s:%d, inaccurate answer: bit %d (%08x%08x %08x%08x) (%g %g)\n",
+    printf("%s:%d, inaccurate answer: bit %d (%08lx%08lx %08lx%08lx) (%g %g)\n",
 	   name,  p->line, mag,
-	   correct.parts.msw,
-	   correct.parts.lsw,
-	   isbits.parts.msw,
-	   isbits.parts.lsw,
+	   (unsigned long) correct.parts.msw,
+	   (unsigned long) correct.parts.lsw,
+	   (unsigned long) isbits.parts.msw,
+	   (unsigned long) isbits.parts.lsw,
 	   correct.value, is);
   }      
   
@@ -171,13 +171,13 @@ frontline (FILE *f,
   
   fprintf(f, ", ");      
 
-  fprintf(f,"0x%08x, 0x%08x", p->qs[1].msw, p->qs[1].lsw);
+  fprintf(f,"0x%08lx, 0x%08lx", (unsigned long) p->qs[1].msw, (unsigned long) p->qs[1].lsw);
   
 
   if (args[2]) 
   {
     fprintf(f, ", ");      
-    fprintf(f,"0x%08x, 0x%08x", p->qs[2].msw, p->qs[2].lsw);
+    fprintf(f,"0x%08lx, 0x%08lx", (unsigned long) p->qs[2].msw, (unsigned long) p->qs[2].lsw);
   }
 	
   fprintf(f,"},	/* %g=f(%g",result,
@@ -214,8 +214,7 @@ run_vector_1 (int vector,
        char *name,
        char *args)
 {
-  FILE *f;
-  int mag;
+  FILE *f = NULL;
   double result;  
   
   if (vector)
@@ -235,8 +234,8 @@ run_vector_1 (int vector,
       {
 	d.d = k;
 	d4.d = k + 4;
-	fprintf(f,"{1,1, 1,1, 0,0,0x%08x,0x%08x, 0x%08x, 0x%08x},\n",
-		d.a, d.b, d4.a, d4.b);
+	fprintf(f,"{1,1, 1,1, 0,0,0x%08lx,0x%08lx, 0x%08lx, 0x%08lx},\n",
+		(unsigned long) d.a, (unsigned long) d.b, (unsigned long) d4.a, (unsigned long) d4.b);
 
       }
 
@@ -244,16 +243,16 @@ run_vector_1 (int vector,
       {
 	d.d = k;
 	d4.d = k + 4;
-	fprintf(f,"{1,1, 1,1, 0,0,0x%08x,0x%08x, 0x%08x, 0x%08x},\n",
-		d.a, d.b, d4.a, d4.b);
+	fprintf(f,"{1,1, 1,1, 0,0,0x%08lx,0x%08lx, 0x%08lx, 0x%08lx},\n",
+		(unsigned long) d.a, (unsigned long) d.b, (unsigned long) d4.a, (unsigned long) d4.b);
 
       }
       for (k = -M_PI *2; k < M_PI *2; k+= M_PI/2) 
       {
 	d.d = k;
 	d4.d = k + 4;
-	fprintf(f,"{1,1, 1,1, 0,0,0x%08x,0x%08x, 0x%08x, 0x%08x},\n",
-		d.a, d.b, d4.a, d4.b);
+	fprintf(f,"{1,1, 1,1, 0,0,0x%08lx,0x%08lx, 0x%08lx, 0x%08lx},\n",
+		(unsigned long) d.a, (unsigned long) d.b, (unsigned long) d4.a, (unsigned long) d4.b);
 
       }
 
@@ -261,8 +260,8 @@ run_vector_1 (int vector,
       {
 	d.d = k;
 	d4.d = k + 4;
-	fprintf(f,"{2,2, 1,1, 0,0, 0x%08x,0x%08x, 0x%08x, 0x%08x},\n",
-		d.a, d.b, d4.a, d4.b);
+	fprintf(f,"{2,2, 1,1, 0,0, 0x%08lx,0x%08lx, 0x%08lx, 0x%08lx},\n",
+		(unsigned long) d.a, (unsigned long) d.b, (unsigned long) d4.a, (unsigned long) d4.b);
 
       }
       VECCLOSE(f, name, args);
@@ -276,9 +275,6 @@ run_vector_1 (int vector,
     double arg1 = thedouble(p->qs[1].msw, p->qs[1].lsw);
     double arg2 = thedouble(p->qs[2].msw, p->qs[2].lsw);
 
-    double r;
-    double rf;
-    
     errno = 0;
     merror = 0;
     mname = 0;
@@ -302,7 +298,6 @@ run_vector_1 (int vector,
     else  if (strcmp(args,"ff")==0)
     {
       float arga;
-      double a;
       
       typedef float (*pdblfunc) (float);
       
@@ -324,8 +319,6 @@ run_vector_1 (int vector,
      }  
      else  if (strcmp(args,"fff")==0)
      {
-       double a,b;
-       
        float arga;
        float argb;
       
@@ -349,8 +342,6 @@ run_vector_1 (int vector,
      }  
      else  if (strcmp(args,"fif")==0)
      {
-       double a,b;
-       
        float arga;
        float argb;
       

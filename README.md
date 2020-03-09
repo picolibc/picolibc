@@ -19,8 +19,12 @@ There are two files used for testing printf, test/printf-tests.c and
 test/testcases.c which are licensed under the GPL version 2 or
 later.
 
-Please see the file COPYING.NEWLIB in this distribution for newlib
-license terms.
+The file COPYING.picolibc contains all of the current copyright and
+license information in the Debian standard machine-readable format. It
+was generated using the make-copyrights and find-copyright
+scripts. There are currently 75 distinct licenses: 9 versions of the
+2-clause BSD license, 35 versions of the 3-clause BSD license, and 31
+other licenses.
 
 ## Supported Architectures
 
@@ -71,6 +75,46 @@ areas unrelated to the code used by picolibc, so keeping things in
 sync has not been difficult so far.
 
 ## Releases
+
+### Picolibc version 1.4.1
+
+This release contains an important TLS fix for ARM along with a few
+minor compatibility fixes
+
+ 1. Make __aeabi_read_tp respect ARM ABI register requirements to
+    avoid clobbering register contents during TLS variable use.
+
+ 2. Use cpu_family instead of cpu in meson config, which is 'more
+    correct' when building for a single cpu instead of multilib.
+
+ 3. Make arm sample interrupt vector work with clang
+
+ 4. Use __inline instead of inline in published headers to allow
+    compiling with -ansi
+
+ 5. Make 'naked' RISC-V _start function contain only asm
+    statements as required by clang (and recommended by gcc).
+
+ 6. Use -msave-restore in sample RISC-V cross-compile
+    configuration. This saves text space.
+
+### Picolibc version 1.4
+
+This release was focused on cleaning up the copyright and license
+information.
+
+ 1. Copyright information should now be present in every source file.
+
+ 2. License information, where it could be inferred from the
+    repository, was added to many files.
+
+ 3. 4-clause BSD licenses were changed (with permission) to 3-clause
+
+ 4. Fix RISC-V ieeefp.h exception bits
+
+ 5. Merge past newlib 3.2.0
+
+ 6. Add PICOLIBC_TLS preprocessor define when the library has TLS support
 
 ### Picolibc version 1.3
 
@@ -169,3 +213,4 @@ include:
  * [Linking with Picolibc.ld](doc/linking.md)
  * [Hello World](hello-world/README.md)
  * [Picolibc as embedded source](doc/embedsource.md)
+ * [Copyright and license information](COPYING.picolibc)

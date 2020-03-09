@@ -302,3 +302,201 @@ run_vector_1 (int vector,
 	      char *func,
 	      char *name,
 	      char *args);
+void
+test_acos(int vector);
+
+void
+test_acosf(int vector);
+
+void
+test_acosh(int vector);
+
+void
+test_acoshf(int vector);
+
+void
+test_asin(int vector);
+
+void
+test_asinf(int vector);
+
+void
+test_asinh(int vector);
+
+void
+test_asinhf(int vector);
+
+void
+test_atan(int vector);
+
+void
+test_atan2(int vector);
+
+void
+test_atan2f(int vector);
+
+void
+test_atanf(int vector);
+
+void
+test_atanh(int vector);
+
+void
+test_atanhf(int vector);
+
+void
+test_ceil(int vector);
+
+void
+test_ceilf(int vector);
+
+void
+test_cos(int vector);
+
+void
+test_cosf(int vector);
+
+void
+test_cosh(int vector);
+
+void
+test_coshf(int vector);
+
+void
+test_erf(int vector);
+
+void
+test_erfc(int vector);
+
+void
+test_erfcf(int vector);
+
+void
+test_erff(int vector);
+
+void
+test_exp(int vector);
+
+void
+test_expf(int vector);
+
+void
+test_fabs(int vector);
+
+void
+test_fabsf(int vector);
+
+void
+test_floor(int vector);
+
+void
+test_floorf(int vector);
+
+void
+test_fmod(int vector);
+
+void
+test_fmodf(int vector);
+
+void
+test_gamma(int vector);
+
+void
+test_gammaf(int vector);
+
+void
+test_hypot(int vector);
+
+void
+test_hypotf(int vector);
+
+void
+test_j0(int vector);
+
+void
+test_j0f(int vector);
+
+void
+test_j1(int vector);
+
+void
+test_j1f(int vector);
+
+void
+test_jn(int vector);
+
+void
+test_jnf(int vector);
+
+void
+test_log(int vector);
+
+void
+test_log10(int vector);
+
+void
+test_log10f(int vector);
+
+void
+test_log1p(int vector);
+
+void
+test_log1pf(int vector);
+
+void
+test_log2(int vector);
+
+void
+test_log2f(int vector);
+
+void
+test_logf(int vector);
+
+void
+test_sin(int vector);
+
+void
+test_sinf(int vector);
+
+void
+test_sinh(int vector);
+
+void
+test_sinhf(int vector);
+
+void
+test_sqrt(int vector);
+
+void
+test_sqrtf(int vector);
+
+void
+test_tan(int vector);
+
+void
+test_tanf(int vector);
+
+void
+test_tanh(int vector);
+
+void
+test_tanhf(int vector);
+
+void
+test_y0(int vector);
+
+void
+test_y0f(int vector);
+
+void
+test_y1(int vector);
+
+void
+test_y1f(int vector);
+
+void
+test_y1f(int vector);
+
+void
+test_ynf(int vector);
+

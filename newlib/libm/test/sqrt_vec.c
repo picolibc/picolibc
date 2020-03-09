@@ -301,4 +301,4 @@
 {63, 0,123,__LINE__, 0x4015171c, 0xbaaadfe1, 0x403bcccc, 0xccccccc9},	/* 5.27257=f(27.8)*/
 {63, 0,123,__LINE__, 0x4015b9be, 0x5d52a9d9, 0x403d7fff, 0xfffffffc},	/* 5.43139=f(29.5)*/
 0,};
-test_sqrt(m)   {run_vector_1(m,sqrt_vec,(char *)(sqrt),"sqrt","dd");   }	
+void test_sqrt(m)   {run_vector_1(m,sqrt_vec,(char *)(sqrt),"sqrt","dd");   }	

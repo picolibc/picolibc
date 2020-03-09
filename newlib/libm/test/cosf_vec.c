@@ -300,4 +300,4 @@
 {36, 0,123,__LINE__, 0xbfec7793, 0xbe7da18f, 0x403bcccc, 0xccccccc9},	/* -0.889597=f(27.8)*/
 {34, 0,123,__LINE__, 0xbfd5a705, 0x9eaeab38, 0x403d7fff, 0xfffffffc},	/* -0.338319=f(29.5)*/
 0,};
-test_cosf(m)   {run_vector_1(m,cosf_vec,(char *)(cosf),"cosf","ff");   }	
+void test_cosf(m)   {run_vector_1(m,cosf_vec,(char *)(cosf),"cosf","ff");   }	

@@ -1,5 +1,5 @@
 [binaries]
-c = ['riscv64-unknown-elf-gcc', '-mcmodel=medany', '-nostdlib']
+c = 'riscv64-unknown-elf-gcc'
 ar = 'riscv64-unknown-elf-ar'
 as = 'riscv64-unknown-elf-as'
 strip = 'riscv64-unknown-elf-strip'
@@ -12,4 +12,5 @@ cpu = 'riscv'
 endian = 'little'
 
 [properties]
+c_args = [ '-mcmodel=medany', '-nostdlib', '-msave-restore' ]
 needs_exe_wrapper = true

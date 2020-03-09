@@ -301,4 +301,4 @@
 {39, 0,123,__LINE__, 0x40101249, 0xc512632c, 0x403bcccc, 0xccccccc9},	/* 4.01786=f(27.8)*/
 {38, 0,123,__LINE__, 0x40104f1a, 0xa2d94c2a, 0x403d7fff, 0xfffffffc},	/* 4.07725=f(29.5)*/
 0,};
-test_acoshf(m)   {run_vector_1(m,acoshf_vec,(char *)(acoshf),"acoshf","ff");   }	
+void test_acoshf(m)   {run_vector_1(m,acoshf_vec,(char *)(acoshf),"acoshf","ff");   }	

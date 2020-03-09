@@ -301,4 +301,4 @@
 {32, 0,123,__LINE__, 0x42713b18, 0x40000000, 0x403bcccc, 0xccccccc9},	/* 1.18409e+12=f(27.8)*/
 {31, 0,123,__LINE__, 0x42979487, 0xa0000000, 0x403d7fff, 0xfffffffc},	/* 6.48167e+12=f(29.5)*/
 0,};
-test_expf(m)   {run_vector_1(m,expf_vec,(char *)(expf),"expf","ff");   }	
+void test_expf(m)   {run_vector_1(m,expf_vec,(char *)(expf),"expf","ff");   }	

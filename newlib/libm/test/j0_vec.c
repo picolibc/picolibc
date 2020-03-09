@@ -301,4 +301,4 @@
 {58, 0,123,__LINE__, 0xbfa7617b, 0x541dda57, 0x403bcccc, 0xccccccc9},	/* -0.0456656=f(27.8)*/
 {62, 0,123,__LINE__, 0xbfc10afd, 0x307647cf, 0x403d7fff, 0xfffffffc},	/* -0.133148=f(29.5)*/
 0,};
-test_j0(m)   {run_vector_1(m,j0_vec,(char *)(j0),"j0","dd");   }	
+void test_j0(m)   {run_vector_1(m,j0_vec,(char *)(j0),"j0","dd");   }	

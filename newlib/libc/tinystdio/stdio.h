@@ -849,7 +849,7 @@ extern int	__f_sscanf(const char *__buf, const char *__fmt, ...);
  */
 extern int	fflush(FILE *stream);
 #else
-static __inline__ int fflush(FILE *stream)
+static __inline int fflush(FILE *stream)
 {
 	if (stream->flush)
 		return (stream->flush)(stream);
@@ -945,7 +945,7 @@ extern char *tmpnam (char *s);
 #define fscanf __f_fscanf
 #define sscanf __f_sscanf
 
-static inline uint32_t
+static __inline uint32_t
 __printf_float(float f)
 {
 	union {

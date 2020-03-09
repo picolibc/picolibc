@@ -301,4 +301,4 @@
 {42, 0,123,__LINE__, 0x3ff71ace, 0xb413c934, 0x403bcccc, 0xccccccc9},	/* 1.44404=f(27.8)*/
 {43, 0,123,__LINE__, 0x3ff78464, 0x1719126e, 0x403d7fff, 0xfffffffc},	/* 1.46982=f(29.5)*/
 0,};
-test_log10f(m)   {run_vector_1(m,log10f_vec,(char *)(log10f),"log10f","ff");   }	
+void test_log10f(m)   {run_vector_1(m,log10f_vec,(char *)(log10f),"log10f","ff");   }	

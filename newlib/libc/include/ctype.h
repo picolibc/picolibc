@@ -122,7 +122,7 @@ const char *__locale_ctype_ptr (void);
    an out-of-bounds reference on a 64-bit machine.  */
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wchar-subscripts"
-static inline char __ctype_lookup(char c) {
+static __inline char __ctype_lookup(char c) {
   return ((__CTYPE_PTR+sizeof(""[c]))[(int)(c)]);
 }
 #pragma GCC diagnostic pop
@@ -154,7 +154,7 @@ const char *__locale_ctype_ptr_l (locale_t);
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wchar-subscripts"
-static inline char __ctype_lookup_l(char c, locale_t l) {
+static __inline char __ctype_lookup_l(char c, locale_t l) {
   return ((__locale_ctype_ptr_l(l)+sizeof(""[c]))[(int)(c)]);
 }
 #pragma GCC diagnostic pop

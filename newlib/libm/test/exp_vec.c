@@ -301,4 +301,4 @@
 {60, 0,123,__LINE__, 0x42713b19, 0x1e69fb1e, 0x403bcccc, 0xccccccc9},	/* 1.1841e+12=f(27.8)*/
 {60, 0,123,__LINE__, 0x42979487, 0x9e85b8ea, 0x403d7fff, 0xfffffffc},	/* 6.48167e+12=f(29.5)*/
 0,};
-test_exp(m)   {run_vector_1(m,exp_vec,(char *)(exp),"exp","dd");   }	
+void test_exp(m)   {run_vector_1(m,exp_vec,(char *)(exp),"exp","dd");   }	

@@ -415,4 +415,4 @@
 {36, 0,123,__LINE__, 0x4011423f, 0xc0000000, 0x4033e666, 0x66666690},	/* 4.3147=f(19.9)*/
 {37, 0,123,__LINE__, 0x401145f4, 0xe0000000, 0x4033f333, 0x3333335d},	/* 4.31832=f(19.95)*/
 0,};
-test_log2f(m)   {run_vector_1(m,log2f_vec,(char *)(log2f),"log2f","ff");   }	
+void test_log2f(m)   {run_vector_1(m,log2f_vec,(char *)(log2f),"log2f","ff");   }	

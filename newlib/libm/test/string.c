@@ -19,6 +19,16 @@
 #include <errno.h>
 
 
+/* Suppresses compiler warnings
+ *    As described by items in quotes
+ */
+
+#pragma GCC diagnostic ignored "-Wmemset-transposed-args"
+#pragma GCC diagnostic ignored "-Wstringop-overflow="
+#pragma GCC diagnostic ignored "-Wstringop-truncation"
+#pragma GCC diagnostic ignored "-Warray-bounds"
+
+
 const char *it = "<UNSET>";	/* Routine name for message routines. */
 int  errors = 0;
 
