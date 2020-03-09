@@ -41,7 +41,7 @@ elf="$1"
 shift
 
 case "$elf" in
-    */thumb_v7_m/*) ;;
+    */thumb_v7_m/*|*/thumb_v7_m_nofp/*) ;;
     *)
 	echo "Skipping $elf"
 	exit 77
