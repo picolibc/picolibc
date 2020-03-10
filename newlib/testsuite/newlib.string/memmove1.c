@@ -128,7 +128,7 @@ main (void)
       if (memcmp (to_known, to_test, sizeof (to_known)) != 0)
 	{
 	  errors++;
-	  DEBUGP ("memmove failed non-overlap test for %d bytes\n", i);
+	  DEBUGP ("memmove failed non-overlap test for %lu bytes\n", (unsigned long) i);
 	}
     }
 
@@ -147,9 +147,9 @@ main (void)
 	  if (memcmp (to_known, to_test, sizeof (to_known)) != 0)
 	    {
 	      errors++;
-	      DEBUGP ("memmove failed for %d bytes,"
-		      " with src %d bytes before dest\n",
-		      i, j);
+	      DEBUGP ("memmove failed for %lu bytes,"
+		      " with src %lu bytes before dest\n",
+		      (unsigned long) i, (unsigned long) j);
 	    }
 	}
     }
@@ -169,9 +169,9 @@ main (void)
 	  if (memcmp (to_known, to_test, sizeof (to_known)) != 0)
 	    {
 	      errors++;
-	      DEBUGP ("memmove failed when moving %d bytes,"
-		      " with src %d bytes after dest\n",
-		      i, j);
+	      DEBUGP ("memmove failed when moving %lu bytes,"
+		      " with src %lu bytes after dest\n",
+		      (unsigned long) i, (unsigned long) j);
 	    }
 	}
     }
