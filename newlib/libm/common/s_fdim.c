@@ -49,11 +49,8 @@ ANSI C, POSIX.
 	double y;
 #endif
 {
-  int c = __fpclassifyd(x);
-  if (c == FP_NAN)  return(x);
+  if (__fpclassifyd(x) == FP_NAN)  return(x);
   if (__fpclassifyd(y) == FP_NAN)  return(y);
-  if (c == FP_INFINITE)
-    return HUGE_VAL;
 
   return x > y ? x - y : 0.0;
 }
