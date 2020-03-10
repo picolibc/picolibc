@@ -53,8 +53,6 @@ int errors = 0;
 void
 mymemmove (unsigned char *dest, unsigned char *src, size_t n)
 {
-  size_t i;
-
   if ((src <= dest && src + n <= dest)
       || src >= dest)
     while (n-- > 0)
