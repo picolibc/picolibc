@@ -18,7 +18,7 @@ asm(".def __lrint_internal; .scl 2; .type 32; .endef\n"
     "\tbx lr");
 #endif /* defined(__arm__) || defined(_ARM_) */
 
-long lrint (double x) 
+long lrint (double x)
 {
   long retval = 0L;
 #if defined (__x86_64__) && defined (__CYGWIN__)

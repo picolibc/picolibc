@@ -9,7 +9,7 @@
  * frexpl(long double x, int* expnt) extracts the exponent from x.
  * It returns an integer power of two to expnt and the significand
  * between 0.5 and 1 to y.  Thus  x = y * 2**expn.
- */ 
+ */
 #ifdef __x86_64__
 	.align 8
 #else

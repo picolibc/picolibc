@@ -30,7 +30,7 @@ nexttoward (double x, long double y)
   if (xx == y)
      /* nextafter (0.0, -O.0) should return -0.0.  */
      return y;
-  u.d = x; 
+  u.d = x;
   if (x == 0.0)
     {
       u.ll = 1;
@@ -38,7 +38,7 @@ nexttoward (double x, long double y)
     }
 
   /* Non-extended encodings are lexicographically ordered,
-     with implicit "normal" bit.  */ 
+     with implicit "normal" bit.  */
   if (((x > 0.0) ^ (y > xx)) == 0)
     u.ll++;
   else

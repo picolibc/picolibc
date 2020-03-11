@@ -12,7 +12,7 @@
 #define __restrict__
 
 /* This file is extracted from S L Moshier's  ioldoubl.c,
- * modified for use in MinGW 
+ * modified for use in MinGW
  *
  * Extended precision arithmetic functions for long double I/O.
  * This program has been placed in the public domain.
@@ -32,9 +32,9 @@
  * 6 Oct 02	Modified for MinGW by inlining utility routines,
  *		removing global variables, and splitting out strtold
  *		from _IO_ldtoa and _IO_ldtostr.
- *  
+ *
  *		Danny Smith <dannysmith@users.sourceforge.net>
- * 
+ *
  */
 
 
@@ -160,7 +160,7 @@
 #undef alloca
 #define alloca __builtin_alloca
 
-/* Don't build non-ANSI _IO_ldtoa.  It is not thread safe. */ 
+/* Don't build non-ANSI _IO_ldtoa.  It is not thread safe. */
 #ifndef USE_LDTOA
 #define USE_LDTOA 0
 #endif
@@ -503,7 +503,7 @@ __eiiszero(const short unsigned int * ai)
 
 /* Return nonzero if internal format number is infinite. */
 
-static __inline__ int 
+static __inline__ int
 __eiisinf (const unsigned short *x)
 {
 #ifdef NANS

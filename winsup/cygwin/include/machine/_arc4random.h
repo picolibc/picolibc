@@ -25,4 +25,4 @@ extern int __isthreaded;
 	    __lock_release (_arc4random_mutex);	\
         } while (0)
 
-#endif /* _MACHINE_ARC4RANDOM_H */ 
+#endif /* _MACHINE_ARC4RANDOM_H */

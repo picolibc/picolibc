@@ -1280,4 +1280,4 @@ void __e64toe(short unsigned int *pe, short unsigned int *y)
 		*q++ = *p++;
 }
 
-#endif /* USE_LDTOA */ 
+#endif /* USE_LDTOA */

@@ -14,7 +14,7 @@
    are currently used in building libmingwex.a math components */
 
 /* FIXME: We really should get rid of the code duplication using euther
-   C++ templates or tgmath-type macros.  */  
+   C++ templates or tgmath-type macros.  */
 
 static __inline__ double __fast_sqrt (double x)
 {

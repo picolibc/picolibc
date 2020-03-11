@@ -29,7 +29,7 @@ nexttowardf (float x, long double y)
   if (xx == y )
      /* nextafter (0.0, -O.0) should return -0.0.  */
      return y;
-  u.f = x; 
+  u.f = x;
   if (x == 0.0F)
     {
       u.i = 1;

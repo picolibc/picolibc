@@ -130,7 +130,7 @@ cygpsid::get_id (BOOL search_grp, int *type, cyg_ldap *pldap)
 		  if (pldap->open (cygheap->dom.get_rfc2307_domain ())
 		      == NO_ERROR)
 		    map_gid = pldap->remap_gid (gid);
-		  if (map_gid == ILLEGAL_GID) 
+		  if (map_gid == ILLEGAL_GID)
 		    map_gid = MAP_UNIX_TO_CYGWIN_ID (gid);
 		  cygheap->ugid_cache.add_gid (gid, map_gid);
 		}

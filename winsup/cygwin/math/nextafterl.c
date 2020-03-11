@@ -23,7 +23,7 @@ nextafterl (long double x, long double y)
         unsigned long long mantissa;
         unsigned short expn;
         unsigned short pad;
-      } parts; 
+      } parts;
   } u;
 
   /* The normal bit is explicit for long doubles, unlike
@@ -58,7 +58,7 @@ nextafterl (long double x, long double y)
     }
 
   /* If we have updated the expn of a normal number,
-     or moved from denormal to normal, [re]set the normal bit.  */ 
+     or moved from denormal to normal, [re]set the normal bit.  */
   if (u.parts.expn & 0x7fff)
     u.parts.mantissa |=  normal_bit;
 

@@ -863,15 +863,15 @@ memcpy4to6 (char *dst, const u_int8_t *src)
   memcpy (dst + 12, src, NS_INADDRSZ);
 }
 
-/* gethostby_specials: RFC 6761 
-   Handles numerical addresses and special names for gethostbyname2 */ 
+/* gethostby_specials: RFC 6761
+   Handles numerical addresses and special names for gethostbyname2 */
 static hostent *
 gethostby_specials (const char *name, const int af,
 		    const int addrsize_in, const int addrsize_out)
 {
   int namelen = strlen (name);
   /* Ignore a final '.' */
-  if ((namelen == 0) || ((namelen -= (name[namelen - 1] == '.')) == 0)) 
+  if ((namelen == 0) || ((namelen -= (name[namelen - 1] == '.')) == 0))
     {
       set_errno (EINVAL);
       h_errno = NETDB_INTERNAL;
@@ -919,7 +919,7 @@ gethostby_specials (const char *name, const int af,
       }
     }
   if (res != 1)
-    return NULL;  
+    return NULL;
 
   int const alias_count = 0, address_count = 1;
   char * string_ptr;
@@ -2975,7 +2975,7 @@ cygwin_getaddrinfo (const char *hostname, const char *servname,
   int ret = 0;
 
   /* Windows' getaddrinfo implementations lets all possible values
-     in ai_flags slip through and just ignores unknown values.  So we 
+     in ai_flags slip through and just ignores unknown values.  So we
      check manually here. */
 #define AI_IDN_MASK (AI_IDN | \
 		     AI_CANONIDN | \

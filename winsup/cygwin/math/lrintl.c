@@ -5,7 +5,7 @@
  */
 #include <math.h>
 
-long lrintl (long double x) 
+long lrintl (long double x)
 {
   long retval = 0l;
 #if defined (__x86_64__) && defined (__CYGWIN__)

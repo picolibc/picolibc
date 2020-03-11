@@ -696,12 +696,12 @@ fhandler_base::fstatvfs_by_handle (HANDLE fh, struct statvfs *sfs)
 	}
       else
 	debug_printf ("%y = NtQueryVolumeInformationFile"
-		      "(%S, FileFsSizeInformation)", 
+		      "(%S, FileFsSizeInformation)",
 		      status, pc.get_nt_native_path ());
     }
   else
     debug_printf ("%y = NtQueryVolumeInformationFile"
-		  "(%S, FileFsFullSizeInformation)", 
+		  "(%S, FileFsFullSizeInformation)",
 		  status, pc.get_nt_native_path ());
   return ret;
 }

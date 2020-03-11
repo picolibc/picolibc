@@ -291,7 +291,7 @@ fhandler_socket_wsock::evaluate_events (const long event_mask, long &events,
 	    {
 	      wsock_events->connect_errorcode = evts.iErrorCode[FD_CONNECT_BIT];
 
-	      /* Setting the connect_state and calling the AF_LOCAL handshake 
+	      /* Setting the connect_state and calling the AF_LOCAL handshake
 		 here allows to handle this stuff from a single point.  This
 		 is independent of FD_CONNECT being requested.  Consider a
 		 server calling connect(2) and then immediately poll(2) with
@@ -301,7 +301,7 @@ fhandler_socket_wsock::evaluate_events (const long event_mask, long &events,
 		 Something weird occurs in Winsock: If you fork off and call
 		 recv/send on the duplicated, already connected socket, another
 		 FD_CONNECT event is generated in the child process.  This
-		 would trigger a call to af_local_connect which obviously fail. 
+		 would trigger a call to af_local_connect which obviously fail.
 		 Avoid this by calling set_connect_state only if connect_state
 		 is connect_pending. */
 	      if (connect_state () == connect_pending)

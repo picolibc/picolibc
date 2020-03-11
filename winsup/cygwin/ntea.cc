@@ -21,7 +21,7 @@ details. */
 #define MAX_EA_NAME_LEN    256
 #define MAX_EA_VALUE_LEN 65536
 
-/* At least one maximum sized entry fits. 
+/* At least one maximum sized entry fits.
    CV 2014-04-04: NtQueryEaFile function chokes on buffers bigger than 64K
 		  with STATUS_INVALID_PARAMETER if the handle points to a file
 		  on a remote share, at least on Windows 7 and later.

@@ -612,7 +612,7 @@ internal_getgroups (int gidsetsize, gid_t *grouplist, cyg_ldap *pldap)
 	      goto out;
 	    }
 	}
-      else 
+      else
 	sidp_buf[scnt++] = sid;
     }
   /* If there are non-cached groups left, try to fetch them. */

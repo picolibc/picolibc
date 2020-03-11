@@ -18,7 +18,7 @@ asm(".def __lrintf_internal; .scl 2; .type 32; .endef\n"
     "\tbx lr");
 #endif /* defined(__arm__) || defined(_ARM_) */
 
-long lrintf (float x) 
+long lrintf (float x)
 {
   long retval = 0l;
 #if defined (__x86_64__) && defined (__CYGWIN__)

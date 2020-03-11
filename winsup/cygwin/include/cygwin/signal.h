@@ -246,7 +246,7 @@ typedef struct
 					   signals */
     /* Cygwin internal fields */
 #ifdef __INSIDE_CYGWIN__
-    __extension__ struct 
+    __extension__ struct
     {
       __uint32_t __pad2[__SI_CYG_PAD];	/* Locate at end of struct */
       void *si_cyg;			/* pointer to block containing

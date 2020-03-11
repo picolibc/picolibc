@@ -63,7 +63,7 @@ __MINGW_USYMBOL(remquol):
 	leal (%ecx,%ecx,2),%ecx
         shrl %cl, %eax
         andl $7, %eax
-        movl 4 +12 +12(%esp), %ecx      
+        movl 4 +12 +12(%esp), %ecx
         movl 4 +8(%esp), %edx
         xorl 4 +12 +8(%esp), %edx
         testl $0x8000, %edx

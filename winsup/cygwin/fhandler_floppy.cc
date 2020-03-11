@@ -74,7 +74,7 @@ fhandler_dev_floppy::get_drive_info (struct hd_geometry *geo)
       di = (DISK_GEOMETRY *) dbuf;
     }
   if (dix) /* Don't try IOCTL_DISK_GET_PARTITION_INFO_EX if
-	      IOCTL_DISK_GET_DRIVE_GEOMETRY_EX didn't work. 
+	      IOCTL_DISK_GET_DRIVE_GEOMETRY_EX didn't work.
 	      Probably a floppy.*/
     {
       if (!DeviceIoControl (get_handle (),

@@ -678,7 +678,7 @@ gen_decimalLL:
 	    }
 	}
     }
-  if (Rval < 0)     
+  if (Rval < 0)
     {
       dst = wcpcpy (dst, L", errno ");
       dst = __wrn (dst, 10, false, get_errno (), 0, 0, LMASK);

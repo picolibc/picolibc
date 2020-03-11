@@ -305,9 +305,9 @@ vstrfmon_l(char * __restrict s, size_t maxsize, locale_t loc,
                  *
 		 * = 0 - parentheses enclose the quantity and the
 		 *	 $currency_symbol
-		 * = 1 - the sign string precedes the quantity and the 
+		 * = 1 - the sign string precedes the quantity and the
 		 *       $currency_symbol
-		 * = 2 - the sign string succeeds the quantity and the 
+		 * = 2 - the sign string succeeds the quantity and the
 		 *       $currency_symbol
 		 * = 3 - the sign string precedes the $currency_symbol
 		 * = 4 - the sign string succeeds the $currency_symbol

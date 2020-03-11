@@ -80,7 +80,7 @@ check_iovec (const struct iovec *iov, int iovcnt, bool forwrite)
   return -1;
 }
 
-/* Try hard to schedule another thread.  
+/* Try hard to schedule another thread.
    Remember not to call this in a lock condition or you'll potentially
    suffer starvation.  */
 void
@@ -256,7 +256,7 @@ NT_readline::init (POBJECT_ATTRIBUTES attr, PCHAR in_buf, ULONG in_buflen)
   return true;
 }
 
-PCHAR 
+PCHAR
 NT_readline::gets ()
 {
   IO_STATUS_BLOCK io;

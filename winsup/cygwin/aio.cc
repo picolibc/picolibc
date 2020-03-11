@@ -37,7 +37,7 @@ static NO_COPY volatile LONG    aioinitialized = 0;
  * on completion.  Event arrival causes AIO context for the fd to be updated.
  *
  * A queued AIO is performed in a similar manner, but by an AIO worker thread
- * rather than the calling app's thread.  The queued flavor can also operate 
+ * rather than the calling app's thread.  The queued flavor can also operate
  * on sockets, pipes, non-binary files, mandatory-locked files, and files
  * that don't support pread|pwrite.  Generally all these cases are handled as
  * synchronous read|write operations, but still don't delay the app because

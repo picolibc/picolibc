@@ -24,7 +24,7 @@ virt_ftype_to_dtype (virtual_ftype_t type)
 {
   unsigned char d_type;
 
-  switch (type) 
+  switch (type)
     {
     case virt_directory:
       d_type = DT_DIR;

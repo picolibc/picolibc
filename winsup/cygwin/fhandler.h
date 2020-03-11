@@ -605,7 +605,7 @@ class fhandler_socket: public fhandler_base
   int __reg3 facl (int, int, struct acl *);
   int __reg2 link (const char *);
   off_t lseek (off_t, int)
-  { 
+  {
     set_errno (ESPIPE);
     return -1;
   }
@@ -1709,7 +1709,7 @@ class fhandler_serial: public fhandler_base
   int tcsetattr (int a, const struct termios *t);
   int tcgetattr (struct termios *t);
   off_t lseek (off_t, int)
-  { 
+  {
     set_errno (ESPIPE);
     return -1;
   }

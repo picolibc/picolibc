@@ -531,7 +531,7 @@ pg_ent::enumerate_builtin ()
   arg.sid = &sid;
   char *line = pg.fetch_account_from_windows (arg);
   return pg.add_account_post_fetch (line, false);
-} 
+}
 
 void *
 pg_ent::enumerate_sam ()
@@ -568,7 +568,7 @@ pg_ent::enumerate_sam ()
       while (cnt < max)
 	{
 	  cygsid sid (cygheap->dom.account_sid ());
-	  sid_sub_auth (sid, sid_sub_auth_count (sid)) = 
+	  sid_sub_auth (sid, sid_sub_auth_count (sid)) =
 	    group ? ((PGROUP_INFO_2) buf)[cnt].grpi2_group_id
 		  : ((PUSER_INFO_20) buf)[cnt].usri20_user_id;
 	  ++cnt;

@@ -35,7 +35,7 @@ class cyg_ldap {
 
 public:
   cyg_ldap () : lh (NULL), def_context (NULL), msg (NULL), entry (NULL),
-		val (NULL), isAD (false), srch_id (NULL), 
+		val (NULL), isAD (false), srch_id (NULL),
 		last_fetched_sid (NO_SID)
   {}
   ~cyg_ldap () { close (); }

@@ -106,7 +106,7 @@ quotactl (int cmd, const char *special, int id, caddr_t addr)
       return -1;
     }
   pc.get_object_attr (attr, sec_none_nih);
-  /* For the following functions to work, we must attach the virtual path to 
+  /* For the following functions to work, we must attach the virtual path to
      the quota file to the device path.
 
      FIXME: Note that this is NTFS-specific.  Adding ReFS in another step. */

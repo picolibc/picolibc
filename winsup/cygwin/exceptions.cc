@@ -814,7 +814,7 @@ exception::handle (EXCEPTION_RECORD *e, exception_list *frame, CONTEXT *in,
   /* POSIX requires that for SIGSEGV and SIGBUS, si_addr should be set to the
      address of faulting memory reference.  For SIGILL and SIGFPE these should
      be the address of the faulting instruction.  Other signals are apparently
-     undefined so we just set those to the faulting instruction too.  */ 
+     undefined so we just set those to the faulting instruction too.  */
   si.si_addr = (si.si_signo == SIGSEGV || si.si_signo == SIGBUS)
 	       ? (void *) e->ExceptionInformation[1] : (void *) in->_GR(ip);
   me.incyg++;
