@@ -14,7 +14,7 @@
  * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  */
-/* 
+/*
   Test the library maths functions using trusted precomputed test
   vectors.
 
@@ -57,7 +57,7 @@ void translate_to (FILE *file,
   fprintf(file, "0x%08lx, 0x%08lx", (unsigned long) bits.parts.msw, (unsigned long) bits.parts.lsw);
 }
 
-int 
+int
 ffcheck (double is,
        one_line_type *p,
        char *name,
@@ -67,12 +67,12 @@ ffcheck (double is,
 {
   /* Make sure the answer isn't to far wrong from the correct value */
   __ieee_double_shape_type correct, isbits;
-  int mag;  
+  int mag;
   isbits.value = is;
-  
+
   correct.parts.msw = p->qs[0].msw;
   correct.parts.lsw = p->qs[0].lsw;
-  
+
   int error_bit = p->error_bit;
 
   if (is_float) {
@@ -84,14 +84,14 @@ ffcheck (double is,
   }
 
   mag = mag_of_error(correct.value, is);
-  
+
   if (isnan(correct.value) && isnan(is))
     mag = 64;
 
   if (mag < error_bit)
   {
     inacc ++;
-    
+
     printf("%s:%d, inaccurate answer: bit %d (%08lx%08lx %08lx%08lx) (%g %g)\n",
 	   name,  p->line, mag,
 	   (unsigned long) correct.parts.msw,
@@ -99,21 +99,21 @@ ffcheck (double is,
 	   (unsigned long) isbits.parts.msw,
 	   (unsigned long) isbits.parts.lsw,
 	   correct.value, is);
-  }      
-  
+  }
+
 #if 0
-  if (p->qs[0].merror != merror) 
+  if (p->qs[0].merror != merror)
   {
     /* Beware, matherr doesn't exist anymore.  */
     printf("testing %s_vec.c:%d, matherr wrong: %d %d\n",
 	   name, p->line, merror, p->qs[0].merror);
   }
 
-  if (p->qs[0].errno_val != errno) 
+  if (p->qs[0].errno_val != errno)
   {
     printf("testing %s_vec.c:%d, errno wrong: %d %d\n",
 	   name, p->line, errno, p->qs[0].errno_val);
-    
+
   }
 #endif
   return mag;
@@ -124,7 +124,7 @@ thedouble (uint32_t msw,
 	   uint32_t lsw)
 {
   __ieee_double_shape_type x;
-  
+
   x.parts.msw = msw;
   x.parts.lsw = lsw;
   return x.value;
@@ -147,11 +147,11 @@ frontline (FILE *f,
   if (*args == 'f' && mag > 32)
     mag = 32;
 
-  if (reduce && p->error_bit < mag) 
+  if (reduce && p->error_bit < mag)
   {
     fprintf(f, "{%2d,", p->error_bit);
   }
-  else 
+  else
   {
     fprintf(f, "{%2d,",mag);
   }
@@ -160,26 +160,26 @@ frontline (FILE *f,
   fprintf(f,"%2d,%3d,", merror,my_errno);
   fprintf(f, "__LINE__, ");
 
-  if (calc) 
+  if (calc)
   {
     translate_to(f, result);
   }
-  else 
+  else
   {
     translate_to(f, thedouble(p->qs[0].msw, p->qs[0].lsw));
   }
-  
-  fprintf(f, ", ");      
+
+  fprintf(f, ", ");
 
   fprintf(f,"0x%08lx, 0x%08lx", (unsigned long) p->qs[1].msw, (unsigned long) p->qs[1].lsw);
-  
 
-  if (args[2]) 
+
+  if (args[2])
   {
-    fprintf(f, ", ");      
+    fprintf(f, ", ");
     fprintf(f,"0x%08lx, 0x%08lx", (unsigned long) p->qs[2].msw, (unsigned long) p->qs[2].lsw);
   }
-	
+
   fprintf(f,"},	/* %g=f(%g",result,
   	  thedouble(p->qs[1].msw, p->qs[1].lsw));
 
@@ -187,7 +187,7 @@ frontline (FILE *f,
   {
     fprintf(f,", %g", thedouble(p->qs[2].msw,p->qs[2].lsw));
   }
-  fprintf(f, ")*/\n");      
+  fprintf(f, ")*/\n");
 }
 
 finish (FILE *f,
@@ -199,13 +199,13 @@ finish (FILE *f,
 {
   int mag;
 
-  mag = ffcheck(result, p,name,  merror, errno, args[0] == 'f');    
-  if (vector) 
-  {    
+  mag = ffcheck(result, p,name,  merror, errno, args[0] == 'f');
+  if (vector)
+  {
     frontline(f, mag, p, result, merror, errno, args , name);
   }
-} 
-int redo;  
+}
+int redo;
 
 void
 run_vector_1 (int vector,
@@ -215,8 +215,8 @@ run_vector_1 (int vector,
        char *args)
 {
   FILE *f = NULL;
-  double result;  
-  
+  double result;
+
   if (vector)
   {
 
@@ -230,7 +230,7 @@ run_vector_1 (int vector,
 	double d;
       } d, d4;
 
-      for (k = -.2; k < .2; k+= 0.00132) 
+      for (k = -.2; k < .2; k+= 0.00132)
       {
 	d.d = k;
 	d4.d = k + 4;
@@ -239,7 +239,7 @@ run_vector_1 (int vector,
 
       }
 
-      for (k = -1.2; k < 1.2; k+= 0.01) 
+      for (k = -1.2; k < 1.2; k+= 0.01)
       {
 	d.d = k;
 	d4.d = k + 4;
@@ -247,7 +247,7 @@ run_vector_1 (int vector,
 		(unsigned long) d.a, (unsigned long) d.b, (unsigned long) d4.a, (unsigned long) d4.b);
 
       }
-      for (k = -M_PI *2; k < M_PI *2; k+= M_PI/2) 
+      for (k = -M_PI *2; k < M_PI *2; k+= M_PI/2)
       {
 	d.d = k;
 	d4.d = k + 4;
@@ -256,7 +256,7 @@ run_vector_1 (int vector,
 
       }
 
-      for (k = -30; k < 30; k+= 1.7) 
+      for (k = -30; k < 30; k+= 1.7)
       {
 	d.d = k;
 	d4.d = k + 4;
@@ -268,9 +268,9 @@ run_vector_1 (int vector,
       return;
     }
   }
- 
+
   newfunc(name);
-  while (p->line) 
+  while (p->line)
   {
     double arg1 = thedouble(p->qs[1].msw, p->qs[1].lsw);
     double arg2 = thedouble(p->qs[2].msw, p->qs[2].lsw);
@@ -279,8 +279,8 @@ run_vector_1 (int vector,
     merror = 0;
     mname = 0;
 
-    
-    line(p->line);          
+
+    line(p->line);
 
     merror = 0;
     errno = 123;
@@ -288,74 +288,74 @@ run_vector_1 (int vector,
     if (strcmp(args,"dd")==0)
     {
       typedef double (*pdblfunc) (double);
-      
+
       /* Double function returning a double */
-      
+
       result = ((pdblfunc)(func))(arg1);
-      
-      finish(f,vector, result, p, args, name);       
-    }  
+
+      finish(f,vector, result, p, args, name);
+    }
     else  if (strcmp(args,"ff")==0)
     {
       float arga;
-      
+
       typedef float (*pdblfunc) (float);
-      
+
       /* Double function returning a double */
-      
+
       if (arg1 < FLT_MAX )
       {
-	arga = arg1;      
+	arga = arg1;
 	result = ((pdblfunc)(func))(arga);
-	finish(f, vector, result, p,args, name);       
+	finish(f, vector, result, p,args, name);
       }
-    }      
+    }
     else if (strcmp(args,"ddd")==0)
      {
        typedef double (*pdblfunc) (double,double);
-      
+
        result = ((pdblfunc)(func))(arg1,arg2);
-       finish(f, vector, result, p,args, name);       
-     }  
+       finish(f, vector, result, p,args, name);
+     }
      else  if (strcmp(args,"fff")==0)
      {
        float arga;
        float argb;
-      
-       typedef float (*pdblfunc) (float,float);
-      
 
-       if (arg1 < FLT_MAX && arg2 < FLT_MAX) 
+       typedef float (*pdblfunc) (float,float);
+
+
+       if (arg1 < FLT_MAX && arg2 < FLT_MAX)
        {
-	 arga = arg1;      
+	 arga = arg1;
 	 argb = arg2;
 	 result = ((pdblfunc)(func))(arga, argb);
-	 finish(f, vector, result, p,args, name);       
+	 finish(f, vector, result, p,args, name);
        }
-     }      
+     }
      else if (strcmp(args,"did")==0)
      {
        typedef double (*pdblfunc) (int,double);
-      
+
        result = ((pdblfunc)(func))((int)arg1,arg2);
-       finish(f, vector, result, p,args, name);       
-     }  
+       finish(f, vector, result, p,args, name);
+     }
      else  if (strcmp(args,"fif")==0)
      {
        float arga;
        float argb;
-      
-       typedef float (*pdblfunc) (int,float);
-      
 
-       if (arg1 < FLT_MAX && arg2 < FLT_MAX) 
+       typedef float (*pdblfunc) (int,float);
+
+
+       if (arg1 < FLT_MAX && arg2 < FLT_MAX)
        {
-	 arga = arg1;      
+	 arga = arg1;
 	 argb = arg2;
 	 result = ((pdblfunc)(func))((int)arga, argb);
-	 finish(f, vector, result, p,args, name);       
+	 finish(f, vector, result, p,args, name);
        }
-     }      
+     }
 
     p++;
   }
@@ -454,7 +454,7 @@ float floorf (float a) { return floor(a); }
 
 float fmodf(a,b) float a,b; { return fmod(a,b); }
 float hypotf(a,b) float a,b; { return hypot(a,b); }
-  
+
 float acosf(a) float a; { return acos(a); }
 float acoshf(a) float a; { return acosh(a); }
 float asinf(a) float a; { return asin(a); }
