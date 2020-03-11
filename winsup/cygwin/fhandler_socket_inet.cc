@@ -341,7 +341,7 @@ fhandler_socket_wsock::evaluate_events (const long event_mask, long &events,
 		 socket.  We're trying to workaround this problem here by
 		 taking the connect errorcode from the event and write it back
 		 into the SO_ERROR socket option.
-	         
+
 		 CV 2014-06-16: Call WSASetLastError *after* setsockopt since,
 		 apparently, setsockopt sets the last WSA error code to 0 on
 		 success. */

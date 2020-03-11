@@ -2627,7 +2627,7 @@ suffix_scan::has (const char *in_path, const suffix_info *in_suffixes)
   /* Avoid attaching suffixes if the resulting filename would be invalid.
      For performance reasons we don't check the length of a suffix, since
      we know that all suffixes are 4 chars in length.
-     
+
      FIXME: This is not really correct.  A fully functional test should
             work on wide character paths.  This would probably also speed
 	    up symlink_info::check. */

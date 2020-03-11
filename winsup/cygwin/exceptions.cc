@@ -1455,7 +1455,7 @@ sigpacket::process ()
 	    tls = NULL;
 	}
     }
-      
+
   /* !tls means no threads available to catch a signal. */
   if (!tls)
     {

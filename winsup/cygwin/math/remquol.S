@@ -70,6 +70,6 @@ __MINGW_USYMBOL(remquol):
         jz 1f
         negl %eax
 1:	movl %eax, (%ecx)
-      
+
         ret
 #endif

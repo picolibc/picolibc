@@ -621,7 +621,7 @@ fhandler_dev_floppy::raw_write (const void *ptr, size_t len)
 	}
       return bytes_written;
     }
-  
+
   /* In O_DIRECT case, just write. */
   if (write_file (p, len, &bytes_written, &ret))
     return bytes_written;

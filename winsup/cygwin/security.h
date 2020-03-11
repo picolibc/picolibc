@@ -36,7 +36,7 @@ bool check_token_membership (PSID);
    SIDs of the form S-1-22-x-y, with x == 1 for users and x == 2 for groups,
    and y == UNIX uid/gid.  NFS returns no SIDs at all, but the plain UNIX
    uid/gid values.
-   
+
    UNIX uid/gid values are mapped to Cygwin uid/gid values 0xff000000 +
    unix uid/gid.  This *might* collide with a posix_offset of some trusted
    domain, but it's *very* unlikely.  Define the mapping as macro. */

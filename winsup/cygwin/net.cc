@@ -2857,7 +2857,7 @@ ga_dup (struct addrinfoW *ai, bool v4mapped, int idn_flags, int &err)
 	}
       wcstombs (nai->ai_canonname, canonname, len + 1);
     }
-  
+
   nai->ai_addrlen = v4mapped ? sizeof (struct sockaddr_in6) : ai->ai_addrlen;
   if ((nai->ai_addr = (struct sockaddr *) malloc (v4mapped
 						  ? sizeof (struct sockaddr_in6)

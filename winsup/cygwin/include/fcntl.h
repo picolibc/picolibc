@@ -19,7 +19,7 @@ details. */
    processes interact.  If you have the requirement to interact with native
    Windows applications which use Windows mandatory file locking, your have
    to use mandatory locking as well.  The command
-   
+
    fcntl (fd, F_LCK_MANDATORY, 1)
 
    switches subsequent F_GETLK, F_SETLK, F_SETLKW calls to mandatory locking

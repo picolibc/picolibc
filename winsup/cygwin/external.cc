@@ -656,7 +656,7 @@ cygwin_internal (cygwin_getinfo_types t, ...)
 					 "sshd",
 					 username_buffer,
 					 sizeof username_buffer);
-	     
+
 	     If this call succeeds, sshd expects the correct Cygwin
 	     username of the unprivileged sshd account in username_buffer.
 

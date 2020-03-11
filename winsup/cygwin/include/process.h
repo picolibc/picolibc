@@ -1,6 +1,6 @@
 /* cygwin/process.h.  Define spawn family of functions as provided by Cygwin.
    The original file of this name is a MS/DOS invention.
-   
+
 This file is part of Cygwin.
 
 This software is a copyrighted work licensed under the terms of the

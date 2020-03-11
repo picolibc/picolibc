@@ -1220,7 +1220,7 @@ do_exit (int status)
    a reproducible value which could also be easily evaluated in cygwin_atexit.
    However, when building C++ applications with -fuse-cxa-atexit, G++ creates
    calls to __cxa_atexit using the *address* of __dso_handle as DSO handle.
-   
+
    So what we do here is this:  A call to __cxa_atexit from the application
    actually calls cygwin__cxa_atexit.  From dso_handle (which is either
    &__dso_handle, or __dso_handle == ImageBase or NULL) we fetch the dll
@@ -1265,7 +1265,7 @@ cygwin_atexit (void (*fn) (void))
      Workaround: If dlls.find fails, try to find the dll entry of the DLL
      containing fn.  If that works, proceed by calling __cxa_atexit, otherwise
      call atexit.
-     
+
      This *should* be sufficiently safe.  Ultimately, new applications will
      use the statically linked atexit function though, as outlined above. */
   if (!d)

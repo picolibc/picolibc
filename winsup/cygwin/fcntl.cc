@@ -43,7 +43,7 @@ fcntl64 (int fd, int cmd, ...)
 	 case which is covered here by always reading the arg with
 	 sizeof (intptr_t) == sizeof (long) == sizeof (void*) which matches
 	 all targets.
-	 
+
 	 However, the POSIX standard defines all numerical args as type int.
 	 If we take that literally, we had a (small) problem on 64 bit, since
 	 sizeof (void*) != sizeof (int).  If we would like to follow POSIX more

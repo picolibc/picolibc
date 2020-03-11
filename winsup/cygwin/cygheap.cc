@@ -626,7 +626,7 @@ init_cygheap::add_tls (_cygtls *t)
      still utilizes the thread's _cygtls area, things go awry.
 
      The following methods take this into account:
-     
+
      - The thread mutex is generally only locked under tls_sentry locking.
      - remove_tls, called from _cygtls::remove, locks the mutex before
        removing the threadlist entry and _cygtls::remove then unlocks and

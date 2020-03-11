@@ -246,7 +246,7 @@ fhandler_netdrive::readdir (DIR *dir, dirent *de)
       if (strlen (get_name ()) == 2)
 	{
 	  UNICODE_STRING ss, ds;
-	  
+
 	  tp.u_get (&ds);
 	  RtlInitUnicodeString (&ss, bs);
 	  RtlDowncaseUnicodeString (&ds, &ss, FALSE);

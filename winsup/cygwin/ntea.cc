@@ -26,10 +26,10 @@ details. */
 		  with STATUS_INVALID_PARAMETER if the handle points to a file
 		  on a remote share, at least on Windows 7 and later.
 		  In theory the buffer should have a size of
-		  
+
 		    sizeof (FILE_FULL_EA_INFORMATION) + MAX_EA_NAME_LEN
 		    + MAX_EA_VALUE_LEN
-		  
+
 		  (65804 bytes), but we're opting for simplicity here, and
 		  a 64K buffer has the advantage that we can use a tmp_pathbuf
 		  buffer, rather than having to alloca 64K from stack. */
