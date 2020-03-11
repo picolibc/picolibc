@@ -809,7 +809,7 @@ format_proc_cpuinfo (void *, char *&destbuf)
 					 "cpu MHz\t\t: %d.000\n",
 				 family,
 				 model,
-				 in_buf.s + strspn (in_buf.s, " 	"),
+				 in_buf.s + strspn (in_buf.s, " \t"),
 				 stepping,
 				 microcode,
 				 cpu_mhz);
