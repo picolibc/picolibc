@@ -167,7 +167,7 @@ class fhandler_base
   struct status_flags
   {
     unsigned rbinary		: 1; /* binary read mode */
-    unsigned rbinset	    	: 1; /* binary read mode explicitly set */
+    unsigned rbinset		: 1; /* binary read mode explicitly set */
     unsigned wbinary		: 1; /* binary write mode */
     unsigned wbinset		: 1; /* binary write mode explicitly set */
     unsigned nohandle		: 1; /* No handle associated with fhandler. */

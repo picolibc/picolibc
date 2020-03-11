@@ -97,7 +97,7 @@ extern "C" {
   int cygwin_getaddrinfo (const char *, const char *, const struct addrinfo *,
 			  struct addrinfo **);
   int cygwin_getnameinfo (const struct sockaddr *, socklen_t, char *, size_t,
-  			  char *, size_t, int);
+			  char *, size_t, int);
   struct servent *cygwin_getservbyname (const char *, const char *);
   int cygwin_listen (int, int);
   int cygwin_rresvport_af(int *alport, int family);
@@ -693,7 +693,7 @@ __ivaliduser_sa(FILE *hostf, const struct sockaddr *raddr, socklen_t salen,
 			else	   /* match a user by direct specification */
 				userok = !(strcmp(ruser, user+1));
 			break;
-		case '-': 		/* if we matched a hostname, */
+		case '-':		/* if we matched a hostname, */
 			if (hostok) {   /* check for user field rejections */
 				if (!*(user+1))
 					return(-1);

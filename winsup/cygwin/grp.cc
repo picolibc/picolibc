@@ -153,13 +153,13 @@ internal_getgrfull (fetch_acc_t &full_acc, cyg_ldap *pldap)
      internal_getgrsid_cachedonly. */
   if (cygheap->pg.nss_cygserver_caching ()
       && (ret = cygheap->pg.grp_cache.cygserver.add_group_from_cygserver
-      							(full_acc.sid)))
+							(full_acc.sid)))
     return ret;
   if (cygheap->pg.nss_grp_files ())
     {
       cygheap->pg.grp_cache.file.check_file ();
       if ((ret = cygheap->pg.grp_cache.file.add_group_from_file
-      							(full_acc.sid)))
+							(full_acc.sid)))
 	return ret;
     }
   if (cygheap->pg.nss_grp_db ())

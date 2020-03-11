@@ -308,7 +308,7 @@ normalize_posix_path (const char *src, char *dst, char *&tail)
 		  if (check_parent)
 		    {
 		      if (tail > dst_start) /* Don't check for / or // dir. */
-		      	{
+			{
 			  *tail = 0;
 			  debug_printf ("checking %s before '..'", dst);
 			  /* In conjunction with native and NFS symlinks,
@@ -2311,7 +2311,7 @@ symlink_info::check_sysfile (HANDLE h)
 	  if (status != STATUS_END_OF_FILE)
 	    set_error (EIO);
 	}
-      else if (*(PWCHAR) srcbuf == 0xfeff 	/* BOM */
+      else if (*(PWCHAR) srcbuf == 0xfeff	/* BOM */
 	       || interix_symlink)
 	{
 	  /* Add trailing 0 to Interix symlink target.  Skip BOM in Cygwin
@@ -2383,7 +2383,7 @@ check_reparse_point_target (HANDLE h, bool remote, PREPARSE_DATA_BUFFER rp,
   if (status == STATUS_PENDING)
     {
       while (io.Status == (NTSTATUS) 0xffffffff)
-      	Sleep (1L);
+	Sleep (1L);
       status = io.Status;
     }
   if (!NT_SUCCESS (status))
@@ -3890,7 +3890,7 @@ cygwin_conv_path_list (cygwin_conv_path_t what, const void *from, void *to,
       ret = conv_path_list ((const char *) from, (char *) to, size, what);
       /* Free winp buffer in case of CCP_WIN_W_TO_POSIX. */
       if (winp)
-      	free (winp);
+	free (winp);
       /* Convert to WCHAR in case of CCP_POSIX_TO_WIN_W. */
       if (orig_to)
 	sys_mbstowcs ((wchar_t *) orig_to, size / sizeof (WCHAR),
@@ -4202,7 +4202,7 @@ find_fast_cwd_pointer ()
   if (lock)
     {
       /* The lock instruction tweaks the LockCount member, which is not at
-      	 the start of the PRTL_CRITICAL_SECTION structure.  So we have to
+	 the start of the PRTL_CRITICAL_SECTION structure.  So we have to
 	 subtract the offset of LockCount to get the real address. */
       PRTL_CRITICAL_SECTION lockaddr =
         (PRTL_CRITICAL_SECTION) (lock + 9 + peek32 (lock + 4)
@@ -4300,7 +4300,7 @@ find_fast_cwd_pointer ()
   if (movedi[0] == 0x8b && movedi[1] == 0xff)	/* mov %edi,%edi -> W8 */
     {
       /* Windows 8 does not call RtlEnterCriticalSection.  The code manipulates
-      	 the FastPebLock manually, probably because RtlEnterCriticalSection has
+	 the FastPebLock manually, probably because RtlEnterCriticalSection has
 	 been converted to an inline function.
 
 	 Next we search for a `mov some address,%eax'.  This address points

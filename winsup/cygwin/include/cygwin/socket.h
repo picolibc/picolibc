@@ -114,7 +114,7 @@ struct OLD_msghdr
   struct iovec *	msg_iov;	/* Data blocks			*/
   int			msg_iovlen;	/* Number of blocks		*/
   void *		msg_accrights;	/* Per protocol magic		*/
-  					/* (eg BSD descriptor passing)	*/
+					/* (eg BSD descriptor passing)	*/
   int			msg_accrightslen; /* Length of rights list	*/
 };
 #endif

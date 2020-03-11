@@ -1842,7 +1842,7 @@ computematchjumps(struct parse *p, struct re_guts *g)
                         suffix++;
                 }
 		if (suffix < g->mlen)
-                	ssuffix = pmatches[ssuffix];
+			ssuffix = pmatches[ssuffix];
         }
 
 	free(pmatches);

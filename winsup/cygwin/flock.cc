@@ -801,7 +801,7 @@ lockf_t::create_lock_obj ()
 
       pinfo p (myself->ppid);
       if (!p)	/* No access or not a Cygwin parent. */
-      	return;
+	return;
 
       parent_proc = OpenProcess (PROCESS_DUP_HANDLE
 				 | PROCESS_CREATE_THREAD
@@ -1025,7 +1025,7 @@ fhandler_base::lock (int a_op, struct flock *fl)
 
     case SEEK_END:
       if (get_device () != FH_FS)
-      	start = 0;
+	start = 0;
       else
 	{
 	  NTSTATUS status;
@@ -2015,7 +2015,7 @@ fhandler_disk_file::mand_lock (int a_op, struct flock *fl)
 	      if (CancelSynchronousIo (thr->thread_handle ()))
 		thr->detach ();
 	      else
-	      	thr->terminate_thread ();
+		thr->terminate_thread ();
 	      if (NT_SUCCESS (lp.status))
 		NtUnlockFile (get_handle (), &io, &offset, &length, 0);
 	      /* Per SUSv4: If a signal is received while fcntl is waiting,

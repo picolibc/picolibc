@@ -1420,7 +1420,7 @@ __set_charset_from_locale (const char *locale, char *charset)
       break;
     case 1258:
     default:
-      if (lcid == 0x3c09 		/* en_HK (English/Hong Kong) */
+      if (lcid == 0x3c09		/* en_HK (English/Hong Kong) */
 	  || lcid == 0x200c		/* fr_RE (French/Réunion) */
 	  || lcid == 0x240c		/* fr_CD (French/Congo) */
 	  || lcid == 0x280c		/* fr_SN (French/Senegal) */
@@ -1431,9 +1431,9 @@ __set_charset_from_locale (const char *locale, char *charset)
 	  || lcid == 0x3c0c		/* fr_HT (French/Haiti) */
 	  || lcid == 0x0477		/* so_SO (Somali/Somali) */
 	  || lcid == 0x0430)		/* st_ZA (Sotho/South Africa) */
-      	cs = "ISO-8859-1";
+	cs = "ISO-8859-1";
       else if (lcid == 0x818)		/* ro_MD (Romanian/Moldovia) */
-      	cs = "ISO-8859-2";
+	cs = "ISO-8859-2";
       else if (lcid == 0x043a)		/* mt_MT (Maltese/Malta) */
 	cs = "ISO-8859-3";
       else if (lcid == 0x0481)		/* mi_NZ (Maori/New Zealand) */

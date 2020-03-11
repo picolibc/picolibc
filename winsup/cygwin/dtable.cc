@@ -401,7 +401,7 @@ dtable::init_std_file_from_handle (int fd, HANDLE handle)
       int openflags = O_BINARY;
 
       /* Console windows are no kernel objects up to Windows 7/2008R2, so the
-      	 access mask returned by NtQueryInformationFile is meaningless.  CMD
+	 access mask returned by NtQueryInformationFile is meaningless.  CMD
 	 always hands down stdin handles as R/O handles, but our tty slave
 	 sides are R/W. */
       if (fh->is_tty ())

@@ -1718,13 +1718,13 @@ gen_old_if_name (char *name, PIP_ADAPTER_ADDRESSES pap, DWORD idx)
 	prefix = "ppp";
 	break;
       case IF_TYPE_SOFTWARE_LOOPBACK:
-      	prefix = "lo";
+	prefix = "lo";
 	break;
       case IF_TYPE_ATM:
-      	prefix = "atm";
+	prefix = "atm";
 	break;
       case IF_TYPE_IEEE80211:
-      	prefix = "wlan";
+	prefix = "wlan";
 	break;
       case IF_TYPE_SLIP:
       case IF_TYPE_RS232:
@@ -1732,7 +1732,7 @@ gen_old_if_name (char *name, PIP_ADAPTER_ADDRESSES pap, DWORD idx)
 	prefix = "slp";
 	break;
       case IF_TYPE_TUNNEL:
-      	prefix = "tun";
+	prefix = "tun";
 	break;
       default:
 	prefix = "eth";

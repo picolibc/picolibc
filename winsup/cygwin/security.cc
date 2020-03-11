@@ -410,7 +410,7 @@ create_object_sd_from_attribute (uid_t uid, gid_t gid, mode_t attribute,
 				 security_descriptor &sd)
 {
   return set_posix_access (attribute, uid, gid, NULL, 0, sd, false)
-  	 ? 0 : -1;
+	 ? 0 : -1;
 }
 
 int

@@ -29,7 +29,7 @@ private:
       fetch_user_arg_type_t type;
       union
       {
-      	BYTE sid[40];
+	BYTE sid[40];
 	char name[UNLEN + 1];
 	uint32_t id;
       } arg;

@@ -1401,7 +1401,7 @@ get_process_state (DWORD dwProcessId)
       n <<= 1;
       PSYSTEM_PROCESS_INFORMATION new_p = (PSYSTEM_PROCESS_INFORMATION) realloc (p, n);
       if (!new_p)
-      	goto out;
+	goto out;
       p = new_p;
     }
   if (!NT_SUCCESS (status))

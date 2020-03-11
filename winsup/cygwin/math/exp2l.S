@@ -24,15 +24,15 @@ __MINGW_USYMBOL(exp2l):
 	cmpb	$0x05, %dh
 	je	1f			/* Is +-Inf, jump.  */
 	fld	%st
-  	subq $8, %rsp /* int(x) */
-    	fnstcw 4(%rsp)
-    	movzwl 4(%rsp), %eax
-    	orb $12, %ah
-    	movw %ax, (%rsp)
-    	fldcw (%rsp)
-    	frndint
-    	fldcw 4(%rsp)
-    	addq $8, %rsp
+	subq $8, %rsp /* int(x) */
+	fnstcw 4(%rsp)
+	movzwl 4(%rsp), %eax
+	orb $12, %ah
+	movw %ax, (%rsp)
+	fldcw (%rsp)
+	frndint
+	fldcw 4(%rsp)
+	addq $8, %rsp
 	fsubr	%st,%st(1)		/* fract(x) */
 	fxch
 	f2xm1				/* 2^(fract(x)) - 1 */

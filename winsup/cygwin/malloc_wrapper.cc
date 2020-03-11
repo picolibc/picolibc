@@ -74,7 +74,7 @@ realloc (void *p, size_t size)
       __malloc_unlock ();
     }
   malloc_printf ("(%p, %ld) = %p, called by %p", p, size, res,
-  						 caller_return_address ());
+						 caller_return_address ());
   return res;
 }
 

@@ -15,7 +15,7 @@
 .globl __MINGW_USYMBOL(remquol)
 __MINGW_USYMBOL(remquol):
 #ifdef __x86_64__
- 	pushq	%rcx
+	pushq	%rcx
         fldt (%r8)
         fldt (%rdx)
 1:	fprem1

@@ -138,7 +138,7 @@ struct external_scnhdr {
  */
 struct external_lineno {
   union {
-    uint32_t l_symndx; 		/* function name symbol index, iff l_lnno 0 */
+    uint32_t l_symndx;		/* function name symbol index, iff l_lnno 0 */
     uint32_t l_paddr;		/* (physical) address of line number	*/
   } l_addr;
   uint16_t l_lnno;	/* line number		*/

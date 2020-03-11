@@ -442,9 +442,9 @@ pthread_wrapper (PVOID arg)
 	   movq  16(%%rbx), %%rcx	# Load stackaddr into rcx	\n\
 	   movq  24(%%rbx), %%rsp	# Load stackbase into rsp	\n\
 	   subq  %[CYGTLS], %%rsp	# Subtract CYGTLS_PADSIZE	\n\
-	   				# (here we are 16 bytes aligned)\n\
+					# (here we are 16 bytes aligned)\n\
 	   subq  $32, %%rsp		# Subtract another 32 bytes	\n\
-	   				# (shadow space for arg regs)	\n\
+					# (shadow space for arg regs)	\n\
 	   xorq  %%rbp, %%rbp		# Set rbp to 0			\n\
 	   # We moved to the new stack.					\n\
 	   # Now it's safe to release the OS stack.			\n\

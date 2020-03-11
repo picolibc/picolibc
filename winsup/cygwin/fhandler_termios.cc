@@ -438,7 +438,7 @@ fhandler_termios::line_edit (const char *rptr, size_t nread, termios& ti,
       if (ti.c_lflag & ECHO)
 	doecho (&c, 1);
       /* Write in chunks of 32 bytes to reduce the number of WriteFile calls
-      	in non-canonical mode. */
+	in non-canonical mode. */
       if ((!iscanon && ralen () >= 32) || input_done)
 	{
 	  int status = accept_input ();

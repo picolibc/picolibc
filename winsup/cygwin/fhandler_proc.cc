@@ -74,7 +74,7 @@ static const virt_tab_t proc_tab[] = {
   { _VN ("sysvipc"),	 FH_PROCSYSVIPC,	virt_directory,	NULL },
   { _VN ("uptime"),	 FH_PROC,	virt_file,	format_proc_uptime },
   { _VN ("version"),	 FH_PROC,	virt_file,	format_proc_version },
-  { NULL, 0,	   	 FH_NADA,	virt_none,	NULL }
+  { NULL, 0,		 FH_NADA,	virt_none,	NULL }
 };
 
 #define PROC_DIR_COUNT 4

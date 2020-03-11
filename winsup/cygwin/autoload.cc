@@ -219,7 +219,7 @@ dll_func_load:								\n\
 	jmp	noload		# Issue an error or return		\n\
 gotit:									\n\
 	addq	$40,%rsp	# Revert stack				\n\
-	pop 	%r10		# Pointer to 'return address'		\n\
+	pop	%r10		# Pointer to 'return address'		\n\
 	movq	%rax,12(%r10)	# Move absolute address to address slot	\n\
 	subq	$25,%r10	# Point to jmp				\n\
 	pop	%rcx		# Restore arg registers			\n\

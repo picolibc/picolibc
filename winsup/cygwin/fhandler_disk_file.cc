@@ -827,7 +827,7 @@ fhandler_disk_file::fchmod (mode_t mode)
       HANDLE fh;
 
       if (NT_SUCCESS (NtOpenFile (&fh, FILE_WRITE_ATTRIBUTES,
-      				  pc.init_reopen_attr (attr, get_handle ()),
+				  pc.init_reopen_attr (attr, get_handle ()),
 				  &io, FILE_SHARE_VALID_FLAGS,
 				  FILE_OPEN_FOR_BACKUP_INTENT)))
 	{

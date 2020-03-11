@@ -362,7 +362,7 @@ struct sigaction
 {
   __extension__ union
   {
-    _sig_func_ptr sa_handler;  		/* SIG_DFL, SIG_IGN, or pointer to a function */
+    _sig_func_ptr sa_handler;		/* SIG_DFL, SIG_IGN, or pointer to a function */
 #if __POSIX_VISIBLE >= 199309
     void  (*sa_sigaction) ( int, siginfo_t *, void * );
 #endif
@@ -371,12 +371,12 @@ struct sigaction
   int sa_flags;
 };
 
-#define SA_NOCLDSTOP 1   		/* Do not generate SIGCHLD when children
+#define SA_NOCLDSTOP 1			/* Do not generate SIGCHLD when children
 					   stop */
-#define SA_SIGINFO   2   		/* Invoke the signal catching function
+#define SA_SIGINFO   2			/* Invoke the signal catching function
 					   with three arguments instead of one
 					 */
-#define SA_RESTART   0x10000000 	/* Restart syscall on signal return */
+#define SA_RESTART   0x10000000		/* Restart syscall on signal return */
 #define SA_ONSTACK   0x20000000		/* Call signal handler on alternate
 					   signal stack provided by
 					   sigaltstack(2). */

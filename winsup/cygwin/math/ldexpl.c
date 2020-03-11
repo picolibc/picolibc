@@ -13,7 +13,7 @@ long double ldexpl(long double x, int expn)
     return x;
 
   __asm__ __volatile__ ("fscale"
-  	    : "=t" (res)
+	    : "=t" (res)
 	    : "0" (x), "u" ((long double) expn));
 
   if (!isfinite (res) || res == 0.0L)

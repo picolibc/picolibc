@@ -444,7 +444,7 @@ pg_ent::endent (bool _group)
       if (state == from_file)
 	free (buf);
       else if (state == from_local || state == from_sam)
-      	NetApiBufferFree (buf);
+	NetApiBufferFree (buf);
       buf = NULL;
     }
   if (!pg.curr_lines)

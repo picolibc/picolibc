@@ -1340,7 +1340,7 @@ tzparse(timezone_t sp, const char *name, const int lastditch)
 			for (year = EPOCH_YEAR;
 			    sp->timecnt + 2 <= TZ_MAX_TIMES;
 			    ++year) {
-			    	time_t	newfirst;
+				time_t	newfirst;
 
 				starttime = transtime(janfirst, year, &start,
 					stdoffset);

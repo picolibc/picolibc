@@ -123,7 +123,7 @@ quotactl (int cmd, const char *special, int id, caddr_t addr)
       case Q_SYNC:
 	/* No sync, just report success. */
 	status = STATUS_SUCCESS;
-      	break;
+	break;
       case Q_QUOTAON:
       case Q_QUOTAOFF:
 	/* Ignore filename in addr. */
@@ -141,7 +141,7 @@ quotactl (int cmd, const char *special, int id, caddr_t addr)
 					     FileFsControlInformation);
 	break;
       case Q_GETFMT:
-      	__try
+	__try
 	  {
 	    uint32_t *retval = (uint32_t *) addr;
 
@@ -176,7 +176,7 @@ quotactl (int cmd, const char *special, int id, caddr_t addr)
       case Q_SETINFO:
 	/* No settings possible, just report success. */
 	status = STATUS_SUCCESS;
-      	break;
+	break;
       case Q_GETQUOTA:
 	/* Windows feature: Default limits.  Get or set them with id == -1. */
 	if (id == -1)

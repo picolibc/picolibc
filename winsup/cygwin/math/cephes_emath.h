@@ -30,7 +30,7 @@
  * Author:  S. L. Moshier.
  *
  * 6 Oct 02	Modified for MinGW by inlining utility routines,
- * 		removing global variables, and splitting out strtold
+ *		removing global variables, and splitting out strtold
  *		from _IO_ldtoa and _IO_ldtostr.
  *  
  *		Danny Smith <dannysmith@users.sourceforge.net>
@@ -81,8 +81,8 @@
  *	__ediv( a, b, c )		c = b / a
  *	__efloor( a, b )		truncate to integer, toward -infinity
  *	__efrexp( a, exp, s )		extract exponent and significand
- *	__eifrac( e, &l, frac )   	e to long integer and e type fraction
- *	__euifrac( e, &l, frac )  	e to unsigned long integer and e type fraction
+ *	__eifrac( e, &l, frac )	e to long integer and e type fraction
+ *	__euifrac( e, &l, frac )	e to unsigned long integer and e type fraction
  *	__einfin( e )			set e to infinity, leaving its sign alone
  *	__eldexp( a, n, b )		multiply by 2**n
  *	__emov( a, b )			b = a
@@ -97,10 +97,10 @@
  *	__etoe24( e, &f )		convert e type to IEEE single precision
  *	__etoe53( e, &d )		convert e type to IEEE double precision
  *	__etoe64( e, &d )		convert e type to IEEE long double precision
- *	__eisneg( e )             	1 if sign bit of e != 0, else 0
- *	__eisinf( e )             	1 if e has maximum exponent (non-IEEE)
+ *	__eisneg( e )			1 if sign bit of e != 0, else 0
+ *	__eisinf( e )			1 if e has maximum exponent (non-IEEE)
  *					or is infinite (IEEE)
- *	__eisnan( e )             	1 if e is a NaN
+ *	__eisnan( e )			1 if e is a NaN
  *	__esqrt( a, b )			b = square root of a
  *
  *

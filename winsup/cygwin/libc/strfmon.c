@@ -66,7 +66,7 @@ __FBSDID("$FreeBSD$");
 
 /* internal macros */
 #define PRINT(CH) do {						\
-	if (dst >= s + maxsize) 				\
+	if (dst >= s + maxsize)					\
 		goto e2big_error;				\
 	*dst++ = CH;						\
 } while (0)
@@ -111,9 +111,9 @@ static ssize_t
 vstrfmon_l(char * __restrict s, size_t maxsize, locale_t loc,
 		const char * __restrict format, va_list ap)
 {
-	char 		*dst;		/* output destination pointer */
-	const char 	*fmt;		/* current format poistion pointer */
-	struct lconv 	*lc;		/* pointer to lconv structure */
+	char		*dst;		/* output destination pointer */
+	const char	*fmt;		/* current format poistion pointer */
+	struct lconv	*lc;		/* pointer to lconv structure */
 	char		*asciivalue;	/* formatted double pointer */
 
 	int		flags;		/* formatting options */
