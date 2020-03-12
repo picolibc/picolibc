@@ -68,6 +68,16 @@ fhandler_serial::raw_read (void *ptr, size_t& ulen)
 	goto err;
       else if (ev)
 	termios_printf ("error detected %x", ev);
+      else if (is_nonblocking ())
+	{
+	  if (!st.cbInQue)
+	    {
+	      tot = -1;
+	      set_errno (EAGAIN);
+	      goto out;
+	    }
+	  inq = st.cbInQue;
+	}
       else if (st.cbInQue && !vtime_)
 	inq = st.cbInQue;
       else if (!is_nonblocking () && !overlapped_armed)
