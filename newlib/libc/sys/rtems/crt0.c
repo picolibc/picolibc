@@ -13,6 +13,7 @@
 #include <sys/lock.h>
 #include <sys/stat.h>
 #include <sys/uio.h>
+#include <assert.h>
 #include <reent.h>
 #include <signal.h>
 #include <stdlib.h>
@@ -194,7 +195,7 @@ RTEMS_STUB(void *, _malloc_r(struct _reent * r, size_t s), { return 0; })
 RTEMS_STUB(void, _free_r(struct _reent *r, void *p), { })
 
 /* stubs for functions required by libc/stdlib */
-RTEMS_STUB(void, __assert_func(const char *file, int line, const char *failedexpr), { })
+RTEMS_STUB(void, __assert_func(const char *file, int line, const char *func, const char *failedexpr), { })
 
 #if defined(__arm__)
 RTEMS_STUB(void, __aeabi_read_tp(void), { })
