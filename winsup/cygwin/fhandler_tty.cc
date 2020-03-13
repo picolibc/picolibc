@@ -706,8 +706,15 @@ fhandler_pty_slave::fhandler_pty_slave (int unit)
 fhandler_pty_slave::~fhandler_pty_slave ()
 {
   if (!get_ttyp ())
-    /* Why comes here? Who clears _tc? */
-    return;
+    {
+      /* Why comes here? Who clears _tc? */
+      if (freeconsole_on_close)
+	{
+	  FreeConsole ();
+	  pcon_attached_to = -1;
+	}
+      return;
+    }
   if (get_pseudo_console ())
     {
       int used = 0;
