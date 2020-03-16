@@ -1284,10 +1284,10 @@ enum
 
 struct fifo_client_handler
 {
-  fhandler_base *fh;
+  HANDLE h;
   fifo_client_connect_state state;
-  fifo_client_handler () : fh (NULL), state (fc_unknown) {}
-  int close ();
+  fifo_client_handler () : h (NULL), state (fc_unknown) {}
+  void close () { NtClose (h); }
 /* Returns FILE_PIPE_DISCONNECTED_STATE, FILE_PIPE_LISTENING_STATE,
    FILE_PIPE_CONNECTED_STATE, FILE_PIPE_CLOSING_STATE,
    FILE_PIPE_INPUT_AVAILABLE_STATE, or -1 on error. */
@@ -1312,7 +1312,7 @@ class fhandler_fifo: public fhandler_base
   HANDLE create_pipe_instance (bool);
   NTSTATUS open_pipe (HANDLE&);
   int add_client_handler ();
-  int delete_client_handler (int);
+  void delete_client_handler (int);
   bool listen_client ();
   int stop_listen_client ();
   int check_listen_client_thread ();
@@ -1321,8 +1321,7 @@ public:
   fhandler_fifo ();
   bool hit_eof ();
   int get_nhandlers () const { return nhandlers; }
-  HANDLE get_fc_handle (int i) const
-  { return fc_handler[i].fh->get_handle (); }
+  HANDLE get_fc_handle (int i) const { return fc_handler[i].h; }
   bool is_connected (int i) const
   { return fc_handler[i].state == fc_connected; }
   PUNICODE_STRING get_pipe_name ();
@@ -1345,12 +1344,6 @@ public:
   void fixup_after_fork (HANDLE);
   void fixup_after_exec ();
   int __reg2 fstatvfs (struct statvfs *buf);
-  void clear_readahead ()
-  {
-    fhandler_base::clear_readahead ();
-    for (int i = 0; i < nhandlers; i++)
-      fc_handler[i].fh->clear_readahead ();
-  }
   select_record *select_read (select_stuff *);
   select_record *select_write (select_stuff *);
   select_record *select_except (select_stuff *);
@@ -1374,8 +1367,6 @@ public:
     /* fhf->pipe_name_buf is a *copy* of this->pipe_name_buf, but
        fhf->pipe_name.Buffer == this->pipe_name_buf. */
     fhf->pipe_name.Buffer = fhf->pipe_name_buf;
-    for (int i = 0; i < nhandlers; i++)
-      fhf->fc_handler[i].fh = fc_handler[i].fh->clone ();
     return fhf;
   }
 };

@@ -252,7 +252,6 @@ fhandler_fifo::add_client_handler ()
 {
   int ret = -1;
   fifo_client_handler fc;
-  fhandler_base *fh;
   HANDLE ph = NULL;
   bool first = (nhandlers == 0);
 
@@ -261,40 +260,26 @@ fhandler_fifo::add_client_handler ()
       set_errno (EMFILE);
       goto out;
     }
-  if (!(fh = build_fh_dev (dev ())))
-    {
-      set_errno (EMFILE);
-      goto out;
-    }
   ph = create_pipe_instance (first);
   if (!ph)
-    {
-      delete fh;
-      goto out;
-    }
+    goto out;
   else
     {
-      fh->set_handle (ph);
-      fh->set_flags ((openflags & ~O_ACCMODE) | O_RDONLY);
-      fh->set_nonblocking (false);
       ret = 0;
-      fc.fh = fh;
-      fifo_client_lock ();
+      fc.h = ph;
       fc_handler[nhandlers++] = fc;
-      fifo_client_unlock ();
     }
 out:
   return ret;
 }
 
-int
+void
 fhandler_fifo::delete_client_handler (int i)
 {
-  int ret = fc_handler[i].close ();
+  fc_handler[i].close ();
   if (i < --nhandlers)
     memmove (fc_handler + i, fc_handler + i + 1,
 	     (nhandlers - i) * sizeof (fc_handler[i]));
-  return ret;
 }
 
 /* Just hop to the listen_client_thread method. */
@@ -331,8 +316,7 @@ fhandler_fifo::record_connection (fifo_client_handler& fc)
   SetEvent (write_ready);
   fc.state = fc_connected;
   nconnected++;
-  fc.fh->set_nonblocking (true);
-  set_pipe_non_blocking (fc.fh->get_handle (), true);
+  set_pipe_non_blocking (fc.h, true);
 }
 
 DWORD
@@ -355,13 +339,7 @@ fhandler_fifo::listen_client_thread ()
       while (i < nhandlers)
 	{
 	  if (fc_handler[i].state == fc_invalid)
-	    {
-	      if (delete_client_handler (i) < 0)
-		{
-		  fifo_client_unlock ();
-		  goto out;
-		}
-	    }
+	    delete_client_handler (i);
 	  else
 	    i++;
 	}
@@ -383,7 +361,7 @@ fhandler_fifo::listen_client_thread ()
       NTSTATUS status;
       IO_STATUS_BLOCK io;
 
-      status = NtFsControlFile (fc.fh->get_handle (), evt, NULL, NULL, &io,
+      status = NtFsControlFile (fc.h, evt, NULL, NULL, &io,
 				FSCTL_PIPE_LISTEN, NULL, 0, NULL, 0);
       if (status == STATUS_PENDING)
 	{
@@ -424,8 +402,7 @@ fhandler_fifo::listen_client_thread ()
 	      && (NT_SUCCESS (io.Status) || io.Status == STATUS_PIPE_CONNECTED))
 	    {
 	      debug_printf ("successfully connected bogus client");
-	      if (delete_client_handler (nhandlers - 1) < 0)
-		ret = -1;
+	      delete_client_handler (nhandlers - 1);
 	    }
 	  else if ((ps = fc.pipe_state ()) == FILE_PIPE_CONNECTED_STATE
 		   || ps == FILE_PIPE_INPUT_AVAILABLE_STATE)
@@ -949,26 +926,13 @@ fhandler_fifo::fstatvfs (struct statvfs *sfs)
 }
 
 int
-fifo_client_handler::close ()
-{
-  int res = 0;
-
-  if (fh)
-    {
-      res = fh->fhandler_base::close ();
-      delete fh;
-    }
-  return res;
-}
-
-int
 fifo_client_handler::pipe_state ()
 {
   IO_STATUS_BLOCK io;
   FILE_PIPE_LOCAL_INFORMATION fpli;
   NTSTATUS status;
 
-  status = NtQueryInformationFile (fh->get_handle (), &io, &fpli,
+  status = NtQueryInformationFile (h, &io, &fpli,
 				   sizeof (fpli), FilePipeLocalInformation);
   if (!NT_SUCCESS (status))
     {
@@ -1022,8 +986,7 @@ fhandler_fifo::close ()
     NtClose (write_ready);
   fifo_client_lock ();
   for (int i = 0; i < nhandlers; i++)
-    if (fc_handler[i].close () < 0)
-      ret = -1;
+    fc_handler[i].close ();
   fifo_client_unlock ();
   return fhandler_base::close () || ret;
 }
@@ -1078,9 +1041,9 @@ fhandler_fifo::dup (fhandler_base *child, int flags)
   fifo_client_lock ();
   for (int i = 0; i < nhandlers; i++)
     {
-      if (!DuplicateHandle (GetCurrentProcess (), fc_handler[i].fh->get_handle (),
+      if (!DuplicateHandle (GetCurrentProcess (), fc_handler[i].h,
 			    GetCurrentProcess (),
-			    &fhf->fc_handler[i].fh->get_handle (),
+			    &fhf->fc_handler[i].h,
 			    0, true, DUPLICATE_SAME_ACCESS))
 	{
 	  fifo_client_unlock ();
@@ -1114,7 +1077,7 @@ fhandler_fifo::fixup_after_fork (HANDLE parent)
   fork_fixup (parent, write_ready, "write_ready");
   fifo_client_lock ();
   for (int i = 0; i < nhandlers; i++)
-    fc_handler[i].fh->fhandler_base::fixup_after_fork (parent);
+  fork_fixup (parent, fc_handler[i].h, "fc_handler[].h");
   fifo_client_unlock ();
   if (reader && !listen_client ())
     debug_printf ("failed to start lct, %E");
@@ -1136,6 +1099,6 @@ fhandler_fifo::set_close_on_exec (bool val)
   set_no_inheritance (write_ready, val);
   fifo_client_lock ();
   for (int i = 0; i < nhandlers; i++)
-    fc_handler[i].fh->fhandler_base::set_close_on_exec (val);
+    set_no_inheritance (fc_handler[i].h, val);
   fifo_client_unlock ();
 }
