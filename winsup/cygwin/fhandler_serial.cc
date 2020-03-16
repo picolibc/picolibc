@@ -135,7 +135,7 @@ fhandler_serial::raw_read (void *ptr, size_t& ulen)
 	     PurgeComm apparently discards in-flight bytes while CancelIo
 	     only stops the overlapped IO routine. */
 	  CancelIo (get_handle ());
-	  if (GetOverlappedResult (get_handle (), &io_status, &n, FALSE))
+	  if (GetOverlappedResult (get_handle (), &io_status, &n, TRUE))
 	    tot = n;
 	  else if (GetLastError () != ERROR_OPERATION_ABORTED)
 	    goto err;
