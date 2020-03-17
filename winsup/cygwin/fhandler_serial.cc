@@ -41,12 +41,21 @@ fhandler_serial::overlapped_setup ()
 void __reg3
 fhandler_serial::raw_read (void *ptr, size_t& ulen)
 {
-  int tot;
-  DWORD n;
+  DWORD io_err, event;
+  COMSTAT st;
+  DWORD bytes_to_read, read_bytes, undefined;
+  ssize_t tot = 0;
 
-  size_t minchars = vmin_ ? MIN (vmin_, ulen) : ulen;
+  if (ulen > SSIZE_MAX)
+    ulen = SSIZE_MAX;
+  if (ulen == 0)
+    return;
 
-  debug_printf ("ulen %ld, vmin_ %ld, vtime_ %u, hEvent %p",
+  /* If VMIN > 0 in blocking mode, we have to read at least VMIN chars,
+     otherwise we're in polling mode and there's no minimum chars. */
+  ssize_t minchars = (!is_nonblocking () && vmin_) ? MIN (vmin_, ulen) : 0;
+
+  debug_printf ("ulen %ld, vmin_ %u, vtime_ %u, hEvent %p",
 		ulen, vmin_, vtime_, io_status.hEvent);
   if (!overlapped_armed)
     {
@@ -54,122 +63,137 @@ fhandler_serial::raw_read (void *ptr, size_t& ulen)
       ResetEvent (io_status.hEvent);
     }
 
-  for (n = 0, tot = 0; ulen; ulen -= n, ptr = (char *) ptr + n)
+  do
     {
-      COMSTAT st;
-      DWORD inq = vmin_ ? minchars : vtime_ ? ulen : 1;
-
-      n = 0;
-
-      if (vtime_) // non-interruptible -- have to use kernel timeouts
-	overlapped_armed = -1;
-
-      if (!ClearCommError (get_handle (), &ev, &st))
+      /* First check if chars are already in the inbound queue. */
+      if (!ClearCommError (get_handle (), &io_err, &st))
 	goto err;
-      else if (ev)
-	termios_printf ("error detected %x", ev);
-      else if (is_nonblocking ())
+      /* FIXME: In case of I/O error, do we really want to bail out or is it
+		better just trying to pull through? */
+      if (io_err)
 	{
-	  if (!st.cbInQue)
-	    {
-	      tot = -1;
-	      set_errno (EAGAIN);
-	      goto out;
-	    }
-	  inq = st.cbInQue;
+	  termios_printf ("error detected %x", io_err);
+	  SetLastError (ERROR_IO_DEVICE);
+	  goto err;
 	}
-      else if (st.cbInQue && !vtime_)
-	inq = st.cbInQue;
-      else if (!is_nonblocking () && !overlapped_armed)
+      /* ReadFile only handles up to DWORD bytes. */
+      bytes_to_read = MIN (ulen, UINT32_MAX);
+      if (is_nonblocking ())
 	{
-	  if ((size_t) tot >= minchars)
+	  /* In O_NONBLOCK mode we just care for the number of chars already
+	     in the inbound queue. */
+	  if (!st.cbInQue)
 	    break;
-	  else if (WaitCommEvent (get_handle (), &ev, &io_status))
+	  bytes_to_read = MIN (st.cbInQue, bytes_to_read);
+	}
+      else
+	{
+	  /* If the number of chars in the inbound queue is sufficent
+	     (minchars defines the minimum), set bytes_to_read accordingly
+	     and don't wait. */
+	  if (st.cbInQue && st.cbInQue >= minchars)
+	    bytes_to_read = MIN (st.cbInQue, bytes_to_read);
+	  /* if vtime_ is set, use kernel timeouts, otherwise wait here. */
+	  else if (vtime_ == 0 && !overlapped_armed)
 	    {
-	      debug_printf ("WaitCommEvent succeeded: ev %x", ev);
-	      if (!ev)
-		continue;
-	    }
-	  else if (GetLastError () != ERROR_IO_PENDING)
-	    goto err;
-	  else
-	    {
-	      overlapped_armed = 1;
-	      switch (cygwait (io_status.hEvent))
+	      if (WaitCommEvent (get_handle (), &event, &io_status))
 		{
-		case WAIT_OBJECT_0:
-		  if (!GetOverlappedResult (get_handle (), &io_status, &n,
-					    FALSE))
-		    goto err;
-		  debug_printf ("n %u, ev %x", n, ev);
-		  break;
-		case WAIT_SIGNALED:
-		  tot = -1;
-		  PurgeComm (get_handle (), PURGE_RXABORT);
-		  overlapped_armed = 0;
-		  set_sig_errno (EINTR);
-		  goto out;
-		case WAIT_CANCELED:
-		  PurgeComm (get_handle (), PURGE_RXABORT);
-		  overlapped_armed = 0;
-		  pthread::static_cancel_self ();
-		  /*NOTREACHED*/
-		default:
-		  goto err;
+		  debug_printf ("WaitCommEvent succeeded: event %x", event);
+		  if (!event)
+		    continue;
 		}
+	      else if (GetLastError () != ERROR_IO_PENDING)
+		goto err;
+	      overlapped_armed = 1;
+	    }
+	}
+      /* overlapped_armed may be set by select, so we have to make sure
+	 to disarm even in O_NONBLOCK mode. */
+      if (overlapped_armed)
+	{
+	  switch (cygwait (io_status.hEvent, is_nonblocking () ? 0 : INFINITE))
+	    {
+	    case WAIT_OBJECT_0:
+	      if (!GetOverlappedResult (get_handle (), &io_status,
+					&undefined, TRUE))
+		goto err;
+	      debug_printf ("overlapped event %x", event);
+	      break;
+	    case WAIT_SIGNALED:
+	      CancelIo (get_handle ());
+	      overlapped_armed = 0;
+	      if (!GetOverlappedResult (get_handle (), &io_status,
+					&undefined, TRUE))
+		goto err;
+	      /* Only if no bytes read, return with EINTR. */
+	      if (!tot)
+		{
+		  tot = -1;
+		  set_sig_errno (EINTR);
+		}
+	      goto out;
+	    case WAIT_CANCELED:
+	      CancelIo (get_handle ());
+	      overlapped_armed = 0;
+	      GetOverlappedResult (get_handle (), &io_status, &undefined,
+				   TRUE);
+	      pthread::static_cancel_self ();
+	      /*NOTREACHED*/
+	    default:
+	      goto err;
 	    }
 	}
 
       overlapped_armed = 0;
       ResetEvent (io_status.hEvent);
-      if (inq > ulen)
-	inq = ulen;
-      debug_printf ("inq %u", inq);
-      if (ReadFile (get_handle (), ptr, inq, &n, &io_status))
-	/* Got something */;
-      else if (GetLastError () != ERROR_IO_PENDING)
-	goto err;
-      else if (is_nonblocking ())
+      if (!ReadFile (get_handle (), ptr, bytes_to_read, &read_bytes,
+		     &io_status))
 	{
-	  /* Use CancelIo rather than PurgeComm (PURGE_RXABORT) since
-	     PurgeComm apparently discards in-flight bytes while CancelIo
-	     only stops the overlapped IO routine. */
-	  CancelIo (get_handle ());
-	  if (GetOverlappedResult (get_handle (), &io_status, &n, TRUE))
-	    tot = n;
-	  else if (GetLastError () != ERROR_OPERATION_ABORTED)
+	  if (GetLastError () != ERROR_IO_PENDING)
 	    goto err;
-	  if (tot == 0)
-	    {
-	      tot = -1;
-	      set_errno (EAGAIN);
-	    }
-	  goto out;
+	  if (is_nonblocking ())
+	    CancelIo (get_handle ());
+	  if (!GetOverlappedResult (get_handle (), &io_status, &read_bytes,
+				    TRUE))
+	    goto err;
 	}
-      else if (!GetOverlappedResult (get_handle (), &io_status, &n, TRUE))
-	goto err;
-
-      tot += n;
-      debug_printf ("vtime_ %u, vmin_ %lu, n %u, tot %d", vtime_, vmin_, n, tot);
-      if (vtime_ || !vmin_ || !n)
-	break;
+      tot += read_bytes;
+      ptr = (void *) ((caddr_t) ptr + read_bytes);
+      ulen -= read_bytes;
+      minchars -= read_bytes;
+      debug_printf ("vtime_ %u, vmin_ %u, read_bytes %u, tot %D",
+		    vtime_, vmin_, read_bytes, tot);
       continue;
 
     err:
       debug_printf ("err %E");
       if (GetLastError () != ERROR_OPERATION_ABORTED)
 	{
-	  PurgeComm (get_handle (), PURGE_RXABORT);
-	  tot = -1;
-	  __seterrno ();
+	  if (tot == 0)
+	    {
+	      tot = -1;
+	      __seterrno ();
+	    }
+	  CancelIo (get_handle ());
+	  overlapped_armed = 0;
+	  GetOverlappedResult (get_handle (), &io_status, &undefined, TRUE);
 	  break;
 	}
-
-      n = 0;
     }
+  /* ALL of these are required to loop:
+
+     Still room in user space buffer
+     AND still a minchars requirement (implies blocking mode)
+     AND vtime_ is not set. */
+  while (ulen > 0 && minchars > 0 && vtime_ == 0);
 
 out:
-  ulen = tot;
+  ulen = (size_t) tot;
+  if (is_nonblocking () && ulen == 0)
+    {
+      ulen = (size_t) -1;
+      set_errno (EAGAIN);
+    }
 }
 
 /* Cover function to WriteFile to provide Posix interface and semantics
@@ -595,7 +619,7 @@ fhandler_serial::tcsetattr (int action, const struct termios *t)
   bool dropDTR = false;
   COMMTIMEOUTS to;
   DCB ostate, state;
-  unsigned int ovtime = vtime_, ovmin = vmin_;
+  cc_t ovtime = vtime_, ovmin = vmin_;
   int tmpDtr, tmpRts, res;
   res = tmpDtr = tmpRts = 0;
 
@@ -902,7 +926,7 @@ fhandler_serial::tcsetattr (int action, const struct termios *t)
       vmin_ = t->c_cc[VMIN];
     }
 
-  debug_printf ("vtime %d, vmin %ld", vtime_, vmin_);
+  debug_printf ("vtime %u, vmin %u", vtime_, vmin_);
 
   if (ovmin != vmin_ || ovtime != vtime_)
   {
@@ -1136,7 +1160,7 @@ fhandler_serial::tcgetattr (struct termios *t)
   t->c_cc[VTIME] = vtime_ / 100;
   t->c_cc[VMIN] = vmin_;
 
-  debug_printf ("vmin_ %lu, vtime_ %u", vmin_, vtime_);
+  debug_printf ("vmin_ %u, vtime_ %u", vmin_, vtime_);
 
   return 0;
 }

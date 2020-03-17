@@ -1680,8 +1680,8 @@ class fhandler_cygdrive: public fhandler_disk_file
 class fhandler_serial: public fhandler_base
 {
  private:
-  size_t vmin_;				/* from termios */
-  unsigned int vtime_;			/* from termios */
+  cc_t vmin_;				/* from termios */
+  cc_t vtime_;				/* from termios */
   pid_t pgrp_;
   int rts;				/* for Windows 9x purposes only */
   int dtr;				/* for Windows 9x purposes only */
@@ -1689,7 +1689,6 @@ class fhandler_serial: public fhandler_base
  public:
   int overlapped_armed;
   OVERLAPPED io_status;
-  DWORD ev;
 
   /* Constructor */
   fhandler_serial ();
