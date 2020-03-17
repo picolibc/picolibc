@@ -1300,6 +1300,11 @@ struct fifo_client_handler
   int pipe_state ();
 };
 
+/* Info needed by all readers of a FIFO, stored in named shared memory. */
+class fifo_shmem_t
+{
+};
+
 class fhandler_fifo: public fhandler_base
 {
   /* Handles to named events shared by all fhandlers for a given FIFO. */
@@ -1319,6 +1324,10 @@ class fhandler_fifo: public fhandler_base
   af_unix_spinlock_t _fifo_client_lock;
   bool reader, writer, duplexer;
   size_t max_atomic_write;
+
+  HANDLE shmem_handle;
+  fifo_shmem_t *shmem;
+
   bool __reg2 wait (HANDLE);
   static NTSTATUS npfs_handle (HANDLE &);
   HANDLE create_pipe_instance (bool);
@@ -1329,6 +1338,9 @@ class fhandler_fifo: public fhandler_base
   void cancel_reader_thread ();
   void record_connection (fifo_client_handler&,
 			  fifo_client_connect_state = fc_connected);
+
+  int create_shmem ();
+  int reopen_shmem ();
 
 public:
   fhandler_fifo ();
@@ -1341,6 +1353,7 @@ public:
   DWORD fifo_reader_thread_func ();
   void fifo_client_lock () { _fifo_client_lock.lock (); }
   void fifo_client_unlock () { _fifo_client_lock.unlock (); }
+
   int open (int, mode_t);
   off_t lseek (off_t offset, int whence);
   int close ();
