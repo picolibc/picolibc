@@ -1440,23 +1440,23 @@ static int
 peek_serial (select_record *s, bool)
 {
   COMSTAT st;
+  DWORD event, io_err;
 
   fhandler_serial *fh = (fhandler_serial *) s->fh;
 
-  if (fh->get_readahead_valid () || fh->overlapped_armed < 0)
+  if (fh->get_readahead_valid ())
     return s->read_ready = true;
 
   select_printf ("fh->overlapped_armed %d", fh->overlapped_armed);
 
   HANDLE h;
   set_handle_or_return_if_not_open (h, s);
-  int ready = 0;
 
-  if ((s->read_selected && s->read_ready) || (s->write_selected && s->write_ready))
+  if ((s->read_selected && s->read_ready)
+      || (s->write_selected && s->write_ready))
     {
       select_printf ("already ready");
-      ready = 1;
-      goto out;
+      return true;
     }
 
   /* This is apparently necessary for the com0com driver.
@@ -1471,59 +1471,54 @@ peek_serial (select_record *s, bool)
 
       ResetEvent (fh->io_status.hEvent);
 
-      if (!ClearCommError (h, &fh->ev, &st))
+      if (!ClearCommError (h, &io_err, &st))
 	{
-	  debug_printf ("ClearCommError");
+	  debug_printf ("ClearCommError %E");
 	  goto err;
 	}
-      else if (st.cbInQue)
+      if (st.cbInQue)
 	return s->read_ready = true;
-      else if (WaitCommEvent (h, &fh->ev, &fh->io_status))
+      if (WaitCommEvent (h, &event, &fh->io_status))
 	return s->read_ready = true;
-      else if (GetLastError () == ERROR_IO_PENDING)
-	fh->overlapped_armed = 1;
-      else
+      if (GetLastError () != ERROR_IO_PENDING)
 	{
-	  debug_printf ("WaitCommEvent");
+	  debug_printf ("WaitCommEvent %E");
 	  goto err;
 	}
+      fh->overlapped_armed = 1;
     }
 
   switch (WaitForSingleObject (fh->io_status.hEvent, 10L))
     {
     case WAIT_OBJECT_0:
-      if (!ClearCommError (h, &fh->ev, &st))
+      if (!ClearCommError (h, &io_err, &st))
 	{
-	  debug_printf ("ClearCommError");
+	  debug_printf ("ClearCommError %E");
 	  goto err;
 	}
-      else if (!st.cbInQue)
-	Sleep (10L);
-      else
+      if (st.cbInQue)
 	{
-	  return s->read_ready = true;
 	  select_printf ("got something");
+	  return s->read_ready = true;
 	}
       break;
     case WAIT_TIMEOUT:
       break;
     default:
-      debug_printf ("WaitForMultipleObjects");
+      debug_printf ("WaitForMultipleObjects %E");
       goto err;
     }
 
-out:
-  return ready;
+  return 0;
 
 err:
   if (GetLastError () == ERROR_OPERATION_ABORTED)
     {
       select_printf ("operation aborted");
-      return ready;
+      return 0;
     }
 
   s->set_select_errno ();
-  select_printf ("error %E");
   return -1;
 }
 
