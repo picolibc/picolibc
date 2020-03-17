@@ -319,7 +319,7 @@ fhandler_fifo::listen_client ()
       __seterrno ();
       HANDLE evt = InterlockedExchangePointer (&lct_termination_evt, NULL);
       if (evt)
-	CloseHandle (evt);
+	NtClose (evt);
       return false;
     }
   return true;
@@ -441,7 +441,7 @@ fhandler_fifo::listen_client_thread ()
 	      ret = -1;
 	    }
 	  if (ph)
-	    CloseHandle (ph);
+	    NtClose (ph);
 	  fifo_client_unlock ();
 	  goto out;
 	default:
@@ -462,7 +462,7 @@ fhandler_fifo::listen_client_thread ()
     }
 out:
   if (evt)
-    CloseHandle (evt);
+    NtClose (evt);
   ResetEvent (read_ready);
   if (ret < 0)
     debug_printf ("exiting with error, %E");
@@ -617,16 +617,16 @@ out:
     {
       if (read_ready)
 	{
-	  CloseHandle (read_ready);
+	  NtClose (read_ready);
 	  read_ready = NULL;
 	}
       if (write_ready)
 	{
-	  CloseHandle (write_ready);
+	  NtClose (write_ready);
 	  write_ready = NULL;
 	}
       if (get_handle ())
-	CloseHandle (get_handle ());
+	NtClose (get_handle ());
       if (listen_client_thr)
 	stop_listen_client ();
     }
@@ -775,7 +775,7 @@ fhandler_fifo::raw_write (const void *ptr, size_t len)
 	ret = nbytes;
     }
   if (evt)
-    CloseHandle (evt);
+    NtClose (evt);
   if (status == STATUS_THREAD_SIGNALED && ret < 0)
     set_errno (EINTR);
   else if (status == STATUS_THREAD_CANCELED)
@@ -819,7 +819,7 @@ fhandler_fifo::check_listen_client_thread ()
       switch (waitret)
 	{
 	case WAIT_OBJECT_0:
-	  CloseHandle (listen_client_thr);
+	  NtClose (listen_client_thr);
 	  break;
 	case WAIT_TIMEOUT:
 	  ret = 1;
@@ -828,7 +828,7 @@ fhandler_fifo::check_listen_client_thread ()
 	  debug_printf ("WaitForSingleObject failed, %E");
 	  ret = -1;
 	  __seterrno ();
-	  CloseHandle (listen_client_thr);
+	  NtClose (listen_client_thr);
 	  break;
 	}
     }
@@ -1001,11 +1001,11 @@ fhandler_fifo::stop_listen_client ()
 	  ret = -1;
 	  debug_printf ("listen_client_thread exited with error");
 	}
-      CloseHandle (thr);
+      NtClose (thr);
     }
   evt = InterlockedExchangePointer (&lct_termination_evt, NULL);
   if (evt)
-    CloseHandle (evt);
+    NtClose (evt);
   return ret;
 }
 
@@ -1017,9 +1017,9 @@ fhandler_fifo::close ()
   fifo_client_unlock ();
   int ret = stop_listen_client ();
   if (read_ready)
-    CloseHandle (read_ready);
+    NtClose (read_ready);
   if (write_ready)
-    CloseHandle (write_ready);
+    NtClose (write_ready);
   fifo_client_lock ();
   for (int i = 0; i < nhandlers; i++)
     if (fc_handler[i].close () < 0)
@@ -1070,7 +1070,7 @@ fhandler_fifo::dup (fhandler_base *child, int flags)
 			GetCurrentProcess (), &fhf->write_ready,
 			0, true, DUPLICATE_SAME_ACCESS))
     {
-      CloseHandle (fhf->read_ready);
+      NtClose (fhf->read_ready);
       fhf->close ();
       __seterrno ();
       goto out;
@@ -1084,8 +1084,8 @@ fhandler_fifo::dup (fhandler_base *child, int flags)
 			    0, true, DUPLICATE_SAME_ACCESS))
 	{
 	  fifo_client_unlock ();
-	  CloseHandle (fhf->read_ready);
-	  CloseHandle (fhf->write_ready);
+	  NtClose (fhf->read_ready);
+	  NtClose (fhf->write_ready);
 	  fhf->close ();
 	  __seterrno ();
 	  goto out;
