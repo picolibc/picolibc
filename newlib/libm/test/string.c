@@ -14,6 +14,16 @@
  * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  */
+
+/* Suppresses compiler warnings
+ *    As described by items in quotes
+ */
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wmemset-transposed-args"
+#pragma GCC diagnostic ignored "-Wstringop-overflow="
+#pragma GCC diagnostic ignored "-Wstringop-truncation"
+#pragma GCC diagnostic ignored "-Warray-bounds"
+
 #include "test.h"
 #include <string.h>
 #include <errno.h>
@@ -568,3 +578,4 @@ void test_string()
 #endif
 }
 
+#pragma GCC diagnostic pop

@@ -33,6 +33,16 @@
    makes an upper limit for simple testing.  For the CRIS simulator,
    making this 256 added 90s to the test-run (2GHz P4) while 64 (4s) was
    enough to spot the bugs that had crept in, hence the number chosen.  */
+
+
+/* Suppresses compiler warnings
+ *    As described by items in quotes
+ */
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wformat="
+#pragma GCC diagnostic ignored "-Wunused-variable"
+
+
 #define MAX 64
 
 #include <stdio.h>
@@ -182,3 +192,5 @@ main (void)
     abort ();
   exit (0);
 }
+
+#pragma GCC diagnostic pop

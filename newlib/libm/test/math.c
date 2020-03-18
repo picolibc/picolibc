@@ -32,6 +32,15 @@
 
 */
 
+/* Suppresses compiler warnings
+ *    As described by items in quotes 
+ */
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-variable"
+#pragma GCC diagnostic ignored "-Wimplicit-function-declaration"
+#pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
+#pragma GCC diagnostic ignored "-Wformat="
+
 #include "test.h"
 #include <math.h>
 #include <float.h>
@@ -491,3 +500,5 @@ float tanhf(a) float a; { return tanh(a); }
 float y0f(a) float a; { return y0(a); }
 float y1f(a) float a; { return y1(a); }
 #endif
+
+#pragma GCC diagnostic pop
