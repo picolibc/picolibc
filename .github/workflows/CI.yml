@@ -1,0 +1,36 @@
+#Names GitHub action
+name: CI
+
+#Specifies when this action runs
+on:
+  push:                           #On push to either
+    branches:                     # Master branch or
+      - master                    # CI-Inclusion branch
+      - ci-inclusion2
+    pull_request:                 #On pull-request to
+      - master                    # Master branch
+
+#Describes job that this action performs
+jobs:
+  build:
+
+    #Runs on standard ubuntu VM
+    runs-on: ubuntu-latest
+
+    #Specifies which docker container to grab
+    container:
+      image: vlamdock/riskv #This is from our team members dockerhub acct
+
+    #Job to run...
+    steps:
+    - uses: actions/checkout@v2   #Pulls repo that was pushed to into docker container
+    - name: Build Picolibc        #Step 1: Build picolibc
+      run: |
+        mkdir build                   
+        cd build
+        ../do-riscv-configure
+        ninja
+    - name: Initiate Tests        #Step 2: Initiate Tests
+      run: |
+        cd build
+        ninja test
