@@ -33,7 +33,7 @@
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
-tests = ['tiswctype', 'twctrans']
+tests = ['tiswctype', 'twctrans', 'test_wcfuncs', 'test_wctype']
 
 cygwin_tests = ['twctype']
 

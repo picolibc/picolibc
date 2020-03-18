@@ -33,7 +33,7 @@
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
-tests = ['nulprintf']
+tests = ['nulprintf', 'tst-wc-printf']
 
 if not newlib_tinystdio
   tests += ['swprintf']

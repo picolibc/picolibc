@@ -33,7 +33,7 @@
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
-tests = ['atexit', 'size_max']
+tests = ['atexit', 'size_max', 'tst-strtol', 'tst-strtoll']
 
 foreach target : targets
   value = get_variable('target_' + target)
