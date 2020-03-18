@@ -1687,7 +1687,6 @@ class fhandler_serial: public fhandler_base
   int dtr;				/* for Windows 9x purposes only */
 
  public:
-  int overlapped_armed;
   OVERLAPPED io_status;
 
   /* Constructor */

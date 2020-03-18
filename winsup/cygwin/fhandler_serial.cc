@@ -35,15 +35,14 @@ fhandler_serial::overlapped_setup ()
   memset (&io_status, 0, sizeof (io_status));
   io_status.hEvent = CreateEvent (&sec_none_nih, TRUE, FALSE, NULL);
   ProtectHandle (io_status.hEvent);
-  overlapped_armed = 0;
 }
 
 void __reg3
 fhandler_serial::raw_read (void *ptr, size_t& ulen)
 {
-  DWORD io_err, event;
+  DWORD io_err;
   COMSTAT st;
-  DWORD bytes_to_read, read_bytes, undefined;
+  DWORD bytes_to_read, read_bytes;
   ssize_t tot = 0;
 
   if (ulen > SSIZE_MAX)
@@ -57,11 +56,6 @@ fhandler_serial::raw_read (void *ptr, size_t& ulen)
 
   debug_printf ("ulen %ld, vmin_ %u, vtime_ %u, hEvent %p",
 		ulen, vmin_, vtime_, io_status.hEvent);
-  if (!overlapped_armed)
-    {
-      SetCommMask (get_handle (), EV_RXCHAR);
-      ResetEvent (io_status.hEvent);
-    }
 
   do
     {
@@ -93,58 +87,8 @@ fhandler_serial::raw_read (void *ptr, size_t& ulen)
 	     and don't wait. */
 	  if (st.cbInQue && st.cbInQue >= minchars)
 	    bytes_to_read = MIN (st.cbInQue, bytes_to_read);
-	  /* if vtime_ is set, use kernel timeouts, otherwise wait here. */
-	  else if (vtime_ == 0 && !overlapped_armed)
-	    {
-	      if (WaitCommEvent (get_handle (), &event, &io_status))
-		{
-		  debug_printf ("WaitCommEvent succeeded: event %x", event);
-		  if (!event)
-		    continue;
-		}
-	      else if (GetLastError () != ERROR_IO_PENDING)
-		goto err;
-	      overlapped_armed = 1;
-	    }
-	}
-      /* overlapped_armed may be set by select, so we have to make sure
-	 to disarm even in O_NONBLOCK mode. */
-      if (overlapped_armed)
-	{
-	  switch (cygwait (io_status.hEvent, is_nonblocking () ? 0 : INFINITE))
-	    {
-	    case WAIT_OBJECT_0:
-	      if (!GetOverlappedResult (get_handle (), &io_status,
-					&undefined, TRUE))
-		goto err;
-	      debug_printf ("overlapped event %x", event);
-	      break;
-	    case WAIT_SIGNALED:
-	      CancelIo (get_handle ());
-	      overlapped_armed = 0;
-	      if (!GetOverlappedResult (get_handle (), &io_status,
-					&undefined, TRUE))
-		goto err;
-	      /* Only if no bytes read, return with EINTR. */
-	      if (!tot)
-		{
-		  tot = -1;
-		  set_sig_errno (EINTR);
-		}
-	      goto out;
-	    case WAIT_CANCELED:
-	      CancelIo (get_handle ());
-	      overlapped_armed = 0;
-	      GetOverlappedResult (get_handle (), &io_status, &undefined,
-				   TRUE);
-	      pthread::static_cancel_self ();
-	      /*NOTREACHED*/
-	    default:
-	      goto err;
-	    }
 	}
 
-      overlapped_armed = 0;
       ResetEvent (io_status.hEvent);
       if (!ReadFile (get_handle (), ptr, bytes_to_read, &read_bytes,
 		     &io_status))
@@ -152,10 +96,50 @@ fhandler_serial::raw_read (void *ptr, size_t& ulen)
 	  if (GetLastError () != ERROR_IO_PENDING)
 	    goto err;
 	  if (is_nonblocking ())
-	    CancelIo (get_handle ());
-	  if (!GetOverlappedResult (get_handle (), &io_status, &read_bytes,
-				    TRUE))
-	    goto err;
+	    {
+	      CancelIo (get_handle ());
+	      if (!GetOverlappedResult (get_handle (), &io_status, &read_bytes,
+					TRUE))
+		goto err;
+	    }
+	  else
+	    {
+	      switch (cygwait (io_status.hEvent))
+		{
+		default: /* Handle an error case from cygwait basically like
+			    a cancel condition and see if we got "something" */
+		  CancelIo (get_handle ());
+		  /*FALLTHRU*/
+		case WAIT_OBJECT_0:
+		  if (!GetOverlappedResult (get_handle (), &io_status,
+					    &read_bytes, TRUE))
+		    goto err;
+		  debug_printf ("got %u bytes from ReadFile", read_bytes);
+		  break;
+		case WAIT_SIGNALED:
+		  CancelIo (get_handle ());
+		  if (!GetOverlappedResult (get_handle (), &io_status,
+					    &read_bytes, TRUE))
+		    goto err;
+		  /* Only if no bytes read, return with EINTR. */
+		  if (!tot && !read_bytes)
+		    {
+		      tot = -1;
+		      set_sig_errno (EINTR);
+		      debug_printf ("signal received, set EINTR");
+		    }
+		  else
+		    debug_printf ("signal received but ignored");
+		  goto out;
+		case WAIT_CANCELED:
+		  CancelIo (get_handle ());
+		  GetOverlappedResult (get_handle (), &io_status, &read_bytes,
+				       TRUE);
+		  debug_printf ("thread canceled");
+		  pthread::static_cancel_self ();
+		  /*NOTREACHED*/
+		}
+	    }
 	}
       tot += read_bytes;
       ptr = (void *) ((caddr_t) ptr + read_bytes);
@@ -174,9 +158,6 @@ fhandler_serial::raw_read (void *ptr, size_t& ulen)
 	      tot = -1;
 	      __seterrno ();
 	    }
-	  CancelIo (get_handle ());
-	  overlapped_armed = 0;
-	  GetOverlappedResult (get_handle (), &io_status, &undefined, TRUE);
 	  break;
 	}
     }

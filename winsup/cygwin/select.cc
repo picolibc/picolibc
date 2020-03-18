@@ -1434,22 +1434,15 @@ fhandler_dev_null::select_except (select_stuff *ss)
   return s;
 }
 
-static int start_thread_serial (select_record *me, select_stuff *stuff);
-
 static int
 peek_serial (select_record *s, bool)
 {
+  HANDLE h;
   COMSTAT st;
-  DWORD event, io_err;
+  DWORD io_err;
 
   fhandler_serial *fh = (fhandler_serial *) s->fh;
 
-  if (fh->get_readahead_valid ())
-    return s->read_ready = true;
-
-  select_printf ("fh->overlapped_armed %d", fh->overlapped_armed);
-
-  HANDLE h;
   set_handle_or_return_if_not_open (h, s);
 
   if ((s->read_selected && s->read_ready)
@@ -1459,55 +1452,16 @@ peek_serial (select_record *s, bool)
       return true;
     }
 
-  /* This is apparently necessary for the com0com driver.
-     See: http://cygwin.com/ml/cygwin/2009-01/msg00667.html */
-  SetCommMask (h, 0);
+  if (fh->get_readahead_valid ())
+    return s->read_ready = true;
 
-  SetCommMask (h, EV_RXCHAR);
-
-  if (!fh->overlapped_armed)
+  if (!ClearCommError (h, &io_err, &st))
     {
-      COMSTAT st;
-
-      ResetEvent (fh->io_status.hEvent);
-
-      if (!ClearCommError (h, &io_err, &st))
-	{
-	  debug_printf ("ClearCommError %E");
-	  goto err;
-	}
-      if (st.cbInQue)
-	return s->read_ready = true;
-      if (WaitCommEvent (h, &event, &fh->io_status))
-	return s->read_ready = true;
-      if (GetLastError () != ERROR_IO_PENDING)
-	{
-	  debug_printf ("WaitCommEvent %E");
-	  goto err;
-	}
-      fh->overlapped_armed = 1;
-    }
-
-  switch (WaitForSingleObject (fh->io_status.hEvent, 10L))
-    {
-    case WAIT_OBJECT_0:
-      if (!ClearCommError (h, &io_err, &st))
-	{
-	  debug_printf ("ClearCommError %E");
-	  goto err;
-	}
-      if (st.cbInQue)
-	{
-	  select_printf ("got something");
-	  return s->read_ready = true;
-	}
-      break;
-    case WAIT_TIMEOUT:
-      break;
-    default:
-      debug_printf ("WaitForMultipleObjects %E");
+      debug_printf ("ClearCommError %E");
       goto err;
     }
+  if (st.cbInQue)
+    return s->read_ready = true;
 
   return 0;
 
@@ -1515,84 +1469,49 @@ err:
   if (GetLastError () == ERROR_OPERATION_ABORTED)
     {
       select_printf ("operation aborted");
-      return 0;
+      return false;
     }
 
   s->set_select_errno ();
   return -1;
 }
 
-static DWORD WINAPI
-thread_serial (void *arg)
-{
-  select_serial_info *si = (select_serial_info *) arg;
-  bool looping = true;
-
-  while (looping)
-    for (select_record *s = si->start; (s = s->next); )
-      if (s->startup != start_thread_serial)
-	continue;
-      else
-	{
-	  if (peek_serial (s, true))
-	    looping = false;
-	  if (si->stop_thread)
-	    {
-	      select_printf ("stopping");
-	      looping = false;
-	      break;
-	    }
-	}
-
-  select_printf ("exiting");
-  return 0;
-}
-
-static int
-start_thread_serial (select_record *me, select_stuff *stuff)
-{
-  if (stuff->device_specific_serial)
-    me->h = *((select_serial_info *) stuff->device_specific_serial)->thread;
-  else
-    {
-      select_serial_info *si = new select_serial_info;
-      si->start = &stuff->start;
-      si->stop_thread = false;
-      si->thread = new cygthread (thread_serial, si, "sersel");
-      me->h = *si->thread;
-      stuff->device_specific_serial = si;
-    }
-  return 1;
-}
-
 static void
-serial_cleanup (select_record *, select_stuff *stuff)
+serial_read_cleanup (select_record *s, select_stuff *stuff)
 {
-  select_serial_info *si = (select_serial_info *) stuff->device_specific_serial;
-  if (!si)
-    return;
-  if (si->thread)
+  if (s->h)
     {
-      si->stop_thread = true;
-      si->thread->detach ();
+      fhandler_serial *fh = (fhandler_serial *) s->fh;
+      HANDLE h = fh->get_handle_cyg ();
+      DWORD undefined;
+
+      if (h)
+	{
+	  CancelIo (h);
+	  GetOverlappedResult (h, &fh->io_status, &undefined, TRUE);
+	}
     }
-  delete si;
-  stuff->device_specific_serial = NULL;
 }
 
 select_record *
 fhandler_serial::select_read (select_stuff *ss)
 {
+  DWORD event;
   select_record *s = ss->start.next;
-  if (!s->startup)
-    {
-      s->startup = start_thread_serial;
-      s->verify = verify_ok;
-      s->cleanup = serial_cleanup;
-    }
+
+  s->startup = no_startup;
+  s->verify = verify_ok;
+  s->cleanup = serial_read_cleanup;
   s->peek = peek_serial;
   s->read_selected = true;
   s->read_ready = false;
+  /* This is apparently necessary for the com0com driver.
+     See: http://cygwin.com/ml/cygwin/2009-01/msg00667.html */
+  SetCommMask (get_handle_cyg (), 0);
+  SetCommMask (get_handle_cyg (), EV_RXCHAR);
+  if (!WaitCommEvent (get_handle_cyg (), &event, &io_status)
+      && GetLastError () == ERROR_IO_PENDING)
+    s->h = io_status.hEvent;
   return s;
 }
 
@@ -1600,13 +1519,10 @@ select_record *
 fhandler_serial::select_write (select_stuff *ss)
 {
   select_record *s = ss->start.next;
-  if (!s->startup)
-    {
-      s->startup = no_startup;
-      s->verify = verify_ok;
-    }
+
+  s->startup = no_startup;
+  s->verify = verify_ok;
   s->peek = peek_serial;
-  s->h = get_handle ();
   s->write_selected = true;
   s->write_ready = true;
   return s;
@@ -1616,12 +1532,9 @@ select_record *
 fhandler_serial::select_except (select_stuff *ss)
 {
   select_record *s = ss->start.next;
-  if (!s->startup)
-    {
-      s->startup = no_startup;
-      s->verify = verify_ok;
-    }
-  s->h = NULL;
+
+  s->startup = no_startup;
+  s->verify = verify_ok;
   s->peek = peek_serial;
   s->except_selected = false;	// Can't do this
   s->except_ready = false;
