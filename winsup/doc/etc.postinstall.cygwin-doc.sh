@@ -37,10 +37,11 @@ do
 done
 
 # Cygwin Start Menu directory
-smpc_dir="$($cygp $CYGWINFORALL -P -U --)/Cygwin"
+case $(uname -s) in *-WOW*) wow64=" (32-bit)" ;; esac
+smpc_dir="$($cygp $CYGWINFORALL -P -U --)/Cygwin${wow64}"
 
-# check Cygwin Start Menu directory exists
-[ -d "$smpc_dir/" ] || exit 0
+# ensure Cygwin Start Menu directory exists
+/usr/bin/mkdir -p "$smpc_dir"
 
 # check Cygwin Start Menu directory writable
 if [ ! -w "$smpc_dir/" ]
@@ -52,7 +53,7 @@ fi
 # create User Guide and API PDF and HTML shortcuts
 while read target name desc
 do
-	[ -r "$target" ] && $mks $CYGWINFORALL -P -n "Cygwin/$name" -d "$desc" -- $target
+	[ -r "$target" ] && $mks $CYGWINFORALL -P -n "Cygwin${wow64}/$name" -d "$desc" -- $target
 done <<EOF
 $doc/cygwin-ug-net.pdf		User\ Guide\ \(PDF\)  Cygwin\ User\ Guide\ PDF
 $html/cygwin-ug-net/index.html	User\ Guide\ \(HTML\) Cygwin\ User\ Guide\ HTML
@@ -63,9 +64,8 @@ EOF
 # create Home Page and FAQ URL link shortcuts
 while read target name desc
 do
-	$mks $CYGWINFORALL -P -n "Cygwin/$name" -d "$desc" -a $target -- $launch
+	$mks $CYGWINFORALL -P -n "Cygwin${wow64}/$name" -d "$desc" -a $target -- $launch
 done <<EOF
 $site/index.html	Home\ Page	Cygwin\ Home\ Page\ Link
 $site/faq.html		FAQ	Cygwin\ Frequently\ Asked\ Questions\ Link
 EOF
-
