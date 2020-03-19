@@ -29,7 +29,7 @@
 	ha &= 0x7fffffffL;
 	GET_FLOAT_WORD(hb,y);
 	hb &= 0x7fffffffL;
-	if(hb > ha) {a=y;b=x;j=ha; ha=hb;hb=j;} else {a=x;b=y;}
+	if(hb > ha) { j = ha; ha = hb; hb = j; }
 	SET_FLOAT_WORD(a,ha);	/* a <- |a| */
 	SET_FLOAT_WORD(b,hb);	/* b <- |b| */
 	if((ha-hb)>0xf000000L) {return a+b;} /* x/y > 2**30 */
@@ -72,7 +72,7 @@
 	    a  = a+a;
 	    SET_FLOAT_WORD(y1,hb&0xfffff000L);
 	    y2 = b - y1;
-	    SET_FLOAT_WORD(t1,ha+0x00800000L);
+	    SET_FLOAT_WORD(t1,(ha+0x00800000L)&0xfffff000UL);
 	    t2 = a - t1;
 	    w  = __ieee754_sqrtf(t1*y1-(w*(-w)-(t1*y2+t2*b)));
 	}
