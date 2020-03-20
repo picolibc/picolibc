@@ -1685,6 +1685,7 @@ class fhandler_serial: public fhandler_base
   pid_t pgrp_;
   int rts;				/* for Windows 9x purposes only */
   int dtr;				/* for Windows 9x purposes only */
+  DWORD event;				/* for select */
 
  public:
   OVERLAPPED io_status;

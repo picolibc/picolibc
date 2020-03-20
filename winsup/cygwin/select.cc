@@ -1493,14 +1493,18 @@ serial_read_cleanup (select_record *s, select_stuff *stuff)
     }
 }
 
+verify_serial (select_record *me, fd_set *rfds, fd_set *wfds, fd_set *efds)
+{
+  return peek_serial (me, true);
+}
+
 select_record *
 fhandler_serial::select_read (select_stuff *ss)
 {
-  DWORD event;
   select_record *s = ss->start.next;
 
   s->startup = no_startup;
-  s->verify = verify_ok;
+  s->verify = verify_serial;
   s->cleanup = serial_read_cleanup;
   s->peek = peek_serial;
   s->read_selected = true;
@@ -1521,7 +1525,7 @@ fhandler_serial::select_write (select_stuff *ss)
   select_record *s = ss->start.next;
 
   s->startup = no_startup;
-  s->verify = verify_ok;
+  s->verify = verify_serial;
   s->peek = peek_serial;
   s->write_selected = true;
   s->write_ready = true;
@@ -1534,7 +1538,7 @@ fhandler_serial::select_except (select_stuff *ss)
   select_record *s = ss->start.next;
 
   s->startup = no_startup;
-  s->verify = verify_ok;
+  s->verify = verify_serial;
   s->peek = peek_serial;
   s->except_selected = false;	// Can't do this
   s->except_ready = false;
