@@ -903,7 +903,7 @@ fhandler_serial::tcsetattr (int action, const struct termios *t)
     }
   else
     {
-      vtime_ = t->c_cc[VTIME] * 100;
+      vtime_ = t->c_cc[VTIME];
       vmin_ = t->c_cc[VMIN];
     }
 
@@ -925,13 +925,13 @@ fhandler_serial::tcsetattr (int action, const struct termios *t)
       {
 	/* set timeoout constant appropriately and we will only try to
 	   read one character in ReadFile() */
-	to.ReadTotalTimeoutConstant = vtime_;
+	to.ReadTotalTimeoutConstant = vtime_ * 100;
 	to.ReadIntervalTimeout = to.ReadTotalTimeoutMultiplier = MAXDWORD;
       }
     else if ((vmin_ > 0) && (vtime_ > 0))
       {
 	/* time applies to the interval time for this case */
-	to.ReadIntervalTimeout = vtime_;
+	to.ReadIntervalTimeout = vtime_ * 100;
       }
     else if ((vmin_ == 0) && (vtime_ == 0))
       {
@@ -1138,7 +1138,7 @@ fhandler_serial::tcgetattr (struct termios *t)
   if (!wbinary ())
     t->c_oflag |= ONLCR;
 
-  t->c_cc[VTIME] = vtime_ / 100;
+  t->c_cc[VTIME] = vtime_;
   t->c_cc[VMIN] = vmin_;
 
   debug_printf ("vmin_ %u, vtime_ %u", vmin_, vtime_);
