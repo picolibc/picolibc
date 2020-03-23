@@ -271,6 +271,27 @@ extern int __signbitd (double x);
   #define isnormal(__x) (fpclassify(__x) == FP_NORMAL)
 #endif
 
+#ifndef issignaling
+int __issignalingf(float f);
+int __issignaling(double d);
+
+#if defined(_HAVE_LONG_DOUBLE)
+int __issignalingl(long double d);
+#define issignaling(__x)						\
+	((sizeof(__x) == sizeof(float))  ? __issignalingf(__x) :	\
+	 (sizeof(__x) == sizeof(double)) ? __issignaling (__x) :	\
+	 __issignalingl(__x))
+#else
+#ifdef _DOUBLE_IS_32BITS
+#define issignaling(__x) __issignalingf((float) (__x))
+#else
+#define issignaling(__x)						\
+	((sizeof(__x) == sizeof(float))  ? __issignalingf(__x) :	\
+	 __issignaling (__x))
+#endif /* _DOUBLE_IS_32BITS */
+#endif /* _HAVE_LONG_DOUBLE */
+#endif
+
 #if __GNUC_PREREQ (4, 0)
   #if defined(_HAVE_LONG_DOUBLE)
     #define signbit(__x) \

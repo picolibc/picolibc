@@ -73,6 +73,7 @@ math_test_src = [
   'hypotf_vec.c',
   'hypot_vec.c',
   'iconv_vec.c',
+  'issignaling_vec.c',
   'j0f_vec.c',
   'j0_vec.c',
   'j1f_vec.c',
