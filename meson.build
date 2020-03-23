@@ -181,6 +181,12 @@ if enable_multilib
       name = ''
     endif
     targets += name
+
+    # Add any extra flags for this target from the cross file
+    target_extra = meson.get_cross_property('c_args_' + name, [])
+    if target_extra != []
+      flags += target_extra
+    endif
     value = [tmp[0], flags]
     set_variable('target_' + name, value)
   endforeach
