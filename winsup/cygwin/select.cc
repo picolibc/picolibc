@@ -1481,15 +1481,16 @@ serial_read_cleanup (select_record *s, select_stuff *stuff)
 {
   if (s->h)
     {
-      fhandler_serial *fh = (fhandler_serial *) s->fh;
-      HANDLE h = fh->get_handle_cyg ();
+      HANDLE h = ((fhandler_serial *) s->fh)->get_handle_cyg ();
       DWORD undefined;
 
       if (h)
 	{
 	  CancelIo (h);
-	  GetOverlappedResult (h, &fh->io_status, &undefined, TRUE);
+	  GetOverlappedResult (h, &s->fh_data_serial->ov, &undefined, TRUE);
 	}
+      CloseHandle (s->fh_data_serial->ov.hEvent);
+      delete s->fh_data_serial;
     }
 }
 
@@ -1513,27 +1514,30 @@ fhandler_serial::select_read (select_stuff *ss)
   s->peek = peek_serial;
   s->read_selected = true;
   s->read_ready = false;
+
+  s->fh_data_serial = new (fh_select_data_serial);
+  s->fh_data_serial->ov.hEvent = CreateEvent (&sec_none_nih, TRUE, FALSE, NULL);
+
   /* This is apparently necessary for the com0com driver.
      See: http://cygwin.com/ml/cygwin/2009-01/msg00667.html */
-  ResetEvent (io_status.hEvent);
   SetCommMask (get_handle_cyg (), 0);
   SetCommMask (get_handle_cyg (), EV_RXCHAR);
   if (ClearCommError (get_handle_cyg (), &io_err, &st) && st.cbInQue)
+    s->read_ready = true;
+  else if (WaitCommEvent (get_handle_cyg (), &s->fh_data_serial->event,
+			  &s->fh_data_serial->ov))
+    s->read_ready = true;
+  else if (GetLastError () == ERROR_IO_PENDING)
+    s->h = s->fh_data_serial->ov.hEvent;
+  else
+    select_printf ("WaitCommEvent %E");
+
+  /* No overlapped operation?  Destroy the helper struct */
+  if (!s->h)
     {
-      s->read_ready = true;
-      return s;
+      CloseHandle (s->fh_data_serial->ov.hEvent);
+      delete s->fh_data_serial;
     }
-  if (WaitCommEvent (get_handle_cyg (), &event, &io_status))
-    {
-      s->read_ready = true;
-      return s;
-    }
-  if (GetLastError () == ERROR_IO_PENDING)
-    {
-      s->h = io_status.hEvent;
-      return s;
-    }
-  select_printf ("WaitCommEvent %E");
   return s;
 }
 

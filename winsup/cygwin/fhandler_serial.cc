@@ -1,5 +1,6 @@
 /* fhandler_serial.cc
 
+
 This file is part of Cygwin.
 
 This software is a copyrighted work licensed under the terms of the
@@ -29,17 +30,10 @@ fhandler_serial::fhandler_serial ()
   need_fork_fixup (true);
 }
 
-void
-fhandler_serial::overlapped_setup ()
-{
-  memset (&io_status, 0, sizeof (io_status));
-  io_status.hEvent = CreateEvent (&sec_none_nih, TRUE, FALSE, NULL);
-  ProtectHandle (io_status.hEvent);
-}
-
 void __reg3
 fhandler_serial::raw_read (void *ptr, size_t& ulen)
 {
+  OVERLAPPED ov = { 0 };
   DWORD io_err;
   COMSTAT st;
   DWORD bytes_to_read, read_bytes;
@@ -54,8 +48,9 @@ fhandler_serial::raw_read (void *ptr, size_t& ulen)
      otherwise we're in polling mode and there's no minimum chars. */
   ssize_t minchars = (!is_nonblocking () && vmin_) ? MIN (vmin_, ulen) : 0;
 
-  debug_printf ("ulen %ld, vmin_ %u, vtime_ %u, hEvent %p",
-		ulen, vmin_, vtime_, io_status.hEvent);
+  debug_printf ("ulen %ld, vmin_ %u, vtime_ %u", ulen, vmin_, vtime_);
+
+  ov.hEvent = CreateEvent (&sec_none_nih, TRUE, FALSE, NULL);
 
   do
     {
@@ -89,37 +84,36 @@ fhandler_serial::raw_read (void *ptr, size_t& ulen)
 	    bytes_to_read = MIN (st.cbInQue, bytes_to_read);
 	}
 
-      ResetEvent (io_status.hEvent);
-      if (!ReadFile (get_handle (), ptr, bytes_to_read, &read_bytes,
-		     &io_status))
+      ResetEvent (ov.hEvent);
+      if (!ReadFile (get_handle (), ptr, bytes_to_read, &read_bytes, &ov))
 	{
 	  if (GetLastError () != ERROR_IO_PENDING)
 	    goto err;
 	  if (is_nonblocking ())
 	    {
 	      CancelIo (get_handle ());
-	      if (!GetOverlappedResult (get_handle (), &io_status, &read_bytes,
+	      if (!GetOverlappedResult (get_handle (), &ov, &read_bytes,
 					TRUE))
 		goto err;
 	    }
 	  else
 	    {
-	      switch (cygwait (io_status.hEvent))
+	      switch (cygwait (ov.hEvent))
 		{
 		default: /* Handle an error case from cygwait basically like
 			    a cancel condition and see if we got "something" */
 		  CancelIo (get_handle ());
 		  /*FALLTHRU*/
 		case WAIT_OBJECT_0:
-		  if (!GetOverlappedResult (get_handle (), &io_status,
-					    &read_bytes, TRUE))
+		  if (!GetOverlappedResult (get_handle (), &ov, &read_bytes,
+					    TRUE))
 		    goto err;
 		  debug_printf ("got %u bytes from ReadFile", read_bytes);
 		  break;
 		case WAIT_SIGNALED:
 		  CancelIo (get_handle ());
-		  if (!GetOverlappedResult (get_handle (), &io_status,
-					    &read_bytes, TRUE))
+		  if (!GetOverlappedResult (get_handle (), &ov, &read_bytes,
+					    TRUE))
 		    goto err;
 		  /* Only if no bytes read, return with EINTR. */
 		  if (!tot && !read_bytes)
@@ -133,8 +127,7 @@ fhandler_serial::raw_read (void *ptr, size_t& ulen)
 		  goto out;
 		case WAIT_CANCELED:
 		  CancelIo (get_handle ());
-		  GetOverlappedResult (get_handle (), &io_status, &read_bytes,
-				       TRUE);
+		  GetOverlappedResult (get_handle (), &ov, &read_bytes, TRUE);
 		  debug_printf ("thread canceled");
 		  pthread::static_cancel_self ();
 		  /*NOTREACHED*/
@@ -169,6 +162,7 @@ fhandler_serial::raw_read (void *ptr, size_t& ulen)
   while (ulen > 0 && minchars > 0 && vtime_ == 0);
 
 out:
+  CloseHandle (ov.hEvent);
   ulen = (size_t) tot;
   if (is_nonblocking () && ulen == 0)
     {
@@ -266,8 +260,6 @@ fhandler_serial::open (int flags, mode_t mode)
 
   SetCommMask (get_handle (), EV_RXCHAR);
 
-  overlapped_setup ();
-
   memset (&to, 0, sizeof (to));
   SetCommTimeouts (get_handle (), &to);
 
@@ -316,13 +308,6 @@ fhandler_serial::open (int flags, mode_t mode)
   syscall_printf ("%p = fhandler_serial::open (%s, %y, 0%o)",
 		  res, get_name (), flags, mode);
   return res;
-}
-
-int
-fhandler_serial::close ()
-{
-  ForceCloseHandle (io_status.hEvent);
-  return fhandler_base::close ();
 }
 
 /* tcsendbreak: POSIX 7.2.2.1 */
@@ -1141,29 +1126,4 @@ fhandler_serial::tcgetattr (struct termios *t)
   debug_printf ("vmin_ %u, vtime_ %u", vmin_, vtime_);
 
   return 0;
-}
-
-void
-fhandler_serial::fixup_after_fork (HANDLE parent)
-{
-  if (close_on_exec ())
-    fhandler_base::fixup_after_fork (parent);
-  overlapped_setup ();
-  debug_printf ("io_status.hEvent %p", io_status.hEvent);
-}
-
-void
-fhandler_serial::fixup_after_exec ()
-{
-  if (!close_on_exec ())
-    overlapped_setup ();
-  debug_printf ("io_status.hEvent %p, close_on_exec %d", io_status.hEvent, close_on_exec ());
-}
-
-int
-fhandler_serial::dup (fhandler_base *child, int flags)
-{
-  fhandler_serial *fhc = (fhandler_serial *) child;
-  fhc->overlapped_setup ();
-  return fhandler_base::dup (child, flags);
 }

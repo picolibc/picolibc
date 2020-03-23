@@ -1685,19 +1685,13 @@ class fhandler_serial: public fhandler_base
   pid_t pgrp_;
   int rts;				/* for Windows 9x purposes only */
   int dtr;				/* for Windows 9x purposes only */
-  DWORD event;				/* for select */
 
  public:
-  OVERLAPPED io_status;
-
   /* Constructor */
   fhandler_serial ();
 
   int open (int flags, mode_t mode);
-  int close ();
   int init (HANDLE h, DWORD a, mode_t flags);
-  void overlapped_setup ();
-  int dup (fhandler_base *child, int);
   void __reg3 raw_read (void *ptr, size_t& ulen);
   ssize_t __reg3 raw_write (const void *ptr, size_t ulen);
   int tcsendbreak (int);
@@ -1714,8 +1708,6 @@ class fhandler_serial: public fhandler_base
   }
   int tcflush (int);
   bool is_tty () const { return true; }
-  void fixup_after_fork (HANDLE parent);
-  void fixup_after_exec ();
 
   /* We maintain a pgrp so that tcsetpgrp and tcgetpgrp work, but we
      don't use it for permissions checking.  fhandler_pty_slave does
