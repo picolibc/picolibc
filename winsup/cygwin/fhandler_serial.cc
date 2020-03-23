@@ -600,7 +600,6 @@ fhandler_serial::tcsetattr (int action, const struct termios *t)
   bool dropDTR = false;
   COMMTIMEOUTS to;
   DCB ostate, state;
-  cc_t ovtime = vtime_, ovmin = vmin_;
   int tmpDtr, tmpRts, res;
   res = tmpDtr = tmpRts = 0;
 
@@ -909,49 +908,47 @@ fhandler_serial::tcsetattr (int action, const struct termios *t)
 
   debug_printf ("vtime %u, vmin %u", vtime_, vmin_);
 
-  if (ovmin != vmin_ || ovtime != vtime_)
-  {
-    memset (&to, 0, sizeof (to));
+  memset (&to, 0, sizeof (to));
 
-    if ((vmin_ > 0) && (vtime_ == 0))
-      {
-	/* Returns immediately with whatever is in buffer on a ReadFile();
-	   or blocks if nothing found.  We will keep calling ReadFile(); until
-	   vmin_ characters are read */
-	to.ReadIntervalTimeout = to.ReadTotalTimeoutMultiplier = MAXDWORD;
-	to.ReadTotalTimeoutConstant = MAXDWORD - 1;
-      }
-    else if ((vmin_ == 0) && (vtime_ > 0))
-      {
-	/* set timeoout constant appropriately and we will only try to
-	   read one character in ReadFile() */
-	to.ReadTotalTimeoutConstant = vtime_ * 100;
-	to.ReadIntervalTimeout = to.ReadTotalTimeoutMultiplier = MAXDWORD;
-      }
-    else if ((vmin_ > 0) && (vtime_ > 0))
-      {
-	/* time applies to the interval time for this case */
-	to.ReadIntervalTimeout = vtime_ * 100;
-      }
-    else if ((vmin_ == 0) && (vtime_ == 0))
-      {
-	/* returns immediately with whatever is in buffer as per
-	   Time-Outs docs in Win32 SDK API docs */
-	to.ReadIntervalTimeout = MAXDWORD;
-      }
+  if ((vmin_ > 0) && (vtime_ == 0))
+    {
+      /* Returns immediately with whatever is in buffer on a ReadFile();
+	 or blocks if nothing found.  We will keep calling ReadFile(); until
+	 vmin_ characters are read */
+      to.ReadIntervalTimeout = to.ReadTotalTimeoutMultiplier = MAXDWORD;
+      to.ReadTotalTimeoutConstant = MAXDWORD - 1;
+    }
+  else if ((vmin_ == 0) && (vtime_ > 0))
+    {
+      /* set timeoout constant appropriately and we will only try to
+	 read one character in ReadFile() */
+      to.ReadTotalTimeoutConstant = vtime_ * 100;
+      to.ReadIntervalTimeout = to.ReadTotalTimeoutMultiplier = MAXDWORD;
+    }
+  else if ((vmin_ > 0) && (vtime_ > 0))
+    {
+      /* time applies to the interval time for this case */
+      to.ReadIntervalTimeout = vtime_ * 100;
+    }
+  else if ((vmin_ == 0) && (vtime_ == 0))
+    {
+      /* returns immediately with whatever is in buffer as per
+	 Time-Outs docs in Win32 SDK API docs */
+      to.ReadIntervalTimeout = MAXDWORD;
+    }
 
-    debug_printf ("ReadTotalTimeoutConstant %u, ReadIntervalTimeout %u, ReadTotalTimeoutMultiplier %u",
-		  to.ReadTotalTimeoutConstant, to.ReadIntervalTimeout, to.ReadTotalTimeoutMultiplier);
+  debug_printf ("ReadTotalTimeoutConstant %u, ReadIntervalTimeout %u, "
+		"ReadTotalTimeoutMultiplier %u", to.ReadTotalTimeoutConstant,
+		to.ReadIntervalTimeout, to.ReadTotalTimeoutMultiplier);
 
-    if (!SetCommTimeouts(get_handle (), &to))
-      {
-	/* SetCommTimeouts() failed. Keep track of this so we
-	   can set errno to EINVAL later and return failure */
-	termios_printf ("SetCommTimeouts() failed, %E");
-	__seterrno ();
-	res = -1;
-      }
-  }
+  if (!SetCommTimeouts(get_handle (), &to))
+    {
+      /* SetCommTimeouts() failed. Keep track of this so we
+	 can set errno to EINVAL later and return failure */
+      termios_printf ("SetCommTimeouts() failed, %E");
+      __seterrno ();
+      res = -1;
+    }
 
   return res;
 }
