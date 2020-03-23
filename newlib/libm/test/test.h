@@ -128,7 +128,7 @@ typedef union
     unsigned int function0:6;
     unsigned int function1:16;
   } nan;
-  int32_t p1;
+  uint32_t p1;
   
 } __ieee_float_shape_type;
 
@@ -186,6 +186,7 @@ typedef struct
 
 
 int mag_of_error (double, double);
+int fmag_of_error (float, float);
 
 
 #define ERROR_PERFECT 20
@@ -411,6 +412,9 @@ void
 test_hypotf(int vector);
 
 void
+test_issignaling(int vector);
+
+void
 test_j0(int vector);
 
 void
@@ -481,6 +485,12 @@ test_tanh(int vector);
 
 void
 test_tanhf(int vector);
+
+void
+test_trunc(int vector);
+
+void
+test_truncf(int vector);
 
 void
 test_y0(int vector);

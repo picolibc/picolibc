@@ -39,6 +39,7 @@
 #include <errno.h>
 #include <stdio.h>
 #include <string.h>
+#include <stdbool.h>
 
 int inacc;
 
@@ -57,13 +58,15 @@ void translate_to (FILE *file,
   fprintf(file, "0x%08lx, 0x%08lx", (unsigned long) bits.parts.msw, (unsigned long) bits.parts.lsw);
 }
 
+/* Convert double to float, preserving issignaling status */
+#define to_float(d)	(issignaling(d) ? __builtin_nanf("0x2000000") : (d))
+
 int
 ffcheck (double is,
-       one_line_type *p,
-       char *name,
-       int serrno,
-	 int merror,
-	 int is_float)
+	 one_line_type *p,
+	 char *name,
+	 int serrno,
+	 int merror)
 {
   /* Make sure the answer isn't to far wrong from the correct value */
   __ieee_double_shape_type correct, isbits;
@@ -75,18 +78,23 @@ ffcheck (double is,
 
   int error_bit = p->error_bit;
 
-  if (is_float) {
-    if (error_bit > 31)
-      error_bit = 31;
-  } else  {
-    if (error_bit > 63)
-      error_bit = 63;
-  }
-
   mag = mag_of_error(correct.value, is);
 
-  if (isnan(correct.value) && isnan(is))
+  if (error_bit > 63)
+    error_bit = 63;
+
+  /* All signaling nans are the "same", as are all quiet nans.
+   * On i386, just returning a value converts signaling nans to quiet
+   * nans, let that pass
+   */
+  if (isnan(correct.value) && isnan(is)
+#ifndef __i386__
+      && (issignaling(correct.value) == issignaling(is))
+#endif
+    )
+  {
     mag = 64;
+  }
 
   if (mag < error_bit)
   {
@@ -119,14 +127,81 @@ ffcheck (double is,
   return mag;
 }
 
+int
+fffcheck (float is,
+	  one_line_type *p,
+	  char *name,
+	  int serrno,
+	  int merror)
+{
+  /* Make sure the answer isn't to far wrong from the correct value */
+  __ieee_float_shape_type correct, isbits;
+  __ieee_double_shape_type correct_double;
+  __ieee_double_shape_type is_double;
+  int mag;
+  isbits.value = is;
+  is_double.value = is;
+
+  correct_double.parts.msw = p->qs[0].msw;
+  correct_double.parts.lsw = p->qs[0].lsw;
+  correct.value = to_float(correct_double.value);
+
+  int error_bit = p->error_bit;
+
+  if (error_bit > 31)
+    error_bit = 31;
+
+  mag = fmag_of_error(correct.value, is);
+
+  /* All signaling nans are the "same", as are all quiet nans */
+  if (isnan(correct.value) && isnan(is)
+      && (issignaling(correct.value) == issignaling(is)))
+  {
+	mag = 32;
+  }
+
+  if (mag < error_bit)
+  {
+    inacc ++;
+
+    printf("%s:%d, inaccurate answer: bit %d (%08lx %08lx) (%g %g) (is double 0x%08lx, 0x%08lx)\n",
+	   name,  p->line, mag,
+	   (unsigned long) (uint32_t) correct.p1,
+	   (unsigned long) (uint32_t) isbits.p1,
+	   correct.value,
+	   is,
+	   (unsigned long) (uint32_t) is_double.parts.msw,
+	   (unsigned long) (uint32_t) is_double.parts.lsw);
+  }
+
+#if 0
+  if (p->qs[0].merror != merror)
+  {
+    /* Beware, matherr doesn't exist anymore.  */
+    printf("testing %s_vec.c:%d, matherr wrong: %d %d\n",
+	   name, p->line, merror, p->qs[0].merror);
+  }
+
+  if (p->qs[0].errno_val != errno)
+  {
+    printf("testing %s_vec.c:%d, errno wrong: %d %d\n",
+	   name, p->line, errno, p->qs[0].errno_val);
+
+  }
+#endif
+  return mag;
+}
+
 double
 thedouble (uint32_t msw,
-	   uint32_t lsw)
+  uint32_t lsw, double *r)
 {
   __ieee_double_shape_type x;
 
   x.parts.msw = msw;
   x.parts.lsw = lsw;
+  if (r)
+    memcpy(r, &x.value, sizeof(double));
   return x.value;
 }
 
@@ -166,7 +241,7 @@ frontline (FILE *f,
   }
   else
   {
-    translate_to(f, thedouble(p->qs[0].msw, p->qs[0].lsw));
+    translate_to(f, thedouble(p->qs[0].msw, p->qs[0].lsw, NULL));
   }
 
   fprintf(f, ", ");
@@ -181,11 +256,11 @@ frontline (FILE *f,
   }
 
   fprintf(f,"},	/* %g=f(%g",result,
-  	  thedouble(p->qs[1].msw, p->qs[1].lsw));
+  	  thedouble(p->qs[1].msw, p->qs[1].lsw, NULL));
 
   if (args[2])
   {
-    fprintf(f,", %g", thedouble(p->qs[2].msw,p->qs[2].lsw));
+    fprintf(f,", %g", thedouble(p->qs[2].msw,p->qs[2].lsw, NULL));
   }
   fprintf(f, ")*/\n");
 }
@@ -199,13 +274,37 @@ finish (FILE *f,
 {
   int mag;
 
-  mag = ffcheck(result, p,name,  merror, errno, args[0] == 'f');
+  mag = ffcheck(result, p,name,  merror, errno);
   if (vector)
   {
     frontline(f, mag, p, result, merror, errno, args , name);
   }
 }
+
+ffinish (FILE *f,
+       int vector,
+       float fresult,
+       one_line_type *p,
+       char *args,
+       char *name)
+{
+  int mag;
+
+  mag = fffcheck(fresult, p,name,  merror, errno);
+  if (vector)
+  {
+    frontline(f, mag, p, fresult, merror, errno, args , name);
+  }
+}
 int redo;
+
+bool
+in_float_range(double arg)
+{
+	if (isinf(arg) || isnan(arg))
+		return true;
+	return -FLT_MAX <= arg && arg < FLT_MAX;
+}
 
 void
 run_vector_1 (int vector,
@@ -216,6 +315,7 @@ run_vector_1 (int vector,
 {
   FILE *f = NULL;
   double result;
+  float fresult;
 
   if (vector)
   {
@@ -272,8 +372,10 @@ run_vector_1 (int vector,
   newfunc(name);
   while (p->line)
   {
-    double arg1 = thedouble(p->qs[1].msw, p->qs[1].lsw);
-    double arg2 = thedouble(p->qs[2].msw, p->qs[2].lsw);
+    double arg1;
+    thedouble(p->qs[1].msw, p->qs[1].lsw, &arg1);
+    double arg2;
+    thedouble(p->qs[2].msw, p->qs[2].lsw, &arg2);
 
     errno = 0;
     merror = 0;
@@ -303,11 +405,11 @@ run_vector_1 (int vector,
 
       /* Double function returning a double */
 
-      if (arg1 < FLT_MAX )
+      if (in_float_range(arg1))
       {
-	arga = arg1;
-	result = ((pdblfunc)(func))(arga);
-	finish(f, vector, result, p,args, name);
+	arga = to_float(arg1);
+	fresult = ((pdblfunc)(func))(arga);
+	ffinish(f, vector, fresult, p,args, name);
       }
     }
     else if (strcmp(args,"ddd")==0)
@@ -324,13 +426,12 @@ run_vector_1 (int vector,
 
        typedef float (*pdblfunc) (float,float);
 
-
-       if (arg1 < FLT_MAX && arg2 < FLT_MAX)
+       if (in_float_range(arg1) && in_float_range(arg2))
        {
-	 arga = arg1;
-	 argb = arg2;
-	 result = ((pdblfunc)(func))(arga, argb);
-	 finish(f, vector, result, p,args, name);
+	 arga = to_float(arg1);
+	 argb = to_float(arg2);
+	 fresult = ((pdblfunc)(func))(arga, argb);
+	 ffinish(f, vector, fresult, p,args, name);
        }
      }
      else if (strcmp(args,"did")==0)
@@ -342,19 +443,24 @@ run_vector_1 (int vector,
      }
      else  if (strcmp(args,"fif")==0)
      {
-       float arga;
        float argb;
 
        typedef float (*pdblfunc) (int,float);
 
 
-       if (arg1 < FLT_MAX && arg2 < FLT_MAX)
+       if (in_float_range(arg2))
        {
-	 arga = arg1;
-	 argb = arg2;
-	 result = ((pdblfunc)(func))((int)arga, argb);
-	 finish(f, vector, result, p,args, name);
+	 argb = to_float(arg2);
+	 fresult = ((pdblfunc)(func))((int)arg1, argb);
+	 ffinish(f, vector, fresult, p,args, name);
        }
+     }
+     else if (strcmp(args,"id")==0)
+     {
+       typedef int (*pdblfunc)(double);
+
+       result = (double) ((pdblfunc)(func))(arg1);
+       finish(f, vector, result, p, args, name);
      }
 
     p++;
@@ -404,6 +510,7 @@ test_math (int vector)
   test_gammaf(vector);
   test_hypot(vector);
   test_hypotf(vector);
+  test_issignaling(vector);
   test_j0(vector);
   test_j0f(vector);
   test_j1(vector);
@@ -428,6 +535,8 @@ test_math (int vector)
   test_tanf(vector);
   test_tanh(vector);
   test_tanhf(vector);
+  test_trunc(vector);
+  test_truncf(vector);
   test_y0(vector);
   test_y0f(vector);
   test_y1(vector);

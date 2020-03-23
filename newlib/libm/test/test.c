@@ -18,6 +18,7 @@
 #include  "test.h"
 #include <math.h>
 #include <string.h>
+#include <stdint.h>
 int verbose;
 static int count;
 int inacc;
@@ -136,6 +137,18 @@ bigger (__ieee_double_shape_type *a,
   return 0;
 }
 
+int 
+fbigger (__ieee_float_shape_type *a,
+	   __ieee_float_shape_type *b)
+{
+
+  if (a->p1 > b->p1)
+    {
+      return 1;
+    }
+  return 0;
+}
+
 
 
 /* Return the first bit different between two double numbers */
@@ -199,6 +212,44 @@ mag_of_error (double is,
   
   return 64;
   
+}
+
+/* Return the first bit different between two double numbers */
+int 
+fmag_of_error (float is,
+       float shouldbe)
+{
+  __ieee_float_shape_type a,b;
+  int i;
+  int a_big;
+  unsigned  int mask;
+  uint32_t sw;
+  a.value = is;
+  
+  b.value = shouldbe;
+  
+  if (a.p1 == b.p1) return 32;
+
+  /* Subtract the larger from the smaller number */
+
+  a_big = fbigger(&a, &b);
+
+  if (!a_big) {
+    uint32_t t;
+    t = a.p1;
+    a.p1 = b.p1;
+    b.p1 = t;
+  }
+
+  sw = (a.p1) - (b.p1);
+
+  mask = 0x80000000;
+  for (i = 0; i < 32; i++)
+  {
+	  if (((sw) & mask)!=0) return i;
+	  mask >>=1;
+  }
+  return 32;
 }
 
  int ok_mag;
