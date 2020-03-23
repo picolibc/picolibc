@@ -1502,6 +1502,9 @@ verify_serial (select_record *me, fd_set *rfds, fd_set *wfds, fd_set *efds)
 select_record *
 fhandler_serial::select_read (select_stuff *ss)
 {
+  COMSTAT st;
+  DWORD io_err;
+
   select_record *s = ss->start.next;
 
   s->startup = no_startup;
@@ -1512,18 +1515,25 @@ fhandler_serial::select_read (select_stuff *ss)
   s->read_ready = false;
   /* This is apparently necessary for the com0com driver.
      See: http://cygwin.com/ml/cygwin/2009-01/msg00667.html */
+  ResetEvent (io_status.hEvent);
   SetCommMask (get_handle_cyg (), 0);
   SetCommMask (get_handle_cyg (), EV_RXCHAR);
-  ResetEvent (io_status.hEvent);
-  if (!WaitCommEvent (get_handle_cyg (), &event, &io_status))
+  if (ClearCommError (get_handle_cyg (), &io_err, &st) && st.cbInQue)
     {
-      if (GetLastError () == ERROR_IO_PENDING)
-	s->h = io_status.hEvent;
-      else
-	select_printf ("WaitCommEvent %E");
+      s->read_ready = true;
+      return s;
     }
-  else
-    s->read_ready = true;
+  if (WaitCommEvent (get_handle_cyg (), &event, &io_status))
+    {
+      s->read_ready = true;
+      return s;
+    }
+  if (GetLastError () == ERROR_IO_PENDING)
+    {
+      s->h = io_status.hEvent;
+      return s;
+    }
+  select_printf ("WaitCommEvent %E");
   return s;
 }
 
