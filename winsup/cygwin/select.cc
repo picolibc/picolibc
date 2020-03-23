@@ -1457,7 +1457,7 @@ peek_serial (select_record *s, bool)
 
   if (!ClearCommError (h, &io_err, &st))
     {
-      debug_printf ("ClearCommError %E");
+      select_printf ("ClearCommError %E");
       goto err;
     }
   if (st.cbInQue)
@@ -1493,6 +1493,7 @@ serial_read_cleanup (select_record *s, select_stuff *stuff)
     }
 }
 
+static int
 verify_serial (select_record *me, fd_set *rfds, fd_set *wfds, fd_set *efds)
 {
   return peek_serial (me, true);
@@ -1513,9 +1514,16 @@ fhandler_serial::select_read (select_stuff *ss)
      See: http://cygwin.com/ml/cygwin/2009-01/msg00667.html */
   SetCommMask (get_handle_cyg (), 0);
   SetCommMask (get_handle_cyg (), EV_RXCHAR);
-  if (!WaitCommEvent (get_handle_cyg (), &event, &io_status)
-      && GetLastError () == ERROR_IO_PENDING)
-    s->h = io_status.hEvent;
+  ResetEvent (io_status.hEvent);
+  if (!WaitCommEvent (get_handle_cyg (), &event, &io_status))
+    {
+      if (GetLastError () == ERROR_IO_PENDING)
+	s->h = io_status.hEvent;
+      else
+	select_printf ("WaitCommEvent %E");
+    }
+  else
+    s->read_ready = true;
   return s;
 }
 
