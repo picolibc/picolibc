@@ -105,6 +105,8 @@ math_test_src = [
   'tan_vec.c',
   'test.c',
   'test_is.c',
+  'trunc_vec.c',
+  'truncf_vec.c',
   'y0f_vec.c',
   'y0_vec.c',
   'y1f_vec.c',
