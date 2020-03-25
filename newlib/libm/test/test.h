@@ -463,6 +463,12 @@ void
 test_modff(int vector);
 
 void
+test_pow_vec(int vector);
+
+void
+test_powf_vec(int vector);
+
+void
 test_sin(int vector);
 
 void

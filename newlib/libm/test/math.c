@@ -613,6 +613,8 @@ test_math (int vector)
   test_logf(vector);
   test_modf(vector);
   test_modff(vector);
+  test_pow_vec(vector);
+  test_powf_vec(vector);
   test_sin(vector);
   test_sinf(vector);
   test_sinh(vector);
