@@ -59,8 +59,8 @@ void translate_to (FILE *file,
 }
 
 /* Convert double to float, preserving issignaling status */
-#define to_float(d)	(issignaling(d) ? __builtin_nanf("0x2000000") : (d))
-#define to_double(d)	(issignaling(d) ? __builtin_nan("0x4000000000000") : (d))
+#define to_float(f,d)	do { if (issignaling(d)) (f) = __builtin_nansf(""); else (f) = (d); } while(0)
+#define to_double(d,f)	do { if (issignaling(f)) (d) = __builtin_nans(""); else (d) = (f); } while(0)
 
 int
 ffcheck_id(double is,
@@ -157,7 +157,7 @@ fffcheck_id (float is,
 
   correct_double.parts.msw = p->qs[id].msw;
   correct_double.parts.lsw = p->qs[id].lsw;
-  correct.value = to_float(correct_double.value);
+  to_float(correct.value, correct_double.value);
 
   int error_bit = p->error_bit;
 
@@ -361,7 +361,7 @@ ffinish2 (FILE *f,
   if (vector)
   {
     __ieee_double_shape_type result2_double;
-    result2_double.value = to_double(fresult2);
+    to_double(result2_double.value, fresult2);
     p->qs[2].msw = result2_double.parts.msw;
     p->qs[2].lsw = result2_double.parts.lsw;
     frontline(f, mag, p, fresult, merror, errno, args , name);
@@ -478,7 +478,7 @@ run_vector_1 (int vector,
 
       if (in_float_range(arg1))
       {
-	arga = to_float(arg1);
+	to_float(arga, arg1);
 	fresult = ((pdblfunc)(func))(arga);
 	ffinish(f, vector, fresult, p,args, name);
       }
@@ -499,8 +499,8 @@ run_vector_1 (int vector,
 
        if (in_float_range(arg1) && in_float_range(arg2))
        {
-	 arga = to_float(arg1);
-	 argb = to_float(arg2);
+	 to_float(arga, arg1);
+	 to_float(argb, arg2);
 	 fresult = ((pdblfunc)(func))(arga, argb);
 	 ffinish(f, vector, fresult, p,args, name);
        }
@@ -521,7 +521,7 @@ run_vector_1 (int vector,
 
        if (in_float_range(arg2))
        {
-	 argb = to_float(arg2);
+	 to_float(argb, arg2);
 	 fresult = ((pdblfunc)(func))((int)arg1, argb);
 	 ffinish(f, vector, fresult, p,args, name);
        }
