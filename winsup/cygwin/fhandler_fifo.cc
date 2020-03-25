@@ -955,56 +955,62 @@ fhandler_fifo::fcntl (int cmd, intptr_t arg)
 int
 fhandler_fifo::dup (fhandler_base *child, int flags)
 {
-  int ret = -1;
+  int i = 0;
   fhandler_fifo *fhf = NULL;
 
   if (get_flags () & O_PATH)
     return fhandler_base::dup (child, flags);
 
   if (fhandler_base::dup (child, flags))
-    goto out;
+    goto err;
 
   fhf = (fhandler_fifo *) child;
   if (!DuplicateHandle (GetCurrentProcess (), read_ready,
 			GetCurrentProcess (), &fhf->read_ready,
-			0, true, DUPLICATE_SAME_ACCESS))
+			0, !(flags & O_CLOEXEC), DUPLICATE_SAME_ACCESS))
     {
-      fhf->close ();
       __seterrno ();
-      goto out;
+      goto err;
     }
   if (!DuplicateHandle (GetCurrentProcess (), write_ready,
 			GetCurrentProcess (), &fhf->write_ready,
-			0, true, DUPLICATE_SAME_ACCESS))
+			0, !(flags & O_CLOEXEC), DUPLICATE_SAME_ACCESS))
     {
-      NtClose (fhf->read_ready);
-      fhf->close ();
       __seterrno ();
-      goto out;
+      goto err_close_read_ready;
     }
-  fifo_client_lock ();
-  for (int i = 0; i < nhandlers; i++)
+  if (reader)
     {
-      if (!DuplicateHandle (GetCurrentProcess (), fc_handler[i].h,
-			    GetCurrentProcess (),
-			    &fhf->fc_handler[i].h,
-			    0, true, DUPLICATE_SAME_ACCESS))
+      fifo_client_lock ();
+      for (i = 0; i < nhandlers; i++)
+	{
+	  if (!DuplicateHandle (GetCurrentProcess (), fc_handler[i].h,
+				GetCurrentProcess (), &fhf->fc_handler[i].h,
+				0, !(flags & O_CLOEXEC), DUPLICATE_SAME_ACCESS))
+	    {
+	      __seterrno ();
+	      break;
+	    }
+	}
+      if (i < nhandlers)
 	{
 	  fifo_client_unlock ();
-	  NtClose (fhf->read_ready);
-	  NtClose (fhf->write_ready);
-	  fhf->close ();
-	  __seterrno ();
-	  goto out;
+	  goto err_close_handlers;
 	}
+      fifo_client_unlock ();
+      if (!fhf->listen_client ())
+	goto err_close_handlers;
+      fhf->init_fixup_before ();
     }
-  fifo_client_unlock ();
-  if (!reader || fhf->listen_client ())
-    ret = 0;
-  if (reader)
-    fhf->init_fixup_before ();
-out:
-  return ret;
+  return 0;
+err_close_handlers:
+  for (int j = 0; j < i; j++)
+    fhf->fc_handler[j].close ();
+  NtClose (fhf->write_ready);
+err_close_read_ready:
+  NtClose (fhf->read_ready);
+err:
+  return -1;
 }
 
 void
