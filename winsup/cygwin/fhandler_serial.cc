@@ -45,7 +45,7 @@ fhandler_serial::raw_read (void *ptr, size_t& ulen)
   if (ulen == 0)
     return;
 
-  /* If VMIN > 0 in blocking mode, we have to wait for at least VMIN chars.
+  /* If MIN > 0 in blocking mode, we have to wait for at least MIN chars.
      Otherwise we're in polling mode and there's no minimum chars. */
   ssize_t minchars = is_nonblocking () ? 0 : vmin_;
 
@@ -85,8 +85,8 @@ fhandler_serial::raw_read (void *ptr, size_t& ulen)
 	     and don't wait. */
 	  if (st.cbInQue && st.cbInQue >= minchars)
 	    bytes_to_read = MIN (st.cbInQue, bytes_to_read);
-	  /* Otherwise, if VMIN > 0, VTIME == 0, we have to wait until
-	     VMIN bytes are available in the inbound queue. */
+	  /* Otherwise, if MIN > 0, TIME == 0, we have to wait until
+	     MIN bytes are available in the inbound queue. */
 	  else if (minchars && !vtime_)
 	    wait_for_vmin = true;
 	}
