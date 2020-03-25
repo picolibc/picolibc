@@ -74,7 +74,7 @@ static float zero = 0.0;
 	 * j0(x) = 1/sqrt(pi) * (P(0,x)*cc - Q(0,x)*ss) / sqrt(x)
 	 * y0(x) = 1/sqrt(pi) * (P(0,x)*ss + Q(0,x)*cc) / sqrt(x)
 	 */
-		if(ix>0x80000000) z = (invsqrtpi*cc)/__ieee754_sqrtf(x);
+		if(ix>0x5c000000) z = (invsqrtpi*cc)/__ieee754_sqrtf(x);
 		else {
 		    u = pzerof(x); v = qzerof(x);
 		    z = invsqrtpi*(u*cc-v*ss)/__ieee754_sqrtf(x);
@@ -156,14 +156,14 @@ v04  =  4.4111031494e-10; /* 0x2ff280c2 */
                     if ((s*c)<zero) cc = z/ss;
                     else            ss = z/cc;
                 }
-                if(ix>0x80000000) z = (invsqrtpi*ss)/__ieee754_sqrtf(x);
+                if(ix>0x5c000000) z = (invsqrtpi*ss)/__ieee754_sqrtf(x);
                 else {
                     u = pzerof(x); v = qzerof(x);
                     z = invsqrtpi*(u*ss+v*cc)/__ieee754_sqrtf(x);
                 }
                 return z;
 	}
-	if(ix<=0x32000000) {	/* x < 2**-27 */
+	if(ix<=0x39800000) {	/* x < 2**-27 */
 	    return(u00 + tpi*__ieee754_logf(x));
 	}
 	z = x*x;

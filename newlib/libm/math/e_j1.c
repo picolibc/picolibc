@@ -336,7 +336,8 @@ static double ps2[5] = {
         __int32_t ix;
 	GET_HIGH_WORD(ix,x);
 	ix &= 0x7fffffff;
-        if(ix>=0x40200000)     {p = pr8; q= ps8;}
+	if (ix>=0x41b00000)    {return one;}
+	else if(ix>=0x40200000){p = pr8; q= ps8;}
         else if(ix>=0x40122E8B){p = pr5; q= ps5;}
         else if(ix>=0x4006DB6D){p = pr3; q= ps3;}
         else {p = pr2; q= ps2;}
@@ -473,7 +474,8 @@ static double qs2[6] = {
 	__int32_t ix;
 	GET_HIGH_WORD(ix,x);
 	ix &= 0x7fffffff;
-	if(ix>=0x40200000)     {p = qr8; q= qs8;}
+	if (ix>=0x41b00000)    {return .375/x;}
+	else if(ix>=0x40200000){p = qr8; q= qs8;}
 	else if(ix>=0x40122E8B){p = qr5; q= qs5;}
 	else if(ix>=0x4006DB6D){p = qr3; q= qs3;}
       else {p = qr2; q= qs2;}

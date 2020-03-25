@@ -75,7 +75,7 @@ static float zero    = 0.0;
 	 * j1(x) = 1/sqrt(pi) * (P(1,x)*cc - Q(1,x)*ss) / sqrt(x)
 	 * y1(x) = 1/sqrt(pi) * (P(1,x)*ss + Q(1,x)*cc) / sqrt(x)
 	 */
-		if(ix>0x80000000) z = (invsqrtpi*cc)/__ieee754_sqrtf(y);
+		if(ix>0x5c000000) z = (invsqrtpi*cc)/__ieee754_sqrtf(y);
 		else {
 		    u = ponef(y); v = qonef(y);
 		    z = invsqrtpi*(u*cc-v*ss)/__ieee754_sqrtf(y);
@@ -153,7 +153,7 @@ static float V0[5] = {
          *              sin(x) +- cos(x) = -cos(2x)/(sin(x) -+ cos(x))
          * to compute the worse one.
          */
-                if(ix>0x48000000) z = (invsqrtpi*ss)/__ieee754_sqrtf(x);
+                if(ix>0x5c000000) z = (invsqrtpi*ss)/__ieee754_sqrtf(x);
                 else {
                     u = ponef(x); v = qonef(x);
                     z = invsqrtpi*(u*ss+v*cc)/__ieee754_sqrtf(x);
