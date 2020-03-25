@@ -34,20 +34,19 @@ void __reg3
 fhandler_serial::raw_read (void *ptr, size_t& ulen)
 {
   OVERLAPPED ov = { 0 };
-  DWORD io_err, event;
+  DWORD io_err;
   COMSTAT st;
   DWORD bytes_to_read, read_bytes;
   ssize_t tot = 0;
-  bool wait_for_vmin, ret;
 
   if (ulen > SSIZE_MAX)
     ulen = SSIZE_MAX;
   if (ulen == 0)
     return;
 
-  /* If MIN > 0 in blocking mode, we have to wait for at least MIN chars.
-     Otherwise we're in polling mode and there's no minimum chars. */
-  ssize_t minchars = is_nonblocking () ? 0 : vmin_;
+  /* If MIN > 0 in blocking mode, we have to read at least VMIN chars,
+     otherwise we're in polling mode and there's no minimum chars. */
+  ssize_t minchars = (!is_nonblocking () && vmin_) ? MIN (vmin_, ulen) : 0;
 
   debug_printf ("ulen %ld, vmin_ %u, vtime_ %u", ulen, vmin_, vtime_);
 
@@ -55,8 +54,6 @@ fhandler_serial::raw_read (void *ptr, size_t& ulen)
 
   do
     {
-      wait_for_vmin = false;
-
       /* First check if chars are already in the inbound queue. */
       if (!ClearCommError (get_handle (), &io_err, &st))
 	goto err;
@@ -85,22 +82,14 @@ fhandler_serial::raw_read (void *ptr, size_t& ulen)
 	     and don't wait. */
 	  if (st.cbInQue && st.cbInQue >= minchars)
 	    bytes_to_read = MIN (st.cbInQue, bytes_to_read);
-	  /* Otherwise, if MIN > 0, TIME == 0, we have to wait until
-	     MIN bytes are available in the inbound queue. */
-	  else if (minchars && !vtime_)
-	    wait_for_vmin = true;
 	}
 
       ResetEvent (ov.hEvent);
-      if (wait_for_vmin)
-	ret = WaitCommEvent (get_handle (), &event, &ov);
-      else
-	ret = ReadFile (get_handle (), ptr, bytes_to_read, &read_bytes, &ov);
-      if (!ret)
+      if (!ReadFile (get_handle (), ptr, bytes_to_read, &read_bytes, &ov))
 	{
 	  if (GetLastError () != ERROR_IO_PENDING)
 	    goto err;
-	  if (!wait_for_vmin && is_nonblocking ())
+	  if (is_nonblocking ())
 	    {
 	      CancelIo (get_handle ());
 	      if (!GetOverlappedResult (get_handle (), &ov, &read_bytes,
@@ -145,15 +134,12 @@ fhandler_serial::raw_read (void *ptr, size_t& ulen)
 		}
 	    }
 	}
-      if (!wait_for_vmin)
-	{
-	  tot += read_bytes;
-	  ptr = (void *) ((caddr_t) ptr + read_bytes);
-	  ulen -= read_bytes;
-	  minchars -= read_bytes;
-	  debug_printf ("vtime_ %u, vmin_ %u, read_bytes %u, tot %D",
-			vtime_, vmin_, read_bytes, tot);
-	}
+      tot += read_bytes;
+      ptr = (void *) ((caddr_t) ptr + read_bytes);
+      ulen -= read_bytes;
+      minchars -= read_bytes;
+      debug_printf ("vtime_ %u, vmin_ %u, read_bytes %u, tot %D",
+		    vtime_, vmin_, read_bytes, tot);
       continue;
 
     err:
