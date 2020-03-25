@@ -65,13 +65,15 @@ STATUS_PIPE_EMPTY simply means there's no data to be read. */
 		   || _s == STATUS_PIPE_NOT_AVAILABLE \
 		   || _s == STATUS_PIPE_BUSY; })
 
+static NO_COPY fifo_reader_id_t null_fr_id = { .winpid = 0, .fh = NULL };
+
 fhandler_fifo::fhandler_fifo ():
   fhandler_base (),
   read_ready (NULL), write_ready (NULL), writer_opening (NULL),
   cancel_evt (NULL), thr_sync_evt (NULL), _maybe_eof (false), nhandlers (0),
   reader (false), writer (false), duplexer (false),
   max_atomic_write (DEFAULT_PIPEBUFSIZE),
-  shmem_handle (NULL), shmem (NULL)
+  me (null_fr_id), shmem_handle (NULL), shmem (NULL)
 {
   pipe_name_buf[0] = L'\0';
   need_fork_fixup (true);
@@ -575,6 +577,8 @@ fhandler_fifo::open (int flags, mode_t)
 	goto err_dec_nreaders;
       if (!(thr_sync_evt = create_event ()))
 	goto err_close_cancel_evt;
+      me.winpid = GetCurrentProcessId ();
+      me.fh = this;
       new cygthread (fifo_reader_thread, this, "fifo_reader", thr_sync_evt);
 
       /* If we're a duplexer, we need a handle for writing. */
@@ -1119,6 +1123,7 @@ fhandler_fifo::dup (fhandler_base *child, int flags)
       if (!(fhf->thr_sync_evt = create_event ()))
 	goto err_close_cancel_evt;
       inc_nreaders ();
+      fhf->me.fh = fhf;
       new cygthread (fifo_reader_thread, fhf, "fifo_reader", fhf->thr_sync_evt);
     }
   return 0;
@@ -1164,6 +1169,7 @@ fhandler_fifo::fixup_after_fork (HANDLE parent)
       if (!(thr_sync_evt = create_event ()))
 	api_fatal ("Can't create reader thread sync event during fork, %E");
       inc_nreaders ();
+      me.winpid = GetCurrentProcessId ();
       new cygthread (fifo_reader_thread, this, "fifo_reader", thr_sync_evt);
     }
 }
@@ -1179,6 +1185,7 @@ fhandler_fifo::fixup_after_exec ()
 
       if (reopen_shmem () < 0)
 	api_fatal ("Can't reopen shared memory during exec, %E");
+      me.winpid = GetCurrentProcessId ();
       if (!(cancel_evt = create_event ()))
 	api_fatal ("Can't create reader thread cancel event during exec, %E");
       if (!(thr_sync_evt = create_event ()))
