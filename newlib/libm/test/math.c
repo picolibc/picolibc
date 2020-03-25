@@ -60,21 +60,23 @@ void translate_to (FILE *file,
 
 /* Convert double to float, preserving issignaling status */
 #define to_float(d)	(issignaling(d) ? __builtin_nanf("0x2000000") : (d))
+#define to_double(d)	(issignaling(d) ? __builtin_nan("0x4000000000000") : (d))
 
 int
-ffcheck (double is,
-	 one_line_type *p,
-	 char *name,
-	 int serrno,
-	 int merror)
+ffcheck_id(double is,
+	   one_line_type *p,
+	   char *name,
+	   int serrno,
+	   int merror,
+	   int id)
 {
   /* Make sure the answer isn't to far wrong from the correct value */
   __ieee_double_shape_type correct, isbits;
   int mag;
   isbits.value = is;
 
-  correct.parts.msw = p->qs[0].msw;
-  correct.parts.lsw = p->qs[0].lsw;
+  correct.parts.msw = p->qs[id].msw;
+  correct.parts.lsw = p->qs[id].lsw;
 
   int error_bit = p->error_bit;
 
@@ -110,17 +112,17 @@ ffcheck (double is,
   }
 
 #if 0
-  if (p->qs[0].merror != merror)
+  if (p->qs[id].merror != merror)
   {
     /* Beware, matherr doesn't exist anymore.  */
     printf("testing %s_vec.c:%d, matherr wrong: %d %d\n",
-	   name, p->line, merror, p->qs[0].merror);
+	   name, p->line, merror, p->qs[id].merror);
   }
 
-  if (p->qs[0].errno_val != errno)
+  if (p->qs[id].errno_val != errno)
   {
     printf("testing %s_vec.c:%d, errno wrong: %d %d\n",
-	   name, p->line, errno, p->qs[0].errno_val);
+	   name, p->line, errno, p->qs[id].errno_val);
 
   }
 #endif
@@ -128,11 +130,22 @@ ffcheck (double is,
 }
 
 int
-fffcheck (float is,
-	  one_line_type *p,
-	  char *name,
-	  int serrno,
-	  int merror)
+ffcheck(double is,
+	one_line_type *p,
+	char *name,
+	int serrno,
+	int merror)
+{
+  return ffcheck_id(is, p, name, serrno, merror, 0);
+}
+
+int
+fffcheck_id (float is,
+	     one_line_type *p,
+	     char *name,
+	     int serrno,
+	     int merror,
+	     int id)
 {
   /* Make sure the answer isn't to far wrong from the correct value */
   __ieee_float_shape_type correct, isbits;
@@ -142,8 +155,8 @@ fffcheck (float is,
   isbits.value = is;
   is_double.value = is;
 
-  correct_double.parts.msw = p->qs[0].msw;
-  correct_double.parts.lsw = p->qs[0].lsw;
+  correct_double.parts.msw = p->qs[id].msw;
+  correct_double.parts.lsw = p->qs[id].lsw;
   correct.value = to_float(correct_double.value);
 
   int error_bit = p->error_bit;
@@ -175,21 +188,31 @@ fffcheck (float is,
   }
 
 #if 0
-  if (p->qs[0].merror != merror)
+  if (p->qs[id].merror != merror)
   {
     /* Beware, matherr doesn't exist anymore.  */
     printf("testing %s_vec.c:%d, matherr wrong: %d %d\n",
-	   name, p->line, merror, p->qs[0].merror);
+	   name, p->line, merror, p->qs[id].merror);
   }
 
-  if (p->qs[0].errno_val != errno)
+  if (p->qs[id].errno_val != errno)
   {
     printf("testing %s_vec.c:%d, errno wrong: %d %d\n",
-	   name, p->line, errno, p->qs[0].errno_val);
+	   name, p->line, errno, p->qs[id].errno_val);
 
   }
 #endif
   return mag;
+}
+
+int
+fffcheck (float is,
+	  one_line_type *p,
+	  char *name,
+	  int serrno,
+	  int merror)
+{
+  return fffcheck_id(is, p, name, serrno, merror, 0);
 }
 
 double
@@ -281,6 +304,30 @@ finish (FILE *f,
   }
 }
 
+finish2 (FILE *f,
+	 int vector,
+	 double result,
+	 double result2,
+	 one_line_type *p,
+	 char *args,
+	 char *name)
+{
+  int mag, mag2;
+
+  mag = ffcheck(result, p,name,  merror, errno);
+  mag2 = ffcheck_id(result2, p,name,  merror, errno, 2);
+  if (mag2 < mag)
+    mag = mag2;
+  if (vector)
+  {
+    __ieee_double_shape_type result2_double;
+    result2_double.value = result2;
+    p->qs[2].msw = result2_double.parts.msw;
+    p->qs[2].lsw = result2_double.parts.lsw;
+    frontline(f, mag, p, result, merror, errno, args , name);
+  }
+}
+
 ffinish (FILE *f,
        int vector,
        float fresult,
@@ -293,6 +340,30 @@ ffinish (FILE *f,
   mag = fffcheck(fresult, p,name,  merror, errno);
   if (vector)
   {
+    frontline(f, mag, p, fresult, merror, errno, args , name);
+  }
+}
+
+ffinish2 (FILE *f,
+	  int vector,
+	  float fresult,
+	  float fresult2,
+	  one_line_type *p,
+	  char *args,
+	  char *name)
+{
+  int mag, mag2;
+
+  mag = fffcheck(fresult, p,name,  merror, errno);
+  mag2 = fffcheck_id(fresult2, p, name, merror, errno, 2);
+  if (mag2 < mag)
+    mag = mag2;
+  if (vector)
+  {
+    __ieee_double_shape_type result2_double;
+    result2_double.value = to_double(fresult2);
+    p->qs[2].msw = result2_double.parts.msw;
+    p->qs[2].lsw = result2_double.parts.lsw;
     frontline(f, mag, p, fresult, merror, errno, args , name);
   }
 }
@@ -462,7 +533,22 @@ run_vector_1 (int vector,
        result = (double) ((pdblfunc)(func))(arg1);
        finish(f, vector, result, p, args, name);
      }
+     else if (strcmp(args,"ddp") == 0)
+     {
+       typedef double (*pdblfunc)(double, double *);
+       double result2;
 
+       result = (double) ((pdblfunc)(func))(arg1, &result2);
+       finish2(f, vector, result, result2, p, args, name);
+     }
+     else if (strcmp(args,"ffp") == 0)
+     {
+       typedef float (*pdblfunc)(float, float *);
+       float result2;
+
+       fresult = (float) ((pdblfunc)(func))(arg1, &result2);
+       ffinish2(f, vector, fresult, result2, p, args, name);
+     }
     p++;
   }
   if (vector)
@@ -525,6 +611,8 @@ test_math (int vector)
   test_log2(vector);
   test_log2f(vector);
   test_logf(vector);
+  test_modf(vector);
+  test_modff(vector);
   test_sin(vector);
   test_sinf(vector);
   test_sinh(vector);

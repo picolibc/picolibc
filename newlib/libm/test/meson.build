@@ -90,6 +90,8 @@ math_test_src = [
   'log_vec.c',
   'math2.c',
   'math.c',
+  'modf_vec.c',
+  'modff_vec.c',
   'sinf_vec.c',
   'sinhf_vec.c',
   'sinh_vec.c',

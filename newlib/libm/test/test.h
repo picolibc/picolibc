@@ -457,6 +457,12 @@ void
 test_logf(int vector);
 
 void
+test_modf(int vector);
+
+void
+test_modff(int vector);
+
+void
 test_sin(int vector);
 
 void
