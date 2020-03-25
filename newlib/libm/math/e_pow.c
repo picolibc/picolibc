@@ -126,7 +126,7 @@ __strong_reference(__ieee754_pow, pow);
     /* x|y==NaN return NaN unless x==1 then return 1 */
 	if(ix > 0x7ff00000 || ((ix==0x7ff00000)&&(lx!=0)) ||
 	   iy > 0x7ff00000 || ((iy==0x7ff00000)&&(ly!=0))) {
-	    if(((ix-0x3ff00000)|lx)==0) return one;
+	    if(((hx-0x3ff00000)|lx)==0) return one;
 	    else return nan("");	
 	}
 

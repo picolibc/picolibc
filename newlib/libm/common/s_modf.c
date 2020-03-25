@@ -100,6 +100,7 @@ static double one = 1.0;
 	} else if (j0>51) {		/* no fraction part */
 	    __uint32_t high;
 	    *iptr = x*one;
+	    if (__fpclassifyd(x) == FP_NAN) return x+x; /* x is NaN, return NaN */
 	    GET_HIGH_WORD(high,x);
 	    INSERT_WORDS(x,high&0x80000000,0);	/* return +-0 */
 	    return x;

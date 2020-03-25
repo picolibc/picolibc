@@ -83,7 +83,7 @@ __strong_reference(__ieee754_powf, powf);
     /* x|y==NaN return NaN unless x==1 then return 1 */
 	if(FLT_UWORD_IS_NAN(ix) ||
 	   FLT_UWORD_IS_NAN(iy)) {
-	    if(ix==0x3f800000) return one;
+	    if(hx==0x3f800000) return one;
 	    else return nanf("");
 	}
 
