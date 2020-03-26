@@ -33,19 +33,6 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 #include "test.h"
- one_line_type powf_vec[] = {
-{64, 0,123,__LINE__, 0x7ff80000, 0x00000000, 0x7ff80000, 0x00000000, 0x7ff80000, 0x00000000 },   /* qnan=f(qnan, qnan) */
-{64, 0,123,__LINE__, 0x7ff80000, 0x00000000, 0x7ff40000, 0x00000000, 0x7ff80000, 0x00000000 },   /* qnan=f(snan, qnan) */
-{64, 0,123,__LINE__, 0x7ff80000, 0x00000000, 0x7ff80000, 0x00000000, 0x7ff40000, 0x00000000 },   /* qnan=f(qnan, snan) */
-{64, 0,123,__LINE__, 0x7ff80000, 0x00000000, 0x7ff40000, 0x00000000, 0x7ff40000, 0x00000000 },   /* qnan=f(snan, snan) */
-{64, 0,123,__LINE__, 0x7ff80000, 0x00000000, 0x7ff80000, 0x00000000, 0x7ff80000, 0x00000000 },   /* qnan=f(qnan, qnan) */
-{64, 0,123,__LINE__, 0x7ff80000, 0x00000000, 0x7ff80000, 0x00000000, 0x3ff00000, 0x00000000 },   /* qnan=f(qnan, 1) */
-{64, 0,123,__LINE__, 0x7ff80000, 0x00000000, 0x7ff40000, 0x00000000, 0x3ff00000, 0x00000000 },   /* qnan=f(snan, 1) */
-{64, 0,123,__LINE__, 0x7ff80000, 0x00000000, 0x7ff80000, 0x00000000, 0xbff00000, 0x00000000 },   /* qnan=f(qnan, -1) */
-{64, 0,123,__LINE__, 0x7ff80000, 0x00000000, 0x7ff40000, 0x00000000, 0xbff00000, 0x00000000 },   /* qnan=f(snan, -1) */
-{64, 0,123,__LINE__, 0x7ff80000, 0x00000000, 0x3ff00000, 0x00000000, 0x7ff80000, 0x00000000 },   /* qnan=f(1, qnan) */
-{64, 0,123,__LINE__, 0x7ff80000, 0x00000000, 0x3ff00000, 0x00000000, 0x7ff40000, 0x00000000 },   /* qnan=f(1, snan) */
-{64, 0,123,__LINE__, 0x7ff80000, 0x00000000, 0xbff00000, 0x00000000, 0x7ff80000, 0x00000000 },   /* qnan=f(-1, qnan) */
-{64, 0,123,__LINE__, 0x7ff80000, 0x00000000, 0xbff00000, 0x00000000, 0x7ff40000, 0x00000000 },   /* qnan=f(-1, snan) */
-0,};
-void test_powf_vec(int m)   {run_vector_1(m,powf_vec,(char *)(powf),"powf","fff");   }
+extern one_line_type pow_vec[];
+
+void test_powf_vec(int m)   {run_vector_1(m,pow_vec,(char *)(powf),"powf","fff");   }
