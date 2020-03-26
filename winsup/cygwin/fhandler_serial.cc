@@ -80,7 +80,7 @@ fhandler_serial::raw_read (void *ptr, size_t& ulen)
 	  /* If the number of chars in the inbound queue is sufficent
 	     (minchars defines the minimum), set bytes_to_read accordingly
 	     and don't wait. */
-	  if (st.cbInQue && st.cbInQue >= minchars)
+	  if (st.cbInQue && (ssize_t) st.cbInQue >= minchars)
 	    bytes_to_read = MIN (st.cbInQue, bytes_to_read);
 	}
 
