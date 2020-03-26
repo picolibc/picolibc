@@ -33,10 +33,8 @@
 	    } else {
 		i = (0x007fffff)>>j0;
 		if((i0&i)==0) {			/* x is integral */
-		    __uint32_t ix;
 		    *iptr = x;
-		    GET_FLOAT_WORD(ix,x);
-		    SET_FLOAT_WORD(x,ix&0x80000000);	/* return +-0 */
+		    SET_FLOAT_WORD(x,i0&0x80000000);	/* return +-0 */
 		    return x;
 		} else {
 		    SET_FLOAT_WORD(*iptr,i0&(~i));
@@ -44,11 +42,9 @@
 		}
 	    }
 	} else {			/* no fraction part */
-	    __uint32_t ix;
 	    *iptr = x;
 	    if (__fpclassifyf(x) == FP_NAN) return *iptr = x+x; /* x is NaN, return NaN */
-	    GET_FLOAT_WORD(ix,x);
-	    SET_FLOAT_WORD(x,ix&0x80000000);	/* return +-0 */
+	    SET_FLOAT_WORD(x,i0&0x80000000);	/* return +-0 */
 	    return x;
 	}
 }
