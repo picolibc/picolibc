@@ -1307,9 +1307,9 @@ class fhandler_fifo: public fhandler_base
   HANDLE write_ready;           /* A writer is open; OK for a reader to open. */
   HANDLE writer_opening;        /* A writer is opening; no EOF. */
 
-  /* Non-shared handles needed for the listen_client_thread. */
-  HANDLE listen_client_thr;
-  HANDLE lct_termination_evt;
+  /* Handles to non-shared events needed for fifo_reader_threads. */
+  HANDLE cancel_evt;            /* Signal thread to terminate. */
+  HANDLE thr_sync_evt;          /* The thread has terminated. */
 
   UNICODE_STRING pipe_name;
   WCHAR pipe_name_buf[CYGWIN_FIFO_PIPE_NAME_LEN + 1];
@@ -1326,11 +1326,10 @@ class fhandler_fifo: public fhandler_base
   NTSTATUS wait_open_pipe (HANDLE&);
   int add_client_handler ();
   void delete_client_handler (int);
-  bool listen_client ();
-  void stop_listen_client ();
-  int check_listen_client_thread ();
+  void cancel_reader_thread ();
   void record_connection (fifo_client_handler&,
 			  fifo_client_connect_state = fc_connected);
+
 public:
   fhandler_fifo ();
   bool hit_eof ();
@@ -1339,7 +1338,7 @@ public:
   int get_nhandlers () const { return nhandlers; }
   fifo_client_handler get_fc_handler (int i) const { return fc_handler[i]; }
   PUNICODE_STRING get_pipe_name ();
-  DWORD listen_client_thread ();
+  DWORD fifo_reader_thread_func ();
   void fifo_client_lock () { _fifo_client_lock.lock (); }
   void fifo_client_unlock () { _fifo_client_lock.unlock (); }
   int open (int, mode_t);
@@ -1351,9 +1350,6 @@ public:
   void set_close_on_exec (bool val);
   void __reg3 raw_read (void *ptr, size_t& ulen);
   ssize_t __reg3 raw_write (const void *ptr, size_t ulen);
-  bool need_fixup_before () const { return reader; }
-  int fixup_before_fork_exec (DWORD) { stop_listen_client (); return 0; }
-  void init_fixup_before ();
   void fixup_after_fork (HANDLE);
   void fixup_after_exec ();
   int __reg2 fstatvfs (struct statvfs *buf);
@@ -1375,7 +1371,6 @@ public:
     void *ptr = (void *) ccalloc (malloc_type, 1, sizeof (fhandler_fifo));
     fhandler_fifo *fhf = new (ptr) fhandler_fifo (ptr);
     /* We don't want our client list to change any more. */
-    stop_listen_client ();
     copyto (fhf);
     /* fhf->pipe_name_buf is a *copy* of this->pipe_name_buf, but
        fhf->pipe_name.Buffer == this->pipe_name_buf. */
