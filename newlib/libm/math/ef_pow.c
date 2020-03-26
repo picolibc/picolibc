@@ -14,6 +14,7 @@
  */
 
 #include "fdlibm.h"
+#include "math_config.h"
 
 #if __OBSOLETE_MATH
 #ifdef __v810__
@@ -74,13 +75,16 @@ ivln2_l  =  7.0526075433e-06; /* 0x36eca570 =1/ln2 tail*/
 	ix = hx&0x7fffffff;  iy = hy&0x7fffffff;
 
     /* y==zero: x**0 = 1 */
-	if(FLT_UWORD_IS_ZERO(iy)) return one; 	
+	if(FLT_UWORD_IS_ZERO(iy)) {
+	    if (issignalingf_inline(x)) return x + y;
+	    return one;
+	}
 
     /* x|y==NaN return NaN unless x==1 then return 1 */
 	if(FLT_UWORD_IS_NAN(ix) ||
 	   FLT_UWORD_IS_NAN(iy)) {
-	    if(hx==0x3f800000) return one;
-	    else return nanf("");
+	    if(hx==0x3f800000 && !issignalingf_inline(y)) return one;
+	    else return x + y;
 	}
 
     /* determine if y is an odd int when x < 0
