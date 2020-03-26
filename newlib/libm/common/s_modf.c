@@ -64,12 +64,6 @@ QUICKREF
 #ifndef _DOUBLE_IS_32BITS
 
 #ifdef __STDC__
-static const double one = 1.0;
-#else
-static double one = 1.0;
-#endif
-
-#ifdef __STDC__
 	double modf(double x, double *iptr)
 #else
 	double modf(x, iptr)
@@ -99,8 +93,8 @@ static double one = 1.0;
 	    }
 	} else if (j0>51) {		/* no fraction part */
 	    __uint32_t high;
-	    *iptr = x*one;
-	    if (__fpclassifyd(x) == FP_NAN) return x+x; /* x is NaN, return NaN */
+	    *iptr = x;
+	    if (__fpclassifyd(x) == FP_NAN) return *iptr = x+x; /* x is NaN, return NaN */
 	    GET_HIGH_WORD(high,x);
 	    INSERT_WORDS(x,high&0x80000000,0);	/* return +-0 */
 	    return x;

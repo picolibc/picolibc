@@ -16,12 +16,6 @@
 #include "fdlibm.h"
 
 #ifdef __STDC__
-static const float one = 1.0;
-#else
-static float one = 1.0;
-#endif
-
-#ifdef __STDC__
 	float modff(float x, float *iptr)
 #else
 	float modff(x, iptr)
@@ -51,8 +45,8 @@ static float one = 1.0;
 	    }
 	} else {			/* no fraction part */
 	    __uint32_t ix;
-	    *iptr = x*one;
-	    if (__fpclassifyf(x) == FP_NAN) return x+x; /* x is NaN, return NaN */
+	    *iptr = x;
+	    if (__fpclassifyf(x) == FP_NAN) return *iptr = x+x; /* x is NaN, return NaN */
 	    GET_FLOAT_WORD(ix,x);
 	    SET_FLOAT_WORD(x,ix&0x80000000);	/* return +-0 */
 	    return x;
