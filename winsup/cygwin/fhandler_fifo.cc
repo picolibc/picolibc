@@ -164,7 +164,7 @@ fhandler_fifo::npfs_handle (HANDLE &nph)
    blocking mode so that we can easily wait for a connection.  After
    it is connected, it is put in nonblocking mode. */
 HANDLE
-fhandler_fifo::create_pipe_instance (bool first)
+fhandler_fifo::create_pipe_instance ()
 {
   NTSTATUS status;
   HANDLE npfsh;
@@ -187,14 +187,12 @@ fhandler_fifo::create_pipe_instance (bool first)
   access = GENERIC_READ | FILE_READ_ATTRIBUTES | FILE_WRITE_ATTRIBUTES
     | SYNCHRONIZE;
   sharing = FILE_SHARE_READ | FILE_SHARE_WRITE;
-  hattr = openflags & O_CLOEXEC ? 0 : OBJ_INHERIT;
-  if (first)
-    hattr |= OBJ_CASE_INSENSITIVE;
+  hattr = (openflags & O_CLOEXEC ? 0 : OBJ_INHERIT) | OBJ_CASE_INSENSITIVE;
   InitializeObjectAttributes (&attr, get_pipe_name (),
 			      hattr, npfsh, NULL);
   timeout.QuadPart = -500000;
   status = NtCreateNamedPipeFile (&ph, access, &attr, &io, sharing,
-				  first ? FILE_CREATE : FILE_OPEN, 0,
+				  FILE_OPEN_IF, 0,
 				  FILE_PIPE_MESSAGE_TYPE
 				    | FILE_PIPE_REJECT_REMOTE_CLIENTS,
 				  FILE_PIPE_MESSAGE_MODE,
@@ -292,14 +290,13 @@ fhandler_fifo::add_client_handler ()
   int ret = -1;
   fifo_client_handler fc;
   HANDLE ph = NULL;
-  bool first = (nhandlers == 0);
 
   if (nhandlers == MAX_CLIENTS)
     {
       set_errno (EMFILE);
       goto out;
     }
-  ph = create_pipe_instance (first);
+  ph = create_pipe_instance ();
   if (!ph)
     goto out;
   else
@@ -349,92 +346,120 @@ fhandler_fifo::fifo_reader_thread_func ()
 
   while (1)
     {
-      /* Cleanup the fc_handler list. */
-      fifo_client_lock ();
-      int i = 0;
-      while (i < nhandlers)
+      fifo_reader_id_t cur_owner;
+
+      owner_lock ();
+      cur_owner = get_owner ();
+      if (!cur_owner)
 	{
-	  if (fc_handler[i].state < fc_connected)
-	    delete_client_handler (i);
-	  else
-	    i++;
+	  set_owner (me);
+	  owner_unlock ();
+	  continue;
 	}
-
-      /* Create a new client handler. */
-      if (add_client_handler () < 0)
-	api_fatal ("Can't add a client handler, %E");
-
-      /* Listen for a writer to connect to the new client handler. */
-      fifo_client_handler& fc = fc_handler[nhandlers - 1];
-      fifo_client_unlock ();
-      NTSTATUS status;
-      IO_STATUS_BLOCK io;
-      bool cancel = false;
-
-      status = NtFsControlFile (fc.h, conn_evt, NULL, NULL, &io,
-				FSCTL_PIPE_LISTEN, NULL, 0, NULL, 0);
-      if (status == STATUS_PENDING)
+      else if (cur_owner != me)
 	{
-	  HANDLE w[2] = { conn_evt, cancel_evt };
-	  switch (WaitForMultipleObjects (2, w, false, INFINITE))
+	  owner_unlock ();
+	  WaitForSingleObject (cancel_evt, INFINITE);
+	  goto canceled;
+	}
+      else
+	{
+	  /* I'm the owner */
+	  fifo_client_lock ();
+
+	  /* Cleanup the fc_handler list. */
+	  fifo_client_lock ();
+	  int i = 0;
+	  while (i < nhandlers)
 	    {
-	    case WAIT_OBJECT_0:
-	      status = io.Status;
+	      if (fc_handler[i].state < fc_connected)
+		delete_client_handler (i);
+	      else
+		i++;
+	    }
+
+	  /* Create a new client handler. */
+	  if (add_client_handler () < 0)
+	    api_fatal ("Can't add a client handler, %E");
+
+	  /* Listen for a writer to connect to the new client handler. */
+	  fifo_client_handler& fc = fc_handler[nhandlers - 1];
+	  fifo_client_unlock ();
+	  owner_unlock ();
+	  NTSTATUS status;
+	  IO_STATUS_BLOCK io;
+	  bool cancel = false;
+
+	  status = NtFsControlFile (fc.h, conn_evt, NULL, NULL, &io,
+				    FSCTL_PIPE_LISTEN, NULL, 0, NULL, 0);
+	  if (status == STATUS_PENDING)
+	    {
+	      HANDLE w[2] = { conn_evt, cancel_evt };
+	      switch (WaitForMultipleObjects (2, w, false, INFINITE))
+		{
+		case WAIT_OBJECT_0:
+		  status = io.Status;
+		  debug_printf ("NtFsControlFile STATUS_PENDING, then %y",
+				status);
+		  break;
+		case WAIT_OBJECT_0 + 1:
+		  status = STATUS_THREAD_IS_TERMINATING;
+		  cancel = true;
+		  break;
+		default:
+		  api_fatal ("WFMO failed, %E");
+		}
+	    }
+	  else
+	    debug_printf ("NtFsControlFile status %y, no STATUS_PENDING",
+			  status);
+	  HANDLE ph = NULL;
+	  NTSTATUS status1;
+
+	  fifo_client_lock ();
+	  switch (status)
+	    {
+	    case STATUS_SUCCESS:
+	    case STATUS_PIPE_CONNECTED:
+	      record_connection (fc);
 	      break;
-	    case WAIT_OBJECT_0 + 1:
-	      status = STATUS_THREAD_IS_TERMINATING;
-	      cancel = true;
+	    case STATUS_PIPE_CLOSING:
+	      record_connection (fc, fc_closing);
+	      break;
+	    case STATUS_THREAD_IS_TERMINATING:
+	      /* Try to connect a bogus client.  Otherwise fc is still
+		 listening, and the next connection might not get recorded. */
+	      status1 = open_pipe (ph);
+	      WaitForSingleObject (conn_evt, INFINITE);
+	      if (NT_SUCCESS (status1))
+		/* Bogus cilent connected. */
+		delete_client_handler (nhandlers - 1);
+	      else
+		/* Did a real client connect? */
+		switch (io.Status)
+		  {
+		  case STATUS_SUCCESS:
+		  case STATUS_PIPE_CONNECTED:
+		    record_connection (fc);
+		    break;
+		  case STATUS_PIPE_CLOSING:
+		    record_connection (fc, fc_closing);
+		    break;
+		  default:
+		    debug_printf ("NtFsControlFile status %y after failing to connect bogus client or real client", io.Status);
+		    fc.state = fc_unknown;
+		    break;
+		  }
 	      break;
 	    default:
-	      api_fatal ("WFMO failed, %E");
+	      break;
 	    }
+	  fifo_client_unlock ();
+	  if (ph)
+	    NtClose (ph);
+	  if (cancel)
+	    goto canceled;
 	}
-      HANDLE ph = NULL;
-      NTSTATUS status1;
-
-      fifo_client_lock ();
-      switch (status)
-	{
-	case STATUS_SUCCESS:
-	case STATUS_PIPE_CONNECTED:
-	  record_connection (fc);
-	  break;
-	case STATUS_PIPE_CLOSING:
-	  record_connection (fc, fc_closing);
-	  break;
-	case STATUS_THREAD_IS_TERMINATING:
-	  /* Try to connect a bogus client.  Otherwise fc is still
-	     listening, and the next connection might not get recorded. */
-	  status1 = open_pipe (ph);
-	  WaitForSingleObject (conn_evt, INFINITE);
-	  if (NT_SUCCESS (status1))
-	    /* Bogus cilent connected. */
-	    delete_client_handler (nhandlers - 1);
-	  else
-	    /* Did a real client connect? */
-	    switch (io.Status)
-	      {
-	      case STATUS_SUCCESS:
-	      case STATUS_PIPE_CONNECTED:
-		record_connection (fc);
-		break;
-	      case STATUS_PIPE_CLOSING:
-		record_connection (fc, fc_closing);
-		break;
-	      default:
-		debug_printf ("NtFsControlFile status %y after failing to connect bogus client or real client", io.Status);
-		fc.state = fc_unknown;
-		break;
-	      }
-	  break;
-	default:
-	  break;
-	}
-      fifo_client_unlock ();
-      if (ph)
-	NtClose (ph);
-      if (cancel)
-	goto canceled;
     }
 canceled:
   if (conn_evt)
@@ -580,6 +605,15 @@ fhandler_fifo::open (int flags, mode_t)
       me.winpid = GetCurrentProcessId ();
       me.fh = this;
       new cygthread (fifo_reader_thread, this, "fifo_reader", thr_sync_evt);
+      /* Wait until there's an owner. */
+      owner_lock ();
+      while (!get_owner ())
+	{
+	  owner_unlock ();
+	  yield ();
+	  owner_lock ();
+	}
+      owner_unlock ();
 
       /* If we're a duplexer, we need a handle for writing. */
       if (duplexer)
@@ -1014,6 +1048,10 @@ fhandler_fifo::close ()
       if (dec_nreaders () == 0)
 	ResetEvent (read_ready);
       cancel_reader_thread ();
+      owner_lock ();
+      if (get_owner () == me)
+	set_owner (null_fr_id);
+      owner_unlock ();
       if (cancel_evt)
 	NtClose (cancel_evt);
       if (thr_sync_evt)
@@ -1056,7 +1094,6 @@ fhandler_fifo::fcntl (int cmd, intptr_t arg)
 int
 fhandler_fifo::dup (fhandler_base *child, int flags)
 {
-  int i = 0;
   fhandler_fifo *fhf = NULL;
 
   if (get_flags () & O_PATH)
@@ -1092,6 +1129,9 @@ fhandler_fifo::dup (fhandler_base *child, int flags)
       /* Make sure the child starts unlocked. */
       fhf->fifo_client_unlock ();
 
+      /* Clear fc_handler list; the child never starts as owner. */
+      fhf->nhandlers = 0;
+
       if (!DuplicateHandle (GetCurrentProcess (), shmem_handle,
 			    GetCurrentProcess (), &fhf->shmem_handle,
 			    0, !(flags & O_CLOEXEC), DUPLICATE_SAME_ACCESS))
@@ -1101,25 +1141,8 @@ fhandler_fifo::dup (fhandler_base *child, int flags)
 	}
       if (fhf->reopen_shmem () < 0)
 	goto err_close_shmem_handle;
-      fifo_client_lock ();
-      for (i = 0; i < nhandlers; i++)
-	{
-	  if (!DuplicateHandle (GetCurrentProcess (), fc_handler[i].h,
-				GetCurrentProcess (), &fhf->fc_handler[i].h,
-				0, !(flags & O_CLOEXEC), DUPLICATE_SAME_ACCESS))
-	    {
-	      __seterrno ();
-	      break;
-	    }
-	}
-      if (i < nhandlers)
-	{
-	  fifo_client_unlock ();
-	  goto err_close_handlers;
-	}
-      fifo_client_unlock ();
       if (!(fhf->cancel_evt = create_event ()))
-	goto err_close_handlers;
+	goto err_close_shmem;
       if (!(fhf->thr_sync_evt = create_event ()))
 	goto err_close_cancel_evt;
       inc_nreaders ();
@@ -1129,9 +1152,7 @@ fhandler_fifo::dup (fhandler_base *child, int flags)
   return 0;
 err_close_cancel_evt:
   NtClose (fhf->cancel_evt);
-err_close_handlers:
-  for (int j = 0; j < i; j++)
-    fhf->fc_handler[j].close ();
+err_close_shmem:
   NtUnmapViewOfSection (GetCurrentProcess (), fhf->shmem);
 err_close_shmem_handle:
   NtClose (fhf->shmem_handle);
@@ -1160,10 +1181,10 @@ fhandler_fifo::fixup_after_fork (HANDLE parent)
       fork_fixup (parent, shmem_handle, "shmem_handle");
       if (reopen_shmem () < 0)
 	api_fatal ("Can't reopen shared memory during fork, %E");
-      fifo_client_lock ();
-      for (int i = 0; i < nhandlers; i++)
-	fork_fixup (parent, fc_handler[i].h, "fc_handler[].h");
-      fifo_client_unlock ();
+      if (close_on_exec ())
+	/* Prevent a later attempt to close the non-inherited
+	   pipe-instance handles copied from the parent. */
+	nhandlers = 0;
       if (!(cancel_evt = create_event ()))
 	api_fatal ("Can't create reader thread cancel event during fork, %E");
       if (!(thr_sync_evt = create_event ()))

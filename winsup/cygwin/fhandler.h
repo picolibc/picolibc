@@ -1324,10 +1324,17 @@ struct fifo_reader_id_t
 class fifo_shmem_t
 {
   LONG _nreaders;
+  fifo_reader_id_t _owner;
+  af_unix_spinlock_t _owner_lock;
 
 public:
   int inc_nreaders () { return (int) InterlockedIncrement (&_nreaders); }
   int dec_nreaders () { return (int) InterlockedDecrement (&_nreaders); }
+
+  fifo_reader_id_t get_owner () const { return _owner; }
+  void set_owner (fifo_reader_id_t fr_id) { _owner = fr_id; }
+  void owner_lock () { _owner_lock.lock (); }
+  void owner_unlock () { _owner_lock.unlock (); }
 };
 
 class fhandler_fifo: public fhandler_base
@@ -1356,7 +1363,7 @@ class fhandler_fifo: public fhandler_base
 
   bool __reg2 wait (HANDLE);
   static NTSTATUS npfs_handle (HANDLE &);
-  HANDLE create_pipe_instance (bool);
+  HANDLE create_pipe_instance ();
   NTSTATUS open_pipe (HANDLE&);
   NTSTATUS wait_open_pipe (HANDLE&);
   int add_client_handler ();
@@ -1384,6 +1391,10 @@ public:
   void fifo_client_unlock () { _fifo_client_lock.unlock (); }
 
   fifo_reader_id_t get_me () const { return me; }
+  fifo_reader_id_t get_owner () const { return shmem->get_owner (); }
+  void set_owner (fifo_reader_id_t fr_id) { shmem->set_owner (fr_id); }
+  void owner_lock () { shmem->owner_lock (); }
+  void owner_unlock () { shmem->owner_unlock (); }
 
   int open (int, mode_t);
   off_t lseek (off_t offset, int whence);
