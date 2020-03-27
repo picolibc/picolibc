@@ -82,6 +82,10 @@ be supported by upcoming mintty releases.  For the reasoning, see
 https://gitlab.freedesktop.org/terminal-wg/specifications/issues/9.
 </para></listitem>
 
+<listitem><para>
+Support WSL symlinks.
+</para></listitem>
+
 </itemizedlist>
 
 </sect2>

@@ -2360,6 +2360,29 @@ check_reparse_point_string (PUNICODE_STRING subst)
   return false;
 }
 
+#ifndef IO_REPARSE_TAG_LX_SYMLINK
+#define IO_REPARSE_TAG_LX_SYMLINK	(0xa000001d)
+#endif
+
+typedef struct _REPARSE_LX_SYMLINK_BUFFER
+{
+  DWORD	ReparseTag;
+  WORD	ReparseDataLength;
+  WORD	Reserved;
+  struct {
+    DWORD FileType;	/* Take member name with a grain of salt.  Value is
+			   apparently always 2 for symlinks. */
+    char  PathBuffer[1];/* POSIX path as given to symlink(2).
+			   Path is not \0 terminated.
+			   Length is ReparseDataLength - sizeof (FileType).
+			   Always UTF-8.
+			   Chars given in incompatible codesets, e. g. umlauts
+			   in ISO-8859-x, are converted to the Unicode
+			   REPLACEMENT CHARACTER 0xfffd == \xef\xbf\bd */
+  } LxSymlinkReparseBuffer;
+} REPARSE_LX_SYMLINK_BUFFER,*PREPARSE_LX_SYMLINK_BUFFER;
+
+
 /* Return values:
     <0: Negative errno.
      0: No symlink.
@@ -2433,6 +2456,56 @@ check_reparse_point_target (HANDLE h, bool remote, PREPARSE_DATA_BUFFER rp,
 	}
       if (check_reparse_point_string (psymbuf))
 	return PATH_SYMLINK | PATH_REP;
+    }
+  else if (rp->ReparseTag == IO_REPARSE_TAG_LX_SYMLINK)
+    {
+      /* WSL symlink.  Problem: We have to convert the path to UTF-16 for
+	 the caller.  Reparse points are 16K max.  The buffer given to rp
+	 is 32K.  So there's enough trailing space in the buffer to convert
+	 to UTF-16 and let psymbuf point to it. */
+      PREPARSE_LX_SYMLINK_BUFFER rpl = (PREPARSE_LX_SYMLINK_BUFFER) rp;
+      char *path_buf = rpl->LxSymlinkReparseBuffer.PathBuffer;
+      DWORD path_len = rpl->ReparseDataLength - sizeof (DWORD);
+      PBYTE utf16_ptr;
+      PWCHAR utf16_buf;
+      int utf16_bufsize;
+      bool full_path = false;
+      const size_t drv_prefix_len = strlen ("/mnt");
+
+      /* Compute buffer for path converted to UTF-16. */
+      utf16_ptr = (PBYTE) rpl + sizeof (REPARSE_LX_SYMLINK_BUFFER)
+		  + rp->ReparseDataLength;
+      while ((intptr_t) utf16_ptr % sizeof (WCHAR))
+	++utf16_ptr;
+      utf16_buf = (PWCHAR) utf16_ptr;
+      utf16_bufsize = NT_MAX_PATH - (utf16_buf - (PWCHAR) rpl);
+      /* Check for abs path /mnt/x. Convert to x: after conversion to UTF-16. */
+      if (path_len >= drv_prefix_len + 2
+	  && !strncmp (path_buf, "/mnt/", drv_prefix_len + 1)
+	  && islower (path_buf[drv_prefix_len + 1])
+	  && (path_len == drv_prefix_len + 2
+	      || path_buf[drv_prefix_len + 2] == '/'))
+	{
+	  /* Skip forward to the slash leading the drive letter.  That leaves
+	     room for adding the colon. */
+	  path_buf += drv_prefix_len;
+	  path_len -= drv_prefix_len;
+	  full_path = true;
+	}
+      utf16_bufsize = MultiByteToWideChar (CP_UTF8, 0, path_buf, path_len,
+					  utf16_buf, utf16_bufsize);
+      if (utf16_bufsize)
+	{
+	  if (full_path)
+	    {
+	      utf16_buf[0] = utf16_buf[1];	/* Move drive letter to front */
+	      utf16_buf[1] = L':';		/* Add colon */
+	    }
+	  RtlInitCountedUnicodeString (psymbuf, utf16_buf,
+				       utf16_bufsize * sizeof (WCHAR));
+	  return PATH_SYMLINK | PATH_REP;
+	}
+      return -EIO;
     }
 #ifdef __WITH_AF_UNIX
   else if (rp->ReparseTag == IO_REPARSE_TAG_CYGUNIX)
