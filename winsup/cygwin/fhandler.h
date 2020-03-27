@@ -1303,6 +1303,11 @@ struct fifo_client_handler
 /* Info needed by all readers of a FIFO, stored in named shared memory. */
 class fifo_shmem_t
 {
+  LONG _nreaders;
+
+public:
+  int inc_nreaders () { return (int) InterlockedIncrement (&_nreaders); }
+  int dec_nreaders () { return (int) InterlockedDecrement (&_nreaders); }
 };
 
 class fhandler_fifo: public fhandler_base
@@ -1341,6 +1346,9 @@ class fhandler_fifo: public fhandler_base
 
   int create_shmem ();
   int reopen_shmem ();
+
+  int inc_nreaders () { return shmem->inc_nreaders (); }
+  int dec_nreaders () { return shmem->dec_nreaders (); }
 
 public:
   fhandler_fifo ();

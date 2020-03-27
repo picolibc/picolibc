@@ -570,8 +570,9 @@ fhandler_fifo::open (int flags, mode_t)
       SetEvent (read_ready);
       if (create_shmem () < 0)
 	goto err_close_writer_opening;
+      inc_nreaders ();
       if (!(cancel_evt = create_event ()))
-	goto err_close_shmem;
+	goto err_dec_nreaders;
       if (!(thr_sync_evt = create_event ()))
 	goto err_close_cancel_evt;
       new cygthread (fifo_reader_thread, this, "fifo_reader", thr_sync_evt);
@@ -680,7 +681,10 @@ err_close_reader:
   return 0;
 err_close_cancel_evt:
   NtClose (cancel_evt);
-err_close_shmem:
+err_dec_nreaders:
+  if (dec_nreaders () == 0)
+    ResetEvent (read_ready);
+/* err_close_shmem: */
   NtUnmapViewOfSection (NtCurrentProcess (), shmem);
   NtClose (shmem_handle);
 err_close_writer_opening:
@@ -1003,15 +1007,13 @@ fhandler_fifo::close ()
 {
   if (reader)
     {
+      if (dec_nreaders () == 0)
+	ResetEvent (read_ready);
       cancel_reader_thread ();
       if (cancel_evt)
 	NtClose (cancel_evt);
       if (thr_sync_evt)
 	NtClose (thr_sync_evt);
-      /* FIXME: There could be several readers open because of
-	 dup/fork/exec; we should only reset read_ready when the last
-	 one closes. */
-      ResetEvent (read_ready);
       if (shmem)
 	NtUnmapViewOfSection (NtCurrentProcess (), shmem);
       if (shmem_handle)
@@ -1116,8 +1118,8 @@ fhandler_fifo::dup (fhandler_base *child, int flags)
 	goto err_close_handlers;
       if (!(fhf->thr_sync_evt = create_event ()))
 	goto err_close_cancel_evt;
-      new cygthread (fifo_reader_thread, fhf, "fifo_reader",
-		     fhf->thr_sync_evt);
+      inc_nreaders ();
+      new cygthread (fifo_reader_thread, fhf, "fifo_reader", fhf->thr_sync_evt);
     }
   return 0;
 err_close_cancel_evt:
@@ -1161,6 +1163,7 @@ fhandler_fifo::fixup_after_fork (HANDLE parent)
 	api_fatal ("Can't create reader thread cancel event during fork, %E");
       if (!(thr_sync_evt = create_event ()))
 	api_fatal ("Can't create reader thread sync event during fork, %E");
+      inc_nreaders ();
       new cygthread (fifo_reader_thread, this, "fifo_reader", thr_sync_evt);
     }
 }
@@ -1180,6 +1183,9 @@ fhandler_fifo::fixup_after_exec ()
 	api_fatal ("Can't create reader thread cancel event during exec, %E");
       if (!(thr_sync_evt = create_event ()))
 	api_fatal ("Can't create reader thread sync event during exec, %E");
+      /* At this moment we're a new reader.  The count will be
+	 decremented when the parent closes. */
+      inc_nreaders ();
       new cygthread (fifo_reader_thread, this, "fifo_reader", thr_sync_evt);
     }
 }
