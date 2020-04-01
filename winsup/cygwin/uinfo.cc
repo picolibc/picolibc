@@ -1912,9 +1912,6 @@ pwdgrp::construct_sid_from_name (cygsid &sid, wchar_t *name, wchar_t *sep)
   return false;
 }
 
-/* CV 2018-08-28: SidTypeLogonSession is not yet defined in Mingw64. */
-#define SidTypeLogonSession 11
-
 char *
 pwdgrp::fetch_account_from_windows (fetch_user_arg_t &arg, cyg_ldap *pldap)
 {

@@ -1466,9 +1466,6 @@ munlock (const void *addr, size_t len)
   return ret;
 }
 
-/* This is required until Mingw-w64 catches up with newer functions. */
-extern "C" WINAPI DWORD DiscardVirtualMemory (PVOID, SIZE_T);
-
 extern "C" int
 posix_madvise (void *addr, size_t len, int advice)
 {
