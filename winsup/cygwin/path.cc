@@ -2466,32 +2466,52 @@ check_reparse_point_target (HANDLE h, bool remote, PREPARSE_DATA_BUFFER rp,
       PREPARSE_LX_SYMLINK_BUFFER rpl = (PREPARSE_LX_SYMLINK_BUFFER) rp;
       char *path_buf = rpl->LxSymlinkReparseBuffer.PathBuffer;
       DWORD path_len = rpl->ReparseDataLength - sizeof (DWORD);
+      bool full_path = false;
+      const size_t drv_prefix_len = strlen ("/mnt");
       PBYTE utf16_ptr;
       PWCHAR utf16_buf;
       int utf16_bufsize;
-      bool full_path = false;
-      const size_t drv_prefix_len = strlen ("/mnt");
 
+      /* 0-terminate path_buf for easier testing. */
+      path_buf[path_len] = '\0';
+      if (path_prefix_p ("/mnt", path_buf, drv_prefix_len, false))
+	{
+	  size_t len = strlen (path_buf);
+
+	  if (len <= drv_prefix_len + 1)
+	    {
+	      /* /mnt or /mnt/.  Replace with cygdrive prefix. */
+	      stpcpy (path_buf, mount_table->cygdrive);
+	      path_len = mount_table->cygdrive_len;
+	      if (len == drv_prefix_len)
+		{
+		  path_buf[mount_table->cygdrive_len - 1] = '\0';
+		  --path_len;
+		}
+	      rp->ReparseDataLength = path_len + sizeof (DWORD);
+	    }
+	  else if (islower (path_buf[drv_prefix_len + 1])
+		   && (path_len == drv_prefix_len + 2
+		       || path_buf[drv_prefix_len + 2] == '/'))
+	    {
+	      /* Skip forward to the slash leading the drive letter.
+		 That leaves room for adding the colon. */
+	      path_buf += drv_prefix_len;
+	      path_len -= drv_prefix_len;
+	      full_path = true;
+	    }
+	}
       /* Compute buffer for path converted to UTF-16. */
       utf16_ptr = (PBYTE) rpl + sizeof (REPARSE_LX_SYMLINK_BUFFER)
 		  + rp->ReparseDataLength;
+      /* Skip \0-termination added above. */
+      ++utf16_ptr;
+      /* Make sure pointer is aligned */
       while ((intptr_t) utf16_ptr % sizeof (WCHAR))
 	++utf16_ptr;
       utf16_buf = (PWCHAR) utf16_ptr;
       utf16_bufsize = NT_MAX_PATH - (utf16_buf - (PWCHAR) rpl);
-      /* Check for abs path /mnt/x. Convert to x: after conversion to UTF-16. */
-      if (path_len >= drv_prefix_len + 2
-	  && !strncmp (path_buf, "/mnt/", drv_prefix_len + 1)
-	  && islower (path_buf[drv_prefix_len + 1])
-	  && (path_len == drv_prefix_len + 2
-	      || path_buf[drv_prefix_len + 2] == '/'))
-	{
-	  /* Skip forward to the slash leading the drive letter.  That leaves
-	     room for adding the colon. */
-	  path_buf += drv_prefix_len;
-	  path_len -= drv_prefix_len;
-	  full_path = true;
-	}
+      /* Now convert path to UTF-16. */
       utf16_bufsize = MultiByteToWideChar (CP_UTF8, 0, path_buf, path_len,
 					  utf16_buf, utf16_bufsize);
       if (utf16_bufsize)
