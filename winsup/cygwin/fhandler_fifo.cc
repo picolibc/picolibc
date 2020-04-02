@@ -70,7 +70,8 @@ static NO_COPY fifo_reader_id_t null_fr_id = { .winpid = 0, .fh = NULL };
 fhandler_fifo::fhandler_fifo ():
   fhandler_base (),
   read_ready (NULL), write_ready (NULL), writer_opening (NULL),
-  cancel_evt (NULL), thr_sync_evt (NULL), _maybe_eof (false), nhandlers (0),
+  cancel_evt (NULL), thr_sync_evt (NULL), _maybe_eof (false),
+  fc_handler (NULL), shandlers (0), nhandlers (0),
   reader (false), writer (false), duplexer (false),
   max_atomic_write (DEFAULT_PIPEBUFSIZE),
   me (null_fr_id), shmem_handle (NULL), shmem (NULL)
@@ -287,27 +288,28 @@ fhandler_fifo::wait_open_pipe (HANDLE& ph)
 int
 fhandler_fifo::add_client_handler ()
 {
-  int ret = -1;
   fifo_client_handler fc;
   HANDLE ph = NULL;
 
-  if (nhandlers == MAX_CLIENTS)
+  if (nhandlers >= shandlers)
     {
-      set_errno (EMFILE);
-      goto out;
+      void *temp = realloc (fc_handler,
+			    (shandlers += 64) * sizeof (fc_handler[0]));
+      if (!temp)
+	{
+	  shandlers -= 64;
+	  set_errno (ENOMEM);
+	  return -1;
+	}
+      fc_handler = (fifo_client_handler *) temp;
     }
   ph = create_pipe_instance ();
   if (!ph)
-    goto out;
-  else
-    {
-      ret = 0;
-      fc.h = ph;
-      fc.state = fc_listening;
-      fc_handler[nhandlers++] = fc;
-    }
-out:
-  return ret;
+    return -1;
+  fc.h = ph;
+  fc.state = fc_listening;
+  fc_handler[nhandlers++] = fc;
+  return 0;
 }
 
 void
@@ -1067,10 +1069,10 @@ fhandler_fifo::close ()
     NtClose (write_ready);
   if (writer_opening)
     NtClose (writer_opening);
-  fifo_client_lock ();
   for (int i = 0; i < nhandlers; i++)
     fc_handler[i].close ();
-  fifo_client_unlock ();
+  if (fc_handler)
+    free (fc_handler);
   return fhandler_base::close ();
 }
 
@@ -1130,7 +1132,8 @@ fhandler_fifo::dup (fhandler_base *child, int flags)
       fhf->fifo_client_unlock ();
 
       /* Clear fc_handler list; the child never starts as owner. */
-      fhf->nhandlers = 0;
+      fhf->nhandlers = fhf->shandlers = 0;
+      fhf->fc_handler = NULL;
 
       if (!DuplicateHandle (GetCurrentProcess (), shmem_handle,
 			    GetCurrentProcess (), &fhf->shmem_handle,
@@ -1206,6 +1209,8 @@ fhandler_fifo::fixup_after_exec ()
 
       if (reopen_shmem () < 0)
 	api_fatal ("Can't reopen shared memory during exec, %E");
+      fc_handler = NULL;
+      nhandlers = shandlers = 0;
       me.winpid = GetCurrentProcessId ();
       if (!(cancel_evt = create_event ()))
 	api_fatal ("Can't create reader thread cancel event during exec, %E");
