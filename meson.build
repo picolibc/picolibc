@@ -332,7 +332,7 @@ if has_semihost
 
   # Undefine _exit as that's in libsemihost and needs to replace the weak _exit
 
-  test_link_args += test_c_args + ['-L.', '-L' + meson.source_root(), '-T', test_link_path, '-Wl,--undefined=_exit', '-lgcc']
+  test_link_args += test_c_args + ['-nostdlib', '-L.', '-L' + meson.source_root(), '-T', test_link_path, '-Wl,--undefined=_exit', '-lgcc']
 
   # Make sure all of the tests get re-linked if the linker scripts change
 
