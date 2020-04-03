@@ -94,6 +94,7 @@ posix_io = get_option('posix-io')
 posix_console = posix_io and get_option('posix-console')
 sysroot_install = get_option('sysroot-install')
 newlib_obsolete_math = get_option('newlib-obsolete-math')
+prefix = get_option('prefix')
 
 host_cpu_family=host_machine.cpu_family()
 if host_cpu_family == ''
@@ -122,12 +123,22 @@ else
   thread_local_storage = thread_local_storage_option == 'true'
 endif
 
-lib_dir = join_paths(get_option('prefix'), get_option('libdir'))
+if sysroot_install
+  sysroot = run_command(meson.get_compiler('c').cmd_array() + ['-print-sysroot']).stdout().split('\n')[0]
+  if sysroot == ''
+    error('sysroot install requested, but compiler has no sysroot')
+  endif
+  if sysroot != prefix
+    error('sysroot install requires --prefix=' + sysroot)
+  endif
+endif
+
+lib_dir = join_paths(prefix, get_option('libdir'))
 
 specs_data = configuration_data()
 specs_data.set(
   'INCLUDEDIR',
-  join_paths(sysroot_install? '%R' : get_option('prefix'), get_option('includedir'))
+  join_paths(sysroot_install? '%R' : prefix, get_option('includedir'))
 )
 
 specs_data.set(
@@ -286,7 +297,7 @@ inc_dirs = [stdio_inc_dir, '.', 'newlib/libc/include']
 
 inc = include_directories(inc_dirs)
 
-includedir = join_paths(get_option('prefix'), get_option('includedir'))
+includedir = join_paths(prefix, get_option('includedir'))
 
 arguments = ['-g', '-ffunction-sections', '-fdata-sections']
 
