@@ -1845,6 +1845,97 @@ symlink_native (const char *oldpath, path_conv &win32_newpath)
   return 0;
 }
 
+#ifndef IO_REPARSE_TAG_LX_SYMLINK
+#define IO_REPARSE_TAG_LX_SYMLINK	(0xa000001d)
+#endif
+
+typedef struct _REPARSE_LX_SYMLINK_BUFFER
+{
+  DWORD	ReparseTag;
+  WORD	ReparseDataLength;
+  WORD	Reserved;
+  struct {
+    DWORD FileType;	/* Take member name with a grain of salt.  Value is
+			   apparently always 2 for symlinks. */
+    char  PathBuffer[1];/* POSIX path as given to symlink(2).
+			   Path is not \0 terminated.
+			   Length is ReparseDataLength - sizeof (FileType).
+			   Always UTF-8.
+			   Chars given in incompatible codesets, e. g. umlauts
+			   in ISO-8859-x, are converted to the Unicode
+			   REPLACEMENT CHARACTER 0xfffd == \xef\xbf\bd */
+  } LxSymlinkReparseBuffer;
+} REPARSE_LX_SYMLINK_BUFFER,*PREPARSE_LX_SYMLINK_BUFFER;
+
+static int
+symlink_wsl (const char *oldpath, path_conv &win32_newpath)
+{
+  tmp_pathbuf tp;
+  PREPARSE_LX_SYMLINK_BUFFER rpl = (PREPARSE_LX_SYMLINK_BUFFER) tp.c_get ();
+  char *path_buf = rpl->LxSymlinkReparseBuffer.PathBuffer;
+  const int max_pathlen = MAXIMUM_REPARSE_DATA_BUFFER_SIZE
+			  - offsetof (REPARSE_LX_SYMLINK_BUFFER,
+				      LxSymlinkReparseBuffer.PathBuffer);
+  PWCHAR utf16 = tp.w_get ();
+  NTSTATUS status;
+  IO_STATUS_BLOCK io;
+  OBJECT_ATTRIBUTES attr;
+  HANDLE fh;
+  int len;
+
+  rpl->ReparseTag = IO_REPARSE_TAG_LX_SYMLINK;
+  rpl->Reserved = 0;
+  rpl->LxSymlinkReparseBuffer.FileType = 2;
+  /* Convert cygdrive prefix to "/mnt" for WSL compatibility. */
+  if (path_prefix_p (mount_table->cygdrive, oldpath,
+		     mount_table->cygdrive_len, false))
+    stpcpy (stpcpy (path_buf, "/mnt"),
+	    oldpath + mount_table->cygdrive_len - 1);
+  else
+    *stpncpy (path_buf, oldpath, max_pathlen) = '\0';
+  /* Convert target path to UTF-16 and then back to UTF-8 to make sure the
+     WSL symlink is in UTF-8, independet of the current Cygwin codeset. */
+  sys_mbstowcs (utf16, NT_MAX_PATH, path_buf);
+  len = WideCharToMultiByte (CP_UTF8, 0, utf16, -1, path_buf, max_pathlen,
+			     NULL, NULL);
+  /* Length is omitting trailing \0. */
+  rpl->ReparseDataLength = sizeof (DWORD) + len - 1;
+  /* Create reparse point. */
+  status = NtCreateFile (&fh, DELETE | FILE_GENERIC_WRITE
+			     | READ_CONTROL | WRITE_DAC,
+			 win32_newpath.get_object_attr (attr, sec_none_nih),
+			 &io, NULL, FILE_ATTRIBUTE_NORMAL,
+			 FILE_SHARE_VALID_FLAGS, FILE_CREATE,
+			 FILE_SYNCHRONOUS_IO_NONALERT
+			 | FILE_NON_DIRECTORY_FILE
+			 | FILE_OPEN_FOR_BACKUP_INTENT
+			 | FILE_OPEN_REPARSE_POINT,
+			 NULL, 0);
+  if (!NT_SUCCESS (status))
+    {
+      SetLastError (RtlNtStatusToDosError (status));
+      return -1;
+    }
+  set_created_file_access (fh, win32_newpath, S_IFLNK | STD_RBITS | STD_WBITS);
+  status = NtFsControlFile (fh, NULL, NULL, NULL, &io, FSCTL_SET_REPARSE_POINT,
+			    (LPVOID) rpl, REPARSE_DATA_BUFFER_HEADER_SIZE
+					 + rpl->ReparseDataLength,
+			    NULL, 0);
+  if (!NT_SUCCESS (status))
+    {
+      SetLastError (RtlNtStatusToDosError (status));
+      FILE_DISPOSITION_INFORMATION fdi = { TRUE };
+      status = NtSetInformationFile (fh, &io, &fdi, sizeof fdi,
+				     FileDispositionInformation);
+      NtClose (fh);
+      if (!NT_SUCCESS (status))
+	debug_printf ("Setting delete dispostion failed, status = %y", status);
+      return -1;
+    }
+  NtClose (fh);
+  return 0;
+}
+
 int
 symlink_worker (const char *oldpath, path_conv &win32_newpath, bool isdevice)
 {
@@ -1908,7 +1999,7 @@ symlink_worker (const char *oldpath, path_conv &win32_newpath, bool isdevice)
 	  __leave;
 	}
 
-      /* Handle NFS and native symlinks in their own functions. */
+      /* Handle NFS, native symlinks and WSL symlinks in their own functions. */
       switch (wsym_type)
 	{
 	case WSYM_nfs:
@@ -1928,6 +2019,17 @@ symlink_worker (const char *oldpath, path_conv &win32_newpath, bool isdevice)
 	    }
 	  /* Otherwise, fall back to default symlink type. */
 	  wsym_type = WSYM_sysfile;
+	  /*FALLTHRU*/
+	case WSYM_sysfile:
+	  if (win32_newpath.fs_flags () & FILE_SUPPORTS_REPARSE_POINTS)
+	    {
+	      res = symlink_wsl (oldpath, win32_newpath);
+	      if (!res)
+		__leave;
+	    }
+	  /* On FSes not supporting reparse points, or in case of an error
+	     creating the WSL symlink, fall back to creating the plain old
+	     SYSTEM file symlink. */
 	  break;
 	default:
 	  break;
@@ -2359,29 +2461,6 @@ check_reparse_point_string (PUNICODE_STRING subst)
     }
   return false;
 }
-
-#ifndef IO_REPARSE_TAG_LX_SYMLINK
-#define IO_REPARSE_TAG_LX_SYMLINK	(0xa000001d)
-#endif
-
-typedef struct _REPARSE_LX_SYMLINK_BUFFER
-{
-  DWORD	ReparseTag;
-  WORD	ReparseDataLength;
-  WORD	Reserved;
-  struct {
-    DWORD FileType;	/* Take member name with a grain of salt.  Value is
-			   apparently always 2 for symlinks. */
-    char  PathBuffer[1];/* POSIX path as given to symlink(2).
-			   Path is not \0 terminated.
-			   Length is ReparseDataLength - sizeof (FileType).
-			   Always UTF-8.
-			   Chars given in incompatible codesets, e. g. umlauts
-			   in ISO-8859-x, are converted to the Unicode
-			   REPLACEMENT CHARACTER 0xfffd == \xef\xbf\bd */
-  } LxSymlinkReparseBuffer;
-} REPARSE_LX_SYMLINK_BUFFER,*PREPARSE_LX_SYMLINK_BUFFER;
-
 
 /* Return values:
     <0: Negative errno.

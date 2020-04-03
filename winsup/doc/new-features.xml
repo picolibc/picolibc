@@ -83,7 +83,7 @@ https://gitlab.freedesktop.org/terminal-wg/specifications/issues/9.
 </para></listitem>
 
 <listitem><para>
-Support WSL symlinks.
+Support WSL symlinks.  Create those by default now.
 </para></listitem>
 
 </itemizedlist>
