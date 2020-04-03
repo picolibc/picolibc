@@ -853,7 +853,7 @@ because they do not always work on Samba drives.  Also, mounts are
 faster to process because no disk access is required to resolve them.
 </para>
 <para>Note that non-cygwin applications will not observe Cygwin mounts (or
-symlinks for that matter).  For example, if you use WinZip to unpack the
+most symlinks for that matter).  For example, if you use WinZip to unpack the
 tar distribution of a Cygwin package, it may not get installed to the
 correct Cygwin path.  <emphasis>So don't do this!</emphasis>
 </para>
@@ -967,10 +967,10 @@ set you're using in future.</para>
 <question><para>Why don't symlinks work on Samba-mounted filesystems?</para></question>
 <answer>
 
-<para>Symlinks are marked with "system" file attribute.  Samba does not
-enable this attribute by default.  To enable it, consult your Samba
-documentation and then add these lines to your samba configuration
-file:
+<para>Default symlinks on Samba are marked with DOS SYSTEM file
+attribute.  Samba does not enable this attribute by default.  To enable
+it, consult your Samba documentation and then add these lines to your
+samba configuration file:
 </para>
 <screen>
 	map system = yes
@@ -980,8 +980,10 @@ file:
 <para>Note that the 0775 can be anything as long as the 0010 bit is set.
 </para>
 <para>Alternatively, use Windows shortcuts as symlinks.  See the CYGWIN
-environment variable option "winsymlinks" 
+environment variable option "winsymlinks:lnk"
 <ulink url="https://cygwin.com/cygwin-ug-net/using-cygwinenv.html"/>
+Note that Samba does not support reparse points so some methods to
+create symlinks are just not available.
 </para>
 </answer></qandaentry>
 

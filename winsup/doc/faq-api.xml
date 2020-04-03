@@ -180,37 +180,108 @@ expect.
 <question><para>How do symbolic links work?</para></question>
 <answer>
 
-<para>Cygwin knows of two ways to create symlinks.
-</para>
-<para>The default method generates link files with a magic header.  When you
-open a file or directory that is a link to somewhere else, it opens the file
-or directory listed in the magic header.  Because we don't want to have to
-open every referenced file to check symlink status, Cygwin marks symlinks
-with the system attribute.  Files without the system attribute are not
-checked.  Because remote samba filesystems do not enable the system
-attribute by default, symlinks do not work on network drives unless you
-explicitly enable this attribute or use the second method to create symlinks.
+<para>Cygwin knows of five ways to create symlinks.  This is really
+complicated stuff since we started out way back when Windows didn't
+know symlinks at all.  The rest is history...
 </para>
 
-<para>The second method is enabled if `winsymlinks' is set in the environment
-variable CYGWIN.
-Using this method, Cygwin generates symlinks by creating Windows shortcuts.
-Cygwin created shortcuts have a special header (which is in that way never
-created by Explorer) and the R/O attribute set.  A DOS path is stored in
-the shortcut as usual and the description entry is used to store the POSIX
-path.  While the POSIX path is stored as is, the DOS path has perhaps to be
-rearranged to result in a valid path.  This may result in a divergence
-between the DOS and the POSIX path when symlinks are moved crossing mount
-points.  When a user changes the shortcut, this will be detected by Cygwin
-and it will only use the DOS path then.  While Cygwin shortcuts are shown
-without the ".lnk" suffix in `ls' output, non-Cygwin shortcuts are shown
-with the suffix.  However, both are treated as symlinks.
+<itemizedlist spacing="compact">
+
+<listitem><para>
+Starting with Cygwin 3.1.5 in 2020, symlinks are created by default as a
+special reparse point type known as "WSL symlinks".  These have been
+introduced on Windows 10 with the advent of WSL, "Windows Subsystem for
+Linux".  WSL symlinks created by Cygwin are understood by WSL and vice
+versa.  They contain a normal POSIX path as used in the Cygwin and WSL
+environments.  Windows itself recognizes them as arbitrary reparse
+points (CMD's "dir" command shows them as "[JUNCTION]") but it doesn't
+know how to follow them to the target.  Older Windows versions handle
+these symlinks exactly the same way, so there's no point using different
+symlink types on older Windows.  These symlinks only work on filesystems
+supporting reparse points, but fortunately there's another symlink type
+Cygwin creates, right the next bullet point...
+</para></listitem>
+
+<listitem><para>
+The original default method creating symlinks in Cygwin since pre-2000
+generates symlinks as simple files with a magic header and the DOS
+SYSTEM attribute set.  When you open a file or directory through such a
+symlink, Cygwin opens the file, checks the magic header, and if it's
+correct, reads the target of the symlink from the remainder of the file.
+Because we don't want having to open every referenced file to check
+symlink status, Cygwin only opens files with DOS SYSTEM attribute set to
+inspect them for being a Cygwin symlink.  These symlinks also work
+on filesystems not supporting reparse points, i. e., FAT/FAT32/ExFAT.
+</para></listitem>
+
+<listitem><para>
+A very special case are NFS filesystems, supported by Cygwin since 2008
+via the Microsoft NFS driver, unfortunately only available in Enterprise
+versions of Windows.  Filesystems shared via NFS usually support symlinks
+all by themselves, and the Microsoft driver has special functionality to
+support them.  Cygwin utilizes this interface to create "real" symlinks
+on filesystems mounted via NFS.
+</para></listitem>
+
+<listitem><para>
+Starting 2013, Cygwin also supports NTFS symlinks, introduced with
+Windows Vista.  These symlinks are reparse points containing a Windows
+path.  Creating them is enabled by setting 'winsymlinks:native' or
+'winsymlinks:nativestrict' in the environment variable CYGWIN.  The
+upside of this symlink type is that the path is stored as Windows path
+so they are understood by non-Cygwin Windows tools as well.  The downsides
+are:
+<itemizedlist spacing="compact">
+<listitem><para>
+The path is stored as Windows path, so the path has perhaps to be rearranged
+to result in a valid path.  This may result in a divergence from the original
+POSIX path the user intended.
+</para></listitem>
+<listitem><para>
+Creating NTFS symlinks require administrative privileges by default.  You
+have to make certain settings in the OS (depending on the Windows version)
+to allow creating them as a non-privileged user.
+</para></listitem>
+<listitem><para>
+NTFS symlinks have a type.  They are either a "file" or a "directory",
+depending on the target file type.  This information is utilized especially
+by Windows Explorer to show the correct file or directory icon in file
+listings without having to check on the target file and to know what
+actions are provided by clicking on the symlink.  However, if a NTFS
+symlink points to a file "foo", and "foo" is deleted and replaced by
+a directory "foo", the symlink type of an NTFS symlink pointing to "foo"
+is unchanged and subsequently Windows Explorer will misbehave.
+Consequentially, creating dangling NTFS symlinks is a nuisance, since
+the library does not know what type the still-to-be-created symlink
+target will be.  Cygwin will not create dangling NTFS symlinks, but
+fallback to creating the default symlink type (winsymlinks:native) or
+just fail (winsymlinks:nativestrict).
+</para></listitem>
+</itemizedlist>
+</para></listitem>
+
+<listitem><para>
+Another method, available since 2001, is enabled if `winsymlinks'  or
+'winsymlinks:lnk' is set in the environment variable CYGWIN.  Using this
+method, Cygwin generates symlinks by creating Windows shortcuts .
+Cygwin created shortcuts have a special header (which is never created
+by Explorer that way) and the DOS READONLY attribute set.  A Windows
+path is stored in the shortcut as usual and the POSIX path is stored in
+the remainder of the file.  While the POSIX path is stored as is, the
+Windows path has perhaps to be rearranged to result in a valid path.
+This may result in a divergence between the Windows and the POSIX path
+when symlinks are moved crossing mount points.  When a user changes the
+shortcut, this will be detected by Cygwin and it will only use the
+Windows path then.  While Cygwin shortcuts are shown without the ".lnk"
+suffix in `ls' output, non-Cygwin shortcuts are shown with the suffix.
 </para>
 
-<para>Both, types of symlinks can live peacefully together since Cygwin
-treats both as symlinks regardless of the setting of `(no)winsymlinks' in
-the environment variable CYGWIN.
-</para>
+<para>For enabling this or the preceeding symlink type, see
+<ulink url="https://cygwin.com/cygwin-ug-net/using-cygwinenv.html"/>
+</para></listitem>
+
+</itemizedlist>
+
 </answer></qandaentry>
 
 <qandaentry id="faq.api.executables">

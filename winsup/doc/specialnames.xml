@@ -37,8 +37,7 @@ is allowed to be a Cygwin symlink either.</para>
 
 <para>However, native NTFS symlinks and reparse points are transparent
 when accessing the above files so all these files as well as
-<filename>/etc</filename> itself may be NTFS symlinks or reparse
-points.</para>
+<filename>/etc</filename> itself may be NTFS symlinks.</para>
 
 <para>Last but not least, make sure that these files are world-readable.
 Every process of any user account has to read these files potentially,
