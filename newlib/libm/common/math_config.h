@@ -208,6 +208,7 @@ opt_barrier_double (double x)
   volatile double y = x;
   return y;
 }
+#pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-variable"
 static inline void
 force_eval_float (float x)
