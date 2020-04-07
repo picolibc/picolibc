@@ -16,6 +16,7 @@ details. */
 #include "fhandler.h"
 #include "exception.h"
 #include "tls_pbuf.h"
+#include "mmap_alloc.h"
 
 int __reg2
 check_invalid_virtual_addr (const void *s, unsigned sz)
