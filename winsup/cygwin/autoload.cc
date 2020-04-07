@@ -597,6 +597,9 @@ LoadDLLfunc (QueryInterruptTime, 4, KernelBase)
 LoadDLLfunc (QueryInterruptTimePrecise, 4, KernelBase)
 LoadDLLfunc (QueryUnbiasedInterruptTime, 4, KernelBase)
 LoadDLLfunc (QueryUnbiasedInterruptTimePrecise, 4, KernelBase)
+LoadDLLfunc (VirtualAlloc2, 28, kernelbase)
+
+LoadDLLfunc (NtMapViewOfSectionEx, 36, ntdll)
 
 /* ldap functions are cdecl! */
 #pragma push_macro ("mangle")

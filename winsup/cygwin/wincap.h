@@ -39,6 +39,7 @@ struct wincaps
     unsigned has_con_broken_csi3j		: 1;
     unsigned has_con_broken_il_dl		: 1;
     unsigned has_con_esc_rep			: 1;
+    unsigned has_extended_mem_api		: 1;
   };
 };
 
@@ -101,6 +102,7 @@ public:
   bool	IMPLEMENT (has_con_broken_csi3j)
   bool	IMPLEMENT (has_con_broken_il_dl)
   bool	IMPLEMENT (has_con_esc_rep)
+  bool	IMPLEMENT (has_extended_mem_api)
 
   void disable_case_sensitive_dirs ()
   {

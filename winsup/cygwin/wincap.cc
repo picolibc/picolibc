@@ -45,6 +45,7 @@ wincaps wincap_vista __attribute__((section (".cygwin_dll_common"), shared)) = {
     has_con_broken_csi3j:false,
     has_con_broken_il_dl:false,
     has_con_esc_rep:false,
+    has_extended_mem_api:false,
   },
 };
 
@@ -75,6 +76,7 @@ wincaps wincap_7 __attribute__((section (".cygwin_dll_common"), shared)) = {
     has_con_broken_csi3j:false,
     has_con_broken_il_dl:false,
     has_con_esc_rep:false,
+    has_extended_mem_api:false,
   },
 };
 
@@ -105,6 +107,7 @@ wincaps wincap_8 __attribute__((section (".cygwin_dll_common"), shared)) = {
     has_con_broken_csi3j:false,
     has_con_broken_il_dl:false,
     has_con_esc_rep:false,
+    has_extended_mem_api:false,
   },
 };
 
@@ -135,6 +138,7 @@ wincaps wincap_8_1 __attribute__((section (".cygwin_dll_common"), shared)) = {
     has_con_broken_csi3j:false,
     has_con_broken_il_dl:false,
     has_con_esc_rep:false,
+    has_extended_mem_api:false,
   },
 };
 
@@ -165,6 +169,7 @@ wincaps  wincap_10_1507 __attribute__((section (".cygwin_dll_common"), shared)) 
     has_con_broken_csi3j:false,
     has_con_broken_il_dl:false,
     has_con_esc_rep:false,
+    has_extended_mem_api:false,
   },
 };
 
@@ -195,6 +200,7 @@ wincaps wincap_10_1703 __attribute__((section (".cygwin_dll_common"), shared)) =
     has_con_broken_csi3j:false,
     has_con_broken_il_dl:false,
     has_con_esc_rep:false,
+    has_extended_mem_api:false,
   },
 };
 
@@ -225,6 +231,7 @@ wincaps wincap_10_1709 __attribute__((section (".cygwin_dll_common"), shared)) =
     has_con_broken_csi3j:false,
     has_con_broken_il_dl:false,
     has_con_esc_rep:false,
+    has_extended_mem_api:false,
   },
 };
 
@@ -255,6 +262,7 @@ wincaps wincap_10_1803 __attribute__((section (".cygwin_dll_common"), shared)) =
     has_con_broken_csi3j:false,
     has_con_broken_il_dl:false,
     has_con_esc_rep:false,
+    has_extended_mem_api:true,
   },
 };
 
@@ -285,6 +293,7 @@ wincaps wincap_10_1809 __attribute__((section (".cygwin_dll_common"), shared)) =
     has_con_broken_csi3j:true,
     has_con_broken_il_dl:false,
     has_con_esc_rep:false,
+    has_extended_mem_api:true,
   },
 };
 
@@ -315,6 +324,7 @@ wincaps wincap_10_1903 __attribute__((section (".cygwin_dll_common"), shared)) =
     has_con_broken_csi3j:false,
     has_con_broken_il_dl:true,
     has_con_esc_rep:true,
+    has_extended_mem_api:true,
   },
 };
 
