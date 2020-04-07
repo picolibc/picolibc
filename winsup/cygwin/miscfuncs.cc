@@ -502,7 +502,7 @@ pthread_wrapper (PVOID arg)
 /* We provide the stacks always in 1 Megabyte slots */
 #define THREAD_STACK_SLOT	0x100000L	/* 1 Meg */
 /* Maximum stack size returned from the pool. */
-#define THREAD_STACK_MAX	0x20000000L	/* 512 Megs */
+#define THREAD_STACK_MAX	0x10000000L	/* 256 Megs */
 
 class thread_allocator
 {
