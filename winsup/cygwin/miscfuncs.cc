@@ -515,11 +515,13 @@ public:
     BOOL overflow = FALSE;
     PVOID real_stackaddr = NULL;
 
-    /* If an application requests a monster stack, we fulfill this request
-       from outside of our pool, top down. */
+    /* If an application requests a monster stack, fulfill request
+       from mmap area. */
     if (real_size > THREAD_STACK_MAX)
-      return VirtualAlloc (NULL, real_size, MEM_RESERVE | MEM_TOP_DOWN,
-			   PAGE_READWRITE);
+      {
+	PVOID addr = mmap_alloc.alloc (NULL, real_size, false);
+	return VirtualAlloc (addr, real_size, MEM_RESERVE, PAGE_READWRITE);
+      }
     /* Simple round-robin.  Keep looping until VirtualAlloc succeeded, or
        until we overflowed and hit the current address. */
     for (UINT_PTR addr = current - real_size;
