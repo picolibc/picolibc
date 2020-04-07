@@ -508,9 +508,45 @@ pthread_wrapper (PVOID arg)
 class thread_allocator
 {
   UINT_PTR current;
-public:
-  thread_allocator () : current (THREAD_STORAGE_HIGH) {}
-  PVOID alloc (SIZE_T size)
+  PVOID (thread_allocator::*alloc_func) (SIZE_T);
+  PVOID _alloc (SIZE_T size)
+  {
+    MEM_ADDRESS_REQUIREMENTS thread_req = {
+      (PVOID) THREAD_STORAGE_LOW,
+      (PVOID) (THREAD_STORAGE_HIGH - 1),
+      THREAD_STACK_SLOT
+    };
+    MEM_EXTENDED_PARAMETER thread_ext = {
+      .Type = MemExtendedParameterAddressRequirements,
+      .Pointer = (PVOID) &thread_req
+    };
+    SIZE_T real_size = roundup2 (size, THREAD_STACK_SLOT);
+    PVOID real_stackaddr = NULL;
+
+    if (real_size <= THREAD_STACK_MAX)
+      real_stackaddr = VirtualAlloc2 (GetCurrentProcess(), NULL, real_size,
+				      MEM_RESERVE | MEM_TOP_DOWN,
+				      PAGE_READWRITE, &thread_ext, 1);
+    /* If the thread area allocation failed, or if the application requests a
+       monster stack, fulfill request from mmap area. */
+    if (!real_stackaddr)
+      {
+	MEM_ADDRESS_REQUIREMENTS mmap_req = {
+	  (PVOID) MMAP_STORAGE_LOW,
+	  (PVOID) (MMAP_STORAGE_HIGH - 1),
+	  THREAD_STACK_SLOT
+	};
+	MEM_EXTENDED_PARAMETER mmap_ext = {
+	  .Type = MemExtendedParameterAddressRequirements,
+	  .Pointer = (PVOID) &mmap_req
+	};
+	real_stackaddr = VirtualAlloc2 (GetCurrentProcess(), NULL, real_size,
+					MEM_RESERVE | MEM_TOP_DOWN,
+					PAGE_READWRITE, &mmap_ext, 1);
+      }
+    return real_stackaddr;
+  }
+  PVOID _alloc_old (SIZE_T size)
   {
     SIZE_T real_size = roundup2 (size, THREAD_STACK_SLOT);
     BOOL overflow = FALSE;
@@ -557,6 +593,15 @@ public:
     else
       set_errno (EAGAIN);
     return real_stackaddr;
+  }
+public:
+  thread_allocator () : current (THREAD_STORAGE_HIGH)
+  {
+    alloc_func = wincap.has_extended_mem_api () ? &_alloc : &_alloc_old;
+  }
+  PVOID alloc (SIZE_T size)
+  {
+    return (this->*alloc_func) (size);
   }
 };
 
