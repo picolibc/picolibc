@@ -188,13 +188,12 @@ CreateMapping (HANDLE fhdl, size_t len, off_t off, DWORD openflags,
 
 static void *
 MapView (HANDLE h, void *addr, size_t len, DWORD openflags,
-	 int prot, int flags, off_t off)
+	 int prot, int flags, off_t off, bool from_fixup_after_fork)
 {
   NTSTATUS status;
   LARGE_INTEGER offset = { QuadPart:off };
   DWORD protect = gen_create_protect (openflags, flags);
   void *base = addr;
-  SIZE_T commitsize = attached (prot) ? 0 : len;
   SIZE_T viewsize = len;
 #ifdef __x86_64__ /* AT_ROUND_TO_PAGE isn't supported on 64 bit systems. */
   ULONG alloc_type = MEM_TOP_DOWN;
@@ -203,12 +202,51 @@ MapView (HANDLE h, void *addr, size_t len, DWORD openflags,
 		     | MEM_TOP_DOWN;
 #endif
 
+#ifdef __x86_64__
+  /* Don't call NtMapViewOfSectionEx during fork.  It requires autoloading
+     a function under loader lock (STATUS_DLL_INIT_FAILED). */
+  if (!from_fixup_after_fork && wincap.has_extended_mem_api ())
+    {
+      MEM_ADDRESS_REQUIREMENTS mmap_req = {
+	(PVOID) MMAP_STORAGE_LOW,
+	(PVOID) (MMAP_STORAGE_HIGH - 1),
+	0
+      };
+      MEM_EXTENDED_PARAMETER mmap_ext = {
+	.Type = MemExtendedParameterAddressRequirements,
+	.Pointer = (PVOID) &mmap_req
+      };
+
+      alloc_type |= attached (prot) ? MEM_RESERVE : 0;
+      status = NtMapViewOfSectionEx (h, NtCurrentProcess (), &base, &offset,
+				     &viewsize, alloc_type, protect,
+				     addr ? NULL : &mmap_ext, addr ? 0 : 1);
+      if (!NT_SUCCESS (status) && addr && !fixed (flags))
+	{
+	  base = NULL;
+	  status = NtMapViewOfSectionEx (h, NtCurrentProcess (), &base,
+					 &offset, &viewsize, alloc_type,
+					 protect, &mmap_ext, 1);
+	}
+      if (!NT_SUCCESS (status))
+	{
+	  base = NULL;
+	  SetLastError (RtlNtStatusToDosError (status));
+	}
+      debug_printf ("%p (status %p) = NtMapViewOfSectionEx (h:%p, addr:%p, "
+		    "off:%Y, viewsize:%U, alloc_type:%y, protect:%y",
+		    base, status, h, addr, off, viewsize, alloc_type, protect);
+      return base;
+    }
+#endif
+
   /* Try mapping using the given address first, even if it's NULL.
      If it failed, and addr was not NULL and flags is not MAP_FIXED,
      try again with NULL address.
 
      Note: Retrying the mapping might be unnecessary, now that mmap64 checks
 	   for a valid memory area first. */
+  SIZE_T commitsize = attached (prot) ? 0 : len;
   status = NtMapViewOfSection (h, NtCurrentProcess (), &base, 0, commitsize,
 			       &offset, &viewsize, ViewShare, alloc_type,
 			       protect);
@@ -1051,7 +1089,8 @@ go_ahead:
     }
 
 #ifdef __x86_64__
-  addr = mmap_alloc.alloc (addr, orig_len ?: len, fixed (flags));
+  if (!wincap.has_extended_mem_api ())
+    addr = mmap_alloc.alloc (addr, orig_len ?: len, fixed (flags));
 #else
   if (orig_len)
     {
@@ -1637,9 +1676,33 @@ fhandler_dev_zero::mmap (caddr_t *addr, size_t len, int prot,
       DWORD protect = gen_protect (prot, flags);
       DWORD alloc_type = MEM_TOP_DOWN | MEM_RESERVE
 			 | (noreserve (flags) ? 0 : MEM_COMMIT);
-      base = VirtualAlloc (*addr, len, alloc_type, protect);
-      if (!base && addr && !fixed (flags))
-	base = VirtualAlloc (NULL, len, alloc_type, protect);
+#ifdef __x86_64__
+      if (wincap.has_extended_mem_api ())
+	{
+	  MEM_ADDRESS_REQUIREMENTS mmap_req = {
+	    (PVOID) MMAP_STORAGE_LOW,
+	    (PVOID) (MMAP_STORAGE_HIGH - 1),
+	    0
+	  };
+	  MEM_EXTENDED_PARAMETER mmap_ext = {
+	    .Type = MemExtendedParameterAddressRequirements,
+	    .Pointer = (PVOID) &mmap_req
+	  };
+
+	  base = VirtualAlloc2 (GetCurrentProcess(), *addr, len, alloc_type,
+				protect, *addr ? NULL : &mmap_ext,
+				*addr ? 0 : 1);
+	  if (!base && addr && !fixed (flags))
+	    base = VirtualAlloc2 (GetCurrentProcess(), NULL, len, alloc_type,
+				  protect, &mmap_ext, 1);
+	}
+      else
+#endif
+	{
+	  base = VirtualAlloc (*addr, len, alloc_type, protect);
+	  if (!base && addr && !fixed (flags))
+	    base = VirtualAlloc (NULL, len, alloc_type, protect);
+	}
       if (!base || (fixed (flags) && base != *addr))
 	{
 	  if (!base)
@@ -1664,7 +1727,7 @@ fhandler_dev_zero::mmap (caddr_t *addr, size_t len, int prot,
 	  return INVALID_HANDLE_VALUE;
 	}
 
-      base = MapView (h, *addr, len, get_access(), prot, flags, off);
+      base = MapView (h, *addr, len, get_access(), prot, flags, off, false);
       if (!base || (fixed (flags) && base != *addr))
 	{
 	  if (!base)
@@ -1718,7 +1781,7 @@ fhandler_dev_zero::fixup_mmap_after_fork (HANDLE h, int prot, int flags,
       base = VirtualAlloc (address, size, alloc_type, PAGE_READWRITE);
     }
   else
-    base = MapView (h, address, size, get_access (), prot, flags, offset);
+    base = MapView (h, address, size, get_access (), prot, flags, offset, true);
   if (base != address)
     {
       MEMORY_BASIC_INFORMATION m;
@@ -1744,7 +1807,7 @@ fhandler_disk_file::mmap (caddr_t *addr, size_t len, int prot,
       return INVALID_HANDLE_VALUE;
     }
 
-  void *base = MapView (h, *addr, len, get_access (), prot, flags, off);
+  void *base = MapView (h, *addr, len, get_access (), prot, flags, off, false);
   if (!base || (fixed (flags) && base != *addr))
     {
       if (!base)
@@ -1804,7 +1867,8 @@ fhandler_disk_file::fixup_mmap_after_fork (HANDLE h, int prot, int flags,
 					   void *address)
 {
   /* Re-create the map */
-  void *base = MapView (h, address, size, get_access (), prot, flags, offset);
+  void *base = MapView (h, address, size, get_access (), prot, flags,
+			offset, true);
   if (base != address)
     {
       MEMORY_BASIC_INFORMATION m;
