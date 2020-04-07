@@ -4,17 +4,20 @@
 #include "mmap_alloc.h"
 #include <sys/param.h>
 
-/* FIXME?  Unfortunately the OS doesn't support a top down allocation with
-	   a ceiling value.  The ZeroBits mechanism only works for
-	   NtMapViewOfSection and it only evaluates the high bit of ZeroBits
-	   on 64 bit, so it's pretty much useless for our purposes.
+/* Starting with Windows 10 1803 we use VirtualAlloc2 and MapViewOfFile3
+   (or rather NtMapViewOfSectionEx), rather than the below class.
 
-	   If the below simple mechanism to perform top-down allocations
-	   turns out to be too dumb, we need something else.  One idea is to
-	   dived the space in (3835) 4 Gig chunks and simply store the
-	   available free space per slot.  Then we can go top down from slot
-	   to slot and only try slots which are supposed to have enough space.
-	   Bookkeeping would be very simple and fast. */
+   Up to Windows 10 1709, the OS doesn't support a top down allocation with
+   a ceiling value.  The ZeroBits mechanism only works for NtMapViewOfSection
+   and it only evaluates the high bit of ZeroBits on 64 bit, so it's pretty
+   much useless for our purposes.
+
+   If the below simple mechanism to perform top-down allocations turns out to
+   be too dumb, we need something else.  One idea is to divide the space in
+   (3835) 4 Gig chunks and just store the available free space per slot.  Then
+   we can go top down from slot to slot and only try slots which are supposed
+   to have enough space.  Bookkeeping would be very simple and fast. */
+
 PVOID
 mmap_allocator::alloc (PVOID in_addr, SIZE_T in_size, bool fixed)
 {
