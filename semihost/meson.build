@@ -33,8 +33,8 @@
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 src_semihost_machine = {
-			'riscv' : 'riscv/semihost-riscv.c',
-			'riscv64' : 'riscv/semihost-riscv.c',
+			'riscv' : 'riscv/semihost-riscv.s',
+			'riscv64' : 'riscv/semihost-riscv.s',
 			'arm' : 'arm/semihost-arm.c'
 		      }
 

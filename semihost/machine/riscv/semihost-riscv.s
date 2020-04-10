@@ -32,15 +32,13 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-
-#include "semihost-private.h"
-
-uintptr_t
-sys_semihost(uintptr_t op, uintptr_t param)
-{
-	register uintptr_t r0 asm("a0") = op;
-	register uintptr_t r1 asm("a1") = param;
-	asm(".option push\n.option norvc\nslli zero,zero,0x1f; ebreak; srai zero,zero,0x7\n.option pop" : "=r" (r0) : "r" (r0), "r" (r1) : "memory");
-	return r0;
-}
-
+        .global sys_semihost
+        .balign 16
+        .option push
+        .option norvc
+sys_semihost:
+        slli zero, zero, 0x1f
+        ebreak
+        srai zero, zero, 0x7
+        ret
+        .option pop
