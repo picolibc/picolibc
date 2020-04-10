@@ -13,18 +13,7 @@ endian = 'little'
 
 [properties]
 c_args = [ '-nostdlib', '-msave-restore' ]
+# default multilib is 64 bit
 c_args_ = [ '-mcmodel=medany' ]
-c_args_rv64i_lp64 = [ '-mcmodel=medany' ]
-c_args_rv64ia_lp64 = [ '-mcmodel=medany' ]
-c_args_rv64im_lp64 = [ '-mcmodel=medany' ]
-c_args_rv64if_lp64f = [ '-mcmodel=medany' ]
-c_args_rv64ifd_lp64d = [ '-mcmodel=medany' ]
-c_args_rv64iaf_lp64f = [ '-mcmodel=medany' ]
-c_args_rv64iafd_lp64d = [ '-mcmodel=medany' ]
-c_args_rv64imf_lp64f = [ '-mcmodel=medany' ]
-c_args_rv64iac_lp64 = [ '-mcmodel=medany' ]
-c_args_rv64imac_lp64 = [ '-mcmodel=medany' ]
-c_args_rv64imafc_lp64f = [ '-mcmodel=medany' ]
-c_args_rv64imafdc_lp64d = [ '-mcmodel=medany' ]
 needs_exe_wrapper = true
 skip_sanity_check = true

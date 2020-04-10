@@ -193,11 +193,18 @@ if enable_multilib
     endif
     targets += name
 
+    # rv64 needs to use a non-default mcmodel so that variables can
+    # live in a broader range of memory addresses
+    if name.startswith('rv64')
+      flags += [ '-mcmodel=medany' ]
+    endif
+
     # Add any extra flags for this target from the cross file
     target_extra = meson.get_cross_property('c_args_' + name, [])
     if target_extra != []
       flags += target_extra
     endif
+
     value = [tmp[0], flags]
     set_variable('target_' + name, value)
   endforeach
