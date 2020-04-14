@@ -987,6 +987,7 @@ create symlinks are just not available.
 </para>
 </answer></qandaentry>
 
+<!--
 <qandaentry id="faq.using.sshd-in-domain">
 <question><para>How do I setup sshd in a domain?</para></question>
 <answer>
@@ -1053,6 +1054,7 @@ usually all set and you can start the sshd service via
 </screen>
 
 </answer></qandaentry>
+-->
 
 <qandaentry id="faq.using.ssh-pubkey-stops-working">
 <question><para>Why does public key authentication with ssh fail after updating to Cygwin 1.7.34 or later?</para></question>
