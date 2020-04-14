@@ -26,29 +26,41 @@
 /*
    Overview:
 
-     Currently a FIFO can be opened once for reading and multiple
-     times for writing.  Any attempt to open the FIFO a second time
-     for reading fails with EACCES (from STATUS_ACCESS_DENIED).
+     FIFOs are implemented via Windows named pipes.  The server end of
+     the pipe corresponds to an fhandler_fifo open for reading (a.k.a,
+     a "reader"), and the client end corresponds to an fhandler_fifo
+     open for writing (a.k.a, a "writer").
 
-     When a FIFO is opened for reading,
-     fhandler_fifo::create_pipe_instance is called to create the first
-     instance of a Windows named pipe server (Windows terminology).  A
-     "fifo_reader" thread is also started; it waits for pipe clients
-     (Windows terminology again) to connect.  This happens every time
-     a process opens the FIFO for writing.
+     The server can have multiple instances.  The reader (assuming for
+     the moment that there is only one) creates a pipe instance for
+     each writer that opens.  The reader maintains a list of
+     "fifo_client_handler" structures, one for each writer.  A
+     fifo_client_handler contains the handle for the pipe server
+     instance and information about the state of the connection with
+     the writer.  Each writer holds the pipe instance's client handle.
 
-     The fifo_reader thread creates new instances of the pipe server
-     as needed, so that there is always an instance available for a
-     writer to connect to.
+     The reader runs a "fifo_reader_thread" that creates new pipe
+     instances as needed and listens for client connections.
 
-     The reader maintains a list of "fifo_client_handlers", one for
-     each pipe instance.  A fifo_client_handler manages the connection
-     between the pipe instance and a writer connected to that pipe
-     instance.
+     If there are multiple readers open, only one of them, called the
+     "owner", maintains the fifo_client_handler list.  The owner is
+     therefore the only reader that can read at any given time.  If a
+     different reader wants to read, it has to take ownership and
+     duplicate the fifo_client_handler list.
 
-     TODO: Allow a FIFO to be opened multiple times for reading.
-     Maybe this could be done by using shared memory, so that all
-     readers could have access to the same list of writers.
+     A reader that is not an owner also runs a fifo_reader_thread,
+     which is mostly idle.  The thread wakes up if that reader might
+     need to take ownership.
+
+     There is a block of shared memory, accessible to all readers,
+     that contains information needed for the owner change process.
+     It also contains some locks to prevent races and deadlocks
+     between the various threads.
+
+     At this writing, I know of only one application (Midnight
+     Commander when running under tcsh) that *explicitly* opens two
+     readers of a FIFO.  But many applications will have multiple
+     readers open via dup/fork/exec.
 */
 
 
