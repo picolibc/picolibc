@@ -823,7 +823,10 @@ cygheap_pwdgrp::nss_init_line (const char *line)
 					  c, e - c);
 		    }
 		  else
-		    debug_printf ("Invalid nsswitch.conf content: %s", line);
+		    {
+		      debug_printf ("Invalid nsswitch.conf content: %s", line);
+		      --idx;
+		    }
 		  c += strcspn (c, " \t");
 		  c += strspn (c, " \t");
 		  ++idx;
