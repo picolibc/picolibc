@@ -154,7 +154,12 @@ vfprintf (FILE * stream, const char *fmt, va_list ap)
     unsigned char flags;
     unsigned char buf[PRINTF_BUF_SIZE];	/* size for -1 in octal, without '\0'	*/
 
-    stream->len = 0;
+    int stream_len = 0;
+
+    static void my_putc(char c, FILE *stream) {
+	++stream_len;
+	putc(c, stream);
+    }
 
     if ((stream->flags & __SWR) == 0)
 	return EOF;
@@ -168,7 +173,7 @@ vfprintf (FILE * stream, const char *fmt, va_list ap)
 		c = *fmt++;
 		if (c != '%') break;
 	    }
-	    putc (c, stream);
+	    my_putc (c, stream);
 	}
 
 	for (flags = 0;
@@ -192,7 +197,7 @@ vfprintf (FILE * stream, const char *fmt, va_list ap)
 
 	if (c && strchr("EFGefg", c)) {
 		(void) PRINTF_FLOAT_ARG(ap);
-	    putc ('?', stream);
+	    my_putc ('?', stream);
 	    continue;
 	}
 
@@ -202,7 +207,7 @@ vfprintf (FILE * stream, const char *fmt, va_list ap)
 	    switch (c) {
 
 	      case 'c':
-		putc (va_arg (ap, int), stream);
+		my_putc (va_arg (ap, int), stream);
 		continue;
 
 	      case 'S':
@@ -210,7 +215,7 @@ vfprintf (FILE * stream, const char *fmt, va_list ap)
 	      case 's':
 		pnt = va_arg (ap, char *);
 	        while ( (c = *pnt++) != 0)
-		    putc (c, stream);
+		    my_putc (c, stream);
 		continue;
 	    }
 	}
@@ -221,7 +226,7 @@ vfprintf (FILE * stream, const char *fmt, va_list ap)
 	    flags &= ~FL_ALT;
 	    if (x < 0) {
 		x = -x;
-		/* `putc ('-', stream)' will considarably inlarge stack size.
+		/* `my_putc ('-', stream)' will considarably inlarge stack size.
 		   So flag is used.	*/
 		flags |= FL_NEGATIVE;
 	    }
@@ -259,23 +264,23 @@ vfprintf (FILE * stream, const char *fmt, va_list ap)
 
 	/* Integer number output.	*/
 	if (flags & FL_NEGATIVE)
-	    putc ('-', stream);
+	    my_putc ('-', stream);
 	if ((flags & FL_ALT) && (buf[c-1] != '0')) {
-	    putc ('0', stream);
+	    my_putc ('0', stream);
 	    if (flags & FL_ALTHEX)
 #if  FL_ALTLWR != 'x' - 'X'
 # error
 #endif
-		putc ('X' + (flags & FL_ALTLWR), stream);
+		my_putc ('X' + (flags & FL_ALTLWR), stream);
 	}
 	do {
-	    putc (buf[--c], stream);
+	    my_putc (buf[--c], stream);
 	} while (c);
 
     } /* for (;;) */
 
   ret:
-    return stream->len;
+    return stream_len;
 }
 
 /* --------------------------------------------------------------------	*/
@@ -324,7 +329,12 @@ int vfprintf (FILE * stream, const char *fmt, va_list ap)
 #define buf	(u.__buf)
 #define _dtoa	(u.__dtoa)
 
-    stream->len = 0;
+    int stream_len = 0;
+
+    void my_putc(char c, FILE *stream) {
+	++stream_len;
+	putc(c, stream);
+    }
 
     if ((stream->flags & __SWR) == 0)
 	return EOF;
@@ -338,7 +348,7 @@ int vfprintf (FILE * stream, const char *fmt, va_list ap)
 		c = *fmt++;
 		if (c != '%') break;
 	    }
-	    putc (c, stream);
+	    my_putc (c, stream);
 	}
 
 	flags = 0;
@@ -489,14 +499,14 @@ int vfprintf (FILE * stream, const char *fmt, va_list ap)
 		    width -= ndigs;
 		    if (!(flags & FL_LPAD)) {
 			do {
-			    putc (' ', stream);
+			    my_putc (' ', stream);
 			} while (--width);
 		    }
 		} else {
 		    width = 0;
 		}
 		if (sign)
-		    putc (sign, stream);
+		    my_putc (sign, stream);
 		p = "inf";
 		if (_dtoa.flags & DTOA_NAN)
 		    p = "nan";
@@ -506,7 +516,7 @@ int vfprintf (FILE * stream, const char *fmt, va_list ap)
 		while ( (ndigs = *p) != 0) {
 		    if (flags & FL_FLTUPP)
 			ndigs += 'I' - 'i';
-		    putc (ndigs, stream);
+		    my_putc (ndigs, stream);
 		    p++;
 		}
 		goto tail;
@@ -555,16 +565,16 @@ int vfprintf (FILE * stream, const char *fmt, va_list ap)
 	    /* Output before first digit	*/
 	    if (!(flags & (FL_LPAD | FL_ZFILL))) {
 		while (width) {
-		    putc (' ', stream);
+		    my_putc (' ', stream);
 		    width--;
 		}
 	    }
 	    if (sign)
-		putc (sign, stream);
+		my_putc (sign, stream);
 
 	    if (!(flags & FL_LPAD)) {
 		while (width) {
-		    putc ('0', stream);
+		    my_putc ('0', stream);
 		    width--;
 		}
 	    }
@@ -585,7 +595,7 @@ int vfprintf (FILE * stream, const char *fmt, va_list ap)
 
 		    /* Insert decimal point at correct place */
 		    if (n == -1)
-			putc ('.', stream);
+			my_putc ('.', stream);
 
 		    /* Pull digits from buffer when in-range,
 		     * otherwise use 0
@@ -597,7 +607,7 @@ int vfprintf (FILE * stream, const char *fmt, va_list ap)
 		    if (--n < -prec) {
 			break;
 		    }
-		    putc (out, stream);
+		    my_putc (out, stream);
 		} while (1);
 		if (n == exp
 		    && (_dtoa.digits[0] > '5'
@@ -605,40 +615,40 @@ int vfprintf (FILE * stream, const char *fmt, va_list ap)
 		{
 		    out = '1';
 		}
-		putc (out, stream);
+		my_putc (out, stream);
 		if ((flags & FL_ALT) && n == -1)
-			putc('.', stream);
+			my_putc('.', stream);
 	    } else {				/* 'e(E)' format	*/
 
 		/* mantissa	*/
 		if (_dtoa.digits[0] != '1')
 		    _dtoa.flags &= ~DTOA_CARRY;
-		putc (_dtoa.digits[0], stream);
+		my_putc (_dtoa.digits[0], stream);
 		if (prec > 0) {
-		    putc ('.', stream);
+		    my_putc ('.', stream);
 		    uint8_t pos = 1;
 		    for (pos = 1; pos < 1 + prec; pos++)
-			putc (pos < ndigs ? _dtoa.digits[pos] : '0', stream);
+			my_putc (pos < ndigs ? _dtoa.digits[pos] : '0', stream);
 		} else if (flags & FL_ALT)
-		    putc ('.', stream);
+		    my_putc ('.', stream);
 
 		/* exponent	*/
-		putc (flags & FL_FLTUPP ? 'E' : 'e', stream);
+		my_putc (flags & FL_FLTUPP ? 'E' : 'e', stream);
 		ndigs = '+';
 		if (exp < 0 || (exp == 0 && (_dtoa.flags & DTOA_CARRY) != 0)) {
 		    exp = -exp;
 		    ndigs = '-';
 		}
-		putc (ndigs, stream);
+		my_putc (ndigs, stream);
 #ifndef PICOLIBC_FLOAT_PRINTF_SCANF
 		if (ndigs_exp > 2) {
-			putc(exp / 100 + '0', stream);
+			my_putc(exp / 100 + '0', stream);
 			exp %= 100;
 		}
 #endif
-		putc(exp / 10 + '0', stream);
+		my_putc(exp / 10 + '0', stream);
 		exp %= 10;
-		putc ('0' + exp, stream);
+		my_putc ('0' + exp, stream);
 	    }
 
 	    goto tail;
@@ -671,12 +681,12 @@ int vfprintf (FILE * stream, const char *fmt, va_list ap)
 	str_lpad:
 	    if (!(flags & FL_LPAD)) {
 		while (size < width) {
-		    putc (' ', stream);
+		    my_putc (' ', stream);
 		    width--;
 		}
 	    }
 	    while (size) {
-		putc (*pnt++, stream);
+		my_putc (*pnt++, stream);
 		if (width) width -= 1;
 		size -= 1;
 	    }
@@ -724,8 +734,8 @@ int vfprintf (FILE * stream, const char *fmt, va_list ap)
 	        base = 16 | XTOA_UPPER;
 		break;
 	      default:
-		putc('%', stream);
-		putc(c, stream);
+		my_putc('%', stream);
+		my_putc(c, stream);
 		continue;
 	    }
 	    if ((flags & FL_PREC) && prec == 0 && x == 0)
@@ -766,7 +776,7 @@ int vfprintf (FILE * stream, const char *fmt, va_list ap)
 		}
 	    }
 	    while (len < width) {
-		putc (' ', stream);
+		my_putc (' ', stream);
 		len++;
 	    }
 	}
@@ -774,34 +784,34 @@ int vfprintf (FILE * stream, const char *fmt, va_list ap)
 	width =  (len < width) ? width - len : 0;
 
 	if (flags & FL_ALT) {
-	    putc ('0', stream);
+	    my_putc ('0', stream);
 	    if (flags & FL_ALTHEX)
-		putc (flags & FL_ALTUPP ? 'X' : 'x', stream);
+		my_putc (flags & FL_ALTUPP ? 'X' : 'x', stream);
 	} else if (flags & (FL_NEGATIVE | FL_PLUS | FL_SPACE)) {
 	    unsigned char z = ' ';
 	    if (flags & FL_PLUS) z = '+';
 	    if (flags & FL_NEGATIVE) z = '-';
-	    putc (z, stream);
+	    my_putc (z, stream);
 	}
 
 	while (prec > c) {
-	    putc ('0', stream);
+	    my_putc ('0', stream);
 	    prec--;
 	}
 
 	while (c)
-	    putc (buf[--c], stream);
+	    my_putc (buf[--c], stream);
 
       tail:
 	/* Tail is possible.	*/
 	while (width) {
-	    putc (' ', stream);
+	    my_putc (' ', stream);
 	    width--;
 	}
     } /* for (;;) */
 
   ret:
-    return stream->len;
+    return stream_len;
 }
 
 #endif	/* PRINTF_LEVEL > PRINTF_MIN */

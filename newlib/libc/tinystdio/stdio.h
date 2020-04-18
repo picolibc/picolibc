@@ -241,7 +241,6 @@ struct __file {
 #define __SNBF	0x0400		/* unbuffered */
 #define __SMBF	0x0800		/* buf is from malloc */
 #endif
-	int	len;		/* characters read or written so far */
 	int	(*put)(char, struct __file *);	/* function to write one char to device */
 	int	(*get)(struct __file *);	/* function to read one char from device */
 	int	(*flush)(struct __file *);	/* function to flush output to device */
