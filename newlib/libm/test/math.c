@@ -168,7 +168,11 @@ fffcheck_id (float is,
 
   /* All signaling nans are the "same", as are all quiet nans */
   if (isnan(correct.value) && isnan(is)
-      && (issignaling(correct.value) == issignaling(is)))
+#ifndef __i386__
+      /* i386 calling convention ends up always converting snan into qnan */
+      && (issignaling(correct.value) == issignaling(is))
+#endif
+	  )
   {
 	mag = 32;
   }
