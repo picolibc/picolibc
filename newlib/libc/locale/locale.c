@@ -932,9 +932,12 @@ restart:
     case LC_NUMERIC:
       ret = __numeric_load_locale (loc, locale, (void *) l_wctomb, charset);
       break;
+#ifdef __CYGWIN__
+  /* Right now only Cygwin supports a __time_load_locale function at all. */
     case LC_TIME:
       ret = __time_load_locale (loc, locale, (void *) l_wctomb, charset);
       break;
+#endif
 #endif /* __HAVE_LOCALE_INFO__ */
     default:
       break;
