@@ -36,6 +36,7 @@ srcs_locale = [
     'locale.c',
     'localeconv.c',
     'lnumeric.c',
+    'timelocal.c',
 ]
 
 srcs_locale_elix2 = [
@@ -46,7 +47,6 @@ srcs_locale_elix2 = [
     'lmonetary.c',
     'newlocale.c',
     'nl_langinfo.c',
-    'timelocal.c',
     'uselocale.c',
 ]
 
