@@ -48,6 +48,7 @@ srcs_tls = [
 
 srcs_picolib = [
   'picosbrk.c',
+  'dso_handle.c',
 ]
 
 if srcs_machine.has_key(host_cpu_family)
