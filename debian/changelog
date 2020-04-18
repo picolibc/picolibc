@@ -1,3 +1,9 @@
+picolibc (1.4.1-2) unstable; urgency=medium
+
+  * Build with newer GCC versions
+
+ -- Keith Packard <keithp@keithp.com>  Sat, 18 Apr 2020 14:56:40 -0700
+
 picolibc (1.4.1-1) unstable; urgency=medium
 
   * ARM TLS corruption fix
