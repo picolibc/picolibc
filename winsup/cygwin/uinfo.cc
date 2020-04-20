@@ -790,12 +790,12 @@ cygheap_pwdgrp::nss_init_line (const char *line)
 	    scheme = gecos_scheme;
 	  if (scheme)
 	    {
-	      uint16_t idx = 0;
+	      for (uint16_t idx = 0; idx < NSS_SCHEME_MAX; ++idx)
+		scheme[idx].method = NSS_SCHEME_FALLBACK;
 
-	      scheme[0].method = scheme[1].method = NSS_SCHEME_FALLBACK;
 	      c = strchr (c, ':') + 1;
 	      c += strspn (c, " \t");
-	      while (*c && idx < NSS_SCHEME_MAX)
+	      for (uint16_t idx = 0; *c && idx < NSS_SCHEME_MAX; ++idx)
 		{
 		  if (NSS_CMP ("windows"))
 		    scheme[idx].method = NSS_SCHEME_WINDOWS;
@@ -826,7 +826,6 @@ cygheap_pwdgrp::nss_init_line (const char *line)
 		    }
 		  c += strcspn (c, " \t");
 		  c += strspn (c, " \t");
-		  ++idx;
 		}
 	    }
 	}

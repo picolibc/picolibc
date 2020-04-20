@@ -918,6 +918,11 @@ Apart from this restriction, the remainder of the line can have as
 many spaces and TABs as you like.
 </para>
 
+<para>
+When the same keyword occurs multiple times, the last one wins, as if the
+previous ones were ignored.
+</para>
+
 </sect4>
 
 <sect4 id="ntsec-mapping-nsswitch-pwdgrp"><title id="ntsec-mapping-nsswitch-pwdgrp.title">The <literal>passwd:</literal> and <literal>group:</literal> settings</title>
