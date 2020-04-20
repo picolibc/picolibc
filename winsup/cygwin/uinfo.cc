@@ -828,6 +828,8 @@ cygheap_pwdgrp::nss_init_line (const char *line)
 		  c += strspn (c, " \t");
 		}
 	    }
+	  else
+	      debug_printf ("Invalid nsswitch.conf content: %s", line);
 	}
       break;
     case '\0':
