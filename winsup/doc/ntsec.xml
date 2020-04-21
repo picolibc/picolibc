@@ -1507,18 +1507,15 @@ of each schema when used with <literal>db_home:</literal>
 </variablelist>
 
 <para>
-As has been briefly mentioned before, the default setting for
-<literal>db_home:</literal> is
+<literal>db_home:</literal> defines no default schemata.  If this setting is not
+present in <filename>/etc/nsswitch.conf</filename>, the aforementioned fallback
+takes over, which is equivalent to a <filename>/etc/nsswitch.conf</filename>
+settting of
 </para>
 
 <screen>
   db_home: /home/%U
 </screen>
-
-<para>
-So by default, Cygwin just sets the home dir to
-<filename>/home/$USERNAME</filename>.
-</para>
 
 </sect4>
 
@@ -1590,8 +1587,10 @@ when used with <literal>db_shell:</literal>
 </variablelist>
 
 <para>
-As for <literal>db_home:</literal>, the default setting for
-<literal>db_shell:</literal> is pretty much a constant
+<literal>db_shell:</literal> defines no default schemata.  If this setting is
+not present in <filename>/etc/nsswitch.conf</filename>, the aforementioned
+fallback takes over, which is equivalent to a
+<filename>/etc/nsswitch.conf</filename> settting of
 </para>
 
 <screen>
@@ -1664,13 +1663,13 @@ The following list describes the meaning of each schema when used with
   <varlistentry>
     <term>Fallback</term>
     <listitem>If none of the schemes given for <literal>db_gecos:</literal>
-	      define a non-empty pathname, nothing is added to
+	      define a non-empty string, nothing is added to
 	      <literal>pw_gecos</literal>.</listitem>
   </varlistentry>
 </variablelist>
 
 <para>
-The default setting for <literal>db_gecos:</literal> is the empty string.
+<literal>db_gecos:</literal> defines no default schemata.
 </para>
 
 </sect4>

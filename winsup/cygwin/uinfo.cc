@@ -626,15 +626,12 @@ cygheap_pwdgrp::init ()
   grp_cache.cygserver.init_grp ();
   grp_cache.file.init_grp ();
   grp_cache.win.init_grp ();
-  /* Default settings:
+  /* Default settings (excluding fallbacks):
 
      passwd: files db
      group:  files db
      db_prefix: auto		DISABLED
      db_separator: +		DISABLED
-     db_home: cygwin desc
-     db_shell: cygwin desc
-     db_gecos: cygwin desc
      db_enum: cache builtin
   */
   pwd_src = (NSS_SRC_FILES | NSS_SRC_DB);
@@ -830,12 +827,6 @@ cygheap_pwdgrp::nss_init_line (const char *line)
 		  c += strcspn (c, " \t");
 		  c += strspn (c, " \t");
 		  ++idx;
-		}
-	      /* If nothing has been set, revert to default. */
-	      if (scheme[0].method == NSS_SCHEME_FALLBACK)
-		{
-		  scheme[0].method = NSS_SCHEME_CYGWIN;
-		  scheme[1].method = NSS_SCHEME_DESC;
 		}
 	    }
 	}
