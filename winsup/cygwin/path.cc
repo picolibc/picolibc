@@ -1886,15 +1886,17 @@ symlink_wsl (const char *oldpath, path_conv &win32_newpath)
   rpl->ReparseTag = IO_REPARSE_TAG_LX_SYMLINK;
   rpl->Reserved = 0;
   rpl->LxSymlinkReparseBuffer.FileType = 2;
-  /* Convert cygdrive prefix to "/mnt" for WSL compatibility. */
-  if (path_prefix_p (mount_table->cygdrive, oldpath,
-		     mount_table->cygdrive_len, false))
+  /* Convert cygdrive prefix to "/mnt" for WSL compatibility, but only if
+     cygdrive prefix is not "/", otherwise suffer random "/mnt" symlinks... */
+  if (mount_table->cygdrive_len > 1
+      && path_prefix_p (mount_table->cygdrive, oldpath,
+			mount_table->cygdrive_len, false))
     stpcpy (stpcpy (path_buf, "/mnt"),
 	    oldpath + mount_table->cygdrive_len - 1);
   else
     *stpncpy (path_buf, oldpath, max_pathlen) = '\0';
   /* Convert target path to UTF-16 and then back to UTF-8 to make sure the
-     WSL symlink is in UTF-8, independet of the current Cygwin codeset. */
+     WSL symlink is in UTF-8, independent of the current Cygwin codeset. */
   sys_mbstowcs (utf16, NT_MAX_PATH, path_buf);
   len = WideCharToMultiByte (CP_UTF8, 0, utf16, -1, path_buf, max_pathlen,
 			     NULL, NULL);
