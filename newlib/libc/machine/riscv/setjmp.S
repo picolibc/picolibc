@@ -12,6 +12,7 @@
 #include <sys/asm.h>
 
 /* int setjmp (jmp_buf);  */
+  .section .text.setjmp
   .globl  setjmp
   .type   setjmp, @function
 setjmp:
@@ -55,6 +56,7 @@ setjmp:
 	.size	setjmp, .-setjmp
 
 /* volatile void longjmp (jmp_buf, int);  */
+  .section .text.longjmp
   .globl  longjmp
   .type   longjmp, @function
 longjmp:

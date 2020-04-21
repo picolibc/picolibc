@@ -9,7 +9,7 @@
    http://www.opensource.org/licenses.
 */
 
-.text
+.section .text.memset
 .global memset
 .type	memset, @function
 memset:
