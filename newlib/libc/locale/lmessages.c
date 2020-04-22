@@ -33,10 +33,6 @@
 #define LCMESSAGES_SIZE_MIN \
 		(offsetof(struct lc_messages_T, yesstr) / sizeof(char *))
 
-#ifndef __CYGWIN__
-static char empty[] = "";
-#endif
-
 const struct lc_messages_T _C_messages_locale = {
 	"^[yY]" ,	/* yesexpr */
 	"^[nN]" ,	/* noexpr */
@@ -51,12 +47,7 @@ const struct lc_messages_T _C_messages_locale = {
 #endif
 };
 
-#ifndef __CYGWIN__
-static struct lc_messages_T _messages_locale;
-static int	_messages_using_locale;
-static char	*_messages_locale_buf;
-#endif
-
+#ifdef __CYGWIN__
 int
 __messages_load_locale (struct __locale_t *locale, const char *name,
 			void *f_wctomb, const char *charset)
@@ -65,7 +56,6 @@ __messages_load_locale (struct __locale_t *locale, const char *name,
   struct lc_messages_T me;
   char *bufp = NULL;
 
-#ifdef __CYGWIN__
   extern int __set_lc_messages_from_win (const char *,
 					 const struct lc_messages_T *,
 					 struct lc_messages_T *, char **,
@@ -99,8 +89,6 @@ __messages_load_locale (struct __locale_t *locale, const char *name,
 	}
       ret = 0;
     }
-#else
-  /* TODO */
-#endif
   return ret;
 }
+#endif

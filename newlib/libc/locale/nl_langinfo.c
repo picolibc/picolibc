@@ -173,9 +173,6 @@ static struct _nl_item_t
 char *nl_langinfo_l (nl_item item, struct __locale_t *locale)
 {
    char *ret, *cs;
-#ifndef __CYGWIN__
-   char *s;
-#endif
    static char *csym = NULL;
    char *nptr;
 

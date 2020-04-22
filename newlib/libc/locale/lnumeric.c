@@ -42,6 +42,7 @@ const struct lc_numeric_T _C_numeric_locale = {
 };
 
 #ifdef __HAVE_LOCALE_INFO__
+#ifdef __CYGWIN__
 int
 __numeric_load_locale (struct __locale_t *locale, const char *name ,
 		       void *f_wctomb, const char *charset)
@@ -50,7 +51,6 @@ __numeric_load_locale (struct __locale_t *locale, const char *name ,
   struct lc_numeric_T nm;
   char *bufp = NULL;
 
-#ifdef __CYGWIN__
   extern int __set_lc_numeric_from_win (const char *,
 					const struct lc_numeric_T *,
 					struct lc_numeric_T *, char **,
@@ -83,9 +83,7 @@ __numeric_load_locale (struct __locale_t *locale, const char *name ,
 	}
       ret = 0;
     }
-#else
-  /* TODO */
-#endif
   return ret;
 }
+#endif
 #endif

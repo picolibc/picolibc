@@ -906,11 +906,13 @@ restart:
 			   || strncmp (locale, "zh", 2) == 0));
       if (cjksingle)
 	loc->cjk_lang = -1;	/* Disable CJK dual-width */
-#ifdef __HAVE_LOCALE_INFO__
+#ifdef __CYGWIN__
       ret = __ctype_load_locale (loc, locale, (void *) l_wctomb, charset,
 				 mbc_max);
-#endif /* __HAVE_LOCALE_INFO__ */
+#endif /* __CYGWIN__ */
       break;
+#ifdef __CYGWIN__
+  /* Right now only Cygwin supports a __messages_load_locale function at all. */
     case LC_MESSAGES:
 #ifdef __HAVE_LOCALE_INFO__
       ret = __messages_load_locale (loc, locale, (void *) l_wctomb, charset);
@@ -919,20 +921,21 @@ restart:
       strcpy (loc->message_codeset, charset);
 #endif /* __HAVE_LOCALE_INFO__ */
       break;
+#endif
 #ifdef __HAVE_LOCALE_INFO__
 #ifdef __CYGWIN__
   /* Right now only Cygwin supports a __collate_load_locale function at all. */
     case LC_COLLATE:
       ret = __collate_load_locale (loc, locale, (void *) l_mbtowc, charset);
       break;
-#endif
+  /* Right now only Cygwin supports a __monetary_load_locale function at all. */
     case LC_MONETARY:
       ret = __monetary_load_locale (loc, locale, (void *) l_wctomb, charset);
       break;
+  /* Right now only Cygwin supports a __numeric_load_locale function at all. */
     case LC_NUMERIC:
       ret = __numeric_load_locale (loc, locale, (void *) l_wctomb, charset);
       break;
-#ifdef __CYGWIN__
   /* Right now only Cygwin supports a __time_load_locale function at all. */
     case LC_TIME:
       ret = __time_load_locale (loc, locale, (void *) l_wctomb, charset);
