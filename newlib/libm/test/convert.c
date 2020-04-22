@@ -213,10 +213,6 @@ test_fcvt (void)
 {
   int a2,a3;
   char *sd;
-  char *sf;
-  double v1;
-  double v2;
-  int s1, s2;
   sd =  fcvt(pdd->value, pdd->f1, &a2, &a3);
 
   test_scok(sd,pdd->fstring,10);
@@ -224,6 +220,10 @@ test_fcvt (void)
   test_iok(pdd->f3,a3);
 
 #ifndef NO_NEWLIB
+  char *sf;
+  double v1;
+  double v2;
+  int s1, s2;
   /* Test the float version by converting and inspecting the numbers 3
    after reconverting */
   sf =  fcvtf(pdd->value, pdd->f1, &a2, &a3);
