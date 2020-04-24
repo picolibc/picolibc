@@ -104,13 +104,14 @@ sec_user_cloexec (bool cloexec, PSECURITY_ATTRIBUTES sa, PSID sid)
 }
 
 static HANDLE
-create_event ()
+create_event (bool inherit = false)
 {
   NTSTATUS status;
   OBJECT_ATTRIBUTES attr;
   HANDLE evt = NULL;
 
-  InitializeObjectAttributes (&attr, NULL, 0, NULL, NULL);
+  InitializeObjectAttributes (&attr, NULL, inherit ? OBJ_INHERIT : 0,
+			      NULL, NULL);
   status = NtCreateEvent (&evt, EVENT_ALL_ACCESS, &attr,
 			  NotificationEvent, FALSE);
   if (!NT_SUCCESS (status))
@@ -353,47 +354,72 @@ fhandler_fifo::record_connection (fifo_client_handler& fc,
   set_pipe_non_blocking (fc.h, true);
 }
 
-/* Called from fifo_reader_thread_func with owner_lock in place. */
+/* Called from fifo_reader_thread_func with owner_lock in place, also
+   from fixup_after_exec with shared handles useable as they are. */
 int
-fhandler_fifo::update_my_handlers ()
+fhandler_fifo::update_my_handlers (bool from_exec)
 {
-  close_all_handlers ();
-  fifo_reader_id_t prev = get_prev_owner ();
-  if (!prev)
+  if (from_exec)
     {
-      debug_printf ("No previous owner to copy handles from");
-      return 0;
-    }
-  HANDLE prev_proc;
-  if (prev.winpid == me.winpid)
-    prev_proc =  GetCurrentProcess ();
-  else
-    prev_proc = OpenProcess (PROCESS_DUP_HANDLE, false, prev.winpid);
-  if (!prev_proc)
-    {
-      debug_printf ("Can't open process of previous owner, %E");
-      __seterrno ();
-      return -1;
-    }
-
-  for (int i = 0; i < get_shared_nhandlers (); i++)
-    {
-      /* Should never happen. */
-      if (shared_fc_handler[i].state < fc_connected)
-	continue;
-      if (add_client_handler (false) < 0)
-	api_fatal ("Can't add client handler, %E");
-      fifo_client_handler &fc = fc_handler[nhandlers - 1];
-      if (!DuplicateHandle (prev_proc, shared_fc_handler[i].h,
-			    GetCurrentProcess (), &fc.h, 0,
-			    !close_on_exec (), DUPLICATE_SAME_ACCESS))
+      nhandlers = get_shared_nhandlers ();
+      if (nhandlers > shandlers)
 	{
-	  debug_printf ("Can't duplicate handle of previous owner, %E");
-	  --nhandlers;
+	  int save = shandlers;
+	  shandlers = nhandlers + 64;
+	  void *temp = realloc (fc_handler,
+				shandlers * sizeof (fc_handler[0]));
+	  if (!temp)
+	    {
+	      shandlers = save;
+	      nhandlers = 0;
+	      set_errno (ENOMEM);
+	      return -1;
+	    }
+	  fc_handler = (fifo_client_handler *) temp;
+	}
+      memcpy (fc_handler, shared_fc_handler,
+	      nhandlers * sizeof (fc_handler[0]));
+    }
+  else
+    {
+      close_all_handlers ();
+      fifo_reader_id_t prev = get_prev_owner ();
+      if (!prev)
+	{
+	  debug_printf ("No previous owner to copy handles from");
+	  return 0;
+	}
+      HANDLE prev_proc;
+      if (prev.winpid == me.winpid)
+	prev_proc =  GetCurrentProcess ();
+      else
+	prev_proc = OpenProcess (PROCESS_DUP_HANDLE, false, prev.winpid);
+      if (!prev_proc)
+	{
+	  debug_printf ("Can't open process of previous owner, %E");
 	  __seterrno ();
 	  return -1;
 	}
-      fc.state = shared_fc_handler[i].state;
+
+      for (int i = 0; i < get_shared_nhandlers (); i++)
+	{
+	  /* Should never happen. */
+	  if (shared_fc_handler[i].state < fc_connected)
+	    continue;
+	  if (add_client_handler (false) < 0)
+	    api_fatal ("Can't add client handler, %E");
+	  fifo_client_handler &fc = fc_handler[nhandlers - 1];
+	  if (!DuplicateHandle (prev_proc, shared_fc_handler[i].h,
+				GetCurrentProcess (), &fc.h, 0,
+				!close_on_exec (), DUPLICATE_SAME_ACCESS))
+	    {
+	      debug_printf ("Can't duplicate handle of previous owner, %E");
+	      --nhandlers;
+	      __seterrno ();
+	      return -1;
+	    }
+	  fc.state = shared_fc_handler[i].state;
+	}
     }
   return 0;
 }
@@ -771,9 +797,9 @@ fhandler_fifo::open (int flags, mode_t)
       if (create_shared_fc_handler () < 0)
 	goto err_close_shmem;
       inc_nreaders ();
-      if (!(cancel_evt = create_event ()))
+      if (!(cancel_evt = create_event (true)))
 	goto err_dec_nreaders;
-      if (!(thr_sync_evt = create_event ()))
+      if (!(thr_sync_evt = create_event (true)))
 	goto err_close_cancel_evt;
       me.winpid = GetCurrentProcessId ();
       me.fh = this;
@@ -1338,9 +1364,9 @@ fhandler_fifo::dup (fhandler_base *child, int flags)
 	}
       if (fhf->reopen_shared_fc_handler () < 0)
 	goto err_close_shared_fc_hdl;
-      if (!(fhf->cancel_evt = create_event ()))
+      if (!(fhf->cancel_evt = create_event (true)))
 	goto err_close_shared_fc_handler;
-      if (!(fhf->thr_sync_evt = create_event ()))
+      if (!(fhf->thr_sync_evt = create_event (true)))
 	goto err_close_cancel_evt;
       inc_nreaders ();
       fhf->me.fh = fhf;
@@ -1389,9 +1415,17 @@ fhandler_fifo::fixup_after_fork (HANDLE parent)
 	/* Prevent a later attempt to close the non-inherited
 	   pipe-instance handles copied from the parent. */
 	nhandlers = 0;
-      if (!(cancel_evt = create_event ()))
+      else
+	{
+	  /* Close inherited handles needed only by exec. */
+	  if (cancel_evt)
+	    NtClose (cancel_evt);
+	  if (thr_sync_evt)
+	    NtClose (thr_sync_evt);
+	}
+      if (!(cancel_evt = create_event (true)))
 	api_fatal ("Can't create reader thread cancel event during fork, %E");
-      if (!(thr_sync_evt = create_event ()))
+      if (!(thr_sync_evt = create_event (true)))
 	api_fatal ("Can't create reader thread sync event during fork, %E");
       inc_nreaders ();
       me.winpid = GetCurrentProcessId ();
@@ -1414,10 +1448,32 @@ fhandler_fifo::fixup_after_exec ()
 	api_fatal ("Can't reopen shared fc_handler memory during exec, %E");
       fc_handler = NULL;
       nhandlers = shandlers = 0;
+
+      /* Cancel parent's reader thread */
+      if (cancel_evt)
+	SetEvent (cancel_evt);
+      if (thr_sync_evt)
+	WaitForSingleObject (thr_sync_evt, INFINITE);
+
+      /* Take ownership if parent is owner. */
+      fifo_reader_id_t parent_fr = me;
       me.winpid = GetCurrentProcessId ();
-      if (!(cancel_evt = create_event ()))
+      owner_lock ();
+      if (get_owner () == parent_fr)
+	{
+	  set_owner (me);
+	  if (update_my_handlers (true) < 0)
+	    api_fatal ("Can't update my handlers, %E");
+	}
+      owner_unlock ();
+      /* Close inherited cancel_evt and thr_sync_evt. */
+      if (cancel_evt)
+	NtClose (cancel_evt);
+      if (thr_sync_evt)
+	NtClose (thr_sync_evt);
+      if (!(cancel_evt = create_event (true)))
 	api_fatal ("Can't create reader thread cancel event during exec, %E");
-      if (!(thr_sync_evt = create_event ()))
+      if (!(thr_sync_evt = create_event (true)))
 	api_fatal ("Can't create reader thread sync event during exec, %E");
       /* At this moment we're a new reader.  The count will be
 	 decremented when the parent closes. */
@@ -1433,8 +1489,13 @@ fhandler_fifo::set_close_on_exec (bool val)
   set_no_inheritance (read_ready, val);
   set_no_inheritance (write_ready, val);
   set_no_inheritance (writer_opening, val);
-  fifo_client_lock ();
-  for (int i = 0; i < nhandlers; i++)
-    set_no_inheritance (fc_handler[i].h, val);
-  fifo_client_unlock ();
+  if (reader)
+    {
+      set_no_inheritance (cancel_evt, val);
+      set_no_inheritance (thr_sync_evt, val);
+      fifo_client_lock ();
+      for (int i = 0; i < nhandlers; i++)
+	set_no_inheritance (fc_handler[i].h, val);
+      fifo_client_unlock ();
+    }
 }
