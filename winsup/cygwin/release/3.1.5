@@ -18,3 +18,7 @@ Bug Fixes:
 
 - Fix TIOCINQ to always return number of inbound chars if available.
   Addresses: https://cygwin.com/ml/cygwin/2020-02/msg00258.html
+
+- Fix error handling in raw disk writes and allow full disk writes
+  including necessary locking on floppies as well.
+  Addresses: https://cygwin.com/pipermail/cygwin/2020-April/244610.html
