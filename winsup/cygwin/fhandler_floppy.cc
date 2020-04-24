@@ -619,12 +619,12 @@ fhandler_dev_floppy::raw_write (const void *ptr, size_t len)
 	      devbufend = bytes_per_sector;
 	    }
 	}
-      return bytes_written;
+      return (ssize_t) bytes_written;
     }
 
   /* In O_DIRECT case, just write. */
   if (write_file (p, len, &bytes_written, &ret))
-    return bytes_written;
+    return (ssize_t) bytes_written;
 
 err:
   if (IS_EOM (ret))
@@ -635,7 +635,8 @@ err:
     }
   else if (!bytes_written)
     __seterrno ();
-  return bytes_written ?: -1;
+  /* Cast is required, otherwise the error return value is (DWORD)-1. */
+  return (ssize_t) bytes_written ?: -1;
 }
 
 off_t
