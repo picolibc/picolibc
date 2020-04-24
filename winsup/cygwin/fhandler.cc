@@ -949,9 +949,9 @@ fhandler_base::write (const void *ptr, size_t len)
 	    }
 
 	  /* We've got a buffer-full, or we're out of data.  Write it out */
-	  int nbytes;
-	  int want = buf_ptr - buf;
-	  if ((nbytes = raw_write (buf, want)) == want)
+	  ssize_t nbytes;
+	  ptrdiff_t want = buf_ptr - buf;
+	  if ((nbytes = raw_write (buf, (size_t) want)) == want)
 	    {
 	      /* Keep track of how much written not counting additional \r's */
 	      res = data - (char *)ptr;
