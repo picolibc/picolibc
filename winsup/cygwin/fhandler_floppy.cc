@@ -161,7 +161,8 @@ fhandler_dev_floppy::lock_partition (DWORD to_write)
      If there's some file handle open on one of the affected partitions,
      this fails, but that's how it works...
      The high partition major numbers don't have a partition 0. */
-  if (get_major () >= DEV_SD_HIGHPART_START || get_minor () % 16 != 0)
+  if (get_major () == DEV_FLOPPY_MAJOR
+      || get_major () >= DEV_SD_HIGHPART_START || get_minor () % 16 != 0)
     {
       if (!DeviceIoControl (get_handle (), FSCTL_LOCK_VOLUME,
 			   NULL, 0, NULL, 0, &bytes_read, NULL))
@@ -302,7 +303,6 @@ fhandler_dev_floppy::write_file (const void *buf, DWORD to_write,
      See http://support.microsoft.com/kb/942448 for details.
      What we do here is to lock the affected partition(s) and retry. */
   if (*err == ERROR_ACCESS_DENIED
-      && get_major () != DEV_FLOPPY_MAJOR
       && get_major () != DEV_CDROM_MAJOR
       && (get_flags () & O_ACCMODE) != O_RDONLY
       && lock_partition (to_write))
