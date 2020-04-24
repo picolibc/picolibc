@@ -1359,6 +1359,10 @@ class fhandler_fifo: public fhandler_base
   HANDLE write_ready;           /* A writer is open; OK for a reader to open. */
   HANDLE writer_opening;        /* A writer is opening; no EOF. */
 
+  /* Handles to named events needed by all readers of a given FIFO. */
+  HANDLE owner_needed_evt;      /* The owner is closing. */
+  HANDLE owner_found_evt;       /* A new owner has taken over. */
+
   /* Handles to non-shared events needed for fifo_reader_threads. */
   HANDLE cancel_evt;            /* Signal thread to terminate. */
   HANDLE thr_sync_evt;          /* The thread has terminated. */
@@ -1405,6 +1409,16 @@ class fhandler_fifo: public fhandler_base
   fifo_reader_id_t get_prev_owner () const { return shmem->get_prev_owner (); }
   void set_prev_owner (fifo_reader_id_t fr_id)
   { shmem->set_prev_owner (fr_id); }
+  void owner_needed ()
+  {
+    ResetEvent (owner_found_evt);
+    SetEvent (owner_needed_evt);
+  }
+  void owner_found ()
+  {
+    ResetEvent (owner_needed_evt);
+    SetEvent (owner_found_evt);
+  }
 
   int get_shared_nhandlers () { return shmem->get_shared_nhandlers (); }
   void set_shared_nhandlers (int n) { shmem->set_shared_nhandlers (n); }

@@ -74,6 +74,7 @@ static NO_COPY fifo_reader_id_t null_fr_id = { .winpid = 0, .fh = NULL };
 fhandler_fifo::fhandler_fifo ():
   fhandler_base (),
   read_ready (NULL), write_ready (NULL), writer_opening (NULL),
+  owner_needed_evt (NULL), owner_found_evt (NULL),
   cancel_evt (NULL), thr_sync_evt (NULL), _maybe_eof (false),
   fc_handler (NULL), shandlers (0), nhandlers (0),
   reader (false), writer (false), duplexer (false),
@@ -464,14 +465,23 @@ fhandler_fifo::fifo_reader_thread_func ()
 	  set_owner (me);
 	  if (update_my_handlers () < 0)
 	    api_fatal ("Can't update my handlers, %E");
+	  owner_found ();
 	  owner_unlock ();
 	  continue;
 	}
       else if (cur_owner != me)
 	{
 	  owner_unlock ();
-	  WaitForSingleObject (cancel_evt, INFINITE);
-	  goto canceled;
+	  HANDLE w[2] = { owner_needed_evt, cancel_evt };
+	  switch (WaitForMultipleObjects (2, w, false, INFINITE))
+	    {
+	    case WAIT_OBJECT_0:
+	      continue;
+	    case WAIT_OBJECT_0 + 1:
+	      goto canceled;
+	    default:
+	      api_fatal ("WFMO failed, %E");
+	    }
 	}
       else
 	{
@@ -797,8 +807,23 @@ fhandler_fifo::open (int flags, mode_t)
       if (create_shared_fc_handler () < 0)
 	goto err_close_shmem;
       inc_nreaders ();
+      npbuf[0] = 'n';
+      if (!(owner_needed_evt = CreateEvent (sa_buf, true, false, npbuf)))
+	{
+	  debug_printf ("CreateEvent for %s failed, %E", npbuf);
+	  __seterrno ();
+	  goto err_dec_nreaders;
+	}
+      npbuf[0] = 'f';
+      if (!(owner_found_evt = CreateEvent (sa_buf, true, false, npbuf)))
+	{
+	  debug_printf ("CreateEvent for %s failed, %E", npbuf);
+	  __seterrno ();
+	  goto err_close_owner_needed_evt;
+	}
+      /* Make cancel and sync inheritable for exec. */
       if (!(cancel_evt = create_event (true)))
-	goto err_dec_nreaders;
+	goto err_close_owner_found_evt;
       if (!(thr_sync_evt = create_event (true)))
 	goto err_close_cancel_evt;
       me.winpid = GetCurrentProcessId ();
@@ -918,6 +943,10 @@ err_close_reader:
   return 0;
 err_close_cancel_evt:
   NtClose (cancel_evt);
+err_close_owner_found_evt:
+  NtClose (owner_found_evt);
+err_close_owner_needed_evt:
+  NtClose (owner_needed_evt);
 err_dec_nreaders:
   if (dec_nreaders () == 0)
     ResetEvent (read_ready);
@@ -1255,13 +1284,49 @@ fhandler_fifo::close ()
 {
   if (reader)
     {
-      if (dec_nreaders () == 0)
-	ResetEvent (read_ready);
+      /* If we're the owner, try to find a new owner. */
+      bool find_new_owner = false;
+
       cancel_reader_thread ();
       owner_lock ();
       if (get_owner () == me)
-	set_owner (null_fr_id);
+	{
+	  find_new_owner = true;
+	  set_owner (null_fr_id);
+	  set_prev_owner (me);
+	  owner_needed ();
+	}
       owner_unlock ();
+      if (dec_nreaders () == 0)
+	ResetEvent (read_ready);
+      else if (find_new_owner && !IsEventSignalled (owner_found_evt))
+	{
+	  bool found = false;
+	  do
+	    if (dec_nreaders () >= 0)
+	      {
+		/* There's still another reader open. */
+		if (WaitForSingleObject (owner_found_evt, 1) == WAIT_OBJECT_0)
+		  found = true;
+		else
+		  {
+		    owner_lock ();
+		    if (get_owner ()) /* We missed owner_found_evt? */
+		      found = true;
+		    else
+		      owner_needed ();
+		    owner_unlock ();
+		  }
+	      }
+	  while (inc_nreaders () > 0 && !found);
+	}
+      close_all_handlers ();
+      if (fc_handler)
+	free (fc_handler);
+      if (owner_needed_evt)
+	NtClose (owner_needed_evt);
+      if (owner_found_evt)
+	NtClose (owner_found_evt);
       if (cancel_evt)
 	NtClose (cancel_evt);
       if (thr_sync_evt)
@@ -1281,10 +1346,10 @@ fhandler_fifo::close ()
     NtClose (write_ready);
   if (writer_opening)
     NtClose (writer_opening);
-  close_all_handlers ();
-  if (fc_handler)
-    free (fc_handler);
-  return fhandler_base::close ();
+  if (nohandle ())
+    return 0;
+  else
+    return fhandler_base::close ();
 }
 
 /* If we have a write handle (i.e., we're a duplexer or a writer),
@@ -1364,8 +1429,22 @@ fhandler_fifo::dup (fhandler_base *child, int flags)
 	}
       if (fhf->reopen_shared_fc_handler () < 0)
 	goto err_close_shared_fc_hdl;
+      if (!DuplicateHandle (GetCurrentProcess (), owner_needed_evt,
+			    GetCurrentProcess (), &fhf->owner_needed_evt,
+			    0, !(flags & O_CLOEXEC), DUPLICATE_SAME_ACCESS))
+	{
+	  __seterrno ();
+	  goto err_close_shared_fc_handler;
+	}
+      if (!DuplicateHandle (GetCurrentProcess (), owner_found_evt,
+			    GetCurrentProcess (), &fhf->owner_found_evt,
+			    0, !(flags & O_CLOEXEC), DUPLICATE_SAME_ACCESS))
+	{
+	  __seterrno ();
+	  goto err_close_owner_needed_evt;
+	}
       if (!(fhf->cancel_evt = create_event (true)))
-	goto err_close_shared_fc_handler;
+	goto err_close_owner_found_evt;
       if (!(fhf->thr_sync_evt = create_event (true)))
 	goto err_close_cancel_evt;
       inc_nreaders ();
@@ -1375,6 +1454,10 @@ fhandler_fifo::dup (fhandler_base *child, int flags)
   return 0;
 err_close_cancel_evt:
   NtClose (fhf->cancel_evt);
+err_close_owner_found_evt:
+  NtClose (fhf->owner_found_evt);
+err_close_owner_needed_evt:
+  NtClose (fhf->owner_needed_evt);
 err_close_shared_fc_handler:
   NtUnmapViewOfSection (GetCurrentProcess (), fhf->shared_fc_handler);
 err_close_shared_fc_hdl:
@@ -1411,6 +1494,8 @@ fhandler_fifo::fixup_after_fork (HANDLE parent)
       fork_fixup (parent, shared_fc_hdl, "shared_fc_hdl");
       if (reopen_shared_fc_handler () < 0)
 	api_fatal ("Can't reopen shared fc_handler memory during fork, %E");
+      fork_fixup (parent, owner_needed_evt, "owner_needed_evt");
+      fork_fixup (parent, owner_found_evt, "owner_found_evt");
       if (close_on_exec ())
 	/* Prevent a later attempt to close the non-inherited
 	   pipe-instance handles copied from the parent. */
@@ -1491,6 +1576,8 @@ fhandler_fifo::set_close_on_exec (bool val)
   set_no_inheritance (writer_opening, val);
   if (reader)
     {
+      set_no_inheritance (owner_needed_evt, val);
+      set_no_inheritance (owner_found_evt, val);
       set_no_inheritance (cancel_evt, val);
       set_no_inheritance (thr_sync_evt, val);
       fifo_client_lock ();
