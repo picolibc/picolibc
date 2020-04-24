@@ -27,7 +27,7 @@ SYNOPSIS
                       size_t <[length]>);
 
 DESCRIPTION
-	<<strncpy>> copies not more than <[length]> characters from the
+	<<strncpy>> copies not more than <[length]> characters from
 	the string pointed to by <[src]> (including the terminating
 	null character) to the array pointed to by <[dst]>.  If the
 	string pointed to by <[src]> is shorter than <[length]>
