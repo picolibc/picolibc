@@ -866,6 +866,8 @@ peek_fifo (select_record *s, bool from_select)
 	  goto out;
 	}
 
+      fh->reading_lock ();
+      fh->take_ownership ();
       fh->fifo_client_lock ();
       int nconnected = 0;
       for (int i = 0; i < fh->get_nhandlers (); i++)
@@ -888,6 +890,7 @@ peek_fifo (select_record *s, bool from_select)
 		fh->get_fc_handler (i).get_state () = fc_input_avail;
 		select_printf ("read: %s, ready for read", fh->get_name ());
 		fh->fifo_client_unlock ();
+		fh->reading_unlock ();
 		gotone += s->read_ready = true;
 		goto out;
 	      default:
@@ -905,6 +908,7 @@ peek_fifo (select_record *s, bool from_select)
 	  if (s->except_selected)
 	    gotone += s->except_ready = true;
 	}
+      fh->reading_unlock ();
     }
 out:
   if (s->write_selected)

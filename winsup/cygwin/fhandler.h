@@ -1323,12 +1323,13 @@ struct fifo_reader_id_t
 class fifo_shmem_t
 {
   LONG _nreaders;
-  fifo_reader_id_t _owner, _prev_owner;
-  af_unix_spinlock_t _owner_lock;
+  fifo_reader_id_t _owner, _prev_owner, _pending_owner;
+  af_unix_spinlock_t _owner_lock, _reading_lock;
 
   /* Info about shared memory block used for temporary storage of the
      owner's fc_handler list. */
-  LONG _sh_nhandlers, _sh_shandlers, _sh_fc_handler_committed;
+  LONG _sh_nhandlers, _sh_shandlers, _sh_fc_handler_committed,
+    _sh_fc_handler_updated;
 
 public:
   int inc_nreaders () { return (int) InterlockedIncrement (&_nreaders); }
@@ -1338,9 +1339,13 @@ public:
   void set_owner (fifo_reader_id_t fr_id) { _owner = fr_id; }
   fifo_reader_id_t get_prev_owner () const { return _prev_owner; }
   void set_prev_owner (fifo_reader_id_t fr_id) { _prev_owner = fr_id; }
+  fifo_reader_id_t get_pending_owner () const { return _pending_owner; }
+  void set_pending_owner (fifo_reader_id_t fr_id) { _pending_owner = fr_id; }
 
   void owner_lock () { _owner_lock.lock (); }
   void owner_unlock () { _owner_lock.unlock (); }
+  void reading_lock () { _reading_lock.lock (); }
+  void reading_unlock () { _reading_lock.unlock (); }
 
   int get_shared_nhandlers () const { return (int) _sh_nhandlers; }
   void set_shared_nhandlers (int n) { InterlockedExchange (&_sh_nhandlers, n); }
@@ -1350,6 +1355,9 @@ public:
   { return (size_t) _sh_fc_handler_committed; }
   void set_shared_fc_handler_committed (size_t n)
   { InterlockedExchange (&_sh_fc_handler_committed, (LONG) n); }
+  bool shared_fc_handler_updated () const { return _sh_fc_handler_updated; }
+  void shared_fc_handler_updated (bool val)
+  { InterlockedExchange (&_sh_fc_handler_updated, val); }
 };
 
 class fhandler_fifo: public fhandler_base
@@ -1362,6 +1370,7 @@ class fhandler_fifo: public fhandler_base
   /* Handles to named events needed by all readers of a given FIFO. */
   HANDLE owner_needed_evt;      /* The owner is closing. */
   HANDLE owner_found_evt;       /* A new owner has taken over. */
+  HANDLE update_needed_evt;     /* shared_fc_handler needs updating. */
 
   /* Handles to non-shared events needed for fifo_reader_threads. */
   HANDLE cancel_evt;            /* Signal thread to terminate. */
@@ -1409,6 +1418,11 @@ class fhandler_fifo: public fhandler_base
   fifo_reader_id_t get_prev_owner () const { return shmem->get_prev_owner (); }
   void set_prev_owner (fifo_reader_id_t fr_id)
   { shmem->set_prev_owner (fr_id); }
+  fifo_reader_id_t get_pending_owner () const
+  { return shmem->get_pending_owner (); }
+  void set_pending_owner (fifo_reader_id_t fr_id)
+  { shmem->set_pending_owner (fr_id); }
+
   void owner_needed ()
   {
     ResetEvent (owner_found_evt);
@@ -1430,6 +1444,10 @@ class fhandler_fifo: public fhandler_base
   { shmem->set_shared_fc_handler_committed (n); }
   int update_my_handlers (bool from_exec = false);
   int update_shared_handlers ();
+  bool shared_fc_handler_updated () const
+  { return shmem->shared_fc_handler_updated (); }
+  void shared_fc_handler_updated (bool val)
+  { shmem->shared_fc_handler_updated (val); }
 
 public:
   fhandler_fifo ();
@@ -1448,6 +1466,10 @@ public:
   void set_owner (fifo_reader_id_t fr_id) { shmem->set_owner (fr_id); }
   void owner_lock () { shmem->owner_lock (); }
   void owner_unlock () { shmem->owner_unlock (); }
+
+  void take_ownership ();
+  void reading_lock () { shmem->reading_lock (); }
+  void reading_unlock () { shmem->reading_unlock (); }
 
   int open (int, mode_t);
   off_t lseek (off_t offset, int whence);
