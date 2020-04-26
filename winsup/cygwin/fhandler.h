@@ -1296,19 +1296,26 @@ struct fifo_client_handler
 /* Returns FILE_PIPE_DISCONNECTED_STATE, FILE_PIPE_LISTENING_STATE,
    FILE_PIPE_CONNECTED_STATE, FILE_PIPE_CLOSING_STATE,
    FILE_PIPE_INPUT_AVAILABLE_STATE, or -1 on error. */
+  fifo_client_connect_state &get_state () { return state; }
   int pipe_state ();
 };
 
 class fhandler_fifo: public fhandler_base
 {
-  HANDLE read_ready;
-  HANDLE write_ready;
+  /* Handles to named events shared by all fhandlers for a given FIFO. */
+  HANDLE read_ready;            /* A reader is open; OK for a writer to open. */
+  HANDLE write_ready;           /* A writer is open; OK for a reader to open. */
+  HANDLE writer_opening;        /* A writer is opening; no EOF. */
+
+  /* Non-shared handles needed for the listen_client_thread. */
   HANDLE listen_client_thr;
   HANDLE lct_termination_evt;
+
   UNICODE_STRING pipe_name;
   WCHAR pipe_name_buf[CYGWIN_FIFO_PIPE_NAME_LEN + 1];
+  bool _maybe_eof;
   fifo_client_handler fc_handler[MAX_CLIENTS];
-  int nhandlers, nconnected;
+  int nhandlers;
   af_unix_spinlock_t _fifo_client_lock;
   bool reader, writer, duplexer;
   size_t max_atomic_write;
@@ -1326,10 +1333,10 @@ class fhandler_fifo: public fhandler_base
 public:
   fhandler_fifo ();
   bool hit_eof ();
+  bool maybe_eof () const { return _maybe_eof; }
+  void maybe_eof (bool val) { _maybe_eof = val; }
   int get_nhandlers () const { return nhandlers; }
-  HANDLE get_fc_handle (int i) const { return fc_handler[i].h; }
-  bool is_connected (int i) const
-  { return fc_handler[i].state == fc_connected; }
+  fifo_client_handler get_fc_handler (int i) const { return fc_handler[i]; }
   PUNICODE_STRING get_pipe_name ();
   DWORD listen_client_thread ();
   void fifo_client_lock () { _fifo_client_lock.lock (); }
