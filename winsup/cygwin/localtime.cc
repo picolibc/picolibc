@@ -1,16 +1,16 @@
 /*	$NetBSD: localtime.c,v 1.72 2012/10/28 19:02:29 christos Exp $	*/
 
-/* Don't reformat the code arbitrarily.
-
-   It uses in wide parts the exact formatting as the upstream NetBSD
-   versions.  The purpose is to simplify subsequent diffs to the NetBSD
-   version, should the need arise again at one point. */
-
 /*
 ** This file is in the public domain, so clarified as of
 ** 1996-06-05 by Arthur David Olson.
 */
 /* Temporarily merged private.h and tzfile.h for ease of management - DJ */
+
+/* Don't reformat the code arbitrarily.
+
+   It uses in wide parts the exact formatting as the upstream NetBSD
+   versions.  The purpose is to simplify subsequent diffs to the NetBSD
+   version, should the need arise again at one point. */
 
 #include "winsup.h"
 #include "cygerrno.h"
@@ -437,8 +437,6 @@ struct __state {
 	struct lsinfo	lsis[TZ_MAX_LEAPS];
 };
 
-typedef struct __state *timezone_t;
-
 struct rule {
 	int		r_type;		/* type of rule--see below */
 	int		r_day;		/* day number of rule */
@@ -450,6 +448,10 @@ struct rule {
 #define JULIAN_DAY		0	/* Jn - Julian day */
 #define DAY_OF_YEAR		1	/* n - day of year */
 #define MONTH_NTH_DAY_OF_WEEK	2	/* Mm.n.d - month, week, day of week */
+
+#ifdef __CYGWIN__
+typedef struct __state *timezone_t;
+#endif
 
 typedef struct tm *(*subfun_t)(const timezone_t sp, const time_t *timep,
 			       long offset, struct tm *tmp);
