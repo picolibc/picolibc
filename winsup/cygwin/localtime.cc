@@ -1,4 +1,4 @@
-/*	$NetBSD: localtime.c,v 1.72 2012/10/28 19:02:29 christos Exp $	*/
+/*	$NetBSD: localtime.c,v 1.73 2013/03/02 21:24:28 christos Exp $	*/
 
 /*
 ** This file is in the public domain, so clarified as of
@@ -607,8 +607,7 @@ settzname (void)
 	for (i = 0; i < sp->typecnt; ++i) {
 		const struct ttinfo * const	ttisp = &sp->ttis[i];
 
-		tzname[ttisp->tt_isdst] =
-			&sp->chars[ttisp->tt_abbrind];
+		tzname[ttisp->tt_isdst] = &sp->chars[ttisp->tt_abbrind];
 #ifdef USG_COMPAT
 		if (ttisp->tt_isdst)
 			daylight = 1;
@@ -816,20 +815,31 @@ tzload(timezone_t sp, const char *name, const int doextend)
 		** signed time_t system but using a data file with
 		** unsigned values (or vice versa).
 		*/
-		for (i = 0; i < sp->timecnt - 2; ++i)
-			if (sp->ats[i] > sp->ats[i + 1]) {
-				++i;
+		for (i = 0; i < sp->timecnt; ++i)
+			if ((i < sp->timecnt - 1 &&
+			    sp->ats[i] > sp->ats[i + 1]) ||
+			    (i == sp->timecnt - 1 && !TYPE_SIGNED(time_t) &&
+			    sp->ats[i] >
+			    ((stored == 4) ? INT32_MAX : INT64_MAX))) {
 				if (TYPE_SIGNED(time_t)) {
 					/*
 					** Ignore the end (easy).
 					*/
-					sp->timecnt = i;
+					sp->timecnt = i + 1;
 				} else {
 					/*
 					** Ignore the beginning (harder).
 					*/
 					int	j;
 
+					/*
+					** Keep the record right before the
+					** epoch boundary,
+					** but tweak it so that it starts
+					** right with the epoch
+					** (thanks to Doug Bailey).
+					*/
+					sp->ats[i] = 0;
 					for (j = 0; j + i < sp->timecnt; ++j) {
 						sp->ats[j] = sp->ats[j + i];
 						sp->types[j] = sp->types[j + i];
