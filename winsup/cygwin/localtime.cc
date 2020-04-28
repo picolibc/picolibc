@@ -1,4 +1,4 @@
-/*	$NetBSD: localtime.c,v 1.79 2013/12/13 10:34:47 christos Exp $	*/
+/*	$NetBSD: localtime.c,v 1.80 2013/12/13 10:37:24 christos Exp $	*/
 
 /*
 ** This file is in the public domain, so clarified as of
@@ -74,8 +74,6 @@ static char	privatehid[] = "@(#)private.h	7.48";
 #if 0
 #include <assert.h>
 #endif
-#define time_t_min	LONG_MIN
-#define time_t_max	LONG_MAX
 
 /* Unlike <ctype.h>'s isdigit, this also works if c < 0 | c > UCHAR_MAX.  */
 #define is_digit(c) ((unsigned)(c) - '0' <= 9)
@@ -90,7 +88,7 @@ static char	privatehid[] = "@(#)private.h	7.48";
 #if 0
 static char	elsieid[] = "@(#)localtime.cc	8.17";
 #else
-__RCSID("$NetBSD: localtime.c,v 1.79 2013/12/13 10:34:47 christos Exp $");
+__RCSID("$NetBSD: localtime.c,v 1.80 2013/12/13 10:37:24 christos Exp $");
 #endif
 
 /*
@@ -360,6 +358,16 @@ struct tzhead {
 #ifdef __TM_ZONE
 # define TM_ZONE __TM_ZONE
 #endif
+
+/* The minimum and maximum finite time values.  */
+static time_t const time_t_min =
+  (TYPE_SIGNED(time_t)
+   ? (time_t) -1 << (int)(CHAR_BIT * sizeof (time_t) - 1)
+   : 0);
+static time_t const time_t_max =
+  (TYPE_SIGNED(time_t)
+   ? - (~ 0 < 0) - ((time_t) -1 << (int)(CHAR_BIT * sizeof (time_t) - 1))
+   : -1);
 
 /*
 ** SunOS 4.1.1 headers lack O_BINARY.
