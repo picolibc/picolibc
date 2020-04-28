@@ -46,6 +46,7 @@ project('picolibc', 'c',
 targets = []
 
 enable_multilib = get_option('multilib')
+multilib_list = get_option('multilib-list')
 enable_picolib = get_option('picolib')
 enable_tests = get_option('tests')
 enable_native_tests = get_option('native-tests')
@@ -174,40 +175,60 @@ long double test()
 have_long_double = meson.get_compiler('c').compiles(long_double_code, name : 'long double check')
 
 if enable_multilib
+  used_libs = []
+
+  # Ask the compiler for the set of available multilib configurations,
+  # set up the build system to compile for all desired ones
   foreach target : run_command(meson.get_compiler('c'), '--print-multi-lib').stdout().strip().split('\n')
     tmp = target.split(';')
     flags = []
-    if tmp.length() > 1
-      foreach flag : tmp[1].strip('@').split('@')
-	if flag != ''
-	  flags += '-' + flag
+
+    # Let the user specify a subset of the possible multilib
+    # configurations to build for
+    if multilib_list == [] or tmp[0] in multilib_list
+      used_libs += tmp[0]
+      if tmp.length() > 1
+	foreach flag : tmp[1].strip('@').split('@')
+	  if flag != ''
+	    flags += '-' + flag
+	  endif
+	endforeach
+	if tmp[0] == '.'
+	  name = ''
+	else
+	  name = tmp[0].underscorify()
 	endif
-      endforeach
-      if tmp[0] == '.'
-	name = ''
       else
-	name = tmp[0].underscorify()
+	name = ''
       endif
-    else
-      name = ''
-    endif
-    targets += name
+      targets += name
 
-    # rv64 needs to use a non-default mcmodel so that variables can
-    # live in a broader range of memory addresses
-    if name.startswith('rv64')
-      flags += [ '-mcmodel=medany' ]
-    endif
+      # rv64 needs to use a non-default mcmodel so that variables can
+      # live in a broader range of memory addresses
+      if name.startswith('rv64')
+	flags += [ '-mcmodel=medany' ]
+      endif
 
-    # Add any extra flags for this target from the cross file
-    target_extra = meson.get_cross_property('c_args_' + name, [])
-    if target_extra != []
-      flags += target_extra
-    endif
+      # Add any extra flags for this target from the cross file
+      target_extra = meson.get_cross_property('c_args_' + name, [])
+      if target_extra != []
+	flags += target_extra
+      endif
 
-    value = [tmp[0], flags]
-    set_variable('target_' + name, value)
+      value = [tmp[0], flags]
+      set_variable('target_' + name, value)
+    endif
   endforeach
+
+  # Make sure all requested multilib configurations
+  # are actually available
+  if multilib_list != []
+    foreach lib : multilib_list
+      if lib not in used_libs
+	error('Unavailable multilib: ' + lib)
+      endif
+    endforeach
+  endif
 else
   targets = ['']
   target_ = ['.', []]

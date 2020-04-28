@@ -38,6 +38,9 @@ option('fast-strcmp', type: 'boolean', value: true,
 option('multilib', type: 'boolean', value: true,
        description: 'Enable multilib compile')
 
+option('multilib-list', type: 'array', value: [],
+       description: 'List of multilib configurations to build for')
+
 option('picolib', type: 'boolean', value: true,
        description: 'Include pico lib bits')
 
