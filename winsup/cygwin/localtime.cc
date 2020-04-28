@@ -1,4 +1,4 @@
-/*	$NetBSD: localtime.c,v 1.74 2013/07/17 20:13:04 christos Exp $	*/
+/*	$NetBSD: localtime.c,v 1.75 2013/07/17 23:09:26 christos Exp $	*/
 
 /*
 ** This file is in the public domain, so clarified as of
@@ -81,6 +81,11 @@ static char	privatehid[] = "@(#)private.h	7.48";
 #else
 # define ATTRIBUTE_PURE /* empty */
 #endif
+#endif
+#if 0
+static char	elsieid[] = "@(#)localtime.cc	8.17";
+#else
+__RCSID("$NetBSD: localtime.c,v 1.75 2013/07/17 23:09:26 christos Exp $");
 #endif
 
 /*
@@ -1919,7 +1924,7 @@ offtime(const time_t *const timep, long offset)
 	struct tm *tmp;
 
 	if ((offset > 0 && offset > INT_FAST32_MAX) ||
-	    (offset < 0 && offset > INT_FAST32_MIN)) {
+	    (offset < 0 && offset < INT_FAST32_MIN)) {
 		errno = EOVERFLOW;
 		return NULL;
 	}
@@ -2517,7 +2522,7 @@ timeoff(struct tm *const tmp, long offset)
 	time_t t;
 
 	if ((offset > 0 && offset > INT_FAST32_MAX) ||
-	    (offset < 0 && offset > INT_FAST32_MIN)) {
+	    (offset < 0 && offset < INT_FAST32_MIN)) {
 		errno = EOVERFLOW;
 		return -1;
 	}
