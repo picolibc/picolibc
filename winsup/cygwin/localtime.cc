@@ -1,4 +1,4 @@
-/*	$NetBSD: localtime.c,v 1.75 2013/07/17 23:09:26 christos Exp $	*/
+/*	$NetBSD: localtime.c,v 1.77 2013/07/30 15:30:37 joerg Exp $	*/
 
 /*
 ** This file is in the public domain, so clarified as of
@@ -85,7 +85,7 @@ static char	privatehid[] = "@(#)private.h	7.48";
 #if 0
 static char	elsieid[] = "@(#)localtime.cc	8.17";
 #else
-__RCSID("$NetBSD: localtime.c,v 1.75 2013/07/17 23:09:26 christos Exp $");
+__RCSID("$NetBSD: localtime.c,v 1.77 2013/07/30 15:30:37 joerg Exp $");
 #endif
 
 /*
@@ -2013,7 +2013,7 @@ timesub(const timezone_t sp, const time_t *const timep,
 	}
 	{
 		int_fast32_t seconds;
-		const time_t half_second = 0.5;
+		const time_t half_second = (time_t)0.5;
 
 		seconds = (int_fast32_t)(tdays * SECSPERDAY + half_second);
 		tdays = (time_t)(seconds / SECSPERDAY);
