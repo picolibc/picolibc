@@ -34,6 +34,7 @@
 #
 src_semihost_machine = {
 			'riscv' : 'riscv/semihost-riscv.s',
+			'riscv32' : 'riscv/semihost-riscv.s',
 			'riscv64' : 'riscv/semihost-riscv.s',
 			'arm' : 'arm/semihost-arm.c'
 		      }

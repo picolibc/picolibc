@@ -83,6 +83,7 @@ machine_dirs = {
 		 'or1knd': 'or1k',
 		 'powerpc': 'powerpc',
 		 'riscv': 'riscv',
+		 'riscv32': 'riscv',
 		 'riscv64': 'riscv',
 		 'rl78': 'rl78',
 		 'rx': 'rx',
