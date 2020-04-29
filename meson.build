@@ -327,7 +327,12 @@ inc = include_directories(inc_dirs)
 
 includedir = join_paths(prefix, get_option('includedir'))
 
-arguments = ['-g', '-ffunction-sections', '-fdata-sections']
+# We don't need '-fdata-sections' currently as there aren't any
+# files with data used in separate code paths. This works around
+# versions of gcc for RISC-V which have a bug that mis-names
+# initialized read-only data segments when -fdata-sections
+# is defined
+arguments = ['-g', '-ffunction-sections']
 
 if tls_model != ''
   arguments += ['-ftls-model=' + tls_model]
