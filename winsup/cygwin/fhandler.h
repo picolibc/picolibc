@@ -1319,7 +1319,7 @@ class fhandler_fifo: public fhandler_base
   int add_client_handler ();
   void delete_client_handler (int);
   bool listen_client ();
-  int stop_listen_client ();
+  void stop_listen_client ();
   int check_listen_client_thread ();
   void record_connection (fifo_client_handler&,
 			  fifo_client_connect_state = fc_connected);
@@ -1345,7 +1345,7 @@ public:
   ssize_t __reg3 raw_write (const void *ptr, size_t ulen);
   bool arm (HANDLE h);
   bool need_fixup_before () const { return reader; }
-  int fixup_before_fork_exec (DWORD) { return stop_listen_client (); }
+  int fixup_before_fork_exec (DWORD) { stop_listen_client (); return 0; }
   void init_fixup_before ();
   void fixup_after_fork (HANDLE);
   void fixup_after_exec ();

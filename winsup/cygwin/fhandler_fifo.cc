@@ -324,11 +324,10 @@ fhandler_fifo::record_connection (fifo_client_handler& fc,
 DWORD
 fhandler_fifo::listen_client_thread ()
 {
-  DWORD ret = -1;
-  HANDLE evt;
+  HANDLE conn_evt;
 
-  if (!(evt = create_event ()))
-    goto out;
+  if (!(conn_evt = CreateEvent (NULL, false, false, NULL)))
+    api_fatal ("Can't create connection event, %E");
 
   while (1)
     {
@@ -346,7 +345,7 @@ fhandler_fifo::listen_client_thread ()
 
       /* Create a new client handler. */
       if (add_client_handler () < 0)
-	goto out;
+	api_fatal ("Can't add a client handler, %E");
 
       /* Allow a writer to open. */
       if (!arm (read_ready))
@@ -359,12 +358,13 @@ fhandler_fifo::listen_client_thread ()
       fifo_client_handler& fc = fc_handler[nhandlers - 1];
       NTSTATUS status;
       IO_STATUS_BLOCK io;
+      bool cancel = false;
 
-      status = NtFsControlFile (fc.h, evt, NULL, NULL, &io,
+      status = NtFsControlFile (fc.h, conn_evt, NULL, NULL, &io,
 				FSCTL_PIPE_LISTEN, NULL, 0, NULL, 0);
       if (status == STATUS_PENDING)
 	{
-	  HANDLE w[2] = { evt, lct_termination_evt };
+	  HANDLE w[2] = { conn_evt, lct_termination_evt };
 	  DWORD waitret = WaitForMultipleObjects (2, w, false, INFINITE);
 	  switch (waitret)
 	    {
@@ -372,83 +372,65 @@ fhandler_fifo::listen_client_thread ()
 	      status = io.Status;
 	      break;
 	    case WAIT_OBJECT_0 + 1:
-	      ret = 0;
 	      status = STATUS_THREAD_IS_TERMINATING;
+	      cancel = true;
 	      break;
 	    default:
-	      __seterrno ();
-	      debug_printf ("WaitForMultipleObjects failed, %E");
-	      status = STATUS_THREAD_IS_TERMINATING;
-	      break;
+	      api_fatal ("WFMO failed, %E");
 	    }
 	}
       HANDLE ph = NULL;
-      int ps = -1;
+      NTSTATUS status1;
+
       fifo_client_lock ();
       switch (status)
 	{
 	case STATUS_SUCCESS:
 	case STATUS_PIPE_CONNECTED:
 	  record_connection (fc);
-	  ResetEvent (evt);
 	  break;
 	case STATUS_PIPE_CLOSING:
 	  record_connection (fc, fc_closing);
-	  ResetEvent (evt);
 	  break;
 	case STATUS_THREAD_IS_TERMINATING:
-	  /* Force NtFsControlFile to complete.  Otherwise the next
-	     writer to connect might not be recorded in the client
-	     handler list. */
-	  status = open_pipe (ph);
-	  if (NT_SUCCESS (status)
-	      && (NT_SUCCESS (io.Status) || io.Status == STATUS_PIPE_CONNECTED))
-	    {
-	      debug_printf ("successfully connected bogus client");
-	      delete_client_handler (nhandlers - 1);
-	    }
-	  else if ((ps = fc.pipe_state ()) == FILE_PIPE_CONNECTED_STATE
-		   || ps == FILE_PIPE_INPUT_AVAILABLE_STATE)
-	    {
-	      /* A connection was made under our nose. */
-	      debug_printf ("recording connection before terminating");
-	      record_connection (fc);
-	    }
+	  /* Try to connect a bogus client.  Otherwise fc is still
+	     listening, and the next connection might not get recorded. */
+	  status1 = open_pipe (ph);
+	  WaitForSingleObject (conn_evt, INFINITE);
+	  if (NT_SUCCESS (status1))
+	    /* Bogus cilent connected. */
+	    delete_client_handler (nhandlers - 1);
 	  else
-	    {
-	      debug_printf ("failed to terminate NtFsControlFile cleanly");
-	      delete_client_handler (nhandlers - 1);
-	      ret = -1;
-	    }
-	  if (ph)
-	    NtClose (ph);
-	  fifo_client_unlock ();
-	  goto out;
+	    /* Did a real client connect? */
+	    switch (io.Status)
+	      {
+	      case STATUS_SUCCESS:
+	      case STATUS_PIPE_CONNECTED:
+		record_connection (fc);
+		break;
+	      case STATUS_PIPE_CLOSING:
+		record_connection (fc, fc_closing);
+		break;
+	      default:
+		debug_printf ("NtFsControlFile status %y after failing to connect bogus client or real client", io.Status);
+		fc.state = fc_unknown;
+		break;
+	      }
+	  break;
 	default:
-	  debug_printf ("NtFsControlFile status %y", status);
-	  __seterrno_from_nt_status (status);
-	  delete_client_handler (nhandlers - 1);
-	  fifo_client_unlock ();
-	  goto out;
+	  break;
 	}
       fifo_client_unlock ();
-      /* Check for thread termination in case WaitForMultipleObjects
-	 didn't get called above. */
-      if (IsEventSignalled (lct_termination_evt))
-	{
-	  ret = 0;
-	  goto out;
-	}
+      if (ph)
+	NtClose (ph);
+      if (cancel)
+	goto out;
     }
 out:
-  if (evt)
-    NtClose (evt);
+  if (conn_evt)
+    NtClose (conn_evt);
   ResetEvent (read_ready);
-  if (ret < 0)
-    debug_printf ("exiting with error, %E");
-  else
-    debug_printf ("exiting without error");
-  return ret;
+  return 0;
 }
 
 int
@@ -945,10 +927,9 @@ fifo_client_handler::pipe_state ()
     return fpli.NamedPipeState;
 }
 
-int
+void
 fhandler_fifo::stop_listen_client ()
 {
-  int ret = 0;
   HANDLE thr, evt;
 
   thr = InterlockedExchangePointer (&listen_client_thr, NULL);
@@ -957,19 +938,11 @@ fhandler_fifo::stop_listen_client ()
       if (lct_termination_evt)
 	SetEvent (lct_termination_evt);
       WaitForSingleObject (thr, INFINITE);
-      DWORD err;
-      GetExitCodeThread (thr, &err);
-      if (err)
-	{
-	  ret = -1;
-	  debug_printf ("listen_client_thread exited with error");
-	}
       NtClose (thr);
     }
   evt = InterlockedExchangePointer (&lct_termination_evt, NULL);
   if (evt)
     NtClose (evt);
-  return ret;
 }
 
 int
@@ -978,7 +951,7 @@ fhandler_fifo::close ()
   /* Avoid deadlock with lct in case this is called from a signal
      handler or another thread. */
   fifo_client_unlock ();
-  int ret = stop_listen_client ();
+  stop_listen_client ();
   if (read_ready)
     NtClose (read_ready);
   if (write_ready)
@@ -987,7 +960,7 @@ fhandler_fifo::close ()
   for (int i = 0; i < nhandlers; i++)
     fc_handler[i].close ();
   fifo_client_unlock ();
-  return fhandler_base::close () || ret;
+  return fhandler_base::close ();
 }
 
 /* If we have a write handle (i.e., we're a duplexer or a writer),
