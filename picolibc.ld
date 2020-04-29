@@ -199,11 +199,8 @@ SECTIONS
 	PROVIDE( __bss_size = __bss_end - __bss_start );
 
 	/* Make the rest of memory available for heap storage */
-	.heap : {
-		. = ORIGIN(ram) + LENGTH(ram) - (DEFINED(__stack_size) ? __stack_size : 0x800);
-	} >ram AT>ram : ram
-	PROVIDE( __heap_size = SIZEOF(.heap) );
-	PROVIDE( __heap_start = ADDR(.heap) );
-	PROVIDE( __heap_end = ADDR(.heap) + SIZEOF(.heap) );
+	PROVIDE( __heap_start = __end );
+	PROVIDE( __heap_end = __stack - (DEFINED(__stack_size) ? __stack_size : 0x800) );
+	PROVIDE( __heap_size = __heap_end - __heap_start );
 }
 
