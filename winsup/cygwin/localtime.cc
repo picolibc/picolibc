@@ -73,6 +73,8 @@ static char	privatehid[] = "@(#)private.h	7.48";
 #include "unistd.h"	/* for F_OK and R_OK */
 #if 0
 #include <assert.h>
+#else
+#define _DIAGASSERT(e)
 #endif
 
 /* Unlike <ctype.h>'s isdigit, this also works if c < 0 | c > UCHAR_MAX.  */
@@ -786,7 +788,7 @@ tzload(timezone_t sp, const char *name, const int doextend)
 					sp->types[i - 1] = 1;
 					sp->ats[timecnt++] = time_t_min;
 				}
-				//_DIAGASSERT(__type_fit(time_t, at));
+				_DIAGASSERT(__type_fit(time_t, at));
 				sp->ats[timecnt++] = (time_t)at;
 			}
 			p += stored;
@@ -1988,7 +1990,7 @@ timesub(const timezone_t sp, const time_t *const timep,
 		if (! ((! TYPE_SIGNED(time_t) || INT_MIN <= tdelta)
 		       && tdelta <= INT_MAX))
 			return NULL;
-		//_DIAGASSERT(__type_fit(int, tdelta));
+		_DIAGASSERT(__type_fit(int, tdelta));
 		idelta = (int)tdelta;
 		if (idelta == 0)
 			idelta = (tdays < 0) ? -1 : 1;
