@@ -3496,7 +3496,23 @@ fhandler_pty_master::setup_pseudoconsole ()
 			 TRUE, EXTENDED_STARTUPINFO_PRESENT,
 			 NULL, NULL, &si_helper.StartupInfo, &pi_helper))
       goto cleanup_event_and_pipes;
-    WaitForSingleObject (hello, INFINITE);
+    for (;;)
+      {
+        DWORD wait_result = WaitForSingleObject (hello, 500);
+	if (wait_result == WAIT_OBJECT_0)
+	  break;
+	if (wait_result != WAIT_TIMEOUT)
+	  goto cleanup_helper_process;
+	DWORD exit_code;
+	if (!GetExitCodeProcess(pi_helper.hProcess, &exit_code))
+	  goto cleanup_helper_process;
+	if (exit_code == STILL_ACTIVE)
+	  continue;
+	if (exit_code != 0 ||
+	    WaitForSingleObject (hello, 500) != WAIT_OBJECT_0)
+	  goto cleanup_helper_process;
+	break;
+      }
     CloseHandle (hello);
     CloseHandle (pi_helper.hThread);
     /* Retrieve pseudo console handles */
