@@ -4,4 +4,4 @@
 
 #include <errno.h>
 
-NEWLIB_THREAD_LOCAL_ERRNO int _errno;
+NEWLIB_THREAD_LOCAL_ERRNO int errno;
