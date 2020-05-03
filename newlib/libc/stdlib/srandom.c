@@ -56,16 +56,12 @@ algorithm as <<rand>>.
 
 #include <stdlib.h>
 
-NEWLIB_THREAD_LOCAL long long _rand_next = 1;
+extern NEWLIB_THREAD_LOCAL long long _rand_next;
 
-long int
-random (void)
+void
+srandom (unsigned int seed)
 {
-  /* This multiplier was obtained from Knuth, D.E., "The Art of
-     Computer Programming," Vol 2, Seminumerical Algorithms, Third
-     Edition, Addison-Wesley, 1998, p. 106 (line 26) & p. 108 */
-  _rand_next = _rand_next * __extension__ 6364136223846793005LL + 1;
-  return (long int)((_rand_next >> 32) & RAND_MAX);
+	_rand_next = seed;
 }
 
 #endif /* _REENT_ONLY */

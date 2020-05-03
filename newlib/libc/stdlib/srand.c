@@ -61,10 +61,10 @@ on two different systems.
 
 #include <stdlib.h>
 
-int
-rand (void)
+void
+srand (unsigned int seed)
 {
-  return (int) random();
+  srandom(seed);
 }
 
 #endif /* _REENT_ONLY */
