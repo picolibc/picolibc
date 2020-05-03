@@ -1,7 +1,7 @@
 #
 # SPDX-License-Identifier: BSD-3-Clause
 #
-# Copyright © 2019 Keith Packard
+# Copyright © 2020 Keith Packard
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions
@@ -33,41 +33,24 @@
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
-tests = ['nulprintf']
-
-if not newlib_tinystdio and not newlib_nano_formatted_io and newlib_elix_level >= 4
-  tests += ['swprintf']
-endif
-
+srcs_stdio64 = [
+  'fdopen64.c',
+  'fgetpos64.c',
+  'fopen64.c',
+  'freopen64.c',
+  'fseeko64.c',
+  'fsetpos64.c',
+  'ftello64.c',
+  'stdio64.c',
+  'tmpfile64.c',
+]
 foreach target : targets
-  value = get_variable('target_' + target)
-
-  _libs = [get_variable('lib_m' + target), get_variable('lib_c' + target)]
-  if is_variable('lib_semihost' + target)
-    _libs += [get_variable('lib_semihost' + target)]
-  endif
-  if is_variable('lib_crt' + target)
-    _libs += [get_variable('lib_crt'+ target)]
-  endif
-  
-  _c_args = value[1] + test_c_args
-  _link_args = value[1] + test_link_args
-
-  foreach test : tests
-    if target == ''
-      test_name = test
-    else
-      test_name = join_paths(target, test)
-    endif
-
-    src = test + '.c'
-
-    test(test + target,
-	 executable(test_name, src,
-		    c_args: ['-Wno-missing-braces', '-Wno-implicit-int', '-Wno-return-type', '-D_XOPEN_SOURCE=700', '-D_GNU_SOURCE'] + _c_args,
-		    link_args: _link_args,
-		    link_with: _libs,
-		    include_directories: test_inc),
-	 env: ['MESON_SOURCE_ROOT=' + meson.source_root()])
-  endforeach
+	value = get_variable('target_' + target)
+	set_variable('lib_stdio64' + target,
+		static_library('stdio64' + target,
+			srcs_stdio64,
+			pic: false,
+			include_directories: inc,
+			c_args: value[1]))
 endforeach
+

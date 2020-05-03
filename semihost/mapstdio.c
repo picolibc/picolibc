@@ -1,7 +1,7 @@
 /*
  * SPDX-License-Identifier: BSD-3-Clause
  *
- * Copyright © 2019 Keith Packard
+ * Copyright © 2020 Keith Packard
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -41,39 +41,24 @@
 #include <string.h>
 #include <errno.h>
 
+static int _check_done, fd_stdin, fd_stdout, fd_stderr;
+
 int
-open(const char *pathname, int flags, ...)
+_map_stdio(int fd)
 {
-	int semiflags = 0;
-
-	switch (flags & (O_RDONLY|O_WRONLY|O_RDWR)) {
-	case O_RDONLY:
-		semiflags = 0;			/* 'r' */
-		break;
-	case O_WRONLY:
-		if (flags & O_TRUNC)
-			semiflags = 4;	/* 'w' */
-		else
-			semiflags = 8;	/* 'a' */
-		break;
+	if (!_check_done) {
+		fd_stdin = sys_semihost_open(":tt", 0);
+		fd_stdout = sys_semihost_open(":tt", 4);
+		fd_stderr = sys_semihost_open(":tt", 8);
+	}
+	switch (fd) {
+	case 0:
+		return fd_stdin;
+	case 1:
+		return fd_stdout;
+	case 2:
+		return fd_stderr;
 	default:
-		if (flags & O_TRUNC)
-			semiflags = 6;	/* 'w+' */
-		else
-			semiflags = 10;	/* 'a+' */
-		break;
+		return fd;
 	}
-
-	int ret;
-	do {
-		ret = sys_semihost_open(pathname, semiflags);
-	}
-#ifdef TINY_STDIO
-	while(0);
-#else
-	while (ret <= 2);
-#endif
-	if (ret == -1)
-		errno = sys_semihost_errno();
-	return ret;
 }

@@ -25,7 +25,10 @@
 #include "local.h"
 
 #ifdef __LARGE64_FILES
-_fpos64_t
+
+_off64_t lseek64(int fd, _off64_t offset, int whence);
+
+fpos64_t
 __sseek64 (struct _reent *ptr,
        void *cookie,
        _fpos64_t offset,
@@ -34,7 +37,7 @@ __sseek64 (struct _reent *ptr,
   register FILE *fp = (FILE *) cookie;
   register _off64_t ret;
 
-  ret = _lseek64_r (ptr, fp->_file, (_off64_t) offset, whence);
+  ret = lseek64 (fp->_file, (_off64_t) offset, whence);
   if (ret == (_fpos64_t)-1L)
     fp->_flags &= ~__SOFF;
   else
@@ -58,7 +61,7 @@ __swrite64 (struct _reent *ptr,
 #endif
 
   if (fp->_flags & __SAPP)
-    (void) _lseek64_r (ptr, fp->_file, (_off64_t)0, SEEK_END);
+    (void) lseek64 (fp->_file, (_off64_t)0, SEEK_END);
   fp->_flags &= ~__SOFF;	/* in case O_APPEND mode is set */
 
 #ifdef __SCLE
@@ -66,7 +69,7 @@ __swrite64 (struct _reent *ptr,
     oldmode = setmode(fp->_file, O_BINARY);
 #endif
 
-  w = _write_r (ptr, fp->_file, buf, n);
+  w = write (fp->_file, buf, n);
 
 #ifdef __SCLE
   if (oldmode)

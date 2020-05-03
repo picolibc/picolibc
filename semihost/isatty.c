@@ -1,7 +1,7 @@
 /*
  * SPDX-License-Identifier: BSD-3-Clause
  *
- * Copyright © 2019 Keith Packard
+ * Copyright © 2020 Keith Packard
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -42,38 +42,9 @@
 #include <errno.h>
 
 int
-open(const char *pathname, int flags, ...)
+isatty (int fd)
 {
-	int semiflags = 0;
+	int size = sys_semihost_flen(fd);
 
-	switch (flags & (O_RDONLY|O_WRONLY|O_RDWR)) {
-	case O_RDONLY:
-		semiflags = 0;			/* 'r' */
-		break;
-	case O_WRONLY:
-		if (flags & O_TRUNC)
-			semiflags = 4;	/* 'w' */
-		else
-			semiflags = 8;	/* 'a' */
-		break;
-	default:
-		if (flags & O_TRUNC)
-			semiflags = 6;	/* 'w+' */
-		else
-			semiflags = 10;	/* 'a+' */
-		break;
-	}
-
-	int ret;
-	do {
-		ret = sys_semihost_open(pathname, semiflags);
-	}
-#ifdef TINY_STDIO
-	while(0);
-#else
-	while (ret <= 2);
-#endif
-	if (ret == -1)
-		errno = sys_semihost_errno();
-	return ret;
+	return size <= 0;
 }

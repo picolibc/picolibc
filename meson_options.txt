@@ -58,6 +58,8 @@ option('native-tests', type: 'boolean', value: false,
 
 option('newlib-tinystdio', type: 'boolean', value: true,
        description: 'Use tiny stdio from avr libc')
+option('stdio64', type: 'boolean', value: true,
+       description: 'Include stdio64 with newlib stdio')
 
 option('specsdir', type: 'string',
        description: 'Installation directory for .specs file')
@@ -93,7 +95,7 @@ option('newlib-global-stdio-streams', type: 'boolean', value: false,
 option('newlib-fvwrite-in-streamio', type: 'boolean', value: false,
        description: 'disable iov in streamio')
 option('newlib-fseek-optimization', type: 'boolean', value: false,
-       description: 'disable fseek optimization')
+       description: 'enable fseek optimization')
 option('newlib-wide-orient', type: 'boolean', value: false,
        description: 'Turn off wide orientation in streamio')
 option('newlib-nano-malloc', type: 'boolean', value: true,

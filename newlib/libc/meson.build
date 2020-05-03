@@ -117,6 +117,9 @@ if newlib_tinystdio
   libdirs += 'tinystdio'
 else
   libdirs += ['stdio', 'reent']
+  if stdio64
+    libdirs += 'stdio64'
+  endif
 endif
 
 if newlib_supplied_syscalls

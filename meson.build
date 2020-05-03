@@ -51,6 +51,7 @@ enable_picolib = get_option('picolib')
 enable_tests = get_option('tests')
 enable_native_tests = get_option('native-tests')
 newlib_tinystdio = get_option('newlib-tinystdio')
+stdio64 = get_option('stdio64')
 have_alias_attribute_option = get_option('have-alias-attribute')
 newlib_io_pos_args = get_option('newlib-io-pos-args')
 newlib_io_c99_formats = get_option('newlib-io-c99-formats')
@@ -346,8 +347,8 @@ has_ieeefp_funcs = false
 # semihost will adjust this if supported
 has_semihost = false
 
+subdir('semihost')
 if newlib_tinystdio
-  subdir('semihost')
   subdir('dummyhost')
 endif
 

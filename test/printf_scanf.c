@@ -40,6 +40,10 @@
 #include <sys/stat.h>
 #include <string.h>
 
+#ifndef TINY_STDIO
+#define printf_float(x) x
+#endif
+
 extern double strtod(char *, char **);
 
 static const double test_vals[] = { 1.234567, 1.1, M_PI };
