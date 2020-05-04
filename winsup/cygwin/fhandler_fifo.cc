@@ -981,6 +981,9 @@ fhandler_fifo::dup (fhandler_base *child, int flags)
     }
   if (reader)
     {
+      /* Make sure the child starts unlocked. */
+      fhf->fifo_client_unlock ();
+
       fifo_client_lock ();
       for (i = 0; i < nhandlers; i++)
 	{
@@ -1025,20 +1028,32 @@ fhandler_fifo::fixup_after_fork (HANDLE parent)
   fhandler_base::fixup_after_fork (parent);
   fork_fixup (parent, read_ready, "read_ready");
   fork_fixup (parent, write_ready, "write_ready");
-  fifo_client_lock ();
-  for (int i = 0; i < nhandlers; i++)
-  fork_fixup (parent, fc_handler[i].h, "fc_handler[].h");
-  fifo_client_unlock ();
-  if (reader && !listen_client ())
-    debug_printf ("failed to start lct, %E");
+  if (reader)
+    {
+      /* Make sure the child starts unlocked. */
+      fifo_client_unlock ();
+
+      fifo_client_lock ();
+      for (int i = 0; i < nhandlers; i++)
+	fork_fixup (parent, fc_handler[i].h, "fc_handler[].h");
+      fifo_client_unlock ();
+      if (!listen_client ())
+	debug_printf ("failed to start lct, %E");
+    }
 }
 
 void
 fhandler_fifo::fixup_after_exec ()
 {
   fhandler_base::fixup_after_exec ();
-  if (reader && !listen_client ())
-    debug_printf ("failed to start lct, %E");
+  if (reader && !close_on_exec ())
+    {
+      /* Make sure the child starts unlocked. */
+      fifo_client_unlock ();
+
+      if (!listen_client ())
+	debug_printf ("failed to start lct, %E");
+    }
 }
 
 void
