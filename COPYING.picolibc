@@ -427,6 +427,7 @@ Files: do-arm-configure
  newlib/libc/machine/x86_64/meson.build
  newlib/libc/meson.build
  newlib/libc/misc/meson.build
+ newlib/libc/picolib/dso_handle.c
  newlib/libc/picolib/inittls.c
  newlib/libc/picolib/machine/arm/interrupt.c
  newlib/libc/picolib/machine/arm/tls.c
@@ -451,6 +452,7 @@ Files: do-arm-configure
  newlib/libc/stdio/vfiscanf.c
  newlib/libc/stdio/vfiwprintf.c
  newlib/libc/stdio/vfiwscanf.c
+ newlib/libc/stdio64/meson.build
  newlib/libc/stdlib/malloc-calloc.c
  newlib/libc/stdlib/malloc-cfree.c
  newlib/libc/stdlib/malloc-free.c
@@ -480,13 +482,18 @@ Files: do-arm-configure
  newlib/libc/time/meson.build
  newlib/libc/tinystdio/fdopen.c
  newlib/libc/tinystdio/fopen.c
+ newlib/libc/tinystdio/fseek.c
+ newlib/libc/tinystdio/ftell.c
  newlib/libc/tinystdio/ftoa_data.c
  newlib/libc/tinystdio/meson.build
  newlib/libc/tinystdio/posixio.c
  newlib/libc/tinystdio/posixiob.c
+ newlib/libc/tinystdio/setbuf.c
  newlib/libc/xdr/meson.build
  newlib/libm/common/meson.build
  newlib/libm/common/signgam.c
+ newlib/libm/common/s_issignaling.c
+ newlib/libm/common/sf_issignaling.c
  newlib/libm/complex/meson.build
  newlib/libm/fenv/meson.build
  newlib/libm/machine/arm/meson.build
@@ -495,6 +502,11 @@ Files: do-arm-configure
  newlib/libm/math/meson.build
  newlib/libm/meson.build
  newlib/libm/test/meson.build
+ newlib/libm/test/issignaling_vec.c
+ newlib/libm/test/modf_vec.c
+ newlib/libm/test/modff_vec.c
+ newlib/libm/test/pow_vec.c
+ newlib/libm/test/powf_vec.c
  newlib/meson.build
  newlib/testsuite/meson.build
  newlib/testsuite/newlib.iconv/meson.build
@@ -519,7 +531,7 @@ Files: do-arm-configure
  semihost/kill.c
  semihost/lseek.c
  semihost/machine/arm/semihost-arm.c
- semihost/machine/riscv/semihost-riscv.c
+ semihost/machine/riscv/semihost-riscv.s
  semihost/meson.build
  semihost/open.c
  semihost/read.c
@@ -543,6 +555,13 @@ Files: do-arm-configure
  test/printf_scanf.c
  test/rand.c
 Copyright: 2019 Keith Packard
+License: BSD3-1
+
+Files: newlib/libc/stdio64/meson.build
+ semihost/fstat.c
+ semihost/isatty.c
+ semihost/mapstdio.c
+Copyright: 2020 Keith Packard
 License: BSD3-1
 
 Files: newlib/libc/machine/powerpc/meson.build
@@ -2367,6 +2386,7 @@ Files: newlib/libc/stdlib/__adjust.c
  newlib/libc/stdlib/rand.c
  newlib/libc/stdlib/rand_r.c
  newlib/libc/stdlib/realloc.c
+ newlib/libc/stdlib/srand.c
  newlib/libc/stdlib/std.h
  newlib/libc/stdlib/stdlib.tex
  newlib/libc/stdlib/system.c
@@ -2401,6 +2421,7 @@ Copyright: 2015 Freddie Chopin <freddie.chopin@gmail.com>
 License: Default-1
 
 Files: newlib/libc/stdlib/random.c
+ newlib/libc/stdlib/srandom.c
 Copyright: 2016 Joel Sherrill <joel@rtems.org>
 License: Default-1
 
@@ -3110,6 +3131,7 @@ Files: newlib/libc/reent/closer.c
  newlib/libm/test/test.h
  newlib/libm/test/test_ieee.c
  newlib/libm/test/test_is.c
+ newlib/libm/test/trunc_vec.c
  newlib/libm/test/y0_vec.c
  newlib/libm/test/y0f_vec.c
  newlib/libm/test/y1_vec.c
