@@ -156,10 +156,7 @@ vfprintf (FILE * stream, const char *fmt, va_list ap)
 
     int stream_len = 0;
 
-    static void my_putc(char c, FILE *stream) {
-	++stream_len;
-	putc(c, stream);
-    }
+#define my_putc(c, stream) do { ++stream_len; putc(c, stream); } while(0)
 
     if ((stream->flags & __SWR) == 0)
 	return EOF;
@@ -281,6 +278,7 @@ vfprintf (FILE * stream, const char *fmt, va_list ap)
 
   ret:
     return stream_len;
+#undef my_putc
 }
 
 /* --------------------------------------------------------------------	*/
@@ -331,10 +329,7 @@ int vfprintf (FILE * stream, const char *fmt, va_list ap)
 
     int stream_len = 0;
 
-    void my_putc(char c, FILE *stream) {
-	++stream_len;
-	putc(c, stream);
-    }
+#define my_putc(c, stream) do { ++stream_len; putc(c, stream); } while(0)
 
     if ((stream->flags & __SWR) == 0)
 	return EOF;
@@ -812,6 +807,7 @@ int vfprintf (FILE * stream, const char *fmt, va_list ap)
 
   ret:
     return stream_len;
+#undef my_putc
 }
 
 #endif	/* PRINTF_LEVEL > PRINTF_MIN */
