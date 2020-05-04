@@ -130,6 +130,15 @@ SECTIONS
 		KEEP (*(.dtors))
 	} >flash AT>flash :text
 
+	/*
+	 * Data values which are preserved across reset
+	 */
+	.preserve (NOLOAD) : {
+		PROVIDE(__preserve_start__ = .);
+		*(.preserve .preserve.*)
+		PROVIDE(__preserve_end__ = .);
+	} >ram AT>ram :ram
+
 	.data : ALIGN_WITH_INPUT {
 		PROVIDE(__data_start = .);
 		*(.data .data.*)
@@ -162,7 +171,7 @@ SECTIONS
 	PROVIDE( edata = __data_end );
 	PROVIDE( __data_size = __data_end - __data_start );
 
-	.tbss : {
+	.tbss (NOLOAD) : {
 		PROVIDE( __bss_start = . );
 		*(.tbss .tbss.* .gnu.linkonce.tb.*)
 		*(.tcommon)
@@ -180,11 +189,11 @@ SECTIONS
 	 * across them.  We actually need memory allocated for tbss,
 	 * so we create a special segment here just to make room
 	 */
-	.tbss_space : {
+	.tbss_space (NOLOAD) : {
 		. = . + __tbss_size;
 	} >ram AT>ram :ram
 
-	.bss : {
+	.bss (NOLOAD) : {
 		*(.sbss*)
 		*(.gnu.linkonce.sb.*)
 		*(.bss .bss.*)
