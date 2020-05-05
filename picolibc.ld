@@ -211,5 +211,9 @@ SECTIONS
 	PROVIDE( __heap_start = __end );
 	PROVIDE( __heap_end = __stack - (DEFINED(__stack_size) ? __stack_size : 0x800) );
 	PROVIDE( __heap_size = __heap_end - __heap_start );
-}
 
+	/* Throw away C++ exception handling information */
+	/DISCARD/ : {
+		*(.eh_frame .eh_frame.*)
+	}
+}
