@@ -117,7 +117,7 @@ if newlib_tinystdio
   libdirs += 'tinystdio'
 else
   libdirs += ['stdio', 'reent']
-  if stdio64
+  if newlib_stdio64
     libdirs += 'stdio64'
   endif
 endif

@@ -58,7 +58,7 @@ option('native-tests', type: 'boolean', value: false,
 
 option('newlib-tinystdio', type: 'boolean', value: true,
        description: 'Use tiny stdio from avr libc')
-option('stdio64', type: 'boolean', value: true,
+option('newlib-stdio64', type: 'boolean', value: true,
        description: 'Include stdio64 with newlib stdio')
 
 option('specsdir', type: 'string',
@@ -67,11 +67,13 @@ option('specsdir', type: 'string',
 option('newlib-io-pos-args', type: 'boolean', value: false,
        description: 'enable printf-family positional arg support')
 option('newlib-io-c99-formats', type: 'boolean', value: false,
-       description: 'enable C99 support in IO functions like printf/scanf')
+       description: 'enable C99 support in IO functions like printf/scanf (newlib stdio only)')
+option('io-long-long', type: 'boolean', value: false,
+       description: 'enable long long type support in IO functions like printf/scanf')
 option('newlib-io-long-long', type: 'boolean', value: false,
        description: 'enable long long type support in IO functions like printf/scanf')
 option('newlib-io-long-double', type: 'boolean', value: false,
-       description: 'enable long double type support in IO functions printf/scanf')
+       description: 'enable long double type support in IO functions printf/scanf (newlib stdio only)')
 option('newlib-register-fini', type: 'boolean', value: false,
        description: 'enable finalization function registration using atexit')
 option('newlib-mb', type: 'boolean', value: false,
