@@ -39,12 +39,21 @@
 #include <errno.h>
 #include <sys/stat.h>
 #include <string.h>
+#include <stdlib.h>
 
 #ifndef TINY_STDIO
 #define printf_float(x) x
-#endif
 
-extern double strtod(char *, char **);
+#ifdef _NANO_FORMATTED_IO
+#ifndef NO_FLOATING_POINT
+extern int _printf_float();
+extern int _scanf_float();
+
+int (*_reference_printf_float)() = _printf_float;
+int (*_reference_scanf_float)() = _scanf_float;
+#endif
+#endif
+#endif
 
 static const double test_vals[] = { 1.234567, 1.1, M_PI };
 
@@ -110,6 +119,7 @@ main(int argc, char **argv)
 		}
 	}
 
+#if defined(TINY_STDIO) || !defined(NO_FLOATING_POINT)
 	for (x = -37; x <= 37; x++)
 	{
 		int t;
@@ -158,6 +168,7 @@ main(int argc, char **argv)
 			}
 		}
 	}
+#endif
 	fflush(stdout);
-	return errors;
+	exit(errors);
 }

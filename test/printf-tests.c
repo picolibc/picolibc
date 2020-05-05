@@ -9,6 +9,15 @@
 
 #ifndef TINY_STDIO
 #define printf_float(x) x
+#ifdef _NANO_FORMATTED_IO
+#ifndef NO_FLOATING_POINT
+extern int _printf_float();
+extern int _scanf_float();
+
+int (*_reference_printf_float)() = _printf_float;
+int (*_reference_scanf_float)() = _scanf_float;
+#endif
+#endif
 #endif
 
 static char buf[1024];
@@ -25,9 +34,11 @@ static void failmsg(int serial, char *fmt, ...) {
 static int test(int serial, char *expect, char *fmt, ...) {
     va_list ap;
     va_start(ap, fmt);
-    double dv;
     int n;
+#ifndef NO_FLOATING_POINT
+    double dv;
     char *star;
+#endif
     switch (fmt[strlen(fmt)-1]) {
     case 'e':
     case 'E':
@@ -35,6 +46,9 @@ static int test(int serial, char *expect, char *fmt, ...) {
     case 'F':
     case 'g':
     case 'G':
+#ifdef NO_FLOATING_POINT
+	    return 0;
+#else
 	    star = strchr(fmt, '*');
 	    if (star) {
 		    if (strchr(star+1, '*')) {
@@ -52,6 +66,7 @@ static int test(int serial, char *expect, char *fmt, ...) {
 		    n = snprintf(buf, 1024, fmt, printf_float(dv));
 	    }
 	    break;
+#endif
     default:
 	    n = vsnprintf(buf, 1024, fmt, ap);
 	    break;
