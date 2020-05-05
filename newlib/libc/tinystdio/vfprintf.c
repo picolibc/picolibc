@@ -91,7 +91,7 @@ typedef double printf_float_t;
 #endif
 
 #ifndef PRINTF_LONGLONG
-# define PRINTF_LONGLONG	(PRINTF_LEVEL >= PRINTF_FLT)
+# define PRINTF_LONGLONG	((PRINTF_LEVEL >= PRINTF_FLT) || defined(_WANT_IO_LONG_LONG))
 #endif
 
 #if PRINTF_LONGLONG
