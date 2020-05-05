@@ -301,7 +301,7 @@ fskip:
 	  exp_start = p;
 	}
       else if (exp_adjust)
-	new_exp = _strtol_r (rptr, (exp_start + 1), NULL, 10) - exp_adjust;
+	new_exp = strtol ((exp_start + 1), NULL, 10) - exp_adjust;
 
       if (exp_adjust)
 	{
@@ -312,10 +312,10 @@ fskip:
 	  sprintf (exp_start, "e%ld", new_exp);
 	}
 
-      /* Current _strtold routine is markedly slower than
-	 _strtod_r.  Only use it if we have a long double
+      /* Current strtold routine is markedly slower than
+	 strtod.  Only use it if we have a long double
 	 result.  */
-      fp = _strtod_r (rptr, pdata->buf, NULL);
+      fp = strtod (pdata->buf, NULL);
 
       /* Do not support long double.  */
       if (pdata->flags & LONG)

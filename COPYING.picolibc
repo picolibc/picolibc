@@ -559,6 +559,8 @@ License: BSD3-1
 
 Files: newlib/libc/stdio64/meson.build
  newlib/libc/tinystdio/fflush.c
+ newlib/libc/stdio/nano-svfprintf.c
+ newlib/libc/stdio/nano-svfscanf.c
  semihost/fstat.c
  semihost/isatty.c
  semihost/mapstdio.c

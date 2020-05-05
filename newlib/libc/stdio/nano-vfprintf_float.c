@@ -98,7 +98,7 @@ __cvt (struct _reent *data, _PRINTF_FLOAT_TYPE value, int ndigits, int flags,
       mode = 2;
     }
 
-  digits = _DTOA_R (data, value, mode, ndigits, decpt, &dsgn, &rve);
+  digits = _DTOA_R (value, mode, ndigits, decpt, &dsgn, &rve);
 
   /* Print trailing zeros.  */
   if ((ch != 'g' && ch != 'G') || flags & ALT)
