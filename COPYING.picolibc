@@ -558,6 +558,7 @@ Copyright: 2019 Keith Packard
 License: BSD3-1
 
 Files: newlib/libc/stdio64/meson.build
+ newlib/libc/tinystdio/fflush.c
  semihost/fstat.c
  semihost/isatty.c
  semihost/mapstdio.c

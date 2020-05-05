@@ -40,6 +40,7 @@ srcs_tinystdio = [
     'fdevopen.c',
     'feof.c',
     'ferror.c',
+    'fflush.c',
     'fgetc.c',
     'fgets.c',
     'fileno.c',
