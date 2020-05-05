@@ -55,6 +55,19 @@ test_strtof (void)
   test_iok(tail - pd->string, pd->endscan);
 }
 
+#ifdef _HAVE_LONG_DOUBLE
+void
+test_strtold (void)
+{
+  char *tail;
+  long double v;
+  /* On average we'll loose 1/2 a bit, so the test is for within 1 bit  */
+  v = strtold(pd->string, &tail);
+  test_mok(v, pd->value, 62);
+  test_iok(tail - pd->string, pd->endscan);
+}
+#endif
+
 void
 test_atof (void)
 {
@@ -443,6 +456,9 @@ test_cvt (void)
 #endif
 
   iterate(test_strtod, "strtod");
+#ifdef _HAVE_LONG_DOUBLE
+  iterate(test_strtold, "strtold");
+#endif
 
   test_scan();
   test_sprint();  
