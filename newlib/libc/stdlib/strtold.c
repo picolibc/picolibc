@@ -28,6 +28,7 @@ ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGE.
 */
 
+#define _GNU_SOURCE
 #include <stdlib.h>
 #include "local.h"
 #include "mprec.h"
@@ -63,7 +64,7 @@ strtold_l (const char *__restrict s00, char **__restrict se, locale_t loc)
 {
 #ifdef _LDBL_EQ_DBL
   /* On platforms where long double is as wide as double.  */
-  return _strtod_l (_REENT, s00, se, loc);
+  return strtod_l (s00, se, loc);
 #else
   long double result;
 
@@ -77,7 +78,7 @@ strtold (const char *__restrict s00, char **__restrict se)
 {
 #ifdef _LDBL_EQ_DBL
   /* On platforms where long double is as wide as double.  */
-  return _strtod_l (_REENT, s00, se, __get_current_locale ());
+  return strtod (s00, se);
 #else
   long double result;
 

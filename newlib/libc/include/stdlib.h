@@ -139,7 +139,6 @@ int	mbtowc (wchar_t *__restrict, const char *__restrict, size_t);
 int	wctomb (char *, wchar_t);
 size_t	mbstowcs (wchar_t *__restrict, const char *__restrict, size_t);
 size_t	wcstombs (char *__restrict, const wchar_t *__restrict, size_t);
-#ifndef _REENT_ONLY
 #if __BSD_VISIBLE || __POSIX_VISIBLE >= 200809
 char *	mkdtemp (char *);
 #endif
@@ -156,7 +155,6 @@ int	mkstemps (char *, int);
 #if __BSD_VISIBLE || (__XSI_VISIBLE >= 4 && __POSIX_VISIBLE < 200112)
 char *	mktemp (char *) _ATTRIBUTE ((__deprecated__("the use of `mktemp' is dangerous; use `mkstemp' instead")));
 #endif
-#endif /* !_REENT_ONLY */
 void	qsort (void *__base, size_t __nmemb, size_t __size, __compar_fn_t _compar);
 int	rand (void);
 void	*realloc(void *, size_t) __result_use_check __alloc_size(2) _NOTHROW;
@@ -175,7 +173,6 @@ void	setkey (const char *__key);
 #endif
 void	srand (unsigned __seed);
 double	strtod (const char *__restrict __n, char **__restrict __end_PTR);
-double	_strtod_r (const char *__restrict __n, char **__restrict __end_PTR);
 #if __ISO_C_VISIBLE >= 1999
 float	strtof (const char *__restrict __n, char **__restrict __end_PTR);
 #endif

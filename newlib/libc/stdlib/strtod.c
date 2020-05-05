@@ -240,8 +240,8 @@ ULtod (__ULong *L,
 #endif /* !NO_HEX_FP */
 
 double
-_strtod_l (const char *__restrict s00, char **__restrict se,
-	   locale_t loc)
+strtod_l (const char *__restrict s00, char **__restrict se,
+	  locale_t loc)
 {
 #ifdef Avoid_Underflow
 	int scale;
@@ -1262,55 +1262,28 @@ _strtod_l (const char *__restrict s00, char **__restrict se,
 	return sign ? -dval(rv) : dval(rv);
 }
 
+#ifndef TINY_STDIO
+/* tinystdio has smaller implementations of the C locale version */
+
 double
-_strtod_r (
-	const char *__restrict s00,
+strtod (const char *__restrict s00,
 	char **__restrict se)
 {
-  return _strtod_l (s00, se, __get_current_locale ());
-}
-
-#ifndef _REENT_ONLY
-
-double
-strtod_l (const char *__restrict s00, char **__restrict se, locale_t loc)
-{
-  return _strtod_l (s00, se, loc);
-}
-
-double
-strtod (const char *__restrict s00, char **__restrict se)
-{
-  return _strtod_l (s00, se, __get_current_locale ());
-}
-
-float
-strtof_l (const char *__restrict s00, char **__restrict se, locale_t loc)
-{
-  double val = _strtod_l (s00, se, loc);
-  if (isnan (val))
-    return signbit (val) ? -nanf ("") : nanf ("");
-  float retval = (float) val;
-#ifndef NO_ERRNO
-  if (isinf (retval) && !isinf (val))
-    __errno_r(_REENT) = ERANGE;
-#endif
-  return retval;
+  return strtod_l (s00, se, __get_current_locale ());
 }
 
 float
 strtof (const char *__restrict s00,
 	char **__restrict se)
 {
-  double val = _strtod_l (s00, se, __get_current_locale ());
+  double val = strtod_l (s00, se, __get_current_locale ());
   if (isnan (val))
     return signbit (val) ? -nanf ("") : nanf ("");
   float retval = (float) val;
 #ifndef NO_ERRNO
   if (isinf (retval) && !isinf (val))
-    __errno_r(_REENT) = ERANGE;
+    errno = ERANGE;
 #endif
   return retval;
 }
-
 #endif
