@@ -37,6 +37,8 @@ POSSIBILITY OF SUCH DAMAGE.
 #include "local.h"
 #include "../locale/setlocale.h"
 
+#ifdef _HAVE_LONG_DOUBLE && __LDBL_MANT_DIG == 64
+
 long double
 wcstold_l (const wchar_t *__restrict nptr, wchar_t **__restrict endptr,
 	   locale_t loc)
@@ -122,3 +124,5 @@ wcstold (const wchar_t *__restrict nptr, wchar_t **__restrict endptr)
   return wcstold_l(nptr, endptr, __get_current_locale ());
 #endif
 }
+
+#endif /* _HAVE_LONG_DOUBLE && __LDBL_MANT_DIG == 64 */

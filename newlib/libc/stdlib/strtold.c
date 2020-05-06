@@ -34,7 +34,7 @@ POSSIBILITY OF SUCH DAMAGE.
 #include "mprec.h"
 #undef FLT_ROUNDS
 
-#ifdef _HAVE_LONG_DOUBLE
+#ifdef _HAVE_LONG_DOUBLE && __LDBL_MANT_DIG == 64
 
 /* Intel MCU has no x87 floating point unit */
 #if (defined (__x86_64__) || defined (__i386__)) && !defined (__iamcu__)
