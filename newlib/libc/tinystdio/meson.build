@@ -103,6 +103,10 @@ srcs_tinystdio = [
     'vsprintff.c',
 ]
 
+if have_long_double and not long_double_equals_double
+  srcs_tinystdio += 'strtold.c'
+endif
+
 srcs_tinystdio_posix = [
     'fopen.c',
     'fdopen.c',

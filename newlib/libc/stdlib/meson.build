@@ -147,7 +147,6 @@ srcs_stdlib = [
     'strtoimax.c',
     'strtol.c',
     'strtoll.c',
-    'strtorx.c',
     'strtoul.c',
     'strtoull.c',
     'strtoumax.c',
@@ -172,12 +171,13 @@ srcs_stdlib = [
 
 lsrcs_stdlib = [
   'strtold.c',
+  'strtorx.c',
   'wcstold.c'
 ]
 
-if have_long_double
+if have_long_double and not newlib_tinystdio
   srcs_stdlib += lsrcs_stdlib
-  if newlib_io_long_double and not newlib_tinystdio
+  if newlib_io_long_double
     srcs_stdlib += 'ldtoa.c'
   endif
 endif
