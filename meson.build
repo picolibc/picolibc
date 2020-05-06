@@ -220,10 +220,13 @@ long double test()
 '''
 have_long_double = meson.get_compiler('c').compiles(long_double_code, name : 'long double check')
 
+long_double_size_code = '''
+#include <float.h>
+char size_test[sizeof(double) == sizeof(long double) ? 1 : -1];
+'''
+
 if have_long_double
-  long_double_size = meson.get_compiler('c').sizeof('long double')
-  double_size = meson.get_compiler('c').sizeof('double')
-  long_double_equals_double = long_double_size > 0 and long_double_size == double_size
+  long_double_equals_double = meson.get_compiler('c').compiles(long_double_size_code, name : 'long double same as double')
 endif
 
 if enable_multilib
