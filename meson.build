@@ -87,7 +87,8 @@ prefix = get_option('prefix')
 newlib_tinystdio = get_option('newlib-tinystdio')
 
 # Shared stdio options
-io_long_long = get_option('newlib-io-long-long') or get_option('io-long-long')
+io_long_long = get_option('io-long-long') or get_option('newlib-io-long-long')
+io_c99_formats = get_option('io-c99-formats') or get_option('newlib-io-c99-formats')
 
 # tinystdio options
 posix_io = newlib_tinystdio and get_option('posix-io')
@@ -95,7 +96,6 @@ posix_console = posix_io and get_option('posix-console')
 
 # A bunch of newlib-stdio only options
 newlib_io_pos_args = get_option('newlib-io-pos-args')
-newlib_io_c99_formats = get_option('newlib-io-c99-formats')
 newlib_io_long_double = get_option('newlib-io-long-double')
 newlib_global_stdio_streams = get_option('newlib-global-stdio-streams')
 newlib_fvwrite_in_streamio = get_option('newlib-fvwrite-in-streamio')
@@ -115,9 +115,6 @@ newlib_missing_syscall_names = get_option('newlib-missing-syscall-names')
 if newlib_tinystdio
   if newlib_io_pos_args
     error('tinystdio does not support positional arguments (newlib-io-pos-args)')
-  endif
-  if newlib_io_c99_formats
-    error('tinystdio does not support all c99 formats (newlib-io-c99-formats)')
   endif
   if newlib_io_long_double
     error('tinystdio does not support long double (newlib-io-long-double)')
@@ -308,8 +305,8 @@ endif
 conf_data.set('HAVE_ALIAS_ATTRIBUTE', have_alias_attribute)
 conf_data.set('_WANT_REGISTER_FINI', newlib_register_fini)
 conf_data.set('_WANT_IO_LONG_LONG', io_long_long)
+conf_data.set('_WANT_IO_C99_FORMATS', io_c99_formats)
 if not newlib_tinystdio
-  conf_data.set('_WANT_IO_C99_FORMATS', newlib_io_c99_formats)
   conf_data.set('_WANT_IO_LONG_DOUBLE', newlib_io_long_double)
   conf_data.set('_WANT_IO_POS_ARGS', newlib_io_pos_args)
   conf_data.set('NO_FLOATING_POINT', not newlib_io_float)

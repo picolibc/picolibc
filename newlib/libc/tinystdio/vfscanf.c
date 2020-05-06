@@ -646,6 +646,9 @@ int vfscanf (FILE * stream, const char *fmt, va_list ap)
 	    switch (c) {
 	      case 'h':
 		if ((c = *fmt++) != 'h') {
+#ifdef _WANT_IO_C99_FORMATS
+		is_short:
+#endif
 		    flags |= FL_SHORT;
 		    break;
 		}
@@ -653,9 +656,28 @@ int vfscanf (FILE * stream, const char *fmt, va_list ap)
 		c = *fmt++;
 		break;
 	      case 'l':
+#ifdef _WANT_IO_C99_FORMATS
+	    is_long:
+#endif
 		flags |= FL_LONG;
 		c = *fmt++;
 		break;
+#ifdef _WANT_IO_C99_FORMATS
+#define CHECK_INT_SIZE(letter, type)				\
+	    case letter:					\
+		if (sizeof(type) != sizeof(int)) {		\
+		    if (sizeof(type) == sizeof(long))		\
+			goto is_long;				\
+		    if (sizeof(type) == sizeof(short))		\
+			goto is_short;				\
+		}						\
+		c = *fmt++;					\
+		break;
+
+	    CHECK_INT_SIZE('j', intmax_t);
+	    CHECK_INT_SIZE('z', size_t);
+	    CHECK_INT_SIZE('t', ptrdiff_t);
+#endif
 	    }
 
 #define CNV_BASE	"cdinopsuxX"

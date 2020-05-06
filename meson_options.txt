@@ -66,6 +66,8 @@ option('specsdir', type: 'string',
 
 option('newlib-io-pos-args', type: 'boolean', value: false,
        description: 'enable printf-family positional arg support')
+option('io-c99-formats', type: 'boolean', value: true,
+       description: 'enable C99 support in IO functions like printf/scanf')
 option('newlib-io-c99-formats', type: 'boolean', value: false,
        description: 'enable C99 support in IO functions like printf/scanf (newlib stdio only)')
 option('io-long-long', type: 'boolean', value: false,

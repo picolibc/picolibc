@@ -406,8 +406,15 @@ int vfprintf (FILE * stream, const char *fmt, va_list ap)
 	    }
 
 	    if (c == 'l') {
-		if (flags & FL_LONG)
+		if (flags & FL_LONG) {
+#ifdef _WANT_IO_C99_FORMATS
+		is_long_long:
+#endif
 		    flags |= FL_REPD_TYPE;
+		}
+#ifdef _WANT_IO_C99_FORMATS
+	    is_long:
+#endif
 		flags |= FL_LONG;
 		flags &= ~FL_SHORT;
 		continue;
@@ -416,10 +423,32 @@ int vfprintf (FILE * stream, const char *fmt, va_list ap)
 	    if (c == 'h') {
 		if (flags & FL_SHORT)
 		    flags |= FL_REPD_TYPE;
+#ifdef _WANT_IO_C99_FORMATS
+	    is_short:
+#endif
 		flags |= FL_SHORT;
 		flags &= ~FL_LONG;
 		continue;
 	    }
+
+#ifdef _WANT_IO_C99_FORMATS
+#define CHECK_INT_SIZE(letter, type) do {			\
+		if (c == letter) {				\
+		    if (sizeof(type) == sizeof(int))		\
+			continue;				\
+		    if (sizeof(type) == sizeof(long))		\
+			goto is_long;				\
+		    if (sizeof(type) == sizeof(long long))	\
+			goto is_long_long;			\
+		    if (sizeof(type) == sizeof(short))		\
+			goto is_short;				\
+		} \
+	    } while(0)
+
+	    CHECK_INT_SIZE('j', intmax_t);
+	    CHECK_INT_SIZE('z', size_t);
+	    CHECK_INT_SIZE('t', ptrdiff_t);
+#endif
 
 	    break;
 	} while ( (c = *fmt++) != 0);
