@@ -127,7 +127,9 @@ SUCH DAMAGE.
 #define __DYNAMIC_REENT__
 #define HAVE_GETDATE
 #define _READ_WRITE_RETURN_TYPE _ssize_t
+#ifndef __LARGE64_FILES
 #define __LARGE64_FILES 1
+#endif
 /* we use some glibc header files so turn on glibc large file feature */
 #define _LARGEFILE64_SOURCE 1
 #endif
