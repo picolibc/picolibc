@@ -267,6 +267,7 @@ fhandler_fifo::add_client_handler ()
     {
       ret = 0;
       fc.h = ph;
+      fc.state = fc_listening;
       fc_handler[nhandlers++] = fc;
     }
 out:
@@ -311,10 +312,11 @@ fhandler_fifo::listen_client ()
 }
 
 void
-fhandler_fifo::record_connection (fifo_client_handler& fc)
+fhandler_fifo::record_connection (fifo_client_handler& fc,
+				  fifo_client_connect_state s)
 {
   SetEvent (write_ready);
-  fc.state = fc_connected;
+  fc.state = s;
   nconnected++;
   set_pipe_non_blocking (fc.h, true);
 }
@@ -330,15 +332,12 @@ fhandler_fifo::listen_client_thread ()
 
   while (1)
     {
-      /* At the beginning of the loop, all client handlers are
-	 in the fc_connected or fc_invalid state. */
-
-      /* Delete any invalid clients. */
+      /* Cleanup the fc_handler list. */
       fifo_client_lock ();
       int i = 0;
       while (i < nhandlers)
 	{
-	  if (fc_handler[i].state == fc_invalid)
+	  if (fc_handler[i].state < fc_connected)
 	    delete_client_handler (i);
 	  else
 	    i++;
@@ -391,6 +390,10 @@ fhandler_fifo::listen_client_thread ()
 	case STATUS_SUCCESS:
 	case STATUS_PIPE_CONNECTED:
 	  record_connection (fc);
+	  ResetEvent (evt);
+	  break;
+	case STATUS_PIPE_CLOSING:
+	  record_connection (fc, fc_closing);
 	  ResetEvent (evt);
 	  break;
 	case STATUS_THREAD_IS_TERMINATING:
@@ -835,7 +838,7 @@ fhandler_fifo::raw_read (void *in_ptr, size_t& len)
       /* Poll the connected clients for input. */
       fifo_client_lock ();
       for (int i = 0; i < nhandlers; i++)
-	if (fc_handler[i].state == fc_connected)
+	if (fc_handler[i].state >= fc_connected)
 	  {
 	    NTSTATUS status;
 	    IO_STATUS_BLOCK io;
@@ -859,18 +862,14 @@ fhandler_fifo::raw_read (void *in_ptr, size_t& len)
 	      case STATUS_PIPE_EMPTY:
 		break;
 	      case STATUS_PIPE_BROKEN:
-		/* Client has disconnected.  Mark the client handler
-		   to be deleted when it's safe to do that. */
-		fc_handler[i].state = fc_invalid;
+		fc_handler[i].state = fc_disconnected;
 		nconnected--;
 		break;
 	      default:
 		debug_printf ("NtReadFile status %y", status);
-		__seterrno_from_nt_status (status);
-		fc_handler[i].state = fc_invalid;
+		fc_handler[i].state = fc_error;
 		nconnected--;
-		fifo_client_unlock ();
-		goto errout;
+		break;
 	      }
 	  }
       fifo_client_unlock ();

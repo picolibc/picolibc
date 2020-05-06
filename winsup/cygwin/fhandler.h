@@ -1270,11 +1270,16 @@ public:
 #define CYGWIN_FIFO_PIPE_NAME_LEN     47
 #define MAX_CLIENTS 64
 
+/* The last three are the ones we try to read from. */
 enum fifo_client_connect_state
 {
   fc_unknown,
+  fc_error,
+  fc_disconnected,
+  fc_listening,
   fc_connected,
-  fc_invalid
+  fc_closing,
+  fc_input_avail,
 };
 
 enum
@@ -1316,7 +1321,8 @@ class fhandler_fifo: public fhandler_base
   bool listen_client ();
   int stop_listen_client ();
   int check_listen_client_thread ();
-  void record_connection (fifo_client_handler&);
+  void record_connection (fifo_client_handler&,
+			  fifo_client_connect_state = fc_connected);
 public:
   fhandler_fifo ();
   bool hit_eof ();
