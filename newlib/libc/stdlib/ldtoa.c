@@ -9,9 +9,6 @@
 
 /* These are the externally visible entries. */
 /* linux name:  long double _IO_strtold (char *, char **); */
-long double _strtold (char *, char **);
-char *_ldtoa_r (struct _reent *, long double, int, int, int *, int *,
-		char **);
 int _ldcheck (long double *);
 #if 0
 void _IO_ldtostr (long double *, char *, int, int, char);
@@ -2783,8 +2780,8 @@ _IO_ldtostr (x, string, ndigs, flags, fmt)
 /* This routine will not return more than NDEC+1 digits. */
 
 char *
-_ldtoa_r (struct _reent *ptr, long double d, int mode, int ndigits,
-	  int *decpt, int *sign, char **rve)
+__ldtoa (long double d, int mode, int ndigits,
+       int *decpt, int *sign, char **rve)
 {
   unsigned short e[NI];
   char *s, *p;
@@ -3308,7 +3305,7 @@ bxit:
 */
 
 long double
-_strtold (char *s, char **se)
+strtold (char *s, char **se)
 {
   union uconv x;
   LDPARMS rnd;

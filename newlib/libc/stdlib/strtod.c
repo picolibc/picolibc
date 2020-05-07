@@ -1272,6 +1272,18 @@ strtod (const char *__restrict s00,
   return strtod_l (s00, se, __get_current_locale ());
 }
 
+#if defined(_HAVE_LONG_DOUBLE) && defined(_LDBL_EQ_DBL)
+#ifdef HAVE_ALIAS_ATTRIBUTE
+extern long double strtold(const char *, char **) __attribute__ ((__alias__ ("strtod")));
+#else
+long double
+strtold (const char * nptr, char ** endptr)
+{
+	return (long double) strtod(nptr, endptr);
+}
+#endif
+#endif
+
 float
 strtof (const char *__restrict s00,
 	char **__restrict se)

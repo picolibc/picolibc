@@ -135,8 +135,8 @@ SEEALSO
 #endif
 
 /* Currently a test is made to see if long double processing is warranted.
-   This could be changed in the future should the _ldtoa_r code be
-   preferred over _dtoa_r.  */
+   This could be changed in the future should the __ldtoa code be
+   preferred over __dtoa.  */
 #define _NO_LONGDBL
 #if defined _WANT_IO_LONG_DOUBLE && (LDBL_MANT_DIG > DBL_MANT_DIG)
 #undef _NO_LONGDBL
@@ -226,22 +226,16 @@ __sbwprintf (struct _reent *rptr,
 
 # ifdef _NO_LONGDBL
 
-extern char *_dtoa_r (double, int,
-			      int, int *, int *, char **);
-
 #  define _PRINTF_FLOAT_TYPE double
-#  define _DTOA_R _dtoa_r
+#  define _DTOA __dtoa
 #  define FREXP frexp
 
 # else /* !_NO_LONGDBL */
 
-extern char *_ldtoa_r (_LONG_DOUBLE, int,
-			      int, int *, int *, char **);
-
 extern int _ldcheck (_LONG_DOUBLE *);
 
 #  define _PRINTF_FLOAT_TYPE _LONG_DOUBLE
-#  define _DTOA_R _ldtoa_r
+#  define _DTOA __ldtoa
 /* FIXME - frexpl is not yet supported; and cvt infloops if (double)f
    converts a finite value into infinity.  */
 /* #  define FREXP frexpl */
@@ -1020,7 +1014,7 @@ reswitch:	switch (ch) {
 				if (prec >= BUF)
 				  {
 				    if ((malloc_buf =
-					 (wchar_t *)_malloc_r (data, (prec + 1) * sizeof (wchar_t)))
+					 (wchar_t *)malloc ((prec + 1) * sizeof (wchar_t)))
 					== NULL)
 				      {
 					fp->_flags |= __SERR;
@@ -1631,7 +1625,7 @@ wcvt(struct _reent *data, _PRINTF_FLOAT_TYPE value, int ndigits, int flags,
 	  int i;
 #endif
 
-	  digits = _DTOA_R (value, mode, ndigits, decpt, &dsgn, &rve);
+	  digits = _DTOA (value, mode, ndigits, decpt, &dsgn, &rve);
 
 	  if ((ch != L'g' && ch != L'G') || flags & ALT) {	/* Print trailing zeros */
 		bp = digits + ndigits;

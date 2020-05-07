@@ -85,7 +85,6 @@ srcs_stdlib = [
     'div.c',
     'drand48.c',
     'dtoa.c',
-    'dtoastub.c',
     'ecvtbuf.c',
     'efgcvt.c',
     'environ.c',
@@ -175,7 +174,7 @@ lsrcs_stdlib = [
   'wcstold.c'
 ]
 
-if have_long_double and not newlib_tinystdio
+if have_long_double and not long_double_equals_double and not newlib_tinystdio
   srcs_stdlib += lsrcs_stdlib
   if newlib_io_long_double
     srcs_stdlib += 'ldtoa.c'

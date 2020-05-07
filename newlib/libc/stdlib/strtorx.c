@@ -36,7 +36,7 @@ THIS SOFTWARE.
 #include "mprec.h"
 #include "gdtoa.h"
 
-#if defined (_HAVE_LONG_DOUBLE) && !defined (_LDBL_EQ_DBL) && __LDBL_MANT_DIG == 64
+#if defined (_HAVE_LONG_DOUBLE) && !defined (_LDBL_EQ_DBL) && __LDBL_MANT_DIG__ == 64
 
 /* one or the other of IEEE_MC68k or IEEE_8087 should be #defined */
 
@@ -81,8 +81,6 @@ ULtox(__UShort *L, __ULong *bits, Long exp, int k)
 		L[_2] = (__UShort)bits[1];
 		L[_1] = (__UShort)(bits[1] >> 16);
 
-		long double x;
-		printf("L %04x %04x %04x %04x %04x %g\n", L[_0], L[_1], L[_2], L[_3], L[_4], (double) x);
 		break;
 
 	  case STRTOG_Infinite:

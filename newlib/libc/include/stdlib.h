@@ -294,7 +294,8 @@ int	posix_memalign (void **, size_t, size_t) __nonnull((1))
 	    __result_use_check;
 #endif
 
-char *	_dtoa_r (double, int, int, int *, int*, char**);
+char *	__dtoa (double, int, int, int *, int*, char**);
+char *  __ldtoa (long double, int, int, int *, int *, char **);
 
 void	__eprintf (const char *, const char *, unsigned int, const char *);
 
