@@ -1,0 +1,8 @@
+#!/bin/sh
+CONFIGURE=$1
+DIR=$2
+
+mkdir $2
+cd $2
+../$CONFIGURE
+ninja
