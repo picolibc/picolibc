@@ -17,10 +17,14 @@ jobs:
             -f picolibc/.github/Dockerfile \
             picolibc
 
-      - name: 'Build on arm'
-        run: |
-          docker run --rm picolibc ./.github/do-build do-arm-configure build-arm
-
       - name: 'Test on native'
         run: |
           docker run --rm picolibc ./.github/do-test do-native-configure build-native
+
+      - name: 'Build on risc-v'
+        run: |
+          docker run --rm picolibc ./.github/do-build do-riscv-configure build-riscv
+
+      - name: 'Build on arm'
+        run: |
+          docker run --rm picolibc ./.github/do-build do-arm-configure build-arm

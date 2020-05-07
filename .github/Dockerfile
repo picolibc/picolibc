@@ -6,8 +6,8 @@ RUN apt-get update && \
     build-essential \
     meson \
     ninja-build \
-    qemu-system-arm \
-    gcc-arm-none-eabi
+    gcc-arm-none-eabi \
+    gcc-riscv64-unknown-elf
 
 # Copy freedom-e-sdk into container
 RUN mkdir picolibc
