@@ -19,4 +19,4 @@ jobs:
 
       - name: 'Build on arm'
         run: |
-          docker run --rm -e picolibc ./.github/do-test do-arm-configure build-arm
+          docker run --rm picolibc ./.github/do-test do-arm-configure build-arm
