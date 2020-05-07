@@ -1,0 +1,22 @@
+name: tests
+
+on: pull_request
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 'Clone picolibc'
+        uses: actions/checkout@v2
+        with:
+          path: picolibc
+
+      - name: 'Build picolibc container'
+        run: |
+          docker build -t picolibc \
+            -f picolib/.github/Dockerfile \
+            picolibc
+
+      - name: 'Build on arm'
+        run: |
+          docker run --rm -e picolibc ./.github/do-test do-arm-configure build-arm
