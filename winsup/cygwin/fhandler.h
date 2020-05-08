@@ -1308,12 +1308,12 @@ struct fifo_reader_id_t
 
   operator bool () const { return winpid != 0 || fh != NULL; }
 
-  friend operator == (const fifo_reader_id_t &l, const fifo_reader_id_t &r)
+  friend bool operator == (const fifo_reader_id_t &l, const fifo_reader_id_t &r)
   {
     return l.winpid == r.winpid && l.fh == r.fh;
   }
 
-  friend operator != (const fifo_reader_id_t &l, const fifo_reader_id_t &r)
+  friend bool operator != (const fifo_reader_id_t &l, const fifo_reader_id_t &r)
   {
     return l.winpid != r.winpid || l.fh != r.fh;
   }
