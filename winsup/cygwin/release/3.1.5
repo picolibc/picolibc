@@ -3,6 +3,8 @@ What changed:
 
 - Support WSL symlinks.  Create those by default now.
 
+- FIFOs can now be opened multiple times for reading.
+
 
 Bug Fixes:
 ----------
@@ -22,3 +24,7 @@ Bug Fixes:
 - Fix error handling in raw disk writes and allow full disk writes
   including necessary locking on floppies as well.
   Addresses: https://cygwin.com/pipermail/cygwin/2020-April/244610.html
+
+- Fix several FIFO bugs.
+  Addresses: https://sourceware.org/pipermail/cygwin/2020-March/000206.html
+             https://sourceware.org/pipermail/cygwin/2020-April/244518.html

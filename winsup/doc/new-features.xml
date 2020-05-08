@@ -86,6 +86,10 @@ https://gitlab.freedesktop.org/terminal-wg/specifications/issues/9.
 Support WSL symlinks.  Create those by default now.
 </para></listitem>
 
+<listitem><para>
+FIFOs can now be opened multiple times for reading.
+</para></listitem>
+
 </itemizedlist>
 
 </sect2>
