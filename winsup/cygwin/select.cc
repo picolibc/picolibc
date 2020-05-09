@@ -871,32 +871,16 @@ peek_fifo (select_record *s, bool from_select)
       fh->fifo_client_lock ();
       int nconnected = 0;
       for (int i = 0; i < fh->get_nhandlers (); i++)
-	if (fh->get_fc_handler (i).get_state () >= fc_connected)
+	if (fh->get_fc_handler (i).set_state () >= fc_closing)
 	  {
 	    nconnected++;
-	    switch (fh->get_fc_handler (i).pipe_state ())
+	    if (fh->get_fc_handler (i).state == fc_input_avail)
 	      {
-	      case FILE_PIPE_CONNECTED_STATE:
-		fh->get_fc_handler (i).get_state () = fc_connected;
-		break;
-	      case FILE_PIPE_DISCONNECTED_STATE:
-		fh->get_fc_handler (i).get_state () = fc_disconnected;
-		nconnected--;
-		break;
-	      case FILE_PIPE_CLOSING_STATE:
-		fh->get_fc_handler (i).get_state () = fc_closing;
-		break;
-	      case FILE_PIPE_INPUT_AVAILABLE_STATE:
-		fh->get_fc_handler (i).get_state () = fc_input_avail;
 		select_printf ("read: %s, ready for read", fh->get_name ());
 		fh->fifo_client_unlock ();
 		fh->reading_unlock ();
 		gotone += s->read_ready = true;
 		goto out;
-	      default:
-		fh->get_fc_handler (i).get_state () = fc_error;
-		nconnected--;
-		break;
 	      }
 	  }
       fh->maybe_eof (!nconnected);

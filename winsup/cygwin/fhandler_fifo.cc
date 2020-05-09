@@ -343,7 +343,7 @@ fhandler_fifo::delete_client_handler (int i)
 	     (nhandlers - i) * sizeof (fc_handler[i]));
 }
 
-/* Delete invalid handlers. */
+/* Delete handlers that we will never read from. */
 void
 fhandler_fifo::cleanup_handlers ()
 {
@@ -351,7 +351,7 @@ fhandler_fifo::cleanup_handlers ()
 
   while (i < nhandlers)
     {
-      if (fc_handler[i].state < fc_connected)
+      if (fc_handler[i].state < fc_closing)
 	delete_client_handler (i);
       else
 	i++;
@@ -417,9 +417,6 @@ fhandler_fifo::update_my_handlers (bool from_exec)
 
       for (int i = 0; i < get_shared_nhandlers (); i++)
 	{
-	  /* Should never happen. */
-	  if (shared_fc_handler[i].state < fc_connected)
-	    continue;
 	  if (add_client_handler (false) < 0)
 	    api_fatal ("Can't add client handler, %E");
 	  fifo_client_handler &fc = fc_handler[nhandlers - 1];
@@ -462,30 +459,9 @@ fhandler_fifo::check_write_ready ()
 {
   bool set = false;
 
-  fifo_client_lock ();
   for (int i = 0; i < nhandlers && !set; i++)
-    switch (fc_handler[i].pipe_state ())
-      {
-      case FILE_PIPE_CONNECTED_STATE:
-	fc_handler[i].state = fc_connected;
-	set = true;
-	break;
-      case FILE_PIPE_INPUT_AVAILABLE_STATE:
-	fc_handler[i].state = fc_input_avail;
-	set = true;
-	break;
-      case FILE_PIPE_DISCONNECTED_STATE:
-	fc_handler[i].state = fc_disconnected;
-	break;
-      case FILE_PIPE_LISTENING_STATE:
-	fc_handler[i].state = fc_listening;
-      case FILE_PIPE_CLOSING_STATE:
-	fc_handler[i].state = fc_closing;
-      default:
-	fc_handler[i].state = fc_error;
-	break;
-      }
-  fifo_client_unlock ();
+    if (fc_handler[i].set_state () >= fc_connected)
+      set = true;
   if (set || IsEventSignalled (writer_opening))
     SetEvent (write_ready);
   else
@@ -656,13 +632,13 @@ fhandler_fifo::fifo_reader_thread_func ()
 	    default:
 	      break;
 	    }
-	  fifo_client_unlock ();
 	  if (ph)
 	    NtClose (ph);
 	  if (update && update_shared_handlers () < 0)
 	    api_fatal ("Can't update shared handlers, %E");
 	  if (check)
 	    check_write_ready ();
+	  fifo_client_unlock ();
 	  if (cancel)
 	    goto canceled;
 	}
@@ -1307,7 +1283,7 @@ fhandler_fifo::raw_read (void *in_ptr, size_t& len)
       int nconnected = 0;
       fifo_client_lock ();
       for (int i = 0; i < nhandlers; i++)
-	if (fc_handler[i].state >= fc_connected)
+	if (fc_handler[i].state >= fc_closing)
 	  {
 	    NTSTATUS status;
 	    IO_STATUS_BLOCK io;
@@ -1411,25 +1387,45 @@ fhandler_fifo::close_all_handlers ()
   nhandlers = 0;
 }
 
-int
-fifo_client_handler::pipe_state ()
+fifo_client_connect_state
+fifo_client_handler::set_state ()
 {
   IO_STATUS_BLOCK io;
   FILE_PIPE_LOCAL_INFORMATION fpli;
   NTSTATUS status;
+
+  if (!h)
+    return (state = fc_unknown);
 
   status = NtQueryInformationFile (h, &io, &fpli,
 				   sizeof (fpli), FilePipeLocalInformation);
   if (!NT_SUCCESS (status))
     {
       debug_printf ("NtQueryInformationFile status %y", status);
-      __seterrno_from_nt_status (status);
-      return -1;
+      state = fc_error;
     }
   else if (fpli.ReadDataAvailable > 0)
-    return FILE_PIPE_INPUT_AVAILABLE_STATE;
+    state = fc_input_avail;
   else
-    return fpli.NamedPipeState;
+    switch (fpli.NamedPipeState)
+      {
+      case FILE_PIPE_DISCONNECTED_STATE:
+	state = fc_disconnected;
+	break;
+      case FILE_PIPE_LISTENING_STATE:
+	state = fc_listening;
+	break;
+      case FILE_PIPE_CONNECTED_STATE:
+	state = fc_connected;
+	break;
+      case FILE_PIPE_CLOSING_STATE:
+	state = fc_closing;
+	break;
+      default:
+	state = fc_error;
+	break;
+      }
+  return state;
 }
 
 void

@@ -1269,21 +1269,22 @@ public:
 
 #define CYGWIN_FIFO_PIPE_NAME_LEN     47
 
-/* The last three are the ones we try to read from. */
+/* We view the fc_closing state as borderline between open and closed
+   for a writer at the other end of a fifo_client_handler.
+
+   We still attempt to read from the writer when the handler is in
+   this state, and we don't declare a reader to be at EOF if there's a
+   handler in this state.  But the existence of a handler in this
+   state is not sufficient to unblock a reader trying to open. */
 enum fifo_client_connect_state
 {
   fc_unknown,
   fc_error,
   fc_disconnected,
   fc_listening,
-  fc_connected,
   fc_closing,
+  fc_connected,
   fc_input_avail,
-};
-
-enum
-{
-  FILE_PIPE_INPUT_AVAILABLE_STATE = 5
 };
 
 struct fifo_client_handler
@@ -1292,11 +1293,7 @@ struct fifo_client_handler
   fifo_client_connect_state state;
   fifo_client_handler () : h (NULL), state (fc_unknown) {}
   void close () { NtClose (h); }
-/* Returns FILE_PIPE_DISCONNECTED_STATE, FILE_PIPE_LISTENING_STATE,
-   FILE_PIPE_CONNECTED_STATE, FILE_PIPE_CLOSING_STATE,
-   FILE_PIPE_INPUT_AVAILABLE_STATE, or -1 on error. */
-  fifo_client_connect_state &get_state () { return state; }
-  int pipe_state ();
+  fifo_client_connect_state set_state ();
 };
 
 class fhandler_fifo;
@@ -1462,7 +1459,7 @@ public:
   bool maybe_eof () const { return _maybe_eof; }
   void maybe_eof (bool val) { _maybe_eof = val; }
   int get_nhandlers () const { return nhandlers; }
-  fifo_client_handler get_fc_handler (int i) const { return fc_handler[i]; }
+  fifo_client_handler &get_fc_handler (int i) { return fc_handler[i]; }
   PUNICODE_STRING get_pipe_name ();
   DWORD fifo_reader_thread_func ();
   void fifo_client_lock () { _fifo_client_lock.lock (); }
