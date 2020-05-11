@@ -1335,8 +1335,8 @@ fhandler_fifo::raw_read (void *in_ptr, size_t& len)
 	}
       else
 	{
-	  /* Allow interruption. */
-	  DWORD waitret = cygwait (NULL, cw_nowait, cw_cancel | cw_sig_eintr);
+	  /* Allow interruption and don't hog the CPU. */
+	  DWORD waitret = cygwait (NULL, 1, cw_cancel | cw_sig_eintr);
 	  if (waitret == WAIT_CANCELED)
 	    pthread::static_cancel_self ();
 	  else if (waitret == WAIT_SIGNALED)
@@ -1356,8 +1356,6 @@ fhandler_fifo::raw_read (void *in_ptr, size_t& len)
 	  set_errno (EBADF);
 	  goto errout;
 	}
-      /* Don't hog the CPU. */
-      Sleep (1);
     }
 errout:
   len = (size_t) -1;
