@@ -55,7 +55,11 @@ void __aeabi_memset8 (void *dest, size_t n, int c)
 
 /* Support the routine __aeabi_memset.  Can't alias to memset
    because it's not defined in the same translation unit.  */
-void __aeabi_memset (void *dest, size_t n, int c)
+/*
+ *__attribute__((used)) added so that building with clang -flto
+ * doesn't discard this function
+ */
+void __attribute__((used)) __aeabi_memset (void *dest, size_t n, int c)
 {
   /*Note that relative to ANSI memset, __aeabi_memset hase the order
     of its second and third arguments reversed.  */
