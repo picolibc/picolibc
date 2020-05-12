@@ -38,7 +38,7 @@ void __aeabi_memclr8 (void *dest, size_t n)
 	_ATTRIBUTE ((alias ("__aeabi_memclr")));
 
 /* Support the routine __aeabi_memclr.  */
-void __aeabi_memclr (void *dest, size_t n)
+void __attribute__((used)) __aeabi_memclr (void *dest, size_t n)
 {
   extern void __aeabi_memset (void *dest, size_t n, int c);
   __aeabi_memset (dest, n, 0);
