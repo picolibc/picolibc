@@ -33,7 +33,6 @@
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 srcs_xdr = [
-    'dummy.c',
     'xdr_array.c',
     'xdr.c',
     'xdr_float.c',
