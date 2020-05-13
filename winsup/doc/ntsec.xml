@@ -2159,11 +2159,13 @@ will correctly deal with the ACL regardless of the order of allow and
 deny ACEs.  The second rule is not modified to get the ACEs in the
 preferred order.</para>
 
-<para>Unfortunately the security tab in the file properties dialog of
-the Windows Explorer insists to rearrange the order of the ACEs to
-canonical order before you can read them. Thank God, the sort order
-remains unchanged if one presses the Cancel button.  But don't even
-<emphasis role='bold'>think</emphasis> of pressing OK...</para>
+<para>Unfortunately, the security tab in the file properties dialog of
+the Windows Explorer will pop up a warning stating "The permissions on
+... are incorrectly ordered, which may cause some entries to be
+ineffective."  Pressing the Cancel button of the properties dialog
+fortunately leaves the sort order unchanged, but pressing OK will cause
+Explorer to canonicalize the order of the ACEs, thereby invalidating
+POSIX compatibility.</para>
 
 <para>Canonical ACLs are unable to reflect each possible combination
 of POSIX permissions. Example:</para>
