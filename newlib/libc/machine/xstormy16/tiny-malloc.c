@@ -1,3 +1,4 @@
+/* Copyright (c) 2002 Geoffrey Keating <geoffk@geoffk.org> */
 /* A replacement malloc with:
    - Much reduced code size;
    - Smaller RAM footprint;

@@ -15,7 +15,7 @@
 # error
 #endif
 
-.text
+.section .text.strcmp
 .globl strcmp
 .type  strcmp, @function
 strcmp:

@@ -1,3 +1,4 @@
+/* Copyright (c) 2007 Patrick Mansfield <patmans@us.ibm.com> */
 /* creat() "system call" */
 
 /* copied from libc/posix/creat.c */

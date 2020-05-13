@@ -91,11 +91,7 @@ No supporting OS subroutines are required.
  * 2. Redistributions in binary form must reproduce the above copyright
  *    notice, this list of conditions and the following disclaimer in the
  *    documentation and/or other materials provided with the distribution.
- * 3. All advertising materials mentioning features or use of this software
- *    must display the following acknowledgement:
- *	This product includes software developed by the University of
- *	California, Berkeley and its contributors.
- * 4. Neither the name of the University nor the names of its contributors
+ * 3. Neither the name of the University nor the names of its contributors
  *    may be used to endorse or promote products derived from this software
  *    without specific prior written permission.
  *
@@ -132,6 +128,11 @@ _strtol_l (const char *__restrict nptr,
 	register int c;
 	register unsigned long cutoff;
 	register int neg = 0, any, cutlim;
+
+	if (base < 0 || base == 1 || base > 36) {
+		errno = EINVAL;
+		return 0;
+	}
 
 	/*
 	 * Skip white space and pick up leading +/- sign if any.
@@ -186,9 +187,9 @@ _strtol_l (const char *__restrict nptr,
 			break;
 		if (c >= base)
 			break;
-               if (any < 0 || acc > cutoff || (acc == cutoff && c > cutlim))
+		if (any < 0 || acc > cutoff || (acc == cutoff && c > cutlim)) {
 			any = -1;
-		else {
+		} else {
 			any = 1;
 			acc *= base;
 			acc += c;

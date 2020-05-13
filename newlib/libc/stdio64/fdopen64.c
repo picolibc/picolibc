@@ -1,3 +1,4 @@
+/* Copyright (c) 2003 Christopher Faylor <me@cgf.cx> */
 /*
 FUNCTION
 <<fdopen64>>---turn open large file into a stream

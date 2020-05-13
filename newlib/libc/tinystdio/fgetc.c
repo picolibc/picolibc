@@ -42,7 +42,6 @@ fgetc(FILE *stream)
 
 	if ((stream->flags & __SUNGET) != 0) {
 		stream->flags &= ~__SUNGET;
-		stream->len++;
 		return stream->unget;
 	}
 
@@ -64,7 +63,6 @@ fgetc(FILE *stream)
 		}
 	}
 
-	stream->len++;
 	return (unsigned char)rv;
 }
 

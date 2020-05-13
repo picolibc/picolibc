@@ -1,3 +1,4 @@
+/* Copyright (c) 2002 Jeff Johnston <jjohnstn@redhat.com> */
 /* 
 FUNCTION
 	<<strnlen>>---character string length

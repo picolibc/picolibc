@@ -1,3 +1,19 @@
+/*
+ * Copyright (c) 1994 Cygnus Support.
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms are permitted
+ * provided that the above copyright notice and this paragraph are
+ * duplicated in all such forms and that any documentation,
+ * and/or other materials related to such
+ * distribution and use acknowledge that the software was developed
+ * at Cygnus Support, Inc.  Cygnus Support, Inc. may not be used to
+ * endorse or promote products derived from this software without
+ * specific prior written permission.
+ * THIS SOFTWARE IS PROVIDED ``AS IS'' AND WITHOUT ANY EXPRESS OR
+ * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+ */
 #include "test.h"
  one_line_type sin_vec[] = {
 {62, 0,123,__LINE__, 0xbfedd343, 0xa21a55c4, 0xbff33333, 0x33333333},	/* -0.932039=f(-1.2)*/
@@ -242,7 +258,7 @@
 {64, 0,123,__LINE__, 0x3fedb532, 0xd61e9b64, 0x3ff30a3d, 0x70a3d712},	/* 0.928369=f(1.19)*/
 { 1, 0,123,__LINE__, 0x3cb1a626, 0x33145c07, 0xc01921fb, 0x54442d18},	/* 2.44929e-16=f(-6.28319)*/
 {63, 0,123,__LINE__, 0x3ff00000, 0x00000000, 0xc012d97c, 0x7f3321d2},	/* 1=f(-4.71239)*/
-{ 2, 0,123,__LINE__, 0xbca1a626, 0x33145c07, 0xc00921fb, 0x54442d18},	/* -1.22465e-16=f(-3.14159)*/
+{64, 0,123,__LINE__, 0xbca1a626, 0x33145c07, 0xc00921fb, 0x54442d18},	/* -1.22465e-16=f(-3.14159)*/
 {63, 0,123,__LINE__, 0xbff00000, 0x00000000, 0xbff921fb, 0x54442d18},	/* -1=f(-1.5708)*/
 {64, 0,123,__LINE__, 0x00000000, 0x00000000, 0x00000000, 0x00000000},	/* 0=f(0)*/
 {63, 0,123,__LINE__, 0x3ff00000, 0x00000000, 0x3ff921fb, 0x54442d18},	/* 1=f(1.5708)*/
@@ -285,4 +301,4 @@
 {59, 0,123,__LINE__, 0x3fdd3b53, 0x753c1a0b, 0x403bcccc, 0xccccccc9},	/* 0.456746=f(27.8)*/
 {61, 0,123,__LINE__, 0xbfee1ced, 0xe66aefea, 0x403d7fff, 0xfffffffc},	/* -0.941031=f(29.5)*/
 0,};
-test_sin(m)   {run_vector_1(m,sin_vec,(char *)(sin),"sin","dd");   }	
+void test_sin(m)   {run_vector_1(m,sin_vec,(char *)(sin),"sin","dd");   }	

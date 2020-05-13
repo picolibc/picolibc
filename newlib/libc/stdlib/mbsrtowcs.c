@@ -1,3 +1,6 @@
+/*
+Copyright (c) 2002 Thomas Fitzsimmons <fitzsim@redhat.com>
+ */
 /* doc in mbsnrtowcs.c */
 
 #include <newlib.h>

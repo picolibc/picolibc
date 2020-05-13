@@ -1,4 +1,6 @@
 /*
+ * Copyright (c) 2010 Corinna Vinschen <corinna@vinschen.de>
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
  * are met:
@@ -39,6 +41,7 @@ const struct lc_ctype_T _C_ctype_locale = {
 #endif
 };
 
+#ifdef __CYGWIN__
 /* NULL locale indicates global locale (called from setlocale) */
 int
 __ctype_load_locale (struct __locale_t *locale, const char *name,
@@ -48,7 +51,6 @@ __ctype_load_locale (struct __locale_t *locale, const char *name,
   struct lc_ctype_T ct;
   char *bufp = NULL;
 
-#ifdef __CYGWIN__
   extern int __set_lc_ctype_from_win (const char *, const struct lc_ctype_T *,
 				      struct lc_ctype_T *, char **, void *,
 				      const char *, int);
@@ -80,8 +82,6 @@ __ctype_load_locale (struct __locale_t *locale, const char *name,
 	}
       ret = 0;
     }
-#else
-  /* TODO */
-#endif
   return ret;
 }
+#endif

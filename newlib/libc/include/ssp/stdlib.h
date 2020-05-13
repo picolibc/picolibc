@@ -1,3 +1,4 @@
+/* Copyright (c) 2017 Yaakov Selkowitz <yselkowi@redhat.com> */
 #ifndef _SSP_STDLIB_H_
 #define _SSP_STDLIB_H_
 

@@ -1,3 +1,4 @@
+/* Copyright (c) 2009 Corinna Vinschen <corinna@vinschen.de> */
 /*
 FUNCTION
 	<<wcsdup>>---wide character string duplicate

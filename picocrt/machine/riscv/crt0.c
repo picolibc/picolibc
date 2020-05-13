@@ -33,13 +33,32 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+static inline void
+_set_tls(void *tls)
+{
+	asm("mv tp, %0" : : "r" (tls));
+}
+
 #include "../../crt0.h"
 #include <sys/cdefs.h>
+
+static void __attribute((used))
+_cstart(void)
+{
+	asm(".option push\n.option norelax\nla gp, __global_pointer$\n.option pop");
+#ifdef __riscv_flen
+	long mstatus;
+	asm("csrr %0, mstatus" : "=r" (mstatus));
+	mstatus |= 1 << 13;
+	asm("csrw mstatus, %0" : : "r" (mstatus));
+	asm("csrwi fcsr, 0");
+#endif
+	__start();
+}
 
 void __attribute((naked)) __section(".text.init.enter")
 _start(void)
 {
-	asm(".option push\n.option norelax\nla gp, __global_pointer$\n.option pop");
-	asm("la sp, __stack");
-	__start();
+	asm(".option push\n.option norelax\nla sp, __stack\n.option pop");
+	asm("j _cstart");
 }

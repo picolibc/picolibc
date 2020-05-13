@@ -60,25 +60,7 @@ const double __dtoa_scale_up[] = {
 	1e512,
 #endif
 #if DTOA_MAX_10_EXP >= 1024
-	1e1024,
-#endif
-#if DTOA_MAX_10_EXP >= 2048
-	1e2048,
-#endif
-#if DTOA_MAX_10_EXP >= 4096
-	1e4096,
-#endif
-#if DTOA_MAX_10_EXP >= 8192
-	1e8192,
-#endif
-#if DTOA_MAX_10_EXP >= 16384
-	1e16384,
-#endif
-#if DTOA_MAX_10_EXP >= 32768
-	1e32768,
-#endif
-#if DTOA_MAX_10_EXP >= 65536
-	1e65536,
+#error DTOA_MAX_10_EXP too large
 #endif
 };
 
@@ -113,30 +95,15 @@ const double __dtoa_scale_down[] = {
 #if DTOA_MIN_10_EXP <= -512
 	1e-512,
 #endif
-#if DTOA_MIN_10_EXP <= -1024
-	1e-1024,
-#endif
-#if DTOA_MIN_10_EXP <= -2048
-	1e-2048,
-#endif
-#if DTOA_MIN_10_EXP <= -4096
-	1e-4096,
-#endif
-#if DTOA_MIN_10_EXP <= -8192
-	1e-8192,
-#endif
-#if DTOA_MIN_10_EXP <= -16384
-	1e-16384,
-#endif
-#if DTOA_MIN_10_EXP <= -32768
-	1e-32768,
-#endif
-#if DTOA_MIN_10_EXP <= -65536
-	1e-65536,
+#if DTOA_MIN_10_EXP >= 1024
+#error DTOA_MIN_10_EXP too small
 #endif
 };
 
 const double __dtoa_round[] = {
+#if DTOA_DIG > 30
+#error DTOA_DIG too large
+#endif
 #if DTOA_DIG >= 30
 	5e30,
 #endif

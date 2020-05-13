@@ -1,3 +1,7 @@
+/*
+Copyright (c) 2016 Corinna Vinschen <corinna@vinschen.de> 
+Modified (m) 2017 Thomas Wolff: revise Unicode and locale/wchar handling
+ */
 #include <_ansi.h>
 #include <ctype.h>
 

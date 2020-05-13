@@ -2,7 +2,7 @@
 !        arg1: source
 ! Exit:  result: destination
 !
-! SH5 code Copyright 2002 SuperH Ltd.
+/* SH5 code Copyright 2002 SuperH Ltd. */
 
 #include "asm.h"
 

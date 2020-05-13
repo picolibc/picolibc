@@ -92,12 +92,15 @@ any of the target hardware has been set up.
 Picolibc distributes the semihosting implementation as a separate
 library, `libsemihost.a`. Because it provides interfaces that are used
 by libc itself, it must be included in the linker command line *after*
-libc. You can do this by using the GCC --semihost
+libc. You can do this by using the GCC --oslib=semihost
 command line flag defined by picolibc.specs:
 
-	$ gcc --specs=picolibc.specs --semihost -o program.elf program.o
+	$ gcc --specs=picolibc.specs --oslib=semihost -o program.elf program.o
 
 You can also list libc and libsemihost in the correct order
 explicitly:
 
 	$ gcc --specs=picolibc.specs -o program.elf -lc -lsemihost
+
+This second form doesn't force using the version of _exit from
+libsemihost.a, and so isn't quite as useful.

@@ -35,6 +35,10 @@
 
 #include <sys/cdefs.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #if defined(__rtems__)
 /*
  * The FACE Technical Standard, Edition 3.0 and later require the
@@ -65,6 +69,10 @@ int posix_devctl(
   size_t           nbyte,
   int *__restrict  dev_info_ptr
 );
+#endif
+
+#ifdef __cplusplus
+}
 #endif
 
 #endif

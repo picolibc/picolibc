@@ -1,3 +1,4 @@
+/* Copyright (c) 2014 Yaakov Selkowitz <yselkowi@redhat.com> */
 /*
 FUNCTION
 <<stdio_ext>>,<<__fbufsize>>,<<__fpending>>,<<__flbf>>,<<__freadable>>,<<__fwritable>>,<<__freading>>,<<__fwriting>>---access internals of FILE structure

@@ -1,3 +1,19 @@
+/*
+ * Copyright (c) 1994 Cygnus Support.
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms are permitted
+ * provided that the above copyright notice and this paragraph are
+ * duplicated in all such forms and that any documentation,
+ * and/or other materials related to such
+ * distribution and use acknowledge that the software was developed
+ * at Cygnus Support, Inc.  Cygnus Support, Inc. may not be used to
+ * endorse or promote products derived from this software without
+ * specific prior written permission.
+ * THIS SOFTWARE IS PROVIDED ``AS IS'' AND WITHOUT ANY EXPRESS OR
+ * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+ */
 #include "test.h"
  one_line_type gamma_vec[] = {
 { 1, 0,123,__LINE__, 0x3ff9444e, 0x16cd4267, 0xbff33333, 0x33333333},	/* 1.57918=f(-1.2)*/
@@ -244,11 +260,11 @@
 { 0, 0,123,__LINE__, 0xc00758af, 0x8d064209, 0xc012d97c, 0x7f3321d2},	/* -2.9183=f(-4.71239)*/
 { 9, 0,123,__LINE__, 0x3f8fe5e6, 0x72b2793b, 0xc00921fb, 0x54442d18},	/* 0.0155752=f(-3.14159)*/
 { 1, 0,123,__LINE__, 0x3feab00e, 0xd8258966, 0xbff921fb, 0x54442d18},	/* 0.833991=f(-1.5708)*/
-{ 2, 0, 34,__LINE__, 0x7ff00000, 0x00000000, 0x00000000, 0x00000000},	/* inf=f(0)*/
+{64, 0, 34,__LINE__, 0x7ff00000, 0x00000000, 0x00000000, 0x00000000},	/* inf=f(0)*/
 {64, 0,123,__LINE__, 0xbfbdabdf, 0x1a1d104e, 0x3ff921fb, 0x54442d18},	/* -0.115904=f(1.5708)*/
 {64, 0,123,__LINE__, 0x3fea7c79, 0x5ea35deb, 0x400921fb, 0x54442d18},	/* 0.827695=f(3.14159)*/
 {64, 0,123,__LINE__, 0x400608aa, 0x8a8d8d2f, 0x4012d97c, 0x7f3321d2},	/* 2.75423=f(4.71239)*/
-{ 2, 0, 34,__LINE__, 0x7ff00000, 0x00000000, 0xc03e0000, 0x00000000},	/* inf=f(-30)*/
+{64, 0, 34,__LINE__, 0x7ff00000, 0x00000000, 0xc03e0000, 0x00000000},	/* inf=f(-30)*/
 { 0, 0,123,__LINE__, 0xc050e289, 0x6cea7ba9, 0xc03c4ccc, 0xcccccccd},	/* -67.5396=f(-28.3)*/
 { 0, 0,123,__LINE__, 0xc04f0519, 0xeb4db9ec, 0xc03a9999, 0x9999999a},	/* -62.0399=f(-26.6)*/
 { 0, 0,123,__LINE__, 0xc04bae2f, 0xf3cea701, 0xc038e666, 0x66666667},	/* -55.3608=f(-24.9)*/
@@ -285,4 +301,4 @@
 {64, 0,123,__LINE__, 0x404ff29d, 0x1a191b4b, 0x403bcccc, 0xccccccc9},	/* 63.8954=f(27.8)*/
 {64, 0,123,__LINE__, 0x4051646b, 0xd261edc0, 0x403d7fff, 0xfffffffc},	/* 69.5691=f(29.5)*/
 0,};
-test_gamma(m)   {run_vector_1(m,gamma_vec,(char *)(lgamma),"lgamma","dd");   }	
+void test_gamma(m)   {run_vector_1(m,gamma_vec,(char *)(lgamma),"lgamma","dd");   }	

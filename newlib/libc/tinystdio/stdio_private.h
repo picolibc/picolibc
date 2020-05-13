@@ -44,6 +44,7 @@
 struct __file_str {
 	struct __file file;	/* main file struct */
 	char	*buf;		/* buffer pointer */
+	int	len;		/* characters written so far */
 	int	size;		/* size of buffer */
 };
 

@@ -1,3 +1,4 @@
+/* Copyright (c) 2017 Yaakov Selkowitz <yselkowi@redhat.com> */
 #include <sys/cdefs.h>
 #include <sys/param.h>
 #include <signal.h>

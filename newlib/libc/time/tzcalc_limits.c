@@ -1,3 +1,4 @@
+/* Copyright (c) 2002 Arthur David Olson */
 /*
  * tzcalc_limits.c
  * Original Author: Adapted from tzcode maintained by Arthur David Olson.

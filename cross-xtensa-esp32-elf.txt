@@ -1,0 +1,14 @@
+[binaries]
+c = 'xtensa-esp32-elf-gcc'
+ar = 'xtensa-esp32-elf-ar'
+as = 'xtensa-esp32-elf-as'
+strip = 'xtensa-esp32-elf-strip'
+
+[host_machine]
+system = 'unknown'
+cpu_family = 'esp32'
+cpu = 'esp32'
+endian = 'little'
+
+[properties]
+skip_sanity_check = true

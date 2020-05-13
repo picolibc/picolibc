@@ -37,28 +37,34 @@ int
 snprintf(char *s, size_t n, const char *fmt, ...)
 {
 	va_list ap;
-	struct __file_str f;
 	int i;
 
-	f.file.flags = __SWR | __SSTR;
-	f.buf = s;
-	/* Restrict max output length to 32767, as snprintf() return
+	/* Restrict max output length to INT_MAX, as snprintf() return
 	   signed int. The fputc() function uses a signed comparison
 	   between estimated len and f.size field. So we can write a
 	   negative value into f.size in the case of n was 0. Note,
 	   that f.size will be a max number of nonzero symbols.	*/
-	if ((int)n < 0)
-		n = (unsigned)INT_MAX + 1;		/* 32768 */
-	f.size = n - 1;				/* -1,0,...32767 */
+
+	if ((int) n < 0)
+		n = (unsigned)INT_MAX;		/* 32767 */
+	else
+		n--;
+
+	struct __file_str f = {
+		.file = {
+			.flags = __SWR | __SSTR,
+		},
+		.buf = s,
+		.len = 0,
+		.size = n			/* -1,0,...32767 */
+	};
 
 	va_start(ap, fmt);
 	i = vfprintf(&f.file, fmt, ap);
 	va_end(ap);
 
-	/* We use f.size (not 'n') as this is more effective: two 'ld'
-	   instructions vs. two 'push+pop' and 'movw'.	*/
-	if (f.size >= 0)
-		s[f.file.len < f.size ? f.file.len : f.size] = 0;
+	if (n >= 0 && i >= 0)
+		s[i < n ? i : n] = 0;
 
 	return i;
 }

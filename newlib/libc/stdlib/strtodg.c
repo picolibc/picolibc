@@ -63,7 +63,7 @@ sum (_Bigint *a, _Bigint *b)
 	if (a->_wds < b->_wds) {
 		c = b; b = a; a = c;
 		}
-	c = Balloc(a->_k);
+	c = eBalloc(a->_k);
 	c->_wds = a->_wds;
 	carry = 0;
 	xa = a->_x;
@@ -103,7 +103,7 @@ sum (_Bigint *a, _Bigint *b)
 #endif
 	if (carry) {
 		if (c->_wds == c->_maxwds) {
-			b = Balloc(c->_k + 1);
+			b = eBalloc(c->_k + 1);
 			Bcopy(b, c);
 			Bfree(c);
 			c = b;
@@ -190,7 +190,7 @@ increment (_Bigint *b)
 #endif
 	{
 		if (b->_wds >= b->_maxwds) {
-			b1 = Balloc(b->_k+1);
+			b1 = eBalloc(b->_k+1);
 			Bcopy(b1,b);
 			Bfree(b);
 			b = b1;
@@ -253,7 +253,7 @@ set_ones (_Bigint *b, int n)
 	k = (n + ((1 << kshift) - 1)) >> kshift;
 	if (b->_k < k) {
 		Bfree(b);
-		b = Balloc(k);
+		b = eBalloc(k);
 		}
 	k = n >> kshift;
 	if (n &= kmask)
@@ -348,6 +348,9 @@ rvOK (double d, FPI *fpi, Long *exp, __ULong *bits, int exact,
 		if (k > nb || fpi->sudden_underflow) {
 			b->_wds = inex = 0;
 			*irv = STRTOG_Underflow | STRTOG_Inexlo;
+#ifndef NO_ERRNO
+			errno = ERANGE;
+#endif
 			}
 		else {
 			k1 = k - 1;
@@ -362,9 +365,15 @@ rvOK (double d, FPI *fpi, Long *exp, __ULong *bits, int exact,
 			if (carry) {
 				b = increment(b);
 				inex = STRTOG_Inexhi | STRTOG_Underflow;
+#ifndef NO_ERRNO
+				errno = ERANGE;
+#endif
 				}
 			else if (lostbits)
 				inex = STRTOG_Inexlo | STRTOG_Underflow;
+#ifndef NO_ERRNO
+				errno = ERANGE;
+#endif
 			}
 		}
 	else if (e > fpi->emax) {
@@ -761,6 +770,9 @@ _strtodg_l (const char *s00, char **se, FPI *fpi, Long *exp,
 					rvb->_x[0] = 0;
 					*exp = emin;
 					irv = STRTOG_Underflow | STRTOG_Inexlo;
+#ifndef NO_ERRNO
+					errno = ERANGE;
+#endif
 					goto ret;
 					}
 				rvb->_x[0] = rvb->_wds = rvbits = 1;
@@ -780,9 +792,9 @@ _strtodg_l (const char *s00, char **se, FPI *fpi, Long *exp,
 	bd0 = s2b(s0, nd0, nd, y);
 
 	for(;;) {
-		bd = Balloc(bd0->_k);
+		bd = eBalloc(bd0->_k);
 		Bcopy(bd, bd0);
-		bb = Balloc(rvb->_k);
+		bb = eBalloc(rvb->_k);
 		Bcopy(bb, rvb);
 		bbbits = rvbits - bb0;
 		bbe = rve + bb0;
@@ -940,6 +952,9 @@ _strtodg_l (const char *s00, char **se, FPI *fpi, Long *exp,
 				rvb->_wds = 0;
 				rve = emin;
 				irv = STRTOG_Underflow | STRTOG_Inexlo;
+#ifndef NO_ERRNO
+				errno = ERANGE;
+#endif
 				break;
 				}
 			adj0 = dval(adj) = 1.;
@@ -1083,12 +1098,18 @@ _strtodg_l (const char *s00, char **se, FPI *fpi, Long *exp,
 		if (sudden_underflow) {
 			rvb->_wds = 0;
 			irv = STRTOG_Underflow | STRTOG_Inexlo;
+#ifndef NO_ERRNO
+			errno = ERANGE;
+#endif
 			}
 		else  {
 			irv = (irv & ~STRTOG_Retmask) |
 				(rvb->_wds > 0 ? STRTOG_Denormal : STRTOG_Zero);
 			if (irv & STRTOG_Inexact)
 				irv |= STRTOG_Underflow;
+#ifndef NO_ERRNO
+				errno = ERANGE;
+#endif
 			}
 		}
 	if (se)

@@ -84,6 +84,24 @@ typedef unsigned int width_t;
 # endif
 #endif
 
+static int
+scanf_getc(FILE *stream, int *lenp)
+{
+	int c = getc(stream);
+	if (c >= 0)
+		++(*lenp);
+	return c;
+}
+
+static int
+scanf_ungetc(int c, FILE *stream, int *lenp)
+{
+	c = ungetc(c, stream);
+	if (c >= 0)
+		--(*lenp);
+	return c;
+}
+
 static void
 putval (void *addr, long val, uint16_t flags)
 {
@@ -118,19 +136,19 @@ mulacc (unsigned long val, uint16_t flags, unsigned char c)
 }
 
 static unsigned char
-conv_int (FILE *stream, width_t width, void *addr, uint16_t flags)
+conv_int (FILE *stream, int *lenp, width_t width, void *addr, uint16_t flags)
 {
     unsigned long val;
     int i;
 
-    i = getc (stream);			/* after ungetc()	*/
+    i = scanf_getc (stream, lenp);			/* after scanf_ungetc()	*/
 
     switch ((unsigned char)i) {
       case '-':
         flags |= FL_MINUS;
 	/* FALLTHROUGH */
       case '+':
-	if (!--width || (i = getc(stream)) < 0)
+	if (!--width || (i = scanf_getc(stream, lenp)) < 0)
 	    goto err;
     }
 
@@ -138,12 +156,12 @@ conv_int (FILE *stream, width_t width, void *addr, uint16_t flags)
     flags &= ~FL_WIDTH;
 
     if (!(flags & (FL_DEC | FL_OCT)) && (unsigned char)i == '0') {
-	if (!--width || (i = getc (stream)) < 0)
+	if (!--width || (i = scanf_getc (stream, lenp)) < 0)
 	    goto putval;
 	flags |= FL_WIDTH;
 	if ((unsigned char)(i) == 'x' || (unsigned char)(i) == 'X') {
 	    flags |= FL_HEX;
-	    if (!--width || (i = getc(stream)) < 0)
+	    if (!--width || (i = scanf_getc(stream, lenp)) < 0)
 		goto putval;
 	} else {
 	    if (!(flags & FL_HEX))
@@ -166,7 +184,7 @@ conv_int (FILE *stream, width_t width, void *addr, uint16_t flags)
 		c += '0' - 'A';
 		if (c > 5) {
 		  unget:
-		    ungetc (i, stream);
+		    scanf_ungetc (i, stream, lenp);
 		    break;
 		}
 		c += 10;
@@ -175,7 +193,7 @@ conv_int (FILE *stream, width_t width, void *addr, uint16_t flags)
 	val = mulacc (val, flags, c);
 	flags |= FL_WIDTH;
 	if (!--width) goto putval;
-    } while ((i = getc(stream)) >= 0);
+    } while ((i = scanf_getc(stream, lenp)) >= 0);
     if (!(flags & FL_WIDTH))
 	goto err;
 
@@ -190,7 +208,7 @@ conv_int (FILE *stream, width_t width, void *addr, uint16_t flags)
 
 #if  SCANF_BRACKET
 static const char *
-conv_brk (FILE *stream, width_t width, char *addr, const char *fmt)
+conv_brk (FILE *stream, int *lenp, width_t width, char *addr, const char *fmt)
 {
     unsigned char msk[32];
     unsigned char fnegate;
@@ -249,10 +267,10 @@ conv_brk (FILE *stream, width_t width, char *addr, const char *fmt)
     /* NUL ('\0') is consided as normal character. This is match to Glibc.
        Note, there is no method to include NUL into symbol list.	*/
     do {
-	i = getc (stream);
+	i = scanf_getc (stream, lenp);
 	if (i < 0) break;
 	if (!((msk[(unsigned char)i >> 3] >> (i & 7)) & 1)) {
-	    ungetc (i, stream);
+	    scanf_ungetc (i, stream, lenp);
 	    break;
 	}
 	if (addr) *addr++ = i;
@@ -276,7 +294,7 @@ static const char pstr_nfinity[] = "nfinity";
 static const char pstr_an[] = "an";
 
 static unsigned char
-conv_flt (FILE *stream, width_t width, void *addr, uint16_t flags)
+conv_flt (FILE *stream, int *lenp, width_t width, void *addr, uint16_t flags)
 {
     uint64_t u64;
     double flt;
@@ -292,7 +310,7 @@ conv_flt (FILE *stream, width_t width, void *addr, uint16_t flags)
 #define FL_DOT	    0x800	/* decimal '.' was	*/
 #define FL_MEXP	    0x1000 	/* exponent 'e' is neg.	*/
 
-    i = getc (stream);		/* after ungetc()	*/
+    i = scanf_getc (stream, lenp);		/* after scanf_ungetc()	*/
 
     flag = 0;
     switch ((unsigned char)i) {
@@ -300,7 +318,7 @@ conv_flt (FILE *stream, width_t width, void *addr, uint16_t flags)
         flag = FL_MINUS;
 	/* FALLTHROUGH */
       case '+':
-	if (!--width || (i = getc (stream)) < 0)
+	if (!--width || (i = scanf_getc (stream, lenp)) < 0)
 	    goto err;
     }
 
@@ -318,9 +336,9 @@ conv_flt (FILE *stream, width_t width, void *addr, uint16_t flags)
 	    
 	    while ((c = *p++) != 0) {
 		if (!--width
-		    || (i = getc (stream)) < 0
+		    || (i = scanf_getc (stream, lenp)) < 0
 		    || ((unsigned char)tolower(i) != c
-			&& (ungetc (i, stream), 1)))
+			&& (scanf_ungetc (i, stream, lenp), 1)))
 		{	
 		    if (p == pstr_nfinity + 3)
 			break;
@@ -356,7 +374,7 @@ conv_flt (FILE *stream, width_t width, void *addr, uint16_t flags)
 	    } else {
 		break;
 	    }
-	} while (--width && (i = getc (stream)) >= 0);
+	} while (--width && (i = scanf_getc (stream, lenp)) >= 0);
     
 	if (!(flag & FL_ANY))
 	    goto err;
@@ -365,14 +383,14 @@ conv_flt (FILE *stream, width_t width, void *addr, uint16_t flags)
 	{
 	    int expacc;
 
-	    if (!--width || (i = getc (stream)) < 0) goto err;
+	    if (!--width || (i = scanf_getc (stream, lenp)) < 0) goto err;
 	    switch ((unsigned char)i) {
 	      case '-':
 		flag |= FL_MEXP;
 		/* FALLTHROUGH */
 	      case '+':
 		if (!--width) goto err;
-		i = getc (stream);		/* test EOF will below	*/
+		i = scanf_getc (stream, lenp);		/* test EOF will below	*/
 	    }
 
 	    if (!isdigit (i)) goto err;
@@ -380,13 +398,13 @@ conv_flt (FILE *stream, width_t width, void *addr, uint16_t flags)
 	    expacc = 0;
 	    do {
 		expacc = expacc * 10 + (i - '0');
-	    } while (--width && isdigit (i = getc(stream)));
+	    } while (--width && isdigit (i = scanf_getc(stream, lenp)));
 	    if (flag & FL_MEXP)
 		expacc = -expacc;
 	    exp += expacc;
 	}
 
-	if (width && i >= 0) ungetc (i, stream);
+	if (width && i >= 0) scanf_ungetc (i, stream, lenp);
 
 	flt = u64;
 
@@ -426,14 +444,14 @@ conv_flt (FILE *stream, width_t width, void *addr, uint16_t flags)
 }
 #endif	/* SCANF_FLOAT	*/
 
-static int skip_spaces (FILE *stream)
+static int skip_spaces (FILE *stream, int *lenp)
 {
     int i;
     do {
-	if ((i = getc (stream)) < 0)
+	if ((i = scanf_getc (stream, lenp)) < 0)
 	    return i;
     } while (isspace (i));
-    ungetc (i, stream);
+    scanf_ungetc (i, stream, lenp);
     return i;
 }
 
@@ -578,9 +596,10 @@ int vfscanf (FILE * stream, const char *fmt, va_list ap)
     void *addr;
     uint16_t flags;
     int i;
+    int scanf_len = 0;
+#define lenp (&scanf_len)
 
     nconvs = 0;
-    stream->len = 0;
 
     /* Initialization of stream_flags at each pass simplifies the register
        allocation with GCC 3.3 - 4.2.  Only the GCC 4.3 is good to move it
@@ -588,16 +607,16 @@ int vfscanf (FILE * stream, const char *fmt, va_list ap)
     while ((c = *fmt++) != 0) {
 
 	if (isspace (c)) {
-	    skip_spaces (stream);
+	    skip_spaces (stream, lenp);
 
 	} else if (c != '%'
 		   || (c = *fmt++) == '%')
 	{
 	    /* Ordinary character.	*/
-	    if ((i = getc (stream)) < 0)
+	    if ((i = scanf_getc (stream, lenp)) < 0)
 		goto eof;
 	    if ((unsigned char)i != c) {
-		ungetc (i, stream);
+		scanf_ungetc (i, stream, lenp);
 		break;
 	    }
 	
@@ -627,6 +646,9 @@ int vfscanf (FILE * stream, const char *fmt, va_list ap)
 	    switch (c) {
 	      case 'h':
 		if ((c = *fmt++) != 'h') {
+#ifdef _WANT_IO_C99_FORMATS
+		is_short:
+#endif
 		    flags |= FL_SHORT;
 		    break;
 		}
@@ -634,9 +656,28 @@ int vfscanf (FILE * stream, const char *fmt, va_list ap)
 		c = *fmt++;
 		break;
 	      case 'l':
+#ifdef _WANT_IO_C99_FORMATS
+	    is_long:
+#endif
 		flags |= FL_LONG;
 		c = *fmt++;
 		break;
+#ifdef _WANT_IO_C99_FORMATS
+#define CHECK_INT_SIZE(letter, type)				\
+	    case letter:					\
+		if (sizeof(type) != sizeof(int)) {		\
+		    if (sizeof(type) == sizeof(long))		\
+			goto is_long;				\
+		    if (sizeof(type) == sizeof(short))		\
+			goto is_short;				\
+		}						\
+		c = *fmt++;					\
+		break;
+
+	    CHECK_INT_SIZE('j', intmax_t);
+	    CHECK_INT_SIZE('z', size_t);
+	    CHECK_INT_SIZE('t', ptrdiff_t);
+#endif
 	    }
 
 #define CNV_BASE	"cdinopsuxX"
@@ -657,14 +698,14 @@ int vfscanf (FILE * stream, const char *fmt, va_list ap)
 	    addr = (flags & FL_STAR) ? 0 : va_arg (ap, void *);
 
 	    if (c == 'n') {
-		putval (addr, (unsigned)(stream->len), flags);
+		putval (addr, (unsigned)(scanf_len), flags);
 		continue;
 	    }
 
 	    if (c == 'c') {
 		if (!(flags & FL_WIDTH)) width = 1;
 		do {
-		    if ((i = getc (stream)) < 0)
+		    if ((i = scanf_getc (stream, lenp)) < 0)
 			goto eof;
 		    if (addr) *(char *)addr++ = i;
 		} while (--width);
@@ -672,13 +713,13 @@ int vfscanf (FILE * stream, const char *fmt, va_list ap)
 
 #if  SCANF_BRACKET
 	    } else if (c == '[') {
-		fmt = conv_brk (stream, width, addr, fmt);
+		fmt = conv_brk (stream, lenp, width, addr, fmt);
 		c = (fmt != 0);
 #endif
 
 	    } else {
 
-		if (skip_spaces (stream) < 0)
+		if (skip_spaces (stream, lenp) < 0)
 		    goto eof;
 		
 		switch (c) {
@@ -686,10 +727,10 @@ int vfscanf (FILE * stream, const char *fmt, va_list ap)
 		  case 's':
 		    /* Now we have 1 nospace symbol.	*/
 		    do {
-			if ((i = getc (stream)) < 0)
+			if ((i = scanf_getc (stream, lenp)) < 0)
 			    break;
 			if (isspace (i)) {
-			    ungetc (i, stream);
+			    scanf_ungetc (i, stream, lenp);
 			    break;
 			}
 			if (addr) *(char *)addr++ = i;
@@ -715,11 +756,11 @@ int vfscanf (FILE * stream, const char *fmt, va_list ap)
 		    /* FALLTHROUGH */
 		  case 'i':
 		  conv_int:
-		    c = conv_int (stream, width, addr, flags);
+		    c = conv_int (stream, lenp, width, addr, flags);
 		    break;
 
 	          default:		/* e,E,f,F,g,G	*/
-		      c = conv_flt (stream, width, addr, flags);
+		      c = conv_flt (stream, lenp, width, addr, flags);
 #else
 	          case 'd':
 		  case 'u':
@@ -735,7 +776,7 @@ int vfscanf (FILE * stream, const char *fmt, va_list ap)
 		  default:			/* p,x,X	*/
 		    flags |= FL_HEX;
 		  conv_int:
-		    c = conv_int (stream, width, addr, flags);
+		    c = conv_int (stream, lenp, width, addr, flags);
 #endif
 		}
 	    } /* else */

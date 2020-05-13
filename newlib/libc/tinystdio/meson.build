@@ -32,8 +32,6 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
-subdir('sys')
-
 srcs_tinystdio = [
     'clearerr.c',
     'dtoa_engine.c',
@@ -42,8 +40,10 @@ srcs_tinystdio = [
     'fdevopen.c',
     'feof.c',
     'ferror.c',
+    'fflush.c',
     'fgetc.c',
     'fgets.c',
+    'fileno.c',
     'fiprintf.c',
     'fiscanf.c',
     'fprintf.c',
@@ -53,6 +53,8 @@ srcs_tinystdio = [
     'fread.c',
     'fscanf.c',
     'fscanff.c',
+    'fseek.c',
+    'ftell.c',
     'ftoa_data.c',
     'ftoa_engine.c',
     'fwrite.c',
@@ -68,6 +70,7 @@ srcs_tinystdio = [
     'puts.c',
     'scanf.c',
     'scanff.c',
+    'setbuf.c',
     'siprintf.c',
     'siscanf.c',
     'sniprintf.c',
@@ -99,6 +102,10 @@ srcs_tinystdio = [
     'vsprintf.c',
     'vsprintff.c',
 ]
+
+if have_long_double and not long_double_equals_double
+  srcs_tinystdio += 'strtold.c'
+endif
 
 srcs_tinystdio_posix = [
     'fopen.c',

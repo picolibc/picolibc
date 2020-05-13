@@ -1,3 +1,7 @@
+/*
+Copyright (c) 1990 Regents of the University of California.
+All rights reserved.
+ */
 /* This is an implementation of the __eprintf function which is
    compatible with the assert.h which is distributed with gcc.
 
@@ -20,7 +24,7 @@ __eprintf (format, file, line, expression)
      unsigned int line;
      const char *expression;
 {
-  (void) fiprintf (stderr, format, file, line, expression);
+  (void) __i_fprintf (stderr, format, file, line, expression);
   abort ();
   /*NOTREACHED*/
 }

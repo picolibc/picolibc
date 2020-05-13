@@ -1,3 +1,19 @@
+/*
+ * Copyright (c) 1994 Cygnus Support.
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms are permitted
+ * provided that the above copyright notice and this paragraph are
+ * duplicated in all such forms and that any documentation,
+ * and/or other materials related to such
+ * distribution and use acknowledge that the software was developed
+ * at Cygnus Support, Inc.  Cygnus Support, Inc. may not be used to
+ * endorse or promote products derived from this software without
+ * specific prior written permission.
+ * THIS SOFTWARE IS PROVIDED ``AS IS'' AND WITHOUT ANY EXPRESS OR
+ * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+ */
 #include "test.h"
  one_line_type sinh_vec[] = {
 {63, 0,123,__LINE__, 0xbff826c0, 0xf3412348, 0xbff33333, 0x33333333},	/* -1.50946=f(-1.2)*/
@@ -285,4 +301,4 @@
 {61, 0,123,__LINE__, 0x42613b19, 0x1e69fb1e, 0x403bcccc, 0xccccccc9},	/* 5.92048e+11=f(27.8)*/
 {60, 0,123,__LINE__, 0x42879487, 0x9e85b8ea, 0x403d7fff, 0xfffffffc},	/* 3.24084e+12=f(29.5)*/
 0,};
-test_sinh(m)   {run_vector_1(m,sinh_vec,(char *)(sinh),"sinh","dd");   }	
+void test_sinh(m)   {run_vector_1(m,sinh_vec,(char *)(sinh),"sinh","dd");   }	

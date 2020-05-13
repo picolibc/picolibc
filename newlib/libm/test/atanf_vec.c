@@ -1,3 +1,19 @@
+/*
+ * Copyright (c) 1994 Cygnus Support.
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms are permitted
+ * provided that the above copyright notice and this paragraph are
+ * duplicated in all such forms and that any documentation,
+ * and/or other materials related to such
+ * distribution and use acknowledge that the software was developed
+ * at Cygnus Support, Inc.  Cygnus Support, Inc. may not be used to
+ * endorse or promote products derived from this software without
+ * specific prior written permission.
+ * THIS SOFTWARE IS PROVIDED ``AS IS'' AND WITHOUT ANY EXPRESS OR
+ * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+ */
 #include "test.h"
  one_line_type atanf_vec[] = {
 {39, 0,123,__LINE__, 0xbfec08aa, 0xef14d674, 0xbff33333, 0x33333333},	/* -0.876058=f(-1.2)*/
@@ -285,4 +301,4 @@
 {41, 0,123,__LINE__, 0x3ff88eb5, 0x05d253be, 0x403bcccc, 0xccccccc9},	/* 1.53484=f(27.8)*/
 {41, 0,123,__LINE__, 0x3ff8972f, 0xfc482372, 0x403d7fff, 0xfffffffc},	/* 1.53691=f(29.5)*/
 0,};
-test_atanf(m)   {run_vector_1(m,atanf_vec,(char *)(atanf),"atanf","ff");   }	
+void test_atanf(m)   {run_vector_1(m,atanf_vec,(char *)(atanf),"atanf","ff");   }	

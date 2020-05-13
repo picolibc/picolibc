@@ -1,7 +1,7 @@
 ! Entry: arg0: string start address
 ! Exit:  result: length
 !
-! Copyright 2002 SuperH Ltd.
+/* Copyright 2002 SuperH Ltd. */
 
 #include "asm.h"
 

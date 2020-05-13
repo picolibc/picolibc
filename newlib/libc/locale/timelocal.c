@@ -143,6 +143,7 @@ const struct lc_time_T	_C_time_locale = {
 #endif
 };
 
+#ifdef __CYGWIN__
 int
 __time_load_locale (struct __locale_t *locale, const char *name,
 		    void *f_wctomb, const char *charset)
@@ -150,8 +151,6 @@ __time_load_locale (struct __locale_t *locale, const char *name,
   int	ret;
   struct lc_time_T ti;
   char *bufp = NULL;
-
-#ifdef __CYGWIN__
   extern int __set_lc_time_from_win (const char *, const struct lc_time_T *,
 				     struct lc_time_T *, char **, void *,
 				     const char *);
@@ -183,8 +182,6 @@ __time_load_locale (struct __locale_t *locale, const char *name,
 	}
       ret = 0;
     }
-#else
-  /* TODO */
-#endif
   return (ret);
 }
+#endif

@@ -1,3 +1,7 @@
+/*
+Copyright (c) 1990 Regents of the University of California.
+All rights reserved.
+ */
 #ifndef MALLOC_PROVIDED
 /* malign.c -- a wrapper for memalign_r.  */
 

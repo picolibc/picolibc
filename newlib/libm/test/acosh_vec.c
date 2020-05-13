@@ -1,3 +1,19 @@
+/*
+ * Copyright (c) 1994 Cygnus Support.
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms are permitted
+ * provided that the above copyright notice and this paragraph are
+ * duplicated in all such forms and that any documentation,
+ * and/or other materials related to such
+ * distribution and use acknowledge that the software was developed
+ * at Cygnus Support, Inc.  Cygnus Support, Inc. may not be used to
+ * endorse or promote products derived from this software without
+ * specific prior written permission.
+ * THIS SOFTWARE IS PROVIDED ``AS IS'' AND WITHOUT ANY EXPRESS OR
+ * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+ */
 #include "test.h"
  one_line_type acosh_vec[] = {
 { 0, 0, 33,__LINE__, 0xfff80000, 0x00000000, 0xbff33333, 0x33333333},	/* -nan=f(-1.2)*/
@@ -285,4 +301,4 @@
 {64, 0,123,__LINE__, 0x40101249, 0xc6ea2cbb, 0x403bcccc, 0xccccccc9},	/* 4.01786=f(27.8)*/
 {64, 0,123,__LINE__, 0x40104f1a, 0xa2d94c29, 0x403d7fff, 0xfffffffc},	/* 4.07725=f(29.5)*/
 0,};
-test_acosh(m)   {run_vector_1(m,acosh_vec,(char *)(acosh),"acosh","dd");   }	
+void test_acosh(m)   {run_vector_1(m,acosh_vec,(char *)(acosh),"acosh","dd");   }	

@@ -33,21 +33,26 @@
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 src_semihost_machine = {
-			'riscv' : 'riscv/semihost-riscv.c',
-			'riscv64' : 'riscv/semihost-riscv.c',
+			'riscv' : 'riscv/semihost-riscv.s',
+			'riscv32' : 'riscv/semihost-riscv.s',
+			'riscv64' : 'riscv/semihost-riscv.s',
 			'arm' : 'arm/semihost-arm.c'
 		      }
 
-if src_semihost_machine.has_key(host_cpu)
+if src_semihost_machine.has_key(host_cpu_family)
   srcs_semihost = [
     'close.c',
     'exit.c',
-    'iob.c',
+    'fstat.c',
+    'isatty.c',
+    'kill.c',
     'lseek.c',
     'open.c',
     'read.c',
+    'unlink.c',
     'write.c',
     'sys_clock.c',
+    'sys_close.c',
     'sys_errno.c',
     'sys_feature.c',
     'sys_flen.c',
@@ -56,9 +61,15 @@ if src_semihost_machine.has_key(host_cpu)
     'sys_open.c',
     'sys_putc.c',
     'sys_read.c',
-    'sys_close.c',
-    join_paths('machine', src_semihost_machine[host_cpu])
+    'sys_remove.c',
+    join_paths('machine', src_semihost_machine[host_cpu_family])
   ]
+
+  if newlib_tinystdio
+    srcs_semihost += 'iob.c'
+  else
+    srcs_semihost += 'mapstdio.c'
+  endif
 
   install_headers(
     'semihost.h'

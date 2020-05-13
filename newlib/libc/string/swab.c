@@ -1,3 +1,4 @@
+/* Copyright (c) 2000 Alexandre Oliva <aoliva@redhat.com> */
 /*
 FUNCTION
 	<<swab>>---swap adjacent bytes

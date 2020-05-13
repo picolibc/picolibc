@@ -1,3 +1,19 @@
+/*
+ * Copyright (c) 1994 Cygnus Support.
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms are permitted
+ * provided that the above copyright notice and this paragraph are
+ * duplicated in all such forms and that any documentation,
+ * and/or other materials related to such
+ * distribution and use acknowledge that the software was developed
+ * at Cygnus Support, Inc.  Cygnus Support, Inc. may not be used to
+ * endorse or promote products derived from this software without
+ * specific prior written permission.
+ * THIS SOFTWARE IS PROVIDED ``AS IS'' AND WITHOUT ANY EXPRESS OR
+ * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+ */
 #include "test.h"
  one_line_type erfcf_vec[] = {
 {37, 0,123,__LINE__, 0x3ffe90a5, 0x668e2743, 0xbff33333, 0x33333333},	/* 1.91031=f(-1.2)*/
@@ -281,6 +297,6 @@
 {64, 0, 34,__LINE__, 0x00000000, 0x00000000, 0x40386666, 0x66666663},	/* 0=f(24.4)*/
 {64, 0, 34,__LINE__, 0x00000000, 0x00000000, 0x403a1999, 0x99999996},	/* 0=f(26.1)*/
 {64, 0, 34,__LINE__, 0x00000000, 0x00000000, 0x403bcccc, 0xccccccc9},	/* 0=f(27.8)*/
-{ 2, 0, 34,__LINE__, 0x3379b604, 0xad690000, 0x403d7fff, 0xfffffffc},	/* 1e-60=f(29.5)*/
+{31, 0, 34,__LINE__, 0x3379b604, 0xad690000, 0x403d7fff, 0xfffffffc},	/* 1e-60=f(29.5)*/
 0,};
-test_erfcf(m)   {run_vector_1(m,erfcf_vec,(char *)(erfcf),"erfcf","ff");   }	
+void test_erfcf(m)   {run_vector_1(m,erfcf_vec,(char *)(erfcf),"erfcf","ff");   }	

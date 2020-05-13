@@ -1,4 +1,37 @@
 /*
+Copyright (c) 1991, 1993
+The Regents of the University of California.  All rights reserved.
+c) UNIX System Laboratories, Inc.
+All or some portions of this file are derived from material licensed
+to the University of California by American Telephone and Telegraph
+Co. or Unix System Laboratories, Inc. and are reproduced herein with
+the permission of UNIX System Laboratories, Inc.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions
+are met:
+1. Redistributions of source code must retain the above copyright
+notice, this list of conditions and the following disclaimer.
+2. Redistributions in binary form must reproduce the above copyright
+notice, this list of conditions and the following disclaimer in the
+documentation and/or other materials provided with the distribution.
+3. Neither the name of the University nor the names of its contributors
+may be used to endorse or promote products derived from this software
+without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS ``AS IS'' AND
+ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ARE DISCLAIMED.  IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE
+FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
+OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+SUCH DAMAGE.
+ */
+/*
  * stdlib.h
  *
  * Definitions for common types, variables, and functions.
@@ -106,7 +139,6 @@ int	mbtowc (wchar_t *__restrict, const char *__restrict, size_t);
 int	wctomb (char *, wchar_t);
 size_t	mbstowcs (wchar_t *__restrict, const char *__restrict, size_t);
 size_t	wcstombs (char *__restrict, const wchar_t *__restrict, size_t);
-#ifndef _REENT_ONLY
 #if __BSD_VISIBLE || __POSIX_VISIBLE >= 200809
 char *	mkdtemp (char *);
 #endif
@@ -123,7 +155,6 @@ int	mkstemps (char *, int);
 #if __BSD_VISIBLE || (__XSI_VISIBLE >= 4 && __POSIX_VISIBLE < 200112)
 char *	mktemp (char *) _ATTRIBUTE ((__deprecated__("the use of `mktemp' is dangerous; use `mkstemp' instead")));
 #endif
-#endif /* !_REENT_ONLY */
 void	qsort (void *__base, size_t __nmemb, size_t __size, __compar_fn_t _compar);
 int	rand (void);
 void	*realloc(void *, size_t) __result_use_check __alloc_size(2) _NOTHROW;
@@ -142,7 +173,6 @@ void	setkey (const char *__key);
 #endif
 void	srand (unsigned __seed);
 double	strtod (const char *__restrict __n, char **__restrict __end_PTR);
-double	_strtod_r (const char *__restrict __n, char **__restrict __end_PTR);
 #if __ISO_C_VISIBLE >= 1999
 float	strtof (const char *__restrict __n, char **__restrict __end_PTR);
 #endif
@@ -264,7 +294,8 @@ int	posix_memalign (void **, size_t, size_t) __nonnull((1))
 	    __result_use_check;
 #endif
 
-char *	_dtoa_r (double, int, int, int *, int*, char**);
+char *	__dtoa (double, int, int, int *, int*, char**);
+char *  __ldtoa (long double, int, int, int *, int *, char **);
 
 void	__eprintf (const char *, const char *, unsigned int, const char *);
 

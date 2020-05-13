@@ -72,20 +72,7 @@ const struct lc_monetary_T _C_monetary_locale = {
 };
 
 #ifdef __HAVE_LOCALE_INFO__
-
-#ifndef __CYGWIN__
-static struct lc_monetary_T _monetary_locale;
-static int	_monetary_using_locale;
-static char	*_monetary_locale_buf;
-
-static char
-cnv(const char *str) {
-	int i = strtol(str, NULL, 10);
-	if (i == -1)
-		i = CHAR_MAX;
-	return (char)i;
-}
-#endif
+#ifdef __CYGWIN__
 
 int
 __monetary_load_locale (struct __locale_t *locale, const char *name ,
@@ -95,7 +82,6 @@ __monetary_load_locale (struct __locale_t *locale, const char *name ,
   struct lc_monetary_T mo;
   char *bufp = NULL;
 
-#ifdef __CYGWIN__
   extern int __set_lc_monetary_from_win (const char *,
 					 const struct lc_monetary_T *,
 					 struct lc_monetary_T *, char **,
@@ -128,10 +114,8 @@ __monetary_load_locale (struct __locale_t *locale, const char *name ,
 	}
       ret = 0;
     }
-#else
-  /* TODO */
-#endif
   return ret;
 }
 
+#endif
 #endif

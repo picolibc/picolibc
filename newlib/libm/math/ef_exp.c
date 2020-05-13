@@ -81,7 +81,7 @@ __strong_reference(__ieee754_expf, expf);
 	    }
 	    x  = hi - lo;
 	} 
-	else if(hx < 0x31800000)  {	/* when |x|<2**-28 */
+	else if(hx < 0x34000000)  {	/* when |x|<2**-23 */
 	    if(huge+x>one) return one+x;/* trigger inexact */
 	}
 

@@ -84,14 +84,27 @@ T[] =  {
 	__int32_t ix,hx;
 	GET_HIGH_WORD(hx,x);
 	ix = hx&0x7fffffff;	/* high word of |x| */
-	if(ix<0x3e300000)			/* x < 2**-28 */
-	    {if((int)x==0) {			/* generate inexact */
-	        __uint32_t low;
-		GET_LOW_WORD(low,x);
-		if(((ix|low)|(iy+1))==0) return one/fabs(x);
-		else return (iy==1)? x: -one/x;
-	    }
-	    }
+	if(ix<0x3e300000) {			/* x < 2**-28 */
+		if((int)x==0) {			/* generate inexact */
+			__uint32_t low;
+			GET_LOW_WORD(low,x);
+			if(((ix|low)|(iy+1))==0) return one/fabs(x);
+			else {
+				if(iy==1)
+					return x;
+				else {
+					double a, t;
+					z = w = x + y;
+					SET_LOW_WORD(z,0);
+					v = y - (z - x);
+					t = a = -one / w;
+					SET_LOW_WORD(t,0);
+					s = one + t * z;
+					return t + a * (s + t * v);
+				}
+			}
+		}
+	}
 	if(ix>=0x3FE59428) { 			/* |x|>=0.6744 */
 	    if(hx<0) {x = -x; y = -y;}
 	    z = pio4-x;

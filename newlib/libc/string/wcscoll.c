@@ -1,3 +1,4 @@
+/* Copyright (c) 2003 Corinna Vinschen <corinna@vinschen.de> */
 /*
 FUNCTION
 	<<wcscoll>>---locale-specific wide-character string compare

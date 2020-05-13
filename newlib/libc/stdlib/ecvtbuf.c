@@ -1,4 +1,8 @@
 /*
+Copyright (c) 1990 Regents of the University of California.
+All rights reserved.
+ */
+/*
 FUNCTION
 <<ecvtbuf>>, <<fcvtbuf>>---double or float to string
 
@@ -70,7 +74,7 @@ print_f (
   int sign;
   char *p, *start, *end;
 
-  start = p = _dtoa_r (invalue, mode, ndigit, &decpt, &sign, &end);
+  start = p = __dtoa (invalue, mode, ndigit, &decpt, &sign, &end);
 
   if (decpt == 9999)
     {
@@ -93,7 +97,8 @@ print_f (
     {
       if (p == start)
 	*buf++ = '0';
-      *buf++ = '.';
+      if (decpt < 0 && ndigit > 0)
+	*buf++ = '.';
       while (decpt < 0 && ndigit > 0)
 	{
 	  *buf++ = '0';
@@ -139,7 +144,7 @@ print_e (
   int top;
   int ndigit = width;
 
-  p = _dtoa_r (invalue, 2, width + 1, &decpt, &sign, &end);
+  p = __dtoa (invalue, 2, width + 1, &decpt, &sign, &end);
 
   if (decpt == 9999)
     {
@@ -148,11 +153,15 @@ print_e (
     }
 
   *buf++ = *p++;
-  if (dot || ndigit != 0)
-    *buf++ = '.';
+  if (ndigit > 0)
+    dot = 1;
 
   while (*p && ndigit > 0)
     {
+      if (dot) {
+	*buf++ = '.';
+	dot = 0;
+      }
       *buf++ = *p++;
       ndigit--;
     }
@@ -168,6 +177,10 @@ print_e (
     {
       while (ndigit > 0)
 	{
+	  if  (dot) {
+	    *buf++ = '.';
+	    dot = 0;
+	  }
 	  *buf++ = '0';
 	  ndigit--;
 	}
@@ -249,18 +262,12 @@ fcvtbuf (double invalue,
 
   save = fcvt_buf;
 
-  if (invalue < 1.0 && invalue > -1.0)
-    {
-      p = _dtoa_r (invalue, 2, ndigit, decpt, sign, &end);
-    }
-  else
-    {
-      p = _dtoa_r (invalue, 3, ndigit, decpt, sign, &end);
-    }
+  p = __dtoa (invalue, 3, ndigit, decpt, sign, &end);
 
   /* Now copy */
 
   done = -*decpt;
+
   while (p < end)
     {
       *fcvt_buf++ = *p++;
@@ -304,7 +311,7 @@ ecvtbuf (double invalue,
 
   save = fcvt_buf;
 
-  p = _dtoa_r (invalue, 2, ndigit, decpt, sign, &end);
+  p = __dtoa (invalue, 2, ndigit, decpt, sign, &end);
 
   /* Now copy */
 
@@ -369,15 +376,10 @@ _gcvt (
       char *end;
       char *p;
 
-      if (invalue < 1.0)
-	{
-	  /* what we want is ndigits after the point */
-	  p = _dtoa_r (invalue, 3, ndigit, &decpt, &sign, &end);
-	}
-      else
-	{
-	  p = _dtoa_r (invalue, 2, ndigit, &decpt, &sign, &end);
-	}
+      /* We always want ndigits of precision, even if that means printing
+       * a bunch of leading zeros for numbers < 1.0
+       */
+      p = __dtoa (invalue, 2, ndigit, &decpt, &sign, &end);
 
       if (decpt == 9999)
 	{
@@ -403,11 +405,12 @@ _gcvt (
 	  if (buf == save)
 	    *buf++ = '0';
 	  *buf++ = '.';
-	  while (decpt < 0 && ndigit > 0)
+
+	  /* Leading zeros don't count towards 'ndigit' */
+	  while (decpt < 0)
 	    {
 	      *buf++ = '0';
 	      decpt++;
-	      ndigit--;
 	    }
 
 	  /* Print rest of stuff */

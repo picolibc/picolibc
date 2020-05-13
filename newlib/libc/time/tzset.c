@@ -1,3 +1,4 @@
+/* Copyright (c) 2002 Jeff Johnston <jjohnstn@redhat.com> */
 /*
 FUNCTION
 <<tzset>>---set timezone characteristics from TZ environment variable
@@ -70,7 +71,7 @@ static char __tzname_dst[11];
 static char *prev_tzenv = NULL;
 
 void
-tzset_unlocked (void)
+_tzset_unlocked (void)
 {
   char *tzenv;
   unsigned short hh, mm, ss, m, w, d;
@@ -242,6 +243,6 @@ void
 tzset (void)
 {
   TZ_LOCK;
-  tzset_unlocked ();
+  _tzset_unlocked ();
   TZ_UNLOCK;
 }

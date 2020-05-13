@@ -9,9 +9,6 @@
 
 /* These are the externally visible entries. */
 /* linux name:  long double _IO_strtold (char *, char **); */
-long double _strtold (char *, char **);
-char *_ldtoa_r (struct _reent *, long double, int, int, int *, int *,
-		char **);
 int _ldcheck (long double *);
 #if 0
 void _IO_ldtostr (long double *, char *, int, int, char);
@@ -2783,8 +2780,8 @@ _IO_ldtostr (x, string, ndigs, flags, fmt)
 /* This routine will not return more than NDEC+1 digits. */
 
 char *
-_ldtoa_r (struct _reent *ptr, long double d, int mode, int ndigits,
-	  int *decpt, int *sign, char **rve)
+__ldtoa (long double d, int mode, int ndigits,
+       int *decpt, int *sign, char **rve)
 {
   unsigned short e[NI];
   char *s, *p;
@@ -2922,9 +2919,7 @@ stripspaces:
     _mprec_result_k++;
   if (__mprec_register_exit() != 0)
     return NULL;
-  _mprec_result = Balloc (_mprec_result_k);
-  if (!_mprec_result)
-    return NULL;
+  _mprec_result = eBalloc (_mprec_result_k);
 
 /* Copy from internal temporary buffer to permanent buffer.  */
   outstr = (char *) _mprec_result;
@@ -3310,7 +3305,7 @@ bxit:
 */
 
 long double
-_strtold (char *s, char **se)
+strtold (char *s, char **se)
 {
   union uconv x;
   LDPARMS rnd;

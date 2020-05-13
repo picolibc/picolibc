@@ -39,11 +39,13 @@
 #include <stdlib.h>
 #include <inttypes.h>
 
-static const double pwr_p10 [6] = {
-    1e+1, 1e+2, 1e+4, 1e+8, 1e+16, 1e+32
+#define NPOW_10	9
+
+static const double pwr_p10 [NPOW_10] = {
+    1e+1, 1e+2, 1e+4, 1e+8, 1e+16, 1e+32, 1e+64, 1e+128, 1e+256,
 };
-static const double pwr_m10 [6] = {
-    1e-1, 1e-2, 1e-4, 1e-8, 1e-16, 1e-32
+static const double pwr_m10 [NPOW_10] = {
+    1e-1, 1e-2, 1e-4, 1e-8, 1e-16, 1e-32, 1e-64, 1e-128, 1e-256,
 };
 
 /* PSTR() is not used to save 1 byte per string: '\0' at the tail.	*/
@@ -191,12 +193,12 @@ strtod (const char * nptr, char ** endptr)
 	int pwr;
 	const double *pptr;
 	if (exp < 0) {
-	    pptr = (pwr_m10 + 5);
+	    pptr = (pwr_m10 + NPOW_10 - 1);
 	    exp = -exp;
 	} else {
-	    pptr = (pwr_p10 + 5);
+	    pptr = (pwr_p10 + NPOW_10 - 1);
 	}
-	for (pwr = 32; pwr; pwr >>= 1) {
+	for (pwr = 1 << (NPOW_10 - 1); pwr; pwr >>= 1) {
 	    for (; exp >= pwr; exp -= pwr) {
 		flt *= *pptr;
 	    }
@@ -208,3 +210,15 @@ strtod (const char * nptr, char ** endptr)
 
     return flt;
 }
+
+#if defined(_HAVE_LONG_DOUBLE) && defined(_LDBL_EQ_DBL)
+#ifdef HAVE_ALIAS_ATTRIBUTE
+extern long double strtold(const char *, char **) __attribute__ ((__alias__ ("strtod")));
+#else
+long double
+strtold (const char * nptr, char ** endptr)
+{
+	return (long double) strtod(nptr, endptr);
+}
+#endif
+#endif

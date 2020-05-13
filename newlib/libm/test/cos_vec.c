@@ -1,3 +1,19 @@
+/*
+ * Copyright (c) 1994 Cygnus Support.
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms are permitted
+ * provided that the above copyright notice and this paragraph are
+ * duplicated in all such forms and that any documentation,
+ * and/or other materials related to such
+ * distribution and use acknowledge that the software was developed
+ * at Cygnus Support, Inc.  Cygnus Support, Inc. may not be used to
+ * endorse or promote products derived from this software without
+ * specific prior written permission.
+ * THIS SOFTWARE IS PROVIDED ``AS IS'' AND WITHOUT ANY EXPRESS OR
+ * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+ */
 #include "test.h"
  one_line_type cos_vec[] = {
 {63, 0,123,__LINE__, 0x3fd730de, 0x943b79d4, 0xbff33333, 0x33333333},	/* 0.362358=f(-1.2)*/
@@ -241,9 +257,9 @@
 {62, 0,123,__LINE__, 0x3fd86112, 0x83b8fa95, 0x3ff2e147, 0xae147ae9},	/* 0.380925=f(1.18)*/
 {63, 0,123,__LINE__, 0x3fd7c946, 0x7d260c9c, 0x3ff30a3d, 0x70a3d712},	/* 0.37166=f(1.19)*/
 {63, 0,123,__LINE__, 0x3ff00000, 0x00000000, 0xc01921fb, 0x54442d18},	/* 1=f(-6.28319)*/
-{ 2, 0,123,__LINE__, 0xbcaa7939, 0x4c9e8a0a, 0xc012d97c, 0x7f3321d2},	/* -1.83697e-16=f(-4.71239)*/
+{64, 0,123,__LINE__, 0xbcaa7939, 0x4c9e8a0a, 0xc012d97c, 0x7f3321d2},	/* -1.83697e-16=f(-4.71239)*/
 {63, 0,123,__LINE__, 0xbff00000, 0x00000000, 0xc00921fb, 0x54442d18},	/* -1=f(-3.14159)*/
-{ 2, 0,123,__LINE__, 0x3c91a626, 0x33145c07, 0xbff921fb, 0x54442d18},	/* 6.12323e-17=f(-1.5708)*/
+{64, 0,123,__LINE__, 0x3c91a626, 0x33145c07, 0xbff921fb, 0x54442d18},	/* 6.12323e-17=f(-1.5708)*/
 {63, 0,123,__LINE__, 0x3ff00000, 0x00000000, 0x00000000, 0x00000000},	/* 1=f(0)*/
 { 1, 0,123,__LINE__, 0x3c91a626, 0x33145c07, 0x3ff921fb, 0x54442d18},	/* 6.12323e-17=f(1.5708)*/
 {63, 0,123,__LINE__, 0xbff00000, 0x00000000, 0x400921fb, 0x54442d18},	/* -1=f(3.14159)*/
@@ -285,4 +301,4 @@
 {62, 0,123,__LINE__, 0xbfec7794, 0x7992f401, 0x403bcccc, 0xccccccc9},	/* -0.889597=f(27.8)*/
 {58, 0,123,__LINE__, 0xbfd5a705, 0x9eaeac43, 0x403d7fff, 0xfffffffc},	/* -0.338319=f(29.5)*/
 0,};
-test_cos(m)   {run_vector_1(m,cos_vec,(char *)(cos),"cos","dd");   }	
+void test_cos(m)   {run_vector_1(m,cos_vec,(char *)(cos),"cos","dd");   }	

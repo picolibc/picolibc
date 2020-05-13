@@ -5,7 +5,7 @@
  * Redistribution and use in source and binary forms are permitted
  * provided that the above copyright notice and this paragraph are
  * duplicated in all such forms and that any documentation,
- * advertising materials, and other materials related to such
+ * and/or other materials related to such
  * distribution and use acknowledge that the software was developed
  * by the University of California, Berkeley.  The name of the
  * University may not be used to endorse or promote products derived
@@ -293,6 +293,7 @@ int	diprintf (int, const char *, ...)
 #endif
 int	fiprintf (FILE *, const char *, ...)
                _ATTRIBUTE ((__format__ (__printf__, 2, 3)));
+#define __i_fprintf fiprintf
 int	fiscanf (FILE *, const char *, ...)
                _ATTRIBUTE ((__format__ (__scanf__, 2, 3)));
 int	iprintf (const char *, ...)
@@ -301,10 +302,12 @@ int	iscanf (const char *, ...)
                _ATTRIBUTE ((__format__ (__scanf__, 1, 2)));
 int	siprintf (char *, const char *, ...)
                _ATTRIBUTE ((__format__ (__printf__, 2, 3)));
+#define __i_sprintf siprintf
 int	siscanf (const char *, const char *, ...)
                _ATTRIBUTE ((__format__ (__scanf__, 2, 3)));
 int	sniprintf (char *, size_t, const char *, ...)
                _ATTRIBUTE ((__format__ (__printf__, 3, 4)));
+#define  __i_snprintf sniprintf
 int	vasiprintf (char **, const char *, __VALIST)
                _ATTRIBUTE ((__format__ (__printf__, 2, 0)));
 char *	vasniprintf (char *, size_t *, const char *, __VALIST)

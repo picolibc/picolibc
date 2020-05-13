@@ -1,6 +1,6 @@
 /* This is a simple version of setjmp and longjmp.
 
-   Nick Clifton, Cygnus Solutions, 13 June 1997.  */
+   Copyright (c) 1997 Nick Clifton, Cygnus Solutions  */
 
 /* ANSI concatenation macros.  */
 #define CONCAT(a, b)  CONCAT2(a, b)

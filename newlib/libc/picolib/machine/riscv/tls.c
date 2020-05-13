@@ -37,11 +37,9 @@
 #include <string.h>
 #include <stdint.h>
 
-extern char __tdata_size[];
-
+/* This code is duplicated in picocrt/machine/riscv/crt0.c */
 void
 _set_tls(void *tls)
 {
-	uint8_t *__tls = tls;
-	asm("mv tp, %0" : : "r" (__tls + (uintptr_t) __tdata_size));
+	asm("mv tp, %0" : : "r" (tls));
 }

@@ -50,7 +50,6 @@ ungetc(int c, FILE *stream)
 	stream->unget = c;
 	stream->flags |= __SUNGET;
 	stream->flags &= ~__SEOF;
-	stream->len--;
 
 	return stream->unget;
 }

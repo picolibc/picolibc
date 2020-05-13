@@ -1,3 +1,6 @@
+/*
+Copyright (c) 2000 Nick Clifton <nickc@redhat.com>
+ */
 #ifndef __XSCALE_MACH_H__
 #define __XSCALE_MACH_H__
 

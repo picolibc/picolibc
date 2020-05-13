@@ -1,3 +1,19 @@
+/*
+ * Copyright (c) 1994 Cygnus Support.
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms are permitted
+ * provided that the above copyright notice and this paragraph are
+ * duplicated in all such forms and that any documentation,
+ * and/or other materials related to such
+ * distribution and use acknowledge that the software was developed
+ * at Cygnus Support, Inc.  Cygnus Support, Inc. may not be used to
+ * endorse or promote products derived from this software without
+ * specific prior written permission.
+ * THIS SOFTWARE IS PROVIDED ``AS IS'' AND WITHOUT ANY EXPRESS OR
+ * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+ */
 #include "test.h"
  one_line_type expf_vec[] = {
 {34, 0,123,__LINE__, 0x3fd346c4, 0x00000000, 0xbff33333, 0x33333333},	/* 0.301194=f(-1.2)*/
@@ -285,4 +301,4 @@
 {32, 0,123,__LINE__, 0x42713b18, 0x40000000, 0x403bcccc, 0xccccccc9},	/* 1.18409e+12=f(27.8)*/
 {31, 0,123,__LINE__, 0x42979487, 0xa0000000, 0x403d7fff, 0xfffffffc},	/* 6.48167e+12=f(29.5)*/
 0,};
-test_expf(m)   {run_vector_1(m,expf_vec,(char *)(expf),"expf","ff");   }	
+void test_expf(m)   {run_vector_1(m,expf_vec,(char *)(expf),"expf","ff");   }	

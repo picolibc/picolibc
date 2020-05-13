@@ -1,4 +1,7 @@
 /*
+Copyright (c) 2016 Corinna Vinschen <corinna@vinschen.de>
+ */
+/*
 FUNCTION
 	<<strcoll_l>>---locale-specific character string compare
 	

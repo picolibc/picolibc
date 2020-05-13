@@ -1,3 +1,19 @@
+/*
+ * Copyright (c) 1994 Cygnus Support.
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms are permitted
+ * provided that the above copyright notice and this paragraph are
+ * duplicated in all such forms and that any documentation,
+ * and/or other materials related to such
+ * distribution and use acknowledge that the software was developed
+ * at Cygnus Support, Inc.  Cygnus Support, Inc. may not be used to
+ * endorse or promote products derived from this software without
+ * specific prior written permission.
+ * THIS SOFTWARE IS PROVIDED ``AS IS'' AND WITHOUT ANY EXPRESS OR
+ * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+ */
 #include "test.h"
  one_line_type tan_vec[] = {
 {63, 0,123,__LINE__, 0xc00493c4, 0x3acb164d, 0xbff33333, 0x33333333},	/* -2.57215=f(-1.2)*/
@@ -285,4 +301,4 @@
 {64, 0,123,__LINE__, 0xbfe06e04, 0xfc5ca3b7, 0x403bcccc, 0xccccccc9},	/* -0.51343=f(27.8)*/
 {64, 0,123,__LINE__, 0x4006407d, 0xaf0ccd5f, 0x403d7fff, 0xfffffffc},	/* 2.78149=f(29.5)*/
 0,};
-test_tan(m)   {run_vector_1(m,tan_vec,(char *)(tan),"tan","dd");   }	
+void test_tan(m)   {run_vector_1(m,tan_vec,(char *)(tan),"tan","dd");   }	

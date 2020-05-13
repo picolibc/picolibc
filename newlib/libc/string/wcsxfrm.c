@@ -1,3 +1,4 @@
+/* Copyright (c) 2007 Corinna Vinschen <corinna@vinschen.de> */
 /*
 FUNCTION
 	<<wcsxfrm>>---locale-specific wide-character string transformation

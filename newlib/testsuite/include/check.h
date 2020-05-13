@@ -1,3 +1,9 @@
+/*
+Copyright (C) 2002 by Red Hat, Incorporated. All rights reserved.
+
+Permission to use, copy, modify, and distribute this software
+is freely granted, provided that this notice is preserved.
+ */
 #include <stdio.h>
 #include <stdlib.h>
 

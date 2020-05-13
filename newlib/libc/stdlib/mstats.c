@@ -1,3 +1,7 @@
+/*
+Copyright (c) 1990 Regents of the University of California.
+All rights reserved.
+ */
 /* VxWorks provides its own version of malloc, and we can't use this
    one because VxWorks does not provide sbrk.  So we have a hook to
    not compile this code.  */
@@ -91,7 +95,7 @@ not portable.
 void
 mstats (char *s)
 {
-  fiprintf (stderr, "Memory allocation statistics %s\n", s);
+  __i_fprintf (stderr, "Memory allocation statistics %s\n", s);
   malloc_stats ();
 }
 

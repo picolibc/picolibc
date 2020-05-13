@@ -1,3 +1,19 @@
+/*
+ * Copyright (c) 1994 Cygnus Support.
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms are permitted
+ * provided that the above copyright notice and this paragraph are
+ * duplicated in all such forms and that any documentation,
+ * and/or other materials related to such
+ * distribution and use acknowledge that the software was developed
+ * at Cygnus Support, Inc.  Cygnus Support, Inc. may not be used to
+ * endorse or promote products derived from this software without
+ * specific prior written permission.
+ * THIS SOFTWARE IS PROVIDED ``AS IS'' AND WITHOUT ANY EXPRESS OR
+ * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+ */
 #include "test.h"
  one_line_type j1f_vec[] = {
 {36, 0,123,__LINE__, 0xbfdfe3f7, 0xd6d8c2cc, 0xbff33333, 0x33333333},	/* -0.498289=f(-1.2)*/
@@ -259,11 +275,11 @@
 {27, 0,123,__LINE__, 0xbf8c74da, 0xb4bbaab5, 0xc0306666, 0x66666668},	/* -0.0138948=f(-16.4)*/
 {33, 0,123,__LINE__, 0xbfca24e7, 0xdd1f580e, 0xc02d6666, 0x6666666a},	/* -0.204251=f(-14.7)*/
 {31, 0,123,__LINE__, 0x3fb2005d, 0x483d9a3b, 0xc02a0000, 0x00000004},	/* 0.0703181=f(-13)*/
-{32, 0,123,__LINE__, 0x3fcb6cb5, 0xbe7e4e3c, 0xc0269999, 0x9999999e},	/* 0.214255=f(-11.3)*/
+{30, 0,123,__LINE__, 0x3fcb6cb5, 0xbe7e4e3c, 0xc0269999, 0x9999999e},	/* 0.214255=f(-11.3)*/
 {32, 0,123,__LINE__, 0xbfc1dbf2, 0x47e3acb7, 0xc0233333, 0x33333338},	/* -0.139525=f(-9.6)*/
 {31, 0,123,__LINE__, 0xbfcc0e12, 0x3bd9d25a, 0xc01f9999, 0x999999a3},	/* -0.219179=f(-7.9)*/
 {30, 0,123,__LINE__, 0x3fcdd036, 0x41e8765f, 0xc018cccc, 0xccccccd6},	/* 0.232917=f(-6.2)*/
-{33, 0,123,__LINE__, 0x3fcd9363, 0x933bd0e5, 0xc0120000, 0x00000009},	/* 0.23106=f(-4.5)*/
+{30, 0,123,__LINE__, 0x3fcd9363, 0x933bd0e5, 0xc0120000, 0x00000009},	/* 0.23106=f(-4.5)*/
 {38, 0,123,__LINE__, 0xbfda38ad, 0x5dbc72a8, 0xc0066666, 0x66666678},	/* -0.409709=f(-2.8)*/
 {35, 0,123,__LINE__, 0xbfde2343, 0xd3fac201, 0xbff19999, 0x999999bd},	/* -0.470902=f(-1.1)*/
 {35, 0,123,__LINE__, 0x3fd2594f, 0x24fccace, 0x3fe33333, 0x333332ec},	/* 0.286701=f(0.6)*/
@@ -285,4 +301,4 @@
 {33, 0,123,__LINE__, 0x3fc25cf8, 0xd1c20f55, 0x403bcccc, 0xccccccc9},	/* 0.143462=f(27.8)*/
 {31, 0,123,__LINE__, 0xbfb07640, 0x84343430, 0x403d7fff, 0xfffffffc},	/* -0.0643044=f(29.5)*/
 0,};
-test_j1f(m)   {run_vector_1(m,j1f_vec,(char *)(j1f),"j1f","ff");   }	
+void test_j1f(m)   {run_vector_1(m,j1f_vec,(char *)(j1f),"j1f","ff");   }	

@@ -130,20 +130,23 @@ SECTIONS
 		KEEP (*(.dtors))
 	} >flash AT>flash :text
 
-	.data : {
+	/*
+	 * Data values which are preserved across reset
+	 */
+	.preserve (NOLOAD) : {
+		PROVIDE(__preserve_start__ = .);
+		*(.preserve .preserve.*)
+		PROVIDE(__preserve_end__ = .);
+	} >ram AT>ram :ram
+
+	.data : ALIGN_WITH_INPUT {
 		PROVIDE(__data_start = .);
 		*(.data .data.*)
 		*(.gnu.linkonce.d.*)
-		. = ALIGN(8);
+ 		. = ALIGN(8);
 		PROVIDE( __global_pointer$ = . + 0x800 );
 		*(.sdata .sdata.* .sdata2.*)
 		*(.gnu.linkonce.s.*)
-		. = ALIGN(8);
-		*(.srodata.cst16)
-		*(.srodata.cst8)
-		*(.srodata.cst4)
-		*(.srodata.cst2)
-		*(.srodata .srodata.*)
 	} >ram AT>flash :ram_init
 	PROVIDE(__data_source = LOADADDR(.data));
 
@@ -159,7 +162,7 @@ SECTIONS
 		PROVIDE( __tls_base = .);
 		*(.tdata .tdata.* .gnu.linkonce.td.*)
 		PROVIDE(__data_end = .);
-	} >ram AT>flash :tls : text
+	} >ram AT>flash :tls :ram_init
 	PROVIDE( __tdata_source = LOADADDR(.tdata) );
 	PROVIDE( __tdata_size = SIZEOF(.tdata) );
 
@@ -168,12 +171,12 @@ SECTIONS
 	PROVIDE( edata = __data_end );
 	PROVIDE( __data_size = __data_end - __data_start );
 
-	.tbss : {
+	.tbss (NOLOAD) : {
 		PROVIDE( __bss_start = . );
 		*(.tbss .tbss.* .gnu.linkonce.tb.*)
 		*(.tcommon)
 		PROVIDE( __tls_end = . );
-	} >ram AT>ram : tls : ram
+	} >ram AT>ram :tls :ram
 	PROVIDE( __tbss_size = SIZEOF(.tbss) );
 	PROVIDE( __tls_size = __tls_end - __tls_base );
 
@@ -186,24 +189,31 @@ SECTIONS
 	 * across them.  We actually need memory allocated for tbss,
 	 * so we create a special segment here just to make room
 	 */
-	.tbss_space : {
+	.tbss_space (NOLOAD) : {
 		. = . + __tbss_size;
-	} >ram AT>ram : ram
+	} >ram AT>ram :ram
 
-	.bss : {
+	.bss (NOLOAD) : {
 		*(.sbss*)
 		*(.gnu.linkonce.sb.*)
 		*(.bss .bss.*)
 		*(.gnu.linkonce.b.*)
 		*(COMMON)
+		. = ALIGN(8);
 		__bss_end = .;
 	} >ram AT>ram :ram
 	PROVIDE( __end = __bss_end );
 	PROVIDE( _end = __bss_end );
 	PROVIDE( end = __bss_end );
-	PROVIDE(__bss_size = __bss_end - __bss_start);
+	PROVIDE( __bss_size = __bss_end - __bss_start );
 
-	PROVIDE( __heap_end = ORIGIN(ram) + LENGTH(ram) - (DEFINED(__stack_size) ? __stack_size : 0x800));
-	PROVIDE( __heap_size = __heap_end - __bss_end );
+	/* Make the rest of memory available for heap storage */
+	PROVIDE( __heap_start = __end );
+	PROVIDE( __heap_end = __stack - (DEFINED(__stack_size) ? __stack_size : 0x800) );
+	PROVIDE( __heap_size = __heap_end - __heap_start );
+
+	/* Throw away C++ exception handling information */
+	/DISCARD/ : {
+		*(.eh_frame .eh_frame.*)
+	}
 }
-

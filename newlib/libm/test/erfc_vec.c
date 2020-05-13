@@ -1,3 +1,19 @@
+/*
+ * Copyright (c) 1994 Cygnus Support.
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms are permitted
+ * provided that the above copyright notice and this paragraph are
+ * duplicated in all such forms and that any documentation,
+ * and/or other materials related to such
+ * distribution and use acknowledge that the software was developed
+ * at Cygnus Support, Inc.  Cygnus Support, Inc. may not be used to
+ * endorse or promote products derived from this software without
+ * specific prior written permission.
+ * THIS SOFTWARE IS PROVIDED ``AS IS'' AND WITHOUT ANY EXPRESS OR
+ * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+ */
 #include "test.h"
  one_line_type erfc_vec[] = {
 {64, 0,123,__LINE__, 0x3ffe90a5, 0x63d96834, 0xbff33333, 0x33333333},	/* 1.91031=f(-1.2)*/
@@ -275,12 +291,12 @@
 {11, 0,123,__LINE__, 0x2d75ac5f, 0xcafcd239, 0x402c6666, 0x66666661},	/* 1.06396e-89=f(14.2)*/
 {11, 0,123,__LINE__, 0x28d5e5e0, 0x93faea9c, 0x402fcccc, 0xccccccc7},	/* 5.69096e-112=f(15.9)*/
 { 3, 0,123,__LINE__, 0x23b1b1bd, 0xee206a73, 0x40319999, 0x99999997},	/* 9.50945e-137=f(17.6)*/
-{ 2, 0,123,__LINE__, 0x1e06d249, 0x0dba141b, 0x40334ccc, 0xccccccca},	/* 4.95376e-164=f(19.3)*/
-{ 2, 0,123,__LINE__, 0x17d77457, 0x7e1fbadd, 0x4034ffff, 0xfffffffd},	/* 8.03245e-194=f(21)*/
-{ 2, 0,123,__LINE__, 0x11232f5c, 0xa5224730, 0x4036b333, 0x33333330},	/* 4.04926e-226=f(22.7)*/
-{ 2, 0,123,__LINE__, 0x09e8f4bb, 0x92ece23f, 0x40386666, 0x66666663},	/* 6.34028e-261=f(24.4)*/
-{ 2, 0,123,__LINE__, 0x0229cb1a, 0x25271190, 0x403a1999, 0x99999996},	/* 3.08122e-298=f(26.1)*/
+{64, 0,123,__LINE__, 0x1e06d249, 0x0dba141b, 0x40334ccc, 0xccccccca},	/* 4.95376e-164=f(19.3)*/
+{64, 0,123,__LINE__, 0x17d77457, 0x7e1fbadd, 0x4034ffff, 0xfffffffd},	/* 8.03245e-194=f(21)*/
+{64, 0,123,__LINE__, 0x11232f5c, 0xa5224730, 0x4036b333, 0x33333330},	/* 4.04926e-226=f(22.7)*/
+{64, 0,123,__LINE__, 0x09e8f4bb, 0x92ece23f, 0x40386666, 0x66666663},	/* 6.34028e-261=f(24.4)*/
+{64, 0,123,__LINE__, 0x0229cb1a, 0x25271190, 0x403a1999, 0x99999996},	/* 3.08122e-298=f(26.1)*/
 {64, 0, 34,__LINE__, 0x00000000, 0x00000000, 0x403bcccc, 0xccccccc9},	/* 0=f(27.8)*/
 {64, 0, 34,__LINE__, 0x00000000, 0x00000000, 0x403d7fff, 0xfffffffc},	/* 0=f(29.5)*/
 0,};
-test_erfc(m)   {run_vector_1(m,erfc_vec,(char *)(erfc),"erfc","dd");   }	
+void test_erfc(m)   {run_vector_1(m,erfc_vec,(char *)(erfc),"erfc","dd");   }	

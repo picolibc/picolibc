@@ -1,6 +1,5 @@
-/* setjmp/longjmp routines.
- *
- * Written by Michael Hayes <m.hayes@elec.canterbury.ac.nz>.
+/*
+ * Copyright (c) 2004 Michael Hayes <m.hayes@elec.canterbury.ac.nz>.
  *
  * The author hereby grant permission to use, copy, modify, distribute,
  * and license this software and its documentation for any purpose, provided
@@ -12,6 +11,7 @@
  * the new terms are clearly indicated on the first page of each file where
  * they apply.
  */
+/* setjmp/longjmp routines. */
 
 	.sect .text
 	.global setjmp

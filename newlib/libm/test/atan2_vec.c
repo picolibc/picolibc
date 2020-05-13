@@ -1,3 +1,19 @@
+/*
+ * Copyright (c) 1994 Cygnus Support.
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms are permitted
+ * provided that the above copyright notice and this paragraph are
+ * duplicated in all such forms and that any documentation,
+ * and/or other materials related to such
+ * distribution and use acknowledge that the software was developed
+ * at Cygnus Support, Inc.  Cygnus Support, Inc. may not be used to
+ * endorse or promote products derived from this software without
+ * specific prior written permission.
+ * THIS SOFTWARE IS PROVIDED ``AS IS'' AND WITHOUT ANY EXPRESS OR
+ * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+ */
 #include "test.h"
  one_line_type atan2_vec[] = {
 {64, 0,123,__LINE__, 0xc002d97c, 0x7f3321d2, 0xbff00000, 0x00000000, 0xbff00000, 0x00000000},	/* -2.35619=f(-1, -1)*/
@@ -1601,4 +1617,4 @@
 {64, 0,123,__LINE__, 0x3fe9ff55, 0x5176d133, 0x3fee6666, 0x6666666d, 0x3feccccc, 0xccccccd3},	/* 0.812419=f(0.95, 0.9)*/
 {64, 0,123,__LINE__, 0x3fe921fb, 0x54442d18, 0x3fee6666, 0x6666666d, 0x3fee6666, 0x6666666d},	/* 0.785398=f(0.95, 0.95)*/
 0,};
-test_atan2(m)   {run_vector_1(m,atan2_vec,(char *)(atan2),"atan2","ddd");   }	
+void test_atan2(m)   {run_vector_1(m,atan2_vec,(char *)(atan2),"atan2","ddd");   }	

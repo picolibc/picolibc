@@ -1,3 +1,4 @@
+/* Copyright (c) 2016 Yaakov Selkowitz <yselkowi@redhat.com> */
 #include <complex.h>
 #include <math.h>
 

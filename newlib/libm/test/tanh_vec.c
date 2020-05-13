@@ -1,3 +1,19 @@
+/*
+ * Copyright (c) 1994 Cygnus Support.
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms are permitted
+ * provided that the above copyright notice and this paragraph are
+ * duplicated in all such forms and that any documentation,
+ * and/or other materials related to such
+ * distribution and use acknowledge that the software was developed
+ * at Cygnus Support, Inc.  Cygnus Support, Inc. may not be used to
+ * endorse or promote products derived from this software without
+ * specific prior written permission.
+ * THIS SOFTWARE IS PROVIDED ``AS IS'' AND WITHOUT ANY EXPRESS OR
+ * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+ */
 #include "test.h"
  one_line_type tanh_vec[] = {
 {64, 0,123,__LINE__, 0xbfeaad4c, 0x6d28dcaf, 0xbff33333, 0x33333333},	/* -0.833655=f(-1.2)*/
@@ -99,7 +115,7 @@
 {64, 0,123,__LINE__, 0xbfce24b9, 0x874eb37a, 0xbfceb851, 0xeb851e98},	/* -0.235496=f(-0.24)*/
 {64, 0,123,__LINE__, 0xbfccee7f, 0x3e80b94e, 0xbfcd70a3, 0xd70a3d50},	/* -0.226028=f(-0.23)*/
 {64, 0,123,__LINE__, 0xbfcbb6dd, 0x248d8d37, 0xbfcc28f5, 0xc28f5c08},	/* -0.216518=f(-0.22)*/
-{64, 0,123,__LINE__, 0xbfca7de0, 0xd5da50b4, 0xbfcae147, 0xae147ac0},	/* -0.206966=f(-0.21)*/
+{62, 0,123,__LINE__, 0xbfca7de0, 0xd5da50b4, 0xbfcae147, 0xae147ac0},	/* -0.206966=f(-0.21)*/
 {64, 0,123,__LINE__, 0xbfc94398, 0x30b3a570, 0xbfc99999, 0x99999978},	/* -0.197375=f(-0.2)*/
 {64, 0,123,__LINE__, 0xbfc80811, 0x531380b4, 0xbfc851eb, 0x851eb830},	/* -0.187746=f(-0.19)*/
 {64, 0,123,__LINE__, 0xbfc6cb5a, 0x984db955, 0xbfc70a3d, 0x70a3d6e8},	/* -0.178081=f(-0.18)*/
@@ -167,11 +183,11 @@
 {64, 0,123,__LINE__, 0x3fda7926, 0x89d76b1d, 0x3fdc28f5, 0xc28f5c3f},	/* 0.413644=f(0.44)*/
 {64, 0,123,__LINE__, 0x3fdb0064, 0xaf70e0cd, 0x3fdccccc, 0xcccccce3},	/* 0.421899=f(0.45)*/
 {64, 0,123,__LINE__, 0x3fdb867f, 0xed9fd654, 0x3fdd70a3, 0xd70a3d87},	/* 0.430084=f(0.46)*/
-{64, 0,123,__LINE__, 0x3fdc0b75, 0x239586c0, 0x3fde147a, 0xe147ae2b},	/* 0.438199=f(0.47)*/
+{62, 0,123,__LINE__, 0x3fdc0b75, 0x239586c0, 0x3fde147a, 0xe147ae2b},	/* 0.438199=f(0.47)*/
 {64, 0,123,__LINE__, 0x3fdc8f41, 0x5c0451a6, 0x3fdeb851, 0xeb851ecf},	/* 0.446244=f(0.48)*/
 {64, 0,123,__LINE__, 0x3fdd11e1, 0xcceb451a, 0x3fdf5c28, 0xf5c28f73},	/* 0.454216=f(0.49)*/
 {64, 0,123,__LINE__, 0x3fdd9353, 0xd7568b05, 0x3fe00000, 0x0000000b},	/* 0.462117=f(0.5)*/
-{64, 0,123,__LINE__, 0x3fde1395, 0x07151869, 0x3fe051eb, 0x851eb85d},	/* 0.469945=f(0.51)*/
+{62, 0,123,__LINE__, 0x3fde1395, 0x07151869, 0x3fe051eb, 0x851eb85d},	/* 0.469945=f(0.51)*/
 {64, 0,123,__LINE__, 0x3fde92a3, 0x12640015, 0x3fe0a3d7, 0x0a3d70af},	/* 0.4777=f(0.52)*/
 {64, 0,123,__LINE__, 0x3fdf107b, 0xd98fcd02, 0x3fe0f5c2, 0x8f5c2901},	/* 0.485381=f(0.53)*/
 {64, 0,123,__LINE__, 0x3fdf8d1d, 0x668c4ab6, 0x3fe147ae, 0x147ae153},	/* 0.492988=f(0.54)*/
@@ -285,4 +301,4 @@
 {64, 0,123,__LINE__, 0x3ff00000, 0x00000000, 0x403bcccc, 0xccccccc9},	/* 1=f(27.8)*/
 {64, 0,123,__LINE__, 0x3ff00000, 0x00000000, 0x403d7fff, 0xfffffffc},	/* 1=f(29.5)*/
 0,};
-test_tanh(m)   {run_vector_1(m,tanh_vec,(char *)(tanh),"tanh","dd");   }	
+void test_tanh(m)   {run_vector_1(m,tanh_vec,(char *)(tanh),"tanh","dd");   }	

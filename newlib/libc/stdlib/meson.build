@@ -62,10 +62,6 @@ std_malloc_srcs_stdlib = [
   'malloc-valloc.c',
 ]
 
-std_strtod_srcs_stdlib = [
-  'strtod.c',
-]
-
 srcs_stdlib = [
     'a64l.c',
     'abort.c',
@@ -89,7 +85,6 @@ srcs_stdlib = [
     'div.c',
     'drand48.c',
     'dtoa.c',
-    'dtoastub.c',
     'ecvtbuf.c',
     'efgcvt.c',
     'environ.c',
@@ -143,12 +138,14 @@ srcs_stdlib = [
     'sb_charsets.c',
     'seed48.c',
     'setenv.c',
+    'srand.c',
     'srand48.c',
+    'srandom.c',
+    'strtod.c',
     'strtodg.c',
     'strtoimax.c',
     'strtol.c',
     'strtoll.c',
-    'strtorx.c',
     'strtoul.c',
     'strtoull.c',
     'strtoumax.c',
@@ -172,23 +169,22 @@ srcs_stdlib = [
 ]
 
 lsrcs_stdlib = [
-  'ldtoa.c',
   'strtold.c',
+  'strtorx.c',
   'wcstold.c'
 ]
 
-if newlib_io_long_double
+if have_long_double and not long_double_equals_double and not newlib_tinystdio
   srcs_stdlib += lsrcs_stdlib
+  if newlib_io_long_double
+    srcs_stdlib += 'ldtoa.c'
+  endif
 endif
 
 if newlib_nano_malloc
   srcs_stdlib += nano_malloc_srcs_stdlib
 else
   srcs_stdlib += std_malloc_srcs_stdlib
-endif
-
-if not newlib_tinystdio
-  srcs_stdlib += std_strtod_srcs_stdlib
 endif
 
 hdrs_stdlib = [

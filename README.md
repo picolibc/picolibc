@@ -10,13 +10,21 @@ code from [Newlib](http://sourceware.org/newlib/) and
 
 Picolibc source comes from a variety of places and has a huge variety
 of copyright holders and license texts. While much of the code comes
-from newlib, none of the GPL-related bits are left in the repository,
-so all of the source code uses BSD-like licenses, a mixture of 2- and
-3- clause BSD itself and a variety of other (mostly older) licenses
-with similar terms.
+from newlib, none of the GPL-related bits used to build the library
+are left in the repository, so all of the source code uses BSD-like
+licenses, a mixture of 2- and 3- clause BSD itself and a variety of
+other (mostly older) licenses with similar terms.
 
-Please see the file COPYING.NEWLIB in this distribution for newlib
-license terms.
+There are two files used for testing printf, test/printf-tests.c and
+test/testcases.c which are licensed under the GPL version 2 or
+later.
+
+The file COPYING.picolibc contains all of the current copyright and
+license information in the Debian standard machine-readable format. It
+was generated using the make-copyrights and find-copyright
+scripts. There are currently 75 distinct licenses: 9 versions of the
+2-clause BSD license, 35 versions of the 3-clause BSD license, and 31
+other licenses.
 
 ## Supported Architectures
 
@@ -28,6 +36,7 @@ at this point only has code to build for the following targets:
  * RISC-V (both 32- and 64- bit)
  * x86_64 (Linux hosted, for testing)
  * PowerPC
+ * ESP8266 (xtensa-lx106-elf)
 
 Supporting architectures that already have newlib code requires:
 
@@ -66,6 +75,66 @@ areas unrelated to the code used by picolibc, so keeping things in
 sync has not been difficult so far.
 
 ## Releases
+
+### Picolibc version 1.4.1
+
+This release contains an important TLS fix for ARM along with a few
+minor compatibility fixes
+
+ 1. Make __aeabi_read_tp respect ARM ABI register requirements to
+    avoid clobbering register contents during TLS variable use.
+
+ 2. Use cpu_family instead of cpu in meson config, which is 'more
+    correct' when building for a single cpu instead of multilib.
+
+ 3. Make arm sample interrupt vector work with clang
+
+ 4. Use __inline instead of inline in published headers to allow
+    compiling with -ansi
+
+ 5. Make 'naked' RISC-V _start function contain only asm
+    statements as required by clang (and recommended by gcc).
+
+ 6. Use -msave-restore in sample RISC-V cross-compile
+    configuration. This saves text space.
+
+### Picolibc version 1.4
+
+This release was focused on cleaning up the copyright and license
+information.
+
+ 1. Copyright information should now be present in every source file.
+
+ 2. License information, where it could be inferred from the
+    repository, was added to many files.
+
+ 3. 4-clause BSD licenses were changed (with permission) to 3-clause
+
+ 4. Fix RISC-V ieeefp.h exception bits
+
+ 5. Merge past newlib 3.2.0
+
+ 6. Add PICOLIBC_TLS preprocessor define when the library has TLS support
+
+### Picolibc version 1.3
+
+This release now includes tests, and fixes bugs found by them.
+
+ 1. ESP8266 support added, thanks to Jonathan McDowell.
+
+ 2. Numerous test cases from newlib have been fixed, and
+    precision requirements adjusted so that the library now
+    passes its own test suite on x86, RISC-V and ARM.
+
+ 3. String/number conversion bug fixes. This includes fcvt/ecvt/gcvt
+    shared with newlib and tinystdio printf/scanf
+
+ 4. A few RISC-V ABI fixes, including setting the TLS base correctly,
+    compiling with -mcmodel=medany, and enabling the FPU for libraries
+    built to use it.
+
+ 5. Semihosting updates, including adding unlink, kill and getpid
+    (which are used by some tests).
 
 ### Picolibc version 1.2
 
@@ -137,9 +206,11 @@ include:
 ## Documentation
 
  * [Building Picolibc](doc/build.md)
+ * [Operating System Support](doc/os.md)
  * [Using Picolibc](doc/using.md)
  * [Picolibc initialization](doc/init.md)
  * [Thread Local Storage](doc/tls.md)
  * [Linking with Picolibc.ld](doc/linking.md)
  * [Hello World](hello-world/README.md)
  * [Picolibc as embedded source](doc/embedsource.md)
+ * [Copyright and license information](COPYING.picolibc)

@@ -158,7 +158,7 @@ __jp2uc (wint_t c, int type)
 static wint_t
 __uc2jp (wint_t c, int type)
 {
-#warning back-conversion Unicode to Japanese not implemented; needed for towupper/towlower
+//#warning back-conversion Unicode to Japanese not implemented; needed for towupper/towlower
   return c;
 }
 

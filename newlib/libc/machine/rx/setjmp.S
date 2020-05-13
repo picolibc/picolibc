@@ -1,3 +1,6 @@
+/*
+Copyright (c) 2009 Nick Clifton <nickc@redhat.com>
+ */
 # setjmp/longjmp for Renesas RX.
 # 
 # The jmpbuf looks like this:

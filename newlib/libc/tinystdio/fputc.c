@@ -40,13 +40,13 @@ fputc(int c, FILE *stream)
 
 	if (stream->flags & __SSTR) {
 		struct __file_str *sstream = (struct __file_str *) stream;
-		if (stream->len >= sstream->size)
+		if (sstream->len >= sstream->size)
 			return EOF;
 		*sstream->buf++ = c;
+		++sstream->len;
 	} else {
 		if (stream->put(c, stream) == EOF)
 			return EOF;
 	}
-	++stream->len;
 	return c;
 }

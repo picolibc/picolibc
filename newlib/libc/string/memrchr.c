@@ -1,3 +1,4 @@
+/* Copyright (c) 2012 Corinna Vinschen <corinna@vinschen.de> */
 /*
 FUNCTION
 	<<memrchr>>---reverse search for character in memory

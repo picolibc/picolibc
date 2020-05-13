@@ -1,3 +1,4 @@
+/* Copyright (c) 2009 Corinna Vinschen <corinna@vinschen.de> */
 /*
 FUNCTION
 <<mbsrtowcs>>, <<mbsnrtowcs>>---convert a character string to a wide-character string

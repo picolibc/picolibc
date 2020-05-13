@@ -1,3 +1,4 @@
+/* Copyright (c) 2009 Craig Howland */
 /*
  * wcsftime.c
  * Original Author:	Craig Howland, for Newlib

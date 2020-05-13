@@ -48,8 +48,8 @@
 
 #define DTOA_MAX_10_EXP FLT_MAX_10_EXP
 #define DTOA_MIN_10_EXP FLT_MIN_10_EXP
-#define DTOA_DIG	FLT_DIG
-#define DTOA_MAX_DIG 	FLT_DIG
+#define DTOA_DIG	12
+#define DTOA_MAX_DIG 	12
 
 #define __dtoa_scale_up __ftoa_scale_up
 #define __dtoa_scale_down __ftoa_scale_down
@@ -60,8 +60,8 @@
 
 #define DTOA_MAX_10_EXP DBL_MAX_10_EXP
 #define DTOA_MIN_10_EXP DBL_MIN_10_EXP
-#define DTOA_DIG DBL_DIG
-#define DTOA_MAX_DIG DBL_DIG
+#define DTOA_DIG 	18
+#define DTOA_MAX_DIG	18
 
 #endif
 

@@ -1,3 +1,19 @@
+/*
+ * Copyright (c) 1994 Cygnus Support.
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms are permitted
+ * provided that the above copyright notice and this paragraph are
+ * duplicated in all such forms and that any documentation,
+ * and/or other materials related to such
+ * distribution and use acknowledge that the software was developed
+ * at Cygnus Support, Inc.  Cygnus Support, Inc. may not be used to
+ * endorse or promote products derived from this software without
+ * specific prior written permission.
+ * THIS SOFTWARE IS PROVIDED ``AS IS'' AND WITHOUT ANY EXPRESS OR
+ * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+ */
 #include "test.h"
  one_line_type sqrt_vec[] = {
 { 0, 0, 33,__LINE__, 0xfff80000, 0x00000000, 0xbff33333, 0x33333333},	/* -nan=f(-1.2)*/
@@ -285,4 +301,4 @@
 {63, 0,123,__LINE__, 0x4015171c, 0xbaaadfe1, 0x403bcccc, 0xccccccc9},	/* 5.27257=f(27.8)*/
 {63, 0,123,__LINE__, 0x4015b9be, 0x5d52a9d9, 0x403d7fff, 0xfffffffc},	/* 5.43139=f(29.5)*/
 0,};
-test_sqrt(m)   {run_vector_1(m,sqrt_vec,(char *)(sqrt),"sqrt","dd");   }	
+void test_sqrt(m)   {run_vector_1(m,sqrt_vec,(char *)(sqrt),"sqrt","dd");   }	

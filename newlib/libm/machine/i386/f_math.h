@@ -1,3 +1,10 @@
+/*
+Copyright (C) 1998, 2002 by Red Hat Inc. All rights reserved.
+
+Permission to use, copy, modify, and distribute this
+software is freely granted, provided that this notice
+is preserved.
+ */
 #ifndef __F_MATH_H__
 #define __F_MATH_H__
 

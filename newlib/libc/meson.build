@@ -83,6 +83,7 @@ machine_dirs = {
 		 'or1knd': 'or1k',
 		 'powerpc': 'powerpc',
 		 'riscv': 'riscv',
+		 'riscv32': 'riscv',
 		 'riscv64': 'riscv',
 		 'rl78': 'rl78',
 		 'rx': 'rx',
@@ -99,6 +100,7 @@ machine_dirs = {
 		 'x86_64': 'x86_64',
 		 'xc16x': 'xc16x',
 		 'xstormy16': 'xstormy16',
+		 'xtensa': 'xtensa',
 		 'z8k': 'z8k',
 		 'spu': 'spu',
 	       }
@@ -115,6 +117,9 @@ if newlib_tinystdio
   libdirs += 'tinystdio'
 else
   libdirs += ['stdio', 'reent']
+  if newlib_stdio64
+    libdirs += 'stdio64'
+  endif
 endif
 
 if newlib_supplied_syscalls
@@ -125,8 +130,8 @@ libnames = libdirs
 
 need_generic_fenv_h = true
 
-if machine_dirs.has_key(host_cpu)
-  machine_dir = join_paths('machine', machine_dirs[host_cpu])
+if machine_dirs.has_key(host_cpu_family)
+  machine_dir = join_paths('machine', machine_dirs[host_cpu_family])
   fenv_file_check = join_paths(machine_dir, 'sys', 'fenv.h')
   if run_command('test', '-f', fenv_file_check).returncode() == 0
     need_generic_fenv_h = false
@@ -145,7 +150,7 @@ if machine_dirs.has_key(host_cpu)
   libdirs = [machine_dir] + libdirs
   libnames = ['machine'] + libnames
 else
-  warning('No libc machine directory for cpu ' + host_cpu)
+  warning('No libc machine directory for CPU family ' + host_cpu_family)
   need_generic_fenv_h = true
 endif
 

@@ -1,3 +1,19 @@
+/*
+ * Copyright (c) 1994 Cygnus Support.
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms are permitted
+ * provided that the above copyright notice and this paragraph are
+ * duplicated in all such forms and that any documentation,
+ * and/or other materials related to such
+ * distribution and use acknowledge that the software was developed
+ * at Cygnus Support, Inc.  Cygnus Support, Inc. may not be used to
+ * endorse or promote products derived from this software without
+ * specific prior written permission.
+ * THIS SOFTWARE IS PROVIDED ``AS IS'' AND WITHOUT ANY EXPRESS OR
+ * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+ */
 #include "test.h"
  one_line_type atanhf_vec[] = {
 { 0, 0, 33,__LINE__, 0xfff80000, 0x00000000, 0xbff33333, 0x33333333},	/* -nan=f(-1.2)*/
@@ -220,7 +236,7 @@
 {36, 0,123,__LINE__, 0x4000bd05, 0xcad265a5, 0x3fef0a3d, 0x70a3d719},	/* 2.0923=f(0.97)*/
 {37, 0,123,__LINE__, 0x40026167, 0x59bb9de0, 0x3fef5c28, 0xf5c28f6b},	/* 2.29756=f(0.98)*/
 {37, 0,123,__LINE__, 0x40052c58, 0x59ea246e, 0x3fefae14, 0x7ae147bd},	/* 2.64665=f(0.99)*/
-{ 2, 0, 34,__LINE__, 0x7ff00000, 0x00000000, 0x3ff00000, 0x00000007},	/* inf=f(1)*/
+{31, 0, 34,__LINE__, 0x7ff00000, 0x00000000, 0x3ff00000, 0x00000007},	/* inf=f(1)*/
 { 0, 0, 33,__LINE__, 0xfff80000, 0x00000000, 0x3ff028f5, 0xc28f5c30},	/* -nan=f(1.01)*/
 { 0, 0, 33,__LINE__, 0xfff80000, 0x00000000, 0x3ff051eb, 0x851eb859},	/* -nan=f(1.02)*/
 { 0, 0, 33,__LINE__, 0xfff80000, 0x00000000, 0x3ff07ae1, 0x47ae1482},	/* -nan=f(1.03)*/
@@ -285,4 +301,4 @@
 { 0, 0, 33,__LINE__, 0xfff80000, 0x00000000, 0x403bcccc, 0xccccccc9},	/* -nan=f(27.8)*/
 { 0, 0, 33,__LINE__, 0xfff80000, 0x00000000, 0x403d7fff, 0xfffffffc},	/* -nan=f(29.5)*/
 0,};
-test_atanhf(m)   {run_vector_1(m,atanhf_vec,(char *)(atanhf),"atanhf","ff");   }	
+void test_atanhf(m)   {run_vector_1(m,atanhf_vec,(char *)(atanhf),"atanhf","ff");   }	

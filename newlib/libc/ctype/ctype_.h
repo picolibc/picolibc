@@ -1,3 +1,4 @@
+/* Copyright (c) 2016 Corinna Vinschen <corinna@vinschen.de> */
 #include <ctype.h>
 
 #if (defined(__GNUC__) && !defined(__CHAR_UNSIGNED__) && !defined(COMPACT_CTYPE)) || defined (__CYGWIN__)

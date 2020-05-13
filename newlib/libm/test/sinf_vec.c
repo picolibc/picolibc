@@ -1,3 +1,19 @@
+/*
+ * Copyright (c) 1994 Cygnus Support.
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms are permitted
+ * provided that the above copyright notice and this paragraph are
+ * duplicated in all such forms and that any documentation,
+ * and/or other materials related to such
+ * distribution and use acknowledge that the software was developed
+ * at Cygnus Support, Inc.  Cygnus Support, Inc. may not be used to
+ * endorse or promote products derived from this software without
+ * specific prior written permission.
+ * THIS SOFTWARE IS PROVIDED ``AS IS'' AND WITHOUT ANY EXPRESS OR
+ * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+ */
 #include "test.h"
  one_line_type sinf_vec[] = {
 {37, 0,123,__LINE__, 0xbfedd343, 0xab6112e5, 0xbff33333, 0x33333333},	/* -0.932039=f(-1.2)*/
@@ -283,4 +299,4 @@
 {30, 0,123,__LINE__, 0x3fdd3b56, 0x4dfe1bfd, 0x403bcccc, 0xccccccc9},	/* 0.456747=f(27.8)*/
 {33, 0,123,__LINE__, 0xbfee1ced, 0xe66aee4e, 0x403d7fff, 0xfffffffc},	/* -0.941031=f(29.5)*/
 0,};
-test_sinf(m)   {run_vector_1(m,sinf_vec,(char *)(sinf),"sinf","ff");   }	
+void test_sinf(m)   {run_vector_1(m,sinf_vec,(char *)(sinf),"sinf","ff");   }	

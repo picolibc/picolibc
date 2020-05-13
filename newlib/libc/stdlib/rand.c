@@ -1,4 +1,8 @@
 /*
+Copyright (c) 1990 Regents of the University of California.
+All rights reserved.
+ */
+/*
 FUNCTION
 <<rand>>, <<srand>>---pseudo-random numbers
 
@@ -56,12 +60,6 @@ on two different systems.
 #ifndef _REENT_ONLY
 
 #include <stdlib.h>
-
-void
-srand (unsigned int seed)
-{
-  srandom(seed);
-}
 
 int
 rand (void)

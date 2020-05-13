@@ -1,5 +1,22 @@
+/*
+ * Copyright (c) 1994 Cygnus Support.
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms are permitted
+ * provided that the above copyright notice and this paragraph are
+ * duplicated in all such forms and that any documentation,
+ * and/or other materials related to such
+ * distribution and use acknowledge that the software was developed
+ * at Cygnus Support, Inc.  Cygnus Support, Inc. may not be used to
+ * endorse or promote products derived from this software without
+ * specific prior written permission.
+ * THIS SOFTWARE IS PROVIDED ``AS IS'' AND WITHOUT ANY EXPRESS OR
+ * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+ */
 #include "test.h"
  one_line_type fabs_vec[] = {
+{64, 0,123,__LINE__, 0x7ff40000, 0x00000000, 0x7ff40000, 0x00000000},   /* snan=f(snan)*/
 {64, 0,123,__LINE__, 0x3ff33333, 0x33333333, 0xbff33333, 0x33333333},	/* 1.2=f(-1.2)*/
 {64, 0,123,__LINE__, 0x3ff30a3d, 0x70a3d70a, 0xbff30a3d, 0x70a3d70a},	/* 1.19=f(-1.19)*/
 {64, 0,123,__LINE__, 0x3ff2e147, 0xae147ae1, 0xbff2e147, 0xae147ae1},	/* 1.18=f(-1.18)*/
@@ -284,5 +301,11 @@
 {64, 0,123,__LINE__, 0x403a1999, 0x99999996, 0x403a1999, 0x99999996},	/* 26.1=f(26.1)*/
 {64, 0,123,__LINE__, 0x403bcccc, 0xccccccc9, 0x403bcccc, 0xccccccc9},	/* 27.8=f(27.8)*/
 {64, 0,123,__LINE__, 0x403d7fff, 0xfffffffc, 0x403d7fff, 0xfffffffc},	/* 29.5=f(29.5)*/
+{64, 0,123,__LINE__, 0x7ff80000, 0x00000000, 0x7ff80000, 0x00000000},   /* qnan=f(qnan)*/
+{64, 0,123,__LINE__, 0x7ff40000, 0x00000000, 0x7ff40000, 0x00000000},   /* snan=f(snan)*/
+{64, 0,123,__LINE__, 0x7ff00000, 0x00000000, 0x7ff00000, 0x00000000},   /* +inf=f(+inf)*/
+{64, 0,123,__LINE__, 0x7ff00000, 0x00000000, 0xfff00000, 0x00000000},   /* +inf=f(-inf)*/
+{64, 0,123,__LINE__, 0x00000000, 0x00000000, 0x00000000, 0x00000000},   /* +0=f(+0)*/
+{64, 0,123,__LINE__, 0x00000000, 0x00000000, 0x80000000, 0x00000000},   /* +0=f(-0)*/
 0,};
-test_fabs(m)   {run_vector_1(m,fabs_vec,(char *)(fabs),"fabs","dd");   }	
+void test_fabs(m)   {run_vector_1(m,fabs_vec,(char *)(fabs),"fabs","dd");   }	

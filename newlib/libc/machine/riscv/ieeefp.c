@@ -15,14 +15,14 @@
 static void
 fssr(unsigned value)
 {
-  asm volatile ("fssr %0" :: "r"(value));
+  asm volatile ("fscsr %0" :: "r"(value));
 }
 
 static unsigned
 frsr()
 {
   unsigned value;
-  asm volatile ("frsr %0" : "=r" (value));
+  asm volatile ("frcsr %0" : "=r" (value));
   return value;
 }
 
@@ -38,6 +38,40 @@ frm_fp_rnd (unsigned frm)
     /* 4 ~ 7 is invalid value, so just retun FP_RP.  */
     default:return FP_RP;
     }
+}
+
+static fp_except
+frm_fp_except (unsigned except)
+{
+  fp_except fp = 0;
+  if (except & (1 << 0))
+    fp |= FP_X_IMP;
+  if (except & (1 << 1))
+    fp |= FP_X_UFL;
+  if (except & (1 << 2))
+    fp |= FP_X_OFL;
+  if (except & (1 << 3))
+    fp |= FP_X_DX;
+  if (except & (1 << 4))
+    fp |= FP_X_INV;
+  return fp;
+}
+
+static unsigned
+frm_except(fp_except fp)
+{
+  unsigned except = 0;
+  if (fp & FP_X_IMP)
+    except |= (1 << 0);
+  if (fp & FP_X_UFL)
+    except |= (1 << 1);
+  if (fp & FP_X_OFL)
+    except |= (1 << 2);
+  if (fp & FP_X_DX)
+    except |= (1 << 3);
+  if (fp & FP_X_INV)
+    except |= (1 << 4);
+  return except;
 }
 
 #endif /* __riscv_flen */
@@ -63,7 +97,7 @@ fp_except
 fpgetsticky(void)
 {
 #ifdef __riscv_flen
-  return frsr () & 0x1f;
+  return frm_fp_except(frsr ());
 #else
   return 0;
 #endif /* __riscv_flen */
@@ -84,10 +118,10 @@ fpsetround(fp_rnd rnd_dir)
   unsigned new_rm;
   switch (rnd_dir)
     {
-    case FP_RN: new_rm = 0;
-    case FP_RZ: new_rm = 1;
-    case FP_RM: new_rm = 2;
-    case FP_RP: new_rm = 3;
+    case FP_RN: new_rm = 0; break;
+    case FP_RZ: new_rm = 1; break;
+    case FP_RM: new_rm = 2; break;
+    case FP_RP: new_rm = 3; break;
     default:    return -1;
     }
   fssr (new_rm << 5 | (fsr & 0x1f));
@@ -102,9 +136,19 @@ fpsetsticky(fp_except sticky)
 {
 #ifdef __riscv_flen
   unsigned fsr = frsr ();
-  fssr ((sticky & 0x1f) | (fsr & ~0x1f));
-  return fsr & 0x1f;
+  fssr (frm_except(sticky) | (fsr & ~0x1f));
+  return frm_fp_except(fsr);
 #else
   return -1;
 #endif /* __riscv_flen */
+}
+
+fp_rdi fpgetroundtoi (void)
+{
+  return 0;
+}
+
+fp_rdi fpsetroundtoi (fp_rdi rdi)
+{
+  return -1;
 }

@@ -1,3 +1,4 @@
+/* This file was generated automatically */
     {CAT_Cc, 0x0000, 31},
     {CAT_Zs, 0x0020, 0},
     {CAT_Po, 0x0021, 2},

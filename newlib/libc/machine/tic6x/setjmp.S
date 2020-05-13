@@ -1,7 +1,7 @@
 ;******************************************************************************
 ;* SETJMP  v7.2.0I10181                                                       *
 ;*                                                                            *
-;* Copyright (c) 1996-2010 Texas Instruments Incorporated                     *
+;/* Copyright (c) 1996-2010 Texas Instruments Incorporated                    */
 ;* http://www.ti.com/                                                         *
 ;*                                                                            *
 ;*  Redistribution and  use in source  and binary forms, with  or without     *

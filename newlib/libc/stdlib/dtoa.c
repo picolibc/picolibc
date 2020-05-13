@@ -174,7 +174,7 @@ quorem (_Bigint * b, _Bigint * S)
 
 
 char *
-_dtoa_r (
+__dtoa (
 	double _d,
 	int mode,
 	int ndigits,

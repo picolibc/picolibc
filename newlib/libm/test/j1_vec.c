@@ -1,3 +1,19 @@
+/*
+ * Copyright (c) 1994 Cygnus Support.
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms are permitted
+ * provided that the above copyright notice and this paragraph are
+ * duplicated in all such forms and that any documentation,
+ * and/or other materials related to such
+ * distribution and use acknowledge that the software was developed
+ * at Cygnus Support, Inc.  Cygnus Support, Inc. may not be used to
+ * endorse or promote products derived from this software without
+ * specific prior written permission.
+ * THIS SOFTWARE IS PROVIDED ``AS IS'' AND WITHOUT ANY EXPRESS OR
+ * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+ */
 #include "test.h"
  one_line_type j1_vec[] = {
 {64, 0,123,__LINE__, 0xbfdfe3f7, 0xc98d2cad, 0xbff33333, 0x33333333},	/* -0.498289=f(-1.2)*/
@@ -281,4 +297,4 @@
 {64, 0,123,__LINE__, 0x3fc25cf8, 0x6ae10498, 0x403bcccc, 0xccccccc9},	/* 0.143462=f(27.8)*/
 {58, 0,123,__LINE__, 0xbfb07640, 0x70ecf6df, 0x403d7fff, 0xfffffffc},	/* -0.0643044=f(29.5)*/
 0,};
-test_j1(m)   {run_vector_1(m,j1_vec,(char *)(j1),"j1","dd");   }	
+void test_j1(m)   {run_vector_1(m,j1_vec,(char *)(j1),"j1","dd");   }	

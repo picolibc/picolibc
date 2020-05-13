@@ -34,12 +34,13 @@
 #
 src_picocrt_machine = {
 			'riscv' : 'riscv/crt0.c',
+			'riscv32' : 'riscv/crt0.c',
 			'riscv64' : 'riscv/crt0.c',
 			'arm' : 'arm/crt0.c'
 		      }
 
-if src_picocrt_machine.has_key(host_cpu)
-  srcs_picocrt = join_paths('machine', src_picocrt_machine[host_cpu])
+if src_picocrt_machine.has_key(host_cpu_family)
+  srcs_picocrt = join_paths('machine', src_picocrt_machine[host_cpu_family])
 else
   srcs_picocrt = 'shared/crt0.c'
 endif
@@ -51,8 +52,10 @@ foreach target : targets
 
   if target == ''
     crt_name = 'crt0.o'
+    libcrt_name = 'crt'
   else
     crt_name = join_paths(target, 'crt0.o')
+    libcrt_name = join_paths(target, 'libcrt')
   endif
 
   executable(crt_name,
@@ -62,4 +65,12 @@ foreach target : targets
 	     install_dir : instdir,
 	     c_args : value[1] + ['-fno-builtin', '-ffreestanding'],
 	     link_args : value[1] + ['-r', '-ffreestanding', '-nostdlib'])
+
+  # Tests link against this because using the .o isn't supported under meson
+  set_variable('lib_crt' + target,
+	       static_library(libcrt_name,
+			      srcs_picocrt,
+			      install : false,
+			      include_directories : inc,
+			      c_args : value[1]))
 endforeach

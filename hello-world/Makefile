@@ -33,7 +33,7 @@
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
-CFLAGS=--specs=picolibc.specs --semihost
+CFLAGS=--specs=picolibc.specs --oslib=semihost
 
 CC_RISCV=riscv64-unknown-elf-gcc
 CFLAGS_RISCV=$(CFLAGS) -march=rv32imac -mabi=ilp32 -Thello-world-riscv.ld

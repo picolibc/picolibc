@@ -1,3 +1,19 @@
+/*
+ * Copyright (c) 1994 Cygnus Support.
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms are permitted
+ * provided that the above copyright notice and this paragraph are
+ * duplicated in all such forms and that any documentation,
+ * and/or other materials related to such
+ * distribution and use acknowledge that the software was developed
+ * at Cygnus Support, Inc.  Cygnus Support, Inc. may not be used to
+ * endorse or promote products derived from this software without
+ * specific prior written permission.
+ * THIS SOFTWARE IS PROVIDED ``AS IS'' AND WITHOUT ANY EXPRESS OR
+ * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+ */
 #include "test.h"
  one_line_type cosf_vec[] = {
 {43, 0,123,__LINE__, 0x3fd730de, 0x64830d71, 0xbff33333, 0x33333333},	/* 0.362358=f(-1.2)*/
@@ -246,7 +262,7 @@
 {39, 0,123,__LINE__, 0x3ff00000, 0x00000000, 0x00000000, 0x00000000},	/* 1=f(0)*/
 {64, 0,123,__LINE__, 0xbe6777a5, 0xcffffffe, 0x3ff921fb, 0x54442d18},	/* -4.37114e-08=f(1.5708)*/
 {39, 0,123,__LINE__, 0xbfefffff, 0xffffffde, 0x400921fb, 0x54442d18},	/* -1=f(3.14159)*/
-{ 2, 0,123,__LINE__, 0x3e499bc5, 0xc0000000, 0x4012d97c, 0x7f3321d2},	/* 1.19249e-08=f(4.71239)*/
+{31, 0,123,__LINE__, 0x3e499bc5, 0xc0000000, 0x4012d97c, 0x7f3321d2},	/* 1.19249e-08=f(4.71239)*/
 {28, 0,123,__LINE__, 0x3fc3be82, 0xf2505a70, 0xc03e0000, 0x00000000},	/* 0.154251=f(-30)*/
 {35, 0,123,__LINE__, 0xbfeffd4d, 0x54785727, 0xc03c4ccc, 0xcccccccd},	/* -0.999671=f(-28.3)*/
 {27, 0,123,__LINE__, 0x3fba754b, 0xa78a3763, 0xc03a9999, 0x9999999a},	/* 0.103352=f(-26.6)*/
@@ -284,4 +300,4 @@
 {36, 0,123,__LINE__, 0xbfec7793, 0xbe7da18f, 0x403bcccc, 0xccccccc9},	/* -0.889597=f(27.8)*/
 {34, 0,123,__LINE__, 0xbfd5a705, 0x9eaeab38, 0x403d7fff, 0xfffffffc},	/* -0.338319=f(29.5)*/
 0,};
-test_cosf(m)   {run_vector_1(m,cosf_vec,(char *)(cosf),"cosf","ff");   }	
+void test_cosf(m)   {run_vector_1(m,cosf_vec,(char *)(cosf),"cosf","ff");   }	

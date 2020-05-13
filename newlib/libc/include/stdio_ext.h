@@ -1,3 +1,4 @@
+/* Copyright (c) 2011 Yaakov Selkowitz <yselkowi@redhat.com> */
 /*
  * stdio_ext.h
  *

@@ -1,3 +1,4 @@
+/* Copyright (c) 2002 Jeff Johnston  <jjohnstn@redhat.com> */
 #ifndef _WCTYPE_H_
 #define _WCTYPE_H_
 

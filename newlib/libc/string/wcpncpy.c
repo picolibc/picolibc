@@ -1,3 +1,4 @@
+/* Copyright (c) 2007 Corinna Vinschen <corinna@vinschen.de> */
 /*
 FUNCTION
 	<<wcpncpy>>---copy part of a wide-character string returning a pointer to its end

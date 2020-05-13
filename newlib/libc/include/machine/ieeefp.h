@@ -1,3 +1,14 @@
+/*
+Copyright (C) 1991 DJ Delorie
+All rights reserved.
+
+Redistribution, modification, and use in source and binary forms is permitted
+provided that the above copyright notice and following paragraph are
+duplicated in all such forms.
+
+This file is distributed WITHOUT ANY WARRANTY; without even the implied
+warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ */
 #ifndef __IEEE_BIG_ENDIAN
 #include <picolibc.h>
 #ifndef __IEEE_LITTLE_ENDIAN
@@ -457,7 +468,19 @@
 #define __IEEE_BIG_ENDIAN
 #endif
 
+#if (defined(__XTENSA__))
+#ifdef __XTENSA_EB__
+#define __IEEE_BIG_ENDIAN
+#else
+#define __IEEE_LITTLE_ENDIAN
+#endif
+#endif
+
 #ifdef __AMDGCN__
+#define __IEEE_LITTLE_ENDIAN
+#endif
+
+#ifdef __XTENSA_EL__
 #define __IEEE_LITTLE_ENDIAN
 #endif
 

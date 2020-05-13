@@ -53,7 +53,7 @@ _start(void);
 
 /* This is the application entry point */
 int
-main(void);
+main(int, char **);
 
 #ifdef HAVE_INITFINI_ARRAY
 extern void __libc_init_array(void);
@@ -69,17 +69,27 @@ extern void __libc_fini_array(void);
  * entry point and finally any cleanup functions
  */
 
+#include <picotls.h>
+#include <stdio.h>
+
+extern void
+_exit(int) __weak_symbol;
+
 static inline void
 __start(void)
 {
 	memcpy(__data_start, __data_source, (uintptr_t) __data_size);
 	memset(__bss_start, '\0', (uintptr_t) __bss_size);
+#ifdef PICOLIBC_TLS
 	_set_tls(__tls_base);
+#endif
 #ifdef HAVE_INITFINI_ARRAY
 	__libc_init_array();
 #endif
-	main();
+	int ret = main(0, NULL);
 #ifdef HAVE_INITFINI_ARRAY
 	__libc_fini_array();
 #endif
+	if (_exit)
+		_exit(ret);
 }

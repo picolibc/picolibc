@@ -1,5 +1,5 @@
 /*
- *  $Id$
+ *  Copyright (c) 2007 Patrick Mansfield <patmans@us.ibm.com>
  */
 
 #ifndef _MACHINE__DEFAULT_TYPES_H

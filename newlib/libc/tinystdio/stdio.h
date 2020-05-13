@@ -241,7 +241,6 @@ struct __file {
 #define __SNBF	0x0400		/* unbuffered */
 #define __SMBF	0x0800		/* buf is from malloc */
 #endif
-	int	len;		/* characters read or written so far */
 	int	(*put)(char, struct __file *);	/* function to write one char to device */
 	int	(*get)(struct __file *);	/* function to read one char from device */
 	int	(*flush)(struct __file *);	/* function to flush output to device */
@@ -567,8 +566,8 @@ extern int	fclose(FILE *__stream);
  */
 
 extern int	vfprintf(FILE *__stream, const char *__fmt, va_list __ap);
-extern int	vfiprintf(FILE *__stream, const char *__fmt, va_list __ap);
-extern int	vfprintff(FILE *__stream, const char *__fmt, va_list __ap);
+extern int	__i_vfprintf(FILE *__stream, const char *__fmt, va_list __ap);
+extern int	__f_vfprintf(FILE *__stream, const char *__fmt, va_list __ap);
 
 /**
    The function \c fputc sends the character \c c (though given as type
@@ -604,8 +603,8 @@ extern int	putchar(int __c);
    \c stdout.  See \c vfprintf() for details.
 */
 extern int	printf(const char *__fmt, ...);
-extern int	iprintf(const char *__fmt, ...);
-extern int	printff(const char *__fmt, ...);
+extern int	__i_printf(const char *__fmt, ...);
+extern int	__f_printf(const char *__fmt, ...);
 
 /**
    The function \c vprintf performs formatted output to stream
@@ -614,16 +613,16 @@ extern int	printff(const char *__fmt, ...);
    See vfprintf() for details.
 */
 extern int	vprintf(const char *__fmt, va_list __ap);
-extern int	viprintf(const char *__fmt, va_list __ap);
-extern int	vprintff(const char *__fmt, va_list __ap);
+extern int	__i_vprintf(const char *__fmt, va_list __ap);
+extern int	__f_vprintf(const char *__fmt, va_list __ap);
 
 /**
    Variant of \c printf() that sends the formatted characters
    to string \c s.
 */
 extern int	sprintf(char *__s, const char *__fmt, ...);
-extern int	siprintf(char *__s, const char *__fmt, ...);
-extern int	sprintff(char *__s, const char *__fmt, ...);
+extern int	__i_sprintf(char *__s, const char *__fmt, ...);
+extern int	__f_sprintf(char *__s, const char *__fmt, ...);
 
 /**
    Like \c sprintf(), but instead of assuming \c s to be of infinite
@@ -634,16 +633,16 @@ extern int	sprintff(char *__s, const char *__fmt, ...);
    \c s if there were enough space.
 */
 extern int	snprintf(char *__s, size_t __n, const char *__fmt, ...);
-extern int	sniprintf(char *__s, size_t __n, const char *__fmt, ...);
-extern int	snprintff(char *__s, size_t __n, const char *__fmt, ...);
+extern int	__i_snprintf(char *__s, size_t __n, const char *__fmt, ...);
+extern int	__f_snprintf(char *__s, size_t __n, const char *__fmt, ...);
 
 /**
    Like \c sprintf() but takes a variable argument list for the
    arguments.
 */
 extern int	vsprintf(char *__s, const char *__fmt, va_list ap);
-extern int	vsiprintf(char *__s, const char *__fmt, va_list ap);
-extern int	vsprintff(char *__s, const char *__fmt, va_list ap);
+extern int	__i_vsprintf(char *__s, const char *__fmt, va_list ap);
+extern int	__f_vsprintf(char *__s, const char *__fmt, va_list ap);
 
 /**
    Like \c vsprintf(), but instead of assuming \c s to be of infinite
@@ -654,16 +653,16 @@ extern int	vsprintff(char *__s, const char *__fmt, va_list ap);
    \c s if there were enough space.
 */
 extern int	vsnprintf(char *__s, size_t __n, const char *__fmt, va_list ap);
-extern int	vsniprintf(char *__s, size_t __n, const char *__fmt, va_list ap);
-extern int	vsnprintff(char *__s, size_t __n, const char *__fmt, va_list ap);
+extern int	__i_vsnprintf(char *__s, size_t __n, const char *__fmt, va_list ap);
+extern int	__f_vsnprintf(char *__s, size_t __n, const char *__fmt, va_list ap);
 
 /**
    The function \c fprintf performs formatted output to \c stream.
    See \c vfprintf() for details.
 */
 extern int	fprintf(FILE *__stream, const char *__fmt, ...);
-extern int	fiprintf(FILE *__stream, const char *__fmt, ...);
-extern int	fprintff(FILE *__stream, const char *__fmt, ...);
+extern int	__i_fprintf(FILE *__stream, const char *__fmt, ...);
+extern int	__f_fprintf(FILE *__stream, const char *__fmt, ...);
 
 /**
    Write the string pointed to by \c str to stream \c stream.
@@ -799,8 +798,8 @@ extern int	ferror(FILE *__stream);
 #endif /* !defined(__DOXYGEN__) */
 
 extern int	vfscanf(FILE *__stream, const char *__fmt, va_list __ap);
-extern int	vfiscanf(FILE *__stream, const char *__fmt, va_list __ap);
-extern int	vfscanff(FILE *__stream, const char *__fmt, va_list __ap);
+extern int	__i_vfscanf(FILE *__stream, const char *__fmt, va_list __ap);
+extern int	__f_vfscanf(FILE *__stream, const char *__fmt, va_list __ap);
 
 /**
    The function \c fscanf performs formatted input, reading the
@@ -809,8 +808,8 @@ extern int	vfscanff(FILE *__stream, const char *__fmt, va_list __ap);
    See vfscanf() for details.
  */
 extern int	fscanf(FILE *__stream, const char *__fmt, ...);
-extern int	fiscanf(FILE *__stream, const char *__fmt, ...);
-extern int	fscanff(FILE *__stream, const char *__fmt, ...);
+extern int	__i_fscanf(FILE *__stream, const char *__fmt, ...);
+extern int	__f_fscanf(FILE *__stream, const char *__fmt, ...);
 
 /**
    The function \c scanf performs formatted input from stream \c stdin.
@@ -818,8 +817,8 @@ extern int	fscanff(FILE *__stream, const char *__fmt, ...);
    See vfscanf() for details.
  */
 extern int	scanf(const char *__fmt, ...);
-extern int	iscanf(const char *__fmt, ...);
-extern int	scanff(const char *__fmt, ...);
+extern int	__i_scanf(const char *__fmt, ...);
+extern int	__f_scanf(const char *__fmt, ...);
 
 /**
    The function \c vscanf performs formatted input from stream
@@ -828,8 +827,8 @@ extern int	scanff(const char *__fmt, ...);
    See vfscanf() for details.
 */
 extern int	vscanf(const char *__fmt, va_list __ap);
-extern int	viscanf(const char *__fmt, va_list __ap);
-extern int	vscanff(const char *__fmt, va_list __ap);
+extern int	__i_vscanf(const char *__fmt, va_list __ap);
+extern int	__f_vscanf(const char *__fmt, va_list __ap);
 
 /**
    The function \c sscanf performs formatted input, reading the
@@ -838,24 +837,15 @@ extern int	vscanff(const char *__fmt, va_list __ap);
    See vfscanf() for details.
  */
 extern int	sscanf(const char *__buf, const char *__fmt, ...);
-extern int	siscanf(const char *__buf, const char *__fmt, ...);
-extern int	sscanff(const char *__buf, const char *__fmt, ...);
+extern int	__i_sscanf(const char *__buf, const char *__fmt, ...);
+extern int	__f_sscanf(const char *__buf, const char *__fmt, ...);
 
-#if defined(__DOXYGEN__)
 /**
    Flush \c stream.
 
    If the stream provides a flush hook, use that. Otherwise return 0.
  */
 extern int	fflush(FILE *stream);
-#else
-static __inline__ int fflush(FILE *stream)
-{
-	if (stream->flush)
-		return (stream->flush)(stream);
-	return 0;
-}
-#endif
 
 #ifndef __DOXYGEN__
 /* only mentioned for libstdc++ support, not implemented in library */
@@ -911,41 +901,41 @@ extern char *tmpnam (char *s);
 #define PRINTF_LEVEL	PRINTF_STD
 #define SCANF_LEVEL	SCANF_STD
 
-#define vsnprintf vsniprintf
-#define vfprintf vfiprintf
-#define vprintf viprintf
-#define fprintf fiprintf
-#define printf iprintf
-#define sprintf siprintf
-#define snprintf sniprintf
-#define asprintf asiprintf
-#define asnprintf asniprintf
+#define vsnprintf __i_vsnprintf
+#define vfprintf __i_vfprintf
+#define vprintf __i_vprintf
+#define fprintf __i_fprintf
+#define printf __i_printf
+#define sprintf __i_sprintf
+#define snprintf __i_snprintf
+#define asprintf __i_asprintf
+#define asnprintf __i_asnprintf
 
-#define vfscanf vfiscanf
-#define scanf iscanf
-#define fscanf fiscanf
-#define sscanf siscanf
+#define vfscanf __i_vfscanf
+#define scanf __i_scanf
+#define fscanf __i_fscanf
+#define sscanf __i_sscanf
 
 #else
 
 #ifdef PICOLIBC_FLOAT_PRINTF_SCANF
 
-#define vsnprintf vsnprintff
-#define vfprintf vfprintff
-#define vprintf vprintff
-#define fprintf fprintff
-#define printf printff
-#define sprintf sprintff
-#define snprintf snprintff
-#define asprintf asprintff
-#define asnprintf asnprintff
+#define vsnprintf __f_vsnprintf
+#define vfprintf __f_vfprintf
+#define vprintf __f_vprintf
+#define fprintf __f_fprintf
+#define printf __f_printf
+#define sprintf __f_sprintf
+#define snprintf __f_snprintf
+#define asprintf __f_asprintf
+#define asnprintf __f_asnprintf
 
-#define vfscanf vfscanff
-#define scanf scanff
-#define fscanf fscanff
-#define sscanf sscanff
+#define vfscanf __f_vfscanf
+#define scanf __f_scanf
+#define fscanf __f_fscanf
+#define sscanf __f_sscanf
 
-static inline uint32_t
+static __inline uint32_t
 __printf_float(float f)
 {
 	union {

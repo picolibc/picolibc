@@ -1,3 +1,7 @@
+/*
+Copyright (c) 1990 Regents of the University of California.
+All rights reserved.
+ */
 #ifdef MALLOC_PROVIDED
 int _dummy_mallocr = 1;
 #else

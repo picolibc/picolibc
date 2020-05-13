@@ -83,8 +83,8 @@ __posix_getc(FILE *f)
 	if (pf->read_off >= pf->read_len) {
 
 		/* Flush stdout if reading from stdin */
-		if (pf->fd <= 2)
-			__posix_flush(stdout);
+		if (f == stdin)
+			fflush(stdout);
 
 		/* Reset read pointer, read some data */
 		pf->read_off = 0;
@@ -123,7 +123,7 @@ __posix_close(FILE *f)
  * Add a destructor function to get stdout flushed on
  * exit
  */
-__attribute__((destructor))
+__attribute__((destructor (101)))
 static void posix_exit(void)
 {
 	__posix_flush(stdout);

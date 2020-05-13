@@ -5,7 +5,7 @@
  * Redistribution and use in source and binary forms are permitted
  * provided that the above copyright notice and this paragraph are
  * duplicated in all such forms and that any documentation,
- * advertising materials, and other materials related to such
+ * and/or other materials related to such
  * distribution and use acknowledge that the software was developed
  * by the University of California, Berkeley.  The name of the
  * University may not be used to endorse or promote products derived
@@ -94,7 +94,6 @@ _fseeko64_r (struct _reent *ptr,
   _fpos64_t target, curoff;
   size_t n;
 
-  struct stat64 st;
   int havepos;
 
   /* Only do 64-bit seek on large file.  */
@@ -142,12 +141,31 @@ _fseeko64_r (struct _reent *ptr,
   switch (whence)
     {
     case SEEK_CUR:
-      curoff = _ftello64_r(ptr, fp);
-      if (curoff == -1L)
-        {
-          _newlib_flockfile_exit (fp);
-          return EOF;
-        }
+      /*
+       * In order to seek relative to the current stream offset,
+       * we have to first find the current stream offset a la
+       * ftell (see ftell for details).
+       */
+      _fflush_r (ptr, fp);   /* may adjust seek offset on append stream */
+      if (fp->_flags & __SOFF)
+	curoff = fp->_offset;
+      else
+	{
+	  curoff = seekfn (ptr, fp->_cookie, (_fpos64_t) 0, SEEK_CUR);
+	  if (curoff == -1L)
+	    {
+	      _newlib_flockfile_exit(fp);
+	      return EOF;
+	    }
+	}
+      if (fp->_flags & __SRD)
+	{
+	  curoff -= fp->_r;
+	  if (HASUB (fp))
+	    curoff -= fp->_ur;
+	}
+      else if (fp->_flags & __SWR && fp->_p != NULL)
+	curoff += fp->_p - fp->_bf._base;
 
       offset += curoff;
       whence = SEEK_SET;
@@ -182,6 +200,7 @@ _fseeko64_r (struct _reent *ptr,
     goto dumb;
   if ((fp->_flags & __SOPT) == 0)
     {
+      struct stat64 st;
       if (seekfn != __sseek64
 	  || fp->_file < 0
 	  || _fstat64_r (ptr, fp->_file, &st)

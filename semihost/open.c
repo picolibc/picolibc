@@ -64,9 +64,16 @@ open(const char *pathname, int flags, ...)
 		break;
 	}
 
-	int ret = sys_semihost_open(pathname, semiflags);
+	int ret;
+	do {
+		ret = sys_semihost_open(pathname, semiflags);
+	}
+#ifdef TINY_STDIO
+	while(0);
+#else
+	while (ret <= 2);
+#endif
 	if (ret == -1)
 		errno = sys_semihost_errno();
 	return ret;
 }
-

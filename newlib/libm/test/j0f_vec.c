@@ -1,3 +1,19 @@
+/*
+ * Copyright (c) 1994 Cygnus Support.
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms are permitted
+ * provided that the above copyright notice and this paragraph are
+ * duplicated in all such forms and that any documentation,
+ * and/or other materials related to such
+ * distribution and use acknowledge that the software was developed
+ * at Cygnus Support, Inc.  Cygnus Support, Inc. may not be used to
+ * endorse or promote products derived from this software without
+ * specific prior written permission.
+ * THIS SOFTWARE IS PROVIDED ``AS IS'' AND WITHOUT ANY EXPRESS OR
+ * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+ */
 #include "test.h"
  one_line_type j0f_vec[] = {
 {39, 0,123,__LINE__, 0x3fe579eb, 0x53b98ce6, 0xbff33333, 0x33333333},	/* 0.671133=f(-1.2)*/
@@ -249,7 +265,7 @@
 {38, 0,123,__LINE__, 0xbfd378b4, 0x5bff7c13, 0x400921fb, 0x54442d18},	/* -0.304242=f(3.14159)*/
 {33, 0,123,__LINE__, 0xbfd103ce, 0x275cddb6, 0x4012d97c, 0x7f3321d2},	/* -0.265857=f(4.71239)*/
 {32, 0,123,__LINE__, 0xbfb61c36, 0x5d354afd, 0xc03e0000, 0x00000000},	/* -0.086368=f(-30)*/
-{32, 0,123,__LINE__, 0xbfbbb801, 0x1dbc6619, 0xc03c4ccc, 0xcccccccd},	/* -0.108276=f(-28.3)*/
+{30, 0,123,__LINE__, 0xbfbbb801, 0x1dbc6619, 0xc03c4ccc, 0xcccccccd},	/* -0.108276=f(-28.3)*/
 {32, 0,123,__LINE__, 0x3fbedcdd, 0x5fdd7714, 0xc03a9999, 0x9999999a},	/* 0.120558=f(-26.6)*/
 {32, 0,123,__LINE__, 0x3fb54f9a, 0xbe409cae, 0xc038e666, 0x66666667},	/* 0.0832459=f(-24.9)*/
 {40, 0,123,__LINE__, 0xbfc36000, 0xbde60230, 0xc0373333, 0x33333334},	/* -0.151367=f(-23.2)*/
@@ -285,4 +301,4 @@
 {31, 0,123,__LINE__, 0xbfa76177, 0xa9edecfb, 0x403bcccc, 0xccccccc9},	/* -0.0456655=f(27.8)*/
 {34, 0,123,__LINE__, 0xbfc10afd, 0x42788fc9, 0x403d7fff, 0xfffffffc},	/* -0.133148=f(29.5)*/
 0,};
-test_j0f(m)   {run_vector_1(m,j0f_vec,(char *)(j0f),"j0f","ff");   }	
+void test_j0f(m)   {run_vector_1(m,j0f_vec,(char *)(j0f),"j0f","ff");   }	

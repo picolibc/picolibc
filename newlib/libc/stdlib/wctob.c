@@ -1,3 +1,6 @@
+/*
+Copyright (c) 2002 Thomas Fitzsimmons <fitzsim@redhat.com>
+ */
 #include <wchar.h>
 #include <stdio.h>
 #include <string.h>

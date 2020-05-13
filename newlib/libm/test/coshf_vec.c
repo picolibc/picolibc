@@ -1,3 +1,19 @@
+/*
+ * Copyright (c) 1994 Cygnus Support.
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms are permitted
+ * provided that the above copyright notice and this paragraph are
+ * duplicated in all such forms and that any documentation,
+ * and/or other materials related to such
+ * distribution and use acknowledge that the software was developed
+ * at Cygnus Support, Inc.  Cygnus Support, Inc. may not be used to
+ * endorse or promote products derived from this software without
+ * specific prior written permission.
+ * THIS SOFTWARE IS PROVIDED ``AS IS'' AND WITHOUT ANY EXPRESS OR
+ * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+ */
 #include "test.h"
  one_line_type coshf_vec[] = {
 {35, 0,123,__LINE__, 0x3ffcf872, 0x01e8823e, 0xbff33333, 0x33333333},	/* 1.81066=f(-1.2)*/
@@ -285,4 +301,4 @@
 {31, 0,123,__LINE__, 0x42613b18, 0x40000000, 0x403bcccc, 0xccccccc9},	/* 5.92047e+11=f(27.8)*/
 {31, 0,123,__LINE__, 0x42879487, 0xa0000000, 0x403d7fff, 0xfffffffc},	/* 3.24084e+12=f(29.5)*/
 0,};
-test_coshf(m)   {run_vector_1(m,coshf_vec,(char *)(coshf),"coshf","ff");   }	
+void test_coshf(m)   {run_vector_1(m,coshf_vec,(char *)(coshf),"coshf","ff");   }	

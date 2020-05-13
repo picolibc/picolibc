@@ -1,7 +1,24 @@
+/*
+ * Copyright (c) 1994 Cygnus Support.
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms are permitted
+ * provided that the above copyright notice and this paragraph are
+ * duplicated in all such forms and that any documentation,
+ * and/or other materials related to such
+ * distribution and use acknowledge that the software was developed
+ * at Cygnus Support, Inc.  Cygnus Support, Inc. may not be used to
+ * endorse or promote products derived from this software without
+ * specific prior written permission.
+ * THIS SOFTWARE IS PROVIDED ``AS IS'' AND WITHOUT ANY EXPRESS OR
+ * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+ */
 #include <signal.h>
 #include  "test.h"
 #include <math.h>
 #include <string.h>
+#include <stdint.h>
 int verbose;
 static int count;
 int inacc;
@@ -19,9 +36,10 @@ main (int ac,
   int is = 1;
   int math= 1;
   int cvt = 1;
+#ifdef HAVE_IEEEFP_FUNCS
   int ieee= 1;
+#endif
   int vector=0;
-bt();
   for (i = 1; i < ac; i++) 
   {
     if (strcmp(av[i],"-v")==0) 
@@ -36,8 +54,10 @@ bt();
      math= 0;
     if (strcmp(av[i],"-nocvt") == 0)
      cvt = 0;
+#ifdef HAVE_IEEEFP_FUNCS
     if (strcmp(av[i],"-noiee") == 0)
      ieee= 0;
+#endif
     if (strcmp(av[i],"-generate") == 0) {
      vector = 1;
      calc = 1;
@@ -54,9 +74,12 @@ bt();
    test_math(vector);
   if (is)
    test_is();
-//  if (ieee)  test_ieee();
+#ifdef HAVE_IEEEFP_FUNCS
+  if (ieee)
+   test_ieee();
+#endif
   printf("Tested %d functions, %d errors detected\n", count, inacc);
-  return 0;
+  return inacc != 0;
 }
 
 
@@ -110,6 +133,18 @@ bigger (__ieee_double_shape_type *a,
 	{
 	  return 1;
 	}
+    }
+  return 0;
+}
+
+int 
+fbigger (__ieee_float_shape_type *a,
+	   __ieee_float_shape_type *b)
+{
+
+  if (a->p1 > b->p1)
+    {
+      return 1;
     }
   return 0;
 }
@@ -177,6 +212,44 @@ mag_of_error (double is,
   
   return 64;
   
+}
+
+/* Return the first bit different between two double numbers */
+int 
+fmag_of_error (float is,
+       float shouldbe)
+{
+  __ieee_float_shape_type a,b;
+  int i;
+  int a_big;
+  unsigned  int mask;
+  uint32_t sw;
+  a.value = is;
+  
+  b.value = shouldbe;
+  
+  if (a.p1 == b.p1) return 32;
+
+  /* Subtract the larger from the smaller number */
+
+  a_big = fbigger(&a, &b);
+
+  if (!a_big) {
+    uint32_t t;
+    t = a.p1;
+    a.p1 = b.p1;
+    b.p1 = t;
+  }
+
+  sw = (a.p1) - (b.p1);
+
+  mask = 0x80000000;
+  for (i = 0; i < 32; i++)
+  {
+	  if (((sw) & mask)!=0) return i;
+	  mask >>=1;
+  }
+  return 32;
 }
 
  int ok_mag;
@@ -264,9 +337,9 @@ test_mok (double value,
 	   iname, 
 	   theline,
 	   mag);
-     printf("%08x%08x %08x%08x) ",
-	    a.parts.msw,	     a.parts.lsw,
-	    b.parts.msw,	     b.parts.lsw);
+     printf("%08lx%08lx %08lx%08lx) ",
+	    (unsigned long) a.parts.msw,	     (unsigned long) a.parts.lsw,
+	    (unsigned long) b.parts.msw,	     (unsigned long) b.parts.lsw);
     printf("(%g %g)\n",   a.value, b.value);
     inacc++;
   }

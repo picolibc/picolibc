@@ -37,11 +37,35 @@ tests = ['tiswctype', 'twctrans']
 
 cygwin_tests = ['twctype']
 
-foreach test : tests
-  src = test + '.c'
-  test(test,
-       executable(test, [src, '../stdio-bits.c'],
-		  c_args: ['-Wno-missing-braces', '-Wno-implicit-int', '-Wno-return-type', '-D_XOPEN_SOURCE=700', '-D_GNU_SOURCE'],
-		  link_with: [lib_m, lib_c],
-		  include_directories: test_inc))
+foreach target : targets
+  value = get_variable('target_' + target)
+
+  _libs = [get_variable('lib_m' + target), get_variable('lib_c' + target)]
+  if is_variable('lib_semihost' + target)
+    _libs += [get_variable('lib_semihost' + target)]
+  endif
+  if is_variable('lib_crt' + target)
+    _libs += [get_variable('lib_crt'+ target)]
+  endif
+  
+  _c_args = value[1] + test_c_args
+  _link_args = value[1] + test_link_args
+
+  foreach test : tests
+    if target == ''
+      test_name = test
+    else
+      test_name = join_paths(target, test)
+    endif
+
+    src = test + '.c'
+
+    test(test + target,
+	 executable(test_name, src,
+		    c_args: ['-Wno-missing-braces', '-Wno-implicit-int', '-Wno-return-type', '-D_XOPEN_SOURCE=700', '-D_GNU_SOURCE'] + _c_args,
+		    link_args: _link_args,
+		    link_with: _libs,
+		    include_directories: test_inc),
+	 env: ['MESON_SOURCE_ROOT=' + meson.source_root()])
+  endforeach
 endforeach
