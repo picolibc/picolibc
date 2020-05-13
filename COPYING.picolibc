@@ -481,6 +481,7 @@ Files: do-arm-configure
  newlib/libc/string/meson.build
  newlib/libc/time/meson.build
  newlib/libc/tinystdio/fdopen.c
+ newlib/libc/tinystdio/fileno.c
  newlib/libc/tinystdio/fopen.c
  newlib/libc/tinystdio/fseek.c
  newlib/libc/tinystdio/ftell.c
@@ -558,12 +559,17 @@ Copyright: 2019 Keith Packard
 License: BSD3-1
 
 Files: newlib/libc/stdio64/meson.build
+ newlib/libc/errno/errno.c
  newlib/libc/tinystdio/fflush.c
  newlib/libc/stdio/nano-svfprintf.c
  newlib/libc/stdio/nano-svfscanf.c
  semihost/fstat.c
  semihost/isatty.c
  semihost/mapstdio.c
+ test-arm.ld
+ test-riscv32.ld
+ test-riscv64.ld
+ test-riscv.ld
 Copyright: 2020 Keith Packard
 License: BSD3-1
 
@@ -1685,6 +1691,7 @@ License: BSD3-31
 
 Files: newlib/libc/tinystdio/strtod.c
  newlib/libc/tinystdio/strtof.c
+ newlib/libc/tinystdio/strtold.c
 Copyright: 2002-2005  Michael Stumpf  <mistumpf@de.pepperl-fuchs.com>
  2006,2008  Dmitry Xmelkov 
 License: BSD3-31
@@ -2006,7 +2013,6 @@ Files: .drone.yml
  newlib/make-target
  newlib/newlib.hin
  picolibc.specs.in
- winsup/cygwin/release/3.1.3
 Copyright: 2020 The Newlib Project
 License: Default-1
 
@@ -2092,6 +2098,10 @@ Files: newlib/libc/ctype/isblank.c
 Copyright: 2002 Thomas Fitzsimmons <fitzsim@redhat.com>
 License: Default-1
 
+Files: newlib/libc/string/swab.c
+Copyright: 2000 Alexandre Oliva <aoliva@redhat.com>
+License: Default-1
+
 Files: newlib/libc/ctype/mkcaseconv
  newlib/libc/ctype/mkcategories
  newlib/libc/ctype/mkunidata
@@ -2142,10 +2152,17 @@ Files: newlib/libc/include/limits.h
  newlib/libc/time/local.h
  newlib/libc/time/tzlock.c
  newlib/libc/time/tzset.c
- newlib/libc/time/tzset_r.c
  newlib/testsuite/newlib.wctype/tiswctype.c
  newlib/testsuite/newlib.wctype/twctrans.c
 Copyright: 2002 Jeff Johnston  <jjohnstn@redhat.com>
+License: Default-1
+
+Files: newlib/libc/include/machine/ansi.h
+Copyright: 2001 Jeff Johnston  <jjohnstn@redhat.com>
+License: Default-1
+
+Files: newlib/libc/time/tzvars.c
+Copyright: 2005 Tom Walsh <tom@openhardware.net>
 License: Default-1
 
 Files: newlib/libc/include/machine/_default_types.h
@@ -2176,6 +2193,7 @@ License: Default-1
 
 Files: newlib/libc/include/ssp/stdlib.h
  newlib/libc/include/ssp/wchar.h
+ newlib/libc/ssp/chk_fail.c
  newlib/libc/ssp/stack_protector.c
  newlib/libc/string/wmempcpy.c
 Copyright: 2017 Yaakov Selkowitz <yselkowi@redhat.com>
@@ -2339,7 +2357,6 @@ Files: newlib/libc/stdlib/__adjust.c
  newlib/libc/stdlib/atoi.c
  newlib/libc/stdlib/atol.c
  newlib/libc/stdlib/calloc.c
- newlib/libc/stdlib/dtoastub.c
  newlib/libc/stdlib/ecvtbuf.c
  newlib/libc/stdlib/efgcvt.c
  newlib/libc/stdlib/envlock.c
@@ -3098,6 +3115,7 @@ Files: newlib/libc/reent/impure.c
  newlib/libm/test/test_ieee.c
  newlib/libm/test/test_is.c
  newlib/libm/test/trunc_vec.c
+ newlib/libm/test/truncf_vec.c
  newlib/libm/test/y0_vec.c
  newlib/libm/test/y0f_vec.c
  newlib/libm/test/y1_vec.c
