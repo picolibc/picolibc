@@ -1,3 +1,34 @@
+picolibc (1.4.2-1) unstable; urgency=medium
+
+  * Clang source compatibility. Clang should now be able to compile
+    the library.
+
+  * Testing on github on push and pull-request. For now, this is
+    limited to building the library due to a bug in qemu.
+
+  * Get newlib stdio working again. You can now usefully use newlib's
+    stdio. This requires a working malloc and is substantially larger
+    than tinystdio, but has more accurate floating point input. This
+    requires POSIX functions including read, write and a few others.
+
+  * Fix long double strtold. The working version is only available
+    when using tinystdio; if using newlib stdio, strtold is simply not
+    available.
+
+  * Improve tinystdio support for C99 printf/scanf additions.
+
+  * Check for correct prefix when sysroot-install option is
+    selected. The value of this option depends on how gcc was
+    configured, and (alas) meson won't let us set it at runtime, so
+    instead we complain if the wrong value was given and display the
+    correct value.
+
+  * Sync up with current newlib master
+
+  * Add aarch64-linux-gnu support
+
+ -- Keith Packard <keithp@keithp.com>  Thu, 21 May 2020 08:51:37 -0700
+
 picolibc (1.4.1-2) unstable; urgency=medium
 
   * Build with newer GCC versions
