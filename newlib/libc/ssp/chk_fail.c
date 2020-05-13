@@ -1,3 +1,4 @@
+/* Copyright 2017 Yaakov Selkowitz <yselkowi@redhat.com> */
 #include <signal.h>
 #include <string.h>
 #include <unistd.h>
