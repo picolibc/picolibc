@@ -1,7 +1,8 @@
 #
 # SPDX-License-Identifier: BSD-3-Clause
 #
-# Copyright © 2019 Keith Packard, Anthony Anderson
+# Copyright © 2019 Keith Packard, 
+# Copyright © 2020 Anthony Anderson
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions
