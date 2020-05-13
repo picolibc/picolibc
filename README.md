@@ -1,8 +1,8 @@
-# PicoLibc
+# Picolibc
 Copyright © 2018,2019 Keith Packard
 
-PicoLibc is library offering standard C library APIs that targets
-small embedded systems with limited RAM. PicoLibc was formed by blending
+Picolibc is library offering standard C library APIs that targets
+small embedded systems with limited RAM. Picolibc was formed by blending
 code from [Newlib](http://sourceware.org/newlib/) and
 [AVR Libc](https://www.nongnu.org/avr-libc/).
 
@@ -10,7 +10,7 @@ code from [Newlib](http://sourceware.org/newlib/) and
 
 Picolibc source comes from a variety of places and has a huge variety
 of copyright holders and license texts. While much of the code comes
-from newlib, none of the GPL-related bits used to build the library
+from Newlib, none of the GPL-related bits used to build the library
 are left in the repository, so all of the source code uses BSD-like
 licenses, a mixture of 2- and 3- clause BSD itself and a variety of
 other (mostly older) licenses with similar terms.
@@ -28,7 +28,7 @@ other licenses.
 
 ## Supported Architectures
 
-Picolibc inherited code for a *lot* of architectures from newlib, but
+Picolibc inherited code for a *lot* of architectures from Newlib, but
 at this point only has code to build for the following targets:
 
  * ARM (32-bit only)
@@ -38,18 +38,33 @@ at this point only has code to build for the following targets:
  * PowerPC
  * ESP8266 (xtensa-lx106-elf)
 
-Supporting architectures that already have newlib code requires:
+Supporting architectures that already have Newlib code requires:
 
  1. newlib/libc/machine/_architecture_/meson.build to build any
     architecture-specific libc bits
+
  2. newlib/libm/machine/_architecture_/meson.build to build any
     architecture-specific libm bits
- 3. picocrt/machine/_architecture_ source code and build bits if
-    you need custom startup code for the architecture.
+
+ 3. picocrt/machine/_architecture_ source code and build bits if you
+    need custom startup code for the architecture. Useful in all
+    cases, but this is necessary to run tests under qemu if your
+    platform can do that.
+
  4. cross-_gcc-triple_.txt to configure the meson cross-compilation
     mechanism to use the right tools
+
  5. do-_architecture_-configure to make testing the cross-compilation
     setup easier.
+
+ 6. newlib/libc/picolib support. This should include whatever startup
+    helpers are required (like ARM interrupt vector) and TLS support
+    (if your compiler includes this).
+
+ 7. run-_architecture_ script to run tests under QEMU. Look at the ARM
+    and RISC-V examples to get a sense of what this needs to do and
+    how it gets invoked from the cross-_gcc-triple_.txt configuration
+    file.
 
 ## Relation to newlib
 
@@ -75,6 +90,38 @@ areas unrelated to the code used by picolibc, so keeping things in
 sync has not been difficult so far.
 
 ## Releases
+
+### Picolibc version 1.4.2
+
+ 1. Clang source compatibility. Clang should now be able to compile
+    the library. Thanks to Denis Feklushkin for figuring out how
+    to make this work.
+
+ 2. aarch64 support. This enables the existing aarch64 code and
+    provides an example configuration file for getting it
+    built.  Thanks for Anthony Anderson for this feature.
+
+ 3. Testing on github on push and pull-request. For now, this is
+    limited to building the library due to a bug in qemu.
+
+ 4. Get newlib stdio working again. You can now usefully use Newlib's
+    stdio. This requires a working malloc and is substantially larger
+    than tinystdio, but has more accurate floating point input. This
+    requires POSIX functions including read, write and a few others.
+
+ 5. Fix long double strtold. The working version is only available
+    when using tinystdio; if using newlib stdio, strtold is simply not
+    available.
+
+ 6. Improve tinystdio support for C99 printf/scanf additions.
+
+ 7. Check for correct prefix when sysroot-install option is
+    selected. The value of this option depends on how gcc was
+    configured, and (alas) meson won't let us set it at runtime, so
+    instead we complain if the wrong value was given and display the
+    correct value.
+
+ 8. Sync up with current newlib master.
 
 ### Picolibc version 1.4.1
 
@@ -146,7 +193,7 @@ semihosting support.
     value.
 
  2. Fix picolibc.ld to not attempt to use redefined symbols for memory
-    space definitions. These redefinitions would fail and the default
+    space definitions. These re-definitions would fail and the default
     values be used for system memory definitions. Instead, just use
     the ? : operators each place the values are needed. Linker scripts
     continue to mystify.
