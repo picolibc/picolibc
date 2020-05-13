@@ -127,41 +127,50 @@ main(int argc, char **argv)
 #ifdef PICOLIBC_FLOAT_PRINTF_SCANF
 #define float_type float
 #define scanf_format "%f"
+#define ERROR_MAX 1e-6
 #else
 #define float_type double
 #define scanf_format "%lf"
+#ifdef TINY_STDIO
+#define ERROR_MAX 1e-15
+#else
+#define ERROR_MAX 0
 #endif
+#endif
+
 			float_type v = test_vals[t] * pow(10.0, (float_type) x);
 			float_type r;
 			float_type e;
 
-			sprintf(buf, "%.45f", printf_float(v));
+			sprintf(buf, "%.55f", printf_float(v));
 			sscanf(buf, scanf_format, &r);
 			e = fabs(v-r) / v;
-			if (e > 1e-6) {
-				printf("\t%3d: wanted %.7e got %.7e (error %.7e\n", x,
-				       printf_float(v), printf_float(r), printf_float(e));
-				errors++;
-				fflush(stdout);
-			}
-
-
-			sprintf(buf, "%.14e", printf_float(v));
-			sscanf(buf, scanf_format, &r);
-			e = fabs(v-r) / v;
-			if (e > 1e-6) {
-				printf("\t%3d: wanted %.7e got %.7e (error %.7e, buf %s)\n", x,
+			if (e > ERROR_MAX) {
+				printf("\tf %3d: wanted %.7e got %.7e (error %.7e, buf %s)\n", x,
 				       printf_float(v), printf_float(r), printf_float(e), buf);
 				errors++;
 				fflush(stdout);
 			}
 
 
-			sprintf(buf, "%.7g", printf_float(v));
+			sprintf(buf, "%.20e", printf_float(v));
 			sscanf(buf, scanf_format, &r);
 			e = fabs(v-r) / v;
-			if (e > 1e-6) {
-				printf("\t%3d: wanted %.7e got %.7e (error %.7e, buf %s)\n", x,
+			if (e > ERROR_MAX)
+			{
+				printf("\te %3d: wanted %.7e got %.7e (error %.7e, buf %s)\n", x,
+				       printf_float(v), printf_float(r), printf_float(e), buf);
+				errors++;
+				fflush(stdout);
+			}
+
+
+			sprintf(buf, "%.20g", printf_float(v));
+			sscanf(buf, scanf_format, &r);
+			e = fabs(v-r) / v;
+			if (e > ERROR_MAX)
+			{
+				printf("\tg %3d: wanted %.7e got %.7e (error %.7e, buf %s)\n", x,
 				       printf_float(v), printf_float(r), printf_float(e), buf);
 				errors++;
 				fflush(stdout);
