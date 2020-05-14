@@ -28,3 +28,6 @@ jobs:
       - name: 'Build on arm'
         run: |
           docker run --rm picolibc ./.github/do-build do-arm-configure build-arm
+      - name: 'Build on aarch64'
+        run: |
+          docker run --rm picolibc ./.github/do-build do-aarch64-configure build-aarch64

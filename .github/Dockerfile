@@ -7,7 +7,8 @@ RUN apt-get update && \
     meson \
     ninja-build \
     gcc-arm-none-eabi \
-    gcc-riscv64-unknown-elf
+    gcc-riscv64-unknown-elf \
+    gcc-aarch64-linux-gnu
 
 # Copy freedom-e-sdk into container
 RUN mkdir picolibc
