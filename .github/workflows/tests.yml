@@ -21,13 +21,14 @@ jobs:
         run: |
           docker run --rm picolibc ./.github/do-test do-native-configure build-native
 
-      - name: 'Build on risc-v'
+      - name: 'Test on risc-v'
         run: |
-          docker run --rm picolibc ./.github/do-build do-riscv-configure build-riscv
+          docker run --rm picolibc ./.github/do-test do-riscv-configure build-riscv
 
-      - name: 'Build on arm'
+      - name: 'Test on arm'
         run: |
-          docker run --rm picolibc ./.github/do-build do-arm-configure build-arm
+          docker run --rm picolibc ./.github/do-test do-arm-configure build-arm
+
       - name: 'Build on aarch64'
         run: |
           docker run --rm picolibc ./.github/do-build do-aarch64-configure build-aarch64
