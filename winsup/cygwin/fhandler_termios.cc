@@ -33,7 +33,8 @@ fhandler_termios::tcinit (bool is_pty_master)
       tc ()->ti.c_iflag = BRKINT | ICRNL | IXON | IUTF8;
       tc ()->ti.c_oflag = OPOST | ONLCR;
       tc ()->ti.c_cflag = B38400 | CS8 | CREAD;
-      tc ()->ti.c_lflag = ISIG | ICANON | ECHO | IEXTEN;
+      tc ()->ti.c_lflag = ISIG | ICANON | ECHO | IEXTEN
+	| ECHOE | ECHOK | ECHOCTL | ECHOKE;
 
       tc ()->ti.c_cc[VDISCARD]	= CFLUSH;
       tc ()->ti.c_cc[VEOL]	= CEOL;
