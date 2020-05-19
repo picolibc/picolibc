@@ -948,6 +948,10 @@ fhandler_pty_slave::open (int flags, mode_t)
       init_console_handler (true);
     }
 
+  get_ttyp ()->pcon_pid = 0;
+  get_ttyp ()->switch_to_pcon_in = false;
+  get_ttyp ()->switch_to_pcon_out = false;
+
   set_open_status ();
   return 1;
 
@@ -1008,6 +1012,7 @@ fhandler_pty_slave::close ()
     termios_printf ("CloseHandle (output_mutex<%p>), %E", output_mutex);
   if (pcon_attached_to == get_minor ())
     get_ttyp ()->num_pcon_attached_slaves --;
+  set_switch_to_pcon (2); /* Make system_printf() work after close. */
   return 0;
 }
 
