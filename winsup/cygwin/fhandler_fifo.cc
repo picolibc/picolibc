@@ -1020,6 +1020,7 @@ err_close_reader:
   saved_errno = get_errno ();
   close ();
   set_errno (saved_errno);
+  reader_opening_unlock ();
   return 0;
 err_close_cancel_evt:
   NtClose (cancel_evt);
