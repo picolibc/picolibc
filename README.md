@@ -207,6 +207,7 @@ include:
 
  * [Building Picolibc](doc/build.md)
  * [Operating System Support](doc/os.md)
+ * [Printf and Scanf in Picolibc](doc/printf.md)
  * [Using Picolibc](doc/using.md)
  * [Picolibc initialization](doc/init.md)
  * [Thread Local Storage](doc/tls.md)
