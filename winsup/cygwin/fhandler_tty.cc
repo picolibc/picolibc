@@ -180,6 +180,16 @@ set_ishybrid_and_switch_to_pcon (HANDLE h)
     }
 }
 
+inline void
+fhandler_pty_slave::free_attached_console ()
+{
+  if (freeconsole_on_close && get_minor () == pcon_attached_to)
+    {
+      FreeConsole ();
+      pcon_attached_to = -1;
+    }
+}
+
 #define DEF_HOOK(name) static __typeof__ (name) *name##_Orig
 DEF_HOOK (WriteFile);
 DEF_HOOK (WriteConsoleA);
@@ -708,11 +718,7 @@ fhandler_pty_slave::~fhandler_pty_slave ()
   if (!get_ttyp ())
     {
       /* Why comes here? Who clears _tc? */
-      if (freeconsole_on_close)
-	{
-	  FreeConsole ();
-	  pcon_attached_to = -1;
-	}
+      free_attached_console ();
       return;
     }
   if (get_pseudo_console ())
@@ -739,11 +745,7 @@ fhandler_pty_slave::~fhandler_pty_slave ()
       if (used == 0)
 	{
 	  init_console_handler (false);
-	  if (freeconsole_on_close)
-	    {
-	      FreeConsole ();
-	      pcon_attached_to = -1;
-	    }
+	  free_attached_console ();
 	}
     }
 }
@@ -3006,11 +3008,7 @@ fhandler_pty_slave::fixup_after_exec ()
       if (used == 1 /* About to close this tty */)
 	{
 	  init_console_handler (false);
-	  if (freeconsole_on_close)
-	    {
-	      FreeConsole ();
-	      pcon_attached_to = -1;
-	    }
+	  free_attached_console ();
 	}
     }
 

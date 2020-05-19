@@ -2284,6 +2284,7 @@ class fhandler_pty_slave: public fhandler_pty_common
 
   bool try_reattach_pcon ();
   void restore_reattach_pcon ();
+  inline void free_attached_console ();
 
  public:
   /* Constructor */
