@@ -1443,7 +1443,7 @@ class fhandler_fifo: public fhandler_base
   { return shmem->get_shared_fc_handler_committed (); }
   void set_shared_fc_handler_committed (size_t n)
   { shmem->set_shared_fc_handler_committed (n); }
-  int update_my_handlers (bool from_exec = false);
+  int update_my_handlers ();
   int update_shared_handlers ();
   bool shared_fc_handler_updated () const
   { return shmem->shared_fc_handler_updated (); }
