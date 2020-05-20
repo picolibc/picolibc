@@ -3,17 +3,14 @@
 # output every command that modifies files on the build system.
 export DH_VERBOSE = 1
 
-
-# see FEATURE AREAS in dpkg-buildflags(1)
-#export DEB_BUILD_MAINT_OPTIONS = hardening=+all
-
-# see ENVIRONMENT in dpkg-buildflags(1)
-# package maintainers to append CFLAGS
-#export DEB_CFLAGS_MAINT_APPEND  = -Wall -pedantic
-# package maintainers to append LDFLAGS
-#export DEB_LDFLAGS_MAINT_APPEND = -Wl,--as-needed
+# Don't let dpkg-buildflags mess with the compiler settings
+export DEB_CPPFLAGS_MAINT_SET =
+export DEB_CFLAGS_MAINT_SET =
+export DEB_LDFLAGS_MAINT_SET =
 
 BUILDDIR=build
+
+BUILDPATH=$(shell pwd)/debian/$(BUILDDIR)
 
 %:
 	dh $@ -B$(BUILDDIR)
@@ -24,6 +21,7 @@ LX106_ARCH=xtensa-lx106-elf
 AARCH64_ARCH=aarch64-linux-gnu
 
 MESON_SHARED_FLAGS = \
+	-Dc_args='-Wdate-time -ffile-prefix-map=$(BUILDPATH)=. -fdebug-prefix-map=$(BUILDPATH)=.' \
 	--prefix=/usr
 
 MESON_RISCV_FLAGS = \
