@@ -69,10 +69,10 @@ override_dh_auto_configure:
 	meson . debian/$(BUILDDIR)/$(AARCH64_ARCH) $(MESON_AARCH64_FLAGS)
 
 override_dh_auto_build:
-	cd debian/$(BUILDDIR)/$(RISCV_ARCH) && ninja
-	cd debian/$(BUILDDIR)/$(ARM_ARCH) && ninja
-	cd debian/$(BUILDDIR)/$(LX106_ARCH) && ninja
-	cd debian/$(BUILDDIR)/$(AARCH64_ARCH) && ninja
+	cd debian/$(BUILDDIR)/$(RISCV_ARCH) && ninja -v
+	cd debian/$(BUILDDIR)/$(ARM_ARCH) && ninja -v
+	cd debian/$(BUILDDIR)/$(LX106_ARCH) && ninja -v
+	cd debian/$(BUILDDIR)/$(AARCH64_ARCH) && ninja -v
 
 override_dh_auto_test:
 ifeq (,$(filter nocheck,$(DEB_BUILD_OPTIONS)))
