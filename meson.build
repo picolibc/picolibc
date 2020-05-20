@@ -35,6 +35,7 @@
 project('picolibc', 'c',
 	default_options: [
 	  'buildtype=minsize',
+	  'debug=true',
 	  'c_std=gnu99',
 	  'b_staticpic=false',
 	],
@@ -396,7 +397,7 @@ includedir = join_paths(prefix, get_option('includedir'))
 # versions of gcc for RISC-V which have a bug that mis-names
 # initialized read-only data segments when -fdata-sections
 # is defined
-arguments = ['-g', '-ffunction-sections']
+arguments = ['-ffunction-sections']
 
 if tls_model != ''
   arguments += ['-ftls-model=' + tls_model]
