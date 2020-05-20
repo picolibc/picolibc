@@ -6,9 +6,9 @@ Build-Depends: debhelper-compat (= 12), gcc-arm-none-eabi, gcc-riscv64-unknown-e
 Standards-Version: 4.5.0
 Rules-Requires-Root: no
 Section: devel
-HomePage: https://keithp.com/git/picolibc
-Vcs-Git: https://keithp.com/git/picolibc.git
-Vcs-Browser: https://keithp.com/picolibc
+HomePage: https://keithp.com/picolibc
+Vcs-Git: git://keithp.com/git/picolibc.git
+Vcs-Browser: https://keithp.com/cgit/picolibc.git/
 
 Package: picolibc-riscv64-unknown-elf
 Architecture: all
