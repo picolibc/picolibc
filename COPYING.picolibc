@@ -104,8 +104,7 @@ Copyright: 2001 Alexey Zelkin <phantom@FreeBSD.org>
  1997 FreeBSD Inc.
 License: BSD2-1
 
-Files: newlib/libc/machine/i386/sys/fenv.h
- newlib/libc/machine/x86_64/sys/fenv.h
+Files: newlib/libc/machine/x86_64/sys/fenv.h
 Copyright: 2010-2019 Red Hat, Inc.
 License: BSD2-1
 
