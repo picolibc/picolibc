@@ -10,3 +10,5 @@ cpu_family = 'esp32'
 cpu = 'esp32'
 endian = 'little'
 
+[properties]
+skip_sanity_check = true

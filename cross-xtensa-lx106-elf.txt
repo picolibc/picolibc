@@ -1,5 +1,5 @@
 [binaries]
-c = ['xtensa-lx106-elf-gcc', '-nostdlib', '-mlongcalls']
+c = 'xtensa-lx106-elf-gcc'
 ar = 'xtensa-lx106-elf-ar'
 as = 'xtensa-lx106-elf-as'
 strip = 'xtensa-lx106-elf-strip'
@@ -10,3 +10,6 @@ cpu_family = 'xtensa'
 cpu = 'xtensa'
 endian = 'little'
 
+[properties]
+c_args = ['-nostdlib', '-mlongcalls']
+skip_sanity_check = true

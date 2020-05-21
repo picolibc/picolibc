@@ -35,13 +35,10 @@
 
 #include <unistd.h>
 
-extern char __end[];
+extern char __heap_start[];
 extern char __heap_end[];
-extern char __heap_size[];
 
-static char *brk = __end;
-
-#define heap_size ((uintptr_t)__heap_size)
+static char *brk = __heap_start;
 
 void *sbrk(ptrdiff_t incr)
 {

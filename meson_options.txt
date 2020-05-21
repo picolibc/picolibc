@@ -38,6 +38,9 @@ option('fast-strcmp', type: 'boolean', value: true,
 option('multilib', type: 'boolean', value: true,
        description: 'Enable multilib compile')
 
+option('multilib-list', type: 'array', value: [],
+       description: 'List of multilib configurations to build for')
+
 option('picolib', type: 'boolean', value: true,
        description: 'Include pico lib bits')
 
@@ -55,18 +58,24 @@ option('native-tests', type: 'boolean', value: false,
 
 option('newlib-tinystdio', type: 'boolean', value: true,
        description: 'Use tiny stdio from avr libc')
+option('newlib-stdio64', type: 'boolean', value: true,
+       description: 'Include stdio64 with newlib stdio')
 
 option('specsdir', type: 'string',
        description: 'Installation directory for .specs file')
 
 option('newlib-io-pos-args', type: 'boolean', value: false,
        description: 'enable printf-family positional arg support')
-option('newlib-io-c99-formats', type: 'boolean', value: false,
+option('io-c99-formats', type: 'boolean', value: true,
        description: 'enable C99 support in IO functions like printf/scanf')
+option('newlib-io-c99-formats', type: 'boolean', value: false,
+       description: 'enable C99 support in IO functions like printf/scanf (newlib stdio only)')
+option('io-long-long', type: 'boolean', value: false,
+       description: 'enable long long type support in IO functions like printf/scanf')
 option('newlib-io-long-long', type: 'boolean', value: false,
        description: 'enable long long type support in IO functions like printf/scanf')
 option('newlib-io-long-double', type: 'boolean', value: false,
-       description: 'enable long double type support in IO functions printf/scanf')
+       description: 'enable long double type support in IO functions printf/scanf (newlib stdio only)')
 option('newlib-register-fini', type: 'boolean', value: false,
        description: 'enable finalization function registration using atexit')
 option('newlib-mb', type: 'boolean', value: false,
@@ -90,7 +99,7 @@ option('newlib-global-stdio-streams', type: 'boolean', value: false,
 option('newlib-fvwrite-in-streamio', type: 'boolean', value: false,
        description: 'disable iov in streamio')
 option('newlib-fseek-optimization', type: 'boolean', value: false,
-       description: 'disable fseek optimization')
+       description: 'enable fseek optimization')
 option('newlib-wide-orient', type: 'boolean', value: false,
        description: 'Turn off wide orientation in streamio')
 option('newlib-nano-malloc', type: 'boolean', value: true,

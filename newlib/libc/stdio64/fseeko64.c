@@ -94,7 +94,6 @@ _fseeko64_r (struct _reent *ptr,
   _fpos64_t target, curoff;
   size_t n;
 
-  struct stat64 st;
   int havepos;
 
   /* Only do 64-bit seek on large file.  */
@@ -201,6 +200,7 @@ _fseeko64_r (struct _reent *ptr,
     goto dumb;
   if ((fp->_flags & __SOPT) == 0)
     {
+      struct stat64 st;
       if (seekfn != __sseek64
 	  || fp->_file < 0
 	  || _fstat64_r (ptr, fp->_file, &st)

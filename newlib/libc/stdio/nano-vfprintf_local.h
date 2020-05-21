@@ -69,8 +69,8 @@
 #undef _WANT_IO_C99_FORMATS
 
 /* Currently a test is made to see if long double processing is warranted.
-   This could be changed in the future should the _ldtoa_r code be
-   preferred over _dtoa_r.  */
+   This could be changed in the future should the __ldtoa code be
+   preferred over __dtoa.  */
 #define _NO_LONGDBL
 
 #define _NO_LONGLONG
@@ -88,10 +88,7 @@
 # define MAXEXPLEN		7
 # define DEFPREC		6
 
-extern char *_dtoa_r (double, int,
-			      int, int *, int *, char **);
-
-# define _DTOA_R _dtoa_r
+# define _DTOA __dtoa
 # define FREXP frexp
 
 #endif /* FLOATING_POINT.  */

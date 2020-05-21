@@ -197,10 +197,10 @@ __ssputs_r (struct _reent *ptr,
       if (fp->_flags & __SOPT)
 	{
 	  /* asnprintf leaves original buffer alone.  */
-	  str = (unsigned char *)_malloc_r (ptr, newsize);
+	  str = (unsigned char *)malloc (newsize);
 	  if (!str)
 	    {
-	      __errno_r(ptr) = ENOMEM;
+	      errno = ENOMEM;
 	      goto err;
 	    }
 	  memcpy (str, fp->_bf._base, curpos);
@@ -208,13 +208,13 @@ __ssputs_r (struct _reent *ptr,
 	}
       else
 	{
-	  str = (unsigned char *)_realloc_r (ptr, fp->_bf._base, newsize);
+	  str = (unsigned char *)realloc (fp->_bf._base, newsize);
 	  if (!str)
 	    {
 	      /* Free unneeded buffer.  */
-	      _free_r (ptr, fp->_bf._base);
+	      free (fp->_bf._base);
 	      /* Ensure correct errno, even if free changed it.  */
-	      __errno_r(ptr) = ENOMEM;
+	      errno = ENOMEM;
 	      goto err;
 	    }
 	}
@@ -287,10 +287,10 @@ __ssprint_r (struct _reent *ptr,
 	  if (fp->_flags & __SOPT)
 	    {
 	      /* asnprintf leaves original buffer alone.  */
-	      str = (unsigned char *)_malloc_r (ptr, newsize);
+	      str = (unsigned char *)malloc (newsize);
 	      if (!str)
 		{
-		  __errno_r(ptr) = ENOMEM;
+		  errno = ENOMEM;
 		  goto err;
 		}
 	      memcpy (str, fp->_bf._base, curpos);
@@ -298,14 +298,14 @@ __ssprint_r (struct _reent *ptr,
 	    }
 	  else
 	    {
-	      str = (unsigned char *)_realloc_r (ptr, fp->_bf._base,
+	      str = (unsigned char *)realloc (fp->_bf._base,
 						 newsize);
 	      if (!str)
 		{
 		  /* Free unneeded buffer.  */
-		  _free_r (ptr, fp->_bf._base);
+		  free (fp->_bf._base);
 		  /* Ensure correct errno, even if free changed it.  */
-		  __errno_r(ptr) = ENOMEM;
+		  errno = ENOMEM;
 		  goto err;
 		}
 	    }
@@ -497,10 +497,10 @@ _VFPRINTF_R (struct _reent *data,
   /* Create initial buffer if we are called by asprintf family.  */
   if (fp->_flags & __SMBF && !fp->_bf._base)
     {
-      fp->_bf._base = fp->_p = _malloc_r (data, 64);
+      fp->_bf._base = fp->_p = malloc (64);
       if (!fp->_p)
 	{
-	  __errno_r(data) = ENOMEM;
+	  errno = ENOMEM;
 	  return EOF;
 	}
       fp->_bf._size = 64;

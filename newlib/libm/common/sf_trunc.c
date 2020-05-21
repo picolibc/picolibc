@@ -42,7 +42,7 @@
     }
   else
     {
-      if (exponent_less_127 == 255)
+      if (exponent_less_127 == 128)
         /* x is NaN or infinite. */
         return x + x;
 

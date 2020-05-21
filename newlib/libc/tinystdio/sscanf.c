@@ -38,10 +38,7 @@ int
 sscanf(const char *s, const char *fmt, ...)
 {
 	va_list ap;
-	struct __file_str f;
 	int i;
-
-	f.file.flags = __SRD | __SSTR;
 	/*
 	 * It is OK to discard the "const" qualifier here.  f.buf is
 	 * non-const as in the generic case, this buffer is obtained
@@ -50,7 +47,12 @@ sscanf(const char *s, const char *fmt, ...)
 	 * be discarded upon exiting sscanf(), nobody will ever get
 	 * a chance to get write access to it again.
 	 */
-	f.buf = (char *)s;
+	struct __file_str f = {
+		.file = {
+			.flags = __SRD | __SSTR
+		},
+		.buf = (char *) s,
+	};
 	va_start(ap, fmt);
 	i = vfscanf(&f.file, fmt, ap);
 	va_end(ap);

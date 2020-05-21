@@ -74,7 +74,7 @@ print_f (
   int sign;
   char *p, *start, *end;
 
-  start = p = _dtoa_r (invalue, mode, ndigit, &decpt, &sign, &end);
+  start = p = __dtoa (invalue, mode, ndigit, &decpt, &sign, &end);
 
   if (decpt == 9999)
     {
@@ -144,7 +144,7 @@ print_e (
   int top;
   int ndigit = width;
 
-  p = _dtoa_r (invalue, 2, width + 1, &decpt, &sign, &end);
+  p = __dtoa (invalue, 2, width + 1, &decpt, &sign, &end);
 
   if (decpt == 9999)
     {
@@ -262,7 +262,7 @@ fcvtbuf (double invalue,
 
   save = fcvt_buf;
 
-  p = _dtoa_r (invalue, 3, ndigit, decpt, sign, &end);
+  p = __dtoa (invalue, 3, ndigit, decpt, sign, &end);
 
   /* Now copy */
 
@@ -311,7 +311,7 @@ ecvtbuf (double invalue,
 
   save = fcvt_buf;
 
-  p = _dtoa_r (invalue, 2, ndigit, decpt, sign, &end);
+  p = __dtoa (invalue, 2, ndigit, decpt, sign, &end);
 
   /* Now copy */
 
@@ -379,7 +379,7 @@ _gcvt (
       /* We always want ndigits of precision, even if that means printing
        * a bunch of leading zeros for numbers < 1.0
        */
-      p = _dtoa_r (invalue, 2, ndigit, &decpt, &sign, &end);
+      p = __dtoa (invalue, 2, ndigit, &decpt, &sign, &end);
 
       if (decpt == 9999)
 	{

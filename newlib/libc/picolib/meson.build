@@ -34,6 +34,7 @@
 #
 srcs_machine_tls = {
 			'riscv' : ['machine/riscv/tls.c'],
+			'riscv32' : ['machine/riscv/tls.c'],
 			'riscv64' : ['machine/riscv/tls.c'],
 			'arm' : ['machine/arm/tls.c']
 		      }
@@ -48,6 +49,7 @@ srcs_tls = [
 
 srcs_picolib = [
   'picosbrk.c',
+  'dso_handle.c',
 ]
 
 if srcs_machine.has_key(host_cpu_family)

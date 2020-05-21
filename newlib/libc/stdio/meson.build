@@ -222,14 +222,14 @@ if newlib_elix_level >= 4
 endif
 
 nano_printf_srcs_stdio = [
-  'nano-vfprintf_float.c',
   'nano-svfprintf.c',
   'nano-svfscanf.c',
   'nano-vfprintf.c',
+  'nano-vfprintf_float.c',
   'nano-vfprintf_i.c',
   'nano-vfscanf.c',
-  'nano-vfscanf_i.c',
   'nano-vfscanf_float.c',
+  'nano-vfscanf_i.c',
   'svfiwprintf.c',
   'svfwprintf.c',
   'vfiwprintf.c',

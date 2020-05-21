@@ -1,3 +1,4 @@
+/* Copyright 2005 Tom Walsh <tom@openhardware.net> */
 #include <time.h>
 
 /* Global timezone variables.  */

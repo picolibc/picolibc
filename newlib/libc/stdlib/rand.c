@@ -61,12 +61,6 @@ on two different systems.
 
 #include <stdlib.h>
 
-void
-srand (unsigned int seed)
-{
-  srandom(seed);
-}
-
 int
 rand (void)
 {

@@ -46,7 +46,7 @@ foreach target : targets
   _c_args = value[1] + test_c_args
   _link_args = value[1] + test_link_args
 
-  t1 = 'printf/scanf'
+  t1 = 'printf_scanf'
   if target == ''
     t1_name = t1
   else
@@ -62,7 +62,7 @@ foreach target : targets
 		  include_directories: inc),
        env: ['MESON_SOURCE_ROOT=' + meson.source_root()])
 
-  t1 = 'printff/scanff'
+  t1 = 'printff_scanff'
   if target == ''
     t1_name = t1
   else

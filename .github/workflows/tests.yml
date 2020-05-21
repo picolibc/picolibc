@@ -1,0 +1,34 @@
+name: tests
+
+on: [push, pull_request]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 'Clone picolibc'
+        uses: actions/checkout@v2
+        with:
+          path: picolibc
+
+      - name: 'Build picolibc container'
+        run: |
+          docker build -t picolibc \
+            -f picolibc/.github/Dockerfile \
+            picolibc
+
+      - name: 'Test on native'
+        run: |
+          docker run --rm picolibc ./.github/do-test do-native-configure build-native
+
+      - name: 'Test on risc-v'
+        run: |
+          docker run --rm picolibc ./.github/do-test do-riscv-configure build-riscv
+
+      - name: 'Test on arm'
+        run: |
+          docker run --rm picolibc ./.github/do-test do-arm-configure build-arm
+
+      - name: 'Build on aarch64'
+        run: |
+          docker run --rm picolibc ./.github/do-build do-aarch64-configure build-aarch64

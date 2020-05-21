@@ -132,8 +132,8 @@ C99, POSIX-1.2008
 #endif
 
 /* Currently a test is made to see if long double processing is warranted.
-   This could be changed in the future should the _ldtoa_r code be
-   preferred over _dtoa_r.  */
+   This could be changed in the future should the __ldtoa code be
+   preferred over __dtoa.  */
 #define _NO_LONGDBL
 #if defined _WANT_IO_LONG_DOUBLE && (LDBL_MANT_DIG > DBL_MANT_DIG)
 #undef _NO_LONGDBL

@@ -83,6 +83,7 @@ machine_dirs = {
 		 'or1knd': 'or1k',
 		 'powerpc': 'powerpc',
 		 'riscv': 'riscv',
+		 'riscv32': 'riscv',
 		 'riscv64': 'riscv',
 		 'rl78': 'rl78',
 		 'rx': 'rx',
@@ -116,6 +117,9 @@ if newlib_tinystdio
   libdirs += 'tinystdio'
 else
   libdirs += ['stdio', 'reent']
+  if newlib_stdio64
+    libdirs += 'stdio64'
+  endif
 endif
 
 if newlib_supplied_syscalls

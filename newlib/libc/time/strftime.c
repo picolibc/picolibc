@@ -1805,11 +1805,6 @@ const struct list  List[] = {
 	{ &tm1, Vec1, sizeof(Vec1)/sizeof(Vec1[0]) },
 	};
 
-#if defined(STUB_getenv_r)
-char *
-_getenv_r(struct _reent *p, const char *cp) { return getenv(cp); }
-#endif
-
 int
 main(void)
 {

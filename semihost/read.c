@@ -41,9 +41,12 @@
 #include <string.h>
 #include <errno.h>
 
-ssize_t
+_READ_WRITE_RETURN_TYPE
 read(int fd, void *buf, size_t count)
 {
+#ifndef TINY_STDIO
+	fd = _map_stdio(fd);
+#endif
 	uintptr_t ret = sys_semihost_read(fd, buf, count);
 
 	ssize_t got = count - (ssize_t) ret;

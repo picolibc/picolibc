@@ -46,7 +46,6 @@ srcs_argz = [
     'argz_replace.c',
     'argz_stringify.c',
     'buf_findstr.c',
-    'dummy.c',
     'envz_add.c',
     'envz_entry.c',
     'envz_get.c',

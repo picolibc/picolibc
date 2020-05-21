@@ -73,8 +73,6 @@ for o in $all_options; do
     cpu=$cpu",$o=$value"
 done
 
-echo cpu is "$cpu"
-
 # Set the target machine
 machine=virt,accel=tcg
 

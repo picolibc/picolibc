@@ -37,14 +37,19 @@
 int
 vsprintf(char *s, const char *fmt, va_list ap)
 {
-	struct __file_str f;
+	struct __file_str f = {
+		.file = {
+			.flags = __SWR | __SSTR
+		},
+		.buf = s,
+		.size = INT_MAX,
+		.len = 0
+	};
 	int i;
 
-	f.file.flags = __SWR | __SSTR;
-	f.buf = s;
-	f.size = INT_MAX;
 	i = vfprintf(&f.file, fmt, ap);
-	s[f.file.len] = 0;
+	if (i >= 0)
+		s[i] = 0;
 
 	return i;
 }

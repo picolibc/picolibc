@@ -55,6 +55,19 @@ test_strtof (void)
   test_iok(tail - pd->string, pd->endscan);
 }
 
+#ifdef _HAVE_LONG_DOUBLE
+void
+test_strtold (void)
+{
+  char *tail;
+  long double v;
+  /* On average we'll loose 1/2 a bit, so the test is for within 1 bit  */
+  v = strtold(pd->string, &tail);
+  test_mok(v, pd->value, 62);
+  test_iok(tail - pd->string, pd->endscan);
+}
+#endif
+
 void
 test_atof (void)
 {
@@ -213,10 +226,6 @@ test_fcvt (void)
 {
   int a2,a3;
   char *sd;
-  char *sf;
-  double v1;
-  double v2;
-  int s1, s2;
   sd =  fcvt(pdd->value, pdd->f1, &a2, &a3);
 
   test_scok(sd,pdd->fstring,10);
@@ -224,6 +233,10 @@ test_fcvt (void)
   test_iok(pdd->f3,a3);
 
 #ifndef NO_NEWLIB
+  char *sf;
+  double v1;
+  double v2;
+  int s1, s2;
   /* Test the float version by converting and inspecting the numbers 3
    after reconverting */
   sf =  fcvtf(pdd->value, pdd->f1, &a2, &a3);
@@ -443,6 +456,9 @@ test_cvt (void)
 #endif
 
   iterate(test_strtod, "strtod");
+#ifdef _HAVE_LONG_DOUBLE
+  iterate(test_strtold, "strtold");
+#endif
 
   test_scan();
   test_sprint();  

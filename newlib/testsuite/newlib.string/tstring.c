@@ -17,6 +17,11 @@
 #endif
 #endif
 
+/* Ignore warnings about odd (but intended) use of functions */
+#pragma GCC diagnostic ignored "-Wmemset-transposed-args"
+#pragma GCC diagnostic ignored "-Wstringop-truncation"
+#pragma GCC diagnostic ignored "-Wunused-value"
+
 #define MAX_2 (2 * MAX_1 + MAX_1 / 10)
 
 void eprintf (int line, char *result, char *expected, int size)
@@ -64,7 +69,7 @@ int main()
   char buffer7[MAX_2];
   char expected[MAX_1];
   char *tmp1, *tmp2, *tmp3, *tmp4, *tmp5, *tmp6, *tmp7;
-  int i, j, k, x, z, align_test_iterations;
+  int i, j, k, x, z = 0, align_test_iterations;
 
   int test_failed = 0;
 

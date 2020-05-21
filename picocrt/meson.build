@@ -34,6 +34,7 @@
 #
 src_picocrt_machine = {
 			'riscv' : 'riscv/crt0.c',
+			'riscv32' : 'riscv/crt0.c',
 			'riscv64' : 'riscv/crt0.c',
 			'arm' : 'arm/crt0.c'
 		      }

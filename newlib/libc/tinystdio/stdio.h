@@ -241,7 +241,6 @@ struct __file {
 #define __SNBF	0x0400		/* unbuffered */
 #define __SMBF	0x0800		/* buf is from malloc */
 #endif
-	int	len;		/* characters read or written so far */
 	int	(*put)(char, struct __file *);	/* function to write one char to device */
 	int	(*get)(struct __file *);	/* function to read one char from device */
 	int	(*flush)(struct __file *);	/* function to flush output to device */
@@ -841,21 +840,12 @@ extern int	sscanf(const char *__buf, const char *__fmt, ...);
 extern int	__i_sscanf(const char *__buf, const char *__fmt, ...);
 extern int	__f_sscanf(const char *__buf, const char *__fmt, ...);
 
-#if defined(__DOXYGEN__)
 /**
    Flush \c stream.
 
    If the stream provides a flush hook, use that. Otherwise return 0.
  */
 extern int	fflush(FILE *stream);
-#else
-static __inline int fflush(FILE *stream)
-{
-	if (stream->flush)
-		return (stream->flush)(stream);
-	return 0;
-}
-#endif
 
 #ifndef __DOXYGEN__
 /* only mentioned for libstdc++ support, not implemented in library */

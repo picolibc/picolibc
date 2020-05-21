@@ -56,13 +56,7 @@ algorithm as <<rand>>.
 
 #include <stdlib.h>
 
-static NEWLIB_THREAD_LOCAL long long _rand_next = 1;
-
-void
-srandom (unsigned int seed)
-{
-	_rand_next = seed;
-}
+NEWLIB_THREAD_LOCAL long long _rand_next = 1;
 
 long int
 random (void)

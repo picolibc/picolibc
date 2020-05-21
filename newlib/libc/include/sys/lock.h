@@ -12,8 +12,8 @@
 typedef int _LOCK_T;
 typedef int _LOCK_RECURSIVE_T;
 
-#define __LOCK_INIT(class,lock) static int lock = 0;
-#define __LOCK_INIT_RECURSIVE(class,lock) static int lock = 0;
+#define __LOCK_INIT(class,lock)
+#define __LOCK_INIT_RECURSIVE(class,lock)
 #define __lock_init(lock) ((void) 0)
 #define __lock_init_recursive(lock) ((void) 0)
 #define __lock_close(lock) ((void) 0)

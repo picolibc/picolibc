@@ -41,9 +41,13 @@
 #include <string.h>
 #include <errno.h>
 
-ssize_t
+_READ_WRITE_RETURN_TYPE
 write(int fd, const void *buf, size_t count)
 {
+#ifndef TINY_STDIO
+	fd = _map_stdio(fd);
+#endif
+
 	struct {
 		uintptr_t	field1;
 		uintptr_t	field2;
@@ -53,6 +57,7 @@ write(int fd, const void *buf, size_t count)
 		.field2 = (uintptr_t) buf,
 		.field3 = (uintptr_t) count
 	};
+
 
 	uintptr_t ret = sys_semihost(SYS_WRITE, (uintptr_t) &arg);
 

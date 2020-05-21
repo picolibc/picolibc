@@ -35,7 +35,7 @@
 
 tests = ['nulprintf']
 
-if not newlib_tinystdio
+if not newlib_tinystdio and not newlib_nano_formatted_io and newlib_elix_level >= 4
   tests += ['swprintf']
 endif
 

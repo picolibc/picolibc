@@ -104,8 +104,7 @@ Copyright: 2001 Alexey Zelkin <phantom@FreeBSD.org>
  1997 FreeBSD Inc.
 License: BSD2-1
 
-Files: newlib/libc/machine/i386/sys/fenv.h
- newlib/libc/machine/x86_64/sys/fenv.h
+Files: newlib/libc/machine/x86_64/sys/fenv.h
 Copyright: 2010-2019 Red Hat, Inc.
 License: BSD2-1
 
@@ -427,6 +426,7 @@ Files: do-arm-configure
  newlib/libc/machine/x86_64/meson.build
  newlib/libc/meson.build
  newlib/libc/misc/meson.build
+ newlib/libc/picolib/dso_handle.c
  newlib/libc/picolib/inittls.c
  newlib/libc/picolib/machine/arm/interrupt.c
  newlib/libc/picolib/machine/arm/tls.c
@@ -451,6 +451,7 @@ Files: do-arm-configure
  newlib/libc/stdio/vfiscanf.c
  newlib/libc/stdio/vfiwprintf.c
  newlib/libc/stdio/vfiwscanf.c
+ newlib/libc/stdio64/meson.build
  newlib/libc/stdlib/malloc-calloc.c
  newlib/libc/stdlib/malloc-cfree.c
  newlib/libc/stdlib/malloc-free.c
@@ -479,14 +480,20 @@ Files: do-arm-configure
  newlib/libc/string/meson.build
  newlib/libc/time/meson.build
  newlib/libc/tinystdio/fdopen.c
+ newlib/libc/tinystdio/fileno.c
  newlib/libc/tinystdio/fopen.c
+ newlib/libc/tinystdio/fseek.c
+ newlib/libc/tinystdio/ftell.c
  newlib/libc/tinystdio/ftoa_data.c
  newlib/libc/tinystdio/meson.build
  newlib/libc/tinystdio/posixio.c
  newlib/libc/tinystdio/posixiob.c
+ newlib/libc/tinystdio/setbuf.c
  newlib/libc/xdr/meson.build
  newlib/libm/common/meson.build
  newlib/libm/common/signgam.c
+ newlib/libm/common/s_issignaling.c
+ newlib/libm/common/sf_issignaling.c
  newlib/libm/complex/meson.build
  newlib/libm/fenv/meson.build
  newlib/libm/machine/arm/meson.build
@@ -495,6 +502,11 @@ Files: do-arm-configure
  newlib/libm/math/meson.build
  newlib/libm/meson.build
  newlib/libm/test/meson.build
+ newlib/libm/test/issignaling_vec.c
+ newlib/libm/test/modf_vec.c
+ newlib/libm/test/modff_vec.c
+ newlib/libm/test/pow_vec.c
+ newlib/libm/test/powf_vec.c
  newlib/meson.build
  newlib/testsuite/meson.build
  newlib/testsuite/newlib.iconv/meson.build
@@ -519,7 +531,7 @@ Files: do-arm-configure
  semihost/kill.c
  semihost/lseek.c
  semihost/machine/arm/semihost-arm.c
- semihost/machine/riscv/semihost-riscv.c
+ semihost/machine/riscv/semihost-riscv.s
  semihost/meson.build
  semihost/open.c
  semihost/read.c
@@ -543,6 +555,21 @@ Files: do-arm-configure
  test/printf_scanf.c
  test/rand.c
 Copyright: 2019 Keith Packard
+License: BSD3-1
+
+Files: newlib/libc/stdio64/meson.build
+ newlib/libc/errno/errno.c
+ newlib/libc/tinystdio/fflush.c
+ newlib/libc/stdio/nano-svfprintf.c
+ newlib/libc/stdio/nano-svfscanf.c
+ semihost/fstat.c
+ semihost/isatty.c
+ semihost/mapstdio.c
+ test-arm.ld
+ test-riscv32.ld
+ test-riscv64.ld
+ test-riscv.ld
+Copyright: 2020 Keith Packard
 License: BSD3-1
 
 Files: newlib/libc/machine/powerpc/meson.build
@@ -1663,6 +1690,7 @@ License: BSD3-31
 
 Files: newlib/libc/tinystdio/strtod.c
  newlib/libc/tinystdio/strtof.c
+ newlib/libc/tinystdio/strtold.c
 Copyright: 2002-2005  Michael Stumpf  <mistumpf@de.pepperl-fuchs.com>
  2006,2008  Dmitry Xmelkov 
 License: BSD3-31
@@ -1984,7 +2012,6 @@ Files: .drone.yml
  newlib/make-target
  newlib/newlib.hin
  picolibc.specs.in
- winsup/cygwin/release/3.1.3
 Copyright: 2020 The Newlib Project
 License: Default-1
 
@@ -2070,6 +2097,10 @@ Files: newlib/libc/ctype/isblank.c
 Copyright: 2002 Thomas Fitzsimmons <fitzsim@redhat.com>
 License: Default-1
 
+Files: newlib/libc/string/swab.c
+Copyright: 2000 Alexandre Oliva <aoliva@redhat.com>
+License: Default-1
+
 Files: newlib/libc/ctype/mkcaseconv
  newlib/libc/ctype/mkcategories
  newlib/libc/ctype/mkunidata
@@ -2105,11 +2136,7 @@ Files: newlib/libc/include/limits.h
  newlib/libc/include/machine/termios.h
  newlib/libc/include/sys/lock.h
  newlib/libc/include/wctype.h
- newlib/libc/reent/fcntlr.c
- newlib/libc/reent/fstat64r.c
  newlib/libc/reent/getreent.c
- newlib/libc/reent/lseek64r.c
- newlib/libc/reent/open64r.c
  newlib/libc/stdlib/_Exit.c
  newlib/libc/stdlib/a64l.c
  newlib/libc/stdlib/l64a.c
@@ -2124,10 +2151,17 @@ Files: newlib/libc/include/limits.h
  newlib/libc/time/local.h
  newlib/libc/time/tzlock.c
  newlib/libc/time/tzset.c
- newlib/libc/time/tzset_r.c
  newlib/testsuite/newlib.wctype/tiswctype.c
  newlib/testsuite/newlib.wctype/twctrans.c
 Copyright: 2002 Jeff Johnston  <jjohnstn@redhat.com>
+License: Default-1
+
+Files: newlib/libc/include/machine/ansi.h
+Copyright: 2001 Jeff Johnston  <jjohnstn@redhat.com>
+License: Default-1
+
+Files: newlib/libc/time/tzvars.c
+Copyright: 2005 Tom Walsh <tom@openhardware.net>
 License: Default-1
 
 Files: newlib/libc/include/machine/_default_types.h
@@ -2137,8 +2171,6 @@ Files: newlib/libc/include/machine/_default_types.h
  newlib/libc/machine/spu/sys/syscall.h
  newlib/libc/machine/spu/sys/uio.h
  newlib/libc/machine/spu/sys/utime.h
- newlib/libc/reent/gettimeofdayr.c
- newlib/libc/reent/timesr.c
 Copyright: 2007 Patrick Mansfield <patmans@us.ibm.com>
 License: Default-1
 
@@ -2152,11 +2184,6 @@ Files: newlib/libc/include/machine/_types.h
 Copyright: 2005 Ralf Corsepious  <ralf.corsepius@rtems.org>
 License: Default-1
 
-Files: newlib/libc/include/machine/ansi.h
- newlib/libc/reent/signgam.c
-Copyright: 2001 Jeff Johnston  <jjohnstn@redhat.com>
-License: Default-1
-
 Files: newlib/libc/include/machine/endian.h
  newlib/libc/include/machine/param.h
  newlib/libc/machine/arm/machine/param.h
@@ -2165,6 +2192,7 @@ License: Default-1
 
 Files: newlib/libc/include/ssp/stdlib.h
  newlib/libc/include/ssp/wchar.h
+ newlib/libc/ssp/chk_fail.c
  newlib/libc/ssp/stack_protector.c
  newlib/libc/string/wmempcpy.c
 Copyright: 2017 Yaakov Selkowitz <yselkowi@redhat.com>
@@ -2212,12 +2240,6 @@ License: Default-1
 
 Files: newlib/libc/machine/iq2000/setjmp.S
 Copyright: 2003 Anthony Green <green@moxielogic.com>
-License: Default-1
-
-Files: newlib/libc/machine/m68k/m68kasm.h
- newlib/libc/reent/isattyr.c
- newlib/libc/reent/stat64r.c
-Copyright: 2008 Jeff Johnston  <jjohnstn@redhat.com>
 License: Default-1
 
 Files: newlib/libc/machine/mep/setjmp.S
@@ -2302,15 +2324,6 @@ Files: newlib/libc/misc/lock.c
 Copyright: 2016 Thomas Preud'homme <thomas.preudhomme@arm.com>
 License: Default-1
 
-Files: newlib/libc/reent/mkdirr.c
-Copyright: 2009 Jeff Johnston <jjohnstn@redhat.com>
-License: Default-1
-
-Files: newlib/libc/reent/unlinkr.c
- newlib/libc/string/swab.c
-Copyright: 2000 Alexandre Oliva <aoliva@redhat.com>
-License: Default-1
-
 Files: newlib/libc/search/bsd_qsort_r.c
  newlib/libc/search/qsort_r.c
  newlib/libc/stdio/stdio_ext.c
@@ -2343,7 +2356,6 @@ Files: newlib/libc/stdlib/__adjust.c
  newlib/libc/stdlib/atoi.c
  newlib/libc/stdlib/atol.c
  newlib/libc/stdlib/calloc.c
- newlib/libc/stdlib/dtoastub.c
  newlib/libc/stdlib/ecvtbuf.c
  newlib/libc/stdlib/efgcvt.c
  newlib/libc/stdlib/envlock.c
@@ -2367,6 +2379,7 @@ Files: newlib/libc/stdlib/__adjust.c
  newlib/libc/stdlib/rand.c
  newlib/libc/stdlib/rand_r.c
  newlib/libc/stdlib/realloc.c
+ newlib/libc/stdlib/srand.c
  newlib/libc/stdlib/std.h
  newlib/libc/stdlib/stdlib.tex
  newlib/libc/stdlib/system.c
@@ -2401,6 +2414,7 @@ Copyright: 2015 Freddie Chopin <freddie.chopin@gmail.com>
 License: Default-1
 
 Files: newlib/libc/stdlib/random.c
+ newlib/libc/stdlib/srandom.c
 Copyright: 2016 Joel Sherrill <joel@rtems.org>
 License: Default-1
 
@@ -2974,20 +2988,9 @@ Files: newlib/libc/misc/init.c
 Copyright: 2004 CodeSourcery, LLC
 License: Other-16
 
-Files: newlib/libc/reent/closer.c
- newlib/libc/reent/execr.c
- newlib/libc/reent/fstatr.c
- newlib/libc/reent/impure.c
- newlib/libc/reent/linkr.c
- newlib/libc/reent/lseekr.c
- newlib/libc/reent/openr.c
- newlib/libc/reent/readr.c
+Files: newlib/libc/reent/impure.c
  newlib/libc/reent/reent.c
  newlib/libc/reent/reent.tex
- newlib/libc/reent/sbrkr.c
- newlib/libc/reent/signalr.c
- newlib/libc/reent/statr.c
- newlib/libc/reent/writer.c
  newlib/libc/signal/raise.c
  newlib/libc/signal/signal.c
  newlib/libc/signal/signal.tex
@@ -3110,6 +3113,8 @@ Files: newlib/libc/reent/closer.c
  newlib/libm/test/test.h
  newlib/libm/test/test_ieee.c
  newlib/libm/test/test_is.c
+ newlib/libm/test/trunc_vec.c
+ newlib/libm/test/truncf_vec.c
  newlib/libm/test/y0_vec.c
  newlib/libm/test/y0f_vec.c
  newlib/libm/test/y1_vec.c
@@ -3441,7 +3446,6 @@ Files: newlib/libc/machine/d10v/setjmp.S
  newlib/libc/machine/w65/umodhi3.S
  newlib/libc/machine/z8k/args.h
  newlib/libc/machine/z8k/setjmp.S
- newlib/libc/reent/renamer.c
  newlib/libc/stdio/asiprintf.c
  newlib/libc/stdio/clearerr.c
  newlib/libc/stdio/fclose.c

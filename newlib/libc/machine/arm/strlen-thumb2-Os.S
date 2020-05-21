@@ -45,7 +45,7 @@
 
 def_fn	strlen p2align=1
 	mov     r3, r0
-1:	ldrb.w  r2, [r3], #1
+1:	ldrb    r2, [r3], #1
 	cmp     r2, #0
 	bne	1b
 	subs    r0, r3, r0

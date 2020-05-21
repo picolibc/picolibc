@@ -1,5 +1,5 @@
 [binaries]
-c = ['arm-none-eabi-gcc', '-nostdlib']
+c = 'arm-none-eabi-gcc'
 ar = 'arm-none-eabi-ar'
 as = 'arm-none-eabi-as'
 strip = 'arm-none-eabi-strip'
@@ -12,4 +12,6 @@ cpu = 'arm'
 endian = 'little'
 
 [properties]
+c_args = [ '-nostdlib' ]
 needs_exe_wrapper = true
+skip_sanity_check = true

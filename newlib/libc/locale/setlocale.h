@@ -412,10 +412,12 @@ int __ctype_load_locale (struct __locale_t *, const char *, void *,
 			 const char *, int);
 int __monetary_load_locale (struct __locale_t *, const char *, void *,
 			    const char *);
+#ifdef __CYGWIN__
 int __numeric_load_locale (struct __locale_t *, const char *, void *,
 			   const char *);
 int __time_load_locale (struct __locale_t *, const char *, void *,
 			const char *);
+#endif
 int __messages_load_locale (struct __locale_t *, const char *, void *,
 			    const char *);
 #ifdef __CYGWIN__

@@ -130,8 +130,8 @@ Supporting OS subroutines required:
 #include <locale.h>
 
 /* Currently a test is made to see if long double processing is warranted.
-   This could be changed in the future should the _ldtoa_r code be
-   preferred over _dtoa_r.  */
+   This could be changed in the future should the __ldtoa code be
+   preferred over __dtoa.  */
 #define _NO_LONGDBL
 #if defined _WANT_IO_LONG_DOUBLE && (LDBL_MANT_DIG > DBL_MANT_DIG)
 #undef _NO_LONGDBL
@@ -1489,7 +1489,7 @@ __SVFSCANF_R (struct _reent *rptr,
 		  if (sizeof (uintptr_t) > sizeof (u_long))
 		    {
 		      u_long_long resll;
-		      resll = _strtoull_r (rptr, buf, (char **) NULL, base);
+		      resll = strtoull (buf, (char **) NULL, base);
 		      *vp = (void *) (uintptr_t) resll;
 		    }
 		  else
@@ -1517,10 +1517,10 @@ __SVFSCANF_R (struct _reent *rptr,
 	      else if (flags & LONGDBL)
 		{
 		  u_long_long resll;
-		  if (ccfn == _strtoul_r)
-		    resll = _strtoull_r (rptr, buf, (char **) NULL, base);
+		  if (ccfn == strtoul)
+		    resll = strtoull (buf, (char **) NULL, base);
 		  else
-		    resll = _strtoll_r (rptr, buf, (char **) NULL, base);
+		    resll = strtoll (buf, (char **) NULL, base);
 		  llp = GET_ARG (N, ap, long long*);
 		  *llp = resll;
 		}
@@ -1861,15 +1861,15 @@ __SVFSCANF_R (struct _reent *rptr,
 		}
 
 	      /* FIXME: Is that still true?
-	         Current _strtold routine is markedly slower than
-	         _strtod_r.  Only use it if we have a long double
+	         Current strtold routine is markedly slower than
+	         strtod.  Only use it if we have a long double
 	         result.  */
 #ifndef _NO_LONGDBL /* !_NO_LONGDBL */
 	      if (flags & LONGDBL)
-		qres = _strtold_r (buf, NULL);
+		qres = strtold (buf, NULL);
 	      else
 #endif
-	        res = _strtod_r (buf, NULL);
+	        res = strtod (buf, NULL);
 
 	      if (flags & LONG)
 		{

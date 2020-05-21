@@ -55,11 +55,10 @@ extern __IMPORT char *program_invocation_short_name;
 #define NEWLIB_THREAD_LOCAL_ERRNO NEWLIB_THREAD_LOCAL
 #endif
 
-extern NEWLIB_THREAD_LOCAL_ERRNO int _errno;
+extern NEWLIB_THREAD_LOCAL_ERRNO int errno;
 
-#define errno _errno
-#define __errno_r(ptr)	(_errno)
-#define __errno() 	(&_errno)
+#define __errno_r(ptr)	(errno)
+#define __errno() 	(&errno)
 
 #define	EPERM 1		/* Not owner */
 #define	ENOENT 2	/* No such file or directory */
