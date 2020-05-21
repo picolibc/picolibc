@@ -261,4 +261,5 @@ include:
  * [Linking with Picolibc.ld](doc/linking.md)
  * [Hello World](hello-world/README.md)
  * [Picolibc as embedded source](doc/embedsource.md)
+ * [Releasing Picolibc](doc/releasing.md)
  * [Copyright and license information](COPYING.picolibc)
