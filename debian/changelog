@@ -1,3 +1,9 @@
+picolibc (1.4.2-2) unstable; urgency=medium
+
+  * Remove aarch64 support to avoid hitting NEW queue
+
+ -- Keith Packard <keithp@keithp.com>  Thu, 21 May 2020 11:20:07 -0700
+
 picolibc (1.4.2-1) unstable; urgency=medium
 
   * Clang source compatibility. Clang should now be able to compile
