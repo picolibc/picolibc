@@ -43,7 +43,7 @@ MESON_LX106_FLAGS = \
 	$(MESON_SHARED_FLAGS) \
 	--cross-file cross-$(LX106_ARCH).txt \
 	-Dnewlib-long-time_t=true \
-	-Dspecsdir=/usr/lib/gcc/$(LX106_ARCH) \
+	-Dspecsdir=/usr/lib/picolibc/$(LX106_ARCH) \
 	-Dincludedir=lib/$(LX106_ARCH)/include \
 	-Dlibdir=lib/$(LX106_ARCH)/lib
 
