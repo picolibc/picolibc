@@ -1,0 +1,8 @@
+Test-Command: riscv64-unknown-elf-gcc --specs=picolibc.specs -o /tmp/risc-v debian/tests/touch.c -lm
+Depends: @, gcc-riscv64-unknown-elf
+
+Test-Command: arm-none-eabi-gcc --specs=picolibc.specs -o /tmp/touch-arm debian/tests/touch.c -lm
+Depends: @, gcc-arm-none-eabi
+
+Test-Command: aarch64-linux-gnu-gcc --specs=picolibc.specs -o /tmp/touch-aarch64 debian/tests/touch.c -lm
+Depends: @, gcc-aarch64-linux-gnu
