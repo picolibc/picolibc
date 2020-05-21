@@ -294,3 +294,26 @@ tty_min::ttyname ()
   d.parse (ntty);
   return d.name ();
 }
+
+void
+tty::set_switch_to_pcon_out (bool v)
+{
+  if (switch_to_pcon_out != v)
+    {
+      wait_pcon_fwd ();
+      switch_to_pcon_out = v;
+    }
+}
+
+void
+tty::wait_pcon_fwd (void)
+{
+  const int sleep_in_pcon = 16;
+  const int time_to_wait = sleep_in_pcon * 2 + 1/* margine */;
+  pcon_last_time = GetTickCount ();
+  while (GetTickCount () - pcon_last_time < time_to_wait)
+    {
+      int tw = time_to_wait - (GetTickCount () - pcon_last_time);
+      cygwait (tw);
+    }
+}

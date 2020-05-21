@@ -64,6 +64,7 @@ static int pcon_attached_to = -1;
 static bool isHybrid;
 static bool do_not_reset_switch_to_pcon;
 static bool freeconsole_on_close = true;
+static tty *last_ttyp = NULL;
 
 void
 clear_pcon_attached_to (void)
@@ -89,7 +90,11 @@ set_switch_to_pcon (void)
 	      ENABLE_PROCESSED_INPUT | ENABLE_LINE_INPUT | ENABLE_ECHO_INPUT;
 	    SetConsoleMode (ptys->get_handle (), mode);
 	  }
+	return;
       }
+  /* No pty slave opened */
+  if (last_ttyp) /* Make system_printf() work after closing pty slave */
+    last_ttyp->set_switch_to_pcon_out (true);
 }
 
 static void
@@ -741,7 +746,10 @@ fhandler_pty_slave::~fhandler_pty_slave ()
 	 needed to make GNU screen and tmux work in Windows 10
 	 1903. */
       if (attached == 0)
-	pcon_attached_to = -1;
+	{
+	  pcon_attached_to = -1;
+	  last_ttyp = get_ttyp ();
+	}
       if (used == 0)
 	{
 	  init_console_handler (false);
@@ -948,6 +956,7 @@ fhandler_pty_slave::open (int flags, mode_t)
       init_console_handler (true);
     }
 
+  isHybrid = false;
   get_ttyp ()->pcon_pid = 0;
   get_ttyp ()->switch_to_pcon_in = false;
   get_ttyp ()->switch_to_pcon_out = false;
@@ -1012,7 +1021,6 @@ fhandler_pty_slave::close ()
     termios_printf ("CloseHandle (output_mutex<%p>), %E", output_mutex);
   if (pcon_attached_to == get_minor ())
     get_ttyp ()->num_pcon_attached_slaves --;
-  set_switch_to_pcon (2); /* Make system_printf() work after close. */
   return 0;
 }
 
@@ -2888,7 +2896,8 @@ fhandler_pty_slave::wait_pcon_fwd (void)
   get_ttyp ()->pcon_last_time = GetTickCount ();
   ResetEvent (get_ttyp ()->fwd_done);
   release_output_mutex ();
-  cygwait (get_ttyp ()->fwd_done, INFINITE);
+  while (get_ttyp ()->fwd_done
+	 && cygwait (get_ttyp ()->fwd_done, 1) == WAIT_TIMEOUT);
 }
 
 void
