@@ -1,4 +1,4 @@
 version=4
 opts="mode=git, gitmode=full, pgpmode=none" \
 git://keithp.com/git/picolibc \
-refs/tags/([\d\.]+) debian uupdate
+refs/tags/([12]\.[\d\.]+) debian uupdate
