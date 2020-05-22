@@ -1,0 +1,59 @@
+--- localtime.c	2020-05-16 21:54:00.533111800 -0700
++++ localtime.c.patched	2020-05-22 00:03:30.826646000 -0700
+@@ -413,7 +413,7 @@
+ };
+ 
+ /* TZDIR with a trailing '/' rather than a trailing '\0'.  */
+-static char const tzdirslash[sizeof TZDIR] = TZDIR "/";
++static char const tzdirslash[sizeof TZDIR + 1] = TZDIR "/";
+ 
+ /* Local storage needed for 'tzloadbody'.  */
+ union local_storage {
+@@ -473,7 +473,7 @@
+ 		   would pull in stdio (and would fail if the
+ 		   resulting string length exceeded INT_MAX!).  */
+ 		memcpy(lsp->fullname, tzdirslash, sizeof tzdirslash);
+-		strcpy(lsp->fullname + sizeof tzdirslash, name);
++		strcpy(lsp->fullname + sizeof tzdirslash - 1, name);
+ 
+ 		/* Set doaccess if NAME contains a ".." file name
+ 		   component, as such a name could read a file outside
+@@ -488,11 +488,11 @@
+ 		name = lsp->fullname;
+ 	}
+ 	if (doaccess && access(name, R_OK) != 0)
+-		return errno;
++		goto trydefrules;
+ 
+ 	fid = open(name, OPEN_MODE);
+ 	if (fid < 0)
+-		return errno;
++		goto trydefrules;
+ 	nread = read(fid, up->buf, sizeof up->buf);
+ 	if (nread < (ssize_t)tzheadsize) {
+ 		int err = nread < 0 ? errno : EINVAL;
+@@ -501,6 +501,15 @@
+ 	}
+ 	if (close(fid) < 0)
+ 		return errno;
++	if (0) {
++trydefrules:
++		const char *base = strrchr(name, '/');
++		base = base ? base + 1 : name;
++		if (strcmp(base, TZDEFRULES))
++		    return errno;
++		nread = sizeof _posixrules_data;
++		memcpy(up->buf, _posixrules_data, nread);
++	}
+ 	for (stored = 4; stored <= 8; stored *= 2) {
+ 		int_fast32_t ttisstdcnt = detzcode(up->tzhead.tzh_ttisstdcnt);
+ 		int_fast32_t ttisutcnt = detzcode(up->tzhead.tzh_ttisutcnt);
+@@ -1417,6 +1426,8 @@
+ tzsetlcl(char const *name)
+ {
+ 	struct state *sp = __lclptr;
++	if (! name)
++		name = tzgetwintzi(__UNCONST(wildabbr), (char *) alloca (512));
+ 	int lcl = name ? strlen(name) < sizeof lcl_TZname : -1;
+ 	if (lcl < 0 ? lcl_is_set < 0
+ 	    : 0 < lcl_is_set && strcmp(lcl_TZname, name) == 0)
