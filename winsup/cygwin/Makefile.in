@@ -27,7 +27,7 @@ export CCWRAP_HEADERS:=. ${srcdir}
 export CCWRAP_SYSTEM_HEADERS:=@cygwin_headers@ @newlib_headers@
 export CCWRAP_DIRAFTER_HEADERS:=@windows_headers@
 
-VPATH+=$(srcdir)/regex $(srcdir)/lib $(srcdir)/libc $(srcdir)/math
+VPATH+=$(srcdir)/regex $(srcdir)/lib $(srcdir)/libc $(srcdir)/math $(srcdir)/tzcode
 
 target_cpu:=@target_cpu@
 target_alias:=@target_alias@
@@ -246,6 +246,15 @@ MATH_OFILES:= \
 	tgammal.o \
 	truncl.o
 
+TZCODE_OFILES:=localtime.o
+
+localtime.o: $(srcdir)/tzcode/localtime.cc $(srcdir)/tzcode/localtime.c.patch
+	(cd $(srcdir)/tzcode && \
+		patch -u -o localtime.c.patched localtime.c localtime.c.patch)
+	$(CXX) ${CXXFLAGS} ${localtime_CFLAGS} \
+		-I$(target_builddir)/winsup/cygwin \
+		-I$(srcdir) -I$(srcdir)/tzcode -c -o $@ $<
+
 DLL_OFILES:= \
 	advapi32.o \
 	aio.o \
@@ -333,7 +342,6 @@ DLL_OFILES:= \
 	ldap.o \
 	libstdcxx_wrapper.o \
 	loadavg.o \
-	localtime.o \
 	lsearch.o \
 	malloc_wrapper.o \
 	minires-os-if.o \
@@ -412,6 +420,7 @@ DLL_OFILES:= \
 	$(EXTRA_OFILES) \
 	$(MALLOC_OFILES) \
 	$(MATH_OFILES) \
+	$(TZCODE_OFILES) \
 	$(MT_SAFE_OBJECTS)
 
 EXCLUDE_STATIC_OFILES:=$(addprefix --exclude=,\
@@ -559,7 +568,7 @@ TARGET_LIBS:=$(LIB_NAME) $(CYGWIN_START) $(GMON_START) $(LIBGMON_A) $(SUBLIBS) $
 
 ifneq "${filter -O%,$(CFLAGS)}" ""
 dtable_CFLAGS:=-fcheck-new
-localtime_CFLAGS:=-fwrapv
+localtime_CFLAGS:=-fwrapv -fpermissive
 malloc_CFLAGS:=-O3
 sync_CFLAGS:=-O3
 ifeq ($(target_cpu),i686)
