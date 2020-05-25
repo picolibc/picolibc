@@ -130,7 +130,7 @@ __rn (char *dst, int base, int dosign, long long val, int len, int pad, unsigned
   return dst;
 }
 
-int
+extern "C" int
 __small_vsprintf (char *dst, const char *fmt, va_list ap)
 {
   tmpbuf tmp;
@@ -373,7 +373,7 @@ gen_decimalLL:
   return dst - orig;
 }
 
-int
+extern "C" int
 __small_sprintf (char *dst, const char *fmt, ...)
 {
   int r;
