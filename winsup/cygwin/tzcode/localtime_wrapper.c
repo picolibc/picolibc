@@ -6,16 +6,17 @@ This software is a copyrighted work licensed under the terms of the
 Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
-#include "../winsup.h"
-#include "../sync.h"
-#include "../include/cygwin/version.h"
+#include "winsup.h"
+#include "perprocess.h"
 #include "tz_posixrules.h"
+#include <cygwin/version.h>
+#include <stdlib.h>
 
-static NO_COPY muto tzset_guard;
+static NO_COPY SRWLOCK tzset_guard = SRWLOCK_INIT;
 
-// Convert these NetBSD rwlock ops into Cygwin muto ops
-#define rwlock_wrlock(X) tzset_guard.init("tzset_guard")->acquire()
-#define rwlock_unlock(X) tzset_guard.release()
+// Convert these NetBSD rwlock ops into SRWLocks
+#define rwlock_wrlock(X) AcquireSRWLockExclusive(&tzset_guard)
+#define rwlock_unlock(X) ReleaseSRWLockExclusive(&tzset_guard)
 
 // Set these NetBSD-related option #defines appropriately for Cygwin
 //#define STD_INSPIRED	// early-include private.h below does this
@@ -109,9 +110,6 @@ tzgetwintzi (char *wildabbr, char *outbuf)
 }
 
 // Get ready to wrap NetBSD's localtime.c
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 // Pull these in early to catch any small issues before the real test
 #include "private.h"
@@ -126,19 +124,15 @@ extern "C" {
 */
 #include "localtime.c.patched"
 
-#ifdef __cplusplus
-}
-#endif
-
 // Don't forget these Cygwin-specific additions from this point to EOF
 EXPORT_ALIAS (tzset_unlocked, _tzset_unlocked)
 
-extern "C" long
+long
 __cygwin_gettzoffset (const struct tm *tmp)
 {
 #ifdef TM_GMTOFF
     if (CYGWIN_VERSION_CHECK_FOR_EXTRA_TM_MEMBERS)
-    	return tmp->TM_GMTOFF;
+	return tmp->TM_GMTOFF;
 #endif /* defined TM_GMTOFF */
     __tzinfo_type *tz = __gettzinfo ();
     /* The sign of this is exactly opposite the envvar TZ.  We
@@ -148,7 +142,7 @@ __cygwin_gettzoffset (const struct tm *tmp)
     return offset;
 }
 
-extern "C" const char *
+const char *
 __cygwin_gettzname (const struct tm *tmp)
 {
 #ifdef TM_ZONE

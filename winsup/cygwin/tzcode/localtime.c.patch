@@ -32,13 +32,15 @@
  	nread = read(fid, up->buf, sizeof up->buf);
  	if (nread < (ssize_t)tzheadsize) {
  		int err = nread < 0 ? errno : EINVAL;
-@@ -501,6 +501,15 @@
+@@ -501,6 +501,17 @@
  	}
  	if (close(fid) < 0)
  		return errno;
 +	if (0) {
++		const char *base;
 +trydefrules:
-+		const char *base = strrchr(name, '/');
++
++		base = strrchr(name, '/');
 +		base = base ? base + 1 : name;
 +		if (strcmp(base, TZDEFRULES))
 +		    return errno;
@@ -48,7 +50,7 @@
  	for (stored = 4; stored <= 8; stored *= 2) {
  		int_fast32_t ttisstdcnt = detzcode(up->tzhead.tzh_ttisstdcnt);
  		int_fast32_t ttisutcnt = detzcode(up->tzhead.tzh_ttisutcnt);
-@@ -1417,6 +1426,8 @@
+@@ -1417,6 +1428,8 @@
  tzsetlcl(char const *name)
  {
  	struct state *sp = __lclptr;

@@ -561,7 +561,7 @@ TARGET_LIBS:=$(LIB_NAME) $(CYGWIN_START) $(GMON_START) $(LIBGMON_A) $(SUBLIBS) $
 
 ifneq "${filter -O%,$(CFLAGS)}" ""
 dtable_CFLAGS:=-fcheck-new
-localtime_CFLAGS:=-fwrapv -fpermissive
+localtime_CFLAGS:=-fwrapv
 malloc_CFLAGS:=-O3
 sync_CFLAGS:=-O3
 ifeq ($(target_cpu),i686)
@@ -737,7 +737,7 @@ shared.o: shared_info_magic.h
 localtime.o: $(srcdir)/tzcode/localtime_wrapper.c $(srcdir)/tzcode/localtime.c.patch
 	(cd $(srcdir)/tzcode && \
 		patch -u -o localtime.c.patched localtime.c localtime.c.patch)
-	$(CXX) ${CXXFLAGS} ${localtime_CFLAGS} \
+	$(CC) ${COMMON_CFLAGS} ${localtime_CFLAGS} \
 		-I$(target_builddir)/winsup/cygwin \
 		-I$(srcdir) -I$(srcdir)/tzcode -c -o $@ $<
 
