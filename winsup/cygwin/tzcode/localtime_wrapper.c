@@ -122,7 +122,7 @@ tzgetwintzi (char *wildabbr, char *outbuf)
    (2) add conditional call to Cygwin's tzgetwintzi() from tzsetlcl()
    (3) add Cygwin's historical "posixrules" support to tzloadbody()
 */
-#include "localtime.c.patched"
+#include "localtime.patched.c"
 
 // Don't forget these Cygwin-specific additions from this point to EOF
 EXPORT_ALIAS (tzset_unlocked, _tzset_unlocked)
