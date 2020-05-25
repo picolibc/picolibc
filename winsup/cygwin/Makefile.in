@@ -734,7 +734,7 @@ dcrt0.o sigproc.o: child_info_magic.h
 
 shared.o: shared_info_magic.h
 
-localtime.o: $(srcdir)/tzcode/localtime.cc $(srcdir)/tzcode/localtime.c.patch
+localtime.o: $(srcdir)/tzcode/localtime_wrapper.c $(srcdir)/tzcode/localtime.c.patch
 	(cd $(srcdir)/tzcode && \
 		patch -u -o localtime.c.patched localtime.c localtime.c.patch)
 	$(CXX) ${CXXFLAGS} ${localtime_CFLAGS} \
