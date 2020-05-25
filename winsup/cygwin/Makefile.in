@@ -248,13 +248,6 @@ MATH_OFILES:= \
 
 TZCODE_OFILES:=localtime.o
 
-localtime.o: $(srcdir)/tzcode/localtime.cc $(srcdir)/tzcode/localtime.c.patch
-	(cd $(srcdir)/tzcode && \
-		patch -u -o localtime.c.patched localtime.c localtime.c.patch)
-	$(CXX) ${CXXFLAGS} ${localtime_CFLAGS} \
-		-I$(target_builddir)/winsup/cygwin \
-		-I$(srcdir) -I$(srcdir)/tzcode -c -o $@ $<
-
 DLL_OFILES:= \
 	advapi32.o \
 	aio.o \
@@ -740,6 +733,13 @@ child_info_magic.h: cygmagic child_info.h
 dcrt0.o sigproc.o: child_info_magic.h
 
 shared.o: shared_info_magic.h
+
+localtime.o: $(srcdir)/tzcode/localtime.cc $(srcdir)/tzcode/localtime.c.patch
+	(cd $(srcdir)/tzcode && \
+		patch -u -o localtime.c.patched localtime.c localtime.c.patch)
+	$(CXX) ${CXXFLAGS} ${localtime_CFLAGS} \
+		-I$(target_builddir)/winsup/cygwin \
+		-I$(srcdir) -I$(srcdir)/tzcode -c -o $@ $<
 
 $(srcdir)/devices.cc: gendevices devices.in devices.h
 	${wordlist 1,2,$^} $@
