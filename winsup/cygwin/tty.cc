@@ -242,9 +242,8 @@ tty::init ()
   screen_alternated = false;
   mask_switch_to_pcon_in = false;
   pcon_pid = 0;
-  num_pcon_attached_slaves = 0;
   term_code_page = 0;
-  need_redraw_screen = false;
+  need_redraw_screen = true;
   fwd_done = NULL;
   pcon_last_time = 0;
   pcon_in_empty = true;

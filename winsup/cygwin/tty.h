@@ -103,7 +103,6 @@ private:
   bool screen_alternated;
   bool mask_switch_to_pcon_in;
   pid_t pcon_pid;
-  int num_pcon_attached_slaves;
   UINT term_code_page;
   bool need_redraw_screen;
   HANDLE fwd_done;

@@ -1019,8 +1019,6 @@ fhandler_pty_slave::close ()
   fhandler_pty_common::close ();
   if (!ForceCloseHandle (output_mutex))
     termios_printf ("CloseHandle (output_mutex<%p>), %E", output_mutex);
-  if (pcon_attached_to == get_minor ())
-    get_ttyp ()->num_pcon_attached_slaves --;
   return 0;
 }
 
@@ -2924,21 +2922,11 @@ fhandler_pty_slave::fixup_after_attach (bool native_maybe, int fd_set)
     {
       if (fhandler_console::get_console_process_id (get_helper_process_id (),
 						    true))
-	{
-	  if (pcon_attached_to != get_minor ())
-	    {
-	      pcon_attached_to = get_minor ();
-	      init_console_handler (true);
-	    }
-	  /* Clear screen to synchronize pseudo console screen buffer
-	     with real terminal. This is necessary because pseudo
-	     console screen buffer is empty at start. */
-	  if (get_ttyp ()->num_pcon_attached_slaves == 0)
-	    /* Assume this is the first process using this pty slave. */
-	    get_ttyp ()->need_redraw_screen = true;
-
-	  get_ttyp ()->num_pcon_attached_slaves ++;
-	}
+	if (pcon_attached_to != get_minor ())
+	  {
+	    pcon_attached_to = get_minor ();
+	    init_console_handler (true);
+	  }
 
 #if 0 /* This is for debug only. */
       isHybrid = true;
