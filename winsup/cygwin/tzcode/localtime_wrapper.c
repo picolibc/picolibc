@@ -109,8 +109,6 @@ tzgetwintzi (char *wildabbr, char *outbuf)
     return outbuf;
 }
 
-// Get ready to wrap NetBSD's localtime.c
-
 // Pull these in early to catch any small issues before the real test
 #include "private.h"
 #include "tzfile.h"
