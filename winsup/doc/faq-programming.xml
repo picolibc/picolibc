@@ -676,16 +676,20 @@ rewriting the runtime library in question from specs...
 <answer>
 
 <para>First, you need to make sure you have the necessary build tools
-installed; you at least need <literal>gcc-g++</literal>, <literal>make</literal>,
-<literal>perl</literal>, <literal>cocom</literal>, <literal>gettext-devel</literal>,
-<literal>libiconv-devel</literal> and <literal>zlib-devel</literal>.
+installed; you at least need <literal>gcc-g++</literal>,
+<literal>make</literal>, <literal>patch</literal>, <literal>perl</literal>,
+<literal>gettext-devel</literal>, <literal>libiconv-devel</literal> and
+<literal>zlib-devel</literal>.  Installing <literal>git</literal> to fetch
+the sources from the
+<ulink url="https://cygwin.com/git/newlib-cygwin.git">source repository</ulink>
+helps, too.  If you change a certain core part of Cygwin, namely the layout
+of the Cygwin TLS area, you also have to install <literal>cocom</literal>.
 Building for 32-bit Cygwin also requires
-<literal>mingw64-x86_64-gcc-core</literal> (for building the cyglsa64 DLL for WoW64),
 <literal>mingw64-i686-gcc-g++</literal> and <literal>mingw64-i686-zlib</literal>.
 Building for 64-bit Cygwin also requires
 <literal>mingw64-x86_64-gcc-g++</literal> and
 <literal>mingw64-x86_64-zlib</literal>.
-If you want to run the tests, <literal>dejagnu</literal> is also required.
+<!-- If you want to run the tests, <literal>dejagnu</literal> is also required. -->
 Normally, building ignores any errors in building the documentation,
 which requires the <literal>dblatex</literal>, <literal>docbook2X</literal>,
 <literal>docbook-xml45</literal>, <literal>docbook-xsl</literal>, and
