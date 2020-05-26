@@ -670,7 +670,9 @@ uninstall-man:
 	done
 
 clean distclean realclean:
-	-rm -f *.o *.dll *.dbg *.a *.exp junk *.base version.cc *.exe *.d *stamp* *_magic.h sigfe.s cygwin.def globals.h localtime.patched.c
+	-rm -f *.o *.dll *.dbg *.a *.exp junk *.base version.cc *.exe *.d \
+	       *stamp* *_magic.h sigfe.s cygwin.def cygwin.map cygwin.sc \
+	       globals.h localtime.patched.c
 	-@$(MAKE) -C ${cygserver_blddir} libclean
 
 maintainer-clean: clean
