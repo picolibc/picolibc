@@ -1302,6 +1302,8 @@ reswitch:	switch (ch) {
 
 			cp = cvt (data, _fpvalue, prec, flags, &softsign,
 				  &expt, ch, &ndig, cp);
+			if (!cp)
+				goto error;
 
 			if (ch == 'g' || ch == 'G') {
 				if (expt <= -4 || expt > prec)
@@ -1864,6 +1866,8 @@ cvt(struct _reent *data, _PRINTF_FLOAT_TYPE value, int ndigits, int flags,
 	}
 
 	digits = _DTOA (value, mode, ndigits, decpt, &dsgn, &rve);
+	if (!digits)
+		return NULL;
 
 	if ((ch != 'g' && ch != 'G') || flags & ALT) {	/* Print trailing zeros */
 		bp = digits + ndigits;
