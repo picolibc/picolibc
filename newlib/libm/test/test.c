@@ -19,6 +19,7 @@
 #include <math.h>
 #include <string.h>
 #include <stdint.h>
+#include <malloc.h>
 int verbose;
 static int count;
 int inacc;
@@ -26,10 +27,18 @@ int inacc;
 int redo = 0;
 extern int calc;
 
+#ifdef MALLOC_DEBUG
+extern char **environ;
+extern int _malloc_test_fail;
+#endif
+
 int
 main (int ac,
-       char **av)
+      char **av, char **en)
 {
+#ifdef MALLOC_DEBUG
+  environ = en;
+#endif
   int i;
   int math2 = 1;
   int string= 1;
@@ -82,13 +91,23 @@ main (int ac,
   return inacc != 0;
 }
 
-
 static const char *iname = "foo";
 void 
 newfunc (const char *string)
 {
   if (strcmp(iname, string)) 
   {
+#ifdef MALLOC_DEBUG
+    char *memcheck = getenv("CHECK_NAME");
+    if (memcheck && !strcmp(string, memcheck))
+      _malloc_test_fail = atoi(getenv("CHECK_COUNT"));
+    if (memcheck && !strcmp(iname, memcheck)) {
+      if (_malloc_test_fail) {
+	printf("malloc test fail remain %d\n", _malloc_test_fail);
+	_malloc_test_fail = 0;
+      }
+    }
+#endif
     printf("testing %s\n", string);
     fflush(stdout);
     iname = string;
