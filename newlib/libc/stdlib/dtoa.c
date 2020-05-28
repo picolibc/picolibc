@@ -230,14 +230,6 @@ __dtoa (
 
   d.d = _d;
 
-  if (_mprec_result)
-    {
-      _mprec_result->_k = _mprec_result_k;
-      _mprec_result->_maxwds = 1 << _mprec_result_k;
-      Bfree (_mprec_result);
-      _mprec_result = 0;
-    }
-
   if (word0 (d) & Sign_bit)
     {
       /* set sign for everything, including 0's and NaNs */
@@ -417,16 +409,11 @@ __dtoa (
       if (i <= 0)
 	i = 1;
     }
-  j = sizeof (__ULong);
-  for (_mprec_result_k = 0; sizeof (_Bigint) - sizeof (__ULong) + j <= i;
-       j <<= 1)
-    _mprec_result_k++;
-  if (__mprec_register_exit() != 0)
+  s = s0 = __alloc_dtoa_result(i);
+  if (!s) {
+    Bfree(b);
     return NULL;
-  _mprec_result = Balloc (_mprec_result_k);
-  if (!_mprec_result)
-    return NULL;
-  s = s0 = (char *) _mprec_result;
+  }
 
   if (ilim >= 0 && ilim <= Quick_max && try_quick)
     {

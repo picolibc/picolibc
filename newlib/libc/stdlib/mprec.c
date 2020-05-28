@@ -97,34 +97,33 @@
    we define it here, rather than in stdlib/misc.c, as before. */
 #define _Kmax (sizeof (size_t) << 3)
 
-static NEWLIB_THREAD_LOCAL _Bigint **_mprec_freelist;
-NEWLIB_THREAD_LOCAL _Bigint *_mprec_result;
-NEWLIB_THREAD_LOCAL int _mprec_result_k;
+static NEWLIB_THREAD_LOCAL char *__dtoa_result;
+static NEWLIB_THREAD_LOCAL int __dtoa_result_len;
+
+char *__alloc_dtoa_result(int len)
+{
+  if (len > __dtoa_result_len) {
+    if (__mprec_register_exit() != 0)
+      return NULL;
+    if (__dtoa_result)
+      free(__dtoa_result);
+    __dtoa_result = malloc(len);
+    if (__dtoa_result)
+      __dtoa_result_len = len;
+  }
+  return __dtoa_result;
+}
+
 static NEWLIB_THREAD_LOCAL int _mprec_exit_registered;
 
 static void
 __mprec_exit(void)
 {
-  if (_mprec_freelist)
-  {
-    int i;
-    for (i = 0; i < _Kmax; i++)
-    {
-      struct _Bigint *thisone, *nextone;
-
-      nextone = _mprec_freelist[i];
-      while (nextone)
-      {
-	thisone = nextone;
-	nextone = nextone->_next;
-	free(thisone);
-      }
-    }
-
-    free(_mprec_freelist);
+  if (__dtoa_result) {
+    free(__dtoa_result);
+    __dtoa_result = NULL;
+    __dtoa_result_len = 0;
   }
-  if (_mprec_result)
-    free(_mprec_result);
 }
 
 int
@@ -143,35 +142,14 @@ Balloc (int k)
   int x;
   _Bigint *rv ;
 
-  if (_mprec_freelist == NULL)
-    {
-      if (__mprec_register_exit() != 0)
-	return NULL;
-
-      /* Allocate a list of pointers to the mprec objects */
-      _mprec_freelist = (struct _Bigint **) calloc (sizeof (struct _Bigint *),
-						      _Kmax + 1);
-      if (_mprec_freelist == NULL)
-	{
-	  return NULL;
-	}
-    }
-
-  if ((rv = _mprec_freelist[k]) != 0)
-    {
-      _mprec_freelist[k] = rv->_next;
-    }
-  else
-    {
-      x = 1 << k;
-      /* Allocate an mprec Bigint and stick in in the freelist */
-      rv = (_Bigint *) calloc(1,
-				  sizeof (_Bigint) +
-				  (x-1) * sizeof(rv->_x));
-      if (rv == NULL) return NULL;
-      rv->_k = k;
-      rv->_maxwds = x;
-    }
+  x = 1 << k;
+  /* Allocate an mprec Bigint */
+  rv = (_Bigint *) calloc(1,
+			  sizeof (_Bigint) +
+			  (x-1) * sizeof(rv->_x));
+  if (rv == NULL) return NULL;
+  rv->_k = k;
+  rv->_maxwds = x;
   rv->_sign = rv->_wds = 0;
   return rv;
 }
@@ -179,11 +157,7 @@ Balloc (int k)
 void
 Bfree (_Bigint * v)
 {
-  if (v)
-    {
-      v->_next = _mprec_freelist[v->_k];
-      _mprec_freelist[v->_k] = v;
-    }
+  free(v);
 }
 
 _Bigint *

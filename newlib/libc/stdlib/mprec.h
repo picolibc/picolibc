@@ -358,13 +358,12 @@ typedef struct _Bigint _Bigint;
 #define bigtens __mprec_bigtens
 #define tinytens __mprec_tinytens
 
-extern NEWLIB_THREAD_LOCAL _Bigint *_mprec_result;
-extern NEWLIB_THREAD_LOCAL int _mprec_result_k;
+char *__alloc_dtoa_result(int len);
+
 int __mprec_register_exit(void);
 
 struct _Bigint
 {
-  struct _Bigint *_next;
   int _k, _maxwds, _sign, _wds;
   uint32_t _x[1];
 };
