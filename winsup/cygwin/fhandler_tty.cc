@@ -188,7 +188,10 @@ set_ishybrid_and_switch_to_pcon (HANDLE h)
 inline void
 fhandler_pty_slave::free_attached_console ()
 {
-  if (freeconsole_on_close && get_minor () == pcon_attached_to)
+  bool attached = get_ttyp () ?
+    fhandler_console::get_console_process_id (get_helper_process_id (), true)
+    : (get_minor () == pcon_attached_to);
+  if (freeconsole_on_close && attached)
     {
       FreeConsole ();
       pcon_attached_to = -1;
