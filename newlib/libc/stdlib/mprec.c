@@ -173,6 +173,9 @@ multadd (
 #endif
   _Bigint *b1;
 
+  if (!b)
+    return NULL;
+
   wds = b->_wds;
   x = b->_x;
   i = 0;
@@ -195,7 +198,11 @@ multadd (
     {
       if (wds >= b->_maxwds)
 	{
-	  b1 = eBalloc (b->_k + 1);
+	  b1 = Balloc (b->_k + 1);
+	  if (!b1) {
+	    Bfree(b);
+	    return NULL;
+	  }
 	  Bcopy (b1, b);
 	  Bfree (b);
 	  b = b1;
@@ -220,11 +227,15 @@ s2b (
   x = (nd + 8) / 9;
   for (k = 0, y = 1; x > y; y <<= 1, k++);
 #ifdef Pack_32
-  b = eBalloc (k);
+  b = Balloc (k);
+  if (!b)
+    return NULL;
   b->_x[0] = y9;
   b->_wds = 1;
 #else
-  b = eBalloc (k + 1);
+  b = Balloc (k + 1);
+  if (!b)
+    return NULL;
   b->_x[0] = y9 & 0xffff;
   b->_wds = (b->_x[1] = y9 >> 16) ? 2 : 1;
 #endif
@@ -334,9 +345,11 @@ i2b (int i)
 {
   _Bigint *b;
 
-  b = eBalloc (1);
-  b->_x[0] = i;
-  b->_wds = 1;
+  b = Balloc (1);
+  if (b) {
+    b->_x[0] = i;
+    b->_wds = 1;
+  }
   return b;
 }
 
@@ -351,6 +364,9 @@ mult (_Bigint * a, _Bigint * b)
   __ULong z2;
 #endif
 
+  if (!a || !b)
+    return NULL;
+
   if (a->_wds < b->_wds)
     {
       c = a;
@@ -363,7 +379,9 @@ mult (_Bigint * a, _Bigint * b)
   wc = wa + wb;
   if (wc > a->_maxwds)
     k++;
-  c = eBalloc (k);
+  c = Balloc (k);
+  if (!c)
+    return NULL;
   for (x = c->_x, xa = x + wc; x < xa; x++)
     *x = 0;
   xa = a->_x;
@@ -432,8 +450,6 @@ mult (_Bigint * a, _Bigint * b)
   return c;
 }
 
-static NEWLIB_THREAD_LOCAL _Bigint *_p5s;
-
 _Bigint *
 pow5mult (_Bigint * b, int k)
 {
@@ -446,12 +462,7 @@ pow5mult (_Bigint * b, int k)
 
   if (!(k >>= 2))
     return b;
-  if (!(p5 = _p5s))
-    {
-      /* first time */
-      p5 = _p5s = i2b (625);
-      p5->_next = 0;
-    }
+  p5 = i2b (625);
   for (;;)
     {
       if (k & 1)
@@ -462,13 +473,11 @@ pow5mult (_Bigint * b, int k)
 	}
       if (!(k >>= 1))
 	break;
-      if (!(p51 = p5->_next))
-	{
-	  p51 = p5->_next = mult (p5, p5);
-	  p51->_next = 0;
-	}
+      p51 = mult (p5, p5);
+      Bfree(p5);
       p5 = p51;
     }
+  Bfree(p5);
   return b;
 }
 
@@ -479,6 +488,9 @@ lshift (_Bigint * b, int k)
   _Bigint *b1;
   __ULong *x, *x1, *xe, z;
 
+  if (!b)
+    return NULL;
+
 #ifdef Pack_32
   n = k >> 5;
 #else
@@ -488,7 +500,10 @@ lshift (_Bigint * b, int k)
   n1 = n + b->_wds + 1;
   for (i = b->_maxwds; n1 > i; i <<= 1)
     k1++;
-  b1 = eBalloc (k1);
+  b1 = Balloc (k1);
+  if (!b1)
+    goto bail;
+
   x1 = b1->_x;
   for (i = 0; i < n; i++)
     *x1++ = 0;
@@ -528,6 +543,7 @@ lshift (_Bigint * b, int k)
       *x1++ = *x++;
     while (x < xe);
   b1->_wds = n1 - 1;
+bail:
   Bfree (b);
   return b1;
 }
@@ -537,6 +553,9 @@ cmp (_Bigint * a, _Bigint * b)
 {
   __ULong *xa, *xa0, *xb, *xb0;
   int i, j;
+
+  if (!a || !b)
+    return 0;
 
   i = a->_wds;
   j = b->_wds;
@@ -577,7 +596,9 @@ diff (
   i = cmp (a, b);
   if (!i)
     {
-      c = eBalloc (0);
+      c = Balloc (0);
+      if (!c)
+	return NULL;
       c->_wds = 1;
       c->_x[0] = 0;
       return c;
@@ -591,7 +612,9 @@ diff (
     }
   else
     i = 0;
-  c = eBalloc (a->_k);
+  c = Balloc (a->_k);
+  if (!c)
+    return NULL;
   c->_sign = i;
   wa = a->_wds;
   xa = a->_x;

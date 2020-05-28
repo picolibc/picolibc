@@ -43,6 +43,9 @@ quorem (_Bigint * b, _Bigint * S)
   __ULong si, zs;
 #endif
 
+  if (!b || !S)
+    return 0;
+
   n = S->_wds;
 #ifdef DEBUG
   /*debug*/ if (b->_wds > n)
@@ -275,6 +278,8 @@ __dtoa (
     }
 
   b = d2b (d.d, &be, &bbits);
+  if (!b)
+    return NULL;
 #ifdef Sudden_Underflow
   i = (int) (word0 (d) >> Exp_shift1 & (Exp_mask >> Exp_shift1));
 #else
@@ -643,6 +648,8 @@ __dtoa (
   S = i2b (1);
   if (s5 > 0)
     S = pow5mult (S, s5);
+  if (!S)
+    goto ret;
 
   /* Check for special case that d is a normalized power of 2. */
 
@@ -733,6 +740,10 @@ __dtoa (
       if (spec_case)
 	{
 	  mhi = Balloc (mhi->_k);
+	  if (!mhi) {
+	    Bfree(mlo);
+	    return NULL;
+	  }
 	  Bcopy (mhi, mlo);
 	  mhi = lshift (mhi, Log2P);
 	}

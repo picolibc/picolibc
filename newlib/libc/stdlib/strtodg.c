@@ -63,7 +63,9 @@ sum (_Bigint *a, _Bigint *b)
 	if (a->_wds < b->_wds) {
 		c = b; b = a; a = c;
 		}
-	c = eBalloc(a->_k);
+	c = Balloc(a->_k);
+	if (!c)
+		return NULL;
 	c->_wds = a->_wds;
 	carry = 0;
 	xa = a->_x;
@@ -103,7 +105,11 @@ sum (_Bigint *a, _Bigint *b)
 #endif
 	if (carry) {
 		if (c->_wds == c->_maxwds) {
-			b = eBalloc(c->_k + 1);
+			b = Balloc(c->_k + 1);
+			if (!b) {
+				Bfree(c);
+				return NULL;
+			}
 			Bcopy(b, c);
 			Bfree(c);
 			c = b;
@@ -190,7 +196,11 @@ increment (_Bigint *b)
 #endif
 	{
 		if (b->_wds >= b->_maxwds) {
-			b1 = eBalloc(b->_k+1);
+			b1 = Balloc(b->_k+1);
+			if (!b) {
+				Bfree(b);
+				return NULL;
+			}
 			Bcopy(b1,b);
 			Bfree(b);
 			b = b1;
@@ -253,7 +263,9 @@ set_ones (_Bigint *b, int n)
 	k = (n + ((1 << kshift) - 1)) >> kshift;
 	if (b->_k < k) {
 		Bfree(b);
-		b = eBalloc(k);
+		b = Balloc(k);
+		if (!b)
+			return NULL;
 		}
 	k = n >> kshift;
 	if (n &= kmask)
@@ -272,12 +284,14 @@ static int
 rvOK (double d, FPI *fpi, Long *exp, __ULong *bits, int exact,
       int rd, int *irv)
 {
-	_Bigint *b;
+	_Bigint *b = NULL;
 	__ULong carry, inex, lostbits;
 	int bdif, e, j, k, k1, nb, rv;
 
 	carry = rv = 0;
 	b = d2b(d, &e, &bdif);
+	if (!b)
+		goto ret;
 	bdif -= nb = fpi->nbits;
 	e += bdif;
 	if (bdif <= 0) {
@@ -330,6 +344,8 @@ rvOK (double d, FPI *fpi, Long *exp, __ULong *bits, int exact,
 		if (carry) {
 			inex = STRTOG_Inexhi;
 			b = increment(b);
+			if (!b)
+				goto ret;
 			if ( (j = nb & kmask) !=0)
 				j = ULbits - j;
 			if (hi0bits(b->_x[b->_wds - 1]) != j) {
@@ -340,8 +356,11 @@ rvOK (double d, FPI *fpi, Long *exp, __ULong *bits, int exact,
 				}
 			}
 		}
-	else if (bdif < 0)
+	else if (bdif < 0) {
 		b = lshift(b, -bdif);
+		if (!b)
+			goto ret;
+	}
 	if (e < fpi->emin) {
 		k = fpi->emin - e;
 		e = fpi->emin;
@@ -364,6 +383,8 @@ rvOK (double d, FPI *fpi, Long *exp, __ULong *bits, int exact,
 			*irv = STRTOG_Denormal;
 			if (carry) {
 				b = increment(b);
+				if (!b)
+					goto ret;
 				inex = STRTOG_Inexhi | STRTOG_Underflow;
 #ifndef NO_ERRNO
 				errno = ERANGE;
@@ -427,7 +448,7 @@ _strtodg_l (const char *s00, char **se, FPI *fpi, Long *exp,
 	U adj, rv;
 	Long L;
 	__ULong y, z;
-	_Bigint *ab, *bb, *bb1, *bd, *bd0, *bs, *delta, *rvb, *rvb0;
+	_Bigint *ab = NULL, *bb = NULL, *bb1 = NULL, *bd = NULL, *bd0 = NULL, *bs = NULL, *delta = NULL, *rvb = NULL, *rvb0 = NULL;
 	const char *decimal_point = __get_numeric_locale(loc)->decimal_point;
 	int dec_len = strlen (decimal_point);
 
@@ -743,6 +764,8 @@ _strtodg_l (const char *s00, char **se, FPI *fpi, Long *exp,
 	e2 <<= 2;
 #endif
 	rvb = d2b(dval(rv), &rve, &rvbits);	/* rv = rvb * 2^rve */
+	if (!rvb)
+		goto nomem;
 	rve += e2;
 	if ((j = rvbits - nbits) > 0) {
 		rshift(rvb, j);
@@ -759,6 +782,8 @@ _strtodg_l (const char *s00, char **se, FPI *fpi, Long *exp,
 		j = rve - emin;
 		if (j > 0) {
 			rvb = lshift(rvb, j);
+			if (!rvb)
+				goto nomem;
 			rvbits += j;
 			}
 		else if (j < 0) {
@@ -790,15 +815,23 @@ _strtodg_l (const char *s00, char **se, FPI *fpi, Long *exp,
 	/* Put digits into bd: true value = bd * 10^e */
 
 	bd0 = s2b(s0, nd0, nd, y);
+	if (!bd0)
+		goto nomem;
 
 	for(;;) {
-		bd = eBalloc(bd0->_k);
+		bd = Balloc(bd0->_k);
+		if (!bd)
+			goto nomem;
 		Bcopy(bd, bd0);
-		bb = eBalloc(rvb->_k);
+		bb = Balloc(rvb->_k);
+		if (!bb)
+			goto nomem;
 		Bcopy(bb, rvb);
 		bbbits = rvbits - bb0;
 		bbe = rve + bb0;
 		bs = i2b(1);
+		if (!bs)
+			goto nomem;
 
 		if (e >= 0) {
 			bb2 = bb5 = 0;
@@ -829,24 +862,41 @@ _strtodg_l (const char *s00, char **se, FPI *fpi, Long *exp,
 			}
 		if (bb5 > 0) {
 			bs = pow5mult(bs, bb5);
+			if (!bs)
+				goto nomem;
 			bb1 = mult(bs, bb);
+			if (!bb1)
+				goto nomem;
 			Bfree(bb);
 			bb = bb1;
 			}
 		bb2 -= bb0;
-		if (bb2 > 0)
+		if (bb2 > 0) {
 			bb = lshift(bb, bb2);
-		else if (bb2 < 0)
+			if (!bb)
+				goto nomem;
+		} else if (bb2 < 0)
 			rshift(bb, -bb2);
-		if (bd5 > 0)
+		if (bd5 > 0) {
 			bd = pow5mult(bd, bd5);
-		if (bd2 > 0)
+			if (!bd)
+				goto nomem;
+		}
+		if (bd2 > 0) {
 			bd = lshift(bd, bd2);
-		if (bs2 > 0)
+			if (!bd)
+				goto nomem;
+		}
+		if (bs2 > 0) {
 			bs = lshift(bs, bs2);
+			if (!bs)
+				goto nomem;
+		}
 		asub = 1;
 		inex = STRTOG_Inexhi;
 		delta = diff(bb, bd);
+		if (!delta)
+			goto nomem;
 		if (delta->_wds <= 1 && !delta->_x[0])
 			break;
 		dsign = delta->_sign;
@@ -872,6 +922,8 @@ _strtodg_l (const char *s00, char **se, FPI *fpi, Long *exp,
 					goto adj1;
 				rve = rve1 - 1;
 				rvb = set_ones(rvb, rvbits = nbits);
+				if (!rvb)
+					goto nomem;
 				break;
 				}
 			irv |= dsign ? STRTOG_Inexlo : STRTOG_Inexhi;
@@ -887,6 +939,8 @@ _strtodg_l (const char *s00, char **se, FPI *fpi, Long *exp,
 			if (dsign || bbbits > 1 || denorm || rve1 == emin)
 				break;
 			delta = lshift(delta,1);
+			if (!delta)
+				goto nomem;
 			if (cmp(delta, bs) > 0) {
 				irv = STRTOG_Normal | STRTOG_Inexlo;
 				goto drop_down;
@@ -919,6 +973,8 @@ _strtodg_l (const char *s00, char **se, FPI *fpi, Long *exp,
 					}
 				rve -= nbits;
 				rvb = set_ones(rvb, rvbits = nbits);
+				if (!rvb)
+					goto nomem;
 				break;
 				}
 			else
@@ -927,6 +983,8 @@ _strtodg_l (const char *s00, char **se, FPI *fpi, Long *exp,
 				break;
 			if (dsign) {
 				rvb = increment(rvb);
+				if (!rvb)
+					goto nomem;
 				j = kmask & (ULbits - (rvbits & kmask));
 				if (hi0bits(rvb->_x[rvb->_wds - 1]) != j)
 					rvbits++;
@@ -994,19 +1052,28 @@ _strtodg_l (const char *s00, char **se, FPI *fpi, Long *exp,
 
 		if (!denorm && rvbits < nbits) {
 			rvb = lshift(rvb, j = nbits - rvbits);
+			if (!rvb)
+				goto nomem;
 			rve -= j;
 			rvbits = nbits;
 			}
 		ab = d2b(dval(adj), &abe, &abits);
+		if (!ab)
+			goto nomem;
 		if (abe < 0)
 			rshift(ab, -abe);
-		else if (abe > 0)
+		else if (abe > 0) {
 			ab = lshift(ab, abe);
+			if (!ab)
+				goto nomem;
+		}
 		rvb0 = rvb;
 		if (asub) {
 			/* rv -= adj; */
 			j = hi0bits(rvb->_x[rvb->_wds-1]);
 			rvb = diff(rvb, ab);
+			if (!rvb)
+				goto nomem;
 			k = rvb0->_wds - 1;
 			if (denorm)
 				/* do nothing */;
@@ -1020,6 +1087,8 @@ _strtodg_l (const char *s00, char **se, FPI *fpi, Long *exp,
 					}
 				else {
 					rvb = lshift(rvb, 1);
+					if (!rvb)
+						goto nomem;
 					--rve;
 					--rve1;
 					L = finished = 0;
@@ -1028,6 +1097,8 @@ _strtodg_l (const char *s00, char **se, FPI *fpi, Long *exp,
 			}
 		else {
 			rvb = sum(rvb, ab);
+			if (!rvb)
+				goto nomem;
 			k = rvb->_wds - 1;
 			if (k >= rvb0->_wds
 			 || hi0bits(rvb->_x[k]) < hi0bits(rvb0->_x[k])) {
@@ -1044,7 +1115,9 @@ _strtodg_l (const char *s00, char **se, FPI *fpi, Long *exp,
 				}
 			}
 		Bfree(ab);
+		ab = NULL;
 		Bfree(rvb0);
+		rvb0 = NULL;
 		if (finished)
 			break;
 
@@ -1066,13 +1139,20 @@ _strtodg_l (const char *s00, char **se, FPI *fpi, Long *exp,
 			}
 		bb0 = denorm ? 0 : trailz(rvb);
 		Bfree(bb);
+		bb = NULL;
 		Bfree(bd);
+		bd = NULL;
 		Bfree(bs);
+		bs = NULL;
 		Bfree(delta);
+		delta = NULL;
 		}
 	if (!denorm && (j = nbits - rvbits)) {
-		if (j > 0)
+		if (j > 0) {
 			rvb = lshift(rvb, j);
+			if (!rvb)
+				goto nomem;
+		}
 		else
 			rshift(rvb, -j);
 		rve -= j;
@@ -1121,6 +1201,20 @@ _strtodg_l (const char *s00, char **se, FPI *fpi, Long *exp,
 		Bfree(rvb);
 		}
 	return irv;
+nomem:
+	Bfree(bb);
+	Bfree(bd);
+	Bfree(bs);
+	if (bd0 != bd)
+		Bfree(bd0);
+	Bfree(delta);
+	Bfree(rvb);
+	if (rvb0 != rvb)
+		Bfree(rvb0);
+#ifndef NO_ERRNO
+	errno = ENOMEM;
+#endif
+	return STRTOG_NoNumber;
 	}
 
 #endif /* _HAVE_LONG_DOUBLE && !_LDBL_EQ_DBL */

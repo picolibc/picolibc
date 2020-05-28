@@ -106,6 +106,9 @@ increment (
 	__ULong carry = 1, y;
 #endif
 
+	if (!b)
+		return NULL;
+
 	x = b->_x;
 	xe = x + b->_wds;
 #ifdef Pack_32
@@ -128,7 +131,11 @@ increment (
 #endif
 	{
 		if (b->_wds >= b->_maxwds) {
-			b1 = eBalloc(b->_k+1);
+			b1 = Balloc(b->_k+1);
+			if (!b1) {
+				Bfree(b);
+				return NULL;
+			}
 			Bcopy(b1, b);
 			Bfree(b);
 			b = b1;
@@ -218,7 +225,9 @@ gethex (const char **sp, const FPI *fpi,
 	n = s1 - s0 - 1;
 	for(k = 0; n > 7; n >>= 1)
 		k++;
-	b = eBalloc(k);
+	b = Balloc(k);
+	if (!b)
+		return STRTOG_NoNumber;
 	x = b->_x;
 	n = 0;
 	L = 0;
@@ -327,6 +336,8 @@ gethex (const char **sp, const FPI *fpi,
 		if (up) {
 			k = b->_wds;
 			b = increment(b);
+			if (!b)
+				return STRTOG_NoNumber;
 			x = b->_x;
 			if (irv == STRTOG_Denormal) {
 				if (nbits == fpi->nbits - 1
