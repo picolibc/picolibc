@@ -1,7 +1,7 @@
 /*
  * SPDX-License-Identifier: BSD-3-Clause
  *
- * Copyright © 2019 Keith Packard
+ * Copyright © 2020 Keith Packard
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -32,25 +32,30 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-
-#include <picotls.h>
-#include <string.h>
-#include <stdint.h>
-
-/* This needs to be global so that __aeabi_read_tp can
- * refer to it in an asm statement
+/*
+ * This cannot be a C ABI function as the compiler assumes that it
+ * does not modify anything other than r0 and lr.
  */
-void *__tls;
+	.syntax unified
+	.text
+	.thumb_func
+	.align 4
+	.p2align 4,,15
+	.global __aeabi_read_tp
+	.type __aeabi_read_tp,%function
 
-/* The size of the thread control block.
- * TLS relocations are generated relative to
- * a location this far *before* the first thread
- * variable (!)
- */
-#define TCB_SIZE	8
+__aeabi_read_tp:
+	.cfi_sections .debug_frame
+	.cfi_startproc
+	/* Load the address of __tls */
+	ldr r0,1f
+	/* Dereference to get the value of __tls */
+	ldr r0,[r0]
+	/* All done, return to caller */
+	bx lr
+	.cfi_endproc
+	
+	/* Holds the address of __tls */
+	.align 2
+1: .word __tls
 
-void
-_set_tls(void *tls)
-{
-	__tls = (uint8_t *) tls - TCB_SIZE;
-}
