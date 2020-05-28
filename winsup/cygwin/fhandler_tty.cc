@@ -2615,18 +2615,18 @@ fhandler_pty_master::ioctl (unsigned int cmd, void *arg)
       *(struct winsize *) arg = get_ttyp ()->winsize;
       break;
     case TIOCSWINSZ:
-      /* FIXME: Pseudo console can be accessed via its handle
-	 only in the process which created it. What else can we do? */
-      if (get_pseudo_console () && get_ttyp ()->master_pid == myself->pid)
-	{
-	  COORD size;
-	  size.X = ((struct winsize *) arg)->ws_col;
-	  size.Y = ((struct winsize *) arg)->ws_row;
-	  ResizePseudoConsole (get_pseudo_console (), size);
-	}
       if (get_ttyp ()->winsize.ws_row != ((struct winsize *) arg)->ws_row
 	  || get_ttyp ()->winsize.ws_col != ((struct winsize *) arg)->ws_col)
 	{
+	  /* FIXME: Pseudo console can be accessed via its handle
+	     only in the process which created it. What else can we do? */
+	  if (get_pseudo_console () && get_ttyp ()->master_pid == myself->pid)
+	    {
+	      COORD size;
+	      size.X = ((struct winsize *) arg)->ws_col;
+	      size.Y = ((struct winsize *) arg)->ws_row;
+	      ResizePseudoConsole (get_pseudo_console (), size);
+	    }
 	  get_ttyp ()->winsize = *(struct winsize *) arg;
 	  get_ttyp ()->kill_pgrp (SIGWINCH);
 	}
