@@ -116,7 +116,7 @@ typedef struct malloc_chunk
 }chunk;
 
 
-#define CHUNK_OFFSET ((malloc_size_t)(&(((struct malloc_chunk *)0)->next)))
+#define CHUNK_OFFSET 	offsetof(chunk, next)
 
 /* size of smallest possible chunk. A memory piece smaller than this size
  * won't be able to create a chunk */
@@ -289,7 +289,7 @@ void * nano_malloc(malloc_size_t s)
            Note that the size of the padding must be at least CHUNK_OFFSET.
 
            The rest of the padding is not initialized.  */
-        *(long *)((char *)r + offset) = -offset;
+	((chunk *)((char *)align_ptr - CHUNK_OFFSET))->size = -offset;
     }
 
     assert(align_ptr + size <= (char *)r + alloc_size);
