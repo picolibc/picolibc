@@ -160,6 +160,13 @@ test_atol (void)
 extern ddouble_type ddoubles[];
 ddouble_type *pdd;
 
+static inline char *
+check_null(char *s) {
+  if (s == NULL)
+    return "(out of memory)";
+  return s;
+}
+
 #ifndef NO_NEWLIB
 /* test ECVT and friends */
 void
@@ -167,7 +174,7 @@ test_ecvtbuf (void)
 {
   int a2,a3;
   char *s;
-  s =  ecvtbuf(pdd->value, pdd->e1, &a2, &a3, buffer);
+  s =  check_null(ecvtbuf(pdd->value, pdd->e1, &a2, &a3, buffer));
 
   test_sok(s,pdd->estring);
   test_iok(pdd->e2,a2);
@@ -180,14 +187,14 @@ test_ecvt (void)
 {
   int a2,a3;
   char *s;
-  s =  ecvt(pdd->value, pdd->e1, &a2, &a3);
+  s =  check_null(ecvt(pdd->value, pdd->e1, &a2, &a3));
 
   test_sok(s,pdd->estring);
   test_iok(pdd->e2,a2);
   test_iok(pdd->e3,a3);
 
 #ifndef NO_NEWLIB
-  s =  ecvtf(pdd->value, pdd->e1, &a2, &a3);
+  s =  check_null(ecvtf(pdd->value, pdd->e1, &a2, &a3));
 
   test_scok(s,pdd->estring, 6);
   test_iok(pdd->e2,a2);
@@ -201,7 +208,7 @@ test_fcvtbuf (void)
 {
   int a2,a3;
   char *s;
-  s =  fcvtbuf(pdd->value, pdd->f1, &a2, &a3, buffer);
+  s =  check_null(fcvtbuf(pdd->value, pdd->f1, &a2, &a3, buffer));
 
   test_scok(s,pdd->fstring,10);
   test_iok(pdd->f2,a2);
@@ -212,11 +219,11 @@ test_fcvtbuf (void)
 void
 test_gcvt (void)
 {
-  char *s = gcvt(pdd->value, pdd->g1, buffer);  
+  char *s = check_null(gcvt(pdd->value, pdd->g1, buffer));
   test_scok(s, pdd->gstring, 9);
   
 #ifndef NO_NEWLIB
-  s = gcvtf(pdd->value, pdd->g1, buffer);  
+  s = check_null(gcvtf(pdd->value, pdd->g1, buffer)); 
   test_scok(s, pdd->gstring, 6);
 #endif
 }
@@ -226,7 +233,7 @@ test_fcvt (void)
 {
   int a2,a3;
   char *sd;
-  sd =  fcvt(pdd->value, pdd->f1, &a2, &a3);
+  sd =  check_null(fcvt(pdd->value, pdd->f1, &a2, &a3));
 
   test_scok(sd,pdd->fstring,10);
   test_iok(pdd->f2,a2);
@@ -239,7 +246,7 @@ test_fcvt (void)
   int s1, s2;
   /* Test the float version by converting and inspecting the numbers 3
    after reconverting */
-  sf =  fcvtf(pdd->value, pdd->f1, &a2, &a3);
+  sf =  check_null(fcvtf(pdd->value, pdd->f1, &a2, &a3));
   s1 = sscanf(sd, "%lg", &v1);
   s2 = sscanf(sf, "%lg", &v2);
   if (strlen(sd) == 0) {
@@ -424,9 +431,9 @@ gen_dvec(void)
   int	e_decpt, e_sign;
   int	f_decpt, f_sign;
 
-  strcpy(ebuf, ecvt(pdd->value, pdd->e1, &e_decpt, &e_sign));
-  strcpy(fbuf, fcvt(pdd->value, pdd->f1, &f_decpt, &f_sign));
-  gcvt(pdd->value, pdd->g1, gbuf);
+  strcpy(ebuf, check_null(ecvt(pdd->value, pdd->e1, &e_decpt, &e_sign)));
+  strcpy(fbuf, check_null(fcvt(pdd->value, pdd->f1, &f_decpt, &f_sign)));
+  check_null(gcvt(pdd->value, pdd->g1, gbuf));
   printf("__LINE__, %.15e,\"%s\",%d,%d,%d,\"%s\",%d,%d,%d,\"%s\",%d,\n\n",
 	 pdd->value,
 	 ebuf, pdd->e1, e_decpt, e_sign,
@@ -434,6 +441,8 @@ gen_dvec(void)
 	 gbuf, pdd->g1);
 }
 #endif
+
+extern int _malloc_test_fail;
 
 void
 test_cvt (void)
