@@ -491,7 +491,7 @@ fhandler_base::fstat_helper (struct stat *buf)
       else
 	{
 	  buf->st_dev = buf->st_rdev = dev ();
-	  buf->st_mode |= dev ().mode () & S_IFMT;
+	  buf->st_mode = dev ().mode ();
 	  buf->st_size = 0;
 	}
     }
