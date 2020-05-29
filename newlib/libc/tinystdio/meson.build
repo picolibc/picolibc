@@ -36,6 +36,16 @@ srcs_tinystdio = [
     'clearerr.c',
     'dtoa_engine.c',
     'dtoa_data.c',
+    'ecvt_data.c',
+    'ecvtf_data.c',
+    'ecvtbuf.c',
+    'ecvt.c',
+    'ecvtf.c',
+    'fcvtbuf.c',
+    'fcvt.c',
+    'fcvtf.c',
+    'gcvt.c',
+    'gcvtf.c',
     'fclose.c',
     'fdevopen.c',
     'feof.c',
@@ -82,6 +92,7 @@ srcs_tinystdio = [
     'sscanff.c',
     'strtof.c',
     'strtod.c',
+    'strtod_l.c',
     'ungetc.c',
     'vfiprintf.c',
     'vfiscanf.c',
@@ -104,7 +115,7 @@ srcs_tinystdio = [
 ]
 
 if have_long_double and not long_double_equals_double
-  srcs_tinystdio += 'strtold.c'
+  srcs_tinystdio += ['strtold.c', 'strtold_l.c']
 endif
 
 srcs_tinystdio_posix = [

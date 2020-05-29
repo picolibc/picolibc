@@ -31,6 +31,9 @@
 #ifndef	_FTOA_ENGINE_H
 #define	_FTOA_ENGINE_H
 
+#define _XOPEN_SOURCE
+#define _XOPEN_SOURCE_EXTENDED
+#include <stdlib.h>
 #include <stdint.h>
 #include <float.h>
 
@@ -43,6 +46,8 @@ struct ftoa {
 };
 
 int __ftoa_engine (float val, struct ftoa *ftoa, uint8_t maxDigits, uint8_t maxDecimal);
+
+extern NEWLIB_THREAD_LOCAL char __ecvtf_buf[FTOA_MAX_DIG + 1];
 
 /* '__ftoa_engine' flags return value */
 #define	FTOA_MINUS	1

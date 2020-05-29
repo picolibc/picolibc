@@ -935,6 +935,12 @@ extern char *tmpnam (char *s);
 #define fscanf __f_fscanf
 #define sscanf __f_sscanf
 
+#define printf_float(x) __printf_float(x)
+
+#endif
+
+#endif
+
 static __inline uint32_t
 __printf_float(float f)
 {
@@ -944,12 +950,6 @@ __printf_float(float f)
 	} u = { .f = f };
 	return u.u;
 }
-
-#define printf_float(x) __printf_float(x)
-
-#endif
-
-#endif
 
 #ifndef printf_float
 #define printf_float(x) ((double) (x))

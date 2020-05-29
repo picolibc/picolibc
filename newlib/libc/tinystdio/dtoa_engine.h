@@ -29,6 +29,9 @@
 #ifndef	_DTOA_ENGINE_H_
 #define	_DTOA_ENGINE_H_
 
+#define _XOPEN_SOURCE
+#define _XOPEN_SOURCE_EXTENDED
+#include <stdlib.h>
 #include <stdint.h>
 #include <float.h>
 
@@ -79,6 +82,8 @@ struct dtoa {
 
 int
 __dtoa_engine(double x, struct dtoa *dtoa, int max_digits, int max_decimals);
+
+extern NEWLIB_THREAD_LOCAL char __ecvt_buf[DTOA_MAX_DIG + 1];
 
 extern const double __dtoa_scale_up[];
 extern const double __dtoa_scale_down[];
