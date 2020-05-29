@@ -224,7 +224,7 @@ test_gcvt (void)
   
 #ifndef NO_NEWLIB
   s = check_null(gcvtf(pdd->value, pdd->g1, buffer)); 
-  test_scok(s, pdd->gstring, 6);
+  test_scok2(s, pdd->gstring, pdd->gfstring, 6);
 #endif
 }
 

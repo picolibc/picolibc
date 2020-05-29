@@ -260,6 +260,7 @@ typedef struct
   int f3;
   char *gstring;
   int g1;
+  char *gfstring;
 } ddouble_type;
 
 typedef struct
@@ -295,6 +296,7 @@ void test_iok (int, int);
 void test_eok (int, int);
 void test_sok (char *, char*);
 void test_scok (char *, char*, int);
+void test_scok2 (char *, char*, char*, int);
 void newfunc (const char *);
 
 void

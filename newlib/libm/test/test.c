@@ -320,6 +320,25 @@ test_scok (char *is,
   }
 }
 
+/* Compare counted strings upto a certain length, allowing two forms - useful to test single
+   prec float conversions against double results
+*/
+void 
+test_scok2 (char *is,
+       char *maybe1,
+       char *maybe2,
+       int count)
+{
+  if (strncmp(is,maybe1, count) && (maybe2 == NULL || strncmp(is,maybe2,count)))
+    {
+    printf("%s:%d, inacurate answer: (%s may be %s or %s)\n",
+	   iname, 
+	   theline,
+	   is, maybe1, maybe2 ? maybe2 : "(nothing)");
+    inacc++;
+  }
+}
+
 void
 test_eok (int is,
        int shouldbe)
