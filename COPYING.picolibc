@@ -559,6 +559,8 @@ License: BSD3-1
 
 Files: newlib/libc/stdio64/meson.build
  newlib/libc/errno/errno.c
+ newlib/libc/picolib/machine/arm/read_tp.S
+ newlib/libc/posix/meson.build
  newlib/libc/tinystdio/fflush.c
  newlib/libc/stdio/nano-svfprintf.c
  newlib/libc/stdio/nano-svfscanf.c
@@ -674,6 +676,14 @@ Files: newlib/libc/machine/msp430/tiny-printf.c
  newlib/libc/stdlib/wcstoll_r.c
  newlib/libc/stdlib/wcstoull_r.c
 Copyright: 1990 The Regents of the University of California.
+License: BSD3-2
+
+Files: newlib/libc/posix/cclass.h
+ newlib/libc/posix/cname.h
+ newlib/libc/posix/regex2.h
+ newlib/libc/posix/utils.h
+Copyright: 1992, 1993, 1994 Henry Spencer.
+ 1992, 1993, 1994 The Regents of the University of California.
 License: BSD3-2
 
 Files: newlib/libc/search/bsearch.c
@@ -823,6 +833,15 @@ License: BSD3-5
 Files: newlib/libc/misc/__dprintf.c
  newlib/libc/stdio/vfwprintf.c
 Copyright: 1990 The Regents of the University of California.
+License: BSD3-5
+
+Files: newlib/libc/posix/engine.c
+ newlib/libc/posix/regcomp.c
+ newlib/libc/posix/regerror.c
+ newlib/libc/posix/regexec.c
+ newlib/libc/posix/regfree.c
+Copyright: 1992, 1993, 1994 Henry Spencer.
+ 1992, 1993, 1994 The Regents of the University of California.
 License: BSD3-5
 
 Files: newlib/libc/string/strcasestr.c

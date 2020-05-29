@@ -105,9 +105,9 @@ machine_dirs = {
 		 'spu': 'spu',
 	       }
 
-libdirs = ['argz', 'ctype', 'errno', 'iconv', 'misc', 'search',
-	   'signal', 'ssp', 'stdlib', 'string', 'time',
-	   'xdr', 'locale']
+libdirs = ['argz', 'ctype', 'errno', 'iconv', 'misc',
+	   'posix', 'search', 'signal', 'ssp', 'stdlib',
+	   'string', 'time', 'xdr', 'locale']
 
 if enable_picolib
   libdirs += 'picolib'
