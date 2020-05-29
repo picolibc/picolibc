@@ -77,12 +77,15 @@ static const uint32_t factorTable[32] = {
     1038459372UL
 };
 
-static uint8_t min_uint8(uint8_t a, uint8_t b)
-{
-    if (a < b)
-	return a;
-    return b;
-}
+#define max(a, b) ({\
+		typeof(a) _a = a;\
+		typeof(b) _b = b;\
+		_a > _b ? _a : _b; })
+
+#define min(a, b) ({\
+		typeof(a) _a = a;\
+		typeof(b) _b = b;\
+		_a < _b ? _a : _b; })
 
 int __ftoa_engine(float val, struct ftoa *ftoa, uint8_t maxDigits, uint8_t maxDecimals) 
 {
@@ -160,12 +163,11 @@ int __ftoa_engine(float val, struct ftoa *ftoa, uint8_t maxDigits, uint8_t maxDe
         uint8_t hadNonzeroDigit = 0; /* have seen a non-zero digit flag */
         uint8_t outputIdx = 0;
         int64_t decimal = 100000000000000ull;
+	uint8_t saveMaxDigits = maxDigits;
 
         do {
             /* Compute next digit */
             char digit = prod / decimal + '0';
-            prod = prod % decimal;
-            decimal /= 10;
 
             if(!hadNonzeroDigit)
             {
@@ -174,6 +176,8 @@ int __ftoa_engine(float val, struct ftoa *ftoa, uint8_t maxDigits, uint8_t maxDe
                  */
                 if (digit == '0') {
                     exp10--;
+		    prod = prod % decimal;
+		    decimal /= 10;
                     continue;
                 }
 
@@ -183,15 +187,13 @@ int __ftoa_engine(float val, struct ftoa *ftoa, uint8_t maxDigits, uint8_t maxDe
                 /* If limiting decimals... */
                 if(maxDecimals != 0)
                 {
-                    int8_t beforeDP = exp10+1;                // Digits before point
-
-                    /* Numbers < 1 should also output at least 1 digit. */
-                    if (beforeDP < 1)
-                        beforeDP = 1;
-
-                    maxDigits = min_uint8 (maxDigits, maxDecimals - 1 + beforeDP);
+		    maxDigits = min(maxDigits, max(0, maxDecimals - 1 + exp10 + 1));
+		    if (maxDigits == 0)
+			break;
                 }
             }
+            prod = prod % decimal;
+            decimal /= 10;
 
             /* Now we have a digit. */
             if(digit < '0' + 10) {
@@ -214,13 +216,23 @@ int __ftoa_engine(float val, struct ftoa *ftoa, uint8_t maxDigits, uint8_t maxDe
         decimal *= 10;
         if (prod - (decimal >> 1) >= 0)
         {
+	    uint8_t rounded;
         round_up:
 
+	    rounded = 0;
             while(outputIdx != 0) {
 
                 /* Increment digit, check if we're done */
-                if(++ftoa->digits[outputIdx-1] < '0' + 10)
+                if(++ftoa->digits[outputIdx-1] < '0' + 10) {
+		    rounded = 1;
                     break;
+		}
+
+                ftoa->digits[--outputIdx] = '0';
+                /* and the loop continues, carrying to next digit. */
+	    }
+
+	    if (!rounded) {
 
                 /* Rounded past the first digit;
                  * reset the leading digit to 1,
@@ -228,17 +240,12 @@ int __ftoa_engine(float val, struct ftoa *ftoa, uint8_t maxDigits, uint8_t maxDe
                  * The remaining digits will already be '0',
                  * so we don't need to mess with them
                  */
-                if(outputIdx == 1)
-                {
-                    ftoa->digits[0] = '1';
-                    exp10++;
-                    flags |= FTOA_CARRY;
-                    break;
-                }
-
-                ftoa->digits[--outputIdx] = '0';
-                /* and the loop continues, carrying to next digit. */
-            }
+		ftoa->digits[0] = '1';
+		exp10++;
+		if (maxDecimals != 0)
+		    maxDigits = min(saveMaxDigits, max(0, maxDecimals - 1 + exp10 + 1));
+		flags |= FTOA_CARRY;
+	    }
         }
         ftoa->exp = exp10;
     }
