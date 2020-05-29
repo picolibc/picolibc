@@ -249,6 +249,10 @@ test_fcvt (void)
   sf =  check_null(fcvtf(pdd->value, pdd->f1, &a2, &a3));
   s1 = sscanf(sd, "%lg", &v1);
   s2 = sscanf(sf, "%lg", &v2);
+  /* float version may return fewer digits; expand to match */
+  int x = strlen(sd) - strlen(sf);
+  while (x-- > 0)
+    v2 *= 10;
   if (strlen(sd) == 0) {
     test_iok(EOF, s1);
     v1 = 0.0;
