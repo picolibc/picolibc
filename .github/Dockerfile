@@ -16,7 +16,7 @@ RUN apt-get update && \
     qemu-system-arm=1:5.0-4.1 \
     qemu-system-misc=1:5.0-4.1
 
-# Copy freedom-e-sdk into container
+# Copy picolibc into container
 RUN mkdir picolibc
 COPY ./ picolibc/
 
