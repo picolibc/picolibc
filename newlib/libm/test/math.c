@@ -35,20 +35,17 @@
 #include "test.h"
 #include <math.h>
 #include <float.h>
-#include <math.h>
 #include <errno.h>
 #include <stdio.h>
 #include <string.h>
 #include <stdbool.h>
 
-int inacc;
+extern int inacc;
 
 int merror;
 double mretval = 64;
 int traperror = 1;
 char *mname;
-
-int verbose;
 
 void translate_to (FILE *file,
 	    double r)
@@ -233,7 +230,7 @@ thedouble (uint32_t msw,
 }
 
 int calc;
-int reduce;
+extern int reduce;
 
 
 frontline (FILE *f,
@@ -371,7 +368,8 @@ ffinish2 (FILE *f,
     frontline(f, mag, p, fresult, merror, errno, args , name);
   }
 }
-int redo;
+
+extern int redo;
 
 bool
 in_float_range(double arg)
