@@ -34,21 +34,21 @@ details. */
    references to these operators toward the redirectors in the Cygwin DLL; this
    way we can record what definitions were visible at final link time but still
    send all calls to the redirectors.  */
-extern WEAK void *operator new(std::size_t sz) throw (std::bad_alloc)
+extern WEAK void *operator new(std::size_t sz) noexcept (false)
 			__asm__ (REAL_ZNWX);
-extern WEAK void *operator new[](std::size_t sz) throw (std::bad_alloc)
+extern WEAK void *operator new[](std::size_t sz) noexcept (false)
 			__asm__ (REAL_ZNAX);
-extern WEAK void operator delete(void *p) throw()
+extern WEAK void operator delete(void *p) noexcept (true)
 			__asm__ (REAL_ZDLPV);
-extern WEAK void operator delete[](void *p) throw()
+extern WEAK void operator delete[](void *p) noexcept (true)
 			__asm__ (REAL_ZDAPV);
-extern WEAK void *operator new(std::size_t sz, const std::nothrow_t &nt) throw()
+extern WEAK void *operator new(std::size_t sz, const std::nothrow_t &nt) noexcept (true)
 			__asm__ (REAL_ZNWX_NOTHROW_T);
-extern WEAK void *operator new[](std::size_t sz, const std::nothrow_t &nt) throw()
+extern WEAK void *operator new[](std::size_t sz, const std::nothrow_t &nt) noexcept (true)
 			__asm__ (REAL_ZNAX_NOTHROW_T);
-extern WEAK void operator delete(void *p, const std::nothrow_t &nt) throw()
+extern WEAK void operator delete(void *p, const std::nothrow_t &nt) noexcept (true)
 			__asm__ (REAL_ZDLPV_NOTHROW_T);
-extern WEAK void operator delete[](void *p, const std::nothrow_t &nt) throw()
+extern WEAK void operator delete[](void *p, const std::nothrow_t &nt) noexcept (true)
 			__asm__ (REAL_ZDAPV_NOTHROW_T);
 
 /* Avoid an info message from linker when linking applications.  */
