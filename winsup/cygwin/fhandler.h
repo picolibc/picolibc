@@ -2040,6 +2040,7 @@ class dev_console
   char *cons_rapoi;
   LONG xterm_mode_input;
   LONG xterm_mode_output;
+  bool cursor_key_app_mode;
 
   inline UINT get_console_cp ();
   DWORD con_to_str (char *d, int dlen, WCHAR w);

@@ -243,6 +243,7 @@ fhandler_console::setup ()
       con.backspace_keycode = CERASE;
       con.cons_rapoi = NULL;
       shared_console_info->tty_min_state.is_console = true;
+      con.cursor_key_app_mode = false;
     }
 }
 
@@ -289,6 +290,8 @@ fhandler_console::request_xterm_mode_input (bool req)
 	  GetConsoleMode (get_handle (), &dwMode);
 	  dwMode |= ENABLE_VIRTUAL_TERMINAL_INPUT;
 	  SetConsoleMode (get_handle (), dwMode);
+	  if (con.cursor_key_app_mode) /* Restore DECCKM */
+	    WriteConsoleA (get_output_handle (), "\033[?1h", 5, NULL, 0);
 	}
     }
   else
@@ -2150,10 +2153,6 @@ fhandler_console::char_command (char c)
 	  break;
 	case 'h': /* DECSET */
 	case 'l': /* DECRST */
-	  if (c == 'h')
-	    con.screen_alternated = true;
-	  else
-	    con.screen_alternated = false;
 	  wpbuf.put (c);
 	  /* Just send the sequence */
 	  wpbuf.send (get_output_handle ());
@@ -2161,8 +2160,15 @@ fhandler_console::char_command (char c)
 	    {
 	      bool need_fix_tab_position = false;
 	      for (int i = 0; i < con.nargs; i++)
-		if (con.args[i] == 1049)
-		  need_fix_tab_position = true;
+		{
+		  if (con.args[i] == 1049)
+		    {
+		      con.screen_alternated = (c == 'h');
+		      need_fix_tab_position = true;
+		    }
+		  if (con.args[i] == 1) /* DECCKM */
+		    con.cursor_key_app_mode = (c == 'h');
+		}
 	      /* Call fix_tab_position() if screen has been alternated. */
 	      if (need_fix_tab_position)
 		fix_tab_position ();
@@ -2174,6 +2180,7 @@ fhandler_console::char_command (char c)
 	      con.scroll_region.Top = 0;
 	      con.scroll_region.Bottom = -1;
 	      con.savex = con.savey = -1;
+	      con.cursor_key_app_mode = false;
 	    }
 	  wpbuf.put (c);
 	  /* Just send the sequence */
@@ -3077,6 +3084,7 @@ fhandler_console::write (const void *vsrc, size_t len)
 		  con.scroll_region.Top = 0;
 		  con.scroll_region.Bottom = -1;
 		  con.savex = con.savey = -1;
+		  con.cursor_key_app_mode = false;
 		}
 	      /* ESC sequences below (e.g. OSC, etc) are left to xterm
 		 emulation in xterm compatible mode, therefore, are not
