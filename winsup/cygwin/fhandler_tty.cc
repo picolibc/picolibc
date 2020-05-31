@@ -533,6 +533,14 @@ fhandler_pty_master::doecho (const void *str, DWORD len)
 }
 
 int
+fhandler_pty_master::put_readahead (char value)
+{
+  if (to_be_read_from_pcon ())
+    return 1;
+  return fhandler_base::put_readahead (value);
+}
+
+int
 fhandler_pty_master::accept_input ()
 {
   DWORD bytes_left;
@@ -542,12 +550,14 @@ fhandler_pty_master::accept_input ()
 
   bytes_left = eat_readahead (-1);
 
-  if (!bytes_left)
+  if (to_be_read_from_pcon ())
+    ; /* Do nothing */
+  else if (!bytes_left)
     {
       termios_printf ("sending EOF to slave");
       get_ttyp ()->read_retval = 0;
     }
-  else if (!to_be_read_from_pcon ())
+  else
     {
       char *p = rabuf ();
       DWORD rc;

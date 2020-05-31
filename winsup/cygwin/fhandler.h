@@ -328,7 +328,7 @@ class fhandler_base
 
   virtual bool get_readahead_valid () { return raixget () < ralen (); }
   int puts_readahead (const char *s, size_t len = (size_t) -1);
-  int put_readahead (char value);
+  virtual int put_readahead (char value);
 
   int get_readahead ();
   int peek_readahead (int queryput = 0);
@@ -2381,6 +2381,7 @@ public:
   int process_slave_output (char *buf, size_t len, int pktmode_on);
   void doecho (const void *str, DWORD len);
   int accept_input ();
+  int put_readahead (char value);
   int open (int flags, mode_t mode = 0);
   void open_setup (int flags);
   ssize_t __stdcall write (const void *ptr, size_t len);
