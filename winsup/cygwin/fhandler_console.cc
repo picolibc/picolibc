@@ -2186,6 +2186,14 @@ fhandler_console::char_command (char c)
 	  /* Just send the sequence */
 	  wpbuf.send (get_output_handle ());
 	  break;
+	case 'm':
+	  if (con.saw_greater_than_sign)
+	    break; /* Ignore unsupported CSI > Pm m */
+	  /* Text attribute settings */
+	  wpbuf.put (c);
+	  /* Just send the sequence */
+	  wpbuf.send (get_output_handle ());
+	  break;
 	default:
 	  /* Other escape sequences */
 	  wpbuf.put (c);
@@ -3077,6 +3085,13 @@ fhandler_console::write (const void *vsrc, size_t len)
 	      con.state = normal;
 	      wpbuf.empty();
 	    }
+	  else if (*src == ']')		/* OSC Operating System Command */
+	    {
+	      wpbuf.put (*src);
+	      con.rarg = 0;
+	      con.my_title_buf[0] = '\0';
+	      con.state = gotrsquare;
+	    }
 	  else if (wincap.has_con_24bit_colors () && !con_is_legacy)
 	    {
 	      if (*src == 'c') /* RIS Full reset */
@@ -3094,13 +3109,6 @@ fhandler_console::write (const void *vsrc, size_t len)
 	      wpbuf.send (get_output_handle ());
 	      con.state = normal;
 	      wpbuf.empty();
-	    }
-	  else if (*src == ']')		/* OSC Operating System Command */
-	    {
-	      wpbuf.put (*src);
-	      con.rarg = 0;
-	      con.my_title_buf[0] = '\0';
-	      con.state = gotrsquare;
 	    }
 	  else if (*src == '(')		/* Designate G0 character set */
 	    {
@@ -3179,7 +3187,8 @@ fhandler_console::write (const void *vsrc, size_t len)
 	    con.rarg = con.rarg * 10 + (*src - '0');
 	  else if (*src == ';' && (con.rarg == 2 || con.rarg == 0))
 	    con.state = gettitle;
-	  else if (*src == ';' && (con.rarg == 4 || con.rarg == 104))
+	  else if (*src == ';' && (con.rarg == 4 || con.rarg == 104
+				   || (con.rarg >= 10 && con.rarg <= 19)))
 	    con.state = eatpalette;
 	  else
 	    con.state = eattitle;
@@ -3189,10 +3198,13 @@ fhandler_console::write (const void *vsrc, size_t len)
 	case eattitle:
 	case gettitle:
 	  {
+	    wpbuf.put (*src);
 	    int n = strlen (con.my_title_buf);
 	    if (*src < ' ')
 	      {
-		if (*src == '\007' && con.state == gettitle)
+		if (wincap.has_con_24bit_colors () && !con_is_legacy)
+		  wpbuf.send (get_output_handle ());
+		else if (*src == '\007' && con.state == gettitle)
 		  set_console_title (con.my_title_buf);
 		con.state = normal;
 		wpbuf.empty();
@@ -3201,27 +3213,37 @@ fhandler_console::write (const void *vsrc, size_t len)
 	      {
 		con.my_title_buf[n++] = *src;
 		con.my_title_buf[n] = '\0';
-		wpbuf.put (*src);
 	      }
 	    src++;
 	    break;
 	  }
 	case eatpalette:
-	  if (*src == '\033')
-	    {
-	      wpbuf.put (*src);
-	      con.state = endpalette;
-	    }
+	  wpbuf.put (*src);
+	  if (*src == '?')
+	    con.saw_question_mark = true;
+	  else if (*src == '\033')
+	    con.state = endpalette;
 	  else if (*src == '\a')
 	    {
+	      /* Send OSC Ps; Pt BEL other than OSC Ps; ? BEL */
+	      if (wincap.has_con_24bit_colors () && !con_is_legacy
+		  && !con.saw_question_mark)
+		wpbuf.send (get_output_handle ());
 	      con.state = normal;
 	      wpbuf.empty();
 	    }
 	  src++;
 	  break;
 	case endpalette:
+	  wpbuf.put (*src);
 	  if (*src == '\\')
-	    con.state = normal;
+	    {
+	      /* Send OSC Ps; Pt ST other than OSC Ps; ? ST */
+	      if (wincap.has_con_24bit_colors () && !con_is_legacy
+		  && !con.saw_question_mark)
+		wpbuf.send (get_output_handle ());
+	      con.state = normal;
+	    }
 	  else
 	    /* Sequence error (abort) */
 	    con.state = normal;
