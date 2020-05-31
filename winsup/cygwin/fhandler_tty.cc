@@ -3324,24 +3324,6 @@ fhandler_pty_master::pty_master_fwd_thread ()
 		continue;
 	      }
 
-	  /* Remove ESC sequence which returns results to console
-	     input buffer. Without this, cursor position report
-	     is put into the input buffer as a garbage. */
-	  /* Remove ESC sequence to report cursor position. */
-	  char *p0;
-	  while ((p0 = (char *) memmem (outbuf, rlen, "\033[6n", 4)))
-	    {
-	      memmove (p0, p0+4, rlen - (p0+4 - outbuf));
-	      rlen -= 4;
-	    }
-	  /* Remove ESC sequence to report terminal identity. */
-	  while ((p0 = (char *) memmem (outbuf, rlen, "\033[0c", 4)))
-	    {
-	      memmove (p0, p0+4, rlen - (p0+4 - outbuf));
-	      rlen -= 4;
-	    }
-	  wlen = rlen;
-
 	  size_t nlen;
 	  char *buf = convert_mb_str
 	    (get_ttyp ()->term_code_page, &nlen, CP_UTF8, ptr, wlen);
