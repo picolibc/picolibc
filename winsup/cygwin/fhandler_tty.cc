@@ -3313,9 +3313,14 @@ fhandler_pty_master::pty_master_fwd_thread ()
 	      }
 	    else if (state == 4 && outbuf[i] == '\a')
 	      {
-		memmove (&outbuf[start_at], &outbuf[i+1], rlen-i-1);
+		const char *helper_str = "\\bin\\cygwin-console-helper.exe";
+		if (memmem (&outbuf[start_at], i + 1 - start_at,
+			    helper_str, strlen (helper_str)))
+		  {
+		    memmove (&outbuf[start_at], &outbuf[i+1], rlen-i-1);
+		    rlen = wlen = start_at + rlen - i - 1;
+		  }
 		state = 0;
-		rlen = wlen = start_at + rlen - i - 1;
 		continue;
 	      }
 	    else if (outbuf[i] == '\a')
