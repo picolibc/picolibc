@@ -94,6 +94,7 @@ io_c99_formats = get_option('io-c99-formats') or get_option('newlib-io-c99-forma
 # tinystdio options
 posix_io = newlib_tinystdio and get_option('posix-io')
 posix_console = posix_io and get_option('posix-console')
+io_float_exact = not newlib_tinystdio or get_option('io-float-exact')
 
 # A bunch of newlib-stdio only options
 newlib_io_pos_args = get_option('newlib-io-pos-args')
@@ -310,6 +311,7 @@ conf_data.set('HAVE_ALIAS_ATTRIBUTE', have_alias_attribute)
 conf_data.set('_WANT_REGISTER_FINI', newlib_register_fini)
 conf_data.set('_WANT_IO_LONG_LONG', io_long_long)
 conf_data.set('_WANT_IO_C99_FORMATS', io_c99_formats)
+conf_data.set('_IO_FLOAT_EXACT', io_float_exact)
 if not newlib_tinystdio
   conf_data.set('_WANT_IO_LONG_DOUBLE', newlib_io_long_double)
   conf_data.set('_WANT_IO_POS_ARGS', newlib_io_pos_args)

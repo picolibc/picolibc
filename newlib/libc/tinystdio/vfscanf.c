@@ -296,11 +296,11 @@ static const char pstr_an[] = "an";
 static unsigned char
 conv_flt (FILE *stream, int *lenp, width_t width, void *addr, uint16_t flags)
 {
-    uint64_t u64;
-    double flt;
+    UINTFLOAT uint;
+    int uintdigits = 0;
+    FLOAT flt;
     int i;
     const char *p;
-    const double *f;
     int exp;
 
     uint16_t flag;
@@ -351,7 +351,7 @@ conv_flt (FILE *stream, int *lenp, width_t width, void *addr, uint16_t flags)
 
       default:
         exp = 0;
-	u64 = 0;
+	uint = 0;
 	do {
 
 	    unsigned char c = i - '0';
@@ -364,9 +364,21 @@ conv_flt (FILE *stream, int *lenp, width_t width, void *addr, uint16_t flags)
 		} else {
 		    if (flag & FL_DOT)
 			exp -= 1;
-		    u64 = u64 * 10 + c;
-		    if (u64 >= (0xffffffffffffffffULL - 9) / 10)
-			flag |= FL_OVFL;
+		    uint = uint * 10 + c;
+		    if (uint) {
+			uintdigits++;
+#ifndef PICOLIBC_FLOAT_PRINTF_SCANF
+			if (flags & FL_LONG) {
+			    if (uintdigits > 16)
+				flag |= FL_OVFL;
+			}
+			else
+#endif
+			{
+			    if (uintdigits > 8)
+				flag |= FL_OVFL;
+			}
+		    }
 	        }
 
 	    } else if (c == (('.'-'0') & 0xff) && !(flag & FL_DOT)) {
@@ -406,25 +418,42 @@ conv_flt (FILE *stream, int *lenp, width_t width, void *addr, uint16_t flags)
 
 	if (width && i >= 0) scanf_ungetc (i, stream, lenp);
 
-	flt = u64;
-
-	if (exp < 0) {
-	    f = __dtoa_scale_down + DTOA_SCALE_DOWN_NUM - 1;
-	    exp = -exp;
-	    width = 1 << (DTOA_SCALE_DOWN_NUM - 1);
-	} else {
-	    f = __dtoa_scale_up + DTOA_SCALE_UP_NUM - 1;
-	    width = 1 << (DTOA_SCALE_UP_NUM - 1);
+	if (uint == 0) {
+	    flt = 0;
+	    break;
 	}
 
-	while (exp) {
-	    if (exp >= width) {
-		flt *= *f;
-		exp -= width;
-	    }
-	    f--;
-	    width >>= 1;
+#ifndef PICOLIBC_FLOAT_PRINTF_SCANF
+	if (flags & FL_LONG)
+	{
+		if ((uintdigits + exp <= -324) || (uint == 0)) {
+			// Number is less than 1e-324, which should be rounded down to 0; return +/-0.0.
+			flt = 0.0;
+			break;
+		}
+		if (uintdigits + exp >= 310) {
+			// Number is larger than 1e+309, which should be rounded to +/-Infinity.
+			flt = INFINITY;
+			break;
+		}
+		flt = __atod_engine(uint, exp);
 	}
+	else
+#endif
+	{
+		if ((uintdigits + exp <= -46) || (uint == 0)) {
+			// Number is less than 1e-46, which should be rounded down to 0; return 0.0.
+			flt = 0.0f;
+			break;
+		}
+		if (uintdigits + exp >= 40) {
+			// Number is larger than 1e+39, which should be rounded to +/-Infinity.
+			flt = INFINITY;
+			break;
+		}
+		flt = __atof_engine(uint, exp);
+	}
+	break;
     } /* switch */
 
     if (flag & FL_MINUS)

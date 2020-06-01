@@ -28,7 +28,7 @@
 
 #include "dtoa_engine.h"
 
-const double __dtoa_scale_up[] = {
+const FLOAT __dtoa_scale_up[] = {
 #if DTOA_MAX_10_EXP >= 1
 	1e1,
 #endif
@@ -64,7 +64,7 @@ const double __dtoa_scale_up[] = {
 #endif
 };
 
-const double __dtoa_scale_down[] = {
+const FLOAT __dtoa_scale_down[] = {
 #if DTOA_MIN_10_EXP <= -1
 	1e-1,
 #endif
@@ -100,7 +100,7 @@ const double __dtoa_scale_down[] = {
 #endif
 };
 
-const double __dtoa_round[] = {
+const FLOAT __dtoa_round[] = {
 #if DTOA_DIG > 30
 #error DTOA_DIG too large
 #endif

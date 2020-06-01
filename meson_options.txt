@@ -64,6 +64,8 @@ option('newlib-stdio64', type: 'boolean', value: true,
 option('specsdir', type: 'string',
        description: 'Installation directory for .specs file')
 
+option('io-float-exact', type: 'boolean', value: true,
+       description: 'use float/string code which supports round-tripping')
 option('newlib-io-pos-args', type: 'boolean', value: false,
        description: 'enable printf-family positional arg support')
 option('io-c99-formats', type: 'boolean', value: true,

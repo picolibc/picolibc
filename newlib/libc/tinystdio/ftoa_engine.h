@@ -37,7 +37,7 @@
 #include <stdint.h>
 #include <float.h>
 
-#define FTOA_MAX_DIG	(__FLT_DIG__ + 1)
+#define FTOA_MAX_DIG	9
 
 struct ftoa {
 	int16_t	exp;

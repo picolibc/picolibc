@@ -1,4 +1,5 @@
-/* Copyright (c) 2002,2005, Joerg Wunsch
+/* Copyright (c) 2002,2004,2005 Joerg Wunsch
+   Copyright (c) 2008  Dmitry Xmelkov
    All rights reserved.
 
    Redistribution and use in source and binary forms, with or without
@@ -6,10 +7,12 @@
 
    * Redistributions of source code must retain the above copyright
      notice, this list of conditions and the following disclaimer.
+
    * Redistributions in binary form must reproduce the above copyright
      notice, this list of conditions and the following disclaimer in
      the documentation and/or other materials provided with the
      distribution.
+
    * Neither the name of the copyright holders nor the names of
      contributors may be used to endorse or promote products derived
      from this software without specific prior written permission.
@@ -27,58 +30,33 @@
   POSSIBILITY OF SUCH DAMAGE.
 */
 
-/* $Id: stdio_private.h 847 2005-09-06 18:49:15Z joerg_wunsch $ */
+#define PICOLIBC_FLOAT_PRINTF_SCANF
 
-#include <stdio.h>
-
-/* values for PRINTF_LEVEL */
-#define PRINTF_MIN 1
-#define PRINTF_STD 2
-#define PRINTF_FLT 3
-
-/* values for SCANF_LEVEL */
-#define SCANF_MIN 1
-#define SCANF_STD 2
-#define SCANF_FLT 3
-
-struct __file_str {
-	struct __file file;	/* main file struct */
-	char	*buf;		/* buffer pointer */
-	int	len;		/* characters written so far */
-	int	size;		/* size of buffer */
-};
-
-#ifdef POSIX_IO
-
-struct __file_posix {
-	struct __file_close cfile;
-	int	fd;
-	char	*write_buf;
-	int	write_len;
-	char	*read_buf;
-	int	read_len;
-	int	read_off;
-};
-
-int
-__posix_sflags (const char *mode, int *optr);
-
-int
-__posix_flush(FILE *f);
-
-int
-__posix_putc(char c, FILE *f);
-
-int
-__posix_getc(FILE *f);
-
-int
-__posix_close(FILE *f);
-
-double
-__atod_engine(uint64_t m10, int e10);
+#include "dtoa_engine.h"
 
 float
-__atof_engine(uint32_t m10, int e10);
+__atof_engine(uint32_t u32, int exp)
+{
+    float flt;
+    const float *f;
+    flt = u32;
+    int exp_cur;
 
-#endif
+    if (exp < 0) {
+	f = __ftoa_scale_down + DTOA_SCALE_DOWN_NUM - 1;
+	exp = -exp;
+	exp_cur = 1 << (DTOA_SCALE_DOWN_NUM - 1);
+    } else {
+	f = __ftoa_scale_up + DTOA_SCALE_UP_NUM - 1;
+	exp_cur = 1 << (DTOA_SCALE_UP_NUM - 1);
+    }
+    while (exp) {
+	if (exp >= exp_cur) {
+	    flt *= *f;
+	    exp -= exp_cur;
+	}
+	f--;
+	exp_cur >>= 1;
+    }
+    return flt;
+}
