@@ -1372,7 +1372,7 @@ fhandler_pty_slave::push_to_pcon_screenbuffer (const char *ptr, size_t len,
 	  p0 = (char *) memmem (p1, nlen - (p1-buf), "\033[?1049h", 8);
 	  if (p0)
 	    {
-	      //p0 += 8;
+	      p0 += 8;
 	      get_ttyp ()->screen_alternated = true;
 	      if (get_ttyp ()->switch_to_pcon_out)
 		do_not_reset_switch_to_pcon = true;
@@ -1384,7 +1384,7 @@ fhandler_pty_slave::push_to_pcon_screenbuffer (const char *ptr, size_t len,
 	  p1 = (char *) memmem (p0, nlen - (p0-buf), "\033[?1049l", 8);
 	  if (p1)
 	    {
-	      p1 += 8;
+	      //p1 += 8;
 	      get_ttyp ()->screen_alternated = false;
 	      do_not_reset_switch_to_pcon = false;
 	      memmove (p0, p1, buf+nlen - p1);
@@ -1504,7 +1504,10 @@ fhandler_pty_slave::write (const void *ptr, size_t len)
 
   reset_switch_to_pcon ();
 
-  UINT target_code_page = get_ttyp ()->switch_to_pcon_out ?
+  bool output_to_pcon =
+    get_ttyp ()->switch_to_pcon_out && !get_ttyp ()->screen_alternated;
+
+  UINT target_code_page = output_to_pcon ?
     GetConsoleOutputCP () : get_ttyp ()->term_code_page;
   ssize_t nlen;
   char *buf = convert_mb_str (target_code_page, (size_t *) &nlen,
@@ -1513,11 +1516,11 @@ fhandler_pty_slave::write (const void *ptr, size_t len)
   /* If not attached to this pseudo console, try to attach temporarily. */
   pid_restore = 0;
   bool fallback = false;
-  if (get_ttyp ()->switch_to_pcon_out && pcon_attached_to != get_minor ())
+  if (output_to_pcon && pcon_attached_to != get_minor ())
     if (!try_reattach_pcon ())
       fallback = true;
 
-  if (get_ttyp ()->switch_to_pcon_out && !fallback &&
+  if (output_to_pcon && !fallback &&
       (memmem (buf, nlen, "\033[6n", 4) || memmem (buf, nlen, "\033[0c", 4)))
     {
       get_ttyp ()->pcon_in_empty = false;
@@ -1530,12 +1533,12 @@ fhandler_pty_slave::write (const void *ptr, size_t len)
   if (!(get_ttyp ()->ti.c_oflag & OPOST) ||
       !(get_ttyp ()->ti.c_oflag & ONLCR))
     flags |= DISABLE_NEWLINE_AUTO_RETURN;
-  if (get_ttyp ()->switch_to_pcon_out && !fallback)
+  if (output_to_pcon && !fallback)
     {
       GetConsoleMode (get_output_handle (), &dwMode);
       SetConsoleMode (get_output_handle (), dwMode | flags);
     }
-  HANDLE to = (get_ttyp ()->switch_to_pcon_out && !fallback) ?
+  HANDLE to = (output_to_pcon && !fallback) ?
     get_output_handle () : get_output_handle_cyg ();
   acquire_output_mutex (INFINITE);
   if (!process_opost_output (to, buf, nlen, false))
@@ -1555,7 +1558,7 @@ fhandler_pty_slave::write (const void *ptr, size_t len)
   release_output_mutex ();
   mb_str_free (buf);
   flags = ENABLE_VIRTUAL_TERMINAL_PROCESSING;
-  if (get_ttyp ()->switch_to_pcon_out && !fallback)
+  if (output_to_pcon && !fallback)
     SetConsoleMode (get_output_handle (), dwMode | flags);
 
   restore_reattach_pcon ();
