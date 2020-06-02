@@ -33,6 +33,14 @@ extern double_type doubles[];
 
 double_type *pd = doubles;
 
+#ifdef _IO_FLOAT_EXACT
+#define CONVERT_BITS_DOUBLE	64
+#define CONVERT_BITS_FLOAT	32
+#else
+#define CONVERT_BITS_DOUBLE	61
+#define CONVERT_BITS_FLOAT	30
+#endif
+
 void
 test_strtod (void)
 {
@@ -40,7 +48,7 @@ test_strtod (void)
   double v;
   /* On average we'll loose 1/2 a bit, so the test is for within 1 bit  */
   v = strtod(pd->string, &tail);
-  test_mok(v, pd->value, 62);
+  test_mok(v, pd->value, CONVERT_BITS_DOUBLE);
   test_iok(tail - pd->string, pd->endscan);
 }
 
@@ -51,7 +59,7 @@ test_strtof (void)
   double v;
   /* On average we'll loose 1/2 a bit, so the test is for within 1 bit  */
   v = strtof(pd->string, &tail);
-  test_mok(v, pd->value, 30);
+  test_mok(v, pd->value, CONVERT_BITS_FLOAT);
   test_iok(tail - pd->string, pd->endscan);
 }
 
@@ -63,7 +71,7 @@ test_strtold (void)
   long double v;
   /* On average we'll loose 1/2 a bit, so the test is for within 1 bit  */
   v = strtold(pd->string, &tail);
-  test_mok(v, pd->value, 62);
+  test_mok(v, pd->value, CONVERT_BITS_DOUBLE);
   test_iok(tail - pd->string, pd->endscan);
 }
 #endif
@@ -71,7 +79,7 @@ test_strtold (void)
 void
 test_atof (void)
 {
-  test_mok(atof(pd->string), pd->value, 62);
+  test_mok(atof(pd->string), pd->value, CONVERT_BITS_DOUBLE);
 }
 
 #ifndef NO_NEWLIB
@@ -393,7 +401,7 @@ test_scan (void)
     if  (s->mag)
       test_mok(d0, d1, s->mag);
     else
-      test_mok(d0,d1, 62);
+      test_mok(d0,d1, CONVERT_BITS_DOUBLE);
     s++;
   }
 
