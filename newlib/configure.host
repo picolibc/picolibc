@@ -290,6 +290,7 @@ case "${host_cpu}" in
 	;;
   powerpc*)
 	machine_dir=powerpc
+	libm_machine_dir=powerpc
 	;;
   pru*)
 	newlib_cflags="${newlib_cflags} -DPREFER_SIZE_OVER_SPEED"
