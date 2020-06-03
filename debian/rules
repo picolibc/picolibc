@@ -43,8 +43,8 @@ MESON_LX106_FLAGS = \
 	--cross-file cross-$(LX106_ARCH).txt \
 	-Dnewlib-long-time_t=true \
 	-Dspecsdir=/usr/lib/picolibc/$(LX106_ARCH) \
-	-Dincludedir=lib/picolibc/$(LX106_ARCH)/include \
-	-Dlibdir=lib/picolibc/$(LX106_ARCH)/lib
+	-Dincludedir=lib/$(LX106_ARCH)/include \
+	-Dlibdir=lib/$(LX106_ARCH)/lib
 
 override_dh_autoreconf:
 	echo 'no reconf needed'
