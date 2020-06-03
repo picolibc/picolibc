@@ -24,8 +24,12 @@
 #define assert(x)
 //#include <assert.h>
 
-#if defined(_M_IX86) || defined(_M_ARM)
+#if __SIZEOF_POINTER__ == 4
 #define RYU_32_BIT_PLATFORM
+#endif
+
+#ifdef __SIZEOF_INT128__
+#define HAS_UINT128
 #endif
 
 // Returns e == 0 ? 1 : [log_2(5^e)]; requires 0 <= e <= 3528.
