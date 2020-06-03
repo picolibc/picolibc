@@ -1,3 +1,9 @@
+picolibc (1.4.2-3) unstable; urgency=medium
+
+  * Move lx106 bits back to original location
+
+ -- Keith Packard <keithp@keithp.com>  Wed, 03 Jun 2020 12:05:15 -0700
+
 picolibc (1.4.2-2) unstable; urgency=medium
 
   * Remove aarch64 support to avoid hitting NEW queue
