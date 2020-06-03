@@ -19,7 +19,23 @@ LIB_SOURCES = \
 	sf_nearbyint.c \
 	sf_rint.c \
 	sf_round.c \
-	sf_trunc.c
+	sf_trunc.c \
+	feclearexcept.c \
+	fe_dfl_env.c\
+	fegetenv.c \
+	fegetexceptflag.c \
+	fegetround.c \
+	feholdexcept.c \
+	fenv.c \
+	feraiseexcept.c \
+	fesetenv.c \
+	fesetexceptflag.c \
+	fesetround.c \
+	fetestexcept.c \
+	feupdateenv.c \
+	fenv-vfp.c \
+	fenv-softfp.c 
+
 
 noinst_LIBRARIES = lib.a
 lib_a_SOURCES = $(LIB_SOURCES)
