@@ -3234,7 +3234,12 @@ Files: newlib/libc/tinystdio/dtoa_ryu.c
  newlib/libc/tinystdio/ryu/digit_table.h
  newlib/libc/tinystdio/ryu/f2s_intrinsics.h
  newlib/libc/tinystdio/ryu/ryu.h
+ newlib/libc/tinystdio/ryu_divpow2.c
+ newlib/libc/tinystdio/ryu_log10.c
+ newlib/libc/tinystdio/ryu_log2pow5.c
+ newlib/libc/tinystdio/ryu_pow5bits.c
  newlib/libc/tinystdio/ryu_table.c
+ newlib/libc/tinystdio/ryu_umul128.c
 Copyright: 2018 Ulf Adams
 License: Other-23
 
