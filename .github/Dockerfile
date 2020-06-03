@@ -13,8 +13,8 @@ RUN apt-get update && \
     gcc-arm-none-eabi \
     gcc-riscv64-unknown-elf \
     gcc-aarch64-linux-gnu \
-    qemu-system-arm=1:5.0-4.1 \
-    qemu-system-misc=1:5.0-4.1
+    qemu-system-arm=1:5.0-5.1 \
+    qemu-system-misc=1:5.0-5.1
 
 # Copy picolibc into container
 RUN mkdir picolibc
