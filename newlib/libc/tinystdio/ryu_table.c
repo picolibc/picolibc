@@ -74,6 +74,7 @@ static const uint64_t DOUBLE_POW5_TABLE[POW5_TABLE_SIZE] = {
 298023223876953125ull //, 1490116119384765625ull
 };
 
+// Returns e == 0 ? 1 : ceil(log_2(5^e)); requires 0 <= e <= 3528.
 int32_t __pow5bits(const int32_t e) {
   // This approximation works up to the point that the multiplication overflows at e = 3529.
   // If the multiplication were done in 64 bits, it would fail at 5^4004 which is just greater
