@@ -91,7 +91,6 @@ __atod_engine(uint64_t m10, int e10)
 	// To that end, we use the DOUBLE_POW5_SPLIT table.
 	int j = e2 - e10 - ceil_log2pow5(e10) + DOUBLE_POW5_BITCOUNT;
 	assert(j >= 0);
-	assert(e10 < DOUBLE_POW5_TABLE_SIZE);
 	uint64_t pow5[2];
 	__double_computePow5(e10, pow5);
 	m2 = mulShift64(m10, pow5, j);
@@ -105,7 +104,6 @@ __atod_engine(uint64_t m10, int e10)
     } else {
 	e2 = floor_log2(m10) + e10 - ceil_log2pow5(-e10) - (DOUBLE_MANTISSA_BITS + 1);
 	int j = e2 - e10 + ceil_log2pow5(-e10) - 1 + DOUBLE_POW5_INV_BITCOUNT;
-	assert(-e10 < DOUBLE_POW5_INV_TABLE_SIZE);
 	uint64_t pow5[2];
 	__double_computeInvPow5(-e10, pow5);
 	m2 = mulShift64(m10, pow5, j);
