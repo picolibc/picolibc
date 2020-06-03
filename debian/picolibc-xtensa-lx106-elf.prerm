@@ -8,7 +8,7 @@ case "$1" in
     remove)
 	if which $ARCH-gcc > /dev/null; then
 	    target=`$ARCH-gcc -print-search-dirs | sed -n '/^install:/s/^install: //p'`/picolibc.specs
-	    source=/usr/lib/picolibc/$ARCH/picolibc.specs
+	    source=/usr/lib/$ARCH/picolibc.specs
 	    if cmp -s "$target" "$source"; then
 		rm -f "$target"
 	    fi

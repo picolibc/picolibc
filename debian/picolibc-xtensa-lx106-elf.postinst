@@ -8,7 +8,7 @@ case "$1" in
     configure|triggered)
 	if which $ARCH-gcc > /dev/null; then
 	    target=`$ARCH-gcc -print-search-dirs | sed -n '/^install:/s/^install: //p'`
-	    source=/usr/lib/picolibc/$ARCH/picolibc.specs
+	    source=/usr/lib/$ARCH/picolibc.specs
 	    if [ -d "$target" -a -f "$source" ]; then
 		cp -a "$source" "$target" || true
 	    fi
