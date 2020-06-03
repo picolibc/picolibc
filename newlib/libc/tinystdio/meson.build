@@ -117,6 +117,11 @@ srcs_dtoa_ryu = [
   'ryu_table.c',
   'atod_ryu.c',
   'atof_ryu.c',
+  'ryu_log2pow5.c',
+  'ryu_log10.c',
+  'ryu_pow5bits.c',
+  'ryu_umul128.c',
+  'ryu_divpow2.c',
   ]
 		
 # smaller float/string conversion code
