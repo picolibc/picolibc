@@ -42,6 +42,7 @@ __SC_ret:
 	/* Invert return code and store to errno (first int in _impure_ptr).  */
 	rsb	r14, r14, 0
 	ldi32	r1, _impure_ptr
+	lbbo	r1, r1, 0, 4
 	sbbo	r14, r1, 0, 4
 	/* Return -1 (for both int32_t or int64_t).  */
 	fill	r14, 8
