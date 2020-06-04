@@ -2354,7 +2354,6 @@ class fhandler_pty_slave: public fhandler_pty_common
   void setup_locale (void);
   void set_freeconsole_on_close (bool val);
   void trigger_redraw_screen (void);
-  void wait_pcon_fwd (void);
   void pull_pcon_input (void);
   void update_pcon_input_state (bool need_lock);
 };

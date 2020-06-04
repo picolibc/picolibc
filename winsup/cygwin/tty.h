@@ -105,7 +105,6 @@ private:
   pid_t pcon_pid;
   UINT term_code_page;
   bool need_redraw_screen;
-  HANDLE fwd_done;
   DWORD pcon_last_time;
   bool pcon_in_empty;
   bool req_transfer_input_to_pcon;

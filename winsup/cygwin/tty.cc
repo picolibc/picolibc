@@ -244,7 +244,6 @@ tty::init ()
   pcon_pid = 0;
   term_code_page = 0;
   need_redraw_screen = true;
-  fwd_done = NULL;
   pcon_last_time = 0;
   pcon_in_empty = true;
   req_transfer_input_to_pcon = false;
@@ -307,6 +306,12 @@ tty::set_switch_to_pcon_out (bool v)
 void
 tty::wait_pcon_fwd (void)
 {
+  /* The forwarding in pseudo console sometimes stops for
+     16-32 msec even if it already has data to transfer.
+     If the time without transfer exceeds 32 msec, the
+     forwarding is supposed to be finished. pcon_last_time
+     is reset to GetTickCount() in pty master forwarding
+     thread when the last data is transfered. */
   const int sleep_in_pcon = 16;
   const int time_to_wait = sleep_in_pcon * 2 + 1/* margine */;
   pcon_last_time = GetTickCount ();
