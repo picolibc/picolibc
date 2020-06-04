@@ -76,7 +76,7 @@
 #define	DTOA_ZERO	2
 #define	DTOA_INF	4
 #define	DTOA_NAN	8
-#define	DTOA_CARRY	16	/* Carry was to master position.	*/
+#define	DTOA_CARRY	16	/* Carry was to most significant position. */
 
 struct dtoa {
 	int32_t	exp;

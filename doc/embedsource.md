@@ -1,6 +1,6 @@
 # Using picolibc as an embedded source
 
-For projects where deterministic builds, reproduceability and traceability is important, it is possible to embed the entire picolibc library as a meson subproject into the source directory of the master project. The benefit is that git submodules and meson subprojects work nicely together, and it is possible to lock down the libc version together with the source tree.
+For projects where deterministic builds, reproduceability and traceability is important, it is possible to embed the entire picolibc library as a meson subproject into the source directory of the main project. The benefit is that git submodules and meson subprojects work nicely together, and it is possible to lock down the libc version together with the source tree.
 
 For more information on the meson subproject feature, refer to the documentation at : https://mesonbuild.com/Subprojects.html
 
@@ -13,7 +13,7 @@ First you need to add picolibc as a git submodule:
   git submodule add https://github.com/keith-packard/picolibc subprojects/picolibc
   ```
 
-Your source direcoty could now look something like this:
+Your source directory could now look something like this:
 
   ```
   subprojects/

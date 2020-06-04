@@ -24952,7 +24952,7 @@ Fri Aug 18 12:22:59 1995  J.T. Conklin  <jtc@rtl.cygnus.com>
 	* libc/reent/reent.c (_reclaim_reent): Free Bigint's by going
 	through the _freelist instead of through the _reclaim list.
 	* libc/stdlib/mprec.c (_Balloc): Don't put new node on _reclaim	list.
-	* libc/stdlib/mprec.c (_Bcopy): Make like version in master dtoa.c
+	* libc/stdlib/mprec.c (_Bcopy): Make like version in upstream dtoa.c
 	sources.
 
 Thu Aug 17 11:03:27 1995  J.T. Conklin  <jtc@rtl.cygnus.com>
@@ -25178,7 +25178,7 @@ Thu Aug 10 16:32:52 1995  Doug Evans  <dje@canuck.cygnus.com>
 Thu Aug 10 12:07:38 1995  J.T. Conklin  <jtc@rtl.cygnus.com>
 
 	* libc/stdlib/{dtoa.c, strtod.c}: Merged assorted changes that
-	have been made to the master dtoa.c sources (from netlib.att.com)
+	have been made to the upstream dtoa.c sources (from netlib.att.com)
 	since they were integrated into newlib in early 1992.  Fixes
 	problems with storage leaks and handling of numbers with very
 	negative exponents.

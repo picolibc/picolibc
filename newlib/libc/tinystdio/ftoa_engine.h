@@ -54,6 +54,6 @@ extern NEWLIB_THREAD_LOCAL char __ecvtf_buf[FTOA_MAX_DIG + 1];
 #define	FTOA_ZERO	2
 #define	FTOA_INF	4
 #define	FTOA_NAN	8
-#define	FTOA_CARRY	16	/* Carry was to master position.	*/
+#define	FTOA_CARRY	16	/* Carry was to most significant position. */
 
 #endif	/* !_FTOA_ENGINE_H */

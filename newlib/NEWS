@@ -319,7 +319,7 @@
 
 * unctrl added.
 
-* dtoa.c updated from master dtoa.c soruces (netlib.att.com)
+* dtoa.c updated from upstream dtoa.c soruces (netlib.att.com)
 
 * Various bug fixes.
 

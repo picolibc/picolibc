@@ -468,7 +468,7 @@ int vfprintf (FILE * stream, const char *fmt, va_list ap)
 	    goto flt_oper;
 
 	} else if (c >= 'e' && c <= 'g') {
-	    int exp;			/* exponent of master decimal digit	*/
+	    int exp;			/* exponent of most significant decimal digit */
 	    int n;
 	    uint8_t sign;		/* sign character (or 0)	*/
 	    uint8_t ndigs;		/* number of digits to convert */

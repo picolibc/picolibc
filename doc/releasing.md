@@ -32,7 +32,7 @@ picolibc:
 
  6. Tag release
 
-	$ git tag -m'Version <version-number>' <version-number> master
+	$ git tag -m'Version <version-number>' <version-number> main
 
  7. Upload release to web site:
 
@@ -54,7 +54,7 @@ how to build debian packages:
 
 	$ git checkout debian
 
- 3. Merge in master at the release tag
+ 3. Merge in main at the release tag
 
 	$ git merge <release-tag>
 

@@ -121,7 +121,7 @@ sync has not been difficult so far.
     instead we complain if the wrong value was given and display the
     correct value.
 
- 8. Sync up with current newlib master.
+ 8. Sync up with current newlib head.
 
 ### Picolibc version 1.4.1
 
