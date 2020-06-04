@@ -69,7 +69,7 @@ extern "C" {
 # endif /* !__ASSERT_FUNC */
 #endif /* !NDEBUG */
 
-void __assert (const char *, int, const char *)
+void __assert (const char *, const char *, int)
 	    _ATTRIBUTE ((__noreturn__));
 void __assert_func (const char *, int, const char *, const char *)
 	    _ATTRIBUTE ((__noreturn__));
