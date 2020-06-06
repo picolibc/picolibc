@@ -1,9 +1,23 @@
 # Building Picolibc
 
 Picolibc is designed to be cross-compiled for embedded systems on a
-Linux host using GCC. Picolibc uses the meson build system, which is a
-slightly quirky build system designed to replace autotools with a
-single language.
+Linux host using GCC. There is some support for Clang, but that
+doesn't include the built-in multilib support. Picolibc uses the meson
+build system, which is a slightly quirky build system designed to
+replace autotools with a single language.
+
+Picolibc requires meson version 0.50 or newer. If your operating
+system provides an older version, you can get the latest using
+pip. For example, on a Debian or Ubuntu system, you would do:
+
+    $ sudo apt install pip
+    $ pip install meson
+
+On POSIX systems, meson uses the low-level 'ninja' build tool and
+currently requires at least ninja version 1.5. If your operating
+system doesn't provide at least this version, head over to
+[ninja-build.org](https://ninja-build.org) to find out how to
+download and install the latest bits.
 
 ## Selecting build options
 
