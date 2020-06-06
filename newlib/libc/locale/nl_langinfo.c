@@ -179,7 +179,7 @@ char *nl_langinfo_l (nl_item item, struct __locale_t *locale)
    switch (item) {
 #ifdef __HAVE_LOCALE_INFO__
 	case _NL_MESSAGES_CODESET:
-		ret = (char *) __get_messages_locale (locale)->codeset;
+		ret = (char *) __locale_msgcharset();
 		goto do_codeset;
 #ifdef __HAVE_LOCALE_INFO_EXTENDED__
 	case _NL_TIME_CODESET:

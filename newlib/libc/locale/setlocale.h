@@ -396,7 +396,11 @@ _ELIDABLE_INLINE const char *
 __locale_msgcharset (void)
 {
 #ifdef __HAVE_LOCALE_INFO__
+#ifdef __HAVE_LOCALE_INFO_EXTENDED__
   return (char *) __get_current_messages_locale ()->codeset;
+#else
+  return (char *) __get_current_ctype_locale ()->codeset;
+#endif
 #else
   return (char *) _locale->message_codeset;
 #endif
