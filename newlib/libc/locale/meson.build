@@ -39,7 +39,7 @@ srcs_locale = [
     'timelocal.c',
 ]
 
-srcs_locale_elix2 = [
+srcs_locale_info = [
     'duplocale.c',
     'freelocale.c',
     'lctype.c',
@@ -50,8 +50,8 @@ srcs_locale_elix2 = [
     'uselocale.c',
 ]
 
-if newlib_elix_level >= 2 and newlib_locale_info
-  srcs_locale += srcs_locale_elix2
+if newlib_locale_info
+  srcs_locale += srcs_locale_info
 endif
 
 hdrs_locale = [
