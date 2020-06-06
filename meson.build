@@ -92,8 +92,17 @@ if newlib_tinystdio != 'auto'
 endif
 
 # Shared stdio options
-io_long_long = get_option('io-long-long') or get_option('newlib-io-long-long')
-io_c99_formats = get_option('io-c99-formats') or get_option('newlib-io-c99-formats')
+io_long_long = get_option('io-long-long')
+newlib_io_long_long = get_option('newlib-io-long-long')
+if newlib_io_long_long != 'auto'
+  io_long_long = newlib_io_long_long == 'true'
+endif
+
+io_c99_formats = get_option('io-c99-formats')
+newlib_io_c99_formats = get_option('newlib-io-c99-formats')
+if newlib_io_c99_formats != 'auto'
+  io_c99_formats = newlib_io_c99_formats == 'true'
+endif
 
 # tinystdio options
 posix_io = tinystdio and get_option('posix-io')

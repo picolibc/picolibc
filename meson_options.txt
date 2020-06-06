@@ -35,55 +35,91 @@
 option('fast-strcmp', type: 'boolean', value: true,
        description: 'Always optimize strcmp for performance')
 
+option('have-alias-attribute', type: 'combo', choices: ['true', 'false', 'auto'], value: 'auto',
+       description: 'Compiler supports __alias__ attribute')
+
 option('multilib', type: 'boolean', value: true,
        description: 'Enable multilib compile')
 
 option('multilib-list', type: 'array', value: [],
        description: 'List of multilib configurations to build for')
 
+option('native-tests', type: 'boolean', value: false,
+       description: 'Run math tests against native libc too')
+
 option('picolib', type: 'boolean', value: true,
        description: 'Include pico lib bits')
+
+option('specsdir', type: 'string',
+       description: 'Installation directory for .specs file')
 
 option('sysroot-install', type: 'boolean', value: false,
        description: 'Install in gcc sysroot')
 
-option('have-alias-attribute', type: 'combo', choices: ['true', 'false', 'auto'], value: 'auto',
-       description: 'Compiler supports __alias__ attribute')
-
 option('tests', type: 'boolean', value: false,
        description: 'Enable tests')
-
-option('native-tests', type: 'boolean', value: false,
-       description: 'Run math tests against native libc too')
 
 option('newlib-tinystdio', type: 'combo', choices: ['true', 'false', 'auto'], value: 'auto',
        description: 'Use tiny stdio from avr libc')
 option('tinystdio', type: 'boolean', value: true,
        description: 'Use tiny stdio from avr libc')
-option('newlib-stdio64', type: 'boolean', value: true,
-       description: 'Include stdio64 with newlib stdio')
 
-option('specsdir', type: 'string',
-       description: 'Installation directory for .specs file')
-
-option('io-float-exact', type: 'boolean', value: true,
-       description: 'use float/string code which supports round-tripping')
-option('newlib-io-pos-args', type: 'boolean', value: false,
-       description: 'enable printf-family positional arg support')
+#
+# Options applying to both legacy stdio and tinystdio
+#
 option('io-c99-formats', type: 'boolean', value: true,
        description: 'enable C99 support in IO functions like printf/scanf')
-option('newlib-io-c99-formats', type: 'boolean', value: false,
-       description: 'enable C99 support in IO functions like printf/scanf (newlib stdio only)')
+option('newlib-io-c99-formats', type: 'combo', choices: ['true', 'false', 'auto'], value: 'auto',
+       description: 'enable C99 support in IO functions like printf/scanf')
 option('io-long-long', type: 'boolean', value: false,
        description: 'enable long long type support in IO functions like printf/scanf')
-option('newlib-io-long-long', type: 'boolean', value: false,
+option('newlib-io-long-long', type: 'combo', choices: ['true', 'false', 'auto'], value: 'auto',
        description: 'enable long long type support in IO functions like printf/scanf')
+
+#
+# Options applying only to tinystdio
+#
+option('io-float-exact', type: 'boolean', value: true,
+       description: 'use float/string code which supports round-tripping')
+option('posix-io', type: 'boolean', value: true,
+       description: 'Provide fopen/fdopen using POSIX I/O (open, close, read, write, lseek)')
+option('posix-console', type: 'boolean', value: false,
+       description: 'Use POSIX I/O for stdin/stdout/stderr')
+
+#
+# Options applying to only legacy stdio
+#
+option('newlib-elix-level', type: 'integer', value: 0,
+       description: 'desired elix library level (0-4)')
+option('newlib-fseek-optimization', type: 'boolean', value: false,
+       description: 'enable fseek optimization')
+option('newlib-fvwrite-in-streamio', type: 'boolean', value: false,
+       description: 'disable iov in streamio')
+option('newlib-global-stdio-streams', type: 'boolean', value: false,
+       description: 'enable global stdio streams')
+option('newlib-io-float', type: 'boolean', value: false,
+       description: 'enable printf/scanf family float support')
+option('newlib-io-pos-args', type: 'boolean', value: false,
+       description: 'enable printf-family positional arg support')
 option('newlib-io-long-double', type: 'boolean', value: false,
        description: 'enable long double type support in IO functions printf/scanf (newlib stdio only)')
-option('newlib-register-fini', type: 'boolean', value: false,
-       description: 'enable finalization function registration using atexit')
-option('newlib-mb', type: 'boolean', value: false,
-       description: 'enable multibyte support')
+option('newlib-nano-formatted-io', type: 'boolean', value: false,
+       description: 'Use nano version formatted IO')
+option('newlib-reent-small', type: 'boolean', value: false,
+       description: 'enable small reentrant struct support')
+option('newlib-stdio64', type: 'boolean', value: true,
+       description: 'Include stdio64 with newlib stdio')
+option('newlib-unbuf-stream-opt', type: 'boolean', value: false,
+       description: 'enable unbuffered stream optimization in streamio')
+option('newlib-wide-orient', type: 'boolean', value: false,
+       description: 'Turn off wide orientation in streamio')
+
+#
+# Internationalization options
+#
+
+option('newlib-iconv', type: 'boolean', value: false,
+       description: 'enable iconv library support')
 option('newlib-iconv-encodings', type: 'boolean', value: false,
        description: 'enable specific comma-separated list of bidirectional iconv encodings to be built-in')
 option('newlib-iconv-from-encodings', type: 'boolean', value: false,
@@ -92,64 +128,70 @@ option('newlib-iconv-to-encodings', type: 'boolean', value: false,
        description: 'enable specific comma-separated list of "to" iconv encodings to be built-in')
 option('newlib-iconv-external-ccs', type: 'boolean', value: false,
        description: 'enable capabilities to load external CCS files for iconv')
-option('newlib-atexit-dynamic-alloc', type: 'boolean', value: false,
-       description: 'enable dynamic allocation of atexit entries')
-option('newlib-global-atexit', type: 'boolean', value: false,
-       description: 'enable atexit data structure as global')
-option('newlib-reent-small', type: 'boolean', value: false,
-       description: 'enable small reentrant struct support')
-option('newlib-global-stdio-streams', type: 'boolean', value: false,
-       description: 'enable global stdio streams')
-option('newlib-fvwrite-in-streamio', type: 'boolean', value: false,
-       description: 'disable iov in streamio')
-option('newlib-fseek-optimization', type: 'boolean', value: false,
-       description: 'enable fseek optimization')
-option('newlib-wide-orient', type: 'boolean', value: false,
-       description: 'Turn off wide orientation in streamio')
-option('newlib-nano-malloc', type: 'boolean', value: true,
-       description: 'use small-footprint nano-malloc implementation')
-option('newlib-unbuf-stream-opt', type: 'boolean', value: false,
-       description: 'enable unbuffered stream optimization in streamio')
-option('lite-exit', type: 'boolean', value: true,
-       description: 'enable light weight exit')
-option('newlib-nano-formatted-io', type: 'boolean', value: false,
-       description: 'Use nano version formatted IO')
-option('newlib-retargetable-locking', type: 'boolean', value: false,
-       description: 'Allow locking routines to be retargeted at link time')
-option('newlib-long-time_t', type: 'boolean', value: false,
-       description: 'define time_t to long')
-option('newlib-multithread', type: 'boolean', value: false,
-       description: 'enable support for multiple threads')
-option('newlib-iconv', type: 'boolean', value: false,
-       description: 'enable iconv library support')
-option('newlib-io-float', type: 'boolean', value: false,
-       description: 'enable printf/scanf family float support')
-option('newlib-supplied-syscalls', type: 'boolean', value: false,
-       description: 'enable newlib supplied syscalls')
-option('newlib-elix-level', type: 'integer', value: 0,
-       description: 'desired elix library level (0-4)')
-option('newlib-reentrant-syscalls-provided', type: 'boolean', value: false,
-       description: 'system provides reentrant syscall API')
-option('newlib-missing-syscall-names', type: 'boolean', value: false,
-       description: 'system only provides regular syscall API')
 option('newlib-locale-info', type: 'boolean', value: false,
        description: 'locale support')
 option('newlib-locale-info-extended', type: 'boolean', value: false,
        description: 'extended locale support')
-option('newlib-global-errno', type: 'boolean', value: false,
-       description: 'use global errno variable')
-option('newlib-initfini-array', type: 'boolean', value: true,
-       description: 'compiler supports INIT_ARRAY section types')
+option('newlib-mb', type: 'boolean', value: false,
+       description: 'enable multibyte support')
+
+#
+# Startup/shutdown options
+#
+option('lite-exit', type: 'boolean', value: true,
+       description: 'enable light weight exit')
+option('newlib-atexit-dynamic-alloc', type: 'boolean', value: false,
+       description: 'enable dynamic allocation of atexit entries')
+option('newlib-global-atexit', type: 'boolean', value: false,
+       description: 'enable atexit data structure as global')
 option('newlib-initfini', type: 'boolean', value: true,
        description: 'Supports _init() and _fini()')
+option('newlib-initfini-array', type: 'boolean', value: true,
+       description: 'compiler supports INIT_ARRAY section types')
+option('newlib-register-fini', type: 'boolean', value: false,
+       description: 'enable finalization function registration using atexit')
+
+#
+# Malloc option
+#
+option('newlib-nano-malloc', type: 'boolean', value: true,
+       description: 'use small-footprint nano-malloc implementation')
+
+#
+# Locking support
+#
+option('newlib-multithread', type: 'boolean', value: false,
+       description: 'enable support for multiple threads')
+option('newlib-retargetable-locking', type: 'boolean', value: false,
+       description: 'Allow locking routines to be retargeted at link time')
+
+#
+# Thread-local storage support
+#
 option('thread-local-storage', type: 'combo', choices: ['true', 'false', 'auto'], value: 'auto',
        description: 'use thread local storage for static data (default: automatically detect support)')
 option('tls-model', type: 'string', value: 'local-exec',
        description: 'tls model (global-dynamic, local-dynamic, initial-exec or local-exec)')
-option('posix-io', type: 'boolean', value: true,
-       description: 'Provide fopen/fdopen using POSIX I/O (open, close, read, write, lseek)')
-option('posix-console', type: 'boolean', value: false,
-       description: 'Use POSIX I/O for stdin/stdout/stderr')
+option('newlib-global-errno', type: 'boolean', value: false,
+       description: 'use global errno variable')
+
+#
+# Use "obsolete" math code, which use 'float' for 'float' functions
+# instead of the newer code which uses 'double' instead.
+#
 option('newlib-obsolete-math', type: 'combo', choices: ['true', 'false', 'auto'],
        value: 'auto',
-       description: 'Use obsolete math routines (default: automatic based on platform)')
+       description: 'Use float type for float valued math routines (default: automatic based on platform)')
+
+#
+# Obsolete newlib options
+#
+option('newlib-long-time_t', type: 'boolean', value: false,
+       description: 'define time_t to long instead of a 64-bit type')
+option('newlib-missing-syscall-names', type: 'boolean', value: false,
+       description: 'system only provides regular syscall API')
+option('newlib-reentrant-syscalls-provided', type: 'boolean', value: false,
+       description: 'system provides reentrant syscall API')
+option('newlib-supplied-syscalls', type: 'boolean', value: false,
+       description: 'newlib supplies system call functions')
+
