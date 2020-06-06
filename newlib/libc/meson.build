@@ -122,10 +122,6 @@ else
   endif
 endif
 
-if newlib_supplied_syscalls
-  libdirs += 'syscalls'
-endif
-
 libnames = libdirs
 
 need_generic_fenv_h = true
