@@ -56,7 +56,9 @@ option('tests', type: 'boolean', value: false,
 option('native-tests', type: 'boolean', value: false,
        description: 'Run math tests against native libc too')
 
-option('newlib-tinystdio', type: 'boolean', value: true,
+option('newlib-tinystdio', type: 'combo', choices: ['true', 'false', 'auto'], value: 'auto',
+       description: 'Use tiny stdio from avr libc')
+option('tinystdio', type: 'boolean', value: true,
        description: 'Use tiny stdio from avr libc')
 option('newlib-stdio64', type: 'boolean', value: true,
        description: 'Include stdio64 with newlib stdio')

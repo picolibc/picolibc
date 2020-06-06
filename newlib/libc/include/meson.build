@@ -100,7 +100,7 @@ inc_headers = [
 
 inc_headers += ['picotls.h']
 
-if not newlib_tinystdio
+if not tinystdio
   inc_headers += ['reent.h']
 endif
 

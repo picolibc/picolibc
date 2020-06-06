@@ -85,16 +85,20 @@ newlib_obsolete_math = get_option('newlib-obsolete-math')
 prefix = get_option('prefix')
 
 # Select stdio implementation
+tinystdio = get_option('tinystdio')
 newlib_tinystdio = get_option('newlib-tinystdio')
+if newlib_tinystdio != 'auto'
+  tinystdio = newlib_tinystdio == 'true'
+endif
 
 # Shared stdio options
 io_long_long = get_option('io-long-long') or get_option('newlib-io-long-long')
 io_c99_formats = get_option('io-c99-formats') or get_option('newlib-io-c99-formats')
 
 # tinystdio options
-posix_io = newlib_tinystdio and get_option('posix-io')
+posix_io = tinystdio and get_option('posix-io')
 posix_console = posix_io and get_option('posix-console')
-io_float_exact = not newlib_tinystdio or get_option('io-float-exact')
+io_float_exact = not tinystdio or get_option('io-float-exact')
 
 # A bunch of newlib-stdio only options
 newlib_io_pos_args = get_option('newlib-io-pos-args')
@@ -114,7 +118,7 @@ newlib_missing_syscall_names = get_option('newlib-missing-syscall-names')
 # Check for a bunch of newlib-stdio only options and complain
 # if they are selected while using tinystdio
 
-if newlib_tinystdio
+if tinystdio
   if newlib_io_pos_args
     error('tinystdio does not support positional arguments (newlib-io-pos-args)')
   endif
@@ -312,7 +316,7 @@ conf_data.set('_WANT_REGISTER_FINI', newlib_register_fini)
 conf_data.set('_WANT_IO_LONG_LONG', io_long_long)
 conf_data.set('_WANT_IO_C99_FORMATS', io_c99_formats)
 conf_data.set('_IO_FLOAT_EXACT', io_float_exact)
-if not newlib_tinystdio
+if not tinystdio
   conf_data.set('_WANT_IO_LONG_DOUBLE', newlib_io_long_double)
   conf_data.set('_WANT_IO_POS_ARGS', newlib_io_pos_args)
   conf_data.set('NO_FLOATING_POINT', not newlib_io_float)
@@ -338,7 +342,7 @@ conf_data.set('_LITE_EXIT', lite_exit)
 conf_data.set('_NANO_FORMATTED_IO', newlib_nano_formatted_io)
 conf_data.set('_RETARGETABLE_LOCKING', newlib_retargetable_locking)
 conf_data.set('_WANT_USE_LONG_TIME_T', newlib_long_time_t)
-conf_data.set('TINY_STDIO', newlib_tinystdio, description: 'Use tiny stdio from gcc avr')
+conf_data.set('TINY_STDIO', tinystdio, description: 'Use tiny stdio from gcc avr')
 conf_data.set('_IEEE_LIBM', true, description: 'math library only offers ieee semantics')
 conf_data.set('PREFER_SIZE_OVER_SPEED', target_optspace, description: 'Optimize for space over speed')
 conf_data.set('FAST_STRCMP', fast_strcmp, description: 'Always optimize strcmp for performance')
@@ -382,7 +386,7 @@ conf_data.set('_NEWLIB__', NEWLIB_MAJOR_VERSION, description: 'The newlib major 
 conf_data.set('_NEWLIB_MINOR__', NEWLIB_MINOR_VERSION, description: 'The newlib minor version number.')
 conf_data.set('__NEWLIB_PATCHLEVEL__', NEWLIB_PATCHLEVEL_VERSION, description: 'The newlib patch level.')
 
-if newlib_tinystdio
+if tinystdio
   stdio_inc_dir = 'newlib/libc/tinystdio'
 else
   stdio_inc_dir = 'newlib/libc/stdio'
@@ -414,7 +418,7 @@ has_ieeefp_funcs = false
 has_semihost = false
 
 subdir('semihost')
-if newlib_tinystdio
+if tinystdio
   subdir('dummyhost')
 endif
 

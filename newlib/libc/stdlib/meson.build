@@ -177,7 +177,7 @@ lsrcs_stdlib = [
   'wcstold.c'
 ]
 
-if not newlib_tinystdio
+if not tinystdio
   srcs_stdlib += srcs_stdlib_stdio
   if have_long_double and not long_double_equals_double
     srcs_stdlib += lsrcs_stdlib

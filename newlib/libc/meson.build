@@ -113,7 +113,7 @@ if enable_picolib
   libdirs += 'picolib'
 endif
 
-if newlib_tinystdio
+if tinystdio
   libdirs += 'tinystdio'
 else
   libdirs += ['stdio', 'reent']
