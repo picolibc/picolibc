@@ -78,7 +78,6 @@ inc_headers = [
   'setjmp.h',
   'signal.h',
   'spawn.h',
-  'stdatomic.h',
   'stdint.h',
   'stdlib.h',
   'string.h',
@@ -86,7 +85,6 @@ inc_headers = [
   '_syslist.h',
   'tar.h',
   'termios.h',
-  'tgmath.h',
   'threads.h',
   'time.h',
   'unctrl.h',
@@ -96,6 +94,13 @@ inc_headers = [
   'wchar.h',
   'wctype.h',
   'wordexp.h'
+]
+
+# these headers are provided by GCC
+# let's not replace them
+inc_headers_toolchain = [
+  'stdatomic.h.dontuse',
+  'tgmath.h.dontuse',
 ]
 
 inc_headers += ['picotls.h']
