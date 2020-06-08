@@ -40,12 +40,12 @@
 #define FTOA_MAX_DIG	9
 
 struct ftoa {
-	int16_t	exp;
+	int32_t	exp;
 	uint8_t flags;
 	char	digits[FTOA_MAX_DIG + 1];
 };
 
-int __ftoa_engine (float val, struct ftoa *ftoa, uint8_t maxDigits, uint8_t maxDecimal);
+int __ftoa_engine (float val, struct ftoa *ftoa, int maxDigits, int maxDecimal);
 
 extern NEWLIB_THREAD_LOCAL char __ecvtf_buf[FTOA_MAX_DIG + 1];
 

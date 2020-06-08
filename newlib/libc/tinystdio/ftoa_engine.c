@@ -87,7 +87,7 @@ static const uint32_t factorTable[32] = {
 		typeof(b) _b = b;\
 		_a < _b ? _a : _b; })
 
-int __ftoa_engine(float val, struct ftoa *ftoa, uint8_t maxDigits, uint8_t maxDecimals) 
+int __ftoa_engine(float val, struct ftoa *ftoa, int maxDigits, int maxDecimals) 
 {
     uint8_t flags = 0;
 

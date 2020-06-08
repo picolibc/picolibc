@@ -69,7 +69,7 @@ typedef struct floating_decimal_32 {
 } floating_decimal_32;
 
 static inline floating_decimal_32
-f2d(const uint32_t ieeeMantissa, const uint32_t ieeeExponent, uint8_t max_digits, uint8_t max_decimals)
+f2d(const uint32_t ieeeMantissa, const uint32_t ieeeExponent, int max_digits, int max_decimals)
 {
 	int32_t e2;
 	uint32_t m2;
@@ -311,7 +311,7 @@ f2d(const uint32_t ieeeMantissa, const uint32_t ieeeExponent, uint8_t max_digits
 #include "ftoa_engine.h"
 
 int
-__ftoa_engine(float x, struct ftoa *ftoa, uint8_t max_digits, uint8_t max_decimals)
+__ftoa_engine(float x, struct ftoa *ftoa, int max_digits, int max_decimals)
 {
 	// Step 1: Decode the floating-point number, and unify normalized and subnormal cases.
 	const uint32_t bits = float_to_bits(x);
