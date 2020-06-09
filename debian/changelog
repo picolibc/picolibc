@@ -1,3 +1,28 @@
+picolibc (1.4.3-1) unstable; urgency=medium
+
+  * New upstream version 1.4.3
+
+  * Make fix for CVE 2019-14871 - CVE 2019-14878 in original newlib
+    stdio code not call 'abort'. Allocation failures are now reported
+    back to the application.
+
+  * Add 'exact' floating point print/scan code to tinystdio. Thanks
+    to Sreepathi Pai for pointing me at the Ryu code by Ulf
+    Adams.
+
+  * Add regular expression functions from newlib. These were removed
+    by accident while removing POSIX filesystem-specific code.
+
+  * Make tinystdio versions of [efg]cvt functions. This means that the
+    default tinystdio version of picolibc no longer calls malloc from
+    these functions.
+
+  * More clang-compatibility fixes. (Thanks to Denis Feklushkin)
+
+  * Remove stdatomic.h and tgmath.h. (they should not be provide by picolibc)
+
+ -- Keith Packard <keithp@keithp.com>  Tue, 09 Jun 2020 12:45:58 -0700
+
 picolibc (1.4.2-3) unstable; urgency=medium
 
   * Move lx106 bits back to original location
