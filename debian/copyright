@@ -69,10 +69,6 @@ Files: newlib/libc/include/spawn.h
 Copyright: 2008 Ed Schouten <ed@FreeBSD.org>
 License: BSD2-1
 
-Files: newlib/libc/include/stdatomic.h
-Copyright: 2011 Ed Schouten <ed@FreeBSD.org> David Chisnall <theraven@FreeBSD.org>
-License: BSD2-1
-
 Files: newlib/libc/include/strings.h
  newlib/libc/include/sys/_timeval.h
 Copyright: 2002 Mike Barcroft <mike@FreeBSD.org>
@@ -80,10 +76,6 @@ License: BSD2-1
 
 Files: newlib/libc/include/sys/iconvnls.h
 Copyright: 2003-2004, Artem B. Bityuckiy. Rights transferred to Franklin Electronic Publishers.
-License: BSD2-1
-
-Files: newlib/libc/include/tgmath.h
-Copyright: 2004 Stefan Farfeleder.
 License: BSD2-1
 
 Files: newlib/libc/include/threads.h
@@ -451,7 +443,6 @@ Files: do-arm-configure
  newlib/libc/stdio/vfiscanf.c
  newlib/libc/stdio/vfiwprintf.c
  newlib/libc/stdio/vfiwscanf.c
- newlib/libc/stdio64/meson.build
  newlib/libc/stdlib/malloc-calloc.c
  newlib/libc/stdlib/malloc-cfree.c
  newlib/libc/stdlib/malloc-free.c
@@ -491,9 +482,9 @@ Files: do-arm-configure
  newlib/libc/tinystdio/setbuf.c
  newlib/libc/xdr/meson.build
  newlib/libm/common/meson.build
- newlib/libm/common/signgam.c
  newlib/libm/common/s_issignaling.c
  newlib/libm/common/sf_issignaling.c
+ newlib/libm/common/signgam.c
  newlib/libm/complex/meson.build
  newlib/libm/fenv/meson.build
  newlib/libm/machine/arm/meson.build
@@ -501,8 +492,8 @@ Files: do-arm-configure
  newlib/libm/machine/riscv/meson.build
  newlib/libm/math/meson.build
  newlib/libm/meson.build
- newlib/libm/test/meson.build
  newlib/libm/test/issignaling_vec.c
+ newlib/libm/test/meson.build
  newlib/libm/test/modf_vec.c
  newlib/libm/test/modff_vec.c
  newlib/libm/test/pow_vec.c
@@ -557,19 +548,44 @@ Files: do-arm-configure
 Copyright: 2019 Keith Packard
 License: BSD3-1
 
-Files: newlib/libc/stdio64/meson.build
- newlib/libc/errno/errno.c
- newlib/libc/tinystdio/fflush.c
+Files: newlib/libc/errno/errno.c
+ newlib/libc/picolib/machine/arm/read_tp.S
+ newlib/libc/posix/meson.build
  newlib/libc/stdio/nano-svfprintf.c
  newlib/libc/stdio/nano-svfscanf.c
+ newlib/libc/stdio64/meson.build
+ newlib/libc/tinystdio/ecvt.c
+ newlib/libc/tinystdio/ecvt_data.c
+ newlib/libc/tinystdio/ecvtbuf.c
+ newlib/libc/tinystdio/ecvtf.c
+ newlib/libc/tinystdio/ecvtf_data.c
+ newlib/libc/tinystdio/ecvtfbuf.c
+ newlib/libc/tinystdio/fcvt.c
+ newlib/libc/tinystdio/fcvtbuf.c
+ newlib/libc/tinystdio/fcvtf.c
+ newlib/libc/tinystdio/fcvtfbuf.c
+ newlib/libc/tinystdio/fflush.c
+ newlib/libc/tinystdio/gcvt.c
+ newlib/libc/tinystdio/gcvtbuf.c
+ newlib/libc/tinystdio/gcvtf.c
+ newlib/libc/tinystdio/gcvtfbuf.c
+ newlib/libc/tinystdio/strtod_l.c
+ newlib/libc/tinystdio/strtold_l.c
  semihost/fstat.c
  semihost/isatty.c
  semihost/mapstdio.c
  test-arm.ld
+ test-riscv.ld
  test-riscv32.ld
  test-riscv64.ld
- test-riscv.ld
+ test/regex.c
 Copyright: 2020 Keith Packard
+License: BSD3-1
+
+Files: newlib/libc/machine/aarch64/meson.build
+ newlib/libm/machine/aarch64/meson.build
+Copyright: 2019 Keith Packard,
+ 2020 Anthony Anderson
 License: BSD3-1
 
 Files: newlib/libc/machine/powerpc/meson.build
@@ -674,6 +690,14 @@ Files: newlib/libc/machine/msp430/tiny-printf.c
  newlib/libc/stdlib/wcstoll_r.c
  newlib/libc/stdlib/wcstoull_r.c
 Copyright: 1990 The Regents of the University of California.
+License: BSD3-2
+
+Files: newlib/libc/posix/cclass.h
+ newlib/libc/posix/cname.h
+ newlib/libc/posix/regex2.h
+ newlib/libc/posix/utils.h
+Copyright: 1992, 1993, 1994 Henry Spencer.
+ 1992, 1993, 1994 The Regents of the University of California.
 License: BSD3-2
 
 Files: newlib/libc/search/bsearch.c
@@ -816,13 +840,22 @@ Files: newlib/libc/locale/duplocale.c
  newlib/libc/locale/localeconv.c
  newlib/libc/locale/newlocale.c
  newlib/libc/locale/uselocale.c
-Copyright: 1996 2002 FreeBSD Project
+Copyright: 1996 - 2002 FreeBSD Project
  1991, 1993 The Regents of the University of California.
 License: BSD3-5
 
 Files: newlib/libc/misc/__dprintf.c
  newlib/libc/stdio/vfwprintf.c
 Copyright: 1990 The Regents of the University of California.
+License: BSD3-5
+
+Files: newlib/libc/posix/engine.c
+ newlib/libc/posix/regcomp.c
+ newlib/libc/posix/regerror.c
+ newlib/libc/posix/regexec.c
+ newlib/libc/posix/regfree.c
+Copyright: 1992, 1993, 1994 Henry Spencer.
+ 1992, 1993, 1994 The Regents of the University of California.
 License: BSD3-5
 
 Files: newlib/libc/string/strcasestr.c
@@ -1639,6 +1672,13 @@ Files: newlib/libc/tinystdio/asnprintff.c
 Copyright: 2018 Keith Packard
 License: BSD3-31
 
+Files: newlib/libc/tinystdio/atod_engine.c
+ newlib/libc/tinystdio/atof_engine.c
+ newlib/libc/tinystdio/vfscanf.c
+Copyright: 2002,2004,2005 Joerg Wunsch
+ 2008  Dmitry Xmelkov
+License: BSD3-31
+
 Files: newlib/libc/tinystdio/clearerr.c
  newlib/libc/tinystdio/fclose.c
  newlib/libc/tinystdio/feof.c
@@ -1700,11 +1740,6 @@ Copyright: 2002, Alexander Popov (sasho@vip.bg)
  2002,2004,2005 Joerg Wunsch
  2005, Helmut Wallner
  2007, Dmitry Xmelkov
-License: BSD3-31
-
-Files: newlib/libc/tinystdio/vfscanf.c
-Copyright: 2002,2004,2005 Joerg Wunsch
- 2008  Dmitry Xmelkov
 License: BSD3-31
 
 Files: newlib/libc/tinystdio/vprintf.c
@@ -1970,25 +2005,22 @@ License: GPL2-1
 
 Files: .drone.yml
  .gitattributes
+ .github/Dockerfile
+ .github/workflows/tests.yml
  .gitignore
  README.md
  cross-arm-none-eabi.txt
  cross-i386-linux-gnu.txt
  cross-riscv64-unknown-elf.txt
+ cross-xtensa-lx106-elf.txt
  cross.tmpl
- debian/changelog
- debian/control
- debian/copyright
- debian/picolibc-arm-none-eabi.postinst
- debian/picolibc-arm-none-eabi.prerm
- debian/picolibc-riscv64-unknown-elf.postinst
- debian/picolibc-riscv64-unknown-elf.prerm
- debian/rules
  doc/build.md
  doc/embedsource.md
  doc/init.md
  doc/linking.md
  doc/os.md
+ doc/printf.md
+ doc/releasing.md
  doc/testing.md
  doc/tls.md
  doc/using.md
@@ -2097,10 +2129,6 @@ Files: newlib/libc/ctype/isblank.c
 Copyright: 2002 Thomas Fitzsimmons <fitzsim@redhat.com>
 License: Default-1
 
-Files: newlib/libc/string/swab.c
-Copyright: 2000 Alexandre Oliva <aoliva@redhat.com>
-License: Default-1
-
 Files: newlib/libc/ctype/mkcaseconv
  newlib/libc/ctype/mkcategories
  newlib/libc/ctype/mkunidata
@@ -2156,14 +2184,6 @@ Files: newlib/libc/include/limits.h
 Copyright: 2002 Jeff Johnston  <jjohnstn@redhat.com>
 License: Default-1
 
-Files: newlib/libc/include/machine/ansi.h
-Copyright: 2001 Jeff Johnston  <jjohnstn@redhat.com>
-License: Default-1
-
-Files: newlib/libc/time/tzvars.c
-Copyright: 2005 Tom Walsh <tom@openhardware.net>
-License: Default-1
-
 Files: newlib/libc/include/machine/_default_types.h
  newlib/libc/machine/spu/creat.c
  newlib/libc/machine/spu/sys/errno.h
@@ -2184,6 +2204,10 @@ Files: newlib/libc/include/machine/_types.h
 Copyright: 2005 Ralf Corsepious  <ralf.corsepius@rtems.org>
 License: Default-1
 
+Files: newlib/libc/include/machine/ansi.h
+Copyright: 2001 Jeff Johnston  <jjohnstn@redhat.com>
+License: Default-1
+
 Files: newlib/libc/include/machine/endian.h
  newlib/libc/include/machine/param.h
  newlib/libc/machine/arm/machine/param.h
@@ -2192,7 +2216,6 @@ License: Default-1
 
 Files: newlib/libc/include/ssp/stdlib.h
  newlib/libc/include/ssp/wchar.h
- newlib/libc/ssp/chk_fail.c
  newlib/libc/ssp/stack_protector.c
  newlib/libc/string/wmempcpy.c
 Copyright: 2017 Yaakov Selkowitz <yselkowi@redhat.com>
@@ -2240,6 +2263,10 @@ License: Default-1
 
 Files: newlib/libc/machine/iq2000/setjmp.S
 Copyright: 2003 Anthony Green <green@moxielogic.com>
+License: Default-1
+
+Files: newlib/libc/machine/m68k/m68kasm.h
+Copyright: 2008 Jeff Johnston  <jjohnstn@redhat.com>
 License: Default-1
 
 Files: newlib/libc/machine/mep/setjmp.S
@@ -2334,60 +2361,12 @@ Files: newlib/libc/signal/psignal.c
 Copyright: 2002, 2011 Red Hat Inc.
 License: Default-1
 
-Files: newlib/libc/stdio/getdelim.c
- newlib/libc/stdio/getline.c
-Copyright: 2002, Red Hat Inc.
+Files: newlib/libc/ssp/chk_fail.c
+Copyright: 2017 Yaakov Selkowitz <yselkowi@redhat.com>
 License: Default-1
 
 Files: newlib/libc/stdio64/fdopen64.c
 Copyright: 2003 Christopher Faylor <me@cgf.cx>
-License: Default-1
-
-Files: newlib/libc/stdlib/__adjust.c
- newlib/libc/stdlib/__exp10.c
- newlib/libc/stdlib/__ten_mu.c
- newlib/libc/stdlib/abort.c
- newlib/libc/stdlib/abs.c
- newlib/libc/stdlib/assert.c
- newlib/libc/stdlib/atexit.c
- newlib/libc/stdlib/atexit.h
- newlib/libc/stdlib/atof.c
- newlib/libc/stdlib/atoff.c
- newlib/libc/stdlib/atoi.c
- newlib/libc/stdlib/atol.c
- newlib/libc/stdlib/calloc.c
- newlib/libc/stdlib/ecvtbuf.c
- newlib/libc/stdlib/efgcvt.c
- newlib/libc/stdlib/envlock.c
- newlib/libc/stdlib/eprintf.c
- newlib/libc/stdlib/exit.c
- newlib/libc/stdlib/labs.c
- newlib/libc/stdlib/local.h
- newlib/libc/stdlib/malign.c
- newlib/libc/stdlib/malloc.c
- newlib/libc/stdlib/mallocr.c
- newlib/libc/stdlib/mbctype.h
- newlib/libc/stdlib/mblen.c
- newlib/libc/stdlib/mbstowcs.c
- newlib/libc/stdlib/mbtowc.c
- newlib/libc/stdlib/mbtowc_r.c
- newlib/libc/stdlib/mlock.c
- newlib/libc/stdlib/msize.c
- newlib/libc/stdlib/mstats.c
- newlib/libc/stdlib/mtrim.c
- newlib/libc/stdlib/on_exit.c
- newlib/libc/stdlib/rand.c
- newlib/libc/stdlib/rand_r.c
- newlib/libc/stdlib/realloc.c
- newlib/libc/stdlib/srand.c
- newlib/libc/stdlib/std.h
- newlib/libc/stdlib/stdlib.tex
- newlib/libc/stdlib/system.c
- newlib/libc/stdlib/valloc.c
- newlib/libc/stdlib/wcstombs.c
- newlib/libc/stdlib/wctomb.c
- newlib/libc/stdlib/wctomb_r.c
-Copyright: 1990 Regents of the University of California.
 License: Default-1
 
 Files: newlib/libc/stdlib/__atexit.c
@@ -2446,6 +2425,10 @@ Files: newlib/libc/string/strsep.c
 Copyright: 2002, Red Hat Inc.
 License: Default-1
 
+Files: newlib/libc/string/swab.c
+Copyright: 2000 Alexandre Oliva <aoliva@redhat.com>
+License: Default-1
+
 Files: newlib/libc/string/uniset
 Copyright: 2018 Markus Kuhn
 License: Default-1
@@ -2465,16 +2448,24 @@ Files: newlib/libc/time/month_lengths.c
 Copyright: 2002 Arthur David Olson
 License: Default-1
 
+Files: newlib/libc/time/tzvars.c
+Copyright: 2005 Tom Walsh <tom@openhardware.net>
+License: Default-1
+
 Files: newlib/libc/time/wcsftime.c
 Copyright: 2009 Craig Howland
 License: Default-1
 
 Files: newlib/libm/fenv/fenv_stub.c
- newlib/libm/machine/i386/feclearexcept.c
+Copyright: 2019 Joel Sherrill <joel@rtems.org
+License: Default-1
+
+Files: newlib/libm/machine/i386/feclearexcept.c
  newlib/libm/machine/i386/fegetenv.c
  newlib/libm/machine/i386/fegetexceptflag.c
  newlib/libm/machine/i386/fegetround.c
  newlib/libm/machine/i386/feholdexcept.c
+ newlib/libm/machine/i386/fenv.c
  newlib/libm/machine/i386/feraiseexcept.c
  newlib/libm/machine/i386/fesetenv.c
  newlib/libm/machine/i386/fesetexceptflag.c
@@ -2492,11 +2483,10 @@ Files: newlib/libm/fenv/fenv_stub.c
  newlib/libm/machine/x86_64/fesetround.c
  newlib/libm/machine/x86_64/fetestexcept.c
  newlib/libm/machine/x86_64/feupdateenv.c
-Copyright: 2019 Joel Sherrill <joel@rtems.org
+Copyright: 2019 Joel Sherrill <joel@rtems.org>
 License: Default-1
 
-Files: newlib/libm/machine/i386/fenv.c
- newlib/libm/machine/x86_64/fenv.c
+Files: newlib/libm/machine/x86_64/fenv.c
 Copyright: 2010-2019 Red Hat, Inc.
 License: Default-1
 
@@ -3124,6 +3114,58 @@ Files: newlib/libc/reent/impure.c
 Copyright: 1994 Cygnus Support.
 License: Other-17
 
+Files: newlib/libc/stdio/getdelim.c
+ newlib/libc/stdio/getline.c
+Copyright: 2002, Red Hat Inc. -
+License: Default-1
+
+Files: newlib/libc/stdlib/__adjust.c
+ newlib/libc/stdlib/__exp10.c
+ newlib/libc/stdlib/__ten_mu.c
+ newlib/libc/stdlib/abort.c
+ newlib/libc/stdlib/abs.c
+ newlib/libc/stdlib/assert.c
+ newlib/libc/stdlib/atexit.c
+ newlib/libc/stdlib/atexit.h
+ newlib/libc/stdlib/atof.c
+ newlib/libc/stdlib/atoff.c
+ newlib/libc/stdlib/atoi.c
+ newlib/libc/stdlib/atol.c
+ newlib/libc/stdlib/calloc.c
+ newlib/libc/stdlib/ecvtbuf.c
+ newlib/libc/stdlib/efgcvt.c
+ newlib/libc/stdlib/envlock.c
+ newlib/libc/stdlib/eprintf.c
+ newlib/libc/stdlib/exit.c
+ newlib/libc/stdlib/labs.c
+ newlib/libc/stdlib/local.h
+ newlib/libc/stdlib/malign.c
+ newlib/libc/stdlib/malloc.c
+ newlib/libc/stdlib/mallocr.c
+ newlib/libc/stdlib/mbctype.h
+ newlib/libc/stdlib/mblen.c
+ newlib/libc/stdlib/mbstowcs.c
+ newlib/libc/stdlib/mbtowc.c
+ newlib/libc/stdlib/mbtowc_r.c
+ newlib/libc/stdlib/mlock.c
+ newlib/libc/stdlib/msize.c
+ newlib/libc/stdlib/mstats.c
+ newlib/libc/stdlib/mtrim.c
+ newlib/libc/stdlib/on_exit.c
+ newlib/libc/stdlib/rand.c
+ newlib/libc/stdlib/rand_r.c
+ newlib/libc/stdlib/realloc.c
+ newlib/libc/stdlib/srand.c
+ newlib/libc/stdlib/std.h
+ newlib/libc/stdlib/stdlib.tex
+ newlib/libc/stdlib/system.c
+ newlib/libc/stdlib/valloc.c
+ newlib/libc/stdlib/wcstombs.c
+ newlib/libc/stdlib/wctomb.c
+ newlib/libc/stdlib/wctomb_r.c
+Copyright: 1990 Regents of the University of California.
+License: BSD3-2
+
 Files: newlib/libc/stdio/vfieeefp.h
  newlib/libc/stdlib/dtoa.c
  newlib/libc/stdlib/mprec.c
@@ -3171,10 +3213,32 @@ Files: newlib/libc/string/wcsnlen.c
 Copyright: 2003, Artem B. Bityuckiy (dedekind@mail.ru).
 License: Other-22
 
+Files: newlib/libc/tinystdio/atod_ryu.c
+ newlib/libc/tinystdio/atof_ryu.c
+ newlib/libc/tinystdio/ryu/ryu_parse.h
+Copyright: 2019 Ulf Adams
+License: Other-23
+
+Files: newlib/libc/tinystdio/dtoa_ryu.c
+ newlib/libc/tinystdio/ftoa_ryu.c
+ newlib/libc/tinystdio/ryu/common.h
+ newlib/libc/tinystdio/ryu/d2s_intrinsics.h
+ newlib/libc/tinystdio/ryu/digit_table.h
+ newlib/libc/tinystdio/ryu/f2s_intrinsics.h
+ newlib/libc/tinystdio/ryu/ryu.h
+ newlib/libc/tinystdio/ryu_divpow2.c
+ newlib/libc/tinystdio/ryu_log10.c
+ newlib/libc/tinystdio/ryu_log2pow5.c
+ newlib/libc/tinystdio/ryu_pow5bits.c
+ newlib/libc/tinystdio/ryu_table.c
+ newlib/libc/tinystdio/ryu_umul128.c
+Copyright: 2018 Ulf Adams
+License: Other-23
+
 Files: newlib/libc/xdr/xdr_private.c
  newlib/libc/xdr/xdr_private.h
 Copyright: 2009 Charles S. Wilson
-License: Other-23
+License: Other-24
 
 Files: newlib/libm/common/fdlibm.h
  newlib/libm/common/isgreater.c
@@ -3368,12 +3432,12 @@ Files: newlib/libm/common/fdlibm.h
  newlib/libm/math/wrf_gamma.c
  newlib/libm/math/wrf_lgamma.c
 Copyright: 1993 Sun Microsystems, Inc.
-License: Other-24
+License: Other-25
 
 Files: newlib/libm/common/s_remquo.c
  newlib/libm/common/sf_remquo.c
 Copyright: 1993 Sun Microsystems, Inc.
-License: Other-25
+License: Other-26
 
 Files: newlib/libm/machine/i386/f_llrint.c
  newlib/libm/machine/i386/f_llrintf.c
@@ -3385,7 +3449,7 @@ Files: newlib/libm/machine/i386/f_llrint.c
  newlib/libm/machine/i386/f_rintf.c
  newlib/libm/machine/i386/f_rintl.c
 Copyright: 2007 Dave Korn
-License: Other-26
+License: Other-27
 
 Files: newlib/libc/machine/d10v/setjmp.S
  newlib/libc/machine/d30v/setjmp.S
@@ -5017,6 +5081,22 @@ License: Other-22
  SUCH DAMAGE.
 
 License: Other-23
+ The contents of this file may be used under the terms of the Apache License,
+ Version 2.0.
+ .
+ See accompanying file LICENSE-Apache or copy at
+ http://www.apache.org/licenses/LICENSE-2.0)
+ .
+ Alternatively, the contents of this file may be used under the terms of
+ the Boost Software License, Version 1.0.
+ See accompanying file LICENSE-Boost or copy at
+ https://www.boost.org/LICENSE_1_0.txt)
+ .
+ Unless required by applicable law or agreed to in writing, this software
+ is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ KIND, either express or implied.
+
+License: Other-24
  Permission is hereby granted, free of charge, to any person obtaining a
  copy of this software and associated documentation files (the "Software"),
  to deal in the Software without restriction, including without limitation
@@ -5035,19 +5115,19 @@ License: Other-23
  ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
  OTHER DEALINGS IN THE SOFTWARE.
 
-License: Other-24
+License: Other-25
  Developed at SunPro, a Sun Microsystems, Inc. business.
  Permission to use, copy, modify, and distribute this
  software is freely granted, provided that this notice
  is preserved.
 
-License: Other-25
+License: Other-26
  Developed at SunSoft, a Sun Microsystems, Inc. business.
  Permission to use, copy, modify, and distribute this
  software is freely granted, provided that this notice
  is preserved.
 
-License: Other-26
+License: Other-27
  x87 FP implementation contributed to Newlib by
  Dave Korn, November 2007.  This file is placed in the
  public domain.  Permission to use, copy, modify, and
