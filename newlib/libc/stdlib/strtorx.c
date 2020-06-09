@@ -117,7 +117,6 @@ _strtorx_l(const char *s, char **sp, int rounding, void *L,
 		fpi = &fpi1;
 		}
 	k = _strtodg_l(s, sp, fpi, &exp, bits, loc);
-	printf("bits %08lx %08lx exp %ld k %d\n", (unsigned long) bits[0], (unsigned long) bits[1], (long) exp, k);
 	ULtox((__UShort*)L, bits, exp, k);
 	return k;
 	}

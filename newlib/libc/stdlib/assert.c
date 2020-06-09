@@ -69,9 +69,9 @@ __assert_func (const char *file,
 #endif /* HAVE_ASSERT_FUNC */
 
 void
-__assert (const char *file,
-	int line,
-	const char *failedexpr)
+__assert (const char *failedexpr,
+	const char *file,
+	int line)
 {
    __assert_func (file, line, NULL, failedexpr);
   /* NOTREACHED */

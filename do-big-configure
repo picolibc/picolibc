@@ -38,7 +38,7 @@ meson $DIR \
         -Dtls-model=global-dynamic \
         -Dmultilib=false \
         -Dpicolib=false \
-        -Dnewlib-tinystdio=true \
+        -Dtinystdio=true \
         -Dnewlib-locale-info=true\
         -Dnewlib-locale-info-extended=true\
         -Dnewlib-elix-level=2\

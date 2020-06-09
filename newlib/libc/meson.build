@@ -105,25 +105,21 @@ machine_dirs = {
 		 'spu': 'spu',
 	       }
 
-libdirs = ['argz', 'ctype', 'errno', 'iconv', 'misc', 'search',
-	   'signal', 'ssp', 'stdlib', 'string', 'time',
-	   'xdr', 'locale']
+libdirs = ['argz', 'ctype', 'errno', 'iconv', 'misc',
+	   'posix', 'search', 'signal', 'ssp', 'stdlib',
+	   'string', 'time', 'xdr', 'locale']
 
 if enable_picolib
   libdirs += 'picolib'
 endif
 
-if newlib_tinystdio
+if tinystdio
   libdirs += 'tinystdio'
 else
   libdirs += ['stdio', 'reent']
   if newlib_stdio64
     libdirs += 'stdio64'
   endif
-endif
-
-if newlib_supplied_syscalls
-  libdirs += 'syscalls'
 endif
 
 libnames = libdirs

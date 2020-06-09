@@ -1262,9 +1262,6 @@ strtod_l (const char *__restrict s00, char **__restrict se,
 	return sign ? -dval(rv) : dval(rv);
 }
 
-#ifndef TINY_STDIO
-/* tinystdio has smaller implementations of the C locale version */
-
 double
 strtod (const char *__restrict s00,
 	char **__restrict se)
@@ -1298,4 +1295,3 @@ strtof (const char *__restrict s00,
 #endif
   return retval;
 }
-#endif

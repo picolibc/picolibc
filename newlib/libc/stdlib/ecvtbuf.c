@@ -75,6 +75,10 @@ print_f (
   char *p, *start, *end;
 
   start = p = __dtoa (invalue, mode, ndigit, &decpt, &sign, &end);
+  if (!p) {
+    buf[0] = '\0';
+    return;
+  }
 
   if (decpt == 9999)
     {
@@ -145,6 +149,10 @@ print_e (
   int ndigit = width;
 
   p = __dtoa (invalue, 2, width + 1, &decpt, &sign, &end);
+  if (!p) {
+    buf[0] = '\0';
+    return;
+  }
 
   if (decpt == 9999)
     {
@@ -263,6 +271,8 @@ fcvtbuf (double invalue,
   save = fcvt_buf;
 
   p = __dtoa (invalue, 3, ndigit, decpt, sign, &end);
+  if (!p)
+    return NULL;
 
   /* Now copy */
 
@@ -312,6 +322,8 @@ ecvtbuf (double invalue,
   save = fcvt_buf;
 
   p = __dtoa (invalue, 2, ndigit, decpt, sign, &end);
+  if (!p)
+    return NULL;
 
   /* Now copy */
 
@@ -380,6 +392,8 @@ _gcvt (
        * a bunch of leading zeros for numbers < 1.0
        */
       p = __dtoa (invalue, 2, ndigit, &decpt, &sign, &end);
+      if (!p)
+	return NULL;
 
       if (decpt == 9999)
 	{

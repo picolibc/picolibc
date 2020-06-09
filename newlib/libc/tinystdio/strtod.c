@@ -39,15 +39,6 @@
 #include <stdlib.h>
 #include <inttypes.h>
 
-#define NPOW_10	9
-
-static const double pwr_p10 [NPOW_10] = {
-    1e+1, 1e+2, 1e+4, 1e+8, 1e+16, 1e+32, 1e+64, 1e+128, 1e+256,
-};
-static const double pwr_m10 [NPOW_10] = {
-    1e-1, 1e-2, 1e-4, 1e-8, 1e-16, 1e-32, 1e-64, 1e-128, 1e-256,
-};
-
 /* PSTR() is not used to save 1 byte per string: '\0' at the tail.	*/
 static const char pstr_inf[] = {'I','N','F'};
 static const char pstr_inity[] = {'I','N','I','T','Y'};
@@ -79,11 +70,14 @@ static const char pstr_nan[] = {'N','A','N'};
      returned and \c ERANGE is stored in \c errno.
  */
 
+#include "stdio_private.h"
+
 double
 strtod (const char * nptr, char ** endptr)
 {
     uint64_t u64;
     double flt;
+    int u64digits = 0;
     unsigned char c;
     int exp;
 
@@ -141,8 +135,11 @@ strtod (const char * nptr, char ** endptr)
 		if (flag & FL_DOT)
 		    exp -= 1;
 		u64 = u64 * 10 + c;
-		if (u64 >= (0xffffffffffffffffULL - 9) / 10)
-		    flag |= FL_OVFL;
+		if (u64) {
+		    u64digits++;
+		    if (u64digits > 16)
+			flag |= FL_OVFL;
+		}
 	    }
 
 	} else if (c == (('.'-'0') & 0xff)  &&  !(flag & FL_DOT)) {
@@ -185,29 +182,22 @@ strtod (const char * nptr, char ** endptr)
     if ((flag & FL_ANY) && endptr)
 	*endptr = (char *)nptr - 1;
 
-    flt = (double) (u64);		/* manually	*/
-    if ((flag & FL_MINUS) && (flag & FL_ANY))
-	flt = -flt;
-
-    if (flt != 0) {
-	int pwr;
-	const double *pptr;
-	if (exp < 0) {
-	    pptr = (pwr_m10 + NPOW_10 - 1);
-	    exp = -exp;
-	} else {
-	    pptr = (pwr_p10 + NPOW_10 - 1);
-	}
-	for (pwr = 1 << (NPOW_10 - 1); pwr; pwr >>= 1) {
-	    for (; exp >= pwr; exp -= pwr) {
-		flt *= *pptr;
-	    }
-	    pptr--;
-	}
-//	if (!isfinite(flt) || flt == 0)
-//	    errno = ERANGE;
+    if (u64 == 0) {
+	flt = 0;
     }
 
+    else if ((u64digits + exp <= -324) || (u64 == 0)) {
+	// Number is less than 1e-324, which should be rounded down to 0; return +/-0.0.
+	flt = 0;
+    }
+    else if (u64digits + exp >= 310) {
+	// Number is larger than 1e+309, which should be rounded to +/-Infinity.
+	flt = INFINITY;
+    }
+    else
+	flt = __atod_engine(u64, exp);
+    if (flag & FL_MINUS)
+	flt = -flt;
     return flt;
 }
 

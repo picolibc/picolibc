@@ -91,6 +91,27 @@ sync has not been difficult so far.
 
 ## Releases
 
+### Picolibc version 1.4.3
+
+ 1. Make fix for CVE 2019-14871 - CVE 2019-14878 in original newlib
+    stdio code not call 'abort'. Allocation failures are now reported
+    back to the application.
+
+ 2. Add 'exact' floating point print/scan code to tinystdio. Thanks
+    to Sreepathi Pai for pointing me at the Ryu code by Ulf
+    Adams.
+
+ 3. Add regular expression functions from newlib. These were removed
+    by accident while removing POSIX filesystem-specific code.
+
+ 4. Make tinystdio versions of [efg]cvt functions. This means that the
+    default tinystdio version of picolibc no longer calls malloc from
+    these functions.    
+
+ 5. More clang-compatibility fixes. (Thanks to Denis Feklushkin)
+
+ 6. Remove stdatomic.h and tgmath.h. (they should not be provide by picolibc)
+
 ### Picolibc version 1.4.2
 
  1. Clang source compatibility. Clang should now be able to compile
@@ -121,7 +142,7 @@ sync has not been difficult so far.
     instead we complain if the wrong value was given and display the
     correct value.
 
- 8. Sync up with current newlib master.
+ 8. Sync up with current newlib head.
 
 ### Picolibc version 1.4.1
 
@@ -261,4 +282,5 @@ include:
  * [Linking with Picolibc.ld](doc/linking.md)
  * [Hello World](hello-world/README.md)
  * [Picolibc as embedded source](doc/embedsource.md)
+ * [Releasing Picolibc](doc/releasing.md)
  * [Copyright and license information](COPYING.picolibc)

@@ -84,9 +84,6 @@ srcs_stdlib = [
     'cxa_finalize.c',
     'div.c',
     'drand48.c',
-    'dtoa.c',
-    'ecvtbuf.c',
-    'efgcvt.c',
     'environ.c',
     'envlock.c',
     'eprintf.c',
@@ -94,8 +91,6 @@ srcs_stdlib = [
     'exit.c',
     '_Exit.c',
     '__exp10.c',
-    'gdtoa-gethex.c',
-    'gdtoa-hexnan.c',
     'getenv.c',
     'getenv_r.c',
     'getopt.c',
@@ -121,7 +116,6 @@ srcs_stdlib = [
     'mbtowc.c',
     'mbtowc_r.c',
     'mlock.c',
-    'mprec.c',
     'mrand48.c',
     'mstats.c',
     'nrand48.c',
@@ -141,8 +135,6 @@ srcs_stdlib = [
     'srand.c',
     'srand48.c',
     'srandom.c',
-    'strtod.c',
-    'strtodg.c',
     'strtoimax.c',
     'strtol.c',
     'strtoll.c',
@@ -168,16 +160,30 @@ srcs_stdlib = [
     'wctomb_r.c',
 ]
 
+srcs_stdlib_stdio = [
+    'dtoa.c',
+    'ecvtbuf.c',
+    'efgcvt.c',
+    'gdtoa-gethex.c',
+    'gdtoa-hexnan.c',
+    'mprec.c',
+    'strtod.c',
+    'strtodg.c',
+]
+
 lsrcs_stdlib = [
   'strtold.c',
   'strtorx.c',
   'wcstold.c'
 ]
 
-if have_long_double and not long_double_equals_double and not newlib_tinystdio
-  srcs_stdlib += lsrcs_stdlib
-  if newlib_io_long_double
-    srcs_stdlib += 'ldtoa.c'
+if not tinystdio
+  srcs_stdlib += srcs_stdlib_stdio
+  if have_long_double and not long_double_equals_double
+    srcs_stdlib += lsrcs_stdlib
+    if newlib_io_long_double
+      srcs_stdlib += 'ldtoa.c'
+    endif
   endif
 endif
 

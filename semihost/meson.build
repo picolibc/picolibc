@@ -65,7 +65,7 @@ if src_semihost_machine.has_key(host_cpu_family)
     join_paths('machine', src_semihost_machine[host_cpu_family])
   ]
 
-  if newlib_tinystdio
+  if tinystdio
     srcs_semihost += 'iob.c'
   else
     srcs_semihost += 'mapstdio.c'

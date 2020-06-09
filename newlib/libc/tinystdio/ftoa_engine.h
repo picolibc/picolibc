@@ -31,24 +31,29 @@
 #ifndef	_FTOA_ENGINE_H
 #define	_FTOA_ENGINE_H
 
+#define _XOPEN_SOURCE
+#define _XOPEN_SOURCE_EXTENDED
+#include <stdlib.h>
 #include <stdint.h>
 #include <float.h>
 
-#define FTOA_MAX_DIG	(__FLT_DIG__ + 1)
+#define FTOA_MAX_DIG	9
 
 struct ftoa {
-	int16_t	exp;
+	int32_t	exp;
 	uint8_t flags;
 	char	digits[FTOA_MAX_DIG + 1];
 };
 
-int __ftoa_engine (float val, struct ftoa *ftoa, uint8_t maxDigits, uint8_t maxDecimal);
+int __ftoa_engine (float val, struct ftoa *ftoa, int maxDigits, int maxDecimal);
+
+extern NEWLIB_THREAD_LOCAL char __ecvtf_buf[FTOA_MAX_DIG + 1];
 
 /* '__ftoa_engine' flags return value */
 #define	FTOA_MINUS	1
 #define	FTOA_ZERO	2
 #define	FTOA_INF	4
 #define	FTOA_NAN	8
-#define	FTOA_CARRY	16	/* Carry was to master position.	*/
+#define	FTOA_CARRY	16	/* Carry was to most significant position. */
 
 #endif	/* !_FTOA_ENGINE_H */

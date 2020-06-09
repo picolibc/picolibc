@@ -78,7 +78,6 @@ inc_headers = [
   'setjmp.h',
   'signal.h',
   'spawn.h',
-  'stdatomic.h',
   'stdint.h',
   'stdlib.h',
   'string.h',
@@ -86,7 +85,6 @@ inc_headers = [
   '_syslist.h',
   'tar.h',
   'termios.h',
-  'tgmath.h',
   'threads.h',
   'time.h',
   'unctrl.h',
@@ -100,7 +98,7 @@ inc_headers = [
 
 inc_headers += ['picotls.h']
 
-if not newlib_tinystdio
+if not tinystdio
   inc_headers += ['reent.h']
 endif
 

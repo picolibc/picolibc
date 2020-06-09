@@ -29,6 +29,9 @@
 #ifndef	_DTOA_ENGINE_H_
 #define	_DTOA_ENGINE_H_
 
+#define _XOPEN_SOURCE
+#define _XOPEN_SOURCE_EXTENDED
+#include <stdlib.h>
 #include <stdint.h>
 #include <float.h>
 
@@ -48,20 +51,24 @@
 
 #define DTOA_MAX_10_EXP FLT_MAX_10_EXP
 #define DTOA_MIN_10_EXP FLT_MIN_10_EXP
-#define DTOA_DIG	12
-#define DTOA_MAX_DIG 	12
+#define DTOA_DIG	9
+#define DTOA_MAX_DIG 	9
 
 #define __dtoa_scale_up __ftoa_scale_up
 #define __dtoa_scale_down __ftoa_scale_down
 #define __dtoa_round __ftoa_round
-#define double float
+#define __atod_engine __atof_engine
+#define FLOAT float
+#define UINTFLOAT uint32_t
 
 #else
 
 #define DTOA_MAX_10_EXP DBL_MAX_10_EXP
 #define DTOA_MIN_10_EXP DBL_MIN_10_EXP
-#define DTOA_DIG 	18
-#define DTOA_MAX_DIG	18
+#define DTOA_DIG 	17
+#define DTOA_MAX_DIG	17
+#define FLOAT double
+#define UINTFLOAT uint64_t
 
 #endif
 
@@ -69,7 +76,7 @@
 #define	DTOA_ZERO	2
 #define	DTOA_INF	4
 #define	DTOA_NAN	8
-#define	DTOA_CARRY	16	/* Carry was to master position.	*/
+#define	DTOA_CARRY	16	/* Carry was to most significant position. */
 
 struct dtoa {
 	int32_t	exp;
@@ -78,11 +85,13 @@ struct dtoa {
 };
 
 int
-__dtoa_engine(double x, struct dtoa *dtoa, int max_digits, int max_decimals);
+__dtoa_engine(FLOAT x, struct dtoa *dtoa, int max_digits, int max_decimals);
 
-extern const double __dtoa_scale_up[];
-extern const double __dtoa_scale_down[];
-extern const double __dtoa_round[];
+extern NEWLIB_THREAD_LOCAL char __ecvt_buf[DTOA_MAX_DIG + 1];
+
+extern const FLOAT __dtoa_scale_up[];
+extern const FLOAT __dtoa_scale_down[];
+extern const FLOAT __dtoa_round[];
 
 #if DTOA_MAX_10_EXP >= 1 && DTOA_MAX_10_EXP < 2
 #define DTOA_SCALE_UP_NUM 1

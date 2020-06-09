@@ -127,11 +127,15 @@ main(int argc, char **argv)
 #ifdef PICOLIBC_FLOAT_PRINTF_SCANF
 #define float_type float
 #define scanf_format "%f"
+#if defined(TINY_STDIO) && !defined(_IO_FLOAT_EXACT)
 #define ERROR_MAX 1e-6
+#else
+#define ERROR_MAX 0
+#endif
 #else
 #define float_type double
 #define scanf_format "%lf"
-#ifdef TINY_STDIO
+#if defined(TINY_STDIO) && !defined(_IO_FLOAT_EXACT)
 #define ERROR_MAX 1e-15
 #else
 #define ERROR_MAX 0

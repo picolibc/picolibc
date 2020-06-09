@@ -2798,15 +2798,6 @@ __ldtoa (long double d, int mode, int ndigits,
   rnd.rlast = -1;
   rnd.rndprc = NBITS;
 
-/* reentrancy addition to use mprec storage pool */
-  if (_mprec_result)
-    {
-      _mprec_result->_k = _mprec_result_k;
-      _mprec_result->_maxwds = 1 << _mprec_result_k;
-      Bfree (_mprec_result);
-      _mprec_result = 0;
-    }
-
 #if LDBL_MANT_DIG == 24
   e24toe (&du.pe, e, ldp);
 #elif LDBL_MANT_DIG == 53
@@ -2905,7 +2896,6 @@ stripspaces:
       *decpt = 0;
     }
 
-/* reentrancy addition to use mprec storage pool */
 /* we want to have enough space to hold the formatted result */
 
   if (mode == 3)		/* f format, account for sign + dec digits + decpt + frac */
@@ -2913,16 +2903,11 @@ stripspaces:
   else				/* account for sign + max precision digs + E + exp sign + exponent */
     i = orig_ndigits + MAX_EXP_DIGITS + 4;
 
-  j = sizeof (__ULong);
-  for (_mprec_result_k = 0;
-       sizeof (_Bigint) - sizeof (__ULong) + j <= i; j <<= 1)
-    _mprec_result_k++;
-  if (__mprec_register_exit() != 0)
+  outstr = _alloc_dtoa_result(i);
+  if (!outstr)
     return NULL;
-  _mprec_result = eBalloc (_mprec_result_k);
 
 /* Copy from internal temporary buffer to permanent buffer.  */
-  outstr = (char *) _mprec_result;
   strcpy (outstr, outbuf);
 
   if (rve)

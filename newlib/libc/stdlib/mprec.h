@@ -341,13 +341,6 @@ typedef struct _Bigint _Bigint;
 #define copybits 	__copybits
 #define hexnan	__hexnan
 
-#define eBalloc(__len) ({ \
-   void *__ptr = Balloc(__len); \
-   if (__ptr == NULL) \
-     __assert_func(__FILE__, __LINE__, (char *)0, "Balloc succeeded"); \
-   __ptr; \
-   })
-   
 #if !defined(PREFER_SIZE_OVER_SPEED) && !defined(__OPTIMIZE_SIZE__) && !defined(_SMALL_HEXDIG)
 #define __get_hexdig(x) __hexdig[x] /* NOTE: must evaluate arg only once */
 #else /* !defined(PREFER_SIZE_OVER_SPEED) && !defined(__OPTIMIZE_SIZE__) && !defined(_SMALL_HEXDIG) */
@@ -358,13 +351,12 @@ typedef struct _Bigint _Bigint;
 #define bigtens __mprec_bigtens
 #define tinytens __mprec_tinytens
 
-extern NEWLIB_THREAD_LOCAL _Bigint *_mprec_result;
-extern NEWLIB_THREAD_LOCAL int _mprec_result_k;
+char *__alloc_dtoa_result(int len);
+
 int __mprec_register_exit(void);
 
 struct _Bigint
 {
-  struct _Bigint *_next;
   int _k, _maxwds, _sign, _wds;
   uint32_t _x[1];
 };

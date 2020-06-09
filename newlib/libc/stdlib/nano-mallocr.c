@@ -86,8 +86,19 @@
 
 typedef size_t malloc_size_t;
 
+// #define MALLOC_DEBUG
+
 typedef struct malloc_chunk
 {
+#ifdef MALLOC_DEBUG
+    void *malloc_backtrace[31];
+    int malloc_backtrace_len;
+    void *free_backtrace[31];
+    int free_backtrace_len;
+    struct malloc_chunk *busy;
+    int signature;
+#endif
+
     /*          --------------------------------------
      *   chunk->| size                               |
      *          --------------------------------------
@@ -116,7 +127,7 @@ typedef struct malloc_chunk
 }chunk;
 
 
-#define CHUNK_OFFSET ((malloc_size_t)(&(((struct malloc_chunk *)0)->next)))
+#define CHUNK_OFFSET 	offsetof(chunk, next)
 
 /* size of smallest possible chunk. A memory piece smaller than this size
  * won't be able to create a chunk */
@@ -126,6 +137,10 @@ typedef struct malloc_chunk
 extern chunk * free_list;
 extern char * sbrk_start;
 extern struct mallinfo current_mallinfo;
+#ifdef MALLOC_DEBUG
+extern chunk * busy_list;
+extern int _in_malloc;
+#endif
 
 /* Forward function declarations */
 extern void * nano_malloc(malloc_size_t);
@@ -158,6 +173,11 @@ extern void  *sbrk(intptr_t);
 #ifdef DEFINE_MALLOC
 /* List list header of free blocks */
 chunk * free_list = NULL;
+#ifdef MALLOC_DEBUG
+chunk * busy_list = NULL;
+int _in_malloc;
+int _malloc_test_fail;
+#endif
 
 /* Starting point of memory allocated from system */
 char * sbrk_start = NULL;
@@ -203,6 +223,12 @@ void * nano_malloc(malloc_size_t s)
     char * ptr, * align_ptr;
     int offset;
 
+#ifdef MALLOC_DEBUG
+    if (!_in_malloc) {
+	if (_malloc_test_fail && !--_malloc_test_fail)
+	    return NULL;
+    }
+#endif
     malloc_size_t alloc_size;
 
     alloc_size = ALIGN_TO(s, CHUNK_ALIGN); /* size of aligned data load */
@@ -289,10 +315,22 @@ void * nano_malloc(malloc_size_t s)
            Note that the size of the padding must be at least CHUNK_OFFSET.
 
            The rest of the padding is not initialized.  */
-        *(long *)((char *)r + offset) = -offset;
+	((chunk *)((char *)align_ptr - CHUNK_OFFSET))->size = -offset;
     }
 
     assert(align_ptr + size <= (char *)r + alloc_size);
+#ifdef MALLOC_DEBUG
+    if (_in_malloc++ == 0)
+	r->malloc_backtrace_len = backtrace(r->malloc_backtrace, sizeof(r->malloc_backtrace) / sizeof(r->malloc_backtrace[0]));
+    else
+	r->malloc_backtrace_len = 0;
+    r->free_backtrace_len = 0;
+    --_in_malloc;
+    r->busy = busy_list;
+    r->signature = 0xbeeff00d;
+    busy_list = r;
+#endif
+
     return align_ptr;
 }
 #endif /* DEFINE_MALLOC */
@@ -317,6 +355,41 @@ void nano_free (void * free_p)
     if (free_p == NULL) return;
 
     p_to_free = get_chunk_from_ptr(free_p);
+
+#ifdef MALLOC_DEBUG
+    chunk **prev;
+
+    for (prev = &busy_list; (q = *prev); prev = (&q->busy))
+    {
+	if (q == p_to_free) {
+	    *prev = q->busy;
+	    break;
+	}
+    }
+    if (!q || p_to_free->signature != 0xbeeff00d) {
+	int i;
+	chunk *busy;
+	__i_fprintf(stderr, "Free block which is not busy\n");
+	for (busy = busy_list; busy; busy = busy->busy) {
+	    int i;
+	    __i_fprintf(stderr, " 0x%08x %10lu:", (unsigned) (uintptr_t) busy, busy->size);
+	    for (i = 0; i < busy->malloc_backtrace_len; i++)
+		__i_fprintf(stderr, " 0x%08x", (unsigned) (uintptr_t) busy->malloc_backtrace[i]);
+	    __i_fprintf(stderr, "\n");
+	}
+	__i_fprintf(stderr, " 0x%08x %10lu:", (unsigned) (uintptr_t) p_to_free, p_to_free->size);
+	for (i = 0; i < p_to_free->free_backtrace_len; i++)
+	    __i_fprintf(stderr, " 0x%08x", (unsigned) (uintptr_t) p_to_free->free_backtrace[i]);
+	__i_fprintf(stderr, "\n");
+	abort();
+    }
+
+    if (_in_malloc++ == 0)
+	p_to_free->free_backtrace_len = backtrace(p_to_free->free_backtrace, sizeof(p_to_free->free_backtrace) / sizeof(p_to_free->free_backtrace[0]));
+    else
+	p_to_free->free_backtrace_len = 0;
+    --_in_malloc;
+#endif
 
     MALLOC_LOCK;
     if (free_list == NULL)
@@ -493,6 +566,20 @@ void nano_malloc_stats(void)
              current_mallinfo.arena);
     __i_fprintf(stderr, "in use bytes     = %10u\n",
              current_mallinfo.uordblks);
+#ifdef MALLOC_DEBUG
+    chunk *busy;
+    malloc_size_t total_busy = 0;
+
+    for (busy = busy_list; busy; busy = busy->busy) {
+	int i;
+	total_busy += busy->size;
+	__i_fprintf(stderr, " 0x%08x %10lu:", (unsigned) (uintptr_t) busy, busy->size);
+	for (i = 0; i < busy->malloc_backtrace_len; i++)
+	    __i_fprintf(stderr, " 0x%08x", (unsigned) (uintptr_t) busy->malloc_backtrace[i]);
+	__i_fprintf(stderr, "\n");
+    }
+    __i_fprintf(stderr, "busy  bytes     = %10u\n", total_busy);
+#endif
 }
 #endif /* DEFINE_MALLOC_STATS */
 

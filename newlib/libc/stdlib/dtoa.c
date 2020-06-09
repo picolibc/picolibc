@@ -43,6 +43,9 @@ quorem (_Bigint * b, _Bigint * S)
   __ULong si, zs;
 #endif
 
+  if (!b || !S)
+    return 0;
+
   n = S->_wds;
 #ifdef DEBUG
   /*debug*/ if (b->_wds > n)
@@ -230,14 +233,6 @@ __dtoa (
 
   d.d = _d;
 
-  if (_mprec_result)
-    {
-      _mprec_result->_k = _mprec_result_k;
-      _mprec_result->_maxwds = 1 << _mprec_result_k;
-      Bfree (_mprec_result);
-      _mprec_result = 0;
-    }
-
   if (word0 (d) & Sign_bit)
     {
       /* set sign for everything, including 0's and NaNs */
@@ -283,6 +278,8 @@ __dtoa (
     }
 
   b = d2b (d.d, &be, &bbits);
+  if (!b)
+    return NULL;
 #ifdef Sudden_Underflow
   i = (int) (word0 (d) >> Exp_shift1 & (Exp_mask >> Exp_shift1));
 #else
@@ -417,16 +414,11 @@ __dtoa (
       if (i <= 0)
 	i = 1;
     }
-  j = sizeof (__ULong);
-  for (_mprec_result_k = 0; sizeof (_Bigint) - sizeof (__ULong) + j <= i;
-       j <<= 1)
-    _mprec_result_k++;
-  if (__mprec_register_exit() != 0)
+  s = s0 = __alloc_dtoa_result(i);
+  if (!s) {
+    Bfree(b);
     return NULL;
-  _mprec_result = Balloc (_mprec_result_k);
-  if (!_mprec_result)
-    return NULL;
-  s = s0 = (char *) _mprec_result;
+  }
 
   if (ilim >= 0 && ilim <= Quick_max && try_quick)
     {
@@ -656,6 +648,8 @@ __dtoa (
   S = i2b (1);
   if (s5 > 0)
     S = pow5mult (S, s5);
+  if (!S)
+    goto ret;
 
   /* Check for special case that d is a normalized power of 2. */
 
@@ -746,6 +740,10 @@ __dtoa (
       if (spec_case)
 	{
 	  mhi = Balloc (mhi->_k);
+	  if (!mhi) {
+	    Bfree(mlo);
+	    return NULL;
+	  }
 	  Bcopy (mhi, mlo);
 	  mhi = lshift (mhi, Log2P);
 	}

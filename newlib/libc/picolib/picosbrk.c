@@ -43,7 +43,7 @@ static char *brk = __heap_start;
 void *sbrk(ptrdiff_t incr)
 {
 	if (brk + incr > __heap_end)
-		return NULL;
+		return (void *) -1;
 	void *ret = brk;
 	brk += incr;
 	return ret;

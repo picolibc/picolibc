@@ -34,8 +34,16 @@
 #
 srcs_tinystdio = [
     'clearerr.c',
-    'dtoa_engine.c',
-    'dtoa_data.c',
+    'ecvt_data.c',
+    'ecvtf_data.c',
+    'ecvtbuf.c',
+    'ecvt.c',
+    'ecvtf.c',
+    'fcvtbuf.c',
+    'fcvt.c',
+    'fcvtf.c',
+    'gcvt.c',
+    'gcvtf.c',
     'fclose.c',
     'fdevopen.c',
     'feof.c',
@@ -55,8 +63,6 @@ srcs_tinystdio = [
     'fscanff.c',
     'fseek.c',
     'ftell.c',
-    'ftoa_data.c',
-    'ftoa_engine.c',
     'fwrite.c',
     'getc.c',
     'getchar.c',
@@ -82,6 +88,7 @@ srcs_tinystdio = [
     'sscanff.c',
     'strtof.c',
     'strtod.c',
+    'strtod_l.c',
     'ungetc.c',
     'vfiprintf.c',
     'vfiscanf.c',
@@ -103,8 +110,38 @@ srcs_tinystdio = [
     'vsprintff.c',
 ]
 
+# exact float/string conversion code
+srcs_dtoa_ryu = [
+  'dtoa_ryu.c',
+  'ftoa_ryu.c',
+  'ryu_table.c',
+  'atod_ryu.c',
+  'atof_ryu.c',
+  'ryu_log2pow5.c',
+  'ryu_log10.c',
+  'ryu_pow5bits.c',
+  'ryu_umul128.c',
+  'ryu_divpow2.c',
+  ]
+		
+# smaller float/string conversion code
+srcs_dtoa_float = [
+  'dtoa_engine.c',
+  'dtoa_data.c',
+  'ftoa_data.c',
+  'ftoa_engine.c',
+  'atod_engine.c',
+  'atof_engine.c',
+]
+
+if io_float_exact
+  srcs_tinystdio += srcs_dtoa_ryu
+else
+  srcs_tinystdio += srcs_dtoa_float
+endif
+
 if have_long_double and not long_double_equals_double
-  srcs_tinystdio += 'strtold.c'
+  srcs_tinystdio += ['strtold.c', 'strtold_l.c']
 endif
 
 srcs_tinystdio_posix = [

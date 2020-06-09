@@ -131,6 +131,7 @@ Supporting OS subroutines required: <<close>>, <<fstat>>, <<isatty>>,
  * SUCH DAMAGE.
  */
 
+#define _GNU_SOURCE
 #include <_ansi.h>
 #include <errno.h>
 #include <stdlib.h>
@@ -139,7 +140,7 @@ Supporting OS subroutines required: <<close>>, <<fstat>>, <<isatty>>,
 #include <wctype.h>
 #include <locale.h>
 #include <math.h>
-#include "mprec.h"
+#include "../locale/setlocale.h"
 
 #ifndef _REENT_ONLY
 
@@ -181,7 +182,7 @@ wcstod_l (const wchar_t *nptr, wchar_t **endptr,
         _wcsnrtombs_l(buf, &wcp, (size_t) -1, len + 1, &mbs, loc);
 
         /* Let strtod() do most of the work for us. */
-        val = _strtod_l(buf, &end, loc);
+        val = strtod_l(buf, &end, loc);
 
         /*
          * We only know where the number ended in the _multibyte_

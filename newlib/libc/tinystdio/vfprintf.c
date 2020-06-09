@@ -97,6 +97,7 @@ typedef double printf_float_t;
 #if PRINTF_LONGLONG
 typedef unsigned long long ultoa_unsigned_t;
 typedef long long ultoa_signed_t;
+#define SIZEOF_ULTOA __SIZEOF_LONG_LONG__
 #define PRINTF_BUF_SIZE 22
 #define arg_to_t(flags, _s_)	({				\
 	    _s_ long long __v__;				\
@@ -118,6 +119,7 @@ typedef long long ultoa_signed_t;
 #else
 typedef unsigned long ultoa_unsigned_t;
 typedef long ultoa_signed_t;
+#define SIZEOF_ULTOA __SIZEOF_LONG__
 #define PRINTF_BUF_SIZE 11
 #define arg_to_t(flags, _s_)	({				\
 	    _s_ long __v__;					\
@@ -466,7 +468,7 @@ int vfprintf (FILE * stream, const char *fmt, va_list ap)
 	    goto flt_oper;
 
 	} else if (c >= 'e' && c <= 'g') {
-	    int exp;			/* exponent of master decimal digit	*/
+	    int exp;			/* exponent of most significant decimal digit */
 	    int n;
 	    uint8_t sign;		/* sign character (or 0)	*/
 	    uint8_t ndigs;		/* number of digits to convert */

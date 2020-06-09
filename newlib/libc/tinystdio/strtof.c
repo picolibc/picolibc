@@ -38,13 +38,6 @@
 #include <stdint.h>
 #include <string.h>
 
-static const float pwr_p10 [6] = {
-    1e+1, 1e+2, 1e+4, 1e+8, 1e+16, 1e+32
-};
-static const float pwr_m10 [6] = {
-    1e-1, 1e-2, 1e-4, 1e-8, 1e-16, 1e-32
-};
-
 /* PSTR() is not used to save 1 byte per string: '\0' at the tail.	*/
 static const char pstr_inf[] = {'I','N','F'};
 static const char pstr_inity[] = {'I','N','I','T','Y'};
@@ -76,11 +69,14 @@ static const char pstr_nan[] = {'N','A','N'};
      returned and \c ERANGE is stored in \c errno.
  */
 
+#include "stdio_private.h"
+
 float
 strtof (const char * nptr, char ** endptr)
 {
     uint32_t u32;
     float flt;
+    int u32digits = 0;
     unsigned char c;
     int exp;
 
@@ -139,8 +135,11 @@ strtof (const char * nptr, char ** endptr)
 		    exp -= 1;
 		/* u32 = u32 * 10 + c	*/
 		u32 = (((u32 << 2) + u32) << 1) + c;
-		if (u32 >= (0xffffffffUL - 9) / 10)
-		    flag |= FL_OVFL;
+		if (u32) {
+		    u32digits++;
+		    if (u32digits > 8)
+			flag |= FL_OVFL;
+		}
 	    }
 
 	} else if (c == (('.'-'0') & 0xff)  &&  !(flag & FL_DOT)) {
@@ -183,28 +182,22 @@ strtof (const char * nptr, char ** endptr)
     if ((flag & FL_ANY) && endptr)
 	*endptr = (char *)nptr - 1;
 
-    flt = (float) (u32);		/* manually	*/
-    if ((flag & FL_MINUS) && (flag & FL_ANY))
-	flt = -flt;
-
-    if (flt != 0) {
-	int pwr;
-	const float *pptr;
-	if (exp < 0) {
-	    pptr = (pwr_m10 + 5);
-	    exp = -exp;
-	} else {
-	    pptr = (pwr_p10 + 5);
-	}
-	for (pwr = 32; pwr; pwr >>= 1) {
-	    for (; exp >= pwr; exp -= pwr) {
-		flt *= *pptr;
-	    }
-	    pptr--;
-	}
-//	if (!isfinite(flt) || flt == 0)
-//	    errno = ERANGE;
+    if (u32 == 0) {
+	flt = 0;
     }
+    else if (u32digits + exp <= -46 || (u32 == 0)) {
+	// Number is less than 1e-46, which should be rounded down to 0; return 0.0.
+	flt = 0;
+    }
+    else if (u32digits + exp >= 40) {
+	// Number is larger than 1e+39, which should be rounded to +/-Infinity.
+	flt = INFINITY;
+    }
+    else
+	flt = __atof_engine(u32, exp);
+
+    if (flag & FL_MINUS)
+	flt = -flt;
 
     return flt;
 }

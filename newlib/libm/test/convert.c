@@ -33,6 +33,14 @@ extern double_type doubles[];
 
 double_type *pd = doubles;
 
+#ifdef _IO_FLOAT_EXACT
+#define CONVERT_BITS_DOUBLE	64
+#define CONVERT_BITS_FLOAT	32
+#else
+#define CONVERT_BITS_DOUBLE	61
+#define CONVERT_BITS_FLOAT	30
+#endif
+
 void
 test_strtod (void)
 {
@@ -40,7 +48,7 @@ test_strtod (void)
   double v;
   /* On average we'll loose 1/2 a bit, so the test is for within 1 bit  */
   v = strtod(pd->string, &tail);
-  test_mok(v, pd->value, 62);
+  test_mok(v, pd->value, CONVERT_BITS_DOUBLE);
   test_iok(tail - pd->string, pd->endscan);
 }
 
@@ -51,7 +59,7 @@ test_strtof (void)
   double v;
   /* On average we'll loose 1/2 a bit, so the test is for within 1 bit  */
   v = strtof(pd->string, &tail);
-  test_mok(v, pd->value, 30);
+  test_mok(v, pd->value, CONVERT_BITS_FLOAT);
   test_iok(tail - pd->string, pd->endscan);
 }
 
@@ -63,7 +71,7 @@ test_strtold (void)
   long double v;
   /* On average we'll loose 1/2 a bit, so the test is for within 1 bit  */
   v = strtold(pd->string, &tail);
-  test_mok(v, pd->value, 62);
+  test_mok(v, pd->value, CONVERT_BITS_DOUBLE);
   test_iok(tail - pd->string, pd->endscan);
 }
 #endif
@@ -71,7 +79,7 @@ test_strtold (void)
 void
 test_atof (void)
 {
-  test_mok(atof(pd->string), pd->value, 62);
+  test_mok(atof(pd->string), pd->value, CONVERT_BITS_DOUBLE);
 }
 
 #ifndef NO_NEWLIB
@@ -160,6 +168,13 @@ test_atol (void)
 extern ddouble_type ddoubles[];
 ddouble_type *pdd;
 
+static inline char *
+check_null(char *s) {
+  if (s == NULL)
+    return "(out of memory)";
+  return s;
+}
+
 #ifndef NO_NEWLIB
 /* test ECVT and friends */
 void
@@ -167,7 +182,7 @@ test_ecvtbuf (void)
 {
   int a2,a3;
   char *s;
-  s =  ecvtbuf(pdd->value, pdd->e1, &a2, &a3, buffer);
+  s =  check_null(ecvtbuf(pdd->value, pdd->e1, &a2, &a3, buffer));
 
   test_sok(s,pdd->estring);
   test_iok(pdd->e2,a2);
@@ -180,14 +195,14 @@ test_ecvt (void)
 {
   int a2,a3;
   char *s;
-  s =  ecvt(pdd->value, pdd->e1, &a2, &a3);
+  s =  check_null(ecvt(pdd->value, pdd->e1, &a2, &a3));
 
   test_sok(s,pdd->estring);
   test_iok(pdd->e2,a2);
   test_iok(pdd->e3,a3);
 
 #ifndef NO_NEWLIB
-  s =  ecvtf(pdd->value, pdd->e1, &a2, &a3);
+  s =  check_null(ecvtf(pdd->value, pdd->e1, &a2, &a3));
 
   test_scok(s,pdd->estring, 6);
   test_iok(pdd->e2,a2);
@@ -201,7 +216,7 @@ test_fcvtbuf (void)
 {
   int a2,a3;
   char *s;
-  s =  fcvtbuf(pdd->value, pdd->f1, &a2, &a3, buffer);
+  s =  check_null(fcvtbuf(pdd->value, pdd->f1, &a2, &a3, buffer));
 
   test_scok(s,pdd->fstring,10);
   test_iok(pdd->f2,a2);
@@ -212,12 +227,12 @@ test_fcvtbuf (void)
 void
 test_gcvt (void)
 {
-  char *s = gcvt(pdd->value, pdd->g1, buffer);  
+  char *s = check_null(gcvt(pdd->value, pdd->g1, buffer));
   test_scok(s, pdd->gstring, 9);
   
 #ifndef NO_NEWLIB
-  s = gcvtf(pdd->value, pdd->g1, buffer);  
-  test_scok(s, pdd->gstring, 6);
+  s = check_null(gcvtf(pdd->value, pdd->g1, buffer)); 
+  test_scok2(s, pdd->gstring, pdd->gfstring, 6);
 #endif
 }
 
@@ -226,7 +241,7 @@ test_fcvt (void)
 {
   int a2,a3;
   char *sd;
-  sd =  fcvt(pdd->value, pdd->f1, &a2, &a3);
+  sd =  check_null(fcvt(pdd->value, pdd->f1, &a2, &a3));
 
   test_scok(sd,pdd->fstring,10);
   test_iok(pdd->f2,a2);
@@ -239,9 +254,13 @@ test_fcvt (void)
   int s1, s2;
   /* Test the float version by converting and inspecting the numbers 3
    after reconverting */
-  sf =  fcvtf(pdd->value, pdd->f1, &a2, &a3);
+  sf =  check_null(fcvtf(pdd->value, pdd->f1, &a2, &a3));
   s1 = sscanf(sd, "%lg", &v1);
   s2 = sscanf(sf, "%lg", &v2);
+  /* float version may return fewer digits; expand to match */
+  int x = strlen(sd) - strlen(sf);
+  while (x-- > 0)
+    v2 *= 10;
   if (strlen(sd) == 0) {
     test_iok(EOF, s1);
     v1 = 0.0;
@@ -382,7 +401,7 @@ test_scan (void)
     if  (s->mag)
       test_mok(d0, d1, s->mag);
     else
-      test_mok(d0,d1, 62);
+      test_mok(d0,d1, CONVERT_BITS_DOUBLE);
     s++;
   }
 
@@ -424,9 +443,9 @@ gen_dvec(void)
   int	e_decpt, e_sign;
   int	f_decpt, f_sign;
 
-  strcpy(ebuf, ecvt(pdd->value, pdd->e1, &e_decpt, &e_sign));
-  strcpy(fbuf, fcvt(pdd->value, pdd->f1, &f_decpt, &f_sign));
-  gcvt(pdd->value, pdd->g1, gbuf);
+  strcpy(ebuf, check_null(ecvt(pdd->value, pdd->e1, &e_decpt, &e_sign)));
+  strcpy(fbuf, check_null(fcvt(pdd->value, pdd->f1, &f_decpt, &f_sign)));
+  check_null(gcvt(pdd->value, pdd->g1, gbuf));
   printf("__LINE__, %.15e,\"%s\",%d,%d,%d,\"%s\",%d,%d,%d,\"%s\",%d,\n\n",
 	 pdd->value,
 	 ebuf, pdd->e1, e_decpt, e_sign,
@@ -434,6 +453,8 @@ gen_dvec(void)
 	 gbuf, pdd->g1);
 }
 #endif
+
+extern int _malloc_test_fail;
 
 void
 test_cvt (void)

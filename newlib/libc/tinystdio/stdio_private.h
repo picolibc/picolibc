@@ -75,4 +75,10 @@ __posix_getc(FILE *f);
 int
 __posix_close(FILE *f);
 
+double
+__atod_engine(uint64_t m10, int e10);
+
+float
+__atof_engine(uint32_t m10, int e10);
+
 #endif

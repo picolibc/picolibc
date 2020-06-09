@@ -62,11 +62,19 @@
     result |= test(39, "-42            ", "%0-15d", -42);
     result |= test(43, "42.90", "%.2f", 42.8952);
     result |= test(44, "42.90", "%.2F", 42.8952);
+#ifdef PICOLIBC_FLOAT_PRINTF_SCANF
+    result |= test(45, "42.89520", "%.5f", 42.8952);
+#else
     result |= test(45, "42.8952000000", "%.10f", 42.8952);
+#endif
     result |= test(46, "42.90", "%1.2f", 42.8952);
     result |= test(47, " 42.90", "%6.2f", 42.8952);
     result |= test(49, "+42.90", "%+6.2f", 42.8952);
+#ifdef PICOLIBC_FLOAT_PRINTF_SCANF
+    result |= test(50, "42.89520", "%5.5f", 42.8952);
+#else
     result |= test(50, "42.8952000000", "%5.10f", 42.8952);
+#endif
     /* 51: anti-test */
     /* 52: anti-test */
     /* 53: excluded for C */

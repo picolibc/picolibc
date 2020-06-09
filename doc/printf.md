@@ -90,14 +90,20 @@ hence the size) of the library:
    float-only versions of printf and scanf. This option is disabled by
    default.
 
+ * `-Dio-float-exact=true` This option, which is enabled by default,
+   controls whether the tinystdio code uses exact algorithms for
+   printf and scanf. When enabled, printing at least 9 digits
+   (e.g. "%.9g") for 32-bit floats and 17 digits (e.g. "%.17g") for
+   64-bit floats ensures that passing the output back to scanf will
+   exactly re-create the original value.
+
 For even more printf and scanf functionality, picolibc can be compiled
 with the original newlib stdio code. That greatly increases the code
 and data sizes of the library, including adding a requirement for heap
 support in the run time system. Here are the picolibc build options for that code:
 
- * `-Dnewlib-tinystdio=true` This option enables the tinystdio code in
-   place of the original newlib stdio code. This option is enabled by
-   default.
+ * `-Dtinystdio=false` This disables the tinystdio code and uses
+   original newlib stdio code.
 
  * `-Dnewlib-io-pos-args=true` This option add support for C99
    positional arguments (e.g. "%1$"). This option is disabled by default.
