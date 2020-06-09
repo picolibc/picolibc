@@ -96,13 +96,6 @@ inc_headers = [
   'wordexp.h'
 ]
 
-# these headers are provided by GCC
-# let's not replace them
-inc_headers_toolchain = [
-  'stdatomic.h.dontuse',
-  'tgmath.h.dontuse',
-]
-
 inc_headers += ['picotls.h']
 
 if not tinystdio

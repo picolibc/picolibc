@@ -69,10 +69,6 @@ Files: newlib/libc/include/spawn.h
 Copyright: 2008 Ed Schouten <ed@FreeBSD.org>
 License: BSD2-1
 
-Files: newlib/libc/include/stdatomic.h
-Copyright: 2011 Ed Schouten <ed@FreeBSD.org> David Chisnall <theraven@FreeBSD.org>
-License: BSD2-1
-
 Files: newlib/libc/include/strings.h
  newlib/libc/include/sys/_timeval.h
 Copyright: 2002 Mike Barcroft <mike@FreeBSD.org>
@@ -80,10 +76,6 @@ License: BSD2-1
 
 Files: newlib/libc/include/sys/iconvnls.h
 Copyright: 2003-2004, Artem B. Bityuckiy. Rights transferred to Franklin Electronic Publishers.
-License: BSD2-1
-
-Files: newlib/libc/include/tgmath.h
-Copyright: 2004 Stefan Farfeleder.
 License: BSD2-1
 
 Files: newlib/libc/include/threads.h
