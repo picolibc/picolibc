@@ -91,6 +91,15 @@ sync has not been difficult so far.
 
 ## Releases
 
+### Picolibc version 1.4.4
+
+ 1. Fix floating point 'g' format output in tinystdio. (e.g.,
+    for 10.0, print '10' instead of '1e+01'). There are tests which
+    verify a range of 'g' cases like these now.
+    
+ 2. Merge current newlib bits. The only thing which affects picolibc
+    is the addition of fenv support for arm.
+
 ### Picolibc version 1.4.3
 
  1. Make fix for CVE 2019-14871 - CVE 2019-14878 in original newlib
