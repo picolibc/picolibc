@@ -552,25 +552,65 @@ int vfprintf (FILE * stream, const char *fmt, va_list ap)
 
 		/* 'g(G)' format */
 
-		prec = ndigs;
+		/*
+		 * On entry to this block, prec is
+		 * the number of digits to display.
+		 *
+		 * On exit, prec is the number of digits
+		 * to display after the decimal point
+		 */
 
-		/* Remove trailing zeros unless '#' */
+		/* Always show at least one digit */
+		if (prec == 0)
+		    prec = 1;
+
+		/*
+		 * Remove trailing zeros. The ryu code can emit them
+		 * when rounding to fewer digits than required for
+		 * exact output, the imprecise code often emits them
+		 */
+		while (ndigs > 0 && _dtoa.digits[ndigs-1] == '0')
+		    ndigs--;
+
+		/* Save requested precision */
+		int req_prec = prec;
+
+		/* Limit output precision to ndigs unless '#' */
 		if (!(flags & FL_ALT))
-		    while (ndigs > 0 && _dtoa.digits[ndigs-1] == '0')
-			ndigs--;
+		    prec = ndigs;
 
-		if (-4 <= exp && exp < prec)
+		/*
+		 * Figure out whether to use 'f' or 'e' format. The spec
+		 * says to use 'f' if the exponent is >= -4 and < requested
+		 * precision. 
+		 */
+		if (-4 <= exp && exp < req_prec)
 		{
 		    flags |= FL_FLTFIX;
 
-		    if (exp < 0 || ndigs > exp)
-			prec = ndigs - (exp + 1);
+		    /* Compute how many digits to show after the decimal.
+		     *
+		     * If exp is negative, then we need to show that
+		     * many leading zeros plus the requested precision
+		     *
+		     * If exp is less than prec, then we need to show a
+		     * number of digits past the decimal point,
+		     * including (potentially) some trailing zeros
+		     *
+		     * (these two cases end up computing the same value,
+		     * and are both caught by the exp < prec test,
+		     * so they share the same branch of the 'if')
+		     *
+		     * If exp is at least 'prec', then we don't show
+		     * any digits past the decimal point.
+		     */
+		    if (exp < prec)
+			prec = prec - (exp + 1);
 		    else
 			prec = 0;
 		} else {
-
-		    /* Limit displayed precision to available precision */
-		    prec = ndigs - 1;
+		    /* Compute how many digits to show after the decimal */
+		    prec = prec - 1;
 		}
 	    }
 
