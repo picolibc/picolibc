@@ -383,14 +383,12 @@ __dtoa_engine(double x, struct dtoa *dtoa, int max_digits, int max_decimals)
 	if (ieeeSign)
 		flags |= DTOA_MINUS;
 	if (ieeeExponent == 0 && ieeeMantissa == 0) {
-		int i;
 		flags |= DTOA_ZERO;
-		for (i = 0; i < max_digits; i++)
-			dtoa->digits[i] = '0';
+		dtoa->digits[0] = '0';
+		dtoa->digits[1] = '\0';
 		dtoa->flags = flags;
 		dtoa->exp = 0;
-		dtoa->digits[max_digits] = '\0';
-		return max_digits;
+		return 1;
 	}
 	if (ieeeExponent == ((1u << DOUBLE_EXPONENT_BITS) - 1u)) {
 		if (ieeeMantissa) {

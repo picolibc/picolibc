@@ -327,14 +327,12 @@ __ftoa_engine(float x, struct ftoa *ftoa, int max_digits, int max_decimals)
 		flags |= FTOA_MINUS;
 
 	if (ieeeExponent == 0 && ieeeMantissa == 0) {
-		int i;
 		flags |= FTOA_ZERO;
-		for (i = 0; i < max_digits; i++)
-			ftoa->digits[i] = '0';
+		ftoa->digits[0] = '0';
+		ftoa->digits[1] = '\0';
 		ftoa->flags = flags;
 		ftoa->exp = 0;
-		ftoa->digits[max_digits] = '\0';
-		return max_digits;
+		return 1;
 	}
 	if (ieeeExponent == ((1u << FLOAT_EXPONENT_BITS) - 1u)) {
 		if (ieeeMantissa) {

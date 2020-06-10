@@ -118,9 +118,8 @@ int __ftoa_engine(float val, struct ftoa *ftoa, int maxDigits, int maxDecimals)
     if(exp==0 && frac==0)
     {
         flags |= FTOA_ZERO;
-        uint8_t i;
-        for(i=0; i<=maxDigits; i++)
-            ftoa->digits[i] = '0';
+	ftoa->digits[0] = '0';
+	maxDigits = 1;
     } else if(exp == 0xff) {
         if(frac == 0)
             flags |= FTOA_INF;
