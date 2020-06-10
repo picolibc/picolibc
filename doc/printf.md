@@ -42,7 +42,7 @@ Here's an example program to experiment with these options:
 	#include <stdio.h>
 
 	void main(void) {
-		printf(" 2⁶¹ = %lld π ≃ %g\n", 1ll << 61, printf_float(3.1415f));
+		printf(" 2⁶¹ = %lld π ≃ %.17g\n", 1ll << 61, printf_float(3.141592653589793));
 	}
 
 Now we can build and run it with the default options:
@@ -50,18 +50,19 @@ Now we can build and run it with the default options:
 	$ riscv64-unknown-elf-gcc -Os -march=rv32imac -mabi=ilp32 --specs=picolibc.specs --oslib=semihost -Wl,--defsym=__flash=0x80000000 -Wl,--defsym=__flash_size=0x00200000 -Wl,--defsym=__ram=0x80200000 -Wl,--defsym=__ram_size=0x200000 -o printf.elf printf.c
 	$ riscv64-unknown-elf-size printf.elf
 	   text	   data	    bss	    dec	    hex	filename
-	  12878	     16	      8	  12902	   3266	printf.elf
+	   9284	     16	      8	   9308	   245c	printf.elf
 	$ qemu-system-riscv32 -chardev stdio,mux=on,id=stdio0 -semihosting-config enable=on,chardev=stdio0 -monitor none -serial none -machine virt,accel=tcg -kernel printf.elf -nographic -bios none
-	 2⁶¹ = 2305843009213693952 π ≃ 3.1415
+	 2⁶¹ = 2305843009213693952 π ≃ 3.141592653589793
 
-Switching to float-only reduces the size but lets this still work correctly:
+Switching to float-only reduces the size but lets this still work,
+although the floating point value has reduced precision:
 
 	$ riscv64-unknown-elf-gcc -DPICOLIBC_FLOAT_PRINTF_SCANF -Os -march=rv32imac -mabi=ilp32 --specs=picolibc.specs --oslib=semihost -Wl,--defsym=__flash=0x80000000 -Wl,--defsym=__flash_size=0x00200000 -Wl,--defsym=__ram=0x80200000 -Wl,--defsym=__ram_size=0x200000 -o printf-float.elf printf.c
 	$ riscv64-unknown-elf-size printf-float.elf
 	   text	   data	    bss	    dec	    hex	filename
-	   7844	     16	      8	   7868	   1ebc	printf-float.elf
+	   6540	     16	      8	   6564	   19a4	printf-float.elf
 	$ qemu-system-riscv32 -chardev stdio,mux=on,id=stdio0 -semihosting-config enable=on,chardev=stdio0 -monitor none -serial none -machine virt,accel=tcg -kernel printf-float.elf -nographic -bios none
-	 2⁶¹ = 2305843009213693952 π ≃ 3.1415
+	 2⁶¹ = 2305843009213693952 π ≃ 3.1415927
 
 Going to integer-only reduces the size even further, but now it doesn't output
 the values correctly:
@@ -69,7 +70,7 @@ the values correctly:
 	$ riscv64-unknown-elf-gcc -DPICOLIBC_INTEGER_PRINTF_SCANF -Os -march=rv32imac -mabi=ilp32 --specs=picolibc.specs --oslib=semihost -Wl,--defsym=__flash=0x80000000 -Wl,--defsym=__flash_size=0x00200000 -Wl,--defsym=__ram=0x80200000 -Wl,--defsym=__ram_size=0x200000 -o printf-int.elf printf.c
 	$ riscv64-unknown-elf-size printf-int.elf
 	   text	   data	    bss	    dec	    hex	filename
-	   2306	     16	      8	   2330	    91a	printf-int.elf
+	   2336	     16	      8	   2360	    938	printf-int.elf
 	$ qemu-system-riscv32 -chardev stdio,mux=on,id=stdio0 -semihosting-config enable=on,chardev=stdio0 -monitor none -serial none -machine virt,accel=tcg -kernel printf-int.elf -nographic -bios none
 	 2⁶¹ = 0 π ≃ *float*
 
