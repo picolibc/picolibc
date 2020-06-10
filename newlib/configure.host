@@ -891,6 +891,7 @@ newlib_cflags="${newlib_cflags} -DCLOCK_PROVIDED -DMALLOC_PROVIDED -DEXIT_PROVID
 	;;
   riscv*-*-*)
 	syscall_dir=syscalls
+	newlib_cflags="${newlib_cflags} -DHAVE_FCNTL -DHAVE_BLKSIZE -DGETREENT_PROVIDED -DREENTRANT_SYSCALLS_PROVIDED -DSIGNAL_PROVIDED"
 	;;
   sh*-*-*)
 	default_newlib_io_long_long="yes"
