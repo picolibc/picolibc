@@ -28,8 +28,12 @@ Defaults to off.</para>
 which is useful for debugging.  <filename>Win32filepath</filename> is
 usually set to the path to <command>gdb</command> or
 <command>dumper</command>, for example
-<filename>C:\cygwin\bin\gdb.exe</filename>. 
+<filename>C:\cygwin\bin\gdb.exe</filename>.
 There is no default set.
+</para>
+<para>
+The filename of the executing program and it's Windows process id are appended
+to the command as arguments.
 </para>
 </listitem>
 
