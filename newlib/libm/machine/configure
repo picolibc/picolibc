@@ -793,7 +793,8 @@ nds32
 pru
 spu
 riscv
-x86_64'
+x86_64
+powerpc'
 
 # Initialize some variables set by options.
 ac_init_help=
@@ -11455,7 +11456,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<_LT_EOF
-#line 11458 "configure"
+#line 11459 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -11561,7 +11562,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<_LT_EOF
-#line 11564 "configure"
+#line 11565 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -11821,6 +11822,8 @@ subdirs="$subdirs aarch64"
 	riscv) subdirs="$subdirs riscv"
  ;;
 	x86_64) subdirs="$subdirs x86_64"
+ ;;
+	powerpc) subdirs="$subdirs powerpc"
  ;;
   esac;
   if test "${use_libtool}" = "yes"; then
