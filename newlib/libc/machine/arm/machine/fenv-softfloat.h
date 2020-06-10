@@ -127,7 +127,6 @@ fegetenv(fenv_t *envp)
 __fenv_static inline int
 feholdexcept(fenv_t *envp)
 {
-	fenv_t __env;
 
 	fegetenv(envp);
 	__softfloat_float_exception_flags = 0;
