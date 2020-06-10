@@ -19,35 +19,38 @@ picolibc:
     * RISC-V, all targets (qemu)
     * ARM, thumb v7m only (qemu)
 
- 3. Add release notes to README.md
- 
- 4. Update meson.build file with new version number
+ 3. Verify that COPYING.picolibc includes information
+    about the current source files
 
- 5. Use native configuration to build release:
+ 4. Add release notes to README.md
+ 
+ 5. Update meson.build file with new version number
+
+ 6. Commit release notes and meson.build
+
+	$ git commit -m'Version <version>' README.md meson.build
+
+ 7. Use native configuration to build release:
 
 	$ mkdir build-native
 	$ cd build-native
         $ ../do-native-configure
 	$ ninja dist
 
- 6. Commit release notes and meson.build
-
-	$ git commit -m'Version <version>' README.md meson.build
-
- 6. Tag release
+ 8. Tag release
 
 	$ git tag -m'Version <version>' <version> main
 
- 7. Push tag and branch to repositories
+ 9. Push tag and branch to repositories
 
 	$ git push origin main <version>
 
- 7. Upload release to web site:
+ 10. Upload release to web site:
 
 	$ scp build-native/meson-dist/* keithp.com:/var/www/picolibc/dist
 
- 8. Email release message to mailing list. Paste in README.md section
-    about the new release.
+ 11. Email release message to mailing list. Paste in README.md section
+     about the new release.
 
 ## Debian Packages
 
