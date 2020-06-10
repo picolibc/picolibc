@@ -531,8 +531,10 @@ extern "C" {
 
 #endif /* __CYGWIN__ */
 
-/* ESP-specific */
-#ifdef __XTENSA__
+/* ESP-specific.
+ * TODO: introduce 'esp-idf' sys subdirectory, provide custom features.h there.
+ */
+#if defined(__XTENSA__) || defined(__riscv)
 
 #define _POSIX_THREADS                          1
 #define _POSIX_TIMEOUTS                         1
@@ -541,7 +543,7 @@ extern "C" {
 #define _POSIX_CLOCK_SELECTION                  200112L
 #define _UNIX98_THREAD_MUTEX_ATTRIBUTES         1
 
-#endif /* __XTENSA__ */
+#endif /* ESP specific */
 
 #ifdef __cplusplus
 }
