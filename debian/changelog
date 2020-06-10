@@ -1,3 +1,13 @@
+picolibc (1.4.4-1) unstable; urgency=medium
+
+  * New upstream 1.4.4
+
+  * Fix printf 'g' output when using 'ryu' conversion code
+
+  * Add fenv for ARM from newlib
+
+ -- Keith Packard <keithp@keithp.com>  Wed, 10 Jun 2020 16:06:11 -0700
+
 picolibc (1.4.3-1) unstable; urgency=medium
 
   * New upstream version 1.4.3
