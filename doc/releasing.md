@@ -19,27 +19,38 @@ picolibc:
     * RISC-V, all targets (qemu)
     * ARM, thumb v7m only (qemu)
 
- 3. Add release notes to README.md
- 
- 4. Update meson.build file with new version number
+ 3. Verify that COPYING.picolibc includes information
+    about the current source files
 
- 5. Use native configuration to build release:
+ 4. Add release notes to README.md
+ 
+ 5. Update meson.build file with new version number
+
+ 6. Commit release notes and meson.build
+
+	$ git commit -m'Version <version>' README.md meson.build
+
+ 7. Use native configuration to build release:
 
 	$ mkdir build-native
 	$ cd build-native
         $ ../do-native-configure
 	$ ninja dist
 
- 6. Tag release
+ 8. Tag release
 
-	$ git tag -m'Version <version-number>' <version-number> main
+	$ git tag -m'Version <version>' <version> main
 
- 7. Upload release to web site:
+ 9. Push tag and branch to repositories
+
+	$ git push origin main <version>
+
+ 10. Upload release to web site:
 
 	$ scp build-native/meson-dist/* keithp.com:/var/www/picolibc/dist
 
- 8. Email release message to mailing list. Paste in README.md section
-    about the new release.
+ 11. Email release message to mailing list. Paste in README.md section
+     about the new release.
 
 ## Debian Packages
 
@@ -60,21 +71,35 @@ how to build debian packages:
 
  4. Update debian packaging to current standards
 
- 5. Add new Debian change log entry
+ 5. Update debian/copyright from COPYING.picolibc
+
+	$ cp COPYING.picolibc 
+
+ 6. Add new Debian change log entry
 
 	$ dch -v <release>-1 -D unstable
 
- 6. Commit debian changes to repository
+ 7. Commit debian changes to repository
 
- 7. Build debian packages
+	$ git commit -m'debian: Version <version>-1' debian/changelog
+
+ 8. Build debian packages
 
 	$ gbp buildpackage
 
- 8. Verify package results remain lintian-clean:
+ 9. Verify package results remain lintian-clean:
 
 	$ lintian --info --display-info --pedantic picolibc_<version>-1_amd64.changes
 
- 9. Sign and upload source changes:
+ 10. Tag release
+
+	$ git tag -m'debian: Version <version>-1' <version>-1 debian
+
+ 11. Push tags and branches to salsa
+
+	$ git push salsa main debian <version> <version>-1
+
+ 12. Sign and upload source changes:
 
 	$ debsign picolibc_<version>-1_source.changes
 	$ dput picolibc_<version>-1_source.changes

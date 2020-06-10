@@ -96,6 +96,23 @@ Copyright: 2001 Alexey Zelkin <phantom@FreeBSD.org>
  1997 FreeBSD Inc.
 License: BSD2-1
 
+Files: newlib/libc/machine/arm/machine/fenv-mangle.h
+ newlib/libm/machine/arm/fenv-softfp.c
+ newlib/libm/machine/arm/fenv-vfp.c
+Copyright: 2013 Andrew Turner <andrew@FreeBSD.ORG>
+License: BSD2-1
+
+Files: newlib/libc/machine/arm/machine/fenv-softfloat.h
+Copyright: 2004-2011 David Schultz <das@FreeBSD.ORG>
+License: BSD2-1
+
+Files: newlib/libc/machine/arm/machine/fenv-vfp.h
+ newlib/libc/machine/arm/sys/fenv.h
+ newlib/libc/machine/powerpc/machine/fenv-fp.h
+ newlib/libc/machine/powerpc/sys/fenv.h
+Copyright: 2004-2005 David Schultz <das@FreeBSD.ORG>
+License: BSD2-1
+
 Files: newlib/libc/machine/x86_64/sys/fenv.h
 Copyright: 2010-2019 Red Hat, Inc.
 License: BSD2-1
@@ -142,10 +159,6 @@ Files: newlib/libc/stdio/getwc.c
  newlib/libc/stdio/putwchar.c
  newlib/libc/stdlib/wcstod.c
 Copyright: 2002 Tim J. Robbins.
-License: BSD2-1
-
-Files: newlib/libc/stdlib/aligned_alloc.c
-Copyright: 2015 embedded brains GmbH
 License: BSD2-1
 
 Files: newlib/libc/stdlib/arc4random.h
@@ -203,6 +216,15 @@ License: BSD2-1
 
 Files: newlib/libm/complex/csqrtl.c
 Copyright: 2007-2008 David Schultz <das@FreeBSD.ORG>
+License: BSD2-1
+
+Files: newlib/libm/machine/arm/fenv.c
+Copyright: 2004 David Schultz <das@FreeBSD.ORG>
+ 2013 Andrew Turner <andrew@FreeBSD.ORG>
+License: BSD2-1
+
+Files: newlib/libm/machine/powerpc/fenv.c
+Copyright: 2004 David Schultz <das@FreeBSD.ORG>
 License: BSD2-1
 
 Files: newlib/testsuite/newlib.iconv/iconv.exp
@@ -929,6 +951,7 @@ License: BSD3-8
 Files: newlib/libc/machine/arm/acle-compat.h
  newlib/libc/machine/arm/aeabi_memcpy-armv7a.S
  newlib/libc/machine/arm/aeabi_memcpy.c
+ newlib/libc/machine/arm/machine/acle-compat.h
  newlib/libc/machine/arm/strcmp-armv6m.S
 Copyright: 2014 ARM Ltd
 License: BSD3-8
@@ -1573,12 +1596,8 @@ Files: newlib/libc/string/strlcat.c
 Copyright: 1998 Todd C. Miller <Todd.Miller@courtesan.com>
 License: BSD3-27
 
-Files: newlib/libc/stdlib/strtoimax.c
- newlib/libc/stdlib/strtoumax.c
- newlib/libc/stdlib/wcstoimax.c
- newlib/libc/stdlib/wcstoumax.c
-Copyright: 1992, 1993 The Regents of the University of California. 
- 2011 The FreeBSD Foundation
+Files: newlib/libc/stdlib/aligned_alloc.c
+Copyright: 2020 Arm Ltd.
 License: BSD3-28
 
 Files: newlib/libc/string/memmem.c
@@ -1607,7 +1626,7 @@ Files: newlib/libc/string/memmem.c
  newlib/libm/common/sincosf_data.c
  newlib/libm/common/sinf.c
 Copyright: 2018 Arm Ltd.
-License: BSD3-29
+License: BSD3-28
 
 Files: newlib/libm/common/math_config.h
  newlib/libm/common/math_errf_divzerof.c
@@ -1619,7 +1638,7 @@ Files: newlib/libm/common/math_config.h
  newlib/libm/common/math_errf_xflowf.c
  newlib/libm/common/sf_pow.c
 Copyright: 2017-2018 Arm Ltd.
-License: BSD3-29
+License: BSD3-28
 
 Files: newlib/libm/common/sf_exp.c
  newlib/libm/common/sf_exp2.c
@@ -1630,6 +1649,14 @@ Files: newlib/libm/common/sf_exp.c
  newlib/libm/common/sf_log_data.c
  newlib/libm/common/sf_pow_log2_data.c
 Copyright: 2017 Arm Ltd.
+License: BSD3-28
+
+Files: newlib/libc/stdlib/strtoimax.c
+ newlib/libc/stdlib/strtoumax.c
+ newlib/libc/stdlib/wcstoimax.c
+ newlib/libc/stdlib/wcstoumax.c
+Copyright: 1992, 1993 The Regents of the University of California. 
+ 2011 The FreeBSD Foundation
 License: BSD3-29
 
 Files: newlib/libc/time/strptime.c
@@ -4556,6 +4583,32 @@ License: BSD3-27
  ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 License: BSD3-28
+ SPDX-License-Identifier: BSD-3-Clause
+ .
+ Redistribution and use in source and binary forms, with or without
+ modification, are permitted provided that the following conditions
+ are met:
+ 1. Redistributions of source code must retain the above copyright
+ notice, this list of conditions and the following disclaimer.
+ 2. Redistributions in binary form must reproduce the above copyright
+ notice, this list of conditions and the following disclaimer in the
+ documentation and/or other materials provided with the distribution.
+ 3. The name of the company may not be used to endorse or promote
+ products derived from this software without specific prior written
+ permission.
+ .
+ THIS SOFTWARE IS PROVIDED BY ARM LTD ``AS IS'' AND ANY EXPRESS OR IMPLIED
+ WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+ MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+ IN NO EVENT SHALL ARM LTD BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED
+ TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+ PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+ LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+License: BSD3-29
  Portions of this software were developed by David Chisnall
  under sponsorship from the FreeBSD Foundation.
  .
@@ -4582,32 +4635,6 @@ License: BSD3-28
  LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
  OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  SUCH DAMAGE.
-
-License: BSD3-29
- SPDX-License-Identifier: BSD-3-Clause
- .
- Redistribution and use in source and binary forms, with or without
- modification, are permitted provided that the following conditions
- are met:
- 1. Redistributions of source code must retain the above copyright
- notice, this list of conditions and the following disclaimer.
- 2. Redistributions in binary form must reproduce the above copyright
- notice, this list of conditions and the following disclaimer in the
- documentation and/or other materials provided with the distribution.
- 3. The name of the company may not be used to endorse or promote
- products derived from this software without specific prior written
- permission.
- .
- THIS SOFTWARE IS PROVIDED BY ARM LTD ``AS IS'' AND ANY EXPRESS OR IMPLIED
- WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
- MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- IN NO EVENT SHALL ARM LTD BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
- SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED
- TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
- LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
- SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 License: BSD3-30
  Redistribution and use in source and binary forms, with or without

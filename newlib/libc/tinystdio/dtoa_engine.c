@@ -63,8 +63,8 @@ __dtoa_engine(double x, struct dtoa *dtoa, int max_digits, int max_decimals)
 	}
 	if (x == 0) {
 		flags |= DTOA_ZERO;
-		for (i = 0; i < max_digits; i++)
-			dtoa->digits[i] = '0';
+		dtoa->digits[0] = '0';
+		max_digits = 1;
 	} else if (isnan(x)) {
 		flags |= DTOA_NAN;
 	} else if (isinf(x)) {
