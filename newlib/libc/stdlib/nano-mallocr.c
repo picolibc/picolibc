@@ -667,6 +667,9 @@ void * nano_memalign(size_t align, size_t s)
     }
     return aligned_p;
 }
+#ifdef HAVE_ALIAS_ATTRIBUTE
+__strong_reference(memalign, aligned_alloc);
+#endif
 #endif /* DEFINE_MEMALIGN */
 
 #ifdef DEFINE_MALLOPT

@@ -3102,6 +3102,9 @@ Void_t* mEMALIGn(alignment, bytes) RDECL size_t alignment; size_t bytes;
 
 }
 
+#ifdef HAVE_ALIAS_ATTRIBUTE
+__strong_reference(memalign, aligned_alloc);
+#endif
 #endif /* DEFINE_MEMALIGN */
 
 #ifdef DEFINE_VALLOC
