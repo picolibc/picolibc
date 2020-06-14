@@ -34,6 +34,7 @@ These options control some general build configuration values.
 | ------                      | ------- | -----------                                                                          |
 | fast-strcmp                 | true    | Always optimize strcmp for performance (to make Dhrystone happy)                     |
 | have-alias-attribute        | auto    | Compiler supports __alias__ attribute (default autodetected)                         |
+| have-format-attribute       | auto    | Compiler supports __format__ attribute (default autodetected)                        |
 | multilib                    | true    | Build every multilib configuration supported by the compiler                         |
 | multilib-list               | <empty> | If non-empty, the set of multilib configurations to compile for                      |
 | native-tests                | false   | Build tests against native libc (used to validate tests)                             |

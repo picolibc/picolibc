@@ -565,9 +565,15 @@ extern int	fclose(FILE *__stream);
 
  */
 
-extern int	vfprintf(FILE *__stream, const char *__fmt, va_list __ap);
-extern int	__i_vfprintf(FILE *__stream, const char *__fmt, va_list __ap);
-extern int	__f_vfprintf(FILE *__stream, const char *__fmt, va_list __ap);
+#ifdef HAVE_FORMAT_ATTRIBUTE
+#define __FORMAT_ATTRIBUTE__(...) __attribute__((__format__ (__VA_ARGS__)))
+#else
+#define __FORMAT_ATTRIBUTE__(...)
+#endif
+
+extern int	vfprintf(FILE *__stream, const char *__fmt, va_list __ap) __FORMAT_ATTRIBUTE__(printf, 2, 0);
+extern int	__i_vfprintf(FILE *__stream, const char *__fmt, va_list __ap) __FORMAT_ATTRIBUTE__(printf, 2, 0);
+extern int	__f_vfprintf(FILE *__stream, const char *__fmt, va_list __ap) __FORMAT_ATTRIBUTE__(printf, 2, 0);
 
 /**
    The function \c fputc sends the character \c c (though given as type
@@ -602,9 +608,9 @@ extern int	putchar(int __c);
    The function \c printf performs formatted output to stream
    \c stdout.  See \c vfprintf() for details.
 */
-extern int	printf(const char *__fmt, ...);
-extern int	__i_printf(const char *__fmt, ...);
-extern int	__f_printf(const char *__fmt, ...);
+extern int	printf(const char *__fmt, ...) __FORMAT_ATTRIBUTE__(printf, 1, 2);
+extern int	__i_printf(const char *__fmt, ...) __FORMAT_ATTRIBUTE__(printf, 1, 2);
+extern int	__f_printf(const char *__fmt, ...) __FORMAT_ATTRIBUTE__(printf, 1, 0);
 
 /**
    The function \c vprintf performs formatted output to stream
@@ -612,17 +618,17 @@ extern int	__f_printf(const char *__fmt, ...);
 
    See vfprintf() for details.
 */
-extern int	vprintf(const char *__fmt, va_list __ap);
-extern int	__i_vprintf(const char *__fmt, va_list __ap);
-extern int	__f_vprintf(const char *__fmt, va_list __ap);
+extern int	vprintf(const char *__fmt, va_list __ap) __FORMAT_ATTRIBUTE__(printf, 1, 0);
+extern int	__i_vprintf(const char *__fmt, va_list __ap) __FORMAT_ATTRIBUTE__(printf, 1, 0);
+extern int	__f_vprintf(const char *__fmt, va_list __ap) __FORMAT_ATTRIBUTE__(printf, 1, 0);
 
 /**
    Variant of \c printf() that sends the formatted characters
    to string \c s.
 */
-extern int	sprintf(char *__s, const char *__fmt, ...);
-extern int	__i_sprintf(char *__s, const char *__fmt, ...);
-extern int	__f_sprintf(char *__s, const char *__fmt, ...);
+extern int	sprintf(char *__s, const char *__fmt, ...) __FORMAT_ATTRIBUTE__(printf, 2, 3);
+extern int	__i_sprintf(char *__s, const char *__fmt, ...) __FORMAT_ATTRIBUTE__(printf, 2, 3);
+extern int	__f_sprintf(char *__s, const char *__fmt, ...) __FORMAT_ATTRIBUTE__(printf, 2, 0);
 
 /**
    Like \c sprintf(), but instead of assuming \c s to be of infinite
@@ -632,17 +638,17 @@ extern int	__f_sprintf(char *__s, const char *__fmt, ...);
    Returns the number of characters that would have been written to
    \c s if there were enough space.
 */
-extern int	snprintf(char *__s, size_t __n, const char *__fmt, ...);
-extern int	__i_snprintf(char *__s, size_t __n, const char *__fmt, ...);
-extern int	__f_snprintf(char *__s, size_t __n, const char *__fmt, ...);
+extern int	snprintf(char *__s, size_t __n, const char *__fmt, ...) __FORMAT_ATTRIBUTE__(printf, 3, 4);
+extern int	__i_snprintf(char *__s, size_t __n, const char *__fmt, ...) __FORMAT_ATTRIBUTE__(printf, 3, 4);
+extern int	__f_snprintf(char *__s, size_t __n, const char *__fmt, ...) __FORMAT_ATTRIBUTE__(printf, 3, 0);
 
 /**
    Like \c sprintf() but takes a variable argument list for the
    arguments.
 */
-extern int	vsprintf(char *__s, const char *__fmt, va_list ap);
-extern int	__i_vsprintf(char *__s, const char *__fmt, va_list ap);
-extern int	__f_vsprintf(char *__s, const char *__fmt, va_list ap);
+extern int	vsprintf(char *__s, const char *__fmt, va_list ap) __FORMAT_ATTRIBUTE__(printf, 2, 0);
+extern int	__i_vsprintf(char *__s, const char *__fmt, va_list ap) __FORMAT_ATTRIBUTE__(printf, 2, 0);
+extern int	__f_vsprintf(char *__s, const char *__fmt, va_list ap) __FORMAT_ATTRIBUTE__(printf, 2, 0);
 
 /**
    Like \c vsprintf(), but instead of assuming \c s to be of infinite
@@ -652,17 +658,17 @@ extern int	__f_vsprintf(char *__s, const char *__fmt, va_list ap);
    Returns the number of characters that would have been written to
    \c s if there were enough space.
 */
-extern int	vsnprintf(char *__s, size_t __n, const char *__fmt, va_list ap);
-extern int	__i_vsnprintf(char *__s, size_t __n, const char *__fmt, va_list ap);
-extern int	__f_vsnprintf(char *__s, size_t __n, const char *__fmt, va_list ap);
+extern int	vsnprintf(char *__s, size_t __n, const char *__fmt, va_list ap) __FORMAT_ATTRIBUTE__(printf, 3, 0);
+extern int	__i_vsnprintf(char *__s, size_t __n, const char *__fmt, va_list ap) __FORMAT_ATTRIBUTE__(printf, 3, 0);
+extern int	__f_vsnprintf(char *__s, size_t __n, const char *__fmt, va_list ap) __FORMAT_ATTRIBUTE__(printf, 3, 0);
 
 /**
    The function \c fprintf performs formatted output to \c stream.
    See \c vfprintf() for details.
 */
-extern int	fprintf(FILE *__stream, const char *__fmt, ...);
-extern int	__i_fprintf(FILE *__stream, const char *__fmt, ...);
-extern int	__f_fprintf(FILE *__stream, const char *__fmt, ...);
+extern int	fprintf(FILE *__stream, const char *__fmt, ...) __FORMAT_ATTRIBUTE__(printf, 2, 3);
+extern int	__i_fprintf(FILE *__stream, const char *__fmt, ...) __FORMAT_ATTRIBUTE__(printf, 2, 3);
+extern int	__f_fprintf(FILE *__stream, const char *__fmt, ...) __FORMAT_ATTRIBUTE__(printf, 2, 0);
 
 /**
    Write the string pointed to by \c str to stream \c stream.
@@ -797,9 +803,9 @@ extern int	ferror(FILE *__stream);
 #define ferror(s) ((s)->flags & __SERR)
 #endif /* !defined(__DOXYGEN__) */
 
-extern int	vfscanf(FILE *__stream, const char *__fmt, va_list __ap);
-extern int	__i_vfscanf(FILE *__stream, const char *__fmt, va_list __ap);
-extern int	__f_vfscanf(FILE *__stream, const char *__fmt, va_list __ap);
+extern int	vfscanf(FILE *__stream, const char *__fmt, va_list __ap) __FORMAT_ATTRIBUTE__(scanf, 2, 0);
+extern int	__i_vfscanf(FILE *__stream, const char *__fmt, va_list __ap) __FORMAT_ATTRIBUTE__(scanf, 2, 0);
+extern int	__f_vfscanf(FILE *__stream, const char *__fmt, va_list __ap) __FORMAT_ATTRIBUTE__(scanf, 2, 0);
 
 /**
    The function \c fscanf performs formatted input, reading the
@@ -807,18 +813,18 @@ extern int	__f_vfscanf(FILE *__stream, const char *__fmt, va_list __ap);
 
    See vfscanf() for details.
  */
-extern int	fscanf(FILE *__stream, const char *__fmt, ...);
-extern int	__i_fscanf(FILE *__stream, const char *__fmt, ...);
-extern int	__f_fscanf(FILE *__stream, const char *__fmt, ...);
+extern int	fscanf(FILE *__stream, const char *__fmt, ...) __FORMAT_ATTRIBUTE__(scanf, 2, 3);
+extern int	__i_fscanf(FILE *__stream, const char *__fmt, ...) __FORMAT_ATTRIBUTE__(scanf, 2, 3);
+extern int	__f_fscanf(FILE *__stream, const char *__fmt, ...) __FORMAT_ATTRIBUTE__(scanf, 2, 3);
 
 /**
    The function \c scanf performs formatted input from stream \c stdin.
 
    See vfscanf() for details.
  */
-extern int	scanf(const char *__fmt, ...);
-extern int	__i_scanf(const char *__fmt, ...);
-extern int	__f_scanf(const char *__fmt, ...);
+extern int	scanf(const char *__fmt, ...) __FORMAT_ATTRIBUTE__(scanf, 1, 2);
+extern int	__i_scanf(const char *__fmt, ...) __FORMAT_ATTRIBUTE__(scanf, 1, 2);
+extern int	__f_scanf(const char *__fmt, ...) __FORMAT_ATTRIBUTE__(scanf, 1, 2);
 
 /**
    The function \c vscanf performs formatted input from stream
@@ -826,9 +832,9 @@ extern int	__f_scanf(const char *__fmt, ...);
 
    See vfscanf() for details.
 */
-extern int	vscanf(const char *__fmt, va_list __ap);
-extern int	__i_vscanf(const char *__fmt, va_list __ap);
-extern int	__f_vscanf(const char *__fmt, va_list __ap);
+extern int	vscanf(const char *__fmt, va_list __ap) __FORMAT_ATTRIBUTE__(scanf, 1, 0);
+extern int	__i_vscanf(const char *__fmt, va_list __ap) __FORMAT_ATTRIBUTE__(scanf, 1, 0);
+extern int	__f_vscanf(const char *__fmt, va_list __ap) __FORMAT_ATTRIBUTE__(scanf, 1, 0);
 
 /**
    The function \c sscanf performs formatted input, reading the
@@ -836,9 +842,9 @@ extern int	__f_vscanf(const char *__fmt, va_list __ap);
 
    See vfscanf() for details.
  */
-extern int	sscanf(const char *__buf, const char *__fmt, ...);
-extern int	__i_sscanf(const char *__buf, const char *__fmt, ...);
-extern int	__f_sscanf(const char *__buf, const char *__fmt, ...);
+extern int	sscanf(const char *__buf, const char *__fmt, ...) __FORMAT_ATTRIBUTE__(scanf, 2, 3);
+extern int	__i_sscanf(const char *__buf, const char *__fmt, ...) __FORMAT_ATTRIBUTE__(scanf, 2, 3);
+extern int	__f_sscanf(const char *__buf, const char *__fmt, ...) __FORMAT_ATTRIBUTE__(scanf, 2, 3);
 
 /**
    Flush \c stream.
