@@ -63,7 +63,11 @@ test_strtof (void)
   test_iok(tail - pd->string, pd->endscan);
 }
 
-#ifdef _HAVE_LONG_DOUBLE
+#if defined(_HAVE_LONG_DOUBLE) && (__LDBL_MANT_DIG__ == 64 || defined(TINY_STDIO))
+#define HAVE_STRTOLD
+#endif
+
+#ifdef HAVE_STRTOLD
 void
 test_strtold (void)
 {
@@ -477,7 +481,7 @@ test_cvt (void)
 #endif
 
   iterate(test_strtod, "strtod");
-#ifdef _HAVE_LONG_DOUBLE
+#ifdef HAVE_STRTOLD
   iterate(test_strtold, "strtold");
 #endif
 
