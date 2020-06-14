@@ -47,6 +47,7 @@ if src_semihost_machine.has_key(host_cpu_family)
     'isatty.c',
     'kill.c',
     'lseek.c',
+    'lseek64.c',
     'open.c',
     'read.c',
     'unlink.c',
