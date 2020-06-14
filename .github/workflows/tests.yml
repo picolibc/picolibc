@@ -5,6 +5,20 @@ on: [push, pull_request]
 jobs:
   test:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        meson_flags: [
+          "",
+          "-Dio-float-exact=false",
+          "-Dtinystdio=false -Dnewlib-io-float=true -Dio-long-long=true"
+        ]
+        test: [
+           "./.github/do-test do-native-configure build-native",
+           "./.github/do-test do-riscv-configure build-riscv",
+           "./.github/do-test do-arm-configure build-arm",
+           "./.github/do-build do-aarch64-configure build-aarch64"
+        ]
+
     steps:
       - name: 'Clone picolibc'
         uses: actions/checkout@v2
@@ -17,18 +31,6 @@ jobs:
             -f picolibc/.github/Dockerfile \
             picolibc
 
-      - name: 'Test on native'
+      - name: 'Test'
         run: |
-          docker run --rm picolibc ./.github/do-test do-native-configure build-native
-
-      - name: 'Test on risc-v'
-        run: |
-          docker run --rm picolibc ./.github/do-test do-riscv-configure build-riscv
-
-      - name: 'Test on arm'
-        run: |
-          docker run --rm picolibc ./.github/do-test do-arm-configure build-arm
-
-      - name: 'Build on aarch64'
-        run: |
-          docker run --rm picolibc ./.github/do-build do-aarch64-configure build-aarch64
+          docker run --rm picolibc ${{ matrix.test }} ${{ matrix.meson_flags }}
