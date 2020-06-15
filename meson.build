@@ -120,6 +120,9 @@ newlib_nano_formatted_io = get_option('newlib-nano-formatted-io')
 newlib_io_float = get_option('newlib-io-float')
 newlib_stdio64 = get_option('newlib-stdio64')
 newlib_wide_orient = get_option('newlib-wide-orient')
+newlib_iconv_encodings = get_option('newlib-iconv-encodings')
+newlib_iconv_from_encodings = get_option('newlib-iconv-from-encodings')
+newlib_iconv_to_encodings = get_option('newlib-iconv-to-encodings')
 
 # options which no longer have any effect
 newlib_reentrant_syscalls_provided = get_option('newlib-reentrant-syscalls-provided')
@@ -386,6 +389,48 @@ elif newlib_obsolete_math == 'false'
 endif
   
 conf_data.set('__OBSOLETE_MATH', obsolete_math_value, description: 'Use old math code (undef auto, 0 no, 1 yes)')
+
+# Compute iconv encodings to support in the library
+
+if newlib_iconv
+
+  # By default, use newlib_iconv_encodings for both directions,
+  # allowing overrides if specified
+
+  if newlib_iconv_from_encodings.length() == 0
+    newlib_iconv_from_encodings = newlib_iconv_encodings
+  endif
+  if newlib_iconv_to_encodings.length() == 0
+    newlib_iconv_to_encodings = newlib_iconv_encodings
+  endif
+
+  if newlib_iconv_to_encodings.length() == 0 or newlib_iconv_from_encodings.length() == 0
+    error('newlib-iconv-encodings required for newlib-iconv')
+  endif
+
+  # Dig out the list of available encodings from the encoding.aliases file. Only
+  # accept the first entry from each line
+  
+  available_encodings = run_command(['sed', '-e', '/^#/d', '-e', '/^$/d', '-e', 's/ .*$//', files('newlib/libc/iconv/encoding.aliases')[0]]).stdout().split('\n')
+
+  # Set config variables for each requested 'from' encoding
+
+  foreach from : newlib_iconv_from_encodings
+    if not available_encodings.contains(from)
+      error('Requested from encoding ' + from + ' is not available. Look in newlib/libc/iconv/encoding.aliases')
+    endif
+    conf_data.set('_ICONV_FROM_ENCODING_' + from.to_upper(), true)
+  endforeach
+
+  # Set config variables for each requested 'to' encoding
+
+  foreach to : newlib_iconv_to_encodings
+    if not available_encodings.contains(to)
+      error('Requested to encoding ' + to + ' is not available. Look in newlib/libc/iconv/encoding.aliases')
+    endif
+    conf_data.set('_ICONV_TO_ENCODING_' + to.to_upper(), true)
+  endforeach
+endif
 
 version_array = meson.project_version().split('.')
 

@@ -52,7 +52,10 @@ types and formats.
 | Option                      | Default | Description                                                                          |
 | ------                      | ------- | -----------                                                                          |
 | io-c99-formats              | true    | Enable C99 support in IO functions like printf/scanf                                 |
-| io-long-long                | false   | Enable long long type support in IO functions like printf/scanf                      |
+| io-long-long                | false   | Enable long long type support in IO functions like printf/scanf.
+					  These are always enabled for the tinystdio full printf/scanf modes,
+					  this option adds them to the limited (float and integer) versions, as well
+					  as to the original newlib stdio bits                                                 |
 
 ### Options when using tinystdio bits
 
@@ -104,11 +107,11 @@ locale and the ASCII character set for things like ctype and iconv.
 
 | Option                      | Default | Description                                                                          |
 | ------                      | ------- | -----------                                                                          |
-| newlib-iconv-encodings      | false   | Enable specific comma-separated list of bidirectional iconv encodings to be built-in |
-| newlib-iconv-from-encodings | false   | Enable specific comma-separated list of "from" iconv encodings to be built-in        |
-| newlib-iconv-to-encodings   | false   | Enable specific comma-separated list of "to" iconv encodings to be built-in          |
+| newlib-iconv                | false   | Enable iconv library support. Requires some from/to encodings to be specified        |
+| newlib-iconv-encodings      | <empty> | Comma-separated list of bidirectional iconv encodings to be built-in                 |
+| newlib-iconv-from-encodings | <empty> | Comma-separated list of "from" iconv encodings to be built-in                        |
+| newlib-iconv-to-encodings   | <empty> | Comma-separated list of "to" iconv encodings to be built-in                          |
 | newlib-iconv-external-ccs   | false   | Enable capabilities to load external CCS files for iconv                             |
-| newlib-iconv                | false   | Enable iconv library support                                                         |
 | newlib-locale-info          | false   | Enable locale support                                                                |
 | newlib-locale-info-extended | false   | Enable even more locale support                                                      |
 | newlib-mb                   | false   | Enable multibyte support                                                             |
