@@ -90,6 +90,8 @@ SECTIONS
 		*(.srodata.cst4)
 		*(.srodata.cst2)
 		*(.srodata .srodata.*)
+		*(.data.rel.ro .data.rel.ro.*)
+		*(.got .got.*)
 	} >flash AT>flash :text
 
 	. = ALIGN(8);
