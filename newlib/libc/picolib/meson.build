@@ -36,7 +36,8 @@ srcs_machine_tls = {
 			'riscv' : ['machine/riscv/tls.c'],
 			'riscv32' : ['machine/riscv/tls.c'],
 			'riscv64' : ['machine/riscv/tls.c'],
-			'arm' : ['machine/arm/tls.c', 'machine/arm/read_tp.S']
+			'arm' : ['machine/arm/tls.c', 'machine/arm/read_tp.S'],
+			'aarch64' : [ 'machine/aarch64/tls.c' ]
 		      }
 
 srcs_machine = {
