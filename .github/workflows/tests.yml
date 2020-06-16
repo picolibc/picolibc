@@ -18,7 +18,8 @@ jobs:
            "./.github/do-test do-native-configure build-native",
            "./.github/do-test do-riscv-configure build-riscv",
            "./.github/do-test do-arm-configure build-arm",
-           "./.github/do-build do-aarch64-configure build-aarch64"
+           "./.github/do-build do-aarch64-configure build-aarch64",
+           "./.github/do-build do-lx106-configure build-lx106"
         ]
 
     steps:

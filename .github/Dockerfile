@@ -13,6 +13,7 @@ RUN apt-get update && \
     gcc-arm-none-eabi \
     gcc-riscv64-unknown-elf \
     gcc-aarch64-linux-gnu \
+    gcc-xtensa-lx106 \
     qemu-system-arm=1:5.0-5.1 \
     qemu-system-misc=1:5.0-5.1
 
