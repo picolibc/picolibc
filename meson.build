@@ -287,7 +287,7 @@ if enable_multilib
   endif
 else
   targets = ['']
-  target_ = ['.', []]
+  target_ = ['.', meson.get_cross_property('c_args')]
 endif
 
 conf_data = configuration_data()
