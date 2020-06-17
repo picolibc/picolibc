@@ -217,5 +217,6 @@ SECTIONS
 	/* Throw away C++ exception handling information */
 	/DISCARD/ : {
 		*(.eh_frame .eh_frame.*)
+		*(.note .note.*)
 	}
 }
