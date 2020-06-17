@@ -47,13 +47,13 @@ CFLAGS_AARCH64=$(CFLAGS) -Thello-world-aarch64.ld
 all: hello-world-riscv.elf hello-world-arm.elf hello-world-aarch64.elf
 
 hello-world-riscv.elf: hello-world.c
-	$(CC_RISCV) $(CFLAGS_RISCV) -o $@ $^
+	$(CC_RISCV) $(CFLAGS_RISCV) -o $@ $^ -Wl,-Map=hello-world-riscv.map
 
 hello-world-arm.elf: hello-world.c
-	$(CC_ARM) $(CFLAGS_ARM) -o $@ $^
+	$(CC_ARM) $(CFLAGS_ARM) -o $@ $^ -Wl,-Map=hello-world-arm.map
 
 hello-world-aarch64.elf: hello-world.c
-	$(CC_AARCH64) $(CFLAGS_AARCH64) -o $@ $^
+	$(CC_AARCH64) $(CFLAGS_AARCH64) -o $@ $^ -Wl,-Map=hello-world-aarch64.map
 
 clean:
 	rm -f *.elf *.map
