@@ -225,6 +225,33 @@ specs_data.set(
   tls_model
 )
 
+specs_data.set(
+  'LINK_SPEC',
+  meson.get_cross_property('link_spec', '')
+)
+
+specs_data.set(
+  'CC1_SPEC',
+  meson.get_cross_property('cc1_spec', '')
+)
+
+specs_data.set(
+  'CC1PLUS_SPEC',
+  meson.get_cross_property('cc1plus_spec', '')
+)
+
+specs_extra_list = meson.get_cross_property('specs_extra', [])
+if specs_extra_list != []
+  specs_extra = '\n' + '\n'.join(specs_extra_list)
+else
+  specs_extra = ''
+endif
+
+specs_data.set(
+  'SPECS_EXTRA',
+  specs_extra
+)
+
 picolibc_specs = configure_file(input: 'picolibc.specs.in',
 				output: '@BASENAME@',
 				configuration: specs_data,
