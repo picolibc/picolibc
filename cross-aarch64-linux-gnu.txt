@@ -13,6 +13,8 @@ cpu = 'aarch64'
 endian = 'little'
 
 [properties]
-c_args = ['-mpc-relative-literal-loads', '-nostdlib', '-fno-builtin-sincos']
+c_args = ['-mpc-relative-literal-loads', '-nostdlib']
 needs_exe_wrapper = true
 skip_sanity_check = true
+link_spec = '--build-id=none -static -no-pie -Bstatic'
+specs_extra = ['*libgcc:', '-lgcc']
