@@ -323,6 +323,10 @@ if enable_multilib
       if target_extra != []
 	flags += target_extra
       endif
+      c_args_extra = meson.get_cross_property('c_args', [])
+      if c_args_extra != []
+	flags += c_args_extra
+      endif
 
       value = [tmp[0], flags]
       set_variable('target_' + name, value)
