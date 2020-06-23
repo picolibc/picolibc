@@ -35,6 +35,7 @@
 
 #define _XOPEN_SOURCE
 #define _XOPEN_SOURCE_EXTENDED
+#define PICOLIBC_FLOAT_PRINTF_SCANF
 #include <_ansi.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -44,6 +45,6 @@ gcvtf (float invalue,
        int ndigit,
        char *buf)
 {
-	__f_sprintf(buf, "%.*g", ndigit, __printf_float(invalue));
+	sprintf(buf, "%.*g", ndigit, printf_float(invalue));
 	return buf;
 }
