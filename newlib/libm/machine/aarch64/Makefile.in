@@ -84,7 +84,13 @@ am__objects_1 = lib_a-e_sqrt.$(OBJEXT) lib_a-ef_sqrt.$(OBJEXT) \
 	lib_a-sf_llrint.$(OBJEXT) lib_a-sf_llround.$(OBJEXT) \
 	lib_a-sf_lrint.$(OBJEXT) lib_a-sf_lround.$(OBJEXT) \
 	lib_a-sf_nearbyint.$(OBJEXT) lib_a-sf_rint.$(OBJEXT) \
-	lib_a-sf_round.$(OBJEXT) lib_a-sf_trunc.$(OBJEXT)
+	lib_a-sf_round.$(OBJEXT) lib_a-sf_trunc.$(OBJEXT) \
+	lib_a-fenv.$(OBJEXT) lib_a-feclearexcept.$(OBJEXT) \
+	lib_a-fegetenv.$(OBJEXT) lib_a-fegetexceptflag.$(OBJEXT) \
+	lib_a-fegetround.$(OBJEXT) lib_a-feholdexcept.$(OBJEXT) \
+	lib_a-feraiseexcept.$(OBJEXT) lib_a-fesetenv.$(OBJEXT) \
+	lib_a-fesetexceptflag.$(OBJEXT) lib_a-fesetround.$(OBJEXT) \
+	lib_a-fetestexcept.$(OBJEXT) lib_a-feupdateenv.$(OBJEXT)
 am_lib_a_OBJECTS = $(am__objects_1)
 lib_a_OBJECTS = $(am_lib_a_OBJECTS)
 DEFAULT_INCLUDES = -I.@am__isrc@
@@ -240,7 +246,19 @@ LIB_SOURCES = \
 	sf_nearbyint.c \
 	sf_rint.c \
 	sf_round.c \
-	sf_trunc.c
+	sf_trunc.c \
+	fenv.c \
+	feclearexcept.c \
+	fegetenv.c \
+	fegetexceptflag.c \
+	fegetround.c \
+	feholdexcept.c \
+	feraiseexcept.c \
+	fesetenv.c \
+	fesetexceptflag.c \
+	fesetround.c \
+	fetestexcept.c \
+	feupdateenv.c
 
 noinst_LIBRARIES = lib.a
 lib_a_SOURCES = $(LIB_SOURCES)
@@ -497,6 +515,78 @@ lib_a-sf_trunc.o: sf_trunc.c
 
 lib_a-sf_trunc.obj: sf_trunc.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-sf_trunc.obj `if test -f 'sf_trunc.c'; then $(CYGPATH_W) 'sf_trunc.c'; else $(CYGPATH_W) '$(srcdir)/sf_trunc.c'; fi`
+
+lib_a-fenv.o: fenv.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-fenv.o `test -f 'fenv.c' || echo '$(srcdir)/'`fenv.c
+
+lib_a-fenv.obj: fenv.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-fenv.obj `if test -f 'fenv.c'; then $(CYGPATH_W) 'fenv.c'; else $(CYGPATH_W) '$(srcdir)/fenv.c'; fi`
+
+lib_a-feclearexcept.o: feclearexcept.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-feclearexcept.o `test -f 'feclearexcept.c' || echo '$(srcdir)/'`feclearexcept.c
+
+lib_a-feclearexcept.obj: feclearexcept.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-feclearexcept.obj `if test -f 'feclearexcept.c'; then $(CYGPATH_W) 'feclearexcept.c'; else $(CYGPATH_W) '$(srcdir)/feclearexcept.c'; fi`
+
+lib_a-fegetenv.o: fegetenv.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-fegetenv.o `test -f 'fegetenv.c' || echo '$(srcdir)/'`fegetenv.c
+
+lib_a-fegetenv.obj: fegetenv.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-fegetenv.obj `if test -f 'fegetenv.c'; then $(CYGPATH_W) 'fegetenv.c'; else $(CYGPATH_W) '$(srcdir)/fegetenv.c'; fi`
+
+lib_a-fegetexceptflag.o: fegetexceptflag.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-fegetexceptflag.o `test -f 'fegetexceptflag.c' || echo '$(srcdir)/'`fegetexceptflag.c
+
+lib_a-fegetexceptflag.obj: fegetexceptflag.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-fegetexceptflag.obj `if test -f 'fegetexceptflag.c'; then $(CYGPATH_W) 'fegetexceptflag.c'; else $(CYGPATH_W) '$(srcdir)/fegetexceptflag.c'; fi`
+
+lib_a-fegetround.o: fegetround.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-fegetround.o `test -f 'fegetround.c' || echo '$(srcdir)/'`fegetround.c
+
+lib_a-fegetround.obj: fegetround.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-fegetround.obj `if test -f 'fegetround.c'; then $(CYGPATH_W) 'fegetround.c'; else $(CYGPATH_W) '$(srcdir)/fegetround.c'; fi`
+
+lib_a-feholdexcept.o: feholdexcept.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-feholdexcept.o `test -f 'feholdexcept.c' || echo '$(srcdir)/'`feholdexcept.c
+
+lib_a-feholdexcept.obj: feholdexcept.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-feholdexcept.obj `if test -f 'feholdexcept.c'; then $(CYGPATH_W) 'feholdexcept.c'; else $(CYGPATH_W) '$(srcdir)/feholdexcept.c'; fi`
+
+lib_a-feraiseexcept.o: feraiseexcept.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-feraiseexcept.o `test -f 'feraiseexcept.c' || echo '$(srcdir)/'`feraiseexcept.c
+
+lib_a-feraiseexcept.obj: feraiseexcept.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-feraiseexcept.obj `if test -f 'feraiseexcept.c'; then $(CYGPATH_W) 'feraiseexcept.c'; else $(CYGPATH_W) '$(srcdir)/feraiseexcept.c'; fi`
+
+lib_a-fesetenv.o: fesetenv.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-fesetenv.o `test -f 'fesetenv.c' || echo '$(srcdir)/'`fesetenv.c
+
+lib_a-fesetenv.obj: fesetenv.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-fesetenv.obj `if test -f 'fesetenv.c'; then $(CYGPATH_W) 'fesetenv.c'; else $(CYGPATH_W) '$(srcdir)/fesetenv.c'; fi`
+
+lib_a-fesetexceptflag.o: fesetexceptflag.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-fesetexceptflag.o `test -f 'fesetexceptflag.c' || echo '$(srcdir)/'`fesetexceptflag.c
+
+lib_a-fesetexceptflag.obj: fesetexceptflag.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-fesetexceptflag.obj `if test -f 'fesetexceptflag.c'; then $(CYGPATH_W) 'fesetexceptflag.c'; else $(CYGPATH_W) '$(srcdir)/fesetexceptflag.c'; fi`
+
+lib_a-fesetround.o: fesetround.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-fesetround.o `test -f 'fesetround.c' || echo '$(srcdir)/'`fesetround.c
+
+lib_a-fesetround.obj: fesetround.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-fesetround.obj `if test -f 'fesetround.c'; then $(CYGPATH_W) 'fesetround.c'; else $(CYGPATH_W) '$(srcdir)/fesetround.c'; fi`
+
+lib_a-fetestexcept.o: fetestexcept.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-fetestexcept.o `test -f 'fetestexcept.c' || echo '$(srcdir)/'`fetestexcept.c
+
+lib_a-fetestexcept.obj: fetestexcept.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-fetestexcept.obj `if test -f 'fetestexcept.c'; then $(CYGPATH_W) 'fetestexcept.c'; else $(CYGPATH_W) '$(srcdir)/fetestexcept.c'; fi`
+
+lib_a-feupdateenv.o: feupdateenv.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-feupdateenv.o `test -f 'feupdateenv.c' || echo '$(srcdir)/'`feupdateenv.c
+
+lib_a-feupdateenv.obj: feupdateenv.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-feupdateenv.obj `if test -f 'feupdateenv.c'; then $(CYGPATH_W) 'feupdateenv.c'; else $(CYGPATH_W) '$(srcdir)/feupdateenv.c'; fi`
 
 ID: $(HEADERS) $(SOURCES) $(LISP) $(TAGS_FILES)
 	list='$(SOURCES) $(HEADERS) $(LISP) $(TAGS_FILES)'; \
