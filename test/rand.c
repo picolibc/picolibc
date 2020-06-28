@@ -54,7 +54,7 @@ main(int argc, char **argv)
 	int ret = 0;
 	double s1 = 0;
 	double s2 = 0;
-#define N	1000000
+#define N	100000
 	for (i = 0; i < N; i++) {
 		double d = drand48();
 		s1 += d;
