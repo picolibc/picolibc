@@ -41,7 +41,7 @@ project('picolibc', 'c',
 	],
 	license : 'BSD',
 	meson_version : '>= 0.50',
-	version: '1.4.4'
+	version: '1.4.5'
        )
 
 targets = []
@@ -52,6 +52,7 @@ enable_picolib = get_option('picolib')
 enable_tests = get_option('tests')
 enable_native_tests = get_option('native-tests')
 have_alias_attribute_option = get_option('have-alias-attribute')
+have_format_attribute_option = get_option('have-format-attribute')
 newlib_register_fini = get_option('newlib-register-fini')
 newlib_mb = get_option('newlib-mb')
 newlib_iconv_encodings = get_option('newlib-iconv-encodings')
@@ -119,6 +120,9 @@ newlib_nano_formatted_io = get_option('newlib-nano-formatted-io')
 newlib_io_float = get_option('newlib-io-float')
 newlib_stdio64 = get_option('newlib-stdio64')
 newlib_wide_orient = get_option('newlib-wide-orient')
+newlib_iconv_encodings = get_option('newlib-iconv-encodings')
+newlib_iconv_from_encodings = get_option('newlib-iconv-from-encodings')
+newlib_iconv_to_encodings = get_option('newlib-iconv-to-encodings')
 
 # options which no longer have any effect
 newlib_reentrant_syscalls_provided = get_option('newlib-reentrant-syscalls-provided')
@@ -179,6 +183,12 @@ else
   have_alias_attribute = have_alias_attribute_option == 'true'
 endif
 
+if have_format_attribute_option == 'auto'
+  have_format_attribute = meson.get_compiler('c').has_function_attribute('format')
+else
+  have_format_attribute = have_format_attribute_option == 'true'
+endif
+
 if thread_local_storage_option == 'auto'
   thread_local_storage = not meson.get_compiler('c').has_function('__emutls_get_address', args: ['-nostdlib', '-lgcc'])
 else
@@ -190,7 +200,9 @@ if sysroot_install
   if sysroot == ''
     error('sysroot install requested, but compiler has no sysroot')
   endif
-  if sysroot != prefix
+  sysroot = run_command('realpath', sysroot).stdout().split('\n')[0]
+  prefix_path = run_command('realpath', prefix).stdout().split('\n')[0]
+  if sysroot != prefix_path
     error('sysroot install requires --prefix=' + sysroot)
   endif
 endif
@@ -211,6 +223,33 @@ specs_data.set(
 specs_data.set(
   'TLSMODEL',
   tls_model
+)
+
+specs_data.set(
+  'LINK_SPEC',
+  meson.get_cross_property('link_spec', '')
+)
+
+specs_data.set(
+  'CC1_SPEC',
+  meson.get_cross_property('cc1_spec', '')
+)
+
+specs_data.set(
+  'CC1PLUS_SPEC',
+  meson.get_cross_property('cc1plus_spec', '')
+)
+
+specs_extra_list = meson.get_cross_property('specs_extra', [])
+if specs_extra_list != []
+  specs_extra = '\n' + '\n'.join(specs_extra_list)
+else
+  specs_extra = ''
+endif
+
+specs_data.set(
+  'SPECS_EXTRA',
+  specs_extra
 )
 
 picolibc_specs = configure_file(input: 'picolibc.specs.in',
@@ -284,6 +323,10 @@ if enable_multilib
       if target_extra != []
 	flags += target_extra
       endif
+      c_args_extra = meson.get_cross_property('c_args', [])
+      if c_args_extra != []
+	flags += c_args_extra
+      endif
 
       value = [tmp[0], flags]
       set_variable('target_' + name, value)
@@ -301,7 +344,7 @@ if enable_multilib
   endif
 else
   targets = ['']
-  target_ = ['.', []]
+  target_ = ['.', meson.get_cross_property('c_args', [])]
 endif
 
 conf_data = configuration_data()
@@ -321,6 +364,7 @@ if have_long_double
 		description: 'long double is the same as double')
 endif
 conf_data.set('HAVE_ALIAS_ATTRIBUTE', have_alias_attribute)
+conf_data.set('HAVE_FORMAT_ATTRIBUTE', have_alias_attribute)
 conf_data.set('_WANT_REGISTER_FINI', newlib_register_fini)
 conf_data.set('_WANT_IO_LONG_LONG', io_long_long)
 conf_data.set('_WANT_IO_C99_FORMATS', io_c99_formats)
@@ -376,6 +420,48 @@ elif newlib_obsolete_math == 'false'
 endif
   
 conf_data.set('__OBSOLETE_MATH', obsolete_math_value, description: 'Use old math code (undef auto, 0 no, 1 yes)')
+
+# Compute iconv encodings to support in the library
+
+if newlib_iconv
+
+  # By default, use newlib_iconv_encodings for both directions,
+  # allowing overrides if specified
+
+  if newlib_iconv_from_encodings.length() == 0
+    newlib_iconv_from_encodings = newlib_iconv_encodings
+  endif
+  if newlib_iconv_to_encodings.length() == 0
+    newlib_iconv_to_encodings = newlib_iconv_encodings
+  endif
+
+  if newlib_iconv_to_encodings.length() == 0 or newlib_iconv_from_encodings.length() == 0
+    error('newlib-iconv-encodings required for newlib-iconv')
+  endif
+
+  # Dig out the list of available encodings from the encoding.aliases file. Only
+  # accept the first entry from each line
+  
+  available_encodings = run_command(['sed', '-e', '/^#/d', '-e', '/^$/d', '-e', 's/ .*$//', files('newlib/libc/iconv/encoding.aliases')[0]]).stdout().split('\n')
+
+  # Set config variables for each requested 'from' encoding
+
+  foreach from : newlib_iconv_from_encodings
+    if not available_encodings.contains(from)
+      error('Requested from encoding ' + from + ' is not available. Look in newlib/libc/iconv/encoding.aliases')
+    endif
+    conf_data.set('_ICONV_FROM_ENCODING_' + from.to_upper(), true)
+  endforeach
+
+  # Set config variables for each requested 'to' encoding
+
+  foreach to : newlib_iconv_to_encodings
+    if not available_encodings.contains(to)
+      error('Requested to encoding ' + to + ' is not available. Look in newlib/libc/iconv/encoding.aliases')
+    endif
+    conf_data.set('_ICONV_TO_ENCODING_' + to.to_upper(), true)
+  endforeach
+endif
 
 version_array = meson.project_version().split('.')
 

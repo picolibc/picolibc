@@ -36,7 +36,8 @@ src_semihost_machine = {
 			'riscv' : 'riscv/semihost-riscv.s',
 			'riscv32' : 'riscv/semihost-riscv.s',
 			'riscv64' : 'riscv/semihost-riscv.s',
-			'arm' : 'arm/semihost-arm.c'
+			'arm' : 'arm/semihost-arm.c',
+			'aarch64' : 'aarch64/semihost-aarch64.c'
 		      }
 
 if src_semihost_machine.has_key(host_cpu_family)
@@ -47,6 +48,7 @@ if src_semihost_machine.has_key(host_cpu_family)
     'isatty.c',
     'kill.c',
     'lseek.c',
+    'lseek64.c',
     'open.c',
     'read.c',
     'unlink.c',

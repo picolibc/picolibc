@@ -1,8 +1,10 @@
 #!/bin/sh
 CONFIGURE=$1
 DIR=$2
+shift
+shift
 
-mkdir $2
-cd $2
-../$CONFIGURE
+mkdir $DIR
+cd $DIR
+../$CONFIGURE "$@"
 ninja test

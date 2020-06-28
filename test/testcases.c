@@ -81,7 +81,9 @@
 //    result |= test(55, "Hot Pocket", "%1$s %2$s", "Hot", "Pocket");
 //    result |= test(56, "12.0 Hot Pockets", "%1$.1f %2$s %3$ss", 12.0, "Hot", "Pocket");
     /* 58: anti-test */
+#ifdef TINY_STDIO
     result |= test(59, "%(foo", "%(foo");
+#endif
     result |= test(60, " foo", "%*s", 4, "foo");
     result |= test(61, "      3.14", "%*.*f", 10, 2, 3.14159265);
     result |= test(63, "3.14      ", "%-*.*f", 10, 2, 3.14159265);
@@ -110,7 +112,9 @@
     result |= test(81, "    +100", "%+8lld", 100LL);
     result |= test(82, "+00000100", "%+.8lld", 100LL);
     result |= test(83, " +00000100", "%+10.8lld", 100LL);
+#ifdef TINY_STDIO
     result |= test(84, "%_1lld", "%_1lld", 100LL);
+#endif
     result |= test(85, "-00100", "%-1.5lld", -100LL);
     result |= test(86, "  100", "%5lld", 100LL);
     result |= test(87, " -100", "%5lld", -100LL);
@@ -160,7 +164,9 @@
     result |= test(143, "f", "%.*s", 1, "foo");
     result |= test(144, "foo  ", "%*s", -5, "foo");
     result |= test(145, "hello", "hello");
+#ifdef TINY_STDIO
     result |= test(147, "%b", "%b");
+#endif
     result |= test(148, "  a", "%3c", 'a');
     result |= test(149, "1234", "%3d", 1234);
     /* 150: excluded for C */
@@ -179,14 +185,20 @@
     result |= test(165, "12", "%o", 10);
     /* 166: excluded for C */
     /* 167: excluded for C */
+#ifdef TINY_STDIO
     result |= test(168, "(null)", "%s", NULL); 
+#endif
     result |= test(169, "%%%%", "%s", "%%%%");
     result |= test(170, "4294967295", "%u", -1);
+#ifdef TINY_STDIO
     result |= test(171, "%w", "%w", -1);
+#endif
     /* 172: excluded for C */
     /* 173: excluded for C */
     /* 174: excluded for C */
+#ifdef TINY_STDIO
     result |= test(176, "%H", "%H", -1);
+#endif
     result |= test(177, "%0", "%%0");
     result |= test(178, "2345", "%hx", 74565);
     result |= test(179, "61", "%hhx", 'a');

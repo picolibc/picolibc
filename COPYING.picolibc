@@ -409,14 +409,17 @@ Files: do-arm-configure
  do-lx106-configure
  do-native-configure
  do-riscv-configure
+ do-rv32imac-configure
  do-tiny-configure
  do-x86-configure
  dummyhost/iob.c
  dummyhost/meson.build
  hello-world/Makefile
  hello-world/hello-world.c
+ hello-world/run-aarch64
  hello-world/run-arm
  hello-world/run-riscv
+ hello-world/*.ld
  meson.build
  meson_options.txt
  newlib/libc/argz/meson.build
@@ -531,6 +534,7 @@ Files: do-arm-configure
  newlib/testsuite/newlib.wctype/meson.build
  newlib/testsuite/stdio-bits.c
  picocrt/crt0.h
+ picocrt/machine/aarch64/crt0.c
  picocrt/machine/arm/crt0.c
  picocrt/machine/riscv/crt0.c
  picocrt/meson.build
@@ -543,6 +547,8 @@ Files: do-arm-configure
  semihost/iob.c
  semihost/kill.c
  semihost/lseek.c
+ semihost/lseek64.c
+ semihost/machine/aarch64/semihost-aarch64.c
  semihost/machine/arm/semihost-arm.c
  semihost/machine/riscv/semihost-riscv.s
  semihost/meson.build
@@ -571,6 +577,7 @@ Copyright: 2019 Keith Packard
 License: BSD3-1
 
 Files: newlib/libc/errno/errno.c
+ newlib/libc/picolib/machine/aarch64/tls.c
  newlib/libc/picolib/machine/arm/read_tp.S
  newlib/libc/posix/meson.build
  newlib/libc/stdio/nano-svfprintf.c
@@ -593,6 +600,8 @@ Files: newlib/libc/errno/errno.c
  newlib/libc/tinystdio/gcvtfbuf.c
  newlib/libc/tinystdio/strtod_l.c
  newlib/libc/tinystdio/strtold_l.c
+ run-aarch64
+ run-rv32imac
  semihost/fstat.c
  semihost/isatty.c
  semihost/mapstdio.c
@@ -2004,41 +2013,17 @@ Files: newlib/libm/machine/spu/headers/nearbyintf4.h
 Copyright: 2006,2008, International Business Machines Corporation, Sony Computer Entertainment, Incorporated, Toshiba Corporation, 
 License: BSD3-35
 
-Files: newlib/libc/include/fenv.h
- newlib/libc/machine/riscv/ffs.c
- newlib/libc/machine/riscv/ieeefp.c
- newlib/libc/machine/riscv/memcpy.c
- newlib/libc/machine/riscv/memset.S
- newlib/libc/machine/riscv/setjmp.S
- newlib/libc/machine/riscv/strcmp.S
- newlib/libc/machine/riscv/strcpy.c
- newlib/libc/machine/riscv/strlen.c
- newlib/libc/machine/riscv/sys/asm.h
- newlib/libc/machine/riscv/sys/fenv.h
- newlib/libc/machine/riscv/sys/string.h
-Copyright: 2017  SiFive Inc.
-License: FreeBSD-1
-
-Files: newlib/libc/machine/riscv/memcpy-asm.S
- newlib/libc/machine/riscv/memmove-stub.c
- newlib/libc/machine/riscv/memmove.S
-Copyright: 2019  SiFive Inc.
-License: FreeBSD-1
-
-Files: test/printf-tests.c
- test/testcases.c
-Copyright: 2013 Bart Massey
-License: GPL2-1
-
 Files: .drone.yml
  .gitattributes
  .github/Dockerfile
  .github/workflows/tests.yml
  .gitignore
  README.md
+ cross-aarch64-linux-gnu.txt
  cross-arm-none-eabi.txt
  cross-i386-linux-gnu.txt
  cross-riscv64-unknown-elf.txt
+ cross-rv32imac.txt
  cross-xtensa-lx106-elf.txt
  cross.tmpl
  doc/build.md
@@ -2487,7 +2472,20 @@ Files: newlib/libm/fenv/fenv_stub.c
 Copyright: 2019 Joel Sherrill <joel@rtems.org
 License: Default-1
 
-Files: newlib/libm/machine/i386/feclearexcept.c
+Files: newlib/libm/machine/arm/fe_dfl_env.c
+ newlib/libm/machine/arm/feclearexcept.c
+ newlib/libm/machine/arm/fegetenv.c
+ newlib/libm/machine/arm/fegetexceptflag.c
+ newlib/libm/machine/arm/fegetround.c
+ newlib/libm/machine/arm/feholdexcept.c
+ newlib/libm/machine/arm/feraiseexcept.c
+ newlib/libm/machine/arm/fesetenv.c
+ newlib/libm/machine/arm/fesetexceptflag.c
+ newlib/libm/machine/arm/fesetround.c
+ newlib/libm/machine/arm/fetestexcept.c
+ newlib/libm/machine/arm/feupdateenv.c
+ newlib/libm/machine/i386/feclearexcept.c
+ newlib/libm/machine/i386/feclearexcept.c
  newlib/libm/machine/i386/fegetenv.c
  newlib/libm/machine/i386/fegetexceptflag.c
  newlib/libm/machine/i386/fegetround.c
@@ -2499,6 +2497,17 @@ Files: newlib/libm/machine/i386/feclearexcept.c
  newlib/libm/machine/i386/fesetround.c
  newlib/libm/machine/i386/fetestexcept.c
  newlib/libm/machine/i386/feupdateenv.c
+ newlib/libm/machine/powerpc/feclearexcept.c
+ newlib/libm/machine/powerpc/fegetenv.c
+ newlib/libm/machine/powerpc/fegetexceptflag.c
+ newlib/libm/machine/powerpc/fegetround.c
+ newlib/libm/machine/powerpc/feholdexcept.c
+ newlib/libm/machine/powerpc/feraiseexcept.c
+ newlib/libm/machine/powerpc/fesetenv.c
+ newlib/libm/machine/powerpc/fesetexceptflag.c
+ newlib/libm/machine/powerpc/fesetround.c
+ newlib/libm/machine/powerpc/fetestexcept.c
+ newlib/libm/machine/powerpc/feupdateenv.c
  newlib/libm/machine/x86_64/feclearexcept.c
  newlib/libm/machine/x86_64/fegetenv.c
  newlib/libm/machine/x86_64/fegetexceptflag.c
@@ -2516,6 +2525,32 @@ License: Default-1
 Files: newlib/libm/machine/x86_64/fenv.c
 Copyright: 2010-2019 Red Hat, Inc.
 License: Default-1
+
+Files: newlib/libc/include/fenv.h
+ newlib/libc/machine/riscv/ffs.c
+ newlib/libc/machine/riscv/ieeefp.c
+ newlib/libc/machine/riscv/memcpy.c
+ newlib/libc/machine/riscv/memset.S
+ newlib/libc/machine/riscv/setjmp.S
+ newlib/libc/machine/riscv/strcmp.S
+ newlib/libc/machine/riscv/strcpy.c
+ newlib/libc/machine/riscv/strlen.c
+ newlib/libc/machine/riscv/sys/asm.h
+ newlib/libc/machine/riscv/sys/fenv.h
+ newlib/libc/machine/riscv/sys/string.h
+Copyright: 2017  SiFive Inc.
+License: FreeBSD-1
+
+Files: newlib/libc/machine/riscv/memcpy-asm.S
+ newlib/libc/machine/riscv/memmove-stub.c
+ newlib/libc/machine/riscv/memmove.S
+Copyright: 2019  SiFive Inc.
+License: FreeBSD-1
+
+Files: test/printf-tests.c
+ test/testcases.c
+Copyright: 2013 Bart Massey
+License: GPL2-1
 
 Files: newlib/libc/argz/argz_add.c
  newlib/libc/argz/argz_add_sep.c

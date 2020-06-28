@@ -1,7 +1,8 @@
+#!/bin/sh
 #
 # SPDX-License-Identifier: BSD-3-Clause
 #
-# Copyright © 2019 Keith Packard
+# Copyright © 2020 Keith Packard
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions
@@ -32,46 +33,52 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
-src_picocrt_machine = {
-			'riscv' : 'riscv/crt0.c',
-			'riscv32' : 'riscv/crt0.c',
-			'riscv64' : 'riscv/crt0.c',
-			'arm' : 'arm/crt0.c',
-			'aarch64' : 'aarch64/crt0.c'
-		      }
 
-if src_picocrt_machine.has_key(host_cpu_family)
-  srcs_picocrt = join_paths('machine', src_picocrt_machine[host_cpu_family])
-else
-  srcs_picocrt = 'shared/crt0.c'
-endif
+# Run qemu for rv32imac processor
 
-foreach target : targets
-  value = get_variable('target_' + target)
+qemu=qemu-system-riscv32
+options="i m a c"
+cpu=rv32
 
-  instdir = join_paths(get_option('libdir'), value[0])
+# select the program
+elf="$1"
+shift
 
-  if target == ''
-    crt_name = 'crt0.o'
-    libcrt_name = 'crt'
-  else
-    crt_name = join_paths(target, 'crt0.o')
-    libcrt_name = join_paths(target, 'libcrt')
-  endif
+cpu="$cpu,mmu=false,pmp=false"
 
-  executable(crt_name,
-	     srcs_picocrt,
-	     include_directories : inc,
-	     install : true,
-	     install_dir : instdir,
-	     c_args : value[1] + ['-fno-builtin', '-ffreestanding'],
-	     link_args : value[1] + ['-r', '-ffreestanding', '-nostdlib'])
+if [ -z "$options" ]; then
+    options=`echo $elf | sed 's/.*rv[36][24]\([a-z]*\)_.*$/\1/' | sed 's/\(.\)/\1 /g'`
+fi
 
-  # Tests link against this because using the .o isn't supported under meson
-  set_variable('lib_crt' + target,
-	       static_library(libcrt_name,
-			      srcs_picocrt,
-			      install : false,
-			      include_directories : inc,
-			      c_args : value[1]))
-endforeach
+all_options="i e g m a f d c s u"
+
+for o in $all_options; do
+    if `echo $options | grep -q $o`; then
+	value=true
+    else
+	value=false
+    fi
+    cpu=$cpu",$o=$value"
+done
+
+# Set the target machine
+machine=virt,accel=tcg
+
+# Map stdio to a multiplexed character device so we can use it
+# for the monitor and semihosting output
+
+chardev=stdio,mux=on,id=stdio0
+
+# Point the semihosting driver at our new chardev
+
+semi=enable=on,chardev=stdio0,arg="test-file"
+
+# Point the monitor at the new chardev too
+
+mon=none
+
+# Disable the serial port
+
+serial=none
+
+$qemu -chardev $chardev -semihosting-config $semi -monitor $mon -serial $serial -machine $machine -cpu $cpu -kernel $elf -nographic "$@" -bios none < /dev/null

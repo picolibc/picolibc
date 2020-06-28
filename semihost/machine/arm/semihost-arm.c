@@ -43,7 +43,11 @@ sys_semihost(uintptr_t op, uintptr_t param)
 #if __ARM_ARCH_PROFILE == 'M'
 	asm("bkpt #0xab" : "=r" (r0) : "r" (r0), "r" (r1) : "memory");
 #else
+#ifdef __thumb__
 	asm("svc #0xab" : "=r" (r0) : "r" (r0), "r" (r1) : "memory");
+#else
+	asm("svc #0x123456" : "=r" (r0) : "r" (r0), "r" (r1) : "memory");
+#endif
 #endif
 	return r0;
 }

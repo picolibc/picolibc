@@ -560,11 +560,11 @@ struct mallinfo nano_mallinfo(void)
 void nano_malloc_stats(void)
 {
     nano_mallinfo();
-    __i_fprintf(stderr, "max system bytes = %10u\n",
+    __i_fprintf(stderr, "max system bytes = %10zu\n",
              current_mallinfo.arena);
-    __i_fprintf(stderr, "system bytes     = %10u\n",
+    __i_fprintf(stderr, "system bytes     = %10zu\n",
              current_mallinfo.arena);
-    __i_fprintf(stderr, "in use bytes     = %10u\n",
+    __i_fprintf(stderr, "in use bytes     = %10zu\n",
              current_mallinfo.uordblks);
 #ifdef MALLOC_DEBUG
     chunk *busy;
@@ -573,7 +573,7 @@ void nano_malloc_stats(void)
     for (busy = busy_list; busy; busy = busy->busy) {
 	int i;
 	total_busy += busy->size;
-	__i_fprintf(stderr, " 0x%08x %10lu:", (unsigned) (uintptr_t) busy, busy->size);
+	__i_fprintf(stderr, " 0x%08x %10zu:", (unsigned) (uintptr_t) busy, busy->size);
 	for (i = 0; i < busy->malloc_backtrace_len; i++)
 	    __i_fprintf(stderr, " 0x%08x", (unsigned) (uintptr_t) busy->malloc_backtrace[i]);
 	__i_fprintf(stderr, "\n");

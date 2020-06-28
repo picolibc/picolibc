@@ -6,6 +6,14 @@
 
 #include <errno.h>
 
+#ifdef HAVE_ALIAS_ATTRIBUTE
+extern float _sinf(float);
+extern float _cosf(float);
+#else
+#define _sinf sinf
+#define _cosf cosf
+#endif
+
 #ifdef __STDC__
 	void sincosf(float x, float *sinx, float *cosx)
 #else
@@ -15,8 +23,8 @@
         float *cosx;
 #endif
 {
-  *sinx = sinf (x);
-  *cosx = cosf (x);
+  *sinx = _sinf (x);
+  *cosx = _cosf (x);
 }
 
 #ifdef _DOUBLE_IS_32BITS
@@ -30,8 +38,8 @@
         double cosx;
 #endif
 {
-  *sinx = sinf((float) x);
-  *cosx = cosf((float) x);
+  *sinx = _sinf((float) x);
+  *cosx = _cosf((float) x);
 }
 #endif /* defined(_DOUBLE_IS_32BITS) */
 #endif /* __OBSOLETE_MATH */

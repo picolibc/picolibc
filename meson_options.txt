@@ -38,6 +38,9 @@ option('fast-strcmp', type: 'boolean', value: true,
 option('have-alias-attribute', type: 'combo', choices: ['true', 'false', 'auto'], value: 'auto',
        description: 'Compiler supports __alias__ attribute')
 
+option('have-format-attribute', type: 'combo', choices: ['true', 'false', 'auto'], value: 'auto',
+       description: 'Compiler supports __format__ attribute')
+
 option('multilib', type: 'boolean', value: true,
        description: 'Enable multilib compile')
 
@@ -58,6 +61,7 @@ option('sysroot-install', type: 'boolean', value: false,
 
 option('tests', type: 'boolean', value: false,
        description: 'Enable tests')
+
 
 option('newlib-tinystdio', type: 'combo', choices: ['true', 'false', 'auto'], value: 'auto',
        description: 'Use tiny stdio from avr libc')
@@ -120,13 +124,13 @@ option('newlib-wide-orient', type: 'boolean', value: false,
 
 option('newlib-iconv', type: 'boolean', value: false,
        description: 'enable iconv library support')
-option('newlib-iconv-encodings', type: 'boolean', value: false,
+option('newlib-iconv-encodings', type: 'array',
        description: 'enable specific comma-separated list of bidirectional iconv encodings to be built-in')
-option('newlib-iconv-from-encodings', type: 'boolean', value: false,
+option('newlib-iconv-from-encodings', type: 'array',
        description: 'enable specific comma-separated list of "from" iconv encodings to be built-in')
-option('newlib-iconv-to-encodings', type: 'boolean', value: false,
+option('newlib-iconv-to-encodings', type: 'array',
        description: 'enable specific comma-separated list of "to" iconv encodings to be built-in')
-option('newlib-iconv-external-ccs', type: 'boolean', value: false,
+option('newlib-iconv-external-ccs', type: 'boolean',
        description: 'enable capabilities to load external CCS files for iconv')
 option('newlib-locale-info', type: 'boolean', value: false,
        description: 'locale support')

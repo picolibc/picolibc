@@ -115,9 +115,9 @@ def clean_copyright(string):
 
 def get_license_type(copyright):
         if re.match(r'^no support for.*', copyright):
-                return "Unknown"
+                return "Default"
         if copyright == 'none':
-                return "None"
+                return "Default"
         if re.search(r'NetBSD', copyright):
                 return "NetBSD"
         if (re.search(r'Redistributions *(of)? *source +code', copyright) and

@@ -48,6 +48,10 @@
 	}
 }
 
+#if defined(HAVE_ALIAS_ATTRIBUTE)
+float _sinf(float) __attribute__ ((__alias__ ("sinf")))  __attribute__((const)) __attribute__((leaf)) __attribute__((nothrow));
+#endif
+
 #ifdef _DOUBLE_IS_32BITS
 
 #ifdef __STDC__

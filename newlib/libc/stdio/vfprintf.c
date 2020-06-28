@@ -1429,17 +1429,14 @@ reswitch:	switch (ch) {
 string:
 #endif
 			sign = '\0';
-#ifndef __OPTIMIZE_SIZE__
 			/* Behavior is undefined if the user passed a
 			   NULL string when precision is not 0.
-			   However, if we are not optimizing for size,
-			   we might as well mirror glibc behavior.  */
+			   However, we might as well mirror glibc behavior.  */
 			if (cp == NULL) {
 				cp = "(null)";
 				size = ((unsigned) prec > 6U) ? 6 : prec;
 			}
 			else
-#endif /* __OPTIMIZE_SIZE__ */
 #ifdef _MB_CAPABLE
 			if (ch == 'S' || (flags & LONGINT)) {
 				mbstate_t ps;

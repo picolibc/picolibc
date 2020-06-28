@@ -32,44 +32,16 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-#include <stdio.h>
-#include <stdlib.h>
-#include <math.h>
-#include <stdbool.h>
 
-bool
-near(double got, double target, double close)
+#include "semihost-private.h"
+
+uintptr_t
+sys_semihost(uintptr_t op, uintptr_t param)
 {
-	if (got < target - close)
-		return false;
-	if (got > target + close)
-		return false;
-	return true;
+	register uintptr_t w0 asm("w0") = op;
+	register uintptr_t x1 asm("x1") = param;
+	register uintptr_t x0 asm("x0");
+	asm("hlt #0xf000" : "=r" (x0) : "r" (w0), "r" (x1) : "memory");
+	return x0;
 }
 
-int
-main(int argc, char **argv)
-{
-	int i;
-	int ret = 0;
-	double s1 = 0;
-	double s2 = 0;
-#define N	100000
-	for (i = 0; i < N; i++) {
-		double d = drand48();
-		s1 += d;
-		s2 += d*d;
-	}
-	double mean = s1 / N;
-	double stddev = sqrt((N * s2 - s1*s1) / ((double) N * ((double) N - 1)));
-	if (!near(mean, .5, .1)) {
-		printf("bad mean %g\n", mean);
-		ret = 1;
-	}
-	if (!near(stddev, .28, .1)) {
-		printf("bad stddev %g\n", stddev);
-		ret = 2;
-	}
-	fflush(stdout);
-	return ret;
-}

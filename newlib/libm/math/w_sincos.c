@@ -4,8 +4,17 @@
 
 #include "fdlibm.h"
 #include <errno.h>
+#include <math.h>
 
 #ifndef _DOUBLE_IS_32BITS
+
+#ifdef HAVE_ALIAS_ATTRIBUTE
+extern double _sin(double);
+extern double _cos(double);
+#else
+#define _sin sin
+#define _cos cos
+#endif
 
 #ifdef __STDC__
 	void sincos(double x, double *sinx, double *cosx)
@@ -16,8 +25,8 @@
         double *cosx;
 #endif
 {
-  *sinx = sin (x);
-  *cosx = cos (x);
+  *sinx = _sin (x);
+  *cosx = _cos (x);
 }
 
 #endif /* defined(_DOUBLE_IS_32BITS) */

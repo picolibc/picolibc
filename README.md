@@ -31,7 +31,7 @@ other licenses.
 Picolibc inherited code for a *lot* of architectures from Newlib, but
 at this point only has code to build for the following targets:
 
- * ARM (32-bit only)
+ * ARM (32- and 64- bit)
  * i386 (Linux hosted, for testing)
  * RISC-V (both 32- and 64- bit)
  * x86_64 (Linux hosted, for testing)
@@ -90,6 +90,14 @@ areas unrelated to the code used by picolibc, so keeping things in
 sync has not been difficult so far.
 
 ## Releases
+
+### Picolibc version 1.4.5
+
+ 1. Fix section order in picolibc.ld to give applications correct
+    control over the layout of .preserve, .init and .fini regions.
+
+ 2. Add startup and TLS support for aarch64 and non Cortex-M 32-bit
+    arm.
 
 ### Picolibc version 1.4.4
 

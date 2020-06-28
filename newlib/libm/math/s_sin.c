@@ -117,4 +117,8 @@ QUICKREF
 	}
 }
 
+#if defined(HAVE_ALIAS_ATTRIBUTE)
+double _sin(double) __attribute__ ((__alias__ ("sin")))  __attribute__((const)) __attribute__((leaf)) __attribute__((nothrow));
+#endif
+
 #endif /* _DOUBLE_IS_32BITS */

@@ -1,7 +1,7 @@
 /*
  * SPDX-License-Identifier: BSD-3-Clause
  *
- * Copyright © 2019 Keith Packard
+ * Copyright © 2020 Keith Packard
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -32,44 +32,21 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-#include <stdio.h>
-#include <stdlib.h>
-#include <math.h>
-#include <stdbool.h>
 
-bool
-near(double got, double target, double close)
-{
-	if (got < target - close)
-		return false;
-	if (got > target + close)
-		return false;
-	return true;
-}
+#include <picotls.h>
+#include <string.h>
+#include <stdint.h>
 
-int
-main(int argc, char **argv)
+/* This code is duplicated in picocrt/machine/aarch/crt0.c */
+/* The size of the thread control block.
+ * TLS relocations are generated relative to
+ * a location this far *before* the first thread
+ * variable (!)
+ */
+#define TCB_SIZE	16
+
+void
+_set_tls(void *tls)
 {
-	int i;
-	int ret = 0;
-	double s1 = 0;
-	double s2 = 0;
-#define N	100000
-	for (i = 0; i < N; i++) {
-		double d = drand48();
-		s1 += d;
-		s2 += d*d;
-	}
-	double mean = s1 / N;
-	double stddev = sqrt((N * s2 - s1*s1) / ((double) N * ((double) N - 1)));
-	if (!near(mean, .5, .1)) {
-		printf("bad mean %g\n", mean);
-		ret = 1;
-	}
-	if (!near(stddev, .28, .1)) {
-		printf("bad stddev %g\n", stddev);
-		ret = 2;
-	}
-	fflush(stdout);
-	return ret;
+	__asm__ volatile("msr tpidr_el0, %0" : : "r" (tls - TCB_SIZE));
 }

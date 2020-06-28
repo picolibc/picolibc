@@ -72,7 +72,7 @@ SECTIONS
 	} >flash AT>flash :text
 
 	.fini : {
-		KEEP (*(SORT_NONE(.fini)))
+		KEEP (*(.fini))
 		__text_end = .;
 	} >flash AT>flash :text
 
@@ -90,6 +90,8 @@ SECTIONS
 		*(.srodata.cst4)
 		*(.srodata.cst2)
 		*(.srodata .srodata.*)
+		*(.data.rel.ro .data.rel.ro.*)
+		*(.got .got.*)
 	} >flash AT>flash :text
 
 	. = ALIGN(8);
@@ -118,7 +120,7 @@ SECTIONS
 		KEEP (*crtbegin.o(.ctors))
 		KEEP (*crtbegin?.o(.ctors))
 		KEEP (*(EXCLUDE_FILE (*crtend.o *crtend?.o ) .ctors))
-		KEEP (*(SORT(.ctors.*)))
+		KEEP (*(SORT_BY_INIT_PRIORITY(.ctors.*)))
 		KEEP (*(.ctors))
 	} >flash AT>flash :text
 
@@ -126,7 +128,7 @@ SECTIONS
 		KEEP (*crtbegin.o(.dtors))
 		KEEP (*crtbegin?.o(.dtors))
 		KEEP (*(EXCLUDE_FILE (*crtend.o *crtend?.o ) .dtors))
-		KEEP (*(SORT(.dtors.*)))
+		KEEP (*(SORT_BY_INIT_PRIORITY(.dtors.*)))
 		KEEP (*(.dtors))
 	} >flash AT>flash :text
 
@@ -135,7 +137,8 @@ SECTIONS
 	 */
 	.preserve (NOLOAD) : {
 		PROVIDE(__preserve_start__ = .);
-		*(.preserve .preserve.*)
+		KEEP(*(SORT_BY_NAME(.preserve.*)))
+		KEEP(*(.preserve))
 		PROVIDE(__preserve_end__ = .);
 	} >ram AT>ram :ram
 
@@ -215,5 +218,6 @@ SECTIONS
 	/* Throw away C++ exception handling information */
 	/DISCARD/ : {
 		*(.eh_frame .eh_frame.*)
+		*(.note .note.*)
 	}
 }

@@ -5,6 +5,24 @@ on: [push, pull_request]
 jobs:
   test:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        meson_flags: [
+          "",
+          "-Dio-float-exact=false",
+          "-Dtinystdio=false -Dnewlib-io-float=true -Dio-long-long=true",
+          "-Dnewlib-iconv-external-ccs=true -Dnewlib-iconv=true -Dnewlib-iconv-encodings=big5,cp775,cp850,cp852,cp855,cp866,euc_jp,euc_kr,euc_tw,iso_8859_1,iso_8859_10,iso_8859_11,iso_8859_13,iso_8859_14,iso_8859_15,iso_8859_2,iso_8859_3,iso_8859_4,iso_8859_5,iso_8859_6,iso_8859_7,iso_8859_8,iso_8859_9,iso_ir_111,koi8_r,koi8_ru,koi8_u,koi8_uni,ucs_2,ucs_2_internal,ucs_2be,ucs_2le,ucs_4,ucs_4_internal,ucs_4be,ucs_4le,us_ascii,utf_16,utf_16be,utf_16le,utf_8,win_1250,win_1251,win_1252,win_1253,win_1254,win_1255,win_1256,win_1257,win_1258 -Dnewlib-locale-info=true -Dnewlib-locale-info-extended=true -Dnewlib-mb=true", 
+          "-Dtinystdio=false -Dnewlib-io-float=true -Dio-long-long=true -Dnewlib-iconv-encodings=big5,cp775,cp850,cp852,cp855,cp866,euc_jp,euc_kr,euc_tw,iso_8859_1,iso_8859_10,iso_8859_11,iso_8859_13,iso_8859_14,iso_8859_15,iso_8859_2,iso_8859_3,iso_8859_4,iso_8859_5,iso_8859_6,iso_8859_7,iso_8859_8,iso_8859_9,iso_ir_111,koi8_r,koi8_ru,koi8_u,koi8_uni,ucs_2,ucs_2_internal,ucs_2be,ucs_2le,ucs_4,ucs_4_internal,ucs_4be,ucs_4le,us_ascii,utf_16,utf_16be,utf_16le,utf_8,win_1250,win_1251,win_1252,win_1253,win_1254,win_1255,win_1256,win_1257,win_1258 -Dnewlib-iconv-external-ccs=true -Dnewlib-iconv=true -Dnewlib-locale-info=true -Dnewlib-locale-info-extended=true -Dnewlib-mb=true"
+        ]
+        test: [
+           "./.github/do-test do-native-configure build-native",
+           "./.github/do-test do-riscv-configure build-riscv",
+           "./.github/do-test do-arm-configure build-arm",
+           "./.github/do-test do-aarch64-configure build-aarch64",
+           "./.github/do-build do-lx106-configure build-lx106",
+           "./.github/do-test do-rv32imac-configure build-rv32imac"
+        ]
+
     steps:
       - name: 'Clone picolibc'
         uses: actions/checkout@v2
@@ -17,18 +35,6 @@ jobs:
             -f picolibc/.github/Dockerfile \
             picolibc
 
-      - name: 'Test on native'
+      - name: 'Test'
         run: |
-          docker run --rm picolibc ./.github/do-test do-native-configure build-native
-
-      - name: 'Test on risc-v'
-        run: |
-          docker run --rm picolibc ./.github/do-test do-riscv-configure build-riscv
-
-      - name: 'Test on arm'
-        run: |
-          docker run --rm picolibc ./.github/do-test do-arm-configure build-arm
-
-      - name: 'Build on aarch64'
-        run: |
-          docker run --rm picolibc ./.github/do-build do-aarch64-configure build-aarch64
+          docker run --rm picolibc ${{ matrix.test }} ${{ matrix.meson_flags }}

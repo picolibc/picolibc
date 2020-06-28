@@ -35,7 +35,16 @@
 
 #include "../../crt0.h"
 
+#if __ARM_ARCH_PROFILE == 'M'
+
+/*
+ * Cortex-mM includes an NVIC and starts with SP initialized, so start
+ * is a C function
+ */
+
 extern const void *__interrupt_vector[];
+
+#define CPACR	((volatile uint32_t *) (0xE000ED88))
 
 void
 _start(void)
@@ -44,13 +53,58 @@ _start(void)
 	__asm__(".equ __my_interrupt_vector, __interrupt_vector");
 #ifndef __SOFTFP__
 #define FPSCR_FZ		(1 << 24)
+	/* Enable FPU */
+	*CPACR |= 0xf << 20;
+	while ((*CPACR & (0xf << 20)) != (0xf << 20))
+		;
 
-	unsigned int fpscr_save;
-
-	/* Set the FZ (flush-to-zero) bit in FPSCR.  */
-	__asm__("vmrs %0, fpscr" : "=r" (fpscr_save));
-	fpscr_save |= FPSCR_FZ;
-	__asm__("vmsr fpscr, %0" : : "r" (fpscr_save));
+	__asm__("vmsr fpscr, %0" : : "r" (0));
 #endif
 	__start();
 }
+
+#else
+
+/*
+ * Regular ARM has an 8-entry exception vector and starts without SP
+ * initialized, so start is a naked function
+ */
+
+static void __attribute__((used)) __section(".init")
+_cstart(void)
+{
+	__start();
+}
+
+extern char __stack[];
+
+void __attribute__((naked)) __section(".init") __attribute__((used))
+_start(void)
+{
+	/* Generate a reference to __vector_table so we get one loaded */
+	__asm__(".equ __my_vector_table, __vector_table");
+
+	/* Initialize stack pointer */
+	__asm__("mov sp, %0" : : "r" (__stack));
+
+#if __ARM_ARCH == 7
+#ifdef __thumb__
+	/* Make exceptions run in Thumb mode */
+	uint32_t sctlr;
+	__asm__("mrc p15, 0, %0, c1, c0, 0" : "=r" (sctlr));
+	sctlr |= (1 << 30);
+	__asm__("mcr p15, 0, %0, c1, c0, 0" : : "r" (sctlr));
+#endif
+#ifndef __SOFTFP__
+	/* Set CPACR for access to CP10 and 11 */
+	__asm__("mcr p15, 0, %0, c1, c0, 2" : : "r" (0xf << 20));
+	/* Enable FPU */
+	__asm__("vmsr fpexc, %0" : : "r" (0x40000000));
+#endif
+#endif
+
+	/* Branch to C code */
+	__asm__("b _cstart");
+}
+
+#endif
