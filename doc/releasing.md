@@ -17,7 +17,7 @@ picolibc:
     * native
     * 32-bit x86 (requires x86 host)
     * RISC-V, all targets (qemu)
-    * ARM, thumb v7m only (qemu)
+    * ARM, almost all targets (qemu)
 
  3. Verify that COPYING.picolibc includes information
     about the current source files
