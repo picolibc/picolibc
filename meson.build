@@ -41,7 +41,7 @@ project('picolibc', 'c',
 	],
 	license : 'BSD',
 	meson_version : '>= 0.50',
-	version: '1.4.4'
+	version: '1.4.5'
        )
 
 targets = []
