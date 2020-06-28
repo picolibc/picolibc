@@ -37,6 +37,8 @@
 
 extern const void *__interrupt_vector[];
 
+#define CPACR	((volatile uint32_t *) (0xE000ED88))
+
 void
 _start(void)
 {
@@ -44,13 +46,12 @@ _start(void)
 	__asm__(".equ __my_interrupt_vector, __interrupt_vector");
 #ifndef __SOFTFP__
 #define FPSCR_FZ		(1 << 24)
+	/* Enable FPU */
+	*CPACR |= 0xf << 20;
+	while ((*CPACR & (0xf << 20)) != (0xf << 20))
+		;
 
-	unsigned int fpscr_save;
-
-	/* Set the FZ (flush-to-zero) bit in FPSCR.  */
-	__asm__("vmrs %0, fpscr" : "=r" (fpscr_save));
-	fpscr_save |= FPSCR_FZ;
-	__asm__("vmsr fpscr, %0" : : "r" (fpscr_save));
+	__asm__("vmsr fpscr, %0" : : "r" (0));
 #endif
 	__start();
 }
