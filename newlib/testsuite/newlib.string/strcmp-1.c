@@ -158,9 +158,11 @@ main (void)
 	      if (n - m > MAX_DIFF)
 		continue;
 	      /* Make a copy of the source.  */
+	      j = 'A';
 	      for (i = 0; i < BUFF_SIZE; i++)
 		{
-		  src[i] = 'A' + (i % 26);
+		  src[i] = j;
+		  if (j++ == 'Z') j = 'A';
 		  dest[i] = src[i];
 		}
 	      memcpy (dest + da, src + sa, n);
