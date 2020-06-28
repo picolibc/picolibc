@@ -38,7 +38,6 @@
  */
 	.syntax unified
 	.text
-	.thumb_func
 	.align 4
 	.p2align 4,,15
 	.global __aeabi_read_tp
