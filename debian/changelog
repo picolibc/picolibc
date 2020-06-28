@@ -1,3 +1,13 @@
+picolibc (1.4.5-1) unstable; urgency=medium
+
+  * Fix section order in picolibc.ld to give applications correct
+    control over the layout of .preserve, .init and .fini regions.
+
+  * Add startup and TLS support for aarch64 and non Cortex-M 32-bit
+    arm.
+
+ -- Keith Packard <keithp@keithp.com>  Sun, 28 Jun 2020 15:34:19 -0700
+
 picolibc (1.4.4-1) unstable; urgency=medium
 
   * New upstream 1.4.4
