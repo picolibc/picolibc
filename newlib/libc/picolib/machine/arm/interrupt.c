@@ -36,6 +36,8 @@
 #include <sys/cdefs.h>
 #include <stdint.h>
 
+#if __ARM_ARCH_PROFILE == 'M'
+
 #define STRINGIFY(x) #x
 
 /* Interrupt functions */
@@ -88,3 +90,72 @@ void (* const __weak_interrupt_vector[])(void) __attribute((aligned(128))) = {
 	i(0x3c, systick),
 };
 __weak_reference(__weak_interrupt_vector, __interrupt_vector);
+
+#endif
+
+#if __ARM_ARCH_PROFILE == 'A'
+
+
+void arm_halt_isr(void);
+
+void __attribute__((naked)) __section(".init") __attribute__((noreturn))
+arm_halt_vector(void)
+{
+	/* Loop forever. */
+	__asm__("1: b 1b");
+}
+
+void arm_ignore_isr(void);
+
+void __attribute__((naked)) __section(".init")
+arm_ignore_vector(void)
+{
+	/* Ignore the interrupt by returning */
+	__asm__("bx lr");
+}
+
+#define vector(name) \
+	void  arm_ ## name ## _vector(void) __attribute__ ((weak, alias("arm_ignore_vector")))
+
+#define vector_halt(name) \
+	void  arm_ ## name ## _vector(void) __attribute__ ((weak, alias("arm_halt_vector")))
+
+vector_halt(undef);
+vector_halt(svc);
+vector_halt(prefetch_abort);
+vector_halt(data_abort);
+vector(not_used);
+vector(irq);
+vector(fiq);
+
+void __attribute__((naked)) __section(".text.init.enter")
+__weak_vector_table(void)
+{
+	/*
+	 * Exception vector that lives at the
+	 * start of program text (usually 0x0)
+	 */
+#if __ARM_ARCH_ISA_THUMB == 2
+	__asm__("b.w _start");
+	__asm__("b.w arm_undef_vector");
+	__asm__("b.w arm_svc_vector");
+	__asm__("b.w arm_prefetch_abort_vector");
+	__asm__("b.w arm_data_abort_vector");
+	__asm__("b.w arm_not_used_vector");
+	__asm__("b.w arm_irq_vector");
+	__asm__("b.w arm_fiq_vector");
+#else
+	__asm__("b _start");
+	__asm__("b arm_undef_vector");
+	__asm__("b arm_svc_vector");
+	__asm__("b arm_prefetch_abort_vector");
+	__asm__("b arm_data_abort_vector");
+	__asm__("b arm_not_used_vector");
+	__asm__("b arm_irq_vector");
+	__asm__("b arm_fiq_vector");
+#endif
+}
+
+__weak_reference(__weak_vector_table, __vector_table);
+
+#endif
