@@ -502,7 +502,11 @@ dumper::dump_module (asection * to, process_module * module)
   strncpy (header.elf_note_header.name, "win32module", NOTE_NAME_SIZE);
 #pragma GCC diagnostic pop
 
+#ifdef __x86_64__
+  module_pstatus_ptr->data_type = NOTE_INFO_MODULE64;
+#else
   module_pstatus_ptr->data_type = NOTE_INFO_MODULE;
+#endif
   module_pstatus_ptr->data.module_info.base_address = module->base_address;
   module_pstatus_ptr->data.module_info.module_name_size = strlen (module->name) + 1;
   strcpy (module_pstatus_ptr->data.module_info.module_name, module->name);
