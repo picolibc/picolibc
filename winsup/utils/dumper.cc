@@ -645,7 +645,13 @@ dumper::init_core_dump ()
 {
   bfd_init ();
 
-  core_bfd = bfd_openw (file_name, "elf32-i386");
+#ifdef __x86_64__
+  const char *target = "elf64-x86-64";
+#else
+  const char *target = "elf32-i386";
+#endif
+
+  core_bfd = bfd_openw (file_name, target);
   if (core_bfd == NULL)
     {
       bfd_perror ("opening bfd");
@@ -658,7 +664,7 @@ dumper::init_core_dump ()
       goto failed;
     }
 
-  if (!bfd_set_arch_mach (core_bfd, bfd_arch_i386, 0))
+  if (!bfd_set_arch_mach (core_bfd, bfd_arch_i386, 0 /* = default */))
     {
       bfd_perror ("setting bfd architecture");
       goto failed;
