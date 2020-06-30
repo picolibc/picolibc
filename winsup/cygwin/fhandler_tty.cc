@@ -3316,6 +3316,34 @@ fhandler_pty_master::pty_master_fwd_thread ()
 		continue;
 	      }
 
+	  /* Remove CSI > Pm m */
+	  state = 0;
+	  start_at = 0;
+	  for (DWORD i=0; i<rlen; i++)
+	    if (outbuf[i] == '\033')
+	      {
+		start_at = i;
+		state = 1;
+		continue;
+	      }
+	    else if ((state == 1 && outbuf[i] == '[') ||
+		     (state == 2 && outbuf[i] == '>'))
+	      {
+		state ++;
+		continue;
+	      }
+	    else if (state == 3 && (isdigit (outbuf[i]) || outbuf[i] == ';'))
+	      continue;
+	    else if (state == 3 && outbuf[i] == 'm')
+	      {
+		memmove (&outbuf[start_at], &outbuf[i+1], rlen-i-1);
+		rlen = wlen = start_at + rlen - i - 1;
+		state = 0;
+		continue;
+	      }
+	    else
+	      state = 0;
+
 	  size_t nlen;
 	  char *buf = convert_mb_str
 	    (get_ttyp ()->term_code_page, &nlen, CP_UTF8, ptr, wlen);
