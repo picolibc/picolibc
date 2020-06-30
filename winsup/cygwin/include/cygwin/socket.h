@@ -300,12 +300,6 @@ struct OLD_msghdr
 /* IPX options */
 #define IPX_TYPE	1
 
-/* TCP options - this way around because someone left a set in the c library includes */
-#ifndef TCP_NODELAY
-#define TCP_NODELAY     0x0001
-#define TCP_MAXSEG	2
-#endif
-
 /* SUS symbolic values for the second parm to shutdown(2) */
 #define SHUT_RD   0		/* == Win32 SD_RECEIVE */
 #define SHUT_WR   1		/* == Win32 SD_SEND    */

@@ -23,6 +23,7 @@
 #endif
 #include <w32api/ws2tcpip.h>
 #include <w32api/mswsock.h>
+#include <netinet/tcp.h>
 #include <unistd.h>
 #include <asm/byteorder.h>
 #include <sys/socket.h>
@@ -1681,6 +1682,20 @@ fhandler_socket_inet::setsockopt (int level, int optname, const void *optval,
 	}
       }
     default:
+      break;
+
+    case IPPROTO_TCP:
+      switch (optname)
+	{
+	case TCP_MAXSEG:
+	  /* Winsock doesn't support setting TCP_MAXSEG, only requesting it
+	     via getsockopt.  Make this a no-op. */
+	  ignore = true;
+	  break;
+
+	default:
+	  break;
+	}
       break;
     }
 
