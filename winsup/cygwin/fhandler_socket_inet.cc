@@ -691,7 +691,8 @@ fhandler_socket_wsock::set_socket_handle (SOCKET sock, int af, int type,
 
 fhandler_socket_inet::fhandler_socket_inet () :
   fhandler_socket_wsock (),
-  oobinline (false)
+  oobinline (false),
+  tcp_fastopen (false)
 {
 }
 
@@ -1693,6 +1694,20 @@ fhandler_socket_inet::setsockopt (int level, int optname, const void *optval,
 	  ignore = true;
 	  break;
 
+	case TCP_FASTOPEN:
+	  /* Fake FastOpen on older systems. */
+	  if (!wincap.has_tcp_fastopen ())
+	    {
+	      if (type != SOCK_STREAM)
+		{
+		  set_errno (EOPNOTSUPP);
+		  return -1;
+		}
+	      ignore = true;
+	      tcp_fastopen = *(int *) optval ? true : false;
+	    }
+	  break;
+
 	default:
 	  break;
 	}
@@ -1825,6 +1840,29 @@ fhandler_socket_inet::getsockopt (int level, int optname, const void *optval,
 	optname = convert_ws1_ip_optname (optname);
       break;
 
+    case IPPROTO_TCP:
+      switch (optname)
+	{
+	case TCP_FASTOPEN:
+	  /* Fake FastOpen on older systems */
+	  if (!wincap.has_tcp_fastopen ())
+	    {
+	      if (type != SOCK_STREAM)
+		{
+		  set_errno (EOPNOTSUPP);
+		  return -1;
+		}
+	      *(int *) optval = tcp_fastopen ? 1 : 0;
+	      *optlen = sizeof (int);
+	      return 0;
+	    }
+	  break;
+
+	default:
+	  break;
+	}
+      break;
+
     default:
       break;
     }
@@ -1869,6 +1907,10 @@ fhandler_socket_inet::getsockopt (int level, int optname, const void *optval,
 	  onebyte = true;
 	  break;
 
+	case TCP_FASTOPEN:
+	  onebyte = true;
+	  break;
+
 	default:
 	  break;
 	}
@@ -1881,8 +1923,7 @@ fhandler_socket_inet::getsockopt (int level, int optname, const void *optval,
       /* Regression in Vista and later: instead of a 4 byte BOOL value, a
 	 1 byte BOOLEAN value is returned, in contrast to older systems and
 	 the documentation.  Since an int type is expected by the calling
-	 application, we convert the result here.  For some reason only three
-	 BSD-compatible socket options seem to be affected. */
+	 application, we convert the result here. */
       BOOLEAN *in = (BOOLEAN *) optval;
       int *out = (int *) optval;
       *out = *in;

@@ -125,5 +125,6 @@ struct tcphdr {
  */
 #define TCP_NODELAY     0x01    /* don't delay send to coalesce packets */
 #define TCP_MAXSEG      0x04    /* get maximum segment size (r/o on windows) */
+#define TCP_FASTOPEN    0x0f    /* enable FastOpen on listeners */
 
 #endif

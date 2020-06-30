@@ -718,7 +718,8 @@ class fhandler_socket_wsock: public fhandler_socket
 class fhandler_socket_inet: public fhandler_socket_wsock
 {
  private:
-  bool oobinline; /* True if option SO_OOBINLINE is set */
+  bool oobinline;	/* True if option SO_OOBINLINE is set */
+  bool tcp_fastopen;	/* True if TCP_FASTOPEN is set on older systems */
  protected:
   int af_local_connect () { return 0; }
 
