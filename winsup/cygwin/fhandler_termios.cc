@@ -268,25 +268,25 @@ fhandler_termios::eat_readahead (int n)
 {
   int oralen = ralen ();
   if (n < 0)
-    n = ralen ();
-  if (n > 0 && ralen () > 0)
+    n = ralen () - raixget ();
+  if (n > 0 && ralen () > raixget ())
     {
-      if ((int) (ralen () -= n) < 0)
-	ralen () = 0;
+      if ((int) (ralen () -= n) < (int) raixget ())
+	ralen () = raixget ();
       /* If IUTF8 is set, the terminal is in UTF-8 mode.  If so, we erase
 	 a complete UTF-8 multibyte sequence on VERASE/VWERASE.  Otherwise,
 	 if we only erase a single byte, invalid unicode chars are left in
 	 the input. */
       if (tc ()->ti.c_iflag & IUTF8)
-	while (ralen () > 0 &&
+	while (ralen () > raixget () &&
 	       ((unsigned char) rabuf ()[ralen ()] & 0xc0) == 0x80)
 	  --ralen ();
-
-      if (raixget () >= ralen ())
-	raixget () = raixput () = ralen () = 0;
-      else if (raixput () > ralen ())
-	raixput () = ralen ();
     }
+  oralen = oralen - ralen ();
+  if (raixget () >= ralen ())
+    raixget () = raixput () = ralen () = 0;
+  else if (raixput () > ralen ())
+    raixput () = ralen ();
 
   return oralen;
 }

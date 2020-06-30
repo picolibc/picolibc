@@ -548,6 +548,7 @@ fhandler_pty_master::accept_input ()
 
   WaitForSingleObject (input_mutex, INFINITE);
 
+  char *p = rabuf () + raixget ();
   bytes_left = eat_readahead (-1);
 
   if (to_be_read_from_pcon ())
@@ -559,7 +560,6 @@ fhandler_pty_master::accept_input ()
     }
   else
     {
-      char *p = rabuf ();
       DWORD rc;
       DWORD written = 0;
 
@@ -1171,10 +1171,10 @@ fhandler_pty_slave::update_pcon_input_state (bool need_lock)
 	  '\n',
 	  '\r'
 	};
-	if (is_line_input () && memchr (eols, c, sizeof (eols)))
+	if (is_line_input () && c && memchr (eols, c, sizeof (eols)))
 	  saw_accept = true;
-	if ((get_ttyp ()->ti.c_lflag & ISIG) &&
-	    memchr (sigs, c, sizeof (sigs)))
+	if ((get_ttyp ()->ti.c_lflag & ISIG)
+	    && c && memchr (sigs, c, sizeof (sigs)))
 	  saw_accept = true;
       }
   get_ttyp ()->pcon_in_empty = pipe_empty && !(ralen () > raixget ());
@@ -1189,7 +1189,7 @@ fhandler_pty_slave::update_pcon_input_state (bool need_lock)
 int
 fhandler_pty_slave::eat_readahead (int n)
 {
-  int oralen = ralen () - raixget ();
+  int oralen = ralen ();
   if (n < 0)
     n = ralen () - raixget ();
   if (n > 0 && ralen () > raixget ())
@@ -1202,7 +1202,8 @@ fhandler_pty_slave::eat_readahead (int n)
       };
       while (n > 0 && ralen () > raixget ())
 	{
-	  if (memchr (eols, rabuf ()[ralen ()-1], sizeof (eols)))
+	  if (is_line_input () && rabuf ()[ralen ()-1]
+	      && memchr (eols, rabuf ()[ralen ()-1], sizeof (eols)))
 	    break;
 	  -- n;
 	  -- ralen ();
@@ -1213,15 +1214,15 @@ fhandler_pty_slave::eat_readahead (int n)
 	 if we only erase a single byte, invalid unicode chars are left in
 	 the input. */
       if (get_ttyp ()->ti.c_iflag & IUTF8)
-	while (ralen () > 0 &&
+	while (ralen () > raixget () &&
 	       ((unsigned char) rabuf ()[ralen ()] & 0xc0) == 0x80)
 	  --ralen ();
-
-      if (raixget () >= ralen ())
-	raixget () = raixput () = ralen () = 0;
-      else if (raixput () > ralen ())
-	raixput () = ralen ();
     }
+  oralen = oralen - ralen ();
+  if (raixget () >= ralen ())
+    raixget () = raixput () = ralen () = 0;
+  else if (raixput () > ralen ())
+    raixput () = ralen ();
 
   return oralen;
 }
@@ -1245,7 +1246,7 @@ fhandler_pty_slave::get_readahead_into_buffer (char *buf, size_t buflen)
 	};
 	buf[copied_chars++] = (unsigned char)(ch & 0xff);
 	buflen--;
-	if (is_line_input () && memchr (eols, ch & 0xff, sizeof (eols)))
+	if (is_line_input () && ch && memchr (eols, ch & 0xff, sizeof (eols)))
 	  break;
       }
 
@@ -1264,7 +1265,7 @@ fhandler_pty_slave::get_readahead_valid (void)
 	'\n'
       };
       for (size_t i=raixget (); i<ralen (); i++)
-	if (memchr (eols, rabuf ()[i], sizeof (eols)))
+	if (rabuf ()[i] && memchr (eols, rabuf ()[i], sizeof (eols)))
 	  return true;
       return false;
     }
@@ -2554,7 +2555,7 @@ fhandler_pty_master::write (const void *ptr, size_t len)
       };
       if (tc ()->ti.c_lflag & ISIG)
 	for (size_t i=0; i<sizeof (sigs); i++)
-	  if (memchr (buf, sigs[i], nlen))
+	  if (sigs[i] && memchr (buf, sigs[i], nlen))
 	    {
 	      eat_readahead (-1);
 	      SetEvent (input_available_event);
@@ -3222,12 +3223,6 @@ fhandler_pty_master::transfer_input_to_pcon (void)
       while ((p = (char *) memchr (p, '\n', n - (p - buf))))
 	*p = '\r';
       if (WriteFile (to_slave, buf, n, &n, 0))
-	transfered += n;
-    }
-  DWORD bytes_left = eat_readahead (-1);
-  if (bytes_left)
-    {
-      if (WriteFile (to_slave, rabuf (), bytes_left, &n, NULL))
 	transfered += n;
     }
   if (transfered)
