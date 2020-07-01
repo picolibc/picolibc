@@ -123,8 +123,11 @@ struct tcphdr {
 /*
  * User-settable options (used with setsockopt).
  */
-#define TCP_NODELAY     0x01    /* don't delay send to coalesce packets */
-#define TCP_MAXSEG      0x04    /* get maximum segment size (r/o on windows) */
-#define TCP_FASTOPEN    0x0f    /* enable FastOpen on listeners */
+#define TCP_NODELAY      0x01   /* don't delay send to coalesce packets */
+#define TCP_KEEPIDLE     0x03   /* start keepalives after this period */
+#define TCP_MAXSEG       0x04   /* get maximum segment size (r/o on windows) */
+#define TCP_FASTOPEN     0x0f   /* enable FastOpen on listeners */
+#define TCP_KEEPCNT      0x10   /* number of keepalives before death */
+#define TCP_KEEPINTVL    0x11   /* interval between keepalives */
 
 #endif

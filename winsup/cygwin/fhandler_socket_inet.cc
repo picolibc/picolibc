@@ -23,6 +23,7 @@
 #endif
 #include <w32api/ws2tcpip.h>
 #include <w32api/mswsock.h>
+#include <w32api/mstcpip.h>
 #include <netinet/tcp.h>
 #include <unistd.h>
 #include <asm/byteorder.h>
@@ -692,7 +693,10 @@ fhandler_socket_wsock::set_socket_handle (SOCKET sock, int af, int type,
 fhandler_socket_inet::fhandler_socket_inet () :
   fhandler_socket_wsock (),
   oobinline (false),
-  tcp_fastopen (false)
+  tcp_fastopen (false),
+  tcp_keepidle (7200),	/* WinSock default */
+  tcp_keepcnt (10),	/* WinSock default */
+  tcp_keepintvl (1)	/* WinSock default */
 {
 }
 
@@ -1572,6 +1576,63 @@ fhandler_socket_wsock::writev (const struct iovec *const iov, const int iovcnt,
   return send_internal (&wsamsg, 0);
 }
 
+#define MAX_TCP_KEEPIDLE  32767
+#define MAX_TCP_KEEPCNT     255
+#define MAX_TCP_KEEPINTVL 32767
+
+#define FIXED_WSOCK_TCP_KEEPCNT 10
+
+int
+fhandler_socket_inet::set_keepalive (int keepidle, int keepcnt, int keepintvl)
+{
+  struct tcp_keepalive tka;
+  int so_keepalive = 0;
+  int len = sizeof so_keepalive;
+  int ret;
+  DWORD dummy;
+
+  /* Per MSDN,
+     https://docs.microsoft.com/en-us/windows/win32/winsock/sio-keepalive-vals
+     the subsequent keep-alive settings in struct tcp_keepalive are only used
+     if the onoff member is != 0.  Request the current state of SO_KEEPALIVE,
+     then set the keep-alive options with onoff set to 1.  On success, if
+     SO_KEEPALIVE was 0, restore to the original SO_KEEPALIVE setting.  Per
+     the above MSDN doc, the SIO_KEEPALIVE_VALS settings are persistent
+     across switching SO_KEEPALIVE. */
+  ret = ::getsockopt (get_socket (), SOL_SOCKET, SO_KEEPALIVE,
+		      (char *) &so_keepalive, &len);
+  if (ret == SOCKET_ERROR)
+    debug_printf ("getsockopt (SO_KEEPALIVE) failed, %u\n", WSAGetLastError ());
+  tka.onoff = 1;
+  tka.keepalivetime = keepidle * MSPERSEC;
+  /* WinSock TCP_KEEPCNT is fixed.  But we still want that the keep-alive
+     times out after TCP_KEEPIDLE + TCP_KEEPCNT * TCP_KEEPINTVL secs.
+     To that end, we set keepaliveinterval so that
+
+     keepaliveinterval * FIXED_WSOCK_TCP_KEEPCNT == TCP_KEEPINTVL * TCP_KEEPCNT
+
+     FIXME?  Does that make sense?
+
+     Sidenote: Given the max values, the entire operation fits into an int.  */
+  tka.keepaliveinterval = MSPERSEC / FIXED_WSOCK_TCP_KEEPCNT * keepcnt
+			  * keepintvl;
+  if (WSAIoctl (get_socket (), SIO_KEEPALIVE_VALS, (LPVOID) &tka, sizeof tka,
+		NULL, 0, &dummy, NULL, NULL) == SOCKET_ERROR)
+    {
+      set_winsock_errno ();
+      return -1;
+    }
+  if (!so_keepalive)
+    {
+      ret = ::setsockopt (get_socket (), SOL_SOCKET, SO_KEEPALIVE,
+			  (const char *) &so_keepalive, sizeof so_keepalive);
+      if (ret == SOCKET_ERROR)
+	debug_printf ("setsockopt (SO_KEEPALIVE) failed, %u\n",
+		      WSAGetLastError ());
+    }
+  return 0;
+}
+
 int
 fhandler_socket_inet::setsockopt (int level, int optname, const void *optval,
 				  socklen_t optlen)
@@ -1686,6 +1747,14 @@ fhandler_socket_inet::setsockopt (int level, int optname, const void *optval,
       break;
 
     case IPPROTO_TCP:
+      /* Check for stream socket early on, so we don't have to do this for
+	 every option.  Also, WinSock returns EINVAL. */
+      if (type != SOCK_STREAM)
+	{
+	  set_errno (EOPNOTSUPP);
+	  return -1;
+	}
+
       switch (optname)
 	{
 	case TCP_MAXSEG:
@@ -1698,13 +1767,56 @@ fhandler_socket_inet::setsockopt (int level, int optname, const void *optval,
 	  /* Fake FastOpen on older systems. */
 	  if (!wincap.has_tcp_fastopen ())
 	    {
-	      if (type != SOCK_STREAM)
-		{
-		  set_errno (EOPNOTSUPP);
-		  return -1;
-		}
 	      ignore = true;
 	      tcp_fastopen = *(int *) optval ? true : false;
+	    }
+	  break;
+
+	case TCP_KEEPIDLE:
+	  /* Handle TCP_KEEPIDLE on older systems. */
+	  if (!wincap.has_linux_tcp_keepalive_sockopts ())
+	    {
+	      if (*(int *) optval < 1 || *(int *) optval > MAX_TCP_KEEPIDLE)
+		{
+		  set_errno (EINVAL);
+		  return -1;
+		}
+	      if (set_keepalive (*(int *) optval, tcp_keepcnt, tcp_keepintvl))
+		return -1;
+	      ignore = true;
+	      tcp_keepidle = *(int *) optval;
+	    }
+	  break;
+
+	case TCP_KEEPCNT:
+	  /* Fake TCP_KEEPCNT on older systems. */
+	  if (!wincap.has_linux_tcp_keepalive_sockopts ())
+	    {
+	      if (*(int *) optval < 1 || *(int *) optval > MAX_TCP_KEEPCNT)
+		{
+		  set_errno (EINVAL);
+		  return -1;
+		}
+	      if (set_keepalive (tcp_keepidle, *(int *) optval, tcp_keepintvl))
+		return -1;
+	      ignore = true;
+	      tcp_keepcnt = *(int *) optval;
+	    }
+	  break;
+
+	case TCP_KEEPINTVL:
+	  /* Handle TCP_KEEPINTVL on older systems. */
+	  if (!wincap.has_linux_tcp_keepalive_sockopts ())
+	    {
+	      if (*(int *) optval < 1 || *(int *) optval > MAX_TCP_KEEPINTVL)
+		{
+		  set_errno (EINVAL);
+		  return -1;
+		}
+	      if (set_keepalive (tcp_keepidle, tcp_keepcnt, *(int *) optval))
+		return -1;
+	      ignore = true;
+	      tcp_keepintvl = *(int *) optval;
 	    }
 	  break;
 
@@ -1841,18 +1953,51 @@ fhandler_socket_inet::getsockopt (int level, int optname, const void *optval,
       break;
 
     case IPPROTO_TCP:
+      /* Check for stream socket early on, so we don't have to do this for
+	 every option.  Also, WinSock returns EINVAL. */
+      if (type != SOCK_STREAM)
+	{
+	  set_errno (EOPNOTSUPP);
+	  return -1;
+	}
+
       switch (optname)
 	{
 	case TCP_FASTOPEN:
 	  /* Fake FastOpen on older systems */
 	  if (!wincap.has_tcp_fastopen ())
 	    {
-	      if (type != SOCK_STREAM)
-		{
-		  set_errno (EOPNOTSUPP);
-		  return -1;
-		}
 	      *(int *) optval = tcp_fastopen ? 1 : 0;
+	      *optlen = sizeof (int);
+	      return 0;
+	    }
+	  break;
+
+	case TCP_KEEPIDLE:
+	  /* Use stored value on older systems */
+	  if (!wincap.has_linux_tcp_keepalive_sockopts ())
+	    {
+	      *(int *) optval = tcp_keepidle;
+	      *optlen = sizeof (int);
+	      return 0;
+	    }
+	  break;
+
+	case TCP_KEEPCNT:
+	  /* Use stored value on older systems */
+	  if (!wincap.has_linux_tcp_keepalive_sockopts ())
+	    {
+	      *(int *) optval = tcp_keepcnt;
+	      *optlen = sizeof (int);
+	      return 0;
+	    }
+	  break;
+
+	case TCP_KEEPINTVL:
+	  /* Use stored value on older systems */
+	  if (!wincap.has_linux_tcp_keepalive_sockopts ())
+	    {
+	      *(int *) optval = tcp_keepintvl;
 	      *optlen = sizeof (int);
 	      return 0;
 	    }
