@@ -1576,6 +1576,9 @@ fhandler_socket_wsock::writev (const struct iovec *const iov, const int iovcnt,
   return send_internal (&wsamsg, 0);
 }
 
+#define TCP_MAXRT	      5	/* Older systems don't support TCP_MAXRTMS
+				   TCP_MAXRT takes secs, not msecs. */
+
 #define MAX_TCP_KEEPIDLE  32767
 #define MAX_TCP_KEEPCNT     255
 #define MAX_TCP_KEEPINTVL 32767
@@ -1639,6 +1642,7 @@ fhandler_socket_inet::setsockopt (int level, int optname, const void *optval,
 {
   bool ignore = false;
   int ret = -1;
+  unsigned int timeout;
 
   /* Preprocessing setsockopt.  Set ignore to true if setsockopt call should
      get skipped entirely. */
@@ -1761,6 +1765,22 @@ fhandler_socket_inet::setsockopt (int level, int optname, const void *optval,
 	  /* Winsock doesn't support setting TCP_MAXSEG, only requesting it
 	     via getsockopt.  Make this a no-op. */
 	  ignore = true;
+	  break;
+
+	case TCP_MAXRT:
+	  /* Don't let this option slip through from user space. */
+	  set_errno (EOPNOTSUPP);
+	  return -1;
+
+	case TCP_USER_TIMEOUT:
+	  if (!wincap.has_tcp_maxrtms ())
+	    {
+	      /* convert msecs to secs.  Values < 1000 ms are converted to
+		 0 secs, just as in WinSock. */
+	      timeout = *(unsigned int *) optval / MSPERSEC;
+	      optname = TCP_MAXRT;
+	      optval = (const void *) &timeout;
+	    }
 	  break;
 
 	case TCP_FASTOPEN:
@@ -1963,6 +1983,17 @@ fhandler_socket_inet::getsockopt (int level, int optname, const void *optval,
 
       switch (optname)
 	{
+	case TCP_MAXRT:
+	  /* Don't let this option slip through from user space. */
+	  set_errno (EOPNOTSUPP);
+	  return -1;
+
+	case TCP_USER_TIMEOUT:
+	  /* Older systems don't support TCP_MAXRTMS, just call TCP_MAXRT. */
+	  if (!wincap.has_tcp_maxrtms ())
+	    optname = TCP_MAXRT;
+	  break;
+
 	case TCP_FASTOPEN:
 	  /* Fake FastOpen on older systems */
 	  if (!wincap.has_tcp_fastopen ())
@@ -2050,6 +2081,11 @@ fhandler_socket_inet::getsockopt (int level, int optname, const void *optval,
 	{
 	case TCP_NODELAY:
 	  onebyte = true;
+	  break;
+
+	case TCP_MAXRT: /* After above conversion from TCP_USER_TIMEOUT */
+	  /* convert secs to msecs */
+	  *(unsigned int *) optval *= MSPERSEC;
 	  break;
 
 	case TCP_FASTOPEN:

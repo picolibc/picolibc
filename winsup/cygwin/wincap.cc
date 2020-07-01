@@ -48,6 +48,7 @@ wincaps wincap_vista __attribute__((section (".cygwin_dll_common"), shared)) = {
     has_extended_mem_api:false,
     has_tcp_fastopen:false,
     has_linux_tcp_keepalive_sockopts:false,
+    has_tcp_maxrtms:false,
   },
 };
 
@@ -81,6 +82,7 @@ wincaps wincap_7 __attribute__((section (".cygwin_dll_common"), shared)) = {
     has_extended_mem_api:false,
     has_tcp_fastopen:false,
     has_linux_tcp_keepalive_sockopts:false,
+    has_tcp_maxrtms:false,
   },
 };
 
@@ -114,6 +116,7 @@ wincaps wincap_8 __attribute__((section (".cygwin_dll_common"), shared)) = {
     has_extended_mem_api:false,
     has_tcp_fastopen:false,
     has_linux_tcp_keepalive_sockopts:false,
+    has_tcp_maxrtms:false,
   },
 };
 
@@ -147,6 +150,7 @@ wincaps wincap_8_1 __attribute__((section (".cygwin_dll_common"), shared)) = {
     has_extended_mem_api:false,
     has_tcp_fastopen:false,
     has_linux_tcp_keepalive_sockopts:false,
+    has_tcp_maxrtms:false,
   },
 };
 
@@ -180,6 +184,7 @@ wincaps  wincap_10_1507 __attribute__((section (".cygwin_dll_common"), shared)) 
     has_extended_mem_api:false,
     has_tcp_fastopen:false,
     has_linux_tcp_keepalive_sockopts:false,
+    has_tcp_maxrtms:false,
   },
 };
 
@@ -213,6 +218,7 @@ wincaps  wincap_10_1607 __attribute__((section (".cygwin_dll_common"), shared)) 
     has_extended_mem_api:false,
     has_tcp_fastopen:true,
     has_linux_tcp_keepalive_sockopts:false,
+    has_tcp_maxrtms:true,
   },
 };
 
@@ -246,6 +252,7 @@ wincaps wincap_10_1703 __attribute__((section (".cygwin_dll_common"), shared)) =
     has_extended_mem_api:false,
     has_tcp_fastopen:true,
     has_linux_tcp_keepalive_sockopts:false,
+    has_tcp_maxrtms:true,
   },
 };
 
@@ -279,6 +286,7 @@ wincaps wincap_10_1709 __attribute__((section (".cygwin_dll_common"), shared)) =
     has_extended_mem_api:false,
     has_tcp_fastopen:true,
     has_linux_tcp_keepalive_sockopts:true,
+    has_tcp_maxrtms:true,
   },
 };
 
@@ -312,6 +320,7 @@ wincaps wincap_10_1803 __attribute__((section (".cygwin_dll_common"), shared)) =
     has_extended_mem_api:true,
     has_tcp_fastopen:true,
     has_linux_tcp_keepalive_sockopts:true,
+    has_tcp_maxrtms:true,
   },
 };
 
@@ -345,6 +354,7 @@ wincaps wincap_10_1809 __attribute__((section (".cygwin_dll_common"), shared)) =
     has_extended_mem_api:true,
     has_tcp_fastopen:true,
     has_linux_tcp_keepalive_sockopts:true,
+    has_tcp_maxrtms:true,
   },
 };
 
@@ -378,6 +388,7 @@ wincaps wincap_10_1903 __attribute__((section (".cygwin_dll_common"), shared)) =
     has_extended_mem_api:true,
     has_tcp_fastopen:true,
     has_linux_tcp_keepalive_sockopts:true,
+    has_tcp_maxrtms:true,
   },
 };
 
