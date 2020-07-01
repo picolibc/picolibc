@@ -289,6 +289,25 @@ dumper::add_module (LPVOID base_address)
 
 #define PAGE_BUFFER_SIZE 4096
 
+void protect_dump(DWORD protect, char *buf)
+{
+  const char *pt[10];
+  pt[0] = (protect & PAGE_READONLY) ? "RO " : "";
+  pt[1] = (protect & PAGE_READWRITE) ? "RW " : "";
+  pt[2] = (protect & PAGE_WRITECOPY) ? "WC " : "";
+  pt[3] = (protect & PAGE_EXECUTE) ? "EX " : "";
+  pt[4] = (protect & PAGE_EXECUTE_READ) ? "EXRO " : "";
+  pt[5] = (protect & PAGE_EXECUTE_READWRITE) ? "EXRW " : "";
+  pt[6] = (protect & PAGE_EXECUTE_WRITECOPY) ? "EXWC " : "";
+  pt[7] = (protect & PAGE_GUARD) ? "GRD " : "";
+  pt[8] = (protect & PAGE_NOACCESS) ? "NA " : "";
+  pt[9] = (protect & PAGE_NOCACHE) ? "NC " : "";
+
+  buf[0] = '\0';
+  for (int i = 0; i < 10; i++)
+    strcat (buf, pt[i]);
+}
+
 int
 dumper::collect_memory_sections ()
 {
@@ -313,10 +332,65 @@ dumper::collect_memory_sections ()
 	break;
 
       int skip_region_p = 0;
+      const char *disposition = "dumped";
 
-      if (mbi.Protect & (PAGE_NOACCESS | PAGE_GUARD) ||
-	  mbi.State != MEM_COMMIT)
-	skip_region_p = 1;
+      if (mbi.Protect & PAGE_NOACCESS)
+	{
+	  skip_region_p = 1;
+	  disposition = "skipped due to noaccess";
+	}
+
+      if (mbi.Protect & PAGE_GUARD)
+	{
+	  skip_region_p = 1;
+	  disposition = "skipped due to guardpage";
+	}
+
+      if (mbi.State != MEM_COMMIT)
+	{
+	  skip_region_p = 1;
+	  disposition = "skipped due to uncommited";
+	}
+
+      {
+	char buf[10 * 6];
+	protect_dump(mbi.Protect, buf);
+
+	const char *state = "";
+	const char *type = "";
+
+	if (mbi.State & MEM_COMMIT)
+	  {
+	    state = "COMMIT";
+	  }
+	else if (mbi.State & MEM_FREE)
+	  {
+	    state = "FREE";
+	    type = "FREE";
+	  }
+	else if (mbi.State & MEM_RESERVE)
+	  {
+	    state = "RESERVE";
+	  }
+
+	if (mbi.Type & MEM_IMAGE)
+	  {
+	    type = "IMAGE";
+	  }
+	else if (mbi.Type & MEM_MAPPED)
+	  {
+	    type = "MAPPED";
+	  }
+	else if (mbi.Type & MEM_PRIVATE)
+	  {
+	    type = "PRIVATE";
+	  }
+
+	deb_printf ("region 0x%016lx-0x%016lx (protect = %-8s, state = %-7s, type = %-7s, %s)\n",
+		    current_page_address,
+		    current_page_address + mbi.RegionSize,
+		    buf, state, type, disposition);
+      }
 
       if (!skip_region_p)
 	{
@@ -326,26 +400,11 @@ dumper::collect_memory_sections ()
 	  if (!ReadProcessMemory (hProcess, current_page_address, mem_buf, sizeof (mem_buf), &done))
 	    {
 	      DWORD err = GetLastError ();
-	      const char *pt[10];
-	      pt[0] = (mbi.Protect & PAGE_READONLY) ? "RO " : "";
-	      pt[1] = (mbi.Protect & PAGE_READWRITE) ? "RW " : "";
-	      pt[2] = (mbi.Protect & PAGE_WRITECOPY) ? "WC " : "";
-	      pt[3] = (mbi.Protect & PAGE_EXECUTE) ? "EX " : "";
-	      pt[4] = (mbi.Protect & PAGE_EXECUTE_READ) ? "EXRO " : "";
-	      pt[5] = (mbi.Protect & PAGE_EXECUTE_READWRITE) ? "EXRW " : "";
-	      pt[6] = (mbi.Protect & PAGE_EXECUTE_WRITECOPY) ? "EXWC " : "";
-	      pt[7] = (mbi.Protect & PAGE_GUARD) ? "GRD " : "";
-	      pt[8] = (mbi.Protect & PAGE_NOACCESS) ? "NA " : "";
-	      pt[9] = (mbi.Protect & PAGE_NOCACHE) ? "NC " : "";
-	      char buf[10 * 6];
-	      buf[0] = '\0';
-	      for (int i = 0; i < 10; i++)
-		strcat (buf, pt[i]);
 
-	      deb_printf ("warning: failed to read memory at %p-%p (protect = %s), error %ld.\n",
+	      deb_printf ("warning: failed to read memory at %p-%p, error %ld.\n",
 			  current_page_address,
 			  current_page_address + mbi.RegionSize,
-			  buf, err);
+			  err);
 	      skip_region_p = 1;
 	    }
 	}
