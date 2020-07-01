@@ -296,7 +296,7 @@ dumper::collect_memory_sections ()
     return 0;
 
   LPBYTE current_page_address;
-  LPBYTE last_base = (LPBYTE) 0xFFFFFFFF;
+  LPBYTE last_base = (LPBYTE) -1;
   SIZE_T last_size = (SIZE_T) 0;
   SIZE_T done;
 
@@ -307,7 +307,7 @@ dumper::collect_memory_sections ()
   if (hProcess == NULL)
     return 0;
 
-  for (current_page_address = 0; current_page_address < (LPBYTE) 0xFFFF0000;)
+  for (current_page_address = 0; current_page_address < (LPBYTE) -1;)
     {
       if (!VirtualQueryEx (hProcess, current_page_address, &mbi, sizeof (mbi)))
 	break;
