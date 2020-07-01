@@ -693,6 +693,7 @@ fhandler_socket_wsock::set_socket_handle (SOCKET sock, int af, int type,
 fhandler_socket_inet::fhandler_socket_inet () :
   fhandler_socket_wsock (),
   oobinline (false),
+  tcp_quickack (false),
   tcp_fastopen (false),
   tcp_keepidle (7200),	/* WinSock default */
   tcp_keepcnt (10),	/* WinSock default */
@@ -1579,6 +1580,10 @@ fhandler_socket_wsock::writev (const struct iovec *const iov, const int iovcnt,
 #define TCP_MAXRT	      5	/* Older systems don't support TCP_MAXRTMS
 				   TCP_MAXRT takes secs, not msecs. */
 
+#ifndef SIO_TCP_SET_ACK_FREQUENCY
+#define SIO_TCP_SET_ACK_FREQUENCY	_WSAIOW(IOC_VENDOR,23)
+#endif
+
 #define MAX_TCP_KEEPIDLE  32767
 #define MAX_TCP_KEEPCNT     255
 #define MAX_TCP_KEEPINTVL 32767
@@ -1765,6 +1770,41 @@ fhandler_socket_inet::setsockopt (int level, int optname, const void *optval,
 	  /* Winsock doesn't support setting TCP_MAXSEG, only requesting it
 	     via getsockopt.  Make this a no-op. */
 	  ignore = true;
+	  break;
+
+	case TCP_QUICKACK:
+	  /* Various sources on the net claim that TCP_QUICKACK is supported
+	     by Windows, even using the same optname value of 12.  However,
+	     the ws2ipdef.h header calls this option TCP_CONGESTION_ALGORITHM
+	     and there's no official statement, nor official documentation
+	     confirming or denying this option is equivalent to Linux'
+	     TCP_QUICKACK.  Also, weirdly, this option takes values from 0..7.
+
+	     There is another undocumented option to WSAIoctl called
+	     SIO_TCP_SET_ACK_FREQUENCY which is already used by some
+	     projects, so we're going to use it here, too, for now.
+
+	     There's an open issue in the dotnet github,
+	     https://github.com/dotnet/runtime/issues/798
+	     Hopefully this clarifies the situation in the not too distant
+	     future... */
+	  {
+	    DWORD dummy;
+	    /* https://stackoverflow.com/questions/55034112/c-disable-delayed-ack-on-windows
+	       claims that valid values for SIO_TCP_SET_ACK_FREQUENCY are
+	       1..255.  In contrast to that, my own testing shows that
+	       valid values are 0 and 1 exclusively. */
+	    int freq = !!*(int *) optval;
+	    if (WSAIoctl (get_socket (), SIO_TCP_SET_ACK_FREQUENCY, &freq,
+			  sizeof freq, NULL, 0, &dummy, NULL, NULL)
+		== SOCKET_ERROR)
+	      {
+		set_winsock_errno ();
+		return -1;
+	      }
+	    ignore = true;
+	    tcp_quickack = freq ? true : false;
+	  }
 	  break;
 
 	case TCP_MAXRT:
@@ -1983,6 +2023,11 @@ fhandler_socket_inet::getsockopt (int level, int optname, const void *optval,
 
       switch (optname)
 	{
+	case TCP_QUICKACK:
+	  *(int *) optval = tcp_quickack ? 1 : 0;
+	  *optlen = sizeof (int);
+	  return 0;
+
 	case TCP_MAXRT:
 	  /* Don't let this option slip through from user space. */
 	  set_errno (EOPNOTSUPP);

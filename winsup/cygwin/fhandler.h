@@ -719,6 +719,7 @@ class fhandler_socket_inet: public fhandler_socket_wsock
 {
  private:
   bool oobinline;	/* True if option SO_OOBINLINE is set */
+  bool tcp_quickack;	/* True if quickack is enabled */
   bool tcp_fastopen;	/* True if TCP_FASTOPEN is set on older systems */
   int  tcp_keepidle;	/* TCP_KEEPIDLE value in secs on older systems */
   int  tcp_keepcnt;	/* TCP_KEEPCNT value on older systems */

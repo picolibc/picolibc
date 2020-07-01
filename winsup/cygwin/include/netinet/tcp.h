@@ -126,6 +126,9 @@ struct tcphdr {
 #define TCP_NODELAY      0x01   /* don't delay send to coalesce packets */
 #define TCP_KEEPIDLE     0x03   /* start keepalives after this period */
 #define TCP_MAXSEG       0x04   /* get maximum segment size (r/o on windows) */
+#define TCP_QUICKACK     0x0c   /* block/reenable quick acks
+				   (TCP_CONGESTION_ALGORITHM in ws2ipdef.h,
+				    valid vals 0 - 7, unclear if equivalent) */
 #define TCP_USER_TIMEOUT 0x0e   /* how long for loss retry before timeout,
 				   like WinSock TCP_MAXRTMS/TCP_MAXRT */
 #define TCP_FASTOPEN     0x0f   /* enable FastOpen on listeners */
