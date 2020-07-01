@@ -90,6 +90,11 @@ Support WSL symlinks.  Create those by default now.
 FIFOs can now be opened multiple times for reading.
 </para></listitem>
 
+<listitem><para>
+Support more IPPROTO_TCP socket options: TCP_FASTOPEN, TCP_KEEPIDLE,
+TCP_KEEPCNT, TCP_KEEPINTVL, TCP_QUICKACK, TCP_USER_TIMEOUT.
+</para></listitem>
+
 </itemizedlist>
 
 </sect2>
