@@ -247,6 +247,7 @@ case "${host_cpu}" in
 	;;
   mips*)
 	machine_dir=mips
+	libm_machine_dir=mips
 	;;
   mmix)
 	;;
