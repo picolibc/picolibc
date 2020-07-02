@@ -322,6 +322,7 @@ case "${host_cpu}" in
 	machine_dir=sh
 	;;
   sparc*)
+	libm_machine_dir=sparc
 	machine_dir=sparc
 	# FIXME: Might wish to make MALLOC_ALIGNMENT more generic.
 	newlib_cflags="${newlib_cflags} -DMALLOC_ALIGNMENT=8"
