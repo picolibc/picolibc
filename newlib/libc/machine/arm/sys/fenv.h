@@ -94,7 +94,7 @@ extern const fenv_t	*_fe_dfl_env;
 #define	_ENABLE_MASK	(FE_ALL_EXCEPT << _FPUSW_SHIFT)
 #endif
 
-#ifndef __ARM_PCS_VFP
+
 
 int feclearexcept(int excepts);
 int fegetexceptflag(fexcept_t *flagp, int excepts);
@@ -113,7 +113,7 @@ int fedisableexcept(int __mask);
 int fegetexcept(void);
 #endif /* __BSD_VISIBLE */
 
-#endif	/* __ARM_PCS_VFP */
+
 
 #ifdef __cplusplus
 }
