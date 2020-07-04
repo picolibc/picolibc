@@ -113,9 +113,9 @@ build_dumper := $(shell test -r "$(libbfd)" && echo 1)
 
 ifdef build_dumper
 CYGWIN_BINS += dumper.exe
-dumper.o module_info.o parse_pe.o: CXXFLAGS += -I$(top_srcdir)/include
-dumper.o parse_pe.o: dumper.h
-dumper.exe: module_info.o parse_pe.o
+dumper.o module_info.o: CXXFLAGS += -I$(top_srcdir)/include
+dumper.o: dumper.h
+dumper.exe: module_info.o
 dumper.exe: CYGWIN_LDFLAGS += -lpsapi -lbfd -lintl -liconv -liberty ${ZLIB}
 else
 all: warn_dumper

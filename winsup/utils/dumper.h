@@ -133,8 +133,6 @@ extern int deb_printf ( const char* format, ... );
 
 extern char* psapi_get_module_name ( HANDLE hProcess, LPVOID BaseAddress );
 
-extern int parse_pe ( const char* file_name, exclusion* excl_list );
-
 extern BOOL verbose;
 
 #endif

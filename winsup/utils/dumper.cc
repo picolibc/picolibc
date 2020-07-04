@@ -281,8 +281,6 @@ dumper::add_module (LPVOID base_address)
   new_entity->u.module.base_address = base_address;
   new_entity->u.module.name = module_name;
 
-  parse_pe (module_name, excl_list);
-
   deb_printf ("added module %p %s\n", base_address, module_name);
   return 1;
 }
