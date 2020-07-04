@@ -83,7 +83,6 @@ dumper::dumper (DWORD pid, DWORD tid, const char *file_name)
   this->pid = pid;
   this->tid = tid;
   core_bfd = NULL;
-  excl_list = new exclusion (20);
 
   list = last = NULL;
 
@@ -125,19 +124,16 @@ dumper::close ()
 {
   if (core_bfd)
     bfd_close (core_bfd);
-  if (excl_list)
-    delete excl_list;
   if (hProcess)
     CloseHandle (hProcess);
   core_bfd = NULL;
   hProcess = NULL;
-  excl_list = NULL;
 }
 
 int
 dumper::sane ()
 {
-  if (hProcess == NULL || core_bfd == NULL || excl_list == NULL)
+  if (hProcess == NULL || core_bfd == NULL)
     return 0;
   return 1;
 }
@@ -223,42 +219,6 @@ dumper::add_mem_region (LPBYTE base, SIZE_T size)
   new_entity->u.memory.size = size;
 
   deb_printf ("added memory region %p-%p\n", base, base + size);
-  return 1;
-}
-
-/* split_add_mem_region scans list of regions to be excluded from dumping process
-   (excl_list) and removes all "excluded" parts from given region. */
-int
-dumper::split_add_mem_region (LPBYTE base, SIZE_T size)
-{
-  if (!sane ())
-    return 0;
-
-  if (base == NULL || size == 0)
-    return 1;			// just ignore empty regions
-
-  LPBYTE last_base = base;
-
-  for (process_mem_region * p = excl_list->region;
-       p < excl_list->region + excl_list->last;
-       p++)
-    {
-      if (p->base >= base + size || p->base + p->size <= base)
-	continue;
-
-      if (p->base <= base)
-	{
-	  last_base = p->base + p->size;
-	  continue;
-	}
-
-      add_mem_region (last_base, p->base - last_base);
-      last_base = p->base + p->size;
-    }
-
-  if (last_base < base + size)
-    add_mem_region (last_base, base + size - last_base);
-
   return 1;
 }
 
@@ -413,14 +373,14 @@ dumper::collect_memory_sections ()
 	    last_size += mbi.RegionSize;
 	  else
 	    {
-	      split_add_mem_region (last_base, last_size);
+	      add_mem_region (last_base, last_size);
 	      last_base = (LPBYTE) mbi.BaseAddress;
 	      last_size = mbi.RegionSize;
 	    }
 	}
       else
 	{
-	  split_add_mem_region (last_base, last_size);
+	  add_mem_region (last_base, last_size);
 	  last_base = NULL;
 	  last_size = 0;
 	}
@@ -429,7 +389,7 @@ dumper::collect_memory_sections ()
     }
 
   /* dump last sections, if any */
-  split_add_mem_region (last_base, last_size);
+  add_mem_region (last_base, last_size);
   return 1;
 };
 
