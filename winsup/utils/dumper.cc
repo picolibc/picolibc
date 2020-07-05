@@ -292,6 +292,12 @@ dumper::collect_memory_sections ()
       int skip_region_p = 0;
       const char *disposition = "dumped";
 
+      if ((mbi.Type & MEM_IMAGE) && !(mbi.Protect & (PAGE_EXECUTE_READWRITE | PAGE_READWRITE)))
+	{
+	  skip_region_p = 1;
+	  disposition = "skipped due to non-writeable MEM_IMAGE";
+	}
+
       if (mbi.Protect & PAGE_NOACCESS)
 	{
 	  skip_region_p = 1;
