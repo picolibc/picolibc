@@ -627,10 +627,6 @@ dumper::collect_process_information ()
       return 0;
     }
 
-  char event_name[sizeof ("cygwin_error_start_event") + 20];
-  sprintf (event_name, "cygwin_error_start_event%16x", (unsigned int) pid);
-  HANDLE sync_with_debugee = OpenEvent (EVENT_MODIFY_STATE, FALSE, event_name);
-
   DEBUG_EVENT current_event;
 
   while (1)
@@ -701,10 +697,6 @@ dumper::collect_process_information ()
 	      goto failed;
 	    };
 
-	  /* signal a debugee that we've finished */
-	  if (sync_with_debugee)
-	    SetEvent (sync_with_debugee);
-
 	  break;
 
 	default:
@@ -729,10 +721,6 @@ failed:
     }
   /* Otherwise, the debuggee is terminated when this process exits
      (as DebugSetProcessKillOnExit() defaults to TRUE) */
-
-  /* set debugee free */
-  if (sync_with_debugee)
-    SetEvent (sync_with_debugee);
 
   return 0;
 }
