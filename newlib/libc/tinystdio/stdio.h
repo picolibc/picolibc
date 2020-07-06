@@ -224,8 +224,22 @@
  * elements of it beyond by using the official interfaces provided.
  */
 
+/* Use 32-bit ungetc storage when doing atomic ungetc and when
+ * the platform has 4-byte swap intrinsics but not 2-byte swap
+ * intrinsics, as is the case for RISC-V processors. This increases
+ * the size of the __file struct by four bytes.
+ */
+
+#if defined(ATOMIC_UNGETC) && defined(__GCC_HAVE_SYNC_COMPARE_AND_SWAP_4) && !defined(__GCC_HAVE_SYNC_COMPARE_AND_SWAP_2)
+#define PICOLIBC_UNGET_SIZE	4
+typedef uint32_t __ungetc_t;
+#else
+#define PICOLIBC_UNGET_SIZE	2
+typedef uint16_t __ungetc_t;
+#endif
+
 struct __file {
-	uint16_t unget;		/* ungetc() buffer */
+	__ungetc_t unget;	/* ungetc() buffer */
 	uint8_t	flags;		/* flags, see below */
 #define __SRD	0x0001		/* OK to read */
 #define __SWR	0x0002		/* OK to write */

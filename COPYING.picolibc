@@ -583,12 +583,14 @@ Files: newlib/libc/errno/errno.c
  newlib/libc/stdio/nano-svfprintf.c
  newlib/libc/stdio/nano-svfscanf.c
  newlib/libc/stdio64/meson.build
+ newlib/libc/tinystdio/compare_exchange.c
  newlib/libc/tinystdio/ecvt.c
  newlib/libc/tinystdio/ecvt_data.c
  newlib/libc/tinystdio/ecvtbuf.c
  newlib/libc/tinystdio/ecvtf.c
  newlib/libc/tinystdio/ecvtf_data.c
  newlib/libc/tinystdio/ecvtfbuf.c
+ newlib/libc/tinystdio/exchange.c
  newlib/libc/tinystdio/fcvt.c
  newlib/libc/tinystdio/fcvtbuf.c
  newlib/libc/tinystdio/fcvtf.c

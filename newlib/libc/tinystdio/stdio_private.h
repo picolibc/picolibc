@@ -30,6 +30,7 @@
 /* $Id: stdio_private.h 847 2005-09-06 18:49:15Z joerg_wunsch $ */
 
 #include <stdio.h>
+#include <stdbool.h>
 
 /* values for PRINTF_LEVEL */
 #define PRINTF_MIN 1
@@ -80,10 +81,70 @@ __posix_getc(FILE *f);
 int
 __posix_close(FILE *f);
 
+#endif
+
 double
 __atod_engine(uint64_t m10, int e10);
 
 float
 __atof_engine(uint32_t m10, int e10);
 
+static inline uint16_t
+__non_atomic_exchange_ungetc(__ungetc_t *p, __ungetc_t v)
+{
+	__ungetc_t e = *p;
+	*p = v;
+	return e;
+}
+
+static inline bool
+__non_atomic_compare_exchange_ungetc(__ungetc_t *p, __ungetc_t d, __ungetc_t v)
+{
+	if (*p != d)
+		return false;
+	*p = v;
+	return true;
+}
+
+#ifdef ATOMIC_UNGETC
+
+#if PICOLIBC_UNGET_SIZE == 4 && defined(__GCC_HAVE_SYNC_COMPARE_AND_SWAP_4)
+#define PICOLIBC_HAVE_SYNC_COMPARE_AND_SWAP
 #endif
+
+#if PICOLIBC_UNGET_SIZE == 2 && defined(__GCC_HAVE_SYNC_COMPARE_AND_SWAP_2)
+#define PICOLIBC_HAVE_SYNC_COMPARE_AND_SWAP
+#endif
+
+#ifdef PICOLIBC_HAVE_SYNC_COMPARE_AND_SWAP
+
+/* Use built-in atomic functions if they exist */
+#include <stdatomic.h>
+static inline bool
+__atomic_compare_exchange_ungetc(__ungetc_t *p, __ungetc_t d, __ungetc_t v)
+{
+	return atomic_compare_exchange_weak(p, &d, v);
+}
+static inline __ungetc_t
+__atomic_exchange_ungetc(__ungetc_t *p, __ungetc_t v)
+{
+	return atomic_exchange(p, v);
+}
+
+#else
+
+bool
+__atomic_compare_exchange_ungetc(__ungetc_t *p, __ungetc_t d, __ungetc_t v);
+
+__ungetc_t
+__atomic_exchange_ungetc(__ungetc_t *p, __ungetc_t v);
+
+#endif /* PICOLIBC_HAVE_SYNC_COMPARE_AND_SWAP */
+
+#else
+
+#define __atomic_compare_exchange_ungetc(p,d,v) __non_atomic_compare_exchange_ungetc(p,d,v)
+
+#define __atomic_exchange_ungetc(p,v) __non_atomic_exchange_ungetc(p,v)
+
+#endif /* ATOMIC_UNGETC */

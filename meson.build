@@ -109,6 +109,7 @@ endif
 posix_io = tinystdio and get_option('posix-io')
 posix_console = posix_io and get_option('posix-console')
 io_float_exact = not tinystdio or get_option('io-float-exact')
+atomic_ungetc = tinystdio and get_option('atomic-ungetc')
 
 # A bunch of newlib-stdio only options
 newlib_io_pos_args = get_option('newlib-io-pos-args')
@@ -410,6 +411,7 @@ conf_data.set('NEWLIB_TLS', thread_local_storage, description: 'use thread local
 conf_data.set('PICOLIBC_TLS', thread_local_storage, description: 'use thread local storage')
 conf_data.set('POSIX_IO', posix_io, description: 'Use open/close/read/write in tinystdio')
 conf_data.set('POSIX_CONSOLE', posix_console, description: 'Use POSIX I/O for stdin, stdout and stderr')
+conf_data.set('ATOMIC_UNGETC', atomic_ungetc, description: 'Use atomics for fgetc/ungetc for re-entrancy')
 
 if newlib_obsolete_math == 'auto'
   obsolete_math_value = false

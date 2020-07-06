@@ -42,10 +42,8 @@ fgetc(FILE *stream)
 	if ((stream->flags & __SRD) == 0)
 		return EOF;
 
-	if ((unget = stream->unget) != 0) {
-		stream->unget = 0;
+	if ((unget = __atomic_exchange_ungetc(&stream->unget, 0)) != 0)
 		return (unsigned char) unget;
-	}
 
 	if (stream->flags & __SSTR) {
 		struct __file_str *sstream = (struct __file_str *) stream;
