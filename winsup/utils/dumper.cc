@@ -615,8 +615,6 @@ out:
 int
 dumper::collect_process_information ()
 {
-  int exception_level = 0;
-
   if (!sane ())
     return 0;
 
@@ -631,7 +629,7 @@ dumper::collect_process_information ()
 
   while (1)
     {
-      if (!WaitForDebugEvent (&current_event, 20000))
+      if (!WaitForDebugEvent (&current_event, INFINITE))
 	return 0;
 
       deb_printf ("got debug event %d\n", current_event.dwDebugEventCode);
@@ -675,12 +673,6 @@ dumper::collect_process_information ()
 
 	case EXCEPTION_DEBUG_EVENT:
 
-	  exception_level++;
-	  if (exception_level == 2)
-	    break;
-	  else if (exception_level > 2)
-	    return 0;
-
 	  collect_memory_sections ();
 
 	  /* got all info. time to dump */
@@ -696,6 +688,9 @@ dumper::collect_process_information ()
 	      fprintf (stderr, "Failed to write core dump\n");
 	      goto failed;
 	    };
+
+	  /* We're done */
+	  goto failed;
 
 	  break;
 
