@@ -37,13 +37,14 @@ int
 fgetc(FILE *stream)
 {
 	int rv;
+	uint16_t unget;
 
 	if ((stream->flags & __SRD) == 0)
 		return EOF;
 
-	if ((stream->flags & __SUNGET) != 0) {
-		stream->flags &= ~__SUNGET;
-		return stream->unget;
+	if ((unget = stream->unget) != 0) {
+		stream->unget = 0;
+		return (unsigned char) unget;
 	}
 
 	if (stream->flags & __SSTR) {

@@ -225,14 +225,13 @@
  */
 
 struct __file {
-	unsigned char unget;	/* ungetc() buffer */
+	uint16_t unget;		/* ungetc() buffer */
 	uint8_t	flags;		/* flags, see below */
 #define __SRD	0x0001		/* OK to read */
 #define __SWR	0x0002		/* OK to write */
 #define __SSTR	0x0004		/* this is an sprintf/snprintf string */
 #define __SERR	0x0010		/* found error */
 #define __SEOF	0x0020		/* found EOF */
-#define __SUNGET 0x0040		/* ungetc() happened */
 #define __SCLOSE 0x0080		/* struct is __file_close with close function */
 #if 0
 /* possible future extensions, will require uint16_t flags */

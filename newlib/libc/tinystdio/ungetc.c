@@ -42,15 +42,13 @@ ungetc(int c, FILE *stream)
 	 *
 	 * ungetc(EOF, ...) causes an error per definitionem.
 	 */
-	if ((stream->flags & __SRD) == 0 ||
-	    (stream->flags & __SUNGET) != 0 ||
-	    c == EOF)
+	if ((stream->flags & __SRD) == 0 || c == EOF)
 		return EOF;
 
-	stream->unget = c;
-	stream->flags |= __SUNGET;
-	stream->flags &= ~__SEOF;
+	if (stream->unget != 0)
+		return EOF;
+	stream->unget = c | UNGETC_MARK;
 
-	return stream->unget;
+	return (unsigned char) c;
 }
 
