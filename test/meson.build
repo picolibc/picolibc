@@ -158,4 +158,20 @@ foreach target : targets
 		  include_directories: inc),
 	 env: ['MESON_SOURCE_ROOT=' + meson.source_root()])
 
+  t1 = 'ungetc'
+  if target == ''
+    t1_name = t1
+  else
+    t1_name = join_paths(target, t1)
+  endif
+
+  test(t1 + target,
+       executable(t1_name, ['ungetc.c'],
+		  c_args: _c_args,
+		  link_args: _link_args,
+		  link_with: _libs,
+		  link_depends:  test_link_depends,
+		  include_directories: inc),
+	 env: ['MESON_SOURCE_ROOT=' + meson.source_root()])
+
 endforeach
