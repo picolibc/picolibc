@@ -42,10 +42,7 @@ static char read_buf[BUFSIZ];
 
 static struct __file_posix __stdin = {
 	.cfile = {
-		.file = {
-			.flags = __SRD | __SCLOSE,
-			.get = __posix_getc,
-		},
+		.file = FDEV_SETUP_STREAM(NULL, __posix_getc, NULL, __SRD | __SCLOSE),
 		.close = __posix_close
 	},
 	.fd = 0,
@@ -54,11 +51,7 @@ static struct __file_posix __stdin = {
 
 static struct __file_posix __stdout = {
 	.cfile = {
-		.file = {
-			.flags = __SWR | __SCLOSE,
-			.put = __posix_putc,
-			.flush = __posix_flush,
-		},
+		.file = FDEV_SETUP_STREAM(__posix_putc, NULL, __posix_flush, __SWR | __SCLOSE),
 		.close = __posix_close
 	},
 	.fd = 1,
