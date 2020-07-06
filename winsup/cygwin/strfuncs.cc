@@ -635,7 +635,7 @@ sys_cp_mbstowcs (mbtowc_p f_mbtowc, wchar_t *dst, size_t dlen,
 	  /* The technique is based on a discussion here:
 	     http://www.mail-archive.com/linux-utf8@nl.linux.org/msg00080.html
 
-	     Invalid bytes in a multibyte secuence are converted to
+	     Invalid bytes in a multibyte sequence are converted to
 	     the private use area which is already used to store ASCII
 	     chars invalid in Windows filenames.  This technque allows
 	     to store them in a symmetric way. */
@@ -801,14 +801,18 @@ extern "C" int __stdcall
 cygwin_strcasecmp (const char *cs, const char *ct)
 {
   UNICODE_STRING us, ut;
-  ULONG len;
+  ULONG len, ulen;
 
-  len = (strlen (cs) + 1) * sizeof (WCHAR);
-  RtlInitEmptyUnicodeString (&us, (PWCHAR) alloca (len), len);
-  us.Length = sys_mbstowcs (us.Buffer, us.MaximumLength, cs) * sizeof (WCHAR);
-  len = (strlen (ct) + 1) * sizeof (WCHAR);
-  RtlInitEmptyUnicodeString (&ut, (PWCHAR) alloca (len), len);
-  ut.Length = sys_mbstowcs (ut.Buffer, ut.MaximumLength, ct) * sizeof (WCHAR);
+  len = strlen (cs) + 1;
+  ulen = len * sizeof (WCHAR);
+  RtlInitEmptyUnicodeString (&us, (PWCHAR) alloca (ulen), ulen);
+  us.Length = sys_mbstowcs (us.Buffer, len, cs) * sizeof (WCHAR);
+
+  len = strlen (ct) + 1;
+  ulen = len * sizeof (WCHAR);
+  RtlInitEmptyUnicodeString (&ut, (PWCHAR) alloca (ulen), ulen);
+  ut.Length = sys_mbstowcs (ut.Buffer, len, ct) * sizeof (WCHAR);
+
   return RtlCompareUnicodeString (&us, &ut, TRUE);
 }
 
@@ -816,19 +820,21 @@ extern "C" int __stdcall
 cygwin_strncasecmp (const char *cs, const char *ct, size_t n)
 {
   UNICODE_STRING us, ut;
-  ULONG len;
+  ULONG ulen;
   size_t ls = 0, lt = 0;
 
   while (cs[ls] && ls < n)
     ++ls;
-  len = (ls + 1) * sizeof (WCHAR);
-  RtlInitEmptyUnicodeString (&us, (PWCHAR) alloca (len), len);
+  ulen = (ls + 1) * sizeof (WCHAR);
+  RtlInitEmptyUnicodeString (&us, (PWCHAR) alloca (ulen), ulen);
   us.Length = sys_mbstowcs (us.Buffer, ls + 1, cs, ls) * sizeof (WCHAR);
+
   while (ct[lt] && lt < n)
     ++lt;
-  len = (lt + 1) * sizeof (WCHAR);
-  RtlInitEmptyUnicodeString (&ut, (PWCHAR) alloca (len), len);
+  ulen = (lt + 1) * sizeof (WCHAR);
+  RtlInitEmptyUnicodeString (&ut, (PWCHAR) alloca (ulen), ulen);
   ut.Length = sys_mbstowcs (ut.Buffer, lt + 1, ct, lt)  * sizeof (WCHAR);
+
   return RtlCompareUnicodeString (&us, &ut, TRUE);
 }
 

@@ -9,3 +9,6 @@ Bug Fixes:
 ----------
 
 - Fix IPPROTO_TCP option handling, especially in terms of TCP_MAXSEG.
+
+- Fix a buffer overrun in Cygwin-internal string comparison.
+  Fixes: https://cygwin.com/pipermail/cygwin/2020-June/245226.html
