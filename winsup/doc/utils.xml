@@ -496,6 +496,7 @@ dumper [OPTION] FILENAME WIN32PID
     <refsect1 id="dumper-options">
       <title>Options</title>
       <screen>
+-n, --nokill   don't terminate the dumped process
 -d, --verbose  be verbose while dumping
 -h, --help     output help information and exit
 -q, --quiet    be quiet while dumping (default)
@@ -519,9 +520,12 @@ error_start=x:\path\to\dumper.exe
       be started whenever some program encounters a fatal error. </para>
 
     <para> <command>dumper</command> can be also be started from the command
-      line to create a core dump of any running process. Unfortunately, because
-      of a Windows API limitation, when a core dump is created and
-      <command>dumper</command> exits, the target process is terminated too. </para>
+      line to create a core dump of any running process.</para>
+
+    <para>For historical reasons, unless the <literal>-n</literal> option
+    is given, after the core dump is created and when the
+    <command>dumper</command> exits, the target process is also
+    terminated.</para>
 
     <para> To save space in the core dump, <command>dumper</command> doesn't
       write those portions of the target process's memory space that are loaded

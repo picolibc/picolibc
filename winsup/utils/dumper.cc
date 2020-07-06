@@ -64,6 +64,7 @@ __attribute__ ((packed))
   note_header;
 
 BOOL verbose = FALSE;
+BOOL nokill = FALSE;
 
 int deb_printf (const char *format,...)
 {
@@ -716,7 +717,19 @@ dumper::collect_process_information ()
 			  current_event.dwThreadId,
 			  DBG_CONTINUE);
     }
+
 failed:
+  if (nokill)
+    {
+      if (!DebugActiveProcessStop (pid))
+	{
+	  fprintf (stderr, "Cannot detach from process #%u, error %ld",
+		   (unsigned int) pid, (long) GetLastError ());
+	}
+    }
+  /* Otherwise, the debuggee is terminated when this process exits
+     (as DebugSetProcessKillOnExit() defaults to TRUE) */
+
   /* set debugee free */
   if (sync_with_debugee)
     SetEvent (sync_with_debugee);
@@ -960,6 +973,7 @@ Usage: %s [OPTION] FILENAME WIN32PID\n\
 \n\
 Dump core from WIN32PID to FILENAME.core\n\
 \n\
+ -n, --nokill   don't terminate the dumped process\n\
  -d, --verbose  be verbose while dumping\n\
  -h, --help     output help information and exit\n\
  -q, --quiet    be quiet while dumping (default)\n\
@@ -969,13 +983,14 @@ Dump core from WIN32PID to FILENAME.core\n\
 }
 
 struct option longopts[] = {
+  {"nokill", no_argument, NULL, 'n'},
   {"verbose", no_argument, NULL, 'd'},
   {"help", no_argument, NULL, 'h'},
   {"quiet", no_argument, NULL, 'q'},
   {"version", no_argument, 0, 'V'},
   {0, no_argument, NULL, 0}
 };
-const char *opts = "dhqV";
+const char *opts = "ndhqV";
 
 static void
 print_version ()
@@ -1001,6 +1016,9 @@ main (int argc, char **argv)
   while ((opt = getopt_long (argc, argv, opts, longopts, NULL) ) != EOF)
     switch (opt)
       {
+      case 'n':
+	nokill = TRUE;
+	break;
       case 'd':
 	verbose = TRUE;
 	break;
