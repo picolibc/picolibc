@@ -64,7 +64,6 @@ srcs_tinystdio = [
     'fseek.c',
     'ftell.c',
     'fwrite.c',
-    'getc.c',
     'getchar.c',
     'gets.c',
     'iprintf.c',

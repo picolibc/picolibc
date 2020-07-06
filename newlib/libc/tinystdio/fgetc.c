@@ -31,6 +31,7 @@
 
 #include <stdio.h>
 #include "stdio_private.h"
+#include <sys/cdefs.h>
 
 int
 fgetc(FILE *stream)
@@ -66,3 +67,4 @@ fgetc(FILE *stream)
 	return (unsigned char)rv;
 }
 
+__strong_reference(fgetc, getc);
