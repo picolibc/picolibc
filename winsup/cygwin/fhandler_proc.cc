@@ -692,26 +692,52 @@ format_proc_cpuinfo (void *, char *&destbuf)
       union
         {
 	  LONG uc_len;		/* -max size of buffer before call */
-	  char uc_microcode[16];
-        } uc;
+	  char uc_microcode[16];	/* at least 8 bytes */
+        } uc[4];		/* microcode values changed historically */
 
-      RTL_QUERY_REGISTRY_TABLE tab[3] =
+      RTL_QUERY_REGISTRY_TABLE tab[6] =
         {
 	  { NULL, RTL_QUERY_REGISTRY_DIRECT | RTL_QUERY_REGISTRY_NOSTRING,
-	    L"~Mhz", &cpu_mhz, REG_NONE, NULL, 0 },
+	    L"~Mhz",		       &cpu_mhz, REG_NONE, NULL, 0 },
 	  { NULL, RTL_QUERY_REGISTRY_DIRECT | RTL_QUERY_REGISTRY_NOSTRING,
-	    L"Update Revision", &uc, REG_NONE, NULL, 0 },
+	    L"Update Revision",		 &uc[0], REG_NONE, NULL, 0 },
+							/* latest MSR */
+	  { NULL, RTL_QUERY_REGISTRY_DIRECT | RTL_QUERY_REGISTRY_NOSTRING,
+	    L"Update Signature",	 &uc[1], REG_NONE, NULL, 0 },
+							/* previous MSR */
+	  { NULL, RTL_QUERY_REGISTRY_DIRECT | RTL_QUERY_REGISTRY_NOSTRING,
+	    L"CurrentPatchLevel",	 &uc[2], REG_NONE, NULL, 0 },
+							/* earlier MSR */
+	  { NULL, RTL_QUERY_REGISTRY_DIRECT | RTL_QUERY_REGISTRY_NOSTRING,
+	    L"Platform Specific Field1", &uc[3], REG_NONE, NULL, 0 },
+							/* alternative */
 	  { NULL, 0, NULL, NULL, 0, NULL, 0 }
         };
 
-      memset (&uc, 0, sizeof (uc.uc_microcode));
-      uc.uc_len = -16;	/* -max size of microcode buffer */
+      for (size_t uci = 0; uci < sizeof (uc)/sizeof (*uc); ++uci)
+	{
+	  memset (&uc[uci], 0, sizeof (uc[uci]));
+	  uc[uci].uc_len = -(LONG)sizeof (uc[0].uc_microcode);
+							/* neg buffer size */
+	}
+
       RtlQueryRegistryValues (RTL_REGISTRY_ABSOLUTE, cpu_key, tab,
 			      NULL, NULL);
       cpu_mhz = ((cpu_mhz - 1) / 10 + 1) * 10;	/* round up to multiple of 10 */
       DWORD bogomips = cpu_mhz * 2; /* bogomips is double cpu MHz since MMX */
-      long long microcode = 0;	/* at least 8 bytes for AMD */
-      memcpy (&microcode, &uc, sizeof (microcode));
+
+      unsigned long long microcode = 0;	/* needs 8 bytes */
+      for (size_t uci = 0; uci < sizeof (uc)/sizeof (*uc) && !microcode; ++uci)
+	{
+	  /* still neg buffer size => no data */
+	  if (-(LONG)sizeof (uc[uci].uc_microcode) != uc[uci].uc_len)
+	    {
+	      memcpy (&microcode, uc[uci].uc_microcode, sizeof (microcode));
+
+	      if (!(microcode & 0xFFFFFFFFLL))	/* some values in high bits */
+		  microcode <<= 32;		/* shift them down */
+	    }
+	}
 
       bufptr += __small_sprintf (bufptr, "processor\t: %d\n", cpu_number);
       uint32_t maxf, vendor_id[4], unused;
