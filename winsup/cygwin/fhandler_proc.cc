@@ -735,7 +735,7 @@ format_proc_cpuinfo (void *, char *&destbuf)
 	      memcpy (&microcode, uc[uci].uc_microcode, sizeof (microcode));
 
 	      if (!(microcode & 0xFFFFFFFFLL))	/* some values in high bits */
-		  microcode <<= 32;		/* shift them down */
+		  microcode >>= 32;		/* shift them down */
 	    }
 	}
 
