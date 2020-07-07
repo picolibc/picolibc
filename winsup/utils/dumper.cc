@@ -266,6 +266,46 @@ void protect_dump(DWORD protect, char *buf)
     strcat (buf, pt[i]);
 }
 
+typedef enum _MEMORY_INFORMATION_CLASS
+{
+ MemoryWorkingSetExInformation = 4, // MEMORY_WORKING_SET_EX_INFORMATION
+} MEMORY_INFORMATION_CLASS;
+
+extern "C"
+NTSTATUS
+NtQueryVirtualMemory(HANDLE ProcessHandle,
+		     LPVOID BaseAddress,
+		     MEMORY_INFORMATION_CLASS MemoryInformationClass,
+		     LPVOID MemoryInformation,
+		     SIZE_T MemoryInformationLength,
+		     SIZE_T *ReturnLength);
+
+typedef struct _MEMORY_WORKING_SET_EX_INFORMATION
+{
+  LPVOID VirtualAddress;
+  ULONG_PTR Long;
+} MEMORY_WORKING_SET_EX_INFORMATION;
+
+#define MWSEI_ATTRIB_SHARED (0x1 << 15)
+
+static BOOL
+getRegionAttributes(HANDLE hProcess, LPVOID address, DWORD &attribs)
+{
+  MEMORY_WORKING_SET_EX_INFORMATION mwsei = { address };
+  NTSTATUS status = NtQueryVirtualMemory(hProcess, 0,
+					 MemoryWorkingSetExInformation,
+					 &mwsei, sizeof(mwsei), 0);
+
+  if (!status)
+    {
+      attribs = mwsei.Long;
+      return TRUE;
+    }
+
+  deb_printf("MemoryWorkingSetExInformation failed status %08x\n", status);
+  return FALSE;
+}
+
 int
 dumper::collect_memory_sections ()
 {
@@ -292,10 +332,27 @@ dumper::collect_memory_sections ()
       int skip_region_p = 0;
       const char *disposition = "dumped";
 
-      if ((mbi.Type & MEM_IMAGE) && !(mbi.Protect & (PAGE_EXECUTE_READWRITE | PAGE_READWRITE)))
+      if (mbi.Type & MEM_IMAGE)
 	{
-	  skip_region_p = 1;
-	  disposition = "skipped due to non-writeable MEM_IMAGE";
+	  DWORD attribs = 0;
+	  if (getRegionAttributes(hProcess, current_page_address, attribs))
+	    {
+	      if (attribs & MWSEI_ATTRIB_SHARED)
+		{
+		  skip_region_p = 1;
+		  disposition = "skipped due to shared MEM_IMAGE";
+		}
+	    }
+	  /*
+	    The undocumented MemoryWorkingSetExInformation is allegedly
+	    supported since XP, so should always succeed, but if it fails,
+	    fallback to looking at region protection.
+	   */
+	  else if (!(mbi.Protect & (PAGE_EXECUTE_READWRITE | PAGE_READWRITE)))
+	    {
+	      skip_region_p = 1;
+	      disposition = "skipped due to non-writeable MEM_IMAGE";
+	    }
 	}
 
       if (mbi.Protect & PAGE_NOACCESS)

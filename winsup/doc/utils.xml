@@ -524,11 +524,11 @@ error_start=x:\path\to\dumper.exe
       <command>dumper</command> exits, the target process is terminated too. </para>
 
     <para> To save space in the core dump, <command>dumper</command> doesn't
-      write those portions of target process' memory space that are loaded from
-      executable and dll files and are unchangeable, such as program code and
-      debug info. Instead, <command>dumper</command> saves paths to files which
+      write those portions of the target process's memory space that are loaded
+      from executable and dll files and are unchanged (e.g. program code).
+      Instead, <command>dumper</command> saves paths to the files which
       contain that data. When a core dump is loaded into gdb, it uses these
-      paths to load appropriate files. That means that if you create a core
+      paths to load the appropriate files. That means that if you create a core
       dump on one machine and try to debug it on another, you'll need to place
       identical copies of the executable and dlls in the same directories as on
       the machine where the core dump was created. </para>

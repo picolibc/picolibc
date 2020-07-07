@@ -116,7 +116,7 @@ CYGWIN_BINS += dumper.exe
 dumper.o module_info.o: CXXFLAGS += -I$(top_srcdir)/include
 dumper.o: dumper.h
 dumper.exe: module_info.o
-dumper.exe: CYGWIN_LDFLAGS += -lpsapi -lbfd -lintl -liconv -liberty ${ZLIB}
+dumper.exe: CYGWIN_LDFLAGS += -lpsapi -lbfd -lintl -liconv -liberty ${ZLIB} -lntdll
 else
 all: warn_dumper
 endif
