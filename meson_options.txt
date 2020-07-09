@@ -130,7 +130,7 @@ option('newlib-iconv-from-encodings', type: 'array',
        description: 'enable specific comma-separated list of "from" iconv encodings to be built-in')
 option('newlib-iconv-to-encodings', type: 'array',
        description: 'enable specific comma-separated list of "to" iconv encodings to be built-in')
-option('newlib-iconv-external-ccs', type: 'boolean',
+option('newlib-iconv-external-ccs', type: 'boolean', value:false,
        description: 'enable capabilities to load external CCS files for iconv')
 option('newlib-locale-info', type: 'boolean', value: false,
        description: 'locale support')
