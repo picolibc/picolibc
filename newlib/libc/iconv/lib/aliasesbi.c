@@ -5,8 +5,8 @@
 #include <_ansi.h>
 #include "encnames.h"
 
-const char *
-_iconv_aliases =
+const char
+_iconv_aliases[] =
 {
 #if defined (_ICONV_FROM_ENCODING_BIG5) \
  || defined (_ICONV_TO_ENCODING_BIG5)
@@ -210,4 +210,3 @@ _iconv_aliases =
 #endif
   ""
 };
-
