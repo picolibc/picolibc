@@ -369,18 +369,18 @@ void nano_free (void * free_p)
     if (!q || p_to_free->signature != 0xbeeff00d) {
 	int i;
 	chunk *busy;
-	__i_fprintf(stderr, "Free block which is not busy\n");
+	fprintf(stderr, "Free block which is not busy\n");
 	for (busy = busy_list; busy; busy = busy->busy) {
 	    int i;
-	    __i_fprintf(stderr, " 0x%08x %10lu:", (unsigned) (uintptr_t) busy, busy->size);
+	    fprintf(stderr, " 0x%08x %10lu:", (unsigned) (uintptr_t) busy, busy->size);
 	    for (i = 0; i < busy->malloc_backtrace_len; i++)
-		__i_fprintf(stderr, " 0x%08x", (unsigned) (uintptr_t) busy->malloc_backtrace[i]);
-	    __i_fprintf(stderr, "\n");
+		fprintf(stderr, " 0x%08x", (unsigned) (uintptr_t) busy->malloc_backtrace[i]);
+	    fprintf(stderr, "\n");
 	}
-	__i_fprintf(stderr, " 0x%08x %10lu:", (unsigned) (uintptr_t) p_to_free, p_to_free->size);
+	fprintf(stderr, " 0x%08x %10lu:", (unsigned) (uintptr_t) p_to_free, p_to_free->size);
 	for (i = 0; i < p_to_free->free_backtrace_len; i++)
-	    __i_fprintf(stderr, " 0x%08x", (unsigned) (uintptr_t) p_to_free->free_backtrace[i]);
-	__i_fprintf(stderr, "\n");
+	    fprintf(stderr, " 0x%08x", (unsigned) (uintptr_t) p_to_free->free_backtrace[i]);
+	fprintf(stderr, "\n");
 	abort();
     }
 
@@ -560,11 +560,11 @@ struct mallinfo nano_mallinfo(void)
 void nano_malloc_stats(void)
 {
     nano_mallinfo();
-    __i_fprintf(stderr, "max system bytes = %10zu\n",
+    fprintf(stderr, "max system bytes = %10zu\n",
              current_mallinfo.arena);
-    __i_fprintf(stderr, "system bytes     = %10zu\n",
+    fprintf(stderr, "system bytes     = %10zu\n",
              current_mallinfo.arena);
-    __i_fprintf(stderr, "in use bytes     = %10zu\n",
+    fprintf(stderr, "in use bytes     = %10zu\n",
              current_mallinfo.uordblks);
 #ifdef MALLOC_DEBUG
     chunk *busy;
@@ -573,12 +573,12 @@ void nano_malloc_stats(void)
     for (busy = busy_list; busy; busy = busy->busy) {
 	int i;
 	total_busy += busy->size;
-	__i_fprintf(stderr, " 0x%08x %10zu:", (unsigned) (uintptr_t) busy, busy->size);
+	fprintf(stderr, " 0x%08x %10zu:", (unsigned) (uintptr_t) busy, busy->size);
 	for (i = 0; i < busy->malloc_backtrace_len; i++)
-	    __i_fprintf(stderr, " 0x%08x", (unsigned) (uintptr_t) busy->malloc_backtrace[i]);
-	__i_fprintf(stderr, "\n");
+	    fprintf(stderr, " 0x%08x", (unsigned) (uintptr_t) busy->malloc_backtrace[i]);
+	fprintf(stderr, "\n");
     }
-    __i_fprintf(stderr, "busy  bytes     = %10u\n", total_busy);
+    fprintf(stderr, "busy  bytes     = %10u\n", total_busy);
 #endif
 }
 #endif /* DEFINE_MALLOC_STATS */

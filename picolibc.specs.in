@@ -13,7 +13,7 @@
 %{!ftls-model:-ftls-model=@TLSMODEL@} %(picolibc_cc1plus) @CC1_SPEC@ @CC1PLUS_SPEC@
 
 *link:
--L@LIBDIR@/%M -L@LIBDIR@ %{!T:-Tpicolibc.ld} %(picolibc_link) @LINK_SPEC@
+@SPECS_PRINTF@ -L@LIBDIR@/%M -L@LIBDIR@ %{!T:-Tpicolibc.ld} %(picolibc_link) --gc-sections @LINK_SPEC@
 
 *lib:
 --start-group -lc %{-oslib=*:--undefined=_exit} %{-oslib=*:-l%*} --end-group

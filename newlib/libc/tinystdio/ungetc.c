@@ -35,7 +35,6 @@
 int
 ungetc(int c, FILE *stream)
 {
-
 	/*
 	 * Streams that are not readable, or streams that already had
 	 * had an ungetc() before will cause an error.
@@ -50,4 +49,3 @@ ungetc(int c, FILE *stream)
 
 	return (unsigned char) c;
 }
-

@@ -37,7 +37,7 @@ int
 fgetc(FILE *stream)
 {
 	int rv;
-	uint16_t unget;
+	__ungetc_t unget;
 
 	if ((stream->flags & __SRD) == 0)
 		return EOF;

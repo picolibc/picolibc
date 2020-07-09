@@ -253,12 +253,31 @@ specs_data.set(
   specs_extra
 )
 
+if tinystdio
+  specs_printf=('%{DPICOLIBC_FLOAT_PRINTF_SCANF:--defsym=vfprintf=__f_vfprintf}' +
+		' %{DPICOLIBC_FLOAT_PRINTF_SCANF:--defsym=vfscanf=__f_vfscanf}' +
+		' %{DPICOLIBC_INTEGER_PRINTF_SCANF:--defsym=vfprintf=__i_vfprintf}' +
+		' %{DPICOLIBC_INTEGER_PRINTF_SCANF:--defsym=vfscanf=__i_vfscanf}')
+else
+  specs_printf=''
+endif
+
+specs_data.set(
+  'SPECS_PRINTF',
+  specs_printf
+)
+
 picolibc_specs = configure_file(input: 'picolibc.specs.in',
 				output: '@BASENAME@',
 				configuration: specs_data,
 				install_dir: specs_dir,
 				install: true)
 				     
+test_specs = configure_file(input: 'test.specs.in',
+			    output: '@BASENAME@',
+			    configuration: specs_data,
+			    install: false)
+
 install_data('picolibc.ld',
 	     install_dir: lib_dir)
 
@@ -551,6 +570,10 @@ if has_semihost
   # Make sure all of the tests get re-linked if the linker scripts change
 
   test_link_depends += test_link_dep + files('picolibc.ld') + [picolibc_specs]
+else
+  test_link_depends += test_specs
+  test_c_args += ['--specs', '@0@/@1@'.format(meson.current_build_dir(), test_specs)]
+  test_link_args += test_c_args
 endif
 
 subdir('picocrt')
