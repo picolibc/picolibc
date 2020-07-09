@@ -70,7 +70,6 @@ srcs_tinystdio = [
     'gets.c',
     'perror.c',
     'printf.c',
-    'putc.c',
     'putchar.c',
     'puts.c',
     'scanf.c',

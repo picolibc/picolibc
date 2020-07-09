@@ -31,6 +31,7 @@
 
 #include <stdio.h>
 #include "stdio_private.h"
+#include <sys/cdefs.h>
 
 int
 fputc(int c, FILE *stream)
@@ -43,3 +44,6 @@ fputc(int c, FILE *stream)
 
 	return c;
 }
+
+
+__strong_reference(fputc, putc);
