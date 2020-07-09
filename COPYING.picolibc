@@ -573,10 +573,12 @@ Files: do-arm-configure
  test/posix-io.c
  test/printf_scanf.c
  test/rand.c
+ test/ungetc.c
 Copyright: 2019 Keith Packard
 License: BSD3-1
 
 Files: newlib/libc/errno/errno.c
+ newlib/libc/include/ssp/meson.build
  newlib/libc/picolib/machine/aarch64/tls.c
  newlib/libc/picolib/machine/arm/read_tp.S
  newlib/libc/posix/meson.build
@@ -596,10 +598,13 @@ Files: newlib/libc/errno/errno.c
  newlib/libc/tinystdio/fcvtf.c
  newlib/libc/tinystdio/fcvtfbuf.c
  newlib/libc/tinystdio/fflush.c
+ newlib/libc/tinystdio/filestrget.c
+ newlib/libc/tinystdio/filestrput.c
  newlib/libc/tinystdio/gcvt.c
  newlib/libc/tinystdio/gcvtbuf.c
  newlib/libc/tinystdio/gcvtf.c
  newlib/libc/tinystdio/gcvtfbuf.c
+ newlib/libc/tinystdio/perror.c
  newlib/libc/tinystdio/strtod_l.c
  newlib/libc/tinystdio/strtold_l.c
  run-aarch64
@@ -1674,42 +1679,6 @@ Files: newlib/libc/time/strptime.c
 Copyright: 1999 Kungliga Tekniska Hgskolan Royal Institute of Technology, Stockholm, Sweden).
 License: BSD3-30
 
-Files: newlib/libc/tinystdio/asnprintff.c
- newlib/libc/tinystdio/asprintff.c
- newlib/libc/tinystdio/dtoa_data.c
- newlib/libc/tinystdio/dtoa_engine.c
- newlib/libc/tinystdio/dtoa_engine.h
- newlib/libc/tinystdio/fiprintf.c
- newlib/libc/tinystdio/fiscanf.c
- newlib/libc/tinystdio/fprintff.c
- newlib/libc/tinystdio/fscanff.c
- newlib/libc/tinystdio/fsnprintff.c
- newlib/libc/tinystdio/iprintf.c
- newlib/libc/tinystdio/iscanf.c
- newlib/libc/tinystdio/make-dtoa-data
- newlib/libc/tinystdio/printff.c
- newlib/libc/tinystdio/scanff.c
- newlib/libc/tinystdio/siprintf.c
- newlib/libc/tinystdio/siscanf.c
- newlib/libc/tinystdio/sniprintf.c
- newlib/libc/tinystdio/snprintff.c
- newlib/libc/tinystdio/sprintff.c
- newlib/libc/tinystdio/sscanff.c
- newlib/libc/tinystdio/vfiprintf.c
- newlib/libc/tinystdio/vfiscanf.c
- newlib/libc/tinystdio/vfprintff.c
- newlib/libc/tinystdio/vfscanff.c
- newlib/libc/tinystdio/viprintf.c
- newlib/libc/tinystdio/viscanf.c
- newlib/libc/tinystdio/vprintff.c
- newlib/libc/tinystdio/vscanff.c
- newlib/libc/tinystdio/vsiprintf.c
- newlib/libc/tinystdio/vsniprintf.c
- newlib/libc/tinystdio/vsnprintff.c
- newlib/libc/tinystdio/vsprintff.c
-Copyright: 2018 Keith Packard
-License: BSD3-31
-
 Files: newlib/libc/tinystdio/atod_engine.c
  newlib/libc/tinystdio/atof_engine.c
  newlib/libc/tinystdio/vfscanf.c
@@ -1724,6 +1693,19 @@ Files: newlib/libc/tinystdio/clearerr.c
  newlib/libc/tinystdio/fgetc.c
  newlib/libc/tinystdio/stdio_private.h
 Copyright: 2002,2005 Joerg Wunsch
+License: BSD3-31
+
+Files: newlib/libc/tinystdio/dtoa_data.c
+ newlib/libc/tinystdio/dtoa_engine.c
+ newlib/libc/tinystdio/dtoa_engine.h
+ newlib/libc/tinystdio/make-dtoa-data
+ newlib/libc/tinystdio/sprintfd.c
+ newlib/libc/tinystdio/sprintff.c
+ newlib/libc/tinystdio/vfiprintf.c
+ newlib/libc/tinystdio/vfiscanf.c
+ newlib/libc/tinystdio/vfprintff.c
+ newlib/libc/tinystdio/vfscanff.c
+Copyright: 2018, Keith Packard
 License: BSD3-31
 
 Files: newlib/libc/tinystdio/fdevopen.c
@@ -1755,12 +1737,6 @@ Files: newlib/libc/tinystdio/ftoa_engine.h
 Copyright: 2005, Dmitry Xmelkov
 License: BSD3-31
 
-Files: newlib/libc/tinystdio/getc.c
- newlib/libc/tinystdio/putc.c
- newlib/libc/tinystdio/ultoa_invert.c
-Copyright: 2017 Keith Packard
-License: BSD3-31
-
 Files: newlib/libc/tinystdio/stdio.h
 Copyright: 2002, 2005, 2007 Joerg Wunsch  
  1990, 1991, 1993 The Regents of the University of California. 
@@ -1771,6 +1747,10 @@ Files: newlib/libc/tinystdio/strtod.c
  newlib/libc/tinystdio/strtold.c
 Copyright: 2002-2005  Michael Stumpf  <mistumpf@de.pepperl-fuchs.com>
  2006,2008  Dmitry Xmelkov 
+License: BSD3-31
+
+Files: newlib/libc/tinystdio/ultoa_invert.c
+Copyright: 2017 Keith Packard
 License: BSD3-31
 
 Files: newlib/libc/tinystdio/vfprintf.c
@@ -2486,7 +2466,6 @@ Files: newlib/libm/machine/arm/fe_dfl_env.c
  newlib/libm/machine/arm/fesetround.c
  newlib/libm/machine/arm/fetestexcept.c
  newlib/libm/machine/arm/feupdateenv.c
- newlib/libm/machine/i386/feclearexcept.c
  newlib/libm/machine/i386/feclearexcept.c
  newlib/libm/machine/i386/fegetenv.c
  newlib/libm/machine/i386/fegetexceptflag.c
