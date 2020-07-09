@@ -302,7 +302,7 @@ ok:
     {
       data->data[i] = _iconv_to_ucs_ces_handlers_table.init (
                                                         data->desc[i].csname);
-      if (data->data == NULL)
+      if (data->data[i] == NULL)
         goto error;
     } 
 
