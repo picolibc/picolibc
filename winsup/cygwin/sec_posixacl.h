@@ -34,7 +34,7 @@ struct __acl_t
 inline acl_entry_t
 __to_entry (acl_t acl, uint16_t idx)
 {
-  return ((uint64_t) idx << 48) | (uint64_t) acl;
+  return ((uint64_t) idx << 48) | (uint64_t) ((uintptr_t) acl);
 }
 #define __to_permset(a,i)	((acl_permset_t)__to_entry((a),(i)))
 
