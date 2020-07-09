@@ -11,7 +11,7 @@ details. */
    changes to the DLL and is mainly informative in nature. */
 
 #define CYGWIN_VERSION_DLL_MAJOR 3001
-#define CYGWIN_VERSION_DLL_MINOR 6
+#define CYGWIN_VERSION_DLL_MINOR 7
 
 /* Major numbers before CYGWIN_VERSION_DLL_EPOCH are incompatible. */
 
