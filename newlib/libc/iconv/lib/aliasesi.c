@@ -115,7 +115,7 @@ search_again:
      && (p+l == table_end || isspace (*(p+l)) || *(p+l) == '\n')))
     {
       ptable = p + l;
-      len -= table - p;
+      len = table_end - ptable;
       goto search_again;
     }
 
