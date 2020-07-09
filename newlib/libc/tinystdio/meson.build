@@ -52,6 +52,8 @@ srcs_tinystdio = [
     'fgetc.c',
     'fgets.c',
     'fileno.c',
+    'filestrget.c',
+    'filestrput.c',
     'fiprintf.c',
     'fiscanf.c',
     'fprintf.c',

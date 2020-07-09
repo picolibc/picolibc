@@ -243,17 +243,9 @@ struct __file {
 	uint8_t	flags;		/* flags, see below */
 #define __SRD	0x0001		/* OK to read */
 #define __SWR	0x0002		/* OK to write */
-#define __SSTR	0x0004		/* this is an sprintf/snprintf string */
-#define __SERR	0x0010		/* found error */
-#define __SEOF	0x0020		/* found EOF */
-#define __SCLOSE 0x0080		/* struct is __file_close with close function */
-#if 0
-/* possible future extensions, will require uint16_t flags */
-#define __SRW	0x0100		/* open for reading & writing */
-#define __SLBF	0x0200		/* line buffered */
-#define __SNBF	0x0400		/* unbuffered */
-#define __SMBF	0x0800		/* buf is from malloc */
-#endif
+#define __SERR	0x0004		/* found error */
+#define __SEOF	0x0008		/* found EOF */
+#define __SCLOSE 0x0010		/* struct is __file_close with close function */
 	int	(*put)(char, struct __file *);	/* function to write one char to device */
 	int	(*get)(struct __file *);	/* function to read one char from device */
 	int	(*flush)(struct __file *);	/* function to flush output to device */

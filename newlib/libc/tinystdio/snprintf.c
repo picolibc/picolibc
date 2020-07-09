@@ -50,14 +50,7 @@ snprintf(char *s, size_t n, const char *fmt, ...)
 	else
 		n--;
 
-	struct __file_str f = {
-		.file = {
-			.flags = __SWR | __SSTR,
-		},
-		.buf = s,
-		.len = 0,
-		.size = n			/* -1,0,...32767 */
-	};
+	struct __file_str f = FDEV_SETUP_STRING_WRITE(s, n);
 
 	va_start(ap, fmt);
 	i = vfprintf(&f.file, fmt, ap);

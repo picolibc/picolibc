@@ -54,6 +54,38 @@ struct __file_str {
 	int	size;		/* size of buffer */
 };
 
+int
+__file_str_get(FILE *stream);
+
+int
+__file_str_put(char c, FILE *stream);
+
+/*
+ * It is OK to discard the "const" qualifier here.  f.buf is
+ * non-const as in the generic case, this buffer is obtained
+ * by malloc().  In the scanf case however, the buffer is
+ * really only be read (by getc()), and as this our FILE f we
+ * be discarded upon exiting sscanf(), nobody will ever get
+ * a chance to get write access to it again.
+ */
+#define FDEV_SETUP_STRING_READ(_s) {		\
+		.file = {			\
+			.flags = __SRD,		\
+			.get = __file_str_get	\
+		},				\
+		.buf = (char *) (_s)		\
+	}
+
+#define FDEV_SETUP_STRING_WRITE(_s, _size) {	\
+		.file = {			\
+			.flags = __SWR,		\
+			.put = __file_str_put	\
+		},				\
+		.buf = (_s),			\
+		.size = (_size),		\
+		.len = 0			\
+	}
+
 #ifdef POSIX_IO
 
 struct __file_posix {
