@@ -68,6 +68,7 @@ srcs_tinystdio = [
     'gets.c',
     'iprintf.c',
     'iscanf.c',
+    'perror.c',
     'printf.c',
     'printff.c',
     'putc.c',
