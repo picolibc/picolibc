@@ -31,12 +31,12 @@
 
 #ifdef _ICONV_ENABLED
 
-#if defined(_ICONV_CONVERTER_UTF_8) || \
-    defined(_ICONV_CONVERTER_EUC_JP) || \
-    defined(_ICONV_CONVERTER_SHIFT_JIS) || \
-    defined(_ICONV_CONVERTER_UCS_2_INTERNAL)
+#if defined(_ICONV_FROM_ENCODING_UTF_8) || \
+    defined(_ICONV_FROM_ENCODING_EUC_JP) || \
+    defined(_ICONV_FROM_ENCODING_SHIFT_JIS) || \
+    defined(_ICONV_FROM_ENCODING_UCS_2_INTERNAL)
 
-#ifdef _ICONV_CONVERTER_UTF_8
+#ifdef _ICONV_FROM_ENCODING_UTF_8
 char utf8[] =
 {
     0xe8,0x89,0xb2,0xe3,0x80,0x85,0xe3,0x83,0x86,0xe3,
@@ -227,9 +227,9 @@ char utf8[] =
     0x95,0xe3,0x82,0xa9,0xe3,0x83,0xbc,0xe3,0x83,0x9e,
     0xe3,0x83,0x83,0xe3,0x83,0x88,0x0d,0xa
  };
-#endif /* ifdef _ICONV_CONVERTER_UTF_8 */
- 
-#ifdef _ICONV_CONVERTER_EUC_JP 
+#endif /* ifdef _ICONV_FROM_ENCODING_UTF_8 */
+
+#ifdef _ICONV_FROM_ENCODING_EUC_JP
  char euc_jp[] =
  {
     0xbf,0xa7,0xa1,0xb9,0xa5,0xc6,0xa5,0xad,0xa5,0xb9,
@@ -394,10 +394,10 @@ char utf8[] =
     0xa5,0xca,0xa5,0xea,0x49,0x49,0xa5,0xd5,0xa5,0xa9,
     0xa1,0xbc,0xa5,0xde,0xa5,0xc3,0xa5,0xc8,0x0d,0x0a
 };
-#endif /* #ifdef _ICONV_CONVERTER_EUC_JP */
+#endif /* #ifdef _ICONV_FROM_ENCODING_EUC_JP */
 
-#ifdef _ICONV_CONVERTER_SHIFT_JIS
-char shift_jis[] = 
+#ifdef _ICONV_FROM_ENCODING_SHIFT_JIS
+char shift_jis[] =
 {
     0x90,0x46,0x81,0x58,0x83,0x65,0x83,0x4c,0x83,0x58,
     0x83,0x67,0x83,0x74,0x83,0x40,0x83,0x43,0x83,0x8b,
@@ -561,9 +561,9 @@ char shift_jis[] =
     0x83,0x69,0x83,0x8a,0x49,0x49,0x83,0x74,0x83,0x48,
     0x81,0x5b,0x83,0x7d,0x83,0x62,0x83,0x67,0x0d,0x0a
 };
-#endif /* _ICONV_CONVERTER_SHIFT_JIS */
+#endif /* _ICONV_FROM_ENCODING_SHIFT_JIS */
 
-#ifdef _ICONV_CONVERTER_UCS_2_INTERNAL
+#ifdef _ICONV_FROM_ENCODING_UCS_2_INTERNAL
 short ucs2[] =
 {
     0x8272,0x3005,0x30c6,0x30ad,0x30b9,
@@ -849,18 +849,18 @@ struct iconv_data
 
 #define CONVERSIONS 4
 
-struct iconv_data data[] = 
+struct iconv_data data[] =
 {
-#ifdef _ICONV_CONVERTER_EUC_JP
+#if defined(_ICONV_FROM_ENCODING_EUC_JP) && defined(_ICONV_TO_ENCODING_EUC_JP)
     {sizeof(euc_jp), "EUC-JP", (char *)euc_jp},
 #endif
-#ifdef _ICONV_CONVERTER_SHIFT_JIS
+#if defined(_ICONV_FROM_ENCODING_SHIFT_JIS) && defined(_ICONV_TO_ENCODING_SHIFT_JIS)
     {sizeof(shift_jis), "SHIFT-JIS", (char *)shift_jis},
 #endif
-#ifdef _ICONV_CONVERTER_UTF_8
+#if defined(_ICONV_FROM_ENCODING_UTF_8) && defined(_ICONV_TO_ENCODING_UTF_8)
     {sizeof(utf8), "UTF-8", (char *)utf8},
 #endif
-#ifdef _ICONV_CONVERTER_UCS_2_INTERNAL
+#if defined(_ICONV_FROM_ENCODING_UCS_2_INTERNAL) && defined(_ICONV_TO_ENCODING_UCS_2_INTERNAL)
     {sizeof(ucs2), "UCS-2-INTERNAL", (char *)ucs2},
 #endif
     {0, NULL, NULL}
@@ -881,7 +881,7 @@ int main(int argc, char **argv)
     int conversions = sizeof(data)/sizeof(struct iconv_data) - 1;
 
     puts("JP iconv test");
-    
+
     for (i = 0; i < conversions; i++)
     {
         for (j = 0; j < conversions; j++)
@@ -895,7 +895,7 @@ int main(int argc, char **argv)
 	    }
 	}
     }
-    
+
     d = 0;
     for (i = 0; i < conversions; i++)
     {
@@ -911,8 +911,8 @@ int main(int argc, char **argv)
                 perror("Can't reset shift state");
                 CHECK(ERROR);
             }
-	    
-            n = iconv(descs[d++], (const char **)&(inbuf), &inbytes, 
+
+            n = iconv(descs[d++], (const char **)&(inbuf), &inbytes,
 	                          (char **)&outbuf, &outbytes);
             if (n == (size_t)-1)
             {
@@ -921,7 +921,7 @@ int main(int argc, char **argv)
 		perror("");
                 CHECK(ERROR);
             }
-	    
+
 	    if (data[j].len != OUTBUF_LEN - outbytes)
 	    {
                 printf("Conversion from %s to %s FAILED",
@@ -930,7 +930,7 @@ int main(int argc, char **argv)
 		       OUTBUF_LEN - outbytes, data[j].len);
                 CHECK(ERROR);
 	    }
-	    
+
 	    for (k = 0; k < data[j].len; k++)
 	    {
 	        if (ob[k] != data[j].data[k])
@@ -940,18 +940,18 @@ int main(int argc, char **argv)
    	            printf("Error: byte %d is wrong\n", k);
 		    printf("outbuf value: %#x, inbuf value %#x, "
 		           "right value: %#x\n",
-          	           (int)ob[k], (int)(data[i].data[k]), 
+          	           (int)ob[k], (int)(data[i].data[k]),
 		           (int)(data[j].data[k]));
                     CHECK(ERROR);
 		}
 	    }
 
 	    printf("iconv from %s to %s was successfully done\n",
-                   data[i].name, data[j].name); 
-            
+                   data[i].name, data[j].name);
+
 	}
     }
-    
+
     d = 0;
     for (i = 0; i < conversions; i++)
         for (j = 0; j < conversions; j++)
@@ -960,14 +960,14 @@ int main(int argc, char **argv)
     exit(0);
 }
 
-#else /* #if defined(_ICONV_CONVERTER_UTF_8) || ... */
+#else /* #if defined(_ICONV_FROM_ENCODING_UTF_8) || ... */
 int main(int argc, char **argv)
 {
     puts("None of UTF-8, EUC-JP, SHIFT-JIS and UCS-2_INTERNAL converters "
          "linked, SKIP test");
     exit(0);
 }
-#endif /* #if defined(_ICONV_CONVERTER_UTF_8) || ... */
+#endif /* #if defined(_ICONV_FROM_ENCODING_UTF_8) || ... */
 
 #else /* #ifdef _ICONV_ENABLED */
 int main(int argc, char **argv)
@@ -976,4 +976,3 @@ int main(int argc, char **argv)
     exit(0);
 }
 #endif /* #ifdef _ICONV_ENABLED */
-

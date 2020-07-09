@@ -32,11 +32,11 @@
 
 #ifdef _ICONV_ENABLED
 
-#if defined(_ICONV_CONVERTER_UTF_8) || \
-    defined(_ICONV_CONVERTER_ISO_8859_5) || \
-    defined(_ICONV_CONVERTER_KOI8_R)
+#if defined(_ICONV_FROM_ENCODING_UTF_8) || \
+    defined(_ICONV_FROM_ENCODING_ISO_8859_5) || \
+    defined(_ICONV_FROM_ENCODING_KOI8_R)
 
-#ifdef _ICONV_CONVERTER_ISO_8859_5
+#ifdef _ICONV_FROM_ENCODING_ISO_8859_5
 char iso_8859_5[] =
 {
     0xbe,0xdf,0xd5,0xe0,0xd0,0xe2,0xde,0xe0,0xeb,0x20,
@@ -137,9 +137,9 @@ char iso_8859_5[] =
     0x20,0x20,0x20,0x20,0x20,0x20,0x20,0x20,0x20,0x2d,
     0x2d,0x2d,0x3e,0x0a
 };
-#endif /* #ifdef _ICONV_CONVERTER_ISO_8859_5 */
+#endif /* #ifdef _ICONV_FROM_ENCODING_ISO_8859_5 */
 
-#ifdef _ICONV_CONVERTER_KOI8_R
+#ifdef _ICONV_FROM_ENCODING_KOI8_R
 char koi8_r[] = 
 {
     0xef,0xd0,0xc5,0xd2,0xc1,0xd4,0xcf,0xd2,0xd9,0x20,
@@ -240,9 +240,9 @@ char koi8_r[] =
     0x20,0x20,0x20,0x20,0x20,0x20,0x20,0x20,0x20,0x2d,
     0x2d,0x2d,0x3e,0x0a
 };
-#endif /* #ifdef _ICONV_CONVERTER_KOI8_R */
+#endif /* #ifdef _ICONV_FROM_ENCODING_KOI8_R */
 
-#ifdef _ICONV_CONVERTER_UTF_8
+#ifdef _ICONV_FROM_ENCODING_UTF_8
 char utf8[] =
 {
     0xd0,0x9e,0xd0,0xbf,0xd0,0xb5,0xd1,0x80,0xd0,0xb0,
@@ -365,13 +365,13 @@ struct iconv_data
 
 struct iconv_data data[] = 
 {
-#ifdef _ICONV_CONVERTER_ISO_8859_5
+#ifdef _ICONV_FROM_ENCODING_ISO_8859_5
     {sizeof(iso_8859_5), "ISO-8859-5", (char *)iso_8859_5},
 #endif
-#ifdef _ICONV_CONVERTER_KOI8_R
+#ifdef _ICONV_FROM_ENCODING_KOI8_R
     {sizeof(koi8_r), "KOI8-R", (char *)koi8_r},
 #endif
-#ifdef _ICONV_CONVERTER_UTF_8
+#ifdef _ICONV_FROM_ENCODING_UTF_8
     {sizeof(utf8), "UTF-8", (char *)utf8},
 #endif
     {0, NULL, NULL}
@@ -471,13 +471,13 @@ int main(int argc, char **argv)
     exit(0);
 }
 
-#else /* #if defined(_ICONV_CONVERTER_UTF_8) || ... */
+#else /* #if defined(_ICONV_FROM_ENCODING_UTF_8) || ... */
 int main(int argc, char **argv)
 {
     puts("None of ISO-8859-5, KOI8-R and UTF-8 converters linked, SKIP test");
     exit(0);
 }
-#endif /* #if defined(_ICONV_CONVERTER_UTF_8) || ... */
+#endif /* #if defined(_ICONV_FROM_ENCODING_UTF_8) || ... */
 
 #else /* #ifdef _ICONV_ENABLED */
 int main(int argc, char **argv)
