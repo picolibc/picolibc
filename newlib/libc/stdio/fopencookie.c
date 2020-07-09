@@ -187,7 +187,7 @@ fccloser (struct _reent *ptr,
       if ((result = c->closefn (c->cookie)) < 0 && errno)
 	__errno_r(ptr) = errno;
     }
-  _free_r (ptr, c);
+  free (c);
   return result;
 }
 
@@ -212,7 +212,7 @@ _fopencookie_r (struct _reent *ptr,
     }
   if ((fp = __sfp (ptr)) == NULL)
     return NULL;
-  if ((c = (fccookie *) _malloc_r (ptr, sizeof *c)) == NULL)
+  if ((c = (fccookie *) malloc (sizeof *c)) == NULL)
     {
       _newlib_sfp_lock_start ();
       fp->_flags = 0;		/* release */

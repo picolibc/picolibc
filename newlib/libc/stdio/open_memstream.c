@@ -284,7 +284,7 @@ memcloser (struct _reent *ptr,
 				: *c->psize + 1);
   if (buf)
     *c->pbuf = buf;
-  _free_r (ptr, c->storage);
+  free (c->storage);
   return 0;
 }
 
@@ -306,7 +306,7 @@ internal_open_memstream_r (struct _reent *ptr,
     }
   if ((fp = __sfp (ptr)) == NULL)
     return NULL;
-  if ((c = (memstream *) _malloc_r (ptr, sizeof *c)) == NULL)
+  if ((c = (memstream *) malloc (sizeof *c)) == NULL)
     {
       _newlib_sfp_lock_start ();
       fp->_flags = 0;		/* release */
@@ -330,7 +330,7 @@ internal_open_memstream_r (struct _reent *ptr,
     c->max = 64 * 1024;
 #endif
   *size = 0;
-  *buf = _malloc_r (ptr, c->max);
+  *buf = malloc (c->max);
   if (!*buf)
     {
       _newlib_sfp_lock_start ();
@@ -339,7 +339,7 @@ internal_open_memstream_r (struct _reent *ptr,
       __lock_close_recursive (fp->_lock);
 #endif
       _newlib_sfp_lock_end ();
-      _free_r (ptr, c);
+      free (c);
       return NULL;
     }
   if (wide == 1)
