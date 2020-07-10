@@ -926,8 +926,8 @@ int main(int argc, char **argv)
 	    {
                 printf("Conversion from %s to %s FAILED",
                        data[i].name, data[j].name);
-	        printf(" - bad output buffer length (%d instead of %d)\n",
-		       OUTBUF_LEN - outbytes, data[j].len);
+	        printf(" - bad output buffer length (%ld instead of %d)\n",
+		       OUTBUF_LEN - (long) outbytes, data[j].len);
                 CHECK(ERROR);
 	    }
 

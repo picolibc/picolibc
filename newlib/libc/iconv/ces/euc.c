@@ -205,7 +205,7 @@ euc_convert_from_ucs (void *data,
       
       if (((int)*outbytesleft - d->desc[i].prefixbytes - d->desc[i].bytes) < 0)
         {
-          char buf[ICONV_MB_LEN_MAX];
+          unsigned char buf[ICONV_MB_LEN_MAX];
           outbytesleft1 = ICONV_MB_LEN_MAX;
           outbuf1 = &buf[0];
           /* See wether this is right sequence */
