@@ -403,7 +403,7 @@ dev_console::get_console_cp ()
 inline DWORD
 dev_console::str_to_con (mbtowc_p f_mbtowc, PWCHAR d, const char *s, DWORD sz)
 {
-  return sys_cp_mbstowcs (f_mbtowc, d, CONVERT_LIMIT, s, sz);
+  return _sys_mbstowcs (f_mbtowc, d, CONVERT_LIMIT, s, sz);
 }
 
 bool

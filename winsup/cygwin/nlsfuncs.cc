@@ -1542,11 +1542,11 @@ internal_setlocale ()
   if (path && *path)	/* $PATH can be potentially unset. */
     {
       w_path = tp.w_get ();
-      sys_cp_mbstowcs (cygheap->locale.mbtowc, w_path, 32768, path);
+      _sys_mbstowcs (cygheap->locale.mbtowc, w_path, 32768, path);
     }
   w_cwd = tp.w_get ();
   cwdstuff::cwd_lock.acquire ();
-  sys_cp_mbstowcs (cygheap->locale.mbtowc, w_cwd, 32768,
+  _sys_mbstowcs (cygheap->locale.mbtowc, w_cwd, 32768,
 		   cygheap->cwd.get_posix ());
   /* Set charset for internal conversion functions. */
   cygheap->locale.mbtowc = __get_global_locale ()->mbtowc;

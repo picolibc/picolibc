@@ -45,22 +45,52 @@ extern wctomb_f __utf8_wctomb;
 
 #ifdef __INSIDE_CYGWIN__
 #ifdef __cplusplus
-size_t __reg3 sys_wcstombs (char *dst, size_t len, const wchar_t * src,
-			    size_t nwc = (size_t) -1);
-size_t __reg3 sys_wcstombs_no_path (char *dst, size_t len,
-				    const wchar_t * src,
-				    size_t nwc = (size_t) -1);
-size_t __reg3 sys_wcstombs_alloc (char **, int, const wchar_t *,
-				  size_t = (size_t) -1);
-size_t __reg3 sys_wcstombs_alloc_no_path (char **, int, const wchar_t *,
-					  size_t = (size_t) -1);
+extern size_t _sys_wcstombs (char *dst, size_t len, const wchar_t *src,
+			     size_t nwc, bool is_path);
+extern size_t _sys_wcstombs_alloc (char **dst_p, int type, const wchar_t *src,
+				   size_t nwc, bool is_path);
 
-size_t __reg3 sys_cp_mbstowcs (mbtowc_p, wchar_t *, size_t, const char *,
-			       size_t = (size_t) -1);
-size_t __reg3 sys_mbstowcs (wchar_t * dst, size_t dlen, const char *src,
-			    size_t nms = (size_t) -1);
-size_t __reg3 sys_mbstowcs_alloc (wchar_t **, int, const char *,
-				  size_t = (size_t) -1);
+static inline size_t
+sys_wcstombs (char *dst, size_t len, const wchar_t * src,
+	      size_t nwc = (size_t) -1)
+{
+  return _sys_wcstombs (dst, len, src, nwc, true);
+}
+
+static inline size_t
+sys_wcstombs_no_path (char *dst, size_t len, const wchar_t * src,
+		      size_t nwc = (size_t) -1)
+{
+  return _sys_wcstombs (dst, len, src, nwc, false);
+}
+
+static inline size_t
+sys_wcstombs_alloc (char **dst_p, int type, const wchar_t *src,
+		    size_t nwc = (size_t) -1)
+{
+  return _sys_wcstombs_alloc (dst_p, type, src, nwc, true);
+}
+
+static inline size_t
+sys_wcstombs_alloc_no_path (char **dst_p, int type, const wchar_t *src,
+			    size_t nwc = (size_t) -1)
+{
+  return _sys_wcstombs_alloc (dst_p, type, src, nwc, false);
+}
+
+size_t _sys_mbstowcs (mbtowc_p, wchar_t *, size_t, const char *,
+		      size_t = (size_t) -1);
+
+static inline size_t
+sys_mbstowcs (wchar_t * dst, size_t dlen, const char *src,
+	      size_t nms = (size_t) -1)
+{
+  mbtowc_p f_mbtowc = (__MBTOWC == __ascii_mbtowc) ? __utf8_mbtowc : __MBTOWC;
+  return _sys_mbstowcs (f_mbtowc, dst, dlen, src, nms);
+}
+
+size_t sys_mbstowcs_alloc (wchar_t **, int, const char *, size_t = (size_t) -1);
+
 #endif /* __cplusplus */
 #endif /* __INSIDE_CYGWIN__ */
 
