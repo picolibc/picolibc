@@ -1392,7 +1392,6 @@ class fhandler_fifo: public fhandler_base
 
   UNICODE_STRING pipe_name;
   WCHAR pipe_name_buf[CYGWIN_FIFO_PIPE_NAME_LEN + 1];
-  bool _maybe_eof;
   fifo_client_handler *fc_handler;     /* Dynamically growing array. */
   int shandlers;                       /* Size (capacity) of the array. */
   int nhandlers;                       /* Number of elements in the array. */
@@ -1473,9 +1472,9 @@ class fhandler_fifo: public fhandler_base
 
 public:
   fhandler_fifo ();
-  bool hit_eof ();
-  bool maybe_eof () const { return _maybe_eof; }
-  void maybe_eof (bool val) { _maybe_eof = val; }
+  /* Called if we appear to be at EOF after polling fc_handlers. */
+  bool hit_eof () const
+  { return !nwriters () && !IsEventSignalled (writer_opening); }
   int get_nhandlers () const { return nhandlers; }
   fifo_client_handler &get_fc_handler (int i) { return fc_handler[i]; }
   PUNICODE_STRING get_pipe_name ();

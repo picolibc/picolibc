@@ -87,7 +87,7 @@ fhandler_fifo::fhandler_fifo ():
   fhandler_base (),
   read_ready (NULL), write_ready (NULL), writer_opening (NULL),
   owner_needed_evt (NULL), owner_found_evt (NULL), update_needed_evt (NULL),
-  cancel_evt (NULL), thr_sync_evt (NULL), _maybe_eof (false),
+  cancel_evt (NULL), thr_sync_evt (NULL),
   fc_handler (NULL), shandlers (0), nhandlers (0),
   reader (false), writer (false), duplexer (false),
   max_atomic_write (DEFAULT_PIPEBUFSIZE),
@@ -361,8 +361,6 @@ fhandler_fifo::record_connection (fifo_client_handler& fc,
 				  fifo_client_connect_state s)
 {
   fc.state = s;
-  maybe_eof (false);
-  ResetEvent (writer_opening);
   set_pipe_non_blocking (fc.h, true);
 }
 
@@ -1173,25 +1171,6 @@ fhandler_fifo::raw_write (const void *ptr, size_t len)
   return ret;
 }
 
-/* A reader is at EOF if the pipe is empty and no writers are open.
-   hit_eof is called by raw_read and select.cc:peek_fifo if it appears
-   that we are at EOF after polling the fc_handlers.  We recheck this
-   in case a writer opened while we were polling.  */
-bool
-fhandler_fifo::hit_eof ()
-{
-  bool ret = maybe_eof () && !IsEventSignalled (writer_opening);
-  if (ret)
-    {
-      yield ();
-      /* Wait for the reader thread to finish recording any connection. */
-      fifo_client_lock ();
-      fifo_client_unlock ();
-      ret = maybe_eof ();
-    }
-  return ret;
-}
-
 /* Called from raw_read and select.cc:peek_fifo. */
 void
 fhandler_fifo::take_ownership ()
@@ -1261,9 +1240,8 @@ fhandler_fifo::raw_read (void *in_ptr, size_t& len)
 		break;
 	      }
 	  }
-      maybe_eof (!nconnected && !IsEventSignalled (writer_opening));
       fifo_client_unlock ();
-      if (maybe_eof () && hit_eof ())
+      if (!nconnected && hit_eof ())
 	{
 	  reading_unlock ();
 	  len = 0;
