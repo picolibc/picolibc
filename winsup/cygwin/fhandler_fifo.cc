@@ -462,26 +462,10 @@ fhandler_fifo::fifo_reader_thread_func ()
 	take_ownership = true;
       else if (cur_owner != me)
 	idle = true;
-      if (take_ownership)
-	{
-	  if (!shared_fc_handler_updated ())
-	    {
-	      owner_unlock ();
-	      yield ();
-	      continue;
-	    }
-	  else
-	    {
-	      set_owner (me);
-	      set_pending_owner (null_fr_id);
-	      if (update_my_handlers () < 0)
-		api_fatal ("Can't update my handlers, %E");
-	      owner_found ();
-	      owner_unlock ();
-	      continue;
-	    }
-	}
-      else if (idle)
+      else
+	/* I'm the owner. */
+	goto owner_listen;
+      if (idle)
 	{
 	  owner_unlock ();
 	  HANDLE w[2] = { owner_needed_evt, cancel_evt };
@@ -495,9 +479,28 @@ fhandler_fifo::fifo_reader_thread_func ()
 	      api_fatal ("WFMO failed, %E");
 	    }
 	}
-      else
+      else if (take_ownership)
 	{
-	  /* I'm the owner */
+	  if (!shared_fc_handler_updated ())
+	    {
+	      owner_unlock ();
+	      if (IsEventSignalled (cancel_evt))
+		goto canceled;
+	      continue;
+	    }
+	  else
+	    {
+	      set_owner (me);
+	      set_pending_owner (null_fr_id);
+	      if (update_my_handlers () < 0)
+		api_fatal ("Can't update my handlers, %E");
+	      owner_found ();
+	      owner_unlock ();
+	      /* Fall through to owner_listen. */
+	    }
+	}
+
+owner_listen:
 	  fifo_client_lock ();
 	  cleanup_handlers ();
 	  if (add_client_handler () < 0)
@@ -590,7 +593,6 @@ fhandler_fifo::fifo_reader_thread_func ()
 	  fifo_client_unlock ();
 	  if (cancel)
 	    goto canceled;
-	}
     }
 canceled:
   if (conn_evt)
