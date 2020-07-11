@@ -1298,7 +1298,8 @@ struct fifo_client_handler
 {
   HANDLE h;
   fifo_client_connect_state state;
-  fifo_client_handler () : h (NULL), state (fc_unknown) {}
+  bool last_read;  /* true if our last successful read was from this client. */
+  fifo_client_handler () : h (NULL), state (fc_unknown), last_read (false) {}
   void close () { NtClose (h); }
   fifo_client_connect_state set_state ();
 };
