@@ -383,11 +383,7 @@ fhandler_fifo::update_my_handlers ()
   else
     prev_proc = OpenProcess (PROCESS_DUP_HANDLE, false, prev.winpid);
   if (!prev_proc)
-    {
-      debug_printf ("Can't open process of previous owner, %E");
-      __seterrno ();
-      goto out;
-    }
+    api_fatal ("Can't open process of previous owner, %E");
 
   for (int i = 0; i < get_shared_nhandlers (); i++)
     {
@@ -399,14 +395,17 @@ fhandler_fifo::update_my_handlers ()
 			    !close_on_exec (), DUPLICATE_SAME_ACCESS))
 	{
 	  debug_printf ("Can't duplicate handle of previous owner, %E");
-	  --nhandlers;
 	  __seterrno ();
-	  goto out;
+	  fc.state = fc_error;
+	  fc.last_read = false;
+	  ret = -1;
 	}
-      fc.state = shared_fc_handler[i].state;
-      fc.last_read = shared_fc_handler[i].last_read;
+      else
+	{
+	  fc.state = shared_fc_handler[i].state;
+	  fc.last_read = shared_fc_handler[i].last_read;
+	}
     }
-out:
   set_prev_owner (null_fr_id);
   return ret;
 }
@@ -493,7 +492,7 @@ fhandler_fifo::fifo_reader_thread_func ()
 	      set_owner (me);
 	      set_pending_owner (null_fr_id);
 	      if (update_my_handlers () < 0)
-		api_fatal ("Can't update my handlers, %E");
+		debug_printf ("error updating my handlers, %E");
 	      owner_found ();
 	      owner_unlock ();
 	      /* Fall through to owner_listen. */
