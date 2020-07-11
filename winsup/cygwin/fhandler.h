@@ -1323,12 +1323,14 @@ struct fifo_reader_id_t
   }
 };
 
-/* Info needed by all readers of a FIFO, stored in named shared memory. */
+/* Info needed by all fhandlers for a given FIFO, stored in named
+   shared memory.  This is mostly for readers, but writers need access
+   in order to update the count of open writers. */
 class fifo_shmem_t
 {
-  LONG _nreaders;
+  LONG _nreaders, _nwriters;
   fifo_reader_id_t _owner, _prev_owner, _pending_owner;
-  af_unix_spinlock_t _owner_lock, _reading_lock, _reader_opening_lock, _nreaders_lock;
+  af_unix_spinlock_t _owner_lock, _reading_lock, _nreaders_lock, _nwriters_lock;
 
   /* Info about shared memory block used for temporary storage of the
      owner's fc_handler list. */
@@ -1339,6 +1341,9 @@ public:
   int nreaders () const { return (int) _nreaders; }
   int inc_nreaders () { return (int) InterlockedIncrement (&_nreaders); }
   int dec_nreaders () { return (int) InterlockedDecrement (&_nreaders); }
+  int nwriters () const { return (int) _nwriters; }
+  int inc_nwriters () { return (int) InterlockedIncrement (&_nwriters); }
+  int dec_nwriters () { return (int) InterlockedDecrement (&_nwriters); }
 
   fifo_reader_id_t get_owner () const { return _owner; }
   void set_owner (fifo_reader_id_t fr_id) { _owner = fr_id; }
@@ -1351,10 +1356,10 @@ public:
   void owner_unlock () { _owner_lock.unlock (); }
   void reading_lock () { _reading_lock.lock (); }
   void reading_unlock () { _reading_lock.unlock (); }
-  void reader_opening_lock () { _reader_opening_lock.lock (); }
-  void reader_opening_unlock () { _reader_opening_lock.unlock (); }
   void nreaders_lock () { _nreaders_lock.lock (); }
   void nreaders_unlock () { _nreaders_lock.unlock (); }
+  void nwriters_lock () { _nwriters_lock.lock (); }
+  void nwriters_unlock () { _nwriters_lock.unlock (); }
 
   int get_shared_nhandlers () const { return (int) _sh_nhandlers; }
   void set_shared_nhandlers (int n) { InterlockedExchange (&_sh_nhandlers, n); }
@@ -1380,8 +1385,6 @@ class fhandler_fifo: public fhandler_base
   HANDLE owner_needed_evt;      /* The owner is closing. */
   HANDLE owner_found_evt;       /* A new owner has taken over. */
   HANDLE update_needed_evt;     /* shared_fc_handler needs updating. */
-  HANDLE check_write_ready_evt; /* write_ready needs to be checked. */
-  HANDLE write_ready_ok_evt;    /* check_write_ready is done. */
 
   /* Handles to non-shared events needed for fifo_reader_threads. */
   HANDLE cancel_evt;            /* Signal thread to terminate. */
@@ -1417,7 +1420,7 @@ class fhandler_fifo: public fhandler_base
   void record_connection (fifo_client_handler&,
 			  fifo_client_connect_state = fc_connected);
 
-  int create_shmem ();
+  int create_shmem (bool only_open = false);
   int reopen_shmem ();
   int create_shared_fc_handler ();
   int reopen_shared_fc_handler ();
@@ -1426,8 +1429,13 @@ class fhandler_fifo: public fhandler_base
   int nreaders () const { return shmem->nreaders (); }
   int inc_nreaders () { return shmem->inc_nreaders (); }
   int dec_nreaders () { return shmem->dec_nreaders (); }
+  int nwriters () const { return shmem->nwriters (); }
+  int inc_nwriters () { return shmem->inc_nwriters (); }
+  int dec_nwriters () { return shmem->dec_nwriters (); }
   void nreaders_lock () { shmem->nreaders_lock (); }
   void nreaders_unlock () { shmem->nreaders_unlock (); }
+  void nwriters_lock () { shmem->nwriters_lock (); }
+  void nwriters_unlock () { shmem->nwriters_unlock (); }
 
   fifo_reader_id_t get_prev_owner () const { return shmem->get_prev_owner (); }
   void set_prev_owner (fifo_reader_id_t fr_id)
@@ -1462,9 +1470,6 @@ class fhandler_fifo: public fhandler_base
   { return shmem->shared_fc_handler_updated (); }
   void shared_fc_handler_updated (bool val)
   { shmem->shared_fc_handler_updated (val); }
-  void check_write_ready ();
-  void reader_opening_lock () { shmem->reader_opening_lock (); }
-  void reader_opening_unlock () { shmem->reader_opening_unlock (); }
 
 public:
   fhandler_fifo ();
