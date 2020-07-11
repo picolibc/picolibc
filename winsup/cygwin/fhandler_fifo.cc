@@ -52,10 +52,23 @@
      which is mostly idle.  The thread wakes up if that reader might
      need to take ownership.
 
-     There is a block of shared memory, accessible to all readers,
-     that contains information needed for the owner change process.
-     It also contains some locks to prevent races and deadlocks
-     between the various threads.
+     There is a block of named shared memory, accessible to all
+     fhandlers for a given FIFO.  It keeps track of the number of open
+     readers and writers; it contains information needed for the owner
+     change process; and it contains some locks to prevent races and
+     deadlocks between the various threads.
+
+     The shared memory is created by the first reader to open the
+     FIFO.  It is opened by subsequent readers and by all writers.  It
+     is destroyed by Windows when the last handle to it is closed.
+
+     If a handle to it somehow remains open after all processes
+     holding file descriptors to the FIFO have closed, the shared
+     memory can persist and be reused with stale data by the next
+     process that opens the FIFO.  So far I've seen this happen only
+     as a result of a bug in the code, but there are some debug_printf
+     statements in fhandler_fifo::open to help detect this if it
+     happens again.
 
      At this writing, I know of only one application (Midnight
      Commander when running under tcsh) that *explicitly* opens two
