@@ -501,98 +501,98 @@ fhandler_fifo::fifo_reader_thread_func ()
 	}
 
 owner_listen:
-	  fifo_client_lock ();
-	  cleanup_handlers ();
-	  if (add_client_handler () < 0)
-	    api_fatal ("Can't add a client handler, %E");
+      fifo_client_lock ();
+      cleanup_handlers ();
+      if (add_client_handler () < 0)
+	api_fatal ("Can't add a client handler, %E");
 
-	  /* Listen for a writer to connect to the new client handler. */
-	  fifo_client_handler& fc = fc_handler[nhandlers - 1];
-	  fifo_client_unlock ();
-	  shared_fc_handler_updated (false);
-	  owner_unlock ();
-	  NTSTATUS status;
-	  IO_STATUS_BLOCK io;
-	  bool cancel = false;
-	  bool update = false;
+      /* Listen for a writer to connect to the new client handler. */
+      fifo_client_handler& fc = fc_handler[nhandlers - 1];
+      fifo_client_unlock ();
+      shared_fc_handler_updated (false);
+      owner_unlock ();
+      NTSTATUS status;
+      IO_STATUS_BLOCK io;
+      bool cancel = false;
+      bool update = false;
 
-	  status = NtFsControlFile (fc.h, conn_evt, NULL, NULL, &io,
-				    FSCTL_PIPE_LISTEN, NULL, 0, NULL, 0);
-	  if (status == STATUS_PENDING)
+      status = NtFsControlFile (fc.h, conn_evt, NULL, NULL, &io,
+				FSCTL_PIPE_LISTEN, NULL, 0, NULL, 0);
+      if (status == STATUS_PENDING)
+	{
+	  HANDLE w[3] = { conn_evt, update_needed_evt, cancel_evt };
+	  switch (WaitForMultipleObjects (3, w, false, INFINITE))
 	    {
-	      HANDLE w[3] = { conn_evt, update_needed_evt, cancel_evt };
-	      switch (WaitForMultipleObjects (3, w, false, INFINITE))
-		{
-		case WAIT_OBJECT_0:
-		  status = io.Status;
-		  debug_printf ("NtFsControlFile STATUS_PENDING, then %y",
-				status);
-		  break;
-		case WAIT_OBJECT_0 + 1:
-		  status = STATUS_WAIT_1;
-		  update = true;
-		  break;
-		case WAIT_OBJECT_0 + 2:
-		  status = STATUS_THREAD_IS_TERMINATING;
-		  cancel = true;
-		  update = true;
-		  break;
-		default:
-		  api_fatal ("WFMO failed, %E");
-		}
-	    }
-	  else
-	    debug_printf ("NtFsControlFile status %y, no STATUS_PENDING",
-			  status);
-	  HANDLE ph = NULL;
-	  NTSTATUS status1;
-
-	  fifo_client_lock ();
-	  switch (status)
-	    {
-	    case STATUS_SUCCESS:
-	    case STATUS_PIPE_CONNECTED:
-	      record_connection (fc);
+	    case WAIT_OBJECT_0:
+	      status = io.Status;
+	      debug_printf ("NtFsControlFile STATUS_PENDING, then %y",
+			    status);
 	      break;
-	    case STATUS_PIPE_CLOSING:
-	      record_connection (fc, fc_closing);
+	    case WAIT_OBJECT_0 + 1:
+	      status = STATUS_WAIT_1;
+	      update = true;
 	      break;
-	    case STATUS_THREAD_IS_TERMINATING:
-	    case STATUS_WAIT_1:
-	      /* Try to connect a bogus client.  Otherwise fc is still
-		 listening, and the next connection might not get recorded. */
-	      status1 = open_pipe (ph);
-	      WaitForSingleObject (conn_evt, INFINITE);
-	      if (NT_SUCCESS (status1))
-		/* Bogus cilent connected. */
-		delete_client_handler (nhandlers - 1);
-	      else
-		/* Did a real client connect? */
-		switch (io.Status)
-		  {
-		  case STATUS_SUCCESS:
-		  case STATUS_PIPE_CONNECTED:
-		    record_connection (fc);
-		    break;
-		  case STATUS_PIPE_CLOSING:
-		    record_connection (fc, fc_closing);
-		    break;
-		  default:
-		    debug_printf ("NtFsControlFile status %y after failing to connect bogus client or real client", io.Status);
-		    fc.state = fc_unknown;
-		    break;
-		  }
+	    case WAIT_OBJECT_0 + 2:
+	      status = STATUS_THREAD_IS_TERMINATING;
+	      cancel = true;
+	      update = true;
 	      break;
 	    default:
-	      break;
+	      api_fatal ("WFMO failed, %E");
 	    }
-	  if (ph)
-	    NtClose (ph);
-	  if (update && update_shared_handlers () < 0)
-	    api_fatal ("Can't update shared handlers, %E");
-	  fifo_client_unlock ();
-	  if (cancel)
-	    goto canceled;
+	}
+      else
+	debug_printf ("NtFsControlFile status %y, no STATUS_PENDING",
+		      status);
+      HANDLE ph = NULL;
+      NTSTATUS status1;
+
+      fifo_client_lock ();
+      switch (status)
+	{
+	case STATUS_SUCCESS:
+	case STATUS_PIPE_CONNECTED:
+	  record_connection (fc);
+	  break;
+	case STATUS_PIPE_CLOSING:
+	  record_connection (fc, fc_closing);
+	  break;
+	case STATUS_THREAD_IS_TERMINATING:
+	case STATUS_WAIT_1:
+	  /* Try to connect a bogus client.  Otherwise fc is still
+	     listening, and the next connection might not get recorded. */
+	  status1 = open_pipe (ph);
+	  WaitForSingleObject (conn_evt, INFINITE);
+	  if (NT_SUCCESS (status1))
+	    /* Bogus cilent connected. */
+	    delete_client_handler (nhandlers - 1);
+	  else
+	    /* Did a real client connect? */
+	    switch (io.Status)
+	      {
+	      case STATUS_SUCCESS:
+	      case STATUS_PIPE_CONNECTED:
+		record_connection (fc);
+		break;
+	      case STATUS_PIPE_CLOSING:
+		record_connection (fc, fc_closing);
+		break;
+	      default:
+		debug_printf ("NtFsControlFile status %y after failing to connect bogus client or real client", io.Status);
+		fc.state = fc_unknown;
+		break;
+	      }
+	  break;
+	default:
+	  break;
+	}
+      if (ph)
+	NtClose (ph);
+      if (update && update_shared_handlers () < 0)
+	api_fatal ("Can't update shared handlers, %E");
+      fifo_client_unlock ();
+      if (cancel)
+	goto canceled;
     }
 canceled:
   if (conn_evt)
