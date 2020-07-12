@@ -1186,8 +1186,11 @@ fhandler_fifo::take_ownership ()
       return;
     }
   set_pending_owner (me);
+  /* Wake up my fifo_reader_thread. */
   owner_needed ();
-  SetEvent (update_needed_evt);
+  if (get_owner ())
+    /* Wake up owner's fifo_reader_thread. */
+    SetEvent (update_needed_evt);
   owner_unlock ();
   /* The reader threads should now do the transfer.  */
   WaitForSingleObject (owner_found_evt, INFINITE);
