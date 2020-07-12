@@ -449,6 +449,14 @@ if newlib_iconv
   # By default, use newlib_iconv_encodings for both directions,
   # allowing overrides if specified
 
+  available_encodings = run_command(['sed', '-e', '/^#/d', '-e', '/^$/d', '-e', 's/ .*$//', files('newlib/libc/iconv/encoding.aliases')[0]]).stdout().split('\n')
+
+  # Include all available encodings if none were specified on the command line
+
+  if newlib_iconv_encodings.length() == 0
+    newlib_iconv_encodings = available_encodings
+  endif
+
   if newlib_iconv_from_encodings.length() == 0
     newlib_iconv_from_encodings = newlib_iconv_encodings
   endif
@@ -456,15 +464,9 @@ if newlib_iconv
     newlib_iconv_to_encodings = newlib_iconv_encodings
   endif
 
-  if newlib_iconv_to_encodings.length() == 0 or newlib_iconv_from_encodings.length() == 0
-    error('newlib-iconv-encodings required for newlib-iconv')
-  endif
-
   # Dig out the list of available encodings from the encoding.aliases file. Only
   # accept the first entry from each line
   
-  available_encodings = run_command(['sed', '-e', '/^#/d', '-e', '/^$/d', '-e', 's/ .*$//', files('newlib/libc/iconv/encoding.aliases')[0]]).stdout().split('\n')
-
   # Set config variables for each requested 'from' encoding
 
   foreach from : newlib_iconv_from_encodings
