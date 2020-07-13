@@ -867,7 +867,16 @@ peek_fifo (select_record *s, bool from_select)
 	}
 
       fh->reading_lock ();
-      fh->take_ownership ();
+      if (fh->take_ownership () != WAIT_OBJECT_0)
+	{
+	  select_printf ("%s, unable to take ownership", fh->get_name ());
+	  fh->reading_unlock ();
+	  gotone += s->read_ready = true;
+	  if (s->except_selected)
+	    gotone += s->except_ready = true;
+	  goto out;
+	}
+
       fh->fifo_client_lock ();
       int nconnected = 0;
       for (int i = 0; i < fh->get_nhandlers (); i++)

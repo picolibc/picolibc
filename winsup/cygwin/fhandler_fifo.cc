@@ -1175,15 +1175,16 @@ fhandler_fifo::raw_write (const void *ptr, size_t len)
   return ret;
 }
 
-/* Called from raw_read and select.cc:peek_fifo. */
-void
+/* Called from raw_read and select.cc:peek_fifo.  Return WAIT_OBJECT_0
+   on success.  */
+DWORD
 fhandler_fifo::take_ownership ()
 {
   owner_lock ();
   if (get_owner () == me)
     {
       owner_unlock ();
-      return;
+      return WAIT_OBJECT_0;
     }
   set_pending_owner (me);
   /* Wake up my fifo_reader_thread. */
@@ -1192,8 +1193,19 @@ fhandler_fifo::take_ownership ()
     /* Wake up owner's fifo_reader_thread. */
     SetEvent (update_needed_evt);
   owner_unlock ();
-  /* The reader threads should now do the transfer.  */
-  WaitForSingleObject (owner_found_evt, INFINITE);
+  /* The reader threads should now do the transfer. */
+  DWORD waitret = cygwait (owner_found_evt, cw_cancel | cw_sig_eintr);
+  owner_lock ();
+  if (waitret == WAIT_OBJECT_0
+      && (get_owner () != me || get_pending_owner ()))
+    {
+      /* Something went wrong.  Return WAIT_TIMEOUT, which can't be
+	 returned by the above cygwait call. */
+      set_pending_owner (null_fr_id);
+      waitret = WAIT_TIMEOUT;
+    }
+  owner_unlock ();
+  return waitret;
 }
 
 void __reg3
@@ -1206,7 +1218,37 @@ fhandler_fifo::raw_read (void *in_ptr, size_t& len)
     {
       /* No one else can take ownership while we hold the reading_lock. */
       reading_lock ();
-      take_ownership ();
+      switch (take_ownership ())
+	{
+	case WAIT_OBJECT_0:
+	  break;
+	case WAIT_SIGNALED:
+	  if (_my_tls.call_signal_handler ())
+	    {
+	      reading_unlock ();
+	      continue;
+	    }
+	  else
+	    {
+	      set_errno (EINTR);
+	      reading_unlock ();
+	      goto errout;
+	    }
+	  break;
+	case WAIT_CANCELED:
+	  reading_unlock ();
+	  pthread::static_cancel_self ();
+	  break;
+	case WAIT_TIMEOUT:
+	  reading_unlock ();
+	  debug_printf ("take_ownership returned an unexpected result; retry");
+	  continue;
+	default:
+	  reading_unlock ();
+	  debug_printf ("unknown error while trying to take ownership, %E");
+	  goto errout;
+	}
+
       /* Poll the connected clients for input.  Make two passes.  On
 	 the first pass, just try to read from the client from which
 	 we last read successfully.  This should minimize
