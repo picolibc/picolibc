@@ -124,29 +124,28 @@ questions, all of these people will appreciate it if you use the cygwin
 mailing lists rather than sending personal email.)</emphasis>
 </para>
 <para>
-Corinna Vinschen is the current project lead. Corinna is a senior Red Hat
-engineer. Corinna is responsible for the Cygwin library and maintains a couple
-of packages, for instance OpenSSH, OpenSSL, and a lot more.
+Corinna Vinschen is the current project lead,
+responsible for the Cygwin library and a lot more.
 </para>
 <para>
-Yaakov Selkowitz is another Red Hat engineer working on the Cygwin project.
-He's the guy behind the current build and packaging system and maintains by
-far the most packages in the Cygwin distribution.
+Yaakov Selkowitz is the guy behind the current build and packaging system
+and maintained by far the most packages in the Cygwin distribution.
 </para>
 <para>
-Jon Turney is developer and maintainer of the Cygwin X server and a couple
-of related packages.
+Jon Turney is maintainer of the Cygwin X server and related packages.
 </para>
 <para>
-The packages in the Net release are maintained by a large group of people;
-a complete list can be found
-<ulink url='https://cygwin.com/cygwin-pkg-maint'>here</ulink>.
+The packages are maintained by a large group of
+<ulink url='https://cygwin.com/cygwin-pkg-maint'>volunteers</ulink>.
 </para>
-<para>Please note that all of us working on Cygwin try to be as responsive as
-possible and deal with patches and questions as we get them, but realistically
-we don't have time to answer all of the email that is sent to the main mailing
-list.  Making Net releases of the Win32 tools and helping people on the Net out
-is not our primary job function, so some email will have to go unanswered.
+<para>
+Please note that all of us volunteering on Cygwin try to be as responsive as
+possible and deal with patches and questions as we get them, but
+realistically we don't have time to answer all of the email that is sent to
+the main mailing list.
+Making releases of the tools and packages is an activity in our spare time,
+helping people out is not our primary focus, so some email will have to go
+unanswered.
 </para>
 <para>Many thanks to everyone using the tools for their many contributions in
 the form of advice, bug reports, and code fixes.  Keep them coming!
