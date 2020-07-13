@@ -85,25 +85,34 @@ freedoms, so it is free software.
 <answer>
 
 <para>To find the version of the Cygwin DLL installed, you can use
-<filename>uname</filename> as on Linux or <filename>cygcheck</filename>. Refer to each command's
+<filename>uname</filename> <literal>-r</literal> as you would for a Unix kernel.
+As the Cygwin DLL takes the place of a Unix kernel,
+you can also use the Unix compatible command:
+<filename>head</filename> <filename>/proc/version</filename>,
+or the Cygwin specific command:
+<filename>cygcheck</filename> <literal>-V</literal>.
+Refer to each command's
 <literal>--help</literal> output and the
 <ulink url='https://cygwin.com/cygwin-ug-net/'>Cygwin User's Guide</ulink>
 for more information.
 </para>
 <para>If you are looking for the version number for the whole Cygwin
-release, there is none. Each package in the Cygwin release has its own
-version.  The packages in Cygwin are continually improving, thanks to
-the efforts of net volunteers who maintain the Cygwin binary ports.
+release, there is none.
+Each package in the Cygwin release has its own version, and the
+<literal>cygwin</literal> package containing the Cygwin DLL and Cygwin
+system specific utilities is just another (but very important!) package.
+The packages in Cygwin are continually improving, thanks to
+the efforts of volunteers who maintain the Cygwin ports.
 Each package has its own version numbers and its own release process.
 </para>
 <para>So, how do you get the most up-to-date version of Cygwin?  Easy.  Just
-download the Cygwin Setup program by following the instructions
-<ulink url='https://cygwin.com/install.html'>here</ulink>.
-The setup program will handle the task of updating the packages on your system
-to the latest version. For more information about using Cygwin's
-<filename>setup.exe</filename>, see 
+download the Cygwin Setup program by following the
+<ulink url='https://cygwin.com/install.html'>installation instructions</ulink>.
+The Setup program will handle the task of updating the packages on your system
+to the latest version.
+For more information about using Cygwin's Setup program, see
 <ulink url='https://cygwin.com/cygwin-ug-net/setup-net.html'>Setting Up Cygwin</ulink>
-in the Cygwin User's Guide. 
+in the Cygwin User's Guide.
 </para></answer></qandaentry>
 
 <qandaentry id="faq.what.who">
