@@ -1437,6 +1437,8 @@ class fhandler_fifo: public fhandler_base
   void nwriters_lock () { shmem->nwriters_lock (); }
   void nwriters_unlock () { shmem->nwriters_unlock (); }
 
+  fifo_reader_id_t get_owner () const { return shmem->get_owner (); }
+  void set_owner (fifo_reader_id_t fr_id) { shmem->set_owner (fr_id); }
   fifo_reader_id_t get_prev_owner () const { return shmem->get_prev_owner (); }
   void set_prev_owner (fifo_reader_id_t fr_id)
   { shmem->set_prev_owner (fr_id); }
@@ -1444,6 +1446,8 @@ class fhandler_fifo: public fhandler_base
   { return shmem->get_pending_owner (); }
   void set_pending_owner (fifo_reader_id_t fr_id)
   { shmem->set_pending_owner (fr_id); }
+  void owner_lock () { shmem->owner_lock (); }
+  void owner_unlock () { shmem->owner_unlock (); }
 
   void owner_needed ()
   {
@@ -1482,12 +1486,6 @@ public:
   DWORD fifo_reader_thread_func ();
   void fifo_client_lock () { _fifo_client_lock.lock (); }
   void fifo_client_unlock () { _fifo_client_lock.unlock (); }
-
-  fifo_reader_id_t get_me () const { return me; }
-  fifo_reader_id_t get_owner () const { return shmem->get_owner (); }
-  void set_owner (fifo_reader_id_t fr_id) { shmem->set_owner (fr_id); }
-  void owner_lock () { shmem->owner_lock (); }
-  void owner_unlock () { shmem->owner_unlock (); }
 
   DWORD take_ownership ();
   void reading_lock () { shmem->reading_lock (); }
