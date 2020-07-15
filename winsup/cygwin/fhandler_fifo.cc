@@ -371,6 +371,8 @@ fhandler_fifo::record_connection (fifo_client_handler& fc,
 int
 fhandler_fifo::update_my_handlers ()
 {
+  int ret = 0;
+
   close_all_handlers ();
   fifo_reader_id_t prev = get_prev_owner ();
   if (!prev)
@@ -387,7 +389,7 @@ fhandler_fifo::update_my_handlers ()
     {
       debug_printf ("Can't open process of previous owner, %E");
       __seterrno ();
-      return -1;
+      goto out;
     }
 
   for (int i = 0; i < get_shared_nhandlers (); i++)
@@ -402,11 +404,13 @@ fhandler_fifo::update_my_handlers ()
 	  debug_printf ("Can't duplicate handle of previous owner, %E");
 	  --nhandlers;
 	  __seterrno ();
-	  return -1;
+	  goto out;
 	}
       fc.state = shared_fc_handler[i].state;
     }
-  return 0;
+out:
+  set_prev_owner (null_fr_id);
+  return ret;
 }
 
 int
@@ -1414,41 +1418,59 @@ fhandler_fifo::close ()
 {
   if (reader)
     {
-      /* If we're the owner, try to find a new owner. */
-      bool find_new_owner = false;
+      /* If we're the owner, we can't close our fc_handlers if a new
+	 owner might need to duplicate them. */
+      bool close_fc_ok = false;
 
       cancel_reader_thread ();
-      owner_lock ();
-      if (get_owner () == me)
-	{
-	  find_new_owner = true;
-	  set_owner (null_fr_id);
-	  set_prev_owner (me);
-	  owner_needed ();
-	}
-      owner_unlock ();
+      nreaders_lock ();
       if (dec_nreaders () == 0)
-	ResetEvent (read_ready);
-      else if (find_new_owner && !IsEventSignalled (owner_found_evt))
 	{
-	  bool found = false;
-	  do
-	    if (dec_nreaders () >= 0)
-	      {
-		/* There's still another reader open. */
-		if (WaitForSingleObject (owner_found_evt, 1) == WAIT_OBJECT_0)
-		  found = true;
-		else
-		  {
-		    owner_lock ();
-		    if (get_owner ()) /* We missed owner_found_evt? */
-		      found = true;
-		    else
-		      owner_needed ();
-		    owner_unlock ();
-		  }
-	      }
-	  while (inc_nreaders () > 0 && !found);
+	  close_fc_ok = true;
+	  ResetEvent (read_ready);
+	  ResetEvent (owner_needed_evt);
+	  ResetEvent (owner_found_evt);
+	  set_owner (null_fr_id);
+	  set_prev_owner (null_fr_id);
+	  set_pending_owner (null_fr_id);
+	  set_shared_nhandlers (0);
+	}
+      else
+	{
+	  owner_lock ();
+	  if (get_owner () != me)
+	    close_fc_ok = true;
+	  else
+	    {
+	      set_owner (null_fr_id);
+	      set_prev_owner (me);
+	      if (!get_pending_owner ())
+		owner_needed ();
+	    }
+	  owner_unlock ();
+	}
+      nreaders_unlock ();
+      while (!close_fc_ok)
+	{
+	  if (WaitForSingleObject (owner_found_evt, 1) == WAIT_OBJECT_0)
+	    close_fc_ok = true;
+	  else
+	    {
+	      nreaders_lock ();
+	      if (!nreaders ())
+		{
+		  close_fc_ok = true;
+		  nreaders_unlock ();
+		}
+	      else
+		{
+		  nreaders_unlock ();
+		  owner_lock ();
+		  if (get_owner () || get_prev_owner () != me)
+		    close_fc_ok = true;
+		  owner_unlock ();
+		}
+	    }
 	}
       close_all_handlers ();
       if (fc_handler)

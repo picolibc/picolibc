@@ -1328,7 +1328,7 @@ class fifo_shmem_t
 {
   LONG _nreaders;
   fifo_reader_id_t _owner, _prev_owner, _pending_owner;
-  af_unix_spinlock_t _owner_lock, _reading_lock, _reader_opening_lock;
+  af_unix_spinlock_t _owner_lock, _reading_lock, _reader_opening_lock, _nreaders_lock;
 
   /* Info about shared memory block used for temporary storage of the
      owner's fc_handler list. */
@@ -1336,6 +1336,7 @@ class fifo_shmem_t
     _sh_fc_handler_updated;
 
 public:
+  int nreaders () const { return (int) _nreaders; }
   int inc_nreaders () { return (int) InterlockedIncrement (&_nreaders); }
   int dec_nreaders () { return (int) InterlockedDecrement (&_nreaders); }
 
@@ -1352,6 +1353,8 @@ public:
   void reading_unlock () { _reading_lock.unlock (); }
   void reader_opening_lock () { _reader_opening_lock.lock (); }
   void reader_opening_unlock () { _reader_opening_lock.unlock (); }
+  void nreaders_lock () { _nreaders_lock.lock (); }
+  void nreaders_unlock () { _nreaders_lock.unlock (); }
 
   int get_shared_nhandlers () const { return (int) _sh_nhandlers; }
   void set_shared_nhandlers (int n) { InterlockedExchange (&_sh_nhandlers, n); }
@@ -1420,8 +1423,11 @@ class fhandler_fifo: public fhandler_base
   int reopen_shared_fc_handler ();
   int remap_shared_fc_handler (size_t);
 
+  int nreaders () const { return shmem->nreaders (); }
   int inc_nreaders () { return shmem->inc_nreaders (); }
   int dec_nreaders () { return shmem->dec_nreaders (); }
+  void nreaders_lock () { shmem->nreaders_lock (); }
+  void nreaders_unlock () { shmem->nreaders_unlock (); }
 
   fifo_reader_id_t get_prev_owner () const { return shmem->get_prev_owner (); }
   void set_prev_owner (fifo_reader_id_t fr_id)
