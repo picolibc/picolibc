@@ -376,6 +376,12 @@ fhandler_socket_wsock::evaluate_events (const long event_mask, long &events,
       if (erase)
 	wsock_events->events &= ~(events & ~(FD_WRITE | FD_CLOSE));
     }
+  /* Since FD_CONNECT is only given once, we manually need to set
+     FD_WRITE for connection failed sockets to have consistent
+     behaviour in programs calling poll/select multiple times.
+     Example test to non-listening port: curl -v 127.0.0.1:47 */
+  if ((connect_state () == connect_failed) && (event_mask & FD_WRITE))
+    wsock_events->events |= FD_WRITE;
   UNLOCK_EVENTS;
 
   return ret;
