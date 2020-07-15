@@ -422,7 +422,9 @@ fhandler_fifo::update_shared_handlers ()
   set_shared_nhandlers (nhandlers);
   memcpy (shared_fc_handler, fc_handler, nhandlers * sizeof (fc_handler[0]));
   shared_fc_handler_updated (true);
+  owner_lock ();
   set_prev_owner (me);
+  owner_unlock ();
   return 0;
 }
 
