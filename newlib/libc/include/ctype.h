@@ -66,6 +66,9 @@ extern int toascii_l (int __c, locale_t __l);
 #define _X	0100
 #define	_B	0200
 
+/* For C++ backward-compatibility only.  */
+extern	__IMPORT const char	_ctype_[];
+
 #ifdef __HAVE_LOCALE_INFO__
 const char *__locale_ctype_ptr (void);
 #else
@@ -108,7 +111,12 @@ const char *__locale_ctype_ptr (void);
 #ifdef __HAVE_LOCALE_INFO__
 const char *__locale_ctype_ptr_l (locale_t);
 #else
-#define __locale_ctype_ptr_l(l)	_ctype_
+static __inline char *
+__locale_ctype_ptr_l(locale_t _l)
+{
+	(void)_l;
+	return __locale_ctype_ptr();
+}
 #endif
 #define __ctype_lookup_l(__c,__l) ((__locale_ctype_ptr_l(__l)+sizeof(""[__c]))[(int)(__c)])
 
@@ -169,9 +177,6 @@ const char *__locale_ctype_ptr_l (locale_t);
 #endif /* __POSIX_VISIBLE >= 200809 */
 
 #endif /* !__cplusplus */
-
-/* For C++ backward-compatibility only.  */
-extern	__IMPORT const char	_ctype_[];
 
 _END_STD_C
 
