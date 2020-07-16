@@ -2,3 +2,6 @@ Bug Fixes:
 ----------
 
 - Fix acl_get_* functions in 32-bit Cygwin (pointer sign extension)
+
+- Fix select/poll issue in case a socket connect call fails.
+  Addresses: https://cygwin.com/pipermail/cygwin/2020-July/245528.html
