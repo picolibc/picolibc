@@ -969,11 +969,6 @@ fhandler_pty_slave::open (int flags, mode_t)
       init_console_handler (true);
     }
 
-  isHybrid = false;
-  get_ttyp ()->pcon_pid = 0;
-  get_ttyp ()->switch_to_pcon_in = false;
-  get_ttyp ()->switch_to_pcon_out = false;
-
   set_open_status ();
   return 1;
 
