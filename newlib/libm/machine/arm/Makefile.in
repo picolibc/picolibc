@@ -83,8 +83,7 @@ am__objects_1 = lib_a-e_sqrt.$(OBJEXT) lib_a-ef_sqrt.$(OBJEXT) \
 	lib_a-fenv.$(OBJEXT) lib_a-feraiseexcept.$(OBJEXT) \
 	lib_a-fesetenv.$(OBJEXT) lib_a-fesetexceptflag.$(OBJEXT) \
 	lib_a-fesetround.$(OBJEXT) lib_a-fetestexcept.$(OBJEXT) \
-	lib_a-feupdateenv.$(OBJEXT) lib_a-fenv-vfp.$(OBJEXT) \
-	lib_a-fenv-softfp.$(OBJEXT)
+	lib_a-feupdateenv.$(OBJEXT)
 am_lib_a_OBJECTS = $(am__objects_1)
 lib_a_OBJECTS = $(am_lib_a_OBJECTS)
 DEFAULT_INCLUDES = -I.@am__isrc@
@@ -237,9 +236,7 @@ LIB_SOURCES = \
 	fesetexceptflag.c \
 	fesetround.c \
 	fetestexcept.c \
-	feupdateenv.c \
-	fenv-vfp.c \
-	fenv-softfp.c 
+	feupdateenv.c
 
 noinst_LIBRARIES = lib.a
 lib_a_SOURCES = $(LIB_SOURCES)
@@ -478,18 +475,6 @@ lib_a-feupdateenv.o: feupdateenv.c
 
 lib_a-feupdateenv.obj: feupdateenv.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-feupdateenv.obj `if test -f 'feupdateenv.c'; then $(CYGPATH_W) 'feupdateenv.c'; else $(CYGPATH_W) '$(srcdir)/feupdateenv.c'; fi`
-
-lib_a-fenv-vfp.o: fenv-vfp.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-fenv-vfp.o `test -f 'fenv-vfp.c' || echo '$(srcdir)/'`fenv-vfp.c
-
-lib_a-fenv-vfp.obj: fenv-vfp.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-fenv-vfp.obj `if test -f 'fenv-vfp.c'; then $(CYGPATH_W) 'fenv-vfp.c'; else $(CYGPATH_W) '$(srcdir)/fenv-vfp.c'; fi`
-
-lib_a-fenv-softfp.o: fenv-softfp.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-fenv-softfp.o `test -f 'fenv-softfp.c' || echo '$(srcdir)/'`fenv-softfp.c
-
-lib_a-fenv-softfp.obj: fenv-softfp.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-fenv-softfp.obj `if test -f 'fenv-softfp.c'; then $(CYGPATH_W) 'fenv-softfp.c'; else $(CYGPATH_W) '$(srcdir)/fenv-softfp.c'; fi`
 
 ID: $(HEADERS) $(SOURCES) $(LISP) $(TAGS_FILES)
 	list='$(SOURCES) $(HEADERS) $(LISP) $(TAGS_FILES)'; \

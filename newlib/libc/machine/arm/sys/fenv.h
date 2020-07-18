@@ -38,10 +38,6 @@
 extern "C" {
 #endif
 
-#ifndef	__fenv_static
-#define	__fenv_static static
-#endif
-
 typedef int fenv_t;
 typedef int fexcept_t;
 
@@ -51,7 +47,7 @@ typedef int fexcept_t;
 #define	FE_OVERFLOW	0x0004
 #define	FE_UNDERFLOW	0x0008
 #define	FE_INEXACT	0x0010
-#ifdef __ARM_PCS_VFP
+#ifndef __SOFTFP__
 #define	FE_DENORMAL	0x0080
 #define	FE_ALL_EXCEPT	(FE_DIVBYZERO | FE_INEXACT | \
 			 FE_INVALID | FE_OVERFLOW | FE_UNDERFLOW | FE_DENORMAL)
@@ -60,60 +56,32 @@ typedef int fexcept_t;
 			 FE_INVALID | FE_OVERFLOW | FE_UNDERFLOW)
 #endif
 
-
-
 /* Rounding modes */
-#define	VFP_FE_TONEAREST	0x00000000
-#define	VFP_FE_UPWARD		0x00400000
-#define	VFP_FE_DOWNWARD		0x00800000
-#define	VFP_FE_TOWARDZERO	0x00c00000
-
-#ifdef __ARM_PCS_VFP
-#define	FE_TONEAREST	VFP_FE_TONEAREST
-#define	FE_UPWARD	VFP_FE_UPWARD
-#define	FE_DOWNWARD	VFP_FE_DOWNWARD
-#define	FE_TOWARDZERO	VFP_FE_TOWARDZERO
-#else
-#define	FE_TONEAREST	0x0000
-#define	FE_TOWARDZERO	0x0001
-#define	FE_UPWARD	0x0002
-#define	FE_DOWNWARD	0x0003
-#endif
-#define	_ROUND_MASK	(FE_TONEAREST | FE_DOWNWARD | \
-			 FE_UPWARD | FE_TOWARDZERO)
-
+#define	FE_TONEAREST		0x00000000
+#define	FE_UPWARD		0x00400000
+#define	FE_DOWNWARD		0x00800000
+#define	FE_TOWARDZERO		0x00c00000
 
 /* Default floating-point environment */
-
 extern const fenv_t	*_fe_dfl_env;
 #define	FE_DFL_ENV	(_fe_dfl_env)
 
-/* We need to be able to map status flag positions to mask flag positions */
-#ifndef __ARM_PCS_VFP
-#define	_FPUSW_SHIFT	16
-#define	_ENABLE_MASK	(FE_ALL_EXCEPT << _FPUSW_SHIFT)
-#endif
-
-
-
-int feclearexcept(int excepts);
-int fegetexceptflag(fexcept_t *flagp, int excepts);
-int fesetexceptflag(const fexcept_t *flagp, int excepts);
-int feraiseexcept(int excepts);
-int fetestexcept(int excepts);
+int feclearexcept(int);
+int fegetexceptflag(fexcept_t *, int);
+int fesetexceptflag(const fexcept_t *, int);
+int feraiseexcept(int);
+int fetestexcept(int);
 int fegetround(void);
-int fesetround(int round);
-int fegetenv(fenv_t *envp);
-int feholdexcept(fenv_t *envp);
-int fesetenv(const fenv_t *envp);
-int feupdateenv(const fenv_t *envp);
+int fesetround(int);
+int fegetenv(fenv_t *);
+int feholdexcept(fenv_t *);
+int fesetenv(const fenv_t *);
+int feupdateenv(const fenv_t *);
 #if __BSD_VISIBLE
-int feenableexcept(int __mask);
-int fedisableexcept(int __mask);
+int feenableexcept(int);
+int fedisableexcept(int);
 int fegetexcept(void);
 #endif /* __BSD_VISIBLE */
-
-
 
 #ifdef __cplusplus
 }
