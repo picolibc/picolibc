@@ -352,9 +352,13 @@ fhandler_socket_wsock::evaluate_events (const long event_mask, long &events,
 	      WSASetLastError (wsa_err);
 	      ret = SOCKET_ERROR;
 	    }
-	  else
-	    wsock_events->events |= FD_WRITE;
-	  wsock_events->events &= ~FD_CONNECT;
+	  /* Since FD_CONNECT is only given once, we have to keep FD_CONNECT
+	     for connection failed sockets to have consistent behaviour in
+	     programs calling poll/select multiple times.  Example test to
+	     non-listening port: curl -v 127.0.0.1:47 */
+	  if (connect_state () != connect_failed)
+	    wsock_events->events &= ~FD_CONNECT;
+	  wsock_events->events |= FD_WRITE;
 	  wsock_events->connect_errorcode = 0;
 	}
       /* This test makes accept/connect behave as on Linux when accept/connect
@@ -376,12 +380,6 @@ fhandler_socket_wsock::evaluate_events (const long event_mask, long &events,
       if (erase)
 	wsock_events->events &= ~(events & ~(FD_WRITE | FD_CLOSE));
     }
-  /* Since FD_CONNECT is only given once, we manually need to set
-     FD_WRITE for connection failed sockets to have consistent
-     behaviour in programs calling poll/select multiple times.
-     Example test to non-listening port: curl -v 127.0.0.1:47 */
-  if ((connect_state () == connect_failed) && (event_mask & FD_WRITE))
-    wsock_events->events |= FD_WRITE;
   UNLOCK_EVENTS;
 
   return ret;
