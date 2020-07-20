@@ -765,7 +765,7 @@ mmap_is_attached_or_noreserve (void *addr, size_t len)
   LIST_LOCK ();
   mmap_list *map_list = mmapped_areas.get_list_by_fd (-1, NULL);
 
-  size_t pagesize = wincap.allocation_granularity ();
+  const size_t pagesize = wincap.allocation_granularity ();
   caddr_t start_addr = (caddr_t) rounddown ((uintptr_t) addr, pagesize);
   len += ((caddr_t) addr - start_addr);
   len = roundup2 (len, pagesize);
@@ -852,7 +852,7 @@ mmap64 (void *addr, size_t len, int prot, int flags, int fd, off_t off)
   caddr_t base = NULL;
   struct stat st;
 
-  size_t pagesize = wincap.allocation_granularity ();
+  const size_t pagesize = wincap.allocation_granularity ();
 
   fh_anonymous.set_handle (INVALID_HANDLE_VALUE);
   fh_anonymous.set_access (GENERIC_READ | GENERIC_WRITE | GENERIC_EXECUTE);
@@ -1227,7 +1227,7 @@ munmap (void *addr, size_t len)
       set_errno (EINVAL);
       return -1;
     }
-  size_t pagesize = wincap.allocation_granularity ();
+  const size_t pagesize = wincap.allocation_granularity ();
   if (((uintptr_t) addr % pagesize) || !len)
     {
       set_errno (EINVAL);
@@ -1348,7 +1348,7 @@ mprotect (void *addr, size_t len, int prot)
   syscall_printf ("mprotect (addr: %p, len %lu, prot %y)", addr, len, prot);
 
   /* See comment in mmap64 for a description. */
-  size_t pagesize = wincap.allocation_granularity ();
+  const size_t pagesize = wincap.allocation_granularity ();
   if ((uintptr_t) addr % pagesize)
     {
       set_errno (EINVAL);
@@ -1433,7 +1433,7 @@ mlock (const void *addr, size_t len)
   int ret = -1;
 
   /* Align address and length values to page size. */
-  size_t pagesize = wincap.allocation_granularity ();
+  const size_t pagesize = wincap.allocation_granularity ();
   PVOID base = (PVOID) rounddown ((uintptr_t) addr, pagesize);
   SIZE_T size = roundup2 (((uintptr_t) addr - (uintptr_t) base) + len,
 			  pagesize);
@@ -1491,7 +1491,7 @@ munlock (const void *addr, size_t len)
   int ret = -1;
 
   /* Align address and length values to page size. */
-  size_t pagesize = wincap.allocation_granularity ();
+  const size_t pagesize = wincap.allocation_granularity ();
   PVOID base = (PVOID) rounddown ((uintptr_t) addr, pagesize);
   SIZE_T size = roundup2 (((uintptr_t) addr - (uintptr_t) base) + len,
 			  pagesize);
@@ -1539,7 +1539,7 @@ posix_madvise (void *addr, size_t len, int advice)
     case POSIX_MADV_WILLNEED:
       {
 	/* Align address and length values to page size. */
-	size_t pagesize = wincap.allocation_granularity ();
+	const size_t pagesize = wincap.allocation_granularity ();
 	PVOID base = (PVOID) rounddown ((uintptr_t) addr, pagesize);
 	SIZE_T size = roundup2 (((uintptr_t) addr - (uintptr_t) base)
 				+ len, pagesize);
@@ -1560,7 +1560,7 @@ posix_madvise (void *addr, size_t len, int advice)
     case POSIX_MADV_DONTNEED:
       {
 	/* Align address and length values to page size. */
-	size_t pagesize = wincap.allocation_granularity ();
+	const size_t pagesize = wincap.allocation_granularity ();
 	PVOID base = (PVOID) rounddown ((uintptr_t) addr, pagesize);
 	SIZE_T size = roundup2 (((uintptr_t) addr - (uintptr_t) base)
 				+ len, pagesize);
