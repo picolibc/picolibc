@@ -1144,6 +1144,7 @@ go_ahead:
 	 ends in, but there's nothing at all we can do about that. */
 #ifdef __x86_64__
       len = roundup2 (len, wincap.allocation_granularity ());
+      orig_len = roundup2 (orig_len, wincap.allocation_granularity ());
 #else
       len = roundup2 (len, wincap.is_wow64 () ? wincap.allocation_granularity ()
 					      : wincap.page_size ());
