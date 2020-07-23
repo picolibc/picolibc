@@ -11,8 +11,8 @@ jobs:
           "",
           "-Dio-float-exact=false",
           "-Dtinystdio=false -Dnewlib-io-float=true -Dio-long-long=true",
-          "-Dnewlib-iconv=true -Dnewlib-locale-info=true -Dnewlib-locale-info-extended=true -Dnewlib-mb=true", 
-          "-Dtinystdio=false -Dnewlib-io-float=true -Dio-long-long=true -Dnewlib-iconv=true -Dnewlib-locale-info=true -Dnewlib-locale-info-extended=true -Dnewlib-mb=true"
+          "-Dnewlib-locale-info=true -Dnewlib-locale-info-extended=true -Dnewlib-mb=true", 
+          "-Dtinystdio=false -Dnewlib-io-float=true -Dio-long-long=true -Dnewlib-locale-info=true -Dnewlib-locale-info-extended=true -Dnewlib-mb=true"
         ]
         test: [
            "./.github/do-test do-native-configure build-native",
