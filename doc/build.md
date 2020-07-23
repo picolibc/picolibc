@@ -101,17 +101,20 @@ configuration
 
 ### Internationalization options
 
-These options control how much internationalization support is
-included in the library. By default, picolibc only supports the 'C'
-locale and the ASCII character set for things like ctype and iconv.
+These options control which character sets are supported by iconv.
 
 | Option                      | Default | Description                                                                          |
 | ------                      | ------- | -----------                                                                          |
-| newlib-iconv                | false   | Enable iconv library support. Requires some from/to encodings to be specified        |
-| newlib-iconv-encodings      | <empty> | Comma-separated list of bidirectional iconv encodings to be built-in                 |
-| newlib-iconv-from-encodings | <empty> | Comma-separated list of "from" iconv encodings to be built-in                        |
-| newlib-iconv-to-encodings   | <empty> | Comma-separated list of "to" iconv encodings to be built-in                          |
-| newlib-iconv-external-ccs   | false   | Enable capabilities to load external CCS files for iconv                             |
+| newlib-iconv-encodings      | <empty> | Comma-separated list of iconv encodings to be built-in (default all supported)       |
+| newlib-iconv-from-encodings | <empty> | Comma-separated list of "from" iconv encodings to be built-in (default iconv-encodings) |
+| newlib-iconv-to-encodings   | <empty> | Comma-separated list of "to" iconv encodings to be built-in (default iconv-encodings) |
+| newlib-iconv-external-ccs   | false   | Use file system to store iconv tables. Requires fopen. (default built-in to memory)  |
+
+Thes options control how much Locale support is included in the
+library. By default, picolibc only supports the 'C' locale.
+
+| Option                      | Default | Description                                                                          |
+| ------                      | ------- | -----------                                                                          |
 | newlib-locale-info          | false   | Enable locale support                                                                |
 | newlib-locale-info-extended | false   | Enable even more locale support                                                      |
 | newlib-mb                   | false   | Enable multibyte support                                                             |

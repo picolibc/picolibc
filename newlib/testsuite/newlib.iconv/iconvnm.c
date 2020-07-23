@@ -30,8 +30,6 @@
 #include <newlib.h>
 #include "check.h"
 
-#ifdef _ICONV_ENABLED
-
 char *good_names[] = {
 #ifdef _ICONV_FROM_ENCODING_ISO_8859_5
 "iso_8859_5", "iso-8859-5", "iso-8859_5", "IsO-8859_5"
@@ -50,7 +48,11 @@ char *bad_names[] =
  " csisolatincyrillic", "euc-", "p", "euc_jp ", "euc-jp-",
  "us_as", "us_", "us_ascii ", " us_ascii",
  "CCCP", "", "-1", "-", "_", "---", "___", "-_-_-", "_-_-_", NULL};
-   
+
+#ifndef TEST_NLSPATH
+#define TEST_NLSPATH "./"
+#endif
+
 int main(int argc, char **argv)
 {
     int i, failed = 0;
@@ -58,7 +60,7 @@ int main(int argc, char **argv)
 
     puts("iconv names test");
 
-    CHECK(setenv("NLSPATH", "./", 0) != -1);
+    CHECK(setenv("NLSPATH", TEST_NLSPATH, 0) != -1);
 
     for (i = 0; i < sizeof(good_names)/sizeof(char *); i++)
     {
@@ -103,11 +105,3 @@ int main(int argc, char **argv)
 
     exit(0);
 }
-#else
-int main(int argc, char **argv)
-{
-    puts("iconv library is disabled, skip name test");
-    exit(0);
-}
-#endif /* #ifdef _ICONV_ENABLED */
-

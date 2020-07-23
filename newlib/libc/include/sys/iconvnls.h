@@ -38,7 +38,9 @@
 /* Iconv data path environment variable name */
 #define NLS_ENVVAR_NAME  "NLSPATH"
 /* Default NLSPATH value */
+#ifndef ICONV_DEFAULT_NLSPATH
 #define ICONV_DEFAULT_NLSPATH "/usr/locale"
+#endif
 /* Direction markers */
 #define ICONV_NLS_FROM 0
 #define ICONV_NLS_TO   1

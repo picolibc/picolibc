@@ -29,8 +29,6 @@
 #include <newlib.h>
 #include "check.h"
 
-#ifdef _ICONV_ENABLED
-
 #if defined(_ICONV_FROM_ENCODING_UTF_8) || \
     defined(_ICONV_FROM_ENCODING_EUC_JP) || \
     defined(_ICONV_FROM_ENCODING_SHIFT_JIS) || \
@@ -873,12 +871,18 @@ iconv_t descs[CONVERSIONS*CONVERSIONS];
 
 #define ERROR 0
 
+#ifndef TEST_NLSPATH
+#define TEST_NLSPATH "./"
+#endif
+
 int main(int argc, char **argv)
 {
     int i, j, k, d = 0;
     size_t n;
     char *outbuf, *inbuf;
     int conversions = sizeof(data)/sizeof(struct iconv_data) - 1;
+
+    CHECK(setenv("NLSPATH", TEST_NLSPATH, 0) != -1);
 
     puts("JP iconv test");
 
@@ -968,11 +972,3 @@ int main(int argc, char **argv)
     exit(0);
 }
 #endif /* #if defined(_ICONV_FROM_ENCODING_UTF_8) || ... */
-
-#else /* #ifdef _ICONV_ENABLED */
-int main(int argc, char **argv)
-{
-    puts("iconv library is disabled, SKIP test");
-    exit(0);
-}
-#endif /* #ifdef _ICONV_ENABLED */

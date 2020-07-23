@@ -1,7 +1,7 @@
 #
 # SPDX-License-Identifier: BSD-3-Clause
 #
-# Copyright © 2019 Keith Packard
+# Copyright © 2020 Keith Packard
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions
@@ -32,63 +32,53 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
-subdir('binary')
 
-srcs_ccs = [
-    'big5.c',
-    'ccsbi.c',
-    'cns11643_plane14.c',
-    'cns11643_plane1.c',
-    'cns11643_plane2.c',
-    'cp775.c',
-    'cp850.c',
-    'cp852.c',
-    'cp855.c',
-    'cp866.c',
-    'iso_8859_10.c',
-    'iso_8859_11.c',
-    'iso_8859_13.c',
-    'iso_8859_14.c',
-    'iso_8859_15.c',
-    'iso_8859_1.c',
-    'iso_8859_2.c',
-    'iso_8859_3.c',
-    'iso_8859_4.c',
-    'iso_8859_5.c',
-    'iso_8859_6.c',
-    'iso_8859_7.c',
-    'iso_8859_8.c',
-    'iso_8859_9.c',
-    'iso_ir_111.c',
-    'jis_x0201_1976.c',
-    'jis_x0208_1990.c',
-    'jis_x0212_1990.c',
-    'koi8_r.c',
-    'koi8_ru.c',
-    'koi8_u.c',
-    'koi8_uni.c',
-    'ksx1001.c',
-    'win_1250.c',
-    'win_1251.c',
-    'win_1252.c',
-    'win_1253.c',
-    'win_1254.c',
-    'win_1255.c',
-    'win_1256.c',
-    'win_1257.c',
-    'win_1258.c',
+iconv_data = meson.current_source_dir()
+
+cctfiles = [
+    'big5.cct',
+    'cns11643_plane14.cct',
+    'cns11643_plane1.cct',
+    'cns11643_plane2.cct',
+    'cp775.cct',
+    'cp850.cct',
+    'cp852.cct',
+    'cp855.cct',
+    'cp866.cct',
+    'iso_8859_10.cct',
+    'iso_8859_11.cct',
+    'iso_8859_13.cct',
+    'iso_8859_14.cct',
+    'iso_8859_15.cct',
+    'iso_8859_1.cct',
+    'iso_8859_2.cct',
+    'iso_8859_3.cct',
+    'iso_8859_4.cct',
+    'iso_8859_5.cct',
+    'iso_8859_6.cct',
+    'iso_8859_7.cct',
+    'iso_8859_8.cct',
+    'iso_8859_9.cct',
+    'iso_ir_111.cct',
+    'jis_x0201_1976.cct',
+    'jis_x0208_1990.cct',
+    'jis_x0212_1990.cct',
+    'koi8_r.cct',
+    'koi8_ru.cct',
+    'koi8_u.cct',
+    'koi8_uni.cct',
+    'ksx1001.cct',
+    'win_1250.cct',
+    'win_1251.cct',
+    'win_1252.cct',
+    'win_1253.cct',
+    'win_1254.cct',
+    'win_1255.cct',
+    'win_1256.cct',
+    'win_1257.cct',
+    'win_1258.cct',
 ]
-hdrs_ccs = [
-    'ccsbi.h',
-    'ccs.h',
-    'ccsnames.h',
-]
-foreach target : targets
-	value = get_variable('target_' + target)
-	set_variable('lib_ccs' + target,
-		static_library('ccs' + target,
-			       srcs_ccs,
-			       pic: false,
-			       include_directories: inc,
-			       c_args: value[1]))
-endforeach
+
+if newlib_iconv_external_ccs
+  install_data(cctfiles, install_dir: join_paths(newlib_iconv_dir, 'iconv_data'))
+endif

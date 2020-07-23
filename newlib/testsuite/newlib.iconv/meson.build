@@ -35,6 +35,14 @@
 
 tests = ['iconvjp', 'iconvnm', 'iconvru' ]
 
+iconv_data_link = custom_target('iconv_data link',
+				install: false,
+				input: iconv_data,
+				output: 'iconv_data',
+				command: ['ln', '-srf', '@INPUT@', '@OUTPUT@'])
+
+iconv_test_c_args = ['-DTEST_NLSPATH="' + meson.current_build_dir() + '"']
+
 foreach target : targets
   value = get_variable('target_' + target)
 
@@ -60,10 +68,11 @@ foreach target : targets
 
     test(test + target,
 	 executable(test_name, src,
-		    c_args: ['-Wno-missing-braces', '-Wno-implicit-int', '-Wno-return-type', '-D_XOPEN_SOURCE=700', '-D_GNU_SOURCE'] + _c_args,
+		    c_args: ['-Wno-missing-braces', '-Wno-implicit-int', '-Wno-return-type', '-D_XOPEN_SOURCE=700', '-D_GNU_SOURCE'] + _c_args + iconv_test_c_args,
 		    link_args: _link_args,
 		    link_with: _libs,
 		    include_directories: test_inc),
+	 depends: iconv_data_link,
 	 env: ['MESON_SOURCE_ROOT=' + meson.source_root()])
   endforeach
 endforeach

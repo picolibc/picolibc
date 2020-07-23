@@ -54,11 +54,12 @@ enable_native_tests = get_option('native-tests')
 have_alias_attribute_option = get_option('have-alias-attribute')
 have_format_attribute_option = get_option('have-format-attribute')
 newlib_register_fini = get_option('newlib-register-fini')
-newlib_mb = get_option('newlib-mb')
+
 newlib_iconv_encodings = get_option('newlib-iconv-encodings')
 newlib_iconv_from_encodings = get_option('newlib-iconv-from-encodings')
 newlib_iconv_to_encodings = get_option('newlib-iconv-to-encodings')
 newlib_iconv_external_ccs = get_option('newlib-iconv-external-ccs')
+
 newlib_atexit_dynamic_alloc = get_option('newlib-atexit-dynamic-alloc')
 newlib_global_atexit = get_option('newlib-global-atexit')
 newlib_reent_small = get_option('newlib-reent-small')
@@ -68,21 +69,26 @@ lite_exit = get_option('lite-exit')
 newlib_retargetable_locking = get_option('newlib-retargetable-locking')
 newlib_long_time_t = get_option('newlib-long-time_t')
 newlib_multithread = get_option('newlib-multithread')
-newlib_iconv = get_option('newlib-iconv')
 
 newlib_supplied_syscalls = get_option('newlib-supplied-syscalls')
 newlib_elix_level = get_option('newlib-elix-level')
 target_optspace = get_option('optimization') == 's'
 fast_strcmp = get_option('fast-strcmp')
+
+newlib_mb = get_option('newlib-mb')
 newlib_locale_info = get_option('newlib-locale-info')
 newlib_locale_info_extended = get_option('newlib-locale-info-extended')
+
 newlib_global_errno = get_option('newlib-global-errno')
 newlib_initfini_array = get_option('newlib-initfini-array')
 newlib_initfini = get_option('newlib-initfini')
+
+newlib_obsolete_math = get_option('newlib-obsolete-math')
+
 thread_local_storage_option = get_option('thread-local-storage')
 tls_model = get_option('tls-model')
+
 sysroot_install = get_option('sysroot-install')
-newlib_obsolete_math = get_option('newlib-obsolete-math')
 prefix = get_option('prefix')
 
 # Select stdio implementation
@@ -121,9 +127,6 @@ newlib_nano_formatted_io = get_option('newlib-nano-formatted-io')
 newlib_io_float = get_option('newlib-io-float')
 newlib_stdio64 = get_option('newlib-stdio64')
 newlib_wide_orient = get_option('newlib-wide-orient')
-newlib_iconv_encodings = get_option('newlib-iconv-encodings')
-newlib_iconv_from_encodings = get_option('newlib-iconv-from-encodings')
-newlib_iconv_to_encodings = get_option('newlib-iconv-to-encodings')
 
 # options which no longer have any effect
 newlib_reentrant_syscalls_provided = get_option('newlib-reentrant-syscalls-provided')
@@ -209,6 +212,16 @@ if sysroot_install
 endif
 
 lib_dir = join_paths(prefix, get_option('libdir'))
+
+newlib_iconv_dir = get_option('newlib-iconv-dir')
+if newlib_iconv_dir == ''
+  newlib_iconv_dir = join_paths(lib_dir, 'locale')
+endif
+
+newlib_iconv_runtime_dir = get_option('newlib-iconv-runtime-dir')
+if newlib_iconv_runtime_dir == ''
+  newlib_iconv_runtime_dir = newlib_iconv_dir
+endif
 
 specs_data = configuration_data()
 specs_data.set(
@@ -402,8 +415,9 @@ conf_data.set('_MB_CAPABLE', newlib_mb)
 conf_data.set('_MB_LEN_MAX', newlib_mb ? '8' : '1')
 conf_data.set('__SINGLE_THREAD__', newlib_multithread == false)
 conf_data.set('_ICONV_ENABLE_EXTERNAL_CCS', newlib_iconv_external_ccs)
-conf_data.set('_ICONV_ENABLED', newlib_iconv)
-conf_data.set('_ICONV_ENABLE_EXTERNAL_CCS', newlib_iconv_external_ccs)
+if newlib_iconv_external_ccs
+  conf_data.set_quoted('ICONV_DEFAULT_NLSPATH', newlib_iconv_runtime_dir)
+endif
 conf_data.set('_ATEXIT_DYNAMIC_ALLOC', newlib_atexit_dynamic_alloc)
 conf_data.set('_REENT_GLOBAL_ATEXIT', newlib_global_atexit)
 conf_data.set('_FVWRITE_IN_STREAMIO', newlib_fvwrite_in_streamio)
@@ -444,47 +458,45 @@ conf_data.set('__OBSOLETE_MATH', obsolete_math_value, description: 'Use old math
 
 # Compute iconv encodings to support in the library
 
-if newlib_iconv
+# Dig out the list of available encodings from the encoding.aliases file. Only
+# accept the first entry from each line
 
-  # By default, use newlib_iconv_encodings for both directions,
-  # allowing overrides if specified
+available_encodings = run_command(['sed', '-e', '/^#/d', '-e', '/^$/d', '-e', 's/ .*$//', files('newlib/libc/iconv/encoding.aliases')[0]]).stdout().split('\n')
 
-  available_encodings = run_command(['sed', '-e', '/^#/d', '-e', '/^$/d', '-e', 's/ .*$//', files('newlib/libc/iconv/encoding.aliases')[0]]).stdout().split('\n')
+# Include all available encodings if none were specified on the command line
 
-  # Include all available encodings if none were specified on the command line
-
-  if newlib_iconv_encodings.length() == 0
-    newlib_iconv_encodings = available_encodings
-  endif
-
-  if newlib_iconv_from_encodings.length() == 0
-    newlib_iconv_from_encodings = newlib_iconv_encodings
-  endif
-  if newlib_iconv_to_encodings.length() == 0
-    newlib_iconv_to_encodings = newlib_iconv_encodings
-  endif
-
-  # Dig out the list of available encodings from the encoding.aliases file. Only
-  # accept the first entry from each line
-  
-  # Set config variables for each requested 'from' encoding
-
-  foreach from : newlib_iconv_from_encodings
-    if not available_encodings.contains(from)
-      error('Requested from encoding ' + from + ' is not available. Look in newlib/libc/iconv/encoding.aliases')
-    endif
-    conf_data.set('_ICONV_FROM_ENCODING_' + from.to_upper(), true)
-  endforeach
-
-  # Set config variables for each requested 'to' encoding
-
-  foreach to : newlib_iconv_to_encodings
-    if not available_encodings.contains(to)
-      error('Requested to encoding ' + to + ' is not available. Look in newlib/libc/iconv/encoding.aliases')
-    endif
-    conf_data.set('_ICONV_TO_ENCODING_' + to.to_upper(), true)
-  endforeach
+if newlib_iconv_encodings.length() == 0
+  newlib_iconv_encodings = available_encodings
+elif newlib_iconv_encodings.length() == 1 and newlib_iconv_encodings[0] == 'none'
+  newlib_iconv_encodings = []
 endif
+
+# Use newlib_iconv_encodings for from/to by default
+
+if newlib_iconv_from_encodings.length() == 0
+  newlib_iconv_from_encodings = newlib_iconv_encodings
+endif
+if newlib_iconv_to_encodings.length() == 0
+  newlib_iconv_to_encodings = newlib_iconv_encodings
+endif
+
+# Set config variables for each requested 'from' encoding
+
+foreach from : newlib_iconv_from_encodings
+  if not available_encodings.contains(from)
+    error('Requested from encoding ' + from + ' is not available. Look in newlib/libc/iconv/encoding.aliases')
+  endif
+  conf_data.set('_ICONV_FROM_ENCODING_' + from.to_upper(), true)
+endforeach
+
+# Set config variables for each requested 'to' encoding
+
+foreach to : newlib_iconv_to_encodings
+  if not available_encodings.contains(to)
+    error('Requested to encoding ' + to + ' is not available. Look in newlib/libc/iconv/encoding.aliases')
+  endif
+  conf_data.set('_ICONV_TO_ENCODING_' + to.to_upper(), true)
+endforeach
 
 version_array = meson.project_version().split('.')
 

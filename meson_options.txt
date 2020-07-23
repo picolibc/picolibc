@@ -124,8 +124,6 @@ option('newlib-wide-orient', type: 'boolean', value: false,
 # Internationalization options
 #
 
-option('newlib-iconv', type: 'boolean', value: false,
-       description: 'enable iconv library support')
 option('newlib-iconv-encodings', type: 'array',
        description: 'enable specific comma-separated list of bidirectional iconv encodings to be built-in')
 option('newlib-iconv-from-encodings', type: 'array',
@@ -133,7 +131,12 @@ option('newlib-iconv-from-encodings', type: 'array',
 option('newlib-iconv-to-encodings', type: 'array',
        description: 'enable specific comma-separated list of "to" iconv encodings to be built-in')
 option('newlib-iconv-external-ccs', type: 'boolean', value:false,
-       description: 'enable capabilities to load external CCS files for iconv')
+       description: 'Load iconv CCS tables from files rather than having them built-in')
+option('newlib-iconv-dir', type: 'string',
+       description: 'Installation directory for iconv CCS files')
+option('newlib-iconv-runtime-dir', type: 'string',
+       description: 'Path used at runtime to locate iconv CCS files')
+
 option('newlib-locale-info', type: 'boolean', value: false,
        description: 'locale support')
 option('newlib-locale-info-extended', type: 'boolean', value: false,
