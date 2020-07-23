@@ -29,8 +29,12 @@
  * $FreeBSD$
  */
 
-#include "_fenv.h"
+#include <fenv.h>
 
-fenv_t __fe_dfl_env = { 0 };
-
-const fenv_t *_fe_dfl_env = &__fe_dfl_env;
+#ifndef __SOFTFP__
+#define	vmrs_fpscr(__r)	__asm __volatile("vmrs %0, fpscr" : "=&r"(__r))
+#define	vmsr_fpscr(__r)	__asm __volatile("vmsr fpscr, %0" : : "r"(__r))
+#define	_FPU_MASK_SHIFT	8
+#define	_ROUND_MASK	(FE_TONEAREST | FE_DOWNWARD | \
+			 FE_UPWARD | FE_TOWARDZERO)
+#endif

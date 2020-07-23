@@ -54,7 +54,8 @@ build_triplet = @build@
 host_triplet = @host@
 DIST_COMMON = $(srcdir)/../../../Makefile.shared $(srcdir)/Makefile.in \
 	$(srcdir)/Makefile.am $(top_srcdir)/configure \
-	$(am__configure_deps) $(srcdir)/../../../../mkinstalldirs
+	$(am__configure_deps) $(srcdir)/../../../../mkinstalldirs \
+	$(srcdir)/../../../../mkinstalldirs
 subdir = .
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/../../../acinclude.m4 \
@@ -80,10 +81,11 @@ am__objects_1 = lib_a-e_sqrt.$(OBJEXT) lib_a-ef_sqrt.$(OBJEXT) \
 	lib_a-feclearexcept.$(OBJEXT) lib_a-fe_dfl_env.$(OBJEXT) \
 	lib_a-fegetenv.$(OBJEXT) lib_a-fegetexceptflag.$(OBJEXT) \
 	lib_a-fegetround.$(OBJEXT) lib_a-feholdexcept.$(OBJEXT) \
-	lib_a-fenv.$(OBJEXT) lib_a-feraiseexcept.$(OBJEXT) \
+	lib_a-fegetexcept.$(OBJEXT) lib_a-feraiseexcept.$(OBJEXT) \
 	lib_a-fesetenv.$(OBJEXT) lib_a-fesetexceptflag.$(OBJEXT) \
 	lib_a-fesetround.$(OBJEXT) lib_a-fetestexcept.$(OBJEXT) \
-	lib_a-feupdateenv.$(OBJEXT)
+	lib_a-feupdateenv.$(OBJEXT) lib_a-feenableexcept.$(OBJEXT) \
+	lib_a-fedisableexcept.$(OBJEXT)
 am_lib_a_OBJECTS = $(am__objects_1)
 lib_a_OBJECTS = $(am_lib_a_OBJECTS)
 DEFAULT_INCLUDES = -I.@am__isrc@
@@ -230,13 +232,15 @@ LIB_SOURCES = \
 	fegetexceptflag.c \
 	fegetround.c \
 	feholdexcept.c \
-	fenv.c \
+	fegetexcept.c \
 	feraiseexcept.c \
 	fesetenv.c \
 	fesetexceptflag.c \
 	fesetround.c \
 	fetestexcept.c \
-	feupdateenv.c
+	feupdateenv.c \
+	feenableexcept.c \
+	fedisableexcept.c
 
 noinst_LIBRARIES = lib.a
 lib_a_SOURCES = $(LIB_SOURCES)
@@ -434,11 +438,11 @@ lib_a-feholdexcept.o: feholdexcept.c
 lib_a-feholdexcept.obj: feholdexcept.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-feholdexcept.obj `if test -f 'feholdexcept.c'; then $(CYGPATH_W) 'feholdexcept.c'; else $(CYGPATH_W) '$(srcdir)/feholdexcept.c'; fi`
 
-lib_a-fenv.o: fenv.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-fenv.o `test -f 'fenv.c' || echo '$(srcdir)/'`fenv.c
+lib_a-fegetexcept.o: fegetexcept.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-fegetexcept.o `test -f 'fegetexcept.c' || echo '$(srcdir)/'`fegetexcept.c
 
-lib_a-fenv.obj: fenv.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-fenv.obj `if test -f 'fenv.c'; then $(CYGPATH_W) 'fenv.c'; else $(CYGPATH_W) '$(srcdir)/fenv.c'; fi`
+lib_a-fegetexcept.obj: fegetexcept.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-fegetexcept.obj `if test -f 'fegetexcept.c'; then $(CYGPATH_W) 'fegetexcept.c'; else $(CYGPATH_W) '$(srcdir)/fegetexcept.c'; fi`
 
 lib_a-feraiseexcept.o: feraiseexcept.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-feraiseexcept.o `test -f 'feraiseexcept.c' || echo '$(srcdir)/'`feraiseexcept.c
@@ -475,6 +479,18 @@ lib_a-feupdateenv.o: feupdateenv.c
 
 lib_a-feupdateenv.obj: feupdateenv.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-feupdateenv.obj `if test -f 'feupdateenv.c'; then $(CYGPATH_W) 'feupdateenv.c'; else $(CYGPATH_W) '$(srcdir)/feupdateenv.c'; fi`
+
+lib_a-feenableexcept.o: feenableexcept.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-feenableexcept.o `test -f 'feenableexcept.c' || echo '$(srcdir)/'`feenableexcept.c
+
+lib_a-feenableexcept.obj: feenableexcept.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-feenableexcept.obj `if test -f 'feenableexcept.c'; then $(CYGPATH_W) 'feenableexcept.c'; else $(CYGPATH_W) '$(srcdir)/feenableexcept.c'; fi`
+
+lib_a-fedisableexcept.o: fedisableexcept.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-fedisableexcept.o `test -f 'fedisableexcept.c' || echo '$(srcdir)/'`fedisableexcept.c
+
+lib_a-fedisableexcept.obj: fedisableexcept.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-fedisableexcept.obj `if test -f 'fedisableexcept.c'; then $(CYGPATH_W) 'fedisableexcept.c'; else $(CYGPATH_W) '$(srcdir)/fedisableexcept.c'; fi`
 
 ID: $(HEADERS) $(SOURCES) $(LISP) $(TAGS_FILES)
 	list='$(SOURCES) $(HEADERS) $(LISP) $(TAGS_FILES)'; \

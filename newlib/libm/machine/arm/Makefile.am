@@ -26,13 +26,15 @@ LIB_SOURCES = \
 	fegetexceptflag.c \
 	fegetround.c \
 	feholdexcept.c \
-	fenv.c \
+	fegetexcept.c \
 	feraiseexcept.c \
 	fesetenv.c \
 	fesetexceptflag.c \
 	fesetround.c \
 	fetestexcept.c \
-	feupdateenv.c
+	feupdateenv.c \
+	feenableexcept.c \
+	fedisableexcept.c
 
 
 noinst_LIBRARIES = lib.a

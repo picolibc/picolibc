@@ -31,6 +31,14 @@
 
 #include "_fenv.h"
 
-fenv_t __fe_dfl_env = { 0 };
+int fegetexcept(void)
+{
+#ifndef __SOFTFP__
+	fenv_t __fpsr;
 
-const fenv_t *_fe_dfl_env = &__fe_dfl_env;
+	vmrs_fpscr(__fpsr);
+	return (__fpsr & FE_ALL_EXCEPT);
+#else
+	return (0);
+#endif
+}
