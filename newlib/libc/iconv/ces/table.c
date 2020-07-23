@@ -454,7 +454,7 @@ load_file (
                   int direction)
 {
   FILE *file;
-  const unsigned char *buf;
+  char *buf;
   int tbllen, hdrlen;
   off_t off;
   off_t cur = 0;
@@ -476,7 +476,7 @@ load_file (
   if ((file = fopen (fname, "rb")) == NULL)
     goto error1;
   
-  if ((buf = (const unsigned char *)malloc (hdrlen)) == NULL)
+  if ((buf = malloc (hdrlen)) == NULL)
     goto error2;
 
   if (fread ((void *) buf, 1, hdrlen, file) != hdrlen)
