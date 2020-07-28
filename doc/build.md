@@ -74,7 +74,9 @@ same POSIX I/O functions.
 
 | Option                      | Default | Description                                                                          |
 | ------                      | ------- | -----------                                                                          |
+| atomic-ungetc               | true    | Make getc/ungetc re-entrant using atomic operations                                  |
 | io-float-exact              | true    | Provide round-trip support in float/string conversions                               |
+| io-long-long                | false   | Include long-long support in integer-only printf function                            |
 | posix-io                    | true    | Provide fopen/fdopen using POSIX I/O (requires open, close, read, write, lseek)      |
 | posix-console               | false   | Use POSIX I/O for stdin/stdout/stderr                                                |
 
@@ -96,11 +98,11 @@ configuration
 | newlib-io-float             | false   | Enable printf/scanf family float support                                             |
 | newlib-io-pos-args          | false   | Enable printf-family positional arg support                                          |
 | newlib-io-long-double       | false   | Enable long double type support in IO functions printf/scanf                         |
-| newlib_nano_formatted_io    | false   | Use nano version formatted IO                                                        |
+| newlib-nano-formatted-io    | false   | Use nano version formatted IO                                                        |
 | newlib-reent-small          | false   | Enable small reentrant struct support                                                |
 | newlib-stdio64              | true    | Include 64-bit APIs                                                                  |
 | newlib-unbuf-stream-opt     | false   | Enable unbuffered stream optimization in streamio                                    |
-| newlib_wide_orient          | false   | Turn off wide orientation in streamio                                                |
+| newlib-wide-orient          | false   | Turn off wide orientation in streamio                                                |
 
 ### Internationalization options
 
@@ -212,6 +214,13 @@ cross-riscv64-unknown-elf.txt:
     cpu = 'riscv'
     endian = 'little'
 
+    [properties]
+    c_args = [ '-nostdlib', '-msave-restore', '-fno-common' ]
+    # default multilib is 64 bit
+    c_args_ = [ '-mcmodel=medany' ]
+    needs_exe_wrapper = true
+    skip_sanity_check = true
+
 Settings for ARM processors are in cross-arm-none-eabi.txt:
 
     [binaries]
@@ -227,10 +236,15 @@ Settings for ARM processors are in cross-arm-none-eabi.txt:
     cpu = 'arm'
     endian = 'little'
 
+    [properties]
+    c_args = [ '-nostdlib', '-fno-common' ]
+    needs_exe_wrapper = true
+    skip_sanity_check = true
+
 If those programs aren't in your path, you can edit the file to point
 wherever they may be.
 
-### Auto-detecting the compiler configurations
+### Auto-detecting the compiler multi-lib configurations
 
 The PicoLibc configuration detects the processor configurations
 supported by the compiler using the `--print-multi-lib` command-line option:
