@@ -28,95 +28,61 @@
  * $FreeBSD$
  */
 
-#ifndef _SYS_FENV_H_
-#define _SYS_FENV_H_ 1
+#ifndef	_SYS_FENV_H_
+#define	_SYS_FENV_H_
 
 #include <sys/_types.h>
-#include <sys/cdefs.h>
-
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 #ifndef	__fenv_static
-#define	__fenv_static static
+#define	__fenv_static	static
 #endif
 
-typedef int fenv_t;
-typedef int fexcept_t;
+typedef	int	fenv_t;
+typedef	int	fexcept_t;
 
 /* Exception flags */
+#ifdef __mips_soft_float
+#define	_FPUSW_SHIFT	16
 #define	FE_INVALID	0x0001
 #define	FE_DIVBYZERO	0x0002
 #define	FE_OVERFLOW	0x0004
 #define	FE_UNDERFLOW	0x0008
 #define	FE_INEXACT	0x0010
-#ifdef __ARM_PCS_VFP
-#define	FE_DENORMAL	0x0080
-#define	FE_ALL_EXCEPT	(FE_DIVBYZERO | FE_INEXACT | \
-			 FE_INVALID | FE_OVERFLOW | FE_UNDERFLOW | FE_DENORMAL)
 #else
+#define	_FCSR_CAUSE_SHIFT	10
+#define	FE_INVALID	0x0040
+#define	FE_DIVBYZERO	0x0020
+#define	FE_OVERFLOW	0x0010
+#define	FE_UNDERFLOW	0x0008
+#define	FE_INEXACT	0x0004
+#endif
 #define	FE_ALL_EXCEPT	(FE_DIVBYZERO | FE_INEXACT | \
 			 FE_INVALID | FE_OVERFLOW | FE_UNDERFLOW)
-#endif
-
-
 
 /* Rounding modes */
-#define	VFP_FE_TONEAREST	0x00000000
-#define	VFP_FE_UPWARD		0x00400000
-#define	VFP_FE_DOWNWARD		0x00800000
-#define	VFP_FE_TOWARDZERO	0x00c00000
-
-#ifdef __ARM_PCS_VFP
-#define	FE_TONEAREST	VFP_FE_TONEAREST
-#define	FE_UPWARD	VFP_FE_UPWARD
-#define	FE_DOWNWARD	VFP_FE_DOWNWARD
-#define	FE_TOWARDZERO	VFP_FE_TOWARDZERO
-#else
 #define	FE_TONEAREST	0x0000
 #define	FE_TOWARDZERO	0x0001
 #define	FE_UPWARD	0x0002
 #define	FE_DOWNWARD	0x0003
-#endif
 #define	_ROUND_MASK	(FE_TONEAREST | FE_DOWNWARD | \
 			 FE_UPWARD | FE_TOWARDZERO)
 
 
 /* Default floating-point environment */
-
 extern const fenv_t	*_fe_dfl_env;
 #define	FE_DFL_ENV	(_fe_dfl_env)
 
 /* We need to be able to map status flag positions to mask flag positions */
-#ifndef __ARM_PCS_VFP
-#define	_FPUSW_SHIFT	16
-#define	_ENABLE_MASK	(FE_ALL_EXCEPT << _FPUSW_SHIFT)
+#define	_ENABLE_SHIFT	5
+#define	_ENABLE_MASK	(FE_ALL_EXCEPT << _ENABLE_SHIFT)
+
+#if !defined(__mips_soft_float) && !defined(__mips_hard_float)
+#error compiler didnt set soft/hard float macros
 #endif
 
-
-
-int feclearexcept(int excepts);
-int fegetexceptflag(fexcept_t *flagp, int excepts);
-int fesetexceptflag(const fexcept_t *flagp, int excepts);
-int feraiseexcept(int excepts);
-int fetestexcept(int excepts);
-int fegetround(void);
-int fesetround(int round);
-int fegetenv(fenv_t *envp);
-int feholdexcept(fenv_t *envp);
-int fesetenv(const fenv_t *envp);
-int feupdateenv(const fenv_t *envp);
-#if __BSD_VISIBLE
-int feenableexcept(int __mask);
-int fedisableexcept(int __mask);
-int fegetexcept(void);
-#endif /* __BSD_VISIBLE */
-
-
-
-#ifdef __cplusplus
-}
+#ifndef	__mips_soft_float
+#define	__cfc1(__fcsr)	__asm __volatile("cfc1 %0, $31" : "=r" (__fcsr))
+#define	__ctc1(__fcsr)	__asm __volatile("ctc1 %0, $31" :: "r" (__fcsr))
 #endif
 
-#endif	/* _SYS_FENV_H_ */ 
+#endif	/* !_FENV_H_ */
