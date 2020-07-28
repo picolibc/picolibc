@@ -59,7 +59,7 @@ be selected when building applications:
    it maps __f_vfprintf to vfprintf and __f_vfscanf to vfscanf. This
    is equivalent to adding this when linking your application:
 
-	cc -Wl,--defsym=vfprintf=__i_vfprintf -Wl,--defsym=vfscanf=__i_vfscanf
+	cc -Wl,--defsym=vfprintf=__f_vfprintf -Wl,--defsym=vfscanf=__f_vfscanf
 
 PICOLIBC_FLOAT_PRINTF_SCANF requires a special macro for float values:
 `printf_float`. To make it easier to switch between that and the default
