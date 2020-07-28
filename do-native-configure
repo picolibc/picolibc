@@ -39,10 +39,12 @@ meson $DIR \
         -Dtls-model=global-dynamic \
         -Dmultilib=false \
         -Dpicolib=false \
+	-Dpicocrt=false \
 	-Dposix-console=true \
 	-Dnative-tests=true \
 	-Dnewlib-global-atexit=true\
 	-Dincludedir=lib/picolibc/include \
 	-Dlibdir=lib/picolibc/lib \
+	-Dspecsdir=none \
 	-Dtests=true \
 	"$@"
