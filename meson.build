@@ -49,6 +49,7 @@ targets = []
 enable_multilib = get_option('multilib')
 multilib_list = get_option('multilib-list')
 enable_picolib = get_option('picolib')
+enable_picocrt = get_option('picocrt')
 enable_tests = get_option('tests')
 enable_native_tests = get_option('native-tests')
 have_alias_attribute_option = get_option('have-alias-attribute')
@@ -590,7 +591,9 @@ else
   test_link_args += test_c_args
 endif
 
-subdir('picocrt')
+if enable_picocrt
+  subdir('picocrt')
+endif
 subdir('newlib')
 
 if enable_tests

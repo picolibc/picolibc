@@ -53,6 +53,9 @@ option('native-tests', type: 'boolean', value: false,
 option('picolib', type: 'boolean', value: true,
        description: 'Include pico lib bits')
 
+option('picocrt', type: 'boolean', value: true,
+       description: 'Include pico crt bits')
+
 option('specsdir', type: 'string',
        description: 'Installation directory for .specs file')
 
