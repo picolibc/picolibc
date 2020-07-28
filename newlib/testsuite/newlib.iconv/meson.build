@@ -37,9 +37,8 @@ tests = ['iconvjp', 'iconvnm', 'iconvru' ]
 
 iconv_data_link = custom_target('iconv_data link',
 				install: false,
-				input: iconv_data,
 				output: 'iconv_data',
-				command: ['ln', '-srf', '@INPUT@', '@OUTPUT@'])
+				command: ['ln', '-srf', '@SOURCE_DIR@' / 'newlib/libc/iconv/ccs/binary', '@OUTPUT@'])
 
 iconv_test_c_args = ['-DTEST_NLSPATH="' + meson.current_build_dir() + '"']
 

@@ -33,8 +33,6 @@
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
-iconv_data = meson.current_source_dir()
-
 cctfiles = [
     'big5.cct',
     'cns11643_plane14.cct',
