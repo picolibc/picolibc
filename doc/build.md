@@ -45,6 +45,8 @@ These options control some general build configuration values.
 | tests                       | false   | Enable tests                                                                         |
 | tinystdio                   | true    | Use tiny stdio from avr libc                                                         |
 
+If you set `specsdir` to `none`, then picolibc.specs will not be installed at all.
+
 ### Options applying to both legacy stdio and tinystdio
 
 These options extend support in printf and scanf for additional

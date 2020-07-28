@@ -175,13 +175,6 @@ if host_cpu_family == ''
   message('Computed host_cpu_family as ' + host_cpu_family)
 endif
 
-specs_dir = get_option('specsdir')
-if specs_dir == ''
-  search_cmds = meson.get_compiler('c').cmd_array() + ['-print-search-dirs']
-  install_dir=run_command(search_cmds).stdout().split('\n')[0]
-  specs_dir=install_dir.split(':')[1].strip()
-endif
-
 if have_alias_attribute_option == 'auto'
   have_alias_attribute = meson.get_compiler('c').has_function_attribute('alias')
 else
@@ -222,6 +215,20 @@ endif
 newlib_iconv_runtime_dir = get_option('newlib-iconv-runtime-dir')
 if newlib_iconv_runtime_dir == ''
   newlib_iconv_runtime_dir = newlib_iconv_dir
+endif
+
+specs_dir_option = get_option('specsdir')
+if specs_dir_option == ''
+  search_cmds = meson.get_compiler('c').cmd_array() + ['-print-search-dirs']
+  install_dir=run_command(search_cmds).stdout().split('\n')[0]
+  specs_dir=install_dir.split(':')[1].strip()
+  specs_install = true
+elif specs_dir_option == 'none'
+  specs_install = false
+  specs_dir = ''
+else
+  specs_dir = join_paths(prefix, specs_dir_option)
+  specs_install = true
 endif
 
 specs_data = configuration_data()
@@ -285,7 +292,7 @@ picolibc_specs = configure_file(input: 'picolibc.specs.in',
 				output: '@BASENAME@',
 				configuration: specs_data,
 				install_dir: specs_dir,
-				install: true)
+				install: specs_install)
 				     
 test_specs = configure_file(input: 'test.specs.in',
 			    output: '@BASENAME@',
