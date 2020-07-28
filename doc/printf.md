@@ -126,6 +126,11 @@ hence the size) of the library:
    64-bit floats ensures that passing the output back to scanf will
    exactly re-create the original value.
 
+ * `-Datomic-ungetc=true` This option, which is enabled by default,
+   controls whether getc/ungetc use atomic instruction sequences to
+   make them re-entrant. Without this option, multiple threads using
+   getc and ungetc may corrupt the state of the input buffer.
+
 For even more printf and scanf functionality, picolibc can be compiled
 with the original newlib stdio code. That greatly increases the code
 and data sizes of the library, including adding a requirement for heap
