@@ -272,7 +272,7 @@ typedef enum _MEMORY_INFORMATION_CLASS
 } MEMORY_INFORMATION_CLASS;
 
 extern "C"
-NTSTATUS
+NTSTATUS NTAPI
 NtQueryVirtualMemory(HANDLE ProcessHandle,
 		     LPVOID BaseAddress,
 		     MEMORY_INFORMATION_CLASS MemoryInformationClass,
