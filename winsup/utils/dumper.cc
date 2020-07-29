@@ -34,6 +34,7 @@
 #include <unistd.h>
 #include <sys/param.h>
 #include <windows.h>
+#include <psapi.h>
 
 #include "dumper.h"
 
@@ -267,43 +268,20 @@ void protect_dump(DWORD protect, char *buf)
     strcat (buf, pt[i]);
 }
 
-typedef enum _MEMORY_INFORMATION_CLASS
-{
- MemoryWorkingSetExInformation = 4, // MEMORY_WORKING_SET_EX_INFORMATION
-} MEMORY_INFORMATION_CLASS;
-
-extern "C"
-NTSTATUS NTAPI
-NtQueryVirtualMemory(HANDLE ProcessHandle,
-		     LPVOID BaseAddress,
-		     MEMORY_INFORMATION_CLASS MemoryInformationClass,
-		     LPVOID MemoryInformation,
-		     SIZE_T MemoryInformationLength,
-		     SIZE_T *ReturnLength);
-
-typedef struct _MEMORY_WORKING_SET_EX_INFORMATION
-{
-  LPVOID VirtualAddress;
-  ULONG_PTR Long;
-} MEMORY_WORKING_SET_EX_INFORMATION;
-
-#define MWSEI_ATTRIB_SHARED (0x1 << 15)
+#define PSWSEI_ATTRIB_SHARED (0x1 << 15)
 
 static BOOL
 getRegionAttributes(HANDLE hProcess, LPVOID address, DWORD &attribs)
 {
-  MEMORY_WORKING_SET_EX_INFORMATION mwsei = { address };
-  NTSTATUS status = NtQueryVirtualMemory(hProcess, 0,
-					 MemoryWorkingSetExInformation,
-					 &mwsei, sizeof(mwsei), 0);
+  PSAPI_WORKING_SET_EX_INFORMATION pswsei = { address };
 
-  if (!status)
+  if (QueryWorkingSetEx(hProcess, &pswsei, sizeof(pswsei)))
     {
-      attribs = mwsei.Long;
+      attribs = pswsei.VirtualAttributes.Flags;
       return TRUE;
     }
 
-  deb_printf("MemoryWorkingSetExInformation failed status %08x\n", status);
+  deb_printf("QueryWorkingSetEx failed status %08x\n", GetLastError());
   return FALSE;
 }
 
@@ -338,7 +316,7 @@ dumper::collect_memory_sections ()
 	  DWORD attribs = 0;
 	  if (getRegionAttributes(hProcess, current_page_address, attribs))
 	    {
-	      if (attribs & MWSEI_ATTRIB_SHARED)
+	      if (attribs & PSWSEI_ATTRIB_SHARED)
 		{
 		  skip_region_p = 1;
 		  disposition = "skipped due to shared MEM_IMAGE";
