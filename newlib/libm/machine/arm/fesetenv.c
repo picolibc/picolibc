@@ -29,7 +29,7 @@
  * $FreeBSD$
  */
 
-#include <fenv.h>
+#include "_fenv.h"
 
 int fesetenv(const fenv_t *envp)
 {
