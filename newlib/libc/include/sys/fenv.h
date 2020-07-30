@@ -109,7 +109,7 @@ typedef int fexcept_t;
  *       fenv_t with the default fenv_t. The format of fenv_t and where
  *       FE_DFL_ENV is are implementation specific.
  */
-extern const fenv_t *_fe_dfl_env;
-#define FE_DFL_ENV _fe_dfl_env
+extern fenv_t _fe_dfl_env;
+#define FE_DFL_ENV ((const fenv_t *) &_fe_dfl_env)
 
 #endif /* _SYS_FENV_H_ */

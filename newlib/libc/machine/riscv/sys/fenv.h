@@ -14,6 +14,8 @@
 
 #include <stddef.h>
 
+#ifdef __riscv_flen
+
 /* Per "The RISC-V Instruction Set Manual: Volume I: User-Level ISA:
  * Version 2.1", Section 8.2, "Floating-Point Control and Status
  * Register":
@@ -59,6 +61,11 @@
 #define FE_TONEAREST  	0x00000000
 
 #define FE_RMODE_MASK   0x7
+#else
+/* Soft float support doesn't include exceptions */
+#define FE_ALL_EXCEPT 0
+#define FE_RMODE_MASK	0x0
+#endif
 
 /* Per "The RISC-V Instruction Set Manual: Volume I: User-Level ISA:
  * Version 2.1":
@@ -71,9 +78,8 @@
 
 typedef size_t fenv_t;
 typedef size_t fexcept_t;
-extern const fenv_t fe_dfl_env;
-extern const fenv_t *fe_dfl_env_p;
+extern fenv_t _fe_dfl_env;
 
-#define FE_DFL_ENV fe_dfl_env_p
+#define FE_DFL_ENV ((const fenv_t *) &_fe_dfl_env)
 
 #endif /* _SYS_FENV_H */
