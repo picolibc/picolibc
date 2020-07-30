@@ -14,15 +14,16 @@
  */
 
 #include "fdlibm.h"
+#include "math_config.h"
 
 #ifdef __v810__
 #define const
 #endif
 
 #ifdef __STDC__
-static const float one = 1.0, half=0.5, huge = 1.0e30;
+static const float one = 1.0, half=0.5;
 #else
-static float one = 1.0, half=0.5, huge = 1.0e30;
+static float one = 1.0, half=0.5;
 #endif
 
 #if defined(_IEEE_LIBM) && defined(HAVE_ALIAS_ATTRIBUTE)
@@ -71,5 +72,5 @@ __strong_reference(__ieee754_coshf, coshf);
 	}
 
     /* |x| > overflowthresold, cosh(x) overflow */
-	return huge*huge;
+	return __math_oflowf(0);
 }

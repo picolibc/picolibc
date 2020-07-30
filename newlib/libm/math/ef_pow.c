@@ -33,8 +33,6 @@ zero    =  0.0,
 one	=  1.0,
 two	=  2.0,
 two24	=  16777216.0,	/* 0x4b800000 */
-huge	=  1.0e30,
-tiny    =  1.0e-30,
 	/* poly coefs for (3/2)*(log(x)-2s-2/3*s**3 */
 L1  =  6.0000002384e-01, /* 0x3f19999a */
 L2  =  4.2857143283e-01, /* 0x3edb6db7 */
@@ -144,8 +142,8 @@ __strong_reference(__ieee754_powf, powf);
     /* |y| is huge */
 	if(iy>0x4d000000) { /* if |y| > 2**27 */
 	/* over/underflow if x is not close to one */
-	    if(ix<0x3f7ffff8) return (hy<0)? huge*huge:tiny*tiny;
-	    if(ix>0x3f800007) return (hy>0)? huge*huge:tiny*tiny;
+	    if(ix<0x3f7ffff8) return (hy<0)? __math_oflowf(0):__math_uflowf(0);
+	    if(ix>0x3f800007) return (hy>0)? __math_oflowf(0):__math_uflowf(0);
 	/* now |1-x| is tiny <= 2**-20, suffice to compute 
 	   log(x) by x-x^2/2+x^3/3-x^4/4 */
 	    t = ax-1;		/* t has 20 trailing zeros */
@@ -223,14 +221,14 @@ __strong_reference(__ieee754_powf, powf);
 	i = j&0x7fffffff;
 	if (j>0) {
 	    if (i>FLT_UWORD_EXP_MAX)
-	        return s*huge*huge;			/* overflow */
+	        return s*__math_oflowf(0);			/* overflow */
 	    else if (i==FLT_UWORD_EXP_MAX)
-	        if(p_l+ovt>z-p_h) return s*huge*huge;	/* overflow */
+	        if(p_l+ovt>z-p_h) return s*__math_oflowf(0);	/* overflow */
         } else {
 	    if (i>FLT_UWORD_EXP_MIN)
-	        return s*tiny*tiny;			/* underflow */
+	        return s*__math_uflowf(0);			/* underflow */
 	    else if (i==FLT_UWORD_EXP_MIN)
-	        if(p_l<=z-p_h) return s*tiny*tiny;	/* underflow */
+	        if(p_l<=z-p_h) return s*__math_uflowf(0);	/* underflow */
 	}
     /*
      * compute 2**(p_h+p_l)

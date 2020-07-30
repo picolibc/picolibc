@@ -14,6 +14,7 @@
  */
 
 #include "fdlibm.h"
+#include "math_config.h"
 
 #ifdef __v810__
 #define const
@@ -217,7 +218,7 @@ sb7  = -2.2440952301e+01; /* 0xc1b38712 */
 			__ieee754_expf((z-x)*(z+x)+R/S);
 	    if(hx>0) return r/x; else return two-r/x;
 	} else {
-	    if(hx>0) return tiny*tiny; else return two-tiny;
+	    if(hx>0) return __math_uflow(0); else return two-tiny;
 	}
 }
 
