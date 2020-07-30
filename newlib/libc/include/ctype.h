@@ -149,7 +149,7 @@ static __inline char __ctype_lookup(char c) {
 #ifdef __HAVE_LOCALE_INFO__
 const char *__locale_ctype_ptr_l (locale_t);
 #else
-static __inline char *
+static __inline const char *
 __locale_ctype_ptr_l(locale_t _l)
 {
 	(void)_l;
