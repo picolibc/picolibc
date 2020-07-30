@@ -3,9 +3,11 @@
    Please see the file COPYING.GPL2 in this distribution for
    license terms. */
 
+#define _GNU_SOURCE
 #include <stdio.h>
 #include <stdarg.h>
 #include <string.h>
+#include <stdlib.h>
 
 #ifndef TINY_STDIO
 #define printf_float(x) x
@@ -33,8 +35,12 @@ static void failmsg(int serial, char *fmt, ...) {
 
 static int test(int serial, char *expect, char *fmt, ...) {
     va_list ap;
+    char *abuf = NULL;
     va_start(ap, fmt);
     int n;
+    int an;
+    va_list aap;
+    va_copy(aap, ap);
 #ifndef NO_FLOATING_POINT
     double dv;
     char *star;
@@ -56,35 +62,54 @@ static int test(int serial, char *expect, char *fmt, ...) {
 			    int iv2 = va_arg(ap, int);
 			    dv = va_arg(ap, double);
 			    n = snprintf(buf, 1024, fmt, iv1, iv2, printf_float(dv));
+			    an = asprintf(&abuf, fmt, iv1, iv2, printf_float(dv));
 		    } else  {
 			    int iv = va_arg(ap, int);
 			    dv = va_arg(ap, double);
 			    n = snprintf(buf, 1024, fmt, iv, printf_float(dv));
+			    an = asprintf(&abuf, fmt, iv, printf_float(dv));
 		    }
 	    } else {
 		    dv = va_arg(ap, double);
 		    n = snprintf(buf, 1024, fmt, printf_float(dv));
+		    an = asprintf(&abuf, fmt, printf_float(dv));
 	    }
 	    break;
 #endif
     default:
 	    n = vsnprintf(buf, 1024, fmt, ap);
+	    an = vasprintf(&abuf, fmt, aap);
 	    break;
     }
     va_end(ap);
+    va_end(aap);
     if (n >= 1024) {
         failmsg(serial, "buffer overflow");
+	free(abuf);
         return 1;
     }
     if (n != strlen(expect)) {
         failmsg(serial, "expected \"%s\" (%d), got \"%s\" (%d)",
 		expect, strlen(expect), buf, n);
+	free(abuf);
         return 1;
     }
     if (strcmp(buf, expect)) {
         failmsg(serial, "expected \"%s\", got \"%s\"", expect, buf);
+	free(abuf);
         return 1;
     }
+    if (an != n) {
+	failmsg(serial, "asprintf return %d sprintf return %d\n", an, n);
+	free(abuf);
+	return 1;
+    }
+    if (strcmp(abuf, buf)) {
+	failmsg(serial, "sprintf return %s asprintf return %s\n", buf, abuf);
+	free(abuf);
+	return 1;
+    }
+    free(abuf);
     return 0;
 }
 
