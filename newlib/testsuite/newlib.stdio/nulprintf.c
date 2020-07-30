@@ -6,12 +6,15 @@
  */
 
 #include <stdio.h>
+#include <string.h>
 #include "check.h"
 
 const char m[8] = {'M','M','M','M','M','M','M','M'};
 
 int main()
 {
-  printf ("%.*s\n", 8, m);
+  char buf[20];
+  sprintf (buf, "%.*s\n", 8, m);
+  CHECK(strcmp(buf, "MMMMMMMM\n") == 0);
   exit (0);
 }
