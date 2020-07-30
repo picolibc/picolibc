@@ -36,10 +36,8 @@
 #define FE_SSE_EXCEPT_MASK_SHIFT (7)
 
 /* These are writable so we can initialise them at startup.  */
-static fenv_t fe_nomask_env;
-
-/* These pointers provide the outside world with read-only access to them.  */
-const fenv_t *_fe_nomask_env = &fe_nomask_env;
+fenv_t _fe_nomask_env;
+fenv_t _fe_dfl_env;
 
 /* Assume i686 or above (hence SSE available) these days, with the
    compiler feels free to use it (depending on compile- time flags of
@@ -452,8 +450,6 @@ fesetprec (int prec)
 static void
 _feinitialise (void)
 {
-  extern fenv_t __fe_dfl_env;
-
   /* Reset FPU: extended prec, all exceptions cleared and masked off.  */
   __asm__ volatile ("fninit");
   /* The default cw value, 0x37f, is rounding mode zero.  The MXCSR has
@@ -467,11 +463,11 @@ _feinitialise (void)
 
   /* Setup unmasked environment, but leave __FE_DENORM masked.  */
   feenableexcept (FE_ALL_EXCEPT);
-  fegetenv (&fe_nomask_env);
+  fegetenv (&_fe_nomask_env);
 
   /* Restore default exception masking (all masked).  */
   fedisableexcept (FE_ALL_EXCEPT);
 
   /* Finally cache state as default environment. */
-  fegetenv (&__fe_dfl_env);
+  fegetenv (&_fe_dfl_env);
 }

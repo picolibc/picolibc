@@ -1,8 +1,7 @@
 #
 # SPDX-License-Identifier: BSD-3-Clause
 #
-# Copyright © 2019 Keith Packard
-# Copyright © 2020 Anthony Anderson
+# Copyright © 2020 Keith Packard
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions
@@ -35,34 +34,7 @@
 #
 
 srcs_libm_machine = [
-  'e_sqrt.c',
-  'ef_sqrt.c',
-  'fenv.c',
-  's_ceil.c',
-  's_fabs.c',
-  's_floor.c',
-  's_fma.c',
-  's_fmax.c',
-  's_fmin.c',
-  's_llrint.c',
-  's_llround.c',
-  's_lrint.c',
-  's_lround.c',
-  's_trunc.c',
-  'sf_ceil.c',
-  'sf_fabs.c',
-  'sf_floor.c',
-  'sf_fma.c',
-  'sf_fmax.c',
-  'sf_fmin.c',
-  'sf_llrint.c',
-  'sf_llround.c',
-  'sf_lrint.c',
-  'sf_lround.c',
-  'sf_nearbyint.c',
-  'sf_rint.c',
-  'sf_round.c',
-  'sf_trunc.c'
+  'fenv.c'
 ]
 
 foreach target : targets

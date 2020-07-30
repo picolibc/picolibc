@@ -48,5 +48,4 @@
  * FE_DFL_ENV"
  */
 
-const fenv_t fe_dfl_env = { 0 };
-const fenv_t *fe_dfl_env_p = &fe_dfl_env;
+fenv_t _fe_dfl_env;
