@@ -75,6 +75,7 @@
  */
 
 #include "fdlibm.h"
+#include "math_config.h"
 #if __OBSOLETE_MATH
 
 #ifndef _DOUBLE_IS_32BITS
@@ -126,8 +127,8 @@ P5   =  4.13813679705723846039e-08; /* 0x3E663769, 0x72BEA4D0 */
 		     return x+x; 		/* NaN */
 		else return (xsb==0)? x:0.0;	/* exp(+-inf)={inf,0} */
 	    }
-	    if(x > o_threshold) return huge*huge; /* overflow */
-	    if(x < u_threshold) return twom1000*twom1000; /* underflow */
+	    if(x > o_threshold) return __math_oflow(0); /* overflow */
+	    if(x < u_threshold) return __math_uflow(0); /* underflow */
 	}
 
     /* argument reduction */

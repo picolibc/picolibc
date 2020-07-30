@@ -25,7 +25,7 @@
  *			       			          2
  *	    22       <= x <= lnovft :  cosh(x) := exp(x)/2 
  *	    lnovft   <= x <= ln2ovft:  cosh(x) := exp(x/2)/2 * exp(x/2)
- *	    ln2ovft  <  x	    :  cosh(x) := huge*huge (overflow)
+ *	    ln2ovft  <  x	    :  cosh(x) := overflow
  *
  * Special cases:
  *	cosh(x) is |x| if x is +INF, -INF, or NaN.
@@ -33,13 +33,14 @@
  */
 
 #include "fdlibm.h"
+#include "math_config.h"
 
 #ifndef _DOUBLE_IS_32BITS
 
 #ifdef __STDC__
-static const double one = 1.0, half=0.5, huge = 1.0e300;
+static const double one = 1.0, half=0.5;
 #else
-static double one = 1.0, half=0.5, huge = 1.0e300;
+static double one = 1.0, half=0.5;
 #endif
 
 #ifdef __STDC__
@@ -87,7 +88,7 @@ static double one = 1.0, half=0.5, huge = 1.0e300;
 	}
 
     /* |x| > overflowthresold, cosh(x) overflow */
-	return huge*huge;
+	return __math_oflow(0);
 }
 
 #endif /* defined(_DOUBLE_IS_32BITS) */

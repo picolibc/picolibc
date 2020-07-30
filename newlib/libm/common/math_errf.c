@@ -51,13 +51,13 @@ xflowf (uint32_t sign, float y)
   return with_errnof (y, ERANGE);
 }
 
-#if !__OBSOLETE_MATH
 HIDDEN float
 __math_uflowf (uint32_t sign)
 {
   return xflowf (sign, 0x1p-95f);
 }
 
+#if !__OBSOLETE_MATH
 #if WANT_ERRNO_UFLOW
 /* Underflows to zero in some non-nearest rounding mode, setting errno
    is valid even if the result is non-zero, but in the subnormal range.  */
