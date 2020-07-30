@@ -663,6 +663,20 @@ extern int	vsprintf(char *__s, const char *__fmt, va_list ap) __PRINTF_ATTRIBUTE
 extern int	vsnprintf(char *__s, size_t __n, const char *__fmt, va_list ap) __PRINTF_ATTRIBUTE__(3, 0);
 
 /**
+   Variant of \c printf() that sends the formatted characters
+   to allocated string \c *strp.
+*/
+int
+asprintf(char **strp, const char *fmt, ...) __PRINTF_ATTRIBUTE__(2,3);
+
+/**
+   Variant of \c vprintf() that sends the formatted characters
+   to allocated string \c *strp.
+*/
+int
+vasprintf(char **strp, const char *fmt, va_list ap) __PRINTF_ATTRIBUTE__(2,0);
+
+/**
    The function \c fprintf performs formatted output to \c stream.
    See \c vfprintf() for details.
 */

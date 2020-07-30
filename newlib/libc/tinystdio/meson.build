@@ -33,6 +33,7 @@
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 srcs_tinystdio = [
+    'asprintf.c',
     'clearerr.c',
     'ecvt_data.c',
     'ecvtf_data.c',
@@ -58,6 +59,7 @@ srcs_tinystdio = [
     'fileno.c',
     'filestrget.c',
     'filestrput.c',
+    'filestrputalloc.c',
     'fprintf.c',
     'fputc.c',
     'fputs.c',
@@ -83,6 +85,7 @@ srcs_tinystdio = [
     'strtod.c',
     'strtod_l.c',
     'ungetc.c',
+    'vasprintf.c',
     'vfiprintf.c',
     'vfprintf.c',
     'vfprintff.c',

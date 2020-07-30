@@ -60,6 +60,9 @@ __file_str_get(FILE *stream);
 int
 __file_str_put(char c, FILE *stream);
 
+int
+__file_str_put_alloc(char c, FILE *stream);
+
 /*
  * It is OK to discard the "const" qualifier here.  f.buf is
  * non-const as in the generic case, this buffer is obtained
@@ -83,6 +86,16 @@ __file_str_put(char c, FILE *stream);
 		},				\
 		.buf = (_s),			\
 		.size = (_size),		\
+		.len = 0			\
+	}
+
+#define FDEV_SETUP_STRING_ALLOC() {		\
+		.file = {			\
+			.flags = __SWR,		\
+			.put = __file_str_put_alloc	\
+		},				\
+		.buf = NULL,			\
+		.size = 0,			\
 		.len = 0			\
 	}
 
