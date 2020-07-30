@@ -1,4 +1,7 @@
 /*-
+ * SPDX-License-Identifier: BSD-2-Clause-FreeBSD
+ *
+ * Copyright (c) 2004-2005 David Schultz <das@FreeBSD.ORG>
  * Copyright (c) 2013 Andrew Turner <andrew@FreeBSD.ORG>
  * All rights reserved.
  *
@@ -26,7 +29,12 @@
  * $FreeBSD$
  */
 
-#define	FENV_MANGLE(x)	__softfp_ ##x
-#include <machine/fenv-mangle.h>
-#include "fenv.c"
+#include <fenv.h>
 
+#ifndef __SOFTFP__
+#define	vmrs_fpscr(__r)	__asm __volatile("vmrs %0, fpscr" : "=&r"(__r))
+#define	vmsr_fpscr(__r)	__asm __volatile("vmsr fpscr, %0" : : "r"(__r))
+#define	_FPU_MASK_SHIFT	8
+#define	_ROUND_MASK	(FE_TONEAREST | FE_DOWNWARD | \
+			 FE_UPWARD | FE_TOWARDZERO)
+#endif

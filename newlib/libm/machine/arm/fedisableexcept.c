@@ -1,4 +1,7 @@
 /*-
+ * SPDX-License-Identifier: BSD-2-Clause-FreeBSD
+ *
+ * Copyright (c) 2004-2005 David Schultz <das@FreeBSD.ORG>
  * Copyright (c) 2013 Andrew Turner <andrew@FreeBSD.ORG>
  * All rights reserved.
  *
@@ -26,7 +29,19 @@
  * $FreeBSD$
  */
 
-#define	FENV_MANGLE(x)	__vfp_ ##x
-#include <machine/fenv-mangle.h>
-#include "fenv.c"
+#include "_fenv.h"
 
+int fedisableexcept(int __mask)
+{
+#ifndef __SOFTFP__
+	fenv_t __old_fpsr, __new_fpsr;
+
+	vmrs_fpscr(__old_fpsr);
+	__new_fpsr = __old_fpsr &
+	    ~((__mask & FE_ALL_EXCEPT) << _FPU_MASK_SHIFT);
+	vmsr_fpscr(__new_fpsr);
+	return ((__old_fpsr >> _FPU_MASK_SHIFT) & FE_ALL_EXCEPT);
+#else
+	return (0);
+#endif
+}

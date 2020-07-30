@@ -1,4 +1,7 @@
 /*-
+ * SPDX-License-Identifier: BSD-2-Clause-FreeBSD
+ *
+ * Copyright (c) 2004-2005 David Schultz <das@FreeBSD.ORG>
  * Copyright (c) 2013 Andrew Turner <andrew@FreeBSD.ORG>
  * All rights reserved.
  *
@@ -26,28 +29,16 @@
  * $FreeBSD$
  */
 
-#ifdef _FENV_MANGLE_H_
-#error Only include fenv-mangle.h once
+#include "_fenv.h"
+
+int fegetexcept(void)
+{
+#ifndef __SOFTFP__
+	fenv_t __fpsr;
+
+	vmrs_fpscr(__fpsr);
+	return (__fpsr & FE_ALL_EXCEPT);
+#else
+	return (0);
 #endif
-
-#define	_FENV_MANGLE_H_
-
-#ifndef FENV_MANGLE
-#error FENV_MANGLE is undefined
-#endif
-
-#define	feclearexcept	FENV_MANGLE(feclearexcept)
-#define	fegetexceptflag	FENV_MANGLE(fegetexceptflag)
-#define	fesetexceptflag	FENV_MANGLE(fesetexceptflag)
-#define	feraiseexcept	FENV_MANGLE(feraiseexcept)
-#define	fetestexcept	FENV_MANGLE(fetestexcept)
-#define	fegetround	FENV_MANGLE(fegetround)
-#define	fesetround	FENV_MANGLE(fesetround)
-#define	fegetenv	FENV_MANGLE(fegetenv)
-#define	feholdexcept	FENV_MANGLE(feholdexcept)
-#define	fesetenv	FENV_MANGLE(fesetenv)
-#define	feupdateenv	FENV_MANGLE(feupdateenv)
-#define	feenableexcept	FENV_MANGLE(feenableexcept)
-#define	fedisableexcept	FENV_MANGLE(fedisableexcept)
-#define	fegetexcept	FENV_MANGLE(fegetexcept)
-
+}
