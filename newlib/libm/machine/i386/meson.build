@@ -59,6 +59,7 @@ srcs_libm_machine = [
   'f_rintl.c',
   'f_tanf.S',
   'f_tan.S',
+  'fenv.c',
   'i386mach.h',
 ]
 
