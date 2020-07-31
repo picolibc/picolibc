@@ -39,14 +39,8 @@
 #include <string.h>
 #include <stdlib.h>
 
-#ifdef __ARM_FP
-#if __ARM_FP & 0x8
+#ifdef __STDC_IEC_559__
 #define HAVE_HW_DOUBLE
-#endif
-#else
-#if __GCC_IEC_559
-#define HAVE_HW_DOUBLE
-#endif
 #endif
 
 #ifdef HAVE_HW_DOUBLE
@@ -77,7 +71,6 @@ volatile test_t inf = INFINITY;
 #define lowbit(x) 	((x) & -(x))
 #define ispoweroftwo(x)	(((x) & ((x) - 1)) == 0)
 
-#if FE_ALL_EXCEPT
 static const char *
 e_to_str(int e)
 {
@@ -116,7 +109,6 @@ e_to_str(int e)
 	sprintf(buf, "Invalid 0x%x", e);
 	return buf;
 }
-#endif
 
 #define s(e) #e
 
@@ -172,28 +164,32 @@ e_to_str(int e)
 int main()
 {
 	int result = 0;
+
+	(void) e_to_str;
+	if (math_errhandling & MATH_ERREXCEPT) {
 #if FE_DIVBYZERO
-	TEST_CASE(one / zero, FE_DIVBYZERO);
-	TEST_CASE(test_log(zero), FE_DIVBYZERO);
+		TEST_CASE(one / zero, FE_DIVBYZERO);
+		TEST_CASE(test_log(zero), FE_DIVBYZERO);
 #endif
 #if FE_OVERFLOW
-	TEST_CASE(huge * huge, FE_OVERFLOW);
-	TEST_CASE(test_pow(two, huge), FE_OVERFLOW);
+		TEST_CASE(huge * huge, FE_OVERFLOW);
+		TEST_CASE(test_pow(two, huge), FE_OVERFLOW);
 #endif
 #if FE_UNDERFLOW
-	TEST_CASE(tiny * tiny, FE_UNDERFLOW);
-	TEST_CASE(test_pow(two, -huge), FE_UNDERFLOW);
+		TEST_CASE(tiny * tiny, FE_UNDERFLOW);
+		TEST_CASE(test_pow(two, -huge), FE_UNDERFLOW);
 #endif
 #if FE_INVALID
-	TEST_CASE(zero * inf, FE_INVALID);
-	TEST_CASE(inf * zero, FE_INVALID);
-	TEST_CASE(inf + -inf, FE_INVALID);
-	TEST_CASE(inf - inf, FE_INVALID);
-	TEST_CASE(zero / zero, FE_INVALID);
-	TEST_CASE(inf / inf, FE_INVALID);
-	TEST_CASE(test_remainder(one, zero), FE_INVALID);
-	TEST_CASE(test_remainder(inf, two), FE_INVALID);
-	TEST_CASE(test_sqrt(-two), FE_INVALID);
+		TEST_CASE(zero * inf, FE_INVALID);
+		TEST_CASE(inf * zero, FE_INVALID);
+		TEST_CASE(inf + -inf, FE_INVALID);
+		TEST_CASE(inf - inf, FE_INVALID);
+		TEST_CASE(zero / zero, FE_INVALID);
+		TEST_CASE(inf / inf, FE_INVALID);
+		TEST_CASE(test_remainder(one, zero), FE_INVALID);
+		TEST_CASE(test_remainder(inf, two), FE_INVALID);
+		TEST_CASE(test_sqrt(-two), FE_INVALID);
 #endif
+	}
 	return result;
 }
