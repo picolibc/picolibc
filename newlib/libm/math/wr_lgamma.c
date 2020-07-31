@@ -30,6 +30,7 @@
 {
         double y;
         y = __ieee754_lgamma_r(x,signgamp);
+#ifndef _IEEE_LIBM
         if(_LIB_VERSION == _IEEE_) return y;
         if(!finite(y)&&finite(x)) {
 	    if(floor(x)==x&&x<=0.0)
@@ -39,8 +40,9 @@
 	      /* lgamma(finite) overflow */
 	      errno = ERANGE;
 	    return HUGE_VAL;
-        } else
-            return y;
+        }
+#endif
+	return y;
 }
 #endif
 

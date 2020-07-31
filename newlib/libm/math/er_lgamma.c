@@ -12,7 +12,7 @@
  *
  */
 
-/* __ieee754_lgamma(x)
+/* __ieee754_lgamma_r(x)
  * Reentrant version of the logarithm of the Gamma function 
  * with signgam for the sign of Gamma(x). 
  *
@@ -210,14 +210,15 @@ static double zero=  0.00000000000000000000e+00;
 
 
 #if defined(_IEEE_LIBM) && defined(HAVE_ALIAS_ATTRIBUTE)
-__strong_reference(__ieee754_lgamma, lgamma);
+__strong_reference(__ieee754_lgamma_r, lgamma_r);
 #endif
 
 #ifdef __STDC__
-	double __ieee754_lgamma(double x)
+	double __ieee754_lgamma_r(double x, int *signgamp)
 #else
-	double __ieee754_lgamma(x)
+	double __ieee754_lgamma_r(x, signgamp)
 	double x;
+	int *signgamp;
 #endif
 {
 	double t,y,z,nadj = 0.0,p,p1,p2,p3,q,r,w;
@@ -226,13 +227,13 @@ __strong_reference(__ieee754_lgamma, lgamma);
 	EXTRACT_WORDS(hx,lx,x);
 
     /* purge off +-inf, NaN, +-0, and negative arguments */
-	signgam = 1;
+	*signgamp = 1;
 	ix = hx&0x7fffffff;
 	if(ix>=0x7ff00000) return x*x;
 	if((ix|lx)==0) return one/zero;
 	if(ix<0x3b900000) {	/* |x|<2**-70, return -log(|x|) */
 	    if(hx<0) {
-	        signgam = -1;
+	        *signgamp = -1;
 	        return -__ieee754_log(-x);
 	    } else return -__ieee754_log(x);
 	}
@@ -242,7 +243,7 @@ __strong_reference(__ieee754_lgamma, lgamma);
 	    t = sin_pi(x);
 	    if(t==zero) return one/zero; /* -integer */
 	    nadj = __ieee754_log(pi/fabs(t*x));
-	    if(t<zero) signgam = -1;
+	    if(t<zero) *signgamp = -1;
 	    x = -x;
 	}
 
