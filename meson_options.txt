@@ -187,6 +187,8 @@ option('tls-model', type: 'string', value: 'local-exec',
 option('newlib-global-errno', type: 'boolean', value: false,
        description: 'use global errno variable')
 
+# 
+# Math options
 #
 # Use "obsolete" math code, which use 'float' for 'float' functions
 # instead of the newer code which uses 'double' instead.
@@ -194,6 +196,8 @@ option('newlib-global-errno', type: 'boolean', value: false,
 option('newlib-obsolete-math', type: 'combo', choices: ['true', 'false', 'auto'],
        value: 'auto',
        description: 'Use float type for float valued math routines (default: automatic based on platform)')
+option('want-math-errno', type: 'boolean', value: false,
+       description: 'Set errno in math functions according to stdc (default: false)')
 
 #
 # Obsolete newlib options
