@@ -9,6 +9,9 @@ jobs:
       matrix:
         meson_flags: [
           "",
+          "-Dwant-math-errno=true",
+          "-Dnewlib-obsolete-math=true",
+          "-Dnewlib-obsolete-math=true -Dwant-math-errno=true",
           "-Dio-float-exact=false",
           "-Dtinystdio=false -Dnewlib-io-float=true -Dio-long-long=true",
           "-Dnewlib-locale-info=true -Dnewlib-locale-info-extended=true -Dnewlib-mb=true",
