@@ -14,8 +14,6 @@
 
 #include <stddef.h>
 
-#ifdef __riscv_flen
-
 /* Per "The RISC-V Instruction Set Manual: Volume I: User-Level ISA:
  * Version 2.1", Section 8.2, "Floating-Point Control and Status
  * Register":
@@ -61,11 +59,6 @@
 #define FE_TONEAREST  	0x00000000
 
 #define FE_RMODE_MASK   0x7
-#else
-/* Soft float support doesn't include exceptions */
-#define FE_ALL_EXCEPT 0
-#define FE_RMODE_MASK	0x0
-#endif
 
 /* Per "The RISC-V Instruction Set Manual: Volume I: User-Level ISA:
  * Version 2.1":
