@@ -316,6 +316,7 @@ fhandler_fifo::wait_open_pipe (HANDLE& ph)
   return status;
 }
 
+/* Always called with fifo_client_lock in place. */
 int
 fhandler_fifo::add_client_handler (bool new_pipe_instance)
 {
@@ -345,6 +346,7 @@ fhandler_fifo::add_client_handler (bool new_pipe_instance)
   return 0;
 }
 
+/* Always called with fifo_client_lock in place. */
 void
 fhandler_fifo::delete_client_handler (int i)
 {
@@ -354,7 +356,8 @@ fhandler_fifo::delete_client_handler (int i)
 	     (nhandlers - i) * sizeof (fc_handler[i]));
 }
 
-/* Delete handlers that we will never read from. */
+/* Delete handlers that we will never read from.  Always called with
+   fifo_client_lock in place. */
 void
 fhandler_fifo::cleanup_handlers ()
 {
@@ -369,6 +372,7 @@ fhandler_fifo::cleanup_handlers ()
     }
 }
 
+/* Always called with fifo_client_lock in place. */
 void
 fhandler_fifo::record_connection (fifo_client_handler& fc,
 				  fifo_client_connect_state s)
@@ -398,6 +402,7 @@ fhandler_fifo::update_my_handlers ()
   if (!prev_proc)
     api_fatal ("Can't open process of previous owner, %E");
 
+  fifo_client_lock ();
   for (int i = 0; i < get_shared_nhandlers (); i++)
     {
       if (add_client_handler (false) < 0)
@@ -419,10 +424,12 @@ fhandler_fifo::update_my_handlers ()
 	  fc.last_read = shared_fc_handler[i].last_read;
 	}
     }
+  fifo_client_unlock ();
   set_prev_owner (null_fr_id);
   return ret;
 }
 
+/* Always called with fifo_client_lock and owner_lock in place. */
 int
 fhandler_fifo::update_shared_handlers ()
 {
@@ -435,9 +442,7 @@ fhandler_fifo::update_shared_handlers ()
   set_shared_nhandlers (nhandlers);
   memcpy (shared_fc_handler, fc_handler, nhandlers * sizeof (fc_handler[0]));
   shared_fc_handler_updated (true);
-  owner_lock ();
   set_prev_owner (me);
-  owner_unlock ();
   return 0;
 }
 
@@ -509,7 +514,6 @@ fhandler_fifo::fifo_reader_thread_func ()
 	      if (update_my_handlers () < 0)
 		debug_printf ("error updating my handlers, %E");
 	      owner_found ();
-	      owner_unlock ();
 	      /* Fall through to owner_listen. */
 	    }
 	}
@@ -602,8 +606,13 @@ owner_listen:
 	}
       if (ph)
 	NtClose (ph);
-      if (update && update_shared_handlers () < 0)
-	api_fatal ("Can't update shared handlers, %E");
+      if (update)
+	{
+	  owner_lock ();
+	  if (get_owner () == me && update_shared_handlers () < 0)
+	    api_fatal ("Can't update shared handlers, %E");
+	  owner_unlock ();
+	}
       fifo_client_unlock ();
       if (cancel)
 	goto canceled;
@@ -1402,9 +1411,11 @@ fhandler_fifo::fstatvfs (struct statvfs *sfs)
 void
 fhandler_fifo::close_all_handlers ()
 {
+  fifo_client_lock ();
   for (int i = 0; i < nhandlers; i++)
     fc_handler[i].close ();
   nhandlers = 0;
+  fifo_client_unlock ();
 }
 
 fifo_client_connect_state
