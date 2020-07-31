@@ -277,15 +277,15 @@ __strong_reference(__ieee754_pow, pow);
 	EXTRACT_WORDS(j,i,z);
 	if (j>=0x40900000) {				/* z >= 1024 */
 	    if(((j-0x40900000)|i)!=0)			/* if z > 1024 */
-		return s*__math_oflow(0);			/* overflow */
+		return __math_oflow(s<0);			/* overflow */
 	    else {
-		if(p_l+ovt>z-p_h) return s*__math_oflow(0);	/* overflow */
+		if(p_l+ovt>z-p_h) return __math_oflow(s<0);	/* overflow */
 	    }
 	} else if((j&0x7fffffff)>=0x4090cc00 ) {	/* z <= -1075 */
 	    if(((j-0xc090cc00)|i)!=0) 		/* z < -1075 */
-		return s*__math_uflow(0);		/* underflow */
+		return __math_uflow(s<0);		/* underflow */
 	    else {
-		if(p_l<=z-p_h) return s*__math_uflow(0);	/* underflow */
+		if(p_l<=z-p_h) return __math_uflow(s<0);	/* underflow */
 	    }
 	}
     /*

@@ -221,14 +221,14 @@ __strong_reference(__ieee754_powf, powf);
 	i = j&0x7fffffff;
 	if (j>0) {
 	    if (i>FLT_UWORD_EXP_MAX)
-	        return s*__math_oflowf(0);			/* overflow */
+	        return __math_oflowf(s<0);			/* overflow */
 	    else if (i==FLT_UWORD_EXP_MAX)
-	        if(p_l+ovt>z-p_h) return s*__math_oflowf(0);	/* overflow */
+	        if(p_l+ovt>z-p_h) return __math_oflowf(s<0);	/* overflow */
         } else {
 	    if (i>FLT_UWORD_EXP_MIN)
-	        return s*__math_uflowf(0);			/* underflow */
+	        return __math_uflowf(s<0);			/* underflow */
 	    else if (i==FLT_UWORD_EXP_MIN)
-	        if(p_l<=z-p_h) return s*__math_uflowf(0);	/* underflow */
+		if(p_l<=z-p_h) return __math_uflowf(s<0);	/* underflow */
 	}
     /*
      * compute 2**(p_h+p_l)
