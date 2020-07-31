@@ -568,9 +568,7 @@ extern float dremf (float, float);
 #ifdef __CYGWIN__
 extern float dreml (long double, long double);
 #endif /* __CYGWIN__ */
-extern double gamma_r (double, int *);
 extern double lgamma_r (double, int *);
-extern float gammaf_r (float, int *);
 extern float lgammaf_r (float, int *);
 #endif
 
