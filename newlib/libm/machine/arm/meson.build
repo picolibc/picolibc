@@ -33,17 +33,17 @@
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 srcs_libm_machine = [
-  'e_sqrt.c',
   'ef_sqrt.c',
-  'fe_dfl_env.c',
+  'e_sqrt.c',
   'feclearexcept.c',
+  'fe_dfl_env.c',
+  'fedisableexcept.c',
+  'feenableexcept.c',
   'fegetenv.c',
+  'fegetexcept.c',
   'fegetexceptflag.c',
   'fegetround.c',
   'feholdexcept.c',
-  'fenv-softfp.c',
-  'fenv-vfp.c',
-  'fenv.c',
   'feraiseexcept.c',
   'fesetenv.c',
   'fesetexceptflag.c',
@@ -51,17 +51,17 @@ srcs_libm_machine = [
   'fetestexcept.c',
   'feupdateenv.c',
   's_ceil.c',
-  's_floor.c',
-  's_nearbyint.c',
-  's_rint.c',
-  's_round.c',
-  's_trunc.c',
   'sf_ceil.c',
   'sf_floor.c',
+  's_floor.c',
   'sf_nearbyint.c',
   'sf_rint.c',
   'sf_round.c',
   'sf_trunc.c',
+  's_nearbyint.c',
+  's_rint.c',
+  's_round.c',
+  's_trunc.c'
 ]
 
 foreach target : targets
