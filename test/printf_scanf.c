@@ -55,7 +55,9 @@ int (*_reference_scanf_float)() = _scanf_float;
 #endif
 #endif
 
+#if defined(TINY_STDIO) || !defined(NO_FLOATING_POINT)
 static const double test_vals[] = { 1.234567, 1.1, M_PI };
+#endif
 
 int
 main(int argc, char **argv)
@@ -86,12 +88,14 @@ main(int argc, char **argv)
 	}
 	printf ("%g\n", exp(11));
 #endif
+#if defined(TINY_STDIO) || !defined(NO_FLOATING_POINT)
 	sprintf(buf, "%g", printf_float(0.0f));
 	if (strcmp(buf, "0") != 0) {
 		printf("0: wanted \"0\" got \"%s\"\n", buf);
 		errors++;
 		fflush(stdout);
 	}
+#endif
 	for (x = 0; x < 32; x++) {
 		unsigned int v = 0x12345678 >> x;
 		unsigned int r;
