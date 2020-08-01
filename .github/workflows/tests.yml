@@ -9,22 +9,36 @@ jobs:
       matrix:
         meson_flags: [
           "",
-          "-Dwant-math-errno=true",
+
+          # Math configurations
+          "-Dnewlib-obsolete-math=false",
+          "-Dnewlib-obsolete-math=false -Dwant-math-errno=true",
           "-Dnewlib-obsolete-math=true",
           "-Dnewlib-obsolete-math=true -Dwant-math-errno=true",
+
+          # Tinystdio configurations
           "-Dio-float-exact=false",
+          "-Dio-long-long=true",
+
+          # Original stdio configurations
+          "-Dtinystdio=false -Dnewlib-io-float=false",
+          "-Dtinystdio=false -Dnewlib-io-float=false -Dio-long-long=true",
+          "-Dtinystdio=false -Dnewlib-io-float=true",
           "-Dtinystdio=false -Dnewlib-io-float=true -Dio-long-long=true",
+
+          # Locale configurations
           "-Dnewlib-locale-info=true -Dnewlib-locale-info-extended=true -Dnewlib-mb=true",
-          "-Dtinystdio=false -Dnewlib-io-float=true -Dio-long-long=true -Dnewlib-locale-info=true -Dnewlib-locale-info-extended=true -Dnewlib-mb=true",
+
+          # Iconv configurations
           "-Dnewlib-iconv-external-ccs=true"
         ]
         test: [
-           "./.github/do-test do-native-configure build-native",
-           "./.github/do-test do-riscv-configure build-riscv",
-           "./.github/do-test do-arm-configure build-arm",
-           "./.github/do-test do-aarch64-configure build-aarch64",
-           "./.github/do-build do-lx106-configure build-lx106",
-           "./.github/do-test do-rv32imac-configure build-rv32imac"
+          "./.github/do-test do-native-configure build-native",
+          "./.github/do-test do-riscv-configure build-riscv",
+          "./.github/do-test do-arm-configure build-arm",
+          "./.github/do-test do-aarch64-configure build-aarch64",
+          "./.github/do-build do-lx106-configure build-lx106",
+          "./.github/do-test do-rv32imac-configure build-rv32imac"
         ]
 
     steps:
