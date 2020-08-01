@@ -109,6 +109,7 @@
     result |= test(78, " 7.894561230000000e+08", "%#22.15e", 7.89456123e8);
 #endif
     result |= test(79, "8.e+08", "%#1.1g", 7.89456123e8);
+#if defined(TINY_STDIO) || defined(_WANT_IO_LONG_LONG)
     result |= test(81, "    +100", "%+8lld", 100LL);
     result |= test(82, "+00000100", "%+.8lld", 100LL);
     result |= test(83, " +00000100", "%+10.8lld", 100LL);
@@ -149,6 +150,7 @@
     result |= test(116, "+00100  ", "%#-+ 08.5lld", 100LL);
     result |= test(117, "0000000000000000000000000000000000000001", "%.40lld", 1LL);
     result |= test(118, " 0000000000000000000000000000000000000001", "% .40lld", 1LL);
+#endif
     result |= test(119, " 0000000000000000000000000000000000000001", "% .40d", 1);
     /* 121: excluded for C */
     /* 124: excluded for C */
