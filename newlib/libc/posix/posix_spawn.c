@@ -254,6 +254,69 @@ process_file_actions(const posix_spawn_file_actions_t fa)
 	return (0);
 }
 
+#ifdef __CYGWIN__
+/* Cygwin's vfork does not follow BSD vfork semantics.  Rather it's equivalent
+   to fork.  While that's POSIX compliant, the below FreeBSD implementation
+   relying on BSD vfork semantics doesn't work as expected on Cygwin.  The
+   following Cygwin-specific code handles the synchronization FreeBSD gets
+   for free by using vfork. */
+
+extern int __posix_spawn_sem_create (void **semp);
+extern void __posix_spawn_sem_release (void *sem, int error);
+extern int __posix_spawn_sem_wait_and_close (void *sem, void *proc);
+extern int __posix_spawn_fork (void **proc);
+extern int __posix_spawn_execvpe (const char *path, char * const *argv,
+				  char *const *envp, void *sem,
+				  int use_env_path);
+
+
+static int
+do_posix_spawn(pid_t *pid, const char *path,
+	const posix_spawn_file_actions_t *fa,
+	const posix_spawnattr_t *sa,
+	char * const argv[], char * const envp[], int use_env_path)
+{
+	int error;
+	void *sem, *proc;
+	pid_t p;
+
+	error = __posix_spawn_sem_create(&sem);
+	if (error)
+		return error;
+
+	p = __posix_spawn_fork(&proc);
+	switch (p) {
+	case -1:
+		return (errno);
+	case 0:
+		if (sa != NULL) {
+			error = process_spawnattr(*sa);
+			if (error) {
+				__posix_spawn_sem_release(sem, error);
+				_exit(127);
+			}
+		}
+		if (fa != NULL) {
+			error = process_file_actions(*fa);
+			if (error) {
+				__posix_spawn_sem_release(sem, error);
+				_exit(127);
+			}
+		}
+		__posix_spawn_execvpe(path, argv,
+				      envp != NULL ? envp : *p_environ,
+				      sem, use_env_path);
+		_exit(127);
+	default:
+		error = __posix_spawn_sem_wait_and_close(sem, proc);
+		if (error != 0)
+			waitpid(p, NULL, WNOHANG);
+		else if (pid != NULL)
+			*pid = p;
+		return (error);
+	}
+}
+#else
 static int
 do_posix_spawn(pid_t *pid, const char *path,
 	const posix_spawn_file_actions_t *fa,
@@ -292,6 +355,7 @@ do_posix_spawn(pid_t *pid, const char *path,
 		return (error);
 	}
 }
+#endif
 
 int
 posix_spawn (pid_t *pid,

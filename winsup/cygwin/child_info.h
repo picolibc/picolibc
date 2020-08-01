@@ -37,7 +37,7 @@ enum child_status
 #define EXEC_MAGIC_SIZE sizeof(child_info)
 
 /* Change this value if you get a message indicating that it is out-of-sync. */
-#define CURR_CHILD_INFO_MAGIC 0xf4531879U
+#define CURR_CHILD_INFO_MAGIC 0xecc930b9U
 
 #define NPROCS	256
 
@@ -144,6 +144,7 @@ class child_info_spawn: public child_info
 {
   HANDLE hExeced;
   HANDLE ev;
+  HANDLE sem;
   pid_t cygpid;
 public:
   cygheap_exec_info *moreinfo;
@@ -159,6 +160,11 @@ public:
   void *operator new (size_t, void *p) __attribute__ ((nothrow)) {return p;}
   void set (child_info_types ci, bool b) { new (this) child_info_spawn (ci, b);}
   void __reg1 handle_spawn ();
+  void set_sem (HANDLE _sem)
+  {
+    /* Don't leak semaphore handle into exec'ed process. */
+    SetHandleInformation (sem = _sem, HANDLE_FLAG_INHERIT, 0);
+  }
   bool set_saw_ctrl_c ()
   {
     if (!has_execed ())
@@ -188,8 +194,8 @@ public:
   bool get_parent_handle ();
   bool has_execed_cygwin () const { return iscygwin () && has_execed (); }
   operator HANDLE& () {return hExeced;}
-  int __reg3 worker (const char *, const char *const *, const char *const [], int,
-	      int = -1, int = -1);;
+  int __reg3 worker (const char *, const char *const *, const char *const [],
+		     int, int = -1, int = -1);
 };
 
 extern child_info_spawn ch_spawn;

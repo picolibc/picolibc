@@ -252,6 +252,8 @@ struct system_call_handle
 
 child_info_spawn NO_COPY ch_spawn;
 
+extern "C" void __posix_spawn_sem_release (void *sem, int error);
+
 int
 child_info_spawn::worker (const char *prog_arg, const char *const *argv,
 			  const char *const envp[], int mode,
@@ -897,6 +899,8 @@ child_info_spawn::worker (const char *prog_arg, const char *const *argv,
 		  && WaitForSingleObject (pi.hProcess, 0) == WAIT_TIMEOUT)
 		wait_for_myself ();
 	    }
+	  if (sem)
+	    __posix_spawn_sem_release (sem, 0);
 	  myself.exit (EXITCODE_NOSET);
 	  break;
 	case _P_WAIT:
@@ -1293,5 +1297,105 @@ av::setup (const char *prog_arg, path_conv& real_path, const char *ext,
 
 err:
   __seterrno ();
+  return -1;
+}
+
+/* The following __posix_spawn_* functions are called from newlib's posix_spawn
+   implementation.  The original code in newlib has been taken from FreeBSD,
+   and the core code relies on specific, non-portable behaviour of vfork(2).
+   Our replacement implementation uses a semaphore to synchronize parent and
+   child process.  Note: __posix_spawn_fork in fork.cc is part of the set. */
+
+/* Create an inheritable semaphore.  Set it to 0 (== non-signalled), so the
+   parent can wait on the semaphore immediately. */
+extern "C" int
+__posix_spawn_sem_create (void **semp)
+{
+  HANDLE sem;
+  OBJECT_ATTRIBUTES attr;
+  NTSTATUS status;
+
+  if (!semp)
+    return EINVAL;
+  InitializeObjectAttributes (&attr, NULL, OBJ_INHERIT, NULL, NULL);
+  status = NtCreateSemaphore (&sem, SEMAPHORE_ALL_ACCESS, &attr, 0, INT_MAX);
+  if (!NT_SUCCESS (status))
+    return geterrno_from_nt_status (status);
+  *semp = sem;
+  return 0;
+}
+
+/* Signal the semaphore.  "error" should be 0 if all went fine and the
+   exec'd child process is up and running, a useful POSIX error code otherwise.
+   After releasing the semaphore, the value of the semaphore reflects
+   the error code + 1.  Thus, after WFMO in__posix_spawn_sem_wait_and_close,
+   querying the value of the semaphore returns either 0 if all went well,
+   or a value > 0 equivalent to the POSIX error code. */
+extern "C" void
+__posix_spawn_sem_release (void *sem, int error)
+{
+  ReleaseSemaphore (sem, error + 1, NULL);
+}
+
+/* Helper to check the semaphore value. */
+static inline int
+__posix_spawn_sem_query (void *sem)
+{
+  SEMAPHORE_BASIC_INFORMATION sbi;
+
+  NtQuerySemaphore (sem, SemaphoreBasicInformation, &sbi, sizeof sbi, NULL);
+  return sbi.CurrentCount;
+}
+
+/* Called from parent to wait for fork/exec completion.  We're waiting for
+   the semaphore as well as the child's process handle, so even if the
+   child crashes without signalling the semaphore, we won't wait infinitely. */
+extern "C" int
+__posix_spawn_sem_wait_and_close (void *sem, void *proc)
+{
+  int ret = 0;
+  HANDLE w4[2] = { sem, proc };
+
+  switch (WaitForMultipleObjects (2, w4, FALSE, INFINITE))
+    {
+    case WAIT_OBJECT_0:
+      ret = __posix_spawn_sem_query (sem);
+      break;
+    case WAIT_OBJECT_0 + 1:
+      /* If we return here due to the child process dying, the semaphore is
+	 very likely not signalled.  Check this here and return a valid error
+	 code. */
+      ret = __posix_spawn_sem_query (sem);
+      if (ret == 0)
+	ret = ECHILD;
+      break;
+    default:
+      ret = geterrno_from_win_error ();
+      break;
+    }
+
+  CloseHandle (sem);
+  return ret;
+}
+
+/* Replacement for execve/execvpe, called from forked child in newlib's
+   posix_spawn.  The relevant difference is the additional semaphore
+   so the worker method (which is not supposed to return on success)
+   can signal the semaphore after sync'ing with the exec'd child. */
+extern "C" int
+__posix_spawn_execvpe (const char *path, char * const *argv, char *const *envp,
+		       HANDLE sem, int use_env_path)
+{
+  path_conv buf;
+
+  static char *const empty_env[] = { NULL };
+  if (!envp)
+    envp = empty_env;
+  ch_spawn.set_sem (sem);
+  ch_spawn.worker (use_env_path ? (find_exec (path, buf, "PATH", FE_NNF) ?: "")
+				: path,
+		   argv, envp,
+		   _P_OVERLAY | (use_env_path ? _P_PATH_TYPE_EXEC : 0));
+  __posix_spawn_sem_release (sem, errno);
   return -1;
 }

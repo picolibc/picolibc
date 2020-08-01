@@ -31,7 +31,7 @@ details. */
 /* FIXME: Once things stabilize, bump up to a few minutes.  */
 #define FORK_WAIT_TIMEOUT (300 * 1000)     /* 300 seconds */
 
-static int dofork (bool *with_forkables);
+static int dofork (void **proc, bool *with_forkables);
 class frok
 {
   frok (bool *forkables)
@@ -47,7 +47,7 @@ class frok
   int __stdcall parent (volatile char * volatile here);
   int __stdcall child (volatile char * volatile here);
   bool error (const char *fmt, ...);
-  friend int dofork (bool *with_forkables);
+  friend int dofork (void **proc, bool *with_forkables);
 };
 
 static void
@@ -583,17 +583,36 @@ extern "C" int
 fork ()
 {
   bool with_forkables = false; /* do not force hardlinks on first try */
-  int res = dofork (&with_forkables);
+  int res = dofork (NULL, &with_forkables);
   if (res >= 0)
     return res;
   if (with_forkables)
     return res; /* no need for second try when already enabled */
   with_forkables = true; /* enable hardlinks for second try */
-  return dofork (&with_forkables);
+  return dofork (NULL, &with_forkables);
+}
+
+
+/* __posix_spawn_fork is called from newlib's posix_spawn implementation.
+   The original code in newlib has been taken from FreeBSD, and the core
+   code relies on specific, non-portable behaviour of vfork(2).  Our
+   replacement implementation needs the forked child's HANDLE for
+   synchronization, so __posix_spawn_fork returns it in proc. */
+extern "C" int
+__posix_spawn_fork (void **proc)
+{
+  bool with_forkables = false; /* do not force hardlinks on first try */
+  int res = dofork (proc, &with_forkables);
+  if (res >= 0)
+    return res;
+  if (with_forkables)
+    return res; /* no need for second try when already enabled */
+  with_forkables = true; /* enable hardlinks for second try */
+  return dofork (proc, &with_forkables);
 }
 
 static int
-dofork (bool *with_forkables)
+dofork (void **proc, bool *with_forkables)
 {
   frok grouped (with_forkables);
 
@@ -670,6 +689,11 @@ dofork (bool *with_forkables)
 		       grouped.errmsg, grouped.this_errno);
 
       set_errno (grouped.this_errno);
+    }
+  else if (proc)
+    {
+      /* Return child process handle to posix_fork. */
+      *proc = grouped.hchild;
     }
   syscall_printf ("%R = fork()", res);
   return res;
