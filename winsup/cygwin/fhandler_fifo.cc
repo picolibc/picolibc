@@ -472,17 +472,34 @@ fhandler_fifo::fifo_reader_thread_func ()
 
       if (pending_owner)
 	{
-	  if (pending_owner != me)
+	  if (pending_owner == me)
+	    take_ownership = true;
+	  else if (cur_owner != me)
 	    idle = true;
 	  else
-	    take_ownership = true;
+	    {
+	      /* I'm the owner but someone else wants to be.  Have I
+		 already seen and reacted to update_needed_evt? */
+	      if (WaitForSingleObject (update_needed_evt, 0) == WAIT_OBJECT_0)
+		{
+		  /* No, I haven't. */
+		  fifo_client_lock ();
+		  if (update_shared_handlers () < 0)
+		    api_fatal ("Can't update shared handlers, %E");
+		  fifo_client_unlock ();
+		}
+	      owner_unlock ();
+	      /* Yield to pending owner. */
+	      Sleep (1);
+	      continue;
+	    }
 	}
       else if (!cur_owner)
 	take_ownership = true;
       else if (cur_owner != me)
 	idle = true;
       else
-	/* I'm the owner. */
+	/* I'm the owner and there's no pending owner. */
 	goto owner_listen;
       if (idle)
 	{
@@ -1212,7 +1229,7 @@ fhandler_fifo::take_ownership ()
   /* Wake up my fifo_reader_thread. */
   owner_needed ();
   if (get_owner ())
-    /* Wake up owner's fifo_reader_thread. */
+    /* Wake up the owner and request an update of the shared fc_handlers. */
     SetEvent (update_needed_evt);
   owner_unlock ();
   /* The reader threads should now do the transfer. */
