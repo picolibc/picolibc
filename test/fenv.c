@@ -112,28 +112,34 @@ e_to_str(int e)
 
 #define s(e) #e
 
+static int
+report(char *expr, test_t v, int e, int exception, int oexception)
+{
+	printf("%-20.20s: ", expr);
+	printf("%8g ", v);
+	printf("(e expect %s", e_to_str(exception));
+	if (oexception)
+		printf(" or %s", e_to_str(oexception));
+	printf(" got %s\n", e_to_str(e));
+	if (e == (exception) ||
+	    (oexception && e == (oexception)))
+	{
+		return 0;
+	}
+	printf("\tgot %s expecting %s", e_to_str(e), e_to_str(exception));
+	if (oexception)
+		printf(" or %s", e_to_str(oexception));
+	printf("\n");
+	return 1;
+}
+
 #define TEST_CASE2(expr, exception, oexception) do {			\
 		int e;							\
 		volatile test_t v;					\
 		feclearexcept(FE_ALL_EXCEPT);				\
 		v = expr;						\
 		e = fetestexcept(FE_ALL_EXCEPT);			\
-		printf("%-20.20s: %8g (e expect %s%s%s got %s)\n",	\
-		       s(expr), v, e_to_str(exception),			\
-		       oexception ? " or " : "",			\
-		       oexception ? e_to_str(oexception) : "",		\
-		       e_to_str(e));					\
-		if (e == (exception) ||					\
-		    (oexception && e == (oexception)))			\
-		{							\
-			;						\
-		} else {						\
-			printf("\tgot %s expecting %s%s%s\n",		\
-			       e_to_str(e), e_to_str(exception),	\
-			       oexception ? " or " : "",		\
-			       oexception ? e_to_str(oexception) : "");	\
-			++result;					\
-		}							\
+		result += report(s(expr), v, e, exception, oexception); \
 	} while(0)
 
 #ifdef FE_OVERFLOW
