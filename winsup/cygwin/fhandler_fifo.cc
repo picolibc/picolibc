@@ -619,56 +619,56 @@ owner_listen:
 	/* select.cc:peek_fifo has already recorded a connection. */
 	;
       else
-      {
-      switch (status)
 	{
-	case STATUS_SUCCESS:
-	case STATUS_PIPE_CONNECTED:
-	  record_connection (fc);
-	  break;
-	case STATUS_PIPE_CLOSING:
-	  debug_printf ("NtFsControlFile got STATUS_PIPE_CLOSING...");
-	  /* Maybe a writer already connected, wrote, and closed.
-	     Just query the O/S. */
-	  fc.query_and_set_state ();
-	  debug_printf ("...O/S reports state %d", fc.get_state ());
-	  record_connection (fc, false);
-	  break;
-	case STATUS_THREAD_IS_TERMINATING:
-	case STATUS_WAIT_1:
-	  /* Try to connect a bogus client.  Otherwise fc is still
-	     listening, and the next connection might not get recorded. */
-	  status1 = open_pipe (ph);
-	  WaitForSingleObject (conn_evt, INFINITE);
-	  if (NT_SUCCESS (status1))
-	    /* Bogus cilent connected. */
-	    delete_client_handler (nhandlers - 1);
-	  else
-	    /* Did a real client connect? */
-	    switch (io.Status)
-	      {
-	      case STATUS_SUCCESS:
-	      case STATUS_PIPE_CONNECTED:
-		record_connection (fc);
-		break;
-	      case STATUS_PIPE_CLOSING:
-		debug_printf ("got STATUS_PIPE_CLOSING when trying to connect bogus client...");
-		fc.query_and_set_state ();
-		debug_printf ("...O/S reports state %d", fc.get_state ());
-		record_connection (fc, false);
-		break;
-	      default:
-		debug_printf ("NtFsControlFile status %y after failing to connect bogus client or real client", io.Status);
-		fc.set_state (fc_error);
-		break;
-	      }
-	  break;
-	default:
-	  debug_printf ("NtFsControlFile got unexpected status %y", status);
-	  fc.set_state (fc_error);
-	  break;
+	  switch (status)
+	    {
+	    case STATUS_SUCCESS:
+	    case STATUS_PIPE_CONNECTED:
+	      record_connection (fc);
+	      break;
+	    case STATUS_PIPE_CLOSING:
+	      debug_printf ("NtFsControlFile got STATUS_PIPE_CLOSING...");
+	      /* Maybe a writer already connected, wrote, and closed.
+		 Just query the O/S. */
+	      fc.query_and_set_state ();
+	      debug_printf ("...O/S reports state %d", fc.get_state ());
+	      record_connection (fc, false);
+	      break;
+	    case STATUS_THREAD_IS_TERMINATING:
+	    case STATUS_WAIT_1:
+	      /* Try to connect a bogus client.  Otherwise fc is still
+		 listening, and the next connection might not get recorded. */
+	      status1 = open_pipe (ph);
+	      WaitForSingleObject (conn_evt, INFINITE);
+	      if (NT_SUCCESS (status1))
+		/* Bogus cilent connected. */
+		delete_client_handler (nhandlers - 1);
+	      else
+		/* Did a real client connect? */
+		switch (io.Status)
+		  {
+		  case STATUS_SUCCESS:
+		  case STATUS_PIPE_CONNECTED:
+		    record_connection (fc);
+		    break;
+		  case STATUS_PIPE_CLOSING:
+		    debug_printf ("got STATUS_PIPE_CLOSING when trying to connect bogus client...");
+		    fc.query_and_set_state ();
+		    debug_printf ("...O/S reports state %d", fc.get_state ());
+		    record_connection (fc, false);
+		    break;
+		  default:
+		    debug_printf ("NtFsControlFile status %y after failing to connect bogus client or real client", io.Status);
+		    fc.set_state (fc_error);
+		    break;
+		  }
+	      break;
+	    default:
+	      debug_printf ("NtFsControlFile got unexpected status %y", status);
+	      fc.set_state (fc_error);
+	      break;
+	    }
 	}
-      }
       if (ph)
 	NtClose (ph);
       if (update)
