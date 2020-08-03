@@ -33,3 +33,11 @@ Description: Smaller embedded C library for ESP8266 development
  PicoLibc is a combination of Newlib and AVR libc bits designed
  for small-RAM embedded systems. This package has binaries for
  ESP8266 processors.
+
+Package: picolibc-aarch64-linux-gnu
+Architecture: all
+Depends: ${misc:Depends}, gcc-aarch64-linux-gnu
+Description: Smaller embedded C library for 64-bit ARM development
+ PicoLibc is a combination of Newlib and AVR libc bits designed
+ for small-RAM embedded systems. This package has binaries for
+ ARM 64-bit processors.

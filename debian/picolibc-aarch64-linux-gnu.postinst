@@ -1,0 +1,27 @@
+#!/bin/sh
+
+set -e
+
+ARCH=aarch64-linux-gnu
+
+case "$1" in
+    configure|triggered)
+	if which $ARCH-gcc > /dev/null; then
+	    target=`$ARCH-gcc -print-search-dirs | sed -n '/^install:/s/^install: //p'`
+	    source=/usr/lib/picolibc/$ARCH/picolibc.specs
+	    if [ -d "$target" -a -f "$source" ]; then
+		cp -a "$source" "$target" || true
+	    fi
+	fi
+	;;
+    abort-upgrade|abort-remove|abort-deconfigure)
+	;;
+    *)
+	echo "postinst called with unknown argument \`$1'" >&2
+        exit 1
+	;;
+esac
+
+#DEBHELPER#
+
+exit 0

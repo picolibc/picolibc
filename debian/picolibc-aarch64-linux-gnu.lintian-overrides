@@ -1,0 +1,4 @@
+picolibc-aarch64-linux-gnu: arch-independent-package-contains-binary-or-object usr/lib/picolibc/*
+picolibc-aarch64-linux-gnu: unstripped-static-library usr/lib/picolibc/*
+picolibc-aarch64-linux-gnu: static-library-has-unneeded-section usr/lib/picolibc/*
+picolibc-aarch64-linux-gnu: repeated-path-segment *
