@@ -1413,8 +1413,6 @@ class fhandler_fifo: public fhandler_base
   void cleanup_handlers ();
   void close_all_handlers ();
   void cancel_reader_thread ();
-  void record_connection (fifo_client_handler&,
-			  fifo_client_connect_state = fc_connected);
 
   int create_shmem (bool only_open = false);
   int reopen_shmem ();
@@ -1482,6 +1480,8 @@ public:
   DWORD fifo_reader_thread_func ();
   void fifo_client_lock () { _fifo_client_lock.lock (); }
   void fifo_client_unlock () { _fifo_client_lock.unlock (); }
+  void record_connection (fifo_client_handler&, bool = true,
+			  fifo_client_connect_state = fc_connected);
 
   int take_ownership (DWORD timeout = INFINITE);
   void reading_lock () { shmem->reading_lock (); }

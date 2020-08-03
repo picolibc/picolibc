@@ -37,10 +37,41 @@
      "fifo_client_handler" structures, one for each writer.  A
      fifo_client_handler contains the handle for the pipe server
      instance and information about the state of the connection with
-     the writer.  Each writer holds the pipe instance's client handle.
+     the writer.  Access to the list is controlled by a
+     "fifo_client_lock".
 
      The reader runs a "fifo_reader_thread" that creates new pipe
      instances as needed and listens for client connections.
+
+     The connection state of a fifo_client_handler has one of the
+     following values, in which order is important:
+
+       fc_unknown
+       fc_error
+       fc_disconnected
+       fc_closing
+       fc_listening
+       fc_connected
+       fc_input_avail
+
+     It can be changed in the following places:
+
+       - It is set to fc_listening when the pipe instance is created.
+
+       - It is set to fc_connected when the fifo_reader_thread detects
+         a connection.
+
+       - It is set to a value reported by the O/S when
+         query_and_set_state is called.  This can happen in
+         select.cc:peek_fifo and a couple other places.
+
+       - It is set to fc_disconnected by raw_read when an attempt to
+         read yields STATUS_PIPE_BROKEN.
+
+       - It is set to fc_error in various places when unexpected
+         things happen.
+
+     State changes are always guarded by fifo_client_lock.
 
      If there are multiple readers open, only one of them, called the
      "owner", maintains the fifo_client_handler list.  The owner is
@@ -374,10 +405,11 @@ fhandler_fifo::cleanup_handlers ()
 
 /* Always called with fifo_client_lock in place. */
 void
-fhandler_fifo::record_connection (fifo_client_handler& fc,
+fhandler_fifo::record_connection (fifo_client_handler& fc, bool set,
 				  fifo_client_connect_state s)
 {
-  fc.set_state (s);
+  if (set)
+    fc.set_state (s);
   set_pipe_non_blocking (fc.h, true);
 }
 
@@ -583,6 +615,11 @@ owner_listen:
       NTSTATUS status1;
 
       fifo_client_lock ();
+      if (fc.get_state () != fc_listening)
+	/* select.cc:peek_fifo has already recorded a connection. */
+	;
+      else
+      {
       switch (status)
 	{
 	case STATUS_SUCCESS:
@@ -590,7 +627,12 @@ owner_listen:
 	  record_connection (fc);
 	  break;
 	case STATUS_PIPE_CLOSING:
-	  record_connection (fc, fc_closing);
+	  debug_printf ("NtFsControlFile got STATUS_PIPE_CLOSING...");
+	  /* Maybe a writer already connected, wrote, and closed.
+	     Just query the O/S. */
+	  fc.query_and_set_state ();
+	  debug_printf ("...O/S reports state %d", fc.get_state ());
+	  record_connection (fc, false);
 	  break;
 	case STATUS_THREAD_IS_TERMINATING:
 	case STATUS_WAIT_1:
@@ -610,17 +652,23 @@ owner_listen:
 		record_connection (fc);
 		break;
 	      case STATUS_PIPE_CLOSING:
-		record_connection (fc, fc_closing);
+		debug_printf ("got STATUS_PIPE_CLOSING when trying to connect bogus client...");
+		fc.query_and_set_state ();
+		debug_printf ("...O/S reports state %d", fc.get_state ());
+		record_connection (fc, false);
 		break;
 	      default:
 		debug_printf ("NtFsControlFile status %y after failing to connect bogus client or real client", io.Status);
-		fc.set_state (fc_unknown);
+		fc.set_state (fc_error);
 		break;
 	      }
 	  break;
 	default:
+	  debug_printf ("NtFsControlFile got unexpected status %y", status);
+	  fc.set_state (fc_error);
 	  break;
 	}
+      }
       if (ph)
 	NtClose (ph);
       if (update)

@@ -877,10 +877,13 @@ peek_fifo (select_record *s, bool from_select)
       for (int i = 0; i < fh->get_nhandlers (); i++)
 	{
 	  fifo_client_handler &fc = fh->get_fc_handler (i);
-	  fc.query_and_set_state ();
+	  fifo_client_connect_state prev_state = fc.query_and_set_state ();
 	  if (fc.get_state () >= fc_connected)
 	    {
 	      nconnected++;
+	      if (prev_state == fc_listening)
+		/* The connection was not recorded by the fifo_reader_thread. */
+		fh->record_connection (fc, false);
 	      if (fc.get_state () == fc_input_avail)
 		{
 		  select_printf ("read: %s, ready for read", fh->get_name ());
