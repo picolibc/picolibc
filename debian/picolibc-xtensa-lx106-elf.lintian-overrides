@@ -1,3 +1,4 @@
 picolibc-xtensa-lx106-elf: arch-independent-package-contains-binary-or-object usr/lib/*
 picolibc-xtensa-lx106-elf: unstripped-static-library usr/lib/*
 picolibc-xtensa-lx106-elf: static-library-has-unneeded-section usr/lib/*
+picolibc-xtensa-lx106-elf: repeated-path-segment *
