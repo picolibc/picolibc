@@ -1214,16 +1214,17 @@ fhandler_fifo::raw_write (const void *ptr, size_t len)
   return ret;
 }
 
-/* Called from raw_read and select.cc:peek_fifo.  Return WAIT_OBJECT_0
-   on success.  */
-DWORD
-fhandler_fifo::take_ownership ()
+/* Called from raw_read and select.cc:peek_fifo. */
+int
+fhandler_fifo::take_ownership (DWORD timeout)
 {
+  int ret = 0;
+
   owner_lock ();
   if (get_owner () == me)
     {
       owner_unlock ();
-      return WAIT_OBJECT_0;
+      return 0;
     }
   set_pending_owner (me);
   /* Wake up my fifo_reader_thread. */
@@ -1233,18 +1234,25 @@ fhandler_fifo::take_ownership ()
     SetEvent (update_needed_evt);
   owner_unlock ();
   /* The reader threads should now do the transfer. */
-  DWORD waitret = cygwait (owner_found_evt, cw_cancel | cw_sig_eintr);
-  owner_lock ();
-  if (waitret == WAIT_OBJECT_0
-      && (get_owner () != me || get_pending_owner ()))
+  switch (WaitForSingleObject (owner_found_evt, timeout))
     {
-      /* Something went wrong.  Return WAIT_TIMEOUT, which can't be
-	 returned by the above cygwait call. */
-      set_pending_owner (null_fr_id);
-      waitret = WAIT_TIMEOUT;
+    case WAIT_OBJECT_0:
+      owner_lock ();
+      if (get_owner () != me)
+	{
+	  debug_printf ("owner_found_evt signaled, but I'm not the owner");
+	  ret = -1;
+	}
+      owner_unlock ();
+      break;
+    case WAIT_TIMEOUT:
+      debug_printf ("timed out");
+      ret = -1;
+    default:
+      debug_printf ("WFSO failed, %E");
+      ret = -1;
     }
-  owner_unlock ();
-  return waitret;
+  return ret;
 }
 
 void __reg3
@@ -1255,38 +1263,12 @@ fhandler_fifo::raw_read (void *in_ptr, size_t& len)
 
   while (1)
     {
+      int nconnected = 0;
+
       /* No one else can take ownership while we hold the reading_lock. */
       reading_lock ();
-      switch (take_ownership ())
-	{
-	case WAIT_OBJECT_0:
-	  break;
-	case WAIT_SIGNALED:
-	  if (_my_tls.call_signal_handler ())
-	    {
-	      reading_unlock ();
-	      continue;
-	    }
-	  else
-	    {
-	      set_errno (EINTR);
-	      reading_unlock ();
-	      goto errout;
-	    }
-	  break;
-	case WAIT_CANCELED:
-	  reading_unlock ();
-	  pthread::static_cancel_self ();
-	  break;
-	case WAIT_TIMEOUT:
-	  reading_unlock ();
-	  debug_printf ("take_ownership returned an unexpected result; retry");
-	  continue;
-	default:
-	  reading_unlock ();
-	  debug_printf ("unknown error while trying to take ownership, %E");
-	  goto errout;
-	}
+      if (take_ownership (10) < 0)
+	goto maybe_retry;
 
       /* Poll the connected clients for input.  Make two passes.  On
 	 the first pass, just try to read from the client from which
@@ -1332,7 +1314,6 @@ fhandler_fifo::raw_read (void *in_ptr, size_t& len)
 	}
 
       /* Second pass. */
-      int nconnected = 0;
       for (int i = 0; i < nhandlers; i++)
 	if (fc_handler[i].state >= fc_closing)
 	  {
@@ -1375,6 +1356,7 @@ fhandler_fifo::raw_read (void *in_ptr, size_t& len)
 	  len = 0;
 	  return;
 	}
+maybe_retry:
       reading_unlock ();
       if (is_nonblocking ())
 	{

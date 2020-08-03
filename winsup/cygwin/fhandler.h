@@ -1487,7 +1487,7 @@ public:
   void fifo_client_lock () { _fifo_client_lock.lock (); }
   void fifo_client_unlock () { _fifo_client_lock.unlock (); }
 
-  DWORD take_ownership ();
+  int take_ownership (DWORD timeout = INFINITE);
   void reading_lock () { shmem->reading_lock (); }
   void reading_unlock () { shmem->reading_unlock (); }
 
