@@ -365,7 +365,7 @@ fhandler_fifo::cleanup_handlers ()
 
   while (i < nhandlers)
     {
-      if (fc_handler[i].get_state () < fc_closing)
+      if (fc_handler[i].get_state () < fc_connected)
 	delete_client_handler (i);
       else
 	i++;
@@ -1280,7 +1280,7 @@ fhandler_fifo::raw_read (void *in_ptr, size_t& len)
       for (j = 0; j < nhandlers; j++)
 	if (fc_handler[j].last_read)
 	  break;
-      if (j < nhandlers && fc_handler[j].get_state () >= fc_closing)
+      if (j < nhandlers && fc_handler[j].get_state () >= fc_connected)
 	{
 	  NTSTATUS status;
 	  IO_STATUS_BLOCK io;
@@ -1315,7 +1315,7 @@ fhandler_fifo::raw_read (void *in_ptr, size_t& len)
 
       /* Second pass. */
       for (int i = 0; i < nhandlers; i++)
-	if (fc_handler[i].get_state () >= fc_closing)
+	if (fc_handler[i].get_state () >= fc_connected)
 	  {
 	    NTSTATUS status;
 	    IO_STATUS_BLOCK io;

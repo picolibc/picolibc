@@ -878,7 +878,7 @@ peek_fifo (select_record *s, bool from_select)
 	{
 	  fifo_client_handler &fc = fh->get_fc_handler (i);
 	  fc.query_and_set_state ();
-	  if (fc.get_state () >= fc_closing)
+	  if (fc.get_state () >= fc_connected)
 	    {
 	      nconnected++;
 	      if (fc.get_state () == fc_input_avail)

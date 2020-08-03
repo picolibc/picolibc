@@ -1276,20 +1276,13 @@ public:
 
 #define CYGWIN_FIFO_PIPE_NAME_LEN     47
 
-/* We view the fc_closing state as borderline between open and closed
-   for a writer at the other end of a fifo_client_handler.
-
-   We still attempt to read from the writer when the handler is in
-   this state, and we don't declare a reader to be at EOF if there's a
-   handler in this state.  But the existence of a handler in this
-   state is not sufficient to unblock a reader trying to open. */
 enum fifo_client_connect_state
 {
   fc_unknown,
   fc_error,
   fc_disconnected,
-  fc_listening,
   fc_closing,
+  fc_listening,
   fc_connected,
   fc_input_avail,
 };
