@@ -1318,17 +1318,30 @@ fhandler_fifo::raw_read (void *in_ptr, size_t& len)
       if (take_ownership (10) < 0)
 	goto maybe_retry;
 
-      /* Poll the connected clients for input.  Make two passes.  On
-	 the first pass, just try to read from the client from which
-	 we last read successfully.  This should minimize
-	 interleaving of writes from different clients. */
       fifo_client_lock ();
+      /* Poll the connected clients for input.  Make three passes.
+
+	 On the first pass, just try to read from the client from
+	 which we last read successfully.  This should minimize
+	 interleaving of writes from different clients.
+
+	 On the second pass, just try to read from the clients in the
+	 state fc_input_avail.  This should be more efficient if
+	 select has been called and detected input available.
+
+	 On the third pass, try to read from all connected clients. */
+
       /* First pass. */
       int j;
       for (j = 0; j < nhandlers; j++)
 	if (fc_handler[j].last_read)
 	  break;
-      if (j < nhandlers && fc_handler[j].get_state () >= fc_connected)
+      if (j < nhandlers && fc_handler[j].get_state () < fc_connected)
+	{
+	  fc_handler[j].last_read = false;
+	  j = nhandlers;
+	}
+      if (j < nhandlers)
 	{
 	  NTSTATUS status;
 	  IO_STATUS_BLOCK io;
@@ -1349,6 +1362,8 @@ fhandler_fifo::raw_read (void *in_ptr, size_t& len)
 		}
 	      break;
 	    case STATUS_PIPE_EMPTY:
+	      /* Update state in case it's fc_input_avail. */
+	      fc_handler[j].set_state (fc_connected);
 	      break;
 	    case STATUS_PIPE_BROKEN:
 	      fc_handler[j].set_state (fc_disconnected);
@@ -1358,10 +1373,47 @@ fhandler_fifo::raw_read (void *in_ptr, size_t& len)
 	      fc_handler[j].set_state (fc_error);
 	      break;
 	    }
-	  fc_handler[j].last_read = false;
 	}
 
       /* Second pass. */
+      for (int i = 0; i < nhandlers; i++)
+	if (fc_handler[i].get_state () == fc_input_avail)
+	  {
+	    NTSTATUS status;
+	    IO_STATUS_BLOCK io;
+
+	    status = NtReadFile (fc_handler[i].h, NULL, NULL, NULL,
+				 &io, in_ptr, len, NULL, NULL);
+	    switch (status)
+	      {
+	      case STATUS_SUCCESS:
+	      case STATUS_BUFFER_OVERFLOW:
+		if (io.Information > 0)
+		  {
+		    len = io.Information;
+		    if (j < nhandlers)
+		      fc_handler[j].last_read = false;
+		    fc_handler[i].last_read = true;
+		    fifo_client_unlock ();
+		    reading_unlock ();
+		    return;
+		  }
+		break;
+	      case STATUS_PIPE_EMPTY:
+		/* No input available after all. */
+		fc_handler[i].set_state (fc_connected);
+		break;
+	      case STATUS_PIPE_BROKEN:
+		fc_handler[i].set_state (fc_disconnected);
+		break;
+	      default:
+		debug_printf ("NtReadFile status %y", status);
+		fc_handler[i].set_state (fc_error);
+		break;
+	      }
+	  }
+
+      /* Third pass. */
       for (int i = 0; i < nhandlers; i++)
 	if (fc_handler[i].get_state () >= fc_connected)
 	  {
@@ -1378,6 +1430,8 @@ fhandler_fifo::raw_read (void *in_ptr, size_t& len)
 		if (io.Information > 0)
 		  {
 		    len = io.Information;
+		    if (j < nhandlers)
+		      fc_handler[j].last_read = false;
 		    fc_handler[i].last_read = true;
 		    fifo_client_unlock ();
 		    reading_unlock ();
