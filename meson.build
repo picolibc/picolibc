@@ -41,7 +41,7 @@ project('picolibc', 'c',
 	],
 	license : 'BSD',
 	meson_version : '>= 0.50',
-	version: '1.4.5'
+	version: '1.4.6'
        )
 
 targets = []
@@ -49,16 +49,18 @@ targets = []
 enable_multilib = get_option('multilib')
 multilib_list = get_option('multilib-list')
 enable_picolib = get_option('picolib')
+enable_picocrt = get_option('picocrt')
 enable_tests = get_option('tests')
 enable_native_tests = get_option('native-tests')
 have_alias_attribute_option = get_option('have-alias-attribute')
 have_format_attribute_option = get_option('have-format-attribute')
 newlib_register_fini = get_option('newlib-register-fini')
-newlib_mb = get_option('newlib-mb')
+
 newlib_iconv_encodings = get_option('newlib-iconv-encodings')
 newlib_iconv_from_encodings = get_option('newlib-iconv-from-encodings')
 newlib_iconv_to_encodings = get_option('newlib-iconv-to-encodings')
 newlib_iconv_external_ccs = get_option('newlib-iconv-external-ccs')
+
 newlib_atexit_dynamic_alloc = get_option('newlib-atexit-dynamic-alloc')
 newlib_global_atexit = get_option('newlib-global-atexit')
 newlib_reent_small = get_option('newlib-reent-small')
@@ -68,21 +70,27 @@ lite_exit = get_option('lite-exit')
 newlib_retargetable_locking = get_option('newlib-retargetable-locking')
 newlib_long_time_t = get_option('newlib-long-time_t')
 newlib_multithread = get_option('newlib-multithread')
-newlib_iconv = get_option('newlib-iconv')
 
 newlib_supplied_syscalls = get_option('newlib-supplied-syscalls')
 newlib_elix_level = get_option('newlib-elix-level')
 target_optspace = get_option('optimization') == 's'
 fast_strcmp = get_option('fast-strcmp')
+
+newlib_mb = get_option('newlib-mb')
 newlib_locale_info = get_option('newlib-locale-info')
 newlib_locale_info_extended = get_option('newlib-locale-info-extended')
+
 newlib_global_errno = get_option('newlib-global-errno')
 newlib_initfini_array = get_option('newlib-initfini-array')
 newlib_initfini = get_option('newlib-initfini')
+
+newlib_obsolete_math = get_option('newlib-obsolete-math')
+want_math_errno = get_option('want-math-errno')
+
 thread_local_storage_option = get_option('thread-local-storage')
 tls_model = get_option('tls-model')
+
 sysroot_install = get_option('sysroot-install')
-newlib_obsolete_math = get_option('newlib-obsolete-math')
 prefix = get_option('prefix')
 
 # Select stdio implementation
@@ -109,6 +117,7 @@ endif
 posix_io = tinystdio and get_option('posix-io')
 posix_console = posix_io and get_option('posix-console')
 io_float_exact = not tinystdio or get_option('io-float-exact')
+atomic_ungetc = tinystdio and get_option('atomic-ungetc')
 
 # A bunch of newlib-stdio only options
 newlib_io_pos_args = get_option('newlib-io-pos-args')
@@ -120,9 +129,6 @@ newlib_nano_formatted_io = get_option('newlib-nano-formatted-io')
 newlib_io_float = get_option('newlib-io-float')
 newlib_stdio64 = get_option('newlib-stdio64')
 newlib_wide_orient = get_option('newlib-wide-orient')
-newlib_iconv_encodings = get_option('newlib-iconv-encodings')
-newlib_iconv_from_encodings = get_option('newlib-iconv-from-encodings')
-newlib_iconv_to_encodings = get_option('newlib-iconv-to-encodings')
 
 # options which no longer have any effect
 newlib_reentrant_syscalls_provided = get_option('newlib-reentrant-syscalls-provided')
@@ -170,13 +176,6 @@ if host_cpu_family == ''
   message('Computed host_cpu_family as ' + host_cpu_family)
 endif
 
-specs_dir = get_option('specsdir')
-if specs_dir == ''
-  search_cmds = meson.get_compiler('c').cmd_array() + ['-print-search-dirs']
-  install_dir=run_command(search_cmds).stdout().split('\n')[0]
-  specs_dir=install_dir.split(':')[1].strip()
-endif
-
 if have_alias_attribute_option == 'auto'
   have_alias_attribute = meson.get_compiler('c').has_function_attribute('alias')
 else
@@ -208,6 +207,30 @@ if sysroot_install
 endif
 
 lib_dir = join_paths(prefix, get_option('libdir'))
+
+newlib_iconv_dir = get_option('newlib-iconv-dir')
+if newlib_iconv_dir == ''
+  newlib_iconv_dir = join_paths(lib_dir, 'locale')
+endif
+
+newlib_iconv_runtime_dir = get_option('newlib-iconv-runtime-dir')
+if newlib_iconv_runtime_dir == ''
+  newlib_iconv_runtime_dir = newlib_iconv_dir
+endif
+
+specs_dir_option = get_option('specsdir')
+if specs_dir_option == ''
+  search_cmds = meson.get_compiler('c').cmd_array() + ['-print-search-dirs']
+  install_dir=run_command(search_cmds).stdout().split('\n')[0]
+  specs_dir=install_dir.split(':')[1].strip()
+  specs_install = true
+elif specs_dir_option == 'none'
+  specs_install = false
+  specs_dir = ''
+else
+  specs_dir = join_paths(prefix, specs_dir_option)
+  specs_install = true
+endif
 
 specs_data = configuration_data()
 specs_data.set(
@@ -252,12 +275,31 @@ specs_data.set(
   specs_extra
 )
 
+if tinystdio
+  specs_printf=('%{DPICOLIBC_FLOAT_PRINTF_SCANF:--defsym=vfprintf=__f_vfprintf}' +
+		' %{DPICOLIBC_FLOAT_PRINTF_SCANF:--defsym=vfscanf=__f_vfscanf}' +
+		' %{DPICOLIBC_INTEGER_PRINTF_SCANF:--defsym=vfprintf=__i_vfprintf}' +
+		' %{DPICOLIBC_INTEGER_PRINTF_SCANF:--defsym=vfscanf=__i_vfscanf}')
+else
+  specs_printf=''
+endif
+
+specs_data.set(
+  'SPECS_PRINTF',
+  specs_printf
+)
+
 picolibc_specs = configure_file(input: 'picolibc.specs.in',
 				output: '@BASENAME@',
 				configuration: specs_data,
 				install_dir: specs_dir,
-				install: true)
+				install: specs_install)
 				     
+test_specs = configure_file(input: 'test.specs.in',
+			    output: '@BASENAME@',
+			    configuration: specs_data,
+			    install: false)
+
 install_data('picolibc.ld',
 	     install_dir: lib_dir)
 
@@ -382,8 +424,9 @@ conf_data.set('_MB_CAPABLE', newlib_mb)
 conf_data.set('_MB_LEN_MAX', newlib_mb ? '8' : '1')
 conf_data.set('__SINGLE_THREAD__', newlib_multithread == false)
 conf_data.set('_ICONV_ENABLE_EXTERNAL_CCS', newlib_iconv_external_ccs)
-conf_data.set('_ICONV_ENABLED', newlib_iconv)
-conf_data.set('_ICONV_ENABLE_EXTERNAL_CCS', newlib_iconv_external_ccs)
+if newlib_iconv_external_ccs
+  conf_data.set_quoted('ICONV_DEFAULT_NLSPATH', newlib_iconv_runtime_dir)
+endif
 conf_data.set('_ATEXIT_DYNAMIC_ALLOC', newlib_atexit_dynamic_alloc)
 conf_data.set('_REENT_GLOBAL_ATEXIT', newlib_global_atexit)
 conf_data.set('_FVWRITE_IN_STREAMIO', newlib_fvwrite_in_streamio)
@@ -396,7 +439,7 @@ conf_data.set('_NANO_FORMATTED_IO', newlib_nano_formatted_io)
 conf_data.set('_RETARGETABLE_LOCKING', newlib_retargetable_locking)
 conf_data.set('_WANT_USE_LONG_TIME_T', newlib_long_time_t)
 conf_data.set('TINY_STDIO', tinystdio, description: 'Use tiny stdio from gcc avr')
-conf_data.set('_IEEE_LIBM', true, description: 'math library only offers ieee semantics')
+conf_data.set('_IEEE_LIBM', not want_math_errno, description: 'math library does not set errno (offering only ieee semantics)')
 conf_data.set('PREFER_SIZE_OVER_SPEED', target_optspace, description: 'Optimize for space over speed')
 conf_data.set('FAST_STRCMP', fast_strcmp, description: 'Always optimize strcmp for performance')
 conf_data.set('REENTRANT_SYSCALLS_PROVIDED', newlib_reentrant_syscalls_provided, description: 'Reentrant syscalls provided for us')
@@ -410,6 +453,7 @@ conf_data.set('NEWLIB_TLS', thread_local_storage, description: 'use thread local
 conf_data.set('PICOLIBC_TLS', thread_local_storage, description: 'use thread local storage')
 conf_data.set('POSIX_IO', posix_io, description: 'Use open/close/read/write in tinystdio')
 conf_data.set('POSIX_CONSOLE', posix_console, description: 'Use POSIX I/O for stdin, stdout and stderr')
+conf_data.set('ATOMIC_UNGETC', atomic_ungetc, description: 'Use atomics for fgetc/ungetc for re-entrancy')
 
 if newlib_obsolete_math == 'auto'
   obsolete_math_value = false
@@ -423,45 +467,45 @@ conf_data.set('__OBSOLETE_MATH', obsolete_math_value, description: 'Use old math
 
 # Compute iconv encodings to support in the library
 
-if newlib_iconv
+# Dig out the list of available encodings from the encoding.aliases file. Only
+# accept the first entry from each line
 
-  # By default, use newlib_iconv_encodings for both directions,
-  # allowing overrides if specified
+available_encodings = run_command(['sed', '-e', '/^#/d', '-e', '/^$/d', '-e', 's/ .*$//', files('newlib/libc/iconv/encoding.aliases')[0]]).stdout().split('\n')
 
-  if newlib_iconv_from_encodings.length() == 0
-    newlib_iconv_from_encodings = newlib_iconv_encodings
-  endif
-  if newlib_iconv_to_encodings.length() == 0
-    newlib_iconv_to_encodings = newlib_iconv_encodings
-  endif
+# Include all available encodings if none were specified on the command line
 
-  if newlib_iconv_to_encodings.length() == 0 or newlib_iconv_from_encodings.length() == 0
-    error('newlib-iconv-encodings required for newlib-iconv')
-  endif
-
-  # Dig out the list of available encodings from the encoding.aliases file. Only
-  # accept the first entry from each line
-  
-  available_encodings = run_command(['sed', '-e', '/^#/d', '-e', '/^$/d', '-e', 's/ .*$//', files('newlib/libc/iconv/encoding.aliases')[0]]).stdout().split('\n')
-
-  # Set config variables for each requested 'from' encoding
-
-  foreach from : newlib_iconv_from_encodings
-    if not available_encodings.contains(from)
-      error('Requested from encoding ' + from + ' is not available. Look in newlib/libc/iconv/encoding.aliases')
-    endif
-    conf_data.set('_ICONV_FROM_ENCODING_' + from.to_upper(), true)
-  endforeach
-
-  # Set config variables for each requested 'to' encoding
-
-  foreach to : newlib_iconv_to_encodings
-    if not available_encodings.contains(to)
-      error('Requested to encoding ' + to + ' is not available. Look in newlib/libc/iconv/encoding.aliases')
-    endif
-    conf_data.set('_ICONV_TO_ENCODING_' + to.to_upper(), true)
-  endforeach
+if newlib_iconv_encodings.length() == 0
+  newlib_iconv_encodings = available_encodings
+elif newlib_iconv_encodings.length() == 1 and newlib_iconv_encodings[0] == 'none'
+  newlib_iconv_encodings = []
 endif
+
+# Use newlib_iconv_encodings for from/to by default
+
+if newlib_iconv_from_encodings.length() == 0
+  newlib_iconv_from_encodings = newlib_iconv_encodings
+endif
+if newlib_iconv_to_encodings.length() == 0
+  newlib_iconv_to_encodings = newlib_iconv_encodings
+endif
+
+# Set config variables for each requested 'from' encoding
+
+foreach from : newlib_iconv_from_encodings
+  if not available_encodings.contains(from)
+    error('Requested from encoding ' + from + ' is not available. Look in newlib/libc/iconv/encoding.aliases')
+  endif
+  conf_data.set('_ICONV_FROM_ENCODING_' + from.to_upper(), true)
+endforeach
+
+# Set config variables for each requested 'to' encoding
+
+foreach to : newlib_iconv_to_encodings
+  if not available_encodings.contains(to)
+    error('Requested to encoding ' + to + ' is not available. Look in newlib/libc/iconv/encoding.aliases')
+  endif
+  conf_data.set('_ICONV_TO_ENCODING_' + to.to_upper(), true)
+endforeach
 
 version_array = meson.project_version().split('.')
 
@@ -549,9 +593,15 @@ if has_semihost
   # Make sure all of the tests get re-linked if the linker scripts change
 
   test_link_depends += test_link_dep + files('picolibc.ld') + [picolibc_specs]
+else
+  test_link_depends += test_specs
+  test_c_args += ['--specs', '@0@/@1@'.format(meson.current_build_dir(), test_specs)]
+  test_link_args += test_c_args
 endif
 
-subdir('picocrt')
+if enable_picocrt
+  subdir('picocrt')
+endif
 subdir('newlib')
 
 if enable_tests

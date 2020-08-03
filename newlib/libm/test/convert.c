@@ -255,22 +255,22 @@ test_fcvt (void)
   char *sf;
   double v1;
   double v2;
-  int s1, s2;
+  char *sde, *sfe;
   /* Test the float version by converting and inspecting the numbers 3
    after reconverting */
   sf =  check_null(fcvtf(pdd->value, pdd->f1, &a2, &a3));
-  s1 = sscanf(sd, "%lg", &v1);
-  s2 = sscanf(sf, "%lg", &v2);
+  v1 = strtod(sd, &sde);
+  v2 = strtod(sf, &sfe);
   /* float version may return fewer digits; expand to match */
   int x = strlen(sd) - strlen(sf);
   while (x-- > 0)
     v2 *= 10;
   if (strlen(sd) == 0) {
-    test_iok(EOF, s1);
+    test_iok(0, sde - sd);
     v1 = 0.0;
   }
   if (strlen(sf) == 0) {
-    test_iok(EOF, s2);
+    test_iok(0, sfe - sf);
     v2 = 0.0;
   }
   test_mok(v1, v2,30);
@@ -299,6 +299,7 @@ diterate (void (*func)(),
 void
 deltest (void)
 {
+#if defined(TINY_STDIO) || !defined(NO_FLOATING_POINT)
   newfunc("rounding");
   line(1);
   sprintf(buffer,"%.2f", 9.999);
@@ -324,6 +325,7 @@ deltest (void)
   line(8);  
   sprintf(buffer,"%.0f", 12.3456789);
   test_sok(buffer,"12");
+#endif
 }
 
 /* Most of what sprint does is tested with the tests of
@@ -331,8 +333,10 @@ deltest (void)
 void
 test_sprint (void)
 {
+#if defined(TINY_STDIO) || !defined(NO_FLOATING_POINT)
   extern sprint_double_type sprint_doubles[];
   sprint_double_type *s = sprint_doubles;
+#endif
   extern sprint_int_type sprint_ints[];
   sprint_int_type *si = sprint_ints;
 
@@ -340,6 +344,7 @@ test_sprint (void)
   newfunc( "sprintf");  
 
 
+#if defined(TINY_STDIO) || !defined(NO_FLOATING_POINT)
   while (s->line) 
   {
     line( s->line);
@@ -357,6 +362,7 @@ test_sprint (void)
 #endif
     s++;
   }
+#endif
 
   while (si->line) 
   {
@@ -384,13 +390,16 @@ void
 test_scan (void)
 {
   int i,j;
+#if defined(TINY_STDIO) || !defined(NO_FLOATING_POINT)
   extern sprint_double_type sprint_doubles[];
   sprint_double_type *s = sprint_doubles;
+#endif
   extern sprint_int_type sprint_ints[];
   sprint_int_type *si = sprint_ints;
 
   newfunc( "scanf");  
   
+#if defined(TINY_STDIO) || !defined(NO_FLOATING_POINT)
   /* Test scanf by converting all the numbers in the sprint vectors
      to and from their source and making sure nothing breaks */
 
@@ -408,6 +417,7 @@ test_scan (void)
       test_mok(d0,d1, CONVERT_BITS_DOUBLE);
     s++;
   }
+#endif
 
   /* And integers too */
   while (si->line) 

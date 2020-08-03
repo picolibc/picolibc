@@ -73,9 +73,10 @@ Finally, the FILE is used to initialize the __iob array:
 
 	FILE *const __iob[3] = { &__stdio, &__stdio, &__stdio };
 
-### fdopen, fdopen
+### fopen, fdopen
 
-Support for these requires a handful of POSIX-compatible functions:
+Support for these requires malloc/free along with a handful of
+POSIX-compatible functions:
 
 	int open (const char *, int, ...);
 	int close (int fd);
@@ -93,6 +94,27 @@ callbacks registered with atexit. To make it work, you'll need to
 implement the `_exit` function:
 
 	void	_exit (int status) _ATTRIBUTE ((__noreturn__));
+
+### malloc and free
+
+Both versions of malloc in picolibc require sbrk to be supported. The
+smaller version, enabled (by default) with -Dnewlib-nano-malloc=true,
+can handle sbrk returning dis-continuous memory while the larger
+version (enabled with -Dnewlib-nano-malloc=false) requires sbrk return
+contiguous chunks of memory.
+
+### sbrk
+
+Picolibc includes a simple version of sbrk that can return chunks of
+memory from a pre-defined contiguous heap. To use this function, your
+application linking process needs to define two symbols:
+
+ * __heap_start — points at the start of the heap available for sbrk.
+ * __heap_end — points at the end of the heap available for sbrk.
+
+The sample linker script provided with picolibc defines these two
+symbols to enclose all RAM which is not otherwise used by the
+application.
 
 ## Linking with System Library
 
@@ -124,3 +146,52 @@ As a build-time option, Picolibc can be configured to use POSIX read
 and write APIs to support stdin, stdout and stderr. Add
 `-Dposix-console=true` to enable this. This is incompatible with
 semihosting support above.
+
+## Building picolibc on native POSIX systems
+
+To allow for testing of picolibc and applications using picolibc, you
+can actually build picolibc on a full POSIX system. In this
+configuration, picolibc provides the non-POSIX libc APIs while the
+underlying system C library is used for the POSIX functions described
+above. To build in this mode, you'll need to override a few default
+picolibc configuration parameters:
+
+	$ meson \
+		-Dtls-model=global-dynamic \
+		-Dmultilib=false \
+		-Dpicolib=false \
+		-Dpicocrt=false \
+		-Dposix-console=true \
+		-Dnewlib-global-atexit=true \
+		-Dincludedir=lib/picolibc/include \
+		-Dlibdir=lib/picolibc/lib \
+		-Dspecsdir=none
+
+ * -Dtls-model=global-dynamic makes picolibc use the default TLS model
+   for GCC.
+
+ * -Dmultilib-false makes picolibc build only a single library for the
+   default GCC configuration.
+
+ * -Dpicolib=false disables building the TLS and sbrk support built-in
+   to picolibc so that the underlying system support is used instead.
+
+ * -Dpicocrt=false disables building the C startup code as that is
+   provided by the underlying system.
+
+ * -Dposix-console=true uses POSIX I/O read/write APIs for stdin,
+    stdout and stderr.
+
+ * -Dnewlib-global-atexit=true disables the per-thread atexit behavior
+   so that picolibc acts like a regular C library.
+
+ * -Dincludedir and -Dlibdir specify install locations for the headers
+   and library
+
+ * -Dspecsdir=none disables installing picolibc.specs as that file
+   is not useful in this environment
+
+Once built, you can install and use picolibc on the host:
+
+	$ cc -I/usr/local/lib/picolibc/include hello-world.c \
+		/usr/local/lib/picolibc/lib/libc.a

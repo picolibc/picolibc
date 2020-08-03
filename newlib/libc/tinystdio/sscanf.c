@@ -39,20 +39,7 @@ sscanf(const char *s, const char *fmt, ...)
 {
 	va_list ap;
 	int i;
-	/*
-	 * It is OK to discard the "const" qualifier here.  f.buf is
-	 * non-const as in the generic case, this buffer is obtained
-	 * by malloc().  In the scanf case however, the buffer is
-	 * really only be read (by getc()), and as this our FILE f we
-	 * be discarded upon exiting sscanf(), nobody will ever get
-	 * a chance to get write access to it again.
-	 */
-	struct __file_str f = {
-		.file = {
-			.flags = __SRD | __SSTR
-		},
-		.buf = (char *) s,
-	};
+	struct __file_str f = FDEV_SETUP_STRING_READ(s);
 	va_start(ap, fmt);
 	i = vfscanf(&f.file, fmt, ap);
 	va_end(ap);

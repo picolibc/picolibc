@@ -152,7 +152,7 @@ in terms of the base return values, although the <[signgam]> global for
 	return __ieee754_gamma(x);
 #else
         double y;
-        y = __ieee754_gamma_r(x);
+        y = __ieee754_gamma(x);
         if(_LIB_VERSION == _IEEE_) return y;
         if(!finite(y)&&finite(x)) {
 	    if(floor(x)==x&&x<=0.0) {

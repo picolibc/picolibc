@@ -23,6 +23,7 @@
 
 #if defined(_IEEE_LIBM) && defined(HAVE_ALIAS_ATTRIBUTE)
 __strong_reference(__ieee754_gamma, gamma);
+__strong_reference(__ieee754_gamma, tgamma);
 #endif
 
 #ifdef __STDC__
@@ -32,5 +33,10 @@ __strong_reference(__ieee754_gamma, gamma);
 	double x;
 #endif
 {
-	return __ieee754_exp (__ieee754_lgamma(x));
+	int sign;
+	double y;
+	y = __ieee754_exp (__ieee754_lgamma_r(x, &sign));
+	if (sign < 0)
+		y = -y;
+	return y;
 }

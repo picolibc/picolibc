@@ -45,4 +45,17 @@ fcvtfbuf(float invalue,
 	 int *sign,
 	 char *fcvt_buf)
 {
+	struct ftoa ftoa;
+	int ndigit;
+
+	ndigit = __ftoa_engine(invalue, &ftoa, FTOA_MAX_DIG, ndecimal + 1);
+	*sign = ftoa.flags & FTOA_MINUS;
+	if (ndigit > 0)
+		*decpt = ftoa.exp + 1;
+	else {
+		*decpt = -ndecimal;
+	}
+	memcpy(fcvt_buf, ftoa.digits, ndigit);
+	fcvt_buf[ndigit] = '\0';
+	return fcvt_buf;
 }

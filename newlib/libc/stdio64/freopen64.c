@@ -185,7 +185,7 @@ _freopen64_r (struct _reent *ptr,
    */
 
   if (fp->_flags & __SMBF)
-    _free_r (ptr, (char *) fp->_bf._base);
+    free ((char *) fp->_bf._base);
   fp->_w = 0;
   fp->_r = 0;
   fp->_p = NULL;

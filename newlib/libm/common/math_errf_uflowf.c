@@ -29,10 +29,8 @@
 #include "fdlibm.h"
 #include "math_config.h"
 
-#if !__OBSOLETE_MATH
 HIDDEN float
 __math_uflowf (uint32_t sign)
 {
   return __math_xflowf (sign, 0x1p-95f);
 }
-#endif

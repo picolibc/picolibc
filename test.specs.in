@@ -1,0 +1,4 @@
+%rename link test_link
+
+*link:
+@SPECS_PRINTF@ --gc-sections %(test_link)

@@ -37,6 +37,7 @@
 srcs_libm_machine = [
   'e_sqrt.c',
   'ef_sqrt.c',
+  'fenv.c',
   's_ceil.c',
   's_fabs.c',
   's_floor.c',

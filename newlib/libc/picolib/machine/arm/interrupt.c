@@ -91,10 +91,7 @@ void (* const __weak_interrupt_vector[])(void) __attribute((aligned(128))) = {
 };
 __weak_reference(__weak_interrupt_vector, __interrupt_vector);
 
-#endif
-
-#if __ARM_ARCH_PROFILE == 'A'
-
+#else
 
 void arm_halt_isr(void);
 

@@ -53,6 +53,9 @@ option('native-tests', type: 'boolean', value: false,
 option('picolib', type: 'boolean', value: true,
        description: 'Include pico lib bits')
 
+option('picocrt', type: 'boolean', value: true,
+       description: 'Include pico crt bits')
+
 option('specsdir', type: 'string',
        description: 'Installation directory for .specs file')
 
@@ -85,6 +88,8 @@ option('newlib-io-long-long', type: 'combo', choices: ['true', 'false', 'auto'],
 #
 option('io-float-exact', type: 'boolean', value: true,
        description: 'use float/string code which supports round-tripping')
+option('atomic-ungetc', type: 'boolean', value: true,
+       description: 'use atomics in fgetc/ungetc to make them re-entrant')
 option('posix-io', type: 'boolean', value: true,
        description: 'Provide fopen/fdopen using POSIX I/O (open, close, read, write, lseek)')
 option('posix-console', type: 'boolean', value: false,
@@ -122,16 +127,19 @@ option('newlib-wide-orient', type: 'boolean', value: false,
 # Internationalization options
 #
 
-option('newlib-iconv', type: 'boolean', value: false,
-       description: 'enable iconv library support')
 option('newlib-iconv-encodings', type: 'array',
        description: 'enable specific comma-separated list of bidirectional iconv encodings to be built-in')
 option('newlib-iconv-from-encodings', type: 'array',
        description: 'enable specific comma-separated list of "from" iconv encodings to be built-in')
 option('newlib-iconv-to-encodings', type: 'array',
        description: 'enable specific comma-separated list of "to" iconv encodings to be built-in')
-option('newlib-iconv-external-ccs', type: 'boolean',
-       description: 'enable capabilities to load external CCS files for iconv')
+option('newlib-iconv-external-ccs', type: 'boolean', value:false,
+       description: 'Load iconv CCS tables from files rather than having them built-in')
+option('newlib-iconv-dir', type: 'string',
+       description: 'Installation directory for iconv CCS files')
+option('newlib-iconv-runtime-dir', type: 'string',
+       description: 'Path used at runtime to locate iconv CCS files')
+
 option('newlib-locale-info', type: 'boolean', value: false,
        description: 'locale support')
 option('newlib-locale-info-extended', type: 'boolean', value: false,
@@ -179,6 +187,8 @@ option('tls-model', type: 'string', value: 'local-exec',
 option('newlib-global-errno', type: 'boolean', value: false,
        description: 'use global errno variable')
 
+# 
+# Math options
 #
 # Use "obsolete" math code, which use 'float' for 'float' functions
 # instead of the newer code which uses 'double' instead.
@@ -186,6 +196,8 @@ option('newlib-global-errno', type: 'boolean', value: false,
 option('newlib-obsolete-math', type: 'combo', choices: ['true', 'false', 'auto'],
        value: 'auto',
        description: 'Use float type for float valued math routines (default: automatic based on platform)')
+option('want-math-errno', type: 'boolean', value: false,
+       description: 'Set errno in math functions according to stdc (default: false)')
 
 #
 # Obsolete newlib options

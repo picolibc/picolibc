@@ -24,7 +24,7 @@ __eprintf (format, file, line, expression)
      unsigned int line;
      const char *expression;
 {
-  (void) __i_fprintf (stderr, format, file, line, expression);
+  (void) fprintf (stderr, format, file, line, expression);
   abort ();
   /*NOTREACHED*/
 }

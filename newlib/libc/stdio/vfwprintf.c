@@ -1242,7 +1242,7 @@ string:
 				} else
 					insize = strlen (arg);
 				if (insize >= BUF) {
-				    if ((malloc_buf = (wchar_t *) _malloc_r (data, (insize + 1) * sizeof (wchar_t)))
+				    if ((malloc_buf = (wchar_t *) malloc ((insize + 1) * sizeof (wchar_t)))
 					== NULL) {
 						fp->_flags |= __SERR;
 						goto error;

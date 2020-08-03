@@ -256,7 +256,7 @@ fmemcloser (struct _reent *ptr,
        void *cookie)
 {
   fmemcookie *c = (fmemcookie *) cookie;
-  _free_r (ptr, c->storage);
+  free (c->storage);
   return 0;
 }
 
@@ -282,7 +282,7 @@ _fmemopen_r (struct _reent *ptr,
     }
   if ((fp = __sfp (ptr)) == NULL)
     return NULL;
-  if ((c = (fmemcookie *) _malloc_r (ptr, sizeof *c + (buf ? 0 : size)))
+  if ((c = (fmemcookie *) malloc (sizeof *c + (buf ? 0 : size)))
       == NULL)
     {
       _newlib_sfp_lock_start ();

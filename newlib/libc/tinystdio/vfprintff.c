@@ -30,6 +30,8 @@
 
 */
 
+#define PRINTF_LEVEL PRINTF_FLT
 #define PICOLIBC_FLOAT_PRINTF_SCANF
+#define vfprintf __f_vfprintf
 
 #include <vfprintf.c>

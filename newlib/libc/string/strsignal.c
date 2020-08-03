@@ -60,7 +60,7 @@ strsignal (int signal)
   buffer = _signal_buf;
 #if defined(SIGRTMIN) && defined(SIGRTMAX)
   if ((signal >= SIGRTMIN) && (signal <= SIGRTMAX)) {
-    __i_sprintf (buffer, "Real-time signal %d", signal - SIGRTMIN);
+    sprintf (buffer, "Real-time signal %d", signal - SIGRTMIN);
     return buffer;
   }
 #endif
@@ -236,7 +236,7 @@ strsignal (int signal)
       break;
 #endif
     default:
-      __i_sprintf (buffer, "Unknown signal %d", signal);
+      sprintf (buffer, "Unknown signal %d", signal);
       break;
   }
 

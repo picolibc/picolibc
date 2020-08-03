@@ -148,7 +148,6 @@ typedef long ultoa_signed_t;
 #define FL_NEGATIVE	0x40
 #define FL_LONG 	0x80
 
-
 int
 vfprintf (FILE * stream, const char *fmt, va_list ap)
 {
@@ -880,5 +879,10 @@ int vfprintf (FILE * stream, const char *fmt, va_list ap)
     return stream_len;
 #undef my_putc
 }
+
+#ifndef vfprintf
+int __d_vfprintf (FILE * stream, const char *fmt, va_list ap) __attribute__((alias("vfprintf"), nonnull));
+#endif
+
 
 #endif	/* PRINTF_LEVEL > PRINTF_MIN */

@@ -453,10 +453,11 @@ load_file (
                   const char *name,
                   int direction)
 {
-  int fd;
-  const unsigned char *buf;
+  FILE *file;
+  char *buf;
   int tbllen, hdrlen;
   off_t off;
+  off_t cur = 0;
   const char *fname;
   iconv_ccs_desc_t *ccsp = NULL;
   int nmlen = strlen(name);
@@ -472,14 +473,16 @@ load_file (
                                               ICONV_DATA_EXT)) == NULL)
     return NULL;
   
-  if ((fd = open (fname, O_RDONLY, S_IRUSR)) == -1)
+  if ((file = fopen (fname, "rb")) == NULL)
     goto error1;
   
-  if ((buf = (const unsigned char *)malloc (hdrlen)) == NULL)
+  if ((buf = malloc (hdrlen)) == NULL)
     goto error2;
 
-  if (read (fd, (void *)buf, hdrlen) != hdrlen)
+  if (fread ((void *) buf, 1, hdrlen, file) != hdrlen)
     goto error3;
+
+  cur += hdrlen;
 
   if (_16BIT_ELT (EXTTABLE_VERSION_OFF) != TABLE_VERSION_1
       || _32BIT_ELT (EXTTABLE_CCSNAME_LEN_OFF) != nmlen
@@ -546,8 +549,12 @@ load_file (
   if ((ccsp->tbl = (ucs2_t *)malloc (tbllen)) == NULL)
     goto error4;
 
-  if (lseek (fd, off, SEEK_SET) == (off_t)-1
-      || read (fd, (void *)ccsp->tbl, tbllen) != tbllen)
+  while (cur < off) {
+    if (getc(file) == EOF)
+      goto error5;
+    cur++;
+  }
+  if (fread ((void *) ccsp->tbl, 1, tbllen, file) != tbllen)
     goto error5;
 
   goto normal_exit;
@@ -562,7 +569,7 @@ error3:
 normal_exit:
   free ((void *)buf);
 error2:
-  if (close (fd) == -1)
+  if (fclose (file) == EOF)
     {
       if (ccsp != NULL)
         {

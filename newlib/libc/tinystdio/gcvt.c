@@ -37,13 +37,13 @@
 #define _XOPEN_SOURCE_EXTENDED
 #include <_ansi.h>
 #include <stdlib.h>
-#include <stdio.h>
+#include "stdio_private.h"
 
 char *
 gcvt (double invalue,
       int ndigit,
       char *buf)
 {
-	sprintf(buf, "%.*g", ndigit, invalue);
+	__d_sprintf(buf, "%.*g", ndigit, invalue);
 	return buf;
 }

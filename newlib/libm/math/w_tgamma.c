@@ -19,6 +19,7 @@
 
 #ifndef _DOUBLE_IS_32BITS
 
+#if !defined(_IEEE_LIBM) || !defined(HAVE_ALIAS_ATTRIBUTE)
 #ifdef __STDC__
 	double tgamma(double x)
 #else
@@ -28,7 +29,6 @@
 {
         double y;
 	y = __ieee754_gamma(x);
-	if (signgam < 0) y = -y;
 #ifdef _IEEE_LIBM
 	return y;
 #else
@@ -43,5 +43,6 @@
 	return y;
 #endif
 }
+#endif
 
 #endif /* defined(_DOUBLE_IS_32BITS) */

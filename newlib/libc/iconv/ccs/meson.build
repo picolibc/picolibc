@@ -32,6 +32,8 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
+subdir('binary')
+
 srcs_ccs = [
     'big5.c',
     'ccsbi.c',

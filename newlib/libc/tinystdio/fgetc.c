@@ -31,38 +31,28 @@
 
 #include <stdio.h>
 #include "stdio_private.h"
+#include <sys/cdefs.h>
 
 int
 fgetc(FILE *stream)
 {
 	int rv;
+	__ungetc_t unget;
 
 	if ((stream->flags & __SRD) == 0)
 		return EOF;
 
-	if ((stream->flags & __SUNGET) != 0) {
-		stream->flags &= ~__SUNGET;
-		return stream->unget;
-	}
+	if ((unget = __atomic_exchange_ungetc(&stream->unget, 0)) != 0)
+		return (unsigned char) unget;
 
-	if (stream->flags & __SSTR) {
-		struct __file_str *sstream = (struct __file_str *) stream;
-		rv = *sstream->buf;
-		if (rv == '\0') {
-			stream->flags |= __SEOF;
-			return EOF;
-		} else {
-			sstream->buf++;
-		}
-	} else {
-		rv = stream->get(stream);
-		if (rv < 0) {
-			/* if != _FDEV_ERR, assume it's _FDEV_EOF */
-			stream->flags |= (rv == _FDEV_ERR)? __SERR: __SEOF;
-			return EOF;
-		}
+	rv = stream->get(stream);
+	if (rv < 0) {
+		/* if != _FDEV_ERR, assume it's _FDEV_EOF */
+		stream->flags |= (rv == _FDEV_ERR)? __SERR: __SEOF;
+		return EOF;
 	}
 
 	return (unsigned char)rv;
 }
 
+__strong_reference(fgetc, getc);

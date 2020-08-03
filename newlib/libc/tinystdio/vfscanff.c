@@ -31,5 +31,6 @@
 */
 
 #define PICOLIBC_FLOAT_PRINTF_SCANF
+#define vfscanf __f_vfscanf
 
 #include "vfscanf.c"

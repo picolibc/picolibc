@@ -30,6 +30,7 @@
 
 */
 
-#define PICOLIBC_FLOAT_PRINTF_SCANF
+#define vfprintf __f_vfprintf
+#define sprintf __f_sprintf
 
 #include <sprintf.c>

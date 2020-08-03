@@ -31,6 +31,7 @@
         float y;
         y = __ieee754_lgammaf_r(x,signgamp);
         if(_LIB_VERSION == _IEEE_) return y;
+#ifndef _IEEE_LIBM
         if(!finitef(y)&&finitef(x)) {
 	    if(floorf(x)==x&&x<=0.0f) {
 		/* lgammaf(-integer) or lgamma(0) */
@@ -40,7 +41,8 @@
 		errno = ERANGE;
 	    }
 	    return HUGE_VALF;
-        } else
-            return y;
-}             
+        }
+#endif
+	return y;
+}
 #endif

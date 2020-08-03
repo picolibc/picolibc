@@ -220,7 +220,17 @@ extern int isnan (double);
 # define MATH_ERREXCEPT 2
 #endif
 #ifndef math_errhandling
-# define math_errhandling MATH_ERRNO
+# ifdef _IEEE_LIBM
+#  define _MATH_ERRHANDLING_ERRNO MATH_ERRNO
+# else
+#  define _MATH_ERRHANDLING_ERRNO 0
+# endif
+# ifdef _SUPPORTS_ERREXCEPT
+#  define _MATH_ERRHANDLING_ERREXCEPT MATH_ERREXCEPT
+# else
+#  define _MATH_ERRHANDLING_ERREXCEPT 0
+# endif
+# define math_errhandling (_MATH_ERRHANDLING_ERRNO | _MATH_ERRHANDLING_ERREXCEPT)
 #endif
 
 extern int __isinff (float x);
@@ -558,9 +568,7 @@ extern float dremf (float, float);
 #ifdef __CYGWIN__
 extern float dreml (long double, long double);
 #endif /* __CYGWIN__ */
-extern double gamma_r (double, int *);
 extern double lgamma_r (double, int *);
-extern float gammaf_r (float, int *);
 extern float lgammaf_r (float, int *);
 #endif
 

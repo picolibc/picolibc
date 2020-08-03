@@ -45,4 +45,14 @@ ecvtfbuf (float invalue,
 	int *sign,
 	char *ecvt_buf)
 {
+	struct ftoa ftoa;
+
+	if (ndigit > FTOA_MAX_DIG)
+		ndigit = FTOA_MAX_DIG;
+	ndigit = __ftoa_engine(invalue, &ftoa, ndigit, 0);
+	*sign = ftoa.flags & FTOA_MINUS;
+	*decpt = ftoa.exp + 1;
+	memcpy(ecvt_buf, ftoa.digits, ndigit);
+	ecvt_buf[ndigit] = '\0';
+	return ecvt_buf;
 }

@@ -34,6 +34,7 @@
 #
 subdir('sys')
 subdir('machine')
+subdir('ssp')
 
 inc_headers = [
   'alloca.h',

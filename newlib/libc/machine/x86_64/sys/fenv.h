@@ -141,8 +141,8 @@ typedef __uint32_t fexcept_t;
    fenv_t. It can be used as an argument to the functions within the
    <fenv.h> header that manage the floating-point environment.  */
 
-extern const fenv_t *_fe_dfl_env;
-#define FE_DFL_ENV (_fe_dfl_env)
+extern fenv_t _fe_dfl_env;
+#define FE_DFL_ENV ((const fenv_t *) &_fe_dfl_env)
 
 /*  Additional implementation-defined environments, with macro
    definitions beginning with FE_ and an uppercase letter,and having
@@ -154,8 +154,8 @@ extern const fenv_t *_fe_dfl_env;
    represents an environment where every exception raised causes a trap
    to occur. You can test for this macro using #ifdef. It is only defined
    if _GNU_SOURCE is defined.  */
-extern const fenv_t *_fe_nomask_env;
-#define FE_NOMASK_ENV (_fe_nomask_env)
+extern fenv_t _fe_nomask_env;
+#define FE_NOMASK_ENV ((const fenv_t *) &_fe_nomask_env)
 #endif /* __GNU_VISIBLE */
 
 #ifdef __INSIDE_CYGWIN__

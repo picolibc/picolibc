@@ -35,22 +35,17 @@
 int
 ungetc(int c, FILE *stream)
 {
-
 	/*
 	 * Streams that are not readable, or streams that already had
 	 * had an ungetc() before will cause an error.
 	 *
 	 * ungetc(EOF, ...) causes an error per definitionem.
 	 */
-	if ((stream->flags & __SRD) == 0 ||
-	    (stream->flags & __SUNGET) != 0 ||
-	    c == EOF)
+	if ((stream->flags & __SRD) == 0 || c == EOF)
 		return EOF;
 
-	stream->unget = c;
-	stream->flags |= __SUNGET;
-	stream->flags &= ~__SEOF;
+	if (!__atomic_compare_exchange_ungetc(&stream->unget, 0, c | UNGETC_MARK))
+		return EOF;
 
-	return stream->unget;
+	return (unsigned char) c;
 }
-

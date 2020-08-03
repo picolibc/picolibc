@@ -37,6 +37,4 @@
  */
 
 /* Non-static and writable to allow initialization at startup.  */
-fenv_t __fe_dfl_env = { 0 };
-
-const fenv_t *_fe_dfl_env = &__fe_dfl_env;
+fenv_t _fe_dfl_env;

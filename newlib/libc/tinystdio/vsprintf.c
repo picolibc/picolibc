@@ -37,14 +37,7 @@
 int
 vsprintf(char *s, const char *fmt, va_list ap)
 {
-	struct __file_str f = {
-		.file = {
-			.flags = __SWR | __SSTR
-		},
-		.buf = s,
-		.size = INT_MAX,
-		.len = 0
-	};
+	struct __file_str f = FDEV_SETUP_STRING_WRITE(s, INT_MAX);
 	int i;
 
 	i = vfprintf(&f.file, fmt, ap);

@@ -152,7 +152,7 @@ iconv_open (
 
 size_t
 iconv (iconv_t cd,
-              char **__restrict inbuf,
+              const char **__restrict inbuf,
               size_t *__restrict inbytesleft,
               char **__restrict outbuf,
               size_t *__restrict outbytesleft)
