@@ -1,3 +1,9 @@
+picolibc (1.4.6-2) unstable; urgency=medium
+
+  * Add aarch64-linux-gnu target
+
+ -- Keith Packard <keithp@keithp.com>  Mon, 03 Aug 2020 14:03:51 -0700
+
 picolibc (1.4.6-1) unstable; urgency=medium
 
   * New upstream version
