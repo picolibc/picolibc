@@ -91,6 +91,39 @@ sync has not been difficult so far.
 
 ## Releases
 
+### Picolibc version 1.4.6
+
+ 1. Install 'ssp' (stack smashing protection) header files. This fixes
+    compiling with -D_FORTIFY_SOURCE.
+
+ 2. Make getc/ungetc re-entrant. This feature, which is enabled by
+    default, uses atomic instruction sequences that do not require
+    OS support.
+
+ 3. Numerous iconv fixes, including enabling testing and switching
+    external CCS file loading to use stdio. By default, iconv provides
+    built-in CCS data for all of the supported encodings, which takes
+    a fairly large amount of read-only memory. Iconv is now always
+    included in picolibc as  it isn't included in applications unless
+    explicitly referenced by them.
+
+ 4. Add __getauxval stub implementation to make picolibc work with
+    GCC version 10 compiled for aarch64-linux-gnu.
+
+ 5. Change how integer- and float- only versions of printf and scanf
+    are selected. Instead of re-defining the symbols using the C
+    preprocessor, picolibc now re-defines the symbols at link
+    time. This avoids having applications compiled with a mixture of
+    modes link in multiple versions of the underlying functions, while
+    still preserving the smallest possible integer-only
+    implementation.
+
+ 6. Document how to use picolibc on a native POSIX system for
+    testing. Check out the [os.md](doc/os.md) file for details.
+
+ 7. Merge current newlib bits in. This includes better fenv support,
+    for which tests are now included in the picolibc test suite.
+
 ### Picolibc version 1.4.5
 
  1. Fix section order in picolibc.ld to give applications correct
