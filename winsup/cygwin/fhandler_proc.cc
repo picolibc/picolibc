@@ -1578,6 +1578,7 @@ format_proc_cpuinfo (void *, char *&destbuf)
           ftcprint (features1,  4, "fsrm");		   /* fast short REP MOVSB */
           ftcprint (features1,  8, "avx512_vp2intersect"); /* vec intcpt d/q */
           ftcprint (features1, 10, "md_clear");            /* verw clear buf */
+          ftcprint (features1, 14, "serialize");           /* SERIALIZE instruction */
           ftcprint (features1, 18, "pconfig");		   /* platform config */
           ftcprint (features1, 19, "arch_lbr");		   /* last branch records */
           ftcprint (features1, 28, "flush_l1d");	   /* flush l1d cache */
