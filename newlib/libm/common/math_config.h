@@ -36,7 +36,9 @@
 /* Correct special case results in non-nearest rounding modes.  */
 # define WANT_ROUNDING 1
 #endif
-#ifndef WANT_ERRNO
+#ifdef _IEEE_LIBM
+# define WANT_ERRNO 0
+#else
 /* Set errno according to ISO C with (math_errhandling & MATH_ERRNO) != 0.  */
 # define WANT_ERRNO 1
 #endif
