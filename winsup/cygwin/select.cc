@@ -875,18 +875,22 @@ peek_fifo (select_record *s, bool from_select)
       fh->fifo_client_lock ();
       int nconnected = 0;
       for (int i = 0; i < fh->get_nhandlers (); i++)
-	if (fh->get_fc_handler (i).set_state () >= fc_closing)
-	  {
-	    nconnected++;
-	    if (fh->get_fc_handler (i).state == fc_input_avail)
-	      {
-		select_printf ("read: %s, ready for read", fh->get_name ());
-		fh->fifo_client_unlock ();
-		fh->reading_unlock ();
-		gotone += s->read_ready = true;
-		goto out;
-	      }
-	  }
+	{
+	  fifo_client_handler &fc = fh->get_fc_handler (i);
+	  fc.query_and_set_state ();
+	  if (fc.get_state () >= fc_closing)
+	    {
+	      nconnected++;
+	      if (fc.get_state () == fc_input_avail)
+		{
+		  select_printf ("read: %s, ready for read", fh->get_name ());
+		  fh->fifo_client_unlock ();
+		  fh->reading_unlock ();
+		  gotone += s->read_ready = true;
+		  goto out;
+		}
+	    }
+	}
       fh->fifo_client_unlock ();
       if (!nconnected && fh->hit_eof ())
 	{

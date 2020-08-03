@@ -340,7 +340,7 @@ fhandler_fifo::add_client_handler (bool new_pipe_instance)
       if (!ph)
 	return -1;
       fc.h = ph;
-      fc.state = fc_listening;
+      fc.set_state (fc_listening);
     }
   fc_handler[nhandlers++] = fc;
   return 0;
@@ -365,7 +365,7 @@ fhandler_fifo::cleanup_handlers ()
 
   while (i < nhandlers)
     {
-      if (fc_handler[i].state < fc_closing)
+      if (fc_handler[i].get_state () < fc_closing)
 	delete_client_handler (i);
       else
 	i++;
@@ -377,7 +377,7 @@ void
 fhandler_fifo::record_connection (fifo_client_handler& fc,
 				  fifo_client_connect_state s)
 {
-  fc.state = s;
+  fc.set_state (s);
   set_pipe_non_blocking (fc.h, true);
 }
 
@@ -414,13 +414,13 @@ fhandler_fifo::update_my_handlers ()
 	{
 	  debug_printf ("Can't duplicate handle of previous owner, %E");
 	  __seterrno ();
-	  fc.state = fc_error;
+	  fc.set_state (fc_error);
 	  fc.last_read = false;
 	  ret = -1;
 	}
       else
 	{
-	  fc.state = shared_fc_handler[i].state;
+	  fc.set_state (shared_fc_handler[i].get_state ());
 	  fc.last_read = shared_fc_handler[i].last_read;
 	}
     }
@@ -614,7 +614,7 @@ owner_listen:
 		break;
 	      default:
 		debug_printf ("NtFsControlFile status %y after failing to connect bogus client or real client", io.Status);
-		fc.state = fc_unknown;
+		fc.set_state (fc_unknown);
 		break;
 	      }
 	  break;
@@ -1280,7 +1280,7 @@ fhandler_fifo::raw_read (void *in_ptr, size_t& len)
       for (j = 0; j < nhandlers; j++)
 	if (fc_handler[j].last_read)
 	  break;
-      if (j < nhandlers && fc_handler[j].state >= fc_closing)
+      if (j < nhandlers && fc_handler[j].get_state () >= fc_closing)
 	{
 	  NTSTATUS status;
 	  IO_STATUS_BLOCK io;
@@ -1303,11 +1303,11 @@ fhandler_fifo::raw_read (void *in_ptr, size_t& len)
 	    case STATUS_PIPE_EMPTY:
 	      break;
 	    case STATUS_PIPE_BROKEN:
-	      fc_handler[j].state = fc_disconnected;
+	      fc_handler[j].set_state (fc_disconnected);
 	      break;
 	    default:
 	      debug_printf ("NtReadFile status %y", status);
-	      fc_handler[j].state = fc_error;
+	      fc_handler[j].set_state (fc_error);
 	      break;
 	    }
 	  fc_handler[j].last_read = false;
@@ -1315,7 +1315,7 @@ fhandler_fifo::raw_read (void *in_ptr, size_t& len)
 
       /* Second pass. */
       for (int i = 0; i < nhandlers; i++)
-	if (fc_handler[i].state >= fc_closing)
+	if (fc_handler[i].get_state () >= fc_closing)
 	  {
 	    NTSTATUS status;
 	    IO_STATUS_BLOCK io;
@@ -1339,12 +1339,12 @@ fhandler_fifo::raw_read (void *in_ptr, size_t& len)
 	      case STATUS_PIPE_EMPTY:
 		break;
 	      case STATUS_PIPE_BROKEN:
-		fc_handler[i].state = fc_disconnected;
+		fc_handler[i].set_state (fc_disconnected);
 		nconnected--;
 		break;
 	      default:
 		debug_printf ("NtReadFile status %y", status);
-		fc_handler[i].state = fc_error;
+		fc_handler[i].set_state (fc_error);
 		nconnected--;
 		break;
 	      }
@@ -1417,45 +1417,51 @@ fhandler_fifo::close_all_handlers ()
   fifo_client_unlock ();
 }
 
+/* Return previous state. */
 fifo_client_connect_state
-fifo_client_handler::set_state ()
+fifo_client_handler::query_and_set_state ()
 {
   IO_STATUS_BLOCK io;
   FILE_PIPE_LOCAL_INFORMATION fpli;
   NTSTATUS status;
+  fifo_client_connect_state prev_state = get_state ();
 
   if (!h)
-    return (state = fc_unknown);
+    {
+      set_state (fc_unknown);
+      goto out;
+    }
 
   status = NtQueryInformationFile (h, &io, &fpli,
 				   sizeof (fpli), FilePipeLocalInformation);
   if (!NT_SUCCESS (status))
     {
       debug_printf ("NtQueryInformationFile status %y", status);
-      state = fc_error;
+      set_state (fc_error);
     }
   else if (fpli.ReadDataAvailable > 0)
-    state = fc_input_avail;
+    set_state (fc_input_avail);
   else
     switch (fpli.NamedPipeState)
       {
       case FILE_PIPE_DISCONNECTED_STATE:
-	state = fc_disconnected;
+	set_state (fc_disconnected);
 	break;
       case FILE_PIPE_LISTENING_STATE:
-	state = fc_listening;
+	set_state (fc_listening);
 	break;
       case FILE_PIPE_CONNECTED_STATE:
-	state = fc_connected;
+	set_state (fc_connected);
 	break;
       case FILE_PIPE_CLOSING_STATE:
-	state = fc_closing;
+	set_state (fc_closing);
 	break;
       default:
-	state = fc_error;
+	set_state (fc_error);
 	break;
       }
-  return state;
+out:
+  return prev_state;
 }
 
 void

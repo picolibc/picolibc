@@ -1297,11 +1297,14 @@ enum fifo_client_connect_state
 struct fifo_client_handler
 {
   HANDLE h;
-  fifo_client_connect_state state;
+  fifo_client_connect_state _state;
   bool last_read;  /* true if our last successful read was from this client. */
-  fifo_client_handler () : h (NULL), state (fc_unknown), last_read (false) {}
+  fifo_client_handler () : h (NULL), _state (fc_unknown), last_read (false) {}
   void close () { NtClose (h); }
-  fifo_client_connect_state set_state ();
+  fifo_client_connect_state get_state () const { return _state; }
+  void set_state (fifo_client_connect_state s) { _state = s; }
+  /* Query O/S.  Return previous state. */
+  fifo_client_connect_state query_and_set_state ();
 };
 
 class fhandler_fifo;
