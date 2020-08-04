@@ -188,7 +188,17 @@ extern int isnan (double);
 # define MATH_ERREXCEPT 2
 #endif
 #ifndef math_errhandling
-# define math_errhandling MATH_ERRNO
+# ifdef _IEEE_LIBM
+#  define _MATH_ERRHANDLING_ERRNO 0
+# else
+#  define _MATH_ERRHANDLING_ERRNO MATH_ERRNO
+# endif
+# ifdef _SUPPORTS_ERREXCEPT
+#  define _MATH_ERRHANDLING_ERREXCEPT MATH_ERREXCEPT
+# else
+#  define _MATH_ERRHANDLING_ERREXCEPT 0
+# endif
+# define math_errhandling (_MATH_ERRHANDLING_ERRNO | _MATH_ERRHANDLING_ERREXCEPT)
 #endif
 
 extern int __isinff (float x);
