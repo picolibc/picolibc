@@ -833,7 +833,7 @@ format_proc_cpuinfo (void *, char *&destbuf)
 					 "model\t\t: %d\n"
 					 "model name\t: %s\n"
 					 "stepping\t: %d\n"
-					 "microcode\t: 0x%x\n"
+					 "microcode\t: 0x%X\n"
 					 "cpu MHz\t\t: %d.000\n",
 				 family,
 				 model,
