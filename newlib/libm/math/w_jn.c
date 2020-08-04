@@ -77,17 +77,19 @@
 	double z;
 	z = __ieee754_yn(n,x);
 	if(_LIB_VERSION == _IEEE_ || isnan(x) ) return z;
-        if(x <= 0.0){
-	    /* yn(n,0) = -inf or yn(x<0) = NaN */
+        if(x < 0.0){
+	    /* yn(x<0) = NaN */
 	    errno = EDOM;
-	    return -HUGE_VAL;
+        }
+        if(x == 0.0){
+	    /* yn(0) = -inf */
+	    errno = ERANGE;
         }
 	if(x>X_TLOSS) {
 	    /* yn(x>X_TLOSS) */
 	    errno = ERANGE;
-	    return 0.0;
-	} else
-	    return z;
+	}
+	return z;
 #endif
 }
 

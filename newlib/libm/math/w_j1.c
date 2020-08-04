@@ -55,17 +55,19 @@
 	double z;
 	z = __ieee754_y1(x);
 	if(_LIB_VERSION == _IEEE_ || isnan(x) ) return z;
-        if(x <= 0.0){
-	    /* y1(0) = -inf  or y1(x<0) = NaN */
+        if(x < 0.0){
+	    /* y1(x<0) = NaN */
 	    errno = EDOM;
-	    return -HUGE_VAL;
+        }
+        if(x == 0.0){
+	    /* y1(0) = -inf */
+	    errno = ERANGE;
         }
 	if(x>X_TLOSS) {
 	    /* y1(x>X_TLOSS) */
 	    errno = ERANGE;
-	    return 0.0;
-	} else
-	    return z;
+	}
+	return z;
 #endif
 }
 

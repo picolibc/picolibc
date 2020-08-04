@@ -33,9 +33,8 @@
 	if(fabsf(x)>(float)X_TLOSS) {
 	    /* jnf(|x|>X_TLOSS) */
 	    errno = ERANGE;
-	    return 0.0f;
-	} else
-	    return z;
+	}
+	return z;
 #endif
 }
 
@@ -52,17 +51,19 @@
 	float z;
 	z = __ieee754_ynf(n,x);
 	if(_LIB_VERSION == _IEEE_ || isnan(x) ) return z;
-        if(x <= 0.0f){
-	    /* ynf(n,0) = -inf or ynf(x<0) = NaN */
+        if(x < 0.0f){
+	    /* ynf(x<0) = NaN */
 	    errno = EDOM;
-	    return -HUGE_VALF;
         }
+	if (x == 0.0f){
+	    /* ynf(n,0) = -inf */
+	    errno = ERANGE;
+	}
 	if(x>(float)X_TLOSS) {
 	    /* ynf(x>X_TLOSS) */
 	    errno = ERANGE;
-	    return 0.0f;
-	} else
-	    return z;
+	}
+	return z;
 #endif
 }
 

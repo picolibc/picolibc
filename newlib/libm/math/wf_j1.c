@@ -56,17 +56,19 @@
 	float z;
 	z = __ieee754_y1f(x);
 	if(_LIB_VERSION == _IEEE_ || isnan(x) ) return z;
-        if(x <= 0.0f){
-	    /* y1f(0) = -inf or y1f(x<0) = NaN */
+        if(x < 0.0f){
+	    /* y1f(x<0) = NaN */
 	    errno = EDOM;
-	    return -HUGE_VALF;
         }
+	if (x == 0.0f){
+	    /* y1f(n,0) = -inf */
+	    errno = ERANGE;
+	}
 	if(x>(float)X_TLOSS) {
 	    /* y1f(x>X_TLOSS) */
 	    errno = ERANGE;
-	    return 0.0f;
-	} else
-	    return z;
+	}
+	return z;
 #endif
 }
 

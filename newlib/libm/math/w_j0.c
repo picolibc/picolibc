@@ -128,17 +128,19 @@ None of the Bessel functions are in ANSI C.
 	double z;
 	z = __ieee754_y0(x);
 	if(_LIB_VERSION == _IEEE_ || isnan(x) ) return z;
-        if(x <= 0.0){
-	    /* y0(0) = -inf or y0(x<0) = NaN */
+        if(x < 0.0){
+	    /* y0(x<0) = NaN */
 	    errno = EDOM;
-	    return -HUGE_VAL;
+        }
+        if(x == 0.0){
+	    /* y0(0) = -inf */
+	    errno = ERANGE;
         }
 	if(x>X_TLOSS) {
 	    /* y0(x>X_TLOSS) */
 	    errno = ERANGE;
-	    return 0.0;
-	} else
-	    return z;
+	}
+	return z;
 #endif
 }
 
