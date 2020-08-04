@@ -38,14 +38,19 @@
 #endif
 #ifdef _IEEE_LIBM
 # define WANT_ERRNO 0
+# define _LIB_VERSION _IEEE_
 #else
 /* Set errno according to ISO C with (math_errhandling & MATH_ERRNO) != 0.  */
 # define WANT_ERRNO 1
+# define _LIB_VERSION _POSIX_
 #endif
 #ifndef WANT_ERRNO_UFLOW
 /* Set errno to ERANGE if result underflows to 0 (in all rounding modes).  */
 # define WANT_ERRNO_UFLOW (WANT_ROUNDING && WANT_ERRNO)
 #endif
+
+#define _IEEE_  -1
+#define _POSIX_ 0
 
 /* Compiler can inline round as a single instruction.  */
 #ifndef HAVE_FAST_ROUND

@@ -612,22 +612,6 @@ extern int *__signgam (void);
 #define M_LOG2_E        _M_LN2
 #define M_INVLN2        1.4426950408889633870E0  /* 1 / log(2) */
 
-/* Global control over fdlibm error handling.  */
-
-enum __fdlibm_version
-{
-  __fdlibm_ieee = -1,
-  __fdlibm_posix
-};
-
-#define _LIB_VERSION_TYPE enum __fdlibm_version
-#define _LIB_VERSION __fdlib_version
-
-extern __IMPORT _LIB_VERSION_TYPE _LIB_VERSION;
-
-#define _IEEE_  __fdlibm_ieee
-#define _POSIX_ __fdlibm_posix
-
 #endif /* __BSD_VISIBLE */
 
 _END_STD_C

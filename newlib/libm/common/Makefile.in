@@ -85,19 +85,19 @@ am__objects_1 = lib_a-s_finite.$(OBJEXT) lib_a-s_copysign.$(OBJEXT) \
 	lib_a-s_nan.$(OBJEXT) lib_a-s_nextafter.$(OBJEXT) \
 	lib_a-s_pow10.$(OBJEXT) lib_a-s_rint.$(OBJEXT) \
 	lib_a-s_logb.$(OBJEXT) lib_a-s_log2.$(OBJEXT) \
-	lib_a-s_lib_ver.$(OBJEXT) lib_a-s_fdim.$(OBJEXT) \
-	lib_a-s_fma.$(OBJEXT) lib_a-s_fmax.$(OBJEXT) \
-	lib_a-s_fmin.$(OBJEXT) lib_a-s_fpclassify.$(OBJEXT) \
-	lib_a-s_lrint.$(OBJEXT) lib_a-s_llrint.$(OBJEXT) \
-	lib_a-s_lround.$(OBJEXT) lib_a-s_llround.$(OBJEXT) \
-	lib_a-s_nearbyint.$(OBJEXT) lib_a-s_remquo.$(OBJEXT) \
-	lib_a-s_round.$(OBJEXT) lib_a-s_scalbln.$(OBJEXT) \
-	lib_a-s_signbit.$(OBJEXT) lib_a-s_trunc.$(OBJEXT) \
-	lib_a-exp.$(OBJEXT) lib_a-exp2.$(OBJEXT) \
-	lib_a-exp_data.$(OBJEXT) lib_a-math_err.$(OBJEXT) \
-	lib_a-log.$(OBJEXT) lib_a-log_data.$(OBJEXT) \
-	lib_a-log2.$(OBJEXT) lib_a-log2_data.$(OBJEXT) \
-	lib_a-pow.$(OBJEXT) lib_a-pow_log_data.$(OBJEXT)
+	lib_a-s_fdim.$(OBJEXT) lib_a-s_fma.$(OBJEXT) \
+	lib_a-s_fmax.$(OBJEXT) lib_a-s_fmin.$(OBJEXT) \
+	lib_a-s_fpclassify.$(OBJEXT) lib_a-s_lrint.$(OBJEXT) \
+	lib_a-s_llrint.$(OBJEXT) lib_a-s_lround.$(OBJEXT) \
+	lib_a-s_llround.$(OBJEXT) lib_a-s_nearbyint.$(OBJEXT) \
+	lib_a-s_remquo.$(OBJEXT) lib_a-s_round.$(OBJEXT) \
+	lib_a-s_scalbln.$(OBJEXT) lib_a-s_signbit.$(OBJEXT) \
+	lib_a-s_trunc.$(OBJEXT) lib_a-exp.$(OBJEXT) \
+	lib_a-exp2.$(OBJEXT) lib_a-exp_data.$(OBJEXT) \
+	lib_a-math_err.$(OBJEXT) lib_a-log.$(OBJEXT) \
+	lib_a-log_data.$(OBJEXT) lib_a-log2.$(OBJEXT) \
+	lib_a-log2_data.$(OBJEXT) lib_a-pow.$(OBJEXT) \
+	lib_a-pow_log_data.$(OBJEXT)
 am__objects_2 = lib_a-sf_finite.$(OBJEXT) lib_a-sf_copysign.$(OBJEXT) \
 	lib_a-sf_modf.$(OBJEXT) lib_a-sf_scalbn.$(OBJEXT) \
 	lib_a-sf_cbrt.$(OBJEXT) lib_a-sf_exp10.$(OBJEXT) \
@@ -163,7 +163,7 @@ am__objects_5 = s_finite.lo s_copysign.lo s_modf.lo s_scalbn.lo \
 	s_cbrt.lo s_exp10.lo s_expm1.lo s_ilogb.lo s_infinity.lo \
 	s_isinf.lo s_isinfd.lo s_isnan.lo s_isnand.lo s_log1p.lo \
 	s_nan.lo s_nextafter.lo s_pow10.lo s_rint.lo s_logb.lo \
-	s_log2.lo s_lib_ver.lo s_fdim.lo s_fma.lo s_fmax.lo s_fmin.lo \
+	s_log2.lo s_fdim.lo s_fma.lo s_fmax.lo s_fmin.lo \
 	s_fpclassify.lo s_lrint.lo s_llrint.lo s_lround.lo \
 	s_llround.lo s_nearbyint.lo s_remquo.lo s_round.lo \
 	s_scalbln.lo s_signbit.lo s_trunc.lo exp.lo exp2.lo \
@@ -354,7 +354,7 @@ src = s_finite.c s_copysign.c s_modf.c s_scalbn.c \
 	s_cbrt.c s_exp10.c s_expm1.c s_ilogb.c \
 	s_infinity.c s_isinf.c s_isinfd.c s_isnan.c s_isnand.c \
 	s_log1p.c s_nan.c s_nextafter.c s_pow10.c \
-	s_rint.c s_logb.c s_log2.c s_lib_ver.c \
+	s_rint.c s_logb.c s_log2.c \
 	s_fdim.c s_fma.c s_fmax.c s_fmin.c s_fpclassify.c \
 	s_lrint.c s_llrint.c \
 	s_lround.c s_llround.c s_nearbyint.c s_remquo.c s_round.c s_scalbln.c \
@@ -601,12 +601,6 @@ lib_a-s_log2.o: s_log2.c
 
 lib_a-s_log2.obj: s_log2.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-s_log2.obj `if test -f 's_log2.c'; then $(CYGPATH_W) 's_log2.c'; else $(CYGPATH_W) '$(srcdir)/s_log2.c'; fi`
-
-lib_a-s_lib_ver.o: s_lib_ver.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-s_lib_ver.o `test -f 's_lib_ver.c' || echo '$(srcdir)/'`s_lib_ver.c
-
-lib_a-s_lib_ver.obj: s_lib_ver.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-s_lib_ver.obj `if test -f 's_lib_ver.c'; then $(CYGPATH_W) 's_lib_ver.c'; else $(CYGPATH_W) '$(srcdir)/s_lib_ver.c'; fi`
 
 lib_a-s_fdim.o: s_fdim.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-s_fdim.o `test -f 's_fdim.c' || echo '$(srcdir)/'`s_fdim.c

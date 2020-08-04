@@ -8,7 +8,7 @@ src = 	s_finite.c s_copysign.c s_modf.c s_scalbn.c \
 	s_cbrt.c s_exp10.c s_expm1.c s_ilogb.c \
 	s_infinity.c s_isinf.c s_isinfd.c s_isnan.c s_isnand.c \
 	s_log1p.c s_nan.c s_nextafter.c s_pow10.c \
-	s_rint.c s_logb.c s_log2.c s_lib_ver.c \
+	s_rint.c s_logb.c s_log2.c \
 	s_fdim.c s_fma.c s_fmax.c s_fmin.c s_fpclassify.c \
 	s_lrint.c s_llrint.c \
 	s_lround.c s_llround.c s_nearbyint.c s_remquo.c s_round.c s_scalbln.c \
