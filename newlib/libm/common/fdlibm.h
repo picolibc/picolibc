@@ -15,6 +15,7 @@
 #include <math.h>
 #include <sys/types.h>
 #include <machine/ieeefp.h>
+#include "math_config.h"
 
 /* Most routines need to check whether a float is finite, infinite, or not a
    number, and many need to know whether the result of an operation will

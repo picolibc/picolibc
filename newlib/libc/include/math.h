@@ -221,9 +221,9 @@ extern int isnan (double);
 #endif
 #ifndef math_errhandling
 # ifdef _IEEE_LIBM
-#  define _MATH_ERRHANDLING_ERRNO MATH_ERRNO
-# else
 #  define _MATH_ERRHANDLING_ERRNO 0
+# else
+#  define _MATH_ERRHANDLING_ERRNO MATH_ERRNO
 # endif
 # ifdef _SUPPORTS_ERREXCEPT
 #  define _MATH_ERRHANDLING_ERREXCEPT MATH_ERREXCEPT
@@ -656,22 +656,6 @@ extern NEWLIB_THREAD_LOCAL int signgam;
 #define M_IVLN10        0.43429448190325182765 /* 1 / log(10) */
 #define M_LOG2_E        _M_LN2
 #define M_INVLN2        1.4426950408889633870E0  /* 1 / log(2) */
-
-/* Global control over fdlibm error handling.  */
-
-enum __fdlibm_version
-{
-  __fdlibm_ieee = -1,
-  __fdlibm_posix
-};
-
-#define _LIB_VERSION_TYPE enum __fdlibm_version
-#define _LIB_VERSION __fdlib_version
-
-extern __IMPORT _LIB_VERSION_TYPE _LIB_VERSION;
-
-#define _IEEE_  __fdlibm_ieee
-#define _POSIX_ __fdlibm_posix
 
 #endif /* __BSD_VISIBLE */
 
