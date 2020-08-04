@@ -34,14 +34,6 @@
 	float z;
 	z=__ieee754_powf(x,y);
 	if(_LIB_VERSION == _IEEE_|| isnan(y)) return z;
-	if(isnan(x)) {
-	    if(y==0.0f) {
-		/* powf(NaN,0.0) */
-		/* Not an error.  */
-		return 1.0f;
-	    } else 
-		return z;
-	}
 	if(x==0.0f){
 	    if(y==0.0f) {
 		/* powf(0.0,0.0) */
@@ -61,20 +53,16 @@
 		    errno = EDOM;
 		    /* Use a float divide, to avoid a soft-float double
 		       divide call on single-float only targets.  */
-		    return 0.0f/0.0f;
 		} else {
 		    /* powf(x,y) overflow */
 		    errno = ERANGE;
-		    if(x<0.0f&&rintf(y)!=y)
-		      return -HUGE_VALF;
-		    return HUGE_VALF;
 		}
+		return z;
 	    }
 	} 
 	if(z==0.0f&&finitef(x)&&finitef(y)) {
 	    /* powf(x,y) underflow */
 	    errno = ERANGE;
-	    return 0.0f;
         }
 	return z;
 #endif
