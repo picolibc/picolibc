@@ -58,7 +58,6 @@ dsrc_common = [
   's_rint.c',
   's_logb.c',
   's_log2.c',
-  's_lib_ver.c',
   's_fdim.c',
   's_fma.c',
   's_fmax.c',
