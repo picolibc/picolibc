@@ -155,16 +155,10 @@ in terms of the base return values, although the <[signgam]> global for
         y = __ieee754_gamma_r(x,&(_REENT_SIGNGAM(_REENT)));
         if(_LIB_VERSION == _IEEE_) return y;
         if(!finite(y)&&finite(x)) {
-	    if(floor(x)==x&&x<=0.0) {
-		/* gamma(-integer) or gamma(0) */
-		errno = EDOM;
-	    } else {
-		/* gamma(finite) overflow */
-		errno = ERANGE;
-	    }
-	    return HUGE_VAL;
-        } else
-            return y;
+	    /* gamma(finite) overflow */
+	    errno = ERANGE;
+        }
+	return y;
 #endif
 }             
 

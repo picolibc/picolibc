@@ -32,16 +32,10 @@
         y = __ieee754_gammaf_r(x,&(_REENT_SIGNGAM(_REENT)));
         if(_LIB_VERSION == _IEEE_) return y;
         if(!finitef(y)&&finitef(x)) {
-	    if(floorf(x)==x&&x<=0.0f) {
-		/* gammaf(-integer) or gammaf(0) */
-		errno = EDOM;
-            } else {
-		/* gammaf(finite) overflow */
-		errno = ERANGE;
-            }
-	    return HUGE_VALF;
-        } else
-            return y;
+	    /* gammaf(finite) overflow */
+	    errno = ERANGE;
+        }
+	return y;
 #endif
 }             
 
