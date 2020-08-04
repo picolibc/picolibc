@@ -48,8 +48,7 @@
 	    }
 	    if(finitef(y)&&y<0.0f) {
 		/* 0**neg */
-		errno = EDOM;
-		return -HUGE_VALF;
+		errno = ERANGE;
 	    }
 	    return z;
 	}

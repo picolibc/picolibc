@@ -82,8 +82,7 @@ PORTABILITY
 	    }
 	    if(finite(y)&&y<0.0) {
 		/* 0**neg */
-		errno = EDOM;
-		return -HUGE_VAL;
+		errno = ERANGE;
 	    }
 	    return z;
 	}
