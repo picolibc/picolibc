@@ -341,9 +341,11 @@ get_cpu_cache_intel_cpuid4 (int in)
 	case _SC_LEVEL1_ICACHE_ASSOC:
 	  if (cur_level == 1 && cache_type == 2)
 	    return assoc;
+	  break;
 	case _SC_LEVEL1_ICACHE_LINESIZE:
 	  if (cur_level == 1 && cache_type == 2)
 	    return linesize;
+	  break;
 	case _SC_LEVEL1_DCACHE_SIZE:
 	  if (cur_level == 1 && cache_type == 1)
 	    ret += assoc * part * linesize * sets;
@@ -351,9 +353,11 @@ get_cpu_cache_intel_cpuid4 (int in)
 	case _SC_LEVEL1_DCACHE_ASSOC:
 	  if (cur_level == 1 && cache_type == 1)
 	    return assoc;
+	  break;
 	case _SC_LEVEL1_DCACHE_LINESIZE:
 	  if (cur_level == 1 && cache_type == 1)
 	    return linesize;
+	  break;
 	case _SC_LEVEL2_CACHE_SIZE:
 	  if (cur_level == 2)
 	    ret += assoc * part * linesize * sets;
@@ -361,9 +365,11 @@ get_cpu_cache_intel_cpuid4 (int in)
 	case _SC_LEVEL2_CACHE_ASSOC:
 	  if (cur_level == 2)
 	    return assoc;
+	  break;
 	case _SC_LEVEL2_CACHE_LINESIZE:
 	  if (cur_level == 2)
 	    return linesize;
+	  break;
 	case _SC_LEVEL3_CACHE_SIZE:
 	  if (cur_level == 3)
 	    ret += assoc * part * linesize * sets;
@@ -371,9 +377,11 @@ get_cpu_cache_intel_cpuid4 (int in)
 	case _SC_LEVEL3_CACHE_ASSOC:
 	  if (cur_level == 3)
 	    return assoc;
+	  break;
 	case _SC_LEVEL3_CACHE_LINESIZE:
 	  if (cur_level == 3)
 	    return linesize;
+	  break;
 	}
     }
   return ret;

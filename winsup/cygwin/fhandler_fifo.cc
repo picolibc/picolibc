@@ -1296,9 +1296,11 @@ fhandler_fifo::take_ownership (DWORD timeout)
     case WAIT_TIMEOUT:
       debug_printf ("timed out");
       ret = -1;
+      break;
     default:
       debug_printf ("WFSO failed, %E");
       ret = -1;
+      break;
     }
   return ret;
 }
