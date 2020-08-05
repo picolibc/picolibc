@@ -445,7 +445,7 @@ p_ere_exp(struct parse *p)
 		break;
 	case '{':		/* okay as ordinary except if digit follows */
 		(void)REQUIRE(!MORE() || !isdigit((uch)PEEK()), REG_BADRPT);
-		/* FALLTHROUGH */
+		fallthrough;
 	default:
 		p->next--;
 		wc = WGETNEXT();
@@ -656,7 +656,7 @@ p_simp_re(struct parse *p,
 		break;
 	case '*':
 		(void)REQUIRE(starordinary, REG_BADRPT);
-		/* FALLTHROUGH */
+		fallthrough;
 	default:
 		p->next--;
 		wc = WGETNEXT();
@@ -1545,7 +1545,7 @@ findmust(struct parse *p, struct re_guts *g)
 					return;
 				}
 			} while (OP(s) != O_QUEST && OP(s) != O_CH);
-			/* FALLTHROUGH */
+			fallthrough;
 		case OBOW:		/* things that break a sequence */
 		case OEOW:
 		case OBOL:

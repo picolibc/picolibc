@@ -1550,7 +1550,7 @@ fhandler_pty_slave::write (const void *ptr, size_t len)
 	{
 	case ERROR_NO_DATA:
 	  err = ERROR_IO_DEVICE;
-	  /*FALLTHRU*/
+	  fallthrough;
 	default:
 	  __seterrno_from_win_error (err);
 	}
@@ -2163,7 +2163,7 @@ fhandler_pty_slave::facl (int cmd, int nentries, aclent_t *aclbufp)
 	    set_errno (EFAULT);
 	    break;
 	  }
-	/*FALLTHRU*/
+	fallthrough;
       case GETACLCNT:
 	if (!input_available_event)
 	  {

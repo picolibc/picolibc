@@ -829,7 +829,7 @@ path_conv::check (const char *src, unsigned opt,
 			    opt &= ~PC_SYM_FOLLOW;
 			    sym.path_flags |= PATH_RESOLVE_PROCFD;
 			  }
-			/*FALLTHRU*/
+			fallthrough;
 		      case virt_symlink:
 			goto is_virtual_symlink;
 		      case virt_pipe:
@@ -866,7 +866,7 @@ path_conv::check (const char *src, unsigned opt,
 				       | FILE_ATTRIBUTE_DEVICE;
 			    goto out;
 			  }
-			/*FALLTHRU*/
+			fallthrough;
 		      case virt_chr:
 			if (component == 0)
 			  fileattr = FILE_ATTRIBUTE_DEVICE;
@@ -2021,7 +2021,7 @@ symlink_worker (const char *oldpath, path_conv &win32_newpath, bool isdevice)
 	    }
 	  /* Otherwise, fall back to default symlink type. */
 	  wsym_type = WSYM_sysfile;
-	  /*FALLTHRU*/
+	  fallthrough;
 	case WSYM_sysfile:
 	  if (win32_newpath.fs_flags () & FILE_SUPPORTS_REPARSE_POINTS)
 	    {

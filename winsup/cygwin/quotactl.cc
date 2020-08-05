@@ -58,7 +58,7 @@ quotactl (int cmd, const char *special, int id, caddr_t addr)
 	  set_errno (EINVAL);
 	  return -1;
 	}
-      /*FALLTHRU*/
+      fallthrough;
     case Q_QUOTAOFF:
     case Q_SETINFO:
       access |= FILE_WRITE_DATA;
@@ -68,7 +68,7 @@ quotactl (int cmd, const char *special, int id, caddr_t addr)
       break;
     case Q_SETQUOTA:
       access |= FILE_WRITE_DATA;
-      /*FALLTHRU*/
+      fallthrough;
     case Q_GETQUOTA:
       /* Windows feature: Default limits.  Get or set them with id == -1. */
       if (id != -1)

@@ -741,7 +741,7 @@ exception::handle (EXCEPTION_RECORD *e, exception_list *frame, CONTEXT *in,
 	 Linux behaviour and also makes a lot of sense on Windows. */
       if (me.altstack.ss_flags)
 	global_sigs[SIGSEGV].sa_handler = SIG_DFL;
-      /*FALLTHRU*/
+      fallthrough;
     case STATUS_ARRAY_BOUNDS_EXCEEDED:
     case STATUS_IN_PAGE_ERROR:
     case STATUS_NO_MEMORY:

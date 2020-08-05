@@ -179,7 +179,7 @@ next:
 
 	case DEFAULT:
 		usedefault = 1;
-		/* FALL THROUGH */
+		fallthrough;
 
 	case MACH:
 		if (!usedefault) {

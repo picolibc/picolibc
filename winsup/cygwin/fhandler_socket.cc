@@ -140,7 +140,7 @@ fhandler_socket::ioctl (unsigned int cmd, void *p)
     case OLD_SIOCGIFMTU:
     case OLD_SIOCGIFINDEX:
       cmd = CONV_OLD_TO_NEW_SIO (cmd);
-      /*FALLTHRU*/
+      fallthrough;
     case SIOCGIFFLAGS:
     case SIOCGIFBRDADDR:
     case SIOCGIFNETMASK:

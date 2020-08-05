@@ -255,7 +255,7 @@ retry:
 		  break;
 		}
 	    }
-	  /*FALLTHRU*/
+	  fallthrough;
 	case STATUS_INVALID_DEVICE_REQUEST:
 	case STATUS_INVALID_PARAMETER:
 	case STATUS_INVALID_HANDLE:
@@ -265,6 +265,7 @@ retry:
 	      len = (size_t) -1;
 	      break;
 	    }
+	  fallthrough;
 	default:
 	  __seterrno_from_nt_status (status);
 	  len = (size_t) -1;

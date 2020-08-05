@@ -147,7 +147,7 @@ tcsetattr (int fd, int a, const struct termios *t)
 	  if (_my_tls.call_signal_handler ())
 	    continue;
 	  res = -1;
-	  /* fall through intentionally */
+	  fallthrough;
 	default:
 	  e = get_errno ();
 	  break;

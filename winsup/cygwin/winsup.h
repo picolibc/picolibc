@@ -20,6 +20,8 @@ details. */
 #define EXPORT_ALIAS(sym,symalias) __typeof (sym) symalias __attribute__ ((alias(#sym)));
 #endif
 
+#define fallthrough	__attribute__((__fallthrough__))
+
 #define _WIN32_WINNT 0x0a00
 #define WINVER 0x0a00
 

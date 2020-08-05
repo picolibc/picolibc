@@ -103,7 +103,7 @@ fhandler_serial::raw_read (void *ptr, size_t& ulen)
 		default: /* Handle an error case from cygwait basically like
 			    a cancel condition and see if we got "something" */
 		  CancelIo (get_handle ());
-		  /*FALLTHRU*/
+		  fallthrough;
 		case WAIT_OBJECT_0:
 		  if (!GetOverlappedResult (get_handle (), &ov, &read_bytes,
 					    TRUE))

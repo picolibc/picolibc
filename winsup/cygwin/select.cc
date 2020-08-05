@@ -469,7 +469,7 @@ was_timeout:
 	  pthread::static_cancel_self ();
 	  /*NOTREACHED*/
 	}
-      /*FALLTHRU*/
+      fallthrough;
     default:
       /* Timer event? */
       if (wait_ret == timer_idx)
@@ -1679,7 +1679,7 @@ thread_socket (void *arg)
 	    case WAIT_OBJECT_0:
 	      if (!i)	/* Socket event set. */
 		goto out;
-	      /*FALLTHRU*/
+	      fallthrough;
 	    default:
 	      break;
 	    }

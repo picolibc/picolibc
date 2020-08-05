@@ -221,7 +221,7 @@ restart1:
     case WAIT_OBJECT_0 + 2:
       if (timer_idx != 2)
 	pthread::static_cancel_self ();
-      /*FALLTHRU*/
+      fallthrough;
     case WAIT_OBJECT_0 + 3:
       ret = ETIMEDOUT;
       break;
@@ -249,7 +249,7 @@ restart1:
 	case WAIT_OBJECT_0 + 2:
 	  if (timer_idx != 2)
 	    pthread_testcancel ();
-	  /*FALLTHRU*/
+	  fallthrough;
 	case WAIT_OBJECT_0 + 3:
 	  ret = ETIMEDOUT;
 	  break;

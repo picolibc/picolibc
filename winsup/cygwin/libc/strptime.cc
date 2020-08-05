@@ -524,7 +524,7 @@ literal:
 
 		case 'k':	/* The hour (24-hour clock representation). */
 			LEGAL_ALT(0);
-			/* FALLTHROUGH */
+			fallthrough;
 		case 'H':
 			LEGAL_ALT(ALT_O);
 			bp = conv_num(bp, &tm->tm_hour, 0, 23, ALT_DIGITS);
@@ -532,7 +532,7 @@ literal:
 
 		case 'l':	/* The hour (12-hour clock representation). */
 			LEGAL_ALT(0);
-			/* FALLTHROUGH */
+			fallthrough;
 		case 'I':
 			LEGAL_ALT(ALT_O);
 			bp = conv_num(bp, &tm->tm_hour, 1, 12, ALT_DIGITS);

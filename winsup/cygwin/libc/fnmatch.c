@@ -193,7 +193,7 @@ fnmatch1(const char *pattern, const char *string, const char *stringstart,
 					return (FNM_NOMATCH);
 				pattern += pclen;
 			}
-			/* FALLTHROUGH */
+			fallthrough;
 		default:
 		norm:
 			string += sclen;

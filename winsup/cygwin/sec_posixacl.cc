@@ -453,7 +453,7 @@ acl_set_tag_type (acl_entry_t entry_d, acl_tag_t tag_type)
 	  case ACL_MASK:
 	  case ACL_OTHER:
 	    acl->entry[idx].a_id = ACL_UNDEFINED_ID;
-	    /*FALLTHRU*/
+	    fallthrough;
 	  case ACL_USER:
 	  case ACL_GROUP:
 	    acl->entry[idx].a_type = tag_type;

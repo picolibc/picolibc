@@ -205,7 +205,7 @@ proc_subproc (DWORD what, uintptr_t val)
 	  set_errno (EAGAIN);
 	  break;
 	}
-      /* fall through intentionally */
+      fallthrough;
 
     case PROC_DETACHED_CHILD:
       if (vchild != myself)
@@ -1078,7 +1078,7 @@ child_info::proc_retry (HANDLE h)
     case STATUS_CONTROL_C_EXIT:
       if (saw_ctrl_c ())
 	return EXITCODE_OK;
-      /* fall through intentionally */
+      fallthrough;
     case STATUS_DLL_INIT_FAILED:
     case STATUS_DLL_INIT_FAILED_LOGOFF:
     case EXITCODE_RETRY:
@@ -1387,10 +1387,10 @@ wait_sig (VOID *)
 	    sig_clear (-pack.si.si_signo);
 	  else
 	    sigq.add (pack);
-	  /*FALLTHRU*/
+	  fallthrough;
 	case __SIGNOHOLD:
 	  sig_held = false;
-	  /*FALLTHRU*/
+	  fallthrough;
 	case __SIGFLUSH:
 	case __SIGFLUSHFAST:
 	  if (!sig_held)

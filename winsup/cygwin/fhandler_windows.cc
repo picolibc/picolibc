@@ -112,7 +112,7 @@ fhandler_windows::read (void *buf, size_t& len)
 	      pthread::static_cancel_self ();
 	      break;
 	    }
-	  /*FALLTHRU*/
+	  fallthrough;
 	case WAIT_OBJECT_0 + 2:
 	  if (!PeekMessageW (ptr, hWnd_, 0, 0, PM_REMOVE))
 	    {

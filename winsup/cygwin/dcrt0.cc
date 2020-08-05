@@ -551,7 +551,7 @@ get_cygwin_startup_info ()
 	  case _CH_FORK:
 	    in_forkee = true;
 	    should_be_cb = sizeof (child_info_fork);
-	    /* fall through */;
+	    fallthrough;
 	  case _CH_SPAWN:
 	  case _CH_EXEC:
 	    if (!should_be_cb)
@@ -570,7 +570,7 @@ get_cygwin_startup_info ()
 	    break;
 	  default:
 	    system_printf ("unknown exec type %u", res->type);
-	    /* intentionally fall through */
+	    fallthrough;
 	  case _CH_WHOOPS:
 	    res = NULL;
 	    break;

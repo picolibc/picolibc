@@ -92,7 +92,7 @@ fhandler_termios::tcsetpgrp (const pid_t pgid)
 	  if (_my_tls.call_signal_handler ())
 	    continue;
 	  set_errno (EINTR);
-	  /* fall through intentionally */
+	  fallthrough;
 	default:
 	  res = -1;
 	  break;

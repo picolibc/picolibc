@@ -404,7 +404,7 @@ gr_ent::enumerate_caches ()
 	}
       cnt = 0;
       max = 1;
-      /*FALLTHRU*/
+      fallthrough;
     case 1:
       if (from_files)
 	{
@@ -415,7 +415,7 @@ gr_ent::enumerate_caches ()
 	}
       cnt = 0;
       max = 2;
-      /*FALLTHRU*/
+      fallthrough;
     case 2:
       if (from_db)
 	{

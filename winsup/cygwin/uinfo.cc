@@ -1743,7 +1743,7 @@ pwdgrp::fetch_account_from_file (fetch_user_arg_t &arg)
       /* Override SID with SID string. */
       arg.sid->string (str);
       arg.name = str;
-      /*FALLTHRU*/
+      fallthrough;
     case NAME_arg:
       arg.len = strlen (arg.name);
       break;
@@ -2300,7 +2300,7 @@ pwdgrp::fetch_account_from_windows (fetch_user_arg_t &arg, cyg_ldap *pldap)
 	      if (!its_ok)
 		return NULL;
 	    }
-	  /*FALLTHRU*/
+	  fallthrough;
 	case SidTypeGroup:
 	case SidTypeAlias:
 	  /* Predefined alias? */

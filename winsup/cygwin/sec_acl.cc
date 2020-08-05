@@ -1427,7 +1427,7 @@ __aclcalcmask (aclent_t *aclbufp, int nentries)
       case USER:
       case GROUP:
 	need_mask = true;
-	/*FALLTHRU*/
+	fallthrough;
       case GROUP_OBJ:
 	mask |= aclbufp[idx].a_perm;
 	break;

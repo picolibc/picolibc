@@ -1067,7 +1067,7 @@ fhandler_dev_dsp::open (int flags, mode_t)
     case O_RDWR:
       if ((num_in = waveInGetNumDevs ()) == 0)
 	err = ENXIO;
-      /* Fall through */
+      fallthrough;
     case O_WRONLY:
       if ((num_out = waveOutGetNumDevs ()) == 0)
 	err = ENXIO;

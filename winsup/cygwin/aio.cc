@@ -698,7 +698,7 @@ aio_read (struct aiocb *aio)
         if (slot >= 0)
           debug_printf ("slot %d released", slot);
       }
-      /* fall through */
+      fallthrough;
 
     case ENOBUFS:
       aio->aio_errno = EINPROGRESS;
@@ -888,7 +888,7 @@ aio_write (struct aiocb *aio)
         if (slot >= 0)
           debug_printf ("slot %d released", slot);
       }
-      /* fall through */
+      fallthrough;
 
     case ENOBUFS:
       aio->aio_errno = EINPROGRESS;
