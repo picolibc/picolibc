@@ -10,6 +10,8 @@
 extern int errno;
 #include "warning.h"
 
+#ifndef REENTRANT_SYSCALLS_STUBS
+
 int
 _getpid (void)
 {
@@ -18,3 +20,16 @@ _getpid (void)
 }
 
 stub_warning(_getpid)
+
+#else /* REENTRANT_SYSCALLS_STUBS */
+
+int
+_getpid_r (struct _reent *ptr)
+{
+  errno = ENOSYS;
+  return -1;
+}
+
+stub_warning(_getpid_r)
+
+#endif /* REENTRANT_SYSCALLS_STUBS */
