@@ -16,7 +16,7 @@
 @SPECS_PRINTF@ -L@LIBDIR@/%M -L@LIBDIR@ %{!T:-Tpicolibc.ld} %(picolibc_link) --gc-sections @LINK_SPEC@
 
 *lib:
---start-group -lc %{-oslib=*:--undefined=_exit} %{-oslib=*:-l%*} --end-group
+--start-group %(libgcc) -lc %{-oslib=*:--undefined=_exit} %{-oslib=*:-l%*} --end-group
 
 *endfile:
 
