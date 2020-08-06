@@ -196,7 +196,7 @@
 #ifdef __XTENSA__
 #include <xtensa/config/core-isa.h>
 #define MALLOC_ALIGNMENT ((XCHAL_DATA_WIDTH) < 16 ? 16 : (XCHAL_DATA_WIDTH))
-/* esp8266-specific: shrink the default fd buffer size */
+/* Espressif-specific: shrink the default fd buffer size */
 #define __BUFSIZ__ 128
 #ifndef __DYNAMIC_REENT__
 #define __DYNAMIC_REENT__
@@ -204,9 +204,11 @@
 #ifndef _REENT_SMALL
 #define _REENT_SMALL
 #endif
-#endif
+#endif /* __XTENSA__ */
 
 #ifdef __riscv
+/* Espressif-specific: shrink the default fd buffer size */
+#define __BUFSIZ__ 128
 #ifndef __DYNAMIC_REENT__
 #define __DYNAMIC_REENT__
 #endif
