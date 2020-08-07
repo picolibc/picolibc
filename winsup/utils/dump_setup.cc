@@ -77,11 +77,15 @@ parse_filename (const char *in_fn, fileparse& f)
     else if (strcasecmp (ver, "-src") == 0 ||
 	     strcasecmp (ver, "-patch") == 0)
       {
+	size_t len;
+
 	*ver++ = '\0';
 	strcpy (f.pkg, p);
 	strcpy (f.what, strlwr (ver));
 	strcpy (f.pkgtar, p);
-	strcat (f.pkgtar, f.tail);
+	len = strlen (f.pkgtar);
+	strncpy (f.pkgtar + len, f.tail, sizeof (f.pkgtar) - len);
+	f.pkgtar[MAX_PATH] = '\0';
 	ver = strchr (ver, '\0');
 	break;
       }
