@@ -14,9 +14,11 @@ configure_args=@configure_args@
 export CC:=@CC@
 export CXX:=@CXX@
 
+CFLAGS_COMMON=-Wimplicit-fallthrough=4 -Werror
 CFLAGS:=@CFLAGS@
 CXXFLAGS:=@CXXFLAGS@
-override CXXFLAGS+=-fno-exceptions -fno-rtti
+override CFLAGS+=${CFLAGS_COMMON}
+override CXXFLAGS+=-fno-exceptions -fno-rtti ${CFLAGS_COMMON}
 
 include ${srcdir}/../Makefile.common
 
