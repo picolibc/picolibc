@@ -120,7 +120,7 @@ ipcexit_hookthread (const LPVOID param)
     {
       case WAIT_OBJECT_0:
         /* Cygserver shutdown. */
-	/*FALLTHRU*/
+	fallthrough;
       case WAIT_OBJECT_0 + 1:
         /* Process exited.  Call semexit_myhook to handle SEM_UNDOs for the
 	   exiting process and shmexit_myhook to keep track of shared

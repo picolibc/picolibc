@@ -326,7 +326,7 @@ _msleep (void *ident, struct mtx *mtx, int priority,
         break;
       case WAIT_OBJECT_0 + 1:	/* Shutdown event (triggered by wakeup_all). */
         priority |= PDROP;
-	/*FALLTHRU*/
+	fallthrough;
       case WAIT_OBJECT_0 + 2:	/* The dependent process has exited. */
 	debug ("msleep process exit or shutdown for %d", td->td_proc->winpid);
 	ret = EIDRM;

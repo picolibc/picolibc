@@ -16,7 +16,7 @@ export CXX:=@CXX@
 
 CFLAGS:=@CFLAGS@
 override CXXFLAGS=@CXXFLAGS@
-override CXXFLAGS+=-MMD -Wimplicit-fallthrough=4 -Werror -D__OUTSIDE_CYGWIN__ -DSYSCONFDIR="\"$(sysconfdir)\""
+override CXXFLAGS+=-MMD -Wimplicit-fallthrough=5 -Werror -D__OUTSIDE_CYGWIN__ -DSYSCONFDIR="\"$(sysconfdir)\""
 
 include ${srcdir}/../Makefile.common
 
