@@ -19,7 +19,7 @@ INCLUDE intr_vectors.ld
 
 MEMORY
 {
-  RAM (w) : ORIGIN = 0x00500, LENGTH = 0x0eb00
+  RAM (w) : ORIGIN = 0x00500, LENGTH = 0x0fac0 /* END=0xffbf */
 }
 
 SECTIONS

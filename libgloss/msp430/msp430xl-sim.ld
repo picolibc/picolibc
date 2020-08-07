@@ -26,7 +26,7 @@ INCLUDE intr_vectors.ld
 MEMORY
 {
   RAM (rw)     : ORIGIN = 0x00500, LENGTH = 0x01b00
-  ROM (rx)     : ORIGIN = 0x02000, LENGTH = 0x0df00
+  ROM (rx)     : ORIGIN = 0x02000, LENGTH = 0x0dfc0
   /* The regions from intr_vectors.ld go here.  */
   HIFRAM (rw)  : ORIGIN = 0x10000, LENGTH = 0x80000
   HIROM (rx)   : ORIGIN = 0x90000, LENGTH = 0x70000
