@@ -134,7 +134,7 @@ minidump(DWORD pid, MINIDUMP_TYPE dump_type, const char *minidump_file)
   CloseHandle(dump_file);
 }
 
-static void
+static void __attribute__ ((__noreturn__))
 usage (FILE *stream, int status)
 {
   fprintf (stream, "\

@@ -62,8 +62,6 @@ void package_find (int, char **);
 void package_list (int, char **);
 /* In bloda.cc  */
 void dump_dodgy_apps (int verbose);
-/* Forward declaration */
-static void usage (FILE *, int);
 
 static const char *known_env_vars[] = {
   "c_include_path",
@@ -2110,7 +2108,7 @@ package_grep (char *search)
   return 0;
 }
 
-static void
+static void __attribute__ ((__noreturn__))
 usage (FILE * stream, int status)
 {
   fprintf (stream, "\

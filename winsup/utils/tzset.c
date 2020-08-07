@@ -78,7 +78,7 @@ reg_enum (HKEY hkey, int idx, PWCHAR name, DWORD size)
 	 == ERROR_SUCCESS;
 }
 
-static void
+static void __attribute__ ((__noreturn__))
 usage (FILE *stream)
 {
   fprintf (stream, ""
@@ -99,6 +99,7 @@ usage (FILE *stream)
   "\n"
   "      setenv TZ `%1$s`\n"
   "\n", program_invocation_short_name);
+  exit (stream == stdout ? 0 : 1);
 };
 
 static void
@@ -130,7 +131,6 @@ main (int argc, char **argv)
       {
       case 'h':
 	usage (stdout);
-	return 0;
       case 'V':
 	print_version ();
 	return 0;
@@ -140,10 +140,7 @@ main (int argc, char **argv)
 	return 1;
       }
   if (optind < argc)
-    {
-	usage (stderr);
-	return 1;
-    }
+    usage (stderr);
 
   /* First fetch current timezone information from registry. */
   hkey = reg_open (HKEY_LOCAL_MACHINE, REG_TZINFO, "timezone information");

@@ -103,7 +103,7 @@ ttynam (int ntty, char buf[9])
   return buf;
 }
 
-static void
+static void __attribute__ ((__noreturn__))
 usage (FILE * stream, int status)
 {
   fprintf (stream, "\

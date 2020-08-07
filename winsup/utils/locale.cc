@@ -42,7 +42,7 @@
 #define LOCALE_ALIAS		"/usr/share/locale/locale.alias"
 #define LOCALE_ALIAS_LINE_LEN	255
 
-void
+static void __attribute__ ((__noreturn__))
 usage ()
 {
   printf (
@@ -78,6 +78,7 @@ usage ()
 "  -h, --help           This text\n"
 "  -V, --version        Print program version and exit\n\n",
   program_invocation_short_name);
+  exit (0);
 }
 
 void
@@ -811,7 +812,6 @@ main (int argc, char **argv)
 	break;
       case 'h':
 	usage ();
-	return 0;
       case 'V':
 	print_version ();
 	return 0;

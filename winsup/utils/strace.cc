@@ -957,7 +957,7 @@ parse_mask (const char *ms, char **endptr)
   return retval;
 }
 
-static void
+static void __attribute__ ((__noreturn__))
 usage (FILE *where = stderr)
 {
   fprintf (where, "\
@@ -1102,9 +1102,7 @@ main2 (int argc, char **argv)
 	forkdebug ^= 1;
 	break;
       case 'h':
-	// Print help and exit
 	usage (stdout);
-	break;
       case 'H':
 	include_hex ^= 1;
 	break;

@@ -180,7 +180,7 @@ print_version ()
 	  strrchr (__DATE__, ' ') + 1);
 }
 
-static void
+static void __attribute__ ((__noreturn__))
 usage (FILE *stream)
 {
   fprintf (stream, "Usage: %s [-RVadhln] [file]...\n",
@@ -221,6 +221,7 @@ usage (FILE *stream)
       "  'C', 'Casesensitive': directory is handled case sensitive\n"
       "                        (Windows 10 1803 or later, local NTFS only,\n"
       "                         WSL must be installed)\n");
+  exit (stream == stdout ? 0 : 1);
 }
 
 int
@@ -254,7 +255,7 @@ main (int argc, char **argv)
 	case 'h':
 	default:
 	  usage (c == 'h' ? stdout : stderr);
-	  return 1;
+	  break;
 	}
     }
   if (optind > argc - 1)

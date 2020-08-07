@@ -501,7 +501,7 @@ printvar (const struct conf_variable *cp, const char *pathname)
     }
 }
 
-static void
+static void __attribute__ ((__noreturn__))
 usage (int ret)
 {
   fprintf (ret ? stderr : stdout,

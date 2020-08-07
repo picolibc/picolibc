@@ -525,7 +525,7 @@ setfacl (action_t action, const char *path, aclent_t *acls, int cnt)
   return 0;
 }
 
-static void
+static void __attribute__ ((__noreturn__))
 usage (FILE *stream)
 {
   fprintf (stream, ""
@@ -647,6 +647,7 @@ usage (FILE *stream)
   }
   else
     fprintf(stream, "Try '%s --help' for more information.\n", prog_name);
+  exit (stream == stdout ? 0 : 1);
 }
 
 struct option longopts[] = {
@@ -702,10 +703,7 @@ main (int argc, char **argv)
 	else if (action == DeleteDef)
 	  action = DeleteAll;
 	else
-	  {
-	    usage (stderr);
-	    return 1;
-	  }
+	  usage (stderr);
 	break;
       case 'd':		/* Backward compat */
       case 'x':
@@ -714,10 +712,7 @@ main (int argc, char **argv)
 	else if (action == Modify)
 	  action = ModNDel;
 	else
-	  {
-	    usage (stderr);
-	    return 1;
-	  }
+	  usage (stderr);
 	if (! getaclentries (Delete, optarg, acls, &aclidx))
 	  {
 	    fprintf (stderr, "%s: illegal acl entries\n", prog_name);
@@ -728,10 +723,7 @@ main (int argc, char **argv)
 	if (action == NoAction)
 	  action = Set;
 	else
-	  {
-	    usage (stderr);
-	    return 1;
-	  }
+	  usage (stderr);
 	if (! getaclentries (SetFromFile, optarg, acls, &aclidx))
 	  {
 	    fprintf (stderr, "%s: illegal acl entries\n", prog_name);
@@ -740,17 +732,13 @@ main (int argc, char **argv)
 	break;
       case 'h':
 	usage (stdout);
-	return 0;
       case 'k':
 	if (action == NoAction)
 	  action = DeleteDef;
 	else if (action == DeleteExt)
 	  action = DeleteAll;
 	else
-	  {
-	    usage (stderr);
-	    return 1;
-	  }
+	  usage (stderr);
 	break;
       case 'm':
 	if (action == NoAction)
@@ -758,10 +746,7 @@ main (int argc, char **argv)
 	else if (action == Delete)
 	  action = ModNDel;
 	else
-	  {
-	    usage (stderr);
-	    return 1;
-	  }
+	  usage (stderr);
 	if (! getaclentries (Modify, optarg, acls, &aclidx))
 	  {
 	    fprintf (stderr, "%s: illegal acl entries\n", prog_name);
@@ -780,10 +765,7 @@ main (int argc, char **argv)
 	if (action == NoAction)
 	  action = Set;
 	else
-	  {
-	    usage (stderr);
-	    return 1;
-	  }
+	  usage (stderr);
 	if (! getaclentries (Set, optarg, acls, &aclidx))
 	  {
 	    fprintf (stderr, "%s: illegal acl entries\n", prog_name);
@@ -798,15 +780,9 @@ main (int argc, char **argv)
 	return 1;
       }
   if (action == NoAction)
-    {
-      usage (stderr);
-      return 1;
-    }
+    usage (stderr);
   if (optind > argc - 1)
-    {
-      usage (stderr);
-      return 1;
-    }
+    usage (stderr);
   if (action == Set)
     switch (aclcheck (acls, aclidx, NULL))
       {

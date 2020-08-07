@@ -948,7 +948,7 @@ dumper::write_core_dump ()
   return 1;
 }
 
-static void
+static void __attribute__ ((__noreturn__))
 usage (FILE *stream, int status)
 {
   fprintf (stream, "\

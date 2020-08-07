@@ -89,7 +89,7 @@ char **argv;
 HKEY key;
 wchar_t *value;
 
-static void
+static void __attribute__ ((__noreturn__))
 usage (FILE *where = stderr)
 {
   fprintf (where, ""
@@ -835,10 +835,7 @@ int
 cmd_load ()
 {
   if (!argv[1])
-    {
-      usage ();
-      return 1;
-    }
+    usage ();
   find_key (1, 0);
   return 0;
 }
@@ -847,10 +844,7 @@ int
 cmd_unload ()
 {
   if (argv[1])
-    {
-      usage ();
-      return 1;
-    }
+    usage ();
   find_key (1, 0);
   return 0;
 }
@@ -859,10 +853,7 @@ int
 cmd_save ()
 {
   if (!argv[1])
-    {
-      usage ();
-      return 1;
-    }
+    usage ();
   /* REG_OPTION_BACKUP_RESTORE is necessary to save /HKLM/SECURITY */
   find_key (1, KEY_QUERY_VALUE, REG_OPTION_BACKUP_RESTORE);
   ssize_t len = cygwin_conv_path (CCP_POSIX_TO_WIN_W, argv[1], NULL, 0);
@@ -880,10 +871,7 @@ int
 cmd_restore ()
 {
   if (!argv[1])
-    {
-      usage ();
-      return 1;
-    }
+    usage ();
   /* REG_OPTION_BACKUP_RESTORE is necessary to restore /HKLM/SECURITY */
   find_key (1, KEY_ALL_ACCESS, REG_OPTION_BACKUP_RESTORE);
   ssize_t len = cygwin_conv_path (CCP_POSIX_TO_WIN_W, argv[1], NULL, 0);
@@ -1009,6 +997,4 @@ main (int argc, char **_argv)
 	return commands[i].func ();
       }
   usage ();
-
-  return 0;
 }

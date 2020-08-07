@@ -674,7 +674,7 @@ run_program (char *cmdline)
 
 }
 
-static void
+static void __attribute__ ((__noreturn__))
 usage (FILE * stream)
 {
   fprintf (stream , ""
@@ -880,7 +880,6 @@ main (int argc, char **argv)
 	break;
       case 'h':
 	usage (stdout);
-	break;
       case 'l':
 	printf ("profiling dll usage\n");
 	dll_counts = 1;

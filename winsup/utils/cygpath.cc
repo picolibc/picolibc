@@ -76,7 +76,7 @@ static struct option long_options[] = {
 
 static char options[] = "ac:df:hilmMopst:uUVwAC:DHOPSWF:";
 
-static void
+static void __attribute__ ((__noreturn__))
 usage (FILE * stream, int status)
 {
   if (!ignore_flag || !status)
@@ -971,7 +971,6 @@ do_options (int argc, char **argv, int from_file)
 
 	case 'h':
 	  usage (stdout, 0);
-	  break;
 
 	case 'V':
 	  print_version ();

@@ -358,7 +358,7 @@ enum_users (domlist_t *mach, const char *sep, const char *passed_home_path,
   return 0;
 }
 
-static int
+static int __attribute__ ((__noreturn__))
 usage (FILE * stream)
 {
   fprintf (stream,
@@ -399,7 +399,7 @@ usage (FILE * stream)
 "on domain controllers and domain member machines.\n"
 "\n", program_invocation_short_name,
       (const char *) cygwin_internal (CW_GETNSSSEP));
-  return 1;
+  exit (stream == stdout ? 0 : 1);
 }
 
 static struct option longopts[] = {
@@ -606,7 +606,6 @@ main (int argc, char **argv)
 	break;
       case 'h':
 	usage (stdout);
-	return 0;
       case 'V':
 	print_version ();
 	return 0;

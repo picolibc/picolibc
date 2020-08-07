@@ -29,7 +29,7 @@ struct option longopts[] =
 
 char opts[] = "hUV";
 
-static void
+static void __attribute__ ((__noreturn__))
 usage (FILE *where = stderr)
 {
   fprintf (where, "\
