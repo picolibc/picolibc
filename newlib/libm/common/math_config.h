@@ -79,6 +79,14 @@
 # endif
 #endif
 
+#ifndef HAVE_FAST_FMAF
+# if HAVE_FAST_FMA || (__ARM_FEATURE_FMA && (__ARM_FP & 4))
+#  define HAVE_FAST_FMAF 1
+# else
+#  define HAVE_FAST_FMAF 0
+# endif
+#endif
+
 #if HAVE_FAST_ROUND
 /* When set, the roundtoint and converttoint functions are provided with
    the semantics documented below.  */
