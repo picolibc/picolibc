@@ -58,6 +58,8 @@ srcs_libm_machine = [
   'sf_rint.c',
   'sf_round.c',
   'sf_trunc.c',
+  's_fma.c',
+  'sf_fma.c',
   's_nearbyint.c',
   's_rint.c',
   's_round.c',
