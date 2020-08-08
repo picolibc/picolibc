@@ -72,7 +72,7 @@
 
 /* Compiler can inline fma as a single instruction.  */
 #ifndef HAVE_FAST_FMA
-# if __aarch64__ || __ARM_FEATURE_FMA
+# if __aarch64__ || (__ARM_FEATURE_FMA && (__ARM_FP & 8))
 #   define HAVE_FAST_FMA 1
 # else
 #   define HAVE_FAST_FMA 0
