@@ -64,7 +64,7 @@ P5   =  4.1381369442e-08; /* 0x3331bb4c */
 	if(sx > FLT_UWORD_LOG_MAX)
 	    return __math_oflowf(0); /* overflow */
 	if(sx < 0 && hx > FLT_UWORD_LOG_MIN)
-	    return __math_uflow(0); /* underflow */
+	    return __math_uflowf(0); /* underflow */
 	
     /* argument reduction */
 	if(hx > 0x3eb17218) {		/* if  |x| > 0.5 ln2 */ 
