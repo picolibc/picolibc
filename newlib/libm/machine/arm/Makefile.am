@@ -10,12 +10,14 @@ LIB_SOURCES = \
 	ef_sqrt.c \
 	s_ceil.c \
 	s_floor.c \
+	s_fma.c \
 	s_nearbyint.c \
 	s_rint.c \
 	s_round.c \
 	s_trunc.c \
 	sf_ceil.c \
 	sf_floor.c \
+	sf_fma.c \
 	sf_nearbyint.c \
 	sf_rint.c \
 	sf_round.c \
