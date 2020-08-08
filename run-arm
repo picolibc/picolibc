@@ -75,6 +75,8 @@ case "$elf" in
     */thumb_v7e_m_fp_softfp/*)
 	cpu=cortex-m4
 	;;
+
+    # v7e-m dp - Cortex-M7
     */thumb_v7e_m_dp_hard/*)
 	cpu=cortex-m7
 	;;
