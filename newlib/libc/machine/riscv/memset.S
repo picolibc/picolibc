@@ -13,7 +13,7 @@
 .global memset
 .type	memset, @function
 memset:
-#if defined(PREFER_SIZE_OVER_SPEED) || defined(__OPTIMIZE_SIZE__)
+#if defined(PREFER_SIZE_OVER_SPEED)
   mv t1, a0
   beqz a2, 2f
 

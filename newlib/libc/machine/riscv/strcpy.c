@@ -16,7 +16,7 @@ char *strcpy(char *dst, const char *src)
 {
   char *dst0 = dst;
 
-#if !defined(PREFER_SIZE_OVER_SPEED) && !defined(__OPTIMIZE_SIZE__)
+#if !defined(PREFER_SIZE_OVER_SPEED)
   int misaligned = ((uintptr_t)dst | (uintptr_t)src) & (sizeof (long) - 1);
   if (__builtin_expect(!misaligned, 1))
     {
