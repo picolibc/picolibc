@@ -27,7 +27,7 @@
    SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 #include "fdlibm.h"
-#if !__OBSOLETE_MATH
+#if !__OBSOLETE_MATH_DOUBLE
 
 #include "math_config.h"
 
@@ -533,4 +533,4 @@ that logc + poly(z/c - 1) has small error, however near x == 1 when
 },
 #endif /* !HAVE_FAST_FMA */
 };
-#endif /* __OBSOLETE_MATH */
+#endif /* __OBSOLETE_MATH_DOUBLE */

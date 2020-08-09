@@ -15,7 +15,7 @@
 
 #include "fdlibm.h"
 
-#if __OBSOLETE_MATH
+#if __OBSOLETE_MATH_FLOAT
 #ifdef __STDC__
 static const float
 #else
@@ -95,4 +95,4 @@ __strong_reference(__ieee754_logf, logf);
 		     return dk*ln2_hi-((s*(f-R)-dk*ln2_lo)-f);
 	}
 }
-#endif /* __OBSOLETE_MATH */
+#endif /* __OBSOLETE_MATH_FLOAT */

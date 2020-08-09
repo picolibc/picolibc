@@ -27,7 +27,7 @@
    SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 #include "fdlibm.h"
-#if !__OBSOLETE_MATH
+#if !__OBSOLETE_MATH_FLOAT
 
 #include <math.h>
 #include <stdint.h>
@@ -98,4 +98,4 @@ exp2f (float x)
   y = y * s;
   return (float) y;
 }
-#endif /* !__OBSOLETE_MATH */
+#endif /* !__OBSOLETE_MATH_FLOAT */

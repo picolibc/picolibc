@@ -58,11 +58,9 @@ PORTABILITY
 	double z;
 	z = __ieee754_sqrt(x);
 	if(_LIB_VERSION == _IEEE_ || isnan(x)) return z;
-	if(x<0.0) {
+	if(x<0.0)
 	    errno = EDOM;
-	    return 0.0/0.0;
-	} else
-	    return z;
+	return z;
 }
 
 #endif /* defined(_DOUBLE_IS_32BITS) */

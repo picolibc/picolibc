@@ -14,7 +14,7 @@
  */
 
 #include "fdlibm.h"
-#if __OBSOLETE_MATH
+#if __OBSOLETE_MATH_FLOAT
 
 #ifdef __STDC__
 	float sinf(float x)
@@ -65,4 +65,4 @@ float _sinf(float) __attribute__ ((__alias__ ("sinf")))  __attribute__((const)) 
 }
 
 #endif /* defined(_DOUBLE_IS_32BITS) */
-#endif /* __OBSOLETE_MATH */
+#endif /* __OBSOLETE_MATH_FLOAT */

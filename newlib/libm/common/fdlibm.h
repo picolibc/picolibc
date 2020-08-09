@@ -225,7 +225,7 @@ extern float __ieee754_scalbf __P((float,int));
 extern float __ieee754_scalbf __P((float,float));
 #endif
 
-#if !__OBSOLETE_MATH
+#if !__OBSOLETE_MATH_DOUBLE
 /* The new math code does not provide separate wrapper function
    for error handling, so the extern symbol is called directly.
    This is valid as long as there are no namespace issues (the
@@ -234,6 +234,8 @@ extern float __ieee754_scalbf __P((float,float));
 # define __ieee754_exp(x) exp(x)
 # define __ieee754_log(x) log(x)
 # define __ieee754_pow(x,y) pow(x,y)
+#endif
+#if !__OBSOLETE_MATH_FLOAT
 # define __ieee754_expf(x) expf(x)
 # define __ieee754_logf(x) logf(x)
 # define __ieee754_powf(x,y) powf(x,y)

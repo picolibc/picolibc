@@ -16,7 +16,7 @@
 #include "fdlibm.h"
 #include "math_config.h"
 
-#if __OBSOLETE_MATH
+#if __OBSOLETE_MATH_FLOAT
 #ifdef __v810__
 #define const
 #endif
@@ -103,4 +103,4 @@ __strong_reference(__ieee754_expf, expf);
 	    return y*twom100;
 	}
 }
-#endif /* __OBSOLETE_MATH */
+#endif /* __OBSOLETE_MATH_FLOAT */

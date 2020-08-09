@@ -18,7 +18,7 @@
  */
 
 #include "fdlibm.h"
-#if __OBSOLETE_MATH
+#if __OBSOLETE_MATH_FLOAT
 #include <errno.h>
 
 #if !defined(_IEEE_LIBM) || !defined(HAVE_ALIAS_ATTRIBUTE)
@@ -68,4 +68,4 @@ u_threshold= -1.0397208405e+02;  /* 0xc2cff1b5 */
 }
 
 #endif /* defined(_DOUBLE_IS_32BITS) */
-#endif /* __OBSOLETE_MATH */
+#endif /* __OBSOLETE_MATH_FLOAT */

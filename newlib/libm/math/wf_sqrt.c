@@ -31,12 +31,10 @@
 	float z;
 	z = __ieee754_sqrtf(x);
 	if(_LIB_VERSION == _IEEE_ || isnan(x)) return z;
-	if(x<0.0f) {
+	if(x<0.0f)
 	    /* sqrtf(negative) */
 	    errno = EDOM;
-	    return 0.0f/0.0f;
-	} else
-	    return z;
+	return z;
 }
 #endif
 

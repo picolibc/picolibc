@@ -27,7 +27,7 @@
    SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 #include "fdlibm.h"
-#if !__OBSOLETE_MATH
+#if !__OBSOLETE_MATH_FLOAT
 
 #include "math_config.h"
 
@@ -55,4 +55,4 @@ const struct exp2f_data __exp2f_data = {
 0x1.c6af84b912394p-5/N/N/N, 0x1.ebfce50fac4f3p-3/N/N, 0x1.62e42ff0c52d6p-1/N
   },
 };
-#endif /* !__OBSOLETE_MATH */
+#endif /* !__OBSOLETE_MATH_FLOAT */

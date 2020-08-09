@@ -18,7 +18,7 @@
  */
 
 #include "fdlibm.h"
-#if __OBSOLETE_MATH
+#if __OBSOLETE_MATH_FLOAT
 #include <errno.h>
 #include <math.h>
 
@@ -45,4 +45,4 @@
 }
 
 #endif /* defined(_DOUBLE_IS_32BITS) */
-#endif /* __OBSOLETE_MATH */
+#endif /* __OBSOLETE_MATH_FLOAT */

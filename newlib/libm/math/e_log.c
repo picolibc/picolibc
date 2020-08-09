@@ -63,7 +63,7 @@
  */
 
 #include "fdlibm.h"
-#if __OBSOLETE_MATH
+#if __OBSOLETE_MATH_DOUBLE
 
 #ifndef _DOUBLE_IS_32BITS
 
@@ -149,4 +149,4 @@ __strong_reference(__ieee754_log, log);
 }
 
 #endif /* defined(_DOUBLE_IS_32BITS) */
-#endif /*__OBSOLETE_MATH */
+#endif /*__OBSOLETE_MATH_DOUBLE */
