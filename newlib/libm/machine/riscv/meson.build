@@ -45,6 +45,10 @@ srcs_libm_machine = [
   'fesetround.c',
   'fetestexcept.c',
   'feupdateenv.c',
+  's_fma.c',
+  's_sqrt.c',
+  'sf_fma.c',
+  'sf_sqrt.c',
 ]
 
 foreach target : targets
