@@ -196,6 +196,12 @@ option('newlib-global-errno', type: 'boolean', value: false,
 option('newlib-obsolete-math', type: 'combo', choices: ['true', 'false', 'auto'],
        value: 'auto',
        description: 'Use float type for float valued math routines (default: automatic based on platform)')
+option('newlib-obsolete-math-float', type: 'combo', choices: ['true', 'false', 'auto'],
+       value: 'auto',
+       description: 'Use old math code that uses float type for float valued math routines (default: automatic based on platform)')
+option('newlib-obsolete-math-double', type: 'combo', choices: ['true', 'false', 'auto'],
+       value: 'auto',
+       description: 'Use old math code for double valued math routines (default: automatic based on platform)')
 option('want-math-errno', type: 'boolean', value: false,
        description: 'Set errno in math functions according to stdc (default: false)')
 

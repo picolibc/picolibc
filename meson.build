@@ -85,6 +85,8 @@ newlib_initfini_array = get_option('newlib-initfini-array')
 newlib_initfini = get_option('newlib-initfini')
 
 newlib_obsolete_math = get_option('newlib-obsolete-math')
+newlib_obsolete_math_float = get_option('newlib-obsolete-math-float')
+newlib_obsolete_math_double = get_option('newlib-obsolete-math-double')
 want_math_errno = get_option('want-math-errno')
 
 thread_local_storage_option = get_option('thread-local-storage')
@@ -463,7 +465,25 @@ elif newlib_obsolete_math == 'false'
   obsolete_math_value = 0
 endif
   
+if newlib_obsolete_math_float == 'auto'
+  obsolete_math_float_value = false
+elif newlib_obsolete_math_float == 'true'
+  obsolete_math_float_value = 1
+elif newlib_obsolete_math_float == 'false'
+  obsolete_math_float_value = 0
+endif
+  
+if newlib_obsolete_math_double == 'auto'
+  obsolete_math_double_value = false
+elif newlib_obsolete_math_double == 'true'
+  obsolete_math_double_value = 1
+elif newlib_obsolete_math_double == 'false'
+  obsolete_math_double_value = 0
+endif
+  
 conf_data.set('__OBSOLETE_MATH', obsolete_math_value, description: 'Use old math code (undef auto, 0 no, 1 yes)')
+conf_data.set('__OBSOLETE_MATH_FLOAT', obsolete_math_float_value, description: 'Use old math code for float funcs (undef auto, 0 no, 1 yes)')
+conf_data.set('__OBSOLETE_MATH_DOUBLE', obsolete_math_double_value, description: 'Use old math code for double funcs (undef auto, 0 no, 1 yes)')
 
 # Compute iconv encodings to support in the library
 
