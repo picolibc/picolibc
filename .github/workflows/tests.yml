@@ -13,6 +13,7 @@ jobs:
           # Math configurations
           "-Dnewlib-obsolete-math=false",
           "-Dnewlib-obsolete-math=false -Dwant-math-errno=true",
+          "-Dnewlib-obsolete-math-float=true -Dnewlib-obsolete-math-double=false",
           "-Dnewlib-obsolete-math=true",
           "-Dnewlib-obsolete-math=true -Dwant-math-errno=true",
 
@@ -31,6 +32,10 @@ jobs:
 
           # Iconv configurations
           "-Dnewlib-iconv-external-ccs=true"
+        ]
+        buildtype: [
+          "--buildtype release",
+          "--buildtype minsize"
         ]
         test: [
           "./.github/do-test do-native-configure build-native",
@@ -55,4 +60,4 @@ jobs:
 
       - name: 'Test'
         run: |
-          docker run --rm picolibc ${{ matrix.test }} ${{ matrix.meson_flags }}
+          docker run --rm picolibc ${{ matrix.test }}  ${{ matrix.buildtype }} ${{ matrix.meson_flags }}
