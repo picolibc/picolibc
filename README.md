@@ -6,6 +6,11 @@ small embedded systems with limited RAM. Picolibc was formed by blending
 code from [Newlib](http://sourceware.org/newlib/) and
 [AVR Libc](https://www.nongnu.org/avr-libc/).
 
+Build status:
+
+ * ![Release](https://github.com/keith-packard/picolibc/workflows/Release/badge.svg?branch=main)
+ * ![Minsize](https://github.com/keith-packard/picolibc/workflows/Minsize/badge.svg?branch=main)
+
 ## License
 
 Picolibc source comes from a variety of places and has a huge variety
