@@ -36,6 +36,7 @@ SUCH DAMAGE.
 
 #include "_ansi.h"
 #include <sys/cdefs.h>
+#include <limits.h>
 
 #if __POSIX_VISIBLE >= 200809 || __MISC_VISIBLE || defined (_COMPILING_NEWLIB)
 #include <sys/_locale.h>
@@ -99,8 +100,16 @@ extern int toascii_l (int __c, locale_t __l);
 #define _X	0100
 #define	_B	0200
 
-/* For C++ backward-compatibility only.  */
+#if CHAR_MIN == SCHAR_MIN
+#define ALLOW_NEGATIVE_CTYPE_INDEX
+#endif
+
+#if defined(ALLOW_NEGATIVE_CTYPE_INDEX)
+extern	__IMPORT const char	_ctype_b[];
+#define _ctype_ (_ctype_b + 127)
+#else
 extern	__IMPORT const char	_ctype_[];
+#endif
 
 #ifdef __HAVE_LOCALE_INFO__
 const char *__locale_ctype_ptr (void);
@@ -111,21 +120,7 @@ const char *__locale_ctype_ptr (void);
 # define __CTYPE_PTR	(__locale_ctype_ptr ())
 
 #ifndef __cplusplus
-/* These macros are intentionally written in a manner that will trigger
-   a gcc -Wall warning if the user mistakenly passes a 'char' instead
-   of an int containing an 'unsigned char'.  Note that the sizeof will
-   always be 1, which is what we want for mapping EOF to __CTYPE_PTR[0];
-   the use of a raw index inside the sizeof triggers the gcc warning if
-   __c was of type char, and sizeof masks side effects of the extra __c.
-   Meanwhile, the real index to __CTYPE_PTR+1 must be cast to int,
-   since isalpha(0x100000001LL) must equal isalpha(1), rather than being
-   an out-of-bounds reference on a 64-bit machine.  */
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wchar-subscripts"
-static __inline char __ctype_lookup(char c) {
-  return ((__CTYPE_PTR+sizeof(""[c]))[(int)(c)]);
-}
-#pragma GCC diagnostic pop
+static __inline char __ctype_lookup(int c) { return (__CTYPE_PTR + 1)[c]; }
 
 #define	isalpha(__c)	(__ctype_lookup(__c)&(_U|_L))
 #define	isupper(__c)	((__ctype_lookup(__c)&(_U|_L))==_U)
@@ -157,12 +152,9 @@ __locale_ctype_ptr_l(locale_t _l)
 }
 #endif
 
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wchar-subscripts"
-static __inline char __ctype_lookup_l(char c, locale_t l) {
-  return ((__locale_ctype_ptr_l(l)+sizeof(""[c]))[(int)(c)]);
+static __inline char __ctype_lookup_l(int c, locale_t l) {
+	return (__locale_ctype_ptr_l(l)+1)[(int)(c)];
 }
-#pragma GCC diagnostic pop
 
 #define	isalpha_l(__c,__l)	(__ctype_lookup_l(__c,__l)&(_U|_L))
 #define	isupper_l(__c,__l)	((__ctype_lookup_l(__c,__l)&(_U|_L))==_U)
