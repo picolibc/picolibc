@@ -484,8 +484,16 @@ void nano_cfree(void * ptr)
  * Implement calloc simply by calling malloc and set zero */
 void * nano_calloc(malloc_size_t n, malloc_size_t elem)
 {
-    void * mem = nano_malloc(n * elem);
-    if (mem != NULL) memset(mem, 0, n * elem);
+    ptrdiff_t bytes;
+    void * mem;
+
+    if (__builtin_mul_overflow (n, elem, &bytes))
+    {
+        errno = ENOMEM;
+        return NULL;
+    }
+    mem = nano_malloc(bytes);
+    if (mem != NULL) memset(mem, 0, bytes);
     return mem;
 }
 #endif /* DEFINE_CALLOC */
