@@ -58,8 +58,14 @@ int isxdigit (int __c);
 int tolower (int __c);
 int toupper (int __c);
 
-#if __ISO_C_VISIBLE >= 1999
-int isblank (int __c);
+#if  __ISO_C_VISIBLE >= 1999
+#ifdef _DEFINING_ISBLANK
+int isblank(int c);
+#else
+static __inline int isblank(int c) {
+	return c == ' ' || c == '\t';
+}
+#endif
 #endif
 
 #if __MISC_VISIBLE || __XSI_VISIBLE
@@ -133,12 +139,6 @@ static __inline char __ctype_lookup(int c) { return (__CTYPE_PTR + 1)[c]; }
 #define isprint(__c)	(__ctype_lookup(__c)&(_P|_U|_L|_N|_B))
 #define	isgraph(__c)	(__ctype_lookup(__c)&(_P|_U|_L|_N))
 #define iscntrl(__c)	(__ctype_lookup(__c)&_C)
-
-#if defined(__GNUC__) && __ISO_C_VISIBLE >= 1999
-#define isblank(__c) \
-  __extension__ ({ __typeof__ (__c) __x = (__c);		\
-        (__ctype_lookup(__x)&_B) || (int) (__x) == '\t';})
-#endif
 
 #if __POSIX_VISIBLE >= 200809
 #ifdef __HAVE_LOCALE_INFO__
