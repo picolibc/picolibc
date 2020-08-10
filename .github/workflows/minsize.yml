@@ -1,4 +1,4 @@
-name: tests
+name: Minsize
 
 on: [push, pull_request]
 
@@ -33,10 +33,6 @@ jobs:
           # Iconv configurations
           "-Dnewlib-iconv-external-ccs=true"
         ]
-        buildtype: [
-          "--buildtype release",
-          "--buildtype minsize"
-        ]
         test: [
           "./.github/do-test do-native-configure build-native",
           "./.github/do-test do-riscv-configure build-riscv",
@@ -58,6 +54,6 @@ jobs:
             -f picolibc/.github/Dockerfile \
             picolibc
 
-      - name: 'Test'
+      - name: 'Minsize test'
         run: |
-          docker run --rm picolibc ${{ matrix.test }}  ${{ matrix.buildtype }} ${{ matrix.meson_flags }}
+          docker run --rm picolibc ${{ matrix.test }} ${{ matrix.meson_flags }} --buildtype minsize
