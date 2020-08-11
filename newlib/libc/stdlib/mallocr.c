@@ -3194,13 +3194,19 @@ Void_t* cALLOc(RARG n, elem_size) RDECL size_t n; size_t elem_size;
   mchunkptr p;
   INTERNAL_SIZE_T csz;
 
-  INTERNAL_SIZE_T sz = n * elem_size;
+  INTERNAL_SIZE_T sz;
 
 #if MORECORE_CLEARS
   mchunkptr oldtop;
   INTERNAL_SIZE_T oldtopsize;
 #endif
   Void_t* mem;
+
+  if (__builtin_mul_overflow((INTERNAL_SIZE_T) n, (INTERNAL_SIZE_T) elem_size, &sz))
+  {
+    errno = ENOMEM;
+    return 0;
+  }
 
   /* check if expand_top called, in which case don't need to clear */
 #if MORECORE_CLEARS
