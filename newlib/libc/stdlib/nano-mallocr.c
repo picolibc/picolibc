@@ -331,6 +331,7 @@ void * nano_malloc(malloc_size_t s)
     busy_list = r;
 #endif
 
+    memset(align_ptr, '\0', s);
     return align_ptr;
 }
 #endif /* DEFINE_MALLOC */
@@ -485,16 +486,13 @@ void nano_cfree(void * ptr)
 void * nano_calloc(malloc_size_t n, malloc_size_t elem)
 {
     ptrdiff_t bytes;
-    void * mem;
 
     if (__builtin_mul_overflow (n, elem, &bytes))
     {
         errno = ENOMEM;
         return NULL;
     }
-    mem = nano_malloc(bytes);
-    if (mem != NULL) memset(mem, 0, bytes);
-    return mem;
+    return nano_malloc(bytes);
 }
 #endif /* DEFINE_CALLOC */
 
