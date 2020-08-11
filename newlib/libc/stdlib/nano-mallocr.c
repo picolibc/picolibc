@@ -517,12 +517,17 @@ void * nano_realloc(void * ptr, malloc_size_t size)
       return ptr;
 
     mem = nano_malloc(size);
-    if (mem != NULL)
+    if (mem == NULL)
+    {
+	if (size <= old_size)
+	    return ptr;
+    }
+    else
     {
 	if (size > old_size)
 	    size = old_size;
-        memcpy(mem, ptr, size);
-        nano_free(ptr);
+	memcpy(mem, ptr, size);
+	nano_free(ptr);
     }
     return mem;
 }
