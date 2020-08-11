@@ -502,6 +502,7 @@ void * nano_calloc(malloc_size_t n, malloc_size_t elem)
 void * nano_realloc(void * ptr, malloc_size_t size)
 {
     void * mem;
+    malloc_size_t old_size;
 
     if (ptr == NULL) return nano_malloc(size);
 
@@ -511,12 +512,9 @@ void * nano_realloc(void * ptr, malloc_size_t size)
         return NULL;
     }
 
-#ifdef DEFINE_MALLOC_USABLE_SIZE
-    /* TODO: There is chance to shrink the chunk if newly requested
-     * size is much small */
-    if (nano_malloc_usable_size(ptr) >= size)
+    old_size = nano_malloc_usable_size(ptr);
+    if (size <= old_size && (old_size >> 1) < size)
       return ptr;
-#endif
 
     mem = nano_malloc(size);
     if (mem != NULL)
