@@ -21,6 +21,9 @@ jobs:
           "-Dio-float-exact=false",
           "-Dio-long-long=true",
 
+          # Malloc configurations
+          "-Dnewlib-nano-malloc=false",
+
           # Original stdio configurations
           "-Dtinystdio=false -Dnewlib-io-float=false",
           "-Dtinystdio=false -Dnewlib-io-float=false -Dio-long-long=true",
