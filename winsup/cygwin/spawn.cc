@@ -177,7 +177,7 @@ find_exec (const char *name, path_conv& buf, const char *search,
 /* Utility for child_info_spawn::worker.  */
 
 static HANDLE
-handle (int fd, bool writing)
+handle (int fd, bool writing, bool iscygwin)
 {
   HANDLE h;
   cygheap_fdget cfd (fd);
@@ -188,6 +188,11 @@ handle (int fd, bool writing)
     h = INVALID_HANDLE_VALUE;
   else if (!writing)
     h = cfd->get_handle ();
+  else if (cfd->get_major () == DEV_PTYS_MAJOR && iscygwin)
+    {
+      fhandler_pty_slave *ptys = (fhandler_pty_slave *)(fhandler_base *) cfd;
+      h = ptys->get_output_handle_cyg ();
+    }
   else
     h = cfd->get_output_handle ();
 
@@ -625,9 +630,11 @@ child_info_spawn::worker (const char *prog_arg, const char *const *argv,
 
       /* Set up needed handles for stdio */
       si.dwFlags = STARTF_USESTDHANDLES;
-      si.hStdInput = handle ((in__stdin < 0 ? 0 : in__stdin), false);
-      si.hStdOutput = handle ((in__stdout < 0 ? 1 : in__stdout), true);
-      si.hStdError = handle (2, true);
+      si.hStdInput = handle ((in__stdin < 0 ? 0 : in__stdin), false,
+			     iscygwin ());
+      si.hStdOutput = handle ((in__stdout < 0 ? 1 : in__stdout), true,
+			      iscygwin ());
+      si.hStdError = handle (2, true, iscygwin ());
 
       si.cb = sizeof (si);
 
