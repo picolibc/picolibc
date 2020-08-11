@@ -126,7 +126,7 @@ foreach target : targets
 	 env: ['MESON_SOURCE_ROOT=' + meson.source_root()])
   endif
 
-  plain_tests = ['rand', 'regex', 'ungetc', 'fenv', 'math_errhandling']
+  plain_tests = ['rand', 'regex', 'ungetc', 'fenv', 'math_errhandling', 'malloc']
 
   foreach t1 : plain_tests
     t1_src = t1 + '.c'
