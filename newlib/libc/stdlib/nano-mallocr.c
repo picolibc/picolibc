@@ -445,7 +445,7 @@ void nano_cfree(RARG void * ptr)
  * Implement calloc simply by calling malloc and set zero */
 void * nano_calloc(RARG malloc_size_t n, malloc_size_t elem)
 {
-    ptrdiff_t bytes;
+    malloc_size_t bytes;
     void * mem;
 
     if (__builtin_mul_overflow (n, elem, &bytes))
@@ -453,7 +453,7 @@ void * nano_calloc(RARG malloc_size_t n, malloc_size_t elem)
         RERRNO = ENOMEM;
         return NULL;
     }
-    mem = nano_malloc(bytes);
+    mem = nano_malloc(RCALL bytes);
     if (mem != NULL) memset(mem, 0, bytes);
     return mem;
 }
