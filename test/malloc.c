@@ -37,6 +37,7 @@
 #include <stdlib.h>
 #include <errno.h>
 #include <string.h>
+#include <malloc.h>
 
 #pragma GCC diagnostic ignored "-Walloc-size-larger-than="
 
@@ -53,8 +54,14 @@ main(void)
 		printf("malloc(0) failed: %s\n", strerror(errno));
 		result++;
 	}
-	if (r)
-		free(r);
+	free(r);
+
+	r = memalign(128, 237);
+	if ((uintptr_t) r & 127) {
+		printf("memalign(128, 237) unaligned (%p)\n", r);
+		result++;
+	}
+	free(r);
 
 	errno = 0;
 	r = malloc(SIZE_MAX);
