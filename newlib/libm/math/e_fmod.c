@@ -18,7 +18,7 @@
 /* __ieee754_remainder is provided by libgcc and presumably is faster
    then original implementation */
 
-#ifndef __XTENSA__
+#if !defined(__XTENSA__) && !defined(__riscv)
 
 extern double __ieee754_remainder(double x, double y);
 

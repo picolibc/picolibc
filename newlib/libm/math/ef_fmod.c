@@ -18,7 +18,7 @@
 /* __ieee754_remainderf is provided by libgcc and presumably is faster
    then original implementation */
 
-#ifndef __XTENSA__
+#if !defined(__XTENSA__) && !defined(__riscv)
 
 extern float __ieee754_remainderf(float x, float y);
 

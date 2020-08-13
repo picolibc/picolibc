@@ -17,7 +17,7 @@
 
 /* __ieee754_remainderf is provided by libgcc */
 
-#ifdef __XTENSA__
+#if defined(__XTENSA__) || defined(__riscv)
 
 #ifdef __STDC__
 static const float zero = 0.0;
@@ -71,4 +71,4 @@ static float zero = 0.0;
 	return x;
 }
 
-#endif /* __XTENSA__ */
+#endif /* __XTENSA__ || __riscv*/
