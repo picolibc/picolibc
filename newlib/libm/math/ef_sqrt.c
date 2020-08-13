@@ -28,7 +28,7 @@ static	const float	one	= 1.0, tiny=1.0e-30;
 static	float	one	= 1.0, tiny=1.0e-30;
 #endif
 
-#if !XCHAL_HAVE_FP_SQRT
+#if !XCHAL_HAVE_FP_SQRT || defined(__riscv)
 
 #ifdef __STDC__
 	float __ieee754_sqrtf(float x)
@@ -97,5 +97,5 @@ static	float	one	= 1.0, tiny=1.0e-30;
 	return z;
 }
 
-#endif /* !XCHAL_HAVE_FP_SQRT */
+#endif /* !XCHAL_HAVE_FP_SQRT || __riscv*/
 
