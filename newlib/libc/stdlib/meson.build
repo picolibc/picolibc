@@ -189,8 +189,12 @@ endif
 
 if newlib_nano_malloc
   srcs_stdlib += nano_malloc_srcs_stdlib
+  # malloc/free code deal with compiler optimizations internally
+  c_args_malloc = []
 else
   srcs_stdlib += std_malloc_srcs_stdlib
+  # Work around compiler optimizing calls involving malloc/free
+  c_args_malloc = ['-fno-builtin-malloc', '-fno-builtin-free']
 endif
 
 hdrs_stdlib = [
@@ -214,5 +218,5 @@ foreach target : targets
 			srcs_stdlib,
 			pic: false,
 			include_directories: inc,
-			c_args: value[1] + ['-DINTERNAL_NEWLIB']))
+			c_args: value[1] + ['-DINTERNAL_NEWLIB'] + c_args_malloc))
 endforeach
