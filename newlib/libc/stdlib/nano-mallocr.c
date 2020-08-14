@@ -466,6 +466,7 @@ void * nano_realloc(RARG void * ptr, malloc_size_t size)
 {
     void * mem;
     chunk * p_to_realloc;
+    malloc_size_t old_size;
 
     if (ptr == NULL) return nano_malloc(RCALL size);
 
@@ -477,13 +478,14 @@ void * nano_realloc(RARG void * ptr, malloc_size_t size)
 
     /* TODO: There is chance to shrink the chunk if newly requested
      * size is much small */
-    if (nano_malloc_usable_size(RCALL ptr) >= size)
+    old_size = nano_malloc_usable_size(RCALL ptr);
+    if (old_size >= size)
       return ptr;
 
     mem = nano_malloc(RCALL size);
     if (mem != NULL)
     {
-        memcpy(mem, ptr, size);
+        memcpy(mem, ptr, old_size);
         nano_free(RCALL ptr);
     }
     return mem;
