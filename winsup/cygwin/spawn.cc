@@ -628,6 +628,18 @@ child_info_spawn::worker (const char *prog_arg, const char *const *argv,
 	    }
 	}
 
+      if (!iscygwin ())
+	{
+	  cfd.rewind ();
+	  while (cfd.next () >= 0)
+	    if (cfd->get_major () == DEV_PTYS_MAJOR)
+	      {
+		fhandler_pty_slave *ptys =
+		  (fhandler_pty_slave *)(fhandler_base *) cfd;
+		ptys->setup_locale ();
+	      }
+	}
+
       /* Set up needed handles for stdio */
       si.dwFlags = STARTF_USESTDHANDLES;
       si.hStdInput = handle ((in__stdin < 0 ? 0 : in__stdin), false,

@@ -2852,6 +2852,9 @@ get_langinfo (char *locale_out, char *charset_out)
 void
 fhandler_pty_slave::setup_locale (void)
 {
+  if (get_ttyp ()->term_code_page != 0)
+    return;
+
   char locale[ENCODING_LEN + 1] = "C";
   char charset[ENCODING_LEN + 1] = "ASCII";
   LCID lcid = get_langinfo (locale, charset);
@@ -2983,10 +2986,6 @@ fhandler_pty_slave::fixup_after_fork (HANDLE parent)
   // fork_fixup (parent, inuse, "inuse");
   // fhandler_pty_common::fixup_after_fork (parent);
   report_tty_counts (this, "inherited", "");
-
-  /* Set locale */
-  if (get_ttyp ()->term_code_page == 0)
-    setup_locale ();
 }
 
 void
@@ -3023,6 +3022,9 @@ fhandler_pty_slave::fixup_after_exec ()
 	  free_attached_console ();
 	}
     }
+
+  /* Set locale */
+  setup_locale ();
 
   /* Hook Console API */
   if (get_pseudo_console ())
