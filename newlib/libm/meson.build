@@ -59,7 +59,7 @@ if libm_machine_dirs.has_key(host_cpu_family)
   libm_machine_dir = join_paths('machine', libm_machine_dirs[host_cpu_family])
   libdirs = [libm_machine_dir] + libdirs
   libnames = ['machine'] + libnames
-  if run_command('test', '-f', join_paths(libm_machine_dir, 'fegetenv.c')).returncode() == 0 or run_command('test', '-f', join_paths(libm_machine_dir, 'fenv.c')).returncode() == 0 
+  if run_command('ls', join_paths(libm_machine_dir, 'fegetenv.c')).returncode() == 0 or run_command('ls', join_paths(libm_machine_dir, 'fenv.c')).returncode() == 0 
     need_generic_fenv = false
   endif
 else

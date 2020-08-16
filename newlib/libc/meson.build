@@ -130,7 +130,7 @@ need_generic_fenv_h = true
 if machine_dirs.has_key(host_cpu_family)
   machine_dir = join_paths('machine', machine_dirs[host_cpu_family])
   fenv_file_check = join_paths(machine_dir, 'sys', 'fenv.h')
-  if run_command('test', '-f', fenv_file_check).returncode() == 0
+  if run_command('ls', fenv_file_check).returncode() == 0
     need_generic_fenv_h = false
   else
     need_generic_fenv_h = true
@@ -138,7 +138,7 @@ if machine_dirs.has_key(host_cpu_family)
 
   machine_inc_dir = join_paths(machine_dir, 'include')
 
-  if run_command('test', '-d', machine_inc_dir).returncode() == 0
+  if run_command('ls', machine_inc_dir).returncode() == 0
     inc = [include_directories(machine_inc_dir), inc]
   endif
 
