@@ -356,15 +356,21 @@ no_insert:
     MALLOC_UNLOCK;
 }
 #ifdef HAVE_ALIAS_ATTRIBUTE
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wmissing-attributes"
 __strong_reference(free, __malloc_free);
+__strong_reference(free, cfree);
+#pragma GCC diagnostic pop
 #endif
 #endif /* DEFINE_FREE */
 
 #ifdef DEFINE_CFREE
+#ifndef HAVE_ALIAS_ATTRIBUTE
 void cfree(void * ptr)
 {
     free(ptr);
 }
+#endif
 #endif /* DEFINE_CFREE */
 
 #ifdef DEFINE_CALLOC
