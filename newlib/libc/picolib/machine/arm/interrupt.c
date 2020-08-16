@@ -95,7 +95,7 @@ __weak_reference(__weak_interrupt_vector, __interrupt_vector);
 
 void arm_halt_isr(void);
 
-void __attribute__((naked)) __section(".init") __attribute__((noreturn))
+void __attribute__((naked)) __section(".init")
 arm_halt_vector(void)
 {
 	/* Loop forever. */
