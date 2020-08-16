@@ -124,5 +124,7 @@ main(void)
 		}
 	}
 
+	malloc_stats();
+
 	return result;
 }
