@@ -39,13 +39,13 @@ uintptr_t
 sys_semihost_read(int fd, void *buf, size_t count)
 {
 	struct {
-		uintptr_t	field1;
-		uintptr_t	field2;
-		uintptr_t	field3;
+		sh_param_t	field1;
+		sh_param_t	field2;
+		sh_param_t	field3;
 	} arg = {
 		.field1 = fd,
-		.field2 = (uintptr_t) buf,
-		.field3 = (uintptr_t) count
+		.field2 = (sh_param_t) (uintptr_t) buf,
+		.field3 = (sh_param_t) count
 	};
 
 	return sys_semihost(SYS_READ, (uintptr_t) &arg);

@@ -91,6 +91,12 @@
 #define SHFB_MAGIC_2	0x46
 #define SHFB_MAGIC_3	0x42
 
+#ifdef __aarch64__
+typedef unsigned long long int sh_param_t;
+#else
+typedef uintptr_t sh_param_t;
+#endif
+
 uintptr_t
 sys_semihost(uintptr_t op, uintptr_t param);
 
