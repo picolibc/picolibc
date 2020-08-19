@@ -231,6 +231,8 @@ float wcstof_l (const wchar_t *, wchar_t **, locale_t);
 long double wcstold_l (const wchar_t *, wchar_t **, locale_t);
 #endif
 
+#ifndef TINY_STDIO
+
 wint_t fgetwc (__FILE *);
 wchar_t *fgetws (wchar_t *__restrict, int, __FILE *__restrict);
 wint_t fputwc (wchar_t, __FILE *);
@@ -243,6 +245,8 @@ wint_t getwchar (void);
 wint_t putwc (wchar_t, __FILE *);
 wint_t putwchar (wchar_t);
 wint_t ungetwc (wint_t wc, __FILE *);
+
+struct _reent;
 
 wint_t _fgetwc_r (struct _reent *, __FILE *);
 wint_t _fgetwc_unlocked_r (struct _reent *, __FILE *);
@@ -336,6 +340,8 @@ int	_wscanf_r (struct _reent *, const wchar_t *, ...);
 #define getwchar_unlocked()	fgetwc_unlocked(stdin)
 #define putwchar_unlocked(wc)	fputwc_unlocked((wc), stdout)
 #endif
+
+#endif /* !TINY_STDIO */
 
 _END_STD_C
 
