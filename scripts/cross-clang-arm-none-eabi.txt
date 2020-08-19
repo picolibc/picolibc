@@ -1,0 +1,16 @@
+[binaries]
+c = ['clang', '-target', 'thumbv7m-none-eabi' ]
+ar = 'arm-none-eabi-ar'
+as = 'arm-none-eab-as'
+strip = 'arm-none-eabi-strip'
+exe_wrapper = ['sh', '-c', 'test -z "$MESON_SOURCE_ROOT" || "$MESON_SOURCE_ROOT"/run-arm "$@"', 'run-arm']
+
+[host_machine]
+system = 'none'
+cpu_family = 'arm'
+cpu = 'arm'
+endian = 'little'
+
+[properties]
+c_args = [ '-nostdlib']
+needs_exe_wrapper = true

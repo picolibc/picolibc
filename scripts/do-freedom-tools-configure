@@ -1,0 +1,13 @@
+#!/bin/sh
+ARCH=riscv64-unknown-elf
+DIR=`dirname $0`
+SYSROOT=`freedom-tools ${ARCH}-gcc -print-sysroot`
+PREFIX=`readlink -f "$SYSROOT"`
+echo SYSROOT $SYSROOT PREFIX $PREFIX
+freedom-tools meson "$DIR" \
+	-Dincludedir=picolibc/$ARCH/include \
+	-Dlibdir=picolibc/$ARCH/lib \
+	-Dprefix="$PREFIX" \
+	-Dsysroot-install=true \
+	--cross-file "$DIR"/cross-$ARCH.txt \
+	"$@"
