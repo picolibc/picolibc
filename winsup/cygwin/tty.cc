@@ -234,20 +234,14 @@ tty::init ()
   was_opened = false;
   master_pid = 0;
   is_console = false;
-  attach_pcon_in_fork = false;
-  h_pseudo_console = NULL;
   column = 0;
+  h_pseudo_console = NULL;
   switch_to_pcon_in = false;
-  switch_to_pcon_out = false;
-  screen_alternated = false;
   mask_switch_to_pcon_in = false;
   pcon_pid = 0;
   term_code_page = 0;
-  need_redraw_screen = true;
   pcon_last_time = 0;
-  pcon_in_empty = true;
-  req_transfer_input_to_pcon = false;
-  req_flush_pcon_input = false;
+  pcon_start = false;
 }
 
 HANDLE
@@ -291,16 +285,6 @@ tty_min::ttyname ()
   device d;
   d.parse (ntty);
   return d.name ();
-}
-
-void
-tty::set_switch_to_pcon_out (bool v)
-{
-  if (switch_to_pcon_out != v)
-    {
-      wait_pcon_fwd ();
-      switch_to_pcon_out = v;
-    }
 }
 
 void

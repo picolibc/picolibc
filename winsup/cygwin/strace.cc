@@ -264,7 +264,6 @@ strace::vprntf (unsigned category, const char *func, const char *fmt, va_list ap
   if (category & _STRACE_SYSTEM)
     {
       DWORD done;
-      set_ishybrid_and_switch_to_pcon (GetStdHandle (STD_ERROR_HANDLE));
       WriteFile (GetStdHandle (STD_ERROR_HANDLE), buf, len, &done, 0);
       FlushFileBuffers (GetStdHandle (STD_ERROR_HANDLE));
       /* Make sure that the message shows up on the screen, too, since this is
@@ -276,7 +275,6 @@ strace::vprntf (unsigned category, const char *func, const char *fmt, va_list ap
 				 &sec_none, OPEN_EXISTING, 0, 0);
 	  if (h != INVALID_HANDLE_VALUE)
 	    {
-	      set_ishybrid_and_switch_to_pcon (h);
 	      WriteFile (h, buf, len, &done, 0);
 	      CloseHandle (h);
 	    }

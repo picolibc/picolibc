@@ -1215,8 +1215,7 @@ verify_tty_slave (select_record *me, fd_set *readfds, fd_set *writefds,
 	   fd_set *exceptfds)
 {
   fhandler_pty_slave *ptys = (fhandler_pty_slave *) me->fh;
-  if (me->read_selected && !ptys->to_be_read_from_pcon () &&
-      IsEventSignalled (ptys->input_available_event))
+  if (me->read_selected && IsEventSignalled (ptys->input_available_event))
     me->read_ready = true;
   return set_bits (me, readfds, writefds, exceptfds);
 }
@@ -1229,8 +1228,6 @@ peek_pty_slave (select_record *s, bool from_select)
   fhandler_pty_slave *ptys = (fhandler_pty_slave *) fh;
 
   ptys->reset_switch_to_pcon ();
-  if (ptys->to_be_read_from_pcon ())
-    ptys->update_pcon_input_state (true);
 
   if (s->read_selected)
     {

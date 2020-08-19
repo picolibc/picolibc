@@ -25,7 +25,6 @@ details. */
 #include "child_info.h"
 #include <asm/socket.h>
 #include "cygwait.h"
-#include "tls_pbuf.h"
 #include "registry.h"
 
 #ifndef PROC_THREAD_ATTRIBUTE_PSEUDOCONSOLE
@@ -33,7 +32,6 @@ details. */
 #endif /* PROC_THREAD_ATTRIBUTE_PSEUDOCONSOLE */
 
 extern "C" int sscanf (const char *, const char *, ...);
-extern "C" int ttyname_r (int, char*, size_t);
 
 extern "C" {
   HRESULT WINAPI CreatePseudoConsole (COORD, HANDLE, HANDLE, DWORD, HPCON *);
@@ -60,20 +58,10 @@ struct pipe_reply {
   DWORD error;
 };
 
-static int pcon_attached_to = -1;
 static bool isHybrid;
-static bool do_not_reset_switch_to_pcon;
-static bool freeconsole_on_close = true;
-static tty *last_ttyp = NULL;
-
-void
-clear_pcon_attached_to (void)
-{
-  pcon_attached_to = -1;
-}
 
 static void
-set_switch_to_pcon (void)
+set_switch_to_pcon (HANDLE h)
 {
   cygheap_fdenum cfd (false);
   int fd;
@@ -82,280 +70,17 @@ set_switch_to_pcon (void)
       {
 	fhandler_base *fh = cfd;
 	fhandler_pty_slave *ptys = (fhandler_pty_slave *) fh;
-	if (ptys->get_pseudo_console ())
-	  {
-	    ptys->set_switch_to_pcon (fd);
-	    ptys->trigger_redraw_screen ();
-	    DWORD mode =
-	      ENABLE_PROCESSED_INPUT | ENABLE_LINE_INPUT | ENABLE_ECHO_INPUT;
-	    SetConsoleMode (ptys->get_handle (), mode);
-	  }
+	if (h == ptys->get_handle ())
+	  ptys->set_switch_to_pcon ();
 	return;
       }
-  /* No pty slave opened */
-  if (last_ttyp) /* Make system_printf() work after closing pty slave */
-    last_ttyp->set_switch_to_pcon_out (true);
-}
-
-static void
-force_attach_to_pcon (HANDLE h)
-{
-  bool attach_done = false;
-  for (int n = 0; n < 2; n ++)
-    {
-      /* First time, attach to the pty whose handle value is match.
-	 Second time, try to attach to any pty. */
-      cygheap_fdenum cfd (false);
-      while (cfd.next () >= 0)
-	if (cfd->get_major () == DEV_PTYS_MAJOR)
-	  {
-	    fhandler_base *fh = cfd;
-	    fhandler_pty_slave *ptys = (fhandler_pty_slave *) fh;
-	    if (!ptys->get_pseudo_console ())
-	      continue;
-	    if (n != 0
-		|| h == ptys->get_handle ()
-		|| h == ptys->get_output_handle ())
-	      {
-		if (fhandler_console::get_console_process_id
-				  (ptys->get_helper_process_id (), true))
-		  attach_done = true;
-		else
-		  {
-		    FreeConsole ();
-		    if (AttachConsole (ptys->get_helper_process_id ()))
-		      {
-			pcon_attached_to = ptys->get_minor ();
-			attach_done = true;
-		      }
-		    else
-		      pcon_attached_to = -1;
-		  }
-		break;
-	      }
-	  }
-	else if (cfd->get_major () == DEV_CONS_MAJOR)
-	  {
-	    fhandler_base *fh = cfd;
-	    fhandler_console *cons = (fhandler_console *) fh;
-	    if (n != 0
-		|| h == cons->get_handle ()
-		|| h == cons->get_output_handle ())
-	      {
-		/* If the process is running on a console,
-		   the parent process should be attached
-		   to the same console. */
-		DWORD attach_wpid;
-		if (myself->ppid == 1)
-		  attach_wpid = ATTACH_PARENT_PROCESS;
-		else
-		  {
-		    pinfo p (myself->ppid);
-		    attach_wpid = p->dwProcessId;
-		  }
-		FreeConsole ();
-		if (AttachConsole (attach_wpid))
-		  {
-		    pcon_attached_to = -1;
-		    attach_done = true;
-		  }
-		else
-		  pcon_attached_to = -1;
-		break;
-	      }
-	  }
-      if (attach_done)
-	break;
-    }
-}
-
-void
-set_ishybrid_and_switch_to_pcon (HANDLE h)
-{
-  if (GetFileType (h) == FILE_TYPE_CHAR)
-    {
-      force_attach_to_pcon (h);
-      DWORD dummy;
-      if (!isHybrid && (GetConsoleMode (h, &dummy)
-			|| GetLastError () != ERROR_INVALID_HANDLE))
-	{
-	  isHybrid = true;
-	  set_switch_to_pcon ();
-	}
-    }
-}
-
-inline void
-fhandler_pty_slave::free_attached_console ()
-{
-  bool attached = get_ttyp () ?
-    fhandler_console::get_console_process_id (get_helper_process_id (), true)
-    : (get_minor () == pcon_attached_to);
-  if (freeconsole_on_close && attached)
-    {
-      FreeConsole ();
-      pcon_attached_to = -1;
-    }
 }
 
 #define DEF_HOOK(name) static __typeof__ (name) *name##_Orig
-DEF_HOOK (WriteFile);
-DEF_HOOK (WriteConsoleA);
-DEF_HOOK (WriteConsoleW);
-DEF_HOOK (ReadFile);
-DEF_HOOK (ReadConsoleA);
-DEF_HOOK (ReadConsoleW);
-DEF_HOOK (WriteConsoleOutputA);
-DEF_HOOK (WriteConsoleOutputW);
-DEF_HOOK (WriteConsoleOutputCharacterA);
-DEF_HOOK (WriteConsoleOutputCharacterW);
-DEF_HOOK (WriteConsoleOutputAttribute);
-DEF_HOOK (SetConsoleCursorPosition);
-DEF_HOOK (SetConsoleTextAttribute);
-DEF_HOOK (WriteConsoleInputA);
-DEF_HOOK (WriteConsoleInputW);
-DEF_HOOK (ReadConsoleInputA);
-DEF_HOOK (ReadConsoleInputW);
-DEF_HOOK (PeekConsoleInputA);
-DEF_HOOK (PeekConsoleInputW);
 /* CreateProcess() is hooked for GDB etc. */
 DEF_HOOK (CreateProcessA);
 DEF_HOOK (CreateProcessW);
 
-static BOOL WINAPI
-WriteFile_Hooked
-     (HANDLE h, LPCVOID p, DWORD l, LPDWORD n, LPOVERLAPPED o)
-{
-  set_ishybrid_and_switch_to_pcon (h);
-  return WriteFile_Orig (h, p, l, n, o);
-}
-static BOOL WINAPI
-WriteConsoleA_Hooked
-     (HANDLE h, LPCVOID p, DWORD l, LPDWORD n, LPVOID o)
-{
-  set_ishybrid_and_switch_to_pcon (h);
-  return WriteConsoleA_Orig (h, p, l, n, o);
-}
-static BOOL WINAPI
-WriteConsoleW_Hooked
-     (HANDLE h, LPCVOID p, DWORD l, LPDWORD n, LPVOID o)
-{
-  set_ishybrid_and_switch_to_pcon (h);
-  return WriteConsoleW_Orig (h, p, l, n, o);
-}
-static BOOL WINAPI
-ReadFile_Hooked
-     (HANDLE h, LPVOID p, DWORD l, LPDWORD n, LPOVERLAPPED o)
-{
-  set_ishybrid_and_switch_to_pcon (h);
-  return ReadFile_Orig (h, p, l, n, o);
-}
-static BOOL WINAPI
-ReadConsoleA_Hooked
-     (HANDLE h, LPVOID p, DWORD l, LPDWORD n, LPVOID o)
-{
-  set_ishybrid_and_switch_to_pcon (h);
-  return ReadConsoleA_Orig (h, p, l, n, o);
-}
-static BOOL WINAPI
-ReadConsoleW_Hooked
-     (HANDLE h, LPVOID p, DWORD l, LPDWORD n, LPVOID o)
-{
-  set_ishybrid_and_switch_to_pcon (h);
-  return ReadConsoleW_Orig (h, p, l, n, o);
-}
-static BOOL WINAPI
-WriteConsoleOutputA_Hooked
-     (HANDLE h, CONST CHAR_INFO *p, COORD s, COORD c, PSMALL_RECT r)
-{
-  set_ishybrid_and_switch_to_pcon (h);
-  return WriteConsoleOutputA_Orig (h, p, s, c, r);
-}
-static BOOL WINAPI
-WriteConsoleOutputW_Hooked
-     (HANDLE h, CONST CHAR_INFO *p, COORD s, COORD c, PSMALL_RECT r)
-{
-  set_ishybrid_and_switch_to_pcon (h);
-  return WriteConsoleOutputW_Orig (h, p, s, c, r);
-}
-static BOOL WINAPI
-WriteConsoleOutputCharacterA_Hooked
-     (HANDLE h, LPCSTR p, DWORD l, COORD c, LPDWORD n)
-{
-  set_ishybrid_and_switch_to_pcon (h);
-  return WriteConsoleOutputCharacterA_Orig (h, p, l, c, n);
-}
-static BOOL WINAPI
-WriteConsoleOutputCharacterW_Hooked
-     (HANDLE h, LPCWSTR p, DWORD l, COORD c, LPDWORD n)
-{
-  set_ishybrid_and_switch_to_pcon (h);
-  return WriteConsoleOutputCharacterW_Orig (h, p, l, c, n);
-}
-static BOOL WINAPI
-WriteConsoleOutputAttribute_Hooked
-     (HANDLE h, CONST WORD *a, DWORD l, COORD c, LPDWORD n)
-{
-  set_ishybrid_and_switch_to_pcon (h);
-  return WriteConsoleOutputAttribute_Orig (h, a, l, c, n);
-}
-static BOOL WINAPI
-SetConsoleCursorPosition_Hooked
-     (HANDLE h, COORD c)
-{
-  set_ishybrid_and_switch_to_pcon (h);
-  return SetConsoleCursorPosition_Orig (h, c);
-}
-static BOOL WINAPI
-SetConsoleTextAttribute_Hooked
-     (HANDLE h, WORD a)
-{
-  set_ishybrid_and_switch_to_pcon (h);
-  return SetConsoleTextAttribute_Orig (h, a);
-}
-static BOOL WINAPI
-WriteConsoleInputA_Hooked
-     (HANDLE h, CONST INPUT_RECORD *r, DWORD l, LPDWORD n)
-{
-  set_ishybrid_and_switch_to_pcon (h);
-  return WriteConsoleInputA_Orig (h, r, l, n);
-}
-static BOOL WINAPI
-WriteConsoleInputW_Hooked
-     (HANDLE h, CONST INPUT_RECORD *r, DWORD l, LPDWORD n)
-{
-  set_ishybrid_and_switch_to_pcon (h);
-  return WriteConsoleInputW_Orig (h, r, l, n);
-}
-static BOOL WINAPI
-ReadConsoleInputA_Hooked
-     (HANDLE h, PINPUT_RECORD r, DWORD l, LPDWORD n)
-{
-  set_ishybrid_and_switch_to_pcon (h);
-  return ReadConsoleInputA_Orig (h, r, l, n);
-}
-static BOOL WINAPI
-ReadConsoleInputW_Hooked
-     (HANDLE h, PINPUT_RECORD r, DWORD l, LPDWORD n)
-{
-  set_ishybrid_and_switch_to_pcon (h);
-  return ReadConsoleInputW_Orig (h, r, l, n);
-}
-static BOOL WINAPI
-PeekConsoleInputA_Hooked
-     (HANDLE h, PINPUT_RECORD r, DWORD l, LPDWORD n)
-{
-  set_ishybrid_and_switch_to_pcon (h);
-  return PeekConsoleInputA_Orig (h, r, l, n);
-}
-static BOOL WINAPI
-PeekConsoleInputW_Hooked
-     (HANDLE h, PINPUT_RECORD r, DWORD l, LPDWORD n)
-{
-  set_ishybrid_and_switch_to_pcon (h);
-  return PeekConsoleInputW_Orig (h, r, l, n);
-}
-/* CreateProcess() is hooked for GDB etc. */
 static BOOL WINAPI
 CreateProcessA_Hooked
      (LPCSTR n, LPSTR c, LPSECURITY_ATTRIBUTES pa, LPSECURITY_ATTRIBUTES ta,
@@ -363,11 +88,14 @@ CreateProcessA_Hooked
       LPSTARTUPINFOA si, LPPROCESS_INFORMATION pi)
 {
   HANDLE h;
-  if (si->dwFlags & STARTF_USESTDHANDLES)
-    h = si->hStdOutput;
-  else
-    h = GetStdHandle (STD_OUTPUT_HANDLE);
-  set_ishybrid_and_switch_to_pcon (h);
+  if (!isHybrid)
+    {
+      if (si->dwFlags & STARTF_USESTDHANDLES)
+	h = si->hStdInput;
+      else
+	h = GetStdHandle (STD_INPUT_HANDLE);
+      set_switch_to_pcon (h);
+    }
   return CreateProcessA_Orig (n, c, pa, ta, inh, f, e, d, si, pi);
 }
 static BOOL WINAPI
@@ -377,11 +105,14 @@ CreateProcessW_Hooked
       LPSTARTUPINFOW si, LPPROCESS_INFORMATION pi)
 {
   HANDLE h;
-  if (si->dwFlags & STARTF_USESTDHANDLES)
-    h = si->hStdOutput;
-  else
-    h = GetStdHandle (STD_OUTPUT_HANDLE);
-  set_ishybrid_and_switch_to_pcon (h);
+  if (!isHybrid)
+    {
+      if (si->dwFlags & STARTF_USESTDHANDLES)
+	h = si->hStdInput;
+      else
+	h = GetStdHandle (STD_INPUT_HANDLE);
+      set_switch_to_pcon (h);
+    }
   return CreateProcessW_Orig (n, c, pa, ta, inh, f, e, d, si, pi);
 }
 
@@ -464,10 +195,6 @@ fhandler_pty_master::flush_to_slave ()
 {
   if (get_readahead_valid () && !(get_ttyp ()->ti.c_lflag & ICANON))
     accept_input ();
-  WaitForSingleObject (input_mutex, INFINITE);
-  if (!get_ttyp ()->pcon_in_empty && !(get_ttyp ()->ti.c_lflag & ICANON))
-    SetEvent (input_available_event);
-  ReleaseMutex (input_mutex);
 }
 
 DWORD
@@ -533,14 +260,6 @@ fhandler_pty_master::doecho (const void *str, DWORD len)
 }
 
 int
-fhandler_pty_master::put_readahead (char value)
-{
-  if (to_be_read_from_pcon ())
-    return 1;
-  return fhandler_base::put_readahead (value);
-}
-
-int
 fhandler_pty_master::accept_input ()
 {
   DWORD bytes_left;
@@ -551,9 +270,11 @@ fhandler_pty_master::accept_input ()
   char *p = rabuf () + raixget ();
   bytes_left = eat_readahead (-1);
 
+  HANDLE write_to = get_output_handle ();
   if (to_be_read_from_pcon ())
-    ; /* Do nothing */
-  else if (!bytes_left)
+    write_to = to_slave;
+
+  if (!bytes_left)
     {
       termios_printf ("sending EOF to slave");
       get_ttyp ()->read_retval = 0;
@@ -564,10 +285,10 @@ fhandler_pty_master::accept_input ()
       DWORD written = 0;
 
       paranoid_printf ("about to write %u chars to slave", bytes_left);
-      rc = WriteFile (get_output_handle (), p, bytes_left, &written, NULL);
+      rc = WriteFile (write_to, p, bytes_left, &written, NULL);
       if (!rc)
 	{
-	  debug_printf ("error writing to pipe %p %E", get_output_handle ());
+	  debug_printf ("error writing to pipe %p %E", write_to);
 	  get_ttyp ()->read_retval = -1;
 	  ret = -1;
 	}
@@ -725,50 +446,10 @@ out:
 
 fhandler_pty_slave::fhandler_pty_slave (int unit)
   : fhandler_pty_common (), inuse (NULL), output_handle_cyg (NULL),
-  io_handle_cyg (NULL), pid_restore (0), fd (-1)
+  io_handle_cyg (NULL)
 {
   if (unit >= 0)
     dev ().parse (DEV_PTYS_MAJOR, unit);
-}
-
-fhandler_pty_slave::~fhandler_pty_slave ()
-{
-  if (!get_ttyp ())
-    {
-      /* Why comes here? Who clears _tc? */
-      free_attached_console ();
-      return;
-    }
-  if (get_pseudo_console ())
-    {
-      int used = 0;
-      int attached = 0;
-      cygheap_fdenum cfd (false);
-      while (cfd.next () >= 0)
-	{
-	  if (cfd->get_major () == DEV_PTYS_MAJOR ||
-	      cfd->get_major () == DEV_CONS_MAJOR)
-	    used ++;
-	  if (cfd->get_major () == DEV_PTYS_MAJOR &&
-	      cfd->get_minor () == pcon_attached_to)
-	    attached ++;
-	}
-
-      /* Call FreeConsole() if no tty is opened and the process
-	 is attached to console corresponding to tty. This is
-	 needed to make GNU screen and tmux work in Windows 10
-	 1903. */
-      if (attached == 0)
-	{
-	  pcon_attached_to = -1;
-	  last_ttyp = get_ttyp ();
-	}
-      if (used == 0)
-	{
-	  init_console_handler (false);
-	  free_attached_console ();
-	}
-    }
 }
 
 int
@@ -833,8 +514,8 @@ fhandler_pty_slave::open (int flags, mode_t)
     release_output_mutex ();
   }
 
-  if (!get_ttyp ()->from_master () || !get_ttyp ()->from_master_cyg () ||
-      !get_ttyp ()->to_master () || !get_ttyp ()->to_master_cyg ())
+  if (!get_ttyp ()->from_master () || !get_ttyp ()->from_master_cyg ()
+      || !get_ttyp ()->to_master () || !get_ttyp ()->to_master_cyg ())
     {
       errmsg = "pty handles have been closed";
       set_errno (EACCES);
@@ -923,8 +604,8 @@ fhandler_pty_slave::open (int flags, mode_t)
       from_master_cyg_local = repl.from_master_cyg;
       to_master_local = repl.to_master;
       to_master_cyg_local = repl.to_master_cyg;
-      if (!from_master_local || !from_master_cyg_local ||
-	  !to_master_local || !to_master_cyg_local)
+      if (!from_master_local || !from_master_cyg_local
+	  || !to_master_local || !to_master_cyg_local)
 	{
 	  SetLastError (repl.error);
 	  errmsg = "error duplicating pipes, %E";
@@ -950,24 +631,7 @@ fhandler_pty_slave::open (int flags, mode_t)
   set_output_handle (to_master_local);
   set_output_handle_cyg (to_master_cyg_local);
 
-  if (!get_pseudo_console ())
-    {
-      fhandler_console::need_invisible ();
-      pcon_attached_to = -1;
-    }
-  else if (!fhandler_console::get_console_process_id
-			       (GetCurrentProcessId (), true))
-    {
-      fhandler_console::need_invisible ();
-      pcon_attached_to = -1;
-    }
-  else if (fhandler_console::get_console_process_id
-			       (get_helper_process_id (), true))
-    /* Attached to pcon of this pty */
-    {
-      pcon_attached_to = get_minor ();
-      init_console_handler (true);
-    }
+  fhandler_console::need_invisible ();
 
   set_open_status ();
   return 1;
@@ -1021,8 +685,7 @@ fhandler_pty_slave::close ()
   if (!ForceCloseHandle (get_handle_cyg ()))
     termios_printf ("CloseHandle (get_handle_cyg ()<%p>), %E",
 	get_handle_cyg ());
-  if (!get_pseudo_console () &&
-      (unsigned) myself->ctty == FHDEV (DEV_PTYS_MAJOR, get_minor ()))
+  if ((unsigned) myself->ctty == FHDEV (DEV_PTYS_MAJOR, get_minor ()))
     fhandler_console::free_console ();	/* assumes that we are the last pty closer */
   fhandler_pty_common::close ();
   if (!ForceCloseHandle (output_mutex))
@@ -1070,423 +733,31 @@ fhandler_pty_slave::init (HANDLE h, DWORD a, mode_t)
   return ret;
 }
 
-bool
-fhandler_pty_slave::try_reattach_pcon (void)
-{
-  pid_restore = 0;
-
-  /* Do not detach from the console because re-attaching will
-     fail if helper process is running as service account. */
-  if (get_ttyp()->attach_pcon_in_fork)
-    return false;
-  if (pcon_attached_to >= 0 &&
-      cygwin_shared->tty[pcon_attached_to]->attach_pcon_in_fork)
-    return false;
-
-  pid_restore =
-    fhandler_console::get_console_process_id (GetCurrentProcessId (),
-					      false);
-  /* If pid_restore is not set, give up. */
-  if (!pid_restore)
-    return false;
-
-  FreeConsole ();
-  if (!AttachConsole (get_helper_process_id ()))
-    {
-      system_printf ("pty%d: AttachConsole(helper=%d) failed. 0x%08lx",
-		     get_minor (), get_helper_process_id (), GetLastError ());
-      return false;
-    }
-  return true;
-}
-
 void
-fhandler_pty_slave::restore_reattach_pcon (void)
+fhandler_pty_slave::set_switch_to_pcon (void)
 {
-  if (pid_restore)
+  if (!get_ttyp ()->switch_to_pcon_in)
     {
-      FreeConsole ();
-      if (!AttachConsole (pid_restore))
-	{
-	  system_printf ("pty%d: AttachConsole(restore=%d) failed. 0x%08lx",
-			 get_minor (), pid_restore, GetLastError ());
-	  pcon_attached_to = -1;
-	}
-    }
-  pid_restore = 0;
-}
-
-/* This function requests transfering the input data from the input
-   pipe for cygwin apps to the other input pipe for native apps. */
-void
-fhandler_pty_slave::pull_pcon_input (void)
-{
-  get_ttyp ()->req_transfer_input_to_pcon = true;
-  while (get_ttyp ()->req_transfer_input_to_pcon)
-    Sleep (1);
-}
-
-void
-fhandler_pty_slave::update_pcon_input_state (bool need_lock)
-{
-  if (need_lock)
-    WaitForSingleObject (input_mutex, INFINITE);
-  /* Flush input buffer if it is requested by master.
-     This happens if ^C is pressed in pseudo console side. */
-  if (get_ttyp ()->req_flush_pcon_input)
-    {
-      FlushConsoleInputBuffer (get_handle ());
-      get_ttyp ()->req_flush_pcon_input = false;
-    }
-  /* Peek console input buffer and update state. */
-  INPUT_RECORD inp[INREC_SIZE];
-  DWORD n;
-  BOOL (WINAPI *PeekFunc)
-    (HANDLE, PINPUT_RECORD, DWORD, LPDWORD);
-  PeekFunc =
-    PeekConsoleInputA_Orig ? : PeekConsoleInput;
-  PeekFunc (get_handle (), inp, INREC_SIZE, &n);
-  bool saw_accept = false;
-  bool pipe_empty = true;
-  while (n-- > 0)
-    if (inp[n].EventType == KEY_EVENT && inp[n].Event.KeyEvent.bKeyDown &&
-	inp[n].Event.KeyEvent.uChar.AsciiChar)
-      {
-	pipe_empty = false;
-	char c = inp[n].Event.KeyEvent.uChar.AsciiChar;
-	const char sigs[] = {
-	  (char) get_ttyp ()->ti.c_cc[VINTR],
-	  (char) get_ttyp ()->ti.c_cc[VQUIT],
-	  (char) get_ttyp ()->ti.c_cc[VSUSP],
-	};
-	const char eols[] = {
-	  (char) get_ttyp ()->ti.c_cc[VEOF],
-	  (char) get_ttyp ()->ti.c_cc[VEOL],
-	  (char) get_ttyp ()->ti.c_cc[VEOL2],
-	  '\n',
-	  '\r'
-	};
-	if (is_line_input () && c && memchr (eols, c, sizeof (eols)))
-	  saw_accept = true;
-	if ((get_ttyp ()->ti.c_lflag & ISIG)
-	    && c && memchr (sigs, c, sizeof (sigs)))
-	  saw_accept = true;
-      }
-  get_ttyp ()->pcon_in_empty = pipe_empty && !(ralen () > raixget ());
-  if (!get_readahead_valid () &&
-      (pipe_empty || (is_line_input () && !saw_accept)) &&
-      get_ttyp ()->read_retval == 1 && bytes_available (n) && n == 0)
-    ResetEvent (input_available_event);
-  if (need_lock)
-    ReleaseMutex (input_mutex);
-}
-
-int
-fhandler_pty_slave::eat_readahead (int n)
-{
-  int oralen = ralen ();
-  if (n < 0)
-    n = ralen () - raixget ();
-  if (n > 0 && ralen () > raixget ())
-    {
-      const char eols[] = {
-	(char) get_ttyp ()->ti.c_cc[VEOF],
-	(char) get_ttyp ()->ti.c_cc[VEOL],
-	(char) get_ttyp ()->ti.c_cc[VEOL2],
-	'\n'
-      };
-      while (n > 0 && ralen () > raixget ())
-	{
-	  if (is_line_input () && rabuf ()[ralen ()-1]
-	      && memchr (eols, rabuf ()[ralen ()-1], sizeof (eols)))
-	    break;
-	  -- n;
-	  -- ralen ();
-	}
-
-      /* If IUTF8 is set, the terminal is in UTF-8 mode.  If so, we erase
-	 a complete UTF-8 multibyte sequence on VERASE/VWERASE.  Otherwise,
-	 if we only erase a single byte, invalid unicode chars are left in
-	 the input. */
-      if (get_ttyp ()->ti.c_iflag & IUTF8)
-	while (ralen () > raixget () &&
-	       ((unsigned char) rabuf ()[ralen ()] & 0xc0) == 0x80)
-	  --ralen ();
-    }
-  oralen = oralen - ralen ();
-  if (raixget () >= ralen ())
-    raixget () = raixput () = ralen () = 0;
-  else if (raixput () > ralen ())
-    raixput () = ralen ();
-
-  return oralen;
-}
-
-int
-fhandler_pty_slave::get_readahead_into_buffer (char *buf, size_t buflen)
-{
-  int ch;
-  int copied_chars = 0;
-
-  while (buflen)
-    if ((ch = get_readahead ()) < 0)
-      break;
-    else
-      {
-	const char eols[] = {
-	  (char) get_ttyp ()->ti.c_cc[VEOF],
-	  (char) get_ttyp ()->ti.c_cc[VEOL],
-	  (char) get_ttyp ()->ti.c_cc[VEOL2],
-	  '\n'
-	};
-	buf[copied_chars++] = (unsigned char)(ch & 0xff);
-	buflen--;
-	if (is_line_input () && ch && memchr (eols, ch & 0xff, sizeof (eols)))
-	  break;
-      }
-
-  return copied_chars;
-}
-
-bool
-fhandler_pty_slave::get_readahead_valid (void)
-{
-  if (is_line_input ())
-    {
-      const char eols[] = {
-	(char) get_ttyp ()->ti.c_cc[VEOF],
-	(char) get_ttyp ()->ti.c_cc[VEOL],
-	(char) get_ttyp ()->ti.c_cc[VEOL2],
-	'\n'
-      };
-      for (size_t i=raixget (); i<ralen (); i++)
-	if (rabuf ()[i] && memchr (eols, rabuf ()[i], sizeof (eols)))
-	  return true;
-      return false;
-    }
-  else
-    return ralen () > raixget ();
-}
-
-void
-fhandler_pty_slave::set_switch_to_pcon (int fd_set)
-{
-  if (fd < 0)
-    fd = fd_set;
-  acquire_output_mutex (INFINITE);
-  if (fd == 0 && !get_ttyp ()->switch_to_pcon_in)
-    {
-      pull_pcon_input ();
-      if (get_ttyp ()->pcon_pid == 0 ||
-	  !pinfo (get_ttyp ()->pcon_pid))
+      isHybrid = true;
+      if (get_ttyp ()->pcon_pid == 0 || !pinfo (get_ttyp ()->pcon_pid))
 	get_ttyp ()->pcon_pid = myself->pid;
       get_ttyp ()->switch_to_pcon_in = true;
-      if (isHybrid && !get_ttyp ()->switch_to_pcon_out)
-	{
-	  get_ttyp ()->wait_pcon_fwd ();
-	  get_ttyp ()->switch_to_pcon_out = true;
-	}
     }
-  else if ((fd == 1 || fd == 2) && !get_ttyp ()->switch_to_pcon_out)
-    {
-      get_ttyp ()->wait_pcon_fwd ();
-      if (get_ttyp ()->pcon_pid == 0 ||
-	  !pinfo (get_ttyp ()->pcon_pid))
-	get_ttyp ()->pcon_pid = myself->pid;
-      get_ttyp ()->switch_to_pcon_out = true;
-      if (isHybrid)
-	get_ttyp ()->switch_to_pcon_in = true;
-    }
-  release_output_mutex ();
 }
 
 void
 fhandler_pty_slave::reset_switch_to_pcon (void)
 {
-  if (get_ttyp ()->pcon_pid &&
-      get_ttyp ()->pcon_pid != myself->pid &&
-      !!pinfo (get_ttyp ()->pcon_pid))
+  if (get_ttyp ()->pcon_pid && get_ttyp ()->pcon_pid != myself->pid
+      && !!pinfo (get_ttyp ()->pcon_pid))
     /* There is a process which is grabbing pseudo console. */
     return;
   if (isHybrid)
     return;
-  if (do_not_reset_switch_to_pcon)
-    return;
-  acquire_output_mutex (INFINITE);
-  if (get_ttyp ()->switch_to_pcon_out)
-    /* Wait for pty_master_fwd_thread() */
-    get_ttyp ()->wait_pcon_fwd ();
   get_ttyp ()->pcon_pid = 0;
   get_ttyp ()->switch_to_pcon_in = false;
-  get_ttyp ()->switch_to_pcon_out = false;
-  release_output_mutex ();
-  init_console_handler (true);
-}
-
-void
-fhandler_pty_slave::push_to_pcon_screenbuffer (const char *ptr, size_t len,
-					       bool is_echo)
-{
-  bool attached =
-    !!fhandler_console::get_console_process_id (get_helper_process_id (), true);
-  if (!attached && pcon_attached_to == get_minor ())
-    {
-      for (DWORD t0 = GetTickCount (); GetTickCount () - t0 < 100; )
-	{
-	  Sleep (1);
-	  attached = fhandler_console::get_console_process_id
-				      (get_helper_process_id (), true);
-	  if (attached)
-	    break;
-	}
-      if (!attached)
-	{
-	  system_printf ("pty%d: pcon_attach_to mismatch??????", get_minor ());
-	  return;
-	}
-    }
-
-  /* If not attached to this pseudo console, try to attach temporarily. */
-  pid_restore = 0;
-  if (pcon_attached_to != get_minor ())
-    if (!try_reattach_pcon ())
-      goto detach;
-
-  char *buf;
-  size_t nlen;
-  DWORD origCP;
-  origCP = GetConsoleOutputCP ();
-  SetConsoleOutputCP (get_ttyp ()->term_code_page);
-  /* Just copy */
-  buf = (char *) HeapAlloc (GetProcessHeap (), 0, len);
-  memcpy (buf, (char *)ptr, len);
-  nlen = len;
-  char *p0, *p1;
-  p0 = p1 = buf;
-  /* Remove alternate screen buffer drawing */
-  while (p0 && p1)
-    {
-      if (!get_ttyp ()->screen_alternated)
-	{
-	  /* Check switching to alternate screen buffer */
-	  p0 = (char *) memmem (p1, nlen - (p1-buf), "\033[?1049h", 8);
-	  if (p0)
-	    {
-	      //p0 += 8;
-	      get_ttyp ()->screen_alternated = true;
-	      if (get_ttyp ()->switch_to_pcon_out)
-		do_not_reset_switch_to_pcon = true;
-	    }
-	}
-      if (get_ttyp ()->screen_alternated)
-	{
-	  /* Check switching to main screen buffer */
-	  p1 = (char *) memmem (p0, nlen - (p0-buf), "\033[?1049l", 8);
-	  if (p1)
-	    {
-	      p1 += 8;
-	      get_ttyp ()->screen_alternated = false;
-	      do_not_reset_switch_to_pcon = false;
-	      memmove (p0, p1, buf+nlen - p1);
-	      nlen -= p1 - p0;
-	    }
-	  else
-	    nlen = p0 - buf;
-	}
-    }
-  if (!nlen) /* Nothing to be synchronized */
-    goto cleanup;
-  if (get_ttyp ()->switch_to_pcon_out && !is_echo)
-    goto cleanup;
-  /* Remove ESC sequence which returns results to console
-     input buffer. Without this, cursor position report
-     is put into the input buffer as a garbage. */
-  /* Remove ESC sequence to report cursor position. */
-  while ((p0 = (char *) memmem (buf, nlen, "\033[6n", 4)))
-    {
-      memmove (p0, p0+4, nlen - (p0+4 - buf));
-      nlen -= 4;
-    }
-  /* Remove ESC sequence to report terminal identity. */
-  while ((p0 = (char *) memmem (buf, nlen, "\033[0c", 4)))
-    {
-      memmove (p0, p0+4, nlen - (p0+4 - buf));
-      nlen -= 4;
-    }
-
-  /* If the ESC sequence ESC[?3h or ESC[?3l which clears console screen
-     buffer is pushed, set need_redraw_screen to trigger redraw screen. */
-  p0 = buf;
-  while ((p0 = (char *) memmem (p0, nlen - (p0 - buf), "\033[?", 3)))
-    {
-      p0 += 3;
-      bool exist_arg_3 = false;
-      while (p0 < buf + nlen && (isdigit (*p0) || *p0 == ';'))
-	{
-	  int arg = 0;
-	  while (p0 < buf + nlen && isdigit (*p0))
-	    arg = arg * 10 + (*p0 ++) - '0';
-	  if (arg == 3)
-	    exist_arg_3 = true;
-	  if (p0 < buf + nlen && *p0 == ';')
-	    p0 ++;
-	}
-      if (p0 < buf + nlen && exist_arg_3 && (*p0 == 'h' || *p0 == 'l'))
-	get_ttyp ()->need_redraw_screen = true;
-      p0 ++;
-      if (p0 >= buf + nlen)
-	break;
-    }
-
-  int retry_count;
-  retry_count = 0;
-  DWORD dwMode, flags;
-  flags = ENABLE_VIRTUAL_TERMINAL_PROCESSING;
-  while (!GetConsoleMode (get_output_handle (), &dwMode))
-    {
-      termios_printf ("GetConsoleMode failed, %E");
-      int errno_save = errno;
-      /* Re-open handles */
-      this->open (0, 0);
-      /* Fix pseudo console window size */
-      this->ioctl (TIOCSWINSZ, &get_ttyp ()->winsize);
-      if (errno != errno_save)
-	set_errno (errno_save);
-      if (++retry_count > 3)
-	goto cleanup;
-    }
-  if (!(get_ttyp ()->ti.c_oflag & OPOST) ||
-      !(get_ttyp ()->ti.c_oflag & ONLCR))
-    flags |= DISABLE_NEWLINE_AUTO_RETURN;
-  SetConsoleMode (get_output_handle (), dwMode | flags);
-  char *p;
-  p = buf;
-  DWORD wLen, written;
-  written = 0;
-  BOOL (WINAPI *WriteFunc)
-    (HANDLE, LPCVOID, DWORD, LPDWORD, LPOVERLAPPED);
-  WriteFunc = WriteFile_Orig ? WriteFile_Orig : WriteFile;
-  while (written <  nlen)
-    {
-      if (!WriteFunc (get_output_handle (), p, nlen - written, &wLen, NULL))
-	{
-	  termios_printf ("WriteFile failed, %E");
-	  break;
-	}
-      else
-	{
-	  written += wLen;
-	  p += wLen;
-	}
-    }
-  /* Detach from pseudo console and resume. */
-  flags = ENABLE_VIRTUAL_TERMINAL_PROCESSING;
-  SetConsoleMode (get_output_handle (), dwMode | flags);
-cleanup:
-  SetConsoleOutputCP (origCP);
-  HeapFree (GetProcessHeap (), 0, buf);
-detach:
-  restore_reattach_pcon ();
+  get_ttyp ()->h_pseudo_console = NULL;
+  get_ttyp ()->pcon_start = false;
 }
 
 ssize_t __stdcall
@@ -1505,44 +776,7 @@ fhandler_pty_slave::write (const void *ptr, size_t len)
   reset_switch_to_pcon ();
 
   acquire_output_mutex (INFINITE);
-  bool output_to_pcon = get_ttyp ()->switch_to_pcon_out;
-  release_output_mutex ();
-
-  UINT target_code_page = output_to_pcon ?
-    GetConsoleOutputCP () : get_ttyp ()->term_code_page;
-  ssize_t nlen;
-  char *buf = convert_mb_str (target_code_page, (size_t *) &nlen,
-		 get_ttyp ()->term_code_page, (const char *) ptr, len);
-
-  /* If not attached to this pseudo console, try to attach temporarily. */
-  pid_restore = 0;
-  bool fallback = false;
-  if (output_to_pcon && pcon_attached_to != get_minor ())
-    if (!try_reattach_pcon ())
-      fallback = true;
-
-  if (output_to_pcon && !fallback &&
-      (memmem (buf, nlen, "\033[6n", 4) || memmem (buf, nlen, "\033[0c", 4)))
-    {
-      get_ttyp ()->pcon_in_empty = false;
-      if (!is_line_input ())
-	SetEvent (input_available_event);
-    }
-
-  DWORD dwMode, flags;
-  flags = ENABLE_VIRTUAL_TERMINAL_PROCESSING;
-  if (!(get_ttyp ()->ti.c_oflag & OPOST) ||
-      !(get_ttyp ()->ti.c_oflag & ONLCR))
-    flags |= DISABLE_NEWLINE_AUTO_RETURN;
-  if (output_to_pcon && !fallback)
-    {
-      GetConsoleMode (get_output_handle (), &dwMode);
-      SetConsoleMode (get_output_handle (), dwMode | flags);
-    }
-  HANDLE to = (output_to_pcon && !fallback) ?
-    get_output_handle () : get_output_handle_cyg ();
-  acquire_output_mutex (INFINITE);
-  if (!process_opost_output (to, buf, nlen, false))
+  if (!process_opost_output (get_output_handle_cyg (), ptr, towrite, false))
     {
       DWORD err = GetLastError ();
       termios_printf ("WriteFile failed, %E");
@@ -1557,20 +791,6 @@ fhandler_pty_slave::write (const void *ptr, size_t len)
       towrite = -1;
     }
   release_output_mutex ();
-  mb_str_free (buf);
-  flags = ENABLE_VIRTUAL_TERMINAL_PROCESSING;
-  if (output_to_pcon && !fallback)
-    SetConsoleMode (get_output_handle (), dwMode | flags);
-
-  restore_reattach_pcon ();
-
-  /* Push slave output to pseudo console screen buffer */
-  if (get_pseudo_console ())
-    {
-      acquire_output_mutex (INFINITE);
-      push_to_pcon_screenbuffer ((char *)ptr, len, false);
-      release_output_mutex ();
-    }
 
   return towrite;
 }
@@ -1582,16 +802,15 @@ fhandler_pty_slave::mask_switch_to_pcon_in (bool mask)
 }
 
 bool
-fhandler_pty_common::to_be_read_from_pcon (void)
+fhandler_pty_master::to_be_read_from_pcon (void)
 {
-  return !get_ttyp ()->pcon_in_empty ||
-    (get_ttyp ()->switch_to_pcon_in && !get_ttyp ()->mask_switch_to_pcon_in);
+  return get_ttyp ()->pcon_start
+    || (get_ttyp ()->switch_to_pcon_in && !get_ttyp ()->mask_switch_to_pcon_in);
 }
 
 void __reg3
 fhandler_pty_slave::read (void *ptr, size_t& len)
 {
-  char *ptr0 = (char *)ptr;
   ssize_t totalread = 0;
   int vmin = 0;
   int vtime = 0;	/* Initialized to prevent -Wuninitialized warning */
@@ -1616,8 +835,6 @@ fhandler_pty_slave::read (void *ptr, size_t& len)
       mask_switch_to_pcon_in (true);
       reset_switch_to_pcon ();
     }
-  if (to_be_read_from_pcon ())
-    update_pcon_input_state (true);
 
   if (is_nonblocking () || !ptr) /* Indicating tcflush(). */
     time_to_wait = 0;
@@ -1717,84 +934,7 @@ fhandler_pty_slave::read (void *ptr, size_t& len)
 	    }
 	  goto out;
 	}
-      if (ptr && to_be_read_from_pcon ())
-	{
-	  if (get_readahead_valid ())
-	    {
-	      ReleaseMutex (input_mutex);
-	      totalread = get_readahead_into_buffer ((char *) ptr, len);
-	    }
-	  else
-	    {
-	      if (!try_reattach_pcon ())
-		{
-		  restore_reattach_pcon ();
-		  goto do_read_cyg;
-		}
 
-	      DWORD dwMode;
-	      GetConsoleMode (get_handle (), &dwMode);
-	      DWORD flags = ENABLE_VIRTUAL_TERMINAL_INPUT;
-	      if (dwMode != flags)
-		SetConsoleMode (get_handle (), flags);
-	      /* Read get_handle() instad of get_handle_cyg() */
-	      BOOL (WINAPI *ReadFunc)
-		(HANDLE, LPVOID, DWORD, LPDWORD, LPVOID);
-	      ReadFunc = ReadConsoleA_Orig ? ReadConsoleA_Orig : ReadConsoleA;
-	      DWORD rlen;
-	      readlen = MIN (len, sizeof (buf));
-	      if (!ReadFunc (get_handle (), buf, readlen, &rlen, NULL))
-		{
-		  termios_printf ("read failed, %E");
-		  SetConsoleMode (get_handle (), dwMode);
-		  restore_reattach_pcon ();
-		  ReleaseMutex (input_mutex);
-		  set_errno (EIO);
-		  totalread = -1;
-		  goto out;
-		}
-	      SetConsoleMode (get_handle (), dwMode);
-	      restore_reattach_pcon ();
-	      ReleaseMutex (input_mutex);
-
-	      ssize_t nlen;
-	      char *nbuf = convert_mb_str (get_ttyp ()->term_code_page,
-			     (size_t *) &nlen, GetConsoleCP (), buf, rlen);
-
-	      ssize_t ret;
-	      line_edit_status res =
-		line_edit (nbuf, nlen, get_ttyp ()->ti, &ret);
-
-	      mb_str_free (nbuf);
-
-	      if (res == line_edit_input_done || res == line_edit_ok)
-		totalread = get_readahead_into_buffer ((char *) ptr, len);
-	      else if (res > line_edit_signalled)
-		{
-		  set_sig_errno (EINTR);
-		  totalread = -1;
-		}
-	      else
-		{
-		  update_pcon_input_state (true);
-		  continue;
-		}
-	    }
-
-	  update_pcon_input_state (true);
-	  mask_switch_to_pcon_in (false);
-	  goto out;
-	}
-      if (!ptr && len == UINT_MAX && !get_ttyp ()->pcon_in_empty)
-	{
-	  FlushConsoleInputBuffer (get_handle ());
-	  get_ttyp ()->pcon_in_empty = true;
-	  DWORD n;
-	  if (bytes_available (n) && n == 0)
-	    ResetEvent (input_available_event);
-	}
-
-do_read_cyg:
       if (!bytes_available (bytes_in_pipe))
 	{
 	  ReleaseMutex (input_mutex);
@@ -1911,16 +1051,6 @@ do_read_cyg:
 out:
   termios_printf ("%d = read(%p, %lu)", totalread, ptr, len);
   len = (size_t) totalread;
-  /* Push slave read as echo to pseudo console screen buffer. */
-  if (get_pseudo_console () && ptr0 && totalread > 0 &&
-      (get_ttyp ()->ti.c_lflag & ECHO))
-    {
-      acquire_output_mutex (INFINITE);
-      push_to_pcon_screenbuffer (ptr0, len, true);
-      if (get_ttyp ()->switch_to_pcon_out)
-	trigger_redraw_screen ();
-      release_output_mutex ();
-    }
   mask_switch_to_pcon_in (false);
 }
 
@@ -2061,38 +1191,11 @@ fhandler_pty_slave::ioctl (unsigned int cmd, void *arg)
       get_ttyp ()->winsize = get_ttyp ()->arg.winsize;
       break;
     case TIOCSWINSZ:
-      if (get_pseudo_console ())
-	{
-	  /* If not attached to this pseudo console,
-	     try to attach temporarily. */
-	  pid_restore = 0;
-	  if (pcon_attached_to != get_minor ())
-	    if (!try_reattach_pcon ())
-	      goto cleanup;
-
-	  COORD size;
-	  size.X = ((struct winsize *) arg)->ws_col;
-	  size.Y = ((struct winsize *) arg)->ws_row;
-	  CONSOLE_SCREEN_BUFFER_INFO csbi;
-	  if (GetConsoleScreenBufferInfo (get_output_handle (), &csbi))
-	    if (size.X == csbi.srWindow.Right - csbi.srWindow.Left + 1 &&
-		size.Y == csbi.srWindow.Bottom - csbi.srWindow.Top + 1)
-	      goto cleanup;
-	  if (!SetConsoleScreenBufferSize (get_output_handle (), size))
-	    goto cleanup;
-	  SMALL_RECT rect;
-	  rect.Left = 0;
-	  rect.Top = 0;
-	  rect.Right = size.X-1;
-	  rect.Bottom = size.Y-1;
-	  SetConsoleWindowInfo (get_output_handle (), TRUE, &rect);
-cleanup:
-	  restore_reattach_pcon ();
-	}
-
       if (get_ttyp ()->winsize.ws_row != ((struct winsize *) arg)->ws_row
 	  || get_ttyp ()->winsize.ws_col != ((struct winsize *) arg)->ws_col)
 	{
+	  if (get_ttyp ()->h_pseudo_console && get_ttyp ()->pcon_pid)
+	    resize_pseudo_console ((struct winsize *) arg);
 	  get_ttyp ()->arg.winsize = *(struct winsize *) arg;
 	  get_ttyp ()->winsize = *(struct winsize *) arg;
 	  get_ttyp ()->kill_pgrp (SIGWINCH);
@@ -2379,6 +1482,27 @@ fhandler_pty_common::close ()
 }
 
 void
+fhandler_pty_common::resize_pseudo_console (struct winsize *ws)
+{
+  COORD size;
+  size.X = ws->ws_col;
+  size.Y = ws->ws_row;
+  pinfo p (get_ttyp ()->pcon_pid);
+  if (p)
+    {
+      HPCON_INTERNAL hpcon_local;
+      HANDLE pcon_owner =
+	OpenProcess (PROCESS_DUP_HANDLE, FALSE, p->exec_dwProcessId);
+      DuplicateHandle (pcon_owner, get_ttyp ()->h_pcon_write_pipe,
+		       GetCurrentProcess (), &hpcon_local.hWritePipe,
+		       0, TRUE, DUPLICATE_SAME_ACCESS);
+      ResizePseudoConsole ((HPCON) &hpcon_local, size);
+      CloseHandle (pcon_owner);
+      CloseHandle (hpcon_local.hWritePipe);
+    }
+}
+
+void
 fhandler_pty_master::cleanup ()
 {
   report_tty_counts (this, "closing master", "");
@@ -2393,7 +1517,6 @@ fhandler_pty_master::close ()
 {
   OBJECT_BASIC_INFORMATION obi;
   NTSTATUS status;
-  pid_t master_pid_tmp = get_ttyp ()->master_pid;
 
   termios_printf ("closing from_master(%p)/from_master_cyg(%p)/to_master(%p)/to_master_cyg(%p) since we own them(%u)",
 		  from_master, from_master_cyg,
@@ -2438,30 +1561,6 @@ fhandler_pty_master::close ()
   else if (obi.HandleCount == 1)
     {
       termios_printf ("Closing last master of pty%d", get_minor ());
-      /* Close Pseudo Console */
-      if (get_pseudo_console ())
-	{
-	  /* Terminate helper process */
-	  SetEvent (get_ttyp ()->h_helper_goodbye);
-	  WaitForSingleObject (get_ttyp ()->h_helper_process, INFINITE);
-	  CloseHandle (get_ttyp ()->h_helper_goodbye);
-	  CloseHandle (get_ttyp ()->h_helper_process);
-	  /* FIXME: Pseudo console can be accessed via its handle
-	     only in the process which created it. What else can we do? */
-	  if (master_pid_tmp == myself->pid)
-	    {
-	      /* ClosePseudoConsole() seems to have a bug that one
-		 internal handle remains opened. This causes handle leak.
-		 This is a workaround for this problem. */
-	      HPCON_INTERNAL *hp = (HPCON_INTERNAL *) get_pseudo_console ();
-	      HANDLE tmp = hp->hConHostProcess;
-	      /* Release pseudo console */
-	      ClosePseudoConsole (get_pseudo_console ());
-	      CloseHandle (tmp);
-	    }
-	  get_ttyp ()->switch_to_pcon_in = false;
-	  get_ttyp ()->switch_to_pcon_out = false;
-	}
       if (get_ttyp ()->getsid () > 0)
 	kill (get_ttyp ()->getsid (), SIGHUP);
       SetEvent (input_available_event);
@@ -2469,9 +1568,8 @@ fhandler_pty_master::close ()
 
   if (!ForceCloseHandle (from_master))
     termios_printf ("error closing from_master %p, %E", from_master);
-  if (from_master_cyg != from_master) /* Avoid double close. */
-    if (!ForceCloseHandle (from_master_cyg))
-      termios_printf ("error closing from_master_cyg %p, %E", from_master_cyg);
+  if (!ForceCloseHandle (from_master_cyg))
+    termios_printf ("error closing from_master_cyg %p, %E", from_master_cyg);
   if (!ForceCloseHandle (to_master))
     termios_printf ("error closing to_master %p, %E", to_master);
   from_master = to_master = NULL;
@@ -2513,7 +1611,7 @@ fhandler_pty_master::write (const void *ptr, size_t len)
 
   /* Write terminal input to to_slave pipe instead of output_handle
      if current application is native console application. */
-  if (to_be_read_from_pcon ())
+  if (to_be_read_from_pcon () && get_ttyp ()->h_pseudo_console)
     {
       size_t nlen;
       char *buf = convert_mb_str
@@ -2521,40 +1619,50 @@ fhandler_pty_master::write (const void *ptr, size_t len)
 
       WaitForSingleObject (input_mutex, INFINITE);
 
-      if (memchr (buf, '\003', nlen)) /* ^C intr key in pcon */
-	get_ttyp ()->req_flush_pcon_input = true;
-
       DWORD wLen;
+
+      if (get_ttyp ()->pcon_start)
+	{
+	  /* Pseudo condole support uses "CSI6n" to get cursor position.
+	     If the reply for "CSI6n" is divided into multiple writes,
+	     pseudo console sometimes does not recognize it.  Therefore,
+	     put them together into wpbuf and write all at once. */
+	  static const int wpbuf_len = 64;
+	  static char wpbuf[wpbuf_len];
+	  static int ixput = 0;
+
+	  if (ixput == 0 && buf[0] != '\033')
+	    { /* fail-safe */
+	      WriteFile (to_slave, "\033[1;1R", 6, &wLen, NULL); /* dummy */
+	      get_ttyp ()->pcon_start = false;
+	    }
+	  else
+	    {
+	      if (ixput + nlen < wpbuf_len)
+		for (size_t i=0; i<nlen; i++)
+		  wpbuf[ixput++] = buf[i];
+	      else
+		{
+		  WriteFile (to_slave, wpbuf, ixput, &wLen, NULL);
+		  ixput = 0;
+		  get_ttyp ()->pcon_start = false;
+		  WriteFile (to_slave, buf, nlen, &wLen, NULL);
+		}
+	      if (ixput && memchr (wpbuf, 'R', ixput))
+		{
+		  WriteFile (to_slave, wpbuf, ixput, &wLen, NULL);
+		  ixput = 0;
+		  get_ttyp ()->pcon_start = false;
+		}
+	      ReleaseMutex (input_mutex);
+	      mb_str_free (buf);
+	      return len;
+	    }
+	}
+
       WriteFile (to_slave, buf, nlen, &wLen, NULL);
-      get_ttyp ()->pcon_in_empty = false;
 
       ReleaseMutex (input_mutex);
-
-      /* Use line_edit () in order to set input_available_event. */
-      bool is_echo = tc ()->ti.c_lflag & ECHO;
-      if (!get_ttyp ()->mask_switch_to_pcon_in)
-	{
-	  tc ()->ti.c_lflag &= ~ECHO;
-	  ti.c_lflag &= ~ECHO;
-	}
-      ti.c_lflag &= ~ISIG;
-      line_edit (buf, nlen, ti, &ret);
-      if (is_echo)
-	tc ()->ti.c_lflag |= ECHO;
-      get_ttyp ()->read_retval = 1;
-
-      const char sigs[] = {
-	(char) ti.c_cc[VINTR],
-	(char) ti.c_cc[VQUIT],
-	(char) ti.c_cc[VSUSP],
-      };
-      if (tc ()->ti.c_lflag & ISIG)
-	for (size_t i=0; i<sizeof (sigs); i++)
-	  if (sigs[i] && memchr (buf, sigs[i], nlen))
-	    {
-	      eat_readahead (-1);
-	      SetEvent (input_available_event);
-	    }
 
       mb_str_free (buf);
       return len;
@@ -2630,15 +1738,8 @@ fhandler_pty_master::ioctl (unsigned int cmd, void *arg)
       if (get_ttyp ()->winsize.ws_row != ((struct winsize *) arg)->ws_row
 	  || get_ttyp ()->winsize.ws_col != ((struct winsize *) arg)->ws_col)
 	{
-	  /* FIXME: Pseudo console can be accessed via its handle
-	     only in the process which created it. What else can we do? */
-	  if (get_pseudo_console () && get_ttyp ()->master_pid == myself->pid)
-	    {
-	      COORD size;
-	      size.X = ((struct winsize *) arg)->ws_col;
-	      size.Y = ((struct winsize *) arg)->ws_row;
-	      ResizePseudoConsole (get_pseudo_console (), size);
-	    }
+	  if (get_ttyp ()->h_pseudo_console && get_ttyp ()->pcon_pid)
+	    resize_pseudo_console ((struct winsize *) arg);
 	  get_ttyp ()->winsize = *(struct winsize *) arg;
 	  get_ttyp ()->kill_pgrp (SIGWINCH);
 	}
@@ -2763,7 +1864,7 @@ get_locale_from_env (char *locale)
   strcpy (locale, env);
 }
 
-static LCID
+static void
 get_langinfo (char *locale_out, char *charset_out)
 {
   /* Get locale from environment */
@@ -2775,11 +1876,6 @@ get_langinfo (char *locale_out, char *charset_out)
   const char *locale = __loadlocale (&loc, LC_CTYPE, new_locale);
   if (!locale)
     locale = "C";
-
-  char tmp_locale[ENCODING_LEN + 1];
-  char *ret = __set_locale_from_locale_alias (locale, tmp_locale);
-  if (ret)
-    locale = tmp_locale;
 
   const char *charset;
   struct lc_ctype_T *lc_ctype = (struct lc_ctype_T *) loc.lc_cat[LC_CTYPE].ptr;
@@ -2830,23 +1926,9 @@ get_langinfo (char *locale_out, char *charset_out)
       charset = "CP932";
     }
 
-  wchar_t lc[ENCODING_LEN + 1];
-  wchar_t *p;
-  mbstowcs (lc, locale, ENCODING_LEN);
-  p = wcschr (lc, L'.');
-  if (p)
-    *p = L'\0';
-  p = wcschr (lc, L'_');
-  if (p)
-    *p = L'-';
-  LCID lcid = LocaleNameToLCID (lc, 0);
-  if (!lcid && !strcmp (charset, "ASCII"))
-    return 0;
-
   /* Set results */
   strcpy (locale_out, new_locale);
   strcpy (charset_out, charset);
-  return lcid;
 }
 
 void
@@ -2857,21 +1939,7 @@ fhandler_pty_slave::setup_locale (void)
 
   char locale[ENCODING_LEN + 1] = "C";
   char charset[ENCODING_LEN + 1] = "ASCII";
-  LCID lcid = get_langinfo (locale, charset);
-
-  /* Set console code page form locale */
-  if (get_pseudo_console ())
-    {
-      UINT code_page;
-      if (lcid == 0 || lcid == (LCID) -1)
-	code_page = 20127; /* ASCII */
-      else if (!GetLocaleInfo (lcid,
-			       LOCALE_IDEFAULTCODEPAGE | LOCALE_RETURN_NUMBER,
-			       (char *) &code_page, sizeof (code_page)))
-	code_page = 20127; /* ASCII */
-      SetConsoleCP (code_page);
-      SetConsoleOutputCP (code_page);
-    }
+  get_langinfo (locale, charset);
 
   /* Set terminal code page from locale */
   /* This code is borrowed from mintty: charset.c */
@@ -2881,9 +1949,9 @@ fhandler_pty_slave::setup_locale (void)
     charset_u[i] = toupper (charset[i]);
   unsigned int iso;
   UINT cp = 20127; /* Default for fallback */
-  if (sscanf (charset_u, "ISO-8859-%u", &iso) == 1 ||
-      sscanf (charset_u, "ISO8859-%u", &iso) == 1 ||
-      sscanf (charset_u, "ISO8859%u", &iso) == 1)
+  if (sscanf (charset_u, "ISO-8859-%u", &iso) == 1
+      || sscanf (charset_u, "ISO8859-%u", &iso) == 1
+      || sscanf (charset_u, "ISO8859%u", &iso) == 1)
     {
       if (iso && iso <= 16 && iso !=12)
 	get_ttyp ()->term_code_page = 28590 + iso;
@@ -2900,89 +1968,8 @@ fhandler_pty_slave::setup_locale (void)
 }
 
 void
-fhandler_pty_slave::set_freeconsole_on_close (bool val)
-{
-  freeconsole_on_close = val;
-}
-
-void
-fhandler_pty_slave::trigger_redraw_screen (void)
-{
-  /* Forcibly redraw screen based on console screen buffer. */
-  /* The following code triggers redrawing the screen. */
-  CONSOLE_SCREEN_BUFFER_INFO sbi;
-  GetConsoleScreenBufferInfo (get_output_handle (), &sbi);
-  SMALL_RECT rect = {0, 0,
-    (SHORT) (sbi.dwSize.X -1), (SHORT) (sbi.dwSize.Y - 1)};
-  COORD dest = {0, 0};
-  CHAR_INFO fill = {' ', 0};
-  ScrollConsoleScreenBuffer (get_output_handle (), &rect, NULL, dest, &fill);
-  get_ttyp ()->need_redraw_screen = false;
-}
-
-void
-fhandler_pty_slave::fixup_after_attach (bool native_maybe, int fd_set)
-{
-  if (fd < 0)
-    fd = fd_set;
-  if (get_pseudo_console ())
-    {
-      if (fhandler_console::get_console_process_id (get_helper_process_id (),
-						    true))
-	if (pcon_attached_to != get_minor ())
-	  {
-	    pcon_attached_to = get_minor ();
-	    init_console_handler (true);
-	  }
-
-#if 0 /* This is for debug only. */
-      isHybrid = true;
-      get_ttyp ()->switch_to_pcon_in = true;
-      get_ttyp ()->switch_to_pcon_out = true;
-#endif
-
-      if (pcon_attached_to == get_minor () && native_maybe)
-	{
-	  if (fd == 0)
-	    {
-	      pull_pcon_input ();
-	      DWORD mode =
-		ENABLE_PROCESSED_INPUT | ENABLE_LINE_INPUT | ENABLE_ECHO_INPUT;
-	      SetConsoleMode (get_handle (), mode);
-	      if (get_ttyp ()->pcon_pid == 0 ||
-		  !pinfo (get_ttyp ()->pcon_pid))
-		get_ttyp ()->pcon_pid = myself->pid;
-	      get_ttyp ()->switch_to_pcon_in = true;
-	    }
-	  else if (fd == 1 || fd == 2)
-	    {
-	      DWORD mode = ENABLE_PROCESSED_OUTPUT | ENABLE_WRAP_AT_EOL_OUTPUT;
-	      SetConsoleMode (get_output_handle (), mode);
-	      acquire_output_mutex (INFINITE);
-	      if (!get_ttyp ()->switch_to_pcon_out)
-		get_ttyp ()->wait_pcon_fwd ();
-	      if (get_ttyp ()->pcon_pid == 0 ||
-		  !pinfo (get_ttyp ()->pcon_pid))
-		get_ttyp ()->pcon_pid = myself->pid;
-	      get_ttyp ()->switch_to_pcon_out = true;
-	      release_output_mutex ();
-
-	      if (get_ttyp ()->need_redraw_screen)
-		trigger_redraw_screen ();
-	    }
-	  init_console_handler (false);
-	}
-      else if (fd == 0 && native_maybe)
-	/* Read from unattached pseudo console cause freeze,
-	   therefore, fallback to legacy pty. */
-	set_handle (get_handle_cyg ());
-    }
-}
-
-void
 fhandler_pty_slave::fixup_after_fork (HANDLE parent)
 {
-  fixup_after_attach (false, -1);
   // fork_fixup (parent, inuse, "inuse");
   // fhandler_pty_common::fixup_after_fork (parent);
   report_tty_counts (this, "inherited", "");
@@ -2995,70 +1982,21 @@ fhandler_pty_slave::fixup_after_exec ()
 
   if (!close_on_exec ())
     fixup_after_fork (NULL);	/* No parent handle required. */
-  else if (get_pseudo_console ())
-    {
-      int used = 0;
-      int attached = 0;
-      cygheap_fdenum cfd (false);
-      while (cfd.next () >= 0)
-	{
-	  if (cfd->get_major () == DEV_PTYS_MAJOR ||
-	      cfd->get_major () == DEV_CONS_MAJOR)
-	    used ++;
-	  if (cfd->get_major () == DEV_PTYS_MAJOR &&
-	      cfd->get_minor () == pcon_attached_to)
-	    attached ++;
-	}
-
-      /* Call FreeConsole() if no tty is opened and the process
-	 is attached to console corresponding to tty. This is
-	 needed to make GNU screen and tmux work in Windows 10
-	 1903. */
-      if (attached == 1 && get_minor () == pcon_attached_to)
-	pcon_attached_to = -1;
-      if (used == 1 /* About to close this tty */)
-	{
-	  init_console_handler (false);
-	  free_attached_console ();
-	}
-    }
 
   /* Set locale */
   setup_locale ();
 
   /* Hook Console API */
-  if (get_pseudo_console ())
-    {
 #define DO_HOOK(module, name) \
-      if (!name##_Orig) \
-	{ \
-	  void *api = hook_api (module, #name, (void *) name##_Hooked); \
-	  name##_Orig = (__typeof__ (name) *) api; \
-	  /*if (api) system_printf (#name " hooked.");*/ \
-	}
-      DO_HOOK (NULL, WriteFile);
-      DO_HOOK (NULL, WriteConsoleA);
-      DO_HOOK (NULL, WriteConsoleW);
-      DO_HOOK (NULL, ReadFile);
-      DO_HOOK (NULL, ReadConsoleA);
-      DO_HOOK (NULL, ReadConsoleW);
-      DO_HOOK (NULL, WriteConsoleOutputA);
-      DO_HOOK (NULL, WriteConsoleOutputW);
-      DO_HOOK (NULL, WriteConsoleOutputCharacterA);
-      DO_HOOK (NULL, WriteConsoleOutputCharacterW);
-      DO_HOOK (NULL, WriteConsoleOutputAttribute);
-      DO_HOOK (NULL, SetConsoleCursorPosition);
-      DO_HOOK (NULL, SetConsoleTextAttribute);
-      DO_HOOK (NULL, WriteConsoleInputA);
-      DO_HOOK (NULL, WriteConsoleInputW);
-      DO_HOOK (NULL, ReadConsoleInputA);
-      DO_HOOK (NULL, ReadConsoleInputW);
-      DO_HOOK (NULL, PeekConsoleInputA);
-      DO_HOOK (NULL, PeekConsoleInputW);
-      /* CreateProcess() is hooked for GDB etc. */
-      DO_HOOK (NULL, CreateProcessA);
-      DO_HOOK (NULL, CreateProcessW);
+  if (!name##_Orig) \
+    { \
+      void *api = hook_api (module, #name, (void *) name##_Hooked); \
+      name##_Orig = (__typeof__ (name) *) api; \
+      /*if (api) system_printf (#name " hooked.");*/ \
     }
+  /* CreateProcess() is hooked for GDB etc. */
+  DO_HOOK (NULL, CreateProcessA);
+  DO_HOOK (NULL, CreateProcessW);
 }
 
 /* This thread function handles the master control pipe.  It waits for a
@@ -3206,27 +2144,6 @@ reply:
   return 0;
 }
 
-void
-fhandler_pty_master::transfer_input_to_pcon (void)
-{
-  WaitForSingleObject (input_mutex, INFINITE);
-  DWORD n;
-  size_t transfered = 0;
-  while (::bytes_available (n, from_master_cyg) && n)
-    {
-      char buf[1024];
-      ReadFile (from_master_cyg, buf, sizeof (buf), &n, 0);
-      char *p = buf;
-      while ((p = (char *) memchr (p, '\n', n - (p - buf))))
-	*p = '\r';
-      if (WriteFile (to_slave, buf, n, &n, 0))
-	transfered += n;
-    }
-  if (transfered)
-    get_ttyp ()->pcon_in_empty = false;
-  ReleaseMutex (input_mutex);
-}
-
 static DWORD WINAPI
 pty_master_thread (VOID *arg)
 {
@@ -3242,23 +2159,7 @@ fhandler_pty_master::pty_master_fwd_thread ()
   termios_printf ("Started.");
   for (;;)
     {
-      if (get_pseudo_console ())
-	{
-	  get_ttyp ()->pcon_last_time = GetTickCount ();
-	  while (::bytes_available (rlen, from_slave) && rlen == 0)
-	    {
-	      /* Forcibly transfer input if it is requested by slave.
-		 This happens when input data should be transfered
-		 from the input pipe for cygwin apps to the input pipe
-		 for native apps. */
-	      if (get_ttyp ()->req_transfer_input_to_pcon)
-		{
-		  transfer_input_to_pcon ();
-		  get_ttyp ()->req_transfer_input_to_pcon = false;
-		}
-	      Sleep (1);
-	    }
-	}
+      get_ttyp ()->pcon_last_time = GetTickCount ();
       if (!ReadFile (from_slave, outbuf, sizeof outbuf, &rlen, NULL))
 	{
 	  termios_printf ("ReadFile for forwarding failed, %E");
@@ -3266,14 +2167,9 @@ fhandler_pty_master::pty_master_fwd_thread ()
 	}
       ssize_t wlen = rlen;
       char *ptr = outbuf;
-      if (get_pseudo_console ())
+      if (get_ttyp ()->h_pseudo_console)
 	{
-	  /* Avoid duplicating slave output which is already sent to
-	     to_master_cyg */
-	  if (!get_ttyp ()->switch_to_pcon_out)
-	    continue;
-
-	  /* Avoid setting window title to "cygwin-console-helper.exe" */
+	  /* Remove CSI > Pm m */
 	  int state = 0;
 	  int start_at = 0;
 	  for (DWORD i=0; i<rlen; i++)
@@ -3283,43 +2179,8 @@ fhandler_pty_master::pty_master_fwd_thread ()
 		state = 1;
 		continue;
 	      }
-	    else if ((state == 1 && outbuf[i] == ']') ||
-		     (state == 2 && outbuf[i] == '0') ||
-		     (state == 3 && outbuf[i] == ';'))
-	      {
-		state ++;
-		continue;
-	      }
-	    else if (state == 4 && outbuf[i] == '\a')
-	      {
-		const char *helper_str = "\\bin\\cygwin-console-helper.exe";
-		if (memmem (&outbuf[start_at], i + 1 - start_at,
-			    helper_str, strlen (helper_str)))
-		  {
-		    memmove (&outbuf[start_at], &outbuf[i+1], rlen-i-1);
-		    rlen = wlen = start_at + rlen - i - 1;
-		  }
-		state = 0;
-		continue;
-	      }
-	    else if (outbuf[i] == '\a')
-	      {
-		state = 0;
-		continue;
-	      }
-
-	  /* Remove CSI > Pm m */
-	  state = 0;
-	  start_at = 0;
-	  for (DWORD i=0; i<rlen; i++)
-	    if (outbuf[i] == '\033')
-	      {
-		start_at = i;
-		state = 1;
-		continue;
-	      }
-	    else if ((state == 1 && outbuf[i] == '[') ||
-		     (state == 2 && outbuf[i] == '>'))
+	    else if ((state == 1 && outbuf[i] == '[')
+		     || (state == 2 && outbuf[i] == '>'))
 	      {
 		state ++;
 		continue;
@@ -3388,201 +2249,6 @@ pty_master_fwd_thread (VOID *arg)
   return ((fhandler_pty_master *) arg)->pty_master_fwd_thread ();
 }
 
-/* If master process is running as service, attaching to
-   pseudo console should be done in fork. If attaching
-   is done in spawn for inetd or sshd, it fails because
-   the helper process is running as privileged user while
-   slave process is not. This function is used to determine
-   if the process is running as a srvice or not. */
-inline static bool
-is_running_as_service (void)
-{
-  return check_token_membership (well_known_service_sid)
-    || cygheap->user.saved_sid () == well_known_system_sid;
-}
-
-bool
-fhandler_pty_master::setup_pseudoconsole ()
-{
-  if (disable_pcon)
-    return false;
-  /* If the legacy console mode is enabled, pseudo console seems
-     not to work as expected. To determine console mode, registry
-     key ForceV2 in HKEY_CURRENT_USER\Console is checked. */
-  reg_key reg (HKEY_CURRENT_USER, KEY_READ, L"Console", NULL);
-  if (reg.error ())
-    return false;
-  if (reg.get_dword (L"ForceV2", 1) == 0)
-    {
-      termios_printf ("Pseudo console is disabled "
-		      "because the legacy console mode is enabled.");
-      return false;
-    }
-
-  /* Pseudo console supprot is realized using a tricky technic.
-     PTY need the pseudo console handles, however, they cannot
-     be retrieved by normal procedure. Therefore, run a helper
-     process in a pseudo console and get them from the helper.
-     Slave process will attach to the pseudo console in the
-     helper process using AttachConsole(). */
-  COORD size = {
-    (SHORT) get_ttyp ()->winsize.ws_col,
-    (SHORT) get_ttyp ()->winsize.ws_row
-  };
-  CreatePipe (&from_master, &to_slave, &sec_none, 0);
-  SetLastError (ERROR_SUCCESS);
-  HRESULT res = CreatePseudoConsole (size, from_master, to_master,
-				     0, &get_ttyp ()->h_pseudo_console);
-  if (res != S_OK || GetLastError () == ERROR_PROC_NOT_FOUND)
-    {
-      if (res != S_OK)
-	system_printf ("CreatePseudoConsole() failed. %08x\n",
-		       GetLastError ());
-      goto fallback;
-    }
-
-  /* If master process is running as service, attaching to
-     pseudo console should be done in fork. If attaching
-     is done in spawn for inetd or sshd, it fails because
-     the helper process is running as privileged user while
-     slave process is not. */
-  if (is_running_as_service ())
-    get_ttyp ()->attach_pcon_in_fork = true;
-
-  STARTUPINFOEXW si_helper;
-  HANDLE hello, goodbye;
-  HANDLE hr, hw;
-  PROCESS_INFORMATION pi_helper;
-  HANDLE hpConIn, hpConOut;
-  {
-    SIZE_T bytesRequired;
-    InitializeProcThreadAttributeList (NULL, 2, 0, &bytesRequired);
-    ZeroMemory (&si_helper, sizeof (si_helper));
-    si_helper.StartupInfo.cb = sizeof (STARTUPINFOEXW);
-    si_helper.lpAttributeList = (PPROC_THREAD_ATTRIBUTE_LIST)
-      HeapAlloc (GetProcessHeap (), 0, bytesRequired);
-    if (si_helper.lpAttributeList == NULL)
-      goto cleanup_pseudo_console;
-    if (!InitializeProcThreadAttributeList (si_helper.lpAttributeList,
-					    2, 0, &bytesRequired))
-      goto cleanup_heap;
-    if (!UpdateProcThreadAttribute (si_helper.lpAttributeList,
-				    0,
-				    PROC_THREAD_ATTRIBUTE_PSEUDOCONSOLE,
-				    get_ttyp ()->h_pseudo_console,
-				    sizeof (get_ttyp ()->h_pseudo_console),
-				    NULL, NULL))
-      goto cleanup_heap;
-    /* Create events for start/stop helper process. */
-    hello = CreateEvent (&sec_none, true, false, NULL);
-    goodbye = CreateEvent (&sec_none, true, false, NULL);
-    /* Create a pipe for receiving pseudo console handles */
-    CreatePipe (&hr, &hw, &sec_none, 0);
-    /* Inherit only handles which are needed by helper. */
-    HANDLE handles_to_inherit[] = {hello, goodbye, hw};
-    if (!UpdateProcThreadAttribute (si_helper.lpAttributeList,
-				    0,
-				    PROC_THREAD_ATTRIBUTE_HANDLE_LIST,
-				    handles_to_inherit,
-				    sizeof (handles_to_inherit),
-				    NULL, NULL))
-      goto cleanup_event_and_pipes;
-    /* Create helper process */
-    WCHAR cmd[MAX_PATH];
-    path_conv helper ("/bin/cygwin-console-helper.exe");
-    size_t len = helper.get_wide_win32_path_len ();
-    helper.get_wide_win32_path (cmd);
-    __small_swprintf (cmd + len, L" %p %p %p", hello, goodbye, hw);
-    si_helper.StartupInfo.dwFlags = STARTF_USESTDHANDLES;
-    si_helper.StartupInfo.hStdInput = NULL;
-    si_helper.StartupInfo.hStdOutput = NULL;
-    si_helper.StartupInfo.hStdError = NULL;
-    if (!CreateProcessW (NULL, cmd, &sec_none, &sec_none,
-			 TRUE, EXTENDED_STARTUPINFO_PRESENT,
-			 NULL, NULL, &si_helper.StartupInfo, &pi_helper))
-      goto cleanup_event_and_pipes;
-    for (;;)
-      {
-        DWORD wait_result = WaitForSingleObject (hello, 500);
-	if (wait_result == WAIT_OBJECT_0)
-	  break;
-	if (wait_result != WAIT_TIMEOUT)
-	  goto cleanup_helper_process;
-	DWORD exit_code;
-	if (!GetExitCodeProcess(pi_helper.hProcess, &exit_code))
-	  goto cleanup_helper_process;
-	if (exit_code == STILL_ACTIVE)
-	  continue;
-	if (exit_code != 0 ||
-	    WaitForSingleObject (hello, 500) != WAIT_OBJECT_0)
-	  goto cleanup_helper_process;
-	break;
-      }
-    CloseHandle (hello);
-    CloseHandle (pi_helper.hThread);
-    /* Retrieve pseudo console handles */
-    DWORD rLen;
-    char buf[64];
-    if (!ReadFile (hr, buf, sizeof (buf), &rLen, NULL))
-      goto cleanup_helper_process;
-    buf[rLen] = '\0';
-    sscanf (buf, "StdHandles=%p,%p", &hpConIn, &hpConOut);
-    if (!DuplicateHandle (pi_helper.hProcess, hpConIn,
-			  GetCurrentProcess (), &hpConIn, 0,
-			  TRUE, DUPLICATE_SAME_ACCESS))
-      goto cleanup_helper_process;
-    if (!DuplicateHandle (pi_helper.hProcess, hpConOut,
-			  GetCurrentProcess (), &hpConOut, 0,
-			  TRUE, DUPLICATE_SAME_ACCESS))
-      goto cleanup_pcon_in;
-    CloseHandle (hr);
-    CloseHandle (hw);
-    /* Clean up */
-    DeleteProcThreadAttributeList (si_helper.lpAttributeList);
-    HeapFree (GetProcessHeap (), 0, si_helper.lpAttributeList);
-  }
-  /* Setting information of stuffs regarding pseudo console */
-  get_ttyp ()->h_helper_goodbye = goodbye;
-  get_ttyp ()->h_helper_process = pi_helper.hProcess;
-  get_ttyp ()->helper_process_id = pi_helper.dwProcessId;
-  CloseHandle (from_master);
-  CloseHandle (to_master);
-  from_master = hpConIn;
-  to_master = hpConOut;
-  ResizePseudoConsole (get_ttyp ()->h_pseudo_console, size);
-  return true;
-
-cleanup_pcon_in:
-  CloseHandle (hpConIn);
-cleanup_helper_process:
-  SetEvent (goodbye);
-  WaitForSingleObject (pi_helper.hProcess, INFINITE);
-  CloseHandle (pi_helper.hProcess);
-  goto skip_close_hello;
-cleanup_event_and_pipes:
-  CloseHandle (hello);
-skip_close_hello:
-  CloseHandle (goodbye);
-  CloseHandle (hr);
-  CloseHandle (hw);
-cleanup_heap:
-  HeapFree (GetProcessHeap (), 0, si_helper.lpAttributeList);
-cleanup_pseudo_console:
-  {
-    HPCON_INTERNAL *hp = (HPCON_INTERNAL *) get_ttyp ()->h_pseudo_console;
-    HANDLE tmp = hp->hConHostProcess;
-    ClosePseudoConsole (get_pseudo_console ());
-    CloseHandle (tmp);
-  }
-fallback:
-  CloseHandle (from_master);
-  CloseHandle (to_slave);
-  from_master = from_master_cyg;
-  to_slave = NULL;
-  get_ttyp ()->h_pseudo_console = NULL;
-  return false;
-}
-
 bool
 fhandler_pty_master::setup ()
 {
@@ -3594,11 +2260,6 @@ fhandler_pty_master::setup ()
   int unit = cygwin_shared->tty.allocate (from_master_cyg, get_output_handle ());
   if (unit < 0)
     return false;
-
-  /* from_master should be used for pseudo console.
-     Just copy from_master_cyg here for the case that
-     pseudo console is not available. */
-  from_master = from_master_cyg;
 
   ProtectHandle1 (get_output_handle (), to_pty);
 
@@ -3698,15 +2359,21 @@ fhandler_pty_master::setup ()
       goto err;
     }
 
-  t.winsize.ws_col = 80;
-  t.winsize.ws_row = 25;
-
-  setup_pseudoconsole ();
+  __small_sprintf (pipename, "pty%d-to-slave", unit);
+  res = fhandler_pipe::create (&sec_none, &from_master, &to_slave,
+			       fhandler_pty_common::pipesize, pipename, 0);
+  if (res)
+    {
+      errstr = "input pipe";
+      goto err;
+    }
 
   t.set_from_master (from_master);
   t.set_from_master_cyg (from_master_cyg);
   t.set_to_master (to_master);
   t.set_to_master_cyg (to_master_cyg);
+  t.winsize.ws_col = 80;
+  t.winsize.ws_row = 25;
   t.master_pid = myself->pid;
 
   dev ().parse (DEV_PTYM_MAJOR, unit);
@@ -3719,6 +2386,7 @@ fhandler_pty_master::setup ()
 err:
   __seterrno ();
   close_maybe (from_slave);
+  close_maybe (to_slave);
   close_maybe (get_handle ());
   close_maybe (get_output_handle ());
   close_maybe (input_available_event);
@@ -3778,9 +2446,6 @@ fhandler_pty_common::process_opost_output (HANDLE h, const void *ptr, ssize_t& l
 {
   ssize_t towrite = len;
   BOOL res = TRUE;
-  BOOL (WINAPI *WriteFunc)
-    (HANDLE, LPCVOID, DWORD, LPDWORD, LPOVERLAPPED);
-  WriteFunc = WriteFile_Orig ? WriteFile_Orig : WriteFile;
   while (towrite)
     {
       if (!is_echo)
@@ -3803,7 +2468,7 @@ fhandler_pty_common::process_opost_output (HANDLE h, const void *ptr, ssize_t& l
       if (!(get_ttyp ()->ti.c_oflag & OPOST))	// raw output mode
 	{
 	  DWORD n = MIN (OUT_BUFFER_SIZE, towrite);
-	  res = WriteFunc (h, ptr, n, &n, NULL);
+	  res = WriteFile (h, ptr, n, &n, NULL);
 	  if (!res)
 	    break;
 	  ptr = (char *) ptr + n;
@@ -3853,7 +2518,7 @@ fhandler_pty_common::process_opost_output (HANDLE h, const void *ptr, ssize_t& l
 		  break;
 		}
 	    }
-	  res = WriteFunc (h, outbuf, n, &n, NULL);
+	  res = WriteFile (h, outbuf, n, &n, NULL);
 	  if (!res)
 	    break;
 	  ptr = (char *) ptr + rc;
@@ -3862,4 +2527,135 @@ fhandler_pty_common::process_opost_output (HANDLE h, const void *ptr, ssize_t& l
     }
   len -= towrite;
   return res;
+}
+
+bool
+fhandler_pty_slave::setup_pseudoconsole (STARTUPINFOEXW *si, bool nopcon)
+{
+
+  /* Setting switch_to_pcon_in is necessary even if
+     pseudo console will not be activated. */
+  fhandler_base *fh = ::cygheap->fdtab[0];
+  if (fh && fh->get_major () == DEV_PTYS_MAJOR)
+    {
+      fhandler_pty_slave *ptys = (fhandler_pty_slave *) fh;
+      ptys->get_ttyp ()->switch_to_pcon_in = true;
+      if (ptys->get_ttyp ()->pcon_pid == 0
+	  || !pinfo (ptys->get_ttyp ()->pcon_pid))
+	ptys->get_ttyp ()->pcon_pid = myself->pid;
+    }
+
+  if (nopcon)
+    return false;
+  if (get_ttyp ()->pcon_pid && get_ttyp ()->pcon_pid != myself->pid
+      && !!pinfo (get_ttyp ()->pcon_pid))
+    return false;
+  if (disable_pcon)
+    return false;
+  /* If the legacy console mode is enabled, pseudo console seems
+     not to work as expected. To determine console mode, registry
+     key ForceV2 in HKEY_CURRENT_USER\Console is checked. */
+  reg_key reg (HKEY_CURRENT_USER, KEY_READ, L"Console", NULL);
+  if (reg.error ())
+    return false;
+  if (reg.get_dword (L"ForceV2", 1) == 0)
+    {
+      termios_printf ("Pseudo console is disabled "
+		      "because the legacy console mode is enabled.");
+      return false;
+    }
+
+  COORD size = {
+    (SHORT) get_ttyp ()->winsize.ws_col,
+    (SHORT) get_ttyp ()->winsize.ws_row
+  };
+  const DWORD inherit_cursor = 1;
+  SetLastError (ERROR_SUCCESS);
+  HRESULT res = CreatePseudoConsole (size, get_handle (), get_output_handle (),
+				     inherit_cursor,
+				     &get_ttyp ()->h_pseudo_console);
+  if (res != S_OK || GetLastError () == ERROR_PROC_NOT_FOUND)
+    {
+      if (res != S_OK)
+	system_printf ("CreatePseudoConsole() failed. %08x %08x\n",
+		       GetLastError (), res);
+      goto fallback;
+    }
+
+  SIZE_T bytesRequired;
+  InitializeProcThreadAttributeList (NULL, 1, 0, &bytesRequired);
+  ZeroMemory (si, sizeof (*si));
+  si->StartupInfo.cb = sizeof (STARTUPINFOEXW);
+  si->lpAttributeList = (PPROC_THREAD_ATTRIBUTE_LIST)
+    HeapAlloc (GetProcessHeap (), 0, bytesRequired);
+  if (si->lpAttributeList == NULL)
+    goto cleanup_pseudo_console;
+  if (!InitializeProcThreadAttributeList (si->lpAttributeList,
+					  1, 0, &bytesRequired))
+    goto cleanup_heap;
+  if (!UpdateProcThreadAttribute (si->lpAttributeList,
+				  0,
+				  PROC_THREAD_ATTRIBUTE_PSEUDOCONSOLE,
+				  get_ttyp ()->h_pseudo_console,
+				  sizeof (get_ttyp ()->h_pseudo_console),
+				  NULL, NULL))
+    goto cleanup_heap;
+  si->StartupInfo.dwFlags = STARTF_USESTDHANDLES;
+  si->StartupInfo.hStdInput = NULL;
+  si->StartupInfo.hStdOutput = NULL;
+  si->StartupInfo.hStdError = NULL;
+
+  {
+    fhandler_base *fh0 = ::cygheap->fdtab[0];
+    if (fh0 && fh0->get_device () != get_device ())
+      si->StartupInfo.hStdInput = fh0->get_handle ();
+    fhandler_base *fh1 = ::cygheap->fdtab[1];
+    if (fh1 && fh1->get_device () != get_device ())
+      si->StartupInfo.hStdOutput = fh1->get_output_handle ();
+    fhandler_base *fh2 = ::cygheap->fdtab[2];
+    if (fh2 && fh2->get_device () != get_device ())
+      si->StartupInfo.hStdError = fh2->get_output_handle ();
+  }
+
+  if (get_ttyp ()->pcon_pid == 0 || !pinfo (get_ttyp ()->pcon_pid))
+    get_ttyp ()->pcon_pid = myself->pid;
+
+  if (get_ttyp ()->h_pseudo_console && get_ttyp ()->pcon_pid == myself->pid)
+    {
+      HPCON_INTERNAL *hp = (HPCON_INTERNAL *) get_ttyp ()->h_pseudo_console;
+      get_ttyp ()->h_pcon_write_pipe = hp->hWritePipe;
+    }
+  get_ttyp ()->pcon_start = true;
+  return true;
+
+cleanup_heap:
+  HeapFree (GetProcessHeap (), 0, si->lpAttributeList);
+cleanup_pseudo_console:
+  if (get_ttyp ()->h_pseudo_console)
+    {
+      HPCON_INTERNAL *hp = (HPCON_INTERNAL *) get_ttyp ()->h_pseudo_console;
+      HANDLE tmp = hp->hConHostProcess;
+      ClosePseudoConsole (get_ttyp ()->h_pseudo_console);
+      CloseHandle (tmp);
+    }
+fallback:
+  get_ttyp ()->h_pseudo_console = NULL;
+  return false;
+}
+
+void
+fhandler_pty_slave::close_pseudoconsole (void)
+{
+  if (get_ttyp ()->h_pseudo_console)
+    {
+      get_ttyp ()->wait_pcon_fwd ();
+      HPCON_INTERNAL *hp = (HPCON_INTERNAL *) get_ttyp ()->h_pseudo_console;
+      HANDLE tmp = hp->hConHostProcess;
+      ClosePseudoConsole (get_ttyp ()->h_pseudo_console);
+      CloseHandle (tmp);
+      get_ttyp ()->h_pseudo_console = NULL;
+      get_ttyp ()->switch_to_pcon_in = false;
+      get_ttyp ()->pcon_pid = 0;
+      get_ttyp ()->pcon_start = false;
+    }
 }

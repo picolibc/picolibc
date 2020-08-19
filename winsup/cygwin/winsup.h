@@ -224,9 +224,6 @@ void init_console_handler (bool);
 
 extern bool wsock_started;
 
-/* PTY related */
-void set_ishybrid_and_switch_to_pcon (HANDLE h);
-
 /* Printf type functions */
 extern "C" void vapi_fatal (const char *, va_list ap) __attribute__ ((noreturn));
 extern "C" void api_fatal (const char *, ...) __attribute__ ((noreturn));

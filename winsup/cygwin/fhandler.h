@@ -326,16 +326,16 @@ class fhandler_base
   virtual size_t &raixput () { return ra.raixput; };
   virtual size_t &rabuflen () { return ra.rabuflen; };
 
-  virtual bool get_readahead_valid () { return raixget () < ralen (); }
+  bool get_readahead_valid () { return raixget () < ralen (); }
   int puts_readahead (const char *s, size_t len = (size_t) -1);
-  virtual int put_readahead (char value);
+  int put_readahead (char value);
 
   int get_readahead ();
   int peek_readahead (int queryput = 0);
 
   void set_readahead_valid (int val, int ch = -1);
 
-  virtual int get_readahead_into_buffer (char *buf, size_t buflen);
+  int get_readahead_into_buffer (char *buf, size_t buflen);
 
   bool has_acls () const { return pc.has_acls (); }
 
@@ -1905,7 +1905,7 @@ class fhandler_termios: public fhandler_base
   int ioctl (int, void *);
   tty_min *_tc;
   tty *get_ttyp () {return (tty *) tc ();}
-  virtual int eat_readahead (int n);
+  int eat_readahead (int n);
 
  public:
   tty_min*& tc () {return _tc;}
@@ -2184,7 +2184,6 @@ private:
   static bool need_invisible ();
   static void free_console ();
   static const char *get_nonascii_key (INPUT_RECORD& input_rec, char *);
-  static DWORD get_console_process_id (DWORD pid, bool match);
 
   fhandler_console (void *) {}
 
@@ -2264,19 +2263,7 @@ class fhandler_pty_common: public fhandler_termios
     return fh;
   }
 
-  bool attach_pcon_in_fork (void)
-  {
-    return get_ttyp ()->attach_pcon_in_fork;
-  }
-  DWORD get_helper_process_id (void)
-  {
-    return get_ttyp ()->helper_process_id;
-  }
-  HPCON get_pseudo_console (void)
-  {
-    return get_ttyp ()->h_pseudo_console;
-  }
-  bool to_be_read_from_pcon (void);
+  void resize_pseudo_console (struct winsize *);
 
  protected:
   BOOL process_opost_output (HANDLE h,
@@ -2287,23 +2274,15 @@ class fhandler_pty_slave: public fhandler_pty_common
 {
   HANDLE inuse;			// used to indicate that a tty is in use
   HANDLE output_handle_cyg, io_handle_cyg;
-  DWORD pid_restore;
-  int fd;
 
   /* Helper functions for fchmod and fchown. */
   bool fch_open_handles (bool chown);
   int fch_set_sd (security_descriptor &sd, bool chown);
   void fch_close_handles ();
 
-  bool try_reattach_pcon ();
-  void restore_reattach_pcon ();
-  inline void free_attached_console ();
-
  public:
   /* Constructor */
   fhandler_pty_slave (int);
-  /* Destructor */
-  ~fhandler_pty_slave ();
 
   void set_output_handle_cyg (HANDLE h) { output_handle_cyg = h; }
   HANDLE& get_output_handle_cyg () { return output_handle_cyg; }
@@ -2315,9 +2294,6 @@ class fhandler_pty_slave: public fhandler_pty_common
   ssize_t __stdcall write (const void *ptr, size_t len);
   void __reg3 read (void *ptr, size_t& len);
   int init (HANDLE, DWORD, mode_t);
-  int eat_readahead (int n);
-  int get_readahead_into_buffer (char *buf, size_t buflen);
-  bool get_readahead_valid (void);
 
   int tcsetattr (int a, const struct termios *t);
   int tcgetattr (struct termios *t);
@@ -2354,20 +2330,12 @@ class fhandler_pty_slave: public fhandler_pty_common
     copyto (fh);
     return fh;
   }
-  void set_switch_to_pcon (int fd);
+  bool setup_pseudoconsole (STARTUPINFOEXW *si, bool nopcon);
+  void close_pseudoconsole (void);
+  void set_switch_to_pcon (void);
   void reset_switch_to_pcon (void);
-  void push_to_pcon_screenbuffer (const char *ptr, size_t len, bool is_echo);
   void mask_switch_to_pcon_in (bool mask);
-  void fixup_after_attach (bool native_maybe, int fd);
-  bool is_line_input (void)
-  {
-    return get_ttyp ()->ti.c_lflag & ICANON;
-  }
   void setup_locale (void);
-  void set_freeconsole_on_close (bool val);
-  void trigger_redraw_screen (void);
-  void pull_pcon_input (void);
-  void update_pcon_input_state (bool need_lock);
 };
 
 #define __ptsname(buf, unit) __small_sprintf ((buf), "/dev/pty%d", (unit))
@@ -2392,7 +2360,6 @@ public:
   int process_slave_output (char *buf, size_t len, int pktmode_on);
   void doecho (const void *str, DWORD len);
   int accept_input ();
-  int put_readahead (char value);
   int open (int flags, mode_t mode = 0);
   void open_setup (int flags);
   ssize_t __stdcall write (const void *ptr, size_t len);
@@ -2431,9 +2398,7 @@ public:
     copyto (fh);
     return fh;
   }
-
-  bool setup_pseudoconsole (void);
-  void transfer_input_to_pcon (void);
+  bool to_be_read_from_pcon (void);
 };
 
 class fhandler_dev_null: public fhandler_base

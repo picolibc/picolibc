@@ -94,21 +94,13 @@ private:
   HANDLE _to_master;
   HANDLE _to_master_cyg;
   HPCON h_pseudo_console;
-  HANDLE h_helper_process;
-  DWORD helper_process_id;
-  HANDLE h_helper_goodbye;
-  bool attach_pcon_in_fork;
+  bool pcon_start;
   bool switch_to_pcon_in;
-  bool switch_to_pcon_out;
-  bool screen_alternated;
   bool mask_switch_to_pcon_in;
   pid_t pcon_pid;
   UINT term_code_page;
-  bool need_redraw_screen;
   DWORD pcon_last_time;
-  bool pcon_in_empty;
-  bool req_transfer_input_to_pcon;
-  bool req_flush_pcon_input;
+  HANDLE h_pcon_write_pipe;
 
 public:
   HANDLE from_master () const { return _from_master; }
@@ -138,7 +130,6 @@ public:
   void set_master_ctl_closed () {master_pid = -1;}
   static void __stdcall create_master (int);
   static void __stdcall init_session ();
-  void set_switch_to_pcon_out (bool v);
   void wait_pcon_fwd (void);
   friend class fhandler_pty_common;
   friend class fhandler_pty_master;

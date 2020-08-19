@@ -177,7 +177,7 @@ find_exec (const char *name, path_conv& buf, const char *search,
 /* Utility for child_info_spawn::worker.  */
 
 static HANDLE
-handle (int fd, bool writing, bool iscygwin)
+handle (int fd, bool writing)
 {
   HANDLE h;
   cygheap_fdget cfd (fd);
@@ -188,15 +188,28 @@ handle (int fd, bool writing, bool iscygwin)
     h = INVALID_HANDLE_VALUE;
   else if (!writing)
     h = cfd->get_handle ();
-  else if (cfd->get_major () == DEV_PTYS_MAJOR && iscygwin)
-    {
-      fhandler_pty_slave *ptys = (fhandler_pty_slave *)(fhandler_base *) cfd;
-      h = ptys->get_output_handle_cyg ();
-    }
   else
     h = cfd->get_output_handle ();
 
   return h;
+}
+
+static bool
+is_console_app (WCHAR *filename)
+{
+  HANDLE h;
+  const int id_offset = 92;
+  h = CreateFileW (filename, GENERIC_READ, FILE_SHARE_READ,
+		  NULL, OPEN_EXISTING, 0, NULL);
+  char buf[1024];
+  DWORD n;
+  ReadFile (h, buf, sizeof (buf), &n, 0);
+  CloseHandle (h);
+  char *p = (char *) memmem (buf, n, "PE\0\0", 4);
+  if (p && p + id_offset <= buf + n)
+    return p[id_offset] == '\003'; /* 02: GUI, 03: console */
+  else
+    return false;
 }
 
 int
@@ -266,8 +279,6 @@ child_info_spawn::worker (const char *prog_arg, const char *const *argv,
 {
   bool rc;
   int res = -1;
-  DWORD pid_restore = 0;
-  bool attach_to_console = false;
   pid_t ctty_pgid = 0;
 
   /* Search for CTTY and retrieve its PGID */
@@ -587,9 +598,7 @@ child_info_spawn::worker (const char *prog_arg, const char *const *argv,
 			 PROCESS_QUERY_LIMITED_INFORMATION))
 	sa = &sec_none_nih;
 
-      /* Attach to pseudo console if pty salve is used */
-      pid_restore = fhandler_console::get_console_process_id
-	(GetCurrentProcessId (), false);
+      fhandler_pty_slave *ptys_primary = NULL;
       for (int i = 0; i < 3; i ++)
 	{
 	  const int chk_order[] = {1, 0, 2};
@@ -598,29 +607,11 @@ child_info_spawn::worker (const char *prog_arg, const char *const *argv,
 	  if (fh && fh->get_major () == DEV_PTYS_MAJOR)
 	    {
 	      fhandler_pty_slave *ptys = (fhandler_pty_slave *) fh;
-	      if (ptys->get_pseudo_console ())
-		{
-		  DWORD helper_process_id = ptys->get_helper_process_id ();
-		  debug_printf ("found a PTY slave %d: helper_PID=%d",
-				    fh->get_minor (), helper_process_id);
-		  if (fhandler_console::get_console_process_id
-					      (helper_process_id, true))
-		    /* Already attached */
-		    attach_to_console = true;
-		  else if (!attach_to_console)
-		    {
-		      FreeConsole ();
-		      if (AttachConsole (helper_process_id))
-			attach_to_console = true;
-		    }
-		  ptys->fixup_after_attach (!iscygwin (), fd);
-		  if (mode == _P_OVERLAY)
-		    ptys->set_freeconsole_on_close (iscygwin ());
-		}
+	      if (ptys_primary == NULL)
+		ptys_primary = ptys;
 	    }
 	  else if (fh && fh->get_major () == DEV_CONS_MAJOR)
 	    {
-	      attach_to_console = true;
 	      fhandler_console *cons = (fhandler_console *) fh;
 	      if (wincap.has_con_24bit_colors () && !iscygwin ())
 		if (fd == 1 || fd == 2)
@@ -642,16 +633,27 @@ child_info_spawn::worker (const char *prog_arg, const char *const *argv,
 
       /* Set up needed handles for stdio */
       si.dwFlags = STARTF_USESTDHANDLES;
-      si.hStdInput = handle ((in__stdin < 0 ? 0 : in__stdin), false,
-			     iscygwin ());
-      si.hStdOutput = handle ((in__stdout < 0 ? 1 : in__stdout), true,
-			      iscygwin ());
-      si.hStdError = handle (2, true, iscygwin ());
+      si.hStdInput = handle ((in__stdin < 0 ? 0 : in__stdin), false);
+      si.hStdOutput = handle ((in__stdout < 0 ? 1 : in__stdout), true);
+      si.hStdError = handle (2, true);
 
       si.cb = sizeof (si);
 
       if (!iscygwin ())
 	init_console_handler (myself->ctty > 0);
+
+      bool enable_pcon = false;
+      STARTUPINFOEXW si_pcon;
+      ZeroMemory (&si_pcon, sizeof (si_pcon));
+      STARTUPINFOW *si_tmp = &si;
+      if (!iscygwin () && ptys_primary && is_console_app (runpath))
+	if (ptys_primary->setup_pseudoconsole (&si_pcon,
+			     mode != _P_OVERLAY && mode != _P_WAIT))
+	  {
+	    c_flags |= EXTENDED_STARTUPINFO_PRESENT;
+	    si_tmp = &si_pcon.StartupInfo;
+	    enable_pcon = true;
+	  }
 
     loop:
       /* When ruid != euid we create the new process under the current original
@@ -681,7 +683,7 @@ child_info_spawn::worker (const char *prog_arg, const char *const *argv,
 			       c_flags,
 			       envblock,	/* environment */
 			       NULL,
-			       &si,
+			       si_tmp,
 			       &pi);
 	}
       else
@@ -735,7 +737,7 @@ child_info_spawn::worker (const char *prog_arg, const char *const *argv,
 			       c_flags,
 			       envblock,	/* environment */
 			       NULL,
-			       &si,
+			       si_tmp,
 			       &pi);
 	  if (hwst)
 	    {
@@ -747,6 +749,11 @@ child_info_spawn::worker (const char *prog_arg, const char *const *argv,
 	      SetThreadDesktop (hdsk_orig);
 	      CloseDesktop (hdsk);
 	    }
+	}
+      if (enable_pcon)
+	{
+	  DeleteProcThreadAttributeList (si_pcon.lpAttributeList);
+	  HeapFree (GetProcessHeap (), 0, si_pcon.lpAttributeList);
 	}
 
       if (mode != _P_OVERLAY)
@@ -920,6 +927,11 @@ child_info_spawn::worker (const char *prog_arg, const char *const *argv,
 	    }
 	  if (sem)
 	    __posix_spawn_sem_release (sem, 0);
+	  if (enable_pcon)
+	    {
+	      WaitForSingleObject (pi.hProcess, INFINITE);
+	      ptys_primary->close_pseudoconsole ();
+	    }
 	  myself.exit (EXITCODE_NOSET);
 	  break;
 	case _P_WAIT:
@@ -927,6 +939,8 @@ child_info_spawn::worker (const char *prog_arg, const char *const *argv,
 	  system_call.arm ();
 	  if (waitpid (cygpid, &res, 0) != cygpid)
 	    res = -1;
+	  if (enable_pcon)
+	    ptys_primary->close_pseudoconsole ();
 	  break;
 	case _P_DETACH:
 	  res = 0;	/* Lost all memory of this child. */
@@ -952,21 +966,6 @@ child_info_spawn::worker (const char *prog_arg, const char *const *argv,
   this->cleanup ();
   if (envblock)
     free (envblock);
-
-  if (attach_to_console && pid_restore)
-    {
-      FreeConsole ();
-      AttachConsole (pid_restore);
-      cygheap_fdenum cfd (false);
-      int fd;
-      while ((fd = cfd.next ()) >= 0)
-	if (cfd->get_major () == DEV_PTYS_MAJOR)
-	  {
-	    fhandler_pty_slave *ptys =
-	      (fhandler_pty_slave *) (fhandler_base *) cfd;
-	    ptys->fixup_after_attach (false, fd);
-	  }
-    }
 
   return (int) res;
 }

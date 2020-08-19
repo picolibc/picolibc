@@ -1206,18 +1206,6 @@ fhandler_console::close ()
   if (con_ra.rabuf)
     free (con_ra.rabuf);
 
-  /* If already attached to pseudo console, don't call free_console () */
-  cygheap_fdenum cfd (false);
-  while (cfd.next () >= 0)
-    if (cfd->get_major () == DEV_PTYM_MAJOR ||
-	cfd->get_major () == DEV_PTYS_MAJOR)
-      {
-	fhandler_pty_common *t =
-	  (fhandler_pty_common *) (fhandler_base *) cfd;
-	if (get_console_process_id (t->get_helper_process_id (), true))
-	  return 0;
-      }
-
   if (!have_execed)
     free_console ();
   return 0;
@@ -3609,37 +3597,6 @@ fhandler_console::need_invisible ()
 
   debug_printf ("invisible_console %d", invisible_console);
   return b;
-}
-
-DWORD
-fhandler_console::get_console_process_id (DWORD pid, bool match)
-{
-  DWORD tmp;
-  DWORD num, num_req;
-  num = 1;
-  num_req = GetConsoleProcessList (&tmp, num);
-  DWORD *list;
-  while (true)
-    {
-      list = (DWORD *)
-	HeapAlloc (GetProcessHeap (), 0, num_req * sizeof (DWORD));
-      num = num_req;
-      num_req = GetConsoleProcessList (list, num);
-      if (num_req > num)
-	HeapFree (GetProcessHeap (), 0, list);
-      else
-	break;
-    }
-  num = num_req;
-
-  tmp = 0;
-  for (DWORD i=0; i<num; i++)
-    if ((match && list[i] == pid) || (!match && list[i] != pid))
-      /* Last one is the oldest. */
-      /* https://github.com/microsoft/terminal/issues/95 */
-      tmp = list[i];
-  HeapFree (GetProcessHeap (), 0, list);
-  return tmp;
 }
 
 DWORD
