@@ -64,7 +64,7 @@ setenv (const char *name,
         }
       if (strlen (C) >= l_value)
 	{			/* old larger; copy over */
-	  while ((*C++ = *value++) != 0);
+	  strcpy(C, value);
           ENV_UNLOCK;
 	  return 0;
 	}

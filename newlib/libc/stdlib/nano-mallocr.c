@@ -357,7 +357,9 @@ no_insert:
 }
 #ifdef HAVE_ALIAS_ATTRIBUTE
 #pragma GCC diagnostic push
+#ifndef __clang__
 #pragma GCC diagnostic ignored "-Wmissing-attributes"
+#endif
 __strong_reference(free, __malloc_free);
 __strong_reference(free, cfree);
 #pragma GCC diagnostic pop
