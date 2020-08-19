@@ -125,10 +125,7 @@ raise (int sig)
       return -1;
     }
 
-  if (_sig_func == NULL)
-    func = SIG_DFL;
-  else
-    func = _sig_func[sig];
+  func = _sig_func[sig];
 
   if (func == SIG_DFL)
     return kill (getpid (), sig);
