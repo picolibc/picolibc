@@ -2390,10 +2390,7 @@ Files: newlib/libc/stdio64/fdopen64.c
 Copyright: 2003 Christopher Faylor <me@cgf.cx>
 License: Default-1
 
-Files: newlib/libc/stdlib/__adjust.c
- newlib/libc/stdlib/__exp10.c
- newlib/libc/stdlib/__ten_mu.c
- newlib/libc/stdlib/abort.c
+Files: newlib/libc/stdlib/abort.c
  newlib/libc/stdlib/abs.c
  newlib/libc/stdlib/assert.c
  newlib/libc/stdlib/atexit.c
