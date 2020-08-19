@@ -6,5 +6,6 @@ shift
 
 mkdir $DIR
 cd $DIR
-../$CONFIGURE "$@"
+../scripts/$CONFIGURE "$@"
+cat meson-logs/*
 ninja test

@@ -15,7 +15,8 @@ RUN apt-get update && \
     gcc-aarch64-linux-gnu \
     gcc-xtensa-lx106 \
     qemu-system-arm=1:5.0-5.1 \
-    qemu-system-misc=1:5.0-5.1
+    qemu-system-misc=1:5.0-5.1 \
+    clang lld
 
 # Copy picolibc into container
 RUN mkdir picolibc
