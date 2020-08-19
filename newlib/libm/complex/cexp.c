@@ -77,6 +77,6 @@ cexp(double complex z)
 	x = creal(z);
 	y = cimag(z);
 	r = exp(x);
-	w = r * cos(y) + r * sin(y) * I;
+	w = r * cos(y) + r * sin(y) * (double complex) I;
 	return w;
 }

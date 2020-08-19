@@ -92,6 +92,6 @@ casinh(double complex z)
 {
 	double complex w;
 
-	w = -1.0 * I * casin(z * I);
+	w = -1.0 * (double complex) I * casin(z * (double complex) I);
 	return w;
 }

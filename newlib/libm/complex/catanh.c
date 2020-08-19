@@ -85,6 +85,6 @@ catanh(double complex z)
 {
 	double complex w;
 
-	w = -1.0 * I * catan(z * I);
+	w = -1.0 * (double complex) I * catan(z * (double complex) I);
 	return w;
 }

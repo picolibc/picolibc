@@ -44,7 +44,7 @@ _BEGIN_STD_C
 /* Natural log of 2 */
 #define _M_LN2        0.693147180559945309417
 
-#if __GNUC_PREREQ (3, 3)
+#if __GNUC_PREREQ (3, 3) || defined(__clang__)
  /* gcc >= 3.3 implicitly defines builtins for HUGE_VALx values.  */
 
 # ifndef HUGE_VAL
@@ -249,7 +249,7 @@ extern int __signbitd (double x);
  *       taking double arguments still exist for compatibility purposes
  *       (prototypes for them are earlier in this header).  */
 
-#if __GNUC_PREREQ (4, 4)
+#if __GNUC_PREREQ (4, 4) || defined(__clang__)
   #define fpclassify(__x) (__builtin_fpclassify (FP_NAN, FP_INFINITE, \
 						 FP_NORMAL, FP_SUBNORMAL, \
 						 FP_ZERO, __x))

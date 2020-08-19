@@ -76,6 +76,6 @@ ccos(double complex z)
 	double ch, sh;
 
 	_cchsh(cimag(z), &ch, &sh);
-	w = cos(creal(z)) * ch - (sin(creal(z)) * sh) * I;
+	w = cos(creal(z)) * ch - (sin(creal(z)) * sh) * (double complex) I;
 	return w;
 }

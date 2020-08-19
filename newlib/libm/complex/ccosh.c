@@ -76,6 +76,6 @@ ccosh(double complex z)
 
 	x = creal(z);
 	y = cimag(z);
-	w = cosh(x) * cos(y) + (sinh(x) * sin(y)) * I;
+	w = cosh(x) * cos(y) + (sinh(x) * sin(y)) * (double complex) I;
 	return w;
 }

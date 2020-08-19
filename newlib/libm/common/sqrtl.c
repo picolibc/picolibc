@@ -143,7 +143,7 @@ sqrtl (long double x)
   if (ux.extu_ext.ext_exp == 0)
     {
       /* Adjust subnormal numbers.  */
-      ux.extu_ld *= 0x1.0p514;
+      ux.extu_ld *= 0x1.0p514l;
       k = -514;
     }
   else
@@ -167,10 +167,10 @@ sqrtl (long double x)
   /* Newton's iteration.
      Split ux.extu_ld into a high and low part to achieve additional precision.  */
 
-  xn = sqrt ((double) ux.extu_ld);	/* 53-bit estimate of sqrtl(x).  */
+  xn = (long double) sqrt ((double) ux.extu_ld);	/* 53-bit estimate of sqrtl(x).  */
 
 #if LDBL_MANT_DIG > 100
-  xn = (xn + (ux.extu_ld / xn)) * 0.5;	/* 106-bit estimate.  */
+  xn = (xn + (ux.extu_ld / xn)) * 0.5l;	/* 106-bit estimate.  */
 #endif
 
   lo = ux.extu_ld;

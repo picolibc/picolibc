@@ -41,7 +41,7 @@
 void
 sincosf (float y, float *sinp, float *cosp)
 {
-  double x = y;
+  double x = (double) y;
   double s;
   int n;
   const sincos_t *p = &__sincosf_table[0];

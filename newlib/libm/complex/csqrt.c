@@ -81,14 +81,14 @@ csqrt(double complex z)
 
 	if (y == 0.0) {
 		if (x == 0.0) {
-			w = 0.0 + y * I;
+			w = 0.0 + y * (double complex) I;
 		} else {
 			r = fabs(x);
 			r = sqrt(r);
 			if (x < 0.0) {
-				w = 0.0 + r * I;
+				w = 0.0 + r * (double complex) I;
 			} else {
-				w = r + y * I;
+				w = r + y * (double complex) I;
 			}
 		}
 		return w;
@@ -97,9 +97,9 @@ csqrt(double complex z)
 		r = fabs(y);
 		r = sqrt(0.5 * r);
 		if (y > 0)
-			w = r + r * I;
+			w = r + r * (double complex) I;
 		else
-			w = r - r * I;
+			w = r - r * (double complex) I;
 		return w;
 	}
 	/* Rescale to avoid internal overflow or underflow.  */
@@ -118,7 +118,7 @@ csqrt(double complex z)
 		scale = 0.5;
 #endif
 	}
-	w = x + y * I;
+	w = x + y * (double complex) I;
 	r = cabs(w);
 	if (x > 0) {
 		t = sqrt(0.5 * r + 0.5 * x);
@@ -130,8 +130,8 @@ csqrt(double complex z)
 		r *= scale;
 	}
 	if (y < 0)
-		w = t - r * I;
+		w = t - r * (double complex) I;
 	else
-		w = t + r * I;
+		w = t + r * (double complex) I;
 	return w;
 }

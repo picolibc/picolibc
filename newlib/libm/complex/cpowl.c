@@ -42,7 +42,7 @@ cpowl(long double complex a, long double complex z)
 	y = cimagl(z);
 	absa = cabsl(a);
 	if (absa == 0.0L) {
-		return (0.0L + 0.0L * I);
+		return (0.0L + 0.0L * (double complex) I);
 	}
 	arga = cargl(a);
 	r = powl(absa, x);
@@ -51,6 +51,6 @@ cpowl(long double complex a, long double complex z)
 		r = r * expl(-y * arga);
 		theta = theta + y * logl(absa);
 	}
-	w = r * cosl(theta) + (r * sinl(theta)) * I;
+	w = r * cosl(theta) + (r * sinl(theta)) * (double complex) I;
 	return w;
 }

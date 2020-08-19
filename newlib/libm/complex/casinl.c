@@ -49,12 +49,12 @@ casinl(long double complex z)
 #if 0 /* MD: test is incorrect, casin(>1) is defined */
 	if (y == 0.0L) {
 		if (fabsl(x) > 1.0L) {
-			w = M_PI_2L + 0.0L * I;
+			w = M_PI_2L + 0.0L * (double complex) I;
 #if 0
 			mtherr ("casinl", DOMAIN);
 #endif
 		} else {
-			w = asinl(x) + 0.0L * I;
+			w = asinl(x) + 0.0L * (double complex) I;
 		}
 		return w;
 	}
@@ -101,20 +101,20 @@ return;
 */
 
 
-	ca = x + y * I;
-	ct = ca * I;
+	ca = x + y * (double complex) I;
+	ct = ca * (double complex) I;
 	/* sqrtl( 1 - z*z) */
 	/* cmull( &ca, &ca, &zz ) */
 	/*x * x  -  y * y */
-	zz = (x - y) * (x + y) + (2.0L * x * y) * I;
+	zz = (x - y) * (x + y) + (2.0L * x * y) * (double complex) I;
 
-	zz = 1.0L - creall(zz) - cimagl(zz) * I;
+	zz = 1.0L - creall(zz) - cimagl(zz) * (double complex) I;
 	z2 = csqrtl(zz);
 
 	zz = ct + z2;
 	zz = clogl(zz);
 	/* multiply by 1/i = -i */
-	w = zz * (-1.0L * I);
+	w = zz * (-1.0L * (double complex) I);
 	return w;
 }
 

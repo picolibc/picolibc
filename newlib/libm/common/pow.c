@@ -289,7 +289,7 @@ checkint (uint64_t iy)
 static inline int
 zeroinfnan (uint64_t i)
 {
-  return 2 * i - 1 >= 2 * asuint64 (INFINITY) - 1;
+  return 2 * i - 1 >= 2 * asuint64 ((double) INFINITY) - 1;
 }
 
 double
@@ -316,8 +316,8 @@ pow (double x, double y)
 	    return issignaling_inline (x) ? x + y : 1.0;
 	  if (ix == asuint64 (1.0))
 	    return issignaling_inline (y) ? x + y : 1.0;
-	  if (2 * ix > 2 * asuint64 (INFINITY)
-	      || 2 * iy > 2 * asuint64 (INFINITY))
+	  if (2 * ix > 2 * asuint64 ((double) INFINITY)
+	      || 2 * iy > 2 * asuint64 ((double) INFINITY))
 	    return x + y;
 	  if (2 * ix == 2 * asuint64 (1.0))
 	    return 1.0;

@@ -213,7 +213,7 @@ powf (float x, float y)
 	}
     }
   double_t logx = log2_inline (ix);
-  double_t ylogx = y * logx; /* Note: cannot overflow, y is single prec.  */
+  double_t ylogx = (double) y * logx; /* Note: cannot overflow, y is single prec.  */
   if (__builtin_expect ((asuint64 (ylogx) >> 47 & 0xffff)
 			  >= asuint64 (126.0 * POWF_SCALE) >> 47,
 			0))
