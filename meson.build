@@ -594,7 +594,7 @@ if has_semihost
   # If we're using semihosting, we assume that there's a
   # custom linker script that includes picolibc.specs
 
-  test_link_name = 'test-' + host_cpu_family + '.ld'
+  test_link_name = 'scripts/test-' + host_cpu_family + '.ld'
   test_link_dep = files(test_link_name)
 
   # Linker args must be strings (seems like a bug), so compute the

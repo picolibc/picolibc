@@ -34,22 +34,58 @@
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 DIR=`dirname $0`
-meson $DIR \
-        -Dtls-model=global-dynamic \
-        -Dmultilib=false \
-        -Dpicolib=false \
-        -Dtinystdio=true \
-        -Dnewlib-locale-info=true\
-        -Dnewlib-locale-info-extended=true\
-        -Dnewlib-elix-level=2\
-	-Dnewlib-supplied-syscalls=false \
-	-Dnewlib-reentrant-small=false\
-	-Dnewlib-wide-orient=false\
-	-Dnewlib-nano-malloc=false\
-	-Dlite-exit=false\
-	-Dnewlib-mb=true\
-	-Dnewlib-global-atexit=false\
-	-Dincludedir=lib/picolibc/include \
-	-Dlibdir=lib/picolibc/lib \
-	-Dtests=true \
-	--buildtype debug
+
+# First argument must be target architecture
+
+case "$1" in
+    "")
+	echo "Usage: $0 <architecture>" 1>&2
+	exit 1
+	;;
+esac
+
+export ARCH="$1"
+shift
+
+# Find cross compile configuration
+
+CROSS="$DIR"/cross-"$ARCH".txt
+
+if [ -f "$CROSS" ]; then
+    :
+else
+    echo "$0: $ARCH not supported" 1>&2
+    exit 1
+fi
+
+# 'clang-' prefix uses clang instead of gcc
+
+case "$ARCH" in
+    clang-*)
+	ARCH=`echo $ARCH | sed 's/clang-//'`
+	;;
+esac
+
+# Check for sysroot-install and automatically set prefix if needed
+
+case "$*" in
+    *sysroot-install=true*)
+	case "$*" in
+	    *-Dprefix*)
+		:
+		;;
+	    *)
+		SYSROOT=`${ARCH}-gcc -print-sysroot`
+		PREFIX=-Dprefix="'"`readlink -f "$SYSROOT"`"'"
+		;;
+	esac
+	;;
+esac
+
+# Run meson
+
+meson "$DIR"/.. \
+	-Dincludedir=picolibc/$ARCH/include \
+	-Dlibdir=picolibc/$ARCH/lib \
+	--cross-file "$CROSS" \
+	$PREFIX "$@"

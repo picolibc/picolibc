@@ -34,7 +34,7 @@
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 DIR=`dirname $0`
-meson $DIR \
+meson "$DIR"/.. \
         --buildtype debug \
         -Dtls-model=global-dynamic \
         -Dmultilib=false \

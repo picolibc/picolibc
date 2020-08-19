@@ -33,11 +33,4 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
-ARCH=riscv64-unknown-elf
-DIR=`dirname $0`
-meson "$DIR" \
-        -Dtests=true \
-	-Dincludedir=picolibc/$ARCH/include \
-	-Dlibdir=picolibc/$ARCH/lib \
-	--cross-file "$DIR"/cross-$ARCH.txt \
-	"$@"
+exec `dirname $0`/do-configure riscv64-unknown-elf -Dtests=true "$@"
