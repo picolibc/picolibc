@@ -53,8 +53,11 @@ srcs_time = [
     'tzlock.c',
     'tzset.c',
     'tzvars.c',
-    'wcsftime.c',
 ]
+if not tinystdio
+  srcs_time += 'wcsftime.c'
+endif
+
 hdrs_time = [
     'local.h',
 ]
