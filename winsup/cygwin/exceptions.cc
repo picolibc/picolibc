@@ -28,6 +28,7 @@ details. */
 #include "ntdll.h"
 #include "exception.h"
 #include "posix_timer.h"
+#include "gcc_seh.h"
 
 /* Definitions for code simplification */
 #ifdef __x86_64__
@@ -763,15 +764,6 @@ exception::handle (EXCEPTION_RECORD *e, exception_list *frame, CONTEXT *in,
       return ExceptionContinueExecution;
 
 #ifdef __x86_64__
-/* From the GCC source file libgcc/unwind-seh.c. */
-#define STATUS_USER_DEFINED		(1U << 29)
-#define GCC_MAGIC			(('G' << 16) | ('C' << 8) | 'C')
-#define GCC_EXCEPTION(TYPE)		\
-       (STATUS_USER_DEFINED | ((TYPE) << 24) | GCC_MAGIC)
-#define STATUS_GCC_THROW		GCC_EXCEPTION (0)
-#define STATUS_GCC_UNWIND		GCC_EXCEPTION (1)
-#define STATUS_GCC_FORCED		GCC_EXCEPTION (2)
-
     case STATUS_GCC_THROW:
     case STATUS_GCC_UNWIND:
     case STATUS_GCC_FORCED:
