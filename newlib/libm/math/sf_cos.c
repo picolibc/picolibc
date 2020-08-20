@@ -49,7 +49,10 @@
 }
 
 #if defined(HAVE_ALIAS_ATTRIBUTE)
-float _cosf(float) __attribute__ ((__alias__ ("cosf")))  __attribute__((const)) __attribute__((leaf)) __attribute__((nothrow));
+#ifndef __clang__
+#pragma GCC diagnostic ignored "-Wmissing-attributes"
+#endif
+__strong_reference(cosf, _cosf);
 #endif
 
 #ifdef _DOUBLE_IS_32BITS
