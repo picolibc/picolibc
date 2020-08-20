@@ -109,7 +109,7 @@ strtod (const char * nptr, char ** endptr)
 	    nptr += 5;
 	if (endptr)
 	    *endptr = (char *)nptr;
-	return flag & FL_MINUS ? -INFINITY : +INFINITY;
+	return flag & FL_MINUS ? (double) -INFINITY : (double) +INFINITY;
     }
 
     /* NAN() construction is not realised.
@@ -117,7 +117,7 @@ strtod (const char * nptr, char ** endptr)
     if (!strncmp (nptr - 1, pstr_nan, 3)) {
 	if (endptr)
 	    *endptr = (char *)nptr + 2;
-	return NAN;
+	return (double) NAN;
     }
 
     u64 = 0;
@@ -192,7 +192,7 @@ strtod (const char * nptr, char ** endptr)
     }
     else if (u64digits + exp >= 310) {
 	// Number is larger than 1e+309, which should be rounded to +/-Infinity.
-	flt = INFINITY;
+	flt = (double) INFINITY;
     }
     else
 	flt = __atod_engine(u64, exp);

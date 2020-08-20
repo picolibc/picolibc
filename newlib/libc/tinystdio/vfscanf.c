@@ -346,7 +346,7 @@ conv_flt (FILE *stream, int *lenp, width_t width, void *addr, uint16_t flags)
 		}
 	    }
         }
-	flt = (p == pstr_an + 3) ? NAN : INFINITY;
+	flt = (p == pstr_an + 3) ? (FLOAT) NAN : (FLOAT) INFINITY;
 	break;
 
       default:
@@ -433,7 +433,7 @@ conv_flt (FILE *stream, int *lenp, width_t width, void *addr, uint16_t flags)
 		}
 		if (uintdigits + exp >= 310) {
 			// Number is larger than 1e+309, which should be rounded to +/-Infinity.
-			flt = INFINITY;
+			flt = (FLOAT) INFINITY;
 			break;
 		}
 		flt = __atod_engine(uint, exp);
@@ -443,15 +443,15 @@ conv_flt (FILE *stream, int *lenp, width_t width, void *addr, uint16_t flags)
 	{
 		if ((uintdigits + exp <= -46) || (uint == 0)) {
 			// Number is less than 1e-46, which should be rounded down to 0; return 0.0.
-			flt = 0.0f;
+			flt = (FLOAT) 0.0f;
 			break;
 		}
 		if (uintdigits + exp >= 40) {
 			// Number is larger than 1e+39, which should be rounded to +/-Infinity.
-			flt = INFINITY;
+			flt = (FLOAT) INFINITY;
 			break;
 		}
-		flt = __atof_engine(uint, exp);
+		flt = (FLOAT) __atof_engine(uint, exp);
 	}
 	break;
     } /* switch */

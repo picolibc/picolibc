@@ -184,7 +184,7 @@ strtold (const char * nptr, char ** endptr)
 	    nptr += 5;
 	if (endptr)
 	    *endptr = (char *)nptr;
-	return flag & FL_MINUS ? -INFINITY : +INFINITY;
+	return flag & FL_MINUS ? (long double) -INFINITY : (long double) +INFINITY;
     }
 
     /* NAN() construction is not realised.
@@ -192,7 +192,7 @@ strtold (const char * nptr, char ** endptr)
     if (!strncmp (nptr - 1, pstr_nan, 3)) {
 	if (endptr)
 	    *endptr = (char *)nptr + 2;
-	return __builtin_nanl("");
+	return (long double) NAN;
     }
 
     u128 = _u128_zero;
