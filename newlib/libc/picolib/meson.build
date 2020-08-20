@@ -61,6 +61,7 @@ endif
 if thread_local_storage
   srcs_picolib += srcs_tls
   if srcs_machine_tls.has_key(host_cpu_family)
+    has_picolibc_tls_api = true
     srcs_picolib += srcs_machine_tls[host_cpu_family]
   endif
 endif

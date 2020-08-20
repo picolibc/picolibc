@@ -619,6 +619,8 @@ else
   test_link_args += test_c_args
 endif
 
+has_picolibc_tls_api = false
+
 if enable_picocrt
   subdir('picocrt')
 endif
@@ -627,6 +629,8 @@ subdir('newlib')
 if enable_tests
   subdir('test')
 endif
+
+conf_data.set('HAVE_PICOLIBC_TLS_API', has_picolibc_tls_api, description: '_set_tls and _init_tls functions available')
 
 conf_data.set('HAVE_IEEEFP_FUNCS', has_ieeefp_funcs, description: 'IEEE fp funcs available')
 
