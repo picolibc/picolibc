@@ -98,25 +98,6 @@ inc (long double x)
   return ux.extu_ld;
 }
 
-/* Return (x - ulp) for normal positive x.  Assumes no underflow.  */
-
-static inline long double
-dec (long double x)
-{
-  union ieee_ext_u ux = { .extu_ld = x, };
-
-  if (ux.extu_ext.ext_fracl-- == 0)
-    {
-      if (ux.extu_ext.ext_frach-- == LDBL_NBIT)
-	{
-	  ux.extu_ext.ext_exp--;
-	  ux.extu_ext.ext_frach |= LDBL_NBIT;
-	}
-    }
-
-  return ux.extu_ld;
-}
-
 /* This is slow, but simple and portable.  */
 
 long double
