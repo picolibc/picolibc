@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 #
 # python script to process makedoc instructions in a source file and produce
 # DocBook XML output
@@ -199,6 +199,8 @@ def function(c, l):
     namelist = map(lambda v: re.sub('^and ', '', v.strip(), 1), namelist)
     # strip off << >> surrounding name
     namelist = map(lambda v: v.strip().lstrip('<').rstrip('>'), namelist)
+    # instantiate list to make it subscriptable
+    namelist = list(namelist)
 
     if verbose:
         print(namelist, file=sys.stderr)
@@ -262,7 +264,7 @@ def index(c, l):
     primary.text = l
 
     # to validate, it seems we need to maintain refentry elements in a certain order
-    refentry[:] = sorted(refentry, key = lambda x: x.tag)
+    refentry[:] = sorted(refentry, key = lambda x: x.tag if isinstance(x.tag, str) else '')
 
     # adds another alternate refname
     refnamediv = refentry.find('refnamediv')
@@ -807,7 +809,7 @@ def main(file):
     perform(processed)
 
     # output the XML tree
-    s = lxml.etree.tostring(rootelement, pretty_print=True)
+    s = lxml.etree.tostring(rootelement, pretty_print=True, encoding='unicode')
 
     if not s:
         print('No output produced (perhaps the input has no makedoc markup?)', file=sys.stderr)
@@ -826,7 +828,7 @@ def main(file):
 
 if __name__ == '__main__' :
     options = OptionParser()
-    options.add_option('-v', '--verbose', action='count', dest = 'verbose')
+    options.add_option('-v', '--verbose', action='count', dest = 'verbose', default = 0)
     options.add_option('-c', '--cache', action='store_true', dest = 'cache', help="just ensure PLY cache is up to date")
     (opts, args) = options.parse_args()
 
