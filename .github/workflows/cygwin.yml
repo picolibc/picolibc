@@ -1,0 +1,45 @@
+name: cygwin
+
+on: push
+
+jobs:
+  fedora-build:
+    runs-on: ubuntu-latest
+    container: fedora:latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+        - target: x86_64-pc-cygwin
+          pkgarch: 64
+        - target: i686-pc-cygwin
+          pkgarch: 32
+    name: Fedora cross ${{ matrix.target }}
+
+    steps:
+    - uses: actions/checkout@v2
+
+    # install build tools
+    - run: dnf install -y make patch perl
+    - run: dnf install -y mingw${{ matrix.pkgarch }}-gcc-c++ mingw${{ matrix.pkgarch }}-winpthreads-static mingw${{ matrix.pkgarch }}-zlib-static
+
+    # cocom isn't packaged in Fedora, so we install from a 3rd party repo
+    - run: dnf install -y https://github.com/rpmsphere/noarch/raw/master/r/rpmsphere-release-$(rpm -E %fedora)-1.noarch.rpm
+    - run: dnf install -y cocom
+
+    # install cross-cygwin toolchain and libs from copr
+    - run: dnf install -y dnf-plugins-core
+    - run: dnf copr enable -y yselkowitz/cygwin
+    - run: dnf install -y cygwin${{ matrix.pkgarch }}-gcc-c++ cygwin${{ matrix.pkgarch }}-gettext cygwin${{ matrix.pkgarch }}-libbfd cygwin${{ matrix.pkgarch }}-libiconv cygwin${{ matrix.pkgarch }}-zlib
+
+    # install doc tools
+    - run: dnf install -y dblatex docbook2X docbook-xsl xmlto
+    - run: dnf install -y python3 python3-lxml python3-ply
+
+    # build
+    - run: mkdir build install
+    - run: cd build && ../configure --target=${{ matrix.target }} --prefix=$(realpath $(pwd)/../install)
+    - run: make -C build
+    - run: make -C build/*/newlib info man
+    - run: make -C build install
+    - run: make -C build/*/newlib install-info install-man
