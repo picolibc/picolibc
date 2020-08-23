@@ -34,6 +34,7 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <stdbool.h>
 #include <errno.h>
 #include <malloc.h>
 #include <sys/config.h>
@@ -118,6 +119,7 @@ void * valloc(size_t s);
 void * pvalloc(size_t s);
 void __malloc_validate(void);
 void * __malloc_sbrk_aligned(size_t s);
+bool __malloc_grow_chunk(chunk_t *c, size_t new_size);
 
 /* Work around compiler optimizing away stores to 'size' field before
  * call to free.
@@ -153,14 +155,14 @@ chunk_end(chunk_t *c)
 static inline size_t
 chunk_size(size_t malloc_size)
 {
-    /* Make sure the requested size is big enough to hold a free chunk */
-    malloc_size = MAX(MALLOC_MINSIZE, malloc_size);
-
     /* Keep all blocks aligned */
     malloc_size = ALIGN_TO(malloc_size, MALLOC_ALIGN);
 
     /* Add space for header */
     malloc_size += MALLOC_HEAD;
+
+    /* Make sure the requested size is big enough to hold a free chunk */
+    malloc_size = MAX(MALLOC_MINSIZE, malloc_size);
     return malloc_size;
 }
 
@@ -185,6 +187,34 @@ extern void  *sbrk(intptr_t);
 #ifdef DEFINE_MALLOC
 /* List list header of free blocks */
 chunk_t * __malloc_free_list;
+
+bool
+__malloc_grow_chunk(chunk_t *c, size_t new_size)
+{
+    char *chunk_e = chunk_end(c);
+
+    if (chunk_e != __malloc_sbrk_top)
+	return false;
+    size_t add_size = MAX(MALLOC_MINSIZE, new_size - c->size);
+
+    /* Ask for the extra memory needed */
+    char *heap = __malloc_sbrk_aligned(add_size);
+
+    /* Check if we got what we wanted */
+    if (heap == chunk_e)
+    {
+	/* Set size and return */
+	c->size += add_size;
+	return true;
+    }
+
+    if (heap != (char *) -1)
+    {
+	/* sbrk returned unexpected memory, free it */
+	make_free_chunk((chunk_t *) heap, add_size);
+    }
+    return false;
+}
 
 /* Starting point of memory allocated from system */
 char * __malloc_sbrk_start;
@@ -255,11 +285,18 @@ void * malloc(size_t s)
             if (rem >= MALLOC_MINSIZE)
             {
                 /* Find a chunk_t that much larger than required size, break
-                * it into two chunks and return the second one */
-                r->size = rem;
-                r = (chunk_t *)((char *)r + rem);
+		 * it into two chunks and return the first one
+		 */
+
+		chunk_t *s = (chunk_t *)((char *)r + alloc_size);
+                s->size = rem;
+		s->next = r->next;
+		*p = s;
+
                 r->size = alloc_size;
-            } else {
+            }
+	    else
+	    {
 		/* Find a chunk_t that is exactly the size or slightly bigger
 		 * than requested size, just return this chunk_t
 		 */
@@ -267,6 +304,14 @@ void * malloc(size_t s)
 	    }
             break;
         }
+	if (!r->next && __malloc_grow_chunk(r, alloc_size))
+	{
+	    /* Grow the last chunk in memory to the requested size,
+	     * just return it
+	     */
+	    *p = r->next;
+	    break;
+	}
     }
 
     MALLOC_UNLOCK;
@@ -426,31 +471,16 @@ void * realloc(void * ptr, size_t size)
      */
     if (new_size > old_size)
     {
-	/* Check to see if we're at the end of the heap
-	 * and try to extend it
-	 */
 	void *chunk_e = chunk_end(p_to_realloc);
 
 	MALLOC_LOCK;
 
-	if (chunk_e == __malloc_sbrk_top)
+	if (__malloc_grow_chunk(p_to_realloc, new_size))
 	{
-	    size_t add_size = new_size - old_size;
-	    char *heap = __malloc_sbrk_aligned(add_size);
-	    if (heap == chunk_e)
-	    {
-		/* clear new memory */
-		memset(chunk_e, '\0', add_size);
-
-		/* adjust chunk_t size */
-		old_size = new_size;
-		p_to_realloc->size = old_size;
-	    } else if (heap != (void *) -1) {
-		/*
-		 * sbrk returned unexpected memory, free it
-		 */
-		make_free_chunk((chunk_t *) heap, add_size);
-	    }
+	    /* clear new memory */
+	    memset(chunk_e, '\0', new_size - old_size);
+	    /* adjust chunk_t size */
+	    old_size = new_size;
 	}
 	else
 	{
