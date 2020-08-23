@@ -1,0 +1,69 @@
+version: '{build}'
+
+branches:
+  only:
+  - master
+  - /cygwin/
+
+skip_tags: true
+shallow_clone: true
+
+environment:
+  APPVEYOR_SAVE_CACHE_ON_ERROR: true
+  CACHE: C:\cache
+  CYGWIN_MIRROR: http://cygwin.mirror.constant.com
+  matrix:
+  - BUILD: x86_64-pc-cygwin
+    CYGWIN_ROOT: C:\cygwin64
+    PKGARCH: mingw64-x86_64
+    SETUP: setup-x86_64.exe
+  - BUILD: i686-pc-cygwin
+    CYGWIN_ROOT: C:\cygwin
+    PKGARCH: mingw64-i686
+    SETUP: setup-x86.exe
+
+cache: C:\cache
+
+install:
+- if not exist %CACHE% mkdir %CACHE%
+- appveyor DownloadFile http://cygwin.com/%SETUP% -FileName %CACHE%\%SETUP%
+- "%CACHE%\\%SETUP% -qnNdO -R %CYGWIN_ROOT% -s %CYGWIN_MIRROR% -l %CACHE% -g -P \
+gcc-core,\
+gcc-g++,\
+make,\
+perl,\
+patch,\
+cocom,\
+gettext-devel,\
+libiconv-devel,\
+zlib-devel,\
+%PKGARCH%-gcc-core,\
+%PKGARCH%-gcc-g++,\
+%PKGARCH%-zlib,\
+dblatex,\
+docbook2X,\
+docbook-xml45,\
+docbook-xsl,\
+xmlto,\
+python3-lxml,\
+python3-ply"
+
+build_script:
+- '%CYGWIN_ROOT%/bin/bash -lc "cd $APPVEYOR_BUILD_FOLDER; mkdir build install"'
+- '%CYGWIN_ROOT%/bin/bash -lc "cd $APPVEYOR_BUILD_FOLDER/build; ../configure --prefix=$(realpath $(pwd)/../install) -v"'
+- '%CYGWIN_ROOT%/bin/bash -lc "cd $APPVEYOR_BUILD_FOLDER/build; make"'
+- '%CYGWIN_ROOT%/bin/bash -lc "cd $APPVEYOR_BUILD_FOLDER/build; make install"'
+- '%CYGWIN_ROOT%/bin/bash -lc "cd $APPVEYOR_BUILD_FOLDER/build; cd */newlib; make info man"'
+- '%CYGWIN_ROOT%/bin/bash -lc "cd $APPVEYOR_BUILD_FOLDER/build; cd */newlib; make install-info install-man"'
+
+test: off
+deploy: off
+
+# irc notification via notifico
+notifications:
+- provider: Webhook
+  url: http://n.tkte.ch/h/4848/0nqixIBiOFzf-S_N2PY83dGB
+  method: GET
+  on_build_success: false
+  on_build_failure: false
+  on_build_status_changed: true
