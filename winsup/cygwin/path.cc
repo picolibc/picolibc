@@ -5022,6 +5022,8 @@ char *
 cwdstuff::get (char *buf, int need_posix, int with_chroot, unsigned ulen)
 {
   tmp_pathbuf tp;
+
+  errno = 0;
   if (ulen)
     /* nothing */;
   else if (buf == NULL)
