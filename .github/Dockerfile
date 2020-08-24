@@ -10,6 +10,7 @@ RUN apt-get update && \
     build-essential \
     meson \
     ninja-build \
+    gcc-i686-linux-gnu \
     gcc-arm-none-eabi \
     gcc-riscv64-unknown-elf \
     gcc-aarch64-linux-gnu \
