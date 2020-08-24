@@ -66,7 +66,12 @@ typedef struct {
 	long long ll;
 	size_t s;
     } u;
-} align_t;
+} align_chunk_t;
+
+typedef struct {
+    char c;
+    size_t s;
+} align_head_t;
 
 typedef struct malloc_chunk
 {
@@ -76,7 +81,15 @@ typedef struct malloc_chunk
      *          | When freed: pointer to next free   |
      *          | chunk                              |
      *          --------------------------------------
+     *
+     * mem_ptr is aligned to MALLOC_CHUNK_ALIGN. That means that
+     * the chunk may not be aligned to MALLOC_CHUNK_ALIGN. But
+     * it will be aligned to MALLOC_HEAD_ALIGN.
+     *
+     * size is set so that a chunk starting at chunk+size will be
+     * aligned correctly
      */
+
     /* size of the allocated payload area */
     size_t size;
 
@@ -84,18 +97,21 @@ typedef struct malloc_chunk
     struct malloc_chunk * next;
 } chunk_t;
 
-/* Alignment of allocated block. Compute the alignment required from a
+/* Alignment of allocated chunk. Compute the alignment required from a
  * range of types */
-#define MALLOC_ALIGN		(offsetof(align_t, u))
+#define MALLOC_CHUNK_ALIGN	(offsetof(align_chunk_t, u))
+
+/* Alignment of the header. Never larger than MALLOC_CHUNK_ALIGN */
+#define MALLOC_HEAD_ALIGN	(offsetof(align_head_t, s))
 
 /* Size of malloc header. Keep it aligned. */
-#define MALLOC_HEAD 		ALIGN_TO(sizeof(size_t), MALLOC_ALIGN)
+#define MALLOC_HEAD 		ALIGN_TO(sizeof(size_t), MALLOC_HEAD_ALIGN)
 
 /* nominal "page size" */
 #define MALLOC_PAGE_ALIGN 	(0x1000)
 
 /* Minimum allocation size */
-#define MALLOC_MINSIZE		ALIGN_TO(sizeof(chunk_t), MALLOC_ALIGN)
+#define MALLOC_MINSIZE		ALIGN_TO(sizeof(chunk_t), MALLOC_HEAD_ALIGN)
 
 /* Maximum allocation size */
 #define MALLOC_MAXSIZE 		(SIZE_MAX - MALLOC_HEAD)
@@ -156,10 +172,13 @@ static inline size_t
 chunk_size(size_t malloc_size)
 {
     /* Keep all blocks aligned */
-    malloc_size = ALIGN_TO(malloc_size, MALLOC_ALIGN);
+    malloc_size = ALIGN_TO(malloc_size, MALLOC_CHUNK_ALIGN);
 
     /* Add space for header */
     malloc_size += MALLOC_HEAD;
+
+    /* fill the gap between chunks */
+    malloc_size += (MALLOC_CHUNK_ALIGN - MALLOC_HEAD_ALIGN);
 
     /* Make sure the requested size is big enough to hold a free chunk */
     malloc_size = MAX(MALLOC_MINSIZE, malloc_size);
@@ -188,6 +207,56 @@ extern void  *sbrk(intptr_t);
 /* List list header of free blocks */
 chunk_t * __malloc_free_list;
 
+/* Starting point of memory allocated from system */
+char * __malloc_sbrk_start;
+char * __malloc_sbrk_top;
+
+/** Function __malloc_sbrk_aligned
+  * Algorithm:
+  *   Use sbrk() to obtain more memory and ensure the storage is
+  *   MALLOC_CHUNK_ALIGN aligned. Optimise for the case that it is
+  *   already aligned - only ask for extra padding after we know we
+  *   need it
+  */
+void* __malloc_sbrk_aligned(size_t s)
+{
+    char *p, *align_p;
+
+    if (__malloc_sbrk_start == NULL)
+	__malloc_sbrk_start = sbrk(0);
+
+    p = sbrk(s);
+
+    /* sbrk returns -1 if fail to allocate */
+    if (p == (void *)-1)
+        return p;
+
+    __malloc_sbrk_top = p + s;
+
+    /* Adjust returned space so that the storage area
+     * is MALLOC_CHUNK_ALIGN aligned and the head is
+     * MALLOC_HEAD_ALIGN aligned.
+     */
+    align_p = ALIGN_PTR(p + MALLOC_HEAD, MALLOC_CHUNK_ALIGN) - MALLOC_HEAD;
+
+    if (align_p != p)
+    {
+        /* p is not aligned, ask for a few more bytes so that we have
+         * s bytes reserved from align_p. This should only occur for
+         * the first sbrk in a chunk of memory as all others should be
+         * aligned to the right value as chunk sizes are selected to
+         * make them abut in memory
+	 */
+	size_t adjust = align_p - p;
+        char *extra = sbrk(adjust);
+        if (extra != p + s)
+            return (void *) -1;
+	__malloc_sbrk_top = extra + adjust;
+    }
+
+    return align_p;
+}
+
 bool
 __malloc_grow_chunk(chunk_t *c, size_t new_size)
 {
@@ -214,45 +283,6 @@ __malloc_grow_chunk(chunk_t *c, size_t new_size)
 	make_free_chunk((chunk_t *) heap, add_size);
     }
     return false;
-}
-
-/* Starting point of memory allocated from system */
-char * __malloc_sbrk_start;
-char * __malloc_sbrk_top;
-
-/** Function __malloc_sbrk_aligned
-  * Algorithm:
-  *   Use sbrk() to obtain more memory and ensure it is MALLOC_ALIGN aligned
-  *   Optimise for the case that it is already aligned - only ask for extra
-  *   padding after we know we need it
-  */
-void* __malloc_sbrk_aligned(size_t s)
-{
-    char *p, *align_p;
-
-    if (__malloc_sbrk_start == NULL) __malloc_sbrk_start = sbrk(0);
-
-    p = sbrk(s);
-
-    /* sbrk returns -1 if fail to allocate */
-    if (p == (void *)-1)
-        return p;
-
-    __malloc_sbrk_top = p + s;
-
-    align_p = ALIGN_PTR(p, MALLOC_ALIGN);
-    if (align_p != p)
-    {
-	size_t adjust = align_p - p;
-        /* p is not aligned, ask for a few more bytes so that we have s
-         * bytes reserved from align_p. */
-        p = sbrk(adjust);
-        if (p == (void *)-1 || p != align_p + s)
-            return (void *) -1;
-	__malloc_sbrk_top = p + adjust;
-    }
-
-    return align_p;
 }
 
 /** Function malloc
@@ -546,9 +576,10 @@ __malloc_validate(void)
     chunk_t *r;
 
     for (r = __malloc_free_list; r; r = r->next) {
-	assert (ALIGN_PTR(r, MALLOC_ALIGN) == r);
+	assert (ALIGN_PTR(chunk_to_ptr(r), MALLOC_CHUNK_ALIGN) == chunk_to_ptr(r));
+	assert (ALIGN_PTR(r, MALLOC_HEAD_ALIGN) == r);
 	assert (r->size >= MALLOC_MINSIZE);
-	assert (ALIGN_TO(r->size, MALLOC_ALIGN) == r->size);
+	assert (ALIGN_TO(r->size, MALLOC_HEAD_ALIGN) == r->size);
 	assert (r->next == NULL || (char *) r + r->size < (char *) r->next);
     }
 }
@@ -638,7 +669,7 @@ void * memalign(size_t align, size_t s)
     /* Return NULL if align isn't power of 2 */
     if ((align & (align-1)) != 0) return NULL;
 
-    s = ALIGN_TO(MAX(s,1), MALLOC_ALIGN);
+    s = ALIGN_TO(MAX(s,1), MALLOC_CHUNK_ALIGN);
     align = MAX(align, MALLOC_MINSIZE);
 
     /* Make sure there's space to align the allocation and split
@@ -671,7 +702,7 @@ void * memalign(size_t align, size_t s)
 	chunk_p = new_chunk_p;
     }
 
-    offset = chunk_usable(chunk_p) - s;
+    offset = chunk_p->size - chunk_size(s);
 
     /* Split off the back piece if large enough */
     if (offset >= MALLOC_MINSIZE)
