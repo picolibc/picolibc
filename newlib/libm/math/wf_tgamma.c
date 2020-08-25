@@ -25,15 +25,17 @@
 {
         float y;
 	y = __ieee754_gammaf(x);
-	if (signgam < 0) y = -y;
 #ifdef _IEEE_LIBM
 	return y;
 #else
 	if(_LIB_VERSION == _IEEE_) return y;
 
 	if(!finitef(y)&&finitef(x)) {
-	  if(floorf(x)==x&&x<=(float)0.0)
-	    /* tgammaf pole */
+	  if (x==0.0f)
+	    /* tgammf pole */
+	    return (float)__kernel_standard((double)x,(double)x,142);
+	  else if(floorf(x)==x&&x<(float)0.0)
+	    /* tgammaf domain */
 	    return (float)__kernel_standard((double)x,(double)x,141);
 	  else
 	    /* tgammaf overflow */

@@ -149,22 +149,27 @@ __strong_reference(__ieee754_lgammaf_r, lgammaf_r);
 #endif
 
 #ifdef __STDC__
-	float __ieee754_lgammaf_r(float x, int *signgamp)
+	float ___ieee754_lgammaf_r(float x, int *signgamp)
 #else
-	float __ieee754_lgammaf_r(x, signgamp)
+	float ___ieee754_lgammaf_r(x, signgamp)
 	float x;
 	int *signgamp;
 #endif
 {
 	float t,y,z,nadj = 0.0,p,p1,p2,p3,q,r,w;
 	__int32_t i,hx,ix;
+	int mode = *signgamp;
 
 	GET_FLOAT_WORD(hx,x);
 
     /* purge off +-inf, NaN, +-0, and negative arguments */
 	*signgamp = 1;
 	ix = hx&0x7fffffff;
-	if(ix>=0x7f800000) return x*x;
+	if(ix>=0x7f800000) {
+	    if (hx<0 && mode)
+		return __math_invalidf(x);
+	    return x*x;
+	}
 	if(ix==0) {
 	    if(hx<0)
 	        *signgamp = -1;
@@ -177,10 +182,18 @@ __strong_reference(__ieee754_lgammaf_r, lgammaf_r);
 	    } else return -__ieee754_logf(x);
 	}
 	if(hx<0) {
-	    if(ix>=0x4b000000) 	/* |x|>=2**23, must be -integer */
+	    if(ix>=0x4b000000) { 	/* |x|>=2**23, must be -integer */
+		if (mode)
+		    return __math_invalidf(x);
 		return one/zero;
+	    }
 	    t = sin_pif(x);
-	    if(t==zero) return one/zero; /* -integer */
+	    if(t==zero) {
+		/* tgamma wants NaN instead of INFINITY */
+		if (mode)
+		    return __math_invalidf(x);
+		return one/zero; /* -integer */
+	    }
 	    nadj = __ieee754_logf(pi/fabsf(t*x));
 	    if(t<zero) *signgamp = -1;
 	    x = -x;
@@ -250,4 +263,11 @@ __strong_reference(__ieee754_lgammaf_r, lgammaf_r);
 	    r =  x*(__ieee754_logf(x)-one);
 	if(hx<0) r = nadj - r;
 	return r;
+}
+
+
+float __ieee754_lgammaf_r(float x, int *signgamp)
+{
+    *signgamp = 0;
+    return ___ieee754_lgammaf_r(x, signgamp);
 }

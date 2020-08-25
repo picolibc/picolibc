@@ -35,8 +35,10 @@
 	if(_LIB_VERSION == _IEEE_) return y;
 
 	if(!finite(y)&&finite(x)) {
-	  if(floor(x)==x&&x<=0.0)
-	    return __kernel_standard(x,x,41); /* tgamma pole */
+	  if (x==0.0)
+	    return __kernel_standard(x,x,42); /* tgamma pole */
+	  else if(floor(x)==x&&x<0.0)
+	    return __kernel_standard(x,x,41); /* tgamma domain */
 	  else
 	    return __kernel_standard(x,x,40); /* tgamma overflow */
 	}

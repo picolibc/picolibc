@@ -35,7 +35,8 @@ __strong_reference(__ieee754_gamma, tgamma);
 {
 	int sign;
 	double y;
-	y = __ieee754_exp (__ieee754_lgamma_r(x, &sign));
+	sign = 1;
+	y = __ieee754_exp(___ieee754_lgamma_r(x, &sign));
 	if (sign < 0)
 		y = -y;
 	return y;

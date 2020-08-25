@@ -34,9 +34,9 @@ __strong_reference(__ieee754_gammaf, gammaf);
 	float x;
 #endif
 {
-	int sign;
+	int sign = 1;
 	float y;
-	y = __ieee754_expf (__ieee754_lgammaf_r(x, &sign));
+	y = __ieee754_expf (___ieee754_lgammaf_r(x, &sign));
 	if (sign < 0)
 		y = -y;
 	return y;

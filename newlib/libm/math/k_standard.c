@@ -74,7 +74,8 @@ static double zero = 0.0;	/* used as const */
  *	39-- yn(x>X_TLOSS, n)
  *	40-- gamma(finite) overflow
  *	41-- gamma(-integer)
- *	42-- pow(NaN,0.0)
+ *	42-- gamma(0)
+ *	43-- pow(NaN,0.0)
  */
 
 
@@ -336,12 +337,18 @@ static double zero = 0.0;	/* used as const */
 		break;
 	    case 41:
 	    case 141:
-		/* gamma(-integer) or gamma(0) */
-		retval = HUGE_VAL;
+		/* gamma(-integer) */
+		retval = (double) NAN;
 		errno = EDOM;
 		break;
 	    case 42:
 	    case 142:
+		/* gamma(0) */
+		retval = copysign(HUGE_VAL,x);
+		errno = ERANGE;
+		break;
+	    case 43:
+	    case 143:
 		/* pow(NaN,0.0) */
 		/* Not an error.  */
 		retval = 1.0;
