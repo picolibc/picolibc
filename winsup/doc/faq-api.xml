@@ -18,7 +18,7 @@ Windows into the C library.  Then your apps should (ideally) run on POSIX
 systems (Unix/Linux) and Windows with no changes at the source level.
 </para>
 <para>The C library is in a DLL, which makes basic applications quite small.
-And it allows relatively easy upgrades to the Win32/POSIX translation
+And it allows relatively easy upgrades to the Windows/POSIX translation
 layer, providing that DLL changes stay backward-compatible.
 </para>
 <para>For a good overview of Cygwin, you may want to read the Cygwin
@@ -140,7 +140,7 @@ spawn family of calls if possible.
 <para>Here's how it works:
 </para>
 <para>Parent initializes a space in the Cygwin process table for child.
-Parent creates child suspended using Win32 CreateProcess call, giving
+Parent creates child suspended using Windows CreateProcess call, giving
 the same path it was invoked with itself.  Parent calls setjmp to save
 its own context and then sets a pointer to this in the Cygwin shared
 memory area (shared among all Cygwin tasks).  Parent fills in the child's
@@ -326,7 +326,7 @@ name under the API.
 <para>E.g., the POSIX select system call can wait on a standard file handles
 and handles to sockets.  The select call in Winsock can only wait on
 sockets.  Because of this, the Cygwin dll does a lot of nasty stuff behind
-the scenes, trying to persuade various Winsock/Win32 functions to do what
+the scenes, trying to persuade various Winsock/Windows functions to do what
 a Unix select would do.
 </para>
 <para>If you are porting an application which already uses Winsock, then
@@ -337,11 +337,11 @@ direct calls to Winsock functions.  If you use Cygwin, use the POSIX API.
 </answer></qandaentry>
 
 <qandaentry id="faq.api.winsock">
-<question><para>I don't want Unix sockets, how do I use normal Win32 winsock?</para></question>
+<question><para>I don't want Unix sockets, how do I use normal Windows winsock?</para></question>
 <answer>
 
 <para>You don't.  Look for the Mingw-w64 project to port applications using
-native Win32/Winsock functions.  Cross compilers packages to build Mingw-w64
+native Windows API/Winsock functions.  Cross compilers packages to build Mingw-w64
 targets are available in the Cygwin distro.
 </para>
 </answer></qandaentry>

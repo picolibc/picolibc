@@ -76,7 +76,7 @@ sizeof(void*)       4        8        8
 </screen>
 
 <para>This difference can result in interesting problems, especially when
-using Win32 functions, especially when using pointers to Windows
+using Windows API functions using pointers to Windows
 datatypes like LONG, ULONG, DWORD.  Given that Windows is LLP64, all of
 the aforementioned types are 4 byte in size, on 32 as well as on 64 bit
 Windows, while `long' on 64 bit Cygwin is 8 bytes.</para>
@@ -189,10 +189,10 @@ string pointer given to printf is missing the upper 4 bytes.
 </para></listitem>
 
 <listitem><para>
-<emphasis>Don't</emphasis> use C base types together with Win32 functions.
+<emphasis>Don't</emphasis> use C base types together with Windows API functions.
 Keep in mind that DWORD, LONG, ULONG are <emphasis>not</emphasis> the same
-as long and unsigned long.  Try to use only Win32 datatypes in conjunction
-with Win32 API function calls to avoid type problems.  See the above
+as long and unsigned long.  Try to use only Windows datatypes in conjunction
+with Windows API function calls to avoid type problems.  See the above
 ReadFile example.  Windows functions in printf calls should be treated
 carefully as well.  This code is common for 32 bit code, but probably prints
 the wrong value on 64 bit:
@@ -438,11 +438,11 @@ gcj --main=Hello Hello.java
 </answer></qandaentry>
 
 <qandaentry id="faq.programming.win32-api">
-<question><para>How do I use Win32 API calls?</para></question>
+<question><para>How do I use Windows API calls?</para></question>
 <answer>
 
 <para>Cygwin tools require that you explicitly link the import libraries
-for whatever Win32 API functions that you are going to use, with the exception
+for whatever Windows API functions that you are going to use, with the exception
 of kernel32, which is linked automatically (because the startup and/or
 built-in code uses it).
 </para>
@@ -464,7 +464,7 @@ including user32, gdi32 and comdlg32.
 or at least after all the object files and static libraries that reference them.
 </para>
 
-<note><para>There are a few restrictions for calls to the Win32 API.
+<note><para>There are a few restrictions for calls to the Windows API.
 For details, see the User's Guide section
 <ulink url="https://cygwin.com/cygwin-ug-net/setup-env.html#setup-env-win32">Restricted Win32 environment</ulink>,
 as well as the User's Guide section
@@ -472,7 +472,7 @@ as well as the User's Guide section
 </answer></qandaentry>
 
 <qandaentry id="faq.programming.win32-no-cygwin">
-<question><para>How do I compile a Win32 executable that doesn't use Cygwin?</para></question>
+<question><para>How do I compile a Windows executable that doesn't use Cygwin?</para></question>
 <answer>
 
 <para>The compilers provided by the <literal>mingw64-i686-gcc</literal> and
@@ -528,7 +528,7 @@ lines must start with tabs.  This is not specific to Cygwin.
 </answer></qandaentry>
 
 <qandaentry id="faq.programming.win32-headers">
-<question><para>Why can't we redistribute Microsoft's Win32 headers?</para></question>
+<question><para>Why can't we redistribute Microsoft's Windows API headers?</para></question>
 <answer>
 
 <para>Subsection 2.d.f of the `Microsoft Open Tools License agreement' looks
@@ -536,7 +536,7 @@ like it says that one may not "permit further redistribution of the
 Redistributables to their end users".  We take this to mean that we can
 give them to you, but you can't give them to anyone else, which is
 something that we can't agree to.  Fortunately, we
-have our own Win32 headers which are pretty complete.
+have our own Windows API headers which are pretty complete.
 </para>
 </answer></qandaentry>
 
