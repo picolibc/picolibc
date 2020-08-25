@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 #
 # python script to convert the handwritten chapter .texi files, which include
 # the generated files for each function, to DocBook XML
