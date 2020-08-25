@@ -12,10 +12,10 @@
 
 <para>Well, something has gone wrong somehow...
 </para>
-<para>To repair the damage, you must run Cygwin Setup again, and re-install the
+<para>To repair the damage, you must run the Cygwin Setup program again, and re-install the
 package which provides the missing DLL package.
 </para>
-<para>If you already installed the package at one point, Cygwin Setup won't
+<para>If you already installed the package at one point, the Cygwin Setup program won't
 show the option to install the package by default.  In the
 ``Select packages to install'' dialog, click on the <literal>Full/Part</literal>
 button.  This lists all packages, even those that are already
@@ -188,7 +188,7 @@ information).
 
 <para>This is done for you in the file /etc/profile, which is sourced by bash
 when you start it from the Desktop or Start Menu shortcut, created by
-<literal>setup.exe</literal>.  The line is
+the Cygwin Setup program. The line is
 </para>
 <screen>
 	PATH="/usr/local/bin:/usr/bin:/bin:$PATH"
@@ -537,11 +537,11 @@ if you have one a single Cygwin installation, for example, if you update the
 Cygwin package without exiting <emphasis>all</emphasis> Cygwin apps (including
 services like sshd) beforehand.</para>
 <para>The only DLL that is sanctioned by the Cygwin project is the one that
-you get by running <ulink url="https://cygwin.com/install.html">setup-x86.exe or setup-x86_64.exe</ulink>,
+you get by running the <ulink url="https://cygwin.com/install.html">Cygwin Setup program</ulink>,
 installed in a directory controlled by this program.  If you have other
 versions on your system and desire help from the cygwin project, you should
 delete or rename all DLLs that are not installed by
-<filename>setup.exe</filename>.
+the Cygwin Setup program.
 </para>
 <para>If you're trying to find multiple versions of the DLL that are causing
 this problem, reboot first, in case DLLs still loaded in memory are the
@@ -882,7 +882,7 @@ this is still a problem, however.)
 hang when unpacking tar.gz archives.  This is surely a bug in VirusScan,
 and should be reported to NAI.  The only workaround is to disable
 VirusScan when accessing these files.  This can be an issue during
-setup, and is discussed in that FAQ entry.
+Setup, and is discussed in that FAQ entry.
 </para>
 <para>Some users report a significant performance hit using Cygwin when their
 anti-virus software is enabled.  Rather than disable the anti-virus
@@ -1402,10 +1402,10 @@ such as virtual memory paging and file caching.</para>
     <listitem>
       <para>
 	Force a full rebase: Run <command>rebase-trigger fullrebase</command>,
-	exit all Cygwin programs and run Cygwin setup.
+	exit all Cygwin programs and run the Cygwin Setup program.
       </para>
       <para>
-	By default, Cygwin's setup program automatically performs an incremental
+	By default, the Cygwin Setup program automatically performs an incremental
 	rebase of newly installed files.  Forcing a full rebase causes the
 	rebase map to be cleared before doing the rebase.
       </para>
@@ -1448,11 +1448,12 @@ such as virtual memory paging and file caching.</para>
 	They also may not provide any obvious way to keep the Cygwin packages
 	their application uses up to date with fixes for security issues and
 	upgrades.</para>
-    <para>The solution is simply downloading and running Cygwin Setup,
-	following the instructions in the Internet Setup section of
+    <para>The solution is simply downloading and running the Cygwin Setup program,
+	following the instructions in the
 	<ulink url="https://cygwin.com/cygwin-ug-net/setup-net.html#internet-setup">
-	    Setting Up Cygwin</ulink> in the Cygwin User's Guide.</para>
-    <para>Please exit from all applications before running Cygwin Setup.
+	Internet Setup</ulink> section of ``Setting Up Cygwin'' in the
+	Cygwin User's Guide.</para>
+    <para>Please exit from all applications before running the Cygwin Setup program.
 	When running Setup, you should not change most of the values presented,
 	just select the <literal>Next</literal> button in most cases, as you
 	already have a Cygwin release installed, and only want to upgrade your
@@ -1463,7 +1464,7 @@ such as virtual memory paging and file caching.</para>
 	faster downloads, as shown, with more details to help you choose, on the
 	<ulink url="https://cygwin.com/mirrors.html">
 	    Mirror Sites</ulink> web page.</para>
-    <para>Cygwin Setup will download and apply upgrades to all packages
+    <para>The Cygwin Setup program will download and apply upgrades to all packages
 	required for Cygwin itself and installed applications.
 	Any problems with applying updates, or the application after updates,
 	should be reported to the project or product supplier for remedial
