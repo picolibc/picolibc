@@ -150,5 +150,6 @@ in terms of the base return values, although the <[signgam]> global for
 {
 	return lgamma(x);
 }
+#endif
 
 #endif /* defined(_DOUBLE_IS_32BITS) */

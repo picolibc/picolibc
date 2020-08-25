@@ -16,6 +16,7 @@
 #include "math.h"
 #include "fdlibm.h"
 
+#if !defined(_IEEE_LIBM) || !defined(HAVE_ALIAS_ATTRIBUTE)
 #ifdef __STDC__
 	float tgammaf(float x)
 #else
@@ -30,20 +31,21 @@
 #else
 	if(_LIB_VERSION == _IEEE_) return y;
 
-	if(!finitef(y)&&finitef(x)) {
+	if(!finitef(y)) {
 	  if (x==0.0f)
 	    /* tgammf pole */
 	    return (float)__kernel_standard((double)x,(double)x,142);
-	  else if(floorf(x)==x&&x<(float)0.0)
+	  else if(floorf(x)==x&&x<0.0f)
 	    /* tgammaf domain */
 	    return (float)__kernel_standard((double)x,(double)x,141);
-	  else
+	  else if (finitef(x))
 	    /* tgammaf overflow */
 	    return (float)__kernel_standard((double)x,(double)x,140);
 	}
 	return y;
 #endif
 }
+#endif
 
 #ifdef _DOUBLE_IS_32BITS
 

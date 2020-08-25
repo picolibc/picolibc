@@ -37,6 +37,7 @@
 
 #if defined(_IEEE_LIBM) && defined(HAVE_ALIAS_ATTRIBUTE)
 __strong_reference(__ieee754_lgammaf, lgammaf);
+__strong_reference(__ieee754_lgammaf, gammaf);
 #endif
 
 float __ieee754_lgammaf(float x)

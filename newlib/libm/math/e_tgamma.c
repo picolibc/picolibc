@@ -21,8 +21,7 @@
 #include "fdlibm.h"
 
 #if defined(_IEEE_LIBM) && defined(HAVE_ALIAS_ATTRIBUTE)
-__strong_reference(__ieee754_gamma, gamma);
-__strong_reference(__ieee754_gamma, tgamma);
+__strong_reference(__ieee754_tgamma, tgamma);
 #endif
 
 #ifdef __STDC__
@@ -32,8 +31,8 @@ __strong_reference(__ieee754_gamma, tgamma);
 	double x;
 #endif
 {
-	int signgam_local;
-	double y = __ieee754_exp(__ieee754_lgamma_r(x, &signgam_local));
+	int signgam_local = 1;
+	double y = __ieee754_exp(___ieee754_lgamma_r(x, &signgam_local));
 	if (signgam_local < 0)
 		y = -y;
 	return y;
