@@ -30,7 +30,7 @@
 #if __ARM_ARCH_ISA_THUMB == 2
 #include "strlen-thumb2-Os.S"
 
-#elif defined (__ARM_ARCH_ISA_THUMB)
+#elif defined (__thumb__)
 #include "strlen-thumb1-Os.S"
 
 #else
