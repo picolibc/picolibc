@@ -34,6 +34,7 @@
  */
 
 volatile FLOAT_T makemathname(zero) = 0.0;
+volatile FLOAT_T makemathname(negzero) = -0.0;
 volatile FLOAT_T makemathname(one) = 1.0;
 volatile FLOAT_T makemathname(two) = 2.0;
 volatile FLOAT_T makemathname(big) = BIG;
@@ -47,11 +48,21 @@ FLOAT_T makemathname(test_acosh_half)(void) { return makemathname(acosh)(makemat
 FLOAT_T makemathname(test_asin_2)(void) { return makemathname(asin)(makemathname(two)); }
 FLOAT_T makemathname(test_exp_big)(void) { return makemathname(exp)(makemathname(big)); }
 FLOAT_T makemathname(test_exp_neg)(void) { return makemathname(exp)(-makemathname(big)); }
-FLOAT_T makemathname(test_gamma_negi)(void) { return makemathname(gamma)(-makemathname(one)); }
-FLOAT_T makemathname(test_gamma_big)(void) { return makemathname(gamma)(makemathname(big)); }
+FLOAT_T makemathname(test_tgamma_0)(void) { return makemathname(tgamma)(makemathname(zero)); }
+FLOAT_T makemathname(test_tgamma_neg0)(void) { return makemathname(tgamma)(makemathname(negzero)); }
+FLOAT_T makemathname(test_tgamma_neg1)(void) { return makemathname(tgamma)(-makemathname(one)); }
+FLOAT_T makemathname(test_tgamma_big)(void) { return makemathname(tgamma)(makemathname(big)); }
+FLOAT_T makemathname(test_tgamma_negbig)(void) { return makemathname(tgamma)(makemathname(-big)); }
+FLOAT_T makemathname(test_tgamma_inf)(void) { return makemathname(tgamma)(INFINITY); }
+FLOAT_T makemathname(test_tgamma_neginf)(void) { return makemathname(tgamma)(-INFINITY); }
 FLOAT_T makemathname(test_hypot_big)(void) { return makemathname(hypot)(makemathname(big), makemathname(big)); }
-FLOAT_T makemathname(test_lgamma_negi)(void) { return makemathname(lgamma)(-makemathname(one)); }
+FLOAT_T makemathname(test_lgamma_0)(void) { return makemathname(lgamma)(makemathname(zero)); }
+FLOAT_T makemathname(test_lgamma_neg0)(void) { return makemathname(lgamma)(makemathname(negzero)); }
+FLOAT_T makemathname(test_lgamma_neg1)(void) { return makemathname(lgamma)(-makemathname(one)); }
 FLOAT_T makemathname(test_lgamma_big)(void) { return makemathname(lgamma)(makemathname(big)); }
+FLOAT_T makemathname(test_lgamma_negbig)(void) { return makemathname(lgamma)(makemathname(-big)); }
+FLOAT_T makemathname(test_lgamma_inf)(void) { return makemathname(lgamma)(INFINITY); }
+FLOAT_T makemathname(test_lgamma_neginf)(void) { return makemathname(lgamma)(-INFINITY); }
 FLOAT_T makemathname(test_log_0)(void) { return makemathname(log)(makemathname(zero)); }
 FLOAT_T makemathname(test_log_neg)(void) { return makemathname(log)(-makemathname(one)); }
 FLOAT_T makemathname(test_log10_0)(void) { return makemathname(log10)(makemathname(zero)); }
@@ -82,10 +93,20 @@ struct {
 	TEST(exp_big, INFINITY, FE_OVERFLOW, ERANGE),
 	TEST(exp_neg, 0.0f, FE_UNDERFLOW, ERANGE),
 	TEST(hypot_big, INFINITY, FE_OVERFLOW, ERANGE),
-	TEST(gamma_negi, INFINITY, FE_DIVBYZERO, ERANGE),
-	TEST(gamma_big, INFINITY, FE_OVERFLOW, ERANGE),
-	TEST(lgamma_negi, INFINITY, FE_DIVBYZERO, ERANGE),
+	TEST(tgamma_0, INFINITY, FE_DIVBYZERO, ERANGE),
+	TEST(tgamma_neg0, -INFINITY, FE_DIVBYZERO, ERANGE),
+	TEST(tgamma_neg1, NAN, FE_INVALID, EDOM),
+	TEST(tgamma_big, INFINITY, FE_OVERFLOW, ERANGE),
+	TEST(tgamma_negbig, NAN, FE_INVALID, EDOM),
+	TEST(tgamma_inf, INFINITY, 0, 0),
+	TEST(tgamma_neginf, NAN, FE_INVALID, EDOM),
+	TEST(lgamma_0, INFINITY, FE_DIVBYZERO, ERANGE),
+	TEST(lgamma_neg0, INFINITY, FE_DIVBYZERO, ERANGE),
+	TEST(lgamma_neg1, INFINITY, FE_DIVBYZERO, ERANGE),
 	TEST(lgamma_big, INFINITY, FE_OVERFLOW, ERANGE),
+	TEST(lgamma_negbig, INFINITY, FE_DIVBYZERO, ERANGE),
+	TEST(lgamma_inf, INFINITY, 0, 0),
+	TEST(lgamma_neginf, INFINITY, 0, 0),
 	TEST(log_0, -INFINITY, FE_DIVBYZERO, ERANGE),
 	TEST(log_neg, NAN, FE_INVALID, EDOM),
 	TEST(log10_0, -INFINITY, FE_DIVBYZERO, ERANGE),
