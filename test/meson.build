@@ -147,3 +147,15 @@ foreach target : targets
   endforeach
 
 endforeach
+
+if enable_native_tests
+
+  native_lib_m = meson.get_compiler('c').find_library('m', required: false)
+
+  if native_lib_m.found()
+    test('math_errhandling_native',
+	 executable('math_errhandling_native', 'math_errhandling.c',
+		    c_args: ['-Wno-missing-braces', '-Wno-implicit-int', '-Wno-return-type', '-D_XOPEN_SOURCE=700', '-D_GNU_SOURCE', '-DNO_NEWLIB'],
+		    dependencies: native_lib_m))
+  endif
+endif
