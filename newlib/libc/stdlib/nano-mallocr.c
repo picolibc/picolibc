@@ -37,6 +37,7 @@
 #include <stdbool.h>
 #include <errno.h>
 #include <malloc.h>
+#include <unistd.h>
 #include <sys/config.h>
 
 #if MALLOC_DEBUG
@@ -200,8 +201,6 @@ make_free_chunk(chunk_t *c, size_t size)
     c->size = size;
     __malloc_free(chunk_to_ptr(c));
 }
-
-extern void  *sbrk(intptr_t);
 
 #ifdef DEFINE_MALLOC
 /* List list header of free blocks */
