@@ -35,6 +35,7 @@
 
 #include "semihost-private.h"
 #include <sys/cdefs.h>
+#include <unistd.h>
 
 void  _ATTRIBUTE((__noreturn__))
 _exit(int code)
