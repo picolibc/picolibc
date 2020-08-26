@@ -40,7 +40,7 @@ volatile FLOAT_T makemathname(big) = BIG;
 
 #define cat2(a,b) a ## b
 #define str(a) #a
-#define TEST(n,v,ex,er)	{ .func = makemathname(cat2(test_, n)), .name = str(n), .value = (v), .except = (ex), .errno = (er) }
+#define TEST(n,v,ex,er)	{ .func = makemathname(cat2(test_, n)), .name = str(n), .value = (v), .except = (ex), .errno_expect = (er) }
 
 FLOAT_T makemathname(test_acos_2)(void) { return makemathname(acos)(makemathname(two)); }
 FLOAT_T makemathname(test_acosh_half)(void) { return makemathname(acosh)(makemathname(one)/makemathname(two)); }
@@ -74,7 +74,7 @@ struct {
 	char	*name;
 	FLOAT_T	value;
 	int	except;
-	int	errno;
+	int	errno_expect;
 } makemathname(tests)[] = {
 	TEST(acos_2, NAN, FE_INVALID, EDOM),
 	TEST(acosh_half, NAN, FE_INVALID, EDOM),
@@ -132,7 +132,7 @@ makemathname(run_tests)(void) {
 			++result;
 		}
 		if (math_errhandling & EXCEPTION_TEST) {
-			if (!(except & makemathname(tests)[t].except)) {
+			if ((except & makemathname(tests)[t].except) != makemathname(tests)[t].except) {
 				printf("\texceptions supported but %s returns 0x%x\n", makemathname(tests)[t].name, except);
 				++result;
 			}
@@ -143,7 +143,7 @@ makemathname(run_tests)(void) {
 			}
 		}
 		if (math_errhandling & MATH_ERRNO) {
-			if (err != makemathname(tests)[t].errno) {
+			if (err != makemathname(tests)[t].errno_expect) {
 				printf("\terrno supported but %s returns %d (%s)\n", makemathname(tests)[t].name, err, strerror(err));
 				++result;
 			}
