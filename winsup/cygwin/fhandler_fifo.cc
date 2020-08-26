@@ -377,14 +377,14 @@ fhandler_fifo::add_client_handler (bool new_pipe_instance)
   return 0;
 }
 
-/* Always called with fifo_client_lock in place. */
+/* Always called with fifo_client_lock in place.  Delete a
+   client_handler by swapping it with the last one in the list. */
 void
 fhandler_fifo::delete_client_handler (int i)
 {
   fc_handler[i].close ();
   if (i < --nhandlers)
-    memmove (fc_handler + i, fc_handler + i + 1,
-	     (nhandlers - i) * sizeof (fc_handler[i]));
+    fc_handler[i] = fc_handler[nhandlers];
 }
 
 /* Delete handlers that we will never read from.  Always called with
