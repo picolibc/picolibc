@@ -43,6 +43,9 @@
 	.p2align 4,,15
 	.global __aeabi_read_tp
 	.type __aeabi_read_tp,%function
+#ifdef __thumb__
+	.thumb
+#endif
 
 __aeabi_read_tp:
 	.cfi_sections .debug_frame
