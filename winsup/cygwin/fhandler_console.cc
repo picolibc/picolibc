@@ -59,7 +59,7 @@ static struct fhandler_base::rabuf_t con_ra;
 
 /* Write pending buffer for ESC sequence handling
    in xterm compatible mode */
-static unsigned char last_char;
+static wchar_t last_char;
 
 /* simple helper class to accumulate output in a buffer
    and send that to the console on request: */
@@ -67,18 +67,20 @@ static class write_pending_buffer
 {
 private:
   static const size_t WPBUF_LEN = 256u;
-  unsigned char buf[WPBUF_LEN];
+  char buf[WPBUF_LEN];
   size_t ixput;
 public:
-  inline void put (unsigned char x)
+  inline void put (char x)
   {
     if (ixput < WPBUF_LEN)
       buf[ixput++] = x;
   }
   inline void empty () { ixput = 0u; }
-  inline void send (HANDLE &handle, DWORD *wn = NULL)
+  inline void send (HANDLE &handle)
   {
-    WriteConsoleA (handle, buf, ixput, wn, 0);
+    wchar_t bufw[WPBUF_LEN];
+    DWORD len = sys_mbstowcs (bufw, WPBUF_LEN, buf, ixput);
+    WriteConsoleW (handle, bufw, len, NULL, 0);
   }
 } wpbuf;
 
@@ -291,7 +293,7 @@ fhandler_console::request_xterm_mode_input (bool req)
 	  dwMode |= ENABLE_VIRTUAL_TERMINAL_INPUT;
 	  SetConsoleMode (get_handle (), dwMode);
 	  if (con.cursor_key_app_mode) /* Restore DECCKM */
-	    WriteConsoleA (get_output_handle (), "\033[?1h", 5, NULL, 0);
+	    WriteConsoleW (get_output_handle (), L"\033[?1h", 5, NULL, 0);
 	}
     }
   else
@@ -1793,6 +1795,9 @@ fhandler_console::write_console (PWCHAR buf, DWORD len, DWORD& done)
       if (buf[i] >= (unsigned char) '`' && buf[i] <= (unsigned char) '~')
 	buf[i] = __vt100_conv[buf[i] - (unsigned char) '`'];
 
+  if (len > 0)
+    last_char = buf[len-1];
+
   while (len > 0)
     {
       DWORD nbytes = len > MAX_WRITE_CHARS ? MAX_WRITE_CHARS : len;
@@ -2001,6 +2006,7 @@ fhandler_console::char_command (char c)
 {
   int x, y, n;
   char buf[40];
+  wchar_t bufw[40];
   int r, g, b;
 
   if (wincap.has_con_24bit_colors () && !con_is_legacy)
@@ -2035,9 +2041,9 @@ fhandler_console::char_command (char c)
 	  if (wincap.has_con_esc_rep ())
 	    /* Just send the sequence */
 	    wpbuf.send (get_output_handle ());
-	  else if (last_char && last_char != '\n')
+	  else if (last_char && last_char != L'\n')
 	    for (int i = 0; i < con.args[0]; i++)
-	      WriteConsoleA (get_output_handle (), &last_char, 1, 0, 0);
+	      WriteConsoleW (get_output_handle (), &last_char, 1, 0, 0);
 	  break;
 	case 'r': /* DECSTBM */
 	  con.scroll_region.Top = con.args[0] ? con.args[0] - 1 : 0;
@@ -2058,25 +2064,25 @@ fhandler_console::char_command (char c)
 		{
 		  /* Erase scroll down area */
 		  n = con.args[0] ? : 1;
-		  __small_sprintf (buf, "\033[%d;1H\033[J\033[%d;%dH",
-				   srBottom - (n-1) - con.b.srWindow.Top + 1,
-				   y + 1 - con.b.srWindow.Top, x + 1);
-		  WriteConsoleA (get_output_handle (),
-				 buf, strlen (buf), 0, 0);
+		  __small_swprintf (bufw, L"\033[%d;1H\033[J\033[%d;%dH",
+				    srBottom - (n-1) - con.b.srWindow.Top + 1,
+				    y + 1 - con.b.srWindow.Top, x + 1);
+		  WriteConsoleW (get_output_handle (),
+				 bufw, wcslen (bufw), 0, 0);
 		}
-	      __small_sprintf (buf, "\033[%d;%dr",
-			       y + 1 - con.b.srWindow.Top,
-			       srBottom + 1 - con.b.srWindow.Top);
-	      WriteConsoleA (get_output_handle (), buf, strlen (buf), 0, 0);
+	      __small_swprintf (bufw, L"\033[%d;%dr",
+				y + 1 - con.b.srWindow.Top,
+				srBottom + 1 - con.b.srWindow.Top);
+	      WriteConsoleW (get_output_handle (), bufw, wcslen (bufw), 0, 0);
 	      wpbuf.put ('T');
 	      wpbuf.send (get_output_handle ());
-	      __small_sprintf (buf, "\033[%d;%dr",
-			       srTop + 1 - con.b.srWindow.Top,
-			       srBottom + 1 - con.b.srWindow.Top);
-	      WriteConsoleA (get_output_handle (), buf, strlen (buf), 0, 0);
-	      __small_sprintf (buf, "\033[%d;%dH",
-			       y + 1 - con.b.srWindow.Top, x + 1);
-	      WriteConsoleA (get_output_handle (), buf, strlen (buf), 0, 0);
+	      __small_swprintf (bufw, L"\033[%d;%dr",
+				srTop + 1 - con.b.srWindow.Top,
+				srBottom + 1 - con.b.srWindow.Top);
+	      WriteConsoleW (get_output_handle (), bufw, wcslen (bufw), 0, 0);
+	      __small_swprintf (bufw, L"\033[%d;%dH",
+				y + 1 - con.b.srWindow.Top, x + 1);
+	      WriteConsoleW (get_output_handle (), bufw, wcslen (bufw), 0, 0);
 	    }
 	  else
 	    {
@@ -2092,19 +2098,19 @@ fhandler_console::char_command (char c)
 	      cursor_get (&x, &y);
 	      if (y < srTop || y > srBottom)
 		break;
-	      __small_sprintf (buf, "\033[%d;%dr",
-			       y + 1 - con.b.srWindow.Top,
-			       srBottom + 1 - con.b.srWindow.Top);
-	      WriteConsoleA (get_output_handle (), buf, strlen (buf), 0, 0);
+	      __small_swprintf (bufw, L"\033[%d;%dr",
+				y + 1 - con.b.srWindow.Top,
+				srBottom + 1 - con.b.srWindow.Top);
+	      WriteConsoleW (get_output_handle (), bufw, wcslen (bufw), 0, 0);
 	      wpbuf.put ('S');
 	      wpbuf.send (get_output_handle ());
-	      __small_sprintf (buf, "\033[%d;%dr",
-			       srTop + 1 - con.b.srWindow.Top,
-			       srBottom + 1 - con.b.srWindow.Top);
-	      WriteConsoleA (get_output_handle (), buf, strlen (buf), 0, 0);
-	      __small_sprintf (buf, "\033[%d;%dH",
-			       y + 1 - con.b.srWindow.Top, x + 1);
-	      WriteConsoleA (get_output_handle (), buf, strlen (buf), 0, 0);
+	      __small_swprintf (bufw, L"\033[%d;%dr",
+				srTop + 1 - con.b.srWindow.Top,
+				srBottom + 1 - con.b.srWindow.Top);
+	      WriteConsoleW (get_output_handle (), bufw, wcslen (bufw), 0, 0);
+	      __small_swprintf (bufw, L"\033[%d;%dH",
+				y + 1 - con.b.srWindow.Top, x + 1);
+	      WriteConsoleW (get_output_handle (), bufw, wcslen (bufw), 0, 0);
 	    }
 	  else
 	    {
@@ -2838,7 +2844,6 @@ fhandler_console::write_normal (const unsigned char *src,
 	  break;
 	default:
 	  found += ret;
-	  last_char = *(found - 1);
 	  break;
 	}
     }
@@ -3056,12 +3061,12 @@ fhandler_console::write (const void *vsrc, size_t len)
 		      && srBottom == con.b.srWindow.Bottom)
 		    {
 		      /* Erase scroll down area */
-		      char buf[] = "\033[32768;1H\033[J\033[32768;32768";
-		      __small_sprintf (buf, "\033[%d;1H\033[J\033[%d;%dH",
-				       srBottom - con.b.srWindow.Top + 1,
-				       y + 1 - con.b.srWindow.Top, x + 1);
-		      WriteConsoleA (get_output_handle (),
-				     buf, strlen (buf), 0, 0);
+		      wchar_t buf[] = L"\033[32768;1H\033[J\033[32768;32768";
+		      __small_swprintf (buf, L"\033[%d;1H\033[J\033[%d;%dH",
+					srBottom - con.b.srWindow.Top + 1,
+					y + 1 - con.b.srWindow.Top, x + 1);
+		      WriteConsoleW (get_output_handle (),
+				     buf, wcslen (buf), 0, 0);
 		    }
 		  /* Substitute "CSI Ps T" */
 		  wpbuf.put ('[');
