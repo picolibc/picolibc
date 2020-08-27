@@ -461,10 +461,8 @@ cygwin_stackdump ()
   exc.dumpstack ();
 }
 
-#define TIME_TO_WAIT_FOR_DEBUGGER 10000
-
 extern "C" int
-try_to_debug (bool waitloop)
+try_to_debug ()
 {
   if (!debugger_command)
     return 0;
@@ -532,13 +530,17 @@ try_to_debug (bool waitloop)
 			&si,
 			&pi);
 
+  /* We want to stop here and wait until the error_start process attaches.  But
+     we can't wait here for the error_start process to exit, as if it's a
+     debugger, it might want to continue this thread.  So we busy wait until a
+     debugger attaches, which stops this process, after which it can decide if
+     we continue or not. */
+
   *dbg_end = L'\0';
   if (!dbg)
     system_printf ("Failed to start debugger, %E");
   else
     {
-      if (!waitloop)
-	return dbg;
       SetThreadPriority (GetCurrentThread (), THREAD_PRIORITY_IDLE);
       while (!being_debugged ())
 	Sleep (1);
@@ -812,7 +814,7 @@ exception::handle (EXCEPTION_RECORD *e, exception_list *frame, CONTEXT *in,
   if (exit_state >= ES_SIGNAL_EXIT
       && (NTSTATUS) e->ExceptionCode != STATUS_CONTROL_C_EXIT)
     api_fatal ("Exception during process exit");
-  else if (!try_to_debug (0))
+  else if (!try_to_debug ())
     rtl_unwind (frame, e);
   else
     {

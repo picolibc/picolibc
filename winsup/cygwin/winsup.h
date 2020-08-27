@@ -190,7 +190,7 @@ void close_all_files (bool = false);
 
 /* debug_on_trap support. see exceptions.cc:try_to_debug() */
 extern "C" void error_start_init (const char*);
-extern "C" int try_to_debug (bool waitloop = 1);
+extern "C" int try_to_debug ();
 
 void ld_preload ();
 void fixup_hooks_after_fork ();
