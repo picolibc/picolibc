@@ -187,18 +187,18 @@ public:
   void preserve () { destroy = false; }
   void allow_remove () { destroy = true; }
 #ifndef SIG_BAD_MASK		// kludge to ensure that sigproc.h included
-  // int reattach () {system_printf ("reattach is not here"); return 0;}
+  // int attach () {system_printf ("attach is not here"); return 0;}
   // int remember (bool) {system_printf ("remember is not here"); return 0;}
 #else
-  int reattach ()
+  int attach ()
   {
-    int res = proc_subproc (PROC_REATTACH_CHILD, (uintptr_t) this);
+    int res = proc_subproc (PROC_ATTACH_CHILD, (uintptr_t) this);
     destroy = res ? false : true;
     return res;
   }
   int remember (bool detach)
   {
-    int res = proc_subproc (detach ? PROC_DETACHED_CHILD : PROC_ADDCHILD,
+    int res = proc_subproc (detach ? PROC_DETACHED_CHILD : PROC_ADD_CHILD,
 			    (uintptr_t) this);
     destroy = res ? false : true;
     return res;

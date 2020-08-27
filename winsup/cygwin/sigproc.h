@@ -30,8 +30,8 @@ enum
 
 enum procstuff
 {
-  PROC_ADDCHILD		  = 1,	// add a new subprocess to list
-  PROC_REATTACH_CHILD	  = 2,	// reattach after exec
+  PROC_ADD_CHILD	  = 1,	// set up a new child
+  PROC_ATTACH_CHILD	  = 2,	// attach child or reattach after exec
   PROC_EXEC_CLEANUP	  = 3,	// cleanup waiting children after exec
   PROC_DETACHED_CHILD	  = 4,	// set up a detached child
   PROC_CLEARWAIT	  = 5,	// clear all waits - signal arrived

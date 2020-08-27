@@ -509,11 +509,11 @@ frok::parent (volatile char * volatile stack_here)
 
   /* Do not attach to the child before it has successfully initialized.
      Otherwise we may wait forever, or deliver an orphan SIGCHILD. */
-  if (!child.reattach ())
+  if (!child.attach ())
     {
       this_errno = EAGAIN;
 #ifdef DEBUGGING0
-      error ("child reattach failed");
+      error ("child attach failed");
 #endif
       goto cleanup;
     }

@@ -195,7 +195,7 @@ proc_subproc (DWORD what, uintptr_t val)
     /* Add a new subprocess to the children arrays.
      * (usually called from the main thread)
      */
-    case PROC_ADDCHILD:
+    case PROC_ADD_CHILD:
       /* Filled up process table? */
       if (nprocs >= NPROCS)
 	{
@@ -217,11 +217,12 @@ proc_subproc (DWORD what, uintptr_t val)
 	  vchild->ctty = myself->ctty;
 	  vchild->cygstarted = true;
 	  vchild->process_state |= PID_INITIALIZING;
-	  vchild->ppid = what == PROC_DETACHED_CHILD ? 1 : myself->pid;	/* always set last */
+	  vchild->ppid = what == PROC_DETACHED_CHILD
+				 ? 1 : myself->pid;	/* always set last */
 	}
       break;
 
-    case PROC_REATTACH_CHILD:
+    case PROC_ATTACH_CHILD:
       procs[nprocs] = vchild;
       rc = procs[nprocs].wait ();
       if (rc)
@@ -879,7 +880,7 @@ child_info_spawn::wait_for_myself ()
 {
   postfork (myself);
   if (myself.remember (false))
-    myself.reattach ();
+    myself.attach ();
   WaitForSingleObject (ev, INFINITE);
 }
 
@@ -973,7 +974,7 @@ cygheap_exec_info::reattach_children (HANDLE parent)
       pinfo p (parent, children[i].p, children[i].pid);
       if (!p)
 	debug_only_printf ("couldn't reattach child %d from previous process", children[i].pid);
-      else if (!p.reattach ())
+      else if (!p.attach ())
 	debug_only_printf ("attach of child process %d failed", children[i].pid);
       else
 	debug_only_printf ("reattached pid %d<%u>, process handle %p, rd_proc_pipe %p->%p",

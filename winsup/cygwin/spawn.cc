@@ -869,7 +869,7 @@ child_info_spawn::worker (const char *prog_arg, const char *const *argv,
 	  postfork (child);
 	  if (mode == _P_DETACH
 	      ? !child.remember (true)
-	      : !(child.remember (false) && child.reattach ()))
+	      : !(child.remember (false) && child.attach ()))
 	    {
 	      /* FIXME: Child in strange state now */
 	      CloseHandle (pi.hProcess);
