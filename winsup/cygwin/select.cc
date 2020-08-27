@@ -783,8 +783,8 @@ pipe_cleanup (select_record *, select_stuff *stuff)
       pi->stop_thread = true;
       SetEvent (pi->bye);
       pi->thread->detach ();
+      CloseHandle (pi->bye);
     }
-  CloseHandle (pi->bye);
   delete pi;
   stuff->device_specific_pipe = NULL;
 }
@@ -978,8 +978,8 @@ fifo_cleanup (select_record *, select_stuff *stuff)
       pi->stop_thread = true;
       SetEvent (pi->bye);
       pi->thread->detach ();
+      CloseHandle (pi->bye);
     }
-  CloseHandle (pi->bye);
   delete pi;
   stuff->device_specific_fifo = NULL;
 }
@@ -1344,8 +1344,8 @@ pty_slave_cleanup (select_record *me, select_stuff *stuff)
       pi->stop_thread = true;
       SetEvent (pi->bye);
       pi->thread->detach ();
+      CloseHandle (pi->bye);
     }
-  CloseHandle (pi->bye);
   delete pi;
   stuff->device_specific_ptys = NULL;
 }
