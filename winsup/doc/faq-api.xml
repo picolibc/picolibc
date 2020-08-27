@@ -385,13 +385,43 @@ Cygwin version number details, check out the
 </answer></qandaentry>
 
 <qandaentry id="faq.api.timezone">
-<question><para>Why isn't timezone set correctly?</para></question>
+<question><para>Why isn't my time (or zone) set correctly?</para></question>
 <answer>
 
-<para><emphasis role='bold'>(Please note: This section has not yet been updated for the latest net release.)</emphasis>
+<para>Daylight saving (Summer time) and other time zone changes are
+decided on by politicians, and announced by government officials,
+sometimes with short or no notice, so time zone updates are released at
+least a few, and sometimes several, times a year.
+Details of changes are not known until they are announced publicly by
+officials, often in foreign languages.
+Those details then have to be noticed, possibly translated, passed to,
+picked up, and applied by the official <filename>tzdata</filename>
+source package maintainers.
+That information has to be compiled, checked, and released publicly in
+an update to the official <filename>tzdata</filename> source package.
+Then those changes have to be picked up and applied to the Cygwin
+<filename>tzdata</filename> package, which has to be updated, built,
+tested, and released publicly.
 </para>
-<para>Did you explicitly call tzset() before checking the value of timezone?
-If not, you must do so.
+<para>Time zone settings are updates to the daylight saving (Summer
+time) rules for dates of changes, hour offsets from UTC of time zones,
+and the geographic regions to which those rules and offsets apply,
+provided in the <filename>tzdata</filename> package included in all
+Cygwin installations.
+Have you run the Cygwin Setup program recently to update at least
+the <filename>tzdata</filename> package?
+</para>
+<para>Are you developing applications using times which may be affected
+by time zones?
+Since the <literal>ctime()</literal>, <literal>localtime()</literal>,
+<literal>mktime()</literal>, and <literal>strftime()</literal> functions
+are required to set time zone information as if by calling
+<literal>tzset()</literal>, there is no need for an explicit
+<literal>tzset()</literal> call before using these functions.
+However, if none of the above functions are called first, applications
+should ensure <literal>tzset()</literal> is called explicitly before
+using any other time functions, or checking or using time zone
+information.
 </para>
 </answer></qandaentry>
 
