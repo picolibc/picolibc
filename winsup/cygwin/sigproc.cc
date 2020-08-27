@@ -63,8 +63,8 @@ HANDLE NO_COPY my_pendingsigs_evt;
 /* Function declarations */
 static int __reg1 checkstate (waitq *);
 static __inline__ bool get_proc_lock (DWORD, DWORD);
-static int __stdcall remove_proc (int);
-static bool __stdcall stopped_or_terminated (waitq *, _pinfo *);
+static int remove_proc (int);
+static bool stopped_or_terminated (waitq *, _pinfo *);
 static void WINAPI wait_sig (VOID *arg);
 
 /* wait_sig bookkeeping */
@@ -87,7 +87,7 @@ public:
 Static pending_signals sigq;
 
 /* Functions */
-void __stdcall
+void
 sigalloc ()
 {
   cygheap->sigs = global_sigs =
@@ -95,7 +95,7 @@ sigalloc ()
   global_sigs[SIGSTOP].sa_flags = SA_RESTART | SA_NODEFER;
 }
 
-void __stdcall
+void
 signal_fixup_after_exec ()
 {
   global_sigs = cygheap->sigs;
@@ -137,7 +137,7 @@ get_proc_lock (DWORD what, DWORD val)
   return false;
 }
 
-static bool __stdcall
+static bool
 proc_can_be_signalled (_pinfo *p)
 {
   if (!(p->exitcode & EXITCODE_SET))
@@ -160,7 +160,7 @@ pid_exists (pid_t pid)
 }
 
 /* Return true if this is one of our children, false otherwise.  */
-static inline bool __stdcall
+static inline bool
 mychild (int pid)
 {
   for (int i = 0; i < nprocs; i++)
@@ -357,7 +357,7 @@ _cygtls::remove_wq (DWORD wait)
    Also called by spawn_guts to disassociate any subprocesses from this
    process.  Subprocesses will then know to clean up after themselves and
    will not become procs.  */
-void __stdcall
+void
 proc_terminate ()
 {
   sigproc_printf ("nprocs %d", nprocs);
@@ -444,7 +444,7 @@ sig_dispatch_pending (bool fast)
 
 /* Signal thread initialization.  Called from dll_crt0_1.
    This routine starts the signal handling thread.  */
-void __stdcall
+void
 sigproc_init ()
 {
   char char_sa_buf[1024];
@@ -1153,7 +1153,7 @@ out:
 
 /* Remove a proc from procs by swapping it with the last child in the list.
    Also releases shared memory of exited processes.  */
-static int __stdcall
+static int
 remove_proc (int ci)
 {
   if (have_execed)
@@ -1188,7 +1188,7 @@ remove_proc (int ci)
    child is the subprocess being considered.
 
    Returns non-zero if waiting thread released.  */
-static bool __stdcall
+static bool
 stopped_or_terminated (waitq *parent_w, _pinfo *child)
 {
   int might_match;

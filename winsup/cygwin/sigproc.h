@@ -68,13 +68,13 @@ int __stdcall handle_sigsuspend (sigset_t);
 int __reg2 proc_subproc (DWORD, uintptr_t);
 
 class _pinfo;
-void __stdcall proc_terminate ();
-void __stdcall sigproc_init ();
+void proc_terminate ();
+void sigproc_init ();
 bool __reg1 pid_exists (pid_t);
 sigset_t __reg3 sig_send (_pinfo *, siginfo_t&, class _cygtls * = NULL);
 sigset_t __reg3 sig_send (_pinfo *, int, class _cygtls * = NULL);
-void __stdcall signal_fixup_after_exec ();
-void __stdcall sigalloc ();
+void signal_fixup_after_exec ();
+void sigalloc ();
 
 int kill_pgrp (pid_t, siginfo_t&);
 void __reg1 exit_thread (DWORD) __attribute__ ((noreturn));
