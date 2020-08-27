@@ -63,7 +63,7 @@ HANDLE NO_COPY my_pendingsigs_evt;
 /* Function declarations */
 static int __reg1 checkstate (waitq *);
 static __inline__ bool get_proc_lock (DWORD, DWORD);
-static bool __stdcall remove_proc (int);
+static int __stdcall remove_proc (int);
 static bool __stdcall stopped_or_terminated (waitq *, _pinfo *);
 static void WINAPI wait_sig (VOID *arg);
 
@@ -1153,7 +1153,7 @@ out:
 
 /* Remove a proc from procs by swapping it with the last child in the list.
    Also releases shared memory of exited processes.  */
-static bool __stdcall
+static int __stdcall
 remove_proc (int ci)
 {
   if (have_execed)
@@ -1162,7 +1162,7 @@ remove_proc (int ci)
 	procs[ci].wait_thread->terminate_thread ();
     }
   else if (procs[ci] && procs[ci]->exists ())
-    return true;
+    return 1;
 
   sigproc_printf ("removing procs[%d], pid %d, nprocs %d", ci, procs[ci]->pid,
 		  nprocs);
