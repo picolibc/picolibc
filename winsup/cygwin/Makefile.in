@@ -608,7 +608,7 @@ install: install-libs install-headers install-man install-ldif install_target \
 uninstall: uninstall-libs uninstall-headers uninstall-man
 
 install-libs: $(TARGET_LIBS)
-	@$(MKDIRP) $(DESTDIR)$(bindir)
+	@$(MKDIRP) $(DESTDIR)$(bindir) $(DESTDIR)$(tooldir)/lib
 	$(INSTALL_PROGRAM) $(TEST_DLL_NAME) $(DESTDIR)$(bindir)/$(DLL_NAME); \
 	for i in $^; do \
 	    $(INSTALL_DATA) $$i $(DESTDIR)$(tooldir)/lib/`basename $$i` ; \
