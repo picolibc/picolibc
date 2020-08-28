@@ -867,9 +867,8 @@ child_info_spawn::worker (const char *prog_arg, const char *const *argv,
 	  child->start_time = time (NULL); /* Register child's starting time. */
 	  child->nice = myself->nice;
 	  postfork (child);
-	  if (mode == _P_DETACH
-	      ? !child.remember (true)
-	      : !(child.remember (false) && child.attach ()))
+	  if (mode != _P_DETACH
+	      && (!child.remember () || !child.attach ()))
 	    {
 	      /* FIXME: Child in strange state now */
 	      CloseHandle (pi.hProcess);

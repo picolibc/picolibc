@@ -196,10 +196,9 @@ public:
     destroy = res ? false : true;
     return res;
   }
-  int remember (bool detach)
+  int remember ()
   {
-    int res = proc_subproc (detach ? PROC_DETACHED_CHILD : PROC_ADD_CHILD,
-			    (uintptr_t) this);
+    int res = proc_subproc (PROC_ADD_CHILD, (uintptr_t) this);
     destroy = res ? false : true;
     return res;
   }

@@ -205,9 +205,6 @@ proc_subproc (DWORD what, uintptr_t val)
 	  set_errno (EAGAIN);
 	  break;
 	}
-      fallthrough;
-
-    case PROC_DETACHED_CHILD:
       if (vchild != myself)
 	{
 	  vchild->uid = myself->uid;
@@ -217,8 +214,7 @@ proc_subproc (DWORD what, uintptr_t val)
 	  vchild->ctty = myself->ctty;
 	  vchild->cygstarted = true;
 	  vchild->process_state |= PID_INITIALIZING;
-	  vchild->ppid = what == PROC_DETACHED_CHILD
-				 ? 1 : myself->pid;	/* always set last */
+	  vchild->ppid = myself->pid;	/* always set last */
 	}
       break;
 
@@ -879,7 +875,7 @@ void
 child_info_spawn::wait_for_myself ()
 {
   postfork (myself);
-  if (myself.remember (false))
+  if (myself.remember ())
     myself.attach ();
   WaitForSingleObject (ev, INFINITE);
 }

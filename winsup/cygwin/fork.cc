@@ -415,7 +415,7 @@ frok::parent (volatile char * volatile stack_here)
      it in afterwards.  This requires more bookkeeping than I like, though,
      so we'll just do it the easy way.  So, terminate any child process if
      we can't actually record the pid in the internal table. */
-  if (!child.remember (false))
+  if (!child.remember ())
     {
       this_errno = EAGAIN;
 #ifdef DEBUGGING0
