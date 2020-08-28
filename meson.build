@@ -224,7 +224,8 @@ specs_dir_option = get_option('specsdir')
 if specs_dir_option == ''
   search_cmds = meson.get_compiler('c').cmd_array() + ['-print-search-dirs']
   install_dir=run_command(search_cmds).stdout().split('\n')[0]
-  specs_dir=install_dir.split(':')[1].strip()
+  # Meson 0.56 adds a 'substring' method which can be used here
+  specs_dir=run_command(['expr', 'substr', install_dir, '10', '1000']).stdout().split('\n')[0]
   specs_install = true
 elif specs_dir_option == 'none'
   specs_install = false
