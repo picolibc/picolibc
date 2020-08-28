@@ -78,7 +78,7 @@ class child_procs {
 	}
       return ((pinfo *) _procs)[idx];
     }
-    int max_child_procs	() const { return _NPROCS + _NPROCS_2; }
+    int max_child_procs () const { return _NPROCS + _NPROCS_2; }
 };
 Static child_procs chld_procs;
 
