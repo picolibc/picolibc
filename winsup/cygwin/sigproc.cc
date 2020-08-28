@@ -299,8 +299,10 @@ proc_subproc (DWORD what, uintptr_t val)
       goto scan_wait;
 
     case PROC_EXEC_CLEANUP:
+      /* Cleanup backwards to eliminate redundant copying of chld_procs
+	 array members inside remove_proc. */
       while (chld_procs.count ())
-	remove_proc (0);
+	remove_proc (chld_procs.count () - 1);
       for (w = &waitq_head; w->next != NULL; w = w->next)
 	CloseHandle (w->next->ev);
       break;
