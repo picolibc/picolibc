@@ -38,19 +38,55 @@ int __sp_ln;
 
 bool no_thread_exit_protect::flag;
 
-char NO_COPY myself_nowait_dummy[1] = {'0'};// Flag to sig_send that signal goes to
-					//  current process but no wait is required
+/* Flag to sig_send that signal goes to current process but no wait is
+   required. */
+char NO_COPY myself_nowait_dummy[1] = {'0'};
 
 #define Static static NO_COPY
 
+/* All my children info.  Avoid expensive constructor ops at DLL startup */
+class child_procs {
+#ifdef __i386__
+    static const int _NPROCS = 255;
+    static const int _NPROCS_2 = 1023;
+#else
+    static const int _NPROCS = 1023;
+    static const int _NPROCS_2 = 4095;
+#endif
+    int _count;
+    uint8_t _procs[(_NPROCS + 1) * sizeof (pinfo)] __attribute__ ((__aligned__));
+    pinfo *_procs_2;
+  public:
+    int count () const { return _count; }
+    int add_one () { return ++_count; }
+    int del_one () { return --_count; }
+    int reset () { return _count = 0; }
+    pinfo &operator[] (int idx)
+    {
+      if (idx >= _NPROCS)
+	{
+	  if (!_procs_2)
+	    {
+	      /* Use HeapAlloc to avoid propagating this memory area
+		 to the child processes. */
+	      _procs_2 = (pinfo *) HeapAlloc (GetProcessHeap (),
+					      HEAP_GENERATE_EXCEPTIONS
+					      | HEAP_ZERO_MEMORY,
+					      (_NPROCS_2 + 1) * sizeof (pinfo));
+	    }
+	  return _procs_2[idx - _NPROCS];
+	}
+      return ((pinfo *) _procs)[idx];
+    }
+    int max_child_procs	() const { return _NPROCS + _NPROCS_2; }
+};
+Static child_procs chld_procs;
 
-Static int nprocs;			// Number of deceased children
-Static char cprocs[(NPROCS + 1) * sizeof (pinfo)];// All my children info
-#define procs ((pinfo *) cprocs)	// All this just to avoid expensive
-					// constructor operation  at DLL startup
-Static waitq waitq_head;		// Start of queue for wait'ing threads
+/* Start of queue for waiting threads. */
+Static waitq waitq_head;
 
-Static muto sync_proc_subproc;	// Control access to subproc stuff
+/* Controls access to subproc stuff. */
+Static muto sync_proc_subproc;
 
 _cygtls NO_COPY *_sig_tls;
 
@@ -163,8 +199,8 @@ pid_exists (pid_t pid)
 static inline bool
 mychild (int pid)
 {
-  for (int i = 0; i < nprocs; i++)
-    if (procs[i]->pid == pid)
+  for (int i = 0; i < chld_procs.count (); i++)
+    if (chld_procs[i]->pid == pid)
       return true;
   return false;
 }
@@ -174,6 +210,7 @@ mychild (int pid)
 int __reg2
 proc_subproc (DWORD what, uintptr_t val)
 {
+  int slot;
   int rc = 1;
   int potential_match;
   int clearing;
@@ -197,14 +234,15 @@ proc_subproc (DWORD what, uintptr_t val)
      */
     case PROC_ADD_CHILD:
       /* Filled up process table? */
-      if (nprocs >= NPROCS)
+      if (chld_procs.count () >= chld_procs.max_child_procs ())
 	{
 	  sigproc_printf ("proc table overflow: hit %d processes, pid %d\n",
-			  nprocs, vchild->pid);
+			  chld_procs.count (), vchild->pid);
 	  rc = 0;
 	  set_errno (EAGAIN);
 	  break;
 	}
+
       if (vchild != myself)
 	{
 	  vchild->uid = myself->uid;
@@ -219,13 +257,14 @@ proc_subproc (DWORD what, uintptr_t val)
       break;
 
     case PROC_ATTACH_CHILD:
-      procs[nprocs] = vchild;
-      rc = procs[nprocs].wait ();
+      slot = chld_procs.count ();
+      chld_procs[slot] = vchild;
+      rc = chld_procs[slot].wait ();
       if (rc)
 	{
 	  sigproc_printf ("added pid %d to proc table, slot %d", vchild->pid,
-			  nprocs);
-	  nprocs++;
+			  slot);
+	  chld_procs.add_one ();
 	}
       break;
 
@@ -260,7 +299,7 @@ proc_subproc (DWORD what, uintptr_t val)
       goto scan_wait;
 
     case PROC_EXEC_CLEANUP:
-      while (nprocs)
+      while (chld_procs.count ())
 	remove_proc (0);
       for (w = &waitq_head; w->next != NULL; w = w->next)
 	CloseHandle (w->next->ev);
@@ -274,7 +313,8 @@ proc_subproc (DWORD what, uintptr_t val)
       if (val)
 	sigproc_printf ("clear waiting threads");
       else
-	sigproc_printf ("looking for processes to reap, nprocs %d", nprocs);
+	sigproc_printf ("looking for processes to reap, count %d",
+			chld_procs.count ());
       clearing = val;
 
     scan_wait:
@@ -312,7 +352,7 @@ proc_subproc (DWORD what, uintptr_t val)
 	}
 
       if (global_sigs[SIGCHLD].sa_handler == (void *) SIG_IGN)
-	for (int i = 0; i < nprocs; i += remove_proc (i))
+	for (int i = 0; i < chld_procs.count (); i += remove_proc (i))
 	  continue;
   }
 
@@ -352,35 +392,35 @@ _cygtls::remove_wq (DWORD wait)
    Called on process exit.
    Also called by spawn_guts to disassociate any subprocesses from this
    process.  Subprocesses will then know to clean up after themselves and
-   will not become procs.  */
+   will not become chld_procs.  */
 void
 proc_terminate ()
 {
-  sigproc_printf ("nprocs %d", nprocs);
-  if (nprocs)
+  sigproc_printf ("child_procs count %d", chld_procs.count ());
+  if (chld_procs.count ())
     {
       sync_proc_subproc.acquire (WPSP);
 
       proc_subproc (PROC_CLEARWAIT, 1);
 
       /* Clean out proc processes from the pid list. */
-      for (int i = 0; i < nprocs; i++)
+      for (int i = 0; i < chld_procs.count (); i++)
 	{
 	  /* If we've execed then the execed process will handle setting ppid
 	     to 1 iff it is a Cygwin process.  */
 	  if (!have_execed || !have_execed_cygwin)
-	    procs[i]->ppid = 1;
-	  if (procs[i].wait_thread)
-	    procs[i].wait_thread->terminate_thread ();
+	    chld_procs[i]->ppid = 1;
+	  if (chld_procs[i].wait_thread)
+	    chld_procs[i].wait_thread->terminate_thread ();
 	  /* Release memory associated with this process unless it is 'myself'.
-	     'myself' is only in the procs table when we've execed.  We reach
-	     here when the next process has finished initializing but we still
-	     can't free the memory used by 'myself' since it is used later on
-	     during cygwin tear down.  */
-	  if (procs[i] != myself)
-	    procs[i].release ();
+	     'myself' is only in the chld_procs table when we've execed.  We
+	     reach here when the next process has finished initializing but we
+	     still can't free the memory used by 'myself' since it is used
+	     later on during cygwin tear down.  */
+	  if (chld_procs[i] != myself)
+	    chld_procs[i].release ();
 	}
-      nprocs = 0;
+      chld_procs.reset ();
       sync_proc_subproc.release ();
     }
   sigproc_printf ("leaving");
@@ -866,7 +906,8 @@ cygheap_exec_info::alloc ()
   cygheap_exec_info *res =
     (cygheap_exec_info *) ccalloc_abort (HEAP_1_EXEC, 1,
 					 sizeof (cygheap_exec_info)
-					 + (nprocs * sizeof (children[0])));
+					 + (chld_procs.count ()
+					    * sizeof (children[0])));
   res->sigmask = _my_tls.sigmask;
   return res;
 }
@@ -942,10 +983,10 @@ child_info_spawn::cleanup ()
 inline void
 cygheap_exec_info::record_children ()
 {
-  for (nchildren = 0; nchildren < nprocs; nchildren++)
+  for (nchildren = 0; nchildren < chld_procs.count (); nchildren++)
     {
-      children[nchildren].pid = procs[nchildren]->pid;
-      children[nchildren].p = procs[nchildren];
+      children[nchildren].pid = chld_procs[nchildren]->pid;
+      children[nchildren].p = chld_procs[nchildren];
       /* Set inheritance of required child handles for reattach_children
 	 in the about-to-be-execed process. */
       children[nchildren].p.set_inheritance (true);
@@ -1126,13 +1167,13 @@ checkstate (waitq *parent_w)
 {
   int potential_match = 0;
 
-  sigproc_printf ("nprocs %d", nprocs);
+  sigproc_printf ("child_procs count %d", chld_procs.count ());
 
   /* Check already dead processes first to see if they match the criteria
    * given in w->next.  */
   int res;
-  for (int i = 0; i < nprocs; i++)
-    if ((res = stopped_or_terminated (parent_w, procs[i])))
+  for (int i = 0; i < chld_procs.count (); i++)
+    if ((res = stopped_or_terminated (parent_w, chld_procs[i])))
       {
 	remove_proc (i);
 	potential_match = 1;
@@ -1140,40 +1181,40 @@ checkstate (waitq *parent_w)
       }
 
   sigproc_printf ("no matching terminated children found");
-  potential_match = -!!nprocs;
+  potential_match = -!!chld_procs.count ();
 
 out:
   sigproc_printf ("returning %d", potential_match);
   return potential_match;
 }
 
-/* Remove a proc from procs by swapping it with the last child in the list.
+/* Remove a proc from chld_procs by swapping it with the last child in the list.
    Also releases shared memory of exited processes.  */
 static int
 remove_proc (int ci)
 {
   if (have_execed)
     {
-      if (_my_tls._ctinfo != procs[ci].wait_thread)
-	procs[ci].wait_thread->terminate_thread ();
+      if (_my_tls._ctinfo != chld_procs[ci].wait_thread)
+	chld_procs[ci].wait_thread->terminate_thread ();
     }
-  else if (procs[ci] && procs[ci]->exists ())
+  else if (chld_procs[ci] && chld_procs[ci]->exists ())
     return 1;
 
-  sigproc_printf ("removing procs[%d], pid %d, nprocs %d", ci, procs[ci]->pid,
-		  nprocs);
-  if (procs[ci] != myself)
-    procs[ci].release ();
-  if (ci < --nprocs)
+  sigproc_printf ("removing chld_procs[%d], pid %d, child_procs count %d",
+		  ci, chld_procs[ci]->pid, chld_procs.count ());
+  if (chld_procs[ci] != myself)
+    chld_procs[ci].release ();
+  if (ci < chld_procs.del_one ())
     {
       /* Wait for proc_waiter thread to make a copy of this element before
 	 moving it or it may become confused.  The chances are very high that
 	 the proc_waiter thread has already done this by the time we
 	 get here.  */
       if (!have_execed && !exit_state)
-	while (!procs[nprocs].waiter_ready)
+	while (!chld_procs[chld_procs.count ()].waiter_ready)
 	  yield ();
-      procs[ci] = procs[nprocs];
+      chld_procs[ci] = chld_procs[chld_procs.count ()];
     }
   return 0;
 }

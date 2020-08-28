@@ -39,8 +39,6 @@ enum child_status
 /* Change this value if you get a message indicating that it is out-of-sync. */
 #define CURR_CHILD_INFO_MAGIC 0xecc930b9U
 
-#define NPROCS	256
-
 #include "pinfo.h"
 struct cchildren
 {
