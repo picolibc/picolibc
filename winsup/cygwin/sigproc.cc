@@ -47,14 +47,14 @@ char NO_COPY myself_nowait_dummy[1] = {'0'};
 /* All my children info.  Avoid expensive constructor ops at DLL startup */
 class child_procs {
 #ifdef __i386__
-    static const int _NPROCS = 255;
+    static const int _NPROCS = 256;
     static const int _NPROCS_2 = 1023;
 #else
-    static const int _NPROCS = 1023;
+    static const int _NPROCS = 1024;
     static const int _NPROCS_2 = 4095;
 #endif
     int _count;
-    uint8_t _procs[(_NPROCS + 1) * sizeof (pinfo)] __attribute__ ((__aligned__));
+    uint8_t _procs[_NPROCS * sizeof (pinfo)] __attribute__ ((__aligned__));
     pinfo *_procs_2;
   public:
     int count () const { return _count; }
