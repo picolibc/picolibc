@@ -1159,7 +1159,7 @@ pthread_suspend SIGFE
 pthread_testcancel SIGFE
 pthread_timedjoin_np SIGFE
 pthread_tryjoin_np SIGFE
-pthread_yield = sched_yield SIGFE
+pthread_yield SIGFE
 ptsname SIGFE
 ptsname_r SIGFE
 putc SIGFE
