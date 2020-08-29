@@ -225,13 +225,8 @@ details. */
 
 /* Maximum number of attempts made to destroy a thread's thread-specific
    data values on thread exit. */
-/* FIXME: I really don't understand this value.  Why should multiple
-   attempts be necessary to destroy thread-specific data?!?  Anyway, the
-   current value here is 1, taken originally from our pthread.h file,
-   where it was mistakenly defined first.  Unfortunately this value is
-   lower than the POSIX defined minimum value, which is 4. */
 #undef PTHREAD_DESTRUCTOR_ITERATIONS
-#define PTHREAD_DESTRUCTOR_ITERATIONS 1
+#define PTHREAD_DESTRUCTOR_ITERATIONS 4
 
 /* Maximum number of data keys that can be created by a process. */
 /* Tls has 1088 items - and we don't want to use them all :] */

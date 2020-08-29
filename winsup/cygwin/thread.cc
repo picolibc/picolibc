@@ -1713,6 +1713,8 @@ pthread_key::_fixup_after_fork ()
   set (fork_buf);
 }
 
+bool pthread_key::iterate_dtors_once_more;
+
 void
 pthread_key::run_destructor ()
 {
@@ -1723,6 +1725,8 @@ pthread_key::run_destructor ()
 	{
 	  set (NULL);
 	  destructor (oldValue);
+	  if (get ())
+	    iterate_dtors_once_more = true;
 	}
     }
 }

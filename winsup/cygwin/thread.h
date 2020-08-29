@@ -197,6 +197,7 @@ protected:
 class pthread_key: public verifyable_object
 {
   DWORD tls_index;
+  static bool iterate_dtors_once_more;
 public:
   static bool is_good_object (pthread_key_t const *);
 
@@ -218,7 +219,24 @@ public:
 
   static void run_all_destructors ()
   {
-    keys.for_each (&pthread_key::run_destructor);
+    /* POSIX requires at least four iterations of running destructors:
+
+       If, after all the destructors have been called for all non-NULL
+       values with associated destructors, there are still some non-NULL
+       values with associated destructors, then the process is repeated.
+       If, after at least {PTHREAD_DESTRUCTOR_ITERATIONS} iterations of
+       destructor calls for outstanding non-NULL values, there are still
+       some non-NULL values with associated destructors, implementations
+       may stop calling destructors, or they may continue calling
+       destructors until no non-NULL values with associated destructors
+       exist, even though this might result in an infinite loop. */
+    for (int i = 0; i < PTHREAD_DESTRUCTOR_ITERATIONS; ++i)
+      {
+	iterate_dtors_once_more = false;
+	keys.for_each (&pthread_key::run_destructor);
+	if (!iterate_dtors_once_more)
+	  break;
+      }
   }
 
   /* List support calls */
