@@ -44,7 +44,11 @@ char NO_COPY myself_nowait_dummy[1] = {'0'};
 
 #define Static static NO_COPY
 
-/* All my children info.  Avoid expensive constructor ops at DLL startup */
+/* All my children info.  Avoid expensive constructor ops at DLL
+   startup.
+
+   This class can allocate memory.  But there's no need to free it
+   because only one instance of the class is created per process. */
 class child_procs {
 #ifdef __i386__
     static const int _NPROCS = 256;
