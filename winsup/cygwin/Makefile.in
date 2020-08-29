@@ -151,6 +151,32 @@ DLL_IMPORTS:=${shell $(CC) -print-file-name=w32api/libkernel32.a} ${shell $(CC) 
 
 MT_SAFE_OBJECTS:=
 #
+LIBC_OFILES:= \
+	arc4random_stir.o \
+	base64.o \
+	bsdlib.o \
+	call_once.o \
+	cnd.o \
+	fnmatch.o \
+	fts.o \
+	ftw.o \
+	getentropy.o \
+	getopt.o \
+	inet_addr.o \
+	inet_network.o \
+	minires-os-if.o \
+	minires.o \
+	msgcat.o \
+	mtx.o \
+	nftw.o \
+	rcmd.o \
+	rexec.o \
+	strfmon.o \
+	strptime.o \
+	thrd.o \
+	tss.o \
+	xsique.o
+
 MATH_OFILES:= \
 	acoshl.o \
 	acosl.o \
@@ -251,11 +277,8 @@ TZCODE_OFILES:=localtime.o
 DLL_OFILES:= \
 	advapi32.o \
 	aio.o \
-	arc4random_stir.o \
 	assert.o \
 	autoload.o \
-	base64.o \
-	bsdlib.o \
 	clock.o \
 	ctype.o \
 	cxx.o \
@@ -313,21 +336,14 @@ DLL_OFILES:= \
 	fhandler_windows.o \
 	fhandler_zero.o \
 	flock.o \
-	fnmatch.o \
 	fork.o \
 	forkable.o \
-	fts.o \
-	ftw.o \
-	getentropy.o \
-	getopt.o \
 	glob.o \
 	glob_pattern_p.o \
 	globals.o \
 	grp.o \
 	heap.o \
 	hookapi.o \
-	inet_addr.o \
-	inet_network.o \
 	init.o \
 	ioctl.o \
 	ipc.o \
@@ -337,19 +353,15 @@ DLL_OFILES:= \
 	loadavg.o \
 	lsearch.o \
 	malloc_wrapper.o \
-	minires-os-if.o \
-	minires.o \
 	miscfuncs.o \
 	mktemp.o \
 	mmap.o \
 	mmap_alloc.o \
 	msg.o \
-	msgcat.o \
 	mount.o \
 	net.o \
 	netdb.o \
 	nfs.o \
-	nftw.o \
 	nlsfuncs.o \
 	ntea.o \
 	passwd.o \
@@ -368,8 +380,6 @@ DLL_OFILES:= \
 	regfree.o \
 	registry.o \
 	resource.o \
-	rexec.o \
-	rcmd.o \
 	scandir.o \
 	sched.o \
 	sec_acl.o \
@@ -388,9 +398,7 @@ DLL_OFILES:= \
 	smallprint.o \
 	spawn.o \
 	strace.o \
-	strfmon.o \
 	strfuncs.o \
-	strptime.o \
 	strsep.o \
 	strsig.o \
 	sync.o \
@@ -409,9 +417,9 @@ DLL_OFILES:= \
 	wincap.o \
 	window.o \
 	winf.o \
-	xsique.o \
 	$(EXTRA_OFILES) \
 	$(MALLOC_OFILES) \
+	$(LIBC_OFILES) \
 	$(MATH_OFILES) \
 	$(TZCODE_OFILES) \
 	$(MT_SAFE_OBJECTS)

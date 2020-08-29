@@ -38,7 +38,6 @@ sys_sigabbrev DATA
 sys_siglist DATA
 
 # Exported functions
-_Exit SIGFE
 __assert NOSIGFE
 __assert_func NOSIGFE
 __assertfail NOSIGFE
@@ -126,6 +125,7 @@ __xdrrec_getrec SIGFE
 __xdrrec_setnonblock SIGFE
 __xpg_sigpause SIGFE
 __xpg_strerror_r SIGFE
+_Exit SIGFE
 _exit SIGFE
 _feinitialise NOSIGFE
 _fscanf_r SIGFE
@@ -233,6 +233,7 @@ asinhl NOSIGFE
 asinl NOSIGFE
 asnprintf SIGFE
 asprintf SIGFE
+at_quick_exit SIGFE
 atan NOSIGFE
 atan2 NOSIGFE
 atan2f NOSIGFE
@@ -248,7 +249,6 @@ atoff SIGFE
 atoi NOSIGFE
 atol NOSIGFE
 atoll NOSIGFE
-at_quick_exit SIGFE
 basename NOSIGFE
 bcmp NOSIGFE
 bcopy NOSIGFE
@@ -267,6 +267,7 @@ cacosh NOSIGFE
 cacoshf NOSIGFE
 cacoshl NOSIGFE
 cacosl NOSIGFE
+call_once SIGFE
 calloc SIGFE
 canonicalize_file_name SIGFE
 carg NOSIGFE
@@ -335,6 +336,12 @@ clogl NOSIGFE
 close SIGFE
 closedir SIGFE
 closelog SIGFE
+cnd_broadcast SIGFE
+cnd_destroy SIGFE
+cnd_init SIGFE
+cnd_signal SIGFE
+cnd_timedwait SIGFE
+cnd_wait SIGFE
 confstr NOSIGFE
 conj NOSIGFE
 conjf NOSIGFE
@@ -635,8 +642,6 @@ gammaf NOSIGFE
 gammaf_r NOSIGFE
 gcvt SIGFE
 gcvtf SIGFE
-GetCommandLineA@0 = cygwin_GetCommandLineA@0 NOSIGFE
-GetCommandLineW@0 = cygwin_GetCommandLineW@0 NOSIGFE
 get_avphys_pages SIGFE
 get_current_dir_name SIGFE
 get_nprocs SIGFE
@@ -647,6 +652,8 @@ getc SIGFE
 getc_unlocked SIGFE
 getchar SIGFE
 getchar_unlocked SIGFE
+GetCommandLineA@0 = cygwin_GetCommandLineA@0 NOSIGFE
+GetCommandLineW@0 = cygwin_GetCommandLineW@0 NOSIGFE
 getcontext NOSIGFE
 getcwd SIGFE
 getdelim = __getdelim SIGFE
@@ -891,9 +898,9 @@ logb NOSIGFE
 logbf NOSIGFE
 logbl NOSIGFE
 logf NOSIGFE
-logl NOSIGFE
 login SIGFE
 login_tty SIGFE
+logl NOSIGFE
 logout SIGFE
 logwtmp SIGFE
 longjmp NOSIGFE
@@ -972,6 +979,12 @@ msgget SIGFE
 msgrcv SIGFE
 msgsnd SIGFE
 msync SIGFE
+mtx_destroy SIGFE
+mtx_init SIGFE
+mtx_lock SIGFE
+mtx_timedlock SIGFE
+mtx_trylock SIGFE
+mtx_unlock SIGFE
 munlock SIGFE
 munmap SIGFE
 nan NOSIGFE
@@ -1017,14 +1030,19 @@ posix_madvise SIGFE
 posix_memalign SIGFE
 posix_openpt SIGFE
 posix_spawn SIGFE
+posix_spawn_file_actions_addclose SIGFE
+posix_spawn_file_actions_adddup2 SIGFE
+posix_spawn_file_actions_addopen SIGFE
+posix_spawn_file_actions_destroy SIGFE
+posix_spawn_file_actions_init SIGFE
 posix_spawnattr_destroy SIGFE
-posix_spawnattr_init SIGFE
 posix_spawnattr_getflags NOSIGFE
 posix_spawnattr_getpgroup NOSIGFE
 posix_spawnattr_getschedparam NOSIGFE
 posix_spawnattr_getschedpolicy NOSIGFE
 posix_spawnattr_getsigdefault NOSIGFE
 posix_spawnattr_getsigmask NOSIGFE
+posix_spawnattr_init SIGFE
 posix_spawnattr_setflags NOSIGFE
 posix_spawnattr_setpgroup NOSIGFE
 posix_spawnattr_setschedparam NOSIGFE
@@ -1032,11 +1050,6 @@ posix_spawnattr_setschedpolicy NOSIGFE
 posix_spawnattr_setsigdefault NOSIGFE
 posix_spawnattr_setsigmask NOSIGFE
 posix_spawnp SIGFE
-posix_spawn_file_actions_destroy SIGFE
-posix_spawn_file_actions_init SIGFE
-posix_spawn_file_actions_addclose SIGFE
-posix_spawn_file_actions_adddup2 SIGFE
-posix_spawn_file_actions_addopen SIGFE
 pow NOSIGFE
 pow10 NOSIGFE
 pow10f NOSIGFE
@@ -1070,13 +1083,13 @@ pthread_attr_setscope SIGFE
 pthread_attr_setstack SIGFE
 pthread_attr_setstackaddr SIGFE
 pthread_attr_setstacksize SIGFE
+pthread_barrier_destroy SIGFE
+pthread_barrier_init SIGFE
+pthread_barrier_wait SIGFE
+pthread_barrierattr_destroy SIGFE
+pthread_barrierattr_getpshared SIGFE
 pthread_barrierattr_init SIGFE
 pthread_barrierattr_setpshared SIGFE
-pthread_barrierattr_getpshared SIGFE
-pthread_barrierattr_destroy SIGFE
-pthread_barrier_init SIGFE
-pthread_barrier_destroy SIGFE
-pthread_barrier_wait SIGFE
 pthread_cancel SIGFE
 pthread_cond_broadcast SIGFE
 pthread_cond_destroy SIGFE
@@ -1176,9 +1189,9 @@ putwc_unlocked SIGFE
 putwchar SIGFE
 putwchar_unlocked SIGFE
 pwrite SIGFE
-quick_exit SIGFE
 qsort NOSIGFE
 qsort_r NOSIGFE
+quick_exit SIGFE
 quotactl SIGFE
 raise SIGFE
 rand NOSIGFE
@@ -1293,7 +1306,6 @@ sendto = cygwin_sendto SIGFE
 setbuf SIGFE
 setbuffer SIGFE
 setcontext NOSIGFE
-sethostname SIGFE
 setdtablesize SIGFE
 setegid SIGFE
 setenv SIGFE
@@ -1302,6 +1314,7 @@ setgid SIGFE
 setgrent NOSIGFE
 setgroups SIGFE
 sethostent NOSIGFE
+sethostname SIGFE
 setitimer SIGFE
 setjmp NOSIGFE
 setlinebuf SIGFE
@@ -1495,6 +1508,14 @@ tfind NOSIGFE
 tgamma NOSIGFE
 tgammaf NOSIGFE
 tgammal NOSIGFE
+thrd_create SIGFE
+thrd_current SIGFE
+thrd_detach SIGFE
+thrd_equal SIGFE
+thrd_exit SIGFE
+thrd_join SIGFE
+thrd_sleep SIGFE
+thrd_yield SIGFE
 time SIGFE
 timegm NOSIGFE
 timelocal SIGFE
@@ -1529,6 +1550,10 @@ truncate SIGFE
 truncf NOSIGFE
 truncl NOSIGFE
 tsearch SIGFE
+tss_create SIGFE
+tss_delete SIGFE
+tss_get SIGFE
+tss_set SIGFE
 ttyname SIGFE
 ttyname_r SIGFE
 ttyslot NOSIGFE
