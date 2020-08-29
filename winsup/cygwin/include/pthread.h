@@ -234,6 +234,8 @@ int pthread_setname_np (pthread_t, const char *) __attribute__((__nonnull__(2)))
 int pthread_sigqueue (pthread_t *, int, const union sigval);
 int pthread_timedjoin_np (pthread_t, void **, const struct timespec *);
 int pthread_tryjoin_np (pthread_t, void **);
+#endif
+#if __BSD_VISIBLE || __GNU_VISIBLE
 int pthread_yield (void);
 #endif
 #if __MISC_VISIBLE /* HP-UX, others? */
