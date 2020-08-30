@@ -27,3 +27,6 @@ Bug Fixes
 
 - The pthread_yield declaration in pthread is now visible by default
   or when defining _BSD_SOURCE, too.
+
+- Fix SEGV in modfl call.
+  Addresses: https://cygwin.com/pipermail/cygwin/2020-August/246056.html
