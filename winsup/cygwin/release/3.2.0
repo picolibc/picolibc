@@ -1,0 +1,29 @@
+What's new:
+-----------
+
+- Revamped pseudo console support.
+
+- New C11 threads API: call_once, cnd_broadcast, cnd_destroy, cnd_init,
+  cnd_signal, cnd_timedwait, cnd_wait, mtx_destroy, mtx_init, mtx_lock,
+  mtx_timedlock, mtx_trylock, mtx_unlock, thrd_create, thrd_current,
+  thrd_detach, thrd_equal, thrd_exit, thrd_join, thrd_sleep, thrd_yield,
+  tss_create, tss_delete, tss_get, tss_set.
+
+
+What changed:
+-------------
+
+- Allow ~5000 child processes per process on 64 bit, ~1200 child processes
+  per process on 32 bit.  So far, only 256 child processes per process were
+  supported.
+
+- A few FAQ updates.
+
+
+Bug Fixes
+---------
+
+- Iterate at least 4 times over pthread_key_t destructors per POSIX.
+
+- The pthread_yield declaration in pthread is now visible by default
+  or when defining _BSD_SOURCE, too.
