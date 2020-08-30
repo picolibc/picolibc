@@ -10,7 +10,8 @@ fmodl (long double x, long double y)
 {
   long double res = 0.0L;
 
-  asm ("1:\tfprem\n\t"
+  asm volatile (
+       "1:\tfprem\n\t"
        "fstsw   %%ax\n\t"
        "sahf\n\t"
        "jp      1b\n\t"

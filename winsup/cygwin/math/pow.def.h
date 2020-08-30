@@ -82,7 +82,7 @@ internal_modf (__FLT_TYPE value, __FLT_TYPE *iptr)
   /* truncate */
   /* truncate */
 #ifdef __x86_64__
-  asm ("pushq %%rax\n\tsubq $8, %%rsp\n"
+  asm volatile ("pushq %%rax\n\tsubq $8, %%rsp\n"
     "fnstcw 4(%%rsp)\n"
     "movzwl 4(%%rsp), %%eax\n"
     "orb $12, %%ah\n"
@@ -92,7 +92,7 @@ internal_modf (__FLT_TYPE value, __FLT_TYPE *iptr)
     "fldcw 4(%%rsp)\n"
     "addq $8, %%rsp\npopq %%rax" : "=t" (int_part) : "0" (value)); /* round */
 #else
-  asm ("push %%eax\n\tsubl $8, %%esp\n"
+  asm volatile ("push %%eax\n\tsubl $8, %%esp\n"
     "fnstcw 4(%%esp)\n"
     "movzwl 4(%%esp), %%eax\n"
     "orb $12, %%ah\n"
@@ -204,7 +204,7 @@ __FLT_ABI(pow) (__FLT_TYPE x, __FLT_TYPE y)
 	}
       if (y == __FLT_CST(0.5))
 	{
-	  asm ("fsqrt" : "=t" (rslt) : "0" (x));
+	  asm volatile ("fsqrt" : "=t" (rslt) : "0" (x));
 	  return rslt;
 	}
     }

@@ -52,7 +52,8 @@ static long double
 __expl_internal (long double x)
 {
   long double res = 0.0L;
-  asm ("fldl2e\n\t"             /* 1  log2(e)         */
+  asm volatile (
+       "fldl2e\n\t"             /* 1  log2(e)         */
        "fmul %%st(1),%%st\n\t"  /* 1  x log2(e)       */
 
 #ifdef __x86_64__

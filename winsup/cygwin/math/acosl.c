@@ -10,7 +10,8 @@ long double acosl (long double x)
   long double res = 0.0L;
 
   /* acosl = atanl (sqrtl(1 - x^2) / x) */
-  asm (	"fld	%%st\n\t"
+  asm volatile (
+	"fld	%%st\n\t"
 	"fmul	%%st(0)\n\t"		/* x^2 */
 	"fld1\n\t"
 	"fsubp\n\t"			/* 1 - x^2 */
