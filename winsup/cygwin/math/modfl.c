@@ -21,7 +21,7 @@ modfl (long double value, long double* iptr)
     "fldcw (%%rsp)\n"
     "frndint\n"
     "fldcw 4(%%rsp)\n"
-    "addq $8, %%rsp\n" : "=t" (int_part) : "0" (value)); /* round */
+    "addq $8, %%rsp\n" : "=t" (int_part) : "0" (value) : "eax"); /* round */
 #elif defined(_X86_) || defined(__i386__)
   asm ("push %%eax\n\tsubl $8, %%esp\n"
     "fnstcw 4(%%esp)\n"
@@ -31,7 +31,7 @@ modfl (long double value, long double* iptr)
     "fldcw (%%esp)\n"
     "frndint\n"
     "fldcw 4(%%esp)\n"
-    "addl $8, %%esp\n\tpop %%eax\n" : "=t" (int_part) : "0" (value)); /* round */
+    "addl $8, %%esp\n\tpop %%eax\n" : "=t" (int_part) : "0" (value) : "eax"); /* round */
 #else
   int_part = truncl(value);
 #endif
