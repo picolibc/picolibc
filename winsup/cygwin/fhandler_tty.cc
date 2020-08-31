@@ -2168,15 +2168,12 @@ fhandler_pty_master::pty_master_fwd_thread ()
 	      /* Remove Set title sequence */
 	      char *p0, *p1;
 	      p0 = outbuf;
-	      while ((p0 = (char *) memmem (p0, rlen, "\033]0;", 4)))
+	      while ((p0 = (char *) memmem (p0, rlen, "\033]0;", 4))
+		     && (p1 = (char *) memchr (p0, '\007', rlen-(p0-outbuf))))
 		{
-		  p1 = (char *) memchr (p0, '\007', rlen - (p0 - outbuf));
-		  if (p1)
-		    {
-		      memmove (p0, p1 + 1, rlen - (p1 + 1 - outbuf));
-		      rlen -= p1 + 1 - p0;
-		      wlen = rlen;
-		    }
+		  memmove (p0, p1 + 1, rlen - (p1 + 1 - outbuf));
+		  rlen -= p1 + 1 - p0;
+		  wlen = rlen;
 		}
 	    }
 	  /* Remove CSI > Pm m */
