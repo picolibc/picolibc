@@ -2332,6 +2332,7 @@ class fhandler_pty_slave: public fhandler_pty_common
   }
   bool setup_pseudoconsole (STARTUPINFOEXW *si, bool nopcon);
   void close_pseudoconsole (void);
+  bool term_has_pcon_cap (const WCHAR *env);
   void set_switch_to_pcon (void);
   void reset_switch_to_pcon (void);
   void mask_switch_to_pcon_in (bool mask);

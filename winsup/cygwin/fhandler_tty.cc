@@ -1631,33 +1631,27 @@ fhandler_pty_master::write (const void *ptr, size_t len)
 	  static char wpbuf[wpbuf_len];
 	  static int ixput = 0;
 
-	  if (ixput == 0 && buf[0] != '\033')
-	    { /* fail-safe */
-	      WriteFile (to_slave, "\033[1;1R", 6, &wLen, NULL); /* dummy */
-	      get_ttyp ()->pcon_start = false;
+	  if (ixput + nlen < wpbuf_len)
+	    {
+	      memcpy (wpbuf + ixput, buf, nlen);
+	      ixput += nlen;
 	    }
 	  else
 	    {
-	      if (ixput + nlen < wpbuf_len)
-		for (size_t i=0; i<nlen; i++)
-		  wpbuf[ixput++] = buf[i];
-	      else
-		{
-		  WriteFile (to_slave, wpbuf, ixput, &wLen, NULL);
-		  ixput = 0;
-		  get_ttyp ()->pcon_start = false;
-		  WriteFile (to_slave, buf, nlen, &wLen, NULL);
-		}
-	      if (ixput && memchr (wpbuf, 'R', ixput))
-		{
-		  WriteFile (to_slave, wpbuf, ixput, &wLen, NULL);
-		  ixput = 0;
-		  get_ttyp ()->pcon_start = false;
-		}
-	      ReleaseMutex (input_mutex);
-	      mb_str_free (buf);
-	      return len;
+	      WriteFile (to_slave, wpbuf, ixput, &wLen, NULL);
+	      ixput = 0;
+	      get_ttyp ()->pcon_start = false;
+	      WriteFile (to_slave, buf, nlen, &wLen, NULL);
 	    }
+	  if (ixput && memchr (wpbuf, 'R', ixput))
+	    {
+	      WriteFile (to_slave, wpbuf, ixput, &wLen, NULL);
+	      ixput = 0;
+	      get_ttyp ()->pcon_start = false;
+	    }
+	  ReleaseMutex (input_mutex);
+	  mb_str_free (buf);
+	  return len;
 	}
 
       WriteFile (to_slave, buf, nlen, &wLen, NULL);
@@ -2169,6 +2163,22 @@ fhandler_pty_master::pty_master_fwd_thread ()
       char *ptr = outbuf;
       if (get_ttyp ()->h_pseudo_console)
 	{
+	  if (!get_ttyp ()->has_set_title)
+	    {
+	      /* Remove Set title sequence */
+	      char *p0, *p1;
+	      p0 = outbuf;
+	      while ((p0 = (char *) memmem (p0, rlen, "\033]0;", 4)))
+		{
+		  p1 = (char *) memchr (p0, '\007', rlen - (p0 - outbuf));
+		  if (p1)
+		    {
+		      memmove (p0, p1 + 1, rlen - (p1 + 1 - outbuf));
+		      rlen -= p1 + 1 - p0;
+		      wlen = rlen;
+		    }
+		}
+	    }
 	  /* Remove CSI > Pm m */
 	  int state = 0;
 	  int start_at = 0;
@@ -2658,4 +2668,182 @@ fhandler_pty_slave::close_pseudoconsole (void)
       get_ttyp ()->pcon_pid = 0;
       get_ttyp ()->pcon_start = false;
     }
+}
+
+static bool
+has_ansi_escape_sequences (const WCHAR *env)
+{
+  /* Retrieve TERM name */
+  const char *term = NULL;
+  char term_str[260];
+  if (env)
+    {
+    for (const WCHAR *p = env; *p != L'\0'; p += wcslen (p) + 1)
+      if (swscanf (p, L"TERM=%236s", term_str) == 1)
+	{
+	  term = term_str;
+	  break;
+	}
+    }
+  else
+    term = getenv ("TERM");
+
+  if (!term)
+    return false;
+
+  /* If cursor_home is not "\033[H", terminal is not supposed to
+     support ANSI escape sequences. */
+  char tinfo[260];
+  __small_sprintf (tinfo, "/usr/share/terminfo/%02x/%s", term[0], term);
+  path_conv path (tinfo);
+  WCHAR wtinfo[260];
+  path.get_wide_win32_path (wtinfo);
+  HANDLE h;
+  h = CreateFileW (wtinfo, GENERIC_READ, FILE_SHARE_READ,
+		   NULL, OPEN_EXISTING, 0, NULL);
+  if (h == NULL)
+    return false;
+  char terminfo[4096];
+  DWORD n;
+  ReadFile (h, terminfo, sizeof (terminfo), &n, 0);
+  CloseHandle (h);
+
+  int num_size = 2;
+  if (*(int16_t *)terminfo == 01036 /* MAGIC2 */)
+    num_size = 4;
+  const int name_pos = 12; /* Position of terminal name */
+  const int name_size = *(int16_t *) (terminfo + 2);
+  const int bool_count = *(int16_t *) (terminfo + 4);
+  const int num_count = *(int16_t *) (terminfo + 6);
+  const int str_count = *(int16_t *) (terminfo + 8);
+  const int str_size = *(int16_t *) (terminfo + 10);
+  const int cursor_home = 12; /* cursor_home entry index */
+  if (cursor_home >= str_count)
+    return false;
+  int str_idx_pos = name_pos + name_size + bool_count + num_size * num_count;
+  if (str_idx_pos & 1)
+    str_idx_pos ++;
+  const int16_t *str_idx = (int16_t *) (terminfo + str_idx_pos);
+  const char *str_table = (const char *) (str_idx + str_count);
+  if (str_idx + cursor_home >= (int16_t *) (terminfo + n))
+    return false;
+  if (str_idx[cursor_home] == -1)
+    return false;
+  const char *cursor_home_str = str_table + str_idx[cursor_home];
+  if (cursor_home_str >= str_table + str_size)
+    return false;
+  if (cursor_home_str >= terminfo + n)
+    return false;
+  if (strcmp (cursor_home_str, "\033[H") != 0)
+    return false;
+  return true;
+}
+
+bool
+fhandler_pty_slave::term_has_pcon_cap (const WCHAR *env)
+{
+  if (get_ttyp ()->pcon_cap_checked)
+    return get_ttyp ()->has_csi6n;
+
+  DWORD n;
+  char buf[1024];
+  char *p;
+  int len;
+  int x1, y1, x2, y2;
+  tcflag_t c_lflag;
+  DWORD t0;
+
+  /* Check if terminal has ANSI escape sequence. */
+  if (!has_ansi_escape_sequences (env))
+    goto maybe_dumb;
+
+  /* Check if terminal has CSI6n */
+  WaitForSingleObject (input_mutex, INFINITE);
+  c_lflag = get_ttyp ()->ti.c_lflag;
+  get_ttyp ()->ti.c_lflag &= ~ICANON;
+  /* Set h_pseudo_console and pcon_start so that the response
+     will sent to io_handle rather than io_handle_cyg. */
+  get_ttyp ()->h_pseudo_console = (HPCON *) -1; /* dummy */
+  /* pcon_start will be cleared in master write() when CSI6n is responded. */
+  get_ttyp ()->pcon_start = true;
+  WriteFile (get_output_handle_cyg (), "\033[6n", 4, &n, NULL);
+  ReleaseMutex (input_mutex);
+  p = buf;
+  len = sizeof (buf) - 1;
+  t0 = GetTickCount ();
+  do
+    {
+      if (::bytes_available (n, get_handle ()) && n)
+	{
+	  ReadFile (get_handle (), p, len, &n, NULL);
+	  p += n;
+	  len -= n;
+	  *p = '\0';
+	  char *p1 = strrchr (buf, '\033');
+	  if (p1 == NULL || sscanf (p1, "\033[%d;%dR", &y1, &x1) != 2)
+	    continue;
+	  break;
+	}
+      else if (GetTickCount () - t0 > 40) /* Timeout */
+	goto not_has_csi6n;
+      else
+	Sleep (1);
+    }
+  while (len);
+  if (len == 0)
+    goto not_has_csi6n;
+
+  get_ttyp ()->has_csi6n = true;
+  get_ttyp ()->pcon_cap_checked = true;
+
+  /* Check if terminal has set-title capability */
+  WaitForSingleObject (input_mutex, INFINITE);
+  /* Set pcon_start again because it should be cleared
+     in master write(). */
+  get_ttyp ()->pcon_start = true;
+  WriteFile (get_output_handle_cyg (), "\033]0;\033\\\033[6n", 10, &n, NULL);
+  ReleaseMutex (input_mutex);
+  p = buf;
+  len = sizeof (buf) - 1;
+  do
+    {
+      ReadFile (get_handle (), p, len, &n, NULL);
+      p += n;
+      len -= n;
+      *p = '\0';
+      char *p2 = strrchr (buf, '\033');
+      if (p2 == NULL || sscanf (p2, "\033[%d;%dR", &y2, &x2) != 2)
+	continue;
+      break;
+    }
+  while (len);
+  WaitForSingleObject (input_mutex, INFINITE);
+  get_ttyp ()->h_pseudo_console = NULL;
+  get_ttyp ()->ti.c_lflag = c_lflag;
+  ReleaseMutex (input_mutex);
+
+  if (len == 0)
+    return true;
+
+  if (x2 == x1 && y2 == y1)
+    /* If "\033]0;\033\\" does not move cursor position,
+       set-title is supposed to be supported. */
+    get_ttyp ()->has_set_title = true;
+  else
+    /* Try to erase garbage string caused by "\033]0;\033\\" */
+    for (int i=0; i<x2-x1; i++)
+      WriteFile (get_output_handle_cyg (), "\b \b", 3, &n, NULL);
+  return true;
+
+not_has_csi6n:
+  WaitForSingleObject (input_mutex, INFINITE);
+  /* If CSI6n is not responded, pcon_start is not cleared
+     in master write(). Therefore, clear it here manually. */
+  get_ttyp ()->pcon_start = false;
+  get_ttyp ()->h_pseudo_console = NULL;
+  get_ttyp ()->ti.c_lflag = c_lflag;
+  ReleaseMutex (input_mutex);
+maybe_dumb:
+  get_ttyp ()->pcon_cap_checked = true;
+  return false;
 }

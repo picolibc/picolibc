@@ -242,6 +242,9 @@ tty::init ()
   term_code_page = 0;
   pcon_last_time = 0;
   pcon_start = false;
+  pcon_cap_checked = false;
+  has_csi6n = false;
+  has_set_title = false;
 }
 
 HANDLE

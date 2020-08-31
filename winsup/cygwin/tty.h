@@ -101,6 +101,9 @@ private:
   UINT term_code_page;
   DWORD pcon_last_time;
   HANDLE h_pcon_write_pipe;
+  bool pcon_cap_checked;
+  bool has_csi6n;
+  bool has_set_title;
 
 public:
   HANDLE from_master () const { return _from_master; }

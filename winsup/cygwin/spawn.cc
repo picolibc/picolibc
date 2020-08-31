@@ -647,13 +647,17 @@ child_info_spawn::worker (const char *prog_arg, const char *const *argv,
       ZeroMemory (&si_pcon, sizeof (si_pcon));
       STARTUPINFOW *si_tmp = &si;
       if (!iscygwin () && ptys_primary && is_console_app (runpath))
-	if (ptys_primary->setup_pseudoconsole (&si_pcon,
-			     mode != _P_OVERLAY && mode != _P_WAIT))
-	  {
-	    c_flags |= EXTENDED_STARTUPINFO_PRESENT;
-	    si_tmp = &si_pcon.StartupInfo;
-	    enable_pcon = true;
-	  }
+	{
+	  bool nopcon = mode != _P_OVERLAY && mode != _P_WAIT;
+	  if (!ptys_primary->term_has_pcon_cap (envblock))
+	    nopcon = true;
+	  if (ptys_primary->setup_pseudoconsole (&si_pcon, nopcon))
+	    {
+	      c_flags |= EXTENDED_STARTUPINFO_PRESENT;
+	      si_tmp = &si_pcon.StartupInfo;
+	      enable_pcon = true;
+	    }
+	}
 
     loop:
       /* When ruid != euid we create the new process under the current original
