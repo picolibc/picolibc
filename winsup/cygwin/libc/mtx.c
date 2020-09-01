@@ -54,13 +54,6 @@ mtx_init(mtx_t *mtx, int type)
 	case mtx_timed:
 		mt = PTHREAD_MUTEX_NORMAL;
 		break;
-#ifdef __CYGWIN__
-	/* This is a hack to support apps running under GLibc.  mtx_plain is
-	   defined as 0 in GLibc, so apps calling mtx_init with just the
-	   mtx_recursive flag don't fail, as they should.  Rather they run
-	   as if mtx_plain | mtx_recursive has been given as type. */
-	case mtx_recursive:
-#endif
 	case mtx_plain | mtx_recursive:
 	case mtx_timed | mtx_recursive:
 		mt = PTHREAD_MUTEX_RECURSIVE;
