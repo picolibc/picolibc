@@ -72,10 +72,10 @@ lib_a_AR = $(AR) $(ARFLAGS)
 lib_a_LIBADD =
 am__objects_1 = lib_a-e_sqrt.$(OBJEXT) lib_a-ef_sqrt.$(OBJEXT) \
 	lib_a-s_ceil.$(OBJEXT) lib_a-s_floor.$(OBJEXT) \
-	lib_a-s_fma.$(OBJEXT) lib_a-s_nearbyint.$(OBJEXT) \
+	lib_a-s_fma_arm.$(OBJEXT) lib_a-s_nearbyint.$(OBJEXT) \
 	lib_a-s_rint.$(OBJEXT) lib_a-s_round.$(OBJEXT) \
 	lib_a-s_trunc.$(OBJEXT) lib_a-sf_ceil.$(OBJEXT) \
-	lib_a-sf_floor.$(OBJEXT) lib_a-sf_fma.$(OBJEXT) \
+	lib_a-sf_floor.$(OBJEXT) lib_a-sf_fma_arm.$(OBJEXT) \
 	lib_a-sf_nearbyint.$(OBJEXT) lib_a-sf_rint.$(OBJEXT) \
 	lib_a-sf_round.$(OBJEXT) lib_a-sf_trunc.$(OBJEXT) \
 	lib_a-feclearexcept.$(OBJEXT) lib_a-fe_dfl_env.$(OBJEXT) \
@@ -216,14 +216,14 @@ LIB_SOURCES = \
 	ef_sqrt.c \
 	s_ceil.c \
 	s_floor.c \
-	s_fma.c \
+	s_fma_arm.c \
 	s_nearbyint.c \
 	s_rint.c \
 	s_round.c \
 	s_trunc.c \
 	sf_ceil.c \
 	sf_floor.c \
-	sf_fma.c \
+	sf_fma_arm.c \
 	sf_nearbyint.c \
 	sf_rint.c \
 	sf_round.c \
@@ -344,11 +344,11 @@ lib_a-s_floor.o: s_floor.c
 lib_a-s_floor.obj: s_floor.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-s_floor.obj `if test -f 's_floor.c'; then $(CYGPATH_W) 's_floor.c'; else $(CYGPATH_W) '$(srcdir)/s_floor.c'; fi`
 
-lib_a-s_fma.o: s_fma.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-s_fma.o `test -f 's_fma.c' || echo '$(srcdir)/'`s_fma.c
+lib_a-s_fma_arm.o: s_fma_arm.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-s_fma_arm.o `test -f 's_fma_arm.c' || echo '$(srcdir)/'`s_fma_arm.c
 
-lib_a-s_fma.obj: s_fma.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-s_fma.obj `if test -f 's_fma.c'; then $(CYGPATH_W) 's_fma.c'; else $(CYGPATH_W) '$(srcdir)/s_fma.c'; fi`
+lib_a-s_fma_arm.obj: s_fma_arm.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-s_fma_arm.obj `if test -f 's_fma_arm.c'; then $(CYGPATH_W) 's_fma_arm.c'; else $(CYGPATH_W) '$(srcdir)/s_fma_arm.c'; fi`
 
 lib_a-s_nearbyint.o: s_nearbyint.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-s_nearbyint.o `test -f 's_nearbyint.c' || echo '$(srcdir)/'`s_nearbyint.c
@@ -386,11 +386,11 @@ lib_a-sf_floor.o: sf_floor.c
 lib_a-sf_floor.obj: sf_floor.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-sf_floor.obj `if test -f 'sf_floor.c'; then $(CYGPATH_W) 'sf_floor.c'; else $(CYGPATH_W) '$(srcdir)/sf_floor.c'; fi`
 
-lib_a-sf_fma.o: sf_fma.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-sf_fma.o `test -f 'sf_fma.c' || echo '$(srcdir)/'`sf_fma.c
+lib_a-sf_fma_arm.o: sf_fma_arm.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-sf_fma_arm.o `test -f 'sf_fma_arm.c' || echo '$(srcdir)/'`sf_fma_arm.c
 
-lib_a-sf_fma.obj: sf_fma.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-sf_fma.obj `if test -f 'sf_fma.c'; then $(CYGPATH_W) 'sf_fma.c'; else $(CYGPATH_W) '$(srcdir)/sf_fma.c'; fi`
+lib_a-sf_fma_arm.obj: sf_fma_arm.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-sf_fma_arm.obj `if test -f 'sf_fma_arm.c'; then $(CYGPATH_W) 'sf_fma_arm.c'; else $(CYGPATH_W) '$(srcdir)/sf_fma_arm.c'; fi`
 
 lib_a-sf_nearbyint.o: sf_nearbyint.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-sf_nearbyint.o `test -f 'sf_nearbyint.c' || echo '$(srcdir)/'`sf_nearbyint.c
