@@ -172,7 +172,6 @@ hash4(keyarg, len)
 	size_t len;
 {
 	const u_char *key;
-	size_t loop;
 	__uint32_t h;
 
 #define HASH4a   h = (h << 5) - h + *key++;
