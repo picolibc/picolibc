@@ -328,6 +328,9 @@ if have_long_double
   long_double_equals_double = meson.get_compiler('c').compiles(long_double_size_code, name : 'long double same as double')
 endif
 
+# CompCert does not have __builtin_expect
+have_builtin_expect = meson.get_compiler('c').compiles('int test = __builtin_expect(42, 0);', name : 'has __builtin_expect')
+
 if enable_multilib
   used_libs = []
 
@@ -457,6 +460,9 @@ conf_data.set('PICOLIBC_TLS', thread_local_storage, description: 'use thread loc
 conf_data.set('POSIX_IO', posix_io, description: 'Use open/close/read/write in tinystdio')
 conf_data.set('POSIX_CONSOLE', posix_console, description: 'Use POSIX I/O for stdin, stdout and stderr')
 conf_data.set('ATOMIC_UNGETC', atomic_ungetc, description: 'Use atomics for fgetc/ungetc for re-entrancy')
+if not have_builtin_expect
+  conf_data.set('__builtin_expect(cond, exp)', '(cond)', description: 'Compiler does not have __builtin_expect')
+endif
 
 if newlib_obsolete_math == 'auto'
   obsolete_math_value = false
