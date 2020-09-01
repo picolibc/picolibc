@@ -44,7 +44,10 @@ static struct caseconv_entry {
   uint_least32_t diff: 8;
   uint_least32_t mode: 2;
   int_least32_t delta: 17;
-} __attribute__ ((packed))
+}
+#ifdef HAVE_BITFIELDS_IN_PACKED_STRUCTS
+__attribute__((packed))
+#endif
 caseconv_table [] = {
 #include "caseconv.t"
 };

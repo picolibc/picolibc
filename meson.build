@@ -328,6 +328,13 @@ if have_long_double
   long_double_equals_double = meson.get_compiler('c').compiles(long_double_size_code, name : 'long double same as double')
 endif
 
+# CompCert does not support bitfields in packed structs, so avoid using this optimization
+bitfields_in_packed_structs_code = '''
+struct test { int part: 24; } __attribute__((packed));
+unsigned int foobar (const struct test *p) { return p->part; }
+'''
+have_bitfields_in_packed_structs = meson.get_compiler('c').compiles(bitfields_in_packed_structs_code, name : 'packed structs may contain bitfields')
+
 if enable_multilib
   used_libs = []
 
@@ -457,6 +464,7 @@ conf_data.set('PICOLIBC_TLS', thread_local_storage, description: 'use thread loc
 conf_data.set('POSIX_IO', posix_io, description: 'Use open/close/read/write in tinystdio')
 conf_data.set('POSIX_CONSOLE', posix_console, description: 'Use POSIX I/O for stdin, stdout and stderr')
 conf_data.set('ATOMIC_UNGETC', atomic_ungetc, description: 'Use atomics for fgetc/ungetc for re-entrancy')
+conf_data.set('HAVE_BITFIELDS_IN_PACKED_STRUCTS', have_bitfields_in_packed_structs, description: 'Use bitfields in packed structs')
 
 if newlib_obsolete_math == 'auto'
   obsolete_math_value = false
