@@ -41,7 +41,7 @@ elf=hello-world-riscv.elf
 
 # Set the target machine
 machine=virt,accel=tcg
-cpu=sifive-e31
+cpu=rv32
 
 # Map stdio to a multiplexed character device so we can use it
 # for the monitor and semihosting output
