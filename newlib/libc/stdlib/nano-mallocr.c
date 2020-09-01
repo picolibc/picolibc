@@ -236,7 +236,7 @@ void* __malloc_sbrk_aligned(size_t s)
      * is MALLOC_CHUNK_ALIGN aligned and the head is
      * MALLOC_HEAD_ALIGN aligned.
      */
-    align_p = ALIGN_PTR(p + MALLOC_HEAD, MALLOC_CHUNK_ALIGN) - MALLOC_HEAD;
+    align_p = (char*)ALIGN_PTR(p + MALLOC_HEAD, MALLOC_CHUNK_ALIGN) - MALLOC_HEAD;
 
     if (align_p != p)
     {
