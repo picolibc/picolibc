@@ -51,16 +51,6 @@ static uint32_t decimalLength17(const uint64_t v) {
 	return len;
 }
 
-#define max(a, b) ({				\
-			typeof(a) _a = a;	\
-			typeof(b) _b = b;	\
-			_a > _b ? _a : _b; })
-
-#define min(a, b) ({				\
-			typeof(a) _a = a;	\
-			typeof(b) _b = b;	\
-			_a < _b ? _a : _b; })
-
 // A floating decimal representing m * 10^e.
 typedef struct floating_decimal_64 {
 	uint64_t mantissa;
@@ -107,7 +97,7 @@ d2d(const uint64_t ieeeMantissa, const uint32_t ieeeExponent, int max_digits, in
 	bool vrIsTrailingZeros = false;
 	if (e2 >= 0) {
 		// I tried special-casing q == 0, but there was no effect on performance.
-		// This expression is slightly faster than max(0, log10Pow2(e2) - 1).
+		// This expression is slightly faster than max_int(0, log10Pow2(e2) - 1).
 		const uint32_t q = log10Pow2(e2) - (e2 > 3);
 		e10 = (int32_t) q;
 		const int32_t k = DOUBLE_POW5_INV_BITCOUNT + pow5bits((int32_t) q) - 1;
@@ -127,17 +117,17 @@ d2d(const uint64_t ieeeMantissa, const uint32_t ieeeExponent, int max_digits, in
 			if (mvMod5 == 0) {
 				vrIsTrailingZeros = multipleOfPowerOf5(mv, q);
 			} else if (acceptBounds) {
-				// Same as min(e2 + (~mm & 1), pow5Factor(mm)) >= q
+				// Same as min_int(e2 + (~mm & 1), pow5Factor(mm)) >= q
 				// <=> e2 + (~mm & 1) >= q && pow5Factor(mm) >= q
 				// <=> true && pow5Factor(mm) >= q, since e2 >= q.
 				vmIsTrailingZeros = multipleOfPowerOf5(mv - 1 - mmShift, q);
 			} else {
-				// Same as min(e2 + 1, pow5Factor(mp)) >= q.
+				// Same as min_int(e2 + 1, pow5Factor(mp)) >= q.
 				vp -= multipleOfPowerOf5(mv + 2, q);
 			}
 		}
 	} else {
-		// This expression is slightly faster than max(0, log10Pow5(-e2) - 1).
+		// This expression is slightly faster than max_int(0, log10Pow5(-e2) - 1).
 		const uint32_t q = log10Pow5(-e2) - (-e2 > 1);
 		e10 = (int32_t) q + e2;
 		const int32_t i = -e2 - (int32_t) q;
@@ -165,7 +155,7 @@ d2d(const uint64_t ieeeMantissa, const uint32_t ieeeExponent, int max_digits, in
 			}
 		} else if (q < 63) { // TODO(ulfjack): Use a tighter bound here.
 			// We want to know if the full product has at least q trailing zeros.
-			// We need to compute min(p2(mv), p5(mv) - e2) >= q
+			// We need to compute min_int(p2(mv), p5(mv) - e2) >= q
 			// <=> p2(mv) >= q && p5(mv) - e2 >= q
 			// <=> p2(mv) >= q (because -e2 >= q)
 			vrIsTrailingZeros = multipleOfPowerOf2(mv, q);
@@ -226,7 +216,7 @@ d2d(const uint64_t ieeeMantissa, const uint32_t ieeeExponent, int max_digits, in
 		 * cases, which is kinda cool
 		 */
 		/* max_decimals comes in biased by 1 to flag the 'f' case */
-		max_digits = min(max_digits, max(0, max_decimals - 1 + exp + 1));
+		max_digits = min_int(max_digits, max_int(0, max_decimals - 1 + exp + 1));
 	}
 
 	for (;;) {
@@ -298,7 +288,7 @@ d2d(const uint64_t ieeeMantissa, const uint32_t ieeeExponent, int max_digits, in
 			if(max_decimals != 0) {
 				int exp = e10 + len - 1;
 				/* max_decimals comes in biased by 1 to flag the 'f' case */
-				max_digits = min(save_max_digits, max(0, max_decimals - 1 + exp + 1));
+				max_digits = min_int(save_max_digits, max_int(0, max_decimals - 1 + exp + 1));
 			}
 
 			if (len > max_digits) {
