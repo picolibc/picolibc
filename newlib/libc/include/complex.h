@@ -14,6 +14,7 @@
 
 #include <sys/cdefs.h>
 
+#ifdef HAVE_COMPLEX
 __BEGIN_DECLS
 
 /* 7.3.5 Trigonometric functions */
@@ -150,4 +151,5 @@ long double complex clog10l(long double complex);
 
 __END_DECLS
 
-#endif	/* ! _COMPLEX_H */
+#endif  /* #ifndef _COMPLEX_H */
+#endif	/* #ifdef HAVE_COMPLEX */
