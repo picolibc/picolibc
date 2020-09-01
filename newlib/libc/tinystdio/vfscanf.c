@@ -736,7 +736,10 @@ int vfscanf (FILE * stream, const char *fmt, va_list ap)
 		do {
 		    if ((i = scanf_getc (stream, lenp)) < 0)
 			goto eof;
-		    if (addr) *(char *)addr++ = i;
+		    if (addr) {
+                *(char *)addr = i;
+                addr = (char*)addr + 1;
+            }
 		} while (--width);
 		c = 1;			/* no matter with smart GCC	*/
 
@@ -762,7 +765,10 @@ int vfscanf (FILE * stream, const char *fmt, va_list ap)
 			    scanf_ungetc (i, stream, lenp);
 			    break;
 			}
-			if (addr) *(char *)addr++ = i;
+		    if (addr) {
+                *(char *)addr = i;
+                addr = (char*)addr + 1;
+            }
 		    } while (--width);
 		    if (addr) *(char *)addr = 0;
 		    c = 1;		/* no matter with smart GCC	*/
