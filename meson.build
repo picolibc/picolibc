@@ -359,6 +359,15 @@ float _Complex test(float _Complex z) { return z; }
 '''
 have_complex = meson.get_compiler('c').compiles(complex_code, name : 'supports _Complex')
 
+# CompCert does not have __builtin_expect
+builtin_expect_code = '''
+volatile int a = 42;
+int main (void) {
+  return __builtin_expect(a, 1);
+}
+'''
+have_builtin_expect = meson.get_compiler('c').links(builtin_expect_code, name : 'has __builtin_expect')
+
 if enable_multilib
   used_libs = []
 
@@ -491,6 +500,7 @@ conf_data.set('ATOMIC_UNGETC', atomic_ungetc, description: 'Use atomics for fget
 conf_data.set('HAVE_BITFIELDS_IN_PACKED_STRUCTS', have_bitfields_in_packed_structs, description: 'Use bitfields in packed structs')
 conf_data.set('HAVE_BUILTIN_MUL', have_builtin_mul_overflow, description: 'Compiler has __builtin_mul_overflow')
 conf_data.set('HAVE_COMPLEX', have_complex, description: 'Compiler supports _Complex')
+conf_data.set('HAVE_BUILTIN_EXPECT', have_builtin_expect, description: 'Compiler has __builtin_expect')
 
 if newlib_obsolete_math == 'auto'
   obsolete_math_value = false
