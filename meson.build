@@ -290,21 +290,21 @@ endif
 specs_data.set(
   'SPECS_PRINTF',
   specs_printf
-)
+  )
 
 picolibc_specs = configure_file(input: 'picolibc.specs.in',
-				output: '@BASENAME@',
-				configuration: specs_data,
-				install_dir: specs_dir,
-				install: specs_install)
-				     
+  output: '@BASENAME@',
+  configuration: specs_data,
+  install_dir: specs_dir,
+  install: specs_install)
+
 test_specs = configure_file(input: 'test.specs.in',
-			    output: '@BASENAME@',
-			    configuration: specs_data,
-			    install: false)
+  output: '@BASENAME@',
+  configuration: specs_data,
+  install: false)
 
 install_data('picolibc.ld',
-	     install_dir: lib_dir)
+  install_dir: lib_dir)
 
 long_double_code = '''
 #include <float.h>
@@ -313,8 +313,8 @@ long_double_code = '''
 #endif
 long double test()
 {
-	long double ld = 0.0L;
-	 return ld;
+    long double ld = 0.0L;
+     return ld;
 }
 '''
 have_long_double = meson.get_compiler('c').compiles(long_double_code, name : 'long double check')
@@ -334,6 +334,13 @@ struct test { int part: 24; } __attribute__((packed));
 unsigned int foobar (const struct test *p) { return p->part; }
 '''
 have_bitfields_in_packed_structs = meson.get_compiler('c').compiles(bitfields_in_packed_structs_code, name : 'packed structs may contain bitfields')
+
+# CompCert does not have __builtin_mul_overflow
+builtin_mul_overflow_code = '''
+#include <stddef.h>
+int overflows (size_t a, size_t b) { size_t x; return __builtin_mul_overflow(a, b, &x); }
+'''
+have_builtin_mul_overflow = meson.get_compiler('c').compiles(builtin_mul_overflow_code, name : 'has __builtin_mul_overflow')
 
 if enable_multilib
   used_libs = []
@@ -465,6 +472,7 @@ conf_data.set('POSIX_IO', posix_io, description: 'Use open/close/read/write in t
 conf_data.set('POSIX_CONSOLE', posix_console, description: 'Use POSIX I/O for stdin, stdout and stderr')
 conf_data.set('ATOMIC_UNGETC', atomic_ungetc, description: 'Use atomics for fgetc/ungetc for re-entrancy')
 conf_data.set('HAVE_BITFIELDS_IN_PACKED_STRUCTS', have_bitfields_in_packed_structs, description: 'Use bitfields in packed structs')
+conf_data.set('HAVE_BUILTIN_MUL', have_builtin_mul_overflow, description: 'Compiler has __builtin_mul_overflow')
 
 if newlib_obsolete_math == 'auto'
   obsolete_math_value = false
