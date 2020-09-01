@@ -55,4 +55,8 @@ fgetc(FILE *stream)
 	return (unsigned char)rv;
 }
 
+#ifdef HAVE_ALIAS_ATTRIBUTE
 __strong_reference(fgetc, getc);
+#elif !defined(getc)
+int getc(FILE *stream) { return fgetc(stream); }
+#endif
