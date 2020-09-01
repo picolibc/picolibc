@@ -763,7 +763,8 @@ ${CURDIR}/libc.a: ${LIB_NAME} ${CURDIR}/libm.a libpthread.a libutil.a
 ${CURDIR}/libm.a: ${LIB_NAME} $(LIBM) $(MATH_OFILES)
 	${speclib} ${@F}
 
-libpthread.a: ${LIB_NAME} pthread.o thread.o
+libpthread.a: ${LIB_NAME} pthread.o thread.o call_once.o cnd.o mtx.o \
+	      thrd.o tss.o
 	${speclib} ${@F}
 
 libutil.a: ${LIB_NAME} bsdlib.o
