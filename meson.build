@@ -353,6 +353,12 @@ int main (void) { return overflows(aa, aa); }
 '''
 have_builtin_mul_overflow = meson.get_compiler('c').links(builtin_mul_overflow_code, name : 'has __builtin_mul_overflow')
 
+# CompCert does not support _Complex
+complex_code = '''
+float _Complex test(float _Complex z) { return z; }
+'''
+have_complex = meson.get_compiler('c').compiles(complex_code, name : 'supports _Complex')
+
 if enable_multilib
   used_libs = []
 
@@ -484,6 +490,7 @@ conf_data.set('POSIX_CONSOLE', posix_console, description: 'Use POSIX I/O for st
 conf_data.set('ATOMIC_UNGETC', atomic_ungetc, description: 'Use atomics for fgetc/ungetc for re-entrancy')
 conf_data.set('HAVE_BITFIELDS_IN_PACKED_STRUCTS', have_bitfields_in_packed_structs, description: 'Use bitfields in packed structs')
 conf_data.set('HAVE_BUILTIN_MUL', have_builtin_mul_overflow, description: 'Compiler has __builtin_mul_overflow')
+conf_data.set('HAVE_COMPLEX', have_complex, description: 'Compiler supports _Complex')
 
 if newlib_obsolete_math == 'auto'
   obsolete_math_value = false

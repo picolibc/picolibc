@@ -49,7 +49,10 @@ libm_machine_dirs = {
 		      'xtensa': 'xtensa',
 		    }
 
-libdirs = ['math', 'common', 'complex', 'fenv']
+libdirs = ['math', 'common', 'fenv']
+if have_complex
+  libdirs = libdirs + ['complex']
+endif
 
 libnames = libdirs
 
