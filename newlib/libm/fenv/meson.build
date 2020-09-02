@@ -48,17 +48,23 @@ srcs_fenv = [
   'feupdateenv.c',
 ]
 
-include_sys = '../../libc/include/sys'
+srcs_fenv_use = []
+foreach file : srcs_fenv
+  s_file = file.split('.')[0] + '.S'
+  if file in srcs_libm_machine
+    message(file + ': machine overrides generic')
+  elif s_file in srcs_libm_machine
+    message(s_file + ': machine overrides generic')
+  else
+    srcs_fenv_use += file
+  endif
+endforeach
 
-install_headers([join_paths(include_sys, 'fenv.h')],
-		subdir:'sys'
-	       )
-  
 foreach target : targets
   value = get_variable('target_' + target)
   set_variable('lib_fenv' + target,
 	       static_library('fenv' + target,
-			      srcs_fenv,
+			      srcs_fenv_use,
 			      pic: false,
 			      include_directories: inc,
 			      c_args: value[1]))

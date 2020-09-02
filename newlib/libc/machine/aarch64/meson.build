@@ -68,6 +68,8 @@ srcs_machine = [
     'strchr.S'
 ]
 
+subdir('sys')
+
 foreach target : targets
     value = get_variable('target_' + target)
     set_variable('lib_machine' + target,

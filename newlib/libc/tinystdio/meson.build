@@ -173,11 +173,23 @@ install_headers(
   'stdio.h'
 )
 
+srcs_tinystdio_use = []
+foreach file : srcs_tinystdio
+  s_file = file.split('.')[0] + '.S'
+  if file in srcs_machine
+    message(file + ': machine overrides generic')
+  elif s_file in srcs_machine
+    message(s_file + ': machine overrides generic')
+  else
+    srcs_tinystdio_use += file
+  endif
+endforeach
+
 foreach target : targets
 	value = get_variable('target_' + target)
 	set_variable('lib_tinystdio' + target,
 		     static_library('tinystdio' + target,
-				    srcs_tinystdio,
+				    srcs_tinystdio_use,
 				    pic: false,
 				    include_directories: inc,
 				    c_args: value[1]))

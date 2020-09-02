@@ -1,7 +1,7 @@
 #
 # SPDX-License-Identifier: BSD-3-Clause
 #
-# Copyright © 2019 Keith Packard
+# Copyright © 2020 Keith Packard, 
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions
@@ -32,42 +32,10 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
-srcs_iconv_ces = [
-    'cesbi.c',
-    'euc.c',
-    'table.c',
-    'table-pcs.c',
-    'ucs-2.c',
-    'ucs-2-internal.c',
-    'ucs-4.c',
-    'ucs-4-internal.c',
-    'us-ascii.c',
-    'utf-16.c',
-    'utf-8.c',
-]
-hdrs_iconv_ces = [
-    'cesbi.h',
-    'cesdeps.h',
+inc_sys_headers_machine = [
+  'fenv.h'
 ]
 
-srcs_iconv_ces_use = []
-foreach file : srcs_iconv_ces
-  s_file = file.split('.')[0] + '.S'
-  if file in srcs_machine
-    message(file + ': machine overrides generic')
-  elif s_file in srcs_machine
-    message(s_file + ': machine overrides generic')
-  else
-    srcs_iconv_ces_use += file
-  endif
-endforeach
-
-foreach target : targets
-	value = get_variable('target_' + target)
-	set_variable('lib_iconv_ces' + target,
-		static_library('iconv_ces' + target,
-			       srcs_iconv_ces_use,
-			       pic: false,
-			       include_directories: inc,
-			       c_args: value[1]))
-endforeach
+install_headers(inc_sys_headers_machine,
+		subdir:'sys'
+	       )

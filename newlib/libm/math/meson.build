@@ -177,11 +177,23 @@ if have_long_double
   srcs_math += l_srcs_math
 endif
 
+srcs_math_use = []
+foreach file : srcs_math
+  s_file = file.split('.')[0] + '.S'
+  if file in srcs_libm_machine
+    message(file + ': machine overrides generic')
+  elif s_file in srcs_libm_machine
+    message(s_file + ': machine overrides generic')
+  else
+    srcs_math_use += file
+  endif
+endforeach
+
 foreach target : targets
 	value = get_variable('target_' + target)
 	set_variable('lib_math' + target,
 		static_library('math' + target,
-			srcs_math,
+			srcs_math_use,
 			pic: false,
 			include_directories: [ inc, include_directories('../common') ],
 			c_args: value[1]))

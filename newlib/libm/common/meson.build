@@ -219,6 +219,18 @@ if have_long_double
   srcs_common += lsrc_common
 endif
 
+srcs_common_use = []
+foreach file : srcs_common
+  s_file = file.split('.')[0] + '.S'
+  if file in srcs_libm_machine
+    message(file + ': machine overrides generic')
+  elif s_file in srcs_libm_machine
+    message(s_file + ': machine overrides generic')
+  else
+    srcs_common_use += file
+  endif
+endforeach
+
 hdrs_common = [
     'fdlibm.h',
     'local.h',
@@ -230,7 +242,7 @@ foreach target : targets
   value = get_variable('target_' + target)
   set_variable('lib_common' + target,
 	       static_library('common' + target,
-			      srcs_common,
+			      srcs_common_use,
 			      pic: false,
 			      include_directories: inc,
 			      c_args: value[1]))

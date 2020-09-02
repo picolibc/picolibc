@@ -34,7 +34,7 @@
 #
 subdir('binary')
 
-srcs_ccs = [
+srcs_iconv_ccs = [
     'big5.c',
     'ccsbi.c',
     'cns11643_plane14.c',
@@ -78,16 +78,29 @@ srcs_ccs = [
     'win_1257.c',
     'win_1258.c',
 ]
-hdrs_ccs = [
+hdrs_iconv_ccs = [
     'ccsbi.h',
     'ccs.h',
     'ccsnames.h',
 ]
+
+srcs_iconv_ccs_use = []
+foreach file : srcs_iconv_ccs
+  s_file = file.split('.')[0] + '.S'
+  if file in srcs_machine
+    message(file + ': machine overrides generic')
+  elif s_file in srcs_machine
+    message(s_file + ': machine overrides generic')
+  else
+    srcs_iconv_ccs_use += file
+  endif
+endforeach
+
 foreach target : targets
 	value = get_variable('target_' + target)
-	set_variable('lib_ccs' + target,
-		static_library('ccs' + target,
-			       srcs_ccs,
+	set_variable('lib_iconv_ccs' + target,
+		static_library('iconv_ccs' + target,
+			       srcs_iconv_ccs,
 			       pic: false,
 			       include_directories: inc,
 			       c_args: value[1]))

@@ -33,6 +33,8 @@
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 srcs_libm_machine = [
+  'e_sqrt.c',
+  'ef_sqrt.c',
   'feclearexcept.c',
   'fe_dfl_env.c',
   'fegetenv.c',
@@ -45,10 +47,8 @@ srcs_libm_machine = [
   'fesetround.c',
   'fetestexcept.c',
   'feupdateenv.c',
-  's_fma.c',
-  's_sqrt.c',
-  'sf_fma.c',
-  'sf_sqrt.c',
+  's_fma_riscv.c',
+  'sf_fma_riscv.c',
 ]
 
 foreach target : targets

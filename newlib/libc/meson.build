@@ -147,8 +147,8 @@ if machine_dirs.has_key(host_cpu_family)
   libdirs = [machine_dir] + libdirs
   libnames = ['machine'] + libnames
 else
-  warning('No libc machine directory for CPU family ' + host_cpu_family)
-  need_generic_fenv_h = true
+  inc_sys_headers_machine = []
+  srcs_machine = []
 endif
 
 foreach libdir : libdirs

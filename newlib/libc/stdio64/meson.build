@@ -44,11 +44,24 @@ srcs_stdio64 = [
   'stdio64.c',
   'tmpfile64.c',
 ]
+
+srcs_stdio64_use = []
+foreach file : srcs_stdio64
+  s_file = file.split('.')[0] + '.S'
+  if file in srcs_machine
+    message(file + ': machine overrides generic')
+  elif s_file in srcs_machine
+    message(s_file + ': machine overrides generic')
+  else
+    srcs_stdio64_use += file
+  endif
+endforeach
+
 foreach target : targets
 	value = get_variable('target_' + target)
 	set_variable('lib_stdio64' + target,
 		static_library('stdio64' + target,
-			srcs_stdio64,
+			srcs_stdio64_use,
 			pic: false,
 			include_directories: inc,
 			c_args: value[1]))

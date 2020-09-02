@@ -111,11 +111,24 @@ hdrs_ctype = [
     'jp2uc.h',
     'local.h',
 ]
+
+srcs_ctype_use = []
+foreach file : srcs_ctype
+  s_file = file.split('.')[0] + '.S'
+  if file in srcs_machine
+    message(file + ': machine overrides generic')
+  elif s_file in srcs_machine
+    message(s_file + ': machine overrides generic')
+  else
+    srcs_ctype_use += file
+  endif
+endforeach
+
 foreach target : targets
 	value = get_variable('target_' + target)
 	set_variable('lib_ctype' + target,
 		static_library('ctype' + target,
-			srcs_ctype,
+			srcs_ctype_use,
 			pic: false,
 			include_directories: inc,
 			c_args: value[1]))

@@ -33,21 +33,22 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <math.h>
-#include "math_config.h"
+#if defined(__riscv_fsqrt) && __riscv_flen >= 64
+#include "fdlibm.h"
 
-#if defined(__riscv_fsqrt) && __riscv_flen >= 32
+#if defined(_IEEE_LIBM) && defined(HAVE_ALIAS_ATTRIBUTE)
+__strong_reference(__ieee754_sqrt, sqrt);
+#endif
 
-float
-__ieee754_sqrtf (float x)
+double
+__ieee754_sqrt (double x)
 {
-	float result;
-	asm ("fsqrt.s %0, %1" : "=f" (result) : "f" (x));
+	double result;
+	asm ("fsqrt.d %0, %1" : "=f" (result) : "f" (x));
 	return result;
 }
 
-#if defined(_IEEE_LIBM) && defined(HAVE_ALIAS_ATTRIBUTE)
-__strong_reference(__ieee754_sqrtf, sqrtf);
+#else
+#include "../../math/e_sqrt.c"
 #endif
 
-#endif

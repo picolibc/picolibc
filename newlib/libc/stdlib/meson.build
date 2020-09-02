@@ -208,11 +208,23 @@ hdrs_stdlib = [
     'std.h',
 ]
 
+srcs_stdlib_use = []
+foreach file : srcs_stdlib
+  s_file = file.split('.')[0] + '.S'
+  if file in srcs_machine
+    message(file + ': machine overrides generic')
+  elif s_file in srcs_machine
+    message(s_file + ': machine overrides generic')
+  else
+    srcs_stdlib_use += file
+  endif
+endforeach
+
 foreach target : targets
 	value = get_variable('target_' + target)
 	set_variable('lib_stdlib' + target,
 		static_library('stdlib' + target,
-			srcs_stdlib,
+			srcs_stdlib_use,
 			pic: false,
 			include_directories: inc,
 			c_args: value[1] + ['-DINTERNAL_NEWLIB'] + c_args_malloc))
