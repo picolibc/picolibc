@@ -44,6 +44,7 @@ srcs_time = [
     'gmtime_r.c',
     'lcltime.c',
     'lcltime_r.c',
+    'lcltime_buf.c',
     'mktime.c',
     'month_lengths.c',
     'strftime.c',

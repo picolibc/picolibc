@@ -57,7 +57,7 @@ ANSI C requires <<localtime>>.
 
 #ifndef _REENT_ONLY
 
-NEWLIB_THREAD_LOCAL struct tm _localtime_buf;
+extern NEWLIB_THREAD_LOCAL struct tm _localtime_buf;
 
 struct tm *
 localtime (const time_t * tim_p)

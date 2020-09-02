@@ -32,6 +32,10 @@ POSSIBILITY OF SUCH DAMAGE.
 #include <errno.h>
 #include "fdlibm.h"
 
+#if defined(_IEEE_LIBM) && defined(HAVE_ALIAS_ATTRIBUTE)
+#else
+
+
 long double
 hypotl (long double x, long double y)
 {
@@ -59,3 +63,5 @@ hypotl (long double x, long double y)
   return z;
 #endif /* ! _LDBL_EQ_DBL */
 }
+
+#endif
