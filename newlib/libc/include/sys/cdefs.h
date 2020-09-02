@@ -95,6 +95,15 @@
 #define	__END_DECLS
 #endif
 
+/**
+ * Not all compilers offer __builtin_expect (e.g. CompCert does
+ * not have it). In that case, transparently replace all
+ * occurences of that builtin with just the condition:
+ */
+#ifndef HAVE_BUILTIN_EXPECT
+#define __builtin_expect(cond, exp) (cond)
+#endif
+
 /*
  * This code has been put in place to help reduce the addition of
  * compiler specific defines in FreeBSD code.  It helps to aid in

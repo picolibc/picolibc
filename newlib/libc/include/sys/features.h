@@ -39,6 +39,7 @@ extern "C" {
 /* Version with trailing underscores for BSD compatibility. */
 #define	__GNUC_PREREQ__(ma, mi)	__GNUC_PREREQ(ma, mi)
 
+
 /*
  * Feature test macros control which symbols are exposed by the system
  * headers.  Any of these must be defined before including any headers.
