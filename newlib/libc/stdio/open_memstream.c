@@ -326,8 +326,8 @@ internal_open_memstream_r (struct _reent *ptr,
   if (c->max < 64)
     c->max = 64;
 #if (SIZE_MAX >= 64 * 1024)
-  else if (c->max > 64 * 1024)
-    c->max = 64 * 1024;
+  else if (c->max > (size_t)64 * 1024)
+    c->max = (size_t)64 * 1024;
 #endif
   *size = 0;
   *buf = _malloc_r (ptr, c->max);

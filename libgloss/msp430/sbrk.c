@@ -11,6 +11,9 @@
    Red Hat, Inc.
 */
 
+int write (int fd, const char *buf, int len);
+void abort (void);
+
 char *
 _sbrk (int adj)
 {
