@@ -412,10 +412,15 @@ extern void __malloc_unlock();
   at the expense of not being able to handle requests greater than
   2^31. This limitation is hardly ever a concern; you are encouraged
   to set this. However, the default version is the same as size_t.
+  Since the implementation relies on __builtin_mul_overflow, defining
+  a custom INTERNAL_SIZE_T on machines/compilers without
+  __builtin_mul_overflow is not permitted.
 */
 
 #ifndef INTERNAL_SIZE_T
 #define INTERNAL_SIZE_T size_t
+#elif !defined(HAVE_BUILTIN_MUL_OVERFLOW)
+#error Compiler does not support __builtin_mul_overflow, hence INTERNAL_SIZE_T shall not be set
 #endif
 
 /*
@@ -3147,7 +3152,7 @@ Void_t* pvALLOc(bytes) RDECL size_t bytes;
 #endif /* DEFINE_PVALLOC */
 
 #ifdef DEFINE_CALLOC
-
+#include "mul_overflow.h"
 /*
 
   calloc calls malloc, then zeroes out the allocated chunk.
@@ -3171,7 +3176,7 @@ Void_t* cALLOc(n, elem_size) RDECL size_t n; size_t elem_size;
 #endif
   Void_t* mem;
 
-  if (__builtin_mul_overflow((INTERNAL_SIZE_T) n, (INTERNAL_SIZE_T) elem_size, &sz))
+  if (mul_overflow((INTERNAL_SIZE_T) n, (INTERNAL_SIZE_T) elem_size, &sz))
   {
     errno = ENOMEM;
     return 0;
