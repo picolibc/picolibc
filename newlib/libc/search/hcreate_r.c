@@ -72,7 +72,12 @@ SLIST_HEAD(internal_head, internal_entry);
  * max * sizeof internal_entry must fit into size_t.
  * assumes internal_entry is <= 32 (2^5) bytes.
  */
+#ifdef __MSP430X_LARGE__
+/* 20-bit size_t.  */
+#define	MAX_BUCKETS_LG2	(20 - 1 - 5)
+#else
 #define	MAX_BUCKETS_LG2	(sizeof (size_t) * 8 - 1 - 5)
+#endif
 #define	MAX_BUCKETS	((size_t)1 << MAX_BUCKETS_LG2)
 
 /* Default hash function, from db/hash/hash_func.c */

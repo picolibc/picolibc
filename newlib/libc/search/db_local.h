@@ -129,7 +129,7 @@ typedef struct {
 	int	lorder;		/* byte order */
 } BTREEINFO;
 
-#define	HASHMAGIC	0x061561
+#define	HASHMAGIC	0x061561L
 #define	HASHVERSION	2
 
 /* Structure used to pass parameters to the hashing routines. */
