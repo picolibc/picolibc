@@ -278,7 +278,6 @@ extern "C" {
 #include <stdio.h>    /* needed for malloc_stats */
 #include <limits.h>   /* needed for overflow checks */
 #include <errno.h>    /* needed to set errno to ENOMEM */
-#include "mul_overflow.h"
 
 #ifdef WIN32
 #define WIN32_LEAN_AND_MEAN
