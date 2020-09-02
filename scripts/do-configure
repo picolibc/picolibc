@@ -76,7 +76,7 @@ case "$*" in
 		;;
 	    *)
 		SYSROOT=`${ARCH}-gcc -print-sysroot`
-		PREFIX=-Dprefix="'"`readlink -f "$SYSROOT"`"'"
+		PREFIX=-Dprefix="`readlink -f "$SYSROOT"`"
 		;;
 	esac
 	;;
