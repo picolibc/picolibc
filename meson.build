@@ -463,7 +463,7 @@ conf_data.set('PICOLIBC_TLS', thread_local_storage, description: 'use thread loc
 conf_data.set('POSIX_IO', posix_io, description: 'Use open/close/read/write in tinystdio')
 conf_data.set('POSIX_CONSOLE', posix_console, description: 'Use POSIX I/O for stdin, stdout and stderr')
 conf_data.set('ATOMIC_UNGETC', atomic_ungetc, description: 'Use atomics for fgetc/ungetc for re-entrancy')
-conf_data.set('HAVE_COMPLEX', have_complex, description: 'Support for _Complex')
+conf_data.set('HAVE_COMPLEX', have_complex, description: 'Only add support for _Complex if the compiler supports it as well')
 
 if newlib_obsolete_math == 'auto'
   obsolete_math_value = false
