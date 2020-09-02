@@ -2,6 +2,7 @@
 c = 'i686-linux-gnu-gcc'
 ar = 'i686-linux-gnu-ar'
 as = 'i686-linux-gnu-as'
+nm = 'i686-linux-gnu-nm'
 strip = 'i686-linux-gnu-strip'
 exe_wrapper = 'env'
 

@@ -173,11 +173,21 @@ foreach target : targets
     libc_name = join_paths(target, 'libc')
   endif
 
-  set_variable('lib_c' + target,
-	       static_library(libc_name,
-			      install : true,
-			      install_dir : instdir,
-			      pic: false,
-			      objects : libobjs))
+  local_lib_c_target = static_library(libc_name,
+				      install : true,
+				      install_dir : instdir,
+				      pic: false,
+				      objects : libobjs)
+
+  set_variable('lib_c' + target, local_lib_c_target)
+
+  if check_duplicate_names
+    custom_target('libc_duplicates' + target,
+		  build_by_default: true,
+		  input: local_lib_c_target,
+		  output: 'libc_duplicates' + target,
+		  command: [duplicate_names, nm, '@INPUT@', '@OUTPUT@'],
+		  install: false)
+  endif
 endforeach
 

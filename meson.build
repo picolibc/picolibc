@@ -95,6 +95,14 @@ tls_model = get_option('tls-model')
 sysroot_install = get_option('sysroot-install')
 prefix = get_option('prefix')
 
+nm = find_program('nm', required : false)
+
+check_duplicate_names = nm.found()
+
+if nm.found()
+  duplicate_names = find_program('scripts/duplicate-names', required : true)
+endif
+
 # Select stdio implementation
 tinystdio = get_option('tinystdio')
 newlib_tinystdio = get_option('newlib-tinystdio')
