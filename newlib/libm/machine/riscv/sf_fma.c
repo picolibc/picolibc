@@ -46,4 +46,6 @@ fmaf (float x, float y, float z)
 	return result;
 }
 
+#else
+#include "../../common/sf_fma.c"
 #endif

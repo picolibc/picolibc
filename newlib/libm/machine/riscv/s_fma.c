@@ -46,4 +46,6 @@ fma (double x, double y, double z)
 	return result;
 }
 
+#else
+#include "../../common/s_fma.c"
 #endif
