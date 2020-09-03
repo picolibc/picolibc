@@ -93,6 +93,15 @@ extern fle __malloc_freelist;
 
 extern void __malloc_start;
 
+/* The below is not trivial to rewrite without explicit register variables,
+   so just complain if the feature is not available.
+   Since the default for most compilers is to have this, the user is
+   probably aware he needs to invest some work to port picolibc to this
+   target */
+#ifndef HAVE_EXPLICIT_REGISTER_VARIABLES
+#error This target relies on explicit register variables being available!
+#endif
+
 /* This is the minimum gap allowed between __malloc_end and the top of
    the stack.  This is only checked for when __malloc_end is
    decreased; if instead the stack grows into the heap, silent data

@@ -187,6 +187,21 @@ if host_cpu_family == ''
   message('Computed host_cpu_family as ' + host_cpu_family)
 endif
 
+# Not all compilers support constructs like 'register int varName arm("r0") = 42;"
+# However, automatic detection depends on the target, since "r0" needs to be replaced with a valid register name
+# Hence, for default (auto) we look at the compiler (defaults to 'true' if unknown compiler), or let the user pass
+#  a setting to meson to override this.
+have_explicit_register_variables = get_option('compiler-has-explicit-register-variables')
+if have_explicit_register_variables == 'auto'
+  if meson.get_compiler('c').get_id() in ['ccomp']
+    have_explicit_register_variables = false
+  else
+    have_explicit_register_variables = true
+  endif
+else
+  have_explicit_register_variables = have_explicit_register_variables == 'true'
+endif
+
 if have_alias_attribute_option == 'auto'
   have_alias_attribute = meson.get_compiler('c').has_function_attribute('alias')
 else
@@ -474,6 +489,7 @@ conf_data.set('POSIX_IO', posix_io, description: 'Use open/close/read/write in t
 conf_data.set('POSIX_CONSOLE', posix_console, description: 'Use POSIX I/O for stdin, stdout and stderr')
 conf_data.set('ATOMIC_UNGETC', atomic_ungetc, description: 'Use atomics for fgetc/ungetc for re-entrancy')
 conf_data.set('HAVE_BITFIELDS_IN_PACKED_STRUCTS', have_bitfields_in_packed_structs, description: 'Use bitfields in packed structs')
+conf_data.set('HAVE_EXPLICIT_REGISTER_VARIABLES', have_explicit_register_variables, description: 'Use explicit register variables')
 
 if newlib_obsolete_math == 'auto'
   obsolete_math_value = false

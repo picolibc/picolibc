@@ -38,8 +38,14 @@
 uintptr_t
 sys_semihost(uintptr_t op, uintptr_t param)
 {
+#ifdef HAVE_EXPLICIT_REGISTER_VARIABLES
 	register uintptr_t r0 asm("r0") = op;
 	register uintptr_t r1 asm("r1") = param;
+#else
+# define r0 op
+# define r1 param
+#endif
+
 #if __ARM_ARCH_PROFILE == 'M'
 	asm("bkpt #0xab" : "=r" (r0) : "r" (r0), "r" (r1) : "memory");
 #else

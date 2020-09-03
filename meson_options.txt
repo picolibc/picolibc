@@ -128,6 +128,13 @@ option('newlib-wide-orient', type: 'boolean', value: false,
        description: 'Turn off wide orientation in streamio')
 
 #
+# Options applying to compiler capabilities
+#
+option('compiler-has-explicit-register-variables', type: 'combo',
+  choices: ['true', 'false', 'auto'], value: 'auto',
+  description: 'compiler supports explicit register variables')
+
+#
 # Internationalization options
 #
 

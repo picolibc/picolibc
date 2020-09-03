@@ -38,9 +38,16 @@
 uintptr_t
 sys_semihost(uintptr_t op, uintptr_t param)
 {
+#ifdef HAVE_EXPLICIT_REGISTER_VARIABLES
 	register sh_param_t w0 asm("w0") = op;
 	register sh_param_t x1 asm("x1") = param;
 	register sh_param_t x0 asm("x0");
+#else
+# define w0 op
+# define x1 param
+	register sh_param_t x0 asm("x0");
+#endif
+
 	asm("hlt #0xf000" : "=r" (x0) : "r" (w0), "r" (x1) : "memory");
 	return x0;
 }

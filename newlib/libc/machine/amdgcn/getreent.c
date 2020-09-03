@@ -18,6 +18,15 @@ they apply.
 #include <stdlib.h>
 #include <unistd.h>
 
+/* The below is not trivial to rewrite without explicit register variables,
+   so just complain if the feature is not available.
+   Since the default for most compilers is to have this, the user is
+   probably aware he needs to invest some work to port picolibc to this
+   target */
+#ifndef HAVE_EXPLICIT_REGISTER_VARIABLES
+#error This target uses hand-written assembly code which relies on explicit register variables being available!
+#endif
+
 /* Copied from the HSA documentation.  */
 typedef struct hsa_signal_s {
   uint64_t handle;
