@@ -52,6 +52,7 @@ enable_picolib = get_option('picolib')
 enable_picocrt = get_option('picocrt')
 enable_tests = get_option('tests')
 enable_native_tests = get_option('native-tests')
+tests_enable_stack_protector = get_option('tests-enable-stack-protector')
 have_alias_attribute_option = get_option('have-alias-attribute')
 have_format_attribute_option = get_option('have-format-attribute')
 newlib_register_fini = get_option('newlib-register-fini')
@@ -603,7 +604,10 @@ conf_data.set('HAVE_SEMIHOST', has_semihost, description: 'Semihost APIs support
 # By default, tests don't require any special arguments
 
 test_c_args = []
-test_link_args = []
+if tests_enable_stack_protector
+  test_c_args += ['-fstack-protector-all', '-fstack-protector-strong', '-DTESTS_ENABLE_STACK_PROTECTOR']
+endif
+test_link_args = test_c_args
 test_link_depends = []
 
 if has_semihost

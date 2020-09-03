@@ -47,9 +47,6 @@ option('multilib', type: 'boolean', value: true,
 option('multilib-list', type: 'array', value: [],
        description: 'List of multilib configurations to build for')
 
-option('native-tests', type: 'boolean', value: false,
-       description: 'Run math tests against native libc too')
-
 option('picolib', type: 'boolean', value: true,
        description: 'Include pico lib bits')
 
@@ -62,8 +59,15 @@ option('specsdir', type: 'string',
 option('sysroot-install', type: 'boolean', value: false,
        description: 'Install in gcc sysroot')
 
+#
+# Testing options
+#
+option('native-tests', type: 'boolean', value: false,
+       description: 'Run math tests against native libc too')
 option('tests', type: 'boolean', value: false,
        description: 'Enable tests')
+option('tests-enable-stack-protector', type: 'boolean', value: true,
+       description: 'tests enable stack protector')
 
 
 option('newlib-tinystdio', type: 'combo', choices: ['true', 'false', 'auto'], value: 'auto',
@@ -216,4 +220,3 @@ option('newlib-reentrant-syscalls-provided', type: 'boolean', value: false,
        description: 'system provides reentrant syscall API')
 option('newlib-supplied-syscalls', type: 'boolean', value: false,
        description: 'newlib supplies system call functions')
-
