@@ -255,7 +255,7 @@ typedef	unsigned long	__useconds_t;	/* microseconds (unsigned) */
  * <sys/cdefs.h>.  The <sys/cdefs.h> must not be included here to avoid cyclic
  * header dependencies.
  */
-#if __GNUC_MINOR__ > 95 || __GNUC__ >= 3
+#if __GNUC_MINOR__ > 95 || __GNUC__ >= 3 || defined(__GNUC_VA_LIST)
 typedef	__builtin_va_list	__va_list;
 #else
 typedef	char *			__va_list;
