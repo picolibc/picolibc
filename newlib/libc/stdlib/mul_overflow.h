@@ -17,6 +17,10 @@ static int mul_overflow_size_t(a, b, res)
     if (res)
         *res = a * b;
 
+    // multiply with 0 can not overflow (and avoid div-by-zero):
+    if (a == 0 || b == 0)
+        return 1;
+
     // check if overflow would happen:
     if ( (a > SIZE_MAX / b) || (b > SIZE_MAX / a))
         return 1;
