@@ -51,6 +51,24 @@ srcs_libm_machine = [
   'sf_fma_riscv.c',
 ]
 
+# CompCert does generally not support the float constraint `f` for
+# `asm` statements; in that case, those have to be relaxed to `r`
+# and `=r`. Since the test needs target specific asm, it is not in
+# the generic meson.build.
+# Mind that with GCC the test also fails for targets without an FPU
+# (e.g. rv32imac); for these, using float registers is inherently
+# wrong anyway.
+float_constraint_code = '''
+double test (double x)
+{
+  double result;
+  asm ("fsqrt.d %0, %1" : "=f" (result) : "f" (x));
+  return result;
+}
+'''
+have_float_constraint = meson.get_compiler('c').compiles(float_constraint_code, name : 'supports asm float constraints')
+conf_data.set('HAVE_FLOAT_CONSTRAINT', have_float_constraint, description: 'Compiler supports the float constraints `f` and `=f`')
+
 foreach target : targets
 	value = get_variable('target_' + target)
 	set_variable('lib_machine' + target,

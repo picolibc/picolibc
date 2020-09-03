@@ -44,7 +44,11 @@ float
 __ieee754_sqrtf (float x)
 {
 	float result;
+#ifdef HAVE_FLOAT_CONSTRAINT
 	asm ("fsqrt.s %0, %1" : "=f" (result) : "f" (x));
+#else
+	asm ("fsqrt.s %0, %1" : "=r" (result) : "r" (x));
+#endif
 	return result;
 }
 
