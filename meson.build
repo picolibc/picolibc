@@ -339,8 +339,10 @@ have_bitfields_in_packed_structs = meson.get_compiler('c').compiles(bitfields_in
 builtin_mul_overflow_code = '''
 #include <stddef.h>
 int overflows (size_t a, size_t b) { size_t x; return __builtin_mul_overflow(a, b, &x); }
+volatile size_t aa = 42;
+int main (void) { return overflows(aa, aa); }
 '''
-have_builtin_mul_overflow = meson.get_compiler('c').compiles(builtin_mul_overflow_code, name : 'has __builtin_mul_overflow')
+have_builtin_mul_overflow = meson.get_compiler('c').links(builtin_mul_overflow_code, name : 'has __builtin_mul_overflow')
 
 if enable_multilib
   used_libs = []
