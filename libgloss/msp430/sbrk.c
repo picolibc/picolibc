@@ -24,7 +24,7 @@ _sbrk (int adj)
 
   if (heap + adj > sp)
     {
-      const char * const msg = "Heap and stack collision\n";
+      const char msg[] = "Heap and stack collision\n";
       write (1, msg, sizeof (msg) - 1);
       abort ();
     }
