@@ -150,4 +150,4 @@ long double complex clog10l(long double complex);
 
 __END_DECLS
 
-#endif  /* #ifndef _COMPLEX_H */
+#endif	/* ! _COMPLEX_H */
