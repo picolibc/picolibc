@@ -46,8 +46,6 @@ __ieee754_sqrt (double x)
 	return result;
 }
 
-#if defined(_IEEE_LIBM) && defined(HAVE_ALIAS_ATTRIBUTE)
-__strong_reference(__ieee754_sqrt, sqrt);
-#endif
-
+#else
+#include "../../math/e_sqrt.c"
 #endif

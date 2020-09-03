@@ -77,8 +77,8 @@ am__objects_1 = lib_a-feclearexcept.$(OBJEXT) \
 	lib_a-fesetenv.$(OBJEXT) lib_a-fesetexceptflag.$(OBJEXT) \
 	lib_a-fesetround.$(OBJEXT) lib_a-fetestexcept.$(OBJEXT) \
 	lib_a-feupdateenv.$(OBJEXT) lib_a-s_fma.$(OBJEXT) \
-	lib_a-s_sqrt.$(OBJEXT) lib_a-sf_fma.$(OBJEXT) \
-	lib_a-sf_sqrt.$(OBJEXT)
+	lib_a-e_sqrt.$(OBJEXT) lib_a-sf_fma.$(OBJEXT) \
+	lib_a-ef_sqrt.$(OBJEXT)
 am_lib_a_OBJECTS = $(am__objects_1)
 lib_a_OBJECTS = $(am_lib_a_OBJECTS)
 DEFAULT_INCLUDES = -I.@am__isrc@
@@ -207,7 +207,7 @@ LIB_SOURCES = \
 	feclearexcept.c fe_dfl_env.c fegetenv.c fegetexceptflag.c \
 	fegetround.c feholdexcept.c feraiseexcept.c fesetenv.c \
 	fesetexceptflag.c fesetround.c fetestexcept.c feupdateenv.c \
-	s_fma.c s_sqrt.c sf_fma.c sf_sqrt.c
+	s_fma.c e_sqrt.c sf_fma.c ef_sqrt.c
 
 noinst_LIBRARIES = lib.a
 lib_a_SOURCES = $(LIB_SOURCES)
@@ -363,11 +363,11 @@ lib_a-s_fma.o: s_fma.c
 lib_a-s_fma.obj: s_fma.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-s_fma.obj `if test -f 's_fma.c'; then $(CYGPATH_W) 's_fma.c'; else $(CYGPATH_W) '$(srcdir)/s_fma.c'; fi`
 
-lib_a-s_sqrt.o: s_sqrt.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-s_sqrt.o `test -f 's_sqrt.c' || echo '$(srcdir)/'`s_sqrt.c
+lib_a-e_sqrt.o: e_sqrt.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-e_sqrt.o `test -f 'e_sqrt.c' || echo '$(srcdir)/'`e_sqrt.c
 
-lib_a-s_sqrt.obj: s_sqrt.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-s_sqrt.obj `if test -f 's_sqrt.c'; then $(CYGPATH_W) 's_sqrt.c'; else $(CYGPATH_W) '$(srcdir)/s_sqrt.c'; fi`
+lib_a-e_sqrt.obj: e_sqrt.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-e_sqrt.obj `if test -f 'e_sqrt.c'; then $(CYGPATH_W) 'e_sqrt.c'; else $(CYGPATH_W) '$(srcdir)/e_sqrt.c'; fi`
 
 lib_a-sf_fma.o: sf_fma.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-sf_fma.o `test -f 'sf_fma.c' || echo '$(srcdir)/'`sf_fma.c
@@ -375,11 +375,11 @@ lib_a-sf_fma.o: sf_fma.c
 lib_a-sf_fma.obj: sf_fma.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-sf_fma.obj `if test -f 'sf_fma.c'; then $(CYGPATH_W) 'sf_fma.c'; else $(CYGPATH_W) '$(srcdir)/sf_fma.c'; fi`
 
-lib_a-sf_sqrt.o: sf_sqrt.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-sf_sqrt.o `test -f 'sf_sqrt.c' || echo '$(srcdir)/'`sf_sqrt.c
+lib_a-ef_sqrt.o: ef_sqrt.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-ef_sqrt.o `test -f 'ef_sqrt.c' || echo '$(srcdir)/'`ef_sqrt.c
 
-lib_a-sf_sqrt.obj: sf_sqrt.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-sf_sqrt.obj `if test -f 'sf_sqrt.c'; then $(CYGPATH_W) 'sf_sqrt.c'; else $(CYGPATH_W) '$(srcdir)/sf_sqrt.c'; fi`
+lib_a-ef_sqrt.obj: ef_sqrt.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-ef_sqrt.obj `if test -f 'ef_sqrt.c'; then $(CYGPATH_W) 'ef_sqrt.c'; else $(CYGPATH_W) '$(srcdir)/ef_sqrt.c'; fi`
 
 ID: $(HEADERS) $(SOURCES) $(LISP) $(TAGS_FILES)
 	list='$(SOURCES) $(HEADERS) $(LISP) $(TAGS_FILES)'; \
