@@ -13,6 +13,8 @@ uintptr_t __stack_chk_guard = 0x00000aff; /* 0, 0, '\n', 255  */
 #else
 uintptr_t __stack_chk_guard = 0;
 
+int     getentropy (void *, size_t) _ATTRIBUTE((__weak__));
+
 void
 __attribute__((__constructor__))
 __stack_chk_init (void)
@@ -20,27 +22,31 @@ __stack_chk_init (void)
   if (__stack_chk_guard != 0)
     return;
 
-#if defined(__CYGWIN__) || defined(__rtems__)
-  arc4random_buf(&__stack_chk_guard, sizeof(__stack_chk_guard));
-#else
-  /* If getentropy is not available, use the "terminator canary". */
-  ((unsigned char *)&__stack_chk_guard)[0] = 0;
-  ((unsigned char *)&__stack_chk_guard)[1] = 0;
-  ((unsigned char *)&__stack_chk_guard)[2] = '\n';
-  ((unsigned char *)&__stack_chk_guard)[3] = 255;
-#endif
+  if (getentropy) {
+    /* Use getentropy if available */
+    getentropy(&__stack_chk_guard, sizeof(__stack_chk_guard));
+  } else {
+    /* If getentropy is not available, use the "terminator canary". */
+    ((unsigned char *)&__stack_chk_guard)[0] = 0;
+    ((unsigned char *)&__stack_chk_guard)[1] = 0;
+    ((unsigned char *)&__stack_chk_guard)[2] = '\n';
+    ((unsigned char *)&__stack_chk_guard)[3] = 255;
+  }
 }
 #endif
 
+void __stack_chk_fail (void) __attribute__((__noreturn__));
+
 void
 __attribute__((__noreturn__))
-__stack_chk_fail (void)
+__stack_chk_fail_weak (void)
 {
   char msg[] = "*** stack smashing detected ***: terminated\n";
   write (2, msg, strlen (msg));
   raise (SIGABRT);
   _exit (127);
 }
+__weak_reference(__stack_chk_fail_weak, __stack_chk_fail);
 
 #ifdef __ELF__
 void
