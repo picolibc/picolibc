@@ -857,7 +857,7 @@ restart:
       c = charset + 3;
       if (*c == '-')
 	++c;
-      if (strcasecmp (c, "620"))
+      if (strcmp (c, "620"))
       	FAIL;
       val = 874;
       strcpy (charset, "CP874");
