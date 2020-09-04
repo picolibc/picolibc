@@ -24,9 +24,7 @@
 #endif
 {
         float y;
-	int local_signgam;
-	y = __ieee754_gammaf_r(x,&local_signgam);
-	if (local_signgam < 0) y = -y;
+	y = __ieee754_tgammaf(x);
 #ifdef _IEEE_LIBM
 	return y;
 #else

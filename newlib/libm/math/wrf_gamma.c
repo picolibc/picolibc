@@ -27,22 +27,5 @@
 	float x; int *signgamp;
 #endif
 {
-#ifdef _IEEE_LIBM
-	return __ieee754_gammaf_r(x,signgamp);
-#else
-        float y;
-        y = __ieee754_gammaf_r(x,signgamp);
-        if(_LIB_VERSION == _IEEE_) return y;
-        if(!finitef(y)&&finitef(x)) {
-	    if(floorf(x)==x&&x<=0.0f) {
-		/* gammaf(-integer) or gamma(0) */
-		errno = EDOM;
-	    } else {
-		/* gammaf(finite) overflow */
-		errno = ERANGE;
-	    }
-	    return HUGE_VALF;
-        } else
-            return y;
-#endif
-}             
+	return lgammaf_r(x, signgamp);
+}

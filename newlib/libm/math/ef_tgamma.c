@@ -1,4 +1,4 @@
-/* erf_gamma.c -- float version of er_gamma.c.
+/* ef_tgamma.c -- float version of e_tgamma.c.
  * Conversion to float by Ian Lance Taylor, Cygnus Support, ian@cygnus.com.
  */
 
@@ -14,9 +14,8 @@
  *
  */
 
-/* __ieee754_gammaf_r(x, signgamp)
- * Reentrant version of the logarithm of the Gamma function 
- * with user provide pointer for the sign of Gamma(x). 
+/* __ieee754_tgammaf(x)
+ * Float version the Gamma function. Returns gamma(x)
  *
  * Method: See __ieee754_lgammaf_r
  */
@@ -24,11 +23,14 @@
 #include "fdlibm.h"
 
 #ifdef __STDC__
-	float __ieee754_gammaf_r(float x, int *signgamp)
+	float __ieee754_tgammaf(float x)
 #else
-	float __ieee754_gammaf_r(x,signgamp)
-	float x; int *signgamp;
+	float __ieee754_tgammaf(x)
 #endif
 {
-	return __ieee754_expf (__ieee754_lgammaf_r(x,signgamp));
+	int signgam_local;
+	float y = __ieee754_expf(__ieee754_lgammaf_r(x, &signgam_local));
+	if (signgam_local < 0)
+		y = -y;
+	return y;
 }

@@ -25,19 +25,8 @@
 	float x;
 #endif
 {
-#ifdef _IEEE_LIBM
-	return __ieee754_gammaf_r(x,&(_REENT_SIGNGAM(_REENT)));
-#else
-        float y;
-        y = __ieee754_gammaf_r(x,&(_REENT_SIGNGAM(_REENT)));
-        if(_LIB_VERSION == _IEEE_) return y;
-        if(!finitef(y)&&finitef(x)) {
-	    /* gammaf(finite) overflow */
-	    errno = ERANGE;
-        }
-	return y;
-#endif
-}             
+	return lgammaf(x);
+}
 
 #ifdef _DOUBLE_IS_32BITS
 
@@ -48,7 +37,7 @@
 	double x;
 #endif
 {
-	return (double) gammaf((float) x);
+	return (double) lgammaf((float) x);
 }
 
 #endif /* defined(_DOUBLE_IS_32BITS) */

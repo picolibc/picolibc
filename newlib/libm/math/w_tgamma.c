@@ -27,9 +27,7 @@
 #endif
 {
         double y;
-	int local_signgam;
-	y = __ieee754_gamma_r(x,&local_signgam);
-	if (local_signgam < 0) y = -y;
+	y = __ieee754_tgamma(x);
 #ifdef _IEEE_LIBM
 	return y;
 #else

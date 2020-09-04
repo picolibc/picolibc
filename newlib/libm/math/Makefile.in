@@ -78,7 +78,7 @@ am__objects_1 = lib_a-k_standard.$(OBJEXT) lib_a-k_rem_pio2.$(OBJEXT) \
 	lib_a-e_acosh.$(OBJEXT) lib_a-e_asin.$(OBJEXT) \
 	lib_a-e_atan2.$(OBJEXT) lib_a-e_atanh.$(OBJEXT) \
 	lib_a-e_cosh.$(OBJEXT) lib_a-e_exp.$(OBJEXT) \
-	lib_a-e_fmod.$(OBJEXT) lib_a-er_gamma.$(OBJEXT) \
+	lib_a-e_fmod.$(OBJEXT) lib_a-e_tgamma.$(OBJEXT) \
 	lib_a-e_hypot.$(OBJEXT) lib_a-e_j0.$(OBJEXT) \
 	lib_a-e_j1.$(OBJEXT) lib_a-e_jn.$(OBJEXT) \
 	lib_a-er_lgamma.$(OBJEXT) lib_a-e_log.$(OBJEXT) \
@@ -111,7 +111,7 @@ am__objects_2 = lib_a-kf_rem_pio2.$(OBJEXT) lib_a-kf_cos.$(OBJEXT) \
 	lib_a-ef_asin.$(OBJEXT) lib_a-ef_atan2.$(OBJEXT) \
 	lib_a-ef_atanh.$(OBJEXT) lib_a-ef_cosh.$(OBJEXT) \
 	lib_a-ef_exp.$(OBJEXT) lib_a-ef_fmod.$(OBJEXT) \
-	lib_a-erf_gamma.$(OBJEXT) lib_a-ef_hypot.$(OBJEXT) \
+	lib_a-ef_tgamma.$(OBJEXT) lib_a-ef_hypot.$(OBJEXT) \
 	lib_a-ef_j0.$(OBJEXT) lib_a-ef_j1.$(OBJEXT) \
 	lib_a-ef_jn.$(OBJEXT) lib_a-erf_lgamma.$(OBJEXT) \
 	lib_a-ef_log.$(OBJEXT) lib_a-ef_log10.$(OBJEXT) \
@@ -147,7 +147,7 @@ LTLIBRARIES = $(noinst_LTLIBRARIES)
 libmath_la_LIBADD =
 am__objects_4 = k_standard.lo k_rem_pio2.lo k_cos.lo k_sin.lo k_tan.lo \
 	e_acos.lo e_acosh.lo e_asin.lo e_atan2.lo e_atanh.lo e_cosh.lo \
-	e_exp.lo e_fmod.lo er_gamma.lo e_hypot.lo e_j0.lo e_j1.lo \
+	e_exp.lo e_fmod.lo e_tgamma.lo e_hypot.lo e_j0.lo e_j1.lo \
 	e_jn.lo er_lgamma.lo e_log.lo e_log10.lo e_pow.lo \
 	e_rem_pio2.lo e_remainder.lo e_scalb.lo e_sinh.lo e_sqrt.lo \
 	w_acos.lo w_acosh.lo w_asin.lo w_atan2.lo w_atanh.lo w_cosh.lo \
@@ -159,7 +159,7 @@ am__objects_4 = k_standard.lo k_rem_pio2.lo k_cos.lo k_sin.lo k_tan.lo \
 	s_signif.lo s_sin.lo s_tan.lo s_tanh.lo w_exp2.lo w_tgamma.lo
 am__objects_5 = kf_rem_pio2.lo kf_cos.lo kf_sin.lo kf_tan.lo \
 	ef_acos.lo ef_acosh.lo ef_asin.lo ef_atan2.lo ef_atanh.lo \
-	ef_cosh.lo ef_exp.lo ef_fmod.lo erf_gamma.lo ef_hypot.lo \
+	ef_cosh.lo ef_exp.lo ef_fmod.lo ef_tgamma.lo ef_hypot.lo \
 	ef_j0.lo ef_j1.lo ef_jn.lo erf_lgamma.lo ef_log.lo ef_log10.lo \
 	ef_pow.lo ef_rem_pio2.lo ef_remainder.lo ef_scalb.lo \
 	ef_sinh.lo ef_sqrt.lo wf_acos.lo wf_acosh.lo wf_asin.lo \
@@ -333,7 +333,7 @@ src = k_standard.c k_rem_pio2.c \
 	k_cos.c k_sin.c k_tan.c \
 	e_acos.c e_acosh.c e_asin.c e_atan2.c \
 	e_atanh.c e_cosh.c e_exp.c e_fmod.c \
-	er_gamma.c e_hypot.c e_j0.c \
+	e_tgamma.c e_hypot.c e_j0.c \
 	e_j1.c e_jn.c er_lgamma.c \
 	e_log.c e_log10.c e_pow.c e_rem_pio2.c e_remainder.c \
 	e_scalb.c e_sinh.c e_sqrt.c \
@@ -356,7 +356,7 @@ fsrc = kf_rem_pio2.c \
 	kf_cos.c kf_sin.c kf_tan.c \
 	ef_acos.c ef_acosh.c ef_asin.c ef_atan2.c \
 	ef_atanh.c ef_cosh.c ef_exp.c ef_fmod.c \
-	erf_gamma.c ef_hypot.c ef_j0.c \
+	ef_tgamma.c ef_hypot.c ef_j0.c \
 	ef_j1.c ef_jn.c erf_lgamma.c \
 	ef_log.c ef_log10.c ef_pow.c ef_rem_pio2.c ef_remainder.c \
 	ef_scalb.c ef_sinh.c ef_sqrt.c \
@@ -552,11 +552,11 @@ lib_a-e_fmod.o: e_fmod.c
 lib_a-e_fmod.obj: e_fmod.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-e_fmod.obj `if test -f 'e_fmod.c'; then $(CYGPATH_W) 'e_fmod.c'; else $(CYGPATH_W) '$(srcdir)/e_fmod.c'; fi`
 
-lib_a-er_gamma.o: er_gamma.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-er_gamma.o `test -f 'er_gamma.c' || echo '$(srcdir)/'`er_gamma.c
+lib_a-e_tgamma.o: e_tgamma.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-e_tgamma.o `test -f 'e_tgamma.c' || echo '$(srcdir)/'`e_tgamma.c
 
-lib_a-er_gamma.obj: er_gamma.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-er_gamma.obj `if test -f 'er_gamma.c'; then $(CYGPATH_W) 'er_gamma.c'; else $(CYGPATH_W) '$(srcdir)/er_gamma.c'; fi`
+lib_a-e_tgamma.obj: e_tgamma.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-e_tgamma.obj `if test -f 'e_tgamma.c'; then $(CYGPATH_W) 'e_tgamma.c'; else $(CYGPATH_W) '$(srcdir)/e_tgamma.c'; fi`
 
 lib_a-e_hypot.o: e_hypot.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-e_hypot.o `test -f 'e_hypot.c' || echo '$(srcdir)/'`e_hypot.c
@@ -948,11 +948,11 @@ lib_a-ef_fmod.o: ef_fmod.c
 lib_a-ef_fmod.obj: ef_fmod.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-ef_fmod.obj `if test -f 'ef_fmod.c'; then $(CYGPATH_W) 'ef_fmod.c'; else $(CYGPATH_W) '$(srcdir)/ef_fmod.c'; fi`
 
-lib_a-erf_gamma.o: erf_gamma.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-erf_gamma.o `test -f 'erf_gamma.c' || echo '$(srcdir)/'`erf_gamma.c
+lib_a-ef_tgamma.o: ef_tgamma.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-ef_tgamma.o `test -f 'ef_tgamma.c' || echo '$(srcdir)/'`ef_tgamma.c
 
-lib_a-erf_gamma.obj: erf_gamma.c
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-erf_gamma.obj `if test -f 'erf_gamma.c'; then $(CYGPATH_W) 'erf_gamma.c'; else $(CYGPATH_W) '$(srcdir)/erf_gamma.c'; fi`
+lib_a-ef_tgamma.obj: ef_tgamma.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-ef_tgamma.obj `if test -f 'ef_tgamma.c'; then $(CYGPATH_W) 'ef_tgamma.c'; else $(CYGPATH_W) '$(srcdir)/ef_tgamma.c'; fi`
 
 lib_a-ef_hypot.o: ef_hypot.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-ef_hypot.o `test -f 'ef_hypot.c' || echo '$(srcdir)/'`ef_hypot.c

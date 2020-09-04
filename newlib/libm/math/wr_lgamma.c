@@ -40,9 +40,8 @@
 	    else
 	      /* lgamma(finite) overflow */
 	      errno = ERANGE;
-	    return HUGE_VAL;
-        } else
-            return y;
+        }
+	return y;
 #endif
 }
 

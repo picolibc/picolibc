@@ -8,7 +8,7 @@ src = 	k_standard.c k_rem_pio2.c \
 	k_cos.c k_sin.c k_tan.c \
 	e_acos.c e_acosh.c e_asin.c e_atan2.c \
 	e_atanh.c e_cosh.c e_exp.c e_fmod.c \
-	er_gamma.c e_hypot.c e_j0.c \
+	e_tgamma.c e_hypot.c e_j0.c \
 	e_j1.c e_jn.c er_lgamma.c \
 	e_log.c e_log10.c e_pow.c e_rem_pio2.c e_remainder.c \
 	e_scalb.c e_sinh.c e_sqrt.c \
@@ -31,7 +31,7 @@ fsrc =	kf_rem_pio2.c \
 	kf_cos.c kf_sin.c kf_tan.c \
 	ef_acos.c ef_acosh.c ef_asin.c ef_atan2.c \
 	ef_atanh.c ef_cosh.c ef_exp.c ef_fmod.c \
-	erf_gamma.c ef_hypot.c ef_j0.c \
+	ef_tgamma.c ef_hypot.c ef_j0.c \
 	ef_j1.c ef_jn.c erf_lgamma.c \
 	ef_log.c ef_log10.c ef_pow.c ef_rem_pio2.c ef_remainder.c \
 	ef_scalb.c ef_sinh.c ef_sqrt.c \
