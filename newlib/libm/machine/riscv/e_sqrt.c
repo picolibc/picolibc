@@ -44,7 +44,7 @@ double
 __ieee754_sqrt (double x)
 {
 	double result;
-#if HAVE_FLOAT_CONSTRAINT
+#ifdef HAVE_FLOAT_CONSTRAINT
 	asm ("fsqrt.d %0, %1" : "=f" (result) : "f" (x));
 #else
 	asm ("fsqrt.d %0, %1" : "=r" (result) : "r" (x));
