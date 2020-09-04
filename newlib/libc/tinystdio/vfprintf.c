@@ -99,43 +99,41 @@ typedef unsigned long long ultoa_unsigned_t;
 typedef long long ultoa_signed_t;
 #define SIZEOF_ULTOA __SIZEOF_LONG_LONG__
 #define PRINTF_BUF_SIZE 22
-#define arg_to_t(flags, _s_)	({				\
-	    _s_ long long __v__;				\
-	    if ((flags) & FL_LONG) {				\
-		if ((flags) & FL_REPD_TYPE)			\
-		    __v__ = va_arg(ap, _s_ long long);		\
-		else						\
-		    __v__ = va_arg(ap, _s_ long);		\
-	    } else if ((flags) & FL_SHORT) {			\
-		if ((flags) & FL_REPD_TYPE)			\
-		    __v__ = (_s_ char) va_arg(ap, _s_ int);	\
-		else						\
-		    __v__ = (_s_ short) va_arg(ap, _s_ int);	\
-	    } else {						\
-		__v__ = va_arg(ap, _s_ int);			\
-	    }							\
-	    __v__;						\
+#define arg_to_t(flags, _s_, _result_)	({				\
+	    if ((flags) & FL_LONG) {					\
+		if ((flags) & FL_REPD_TYPE)				\
+		    *(_result_) = va_arg(ap, _s_ long long);		\
+		else							\
+		    *(_result_) = va_arg(ap, _s_ long);			\
+	    } else if ((flags) & FL_SHORT) {				\
+		if ((flags) & FL_REPD_TYPE)				\
+		    *(_result_) = (_s_ char) va_arg(ap, _s_ int);	\
+		else							\
+		    *(_result_) = (_s_ short) va_arg(ap, _s_ int);	\
+	    } else {							\
+		*(_result_) = va_arg(ap, _s_ int);			\
+	    }								\
 	})
 #else
 typedef unsigned long ultoa_unsigned_t;
 typedef long ultoa_signed_t;
 #define SIZEOF_ULTOA __SIZEOF_LONG__
 #define PRINTF_BUF_SIZE 11
-#define arg_to_t(flags, _s_)	({				\
-	    _s_ long __v__;					\
-	    if ((flags) & FL_LONG) {				\
-		__v__ = va_arg(ap, _s_ long);			\
-	    } else if ((flags) & FL_SHORT) {			\
-		__v__ = (_s_ short) va_arg(ap, _s_ int);	\
-	    } else {						\
-		__v__ = va_arg(ap, _s_ int);			\
-	    }							\
-	    __v__;						\
+#define arg_to_t(flags, _s_, _result_)	({				\
+	    if ((flags) & FL_LONG) {					\
+		*(_result_) = va_arg(ap, _s_ long);			\
+	    } else if ((flags) & FL_SHORT) {				\
+		*(_result_) = (_s_ short) va_arg(ap, _s_ int);		\
+	    } else {							\
+		*(_result_) = va_arg(ap, _s_ int);			\
+	    }								\
 	})
 #endif
 
-#define arg_to_unsigned(flags) arg_to_t(flags, unsigned)
-#define arg_to_signed(flags) arg_to_t(flags, signed)
+// At the call site the address of the result_var is taken (e.g. "&ap")
+// That way, it's clear that these macros *will* modify that variable
+#define arg_to_unsigned(flags, result_var) arg_to_t((flags), unsigned, (result_var))
+#define arg_to_signed(flags, result_var) arg_to_t((flags), signed, (result_var))
 
 #include "ultoa_invert.c"
 
@@ -219,7 +217,8 @@ vfprintf (FILE * stream, const char *fmt, va_list ap)
 	}
 
 	if (c == 'd' || c == 'i') {
-	    ultoa_signed_t x = arg_to_signed(flags);
+	    ultoa_signed_t x;
+	    arg_to_signed(flags, &x);
 
 	    flags &= ~FL_ALT;
 	    if (x < 0) {
@@ -252,7 +251,11 @@ vfprintf (FILE * stream, const char *fmt, va_list ap)
 		flags |= FL_ALTHEX;
 	        base = 16 | XTOA_UPPER;
 	      ultoa:
-		c = __ultoa_invert (arg_to_unsigned(flags), (char *)buf, base) - (char *)buf;
+		{
+		    ultoa_unsigned_t x;
+		    arg_to_unsigned(flags, &x);
+		    c = __ultoa_invert (x, (char *)buf, base) - (char *)buf;
+		}
 		break;
 
 	      default:
@@ -759,7 +762,8 @@ int vfprintf (FILE * stream, const char *fmt, va_list ap)
 	}
 
 	if (c == 'd' || c == 'i') {
-	    ultoa_signed_t x = arg_to_signed(flags);
+	    ultoa_signed_t x;
+	    arg_to_signed(flags, &x);
 
 	    flags &= ~(FL_NEGATIVE | FL_ALT);
 	    if (x < 0) {
@@ -773,7 +777,8 @@ int vfprintf (FILE * stream, const char *fmt, va_list ap)
 		c = __ultoa_invert (x, (char *)buf, 10) - (char *)buf;
 	} else {
 	    int base;
-	    ultoa_unsigned_t x = arg_to_unsigned(flags);
+	    ultoa_unsigned_t x;
+	    arg_to_unsigned(flags, &x);
 
 	    flags &= ~(FL_PLUS | FL_SPACE);
 
