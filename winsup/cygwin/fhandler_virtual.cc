@@ -182,7 +182,7 @@ fhandler_virtual::read (void *ptr, size_t& len)
 {
   if (len == 0)
     return;
-  if (openflags & O_DIROPEN)
+  if (diropen)
     {
       set_errno (EISDIR);
       len = (size_t) -1;

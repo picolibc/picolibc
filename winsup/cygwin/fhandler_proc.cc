@@ -315,7 +315,7 @@ fhandler_proc::open (int flags, mode_t mode)
 	}
       else
 	{
-	  flags |= O_DIROPEN;
+	  diropen = true;
 	  goto success;
 	}
     }
@@ -342,7 +342,7 @@ fhandler_proc::open (int flags, mode_t mode)
 	      }
 	    else
 	      {
-		flags |= O_DIROPEN;
+		diropen = true;
 		goto success;
 	      }
 	  }

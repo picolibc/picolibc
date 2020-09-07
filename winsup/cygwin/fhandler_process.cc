@@ -272,7 +272,7 @@ fhandler_process::open (int flags, mode_t mode)
 	}
       else
 	{
-	  flags |= O_DIROPEN;
+	  diropen = true;
 	  goto success;
 	}
     }
@@ -287,7 +287,7 @@ fhandler_process::open (int flags, mode_t mode)
     }
   if (entry->fhandler == FH_PROCESSFD)
     {
-      flags |= O_DIROPEN;
+      diropen = true;
       goto success;
     }
   if (flags & O_WRONLY)

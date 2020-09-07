@@ -1469,7 +1469,7 @@ fhandler_base::open_fs (int flags, mode_t mode)
 
   bool new_file = !exists ();
 
-  int res = fhandler_base::open (flags | O_DIROPEN, mode);
+  int res = fhandler_base::open (flags, mode);
   if (res)
     {
       /* The file info in pc is wrong at this point for newly created files.

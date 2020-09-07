@@ -14,10 +14,6 @@ details. */
 #include <cygwin/_ucred.h>
 #include <sys/un.h>
 
-/* fcntl flags used only internaly. */
-#define O_NOSYMLINK	0x080000
-#define O_DIROPEN	0x100000
-
 /* newlib used to define O_NDELAY differently from O_NONBLOCK.  Now it
    properly defines both to be the same.  Unfortunately, we have to
    behave properly the old version, too, to accommodate older executables. */
@@ -2634,6 +2630,7 @@ class fhandler_virtual : public fhandler_base
   off_t filesize;
   off_t position;
   int fileid; // unique within each class
+  bool diropen;
  public:
 
   fhandler_virtual ();

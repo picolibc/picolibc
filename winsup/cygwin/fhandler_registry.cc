@@ -784,7 +784,7 @@ fhandler_registry::open (int flags, mode_t mode)
 	}
       else
 	{
-	  flags |= O_DIROPEN;
+	  diropen = true;
 	  /* Marking as nohandle allows to call dup. */
 	  nohandle (true);
 	  goto success;
@@ -824,7 +824,7 @@ fhandler_registry::open (int flags, mode_t mode)
 		   handles. */
 		if (get_handle () >= HKEY_CLASSES_ROOT)
 		  nohandle (true);
-		flags |= O_DIROPEN;
+		diropen = true;
 		goto success;
 	      }
 	  }
@@ -872,13 +872,13 @@ fhandler_registry::open (int flags, mode_t mode)
 	    }
 	}
       else
-	flags |= O_DIROPEN;
+	diropen = true;
 
       set_handle (handle);
       set_close_on_exec (!!(flags & O_CLOEXEC));
       value_name = cwcsdup (dec_file);
 
-      if (!(flags & O_DIROPEN) && !fill_filebuf ())
+      if (!diropen && !fill_filebuf ())
 	{
 	  RegCloseKey (handle);
 	  res = 0;

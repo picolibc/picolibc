@@ -161,7 +161,7 @@ fhandler_procsysvipc::open (int flags, mode_t mode)
 	}
       else
 	{
-	  flags |= O_DIROPEN;
+	  diropen = true;
 	  goto success;
 	}
     }

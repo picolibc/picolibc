@@ -30,3 +30,6 @@ Bug Fixes
 
 - Fix SEGV in modfl call.
   Addresses: https://cygwin.com/pipermail/cygwin/2020-August/246056.html
+
+- Fix a collision of offical and internally used file flags.
+  Addresses: https://cygwin.com/pipermail/cygwin/2020-September/246174.html
