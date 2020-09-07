@@ -407,6 +407,8 @@ report (const char *in_fn, bool multiple)
 	  }
 	  break;
 	case EXIT_PROCESS_DEBUG_EVENT:
+	  if (ev.u.ExitProcess.dwExitCode != 0)
+	    process_fn = fn_win;
 print_and_exit:
 	  print_dlls (&dll_list, isdll ? fn_win : NULL, process_fn);
 	  exitnow = true;
