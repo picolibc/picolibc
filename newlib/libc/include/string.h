@@ -199,7 +199,11 @@ int	 strverscmp (const char *, const char *);
    sure here. */
 #if __GNU_VISIBLE && !defined(basename)
 # define basename basename
+# ifdef __ASMNAME
 char	*__nonnull ((1)) basename (const char *) __asm__(__ASMNAME("__gnu_basename"));
+# else
+char	*__nonnull ((1)) basename (const char *s) { return __gnu_basename(s); }
+# endif
 #endif
 
 #include <sys/string.h>
