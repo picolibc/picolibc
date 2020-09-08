@@ -85,5 +85,5 @@ foreach target : targets
 			srcs_libm_machine_real,
 			pic: false,
 			include_directories: [ inc, include_directories('../../common') ],
-			c_args: value[1] + ['-fno-builtin']))
+			c_args: value[1] + arg_fnobuiltin))
 endforeach

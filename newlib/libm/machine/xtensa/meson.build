@@ -54,5 +54,5 @@ foreach target : targets
 			include_directories: [ inc,
 					       include_directories('../../common'),
 					       include_directories('../../../libc/machine/xtensa') ],
-			c_args: value[1] + ['-fno-builtin']))
+			c_args: value[1] + arg_fnobuiltin))
 endforeach

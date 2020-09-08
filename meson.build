@@ -255,10 +255,18 @@ specs_data.set(
   sysroot_install? join_paths('%R', get_option('libdir')) : lib_dir
 )
 
-specs_data.set(
-  'TLSMODEL',
-  tls_model
-)
+if tls_model != ''
+  specs_data.set(
+    'TLSMODEL',
+    '%{!ftls-model:-ftls-model=' + tls_model + '}'
+  )
+else
+  specs_data.set(
+    'TLSMODEL',
+    ''
+  )
+endif
+
 
 specs_data.set(
   'LINK_SPEC',
@@ -550,6 +558,13 @@ conf_data.set('__OBSOLETE_MATH', obsolete_math_value, description: 'Use old math
 conf_data.set('__OBSOLETE_MATH_FLOAT', obsolete_math_float_value, description: 'Use old math code for float funcs (undef auto, 0 no, 1 yes)')
 conf_data.set('__OBSOLETE_MATH_DOUBLE', obsolete_math_double_value, description: 'Use old math code for double funcs (undef auto, 0 no, 1 yes)')
 
+# Check if compiler has -fno-builtin
+
+arg_fnobuiltin = []
+if meson.get_compiler('c').has_argument('-fno-builtin')
+  arg_fnobuiltin = ['-fno-builtin']
+endif
+
 # Compute iconv encodings to support in the library
 
 # Dig out the list of available encodings from the encoding.aliases file. Only
@@ -627,10 +642,15 @@ includedir = join_paths(prefix, get_option('includedir'))
 # versions of gcc for RISC-V which have a bug that mis-names
 # initialized read-only data segments when -fdata-sections
 # is defined
-arguments = ['-ffunction-sections']
+arguments = []
+if meson.get_compiler('c').has_argument('-ffunction-sections')
+  arguments += ['-ffunction-sections']
+endif
 
 if tls_model != ''
-  arguments += ['-ftls-model=' + tls_model]
+  tls_arg = '-ftls-model=' + tls_model
+  assert(meson.get_compiler('c').has_argument(tls_arg), 'Compiler does not support \'-ftls-model\'!')
+  arguments += [tls_arg]
 endif
 
 add_project_arguments(arguments, language: 'c')
@@ -651,7 +671,7 @@ conf_data.set('HAVE_SEMIHOST', has_semihost, description: 'Semihost APIs support
 # By default, tests don't require any special arguments
 
 # disable compiler built-ins so we reach the library equivalents
-test_c_args = ['-fno-builtin']
+test_c_args = arg_fnobuiltin
 if tests_enable_stack_protector
   if meson.get_compiler('c').has_argument('-fstack-protector-all') and meson.get_compiler('c').has_argument('-fstack-protector-strong')
     test_c_args += ['-fstack-protector-all', '-fstack-protector-strong', '-DTESTS_ENABLE_STACK_PROTECTOR']

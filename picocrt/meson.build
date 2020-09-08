@@ -64,7 +64,7 @@ foreach target : targets
 	     include_directories : inc,
 	     install : true,
 	     install_dir : instdir,
-	     c_args : value[1] + ['-fno-builtin', '-ffreestanding'],
+	     c_args : value[1] + arg_fnobuiltin + ['-ffreestanding'],
 	     link_args : value[1] + ['-r', '-ffreestanding', '-nostdlib'])
 
   # Tests link against this because using the .o isn't supported under meson

@@ -59,5 +59,5 @@ foreach target : targets
 			srcs_libm_machine_real,
 			pic: false,
 			include_directories: math_inc,
-			c_args: value[1] + ['-fno-builtin']))
+			c_args: value[1] + arg_fnobuiltin))
 endforeach
