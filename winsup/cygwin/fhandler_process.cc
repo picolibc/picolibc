@@ -398,6 +398,21 @@ format_process_fd (void *data, char *&destbuf)
 	*((process_fd_t *) data)->fd_type = virt_fdsymlink;
       else /* trailing path */
 	{
+	  /* Does the descriptor link point to a directory? */
+	  bool dir;
+	  if (*destbuf != '/')	/* e.g., "pipe:[" or "socket:[" */
+	    dir = false;
+	  else
+	    {
+	      path_conv pc (destbuf);
+	      dir = pc.isdir ();
+	    }
+	  if (!dir)
+	    {
+	      set_errno (ENOTDIR);
+	      cfree (destbuf);
+	      return -1;
+	    }
 	  char *newbuf = (char *) cmalloc_abort (HEAP_STR, strlen (destbuf)
 							   + strlen (e) + 1);
 	  stpcpy (stpcpy (newbuf, destbuf), e);
