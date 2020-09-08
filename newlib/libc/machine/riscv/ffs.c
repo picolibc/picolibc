@@ -13,8 +13,12 @@
 int
 ffs (int word)
 {
-#if __riscv_xlen == 32
+#if __riscv_xlen == 32 && defined(HAVE_BUILTIN_FFS)
   return (__builtin_ffs (word));
+#elif __riscv_xlen == 32 && defined(HAVE_BUILTIN_CTZ)
+  if (word == 0)
+	  return 0;
+  return (__builtin_ctz((unsigned int)word) + 1);
 #else
   int i;
 

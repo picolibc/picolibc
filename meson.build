@@ -434,6 +434,26 @@ endif
 
 conf_data = configuration_data()
 
+# The supported builtins vary depending on compiler and target.
+# If you want to check for a given builtin, add an array
+#   ['some_builtin_name', '__call_to_builtin(1,2,3);']
+# The below loop will then add the define HAVE_SOME_BUILTIN_NAME if the code snippet
+#   > int main (void) { __call_to_builtin(1,2,3); return 0; }
+# can be compiled + linked.
+# The name should match the builtin, but technically it's not necessary
+builtins = [
+  ['builtin_ffs', '__builtin_ffs(42);'],
+  ['builtin_ffsl', '__builtin_ffsl((long)42);'],
+  ['builtin_ffsll', '__builtin_ffsll((long long)42);'],
+  ['builtin_ctz', '__builtin_ctz((unsigned int)42);'],
+  ['builtin_ctzl', '__builtin_ctzl((unsigned long)42);'],
+  ['builtin_ctzll', '__builtin_ctzll((unsigned long long)42);'],
+]
+foreach builtin : builtins
+  have_current_builtin = meson.get_compiler('c').links('int main(void) { ' + builtin[1] + ' return 0; }', name : 'test for __' + builtin[0])
+  conf_data.set('HAVE_' + builtin[0].to_upper(), have_current_builtin, description: 'The compiler supports __' + builtin[0])
+endforeach
+
 NEWLIB_VERSION='3.3.0'
 NEWLIB_MAJOR_VERSION=3
 NEWLIB_MINOR_VERSION=3
