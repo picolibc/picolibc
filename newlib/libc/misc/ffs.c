@@ -55,6 +55,13 @@ No supporting OS subroutines are required.  */
 int
 ffs(int i)
 {
-
+#ifdef HAVE_BUILTIN_FFS
 	return (__builtin_ffs(i));
+#elif defined(HAVE_BUILTIN_CTZ)
+	if (i == 0)
+		return 0;
+	return __builtin_ctz((unsigned int)i) + 1;
+#else
+#error No __builtin_ffs or __builtin_ctz available!
+#endif
 }
