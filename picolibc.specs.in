@@ -7,10 +7,10 @@
 -isystem @INCLUDEDIR@ %(picolibc_cpp)
 
 *cc1:
-%{!ftls-model:-ftls-model=@TLSMODEL@} %(picolibc_cc1) @CC1_SPEC@
+@TLSMODEL@ %(picolibc_cc1) @CC1_SPEC@
 
 *cc1plus:
-%{!ftls-model:-ftls-model=@TLSMODEL@} %(picolibc_cc1plus) @CC1_SPEC@ @CC1PLUS_SPEC@
+@TLSMODEL@ %(picolibc_cc1plus) @CC1_SPEC@ @CC1PLUS_SPEC@
 
 *link:
 @SPECS_PRINTF@ -L@LIBDIR@/%M -L@LIBDIR@ %{!T:-Tpicolibc.ld} %(picolibc_link) --gc-sections @LINK_SPEC@

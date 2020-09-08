@@ -255,10 +255,18 @@ specs_data.set(
   sysroot_install? join_paths('%R', get_option('libdir')) : lib_dir
 )
 
-specs_data.set(
-  'TLSMODEL',
-  tls_model
-)
+if tls_model != ''
+  specs_data.set(
+    'TLSMODEL',
+    '%{!ftls-model:-ftls-model=' + tls_model + '}'
+  )
+else
+  specs_data.set(
+    'TLSMODEL',
+    ''
+  )
+endif
+
 
 specs_data.set(
   'LINK_SPEC',
