@@ -1448,6 +1448,54 @@ __set_charset_from_locale (const char *locale, char *charset)
   stpcpy (charset, cs);
 }
 
+/* Called from fhandler_tty::setup_locale.  Set a codepage which reflects the
+   internal charset setting.  This is *not* necessarily the Windows
+   codepage connected to a locale by default, so we have to set this
+   up explicitely. */
+UINT
+__eval_codepage_from_internal_charset ()
+{
+  const char *charset = __locale_charset (__get_global_locale ());
+  UINT codepage = CP_UTF8; /* Default UTF8 */
+
+  /* The internal charset names are well defined, so we can use shortcuts. */
+  switch (charset[0])
+    {
+    case 'B': /* BIG5 */
+      codepage = 950;
+      break;
+    case 'C': /* CPxxx */
+      codepage = strtoul (charset + 2, NULL, 10);
+      break;
+    case 'E': /* EUCxx */
+      switch (charset[3])
+	{
+	case 'J': /* EUCJP */
+	  codepage = 20932;
+	  break;
+	case 'K': /* EUCKR */
+	  codepage = 949;
+	  break;
+	case 'C': /* EUCCN */
+	  codepage = 936;
+	  break;
+	}
+      break;
+    case 'G': /* GBK/GB2312 */
+      codepage = 936;
+      break;
+    case 'I': /* ISO-8859-x */
+      codepage = strtoul (charset + 9, NULL, 10) + 28590;
+      break;
+    case 'S': /* SJIS */
+      codepage = 932;
+      break;
+    default: /* All set to UTF8 already */
+      break;
+    }
+  return codepage;
+}
+
 /* This function is called from newlib's loadlocale if the locale identifier
    was invalid, one way or the other.  It looks for the file
 

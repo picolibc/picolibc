@@ -1614,8 +1614,8 @@ fhandler_pty_master::write (const void *ptr, size_t len)
   if (to_be_read_from_pcon () && get_ttyp ()->h_pseudo_console)
     {
       size_t nlen;
-      char *buf = convert_mb_str
-	(CP_UTF8, &nlen, get_ttyp ()->term_code_page, (const char *) ptr, len);
+      char *buf = convert_mb_str (CP_UTF8, &nlen, get_ttyp ()->term_code_page,
+				  (const char *) ptr, len);
 
       WaitForSingleObject (input_mutex, INFINITE);
 
@@ -1782,183 +1782,13 @@ fhandler_pty_common::set_close_on_exec (bool val)
   close_on_exec (val);
 }
 
-/* This table is borrowed from mintty: charset.c */
-static const struct {
-  UINT cp;
-  const char *name;
-}
-cs_names[] = {
-  { CP_UTF8, "UTF-8"},
-  { CP_UTF8, "UTF8"},
-  {   20127, "ASCII"},
-  {   20127, "US-ASCII"},
-  {   20127, "ANSI_X3.4-1968"},
-  {   20866, "KOI8-R"},
-  {   20866, "KOI8R"},
-  {   20866, "KOI8"},
-  {   21866, "KOI8-U"},
-  {   21866, "KOI8U"},
-  {   20932, "EUCJP"},
-  {   20932, "EUC-JP"},
-  {     874, "TIS620"},
-  {     874, "TIS-620"},
-  {     932, "SJIS"},
-  {     936, "GBK"},
-  {     936, "GB2312"},
-  {     936, "EUCCN"},
-  {     936, "EUC-CN"},
-  {     949, "EUCKR"},
-  {     949, "EUC-KR"},
-  {     950, "BIG5"},
-  {       0, "NULL"}
-};
-
-static void
-get_locale_from_env (char *locale)
-{
-  const char *env = NULL;
-  char lang[ENCODING_LEN + 1] = {0, }, country[ENCODING_LEN + 1] = {0, };
-  env = getenv ("LC_ALL");
-  if (env == NULL || !*env)
-    env = getenv ("LC_CTYPE");
-  if (env == NULL || !*env)
-    env = getenv ("LANG");
-  if (env == NULL || !*env)
-    {
-      if (GetLocaleInfo (LOCALE_CUSTOM_UI_DEFAULT,
-			  LOCALE_SISO639LANGNAME,
-			  lang, sizeof (lang)))
-	GetLocaleInfo (LOCALE_CUSTOM_UI_DEFAULT,
-		       LOCALE_SISO3166CTRYNAME,
-		       country, sizeof (country));
-      else if (GetLocaleInfo (LOCALE_CUSTOM_DEFAULT,
-			      LOCALE_SISO639LANGNAME,
-			      lang, sizeof (lang)))
-	  GetLocaleInfo (LOCALE_CUSTOM_DEFAULT,
-			 LOCALE_SISO3166CTRYNAME,
-			 country, sizeof (country));
-      else if (GetLocaleInfo (LOCALE_USER_DEFAULT,
-			      LOCALE_SISO639LANGNAME,
-			      lang, sizeof (lang)))
-	  GetLocaleInfo (LOCALE_USER_DEFAULT,
-			 LOCALE_SISO3166CTRYNAME,
-			 country, sizeof (country));
-      else if (GetLocaleInfo (LOCALE_SYSTEM_DEFAULT,
-			      LOCALE_SISO639LANGNAME,
-			      lang, sizeof (lang)))
-	  GetLocaleInfo (LOCALE_SYSTEM_DEFAULT,
-			 LOCALE_SISO3166CTRYNAME,
-			 country, sizeof (country));
-      if (strlen (lang) && strlen (country))
-	__small_sprintf (lang + strlen (lang), "_%s.UTF-8", country);
-      else
-	strcpy (lang , "C.UTF-8");
-      env = lang;
-    }
-  strcpy (locale, env);
-}
-
-static void
-get_langinfo (char *locale_out, char *charset_out)
-{
-  /* Get locale from environment */
-  char new_locale[ENCODING_LEN + 1];
-  get_locale_from_env (new_locale);
-
-  __locale_t loc;
-  memset (&loc, 0, sizeof (loc));
-  const char *locale = __loadlocale (&loc, LC_CTYPE, new_locale);
-  if (!locale)
-    locale = "C";
-
-  const char *charset;
-  struct lc_ctype_T *lc_ctype = (struct lc_ctype_T *) loc.lc_cat[LC_CTYPE].ptr;
-  if (!lc_ctype)
-    charset = "ASCII";
-  else
-    charset = lc_ctype->codeset;
-
-  /* The following code is borrowed from nl_langinfo()
-     in newlib/libc/locale/nl_langinfo.c */
-  /* Convert charset to Linux compatible codeset string. */
-  if (charset[0] == 'A'/*SCII*/)
-    charset = "ANSI_X3.4-1968";
-  else if (charset[0] == 'E')
-    {
-      if (strcmp (charset, "EUCJP") == 0)
-	charset = "EUC-JP";
-      else if (strcmp (charset, "EUCKR") == 0)
-	charset = "EUC-KR";
-      else if (strcmp (charset, "EUCCN") == 0)
-	charset = "GB2312";
-    }
-  else if (charset[0] == 'C'/*Pxxxx*/)
-    {
-      if (strcmp (charset + 2, "874") == 0)
-	charset = "TIS-620";
-      else if (strcmp (charset + 2, "20866") == 0)
-	charset = "KOI8-R";
-      else if (strcmp (charset + 2, "21866") == 0)
-	charset = "KOI8-U";
-      else if (strcmp (charset + 2, "101") == 0)
-	charset = "GEORGIAN-PS";
-      else if (strcmp (charset + 2, "102") == 0)
-	charset = "PT154";
-    }
-  else if (charset[0] == 'S'/*JIS*/)
-    {
-      /* Cygwin uses MSFT's implementation of SJIS, which differs
-	 in some codepoints from the real thing, especially
-	 0x5c: yen sign instead of backslash,
-	 0x7e: overline instead of tilde.
-	 We can't use the real SJIS since otherwise Win32
-	 pathnames would become invalid.  OTOH, if we return
-	 "SJIS" here, then libiconv will do mb<->wc conversion
-	 differently to our internal functions.  Therefore we
-	 return what we really implement, CP932.  This is handled
-	 fine by libiconv. */
-      charset = "CP932";
-    }
-
-  /* Set results */
-  strcpy (locale_out, new_locale);
-  strcpy (charset_out, charset);
-}
-
 void
 fhandler_pty_slave::setup_locale (void)
 {
-  if (get_ttyp ()->term_code_page != 0)
-    return;
+  extern UINT __eval_codepage_from_internal_charset ();
 
-  char locale[ENCODING_LEN + 1] = "C";
-  char charset[ENCODING_LEN + 1] = "ASCII";
-  get_langinfo (locale, charset);
-
-  /* Set terminal code page from locale */
-  /* This code is borrowed from mintty: charset.c */
-  get_ttyp ()->term_code_page = 20127; /* Default ASCII */
-  char charset_u[ENCODING_LEN + 1] = {0, };
-  for (int i=0; charset[i] && i<ENCODING_LEN; i++)
-    charset_u[i] = toupper (charset[i]);
-  unsigned int iso;
-  UINT cp = 20127; /* Default for fallback */
-  if (sscanf (charset_u, "ISO-8859-%u", &iso) == 1
-      || sscanf (charset_u, "ISO8859-%u", &iso) == 1
-      || sscanf (charset_u, "ISO8859%u", &iso) == 1)
-    {
-      if (iso && iso <= 16 && iso !=12)
-	get_ttyp ()->term_code_page = 28590 + iso;
-    }
-  else if (sscanf (charset_u, "CP%u", &cp) == 1)
-    get_ttyp ()->term_code_page = cp;
-  else
-    for (int i=0; cs_names[i].cp; i++)
-      if (strcasecmp (charset_u, cs_names[i].name) == 0)
-	{
-	  get_ttyp ()->term_code_page = cs_names[i].cp;
-	  break;
-	}
+  if (!get_ttyp ()->term_code_page)
+    get_ttyp ()->term_code_page = __eval_codepage_from_internal_charset ();
 }
 
 void
@@ -1976,9 +1806,6 @@ fhandler_pty_slave::fixup_after_exec ()
 
   if (!close_on_exec ())
     fixup_after_fork (NULL);	/* No parent handle required. */
-
-  /* Set locale */
-  setup_locale ();
 
   /* Hook Console API */
 #define DO_HOOK(module, name) \
@@ -2205,8 +2032,8 @@ fhandler_pty_master::pty_master_fwd_thread ()
 	      state = 0;
 
 	  size_t nlen;
-	  char *buf = convert_mb_str
-	    (get_ttyp ()->term_code_page, &nlen, CP_UTF8, ptr, wlen);
+	  char *buf = convert_mb_str (get_ttyp ()->term_code_page,
+				      &nlen, CP_UTF8, ptr, wlen);
 
 	  ptr = buf;
 	  wlen = rlen = nlen;
@@ -2228,8 +2055,8 @@ fhandler_pty_master::pty_master_fwd_thread ()
 	  continue;
 	}
       size_t nlen;
-      char *buf = convert_mb_str
-	(get_ttyp ()->term_code_page, &nlen, GetConsoleOutputCP (), ptr, wlen);
+      char *buf = convert_mb_str (get_ttyp ()->term_code_page, &nlen,
+				  GetConsoleOutputCP (), ptr, wlen);
 
       ptr = buf;
       wlen = rlen = nlen;
