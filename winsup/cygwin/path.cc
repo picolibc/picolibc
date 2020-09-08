@@ -809,6 +809,15 @@ path_conv::check (const char *src, unsigned opt,
 			  delete fh;
 			  goto retry_fs_via_processfd;
 			}
+		      else if (file_type == virt_none && dev == FH_PROCESSFD)
+			{
+			  error = get_errno ();
+			  if (error)
+			    {
+			      delete fh;
+			      return;
+			    }
+			}
 		      delete fh;
 		    }
 		  switch (file_type)
