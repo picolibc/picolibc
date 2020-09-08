@@ -376,6 +376,15 @@ int main (void) {
 '''
 have_builtin_expect = meson.get_compiler('c').links(builtin_expect_code, name : 'has __builtin_expect')
 
+# CompCert uses the GCC preprocessor, which causes to
+#  > #if __has_attribute(__alloc_size__)
+# produce a wrong result. So test if the compiler has that attribute
+alloc_size_code = '''
+void *foobar(size_t) __attribute__((__alloc_size__(1)));
+void *foobar2(size_t, size_t) __attribute__((__alloc_size__(1, 2)));
+'''
+have_alloc_size = meson.get_compiler('c').compiles(alloc_size_code, name : 'attribute __alloc_size__')
+
 if enable_multilib
   used_libs = []
 
@@ -529,6 +538,7 @@ conf_data.set('HAVE_BITFIELDS_IN_PACKED_STRUCTS', have_bitfields_in_packed_struc
 conf_data.set('HAVE_BUILTIN_MUL', have_builtin_mul_overflow, description: 'Compiler has __builtin_mul_overflow')
 conf_data.set('HAVE_COMPLEX', have_complex, description: 'Compiler supports _Complex')
 conf_data.set('HAVE_BUILTIN_EXPECT', have_builtin_expect, description: 'Compiler has __builtin_expect')
+conf_data.set('HAVE_ALLOC_SIZE', have_alloc_size, description: 'The compiler REALLY has the attribute __alloc_size__')
 
 if newlib_obsolete_math == 'auto'
   obsolete_math_value = false
