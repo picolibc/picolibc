@@ -191,7 +191,14 @@ if newlib_nano_malloc
 else
   srcs_stdlib += std_malloc_srcs_stdlib
   # Work around compiler optimizing calls involving malloc/free
-  c_args_malloc = ['-fno-builtin-malloc', '-fno-builtin-free']
+  c_args_malloc = []
+  if meson.get_compiler('c').has_argument('-fno-builtin-malloc')
+    c_args_malloc += ['-fno-builtin-malloc']
+  endif
+
+  if meson.get_compiler('c').has_argument('-fno-builtin-free')
+    c_args_malloc += ['-fno-builtin-free']
+  endif
 endif
 
 hdrs_stdlib = [

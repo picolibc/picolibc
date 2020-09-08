@@ -503,6 +503,13 @@ conf_data.set('__OBSOLETE_MATH', obsolete_math_value, description: 'Use old math
 conf_data.set('__OBSOLETE_MATH_FLOAT', obsolete_math_float_value, description: 'Use old math code for float funcs (undef auto, 0 no, 1 yes)')
 conf_data.set('__OBSOLETE_MATH_DOUBLE', obsolete_math_double_value, description: 'Use old math code for double funcs (undef auto, 0 no, 1 yes)')
 
+# Check if compiler has -fno-builtin
+
+arg_fnobuiltin = ['-fno-builtin']
+if not meson.get_compiler('c').has_argument('-fno-builtin')
+  arg_fnobuiltin = []
+endif
+
 # Compute iconv encodings to support in the library
 
 # Dig out the list of available encodings from the encoding.aliases file. Only
@@ -580,10 +587,15 @@ includedir = join_paths(prefix, get_option('includedir'))
 # versions of gcc for RISC-V which have a bug that mis-names
 # initialized read-only data segments when -fdata-sections
 # is defined
-arguments = ['-ffunction-sections']
+arguments = []
+if meson.get_compiler('c').has_argument('-ffunction-sections')
+  arguments += ['-ffunction-sections']
+endif
 
 if tls_model != ''
-  arguments += ['-ftls-model=' + tls_model]
+  tls_arg = '-ftls-model=' + tls_model
+  assert(meson.get_compiler('c').has_argument(tls_arg), 'Compiler does not support \'-ftls-model\'!')
+  arguments += [tls_arg]
 endif
 
 add_project_arguments(arguments, language: 'c')
