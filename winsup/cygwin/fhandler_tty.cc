@@ -1470,17 +1470,14 @@ fhandler_pty_master::fhandler_pty_master (int unit)
 {
   if (unit >= 0)
     dev ().parse (DEV_PTYM_MAJOR, unit);
-  else if (!setup ())
-    {
-      dev ().parse (FH_ERROR);
-      return;
-    }
   set_name ("/dev/ptmx");
 }
 
 int
 fhandler_pty_master::open (int flags, mode_t)
 {
+  if (!setup ())
+      return 0;
   set_open_status ();
   dwProcessId = GetCurrentProcessId ();
   return 1;
