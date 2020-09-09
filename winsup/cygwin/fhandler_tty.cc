@@ -295,8 +295,22 @@ fhandler_pty_master::accept_input ()
   bytes_left = eat_readahead (-1);
 
   HANDLE write_to = get_output_handle ();
+  tmp_pathbuf tp;
   if (to_be_read_from_pcon ())
-    write_to = to_slave;
+    {
+      write_to = to_slave;
+      UINT cp_to = GetConsoleCP ();
+      if (get_ttyp ()->term_code_page != cp_to)
+	{
+	  static mbstate_t mbp;
+	  char *mbbuf = tp.c_get ();
+	  size_t nlen = NT_MAX_PATH;
+	  convert_mb_str (cp_to, mbbuf, &nlen,
+			  get_ttyp ()->term_code_page, p, bytes_left, &mbp);
+	  p = mbbuf;
+	  bytes_left = nlen;
+	}
+    }
 
   if (!bytes_left)
     {
