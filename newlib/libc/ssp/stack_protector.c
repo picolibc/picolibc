@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include <stdio.h>
 
 #if defined(__AMDGCN__)
 /* GCN does not support constructors, yet.  */
@@ -37,12 +38,18 @@ __stack_chk_init (void)
 
 void __stack_chk_fail (void) __attribute__((__noreturn__));
 
+#define STACK_CHK_MSG "*** stack smashing detected ***: terminated"
+
 void
 __attribute__((__noreturn__))
 __stack_chk_fail_weak (void)
 {
-  char msg[] = "*** stack smashing detected ***: terminated\n";
-  write (2, msg, strlen (msg));
+#ifdef TINY_STDIO
+  puts(STACK_CHK_MSG);
+#else
+  static const char msg[] = STACK_CHK_MSG "\n";
+  write (2, msg, sizeof(msg)-1);
+#endif
   raise (SIGABRT);
   _exit (127);
 }
