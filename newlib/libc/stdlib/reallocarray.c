@@ -20,13 +20,14 @@
 #include <errno.h>
 #include <stdint.h>
 #include <stdlib.h>
+#include "mul_overflow.h"
 
 void *
 reallocarray(void *optr, size_t nmemb, size_t size)
 {
 	ptrdiff_t bytes;
 
-	if (__builtin_mul_overflow (nmemb, size, &bytes))
+	if (mul_overflow (nmemb, size, &bytes))
 	{
 		errno = ENOMEM;
 		return NULL;
