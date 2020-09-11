@@ -108,25 +108,11 @@ foreach target : targets
 		  include_directories: inc),
        env: ['MESON_SOURCE_ROOT=' + meson.source_root()])
 
-  if posix_io
-    t1 = 'posix-io'
-    if target == ''
-      t1_name = t1
-    else
-      t1_name = join_paths(target, t1)
-    endif
-
-    test(t1 + target,
-	 executable(t1_name, ['posix-io.c'],
-		    c_args: _c_args,
-		    link_args: _link_args,
-		    link_with: _libs,
-		    link_depends:  test_link_depends,
-		    include_directories: inc),
-	 env: ['MESON_SOURCE_ROOT=' + meson.source_root()])
-  endif
-
   plain_tests = ['rand', 'regex', 'ungetc', 'fenv', 'math_errhandling', 'malloc', 'malloc_stress', 'tls', 'stack-smash']
+
+  if posix_io or not tinystdio
+    plain_tests += 'posix-io'
+  endif
 
   foreach t1 : plain_tests
     t1_src = t1 + '.c'
