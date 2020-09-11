@@ -1830,7 +1830,11 @@ fhandler_pty_slave::setup_locale (void)
   extern UINT __eval_codepage_from_internal_charset ();
 
   if (!get_ttyp ()->term_code_page)
-    get_ttyp ()->term_code_page = __eval_codepage_from_internal_charset ();
+    {
+      get_ttyp ()->term_code_page = __eval_codepage_from_internal_charset ();
+      SetConsoleCP (get_ttyp ()->term_code_page);
+      SetConsoleOutputCP (get_ttyp ()->term_code_page);
+    }
 }
 
 void
