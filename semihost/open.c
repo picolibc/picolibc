@@ -71,7 +71,7 @@ open(const char *pathname, int flags, ...)
 #ifdef TINY_STDIO
 	while(0);
 #else
-	while (ret <= 2);
+	while (0 <= ret && ret <= 2);
 #endif
 	if (ret == -1)
 		errno = sys_semihost_errno();
