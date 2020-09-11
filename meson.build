@@ -615,7 +615,11 @@ conf_data.set('HAVE_SEMIHOST', has_semihost, description: 'Semihost APIs support
 
 test_c_args = []
 if tests_enable_stack_protector
-  test_c_args += ['-fstack-protector-all', '-fstack-protector-strong', '-DTESTS_ENABLE_STACK_PROTECTOR']
+  if meson.get_compiler('c').has_argument('-fstack-protector-all') and meson.get_compiler('c').has_argument('-fstack-protector-strong')
+    test_c_args += ['-fstack-protector-all', '-fstack-protector-strong', '-DTESTS_ENABLE_STACK_PROTECTOR']
+  else
+    tests_enable_stack_protector = false
+  endif
 endif
 test_link_args = test_c_args
 test_link_depends = []
