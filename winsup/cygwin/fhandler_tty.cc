@@ -122,58 +122,48 @@ convert_mb_str (UINT cp_to, char *ptr_to, size_t *len_to,
 		UINT cp_from, const char *ptr_from, size_t len_from,
 		mbstate_t *mbp)
 {
-  size_t nlen;
   tmp_pathbuf tp;
   wchar_t *wbuf = tp.w_get ();
   int wlen = 0;
-  if (cp_from == CP_UTF7)
-    /* MB_ERR_INVALID_CHARS does not work properly for UTF-7.
-       Therefore, just convert string without checking */
-    wlen = MultiByteToWideChar (cp_from, 0, ptr_from, len_from,
-				wbuf, NT_MAX_PATH);
-  else
-    {
-      char *tmpbuf = tp.c_get ();
-      memcpy (tmpbuf, mbp->__value.__wchb, mbp->__count);
-      if (mbp->__count + len_from > NT_MAX_PATH)
-	len_from = NT_MAX_PATH - mbp->__count;
-      memcpy (tmpbuf + mbp->__count, ptr_from, len_from);
-      int total_len = mbp->__count + len_from;
-      mbp->__count = 0;
-      int mblen = 0;
-      for (const char *p = tmpbuf; p < tmpbuf + total_len; p += mblen)
-	/* Max bytes in multibyte char is 4. */
-	for (mblen = 1; mblen <= 4; mblen ++)
-	  {
-	    /* Try conversion */
-	    int l = MultiByteToWideChar (cp_from, MB_ERR_INVALID_CHARS,
-					 p, mblen,
-					 wbuf + wlen, NT_MAX_PATH - wlen);
-	    if (l)
-	      { /* Conversion Success */
-		wlen += l;
-		break;
-	      }
-	    else if (mblen == 4)
-	      { /* Conversion Fail */
-		l = MultiByteToWideChar (cp_from, 0, p, 1,
-					 wbuf + wlen, NT_MAX_PATH - wlen);
-		wlen += l;
-		mblen = 1;
-		break;
-	      }
-	    else if (p + mblen == tmpbuf + total_len)
-	      { /* Multibyte char incomplete */
-		memcpy (mbp->__value.__wchb, p, mblen);
-		mbp->__count = mblen;
-		break;
-	      }
-	    /* Retry conversion with extended length */
+  char *tmpbuf = tp.c_get ();
+  memcpy (tmpbuf, mbp->__value.__wchb, mbp->__count);
+  if (mbp->__count + len_from > NT_MAX_PATH)
+    len_from = NT_MAX_PATH - mbp->__count;
+  memcpy (tmpbuf + mbp->__count, ptr_from, len_from);
+  int total_len = mbp->__count + len_from;
+  mbp->__count = 0;
+  int mblen = 0;
+  for (const char *p = tmpbuf; p < tmpbuf + total_len; p += mblen)
+    /* Max bytes in multibyte char supported is 4. */
+    for (mblen = 1; mblen <= 4; mblen ++)
+      {
+	/* Try conversion */
+	int l = MultiByteToWideChar (cp_from, MB_ERR_INVALID_CHARS,
+				     p, mblen,
+				     wbuf + wlen, NT_MAX_PATH - wlen);
+	if (l)
+	  { /* Conversion Success */
+	    wlen += l;
+	    break;
 	  }
-    }
-  nlen = WideCharToMultiByte (cp_to, 0, wbuf, wlen,
-			      ptr_to, *len_to, NULL, NULL);
-  *len_to = nlen;
+	else if (mblen == 4)
+	  { /* Conversion Fail */
+	    l = MultiByteToWideChar (cp_from, 0, p, 1,
+				     wbuf + wlen, NT_MAX_PATH - wlen);
+	    wlen += l;
+	    mblen = 1;
+	    break;
+	  }
+	else if (p + mblen == tmpbuf + total_len)
+	  { /* Multibyte char incomplete */
+	    memcpy (mbp->__value.__wchb, p, mblen);
+	    mbp->__count = mblen;
+	    break;
+	  }
+	/* Retry conversion with extended length */
+      }
+  *len_to = WideCharToMultiByte (cp_to, 0, wbuf, wlen,
+				 ptr_to, *len_to, NULL, NULL);
 }
 
 static bool
