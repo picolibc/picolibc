@@ -42,21 +42,7 @@ SUCH DAMAGE.
 /* For __STDC_ISO_10646__ */
 #include <sys/features.h>
 
-/* typedef only __gnuc_va_list, used throughout the header */
-#define __need___va_list
 #include <stdarg.h>
-
-/* typedef va_list only when required */
-#if __POSIX_VISIBLE >= 200809 || __XSI_VISIBLE
-#ifdef __GNUC__
-#ifndef _VA_LIST_DEFINED
-typedef __gnuc_va_list va_list;
-#define _VA_LIST_DEFINED
-#endif
-#else /* !__GNUC__ */
-#include <stdarg.h>
-#endif
-#endif /* __POSIX_VISIBLE >= 200809 || __XSI_VISIBLE */
 
 #if __XSI_VISIBLE /* && __XSI_VISIBLE < 800 */ && !__GNU_VISIBLE
 #include <wctype.h>
@@ -283,31 +269,23 @@ __FILE *open_wmemstream (wchar_t **, size_t *);
 #endif
 __FILE *_open_wmemstream_r (struct _reent *, wchar_t **, size_t *);
 
-#ifndef __VALIST
-#ifdef __GNUC__
-#define __VALIST __gnuc_va_list
-#else
-#define __VALIST char*
-#endif
-#endif
-
 #if __ISO_C_VISIBLE >= 1999 || __XSI_VISIBLE >= 500
 int	fwprintf (__FILE *__restrict, const wchar_t *__restrict, ...);
 int	swprintf (wchar_t *__restrict, size_t,
 			const wchar_t *__restrict, ...);
 int	vfwprintf (__FILE *__restrict, const wchar_t *__restrict,
-			__VALIST);
+			va_list);
 int	vswprintf (wchar_t *__restrict, size_t,
-			const wchar_t *__restrict, __VALIST);
-int	vwprintf (const wchar_t *__restrict, __VALIST);
+			const wchar_t *__restrict, va_list);
+int	vwprintf (const wchar_t *__restrict, va_list);
 int	wprintf (const wchar_t *__restrict, ...);
 #endif
 
 int	_fwprintf_r (struct _reent *, __FILE *, const wchar_t *, ...);
 int	_swprintf_r (struct _reent *, wchar_t *, size_t, const wchar_t *, ...);
-int	_vfwprintf_r (struct _reent *, __FILE *, const wchar_t *, __VALIST);
-int	_vswprintf_r (struct _reent *, wchar_t *, size_t, const wchar_t *, __VALIST);
-int	_vwprintf_r (struct _reent *, const wchar_t *, __VALIST);
+int	_vfwprintf_r (struct _reent *, __FILE *, const wchar_t *, va_list);
+int	_vswprintf_r (struct _reent *, wchar_t *, size_t, const wchar_t *, va_list);
+int	_vwprintf_r (struct _reent *, const wchar_t *, va_list);
 int	_wprintf_r (struct _reent *, const wchar_t *, ...);
 
 #if __ISO_C_VISIBLE >= 1999 || __XSI_VISIBLE >= 500
@@ -315,18 +293,18 @@ int	fwscanf (__FILE *__restrict, const wchar_t *__restrict, ...);
 int	swscanf (const wchar_t *__restrict,
 			const wchar_t *__restrict, ...);
 int	vfwscanf (__FILE *__restrict, const wchar_t *__restrict,
-			__VALIST);
+			va_list);
 int	vswscanf (const wchar_t *__restrict, const wchar_t *__restrict,
-			__VALIST);
-int	vwscanf (const wchar_t *__restrict, __VALIST);
+			va_list);
+int	vwscanf (const wchar_t *__restrict, va_list);
 int	wscanf (const wchar_t *__restrict, ...);
 #endif
 
 int	_fwscanf_r (struct _reent *, __FILE *, const wchar_t *, ...);
 int	_swscanf_r (struct _reent *, const wchar_t *, const wchar_t *, ...);
-int	_vfwscanf_r (struct _reent *, __FILE *, const wchar_t *, __VALIST);
-int	_vswscanf_r (struct _reent *, const wchar_t *, const wchar_t *, __VALIST);
-int	_vwscanf_r (struct _reent *, const wchar_t *, __VALIST);
+int	_vfwscanf_r (struct _reent *, __FILE *, const wchar_t *, va_list);
+int	_vswscanf_r (struct _reent *, const wchar_t *, const wchar_t *, va_list);
+int	_vwscanf_r (struct _reent *, const wchar_t *, va_list);
 int	_wscanf_r (struct _reent *, const wchar_t *, ...);
 
 #define getwc(fp)	fgetwc(fp)

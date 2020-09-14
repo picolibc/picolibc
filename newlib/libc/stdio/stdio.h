@@ -35,21 +35,7 @@
 #include <sys/cdefs.h>
 #include <stddef.h>
 
-/* typedef only __gnuc_va_list, used throughout the header */
-#define __need___va_list
 #include <stdarg.h>
-
-/* typedef va_list only when required */
-#if __POSIX_VISIBLE >= 200809 || __XSI_VISIBLE
-#ifdef __GNUC__
-#ifndef _VA_LIST_DEFINED
-typedef __gnuc_va_list va_list;
-#define _VA_LIST_DEFINED
-#endif
-#else /* !__GNUC__ */
-#include <stdarg.h>
-#endif
-#endif /* __POSIX_VISIBLE >= 200809 || __XSI_VISIBLE */
 
 /*
  * <sys/reent.h> defines __FILE, _fpos_t.
@@ -169,14 +155,6 @@ typedef _fpos64_t fpos64_t;
  * Functions defined in ANSI C standard.
  */
 
-#ifndef __VALIST
-#ifdef __GNUC__
-#define __VALIST __gnuc_va_list
-#else
-#define __VALIST char*
-#endif
-#endif
-
 #if __POSIX_VISIBLE
 char *	ctermid (char *);
 #endif
@@ -203,11 +181,11 @@ int	scanf (const char *__restrict, ...)
                _ATTRIBUTE ((__format__ (__scanf__, 1, 2)));
 int	sscanf (const char *__restrict, const char *__restrict, ...)
                _ATTRIBUTE ((__format__ (__scanf__, 2, 3)));
-int	vfprintf (FILE *__restrict, const char *__restrict, __VALIST)
+int	vfprintf (FILE *__restrict, const char *__restrict, va_list)
                _ATTRIBUTE ((__format__ (__printf__, 2, 0)));
-int	vprintf (const char *, __VALIST)
+int	vprintf (const char *, va_list)
                _ATTRIBUTE ((__format__ (__printf__, 1, 0)));
-int	vsprintf (char *__restrict, const char *__restrict, __VALIST)
+int	vsprintf (char *__restrict, const char *__restrict, va_list)
                _ATTRIBUTE ((__format__ (__printf__, 2, 0)));
 int	fgetc (FILE *);
 char *  fgets (char *__restrict, int, FILE *__restrict);
@@ -265,19 +243,19 @@ int	fcloseall (void);
 #if __ISO_C_VISIBLE >= 1999
 int	snprintf (char *__restrict, size_t, const char *__restrict, ...)
                _ATTRIBUTE ((__format__ (__printf__, 3, 4)));
-int	vsnprintf (char *__restrict, size_t, const char *__restrict, __VALIST)
+int	vsnprintf (char *__restrict, size_t, const char *__restrict, va_list)
                _ATTRIBUTE ((__format__ (__printf__, 3, 0)));
-int	vfscanf (FILE *__restrict, const char *__restrict, __VALIST)
+int	vfscanf (FILE *__restrict, const char *__restrict, va_list)
                _ATTRIBUTE ((__format__ (__scanf__, 2, 0)));
-int	vscanf (const char *, __VALIST)
+int	vscanf (const char *, va_list)
                _ATTRIBUTE ((__format__ (__scanf__, 1, 0)));
-int	vsscanf (const char *__restrict, const char *__restrict, __VALIST)
+int	vsscanf (const char *__restrict, const char *__restrict, va_list)
                _ATTRIBUTE ((__format__ (__scanf__, 2, 0)));
 #endif
 #if __GNU_VISIBLE
 int	asprintf (char **__restrict, const char *__restrict, ...)
                _ATTRIBUTE ((__format__ (__printf__, 2, 3)));
-int	vasprintf (char **, const char *, __VALIST)
+int	vasprintf (char **, const char *, va_list)
                _ATTRIBUTE ((__format__ (__printf__, 2, 0)));
 #endif
 #if __MISC_VISIBLE /* Newlib-specific */
@@ -308,27 +286,27 @@ int	siscanf (const char *, const char *, ...)
 int	sniprintf (char *, size_t, const char *, ...)
                _ATTRIBUTE ((__format__ (__printf__, 3, 4)));
 #define  __i_snprintf sniprintf
-int	vasiprintf (char **, const char *, __VALIST)
+int	vasiprintf (char **, const char *, va_list)
                _ATTRIBUTE ((__format__ (__printf__, 2, 0)));
-char *	vasniprintf (char *, size_t *, const char *, __VALIST)
+char *	vasniprintf (char *, size_t *, const char *, va_list)
                _ATTRIBUTE ((__format__ (__printf__, 3, 0)));
-char *	vasnprintf (char *, size_t *, const char *, __VALIST)
+char *	vasnprintf (char *, size_t *, const char *, va_list)
                _ATTRIBUTE ((__format__ (__printf__, 3, 0)));
-int	vdiprintf (int, const char *, __VALIST)
+int	vdiprintf (int, const char *, va_list)
                _ATTRIBUTE ((__format__ (__printf__, 2, 0)));
-int	vfiprintf (FILE *, const char *, __VALIST)
+int	vfiprintf (FILE *, const char *, va_list)
                _ATTRIBUTE ((__format__ (__printf__, 2, 0)));
-int	vfiscanf (FILE *, const char *, __VALIST)
+int	vfiscanf (FILE *, const char *, va_list)
                _ATTRIBUTE ((__format__ (__scanf__, 2, 0)));
-int	viprintf (const char *, __VALIST)
+int	viprintf (const char *, va_list)
                _ATTRIBUTE ((__format__ (__printf__, 1, 0)));
-int	viscanf (const char *, __VALIST)
+int	viscanf (const char *, va_list)
                _ATTRIBUTE ((__format__ (__scanf__, 1, 0)));
-int	vsiprintf (char *, const char *, __VALIST)
+int	vsiprintf (char *, const char *, va_list)
                _ATTRIBUTE ((__format__ (__printf__, 2, 0)));
-int	vsiscanf (const char *, const char *, __VALIST)
+int	vsiscanf (const char *, const char *, va_list)
                _ATTRIBUTE ((__format__ (__scanf__, 2, 0)));
-int	vsniprintf (char *, size_t, const char *, __VALIST)
+int	vsniprintf (char *, size_t, const char *, va_list)
                _ATTRIBUTE ((__format__ (__printf__, 3, 0)));
 #endif /* __MISC_VISIBLE */
 #endif /* !_REENT_ONLY */
@@ -381,7 +359,7 @@ FILE *	fmemopen (void *__restrict, size_t, const char *__restrict);
 /* getdelim - see __getdelim for now */
 /* getline - see __getline for now */
 FILE *	open_memstream (char **, size_t *);
-int	vdprintf (int, const char *__restrict, __VALIST)
+int	vdprintf (int, const char *__restrict, va_list)
                _ATTRIBUTE ((__format__ (__printf__, 2, 0)));
 # endif
 #endif
@@ -487,45 +465,45 @@ char *	_tempnam_r (struct _reent *, const char *, const char *);
 FILE *	_tmpfile_r (struct _reent *);
 char *	_tmpnam_r (struct _reent *, char *);
 int	_ungetc_r (struct _reent *, int, FILE *);
-int	_vasiprintf_r (struct _reent *, char **, const char *, __VALIST)
+int	_vasiprintf_r (struct _reent *, char **, const char *, va_list)
                _ATTRIBUTE ((__format__ (__printf__, 3, 0)));
-char *	_vasniprintf_r (struct _reent*, char *, size_t *, const char *, __VALIST)
+char *	_vasniprintf_r (struct _reent*, char *, size_t *, const char *, va_list)
                _ATTRIBUTE ((__format__ (__printf__, 4, 0)));
-char *	_vasnprintf_r (struct _reent*, char *, size_t *, const char *, __VALIST)
+char *	_vasnprintf_r (struct _reent*, char *, size_t *, const char *, va_list)
                _ATTRIBUTE ((__format__ (__printf__, 4, 0)));
-int	_vasprintf_r (struct _reent *, char **, const char *, __VALIST)
+int	_vasprintf_r (struct _reent *, char **, const char *, va_list)
                _ATTRIBUTE ((__format__ (__printf__, 3, 0)));
-int	_vdiprintf_r (struct _reent *, int, const char *, __VALIST)
+int	_vdiprintf_r (struct _reent *, int, const char *, va_list)
                _ATTRIBUTE ((__format__ (__printf__, 3, 0)));
-int	_vdprintf_r (struct _reent *, int, const char *__restrict, __VALIST)
+int	_vdprintf_r (struct _reent *, int, const char *__restrict, va_list)
                _ATTRIBUTE ((__format__ (__printf__, 3, 0)));
-int	_vfiprintf_r (struct _reent *, FILE *, const char *, __VALIST)
+int	_vfiprintf_r (struct _reent *, FILE *, const char *, va_list)
                _ATTRIBUTE ((__format__ (__printf__, 3, 0)));
-int	_vfiscanf_r (struct _reent *, FILE *, const char *, __VALIST)
+int	_vfiscanf_r (struct _reent *, FILE *, const char *, va_list)
                _ATTRIBUTE ((__format__ (__scanf__, 3, 0)));
-int	_vfprintf_r (struct _reent *, FILE *__restrict, const char *__restrict, __VALIST)
+int	_vfprintf_r (struct _reent *, FILE *__restrict, const char *__restrict, va_list)
                _ATTRIBUTE ((__format__ (__printf__, 3, 0)));
-int	_vfscanf_r (struct _reent *, FILE *__restrict, const char *__restrict, __VALIST)
+int	_vfscanf_r (struct _reent *, FILE *__restrict, const char *__restrict, va_list)
                _ATTRIBUTE ((__format__ (__scanf__, 3, 0)));
-int	_viprintf_r (struct _reent *, const char *, __VALIST)
+int	_viprintf_r (struct _reent *, const char *, va_list)
                _ATTRIBUTE ((__format__ (__printf__, 2, 0)));
-int	_viscanf_r (struct _reent *, const char *, __VALIST)
+int	_viscanf_r (struct _reent *, const char *, va_list)
                _ATTRIBUTE ((__format__ (__scanf__, 2, 0)));
-int	_vprintf_r (struct _reent *, const char *__restrict, __VALIST)
+int	_vprintf_r (struct _reent *, const char *__restrict, va_list)
                _ATTRIBUTE ((__format__ (__printf__, 2, 0)));
-int	_vscanf_r (struct _reent *, const char *__restrict, __VALIST)
+int	_vscanf_r (struct _reent *, const char *__restrict, va_list)
                _ATTRIBUTE ((__format__ (__scanf__, 2, 0)));
-int	_vsiprintf_r (struct _reent *, char *, const char *, __VALIST)
+int	_vsiprintf_r (struct _reent *, char *, const char *, va_list)
                _ATTRIBUTE ((__format__ (__printf__, 3, 0)));
-int	_vsiscanf_r (struct _reent *, const char *, const char *, __VALIST)
+int	_vsiscanf_r (struct _reent *, const char *, const char *, va_list)
                _ATTRIBUTE ((__format__ (__scanf__, 3, 0)));
-int	_vsniprintf_r (struct _reent *, char *, size_t, const char *, __VALIST)
+int	_vsniprintf_r (struct _reent *, char *, size_t, const char *, va_list)
                _ATTRIBUTE ((__format__ (__printf__, 4, 0)));
-int	_vsnprintf_r (struct _reent *, char *__restrict, size_t, const char *__restrict, __VALIST)
+int	_vsnprintf_r (struct _reent *, char *__restrict, size_t, const char *__restrict, va_list)
                _ATTRIBUTE ((__format__ (__printf__, 4, 0)));
-int	_vsprintf_r (struct _reent *, char *__restrict, const char *__restrict, __VALIST)
+int	_vsprintf_r (struct _reent *, char *__restrict, const char *__restrict, va_list)
                _ATTRIBUTE ((__format__ (__printf__, 3, 0)));
-int	_vsscanf_r (struct _reent *, const char *__restrict, const char *__restrict, __VALIST)
+int	_vsscanf_r (struct _reent *, const char *__restrict, const char *__restrict, va_list)
                _ATTRIBUTE ((__format__ (__scanf__, 3, 0)));
 
 /* Other extensions.  */

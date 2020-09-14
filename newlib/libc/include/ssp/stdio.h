@@ -37,13 +37,13 @@ __BEGIN_DECLS
 int __sprintf_chk(char *__restrict, int, size_t, const char *__restrict, ...)
     __printflike(4, 5);
 int __vsprintf_chk(char *__restrict, int, size_t, const char *__restrict,
-    __va_list)
+    va_list)
     __printflike(4, 0);
 int __snprintf_chk(char *__restrict, size_t, int, size_t,
     const char *__restrict, ...)
     __printflike(5, 6);
 int __vsnprintf_chk(char *__restrict, size_t, int, size_t,
-     const char *__restrict, __va_list)
+     const char *__restrict, va_list)
     __printflike(5, 0);
 char *__gets_chk(char *, size_t);
 __END_DECLS
