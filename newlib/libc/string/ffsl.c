@@ -36,6 +36,17 @@ ffsl(long i)
 		return 0;
 	return __builtin_ctzl((unsigned long)i) + 1;
 #else
-#error No __builtin_ffsl or __builtin_ctzl available!
+  int r;
+
+  if (!i)
+    return 0;
+
+  r = 0;
+  for (;;)
+    {
+      if (((1L << r++) & i) != 0)
+       return r;
+    }
+  return 0;
 #endif
 }

@@ -36,6 +36,17 @@ ffsll(long long i)
 		return 0;
 	return __builtin_ctzll((unsigned long long)i) + 1;
 #else
-#error No __builtin_ffsll or __builtin_ctzll available!
+  int r;
+
+  if (!i)
+    return 0;
+
+  r = 0;
+  for (;;)
+    {
+      if (((1LL << r++) & i) != 0)
+       return r;
+    }
+  return 0;
 #endif
 }
