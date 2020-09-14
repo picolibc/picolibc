@@ -108,7 +108,7 @@ foreach target : targets
 		  include_directories: inc),
        env: ['MESON_SOURCE_ROOT=' + meson.source_root()])
 
-  plain_tests = ['rand', 'regex', 'ungetc', 'fenv', 'math_errhandling', 'malloc', 'malloc_stress', 'tls']
+  plain_tests = ['rand', 'regex', 'ungetc', 'fenv', 'math_errhandling', 'malloc', 'malloc_stress', 'tls', 'ffs']
 
   if posix_io or not tinystdio
     plain_tests += 'posix-io'

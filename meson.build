@@ -650,7 +650,8 @@ conf_data.set('HAVE_SEMIHOST', has_semihost, description: 'Semihost APIs support
 
 # By default, tests don't require any special arguments
 
-test_c_args = []
+# disable compiler built-ins so we reach the library equivalents
+test_c_args = ['-fno-builtin']
 if tests_enable_stack_protector
   if meson.get_compiler('c').has_argument('-fstack-protector-all') and meson.get_compiler('c').has_argument('-fstack-protector-strong')
     test_c_args += ['-fstack-protector-all', '-fstack-protector-strong', '-DTESTS_ENABLE_STACK_PROTECTOR']
