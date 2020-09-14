@@ -33,22 +33,24 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "semihost-private.h"
-
-uintptr_t
-sys_semihost(uintptr_t op, uintptr_t param)
-{
-	register uintptr_t r0 asm("r0") = op;
-	register uintptr_t r1 asm("r1") = param;
+	.syntax	unified
+	.text
+	.align 4
+	.p2align 4,,15
+	.global sys_semihost
+	.type sys_semihost,%function
+#ifdef __thumb__
+	.thumb
+#endif
+sys_semihost:
 #if __ARM_ARCH_PROFILE == 'M'
-	asm("bkpt #0xab" : "=r" (r0) : "r" (r0), "r" (r1) : "memory");
+	bkpt #0xab
 #else
 #ifdef __thumb__
-	asm("svc #0xab" : "=r" (r0) : "r" (r0), "r" (r1) : "memory");
+	svc #0xab
 #else
-	asm("svc #0x123456" : "=r" (r0) : "r" (r0), "r" (r1) : "memory");
+	svc #0x123456
 #endif
 #endif
-	return r0;
-}
-
+	bx lr
+	.size sys_semihost, . - sys_semihost
