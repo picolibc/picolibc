@@ -475,11 +475,6 @@ conf_data.set('POSIX_CONSOLE', posix_console, description: 'Use POSIX I/O for st
 conf_data.set('ATOMIC_UNGETC', atomic_ungetc, description: 'Use atomics for fgetc/ungetc for re-entrancy')
 conf_data.set('HAVE_BITFIELDS_IN_PACKED_STRUCTS', have_bitfields_in_packed_structs, description: 'Use bitfields in packed structs')
 
-# This needs to be manually set for CompCert
-if meson.get_compiler('c').get_id() == 'ccomp'
-  conf_data.set('_DEFAULT_SOURCE', 1, description: 'CompCert should be handled like this')
-endif
-
 if newlib_obsolete_math == 'auto'
   obsolete_math_value = false
 elif newlib_obsolete_math == 'true'
