@@ -275,6 +275,19 @@ specs_data.set(
   meson.get_cross_property('cc1plus_spec', '')
 )
 
+# When passing the specs file to CompCert, the libcompcert needs to be included there as well
+if meson.get_compiler('c').get_id() == 'ccomp'
+  specs_data.set(
+    'ADDITIONAL_LIBS',
+    '-lcompcert'
+  )
+else
+  specs_data.set(
+    'ADDITIONAL_LIBS',
+    ''
+  )
+endif
+
 specs_extra_list = meson.get_cross_property('specs_extra', [])
 if specs_extra_list != []
   specs_extra = '\n' + '\n'.join(specs_extra_list)
