@@ -99,7 +99,7 @@ typedef unsigned long long ultoa_unsigned_t;
 typedef long long ultoa_signed_t;
 #define SIZEOF_ULTOA __SIZEOF_LONG_LONG__
 #define PRINTF_BUF_SIZE 22
-#define arg_to_t(flags, _s_, _result_)	({				\
+#define arg_to_t(flags, _s_, _result_)	{				\
 	    if ((flags) & FL_LONG) {					\
 		if ((flags) & FL_REPD_TYPE)				\
 		    *(_result_) = va_arg(ap, _s_ long long);		\
@@ -113,13 +113,13 @@ typedef long long ultoa_signed_t;
 	    } else {							\
 		*(_result_) = va_arg(ap, _s_ int);			\
 	    }								\
-	})
+	}
 #else
 typedef unsigned long ultoa_unsigned_t;
 typedef long ultoa_signed_t;
 #define SIZEOF_ULTOA __SIZEOF_LONG__
 #define PRINTF_BUF_SIZE 11
-#define arg_to_t(flags, _s_, _result_)	({				\
+#define arg_to_t(flags, _s_, _result_)	{				\
 	    if ((flags) & FL_LONG) {					\
 		*(_result_) = va_arg(ap, _s_ long);			\
 	    } else if ((flags) & FL_SHORT) {				\
@@ -127,7 +127,7 @@ typedef long ultoa_signed_t;
 	    } else {							\
 		*(_result_) = va_arg(ap, _s_ int);			\
 	    }								\
-	})
+	}
 #endif
 
 // At the call site the address of the result_var is taken (e.g. "&ap")
