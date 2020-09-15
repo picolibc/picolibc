@@ -38,6 +38,7 @@ volatile FLOAT_T makemathname(negzero) = -0.0;
 volatile FLOAT_T makemathname(one) = 1.0;
 volatile FLOAT_T makemathname(two) = 2.0;
 volatile FLOAT_T makemathname(big) = BIG;
+volatile FLOAT_T makemathname(small) = SMALL;
 
 #define cat2(a,b) a ## b
 #define str(a) #a
@@ -55,6 +56,8 @@ FLOAT_T makemathname(test_tgamma_big)(void) { return makemathname(tgamma)(makema
 FLOAT_T makemathname(test_tgamma_negbig)(void) { return makemathname(tgamma)(makemathname(-big)); }
 FLOAT_T makemathname(test_tgamma_inf)(void) { return makemathname(tgamma)(INFINITY); }
 FLOAT_T makemathname(test_tgamma_neginf)(void) { return makemathname(tgamma)(-INFINITY); }
+FLOAT_T makemathname(test_tgamma_small)(void) { return makemathname(tgamma)(SMALL); }
+FLOAT_T makemathname(test_tgamma_negsmall)(void) { return makemathname(tgamma)(-SMALL); }
 FLOAT_T makemathname(test_hypot_big)(void) { return makemathname(hypot)(makemathname(big), makemathname(big)); }
 FLOAT_T makemathname(test_lgamma_0)(void) { return makemathname(lgamma)(makemathname(zero)); }
 FLOAT_T makemathname(test_lgamma_neg0)(void) { return makemathname(lgamma)(makemathname(negzero)); }
@@ -100,6 +103,8 @@ struct {
 	TEST(tgamma_negbig, NAN, FE_INVALID, EDOM),
 	TEST(tgamma_inf, INFINITY, 0, 0),
 	TEST(tgamma_neginf, NAN, FE_INVALID, EDOM),
+	TEST(tgamma_small, INFINITY, FE_OVERFLOW, ERANGE),
+	TEST(tgamma_negsmall, -INFINITY, FE_OVERFLOW, ERANGE),
 	TEST(lgamma_0, INFINITY, FE_DIVBYZERO, ERANGE),
 	TEST(lgamma_neg0, INFINITY, FE_DIVBYZERO, ERANGE),
 	TEST(lgamma_neg1, INFINITY, FE_DIVBYZERO, ERANGE),

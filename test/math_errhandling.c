@@ -52,6 +52,7 @@
 #endif
 
 #define BIG 1.7e308
+#define SMALL 5e-324
 #define FLOAT_T double
 
 #define makemathname(s) s
@@ -59,6 +60,7 @@
 #include "math_errhandling_tests.c"
 
 #undef BIG
+#undef SMALL
 #undef makemathname
 #undef FLOAT_T
 #undef EXCEPTION_TEST
@@ -66,6 +68,7 @@
 /* Tests with floats */
 #define EXCEPTION_TEST	MATH_ERREXCEPT
 #define BIG 3e38
+#define SMALL 1e-45
 #define FLOAT_T float
 #define scat(a,b) a ## b
 #define makemathname(s) scat(s,f)
