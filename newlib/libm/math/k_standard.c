@@ -331,7 +331,7 @@ static double zero = 0.0;	/* used as const */
 	    case 40:
 	    case 140:
 		/* gamma(finite) overflow */
-		retval = HUGE_VAL;
+		retval = copysign(HUGE_VAL, x);
 		errno = ERANGE;
 		break;
 	    case 41:
