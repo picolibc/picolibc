@@ -81,8 +81,7 @@ srcs_libm_machine = srcs_libm_machine_real + [
 ]
 
 foreach target : targets
-
-  endifvalue = get_variable('target_' + target)
+	value = get_variable('target_' + target)
 	set_variable('lib_machine' + target,
 		static_library('machine' + target,
 			srcs_libm_machine_real,

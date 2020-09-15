@@ -513,9 +513,9 @@ conf_data.set('__OBSOLETE_MATH_DOUBLE', obsolete_math_double_value, description:
 
 # Check if compiler has -fno-builtin
 
-arg_fnobuiltin = ['-fno-builtin']
-if not meson.get_compiler('c').has_argument('-fno-builtin')
-  arg_fnobuiltin = []
+arg_fnobuiltin = []
+if meson.get_compiler('c').has_argument('-fno-builtin')
+  arg_fnobuiltin = ['-fno-builtin']
 endif
 
 # Compute iconv encodings to support in the library
