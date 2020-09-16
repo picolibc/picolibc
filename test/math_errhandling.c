@@ -44,6 +44,8 @@
 #define HAVE_HW_DOUBLE
 #endif
 
+#define scat(a,b) a ## b
+
 /* Tests with doubles */
 #ifdef HAVE_HW_DOUBLE
 #define EXCEPTION_TEST	MATH_ERREXCEPT
@@ -56,12 +58,14 @@
 #define FLOAT_T double
 
 #define makemathname(s) s
+#define makemathname_r(s) scat(s,_r)
 
 #include "math_errhandling_tests.c"
 
 #undef BIG
 #undef SMALL
 #undef makemathname
+#undef makemathname_r
 #undef FLOAT_T
 #undef EXCEPTION_TEST
 
@@ -70,8 +74,8 @@
 #define BIG 3e38
 #define SMALL 1e-45
 #define FLOAT_T float
-#define scat(a,b) a ## b
 #define makemathname(s) scat(s,f)
+#define makemathname_r(s) scat(s,f_r)
 
 #include "math_errhandling_tests.c"
 
