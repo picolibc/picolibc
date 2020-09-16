@@ -25,7 +25,7 @@
 void *
 reallocarray(void *optr, size_t nmemb, size_t size)
 {
-	ptrdiff_t bytes;
+	size_t bytes;
 
 	if (mul_overflow (nmemb, size, &bytes))
 	{
