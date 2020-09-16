@@ -385,6 +385,9 @@ void *foobar2(size_t, size_t) __attribute__((__alloc_size__(1, 2)));
 '''
 have_alloc_size = meson.get_compiler('c').compiles(alloc_size_code, name : 'attribute __alloc_size__')
 
+# GCC >= 3.3.0 supports __INT_MAX__ and similar; instead of looking at the compiler version, run a test (also covers CompCert, again):
+have_max_defines = meson.get_compiler('c').compiles('int test = __INT_MAX__ > __LONG_MAX__ ? __SCHAR_MAX__ : __SHRT_MAX__;', name : 'have implicit __INT_MAX__-style defines')
+
 if enable_multilib
   used_libs = []
 
@@ -539,6 +542,7 @@ conf_data.set('HAVE_BUILTIN_MUL', have_builtin_mul_overflow, description: 'Compi
 conf_data.set('HAVE_COMPLEX', have_complex, description: 'Compiler supports _Complex')
 conf_data.set('HAVE_BUILTIN_EXPECT', have_builtin_expect, description: 'Compiler has __builtin_expect')
 conf_data.set('HAVE_ALLOC_SIZE', have_alloc_size, description: 'The compiler REALLY has the attribute __alloc_size__')
+conf_data.set('HAVE_MAX_DEFINES', have_max_defines, description: 'The compiler has __INT_MAX__ and similar implicitly defined')
 
 if newlib_obsolete_math == 'auto'
   obsolete_math_value = false
