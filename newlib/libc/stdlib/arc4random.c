@@ -99,7 +99,8 @@ _rs_stir(void)
 	rs->rs_have = 0;
 	memset(rsx->rs_buf, 0, sizeof(rsx->rs_buf));
 
-	rs->rs_count = (SIZE_MAX <= 65535) ? 65000 : 1600000;
+	rs->rs_count = (SIZE_MAX <= 65535) ? 65000
+	  : (SIZE_MAX <= 1048575 ? 1048000 : 1600000);
 }
 
 static inline void

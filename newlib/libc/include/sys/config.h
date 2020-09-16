@@ -51,7 +51,7 @@ SUCH DAMAGE.
 #endif
 
 /* 16 bit integer machines */
-#if defined(__Z8001__) || defined(__Z8002__) || defined(__H8500__) || defined(__W65__) || defined (__mn10200__) || defined (__AVR__)
+#if defined(__Z8001__) || defined(__Z8002__) || defined(__H8500__) || defined(__W65__) || defined (__mn10200__) || defined (__AVR__) || defined (__MSP430__)
 
 #undef INT_MAX
 #undef UINT_MAX
@@ -194,7 +194,7 @@ SUCH DAMAGE.
 #define __SMALL_BITFIELDS
 
 #ifdef __MSP430X_LARGE__
-#define _POINTER_INT long
+#define _POINTER_INT __int20
 #else
 #define _POINTER_INT int
 #endif

@@ -24,7 +24,7 @@
 #endif
 {
         float y;
-	y = __ieee754_gammaf(x);
+	y = __ieee754_tgammaf(x);
 #ifdef _IEEE_LIBM
 	return y;
 #else

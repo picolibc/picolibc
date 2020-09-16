@@ -28,7 +28,7 @@
 #endif
 {
         double y;
-	y = __ieee754_gamma(x);
+	y = __ieee754_tgamma(x);
 #ifdef _IEEE_LIBM
 	return y;
 #else

@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # Copyright (c) 2016 Jon Turney <jon.turney@dronecode.org.uk>
 #
 # python script to convert the handwritten chapter .texi files, which include

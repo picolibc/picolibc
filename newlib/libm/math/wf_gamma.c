@@ -25,14 +25,7 @@
 	float x;
 #endif
 {
-        float y;
-        y = __ieee754_gammaf(x);
-        if(_LIB_VERSION == _IEEE_) return y;
-        if(!finitef(y)&&finitef(x)) {
-	    /* gammaf(finite) overflow */
-	    errno = ERANGE;
-        }
-	return y;
+	return lgammaf(x);
 }
 #endif
 
@@ -45,7 +38,7 @@
 	double x;
 #endif
 {
-	return (double) gammaf((float) x);
+	return (double) lgammaf((float) x);
 }
 
 #endif /* defined(_DOUBLE_IS_32BITS) */

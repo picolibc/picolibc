@@ -132,7 +132,7 @@ in terms of the base return values, although the <[signgam]> global for
 /* double gamma(double x)
  * Return the logarithm of the Gamma function of x.
  *
- * Method: call gamma_r
+ * Method: call lgamma
  */
 
 #include "fdlibm.h"
@@ -148,19 +148,7 @@ in terms of the base return values, although the <[signgam]> global for
 	double x;
 #endif
 {
-#ifdef _IEEE_LIBM
-	return __ieee754_gamma(x);
-#else
-        double y;
-        y = __ieee754_gamma(x);
-        if(_LIB_VERSION == _IEEE_) return y;
-        if(!finite(y)&&finite(x)) {
-	    /* gamma(finite) overflow */
-	    errno = ERANGE;
-        }
-	return y;
-#endif
-}             
-#endif
+	return lgamma(x);
+}
 
 #endif /* defined(_DOUBLE_IS_32BITS) */
