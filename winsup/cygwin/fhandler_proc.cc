@@ -1376,6 +1376,7 @@ format_proc_cpuinfo (void *, char *&destbuf)
 	  cpuid (&features2, &unused, &unused, &unused, 0x8000001f);
 
 	  ftcprint (features2,  1, "sev");	/* secure encrypted virt */
+	/*ftcprint (features2,  3, "sev_es"); - print below */
 	}
       /* cpuid 0x80000008 ebx */
       if (maxe >= 0x80000008)
@@ -1399,6 +1400,12 @@ format_proc_cpuinfo (void *, char *&destbuf)
 /*	  ftcprint (features1, 25, "virt_ssbd");*//* vir spec store byp dis */
 /*	  ftcprint (features1, 26, "ssb_no");	*//* ssb fixed in hardware */
         }
+
+      /* cpuid 0x8000001f eax - set above */
+      if (maxe >= 0x8000001f)
+	{
+	  ftcprint (features2,  3, "sev_es");	/* AMD SEV encrypted state */
+	}
 
       /* cpuid 0x00000007 ebx */
       if (maxf >= 0x00000007)
@@ -1579,6 +1586,7 @@ format_proc_cpuinfo (void *, char *&destbuf)
           ftcprint (features1,  8, "avx512_vp2intersect"); /* vec intcpt d/q */
           ftcprint (features1, 10, "md_clear");            /* verw clear buf */
           ftcprint (features1, 14, "serialize");           /* SERIALIZE instruction */
+          ftcprint (features1, 16, "tsxldtrk");		   /* TSX Susp Ld Addr Track */
           ftcprint (features1, 18, "pconfig");		   /* platform config */
           ftcprint (features1, 19, "arch_lbr");		   /* last branch records */
           ftcprint (features1, 28, "flush_l1d");	   /* flush l1d cache */
