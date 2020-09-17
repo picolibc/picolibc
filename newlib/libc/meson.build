@@ -42,6 +42,7 @@ machine_dirs = {
 		 'cris': 'cris',
 		 'crisv32': 'cris',
 		 'crx': 'crx',
+		 'csky' : 'csky',
 		 'd10v': 'd10v',
 		 'd30v': 'd30v',
 		 'epiphany': 'epiphany',

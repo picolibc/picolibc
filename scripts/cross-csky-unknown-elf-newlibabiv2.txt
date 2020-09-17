@@ -1,0 +1,16 @@
+[binaries]
+c = 'csky-unknown-elf-newlibabiv2-gcc'
+ar = 'csky-unknown-elf-newlibabiv2-ar'
+as = 'csky-unknown-elf-newlibabiv2-as'
+nm = 'csky-unknown-elf-newlibabiv2-nm'
+strip = 'csky-unknown-elf-newlibabiv2-strip'
+
+[host_machine]
+system = 'unknown'
+cpu_family = 'csky'
+cpu = 'csky'
+endian = 'little'
+
+[properties]
+c_args = [ '-nostdlib' ]
+skip_sanity_check = true
