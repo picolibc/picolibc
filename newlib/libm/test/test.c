@@ -92,8 +92,7 @@ main (int ac,
 }
 
 static const char *iname = "foo";
-void 
-newfunc (const char *string)
+void newfunc (const char *string)
 {
   if (strcmp(iname, string)) 
   {
@@ -388,7 +387,7 @@ kill() {}
 getpid() {}
 #endif
 
-bt(){
+void bt(){
 
   double f1,f2;
   f1 = 0.0;

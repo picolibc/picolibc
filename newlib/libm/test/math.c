@@ -47,7 +47,8 @@ double mretval = 64;
 int traperror = 1;
 char *mname;
 
-void translate_to (FILE *file,
+void
+translate_to (FILE *file,
 	    double r)
 {
   __ieee_double_shape_type bits;
@@ -233,6 +234,7 @@ int calc;
 extern int reduce;
 
 
+void
 frontline (FILE *f,
        int mag,
        one_line_type *p,
@@ -289,6 +291,7 @@ frontline (FILE *f,
   fprintf(f, ")*/\n");
 }
 
+void
 finish (FILE *f,
        int vector,
        double result,
@@ -305,6 +308,7 @@ finish (FILE *f,
   }
 }
 
+void
 finish2 (FILE *f,
 	 int vector,
 	 double result,
@@ -329,6 +333,7 @@ finish2 (FILE *f,
   }
 }
 
+void
 ffinish (FILE *f,
        int vector,
        float fresult,
@@ -345,6 +350,7 @@ ffinish (FILE *f,
   }
 }
 
+void
 ffinish2 (FILE *f,
 	  int vector,
 	  float fresult,
