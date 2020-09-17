@@ -36,11 +36,11 @@
 
 	if(!finite(y)&&finite(x)) {
 	  if (x==0.0)
-	    return __kernel_standard(x,x,42); /* tgamma pole */
+	    return __math_divzero(signbit(x)); /* tgamma pole */
 	  else if(floor(x)==x&&x<0.0)
-	    return __kernel_standard(x,x,41); /* tgamma domain */
+	    return __math_invalid(x); /* tgamma domain */
 	  else
-	    return __kernel_standard(x,x,40); /* tgamma overflow */
+	    return __math_oflow(signbit(x)); /* tgamma overflow */
 	}
 	return y;
 #endif

@@ -86,7 +86,6 @@ srcs_math = [
     'kf_tan.c',
     'k_rem_pio2.c',
     'k_sin.c',
-    'k_standard.c',
     'k_tan.c',
     's_asinh.c',
     's_atan.c',

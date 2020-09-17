@@ -34,13 +34,13 @@
 	if(!finitef(y)) {
 	  if (x==0.0f)
 	    /* tgammf pole */
-	    return (float)__kernel_standard((double)x,(double)x,142);
+	    return __math_divzerof(signbit(x));
 	  else if(floorf(x)==x&&x<0.0f)
 	    /* tgammaf domain */
-	    return (float)__kernel_standard((double)x,(double)x,141);
+	    return __math_invalidf(x);
 	  else if (finitef(x))
 	    /* tgammaf overflow */
-	    return (float)__kernel_standard((double)x,(double)x,140);
+	    return __math_oflowf(signbit(x));
 	}
 	return y;
 #endif
