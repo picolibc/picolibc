@@ -233,7 +233,7 @@ int calc;
 extern int reduce;
 
 
-frontline (FILE *f,
+void frontline (FILE *f,
        int mag,
        one_line_type *p,
        double result,
@@ -289,7 +289,7 @@ frontline (FILE *f,
   fprintf(f, ")*/\n");
 }
 
-finish (FILE *f,
+void finish (FILE *f,
        int vector,
        double result,
        one_line_type *p,
@@ -305,7 +305,7 @@ finish (FILE *f,
   }
 }
 
-finish2 (FILE *f,
+void finish2 (FILE *f,
 	 int vector,
 	 double result,
 	 double result2,
@@ -329,7 +329,7 @@ finish2 (FILE *f,
   }
 }
 
-ffinish (FILE *f,
+void ffinish (FILE *f,
        int vector,
        float fresult,
        one_line_type *p,
@@ -345,7 +345,7 @@ ffinish (FILE *f,
   }
 }
 
-ffinish2 (FILE *f,
+void ffinish2 (FILE *f,
 	  int vector,
 	  float fresult,
 	  float fresult2,
@@ -379,8 +379,7 @@ in_float_range(double arg)
 	return -FLT_MAX <= arg && arg < FLT_MAX;
 }
 
-void
-run_vector_1 (int vector,
+void run_vector_1 (int vector,
        one_line_type *p,
        char *func,
        char *name,
@@ -559,8 +558,7 @@ run_vector_1 (int vector,
   }
 }
 
-void
-test_math (int vector)
+void test_math (int vector)
 {
   test_acos(vector);
   test_acosf(vector);

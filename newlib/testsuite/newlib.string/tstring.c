@@ -56,7 +56,18 @@ void myset (char *target, char ch, int size)
 
 int main()
 {
+  /**
+   * CompCert's proof of correct compilation of array initialization
+   *  is O(pow(length of the array, 2)).
+   * So better not initialize a 11000/33000 element array "the usual way".
+   */
+#ifndef __COMPCERT__
   char target[MAX_1] = "A";
+#else
+  char target[MAX_1];
+  target[0] = 'A';
+  target[1] = '\0';
+#endif
   char first_char;
   char second_char;
   char array[] = "abcdefghijklmnopqrstuvwxz";
