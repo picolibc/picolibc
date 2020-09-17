@@ -336,6 +336,14 @@ test_specs = configure_file(input: 'test.specs.in',
 install_data('picolibc.ld',
 	     install_dir: lib_dir)
 
+# Not all compilers necessarily support all warnings used by the tests; only use these which are:
+test_c_warnings = []
+foreach arg : ['-Wno-missing-braces', '-Wno-implicit-int', '-Wno-return-type']
+  if meson.get_compiler('c').has_argument(arg)
+    test_c_warnings += [arg]
+  endif
+endforeach
+
 long_double_code = '''
 #include <float.h>
 #ifndef LDBL_MANT_DIG

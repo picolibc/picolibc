@@ -146,7 +146,7 @@ foreach target : targets
 
   test('math' + target,
        executable(test_name, math_test_src,
-		  c_args:  value[1] + ['-Wno-missing-braces', '-Wno-implicit-int', '-Wno-return-type', '-D_XOPEN_SOURCE=700', '-D_GNU_SOURCE'] + test_c_args,
+		  c_args:  value[1] + test_c_warnings + ['-D_XOPEN_SOURCE=700', '-D_GNU_SOURCE'] + test_c_args,
 		  link_with: libs,
 		  link_args: value[1] + test_link_args + ['-Wl,--gc-sections'],
 		  include_directories: inc),
@@ -160,7 +160,7 @@ if enable_native_tests
   if native_lib_m.found()
     test('math-native',
 	 executable('math_test_native', math_test_src,
-		    c_args: ['-Wno-missing-braces', '-Wno-implicit-int', '-Wno-return-type', '-D_XOPEN_SOURCE=700', '-D_GNU_SOURCE', '-DNO_NEWLIB'],
+		    c_args: test_c_warnings + ['-D_XOPEN_SOURCE=700', '-D_GNU_SOURCE', '-DNO_NEWLIB'],
 		    dependencies: native_lib_m))
   endif
 endif
