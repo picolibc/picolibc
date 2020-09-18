@@ -167,7 +167,7 @@ __strong_reference(__ieee754_lgammaf_r, lgammaf_r);
 	ix = hx&0x7fffffff;
 	if(ix>=0x7f800000) {
 	    if (hx<0 && mode)
-		return __math_invalidf(x);
+		return (x-x)/(x-x);
 	    return x*x;
 	}
 	if(ix==0) {
@@ -184,14 +184,14 @@ __strong_reference(__ieee754_lgammaf_r, lgammaf_r);
 	if(hx<0) {
 	    if(ix>=0x4b000000) { 	/* |x|>=2**23, must be -integer */
 		if (mode)
-		    return __math_invalidf(x);
+		    return (x-x)/(x-x);
 		return one/zero;
 	    }
 	    t = sin_pif(x);
 	    if(t==zero) {
 		/* tgamma wants NaN instead of INFINITY */
 		if (mode)
-		    return __math_invalidf(x);
+		    return (x-x)/(x-x);
 		return one/zero; /* -integer */
 	    }
 	    nadj = __ieee754_logf(pi/fabsf(t*x));

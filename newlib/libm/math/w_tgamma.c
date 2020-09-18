@@ -34,13 +34,11 @@
 #else
 	if(_LIB_VERSION == _IEEE_) return y;
 
-	if(!finite(y)&&finite(x)) {
-	  if (x==0.0)
-	    return __math_divzero(signbit(x)); /* tgamma pole */
-	  else if(floor(x)==x&&x<0.0)
-	    return __math_invalid(x); /* tgamma domain */
-	  else
-	    return __math_oflow(signbit(x)); /* tgamma overflow */
+	if(!finite(y)) {
+	  if(x < 0.0 && floor(x)==x)
+	    errno = EDOM;
+	  else if (finite(x))
+	    errno = ERANGE;
 	}
 	return y;
 #endif

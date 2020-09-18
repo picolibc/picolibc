@@ -32,15 +32,10 @@
 	if(_LIB_VERSION == _IEEE_) return y;
 
 	if(!finitef(y)) {
-	  if (x==0.0f)
-	    /* tgammf pole */
-	    return __math_divzerof(signbit(x));
-	  else if(floorf(x)==x&&x<0.0f)
-	    /* tgammaf domain */
-	    return __math_invalidf(x);
+	  if(x < 0.0f && floorf(x)==x)
+	    errno = EDOM;
 	  else if (finitef(x))
-	    /* tgammaf overflow */
-	    return __math_oflowf(signbit(x));
+	    errno = ERANGE;
 	}
 	return y;
 #endif

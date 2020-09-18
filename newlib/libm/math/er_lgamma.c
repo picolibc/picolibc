@@ -232,7 +232,7 @@ __strong_reference(__ieee754_lgamma_r, lgamma_r);
 	ix = hx&0x7fffffff;
 	if(ix>=0x7ff00000) {
 	    if (hx<0 && mode)
-		return __math_invalid(x);
+		return (x-x)/(x-x);
 	    return x*x;
 	}
 	if((ix|lx)==0) {
@@ -249,14 +249,14 @@ __strong_reference(__ieee754_lgamma_r, lgamma_r);
 	if(hx<0) {
 	    if(ix>=0x43300000) { /* |x|>=2**52, must be -integer */
 		if (mode)
-		    return __math_invalid(x);
+		    return (x-x)/(x-x);
 		else
 		    return one/zero; /* -integer */
 	    }
 	    t = sin_pi(x);
 	    if(t==zero) {
 		if (mode)
-		    return __math_invalid(x);
+		    return (x-x)/(x-x);
 		else
 		    return one/zero; /* -integer */
 	    }
