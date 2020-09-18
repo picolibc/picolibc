@@ -54,31 +54,21 @@ void myset (char *target, char ch, int size)
     }
 }
 
+static char target[MAX_1] = "A";
+static char buffer2[MAX_1];
+static char buffer3[MAX_1];
+static char buffer4[MAX_1];
+static char buffer5[MAX_2];
+static char buffer6[MAX_2];
+static char buffer7[MAX_2];
+static char expected[MAX_1];
+
 int main()
 {
-  /**
-   * CompCert's proof of correct compilation of array initialization
-   *  is O(pow(length of the array, 2)).
-   * So better not initialize a 11000/33000 element array "the usual way".
-   */
-#ifndef __COMPCERT__
-  char target[MAX_1] = "A";
-#else
-  char target[MAX_1];
-  target[0] = 'A';
-  target[1] = '\0';
-#endif
   char first_char;
   char second_char;
   char array[] = "abcdefghijklmnopqrstuvwxz";
   char array2[] = "0123456789!@#$%^&*(";
-  char buffer2[MAX_1];
-  char buffer3[MAX_1];
-  char buffer4[MAX_1];
-  char buffer5[MAX_2];
-  char buffer6[MAX_2];
-  char buffer7[MAX_2];
-  char expected[MAX_1];
   char *tmp1, *tmp2, *tmp3, *tmp4, *tmp5, *tmp6, *tmp7;
   int i, j, k, x, z = 0, align_test_iterations;
 
