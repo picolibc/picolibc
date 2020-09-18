@@ -694,7 +694,12 @@ void * memalign(size_t align, size_t s)
 	}
 
 	chunk_t *new_chunk_p = ptr_to_chunk(aligned_p);
+#pragma GCC diagnostic push
+#ifndef __clang__
+#pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
+#endif
 	new_chunk_p->size = chunk_p->size - offset;
+#pragma GCC diagnostic pop
 
 	make_free_chunk(chunk_p, offset);
 
