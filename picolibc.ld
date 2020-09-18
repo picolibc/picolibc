@@ -216,7 +216,7 @@ SECTIONS
 	PROVIDE (__heap_size = __heap_end - __heap_start);
 
 	/* Define a stack region to make sure it fits in memory */
-	.stack __heap_end (NOLOAD) : {
+	.stack (NOLOAD) : {
 		. += (DEFINED(__stack_size) ? __stack_size : 0x800);
 	} >ram :ram
 
