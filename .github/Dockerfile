@@ -1,4 +1,4 @@
-FROM debian:unstable AS download-tarballs
+FROM debian:testing AS download-tarballs
 
 RUN apt-get update && \
     apt-get install -y wget gnupg && \
