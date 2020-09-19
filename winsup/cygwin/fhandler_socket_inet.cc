@@ -1378,7 +1378,7 @@ fhandler_socket_wsock::send_internal (struct _WSAMSG *wsamsg, int flags)
      buffer which only gets partially written. */
   for (DWORD in_idx = 0, in_off = 0;
        in_idx < wsamsg->dwBufferCount;
-       in_off >= wsamsg->lpBuffers[in_idx].len && (++in_idx, in_off = 0))
+       in_off >= wsamsg->lpBuffers[in_idx].len && (++in_idx, (in_off = 0)))
     {
       /* Split a message into the least number of pieces to minimize the
 	 number of WsaSendTo calls.  Don't split datagram messages (bad idea).
