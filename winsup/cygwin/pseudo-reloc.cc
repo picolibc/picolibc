@@ -21,8 +21,6 @@
 #else
 # include "winsup.h"
 # include <sys/cygwin.h>
-/* custom status code: */
-# define STATUS_ILLEGAL_DLL_PSEUDO_RELOCATION ((NTSTATUS) 0xe0000269)
 #endif
 
 #include <stdio.h>
