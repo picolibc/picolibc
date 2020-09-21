@@ -191,7 +191,7 @@ static __inline void CPU_ANDNOT(cpu_set_t *destset, const cpu_set_t *srcset1,
 
 static __inline int CPU_COUNT_S(size_t setsize, const cpu_set_t *set)
 {
-  return BIT_COUNT(_cpu_set_bits(setsize), set);
+  return (int)BIT_COUNT(_cpu_set_bits(setsize), set);
 }
 
 static __inline int CPU_COUNT(const cpu_set_t *set)
