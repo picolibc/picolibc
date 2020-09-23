@@ -153,6 +153,10 @@ case "${host_cpu}" in
   crx*)
 	machine_dir=crx
 	;;
+  csky*)
+	machine_dir=csky
+	default_newlib_atexit_dynamic_alloc="no"
+	;;
   d10v*)
 	machine_dir=d10v
 	;;
@@ -723,6 +727,10 @@ newlib_cflags="${newlib_cflags} -DCLOCK_PROVIDED -DMALLOC_PROVIDED -DEXIT_PROVID
 	;;
   crx-*-*)
 	newlib_cflags="${newlib_cflags} -DHAVE_RENAME -DMISSING_SYSCALL_NAMES"
+	syscall_dir=
+	;;
+  csky*)
+	newlib_cflags="${newlib_cflags} -DHAVE_RENAME -DHAVE_SYSTEM -DMISSING_SYSCALL_NAMES"
 	syscall_dir=
 	;;
   d10v*)
