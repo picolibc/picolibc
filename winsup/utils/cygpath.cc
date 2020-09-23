@@ -24,7 +24,6 @@ details. */
 #define _WIN32_WINNT 0x0a00
 #define WINVER 0x0a00
 #define NOCOMATTRIBUTE
-#define PMEM_EXTENDED_PARAMETER PVOID
 #include <windows.h>
 #include <userenv.h>
 #include <shlobj.h>

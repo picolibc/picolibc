@@ -99,47 +99,17 @@ details. */
 extern "C" {
 #endif
 
-/* Define extended memory API here as long as not available from mingw-w64. */
+/* For the extended memory API. */
+#if __MINGW64_VERSION_MAJOR < 8
+#error "Version >= 8 of the w32api headers is required"
+#endif
 
-typedef struct _MEM_ADDRESS_REQUIREMENTS
-{
-  PVOID LowestStartingAddress;
-  PVOID HighestEndingAddress;
-  SIZE_T Alignment;
-} MEM_ADDRESS_REQUIREMENTS, *PMEM_ADDRESS_REQUIREMENTS;
-
-typedef enum MEM_EXTENDED_PARAMETER_TYPE
-{
-  MemExtendedParameterInvalidType = 0,
-  MemExtendedParameterAddressRequirements,
-  MemExtendedParameterNumaNode,
-  MemExtendedParameterPartitionHandle,
-  MemExtendedParameterUserPhysicalHandle,
-  MemExtendedParameterAttributeFlags,
-  MemExtendedParameterMax
-} MEM_EXTENDED_PARAMETER_TYPE, *PMEM_EXTENDED_PARAMETER_TYPE;
-
-#define MEM_EXTENDED_PARAMETER_TYPE_BITS 8
-
-typedef struct DECLSPEC_ALIGN(8) MEM_EXTENDED_PARAMETER
-{
-  struct
-  {
-      DWORD64 Type : MEM_EXTENDED_PARAMETER_TYPE_BITS;
-      DWORD64 Reserved : 64 - MEM_EXTENDED_PARAMETER_TYPE_BITS;
-  };
-  union
-  {
-      DWORD64 ULong64;
-      PVOID Pointer;
-      SIZE_T Size;
-      HANDLE Handle;
-      DWORD ULong;
-  };
-} MEM_EXTENDED_PARAMETER, *PMEM_EXTENDED_PARAMETER;
-
-PVOID VirtualAlloc2 (HANDLE, PVOID, SIZE_T, ULONG, ULONG,
-		     PMEM_EXTENDED_PARAMETER, ULONG);
+/* VirtualAlloc2 is declared in <w32api/memoryapi.h> if NTDDI_VERSION
+   >= NTDDI_WIN10_RS4 (a compile-time condition).  But we need the
+   declaration unconditionally, even though the function will only be
+   executed on systems that support it (a run-time condition). */
+PVOID WINAPI VirtualAlloc2 (HANDLE, PVOID, SIZE_T, ULONG, ULONG,
+			    PMEM_EXTENDED_PARAMETER, ULONG);
 
 #ifdef __cplusplus
 }
