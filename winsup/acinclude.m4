@@ -50,8 +50,6 @@ if test -n "$with_windows_headers"; then
     else
 	AC_MSG_ERROR([cannot find windef.h in specified --with-windows-headers path: $saw_windows_headers]);
     fi
-elif test -d "$winsup_srcdir/w32api/include/windef.h"; then
-    windows_headers="$winsup_srcdir/w32api/include"
 else
     windows_headers=$(cd $($ac_cv_prog_CC -xc /dev/null -E -include windef.h 2>/dev/null | sed -n 's%^# 1 "\([^"]*\)/windef\.h".*$%\1%p' | head -n1) 2>/dev/null && pwd)
     if test -z "$windows_headers" -o ! -d "$windows_headers"; then
