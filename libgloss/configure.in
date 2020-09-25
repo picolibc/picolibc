@@ -41,6 +41,9 @@ case "${target}" in
   arc*-*-*)
 	AC_CONFIG_SUBDIRS(arc)
 	;;
+  csky*-*-*)
+	AC_CONFIG_SUBDIRS(csky)
+	;;
   epiphany-*-*)
 	AC_CONFIG_SUBDIRS(epiphany)
 	config_testsuite=true
