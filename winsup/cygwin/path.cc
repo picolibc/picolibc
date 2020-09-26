@@ -2475,8 +2475,9 @@ check_reparse_point_string (PUNICODE_STRING subst)
 
 /* Return values:
     <0: Negative errno.
-     0: No symlink.
-     1: Symlink.
+     0: Not a reparse point recognized by us.
+    >0: PATH_SYMLINK | PATH_REP for symlink or directory mount point,
+        PATH_SOCKET | PATH_REP for AF_UNIX socket.
 */
 int
 check_reparse_point_target (HANDLE h, bool remote, PREPARSE_DATA_BUFFER rp,
