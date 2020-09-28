@@ -65,7 +65,9 @@ get_file_sd (HANDLE fh, path_conv &pc, security_descriptor &sd,
 			   fh ? pc.init_reopen_attr (attr, fh)
 			      : pc.get_object_attr (attr, sec_none_nih),
 			   &io, FILE_SHARE_VALID_FLAGS,
-			   FILE_OPEN_FOR_BACKUP_INTENT);
+			   FILE_OPEN_FOR_BACKUP_INTENT
+			   | pc.is_known_reparse_point ()
+			   ? FILE_OPEN_REPARSE_POINT : 0);
       if (!NT_SUCCESS (status))
 	{
 	  sd.free ();
@@ -232,7 +234,9 @@ set_file_sd (HANDLE fh, path_conv &pc, security_descriptor &sd, bool is_chown)
 				  : pc.get_object_attr (attr, sec_none_nih),
 			       &io,
 			       FILE_SHARE_VALID_FLAGS,
-			       FILE_OPEN_FOR_BACKUP_INTENT);
+			       FILE_OPEN_FOR_BACKUP_INTENT
+			       | pc.is_known_reparse_point ()
+			       ? FILE_OPEN_REPARSE_POINT : 0);
 	  if (!NT_SUCCESS (status))
 	    {
 	      fh = NULL;
