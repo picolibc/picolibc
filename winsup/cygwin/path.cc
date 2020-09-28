@@ -2655,11 +2655,15 @@ symlink_info::check_reparse_point (HANDLE h, bool remote)
   /* ret is > 0, so it's a known reparse point, path in symbuf. */
   path_flags |= ret;
   if (ret & PATH_SYMLINK)
-    sys_wcstombs (srcbuf, SYMLINK_MAX + 7, symbuf.Buffer,
-		  symbuf.Length / sizeof (WCHAR));
-  /* A symlink is never a directory. */
-  fileattr &= ~FILE_ATTRIBUTE_DIRECTORY;
-  return posixify (srcbuf);
+    {
+      sys_wcstombs (srcbuf, SYMLINK_MAX + 7, symbuf.Buffer,
+		    symbuf.Length / sizeof (WCHAR));
+      /* A symlink is never a directory. */
+      fileattr &= ~FILE_ATTRIBUTE_DIRECTORY;
+      return posixify (srcbuf);
+    }
+  else
+    return 0;
 }
 
 int
@@ -3274,6 +3278,9 @@ restart:
 		&= ~FILE_ATTRIBUTE_DIRECTORY;
 	      break;
 	    }
+	  else if (res == 0 && (path_flags & PATH_REP))
+	    /* Known reparse point but not a symlink. */
+	    goto file_not_symlink;
 	  else
 	    {
 	      /* Volume moint point or unrecognized reparse point type.
