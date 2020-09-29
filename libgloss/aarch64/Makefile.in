@@ -85,7 +85,8 @@ RDIMON_BSP	= librdimon${${MULTILIBNAME}}.a
 RDIMON_OBJS	= $(patsubst %,rdimon-%,$(OBJS))
 RDIMON_SCRIPTS	= rdimon${${MULTILIBNAME}}.specs \
 		  aem-ve${${MULTILIBNAME}}.specs \
-		  aem-validation${${MULTILIBNAME}}.specs
+		  aem-validation${${MULTILIBNAME}}.specs \
+		  aem-v8-r${${MULTILIBNAME}}.specs
 RDIMON_INSTALL	= install-rdimon
 
 CFLAGS		= -g

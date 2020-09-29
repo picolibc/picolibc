@@ -43,7 +43,9 @@ _init_vectors:
         /* Installs a table of exception vectors to catch and handle all
            exceptions by terminating the process with a diagnostic.  */
 	adr	x0, vectors
+#ifndef BUILD_FOR_R_PROFILE
 	msr	vbar_el3, x0
+#endif
 	msr	vbar_el2, x0
 	msr	vbar_el1, x0
 	ret
@@ -110,6 +112,14 @@ vectors:
 	.text
 	.align 2
 _flat_map:
+#ifdef BUILD_FOR_R_PROFILE
+	mrs	x0, sctlr_el2
+	orr	x0, x0, #1         // SCTLR_EL2.M (enable MPU)
+	orr	x0, x0, #(1 << 17) // SCTLR_EL2.BR (background regions)
+	msr	sctlr_el2, x0
+	isb
+	ret
+#else
 	/* Page table setup (identity mapping).  */
 	adrp	x0, ttb
 	add	x0, x0, :lo12:ttb
@@ -173,6 +183,7 @@ _flat_map:
        isb
 .Lnosve:
 	ret
+#endif
 
 	.data
 	.align	12

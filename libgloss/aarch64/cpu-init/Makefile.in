@@ -62,7 +62,7 @@ AR = @AR@
 LD = @LD@
 RANLIB = @RANLIB@
 
-CPU_INIT_OBJS = rdimon-aem-el3.o
+CPU_INIT_OBJS = rdimon-aem-el3.o rdimon-aem-v8-r.o
 CPU_INIT_INSTALL = install-cpu-init
 
 CFLAGS		= -g
@@ -79,9 +79,11 @@ all: ${CPU_INIT_OBJS}
 .PHONY: test
 test:
 
-# Static pattern rule for assembling cpu init files to object files.
-${CPU_INIT_OBJS}: %.o: %.S
+rdimon-aem-el3.o : rdimon-aem-el3.S
 	$(CC) $(CFLAGS_FOR_TARGET) $(CFLAGS) $(INCLUDES) -DARM_RDI_MONITOR -o $@ -c $<
+
+rdimon-aem-v8-r.o : rdimon-aem-el3.S
+	$(CC) $(CFLAGS_FOR_TARGET) $(CFLAGS) $(INCLUDES) -DARM_RDI_MONITOR -DBUILD_FOR_R_PROFILE -o $@ -c $<
 
 clean mostlyclean:
 	rm -f a.out core *.i *.o *-test *.srec *.dis *.x

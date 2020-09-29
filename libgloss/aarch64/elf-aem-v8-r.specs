@@ -1,0 +1,20 @@
+# elf-aem-v8-r.specs
+#
+# Spec file for AArch64 baremetal newlib, libgloss on Armv8-R with version 2 of
+# AngelAPI semi-hosting.
+
+%rename link old_link
+
+*link:
+-Ttext-segment 0x10000 %(old_link)
+
+%rename lib libc
+
+*libgloss:
+-lrdimon
+
+*lib:
+cpu-init/rdimon-aem-v8-r.o%s --start-group %(libc) %(libgloss) --end-group
+
+*startfile:
+crti%O%s crtbegin%O%s %{!pg:rdimon-crt0%O%s} %{pg:rdimon-crt0%O%s}
