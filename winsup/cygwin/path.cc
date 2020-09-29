@@ -2476,8 +2476,7 @@ check_reparse_point_string (PUNICODE_STRING subst)
 /* Return values:
     <0: Negative errno.
      0: Not a reparse point recognized by us.
-    >0: PATH_SYMLINK | PATH_REP for symlink or directory mount point,
-        PATH_SOCKET | PATH_REP for AF_UNIX socket.
+    >0: Path flags for a recognized reparse point, always including PATH_REP.
 */
 int
 check_reparse_point_target (HANDLE h, bool remote, PREPARSE_DATA_BUFFER rp,
@@ -2618,15 +2617,18 @@ check_reparse_point_target (HANDLE h, bool remote, PREPARSE_DATA_BUFFER rp,
 	}
       return -EIO;
     }
-#ifdef __WITH_AF_UNIX
   else if (rp->ReparseTag == IO_REPARSE_TAG_CYGUNIX)
     {
       PREPARSE_GUID_DATA_BUFFER rgp = (PREPARSE_GUID_DATA_BUFFER) rp;
 
       if (memcmp (CYGWIN_SOCKET_GUID, &rgp->ReparseGuid, sizeof (GUID)) == 0)
+#ifdef __WITH_AF_UNIX
 	return PATH_SOCKET | PATH_REP;
+#else
+        /* Recognize this as a reparse point but not as a socket.  */
+        return PATH_REP;
+#endif
     }
-#endif /* __WITH_AF_UNIX */
   return 0;
 }
 
