@@ -75,6 +75,7 @@ newlib_multithread = get_option('newlib-multithread')
 newlib_supplied_syscalls = get_option('newlib-supplied-syscalls')
 newlib_elix_level = get_option('newlib-elix-level')
 target_optspace = get_option('optimization') == 's'
+c_args = ['-include', 'picolibc.h']
 fast_strcmp = get_option('fast-strcmp')
 
 newlib_mb = get_option('newlib-mb')
@@ -413,7 +414,7 @@ if enable_multilib
   # set up the build system to compile for all desired ones
   foreach target : run_command(meson.get_compiler('c'), '--print-multi-lib').stdout().strip().split('\n')
     tmp = target.split(';')
-    flags = []
+    flags = c_args
 
     # Let the user specify a subset of the possible multilib
     # configurations to build for
@@ -467,7 +468,7 @@ if enable_multilib
   endif
 else
   targets = ['']
-  target_ = ['.', meson.get_cross_property('c_args', [])]
+  target_ = ['.', meson.get_cross_property('c_args', []) + c_args]
 endif
 
 conf_data = configuration_data()
