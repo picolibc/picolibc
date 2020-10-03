@@ -11,25 +11,16 @@ target_builddir:=@target_builddir@
 winsup_srcdir:=@winsup_srcdir@
 configure_args=@configure_args@
 
-export CC:=@CC@
-export CXX:=@CXX@
-
 CFLAGS_COMMON=-Wimplicit-fallthrough=4 -Werror
 CFLAGS:=@CFLAGS@
 CXXFLAGS:=@CXXFLAGS@
+INCLUDES:=@INCLUDES@
 override CFLAGS+=${CFLAGS_COMMON}
 override CXXFLAGS+=-fno-exceptions -fno-rtti ${CFLAGS_COMMON}
 
 include ${srcdir}/../Makefile.common
 
 cygwin_build:=${target_builddir}/winsup/cygwin
-
-cygwin_headers:=@cygwin_headers@
-
-# environment variables used by ccwrap
-export CCWRAP_HEADERS:=. ${srcdir} $(call justdir,${cygwin_headers})
-export CCWRAP_SYSTEM_HEADERS:=${cygwin_headers} @newlib_headers@
-export CCWRAP_DIRAFTER_HEADERS:=@windows_headers@
 
 WINDOWS_LIBDIR:=@windows_libdir@
 

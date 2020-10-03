@@ -593,9 +593,7 @@ MINGW_CXX
 INSTALL_DATA
 INSTALL_SCRIPT
 INSTALL_PROGRAM
-cygwin_headers
-newlib_headers
-windows_headers
+INCLUDES
 ac_ct_CXX
 CXXFLAGS
 CXX
@@ -3111,7 +3109,6 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
 
 
-addto_CPPFLAGS -nostdinc
 : ${ac_cv_prog_CXX:=$CXX}
 : ${ac_cv_prog_CC:=$CC}
 
@@ -3138,12 +3135,13 @@ else
 	as_fn_error $? "cannot find windows header files" "$LINENO" 5
     fi
 fi
-CC=$ac_cv_prog_CC
-CXX=$ac_cv_prog_CXX
-export CC
-export CXX
 
-
+INCLUDES="-I${srcdir}/../cygwin -I${target_builddir}/winsup/cygwin"
+INCLUDES="${INCLUDES} -isystem ${cygwin_headers}"
+for h in ${newlib_headers}; do
+    INCLUDES="${INCLUDES} -isystem $h"
+done
+INCLUDES="${INCLUDES} -isystem ${windows_headers}"
 
 
 

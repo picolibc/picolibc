@@ -89,7 +89,7 @@ EOF
 close TMP;
 my @avoid_headers = qw'-D_XMMINTRIN_H_INCLUDED -D_ADXINTRIN_H_INCLUDED -D_EMMINTRIN_H_INCLUDED -D_X86INTRIN_H_INCLUDED';
 my @cmd = (@ARGV, @avoid_headers, '-o', "/tmp/$$-1.cc", '-E', "/tmp/$$.cc");
-$ENV{CCWRAP_VERBOSE}=1;
+
 system @cmd;
 system 'g++', "$tgt_opt", '-o', "/tmp/$$.a.out", "/tmp/$$-1.cc" and
 ($? == 127 && system 'c++', "$tgt_opt", '-o', "/tmp/$$.a.out", "/tmp/$$-1.cc") and

@@ -1,13 +1,3 @@
-addto_CPPFLAGS() {
-    local f
-    for f; do
-	case " $CPPFLAGS " in
-	    *\ $f\ *) ;;
-	    *) CPPFLAGS="$CPPFLAGS $f" ;;
-	esac
-    done
-}
-
 realdirpath() {
     [ -z "$1" ] && return 1
     (cd "$1" 2>/dev/null && pwd)

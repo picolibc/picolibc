@@ -11,21 +11,14 @@ target_builddir:=@target_builddir@
 winsup_srcdir:=@winsup_srcdir@
 configure_args=@configure_args@
 
-export CC:=@CC@
-export CXX:=@CXX@
-
 CFLAGS:=@CFLAGS@
 override CXXFLAGS=@CXXFLAGS@
 override CXXFLAGS+=-MMD -Wimplicit-fallthrough=5 -Werror -D__OUTSIDE_CYGWIN__ -DSYSCONFDIR="\"$(sysconfdir)\""
+INCLUDES:=@INCLUDES@
 
 include ${srcdir}/../Makefile.common
 
 cygwin_build:=${target_builddir}/winsup/cygwin
-
-# environment variables used by ccwrap
-export CCWRAP_HEADERS:=$(dir ${srcdir})/cygwin ${cygwin_build}
-export CCWRAP_SYSTEM_HEADERS:=@cygwin_headers@ @newlib_headers@
-export CCWRAP_DIRAFTER_HEADERS:=@windows_headers@
 
 DESTDIR=
 prefix:=${DESTDIR}@prefix@

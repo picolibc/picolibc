@@ -14,18 +14,11 @@ target_builddir:=@target_builddir@
 winsup_srcdir:=@winsup_srcdir@
 configure_args=@configure_args@
 
-export CC:=@CC@
-export CXX:=@CXX@
-
 CFLAGS?=@CFLAGS@
 CXXFLAGS?=@CXXFLAGS@
+INCLUDES?=@INCLUDES@
 
 include ${srcdir}/../Makefile.common
-
-# environment variables used by ccwrap
-export CCWRAP_HEADERS:=. ${srcdir}
-export CCWRAP_SYSTEM_HEADERS:=@cygwin_headers@ @newlib_headers@
-export CCWRAP_DIRAFTER_HEADERS:=@windows_headers@
 
 VPATH+=$(srcdir)/regex $(srcdir)/lib $(srcdir)/libc $(srcdir)/math $(srcdir)/tzcode
 
@@ -788,7 +781,7 @@ src_files := $(foreach dir,$(VPATH),$(find_src_files))
 # second, so version.cc is always older than winver.o
 version.cc: mkvers.sh include/cygwin/version.h winver.rc $(src_files)
 	@echo "Making version.cc and winver.o";\
-	/bin/sh ${word 1,$^} ${word 2,$^} ${word 3,$^} $(WINDRES) ${CFLAGS} $(addprefix -I,${CCWRAP_SYSTEM_HEADERS} ${CCWRAP_DIRAFTER_HEADERS})
+	/bin/sh ${word 1,$^} ${word 2,$^} ${word 3,$^} $(WINDRES) ${CFLAGS} -I${srcdir}/include
 $(VERSION_OFILES): version.cc
 
 Makefile: ${srcdir}/Makefile.in
@@ -815,7 +808,7 @@ CTAGS:
 	ctags -R --c++-kinds=+p --fields=+iaS --extra=+q \
 	--regex-C++='/EXPORT_ALIAS *\([a-zA-Z0-9_]*, *([a-zA-Z0-9_]*)\)/\1/' \
 	--regex-C++='/__ASMNAME *\("([a-zA-Z0-9_]+)"\)/\1/' \
-	@newlib_headers@ .
+	.
 
 deps:=${wildcard *.d}
 ifneq (,$(deps))

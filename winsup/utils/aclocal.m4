@@ -42,7 +42,6 @@ AC_SUBST(windows_libdir)
 )
 
 AC_DEFUN([AC_CYGWIN_INCLUDES], [
-addto_CPPFLAGS -nostdinc
 : ${ac_cv_prog_CXX:=$CXX}
 : ${ac_cv_prog_CC:=$CC}
 
@@ -69,13 +68,14 @@ else
 	AC_MSG_ERROR([cannot find windows header files])
     fi
 fi
-CC=$ac_cv_prog_CC
-CXX=$ac_cv_prog_CXX
-export CC
-export CXX
-AC_SUBST(windows_headers)
-AC_SUBST(newlib_headers)
-AC_SUBST(cygwin_headers)
+
+INCLUDES="-I${srcdir}/../cygwin -I${target_builddir}/winsup/cygwin"
+INCLUDES="${INCLUDES} -isystem ${cygwin_headers}"
+for h in ${newlib_headers}; do
+    INCLUDES="${INCLUDES} -isystem $h"
+done
+INCLUDES="${INCLUDES} -isystem ${windows_headers}"
+AC_SUBST(INCLUDES)
 ])
 
 AC_DEFUN([AC_CONFIGURE_ARGS], [
