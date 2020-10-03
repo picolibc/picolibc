@@ -30,8 +30,6 @@ top_builddir:=$(call justdir,${target_builddir})
 cygwin_build:=${target_builddir}/winsup/cygwin
 newlib_build:=${target_builddir}/newlib
 
-nostdlib:=-nostdlib
-
 VPATH:=${srcdir}
 
 .SUFFIXES:
