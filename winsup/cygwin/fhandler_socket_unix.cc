@@ -1064,6 +1064,7 @@ fhandler_socket_unix::listen_pipe ()
   IO_STATUS_BLOCK io;
   HANDLE evt = NULL;
   DWORD waitret = WAIT_OBJECT_0;
+  int ret = -1;
 
   io.Status = STATUS_PENDING;
   if (!is_nonblocking () && !(evt = create_event ()))
@@ -1085,9 +1086,11 @@ fhandler_socket_unix::listen_pipe ()
     set_errno (EINTR);
   else if (status == STATUS_PIPE_LISTENING)
     set_errno (EAGAIN);
-  else if (status != STATUS_PIPE_CONNECTED)
+  else if (status == STATUS_SUCCESS || status == STATUS_PIPE_CONNECTED)
+    ret = 0;
+  else
     __seterrno_from_nt_status (status);
-  return (status == STATUS_PIPE_CONNECTED) ? 0 : -1;
+  return ret;
 }
 
 ULONG
