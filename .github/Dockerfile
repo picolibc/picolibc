@@ -15,8 +15,8 @@ RUN apt-get update && \
     gcc-riscv64-unknown-elf \
     gcc-aarch64-linux-gnu \
     gcc-xtensa-lx106 \
-    qemu-system-arm=1:5.0-5.1 \
-    qemu-system-misc=1:5.0-5.1 \
+    qemu-system-arm=1:5.0-5.2 \
+    qemu-system-misc=1:5.0-5.2 \
     clang lld || apt-get install -y \
     build-essential \
     meson \
@@ -26,8 +26,8 @@ RUN apt-get update && \
     gcc-riscv64-unknown-elf \
     gcc-aarch64-linux-gnu \
     gcc-xtensa-lx106 \
-    qemu-system-arm=1:5.0-5.1 \
-    qemu-system-misc=1:5.0-5.1 \
+    qemu-system-arm=1:5.0-5.2 \
+    qemu-system-misc=1:5.0-5.2 \
     clang lld || apt-get install -y \
     build-essential \
     meson \
@@ -37,8 +37,8 @@ RUN apt-get update && \
     gcc-riscv64-unknown-elf \
     gcc-aarch64-linux-gnu \
     gcc-xtensa-lx106 \
-    qemu-system-arm=1:5.0-5.1 \
-    qemu-system-misc=1:5.0-5.1 \
+    qemu-system-arm=1:5.0-5.2 \
+    qemu-system-misc=1:5.0-5.2 \
     clang lld || apt-get install -y \
     build-essential \
     meson \
@@ -48,8 +48,8 @@ RUN apt-get update && \
     gcc-riscv64-unknown-elf \
     gcc-aarch64-linux-gnu \
     gcc-xtensa-lx106 \
-    qemu-system-arm=1:5.0-5.1 \
-    qemu-system-misc=1:5.0-5.1 \
+    qemu-system-arm=1:5.0-5.2 \
+    qemu-system-misc=1:5.0-5.2 \
     clang lld)
 
 # Copy picolibc into container
