@@ -1366,6 +1366,7 @@ fhandler_socket_unix::socket (int af, int type, int protocol, int flags)
   wmem (262144);
   set_addr_family (AF_UNIX);
   set_socket_type (type);
+  set_flags (O_RDWR | O_BINARY);
   if (flags & SOCK_NONBLOCK)
     set_nonblocking (true);
   if (flags & SOCK_CLOEXEC)
