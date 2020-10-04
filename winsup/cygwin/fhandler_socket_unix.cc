@@ -941,7 +941,11 @@ fhandler_socket_unix::open_pipe (PUNICODE_STRING pipe_name, bool xchg_sock_info)
     {
       set_handle (ph);
       if (xchg_sock_info)
-	send_sock_info (false);
+	{
+	  /* FIXME: Should we check for errors? */
+	  send_sock_info (false);
+	  recv_peer_info ();
+	}
     }
   return status;
 }
