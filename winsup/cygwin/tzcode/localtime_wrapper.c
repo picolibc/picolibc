@@ -11,6 +11,7 @@ details. */
 #include "tz_posixrules.h"
 #include <cygwin/version.h>
 #include <stdlib.h>
+#include <sys/_tz_structs.h>
 
 static NO_COPY SRWLOCK tzset_guard = SRWLOCK_INIT;
 
