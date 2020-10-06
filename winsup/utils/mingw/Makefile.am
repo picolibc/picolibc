@@ -1,0 +1,50 @@
+# Makefile for Cygwin utilities
+
+# This file is part of Cygwin.
+
+# This software is a copyrighted work licensed under the terms of the
+# Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
+# details.
+
+# We put utilities built with a MinGW compiler in a separate Makefile here
+# because it's tricky with Automake to use different compilers for the same
+# language in the same Makefile.
+
+override CXX = @MINGW_CXX@
+INCLUDES =
+
+include $(top_srcdir)/Makefile.am.common
+
+CFLAGS_COMMON=-Wimplicit-fallthrough=4 -Werror
+AM_CXXFLAGS=-fno-exceptions -fno-rtti -fno-use-cxa-atexit $(flags_common) $(CFLAGS_COMMON)
+
+bin_PROGRAMS = \
+	cygcheck \
+	cygwin-console-helper \
+	ldh \
+	strace
+
+cygcheck_SOURCES = \
+	../bloda.cc \
+	../cygcheck.cc \
+	../dump_setup.cc \
+	../path.cc
+cygcheck_LDADD = -lz -lwininet -lpsapi -lntdll
+
+cygwin_console_helper_SOURCES = ../cygwin-console-helper.cc
+
+ldh_SOURCES = ../ldh.cc
+
+strace_SOURCES = \
+	../path.cc \
+	../strace.cc
+strace_LDADD = -lntdll
+
+noinst_PROGRAMS = path-testsuite
+
+path_testsuite_SOURCES = \
+	../path.cc \
+	../testsuite.cc
+path_testsuite_CXXFLAGS = -DTESTSUITE
+
+TESTS = path-testsuite

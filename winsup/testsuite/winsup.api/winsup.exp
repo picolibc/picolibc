@@ -9,12 +9,14 @@ if { ! [isnative] } {
 set rv ""
 
 set ltp_includes "-I$ltp_includes"
-set ltp_libs "$rootme/libltp.a"
+set ltp_libs "$ltp_libs"
 
 set add_includes $ltp_includes
 set add_libs $ltp_libs
 
 set test_filter ""
+
+set env(PATH) "$runtime_root:$env(PATH)"
 
 if { [info exists env(CYGWIN_TESTSUITE_TESTS)] } {
     set test_filter "$env(CYGWIN_TESTSUITE_TESTS)"
@@ -69,7 +71,7 @@ foreach src [lsort [glob -nocomplain $srcdir/$subdir/*.c $srcdir/$subdir/*/*.{cc
 	       set redirect_output /dev/null
 	    }
 	    file mkdir $tmpdir/$base
-	    ws_spawn "$rootme/cygrun ./$base.exe $testdll_tmpdir/$base > $redirect_output"
+	    ws_spawn "$cygrun ./$base.exe $testdll_tmpdir/$base > $redirect_output"
 	    file delete -force $tmpdir/$base
 	    if { $rv } {
 		fail "$testcase (execute)"

@@ -10,8 +10,10 @@ dnl Process this file with autoconf to produce a configure script.
 
 AC_PREREQ([2.59])
 AC_INIT([Cygwin],[0],[cygwin@cygwin.com],[cygwin],[https://cygwin.com])
-AC_CONFIG_SRCDIR(Makefile.in)
 AC_CONFIG_AUX_DIR(..)
+AC_CANONICAL_TARGET
+AM_INIT_AUTOMAKE([dejagnu foreign no-define no-dist subdir-objects -Wall -Wno-portability -Wno-extra-portability])
+AM_SILENT_RULES([yes])
 
 realdirpath() {
     test -z "$1" && return 1
@@ -26,13 +28,15 @@ realdirpath() {
 winsup_srcdir="$(realdirpath $srcdir)"
 target_builddir="$(realdirpath ..)"
 
-AC_PROG_INSTALL
 AC_NO_EXECUTABLES
-AC_CANONICAL_TARGET
 
+AC_PROG_INSTALL
+AC_PROG_MKDIR_P
 AC_PROG_CC
 AC_PROG_CXX
 AC_PROG_CPP
+AM_PROG_AS
+
 AC_LANG(C)
 AC_LANG(C++)
 
@@ -82,6 +86,8 @@ AC_SUBST(DEF_DLL_ENTRY)
 AC_SUBST(DIN_FILE)
 AC_SUBST(TLSOFFSETS_H)
 
+AM_CONDITIONAL(TARGET_X86_64, [test $target_cpu = "x86_64"])
+
 AC_CHECK_PROGS([DOCBOOK2XTEXI], [docbook2x-texi db2x_docbook2texi], [true])
 
 if test "x$with_cross_bootstrap" != "xyes"; then
@@ -90,7 +96,14 @@ if test "x$with_cross_bootstrap" != "xyes"; then
     AC_CHECK_PROGS(MINGW_CC, ${target_cpu}-w64-mingw32-gcc)
     test -n "$MINGW_CC" || AC_MSG_ERROR([no acceptable MinGW gcc found in \$PATH])
 fi
+AM_CONDITIONAL(CROSS_BOOTSTRAP, [test "x$with_cross_bootstrap" != "xyes"])
+
 AC_EXEEXT
+
+AC_CHECK_LIB([bfd], [bfd_init], [true],
+	     AC_MSG_WARN([Not building dumper.exe since some required libraries or headers are missing]))
+
+AM_CONDITIONAL(BUILD_DUMPER, [test "x$ac_cv_lib_bfd_bfd_init" = "xyes"])
 
 AC_CONFIG_FILES([
     Makefile
@@ -98,7 +111,9 @@ AC_CONFIG_FILES([
     cygserver/Makefile
     doc/Makefile
     utils/Makefile
+    utils/mingw/Makefile
     testsuite/Makefile
+    testsuite/cygrun/Makefile
 ])
 
 AC_OUTPUT

@@ -1,4 +1,4 @@
-/* config.h.in.  Generated from configure.ac by autoheader.  */
+/* cygwin/config.h.in.  Generated from configure.ac by autoheader.  */
 
 /* Define if DEBUGGING support is requested. */
 #undef DEBUGGING
