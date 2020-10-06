@@ -16,24 +16,12 @@ if test -z "$newlib_headers"; then
 fi
 newlib_headers="$target_builddir/newlib/targ-include $newlib_headers"
 
-INCLUDES="-I${srcdir}/../cygwin -I${target_builddir}/winsup/cygwin"
+INCLUDES="-I${winsup_srcdir}/cygwin -I${target_builddir}/winsup/cygwin"
 INCLUDES="${INCLUDES} -isystem ${cygwin_headers}"
 for h in ${newlib_headers}; do
     INCLUDES="${INCLUDES} -isystem $h"
 done
 AC_SUBST(INCLUDES)
-])
-
-AC_DEFUN([AC_CONFIGURE_ARGS], [
-configure_args=X
-for f in $ac_configure_args; do
-    case "$f" in
-	*--srcdir*) ;;
-	*) configure_args="$configure_args $f" ;;
-    esac
-done
-configure_args=$(/usr/bin/expr "$configure_args" : 'X \(.*\)')
-AC_SUBST(configure_args)
 ])
 
 AC_SUBST(target_builddir)

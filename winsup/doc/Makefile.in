@@ -54,9 +54,6 @@ all: Makefile Makefile.dep \
 	intro2man.stamp \
 	cygwin-ug-net.info cygwin-api.info
 
-Makefile: $(srcdir)/Makefile.in
-	/bin/sh ./config.status
-
 clean:
 	rm -f Makefile.dep
 	rm -f *.html *.html.gz

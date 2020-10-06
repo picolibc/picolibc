@@ -9,7 +9,6 @@
 srcdir:=@srcdir@
 target_builddir:=@target_builddir@
 winsup_srcdir:=@winsup_srcdir@
-configure_args=@configure_args@
 
 CC:=@CC@
 CXX:=@CXX@
@@ -68,9 +67,6 @@ cygserver.exe: $(CYGWIN_LIB) $(OBJS)
 
 $(cygwin_build)/%.o:
 	$(MAKE) -C $(@D) $(@F)
-
-Makefile: Makefile.in configure
-	./config.status
 
 lib%.o: %.cc
 	${filter-out -D__OUTSIDE_CYGWIN__, $(COMPILE.cc)} -c -o $(@D)/${basename $(@F)}.o $<

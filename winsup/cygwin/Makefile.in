@@ -12,7 +12,6 @@
 srcdir:=@srcdir@
 target_builddir:=@target_builddir@
 winsup_srcdir:=@winsup_srcdir@
-configure_args=@configure_args@
 
 CC:=@CC@
 CXX:=@CXX@
@@ -673,10 +672,6 @@ $(TEST_LIB_NAME): $(LIB_NAME)
 $(LIBSERVER): ${cygserver_blddir}/Makefile
 	$(MAKE) -C ${cygserver_blddir} libcygserver.a
 
-${cygserver_blddir}/Makefile:
-	/bin/mkdir -p ${@D}
-	cd ${@D} && exec /bin/sh $(dir ${srcdir})/cygserver/configure ${configure_args}
-
 dll_ofiles: $(DLL_OFILES)
 
 $(LIBGMON_A): $(GMON_OFILES) $(GMON_START)
@@ -753,9 +748,6 @@ version.cc: mkvers.sh include/cygwin/version.h winver.rc $(src_files)
 	export CC="${CC}";\
 	/bin/sh ${word 1,$^} ${word 2,$^} ${word 3,$^} $(WINDRES) ${CFLAGS} -I${srcdir}/include
 $(VERSION_OFILES): version.cc
-
-Makefile: ${srcdir}/Makefile.in
-	/bin/sh ./config.status
 
 $(DEF_FILE): gendef $(srcdir)/$(TLSOFFSETS_H) $(DIN_FILE)
 	$(word 1,$^) --cpu=${target_cpu} --output-def=$@  --tlsoffsets=$(word 2,$^) $(wordlist 3,99,$^)

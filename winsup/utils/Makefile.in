@@ -9,7 +9,6 @@
 srcdir:=@srcdir@
 target_builddir:=@target_builddir@
 winsup_srcdir:=@winsup_srcdir@
-configure_args=@configure_args@
 
 CC:=@CC@
 CXX:=@CXX@
@@ -52,7 +51,9 @@ CYGWIN_BINS := ${addsuffix .exe,chattr cygpath gencat getconf getfacl ldd locale
 
 # List all binaries to be linked in MinGW mode.  Each binary on this list
 # must have a corresponding .o of the same name.
+ifdef MINGW_CXX
 MINGW_BINS := ${addsuffix .exe,cygcheck cygwin-console-helper ldh strace}
+endif
 
 # List all objects to be compiled in MinGW mode.  Any object not on this
 # list will will be compiled in Cygwin mode implicitly, so there is no
@@ -166,9 +167,6 @@ install: all
 	  $(INSTALL_PROGRAM) $$i $(DESTDIR)$(bindir)/$$i; \
 	done
 
-$(cygwin_build)/libcygwin.a: $(cygwin_build)/Makefile
-	@$(MAKE) -C $(@D) $(@F)
-
 .PHONY: warn_dumper
 warn_dumper:
 	@echo '*** Not building dumper.exe since some required libraries or'
@@ -177,6 +175,3 @@ warn_dumper:
 	@echo '*** If you need this program, check out the naked-bfd and naked-intl'
 	@echo '*** sources from sourceware.org.  Then, configure and build these'
 	@echo '*** libraries.  Otherwise, you can safely ignore this warning.'
-
-Makefile: Makefile.in config.status
-	/bin/sh ./config.status

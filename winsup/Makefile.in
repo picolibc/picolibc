@@ -40,7 +40,7 @@ INSTALL:=@INSTALL@
 INSTALL_PROGRAM:=@INSTALL_PROGRAM@
 INSTALL_DATA:=@INSTALL_DATA@
 
-SUBDIRS=@subdirs@
+SUBDIRS=cygwin cygserver doc utils testsuite
 INSTALL_SUBDIRS=${patsubst %,install_%,$(SUBDIRS)}
 CLEAN_SUBDIRS=${patsubst %,clean_%,$(SUBDIRS)}
 
@@ -88,7 +88,7 @@ $(CLEAN_SUBDIRS):
 
 .PRECIOUS: Makefile
 
-Makefile: Makefile.in $(srcdir)/configure config.status
+Makefile: Makefile.in ${patsubst %,%/Makefile.in,$(SUBDIRS)} $(srcdir)/configure config.status
 	$(SHELL) config.status
 
 config.status: configure
@@ -102,6 +102,8 @@ utils: cygwin
 cygwin:
 
 cygserver: cygwin
+
+testsuite: cygwin
 
 install_utils: cygwin
 

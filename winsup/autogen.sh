@@ -10,8 +10,3 @@ fi
 /usr/bin/aclocal --force
 /usr/bin/autoconf -f
 /bin/rm -rf autom4te.cache
-res=0
-for d in cygwin utils cygserver testsuite; do
-    (cd $d && exec ./autogen.sh) || res=1
-done
-exit $res

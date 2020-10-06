@@ -119,7 +119,7 @@ tmpdir = $(abspath $(objdir)/testsuite/tmp/)
 # understood by the test DLL, which will have a different mount table)
 testdll_tmpdir = $(shell cygpath -ma $(tmpdir) | sed -e 's#^\([A-Z]\):#/cygdrive/\L\1#')
 
-site.exp: ./config.status Makefile
+site.exp: ../config.status Makefile
 	@echo "Making a new config file..."
 	-@rm -f ./tmp?
 	@touch site.exp
@@ -163,11 +163,10 @@ check: $(TESTSUP_LIB_NAME) $(RUNTIME) cygrun.exe testsuite/site.exp
 	PATH=$$rootme/../cygwin:$${PATH} ;\
 	cd testsuite; runtest --tool winsup $(RUNTESTFLAGS)
 
+ifdef MINGW_CC
 cygrun.o: cygrun.c
 	$(MINGW_CC) $(MINGW_CFLAGS) -o $@ -c $<
 
 cygrun.exe : cygrun.o
 	$(MINGW_CC) $(MINGW_LDFLAGS) -o $@ $<
-
-Makefile: Makefile.in $(srcdir)/configure config.status
-	$(SHELL) config.status
+endif
