@@ -44,8 +44,6 @@ SUBDIRS=@subdirs@
 INSTALL_SUBDIRS=${patsubst %,install_%,$(SUBDIRS)}
 CLEAN_SUBDIRS=${patsubst %,clean_%,$(SUBDIRS)}
 
-INSTALL_LICENSE:=@INSTALL_LICENSE@
-
 .PHONY: all install clean distclean all-info info install-info install-license check \
 	$(SUBDIRS) $(INSTALL_SUBDIRS) $(CLEAN_SUBDIRS)
 
@@ -67,7 +65,7 @@ install-license: CYGWIN_LICENSE COPYING
 	  ${INSTALL} $$i $(DESTDIR)$(prefix)/share/doc/Cygwin ; \
 	done
 
-install: Makefile $(INSTALL_LICENSE) $(INSTALL_SUBDIRS)
+install: Makefile install-license $(INSTALL_SUBDIRS)
 
 clean distclean: $(CLEAN_SUBDIRS)
 

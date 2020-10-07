@@ -39,9 +39,5 @@ if test "x$with_cross_bootstrap" != "xyes"; then
     AC_CONFIG_SUBDIRS([utils])
 fi
 
-INSTALL_LICENSE="install-license"
-
-AC_SUBST(INSTALL_LICENSE)
-
 AC_CONFIG_FILES([Makefile])
 AC_OUTPUT

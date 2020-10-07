@@ -589,7 +589,6 @@ ac_no_link=no
 enable_option_checking=no
 ac_subst_vars='LTLIBOBJS
 LIBOBJS
-INSTALL_LICENSE
 subdirs
 cygwin_headers
 newlib_headers
@@ -3452,10 +3451,6 @@ if test "x$with_cross_bootstrap" != "xyes"; then
     subdirs="$subdirs utils"
 
 fi
-
-INSTALL_LICENSE="install-license"
-
-
 
 ac_config_files="$ac_config_files Makefile"
 
