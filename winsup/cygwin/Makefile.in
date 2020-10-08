@@ -71,7 +71,6 @@ CRT0:=$(cygwin_build)/crt0.o
 #
 # --enable options from configure
 #
-MT_SAFE:=@MT_SAFE@
 CCEXTRA=
 COMMON_CFLAGS=-MMD ${$(*F)_CFLAGS} -Wimplicit-fallthrough=5 -Werror -fmerge-constants -ftracer $(CCEXTRA)
 ifeq ($(target_cpu),x86_64)
@@ -147,7 +146,6 @@ MALLOC_OFILES:=malloc.o
 
 DLL_IMPORTS:=${shell $(CC) -print-file-name=w32api/libkernel32.a} ${shell $(CC) -print-file-name=w32api/libntdll.a}
 
-MT_SAFE_OBJECTS:=
 #
 LIBC_OFILES:= \
 	arc4random_stir.o \
@@ -419,8 +417,7 @@ DLL_OFILES:= \
 	$(MALLOC_OFILES) \
 	$(LIBC_OFILES) \
 	$(MATH_OFILES) \
-	$(TZCODE_OFILES) \
-	$(MT_SAFE_OBJECTS)
+	$(TZCODE_OFILES)
 
 EXCLUDE_STATIC_OFILES:=$(addprefix --exclude=,\
 	cygtls.o \
