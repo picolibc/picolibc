@@ -589,7 +589,6 @@ ac_no_link=no
 enable_option_checking=no
 ac_subst_vars='LTLIBOBJS
 LIBOBJS
-SET_MAKE
 INSTALL_LICENSE
 subdirs
 cygwin_headers
@@ -3456,38 +3455,6 @@ fi
 
 INSTALL_LICENSE="install-license"
 
-
-
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether ${MAKE-make} sets \$(MAKE)" >&5
-$as_echo_n "checking whether ${MAKE-make} sets \$(MAKE)... " >&6; }
-set x ${MAKE-make}
-ac_make=`$as_echo "$2" | sed 's/+/p/g; s/[^a-zA-Z0-9_]/_/g'`
-if eval \${ac_cv_prog_make_${ac_make}_set+:} false; then :
-  $as_echo_n "(cached) " >&6
-else
-  cat >conftest.make <<\_ACEOF
-SHELL = /bin/sh
-all:
-	@echo '@@@%%%=$(MAKE)=@@@%%%'
-_ACEOF
-# GNU make sometimes prints "make[1]: Entering ...", which would confuse us.
-case `${MAKE-make} -f conftest.make 2>/dev/null` in
-  *@@@%%%=?*=@@@%%%*)
-    eval ac_cv_prog_make_${ac_make}_set=yes;;
-  *)
-    eval ac_cv_prog_make_${ac_make}_set=no;;
-esac
-rm -f conftest.make
-fi
-if eval test \$ac_cv_prog_make_${ac_make}_set = yes; then
-  { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
-$as_echo "yes" >&6; }
-  SET_MAKE=
-else
-  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
-$as_echo "no" >&6; }
-  SET_MAKE="MAKE=${MAKE-make}"
-fi
 
 
 ac_config_files="$ac_config_files Makefile"

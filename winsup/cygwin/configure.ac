@@ -59,8 +59,6 @@ AC_CHECK_TOOL(RANLIB, ranlib, ranlib)
 AC_CHECK_TOOL(STRIP, strip, strip)
 AC_CHECK_TOOL(WINDRES, windres, windres)
 
-AC_PROG_MAKE_SET
-
 AC_ARG_ENABLE(debugging,
 [ --enable-debugging		Build a cygwin DLL which has more consistency checking for debugging],
 [case "${enableval}" in

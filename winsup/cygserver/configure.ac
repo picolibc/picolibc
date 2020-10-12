@@ -55,8 +55,6 @@ AC_CHECK_TOOL(NM, nm, nm)
 AC_CHECK_TOOL(DLLTOOL, dlltool, dlltool)
 AC_CHECK_TOOL(WINDRES, windres, windres)
 
-AC_PROG_MAKE_SET
-
 AC_ARG_ENABLE(debugging,
 [ --enable-debugging		Build a cygwin DLL which has more consistency checking for debugging],
 [case "${enableval}" in
