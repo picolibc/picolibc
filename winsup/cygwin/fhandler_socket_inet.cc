@@ -1208,7 +1208,7 @@ fhandler_socket_inet::recv_internal (LPWSAMSG wsamsg, bool use_recvmsg)
 		  --wsacnt;
 		}
 	    }
-	  if (!wret)
+	  if (!wsacnt)
 	    break;
 	}
       else if (WSAGetLastError () != WSAEWOULDBLOCK)
