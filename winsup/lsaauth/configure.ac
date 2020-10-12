@@ -32,8 +32,6 @@ esac
 AC_CHECK_PROGS(MINGW64_CC, x86_64-w64-mingw32-gcc)
 test -z "$MINGW64_CC" && AC_MSG_ERROR([no acceptable mingw64 cc found in \$PATH])
 
-AC_ARG_PROGRAM
-
 AC_PROG_INSTALL
 
 AC_CONFIG_FILES([Makefile cyglsa.def:cyglsa.din])

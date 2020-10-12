@@ -37,7 +37,6 @@ prefix:=@prefix@
 exec_prefix:=@exec_prefix@
 
 bindir:=@bindir@
-program_transform_name:=@program_transform_name@
 
 override INSTALL:=@INSTALL@
 override INSTALL_PROGRAM:=@INSTALL_PROGRAM@
@@ -176,8 +175,7 @@ realclean: clean
 install: all
 	/bin/mkdir -p ${DESTDIR}${bindir}
 	for i in $(CYGWIN_BINS) ${filter-out testsuite.exe,$(MINGW_BINS)} ; do \
-	  n=`echo $$i | sed '$(program_transform_name)'`; \
-	  $(INSTALL_PROGRAM) $$i $(DESTDIR)$(bindir)/$$n; \
+	  $(INSTALL_PROGRAM) $$i $(DESTDIR)$(bindir)/$$i; \
 	done
 
 $(cygwin_build)/libcygwin.a: $(cygwin_build)/Makefile

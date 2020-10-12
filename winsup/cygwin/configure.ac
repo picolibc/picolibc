@@ -67,21 +67,6 @@ no)	 ;;
 esac
 ])
 
-dnl The only time we might want to transform the install names
-dnl is for unix x cygwin.  Otherwise we don't.  For now we don't
-dnl transform names.
-
-dnl if test "x$cross_compiling" = "xno" -a ; then
-dnl   if test "x$program_transform_name" = "xs,x,x,"; then
-dnl     program_transform_name=""
-dnl   fi
-dnl   if test "x$program_transform_name" = "x"; then
-dnl     program_transform_name="s,^,$target_alias-,"
-dnl   else
-dnl     program_transform_name="$program_transform_name -e s,^,$target_alias-,"
-dnl   fi
-dnl fi
-
 case "$target_cpu" in
    i?86)
 		DLL_NAME="cygwin1.dll"

@@ -4403,8 +4403,6 @@ esac
 fi
 
 
-
-
 case "$target_cpu" in
    i?86)
 		DLL_NAME="cygwin1.dll"
