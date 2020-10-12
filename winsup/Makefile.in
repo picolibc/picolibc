@@ -122,5 +122,3 @@ install_utils: cygwin
 install_cygwin:
 
 install_cygserver: cygwin
-
-lsaauth:
