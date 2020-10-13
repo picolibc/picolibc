@@ -1563,6 +1563,7 @@ format_proc_cpuinfo (void *, char *&destbuf)
 	  ftcprint (features1, 25, "cldemote");         /* cldemote instr */
 	  ftcprint (features1, 27, "movdiri");          /* movdiri instr */
 	  ftcprint (features1, 28, "movdir64b");        /* movdir64b instr */
+	  ftcprint (features1, 29, "enqcmd");		/* enqcmd/s instructions*/
         }
 
       /* AMD MCA cpuid 0x80000007 ebx */
