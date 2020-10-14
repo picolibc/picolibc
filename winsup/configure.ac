@@ -25,11 +25,6 @@ AC_PROG_CPP
 AC_LANG(C)
 AC_ARG_WITH([cross-bootstrap],[AS_HELP_STRING([--with-cross-bootstrap],[do not build programs using the mingw toolchain or check for mingw libraries (useful for bootstrapping a cross-compiler)])],[],[with_cross_bootstrap=no])
 
-AC_WINDOWS_HEADERS
-if test "x$with_cross_bootstrap" != "xyes"; then
-    AC_WINDOWS_LIBS
-fi
-
 AC_LANG(C++)
 
 AC_CYGWIN_INCLUDES

@@ -25,11 +25,6 @@ AC_PROG_CXX
 AC_PROG_CPP
 AC_LANG(C)
 
-AC_WINDOWS_HEADERS
-if test "x$with_cross_bootstrap" != "xyes"; then
-  AC_WINDOWS_LIBS
-fi
-
 AC_LANG(C++)
 
 AC_CYGWIN_INCLUDES

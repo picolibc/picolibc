@@ -591,7 +591,6 @@ ac_subst_vars='LTLIBOBJS
 LIBOBJS
 subdirs
 INCLUDES
-windows_libdir
 CPP
 ac_ct_CXX
 CXXFLAGS
@@ -662,8 +661,6 @@ ac_subst_files=''
 ac_user_opts='
 enable_option_checking
 with_cross_bootstrap
-with_windows_headers
-with_windows_libs
 '
       ac_precious_vars='build_alias
 host_alias
@@ -1294,9 +1291,6 @@ Optional Packages:
   --with-cross-bootstrap  do not build programs using the mingw toolchain or
                           check for mingw libraries (useful for bootstrapping
                           a cross-compiler)
-  --with-windows-headers=DIR
-                          specify where the windows includes are located
-  --with-windows-libs=DIR specify where the windows libraries are located
 
 Some influential environment variables:
   CC          C compiler command
@@ -3367,36 +3361,6 @@ else
 fi
 
 
-
-
-# Check whether --with-windows-headers was given.
-if test "${with_windows_headers+set}" = set; then :
-  withval=$with_windows_headers; test -z "$withval" && as_fn_error $? "must specify value for --with-windows-headers" "$LINENO" 5
-
-fi
-
-
-if test "x$with_cross_bootstrap" != "xyes"; then
-
-
-# Check whether --with-windows-libs was given.
-if test "${with_windows_libs+set}" = set; then :
-  withval=$with_windows_libs; test -z "$withval" && as_fn_error $? "must specify value for --with-windows-libs" "$LINENO" 5
-
-fi
-
-windows_libdir=$(realdirpath "$with_windows_libs")
-if test -z "$windows_libdir"; then
-    windows_libdir=$(realdirpath $(${ac_cv_prog_CC:-$CC} -xc /dev/null  -Wl,--verbose=1 -lntdll 2>&1 | sed -rn 's%^.*\s(\S+)/libntdll\..*succeeded%\1%p'))
-    if test -z "$windows_libdir"; then
-	as_fn_error $? "cannot find windows library files" "$LINENO" 5
-    fi
-fi
-
-
-
-fi
-
 ac_ext=cpp
 ac_cpp='$CXXCPP $CPPFLAGS'
 ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
@@ -3419,25 +3383,11 @@ if test -z "$newlib_headers"; then
 fi
 newlib_headers="$target_builddir/newlib/targ-include $newlib_headers"
 
-if test -n "$with_windows_headers"; then
-    if test -e "$with_windows_headers/windef.h"; then
-	windows_headers="$with_windows_headers"
-    else
-	as_fn_error $? "cannot find windef.h in specified --with-windows-headers path: $saw_windows_headers" "$LINENO" 5;
-    fi
-else
-    windows_headers=$(cd $($ac_cv_prog_CC -xc /dev/null -E -include windef.h 2>/dev/null | sed -n 's%^# 1 "\([^"]*\)/windef\.h".*$%\1%p' | head -n1) 2>/dev/null && pwd)
-    if test -z "$windows_headers" -o ! -d "$windows_headers"; then
-	as_fn_error $? "cannot find windows header files" "$LINENO" 5
-    fi
-fi
-
 INCLUDES="-I${srcdir}/../cygwin -I${target_builddir}/winsup/cygwin"
 INCLUDES="${INCLUDES} -isystem ${cygwin_headers}"
 for h in ${newlib_headers}; do
     INCLUDES="${INCLUDES} -isystem $h"
 done
-INCLUDES="${INCLUDES} -isystem ${windows_headers}"
 
 
 

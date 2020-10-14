@@ -22,8 +22,6 @@ include ${srcdir}/../Makefile.common
 
 cygwin_build:=${target_builddir}/winsup/cygwin
 
-WINDOWS_LIBDIR:=@windows_libdir@
-
 prefix:=@prefix@
 exec_prefix:=@exec_prefix@
 
@@ -39,7 +37,7 @@ EXEEXT_FOR_BUILD:=@EXEEXT_FOR_BUILD@
 .PHONY: all install clean realclean warn_dumper warn_cygcheck_zlib
 
 LDLIBS := -lnetapi32 -ladvapi32 -lkernel32 -luser32
-CYGWIN_LDFLAGS := -static -Wl,--enable-auto-import -L${WINDOWS_LIBDIR} $(LDLIBS)
+CYGWIN_LDFLAGS := -static -Wl,--enable-auto-import $(LDLIBS)
 DEP_LDLIBS := $(cygwin_build)/libcygwin.a
 
 MINGW_CXX      := @MINGW_CXX@
