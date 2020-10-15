@@ -148,7 +148,7 @@ foreach target : targets
        executable(test_name, math_test_src,
 		  c_args:  value[1] + test_c_warnings + ['-D_XOPEN_SOURCE=700', '-D_GNU_SOURCE'] + test_c_args,
 		  link_with: libs,
-		  link_args: value[1] + test_link_args + ['-Wl,--gc-sections'],
+		  link_args: value[1] + test_link_args,
 		  include_directories: inc),
        env: ['MESON_SOURCE_ROOT=' + meson.source_root()])
 endforeach
