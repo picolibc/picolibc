@@ -886,8 +886,11 @@ int vfprintf (FILE * stream, const char *fmt, va_list ap)
 }
 
 #ifndef vfprintf
-int __d_vfprintf (FILE * stream, const char *fmt, va_list ap) __attribute__((alias("vfprintf"), nonnull));
+#ifdef HAVE_ALIAS_ATTRIBUTE
+__strong_reference(vfprintf, __d_vfprintf);
+#else
+int __d_vfprintf (FILE * stream, const char *fmt, va_list ap) { return vfprintf(stream, fmt, ap); }
 #endif
-
+#endif
 
 #endif	/* PRINTF_LEVEL > PRINTF_MIN */
