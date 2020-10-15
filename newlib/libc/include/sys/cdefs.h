@@ -398,6 +398,10 @@
 #define	__noinline
 #endif
 
+#if defined(__clang__) && defined(__nonnull)
+/* Clang has a builtin macro __nonnull for the _Nonnull qualifier */
+#undef __nonnull
+#endif
 #if __GNUC_PREREQ__(3, 3)
 #define	__nonnull(x)	__attribute__((__nonnull__ x))
 #define	__nonnull_all	__attribute__((__nonnull__))
