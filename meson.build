@@ -738,6 +738,8 @@ if has_semihost
   # Make sure all of the tests get re-linked if the linker scripts change
 
   test_link_depends += test_link_dep + files('picolibc.ld') + [picolibc_specs]
+elif meson.get_compiler('c').get_id() == 'clang'
+  # Clang does not support spec files
 else
   test_link_depends += test_specs
   test_c_args += ['--specs', '@0@/@1@'.format(meson.current_build_dir(), test_specs)]
