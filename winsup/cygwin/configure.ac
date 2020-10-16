@@ -32,16 +32,13 @@ AC_CYGWIN_INCLUDES
 case "$with_cross_host" in
   ""|*cygwin*)
     all_host="all_host"
-    install_host="install_host"
     ;;
   *)
     all_host=
-    install_host=
     ;;
 esac
 
 AC_SUBST(all_host)
-AC_SUBST(install_host)
 
 AC_CHECK_TOOL(AR, ar, ar)
 AC_CHECK_TOOL(AS, as, as)

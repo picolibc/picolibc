@@ -604,7 +604,6 @@ LD
 DLLTOOL
 AS
 AR
-install_host
 all_host
 INCLUDES
 CPP
@@ -3402,14 +3401,11 @@ done
 case "$with_cross_host" in
   ""|*cygwin*)
     all_host="all_host"
-    install_host="install_host"
     ;;
   *)
     all_host=
-    install_host=
     ;;
 esac
-
 
 
 

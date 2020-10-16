@@ -82,7 +82,7 @@ override COMPILE_CC:=${filter-out -O%,$(COMPILE_CC)}
 override CFLAGS:=${filter-out -O%,$(CFLAGS)}
 export CFLAGS
 
-.PHONY: all force dll_ofiles install all_target install_target install_host
+.PHONY: all force dll_ofiles install all_target install_target
 
 .SUFFIXES:
 .SUFFIXES: .c .cc .def .a .o .d
@@ -92,8 +92,6 @@ all: $(TESTSUP_LIB_NAME)
 force:
 
 install:
-
-install_host:
 
 clean:
 	-rm -f *.o *.dll *.a *.exp junk *.bak *.base *.exe testsuite/* *.d *.dat
