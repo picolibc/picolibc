@@ -20,11 +20,19 @@ if { [info exists env(CYGWIN_TESTSUITE_TESTS)] } {
     set test_filter "$env(CYGWIN_TESTSUITE_TESTS)"
 }
 
-proc ws_spawn {cmd args} {
+proc ws_spawn {cmd} {
     global rv
     verbose "running $cmd\n"
-    catch "exec $cmd" rv
-    verbose send "catchCode = $rv\n"
+    try {
+	set msg [exec -ignorestderr {*}$cmd "2>@1"]
+	set rv 0
+    } trap CHILDSTATUS {results options} {
+	verbose "returned $::errorCode\n"
+	set msg $results
+	set rv 1
+    }
+    verbose -log "$msg"
+    return $rv
 }
 
 verbose "Filter: $test_filter"
@@ -52,8 +60,7 @@ foreach src [lsort [glob -nocomplain $srcdir/$subdir/*.c $srcdir/$subdir/*/*.{cc
 	source "$srcdir/$subdir/$basename.exp"
     } else {
 	ws_spawn "$CC -nodefaultlibs -mwin32 $CFLAGS $src $add_includes $add_libs $runtime_root/binmode.o -lgcc $runtime_root/libcygwin0.a -lkernel32 -luser32 -o $base.exe"
-	if { $rv != "" } {
-	    verbose -log "$rv"
+	if { $rv } {
 	    fail "$testcase (compile)"
 	} else {
 	    if { $verbose } {
@@ -62,8 +69,7 @@ foreach src [lsort [glob -nocomplain $srcdir/$subdir/*.c $srcdir/$subdir/*/*.{cc
 	       set redirect_output /dev/null
 	    }
 	    ws_spawn "$rootme/cygrun ./$base.exe > $redirect_output"
-	    if { $rv != "" } {
-		verbose -log "$testcase: $rv"
+	    if { $rv } {
 		fail "$testcase (execute)"
 		if { $xfail_expected } {
 		    catch { file delete "$base.exe" } err
