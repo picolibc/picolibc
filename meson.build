@@ -76,6 +76,14 @@ newlib_supplied_syscalls = get_option('newlib-supplied-syscalls')
 newlib_elix_level = get_option('newlib-elix-level')
 target_optspace = get_option('optimization') == 's'
 c_args = ['-include', 'picolibc.h']
+if meson.get_compiler('c').has_argument('-fno-common')
+  c_args += '-fno-common'
+endif
+if meson.get_compiler('c').symbols_have_underscore_prefix()
+  global_prefix = '_'
+else
+  global_prefix = ''
+endif
 fast_strcmp = get_option('fast-strcmp')
 
 newlib_mb = get_option('newlib-mb')
@@ -110,6 +118,25 @@ tinystdio = get_option('tinystdio')
 newlib_tinystdio = get_option('newlib-tinystdio')
 if newlib_tinystdio != 'auto'
   tinystdio = newlib_tinystdio == 'true'
+endif
+
+has_link_defsym=meson.get_compiler('c').has_link_argument('-Wl,--defsym=testdefsym=0')
+has_link_alias=meson.get_compiler('c').has_link_argument('-Wl,-alias,' + global_prefix + 'main,testalias')
+
+float_printf_compile_args=['-DPICOLIBC_FLOAT_PRINTF_SCANF']
+float_printf_link_args=float_printf_compile_args
+if tinystdio
+  vfprintf_symbol = global_prefix + 'vfprintf'
+  __f_vfprintf_symbol = global_prefix + '__f_vfprintf'
+  vfscanf_symbol = global_prefix + 'vfscanf'
+  __f_vfscanf_symbol = global_prefix + '__f_vfscanf'
+  if has_link_defsym
+    float_printf_link_args += '-Wl,--defsym=' + vfprintf_symbol +  '=' + __f_vfprintf_symbol
+    float_printf_link_args += '-Wl,--defsym=' + vfscanf_symbol + '=' + __f_vfscanf_symbol
+  elif has_link_alias
+    float_printf_link_args += '-Wl,-alias,' + __f_vfprintf_symbol +  ',' + vfprintf_symbol
+    float_printf_link_args += '-Wl,-alias,' + __f_vfscanf_symbol + ',' + vfscanf_symbol
+  endif
 endif
 
 # Shared stdio options
