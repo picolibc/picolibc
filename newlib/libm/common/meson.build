@@ -210,7 +210,8 @@ lsrc_common = [
   'nexttoward.c',
   'nexttowardl.c',
   'log2l.c',
-  'sl_finite.c'
+  'sl_finite.c',
+  'sl_issignaling.c'
 ]
 
 srcs_common = src_common + dsrc_common + fsrc_common
