@@ -167,13 +167,13 @@ __strong_reference(__ieee754_lgammaf_r, lgammaf_r);
 	ix = hx&0x7fffffff;
 	if(ix>=0x7f800000) {
 	    if (hx<0 && mode)
-		return (x-x)/(x-x);
+		return zero/(x-x);
 	    return x*x;
 	}
 	if(ix==0) {
 	    if(hx<0)
 	        *signgamp = -1;
-	    return one/zero;
+	    return one/(x-x);
 	}
 	if(ix<0x1c800000) {	/* |x|<2**-70, return -log(|x|) */
 	    if(hx<0) {
@@ -184,15 +184,15 @@ __strong_reference(__ieee754_lgammaf_r, lgammaf_r);
 	if(hx<0) {
 	    if(ix>=0x4b000000) { 	/* |x|>=2**23, must be -integer */
 		if (mode)
-		    return (x-x)/(x-x);
-		return one/zero;
+		    return zero/(x-x);
+		return one/(x-x);
 	    }
 	    t = sin_pif(x);
 	    if(t==zero) {
 		/* tgamma wants NaN instead of INFINITY */
 		if (mode)
-		    return (x-x)/(x-x);
-		return one/zero; /* -integer */
+		    return zero/(x-x);
+		return one/(x-x); /* -integer */
 	    }
 	    nadj = __ieee754_logf(pi/fabsf(t*x));
 	    if(t<zero) *signgamp = -1;

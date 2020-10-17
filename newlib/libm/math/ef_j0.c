@@ -137,8 +137,8 @@ __strong_reference(__ieee754_y0f, y0f);
         ix = 0x7fffffff&hx;
     /* Y0(NaN) is NaN, y0(-inf) is Nan, y0(inf) is 0  */
 	if(!FLT_UWORD_IS_FINITE(ix)) return  one/(x+x*x); 
-        if(FLT_UWORD_IS_ZERO(ix)) return -one/zero;
-        if(hx<0) return zero/zero;
+        if(FLT_UWORD_IS_ZERO(ix)) return -one/(x-x);
+        if(hx<0) return zero/(x-x);
         if(ix >= 0x40000000) {  /* |x| >= 2.0 */
         /* y0(x) = sqrt(2/(pi*x))*(p0(x)*sin(x0)+q0(x)*cos(x0))
          * where x0 = x-pi/4

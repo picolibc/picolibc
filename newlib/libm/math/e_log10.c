@@ -84,7 +84,7 @@ __strong_reference(__ieee754_log10, log10);
         k=0;
         if (hx < 0x00100000) {                  /* x < 2**-1022  */
             if (((hx&0x7fffffff)|lx)==0)
-                return -two54/zero;             /* log(+-0)=-inf */
+                return -two54/(x-x);             /* log(+-0)=-inf */
             if (hx<0) return (x-x)/zero;        /* log(-#) = NaN */
             k -= 54; x *= two54; /* subnormal number, scale up x */
 	    GET_HIGH_WORD(hx,x);

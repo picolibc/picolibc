@@ -189,8 +189,8 @@ __strong_reference(__ieee754_ynf, ynf);
 	ix = 0x7fffffff&hx;
     /* if Y(n,NaN) is NaN */
 	if(FLT_UWORD_IS_NAN(ix)) return x+x;
-	if(FLT_UWORD_IS_ZERO(ix)) return -one/zero;
-	if(hx<0) return zero/zero;
+	if(FLT_UWORD_IS_ZERO(ix)) return -one/(x-x);
+	if(hx<0) return zero/(x-x);
 	sign = 1;
 	if(n<0){
 		n = -n;

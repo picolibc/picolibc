@@ -239,8 +239,8 @@ __strong_reference(__ieee754_yn, yn);
 	ix = 0x7fffffff&hx;
     /* if Y(n,NaN) is NaN */
 	if((ix|((__uint32_t)(lx|-lx))>>31)>0x7ff00000) return x+x;
-	if((ix|lx)==0) return -one/zero;
-	if(hx<0) return zero/zero;
+	if((ix|lx)==0) return -one/(x-x);
+	if(hx<0) return zero/(x-x);
 	sign = 1;
 	if(n<0){
 		n = -n;

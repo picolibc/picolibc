@@ -138,8 +138,8 @@ __strong_reference(__ieee754_y1f, y1f);
         ix = 0x7fffffff&hx;
     /* if Y1(NaN) is NaN, Y1(-inf) is NaN, Y1(inf) is 0 */
 	if(!FLT_UWORD_IS_FINITE(ix)) return one/(x+x*x); 
-        if(FLT_UWORD_IS_ZERO(ix)) return -one/zero;
-        if(hx<0) return zero/zero;
+        if(FLT_UWORD_IS_ZERO(ix)) return -one/(x-x);
+        if(hx<0) return zero/(x-x);
         if(ix >= 0x40000000) {  /* |x| >= 2.0 */
                 s = sinf(x);
                 c = cosf(x);
