@@ -15,6 +15,9 @@ ouch (int sig)
 int
 main (int argc, char **argv)
 {
+  static struct rlimit nocore = { 0,0 };
+  setrlimit(RLIMIT_CORE, &nocore);
+
   static struct sigaction act;
   if (argc == 1)
     act.sa_flags = SA_RESETHAND;
@@ -31,6 +34,6 @@ main (int argc, char **argv)
       exit (0x42);
     }
   status &= ~0x80;	// remove core dump flag
-  printf ("pid %d exited with status %p\n", pid, (void *) status);
+  printf ("pid %d exited with status %x\n", pid, status);
   exit (argc == 1 ? !(status == SIGSEGV) : !(status == SIGTERM));
 }
