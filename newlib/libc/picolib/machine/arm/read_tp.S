@@ -54,16 +54,10 @@ __aeabi_read_tp:
 	mrc 15, 0, r0, c13, c0, 3
 #else
 	/* Load the address of __tls */
-	ldr r0,1f
+	ldr r0,=__tls
 	/* Dereference to get the value of __tls */
 	ldr r0,[r0]
 #endif
 	/* All done, return to caller */
 	bx lr
 	.cfi_endproc
-	
-	/* Holds the address of __tls */
-	.align 2
-#ifndef ARM_TLS_CP15
-1: .word __tls
-#endif
