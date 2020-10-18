@@ -194,6 +194,40 @@ main(void)
 
 		reset_blocks();
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Walloc-size-larger-than=PTRDIFF_MAX"
+		/* Test huge malloc sizes */
+		for (i = sizeof(size_t) * 8 - 2; i < sizeof(size_t) * 8; i++) {
+			blocks[0] = malloc((size_t) 1 << i);
+			if (blocks[0])
+				free(blocks[0]);
+		}
+
+		in_use = 0;
+
+		/* Make sure everything is free */
+		result += check_malloc(in_use);
+
+		reset_blocks();
+
+		/* Test allocating negative amounts */
+		for (i = -1; i >= -128; i--) {
+			blocks[0] = malloc((size_t) i);
+#pragma GCC diagnostic pop
+			if (blocks[0]) {
+				printf("malloc size %d succeeded\n", i);
+				result++;
+				free(blocks[0]);
+			}
+		}
+
+		in_use = 0;
+
+		/* Make sure everything is free */
+		result += check_malloc(in_use);
+
+		reset_blocks();
+
 		/* Test allocating random chunks */
 		for (i = 0; i < NUM_MALLOC; i++) {
 			size_t size = randint(MAX_ALLOC);
