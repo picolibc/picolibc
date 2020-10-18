@@ -224,11 +224,19 @@ void* __malloc_sbrk_aligned(size_t s)
     if (__malloc_sbrk_start == NULL)
 	__malloc_sbrk_start = sbrk(0);
 
+#ifdef __APPLE__
+    /* Mac OS X 'emulates' sbrk, but the
+     * parameter is int, not intptr_t or ptrdiff_t,
+     */
+    int d = (int) s;
+    if (d != s || d < 0)
+	return (void *)-1;
+#else
     ptrdiff_t d = (ptrdiff_t)s;
 
     if (d < 0)
 	return (void *)-1;
-
+#endif
     p = sbrk(d);
 
     /* sbrk returns -1 if fail to allocate */
