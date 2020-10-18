@@ -115,7 +115,7 @@ typedef struct malloc_chunk
 #define MALLOC_MINSIZE		ALIGN_TO(sizeof(chunk_t), MALLOC_HEAD_ALIGN)
 
 /* Maximum allocation size */
-#define MALLOC_MAXSIZE 		(SIZE_MAX - MALLOC_HEAD)
+#define MALLOC_MAXSIZE 		(SIZE_MAX - (MALLOC_HEAD + 2*MALLOC_CHUNK_ALIGN))
 
 /* Forward data declarations */
 extern chunk_t * __malloc_free_list;
