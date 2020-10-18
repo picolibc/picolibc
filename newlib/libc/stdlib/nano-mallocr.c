@@ -224,7 +224,12 @@ void* __malloc_sbrk_aligned(size_t s)
     if (__malloc_sbrk_start == NULL)
 	__malloc_sbrk_start = sbrk(0);
 
-    p = sbrk(s);
+    ptrdiff_t d = (ptrdiff_t)s;
+
+    if (d < 0)
+	return (void *)-1;
+
+    p = sbrk(d);
 
     /* sbrk returns -1 if fail to allocate */
     if (p == (void *)-1)
