@@ -569,7 +569,7 @@ exec_CFLAGS:=-fno-builtin-execve
 fhandler_proc_CFLAGS+=-DUSERNAME="\"$(USER)\"" -DHOSTNAME="\"$(HOSTNAME)\""
 fhandler_proc_CFLAGS+=-DGCC_VERSION="\"`$(CC) -v 2>&1 | tail -n 1`\""
 
-.PHONY: all force dll_ofiles install all_target install_target all_host \
+.PHONY: all force dll_ofiles install all_target all_host \
 	install install-libs install-headers \
 	clean distclean realclean maintainer-clean
 
@@ -583,8 +583,7 @@ all_host: $(TEST_LIB_NAME)
 
 force:
 
-install: install-libs install-headers install-man install-ldif install_target \
-	$(install_target)
+install: install-libs install-headers install-man install-ldif
 
 uninstall: uninstall-libs uninstall-headers uninstall-man
 
@@ -624,8 +623,6 @@ install-man:
 install-ldif:
 	@$(MKDIRP) $(DESTDIR)$(datarootdir)/cygwin
 	$(INSTALL_DATA) $(srcdir)/cygwin.ldif $(DESTDIR)$(datarootdir)/cygwin
-
-install_target:
 
 uninstall-libs: $(TARGET_LIBS)
 	rm -f $(bindir)/$(DLL_NAME); \

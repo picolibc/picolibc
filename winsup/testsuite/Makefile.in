@@ -82,7 +82,7 @@ override COMPILE_CC:=${filter-out -O%,$(COMPILE_CC)}
 override CFLAGS:=${filter-out -O%,$(CFLAGS)}
 export CFLAGS
 
-.PHONY: all force dll_ofiles install all_target install_target
+.PHONY: all force dll_ofiles install all_target
 
 .SUFFIXES:
 .SUFFIXES: .c .cc .def .a .o .d
