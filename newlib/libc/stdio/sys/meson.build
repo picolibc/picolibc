@@ -32,7 +32,21 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
-install_headers(
+inc_stdio_sys_headers_all = [
   'stdio.h',
+]
+
+inc_stdio_sys_headers = []
+
+foreach file : inc_stdio_sys_headers_all
+  if not (file in inc_sys_headers_machine)
+    inc_stdio_sys_headers += file
+  else
+    message(file + ': machine overrides generic stdio/sys')
+  endif
+endforeach
+
+install_headers(
+  inc_stdio_sys_headers,
   subdir:'sys'
 )
