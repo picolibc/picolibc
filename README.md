@@ -8,8 +8,9 @@ code from [Newlib](http://sourceware.org/newlib/) and
 
 Build status:
 
- * ![Release](https://github.com/keith-packard/picolibc/workflows/Release/badge.svg?branch=main)
- * ![Minsize](https://github.com/keith-packard/picolibc/workflows/Minsize/badge.svg?branch=main)
+ * ![Release](https://github.com/picolibc/picolibc/workflows/Release/badge.svg?branch=main)
+ * ![Minsize](https://github.com/picolibc/picolibc/workflows/Minsize/badge.svg?branch=main)
+ * ![Mac OS X](https://github.com/picolibc/picolibc/workflows/Mac%20OS%20X/badge.svg)
 
 ## License
 
