@@ -84,7 +84,7 @@ warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
    byte ordering was big or little endian depending upon the target.
    Modern floating-point formats are naturally ordered; in this case
    __VFP_FP__ will be defined, even if soft-float.  */
-#ifdef __VFP_FP__
+#if defined(__VFP_FP__) || defined(__SOFTFP__)
 # ifdef __ARMEL__
 #  define __IEEE_LITTLE_ENDIAN
 # else
