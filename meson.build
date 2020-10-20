@@ -763,14 +763,7 @@ if has_semihost
 
   # Undefine _exit as that's in libsemihost and needs to replace the weak _exit
 
-  test_link_args += test_c_args
-
-  # Clang does not support -nostartfiles
-  if meson.get_compiler('c').get_id() != 'clang'
-    test_link_args += '-nostartfiles'
-  endif
-
-  test_link_args += ['-nostdlib', '-T', test_link_path, '-T', picolibc_link_path, '-Wl,--undefined=_exit', '-lgcc']
+  test_link_args += test_c_args + ['-nostdlib', '-T', test_link_path, '-T', picolibc_link_path, '-Wl,--undefined=_exit', '-lgcc']
 
   # Make sure all of the tests get re-linked if the linker scripts change
 
