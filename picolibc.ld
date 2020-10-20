@@ -42,8 +42,8 @@ ENTRY(_start)
 
 MEMORY
 {
-	flash (rxai!w) : ORIGIN = DEFINED(__flash) ? __flash : 0x10000000, LENGTH = DEFINED(__flash_size) ? __flash_size : 0x10000
-	ram (wxa!ri)   : ORIGIN = DEFINED(__ram  ) ? __ram   : 0x20000000, LENGTH = DEFINED(__ram_size  ) ? __ram_size   : 0x08000
+	flash (rx) : ORIGIN = DEFINED(__flash) ? __flash : 0x10000000, LENGTH = DEFINED(__flash_size) ? __flash_size : 0x10000
+	ram (rwx)   : ORIGIN = DEFINED(__ram  ) ? __ram   : 0x20000000, LENGTH = DEFINED(__ram_size  ) ? __ram_size   : 0x08000
 }
 
 PHDRS
@@ -132,6 +132,16 @@ SECTIONS
 		KEEP (*(.dtors))
 	} >flash AT>flash :text
 
+	.ARM.extab : {
+		*(.ARM.extab*)
+	} >flash
+
+	.ARM.exidx : {
+		__exidx_start = .;
+		*(.ARM.exidx*)
+		__exidx_end = .;
+	} >flash
+
 	/*
 	 * Data values which are preserved across reset
 	 */
@@ -142,7 +152,7 @@ SECTIONS
 		PROVIDE(__preserve_end__ = .);
 	} >ram AT>ram :ram
 
-	.data : ALIGN_WITH_INPUT {
+	.data : {
 		PROVIDE(__data_start = .);
 		*(.data .data.*)
 		*(.gnu.linkonce.d.*)
@@ -161,7 +171,7 @@ SECTIONS
 	 * into the allocate ram addresses by the existing
 	 * data initialization code in crt0
 	 */
-	.tdata : ALIGN_WITH_INPUT {
+	.tdata : {
 		PROVIDE( __tls_base = .);
 		*(.tdata .tdata.* .gnu.linkonce.td.*)
 		PROVIDE(__data_end = .);
