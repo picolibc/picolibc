@@ -61,8 +61,9 @@ clean:
 	rm -f Makefile.dep
 	rm -f *.html *.html.gz
 	rm -Rf cygwin-api cygwin-ug cygwin-ug-net faq
-	rm -f *.1 utils2man.stamp
-	rm -f *.3 api2man.stamp
+	rm -f api2man.stamp intro2man.stamp utils2man.stamp
+	rm -f *.1
+	rm -f *.3
 	rm -f *.info* charmap
 
 install: install-all
