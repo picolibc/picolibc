@@ -41,7 +41,7 @@
 double
 fma (double x, double y, double z)
 {
-  asm ("vfma.f64 %P0, %P1, %P2" : "=w" (z) : "w" (x), "w" (y));
+  asm ("vfma.f64 %P0, %P1, %P2" : "+w" (z) : "w" (x), "w" (y));
   return z;
 }
 
