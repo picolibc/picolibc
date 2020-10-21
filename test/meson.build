@@ -108,7 +108,11 @@ foreach target : targets
 		  include_directories: inc),
        env: ['MESON_SOURCE_ROOT=' + meson.source_root()])
 
-  plain_tests = ['rand', 'regex', 'ungetc', 'fenv', 'math_errhandling', 'malloc', 'malloc_stress', 'tls', 'ffs']
+  plain_tests = ['rand', 'regex', 'ungetc', 'fenv', 'math_errhandling', 'malloc', 'tls', 'ffs']
+
+  if newlib_nano_malloc or not tests_disable_full_malloc_stress
+    plain_tests += 'malloc_stress'
+  endif
 
   if posix_io or not tinystdio
     plain_tests += 'posix-io'

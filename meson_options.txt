@@ -68,7 +68,8 @@ option('tests', type: 'boolean', value: false,
        description: 'Enable tests')
 option('tests-enable-stack-protector', type: 'boolean', value: true,
        description: 'tests enable stack protector')
-
+option('tests-disable-full-malloc-stress', type: 'boolean', value: true,
+       description: 'tests disable stress test for full malloc')
 
 option('newlib-tinystdio', type: 'combo', choices: ['true', 'false', 'auto'], value: 'auto',
        description: 'Use tiny stdio from avr libc')
