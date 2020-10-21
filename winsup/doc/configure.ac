@@ -20,7 +20,5 @@ AC_CANONICAL_TARGET
 
 AC_PROG_CC
 
-AC_SUBST(build_exeext)
-
 AC_CONFIG_FILES([Makefile])
 AC_OUTPUT
