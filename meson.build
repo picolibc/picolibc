@@ -120,7 +120,7 @@ if newlib_tinystdio != 'auto'
   tinystdio = newlib_tinystdio == 'true'
 endif
 
-has_link_defsym=meson.get_compiler('c').has_link_argument('-Wl,--defsym=testdefsym=0')
+has_link_defsym=meson.get_compiler('c').has_link_argument('-Wl,--defsym=' + global_prefix + '_start=0')
 has_link_alias=meson.get_compiler('c').has_link_argument('-Wl,-alias,' + global_prefix + 'main,testalias')
 
 float_printf_compile_args=['-DPICOLIBC_FLOAT_PRINTF_SCANF']
@@ -756,7 +756,9 @@ if has_semihost
 
   picolibc_link_path = '@0@/@1@'.format(meson.current_source_dir(), 'picolibc.ld')
 
-  test_c_args += ['--specs', '@0@/@1@'.format(meson.current_build_dir(), picolibc_specs)]
+  if meson.get_compiler('c').get_id() != 'clang'
+    test_c_args += ['--specs', '@0@/@1@'.format(meson.current_build_dir(), picolibc_specs)]
+  endif
 
   # Undefine _exit as that's in libsemihost and needs to replace the weak _exit
 
