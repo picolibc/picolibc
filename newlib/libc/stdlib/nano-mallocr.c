@@ -135,6 +135,7 @@ int mallopt(int parameter_number, int parameter_value);
 void * valloc(size_t s);
 void * pvalloc(size_t s);
 void __malloc_validate(void);
+void __malloc_validate_block(chunk_t *r);
 void * __malloc_sbrk_aligned(size_t s);
 bool __malloc_grow_chunk(chunk_t *c, size_t new_size);
 
@@ -401,6 +402,9 @@ void free (void * free_p)
 
     p_to_free = ptr_to_chunk(free_p);
     p_to_free->next = NULL;
+#if MALLOC_DEBUG
+    __malloc_validate_block(p_to_free);
+#endif
 
     MALLOC_LOCK;
 
@@ -506,6 +510,10 @@ void * realloc(void * ptr, size_t size)
     size_t new_size = chunk_size(size);
     chunk_t *p_to_realloc = ptr_to_chunk(ptr);
 
+#if MALLOC_DEBUG
+    __malloc_validate_block(p_to_realloc);
+#endif
+
     size_t old_size = p_to_realloc->size;
 
     /* See if we can avoid allocating new memory
@@ -582,16 +590,26 @@ void * realloc(void * ptr, size_t size)
 
 #ifdef DEFINE_MALLINFO
 
+volatile chunk_t *__malloc_block;
+
+void
+__malloc_validate_block(chunk_t *r)
+{
+    __malloc_block = r;
+    assert (ALIGN_PTR(chunk_to_ptr(r), MALLOC_CHUNK_ALIGN) == chunk_to_ptr(r));
+    assert (ALIGN_PTR(r, MALLOC_HEAD_ALIGN) == r);
+    assert (r->size >= MALLOC_MINSIZE);
+    assert (r->size < 0x80000000UL);
+    assert (ALIGN_TO(r->size, MALLOC_HEAD_ALIGN) == r->size);
+}
+
 void
 __malloc_validate(void)
 {
     chunk_t *r;
 
     for (r = __malloc_free_list; r; r = r->next) {
-	assert (ALIGN_PTR(chunk_to_ptr(r), MALLOC_CHUNK_ALIGN) == chunk_to_ptr(r));
-	assert (ALIGN_PTR(r, MALLOC_HEAD_ALIGN) == r);
-	assert (r->size >= MALLOC_MINSIZE);
-	assert (ALIGN_TO(r->size, MALLOC_HEAD_ALIGN) == r->size);
+	__malloc_validate_block(r);
 	assert (r->next == NULL || (char *) r + r->size < (char *) r->next);
     }
 }
