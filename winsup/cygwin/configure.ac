@@ -61,14 +61,12 @@ esac
 
 case "$target_cpu" in
    i?86)
-		DLL_NAME="cygwin1.dll"
 		DLL_ENTRY="_dll_entry@12"
 		DEF_DLL_ENTRY="dll_entry@12"
 		DIN_FILE="i686.din"
 		TLSOFFSETS_H="tlsoffsets.h"
 		;;
    x86_64)
-		DLL_NAME="cygwin1.dll"
 		DLL_ENTRY="dll_entry"
 		DEF_DLL_ENTRY="dll_entry"
 		DIN_FILE="x86_64.din"
@@ -78,7 +76,6 @@ case "$target_cpu" in
 esac
 
 AC_CONFIGURE_ARGS
-AC_SUBST(DLL_NAME)
 AC_SUBST(DLL_ENTRY)
 AC_SUBST(DEF_DLL_ENTRY)
 AC_SUBST(DIN_FILE)
