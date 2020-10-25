@@ -1,3 +1,51 @@
+picolibc (1.4.7-1) unstable; urgency=medium
+
+  * New upstream version
+
+  * Fix numerous libm exception and errno bugs. The math functions are
+    all now verified to match the C19 and Posix standards in this
+    area.
+
+  * Change behavior of 'gamma' function to match glibc which returns
+    lgamma for this function. Applications should not use this
+    function, they should pick either lgamma or tgamma as appropriate.
+
+  * Fix fma/fmaf on arm and RISC-V so that the machine-specific
+    versions are used when the hardware has support. Also fix the math
+    library to only use fma/fmaf when it is supported by the hardware.
+
+  * Fix numerous nano-malloc bugs, especially with unusual parameters.
+
+  * Change nano-malloc to always clear returned memory.
+
+  * Improve nano-realloc to perform better in various ways, including
+    merging adjacent free blocks and expanding the heap.
+
+  * Add malloc tests, both a basic functional test and a stress test.
+
+  * Improve build portability to Windows. Picolibc should now build
+    using mingw.
+
+  * Use hardware TLS register on ARM when available.
+
+  * Support clang compiler. Thanks to Denis Feklushkin
+    <denis.feklushkin@gmail.com> and Joakim Nohlgård
+    <joakim@nohlgard.se>.
+
+  * Avoid implicit float/double conversions. Check this by having
+    clang builds use -Wdouble-promotion -Werror=double-promotion flags
+
+  * Have portable code check for machine-specific overrides by
+    matching filenames. This avoids building libraries with duplicate
+    symbols and retains compatibility with newlib (which uses a
+    different mechanism for this effect).
+
+  * Patches to support building with CompCert
+    (http://compcert.inria.fr/), a formally verified compiler. Thanks
+    to Sebastian Meyer <meyer@absint.com>.
+
+ -- Keith Packard <keithp@keithp.com>  Sun, 25 Oct 2020 15:20:43 -0700
+
 picolibc (1.4.6-2) unstable; urgency=medium
 
   * Add aarch64-linux-gnu target
