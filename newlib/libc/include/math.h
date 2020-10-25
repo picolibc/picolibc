@@ -44,7 +44,7 @@ _BEGIN_STD_C
 /* Natural log of 2 */
 #define _M_LN2        0.693147180559945309417
 
-#if __GNUC_PREREQ (3, 3)
+#if __GNUC_PREREQ (3, 3) || defined(__clang__)
  /* gcc >= 3.3 implicitly defines builtins for HUGE_VALx values.  */
 
 # ifndef HUGE_VAL
@@ -221,9 +221,9 @@ extern int isnan (double);
 #endif
 #ifndef math_errhandling
 # ifdef _IEEE_LIBM
-#  define _MATH_ERRHANDLING_ERRNO MATH_ERRNO
-# else
 #  define _MATH_ERRHANDLING_ERRNO 0
+# else
+#  define _MATH_ERRHANDLING_ERRNO MATH_ERRNO
 # endif
 # ifdef _SUPPORTS_ERREXCEPT
 #  define _MATH_ERRHANDLING_ERREXCEPT MATH_ERREXCEPT
@@ -233,14 +233,14 @@ extern int isnan (double);
 # define math_errhandling (_MATH_ERRHANDLING_ERRNO | _MATH_ERRHANDLING_ERREXCEPT)
 #endif
 
-extern int __isinff (float x);
-extern int __isinfd (double x);
-extern int __isnanf (float x);
-extern int __isnand (double x);
-extern int __fpclassifyf (float x);
-extern int __fpclassifyd (double x);
-extern int __signbitf (float x);
-extern int __signbitd (double x);
+extern int __isinff (float);
+extern int __isinfd (double);
+extern int __isnanf (float);
+extern int __isnand (double);
+extern int __fpclassifyf (float);
+extern int __fpclassifyd (double);
+extern int __signbitf (float);
+extern int __signbitd (double);
 
 /* Note: isinf and isnan were once functions in newlib that took double
  *       arguments.  C99 specifies that these names are reserved for macros
@@ -249,7 +249,7 @@ extern int __signbitd (double x);
  *       taking double arguments still exist for compatibility purposes
  *       (prototypes for them are earlier in this header).  */
 
-#if __GNUC_PREREQ (4, 4)
+#if __GNUC_PREREQ (4, 4) || defined(__clang__)
   #define fpclassify(__x) (__builtin_fpclassify (FP_NAN, FP_INFINITE, \
 						 FP_NORMAL, FP_SUBNORMAL, \
 						 FP_ZERO, __x))
@@ -656,22 +656,6 @@ extern NEWLIB_THREAD_LOCAL int signgam;
 #define M_IVLN10        0.43429448190325182765 /* 1 / log(10) */
 #define M_LOG2_E        _M_LN2
 #define M_INVLN2        1.4426950408889633870E0  /* 1 / log(2) */
-
-/* Global control over fdlibm error handling.  */
-
-enum __fdlibm_version
-{
-  __fdlibm_ieee = -1,
-  __fdlibm_posix
-};
-
-#define _LIB_VERSION_TYPE enum __fdlibm_version
-#define _LIB_VERSION __fdlib_version
-
-extern __IMPORT _LIB_VERSION_TYPE _LIB_VERSION;
-
-#define _IEEE_  __fdlibm_ieee
-#define _POSIX_ __fdlibm_posix
 
 #endif /* __BSD_VISIBLE */
 

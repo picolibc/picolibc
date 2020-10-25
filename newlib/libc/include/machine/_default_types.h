@@ -10,7 +10,7 @@
 /*
  * Guess on types by examining *_MIN / *_MAX defines.
  */
-#if __GNUC_PREREQ (3, 3)
+#if defined(__INT_MAX__) && defined(__LONG_MAX__) && defined (__SCHAR_MAX__) && defined (__SHRT_MAX__)
 /* GCC >= 3.3.0 has __<val>__ implicitly defined. */
 #define __EXP(x) __##x##__
 #else

@@ -47,7 +47,7 @@ __RCSID("$NetBSD: csqrtl.c,v 1.2 2014/10/11 00:43:51 christos Exp $");
 /* We risk spurious overflow for components >= LDBL_MAX / (1 + sqrt(2)). */
 #define	THRESH	(LDBL_MAX / 2.414213562373095048801688724209698L)
 
-#define cpackl(r, i) ((r) + (i) * I)
+#define cpackl(r, i) ((r) + (i) * (double complex) I)
 
 long double complex
 csqrtl(long double complex z)

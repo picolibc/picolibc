@@ -27,7 +27,7 @@
    SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 #include "fdlibm.h"
-#if !__OBSOLETE_MATH
+#if !__OBSOLETE_MATH_FLOAT
 
 #include <math.h>
 #include "math_config.h"
@@ -40,7 +40,7 @@
 float
 sinf (float y)
 {
-  double x = y;
+  double x = (double) y;
   double s;
   int n;
   const sincos_t *p = &__sincosf_table[0];

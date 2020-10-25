@@ -20,7 +20,7 @@
 /* XXX This code generated automatically by gen-testcases.hs
    from ../../printf-tests.txt . You probably do not want to
    manually edit this file. */
-    result |= test(0, "0", "%.7g", 0.0f);
+    result |= test(0, "0", "%.7g", 0.0);
     result |= test(1, "0.33", "%.*f", 2, 0.33333333);
     result |= test(2, "foo", "%.3s", "foobar");
     result |= test(3, "     00004", "%10.5d", 4);

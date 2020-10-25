@@ -1,0 +1,12 @@
+#!/bin/bash
+NM="$1"
+FILE="$2"
+OUTPUT="$3"
+
+"$NM" -g "$FILE" 2>/dev/null | grep ' [A-TV-Z] ' | grep -v '__x86' | sort | uniq -d > "$OUTPUT"
+if [ -e "$OUTPUT" -a -s "$OUTPUT" ]; then
+    echo "Duplicate names in ${FILE}"
+    cat "$OUTPUT"
+    exit 1
+fi
+exit 0

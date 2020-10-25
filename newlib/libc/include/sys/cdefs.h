@@ -95,6 +95,15 @@
 #define	__END_DECLS
 #endif
 
+/**
+ * Not all compilers offer __builtin_expect (e.g. CompCert does
+ * not have it). In that case, transparently replace all
+ * occurences of that builtin with just the condition:
+ */
+#ifndef HAVE_BUILTIN_EXPECT
+#define __builtin_expect(cond, exp) (cond)
+#endif
+
 /*
  * This code has been put in place to help reduce the addition of
  * compiler specific defines in FreeBSD code.  It helps to aid in
@@ -248,7 +257,8 @@
 #define	__aligned(x)	__attribute__((__aligned__(x)))
 #define	__section(x)	__attribute__((__section__(x)))
 #endif
-#if __GNUC_PREREQ__(4, 3) || __has_attribute(__alloc_size__)
+
+#ifdef HAVE_ALLOC_SIZE
 #define	__alloc_size(x)	__attribute__((__alloc_size__(x)))
 #define	__alloc_size2(n, x)	__attribute__((__alloc_size__(n, x)))
 #else
@@ -388,6 +398,10 @@
 #define	__noinline
 #endif
 
+#if defined(__clang__) && defined(__nonnull)
+/* Clang has a builtin macro __nonnull for the _Nonnull qualifier */
+#undef __nonnull
+#endif
 #if __GNUC_PREREQ__(3, 3)
 #define	__nonnull(x)	__attribute__((__nonnull__ x))
 #define	__nonnull_all	__attribute__((__nonnull__))
@@ -544,11 +558,53 @@
 #define	__strong_reference(sym,aliassym)	\
 	extern __typeof (sym) aliassym __attribute__ ((__alias__ (#sym)))
 #endif
+
 #ifdef __ELF__
 #ifdef __STDC__
 #define	__weak_reference(sym,alias)	\
 	__asm__(".weak " #alias);	\
 	__asm__(".equ "  #alias ", " #sym)
+#else
+#define	__weak_reference(sym,alias)	\
+	__asm__(".weak alias");		\
+	__asm__(".equ alias, sym")
+#endif
+#elif __clang__
+#ifdef __MACH__
+/* Macos prefixes all C symbols with an underscore, this needs to be done manually in asm */
+
+/* So far I have not been able to create on Macos an exported symbol that itself
+ * is weak but aliases a strong symbol. A workaround is to make the original
+ * symbol weak and the alias symbol will automatically become weak too. */
+/* Hint: use `nm -m obj.o` to check the symbols weak/strong on Mac */
+#define __weak_reference(sym,alias) \
+	__asm__(".weak_definition _" #sym); \
+	__asm__(".globl _" #alias); \
+	__asm__(".set _" #alias ", _" #sym)
+#elif defined(__STDC__)
+#define __weak_reference(sym,alias) \
+	__asm__(".weak_reference " #alias); \
+	__asm__(".globl " #alias); \
+	__asm__(".set " #alias ", " #sym)
+#else
+#define __weak_reference(sym,alias) \
+	__asm__(".weak_reference alias");\
+	__asm__(".set alias, sym")
+#endif
+#else	/* !__ELF__ && !__clang__ */
+#ifdef __STDC__
+#define	__weak_reference(sym,alias)	\
+	__asm__(".stabs \"_" #alias "\",11,0,0,0");	\
+	__asm__(".stabs \"_" #sym "\",1,0,0,0")
+#else
+#define	__weak_reference(sym,alias)	\
+	__asm__(".stabs \"_/**/alias\",11,0,0,0");	\
+	__asm__(".stabs \"_/**/sym\",1,0,0,0")
+#endif
+#endif
+
+#if defined(__ELF__)
+#ifdef __STDC__
 #define	__warn_references(sym,msg)	\
 	__asm__(".section .gnu.warning." #sym);	\
 	__asm__(".asciz \"" msg "\"");	\
@@ -558,9 +614,6 @@
 #define	__sym_default(sym,impl,verid)	\
 	__asm__(".symver " #impl ", " #sym "@@" #verid)
 #else
-#define	__weak_reference(sym,alias)	\
-	__asm__(".weak alias");		\
-	__asm__(".equ alias, sym")
 #define	__warn_references(sym,msg)	\
 	__asm__(".section .gnu.warning.sym"); \
 	__asm__(".asciz \"msg\"");	\
@@ -572,16 +625,10 @@
 #endif	/* __STDC__ */
 #else	/* !__ELF__ */
 #ifdef __STDC__
-#define	__weak_reference(sym,alias)	\
-	__asm__(".stabs \"_" #alias "\",11,0,0,0");	\
-	__asm__(".stabs \"_" #sym "\",1,0,0,0")
 #define	__warn_references(sym,msg)	\
 	__asm__(".stabs \"" msg "\",30,0,0,0");		\
 	__asm__(".stabs \"_" #sym "\",1,0,0,0")
 #else
-#define	__weak_reference(sym,alias)	\
-	__asm__(".stabs \"_/**/alias\",11,0,0,0");	\
-	__asm__(".stabs \"_/**/sym\",1,0,0,0")
 #define	__warn_references(sym,msg)	\
 	__asm__(".stabs msg,30,0,0,0");			\
 	__asm__(".stabs \"_/**/sym\",1,0,0,0")

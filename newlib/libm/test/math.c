@@ -47,7 +47,8 @@ double mretval = 64;
 int traperror = 1;
 char *mname;
 
-void translate_to (FILE *file,
+void
+translate_to (FILE *file,
 	    double r)
 {
   __ieee_double_shape_type bits;
@@ -150,7 +151,7 @@ fffcheck_id (float is,
   __ieee_double_shape_type is_double;
   int mag;
   isbits.value = is;
-  is_double.value = is;
+  is_double.value = (double) is;
 
   correct_double.parts.msw = p->qs[id].msw;
   correct_double.parts.lsw = p->qs[id].lsw;
@@ -167,7 +168,7 @@ fffcheck_id (float is,
   if (isnan(correct.value) && isnan(is)
 #ifndef __i386__
       /* i386 calling convention ends up always converting snan into qnan */
-      && (issignaling(correct.value) == issignaling(is))
+      && (__issignalingf(correct.value) == __issignalingf(is))
 #endif
 	  )
   {
@@ -182,8 +183,8 @@ fffcheck_id (float is,
 	   name,  p->line, mag,
 	   (unsigned long) (uint32_t) correct.p1,
 	   (unsigned long) (uint32_t) isbits.p1,
-	   correct.value,
-	   is,
+	   (double) correct.value,
+	   (double) is,
 	   (unsigned long) (uint32_t) is_double.parts.msw,
 	   (unsigned long) (uint32_t) is_double.parts.lsw);
   }
@@ -233,6 +234,7 @@ int calc;
 extern int reduce;
 
 
+void
 frontline (FILE *f,
        int mag,
        one_line_type *p,
@@ -289,6 +291,7 @@ frontline (FILE *f,
   fprintf(f, ")*/\n");
 }
 
+void
 finish (FILE *f,
        int vector,
        double result,
@@ -305,6 +308,7 @@ finish (FILE *f,
   }
 }
 
+void
 finish2 (FILE *f,
 	 int vector,
 	 double result,
@@ -329,6 +333,7 @@ finish2 (FILE *f,
   }
 }
 
+void
 ffinish (FILE *f,
        int vector,
        float fresult,
@@ -341,10 +346,11 @@ ffinish (FILE *f,
   mag = fffcheck(fresult, p,name,  merror, errno);
   if (vector)
   {
-    frontline(f, mag, p, fresult, merror, errno, args , name);
+    frontline(f, mag, p, (double) fresult, merror, errno, args , name);
   }
 }
 
+void
 ffinish2 (FILE *f,
 	  int vector,
 	  float fresult,
@@ -362,10 +368,10 @@ ffinish2 (FILE *f,
   if (vector)
   {
     __ieee_double_shape_type result2_double;
-    to_double(result2_double.value, fresult2);
+    to_double(result2_double.value, (double) fresult2);
     p->qs[2].msw = result2_double.parts.msw;
     p->qs[2].lsw = result2_double.parts.lsw;
-    frontline(f, mag, p, fresult, merror, errno, args , name);
+    frontline(f, mag, p, (double) fresult, merror, errno, args , name);
   }
 }
 
@@ -376,7 +382,7 @@ in_float_range(double arg)
 {
 	if (isinf(arg) || isnan(arg))
 		return true;
-	return -FLT_MAX <= arg && arg < FLT_MAX;
+	return -(double) FLT_MAX <= arg && arg < (double) FLT_MAX;
 }
 
 void

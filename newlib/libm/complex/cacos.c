@@ -87,13 +87,13 @@ cacos(double complex z)
 	   a hopefully temporary workaround. */
 #if 0
 	w = casin(z);
-	w = (M_PI_2 - creal(w)) - cimag(w) * I;
+	w = (M_PI_2 - creal(w)) - cimag(w) * (double complex) (double complex) I;
 #else
 	double complex tmp0, tmp1;
 
 	tmp0 = casin(z);
 	tmp1 = M_PI_2 - creal(tmp0);
-	w = tmp1 - (cimag(tmp0) * I);
+	w = tmp1 - (cimag(tmp0) * (double complex) (double complex) I);
 #endif
 	return w;
 }

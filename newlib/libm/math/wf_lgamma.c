@@ -25,21 +25,8 @@
 	float x;
 #endif
 {
-        float y;
-        y = __ieee754_lgammaf_r(x,&signgam);
-        if(_LIB_VERSION == _IEEE_) return y;
-        if(!finitef(y)&&finitef(x)) {
-	    if(floorf(x)==x&&x<=0.0f) {
-		/* lgammaf(-integer) */
-		errno = EDOM;
-	    } else {
-		/* lgammaf(finite) overflow */
-		errno = ERANGE;
-	    }
-            return HUGE_VALF;
-        } else
-            return y;
-}             
+	return lgammaf_r(x, &signgam);
+}
 #endif
 
 #ifdef _DOUBLE_IS_32BITS

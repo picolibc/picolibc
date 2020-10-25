@@ -16,7 +16,8 @@
 #include "fdlibm.h"
 #include "math_config.h"
 
-#if __OBSOLETE_MATH
+#if __OBSOLETE_MATH_FLOAT
+
 #ifdef __v810__
 #define const 
 #endif
@@ -260,4 +261,4 @@ __strong_reference(__ieee754_powf, powf);
 	else SET_FLOAT_WORD(z,j);
 	return s*z;
 }
-#endif /* __OBSOLETE_MATH */
+#endif /* __OBSOLETE_MATH_FLOAT */

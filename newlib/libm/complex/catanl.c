@@ -64,14 +64,14 @@ catanl(long double complex z)
 
 	t = y + 1.0L;
 	a = (x2 + (t * t))/a;
-	w = w + (0.25L * logl(a)) * I;
+	w = w + (0.25L * logl(a)) * (double complex) I;
 	return w;
 
 ovrf:
 #if 0
 	mtherr ("catanl", OVERFLOW);
 #endif
-	w = HUGE_VALL + HUGE_VALL * I;
+	w = HUGE_VALL + HUGE_VALL * (double complex) I;
 	return w;
 }
 

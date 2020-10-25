@@ -198,8 +198,12 @@ int	 strverscmp (const char *, const char *);
    this also implies that the POSIX version is used in this case.  That's made
    sure here. */
 #if __GNU_VISIBLE && !defined(basename)
-# define basename basename
+# ifdef __ASMNAME
+#  define basename basename
 char	*__nonnull ((1)) basename (const char *) __asm__(__ASMNAME("__gnu_basename"));
+# else
+#  define basename(s) (__gnu_basename(s))
+# endif
 #endif
 
 #include <sys/string.h>

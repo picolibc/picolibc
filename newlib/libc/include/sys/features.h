@@ -39,6 +39,10 @@ extern "C" {
 /* Version with trailing underscores for BSD compatibility. */
 #define	__GNUC_PREREQ__(ma, mi)	__GNUC_PREREQ(ma, mi)
 
+/* Is this CompCert? */
+#ifdef __COMPCERT__
+#define	_DEFAULT_SOURCE		1
+#endif
 
 /*
  * Feature test macros control which symbols are exposed by the system

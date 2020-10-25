@@ -15,7 +15,7 @@
 
 #include "fdlibm.h"
 
-#if __OBSOLETE_MATH
+#if __OBSOLETE_MATH_FLOAT
 #ifdef __STDC__
 static const float
 #else
@@ -56,7 +56,7 @@ __strong_reference(__ieee754_logf, logf);
 
 	k=0;
 	if (FLT_UWORD_IS_ZERO(ix&0x7fffffff))
-	    return -two25/zero;		/* log(+-0)=-inf */
+	    return -two25/(x-x);		/* log(+-0)=-inf */
         if (ix<0) return (x-x)/zero;	/* log(-#) = NaN */
 	if (!FLT_UWORD_IS_FINITE(ix)) return x+x;
 	if (FLT_UWORD_IS_SUBNORMAL(ix)) {
@@ -95,4 +95,4 @@ __strong_reference(__ieee754_logf, logf);
 		     return dk*ln2_hi-((s*(f-R)-dk*ln2_lo)-f);
 	}
 }
-#endif /* __OBSOLETE_MATH */
+#endif /* __OBSOLETE_MATH_FLOAT */

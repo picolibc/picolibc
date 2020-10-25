@@ -56,10 +56,10 @@ void
 test_strtof (void)
 {
   char *tail;
-  double v;
+  float v;
   /* On average we'll loose 1/2 a bit, so the test is for within 1 bit  */
   v = strtof(pd->string, &tail);
-  test_mok(v, pd->value, CONVERT_BITS_FLOAT);
+  test_mok((double) v, pd->value, CONVERT_BITS_FLOAT);
   test_iok(tail - pd->string, pd->endscan);
 }
 
@@ -90,7 +90,8 @@ test_atof (void)
 void
 test_atoff (void)
 {
-  test_mok(atoff(pd->string), pd->value, 30);
+  float v = atoff(pd->string);
+  test_mok((double) v, pd->value, 30);
 }
 #endif
 

@@ -6,6 +6,8 @@
 
 #include "fdlibm.h"
 
+#if !HAVE_FAST_FMAF
+
 #ifdef __STDC__
 	float fmaf(float x, float y, float z)
 #else
@@ -24,6 +26,8 @@
    * the behavior will not be as specified in the standards.  */
   return (float) (((double) x * (double) y) + (double) z);
 }
+
+#endif
 
 #ifdef _DOUBLE_IS_32BITS
 

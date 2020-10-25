@@ -32,10 +32,10 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
-inc_sys_headers = [
+inc_sys_headers_machine = [
   'fenv.h'
 ]
 
-install_headers(inc_sys_headers,
+install_headers(inc_sys_headers_machine,
 		subdir:'sys'
 	       )

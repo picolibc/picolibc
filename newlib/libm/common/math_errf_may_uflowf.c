@@ -29,7 +29,7 @@
 #include "fdlibm.h"
 #include "math_config.h"
 
-#if !__OBSOLETE_MATH
+#if !__OBSOLETE_MATH_FLOAT
 #if WANT_ERRNO_UFLOW
 /* Underflows to zero in some non-nearest rounding mode, setting errno
    is valid even if the result is non-zero, but in the subnormal range.  */
@@ -39,4 +39,4 @@ __math_may_uflowf (uint32_t sign)
   return __math_xflowf (sign, 0x1.4p-75f);
 }
 #endif
-#endif /* !__OBSOLETE_MATH */
+#endif /* !__OBSOLETE_MATH_FLOAT */

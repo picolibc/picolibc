@@ -39,14 +39,19 @@
 #endif
 #ifdef _IEEE_LIBM
 # define WANT_ERRNO 0
+# define _LIB_VERSION _IEEE_
 #else
 /* Set errno according to ISO C with (math_errhandling & MATH_ERRNO) != 0.  */
 # define WANT_ERRNO 1
+# define _LIB_VERSION _POSIX_
 #endif
 #ifndef WANT_ERRNO_UFLOW
 /* Set errno to ERANGE if result underflows to 0 (in all rounding modes).  */
 # define WANT_ERRNO_UFLOW (WANT_ROUNDING && WANT_ERRNO)
 #endif
+
+#define _IEEE_  -1
+#define _POSIX_ 0
 
 /* Compiler can inline round as a single instruction.  */
 #ifndef HAVE_FAST_ROUND
@@ -68,10 +73,18 @@
 
 /* Compiler can inline fma as a single instruction.  */
 #ifndef HAVE_FAST_FMA
-# if __aarch64__ || __ARM_FEATURE_FMA
+# if __aarch64__ || (__ARM_FEATURE_FMA && (__ARM_FP & 8)) || __riscv_flen >= 64
 #   define HAVE_FAST_FMA 1
 # else
 #   define HAVE_FAST_FMA 0
+# endif
+#endif
+
+#ifndef HAVE_FAST_FMAF
+# if HAVE_FAST_FMA || (__ARM_FEATURE_FMA && (__ARM_FP & 4)) || __riscv_flen >= 32
+#  define HAVE_FAST_FMAF 1
+# else
+#  define HAVE_FAST_FMAF 0
 # endif
 #endif
 

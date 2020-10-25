@@ -38,8 +38,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-NEWLIB_THREAD_LOCAL char __ecvt_buf[DTOA_MAX_DIG + 1];
-
 char *
 ecvt (double invalue,
       int ndigit,

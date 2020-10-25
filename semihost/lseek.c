@@ -59,8 +59,8 @@ off_t lseek(int fd, off_t offset, int whence)
 	}
 
 	struct {
-		uintptr_t	field1;
-		uintptr_t	field2;
+		sh_param_t	field1;
+		sh_param_t	field2;
 	} arg = {
 		.field1 = fd,
 		.field2 = offset

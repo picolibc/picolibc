@@ -43,7 +43,11 @@
  * a location this far *before* the first thread
  * variable (!)
  */
+#if __SIZE_WIDTH__ == 32
+#define TCB_SIZE	8
+#else
 #define TCB_SIZE	16
+#endif
 
 void
 _set_tls(void *tls)

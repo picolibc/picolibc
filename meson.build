@@ -41,7 +41,7 @@ project('picolibc', 'c',
 	],
 	license : 'BSD',
 	meson_version : '>= 0.50',
-	version: '1.4.6'
+	version: '1.4.7'
        )
 
 targets = []
@@ -52,6 +52,8 @@ enable_picolib = get_option('picolib')
 enable_picocrt = get_option('picocrt')
 enable_tests = get_option('tests')
 enable_native_tests = get_option('native-tests')
+tests_enable_stack_protector = get_option('tests-enable-stack-protector')
+tests_disable_full_malloc_stress = get_option('tests-disable-full-malloc-stress')
 have_alias_attribute_option = get_option('have-alias-attribute')
 have_format_attribute_option = get_option('have-format-attribute')
 newlib_register_fini = get_option('newlib-register-fini')
@@ -74,6 +76,15 @@ newlib_multithread = get_option('newlib-multithread')
 newlib_supplied_syscalls = get_option('newlib-supplied-syscalls')
 newlib_elix_level = get_option('newlib-elix-level')
 target_optspace = get_option('optimization') == 's'
+c_args = ['-include', 'picolibc.h']
+if meson.get_compiler('c').has_argument('-fno-common')
+  c_args += '-fno-common'
+endif
+if meson.get_compiler('c').symbols_have_underscore_prefix()
+  global_prefix = '_'
+else
+  global_prefix = ''
+endif
 fast_strcmp = get_option('fast-strcmp')
 
 newlib_mb = get_option('newlib-mb')
@@ -85,6 +96,8 @@ newlib_initfini_array = get_option('newlib-initfini-array')
 newlib_initfini = get_option('newlib-initfini')
 
 newlib_obsolete_math = get_option('newlib-obsolete-math')
+newlib_obsolete_math_float = get_option('newlib-obsolete-math-float')
+newlib_obsolete_math_double = get_option('newlib-obsolete-math-double')
 want_math_errno = get_option('want-math-errno')
 
 thread_local_storage_option = get_option('thread-local-storage')
@@ -93,11 +106,38 @@ tls_model = get_option('tls-model')
 sysroot_install = get_option('sysroot-install')
 prefix = get_option('prefix')
 
+nm = find_program('nm', required : false)
+
+check_duplicate_names = nm.found()
+
+if nm.found()
+  duplicate_names = find_program('scripts/duplicate-names', required : true)
+endif
+
 # Select stdio implementation
 tinystdio = get_option('tinystdio')
 newlib_tinystdio = get_option('newlib-tinystdio')
 if newlib_tinystdio != 'auto'
   tinystdio = newlib_tinystdio == 'true'
+endif
+
+has_link_defsym=meson.get_compiler('c').has_link_argument('-Wl,--defsym=' + global_prefix + '_start=0')
+has_link_alias=meson.get_compiler('c').has_link_argument('-Wl,-alias,' + global_prefix + 'main,testalias')
+
+float_printf_compile_args=['-DPICOLIBC_FLOAT_PRINTF_SCANF']
+float_printf_link_args=float_printf_compile_args
+if tinystdio
+  vfprintf_symbol = global_prefix + 'vfprintf'
+  __f_vfprintf_symbol = global_prefix + '__f_vfprintf'
+  vfscanf_symbol = global_prefix + 'vfscanf'
+  __f_vfscanf_symbol = global_prefix + '__f_vfscanf'
+  if has_link_defsym
+    float_printf_link_args += '-Wl,--defsym=' + vfprintf_symbol +  '=' + __f_vfprintf_symbol
+    float_printf_link_args += '-Wl,--defsym=' + vfscanf_symbol + '=' + __f_vfscanf_symbol
+  elif has_link_alias
+    float_printf_link_args += '-Wl,-alias,' + __f_vfprintf_symbol +  ',' + vfprintf_symbol
+    float_printf_link_args += '-Wl,-alias,' + __f_vfscanf_symbol + ',' + vfscanf_symbol
+  endif
 endif
 
 # Shared stdio options
@@ -222,7 +262,8 @@ specs_dir_option = get_option('specsdir')
 if specs_dir_option == ''
   search_cmds = meson.get_compiler('c').cmd_array() + ['-print-search-dirs']
   install_dir=run_command(search_cmds).stdout().split('\n')[0]
-  specs_dir=install_dir.split(':')[1].strip()
+  # Meson 0.56 adds a 'substring' method which can be used here
+  specs_dir=run_command(['expr', 'substr', install_dir, '10', '1000']).stdout().split('\n')[0]
   specs_install = true
 elif specs_dir_option == 'none'
   specs_install = false
@@ -243,10 +284,18 @@ specs_data.set(
   sysroot_install? join_paths('%R', get_option('libdir')) : lib_dir
 )
 
-specs_data.set(
-  'TLSMODEL',
-  tls_model
-)
+if tls_model != ''
+  specs_data.set(
+    'TLSMODEL',
+    '%{!ftls-model:-ftls-model=' + tls_model + '}'
+  )
+else
+  specs_data.set(
+    'TLSMODEL',
+    ''
+  )
+endif
+
 
 specs_data.set(
   'LINK_SPEC',
@@ -262,6 +311,19 @@ specs_data.set(
   'CC1PLUS_SPEC',
   meson.get_cross_property('cc1plus_spec', '')
 )
+
+# When passing the specs file to CompCert, the libcompcert needs to be included there as well
+if meson.get_compiler('c').get_id() == 'ccomp'
+  specs_data.set(
+    'ADDITIONAL_LIBS',
+    '-lcompcert'
+  )
+else
+  specs_data.set(
+    'ADDITIONAL_LIBS',
+    ''
+  )
+endif
 
 specs_extra_list = meson.get_cross_property('specs_extra', [])
 if specs_extra_list != []
@@ -303,6 +365,14 @@ test_specs = configure_file(input: 'test.specs.in',
 install_data('picolibc.ld',
 	     install_dir: lib_dir)
 
+# Not all compilers necessarily support all warnings used by the tests; only use these which are:
+test_c_warnings = []
+foreach arg : ['-Wno-missing-braces', '-Wno-implicit-int', '-Wno-return-type']
+  if meson.get_compiler('c').has_argument(arg)
+    test_c_warnings += [arg]
+  endif
+endforeach
+
 long_double_code = '''
 #include <float.h>
 #ifndef LDBL_MANT_DIG
@@ -325,6 +395,46 @@ if have_long_double
   long_double_equals_double = meson.get_compiler('c').compiles(long_double_size_code, name : 'long double same as double')
 endif
 
+# CompCert does not support bitfields in packed structs, so avoid using this optimization
+bitfields_in_packed_structs_code = '''
+struct test { int part: 24; } __attribute__((packed));
+unsigned int foobar (const struct test *p) { return p->part; }
+'''
+have_bitfields_in_packed_structs = meson.get_compiler('c').compiles(bitfields_in_packed_structs_code, name : 'packed structs may contain bitfields')
+
+# CompCert does not have __builtin_mul_overflow
+builtin_mul_overflow_code = '''
+#include <stddef.h>
+int overflows (size_t a, size_t b) { size_t x; return __builtin_mul_overflow(a, b, &x); }
+volatile size_t aa = 42;
+int main (void) { return overflows(aa, aa); }
+'''
+have_builtin_mul_overflow = meson.get_compiler('c').links(builtin_mul_overflow_code, name : 'has __builtin_mul_overflow')
+
+# CompCert does not support _Complex
+complex_code = '''
+float _Complex test(float _Complex z) { return z; }
+'''
+have_complex = meson.get_compiler('c').compiles(complex_code, name : 'supports _Complex')
+
+# CompCert does not have __builtin_expect
+builtin_expect_code = '''
+volatile int a = 42;
+int main (void) {
+  return __builtin_expect(a, 1);
+}
+'''
+have_builtin_expect = meson.get_compiler('c').links(builtin_expect_code, name : 'has __builtin_expect')
+
+# CompCert uses the GCC preprocessor, which causes to
+#  > #if __has_attribute(__alloc_size__)
+# produce a wrong result. So test if the compiler has that attribute
+alloc_size_code = '''
+void *foobar(size_t) __attribute__((__alloc_size__(1)));
+void *foobar2(size_t, size_t) __attribute__((__alloc_size__(1, 2)));
+'''
+have_alloc_size = meson.get_compiler('c').compiles(alloc_size_code, name : 'attribute __alloc_size__')
+
 if enable_multilib
   used_libs = []
 
@@ -332,7 +442,7 @@ if enable_multilib
   # set up the build system to compile for all desired ones
   foreach target : run_command(meson.get_compiler('c'), '--print-multi-lib').stdout().strip().split('\n')
     tmp = target.split(';')
-    flags = []
+    flags = c_args
 
     # Let the user specify a subset of the possible multilib
     # configurations to build for
@@ -386,10 +496,30 @@ if enable_multilib
   endif
 else
   targets = ['']
-  target_ = ['.', meson.get_cross_property('c_args', [])]
+  target_ = ['.', meson.get_cross_property('c_args', []) + c_args]
 endif
 
 conf_data = configuration_data()
+
+# The supported builtins vary depending on compiler and target.
+# If you want to check for a given builtin, add an array
+#   ['some_builtin_name', '__call_to_builtin(1,2,3);']
+# The below loop will then add the define HAVE_SOME_BUILTIN_NAME if the code snippet
+#   > int main (void) { __call_to_builtin(1,2,3); return 0; }
+# can be compiled + linked.
+# The name should match the builtin, but technically it's not necessary
+builtins = [
+  ['builtin_ffs', '__builtin_ffs(42);'],
+  ['builtin_ffsl', '__builtin_ffsl((long)42);'],
+  ['builtin_ffsll', '__builtin_ffsll((long long)42);'],
+  ['builtin_ctz', '__builtin_ctz((unsigned int)42);'],
+  ['builtin_ctzl', '__builtin_ctzl((unsigned long)42);'],
+  ['builtin_ctzll', '__builtin_ctzll((unsigned long long)42);'],
+]
+foreach builtin : builtins
+  have_current_builtin = meson.get_compiler('c').links('int main(void) { ' + builtin[1] + ' return 0; }', name : 'test for __' + builtin[0])
+  conf_data.set('HAVE_' + builtin[0].to_upper(), have_current_builtin, description: 'The compiler supports __' + builtin[0])
+endforeach
 
 NEWLIB_VERSION='3.3.0'
 NEWLIB_MAJOR_VERSION=3
@@ -454,6 +584,11 @@ conf_data.set('PICOLIBC_TLS', thread_local_storage, description: 'use thread loc
 conf_data.set('POSIX_IO', posix_io, description: 'Use open/close/read/write in tinystdio')
 conf_data.set('POSIX_CONSOLE', posix_console, description: 'Use POSIX I/O for stdin, stdout and stderr')
 conf_data.set('ATOMIC_UNGETC', atomic_ungetc, description: 'Use atomics for fgetc/ungetc for re-entrancy')
+conf_data.set('HAVE_BITFIELDS_IN_PACKED_STRUCTS', have_bitfields_in_packed_structs, description: 'Use bitfields in packed structs')
+conf_data.set('HAVE_BUILTIN_MUL', have_builtin_mul_overflow, description: 'Compiler has __builtin_mul_overflow')
+conf_data.set('HAVE_COMPLEX', have_complex, description: 'Compiler supports _Complex')
+conf_data.set('HAVE_BUILTIN_EXPECT', have_builtin_expect, description: 'Compiler has __builtin_expect')
+conf_data.set('HAVE_ALLOC_SIZE', have_alloc_size, description: 'The compiler REALLY has the attribute __alloc_size__')
 
 if newlib_obsolete_math == 'auto'
   obsolete_math_value = false
@@ -463,7 +598,32 @@ elif newlib_obsolete_math == 'false'
   obsolete_math_value = 0
 endif
   
+if newlib_obsolete_math_float == 'auto'
+  obsolete_math_float_value = false
+elif newlib_obsolete_math_float == 'true'
+  obsolete_math_float_value = 1
+elif newlib_obsolete_math_float == 'false'
+  obsolete_math_float_value = 0
+endif
+  
+if newlib_obsolete_math_double == 'auto'
+  obsolete_math_double_value = false
+elif newlib_obsolete_math_double == 'true'
+  obsolete_math_double_value = 1
+elif newlib_obsolete_math_double == 'false'
+  obsolete_math_double_value = 0
+endif
+  
 conf_data.set('__OBSOLETE_MATH', obsolete_math_value, description: 'Use old math code (undef auto, 0 no, 1 yes)')
+conf_data.set('__OBSOLETE_MATH_FLOAT', obsolete_math_float_value, description: 'Use old math code for float funcs (undef auto, 0 no, 1 yes)')
+conf_data.set('__OBSOLETE_MATH_DOUBLE', obsolete_math_double_value, description: 'Use old math code for double funcs (undef auto, 0 no, 1 yes)')
+
+# Check if compiler has -fno-builtin
+
+arg_fnobuiltin = []
+if meson.get_compiler('c').has_argument('-fno-builtin')
+  arg_fnobuiltin = ['-fno-builtin']
+endif
 
 # Compute iconv encodings to support in the library
 
@@ -542,10 +702,15 @@ includedir = join_paths(prefix, get_option('includedir'))
 # versions of gcc for RISC-V which have a bug that mis-names
 # initialized read-only data segments when -fdata-sections
 # is defined
-arguments = ['-ffunction-sections']
+arguments = []
+if meson.get_compiler('c').has_argument('-ffunction-sections')
+  arguments += ['-ffunction-sections']
+endif
 
 if tls_model != ''
-  arguments += ['-ftls-model=' + tls_model]
+  tls_arg = '-ftls-model=' + tls_model
+  assert(meson.get_compiler('c').has_argument(tls_arg), 'Compiler does not support \'-ftls-model\'!')
+  arguments += [tls_arg]
 endif
 
 add_project_arguments(arguments, language: 'c')
@@ -565,8 +730,16 @@ conf_data.set('HAVE_SEMIHOST', has_semihost, description: 'Semihost APIs support
 
 # By default, tests don't require any special arguments
 
-test_c_args = []
-test_link_args = []
+# disable compiler built-ins so we reach the library equivalents
+test_c_args = arg_fnobuiltin
+if tests_enable_stack_protector
+  if meson.get_compiler('c').has_argument('-fstack-protector-all') and meson.get_compiler('c').has_argument('-fstack-protector-strong')
+    test_c_args += ['-fstack-protector-all', '-fstack-protector-strong', '-DTESTS_ENABLE_STACK_PROTECTOR']
+  else
+    tests_enable_stack_protector = false
+  endif
+endif
+test_link_args = test_c_args
 test_link_depends = []
 
 if has_semihost
@@ -574,7 +747,7 @@ if has_semihost
   # If we're using semihosting, we assume that there's a
   # custom linker script that includes picolibc.specs
 
-  test_link_name = 'test-' + host_cpu_family + '.ld'
+  test_link_name = 'scripts/test-' + host_cpu_family + '.ld'
   test_link_dep = files(test_link_name)
 
   # Linker args must be strings (seems like a bug), so compute the
@@ -584,7 +757,9 @@ if has_semihost
 
   picolibc_link_path = '@0@/@1@'.format(meson.current_source_dir(), 'picolibc.ld')
 
-  test_c_args += ['--specs', '@0@/@1@'.format(meson.current_build_dir(), picolibc_specs)]
+  if meson.get_compiler('c').get_id() != 'clang'
+    test_c_args += ['--specs', '@0@/@1@'.format(meson.current_build_dir(), picolibc_specs)]
+  endif
 
   # Undefine _exit as that's in libsemihost and needs to replace the weak _exit
 
@@ -593,11 +768,15 @@ if has_semihost
   # Make sure all of the tests get re-linked if the linker scripts change
 
   test_link_depends += test_link_dep + files('picolibc.ld') + [picolibc_specs]
+elif meson.get_compiler('c').get_id() == 'clang'
+  # Clang does not support spec files
 else
   test_link_depends += test_specs
   test_c_args += ['--specs', '@0@/@1@'.format(meson.current_build_dir(), test_specs)]
   test_link_args += test_c_args
 endif
+
+has_picolibc_tls_api = false
 
 if enable_picocrt
   subdir('picocrt')
@@ -607,6 +786,8 @@ subdir('newlib')
 if enable_tests
   subdir('test')
 endif
+
+conf_data.set('HAVE_PICOLIBC_TLS_API', has_picolibc_tls_api, description: '_set_tls and _init_tls functions available')
 
 conf_data.set('HAVE_IEEEFP_FUNCS', has_ieeefp_funcs, description: 'IEEE fp funcs available')
 

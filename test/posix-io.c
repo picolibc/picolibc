@@ -85,5 +85,6 @@ main(int argc, char **argv)
 		}
 		t++;
 	}
+	printf("success\n");
 	exit(0);
 }

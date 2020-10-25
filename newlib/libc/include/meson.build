@@ -42,7 +42,6 @@ inc_headers = [
   'argz.h',
   'ar.h',
   'assert.h',
-  'complex.h',
   'cpio.h',
   'ctype.h',
   'devctl.h',
@@ -70,7 +69,6 @@ inc_headers = [
   'memory.h',
   'newlib.h',
   'paths.h',
-  'pthread.h',
   'pwd.h',
   'regdef.h',
   'regex.h',
@@ -96,6 +94,10 @@ inc_headers = [
   'wctype.h',
   'wordexp.h'
 ]
+
+if have_complex
+  inc_headers += ['complex.h']
+endif
 
 inc_headers += ['picotls.h']
 

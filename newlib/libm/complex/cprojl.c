@@ -43,7 +43,7 @@ __RCSID("$NetBSD: cprojl.c,v 1.7 2014/10/10 00:48:18 christos Exp $");
  * infinite part and one NaN part) project to positive infinity on the real axis.
  * If z has an infinite part, then cproj(z) shall be equivalent to:
  *
- * INFINITY + I * copysign(0.0, cimag(z))
+ * INFINITY + (double complex) I * copysign(0.0, cimag(z))
  */
 long double complex
 cprojl(long double complex z)

@@ -39,7 +39,7 @@
 #if defined(ATOMIC_UNGETC) && !defined(PICOLIBC_HAVE_SYNC_COMPARE_AND_SWAP)
 
 __ungetc_t
-__picolibc_non_atomic_exchange_ungetc(__ungetc_t *p, __ungetc_t v)
+__picolibc_non_atomic_exchange_ungetc(__ungetc_store_t *p, __ungetc_t v)
 {
 	return __non_atomic_exchange_ungetc(p, v);
 }

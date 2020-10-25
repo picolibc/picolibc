@@ -80,7 +80,10 @@
 }
 
 #if defined(HAVE_ALIAS_ATTRIBUTE)
-double _cos(double) __attribute__ ((__alias__ ("cos"))) __attribute__((const)) __attribute__((leaf)) __attribute__((nothrow));
+#ifndef __clang__
+#pragma GCC diagnostic ignored "-Wmissing-attributes"
+#endif
+__strong_reference(cos, _cos);
 #endif
 
 #endif /* _DOUBLE_IS_32BITS */

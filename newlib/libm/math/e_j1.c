@@ -183,8 +183,8 @@ __strong_reference(__ieee754_y1, y1);
         ix = 0x7fffffff&hx;
     /* if Y1(NaN) is NaN, Y1(-inf) is NaN, Y1(inf) is 0 */
 	if(ix>=0x7ff00000) return  one/(x+x*x); 
-        if((ix|lx)==0) return -one/zero;
-        if(hx<0) return zero/zero;
+        if((ix|lx)==0) return -one/(x-x);
+        if(hx<0) return zero/(x-x);
         if(ix >= 0x40000000) {  /* |x| >= 2.0 */
                 s = sin(x);
                 c = cos(x);

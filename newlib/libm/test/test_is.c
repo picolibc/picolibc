@@ -355,7 +355,7 @@ test_is_single (int i)
       setlower = 39;
       setupper = 39;
       break;
-    case '\(':
+    case '(':
       myascii = 1;
       mygraph = 1;
       myprint = 1;

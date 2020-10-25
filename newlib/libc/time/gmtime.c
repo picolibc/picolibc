@@ -65,7 +65,7 @@ ANSI C requires <<gmtime>>.
 
 #ifndef _REENT_ONLY
 
-NEWLIB_THREAD_LOCAL struct tm _localtime_buf;
+extern NEWLIB_THREAD_LOCAL struct tm _localtime_buf;
 
 struct tm *
 gmtime (const time_t * tim_p)

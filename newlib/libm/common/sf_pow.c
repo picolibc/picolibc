@@ -27,7 +27,7 @@
    SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 #include "fdlibm.h"
-#if !__OBSOLETE_MATH
+#if !__OBSOLETE_MATH_FLOAT
 
 #include <math.h>
 #include <stdint.h>
@@ -213,7 +213,7 @@ powf (float x, float y)
 	}
     }
   double_t logx = log2_inline (ix);
-  double_t ylogx = y * logx; /* Note: cannot overflow, y is single prec.  */
+  double_t ylogx = (double) y * logx; /* Note: cannot overflow, y is single prec.  */
   if (__builtin_expect ((asuint64 (ylogx) >> 47 & 0xffff)
 			  >= asuint64 (126.0 * POWF_SCALE) >> 47,
 			0))
@@ -240,4 +240,4 @@ powf (float x, float y)
     }
   return (float) exp2_inline (ylogx, sign_bias);
 }
-#endif /* !__OBSOLETE_MATH */
+#endif /* !__OBSOLETE_MATH_FLOAT */

@@ -123,7 +123,7 @@ fcvtf (float d,
 	int *decpt,
 	int *sign)
 {
-  return fcvt ((float) d, ndigit, decpt, sign);
+  return fcvt ((double) d, ndigit, decpt, sign);
 }
 
 
@@ -147,7 +147,7 @@ gcvtf (float d,
 	int ndigit,
 	char *buf)
 {
-  double asd = d;
+  double asd = (double) d;
   return gcvt (asd, ndigit, buf);
 }
 

@@ -32,7 +32,7 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
-inc_sys_headers = [
+inc_sys_headers_all = [
   'cdefs.h',
   'config.h',
   'custom_file.h',
@@ -42,13 +42,13 @@ inc_sys_headers = [
   'errno.h',
   'fcntl.h',
   'features.h',
+  'fenv.h',
   'file.h',
   'iconvnls.h',
   '_intsup.h',
   '_locale.h',
   'lock.h',
   'param.h',
-  '_pthreadtypes.h',
   'queue.h',
   'resource.h',
   'sched.h',
@@ -73,13 +73,18 @@ inc_sys_headers = [
   'wait.h'
 ]
 
-if need_generic_fenv_h
-  inc_sys_headers += ['fenv.h']
+if not tinystdio
+  inc_sys_headers_all += ['reent.h']
 endif
 
-if not tinystdio
-  inc_sys_headers += ['reent.h']
-endif
+inc_sys_headers = []
+foreach file : inc_sys_headers_all
+  if not (file in inc_sys_headers_machine)
+    inc_sys_headers += file
+  else
+    message(file + ': machine overrides generic')
+  endif
+endforeach
 
 install_headers(inc_sys_headers,
 		subdir:'sys'

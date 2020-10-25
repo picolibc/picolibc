@@ -82,10 +82,10 @@ ctan(double complex z)
 
 	if (d == 0.0) {
 		/* mtherr ("ctan", OVERFLOW); */
-		w = HUGE_VAL + HUGE_VAL * I;
+		w = HUGE_VAL + HUGE_VAL * (double complex) I;
 		return w;
 	}
 
-	w = sin(2.0 * creal(z)) / d + (sinh(2.0 * cimag(z)) / d) * I;
+	w = sin(2.0 * creal(z)) / d + (sinh(2.0 * cimag(z)) / d) * (double complex) I;
 	return w;
 }

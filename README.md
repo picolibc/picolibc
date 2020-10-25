@@ -1,10 +1,16 @@
 # Picolibc
-Copyright © 2018,2019 Keith Packard
+Copyright © 2018-2020 Keith Packard
 
 Picolibc is library offering standard C library APIs that targets
 small embedded systems with limited RAM. Picolibc was formed by blending
 code from [Newlib](http://sourceware.org/newlib/) and
 [AVR Libc](https://www.nongnu.org/avr-libc/).
+
+Build status:
+
+ * ![Release](https://github.com/picolibc/picolibc/workflows/Release/badge.svg?branch=main)
+ * ![Minsize](https://github.com/picolibc/picolibc/workflows/Minsize/badge.svg?branch=main)
+ * ![Mac OS X](https://github.com/picolibc/picolibc/workflows/Mac%20OS%20X/badge.svg)
 
 ## License
 
@@ -90,6 +96,50 @@ areas unrelated to the code used by picolibc, so keeping things in
 sync has not been difficult so far.
 
 ## Releases
+
+### Picolibc version 1.4.7
+
+ 1. Fix numerous libm exception and errno bugs. The math functions are
+    all now verified to match the C19 and Posix standards in this
+    area.
+
+ 2. Change behavior of 'gamma' function to match glibc which returns
+    lgamma for this function. Applications should not use this
+    function, they should pick either lgamma or tgamma as appropriate.
+ 
+ 3. Fix fma/fmaf on arm and RISC-V so that the machine-specific versions
+    are used when the hardware has support. Also fix the math library
+    to only use fma/fmaf when it is supported by the hardware.
+
+ 4. Fix numerous nano-malloc bugs, especially with unusual parameters.
+
+ 5. Change nano-malloc to always clear returned memory.
+
+ 6. Improve nano-realloc to perform better in various ways, including
+    merging adjacent free blocks and expanding the heap.
+
+ 7. Add malloc tests, both a basic functional test and a stress test.
+
+ 8. Improve build portability to Windows. Picolibc should now build
+    using mingw.
+
+ 9. Use hardware TLS register on ARM when available.
+
+ 10. Support clang compiler. Thanks to Denis Feklushkin
+     <denis.feklushkin@gmail.com> and Joakim Nohlgård <joakim@nohlgard.se>.
+
+ 11. Avoid implicit float/double conversions. Check this by having
+     clang builds use -Wdouble-promotion -Werror=double-promotion
+     flags
+
+ 12. Have portable code check for machine-specific overrides by
+     matching filenames. This avoids building libraries with
+     duplicate symbols and retains compatibility with newlib (which
+     uses a different mechanism for this effect).
+
+ 13. Patches to support building with [CompCert](http://compcert.inria.fr/), a
+     formally verified compiler. Thanks to Sebastian Meyer
+     <meyer@absint.com>.
 
 ### Picolibc version 1.4.6
 

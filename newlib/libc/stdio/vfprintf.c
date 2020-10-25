@@ -423,10 +423,11 @@ __sprint_r (struct _reent *ptr,
 				}
 			}
 		}
+out:
+		;
 	} else
 #endif
 		err = __sfvwrite_r(ptr, fp, uio);
-out:
 	uio->uio_resid = 0;
 	uio->uio_iovcnt = 0;
 	return (err);

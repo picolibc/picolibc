@@ -38,11 +38,24 @@ srcs_posix = [
   'regexec.c',
   'regfree.c',
 ]
+
+srcs_posix_use = []
+foreach file : srcs_posix
+  s_file = file.split('.')[0] + '.S'
+  if file in srcs_machine
+    message(file + ': machine overrides generic')
+  elif s_file in srcs_machine
+    message(s_file + ': machine overrides generic')
+  else
+    srcs_posix_use += file
+  endif
+endforeach
+
 foreach target : targets
 	value = get_variable('target_' + target)
 	set_variable('lib_posix' + target,
 		static_library('posix' + target,
-			srcs_posix,
+			srcs_posix_use,
 			pic: false,
 			include_directories: inc,
 			c_args: value[1]))

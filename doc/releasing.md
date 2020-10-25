@@ -32,9 +32,9 @@ picolibc:
 
  7. Use native configuration to build release:
 
-	$ mkdir build-native
-	$ cd build-native
-        $ ../do-native-configure
+	$ mkdir -p builds/build-native
+	$ cd builds/build-native
+        $ ../../scripts/do-native-configure
 	$ ninja dist
 
  8. Tag release

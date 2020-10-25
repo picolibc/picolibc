@@ -95,12 +95,12 @@ casin(double complex z)
 #if 0 /* MD: test is incorrect, casin(>1) is defined */
 	if (y == 0.0) {
 		if (fabs(x) > 1.0) {
-			w = M_PI_2 + 0.0 * I;
+			w = M_PI_2 + 0.0 * (double complex) I;
 #if 0
 			mtherr ("casin", DOMAIN);
 #endif
 		} else {
-			w = asin(x) + 0.0 * I;
+			w = asin(x) + 0.0 * (double complex) I;
 		}
 		return w;
 	}
@@ -147,19 +147,19 @@ return;
 */
 
 
-	ca = x + y * I;
-	ct = ca * I;
+	ca = x + y * (double complex) I;
+	ct = ca * (double complex) I;
 	/* sqrt( 1 - z*z) */
 	/* cmul( &ca, &ca, &zz ) */
 	/*x * x  -  y * y */
-	zz = (x - y) * (x + y) + (2.0 * x * y) * I;
+	zz = (x - y) * (x + y) + (2.0 * x * y) * (double complex) I;
 
-	zz = 1.0 - creal(zz) - cimag(zz) * I;
+	zz = 1.0 - creal(zz) - cimag(zz) * (double complex) I;
 	z2 = csqrt(zz);
 
 	zz = ct + z2;
 	zz = clog(zz);
 	/* multiply by 1/i = -i */
-	w = zz * (-1.0 * I);
+	w = zz * (-1.0 * (double complex) I);
 	return w;
 }

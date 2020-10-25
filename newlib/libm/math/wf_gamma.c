@@ -25,20 +25,7 @@
 	float x;
 #endif
 {
-        float y;
-        y = __ieee754_gammaf(x);
-        if(_LIB_VERSION == _IEEE_) return y;
-        if(!finitef(y)&&finitef(x)) {
-	    if(floorf(x)==x&&x<=0.0f) {
-		/* gammaf(-integer) or gammaf(0) */
-		errno = EDOM;
-            } else {
-		/* gammaf(finite) overflow */
-		errno = ERANGE;
-            }
-	    return HUGE_VALF;
-        } else
-            return y;
+	return lgammaf(x);
 }
 #endif
 
@@ -51,7 +38,7 @@
 	double x;
 #endif
 {
-	return (double) gammaf((float) x);
+	return (double) lgammaf((float) x);
 }
 
 #endif /* defined(_DOUBLE_IS_32BITS) */

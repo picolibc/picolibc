@@ -98,14 +98,16 @@ _fseeko_r (struct _reent *ptr,
        int whence)
 {
   _fpos_t (*seekfn) (struct _reent *, void *, _fpos_t, int);
+#ifdef _FSEEK_OPTIMIZATION
   _fpos_t target;
-  _fpos_t curoff = 0;
   size_t n;
 #ifdef __USE_INTERNAL_STAT64
   struct stat64 st;
 #else
   struct stat st;
 #endif
+#endif
+  _fpos_t curoff = 0;
   int havepos;
 
   /* Make sure stdio is set up.  */
@@ -326,9 +328,9 @@ _fseeko_r (struct _reent *ptr,
    * We get here if we cannot optimise the seek ... just
    * do it.  Allow the seek function to change fp->_bf._base.
    */
+dumb:
 #endif
 
-dumb:
   if (_fflush_r (ptr, fp)
       || seekfn (ptr, fp->_cookie, offset, whence) == POS_ERR)
     {

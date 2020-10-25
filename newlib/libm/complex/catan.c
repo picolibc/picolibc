@@ -118,13 +118,13 @@ catan(double complex z)
 
 	t = y + 1.0;
 	a = (x2 + (t * t))/a;
-	w = w + (0.25 * log(a)) * I;
+	w = w + (0.25 * log(a)) * (double complex) I;
 	return w;
 
 ovrf:
 #if 0
 	mtherr ("catan", OVERFLOW);
 #endif
-	w = HUGE_VAL + HUGE_VAL * I;
+	w = HUGE_VAL + HUGE_VAL * (double complex) I;
 	return w;
 }

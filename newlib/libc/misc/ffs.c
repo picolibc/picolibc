@@ -52,9 +52,37 @@ No supporting OS subroutines are required.  */
 
 #include <strings.h>
 
+/*
+ * GCC calls "ffs" for __builtin_ffs when the target doesn't have
+ * custom code and INT_TYPE_SIZE < BITS_PER_WORD so we can't use that
+ * builtin to implement ffs here. Instead, fall back to the ctz code
+ * instead.
+ */
+#if defined(HAVE_BUILTIN_FFS) && defined(__GNUC__) && __INT_WIDTH__ != __LONG_WIDTH__
+#undef HAVE_BUILTIN_FFS
+#endif
+
 int
 ffs(int i)
 {
-
+#ifdef HAVE_BUILTIN_FFS
 	return (__builtin_ffs(i));
+#elif defined(HAVE_BUILTIN_CTZ)
+	if (i == 0)
+		return 0;
+	return __builtin_ctz((unsigned int)i) + 1;
+#else
+  int r;
+
+  if (!i)
+    return 0;
+
+  r = 0;
+  for (;;)
+    {
+      if (((1 << r++) & i) != 0)
+	break;
+    }
+  return r;
+#endif
 }

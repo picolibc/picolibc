@@ -56,11 +56,24 @@ srcs_argz = [
 hdrs_argz = [
     'buf_findstr.h',
 ]
+
+srcs_argz_use = []
+foreach file : srcs_argz
+  s_file = file.split('.')[0] + '.S'
+  if file in srcs_machine
+    message(file + ': machine overrides generic')
+  elif s_file in srcs_machine
+    message(s_file + ': machine overrides generic')
+  else
+    srcs_argz_use += file
+  endif
+endforeach
+
 foreach target : targets
 	value = get_variable('target_' + target)
 	set_variable('lib_argz' + target,
 		static_library('argz' + target,
-			srcs_argz,
+			srcs_argz_use,
 			pic: false,
 			include_directories: inc,
 			c_args: value[1]))

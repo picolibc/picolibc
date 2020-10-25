@@ -75,6 +75,6 @@ csinh(double complex z)
 
 	x = creal(z);
 	y = cimag(z);
-	w = sinh(x) * cos(y) + (cosh(x) * sin(y)) * I;
+	w = sinh(x) * cos(y) + (cosh(x) * sin(y)) * (double complex) I;
 	return w;
 }

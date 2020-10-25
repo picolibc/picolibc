@@ -36,6 +36,6 @@ catanhl(long double complex z)
 {
 	long double complex w;
 
-	w = -1.0L * I * catanl(z * I);
+	w = -1.0L * (double complex) I * catanl(z * (double complex) I);
 	return w;
 }

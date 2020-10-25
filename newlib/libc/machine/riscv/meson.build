@@ -33,7 +33,6 @@
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 srcs_machine = [
-  'ffs.c',
   'ieeefp.c',
   'memcpy-asm.S',
   'memcpy.c',
@@ -57,5 +56,5 @@ foreach target : targets
 			srcs_machine,
 			pic: false,
 			include_directories: inc,
-			c_args: value[1] + ['-fno-builtin']))
+			c_args: value[1] + arg_fnobuiltin))
 endforeach

@@ -40,6 +40,6 @@ ccoshl(long double complex z)
 
 	x = creall(z);
 	y = cimagl(z);
-	w = coshl(x) * cosl(y) + (sinhl(x) * sinl(y)) * I;
+	w = coshl(x) * cosl(y) + (sinhl(x) * sinl(y)) * (double complex) I;
 	return w;
 }

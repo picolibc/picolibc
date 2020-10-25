@@ -27,7 +27,7 @@
    SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 #include "fdlibm.h"
-#if !__OBSOLETE_MATH
+#if !__OBSOLETE_MATH_DOUBLE
 
 #include <math.h>
 #include <stdint.h>
@@ -114,9 +114,9 @@ exp (double x)
 	return WANT_ROUNDING ? 1.0 + x : 1.0;
       if (abstop >= top12 (1024.0))
 	{
-	  if (asuint64 (x) == asuint64 (-INFINITY))
+	  if (asuint64 (x) == asuint64 ((double) -INFINITY))
 	    return 0.0;
-	  if (abstop >= top12 (INFINITY))
+	  if (abstop >= top12 ((double) INFINITY))
 	    return 1.0 + x;
 	  if (asuint64 (x) >> 63)
 	    return __math_uflow (0);

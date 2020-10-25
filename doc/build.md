@@ -191,7 +191,26 @@ newlib environments.
 | newlib-supplied-syscalls    | false   | Enable newlib supplied syscalls (obsolete)                                           |
 | newlib-reentrant-syscalls-provided| false| Underlying system provides reentrant syscall API                                  |
 | newlib-missing-syscall-names| false   | Underlying system provides syscall names without leading underscore                  |
-| 
+
+### Math library options
+
+There are two versions of many libm functions, old ones from SunPro
+and new ones from ARM. The new ones are usually better for current
+hardware, except that the float-valued functions use double-precision
+computations. On systems with HW double support, that's likely a good
+choice. On sytems without HW double support, that's going to pull in SW
+double code.
+
+POSIX requires many of the math functions to set errno when exceptions
+occur; disabling that makes them only support fenv() exception
+reporting.
+
+| Option                      | Default | Description                                             |
+| ------                      | ------- | -----------                                             |
+| newlib-obsolete-math        | auto    | Use old code for both float and double valued functions |
+| newlib-obsolete-math-float  | auto    | Use old code for float-valued functions                 |
+| newlib-obsolete-math-double | auto    | Use old code for double-valued functions                |
+| want-math-errno             | false   | Set errno when exceptions occur                         |
 
 ## Building for embedded RISC-V and ARM systems
 

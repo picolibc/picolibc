@@ -25,7 +25,11 @@
  */
 
 #if (__ARM_FP & 0x4) && !defined(__SOFTFP__)
-#include <math.h>
+#include "fdlibm.h"
+
+#if defined(_IEEE_LIBM) && defined(HAVE_ALIAS_ATTRIBUTE)
+__strong_reference(__ieee754_sqrtf, sqrtf);
+#endif
 
 float
 __ieee754_sqrtf(float x)

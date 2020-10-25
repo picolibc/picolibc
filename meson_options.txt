@@ -47,9 +47,6 @@ option('multilib', type: 'boolean', value: true,
 option('multilib-list', type: 'array', value: [],
        description: 'List of multilib configurations to build for')
 
-option('native-tests', type: 'boolean', value: false,
-       description: 'Run math tests against native libc too')
-
 option('picolib', type: 'boolean', value: true,
        description: 'Include pico lib bits')
 
@@ -62,9 +59,17 @@ option('specsdir', type: 'string',
 option('sysroot-install', type: 'boolean', value: false,
        description: 'Install in gcc sysroot')
 
+#
+# Testing options
+#
+option('native-tests', type: 'boolean', value: false,
+       description: 'Run math tests against native libc too')
 option('tests', type: 'boolean', value: false,
        description: 'Enable tests')
-
+option('tests-enable-stack-protector', type: 'boolean', value: true,
+       description: 'tests enable stack protector')
+option('tests-disable-full-malloc-stress', type: 'boolean', value: true,
+       description: 'tests disable stress test for full malloc')
 
 option('newlib-tinystdio', type: 'combo', choices: ['true', 'false', 'auto'], value: 'auto',
        description: 'Use tiny stdio from avr libc')
@@ -196,6 +201,12 @@ option('newlib-global-errno', type: 'boolean', value: false,
 option('newlib-obsolete-math', type: 'combo', choices: ['true', 'false', 'auto'],
        value: 'auto',
        description: 'Use float type for float valued math routines (default: automatic based on platform)')
+option('newlib-obsolete-math-float', type: 'combo', choices: ['true', 'false', 'auto'],
+       value: 'auto',
+       description: 'Use old math code that uses float type for float valued math routines (default: automatic based on platform)')
+option('newlib-obsolete-math-double', type: 'combo', choices: ['true', 'false', 'auto'],
+       value: 'auto',
+       description: 'Use old math code for double valued math routines (default: automatic based on platform)')
 option('want-math-errno', type: 'boolean', value: false,
        description: 'Set errno in math functions according to stdc (default: false)')
 
@@ -210,4 +221,3 @@ option('newlib-reentrant-syscalls-provided', type: 'boolean', value: false,
        description: 'system provides reentrant syscall API')
 option('newlib-supplied-syscalls', type: 'boolean', value: false,
        description: 'newlib supplies system call functions')
-

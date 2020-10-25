@@ -248,7 +248,6 @@ typedef	__suseconds_t	suseconds_t;
 typedef	__int64_t	sbintime_t;
 
 #include <sys/features.h>
-#include <sys/_pthreadtypes.h>
 #include <machine/types.h>
 
 #endif  /* !__need_inttypes */

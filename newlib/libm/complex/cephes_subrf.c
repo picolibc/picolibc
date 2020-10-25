@@ -61,7 +61,7 @@ _cchshf(float x, float *c, float *s)
 static const double DP1 =  3.140625;
 static const double DP2 =  9.67502593994140625E-4;
 static const double DP3 =  1.509957990978376432E-7;
-#define MACHEPF 3.0e-8
+#define MACHEPF 3.0e-8f
 
 float
 _redupif(float x)
@@ -77,7 +77,7 @@ _redupif(float x)
 
 	i = t;	/* the multiple */
 	t = i;
-	t = ((x - t * DP1) - t * DP2) - t * DP3;
+	t = (((double) x - (double) t * DP1) - (double) t * DP2) - (double) t * DP3;
 	return t;
 }
 

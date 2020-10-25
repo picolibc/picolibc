@@ -42,7 +42,7 @@
 #include <stdlib.h>
 
 #ifndef TINY_STDIO
-#define printf_float(x) x
+#define printf_float(x) ((double) (x))
 
 #ifdef _NANO_FORMATTED_IO
 #ifndef NO_FLOATING_POINT
@@ -130,6 +130,8 @@ main(int argc, char **argv)
 		for (t = 0; t < sizeof(test_vals)/sizeof(test_vals[0]); t++) {
 #ifdef PICOLIBC_FLOAT_PRINTF_SCANF
 #define float_type float
+#define pow(a,b) powf((float) a, (float) b)
+#define fabs(a) fabsf(a)
 #define scanf_format "%f"
 #if defined(TINY_STDIO) && !defined(_IO_FLOAT_EXACT)
 #define ERROR_MAX 1e-6
@@ -146,14 +148,14 @@ main(int argc, char **argv)
 #endif
 #endif
 
-			float_type v = test_vals[t] * pow(10.0, (float_type) x);
+			float_type v = (float_type) test_vals[t] * pow(10.0, (float_type) x);
 			float_type r;
 			float_type e;
 
 			sprintf(buf, "%.55f", printf_float(v));
 			sscanf(buf, scanf_format, &r);
 			e = fabs(v-r) / v;
-			if (e > ERROR_MAX) {
+			if (e > (float_type) ERROR_MAX) {
 				printf("\tf %3d: wanted %.7e got %.7e (error %.7e, buf %s)\n", x,
 				       printf_float(v), printf_float(r), printf_float(e), buf);
 				errors++;
@@ -164,7 +166,7 @@ main(int argc, char **argv)
 			sprintf(buf, "%.20e", printf_float(v));
 			sscanf(buf, scanf_format, &r);
 			e = fabs(v-r) / v;
-			if (e > ERROR_MAX)
+			if (e > (float_type) ERROR_MAX)
 			{
 				printf("\te %3d: wanted %.7e got %.7e (error %.7e, buf %s)\n", x,
 				       printf_float(v), printf_float(r), printf_float(e), buf);
@@ -176,7 +178,7 @@ main(int argc, char **argv)
 			sprintf(buf, "%.20g", printf_float(v));
 			sscanf(buf, scanf_format, &r);
 			e = fabs(v-r) / v;
-			if (e > ERROR_MAX)
+			if (e > (float_type) ERROR_MAX)
 			{
 				printf("\tg %3d: wanted %.7e got %.7e (error %.7e, buf %s)\n", x,
 				       printf_float(v), printf_float(r), printf_float(e), buf);

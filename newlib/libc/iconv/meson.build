@@ -42,7 +42,7 @@ foreach target : targets
   value = get_variable('target_' + target)
   libobjs = []
   foreach libname : libdirs
-    libobjs += get_variable('lib_' + libname + target).extract_all_objects(recursive:true)
+    libobjs += get_variable('lib_iconv_' + libname + target).extract_all_objects(recursive:true)
   endforeach
   
 	set_variable('lib_iconv' + target,

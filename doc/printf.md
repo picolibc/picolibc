@@ -53,6 +53,11 @@ be selected when building applications:
 
 	cc -Wl,--defsym=vfprintf=__i_vfprintf -Wl,--defsym=vfscanf=__i_vfscanf
 
+   If you're using a linker that supports -alias instead of --defsym,
+   you  would use:
+
+	cc -Wl,-alias,___i_vfprintf,_vfprintf -Wl,-alias,___i_vfscanf,_vfscanf
+
  * PICOLIBC_FLOAT_PRINTF_SCANF. This provides support for float, but
    not double conversions. When picolibc.specs finds
    -DPICOLIBC_FLOAT_PRINTF_SCANF on the command line during linking,
@@ -60,6 +65,11 @@ be selected when building applications:
    is equivalent to adding this when linking your application:
 
 	cc -Wl,--defsym=vfprintf=__f_vfprintf -Wl,--defsym=vfscanf=__f_vfscanf
+
+   If you're using a linker that supports -alias instead of --defsym,
+   you  would use:
+
+	cc -Wl,-alias,___f_vfprintf,_vfprintf -Wl,-alias,___f_vfscanf,_vfscanf
 
 PICOLIBC_FLOAT_PRINTF_SCANF requires a special macro for float values:
 `printf_float`. To make it easier to switch between that and the default

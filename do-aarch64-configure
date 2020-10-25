@@ -1,9 +1,0 @@
-#!/bin/sh
-ARCH=aarch64-linux-gnu
-DIR=`dirname $0`
-meson "$DIR" \
-        -Dtests=true \
-	-Dincludedir=picolibc/$ARCH/include \
-	-Dlibdir=picolibc/$ARCH/lib \
-	--cross-file "$DIR"/cross-$ARCH.txt \
-	"$@"

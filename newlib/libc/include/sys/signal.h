@@ -77,11 +77,6 @@ struct sigevent {
   int              sigev_signo;                /* Signal number */
   union sigval     sigev_value;                /* Signal value */
 
-#if defined(_POSIX_THREADS)
-  void           (*sigev_notify_function)( union sigval );
-                                               /* Notification function */
-  pthread_attr_t  *sigev_notify_attributes;    /* Notification Attributes */
-#endif
 };
 
 /* Signal Actions, P1003.1b-1993, p. 64 */
@@ -192,10 +187,6 @@ typedef struct sigaltstack {
 int sigprocmask (int, const sigset_t *, sigset_t *);
 #endif
 
-#if __POSIX_VISIBLE >= 199506
-int pthread_sigmask (int, const sigset_t *, sigset_t *);
-#endif
-
 #ifdef _COMPILING_NEWLIB
 int _kill (pid_t, int);
 #endif /* _COMPILING_NEWLIB */
@@ -248,10 +239,6 @@ int sigpause (int);
 
 #if __BSD_VISIBLE || __XSI_VISIBLE >= 4 || __POSIX_VISIBLE >= 200809
 int sigaltstack (const stack_t *__restrict, stack_t *__restrict);
-#endif
-
-#if __POSIX_VISIBLE >= 199506
-int pthread_kill (pthread_t, int);
 #endif
 
 #if __POSIX_VISIBLE >= 199309

@@ -35,7 +35,7 @@
 #if __ARM_ARCH_ISA_THUMB == 2
 /* Implemented in strlen.S.  */
 
-#elif defined (__ARM_ARCH_ISA_THUMB)
+#elif defined (__thumb__)
 /* Implemented in strlen.S.  */
 
 #else

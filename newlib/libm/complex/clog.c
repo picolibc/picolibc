@@ -86,6 +86,6 @@ clog(double complex z)
 	rr = cabs(z);
 	p = log(rr);
 	rr = atan2(cimag(z), creal(z));
-	w = p + rr * I;
+	w = p + rr * (double complex) I;
 	return w;
 }

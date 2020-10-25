@@ -87,7 +87,7 @@ cpow(double complex a, double complex z)
 	y = cimag(z);
 	absa = cabs(a);
 	if (absa == 0.0) {
-		return (0.0 + 0.0 * I);
+		return (0.0 + 0.0 * (double complex) I);
 	}
 	arga = carg(a);
 	r = pow(absa, x);
@@ -96,6 +96,6 @@ cpow(double complex a, double complex z)
 		r = r * exp(-y * arga);
 		theta = theta + y * log(absa);
 	}
-	w = r * cos(theta) + (r * sin(theta)) * I;
+	w = r * cos(theta) + (r * sin(theta)) * (double complex) I;
 	return w;
 }

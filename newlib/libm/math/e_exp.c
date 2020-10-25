@@ -76,7 +76,7 @@
 
 #include "fdlibm.h"
 #include "math_config.h"
-#if __OBSOLETE_MATH
+#if __OBSOLETE_MATH_DOUBLE
 
 #ifndef _DOUBLE_IS_32BITS
 
@@ -170,4 +170,4 @@ __strong_reference(__ieee754_exp, exp);
 }
 
 #endif /* defined(_DOUBLE_IS_32BITS) */
-#endif /* __OBSOLETE_MATH */
+#endif /* __OBSOLETE_MATH_DOUBLE */

@@ -24,7 +24,11 @@
    NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
    SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
-#include <math.h>
+#include "fdlibm.h"
+
+#if defined(_IEEE_LIBM) && defined(HAVE_ALIAS_ATTRIBUTE)
+__strong_reference(__ieee754_sqrtf, sqrtf);
+#endif
 
 float
 __ieee754_sqrtf (float x)
@@ -33,3 +37,4 @@ __ieee754_sqrtf (float x)
   asm ("fsqrt\t%s0, %s1" : "=w" (result) : "w" (x));
   return result;
 }
+

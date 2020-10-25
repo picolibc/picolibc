@@ -49,7 +49,7 @@ __strong_reference(__ieee754_log10f, log10f);
 
         k=0;
         if (FLT_UWORD_IS_ZERO(hx&0x7fffffff))
-            return -two25/zero;             /* log(+-0)=-inf */
+	    return -two25/(x-x);             /* log(+-0)=-inf */
         if (hx<0) return (x-x)/zero;        /* log(-#) = NaN */
 	if (!FLT_UWORD_IS_FINITE(hx)) return x+x;
         if (FLT_UWORD_IS_SUBNORMAL(hx)) {

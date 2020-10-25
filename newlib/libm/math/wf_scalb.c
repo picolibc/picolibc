@@ -44,12 +44,12 @@
 	if(!(finitef(z)||isnan(z))&&finitef(x)) {
 	    /* scalbf overflow; */
 	    errno = ERANGE;
-	    return (x > 0.0 ? HUGE_VALF : -HUGE_VALF);
+	    return (x > 0.0f ? HUGE_VALF : -HUGE_VALF);
 	}
 	if(z==0.0f&&z!=x) {
 	    /* scalbf underflow */
 	    errno = ERANGE;
-	    return copysign(0.0,x);
+	    return copysignf(0.0f,x);
 	} 
 #ifndef _SCALB_INT
 	if(!finitef(fn)) errno = ERANGE;

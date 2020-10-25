@@ -146,6 +146,30 @@ srcs_strcmp = [
   'strcmp.c'
 ]
 
+srcs_string_use = []
+foreach file : srcs_string
+  s_file = file.split('.')[0] + '.S'
+  if file in srcs_machine
+    message(file + ': machine overrides generic')
+  elif s_file in srcs_machine
+    message(s_file + ': machine overrides generic')
+  else
+    srcs_string_use += file
+  endif
+endforeach
+
+srcs_strcmp_use = []
+foreach file : srcs_strcmp
+  s_file = file.split('.')[0] + '.S'
+  if file in srcs_machine
+    message(file + ': machine overrides generic')
+  elif s_file in srcs_machine
+    message(s_file + ': machine overrides generic')
+  else
+    srcs_strcmp_use += file
+  endif
+endforeach
+
 if fast_strcmp
   cargs_strcmp = ['-O3']
 else
@@ -156,14 +180,14 @@ foreach target : targets
 	value = get_variable('target_' + target)
 	set_variable('lib_strcmp' + target,
 		     static_library('strcmp' + target,
-				    srcs_strcmp,
+				    srcs_strcmp_use,
 				    pic: false,
 				    c_args: value[1] + cargs_strcmp,
 				    include_directories: inc))
 	strcmp_objs = get_variable('lib_strcmp' + target).extract_all_objects(recursive:true)
 	set_variable('lib_string' + target,
 		static_library('string' + target,
-			       srcs_string,
+			       srcs_string_use,
 			       objects: strcmp_objs,
 			       pic: false,
 			       include_directories: inc,

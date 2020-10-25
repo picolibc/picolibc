@@ -36,8 +36,8 @@ src_semihost_machine = {
 			'riscv' : 'riscv/semihost-riscv.s',
 			'riscv32' : 'riscv/semihost-riscv.s',
 			'riscv64' : 'riscv/semihost-riscv.s',
-			'arm' : 'arm/semihost-arm.c',
-			'aarch64' : 'aarch64/semihost-aarch64.c'
+			'arm' : 'arm/semihost-arm.S',
+			'aarch64' : 'aarch64/semihost-aarch64.S'
 		      }
 
 if src_semihost_machine.has_key(host_cpu_family)

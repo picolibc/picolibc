@@ -84,14 +84,16 @@ warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
    byte ordering was big or little endian depending upon the target.
    Modern floating-point formats are naturally ordered; in this case
    __VFP_FP__ will be defined, even if soft-float.  */
-#ifdef __VFP_FP__
+#if defined(__VFP_FP__) || defined(__SOFTFP__)
 # ifdef __ARMEL__
 #  define __IEEE_LITTLE_ENDIAN
 # else
 #  define __IEEE_BIG_ENDIAN
 # endif
 # if __ARM_FP & 0x8
-#  define __OBSOLETE_MATH_DEFAULT 0
+#  define __OBSOLETE_MATH_DEFAULT_FLOAT 0
+# else
+#  define __OBSOLETE_MATH_DEFAULT_FLOAT 1
 # endif
 #else
 # define __IEEE_BIG_ENDIAN
@@ -110,7 +112,7 @@ warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 #else
 #define __IEEE_BIG_ENDIAN
 #endif
-#define __OBSOLETE_MATH_DEFAULT 0
+#define __OBSOLETE_MATH_DEFAULT_FLOAT 0
 #ifdef __ARM_FP
 # define _SUPPORTS_ERREXCEPT
 #endif
@@ -214,6 +216,11 @@ warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 #define __IEEE_LITTLE_ENDIAN
 #ifdef __riscv_flen
 # define _SUPPORTS_ERREXCEPT
+#endif
+#if __riscv_flen >= 64
+# define __OBSOLETE_MATH_DEFAULT_FLOAT 0
+#else
+# define __OBSOLETE_MATH_DEFAULT_FLOAT 1
 #endif
 #endif
 
@@ -328,6 +335,14 @@ warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 #ifdef __CRX__
 #define __IEEE_LITTLE_ENDIAN
+#endif
+
+#ifdef __CSKY__
+#ifdef __CSKYBE__
+#define __IEEE_BIG_ENDIAN
+#else
+#define __IEEE_LITTLE_ENDIAN
+#endif
 #endif
 
 #ifdef __fr30__
@@ -499,12 +514,38 @@ warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 #define __OBSOLETE_MATH_DEFAULT 0
 #endif
 
+#ifndef __OBSOLETE_MATH_DEFAULT_FLOAT
+# ifdef __OBSOLETE_MATH_DEFAULT
+#  define __OBSOLETE_MATH_DEFAULT_FLOAT __OBSOLETE_MATH_DEFAULT
+# else
+/* Use old math code by default for single-precision functions.  */
+#  define __OBSOLETE_MATH_DEFAULT_FLOAT 1
+# endif
+#endif
+
+#ifndef __OBSOLETETE_MATH_DEFAULT_DOUBLE
+# ifdef __OBSOLETE_MATH_DEFAULT
+#  define __OBSOLETE_MATH_DEFAULT_DOUBLE __OBSOLETE_MATH_DEFAULT
+# else
+/* Use new math code by default for double-precision functions. */
+#  define __OBSOLETE_MATH_DEFAULT_DOUBLE 0
+# endif
+#endif
+
 #ifndef __OBSOLETE_MATH_DEFAULT
 /* Use old math code by default.  */
 #define __OBSOLETE_MATH_DEFAULT 1
 #endif
 #ifndef __OBSOLETE_MATH
 #define __OBSOLETE_MATH __OBSOLETE_MATH_DEFAULT
+#endif
+
+#ifndef __OBSOLETE_MATH_FLOAT
+#define __OBSOLETE_MATH_FLOAT __OBSOLETE_MATH_DEFAULT_FLOAT
+#endif
+
+#ifndef __OBSOLETE_MATH_DOUBLE
+#define __OBSOLETE_MATH_DOUBLE __OBSOLETE_MATH_DEFAULT_DOUBLE
 #endif
 
 #ifndef __IEEE_BIG_ENDIAN

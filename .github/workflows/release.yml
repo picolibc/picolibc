@@ -1,0 +1,66 @@
+name: Release
+
+on: [push, pull_request]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        meson_flags: [
+          "",
+
+          # Math configurations
+          "-Dnewlib-obsolete-math=false",
+          "-Dnewlib-obsolete-math=false -Dwant-math-errno=true",
+          "-Dnewlib-obsolete-math-float=true -Dnewlib-obsolete-math-double=false",
+          "-Dnewlib-obsolete-math=true",
+          "-Dnewlib-obsolete-math=true -Dwant-math-errno=true",
+
+          # Tinystdio configurations
+          "-Dio-float-exact=false",
+          "-Dio-long-long=true",
+
+          # Malloc configurations
+          "-Dnewlib-nano-malloc=false",
+
+          # Original stdio configurations
+          "-Dtinystdio=false -Dnewlib-io-float=false",
+          "-Dtinystdio=false -Dnewlib-io-float=false -Dio-long-long=true",
+          "-Dtinystdio=false -Dnewlib-io-float=true",
+          "-Dtinystdio=false -Dnewlib-io-float=true -Dio-long-long=true",
+
+          # Locale configurations
+          "-Dnewlib-locale-info=true -Dnewlib-locale-info-extended=true -Dnewlib-mb=true",
+
+          # Iconv configurations
+          "-Dnewlib-iconv-external-ccs=true"
+        ]
+        test: [
+          "./.github/do-test do-native-configure build-native",
+          "./.github/do-test do-riscv-configure build-riscv",
+          "./.github/do-test do-arm-configure build-arm",
+          "./.github/do-test do-aarch64-configure build-aarch64",
+          "./.github/do-build do-lx106-configure build-lx106",
+          "./.github/do-test do-rv32imac-configure build-rv32imac",
+          "./.github/do-build do-clang-riscv-configure build-riscv-clang",
+          "./.github/do-test do-clang-thumbv7e+fp-configure build-clang-thumbv7e+fp",
+          "./.github/do-test do-clang-thumbv7m-configure build-clang-thumbv7m",
+        ]
+
+    steps:
+      - name: 'Clone picolibc'
+        uses: actions/checkout@v2
+        with:
+          path: picolibc
+
+      - name: 'Build picolibc container'
+        run: |
+          docker build -t picolibc \
+            -f picolibc/.github/Dockerfile \
+            picolibc
+
+      - name: 'Release test'
+        run: |
+          docker run --rm picolibc ${{ matrix.test }} ${{ matrix.meson_flags }} --buildtype release
+

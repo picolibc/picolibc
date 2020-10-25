@@ -38,7 +38,11 @@
  * a location this far *before* the first thread
  * variable (!)
  */
+#if __SIZE_WIDTH__ == 32
+#define TCB_SIZE	8
+#else
 #define TCB_SIZE	16
+#endif
 
 static inline void
 _set_tls(void *tls)
@@ -58,8 +62,9 @@ void __section(".text.init.enter")
 _start(void)
 {
 	/* Initialize stack */
-	__asm__("ldr x30, =__stack");
-	__asm__("mov sp, x30");
+	__asm__("adrp x1, __stack");
+	__asm__("add  x1, x1, :lo12:__stack");
+	__asm__("mov sp, x1");
 	/* Enable FPU */
 	__asm__("mov x1, #(0x3 << 20)");
 	__asm__("msr cpacr_el1,x1");

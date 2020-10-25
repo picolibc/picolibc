@@ -172,7 +172,6 @@ hash4(keyarg, len)
 	size_t len;
 {
 	const u_char *key;
-	size_t loop;
 	__uint32_t h;
 
 #define HASH4a   h = (h << 5) - h + *key++;
@@ -181,36 +180,8 @@ hash4(keyarg, len)
 
 	h = 0;
 	key = keyarg;
-	if (len > 0) {
-		loop = (len + 8 - 1) >> 3;
-
-		switch (len & (8 - 1)) {
-		case 0:
-			do {
-				HASH4;
-				/* FALLTHROUGH */
-		case 7:
-				HASH4;
-				/* FALLTHROUGH */
-		case 6:
-				HASH4;
-				/* FALLTHROUGH */
-		case 5:
-				HASH4;
-				/* FALLTHROUGH */
-		case 4:
-				HASH4;
-				/* FALLTHROUGH */
-		case 3:
-				HASH4;
-				/* FALLTHROUGH */
-		case 2:
-				HASH4;
-				/* FALLTHROUGH */
-		case 1:
-				HASH4;
-			} while (--loop);
-		}
+	while (len--) {
+		HASH4;
 	}
 	return (h);
 }

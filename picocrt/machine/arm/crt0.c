@@ -46,6 +46,10 @@ extern const void *__interrupt_vector[];
 
 #define CPACR	((volatile uint32_t *) (0xE000ED88))
 
+#ifdef __clang__
+const void *__interrupt_reference = __interrupt_vector;
+#endif
+
 void
 _start(void)
 {

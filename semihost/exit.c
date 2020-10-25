@@ -35,14 +35,15 @@
 
 #include "semihost-private.h"
 #include <sys/cdefs.h>
+#include <unistd.h>
 
 void  _ATTRIBUTE((__noreturn__))
 _exit(int code)
 {
 	if (sys_semihost_feature(SH_EXT_EXIT_EXTENDED)) {
 		struct {
-			uintptr_t	field1;
-			uintptr_t	field2;
+			sh_param_t	field1;
+			sh_param_t	field2;
 		} arg = {
 			.field1 = ADP_Stopped_ApplicationExit,
 			.field2 = code

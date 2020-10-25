@@ -95,7 +95,7 @@ __weak_reference(__weak_interrupt_vector, __interrupt_vector);
 
 void arm_halt_isr(void);
 
-void __attribute__((naked)) __section(".init") __attribute__((noreturn))
+void __attribute__((naked)) __section(".init")
 arm_halt_vector(void)
 {
 	/* Loop forever. */
@@ -133,6 +133,8 @@ __weak_vector_table(void)
 	 * start of program text (usually 0x0)
 	 */
 #if __ARM_ARCH_ISA_THUMB == 2
+	/* Thumb 2 processors start in thumb mode */
+	__asm__(".thumb");
 	__asm__("b.w _start");
 	__asm__("b.w arm_undef_vector");
 	__asm__("b.w arm_svc_vector");
@@ -142,6 +144,8 @@ __weak_vector_table(void)
 	__asm__("b.w arm_irq_vector");
 	__asm__("b.w arm_fiq_vector");
 #else
+	/* Thumb 1 and arm processors start in arm mode */
+	__asm__(".arm");
 	__asm__("b _start");
 	__asm__("b arm_undef_vector");
 	__asm__("b arm_svc_vector");

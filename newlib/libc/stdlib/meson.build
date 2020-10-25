@@ -66,7 +66,6 @@ srcs_stdlib = [
     'a64l.c',
     'abort.c',
     'abs.c',
-    '__adjust.c',
     'aligned_alloc.c',
     'arc4random.c',
     'arc4random_uniform.c',
@@ -90,7 +89,6 @@ srcs_stdlib = [
     'erand48.c',
     'exit.c',
     '_Exit.c',
-    '__exp10.c',
     'getenv.c',
     'getenv_r.c',
     'getopt.c',
@@ -142,7 +140,6 @@ srcs_stdlib = [
     'strtoull.c',
     'strtoumax.c',
     'system.c',
-    '__ten_mu.c',
     'utoa.c',
     'wcrtomb.c',
     'wcsnrtombs.c',
@@ -187,10 +184,21 @@ if not tinystdio
   endif
 endif
 
+# Work around compiler optimizing calls involving malloc/free
+
+c_args_malloc = []
+if meson.get_compiler('c').has_argument('-fno-builtin-malloc')
+  c_args_malloc += ['-fno-builtin-malloc']
+endif
+
+if meson.get_compiler('c').has_argument('-fno-builtin-free')
+  c_args_malloc += ['-fno-builtin-free']
+endif
+
 if newlib_nano_malloc
-  srcs_stdlib += nano_malloc_srcs_stdlib
+  srcs_stdlib_malloc = nano_malloc_srcs_stdlib
 else
-  srcs_stdlib += std_malloc_srcs_stdlib
+  srcs_stdlib_malloc = std_malloc_srcs_stdlib
 endif
 
 hdrs_stdlib = [
@@ -207,12 +215,45 @@ hdrs_stdlib = [
     'std.h',
 ]
 
+srcs_stdlib_use = []
+foreach file : srcs_stdlib
+  s_file = file.split('.')[0] + '.S'
+  if file in srcs_machine
+    message(file + ': machine overrides generic')
+  elif s_file in srcs_machine
+    message(s_file + ': machine overrides generic')
+  else
+    srcs_stdlib_use += file
+  endif
+endforeach
+
+srcs_stdlib_malloc_use = []
+foreach file : srcs_stdlib_malloc
+  s_file = file.split('.')[0] + '.S'
+  if file in srcs_machine
+    message(file + ': machine overrides generic')
+  elif s_file in srcs_machine
+    message(s_file + ': machine overrides generic')
+  else
+    srcs_stdlib_malloc_use += file
+  endif
+endforeach
+
 foreach target : targets
 	value = get_variable('target_' + target)
+	set_variable('lib_stdlib_malloc' + target,
+		     static_library('stdlib_malloc' + target,
+				    srcs_stdlib_malloc_use,
+				    pic: false,
+				    include_directories: inc,
+				    c_args: value[1] + ['-DINTERNAL_NEWLIB'] + c_args_malloc))
+	lib_stdlib_malloc_objs = get_variable('lib_stdlib_malloc' + target).extract_all_objects(recursive:true)
+	
 	set_variable('lib_stdlib' + target,
-		static_library('stdlib' + target,
-			srcs_stdlib,
-			pic: false,
-			include_directories: inc,
-			c_args: value[1] + ['-DINTERNAL_NEWLIB']))
+		     static_library('stdlib' + target,
+				    srcs_stdlib_use,
+				    objects: lib_stdlib_malloc_objs,
+				    pic: false,
+				    include_directories: inc,
+				    c_args: value[1] + ['-DINTERNAL_NEWLIB']))
 endforeach

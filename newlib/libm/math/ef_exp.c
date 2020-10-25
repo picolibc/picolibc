@@ -16,7 +16,7 @@
 #include "fdlibm.h"
 #include "math_config.h"
 
-#if __OBSOLETE_MATH
+#if __OBSOLETE_MATH_FLOAT
 #ifdef __v810__
 #define const
 #endif
@@ -68,7 +68,7 @@ __strong_reference(__ieee754_expf, expf);
 	if(sx > FLT_UWORD_LOG_MAX)
 	    return __math_oflowf(0); /* overflow */
 	if(sx < 0 && hx > FLT_UWORD_LOG_MIN)
-	    return __math_uflow(0); /* underflow */
+	    return __math_uflowf(0); /* underflow */
 	
     /* argument reduction */
 	if(hx > 0x3eb17218) {		/* if  |x| > 0.5 ln2 */ 
@@ -103,4 +103,4 @@ __strong_reference(__ieee754_expf, expf);
 	    return y*twom100;
 	}
 }
-#endif /* __OBSOLETE_MATH */
+#endif /* __OBSOLETE_MATH_FLOAT */

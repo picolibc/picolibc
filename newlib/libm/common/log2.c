@@ -27,7 +27,7 @@
    SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 #include "fdlibm.h"
-#if !__OBSOLETE_MATH
+#if !__OBSOLETE_MATH_DOUBLE
 
 #include <math.h>
 #include <stdint.h>
@@ -100,7 +100,7 @@ double
       /* x < 0x1p-1022 or inf or nan.  */
       if (ix * 2 == 0)
 	return __math_divzero (1);
-      if (ix == asuint64 (INFINITY)) /* log(inf) == inf.  */
+      if (ix == asuint64 ((double) INFINITY)) /* log(inf) == inf.  */
 	return x;
       if ((top & 0x8000) || (top & 0x7ff0) == 0x7ff0)
 	return __math_invalid (x);

@@ -31,24 +31,8 @@
 	double x;
 #endif
 {
-#ifdef _IEEE_LIBM
-	return __ieee754_lgamma(x);
-#else
-        double y;
-        y = __ieee754_lgamma(x);
-        if(_LIB_VERSION == _IEEE_) return y;
-        if(!finite(y)&&finite(x)) {
-	    if(floor(x)==x&&x<=0.0)
-	      /* lgamma(-integer) */
-	      errno = EDOM;
-	    else
-	      /* lgamma(finite) overflow */
-	      errno = ERANGE;
-	    return HUGE_VAL;
-	} else
-            return y;
-#endif
-}             
+	return lgamma_r(x, &signgam);
+}
 #endif
 
 #endif /* defined(_DOUBLE_IS_32BITS) */

@@ -25,7 +25,3 @@ All rights reserved.
 #define SIGN	0x01
 #define ESIGN	0x02
 #define DECP	0x04
-
-int    		__ten_mul(double *acc, int digit);
-double		__adjust(struct _reent *ptr, double *acc, int dexp, int sign);
-double		__exp10(unsigned x);

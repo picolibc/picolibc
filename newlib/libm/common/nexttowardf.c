@@ -42,15 +42,15 @@ nexttowardf (float x, long double y)
   uint32_t e;
 
   if (isnan(x) || isnan(y))
-    return x + y;
-  if (x == y)
+    return (long double) x + y;
+  if ((long double) x == y)
     return y;
   ux.value = x;
   if (x == 0) {
     ux.bits = 1;
     if (signbit(y))
       ux.bits |= 0x80000000;
-  } else if (x < y) {
+  } else if ((long double) x < y) {
     if (signbit(x))
       ux.bits--;
     else

@@ -49,26 +49,19 @@ libm_machine_dirs = {
 		      'xtensa': 'xtensa',
 		    }
 
-libdirs = ['math', 'common', 'complex']
+libdirs = ['math', 'common', 'fenv']
+if have_complex
+  libdirs = libdirs + ['complex']
+endif
 
 libnames = libdirs
-
-need_generic_fenv = true
 
 if libm_machine_dirs.has_key(host_cpu_family)
   libm_machine_dir = join_paths('machine', libm_machine_dirs[host_cpu_family])
   libdirs = [libm_machine_dir] + libdirs
   libnames = ['machine'] + libnames
-  if run_command('test', '-f', join_paths(libm_machine_dir, 'fegetenv.c')).returncode() == 0 or run_command('test', '-f', join_paths(libm_machine_dir, 'fenv.c')).returncode() == 0 
-    need_generic_fenv = false
-  endif
 else
-  warning('No libm machine directory for CPU family ' + host_cpu_family)
-endif
-
-if need_generic_fenv
-  libdirs = ['fenv'] + libdirs
-  libnames = ['fenv'] + libnames
+  srcs_libm_machine = []
 endif
 
 math_inc = [include_directories('common'), inc]
@@ -93,12 +86,21 @@ foreach target : targets
     libm_name = join_paths(target, 'libm')
   endif
 
-  set_variable('lib_m' + target,
-	       static_library(libm_name,
-			      install : true,
-			      install_dir : instdir,
-			      pic: false,
-			      objects : libobjs))
+  local_lib_m_target = static_library(libm_name,
+				      install : true,
+				      install_dir : instdir,
+				      pic: false,
+				      objects : libobjs)
+  set_variable('lib_m' + target, local_lib_m_target)
+
+  if check_duplicate_names
+    custom_target('libm_duplicates' + target,
+		  build_by_default: true,
+		  input: local_lib_m_target,
+		  output: 'libm_duplicates' + target,
+		  command: [duplicate_names, nm, '@INPUT@', '@OUTPUT@'],
+		  install: false)
+  endif
 endforeach
 
 if enable_tests

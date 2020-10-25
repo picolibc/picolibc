@@ -44,16 +44,16 @@ int
 sys_semihost_get_cmdline(char *buf, int size)
 {
 	struct {
-		uintptr_t	field1;
-		uintptr_t	field2;
+		sh_param_t	field1;
+		sh_param_t	field2;
 	} arg = {
-		.field1 = (uintptr_t) buf,
+		.field1 = (sh_param_t) (uintptr_t) buf,
 		.field2 = size
 	};
 	uintptr_t ret = sys_semihost(SYS_GET_CMDLINE, (uintptr_t) &arg);
 	if (ret == 0) {
-		if (arg.field1 != (uintptr_t) buf)
-			strcpy(buf, (void *) arg.field1);
+		if (arg.field1 != (sh_param_t) (uintptr_t) buf)
+			strcpy(buf, (void *) (uintptr_t) arg.field1);
 	}
 	return ret;
 }

@@ -24,7 +24,11 @@
    NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
    SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
-#include <math.h>
+#include "fdlibm.h"
+
+#if defined(_IEEE_LIBM) && defined(HAVE_ALIAS_ATTRIBUTE)
+__strong_reference(__ieee754_sqrt, sqrt);
+#endif
 
 double
 __ieee754_sqrt (double x)

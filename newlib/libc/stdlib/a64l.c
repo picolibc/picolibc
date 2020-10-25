@@ -178,7 +178,7 @@ a64l (const char *input)
 #if LONG_MAX > 2147483647
   /* for implementations where long is > 32 bits, the result must be sign-extended */
   if (result & 0x80000000)
-      return (((long)-1 >> 32) << 32) + result;
+      return (~0UL << 32) + result;
 #endif
 
   return result;

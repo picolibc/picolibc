@@ -96,20 +96,20 @@ test_frexp (void)
 	break;
       case 1:
 	newfunc("frexpf/ldexpf");
-	if (x > FLT_MIN && x < FLT_MAX)
+	if (x > (double) FLT_MIN && x < (double) FLT_MAX)
 	{
 	  /* test floats too, but they have a smaller range so make sure x
 	     isn't too big. Also x can get smaller than a float can
 	     represent to make sure that doesn't happen too */
 	  xf = x;
-	  r = frexpf(xf, &pow);
+	  r = (double) frexpf(xf, &pow);
 	  if (r > 1.0 || r < -1.0)
 	  {
 	    /* Answer can never be > 1 or < -1 */
 	    test_iok(0,1);
 	  }
 
-	  gives = ldexpf(r ,pow);
+	  gives = (double) ldexpf(r ,pow);
 	  test_mok(gives,x, 32);
 
 	}
@@ -176,12 +176,12 @@ test_mod (void)
     double nd;
     line(i);
     nd  = randx() ;
-    if (nd < FLT_MAX && finitef(nd) && nd != 0.0)
+    if (nd < (double) FLT_MAX && finitef(nd) && nd != 0.0)
     {
       float n = nd;
-      double r = modff(n, &intpart);
+      double r = (double) modff(n, &intpart);
       line(i);
-      test_mok(intpart + r, n, 32);
+      test_mok((double) intpart + r, (double) n, 32);
     }
   }
 
@@ -229,7 +229,7 @@ test_pow (void)
     res = powf(n1, n2);
     shouldbe = expf(logf(n1) * n2);
     if (!errno)
-     test_mok(shouldbe, res,28);
+      test_mok((double) shouldbe, (double) res,28);
   }
 
 

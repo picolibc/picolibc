@@ -30,18 +30,12 @@
 {
         float y;
         y = __ieee754_lgammaf_r(x,signgamp);
-        if(_LIB_VERSION == _IEEE_) return y;
 #ifndef _IEEE_LIBM
+        if(_LIB_VERSION == _IEEE_) return y;
         if(!finitef(y)&&finitef(x)) {
-	    if(floorf(x)==x&&x<=0.0f) {
-		/* lgammaf(-integer) or lgamma(0) */
-		errno = EDOM;
-	    } else {
-		/* lgammaf(finite) overflow */
-		errno = ERANGE;
-	    }
-	    return HUGE_VALF;
-        }
+	    /* lgammaf(finite) overflow */
+	    errno = ERANGE;
+	}
 #endif
 	return y;
 }

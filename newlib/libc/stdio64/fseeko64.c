@@ -91,8 +91,11 @@ _fseeko64_r (struct _reent *ptr,
      int whence)
 {
   _fpos64_t (*seekfn) (struct _reent *, void *, _fpos64_t, int);
-  _fpos64_t target, curoff;
+  _fpos64_t curoff;
+#if _FSEEK_OPTIMIZATION
+  _fpos64_t target;
   size_t n;
+#endif
 
   int havepos;
 
@@ -318,9 +321,9 @@ _fseeko64_r (struct _reent *ptr,
    * We get here if we cannot optimise the seek ... just
    * do it.  Allow the seek function to change fp->_bf._base.
    */
+dumb:
 #endif
 
-dumb:
   if (_fflush_r (ptr, fp)
       || seekfn (ptr, fp->_cookie, offset, whence) == POS_ERR)
     {

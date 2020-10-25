@@ -46,11 +46,25 @@ srcs_xdr = [
 hdrs_xdr = [
     'xdr_private.h',
 ]
+
+srcs_xdr_use = []
+foreach file : srcs_xdr
+  s_file = file.split('.')[0] + '.S'
+  if file in srcs_machine
+    message(file + ': machine overrides generic')
+  elif s_file in srcs_machine
+    message(s_file + ': machine overrides generic')
+  else
+    srcs_xdr_use += file
+  endif
+endforeach
+
+
 foreach target : targets
 	value = get_variable('target_' + target)
 	set_variable('lib_xdr' + target,
 		static_library('xdr' + target,
-			srcs_xdr,
+			srcs_xdr_use,
 			pic: false,
 			include_directories: inc,
 			c_args: value[1]))

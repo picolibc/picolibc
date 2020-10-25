@@ -58,6 +58,8 @@ srcs_libm_machine = [
   'sf_rint.c',
   'sf_round.c',
   'sf_trunc.c',
+  's_fma_arm.c',
+  'sf_fma_arm.c',
   's_nearbyint.c',
   's_rint.c',
   's_round.c',
@@ -71,5 +73,5 @@ foreach target : targets
 			srcs_libm_machine,
 			pic: false,
 			include_directories: math_inc,
-			c_args: value[1] + ['-fno-builtin']))
+			c_args: value[1] + arg_fnobuiltin))
 endforeach

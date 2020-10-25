@@ -27,7 +27,7 @@
    SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 #include "fdlibm.h"
-#if !__OBSOLETE_MATH
+#if !__OBSOLETE_MATH_DOUBLE
 
 #include "math_config.h"
 
@@ -206,4 +206,4 @@ A(0x1.6c00000000000p-1, 0x1.5d5bddf596000p-2, -0x1.a0b2a08a465dcp-47)
 #endif
 },
 };
-#endif /* __OBSOLETE_MATH */
+#endif /* __OBSOLETE_MATH_DOUBLE */

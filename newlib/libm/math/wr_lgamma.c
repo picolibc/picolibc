@@ -33,14 +33,10 @@
 #ifndef _IEEE_LIBM
         if(_LIB_VERSION == _IEEE_) return y;
         if(!finite(y)&&finite(x)) {
-	    if(floor(x)==x&&x<=0.0)
-	      /* lgamma(-integer) */
-	      errno = EDOM;
-	    else
 	      /* lgamma(finite) overflow */
 	      errno = ERANGE;
-	    return HUGE_VAL;
         }
+	return y;
 #endif
 	return y;
 }

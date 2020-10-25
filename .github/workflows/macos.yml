@@ -1,0 +1,50 @@
+name: Mac OS X
+
+on: [push, pull_request]
+
+jobs:
+  macos:
+    runs-on: macos-latest
+    strategy:
+      matrix:
+        meson_flags: [
+          "",
+
+          # Math configurations
+          "-Dnewlib-obsolete-math=false",
+          "-Dnewlib-obsolete-math=false -Dwant-math-errno=true",
+          "-Dnewlib-obsolete-math-float=true -Dnewlib-obsolete-math-double=false",
+          "-Dnewlib-obsolete-math=true",
+          "-Dnewlib-obsolete-math=true -Dwant-math-errno=true",
+
+          # Tinystdio configurations
+          "-Dio-float-exact=false",
+          "-Dio-long-long=true",
+
+          # Malloc configurations
+          "-Dnewlib-nano-malloc=false",
+
+          # Locale configurations
+          "-Dnewlib-locale-info=true -Dnewlib-locale-info-extended=true -Dnewlib-mb=true",
+
+          # Iconv configurations
+          "-Dnewlib-iconv-external-ccs=true"
+        ]
+        test: [
+          "./.github/do-test do-native-configure build-native -Dnative-tests=false",
+        ]
+
+    steps:
+      - name: 'Clone picolibc'
+        uses: actions/checkout@v2
+
+      - name: 'Setup python'
+        uses: actions/setup-python@v1
+        with:
+          python-version: '3.x'
+
+      - name: 'Install meson and ninja'
+        run: pip install meson ninja
+
+      - name: 'MacOS test'
+        run: ${{ matrix.test }} ${{ matrix.meson_flags }}

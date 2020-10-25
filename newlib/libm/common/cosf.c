@@ -27,7 +27,7 @@
    SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 #include "fdlibm.h"
-#if !__OBSOLETE_MATH
+#if !__OBSOLETE_MATH_FLOAT
 
 #include <stdint.h>
 #include <math.h>
@@ -41,7 +41,7 @@
 float
 cosf (float y)
 {
-  double x = y;
+  double x = (double) y;
   double s;
   int n;
   const sincos_t *p = &__sincosf_table[0];

@@ -29,15 +29,6 @@
 #include <sys/param.h>
 #include <sys/types.h>
 
-/* avoid including stdio header here */
-#ifndef __VALIST
-#ifdef __GNUC__
-#define __VALIST __gnuc_va_list
-#else
-#define __VALIST char*
-#endif
-#endif
-
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -46,7 +37,7 @@ typedef void (*xdr_vprintf_t) (const char *, va_list);
 
 xdr_vprintf_t xdr_set_vprintf (xdr_vprintf_t);
 
-void xdr_vwarnx (const char *, __VALIST)
+void xdr_vwarnx (const char *, va_list)
               _ATTRIBUTE ((__format__ (__printf__, 1, 0)));
 
 void xdr_warnx (const char *, ...)

@@ -42,21 +42,7 @@ SUCH DAMAGE.
 /* For __STDC_ISO_10646__ */
 #include <sys/features.h>
 
-/* typedef only __gnuc_va_list, used throughout the header */
-#define __need___va_list
 #include <stdarg.h>
-
-/* typedef va_list only when required */
-#if __POSIX_VISIBLE >= 200809 || __XSI_VISIBLE
-#ifdef __GNUC__
-#ifndef _VA_LIST_DEFINED
-typedef __gnuc_va_list va_list;
-#define _VA_LIST_DEFINED
-#endif
-#else /* !__GNUC__ */
-#include <stdarg.h>
-#endif
-#endif /* __POSIX_VISIBLE >= 200809 || __XSI_VISIBLE */
 
 #if __XSI_VISIBLE /* && __XSI_VISIBLE < 800 */ && !__GNU_VISIBLE
 #include <wctype.h>
@@ -231,6 +217,8 @@ float wcstof_l (const wchar_t *, wchar_t **, locale_t);
 long double wcstold_l (const wchar_t *, wchar_t **, locale_t);
 #endif
 
+#ifndef TINY_STDIO
+
 wint_t fgetwc (__FILE *);
 wchar_t *fgetws (wchar_t *__restrict, int, __FILE *__restrict);
 wint_t fputwc (wchar_t, __FILE *);
@@ -244,6 +232,8 @@ wint_t putwc (wchar_t, __FILE *);
 wint_t putwchar (wchar_t);
 wint_t ungetwc (wint_t wc, __FILE *);
 
+struct _reent;
+
 wint_t _fgetwc_r (struct _reent *, __FILE *);
 wint_t _fgetwc_unlocked_r (struct _reent *, __FILE *);
 wchar_t *_fgetws_r (struct _reent *, wchar_t *, int, __FILE *);
@@ -255,8 +245,8 @@ int _fputws_unlocked_r (struct _reent *, const wchar_t *, __FILE *);
 int _fwide_r (struct _reent *, __FILE *, int);
 wint_t _getwc_r (struct _reent *, __FILE *);
 wint_t _getwc_unlocked_r (struct _reent *, __FILE *);
-wint_t _getwchar_r (struct _reent *ptr);
-wint_t _getwchar_unlocked_r (struct _reent *ptr);
+wint_t _getwchar_r (struct _reent *);
+wint_t _getwchar_unlocked_r (struct _reent *);
 wint_t _putwc_r (struct _reent *, wchar_t, __FILE *);
 wint_t _putwc_unlocked_r (struct _reent *, wchar_t, __FILE *);
 wint_t _putwchar_r (struct _reent *, wchar_t);
@@ -279,31 +269,23 @@ __FILE *open_wmemstream (wchar_t **, size_t *);
 #endif
 __FILE *_open_wmemstream_r (struct _reent *, wchar_t **, size_t *);
 
-#ifndef __VALIST
-#ifdef __GNUC__
-#define __VALIST __gnuc_va_list
-#else
-#define __VALIST char*
-#endif
-#endif
-
 #if __ISO_C_VISIBLE >= 1999 || __XSI_VISIBLE >= 500
 int	fwprintf (__FILE *__restrict, const wchar_t *__restrict, ...);
 int	swprintf (wchar_t *__restrict, size_t,
 			const wchar_t *__restrict, ...);
 int	vfwprintf (__FILE *__restrict, const wchar_t *__restrict,
-			__VALIST);
+			va_list);
 int	vswprintf (wchar_t *__restrict, size_t,
-			const wchar_t *__restrict, __VALIST);
-int	vwprintf (const wchar_t *__restrict, __VALIST);
+			const wchar_t *__restrict, va_list);
+int	vwprintf (const wchar_t *__restrict, va_list);
 int	wprintf (const wchar_t *__restrict, ...);
 #endif
 
 int	_fwprintf_r (struct _reent *, __FILE *, const wchar_t *, ...);
 int	_swprintf_r (struct _reent *, wchar_t *, size_t, const wchar_t *, ...);
-int	_vfwprintf_r (struct _reent *, __FILE *, const wchar_t *, __VALIST);
-int	_vswprintf_r (struct _reent *, wchar_t *, size_t, const wchar_t *, __VALIST);
-int	_vwprintf_r (struct _reent *, const wchar_t *, __VALIST);
+int	_vfwprintf_r (struct _reent *, __FILE *, const wchar_t *, va_list);
+int	_vswprintf_r (struct _reent *, wchar_t *, size_t, const wchar_t *, va_list);
+int	_vwprintf_r (struct _reent *, const wchar_t *, va_list);
 int	_wprintf_r (struct _reent *, const wchar_t *, ...);
 
 #if __ISO_C_VISIBLE >= 1999 || __XSI_VISIBLE >= 500
@@ -311,18 +293,18 @@ int	fwscanf (__FILE *__restrict, const wchar_t *__restrict, ...);
 int	swscanf (const wchar_t *__restrict,
 			const wchar_t *__restrict, ...);
 int	vfwscanf (__FILE *__restrict, const wchar_t *__restrict,
-			__VALIST);
+			va_list);
 int	vswscanf (const wchar_t *__restrict, const wchar_t *__restrict,
-			__VALIST);
-int	vwscanf (const wchar_t *__restrict, __VALIST);
+			va_list);
+int	vwscanf (const wchar_t *__restrict, va_list);
 int	wscanf (const wchar_t *__restrict, ...);
 #endif
 
 int	_fwscanf_r (struct _reent *, __FILE *, const wchar_t *, ...);
 int	_swscanf_r (struct _reent *, const wchar_t *, const wchar_t *, ...);
-int	_vfwscanf_r (struct _reent *, __FILE *, const wchar_t *, __VALIST);
-int	_vswscanf_r (struct _reent *, const wchar_t *, const wchar_t *, __VALIST);
-int	_vwscanf_r (struct _reent *, const wchar_t *, __VALIST);
+int	_vfwscanf_r (struct _reent *, __FILE *, const wchar_t *, va_list);
+int	_vswscanf_r (struct _reent *, const wchar_t *, const wchar_t *, va_list);
+int	_vwscanf_r (struct _reent *, const wchar_t *, va_list);
 int	_wscanf_r (struct _reent *, const wchar_t *, ...);
 
 #define getwc(fp)	fgetwc(fp)
@@ -336,6 +318,8 @@ int	_wscanf_r (struct _reent *, const wchar_t *, ...);
 #define getwchar_unlocked()	fgetwc_unlocked(stdin)
 #define putwchar_unlocked(wc)	fputwc_unlocked((wc), stdout)
 #endif
+
+#endif /* !TINY_STDIO */
 
 _END_STD_C
 

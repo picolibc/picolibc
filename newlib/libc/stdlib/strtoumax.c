@@ -55,8 +55,8 @@ __FBSDID("$FreeBSD: head/lib/libc/stdlib/strtoumax.c 251672 2013-06-13 00:19:30Z
 #ifndef _REENT_ONLY
 
 uintmax_t
-_strtoumax_l(const char * __restrict nptr,
-	     char ** __restrict endptr, int base, locale_t loc)
+strtoumax_l(const char * __restrict nptr,
+	    char ** __restrict endptr, int base, locale_t loc)
 {
 	const char *s = nptr;
 	uintmax_t acc;

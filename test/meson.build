@@ -71,8 +71,8 @@ foreach target : targets
 
   test(t1 + target,
        executable(t1_name, 'printf_scanf.c',
-		  c_args: ['-DPICOLIBC_FLOAT_PRINTF_SCANF'] + _c_args,
-		  link_args: ['-DPICOLIBC_FLOAT_PRINTF_SCANF'] + _link_args,
+		  c_args: float_printf_compile_args + _c_args,
+		  link_args: float_printf_link_args + _link_args,
 		  link_with: _libs,
 		  link_depends:  test_link_depends,
 		  include_directories: inc),
@@ -102,31 +102,25 @@ foreach target : targets
 
   test(t1 + target,
        executable(t1_name, ['printf-tests.c'],
-		  c_args: ['-DPICOLIBC_FLOAT_PRINTF_SCANF'] + _c_args,
-		  link_args: ['-DPICOLIBC_FLOAT_PRINTF_SCANF'] + _link_args,
+		  c_args: float_printf_compile_args + _c_args,
+		  link_args: float_printf_link_args + _link_args,
 		  link_with: _libs,
 		  include_directories: inc),
        env: ['MESON_SOURCE_ROOT=' + meson.source_root()])
 
-  if posix_io
-    t1 = 'posix-io'
-    if target == ''
-      t1_name = t1
-    else
-      t1_name = join_paths(target, t1)
-    endif
+  plain_tests = ['rand', 'regex', 'ungetc', 'fenv', 'math_errhandling', 'malloc', 'tls', 'ffs']
 
-    test(t1 + target,
-	 executable(t1_name, ['posix-io.c'],
-		    c_args: _c_args,
-		    link_args: _link_args,
-		    link_with: _libs,
-		    link_depends:  test_link_depends,
-		    include_directories: inc),
-	 env: ['MESON_SOURCE_ROOT=' + meson.source_root()])
+  if newlib_nano_malloc or not tests_disable_full_malloc_stress
+    plain_tests += 'malloc_stress'
   endif
 
-  plain_tests = ['rand', 'regex', 'ungetc', 'fenv']
+  if posix_io or not tinystdio
+    plain_tests += 'posix-io'
+  endif
+
+  if tests_enable_stack_protector
+    plain_tests += 'stack-smash'
+  endif
 
   foreach t1 : plain_tests
     t1_src = t1 + '.c'
@@ -147,3 +141,15 @@ foreach target : targets
   endforeach
 
 endforeach
+
+if enable_native_tests
+
+  native_lib_m = meson.get_compiler('c').find_library('m', required: false)
+
+  if native_lib_m.found()
+    test('math_errhandling_native',
+	 executable('math_errhandling_native', 'math_errhandling.c',
+		    c_args: test_c_warnings + ['-D_XOPEN_SOURCE=700', '-D_GNU_SOURCE', '-DNO_NEWLIB'],
+		    dependencies: native_lib_m))
+  endif
+endif

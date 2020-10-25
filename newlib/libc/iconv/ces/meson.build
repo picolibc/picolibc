@@ -32,7 +32,7 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
-srcs_ces = [
+srcs_iconv_ces = [
     'cesbi.c',
     'euc.c',
     'table.c',
@@ -45,15 +45,28 @@ srcs_ces = [
     'utf-16.c',
     'utf-8.c',
 ]
-hdrs_ces = [
+hdrs_iconv_ces = [
     'cesbi.h',
     'cesdeps.h',
 ]
+
+srcs_iconv_ces_use = []
+foreach file : srcs_iconv_ces
+  s_file = file.split('.')[0] + '.S'
+  if file in srcs_machine
+    message(file + ': machine overrides generic')
+  elif s_file in srcs_machine
+    message(s_file + ': machine overrides generic')
+  else
+    srcs_iconv_ces_use += file
+  endif
+endforeach
+
 foreach target : targets
 	value = get_variable('target_' + target)
-	set_variable('lib_ces' + target,
-		static_library('ces' + target,
-			       srcs_ces,
+	set_variable('lib_iconv_ces' + target,
+		static_library('iconv_ces' + target,
+			       srcs_iconv_ces_use,
 			       pic: false,
 			       include_directories: inc,
 			       c_args: value[1]))

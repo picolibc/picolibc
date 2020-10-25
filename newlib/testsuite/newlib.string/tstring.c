@@ -54,20 +54,21 @@ void myset (char *target, char ch, int size)
     }
 }
 
+static char target[MAX_1] = "A";
+static char buffer2[MAX_1];
+static char buffer3[MAX_1];
+static char buffer4[MAX_1];
+static char buffer5[MAX_2];
+static char buffer6[MAX_2];
+static char buffer7[MAX_2];
+static char expected[MAX_1];
+
 int main()
 {
-  char target[MAX_1] = "A";
   char first_char;
   char second_char;
   char array[] = "abcdefghijklmnopqrstuvwxz";
   char array2[] = "0123456789!@#$%^&*(";
-  char buffer2[MAX_1];
-  char buffer3[MAX_1];
-  char buffer4[MAX_1];
-  char buffer5[MAX_2];
-  char buffer6[MAX_2];
-  char buffer7[MAX_2];
-  char expected[MAX_1];
   char *tmp1, *tmp2, *tmp3, *tmp4, *tmp5, *tmp6, *tmp7;
   int i, j, k, x, z = 0, align_test_iterations;
 

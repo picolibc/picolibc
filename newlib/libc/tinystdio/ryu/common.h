@@ -32,6 +32,9 @@
 #define HAS_UINT128
 #endif
 
+static inline int max_int(int a, int b) { return a > b ? a : b; }
+static inline int min_int(int a, int b) { return a < b ? a : b; }
+
 // Returns e == 0 ? 1 : [log_2(5^e)]; requires 0 <= e <= 3528.
 int32_t __log2pow5(const int32_t e);
 

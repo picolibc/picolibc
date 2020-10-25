@@ -15,6 +15,7 @@
 #include <math.h>
 #include <sys/types.h>
 #include <machine/ieeefp.h>
+#include "math_config.h"
 
 /* Most routines need to check whether a float is finite, infinite, or not a
    number, and many need to know whether the result of an operation will
@@ -158,8 +159,9 @@ extern double __ieee754_cosh __P((double));
 extern double __ieee754_fmod __P((double,double));
 extern double __ieee754_pow __P((double,double));
 extern double __ieee754_lgamma __P((double));
+extern double ___ieee754_lgamma_r __P((double, int *));
 extern double __ieee754_lgamma_r __P((double, int *));
-extern double __ieee754_gamma __P((double));
+extern double __ieee754_tgamma __P((double));
 extern double __ieee754_log10 __P((double));
 extern double __ieee754_sinh __P((double));
 extern double __ieee754_hypot __P((double,double));
@@ -178,7 +180,6 @@ extern double __ieee754_scalb __P((double,double));
 #endif
 
 /* fdlibm kernel function */
-extern double __kernel_standard __P((double,double,int));
 extern double __kernel_sin __P((double,double,int));
 extern double __kernel_cos __P((double,double));
 extern double __kernel_tan __P((double,double,int));
@@ -205,8 +206,9 @@ extern float __ieee754_coshf __P((float));
 extern float __ieee754_fmodf __P((float,float));
 extern float __ieee754_powf __P((float,float));
 extern float __ieee754_lgammaf __P((float));
+extern float ___ieee754_lgammaf_r __P((float, int *));
 extern float __ieee754_lgammaf_r __P((float, int *));
-extern float __ieee754_gammaf __P((float));
+extern float __ieee754_tgammaf __P((float));
 extern float __ieee754_log10f __P((float));
 extern float __ieee754_sinhf __P((float));
 extern float __ieee754_hypotf __P((float,float));
@@ -224,7 +226,7 @@ extern float __ieee754_scalbf __P((float,int));
 extern float __ieee754_scalbf __P((float,float));
 #endif
 
-#if !__OBSOLETE_MATH
+#if !__OBSOLETE_MATH_DOUBLE
 /* The new math code does not provide separate wrapper function
    for error handling, so the extern symbol is called directly.
    This is valid as long as there are no namespace issues (the
@@ -233,6 +235,8 @@ extern float __ieee754_scalbf __P((float,float));
 # define __ieee754_exp(x) exp(x)
 # define __ieee754_log(x) log(x)
 # define __ieee754_pow(x,y) pow(x,y)
+#endif
+#if !__OBSOLETE_MATH_FLOAT
 # define __ieee754_expf(x) expf(x)
 # define __ieee754_logf(x) logf(x)
 # define __ieee754_powf(x,y) powf(x,y)

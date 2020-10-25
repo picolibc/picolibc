@@ -32,7 +32,7 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
-srcs_libm_machine = [
+srcs_libm_machine_real = [
   'f_atan2f.S',
   'f_atan2.S',
   'f_exp.c',
@@ -63,12 +63,27 @@ srcs_libm_machine = [
   'i386mach.h',
 ]
 
+srcs_libm_machine = srcs_libm_machine_real + [
+  'fe_dfl_env.c',
+  'feclearexcept.c',
+  'fegetenv.c',
+  'fegetexceptflag.c',
+  'fegetround.c',
+  'feholdexcept.c',
+  'feraiseexcept.c',
+  'fesetenv.c',
+  'fesetexceptflag.c',
+  'fesetround.c',
+  'fetestexcept.c',
+  'feupdateenv.c',
+]
+
 foreach target : targets
 	value = get_variable('target_' + target)
 	set_variable('lib_machine' + target,
 		static_library('machine' + target,
-			srcs_libm_machine,
+			srcs_libm_machine_real,
 			pic: false,
 			include_directories: [ inc, include_directories('../../common') ],
-			c_args: value[1] + ['-fno-builtin']))
+			c_args: value[1] + arg_fnobuiltin))
 endforeach

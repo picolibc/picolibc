@@ -1,0 +1,22 @@
+[binaries]
+c = 'aarch64-linux-gnu-gcc'
+ar = 'aarch64-linux-gnu-ar'
+as = 'aarch64-linux-gnu-as'
+ld = 'aarch64-linux-gnu-ld'
+nm = 'aarch64-linux-gnu-nm'
+strip = 'aarch64-linux-gnu-strip'
+exe_wrapper = ['sh', '-c', 'test -z "$MESON_SOURCE_ROOT" || "$MESON_SOURCE_ROOT"/scripts/run-aarch64 "$@"', 'run-arm']
+
+[host_machine]
+system = 'linux'
+cpu_family = 'aarch64'
+cpu = 'aarch64'
+endian = 'little'
+
+[properties]
+c_args = ['-mpc-relative-literal-loads', '-nostdlib', '-fno-pic', '-static']
+needs_exe_wrapper = true
+skip_sanity_check = true
+link_spec = '--build-id=none'
+cc1_spec = '-fno-pic -mpc-relative-literal-loads'
+specs_extra = ['*libgcc:', '-lgcc']

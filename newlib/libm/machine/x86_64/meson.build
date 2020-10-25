@@ -33,16 +33,31 @@
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
-srcs_libm_machine = [
+srcs_libm_machine_real = [
   'fenv.c'
+]
+
+srcs_libm_machine = srcs_libm_machine_real + [
+  'fe_dfl_env.c',
+  'feclearexcept.c',
+  'fegetenv.c',
+  'fegetexceptflag.c',
+  'fegetround.c',
+  'feholdexcept.c',
+  'feraiseexcept.c',
+  'fesetenv.c',
+  'fesetexceptflag.c',
+  'fesetround.c',
+  'fetestexcept.c',
+  'feupdateenv.c',
 ]
 
 foreach target : targets
 	value = get_variable('target_' + target)
 	set_variable('lib_machine' + target,
 		static_library('machine' + target,
-			srcs_libm_machine,
+			srcs_libm_machine_real,
 			pic: false,
 			include_directories: math_inc,
-			c_args: value[1] + ['-fno-builtin']))
+			c_args: value[1] + arg_fnobuiltin))
 endforeach

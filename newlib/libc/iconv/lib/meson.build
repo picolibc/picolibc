@@ -32,7 +32,7 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
-srcs_lib = [
+srcs_iconv_lib = [
     'aliasesbi.c',
     'aliasesi.c',
     'iconv.c',
@@ -40,7 +40,7 @@ srcs_lib = [
     'nullconv.c',
     'ucsconv.c',
 ]
-hdrs_lib = [
+hdrs_iconv_lib = [
     'conv.h',
     'encnames.h',
     'endian.h',
@@ -48,11 +48,24 @@ hdrs_lib = [
     'local.h',
     'ucsconv.h',
 ]
+
+srcs_iconv_lib_use = []
+foreach file : srcs_iconv_lib
+  s_file = file.split('.')[0] + '.S'
+  if file in srcs_machine
+    message(file + ': machine overrides generic')
+  elif s_file in srcs_machine
+    message(s_file + ': machine overrides generic')
+  else
+    srcs_iconv_lib_use += file
+  endif
+endforeach
+
 foreach target : targets
 	value = get_variable('target_' + target)
-	set_variable('lib_lib' + target,
-		static_library('lib' + target,
-			       srcs_lib,
+	set_variable('lib_iconv_lib' + target,
+		static_library('iconv_lib' + target,
+			       srcs_iconv_lib,
 			       pic: false,
 			       include_directories: inc,
 			       c_args: value[1]))

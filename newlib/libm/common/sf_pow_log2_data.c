@@ -27,7 +27,7 @@
    SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
 #include "fdlibm.h"
-#if !__OBSOLETE_MATH
+#if !__OBSOLETE_MATH_FLOAT
 
 #include "math_config.h"
 
@@ -56,4 +56,4 @@ const struct powf_log2_data __powf_log2_data = {
   0x1.71547652ab82bp0 * POWF_SCALE,
   }
 };
-#endif /* !__OBSOLETE_MATH */
+#endif /* !__OBSOLETE_MATH_FLOAT */

@@ -43,7 +43,7 @@ uintptr_t
 sys_semihost_close(int fd)
 {
 	struct {
-		uintptr_t	field1;
+		sh_param_t	field1;
 	} arg = {
 		.field1 = fd
 	};
