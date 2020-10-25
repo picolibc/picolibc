@@ -75,8 +75,8 @@ override_dh_auto_build:
 
 override_dh_auto_test:
 ifeq (,$(filter nocheck,$(DEB_BUILD_OPTIONS)))
-	cd debian/$(BUILDDIR)/$(ARM_ARCH) && meson test --timeout-multiplier=10
-	cd debian/$(BUILDDIR)/$(AARCH64_ARCH) && meson test --timeout-multiplier=10
+	cd debian/$(BUILDDIR)/$(ARM_ARCH) && meson test --timeout-multiplier=10 --verbose
+	cd debian/$(BUILDDIR)/$(AARCH64_ARCH) && meson test --timeout-multiplier=10 --verbose
 endif
 
 override_dh_auto_install:
