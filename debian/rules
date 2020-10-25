@@ -26,7 +26,7 @@ MESON_SHARED_FLAGS = \
 
 MESON_RISCV_FLAGS = \
 	$(MESON_SHARED_FLAGS) \
-	--cross-file cross-$(RISCV_ARCH).txt \
+	--cross-file scripts/cross-$(RISCV_ARCH).txt \
 	-Dspecsdir=/usr/lib/picolibc/$(RISCV_ARCH) \
 	-Dincludedir=lib/picolibc/$(RISCV_ARCH)/include \
 	-Dlibdir=lib/picolibc/$(RISCV_ARCH)/lib
@@ -34,14 +34,14 @@ MESON_RISCV_FLAGS = \
 MESON_ARM_FLAGS = \
 	$(MESON_SHARED_FLAGS) \
 	-Dtests=true \
-	--cross-file cross-$(ARM_ARCH).txt \
+	--cross-file scripts/cross-$(ARM_ARCH).txt \
 	-Dspecsdir=/usr/lib/picolibc/$(ARM_ARCH) \
 	-Dincludedir=lib/picolibc/$(ARM_ARCH)/include \
 	-Dlibdir=lib/picolibc/$(ARM_ARCH)/lib
 
 MESON_LX106_FLAGS = \
 	$(MESON_SHARED_FLAGS) \
-	--cross-file cross-$(LX106_ARCH).txt \
+	--cross-file scripts/cross-$(LX106_ARCH).txt \
 	-Dnewlib-long-time_t=true \
 	-Dspecsdir=/usr/lib/$(LX106_ARCH) \
 	-Dincludedir=lib/$(LX106_ARCH)/include \
@@ -50,7 +50,7 @@ MESON_LX106_FLAGS = \
 MESON_AARCH64_FLAGS = \
 	$(MESON_SHARED_FLAGS) \
 	-Dtests=true \
-	--cross-file cross-$(AARCH64_ARCH).txt \
+	--cross-file scripts/cross-$(AARCH64_ARCH).txt \
 	-Dspecsdir=/usr/lib/picolibc/$(AARCH64_ARCH) \
 	-Dincludedir=lib/picolibc/$(AARCH64_ARCH)/include \
 	-Dlibdir=lib/picolibc/$(AARCH64_ARCH)/lib
