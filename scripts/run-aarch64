@@ -57,4 +57,4 @@ mon=none
 
 serial=none
 
-$qemu -chardev $chardev -semihosting-config $semi -monitor $mon -serial $serial -M virt -cpu cortex-a57 -nographic -kernel "$elf" "$@" < /dev/null
+$qemu -chardev $chardev -semihosting-config $semi -monitor $mon -serial $serial -M virt -cpu cortex-a57 -nographic -kernel "$elf" "$@" -nic none < /dev/null
