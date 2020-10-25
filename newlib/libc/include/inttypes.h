@@ -318,7 +318,7 @@ typedef struct {
 extern "C" {
 #endif
 
-extern intmax_t  imaxabs(intmax_t j);
+extern intmax_t  imaxabs(intmax_t);
 extern imaxdiv_t imaxdiv(intmax_t numer, intmax_t denomer);
 extern intmax_t  strtoimax(const char *__restrict, char **__restrict, int);
 extern uintmax_t strtoumax(const char *__restrict, char **__restrict, int);
