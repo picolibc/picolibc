@@ -410,11 +410,8 @@ Files: newlib/libc/machine/or1k/setjmp.S
 Copyright: 2014, Hesham ALMatary
 License: BSD2-8
 
-Files: newlib/libm/machine/sparc/fenv.c
-Copyright: 2004-2005 David Schultz <das@FreeBSD.ORG>
-License: BSD2-9
-
-Files: newlib/libm/machine/xtensa/feclearexcept.c
+Files: newlib/libc/machine/xtensa/sys/fenv.h
+ newlib/libm/machine/xtensa/feclearexcept.c
  newlib/libm/machine/xtensa/fegetenv.c
  newlib/libm/machine/xtensa/fegetexcept.c
  newlib/libm/machine/xtensa/fegetexceptflag.c
@@ -424,18 +421,13 @@ Files: newlib/libm/machine/xtensa/feclearexcept.c
  newlib/libm/machine/xtensa/fetestexcept.c
  newlib/libm/machine/xtensa/feupdateenv.c
 Copyright: 2011 Tensilica Inc.
+License: BSD2-9
+
+Files: newlib/libm/machine/sparc/fenv.c
+Copyright: 2004-2005 David Schultz <das@FreeBSD.ORG>
 License: BSD2-10
 
-Files: do-arm-configure
- do-big-configure
- do-esp32-configure
- do-lx106-configure
- do-native-configure
- do-riscv-configure
- do-rv32imac-configure
- do-tiny-configure
- do-x86-configure
- dummyhost/iob.c
+Files: dummyhost/iob.c
  dummyhost/meson.build
  hello-world/Makefile
  hello-world/hello-world.c
@@ -533,6 +525,7 @@ Files: do-arm-configure
  newlib/libm/common/s_issignaling.c
  newlib/libm/common/sf_issignaling.c
  newlib/libm/common/signgam.c
+ newlib/libm/common/sl_issignaling.c
  newlib/libm/complex/meson.build
  newlib/libm/fenv/meson.build
  newlib/libm/machine/arm/meson.build
@@ -563,16 +556,36 @@ Files: do-arm-configure
  picocrt/meson.build
  picocrt/shared/crt0.c
  picolibc.ld
- run-arm
- run-riscv
+ scripts/do-aarch64-configure
+ scripts/do-arm-configure
+ scripts/do-clang-arm-configure
+ scripts/do-clang-riscv-configure
+ scripts/do-clang-thumbv7e+fp-configure
+ scripts/do-clang-thumbv7m-configure
+ scripts/do-configure
+ scripts/do-esp32-configure
+ scripts/do-freedom-tools-configure
+ scripts/do-lx106-configure
+ scripts/do-native-configure
+ scripts/do-riscv-configure
+ scripts/do-rv32imac-configure
+ scripts/do-x86-configure
+ scripts/do-zephyr-aarch64-configure
+ scripts/do-zephyr-arm-configure
+ scripts/do-zephyr-riscv-configure
+ scripts/run-arm
+ scripts/run-riscv
+ scripts/run-riscv-gdb
+ scripts/run-thumbv7e
+ scripts/run-thumbv7m
  semihost/close.c
  semihost/exit.c
  semihost/iob.c
  semihost/kill.c
  semihost/lseek.c
  semihost/lseek64.c
- semihost/machine/aarch64/semihost-aarch64.c
- semihost/machine/arm/semihost-arm.c
+ semihost/machine/aarch64/semihost-aarch64.S
+ semihost/machine/arm/semihost-arm.S
  semihost/machine/riscv/semihost-riscv.s
  semihost/meson.build
  semihost/open.c
@@ -604,8 +617,15 @@ Files: newlib/libc/errno/errno.c
  newlib/libc/iconv/ccs/binary/meson.build
  newlib/libc/include/ssp/meson.build
  newlib/libc/include/sys/auxv.h
+ newlib/libc/machine/aarch64/sys/meson.build
+ newlib/libc/machine/arm/sys/meson.build
+ newlib/libc/machine/csky/meson.build
+ newlib/libc/machine/i386/sys/meson.build
+ newlib/libc/machine/x86_64/sys/meson.build
+ newlib/libc/machine/xtensa/sys/meson.build
  newlib/libc/picolib/getauxval.c
  newlib/libc/picolib/machine/aarch64/tls.c
+ newlib/libc/picolib/machine/arm/arm_tls.h
  newlib/libc/picolib/machine/arm/read_tp.S
  newlib/libc/posix/meson.build
  newlib/libc/stdio/nano-svfprintf.c
@@ -636,20 +656,35 @@ Files: newlib/libc/errno/errno.c
  newlib/libc/tinystdio/strtod_l.c
  newlib/libc/tinystdio/strtold_l.c
  newlib/libc/tinystdio/vasprintf.c
+ newlib/libm/machine/arm/s_fma_arm.c
+ newlib/libm/machine/arm/sf_fma_arm.c
+ newlib/libm/machine/riscv/e_sqrt.c
+ newlib/libm/machine/riscv/ef_sqrt.c
+ newlib/libm/machine/riscv/s_fma.c
+ newlib/libm/machine/riscv/s_fma_riscv.c
+ newlib/libm/machine/riscv/sf_fma.c
+ newlib/libm/machine/riscv/sf_fma_riscv.c
  newlib/libm/machine/x86_64/meson.build
  newlib/libm/math/e_lgamma.c
  newlib/libm/math/ef_lgamma.c
- run-aarch64
- run-rv32imac
+ scripts/run-aarch64
+ scripts/run-rv32imac
+ scripts/test-arm.ld
+ scripts/test-riscv.ld
+ scripts/test-riscv32.ld
+ scripts/test-riscv64.ld
  semihost/fstat.c
  semihost/isatty.c
  semihost/mapstdio.c
- test-arm.ld
- test-riscv.ld
- test-riscv32.ld
- test-riscv64.ld
  test/fenv.c
+ test/ffs.c
+ test/malloc.c
+ test/malloc_stress.c
+ test/math_errhandling.c
+ test/math_errhandling_tests.c
  test/regex.c
+ test/stack-smash.c
+ test/tls.c
 Copyright: 2020 Keith Packard
 License: BSD3-1
 
@@ -666,6 +701,10 @@ License: BSD3-1
 Files: newlib/libc/machine/xtensa/meson.build
  newlib/libm/machine/xtensa/meson.build
 Copyright: 2019 Jonathan McDowell
+License: BSD3-1
+
+Files: scripts/do-freedom-tools-package
+Copyright: 2020 SiFive Inc.
 License: BSD3-1
 
 Files: newlib/libc/ctype/ctype_.c
@@ -2017,24 +2056,20 @@ Files: newlib/libm/machine/spu/headers/nearbyintf4.h
 Copyright: 2006,2008, International Business Machines Corporation, Sony Computer Entertainment, Incorporated, Toshiba Corporation, 
 License: BSD3-35
 
-Files: .drone.yml
- .gitattributes
+Files: .gitattributes
  .github/Dockerfile
- .github/workflows/tests.yml
+ .github/workflows/macos.yml
+ .github/workflows/minsize.yml
+ .github/workflows/release.yml
  .gitignore
  README.md
- cross-aarch64-linux-gnu.txt
- cross-arm-none-eabi.txt
- cross-i386-linux-gnu.txt
- cross-riscv64-unknown-elf.txt
- cross-rv32imac.txt
- cross-xtensa-lx106-elf.txt
  cross.tmpl
  doc/build.md
  doc/embedsource.md
  doc/init.md
  doc/linking.md
  doc/os.md
+ doc/picolibc.svg
  doc/printf.md
  doc/releasing.md
  doc/testing.md
@@ -2046,9 +2081,11 @@ Files: .drone.yml
  newlib/README
  newlib/doc/doc.str
  newlib/libc/ctype/ctype.tex
+ newlib/libc/include/sys/_tz_structs.h
  newlib/libc/libc.in.xml
  newlib/libc/machine/necv70/necv70.tex
  newlib/libc/ssp/ssp.tex
+ newlib/libc/stdlib/mul_overflow.h
  newlib/libc/string/wcstrings.tex
  newlib/libc/sys.tex
  newlib/libc/time/strftime.c
@@ -2060,6 +2097,19 @@ Files: .drone.yml
  newlib/make-target
  newlib/newlib.hin
  picolibc.specs.in
+ scripts/cross-aarch64-linux-gnu.txt
+ scripts/cross-aarch64-zephyr-elf.xt
+ scripts/cross-arm-none-eabi.txt
+ scripts/cross-arm-zephyr-eabi.txt
+ scripts/cross-clang-riscv64-unknown-elf.txt
+ scripts/cross-clang-thumbv7e+fp-none-eabi.txt
+ scripts/cross-clang-thumbv7m-none-eabi.txt
+ scripts/cross-i686-linux-gnu.txt
+ scripts/cross-riscv64-unknown-elf.txt
+ scripts/cross-riscv64-zephyr-elf.txt
+ scripts/cross-rv32imac.txt
+ scripts/cross-xtensa-esp32-elf.txt
+ scripts/cross-xtensa-lx106-elf.txt
 Copyright: 2020 The Newlib Project
 License: Default-1
 
@@ -2390,6 +2440,13 @@ Files: newlib/libc/stdio64/fdopen64.c
 Copyright: 2003 Christopher Faylor <me@cgf.cx>
 License: Default-1
 
+Files: newlib/libc/stdlib/__atexit.c
+ newlib/libc/stdlib/__call_atexit.c
+ newlib/libc/stdlib/cxa_atexit.c
+ newlib/libc/stdlib/cxa_finalize.c
+Copyright: 2004 Paul Brook <paul@codesourcery.com>
+License: Default-1
+
 Files: newlib/libc/stdlib/abort.c
  newlib/libc/stdlib/abs.c
  newlib/libc/stdlib/assert.c
@@ -2432,13 +2489,6 @@ Files: newlib/libc/stdlib/abort.c
  newlib/libc/stdlib/wctomb.c
  newlib/libc/stdlib/wctomb_r.c
 Copyright: 1990 Regents of the University of California.
-License: Default-1
-
-Files: newlib/libc/stdlib/__atexit.c
- newlib/libc/stdlib/__call_atexit.c
- newlib/libc/stdlib/cxa_atexit.c
- newlib/libc/stdlib/cxa_finalize.c
-Copyright: 2004 Paul Brook <paul@codesourcery.com>
 License: Default-1
 
 Files: newlib/libc/stdlib/getenv_r.c
@@ -2530,7 +2580,6 @@ Copyright: 2010-2019 Red Hat, Inc.
 License: Default-1
 
 Files: newlib/libc/include/fenv.h
- newlib/libc/machine/riscv/ffs.c
  newlib/libc/machine/riscv/ieeefp.c
  newlib/libc/machine/riscv/memcpy.c
  newlib/libc/machine/riscv/memset.S
@@ -2542,6 +2591,10 @@ Files: newlib/libc/include/fenv.h
  newlib/libc/machine/riscv/sys/fenv.h
  newlib/libc/machine/riscv/sys/string.h
 Copyright: 2017  SiFive Inc.
+License: FreeBSD-1
+
+Files: newlib/libc/machine/csky/setjmp.S
+Copyright: 2020  C-SKY Microsystems
 License: FreeBSD-1
 
 Files: newlib/libc/machine/riscv/memcpy-asm.S
@@ -2810,11 +2863,6 @@ Files: newlib/libc/include/machine/fastmath.h
  newlib/libc/machine/i386/setjmp.S
 Copyright: 1991 DJ Delorie
 License: Other-6
-
-Files: newlib/libc/include/pthread.h
- newlib/libc/include/sys/_pthreadtypes.h
-Copyright: 1989-2013, 2015. On-Line Applications Research Corporation (OAR).
-License: Other-7
 
 Files: newlib/libc/include/sched.h
  newlib/libc/include/sys/sched.h
@@ -3090,6 +3138,7 @@ Files: newlib/libc/reent/impure.c
  newlib/libc/time/gmtime.c
  newlib/libc/time/gmtime_r.c
  newlib/libc/time/lcltime.c
+ newlib/libc/time/lcltime_buf.c
  newlib/libc/time/lcltime_r.c
  newlib/libc/time/mktime.c
  newlib/libc/time/time.c
@@ -3266,7 +3315,6 @@ Files: newlib/libm/common/fdlibm.h
  newlib/libm/common/s_isinfd.c
  newlib/libm/common/s_isnan.c
  newlib/libm/common/s_isnand.c
- newlib/libm/common/s_lib_ver.c
  newlib/libm/common/s_llrint.c
  newlib/libm/common/s_llround.c
  newlib/libm/common/s_log1p.c
@@ -3331,6 +3379,7 @@ Files: newlib/libm/common/fdlibm.h
  newlib/libm/math/e_scalb.c
  newlib/libm/math/e_sinh.c
  newlib/libm/math/e_sqrt.c
+ newlib/libm/math/e_tgamma.c
  newlib/libm/math/ef_acos.c
  newlib/libm/math/ef_acosh.c
  newlib/libm/math/ef_asin.c
@@ -3351,14 +3400,12 @@ Files: newlib/libm/common/fdlibm.h
  newlib/libm/math/ef_scalb.c
  newlib/libm/math/ef_sinh.c
  newlib/libm/math/ef_sqrt.c
- newlib/libm/math/er_gamma.c
+ newlib/libm/math/ef_tgamma.c
  newlib/libm/math/er_lgamma.c
- newlib/libm/math/erf_gamma.c
  newlib/libm/math/erf_lgamma.c
  newlib/libm/math/k_cos.c
  newlib/libm/math/k_rem_pio2.c
  newlib/libm/math/k_sin.c
- newlib/libm/math/k_standard.c
  newlib/libm/math/k_tan.c
  newlib/libm/math/kf_cos.c
  newlib/libm/math/kf_rem_pio2.c
@@ -3838,26 +3885,6 @@ License: BSD2-9
  Redistribution and use in source and binary forms, with or without
  modification, are permitted provided that the following conditions
  are met:
- 1. Redistributions of source code must retain the above copyright
- notice, this list of conditions and the following disclaimer.
- 2. Redistributions in binary form must reproduce the above copyright
- notice, this list of conditions and the following disclaimer in the
- documentation and/or other materials provided with the distribution.
- .
- THIS SOFTWARE IS PROVIDED BY THE AUTHOR AND CONTRIBUTORS ``AS IS'' AND
- ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
- ARE DISCLAIMED.  IN NO EVENT SHALL THE AUTHOR OR CONTRIBUTORS BE LIABLE
- FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
- DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
- OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
- LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
-
-License: BSD2-10
- Redistribution and use in source and binary forms, with or without
- modification, are permitted provided that the following conditions
- are met:
  .
  1. Redistributions of source code must retain the above copyright
  notice, this list of conditions and the following disclaimer.
@@ -3879,6 +3906,26 @@ License: BSD2-10
  STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  OF THE POSSIBILITY OF SUCH DAMAGE.
+
+License: BSD2-10
+ Redistribution and use in source and binary forms, with or without
+ modification, are permitted provided that the following conditions
+ are met:
+ 1. Redistributions of source code must retain the above copyright
+ notice, this list of conditions and the following disclaimer.
+ 2. Redistributions in binary form must reproduce the above copyright
+ notice, this list of conditions and the following disclaimer in the
+ documentation and/or other materials provided with the distribution.
+ .
+ THIS SOFTWARE IS PROVIDED BY THE AUTHOR AND CONTRIBUTORS ``AS IS'' AND
+ ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ ARE DISCLAIMED.  IN NO EVENT SHALL THE AUTHOR OR CONTRIBUTORS BE LIABLE
+ FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
+ OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+ HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+ LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
 
 License: BSD3-1
  Redistribution and use in source and binary forms, with or without
