@@ -424,13 +424,6 @@ EXCLUDE_STATIC_OFILES:=$(addprefix --exclude=,\
 
 VERSION_OFILES:=version.o winver.o
 
-ifdef PREPROCESS
-override DLL_OFILES:=$(patsubst %.o,%_E,${DLL_OFILES})
-override EXCLUDE_STATIC_OFILES:=$(patsubst %.o,%_E,${EXCLUDE_STATIC_OFILES})
-override EXTRA_OFILES=$(patsubst %.o,%_E,${DLL_OFILES}))
-override MALLOC_OFILES:=$(patsubst %.o,%.E,${MALLOC_OFILES})
-endif #PREPROCESS
-
 ifeq ($(target_cpu),x86_64)
 # Needed by mcountFunc.S to choose the right code path and symbol names
 ASFLAGS:=-D_WIN64
