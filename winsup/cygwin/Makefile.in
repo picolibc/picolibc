@@ -105,7 +105,6 @@ RUNTESTFLAGS =
 DLL_NAME:=cygwin1.dll
 TEST_DLL_NAME:=${patsubst %1.dll,%0.dll,$(DLL_NAME)}
 TEST_LIB_NAME:=libcygwin0.a
-STATIC_LIB_NAME:=libcygwin_s.a
 DIN_FILE=@DIN_FILE@ common.din
 DEF_FILE:=cygwin.def
 TLSOFFSETS_H:=@TLSOFFSETS_H@
@@ -413,15 +412,6 @@ DLL_OFILES:= \
 	$(MATH_OFILES) \
 	$(TZCODE_OFILES)
 
-EXCLUDE_STATIC_OFILES:=$(addprefix --exclude=,\
-	cygtls.o \
-	dcrt0.o \
-	exceptions.o \
-	fork.o \
-	signal.o \
-	spawn.o \
-)
-
 VERSION_OFILES:=version.o winver.o
 
 ifeq ($(target_cpu),x86_64)
@@ -674,9 +664,6 @@ $(TEST_DLL_NAME): $(LDSCRIPT) dllfixdbg $(DLL_OFILES) $(LIBSERVER) $(LIBC) $(LIB
 # Rule to build libcygwin.a
 $(LIB_NAME): $(DEF_FILE) $(LIBCOS) | $(TEST_DLL_NAME)
 	${srcdir}/mkimport ${toolopts} ${NEW_FUNCTIONS} $@ cygdll.a $(wordlist 2,99,$^)
-
-${STATIC_LIB_NAME}: mkstatic ${TEST_DLL_NAME}
-	perl -d $< -x ${EXCLUDE_STATIC_OFILES} --library=${LIBC} --library=${LIBM} --ar=${AR} $@ cygwin.map
 
 # Rule to make stub library used by testsuite
 # dependency set to $(LIB_NAME) to accommodate make -j2.
