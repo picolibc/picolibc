@@ -572,17 +572,11 @@ exec_CFLAGS:=-fno-builtin-execve
 fhandler_proc_CFLAGS+=-DUSERNAME="\"$(USER)\"" -DHOSTNAME="\"$(HOSTNAME)\""
 fhandler_proc_CFLAGS+=-DGCC_VERSION="\"`$(CC) -v 2>&1 | tail -n 1`\""
 
-.PHONY: all force dll_ofiles install all_target all_host \
+.PHONY: all force dll_ofiles install \
 	install install-libs install-headers \
 	clean distclean realclean maintainer-clean
 
-all_host=@all_host@
-
-all: all_target $(all_host)
-
-all_target: $(TARGET_LIBS)
-
-all_host: $(TEST_LIB_NAME)
+all: $(TARGET_LIBS) $(TEST_LIB_NAME)
 
 force:
 

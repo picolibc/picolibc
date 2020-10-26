@@ -27,17 +27,6 @@ AC_LANG(C++)
 
 AC_CYGWIN_INCLUDES
 
-case "$with_cross_host" in
-  ""|*cygwin*)
-    all_host="all_host"
-    ;;
-  *)
-    all_host=
-    ;;
-esac
-
-AC_SUBST(all_host)
-
 AC_CHECK_TOOL(AR, ar, ar)
 AC_CHECK_TOOL(AS, as, as)
 AC_CHECK_TOOL(RANLIB, ranlib, ranlib)

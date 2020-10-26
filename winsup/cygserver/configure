@@ -596,7 +596,6 @@ LD
 RANLIB
 AS
 AR
-all_host
 INCLUDES
 CPP
 ac_ct_CXX
@@ -3384,17 +3383,6 @@ INCLUDES="${INCLUDES} -isystem ${cygwin_headers}"
 for h in ${newlib_headers}; do
     INCLUDES="${INCLUDES} -isystem $h"
 done
-
-
-
-case "$with_cross_host" in
-  ""|*cygwin*)
-    all_host="all_host"
-    ;;
-  *)
-    all_host=
-    ;;
-esac
 
 
 
