@@ -784,8 +784,6 @@ fhandler_pty_slave::reset_switch_to_pcon (void)
     return;
   get_ttyp ()->pcon_pid = 0;
   get_ttyp ()->switch_to_pcon_in = false;
-  get_ttyp ()->h_pseudo_console = NULL;
-  get_ttyp ()->pcon_start = false;
 }
 
 ssize_t __stdcall
@@ -2620,7 +2618,6 @@ fhandler_pty_slave::term_has_pcon_cap (const WCHAR *env)
   char *p;
   int len;
   int x1, y1, x2, y2;
-  tcflag_t c_lflag;
   DWORD t0;
 
   /* Check if terminal has ANSI escape sequence. */
@@ -2629,8 +2626,6 @@ fhandler_pty_slave::term_has_pcon_cap (const WCHAR *env)
 
   /* Check if terminal has CSI6n */
   WaitForSingleObject (input_mutex, INFINITE);
-  c_lflag = get_ttyp ()->ti.c_lflag;
-  get_ttyp ()->ti.c_lflag &= ~ICANON;
   /* Set h_pseudo_console and pcon_start so that the response
      will sent to io_handle rather than io_handle_cyg. */
   get_ttyp ()->h_pseudo_console = (HPCON *) -1; /* dummy */
@@ -2687,10 +2682,7 @@ fhandler_pty_slave::term_has_pcon_cap (const WCHAR *env)
       break;
     }
   while (len);
-  WaitForSingleObject (input_mutex, INFINITE);
   get_ttyp ()->h_pseudo_console = NULL;
-  get_ttyp ()->ti.c_lflag = c_lflag;
-  ReleaseMutex (input_mutex);
 
   if (len == 0)
     return true;
@@ -2711,7 +2703,6 @@ not_has_csi6n:
      in master write(). Therefore, clear it here manually. */
   get_ttyp ()->pcon_start = false;
   get_ttyp ()->h_pseudo_console = NULL;
-  get_ttyp ()->ti.c_lflag = c_lflag;
   ReleaseMutex (input_mutex);
 maybe_dumb:
   get_ttyp ()->pcon_cap_checked = true;
