@@ -11,6 +11,9 @@ target_builddir:=@target_builddir@
 winsup_srcdir:=@winsup_srcdir@
 configure_args=@configure_args@
 
+CC:=@CC@
+CXX:=@CXX@
+
 CFLAGS:=@CFLAGS@
 override CXXFLAGS=@CXXFLAGS@
 override CXXFLAGS+=-MMD -Wimplicit-fallthrough=5 -Werror -D__OUTSIDE_CYGWIN__ -DSYSCONFDIR="\"$(sysconfdir)\""

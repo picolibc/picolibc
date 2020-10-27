@@ -14,6 +14,9 @@ target_builddir:=@target_builddir@
 winsup_srcdir:=@winsup_srcdir@
 configure_args=@configure_args@
 
+CC:=@CC@
+CXX:=@CXX@
+
 CFLAGS?=@CFLAGS@
 CXXFLAGS?=@CXXFLAGS@
 INCLUDES?=@INCLUDES@
@@ -773,6 +776,7 @@ src_files := $(foreach dir,$(VPATH),$(find_src_files))
 # second, so version.cc is always older than winver.o
 version.cc: mkvers.sh include/cygwin/version.h winver.rc $(src_files)
 	@echo "Making version.cc and winver.o";\
+	export CC="${CC}";\
 	/bin/sh ${word 1,$^} ${word 2,$^} ${word 3,$^} $(WINDRES) ${CFLAGS} -I${srcdir}/include
 $(VERSION_OFILES): version.cc
 

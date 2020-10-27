@@ -11,6 +11,9 @@ target_builddir:=@target_builddir@
 winsup_srcdir:=@winsup_srcdir@
 configure_args=@configure_args@
 
+CC:=@CC@
+CXX:=@CXX@
+
 CFLAGS_COMMON=-Wimplicit-fallthrough=4 -Werror
 CFLAGS:=@CFLAGS@
 CXXFLAGS:=@CXXFLAGS@
