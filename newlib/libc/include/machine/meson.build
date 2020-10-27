@@ -32,7 +32,7 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
-install_headers(
+inc_machine_headers_all = [
   'ansi.h',
   '_arc4random.h',
   '_default_types.h',
@@ -50,5 +50,17 @@ install_headers(
   'time.h',
   '_types.h',
   'types.h',
+]
+
+inc_machine_headers = []
+foreach file : inc_machine_headers_all
+  if not (file in inc_machine_headers_machine)
+    inc_machine_headers += file
+  else
+    message('include/machine/' + file + ': machine overrides generic')
+  endif
+endforeach
+
+install_headers(
   subdir:'machine'
 )
