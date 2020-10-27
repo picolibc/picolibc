@@ -20,15 +20,17 @@ jobs:
     - uses: actions/checkout@v2
 
     # install build tools
-    - run: dnf install -y make patch perl
+    - run: dnf install -y autoconf automake make patch perl
     - run: dnf install -y mingw${{ matrix.pkgarch }}-gcc-c++ mingw${{ matrix.pkgarch }}-winpthreads-static mingw${{ matrix.pkgarch }}-zlib-static
 
-    # cocom isn't packaged in Fedora, so we install from a 3rd party repo
-    - run: dnf install -y https://github.com/rpmsphere/noarch/raw/master/r/rpmsphere-release-$(rpm -E %fedora)-1.noarch.rpm
+    # enable 'dnf copr'
+    - run: dnf install -y dnf-plugins-core
+
+    # cocom isn't packaged in Fedora, so we install from a copr
+    - run: dnf copr enable -y jturney/cocom
     - run: dnf install -y cocom
 
     # install cross-cygwin toolchain and libs from copr
-    - run: dnf install -y dnf-plugins-core
     - run: dnf copr enable -y yselkowitz/cygwin
     - run: dnf install -y cygwin${{ matrix.pkgarch }}-gcc-c++ cygwin${{ matrix.pkgarch }}-gettext cygwin${{ matrix.pkgarch }}-libbfd cygwin${{ matrix.pkgarch }}-libiconv cygwin${{ matrix.pkgarch }}-zlib
 
@@ -38,6 +40,7 @@ jobs:
 
     # build
     - run: mkdir build install
+    - run: cd winsup && ./autogen.sh
     - run: cd build && ../configure --target=${{ matrix.target }} --prefix=$(realpath $(pwd)/../install)
     - run: make -C build
     - run: make -C build/*/newlib info man

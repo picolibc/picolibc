@@ -1,4 +1,5 @@
 version: '{build}'
+image: Visual Studio 2019
 
 branches:
   only:
@@ -30,6 +31,8 @@ install:
 - "%CACHE%\\%SETUP% -qnNdO -R %CYGWIN_ROOT% -s %CYGWIN_MIRROR% -l %CACHE% -g -P \
 gcc-core,\
 gcc-g++,\
+autoconf,\
+automake,\
 make,\
 perl,\
 patch,\
@@ -40,21 +43,27 @@ zlib-devel,\
 %PKGARCH%-gcc-core,\
 %PKGARCH%-gcc-g++,\
 %PKGARCH%-zlib,\
+dejagnu,\
 dblatex,\
 docbook2X,\
 docbook-xml45,\
 docbook-xsl,\
+texlive-collection-latexrecommended,\
+texlive-collection-fontsrecommended,\
+texlive-collection-pictures,\
 xmlto,\
-python3-lxml,\
-python3-ply"
+python38-lxml,\
+python38-ply"
 
 build_script:
 - '%CYGWIN_ROOT%/bin/bash -lc "cd $APPVEYOR_BUILD_FOLDER; mkdir build install"'
+- '%CYGWIN_ROOT%/bin/bash -lc "cd $APPVEYOR_BUILD_FOLDER; cd winsup; ./autogen.sh"'
 - '%CYGWIN_ROOT%/bin/bash -lc "cd $APPVEYOR_BUILD_FOLDER/build; ../configure --prefix=$(realpath $(pwd)/../install) -v"'
 - '%CYGWIN_ROOT%/bin/bash -lc "cd $APPVEYOR_BUILD_FOLDER/build; make"'
 - '%CYGWIN_ROOT%/bin/bash -lc "cd $APPVEYOR_BUILD_FOLDER/build; make install"'
 - '%CYGWIN_ROOT%/bin/bash -lc "cd $APPVEYOR_BUILD_FOLDER/build; cd */newlib; make info man"'
 - '%CYGWIN_ROOT%/bin/bash -lc "cd $APPVEYOR_BUILD_FOLDER/build; cd */newlib; make install-info install-man"'
+- '%CYGWIN_ROOT%/bin/bash -lc "cd $APPVEYOR_BUILD_FOLDER/build; cd */winsup; make check || true"'
 
 test: off
 deploy: off
