@@ -37,5 +37,8 @@ Bug Fixes
 - Fix assertion failure on an invalid path under /proc/<pid>/fd/.
   Addresses: https://cygwin.com/pipermail/cygwin/2020-September/246160.html
 
-- Fix crash on stat(2)'ing /dev/ptmx on 32 bit
+- Fix crash on stat(2)'ing /dev/ptmx on 32 bit.
   Addresses: https://cygwin.com/pipermail/cygwin/2020-September/246218.html
+
+- Fix return value of sqrtl on negative infinity.
+  Addresses: https://cygwin.com/pipermail/cygwin/2020-October/246606.html

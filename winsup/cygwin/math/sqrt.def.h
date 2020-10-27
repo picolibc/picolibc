@@ -73,8 +73,11 @@ __FLT_ABI (sqrt) (__FLT_TYPE x)
       if (x_class == FP_ZERO)
 	return __FLT_CST (-0.0);
 
+      if (x_class == FP_NAN)
+	return x;
+
       errno = EDOM;
-      return x;
+      return -__FLT_NAN;
     }
   else if (x_class == FP_ZERO)
     return __FLT_CST (0.0);
