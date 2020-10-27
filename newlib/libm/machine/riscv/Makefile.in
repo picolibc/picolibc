@@ -78,7 +78,10 @@ am__objects_1 = lib_a-feclearexcept.$(OBJEXT) \
 	lib_a-fesetround.$(OBJEXT) lib_a-fetestexcept.$(OBJEXT) \
 	lib_a-feupdateenv.$(OBJEXT) lib_a-s_fma.$(OBJEXT) \
 	lib_a-e_sqrt.$(OBJEXT) lib_a-sf_fma.$(OBJEXT) \
-	lib_a-ef_sqrt.$(OBJEXT)
+	lib_a-ef_sqrt.$(OBJEXT) lib_a-s_fmax.$(OBJEXT) \
+	lib_a-s_fmin.$(OBJEXT) lib_a-sf_fmax.$(OBJEXT) \
+	lib_a-sf_fmin.$(OBJEXT) lib_a-s_fabs.$(OBJEXT) \
+	lib_a-sf_fabs.$(OBJEXT)
 am_lib_a_OBJECTS = $(am__objects_1)
 lib_a_OBJECTS = $(am_lib_a_OBJECTS)
 DEFAULT_INCLUDES = -I.@am__isrc@
@@ -207,7 +210,9 @@ LIB_SOURCES = \
 	feclearexcept.c fe_dfl_env.c fegetenv.c fegetexceptflag.c \
 	fegetround.c feholdexcept.c feraiseexcept.c fesetenv.c \
 	fesetexceptflag.c fesetround.c fetestexcept.c feupdateenv.c \
-	s_fma.c e_sqrt.c sf_fma.c ef_sqrt.c
+	s_fma.c e_sqrt.c sf_fma.c ef_sqrt.c \
+	s_fmax.c s_fmin.c sf_fmax.c sf_fmin.c \
+	s_fabs.c sf_fabs.c
 
 noinst_LIBRARIES = lib.a
 lib_a_SOURCES = $(LIB_SOURCES)
@@ -380,6 +385,42 @@ lib_a-ef_sqrt.o: ef_sqrt.c
 
 lib_a-ef_sqrt.obj: ef_sqrt.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-ef_sqrt.obj `if test -f 'ef_sqrt.c'; then $(CYGPATH_W) 'ef_sqrt.c'; else $(CYGPATH_W) '$(srcdir)/ef_sqrt.c'; fi`
+
+lib_a-s_fmax.o: s_fmax.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-s_fmax.o `test -f 's_fmax.c' || echo '$(srcdir)/'`s_fmax.c
+
+lib_a-s_fmax.obj: s_fmax.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-s_fmax.obj `if test -f 's_fmax.c'; then $(CYGPATH_W) 's_fmax.c'; else $(CYGPATH_W) '$(srcdir)/s_fmax.c'; fi`
+
+lib_a-s_fmin.o: s_fmin.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-s_fmin.o `test -f 's_fmin.c' || echo '$(srcdir)/'`s_fmin.c
+
+lib_a-s_fmin.obj: s_fmin.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-s_fmin.obj `if test -f 's_fmin.c'; then $(CYGPATH_W) 's_fmin.c'; else $(CYGPATH_W) '$(srcdir)/s_fmin.c'; fi`
+
+lib_a-sf_fmax.o: sf_fmax.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-sf_fmax.o `test -f 'sf_fmax.c' || echo '$(srcdir)/'`sf_fmax.c
+
+lib_a-sf_fmax.obj: sf_fmax.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-sf_fmax.obj `if test -f 'sf_fmax.c'; then $(CYGPATH_W) 'sf_fmax.c'; else $(CYGPATH_W) '$(srcdir)/sf_fmax.c'; fi`
+
+lib_a-sf_fmin.o: sf_fmin.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-sf_fmin.o `test -f 'sf_fmin.c' || echo '$(srcdir)/'`sf_fmin.c
+
+lib_a-sf_fmin.obj: sf_fmin.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-sf_fmin.obj `if test -f 'sf_fmin.c'; then $(CYGPATH_W) 'sf_fmin.c'; else $(CYGPATH_W) '$(srcdir)/sf_fmin.c'; fi`
+
+lib_a-s_fabs.o: s_fabs.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-s_fabs.o `test -f 's_fabs.c' || echo '$(srcdir)/'`s_fabs.c
+
+lib_a-s_fabs.obj: s_fabs.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-s_fabs.obj `if test -f 's_fabs.c'; then $(CYGPATH_W) 's_fabs.c'; else $(CYGPATH_W) '$(srcdir)/s_fabs.c'; fi`
+
+lib_a-sf_fabs.o: sf_fabs.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-sf_fabs.o `test -f 'sf_fabs.c' || echo '$(srcdir)/'`sf_fabs.c
+
+lib_a-sf_fabs.obj: sf_fabs.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-sf_fabs.obj `if test -f 'sf_fabs.c'; then $(CYGPATH_W) 'sf_fabs.c'; else $(CYGPATH_W) '$(srcdir)/sf_fabs.c'; fi`
 
 ID: $(HEADERS) $(SOURCES) $(LISP) $(TAGS_FILES)
 	list='$(SOURCES) $(HEADERS) $(LISP) $(TAGS_FILES)'; \
