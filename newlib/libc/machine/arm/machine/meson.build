@@ -1,7 +1,7 @@
 #
 # SPDX-License-Identifier: BSD-3-Clause
 #
-# Copyright © 2019 Keith Packard
+# Copyright © 2020 Keith Packard
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions
@@ -32,34 +32,13 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
-srcs_machine = [
-  'setjmp.S',
-  'strcmp.S',
-  'strcpy.c',
-  'aeabi_memcpy.c',
-  'aeabi_memcpy-armv7a.S',
-  'aeabi_memmove.c',
-  'aeabi_memmove-soft.S',
-  'aeabi_memset.c',
-  'aeabi_memset-soft.S',
-  'aeabi_memclr.c',
-  'memchr-stub.c',
-  'memchr.S',
-  'memcpy-stub.c',
-  'memcpy.S',
-  'strlen-stub.c',
-  'strlen.S',
+inc_machine_headers_machine = [
+  'acle-compat.h',
+  '_endian.h',
+  'math.h',
+  'param.h',
 ]
 
-subdir('sys')
-subdir('machine')
-
-foreach target : targets
-	value = get_variable('target_' + target)
-	set_variable('lib_machine' + target,
-		static_library('machine' + target,
-			srcs_machine,
-			pic: false,
-			include_directories: inc,
-			c_args: value[1] + arg_fnobuiltin))
-endforeach
+install_headers(inc_machine_headers_machine,
+		subdir:'machine'
+	       )
