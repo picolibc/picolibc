@@ -1,7 +1,7 @@
 #
 # SPDX-License-Identifier: BSD-3-Clause
 #
-# Copyright © 2019 Keith Packard
+# Copyright © 2020 Keith Packard, 
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions
@@ -32,27 +32,10 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
-srcs_machine = [
-  'memchr.S',
-  'memcmp.S',
-  'memcpy.S',
-  'memmove.S',
-  'memset.S',
-  'setjmp.S',
-  'strchr.S',
-  'strlen.S',
-  'i386mach.h'
+inc_machine_headers_machine = [
+  'fastmath.h'
 ]
 
-subdir('sys')
-subdir('machine')
-
-foreach target : targets
-	value = get_variable('target_' + target)
-	set_variable('lib_machine' + target,
-		static_library('machine' + target,
-			srcs_machine,
-			pic: false,
-			include_directories: inc,
-			c_args: value[1]))
-endforeach
+install_headers(inc_machine_headers_machine,
+		subdir:'machine'
+	       )
