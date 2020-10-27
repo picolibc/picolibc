@@ -104,6 +104,7 @@ private:
   bool pcon_cap_checked;
   bool has_csi6n;
   bool has_set_title;
+  bool do_not_resize_pcon;
 
 public:
   HANDLE from_master () const { return _from_master; }

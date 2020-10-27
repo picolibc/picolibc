@@ -1511,7 +1511,7 @@ fhandler_pty_common::resize_pseudo_console (struct winsize *ws)
   size.X = ws->ws_col;
   size.Y = ws->ws_row;
   pinfo p (get_ttyp ()->pcon_pid);
-  if (p)
+  if (p && !get_ttyp ()->do_not_resize_pcon)
     {
       HPCON_INTERNAL hpcon_local;
       HANDLE pcon_owner =
@@ -2489,7 +2489,10 @@ fhandler_pty_slave::setup_pseudoconsole (STARTUPINFOEXW *si, bool nopcon)
       si->StartupInfo.hStdInput = fh0->get_handle ();
     fhandler_base *fh1 = ::cygheap->fdtab[1];
     if (fh1 && fh1->get_device () != get_device ())
-      si->StartupInfo.hStdOutput = fh1->get_output_handle ();
+      {
+	get_ttyp ()->do_not_resize_pcon = true;
+	si->StartupInfo.hStdOutput = fh1->get_output_handle ();
+      }
     fhandler_base *fh2 = ::cygheap->fdtab[2];
     if (fh2 && fh2->get_device () != get_device ())
       si->StartupInfo.hStdError = fh2->get_output_handle ();
@@ -2535,6 +2538,7 @@ fhandler_pty_slave::close_pseudoconsole (void)
       get_ttyp ()->switch_to_pcon_in = false;
       get_ttyp ()->pcon_pid = 0;
       get_ttyp ()->pcon_start = false;
+      get_ttyp ()->do_not_resize_pcon = false;
     }
 }
 

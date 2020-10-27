@@ -245,6 +245,7 @@ tty::init ()
   pcon_cap_checked = false;
   has_csi6n = false;
   has_set_title = false;
+  do_not_resize_pcon = false;
 }
 
 HANDLE
