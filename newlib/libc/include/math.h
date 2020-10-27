@@ -659,6 +659,8 @@ extern NEWLIB_THREAD_LOCAL int signgam;
 
 #endif /* __BSD_VISIBLE */
 
+#include <machine/math.h>
+
 _END_STD_C
 
 #ifdef __FAST_MATH__

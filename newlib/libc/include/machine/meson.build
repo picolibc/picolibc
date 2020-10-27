@@ -41,6 +41,7 @@ inc_machine_headers_all = [
   'fastmath.h',
   'ieeefp.h',
   'malloc.h',
+  'math.h',
   'param.h',
   'setjmp-dj.h',
   'setjmp.h',
