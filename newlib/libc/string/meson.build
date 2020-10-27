@@ -150,9 +150,9 @@ srcs_string_use = []
 foreach file : srcs_string
   s_file = file.split('.')[0] + '.S'
   if file in srcs_machine
-    message(file + ': machine overrides generic')
+    message('libc/string/' + file + ': machine overrides generic')
   elif s_file in srcs_machine
-    message(s_file + ': machine overrides generic')
+    message('libc/string/' + s_file + ': machine overrides generic')
   else
     srcs_string_use += file
   endif
@@ -162,9 +162,9 @@ srcs_strcmp_use = []
 foreach file : srcs_strcmp
   s_file = file.split('.')[0] + '.S'
   if file in srcs_machine
-    message(file + ': machine overrides generic')
+    message('libc/string/' + file + ': machine overrides generic')
   elif s_file in srcs_machine
-    message(s_file + ': machine overrides generic')
+    message('libc/string/' + s_file + ': machine overrides generic')
   else
     srcs_strcmp_use += file
   endif

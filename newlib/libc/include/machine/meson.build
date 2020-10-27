@@ -57,7 +57,7 @@ foreach file : inc_machine_headers_all
   if not (file in inc_machine_headers_machine)
     inc_machine_headers += file
   else
-    message('include/machine/' + file + ': machine overrides generic')
+    message('libc/include/machine/' + file + ': machine overrides generic')
   endif
 endforeach
 

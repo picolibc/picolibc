@@ -42,9 +42,9 @@ srcs_reent_use = []
 foreach file : srcs_reent
   s_file = file.split('.')[0] + '.S'
   if file in srcs_machine
-    message(file + ': machine overrides generic')
+    message('libc/reent/' + file + ': machine overrides generic')
   elif s_file in srcs_machine
-    message(s_file + ': machine overrides generic')
+    message('libc/reent/' + s_file + ': machine overrides generic')
   else
     srcs_reent_use += file
   endif

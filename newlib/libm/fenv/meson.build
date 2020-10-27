@@ -52,9 +52,9 @@ srcs_fenv_use = []
 foreach file : srcs_fenv
   s_file = file.split('.')[0] + '.S'
   if file in srcs_libm_machine
-    message(file + ': machine overrides generic')
+    message('libm/fenv/' + file + ': machine overrides generic')
   elif s_file in srcs_libm_machine
-    message(s_file + ': machine overrides generic')
+    message('libm/fenv/' + s_file + ': machine overrides generic')
   else
     srcs_fenv_use += file
   endif

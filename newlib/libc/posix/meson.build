@@ -43,9 +43,9 @@ srcs_posix_use = []
 foreach file : srcs_posix
   s_file = file.split('.')[0] + '.S'
   if file in srcs_machine
-    message(file + ': machine overrides generic')
+    message('libc/posix/' + file + ': machine overrides generic')
   elif s_file in srcs_machine
-    message(s_file + ': machine overrides generic')
+    message('libc/posix/' + s_file + ': machine overrides generic')
   else
     srcs_posix_use += file
   endif

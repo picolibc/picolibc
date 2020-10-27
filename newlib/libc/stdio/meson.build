@@ -282,9 +282,9 @@ srcs_stdio_use = []
 foreach file : srcs_stdio
   s_file = file.split('.')[0] + '.S'
   if file in srcs_machine
-    message(file + ': machine overrides generic')
+    message('libc/stdio/' + file + ': machine overrides generic')
   elif s_file in srcs_machine
-    message(s_file + ': machine overrides generic')
+    message('libc/stdio/' + s_file + ': machine overrides generic')
   else
     srcs_stdio_use += file
   endif
