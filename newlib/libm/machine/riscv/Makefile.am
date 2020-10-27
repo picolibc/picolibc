@@ -9,7 +9,8 @@ LIB_SOURCES = \
 	fesetexceptflag.c fesetround.c fetestexcept.c feupdateenv.c \
 	s_fma.c e_sqrt.c sf_fma.c ef_sqrt.c \
 	s_fmax.c s_fmin.c sf_fmax.c sf_fmin.c \
-	s_fabs.c sf_fabs.c
+	s_fabs.c sf_fabs.c \
+	s_fpclassify.c sf_fpclassify.c
 
 noinst_LIBRARIES = lib.a
 lib_a_SOURCES = $(LIB_SOURCES)

@@ -81,7 +81,8 @@ am__objects_1 = lib_a-feclearexcept.$(OBJEXT) \
 	lib_a-ef_sqrt.$(OBJEXT) lib_a-s_fmax.$(OBJEXT) \
 	lib_a-s_fmin.$(OBJEXT) lib_a-sf_fmax.$(OBJEXT) \
 	lib_a-sf_fmin.$(OBJEXT) lib_a-s_fabs.$(OBJEXT) \
-	lib_a-sf_fabs.$(OBJEXT)
+	lib_a-sf_fabs.$(OBJEXT) lib_a-s_fpclassify.$(OBJEXT) \
+	lib_a-sf_fpclassify.$(OBJEXT)
 am_lib_a_OBJECTS = $(am__objects_1)
 lib_a_OBJECTS = $(am_lib_a_OBJECTS)
 DEFAULT_INCLUDES = -I.@am__isrc@
@@ -212,7 +213,8 @@ LIB_SOURCES = \
 	fesetexceptflag.c fesetround.c fetestexcept.c feupdateenv.c \
 	s_fma.c e_sqrt.c sf_fma.c ef_sqrt.c \
 	s_fmax.c s_fmin.c sf_fmax.c sf_fmin.c \
-	s_fabs.c sf_fabs.c
+	s_fabs.c sf_fabs.c \
+	s_fpclassify.c sf_fpclassify.c
 
 noinst_LIBRARIES = lib.a
 lib_a_SOURCES = $(LIB_SOURCES)
@@ -421,6 +423,18 @@ lib_a-sf_fabs.o: sf_fabs.c
 
 lib_a-sf_fabs.obj: sf_fabs.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-sf_fabs.obj `if test -f 'sf_fabs.c'; then $(CYGPATH_W) 'sf_fabs.c'; else $(CYGPATH_W) '$(srcdir)/sf_fabs.c'; fi`
+
+lib_a-s_fpclassify.o: s_fpclassify.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-s_fpclassify.o `test -f 's_fpclassify.c' || echo '$(srcdir)/'`s_fpclassify.c
+
+lib_a-s_fpclassify.obj: s_fpclassify.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-s_fpclassify.obj `if test -f 's_fpclassify.c'; then $(CYGPATH_W) 's_fpclassify.c'; else $(CYGPATH_W) '$(srcdir)/s_fpclassify.c'; fi`
+
+lib_a-sf_fpclassify.o: sf_fpclassify.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-sf_fpclassify.o `test -f 'sf_fpclassify.c' || echo '$(srcdir)/'`sf_fpclassify.c
+
+lib_a-sf_fpclassify.obj: sf_fpclassify.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-sf_fpclassify.obj `if test -f 'sf_fpclassify.c'; then $(CYGPATH_W) 'sf_fpclassify.c'; else $(CYGPATH_W) '$(srcdir)/sf_fpclassify.c'; fi`
 
 ID: $(HEADERS) $(SOURCES) $(LISP) $(TAGS_FILES)
 	list='$(SOURCES) $(HEADERS) $(LISP) $(TAGS_FILES)'; \
