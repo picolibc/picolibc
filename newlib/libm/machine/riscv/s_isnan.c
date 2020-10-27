@@ -32,28 +32,20 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+
 #include <math.h>
+#include <ieeefp.h>
 
-#if defined(__riscv_flen) && __riscv_flen >= 32
+#if defined(__riscv_flen) && __riscv_flen >= 64
 
+#undef isnan
 
 int
-__fpclassifyf (float x)
+isnan (double x)
 {
-  long fclass = _fclass_f (x);
-
-  if (fclass & FCLASS_ZERO)
-    return FP_ZERO;
-  else if (fclass & FCLASS_NORMAL)
-    return FP_NORMAL;
-  else if (fclass & FCLASS_SUBNORMAL)
-    return FP_SUBNORMAL;
-  else if (fclass & FCLASS_INF)
-    return FP_INFINITE;
-  else
-    return FP_NAN;
+	long fclass = _fclass_d (x);
+	return (fclass & FCLASS_NAN);
 }
-
 #else
-#include "../../common/sf_fpclassify.c"
+#include "../../common/s_isnan.c"
 #endif
