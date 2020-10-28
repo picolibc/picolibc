@@ -49,6 +49,18 @@ chardev=stdio,mux=on,id=stdio0
 
 semi=enable=on,chardev=stdio0
 
+input=""
+
+case "$1" in
+    -*|"")
+	;;
+    *)
+	semi="$semi",arg="$1"
+	input="$1"
+	shift
+	;;
+esac
+
 # Disable monitor
 
 mon=none
@@ -57,4 +69,4 @@ mon=none
 
 serial=none
 
-$qemu -chardev $chardev -semihosting-config $semi -monitor $mon -serial $serial -M virt -cpu cortex-a57 -nographic -kernel "$elf" "$@" -nic none < /dev/null
+echo "$input" | $qemu -chardev $chardev -semihosting-config $semi -monitor $mon -serial $serial -M virt -cpu cortex-a57 -nographic -kernel "$elf" "$@" -nic none

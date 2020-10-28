@@ -37,7 +37,7 @@
 # Run qemu for rv32imac processor
 
 qemu=qemu-system-riscv32
-options="i m a c"
+options="i m a f d c"
 cpu=rv32
 
 # select the program
