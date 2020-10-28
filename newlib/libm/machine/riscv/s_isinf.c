@@ -48,5 +48,5 @@ isinf (double x)
 	return (fclass & FCLASS_INF);
 }
 #else
-#include "../../common/sf_isinf.c"
+#include "../../common/s_isinf.c"
 #endif
