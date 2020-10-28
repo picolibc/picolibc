@@ -14,10 +14,15 @@ AC_CONFIG_SRCDIR(Makefile.in)
 
 . ${srcdir}/../configure.cygwin
 
+AC_CANONICAL_TARGET
+
 AC_PROG_CC
 AC_PROG_CPP
 AC_CHECK_TOOL(AR,ar)
 
 AC_SUBST(target_builddir)
+
+AC_CHECK_PROGS(MINGW_CXX, ${target_cpu}-w64-mingw32-g++)
+AC_CHECK_PROGS(MINGW_CC, ${target_cpu}-w64-mingw32-gcc)
 
 AC_OUTPUT(Makefile)
