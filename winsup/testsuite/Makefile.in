@@ -13,8 +13,6 @@ srcdir:=@srcdir@
 objdir:=.
 libltp_srcdir=$(srcdir)/libltp
 
-VPATH:=$(srcdir):$(libltp_srcdir)/lib
-
 target_alias:=@target_alias@
 build_alias:=@build_alias@
 host_alias:=@host_alias@
@@ -63,6 +61,8 @@ MINGW_FE:=$(dir ${srcdir})/utils/mingw
 # Include common definitions for winsup directory
 #
 include $(srcdir)/../Makefile.common
+
+VPATH+=$(libltp_srcdir)/lib
 
 override CC:=$(CC) $(GCC_INCLUDE)
 export CC
