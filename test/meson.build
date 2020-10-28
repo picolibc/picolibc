@@ -153,3 +153,7 @@ if enable_native_tests
 		    dependencies: native_lib_m))
   endif
 endif
+
+if has_semihost
+  subdir('semihost')
+endif
