@@ -71,6 +71,14 @@ _fclass_d(double x)
 }
 
 __declare_riscv_macro(double)
+copysign(double x, double y)
+{
+	double result;
+	asm ("fsgnj.d\t%0, %1, %2" : "=f" (result) : "f" (x), "f" (y));
+	return result;
+}
+
+__declare_riscv_macro(double)
 fabs(double x)
 {
 	double result;
@@ -163,6 +171,14 @@ _fclass_f(float x)
 	long fclass;
 	__asm __volatile ("fclass.s\t%0, %1" : "=r" (fclass) : "f" (x));
 	return fclass;
+}
+
+__declare_riscv_macro(float)
+copysignf(float x, float y)
+{
+	float result;
+	asm ("fsgnj.s\t%0, %1, %2" : "=f" (result) : "f" (x), "f" (y));
+	return result;
 }
 
 __declare_riscv_macro(float)
