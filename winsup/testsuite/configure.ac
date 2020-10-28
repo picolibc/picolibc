@@ -12,8 +12,12 @@ AC_PREREQ(2.59)
 AC_INIT([Cygwin Testsuite],[0],[cygwin@cygwin.com],[cygwin],[https://cygwin.com])
 AC_CONFIG_SRCDIR(Makefile.in)
 
+. ${srcdir}/../configure.cygwin
+
 AC_PROG_CC
 AC_PROG_CPP
 AC_CHECK_TOOL(AR,ar)
+
+AC_SUBST(target_builddir)
 
 AC_OUTPUT(Makefile)

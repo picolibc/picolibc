@@ -12,6 +12,7 @@ SHELL:=@SHELL@
 srcdir:=@srcdir@
 objdir:=.
 libltp_srcdir=$(srcdir)/libltp
+target_builddir:=@target_builddir@
 
 target_alias:=@target_alias@
 build_alias:=@build_alias@

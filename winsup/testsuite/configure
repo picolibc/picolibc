@@ -587,6 +587,7 @@ PACKAGE_URL='https://cygwin.com'
 ac_unique_file="Makefile.in"
 ac_subst_vars='LTLIBOBJS
 LIBOBJS
+target_builddir
 AR
 CPP
 OBJEXT
@@ -1771,6 +1772,8 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
 
 
+. ${srcdir}/../configure.cygwin
+
 ac_ext=c
 ac_cpp='$CPP $CPPFLAGS'
 ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
@@ -2788,6 +2791,8 @@ esac
 else
   AR="$ac_cv_prog_AR"
 fi
+
+
 
 
 ac_config_files="$ac_config_files Makefile"
