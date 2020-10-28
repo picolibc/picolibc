@@ -162,6 +162,8 @@ testsuite/site.exp: site.exp
 # Note: we set the PATH so that we can pick up cygwin0.dll
 
 check: $(TESTSUP_LIB_NAME) $(RUNTIME) cygrun.exe testsuite/site.exp
+	rootme=`pwd` ;\
+	PATH=$$rootme/../cygwin:$${PATH} ;\
 	cd testsuite; runtest --tool winsup $(RUNTESTFLAGS)
 
 cygrun.o: cygrun.c
