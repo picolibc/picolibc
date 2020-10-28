@@ -41,7 +41,7 @@
 int finitef(float x)
 {
 	long fclass = _fclass_f (x);
-	return (fclass & FCLASS_INF) == 0;
+	return (fclass & (FCLASS_INF | FCLASS_NAN)) == 0;
 }
 #else
 #include "../../common/sf_finite.c"

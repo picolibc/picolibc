@@ -44,7 +44,7 @@
 int finite(double x)
 {
 	long fclass = _fclass_d (x);
-	return (fclass & FCLASS_INF) == 0;
+	return (fclass & (FCLASS_INF | FCLASS_NAN)) == 0;
 }
 #else
 #include "../../common/s_finite.c"
