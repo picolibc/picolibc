@@ -34,12 +34,8 @@
  */
 
 #include "semihost-private.h"
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <fcntl.h>
-#include <unistd.h>
 
-uintptr_t
+int
 sys_semihost_close(int fd)
 {
 	struct {
@@ -47,5 +43,5 @@ sys_semihost_close(int fd)
 	} arg = {
 		.field1 = fd
 	};
-	return sys_semihost(SYS_CLOSE, (uintptr_t) &arg);
+	return (int) sys_semihost(SYS_CLOSE, (uintptr_t) &arg);
 }

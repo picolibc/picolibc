@@ -34,20 +34,22 @@
  */
 
 #include "semihost-private.h"
-#include <sys/cdefs.h>
-#include <unistd.h>
+#include <string.h>
 
-void  _ATTRIBUTE((__noreturn__))
-_exit(int code)
+int
+sys_semihost_rename(const char *old_pathname, const char *new_pathname)
 {
-	if (sys_semihost_feature(SH_EXT_EXIT_EXTENDED)) {
-		sys_semihost_exit_extended(code);
-	} else {
-		uintptr_t	value;
-		if (code == 0)
-			value = ADP_Stopped_ApplicationExit;
-		else
-			value = ADP_Stopped_RunTimeErrorUnknown;
-		sys_semihost_exit(value, code);
-	}
+	struct {
+		sh_param_t	field1;
+		sh_param_t	field2;
+		sh_param_t	field3;
+		sh_param_t	field4;
+	} arg = {
+		.field1 = (sh_param_t) (uintptr_t) old_pathname,
+		.field2 = strlen(old_pathname),
+		.field3 = (sh_param_t) (uintptr_t) new_pathname,
+		.field4 = strlen(new_pathname)
+	};
+
+	return (int) sys_semihost(SYS_RENAME, (uintptr_t) &arg);
 }

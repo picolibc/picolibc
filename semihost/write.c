@@ -47,20 +47,8 @@ write(int fd, const void *buf, size_t count)
 #ifndef TINY_STDIO
 	fd = _map_stdio(fd);
 #endif
+	uintptr_t ret = sys_semihost_write(fd, buf, count);
 
-	struct {
-		sh_param_t	field1;
-		sh_param_t	field2;
-		sh_param_t	field3;
-	} arg = {
-		.field1 = fd,
-		.field2 = (sh_param_t) (uintptr_t) buf,
-		.field3 = (sh_param_t) count
-	};
-
-
-	uintptr_t ret = sys_semihost(SYS_WRITE, (uintptr_t) &arg);
-
-	ssize_t put = count - (ssize_t) ret;
+	_READ_WRITE_RETURN_TYPE put = (_READ_WRITE_RETURN_TYPE) count - (_READ_WRITE_RETURN_TYPE) ret;
 	return put;
 }

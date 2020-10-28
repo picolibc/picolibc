@@ -1,7 +1,7 @@
 /*
  * SPDX-License-Identifier: BSD-3-Clause
  *
- * Copyright © 2019 Keith Packard
+ * Copyright © 2020 Keith Packard
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -34,20 +34,17 @@
  */
 
 #include "semihost-private.h"
-#include <sys/cdefs.h>
-#include <unistd.h>
+#include <string.h>
 
-void  _ATTRIBUTE((__noreturn__))
-_exit(int code)
+int
+sys_semihost_system(const char *command)
 {
-	if (sys_semihost_feature(SH_EXT_EXIT_EXTENDED)) {
-		sys_semihost_exit_extended(code);
-	} else {
-		uintptr_t	value;
-		if (code == 0)
-			value = ADP_Stopped_ApplicationExit;
-		else
-			value = ADP_Stopped_RunTimeErrorUnknown;
-		sys_semihost_exit(value, code);
-	}
+	struct {
+		sh_param_t	field1;
+		sh_param_t	field2;
+	} arg = {
+		.field1 = (uintptr_t) command,
+		.field2 = strlen(command)
+	};
+	return (int) sys_semihost(SYS_SYSTEM, (uintptr_t) &arg);
 }

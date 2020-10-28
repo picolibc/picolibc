@@ -35,7 +35,7 @@
 
 #include "semihost-private.h"
 
-int
+uintptr_t
 sys_semihost_flen(int fd)
 {
 	struct {
@@ -44,5 +44,5 @@ sys_semihost_flen(int fd)
 		.field1 = (sh_param_t) fd,
 	};
 
-	return (int) sys_semihost(SYS_FLEN, (uintptr_t) &arg);
+	return (uintptr_t) sys_semihost(SYS_FLEN, (uintptr_t) &arg);
 }

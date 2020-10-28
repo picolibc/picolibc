@@ -34,20 +34,9 @@
  */
 
 #include "semihost-private.h"
-#include <sys/cdefs.h>
-#include <unistd.h>
 
-void  _ATTRIBUTE((__noreturn__))
-_exit(int code)
+uintptr_t
+sys_semihost_time(void)
 {
-	if (sys_semihost_feature(SH_EXT_EXIT_EXTENDED)) {
-		sys_semihost_exit_extended(code);
-	} else {
-		uintptr_t	value;
-		if (code == 0)
-			value = ADP_Stopped_ApplicationExit;
-		else
-			value = ADP_Stopped_RunTimeErrorUnknown;
-		sys_semihost_exit(value, code);
-	}
+	return sys_semihost(SYS_TIME, 0);
 }
