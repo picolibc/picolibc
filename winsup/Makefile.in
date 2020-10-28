@@ -94,22 +94,8 @@ Makefile: Makefile.in $(srcdir)/configure config.status
 config.status: configure
 	$(SHELL) config.status --recheck
 
-# The below rule is intended to run configure only when "make check" is
-# actually specified, i.e., not in a cross-compilation environment.  The
-# cygwin configuration is copied and modified to ensure that the same configuration
-# parameters are passed when the testsuite is configured as when cygwin was configured.
 check: cygwin
-	@if [ -f testsuite/config.status ]; then \
-	    cd testsuite; \
-	else \
-	    (mkdir testsuite 2>/dev/null || exit 0); \
-	    cd testsuite; \
-	    sed -e 's%winsup/cygwin\>%winsup/testsuite%g' ../cygwin/config.status > config.status; \
-	    chmod a+x config.status; \
-	    sh ./config.status --recheck; \
-	    sh ./config.status; \
-	fi; \
-	$(MAKE) check
+	$(MAKE) -C testsuite check
 
 utils: cygwin
 

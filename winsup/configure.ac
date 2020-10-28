@@ -29,7 +29,7 @@ AC_LANG(C++)
 
 AC_CYGWIN_INCLUDES
 
-AC_CONFIG_SUBDIRS(cygwin cygserver doc)
+AC_CONFIG_SUBDIRS(cygwin cygserver doc testsuite)
 if test "x$with_cross_bootstrap" != "xyes"; then
     AC_CONFIG_SUBDIRS([utils])
 fi
