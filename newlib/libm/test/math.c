@@ -56,9 +56,37 @@ translate_to (FILE *file,
   fprintf(file, "0x%08lx, 0x%08lx", (unsigned long) bits.parts.msw, (unsigned long) bits.parts.lsw);
 }
 
-/* Convert double to float, preserving issignaling status */
-#define to_float(f,d)	do { if (issignaling(d)) (f) = __builtin_nansf(""); else (f) = (d); } while(0)
-#define to_double(d,f)	do { if (issignaling(f)) (d) = __builtin_nans(""); else (d) = (f); } while(0)
+/* Convert double to float, preserving issignaling status and NaN sign */
+
+#define to_float(f,d)	do {					\
+		if (__issignaling(d)) {				\
+			if (signbit(d))				\
+				(f) = -__builtin_nansf("");	\
+			else					\
+				(f) =  __builtin_nansf("");	\
+		} else if (isnan(d)) {				\
+			if (signbit(d))				\
+				(f) = -__builtin_nanf("");	\
+			else					\
+				(f) =  __builtin_nanf("");	\
+		} else						\
+			(f) = (float) (d);			\
+	} while(0)
+
+#define to_double(d,f)	do {					\
+		if (__issignalingf(f)) {				\
+			if (signbit(f))				\
+				(d) = -__builtin_nans("");	\
+			else					\
+				(d) =  __builtin_nans("");	\
+		} else if (isnanf(f)) {				\
+			if (signbit(f))				\
+				(d) = -__builtin_nan("");	\
+			else					\
+				(d) =  __builtin_nan("");	\
+		} else						\
+			(d) = (double) (f);			\
+	} while(0)
 
 int
 ffcheck_id(double is,
@@ -151,11 +179,12 @@ fffcheck_id (float is,
   __ieee_double_shape_type is_double;
   int mag;
   isbits.value = is;
-  is_double.value = (double) is;
+  to_double(is_double.value, is);
 
   correct_double.parts.msw = p->qs[id].msw;
   correct_double.parts.lsw = p->qs[id].lsw;
   to_float(correct.value, correct_double.value);
+//  printf("%s got 0x%08x want 0x%08x\n", name, isbits.p1, correct.p1);
 
   int error_bit = p->error_bit;
 
@@ -510,6 +539,8 @@ run_vector_1 (int vector,
 	 to_float(arga, arg1);
 	 to_float(argb, arg2);
 	 fresult = ((pdblfunc)(func))(arga, argb);
+//	 printf("0x%08x = %s(0x%08x, 0x%08x)\n",
+//		float_bits(fresult), name, float_bits(arga), float_bits(argb));
 	 ffinish(f, vector, fresult, p,args, name);
        }
      }
@@ -584,6 +615,8 @@ test_math (int vector)
   test_atanhf(vector);
   test_ceil(vector);
   test_ceilf(vector);
+  test_copysign(vector);
+  test_copysignf(vector);
   test_cos(vector);
   test_cosf(vector);
   test_cosh(vector);

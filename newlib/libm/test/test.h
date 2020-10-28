@@ -354,6 +354,12 @@ void
 test_ceilf(int vector);
 
 void
+test_copysign(int vector);
+
+void
+test_copysignf(int vector);
+
+void
 test_cos(int vector);
 
 void
