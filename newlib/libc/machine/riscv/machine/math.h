@@ -160,6 +160,16 @@ sqrt (double x)
 }
 #endif
 
+#if HAVE_FAST_FMA
+__declare_riscv_macro(double)
+fma (double x, double y, double z)
+{
+	double result;
+	asm ("fmadd.d %0, %1, %2, %3" : "=f" (result) : "f" (x), "f" (y), "f" (z));
+	return result;
+}
+#endif
+
 #endif /* defined(__riscv_flen) && __riscv_flen >= 64 */
 
 #if defined(__riscv_flen) && __riscv_flen >= 32
@@ -260,5 +270,15 @@ sqrtf (float x)
 #endif
 
 #endif /* defined(__riscv_flen) && __riscv_flen >= 32 */
+
+#if HAVE_FAST_FMAF
+__declare_riscv_macro(float)
+fmaf (float x, float y, float z)
+{
+	float result;
+	asm ("fmadd.s %0, %1, %2, %3" : "=f" (result) : "f" (x), "f" (y), "f" (z));
+	return result;
+}
+#endif
 
 #endif /* _MACHINE_MATH_H_ */
