@@ -24,11 +24,7 @@
 #include <math.h>
 #include <inttypes.h>
 #include "local.h"
-
-union fshape {
-  float value;
-  uint32_t bits;
-};
+#include "math_config.h"
 
 // This is only necessary because the implementation of isnan only works
 // properly when long double == double.
@@ -38,30 +34,30 @@ union fshape {
 float
 nexttowardf (float x, long double y)
 {
-  union fshape ux;
+  uint32_t ux;
   uint32_t e;
 
   if (isnan(x) || isnan(y))
     return (long double) x + y;
   if ((long double) x == y)
     return y;
-  ux.value = x;
+  ux = asuint(x);
   if (x == 0) {
-    ux.bits = 1;
+    ux = 1;
     if (signbit(y))
-      ux.bits |= 0x80000000;
+      ux |= 0x80000000;
   } else if ((long double) x < y) {
     if (signbit(x))
-      ux.bits--;
+      ux--;
     else
-      ux.bits++;
+      ux++;
   } else {
     if (signbit(x))
-      ux.bits++;
+      ux++;
     else
-      ux.bits--;
+      ux--;
   }
-  e = ux.bits & 0x7f800000;
+  e = ux & 0x7f800000;
   /* raise overflow if ux.value is infinite and x is finite */
   if (e == 0x7f800000) {
     volatile float force_eval;
@@ -71,10 +67,10 @@ nexttowardf (float x, long double y)
   /* raise underflow if ux.value is subnormal or zero */
   if (e == 0) {
     volatile float force_eval;
-    force_eval = x*x + ux.value*ux.value;
+    force_eval = x*x + asfloat(ux)*asfloat(ux);
     (void) force_eval;
   }
-  return ux.value;
+  return asfloat(ux);
 }
 
 #endif // _LDBL_EQ_DBL
