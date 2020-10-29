@@ -68,7 +68,9 @@ foreach src [lsort [glob -nocomplain $srcdir/$subdir/*.c $srcdir/$subdir/*/*.{cc
 	    } else {
 	       set redirect_output /dev/null
 	    }
-	    ws_spawn "$rootme/cygrun ./$base.exe > $redirect_output"
+	    file mkdir $tmpdir/$base
+	    ws_spawn "$rootme/cygrun ./$base.exe $tmpdir/$base > $redirect_output"
+	    file delete -force $tmpdir/$base
 	    if { $rv } {
 		fail "$testcase (execute)"
 		if { $xfail_expected } {
