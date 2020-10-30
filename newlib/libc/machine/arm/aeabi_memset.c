@@ -27,6 +27,7 @@
  */
 
 #include <stddef.h>
+#include <string.h>
 #include <_ansi.h>
 
 /* According to the run-time ABI for the ARM Architecture, this
@@ -63,7 +64,6 @@ void __attribute__((used)) __aeabi_memset (void *dest, size_t n, int c)
 {
   /*Note that relative to ANSI memset, __aeabi_memset hase the order
     of its second and third arguments reversed.  */
-  extern void memset (void *dest, int c, size_t n);
   memset (dest, c, n);
 }
 #endif
