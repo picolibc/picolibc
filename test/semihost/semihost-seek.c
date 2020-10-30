@@ -87,8 +87,8 @@ main(void)
 
 	not_read = sys_semihost_read(fd, buf, sizeof(buf));
 	if (sizeof (buf) - not_read != TEST_STRING_LEN - TEST_SEEK_POS) {
-		printf("read failed got %ld wanted %ld\n", not_read,
-		       sizeof(buf) - TEST_STRING_LEN + TEST_SEEK_POS);
+		printf("read failed got %ld wanted %ld\n", (long) not_read,
+		       (long) (sizeof(buf) - TEST_STRING_LEN + TEST_SEEK_POS));
 		code = 6;
 		goto bail1;
 	}
