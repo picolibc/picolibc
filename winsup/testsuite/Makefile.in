@@ -165,3 +165,6 @@ cygrun.o: cygrun.c
 
 cygrun.exe : cygrun.o
 	${MINGW_FE} $(CC) ${MINGW_LDFLAGS} -o $@ $<
+
+Makefile: Makefile.in $(srcdir)/configure config.status
+	$(SHELL) config.status
