@@ -35,6 +35,7 @@ endif
 else
 tooldir:=$(exec_prefix)/$(target_alias)
 endif
+datarootdir:=@datarootdir@
 datadir:=${DESTDIR}@datadir@
 infodir:=${DESTDIR}@infodir@
 includedir:=${DESTDIR}@includedir@
