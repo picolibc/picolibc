@@ -141,7 +141,7 @@ float
 __atof_engine(uint32_t m10, int e10);
 
 static inline uint16_t
-__non_atomic_exchange_ungetc(__ungetc_store_t *p, __ungetc_t v)
+__non_atomic_exchange_ungetc(__ungetc_t *p, __ungetc_t v)
 {
 	__ungetc_t e = *p;
 	*p = v;
@@ -159,28 +159,38 @@ __non_atomic_compare_exchange_ungetc(__ungetc_t *p, __ungetc_t d, __ungetc_t v)
 
 #ifdef ATOMIC_UNGETC
 
+#if __PICOLIBC_UNGETC_SIZE == 4 && defined (__GCC_HAVE_SYNC_COMPARE_AND_SWAP_4)
+#define PICOLIBC_HAVE_SYNC_COMPARE_AND_SWAP
+#endif
+
+#if __PICOLIBC_UNGETC_SIZE == 2 && defined (__GCC_HAVE_SYNC_COMPARE_AND_SWAP_2)
+#define PICOLIBC_HAVE_SYNC_COMPARE_AND_SWAP
+#endif
+
 #ifdef PICOLIBC_HAVE_SYNC_COMPARE_AND_SWAP
 
 /* Use built-in atomic functions if they exist */
 #include <stdatomic.h>
 static inline bool
-__atomic_compare_exchange_ungetc(__ungetc_store_t *p, __ungetc_t d, __ungetc_t v)
+__atomic_compare_exchange_ungetc(__ungetc_t *p, __ungetc_t d, __ungetc_t v)
 {
-	return atomic_compare_exchange_weak(p, &d, v);
+	_Atomic __ungetc_t *pa = (_Atomic __ungetc_t *) p;
+	return atomic_compare_exchange_weak(pa, &d, v);
 }
 static inline __ungetc_t
-__atomic_exchange_ungetc(__ungetc_store_t *p, __ungetc_t v)
+__atomic_exchange_ungetc(__ungetc_t *p, __ungetc_t v)
 {
-	return atomic_exchange_explicit(p, v, memory_order_relaxed);
+	_Atomic __ungetc_t *pa = (_Atomic __ungetc_t *) p;
+	return atomic_exchange_explicit(pa, v, memory_order_relaxed);
 }
 
 #else
 
 bool
-__atomic_compare_exchange_ungetc(__ungetc_store_t *p, __ungetc_t d, __ungetc_t v);
+__atomic_compare_exchange_ungetc(__ungetc_t *p, __ungetc_t d, __ungetc_t v);
 
 __ungetc_t
-__atomic_exchange_ungetc(__ungetc_store_t *p, __ungetc_t v);
+__atomic_exchange_ungetc(__ungetc_t *p, __ungetc_t v);
 
 #endif /* PICOLIBC_HAVE_SYNC_COMPARE_AND_SWAP */
 
