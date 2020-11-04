@@ -66,7 +66,7 @@ __tzcalc_limits (int year)
 	}
 
       /* store the change-over time in GMT form by adding offset */
-      tz->__tzrule[i].change = days * SECSPERDAY +
+      tz->__tzrule[i].change = (time_t) days * SECSPERDAY +
       tz->__tzrule[i].s + tz->__tzrule[i].offset;
     }
 
