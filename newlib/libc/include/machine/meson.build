@@ -63,5 +63,6 @@ foreach file : inc_machine_headers_all
 endforeach
 
 install_headers(
+  inc_machine_headers,
   subdir:'machine'
 )
