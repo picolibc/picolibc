@@ -94,6 +94,16 @@ SECTIONS
 		*(.got .got.*)
 	} >flash AT>flash :text
 
+	.ARM.extab : {
+		*(.ARM.extab* .gnu.linkonce.armextab.*)
+	} >flash AT>flash :text
+
+	PROVIDE (__exidx_start = .);
+	.ARM.exidx : {
+		*(.ARM.exidx*)
+	} >flash AT>flash :text
+	PROVIDE(__exidx_end = .);
+
 	. = ALIGN(8);
 
 	.preinit_array : {
