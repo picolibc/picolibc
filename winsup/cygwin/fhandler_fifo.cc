@@ -457,6 +457,7 @@ fhandler_fifo::update_my_handlers ()
 	}
     }
   fifo_client_unlock ();
+  NtClose (prev_proc);
   set_prev_owner (null_fr_id);
   return ret;
 }
