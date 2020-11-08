@@ -131,25 +131,28 @@ fhandler_fifo::fhandler_fifo ():
   fhandler_base (),
   read_ready (NULL), write_ready (NULL), writer_opening (NULL),
   owner_needed_evt (NULL), owner_found_evt (NULL), update_needed_evt (NULL),
-  cancel_evt (NULL), thr_sync_evt (NULL),
+  cancel_evt (NULL), thr_sync_evt (NULL), pipe_name_buf (NULL),
   fc_handler (NULL), shandlers (0), nhandlers (0),
   reader (false), writer (false), duplexer (false),
   max_atomic_write (DEFAULT_PIPEBUFSIZE),
   me (null_fr_id), shmem_handle (NULL), shmem (NULL),
   shared_fc_hdl (NULL), shared_fc_handler (NULL)
 {
-  pipe_name_buf[0] = L'\0';
   need_fork_fixup (true);
 }
 
 PUNICODE_STRING
 fhandler_fifo::get_pipe_name ()
 {
-  if (!pipe_name_buf[0])
+  if (!pipe_name_buf)
     {
+      pipe_name.Length = CYGWIN_FIFO_PIPE_NAME_LEN * sizeof (WCHAR);
+      pipe_name.MaximumLength = pipe_name.Length + sizeof (WCHAR);
+      pipe_name_buf = (PWCHAR) cmalloc_abort (HEAP_STR,
+					      pipe_name.MaximumLength);
+      pipe_name.Buffer = pipe_name_buf;
       __small_swprintf (pipe_name_buf, L"%S-fifo.%08x.%016X",
 			&cygheap->installation_key, get_dev (), get_ino ());
-      RtlInitUnicodeString (&pipe_name, pipe_name_buf);
     }
   return &pipe_name;
 }

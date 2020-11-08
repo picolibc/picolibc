@@ -1384,7 +1384,7 @@ class fhandler_fifo: public fhandler_base
   HANDLE thr_sync_evt;          /* The thread has terminated. */
 
   UNICODE_STRING pipe_name;
-  WCHAR pipe_name_buf[CYGWIN_FIFO_PIPE_NAME_LEN + 1];
+  PWCHAR pipe_name_buf;
   fifo_client_handler *fc_handler;     /* Dynamically growing array. */
   int shandlers;                       /* Size (capacity) of the array. */
   int nhandlers;                       /* Number of elements in the array. */
@@ -1467,6 +1467,11 @@ class fhandler_fifo: public fhandler_base
 
 public:
   fhandler_fifo ();
+  ~fhandler_fifo ()
+  {
+    if (pipe_name_buf)
+      cfree (pipe_name_buf);
+  }
   /* Called if we appear to be at EOF after polling fc_handlers. */
   bool hit_eof () const
   { return !nwriters () && !IsEventSignalled (writer_opening); }
@@ -1512,11 +1517,8 @@ public:
   {
     void *ptr = (void *) ccalloc (malloc_type, 1, sizeof (fhandler_fifo));
     fhandler_fifo *fhf = new (ptr) fhandler_fifo (ptr);
-    /* We don't want our client list to change any more. */
     copyto (fhf);
-    /* fhf->pipe_name_buf is a *copy* of this->pipe_name_buf, but
-       fhf->pipe_name.Buffer == this->pipe_name_buf. */
-    fhf->pipe_name.Buffer = fhf->pipe_name_buf;
+    fhf->pipe_name_buf = NULL;
     return fhf;
   }
 };
