@@ -69,10 +69,10 @@ int posix_devctl(
   size_t           nbyte,
   int *__restrict  dev_info_ptr
 );
-#endif
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif
+#endif /* _POSIX_26_C_SOURCE */
+#endif /*_POSIX_DEVCTL_h_ */
