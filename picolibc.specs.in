@@ -10,7 +10,7 @@
 @TLSMODEL@ %(picolibc_cc1) @CC1_SPEC@
 
 *cc1plus:
-@TLSMODEL@ %(picolibc_cc1plus) @CC1_SPEC@ @CC1PLUS_SPEC@
+-idirafter @INCLUDEDIR@ @TLSMODEL@ %(picolibc_cc1plus) @CC1_SPEC@ @CC1PLUS_SPEC@
 
 *link:
 @SPECS_PRINTF@ -L@LIBDIR@/%M -L@LIBDIR@ %{!T:-Tpicolibc.ld} %(picolibc_link) --gc-sections @LINK_SPEC@
