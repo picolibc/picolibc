@@ -19,7 +19,7 @@ CFLAGS:=@CFLAGS@
 CXXFLAGS:=@CXXFLAGS@
 INCLUDES:=@INCLUDES@
 override CFLAGS+=${CFLAGS_COMMON}
-override CXXFLAGS+=-fno-exceptions -fno-rtti ${CFLAGS_COMMON}
+override CXXFLAGS+=${CFLAGS_COMMON}
 
 include ${srcdir}/../Makefile.common
 
