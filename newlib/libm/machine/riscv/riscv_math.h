@@ -33,20 +33,48 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <math.h>
-#include <ieeefp.h>
+#ifndef __RISCV_MATH_H
+#define __RISCV_MATH_H
 
-#if defined(__riscv_flen) && __riscv_flen >= 32
 
-#include "riscv_math.h"
-#undef isinff
 
-int
-isinff (float x)
-{
-	long fclass = _fclass_f (x);
-	return (fclass & FCLASS_INF);
+#ifdef __riscv_flen
+
+#define FCLASS_NEG_INF       (1 << 0)
+#define FCLASS_NEG_NORMAL    (1 << 1)
+#define FCLASS_NEG_SUBNORMAL (1 << 2)
+#define FCLASS_NEG_ZERO      (1 << 3)
+#define FCLASS_POS_ZERO      (1 << 4)
+#define FCLASS_POS_SUBNORMAL (1 << 5)
+#define FCLASS_POS_NORMAL    (1 << 6)
+#define FCLASS_POS_INF       (1 << 7)
+#define FCLASS_SNAN          (1 << 8)
+#define FCLASS_QNAN          (1 << 9)
+
+
+#define FCLASS_INF           (FCLASS_NEG_INF | FCLASS_POS_INF)
+#define FCLASS_ZERO          (FCLASS_NEG_ZERO | FCLASS_POS_ZERO)
+#define FCLASS_NORMAL        (FCLASS_NEG_NORMAL | FCLASS_POS_NORMAL)
+#define FCLASS_SUBNORMAL     (FCLASS_NEG_SUBNORMAL | FCLASS_POS_SUBNORMAL)
+#define FCLASS_NAN           (FCLASS_SNAN | FCLASS_QNAN)
+
+#if __riscv_flen >= 64
+static inline long _fclass_d(double x){
+  long fclass;
+  __asm __volatile ("fclass.d\t%0, %1" : "=r" (fclass) : "f" (x));
+  return fclass;
 }
-#else
-#include "../../common/sf_isinf.c"
 #endif
+
+#if __riscv_flen >= 32
+static inline long _fclass_f(float x){
+  long fclass;
+  __asm __volatile ("fclass.s\t%0, %1" : "=r" (fclass) : "f" (x));
+  return fclass;
+}
+#endif
+
+#endif /* __riscv_flen */
+
+
+#endif /* __RISCV_MATH_H */

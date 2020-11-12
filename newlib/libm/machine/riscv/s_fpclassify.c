@@ -36,6 +36,7 @@
 
 #if defined(__riscv_flen) && __riscv_flen >= 64
 
+#include "riscv_math.h"
 
 int
 __fpclassifyd (double x)

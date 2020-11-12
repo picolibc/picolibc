@@ -40,10 +40,11 @@
 #include <math.h>
 
 #if defined(__riscv_flen) && __riscv_flen >= 64
+#include "riscv_math.h"
 int finite(double x)
 {
 	long fclass = _fclass_d (x);
-	return (fclass & (FCLASS_INF|FCLASS_NAN)) == 0;
+	return (fclass & (FCLASS_INF | FCLASS_NAN)) == 0;
 }
 #else
 #include "../../common/s_finite.c"
