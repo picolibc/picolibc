@@ -38,7 +38,6 @@
 
 #if defined(__riscv_flen) && __riscv_flen >= 32
 
-#include "riscv_math.h"
 #undef isinff
 
 int

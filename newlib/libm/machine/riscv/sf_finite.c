@@ -37,7 +37,6 @@
 
 #if defined(__riscv_flen) && __riscv_flen >= 32
 
-#include "riscv_math.h"
 int finitef(float x)
 {
 	long fclass = _fclass_f (x);
