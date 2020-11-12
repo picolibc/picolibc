@@ -46,8 +46,6 @@ TESTSUP_INCLUDES:=-I$(libltp_srcdir)/include
 #
 
 CC:=@CC@
-# FIXME: Which is it, CC or CC_FOR_TARGET?
-CC_FOR_TARGET:=$(CC)
 ifneq (,$(CFLAGS))
   override CFLAGS+= -MD $(TESTSUP_INCLUDES)
 else
@@ -66,9 +64,6 @@ include $(srcdir)/../Makefile.common
 
 VPATH+=$(libltp_srcdir)/lib
 
-override CC:=$(CC) $(GCC_INCLUDE)
-export CC
-
 RUNTESTFLAGS =
 
 ifdef VERBOSE
@@ -80,19 +75,15 @@ RUNTIME=$(cygwin_build)/cygwin0.dll $(cygwin_build)/libcygwin0.a
 TESTSUP_LIB_NAME:=libltp.a
 TESTSUP_OFILES:=${sort ${addsuffix .o,${basename ${notdir ${wildcard $(libltp_srcdir)/lib/*.c}}}}}
 
-override ALL_CFLAGS:=${filter-out -O%,$(ALL_CFLAGS)}
 override COMPILE_CC:=${filter-out -O%,$(COMPILE_CC)}
 override CFLAGS:=${filter-out -O%,$(CFLAGS)}
-export CFLAGS
 
-.PHONY: all force dll_ofiles install all_target
+.PHONY: all install
 
 .SUFFIXES:
 .SUFFIXES: .c .cc .def .a .o .d
 
 all: $(TESTSUP_LIB_NAME)
-
-force:
 
 install:
 
@@ -113,8 +104,6 @@ $(TESTSUP_LIB_NAME): $(TESTSUP_OFILES)
 
 $(RUNTIME) : $(cygwin_build)/Makefile
 	@$(MAKE) --no-print-dir -C $(@D) $(@F)
-
-# Rule to make stub library used by "make check"
 
 #
 
@@ -147,7 +136,7 @@ site.exp: ./config.status Makefile
 	@echo "set target_alias $(target_alias)" >> ./tmp0
 	@echo "set CC \"$(CC)\"" >> ./tmp0
 # CFLAGS is set even though it's empty to show we reserve the right to set it.
-	@echo "set CFLAGS \"$(ALL_CFLAGS)\"" >> ./tmp0
+	@echo "set CFLAGS \"\"" >> ./tmp0
 	@echo "set MINGW_CXX \"$(MINGW_CXX)\"" >> ./tmp0
 	@echo "set tmpdir $(tmpdir)" >> ./tmp0
 	@echo "set testdll_tmpdir $(testdll_tmpdir)" >> ./tmp0
