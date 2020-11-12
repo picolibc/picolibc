@@ -29,14 +29,14 @@ details. */
 
 #if defined(TESTSUITE_MOUNT_TABLE)
 static mnt_t mount_table[] = {
-/* native                 posix               flags                        issys */
- { TESTSUITE_ROOT,        (char*)"/",                MOUNT_BINARY | MOUNT_SYSTEM, 1 },
- { "O:\\other",           (char*)"/otherdir",        MOUNT_BINARY | MOUNT_SYSTEM, 1 },
- { "S:\\some\\dir",       (char*)"/somedir",         MOUNT_BINARY | MOUNT_SYSTEM, 1 },
- { TESTSUITE_ROOT"\\bin", (char*)"/usr/bin",         MOUNT_BINARY | MOUNT_SYSTEM, 1 },
- { TESTSUITE_ROOT"\\lib", (char*)"/usr/lib",         MOUNT_BINARY | MOUNT_SYSTEM, 1 },
- { ".",                   (char*)TESTSUITE_CYGDRIVE, MOUNT_BINARY | MOUNT_SYSTEM | MOUNT_CYGDRIVE, 1 },
- { NULL,                  (char*)NULL,               0,                           0 }
+/* native                 posix               flags */
+ { TESTSUITE_ROOT,        (char*)"/",                MOUNT_SYSTEM},
+ { "O:\\other",           (char*)"/otherdir",        MOUNT_SYSTEM},
+ { "S:\\some\\dir",       (char*)"/somedir",         MOUNT_SYSTEM},
+ { TESTSUITE_ROOT"\\bin", (char*)"/usr/bin",         MOUNT_SYSTEM},
+ { TESTSUITE_ROOT"\\lib", (char*)"/usr/lib",         MOUNT_SYSTEM},
+ { ".",                   (char*)TESTSUITE_CYGDRIVE, MOUNT_SYSTEM | MOUNT_CYGDRIVE},
+ { NULL,                  (char*)NULL,               0}
 };
 
 

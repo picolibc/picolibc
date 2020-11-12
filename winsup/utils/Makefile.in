@@ -123,9 +123,9 @@ MINGW_BINS += testsuite.exe
 MINGW_OBJS += path-testsuite.o testsuite.o
 testsuite.exe: path-testsuite.o
 path-testsuite.cc: path.cc ; @test -L $@ || ln -sf ${filter %.cc,$^} $@
-path-testsuite.o: MINGW_CXXFLAGS += -DTESTSUITE
+path-testsuite.o: MINGW_CXXFLAGS += -DTESTSUITE -Wno-error=write-strings
 # this is necessary because this .c lives in the build dir instead of src
-path-testsuite.o: MINGW_CXX := ${patsubst -I.,-I$(utils_source),$(MINGW_CXX)}
+path-testsuite.o: MINGW_CXXFLAGS += -I$(srcdir)
 path-testsuite.cc path.cc testsuite.cc: testsuite.h
 check: testsuite.exe ; $(<D)/$(<F)
 

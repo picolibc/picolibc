@@ -22,7 +22,9 @@ int get_word (HANDLE, int);
 int get_dword (HANDLE, int);
 bool from_fstab_line (mnt_t *m, char *line, bool user);
 
+#ifndef TESTSUITE
 extern mnt_t mount_table[255];
+#endif
 extern int max_mount_entry;
 
 #ifndef SYMLINK_MAX
