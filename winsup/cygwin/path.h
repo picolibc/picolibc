@@ -320,9 +320,11 @@ class path_conv
        contrast to statically allocated strings.  Calling device::dup()
        will duplicate the string if the source was allocated. */
     dev.dup ();
-    path = cstrdup (in_path);
+    if (in_path)
+      path = cstrdup (in_path);
     conv_handle.dup (pc.conv_handle);
-    posix_path = cstrdup(pc.posix_path);
+    if (pc.posix_path)
+      posix_path = cstrdup(pc.posix_path);
     if (pc.wide_path)
       {
 	wide_path = cwcsdup (uni_path.Buffer);
