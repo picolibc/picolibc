@@ -31,14 +31,15 @@ POSSIBILITY OF SUCH DAMAGE.
 #include <math.h>
 #include "local.h"
 
+#if defined(_LDBL_EQ_DBL) || defined(HAVE_BUILTIN_ISINFL)
 /* On platforms where long double is as wide as double.  */
-long double
-copysignl (long double x, long double y)
+int
+isinfl (long double x)
 {
 #ifdef _LDBL_EQ_DBL
-  return copysign(x, y);
+  return isinf(x);
 #else
-  return __builtin_copysignl(x, y);
+  return __builtin_isinfl(x);
 #endif
 }
-
+#endif

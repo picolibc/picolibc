@@ -32,13 +32,13 @@ POSSIBILITY OF SUCH DAMAGE.
 #include "local.h"
 
 /* On platforms where long double is as wide as double.  */
-long double
-copysignl (long double x, long double y)
+int
+finitel (long double x)
 {
 #ifdef _LDBL_EQ_DBL
-  return copysign(x, y);
+  return finite(x);
 #else
-  return __builtin_copysignl(x, y);
+  return __builtin_finitel(x);
 #endif
 }
 

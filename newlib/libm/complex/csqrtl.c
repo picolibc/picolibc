@@ -24,6 +24,7 @@
  * SUCH DAMAGE.
  */
 
+#define _GNU_SOURCE
 #include <sys/cdefs.h>
 #if 0
 __FBSDID("$FreeBSD: head/lib/msun/src/s_csqrtl.c 181402 2008-08-08 00:15:16Z das $");

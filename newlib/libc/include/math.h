@@ -149,10 +149,10 @@ extern double fmod (double, double);
 #if __MISC_VISIBLE
 extern int finite (double);
 extern int finitef (float);
-extern int finitel (long double);
 extern int isinff (float);
 extern int isnanf (float);
-#ifdef __CYGWIN__ /* not implemented in newlib yet */
+#if defined(_HAVE_LONG_DOUBLE)
+extern int finitel (long double);
 extern int isinfl (long double);
 extern int isnanl (long double);
 #endif
@@ -490,7 +490,6 @@ extern long double tanhl (long double);
 extern long double frexpl (long double, int *);
 extern long double modfl (long double, long double *);
 extern long double ceill (long double);
-extern long double fabsl (long double);
 extern long double floorl (long double);
 extern long double log1pl (long double);
 extern long double expm1l (long double);
@@ -513,7 +512,6 @@ extern long double fmodl (long double, long double);
 extern long double hypotl (long double, long double);
 #endif /* ! defined (__math_68881) */
 #endif /* ! defined (_REENT_ONLY) */
-extern long double copysignl (long double, long double);
 extern long double nanl (const char *);
 extern int ilogbl (long double);
 extern long double asinhl (long double);
@@ -562,12 +560,18 @@ extern long long int llrintl (_LONG_DOUBLE);
 
 #endif /* __ISO_C_VISIBLE >= 1999 */
 
+#ifdef _HAVE_LONG_DOUBLE
+/* Compiler provides these */
+extern long double fabsl (long double);
+extern long double copysignl (long double, long double);
+#endif
+
 #if __MISC_VISIBLE
 extern double drem (double, double);
 extern float dremf (float, float);
-#ifdef __CYGWIN__
-extern float dreml (long double, long double);
-#endif /* __CYGWIN__ */
+#if defined(_LDBL_EQ_DBL) || defined(__CYGWIN__)
+extern long double dreml (long double, long double);
+#endif
 extern double lgamma_r (double, int *);
 extern float lgammaf_r (float, int *);
 #endif
@@ -594,9 +598,9 @@ extern float jnf (int, float);
 #if __GNU_VISIBLE
 extern void sincos (double, double *, double *);
 extern void sincosf (float, float *, float *);
-#ifdef __CYGWIN__
+#if defined (_LDBL_EQ_DBL) || defined (__CYGWIN__)
 extern void sincosl (long double, long double *, long double *);
-#endif /* __CYGWIN__ */
+#endif
 # ifndef exp10
 extern double exp10 (double);
 # endif
@@ -609,14 +613,14 @@ extern float exp10f (float);
 # ifndef pow10f
 extern float pow10f (float);
 # endif
-#ifdef __CYGWIN__
+#if defined (_LDBL_EQ_DBL) || defined (__CYGWIN__)
 # ifndef exp10l
-extern float exp10l (float);
+extern long double exp10l (long double);
 # endif
 # ifndef pow10l
-extern float pow10l (float);
+extern long double pow10l (long double);
 # endif
-#endif /* __CYGWIN__ */
+#endif
 #endif /* __GNU_VISIBLE */
 
 #if __MISC_VISIBLE || __XSI_VISIBLE
