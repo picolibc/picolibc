@@ -114,6 +114,10 @@ lsrc_complex = [
 
 srcs_complex = dsrc_complex + fsrc_complex
 
+if have_long_double
+    srcs_complex += lsrc_complex
+endif
+
 hdrs_complex = [
     'cephes_subrf.h',
     'cephes_subr.h',
