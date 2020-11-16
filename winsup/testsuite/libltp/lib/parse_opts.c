@@ -583,7 +583,7 @@ STD_opts_help()
 
     for(i = 0; std_options[i].optstr; ++i) {
 	if (std_options[i].help)
-	    printf(std_options[i].help);
+	    fputs(std_options[i].help, stdout);
     }
 }
 
