@@ -5298,6 +5298,10 @@ void* dlpvalloc(size_t bytes) {
   size_t pagesz;
   ensure_initialization();
   pagesz = mparams.page_size;
+  if (bytes > MAX_REQUEST) {
+    MALLOC_FAILURE_ACTION;
+    return NULL;
+  }
   return dlmemalign(pagesz, (bytes + pagesz - SIZE_T_ONE) & ~(pagesz - SIZE_T_ONE));
 }
 
