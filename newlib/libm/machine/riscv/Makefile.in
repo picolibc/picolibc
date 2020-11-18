@@ -84,7 +84,9 @@ am__objects_1 = lib_a-feclearexcept.$(OBJEXT) \
 	lib_a-sf_fabs.$(OBJEXT) lib_a-s_fpclassify.$(OBJEXT) \
 	lib_a-sf_fpclassify.$(OBJEXT) lib_a-s_finite.$(OBJEXT) \
 	lib_a-sf_finite.$(OBJEXT) lib_a-s_isinf.$(OBJEXT) \
-	lib_a-sf_isinf.$(OBJEXT)
+	lib_a-sf_isinf.$(OBJEXT) lib_a-s_isnan.$(OBJEXT) \
+	lib_a-sf_isnan.$(OBJEXT) lib_a-s_copysign.$(OBJEXT) \
+	lib_a-sf_copysign.$(OBJEXT)
 am_lib_a_OBJECTS = $(am__objects_1)
 lib_a_OBJECTS = $(am_lib_a_OBJECTS)
 DEFAULT_INCLUDES = -I.@am__isrc@
@@ -218,7 +220,9 @@ LIB_SOURCES = \
 	s_fabs.c sf_fabs.c \
 	s_fpclassify.c sf_fpclassify.c \
 	s_finite.c sf_finite.c \
-	s_isinf.c sf_isinf.c
+	s_isinf.c sf_isinf.c \
+	s_isnan.c sf_isnan.c \
+	s_copysign.c sf_copysign.c
 
 noinst_LIBRARIES = lib.a
 lib_a_SOURCES = $(LIB_SOURCES)
@@ -463,6 +467,30 @@ lib_a-sf_isinf.o: sf_isinf.c
 
 lib_a-sf_isinf.obj: sf_isinf.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-sf_isinf.obj `if test -f 'sf_isinf.c'; then $(CYGPATH_W) 'sf_isinf.c'; else $(CYGPATH_W) '$(srcdir)/sf_isinf.c'; fi`
+
+lib_a-s_isnan.o: s_isnan.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-s_isnan.o `test -f 's_isnan.c' || echo '$(srcdir)/'`s_isnan.c
+
+lib_a-s_isnan.obj: s_isnan.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-s_isnan.obj `if test -f 's_isnan.c'; then $(CYGPATH_W) 's_isnan.c'; else $(CYGPATH_W) '$(srcdir)/s_isnan.c'; fi`
+
+lib_a-sf_isnan.o: sf_isnan.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-sf_isnan.o `test -f 'sf_isnan.c' || echo '$(srcdir)/'`sf_isnan.c
+
+lib_a-sf_isnan.obj: sf_isnan.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-sf_isnan.obj `if test -f 'sf_isnan.c'; then $(CYGPATH_W) 'sf_isnan.c'; else $(CYGPATH_W) '$(srcdir)/sf_isnan.c'; fi`
+
+lib_a-s_copysign.o: s_copysign.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-s_copysign.o `test -f 's_copysign.c' || echo '$(srcdir)/'`s_copysign.c
+
+lib_a-s_copysign.obj: s_copysign.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-s_copysign.obj `if test -f 's_copysign.c'; then $(CYGPATH_W) 's_copysign.c'; else $(CYGPATH_W) '$(srcdir)/s_copysign.c'; fi`
+
+lib_a-sf_copysign.o: sf_copysign.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-sf_copysign.o `test -f 'sf_copysign.c' || echo '$(srcdir)/'`sf_copysign.c
+
+lib_a-sf_copysign.obj: sf_copysign.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-sf_copysign.obj `if test -f 'sf_copysign.c'; then $(CYGPATH_W) 'sf_copysign.c'; else $(CYGPATH_W) '$(srcdir)/sf_copysign.c'; fi`
 
 ID: $(HEADERS) $(SOURCES) $(LISP) $(TAGS_FILES)
 	list='$(SOURCES) $(HEADERS) $(LISP) $(TAGS_FILES)'; \
