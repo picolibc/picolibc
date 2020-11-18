@@ -14,7 +14,11 @@ LIB_SOURCES = \
 	s_finite.c sf_finite.c \
 	s_isinf.c sf_isinf.c \
 	s_isnan.c sf_isnan.c \
-	s_copysign.c sf_copysign.c
+	s_copysign.c sf_copysign.c \
+	s_lrint.c sf_lrint.c \
+	s_lround.c sf_lround.c \
+	s_llrint.c sf_llrint.c \
+	s_llround.c sf_llround.c
 
 noinst_LIBRARIES = lib.a
 lib_a_SOURCES = $(LIB_SOURCES)
