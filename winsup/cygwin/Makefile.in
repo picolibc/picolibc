@@ -674,7 +674,7 @@ $(LIBSERVER): ${cygserver_blddir}/Makefile
 
 dll_ofiles: $(DLL_OFILES)
 
-$(LIBGMON_A): $(GMON_OFILES) $(GMON_START)
+$(LIBGMON_A): $(GMON_OFILES)
 	$(AR) rcv $(LIBGMON_A) $(GMON_OFILES)
 
 globals.h: mkglobals_h globals.cc
