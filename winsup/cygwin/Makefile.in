@@ -698,7 +698,7 @@ localtime.patched.c: tzcode/localtime.c tzcode/localtime.c.patch
 		    $(srcdir)/tzcode/localtime.c.patch
 
 localtime.o: tzcode/localtime_wrapper.c localtime.patched.c
-	$(CC) ${COMMON_CFLAGS} ${localtime_CFLAGS} \
+	$(CC) $(CXXFLAGS) ${COMMON_CFLAGS} ${localtime_CFLAGS} \
 		-I$(target_builddir)/winsup/cygwin \
 		-I$(srcdir) -I$(srcdir)/tzcode -c -o $@ $<
 
