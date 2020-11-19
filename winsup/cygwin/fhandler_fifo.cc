@@ -395,15 +395,10 @@ fhandler_fifo::delete_client_handler (int i)
 void
 fhandler_fifo::cleanup_handlers ()
 {
-  int i = 0;
-
-  while (i < nhandlers)
-    {
-      if (fc_handler[i].get_state () < fc_connected)
-	delete_client_handler (i);
-      else
-	i++;
-    }
+  /* Work from the top down to try to avoid copying. */
+  for (int i = nhandlers - 1; i >= 0; --i)
+    if (fc_handler[i].get_state () < fc_connected)
+      delete_client_handler (i);
 }
 
 /* Always called with fifo_client_lock in place. */
