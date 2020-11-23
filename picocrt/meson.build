@@ -33,9 +33,9 @@
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 src_picocrt_machine = {
-			'riscv' : 'riscv/crt0.c',
-			'riscv32' : 'riscv/crt0.c',
-			'riscv64' : 'riscv/crt0.c',
+			'riscv' : 'riscv/crt0.S',
+			'riscv32' : 'riscv/crt0.S',
+			'riscv64' : 'riscv/crt0.S',
 			'arm' : 'arm/crt0.c',
 			'aarch64' : 'aarch64/crt0.c'
 		      }
