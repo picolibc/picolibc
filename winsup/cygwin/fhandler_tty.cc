@@ -2043,7 +2043,7 @@ fhandler_pty_master::pty_master_fwd_thread ()
 	  /* Remove CSI > Pm m */
 	  int state = 0;
 	  int start_at = 0;
-	  for (DWORD i=0; i<rlen; i++)
+	  for (DWORD i = 0; i < rlen; i++)
 	    if (outbuf[i] == '\033')
 	      {
 		start_at = i;
