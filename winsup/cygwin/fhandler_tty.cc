@@ -2069,6 +2069,36 @@ fhandler_pty_master::pty_master_fwd_thread ()
 	    else
 	      state = 0;
 
+	  /* Remove OSC Ps ; ? BEL/ST */
+	  for (DWORD i = 0; i < rlen; i++)
+	    if (state == 0 && outbuf[i] == '\033')
+	      {
+		start_at = i;
+		state = 1;
+		continue;
+	      }
+	    else if ((state == 1 && outbuf[i] == ']')
+		     || (state == 2 && outbuf[i] == ';')
+		     || (state == 3 && outbuf[i] == '?')
+		     || (state == 4 && outbuf[i] == '\033'))
+	      {
+		state ++;
+		continue;
+	      }
+	    else if (state == 2 && isdigit (outbuf[i]))
+	      continue;
+	    else if ((state == 4 && outbuf[i] == '\a')
+		     || (state == 5 && outbuf[i] == '\\'))
+	      {
+		memmove (&outbuf[start_at], &outbuf[i+1], rlen-i-1);
+		rlen = wlen = start_at + rlen - i - 1;
+		state = 0;
+		i = start_at - 1;
+		continue;
+	      }
+	    else
+	      state = 0;
+
 	  if (get_ttyp ()->term_code_page != CP_UTF8)
 	    {
 	      size_t nlen = NT_MAX_PATH;
