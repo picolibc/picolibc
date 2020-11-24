@@ -46,14 +46,14 @@
 #endif
 
 .text
-.section .text._cstart,"ax",@progbits
+.section .text.init.enter,"ax",@progbits
 .align 1
-.globl _cstart
-.type _cstart, @function
-_cstart:
-
+.globl _start
+.type _start, @function
+_start:
 .option push
 .option norelax
+la sp, __stack
 la gp, __global_pointer$
 .option pop
 
@@ -102,10 +102,10 @@ li a1, 0
 call main
 
 #ifdef HAVE_INITFINI_ARRAY
-// save return value a0 in saved register s5
-mv s5, a0
+// save return value a0 in saved register s1
+mv s1, a0
 call __libc_fini_array
-mv a0, s5
+mv a0, s1
 #endif
 
 lui t0, %hi(_exit)
@@ -121,16 +121,4 @@ call _exit
  * (This makes sure the stack is correctly set, as opposed to _cstart)
  */
 j _start
-.size _cstart, .-_cstart
-
-.section .text.init.enter,"ax",@progbits
-.align 1
-.globl _start
-.type _start, @function
-_start:
-.option push
-.option norelax
-la sp, __stack
-.option pop
-j _cstart
 .size _start, .-_start
