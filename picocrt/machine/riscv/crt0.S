@@ -69,26 +69,20 @@ csrwi fcsr, 0
 // __start
 
 // call to memcpy(__data_start, __data_source, __data_size)
-lui a0, %hi(__data_start)
-addi a0, a0, %lo(__data_start)
-lui a1, %hi(__data_source)
-addi a1, a1, %lo(__data_source)
-lui a2, %hi(__data_size)
-addi a2, a2, %lo(__data_size)
+la a0, __data_start
+la a1, __data_source
+la a2, __data_size
 call memcpy
 
 // call to memset(__bss_start, '\0', __bss_size)
-lui a0, %hi(__bss_start)
-addi a0, a0, %lo(__bss_start)
+la a0, __bss_start
 li a1, 0
-lui a2, %hi(__bss_size)
-addi a2, a2, %lo(__bss_size)
+la a2, __bss_size
 call memset
 
 #ifdef PICOLIBC_TLS
 // call to _set_tls(__tls_base)
-lui a0, %hi(__tls_base)
-addi a0, a0, %lo(__tls_base)
+la a0, __tls_base
 call _set_tls
 #endif
 
@@ -108,8 +102,7 @@ call __libc_fini_array
 mv a0, s1
 #endif
 
-lui t0, %hi(_exit)
-addi t0, t0, %lo(_exit)
+la t0, _exit
 beqz t0, .SKIP_EXIT
 call _exit
 .SKIP_EXIT:
