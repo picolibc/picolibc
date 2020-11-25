@@ -118,6 +118,9 @@ void
 sys_semihost_heapinfo(struct sys_semihost_block *block);
 
 int
+sys_semihost_iserror(intptr_t status);
+
+int
 sys_semihost_istty(int fd);
 
 int
