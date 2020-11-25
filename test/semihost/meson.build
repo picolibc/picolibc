@@ -37,29 +37,28 @@ semihost_tests = [
   'semihost-exit',
   'semihost-exit-extended',
   'semihost-clock',
+  'semihost-close',
+  'semihost-elapsed',
   'semihost-errno',
   'semihost-flen',
   'semihost-get-cmdline',
+  'semihost-heapinfo',
+  'semihost-iserror',
   'semihost-istty',
   'semihost-open',
   'semihost-read',
+  'semihost-readc',
   'semihost-remove',
   'semihost-rename',
   'semihost-seek',
   'semihost-system',
+  'semihost-tickfreq',
   'semihost-time',
+  'semihost-tmpnam',
+  'semihost-write',
   'semihost-writec',
   'semihost-write0'
 ]
-
-# These tests should pass, but are currently broken under qemu
-semihost_broken = [
-  'semihost-elapsed',
-  'semihost-heapinfo',
-  'semihost-readc',
-  'semihost-tickfreq',
-  'semihost-tmpnam',
-  ]
 
 semihost_fail_tests = [
   'semihost-exit-failure',
