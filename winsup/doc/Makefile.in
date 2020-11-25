@@ -17,6 +17,7 @@ htmldir = @htmldir@
 mandir = @mandir@
 man1dir = $(mandir)/man1
 man3dir = $(mandir)/man3
+man5dir = $(mandir)/man5
 infodir:=@infodir@
 sysconfdir:=@sysconfdir@
 
@@ -61,6 +62,7 @@ clean:
 	rm -f api2man.stamp intro2man.stamp utils2man.stamp
 	rm -f *.1
 	rm -f *.3
+	rm -f *.5
 	rm -f *.info* charmap
 
 install: install-all
@@ -86,6 +88,8 @@ install-man: utils2man.stamp api2man.stamp intro2man.stamp
 	$(INSTALL_DATA) *.1 $(DESTDIR)$(man1dir)
 	@$(MKDIRP) $(DESTDIR)$(man3dir)
 	$(INSTALL_DATA) *.3 $(DESTDIR)$(man3dir)
+	@$(MKDIRP) $(DESTDIR)$(man5dir)
+	$(INSTALL_DATA) *.5 $(DESTDIR)$(man5dir)
 
 install-info: cygwin-ug-net.info cygwin-api.info
 	$(MKDIRP) $(DESTDIR)$(infodir)
