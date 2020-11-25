@@ -486,6 +486,2100 @@ one in Linux, but it provides significant capabilities. The
 <systemitem>procps</systemitem> package contains several utilities
 that use it.
 </para>
+  <refentry id="proc">
+    <!-- based on Linux manpages project proc(5)
+    (c) Copyright 2020 Cygwin project
+    (c) Copyright 2002&bsol;-2008,2017 Michael Kerrisk &lt;mtk.manpages@gmail.com&gt;
+    (c) Copyright 1994, 1995 by Daniel Quinlan (quinlan@yggdrasil.com) -->
+
+    <!-- %%%LICENSE_START(GPLv2+_DOC_FULL)
+    This is free documentation; you can redistribute it and/or
+    modify it under the terms of the GNU General Public License as
+    published by the Free Software Foundation; either version 2 of
+    the License, or (at your option) any later version. -->
+
+    <!-- The GNU General Public License's references to "object code"
+    and "executables" are to be interpreted as the output of any
+    document formatting or typesetting system, including
+    intermediate and printed output. -->
+
+    <!-- This manual is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details. -->
+
+    <!-- You should have received a copy of the GNU General Public
+    License along with this manual; if not, see
+    &lt;<ulink url='http://www.gnu.org/licenses/&gt;'>http://www.gnu.org/licenses/&gt;</ulink>.
+    %%%LICENSE_END -->
+
+    <refentryinfo>
+      <date>2020-11-24</date>
+      <author>Cygwin Project</author>
+    </refentryinfo>
+    <refmeta>
+      <refentrytitle>proc</refentrytitle>
+      <manvolnum>5</manvolnum>
+      <refmiscinfo class='date'>2020-11-24</refmiscinfo>
+      <refmiscinfo class='source'>Cygwin</refmiscinfo>
+      <refmiscinfo class='manual'>Cygwin User's Manual</refmiscinfo>
+    </refmeta>
+
+    <refnamediv>
+      <refname>proc</refname>
+      <refpurpose>process and system information pseudo-filesystem</refpurpose>
+    </refnamediv>
+
+    <refsect1 id='proc-desc'>
+      <title>Description</title>
+      <para>The <filename>proc</filename> filesystem is a pseudo-filesystem
+	which provides an interface to Cygwin data structures.
+	It is commonly mounted at <filename>/proc</filename>.
+	Typically, it is mounted automatically by the system.
+      </para>
+
+      <refsect2 id='proc-overview'>
+	<title>Overview</title>
+	<para>Underneath <filename>/proc</filename>, there are the following
+	  general groups of files and subdirectories:
+	</para>
+
+	<variablelist remap='TP'>
+	  <varlistentry>
+	    <term><filename>/proc/<emphasis remap='I'>[pid]</emphasis></filename> subdirectories</term>
+	    <listitem>
+	      <para>Each one of these subdirectories contains files and
+		subdirectories exposing information about the process with the
+		corresponding process id.
+	      </para>
+
+	      <para>The <filename>/proc/<emphasis remap='I'>[pid]</emphasis></filename> subdirectories are
+		visible when iterating through <filename>/proc</filename> with
+		<citerefentry>
+		  <refentrytitle>readdir</refentrytitle><manvolnum>2</manvolnum>
+		</citerefentry>
+		(and thus are visible when one uses
+		<citerefentry>
+		  <refentrytitle>ls</refentrytitle><manvolnum>1</manvolnum>
+		</citerefentry>
+		to view the contents of <filename>/proc</filename>).
+	      </para>
+
+	    </listitem>
+	  </varlistentry>
+	  <varlistentry>
+	    <term><filename>/proc/self</filename></term>
+	    <listitem>
+	      <para>When a process accesses this magic symbolic link, it resolves
+		to the process's own <filename>/proc/<emphasis remap='I'>[pid]</emphasis></filename> directory.
+	      </para>
+
+	    </listitem>
+	  </varlistentry>
+	  <varlistentry>
+	    <term><filename>/proc/<emphasis remap='I'>[a-z]*</emphasis></filename></term>
+	    <listitem>
+	      <para>Various other files and subdirectories under
+		<filename>/proc</filename> expose system-wide information.
+	      </para>
+
+	    </listitem>
+	  </varlistentry>
+	</variablelist>
+
+	<para>All of the above are described in more detail below.
+	</para>
+
+      </refsect2>
+
+      <refsect2 id='proc-files-and-directories'>
+	<title>Files and directories</title>
+	  <para>
+	    The following list provides details of many of the files
+	    and directories under the <filename>/proc</filename> hierarchy.
+	  </para>
+
+	<variablelist remap='TP'>
+	  <varlistentry>
+	    <term><filename>/proc/<emphasis remap='I'>[pid]</emphasis></filename></term>
+	    <listitem>
+	      <para>
+	        There is a numerical subdirectory for each running
+	        process; the subdirectory is named by the process id.
+		Each <filename>/proc/<emphasis remap='I'>[pid]</emphasis></filename> subdirectory
+		contains the pseudo-files and directories described below.
+	      </para>
+
+	      <para>The files inside each <filename>/proc/<emphasis remap='I'>[pid]</emphasis></filename>
+	        directory are normally owned by the effective user and
+	        effective group id of the process.
+	      </para>
+
+	    </listitem>
+	  </varlistentry>
+	  <varlistentry>
+	    <term><filename>/proc/<emphasis remap='I'>[pid]</emphasis>/cmdline</filename></term>
+	    <listitem>
+	      <para>This read-only file holds the complete command line for the
+	        process, unless the process is a zombie.
+	        In the latter case, there is nothing in this file: that is, a
+	        read on this file will return 0 characters.
+	        The command-line arguments appear in this file as a set of
+	        strings followed by null bytes (&apos;&bsol;0&apos;).
+	      </para>
+
+	    </listitem>
+	  </varlistentry>
+	  <varlistentry>
+	    <term><filename>/proc/<emphasis remap='I'>[pid]</emphasis>/ctty</filename></term>
+	    <listitem>
+	      <para>
+	        This read-only file holds the name of the console or control
+	        terminal device for the process, unless the process is detached
+	        from any terminal.
+	        In the latter case, there is only a newline in this file.
+	      </para>
+
+	    </listitem>
+	  </varlistentry>
+	  <varlistentry>
+	    <term><filename>/proc/<emphasis remap='I'>[pid]</emphasis>/cwd</filename></term>
+	    <listitem>
+	      <para>
+	        This is a symbolic link to the current working directory of the
+	        process.
+	        To find out the current working directory of process 20, for
+	        instance, you can do this:
+
+		<screen>
+		  <prompt>$</prompt> <userinput>cd /proc/20/cwd; /bin/pwd</userinput>
+		</screen>
+	      </para>
+
+	      <para>Note that the <emphasis remap='I'>pwd</emphasis> command
+	        is often a shell built-in, and might not work properly. In
+		<citerefentry>
+		  <refentrytitle>bash</refentrytitle><manvolnum>1</manvolnum>
+		</citerefentry>,
+		you may use <userinput>pwd&nbsp;-P</userinput>.
+	      </para>
+	    </listitem>
+	  </varlistentry>
+	  <varlistentry>
+	    <term><filename>/proc/<emphasis remap='I'>[pid]</emphasis>/environ</filename></term>
+	    <listitem>
+	      <para>
+	        This read-only file contains the current environment that may
+	        have been changed by the currently executing program.
+	        The entries are separated by null bytes (&apos;&bsol;0&apos;),
+	        and there may be a null byte at the end.
+		Thus, to print out the environment of process 1, you would do:
+
+		<screen>
+		  <prompt>$</prompt> <userinput>cat -A /proc/1/environ</userinput>
+		</screen>
+	      </para>
+
+	      <para>If, after an
+		<citerefentry>
+		  <refentrytitle>execve</refentrytitle><manvolnum>2</manvolnum>
+		</citerefentry>,
+		the process modifies its environment (e.g., by calling
+		functions such as
+		<citerefentry>
+		  <refentrytitle>putenv</refentrytitle><manvolnum>3</manvolnum>
+		</citerefentry>
+		or modifying the
+		<citerefentry>
+		  <refentrytitle>environ</refentrytitle><manvolnum>7</manvolnum>
+		</citerefentry>
+		variable directly), this file will reflect those changes.
+		That may not be the case on other systems such as Linux.
+	      </para>
+	    </listitem>
+	  </varlistentry>
+	  <varlistentry>
+	    <term><filename>/proc/<emphasis remap='I'>[pid]</emphasis>/exe</filename></term>
+	    <listitem>
+	      <para>
+	        This file is a symbolic link containing the actual pathname of
+	        the executed command.
+	        This symbolic link can be dereferenced normally; attempting to
+	        open it will open the executable.
+	        You can even type <filename>/proc/<emphasis remap='I'>[pid]</emphasis>/exe</filename>
+	        to run another copy of the same executable that is being run by
+	        process <emphasis remap='I'>[pid]</emphasis>.
+		<filename>/proc/<emphasis remap='I'>[pid]</emphasis>/exe</filename> is a pointer to
+		the binary which was executed, and appears as a symbolic link.
+	      </para>
+
+	    </listitem>
+	  </varlistentry>
+	  <varlistentry>
+	    <term><filename>/proc/<emphasis remap='I'>[pid]</emphasis>/exename</filename></term>
+	    <listitem>
+	      <para>
+	        This read-only file contains the actual pathname of the executed
+	        command.
+	      </para>
+
+	    </listitem>
+	  </varlistentry>
+	  <varlistentry>
+	    <term><filename>/proc/<emphasis remap='I'>[pid]</emphasis>/fd/</filename></term>
+	    <listitem>
+              <para>
+                This is a subdirectory containing one entry for each
+                file which the process has open, named by its file
+                descriptor, and which is a symbolic link to the actual
+                file.
+                Thus, 0 is standard input, 1 standard output, 2 standard
+                error, and so on.
+              </para>
+
+	      <para>
+		For file descriptors for pipes and sockets, the entries will
+		be symbolic links whose content is the file type with the
+		inode. A
+		<citerefentry>
+		  <refentrytitle>readlink</refentrytitle><manvolnum>2</manvolnum>
+		</citerefentry>
+		call on this file returns a string in the format:
+		<literal>type:<emphasis remap='I'>[inode]</emphasis></literal>
+	      </para>
+
+	      <para>For example, <literal>socket:[2248868]</literal>
+		will be a socket and its inode is 2248868.
+	      </para>
+
+	      <para>
+	        Programs that take a filename as a command-line argument, but
+	        don't take input from standard input if no argument is supplied,
+	        and programs that write to a file named as a command-line
+	        argument, but don't send their output to standard output if no
+	        argument is supplied, can nevertheless be made to use standard
+		input or standard output by using
+		<filename>/proc/<emphasis remap='I'>[pid]</emphasis>/fd</filename> files as command-line
+		arguments.
+		For example, assuming that <option>-i</option> is the flag
+		designating an input file and <option>-o</option> is the flag
+		designating an output file:
+
+		<screen>
+		  <prompt>$</prompt> <userinput>foobar -i /proc/self/fd/0 -o /proc/self/fd/1 ...</userinput>
+		</screen>
+
+		and you have a working filter.
+	      </para>
+
+	      <para><filename>/proc/self/fd/N</filename> is approximately
+		the same as <filename>/dev/fd/N</filename> in some Unix
+		and Unix-like systems.
+		Most Linux <command>makedev</command> scripts symbolically
+		link <filename>/dev/fd</filename> to
+		<filename>/proc/self/fd</filename>, in fact.
+	      </para>
+
+	      <para>Most systems provide symbolic links
+	        <filename>/dev/stdin</filename>,
+		<filename>/dev/stdout</filename>, and
+		<filename>/dev/stderr</filename>, which respectively link
+		to the files <literal>0</literal>, <literal>1</literal>,
+		and <literal>2</literal> in <filename>/proc/self/fd</filename>.
+		Thus the example command above could be written as:
+
+		<screen>
+		  <prompt>$</prompt> <userinput>foobar -i /dev/stdin -o /dev/stdout ...</userinput>
+		</screen>
+	      </para>
+
+	      <para>
+	        Note that for file descriptors referring to inodes (pipes and
+	        sockets, see above), those inodes still have permission bits and
+	        ownership information distinct from those of the
+		<filename>/proc/<emphasis remap='I'>[pid]</emphasis>/fd</filename> entry, and that the
+		owner may differ from the user and group ids of the process.
+	        An unprivileged process may lack permissions to open them, as in
+	        this example:
+
+		<screen>
+		  <prompt>$</prompt> <userinput>echo test | sudo -u nobody cat</userinput>
+		  <computeroutput>test</computeroutput>
+		  <prompt>$</prompt> <userinput>echo test | sudo -u nobody cat /proc/self/fd/0</userinput>
+		  <computeroutput>cat: /proc/self/fd/0: Permission denied</computeroutput>
+		</screen>
+	      </para>
+
+	      <para>
+	        File descriptor 0 refers to the pipe created by the shell and
+		owned by that shell's user, which is not
+		<literal>nobody</literal>, so <command>cat</command>
+		does not have permission to create a new file descriptor to
+		read from that inode, even though it can still read from its
+		existing file descriptor 0.
+	      </para>
+
+	    </listitem>
+	  </varlistentry>
+	  <varlistentry>
+	    <term><filename>/proc/<emphasis remap='I'>[pid]</emphasis>/gid</filename></term>
+	    <listitem>
+	      <para>
+	        This read-only file contains the primary group id for the
+	        process.
+	      </para>
+
+	    </listitem>
+	  </varlistentry>
+	  <varlistentry>
+	    <term><filename>/proc/<emphasis remap='I'>[pid]</emphasis>/maps</filename></term>
+	    <listitem>
+	      <para>
+	        A file containing the currently mapped memory regions and their
+	        access permissions. See
+		<citerefentry>
+		  <refentrytitle>mmap</refentrytitle><manvolnum>2</manvolnum>
+		</citerefentry>
+		for some further information about memory mappings.
+	      </para>
+
+	      <para>The format of the file is:
+
+<screen>
+<emphasis remap='I'>address          perms offset   dev       inode               pathname</emphasis>
+<computeroutput>
+00010000-00020000 rw-s 00000000 0000:0000 0                   [win heap 1 default shared]
+...
+00080000-00082000 rw-p 00000000 0000:0000 0                   [win heap 0 default grow]
+00082000-0009A000 ===p 00002000 0000:0000 0                   [win heap 0 default grow]
+000A0000-000A1000 rw-p 00000000 0000:0000 0                   [win heap 2 grow]
+000A1000-000BA000 ===p 00001000 0000:0000 0                   [win heap 2 grow]
+000C0000-000D9000 rw-p 00000000 0000:0000 0                   [win heap 0 default grow]
+000D9000-001C0000 ===p 00019000 0000:0000 0                   [win heap 0 default grow]
+00200000-00377000 ===p 00000000 0000:0000 0
+00377000-00378000 rw-p 00177000 0000:0000 0                   [peb]
+00378000-0037A000 rw-p 00178000 0000:0000 0                   [teb (tid 8844)]
+...
+00400000-005F9000 ===p 00000000 0000:0000 0                   [stack (tid 8884)]
+005F9000-005FC000 rw-g 001F9000 0000:0000 0                   [stack (tid 8884)]
+005FC000-00600000 rw-p 001FC000 0000:0000 0                   [stack (tid 8884)]
+00600000-006C7000 r--s 00000000 EE45:4341 281474976741117     /proc/cygdrive/c/Windows/System32/locale.nls
+...
+100400000-100401000 r--p 00000000 EE45:4341 281474978095037   /usr/bin/sh.exe
+100401000-100413000 r-xp 00001000 EE45:4341 281474978095037   /usr/bin/sh.exe
+100413000-100414000 rw-p 00013000 EE45:4341 281474978095037   /usr/bin/sh.exe
+...
+180010000-180020000 rw-s 00000000 0000:0000 0                 [procinfo]
+180020000-180029000 rw-s 00000000 0000:0000 0                 [cygwin-user-shared]
+180030000-18003C000 rw-s 00000000 0000:0000 0                 [cygwin-shared]
+180040000-180041000 r--p 00000000 EE45:4341 2251799814294868   /usr/bin/cygwin1.dll
+180041000-18022D000 r-xp 00001000 EE45:4341 2251799814294868   /usr/bin/cygwin1.dll
+18022D000-180231000 rwxp 001ED000 EE45:4341 2251799814294868   /usr/bin/cygwin1.dll
+180231000-18026A000 rw-p 001F1000 EE45:4341 2251799814294868   /usr/bin/cygwin1.dll
+...
+800000000-800090000 rw-p 00000000 0000:0000 0                 [heap]
+800090000-820000000 ===p 00090000 0000:0000 0                 [heap]
+7FF4FDEB0000-7FF4FDEB5000 r--s 00000000 0000:0000 0
+7FF4FDEB5000-7FF4FDFB0000 ===s 00005000 0000:0000 0
+7FF4FDFB0000-7FF5FDFD0000 ===p 00000000 0000:0000 0
+...
+7FFBEEAC0000-7FFBEEAC1000 r--p 00000000 EE45:4341 844424934724994   /proc/cygdrive/c/Windows/System32/kernel32.dll
+7FFBEEAC1000-7FFBEEB36000 r-xp 00001000 EE45:4341 844424934724994   /proc/cygdrive/c/Windows/System32/kernel32.dll
+7FFBEEB36000-7FFBEEB68000 r--p 00076000 EE45:4341 844424934724994   /proc/cygdrive/c/Windows/System32/kernel32.dll
+7FFBEEB68000-7FFBEEB6A000 rw-p 000A8000 EE45:4341 844424934724994   /proc/cygdrive/c/Windows/System32/kernel32.dll
+7FFBEEB6A000-7FFBEEB72000 r--p 000AA000 EE45:4341 844424934724994   /proc/cygdrive/c/Windows/System32/kernel32.dll
+...
+</computeroutput>
+</screen>
+	      </para>
+
+	      <para>The <literal>address</literal> field is the address
+		space in the process that the mapping occupies.
+		The <literal>perms</literal> field is a set of permissions:
+
+		<variablelist termlength="4">
+		  <varlistentry>
+		    <term>r</term><listitem><para>read</para></listitem>
+
+		  </varlistentry>
+		  <varlistentry>
+		    <term>w</term><listitem><para>write</para></listitem>
+
+		  </varlistentry>
+		  <varlistentry>
+		    <term>x</term><listitem><para>execute</para></listitem>
+
+		  </varlistentry>
+		  <varlistentry>
+		    <term>===</term><listitem><para>reserved</para></listitem>
+
+		  </varlistentry>
+		  <varlistentry>
+		    <term>s</term><listitem><para>shared</para></listitem>
+
+		  </varlistentry>
+		  <varlistentry>
+		    <term>g</term><listitem><para>guard</para></listitem>
+
+		  </varlistentry>
+		  <varlistentry>
+		    <term>p</term><listitem><para>private</para></listitem>
+		  </varlistentry>
+		</variablelist>
+	      </para>
+
+	      <para>The <literal>offset</literal> field is the offset
+		into the file/whatever;
+		<literal>dev</literal> is the device (major:minor);
+		<literal>inode</literal> is the inode on that device.
+		0 indicates that no inode is associated with the memory
+		region, as would be the case with BSS (uninitialized data).
+	      </para>
+
+	      <para>The <literal>pathname</literal> field will usually
+		be the file that is backing the mapping.
+	      </para>
+
+	      <para>There are additional helpful pseudo-paths:
+		<variablelist remap='TP'>
+		  <varlistentry>
+		    <term>[<literal>cygwin-shared</literal>]</term>
+		    <listitem>
+		      <para>Global shared Cygwin process information.</para>
+
+		    </listitem>
+		  </varlistentry>
+		  <varlistentry>
+		    <term>[<literal>cygwin-user-shared</literal>]</term>
+		    <listitem>
+		      <para>Global shared Cygwin user information.</para>
+
+		    </listitem>
+		  </varlistentry>
+		  <varlistentry>
+		    <term>[<literal>peb</literal>]</term>
+		    <listitem>
+		      <para>Windows Process Environment Block.</para>
+
+		    </listitem>
+		  </varlistentry>
+		  <varlistentry>
+		    <term>[<literal>procinfo</literal>]</term>
+		    <listitem>
+		      <para>Cygwin process information.</para>
+
+		    </listitem>
+		  </varlistentry>
+		  <varlistentry>
+		    <term>[<literal>shared-user-data</literal>]</term>
+		    <listitem>
+		      <para>Shared user information.</para>
+
+		    </listitem>
+		  </varlistentry>
+		  <varlistentry>
+		    <term>[<literal>heap</literal>]</term>
+		    <listitem>
+		      <para>The process's heap.</para>
+
+		    </listitem>
+		  </varlistentry>
+		  <varlistentry>
+		    <term>[<literal>stack</literal>]</term>
+		    <listitem>
+		      <para>
+			The initial process's (also known as the main
+			thread's) stack.
+		      </para>
+
+		    </listitem>
+		  </varlistentry>
+		  <varlistentry>
+		    <term>[<literal>stack</literal>
+		      (tid <literal>&lt;tid&gt;</literal>)]
+		    </term>
+		    <listitem>
+		      <para>
+			A thread's stack (where the
+			<literal>&lt;tid&gt;</literal> is a thread id).
+		      </para>
+
+		    </listitem>
+		  </varlistentry>
+		  <varlistentry>
+		    <term>[<literal>teb</literal>
+		      (tid <literal>&lt;tid&gt;</literal>)]
+		    </term>
+		    <listitem>
+		      <para>
+			Windows Thread Environment Block (where
+			<literal>&lt;tid&gt;</literal> is a thread id).
+		      </para>
+
+		    </listitem>
+		  </varlistentry>
+		  <varlistentry>
+		    <term>[<literal>win heap &lt;n&gt;
+		      default shared exec grow noserial debug</literal>]
+		    </term>
+		    <listitem>
+		      <para>
+			Windows extended heap (where
+			<literal>&lt;n&gt;</literal> is a heap id)
+			and the rest of the words are heap flags:
+
+			<variablelist termlength="8" remap='TP'>
+			  <varlistentry>
+			    <term><literal>default</literal></term>
+			    <listitem>
+			      <para>default heap flags</para>
+
+			    </listitem>
+			  </varlistentry>
+			  <varlistentry>
+			    <term><literal>shared</literal></term>
+			    <listitem>
+			      <para>shareable and mapped heap flags</para>
+
+			    </listitem>
+			  </varlistentry>
+			  <varlistentry>
+			    <term><literal>exec</literal></term>
+			    <listitem>
+			      <para>executable heap flag</para>
+
+			    </listitem>
+			  </varlistentry>
+			  <varlistentry>
+			    <term><literal>grow</literal></term>
+			    <listitem>
+			      <para>growable heap flag</para>
+
+			    </listitem>
+			  </varlistentry>
+			  <varlistentry>
+			    <term><literal>noserial</literal></term>
+			    <listitem>
+			      <para>do not serialize heap flag</para>
+
+			    </listitem>
+			  </varlistentry>
+			  <varlistentry>
+			    <term><literal>debug</literal></term>
+			    <listitem>
+			      <para>debugged heap flag</para>
+
+			    </listitem>
+			  </varlistentry>
+			</variablelist>
+		      </para>
+
+		    </listitem>
+		  </varlistentry>
+		</variablelist>
+	      </para>
+
+	      <para>If the <filename>pathname</filename> field is blank,
+	        this is an anonymous mapping as obtained via
+		<citerefentry>
+		  <refentrytitle>mmap</refentrytitle><manvolnum>2</manvolnum>
+		</citerefentry>.
+		There is no easy way to coordinate this back to a process's
+		source, short of running it through
+		<citerefentry>
+		  <refentrytitle>gdb</refentrytitle><manvolnum>1</manvolnum>
+		</citerefentry>,
+		<citerefentry>
+		  <refentrytitle>strace</refentrytitle><manvolnum>1</manvolnum>
+		</citerefentry>,
+		or similar.
+	      </para>
+
+	      <para>
+		<filename>pathname</filename> is shown unescaped except
+		for newline characters, which are replaced with an
+		octal escape sequence.
+		As a result, it is not possible to determine whether the
+		original <filename>pathname</filename> contained a newline
+		character or the literal <literal>&bsol;e012</literal>
+		character sequence.
+	      </para>
+
+	      <para>
+		If the mapping is file-backed and the file has been deleted,
+		the string "<literal> (deleted)</literal>"
+		is appended to the <filename>pathname</filename>.
+	        Note that this is ambiguous too.
+	      </para>
+
+	    </listitem>
+	  </varlistentry>
+	  <varlistentry>
+	    <term><filename>/proc/<emphasis remap='I'>[pid]</emphasis>/mountinfo</filename></term>
+	    <listitem>
+	      <para>
+	        This file contains information about mount points in the
+	        process's mount namespace (see
+	        <citerefentry>
+	          <refentrytitle>mount_namespaces</refentrytitle><manvolnum>7</manvolnum>
+	        </citerefentry>).
+		It supplies various information (e.g., propagation state, root
+		of mount for bind mounts, identifier for each mount and its
+		parent) that is missing from the (older)
+		<filename>/proc/<emphasis remap='I'>[pid]</emphasis>/mounts</filename>
+	        file, and fixes various other problems with that file (e.g.,
+	        nonextensibility, failure to distinguish per-mount versus
+	        per-superblock options).
+	      </para>
+
+	      <para>The file contains lines of the form:</para>
+
+<screen>
+<computeroutput>
+36 35 98:0 /mnt1 /mnt2 rw,noatime master:1 - ext3 /dev/root rw,errors=continue
+(1)(2)(3)   (4)   (5)      (6)      (?)   (7) (8)   (9)         (10)
+</computeroutput>
+</screen>
+
+              <para>
+                The numbers in parentheses are labels for the descriptions below:
+
+		<variablelist termlength="4" remap='TP'>
+		  <varlistentry>
+		    <term>(1)</term>
+		    <listitem>
+	              <para>mount id: a unique id for the mount (may be reused after
+	                <citerefentry>
+	                  <refentrytitle>umount</refentrytitle><manvolnum>2</manvolnum>
+	                </citerefentry>).
+		      </para>
+
+		    </listitem>
+		  </varlistentry>
+		  <varlistentry>
+		    <term>(2)</term>
+		    <listitem>
+	              <para>parent id: the id of the parent mount (or of self for
+	                the root of this mount namespace's mount tree).
+	              </para>
+
+		    </listitem>
+		  </varlistentry>
+		  <varlistentry>
+		    <term>(3)</term>
+		    <listitem>
+	              <para><emphasis remap="B">major</emphasis><literal>:</literal><emphasis remap="B">minor</emphasis>:
+			the value of <literal>st_dev</literal>
+			for files on this filesystem (see
+			<citerefentry>
+			  <refentrytitle>stat</refentrytitle><manvolnum>2</manvolnum>
+			</citerefentry>).
+	              </para>
+
+		    </listitem>
+		  </varlistentry>
+		  <varlistentry>
+		    <term>(4)</term>
+		    <listitem>
+	              <para>root: the pathname of the directory in the filesystem
+	                which forms the root of this mount.
+	              </para>
+
+		    </listitem>
+		  </varlistentry>
+		  <varlistentry>
+		    <term>(5)</term>
+		    <listitem>
+	              <para>mount point: the pathname of the mount point relative to
+	                the process's root directory.
+	              </para>
+
+		    </listitem>
+		  </varlistentry>
+		  <varlistentry>
+		    <term>(6)</term>
+		    <listitem>
+		      <para>mount options: per-mount options (see
+	                <citerefentry>
+	                  <refentrytitle>mount</refentrytitle><manvolnum>2</manvolnum>
+	                </citerefentry>).
+		      </para>
+
+		    </listitem>
+		  </varlistentry>
+		  <varlistentry>
+		    <term>(?)</term>
+		    <listitem>
+	              <para>optional fields: zero or more fields of the form
+			"<emphasis>tag</emphasis><literal>[:</literal><emphasis>value</emphasis><literal>]</literal>";
+			see below.
+	              </para>
+
+		    </listitem>
+		  </varlistentry>
+		  <varlistentry>
+		    <term>(7)</term>
+		    <listitem>
+	              <para>separator: the end of the optional fields is marked by a
+	                single hyphen.
+	              </para>
+
+		    </listitem>
+		  </varlistentry>
+		  <varlistentry>
+		    <term>(8)</term>
+		    <listitem>
+	              <para>filesystem type: the filesystem type in the form
+			"<emphasis>type</emphasis><literal>[.</literal><emphasis>subtype</emphasis><literal>]</literal>".
+	              </para>
+
+		    </listitem>
+		  </varlistentry>
+		  <varlistentry>
+		    <term>(9)</term>
+		    <listitem>
+	              <para>mount source: filesystem-specific information or
+			"<literal>none</literal>".
+	              </para>
+
+		    </listitem>
+		  </varlistentry>
+		  <varlistentry>
+		    <term>(10)</term>
+		    <listitem>
+		      <para>super options: per-superblock options (see
+	                <citerefentry>
+	                  <refentrytitle>mount</refentrytitle><manvolnum>2</manvolnum>
+	                </citerefentry>).
+		      </para>
+
+		    </listitem>
+		  </varlistentry>
+		</variablelist>
+	      </para>
+
+	    </listitem>
+	  </varlistentry>
+	  <varlistentry>
+	    <term><filename>/proc/<emphasis remap='I'>[pid]</emphasis>/mounts</filename></term>
+	    <listitem>
+	      <para>
+	        This file lists all the filesystems currently mounted in the
+	        process's mount namespace (see
+	        <citerefentry>
+	          <refentrytitle>mount_namespaces</refentrytitle><manvolnum>7</manvolnum>
+	        </citerefentry>).
+		The format of this file is documented in
+		<citerefentry>
+		  <refentrytitle>fstab</refentrytitle><manvolnum>5</manvolnum>
+		</citerefentry>.
+	      </para>
+
+	    </listitem>
+	  </varlistentry>
+	  <varlistentry>
+	    <term><filename>/proc/<emphasis remap='I'>[pid]</emphasis>/pgid</filename></term>
+	    <listitem>
+	      <para>
+	        This read-only file contains the process group id for the
+	        process.
+	      </para>
+
+	    </listitem>
+	  </varlistentry>
+	  <varlistentry>
+	    <term><filename>/proc/<emphasis remap='I'>[pid]</emphasis>/ppid</filename></term>
+	    <listitem>
+	      <para>
+	        This read-only file contains the parent process id for the
+	        process.
+	      </para>
+
+	    </listitem>
+	  </varlistentry>
+	  <varlistentry>
+	    <term><filename>/proc/<emphasis remap='I'>[pid]</emphasis>/root</filename></term>
+	    <listitem>
+	      <para>
+	        UNIX and Linux support the idea of a per-process root of the
+	        filesystem, set by the
+	        <citerefentry>
+	          <refentrytitle>chroot</refentrytitle><manvolnum>2</manvolnum>
+	        </citerefentry> system call.
+		This file is a symbolic link that points to the process's root
+		directory, and behaves in the same way as
+		<filename>exe</filename>, and
+		<filename>fd/*</filename>.
+	      </para>
+
+	    </listitem>
+	  </varlistentry>
+	  <varlistentry>
+	    <term><filename>/proc/<emphasis remap='I'>[pid]</emphasis>/sid</filename></term>
+	    <listitem>
+	      <para>
+	        This read-only file contains the session id for the process.
+	      </para>
+
+	    </listitem>
+	  </varlistentry>
+	  <varlistentry>
+	    <term><filename>/proc/<emphasis remap='I'>[pid]</emphasis>/stat</filename></term>
+	    <listitem>
+	      <para>
+	        Status information about the process.
+	        This is used by some implementations of
+	        <citerefentry>
+	          <refentrytitle>ps</refentrytitle><manvolnum>1</manvolnum>
+	        </citerefentry>.
+	      </para>
+
+	      <para>
+	        The fields, in order, with their proper
+	        <citerefentry>
+	          <refentrytitle>scanf</refentrytitle><manvolnum>3</manvolnum>
+	        </citerefentry> format specifiers, are listed below.
+	      </para>
+
+	      <variablelist remap='TP'>
+		<varlistentry>
+		  <term>(1) <emphasis remap='I'>pid</emphasis>  %d</term>
+		  <listitem>
+	            <para>The process id.</para>
+
+	          </listitem>
+		</varlistentry>
+		<varlistentry>
+		  <term>(2) <emphasis remap='I'>comm</emphasis>  %s</term>
+		  <listitem>
+	            <para>
+	              The filename of the executable, in parentheses.
+	              This is visible whether or not the executable is swapped
+	              out.
+	            </para>
+
+		  </listitem>
+		</varlistentry>
+		<varlistentry>
+		  <term>(3) <emphasis remap='I'>state</emphasis>  %c</term>
+		  <listitem>
+	            <para>
+	              One of the following characters, indicating process state:
+	            </para>
+
+		    <variablelist termlength="2">
+		      <varlistentry>
+			<term>R</term>
+			<listitem>
+	                  <para>Runnable</para>
+
+			</listitem>
+		      </varlistentry>
+		      <varlistentry>
+			<term>O</term>
+			<listitem>
+	                  <para>Running</para>
+
+			</listitem>
+		      </varlistentry>
+		      <varlistentry>
+			<term>S</term>
+			<listitem>
+	                  <para>Sleeping in an interruptible wait</para>
+
+			</listitem>
+		      </varlistentry>
+		      <varlistentry>
+			<term>D</term>
+			<listitem>
+	                  <para>Waiting in uninterruptible disk sleep</para>
+
+			</listitem>
+		      </varlistentry>
+		      <varlistentry>
+			<term>Z</term>
+			<listitem>
+	                  <para>Zombie</para>
+
+			</listitem>
+		      </varlistentry>
+		      <varlistentry>
+			<term>T</term>
+			<listitem>
+			  <para>Stopped (on a signal) or trace stopped</para>
+
+			</listitem>
+		      </varlistentry>
+		    </variablelist>
+		  </listitem>
+		</varlistentry>
+		<varlistentry>
+		  <term>(4) <emphasis remap='I'>ppid</emphasis>  %d</term>
+		  <listitem>
+	            <para>The PID of the parent of this process.</para>
+
+		  </listitem>
+		</varlistentry>
+		<varlistentry>
+		  <term>(5) <emphasis remap='I'>pgrp</emphasis>  %d</term>
+		  <listitem>
+	            <para>The process group id of the process.</para>
+
+		  </listitem>
+		</varlistentry>
+		<varlistentry>
+		  <term>(6) <emphasis remap='I'>session</emphasis>  %d</term>
+		  <listitem>
+	            <para>The session id of the process.</para>
+
+		  </listitem>
+		</varlistentry>
+		<varlistentry>
+		  <term>(7) <emphasis remap='I'>tty_nr</emphasis>  %d</term>
+		  <listitem>
+	            <para>
+	              The controlling terminal of the process.
+	              (The minor device number is contained in the combination
+	              of bits 31 to 20 and 7 to 0; the major device number is in
+	              bits 15 to 8.)
+	            </para>
+
+		  </listitem>
+		</varlistentry>
+		<varlistentry>
+		  <term>(8) <emphasis remap='I'>tpgid</emphasis>  %d</term>
+		  <listitem>
+	            <para>
+	              The id of the foreground process group of the controlling
+	              terminal of the process.
+	            </para>
+
+		  </listitem>
+		</varlistentry>
+		<varlistentry>
+		  <term>(9) <emphasis remap='I'>flags</emphasis>  %u</term>
+		  <listitem>
+	            <para>The kernel flags word of the process.</para>
+
+		  </listitem>
+		</varlistentry>
+		<varlistentry>
+		  <term>(10) <emphasis remap='I'>minflt</emphasis>  %lu</term>
+		  <listitem>
+	            <para>
+	              The number of minor faults the process has made which have
+	              not required loading a memory page from disk.
+	            </para>
+
+		  </listitem>
+		</varlistentry>
+		<varlistentry>
+		  <term>(11) <emphasis remap='I'>cminflt</emphasis>  %lu</term>
+		  <listitem>
+	            <para>
+	              The number of minor faults that the process's waited-for
+	              children have made.
+	            </para>
+
+		  </listitem>
+		</varlistentry>
+		<varlistentry>
+		  <term>(12) <emphasis remap='I'>majflt</emphasis>  %lu</term>
+		  <listitem>
+	            <para>
+	              The number of major faults the process has made which have
+	              required loading a memory page from disk.
+	            </para>
+
+		  </listitem>
+		</varlistentry>
+		<varlistentry>
+		  <term>(13) <emphasis remap='I'>cmajflt</emphasis>  %lu</term>
+		  <listitem>
+	            <para>
+	              The number of major faults that the process's waited-for
+	              children have made.
+	            </para>
+
+		  </listitem>
+		</varlistentry>
+		<varlistentry>
+		  <term>(14) <emphasis remap='I'>utime</emphasis>  %lu</term>
+		  <listitem>
+	            <para>
+	              Amount of time that this process has been scheduled in
+	              user mode, measured in clock ticks (divide by
+	              <literal>sysconf(_SC_CLK_TCK)</literal>).
+	            </para>
+
+		  </listitem>
+		</varlistentry>
+		<varlistentry>
+		  <term>(15) <emphasis remap='I'>stime</emphasis>  %lu</term>
+		  <listitem>
+	            <para>
+	              Amount of time that this process has been scheduled in
+	              kernel mode, measured in clock ticks (divide by
+	              <literal>sysconf(_SC_CLK_TCK)</literal>).
+	            </para>
+
+		  </listitem>
+		</varlistentry>
+		<varlistentry>
+		  <term>(16) <emphasis remap='I'>cutime</emphasis>  %ld</term>
+		  <listitem>
+	            <para>
+	              Amount of time that this process's waited-for children
+	              have been scheduled in user mode, measured in clock ticks
+	              (divide by <literal>sysconf(_SC_CLK_TCK)</literal>).
+	              (See also
+	              <citerefentry>
+	                <refentrytitle>times</refentrytitle><manvolnum>2</manvolnum>
+	              </citerefentry>).
+		    </para>
+
+		  </listitem>
+		</varlistentry>
+		<varlistentry>
+		  <term>(17) <emphasis remap='I'>cstime</emphasis>  %ld</term>
+		  <listitem>
+	            <para>
+	              Amount of time that this process's waited-for children
+	              have been scheduled in kernel mode, measured in clock
+	              ticks (divide by <literal>sysconf(_SC_CLK_TCK)</literal>).
+	            </para>
+
+		  </listitem>
+		</varlistentry>
+		<varlistentry>
+		  <term>(18) <emphasis remap='I'>priority</emphasis>  %ld</term>
+		  <listitem>
+	            <para>
+	              For processes running a real-time scheduling policy
+	              (<emphasis remap='I'>policy</emphasis> below; see
+	              <citerefentry>
+	                <refentrytitle>sched_setscheduler</refentrytitle><manvolnum>2</manvolnum>
+	              </citerefentry>),
+		      this is the negated scheduling priority, minus one; that
+		      is, a number in the range -2 to -100, corresponding to
+		      real-time priorities 1 to 99. For processes running
+		      under a non-real-time scheduling policy, this is the raw
+		      nice value
+		      (<citerefentry>
+			<refentrytitle>setpriority</refentrytitle><manvolnum>2</manvolnum>
+	              </citerefentry>)
+		      as represented in the kernel.
+	              The kernel stores nice values as numbers in the range 0
+	              (high) to 39 (low), corresponding to the user-visible nice
+	              range of -20 to 19.
+	            </para>
+
+		  </listitem>
+		</varlistentry>
+		<varlistentry>
+		  <term>(19) <emphasis remap='I'>nice</emphasis>  %ld</term>
+		  <listitem>
+	            <para>
+	              The nice value (see
+	              <citerefentry>
+	                <refentrytitle>setpriority</refentrytitle><manvolnum>2</manvolnum>
+		      </citerefentry>), a value in the range 19 (low priority)
+		      to -20 (high priority).
+		    </para>
+
+		  </listitem>
+		</varlistentry>
+		<varlistentry>
+		  <term>(20) <emphasis remap='I'>num_threads</emphasis>  %ld</term>
+		  <listitem>
+	            <para>
+	              Number of threads in this process. Currently shown as 0.
+	            </para>
+
+		  </listitem>
+		</varlistentry>
+		<varlistentry>
+		  <term>(21) <emphasis remap='I'>itrealvalue</emphasis>  %ld</term>
+		  <listitem>
+	            <para>
+	              The time in jiffies before the next
+		      <literal>SIGALRM</literal>
+	              is sent to the process due to an interval timer.
+	              This field is no longer maintained, and is hard coded as 0.
+	            </para>
+
+		  </listitem>
+		</varlistentry>
+		<varlistentry>
+		  <term>(22) <emphasis remap='I'>starttime</emphasis>  %llu</term>
+		  <listitem>
+	            <para>
+	              The time the process started after system boot.
+	              The value is expressed in clock ticks (divide by
+	              <literal>sysconf(_SC_CLK_TCK)</literal>).
+	          </para>
+
+		  </listitem>
+		</varlistentry>
+		<varlistentry>
+		  <term>(23) <emphasis remap='I'>vsize</emphasis>  %lu</term>
+		  <listitem>
+	            <para>Virtual memory size in bytes.</para>
+
+		  </listitem>
+		</varlistentry>
+		<varlistentry>
+		  <term>(24) <emphasis remap='I'>rss</emphasis>  %ld</term>
+		  <listitem>
+	            <para>
+	              Resident Set Size: number of pages the process has in real
+	              memory.
+	              This is just the pages which count toward text, data, or
+	              stack space.
+	              This does not include pages which have not been
+	              demand-loaded in, or which are swapped out.
+	            </para>
+
+		  </listitem>
+		</varlistentry>
+		<varlistentry>
+		  <term>(25) <emphasis remap='I'>rsslim</emphasis>  %lu</term>
+		  <listitem>
+	            <para>
+	              Current soft limit in bytes on the rss of the process; see
+	              the description of <literal>RLIMIT_RSS</literal> in
+	              <citerefentry>
+	                <refentrytitle>getrlimit</refentrytitle><manvolnum>2</manvolnum>
+	              </citerefentry>.
+		    </para>
+
+		  </listitem>
+		</varlistentry>
+	      </variablelist>
+	    </listitem>
+	  </varlistentry>
+	  <varlistentry>
+	    <term><filename>/proc/<emphasis remap='I'>[pid]</emphasis>/statm</filename></term>
+	    <listitem>
+	      <para>
+	        Provides information about memory usage, measured in pages.
+	        The columns are:
+
+		<variablelist termlength="12">
+		  <varlistentry>
+		    <term>(1) size</term>
+		    <listitem>
+		      <para>total program size
+		      (same as VmSize in <filename>/proc/<emphasis remap='I'>[pid]</emphasis>/status</filename>)</para>
+		    </listitem>
+		  </varlistentry>
+		  <varlistentry>
+		    <term>(2) resident</term>
+		    <listitem>
+		      <para>resident set size
+		      (same as VmRSS in <filename>/proc/<emphasis remap='I'>[pid]</emphasis>/status</filename>)</para>
+		    </listitem>
+		  </varlistentry>
+		  <varlistentry>
+		    <term>(3) shared</term>
+		    <listitem>
+		      <para>number of resident shared pages
+		      (i.e., backed by a file) (same as RssFile+RssShmem in
+		      <filename>/proc/<emphasis remap='I'>[pid]</emphasis>/status</filename>)</para>
+		    </listitem>
+		  </varlistentry>
+		  <varlistentry>
+		    <term>(4) text</term>
+		    <listitem><para>text (code)</para></listitem>
+		  </varlistentry>
+		  <varlistentry>
+		    <term>(5) lib</term>
+		    <listitem><para>library</para></listitem>
+		  </varlistentry>
+		  <varlistentry>
+		    <term>(6) data</term>
+		    <listitem><para>data + stack</para></listitem>
+		  </varlistentry>
+		  <varlistentry>
+		    <term>(7) dt</term>
+		    <listitem><para>dirty pages (always 0)</para></listitem>
+		  </varlistentry>
+		</variablelist>
+
+	      </para>
+
+	    </listitem>
+	  </varlistentry>
+	  <varlistentry>
+	    <term><filename>/proc/<emphasis remap='I'>[pid]</emphasis>/status</filename></term>
+	    <listitem>
+	      <para>
+		Provides much of the information in
+		<filename>/proc/<emphasis remap='I'>[pid]</emphasis>/stat</filename> and
+		<filename>/proc/<emphasis remap='I'>[pid]</emphasis>/statm</filename>
+		in a format that's easier for humans to parse.
+		Here's an example:
+
+		<screen>
+		  <prompt>$</prompt> <userinput>cat /proc/$$/status</userinput>
+		  <computeroutput>
+		  Name:   bash
+		  Umask:  0022
+		  State:  S (sleeping)
+		  Tgid:   17248
+		  Pid:    17248
+		  PPid:   17200
+		  Uid:    1000    1000    1000    1000
+		  Gid:    100     100     100     100
+		  VmSize:	  131168 kB
+		  VmLck:	       0 kB
+		  VmRSS:	   13484 kB
+		  VmData:	   10332 kB
+		  VmStk:	     136 kB
+		  VmExe:	     992 kB
+		  VmLib:	    2104 kB
+		  SigPnd: 0000000000000000
+		  SigBlk: 0000000000010000
+		  SigIgn: 0000000000384004
+		  </computeroutput>
+		</screen>
+
+	      </para>
+
+	      <para>The fields are as follows:
+		<itemizedlist remap='IP+bullet'>
+		  <listitem>
+	            <para>
+		      <emphasis remap='I'>Name</emphasis>:
+		      Command run by this process.
+	            </para>
+
+		  </listitem>
+		  <listitem>
+	            <para>
+	              <emphasis remap='I'>Umask</emphasis>:
+	              Process umask, expressed in octal with a leading zero; see
+	              <citerefentry>
+	                <refentrytitle>umask</refentrytitle><manvolnum>2</manvolnum>
+	              </citerefentry>.
+		    </para>
+
+		  </listitem>
+		  <listitem>
+		    <para>
+		      <emphasis remap='I'>State</emphasis>:
+		      Current state of the process.
+		      One of:
+
+		      <variablelist termlength="2" remap='TP'>
+			<varlistentry>
+			  <term>R</term>
+			  <listitem><para>runnable</para></listitem>
+
+			</varlistentry>
+			<varlistentry>
+			  <term>O</term>
+			  <listitem><para>running</para></listitem>
+
+			</varlistentry>
+			<varlistentry>
+			  <term>S</term>
+			  <listitem><para>sleeping</para></listitem>
+
+			</varlistentry>
+			<varlistentry>
+			  <term>D</term>
+			  <listitem><para>disk sleep</para></listitem>
+
+			</varlistentry>
+			<varlistentry>
+			  <term>T</term>
+			  <listitem><para>stopped or tracing stop</para></listitem>
+
+			</varlistentry>
+			<varlistentry>
+			  <term>Z</term>
+			  <listitem><para>zombie</para></listitem>
+
+			</varlistentry>
+		      </variablelist>
+		    </para>
+
+		  </listitem>
+		  <listitem>
+		    <para>
+		      <emphasis remap='I'>Tgid</emphasis>:
+		      Thread group id (i.e., Process id).
+		    </para>
+
+		  </listitem>
+		  <listitem>
+		    <para>
+		      <emphasis remap='I'>Pid</emphasis>:
+		      Thread id (see
+		      <citerefentry>
+			<refentrytitle>gettid</refentrytitle><manvolnum>2</manvolnum>
+		      </citerefentry>).
+		  </para>
+
+		  </listitem>
+		  <listitem>
+	            <para>
+	              <emphasis remap='I'>PPid</emphasis>:
+	              PID of parent process.
+	            </para>
+
+		  </listitem>
+		  <listitem>
+		    <para>
+		      <emphasis remap='I'>Uid</emphasis>,
+		      <emphasis remap='I'>Gid</emphasis>:
+		      Real, effective, saved set, and filesystem UIDs (GIDs).
+		    </para>
+
+		  </listitem>
+		  <listitem>
+		    <para>
+		      <emphasis remap='I'>VmSize</emphasis>:
+		      Virtual memory size.
+		    </para>
+
+		  </listitem>
+		  <listitem>
+		    <para>
+		      <emphasis remap='I'>VmLck</emphasis>:
+		      Locked memory size (see
+		      <citerefentry>
+			<refentrytitle>mlock</refentrytitle><manvolnum>2</manvolnum>
+		      </citerefentry>).
+		    </para>
+
+		  </listitem>
+		  <listitem>
+		    <para>
+		      <emphasis remap='I'>VmRSS</emphasis>:
+		      Resident set size.
+		    </para>
+
+		  </listitem>
+		  <listitem>
+		    <para>
+		      <emphasis remap='I'>VmData</emphasis>,
+		      <emphasis remap='I'>VmStk</emphasis>,
+		      <emphasis remap='I'>VmExe</emphasis>:
+		      Size of data, stack, and text segments.
+		    </para>
+
+		  </listitem>
+		  <listitem>
+		    <para>
+		      <emphasis remap='I'>VmLib</emphasis>:
+		      Shared library code size.
+		    </para>
+
+		  </listitem>
+		  <listitem>
+		    <para>
+		      <emphasis remap='I'>SigPnd</emphasis>:
+		      Number of signals pending for process as a whole (see
+		      <citerefentry>
+			<refentrytitle>pthreads</refentrytitle><manvolnum>7</manvolnum>
+		      </citerefentry> and
+		      <citerefentry>
+			<refentrytitle>signal</refentrytitle><manvolnum>7</manvolnum></citerefentry>).
+		      </para>
+
+		  </listitem>
+		  <listitem>
+		    <para>
+		      <emphasis remap='I'>SigBlk</emphasis>,
+		      <emphasis remap='I'>SigIgn</emphasis>:
+		      Masks indicating signals being blocked and ignored (see
+		      <citerefentry>
+			<refentrytitle>signal</refentrytitle><manvolnum>7</manvolnum>
+		      </citerefentry>).
+		    </para>
+
+		  </listitem>
+		</itemizedlist>
+	      </para>
+	    </listitem>
+	  </varlistentry>
+	  <varlistentry>
+	    <term><filename>/proc/<emphasis remap='I'>[pid]</emphasis>/uid</filename></term>
+	    <listitem>
+	      <para>
+	        This read-only file contains the user id for the process.
+	      </para>
+
+	    </listitem>
+	  </varlistentry>
+	  <varlistentry>
+	    <term><filename>/proc/<emphasis remap='I'>[pid]</emphasis>/winexename</filename></term>
+	    <listitem>
+	      <para>
+	        This read-only file contains the Windows pathname of the
+	        executed command.
+	      </para>
+
+	    </listitem>
+	  </varlistentry>
+	  <varlistentry>
+	    <term><filename>/proc/<emphasis remap='I'>[pid]</emphasis>/winpid</filename></term>
+	    <listitem>
+	      <para>
+	        This read-only file contains the Windows process id for the
+	        process.
+	      </para>
+
+	    </listitem>
+	  </varlistentry>
+	  <varlistentry>
+	    <term><filename>/proc/cpuinfo</filename></term>
+	    <listitem>
+	      <para>
+	        This is a collection of CPU and system architecture dependent
+	        items, for each supported architecture a different list.
+		Two common entries are <emphasis remap='I'>processor</emphasis>
+		which gives CPU number and
+		<emphasis remap='I'>bogomips</emphasis>, a system constant
+		that is calculated during kernel initialization.
+		SMP machines have information for each CPU.
+		The
+		<citerefentry>
+		  <refentrytitle>lscpu</refentrytitle><manvolnum>1</manvolnum>
+		</citerefentry>
+		command gathers its information from this file.
+	      </para>
+
+	    </listitem>
+	  </varlistentry>
+	  <varlistentry>
+	    <term><filename>/proc/cygdrive</filename></term>
+	    <listitem>
+	      <para>
+		This file is a symbolic link that points to the user's
+		Windows mapped drive mount point, similar to
+		<emphasis remap='I'>root</emphasis>.
+	      </para>
+
+	    </listitem>
+	  </varlistentry>
+	  <varlistentry>
+	    <term><filename>/proc/devices</filename></term>
+	    <listitem>
+	      <para>
+		Text listing of major numbers and device groups.
+	        This can be used by <command>makedev</command>
+		scripts for consistency with the system.
+	      </para>
+
+	    </listitem>
+	  </varlistentry>
+	  <varlistentry>
+	    <term><filename>/proc/filesystems</filename></term>
+	    <listitem>
+	      <para>
+		A text listing of the filesystems which are supported by Cygwin.
+		(See also
+		<citerefentry>
+		  <refentrytitle>filesystems</refentrytitle><manvolnum>5</manvolnum>
+		</citerefentry>.)
+		If a filesystem is marked with "nodev", this means that it
+		does not require a block device to be mounted (e.g., virtual
+		filesystem, network filesystem).
+	      </para>
+
+	    </listitem>
+	  </varlistentry>
+	  <varlistentry>
+	    <term><filename>/proc/loadavg</filename></term>
+	    <listitem>
+	      <para>
+	        The first three fields in this file are load average figures
+	        giving the number of jobs in the run queue (state R)
+	        averaged over 1, 5, and 15 minutes.
+		They are the same as the load average numbers given by
+		<citerefentry>
+		  <refentrytitle>uptime</refentrytitle><manvolnum>1</manvolnum>
+		</citerefentry> and other programs.
+		The fourth field consists of two numbers separated by a slash (/).
+	        The first of these is the number of currently runnable
+	        scheduling entities (processes, threads).
+	        The value after the slash is the number of scheduling entities
+	        that currently exist on the system.
+	      </para>
+
+	    </listitem>
+	  </varlistentry>
+	  <varlistentry>
+	    <term><filename>/proc/meminfo</filename></term>
+	    <listitem>
+	      <para>
+	        This file reports statistics about memory usage on the system.
+		It is used by
+		<citerefentry>
+		  <refentrytitle>free</refentrytitle><manvolnum>1</manvolnum>
+		</citerefentry>
+		to report the amount of free and used memory (both physical
+		and swap) on the system as well as the shared memory and
+		buffers used by the system.
+	        Each line of the file consists of a parameter name, followed by
+	        a colon, the value of the parameter, and an option unit of
+	        measurement (e.g., "kB").
+		The list below describes the parameter names and the format
+		specifier required to read the field value.
+		Some fields are displayed only if the system was configured
+		with various options; those dependencies are noted in the
+		list.
+	      </para>
+
+	      <variablelist remap='TP'>
+		<varlistentry>
+		  <term><emphasis remap='I'>MemTotal</emphasis> %lu</term>
+		  <listitem>
+	            <para>
+	              Total usable RAM (i.e., physical RAM minus a few reserved
+	              bits and the system binary code).
+	            </para>
+
+		  </listitem>
+		</varlistentry>
+		<varlistentry>
+		  <term><emphasis remap='I'>MemFree</emphasis> %lu</term>
+		  <listitem>
+		    <para>
+		      The sum of <emphasis remap='I'>LowFree</emphasis> +
+		      <emphasis remap='I'>HighFree</emphasis>.
+		    </para>
+
+		  </listitem>
+		</varlistentry>
+		<varlistentry>
+		  <term><emphasis remap='I'>HighTotal</emphasis> %lu</term>
+		  <listitem>
+		    <para>Total amount of highmem.</para>
+
+		  </listitem>
+		</varlistentry>
+		<varlistentry>
+		  <term><emphasis remap='I'>HighFree</emphasis> %lu</term>
+		  <listitem>
+		    <para>Amount of free highmem.</para>
+
+		  </listitem>
+		</varlistentry>
+		<varlistentry>
+		  <term><emphasis remap='I'>LowTotal</emphasis> %lu</term>
+		  <listitem>
+		    <para>
+		      Total amount of lowmem.
+		      Lowmem is memory which can be used for everything that
+		      highmem can be used for, but it is also available for the
+		      system's use for its own data structures.
+		      Bad things happen when you're out of lowmem.
+		    </para>
+
+		  </listitem>
+		</varlistentry>
+		<varlistentry>
+		  <term><emphasis remap='I'>LowFree</emphasis> %lu</term>
+		  <listitem>
+	            <para>Amount of free lowmem.</para>
+
+		  </listitem>
+		</varlistentry>
+		<varlistentry>
+		  <term><emphasis remap='I'>SwapTotal</emphasis> %lu</term>
+		  <listitem>
+		    <para>Total amount of swap space available.</para>
+
+		  </listitem>
+		</varlistentry>
+		<varlistentry>
+		  <term><emphasis remap='I'>SwapFree</emphasis> %lu</term>
+		  <listitem>
+	            <para>Amount of swap space that is currently unused.</para>
+
+		  </listitem>
+		</varlistentry>
+	      </variablelist>
+	    </listitem>
+	  </varlistentry>
+	  <varlistentry>
+	    <term><filename>/proc/misc</filename></term>
+	    <listitem>
+	      <para>
+	        Text listing of minor device numbers and names of devices with
+	        major device number of the <literal>misc</literal> device group.
+		This can be used by <command>makedev</command> scripts
+		for consistency with the system.
+	      </para>
+
+	  </listitem>
+	  </varlistentry>
+	  <varlistentry>
+	    <term><filename>/proc/mounts</filename></term>
+	    <listitem>
+	      <para>
+	        With the introduction of per-process mount namespaces, this file
+	        became a link to
+		<filename>/proc/self/mounts</filename>,
+		which lists the mount points of the process's own mount
+		namespace.
+		The format of this file is documented in
+		<citerefentry>
+		  <refentrytitle>fstab</refentrytitle><manvolnum>5</manvolnum>
+		</citerefentry>.
+	      </para>
+	    </listitem>
+	  </varlistentry>
+	  <varlistentry>
+	    <term><filename>/proc/net</filename></term>
+	    <listitem>
+	      <para>
+	        This directory contains various files and subdirectories
+	        containing information about the networking layer.
+	        The files contain ASCII structures and are, therefore, readable
+	        with
+		<citerefentry>
+		  <refentrytitle>cat</refentrytitle><manvolnum>1</manvolnum>
+		</citerefentry>.
+		However, the standard
+		<citerefentry>
+		  <refentrytitle>netstat</refentrytitle><manvolnum>8</manvolnum>
+		</citerefentry>
+		suite provides much cleaner access to these files.
+	      </para>
+	    </listitem>
+	  </varlistentry>
+	  <varlistentry>
+	    <term><filename>/proc/net/if_inet6</filename></term>
+	    <listitem>
+	      <para>
+	        This file contains information about IP V6 interface adapters,
+	        if used.
+	        Each line represents an IP V6 interface adapter.
+	      </para>
+
+<screen>
+<computeroutput>
+fe800000000000002c393d3da6108636 12 40 20 80 {C6B5FBE5-A3AC-4DB0-A308-8EE94E1406A4}
+fe8000000000000039da016f76bd92bc 13 40 20 20 {E06B8972-0918-41FC-851B-090C446C7D1C}
+fe8000000000000050ba9cedf1fe1628 0b 40 20 20 {680ED6FD-DFAC-4398-AA85-FB33E17E38EA}
+fe8000000000000030c5c6a0b30f109d 11 40 20 20 {B9E39F53-1659-4065-BDA5-F41162250E03}
+20021840ac2c12343427e3b9ec6fa585 08 40 00 80 {4083A7F8-99CF-4220-8715-6FDF268B002F}
+20021840ac2c12342403e3b2c7a5a32f 08 80 00 20 {4083A7F8-99CF-4220-8715-6FDF268B002F}
+20021840ac2c1234284e8d0ecb4160cb 08 80 00 20 {4083A7F8-99CF-4220-8715-6FDF268B002F}
+20021840ac2c123468cb06ea72f1d678 08 80 00 80 {4083A7F8-99CF-4220-8715-6FDF268B002F}
+20021840ac2c12346cb59aca97c36e3b 08 80 00 20 {4083A7F8-99CF-4220-8715-6FDF268B002F}
+20021840ac2c123498af9881de1fb828 08 80 00 20 {4083A7F8-99CF-4220-8715-6FDF268B002F}
+20021840ac2c1234cd62a3d73a498611 08 80 00 20 {4083A7F8-99CF-4220-8715-6FDF268B002F}
+20021840ac2c1234e410c873be09df93 08 80 00 20 {4083A7F8-99CF-4220-8715-6FDF268B002F}
+fe800000000000003427e3b9ec6fa585 08 40 20 80 {4083A7F8-99CF-4220-8715-6FDF268B002F}
+00000000000000000000000000000001 01 80 10 80 {2B5345AC-7502-11EA-AC73-806E6F6E6963}
+			   (1)  (2)(3)(4)(5)  (6)
+</computeroutput>
+</screen>
+
+	      <para>The fields in each line are:
+
+		<variablelist termlength="4" remap='TP'>
+		  <varlistentry>
+		    <term>(1)</term>
+		    <listitem>
+		      <para>The IP V6 address of the interface adapter.</para>
+
+		    </listitem>
+		  </varlistentry>
+		  <varlistentry>
+		    <term>(2)</term>
+		    <listitem>
+		      <para>The IP V6 interface adapter index.</para>
+
+		    </listitem>
+		  </varlistentry>
+		  <varlistentry>
+		    <term>(3)</term>
+		    <listitem>
+		      <para>
+			The prefix length of the IP V6 interface address.
+		      </para>
+
+		    </listitem>
+		  </varlistentry>
+		  <varlistentry>
+		    <term>(4)</term>
+		    <listitem>
+		      <para>The scope of the IP V6 interface address.</para>
+
+		    </listitem>
+		  </varlistentry>
+		  <varlistentry>
+		    <term>(5)</term>
+		    <listitem>
+		      <para>The state of the IP V6 interface address.</para>
+
+		    </listitem>
+		  </varlistentry>
+		  <varlistentry>
+		    <term>(6)</term>
+		    <listitem>
+	              <para>
+	                The DUID/GUID/UUID of the IP V6 interface adapter.
+	              </para>
+
+		    </listitem>
+		  </varlistentry>
+		</variablelist>
+		<para>
+		  The last number exists only for compatibility reasons and is
+		  always 1.
+		</para>
+
+	      </para>
+
+	    </listitem>
+	  </varlistentry>
+	  <varlistentry>
+	    <term><filename>/proc/partitions</filename></term>
+	    <listitem>
+	      <para>
+	        Contains the major and minor numbers of each partition as well
+	        as the number of 1024-byte blocks and the partition name.
+	      </para>
+
+	    </listitem>
+	  </varlistentry>
+	  <varlistentry>
+	    <term><filename>/proc/registry</filename></term>
+	    <listitem>
+	      <para>
+	        Under Cygwin, this directory contains subdirectories for
+	        registry paths, keys, and subkeys, and files named for registry
+	        values which contain registry data, for the current process.
+	      </para>
+
+	    </listitem>
+	  </varlistentry>
+	  <varlistentry>
+	    <term><filename>/proc/registry32</filename></term>
+	    <listitem>
+	      <para>
+	        Under 64 bit Windows, this directory contains subdirectories for
+	        registry paths, keys, and subkeys, and files named for registry
+	        values which contain registry data, for 32 bit processes.
+	      </para>
+
+	    </listitem>
+	  </varlistentry>
+	  <varlistentry>
+	    <term><filename>/proc/registry64</filename></term>
+	    <listitem>
+	      <para>
+	        Under 64 bit Windows, this directory contains subdirectories for
+	        registry paths, keys, and subkeys, and files named for registry
+	        values which contain registry data, for 64 bit processes.
+	      </para>
+
+	    </listitem>
+	  </varlistentry>
+	  <varlistentry>
+	  <term><filename>/proc/self</filename></term>
+	  <listitem>
+	    <para>
+	      This directory refers to the process accessing the
+	      <filename>/proc</filename> filesystem, and is identical to the
+	      <filename>/proc</filename> directory named by the process id
+	      of the same process.
+	    </para>
+
+	  </listitem>
+	  </varlistentry>
+	  <varlistentry>
+	    <term><filename>/proc/stat</filename></term>
+	    <listitem>
+	      <para>
+	        system statistics.
+	        Varies with architecture.
+	        Common entries include:
+		<variablelist remap='TP'>
+		  <varlistentry>
+		    <term><emphasis remap='I'>cpu 10132153 0 3084719 46828483</emphasis></term>
+		    <listitem>
+		    </listitem>
+		  </varlistentry>
+		  <varlistentry>
+		    <term><emphasis remap='I'>cpu0 1393280 0 572056 13343292</emphasis></term>
+		    <listitem>
+	              <para>
+	                The amount of time, measured in units of USER_HZ
+	                (1/100ths of a second on most architectures, use
+			<literal>sysconf(_SC_CLK_TCK)</literal>
+			to obtain the right value), that the system ("cpu"
+			line) or the specific CPU
+			("cpu <emphasis remap='I'>N</emphasis>" line)
+			spent in various states:
+
+			<variablelist termlength="10" remap='TP'>
+			  <varlistentry>
+			    <term>(1) <emphasis remap='I'>user</emphasis></term>
+			    <listitem>
+	                      <para>Time spent in user mode.</para>
+
+			    </listitem>
+			  </varlistentry>
+			  <varlistentry>
+			    <term>(2) <emphasis remap='I'>nice</emphasis></term>
+			    <listitem>
+			      <para>
+				Time spent in user mode with low priority
+				(nice).
+			      </para>
+
+			    </listitem>
+			  </varlistentry>
+			  <varlistentry>
+			    <term>(3) <emphasis remap='I'>system</emphasis></term>
+			    <listitem>
+			      <para>Time spent in system mode.</para>
+
+			    </listitem>
+			  </varlistentry>
+			  <varlistentry>
+			    <term>(4) <emphasis remap='I'>idle</emphasis></term>
+			    <listitem>
+			      <para>Time spent in the idle task.</para>
+
+			    </listitem>
+			  </varlistentry>
+			</variablelist>
+		      </para>
+
+		    </listitem>
+		  </varlistentry>
+		  <varlistentry>
+		    <term><emphasis remap='I'>page 5741 1808</emphasis></term>
+		    <listitem>
+	              <para>
+	                The number of pages the system paged in and the number
+	                that were paged out (from disk).
+	              </para>
+
+		    </listitem>
+		  </varlistentry>
+		  <varlistentry>
+		    <term><emphasis remap='I'>swap 1 0</emphasis></term>
+		    <listitem>
+	              <para>
+	                The number of swap pages that have been brought in and
+	                out.
+	              </para>
+
+		    </listitem>
+		  </varlistentry>
+		  <varlistentry>
+		    <term><emphasis remap='I'>intr 1462898</emphasis></term>
+		    <listitem>
+	              <para>The number of interrupts serviced.</para>
+
+		    </listitem>
+		  </varlistentry>
+		  <varlistentry>
+		    <term><emphasis remap='I'>ctxt 115315</emphasis></term>
+		    <listitem>
+	              <para>
+	                The number of context switches that the system
+	                underwent.
+	              </para>
+
+		    </listitem>
+		  </varlistentry>
+		  <varlistentry>
+		    <term><emphasis remap='I'>btime 769041601</emphasis></term>
+		    <listitem>
+	              <para>
+			boot time, in seconds since the Epoch,
+			1970-01-01 00:00:00 +0000 (UTC).
+	              </para>
+
+		    </listitem>
+		  </varlistentry>
+		</variablelist>
+	      </para>
+
+	    </listitem>
+	  </varlistentry>
+	  <varlistentry>
+	    <term><filename>/proc/swaps</filename></term>
+	    <listitem>
+	      <para>
+	        Swap areas in use.
+	        See also
+	        <citerefentry>
+	          <refentrytitle>swapon</refentrytitle><manvolnum>8</manvolnum>
+	        </citerefentry>.
+	      </para>
+
+	    </listitem>
+	  </varlistentry>
+	  <varlistentry>
+	    <term><filename>/proc/sys</filename></term>
+	    <listitem>
+	      <para>
+	        This directory contains a number of files and subdirectories
+	        linking to Windows objects, which can be read using these
+	        entries.
+	      </para>
+
+	      <para>
+	        String values may be terminated by either &apos;&bsol;0&apos;
+	        or &apos;&bsol;n&apos;.
+	      </para>
+
+	      <para>
+	        Integer and long values may be either in decimal or in
+	        hexadecimal notation (e.g. 0x3FFF).
+	        Multiple integer or long values may be separated by any of the
+	        following whitespace characters:
+	        &apos;&nbsp;&apos;, &apos;&bsol;t&apos;, or
+	        &apos;&bsol;n&apos;.
+	      </para>
+
+	    </listitem>
+	  </varlistentry>
+	  <varlistentry>
+	    <term><filename>/proc/sysvipc</filename></term>
+	    <listitem>
+	      <para>
+	        Subdirectory containing the pseudo-files
+		<filename>msg</filename>, <filename>sem</filename>and
+		<filename>shm</filename>.
+		These files list the System V Interprocess Communication (IPC)
+		objects (respectively: message queues, semaphores, and shared
+		memory) that currently exist on the system, providing similar
+		information to that available via
+		<citerefentry>
+		  <refentrytitle>ipcs</refentrytitle><manvolnum>1</manvolnum>
+		</citerefentry>.
+		These files are only available if the cygserver Cygwin service
+		is running.
+	        These files have headers and are formatted (one IPC object per
+	        line) for easy understanding.
+		<citerefentry>
+		  <refentrytitle>svipc</refentrytitle><manvolnum>7</manvolnum>
+		</citerefentry>
+	        provides further background on the information shown by these
+	        files.
+	      </para>
+
+	    </listitem>
+	  </varlistentry>
+	  <varlistentry>
+	    <term><filename>/proc/uptime</filename></term>
+	    <listitem>
+	      <para>
+	        This file contains two numbers (values in seconds): the uptime
+	        of the system (including time spent in suspend) and the amount
+	        of time spent in the idle process.
+	      </para>
+
+	    </listitem>
+	  </varlistentry>
+	  <varlistentry>
+	    <term><filename>/proc/version</filename></term>
+	    <listitem>
+	      <para>
+	        This string identifies the Cygwin version that is currently
+	        running.
+	        For example:
+
+<screen>
+<computeroutput>
+CYGWIN_NT-10.0-18363 version 3.1.7-340.x86_64 (corinna@calimero) (gcc version 9.3.0 20200312 (Fedora Cygwin 9.3.0-1) (GCC) ) 2020-08-22 17:48 UTC
+</computeroutput>
+</screen>
+
+	      </para>
+	    </listitem>
+	  </varlistentry>
+	</variablelist>
+      </refsect2>
+    </refsect1>
+
+    <refsect1 id='proc-notes'><title>Notes</title>
+      <para>
+	Many files contain strings (e.g., the environment and command
+	line) that are in the internal format, with subfields terminated
+	by null bytes (&apos;&bsol;0&apos;).
+	When inspecting such files, you may find that the results are
+	more readable if you use a command of the following form to
+	display them:
+
+	<screen>
+	  <prompt>$</prompt> <userinput>cat -A <emphasis remap='I'>file</emphasis></userinput>
+	</screen>
+      </para>
+
+      <para>
+	This manual page is incomplete, possibly inaccurate, and is the kind
+	of thing that needs to be updated very often.
+      </para>
+    </refsect1>
+
+    <refsect1 id='proc-see_also'><title>See Also</title>
+      <para>
+	<citerefentry>
+	  <refentrytitle>cat</refentrytitle><manvolnum>1</manvolnum>
+	</citerefentry>,
+	<citerefentry>
+	  <refentrytitle>find</refentrytitle><manvolnum>1</manvolnum>
+	</citerefentry>,
+	<citerefentry>
+	  <refentrytitle>free</refentrytitle><manvolnum>1</manvolnum>
+	</citerefentry>,
+	<citerefentry>
+	  <refentrytitle>ps</refentrytitle><manvolnum>1</manvolnum>
+	</citerefentry>,
+	<citerefentry>
+	  <refentrytitle>pstree</refentrytitle><manvolnum>1</manvolnum>
+	</citerefentry>,
+	<citerefentry>
+	  <refentrytitle>tr</refentrytitle><manvolnum>1</manvolnum>
+	</citerefentry>,
+	<citerefentry>
+	  <refentrytitle>uptime</refentrytitle><manvolnum>1</manvolnum>
+	</citerefentry>,
+	<citerefentry>
+	  <refentrytitle>chroot</refentrytitle><manvolnum>2</manvolnum>
+	</citerefentry>,
+	<citerefentry>
+	  <refentrytitle>mmap</refentrytitle><manvolnum>2</manvolnum>
+	</citerefentry>,
+	<citerefentry>
+	  <refentrytitle>readlink</refentrytitle><manvolnum>2</manvolnum>
+	</citerefentry>,
+	<citerefentry>
+	  <refentrytitle>syslog</refentrytitle><manvolnum>2</manvolnum>
+	</citerefentry>,
+	<citerefentry>
+	  <refentrytitle>hier</refentrytitle><manvolnum>7</manvolnum>
+	</citerefentry>,
+	<citerefentry>
+	  <refentrytitle>arp</refentrytitle><manvolnum>8</manvolnum>
+	</citerefentry>,
+	<citerefentry>
+	  <refentrytitle>mount</refentrytitle><manvolnum>8</manvolnum>
+	</citerefentry>,
+	<citerefentry>
+	  <refentrytitle>netstat</refentrytitle><manvolnum>8</manvolnum>
+	</citerefentry>,
+	<citerefentry>
+	  <refentrytitle>route</refentrytitle><manvolnum>8</manvolnum>
+	</citerefentry>.
+      </para>
+    </refsect1>
+  </refentry>
 </sect2>
 
 <sect2 id="pathnames-proc-registry"><title>The /proc/registry filesystem</title>
