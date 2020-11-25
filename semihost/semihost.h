@@ -145,6 +145,9 @@ int
 sys_semihost_system(const char *command);
 
 uintptr_t
+sys_semihost_tickfreq(void);
+
+uintptr_t
 sys_semihost_time(void);
 
 int
