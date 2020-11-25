@@ -50,6 +50,8 @@ main(void)
 				printf("semihost-elapsed: elapsed went backwards\n");
 				exit(2);
 			}
+			printf("start %lld stop %lld diff %lld\n",
+			       (long long) start, (long long) stop, (long long) (stop - start));
 			exit(0);
 		}
 	}

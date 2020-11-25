@@ -54,6 +54,7 @@ main(void)
 		printf("tmpnam fails, ret %d, errno %d\n", ret, sys_semihost_errno());
 		exit(1);
 	}
+	printf("using tmpname \"%s\"\n", pathname);
 	fd = sys_semihost_open(pathname, 4);
 	if (fd < -1) {
 		printf("open fails, ret %d errno %d\n", fd, sys_semihost_errno());
