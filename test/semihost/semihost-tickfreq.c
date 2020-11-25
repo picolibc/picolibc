@@ -43,9 +43,9 @@ main(void)
 
 	tickfreq = sys_semihost_tickfreq();
 	if (tickfreq == 0) {
-		printf("invalid tickfreq %ld\n", (long) tickfreq);
+		printf("invalid tickfreq %lld\n", (long long) tickfreq);
 		exit(1);
 	}
-	printf("tickfreq %ld\n", (long) tickfreq);
+	printf("tickfreq %lld\n", (long long) tickfreq);
 	exit(0);
 }
