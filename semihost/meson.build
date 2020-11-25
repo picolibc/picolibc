@@ -64,6 +64,7 @@ if src_semihost_machine.has_key(host_cpu_family)
     'sys_get_cmdline.c',
     'sys_getc.c',
     'sys_heapinfo.c',
+    'sys_iserror.c',
     'sys_istty.c',
     'sys_open.c',
     'sys_putc.c',
