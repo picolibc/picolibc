@@ -50,6 +50,6 @@ sys_semihost_elapsed(void)
 			sh_param_t	field2;
 		} arg;
 		sys_semihost(SYS_ELAPSED, (uintptr_t) &arg);
-		return (((uint64_t) arg.field1) << 32) | ((uint32_t) arg.field2);
+		return (((uint64_t) arg.field2) << 32) | ((uint32_t) arg.field1);
 	}
 }
