@@ -4,8 +4,8 @@ All cygwin threads have separate context in an object of class _cygtls.  The
 storage for this object is kept on the stack in the bottom __CYGTLS_PADSIZE__
 bytes.  Each thread references the storage via the Thread Environment Block
 (aka Thread Information Block), which Windows maintains for each user thread
-in the system, with the address in the FS segment register.  The memory
-is laid out as in the NT_TIB structure from <w32api/winnt.h>:
+in the system, with the address in a segment register (FS on x86, GS on x86_64).
+The memory is laid out as in the NT_TIB structure from <w32api/winnt.h>:
 
 typedef struct _NT_TIB {
 	struct _EXCEPTION_REGISTRATION_RECORD *ExceptionList;
@@ -20,16 +20,10 @@ typedef struct _NT_TIB {
 	struct _NT_TIB *Self;
 } NT_TIB,*PNT_TIB;
 
-Cygwin sees it like this:
+Cygwin accesses cygtls like this (see cygtls.h):
 
-extern exception_list *_except_list asm ("%fs:0");      // exceptions.cc
-extern char *_tlsbase __asm__ ("%fs:4");                // cygtls.h
-extern char *_tlstop __asm__ ("%fs:8");                 // cygtls.h
-
-And accesses cygtls like this:
-
-#define _my_tls (((_cygtls *) _tlsbase)[-1])            // cygtls.h
-
+#define _my_tls (*((_cygtls *) ((PBYTE) NtCurrentTeb()->Tib.StackBase \
+		                - __CYGTLS_PADSIZE__)))
 
 Initialization always goes through _cygtls::init_thread().  It works
 in the following ways:
@@ -65,11 +59,4 @@ __CYGTLS_PADSIZE__ bytes down from there are overwritten.
 
 Debugging
 
-You can examine the segment registers in gdb via "info w32 selector $fs"
-(which is using GetThreadSelectorEntry()) to get results like this:
-
-    Selector $fs
-    0x03b: base=0x7ffdd000 limit=0x00000fff 32-bit Data (Read/Write, Exp-up)
-    Priviledge level = 3. Byte granular.
-
-"x/3x 0x7ffdd000" will give you _except_list, _tlsbase, and _tlstop.
+You can examine the TIB in gdb via "info w32 tib"

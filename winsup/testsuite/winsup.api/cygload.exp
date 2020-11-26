@@ -14,7 +14,13 @@ proc ws_spawn {cmd args} {
     verbose send "catchCode = $rv\n"
 }
 
-ws_spawn "$MINGW_CXX $srcdir/$subdir/cygload.cc -o mingw-cygload.exe -lstdc++ -Wl,-e,_cygloadCRTStartup@0"
+if { [string match "i686" $target_alias] } {
+    set entrypoint "_cygloadCRTStartup@0"
+} else {
+    set entrypoint "cygloadCRTStartup"
+}
+
+ws_spawn "$MINGW_CXX $srcdir/$subdir/cygload.cc -o mingw-cygload.exe -static -Wl,-e,$entrypoint"
 
 if { $rv != {0 {}} } {
     verbose -log "$rv"

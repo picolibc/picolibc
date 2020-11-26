@@ -43,7 +43,10 @@ using std::string;
 cygwin::padding *cygwin::padding::_main = NULL;
 DWORD cygwin::padding::_mainTID = 0;
 
-// A few cygwin constants.
+// Cygwin signal constants
+#undef SIGINT
+#undef SIGTERM
+
 static const int SIGHUP = 1;
 static const int SIGINT = 2;
 static const int SIGTERM = 15;  // Cygwin won't deliver this one to us;
@@ -68,17 +71,30 @@ cygwin::padding::padding ()
 
   _end = _padding + sizeof (_padding);
   char *stackbase;
-#ifdef __GNUC__
+#ifdef __GNUC__ /* GCC */
+# ifdef __x86_64__
+    __asm__ (
+    "mov %%gs:8, %0"
+    :"=r"(stackbase)
+    );
+# elif __X86__
   __asm__ (
     "movl %%fs:4, %0"
     :"=r"(stackbase)
     );
-#else
+# else
+#  error Unknown architecture
+# endif
+#else /* !GCC assumed to be MSVC */
+# ifdef __X86__
   __asm
       {
         mov eax, fs:[4];
         mov stackbase, eax;
       }
+#else
+#  error Unknown architecture
+# endif
 #endif
   _stackbase = stackbase;
 
