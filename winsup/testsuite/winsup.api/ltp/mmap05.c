@@ -228,8 +228,7 @@ setup()
 	}
 
 	/* Write test buffer contents into temporary file */
-	if (write(fildes, tst_buff, strlen(tst_buff))
-	    != (int)strlen(tst_buff)) {
+	if (write(fildes, tst_buff, page_sz) != page_sz) {
 		tst_brkm(TFAIL, NULL, "write() on %s Failed, errno=%d : %s",
 			 TEMPFILE, errno, strerror(errno));
 		free(tst_buff);
