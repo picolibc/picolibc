@@ -117,6 +117,7 @@
 
 extern void setup();
 extern void cleanup();
+extern char *TESTDIR;
 
 
 
@@ -127,7 +128,7 @@ extern int Tst_count;		/* Test Case counter for tst_* routines */
 int exp_enos[]={0, 0};
 
 int i;
-const char *path = "/tmp";
+const char *path;
 
 struct pathconf_args
 {
@@ -156,6 +157,9 @@ main(int ac, char **av)
      ***************************************************************/
     if ( (msg=parse_opts(ac, av, (option_t *) NULL, NULL)) != (char *) NULL )
 	tst_brkm(TBROK, cleanup, "OPTION PARSING ERROR - %s", msg);
+
+    tst_tmpdir();
+    path = TESTDIR;
 
     /***************************************************************
      * perform global setup for test
@@ -208,6 +212,8 @@ main(int ac, char **av)
     /***************************************************************
      * cleanup and exit
      ***************************************************************/
+    tst_rmdir();
+
     cleanup();
 
     return 0;
