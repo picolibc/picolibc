@@ -863,19 +863,28 @@ path_conv::check (const char *src, unsigned opt,
 			dev.parse (FH_FS);
 			goto is_fs_via_procsys;
 		      case virt_blk:
-			/* Block special device.  If the trailing slash has been
-			   requested, the target is the root directory of the
-			   filesystem on this block device.  So we convert this
-			   to a real file and attach the backslash. */
-			if (component == 0 && need_directory)
+			/* Block special device.  Convert to a /dev/sd* like
+			   block device unless the trailing slash has been
+			   requested.  In this case, the target is the root
+			   directory of the filesystem on this block device.
+			   So we convert this to a real file and attach the
+			   backslash. */
+			if (component == 0)
 			  {
-			    dev.parse (FH_FS);
-			    strcat (full_path, "\\");
-			    fileattr = FILE_ATTRIBUTE_DIRECTORY
-				       | FILE_ATTRIBUTE_DEVICE;
+			    fileattr = FILE_ATTRIBUTE_DEVICE;
+			    if (!need_directory)
+			      /* Use a /dev/sd* device number > /dev/sddx.
+				 FIXME: Define a new major DEV_ice number. */
+			      dev.parse (DEV_SD_HIGHPART_END, 9999);
+			    else
+			      {
+				dev.parse (FH_FS);
+				strcat (full_path, "\\");
+				fileattr |= FILE_ATTRIBUTE_DIRECTORY;
+			      }
 			    goto out;
 			  }
-			fallthrough;
+			break;
 		      case virt_chr:
 			if (component == 0)
 			  fileattr = FILE_ATTRIBUTE_DEVICE;
