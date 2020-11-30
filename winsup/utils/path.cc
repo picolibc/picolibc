@@ -824,8 +824,10 @@ vcygpath (const char *cwd, const char *s, va_list v)
   size_t max_len = 0;
   mnt_t *m, *match = NULL;
 
+#ifndef TESTSUITE
   if (!max_mount_entry)
     read_mounts ();
+#endif
   char *path;
   if (s[0] == '.' && isslash (s[1]))
     s += 2;
@@ -912,8 +914,10 @@ extern "C" FILE *
 setmntent (const char *, const char *)
 {
   m = mount_table;
+#ifndef TESTSUITE
   if (!max_mount_entry)
     read_mounts ();
+#endif
   return NULL;
 }
 
