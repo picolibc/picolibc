@@ -30,12 +30,12 @@ details. */
 #if defined(TESTSUITE_MOUNT_TABLE)
 static mnt_t mount_table[] = {
 /* native                 posix               flags */
- { TESTSUITE_ROOT,        (char*)"/",                MOUNT_SYSTEM},
- { "O:\\other",           (char*)"/otherdir",        MOUNT_SYSTEM},
- { "S:\\some\\dir",       (char*)"/somedir",         MOUNT_SYSTEM},
- { TESTSUITE_ROOT"\\bin", (char*)"/usr/bin",         MOUNT_SYSTEM},
- { TESTSUITE_ROOT"\\lib", (char*)"/usr/lib",         MOUNT_SYSTEM},
- { ".",                   (char*)TESTSUITE_CYGDRIVE, MOUNT_SYSTEM | MOUNT_CYGDRIVE},
+ { (char*)TESTSUITE_ROOT,        (char*)"/",                MOUNT_SYSTEM},
+ { (char*)"O:\\other",           (char*)"/otherdir",        MOUNT_SYSTEM},
+ { (char*)"S:\\some\\dir",       (char*)"/somedir",         MOUNT_SYSTEM},
+ { (char*)TESTSUITE_ROOT"\\bin", (char*)"/usr/bin",         MOUNT_SYSTEM},
+ { (char*)TESTSUITE_ROOT"\\lib", (char*)"/usr/lib",         MOUNT_SYSTEM},
+ { (char*)".",                   (char*)TESTSUITE_CYGDRIVE, MOUNT_SYSTEM | MOUNT_CYGDRIVE},
  { NULL,                  (char*)NULL,               0}
 };
 
