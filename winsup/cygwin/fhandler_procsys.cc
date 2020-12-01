@@ -175,13 +175,10 @@ fhandler_procsys::exists (struct stat *buf)
 	 badly written. */
       if (NT_SUCCESS (status))
 	{
-	  if (ffdi.DeviceType == FILE_DEVICE_NETWORK_FILE_SYSTEM)
-	    file_type = virt_blk;
-	  else if (ffdi.DeviceType == FILE_DEVICE_NAMED_PIPE)
+	  if (ffdi.DeviceType == FILE_DEVICE_NAMED_PIPE)
 	    file_type = internal ? virt_blk : virt_pipe;
 	  else if (ffdi.DeviceType == FILE_DEVICE_DISK
 		   || ffdi.DeviceType == FILE_DEVICE_CD_ROM
-		   || ffdi.DeviceType == FILE_DEVICE_DFS
 		   || ffdi.DeviceType == FILE_DEVICE_VIRTUAL_DISK)
 	    {
 	      /* Check for file attributes.  If we get them, we peeked
