@@ -66,11 +66,11 @@ enum path_types
 {
   PATH_CTTY		= _BIT ( 0),	/* could later be used as ctty */
   PATH_OPEN		= _BIT ( 1),	/* use open semantics */
-  PATH_LNK		= _BIT ( 2),
-  PATH_REP		= _BIT ( 3),
-  PATH_SYMLINK		= _BIT ( 4),
-  PATH_SOCKET		= _BIT ( 5),
-  PATH_RESOLVE_PROCFD	= _BIT ( 6),
+  PATH_LNK		= _BIT ( 2),	/* *.lnk-type symlink */
+  PATH_REP		= _BIT ( 3),	/* reparse point known to Cygwin */
+  PATH_SYMLINK		= _BIT ( 4),	/* symlink understood by Cygwin */
+  PATH_SOCKET		= _BIT ( 5),	/* AF_UNIX socket file */
+  PATH_RESOLVE_PROCFD	= _BIT ( 6),	/* fd symlink via /proc */
   PATH_DONT_USE		= _BIT (31)	/* conversion to signed happens. */
 };
 
