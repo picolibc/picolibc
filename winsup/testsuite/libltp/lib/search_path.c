@@ -50,6 +50,9 @@
 #include <sys/param.h>
 #include <sys/stat.h>
 
+#pragma GCC diagnostic ignored "-Wformat-overflow"
+#pragma GCC diagnostic ignored "-Wformat-truncation"
+
 extern int errno;
 
 struct stat stbuf;
@@ -221,7 +224,7 @@ printf("search_path: res_path = '%s'\n", res_path);
 		toolong++;
 	        continue;
             }
-            sprintf(tmppath, "%s/%s", curpath, res_path);
+            snprintf(tmppath, sizeof tmppath, "%s/%s", curpath, res_path);
 	    strcpy(res_path, tmppath);
 #if DEBUG
 printf("search_path: full res_path= '%s'\n", res_path);
