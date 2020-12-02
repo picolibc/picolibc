@@ -1017,7 +1017,7 @@ path_conv::check (const char *src, unsigned opt,
 		{
 		  if (component == 0
 		      && (!(opt & PC_SYM_FOLLOW)
-			  || (is_known_reparse_point ()
+			  || (is_winapi_reparse_point ()
 			      && (opt & PC_SYM_NOFOLLOW_REP))))
 		    {
 		      /* Usually a trailing slash requires to follow a symlink,
@@ -2622,7 +2622,7 @@ check_reparse_point_target (HANDLE h, bool remote, PREPARSE_DATA_BUFFER rp,
 	    }
 	  RtlInitCountedUnicodeString (psymbuf, utf16_buf,
 				       utf16_bufsize * sizeof (WCHAR));
-	  return PATH_SYMLINK | PATH_REP;
+	  return PATH_SYMLINK | PATH_REP | PATH_REP_NOAPI;
 	}
       return -EIO;
     }
@@ -2632,10 +2632,10 @@ check_reparse_point_target (HANDLE h, bool remote, PREPARSE_DATA_BUFFER rp,
 
       if (memcmp (CYGWIN_SOCKET_GUID, &rgp->ReparseGuid, sizeof (GUID)) == 0)
 #ifdef __WITH_AF_UNIX
-	return PATH_SOCKET | PATH_REP;
+	return PATH_SOCKET | PATH_REP | PATH_REP_NOAPI;
 #else
         /* Recognize this as a reparse point but not as a socket.  */
-        return PATH_REP;
+        return PATH_REP | PATH_REP_NOAPI;
 #endif
     }
   return 0;

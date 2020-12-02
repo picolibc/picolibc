@@ -71,6 +71,7 @@ enum path_types
   PATH_SYMLINK		= _BIT ( 4),	/* symlink understood by Cygwin */
   PATH_SOCKET		= _BIT ( 5),	/* AF_UNIX socket file */
   PATH_RESOLVE_PROCFD	= _BIT ( 6),	/* fd symlink via /proc */
+  PATH_REP_NOAPI	= _BIT ( 7),	/* rep. point unknown to WinAPI */
   PATH_DONT_USE		= _BIT (31)	/* conversion to signed happens. */
 };
 
@@ -179,7 +180,18 @@ class path_conv
   }
   int issymlink () const {return path_flags & PATH_SYMLINK;}
   int is_lnk_symlink () const {return path_flags & PATH_LNK;}
+  /* This indicates any known reparse point */
   int is_known_reparse_point () const {return path_flags & PATH_REP;}
+  /* This indicates any known reparse point, handled sanely by WinAPI.
+     The difference is crucial: WSL symlinks, for instance, are known
+     reparse points, so we want to open them as reparse points usually.
+     However they are foreign to WinAPI and not handled sanely.  If one
+     is part of $PATH, WinAPI functions may fail under the hood with
+     STATUS_IO_REPARSE_TAG_NOT_HANDLED. */
+  int is_winapi_reparse_point () const
+  {
+    return (path_flags & (PATH_REP | PATH_REP_NOAPI)) == PATH_REP;
+  }
   int isdevice () const {return dev.not_device (FH_FS) && dev.not_device (FH_FIFO);}
   int isfifo () const {return dev.is_device (FH_FIFO);}
   int isspecial () const {return dev.not_device (FH_FS);}
