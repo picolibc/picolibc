@@ -772,7 +772,7 @@ getdomainname (char *domain, size_t len)
 	  && GetNetworkParams(info, &size) == ERROR_SUCCESS)
 	{
 	  strncpy(domain, info->DomainName, len);
-	  debug_printf ("gethostname %s", domain);
+	  debug_printf ("getdomainname %s", domain);
 	  return 0;
 	}
       __seterrno ();
