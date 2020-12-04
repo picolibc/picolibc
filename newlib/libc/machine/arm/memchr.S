@@ -79,7 +79,11 @@
 
 @ NOTE: This ifdef MUST match the one in memchr-stub.c
 #if defined (__ARM_NEON__) || defined (__ARM_NEON)
+#if __ARM_ARCH >= 8 && __ARM_ARCH_PROFILE == 'R'
+	.arch	armv8-r
+#else
 	.arch	armv7-a
+#endif
 	.fpu	neon
 
 
