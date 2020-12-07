@@ -679,12 +679,9 @@ out:
 fhandler_base *
 dtable::dup_worker (fhandler_base *oldfh, int flags)
 {
-  /* Don't call set_name in build_fh_pc.  It will be called in
-     fhandler_base::operator= below.  Calling it twice will result
-     in double allocation. */
   fhandler_base *newfh = oldfh->clone ();
   if (!newfh)
-    debug_printf ("build_fh_pc failed");
+    debug_printf ("clone failed");
   else
     {
       if (!oldfh->archetype)
