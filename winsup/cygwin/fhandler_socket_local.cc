@@ -1430,10 +1430,14 @@ fhandler_socket_local::setsockopt (int level, int optname, const void *optval,
 	     FIXME: In the long run we should find a more generic solution
 	     which doesn't require a blocking handshake in accept/connect
 	     to exchange SO_PEERCRED credentials. */
-	  if (optval || optlen)
-	    set_errno (EINVAL);
-	  else
+	  /* Temporary: Allow SO_PEERCRED to only be zeroed. Two ways to
+	     accomplish this: pass NULL,0 for optval,optlen; or pass the
+	     address,length of an '(int) 0' set up by the caller. */
+	  if ((!optval && !optlen) ||
+		(optlen == (socklen_t) sizeof (int) && !*(int *) optval))
 	    ret = af_local_set_no_getpeereid ();
+	  else
+	    set_errno (EINVAL);
 	  return ret;
 
 	case SO_REUSEADDR:
