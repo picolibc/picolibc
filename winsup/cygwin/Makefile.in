@@ -683,10 +683,10 @@ globals.h: mkglobals_h globals.cc
 ${DLL_OFILES} ${LIBCOS}: globals.h $(srcdir)/$(TLSOFFSETS_H)
 
 shared_info_magic.h: cygmagic shared_info.h
-	/bin/sh $(word 1,$^) $@ "${COMPILE.cc} -E -x c++" $(word 2,$^) SHARED_MAGIC 'class shared_info' USER_MAGIC 'class user_info'
+	/bin/bash $(word 1,$^) $@ "${COMPILE.cc} -E -x c++" $(word 2,$^) SHARED_MAGIC 'class shared_info' USER_MAGIC 'class user_info'
 
 child_info_magic.h: cygmagic child_info.h
-	/bin/sh $(word 1,$^) $@ "${COMPILE.cc} -E -x c++" $(word 2,$^) CHILD_INFO_MAGIC 'class child_info'
+	/bin/bash $(word 1,$^) $@ "${COMPILE.cc} -E -x c++" $(word 2,$^) CHILD_INFO_MAGIC 'class child_info'
 
 dcrt0.o sigproc.o: child_info_magic.h
 
