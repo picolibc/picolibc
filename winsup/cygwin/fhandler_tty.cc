@@ -1109,6 +1109,11 @@ fhandler_pty_slave::tcgetattr (struct termios *t)
 {
   reset_switch_to_pcon ();
   *t = get_ttyp ()->ti;
+  /* Workaround for rlwrap */
+  if (get_ttyp ()->pcon_start)
+    t->c_lflag &= ~ICANON;
+  else if (get_ttyp ()->h_pseudo_console)
+    t->c_iflag &= ~ICRNL;
   return 0;
 }
 
