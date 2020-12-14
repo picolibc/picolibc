@@ -656,7 +656,7 @@ child_info_spawn::worker (const char *prog_arg, const char *const *argv,
       if (!iscygwin () && ptys_primary && is_console_app (runpath))
 	{
 	  bool nopcon = mode != _P_OVERLAY && mode != _P_WAIT;
-	  if (!ptys_primary->term_has_pcon_cap (envblock))
+	  if (disable_pcon || !ptys_primary->term_has_pcon_cap (envblock))
 	    nopcon = true;
 	  if (ptys_primary->setup_pseudoconsole (&si_pcon, nopcon))
 	    {
