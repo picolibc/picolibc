@@ -2651,7 +2651,7 @@ fhandler_pty_slave::term_has_pcon_cap (const WCHAR *env)
   char *p;
   int len;
   int x1, y1, x2, y2;
-  DWORD t0;
+  int wait_cnt = 0;
 
   /* Check if terminal has ANSI escape sequence. */
   if (!has_ansi_escape_sequences (env))
@@ -2668,7 +2668,6 @@ fhandler_pty_slave::term_has_pcon_cap (const WCHAR *env)
   ReleaseMutex (input_mutex);
   p = buf;
   len = sizeof (buf) - 1;
-  t0 = GetTickCount ();
   do
     {
       if (::bytes_available (n, get_handle ()) && n)
@@ -2680,9 +2679,10 @@ fhandler_pty_slave::term_has_pcon_cap (const WCHAR *env)
 	  char *p1 = strrchr (buf, '\033');
 	  if (p1 == NULL || sscanf (p1, "\033[%d;%dR", &y1, &x1) != 2)
 	    continue;
+	  wait_cnt = 0;
 	  break;
 	}
-      else if (GetTickCount () - t0 > 40) /* Timeout */
+      else if (++wait_cnt > 100) /* Timeout */
 	goto not_has_csi6n;
       else
 	Sleep (1);
