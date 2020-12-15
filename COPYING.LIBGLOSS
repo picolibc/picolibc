@@ -478,3 +478,8 @@ including the implied warranties of MERCHANTABILITY or FITNESS FOR
 A PARTICULAR PURPOSE.  A copy of this license is available at
 http://www.opensource.org/licenses.
 
+(24) - RISC-V Semihosting (riscv-* targets)
+
+Copyright (C) 2020 Embecosm Limited
+SPDX-License-Identifier: BSD-2-Clause
+

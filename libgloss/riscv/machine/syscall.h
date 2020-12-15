@@ -54,4 +54,29 @@
 #define SYS_time 1062
 #define SYS_getmainvars 2011
 
+/* Semihosting operations.  */
+#define SEMIHOST_clock 0x10
+#define SEMIHOST_close 0x02
+#define SEMIHOST_elapsed 0x30
+#define SEMIHOST_errno 0x13
+#define SEMIHOST_exit 0x18
+#define SEMIHOST_exit_extended 0x20
+#define SEMIHOST_flen 0x0C
+#define SEMIHOST_get_cmdline 0x15
+#define SEMIHOST_heapinfo 0x16
+#define SEMIHOST_iserror 0x08
+#define SEMIHOST_istty 0x09
+#define SEMIHOST_open 0x01
+#define SEMIHOST_read 0x06
+#define SEMIHOST_readc 0x07
+#define SEMIHOST_remove 0x0E
+#define SEMIHOST_rename 0x0F
+#define SEMIHOST_seek 0x0A
+#define SEMIHOST_system 0x12
+#define SEMIHOST_tickfreq 0x31
+#define SEMIHOST_time 0x11
+#define SEMIHOST_tmpnam 0x0D
+#define SEMIHOST_write 0x05
+#define SEMIHOST_writec 0x03
+#define SEMIHOST_write0 0x04
 #endif
