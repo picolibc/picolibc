@@ -1,7 +1,7 @@
 /*
  * SPDX-License-Identifier: BSD-3-Clause
  *
- * Copyright © 2020 Keith Packard
+ * Copyright (c) 2020 Kito Cheng
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -32,6 +32,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+
 #include <math.h>
 
 #if defined(__riscv_flen) && __riscv_flen >= 32
@@ -39,10 +40,11 @@
 float
 copysignf (float x, float y)
 {
-	float result;
-	asm ("fsgnj.s\t%0, %1, %2" : "=f" (result) : "f" (x), "f" (y));
-	return result;
+  float result;
+  asm ("fsgnj.s\t%0, %1, %2" : "=f"(result) : "f"(x), "f"(y));
+  return result;
 }
+
 #else
 #include "../../common/sf_copysign.c"
 #endif

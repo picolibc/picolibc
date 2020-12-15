@@ -35,16 +35,20 @@
 
 #include <math.h>
 
-#if defined(__riscv_flen) && __riscv_flen >= 64
-
-double
-copysign (double x, double y)
+#if defined(__riscv_flen) && __riscv_flen >= 64 && __riscv_xlen >= 64
+long long int
+llround(double x)
 {
-  double result;
-  asm ("fsgnj.d\t%0, %1, %2" : "=f"(result) : "f"(x), "f"(y));
+  long long result;
+  asm (
+#if __riscv_xlen == 64
+       "fcvt.l.d"
+#else
+#error Unsupported XLEN
+#endif
+       "\t%0, %1, rmm" : "=r"(result) : "f"(x));
   return result;
 }
-
 #else
-#include "../../common/s_copysign.c"
+#include "../../common/s_llround.c"
 #endif

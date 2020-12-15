@@ -3026,7 +3026,7 @@ Void_t* mEMALIGn(alignment, bytes) RDECL size_t alignment; size_t bytes;
   nb = request2size(bytes);
 
   /* Check for overflow. */
-  if (nb > INT_MAX || nb < bytes)
+  if (nb > __SIZE_MAX__ - (alignment + MINSIZE) || nb < bytes)
   {
     errno = ENOMEM;
     return 0;
@@ -3146,7 +3146,12 @@ Void_t* pvALLOc(bytes) RDECL size_t bytes;
 #endif
 {
   size_t pagesize = malloc_getpagesize;
-  return mEMALIGn (pagesize, (bytes + pagesize - 1) & ~(pagesize - 1));
+  if (bytes > __SIZE_MAX__ - pagesize)
+  {
+    errno = ENOMEM;
+    return 0;
+  }
+  return mEMALIGn (RCALL pagesize, (bytes + pagesize - 1) & ~(pagesize - 1));
 }
 
 #endif /* DEFINE_PVALLOC */

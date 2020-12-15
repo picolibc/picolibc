@@ -56,6 +56,10 @@ srcs_libm_machine = [
   's_fpclassify.c',
   's_isinf.c',
   's_isnan.c',
+  's_llrint.c',
+  's_llround.c',
+  's_lrint.c',
+  's_lround.c',
   'sf_copysign.c',
   'sf_fabs.c',
   'sf_finite.c',
@@ -65,6 +69,10 @@ srcs_libm_machine = [
   'sf_fpclassify.c',
   'sf_isinf.c',
   'sf_isnan.c',
+  'sf_llrint.c',
+  'sf_llround.c',
+  'sf_lrint.c',
+  'sf_lround.c',
 ]
 
 srcs_libm_machine_dontuse = [
