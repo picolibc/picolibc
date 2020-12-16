@@ -266,7 +266,7 @@ extern int __signbitd (double);
 #else
   #define fpclassify(__x) \
 	  ((sizeof(__x) == sizeof(float))  ? __fpclassifyf(__x) : \
-	  __fpclassifyd(__x))
+	  __fpclassifyd((double) (__x)))
   #ifndef isfinite
     #define isfinite(__y) \
 	    (__extension__ ({int __cy = fpclassify(__y); \
@@ -289,34 +289,34 @@ int __issignaling(double d);
 int __issignalingl(long double d);
 #define issignaling(__x)						\
 	((sizeof(__x) == sizeof(float))  ? __issignalingf(__x) :	\
-	 (sizeof(__x) == sizeof(double)) ? __issignaling (__x) :	\
-	 __issignalingl(__x))
+	 (sizeof(__x) == sizeof(double)) ? __issignaling ((double) (__x)) :	\
+	 __issignalingl((long double) (__x)))
 #else
 #ifdef _DOUBLE_IS_32BITS
 #define issignaling(__x) __issignalingf((float) (__x))
 #else
 #define issignaling(__x)						\
 	((sizeof(__x) == sizeof(float))  ? __issignalingf(__x) :	\
-	 __issignaling (__x))
+	 __issignaling ((double) (__x)))
 #endif /* _DOUBLE_IS_32BITS */
 #endif /* _HAVE_LONG_DOUBLE */
 #endif
 
 #if __GNUC_PREREQ (4, 0)
   #if defined(_HAVE_LONG_DOUBLE)
-    #define signbit(__x) \
-	    ((sizeof(__x) == sizeof(float))  ? __builtin_signbitf(__x) : \
-	     (sizeof(__x) == sizeof(double)) ? __builtin_signbit (__x) : \
-					       __builtin_signbitl(__x))
+    #define signbit(__x)							\
+	    ((sizeof(__x) == sizeof(float))  ? __builtin_signbitf(__x) :	\
+	     ((sizeof(__x) == sizeof(double)) ? __builtin_signbit ((double)(__x)) : \
+	      __builtin_signbitl((long double)(__x))))
   #else
-    #define signbit(__x) \
-	    ((sizeof(__x) == sizeof(float))  ? __builtin_signbitf(__x) : \
-					       __builtin_signbit (__x))
+    #define signbit(__x)							\
+	    ((sizeof(__x) == sizeof(float))  ? __builtin_signbitf(__x) :	\
+	     __builtin_signbit ((double) (__x)))
   #endif
 #else
   #define signbit(__x) \
 	  ((sizeof(__x) == sizeof(float))  ?  __signbitf(__x) : \
-		  __signbitd(__x))
+	                              __signbitd((double) (__x)))
 #endif
 
 #if __GNUC_PREREQ (2, 97)
