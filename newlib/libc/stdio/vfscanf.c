@@ -1879,7 +1879,7 @@ __SVFSCANF_R (struct _reent *rptr,
 	      else if (flags & LONGDBL)
 		{
 		  ldp = GET_ARG (N, ap, _LONG_DOUBLE *);
-		  *ldp = QUAD_RES;
+		  *ldp = (_LONG_DOUBLE) QUAD_RES;
 		}
 	      else
 		{
