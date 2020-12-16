@@ -3151,7 +3151,7 @@ Void_t* pvALLOc(bytes) RDECL size_t bytes;
     errno = ENOMEM;
     return 0;
   }
-  return mEMALIGn (RCALL pagesize, (bytes + pagesize - 1) & ~(pagesize - 1));
+  return mEMALIGn (pagesize, (bytes + pagesize - 1) & ~(pagesize - 1));
 }
 
 #endif /* DEFINE_PVALLOC */
