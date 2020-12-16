@@ -31,6 +31,7 @@
 
 #include <stdio.h>
 #include <stdbool.h>
+#include <sys/lock.h>
 
 /* values for PRINTF_LEVEL */
 #define PRINTF_MIN 1
@@ -109,7 +110,50 @@ struct __file_posix {
 	char	*read_buf;
 	int	read_len;
 	int	read_off;
+#ifndef __SINGLE_THREAD__
+	_LOCK_T lock;
+#endif
 };
+
+static inline void __posix_lock_init(FILE *f) {
+#ifndef __SINGLE_THREAD__
+	struct __file_posix *fp = (struct __file_posix *) f;
+	(void) fp;
+	__lock_init(fp->lock);
+#else
+	(void) f;
+#endif
+}
+
+static inline void __posix_lock_close(FILE *f) {
+#ifndef __SINGLE_THREAD__
+	struct __file_posix *fp = (struct __file_posix *) f;
+	(void) fp;
+	__lock_close(fp->lock);
+#else
+	(void) f;
+#endif
+}
+
+static inline void __posix_lock(FILE *f) {
+#ifndef __SINGLE_THREAD__
+	struct __file_posix *fp = (struct __file_posix *) f;
+	(void) fp;
+	__lock_acquire(fp->lock);
+#else
+	(void) f;
+#endif
+}
+
+static inline void __posix_unlock(FILE *f) {
+#ifndef __SINGLE_THREAD__
+	struct __file_posix *fp = (struct __file_posix *) f;
+	(void) fp;
+	__lock_release(fp->lock);
+#else
+	(void) f;
+#endif
+}
 
 int	__d_vfprintf(FILE *__stream, const char *__fmt, va_list __ap) __FORMAT_ATTRIBUTE__(printf, 2, 0);
 int	__f_vfprintf(FILE *__stream, const char *__fmt, va_list __ap) __FORMAT_ATTRIBUTE__(printf, 2, 0);
