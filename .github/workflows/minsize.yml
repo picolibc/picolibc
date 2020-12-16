@@ -34,7 +34,11 @@ jobs:
           "-Dnewlib-locale-info=true -Dnewlib-locale-info-extended=true -Dnewlib-mb=true",
 
           # Iconv configurations
-          "-Dnewlib-iconv-external-ccs=true"
+          "-Dnewlib-iconv-external-ccs=true",
+
+          # Multithread
+          "-Dnewlib-multithread=true -Dnewlib-retargetable-locking=true",
+          "-Dnewlib-multithread=true -Dnewlib-retargetable-locking=true -Dnewlib-tinystdio=false"
         ]
         test: [
           "./.github/do-test do-native-configure build-native",
