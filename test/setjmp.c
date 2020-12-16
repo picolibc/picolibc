@@ -52,16 +52,17 @@ main(int argc, char **argv)
 	jmp_buf env;
 
 	ret = setjmp(env);
+	printf("setjmp 1 returns %d\n", ret);
 	if (!ret) {
 		func(env, 1);
 		printf("func returned\n");
 		exit(1);
 	}
-	printf("setjmp returns %d\n", ret);
 	ret = setjmp(env);
+	printf("setjmp 2 returns %d\n", ret);
 	if (!ret) {
 		if (been_here) {
-			printf("already been here\n");
+			printf("already been here (longjmp(env, 0) returned 0?)\n");
 			exit(2);
 		}
 		been_here++;
@@ -69,6 +70,5 @@ main(int argc, char **argv)
 		printf("func returned\n");
 		exit(1);
 	}
-	printf("setjmp returns %d\n", ret);
 	exit(0);
 }
