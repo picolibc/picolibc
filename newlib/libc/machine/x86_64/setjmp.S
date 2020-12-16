@@ -37,6 +37,10 @@ SYM (setjmp):
 
 SYM (longjmp):
   movq    rsi, rax        /* Return value */
+  /* turn 0 into 1 */
+  testq   rsi, rsi
+  movl	  $1, edx
+  cmove   rdx, rax
 
   movq     8 (rdi), rbp
 
