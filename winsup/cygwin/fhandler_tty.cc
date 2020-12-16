@@ -2682,7 +2682,9 @@ fhandler_pty_slave::term_has_pcon_cap (const WCHAR *env)
 	  len -= n;
 	  *p = '\0';
 	  char *p1 = strrchr (buf, '\033');
-	  if (p1 == NULL || sscanf (p1, "\033[%d;%dR", &y1, &x1) != 2)
+	  char c;
+	  if (p1 == NULL || sscanf (p1, "\033[%d;%d%c", &y1, &x1, &c) != 3
+	      || c != 'R')
 	    continue;
 	  wait_cnt = 0;
 	  break;
@@ -2715,7 +2717,9 @@ fhandler_pty_slave::term_has_pcon_cap (const WCHAR *env)
       len -= n;
       *p = '\0';
       char *p2 = strrchr (buf, '\033');
-      if (p2 == NULL || sscanf (p2, "\033[%d;%dR", &y2, &x2) != 2)
+      char c;
+      if (p2 == NULL || sscanf (p2, "\033[%d;%d%c", &y2, &x2, &c) != 3
+	  || c != 'R')
 	continue;
       break;
     }
