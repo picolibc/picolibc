@@ -1044,6 +1044,14 @@ int     mALLOPt();
 struct mallinfo mALLINFo();
 #endif
 
+/* Work around compiler optimizing away stores to 'size' field before
+ * call to free.
+ */
+#ifdef HAVE_ALIAS_ATTRIBUTE
+extern typeof(free) __malloc_free;
+#else
+#define __malloc_free(x) fREe(x)
+#endif
 
 #ifdef __cplusplus
 };  /* end of extern "C" */
@@ -2210,7 +2218,7 @@ static void malloc_extend_top(nb) RDECL INTERNAL_SIZE_T nb;
         SIZE_SZ|PREV_INUSE;
       /* If possible, release the rest. */
       if (old_top_size >= MINSIZE) 
-        fREe(chunk2mem(old_top));
+        __malloc_free(chunk2mem(old_top));
     }
   }
 
@@ -2699,7 +2707,14 @@ void fREe(mem) RDECL Void_t* mem;
 
 #endif /* MALLOC_PROVIDED */
 }
-
+#ifdef HAVE_ALIAS_ATTRIBUTE
+#pragma GCC diagnostic push
+#ifndef __clang__
+#pragma GCC diagnostic ignored "-Wmissing-attributes"
+#endif
+__strong_reference(free, __malloc_free);
+#pragma GCC diagnostic pop
+#endif
 #endif /* DEFINE_FREE */
 
 #ifdef DEFINE_REALLOC
@@ -2943,7 +2958,7 @@ Void_t* rEALLOc(oldmem, bytes) RDECL Void_t* oldmem; size_t bytes;
 
     /* Otherwise copy, free, and exit */
     MALLOC_COPY(newmem, oldmem, oldsize - SIZE_SZ);
-    fREe(oldmem);
+    __malloc_free(oldmem);
     MALLOC_UNLOCK;
     return newmem;
   }
@@ -2959,7 +2974,7 @@ Void_t* rEALLOc(oldmem, bytes) RDECL Void_t* oldmem; size_t bytes;
     set_head_size(newp, nb);
     set_head(remainder, remainder_size | PREV_INUSE);
     set_inuse_bit_at_offset(remainder, remainder_size);
-    fREe(chunk2mem(remainder)); /* let free() deal with it */
+    __malloc_free(chunk2mem(remainder)); /* let free() deal with it */
   }
   else
   {
@@ -3083,7 +3098,7 @@ Void_t* mEMALIGn(alignment, bytes) RDECL size_t alignment; size_t bytes;
     set_head(newp, newsize | PREV_INUSE);
     set_inuse_bit_at_offset(newp, newsize);
     set_head_size(p, leadsize);
-    fREe(chunk2mem(p));
+    __malloc_free(chunk2mem(p));
     p = newp;
 
     assert (newsize >= nb && (((unsigned long)(chunk2mem(p))) % alignment) == 0);
@@ -3098,7 +3113,7 @@ Void_t* mEMALIGn(alignment, bytes) RDECL size_t alignment; size_t bytes;
     remainder = chunk_at_offset(p, nb);
     set_head(remainder, remainder_size | PREV_INUSE);
     set_head_size(p, nb);
-    fREe(chunk2mem(remainder));
+    __malloc_free(chunk2mem(remainder));
   }
 
   check_inuse_chunk(p);
