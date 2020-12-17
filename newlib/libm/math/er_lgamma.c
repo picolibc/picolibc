@@ -12,9 +12,9 @@
  *
  */
 
-/* __ieee754_lgamma_r(x, signgamp)
+/* __ieee754_lgamma_r(x)
  * Reentrant version of the logarithm of the Gamma function 
- * with user provide pointer for the sign of Gamma(x). 
+ * with signgam for the sign of Gamma(x). 
  *
  * Method:
  *   1. Argument Reduction for 0 < x <= 8
@@ -212,8 +212,9 @@ static double zero=  0.00000000000000000000e+00;
 #ifdef __STDC__
 	double __ieee754_lgamma_r(double x, int *signgamp)
 #else
-	double __ieee754_lgamma_r(x,signgamp)
-	double x; int *signgamp;
+	double __ieee754_lgamma_r(x, signgamp)
+	double x;
+	int *signgamp;
 #endif
 {
 	double t,y,z,nadj = 0.0,p,p1,p2,p3,q,r,w;
@@ -224,8 +225,14 @@ static double zero=  0.00000000000000000000e+00;
     /* purge off +-inf, NaN, +-0, and negative arguments */
 	*signgamp = 1;
 	ix = hx&0x7fffffff;
-	if(ix>=0x7ff00000) return x*x;
-	if((ix|lx)==0) return one/zero;
+	if(ix>=0x7ff00000) {
+	    return x*x;
+	}
+	if((ix|lx)==0) {
+	    if(hx<0)
+	        *signgamp = -1;
+	    return one/(x-x);
+	}
 	if(ix<0x3b900000) {	/* |x|<2**-70, return -log(|x|) */
 	    if(hx<0) {
 	        *signgamp = -1;
@@ -233,10 +240,13 @@ static double zero=  0.00000000000000000000e+00;
 	    } else return -__ieee754_log(x);
 	}
 	if(hx<0) {
-	    if(ix>=0x43300000) 	/* |x|>=2**52, must be -integer */
-		return one/zero;
+	    if(ix>=0x43300000) { /* |x|>=2**52, must be -integer */
+		return one/(x-x); /* -integer */
+	    }
 	    t = sin_pi(x);
-	    if(t==zero) return one/zero; /* -integer */
+	    if(t==zero) {
+		return one/(x-x); /* -integer */
+	    }
 	    nadj = __ieee754_log(pi/fabs(t*x));
 	    if(t<zero) *signgamp = -1;
 	    x = -x;
@@ -307,3 +317,4 @@ static double zero=  0.00000000000000000000e+00;
 	if(hx<0) r = nadj - r;
 	return r;
 }
+

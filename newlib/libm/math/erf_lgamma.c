@@ -147,8 +147,9 @@ static float zero=  0.0000000000e+00;
 #ifdef __STDC__
 	float __ieee754_lgammaf_r(float x, int *signgamp)
 #else
-	float __ieee754_lgammaf_r(x,signgamp)
-	float x; int *signgamp;
+	float __ieee754_lgammaf_r(x, signgamp)
+	float x;
+	int *signgamp;
 #endif
 {
 	float t,y,z,nadj = 0.0,p,p1,p2,p3,q,r,w;
@@ -159,8 +160,14 @@ static float zero=  0.0000000000e+00;
     /* purge off +-inf, NaN, +-0, and negative arguments */
 	*signgamp = 1;
 	ix = hx&0x7fffffff;
-	if(ix>=0x7f800000) return x*x;
-	if(ix==0) return one/zero;
+	if(ix>=0x7f800000) {
+	    return x*x;
+	}
+	if(ix==0) {
+	    if(hx<0)
+	        *signgamp = -1;
+	    return one/(x-x);
+	}
 	if(ix<0x1c800000) {	/* |x|<2**-70, return -log(|x|) */
 	    if(hx<0) {
 	        *signgamp = -1;
@@ -168,10 +175,14 @@ static float zero=  0.0000000000e+00;
 	    } else return -__ieee754_logf(x);
 	}
 	if(hx<0) {
-	    if(ix>=0x4b000000) 	/* |x|>=2**23, must be -integer */
-		return one/zero;
+	    if(ix>=0x4b000000) { 	/* |x|>=2**23, must be -integer */
+		return one/(x-x);
+	    }
 	    t = sin_pif(x);
-	    if(t==zero) return one/zero; /* -integer */
+	    if(t==zero) {
+		/* tgamma wants NaN instead of INFINITY */
+		return one/(x-x); /* -integer */
+	    }
 	    nadj = __ieee754_logf(pi/fabsf(t*x));
 	    if(t<zero) *signgamp = -1;
 	    x = -x;
