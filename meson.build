@@ -521,9 +521,9 @@ foreach builtin : builtins
   conf_data.set('HAVE_' + builtin[0].to_upper(), have_current_builtin, description: 'The compiler supports __' + builtin[0])
 endforeach
 
-NEWLIB_VERSION='3.3.0'
-NEWLIB_MAJOR_VERSION=3
-NEWLIB_MINOR_VERSION=3
+NEWLIB_VERSION='4.0.0'
+NEWLIB_MAJOR_VERSION=4
+NEWLIB_MINOR_VERSION=0
 NEWLIB_PATCHLEVEL_VERSION=0
 
 have_cc_inhibit_loop_to_libcall=meson.get_compiler('c').has_argument('-fno-tree-loop-distribute-patterns')
