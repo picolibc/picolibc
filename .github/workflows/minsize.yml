@@ -36,9 +36,9 @@ jobs:
           # Iconv configurations
           "-Dnewlib-iconv-external-ccs=true",
 
-          # Multithread
-          "-Dnewlib-multithread=true -Dnewlib-retargetable-locking=true",
-          "-Dnewlib-multithread=true -Dnewlib-retargetable-locking=true -Dnewlib-tinystdio=false"
+          # Multithread disabled
+          "-Dnewlib-multithread=false -Dnewlib-retargetable-locking=false",
+          "-Dnewlib-multithread=false -Dnewlib-retargetable-locking=false -Dnewlib-tinystdio=false"
         ]
         test: [
           "./.github/do-test do-native-configure build-native",
