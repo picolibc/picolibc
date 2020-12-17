@@ -1414,6 +1414,7 @@ format_proc_cpuinfo (void *, char *&destbuf)
 
 	  ftcprint (features1,  0, "fsgsbase");	    /* rd/wr fs/gs base */
 	  ftcprint (features1,  1, "tsc_adjust");   /* TSC adjustment MSR 0x3B */
+	  ftcprint (features1,  2, "sgx");	    /* software guard extensions */
 	  ftcprint (features1,  3, "bmi1");         /* bit manip ext group 1 */
 	  ftcprint (features1,  4, "hle");          /* hardware lock elision */
 	  ftcprint (features1,  5, "avx2");         /* AVX ext instructions */
@@ -1564,6 +1565,7 @@ format_proc_cpuinfo (void *, char *&destbuf)
 	  ftcprint (features1, 27, "movdiri");          /* movdiri instr */
 	  ftcprint (features1, 28, "movdir64b");        /* movdir64b instr */
 	  ftcprint (features1, 29, "enqcmd");		/* enqcmd/s instructions*/
+	  ftcprint (features1, 30, "sgx_lc");		/* sgx launch control */
         }
 
       /* AMD MCA cpuid 0x80000007 ebx */
