@@ -15,6 +15,7 @@
 
 #include "math.h"
 #include "fdlibm.h"
+#include <errno.h>
 
 #ifdef __STDC__
 	float tgammaf(float x)
@@ -34,7 +35,6 @@
 	    errno = EDOM;
 	  else if (finite(x))
 	    errno = ERANGE;
-	}
 	return y;
 #endif
 }

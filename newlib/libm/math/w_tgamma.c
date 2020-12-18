@@ -16,6 +16,7 @@
  */
 
 #include "fdlibm.h"
+#include <errno.h>
 
 #ifndef _DOUBLE_IS_32BITS
 
