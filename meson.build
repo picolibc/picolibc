@@ -358,6 +358,8 @@ specs_data.set(
 specs_c_data = specs_data
 
 specs_c_data.set('PICOLIBC_LD', 'picolibc.ld')
+specs_c_data.set('CRTBEGIN', '')
+specs_c_data.set('CRTEND', '')
 
 specs_cpp_data = specs_data
 
@@ -535,7 +537,7 @@ if enable_multilib
   endif
 else
   targets = ['']
-  target_ = ['.', meson.get_cross_property('c_args', []) + c_args]
+  target_ = ['.', c_args + meson.get_cross_property('c_args', [])]
 endif
 
 conf_data = configuration_data()
@@ -770,7 +772,7 @@ conf_data.set('HAVE_SEMIHOST', has_semihost, description: 'Semihost APIs support
 # By default, tests don't require any special arguments
 
 # disable compiler built-ins so we reach the library equivalents
-test_c_args = arg_fnobuiltin
+test_c_args = c_args + arg_fnobuiltin
 if tests_enable_stack_protector
   if meson.get_compiler('c').has_argument('-fstack-protector-all') and meson.get_compiler('c').has_argument('-fstack-protector-strong')
     test_c_args += ['-fstack-protector-all', '-fstack-protector-strong', '-DTESTS_ENABLE_STACK_PROTECTOR']
