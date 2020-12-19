@@ -40,7 +40,7 @@ int main() {
 	try {
 		throw 20;
 	}
-	catch (int param) { std::cout << "int exception" << param << '\n'; }
+	catch (int param) { std::cout << "int exception " << param << '\n'; }
 	std::cout << "Goodbye, world!\n";
 	return 0;
 }

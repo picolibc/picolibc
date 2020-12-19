@@ -34,14 +34,14 @@
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
-qemu=qemu-system-riscv32
+qemu=qemu-system-aarch64
 
 # select the program
-elf=hello-world-riscv.elf
+elf=hello-world++-aarch64.elf
 
 # Set the target machine
-machine=virt,accel=tcg
-cpu=rv32
+machine=virt
+cpu=cortex-a57
 
 # Map stdio to a multiplexed character device so we can use it
 # for the monitor and semihosting output
@@ -52,12 +52,12 @@ chardev=stdio,mux=on,id=stdio0
 
 semi=enable=on,chardev=stdio0,arg="test-file"
 
-# Point the monitor at the new chardev too
+# Disable monitor
 
-mon=chardev=stdio0,mode=readline
+mon=none
 
 # Disable the serial port
 
-serial=chardev:stdio0
+serial=none
 
-$qemu -chardev $chardev -semihosting-config $semi -mon $mon -serial $serial -machine $machine -cpu $cpu -kernel $elf -bios none -nographic "$@"
+$qemu -chardev $chardev -semihosting-config $semi -monitor $mon -serial $serial -machine $machine -cpu $cpu -kernel $elf -nographic "$@"
