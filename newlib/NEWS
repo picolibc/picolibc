@@ -1,3 +1,9 @@
+*** Major changes in newlib version 4.1.0:
+
+- fixes for regressions to pow/powf and tgamma functions
+- RISC-V semihosting support
+- RISC-V and arm patches
+
 *** Major changes in newlib version 4.0.0:
 
 - additional out-of-bounds checking for malloc/nano-malloc family
