@@ -351,19 +351,58 @@ specs_data.set(
   specs_printf
 )
 
+# Create C and C++ specific specs data,
+# that includes setting the correct linker script
+# and adding the C++ startup/shutdown files
+
+specs_c_data = specs_data
+
+specs_c_data.set('PICOLIBC_LD', 'picolibc.ld')
+
+specs_cpp_data = specs_data
+
+specs_cpp_data.set('PICOLIBC_LD', 'picolibcpp.ld')
+specs_cpp_data.set('CRTBEGIN', 'crtbegin%O%s')
+specs_cpp_data.set('CRTEND', 'crtend%O%s')
+
 picolibc_specs = configure_file(input: 'picolibc.specs.in',
 				output: '@BASENAME@',
-				configuration: specs_data,
+				configuration: specs_c_data,
 				install_dir: specs_dir,
 				install: specs_install)
 				     
+picolibcpp_specs = configure_file(input: 'picolibc.specs.in',
+				  output: 'picolibcpp.specs',
+				  configuration: specs_cpp_data,
+				  install_dir: specs_dir,
+				  install: specs_install)
+
 test_specs = configure_file(input: 'test.specs.in',
 			    output: '@BASENAME@',
 			    configuration: specs_data,
 			    install: false)
 
-install_data('picolibc.ld',
-	     install_dir: lib_dir)
+picolibc_ld_data = configuration_data()
+picolibc_ld_data.set('CPP_START', '/*')
+picolibc_ld_data.set('CPP_END', '*/')
+picolibc_ld_data.set('C_START', '')
+picolibc_ld_data.set('C_END', '')
+
+picolibc_ld = configure_file(input: 'picolibc.ld.in',
+			     output: 'picolibc.ld',
+			     configuration: picolibc_ld_data,
+			     install_dir: lib_dir)
+
+picolibcpp_ld_data = configuration_data()
+picolibcpp_ld_data.set('CPP_START', '')
+picolibcpp_ld_data.set('CPP_END', '')
+picolibcpp_ld_data.set('C_START', '/*')
+picolibcpp_ld_data.set('C_END', '*/')
+
+picolibcpp_ld = configure_file(input: 'picolibc.ld.in',
+			     output: 'picolibcpp.ld',
+			     configuration: picolibcpp_ld_data,
+			     install_dir: lib_dir)
 
 # Not all compilers necessarily support all warnings used by the tests; only use these which are:
 test_c_warnings = []
@@ -755,7 +794,7 @@ if has_semihost
 
   test_link_path = '@0@/@1@'.format(meson.current_source_dir(), test_link_name)
 
-  picolibc_link_path = '@0@/@1@'.format(meson.current_source_dir(), 'picolibc.ld')
+  picolibc_link_path = 'picolibc.ld'
 
   if meson.get_compiler('c').get_id() != 'clang'
     test_c_args += ['--specs', '@0@/@1@'.format(meson.current_build_dir(), picolibc_specs)]
@@ -763,11 +802,11 @@ if has_semihost
 
   # Undefine _exit as that's in libsemihost and needs to replace the weak _exit
 
-  test_link_args += test_c_args + ['-nostartfiles', '-nostdlib', '-T', test_link_path, '-T', picolibc_link_path, '-Wl,--undefined=_exit', '-lgcc']
+  test_link_args += test_c_args + ['-nostartfiles', '-nostdlib', '-T', test_link_path, '-T', 'picolibc.ld', '-Wl,--undefined=_exit', '-lgcc']
 
   # Make sure all of the tests get re-linked if the linker scripts change
 
-  test_link_depends += test_link_dep + files('picolibc.ld') + [picolibc_specs]
+  test_link_depends += test_link_dep + [picolibc_ld] + [picolibc_specs]
 elif meson.get_compiler('c').get_id() == 'clang'
   # Clang does not support spec files
 else

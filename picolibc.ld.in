@@ -94,6 +94,17 @@ SECTIONS
 		*(.got .got.*)
 	} >flash AT>flash :text
 
+	/*
+	 * Additional sections when compiling with C++ exception support
+	 */
+
+	@CPP_START@
+
+	.gcc_except_table : {
+		*(.gcc_except_table *.gcc_except_table.*)
+		KEEP (*(.eh_frame .eh_frame.*))
+	} >flash AT>flash :text
+
 	.ARM.extab : {
 		*(.ARM.extab* .gnu.linkonce.armextab.*)
 	} >flash AT>flash :text
@@ -103,6 +114,8 @@ SECTIONS
 		*(.ARM.exidx*)
 	} >flash AT>flash :text
 	PROVIDE(__exidx_end = .);
+
+	@CPP_END@
 
 	. = ALIGN(8);
 
@@ -231,8 +244,13 @@ SECTIONS
 	} >ram :ram
 
 	/* Throw away C++ exception handling information */
+
+	@C_START@
+
 	/DISCARD/ : {
 		*(.eh_frame .eh_frame.*)
 		*(.note .note.*)
 	}
+
+	@C_END@
 }
