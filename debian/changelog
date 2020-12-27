@@ -1,3 +1,9 @@
+picolibc (1.4.7-2) unstable; urgency=medium
+
+  * Source upload. Closes: #978412.
+
+ -- Keith Packard <keithp@keithp.com>  Sun, 27 Dec 2020 12:42:53 -0800
+
 picolibc (1.4.7-1) unstable; urgency=medium
 
   * New upstream version
