@@ -597,6 +597,7 @@ class BinutilsCmdLine (CmdLine):
         self.add_dir ('gprof')
         self.add_dir ('include')
         self.add_dir ('ld', LdFilter())
+        self.add_dir ('libctf')
         self.add_dir ('libdecnumber')
         self.add_dir ('libiberty')
         self.add_dir ('opcodes')
@@ -613,6 +614,7 @@ class BinutilsCmdLine (CmdLine):
             'gprof',
             'include',
             'ld',
+            'libctf',
             'libiberty',
             'opcodes',
             ]

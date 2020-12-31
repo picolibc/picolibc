@@ -1,3 +1,7 @@
+2021-01-01  Alan Modra  <amodra@gmail.com>
+
+	* update-copyright.py (BinutilsCmdLine.__init__): Add libctf.
+
 2020-01-15  Simon Marchi  <simon.marchi@polymtl.ca>
 
 	* texi2pod.pl: Handle @t{...} tags.
