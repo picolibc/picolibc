@@ -33,6 +33,8 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include <picolibc.h>	
+
 /**
  * seems clang has no option "nopic". Now this could be problematic,
  * since according to the clang devs at [0], that option has an effect
