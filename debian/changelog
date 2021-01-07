@@ -1,3 +1,30 @@
+picolibc (1.5-1) unstable; urgency=medium
+
+  * New upstream release
+
+  * Make picolibc more compatible with C++ compilers.
+
+  * Add GCC specs file and linker script for building C++ applications
+    with G++ that enable exception handling by linking in call stack
+    information.
+
+  * A few clang build fixes, including libm exception generation
+
+  * Nano malloc fixes, especially for 'unusual' arguments
+
+  * Merge in newlib 4.1.0 code
+
+  * More libm exception/errno/infinity fixes, mostly in the gamma funcs.
+
+  * Add tests for all semihost v2.0 functions.
+
+  * A few RISC-V assembly fixes and new libm code.
+
+  * Build fixes to reliably replace generic code with
+    architecture-specific implementations.
+
+ -- Keith Packard <keithp@keithp.com>  Thu, 07 Jan 2021 13:06:25 -0800
+
 picolibc (1.4.7-2) unstable; urgency=medium
 
   * Source upload. Closes: #978412.
