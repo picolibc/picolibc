@@ -39,8 +39,8 @@ CPP_RISCV=riscv64-unknown-elf-g++ -specs=picolibcpp.specs
 CC_RISCV=riscv64-unknown-elf-gcc -specs=picolibc.specs 
 CFLAGS_RISCV=$(CFLAGS) -march=rv32imac -mabi=ilp32 -Wl,-Thello-world-riscv.ld
 
-CPP_ARM=arm-none-eabi-g++ -specs=picolibcpp.specs 
-CC_ARM=arm-none-eabi-gcc -specs=picolibc.specs 
+CPP_ARM=arm-picolibc-eabi-c++ -specs=picolibcpp.specs 
+CC_ARM=arm-picolibc-eabi-gcc -specs=picolibc.specs 
 CFLAGS_ARM=$(CFLAGS) -mcpu=cortex-m3 -Wl,-Thello-world-arm.ld
 
 CPP_AARCH64=aarch64-unknown-elf-g++ -specs=picolibcpp.specs 
