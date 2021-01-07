@@ -130,9 +130,8 @@ check_malloc(size_t in_use)
 {
 	int result = 0;
 
-	malloc_stats();
-#ifdef _NANO_MALLOC
 	struct mallinfo info = mallinfo();
+#ifdef _NANO_MALLOC
 	if (info.arena < info.fordblks + in_use) {
 		printf("non-free bytes in arena %zu free %zu\n", info.arena, info.fordblks);
 		result++;
@@ -255,7 +254,6 @@ main(void)
 
 		result += check_blocks("realloc");
 		result += check_malloc(in_use);
-		malloc_stats();
 
 		shuffle_order();
 		for (i = 0; i < NUM_MALLOC; i++) {

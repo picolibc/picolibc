@@ -27,6 +27,7 @@
  */
 
 #include <stddef.h>
+#include <string.h>
 #include <_ansi.h>
 
 /* According to the run-time ABI for the ARM Architecture, this
@@ -61,7 +62,6 @@ void __aeabi_memmove8 (void *dest, const void *source, size_t n)
  */
 void __attribute__((used)) __aeabi_memmove (void *dest, const void *source, size_t n)
 {
-  extern void memmove (void *dest, const void *source, size_t n);
   memmove (dest, source, n);
 }
 #endif

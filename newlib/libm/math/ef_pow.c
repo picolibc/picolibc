@@ -143,7 +143,7 @@ __strong_reference(__ieee754_powf, powf);
     /* |y| is huge */
 	if(iy>0x4d000000) { /* if |y| > 2**27 */
 	/* over/underflow if x is not close to one */
-	    if(ix<0x3f7ffff8) return (hy<0)? __math_oflowf(0):__math_uflowf(0);
+	    if(ix<0x3f7ffff4) return (hy<0)? __math_oflowf(0):__math_uflowf(0);
 	    if(ix>0x3f800007) return (hy>0)? __math_oflowf(0):__math_uflowf(0);
 	/* now |1-x| is tiny <= 2**-20, suffice to compute 
 	   log(x) by x-x^2/2+x^3/3-x^4/4 */

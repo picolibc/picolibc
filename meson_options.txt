@@ -103,7 +103,7 @@ option('posix-console', type: 'boolean', value: false,
 #
 # Options applying to only legacy stdio
 #
-option('newlib-elix-level', type: 'integer', value: 0,
+option('newlib-elix-level', type: 'integer', value: 2,
        description: 'desired elix library level (0-4)')
 option('newlib-fseek-optimization', type: 'boolean', value: false,
        description: 'enable fseek optimization')
@@ -177,9 +177,9 @@ option('newlib-nano-malloc', type: 'boolean', value: true,
 #
 # Locking support
 #
-option('newlib-multithread', type: 'boolean', value: false,
+option('newlib-multithread', type: 'boolean', value: true,
        description: 'enable support for multiple threads')
-option('newlib-retargetable-locking', type: 'boolean', value: false,
+option('newlib-retargetable-locking', type: 'boolean', value: true,
        description: 'Allow locking routines to be retargeted at link time')
 
 #

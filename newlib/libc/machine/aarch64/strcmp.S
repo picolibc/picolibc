@@ -29,7 +29,7 @@
  * ARMv8-a, AArch64
  */
 
-#if (defined (__OPTIMIZE_SIZE__) || defined (PREFER_SIZE_OVER_SPEED))
+#if (defined (__OPTIMIZE_SIZE__) || defined (PREFER_SIZE_OVER_SPEED)) || !defined(__LP64__)
 /* See strcmp-stub.c  */
 #else
 

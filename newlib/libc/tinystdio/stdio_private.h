@@ -31,6 +31,7 @@
 
 #include <stdio.h>
 #include <stdbool.h>
+#include <sys/lock.h>
 
 /* values for PRINTF_LEVEL */
 #define PRINTF_MIN 1
@@ -109,7 +110,50 @@ struct __file_posix {
 	char	*read_buf;
 	int	read_len;
 	int	read_off;
+#ifndef __SINGLE_THREAD__
+	_LOCK_T lock;
+#endif
 };
+
+static inline void __posix_lock_init(FILE *f) {
+#ifndef __SINGLE_THREAD__
+	struct __file_posix *fp = (struct __file_posix *) f;
+	(void) fp;
+	__lock_init(fp->lock);
+#else
+	(void) f;
+#endif
+}
+
+static inline void __posix_lock_close(FILE *f) {
+#ifndef __SINGLE_THREAD__
+	struct __file_posix *fp = (struct __file_posix *) f;
+	(void) fp;
+	__lock_close(fp->lock);
+#else
+	(void) f;
+#endif
+}
+
+static inline void __posix_lock(FILE *f) {
+#ifndef __SINGLE_THREAD__
+	struct __file_posix *fp = (struct __file_posix *) f;
+	(void) fp;
+	__lock_acquire(fp->lock);
+#else
+	(void) f;
+#endif
+}
+
+static inline void __posix_unlock(FILE *f) {
+#ifndef __SINGLE_THREAD__
+	struct __file_posix *fp = (struct __file_posix *) f;
+	(void) fp;
+	__lock_release(fp->lock);
+#else
+	(void) f;
+#endif
+}
 
 int	__d_vfprintf(FILE *__stream, const char *__fmt, va_list __ap) __FORMAT_ATTRIBUTE__(printf, 2, 0);
 int	__f_vfprintf(FILE *__stream, const char *__fmt, va_list __ap) __FORMAT_ATTRIBUTE__(printf, 2, 0);
@@ -141,7 +185,7 @@ float
 __atof_engine(uint32_t m10, int e10);
 
 static inline uint16_t
-__non_atomic_exchange_ungetc(__ungetc_store_t *p, __ungetc_t v)
+__non_atomic_exchange_ungetc(__ungetc_t *p, __ungetc_t v)
 {
 	__ungetc_t e = *p;
 	*p = v;
@@ -159,28 +203,38 @@ __non_atomic_compare_exchange_ungetc(__ungetc_t *p, __ungetc_t d, __ungetc_t v)
 
 #ifdef ATOMIC_UNGETC
 
+#if __PICOLIBC_UNGETC_SIZE == 4 && defined (__GCC_HAVE_SYNC_COMPARE_AND_SWAP_4)
+#define PICOLIBC_HAVE_SYNC_COMPARE_AND_SWAP
+#endif
+
+#if __PICOLIBC_UNGETC_SIZE == 2 && defined (__GCC_HAVE_SYNC_COMPARE_AND_SWAP_2)
+#define PICOLIBC_HAVE_SYNC_COMPARE_AND_SWAP
+#endif
+
 #ifdef PICOLIBC_HAVE_SYNC_COMPARE_AND_SWAP
 
 /* Use built-in atomic functions if they exist */
 #include <stdatomic.h>
 static inline bool
-__atomic_compare_exchange_ungetc(__ungetc_store_t *p, __ungetc_t d, __ungetc_t v)
+__atomic_compare_exchange_ungetc(__ungetc_t *p, __ungetc_t d, __ungetc_t v)
 {
-	return atomic_compare_exchange_weak(p, &d, v);
+	_Atomic __ungetc_t *pa = (_Atomic __ungetc_t *) p;
+	return atomic_compare_exchange_weak(pa, &d, v);
 }
 static inline __ungetc_t
-__atomic_exchange_ungetc(__ungetc_store_t *p, __ungetc_t v)
+__atomic_exchange_ungetc(__ungetc_t *p, __ungetc_t v)
 {
-	return atomic_exchange_explicit(p, v, memory_order_relaxed);
+	_Atomic __ungetc_t *pa = (_Atomic __ungetc_t *) p;
+	return atomic_exchange_explicit(pa, v, memory_order_relaxed);
 }
 
 #else
 
 bool
-__atomic_compare_exchange_ungetc(__ungetc_store_t *p, __ungetc_t d, __ungetc_t v);
+__atomic_compare_exchange_ungetc(__ungetc_t *p, __ungetc_t d, __ungetc_t v);
 
 __ungetc_t
-__atomic_exchange_ungetc(__ungetc_store_t *p, __ungetc_t v);
+__atomic_exchange_ungetc(__ungetc_t *p, __ungetc_t v);
 
 #endif /* PICOLIBC_HAVE_SYNC_COMPARE_AND_SWAP */
 

@@ -1,0 +1,124 @@
+#
+# SPDX-License-Identifier: BSD-3-Clause
+#
+# Copyright © 2020 Keith Packard
+#
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions
+# are met:
+#
+# 1. Redistributions of source code must retain the above copyright
+#    notice, this list of conditions and the following disclaimer.
+#
+# 2. Redistributions in binary form must reproduce the above
+#    copyright notice, this list of conditions and the following
+#    disclaimer in the documentation and/or other materials provided
+#    with the distribution.
+#
+# 3. Neither the name of the copyright holder nor the names of its
+#    contributors may be used to endorse or promote products derived
+#    from this software without specific prior written permission.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+# "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+# LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+# FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+# COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+# INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+# (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+# SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+# HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
+# STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+# ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
+# OF THE POSSIBILITY OF SUCH DAMAGE.
+#
+
+semihost_tests = [
+  'semihost-exit',
+  'semihost-exit-extended',
+  'semihost-clock',
+  'semihost-errno',
+  'semihost-flen',
+  'semihost-get-cmdline',
+  'semihost-istty',
+  'semihost-open',
+  'semihost-read',
+  'semihost-remove',
+  'semihost-rename',
+  'semihost-seek',
+  'semihost-system',
+  'semihost-time',
+  'semihost-writec',
+  'semihost-write0'
+]
+
+# These tests should pass, but are currently broken under qemu
+semihost_broken = [
+  'semihost-elapsed',
+  'semihost-heapinfo',
+  'semihost-readc',
+  'semihost-tickfreq',
+  'semihost-tmpnam',
+  ]
+
+semihost_fail_tests = [
+  'semihost-exit-failure',
+  'semihost-exit-extended-failure',
+  'semihost-system-failure',
+]
+
+command_line = 'command-line'
+
+foreach target : targets
+  value = get_variable('target_' + target)
+
+  _libs = [get_variable('lib_m' + target), get_variable('lib_c' + target)]
+  _libs += [get_variable('lib_semihost' + target)]
+  if is_variable('lib_crt' + target)
+    _libs += [get_variable('lib_crt'+ target)]
+  endif
+  
+  _c_args = value[1] + test_c_args + ['-DCOMMAND_LINE="' + command_line + '"']
+
+  _link_args = value[1] + test_link_args
+
+  foreach semihost_test : semihost_tests
+    semihost_test_src = semihost_test + '.c'
+    if target == ''
+      semihost_test_name = semihost_test
+    else
+      semihost_test_name = join_paths(target, semihost_test)
+    endif
+
+    test(semihost_test + target,
+	 executable(semihost_test_name, [semihost_test_src],
+		    c_args: _c_args,
+		    link_args: _link_args,
+		    link_with: _libs,
+		    link_depends:  test_link_depends,
+		    include_directories: semihost_inc),
+	 args: [command_line],
+	 env: ['MESON_SOURCE_ROOT=' + meson.source_root()])
+  endforeach
+
+  foreach semihost_fail_test : semihost_fail_tests
+    semihost_fail_test_src = semihost_fail_test + '.c'
+    if target == ''
+      semihost_fail_test_name = semihost_fail_test
+    else
+      semihost_fail_test_name = join_paths(target, semihost_fail_test)
+    endif
+
+    test(semihost_fail_test + target,
+	 executable(semihost_fail_test_name, [semihost_fail_test_src],
+		    c_args: _c_args,
+		    link_args: _link_args,
+		    link_with: _libs,
+		    link_depends:  test_link_depends,
+		    include_directories: semihost_inc),
+	 args: [command_line],
+	 env: ['MESON_SOURCE_ROOT=' + meson.source_root()],
+	 should_fail: true)
+  endforeach
+  
+endforeach

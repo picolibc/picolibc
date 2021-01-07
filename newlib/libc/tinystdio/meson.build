@@ -76,6 +76,7 @@ srcs_tinystdio = [
     'puts.c',
     'scanf.c',
     'setbuf.c',
+    'setvbuf.c',
     'snprintf.c',
     'sprintf.c',
     'sprintff.c',
@@ -177,9 +178,9 @@ srcs_tinystdio_use = []
 foreach file : srcs_tinystdio
   s_file = file.split('.')[0] + '.S'
   if file in srcs_machine
-    message(file + ': machine overrides generic')
+    message('libc/tinystdio/' + file + ': machine overrides generic')
   elif s_file in srcs_machine
-    message(s_file + ': machine overrides generic')
+    message('libc/tinystdio/' + s_file + ': machine overrides generic')
   else
     srcs_tinystdio_use += file
   endif

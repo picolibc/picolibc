@@ -33,18 +33,23 @@
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
-CFLAGS=--specs=picolibc.specs --oslib=semihost
+CFLAGS=--oslib=semihost -O -g -Wl,-gc-sections
 
-CC_RISCV=riscv64-unknown-elf-gcc
-CFLAGS_RISCV=$(CFLAGS) -march=rv32imac -mabi=ilp32 -Thello-world-riscv.ld
+CPP_RISCV=riscv64-unknown-elf-g++ -specs=picolibcpp.specs 
+CC_RISCV=riscv64-unknown-elf-gcc -specs=picolibc.specs 
+CFLAGS_RISCV=$(CFLAGS) -march=rv32imac -mabi=ilp32 -Wl,-Thello-world-riscv.ld
 
-CC_ARM=arm-none-eabi-gcc
-CFLAGS_ARM=$(CFLAGS) -mcpu=cortex-m3 -Thello-world-arm.ld
+CPP_ARM=arm-picolibc-eabi-c++ -specs=picolibcpp.specs 
+CC_ARM=arm-picolibc-eabi-gcc -specs=picolibc.specs 
+CFLAGS_ARM=$(CFLAGS) -mcpu=cortex-m3 -Wl,-Thello-world-arm.ld
 
-CC_AARCH64=aarch64-linux-gnu-gcc
-CFLAGS_AARCH64=$(CFLAGS) -Thello-world-aarch64.ld
+CPP_AARCH64=aarch64-unknown-elf-g++ -specs=picolibcpp.specs 
+CC_AARCH64=aarch64-unknown-elf-gcc -specs=picolibc.specs 
+CFLAGS_AARCH64=$(CFLAGS) -Wl,-Thello-world-aarch64.ld
 
-all: hello-world-riscv.elf hello-world-arm.elf hello-world-aarch64.elf
+all: hello-world-riscv.elf hello-world-arm.elf hello-world-aarch64.elf \
+	hello-world++-riscv.elf hello-world++-arm.elf hello-world++-aarch64.elf
+
 
 hello-world-riscv.elf: hello-world.c
 	$(CC_RISCV) $(CFLAGS_RISCV) -o $@ $^ -Wl,-Map=hello-world-riscv.map
@@ -57,3 +62,15 @@ hello-world-aarch64.elf: hello-world.c
 
 clean:
 	rm -f *.elf *.map
+
+hello-world++-native.elf: hello-world++.c++
+	c++ -o $@ $^
+
+hello-world++-arm.elf:  hello-world++.c++
+	$(CPP_ARM) $(CFLAGS_ARM) -Wl,-Map=hello-world++-arm.map -o $@ $^
+
+hello-world++-riscv.elf:  hello-world++.c++
+	$(CPP_RISCV) $(CFLAGS_RISCV) -Wl,-Map=hello-world++-riscv.map -o $@ $^
+
+hello-world++-aarch64.elf:  hello-world++.c++
+	$(CPP_AARCH64) $(CFLAGS_AARCH64) -Wl,-Map=hello-world++-aarch64.map -o $@ $^

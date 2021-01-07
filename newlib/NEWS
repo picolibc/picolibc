@@ -1,3 +1,24 @@
+*** Major changes in newlib version 4.1.0:
+
+- fixes for regressions to pow/powf and tgamma functions
+- RISC-V semihosting support
+- RISC-V and arm patches
+
+*** Major changes in newlib version 4.0.0:
+
+- additional out-of-bounds checking for malloc/nano-malloc family
+- various fixes to makedocbook for python 3.8
+- multiple standard/accuracy fixes to libm math routines
+- C-SKY port
+- support for Armv8-R aarch64 added
+- move of __tzrules_struct from time.h to internal header
+- math additions/improvements for RISC-V and arm
+- all arm code converted to use unified syntax for Thumb1
+- fenv support added for multiple platforms
+- hard float support for PowerPC taken from FreeBSD
+- advertising clause removed from BSD licenses
+- various other fixes
+
 *** Major changes in newlib version 3.2.0:
 
 - memmem performance improvement

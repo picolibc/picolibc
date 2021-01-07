@@ -61,9 +61,9 @@ srcs_argz_use = []
 foreach file : srcs_argz
   s_file = file.split('.')[0] + '.S'
   if file in srcs_machine
-    message(file + ': machine overrides generic')
+    message('libc/argz/' + file + ': machine overrides generic')
   elif s_file in srcs_machine
-    message(s_file + ': machine overrides generic')
+    message('libc/argz/' + s_file + ': machine overrides generic')
   else
     srcs_argz_use += file
   endif

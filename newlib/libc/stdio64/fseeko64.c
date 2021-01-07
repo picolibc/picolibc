@@ -314,7 +314,7 @@ _fseeko64_r (struct _reent *ptr,
       fp->_p += n;
       fp->_r -= n;
     }
-  _newlib_flockfile_end(fp);
+  _newlib_flockfile_exit(fp);
   return 0;
 
   /*
@@ -327,7 +327,7 @@ dumb:
   if (_fflush_r (ptr, fp)
       || seekfn (ptr, fp->_cookie, offset, whence) == POS_ERR)
     {
-      _funlockfile(fp);
+      _newlib_flockfile_exit(fp);
       return EOF;
     }
   /* success: clear EOF indicator and discard ungetc() data */
@@ -337,7 +337,7 @@ dumb:
   fp->_r = 0;
   /* fp->_w = 0; *//* unnecessary (I think...) */
   fp->_flags &= ~__SEOF;
-  _funlockfile(fp);
+  _newlib_flockfile_end (fp);
   return 0;
 }
 

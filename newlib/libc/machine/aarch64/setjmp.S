@@ -45,6 +45,9 @@
 	.global	setjmp
 	.type	setjmp, %function
 setjmp:
+#ifndef __LP64__
+	mov	w0, w0
+#endif
 	mov	x16, sp
 #define REG_PAIR(REG1, REG2, OFFS)	stp REG1, REG2, [x0, OFFS]
 #define REG_ONE(REG1, OFFS)		str REG1, [x0, OFFS]
@@ -60,6 +63,10 @@ setjmp:
 	.global	longjmp
 	.type	longjmp, %function
 longjmp:
+#ifndef __LP64__
+	mov	w0, w0
+#endif
+	
 #define REG_PAIR(REG1, REG2, OFFS)	ldp REG1, REG2, [x0, OFFS]
 #define REG_ONE(REG1, OFFS)		ldr REG1, [x0, OFFS]
 	GPR_LAYOUT

@@ -33,4 +33,8 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
-exec `dirname $0`/do-configure clang-thumbv7m-none-eabi -Dtests=true -Dtests-enable-stack-protector=false -Dtests-disable-full-malloc-stress=true "$@"
+exec `dirname $0`/do-configure clang-thumbv7m-none-eabi \
+     -Dtests=true \
+     -Dtests-enable-stack-protector=false \
+     -Dtests-disable-full-malloc-stress=true \
+     -Dmultilib=false "$@"

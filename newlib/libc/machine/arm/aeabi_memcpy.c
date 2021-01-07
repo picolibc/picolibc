@@ -27,6 +27,7 @@
  */
 
 #include <stddef.h>
+#include <string.h>
 #include <_ansi.h>
 
 /* According to the Run-time ABI for the ARM Architecture.  This
@@ -58,7 +59,6 @@ void __aeabi_memcpy8 (void *dest, const void *source, size_t n)
    because it's not defined in the same translation unit.  */
 void __aeabi_memcpy (void *dest, const void *source, size_t n)
 {
-  extern void memcpy (void *dest, const void *source, size_t n);
   memcpy (dest, source, n);
 }
 #endif

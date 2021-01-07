@@ -224,9 +224,9 @@ srcs_common_use = []
 foreach file : srcs_common
   s_file = file.split('.')[0] + '.S'
   if file in srcs_libm_machine
-    message(file + ': machine overrides generic')
+    message('libm/common/' + file + ': machine overrides generic')
   elif s_file in srcs_libm_machine
-    message(s_file + ': machine overrides generic')
+    message('libm/common/' + s_file + ': machine overrides generic')
   else
     srcs_common_use += file
   endif

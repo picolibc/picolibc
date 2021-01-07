@@ -83,7 +83,19 @@ chardev=stdio,mux=on,id=stdio0
 
 # Point the semihosting driver at our new chardev
 
-semi=enable=on,chardev=stdio0,arg="test-file"
+semi=enable=on,chardev=stdio0
+
+input=""
+
+case "$1" in
+    -*|"")
+    ;;
+    *)
+	semi="$semi",arg="$1"
+	input="$1"
+	shift
+	;;
+esac
 
 # Point the monitor at the new chardev too
 
@@ -93,4 +105,4 @@ mon=none
 
 serial=none
 
-$qemu -chardev $chardev -semihosting-config $semi -monitor $mon -serial $serial -machine $machine -cpu $cpu -kernel $elf -nographic "$@" -bios none < /dev/null
+echo "$input" | $qemu -chardev $chardev -semihosting-config $semi -monitor $mon -serial $serial -machine $machine -cpu $cpu -kernel $elf -nographic "$@" -bios none

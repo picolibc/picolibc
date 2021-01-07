@@ -1,7 +1,7 @@
 /*
  * SPDX-License-Identifier: BSD-3-Clause
  *
- * Copyright © 2019 Keith Packard
+ * Copyright (c) 2020 Kito Cheng
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -33,32 +33,18 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-static inline void
-_set_tls(void *tls)
+#include <math.h>
+
+#if defined(__riscv_flen) && __riscv_flen >= 64
+
+double
+copysign (double x, double y)
 {
-	asm("mv tp, %0" : : "r" (tls));
+  double result;
+  asm ("fsgnj.d\t%0, %1, %2" : "=f"(result) : "f"(x), "f"(y));
+  return result;
 }
 
-#include "../../crt0.h"
-#include <sys/cdefs.h>
-
-static void __attribute((used))
-_cstart(void)
-{
-	asm(".option push\n.option norelax\nla gp, __global_pointer$\n.option pop");
-#ifdef __riscv_flen
-	long mstatus;
-	asm("csrr %0, mstatus" : "=r" (mstatus));
-	mstatus |= 1 << 13;
-	asm("csrw mstatus, %0" : : "r" (mstatus));
-	asm("csrwi fcsr, 0");
+#else
+#include "../../common/s_copysign.c"
 #endif
-	__start();
-}
-
-void __attribute((naked)) __section(".text.init.enter")
-_start(void)
-{
-	asm(".option push\n.option norelax\nla sp, __stack\n.option pop");
-	asm("j _cstart");
-}

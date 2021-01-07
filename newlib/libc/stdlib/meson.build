@@ -219,9 +219,9 @@ srcs_stdlib_use = []
 foreach file : srcs_stdlib
   s_file = file.split('.')[0] + '.S'
   if file in srcs_machine
-    message(file + ': machine overrides generic')
+    message('libc/stdlib/' + file + ': machine overrides generic')
   elif s_file in srcs_machine
-    message(s_file + ': machine overrides generic')
+    message('libc/stdlib/' + s_file + ': machine overrides generic')
   else
     srcs_stdlib_use += file
   endif
@@ -231,9 +231,9 @@ srcs_stdlib_malloc_use = []
 foreach file : srcs_stdlib_malloc
   s_file = file.split('.')[0] + '.S'
   if file in srcs_machine
-    message(file + ': machine overrides generic')
+    message('libc/stdlib/' + file + ': machine overrides generic')
   elif s_file in srcs_machine
-    message(s_file + ': machine overrides generic')
+    message('libc/stdlib/' + s_file + ': machine overrides generic')
   else
     srcs_stdlib_malloc_use += file
   endif

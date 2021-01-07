@@ -1,5 +1,5 @@
 # Picolibc
-Copyright © 2018-2020 Keith Packard
+Copyright © 2018-2021 Keith Packard
 
 Picolibc is library offering standard C library APIs that targets
 small embedded systems with limited RAM. Picolibc was formed by blending
@@ -96,6 +96,32 @@ areas unrelated to the code used by picolibc, so keeping things in
 sync has not been difficult so far.
 
 ## Releases
+
+### Picolibc version 1.5
+
+ 1. Make picolibc more compatible with C++ compilers.
+   
+ 2. Add GCC specs file and linker script for building C++ applications
+    with G++ that enable exception handling by linking in call stack
+    information.
+
+ 3. A few clang build fixes, including libm exception generation
+
+ 4. Nano malloc fixes, especially for 'unusual' arguments
+
+ 5. Merge in newlib 4.1.0 code
+
+ 6. More libm exception/errno/infinity fixes, mostly in the gamma funcs.
+
+ 7. Add tests for all semihost v2.0 functions.
+
+ 8. A few RISC-V assembly fixes and new libm code.
+
+ 9. Build fixes to reliably replace generic code with
+    architecture-specific implementations.
+
+With a patch which is pending for GCC 11, we'll be able to build C++
+applications that use picolibc with exceptions and iostream.
 
 ### Picolibc version 1.4.7
 

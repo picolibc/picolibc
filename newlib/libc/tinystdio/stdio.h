@@ -224,38 +224,31 @@
  * elements of it beyond by using the official interfaces provided.
  */
 
-/* Use 32-bit ungetc storage when doing atomic ungetc and when
- * the platform has 4-byte swap intrinsics but not 2-byte swap
- * intrinsics, as is the case for RISC-V processors. This increases
- * the size of the __file struct by four bytes.
- */
-
 #ifdef ATOMIC_UNGETC
-#include <stdatomic.h>
-# ifdef __GCC_HAVE_SYNC_COMPARE_AND_SWAP_4
-
-#  define PICOLIBC_HAVE_SYNC_COMPARE_AND_SWAP
-typedef atomic_uint_least32_t __ungetc_store_t;
-typedef uint_least32_t __ungetc_t;
-
-# else
-#  ifdef __GCC_HAVE_SYNC_COMPARE_AND_SWAP_2
-
-#   define PICOLIBC_HAVE_SYNC_COMPARE_AND_SWAP
-typedef atomic_uint_least16_t __ungetc_store_t;
-typedef uint_least16_t __ungetc_t;
-
-#  endif
-# endif
+#ifdef __riscv
+/*
+ * Use 32-bit ungetc storage when doing atomic ungetc on RISC-V, which
+ * has 4-byte swap intrinsics but not 2-byte swap intrinsics. This
+ * increases the size of the __file struct by four bytes.
+ */
+#define __PICOLIBC_UNGETC_SIZE	4
+#endif
 #endif
 
-#ifndef PICOLIBC_HAVE_SYNC_COMPARE_AND_SWAP
-typedef uint16_t __ungetc_store_t;
+#ifndef __PICOLIBC_UNGETC_SIZE
+#define __PICOLIBC_UNGETC_SIZE	2
+#endif
+
+#if __PICOLIBC_UNGETC_SIZE == 4
+typedef uint32_t __ungetc_t;
+#endif
+
+#if __PICOLIBC_UNGETC_SIZE == 2
 typedef uint16_t __ungetc_t;
 #endif
 
 struct __file {
-	__ungetc_store_t unget;	/* ungetc() buffer */
+	__ungetc_t unget;	/* ungetc() buffer */
 	uint8_t	flags;		/* flags, see below */
 #define __SRD	0x0001		/* OK to read */
 #define __SWR	0x0002		/* OK to write */

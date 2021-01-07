@@ -82,7 +82,7 @@ foreach file : inc_sys_headers_all
   if not (file in inc_sys_headers_machine)
     inc_sys_headers += file
   else
-    message(file + ': machine overrides generic')
+    message('libc/include/sys/' + file + ': machine overrides generic')
   endif
 endforeach
 

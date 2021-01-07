@@ -35,8 +35,8 @@
 srcs_libm_machine = [
   'e_sqrt.c',
   'ef_sqrt.c',
-  'feclearexcept.c',
   'fe_dfl_env.c',
+  'feclearexcept.c',
   'fegetenv.c',
   'fegetexceptflag.c',
   'fegetround.c',
@@ -47,10 +47,36 @@ srcs_libm_machine = [
   'fesetround.c',
   'fetestexcept.c',
   'feupdateenv.c',
-  's_fma_riscv.c',
-  'sf_fma_riscv.c',
+  's_copysign.c',
+  's_fabs.c',
+  's_finite.c',
+  's_fma.c',
+  's_fmax.c',
+  's_fmin.c',
+  's_fpclassify.c',
+  's_isinf.c',
+  's_isnan.c',
+  's_llrint.c',
+  's_llround.c',
+  's_lrint.c',
+  's_lround.c',
+  'sf_copysign.c',
+  'sf_fabs.c',
+  'sf_finite.c',
+  'sf_fma.c',
+  'sf_fmax.c',
+  'sf_fmin.c',
+  'sf_fpclassify.c',
+  'sf_isinf.c',
+  'sf_isnan.c',
+  'sf_llrint.c',
+  'sf_llround.c',
+  'sf_lrint.c',
+  'sf_lround.c',
 ]
 
+srcs_libm_machine_dontuse = [
+  ]
 foreach target : targets
 	value = get_variable('target_' + target)
 	set_variable('lib_machine' + target,

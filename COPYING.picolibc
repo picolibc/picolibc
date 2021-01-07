@@ -432,10 +432,12 @@ Files: dummyhost/iob.c
  hello-world/Makefile
  hello-world/hello-world.c
  hello-world/run-aarch64
+ hello-world/run-aarch64++
  hello-world/run-arm
+ hello-world/run-arm++
  hello-world/run-riscv
+ hello-world/run-riscv++
  hello-world/*.ld
- meson.build
  meson_options.txt
  newlib/libc/argz/meson.build
  newlib/libc/ctype/meson.build
@@ -533,6 +535,8 @@ Files: dummyhost/iob.c
  newlib/libm/machine/riscv/meson.build
  newlib/libm/math/meson.build
  newlib/libm/meson.build
+ newlib/libm/test/copysign_vec.c
+ newlib/libm/test/copysignf_vec.c
  newlib/libm/test/issignaling_vec.c
  newlib/libm/test/meson.build
  newlib/libm/test/modf_vec.c
@@ -552,14 +556,14 @@ Files: dummyhost/iob.c
  picocrt/crt0.h
  picocrt/machine/aarch64/crt0.c
  picocrt/machine/arm/crt0.c
- picocrt/machine/riscv/crt0.c
  picocrt/meson.build
  picocrt/shared/crt0.c
- picolibc.ld
  scripts/do-aarch64-configure
+ scripts/do-aarch64-zephyr-elf-configure
  scripts/do-arm-configure
  scripts/do-clang-arm-configure
  scripts/do-clang-riscv-configure
+ scripts/do-clang-rv32imafdc-configure
  scripts/do-clang-thumbv7e+fp-configure
  scripts/do-clang-thumbv7m-configure
  scripts/do-configure
@@ -594,15 +598,26 @@ Files: dummyhost/iob.c
  semihost/semihost.h
  semihost/sys_clock.c
  semihost/sys_close.c
+ semihost/sys_elapsed.c
  semihost/sys_errno.c
+ semihost/sys_exit.c
+ semihost/sys_exit_extended.c
  semihost/sys_feature.c
  semihost/sys_flen.c
  semihost/sys_get_cmdline.c
  semihost/sys_getc.c
+ semihost/sys_heapinfo.c
+ semihost/sys_istty.c
  semihost/sys_open.c
  semihost/sys_putc.c
  semihost/sys_read.c
  semihost/sys_remove.c
+ semihost/sys_rename.c
+ semihost/sys_seek.c
+ semihost/sys_time.c
+ semihost/sys_tmpnam.c
+ semihost/sys_write.c
+ semihost/sys_write0.c
  semihost/unlink.c
  semihost/write.c
  test/meson.build
@@ -613,14 +628,20 @@ Files: dummyhost/iob.c
 Copyright: 2019 Keith Packard
 License: BSD3-1
 
-Files: newlib/libc/errno/errno.c
+Files: hello-world/hello-world++.c++
+ newlib/libc/errno/errno.c
  newlib/libc/iconv/ccs/binary/meson.build
+ newlib/libc/include/machine/math.h
  newlib/libc/include/ssp/meson.build
  newlib/libc/include/sys/auxv.h
  newlib/libc/machine/aarch64/sys/meson.build
+ newlib/libc/machine/arm/machine/meson.build
  newlib/libc/machine/arm/sys/meson.build
  newlib/libc/machine/csky/meson.build
+ newlib/libc/machine/i386/machine/meson.build
  newlib/libc/machine/i386/sys/meson.build
+ newlib/libc/machine/riscv/machine/math.h
+ newlib/libc/machine/riscv/machine/meson.build
  newlib/libc/machine/x86_64/sys/meson.build
  newlib/libc/machine/xtensa/sys/meson.build
  newlib/libc/picolib/getauxval.c
@@ -653,6 +674,7 @@ Files: newlib/libc/errno/errno.c
  newlib/libc/tinystdio/gcvtf.c
  newlib/libc/tinystdio/gcvtfbuf.c
  newlib/libc/tinystdio/perror.c
+ newlib/libc/tinystdio/setvbuf.c
  newlib/libc/tinystdio/strtod_l.c
  newlib/libc/tinystdio/strtold_l.c
  newlib/libc/tinystdio/vasprintf.c
@@ -669,6 +691,7 @@ Files: newlib/libc/errno/errno.c
  newlib/libm/math/ef_lgamma.c
  scripts/run-aarch64
  scripts/run-rv32imac
+ scripts/run-rv32imafdc
  scripts/test-arm.ld
  scripts/test-riscv.ld
  scripts/test-riscv32.ld
@@ -676,6 +699,9 @@ Files: newlib/libc/errno/errno.c
  semihost/fstat.c
  semihost/isatty.c
  semihost/mapstdio.c
+ semihost/sys_iserror.c
+ semihost/sys_system.c
+ semihost/sys_tickfreq.c
  test/fenv.c
  test/ffs.c
  test/malloc.c
@@ -683,15 +709,58 @@ Files: newlib/libc/errno/errno.c
  test/math_errhandling.c
  test/math_errhandling_tests.c
  test/regex.c
+ test/semihost/meson.build
+ test/semihost/semihost-clock.c
+ test/semihost/semihost-close.c
+ test/semihost/semihost-elapsed.c
+ test/semihost/semihost-errno.c
+ test/semihost/semihost-exit-extended-failure.c
+ test/semihost/semihost-exit-extended.c
+ test/semihost/semihost-exit-failure.c
+ test/semihost/semihost-exit.c
+ test/semihost/semihost-flen.c
+ test/semihost/semihost-get-cmdline.c
+ test/semihost/semihost-heapinfo.c
+ test/semihost/semihost-iserror.c
+ test/semihost/semihost-istty.c
+ test/semihost/semihost-open.c
+ test/semihost/semihost-read.c
+ test/semihost/semihost-readc.c
+ test/semihost/semihost-remove.c
+ test/semihost/semihost-rename.c
+ test/semihost/semihost-seek.c
+ test/semihost/semihost-system-failure.c
+ test/semihost/semihost-system.c
+ test/semihost/semihost-tickfreq.c
+ test/semihost/semihost-time.c
+ test/semihost/semihost-tmpnam.c
+ test/semihost/semihost-tmpname.c
+ test/semihost/semihost-write.c
+ test/semihost/semihost-write0.c
+ test/semihost/semihost-writec.c
+ test/setjmp.c
  test/stack-smash.c
  test/tls.c
+ test/try-ilp32-sub.c
+ test/try-ilp32.c
+ test/try-ilp32.h
 Copyright: 2020 Keith Packard
+License: BSD3-1
+
+Files: meson.build
+Copyright: 2019-2021 Keith Packard
 License: BSD3-1
 
 Files: newlib/libc/machine/aarch64/meson.build
  newlib/libm/machine/aarch64/meson.build
 Copyright: 2019 Keith Packard,
  2020 Anthony Anderson
+License: BSD3-1
+
+Files: newlib/libc/machine/arm/machine/math.h
+Copyright: 2020 Keith Packard
+ 2017 embedded brains GmbH.
+ 2011, 2012 ARM Ltd.
 License: BSD3-1
 
 Files: newlib/libc/machine/powerpc/meson.build
@@ -701,6 +770,37 @@ License: BSD3-1
 Files: newlib/libc/machine/xtensa/meson.build
  newlib/libm/machine/xtensa/meson.build
 Copyright: 2019 Jonathan McDowell
+License: BSD3-1
+
+Files: newlib/libm/machine/riscv/s_copysign.c
+ newlib/libm/machine/riscv/s_fabs.c
+ newlib/libm/machine/riscv/s_finite.c
+ newlib/libm/machine/riscv/s_fmax.c
+ newlib/libm/machine/riscv/s_fmin.c
+ newlib/libm/machine/riscv/s_fpclassify.c
+ newlib/libm/machine/riscv/s_isinf.c
+ newlib/libm/machine/riscv/s_isnan.c
+ newlib/libm/machine/riscv/s_llrint.c
+ newlib/libm/machine/riscv/s_llround.c
+ newlib/libm/machine/riscv/s_lrint.c
+ newlib/libm/machine/riscv/s_lround.c
+ newlib/libm/machine/riscv/sf_copysign.c
+ newlib/libm/machine/riscv/sf_fabs.c
+ newlib/libm/machine/riscv/sf_finite.c
+ newlib/libm/machine/riscv/sf_fmax.c
+ newlib/libm/machine/riscv/sf_fmin.c
+ newlib/libm/machine/riscv/sf_fpclassify.c
+ newlib/libm/machine/riscv/sf_isinf.c
+ newlib/libm/machine/riscv/sf_isnan.c
+ newlib/libm/machine/riscv/sf_llrint.c
+ newlib/libm/machine/riscv/sf_llround.c
+ newlib/libm/machine/riscv/sf_lrint.c
+ newlib/libm/machine/riscv/sf_lround.c
+Copyright: 2020 Kito Cheng
+License: BSD3-1
+
+Files: picocrt/machine/riscv/crt0.S
+Copyright: 2020 Sebastian Meyer
 License: BSD3-1
 
 Files: scripts/do-freedom-tools-package
@@ -2096,12 +2196,14 @@ Files: .gitattributes
  newlib/make-library
  newlib/make-target
  newlib/newlib.hin
+ picolibc.ld.in
  picolibc.specs.in
  scripts/cross-aarch64-linux-gnu.txt
- scripts/cross-aarch64-zephyr-elf.xt
+ scripts/cross-aarch64-zephyr-elf.txt
  scripts/cross-arm-none-eabi.txt
  scripts/cross-arm-zephyr-eabi.txt
  scripts/cross-clang-riscv64-unknown-elf.txt
+ scripts/cross-clang-rv32imafdc-unknown-elf.txt
  scripts/cross-clang-thumbv7e+fp-none-eabi.txt
  scripts/cross-clang-thumbv7m-none-eabi.txt
  scripts/cross-i686-linux-gnu.txt

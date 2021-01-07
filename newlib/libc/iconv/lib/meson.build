@@ -53,9 +53,9 @@ srcs_iconv_lib_use = []
 foreach file : srcs_iconv_lib
   s_file = file.split('.')[0] + '.S'
   if file in srcs_machine
-    message(file + ': machine overrides generic')
+    message('libc/iconv/lib/' + file + ': machine overrides generic')
   elif s_file in srcs_machine
-    message(s_file + ': machine overrides generic')
+    message('libc/iconv/lib/' + s_file + ': machine overrides generic')
   else
     srcs_iconv_lib_use += file
   endif

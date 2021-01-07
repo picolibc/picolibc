@@ -270,10 +270,10 @@ extern int   __kernel_rem_pio2f __P((float*,float*,int,int,int,const __int32_t*)
 
 #ifdef __IEEE_BIG_ENDIAN
 
-typedef union 
+typedef union
 {
-  double value;
-  struct 
+  uint64_t bits;
+  struct
   {
     __uint32_t msw;
     __uint32_t lsw;
@@ -284,10 +284,10 @@ typedef union
 
 #ifdef __IEEE_LITTLE_ENDIAN
 
-typedef union 
+typedef union
 {
-  double value;
-  struct 
+  uint64_t bits;
+  struct
   {
     __uint32_t lsw;
     __uint32_t msw;
@@ -301,7 +301,7 @@ typedef union
 #define EXTRACT_WORDS(ix0,ix1,d)				\
 do {								\
   ieee_double_shape_type ew_u;					\
-  ew_u.value = (d);						\
+  ew_u.bits = asuint64(d);					\
   (ix0) = ew_u.parts.msw;					\
   (ix1) = ew_u.parts.lsw;					\
 } while (0)
@@ -311,7 +311,7 @@ do {								\
 #define GET_HIGH_WORD(i,d)					\
 do {								\
   ieee_double_shape_type gh_u;					\
-  gh_u.value = (d);						\
+  gh_u.bits = asuint64(d);					\
   (i) = gh_u.parts.msw;						\
 } while (0)
 
@@ -320,7 +320,7 @@ do {								\
 #define GET_LOW_WORD(i,d)					\
 do {								\
   ieee_double_shape_type gl_u;					\
-  gl_u.value = (d);						\
+  gl_u.bits = asuint64(d);					\
   (i) = gl_u.parts.lsw;						\
 } while (0)
 
@@ -331,7 +331,7 @@ do {								\
   ieee_double_shape_type iw_u;					\
   iw_u.parts.msw = (ix0);					\
   iw_u.parts.lsw = (ix1);					\
-  (d) = iw_u.value;						\
+  (d) = asdouble(iw_u.bits);					\
 } while (0)
 
 /* Set the more significant 32 bits of a double from an int.  */
@@ -339,9 +339,9 @@ do {								\
 #define SET_HIGH_WORD(d,v)					\
 do {								\
   ieee_double_shape_type sh_u;					\
-  sh_u.value = (d);						\
+  sh_u.bits = asuint64(d);					\
   sh_u.parts.msw = (v);						\
-  (d) = sh_u.value;						\
+  (d) = asdouble(sh_u.bits);					\
 } while (0)
 
 /* Set the less significant 32 bits of a double from an int.  */
@@ -349,37 +349,21 @@ do {								\
 #define SET_LOW_WORD(d,v)					\
 do {								\
   ieee_double_shape_type sl_u;					\
-  sl_u.value = (d);						\
+  sl_u.bits = asuint64(d);					\
   sl_u.parts.lsw = (v);						\
-  (d) = sl_u.value;						\
+  (d) = asdouble(sl_u.bits);					\
 } while (0)
 
 /* A union which permits us to convert between a float and a 32 bit
    int.  */
 
-typedef union
-{
-  float value;
-  __uint32_t word;
-} ieee_float_shape_type;
-
 /* Get a 32 bit int from a float.  */
 
-#define GET_FLOAT_WORD(i,d)					\
-do {								\
-  ieee_float_shape_type gf_u;					\
-  gf_u.value = (d);						\
-  (i) = gf_u.word;						\
-} while (0)
+#define GET_FLOAT_WORD(i,d) ((i) = asuint(d))
 
 /* Set a float from a 32 bit int.  */
 
-#define SET_FLOAT_WORD(d,i)					\
-do {								\
-  ieee_float_shape_type sf_u;					\
-  sf_u.word = (i);						\
-  (d) = sf_u.value;						\
-} while (0)
+#define SET_FLOAT_WORD(d,i) ((d) = asfloat(i))
 
 /* Macros to avoid undefined behaviour that can arise if the amount
    of a shift is exactly equal to the size of the shifted operand.  */

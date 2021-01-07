@@ -88,6 +88,18 @@ chardev=stdio,mux=on,id=stdio0
 
 semi=enable=on,chardev=stdio0
 
+input=""
+
+case "$1" in
+    -*|"")
+	;;
+    *)
+	semi="$semi",arg="$1"
+	input="$1"
+	shift
+	;;
+esac
+
 # Disable monitor
 
 mon=none
@@ -96,7 +108,7 @@ mon=none
 
 serial=none
 
-$qemu $memory \
+echo "$input" | $qemu $memory \
       -chardev $chardev \
       -semihosting-config $semi \
       -monitor $mon \
@@ -105,4 +117,4 @@ $qemu $memory \
       -cpu $cpu \
       -device loader,file=$elf,cpu-num=0 \
       -nographic \
-      "$@" < /dev/null
+      "$@"

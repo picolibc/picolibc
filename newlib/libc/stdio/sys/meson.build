@@ -42,7 +42,7 @@ foreach file : inc_stdio_sys_headers_all
   if not (file in inc_sys_headers_machine)
     inc_stdio_sys_headers += file
   else
-    message(file + ': machine overrides generic stdio/sys')
+    message('libc/stdio/sys/' + file + ': machine overrides generic stdio/sys')
   endif
 endforeach
 

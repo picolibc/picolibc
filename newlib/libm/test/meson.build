@@ -49,6 +49,8 @@ math_test_src = [
   'atan_vec.c',
   'ceilf_vec.c',
   'ceil_vec.c',
+  'copysign_vec.c',
+  'copysignf_vec.c',
   'convert.c',
   'conv_vec.c',
   'cosf_vec.c',

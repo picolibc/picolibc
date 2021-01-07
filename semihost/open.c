@@ -48,19 +48,19 @@ open(const char *pathname, int flags, ...)
 
 	switch (flags & (O_RDONLY|O_WRONLY|O_RDWR)) {
 	case O_RDONLY:
-		semiflags = 0;			/* 'r' */
+		semiflags = SH_OPEN_R;			/* 'r' */
 		break;
 	case O_WRONLY:
 		if (flags & O_TRUNC)
-			semiflags = 4;	/* 'w' */
+			semiflags = SH_OPEN_W;		/* 'w' */
 		else
-			semiflags = 8;	/* 'a' */
+			semiflags = SH_OPEN_A;		/* 'a' */
 		break;
 	default:
 		if (flags & O_TRUNC)
-			semiflags = 6;	/* 'w+' */
+			semiflags = SH_OPEN_W_PLUS;	/* 'w+' */
 		else
-			semiflags = 10;	/* 'a+' */
+			semiflags = SH_OPEN_A_PLUS;	/* 'a+' */
 		break;
 	}
 
