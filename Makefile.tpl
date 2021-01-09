@@ -395,7 +395,7 @@ MAKEINFOFLAGS = --split-size=5000000
 # ---------------------------------------------
 
 AS = @AS@
-AR = @AR@
+AR = @AR@ @AR_PLUGIN_OPTION@
 AR_FLAGS = rc
 CC = @CC@
 CXX = @CXX@
@@ -405,7 +405,7 @@ LIPO = @LIPO@
 NM = @NM@
 OBJCOPY = @OBJCOPY@
 OBJDUMP = @OBJDUMP@
-RANLIB = @RANLIB@
+RANLIB = @RANLIB@ @RANLIB_PLUGIN_OPTION@
 READELF = @READELF@
 STRIP = @STRIP@
 WINDRES = @WINDRES@
@@ -1972,6 +1972,7 @@ AUTOCONF = autoconf
 $(srcdir)/configure: @MAINT@ $(srcdir)/configure.ac $(srcdir)/config/acx.m4 \
 	$(srcdir)/config/override.m4 $(srcdir)/config/proginstall.m4 \
 	$(srcdir)/config/elf.m4 $(srcdir)/config/isl.m4 \
+	$(srcdir)/config/gcc-plugin.m4 \
 	$(srcdir)/libtool.m4 $(srcdir)/ltoptions.m4 $(srcdir)/ltsugar.m4 \
 	$(srcdir)/ltversion.m4 $(srcdir)/lt~obsolete.m4
 	cd $(srcdir) && $(AUTOCONF)
