@@ -1929,6 +1929,9 @@ _fstat64_r (struct _reent *ptr, int fd, struct stat *buf)
 }
 
 #ifdef __i386__
+/* This entry point is retained only to serve old 32 bit applications
+built under Cygwin 1.3.x or earlier.  Newer 32 bit apps are redirected
+to fstat64; see NEW_FUNCTIONS in Makefile.in. */
 extern "C" int
 fstat (int fd, struct stat *buf)
 {
@@ -4852,7 +4855,7 @@ fstatat (int dirfd, const char *__restrict pathname, struct stat *__restrict st,
 	      cwdstuff::cwd_lock.release ();
 	    }
 	  else
-	    return fstat (dirfd, st);
+	    return fstat64 (dirfd, st);
 	}
       path_conv pc (path, ((flags & AT_SYMLINK_NOFOLLOW)
 			   ? PC_SYM_NOFOLLOW : PC_SYM_FOLLOW)
