@@ -97,6 +97,11 @@ sync has not been difficult so far.
 
 ## Releases
 
+### Picolibc version 1.5.1
+
+ 1. Make riscv crt0 '_exit' symbol 'weak' to allow linking without
+    this function.
+
 ### Picolibc version 1.5
 
  1. Make picolibc more compatible with C++ compilers.
