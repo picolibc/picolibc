@@ -35,85 +35,87 @@
 
 #include <picolibc.h>	
 
-/**
- * seems clang has no option "nopic". Now this could be problematic,
- * since according to the clang devs at [0], that option has an effect
- * on `la`. However, the resulting crt0.o looks the same as the one from
- * gcc (same opcodes + pc relative relocations where I used `la`), so
- * this could be okay.
- * [0] https://reviews.llvm.org/D55325
- */
+	/**
+	 * seems clang has no option "nopic". Now this could be problematic,
+	 * since according to the clang devs at [0], that option has an effect
+	 * on `la`. However, the resulting crt0.o looks the same as the one from
+	 * gcc (same opcodes + pc relative relocations where I used `la`), so
+	 * this could be okay.
+	 * [0] https://reviews.llvm.org/D55325
+	 */
 #ifndef __clang__
-.option nopic
+	.option	nopic
 #endif
 
-.text
-.section .text.init.enter,"ax",@progbits
-.align 1
-.globl _start
-.type _start, @function
+	.text
+	.section	.text.init.enter,"ax",@progbits
+	.align	1
+	.globl	_start
+	.type	_start, @function
 _start:
-.option push
-.option norelax
-la sp, __stack
-la gp, __global_pointer$
-.option pop
+	.option	push
+	.option	norelax
+	la	sp, __stack
+	la	gp, __global_pointer$
+	.option	pop
 
 #ifdef __riscv_flen
-csrr t0, mstatus
-// 1 << 13 = 8192
-li t1, 8192
-or t0, t1, t0
-csrw mstatus, t0
-csrwi fcsr, 0
+	csrr	t0, mstatus
+	// 1 << 13 = 8192
+	li	t1, 8192
+	or	t0, t1, t0
+	csrw	mstatus, t0
+	csrwi	fcsr, 0
 #endif
 
-// __start
+	// __start
 
-// call to memcpy(__data_start, __data_source, __data_size)
-la a0, __data_start
-la a1, __data_source
-la a2, __data_size
-call memcpy
+	// call to memcpy(__data_start, __data_source, __data_size)
+	la	a0, __data_start
+	la	a1, __data_source
+	la	a2, __data_size
+	call	memcpy
 
-// call to memset(__bss_start, '\0', __bss_size)
-la a0, __bss_start
-li a1, 0
-la a2, __bss_size
-call memset
+	// call to memset(__bss_start, '\0', __bss_size)
+	la	a0, __bss_start
+	li	a1, 0
+	la	a2, __bss_size
+	call	memset
 
 #ifdef PICOLIBC_TLS
-// call to _set_tls(__tls_base)
-la a0, __tls_base
-call _set_tls
+	// call to _set_tls(__tls_base)
+	la	a0, __tls_base
+	call	_set_tls
 #endif
 
 #ifdef HAVE_INITFINI_ARRAY
-call __libc_init_array
+	call	__libc_init_array
 #endif
 
-// call to main(0, NULL)
-li a0, 0
-li a1, 0
-call main
+	// call to main(0, NULL)
+	li	a0, 0
+	li	a1, 0
+	call	main
 
 #ifdef HAVE_INITFINI_ARRAY
-// save return value a0 in saved register s1
-mv s1, a0
-call __libc_fini_array
-mv a0, s1
+	// save return value a0 in saved register s1
+	mv	s1, a0
+	call	__libc_fini_array
+	mv	a0, s1
 #endif
 
-la t0, _exit
-beqz t0, .SKIP_EXIT
-call _exit
+	la	t0, _exit
+	beqz	t0, .SKIP_EXIT
+	call	_exit
+
 .SKIP_EXIT:
-/**
- * TODO what to do after main and exit return?
- * AFAI understood a hardware reset would be good,
- *  but there seems to be no reset instruction in riscv
- * So for now, just jump to _start again
- * (This makes sure the stack is correctly set, as opposed to _cstart)
- */
-j _start
-.size _start, .-_start
+	/**
+	 * TODO what to do after main and exit return?
+	 * AFAI understood a hardware reset would be good,
+	 *  but there seems to be no reset instruction in riscv
+	 * So for now, just jump to _start again
+	 * (This makes sure the stack is correctly set, as opposed to _cstart)
+	 */
+	j	_start
+	.size	_start, .-_start
+	.weak	_exit
