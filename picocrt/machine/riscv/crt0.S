@@ -118,3 +118,4 @@ _start:
 	 */
 	j	_start
 	.size	_start, .-_start
+	.weak	_exit
