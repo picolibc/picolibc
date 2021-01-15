@@ -755,8 +755,9 @@ _unlink_nt (path_conv &pc, bool shareable)
       if ((pc.fs_flags () & FILE_SUPPORTS_TRANSACTIONS))
 	start_transaction (old_trans, trans);
 retry_open:
-      status = NtOpenFile (&fh_ro, FILE_WRITE_ATTRIBUTES, &attr, &io,
-			   FILE_SHARE_VALID_FLAGS, flags);
+      status = NtOpenFile (&fh_ro,
+                           FILE_READ_ATTRIBUTES | FILE_WRITE_ATTRIBUTES,
+                           &attr, &io, FILE_SHARE_VALID_FLAGS, flags);
       if (NT_SUCCESS (status))
 	{
 	  debug_printf ("Opening %S for removing R/O succeeded",
