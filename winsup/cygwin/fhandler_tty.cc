@@ -1720,6 +1720,11 @@ int
 fhandler_pty_master::tcgetattr (struct termios *t)
 {
   *t = cygwin_shared->tty[get_minor ()]->ti;
+  /* Workaround for rlwrap v0.40 or later */
+  if (get_ttyp ()->pcon_start)
+    t->c_lflag &= ~(ICANON | ECHO);
+  if (get_ttyp ()->h_pseudo_console)
+    t->c_iflag &= ~ICRNL;
   return 0;
 }
 
