@@ -2339,12 +2339,13 @@ class fhandler_pty_slave: public fhandler_pty_common
     return fh;
   }
   bool setup_pseudoconsole (STARTUPINFOEXW *si, bool nopcon);
-  void close_pseudoconsole (void);
+  static void close_pseudoconsole (tty *ttyp);
   bool term_has_pcon_cap (const WCHAR *env);
   void set_switch_to_pcon (void);
   void reset_switch_to_pcon (void);
   void mask_switch_to_pcon_in (bool mask);
   void setup_locale (void);
+  tty *get_ttyp () { return (tty *) tc (); } /* Override as public */
 };
 
 #define __ptsname(buf, unit) __small_sprintf ((buf), "/dev/pty%d", (unit))

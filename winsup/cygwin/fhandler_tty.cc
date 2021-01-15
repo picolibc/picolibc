@@ -2563,21 +2563,23 @@ fallback:
   return false;
 }
 
+/* The function close_pseudoconsole() should be static so that it can
+   be called even after the fhandler_pty_slave instance is deleted. */
 void
-fhandler_pty_slave::close_pseudoconsole (void)
+fhandler_pty_slave::close_pseudoconsole (tty *ttyp)
 {
-  if (get_ttyp ()->h_pseudo_console)
+  if (ttyp->h_pseudo_console)
     {
-      get_ttyp ()->wait_pcon_fwd ();
-      HPCON_INTERNAL *hp = (HPCON_INTERNAL *) get_ttyp ()->h_pseudo_console;
+      ttyp->wait_pcon_fwd ();
+      HPCON_INTERNAL *hp = (HPCON_INTERNAL *) ttyp->h_pseudo_console;
       HANDLE tmp = hp->hConHostProcess;
-      ClosePseudoConsole (get_ttyp ()->h_pseudo_console);
+      ClosePseudoConsole (ttyp->h_pseudo_console);
       CloseHandle (tmp);
-      get_ttyp ()->h_pseudo_console = NULL;
-      get_ttyp ()->switch_to_pcon_in = false;
-      get_ttyp ()->pcon_pid = 0;
-      get_ttyp ()->pcon_start = false;
-      get_ttyp ()->do_not_resize_pcon = false;
+      ttyp->h_pseudo_console = NULL;
+      ttyp->switch_to_pcon_in = false;
+      ttyp->pcon_pid = 0;
+      ttyp->pcon_start = false;
+      ttyp->do_not_resize_pcon = false;
     }
 }
 

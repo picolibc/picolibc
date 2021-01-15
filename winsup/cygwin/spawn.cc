@@ -664,6 +664,7 @@ child_info_spawn::worker (const char *prog_arg, const char *const *argv,
 	init_console_handler (myself->ctty > 0);
 
       bool enable_pcon = false;
+      tty *ptys_ttyp = NULL;
       STARTUPINFOEXW si_pcon;
       ZeroMemory (&si_pcon, sizeof (si_pcon));
       STARTUPINFOW *si_tmp = &si;
@@ -677,6 +678,7 @@ child_info_spawn::worker (const char *prog_arg, const char *const *argv,
 	      c_flags |= EXTENDED_STARTUPINFO_PRESENT;
 	      si_tmp = &si_pcon.StartupInfo;
 	      enable_pcon = true;
+	      ptys_ttyp = ptys_primary->get_ttyp ();
 	    }
 	}
 
@@ -954,7 +956,7 @@ child_info_spawn::worker (const char *prog_arg, const char *const *argv,
 	  if (enable_pcon)
 	    {
 	      WaitForSingleObject (pi.hProcess, INFINITE);
-	      ptys_primary->close_pseudoconsole ();
+	      fhandler_pty_slave::close_pseudoconsole (ptys_ttyp);
 	    }
 	  else if (cons_native)
 	    {
@@ -973,7 +975,7 @@ child_info_spawn::worker (const char *prog_arg, const char *const *argv,
 	  if (waitpid (cygpid, &res, 0) != cygpid)
 	    res = -1;
 	  if (enable_pcon)
-	    ptys_primary->close_pseudoconsole ();
+	    fhandler_pty_slave::close_pseudoconsole (ptys_ttyp);
 	  else if (cons_native)
 	    {
 	      fhandler_console::request_xterm_mode_output (true,
