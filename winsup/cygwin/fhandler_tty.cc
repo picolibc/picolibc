@@ -386,7 +386,8 @@ fhandler_pty_master::accept_input ()
 	}
     }
 
-  SetEvent (input_available_event);
+  if (write_to == get_output_handle ())
+    SetEvent (input_available_event);
   ReleaseMutex (input_mutex);
   return ret;
 }
