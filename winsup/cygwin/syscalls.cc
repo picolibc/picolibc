@@ -1106,7 +1106,7 @@ unlink (const char *ourname)
   else if (win32_name.isdir ())
     {
       debug_printf ("unlinking a directory");
-      set_errno (EPERM);
+      set_errno (EISDIR);
       goto done;
     }
 
