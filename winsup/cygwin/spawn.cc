@@ -606,6 +606,7 @@ child_info_spawn::worker (const char *prog_arg, const char *const *argv,
 	sa = &sec_none_nih;
 
       fhandler_pty_slave *ptys_primary = NULL;
+      fhandler_console *cons_native = NULL;
       for (int i = 0; i < 3; i ++)
 	{
 	  const int chk_order[] = {1, 0, 2};
@@ -621,10 +622,23 @@ child_info_spawn::worker (const char *prog_arg, const char *const *argv,
 	    {
 	      fhandler_console *cons = (fhandler_console *) fh;
 	      if (wincap.has_con_24bit_colors () && !iscygwin ())
-		if (fd == 1 || fd == 2)
-		  cons->request_xterm_mode_output (false);
+		{
+		  if (cons_native == NULL)
+		    cons_native = cons;
+		  if (fd == 0)
+		    fhandler_console::request_xterm_mode_input (false,
+						cons->get_handle_set ());
+		  else if (fd == 1 || fd == 2)
+		    fhandler_console::request_xterm_mode_output (false,
+						 cons->get_handle_set ());
+		}
 	    }
 	}
+      struct fhandler_console::handle_set_t cons_handle_set = { 0, };
+      if (cons_native)
+	/* Console handles will be closed by close_all_handle(),
+	   therefore, duplicate them here */
+	cons_native->get_duplicated_handle_set (&cons_handle_set);
 
       if (!iscygwin ())
 	{
@@ -942,6 +956,15 @@ child_info_spawn::worker (const char *prog_arg, const char *const *argv,
 	      WaitForSingleObject (pi.hProcess, INFINITE);
 	      ptys_primary->close_pseudoconsole ();
 	    }
+	  else if (cons_native)
+	    {
+	      WaitForSingleObject (pi.hProcess, INFINITE);
+	      fhandler_console::request_xterm_mode_output (true,
+							   &cons_handle_set);
+	      fhandler_console::request_xterm_mode_input (true,
+							  &cons_handle_set);
+	      fhandler_console::close_handle_set (&cons_handle_set);
+	    }
 	  myself.exit (EXITCODE_NOSET);
 	  break;
 	case _P_WAIT:
@@ -951,6 +974,14 @@ child_info_spawn::worker (const char *prog_arg, const char *const *argv,
 	    res = -1;
 	  if (enable_pcon)
 	    ptys_primary->close_pseudoconsole ();
+	  else if (cons_native)
+	    {
+	      fhandler_console::request_xterm_mode_output (true,
+							   &cons_handle_set);
+	      fhandler_console::request_xterm_mode_input (true,
+							  &cons_handle_set);
+	      fhandler_console::close_handle_set (&cons_handle_set);
+	    }
 	  break;
 	case _P_DETACH:
 	  res = 0;	/* Lost all memory of this child. */

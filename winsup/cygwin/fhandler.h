@@ -2048,8 +2048,6 @@ class dev_console
   bool raw_win32_keyboard_mode;
   char cons_rabuf[40];  // cannot get longer than char buf[40] in char_command
   char *cons_rapoi;
-  LONG xterm_mode_input;
-  LONG xterm_mode_output;
   bool cursor_key_app_mode;
 
   inline UINT get_console_cp ();
@@ -2086,11 +2084,19 @@ public:
     input_signalled = 2,
     input_winch = 3
   };
+  struct handle_set_t
+  {
+    HANDLE input_handle;
+    HANDLE output_handle;
+    HANDLE input_mutex;
+    HANDLE output_mutex;
+  };
 private:
   static const unsigned MAX_WRITE_CHARS;
   static console_state *shared_console_info;
   static bool invisible_console;
   HANDLE input_mutex, output_mutex;
+  handle_set_t handle_set;
 
   /* Used when we encounter a truncated multi-byte sequence.  The
      lead bytes are stored here and revisited in the next write call. */
@@ -2212,8 +2218,12 @@ private:
   size_t &raixput ();
   size_t &rabuflen ();
 
-  void request_xterm_mode_input (bool);
-  void request_xterm_mode_output (bool);
+  const handle_set_t *get_handle_set (void) {return &handle_set;}
+  void get_duplicated_handle_set (handle_set_t *p);
+  static void close_handle_set (handle_set_t *p);
+
+  static void request_xterm_mode_input (bool, const handle_set_t *p);
+  static void request_xterm_mode_output (bool, const handle_set_t *p);
 
   friend tty_min * tty_list::get_cttyp ();
 };

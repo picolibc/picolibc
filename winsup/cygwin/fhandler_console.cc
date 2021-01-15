@@ -187,11 +187,7 @@ fhandler_console::set_unit ()
 	  tty_min_state.setntty (DEV_CONS_MAJOR, console_unit (me));
       devset = (fh_devices) shared_console_info->tty_min_state.getntty ();
       if (created)
-	{
-	  con.owner = myself->pid;
-	  con.xterm_mode_input = 0;
-	  con.xterm_mode_output = 0;
-	}
+	con.owner = myself->pid;
     }
   if (!created && shared_console_info)
     {
@@ -279,60 +275,65 @@ fhandler_console::rabuflen ()
   return con_ra.rabuflen;
 }
 
+/* The function request_xterm_mode_{in,out}put() should be static so that
+   they can be called even after the fhandler_console instance is deleted. */
 void
-fhandler_console::request_xterm_mode_input (bool req)
+fhandler_console::request_xterm_mode_input (bool req, const handle_set_t *p)
 {
   if (con_is_legacy)
     return;
+  WaitForSingleObject (p->input_mutex, INFINITE);
+  DWORD dwMode;
+  GetConsoleMode (p->input_handle, &dwMode);
   if (req)
     {
-      if (InterlockedExchange (&con.xterm_mode_input, 1) == 0)
+      if (!(dwMode & ENABLE_VIRTUAL_TERMINAL_INPUT))
 	{
-	  DWORD dwMode;
-	  GetConsoleMode (get_handle (), &dwMode);
 	  dwMode |= ENABLE_VIRTUAL_TERMINAL_INPUT;
-	  SetConsoleMode (get_handle (), dwMode);
+	  SetConsoleMode (p->input_handle, dwMode);
 	  if (con.cursor_key_app_mode) /* Restore DECCKM */
-	    WriteConsoleW (get_output_handle (), L"\033[?1h", 5, NULL, 0);
+	    {
+	      request_xterm_mode_output (true, p);
+	      WriteConsoleW (p->output_handle, L"\033[?1h", 5, NULL, 0);
+	    }
 	}
     }
   else
     {
-      if (InterlockedExchange (&con.xterm_mode_input, 0) == 1)
+      if (dwMode & ENABLE_VIRTUAL_TERMINAL_INPUT)
 	{
-	  DWORD dwMode;
-	  GetConsoleMode (get_handle (), &dwMode);
 	  dwMode &= ~ENABLE_VIRTUAL_TERMINAL_INPUT;
-	  SetConsoleMode (get_handle (), dwMode);
+	  SetConsoleMode (p->input_handle, dwMode);
 	}
     }
+  ReleaseMutex (p->input_mutex);
 }
 
 void
-fhandler_console::request_xterm_mode_output (bool req)
+fhandler_console::request_xterm_mode_output (bool req, const handle_set_t *p)
 {
   if (con_is_legacy)
     return;
+  WaitForSingleObject (p->output_mutex, INFINITE);
+  DWORD dwMode;
+  GetConsoleMode (p->output_handle, &dwMode);
   if (req)
     {
-      if (InterlockedExchange (&con.xterm_mode_output, 1) == 0)
+      if (!(dwMode & ENABLE_VIRTUAL_TERMINAL_PROCESSING))
 	{
-	  DWORD dwMode;
-	  GetConsoleMode (get_output_handle (), &dwMode);
 	  dwMode |= ENABLE_VIRTUAL_TERMINAL_PROCESSING;
-	  SetConsoleMode (get_output_handle (), dwMode);
+	  SetConsoleMode (p->output_handle, dwMode);
 	}
     }
   else
     {
-      if (InterlockedExchange (&con.xterm_mode_output, 0) == 1)
+      if (dwMode & ENABLE_VIRTUAL_TERMINAL_PROCESSING)
 	{
-	  DWORD dwMode;
-	  GetConsoleMode (get_output_handle (), &dwMode);
 	  dwMode &= ~ENABLE_VIRTUAL_TERMINAL_PROCESSING;
-	  SetConsoleMode (get_output_handle (), dwMode);
+	  SetConsoleMode (p->output_handle, dwMode);
 	}
     }
+  ReleaseMutex (p->output_mutex);
 }
 
 /* Return the tty structure associated with a given tty number.  If the
@@ -440,8 +441,8 @@ fhandler_console::fix_tab_position (void)
 {
   /* Re-setting ENABLE_VIRTUAL_TERMINAL_PROCESSING
      fixes the tab position. */
-  request_xterm_mode_output (false);
-  request_xterm_mode_output (true);
+  request_xterm_mode_output (false, &handle_set);
+  request_xterm_mode_output (true, &handle_set);
 }
 
 bool
@@ -506,7 +507,7 @@ fhandler_console::read (void *pv, size_t& buflen)
 
   /* if system has 24 bit color capability, use xterm compatible mode. */
   if (wincap.has_con_24bit_colors ())
-    request_xterm_mode_input (true);
+    request_xterm_mode_input (true, &handle_set);
 
   while (!input_ready && !get_cons_readahead_valid ())
     {
@@ -514,8 +515,6 @@ fhandler_console::read (void *pv, size_t& buflen)
       if ((bgres = bg_check (SIGTTIN)) <= bg_eof)
 	{
 	  buflen = bgres;
-	  if (wincap.has_con_24bit_colors ())
-	    request_xterm_mode_input (false);
 	  return;
 	}
 
@@ -533,8 +532,6 @@ fhandler_console::read (void *pv, size_t& buflen)
 	case WAIT_TIMEOUT:
 	  set_sig_errno (EAGAIN);
 	  buflen = (size_t) -1;
-	  if (wincap.has_con_24bit_colors ())
-	    request_xterm_mode_input (false);
 	  return;
 	default:
 	  goto err;
@@ -582,22 +579,16 @@ fhandler_console::read (void *pv, size_t& buflen)
 #undef buf
 
   buflen = copied_chars;
-  if (wincap.has_con_24bit_colors ())
-    request_xterm_mode_input (false);
   return;
 
 err:
   __seterrno ();
   buflen = (size_t) -1;
-  if (wincap.has_con_24bit_colors ())
-    request_xterm_mode_input (false);
   return;
 
 sig_exit:
   set_sig_errno (EINTR);
   buflen = (size_t) -1;
-  if (wincap.has_con_24bit_colors ())
-    request_xterm_mode_input (false);
 }
 
 fhandler_console::input_states
@@ -1106,6 +1097,7 @@ fhandler_console::open (int flags, mode_t)
       return 0;
     }
   set_handle (h);
+  handle_set.input_handle = h;
 
   h = CreateFileW (L"CONOUT$", GENERIC_READ | GENERIC_WRITE,
 		  FILE_SHARE_READ | FILE_SHARE_WRITE, &sec_none,
@@ -1117,8 +1109,11 @@ fhandler_console::open (int flags, mode_t)
       return 0;
     }
   set_output_handle (h);
+  handle_set.output_handle = h;
 
   setup_io_mutex ();
+  handle_set.input_mutex = input_mutex;
+  handle_set.output_mutex = output_mutex;
 
   if (con.fillin (get_output_handle ()))
     {
@@ -1191,8 +1186,10 @@ fhandler_console::close ()
 			      &obi, sizeof obi, NULL);
       if ((NT_SUCCESS (status) && obi.HandleCount == 1)
 	  || myself->pid == con.owner)
-	request_xterm_mode_output (false);
-      request_xterm_mode_input (false);
+	{
+	  request_xterm_mode_output (false, &handle_set);
+	  request_xterm_mode_input (false, &handle_set);
+	}
     }
 
   release_output_mutex ();
@@ -1354,9 +1351,13 @@ fhandler_console::output_tcsetattr (int, struct termios const *t)
   /* All the output bits we can ignore */
 
   acquire_output_mutex (INFINITE);
-  if (wincap.has_con_24bit_colors ())
-    request_xterm_mode_output (false);
   DWORD flags = ENABLE_PROCESSED_OUTPUT | ENABLE_WRAP_AT_EOL_OUTPUT;
+
+  DWORD oflags;
+  GetConsoleMode (get_output_handle (), &oflags);
+  if (wincap.has_con_24bit_colors () && !con_is_legacy
+      && (oflags & ENABLE_VIRTUAL_TERMINAL_PROCESSING))
+    flags |= ENABLE_VIRTUAL_TERMINAL_PROCESSING;
 
   int res = SetConsoleMode (get_output_handle (), flags) ? 0 : -1;
   if (res)
@@ -1418,6 +1419,10 @@ fhandler_console::input_tcsetattr (int, struct termios const *t)
   flags |= ENABLE_WINDOW_INPUT |
     ((wincap.has_con_24bit_colors () && !con_is_legacy) ?
      0 : ENABLE_MOUSE_INPUT);
+
+  if (wincap.has_con_24bit_colors () && !con_is_legacy
+      && (oflags & ENABLE_VIRTUAL_TERMINAL_INPUT))
+    flags |= ENABLE_VIRTUAL_TERMINAL_INPUT;
 
   int res;
   if (flags == oflags)
@@ -2973,7 +2978,7 @@ fhandler_console::write (const void *vsrc, size_t len)
 
   /* If system has 24 bit color capability, use xterm compatible mode. */
   if (wincap.has_con_24bit_colors ())
-    request_xterm_mode_output (true);
+    request_xterm_mode_output (true, &handle_set);
   if (wincap.has_con_24bit_colors () && !con_is_legacy)
     {
       DWORD dwMode;
@@ -3656,4 +3661,36 @@ fhandler_console::__release_output_mutex (const char *fn, int ln)
 #ifdef DEBUGGING
   strace.prntf (_STRACE_TERMIOS, fn, "(%d): release output_mutex", ln);
 #endif
+}
+
+void
+fhandler_console::get_duplicated_handle_set (handle_set_t *p)
+{
+  DuplicateHandle (GetCurrentProcess (), get_handle (),
+		   GetCurrentProcess (), &p->input_handle,
+		   0, FALSE, DUPLICATE_SAME_ACCESS);
+  DuplicateHandle (GetCurrentProcess (), get_output_handle (),
+		   GetCurrentProcess (), &p->output_handle,
+		   0, FALSE, DUPLICATE_SAME_ACCESS);
+  DuplicateHandle (GetCurrentProcess (), input_mutex,
+		   GetCurrentProcess (), &p->input_mutex,
+		   0, FALSE, DUPLICATE_SAME_ACCESS);
+  DuplicateHandle (GetCurrentProcess (), output_mutex,
+		   GetCurrentProcess (), &p->output_mutex,
+		   0, FALSE, DUPLICATE_SAME_ACCESS);
+}
+
+/* The function close_handle_set() should be static so that they can
+   be called even after the fhandler_console instance is deleted. */
+void
+fhandler_console::close_handle_set (handle_set_t *p)
+{
+  CloseHandle (p->input_handle);
+  p->input_handle = NULL;
+  CloseHandle (p->output_handle);
+  p->output_handle = NULL;
+  CloseHandle (p->input_mutex);
+  p->input_mutex = NULL;
+  CloseHandle (p->output_mutex);
+  p->output_mutex = NULL;
 }
