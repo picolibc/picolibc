@@ -2274,8 +2274,9 @@ class fhandler_pty_common: public fhandler_termios
   void resize_pseudo_console (struct winsize *);
 
  protected:
-  BOOL process_opost_output (HANDLE h,
-			     const void *ptr, ssize_t& len, bool is_echo);
+  static BOOL process_opost_output (HANDLE h, const void *ptr, ssize_t& len,
+				    bool is_echo, tty *ttyp,
+				    bool is_nonblocking);
 };
 
 class fhandler_pty_slave: public fhandler_pty_common
@@ -2352,6 +2353,24 @@ class fhandler_pty_slave: public fhandler_pty_common
 #define __ptsname(buf, unit) __small_sprintf ((buf), "/dev/pty%d", (unit))
 class fhandler_pty_master: public fhandler_pty_common
 {
+public:
+  /* Parameter set for the static function pty_master_thread() */
+  struct master_thread_param_t {
+    HANDLE from_master;
+    HANDLE from_master_cyg;
+    HANDLE to_master;
+    HANDLE to_master_cyg;
+    HANDLE master_ctl;
+    HANDLE input_available_event;
+  };
+  /* Parameter set for the static function pty_master_fwd_thread() */
+  struct master_fwd_thread_param_t {
+    HANDLE to_master_cyg;
+    HANDLE from_slave;
+    HANDLE output_mutex;
+    tty *ttyp;
+  };
+private:
   int pktmode;			// non-zero if pty in a packet mode.
   HANDLE master_ctl;		// Control socket for handle duplication
   cygthread *master_thread;	// Master control thread
@@ -2360,14 +2379,15 @@ class fhandler_pty_master: public fhandler_pty_common
   DWORD dwProcessId;		// Owner of master handles
   HANDLE to_master_cyg, from_master_cyg;
   cygthread *master_fwd_thread;	// Master forwarding thread
+  HANDLE thread_param_copied_event;
 
 public:
   HANDLE get_echo_handle () const { return echo_r; }
   /* Constructor */
   fhandler_pty_master (int);
 
-  DWORD pty_master_thread ();
-  DWORD pty_master_fwd_thread ();
+  static DWORD pty_master_thread (const master_thread_param_t *p);
+  static DWORD pty_master_fwd_thread (const master_fwd_thread_param_t *p);
   int process_slave_output (char *buf, size_t len, int pktmode_on);
   void doecho (const void *str, DWORD len);
   int accept_input ();
@@ -2410,6 +2430,8 @@ public:
     return fh;
   }
   bool to_be_read_from_pcon (void);
+  void get_master_thread_param (master_thread_param_t *p);
+  void get_master_fwd_thread_param (master_fwd_thread_param_t *p);
 };
 
 class fhandler_dev_null: public fhandler_base
