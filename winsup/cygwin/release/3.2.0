@@ -43,5 +43,8 @@ Bug Fixes
 - Fix return value of sqrtl on negative infinity.
   Addresses: https://cygwin.com/pipermail/cygwin/2020-October/246606.html
 
+- Fix a path handling problem if there is a WSL symlink in PATH.
+  Addresses: https://cygwin.com/pipermail/cygwin/2020-December/246938.html
+
 - Fix a bug in fstatat(2) on 32 bit that could cause it to return garbage.
   Addresses: https://cygwin.com/pipermail/cygwin/2021-January/247399.html
