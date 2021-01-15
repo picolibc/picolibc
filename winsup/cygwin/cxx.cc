@@ -83,16 +83,6 @@ __cxa_pure_virtual (void)
   api_fatal ("pure virtual method called");
 }
 
-extern "C" void
-__cxa_guard_acquire ()
-{
-}
-
-extern "C" void
-__cxa_guard_release ()
-{
-}
-
 /* These routines are made available as last-resort fallbacks
    for the application.  Should not be used in practice; the
    entries in this struct get overwritten by each DLL as it

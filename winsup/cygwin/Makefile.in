@@ -69,7 +69,7 @@ COMMON_CFLAGS=-MMD ${$(*F)_CFLAGS} -Wimplicit-fallthrough=5 -Werror -fmerge-cons
 ifeq ($(target_cpu),x86_64)
 COMMON_CFLAGS+=-mcmodel=small
 endif
-COMPILE.cc+=${COMMON_CFLAGS} # -std=gnu++14
+COMPILE.cc+=${COMMON_CFLAGS} -fno-threadsafe-statics # -std=gnu++14
 COMPILE.c+=${COMMON_CFLAGS}
 
 AR:=@AR@
