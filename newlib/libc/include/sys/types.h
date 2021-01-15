@@ -75,7 +75,6 @@ typedef __intptr_t register_t;
 
 #if __BSD_VISIBLE
 #include <machine/endian.h>
-#include <sys/select.h>
 #  define	physadr		physadr_t
 #  define	quad		quad_t
 
