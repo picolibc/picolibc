@@ -636,7 +636,7 @@ child_info_spawn::worker (const char *prog_arg, const char *const *argv,
 	}
       struct fhandler_console::handle_set_t cons_handle_set = { 0, };
       if (cons_native)
-	/* Console handles will be closed by close_all_handle(),
+	/* Console handles will be closed by close_all_files(),
 	   therefore, duplicate them here */
 	cons_native->get_duplicated_handle_set (&cons_handle_set);
 
