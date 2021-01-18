@@ -2127,7 +2127,7 @@ private:
   int input_tcsetattr (int a, const struct termios *t);
   void set_cursor_maybe ();
   static bool create_invisible_console (HWINSTA);
-  static bool create_invisible_console_workaround ();
+  static bool create_invisible_console_workaround (bool force);
   static console_state *open_shared_console (HWND, HANDLE&, bool&);
   void fix_tab_position (void);
 
@@ -2185,7 +2185,7 @@ private:
   bool send_winch_maybe ();
   void setup ();
   bool set_unit ();
-  static bool need_invisible ();
+  static bool need_invisible (bool force = false);
   static void free_console ();
   static const char *get_nonascii_key (INPUT_RECORD& input_rec, char *);
 
@@ -2346,6 +2346,7 @@ class fhandler_pty_slave: public fhandler_pty_common
   void mask_switch_to_pcon_in (bool mask);
   void setup_locale (void);
   tty *get_ttyp () { return (tty *) tc (); } /* Override as public */
+  void create_invisible_console (void);
 };
 
 #define __ptsname(buf, unit) __small_sprintf ((buf), "/dev/pty%d", (unit))

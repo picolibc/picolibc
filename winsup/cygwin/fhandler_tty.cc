@@ -59,6 +59,31 @@ struct pipe_reply {
   DWORD error;
 };
 
+extern HANDLE attach_mutex; /* Defined in fhandler_console.cc */
+
+static DWORD
+get_console_process_id (DWORD pid, bool match)
+{
+  tmp_pathbuf tp;
+  DWORD *list = (DWORD *) tp.w_get ();
+  const DWORD buf_size = NT_MAX_PATH * sizeof (WCHAR) / sizeof (DWORD);
+
+  DWORD num = GetConsoleProcessList (list, buf_size);
+  if (num == 0 || num > buf_size)
+    return 0;
+
+  DWORD res = 0;
+  /* Last one is the oldest. */
+  /* https://github.com/microsoft/terminal/issues/95 */
+  for (int i = (int) num - 1; i >= 0; i--)
+    if ((match && list[i] == pid) || (!match && list[i] != pid))
+      {
+	res = list[i];
+	break;
+      }
+  return res;
+}
+
 static bool isHybrid;
 
 static void
@@ -289,7 +314,33 @@ fhandler_pty_master::accept_input ()
   if (to_be_read_from_pcon ())
     {
       write_to = to_slave;
-      UINT cp_to = GetConsoleCP ();
+
+      UINT cp_to;
+      pinfo pinfo_target = pinfo (get_ttyp ()->invisible_console_pid);
+      DWORD target_pid = 0;
+      if (pinfo_target)
+	target_pid = pinfo_target->dwProcessId;
+      pinfo pinfo_resume = pinfo (myself->ppid);
+      DWORD resume_pid;
+      if (pinfo_resume)
+	resume_pid = pinfo_resume->dwProcessId;
+      else
+	resume_pid = get_console_process_id (myself->dwProcessId, false);
+      if (target_pid && resume_pid)
+	{
+	  /* Slave attaches to a different console than master.
+	     Therefore reattach here. */
+	  WaitForSingleObject (attach_mutex, INFINITE);
+	  FreeConsole ();
+	  AttachConsole (target_pid);
+	  cp_to = GetConsoleCP ();
+	  FreeConsole ();
+	  AttachConsole (resume_pid);
+	  ReleaseMutex (attach_mutex);
+	}
+      else
+	cp_to = GetConsoleCP ();
+
       if (get_ttyp ()->term_code_page != cp_to)
 	{
 	  static mbstate_t mbp;
@@ -659,7 +710,20 @@ fhandler_pty_slave::open (int flags, mode_t)
   set_output_handle (to_master_local);
   set_output_handle_cyg (to_master_cyg_local);
 
-  fhandler_console::need_invisible ();
+  if (_major (myself->ctty) == DEV_CONS_MAJOR
+      && !(!pinfo (myself->ppid) && getenv ("ConEmuPID")))
+    /* This process is supposed to be a master process which is
+       running on console. Invisible console will be created in
+       primary slave process to prevent overriding code page
+       of root console by setup_locale(). */
+    /* ... except for ConEmu cygwin-connector in which this
+       code does not work as expected because it calls Win32
+       API directly rather than cygwin read()/write(). Due to
+       this behaviour, protection based on attach_mutex does
+       not take effect. */
+    get_ttyp ()->need_invisible_console = true;
+  else
+    fhandler_console::need_invisible ();
 
   set_open_status ();
   return 1;
@@ -1572,6 +1636,7 @@ fhandler_pty_master::close ()
 	    }
 	  release_output_mutex ();
 	  master_fwd_thread->terminate_thread ();
+	  CloseHandle (attach_mutex);
 	}
     }
 
@@ -1847,6 +1912,7 @@ void
 fhandler_pty_slave::fixup_after_exec ()
 {
   reset_switch_to_pcon ();
+  create_invisible_console ();
 
   if (!close_on_exec ())
     fixup_after_fork (NULL);	/* No parent handle required. */
@@ -2135,7 +2201,32 @@ fhandler_pty_master::pty_master_fwd_thread ()
 	  continue;
 	}
 
-      UINT cp_from = GetConsoleOutputCP ();
+      UINT cp_from;
+      pinfo pinfo_target = pinfo (get_ttyp ()->invisible_console_pid);
+      DWORD target_pid = 0;
+      if (pinfo_target)
+	target_pid = pinfo_target->dwProcessId;
+      pinfo pinfo_resume = pinfo (myself->ppid);
+      DWORD resume_pid;
+      if (pinfo_resume)
+	resume_pid = pinfo_resume->dwProcessId;
+      else
+	resume_pid = get_console_process_id (myself->dwProcessId, false);
+      if (target_pid && resume_pid)
+	{
+	  /* Slave attaches to a different console than master.
+	     Therefore reattach here. */
+	  WaitForSingleObject (attach_mutex, INFINITE);
+	  FreeConsole ();
+	  AttachConsole (target_pid);
+	  cp_from = GetConsoleOutputCP ();
+	  FreeConsole ();
+	  AttachConsole (resume_pid);
+	  ReleaseMutex (attach_mutex);
+	}
+      else
+	cp_from = GetConsoleOutputCP ();
+
       if (get_ttyp ()->term_code_page != cp_from)
 	{
 	  size_t nlen = NT_MAX_PATH;
@@ -2250,6 +2341,8 @@ fhandler_pty_master::setup ()
   if (!(input_mutex = CreateMutex (&sa, FALSE, buf)))
     goto err;
 
+  attach_mutex = CreateMutex (&sa, FALSE, NULL);
+
   /* Create master control pipe which allows the master to duplicate
      the pty pipe handles to processes which deserve it. */
   __small_sprintf (buf, "\\\\.\\pipe\\cygwin-%S-pty%d-master-ctl",
@@ -2311,6 +2404,7 @@ err:
   close_maybe (input_available_event);
   close_maybe (output_mutex);
   close_maybe (input_mutex);
+  close_maybe (attach_mutex);
   close_maybe (from_master);
   close_maybe (from_master_cyg);
   close_maybe (to_master);
@@ -2756,4 +2850,22 @@ not_has_csi6n:
 maybe_dumb:
   get_ttyp ()->pcon_cap_checked = true;
   return false;
+}
+
+void
+fhandler_pty_slave::create_invisible_console ()
+{
+  if (get_ttyp ()->need_invisible_console)
+    {
+      /* Detach from console device and create new invisible console. */
+      FreeConsole();
+      fhandler_console::need_invisible (true);
+      get_ttyp ()->need_invisible_console = false;
+      get_ttyp ()->invisible_console_pid = myself->pid;
+    }
+  if (get_ttyp ()->invisible_console_pid
+      && !pinfo (get_ttyp ()->invisible_console_pid))
+    /* If primary slave process does not exist anymore,
+       this process becomes the primary. */
+    get_ttyp ()->invisible_console_pid = myself->pid;
 }

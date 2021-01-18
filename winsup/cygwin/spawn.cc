@@ -648,6 +648,7 @@ child_info_spawn::worker (const char *prog_arg, const char *const *argv,
 	      {
 		fhandler_pty_slave *ptys =
 		  (fhandler_pty_slave *)(fhandler_base *) cfd;
+		ptys->create_invisible_console ();
 		ptys->setup_locale ();
 	      }
 	}

@@ -105,6 +105,8 @@ private:
   bool has_csi6n;
   bool has_set_title;
   bool do_not_resize_pcon;
+  bool need_invisible_console;
+  pid_t invisible_console_pid;
 
 public:
   HANDLE from_master () const { return _from_master; }

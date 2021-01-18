@@ -53,6 +53,23 @@ fhandler_console::console_state NO_COPY *fhandler_console::shared_console_info;
 
 bool NO_COPY fhandler_console::invisible_console;
 
+/* Mutex for AttachConsole()/FreeConsole() in fhandler_tty.cc */
+HANDLE NO_COPY attach_mutex;
+
+static inline void
+acquire_attach_mutex (DWORD t)
+{
+  if (attach_mutex)
+    WaitForSingleObject (attach_mutex, t);
+}
+
+static inline void
+release_attach_mutex ()
+{
+  if (attach_mutex)
+    ReleaseMutex (attach_mutex);
+}
+
 /* con_ra is shared in the same process.
    Only one console can exist in a process, therefore, static is suitable. */
 static struct fhandler_base::rabuf_t con_ra;
@@ -599,6 +616,8 @@ fhandler_console::process_input_message (void)
   if (!shared_console_info)
     return input_error;
 
+  acquire_attach_mutex (INFINITE);
+
   termios *ti = &(get_ttyp ()->ti);
 
   fhandler_console::input_states stat = input_processing;
@@ -608,6 +627,7 @@ fhandler_console::process_input_message (void)
   if (!PeekConsoleInputW (get_handle (), input_rec, INREC_SIZE, &total_read))
     {
       termios_printf ("PeekConsoleInput failed, %E");
+      release_attach_mutex ();
       return input_error;
     }
 
@@ -972,6 +992,7 @@ out:
   /* Discard processed recored. */
   DWORD dummy;
   ReadConsoleInputW (get_handle (), input_rec, min (total_read, i+1), &dummy);
+  release_attach_mutex ();
   return stat;
 }
 
@@ -2973,6 +2994,7 @@ fhandler_console::write (const void *vsrc, size_t len)
   if (bg <= bg_eof)
     return (ssize_t) bg;
 
+  acquire_attach_mutex (INFINITE);
   push_process_state process_state (PID_TTYOU);
   acquire_output_mutex (INFINITE);
 
@@ -3298,6 +3320,7 @@ fhandler_console::write (const void *vsrc, size_t len)
 
   syscall_printf ("%ld = fhandler_console::write(...)", len);
 
+  release_attach_mutex ();
   return len;
 }
 
@@ -3469,12 +3492,13 @@ fhandler_console::create_invisible_console (HWINSTA horig)
    function is currently only called at startup and during exec, it shouldn't
    be a big deal.  */
 bool
-fhandler_console::create_invisible_console_workaround ()
+fhandler_console::create_invisible_console_workaround (bool force)
 {
-  if (!AttachConsole (-1))
+  /* If force is set, avoid to reattach to existing console. */
+  if (force || !AttachConsole (-1))
     {
       bool taskbar;
-      DWORD err = GetLastError ();
+      DWORD err = force ? 0 : GetLastError ();
       path_conv helper ("/bin/cygwin-console-helper.exe");
       HANDLE hello = NULL;
       HANDLE goodbye = NULL;
@@ -3559,10 +3583,12 @@ fhandler_console::free_console ()
 }
 
 bool
-fhandler_console::need_invisible ()
+fhandler_console::need_invisible (bool force)
 {
   BOOL b = false;
-  if (exists ())
+  /* If force is set, forcibly create a new invisible console
+     even if a console device already exists. */
+  if (exists () && !force)
     invisible_console = false;
   else
     {
@@ -3600,7 +3626,7 @@ fhandler_console::need_invisible ()
 	  invisible_console = true;
 	}
       else if (wincap.has_broken_alloc_console ())
-	b = create_invisible_console_workaround ();
+	b = create_invisible_console_workaround (force);
       else
 	b = create_invisible_console (h);
     }

@@ -246,6 +246,8 @@ tty::init ()
   has_csi6n = false;
   has_set_title = false;
   do_not_resize_pcon = false;
+  need_invisible_console = false;
+  invisible_console_pid = 0;
 }
 
 HANDLE
