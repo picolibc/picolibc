@@ -1176,11 +1176,19 @@ fhandler_pty_slave::tcgetattr (struct termios *t)
 {
   reset_switch_to_pcon ();
   *t = get_ttyp ()->ti;
+
   /* Workaround for rlwrap */
-  if (get_ttyp ()->pcon_start)
-    t->c_lflag &= ~(ICANON | ECHO);
-  if (get_ttyp ()->h_pseudo_console)
-    t->c_iflag &= ~ICRNL;
+  cygheap_fdenum cfd (false);
+  while (cfd.next () >= 0)
+    if (cfd->get_major () == DEV_PTYM_MAJOR
+	&& cfd->get_minor () == get_minor ())
+      {
+	if (get_ttyp ()->pcon_start)
+	  t->c_lflag &= ~(ICANON | ECHO);
+	if (get_ttyp ()->h_pseudo_console)
+	  t->c_iflag &= ~ICRNL;
+	break;
+      }
   return 0;
 }
 
