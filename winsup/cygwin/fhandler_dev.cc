@@ -107,6 +107,13 @@ fhandler_dev::fstatvfs (struct statvfs *sfs)
   return ret;
 }
 
+int
+fhandler_dev::rmdir ()
+{
+  set_errno (ENOTEMPTY);
+  return -1;
+}
+
 DIR *
 fhandler_dev::opendir (int fd)
 {

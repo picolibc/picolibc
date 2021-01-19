@@ -1765,6 +1765,7 @@ public:
   int close ();
   int __reg2 fstat (struct stat *buf);
   int __reg2 fstatvfs (struct statvfs *buf);
+  int rmdir ();
   DIR __reg2 *opendir (int fd);
   int __reg3 readdir (DIR *, dirent *);
   void rewinddir (DIR *);

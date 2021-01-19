@@ -410,8 +410,6 @@ rmdir (const char *dir)
 	set_errno (ENOENT);
       else if (has_dot_last_component (dir, false))
 	set_errno (EINVAL);
-      else if (isdev_dev (fh->dev ()))
-	set_errno (ENOTEMPTY);
       else if (!fh->rmdir ())
 	res = 0;
       delete fh;
