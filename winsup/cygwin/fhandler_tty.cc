@@ -65,8 +65,8 @@ static DWORD
 get_console_process_id (DWORD pid, bool match)
 {
   tmp_pathbuf tp;
-  DWORD *list = (DWORD *) tp.w_get ();
-  const DWORD buf_size = NT_MAX_PATH * sizeof (WCHAR) / sizeof (DWORD);
+  DWORD *list = (DWORD *) tp.c_get ();
+  const DWORD buf_size = NT_MAX_PATH / sizeof (DWORD);
 
   DWORD num = GetConsoleProcessList (list, buf_size);
   if (num == 0 || num > buf_size)
