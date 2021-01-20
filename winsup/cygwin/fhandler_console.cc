@@ -557,9 +557,11 @@ fhandler_console::read (void *pv, size_t& buflen)
 #define buf ((char *) pv)
 
       int ret;
+      acquire_attach_mutex (INFINITE);
       acquire_input_mutex (INFINITE);
       ret = process_input_message ();
       release_input_mutex ();
+      release_attach_mutex ();
       switch (ret)
 	{
 	case input_error:
@@ -616,8 +618,6 @@ fhandler_console::process_input_message (void)
   if (!shared_console_info)
     return input_error;
 
-  acquire_attach_mutex (INFINITE);
-
   termios *ti = &(get_ttyp ()->ti);
 
   fhandler_console::input_states stat = input_processing;
@@ -627,7 +627,6 @@ fhandler_console::process_input_message (void)
   if (!PeekConsoleInputW (get_handle (), input_rec, INREC_SIZE, &total_read))
     {
       termios_printf ("PeekConsoleInput failed, %E");
-      release_attach_mutex ();
       return input_error;
     }
 
@@ -991,8 +990,9 @@ fhandler_console::process_input_message (void)
 out:
   /* Discard processed recored. */
   DWORD dummy;
-  ReadConsoleInputW (get_handle (), input_rec, min (total_read, i+1), &dummy);
-  release_attach_mutex ();
+  DWORD discard_len = min (total_read, i + 1);
+  if (discard_len)
+    ReadConsoleInputW (get_handle (), input_rec, discard_len, &dummy);
   return stat;
 }
 

@@ -64,6 +64,11 @@ struct select_info
   select_info (): thread (NULL), stop_thread (0), start (NULL) {}
 };
 
+struct select_console_info: public select_info
+{
+  select_console_info (): select_info () {}
+};
+
 struct select_pipe_info: public select_info
 {
   select_pipe_info (): select_info () {}
@@ -102,6 +107,7 @@ public:
      its objects in the descriptor lists, here's the place to be.  This is
      mainly used to maintain a single thread for all fhandlers of a single
      type in the descriptor lists. */
+  select_console_info *device_specific_console;
   select_pipe_info *device_specific_pipe;
   select_pipe_info *device_specific_ptys;
   select_fifo_info *device_specific_fifo;
@@ -115,6 +121,7 @@ public:
 
   select_stuff (): return_on_signal (false), always_ready (false),
 		   windows_used (false), start (),
+		   device_specific_console (NULL),
 		   device_specific_pipe (NULL),
 		   device_specific_ptys (NULL),
 		   device_specific_fifo (NULL),
