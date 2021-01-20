@@ -52,3 +52,6 @@ Bug Fixes
 - Fix the errno when a path contains .. and the prefix exists but is
   not a directory.
   Addresses: https://lists.gnu.org/archive/html/bug-gnulib/2021-01/msg00214.html
+
+- Fix the return value when ptsname_r(3) is called with a bad file descriptor
+  Addresses: https://lists.gnu.org/archive/html/bug-gnulib/2021-01/msg00245.html

@@ -3392,7 +3392,7 @@ ptsname_r (int fd, char *buf, size_t buflen)
 
   cygheap_fdget cfd (fd);
   if (cfd < 0)
-    return 0;
+    return EBADF;
   return cfd->ptsname_r (buf, buflen);
 }
 
