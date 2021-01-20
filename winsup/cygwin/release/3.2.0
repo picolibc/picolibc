@@ -48,3 +48,7 @@ Bug Fixes
 
 - Fix a bug in fstatat(2) on 32 bit that could cause it to return garbage.
   Addresses: https://cygwin.com/pipermail/cygwin/2021-January/247399.html
+
+- Fix the errno when a path contains .. and the prefix exists but is
+  not a directory.
+  Addresses: https://lists.gnu.org/archive/html/bug-gnulib/2021-01/msg00214.html

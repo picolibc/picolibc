@@ -323,8 +323,10 @@ normalize_posix_path (const char *src, char *dst, char *&tail)
 			  if (!tp.check_usage (4, 3))
 			    return ELOOP;
 			  path_conv head (dst, PC_SYM_FOLLOW | PC_POSIX);
-			  if (!head.isdir())
+			  if (!head.exists ())
 			    return ENOENT;
+			  if (!head.isdir ())
+			    return ENOTDIR;
 			  /* At this point, dst is a normalized path.  If the
 			     normalized path created by path_conv does not
 			     match the normalized path we're just testing, then
