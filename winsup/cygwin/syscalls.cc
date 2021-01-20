@@ -670,6 +670,30 @@ check_dir_not_empty (HANDLE dir, path_conv &pc)
   return STATUS_SUCCESS;
 }
 
+static inline NTSTATUS
+_unlink_nt_post_dir_check (NTSTATUS status, POBJECT_ATTRIBUTES attr, const path_conv &pc)
+{
+  /* Check for existence of remote dirs after trying to delete them.
+     Two reasons:
+     - Sometimes SMB indicates failure when it really succeeds.
+     - Removing a directory on a Samba drive using an old Samba version
+       sometimes doesn't return an error, if the directory can't be removed
+       because it's not empty. */
+  if (pc.isremote ())
+    {
+      FILE_BASIC_INFORMATION fbi;
+      NTSTATUS q_status;
+
+      q_status = NtQueryAttributesFile (attr, &fbi);
+      if (!NT_SUCCESS (status) && q_status == STATUS_OBJECT_NAME_NOT_FOUND)
+          status = STATUS_SUCCESS;
+      else if (pc.fs_is_samba ()
+               && NT_SUCCESS (status) && NT_SUCCESS (q_status))
+          status = STATUS_DIRECTORY_NOT_EMPTY;
+    }
+  return status;
+}
+
 static NTSTATUS
 _unlink_nt (path_conv &pc, bool shareable)
 {
@@ -1059,6 +1083,10 @@ out:
   /* Stop transaction if we started one. */
   if (trans)
     stop_transaction (status, old_trans, trans);
+
+  if (pc.isdir ())
+    status = _unlink_nt_post_dir_check (status, &attr, pc);
+
   syscall_printf ("%S, return status = %y", pc.get_nt_native_path (), status);
   return status;
 }
