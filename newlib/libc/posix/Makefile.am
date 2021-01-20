@@ -10,7 +10,7 @@ GENERAL_SOURCES = \
 	opendir.c readdir.c readdir_r.c \
 	regcomp.c regerror.c regexec.c regfree.c \
 	rewinddir.c sleep.c usleep.c \
-	telldir.c
+	telldir.c ftw.c nftw.c
 
 ELIX_2_SOURCES = \
         scandir.c seekdir.c
