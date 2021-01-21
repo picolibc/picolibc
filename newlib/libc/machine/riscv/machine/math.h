@@ -55,21 +55,32 @@
 #define FCLASS_NORMAL        (FCLASS_NEG_NORMAL | FCLASS_POS_NORMAL)
 #define FCLASS_SUBNORMAL     (FCLASS_NEG_SUBNORMAL | FCLASS_POS_SUBNORMAL)
 #define FCLASS_NAN           (FCLASS_SNAN | FCLASS_QNAN)
-
-#define __declare_riscv_macro(type) extern __inline type __attribute((gnu_inline, always_inline))
 #endif
 
-#if defined(__riscv_flen) && __riscv_flen >= 64
+/**
+ * Not availabe for all compilers.
+ * In case of absence, fall back to normal function calls
+ */
+#ifdef __GNUC_GNU_INLINE__
+# define __declare_riscv_macro(type) extern __inline type __attribute((gnu_inline, always_inline))
+# define __declare_riscv_macro_fclass(type) extern __inline type __attribute((gnu_inline, always_inline))
+#else
+# define __declare_riscv_macro_fclass(type) static __inline type
+#endif
 
-/* Double-precision functions */
-__declare_riscv_macro(long)
+#if defined (__riscv_flen) && __riscv_flen >= 64
+__declare_riscv_macro_fclass(long)
 _fclass_d(double x)
 {
 	long fclass;
 	__asm __volatile ("fclass.d\t%0, %1" : "=r" (fclass) : "f" (x));
 	return fclass;
 }
+#endif
 
+#if defined(__riscv_flen) && __riscv_flen >= 64 && defined(__GNUC_GNU_INLINE__)
+
+/* Double-precision functions */
 __declare_riscv_macro(double)
 copysign(double x, double y)
 {
@@ -170,19 +181,21 @@ fma (double x, double y, double z)
 }
 #endif
 
-#endif /* defined(__riscv_flen) && __riscv_flen >= 64 */
+#endif /* defined(__riscv_flen) && __riscv_flen >= 64 && defined(__GNUC_GNU_INLINE__) */
 
 #if defined(__riscv_flen) && __riscv_flen >= 32
-
-/* Single-precision functions */
-__declare_riscv_macro(long)
+__declare_riscv_macro_fclass(long)
 _fclass_f(float x)
 {
 	long fclass;
 	__asm __volatile ("fclass.s\t%0, %1" : "=r" (fclass) : "f" (x));
 	return fclass;
 }
+#endif
 
+#if defined(__riscv_flen) && __riscv_flen >= 32 && defined(__GNUC_GNU_INLINE__)
+
+/* Single-precision functions */
 __declare_riscv_macro(float)
 copysignf(float x, float y)
 {
@@ -269,9 +282,9 @@ sqrtf (float x)
 }
 #endif
 
-#endif /* defined(__riscv_flen) && __riscv_flen >= 32 */
+#endif /* defined(__riscv_flen) && __riscv_flen >= 32 && defined(__GNUC_GNU_INLINE__) */
 
-#if HAVE_FAST_FMAF
+#if defined(HAVE_FAST_FMAF) && defined(__GNUC_GNU_INLINE__)
 __declare_riscv_macro(float)
 fmaf (float x, float y, float z)
 {
