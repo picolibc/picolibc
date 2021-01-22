@@ -719,7 +719,7 @@ _unlink_nt (path_conv &pc, bool shareable)
 
   pc.get_object_attr (attr, sec_none_nih);
 
-  /* First check if we can use POSIX unlink semantics: W10 1709++, local NTFS.
+  /* First check if we can use POSIX unlink semantics: W10 1709+, local NTFS.
      With POSIX unlink semantics the entire job gets MUCH easier and faster.
      Just try to do it and if it fails, it fails. */
   if (wincap.has_posix_unlink_semantics ()
@@ -727,20 +727,18 @@ _unlink_nt (path_conv &pc, bool shareable)
     {
       FILE_DISPOSITION_INFORMATION_EX fdie;
 
-      if (pc.file_attributes () & FILE_ATTRIBUTE_READONLY)
+      /* POSIX unlink semantics are nice, but they still fail if the file has
+	 the R/O attribute set. If so, ignoring might be an option: W10 1809+
+	 Removing the file is very much a safe bet afterwards, so, no
+	 transaction. */
+      if ((pc.file_attributes () & FILE_ATTRIBUTE_READONLY)
+          && !wincap.has_posix_unlink_semantics_with_ignore_readonly ())
 	access |= FILE_WRITE_ATTRIBUTES;
       status = NtOpenFile (&fh, access, &attr, &io, FILE_SHARE_VALID_FLAGS,
 			   flags);
       if (!NT_SUCCESS (status))
 	goto out;
-      /* Why didn't the devs add a FILE_DELETE_IGNORE_READONLY_ATTRIBUTE
-	 flag just like they did with FILE_LINK_IGNORE_READONLY_ATTRIBUTE
-	 and FILE_LINK_IGNORE_READONLY_ATTRIBUTE???
-
-         POSIX unlink semantics are nice, but they still fail if the file
-	 has the R/O attribute set.  Removing the file is very much a safe
-	 bet afterwards, so, no transaction. */
-      if (pc.file_attributes () & FILE_ATTRIBUTE_READONLY)
+      if (access & FILE_WRITE_ATTRIBUTES)
 	{
 	  status = NtSetAttributesFile (fh, pc.file_attributes ()
 					    & ~FILE_ATTRIBUTE_READONLY);
@@ -751,10 +749,12 @@ _unlink_nt (path_conv &pc, bool shareable)
 	    }
 	}
       fdie.Flags = FILE_DISPOSITION_DELETE | FILE_DISPOSITION_POSIX_SEMANTICS;
+      if (wincap.has_posix_unlink_semantics_with_ignore_readonly ())
+        fdie.Flags |= FILE_DISPOSITION_IGNORE_READONLY_ATTRIBUTE;
       status = NtSetInformationFile (fh, &io, &fdie, sizeof fdie,
 				     FileDispositionInformationEx);
       /* Restore R/O attribute in case we have multiple hardlinks. */
-      if (pc.file_attributes () & FILE_ATTRIBUTE_READONLY)
+      if (access & FILE_WRITE_ATTRIBUTES)
 	NtSetAttributesFile (fh, pc.file_attributes ());
       NtClose (fh);
       /* Trying to delete in-use executables and DLLs using
