@@ -4787,17 +4787,27 @@ fchmodat (int dirfd, const char *pathname, mode_t mode, int flags)
   tmp_pathbuf tp;
   __try
     {
-      if (flags)
+      if (flags & ~AT_SYMLINK_NOFOLLOW)
 	{
-	  /* BSD has lchmod, but Linux does not.  POSIX says
-	     AT_SYMLINK_NOFOLLOW is allowed to fail on symlinks; but Linux
-	     blindly fails even for non-symlinks.  */
-	  set_errno ((flags & ~AT_SYMLINK_NOFOLLOW) ? EINVAL : EOPNOTSUPP);
+	  set_errno (EINVAL);
 	  __leave;
 	}
       char *path = tp.c_get ();
       if (gen_full_path_at (path, dirfd, pathname))
 	__leave;
+      if (flags & AT_SYMLINK_NOFOLLOW)
+	{
+          /* BSD has lchmod, but Linux does not.  POSIX says
+	     AT_SYMLINK_NOFOLLOW is allowed to fail on symlinks.
+	     Linux blindly fails even for non-symlinks, but we allow
+	     it to succeed. */
+	  path_conv pc (path, PC_SYM_NOFOLLOW, stat_suffixes);
+	  if (pc.issymlink ())
+	    {
+	      set_errno (EOPNOTSUPP);
+	      __leave;
+	    }
+	}
       return chmod (path, mode);
     }
   __except (EFAULT) {}
