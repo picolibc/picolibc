@@ -71,5 +71,5 @@ main(int argc, char **argv)
 		ret = 2;
 	}
 	fflush(stdout);
-	return ret;
+	exit(ret);
 }

@@ -305,5 +305,5 @@ main(void)
 		}
 	}
 
-	return result;
+	exit(result);
 }

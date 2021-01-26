@@ -59,5 +59,5 @@ main(void)
 	strcpy(get_str(copy).base, a);
 	len = strlen(copy);
 	printf("copy %s len %d\n", copy, len);
-	return 0;
+	exit(0);
 }

@@ -116,5 +116,5 @@ main(void)
 #endif
 
 	printf("tls test result %d\n", result);
-	return result;
+	exit(result);
 }
