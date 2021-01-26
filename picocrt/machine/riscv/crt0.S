@@ -96,26 +96,5 @@ _start:
 	li	a0, 0
 	li	a1, 0
 	call	main
-
-#ifdef HAVE_INITFINI_ARRAY
-	// save return value a0 in saved register s1
-	mv	s1, a0
-	call	__libc_fini_array
-	mv	a0, s1
-#endif
-
-	la	t0, _exit
-	beqz	t0, .SKIP_EXIT
-	call	_exit
-
-.SKIP_EXIT:
-	/**
-	 * TODO what to do after main and exit return?
-	 * AFAI understood a hardware reset would be good,
-	 *  but there seems to be no reset instruction in riscv
-	 * So for now, just jump to _start again
-	 * (This makes sure the stack is correctly set, as opposed to _cstart)
-	 */
-	j	_start
-	.size	_start, .-_start
-	.weak	_exit
+.L1:	
+	j	.L1

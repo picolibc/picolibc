@@ -57,7 +57,6 @@ main(int, char **);
 
 #ifdef HAVE_INITFINI_ARRAY
 extern void __libc_init_array(void);
-extern void __libc_fini_array(void);
 #endif
 
 /* After the architecture-specific chip initialization is done, this
@@ -86,10 +85,6 @@ __start(void)
 #ifdef HAVE_INITFINI_ARRAY
 	__libc_init_array();
 #endif
-	int ret = main(0, NULL);
-#ifdef HAVE_INITFINI_ARRAY
-	__libc_fini_array();
-#endif
-	if (_exit)
-		_exit(ret);
+	(void) main(0, NULL);
+	for(;;);
 }
