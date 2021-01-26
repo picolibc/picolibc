@@ -887,15 +887,18 @@ fhandler_disk_file::fchown (uid_t uid, gid_t gid)
 				    aclp, MAX_ACL_ENTRIES)) < 0)
     goto out;
 
-  if (uid == ILLEGAL_UID)
-    uid = old_uid;
-  if (gid == ILLEGAL_GID)
-    gid = old_gid;
-  if (uid == old_uid && gid == old_gid)
+  /* According to POSIX, chown can be a no-op if uid is (uid_t)-1 and
+     gid is (gid_t)-1.  Otherwise, even if uid and gid are unchanged,
+     we must ensure that ctime is updated. */
+  if (uid == ILLEGAL_UID && gid == ILLEGAL_GID)
     {
       ret = 0;
       goto out;
     }
+  if (uid == ILLEGAL_UID)
+    uid = old_uid;
+  else if (gid == ILLEGAL_GID)
+    gid = old_gid;
 
   /* Windows ACLs can contain permissions for one group, while being owned by
      another user/group.  The permission bits returned above are pretty much
