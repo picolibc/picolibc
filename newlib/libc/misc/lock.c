@@ -102,6 +102,7 @@ struct __lock __lock___env_recursive_mutex;
 struct __lock __lock___tz_mutex;
 struct __lock __lock___dd_hash_mutex;
 struct __lock __lock___arc4random_mutex;
+struct __lock __lock___on_exit_mutex;
 
 void
 __retarget_lock_init (_LOCK_T *lock)

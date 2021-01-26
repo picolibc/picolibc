@@ -62,6 +62,23 @@ std_malloc_srcs_stdlib = [
   'malloc-valloc.c',
 ]
 
+pico_exit_srcs_stdlib = [
+  'pico-atexit.c',
+  'pico-exit.c',
+  'pico-onexit.c',
+]
+
+newlib_exit_srcs_stdlib = [
+  '__atexit.c',
+  '__call_atexit.c',
+  'atexit.c',
+  'cxa_atexit.c',
+  'cxa_finalize.c',
+  'exit.c',
+  'on_exit.c',
+  'quick_exit.c',
+]
+
 srcs_stdlib = [
     'a64l.c',
     'abort.c',
@@ -70,24 +87,18 @@ srcs_stdlib = [
     'arc4random.c',
     'arc4random_uniform.c',
     'assert.c',
-    '__atexit.c',
-    'atexit.c',
     'atof.c',
     'atoff.c',
     'atoi.c',
     'atol.c',
     'atoll.c',
     'btowc.c',
-    '__call_atexit.c',
-    'cxa_atexit.c',
-    'cxa_finalize.c',
     'div.c',
     'drand48.c',
     'environ.c',
     'envlock.c',
     'eprintf.c',
     'erand48.c',
-    'exit.c',
     '_Exit.c',
     'getenv.c',
     'getenv_r.c',
@@ -117,9 +128,7 @@ srcs_stdlib = [
     'mrand48.c',
     'mstats.c',
     'nrand48.c',
-    'on_exit.c',
     'putenv.c',
-    'quick_exit.c',
     'rand48.c',
     'rand.c',
     'random.c',
@@ -199,6 +208,12 @@ if newlib_nano_malloc
   srcs_stdlib_malloc = nano_malloc_srcs_stdlib
 else
   srcs_stdlib_malloc = std_malloc_srcs_stdlib
+endif
+
+if picoexit
+  srcs_stdlib += pico_exit_srcs_stdlib
+else
+  srcs_stdlib += newlib_exit_srcs_stdlib
 endif
 
 hdrs_stdlib = [

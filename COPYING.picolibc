@@ -772,6 +772,15 @@ Files: newlib/libc/machine/xtensa/meson.build
 Copyright: 2019 Jonathan McDowell
 License: BSD3-1
 
+Files: newlib/libc/stdlib/pico-atexit.c
+ newlib/libc/stdlib/pico-exit.c
+ newlib/libc/stdlib/pico-onexit.c
+ test/atexit.c
+ test/on_exit.c
+Copyright: 2021 Keith Packard
+License: BSD3-1
+
+
 Files: newlib/libm/machine/riscv/s_copysign.c
  newlib/libm/machine/riscv/s_fabs.c
  newlib/libm/machine/riscv/s_finite.c

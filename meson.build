@@ -114,6 +114,9 @@ if nm.found()
   duplicate_names = find_program('scripts/duplicate-names', required : true)
 endif
 
+# Select exit code
+picoexit = get_option('picoexit')
+
 # Select stdio implementation
 tinystdio = get_option('tinystdio')
 newlib_tinystdio = get_option('newlib-tinystdio')

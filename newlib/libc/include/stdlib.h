@@ -105,6 +105,7 @@ __uint32_t arc4random (void);
 __uint32_t arc4random_uniform (__uint32_t);
 void    arc4random_buf (void *, size_t);
 #endif
+#define ATEXIT_MAX	32
 int	atexit (void (*__func)(void));
 double	atof (const char *__nptr);
 #if __MISC_VISIBLE
