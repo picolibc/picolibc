@@ -4915,7 +4915,7 @@ utimensat (int dirfd, const char *pathname, const struct timespec *times,
 }
 
 extern "C" int
-futimesat (int dirfd, const char *pathname, const struct timeval *times)
+futimesat (int dirfd, const char *pathname, const struct timeval times[2])
 {
   tmp_pathbuf tp;
   __try

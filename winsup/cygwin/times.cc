@@ -385,7 +385,7 @@ error:
 
 /* utimes: POSIX/SUSv3 */
 extern "C" int
-utimes (const char *path, const struct timeval *tvp)
+utimes (const char *path, const struct timeval tvp[2])
 {
   path_conv win32 (path, PC_POSIX | PC_SYM_FOLLOW, stat_suffixes);
   struct timespec tmp[2];
@@ -394,7 +394,7 @@ utimes (const char *path, const struct timeval *tvp)
 
 /* BSD */
 extern "C" int
-lutimes (const char *path, const struct timeval *tvp)
+lutimes (const char *path, const struct timeval tvp[2])
 {
   path_conv win32 (path, PC_POSIX | PC_SYM_NOFOLLOW, stat_suffixes);
   struct timespec tmp[2];
@@ -403,7 +403,7 @@ lutimes (const char *path, const struct timeval *tvp)
 
 /* futimens: POSIX/SUSv4 */
 extern "C" int
-futimens (int fd, const struct timespec *tvp)
+futimens (int fd, const struct timespec tvp[2])
 {
   int res;
 
@@ -420,7 +420,7 @@ futimens (int fd, const struct timespec *tvp)
 
 /* BSD */
 extern "C" int
-futimes (int fd, const struct timeval *tvp)
+futimes (int fd, const struct timeval tvp[2])
 {
   struct timespec tmp[2];
   return futimens (fd,  timeval_to_timespec (tvp, tmp));
