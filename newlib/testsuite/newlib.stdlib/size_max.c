@@ -20,5 +20,5 @@ int main () {
   if (++s != 0)
     abort ();
 
-  return 0;
+  exit(0);
 }
