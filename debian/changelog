@@ -1,3 +1,10 @@
+picolibc (1.5.1-2) unstable; urgency=medium
+
+  * Mark tests with 'Restrictions: skip-not-installable' to skip
+    autopkg test on armhf. Closes: #980086.
+
+ -- Keith Packard <keithp@keithp.com>  Tue, 26 Jan 2021 17:36:43 -0800
+
 picolibc (1.5.1-1) unstable; urgency=medium
 
   * New upstream release
