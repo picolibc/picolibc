@@ -1,3 +1,11 @@
+picolibc (1.5.1-3) unstable; urgency=medium
+
+  * Change how test architecures are selected (thanks to Paul Gevers).
+
+  * Test on aarch64
+
+ -- Keith Packard <keithp@keithp.com>  Wed, 27 Jan 2021 10:34:41 -0800
+
 picolibc (1.5.1-2) unstable; urgency=medium
 
   * Mark tests with 'Restrictions: skip-not-installable' to skip
