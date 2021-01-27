@@ -1,5 +1,7 @@
 Test-Command: riscv64-unknown-elf-gcc --specs=picolibc.specs -o /tmp/risc-v debian/tests/touch.c -lm
 Depends: @, gcc-riscv64-unknown-elf
+Restrictions: skip-not-installable
 
 Test-Command: arm-none-eabi-gcc --specs=picolibc.specs -o /tmp/touch-arm debian/tests/touch.c -lm
 Depends: @, gcc-arm-none-eabi
+Restrictions: skip-not-installable
