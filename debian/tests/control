@@ -5,3 +5,7 @@ Architecture: amd64, i386, pcc64el
 Test-Command: arm-none-eabi-gcc --specs=picolibc.specs -o /tmp/touch-arm debian/tests/touch.c -lm
 Depends: @, gcc-arm-none-eabi
 Architecture: amd64, i386, pcc64el
+
+Test-Command: aarch64-linux-gnu-gcc --specs=picolibc.specs -o /tmp/touch-aarch64 debian/tests/touch.c -lm
+Depends: @, gcc-arm-none-eabi
+Architecture: amd64, i386, pcc64el
