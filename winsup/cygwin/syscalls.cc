@@ -2887,7 +2887,7 @@ setdtablesize (int size)
 extern "C" int
 getdtablesize ()
 {
-  return cygheap->fdtab.size;
+  return OPEN_MAX_MAX;
 }
 
 extern "C" int
