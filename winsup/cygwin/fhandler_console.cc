@@ -571,31 +571,34 @@ wait_retry:
 #define buf ((char *) pv)
 
       int ret;
-      acquire_attach_mutex (INFINITE);
       acquire_input_mutex (INFINITE);
+      acquire_attach_mutex (INFINITE);
       ret = process_input_message ();
-      release_input_mutex ();
       release_attach_mutex ();
       switch (ret)
 	{
 	case input_error:
+	  release_input_mutex ();
 	  goto err;
 	case input_processing:
+	  release_input_mutex ();
 	  continue;
 	case input_ok: /* input ready */
 	  break;
 	case input_signalled: /* signalled */
+	  release_input_mutex ();
 	  goto sig_exit;
 	case input_winch:
+	  release_input_mutex ();
 	  continue;
 	default:
 	  /* Should not come here */
+	  release_input_mutex ();
 	  goto err;
 	}
     }
 
   /* Check console read-ahead buffer filled from terminal requests */
-  acquire_input_mutex (INFINITE);
   while (con.cons_rapoi && *con.cons_rapoi && buflen)
     {
       buf[copied_chars++] = *con.cons_rapoi++;
@@ -984,9 +987,7 @@ fhandler_console::process_input_message (void)
       if (toadd)
 	{
 	  ssize_t ret;
-	  release_input_mutex ();
 	  line_edit_status res = line_edit (toadd, nread, *ti, &ret);
-	  acquire_input_mutex (INFINITE);
 	  if (res == line_edit_signalled)
 	    {
 	      stat = input_signalled;

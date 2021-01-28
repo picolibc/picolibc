@@ -332,7 +332,9 @@ fhandler_termios::line_edit (const char *rptr, size_t nread, termios& ti,
 
 	  termios_printf ("got interrupt %d, sending signal %d", c, sig);
 	  eat_readahead (-1);
+	  release_input_mutex_if_necessary ();
 	  tc ()->kill_pgrp (sig);
+	  acquire_input_mutex_if_necessary (INFINITE);
 	  ti.c_lflag &= ~FLUSHO;
 	  sawsig = true;
 	  goto restart_output;

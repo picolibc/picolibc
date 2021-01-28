@@ -1905,6 +1905,8 @@ class fhandler_termios: public fhandler_base
   tty_min *_tc;
   tty *get_ttyp () {return (tty *) tc ();}
   int eat_readahead (int n);
+  virtual void acquire_input_mutex_if_necessary (DWORD ms) {};
+  virtual void release_input_mutex_if_necessary (void) {};
 
  public:
   tty_min*& tc () {return _tc;}
@@ -2212,6 +2214,14 @@ private:
   void __release_input_mutex (const char *fn, int ln);
   DWORD __acquire_output_mutex (const char *fn, int ln, DWORD ms);
   void __release_output_mutex (const char *fn, int ln);
+  void acquire_input_mutex_if_necessary (DWORD ms)
+  {
+    acquire_input_mutex (ms);
+  }
+  void release_input_mutex_if_necessary (void)
+  {
+    release_input_mutex ();
+  }
 
   char *&rabuf ();
   size_t &ralen ();
