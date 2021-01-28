@@ -139,6 +139,10 @@ the Picolibc test suite. This implementation relies on semihosting
 support from the execution environment, which is available when
 running under qemu or when using openocd and gdb. Link this into your
 application using `--oslib=semihost` in your link command line.
+Please note that this will replace the default `crt0` with a variant
+calling `exit` upon return from `main`. The default is to enter an
+infinite loop, and the change ensure a clean return to the execution
+environment.
 
 ## POSIX console support
 

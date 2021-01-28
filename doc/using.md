@@ -97,10 +97,18 @@ command line flag defined by picolibc.specs:
 
 	$ gcc --specs=picolibc.specs --oslib=semihost -o program.elf program.o
 
+This will also replace the `crt0` with a special semihost variant:
+The default `crt0` assumes a freestanding execution environment, entering
+an infinite loop upon returning from `main`. In semihosted mode, the
+alternate `crt0` will instead call `exit` from `libsemihost.a`, resulting
+in a clean return to the hosting environment (this conforms to a hosted
+execution environment as per the C specification).
+
 You can also list libc and libsemihost in the correct order
 explicitly:
 
 	$ gcc --specs=picolibc.specs -o program.elf -lc -lsemihost
 
-This second form doesn't force using the version of _exit from
-libsemihost.a, and so isn't quite as useful.
+This second form doesn't force using the semihosted version of `crt0`,
+so programs built that way will enter an infinite loop upon returning
+from `main` instead of calling `exit`.

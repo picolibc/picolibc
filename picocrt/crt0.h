@@ -71,9 +71,6 @@ extern void __libc_init_array(void);
 #include <picotls.h>
 #include <stdio.h>
 
-extern void
-_exit(int) __weak_symbol;
-
 static inline void
 __start(void)
 {
@@ -85,6 +82,11 @@ __start(void)
 #ifdef HAVE_INITFINI_ARRAY
 	__libc_init_array();
 #endif
+#ifdef _PICOLIBC_CRT0_SEMIHOST_
+	int ret = main(0, NULL);
+	exit(ret);
+#else
 	(void) main(0, NULL);
+#endif
 	for(;;);
 }
