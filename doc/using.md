@@ -77,7 +77,8 @@ Assign these symbols in the linker script as follows:
 
  5) Call `main()`
 
- 6) Call [finalizers/destructors](init.md) using `__libc_fini_array()`
+ 6) If main returns, then crt0 will go into an infinite
+    loop. Applications wanting to call exit() must do that explicitly.
 
 ## Semihosting
 
