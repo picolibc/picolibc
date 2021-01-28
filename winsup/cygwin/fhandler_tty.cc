@@ -2845,6 +2845,11 @@ fhandler_pty_slave::setup_pseudoconsole (bool nopcon)
       HPCON_INTERNAL *hp = (HPCON_INTERNAL *) get_ttyp ()->h_pseudo_console;
       get_ttyp ()->h_pcon_write_pipe = hp->hWritePipe;
     }
+
+  if (get_ttyp ()->previous_code_page)
+    SetConsoleCP (get_ttyp ()->previous_code_page);
+  if (get_ttyp ()->previous_output_code_page)
+    SetConsoleOutputCP (get_ttyp ()->previous_output_code_page);
   return true;
 
 cleanup_pcon_in:
@@ -2884,6 +2889,8 @@ fhandler_pty_slave::close_pseudoconsole (tty *ttyp)
   if (ttyp->h_pseudo_console)
     {
       ttyp->wait_pcon_fwd ();
+      ttyp->previous_code_page = GetConsoleCP ();
+      ttyp->previous_output_code_page = GetConsoleOutputCP ();
       FreeConsole ();
       AttachConsole (ATTACH_PARENT_PROCESS);
       HPCON_INTERNAL *hp = (HPCON_INTERNAL *) ttyp->h_pseudo_console;

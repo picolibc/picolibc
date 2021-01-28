@@ -107,6 +107,8 @@ private:
   bool has_csi6n;
   bool need_invisible_console;
   pid_t invisible_console_pid;
+  UINT previous_code_page;
+  UINT previous_output_code_page;
 
 public:
   HANDLE from_master () const { return _from_master; }
