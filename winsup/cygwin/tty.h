@@ -93,6 +93,8 @@ private:
   HANDLE _from_master_cyg;
   HANDLE _to_master;
   HANDLE _to_master_cyg;
+  HANDLE _to_slave;
+  HANDLE _to_slave_cyg;
   HPCON h_pseudo_console;
   bool pcon_start;
   bool switch_to_pcon_in;
@@ -103,8 +105,6 @@ private:
   HANDLE h_pcon_write_pipe;
   bool pcon_cap_checked;
   bool has_csi6n;
-  bool has_set_title;
-  bool do_not_resize_pcon;
   bool need_invisible_console;
   pid_t invisible_console_pid;
 
@@ -113,10 +113,14 @@ public:
   HANDLE from_master_cyg () const { return _from_master_cyg; }
   HANDLE to_master () const { return _to_master; }
   HANDLE to_master_cyg () const { return _to_master_cyg; }
+  HANDLE to_slave () const { return _to_slave; }
+  HANDLE to_slave_cyg () const { return _to_slave_cyg; }
   void set_from_master (HANDLE h) { _from_master = h; }
   void set_from_master_cyg (HANDLE h) { _from_master_cyg = h; }
   void set_to_master (HANDLE h) { _to_master = h; }
   void set_to_master_cyg (HANDLE h) { _to_master_cyg = h; }
+  void set_to_slave (HANDLE h) { _to_slave = h; }
+  void set_to_slave_cyg (HANDLE h) { _to_slave_cyg = h; }
 
   int read_retval;
   bool was_opened;	/* True if opened at least once. */

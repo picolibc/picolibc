@@ -244,8 +244,6 @@ tty::init ()
   pcon_start = false;
   pcon_cap_checked = false;
   has_csi6n = false;
-  has_set_title = false;
-  do_not_resize_pcon = false;
   need_invisible_console = false;
   invisible_console_pid = 0;
 }

@@ -653,6 +653,36 @@ child_info_spawn::worker (const char *prog_arg, const char *const *argv,
 	      }
 	}
 
+      bool enable_pcon = false;
+      HANDLE ptys_from_master = NULL;
+      HANDLE ptys_input_available_event = NULL;
+      tty *ptys_ttyp = NULL;
+      _minor_t ptys_unit = 0;
+      if (!iscygwin () && ptys_primary && is_console_app (runpath))
+	{
+	  bool nopcon = mode != _P_OVERLAY && mode != _P_WAIT;
+	  if (disable_pcon || !ptys_primary->term_has_pcon_cap (envblock))
+	    nopcon = true;
+	  if (ptys_primary->setup_pseudoconsole (nopcon))
+	    enable_pcon = true;
+	  ptys_ttyp = ptys_primary->get_ttyp ();
+	  ptys_unit = ptys_primary->get_minor ();
+	  ptys_from_master = ptys_primary->get_handle ();
+	  DuplicateHandle (GetCurrentProcess (), ptys_from_master,
+			   GetCurrentProcess (), &ptys_from_master,
+			   0, 0, DUPLICATE_SAME_ACCESS);
+	  ptys_input_available_event =
+	    ptys_primary->get_input_available_event ();
+	  DuplicateHandle (GetCurrentProcess (), ptys_input_available_event,
+			   GetCurrentProcess (), &ptys_input_available_event,
+			   0, 0, DUPLICATE_SAME_ACCESS);
+	  if (!enable_pcon)
+	    fhandler_pty_slave::transfer_input (fhandler_pty_slave::to_nat,
+						ptys_primary->get_handle_cyg (),
+						ptys_ttyp, ptys_unit,
+						ptys_input_available_event);
+	}
+
       /* Set up needed handles for stdio */
       si.dwFlags = STARTF_USESTDHANDLES;
       si.hStdInput = handle ((in__stdin < 0 ? 0 : in__stdin), false);
@@ -663,25 +693,6 @@ child_info_spawn::worker (const char *prog_arg, const char *const *argv,
 
       if (!iscygwin ())
 	init_console_handler (myself->ctty > 0);
-
-      bool enable_pcon = false;
-      tty *ptys_ttyp = NULL;
-      STARTUPINFOEXW si_pcon;
-      ZeroMemory (&si_pcon, sizeof (si_pcon));
-      STARTUPINFOW *si_tmp = &si;
-      if (!iscygwin () && ptys_primary && is_console_app (runpath))
-	{
-	  bool nopcon = mode != _P_OVERLAY && mode != _P_WAIT;
-	  if (disable_pcon || !ptys_primary->term_has_pcon_cap (envblock))
-	    nopcon = true;
-	  if (ptys_primary->setup_pseudoconsole (&si_pcon, nopcon))
-	    {
-	      c_flags |= EXTENDED_STARTUPINFO_PRESENT;
-	      si_tmp = &si_pcon.StartupInfo;
-	      enable_pcon = true;
-	      ptys_ttyp = ptys_primary->get_ttyp ();
-	    }
-	}
 
     loop:
       /* When ruid != euid we create the new process under the current original
@@ -711,7 +722,7 @@ child_info_spawn::worker (const char *prog_arg, const char *const *argv,
 			       c_flags,
 			       envblock,	/* environment */
 			       NULL,
-			       si_tmp,
+			       &si,
 			       &pi);
 	}
       else
@@ -765,7 +776,7 @@ child_info_spawn::worker (const char *prog_arg, const char *const *argv,
 			       c_flags,
 			       envblock,	/* environment */
 			       NULL,
-			       si_tmp,
+			       &si,
 			       &pi);
 	  if (hwst)
 	    {
@@ -777,11 +788,6 @@ child_info_spawn::worker (const char *prog_arg, const char *const *argv,
 	      SetThreadDesktop (hdsk_orig);
 	      CloseDesktop (hdsk);
 	    }
-	}
-      if (enable_pcon)
-	{
-	  DeleteProcThreadAttributeList (si_pcon.lpAttributeList);
-	  HeapFree (GetProcessHeap (), 0, si_pcon.lpAttributeList);
 	}
 
       if (mode != _P_OVERLAY)
@@ -954,14 +960,21 @@ child_info_spawn::worker (const char *prog_arg, const char *const *argv,
 	    }
 	  if (sem)
 	    __posix_spawn_sem_release (sem, 0);
-	  if (enable_pcon)
+	  if (enable_pcon || ptys_ttyp || cons_native)
+	    WaitForSingleObject (pi.hProcess, INFINITE);
+	  if (ptys_ttyp)
 	    {
-	      WaitForSingleObject (pi.hProcess, INFINITE);
-	      fhandler_pty_slave::close_pseudoconsole (ptys_ttyp);
+	      fhandler_pty_slave::transfer_input (fhandler_pty_slave::to_cyg,
+						  ptys_from_master,
+						  ptys_ttyp, ptys_unit,
+						  ptys_input_available_event);
+	      CloseHandle (ptys_from_master);
+	      CloseHandle (ptys_input_available_event);
 	    }
+	  if (enable_pcon)
+	    fhandler_pty_slave::close_pseudoconsole (ptys_ttyp);
 	  else if (cons_native)
 	    {
-	      WaitForSingleObject (pi.hProcess, INFINITE);
 	      fhandler_console::request_xterm_mode_output (true,
 							   &cons_handle_set);
 	      fhandler_console::request_xterm_mode_input (true,
@@ -975,6 +988,15 @@ child_info_spawn::worker (const char *prog_arg, const char *const *argv,
 	  system_call.arm ();
 	  if (waitpid (cygpid, &res, 0) != cygpid)
 	    res = -1;
+	  if (ptys_ttyp)
+	    {
+	      fhandler_pty_slave::transfer_input (fhandler_pty_slave::to_cyg,
+						  ptys_from_master,
+						  ptys_ttyp, ptys_unit,
+						  ptys_input_available_event);
+	      CloseHandle (ptys_from_master);
+	      CloseHandle (ptys_input_available_event);
+	    }
 	  if (enable_pcon)
 	    fhandler_pty_slave::close_pseudoconsole (ptys_ttyp);
 	  else if (cons_native)

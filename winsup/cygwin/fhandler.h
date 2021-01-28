@@ -2291,6 +2291,13 @@ class fhandler_pty_slave: public fhandler_pty_common
   void fch_close_handles ();
 
  public:
+  /* Transfer direction for transfer_input() */
+  enum xfer_dir
+  {
+    to_nat,
+    to_cyg
+  };
+
   /* Constructor */
   fhandler_pty_slave (int);
 
@@ -2340,7 +2347,7 @@ class fhandler_pty_slave: public fhandler_pty_common
     copyto (fh);
     return fh;
   }
-  bool setup_pseudoconsole (STARTUPINFOEXW *si, bool nopcon);
+  bool setup_pseudoconsole (bool nopcon);
   static void close_pseudoconsole (tty *ttyp);
   bool term_has_pcon_cap (const WCHAR *env);
   void set_switch_to_pcon (void);
@@ -2349,6 +2356,9 @@ class fhandler_pty_slave: public fhandler_pty_common
   void setup_locale (void);
   tty *get_ttyp () { return (tty *) tc (); } /* Override as public */
   void create_invisible_console (void);
+  static void transfer_input (xfer_dir dir, HANDLE from, tty *ttyp,
+			      _minor_t unit, HANDLE input_available_event);
+  HANDLE get_input_available_event (void) { return input_available_event; }
 };
 
 #define __ptsname(buf, unit) __small_sprintf ((buf), "/dev/pty%d", (unit))
@@ -2361,6 +2371,8 @@ public:
     HANDLE from_master_cyg;
     HANDLE to_master;
     HANDLE to_master_cyg;
+    HANDLE to_slave;
+    HANDLE to_slave_cyg;
     HANDLE master_ctl;
     HANDLE input_available_event;
   };
