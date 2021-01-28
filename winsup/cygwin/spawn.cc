@@ -964,6 +964,7 @@ child_info_spawn::worker (const char *prog_arg, const char *const *argv,
 	    WaitForSingleObject (pi.hProcess, INFINITE);
 	  if (ptys_ttyp)
 	    {
+	      ptys_ttyp->wait_pcon_fwd ();
 	      fhandler_pty_slave::transfer_input (fhandler_pty_slave::to_cyg,
 						  ptys_from_master,
 						  ptys_ttyp, ptys_unit,
@@ -990,6 +991,7 @@ child_info_spawn::worker (const char *prog_arg, const char *const *argv,
 	    res = -1;
 	  if (ptys_ttyp)
 	    {
+	      ptys_ttyp->wait_pcon_fwd ();
 	      fhandler_pty_slave::transfer_input (fhandler_pty_slave::to_cyg,
 						  ptys_from_master,
 						  ptys_ttyp, ptys_unit,

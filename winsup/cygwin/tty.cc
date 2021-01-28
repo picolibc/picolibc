@@ -237,7 +237,6 @@ tty::init ()
   column = 0;
   h_pseudo_console = NULL;
   switch_to_pcon_in = false;
-  mask_switch_to_pcon_in = false;
   pcon_pid = 0;
   term_code_page = 0;
   pcon_last_time = 0;
@@ -248,6 +247,7 @@ tty::init ()
   invisible_console_pid = 0;
   previous_code_page = 0;
   previous_output_code_page = 0;
+  master_is_running_as_service = false;
 }
 
 HANDLE
@@ -294,7 +294,7 @@ tty_min::ttyname ()
 }
 
 void
-tty::wait_pcon_fwd (void)
+tty::wait_pcon_fwd (bool init)
 {
   /* The forwarding in pseudo console sometimes stops for
      16-32 msec even if it already has data to transfer.
@@ -304,7 +304,8 @@ tty::wait_pcon_fwd (void)
      thread when the last data is transfered. */
   const int sleep_in_pcon = 16;
   const int time_to_wait = sleep_in_pcon * 2 + 1/* margine */;
-  pcon_last_time = GetTickCount ();
+  if (init)
+    pcon_last_time = GetTickCount ();
   while (GetTickCount () - pcon_last_time < time_to_wait)
     {
       int tw = time_to_wait - (GetTickCount () - pcon_last_time);

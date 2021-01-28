@@ -1411,12 +1411,11 @@ pty_slave_cleanup (select_record *me, select_stuff *stuff)
 {
   fhandler_base *fh = (fhandler_base *) me->fh;
   fhandler_pty_slave *ptys = (fhandler_pty_slave *) fh;
-  if (me->read_selected)
-    ptys->mask_switch_to_pcon_in (false);
-
   select_pipe_info *pi = (select_pipe_info *) stuff->device_specific_ptys;
   if (!pi)
     return;
+  if (me->read_selected && pi->start)
+    ptys->mask_switch_to_pcon_in (false);
   if (pi->thread)
     {
       pi->stop_thread = true;

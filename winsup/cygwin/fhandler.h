@@ -2284,6 +2284,8 @@ class fhandler_pty_slave: public fhandler_pty_common
 {
   HANDLE inuse;			// used to indicate that a tty is in use
   HANDLE output_handle_cyg, io_handle_cyg;
+  HANDLE slave_reading;
+  LONG num_reader;
 
   /* Helper functions for fchmod and fchown. */
   bool fch_open_handles (bool chown);
@@ -2359,6 +2361,7 @@ class fhandler_pty_slave: public fhandler_pty_common
   static void transfer_input (xfer_dir dir, HANDLE from, tty *ttyp,
 			      _minor_t unit, HANDLE input_available_event);
   HANDLE get_input_available_event (void) { return input_available_event; }
+  bool pcon_activated (void) { return get_ttyp ()->h_pseudo_console; }
 };
 
 #define __ptsname(buf, unit) __small_sprintf ((buf), "/dev/pty%d", (unit))
