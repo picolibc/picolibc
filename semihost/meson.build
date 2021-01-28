@@ -91,7 +91,7 @@ if src_semihost_machine.has_key(host_cpu_family)
     'semihost.h'
   )
 
-  semihost_inc = [include_directories('.'), inc]
+  inc = [inc, include_directories('.')]
 
   has_semihost = true
 
@@ -111,7 +111,7 @@ if src_semihost_machine.has_key(host_cpu_family)
 				srcs_semihost,
 				install : true,
 				install_dir : instdir,
-				include_directories : semihost_inc,
+				include_directories : inc,
 				c_args : value[1]))
     
   endforeach
