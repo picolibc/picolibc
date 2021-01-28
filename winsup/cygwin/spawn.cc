@@ -656,6 +656,7 @@ child_info_spawn::worker (const char *prog_arg, const char *const *argv,
       bool enable_pcon = false;
       HANDLE ptys_from_master = NULL;
       HANDLE ptys_input_available_event = NULL;
+      HANDLE ptys_output_mutex = NULL;
       tty *ptys_ttyp = NULL;
       _minor_t ptys_unit = 0;
       if (!iscygwin () && ptys_primary && is_console_app (runpath))
@@ -675,6 +676,9 @@ child_info_spawn::worker (const char *prog_arg, const char *const *argv,
 	    ptys_primary->get_input_available_event ();
 	  DuplicateHandle (GetCurrentProcess (), ptys_input_available_event,
 			   GetCurrentProcess (), &ptys_input_available_event,
+			   0, 0, DUPLICATE_SAME_ACCESS);
+	  DuplicateHandle (GetCurrentProcess (), ptys_primary->output_mutex,
+			   GetCurrentProcess (), &ptys_output_mutex,
 			   0, 0, DUPLICATE_SAME_ACCESS);
 	  if (!enable_pcon)
 	    fhandler_pty_slave::transfer_input (fhandler_pty_slave::to_nat,
@@ -965,16 +969,22 @@ child_info_spawn::worker (const char *prog_arg, const char *const *argv,
 	  if (ptys_ttyp)
 	    {
 	      ptys_ttyp->wait_pcon_fwd ();
-	      fhandler_pty_slave::transfer_input (fhandler_pty_slave::to_cyg,
-						  ptys_from_master,
-						  ptys_ttyp, ptys_unit,
-						  ptys_input_available_event);
+	      /* Do not transfer input if another process using pseudo
+		 console exists. */
+	      WaitForSingleObject (ptys_output_mutex, INFINITE);
+	      if (!fhandler_pty_common::get_console_process_id
+			      (myself->exec_dwProcessId, false, true, true))
+		fhandler_pty_slave::transfer_input (fhandler_pty_slave::to_cyg,
+						    ptys_from_master,
+						    ptys_ttyp, ptys_unit,
+						    ptys_input_available_event);
 	      CloseHandle (ptys_from_master);
 	      CloseHandle (ptys_input_available_event);
+	      fhandler_pty_slave::close_pseudoconsole (ptys_ttyp);
+	      ReleaseMutex (ptys_output_mutex);
+	      CloseHandle (ptys_output_mutex);
 	    }
-	  if (enable_pcon)
-	    fhandler_pty_slave::close_pseudoconsole (ptys_ttyp);
-	  else if (cons_native)
+	  if (cons_native)
 	    {
 	      fhandler_console::request_xterm_mode_output (true,
 							   &cons_handle_set);
@@ -992,16 +1002,22 @@ child_info_spawn::worker (const char *prog_arg, const char *const *argv,
 	  if (ptys_ttyp)
 	    {
 	      ptys_ttyp->wait_pcon_fwd ();
-	      fhandler_pty_slave::transfer_input (fhandler_pty_slave::to_cyg,
-						  ptys_from_master,
-						  ptys_ttyp, ptys_unit,
-						  ptys_input_available_event);
+	      /* Do not transfer input if another process using pseudo
+		 console exists. */
+	      WaitForSingleObject (ptys_output_mutex, INFINITE);
+	      if (!fhandler_pty_common::get_console_process_id
+			      (myself->exec_dwProcessId, false, true, true))
+		fhandler_pty_slave::transfer_input (fhandler_pty_slave::to_cyg,
+						    ptys_from_master,
+						    ptys_ttyp, ptys_unit,
+						    ptys_input_available_event);
 	      CloseHandle (ptys_from_master);
 	      CloseHandle (ptys_input_available_event);
+	      fhandler_pty_slave::close_pseudoconsole (ptys_ttyp);
+	      ReleaseMutex (ptys_output_mutex);
+	      CloseHandle (ptys_output_mutex);
 	    }
-	  if (enable_pcon)
-	    fhandler_pty_slave::close_pseudoconsole (ptys_ttyp);
-	  else if (cons_native)
+	  if (cons_native)
 	    {
 	      fhandler_console::request_xterm_mode_output (true,
 							   &cons_handle_set);

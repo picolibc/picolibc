@@ -2273,6 +2273,9 @@ class fhandler_pty_common: public fhandler_termios
   }
 
   void resize_pseudo_console (struct winsize *);
+  static DWORD get_console_process_id (DWORD pid, bool match,
+				       bool cygwin = false,
+				       bool stub_only = false);
 
  protected:
   static BOOL process_opost_output (HANDLE h, const void *ptr, ssize_t& len,
@@ -2354,14 +2357,14 @@ class fhandler_pty_slave: public fhandler_pty_common
   bool term_has_pcon_cap (const WCHAR *env);
   void set_switch_to_pcon (void);
   void reset_switch_to_pcon (void);
-  void mask_switch_to_pcon_in (bool mask);
+  void mask_switch_to_pcon_in (bool mask, bool xfer);
   void setup_locale (void);
   tty *get_ttyp () { return (tty *) tc (); } /* Override as public */
   void create_invisible_console (void);
   static void transfer_input (xfer_dir dir, HANDLE from, tty *ttyp,
 			      _minor_t unit, HANDLE input_available_event);
   HANDLE get_input_available_event (void) { return input_available_event; }
-  bool pcon_activated (void) { return get_ttyp ()->h_pseudo_console; }
+  bool pcon_activated (void) { return get_ttyp ()->pcon_activated; }
 };
 
 #define __ptsname(buf, unit) __small_sprintf ((buf), "/dev/pty%d", (unit))

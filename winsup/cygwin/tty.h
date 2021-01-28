@@ -96,13 +96,17 @@ private:
   HANDLE _to_master_cyg;
   HANDLE _to_slave;
   HANDLE _to_slave_cyg;
-  HPCON h_pseudo_console;
+  bool pcon_activated;
   bool pcon_start;
   bool switch_to_pcon_in;
   pid_t pcon_pid;
   UINT term_code_page;
   DWORD pcon_last_time;
   HANDLE h_pcon_write_pipe;
+  HANDLE h_pcon_condrv_reference;
+  HANDLE h_pcon_conhost_process;
+  HANDLE h_pcon_in;
+  HANDLE h_pcon_out;
   bool pcon_cap_checked;
   bool has_csi6n;
   bool need_invisible_console;

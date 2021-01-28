@@ -235,7 +235,7 @@ tty::init ()
   master_pid = 0;
   is_console = false;
   column = 0;
-  h_pseudo_console = NULL;
+  pcon_activated = false;
   switch_to_pcon_in = false;
   pcon_pid = 0;
   term_code_page = 0;
