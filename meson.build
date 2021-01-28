@@ -769,6 +769,7 @@ has_ieeefp_funcs = false
 # semihost will adjust this if supported
 has_semihost = false
 
+# make sure to include semihost BEFORE picocrt!
 subdir('semihost')
 if tinystdio
   subdir('dummyhost')
@@ -826,6 +827,7 @@ endif
 
 has_picolibc_tls_api = false
 
+# make sure to include semihost BEFORE picocrt!
 if enable_picocrt
   subdir('picocrt')
 endif

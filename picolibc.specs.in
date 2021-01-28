@@ -22,5 +22,5 @@
 @CRTEND@
 
 *startfile:
-@LIBDIR@/%M/crt0%O%s @CRTBEGIN@
+@LIBDIR@/%M/crt0%{-oslib=semihost:-semihost}%O%s @CRTBEGIN@
 @SPECS_EXTRA@

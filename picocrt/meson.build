@@ -53,12 +53,15 @@ foreach target : targets
 
   if target == ''
     crt_name = 'crt0.o'
+    crt_semihost_name = 'crt0-semihost.o'
     libcrt_name = 'crt'
   else
     crt_name = join_paths(target, 'crt0.o')
+    crt_semihost_name = join_paths(target, 'crt0-semihost.o')
     libcrt_name = join_paths(target, 'libcrt')
   endif
 
+  # The normal variant does not call 'exit' after return from main (c lingo: freestanding execution environment)
   executable(crt_name,
 	     srcs_picocrt,
 	     include_directories : inc,
@@ -66,6 +69,17 @@ foreach target : targets
 	     install_dir : instdir,
 	     c_args : value[1] + arg_fnobuiltin + ['-ffreestanding'],
 	     link_args : value[1] + ['-r', '-ffreestanding', '-nostdlib'])
+
+  # The semihost variant call 'exit' after return from main (c lingo: hosted execution environment)
+  if has_semihost
+    executable(crt_semihost_name,
+           srcs_picocrt,
+           include_directories : inc,
+           install : true,
+           install_dir : instdir,
+           c_args : value[1] + arg_fnobuiltin + ['-ffreestanding', '-D_PICOLIBC_CRT0_SEMIHOST_'],
+           link_args : value[1] + ['-r', '-ffreestanding', '-nostdlib'])
+  endif
 
   # Tests link against this because using the .o isn't supported under meson
   set_variable('lib_crt' + target,
