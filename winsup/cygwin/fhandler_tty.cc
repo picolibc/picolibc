@@ -1241,6 +1241,7 @@ fhandler_pty_slave::read (void *ptr, size_t& len)
 	time_to_wait = !vtime ? INFINITE : 100 * vtime;
     }
 
+wait_retry:
   while (len)
     {
       switch (cygwait (input_available_event, time_to_wait))
@@ -1318,6 +1319,11 @@ fhandler_pty_slave::read (void *ptr, size_t& len)
 	      totalread = -1;
 	    }
 	  goto out;
+	}
+      if (!IsEventSignalled (input_available_event))
+	{ /* Maybe another thread has processed input. */
+	  ReleaseMutex (input_mutex);
+	  goto wait_retry;
 	}
 
       if (!bytes_available (bytes_in_pipe))
