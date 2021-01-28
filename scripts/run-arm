@@ -198,3 +198,22 @@ echo "$input" | $qemu $memory \
       -device loader,file=$elf,cpu-num=0 \
       -nographic \
       "$@"
+
+result=$?
+
+if [ $result != 0 ]; then
+    case $cpu in
+	# Cortex-a8 qemu has minor floating point errors
+	# when run on i686 processors
+	cortex-a8)
+	    test=`uname -m`"-$elf"
+	    case "$test" in
+		i?86-*math_test)
+		    echo "fp imprecise for $cpu on" `uname -m`
+		    result=77
+		    ;;
+	    esac
+	    ;;
+    esac
+fi
+exit $result
