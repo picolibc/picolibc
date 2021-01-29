@@ -97,9 +97,9 @@ _start:
 	li	a1, 0
 	call	main
 
-#ifdef _PICOLIBC_CRT0_SEMIHOST_
-    call exit
-#endif
-
+#ifdef CRT0_EXIT
+	call exit
+#else
 .L1:	
 	j	.L1
+#endif

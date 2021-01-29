@@ -36,6 +36,7 @@
 #include <string.h>
 #include <picotls.h>
 #include <stdint.h>
+#include <stdlib.h>
 
 extern char __data_source[];
 extern char __data_start[];
@@ -82,11 +83,11 @@ __start(void)
 #ifdef HAVE_INITFINI_ARRAY
 	__libc_init_array();
 #endif
-#ifdef _PICOLIBC_CRT0_SEMIHOST_
 	int ret = main(0, NULL);
+#ifdef CRT0_EXIT
 	exit(ret);
 #else
-	(void) main(0, NULL);
-#endif
+	(void) ret;
 	for(;;);
+#endif
 }
