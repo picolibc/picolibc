@@ -559,6 +559,10 @@ builtins = [
   ['builtin_ctz', '__builtin_ctz((unsigned int)42);'],
   ['builtin_ctzl', '__builtin_ctzl((unsigned long)42);'],
   ['builtin_ctzll', '__builtin_ctzll((unsigned long long)42);'],
+  ['builtin_copysignl', '__builtin_copysignl((long double)42);'],
+  ['builtin_isinfl', '__builtin_isinfl((long double)42);'],
+  ['builtin_isnanl', '__builtin_isnanl((long double)42);'],
+  ['builtin_finitel', '__builtin_finitel((long double)42);'],
 ]
 foreach builtin : builtins
   have_current_builtin = meson.get_compiler('c').links('int main(void) { ' + builtin[1] + ' return 0; }', name : 'test for __' + builtin[0])
