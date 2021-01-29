@@ -587,7 +587,8 @@ wait_retry:
 	  break;
 	case input_signalled: /* signalled */
 	  release_input_mutex ();
-	  goto sig_exit;
+	  /* The signal will be handled by cygwait() above. */
+	  continue;
 	case input_winch:
 	  release_input_mutex ();
 	  continue;
