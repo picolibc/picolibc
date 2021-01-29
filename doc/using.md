@@ -77,8 +77,10 @@ Assign these symbols in the linker script as follows:
 
  5) Call `main()`
 
- 6) If main returns, then crt0 will go into an infinite
-    loop. Applications wanting to call exit() must do that explicitly.
+ 6) If main returns, then the default crt0 will go into an infinite
+    loop. Applications wanting to call exit() must do that
+    explicitly. The 'hosted' crt0 version (crt0-hosted.o) calls exit,
+    passing the value returned from main.
 
 ## Semihosting
 
@@ -98,18 +100,23 @@ command line flag defined by picolibc.specs:
 
 	$ gcc --specs=picolibc.specs --oslib=semihost -o program.elf program.o
 
-This will also replace the `crt0` with a special semihost variant:
-The default `crt0` assumes a freestanding execution environment, entering
-an infinite loop upon returning from `main`. In semihosted mode, the
-alternate `crt0` will instead call `exit` from `libsemihost.a`, resulting
-in a clean return to the hosting environment (this conforms to a hosted
-execution environment as per the C specification).
-
 You can also list libc and libsemihost in the correct order
 explicitly:
 
-	$ gcc --specs=picolibc.specs -o program.elf -lc -lsemihost
+	$ gcc --specs=picolibc.specs -o program.elf program.o -lc -lsemihost
 
-This second form doesn't force using the semihosted version of `crt0`,
-so programs built that way will enter an infinite loop upon returning
-from `main` instead of calling `exit`.
+## Hosted environment crt0 version
+
+The default crt0 version provided by Picolibc goes into an infinite
+loop after main returns to avoid requiring an `_exit` function. In an
+environment which provides a useful `_exit` implementation, applications
+may want to use an alternate `crt0` that calls `exit` when main
+returns, resulting in a clean return to the hosting environment (this
+conforms to a hosted execution environment as per the C
+specification).
+
+Picolibc provides an alternate crt0 version, `crt0-hosted.o` for
+this. The picolibc specs file has code which selects this when gcc is
+passed the `--crt0=hosted` flag:
+
+	$ gcc --specs=picolibc.specs --crt0=hosted -o program.elf
