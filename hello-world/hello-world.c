@@ -56,6 +56,5 @@ main(void)
 		}
 	}
 #endif
-
-	exit(0);
+	return 0;
 }

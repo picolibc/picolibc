@@ -33,7 +33,7 @@
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
-CFLAGS=--oslib=semihost -O -g -Wl,-gc-sections
+CFLAGS=--oslib=semihost --crt0=hosted -O -g -Wl,-gc-sections
 
 CPP_RISCV=riscv64-unknown-elf-g++ -specs=picolibcpp.specs 
 CC_RISCV=riscv64-unknown-elf-gcc -specs=picolibc.specs 
