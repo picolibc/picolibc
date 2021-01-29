@@ -182,10 +182,7 @@ getrlimit (int resource, struct rlimit *rlp)
 	  __get_rlimit_stack (rlp);
 	  break;
 	case RLIMIT_NOFILE:
-	  rlp->rlim_cur = getdtablesize ();
-	  if (rlp->rlim_cur < OPEN_MAX)
-	    rlp->rlim_cur = OPEN_MAX;
-	  rlp->rlim_max = OPEN_MAX_MAX;
+	  rlp->rlim_cur = rlp->rlim_max = OPEN_MAX_MAX;
 	  break;
 	case RLIMIT_CORE:
 	  rlp->rlim_cur = cygheap->rlim_core;
