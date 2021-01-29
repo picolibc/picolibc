@@ -120,7 +120,6 @@ srcs_math = [
     'w_atanh.c',
     'w_cosh.c',
     'w_drem.c',
-    'w_exp2.c',
     'w_exp.c',
     'wf_acos.c',
     'wf_acosh.c',
@@ -129,7 +128,6 @@ srcs_math = [
     'wf_atanh.c',
     'wf_cosh.c',
     'wf_drem.c',
-    'wf_exp2.c',
     'wf_exp.c',
     'wf_fmod.c',
     'wf_gamma.c',
@@ -176,6 +174,12 @@ if have_long_double
   srcs_math += l_srcs_math
 endif
 
+c_args_exp2 = []
+if meson.get_compiler('c').has_argument('-fno-builtin-exp2')
+  c_args_exp2 += ['-fno-builtin-exp2', '-fno-builtin-exp2f']
+  message('Set c_args_exp2')
+endif
+
 srcs_math_use = []
 foreach file : srcs_math
   s_file = file.split('.')[0] + '.S'
@@ -188,12 +192,23 @@ foreach file : srcs_math
   endif
 endforeach
 
+math_inc = [ inc, include_directories('../common') ]
+
 foreach target : targets
 	value = get_variable('target_' + target)
+	set_variable('lib_math_exp2' + target,
+		     static_library('math_exp2' + target,
+				    ['w_exp2.c', 'wf_exp2.c'],
+				    pic: false,
+				    include_directories: math_inc,
+				    c_args: value[1] + c_args_exp2)
+		    )
+	lib_math_exp2_objs = get_variable('lib_math_exp2' + target).extract_all_objects(recursive:true)
 	set_variable('lib_math' + target,
 		static_library('math' + target,
-			srcs_math_use,
-			pic: false,
-			include_directories: [ inc, include_directories('../common') ],
-			c_args: value[1]))
+			       srcs_math_use,
+			       objects: lib_math_exp2_objs,
+			       pic: false,
+			       include_directories: math_inc,
+			       c_args: value[1]))
 endforeach
