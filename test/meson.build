@@ -43,7 +43,7 @@ foreach target : targets
     _libs += [get_variable('lib_crt'+ target)]
   endif
   
-  _c_args = value[1] + test_c_args
+  _c_args = value[1] + test_c_args + test_c_warnings
   _link_args = value[1] + test_link_args
 
   t1 = 'printf_scanf'
@@ -125,7 +125,9 @@ foreach target : targets
 
   plain_tests = ['rand', 'regex', 'ungetc', 'fenv',
 		 'math_errhandling', 'malloc', 'tls',
-		 'ffs', 'setjmp', 'atexit', 'on_exit']
+		 'ffs', 'setjmp', 'atexit', 'on_exit',
+		 'complex-funcs', 'math-funcs',
+		]
 
   if newlib_nano_malloc or not tests_disable_full_malloc_stress
     plain_tests += 'malloc_stress'
@@ -149,7 +151,7 @@ foreach target : targets
 
     test(t1 + target,
 	 executable(t1_name, [t1_src],
-		    c_args: _c_args,
+		    c_args: test_c_warnings + _c_args,
 		    link_args: _link_args,
 		    link_with: _libs,
 		    link_depends:  test_link_depends,
