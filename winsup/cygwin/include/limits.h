@@ -10,6 +10,7 @@ details. */
 
 #include <features.h>
 #include <bits/wordsize.h>
+#include <cygwin/limits.h>
 
 #ifndef _MACH_MACHLIMITS_H_
 
@@ -156,67 +157,66 @@ details. */
 
 /* Maximum number of I/O operations in a single list I/O call supported by
    the implementation. */
-#define AIO_LISTIO_MAX 32
+#define AIO_LISTIO_MAX __AIO_LISTIO_MAX
 
 /* Maximum number of outstanding asynchronous I/O operations supported by
    the implementation. */
-#define AIO_MAX 8
+#define AIO_MAX __AIO_MAX
 
 /* The maximum amount by which a process can decrease its asynchronous I/O
    priority level from its own scheduling priority. Not yet implemented. */
-#define AIO_PRIO_DELTA_MAX 0
+#define AIO_PRIO_DELTA_MAX __AIO_PRIO_DELTA_MAX
 
 /* Maximum number of bytes in arguments and environment passed in an exec
-   call.  32000 is the safe value used for Windows processes when called
-   from Cygwin processes. */
+   call. */
 #undef ARG_MAX
-#define ARG_MAX 32000
+#define ARG_MAX __ARG_MAX
 
 #if __XSI_VISIBLE || __POSIX_VISIBLE >= 200809
 /* Maximum number of functions that may be registered with atexit(). */
 #undef ATEXIT_MAX
-#define ATEXIT_MAX 32
+#define ATEXIT_MAX __ATEXIT_MAX
 #endif
 
 /* Maximum number of simultaneous processes per real user ID. */
 #undef CHILD_MAX
-#define CHILD_MAX 256
+#define CHILD_MAX __CHILD_MAX
 
 /* Maximum number of timer expiration overruns.  Not yet implemented. */
 #undef DELAYTIMER_MAX
-#define DELAYTIMER_MAX __INT_MAX__
+#define DELAYTIMER_MAX __DELAYTIMER_MAX
 
 /* Maximum length of a host name. */
 #undef HOST_NAME_MAX
-#define HOST_NAME_MAX 255
+#define HOST_NAME_MAX __HOST_NAME_MAX
 
 #if __XSI_VISIBLE
 /* Maximum number of iovcnt in a writev (an arbitrary number) */
 #undef IOV_MAX
-#define IOV_MAX 1024
+#define IOV_MAX __IOV_MAX
 #endif
 
 /* Maximum number of characters in a login name. */
 #undef LOGIN_NAME_MAX
-#define LOGIN_NAME_MAX 256	/* equal to UNLEN defined in w32api/lmcons.h */
+#define LOGIN_NAME_MAX __LOGIN_NAME_MAX
 
 /* The maximum number of open message queue descriptors a process may hold. */
 #undef MQ_OPEN_MAX
-#define MQ_OPEN_MAX OPEN_MAX
+#define MQ_OPEN_MAX __MQ_OPEN_MAX
 
 /* The maximum number of message priorities supported by the implementation. */
 #undef MQ_PRIO_MAX
-#define MQ_PRIO_MAX INT_MAX
+#define MQ_PRIO_MAX __MQ_PRIO_MAX
 
 /* # of open files per process.  This limit is returned by
    getdtablesize(), sysconf(_SC_OPEN_MAX), and
    getrlimit(RLIMIT_NOFILE). */
 #undef OPEN_MAX
-#define OPEN_MAX 3200
+#define OPEN_MAX __OPEN_MAX
 
 /* Size in bytes of a page. */
 #undef PAGESIZE
-#define PAGESIZE 65536
+#define PAGESIZE __PAGESIZE
 #if __XSI_VISIBLE
 #undef PAGE_SIZE
 #define PAGE_SIZE PAGESIZE
@@ -225,23 +225,15 @@ details. */
 /* Maximum number of attempts made to destroy a thread's thread-specific
    data values on thread exit. */
 #undef PTHREAD_DESTRUCTOR_ITERATIONS
-#define PTHREAD_DESTRUCTOR_ITERATIONS 4
+#define PTHREAD_DESTRUCTOR_ITERATIONS __PTHREAD_DESTRUCTOR_ITERATIONS
 
 /* Maximum number of data keys that can be created by a process. */
-/* Tls has 1088 items - and we don't want to use them all :] */
 #undef PTHREAD_KEYS_MAX
-#define PTHREAD_KEYS_MAX 1024
+#define PTHREAD_KEYS_MAX __PTHREAD_KEYS_MAX
 
 /* Minimum size in bytes of thread stack storage. */
-/* Actually the minimum stack size is somewhat of a split personality.
-   The size parameter in a CreateThread call is the size of the initially
-   commited stack size, which can be specified as low as 4K.  However, the
-   default *reserved* stack size is 1 Meg, unless the .def file specifies
-   another STACKSIZE value.  And even if you specify a stack size below 64K,
-   the allocation granularity is in the way.  You can never squeeze multiple
-   threads in the same allocation granularity slot.  Oh well. */
 #undef PTHREAD_STACK_MIN
-#define PTHREAD_STACK_MIN 65536
+#define PTHREAD_STACK_MIN __PTHREAD_STACK_MIN
 
 /* Maximum number of threads that can be created per process. */
 /* Windows allows any arbitrary number of threads per process. */
@@ -249,14 +241,8 @@ details. */
 /* #define PTHREAD_THREADS_MAX unspecified */
 
 /* Maximum number of realtime signals reserved for application use. */
-/* FIXME: We only support one realtime signal in 32 bit mode, but
-	 _POSIX_RTSIG_MAX is 8. */
 #undef RTSIG_MAX
-#if __WORDSIZE == 64
-#define RTSIG_MAX 33
-#else
-#define RTSIG_MAX 1
-#endif
+#define RTSIG_MAX __RTSIG_MAX
 
 /* Maximum number of semaphores that a process may have. */
 /* Windows allows any arbitrary number of semaphores per process. */
@@ -265,12 +251,12 @@ details. */
 
 /* The maximum value a semaphore may have. */
 #undef SEM_VALUE_MAX
-#define SEM_VALUE_MAX 1147483648
+#define SEM_VALUE_MAX __SEM_VALUE_MAX
 
 /* Maximum number of queued signals that a process may send and have pending
    at the receiver(s) at any time. */
 #undef SIGQUEUE_MAX
-#define SIGQUEUE_MAX 32
+#define SIGQUEUE_MAX __SIGQUEUE_MAX
 
 /* The maximum number of replenishment operations that may be simultaneously
    pending for a particular sporadic server scheduler.  Not implemented. */
@@ -279,15 +265,15 @@ details. */
 
 /* Number of streams that one process can have open at one time. */
 #undef STREAM_MAX
-#define STREAM_MAX 20
+#define STREAM_MAX __STREAM_MAX
 
 /* Maximum number of nested symbolic links. */
 #undef SYMLOOP_MAX
-#define SYMLOOP_MAX 10
+#define SYMLOOP_MAX __SYMLOOP_MAX
 
 /* Maximum number of timer expiration overruns. */
 #undef TIMER_MAX
-#define TIMER_MAX 32
+#define TIMER_MAX __TIMER_MAX
 
 /* Maximum length of the trace event name.  Not implemented. */
 #undef TRACE_EVENT_NAME_MAX
@@ -311,7 +297,7 @@ details. */
 
 /* Maximum number of characters in a tty name. */
 #undef TTY_NAME_MAX
-#define TTY_NAME_MAX 32
+#define TTY_NAME_MAX __TTY_NAME_MAX
 
 /* Maximum number of bytes supported for the name of a timezone (not of the TZ variable).  Not implemented. */
 #undef TZNAME_MAX
@@ -322,35 +308,35 @@ details. */
 
 /* Minimum bits needed to represent the maximum size of a regular file. */
 #undef FILESIZEBITS
-#define FILESIZEBITS 64
+#define FILESIZEBITS __FILESIZEBITS
 
 /* Maximum number of hardlinks to a file. */
 #undef LINK_MAX
-#define LINK_MAX 1024
+#define LINK_MAX __LINK_MAX
 
 /* Maximum number of bytes in a terminal canonical input line. */
 #undef MAX_CANON
-#define MAX_CANON 255
+#define MAX_CANON __MAX_CANON
 
 /* Minimum number of bytes available in a terminal input queue. */
 #undef MAX_INPUT
-#define MAX_INPUT 255
+#define MAX_INPUT __MAX_INPUT
 
 /* Maximum length of a path component. */
 #undef NAME_MAX
-#define NAME_MAX 255
+#define NAME_MAX __NAME_MAX
 
 /* Maximum length of a path given to API functions including trailing NUL.
    Deliberately set to the same default value as on Linux.  Internal paths
    may be longer. */
 /* Keep in sync with __PATHNAME_MAX__ in cygwin/config.h */
 #undef PATH_MAX
-#define PATH_MAX 4096
+#define PATH_MAX __PATH_MAX
 
 /* # of bytes in a pipe buf. This is the max # of bytes which can be
    written to a pipe in one atomic operation. */
 #undef PIPE_BUF
-#define PIPE_BUF 4096
+#define PIPE_BUF __PIPE_BUF
 
 /* Minimum number of bytes of storage actually allocated for any portion
    of a file.  Not implemented. */
