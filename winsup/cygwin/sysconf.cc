@@ -511,7 +511,7 @@ static struct
   {cons, {c:CHILD_MAX}},		/*   1, _SC_CHILD_MAX */
   {cons, {c:CLOCKS_PER_SEC}},		/*   2, _SC_CLK_TCK */
   {cons, {c:NGROUPS_MAX}},		/*   3, _SC_NGROUPS_MAX */
-  {cons, {c:OPEN_MAX_MAX}},		/*   4, _SC_OPEN_MAX */
+  {cons, {c:OPEN_MAX}},		/*   4, _SC_OPEN_MAX */
   {cons, {c:_POSIX_JOB_CONTROL}},	/*   5, _SC_JOB_CONTROL */
   {cons, {c:_POSIX_SAVED_IDS}},		/*   6, _SC_SAVED_IDS */
   {cons, {c:_POSIX_VERSION}},		/*   7, _SC_VERSION */

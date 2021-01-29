@@ -74,10 +74,10 @@ dtable::extend (size_t howmuch, size_t min)
   size_t new_size = size + howmuch;
   fhandler_base **newfds;
 
-  if (new_size <= OPEN_MAX_MAX)
+  if (new_size <= OPEN_MAX)
     /* ok */;
-  else if (size < OPEN_MAX_MAX && min < OPEN_MAX_MAX)
-    new_size = OPEN_MAX_MAX;
+  else if (size < OPEN_MAX && min < OPEN_MAX)
+    new_size = OPEN_MAX;
   else
     {
       set_errno (EMFILE);
@@ -735,7 +735,7 @@ dtable::dup3 (int oldfd, int newfd, int flags)
       set_errno (EBADF);
       goto done;
     }
-  if (newfd >= OPEN_MAX_MAX || newfd < 0)
+  if (newfd >= OPEN_MAX || newfd < 0)
     {
       syscall_printf ("new fd out of bounds: %d", newfd);
       set_errno (EBADF);

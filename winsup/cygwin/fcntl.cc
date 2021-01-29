@@ -57,7 +57,7 @@ fcntl64 (int fd, int cmd, ...)
 	{
 	case F_DUPFD:
 	case F_DUPFD_CLOEXEC:
-	  if (arg >= 0 && arg < OPEN_MAX_MAX)
+	  if (arg >= 0 && arg < OPEN_MAX)
 	    {
 	      int flags = cmd == F_DUPFD_CLOEXEC ? O_CLOEXEC : 0;
 	      res = cygheap->fdtab.dup3 (fd, cygheap_fdnew ((arg) - 1), flags);

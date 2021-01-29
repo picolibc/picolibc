@@ -10,8 +10,6 @@ details. */
 
 /* Initial and increment values for cygwin's fd table */
 #define NOFILE_INCR    32
-/* Maximum size we allow expanding to.  */
-#define OPEN_MAX_MAX (100 * NOFILE_INCR)
 
 #include "thread.h"
 #include "sync.h"

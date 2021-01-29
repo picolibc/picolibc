@@ -208,12 +208,11 @@ details. */
 #undef MQ_PRIO_MAX
 #define MQ_PRIO_MAX INT_MAX
 
-/* # of open files per process. Actually it can be more since Cygwin
-   grows the dtable as necessary. We define a reasonable limit here
-   which is returned by getdtablesize(), sysconf(_SC_OPEN_MAX) and
+/* # of open files per process.  This limit is returned by
+   getdtablesize(), sysconf(_SC_OPEN_MAX), and
    getrlimit(RLIMIT_NOFILE). */
 #undef OPEN_MAX
-#define OPEN_MAX 256
+#define OPEN_MAX 3200
 
 /* Size in bytes of a page. */
 #undef PAGESIZE
