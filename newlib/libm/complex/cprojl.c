@@ -55,7 +55,7 @@ cprojl(long double complex z)
 #ifdef __INFINITY
 		REAL_PART(w) = HUGE_VAL;
 #else
-		REAL_PART(w) = INFINITY;
+		REAL_PART(w) = (long double) INFINITY;
 #endif
 		IMAG_PART(w) = copysignl(0.0L, cimagl(z));
 	}
