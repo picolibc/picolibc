@@ -2640,6 +2640,10 @@ check_reparse_point_target (HANDLE h, bool remote, PREPARSE_DATA_BUFFER rp,
         return PATH_REP | PATH_REP_NOAPI;
 #endif
     }
+  else if (rp->ReparseTag == IO_REPARSE_TAG_AF_UNIX)
+    /* Native Windows AF_UNIX socket; recognize this as a reparse
+       point but not as a socket. */
+    return PATH_REP;
   return 0;
 }
 
