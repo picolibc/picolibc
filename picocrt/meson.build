@@ -55,10 +55,12 @@ foreach target : targets
     crt_name = 'crt0.o'
     crt_hosted_name = 'crt0-hosted.o'
     libcrt_name = 'crt'
+    libcrt_hosted_name = 'crt-hosted'
   else
     crt_name = join_paths(target, 'crt0.o')
     crt_hosted_name = join_paths(target, 'crt0-hosted.o')
     libcrt_name = join_paths(target, 'libcrt')
+    libcrt_hosted_name = join_paths(target, 'libcrt-hosted')
   endif
 
   # The normal variant does not call 'exit' after return from main (c lingo: freestanding execution environment)
@@ -86,4 +88,12 @@ foreach target : targets
 			      install : false,
 			      include_directories : inc,
 			      c_args : value[1]))
+
+  # Tests link against this because using the .o isn't supported under meson
+  set_variable('lib_crt_hosted' + target,
+	       static_library(libcrt_hosted_name,
+			      srcs_picocrt,
+			      install : false,
+			      include_directories : inc,
+			      c_args : value[1] + ['-DCRT0_EXIT']))
 endforeach

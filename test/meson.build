@@ -35,14 +35,23 @@
 foreach target : targets
   value = get_variable('target_' + target)
 
-  _libs = [get_variable('lib_m' + target), get_variable('lib_c' + target)]
+  _libs_base = [get_variable('lib_m' + target), get_variable('lib_c' + target)]
   if is_variable('lib_semihost' + target)
-    _libs += [get_variable('lib_semihost' + target)]
+    _libs_base += [get_variable('lib_semihost' + target)]
   endif
+
   if is_variable('lib_crt' + target)
-    _libs += [get_variable('lib_crt'+ target)]
+    _libs = [get_variable('lib_crt'+ target)] + _libs_base
+  else
+    _libs = _libs_base
   endif
-  
+
+  if is_variable('lib_crt_hosted' + target)
+    _libs_hosted = [get_variable('lib_crt_hosted'+ target)] + _libs_base
+  else
+    _libs_hosted = _libs_base
+  endif
+
   _c_args = value[1] + test_c_args + test_c_warnings
   _link_args = value[1] + test_link_args
 
@@ -122,6 +131,31 @@ foreach target : targets
 		  link_with: _libs,
 		  include_directories: inc),
        env: ['MESON_SOURCE_ROOT=' + meson.source_root()])
+
+  t1 = 'hosted-exit'
+  if target == ''
+    t1_name = t1
+  else
+    t1_name = join_paths(target, t1)
+  endif
+
+  test(t1 + target,
+       executable(t1_name, 'hosted-exit.c',
+		  c_args: float_printf_compile_args + _c_args,
+		  link_args:  float_printf_link_args + _link_args,
+		  link_with: _libs_hosted,
+		  include_directories: inc),
+       env: ['MESON_SOURCE_ROOT=' + meson.source_root()])
+
+  test(t1 + '-fail' + target,
+       executable(t1_name + '-fail', 'hosted-exit.c',
+		  c_args: float_printf_compile_args + _c_args + ['-DRETVAL=1'],
+		  link_args:  float_printf_link_args + _link_args,
+		  link_with: _libs_hosted,
+		  include_directories: inc),
+       env: ['MESON_SOURCE_ROOT=' + meson.source_root()],
+       should_fail: true
+      )
 
   plain_tests = ['rand', 'regex', 'ungetc', 'fenv',
 		 'math_errhandling', 'malloc', 'tls',
