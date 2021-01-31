@@ -35,6 +35,10 @@
 
 #include <picolibc.h>	
 
+#ifndef CONSTRUCTORS
+#define CONSTRUCTORS 1
+#endif
+
 	/**
 	 * seems clang has no option "nopic". Now this could be problematic,
 	 * since according to the clang devs at [0], that option has an effect
@@ -88,7 +92,7 @@ _start:
 	call	_set_tls
 #endif
 
-#ifdef HAVE_INITFINI_ARRAY
+#if defined(HAVE_INITFINI_ARRAY) && CONSTRUCTORS
 	call	__libc_init_array
 #endif
 

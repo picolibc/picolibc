@@ -72,6 +72,10 @@ extern void __libc_init_array(void);
 #include <picotls.h>
 #include <stdio.h>
 
+#ifndef CONSTRUCTORS
+#define CONSTRUCTORS 1
+#endif
+
 static inline void
 __start(void)
 {
@@ -80,7 +84,7 @@ __start(void)
 #ifdef PICOLIBC_TLS
 	_set_tls(__tls_base);
 #endif
-#ifdef HAVE_INITFINI_ARRAY
+#if defined(HAVE_INITFINI_ARRAY) && CONSTRUCTORS
 	__libc_init_array();
 #endif
 	int ret = main(0, NULL);
