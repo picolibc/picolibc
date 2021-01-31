@@ -52,6 +52,13 @@ foreach target : targets
     _libs_hosted = _libs_base
   endif
 
+  have_crt_minimal = is_variable('lib_crt_minimal' + target)
+  if have_crt_minimal
+    _libs_minimal = [get_variable('lib_crt_minimal'+ target)] + _libs_base
+  else
+    _libs_minimal = _libs_base
+  endif
+
   _c_args = value[1] + test_c_args + test_c_warnings
   _link_args = value[1] + test_link_args
 
@@ -157,10 +164,27 @@ foreach target : targets
        should_fail: true
       )
 
+  if have_crt_minimal
+    t1 = 'constructor-skip'
+    if target == ''
+      t1_name = t1
+    else
+      t1_name = join_paths(target, t1)
+    endif
+
+    test(t1 + target,
+	 executable(t1_name, 'constructor-skip.c',
+		    c_args: float_printf_compile_args + _c_args,
+		    link_args:  float_printf_link_args + _link_args,
+		    link_with: _libs_minimal,
+		    include_directories: inc),
+	 env: ['MESON_SOURCE_ROOT=' + meson.source_root()])
+  endif
+
   plain_tests = ['rand', 'regex', 'ungetc', 'fenv',
 		 'math_errhandling', 'malloc', 'tls',
 		 'ffs', 'setjmp', 'atexit', 'on_exit',
-		 'complex-funcs', 'math-funcs',
+		 'complex-funcs', 'math-funcs', 'constructor'
 		]
 
   if newlib_nano_malloc or not tests_disable_full_malloc_stress
