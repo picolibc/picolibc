@@ -206,6 +206,7 @@ POSIX commands */
 
 #define CRTSXOFF 0x04000
 #define CRTSCTS	 0x08000
+#define CMSPAR	 0x40000000 /* Mark or space (stick) parity.  */
 
 /* lflag bits */
 #define ISIG	0x0001

@@ -727,7 +727,12 @@ fhandler_serial::tcsetattr (int action, const struct termios *t)
   /* -------------- Set parity ------------------ */
 
   if (t->c_cflag & PARENB)
-    state.Parity = (t->c_cflag & PARODD) ? ODDPARITY : EVENPARITY;
+    {
+      if(t->c_cflag & CMSPAR)
+        state.Parity = (t->c_cflag & PARODD) ? MARKPARITY : SPACEPARITY;
+      else
+        state.Parity = (t->c_cflag & PARODD) ? ODDPARITY : EVENPARITY;
+    }
   else
     state.Parity = NOPARITY;
 
@@ -1068,6 +1073,10 @@ fhandler_serial::tcgetattr (struct termios *t)
     t->c_cflag |= (PARENB | PARODD);
   if (state.Parity == EVENPARITY)
     t->c_cflag |= PARENB;
+  if (state.Parity == MARKPARITY)
+    t->c_cflag |= (PARENB | PARODD | CMSPAR);
+  if (state.Parity == SPACEPARITY)
+    t->c_cflag |= (PARENB | CMSPAR);
 
   /* -------------- Parity errors ------------------ */
 
