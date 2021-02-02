@@ -184,8 +184,12 @@ foreach target : targets
   plain_tests = ['rand', 'regex', 'ungetc', 'fenv',
 		 'math_errhandling', 'malloc', 'tls',
 		 'ffs', 'setjmp', 'atexit', 'on_exit',
-		 'complex-funcs', 'math-funcs', 'constructor'
+		 'math-funcs', 'constructor'
 		]
+
+  if have_complex
+    plain_tests += 'complex-funcs'
+  endif
 
   if newlib_nano_malloc or not tests_disable_full_malloc_stress
     plain_tests += 'malloc_stress'
