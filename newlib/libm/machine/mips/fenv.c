@@ -44,19 +44,9 @@
  * this as a default environment.
  */
 
-
 #ifdef	__mips_soft_float
-#define __set_env(env, flags, mask, rnd) env = ((flags)                 \
-                                                | (mask)<<_FPUSW_SHIFT  \
-                                                | (rnd) << 24)
-#define __env_flags(env)                ((env) & FE_ALL_EXCEPT)
-#define __env_mask(env)                 (((env) >> _FPUSW_SHIFT)        \
-                                                & FE_ALL_EXCEPT)
-#define __env_round(env)                (((env) >> 24) & _ROUND_MASK)
 #include <machine/fenv-softfloat.h>
 #endif
-
-
 
 extern inline int feclearexcept(int excepts);
 extern inline int fegetexceptflag(fexcept_t *flagp, int excepts);
