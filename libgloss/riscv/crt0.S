@@ -27,7 +27,7 @@ _start:
 .option pop
 
   # Clear the bss segment
-  la      a0, _edata
+  la      a0, __bss_start
   la      a2, _end
   sub     a2, a2, a0
   li      a1, 0
