@@ -1487,8 +1487,15 @@ open (const char *unix_path, int flags, ...)
 	  opt |= PC_CTTY;
 	}
 
+      /* If we're opening a FIFO, we will call device_access_denied
+	 below.  This leads to a call to fstat, which can use the
+	 path_conv handle. */
+      opt |= PC_KEEP_HANDLE;
       if (!(fh = build_fh_name (unix_path, opt, stat_suffixes)))
 	__leave;		/* errno already set */
+      opt &= ~PC_KEEP_HANDLE;
+      if (!fh->isfifo ())
+	fh->pc.close_conv_handle ();
       if ((flags & O_NOFOLLOW) && fh->issymlink () && !(flags & O_PATH))
 	{
 	  set_errno (ELOOP);
@@ -1555,9 +1562,18 @@ open (const char *unix_path, int flags, ...)
 	  delete fh;
 	  fh = fh_file;
 	}
-      else if ((fh->is_fs_special () && fh->device_access_denied (flags))
-	       || !fh->open_with_arch (flags, mode & 07777))
-	__leave;		/* errno already set */
+      else
+	{
+	  if (fh->is_fs_special ())
+	    {
+	      if (fh->device_access_denied (flags))
+		__leave;	/* errno already set */
+	      else if (fh->isfifo ())
+		fh->pc.close_conv_handle ();
+	    }
+	  if (!fh->open_with_arch (flags, mode & 07777))
+	    __leave;		/* errno already set */
+	}
       /* Move O_TMPFILEs to the bin to avoid blocking the parent dir. */
       if ((flags & O_TMPFILE) && !fh->pc.isremote ())
 	try_to_bin (fh->pc, fh->get_handle (), DELETE,
