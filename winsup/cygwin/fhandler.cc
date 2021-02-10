@@ -43,7 +43,6 @@ LONG NO_COPY fhandler_base_overlapped::asio_close_counter;
 void
 fhandler_base::reset (const fhandler_base *from)
 {
-  pc << from->pc;
   ra.rabuf = NULL;
   ra.ralen = 0;
   ra.raixget = 0;
