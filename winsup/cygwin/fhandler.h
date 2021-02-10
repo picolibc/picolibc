@@ -229,7 +229,6 @@ class fhandler_base
 
   path_conv pc;
 
-  void reset (const fhandler_base *);
   virtual bool use_archetype () const {return false;}
   virtual void set_name (path_conv &pc);
   virtual void set_name (const char *s)
@@ -493,18 +492,30 @@ public:
 
   fhandler_base (void *) {}
 
-  virtual void copyto (fhandler_base *x)
+ protected:
+  void _copy_from_reset_helper ()
   {
-    x->pc.free_strings ();
-    *reinterpret_cast<fhandler_base *> (x) = *this;
-    x->reset (this);
+    ra.rabuf = NULL;
+    ra.ralen = 0;
+    ra.raixget = 0;
+    ra.raixput = 0;
+    ra.rabuflen = 0;
+    _refcnt = 0;
+  }
+
+ public:
+  virtual void copy_from (fhandler_base *x)
+  {
+    pc.free_strings ();
+    *this = *reinterpret_cast<fhandler_base *> (x);
+    _copy_from_reset_helper ();
   }
 
   virtual fhandler_base *clone (cygheap_types malloc_type = HEAP_FHANDLER)
   {
     void *ptr = (void *) ccalloc (malloc_type, 1, sizeof (fhandler_base));
     fhandler_base *fh = new (ptr) fhandler_base (ptr);
-    copyto (fh);
+    fh->copy_from (this);
     return fh;
   }
 };
@@ -752,18 +763,18 @@ class fhandler_socket_inet: public fhandler_socket_wsock
   /* from here on: CLONING */
   fhandler_socket_inet (void *) {}
 
-  void copyto (fhandler_base *x)
+  void copy_from (fhandler_base *x)
   {
-    x->pc.free_strings ();
-    *reinterpret_cast<fhandler_socket_inet *> (x) = *this;
-    x->reset (this);
+    pc.free_strings ();
+    *this = *reinterpret_cast<fhandler_socket_inet *> (x);
+    _copy_from_reset_helper ();
   }
 
   fhandler_socket_inet *clone (cygheap_types malloc_type = HEAP_FHANDLER)
   {
     void *ptr = (void *) ccalloc (malloc_type, 1, sizeof (fhandler_socket_inet));
     fhandler_socket_inet *fh = new (ptr) fhandler_socket_inet (ptr);
-    copyto (fh);
+    fh->copy_from (this);
     return fh;
   }
 };
@@ -850,18 +861,18 @@ class fhandler_socket_local: public fhandler_socket_wsock
   /* from here on: CLONING */
   fhandler_socket_local (void *) {}
 
-  void copyto (fhandler_base *x)
+  void copy_from (fhandler_base *x)
   {
-    x->pc.free_strings ();
-    *reinterpret_cast<fhandler_socket_local *> (x) = *this;
-    x->reset (this);
+    pc.free_strings ();
+    *this = *reinterpret_cast<fhandler_socket_local *> (x);
+    _copy_from_reset_helper ();
   }
 
   fhandler_socket_local *clone (cygheap_types malloc_type = HEAP_FHANDLER)
   {
     void *ptr = (void *) ccalloc (malloc_type, 1, sizeof (fhandler_socket_local));
     fhandler_socket_local *fh = new (ptr) fhandler_socket_local (ptr);
-    copyto (fh);
+    fh->copy_from (this);
     return fh;
   }
 };
@@ -1137,18 +1148,18 @@ class fhandler_socket_unix : public fhandler_socket
   /* from here on: CLONING */
   fhandler_socket_unix (void *) {}
 
-  void copyto (fhandler_base *x)
+  void copy_from (fhandler_base *x)
   {
-    x->pc.free_strings ();
-    *reinterpret_cast<fhandler_socket_unix *> (x) = *this;
-    x->reset (this);
+    pc.free_strings ();
+    *this = *reinterpret_cast<fhandler_socket_unix *> (x);
+    _copy_from_reset_helper ();
   }
 
   fhandler_socket_unix *clone (cygheap_types malloc_type = HEAP_FHANDLER)
   {
     void *ptr = (void *) ccalloc (malloc_type, 1, sizeof (fhandler_socket_unix));
     fhandler_socket_unix *fh = new (ptr) fhandler_socket_unix (ptr);
-    copyto (fh);
+    fh->copy_from (this);
     return fh;
   }
 };
@@ -1204,19 +1215,19 @@ public:
       cfree (atomic_write_buf);
   }
 
-  virtual void copyto (fhandler_base *x)
+  virtual void copy_from (fhandler_base *x)
   {
-    x->pc.free_strings ();
-    *reinterpret_cast<fhandler_base_overlapped *> (x) = *this;
-    reinterpret_cast<fhandler_base_overlapped *> (x)->atomic_write_buf = NULL;
-    x->reset (this);
+    pc.free_strings ();
+    *this = *reinterpret_cast<fhandler_base_overlapped *> (x);
+    atomic_write_buf = NULL;
+    _copy_from_reset_helper ();
   }
 
   virtual fhandler_base_overlapped *clone (cygheap_types malloc_type = HEAP_FHANDLER)
   {
     void *ptr = (void *) ccalloc (malloc_type, 1, sizeof (fhandler_base_overlapped));
     fhandler_base_overlapped *fh = new (ptr) fhandler_base_overlapped (ptr);
-    copyto (fh);
+    fh->copy_from (this);
     return fh;
   }
 
@@ -1253,19 +1264,19 @@ public:
 		       const char *, DWORD, int64_t *unique_id = NULL);
   fhandler_pipe (void *) {}
 
-  void copyto (fhandler_base *x)
+  void copy_from (fhandler_base *x)
   {
-    x->pc.free_strings ();
-    *reinterpret_cast<fhandler_pipe *> (x) = *this;
-    reinterpret_cast<fhandler_pipe *> (x)->atomic_write_buf = NULL;
-    x->reset (this);
+    pc.free_strings ();
+    *this = *reinterpret_cast<fhandler_pipe *> (x);
+    atomic_write_buf = NULL;
+    _copy_from_reset_helper ();
   }
 
   fhandler_pipe *clone (cygheap_types malloc_type = HEAP_FHANDLER)
   {
     void *ptr = (void *) ccalloc (malloc_type, 1, sizeof (fhandler_pipe));
     fhandler_pipe *fh = new (ptr) fhandler_pipe (ptr);
-    copyto (fh);
+    fh->copy_from (this);
     return fh;
   }
 };
@@ -1506,18 +1517,18 @@ public:
 
   fhandler_fifo (void *) {}
 
-  void copyto (fhandler_base *x)
+  void copy_from (fhandler_base *x)
   {
-    x->pc.free_strings ();
-    *reinterpret_cast<fhandler_fifo *> (x) = *this;
-    x->reset (this);
+    pc.free_strings ();
+    *this = *reinterpret_cast<fhandler_fifo *> (x);
+    _copy_from_reset_helper ();
   }
 
   fhandler_fifo *clone (cygheap_types malloc_type = HEAP_FHANDLER)
   {
     void *ptr = (void *) ccalloc (malloc_type, 1, sizeof (fhandler_fifo));
     fhandler_fifo *fhf = new (ptr) fhandler_fifo (ptr);
-    copyto (fhf);
+    fhf->copy_from (this);
     fhf->pipe_name_buf = NULL;
     return fhf;
   }
@@ -1558,18 +1569,18 @@ class fhandler_dev_raw: public fhandler_base
 
   fhandler_dev_raw (void *) {}
 
-  void copyto (fhandler_base *x)
+  void copy_from (fhandler_base *x)
   {
-    x->pc.free_strings ();
-    *reinterpret_cast<fhandler_dev_raw *> (x) = *this;
-    x->reset (this);
+    pc.free_strings ();
+    *this = *reinterpret_cast<fhandler_dev_raw *> (x);
+    _copy_from_reset_helper ();
   }
 
   fhandler_dev_raw *clone (cygheap_types malloc_type = HEAP_FHANDLER)
   {
     void *ptr = (void *) ccalloc (malloc_type, 1, sizeof (fhandler_dev_raw));
     fhandler_dev_raw *fh = new (ptr) fhandler_dev_raw (ptr);
-    copyto (fh);
+    fh->copy_from (this);
     return fh;
   }
 };
@@ -1617,18 +1628,18 @@ class fhandler_dev_floppy: public fhandler_dev_raw
 
   fhandler_dev_floppy (void *) {}
 
-  void copyto (fhandler_base *x)
+  void copy_from (fhandler_base *x)
   {
-    x->pc.free_strings ();
-    *reinterpret_cast<fhandler_dev_floppy *> (x) = *this;
-    x->reset (this);
+    pc.free_strings ();
+    *this = *reinterpret_cast<fhandler_dev_floppy *> (x);
+    _copy_from_reset_helper ();
   }
 
   fhandler_dev_floppy *clone (cygheap_types malloc_type = HEAP_FHANDLER)
   {
     void *ptr = (void *) ccalloc (malloc_type, 1, sizeof (fhandler_dev_floppy));
     fhandler_dev_floppy *fh = new (ptr) fhandler_dev_floppy (ptr);
-    copyto (fh);
+    fh->copy_from (this);
     return fh;
   }
 };
@@ -1665,18 +1676,18 @@ class fhandler_dev_tape: public fhandler_dev_raw
 
   fhandler_dev_tape (void *) {}
 
-  void copyto (fhandler_base *x)
+  void copy_from (fhandler_base *x)
   {
-    x->pc.free_strings ();
-    *reinterpret_cast<fhandler_dev_tape *> (x) = *this;
-    x->reset (this);
+    pc.free_strings ();
+    *this = *reinterpret_cast<fhandler_dev_tape *> (x);
+    _copy_from_reset_helper ();
   }
 
   fhandler_dev_tape *clone (cygheap_types malloc_type = HEAP_FHANDLER)
   {
     void *ptr = (void *) ccalloc (malloc_type, 1, sizeof (fhandler_dev_tape));
     fhandler_dev_tape *fh = new (ptr) fhandler_dev_tape (ptr);
-    copyto (fh);
+    fh->copy_from (this);
     return fh;
   }
 };
@@ -1738,18 +1749,18 @@ class fhandler_disk_file: public fhandler_base
   fhandler_disk_file (void *) {}
   dev_t get_dev () { return pc.fs_serial_number (); }
 
-  void copyto (fhandler_base *x)
+  void copy_from (fhandler_base *x)
   {
-    x->pc.free_strings ();
-    *reinterpret_cast<fhandler_disk_file *> (x) = *this;
-    x->reset (this);
+    pc.free_strings ();
+    *this = *reinterpret_cast<fhandler_disk_file *> (x);
+    _copy_from_reset_helper ();
   }
 
   fhandler_disk_file *clone (cygheap_types malloc_type = HEAP_FHANDLER)
   {
     void *ptr = (void *) ccalloc (malloc_type, 1, sizeof (fhandler_disk_file));
     fhandler_disk_file *fh = new (ptr) fhandler_disk_file (ptr);
-    copyto (fh);
+    fh->copy_from (this);
     return fh;
   }
 };
@@ -1774,18 +1785,18 @@ public:
   dev_t get_dev () { return dir_exists ? pc.fs_serial_number ()
 				       : get_device (); }
 
-  void copyto (fhandler_base *x)
+  void copy_from (fhandler_base *x)
   {
-    x->pc.free_strings ();
-    *reinterpret_cast<fhandler_dev *> (x) = *this;
-    x->reset (this);
+    pc.free_strings ();
+    *this = *reinterpret_cast<fhandler_dev *> (x);
+    _copy_from_reset_helper ();
   }
 
   fhandler_dev *clone (cygheap_types malloc_type = HEAP_FHANDLER)
   {
     void *ptr = (void *) ccalloc (malloc_type, 1, sizeof (fhandler_dev));
     fhandler_dev *fh = new (ptr) fhandler_dev (ptr);
-    copyto (fh);
+    fh->copy_from (this);
     return fh;
   }
 };
@@ -1805,18 +1816,18 @@ class fhandler_cygdrive: public fhandler_disk_file
   fhandler_cygdrive (void *) {}
   dev_t get_dev () { return get_device (); }
 
-  void copyto (fhandler_base *x)
+  void copy_from (fhandler_base *x)
   {
-    x->pc.free_strings ();
-    *reinterpret_cast<fhandler_cygdrive *> (x) = *this;
-    x->reset (this);
+    pc.free_strings ();
+    *this = *reinterpret_cast<fhandler_cygdrive *> (x);
+    _copy_from_reset_helper ();
   }
 
   fhandler_cygdrive *clone (cygheap_types malloc_type = HEAP_FHANDLER)
   {
     void *ptr = (void *) ccalloc (malloc_type, 1, sizeof (fhandler_cygdrive));
     fhandler_cygdrive *fh = new (ptr) fhandler_cygdrive (ptr);
-    copyto (fh);
+    fh->copy_from (this);
     return fh;
   }
 };
@@ -1864,18 +1875,18 @@ class fhandler_serial: public fhandler_base
 
   fhandler_serial (void *) {}
 
-  void copyto (fhandler_base *x)
+  void copy_from (fhandler_base *x)
   {
-    x->pc.free_strings ();
-    *reinterpret_cast<fhandler_serial *> (x) = *this;
-    x->reset (this);
+    pc.free_strings ();
+    *this = *reinterpret_cast<fhandler_serial *> (x);
+    _copy_from_reset_helper ();
   }
 
   fhandler_serial *clone (cygheap_types malloc_type = HEAP_FHANDLER)
   {
     void *ptr = (void *) ccalloc (malloc_type, 1, sizeof (fhandler_serial));
     fhandler_serial *fh = new (ptr) fhandler_serial (ptr);
-    copyto (fh);
+    fh->copy_from (this);
     return fh;
   }
 };
@@ -1934,18 +1945,18 @@ class fhandler_termios: public fhandler_base
 
   fhandler_termios (void *) {}
 
-  virtual void copyto (fhandler_base *x)
+  virtual void copy_from (fhandler_base *x)
   {
-    x->pc.free_strings ();
-    *reinterpret_cast<fhandler_termios *> (x) = *this;
-    x->reset (this);
+    pc.free_strings ();
+    *this = *reinterpret_cast<fhandler_termios *> (x);
+    _copy_from_reset_helper ();
   }
 
   virtual fhandler_termios *clone (cygheap_types malloc_type = HEAP_FHANDLER)
   {
     void *ptr = (void *) ccalloc (malloc_type, 1, sizeof (fhandler_termios));
     fhandler_termios *fh = new (ptr) fhandler_termios (ptr);
-    copyto (fh);
+    fh->copy_from (this);
     return fh;
   }
 };
@@ -2194,18 +2205,18 @@ private:
 
   fhandler_console (void *) {}
 
-  void copyto (fhandler_base *x)
+  void copy_from (fhandler_base *x)
   {
-    x->pc.free_strings ();
-    *reinterpret_cast<fhandler_console *> (x) = *this;
-    x->reset (this);
+    pc.free_strings ();
+    *this = *reinterpret_cast<fhandler_console *> (x);
+    _copy_from_reset_helper ();
   }
 
   fhandler_console *clone (cygheap_types malloc_type = HEAP_FHANDLER)
   {
     void *ptr = (void *) ccalloc (malloc_type, 1, sizeof (fhandler_console));
     fhandler_console *fh = new (ptr) fhandler_console (ptr);
-    copyto (fh);
+    fh->copy_from (this);
     return fh;
   }
   input_states process_input_message ();
@@ -2267,18 +2278,18 @@ class fhandler_pty_common: public fhandler_termios
 
   fhandler_pty_common (void *) {}
 
-  virtual void copyto (fhandler_base *x)
+  virtual void copy_from (fhandler_base *x)
   {
-    x->pc.free_strings ();
-    *reinterpret_cast<fhandler_pty_common *> (x) = *this;
-    x->reset (this);
+    pc.free_strings ();
+    *this = *reinterpret_cast<fhandler_pty_common *> (x);
+    _copy_from_reset_helper ();
   }
 
   virtual fhandler_pty_common *clone (cygheap_types malloc_type = HEAP_FHANDLER)
   {
     void *ptr = (void *) ccalloc (malloc_type, 1, sizeof (fhandler_pty_common));
     fhandler_pty_common *fh = new (ptr) fhandler_pty_common (ptr);
-    copyto (fh);
+    fh->copy_from (this);
     return fh;
   }
 
@@ -2348,18 +2359,18 @@ class fhandler_pty_slave: public fhandler_pty_common
 
   fhandler_pty_slave (void *) {}
 
-  void copyto (fhandler_base *x)
+  void copy_from (fhandler_base *x)
   {
-    x->pc.free_strings ();
-    *reinterpret_cast<fhandler_pty_slave *> (x) = *this;
-    x->reset (this);
+    pc.free_strings ();
+    *this = *reinterpret_cast<fhandler_pty_slave *> (x);
+    _copy_from_reset_helper ();
   }
 
   fhandler_pty_slave *clone (cygheap_types malloc_type = HEAP_FHANDLER)
   {
     void *ptr = (void *) ccalloc (malloc_type, 1, sizeof (fhandler_pty_slave));
     fhandler_pty_slave *fh = new (ptr) fhandler_pty_slave (ptr);
-    copyto (fh);
+    fh->copy_from (this);
     return fh;
   }
   bool setup_pseudoconsole (bool nopcon);
@@ -2444,18 +2455,18 @@ public:
 
   fhandler_pty_master (void *) {}
 
-  void copyto (fhandler_base *x)
+  void copy_from (fhandler_base *x)
   {
-    x->pc.free_strings ();
-    *reinterpret_cast<fhandler_pty_master *> (x) = *this;
-    x->reset (this);
+    pc.free_strings ();
+    *this = *reinterpret_cast<fhandler_pty_master *> (x);
+    _copy_from_reset_helper ();
   }
 
   fhandler_pty_master *clone (cygheap_types malloc_type = HEAP_FHANDLER)
   {
     void *ptr = (void *) ccalloc (malloc_type, 1, sizeof (fhandler_pty_master));
     fhandler_pty_master *fh = new (ptr) fhandler_pty_master (ptr);
-    copyto (fh);
+    fh->copy_from (this);
     return fh;
   }
   bool to_be_read_from_pcon (void);
@@ -2474,18 +2485,18 @@ class fhandler_dev_null: public fhandler_base
 
   fhandler_dev_null (void *) {}
 
-  void copyto (fhandler_base *x)
+  void copy_from (fhandler_base *x)
   {
-    x->pc.free_strings ();
-    *reinterpret_cast<fhandler_dev_null *> (x) = *this;
-    x->reset (this);
+    pc.free_strings ();
+    *this = *reinterpret_cast<fhandler_dev_null *> (x);
+    _copy_from_reset_helper ();
   }
 
   fhandler_dev_null *clone (cygheap_types malloc_type = HEAP_FHANDLER)
   {
     void *ptr = (void *) ccalloc (malloc_type, 1, sizeof (fhandler_dev_null));
     fhandler_dev_null *fh = new (ptr) fhandler_dev_null (ptr);
-    copyto (fh);
+    fh->copy_from (this);
     return fh;
   }
 
@@ -2510,18 +2521,18 @@ class fhandler_dev_zero: public fhandler_base
 
   fhandler_dev_zero (void *) {}
 
-  void copyto (fhandler_base *x)
+  void copy_from (fhandler_base *x)
   {
-    x->pc.free_strings ();
-    *reinterpret_cast<fhandler_dev_zero *> (x) = *this;
-    x->reset (this);
+    pc.free_strings ();
+    *this = *reinterpret_cast<fhandler_dev_zero *> (x);
+    _copy_from_reset_helper ();
   }
 
   fhandler_dev_zero *clone (cygheap_types malloc_type = HEAP_FHANDLER)
   {
     void *ptr = (void *) ccalloc (malloc_type, 1, sizeof (fhandler_dev_zero));
     fhandler_dev_zero *fh = new (ptr) fhandler_dev_zero (ptr);
-    copyto (fh);
+    fh->copy_from (this);
     return fh;
   }
 };
@@ -2542,18 +2553,18 @@ class fhandler_dev_random: public fhandler_base
   fhandler_dev_random () : fhandler_base () {}
   fhandler_dev_random (void *) {}
 
-  void copyto (fhandler_base *x)
+  void copy_from (fhandler_base *x)
   {
-    x->pc.free_strings ();
-    *reinterpret_cast<fhandler_dev_random *> (x) = *this;
-    x->reset (this);
+    pc.free_strings ();
+    *this = *reinterpret_cast<fhandler_dev_random *> (x);
+    _copy_from_reset_helper ();
   }
 
   fhandler_dev_random *clone (cygheap_types malloc_type = HEAP_FHANDLER)
   {
     void *ptr = (void *) ccalloc (malloc_type, 1, sizeof (fhandler_dev_random));
     fhandler_dev_random *fh = new (ptr) fhandler_dev_random (ptr);
-    copyto (fh);
+    fh->copy_from (this);
     return fh;
   }
 };
@@ -2580,18 +2591,18 @@ class fhandler_dev_clipboard: public fhandler_base
 
   fhandler_dev_clipboard (void *) {}
 
-  void copyto (fhandler_base *x)
+  void copy_from (fhandler_base *x)
   {
-    x->pc.free_strings ();
-    *reinterpret_cast<fhandler_dev_clipboard *> (x) = *this;
-    x->reset (this);
+    pc.free_strings ();
+    *this = *reinterpret_cast<fhandler_dev_clipboard *> (x);
+    _copy_from_reset_helper ();
   }
 
   fhandler_dev_clipboard *clone (cygheap_types malloc_type = HEAP_FHANDLER)
   {
     void *ptr = (void *) ccalloc (malloc_type, 1, sizeof (fhandler_dev_clipboard));
     fhandler_dev_clipboard *fh = new (ptr) fhandler_dev_clipboard (ptr);
-    copyto (fh);
+    fh->copy_from (this);
     return fh;
   }
 };
@@ -2618,18 +2629,18 @@ class fhandler_windows: public fhandler_base
 
   fhandler_windows (void *) {}
 
-  void copyto (fhandler_base *x)
+  void copy_from (fhandler_base *x)
   {
-    x->pc.free_strings ();
-    *reinterpret_cast<fhandler_windows *> (x) = *this;
-    x->reset (this);
+    pc.free_strings ();
+    *this = *reinterpret_cast<fhandler_windows *> (x);
+    _copy_from_reset_helper ();
   }
 
   fhandler_windows *clone (cygheap_types malloc_type = HEAP_FHANDLER)
   {
     void *ptr = (void *) ccalloc (malloc_type, 1, sizeof (fhandler_windows));
     fhandler_windows *fh = new (ptr) fhandler_windows (ptr);
-    copyto (fh);
+    fh->copy_from (this);
     return fh;
   }
 };
@@ -2672,18 +2683,18 @@ class fhandler_dev_dsp: public fhandler_base
 
   fhandler_dev_dsp (void *) {}
 
-  void copyto (fhandler_base *x)
+  void copy_from (fhandler_base *x)
   {
-    x->pc.free_strings ();
-    *reinterpret_cast<fhandler_dev_dsp *> (x) = *this;
-    x->reset (this);
+    pc.free_strings ();
+    *this = *reinterpret_cast<fhandler_dev_dsp *> (x);
+    _copy_from_reset_helper ();
   }
 
   fhandler_dev_dsp *clone (cygheap_types malloc_type = HEAP_FHANDLER)
   {
     void *ptr = (void *) ccalloc (malloc_type, 1, sizeof (fhandler_dev_dsp));
     fhandler_dev_dsp *fh = new (ptr) fhandler_dev_dsp (ptr);
-    copyto (fh);
+    fh->copy_from (this);
     return fh;
   }
 };
@@ -2723,18 +2734,18 @@ class fhandler_virtual : public fhandler_base
 
   fhandler_virtual (void *) {}
 
-  virtual void copyto (fhandler_base *x)
+  virtual void copy_from (fhandler_base *x)
   {
-    x->pc.free_strings ();
-    *reinterpret_cast<fhandler_virtual *> (x) = *this;
-    x->reset (this);
+    pc.free_strings ();
+    *this = *reinterpret_cast<fhandler_virtual *> (x);
+    _copy_from_reset_helper ();
   }
 
   virtual fhandler_virtual *clone (cygheap_types malloc_type = HEAP_FHANDLER)
   {
     void *ptr = (void *) ccalloc (malloc_type, 1, sizeof (fhandler_virtual));
     fhandler_virtual *fh = new (ptr) fhandler_virtual (ptr);
-    copyto (fh);
+    fh->copy_from (this);
     return fh;
   }
 };
@@ -2755,18 +2766,18 @@ class fhandler_proc: public fhandler_virtual
 
   fhandler_proc (void *) {}
 
-  virtual void copyto (fhandler_base *x)
+  virtual void copy_from (fhandler_base *x)
   {
-    x->pc.free_strings ();
-    *reinterpret_cast<fhandler_proc *> (x) = *this;
-    x->reset (this);
+    pc.free_strings ();
+    *this = *reinterpret_cast<fhandler_proc *> (x);
+    _copy_from_reset_helper ();
   }
 
   virtual fhandler_proc *clone (cygheap_types malloc_type = HEAP_FHANDLER)
   {
     void *ptr = (void *) ccalloc (malloc_type, 1, sizeof (fhandler_proc));
     fhandler_proc *fh = new (ptr) fhandler_proc (ptr);
-    copyto (fh);
+    fh->copy_from (this);
     return fh;
   }
 };
@@ -2791,18 +2802,18 @@ class fhandler_procsys: public fhandler_virtual
 
   fhandler_procsys (void *) {}
 
-  void copyto (fhandler_base *x)
+  void copy_from (fhandler_base *x)
   {
-    x->pc.free_strings ();
-    *reinterpret_cast<fhandler_procsys *> (x) = *this;
-    x->reset (this);
+    pc.free_strings ();
+    *this = *reinterpret_cast<fhandler_procsys *> (x);
+    _copy_from_reset_helper ();
   }
 
   fhandler_procsys *clone (cygheap_types malloc_type = HEAP_FHANDLER)
   {
     void *ptr = (void *) ccalloc (malloc_type, 1, sizeof (fhandler_procsys));
     fhandler_procsys *fh = new (ptr) fhandler_procsys (ptr);
-    copyto (fh);
+    fh->copy_from (this);
     return fh;
   }
 };
@@ -2820,18 +2831,18 @@ class fhandler_procsysvipc: public fhandler_proc
 
   fhandler_procsysvipc (void *) {}
 
-  void copyto (fhandler_base *x)
+  void copy_from (fhandler_base *x)
   {
-    x->pc.free_strings ();
-    *reinterpret_cast<fhandler_procsysvipc *> (x) = *this;
-    x->reset (this);
+    pc.free_strings ();
+    *this = *reinterpret_cast<fhandler_procsysvipc *> (x);
+    _copy_from_reset_helper ();
   }
 
   fhandler_procsysvipc *clone (cygheap_types malloc_type = HEAP_FHANDLER)
   {
     void *ptr = (void *) ccalloc (malloc_type, 1, sizeof (fhandler_procsysvipc));
     fhandler_procsysvipc *fh = new (ptr) fhandler_procsysvipc (ptr);
-    copyto (fh);
+    fh->copy_from (this);
     return fh;
   }
 };
@@ -2851,18 +2862,18 @@ class fhandler_netdrive: public fhandler_virtual
 
   fhandler_netdrive (void *) {}
 
-  void copyto (fhandler_base *x)
+  void copy_from (fhandler_base *x)
   {
-    x->pc.free_strings ();
-    *reinterpret_cast<fhandler_netdrive *> (x) = *this;
-    x->reset (this);
+    pc.free_strings ();
+    *this = *reinterpret_cast<fhandler_netdrive *> (x);
+    _copy_from_reset_helper ();
   }
 
   fhandler_netdrive *clone (cygheap_types malloc_type = HEAP_FHANDLER)
   {
     void *ptr = (void *) ccalloc (malloc_type, 1, sizeof (fhandler_netdrive));
     fhandler_netdrive *fh = new (ptr) fhandler_netdrive (ptr);
-    copyto (fh);
+    fh->copy_from (this);
     return fh;
   }
 };
@@ -2892,18 +2903,18 @@ class fhandler_registry: public fhandler_proc
 
   fhandler_registry (void *) {}
 
-  void copyto (fhandler_base *x)
+  void copy_from (fhandler_base *x)
   {
-    x->pc.free_strings ();
-    *reinterpret_cast<fhandler_registry *> (x) = *this;
-    x->reset (this);
+    pc.free_strings ();
+    *this = *reinterpret_cast<fhandler_registry *> (x);
+    _copy_from_reset_helper ();
   }
 
   fhandler_registry *clone (cygheap_types malloc_type = HEAP_FHANDLER)
   {
     void *ptr = (void *) ccalloc (malloc_type, 1, sizeof (fhandler_registry));
     fhandler_registry *fh = new (ptr) fhandler_registry (ptr);
-    copyto (fh);
+    fh->copy_from (this);
     return fh;
   }
 };
@@ -2926,18 +2937,18 @@ class fhandler_process: public fhandler_proc
 
   fhandler_process (void *) {}
 
-  void copyto (fhandler_base *x)
+  void copy_from (fhandler_base *x)
   {
-    x->pc.free_strings ();
-    *reinterpret_cast<fhandler_process *> (x) = *this;
-    x->reset (this);
+    pc.free_strings ();
+    *this = *reinterpret_cast<fhandler_process *> (x);
+    _copy_from_reset_helper ();
   }
 
   fhandler_process *clone (cygheap_types malloc_type = HEAP_FHANDLER)
   {
     void *ptr = (void *) ccalloc (malloc_type, 1, sizeof (fhandler_process));
     fhandler_process *fh = new (ptr) fhandler_process (ptr);
-    copyto (fh);
+    fh->copy_from (this);
     return fh;
   }
 };
@@ -2954,18 +2965,18 @@ class fhandler_process_fd : public fhandler_process
   int __reg2 fstat (struct stat *buf);
   virtual int __reg2 link (const char *);
 
-  void copyto (fhandler_base *x)
+  void copy_from (fhandler_base *x)
   {
-    x->pc.free_strings ();
-    *reinterpret_cast<fhandler_process_fd *> (x) = *this;
-    x->reset (this);
+    pc.free_strings ();
+    *this = *reinterpret_cast<fhandler_process_fd *> (x);
+    _copy_from_reset_helper ();
   }
 
   fhandler_process_fd *clone (cygheap_types malloc_type = HEAP_FHANDLER)
   {
     void *ptr = (void *) ccalloc (malloc_type, 1, sizeof (fhandler_process_fd));
     fhandler_process_fd *fh = new (ptr) fhandler_process_fd (ptr);
-    copyto (fh);
+    fh->copy_from (this);
     return fh;
   }
 };
@@ -2982,18 +2993,18 @@ class fhandler_procnet: public fhandler_proc
   int __reg2 fstat (struct stat *buf);
   bool fill_filebuf ();
 
-  void copyto (fhandler_base *x)
+  void copy_from (fhandler_base *x)
   {
-    x->pc.free_strings ();
-    *reinterpret_cast<fhandler_procnet *> (x) = *this;
-    x->reset (this);
+    pc.free_strings ();
+    *this = *reinterpret_cast<fhandler_procnet *> (x);
+    _copy_from_reset_helper ();
   }
 
   fhandler_procnet *clone (cygheap_types malloc_type = HEAP_FHANDLER)
   {
     void *ptr = (void *) ccalloc (malloc_type, 1, sizeof (fhandler_procnet));
     fhandler_procnet *fh = new (ptr) fhandler_procnet (ptr);
-    copyto (fh);
+    fh->copy_from (this);
     return fh;
   }
 };
@@ -3022,18 +3033,18 @@ class fhandler_signalfd : public fhandler_base
   select_record *select_write (select_stuff *);
   select_record *select_except (select_stuff *);
 
-  void copyto (fhandler_base *x)
+  void copy_from (fhandler_base *x)
   {
-    x->pc.free_strings ();
-    *reinterpret_cast<fhandler_signalfd *> (x) = *this;
-    x->reset (this);
+    pc.free_strings ();
+    *this = *reinterpret_cast<fhandler_signalfd *> (x);
+    _copy_from_reset_helper ();
   }
 
   fhandler_signalfd *clone (cygheap_types malloc_type = HEAP_FHANDLER)
   {
     void *ptr = (void *) ccalloc (malloc_type, 1, sizeof (fhandler_signalfd));
     fhandler_signalfd *fh = new (ptr) fhandler_signalfd (ptr);
-    copyto (fh);
+    fh->copy_from (this);
     return fh;
   }
 };
@@ -3072,18 +3083,18 @@ class fhandler_timerfd : public fhandler_base
   select_record *select_write (select_stuff *);
   select_record *select_except (select_stuff *);
 
-  void copyto (fhandler_base *x)
+  void copy_from (fhandler_base *x)
   {
-    x->pc.free_strings ();
-    *reinterpret_cast<fhandler_timerfd *> (x) = *this;
-    x->reset (this);
+    pc.free_strings ();
+    *this = *reinterpret_cast<fhandler_timerfd *> (x);
+    _copy_from_reset_helper ();
   }
 
   fhandler_timerfd *clone (cygheap_types malloc_type = HEAP_FHANDLER)
   {
     void *ptr = (void *) ccalloc (malloc_type, 1, sizeof (fhandler_timerfd));
     fhandler_timerfd *fh = new (ptr) fhandler_timerfd (ptr);
-    copyto (fh);
+    fh->copy_from (this);
     return fh;
   }
 };

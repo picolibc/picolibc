@@ -40,17 +40,6 @@ struct __cygwin_perfile *perfile_table;
 HANDLE NO_COPY fhandler_base_overlapped::asio_done;
 LONG NO_COPY fhandler_base_overlapped::asio_close_counter;
 
-void
-fhandler_base::reset (const fhandler_base *from)
-{
-  ra.rabuf = NULL;
-  ra.ralen = 0;
-  ra.raixget = 0;
-  ra.raixput = 0;
-  ra.rabuflen = 0;
-  _refcnt = 0;
-}
-
 int
 fhandler_base::puts_readahead (const char *s, size_t len)
 {
@@ -466,7 +455,7 @@ fhandler_base::open_with_arch (int flags, mode_t mode)
     {
       if (!archetype->get_handle ())
 	{
-	  copyto (archetype);
+	  archetype->copy_from (this);
 	  archetype_usecount (1);
 	  archetype->archetype = NULL;
 	  usecount = 0;
@@ -483,7 +472,7 @@ fhandler_base::open_with_arch (int flags, mode_t mode)
 	      strcpy (name, get_name ());
 	    }
 	  fhandler_base *arch = archetype;
-	  archetype->copyto (this);
+	  copy_from (archetype);
 	  if (name)
 	    set_name (name);
 	  archetype = arch;
