@@ -98,7 +98,7 @@ fhandler_pipe::open (int flags, mode_t mode)
 	    continue;
 	  cfd->copyto (this);
 	  set_handle (NULL);
-	  pc.reset_conv_handle ();
+	  pc.close_conv_handle ();
 	  if (!cfd->dup (this, flags))
 	    return 1;
 	  return 0;
