@@ -105,9 +105,10 @@ public:
   }
   inline void dup (const path_conv_handle &pch)
   {
-    if (!DuplicateHandle (GetCurrentProcess (), pch.handle (),
-			  GetCurrentProcess (), &hdl,
-			  0, TRUE, DUPLICATE_SAME_ACCESS))
+    if (pch.handle ()
+	&& !DuplicateHandle (GetCurrentProcess (), pch.handle (),
+			     GetCurrentProcess (), &hdl,
+			     0, TRUE, DUPLICATE_SAME_ACCESS))
       hdl = NULL;
   }
   inline HANDLE handle () const { return hdl; }
