@@ -20,6 +20,7 @@ details. */
 #define INPUT_AVAILABLE_EVENT	"cygtty.input.avail"
 #define OUTPUT_MUTEX		"cygtty.output.mutex"
 #define INPUT_MUTEX		"cygtty.input.mutex"
+#define PCON_MUTEX		"cygtty.pcon.mutex"
 #define TTY_SLAVE_ALIVE		"cygtty.slave_alive"
 #define TTY_SLAVE_READING	"cygtty.slave_reading"
 
@@ -72,7 +73,7 @@ public:
   dev_t getntty () const {return ntty;}
   _minor_t get_minor () const {return device::minor (ntty);}
   pid_t getpgid () const {return pgid;}
-  void setpgid (int pid) {pgid = pid;}
+  void setpgid (int pid);
   int getsid () const {return sid;}
   void setsid (pid_t tsid) {sid = tsid;}
   void kill_pgrp (int);
@@ -89,6 +90,13 @@ class tty: public tty_min
 public:
   pid_t master_pid;	/* PID of tty master process */
 
+  /* Transfer direction for fhandler_pty_slave::transfer_input() */
+  enum xfer_dir
+  {
+    to_cyg,
+    to_nat
+  };
+
 private:
   HANDLE _from_master;
   HANDLE _from_master_cyg;
@@ -98,6 +106,7 @@ private:
   HANDLE _to_slave_cyg;
   bool pcon_activated;
   bool pcon_start;
+  pid_t pcon_start_pid;
   bool switch_to_pcon_in;
   pid_t pcon_pid;
   UINT term_code_page;
@@ -114,6 +123,8 @@ private:
   UINT previous_code_page;
   UINT previous_output_code_page;
   bool master_is_running_as_service;
+  bool req_xfer_input;
+  xfer_dir pcon_input_state;
 
 public:
   HANDLE from_master () const { return _from_master; }
@@ -148,9 +159,12 @@ public:
   static void __stdcall create_master (int);
   static void __stdcall init_session ();
   void wait_pcon_fwd (bool init = true);
+  bool pcon_input_state_eq (xfer_dir x) { return pcon_input_state == x; }
+  bool pcon_fg (pid_t pgid);
   friend class fhandler_pty_common;
   friend class fhandler_pty_master;
   friend class fhandler_pty_slave;
+  friend class tty_min;
 };
 
 class tty_list

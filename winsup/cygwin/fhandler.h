@@ -2255,13 +2255,13 @@ class fhandler_pty_common: public fhandler_termios
  public:
   fhandler_pty_common ()
     : fhandler_termios (),
-    output_mutex (NULL), input_mutex (NULL),
+    output_mutex (NULL), input_mutex (NULL), pcon_mutex (NULL),
     input_available_event (NULL)
   {
     pc.file_attributes (FILE_ATTRIBUTE_NORMAL);
   }
   static const unsigned pipesize = 128 * 1024;
-  HANDLE output_mutex, input_mutex;
+  HANDLE output_mutex, input_mutex, pcon_mutex;
   HANDLE input_available_event;
 
   bool use_archetype () const {return true;}
@@ -2317,13 +2317,6 @@ class fhandler_pty_slave: public fhandler_pty_common
   void fch_close_handles ();
 
  public:
-  /* Transfer direction for transfer_input() */
-  enum xfer_dir
-  {
-    to_nat,
-    to_cyg
-  };
-
   /* Constructor */
   fhandler_pty_slave (int);
 
@@ -2382,8 +2375,8 @@ class fhandler_pty_slave: public fhandler_pty_common
   void setup_locale (void);
   tty *get_ttyp () { return (tty *) tc (); } /* Override as public */
   void create_invisible_console (void);
-  static void transfer_input (xfer_dir dir, HANDLE from, tty *ttyp,
-			      _minor_t unit, HANDLE input_available_event);
+  static void transfer_input (tty::xfer_dir dir, HANDLE from, tty *ttyp,
+			      HANDLE input_available_event);
   HANDLE get_input_available_event (void) { return input_available_event; }
   bool pcon_activated (void) { return get_ttyp ()->pcon_activated; }
 };

@@ -241,6 +241,7 @@ tty::init ()
   term_code_page = 0;
   pcon_last_time = 0;
   pcon_start = false;
+  pcon_start_pid = 0;
   pcon_cap_checked = false;
   has_csi6n = false;
   need_invisible_console = false;
@@ -248,6 +249,8 @@ tty::init ()
   previous_code_page = 0;
   previous_output_code_page = 0;
   master_is_running_as_service = false;
+  req_xfer_input = false;
+  pcon_input_state = to_cyg;
 }
 
 HANDLE
@@ -294,6 +297,77 @@ tty_min::ttyname ()
 }
 
 void
+tty_min::setpgid (int pid)
+{
+  fhandler_pty_slave *ptys = NULL;
+  cygheap_fdenum cfd (false);
+  while (cfd.next () >= 0 && ptys == NULL)
+    if (cfd->get_device () == getntty ())
+      ptys = (fhandler_pty_slave *) (fhandler_base *) cfd;
+
+  if (ptys)
+    {
+      tty *ttyp = ptys->get_ttyp ();
+      WaitForSingleObject (ptys->pcon_mutex, INFINITE);
+      bool was_pcon_fg = ttyp->pcon_fg (pgid);
+      bool pcon_fg = ttyp->pcon_fg (pid);
+      if (!was_pcon_fg && pcon_fg && ttyp->switch_to_pcon_in
+	  && ttyp->pcon_input_state_eq (tty::to_cyg))
+	{
+	WaitForSingleObject (ptys->input_mutex, INFINITE);
+	fhandler_pty_slave::transfer_input (tty::to_nat,
+					    ptys->get_handle_cyg (), ttyp,
+					    ptys->get_input_available_event ());
+	ReleaseMutex (ptys->input_mutex);
+	}
+      else if (was_pcon_fg && !pcon_fg && ttyp->switch_to_pcon_in
+	       && ttyp->pcon_input_state_eq (tty::to_nat))
+	{
+	  bool attach_restore = false;
+	  DWORD pcon_winpid = 0;
+	  if (ttyp->pcon_pid)
+	    {
+	      pinfo p (ttyp->pcon_pid);
+	      if (p)
+		pcon_winpid = p->exec_dwProcessId ?: p->dwProcessId;
+	    }
+	  HANDLE from = ptys->get_handle ();
+	  if (ttyp->pcon_activated && pcon_winpid
+	      && !ptys->get_console_process_id (pcon_winpid, true))
+	    {
+	      HANDLE pcon_owner =
+		OpenProcess (PROCESS_DUP_HANDLE, FALSE, pcon_winpid);
+	      DuplicateHandle (pcon_owner, ttyp->h_pcon_in,
+			       GetCurrentProcess (), &from,
+			       0, TRUE, DUPLICATE_SAME_ACCESS);
+	      CloseHandle (pcon_owner);
+	      FreeConsole ();
+	      AttachConsole (pcon_winpid);
+	      attach_restore = true;
+	    }
+	  WaitForSingleObject (ptys->input_mutex, INFINITE);
+	  fhandler_pty_slave::transfer_input (tty::to_cyg, from, ttyp,
+				  ptys->get_input_available_event ());
+	  ReleaseMutex (ptys->input_mutex);
+	  if (attach_restore)
+	    {
+	      FreeConsole ();
+	      pinfo p (myself->ppid);
+	      if (p)
+		{
+		  if (!AttachConsole (p->dwProcessId))
+		    AttachConsole (ATTACH_PARENT_PROCESS);
+		}
+	      else
+		AttachConsole (ATTACH_PARENT_PROCESS);
+	    }
+	}
+      ReleaseMutex (ptys->pcon_mutex);
+    }
+  pgid = pid;
+}
+
+void
 tty::wait_pcon_fwd (bool init)
 {
   /* The forwarding in pseudo console sometimes stops for
@@ -311,4 +385,19 @@ tty::wait_pcon_fwd (bool init)
       int tw = time_to_wait - (GetTickCount () - pcon_last_time);
       cygwait (tw);
     }
+}
+
+bool
+tty::pcon_fg (pid_t pgid)
+{
+  /* Check if the terminal pgid matches with the pgid of the
+     non-cygwin process. */
+  winpids pids ((DWORD) 0);
+  for (unsigned i = 0; i < pids.npids; i++)
+    {
+      _pinfo *p = pids[i];
+      if (p->ctty == ntty && p->pgid == pgid && p->exec_dwProcessId)
+	return true;
+    }
+  return false;
 }
