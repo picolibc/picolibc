@@ -5225,3 +5225,22 @@ pipe2 (int filedes[2], int mode)
   syscall_printf ("%R = pipe2([%d, %d], %y)", res, read, write, mode);
   return res;
 }
+
+extern "C" FILE *
+tmpfile (void)
+{
+  char *dir = getenv ("TMPDIR");
+  if (!dir)
+    dir = P_tmpdir;
+  int fd = open (dir, O_RDWR | O_BINARY | O_TMPFILE, S_IRUSR | S_IWUSR);
+  if (fd < 0)
+    return NULL;
+  FILE *fp = fdopen (fd, "wb+");
+  int e = errno;
+  if (!fp)
+    close (fd); // ..will remove tmp file
+  set_errno (e);
+  return fp;
+}
+
+EXPORT_ALIAS (tmpfile, tmpfile64)

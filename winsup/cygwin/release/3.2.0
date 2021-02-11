@@ -19,6 +19,10 @@ What changed:
 
 - A few FAQ updates.
 
+- Have tmpfile(3) make use of Win32 FILE_ATTRIBUTE_TEMPORARY via open(2)
+  flag O_TMPFILE.
+  Addresses: https://cygwin.com/pipermail/cygwin/2021-January/247304.html
+
 
 Bug Fixes
 ---------
