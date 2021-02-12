@@ -5243,4 +5243,6 @@ tmpfile (void)
   return fp;
 }
 
+#ifdef __i386__
 EXPORT_ALIAS (tmpfile, tmpfile64)
+#endif
