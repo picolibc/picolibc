@@ -251,6 +251,7 @@ tty::init ()
   master_is_running_as_service = false;
   req_xfer_input = false;
   pcon_input_state = to_cyg;
+  last_sig = 0;
 }
 
 HANDLE

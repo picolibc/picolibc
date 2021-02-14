@@ -48,6 +48,7 @@ public:
   fh_devices ntty;
   ULONGLONG last_ctrl_c;	/* tick count of last ctrl-c */
   bool is_console;
+  int last_sig;
 
   IMPLEMENT_STATUS_FLAG (bool, initialized)
   IMPLEMENT_STATUS_FLAG (bool, rstcons)

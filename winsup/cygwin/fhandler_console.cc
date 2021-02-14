@@ -586,12 +586,11 @@ wait_retry:
 	case input_ok: /* input ready */
 	  break;
 	case input_signalled: /* signalled */
-	  release_input_mutex ();
-	  /* The signal will be handled by cygwait() above. */
-	  continue;
 	case input_winch:
 	  release_input_mutex ();
-	  continue;
+	  if (global_sigs[get_ttyp ()->last_sig].sa_flags & SA_RESTART)
+	    continue;
+	  goto sig_exit;
 	default:
 	  /* Should not come here */
 	  release_input_mutex ();

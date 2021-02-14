@@ -133,6 +133,7 @@ tty_min::kill_pgrp (int sig)
   siginfo_t si = {0};
   si.si_signo = sig;
   si.si_code = SI_KERNEL;
+  last_sig = sig;
 
   for (unsigned i = 0; i < pids.npids; i++)
     {
