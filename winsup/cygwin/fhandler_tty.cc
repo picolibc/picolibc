@@ -1181,7 +1181,7 @@ fhandler_pty_slave::mask_switch_to_pcon_in (bool mask, bool xfer)
   /* In GDB, transfer input based on setpgid() does not work because
      GDB may not set terminal process group properly. Therefore,
      transfer input here if isHybrid is set. */
-  if (get_ttyp ()->switch_to_pcon_in && !!masked != mask && xfer && isHybrid)
+  if (isHybrid && !!masked != mask && xfer)
     {
       if (mask && get_ttyp ()->pcon_input_state_eq (tty::to_nat))
 	{
@@ -1471,7 +1471,8 @@ wait_retry:
 out:
   termios_printf ("%d = read(%p, %lu)", totalread, ptr, len);
   len = (size_t) totalread;
-  mask_switch_to_pcon_in (false, totalread > 0 && ptr0[totalread - 1] == '\n');
+  bool saw_eol = totalread > 0 && strchr ("\r\n", ptr0[totalread -1]);
+  mask_switch_to_pcon_in (false, saw_eol);
 }
 
 int
