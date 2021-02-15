@@ -64,7 +64,7 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     atoi
     atol
     atoll
-    basename			(see chapter "Implementation Notes")
+    basename			(see <xref linkend="std-notes">chapter "Implementation Notes"</xref>)
     bind
     bsearch
     btowc
@@ -126,8 +126,8 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     clock_getcpuclockid
     clock_getres
     clock_gettime
-    clock_nanosleep		(see chapter "Implementation Notes")
-    clock_settime		(see chapter "Implementation Notes")
+    clock_nanosleep		(see <xref linkend="std-notes">chapter "Implementation Notes"</xref>)
+    clock_settime		(see <xref linkend="std-notes">chapter "Implementation Notes"</xref>)
     clog
     clogf
     clogl
@@ -242,7 +242,7 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     fchown
     fchownat
     fclose
-    fcntl			(see chapter "Implementation Notes")
+    fcntl			(see <xref linkend="std-notes">chapter "Implementation Notes"</xref>)
     fdatasync
     fdim
     fdimf
@@ -292,7 +292,7 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     fopen
     fork
     fpathconf
-    fpclassify			(see chapter "Implementation Notes")
+    fpclassify			(see <xref linkend="std-notes">chapter "Implementation Notes"</xref>)
     fprintf
     fputc
     fputs
@@ -347,7 +347,7 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     getgroups
     gethostid
     gethostname
-    getitimer			(see chapter "Implementation Notes")
+    getitimer			(see <xref linkend="std-notes">chapter "Implementation Notes"</xref>)
     getline
     getlogin
     getlogin_r
@@ -367,7 +367,7 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     getpwnam_r
     getpwuid
     getpwuid_r
-    getrlimit
+    getrlimit			(see <xref linkend="std-notes">chapter "Implementation Notes"</xref>)
     getrusage
     gets
     getservbyname
@@ -428,26 +428,26 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     iscntrl_l
     isdigit
     isdigit_l
-    isfinite			(see chapter "Implementation Notes")
+    isfinite			(see <xref linkend="std-notes">chapter "Implementation Notes"</xref>)
     isgraph
     isgraph_l
-    isgreater			(see chapter "Implementation Notes")
-    isgreaterequal		(see chapter "Implementation Notes")
-    isinf			(see chapter "Implementation Notes")
+    isgreater			(see <xref linkend="std-notes">chapter "Implementation Notes"</xref>)
+    isgreaterequal		(see <xref linkend="std-notes">chapter "Implementation Notes"</xref>)
+    isinf			(see <xref linkend="std-notes">chapter "Implementation Notes"</xref>)
     isless
-    islessequal			(see chapter "Implementation Notes")
-    islessgreater		(see chapter "Implementation Notes")
+    islessequal			(see <xref linkend="std-notes">chapter "Implementation Notes"</xref>)
+    islessgreater		(see <xref linkend="std-notes">chapter "Implementation Notes"</xref>)
     islower
     islower_l
-    isnan			(see chapter "Implementation Notes")
-    isnormal			(see chapter "Implementation Notes")
+    isnan			(see <xref linkend="std-notes">chapter "Implementation Notes"</xref>)
+    isnormal			(see <xref linkend="std-notes">chapter "Implementation Notes"</xref>)
     isprint
     isprint_l
     ispunct
     ispunct_l
     isspace
     isspace_l
-    isunordered			(see chapter "Implementation Notes")
+    isunordered			(see <xref linkend="std-notes">chapter "Implementation Notes"</xref>)
     isupper
     isupper_l
     iswalnum
@@ -511,7 +511,7 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     localeconv
     localtime
     localtime_r
-    lockf			(see chapter "Implementation Notes")
+    lockf			(see <xref linkend="std-notes">chapter "Implementation Notes"</xref>)
     log
     log10
     log10f
@@ -579,10 +579,10 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     mq_timedsend
     mq_unlink
     mrand48
-    msgctl			(see chapter "Implementation Notes")
-    msgget			(see chapter "Implementation Notes")
-    msgrcv			(see chapter "Implementation Notes")
-    msgsnd			(see chapter "Implementation Notes")
+    msgctl			(see <xref linkend="std-notes">chapter "Implementation Notes"</xref>)
+    msgget			(see <xref linkend="std-notes">chapter "Implementation Notes"</xref>)
+    msgrcv			(see <xref linkend="std-notes">chapter "Implementation Notes"</xref>)
+    msgsnd			(see <xref linkend="std-notes">chapter "Implementation Notes"</xref>)
     msync
     munlock
     munmap
@@ -834,9 +834,9 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     sem_trywait
     sem_unlink
     sem_wait
-    semctl			(see chapter "Implementation Notes")
-    semget			(see chapter "Implementation Notes")
-    semop			(see chapter "Implementation Notes")
+    semctl			(see <xref linkend="std-notes">chapter "Implementation Notes"</xref>)
+    semget			(see <xref linkend="std-notes">chapter "Implementation Notes"</xref>)
+    semop			(see <xref linkend="std-notes">chapter "Implementation Notes"</xref>)
     send
     sendmsg
     sendto
@@ -847,7 +847,7 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     setgid
     setgrent
     sethostent
-    setitimer			(see chapter "Implementation Notes")
+    setitimer			(see <xref linkend="std-notes">chapter "Implementation Notes"</xref>)
     setjmp
     setkey			(available in external "crypt" library)
     setlocale
@@ -859,7 +859,7 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     setpwent
     setregid
     setreuid
-    setrlimit
+    setrlimit			(see <xref linkend="std-notes">chapter "Implementation Notes"</xref>)
     setservent
     setsid
     setsockopt
@@ -869,10 +869,10 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     setvbuf
     shm_open
     shm_unlink
-    shmat			(see chapter "Implementation Notes")
-    shmctl			(see chapter "Implementation Notes")
-    shmdt			(see chapter "Implementation Notes")
-    shmget			(see chapter "Implementation Notes")
+    shmat			(see <xref linkend="std-notes">chapter "Implementation Notes"</xref>)
+    shmctl			(see <xref linkend="std-notes">chapter "Implementation Notes"</xref>)
+    shmdt			(see <xref linkend="std-notes">chapter "Implementation Notes"</xref>)
+    shmget			(see <xref linkend="std-notes">chapter "Implementation Notes"</xref>)
     shutdown
     sigaction
     sigaddset
@@ -886,9 +886,9 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     sigismember
     siglongjmp
     signal
-    signbit			(see chapter "Implementation Notes")
+    signbit			(see <xref linkend="std-notes">chapter "Implementation Notes"</xref>)
     signgam
-    sigpause			(see chapter "Implementation Notes")
+    sigpause			(see <xref linkend="std-notes">chapter "Implementation Notes"</xref>)
     sigpending
     sigprocmask
     sigqueue
@@ -937,7 +937,7 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     strdup
     strerror
     strerror_l
-    strerror_r			(see chapter "Implementation Notes")
+    strerror_r			(see <xref linkend="std-notes">chapter "Implementation Notes"</xref>)
     strfmon
     strfmon_l
     strftime
@@ -1001,7 +1001,7 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     tgammaf
     tgammal
     time
-    timer_create		(see chapter "Implementation Notes")
+    timer_create		(see <xref linkend="std-notes">chapter "Implementation Notes"</xref>)
     timer_delete
     timer_getoverrun
     timer_gettime
@@ -1162,7 +1162,7 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     finitef
     finitel
     fiprintf
-    flock			(see chapter "Implementation Notes")
+    flock			(see <xref linkend="std-notes">chapter "Implementation Notes"</xref>)
     fls
     flsl
     flsll
@@ -1212,7 +1212,7 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     madvise
     mkstemps
     openpty
-    qsort_r			(see chapter "Implementation Notes")
+    qsort_r			(see <xref linkend="std-notes">chapter "Implementation Notes"</xref>)
     rcmd
     rcmd_af
     reallocarray
@@ -1257,7 +1257,7 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     valloc
     verr
     verrx
-    vhangup			(see chapter "Implementation Notes")
+    vhangup			(see <xref linkend="std-notes">chapter "Implementation Notes"</xref>)
     vsyslog
     vwarn
     vwarnx
@@ -1291,14 +1291,14 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     asnprintf
     asprintf
     asprintf_r
-    basename			(see chapter "Implementation Notes")
+    basename			(see <xref linkend="std-notes">chapter "Implementation Notes"</xref>)
     canonicalize_file_name
     clearenv
     clog10
     clog10f
     clog10l
     crypt_r			(available in external "crypt" library)
-    dladdr			(see chapter "Implementation Notes")
+    dladdr			(see <xref linkend="std-notes">chapter "Implementation Notes"</xref>)
     dremf
     dup3
     envz_add
@@ -1370,8 +1370,8 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     ptsname_r
     putwc_unlocked
     putwchar_unlocked
-    renameat2			(see chapter "Implementation Notes")
-    qsort_r			(see chapter "Implementation Notes")
+    renameat2			(see <xref linkend="std-notes">chapter "Implementation Notes"</xref>)
+    qsort_r			(see <xref linkend="std-notes">chapter "Implementation Notes"</xref>)
     quotactl
     rawmemchr
     removexattr
@@ -1545,8 +1545,8 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     bcmp			(POSIX.1-2001, SUSv3)
     bcopy			(SUSv3)
     bzero			(SUSv3)
-    chroot			(SUSv2) (see chapter "Implementation Notes")
-    clock_setres		(QNX, VxWorks) (see chapter "Implementation Notes")
+    chroot			(SUSv2)		(see <xref linkend="std-notes">chapter "Implementation Notes"</xref>)
+    clock_setres		(QNX, VxWorks)	(see <xref linkend="std-notes">chapter "Implementation Notes"</xref>)
     cuserid			(POSIX.1-1988, SUSv2)
     ecvt			(SUSv3)
     endutent			(XPG2)
@@ -1592,7 +1592,7 @@ also IEEE Std 1003.1-2008 (POSIX.1-2008).</para>
     ualarm			(SUSv3)
     usleep			(SUSv3)
     utmpname			(XPG2)
-    vfork			(SUSv3) (see chapter "Implementation Notes")
+    vfork			(SUSv3)		(see <xref linkend="std-notes">chapter "Implementation Notes"</xref>)
 </screen>
 
 </sect1>
@@ -1726,6 +1726,19 @@ flavors, depending on whether _GNU_SOURCE is defined when compiling.</para>
 
 <para><function>dladdr</function> always sets the Dl_info members dli_sname and
 dli_saddr to NULL, indicating no symbol matching addr could be found.</para>
+
+<para><function>getrlimit</function> resources RLIMIT_AS, RLIMIT_CPU,
+RLIMIT_FSIZE, RLIMIT_DATA always return rlim_cur and rlim_max as RLIM_INFINITY,
+so <function>setrlimit</function> returns -1 and sets EINVAL if they are
+lowered, or returns 0 if unchanged.
+<function>getrlimit</function> resource RLIMIT_NOFILE always returns rlim_cur
+and rlim_max as OPEN_MAX; <function>setrlimit</function> returns 0 sets EINVAL
+if rlim_cur > rlim_max, does not change the value if it is RLIM_INFINITY,
+otherwise returns the result from <function>setdtablesize</function>.
+<function>getrlimit</function>/<function>setrlimit</function> resources
+RLIMIT_CORE and RLIMIT_STACK return the current values and set the requested
+values.
+All other resource arguments return -1 and set EINVAL.</para>
 
 </sect1>
 
