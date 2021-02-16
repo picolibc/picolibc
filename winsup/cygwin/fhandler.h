@@ -2105,6 +2105,7 @@ public:
     HANDLE input_mutex;
     HANDLE output_mutex;
   };
+  HANDLE thread_sync_event;
 private:
   static const unsigned MAX_WRITE_CHARS;
   static console_state *shared_console_info;
@@ -2167,7 +2168,7 @@ private:
 
   void __reg3 read (void *ptr, size_t& len);
   ssize_t __stdcall write (const void *ptr, size_t len);
-  void doecho (const void *str, DWORD len) { (void) write (str, len); }
+  void doecho (const void *str, DWORD len);
   int close ();
   static bool exists () {return !!GetConsoleCP ();}
 
@@ -2246,6 +2247,8 @@ private:
 
   static void request_xterm_mode_input (bool, const handle_set_t *p);
   static void request_xterm_mode_output (bool, const handle_set_t *p);
+
+  static void cons_master_thread (handle_set_t *p, tty *ttyp);
 
   friend tty_min * tty_list::get_cttyp ();
 };

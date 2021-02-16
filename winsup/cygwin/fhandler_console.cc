@@ -47,6 +47,8 @@ details. */
 		  con.b.srWindow.Top + con.scroll_region.Bottom)
 #define con_is_legacy (shared_console_info && con.is_legacy)
 
+#define CONS_THREAD_SYNC "cygcons.thread_sync"
+
 const unsigned fhandler_console::MAX_WRITE_CHARS = 16384;
 
 fhandler_console::console_state NO_COPY *fhandler_console::shared_console_info;
@@ -168,6 +170,143 @@ console_unit::console_unit (HWND me0):
   n = (_minor_t) ffs (bitmask) - 1;
   if (n < 0)
     api_fatal ("console device allocation failure - too many consoles in use, max consoles is 32");
+}
+
+static DWORD WINAPI
+cons_master_thread (VOID *arg)
+{
+  fhandler_console *fh = (fhandler_console *) arg;
+  tty *ttyp = (tty *) fh->tc ();
+  fhandler_console::handle_set_t handle_set;
+  fh->get_duplicated_handle_set (&handle_set);
+  HANDLE thread_sync_event;
+  DuplicateHandle (GetCurrentProcess (), fh->thread_sync_event,
+		   GetCurrentProcess (), &thread_sync_event,
+		   0, FALSE, DUPLICATE_SAME_ACCESS);
+  SetEvent (thread_sync_event);
+  /* Do not touch class members after here because the class instance
+     may have been destroyed. */
+  fhandler_console::cons_master_thread (&handle_set, ttyp);
+  fhandler_console::close_handle_set (&handle_set);
+  SetEvent (thread_sync_event);
+  CloseHandle (thread_sync_event);
+  return 0;
+}
+
+/* This thread processes signals derived from input messages.
+   Without this thread, those signals can be handled only when
+   the process calls read() or select(). This thread reads input
+   records, processes signals and removes corresponding record.
+   The other input records are kept back for read() or select(). */
+void
+fhandler_console::cons_master_thread (handle_set_t *p, tty *ttyp)
+{
+  DWORD output_stopped_at = 0;
+  while (con.owner == myself->pid)
+    {
+      DWORD total_read, n, i, j;
+      INPUT_RECORD input_rec[INREC_SIZE];
+
+      WaitForSingleObject (p->input_mutex, INFINITE);
+      total_read = 0;
+      switch (cygwait (p->input_handle, (DWORD) 0))
+	{
+	case WAIT_OBJECT_0:
+	  ReadConsoleInputA (p->input_handle,
+			     input_rec, INREC_SIZE, &total_read);
+	  break;
+	case WAIT_TIMEOUT:
+	case WAIT_SIGNALED:
+	case WAIT_CANCELED:
+	  break;
+	default: /* Error */
+	  ReleaseMutex (p->input_mutex);
+	  return;
+	}
+      for (i = 0; i < total_read; i++)
+	{
+	  const char c = input_rec[i].Event.KeyEvent.uChar.AsciiChar;
+	  bool processed = false;
+	  termios &ti = ttyp->ti;
+	  switch (input_rec[i].EventType)
+	    {
+	    case KEY_EVENT:
+	      if (ti.c_lflag & ISIG)
+		{
+		  int sig = 0;
+		  if (CCEQ (ti.c_cc[VINTR], c))
+		    sig = SIGINT;
+		  else if (CCEQ (ti.c_cc[VQUIT], c))
+		    sig = SIGQUIT;
+		  else if (CCEQ (ti.c_cc[VSUSP], c))
+		    sig = SIGTSTP;
+		  if (sig && input_rec[i].Event.KeyEvent.bKeyDown)
+		    {
+		      ttyp->kill_pgrp (sig);
+		      ttyp->output_stopped = false;
+		      /* Discard type ahead input */
+		      goto skip_writeback;
+		    }
+		}
+	      if (ti.c_iflag & IXON)
+		{
+		  if (CCEQ (ti.c_cc[VSTOP], c))
+		    {
+		      if (!ttyp->output_stopped
+			  && input_rec[i].Event.KeyEvent.bKeyDown)
+			{
+			  ttyp->output_stopped = true;
+			  output_stopped_at = i;
+			}
+		      processed = true;
+		    }
+		  else if (CCEQ (ti.c_cc[VSTART], c))
+		    {
+		restart_output:
+		      if (input_rec[i].Event.KeyEvent.bKeyDown)
+			ttyp->output_stopped = false;
+		      processed = true;
+		    }
+		  else if ((ti.c_iflag & IXANY) && ttyp->output_stopped
+			   && c && i >= output_stopped_at)
+		    goto restart_output;
+		}
+	      break;
+	    case WINDOW_BUFFER_SIZE_EVENT:
+	      SHORT y = con.dwWinSize.Y;
+	      SHORT x = con.dwWinSize.X;
+	      con.fillin (p->output_handle);
+	      if (y != con.dwWinSize.Y || x != con.dwWinSize.X)
+		{
+		  con.scroll_region.Top = 0;
+		  con.scroll_region.Bottom = -1;
+		  if (wincap.has_con_24bit_colors () && !con_is_legacy)
+		    { /* Fix tab position */
+		      /* Re-setting ENABLE_VIRTUAL_TERMINAL_PROCESSING
+			 fixes the tab position. */
+		      request_xterm_mode_output (false, p);
+		      request_xterm_mode_output (true, p);
+		    }
+		  ttyp->kill_pgrp (SIGWINCH);
+		}
+	      processed = true;
+	      break;
+	    }
+	  if (processed)
+	    { /* Remove corresponding record. */
+	      for (j = i; j < total_read - 1; j++)
+		input_rec[j] = input_rec[j + 1];
+	      total_read--;
+	      i--;
+	    }
+	}
+      if (total_read)
+	/* Write back input records other than interrupt. */
+	WriteConsoleInput (p->input_handle, input_rec, total_read, &n);
+skip_writeback:
+      ReleaseMutex (p->input_mutex);
+      cygwait (40);
+    }
 }
 
 bool
@@ -1194,6 +1333,15 @@ fhandler_console::open (int flags, mode_t)
   debug_printf ("opened conin$ %p, conout$ %p", get_handle (),
 		get_output_handle ());
 
+  if (myself->pid == con.owner)
+    {
+      char name[MAX_PATH];
+      shared_name (name, CONS_THREAD_SYNC, get_minor ());
+      thread_sync_event = CreateEvent(NULL, FALSE, FALSE, name);
+      new cygthread (::cons_master_thread, this, "consm");
+      WaitForSingleObject (thread_sync_event, INFINITE);
+      CloseHandle (thread_sync_event);
+    }
   return 1;
 }
 
@@ -1229,6 +1377,16 @@ fhandler_console::close ()
     }
 
   release_output_mutex ();
+
+  if (con.owner == myself->pid)
+    {
+      char name[MAX_PATH];
+      shared_name (name, CONS_THREAD_SYNC, get_minor ());
+      thread_sync_event = OpenEvent (MAXIMUM_ALLOWED, FALSE, name);
+      con.owner = 0;
+      WaitForSingleObject (thread_sync_event, INFINITE);
+      CloseHandle (thread_sync_event);
+    }
 
   CloseHandle (input_mutex);
   input_mutex = NULL;
@@ -1539,7 +1697,7 @@ fhandler_console::tcgetattr (struct termios *t)
 }
 
 fhandler_console::fhandler_console (fh_devices unit) :
-  fhandler_termios (), input_ready (false),
+  fhandler_termios (), input_ready (false), thread_sync_event (NULL),
   input_mutex (NULL), output_mutex (NULL)
 {
   if (unit > 0)
@@ -3022,6 +3180,14 @@ fhandler_console::write (const void *vsrc, size_t len)
   if (bg <= bg_eof)
     return (ssize_t) bg;
 
+  if (get_ttyp ()->output_stopped && is_nonblocking ())
+    {
+      set_errno (EAGAIN);
+      return -1;
+    }
+  while (get_ttyp ()->output_stopped)
+    cygwait (10);
+
   acquire_attach_mutex (INFINITE);
   push_process_state process_state (PID_TTYOU);
   acquire_output_mutex (INFINITE);
@@ -3350,6 +3516,15 @@ fhandler_console::write (const void *vsrc, size_t len)
 
   release_attach_mutex ();
   return len;
+}
+
+void
+fhandler_console::doecho (const void *str, DWORD len)
+{
+  bool stopped = get_ttyp ()->output_stopped;
+  get_ttyp ()->output_stopped = false;
+  write (str, len);
+  get_ttyp ()->output_stopped = stopped;
 }
 
 static const struct {
