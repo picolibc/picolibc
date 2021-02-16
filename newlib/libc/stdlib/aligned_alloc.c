@@ -28,6 +28,7 @@
 
 #include <reent.h>
 #include <stdlib.h>
+#include <malloc.h>
 
 void *
 aligned_alloc (size_t align, size_t size)
