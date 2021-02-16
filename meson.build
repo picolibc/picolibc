@@ -477,7 +477,14 @@ alloc_size_code = '''
 void *foobar(size_t) __attribute__((__alloc_size__(1)));
 void *foobar2(size_t, size_t) __attribute__((__alloc_size__(1, 2)));
 '''
-have_alloc_size = meson.get_compiler('c').compiles(alloc_size_code, name : 'attribute __alloc_size__')
+have_alloc_size = meson.get_compiler('c').compiles(alloc_size_code, name : 'attribute __alloc_size__', args : (meson.get_compiler('c').has_argument('-Werror') ? '-Werror' : ''))
+
+# attributes constructor/destructor are a GNU extension - if the compiler doesn't have them, don't test them.
+attr_ctor_dtor_code = '''
+void __attribute__((constructor(101))) ctor (void) {}
+void __attribute__((destructor(101))) dtor (void) {}
+'''
+have_attr_ctor_dtor = meson.get_compiler('c').compiles(attr_ctor_dtor_code, name : 'attributes constructor/destructor', args : (meson.get_compiler('c').has_argument('-Werror') ? '-Werror' : ''))
 
 if enable_multilib
   used_libs = []
