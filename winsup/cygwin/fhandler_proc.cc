@@ -1293,7 +1293,7 @@ format_proc_cpuinfo (void *, char *&destbuf)
 
 /* features scattered in various CPUID levels. */
       /* cpuid 0x80000007 edx */
-      if (maxf >= 0x00000007)
+      if (maxe >= 0x80000007)
 	{
 	  cpuid (&unused, &unused, &unused, &features1, 0x80000007);
 
