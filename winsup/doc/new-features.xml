@@ -20,6 +20,14 @@ thrd_detach, thrd_equal, thrd_exit, thrd_join, thrd_sleep, thrd_yield,
 tss_create, tss_delete, tss_get, tss_set.
 </para></listitem>
 
+<listitem><para>
+In cygwin console, new thread which handles special keys/signals such
+as Ctrl-Z (VSUSP), Ctrl-\ (VQUIT), Ctrl-S (VSTOP), Ctrl-Q (VSTART) and
+SIGWINCH has been introduced. There have been a long standing issue
+that these keys/signals are handled only when app calls read() or
+select(). Now, these work even if app does not call read() or select().
+</para></listitem>
+
 </itemizedlist>
 
 </sect2>
