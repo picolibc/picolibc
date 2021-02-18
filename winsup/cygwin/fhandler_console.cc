@@ -223,6 +223,21 @@ fhandler_console::cons_master_thread (handle_set_t *p, tty *ttyp)
 	  ReleaseMutex (p->input_mutex);
 	  return;
 	}
+      /* If ENABLE_VIRTUAL_TERMINAL_INPUT is not set, changing
+	 window height does not generate WINDOW_BUFFER_SIZE_EVENT.
+	 Therefore, check windows size every time here. */
+      if (!wincap.has_con_24bit_colors () || con_is_legacy)
+	{
+	  SHORT y = con.dwWinSize.Y;
+	  SHORT x = con.dwWinSize.X;
+	  con.fillin (p->output_handle);
+	  if (y != con.dwWinSize.Y || x != con.dwWinSize.X)
+	    {
+	      con.scroll_region.Top = 0;
+	      con.scroll_region.Bottom = -1;
+	      ttyp->kill_pgrp (SIGWINCH);
+	    }
+	}
       for (i = 0; i < total_read; i++)
 	{
 	  const char c = input_rec[i].Event.KeyEvent.uChar.AsciiChar;
