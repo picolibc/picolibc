@@ -332,7 +332,8 @@ fhandler_termios::line_edit (const char *rptr, size_t nread, termios& ti,
 	    goto not_a_sig;
 
 	  termios_printf ("got interrupt %d, sending signal %d", c, sig);
-	  eat_readahead (-1);
+	  if (!(ti.c_lflag & NOFLSH))
+	    eat_readahead (-1);
 	  release_input_mutex_if_necessary ();
 	  tc ()->kill_pgrp (sig);
 	  acquire_input_mutex_if_necessary (INFINITE);
