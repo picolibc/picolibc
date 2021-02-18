@@ -1147,8 +1147,8 @@ static int
 console_startup (select_record *me, select_stuff *stuff)
 {
   fhandler_console *fh = (fhandler_console *) me->fh;
-  if (wincap.has_con_24bit_colors ())
-    fhandler_console::request_xterm_mode_input (true, fh->get_handle_set ());
+  fhandler_console::set_input_mode (tty::cygwin, &((tty *)fh->tc ())->ti,
+				    fh->get_handle_set ());
 
   select_console_info *ci = stuff->device_specific_console;
   if (ci->start)

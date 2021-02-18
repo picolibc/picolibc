@@ -607,6 +607,7 @@ child_info_spawn::worker (const char *prog_arg, const char *const *argv,
 
       fhandler_pty_slave *ptys_primary = NULL;
       fhandler_console *cons_native = NULL;
+      termios *cons_ti = NULL;
       for (int i = 0; i < 3; i ++)
 	{
 	  const int chk_order[] = {1, 0, 2};
@@ -621,16 +622,19 @@ child_info_spawn::worker (const char *prog_arg, const char *const *argv,
 	  else if (fh && fh->get_major () == DEV_CONS_MAJOR)
 	    {
 	      fhandler_console *cons = (fhandler_console *) fh;
-	      if (wincap.has_con_24bit_colors () && !iscygwin ())
+	      if (!iscygwin ())
 		{
 		  if (cons_native == NULL)
-		    cons_native = cons;
+		    {
+		      cons_native = cons;
+		      cons_ti = &((tty *)cons->tc ())->ti;
+		    }
 		  if (fd == 0)
-		    fhandler_console::request_xterm_mode_input (false,
-						cons->get_handle_set ());
+		    fhandler_console::set_input_mode (tty::native,
+					   cons_ti, cons->get_handle_set ());
 		  else if (fd == 1 || fd == 2)
-		    fhandler_console::request_xterm_mode_output (false,
-						 cons->get_handle_set ());
+		    fhandler_console::set_output_mode (tty::native,
+					   cons_ti, cons->get_handle_set ());
 		}
 	    }
 	}
@@ -996,10 +1000,10 @@ child_info_spawn::worker (const char *prog_arg, const char *const *argv,
 	    }
 	  if (cons_native)
 	    {
-	      fhandler_console::request_xterm_mode_output (true,
-							   &cons_handle_set);
-	      fhandler_console::request_xterm_mode_input (true,
-							  &cons_handle_set);
+	      fhandler_console::set_output_mode (tty::cygwin, cons_ti,
+						 &cons_handle_set);
+	      fhandler_console::set_input_mode (tty::cygwin, cons_ti,
+						&cons_handle_set);
 	      fhandler_console::close_handle_set (&cons_handle_set);
 	    }
 	  myself.exit (EXITCODE_NOSET);
@@ -1031,10 +1035,10 @@ child_info_spawn::worker (const char *prog_arg, const char *const *argv,
 	    }
 	  if (cons_native)
 	    {
-	      fhandler_console::request_xterm_mode_output (true,
-							   &cons_handle_set);
-	      fhandler_console::request_xterm_mode_input (true,
-							  &cons_handle_set);
+	      fhandler_console::set_output_mode (tty::cygwin, cons_ti,
+						 &cons_handle_set);
+	      fhandler_console::set_input_mode (tty::cygwin, cons_ti,
+						&cons_handle_set);
 	      fhandler_console::close_handle_set (&cons_handle_set);
 	    }
 	  break;

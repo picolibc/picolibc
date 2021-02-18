@@ -39,7 +39,6 @@ class tty_min
   struct status_flags
   {
     unsigned initialized : 1;	/* Set if tty is initialized */
-    unsigned rstcons     : 1;	/* Set if console needs to be set to "non-cooked" */
   } status;
 
 public:
@@ -51,7 +50,6 @@ public:
   int last_sig;
 
   IMPLEMENT_STATUS_FLAG (bool, initialized)
-  IMPLEMENT_STATUS_FLAG (bool, rstcons)
 
   struct termios ti;
   struct winsize winsize;
@@ -96,6 +94,12 @@ public:
   {
     to_cyg,
     to_nat
+  };
+  enum cons_mode
+  {
+    restore, /* For restoring when exit from cygwin. */
+    cygwin,  /* For cygwin apps */
+    native   /* For native apps executed from cygwin. */
   };
 
 private:

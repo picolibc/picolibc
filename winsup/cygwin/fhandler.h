@@ -2135,11 +2135,9 @@ private:
   const unsigned char *write_normal (unsigned const char*, unsigned const char *);
   void char_command (char);
   bool set_raw_win32_keyboard_mode (bool);
-  int output_tcsetattr (int a, const struct termios *t);
 
 /* Input calls */
   int igncr_enabled ();
-  int input_tcsetattr (int a, const struct termios *t);
   void set_cursor_maybe ();
   static bool create_invisible_console (HWINSTA);
   static bool create_invisible_console_workaround (bool force);
@@ -2196,7 +2194,6 @@ private:
   void fixup_after_exec () {fixup_after_fork_exec (true);}
   void fixup_after_fork (HANDLE) {fixup_after_fork_exec (false);}
   void set_close_on_exec (bool val);
-  void set_input_state ();
   bool send_winch_maybe ();
   void setup ();
   bool set_unit ();
@@ -2245,8 +2242,10 @@ private:
   void get_duplicated_handle_set (handle_set_t *p);
   static void close_handle_set (handle_set_t *p);
 
-  static void request_xterm_mode_input (bool, const handle_set_t *p);
-  static void request_xterm_mode_output (bool, const handle_set_t *p);
+  static void set_input_mode (tty::cons_mode m, const termios *t,
+			      const handle_set_t *p);
+  static void set_output_mode (tty::cons_mode m, const termios *t,
+			       const handle_set_t *p);
 
   static void cons_master_thread (handle_set_t *p, tty *ttyp);
 
