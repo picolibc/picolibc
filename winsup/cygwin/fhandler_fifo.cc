@@ -1495,6 +1495,29 @@ errout:
 }
 
 int __reg2
+fhandler_fifo::fstat (struct stat *buf)
+{
+  if (reader || writer || duplexer)
+    {
+      /* fhandler_fifo::open has been called, and O_PATH is not set.
+	 We don't want to call fhandler_base::fstat.  In the writer
+	 and duplexer cases we have a handle, but it's a pipe handle
+	 rather than a file handle, so it's not suitable for stat.  In
+	 the reader case we don't have a handle, but
+	 fhandler_base::fstat would call fhandler_base::open, which
+	 would modify the flags and status_flags. */
+      fhandler_disk_file fh (pc);
+      fh.get_device () = FH_FS;
+      int res = fh.fstat (buf);
+      buf->st_dev = buf->st_rdev = dev ();
+      buf->st_mode = dev ().mode ();
+      buf->st_size = 0;
+      return res;
+    }
+  return fhandler_base::fstat (buf);
+}
+
+int __reg2
 fhandler_fifo::fstatvfs (struct statvfs *sfs)
 {
   if (get_flags () & O_PATH)

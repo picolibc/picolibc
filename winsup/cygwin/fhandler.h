@@ -1511,6 +1511,7 @@ public:
   ssize_t __reg3 raw_write (const void *ptr, size_t ulen);
   void fixup_after_fork (HANDLE);
   void fixup_after_exec ();
+  int __reg2 fstat (struct stat *buf);
   int __reg2 fstatvfs (struct statvfs *buf);
   select_record *select_read (select_stuff *);
   select_record *select_write (select_stuff *);
