@@ -3261,6 +3261,33 @@ skip_create:
   if (get_ttyp ()->previous_output_code_page)
     SetConsoleOutputCP (get_ttyp ()->previous_output_code_page);
 
+  do
+    {
+      termios &t = get_ttyp ()->ti;
+      DWORD mode;
+      /* Set input mode */
+      GetConsoleMode (hpConIn, &mode);
+      mode &= ~(ENABLE_ECHO_INPUT | ENABLE_LINE_INPUT | ENABLE_PROCESSED_INPUT);
+      if (t.c_lflag & ECHO)
+	mode |= ENABLE_ECHO_INPUT;
+      if (t.c_lflag & ICANON)
+	mode |= ENABLE_LINE_INPUT;
+      if (mode & ENABLE_ECHO_INPUT && !(mode & ENABLE_LINE_INPUT))
+	/* This is illegal, so turn off the echo here, and fake it
+	   when we read the characters */
+	mode &= ~ENABLE_ECHO_INPUT;
+      if ((t.c_lflag & ISIG) && !(t.c_iflag & IGNBRK))
+	mode |= ENABLE_PROCESSED_INPUT;
+      SetConsoleMode (hpConIn, mode);
+      /* Set output mode */
+      GetConsoleMode (hpConOut, &mode);
+      mode &= ~DISABLE_NEWLINE_AUTO_RETURN;
+      if (!(t.c_oflag & OPOST) || !(t.c_oflag & ONLCR))
+	mode |= DISABLE_NEWLINE_AUTO_RETURN;
+      SetConsoleMode (hpConOut, mode);
+    }
+  while (false);
+
   return true;
 
 cleanup_pcon_in:
