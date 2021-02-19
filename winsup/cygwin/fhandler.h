@@ -274,7 +274,8 @@ class fhandler_base
   void reset_to_open_binmode ()
   {
     set_flags ((get_flags () & ~(O_TEXT | O_BINARY))
-	       | ((open_status.wbinary || open_status.rbinary)
+	       | (((open_status.wbinset ? open_status.wbinary : 1)
+		   || (open_status.rbinset ? open_status.rbinary : 1))
 		   ? O_BINARY : O_TEXT));
   }
 
