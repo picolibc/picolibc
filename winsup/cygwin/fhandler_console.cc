@@ -259,6 +259,7 @@ fhandler_console::cons_master_thread (handle_set_t *p, tty *ttyp)
 		    {
 		      ttyp->kill_pgrp (sig);
 		      ttyp->output_stopped = false;
+		      ti.c_lflag &= ~FLUSHO;
 		      /* Discard type ahead input */
 		      goto skip_writeback;
 		    }
@@ -285,6 +286,13 @@ fhandler_console::cons_master_thread (handle_set_t *p, tty *ttyp)
 		  else if ((ti.c_iflag & IXANY) && ttyp->output_stopped
 			   && c && i >= output_stopped_at)
 		    goto restart_output;
+		}
+	      if ((ti.c_lflag & ICANON) && (ti.c_lflag & IEXTEN)
+		  && CCEQ (ti.c_cc[VDISCARD], c))
+		{
+		  if (input_rec[i].Event.KeyEvent.bKeyDown)
+		    ti.c_lflag ^= FLUSHO;
+		  processed = true;
 		}
 	      break;
 	    case WINDOW_BUFFER_SIZE_EVENT:
@@ -3051,6 +3059,9 @@ fhandler_console::write (const void *vsrc, size_t len)
   bg_check_types bg = bg_check (SIGTTOU);
   if (bg <= bg_eof)
     return (ssize_t) bg;
+
+  if (get_ttyp ()->ti.c_lflag & FLUSHO)
+    return len; /* Discard write data */
 
   if (get_ttyp ()->output_stopped && is_nonblocking ())
     {
