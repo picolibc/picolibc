@@ -710,6 +710,11 @@ peek_pipe (select_record *s, bool from_select)
     }
 
 out:
+  if (fh->get_major () == DEV_PTYM_MAJOR)
+    {
+      fhandler_pty_master *fhm = (fhandler_pty_master *) fh;
+      fhm->set_mask_flusho (s->read_ready);
+    }
   h = fh->get_output_handle_cyg ();
   if (s->write_selected && dev != FH_PIPER)
     {

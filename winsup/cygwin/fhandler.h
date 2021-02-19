@@ -2467,6 +2467,7 @@ public:
   bool to_be_read_from_pcon (void);
   void get_master_thread_param (master_thread_param_t *p);
   void get_master_fwd_thread_param (master_fwd_thread_param_t *p);
+  void set_mask_flusho (bool m) { get_ttyp ()->mask_flusho = m; }
 };
 
 class fhandler_dev_null: public fhandler_base

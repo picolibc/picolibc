@@ -130,6 +130,7 @@ private:
   bool master_is_running_as_service;
   bool req_xfer_input;
   xfer_dir pcon_input_state;
+  bool mask_flusho;
 
 public:
   HANDLE from_master () const { return _from_master; }

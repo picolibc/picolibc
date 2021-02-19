@@ -252,6 +252,7 @@ tty::init ()
   req_xfer_input = false;
   pcon_input_state = to_cyg;
   last_sig = 0;
+  mask_flusho = false;
 }
 
 HANDLE

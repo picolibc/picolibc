@@ -612,8 +612,8 @@ fhandler_pty_master::process_slave_output (char *buf, size_t len, int pktmode_on
 	      rc = -1;
 	      goto out;
 	    }
-	  /* DISCARD (FLUSHO) and tcflush can finish here. */
-	  if ((get_ttyp ()->ti.c_lflag & FLUSHO || !buf))
+	  /* tclush can finish here. */
+	  if (!buf)
 	    goto out;
 
 	  if (is_nonblocking ())
@@ -671,8 +671,9 @@ fhandler_pty_master::process_slave_output (char *buf, size_t len, int pktmode_on
 
       termios_printf ("bytes read %u", n);
 
-      if (get_ttyp ()->ti.c_lflag & FLUSHO || !buf)
-	continue;
+      if (!buf || ((get_ttyp ()->ti.c_lflag & FLUSHO)
+		   && !get_ttyp ()->mask_flusho))
+	continue; /* Discard read data */
 
       memcpy (optr, outbuf, n);
       optr += n;
@@ -691,6 +692,8 @@ fhandler_pty_master::process_slave_output (char *buf, size_t len, int pktmode_on
     }
 
 out:
+  if (buf)
+    set_mask_flusho (false);
   termios_printf ("returning %d", rc);
   return rc;
 }
@@ -2036,7 +2039,7 @@ fhandler_pty_master::write (const void *ptr, size_t len)
 {
   ssize_t ret;
   char *p = (char *) ptr;
-  termios ti = tc ()->ti;
+  termios &ti = tc ()->ti;
 
   bg_check_types bg = bg_check (SIGTTOU);
   if (bg <= bg_eof)
@@ -2193,7 +2196,7 @@ fhandler_pty_master::tcflush (int queue)
 
   if (queue == TCIFLUSH || queue == TCIOFLUSH)
     ret = process_slave_output (NULL, OUT_BUFFER_SIZE, 0);
-  else if (queue == TCIFLUSH || queue == TCIOFLUSH)
+  if (queue == TCOFLUSH || queue == TCIOFLUSH)
     {
       /* do nothing for now. */
     }
@@ -2929,6 +2932,8 @@ fhandler_pty_common::process_opost_output (HANDLE h, const void *ptr,
 {
   ssize_t towrite = len;
   BOOL res = TRUE;
+  if (ttyp->ti.c_lflag & FLUSHO)
+    return res; /* Discard write data */
   while (towrite)
     {
       if (!is_echo)
