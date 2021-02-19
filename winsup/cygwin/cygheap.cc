@@ -144,6 +144,19 @@ init_cygheap::init_installation_root ()
     api_fatal ("Can't initialize Cygwin installation root dir.\n"
 	       "GetModuleFileNameW(%p, %p, %u), %E",
 	       cygwin_hmodule, installation_root_buf, PATH_MAX);
+
+  /* We don't care if fetching the final pathname fails, it's non-fatal and
+     the path returned by GetModuleFileNameW is still valid. */
+  HANDLE h;
+  h = CreateFileW (installation_root_buf, GENERIC_READ, FILE_SHARE_VALID_FLAGS,
+		   &sec_none, OPEN_EXISTING, 0, 0);
+  if (h != INVALID_HANDLE_VALUE)
+    {
+      GetFinalPathNameByHandleW (h, installation_root_buf, PATH_MAX,
+				 FILE_NAME_NORMALIZED);
+      CloseHandle (h);
+    }
+
   PWCHAR p = installation_root_buf;
   if (wcsncasecmp (p, L"\\\\", 2))	/* Normal drive letter path */
     {
