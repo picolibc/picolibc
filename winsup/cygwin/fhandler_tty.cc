@@ -1474,8 +1474,11 @@ wait_retry:
 out:
   termios_printf ("%d = read(%p, %lu)", totalread, ptr, len);
   len = (size_t) totalread;
-  bool saw_eol = totalread > 0 && strchr ("\r\n", ptr0[totalread -1]);
-  mask_switch_to_pcon_in (false, saw_eol);
+  if (ptr0)
+    { /* Not tcflush() */
+      bool saw_eol = totalread > 0 && strchr ("\r\n", ptr0[totalread -1]);
+      mask_switch_to_pcon_in (false, saw_eol);
+    }
 }
 
 int
