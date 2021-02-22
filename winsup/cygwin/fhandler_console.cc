@@ -1393,7 +1393,7 @@ fhandler_console::close ()
 
   release_output_mutex ();
 
-  if (con.owner == myself->pid)
+  if (shared_console_info && con.owner == myself->pid)
     {
       char name[MAX_PATH];
       shared_name (name, CONS_THREAD_SYNC, get_minor ());
