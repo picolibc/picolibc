@@ -2354,10 +2354,18 @@ fhandler_socket_unix::fstat (struct stat *buf)
 int __reg2
 fhandler_socket_unix::fstatvfs (struct statvfs *sfs)
 {
-  if (sun_path ()
-      && (sun_path ()->un_len <= (socklen_t) sizeof (sa_family_t)
-	  || sun_path ()->un.sun_path[0] == '\0'))
+  if (!dev ().isfs ())
+    /* fstatvfs called on a socket. */
     return fhandler_socket::fstatvfs (sfs);
+
+  /* statvfs on a socket file or fstatvfs on a socket opened w/ O_PATH. */
+  if (get_flags () & O_PATH)
+    /* We already have a handle. */
+    {
+      HANDLE h = get_handle ();
+      if (h)
+	return fstatvfs_by_handle (h, sfs);
+    }
   fhandler_disk_file fh (pc);
   fh.get_device () = FH_FS;
   return fh.fstatvfs (sfs);

@@ -690,8 +690,11 @@ fhandler_socket_local::fstat (struct stat *buf)
 int __reg2
 fhandler_socket_local::fstatvfs (struct statvfs *sfs)
 {
-  if (get_sun_path () && get_sun_path ()[0] == '\0')
+  if (!dev ().isfs ())
+    /* fstatvfs called on a socket. */
     return fhandler_socket_wsock::fstatvfs (sfs);
+
+  /* statvfs on a socket file or fstatvfs on a socket opened w/ O_PATH. */
   if (get_flags () & O_PATH)
     /* We already have a handle. */
     {
