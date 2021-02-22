@@ -737,8 +737,12 @@ fhandler_socket_local::fchown (uid_t uid, gid_t gid)
 int
 fhandler_socket_local::facl (int cmd, int nentries, aclent_t *aclbufp)
 {
-  if (get_sun_path () && get_sun_path ()[0] == '\0')
+  if (!dev ().isfs ())
+    /* facl called on a socket. */
     return fhandler_socket_wsock::facl (cmd, nentries, aclbufp);
+
+  /* facl on a socket file.  [We won't get here if facl is called on a
+     socket opened w/ O_PATH.] */
   fhandler_disk_file fh (pc);
   return fh.facl (cmd, nentries, aclbufp);
 }
