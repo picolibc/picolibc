@@ -2337,13 +2337,12 @@ fhandler_socket_unix::fcntl (int cmd, intptr_t arg)
 int __reg2
 fhandler_socket_unix::fstat (struct stat *buf)
 {
-  int ret = 0;
-
-  if (sun_path ()
-      && (sun_path ()->un_len <= (socklen_t) sizeof (sa_family_t)
-	  || sun_path ()->un.sun_path[0] == '\0'))
+  if (!dev ().isfs ())
+    /* fstat called on a socket. */
     return fhandler_socket::fstat (buf);
-  ret = fhandler_base::fstat_fs (buf);
+
+  /* stat/lstat on a socket file or fstat on a socket opened w/ O_PATH. */
+  int ret = fhandler_base::fstat_fs (buf);
   if (!ret)
     {
       buf->st_mode = (buf->st_mode & ~S_IFMT) | S_IFSOCK;
