@@ -2374,10 +2374,12 @@ fhandler_socket_unix::fstatvfs (struct statvfs *sfs)
 int
 fhandler_socket_unix::fchmod (mode_t newmode)
 {
-  if (sun_path ()
-      && (sun_path ()->un_len <= (socklen_t) sizeof (sa_family_t)
-	  || sun_path ()->un.sun_path[0] == '\0'))
+  if (!dev ().isfs ())
+    /* fchmod called on a socket. */
     return fhandler_socket::fchmod (newmode);
+
+  /* chmod on a socket file.  [We won't get here if fchmod is called
+     on a socket opened w/ O_PATH.] */
   fhandler_disk_file fh (pc);
   fh.get_device () = FH_FS;
   /* Kludge: Don't allow to remove read bit on socket files for

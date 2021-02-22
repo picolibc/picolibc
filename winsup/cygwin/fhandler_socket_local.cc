@@ -710,8 +710,12 @@ fhandler_socket_local::fstatvfs (struct statvfs *sfs)
 int
 fhandler_socket_local::fchmod (mode_t newmode)
 {
-  if (get_sun_path () && get_sun_path ()[0] == '\0')
+  if (!dev ().isfs ())
+    /* fchmod called on a socket. */
     return fhandler_socket_wsock::fchmod (newmode);
+
+  /* chmod on a socket file.  [We won't get here if fchmod is called
+     on a socket opened w/ O_PATH.] */
   fhandler_disk_file fh (pc);
   fh.get_device () = FH_FS;
   return fh.fchmod (S_IFSOCK | adjust_socket_file_mode (newmode));
