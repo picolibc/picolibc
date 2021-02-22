@@ -2395,10 +2395,12 @@ fhandler_socket_unix::fchmod (mode_t newmode)
 int
 fhandler_socket_unix::fchown (uid_t uid, gid_t gid)
 {
-  if (sun_path ()
-      && (sun_path ()->un_len <= (socklen_t) sizeof (sa_family_t)
-	  || sun_path ()->un.sun_path[0] == '\0'))
+  if (!dev ().isfs ())
+    /* fchown called on a socket. */
     return fhandler_socket::fchown (uid, gid);
+
+  /* chown/lchown on a socket file.  [We won't get here if fchown is
+     called on a socket opened w/ O_PATH.] */
   fhandler_disk_file fh (pc);
   return fh.fchown (uid, gid);
 }
