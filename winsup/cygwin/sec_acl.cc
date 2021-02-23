@@ -1246,6 +1246,11 @@ facl32 (int fd, int cmd, int nentries, aclent_t *aclbufp)
       syscall_printf ("-1 = facl (%d)", fd);
       return -1;
     }
+  if (cfd->get_flags () & O_PATH)
+    {
+      set_errno (EBADF);
+      return -1;
+    }
   int res = cfd->facl (cmd, nentries, aclbufp);
   syscall_printf ("%R = facl(%s) )", res, cfd->get_name ());
   return res;
