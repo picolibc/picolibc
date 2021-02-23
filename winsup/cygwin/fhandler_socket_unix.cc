@@ -1208,6 +1208,11 @@ fhandler_socket_unix::~fhandler_socket_unix ()
 int
 fhandler_socket_unix::dup (fhandler_base *child, int flags)
 {
+  if (get_flags () & O_PATH)
+    /* We're viewing the socket as a disk file, but fhandler_base::dup
+       suffices here. */
+    return fhandler_base::dup (child, flags);
+
   if (fhandler_socket::dup (child, flags))
     {
       __seterrno ();
@@ -1802,8 +1807,22 @@ fhandler_socket_unix::shutdown (int how)
 }
 
 int
+fhandler_socket_unix::open (int flags, mode_t mode)
+{
+  /* We don't support opening sockets unless O_PATH is specified. */
+  if (flags & O_PATH)
+    return open_fs (flags, mode);
+
+  set_errno (EOPNOTSUPP);
+  return 0;
+}
+
+int
 fhandler_socket_unix::close ()
 {
+  if (get_flags () & O_PATH)
+    return fhandler_base::close ();
+
   HANDLE evt = InterlockedExchangePointer (&cwt_termination_evt, NULL);
   HANDLE thr = InterlockedExchangePointer (&connect_wait_thr, NULL);
   if (thr)
@@ -2281,6 +2300,11 @@ fhandler_socket_unix::ioctl (unsigned int cmd, void *p)
 int
 fhandler_socket_unix::fcntl (int cmd, intptr_t arg)
 {
+  if (get_flags () & O_PATH)
+    /* We're viewing the socket as a disk file, but
+       fhandler_base::fcntl suffices here. */
+    return fhandler_base::fcntl (cmd, arg);
+
   int ret = -1;
 
   switch (cmd)

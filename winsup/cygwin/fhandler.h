@@ -1111,6 +1111,7 @@ class fhandler_socket_unix : public fhandler_socket
   int getsockname (struct sockaddr *name, int *namelen);
   int getpeername (struct sockaddr *name, int *namelen);
   int shutdown (int how);
+  int open (int flags, mode_t mode = 0);
   int close ();
   int getpeereid (pid_t *pid, uid_t *euid, gid_t *egid);
   ssize_t recvmsg (struct msghdr *msg, int flags);
