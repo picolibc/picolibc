@@ -199,7 +199,11 @@
 #endif
 
 #ifdef __riscv
+#if defined(__BYTE_ORDER__) && (__BYTE_ORDER__ == __ORDER_BIG_ENDIAN__)
+#define __IEEE_BIG_ENDIAN
+#else
 #define __IEEE_LITTLE_ENDIAN
+#endif
 #ifdef __riscv_flen
 # define _SUPPORTS_ERREXCEPT
 #endif
