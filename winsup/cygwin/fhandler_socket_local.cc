@@ -750,9 +750,14 @@ fhandler_socket_local::facl (int cmd, int nentries, aclent_t *aclbufp)
 int
 fhandler_socket_local::link (const char *newpath)
 {
-  if (get_sun_path () && get_sun_path ()[0] == '\0')
+  if (!dev ().isfs ())
+    /* linkat w/ AT_EMPTY_PATH called on a socket not opened w/ O_PATH. */
     return fhandler_socket_wsock::link (newpath);
+  /* link on a socket file or linkat w/ AT_EMPTY_PATH called on a
+     socket opened w/ O_PATH. */
   fhandler_disk_file fh (pc);
+  if (get_flags () & O_PATH)
+    fh.set_handle (get_handle ());
   return fh.link (newpath);
 }
 

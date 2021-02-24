@@ -2421,11 +2421,14 @@ fhandler_socket_unix::facl (int cmd, int nentries, aclent_t *aclbufp)
 int
 fhandler_socket_unix::link (const char *newpath)
 {
-  if (sun_path ()
-      && (sun_path ()->un_len <= (socklen_t) sizeof (sa_family_t)
-	  || sun_path ()->un.sun_path[0] == '\0'))
+  if (!dev ().isfs ())
+    /* linkat w/ AT_EMPTY_PATH called on a socket not opened w/ O_PATH. */
     return fhandler_socket::link (newpath);
+  /* link on a socket file or linkat w/ AT_EMPTY_PATH called on a
+     socket opened w/ O_PATH. */
   fhandler_disk_file fh (pc);
+  if (get_flags () & O_PATH)
+    fh.set_handle (get_handle ());
   return fh.link (newpath);
 }
 
