@@ -4962,6 +4962,8 @@ linkat (int olddirfd, const char *oldpathname,
 	int flags)
 {
   tmp_pathbuf tp;
+  fhandler_base *fh = NULL;
+
   __try
     {
       if (flags & ~(AT_SYMLINK_FOLLOW | AT_EMPTY_PATH))
@@ -4970,21 +4972,25 @@ linkat (int olddirfd, const char *oldpathname,
 	  __leave;
 	}
       char *oldpath = tp.c_get ();
-      /* AT_EMPTY_PATH with an empty oldpathname is equivalent to
-
-	   linkat(AT_FDCWD, "/proc/self/fd/<olddirfd>", newdirfd,
-		  newname, AT_SYMLINK_FOLLOW);
-
-	 Convert the request accordingly. */
       if ((flags & AT_EMPTY_PATH) && oldpathname && oldpathname[0] == '\0')
 	{
+	  /* Operate directly on olddirfd, which can be anything
+	     except a directory. */
 	  if (olddirfd == AT_FDCWD)
 	    {
 	      set_errno (EPERM);
 	      __leave;
 	    }
-	  __small_sprintf (oldpath, "/proc/%d/fd/%d", myself->pid, olddirfd);
-	  flags = AT_SYMLINK_FOLLOW;
+	  cygheap_fdget cfd (olddirfd);
+	  if (cfd < 0)
+	    __leave;
+	  if (cfd->pc.isdir ())
+	    {
+	      set_errno (EPERM);
+	      __leave;
+	    }
+	  fh = cfd;
+	  flags = 0;		/* In case AT_SYMLINK_FOLLOW was set. */
 	}
       else if (gen_full_path_at (oldpath, olddirfd, oldpathname))
 	__leave;
@@ -5003,6 +5009,8 @@ linkat (int olddirfd, const char *oldpathname,
 	    }
 	  strcpy (oldpath, old_name.get_posix ());
 	}
+      if (fh)
+	return fh->link (newpath);
       return link (oldpath, newpath);
     }
   __except (EFAULT) {}
