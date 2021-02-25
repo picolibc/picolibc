@@ -56,12 +56,16 @@ _start(void)
 	/* Generate a reference to __interrupt_vector so we get one loaded */
 	__asm__(".equ __my_interrupt_vector, __interrupt_vector");
 #ifndef __SOFTFP__
-#define FPSCR_FZ		(1 << 24)
 	/* Enable FPU */
 	*CPACR |= 0xf << 20;
-	while ((*CPACR & (0xf << 20)) != (0xf << 20))
-		;
+	/*
+	 * Wait for the write enabling FPU to reach memory before
+	 * executing the instruction accessing the status register
+	 */
+	__asm__("dsb");
+	__asm__("isb");
 
+	/* Clear FPU status register */
 	__asm__("vmsr fpscr, %0" : : "r" (0));
 #endif
 	__start();
