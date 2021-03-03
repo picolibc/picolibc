@@ -2,4 +2,4 @@
 -D__SIM__
 
 *link_device:
-%{!r:-Tpruelf-sim.x}
+%{!r:--defsym=__IMEM_SIZE=0x40000 --defsym=__DMEM_SIZE=0x4000000 --defsym=__HEAP_SIZE=0x2000000 --defsym=__STACK_SIZE=0x100000}

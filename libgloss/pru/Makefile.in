@@ -64,9 +64,6 @@ RANLIB = @RANLIB@
 OBJDUMP = `t='$(program_transform_name)'; echo objdump | sed -e $$t`
 OBJCOPY = `t='$(program_transform_name)'; echo objcopy | sed -e $$t`
 
-# linker scripts
-SCRIPTS = `ls ${srcdir}/ldscripts/*.x`
-
 # object files needed
 OBJS = \
 	do_global_dtors.o gettimeofday.o \
@@ -101,10 +98,7 @@ LDFLAGS_FOR_TARGET = ${MULTILIB}
 .S.o:
 	$(CC) $(CFLAGS_FOR_TARGET) $(INCLUDES) $(CFLAGS) -c $<
 
-all: ${OUTPUTS} copy_scripts_to_objdir
-
-copy_scripts_to_objdir: $(srcdir)/ldscripts/gen-ld-scripts.sh
-	cp $(SCRIPTS) $(objdir)
+all: ${OUTPUTS}
 
 #
 # here's where we build the library for each target
@@ -130,7 +124,7 @@ distclean maintainer-clean realclean: clean
 	rm -f Makefile config.status $(OUTPUTS)
 
 .PHONY: install info install-info clean-info
-install: $(OUTPUTS) $(srcdir)/ldscripts/gen-ld-scripts.sh
+install: $(OUTPUTS)
 	for outputs in ${OUTPUTS}; do\
 	 ${INSTALL_DATA} $${outputs} ${DESTDIR}${tooldir}/lib${MULTISUBDIR}/$${outputs}; \
 	done
