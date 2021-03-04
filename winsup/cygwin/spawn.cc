@@ -608,6 +608,7 @@ child_info_spawn::worker (const char *prog_arg, const char *const *argv,
       fhandler_pty_slave *ptys_primary = NULL;
       fhandler_console *cons_native = NULL;
       termios *cons_ti = NULL;
+      pid_t cons_owner = 0;
       for (int i = 0; i < 3; i ++)
 	{
 	  const int chk_order[] = {1, 0, 2};
@@ -628,6 +629,7 @@ child_info_spawn::worker (const char *prog_arg, const char *const *argv,
 		    {
 		      cons_native = cons;
 		      cons_ti = &((tty *)cons->tc ())->ti;
+		      cons_owner = cons->get_owner ();
 		    }
 		  if (fd == 0)
 		    fhandler_console::set_input_mode (tty::native,
@@ -1000,9 +1002,11 @@ child_info_spawn::worker (const char *prog_arg, const char *const *argv,
 	    }
 	  if (cons_native)
 	    {
-	      fhandler_console::set_output_mode (tty::cygwin, cons_ti,
+	      tty::cons_mode conmode =
+		cons_owner == myself->pid ? tty::restore : tty::cygwin;
+	      fhandler_console::set_output_mode (conmode, cons_ti,
 						 &cons_handle_set);
-	      fhandler_console::set_input_mode (tty::cygwin, cons_ti,
+	      fhandler_console::set_input_mode (conmode, cons_ti,
 						&cons_handle_set);
 	      fhandler_console::close_handle_set (&cons_handle_set);
 	    }
@@ -1035,9 +1039,11 @@ child_info_spawn::worker (const char *prog_arg, const char *const *argv,
 	    }
 	  if (cons_native)
 	    {
-	      fhandler_console::set_output_mode (tty::cygwin, cons_ti,
+	      tty::cons_mode conmode =
+		cons_owner == myself->pid ? tty::restore : tty::cygwin;
+	      fhandler_console::set_output_mode (conmode, cons_ti,
 						 &cons_handle_set);
-	      fhandler_console::set_input_mode (tty::cygwin, cons_ti,
+	      fhandler_console::set_input_mode (conmode, cons_ti,
 						&cons_handle_set);
 	      fhandler_console::close_handle_set (&cons_handle_set);
 	    }

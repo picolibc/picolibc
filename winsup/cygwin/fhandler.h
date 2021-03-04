@@ -2251,6 +2251,7 @@ private:
 			       const handle_set_t *p);
 
   static void cons_master_thread (handle_set_t *p, tty *ttyp);
+  pid_t get_owner (void) { return shared_console_info->con.owner; }
 
   friend tty_min * tty_list::get_cttyp ();
 };
