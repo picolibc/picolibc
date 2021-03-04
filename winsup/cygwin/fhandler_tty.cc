@@ -1118,15 +1118,20 @@ fhandler_pty_slave::reset_switch_to_pcon (void)
 	    }
 	}
     }
-  if (get_ttyp ()->pcon_pid && get_ttyp ()->pcon_pid != myself->pid
-      && !!pinfo (get_ttyp ()->pcon_pid))
-    /* There is a process which is grabbing pseudo console. */
-    return;
   if (isHybrid)
     return;
+  WaitForSingleObject (pcon_mutex, INFINITE);
+  if (get_ttyp ()->pcon_pid && get_ttyp ()->pcon_pid != myself->pid
+      && !!pinfo (get_ttyp ()->pcon_pid))
+    {
+      /* There is a process which is grabbing pseudo console. */
+      ReleaseMutex (pcon_mutex);
+      return;
+    }
   get_ttyp ()->pcon_pid = 0;
   get_ttyp ()->switch_to_pcon_in = false;
   get_ttyp ()->pcon_activated = false;
+  ReleaseMutex (pcon_mutex);
 }
 
 ssize_t __stdcall
@@ -3538,6 +3543,7 @@ fhandler_pty_slave::term_has_pcon_cap (const WCHAR *env)
     goto maybe_dumb;
 
   /* Check if terminal has CSI6n */
+  WaitForSingleObject (pcon_mutex, INFINITE);
   WaitForSingleObject (input_mutex, INFINITE);
   /* Set pcon_activated and pcon_start so that the response
      will sent to io_handle rather than io_handle_cyg. */
@@ -3573,6 +3579,7 @@ fhandler_pty_slave::term_has_pcon_cap (const WCHAR *env)
   while (len);
   get_ttyp ()->pcon_activated = false;
   get_ttyp ()->pcon_pid = 0;
+  ReleaseMutex (pcon_mutex);
   if (len == 0)
     goto not_has_csi6n;
 
@@ -3588,6 +3595,7 @@ not_has_csi6n:
   get_ttyp ()->pcon_start = false;
   get_ttyp ()->pcon_activated = false;
   ReleaseMutex (input_mutex);
+  ReleaseMutex (pcon_mutex);
 maybe_dumb:
   get_ttyp ()->pcon_cap_checked = true;
   return false;
