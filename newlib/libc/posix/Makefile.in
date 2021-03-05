@@ -81,7 +81,8 @@ am__objects_1 = lib_a-closedir.$(OBJEXT) lib_a-collate.$(OBJEXT) \
 	lib_a-regcomp.$(OBJEXT) lib_a-regerror.$(OBJEXT) \
 	lib_a-regexec.$(OBJEXT) lib_a-regfree.$(OBJEXT) \
 	lib_a-rewinddir.$(OBJEXT) lib_a-sleep.$(OBJEXT) \
-	lib_a-usleep.$(OBJEXT) lib_a-telldir.$(OBJEXT)
+	lib_a-usleep.$(OBJEXT) lib_a-telldir.$(OBJEXT) \
+	lib_a-ftw.$(OBJEXT) lib_a-nftw.$(OBJEXT)
 am__objects_2 = lib_a-scandir.$(OBJEXT) lib_a-seekdir.$(OBJEXT)
 am__objects_3 = lib_a-execl.$(OBJEXT) lib_a-execle.$(OBJEXT) \
 	lib_a-execlp.$(OBJEXT) lib_a-execv.$(OBJEXT) \
@@ -103,7 +104,7 @@ libposix_la_LIBADD =
 am__objects_6 = closedir.lo collate.lo collcmp.lo creat.lo dirfd.lo \
 	fnmatch.lo glob.lo _isatty.lo isatty.lo opendir.lo readdir.lo \
 	readdir_r.lo regcomp.lo regerror.lo regexec.lo regfree.lo \
-	rewinddir.lo sleep.lo usleep.lo telldir.lo
+	rewinddir.lo sleep.lo usleep.lo telldir.lo ftw.lo nftw.lo
 am__objects_7 = scandir.lo seekdir.lo
 am__objects_8 = execl.lo execle.lo execlp.lo execv.lo execve.lo \
 	execvp.lo wordexp.lo wordfree.lo
@@ -295,7 +296,7 @@ GENERAL_SOURCES = \
 	opendir.c readdir.c readdir_r.c \
 	regcomp.c regerror.c regexec.c regfree.c \
 	rewinddir.c sleep.c usleep.c \
-	telldir.c
+	telldir.c ftw.c nftw.c
 
 ELIX_2_SOURCES = \
         scandir.c seekdir.c
@@ -523,6 +524,18 @@ lib_a-telldir.o: telldir.c
 
 lib_a-telldir.obj: telldir.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-telldir.obj `if test -f 'telldir.c'; then $(CYGPATH_W) 'telldir.c'; else $(CYGPATH_W) '$(srcdir)/telldir.c'; fi`
+
+lib_a-ftw.o: ftw.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-ftw.o `test -f 'ftw.c' || echo '$(srcdir)/'`ftw.c
+
+lib_a-ftw.obj: ftw.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-ftw.obj `if test -f 'ftw.c'; then $(CYGPATH_W) 'ftw.c'; else $(CYGPATH_W) '$(srcdir)/ftw.c'; fi`
+
+lib_a-nftw.o: nftw.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-nftw.o `test -f 'nftw.c' || echo '$(srcdir)/'`nftw.c
+
+lib_a-nftw.obj: nftw.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-nftw.obj `if test -f 'nftw.c'; then $(CYGPATH_W) 'nftw.c'; else $(CYGPATH_W) '$(srcdir)/nftw.c'; fi`
 
 lib_a-scandir.o: scandir.c
 	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_a_CFLAGS) $(CFLAGS) -c -o lib_a-scandir.o `test -f 'scandir.c' || echo '$(srcdir)/'`scandir.c
