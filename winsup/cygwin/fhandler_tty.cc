@@ -391,6 +391,21 @@ fhandler_pty_master::flush_to_slave ()
     accept_input ();
 }
 
+void
+fhandler_pty_master::discard_input ()
+{
+  DWORD bytes_in_pipe;
+  char buf[1024];
+  DWORD n;
+
+  WaitForSingleObject (input_mutex, INFINITE);
+  while (::bytes_available (bytes_in_pipe, from_master_cyg) && bytes_in_pipe)
+    ReadFile (from_master_cyg, buf, sizeof(buf), &n, NULL);
+  ResetEvent (input_available_event);
+  get_ttyp ()->discard_input = true;
+  ReleaseMutex (input_mutex);
+}
+
 DWORD
 fhandler_pty_common::__acquire_output_mutex (const char *fn, int ln,
 					     DWORD ms)
@@ -2150,6 +2165,9 @@ fhandler_pty_master::write (const void *ptr, size_t len)
 	}
 
       WaitForSingleObject (input_mutex, INFINITE);
+      if ((ti.c_lflag & ISIG) && !(ti.c_iflag & IGNBRK)
+	  && !(ti.c_lflag & NOFLSH) && memchr (buf, '\003', nlen))
+	get_ttyp ()->discard_input = true;
       DWORD n;
       WriteFile (to_slave, buf, nlen, &n, NULL);
       ReleaseMutex (input_mutex);
@@ -3709,6 +3727,8 @@ fhandler_pty_slave::transfer_input (tty::xfer_dir dir, HANDLE from, tty *ttyp,
       while (PeekConsoleInputA (from, r, INREC_SIZE, &n) && n)
 	{
 	  ReadConsoleInputA (from, r, n, &n);
+	  if (ttyp->discard_input)
+	    continue;
 	  int len = 0;
 	  char *ptr = buf;
 	  for (DWORD i = 0; i < n; i++)
@@ -3773,6 +3793,8 @@ fhandler_pty_slave::transfer_input (tty::xfer_dir dir, HANDLE from, tty *ttyp,
 	{
 	  DWORD n = MIN (bytes_in_pipe, NT_MAX_PATH);
 	  ReadFile (from, buf, n, &n, NULL);
+	  if (ttyp->discard_input)
+	    continue;
 	  char *ptr = buf;
 	  if (dir == tty::to_nat)
 	    {
@@ -3803,4 +3825,5 @@ fhandler_pty_slave::transfer_input (tty::xfer_dir dir, HANDLE from, tty *ttyp,
   else if (transfered)
     SetEvent (input_available_event);
   ttyp->pcon_input_state = dir;
+  ttyp->discard_input = false;
 }

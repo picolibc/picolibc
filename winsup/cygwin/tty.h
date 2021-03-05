@@ -131,6 +131,7 @@ private:
   bool req_xfer_input;
   xfer_dir pcon_input_state;
   bool mask_flusho;
+  bool discard_input;
 
 public:
   HANDLE from_master () const { return _from_master; }

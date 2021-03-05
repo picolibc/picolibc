@@ -253,6 +253,7 @@ tty::init ()
   pcon_input_state = to_cyg;
   last_sig = 0;
   mask_flusho = false;
+  discard_input = false;
 }
 
 HANDLE
