@@ -2165,8 +2165,8 @@ fhandler_pty_master::write (const void *ptr, size_t len)
 	}
 
       WaitForSingleObject (input_mutex, INFINITE);
-      if ((ti.c_lflag & ISIG) && !(ti.c_iflag & IGNBRK)
-	  && !(ti.c_lflag & NOFLSH) && memchr (buf, '\003', nlen))
+      if ((ti.c_lflag & ISIG) && !(ti.c_lflag & NOFLSH)
+	  && memchr (buf, '\003', nlen))
 	get_ttyp ()->discard_input = true;
       DWORD n;
       WriteFile (to_slave, buf, nlen, &n, NULL);
@@ -3307,7 +3307,7 @@ skip_create:
 	/* This is illegal, so turn off the echo here, and fake it
 	   when we read the characters */
 	mode &= ~ENABLE_ECHO_INPUT;
-      if ((t.c_lflag & ISIG) && !(t.c_iflag & IGNBRK))
+      if (t.c_lflag & ISIG)
 	mode |= ENABLE_PROCESSED_INPUT;
       SetConsoleMode (hpConIn, mode);
       /* Set output mode */

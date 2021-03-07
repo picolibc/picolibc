@@ -484,7 +484,7 @@ fhandler_console::set_input_mode (tty::cons_mode m, const termios *t,
 	/* This is illegal, so turn off the echo here, and fake it
 	   when we read the characters */
 	flags &= ~ENABLE_ECHO_INPUT;
-      if ((t->c_lflag & ISIG) && !(t->c_iflag & IGNBRK))
+      if (t->c_lflag & ISIG)
 	flags |= ENABLE_PROCESSED_INPUT;
       break;
     }
