@@ -92,14 +92,7 @@ struct old_utsname
 extern "C" int
 uname (struct utsname *in_name)
 {
-  /* This occurs if the application fetches the uname symbol dynamically.
-     We must call uname_x for newer API versions, otherwise the idea of
-     struct utsname doesn't match. */
-  if (CYGWIN_VERSION_CHECK_FOR_UNAME_X)
-    return uname_x (in_name);
-
   struct old_utsname *name = (struct old_utsname *) in_name;
-
   __try
     {
       char *snp = strstr  (cygwin_version.dll_build_date, "SNP");
