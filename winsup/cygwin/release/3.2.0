@@ -15,6 +15,12 @@ What's new:
   that these keys/signals are handled only when app calls read() or
   select(). Now, these work even if app does not call read() or select().
 
+- fchmodat(2) now has limited support for the AT_SYMLINK_NOFOLLOW flag.
+
+- Cygwin now recognizes native Windows AF_UNIX sockets (as regular
+  files, not as socket files).  This allows tools like 'ls' and 'rm'
+  to work.
+
 What changed:
 -------------
 
@@ -30,6 +36,14 @@ What changed:
 
 - Utilize Windows 10 1809 FILE_DISPOSITION_IGNORE_READONLY_ATTRIBUTE
   flag to allow simpler unlink of files with DOS readonly flags set.
+
+- getdtablesize(3), sysconf(_SC_OPEN_MAX), and
+  getrlimit(RLIMIT_NOFILE) now return the true limit on the number of
+  open descriptors, 3200.  Previously they returned the current size
+  of Cygwin's internal file descriptor table, which can grow
+  dynamically.
+
+- facl(2) now fails with EBADF on a file opened with O_PATH.
 
 
 Bug Fixes
@@ -74,3 +88,8 @@ Bug Fixes
 
 - Fix potential handle leaks when dup'ing descriptors
   Addresses: https://cygwin.com/pipermail/cygwin-developers/2021-February/012041.html
+
+- Fix a bug that could cause fstat(2) to return incorrect results on a FIFO.
+
+- Fix some system calls on AF_LOCAL sockets that are not socket files.
+  Addresses: https://cygwin.com/pipermail/cygwin-developers/2021-February/012066.html

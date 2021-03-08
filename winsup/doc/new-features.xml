@@ -48,6 +48,27 @@ Utilize Windows 10 1809 FILE_DISPOSITION_IGNORE_READONLY_ATTRIBUTE flag
 to allow simpler unlink of files with DOS readonly flags set.
 </para></listitem>
 
+<listitem><para>
+fchmodat(2) now has limited support for the AT_SYMLINK_NOFOLLOW flag.
+</para></listitem>
+
+<listitem><para>
+getdtablesize(3), sysconf(_SC_OPEN_MAX), and getrlimit(RLIMIT_NOFILE)
+now return the true limit on the number of open descriptors, 3200.
+Previously they returned the current size of Cygwin's internal file
+descriptor table, which can grow dynamically.
+</para></listitem>
+
+<listitem><para>
+Cygwin now recognizes native Windows AF_UNIX sockets (as regular
+files, not as socket files).  This allows tools like 'ls' and 'rm' to
+work.
+</para></listitem>
+
+<listitem><para>
+facl(2) now fails with EBADF on a file opened with O_PATH.
+</para></listitem>
+
 </itemizedlist>
 
 </sect2>
