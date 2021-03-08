@@ -3104,7 +3104,7 @@ fhandler_pty_slave::setup_pseudoconsole (bool nopcon)
 		       0, TRUE, DUPLICATE_SAME_ACCESS);
       CloseHandle (pcon_owner);
       FreeConsole ();
-      AttachConsole (p->dwProcessId);
+      AttachConsole (p->exec_dwProcessId);
       goto skip_create;
     }
 
