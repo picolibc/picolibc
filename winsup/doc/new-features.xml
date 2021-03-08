@@ -28,6 +28,26 @@ that these keys/signals are handled only when app calls read() or
 select(). Now, these work even if app does not call read() or select().
 </para></listitem>
 
+<listitem><para>
+Allow ~5000 child processes per process on 64 bit, ~1200 child processes
+per process on 32 bit.  So far, only 256 child processes per process were
+supported.
+</para></listitem>
+
+<listitem><para>
+A few FAQ updates.
+</para></listitem>
+
+<listitem><para>
+Have tmpfile(3) make use of Win32 FILE_ATTRIBUTE_TEMPORARY via open(2)
+flag O_TMPFILE.
+</para></listitem>
+
+<listitem><para>
+Utilize Windows 10 1809 FILE_DISPOSITION_IGNORE_READONLY_ATTRIBUTE flag
+to allow simpler unlink of files with DOS readonly flags set.
+</para></listitem>
+
 </itemizedlist>
 
 </sect2>

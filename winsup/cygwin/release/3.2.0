@@ -28,6 +28,9 @@ What changed:
   flag O_TMPFILE.
   Addresses: https://cygwin.com/pipermail/cygwin/2021-January/247304.html
 
+- Utilize Windows 10 1809 FILE_DISPOSITION_IGNORE_READONLY_ATTRIBUTE
+  flag to allow simpler unlink of files with DOS readonly flags set.
+
 
 Bug Fixes
 ---------
