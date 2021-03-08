@@ -64,3 +64,10 @@ Bug Fixes
 
 - Fix the return value when ptsname_r(3) is called with a bad file descriptor
   Addresses: https://lists.gnu.org/archive/html/bug-gnulib/2021-01/msg00245.html
+
+- Fix path handling in case the Cygwin installation dir is accessed via
+  a Windows junction point.
+  Addresses: https://cygwin.com/pipermail/cygwin-developers/2021-February/012054.html
+
+- Fix potential handle leaks when dup'ing descriptors
+  Addresses: https://cygwin.com/pipermail/cygwin-developers/2021-February/012041.html
