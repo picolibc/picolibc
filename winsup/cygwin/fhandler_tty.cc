@@ -3084,14 +3084,16 @@ fhandler_pty_slave::setup_pseudoconsole (bool nopcon)
   if (get_ttyp ()->pcon_pid && get_ttyp ()->pcon_pid != myself->pid
       && !!pinfo (get_ttyp ()->pcon_pid) && get_ttyp ()->pcon_activated)
     {
-      /* Send CSI6n just for requesting transfer input. */
-      DWORD n;
-      WaitForSingleObject (input_mutex, INFINITE);
-      get_ttyp ()->req_xfer_input = true;
-      get_ttyp ()->pcon_start = true;
-      get_ttyp ()->pcon_start_pid = myself->pid;
-      WriteFile (get_output_handle_cyg (), "\033[6n", 4, &n, NULL);
-      ReleaseMutex (input_mutex);
+      if (GetStdHandle (STD_INPUT_HANDLE) == get_handle ())
+	{ /* Send CSI6n just for requesting transfer input. */
+	  DWORD n;
+	  WaitForSingleObject (input_mutex, INFINITE);
+	  get_ttyp ()->req_xfer_input = true;
+	  get_ttyp ()->pcon_start = true;
+	  get_ttyp ()->pcon_start_pid = myself->pid;
+	  WriteFile (get_output_handle_cyg (), "\033[6n", 4, &n, NULL);
+	  ReleaseMutex (input_mutex);
+	}
       /* Attach to the pseudo console which already exits. */
       pinfo p (get_ttyp ()->pcon_pid);
       HANDLE pcon_owner =
