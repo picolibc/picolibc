@@ -94,3 +94,6 @@ Bug Fixes
 
 - Fix some system calls on AF_LOCAL sockets that are not socket files.
   Addresses: https://cygwin.com/pipermail/cygwin-developers/2021-February/012066.html
+
+- Fix access to block devices under /proc/sys.
+  Addresses: https://sourceware.org/pipermail/cygwin-patches/2020q4/010843.html
