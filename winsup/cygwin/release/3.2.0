@@ -1,7 +1,8 @@
 What's new:
 -----------
 
-- Revamped pseudo console support.
+- Revamped pseudo console support.  Conditionally activating it only when
+  a non-cygwin application is run.
 
 - New C11 threads API: call_once, cnd_broadcast, cnd_destroy, cnd_init,
   cnd_signal, cnd_timedwait, cnd_wait, mtx_destroy, mtx_init, mtx_lock,

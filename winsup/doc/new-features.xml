@@ -9,7 +9,8 @@
 <itemizedlist mark="bullet">
 
 <listitem><para>
-Revamped pseudo console support.
+Revamped pseudo console support.  Conditionally activating it only when
+a non-cygwin application is run.
 </para></listitem>
 
 <listitem><para>
