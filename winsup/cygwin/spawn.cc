@@ -665,6 +665,7 @@ child_info_spawn::worker (const char *prog_arg, const char *const *argv,
       HANDLE ptys_pcon_mutex = NULL;
       HANDLE ptys_input_mutex = NULL;
       tty *ptys_ttyp = NULL;
+      bool stdin_is_ptys = false;
       if (!iscygwin () && ptys_primary && is_console_app (runpath))
 	{
 	  bool nopcon = mode != _P_OVERLAY && mode != _P_WAIT;
@@ -675,6 +676,9 @@ child_info_spawn::worker (const char *prog_arg, const char *const *argv,
 	  if (ptys_primary->setup_pseudoconsole (nopcon))
 	    enable_pcon = true;
 	  ReleaseMutex (ptys_primary->pcon_mutex);
+	  HANDLE h_stdin = handle ((in__stdin < 0 ? 0 : in__stdin), false);
+	  if (h_stdin == ptys_primary->get_handle ())
+	    stdin_is_ptys = true;
 	  ptys_from_master = ptys_primary->get_handle ();
 	  DuplicateHandle (GetCurrentProcess (), ptys_from_master,
 			   GetCurrentProcess (), &ptys_from_master,
@@ -691,6 +695,7 @@ child_info_spawn::worker (const char *prog_arg, const char *const *argv,
 			   GetCurrentProcess (), &ptys_input_mutex,
 			   0, 0, DUPLICATE_SAME_ACCESS);
 	  if (!enable_pcon && ptys_ttyp->getpgid () == myself->pgid
+	      && stdin_is_ptys
 	      && ptys_ttyp->pcon_input_state_eq (tty::to_cyg))
 	    {
 	      WaitForSingleObject (ptys_input_mutex, INFINITE);
@@ -983,7 +988,7 @@ child_info_spawn::worker (const char *prog_arg, const char *const *argv,
 	  if (ptys_ttyp)
 	    {
 	      ptys_ttyp->wait_pcon_fwd ();
-	      if (ptys_ttyp->getpgid () == myself->pgid
+	      if (ptys_ttyp->getpgid () == myself->pgid && stdin_is_ptys
 		  && ptys_ttyp->pcon_input_state_eq (tty::to_nat))
 		{
 		  WaitForSingleObject (ptys_input_mutex, INFINITE);
@@ -1020,7 +1025,7 @@ child_info_spawn::worker (const char *prog_arg, const char *const *argv,
 	  if (ptys_ttyp)
 	    {
 	      ptys_ttyp->wait_pcon_fwd ();
-	      if (ptys_ttyp->getpgid () == myself->pgid
+	      if (ptys_ttyp->getpgid () == myself->pgid && stdin_is_ptys
 		  && ptys_ttyp->pcon_input_state_eq (tty::to_nat))
 		{
 		  WaitForSingleObject (ptys_input_mutex, INFINITE);

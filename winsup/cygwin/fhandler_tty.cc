@@ -131,7 +131,9 @@ set_switch_to_pcon (HANDLE *in, HANDLE *out, HANDLE *err, bool iscygwin)
 	{
 	  fhandler_base *fh = cfd;
 	  fhandler_pty_slave *ptys = (fhandler_pty_slave *) fh;
-	  if (*in == ptys->get_handle ())
+	  if (*in == ptys->get_handle ()
+	      || *out == ptys->get_output_handle ()
+	      || *err == ptys->get_output_handle ())
 	    ptys_pcon = ptys;
 	}
     }
@@ -284,6 +286,7 @@ exit_Hooked (int e)
 	    HANDLE from = ptys->get_handle ();
 	    HANDLE input_available_event = ptys->get_input_available_event ();
 	    if (ttyp->getpgid () == myself->pgid
+		&& GetStdHandle (STD_INPUT_HANDLE) == ptys->get_handle ()
 		&& ttyp->pcon_input_state_eq (tty::to_nat))
 	      {
 		WaitForSingleObject (ptys->input_mutex, INFINITE);
@@ -1035,6 +1038,7 @@ fhandler_pty_slave::set_switch_to_pcon (void)
       bool pcon_enabled = setup_pseudoconsole (nopcon);
       ReleaseMutex (pcon_mutex);
       if (!pcon_enabled && get_ttyp ()->getpgid () == myself->pgid
+	  && GetStdHandle (STD_INPUT_HANDLE) == get_handle ()
 	  && get_ttyp ()->pcon_input_state_eq (tty::to_cyg))
 	{
 	  WaitForSingleObject (input_mutex, INFINITE);
@@ -1062,6 +1066,7 @@ fhandler_pty_slave::reset_switch_to_pcon (void)
 	  if (isHybrid)
 	    {
 	      if (get_ttyp ()->getpgid () == myself->pgid
+		  && GetStdHandle (STD_INPUT_HANDLE) == get_handle ()
 		  && get_ttyp ()->pcon_input_state_eq (tty::to_nat))
 		{
 		  WaitForSingleObject (input_mutex, INFINITE);
@@ -1204,7 +1209,8 @@ fhandler_pty_slave::mask_switch_to_pcon_in (bool mask, bool xfer)
   /* In GDB, transfer input based on setpgid() does not work because
      GDB may not set terminal process group properly. Therefore,
      transfer input here if isHybrid is set. */
-  if (isHybrid && !!masked != mask && xfer)
+  if (isHybrid && !!masked != mask && xfer
+      && GetStdHandle (STD_INPUT_HANDLE) == get_handle ())
     {
       if (mask && get_ttyp ()->pcon_input_state_eq (tty::to_nat))
 	{
