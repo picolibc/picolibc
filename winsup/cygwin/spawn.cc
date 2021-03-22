@@ -1276,6 +1276,13 @@ av::setup (const char *prog_arg, path_conv& real_path, const char *ext,
 			     FILE_SYNCHRONOUS_IO_NONALERT
 			     | FILE_OPEN_FOR_BACKUP_INTENT
 			     | FILE_NON_DIRECTORY_FILE);
+	if (status == STATUS_IO_REPARSE_TAG_NOT_HANDLED)
+	  {
+	    /* This is most likely an app execution alias (such as the
+	       Windows Store version of Python, i.e. not a Cygwin program */
+	    real_path.set_cygexec (false);
+	    break;
+	  }
 	if (!NT_SUCCESS (status))
 	  {
 	    /* File is not readable?  Doesn't mean it's not executable.
