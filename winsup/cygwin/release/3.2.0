@@ -46,6 +46,10 @@ What changed:
 
 - facl(2) now fails with EBADF on a file opened with O_PATH.
 
+- Allow to start Windows Store executables via their "app execution
+  aliases".  Handle these aliases (which are special reparse points)
+  as symlinks to the actual executables.
+
 
 Bug Fixes
 ---------
