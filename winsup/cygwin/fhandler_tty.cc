@@ -2768,9 +2768,18 @@ fhandler_pty_master::setup ()
     termios_printf ("can't set output_handle(%p) to non-blocking mode",
 		    get_output_handle ());
 
-  char pipename[sizeof ("ptyNNNN-to-master-cyg")];
-  __small_sprintf (pipename, "pty%d-to-master", unit);
+  char pipename[sizeof ("ptyNNNN-from-master-nat")];
+  __small_sprintf (pipename, "pty%d-to-master-nat", unit);
   res = fhandler_pipe::create (&sec_none, &from_slave, &to_master,
+			       fhandler_pty_common::pipesize, pipename, 0);
+  if (res)
+    {
+      errstr = "output pipe for non-cygwin apps";
+      goto err;
+    }
+
+  __small_sprintf (pipename, "pty%d-to-master", unit);
+  res = fhandler_pipe::create (&sec_none, &get_handle (), &to_master_cyg,
 			       fhandler_pty_common::pipesize, pipename, 0);
   if (res)
     {
@@ -2778,16 +2787,7 @@ fhandler_pty_master::setup ()
       goto err;
     }
 
-  __small_sprintf (pipename, "pty%d-to-master-cyg", unit);
-  res = fhandler_pipe::create (&sec_none, &get_handle (), &to_master_cyg,
-			       fhandler_pty_common::pipesize, pipename, 0);
-  if (res)
-    {
-      errstr = "output pipe for cygwin";
-      goto err;
-    }
-
-  __small_sprintf (pipename, "pty%d-to-slave", unit);
+  __small_sprintf (pipename, "pty%d-from-master-nat", unit);
   /* FILE_FLAG_OVERLAPPED is specified here in order to prevent
      PeekNamedPipe() from blocking in transfer_input().
      Accordig to the official document, in order to access the handle
