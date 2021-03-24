@@ -237,6 +237,23 @@ stmp-targ-include: config.status
 	$(MAKE) targ-include/sys \
 		targ-include/machine \
 		targ-include/bits
+	-if [ -n "$(shared_machine_dir)" ]; then \
+	    for i in $(srcdir)/libc/machine/$(shared_machine_dir)/machine/*.h; do \
+		if [ -f $$i ]; then \
+		  cp $$i targ-include/machine/`basename $$i`; \
+		else true; fi ; \
+	      done; \
+	    for i in $(srcdir)/libc/machine/$(shared_machine_dir)/sys/*.h; do \
+		if [ -f $$i ]; then \
+		  cp $$i targ-include/sys/`basename $$i`; \
+		else true; fi ; \
+	      done; \
+	    for i in $(srcdir)/libc/machine/$(shared_machine_dir)/include/*.h; do \
+		if [ -f $$i ]; then \
+		  cp $$i targ-include/`basename $$i`; \
+		else true; fi ; \
+	      done; \
+	  fi
 	-for i in $(srcdir)/libc/machine/$(machine_dir)/machine/*.h; do \
 	    if [ -f $$i ]; then \
 	      cp $$i targ-include/machine/`basename $$i`; \
@@ -315,6 +332,13 @@ endif
 	  for i in $(srcdir)/libc/include/machine/*.h; do \
 	   $(INSTALL_DATA) $$i $(DESTDIR)$(tooldir)/include/machine/`basename $$i`; \
 	  done; \
+	  if [ -n "$(shared_machine_dir)" ]; then \
+	    for i in $(srcdir)/libc/machine/$(shared_machine_dir)/machine/*.h; do \
+	      if [ -f $$i ]; then \
+	       $(INSTALL_DATA) $$i $(DESTDIR)$(tooldir)/include/machine/`basename $$i`; \
+	      else true; fi ; \
+	    done; \
+	  fi ; \
 	  for i in $(srcdir)/libc/machine/$(machine_dir)/machine/*.h; do \
 	    if [ -f $$i ]; then \
 	     $(INSTALL_DATA) $$i $(DESTDIR)$(tooldir)/include/machine/`basename $$i`; \
@@ -332,6 +356,18 @@ endif
 	  for i in $(srcdir)/libc/include/sys/*.h; do \
 	   $(INSTALL_DATA) $$i $(DESTDIR)$(tooldir)/include/sys/`basename $$i`; \
 	  done; \
+	  if [ -n "$(shared_machine_dir)" ]; then \
+	    for i in $(srcdir)/libc/machine/$(shared_machine_dir)/sys/*.h; do \
+	      if [ -f $$i ]; then \
+	       $(INSTALL_DATA) $$i $(DESTDIR)$(tooldir)/include/sys/`basename $$i`; \
+	      else true; fi ; \
+	    done ; \
+	    for i in $(srcdir)/libc/machine/$(shared_machine_dir)/include/*.h; do \
+	      if [ -f $$i ]; then \
+	       $(INSTALL_DATA) $$i $(DESTDIR)$(tooldir)/include/`basename $$i`; \
+	      else true; fi ; \
+	    done ; \
+	  fi ; \
 	  for i in $(srcdir)/libc/machine/$(machine_dir)/sys/*.h; do \
 	    if [ -f $$i ]; then \
 	     $(INSTALL_DATA) $$i $(DESTDIR)$(tooldir)/include/sys/`basename $$i`; \

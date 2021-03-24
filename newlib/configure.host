@@ -34,6 +34,8 @@
 # It sets the following shell variables:
 #   newlib_cflags	Special CFLAGS to use when building
 #   machine_dir		Subdirectory of libc/machine to configure
+#   shared_machine_dir	Subdirectory of libc/machine for files shared
+#			between specific architectures, optional
 #   sys_dir		Subdirectory of libc/sys to configure
 #   have_sys_mach_dir	Is there a machine subdirectory in sys subdirectory
 #   posix_dir		"posix" to build libc/posix, "" otherwise
@@ -55,6 +57,7 @@
 newlib_cflags=
 libm_machine_dir=
 machine_dir=
+shared_machine_dir=
 sys_dir=
 posix_dir=
 signal_dir=signal

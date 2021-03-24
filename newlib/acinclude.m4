@@ -245,5 +245,6 @@ AC_SUBST(lpfx)
 
 AC_SUBST(libm_machine_dir)
 AC_SUBST(machine_dir)
+AC_SUBST(shared_machine_dir)
 AC_SUBST(sys_dir)
 ])

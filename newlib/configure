@@ -666,6 +666,7 @@ OBJDUMP
 DLLTOOL
 SED
 sys_dir
+shared_machine_dir
 machine_dir
 libm_machine_dir
 lpfx
@@ -4111,6 +4112,7 @@ fi
 # Hard-code OBJEXT.  Normally it is set by AC_OBJEXT, but we
 # use oext, which is set in configure.host based on the target platform.
 OBJEXT=${oext}
+
 
 
 
@@ -11853,7 +11855,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<_LT_EOF
-#line 11856 "configure"
+#line 11858 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -11959,7 +11961,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<_LT_EOF
-#line 11962 "configure"
+#line 11964 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H

@@ -328,6 +328,7 @@ prefix = @prefix@
 program_transform_name = @program_transform_name@
 psdir = @psdir@
 sbindir = @sbindir@
+shared_machine_dir = @shared_machine_dir@
 sharedstatedir = @sharedstatedir@
 srcdir = @srcdir@
 subdirs = @subdirs@

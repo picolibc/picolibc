@@ -218,6 +218,7 @@ if test -n "${machine_dir}"; then
 fi
 AC_SUBST(LIBC_MACHINE_LIB)
 AC_SUBST(machine_dir)
+AC_SUBST(shared_machine_dir)
 
 AC_CONFIG_FILES([Makefile argz/Makefile ctype/Makefile errno/Makefile locale/Makefile misc/Makefile reent/Makefile search/Makefile stdio/Makefile stdio64/Makefile stdlib/Makefile string/Makefile time/Makefile posix/Makefile signal/Makefile syscalls/Makefile unix/Makefile iconv/Makefile iconv/ces/Makefile iconv/ccs/Makefile iconv/ccs/binary/Makefile iconv/lib/Makefile ssp/Makefile xdr/Makefile])
 AC_OUTPUT

@@ -676,6 +676,7 @@ SED
 NEWLIB_NANO_MALLOC_FALSE
 NEWLIB_NANO_MALLOC_TRUE
 sys_dir
+shared_machine_dir
 machine_dir
 libm_machine_dir
 lpfx
@@ -3858,6 +3859,7 @@ fi
 # Hard-code OBJEXT.  Normally it is set by AC_OBJEXT, but we
 # use oext, which is set in configure.host based on the target platform.
 OBJEXT=${oext}
+
 
 
 
@@ -11567,7 +11569,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<_LT_EOF
-#line 11570 "configure"
+#line 11572 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -11673,7 +11675,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<_LT_EOF
-#line 11676 "configure"
+#line 11678 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -12136,6 +12138,7 @@ if test -n "${machine_dir}"; then
     LIBC_MACHINE_LIB=machine/lib.${aext}
   fi
 fi
+
 
 
 
