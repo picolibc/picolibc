@@ -170,11 +170,6 @@ int fegetprec (void);
 int fesetprec (int __prec);
 #endif
 
-#ifdef __INSIDE_CYGWIN__
-/* Cygwin-internal ONLY. */
-extern void _feinitialise ();
-#endif
-
 #endif /* __CYGWIN__ */
 
 #ifdef __cplusplus

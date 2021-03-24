@@ -288,6 +288,7 @@ DLL_OFILES:= \
 	exec.o \
 	external.o \
 	fcntl.o \
+	fenv.o \
 	fhandler.o \
 	fhandler_clipboard.o \
 	fhandler_console.o \

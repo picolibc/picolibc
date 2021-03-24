@@ -63,10 +63,8 @@ static inline bool use_sse(void)
   return false;
 }
 
-#ifndef __CYGWIN__
 /* forward declaration */
 static void _feinitialise (void);
-#endif
 
 /*  This function enables traps for each of the exceptions as indicated
    by the parameter except. The individual exceptions are described in
@@ -451,10 +449,7 @@ fesetprec (int prec)
 #endif
 
 /*  Set up the FPU and SSE environment at the start of execution.  */
-#ifndef __CYGWIN__
-static
-#endif
-void
+static void
 _feinitialise (void)
 {
   extern fenv_t __fe_dfl_env;
