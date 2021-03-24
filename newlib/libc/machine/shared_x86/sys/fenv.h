@@ -163,10 +163,19 @@ int fedisableexcept (int __excepts);
 int fegetexcept (void);
 #endif /* __GNU_VISIBLE */
 
+#ifdef __CYGWIN__
+
+#if __MISC_VISIBLE
+int fegetprec (void);
+int fesetprec (int __prec);
+#endif
+
 #ifdef __INSIDE_CYGWIN__
-/* This is Cygwin-custom, not from the standard, for use in the Cygwin CRT.  */
+/* Cygwin-internal ONLY. */
 extern void _feinitialise ();
 #endif
+
+#endif /* __CYGWIN__ */
 
 #ifdef __cplusplus
 }
