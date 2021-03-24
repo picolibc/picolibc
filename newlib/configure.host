@@ -196,15 +196,14 @@ case "${host_cpu}" in
 	machine_dir=i960
 	;;
   i[34567]86)
+	libm_machine_dir=i386
+	machine_dir=i386
+	shared_machine_dir=shared_x86
 	# Don't use for these since they provide their own setjmp.
 	case ${host} in
 	*-*-sco* | *-*-cygwin*) 
-		libm_machine_dir=i386
-		machine_dir=i386
 		;;
 	*) 
-		libm_machine_dir=i386
-		machine_dir=i386
 		mach_add_setjmp=true
 		;;
 	esac
@@ -361,6 +360,7 @@ case "${host_cpu}" in
   x86_64)
 	machine_dir=x86_64
 	libm_machine_dir=x86_64
+	shared_machine_dir=shared_x86
 	;;
   xc16x*)
         machine_dir=xc16x
