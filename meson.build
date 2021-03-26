@@ -277,15 +277,9 @@ else
 endif
 
 specs_data = configuration_data()
-specs_data.set(
-  'INCLUDEDIR',
-  join_paths(sysroot_install? '%R' : prefix, get_option('includedir'))
-)
-
-specs_data.set(
-  'LIBDIR',
-  sysroot_install? join_paths('%R', get_option('libdir')) : lib_dir
-)
+specs_data.set('PREFIX', sysroot_install? '%R' : prefix)
+specs_data.set('INCLUDEDIR', get_option('includedir'))
+specs_data.set('LIBDIR', get_option('libdir'))
 
 if tls_model != ''
   specs_data.set(
