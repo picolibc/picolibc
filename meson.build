@@ -798,6 +798,12 @@ endif
 test_link_args = test_c_args
 test_link_depends = []
 
+# CompCert needs the '-WUl,' prefix to correctly pass the --spec parameters to the linker
+specs_prefix = ''
+if meson.get_compiler('c').get_id() == 'ccomp'
+  specs_prefix = '-WUl,'
+endif
+
 if has_semihost
 
   # If we're using semihosting, we assume that there's a
@@ -814,7 +820,7 @@ if has_semihost
   picolibc_link_path = 'picolibc.ld'
 
   if meson.get_compiler('c').get_id() != 'clang'
-    test_c_args += ['--specs', '@0@/@1@'.format(meson.current_build_dir(), picolibc_specs)]
+    test_c_args += [specs_prefix + '--specs', specs_prefix + '@0@/@1@'.format(meson.current_build_dir(), picolibc_specs)]
   endif
 
   # Undefine _exit as that's in libsemihost and needs to replace the weak _exit
@@ -828,7 +834,7 @@ elif meson.get_compiler('c').get_id() == 'clang'
   # Clang does not support spec files
 else
   test_link_depends += test_specs
-  test_c_args += ['--specs', '@0@/@1@'.format(meson.current_build_dir(), test_specs)]
+  test_c_args += [specs_prefix + '--specs', specs_prefix + '@0@/@1@'.format(meson.current_build_dir(), test_specs)]
   test_link_args += test_c_args
 endif
 
