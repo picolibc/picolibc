@@ -405,7 +405,7 @@ child_info_spawn::worker (const char *prog_arg, const char *const *argv,
 	 get the default error mode instead of inheriting the mode Cygwin
 	 uses.  This allows things like Windows Error Reporting/JIT debugging
 	 to work with processes launched from a Cygwin shell. */
-      if (!real_path.iscygexec ())
+      if (winjitdebug && !real_path.iscygexec ())
 	c_flags |= CREATE_DEFAULT_ERROR_MODE;
 
       /* We're adding the CREATE_BREAKAWAY_FROM_JOB flag here to workaround

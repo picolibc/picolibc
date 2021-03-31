@@ -122,6 +122,7 @@ static struct parse_thing
   {"wincmdln", {&wincmdln}, setbool, NULL, {{false}, {true}}},
   {"winsymlinks", {func: set_winsymlinks}, isfunc, NULL, {{0}, {0}}},
   {"disable_pcon", {&disable_pcon}, setbool, NULL, {{false}, {true}}},
+  {"winjitdebug", {&winjitdebug}, setbool, NULL, {{false}, {true}}},
   {NULL, {0}, setdword, 0, {{0}, {0}}}
 };
 
