@@ -239,6 +239,6 @@ if enable_native_tests
   endif
 endif
 
-if has_semihost
+if has_arm_semihost
   subdir('semihost')
 endif

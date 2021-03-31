@@ -768,8 +768,13 @@ add_project_arguments(arguments, language: 'c')
 # libc will adjust this if supported
 has_ieeefp_funcs = false
 
-# semihost will adjust this if supported
+# semihost will adjust these if supported
+
+# any kind of semihosting support, enough to run general
 has_semihost = false
+
+# arm compatible semihosting, enough to run arm semihost tests
+has_arm_semihost = false
 
 # make sure to include semihost BEFORE picocrt!
 subdir('semihost')
