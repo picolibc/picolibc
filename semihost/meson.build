@@ -118,3 +118,16 @@ if src_semihost_machine.has_key(host_cpu_family)
     
   endforeach
 endif
+
+#
+# Systems with non-arm semihosting support
+#
+semihost_custom = {
+		    'x86' : 'i386'
+		  }
+
+message('host_cpu_family ' + host_cpu_family)
+
+if semihost_custom.has_key(host_cpu_family)
+  subdir(join_paths('machine', semihost_custom[host_cpu_family]))
+endif
