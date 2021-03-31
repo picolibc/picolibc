@@ -199,7 +199,7 @@ foreach target : targets
     plain_tests += 'malloc_stress'
   endif
 
-  if posix_io or not tinystdio
+  if (posix_io or not tinystdio) and tests_enable_posix_io
     plain_tests += 'posix-io'
   endif
 
