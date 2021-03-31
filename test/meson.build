@@ -195,7 +195,7 @@ foreach target : targets
     plain_tests += 'complex-funcs'
   endif
 
-  if newlib_nano_malloc or not tests_disable_full_malloc_stress
+  if newlib_nano_malloc or tests_enable_full_malloc_stress
     plain_tests += 'malloc_stress'
   endif
 
