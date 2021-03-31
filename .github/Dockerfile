@@ -15,6 +15,7 @@ RUN apt-get update && \
     gcc-riscv64-unknown-elf \
     gcc-aarch64-linux-gnu \
     gcc-xtensa-lx106 \
+    qemu-system-x86 \
     qemu-system-arm=1:5.0-5.5 \
     qemu-system-misc=1:5.0-5.5 \
     clang lld || apt-get install -y \
@@ -26,6 +27,7 @@ RUN apt-get update && \
     gcc-riscv64-unknown-elf \
     gcc-aarch64-linux-gnu \
     gcc-xtensa-lx106 \
+    qemu-system-x86 \
     qemu-system-arm=1:5.0-5.5 \
     qemu-system-misc=1:5.0-5.5 \
     clang lld || apt-get install -y \
@@ -37,6 +39,7 @@ RUN apt-get update && \
     gcc-riscv64-unknown-elf \
     gcc-aarch64-linux-gnu \
     gcc-xtensa-lx106 \
+    qemu-system-x86 \
     qemu-system-arm=1:5.0-5.5 \
     qemu-system-misc=1:5.0-5.5 \
     clang lld || apt-get install -y \
@@ -48,6 +51,7 @@ RUN apt-get update && \
     gcc-riscv64-unknown-elf \
     gcc-aarch64-linux-gnu \
     gcc-xtensa-lx106 \
+    qemu-system-x86 \
     qemu-system-arm=1:5.0-5.5 \
     qemu-system-misc=1:5.0-5.5 \
     clang lld)
