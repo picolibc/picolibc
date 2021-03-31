@@ -33,13 +33,16 @@
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
-dirs = ['newlib.iconv',
-	'newlib.locale',
+dirs = ['newlib.locale',
 	'newlib.search',
 	'newlib.stdio',
 	'newlib.stdlib',
 	'newlib.string',
 	'newlib.wctype']
+
+if not newlib_iconv_external_ccs or tests_enable_posix_io
+  dirs += ['newlib.iconv']
+endif
 
 test_inc = [include_directories('include'), inc]
 
