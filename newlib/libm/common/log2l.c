@@ -34,5 +34,10 @@ log2l (long double x)
 {
   return log2(x);
 }
+#elif defined(__riscv)
+long double
+log2l (long double x)
+{
+  return __builtin_log2l(x);
+}
 #endif
-

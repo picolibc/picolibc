@@ -38,5 +38,10 @@ erfcl (long double x)
 {
   return erfc(x);
 }
+#elif defined(__riscv)
+long double
+erfcl (long double x)
+{
+  return __builtin_erfcl(x);
+}
 #endif
-

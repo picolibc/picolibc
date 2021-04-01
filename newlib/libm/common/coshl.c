@@ -38,5 +38,10 @@ coshl (long double x)
 {
   return cosh(x);
 }
+#elif defined(__riscv)
+long double
+coshl (long double x)
+{
+  return __builtin_coshl(x);
+}
 #endif
-

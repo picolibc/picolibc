@@ -34,5 +34,10 @@ nexttoward (double x, long double y)
 {
   return nextafter(x, y);
 }
+#elif defined(__riscv)
+double
+nexttoward (double x, long double y)
+{
+  return __builtin_nexttoward(x,  y);
+}
 #endif
-

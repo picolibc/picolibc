@@ -38,5 +38,10 @@ roundl (long double x)
 {
   return round(x);
 }
+#elif defined(__riscv)
+long double
+roundl (long double x)
+{
+  return __builtin_roundl(x);
+}
 #endif
-

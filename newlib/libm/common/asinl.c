@@ -38,5 +38,10 @@ asinl (long double x)
 {
   return asin(x);
 }
+#elif defined(__riscv)
+long double
+asinl (long double x)
+{
+  return __builtin_asinl(x);
+}
 #endif
-

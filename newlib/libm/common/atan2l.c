@@ -38,5 +38,10 @@ atan2l (long double v, long double u)
 {
   return atan2(v, u);
 }
+#elif defined(__riscv)
+long double
+atan2l (long double v, long double u)
+{
+  return __builtin_atan2l(v, u);
+}
 #endif
-

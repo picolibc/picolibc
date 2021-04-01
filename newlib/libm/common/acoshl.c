@@ -38,5 +38,10 @@ acoshl (long double x)
 {
   return acosh(x);
 }
+#elif defined(__riscv)
+long double
+acoshl (long double x)
+{
+  return __builtin_acoshl(x);
+}
 #endif
-

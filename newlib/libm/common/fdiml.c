@@ -38,5 +38,10 @@ fdiml (long double x, long double y)
 {
   return fdim(x, y);
 }
+#elif defined(__riscv)
+long double
+fdiml (long double x, long double y)
+{
+  return __builtin_fdiml(x, y);
+}
 #endif
-

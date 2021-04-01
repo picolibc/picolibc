@@ -38,5 +38,10 @@ tgammal (long double x)
 {
   return tgamma(x);
 }
+#elif defined(__riscv)
+long double
+tgammal (long double x)
+{
+  return __builtin_tgammal(x);
+}
 #endif
-

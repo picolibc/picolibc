@@ -38,5 +38,10 @@ nextafterl (long double x, long double y)
 {
   return nextafter(x, y);
 }
+#elif defined(__riscv)
+long double
+nextafterl (long double x, long double y)
+{
+  return __builtin_nextafterl(x, y);
+}
 #endif
-

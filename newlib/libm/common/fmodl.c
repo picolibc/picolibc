@@ -38,5 +38,10 @@ fmodl (long double x, long double y)
 {
   return fmod(x, y);
 }
+#elif defined(__riscv)
+long double
+fmodl (long double x, long double y)
+{
+  return __builtin_fmodl(x, y);
+}
 #endif
-

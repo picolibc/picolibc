@@ -38,5 +38,10 @@ fmal (long double x, long double y, long double z)
 {
   return fma(x, y, z);
 }
+#elif defined(__riscv)
+long double
+fmal (long double x, long double y, long double z)
+{
+  return __builtin_fmal(x, y, z);
+}
 #endif
-

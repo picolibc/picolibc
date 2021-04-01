@@ -75,4 +75,10 @@ nexttowardf (float x, long double y)
   return ux.value;
 }
 
-#endif // _LDBL_EQ_DBL
+#elif defined(__riscv)
+float
+nexttowardf (float x, long double y)
+{
+  return __builtin_nexttowardf(x, y);
+}
+#endif

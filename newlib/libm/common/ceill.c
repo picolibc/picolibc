@@ -38,5 +38,10 @@ ceill (long double x)
 {
   return ceil(x);
 }
+#elif defined(__riscv)
+long double
+ceill (long double x)
+{
+  return __builtin_ceill(x);
+}
 #endif
-

@@ -38,5 +38,10 @@ powl (long double x, long double y)
 {
   return pow(x, y);
 }
+#elif defined(__riscv)
+long double
+powl (long double x, long double y)
+{
+  return __builtin_powl(x, y);
+}
 #endif
-

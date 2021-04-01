@@ -38,5 +38,10 @@ tanhl (long double x)
 {
   return tanh(x);
 }
+#elif defined(__riscv)
+long double
+tanhl (long double x)
+{
+  return __builtin_tanhl(x);
+}
 #endif
-

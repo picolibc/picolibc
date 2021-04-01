@@ -38,5 +38,10 @@ lrintl (long double x)
 {
   return lrint(x);
 }
+#elif defined(__riscv)
+long int
+lrintl (long double x)
+{
+  return __builtin_lrintl(x);
+}
 #endif
-

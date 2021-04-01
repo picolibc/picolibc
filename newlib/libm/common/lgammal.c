@@ -38,5 +38,10 @@ lgammal (long double x)
 {
   return lgamma(x);
 }
+#elif defined(__riscv)
+long double
+lgammal (long double x)
+{
+  return __builtin_lgammal(x);
+}
 #endif
-
