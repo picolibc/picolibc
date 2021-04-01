@@ -38,5 +38,10 @@ ldexpl (long double value, int exp)
 {
   return ldexp(value, exp);
 }
+#elif defined(__riscv)
+long double
+ldexpl (long double value, int exp)
+{
+  return __builtin_ldexpl(value, exp);
+}
 #endif
-

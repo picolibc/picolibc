@@ -38,5 +38,10 @@ atanhl (long double x)
 {
   return atanh(x);
 }
+#elif defined(__riscv)
+long double
+atanhl (long double x)
+{
+  return __builtin_atanhl(x);
+}
 #endif
-

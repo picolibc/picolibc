@@ -38,5 +38,10 @@ fabsl (long double x)
 {
   return fabs(x);
 }
+#elif defined(__riscv)
+long double
+fabsl (long double x)
+{
+  return __builtin_fabsl(x);
+}
 #endif
-

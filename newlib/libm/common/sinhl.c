@@ -38,5 +38,10 @@ sinhl (long double x)
 {
   return sinh(x);
 }
+#elif defined(__riscv)
+long double
+sinhl (long double x)
+{
+  return __builtin_sinhl(x);
+}
 #endif
-

@@ -38,5 +38,10 @@ frexpl (long double x, int *eptr)
 {
   return frexp(x, eptr);
 }
+#elif defined(__riscv)
+long double
+frexpl (long double x, int *eptr)
+{
+  return __builtin_frexpl(x, eptr);
+}
 #endif
-

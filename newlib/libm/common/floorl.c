@@ -38,5 +38,10 @@ floorl (long double x)
 {
   return floor(x);
 }
+#elif defined(__riscv)
+long double
+floorl (long double x)
+{
+  return __builtin_floorl(x);
+}
 #endif
-

@@ -38,5 +38,10 @@ remainderl (long double x, long double p)
 {
   return remainder(x, p);
 }
+#elif defined(__riscv)
+long double
+remainderl (long double x, long double p)
+{
+  return __builtin_remainderl(x, p);
+}
 #endif
-

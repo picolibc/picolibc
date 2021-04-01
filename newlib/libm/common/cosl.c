@@ -38,5 +38,10 @@ cosl (long double x)
 {
   return cos(x);
 }
+#elif defined(__riscv)
+long double
+cosl (long double x)
+{
+  return __builtin_cosl(x);
+}
 #endif
-

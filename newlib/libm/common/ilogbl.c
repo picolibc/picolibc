@@ -38,5 +38,10 @@ ilogbl (long double x)
 {
   return ilogb(x);
 }
+#elif defined(__riscv)
+int
+ilogbl (long double x)
+{
+  return __builtin_ilogbl(x);
+}
 #endif
-

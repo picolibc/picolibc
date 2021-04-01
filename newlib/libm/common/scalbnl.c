@@ -38,5 +38,10 @@ scalbnl (long double x, int n)
 {
   return scalbn(x, n);
 }
+#elif defined(__riscv)
+long double
+scalbnl (long double x, int n)
+{
+  return __builtin_scalbnl(x, n);
+}
 #endif
-

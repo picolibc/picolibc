@@ -38,5 +38,10 @@ exp2l (long double x)
 {
   return exp2(x);
 }
+#elif defined(__riscv)
+long double
+exp2l (long double x)
+{
+  return __builtin_exp2l(x);
+}
 #endif
-
