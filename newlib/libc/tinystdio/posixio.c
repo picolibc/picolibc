@@ -136,13 +136,3 @@ __posix_close(FILE *f)
 	free(f);
 	return ret;
 }
-
-/*
- * Add a destructor function to get stdout flushed on
- * exit
- */
-__attribute__((destructor (101)))
-static void posix_exit(void)
-{
-	__posix_flush(stdout);
-}
