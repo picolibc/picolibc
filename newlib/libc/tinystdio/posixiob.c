@@ -68,5 +68,5 @@ __weak_reference(__posix_iob,__iob);
 __attribute__((destructor (101)))
 static void posix_exit(void)
 {
-	__posix_flush(stdout);
+	fflush(stdout);
 }
