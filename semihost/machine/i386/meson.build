@@ -45,7 +45,7 @@ endif
 
 has_semihost = true
 
-objcopy = find_program('objcopy', required: true)
+objcopy = find_program('objcopy', required: false)
 
 foreach target : targets
   value = get_variable('target_' + target)
@@ -68,21 +68,23 @@ foreach target : targets
 
   set_variable('lib_semihost' + target, local_lib_semihost_target)
 
-  # Stub BIOS which provides a jump instruction at the CPU start
-  # address (0xfffffff0) to get us to our default start address at 1MB
-  # (0x100000)
+  if objcopy.found()
+    # Stub BIOS which provides a jump instruction at the CPU start
+    # address (0xfffffff0) to get us to our default start address at 1MB
+    # (0x100000)
 
-  bios_ld = '@0@/@1@'.format(meson.current_source_dir(), 'bios.ld')
-  bios = executable('bios' + target, 'bios.S',
-		    c_args: value[1],
-		    link_args: ['-nostartfiles', '-nostdlib', '-T', bios_ld])
+    bios_ld = '@0@/@1@'.format(meson.current_source_dir(), 'bios.ld')
+    bios = executable('bios' + target, 'bios.S',
+		      c_args: value[1],
+		      link_args: ['-nostartfiles', '-nostdlib', '-T', bios_ld])
 
-  custom_target('bios' + target + '.bin',
-		build_by_default: true,
-		input: bios,
-		install: true,
-		install_dir: instdir,
-		output: 'bios' + target + '.bin',
-		command: [objcopy, '-O', 'binary', '@INPUT@', '@OUTPUT@'])
+    custom_target('bios' + target + '.bin',
+		  build_by_default: true,
+		  input: bios,
+		  install: true,
+		  install_dir: instdir,
+		  output: 'bios' + target + '.bin',
+		  command: [objcopy, '-O', 'binary', '@INPUT@', '@OUTPUT@'])
+  endif
 
 endforeach
