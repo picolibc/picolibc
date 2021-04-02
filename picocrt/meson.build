@@ -39,6 +39,7 @@ src_picocrt_machine = {
 			'arm' : 'arm/crt0.c',
 			'aarch64' : 'aarch64/crt0.c',
 			'x86' : 'i386/crt0.S',
+			'x86_64' : 'amd64/crt0.S',
 		      }
 
 if src_picocrt_machine.has_key(host_cpu_family)

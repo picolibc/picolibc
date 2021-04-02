@@ -123,7 +123,8 @@ endif
 # Systems with non-arm semihosting support
 #
 semihost_custom = {
-		    'x86' : 'i386'
+		    'x86' : 'i386',
+		    'x86_64' : 'i386',
 		  }
 
 message('host_cpu_family ' + host_cpu_family)
