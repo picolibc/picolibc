@@ -10,6 +10,7 @@ RUN apt-get update && \
     build-essential \
     meson \
     ninja-build \
+    gcc \
     gcc-i686-linux-gnu \
     gcc-arm-none-eabi \
     gcc-riscv64-unknown-elf \
@@ -22,6 +23,7 @@ RUN apt-get update && \
     build-essential \
     meson \
     ninja-build \
+    gcc \
     gcc-i686-linux-gnu \
     gcc-arm-none-eabi \
     gcc-riscv64-unknown-elf \
@@ -34,6 +36,7 @@ RUN apt-get update && \
     build-essential \
     meson \
     ninja-build \
+    gcc \
     gcc-i686-linux-gnu \
     gcc-arm-none-eabi \
     gcc-riscv64-unknown-elf \
@@ -46,6 +49,7 @@ RUN apt-get update && \
     build-essential \
     meson \
     ninja-build \
+    gcc \
     gcc-i686-linux-gnu \
     gcc-arm-none-eabi \
     gcc-riscv64-unknown-elf \
