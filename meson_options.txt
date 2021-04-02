@@ -53,6 +53,9 @@ option('picolib', type: 'boolean', value: true,
 option('picocrt', type: 'boolean', value: true,
        description: 'Include pico crt bits')
 
+option('semihost', type: 'boolean', value: true,
+       description: 'Include semihost bits')
+
 option('specsdir', type: 'string',
        description: 'Installation directory for .specs file')
 

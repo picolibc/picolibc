@@ -50,6 +50,7 @@ enable_multilib = get_option('multilib')
 multilib_list = get_option('multilib-list')
 enable_picolib = get_option('picolib')
 enable_picocrt = get_option('picocrt')
+enable_semihost = get_option('semihost')
 enable_tests = get_option('tests')
 enable_native_tests = get_option('native-tests')
 tests_enable_stack_protector = get_option('tests-enable-stack-protector')
@@ -777,7 +778,9 @@ has_semihost = false
 has_arm_semihost = false
 
 # make sure to include semihost BEFORE picocrt!
-subdir('semihost')
+if enable_semihost
+  subdir('semihost')
+endif
 if tinystdio
   subdir('dummyhost')
 endif
