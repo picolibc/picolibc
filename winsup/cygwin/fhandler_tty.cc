@@ -183,19 +183,20 @@ CreateProcessA_Hooked
       char *p = prog;
       char *p1;
       do
-	if ((p1 = strstr (p, ".exe")) || (p1 = strstr (p, ".com")))
+	if ((p1 = strchr (p, ' ')) || (p1 = p + strlen (p)))
 	  {
-	    p = p1 + 4;
+	    p = p1;
 	    if (*p == ' ')
 	      {
 		*p = '\0';
-		path.check (prog);
+		find_exec (prog, path);
 		*p = ' ';
+		p ++;
 	      }
 	    else if (*p == '\0')
-	      path.check (prog);
+	      find_exec (prog, path);
 	  }
-      while (!path.exists() && p1);
+      while (!path.exists() && *p);
     }
   const char *argv[] = {"", NULL}; /* Dummy */
   av av1;
@@ -239,19 +240,20 @@ CreateProcessW_Hooked
       char *p = prog;
       char *p1;
       do
-	if ((p1 = strstr (p, ".exe")) || (p1 = strstr (p, ".com")))
+	if ((p1 = strchr (p, ' ')) || (p1 = p + strlen (p)))
 	  {
-	    p = p1 + 4;
+	    p = p1;
 	    if (*p == ' ')
 	      {
 		*p = '\0';
-		path.check (prog);
+		find_exec (prog, path);
 		*p = ' ';
+		p ++;
 	      }
 	    else if (*p == '\0')
-	      path.check (prog);
+	      find_exec (prog, path);
 	  }
-      while (!path.exists() && p1);
+      while (!path.exists() && *p);
     }
   const char *argv[] = {"", NULL}; /* Dummy */
   av av1;
