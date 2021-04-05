@@ -187,9 +187,9 @@ handle (int fd, bool writing)
   else if (cfd->close_on_exec ())
     h = INVALID_HANDLE_VALUE;
   else if (!writing)
-    h = cfd->get_handle ();
+    h = cfd->get_handle_nat ();
   else
-    h = cfd->get_output_handle ();
+    h = cfd->get_output_handle_nat ();
 
   return h;
 }
@@ -660,7 +660,7 @@ child_info_spawn::worker (const char *prog_arg, const char *const *argv,
 	}
 
       bool enable_pcon = false;
-      HANDLE ptys_from_master = NULL;
+      HANDLE ptys_from_master_nat = NULL;
       HANDLE ptys_input_available_event = NULL;
       HANDLE ptys_pcon_mutex = NULL;
       HANDLE ptys_input_mutex = NULL;
@@ -677,11 +677,11 @@ child_info_spawn::worker (const char *prog_arg, const char *const *argv,
 	    enable_pcon = true;
 	  ReleaseMutex (ptys_primary->pcon_mutex);
 	  HANDLE h_stdin = handle ((in__stdin < 0 ? 0 : in__stdin), false);
-	  if (h_stdin == ptys_primary->get_handle ())
+	  if (h_stdin == ptys_primary->get_handle_nat ())
 	    stdin_is_ptys = true;
-	  ptys_from_master = ptys_primary->get_handle ();
-	  DuplicateHandle (GetCurrentProcess (), ptys_from_master,
-			   GetCurrentProcess (), &ptys_from_master,
+	  ptys_from_master_nat = ptys_primary->get_handle_nat ();
+	  DuplicateHandle (GetCurrentProcess (), ptys_from_master_nat,
+			   GetCurrentProcess (), &ptys_from_master_nat,
 			   0, 0, DUPLICATE_SAME_ACCESS);
 	  ptys_input_available_event =
 	    ptys_primary->get_input_available_event ();
@@ -700,7 +700,7 @@ child_info_spawn::worker (const char *prog_arg, const char *const *argv,
 	    {
 	      WaitForSingleObject (ptys_input_mutex, INFINITE);
 	      fhandler_pty_slave::transfer_input (tty::to_nat,
-				    ptys_primary->get_handle_cyg (),
+				    ptys_primary->get_handle (),
 				    ptys_ttyp, ptys_input_available_event);
 	      ReleaseMutex (ptys_input_mutex);
 	    }
@@ -993,11 +993,11 @@ child_info_spawn::worker (const char *prog_arg, const char *const *argv,
 		{
 		  WaitForSingleObject (ptys_input_mutex, INFINITE);
 		  fhandler_pty_slave::transfer_input (tty::to_cyg,
-					    ptys_from_master, ptys_ttyp,
+					    ptys_from_master_nat, ptys_ttyp,
 					    ptys_input_available_event);
 		  ReleaseMutex (ptys_input_mutex);
 		}
-	      CloseHandle (ptys_from_master);
+	      CloseHandle (ptys_from_master_nat);
 	      CloseHandle (ptys_input_mutex);
 	      CloseHandle (ptys_input_available_event);
 	      WaitForSingleObject (ptys_pcon_mutex, INFINITE);
@@ -1030,11 +1030,11 @@ child_info_spawn::worker (const char *prog_arg, const char *const *argv,
 		{
 		  WaitForSingleObject (ptys_input_mutex, INFINITE);
 		  fhandler_pty_slave::transfer_input (tty::to_cyg,
-					    ptys_from_master, ptys_ttyp,
+					    ptys_from_master_nat, ptys_ttyp,
 					    ptys_input_available_event);
 		  ReleaseMutex (ptys_input_mutex);
 		}
-	      CloseHandle (ptys_from_master);
+	      CloseHandle (ptys_from_master_nat);
 	      CloseHandle (ptys_input_mutex);
 	      CloseHandle (ptys_input_available_event);
 	      WaitForSingleObject (ptys_pcon_mutex, INFINITE);

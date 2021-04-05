@@ -319,7 +319,7 @@ tty_min::setpgid (int pid)
 	{
 	WaitForSingleObject (ptys->input_mutex, INFINITE);
 	fhandler_pty_slave::transfer_input (tty::to_nat,
-					    ptys->get_handle_cyg (), ttyp,
+					    ptys->get_handle (), ttyp,
 					    ptys->get_input_available_event ());
 	ReleaseMutex (ptys->input_mutex);
 	}
@@ -334,7 +334,7 @@ tty_min::setpgid (int pid)
 	      if (p)
 		pcon_winpid = p->exec_dwProcessId ?: p->dwProcessId;
 	    }
-	  HANDLE from = ptys->get_handle ();
+	  HANDLE from = ptys->get_handle_nat ();
 	  if (ttyp->pcon_activated && pcon_winpid
 	      && !ptys->get_console_process_id (pcon_winpid, true))
 	    {

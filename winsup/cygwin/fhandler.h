@@ -456,9 +456,9 @@ public:
   /* Virtual accessor functions to hide the fact
      that some fd's have two handles. */
   virtual HANDLE& get_handle () { return io_handle; }
-  virtual HANDLE& get_handle_cyg () { return io_handle; }
+  virtual HANDLE& get_handle_nat () { return io_handle; }
   virtual HANDLE& get_output_handle () { return io_handle; }
-  virtual HANDLE& get_output_handle_cyg () { return io_handle; }
+  virtual HANDLE& get_output_handle_nat () { return io_handle; }
   virtual HANDLE get_stat_handle () { return pc.handle () ?: io_handle; }
   virtual HANDLE get_echo_handle () const { return NULL; }
   virtual bool hit_eof () {return false;}
@@ -1931,7 +1931,7 @@ class fhandler_termios: public fhandler_base
     need_fork_fixup (true);
   }
   HANDLE& get_output_handle () { return output_handle; }
-  HANDLE& get_output_handle_cyg () { return output_handle; }
+  HANDLE& get_output_handle_nat () { return output_handle; }
   line_edit_status line_edit (const char *rptr, size_t nread, termios&,
 			      ssize_t *bytes_read = NULL);
   void set_output_handle (HANDLE h) { output_handle = h; }
@@ -2314,7 +2314,7 @@ class fhandler_pty_common: public fhandler_termios
 class fhandler_pty_slave: public fhandler_pty_common
 {
   HANDLE inuse;			// used to indicate that a tty is in use
-  HANDLE output_handle_cyg, io_handle_cyg;
+  HANDLE output_handle_nat, io_handle_nat;
   HANDLE slave_reading;
   LONG num_reader;
 
@@ -2327,10 +2327,10 @@ class fhandler_pty_slave: public fhandler_pty_common
   /* Constructor */
   fhandler_pty_slave (int);
 
-  void set_output_handle_cyg (HANDLE h) { output_handle_cyg = h; }
-  HANDLE& get_output_handle_cyg () { return output_handle_cyg; }
-  void set_handle_cyg (HANDLE h) { io_handle_cyg = h; }
-  HANDLE& get_handle_cyg () { return io_handle_cyg; }
+  void set_output_handle_nat (HANDLE h) { output_handle_nat = h; }
+  HANDLE& get_output_handle_nat () { return output_handle_nat; }
+  void set_handle_nat (HANDLE h) { io_handle_nat = h; }
+  HANDLE& get_handle_nat () { return io_handle_nat; }
 
   int open (int flags, mode_t mode = 0);
   void open_setup (int flags);
@@ -2394,19 +2394,19 @@ class fhandler_pty_master: public fhandler_pty_common
 public:
   /* Parameter set for the static function pty_master_thread() */
   struct master_thread_param_t {
+    HANDLE from_master_nat;
     HANDLE from_master;
-    HANDLE from_master_cyg;
+    HANDLE to_master_nat;
     HANDLE to_master;
-    HANDLE to_master_cyg;
+    HANDLE to_slave_nat;
     HANDLE to_slave;
-    HANDLE to_slave_cyg;
     HANDLE master_ctl;
     HANDLE input_available_event;
   };
   /* Parameter set for the static function pty_master_fwd_thread() */
   struct master_fwd_thread_param_t {
-    HANDLE to_master_cyg;
-    HANDLE from_slave;
+    HANDLE to_master;
+    HANDLE from_slave_nat;
     HANDLE output_mutex;
     tty *ttyp;
   };
@@ -2414,10 +2414,10 @@ private:
   int pktmode;			// non-zero if pty in a packet mode.
   HANDLE master_ctl;		// Control socket for handle duplication
   cygthread *master_thread;	// Master control thread
-  HANDLE from_master, to_master, from_slave, to_slave;
+  HANDLE from_master_nat, to_master_nat, from_slave_nat, to_slave_nat;
   HANDLE echo_r, echo_w;
   DWORD dwProcessId;		// Owner of master handles
-  HANDLE to_master_cyg, from_master_cyg;
+  HANDLE to_master, from_master;
   cygthread *master_fwd_thread;	// Master forwarding thread
   HANDLE thread_param_copied_event;
 

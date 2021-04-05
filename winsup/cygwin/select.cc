@@ -74,7 +74,7 @@ details. */
 })
 
 #define set_handle_or_return_if_not_open(h, s) \
-  h = (s)->fh->get_handle_cyg (); \
+  h = (s)->fh->get_handle (); \
   if (cygheap->fdtab.not_open ((s)->fd)) \
     { \
       (s)->thread_errno =  EBADF; \
@@ -715,7 +715,7 @@ out:
       fhandler_pty_master *fhm = (fhandler_pty_master *) fh;
       fhm->set_mask_flusho (s->read_ready);
     }
-  h = fh->get_output_handle_cyg ();
+  h = fh->get_output_handle ();
   if (s->write_selected && dev != FH_PIPER)
     {
       gotone += s->write_ready =  pipe_data_available (s->fd, fh, h, true);
@@ -1344,7 +1344,7 @@ peek_pty_slave (select_record *s, bool from_select)
     }
 
 out:
-  HANDLE h = ptys->get_output_handle_cyg ();
+  HANDLE h = ptys->get_output_handle ();
   if (s->write_selected)
     {
       gotone += s->write_ready =  pipe_data_available (s->fd, fh, h, true);
@@ -1572,7 +1572,7 @@ serial_read_cleanup (select_record *s, select_stuff *stuff)
 {
   if (s->h)
     {
-      HANDLE h = ((fhandler_serial *) s->fh)->get_handle_cyg ();
+      HANDLE h = ((fhandler_serial *) s->fh)->get_handle ();
       DWORD undefined;
 
       if (h)
@@ -1611,11 +1611,11 @@ fhandler_serial::select_read (select_stuff *ss)
 
   /* This is apparently necessary for the com0com driver.
      See: http://cygwin.com/ml/cygwin/2009-01/msg00667.html */
-  SetCommMask (get_handle_cyg (), 0);
-  SetCommMask (get_handle_cyg (), EV_RXCHAR);
-  if (ClearCommError (get_handle_cyg (), &io_err, &st) && st.cbInQue)
+  SetCommMask (get_handle (), 0);
+  SetCommMask (get_handle (), EV_RXCHAR);
+  if (ClearCommError (get_handle (), &io_err, &st) && st.cbInQue)
     s->read_ready = true;
-  else if (WaitCommEvent (get_handle_cyg (), &s->fh_data_serial->event,
+  else if (WaitCommEvent (get_handle (), &s->fh_data_serial->event,
 			  &s->fh_data_serial->ov))
     s->read_ready = true;
   else if (GetLastError () == ERROR_IO_PENDING)
@@ -1667,7 +1667,7 @@ fhandler_base::select_read (select_stuff *ss)
       s->startup = no_startup;
       s->verify = verify_ok;
     }
-  s->h = get_handle_cyg ();
+  s->h = get_handle ();
   s->read_selected = true;
   s->read_ready = true;
   return s;
@@ -1682,7 +1682,7 @@ fhandler_base::select_write (select_stuff *ss)
       s->startup = no_startup;
       s->verify = verify_ok;
     }
-  s->h = get_output_handle_cyg ();
+  s->h = get_output_handle ();
   s->write_selected = true;
   s->write_ready = true;
   return s;
@@ -1955,7 +1955,7 @@ fhandler_socket_unix::select_read (select_stuff *ss)
       s->startup = no_startup;
       s->verify = verify_ok;
     }
-  s->h = get_handle_cyg ();
+  s->h = get_handle ();
   s->read_selected = true;
   s->read_ready = true;
   return s;
