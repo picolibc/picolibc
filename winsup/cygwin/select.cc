@@ -1920,10 +1920,7 @@ fhandler_socket_wsock::select_write (select_stuff *ss)
   s->write_ready = saw_shutdown_write () || connect_state () == unconnected;
   s->write_selected = true;
   if (connect_state () != unconnected)
-    {
-      s->except_ready = saw_shutdown_write () || saw_shutdown_read ();
-      s->except_on_write = true;
-    }
+    s->except_on_write = true;
   return s;
 }
 
@@ -1938,8 +1935,6 @@ fhandler_socket_wsock::select_except (select_stuff *ss)
       s->cleanup = socket_cleanup;
     }
   s->peek = peek_socket;
-  /* FIXME: Is this right?  Should these be used as criteria for except? */
-  s->except_ready = saw_shutdown_write () || saw_shutdown_read ();
   s->except_selected = true;
   return s;
 }
