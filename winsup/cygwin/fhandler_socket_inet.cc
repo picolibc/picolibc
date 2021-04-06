@@ -361,20 +361,30 @@ fhandler_socket_wsock::evaluate_events (const long event_mask, long &events,
 	  wsock_events->events |= FD_WRITE;
 	  wsock_events->connect_errorcode = 0;
 	}
-      /* This test makes accept/connect behave as on Linux when accept/connect
-         is called on a socket for which shutdown has been called.  The second
-	 half of this code is in the shutdown method. */
       if (events & FD_CLOSE)
 	{
-	  if ((event_mask & FD_ACCEPT) && saw_shutdown_read ())
+	  if (evts.iErrorCode[FD_CLOSE_BIT])
 	    {
-	      WSASetLastError (WSAEINVAL);
+	      WSASetLastError (evts.iErrorCode[FD_CLOSE_BIT]);
 	      ret = SOCKET_ERROR;
 	    }
-	  if (event_mask & FD_CONNECT)
+	  /* This test makes accept/connect behave as on Linux when accept/
+	     connect is called on a socket for which shutdown has been called.
+	     The second half of this code is in the shutdown method.  Note that
+	     we only do this when called from accept/connect, not from select.
+	     In this case erase == false, just as with read (MSG_PEEK). */
+	  if (erase)
 	    {
-	      WSASetLastError (WSAECONNRESET);
-	      ret = SOCKET_ERROR;
+	      if ((event_mask & FD_ACCEPT) && saw_shutdown_read ())
+		{
+		  WSASetLastError (WSAEINVAL);
+		  ret = SOCKET_ERROR;
+		}
+	      if (event_mask & FD_CONNECT)
+		{
+		  WSASetLastError (WSAECONNRESET);
+		  ret = SOCKET_ERROR;
+		}
 	    }
 	}
       if (erase)

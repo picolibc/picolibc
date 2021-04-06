@@ -1709,7 +1709,8 @@ peek_socket (select_record *me, bool)
   fhandler_socket_wsock *fh = (fhandler_socket_wsock *) me->fh;
   long events;
   /* Don't play with the settings again, unless having taken a deep look into
-     Richard W. Stevens Network Programming book.  Thank you. */
+     Richard W. Stevens Network Programming book and how these flags are
+     defined in Winsock.  Thank you. */
   long evt_mask = (me->read_selected ? (FD_READ | FD_ACCEPT | FD_CLOSE) : 0)
 		| (me->write_selected ? (FD_WRITE | FD_CONNECT | FD_CLOSE) : 0)
 		| (me->except_selected ? FD_OOB : 0);
@@ -1717,7 +1718,9 @@ peek_socket (select_record *me, bool)
   if (me->read_selected)
     me->read_ready |= ret || !!(events & (FD_READ | FD_ACCEPT | FD_CLOSE));
   if (me->write_selected)
-    me->write_ready |= ret || !!(events & (FD_WRITE | FD_CONNECT | FD_CLOSE));
+    /* Don't check for FD_CLOSE here.  Only an error case (ret == -1)
+       will set ready for writing. */
+    me->write_ready |= ret || !!(events & (FD_WRITE | FD_CONNECT));
   if (me->except_selected)
     me->except_ready |= !!(events & FD_OOB);
 
