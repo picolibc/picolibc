@@ -147,11 +147,47 @@ set_switch_to_pcon (HANDLE *in, HANDLE *out, HANDLE *err, bool iscygwin)
     *err = replace_err->get_output_handle_nat ();
 }
 
+static bool atexit_func_registered = false;
+static bool debug_process = false;
+
+static void
+atexit_func (void)
+{
+  if (isHybrid)
+    {
+      cygheap_fdenum cfd (false);
+      while (cfd.next () >= 0)
+	if (cfd->get_device () == (dev_t) myself->ctty)
+	  {
+	    DWORD force_switch_to = 0;
+	    if (WaitForSingleObject (h_gdb_process, 0) == WAIT_TIMEOUT
+		&& !debug_process)
+	      force_switch_to = GetProcessId (h_gdb_process);
+	    fhandler_base *fh = cfd;
+	    fhandler_pty_slave *ptys = (fhandler_pty_slave *) fh;
+	    tty *ttyp = ptys->get_ttyp ();
+	    HANDLE from = ptys->get_handle_nat ();
+	    HANDLE input_available_event = ptys->get_input_available_event ();
+	    if (ttyp->getpgid () == myself->pgid
+		&& GetStdHandle (STD_INPUT_HANDLE) == ptys->get_handle ()
+		&& ttyp->pcon_input_state_eq (tty::to_nat) && !force_switch_to)
+	      {
+		WaitForSingleObject (ptys->input_mutex, INFINITE);
+		fhandler_pty_slave::transfer_input (tty::to_cyg, from, ttyp,
+						    input_available_event);
+		ReleaseMutex (ptys->input_mutex);
+	      }
+	    ptys->close_pseudoconsole (ttyp, force_switch_to);
+	    break;
+	  }
+      CloseHandle (h_gdb_process);
+    }
+}
+
 #define DEF_HOOK(name) static __typeof__ (name) *name##_Orig
 /* CreateProcess() is hooked for GDB etc. */
 DEF_HOOK (CreateProcessA);
 DEF_HOOK (CreateProcessW);
-DEF_HOOK (exit);
 
 static BOOL WINAPI
 CreateProcessA_Hooked
@@ -208,8 +244,15 @@ CreateProcessA_Hooked
   DuplicateHandle (GetCurrentProcess (), h_gdb_process,
 		   GetCurrentProcess (), &h_gdb_process,
 		   0, 0, DUPLICATE_SAME_ACCESS);
+  debug_process = !!(f & (DEBUG_PROCESS | DEBUG_ONLY_THIS_PROCESS));
+  if (!atexit_func_registered && !path.iscygexec ())
+    {
+      atexit (atexit_func);
+      atexit_func_registered = true;
+    }
   return ret;
 }
+
 static BOOL WINAPI
 CreateProcessW_Hooked
      (LPCWSTR n, LPWSTR c, LPSECURITY_ATTRIBUTES pa, LPSECURITY_ATTRIBUTES ta,
@@ -265,36 +308,13 @@ CreateProcessW_Hooked
   DuplicateHandle (GetCurrentProcess (), h_gdb_process,
 		   GetCurrentProcess (), &h_gdb_process,
 		   0, 0, DUPLICATE_SAME_ACCESS);
-  return ret;
-}
-
-void
-exit_Hooked (int e)
-{
-  if (isHybrid)
+  debug_process = !!(f & (DEBUG_PROCESS | DEBUG_ONLY_THIS_PROCESS));
+  if (!atexit_func_registered && !path.iscygexec ())
     {
-      cygheap_fdenum cfd (false);
-      while (cfd.next () >= 0)
-	if (cfd->get_device () == (dev_t) myself->ctty)
-	  {
-	    fhandler_base *fh = cfd;
-	    fhandler_pty_slave *ptys = (fhandler_pty_slave *) fh;
-	    tty *ttyp = ptys->get_ttyp ();
-	    HANDLE from = ptys->get_handle_nat ();
-	    HANDLE input_available_event = ptys->get_input_available_event ();
-	    if (ttyp->getpgid () == myself->pgid
-		&& GetStdHandle (STD_INPUT_HANDLE) == ptys->get_handle ()
-		&& ttyp->pcon_input_state_eq (tty::to_nat))
-	      {
-		WaitForSingleObject (ptys->input_mutex, INFINITE);
-		fhandler_pty_slave::transfer_input (tty::to_cyg, from, ttyp,
-						    input_available_event);
-		ReleaseMutex (ptys->input_mutex);
-	      }
-	    break;
-	  }
+      atexit (atexit_func);
+      atexit_func_registered = true;
     }
-  exit_Orig (e);
+  return ret;
 }
 
 static void
@@ -1133,6 +1153,15 @@ fhandler_pty_slave::reset_switch_to_pcon (void)
   if (isHybrid)
     return;
   WaitForSingleObject (pcon_mutex, INFINITE);
+  HANDLE h;
+  if (get_ttyp ()->pcon_pid > MAX_PID &&
+      (h = OpenProcess (SYNCHRONIZE, FALSE, get_ttyp ()->pcon_pid - MAX_PID)))
+    {
+      /* There is a process which is grabbing pseudo console. */
+      CloseHandle (h);
+      ReleaseMutex (pcon_mutex);
+      return;
+    }
   if (get_ttyp ()->pcon_pid && get_ttyp ()->pcon_pid != myself->pid
       && !!pinfo (get_ttyp ()->pcon_pid))
     {
@@ -1140,6 +1169,7 @@ fhandler_pty_slave::reset_switch_to_pcon (void)
       ReleaseMutex (pcon_mutex);
       return;
     }
+  get_ttyp ()->pcon_input_state = tty::to_cyg;
   get_ttyp ()->pcon_pid = 0;
   get_ttyp ()->switch_to_pcon_in = false;
   get_ttyp ()->pcon_activated = false;
@@ -2339,8 +2369,6 @@ fhandler_pty_slave::fixup_after_exec ()
   /* CreateProcess() is hooked for GDB etc. */
   DO_HOOK (NULL, CreateProcessA);
   DO_HOOK (NULL, CreateProcessW);
-  if (CreateProcessA_Orig || CreateProcessW_Orig)
-    DO_HOOK (NULL, exit);
 }
 
 /* This thread function handles the master control pipe.  It waits for a
@@ -3346,11 +3374,17 @@ fallback:
 /* The function close_pseudoconsole() should be static so that it can
    be called even after the fhandler_pty_slave instance is deleted. */
 void
-fhandler_pty_slave::close_pseudoconsole (tty *ttyp)
+fhandler_pty_slave::close_pseudoconsole (tty *ttyp, DWORD force_switch_to)
 {
   DWORD switch_to_stub = 0, switch_to = 0;
   DWORD new_pcon_pid = 0;
-  if (ttyp->pcon_pid == myself->pid)
+  if (force_switch_to)
+    {
+      switch_to_stub = force_switch_to;
+      new_pcon_pid = force_switch_to + MAX_PID;
+      ttyp->setpgid (new_pcon_pid);
+    }
+  else if (ttyp->pcon_pid == myself->pid)
     {
       /* Search another process which attaches to the pseudo console */
       DWORD current_pid = myself->exec_dwProcessId ?: myself->dwProcessId;

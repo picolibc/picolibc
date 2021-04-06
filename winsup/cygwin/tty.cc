@@ -402,5 +402,7 @@ tty::pcon_fg (pid_t pgid)
       if (p->ctty == ntty && p->pgid == pgid && p->exec_dwProcessId)
 	return true;
     }
+  if (pgid > MAX_PID)
+    return true;
   return false;
 }

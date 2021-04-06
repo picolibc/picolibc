@@ -2374,7 +2374,7 @@ class fhandler_pty_slave: public fhandler_pty_common
     return fh;
   }
   bool setup_pseudoconsole (bool nopcon);
-  static void close_pseudoconsole (tty *ttyp);
+  static void close_pseudoconsole (tty *ttyp, DWORD force_switch_to = 0);
   bool term_has_pcon_cap (const WCHAR *env);
   void set_switch_to_pcon (void);
   void reset_switch_to_pcon (void);
