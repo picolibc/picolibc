@@ -8,7 +8,7 @@ details. */
 
 #include "winsup.h"
 #include "miscfuncs.h"
-#include "fenv.h"
+#include <fenv.h>
 #define USE_SYS_TYPES_FD_SET
 #include <winsock2.h>
 

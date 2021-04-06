@@ -33,7 +33,7 @@ details. */
 #include "tls_pbuf.h"
 #include "exception.h"
 #include "cygxdr.h"
-#include "fenv.h"
+#include <fenv.h>
 #include "ntdll.h"
 
 #define MAX_AT_FILE_LEVEL 10
