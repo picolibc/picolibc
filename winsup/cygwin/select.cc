@@ -527,7 +527,10 @@ set_bits (select_record *me, fd_set *readfds, fd_set *writefds,
 	  /* Set readfds entry in case of a failed connect. */
 	  if (!me->read_ready && me->read_selected
 	      && sock->connect_state () == connect_failed)
-	    UNIX_FD_SET (me->fd, readfds);
+	    {
+	      UNIX_FD_SET (me->fd, readfds);
+	      ready++;
+	    }
 	}
       ready++;
     }
