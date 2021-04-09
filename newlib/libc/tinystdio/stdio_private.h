@@ -158,9 +158,6 @@ static inline void __posix_unlock(FILE *f) {
 int	__d_vfprintf(FILE *__stream, const char *__fmt, va_list __ap) __FORMAT_ATTRIBUTE__(printf, 2, 0);
 int	__f_vfprintf(FILE *__stream, const char *__fmt, va_list __ap) __FORMAT_ATTRIBUTE__(printf, 2, 0);
 
-int	__d_sprintf(char *__s, const char *__fmt, ...) __FORMAT_ATTRIBUTE__(printf, 2, 0);
-int	__f_sprintf(char *__s, const char *__fmt, ...) __FORMAT_ATTRIBUTE__(printf, 2, 0);
-
 int
 __posix_sflags (const char *mode, int *optr);
 
@@ -177,6 +174,9 @@ int
 __posix_close(FILE *f);
 
 #endif
+
+int	__d_sprintf(char *__s, const char *__fmt, ...) __FORMAT_ATTRIBUTE__(printf, 2, 0);
+int	__f_sprintf(char *__s, const char *__fmt, ...) __FORMAT_ATTRIBUTE__(printf, 2, 0);
 
 double
 __atod_engine(uint64_t m10, int e10);
