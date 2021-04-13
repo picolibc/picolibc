@@ -44,6 +44,7 @@
 #define SYS_munmap 215
 #define SYS_mremap 216
 #define SYS_mmap 222
+#define SYS_clock_gettime64 403
 #define SYS_open 1024
 #define SYS_link 1025
 #define SYS_unlink 1026
