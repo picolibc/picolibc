@@ -420,10 +420,6 @@ endif
 
 # Generate Unicode data tables for libc/string/wcwidth and libc/ctype/??w*
 unidata:
-	cd $(srcdir)/libc/string; ./mkunidata
-	cd $(srcdir)/libc/ctype; ./mkunidata
-
-unidate-download:
 	cd $(srcdir)/libc/string; ./mkunidata -u
 	cd $(srcdir)/libc/ctype; ./mkunidata -u
 

@@ -21,11 +21,13 @@ case "$1" in
 	;;
 -u)
 	wget () {
-		curl -R -O --connect-timeout 55 -z "`basename $1`" "$1"
+		ref=`basename $1`
+		ref=`ls "$ref" 2> /dev/null || echo 01-Jan-1970`
+		curl -R -O --connect-timeout 55 -z "$ref" "$1"
 	}
 
 	echo downloading uniset tool
-	wget http://www.cl.cam.ac.uk/~mgk25/download/uniset.tar.gz
+	wget https://www.cl.cam.ac.uk/~mgk25/download/uniset.tar.gz
 	gzip -dc uniset.tar.gz | tar xvf - uniset
 
 	echo downloading data from unicode.org

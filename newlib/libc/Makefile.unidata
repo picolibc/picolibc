@@ -1,0 +1,11 @@
+# Generate Unicode data tables for string/wcwidth and ctype/??w*
+# Download Unicode data files
+unidata:
+	cd string; ./mkunidata -u
+	cd ctype; ./mkunidata -u
+
+# Generate Unicode data tables for string/wcwidth and ctype/??w*
+# Use installed Unicode data files from package unicode-ucd
+unidata-local:
+	cd string; ./mkunidata -i
+	cd ctype; ./mkunidata -i
