@@ -48,6 +48,7 @@ details. */
 #define con_is_legacy (shared_console_info && con.is_legacy)
 
 #define CONS_THREAD_SYNC "cygcons.thread_sync"
+static bool NO_COPY master_thread_started = false;
 
 const unsigned fhandler_console::MAX_WRITE_CHARS = 16384;
 
@@ -184,6 +185,7 @@ cons_master_thread (VOID *arg)
 		   GetCurrentProcess (), &thread_sync_event,
 		   0, FALSE, DUPLICATE_SAME_ACCESS);
   SetEvent (thread_sync_event);
+  master_thread_started = true;
   /* Do not touch class members after here because the class instance
      may have been destroyed. */
   fhandler_console::cons_master_thread (&handle_set, ttyp);
@@ -370,6 +372,8 @@ fhandler_console::set_unit ()
     }
   if (!created && shared_console_info)
     {
+      while (con.owner > MAX_PID)
+	Sleep (1);
       pinfo p (con.owner);
       if (!p)
 	con.owner = myself->pid;
@@ -1393,14 +1397,16 @@ fhandler_console::close ()
 
   release_output_mutex ();
 
-  if (shared_console_info && con.owner == myself->pid)
+  if (shared_console_info && con.owner == myself->pid
+      && master_thread_started)
     {
       char name[MAX_PATH];
       shared_name (name, CONS_THREAD_SYNC, get_minor ());
       thread_sync_event = OpenEvent (MAXIMUM_ALLOWED, FALSE, name);
-      con.owner = 0;
+      con.owner = MAX_PID + 1;
       WaitForSingleObject (thread_sync_event, INFINITE);
       CloseHandle (thread_sync_event);
+      con.owner = 0;
     }
 
   CloseHandle (input_mutex);
