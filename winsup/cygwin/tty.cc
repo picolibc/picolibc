@@ -327,25 +327,18 @@ tty_min::setpgid (int pid)
 	       && ttyp->pcon_input_state_eq (tty::to_nat))
 	{
 	  bool attach_restore = false;
-	  DWORD pcon_winpid = 0;
-	  if (ttyp->pcon_pid)
-	    {
-	      pinfo p (ttyp->pcon_pid);
-	      if (p)
-		pcon_winpid = p->exec_dwProcessId ?: p->dwProcessId;
-	    }
 	  HANDLE from = ptys->get_handle_nat ();
-	  if (ttyp->pcon_activated && pcon_winpid
-	      && !ptys->get_console_process_id (pcon_winpid, true))
+	  if (ttyp->pcon_activated && ttyp->pcon_pid
+	      && !ptys->get_console_process_id (ttyp->pcon_pid, true))
 	    {
 	      HANDLE pcon_owner =
-		OpenProcess (PROCESS_DUP_HANDLE, FALSE, pcon_winpid);
+		OpenProcess (PROCESS_DUP_HANDLE, FALSE, ttyp->pcon_pid);
 	      DuplicateHandle (pcon_owner, ttyp->h_pcon_in,
 			       GetCurrentProcess (), &from,
 			       0, TRUE, DUPLICATE_SAME_ACCESS);
 	      CloseHandle (pcon_owner);
 	      FreeConsole ();
-	      AttachConsole (pcon_winpid);
+	      AttachConsole (ttyp->pcon_pid);
 	      attach_restore = true;
 	    }
 	  WaitForSingleObject (ptys->input_mutex, INFINITE);

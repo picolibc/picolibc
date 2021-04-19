@@ -1072,6 +1072,24 @@ fhandler_pty_slave::set_switch_to_pcon (void)
     }
 }
 
+inline static bool
+pcon_pid_alive (DWORD pid)
+{
+  if (pid == 0)
+    return false;
+  HANDLE h = OpenProcess (SYNCHRONIZE, FALSE, pid);
+  if (h == NULL)
+    return false;
+  CloseHandle (h);
+  return true;
+}
+
+inline static bool
+pcon_pid_self (DWORD pid)
+{
+  return (pid == myself->exec_dwProcessId);
+}
+
 void
 fhandler_pty_slave::reset_switch_to_pcon (void)
 {
@@ -1153,17 +1171,8 @@ fhandler_pty_slave::reset_switch_to_pcon (void)
   if (isHybrid)
     return;
   WaitForSingleObject (pcon_mutex, INFINITE);
-  HANDLE h;
-  if (get_ttyp ()->pcon_pid > MAX_PID &&
-      (h = OpenProcess (SYNCHRONIZE, FALSE, get_ttyp ()->pcon_pid - MAX_PID)))
-    {
-      /* There is a process which is grabbing pseudo console. */
-      CloseHandle (h);
-      ReleaseMutex (pcon_mutex);
-      return;
-    }
-  if (get_ttyp ()->pcon_pid && get_ttyp ()->pcon_pid != myself->pid
-      && !!pinfo (get_ttyp ()->pcon_pid))
+  if (!pcon_pid_self (get_ttyp ()->pcon_pid)
+      && pcon_pid_alive (get_ttyp ()->pcon_pid))
     {
       /* There is a process which is grabbing pseudo console. */
       ReleaseMutex (pcon_mutex);
@@ -1975,19 +1984,15 @@ fhandler_pty_common::resize_pseudo_console (struct winsize *ws)
   COORD size;
   size.X = ws->ws_col;
   size.Y = ws->ws_row;
-  pinfo p (get_ttyp ()->pcon_pid);
-  if (p)
-    {
-      HPCON_INTERNAL hpcon_local;
-      HANDLE pcon_owner =
-	OpenProcess (PROCESS_DUP_HANDLE, FALSE, p->exec_dwProcessId);
-      DuplicateHandle (pcon_owner, get_ttyp ()->h_pcon_write_pipe,
-		       GetCurrentProcess (), &hpcon_local.hWritePipe,
-		       0, TRUE, DUPLICATE_SAME_ACCESS);
-      ResizePseudoConsole ((HPCON) &hpcon_local, size);
-      CloseHandle (pcon_owner);
-      CloseHandle (hpcon_local.hWritePipe);
-    }
+  HPCON_INTERNAL hpcon_local;
+  HANDLE pcon_owner =
+    OpenProcess (PROCESS_DUP_HANDLE, FALSE, get_ttyp ()->pcon_pid);
+  DuplicateHandle (pcon_owner, get_ttyp ()->h_pcon_write_pipe,
+		   GetCurrentProcess (), &hpcon_local.hWritePipe,
+		   0, TRUE, DUPLICATE_SAME_ACCESS);
+  ResizePseudoConsole ((HPCON) &hpcon_local, size);
+  CloseHandle (pcon_owner);
+  CloseHandle (hpcon_local.hWritePipe);
 }
 
 void
@@ -3085,9 +3090,8 @@ fhandler_pty_slave::setup_pseudoconsole (bool nopcon)
     {
       fhandler_pty_slave *ptys = (fhandler_pty_slave *) fh;
       ptys->get_ttyp ()->switch_to_pcon_in = true;
-      if (ptys->get_ttyp ()->pcon_pid == 0
-	  || !pinfo (ptys->get_ttyp ()->pcon_pid))
-	ptys->get_ttyp ()->pcon_pid = myself->pid;
+      if (!pcon_pid_alive (ptys->get_ttyp ()->pcon_pid))
+	ptys->get_ttyp ()->pcon_pid = myself->exec_dwProcessId;
     }
 
   if (nopcon)
@@ -3107,8 +3111,7 @@ fhandler_pty_slave::setup_pseudoconsole (bool nopcon)
     }
 
   HANDLE hpConIn, hpConOut;
-  if (get_ttyp ()->pcon_pid && get_ttyp ()->pcon_pid != myself->pid
-      && !!pinfo (get_ttyp ()->pcon_pid) && get_ttyp ()->pcon_activated)
+  if (get_ttyp ()->pcon_activated)
     {
       if (GetStdHandle (STD_INPUT_HANDLE) == get_handle ())
 	{ /* Send CSI6n just for requesting transfer input. */
@@ -3119,11 +3122,14 @@ fhandler_pty_slave::setup_pseudoconsole (bool nopcon)
 	  get_ttyp ()->pcon_start_pid = myself->pid;
 	  WriteFile (get_output_handle (), "\033[6n", 4, &n, NULL);
 	  ReleaseMutex (input_mutex);
+	  while (get_ttyp ()->pcon_start)
+	    Sleep (1);
 	}
       /* Attach to the pseudo console which already exits. */
-      pinfo p (get_ttyp ()->pcon_pid);
       HANDLE pcon_owner =
-	OpenProcess (PROCESS_DUP_HANDLE, FALSE, p->exec_dwProcessId);
+	OpenProcess (PROCESS_DUP_HANDLE, FALSE, get_ttyp ()->pcon_pid);
+      if (pcon_owner == NULL)
+	return false;
       DuplicateHandle (pcon_owner, get_ttyp ()->h_pcon_in,
 		       GetCurrentProcess (), &hpConIn,
 		       0, TRUE, DUPLICATE_SAME_ACCESS);
@@ -3132,7 +3138,7 @@ fhandler_pty_slave::setup_pseudoconsole (bool nopcon)
 		       0, TRUE, DUPLICATE_SAME_ACCESS);
       CloseHandle (pcon_owner);
       FreeConsole ();
-      AttachConsole (p->exec_dwProcessId);
+      AttachConsole (get_ttyp ()->pcon_pid);
       goto skip_create;
     }
 
@@ -3287,10 +3293,10 @@ skip_create:
     }
   while (false);
 
-  if (get_ttyp ()->pcon_pid == 0 || !pinfo (get_ttyp ()->pcon_pid))
-    get_ttyp ()->pcon_pid = myself->pid;
+  if (!pcon_pid_alive (get_ttyp ()->pcon_pid))
+    get_ttyp ()->pcon_pid = myself->exec_dwProcessId;
 
-  if (hpcon && get_ttyp ()->pcon_pid == myself->pid)
+  if (hpcon && pcon_pid_self (get_ttyp ()->pcon_pid))
     {
       HPCON_INTERNAL *hp = (HPCON_INTERNAL *) hpcon;
       get_ttyp ()->h_pcon_write_pipe = hp->hWritePipe;
@@ -3381,15 +3387,14 @@ fhandler_pty_slave::close_pseudoconsole (tty *ttyp, DWORD force_switch_to)
   if (force_switch_to)
     {
       switch_to_stub = force_switch_to;
-      new_pcon_pid = force_switch_to + MAX_PID;
-      ttyp->setpgid (new_pcon_pid);
+      new_pcon_pid = force_switch_to;
+      ttyp->setpgid (force_switch_to + MAX_PID);
     }
-  else if (ttyp->pcon_pid == myself->pid)
+  else if (pcon_pid_self (ttyp->pcon_pid))
     {
       /* Search another process which attaches to the pseudo console */
       DWORD current_pid = myself->exec_dwProcessId ?: myself->dwProcessId;
-      switch_to =
-	get_console_process_id (current_pid, false, true);
+      switch_to = get_console_process_id (current_pid, false, true);
       if (switch_to)
 	{
 	  pinfo p (cygwin_pid (switch_to));
@@ -3397,15 +3402,21 @@ fhandler_pty_slave::close_pseudoconsole (tty *ttyp, DWORD force_switch_to)
 	    {
 	      if (p->exec_dwProcessId)
 		switch_to_stub = p->exec_dwProcessId;
-	      new_pcon_pid = p->pid;
+	      new_pcon_pid = p->exec_dwProcessId;
 	    }
+	}
+      else
+	{
+	  switch_to = get_console_process_id (current_pid, false, false);
+	  if (switch_to)
+	    new_pcon_pid = switch_to;
 	}
     }
   if (ttyp->pcon_activated)
     {
       ttyp->previous_code_page = GetConsoleCP ();
       ttyp->previous_output_code_page = GetConsoleOutputCP ();
-      if (ttyp->pcon_pid == myself->pid)
+      if (pcon_pid_self (ttyp->pcon_pid))
 	{
 	  switch_to = switch_to_stub ?: switch_to;
 	  if (switch_to)
@@ -3447,6 +3458,15 @@ fhandler_pty_slave::close_pseudoconsole (tty *ttyp, DWORD force_switch_to)
 	      ttyp->h_pcon_conhost_process = new_conhost_process;
 	      ttyp->h_pcon_in = new_pcon_in;
 	      ttyp->h_pcon_out = new_pcon_out;
+	      FreeConsole ();
+	      pinfo p (myself->ppid);
+	      if (p)
+		{
+		  if (!AttachConsole (p->dwProcessId))
+		    AttachConsole (ATTACH_PARENT_PROCESS);
+		}
+	      else
+		AttachConsole (ATTACH_PARENT_PROCESS);
 	    }
 	  else
 	    { /* Close pseudo console */
@@ -3462,7 +3482,7 @@ fhandler_pty_slave::close_pseudoconsole (tty *ttyp, DWORD force_switch_to)
 	      /* Reconstruct pseudo console handler container here for close */
 	      HPCON_INTERNAL *hp =
 		(HPCON_INTERNAL *) HeapAlloc (GetProcessHeap (), 0,
-					      sizeof (*hp));
+					      sizeof (HPCON_INTERNAL));
 	      hp->hWritePipe = ttyp->h_pcon_write_pipe;
 	      hp->hConDrvReference = ttyp->h_pcon_condrv_reference;
 	      hp->hConHostProcess = ttyp->h_pcon_conhost_process;
@@ -3489,7 +3509,7 @@ fhandler_pty_slave::close_pseudoconsole (tty *ttyp, DWORD force_switch_to)
 	    AttachConsole (ATTACH_PARENT_PROCESS);
 	}
     }
-  else if (ttyp->pcon_pid == myself->pid)
+  else if (pcon_pid_self (ttyp->pcon_pid))
     {
       if (switch_to_stub)
 	ttyp->pcon_pid = new_pcon_pid;

@@ -113,7 +113,7 @@ private:
   bool pcon_start;
   pid_t pcon_start_pid;
   bool switch_to_pcon_in;
-  pid_t pcon_pid;
+  DWORD pcon_pid;
   UINT term_code_page;
   DWORD pcon_last_time;
   HANDLE h_pcon_write_pipe;
