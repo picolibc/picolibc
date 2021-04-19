@@ -212,6 +212,7 @@ MATH_OFILES:= \
 	fminl.o \
 	fmodl.o \
 	frexpl.o \
+	hypotl.o \
 	ilogbl.o \
 	internal_logl.o \
 	isinf.o \
