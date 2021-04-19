@@ -3179,6 +3179,32 @@ restart:
 	  status = conv_hdl.get_finfo (h, fs.is_nfs ());
 	  if (NT_SUCCESS (status))
 	    fileattr = conv_hdl.get_dosattr (fs.is_nfs ());
+
+	  /* For local paths, check if the inner path components contain
+	     native symlinks or junctions.  Compare incoming path with
+	     path returned by NtQueryInformationFile(FileNameInformation).
+	     If they differ, bail out as if the file doesn't exist.  This
+	     forces path_conv::check to backtrack inner path components. */
+	  if (!fs.is_remote_drive ())
+	    {
+	      PFILE_NAME_INFORMATION pfni = (PFILE_NAME_INFORMATION)
+					    tp.c_get ();
+
+	      if (NT_SUCCESS (NtQueryInformationFile (h, &io, pfni, NT_MAX_PATH,
+						      FileNameInformation)))
+		{
+		  UNICODE_STRING npath;
+
+		  RtlInitCountedUnicodeString (&npath, pfni->FileName,
+					      pfni->FileNameLength);
+		  if (!RtlEqualUnicodePathSuffix (&upath, &npath, !!ci_flag))
+		    {
+		      fileattr = INVALID_FILE_ATTRIBUTES;
+		      set_error (ENOENT);
+		      break;
+		    }
+		}
+	    }
 	}
       if (!NT_SUCCESS (status))
 	{
