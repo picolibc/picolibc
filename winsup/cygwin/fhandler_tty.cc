@@ -1170,6 +1170,8 @@ fhandler_pty_slave::reset_switch_to_pcon (void)
     }
   if (isHybrid)
     return;
+  if (get_ttyp ()->pcon_start)
+    return;
   WaitForSingleObject (pcon_mutex, INFINITE);
   if (!pcon_pid_self (get_ttyp ()->pcon_pid)
       && pcon_pid_alive (get_ttyp ()->pcon_pid))
