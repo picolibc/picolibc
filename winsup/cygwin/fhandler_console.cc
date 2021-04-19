@@ -308,7 +308,7 @@ fhandler_console::cons_master_thread (handle_set_t *p, tty *ttyp)
 		      /* Re-setting ENABLE_VIRTUAL_TERMINAL_PROCESSING
 			 fixes the tab position. */
 		      set_output_mode (tty::restore, &ti, p);
-		      set_input_mode (tty::cygwin, &ti, p);
+		      set_output_mode (tty::cygwin, &ti, p);
 		    }
 		  ttyp->kill_pgrp (SIGWINCH);
 		}
